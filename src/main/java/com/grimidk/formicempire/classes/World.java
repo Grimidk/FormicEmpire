@@ -6,13 +6,9 @@ package com.grimidk.formicempire.classes;
 
 import java.util.ArrayList;
 
-/**
- *
- * @author juanmendezl
- */
 public class World {
-        
-    private int minute; 
+
+    private int minute;
     private int hour;
     private int day;
     private int month;
@@ -20,7 +16,7 @@ public class World {
     private TimeOfDay timeOfDay;
     private Weather weather;
     private int temperature;
-    private int humidity; 
+    private int humidity;
     private ArrayList<Hex> hexes;
 
     public World() {
@@ -105,7 +101,7 @@ public class World {
     public void setHumidity(int humidity) {
         this.humidity = humidity;
     }
-    
+
     public ArrayList<Hex> getHexes() {
         return hexes;
     }
@@ -117,11 +113,11 @@ public class World {
     public Hex getSpawnHex() {
         return this.hexes.get(0);
     }
-    
+
     public void generateWorld() {
-    
+
     }
-    
+
     public void startWorld(Biome biome, Colony colony) {
         Hex startHex = new Hex();
         startHex.setBiome(biome);
@@ -130,56 +126,51 @@ public class World {
         this.hexes.add(startHex);
     }
 
-    public void runMinute(){
-        System.out.println("Running minute...");
-
-
+    public void runMinute() {
         this.minute++;
-        if(this.minute >= 59){
-            this.runHour();
+        if (this.minute > 59) {
             this.minute = 0;
-            this.hour++;
+            this.runHour();
         }
     }
 
-    public void runHour(){
-        System.out.println("Running hour...");
-
-        
+    public void runHour() {
         this.hour++;
-        if(this.hour >= 23){
-            this.runDay();
+        if (this.hour > 23) {
             this.hour = 0;
-            this.day++;
+            this.runDay();
+        }
+
+        try {
+            if (this.hexes != null && !this.hexes.isEmpty()) {
+                Hex spawn = this.getSpawnHex();
+                if (spawn != null && spawn.getColony() != null) {
+                    spawn.getColony().runHatching();
+                }
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 
-    public void runDay(){
-        System.out.println("Running day...");        
-
-
+    public void runDay() {
         this.day++;
-        if(this.day >= 29){
-            this.runMonth();
+        if (this.day > 29) {
             this.day = 0;
-            this.month++;
+            this.runMonth();
         }
     }
 
-    public void runMonth(){
-        System.out.println("Running month...");
-
-
+    public void runMonth() {
         this.month++;
-        if(this.month >= 11){
-            this.runYear();
+        if (this.month > 11) {
             this.month = 0;
-            this.year++;
+            this.runYear();
         }
     }
 
-    public void runYear(){  
-        System.out.println("Running year...");
+    public void runYear() {
         this.year++;
     }
+
 }

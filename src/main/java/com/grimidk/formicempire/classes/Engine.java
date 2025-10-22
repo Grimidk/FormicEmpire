@@ -5,6 +5,7 @@
 package com.grimidk.formicempire.classes;
 
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.ArrayList;
 
 /**
@@ -27,11 +28,14 @@ public class Engine extends Thread{
     private float delay;
     private final Semaphore semaphore;
     private boolean killSwitch;
+    private volatile boolean paused;
+    private final CopyOnWriteArrayList<Runnable> tickListeners = new CopyOnWriteArrayList<>();
 
     public Engine() {
         this.delay = 1000;
         this.semaphore = new Semaphore(1);
         this.killSwitch = false;
+        this.paused = false;
         this.antstatuses = new ArrayList<>();
         this.antSubTypes = new ArrayList<>();
         this.antTypes = new ArrayList<>();
@@ -142,106 +146,137 @@ public class Engine extends Thread{
     public void setKillSwitch(boolean killSwitch) {
         this.killSwitch = killSwitch;
     }
-    
-    public void loadConstants(){
-        
-        System.out.println("Loading biomes...");
-        Biome plainsBiome = new Biome(1, "Plains", 25, 2);
-        this.biomes.add(plainsBiome);
-        Biome forestBiome = new Biome(2, "Forest", 20, 3);
-        this.biomes.add(forestBiome);
-        Biome jungleBiome = new Biome(3, "Jungle", 30, 4);
-        this.biomes.add(jungleBiome);
-        Biome swampBiome = new Biome(4, "Swamp", 25, 5);
-        this.biomes.add(swampBiome);
-        Biome urbanBiome = new Biome(5, "Urban", 30, 1);
-        this.biomes.add(urbanBiome);
-        Biome tundraBiome = new Biome(6, "Tundra", 5, 2);
-        this.biomes.add(tundraBiome);
-        Biome taigaBiome = new Biome(7, "Taiga", 10, 1);
-        this.biomes.add(taigaBiome);
-        Biome dessertBiome = new Biome(8, "Dessert", 50, 0);
-        this.biomes.add(dessertBiome);
-        
-        System.out.println("Loading resources...");
-        Resource plantResource = new Resource(1, "Plant Matter", true, false);
-        this.resources.add(plantResource);
-        Resource fungiResource = new Resource(2, "Fungi Matter", true, false);
-        this.resources.add(fungiResource);
-        Resource meatResource = new Resource(3, "Animal Matter", true, false);
-        this.resources.add(meatResource);
-        Resource waterResource = new Resource(4, "Water", true, true);
-        this.resources.add(waterResource);
-        Resource syrupResource = new Resource(5, "Syrup", true, true);
-        this.resources.add(syrupResource);
-        Resource resinResource = new Resource(6, "Resin", false, true);
-        this.resources.add(resinResource);
-        Resource rockResource = new Resource(7, "Mineral", false, false);
-        this.resources.add(rockResource);
-    
-        System.out.println("Loading times...");
-        TimeOfDay dayTime = new TimeOfDay(1, "Daytime", 1);
-        this.timesOfDay.add(dayTime);
-        TimeOfDay duskTime = new TimeOfDay(2, "Dusk", 5/8);
-        this.timesOfDay.add(duskTime);
-        TimeOfDay nightTime = new TimeOfDay(3, "Nightime", 3/4);
-        this.timesOfDay.add(nightTime);
-        TimeOfDay dawnTime = new TimeOfDay(4, "Dawn", 5/8);
-        this.timesOfDay.add(dawnTime);
-        
-        System.out.println("Loading weather...");
-        Weather clearWeather = new Weather(1, "Clear", 1, 0);
-        this.weathers.add(clearWeather);
-        Weather rainWeather = new Weather(2, "Rain", 1, 1);
-        this.weathers.add(rainWeather);
-        Weather snowWeather = new Weather(3, "Snow", 1, 1);
-        this.weathers.add(snowWeather);
-        Weather heavyRainWeather = new Weather(4, "Heavy Rain", 1, 3);
-        this.weathers.add(heavyRainWeather);
-        Weather thunderWeather = new Weather(5, "Thunder Storm", 1, 2);
-        this.weathers.add(thunderWeather);
-        Weather heavySnowWeather = new Weather(6, "Snow Storm", 1, 2);
-        this.weathers.add(heavySnowWeather);
-        Weather windWeather = new Weather(7, "Heavy Wind", 1, -1);
-        this.weathers.add(windWeather);
-        Weather heatWeather = new Weather(8, "Heat Wave", 2, -2);
-        this.weathers.add(heatWeather);
-        Weather frogWeather = new Weather(9, "Frog Rain", 1, 0);
-        this.weathers.add(frogWeather);
-        
-        System.out.println("Loading status...");
-        AntStatus StatusAlive = new AntStatus(1, "Alive");
-        this.antstatuses.add(StatusAlive);
-        AntStatus StatusDead = new AntStatus(2, "Dead");
-        this.antstatuses.add(StatusDead);
-        AntStatus StatusZombified = new AntStatus(3, "Zombified");
-        this.antstatuses.add(StatusZombified);
-        
-        System.out.println("Loading ant types...");
-        AntType TypeEgg = new AntType(1, "Egg", 1, 1, 0, 1, 0, 1, 0, 0, 0, 1/4);
-        this.antTypes.add(TypeEgg);
-        AntType TypeLarva = new AntType(2, "Larva", 1, 1, 1/2, 1, 1/2, 1, 1, 1/2, 1/2, 1/2);
-        this.antTypes.add(TypeLarva);
-        AntType TypePupa = new AntType(3, "Pupa", 1, 1, 0, 1, 1, 1, 0, 1/2, 0, 1);
-        this.antTypes.add(TypePupa);
-        AntType TypeWorker = new AntType(4, "Worker", 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-        this.antTypes.add(TypeWorker);
-        AntType TypeSoldier = new AntType(5, "Soldier", 3, 2, 3, 1, 3, 2, 3, 5, 3, 2);
-        this.antTypes.add(TypeSoldier);
-        AntType TypeMajor = new AntType(6, "Major", 10, 10, 15, 5, 20, 5, 2, 50, 2, 5);
-        this.antTypes.add(TypeMajor);
-        AntType TypeDrone = new AntType(7, "Drone", 1, 1, 1, 1, 1, 1, 1, 1, 1, 2);
-        this.antTypes.add(TypeDrone);
-        AntType TypePrincess = new AntType(8, "Princess", 1, 1, 1, 1, 1, 1, 1, 1, 1, 2);
-        this.antTypes.add(TypePrincess);
-        AntType TypeQueen = new AntType(9, "Queen", 50, 50, 2, 1000, 50, 10, 1/2, 50, 1/4, 5);
-        this.antTypes.add(TypeQueen);
-        
-        System.out.println("Loading ant subtypes...");
-        System.out.println("Loading upgrades...");
-        System.out.println("Loading synergies...");
-        System.out.println("Loading bugs...");
+
+    public void pauseEngine() {
+        this.paused = true;
     }
+
+    public void resumeEngine() {
+        this.paused = false;
+    }
+
+    public boolean isPaused() {
+        return this.paused;
+    }
+
+    public void addTickListener(Runnable r) {
+        if (r != null) tickListeners.add(r);
+    }
+
+    public void removeTickListener(Runnable r) {
+        if (r != null) tickListeners.remove(r);
+    }
+    
+        // Biomes
+        public static final Biome PLAINS_BIOME = new Biome(1, "Plains", 25, 2);
+        public static final Biome FOREST_BIOME = new Biome(2, "Forest", 20, 3);
+        public static final Biome JUNGLE_BIOME = new Biome(3, "Jungle", 30, 4);
+        public static final Biome SWAMP_BIOME = new Biome(4, "Swamp", 25, 5);
+        public static final Biome URBAN_BIOME = new Biome(5, "Urban", 30, 1);
+        public static final Biome TUNDRA_BIOME = new Biome(6, "Tundra", 5, 2);
+        public static final Biome TAIGA_BIOME = new Biome(7, "Taiga", 10, 1);
+        public static final Biome DESSERT_BIOME = new Biome(8, "Dessert", 50, 0);
+
+        // Resources
+        public static final Resource PLANT_RESOURCE = new Resource(1, "Plant Matter", true, false);
+        public static final Resource FUNGI_RESOURCE = new Resource(2, "Fungi Matter", true, false);
+        public static final Resource MEAT_RESOURCE = new Resource(3, "Animal Matter", true, false);
+        public static final Resource WATER_RESOURCE = new Resource(4, "Water", true, true);
+        public static final Resource SYRUP_RESOURCE = new Resource(5, "Syrup", true, true);
+        public static final Resource RESIN_RESOURCE = new Resource(6, "Resin", false, true);
+        public static final Resource ROCK_RESOURCE = new Resource(7, "Mineral", false, false);
+
+        // Times of Day
+        public static final TimeOfDay DAY_TIME = new TimeOfDay(1, "Daytime", 1);
+        public static final TimeOfDay DUSK_TIME = new TimeOfDay(2, "Dusk", 5/8);
+        public static final TimeOfDay NIGHT_TIME = new TimeOfDay(3, "Nightime", 3/4);
+        public static final TimeOfDay DAWN_TIME = new TimeOfDay(4, "Dawn", 5/8);
+
+        // Weather
+        public static final Weather CLEAR_WEATHER = new Weather(1, "Clear", 1, 0);
+        public static final Weather RAIN_WEATHER = new Weather(2, "Rain", 1, 1);
+        public static final Weather SNOW_WEATHER = new Weather(3, "Snow", 1, 1);
+        public static final Weather HEAVY_RAIN_WEATHER = new Weather(4, "Heavy Rain", 1, 3);
+        public static final Weather THUNDER_WEATHER = new Weather(5, "Thunder Storm", 1, 2);
+        public static final Weather HEAVY_SNOW_WEATHER = new Weather(6, "Snow Storm", 1, 2);
+        public static final Weather WIND_WEATHER = new Weather(7, "Heavy Wind", 1, -1);
+        public static final Weather HEAT_WEATHER = new Weather(8, "Heat Wave", 2, -2);
+        public static final Weather FROG_WEATHER = new Weather(9, "Frog Rain", 1, 0);
+
+        // Ant Status
+        public static final AntStatus STATUS_ALIVE = new AntStatus(1, "Alive");
+        public static final AntStatus STATUS_DEAD = new AntStatus(2, "Dead");
+        public static final AntStatus STATUS_ZOMBIFIED = new AntStatus(3, "Zombified");
+
+        // Ant Types
+        public static final AntType TYPE_EGG = new AntType(1, "Egg", 1, 1, 0, 1, 0, 1, 0, 0, 0, 1/4);
+        public static final AntType TYPE_LARVA = new AntType(2, "Larva", 1, 1, 1/2, 1, 1/2, 1, 1, 1/2, 1/2, 1/2);
+        public static final AntType TYPE_PUPA = new AntType(3, "Pupa", 1, 1, 0, 1, 1, 1, 0, 1/2, 0, 1);
+        public static final AntType TYPE_WORKER = new AntType(4, "Worker", 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+        public static final AntType TYPE_SOLDIER = new AntType(5, "Soldier", 3, 2, 3, 1, 3, 2, 3, 5, 3, 2);
+        public static final AntType TYPE_MAJOR = new AntType(6, "Major", 10, 10, 15, 5, 20, 5, 2, 50, 2, 5);
+        public static final AntType TYPE_DRONE = new AntType(7, "Drone", 1, 1, 1, 1, 1, 1, 1, 1, 1, 2);
+        public static final AntType TYPE_PRINCESS = new AntType(8, "Princess", 1, 1, 1, 1, 1, 1, 1, 1, 1, 2);
+        public static final AntType TYPE_QUEEN = new AntType(9, "Queen", 50, 50, 2, 1000, 50, 10, 1/2, 50, 1/4, 5);
+
+        public void loadConstants(){
+            System.out.println("Loading biomes...");
+            this.biomes.add(PLAINS_BIOME);
+            this.biomes.add(FOREST_BIOME);
+            this.biomes.add(JUNGLE_BIOME);
+            this.biomes.add(SWAMP_BIOME);
+            this.biomes.add(URBAN_BIOME);
+            this.biomes.add(TUNDRA_BIOME);
+            this.biomes.add(TAIGA_BIOME);
+            this.biomes.add(DESSERT_BIOME);
+
+            System.out.println("Loading resources...");
+            this.resources.add(PLANT_RESOURCE);
+            this.resources.add(FUNGI_RESOURCE);
+            this.resources.add(MEAT_RESOURCE);
+            this.resources.add(WATER_RESOURCE);
+            this.resources.add(SYRUP_RESOURCE);
+            this.resources.add(RESIN_RESOURCE);
+            this.resources.add(ROCK_RESOURCE);
+
+            System.out.println("Loading times...");
+            this.timesOfDay.add(DAY_TIME);
+            this.timesOfDay.add(DUSK_TIME);
+            this.timesOfDay.add(NIGHT_TIME);
+            this.timesOfDay.add(DAWN_TIME);
+
+            System.out.println("Loading weather...");
+            this.weathers.add(CLEAR_WEATHER);
+            this.weathers.add(RAIN_WEATHER);
+            this.weathers.add(SNOW_WEATHER);
+            this.weathers.add(HEAVY_RAIN_WEATHER);
+            this.weathers.add(THUNDER_WEATHER);
+            this.weathers.add(HEAVY_SNOW_WEATHER);
+            this.weathers.add(WIND_WEATHER);
+            this.weathers.add(HEAT_WEATHER);
+            this.weathers.add(FROG_WEATHER);
+
+            System.out.println("Loading status...");
+            this.antstatuses.add(STATUS_ALIVE);
+            this.antstatuses.add(STATUS_DEAD);
+            this.antstatuses.add(STATUS_ZOMBIFIED);
+
+            System.out.println("Loading ant types...");
+            this.antTypes.add(TYPE_EGG);
+            this.antTypes.add(TYPE_LARVA);
+            this.antTypes.add(TYPE_PUPA);
+            this.antTypes.add(TYPE_WORKER);
+            this.antTypes.add(TYPE_SOLDIER);
+            this.antTypes.add(TYPE_MAJOR);
+            this.antTypes.add(TYPE_DRONE);
+            this.antTypes.add(TYPE_PRINCESS);
+            this.antTypes.add(TYPE_QUEEN);
+
+            System.out.println("Loading ant subtypes...");
+            System.out.println("Loading upgrades...");
+            System.out.println("Loading synergies...");
+            System.out.println("Loading bugs...");
+        }
     
     public void loadFile(Savefile savefile){ 
         Colony colony = new Colony(1, "Grim Colony", true);
@@ -259,21 +294,29 @@ public class Engine extends Thread{
     }
     
     @Override
-    public void start(){
+    public void run(){
         while (!killSwitch) {
             try {
                 Thread.sleep((long) delay);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            try {
-                semaphore.acquire();
-                // Critical section: update game state here
-                this.world.runMinute();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } finally {
-                semaphore.release();
+            if (!paused) {
+                try {
+                    semaphore.acquire();
+                    if (this.world != null) this.world.runMinute();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } finally {
+                    semaphore.release();
+                }
+                for (Runnable r : tickListeners) {
+                    try {
+                        r.run();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
             }
         }
     }

@@ -35,6 +35,12 @@ public class Colony {
     private Resource resins;
     private Resource minerals;
 
+    private int capacity;
+    private int researchSpeed;
+    private int growthSpeed;
+    private int layingRate;
+    private int parasiteDetection;
+
     private int baseHealth;
     private int baseHunger;
     private int baseAge;
@@ -51,6 +57,15 @@ public class Colony {
         this.id = id;
         this.name = name;
         this.isPlayer = isPlayer;
+        this.eggs = new ArrayList<>();
+        this.larvae = new ArrayList<>();
+        this.pupae = new ArrayList<>();
+        this.workers = new ArrayList<>();
+        this.soldiers = new ArrayList<>();  
+        this.majors = new ArrayList<>();
+        this.drones = new ArrayList<>();
+        this.princesses = new ArrayList<>();
+        this.queens = new ArrayList<>();
         this.baseHealth = 100;
         this.baseHunger = 100;
         this.baseAge = 180;
@@ -220,6 +235,46 @@ public class Colony {
         this.minerals = minerals;
     }
 
+    public int getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(int capacity) {
+        this.capacity = capacity;
+    }
+
+    public int getResearchSpeed() {
+        return researchSpeed;
+    }
+
+    public void setResearchSpeed(int researchSpeed) {
+        this.researchSpeed = researchSpeed;
+    }
+
+    public int getGrowthSpeed() {
+        return growthSpeed;
+    }
+
+    public void setGrowthSpeed(int growthSpeed) {
+        this.growthSpeed = growthSpeed;
+    }
+
+    public int getLayingRate() {
+        return layingRate;
+    }
+
+    public void setLayingRate(int layingRate) {
+        this.layingRate = layingRate;
+    }
+
+    public int getParasiteDetection() {
+        return parasiteDetection;
+    }
+
+    public void setParasiteDetection(int parasiteDetection) {
+        this.parasiteDetection = parasiteDetection;
+    }
+
     public int getBaseHealth() {
     return baseHealth;
     }
@@ -310,9 +365,40 @@ public class Colony {
     
     public void startColony() {
         System.out.println("Generating new colony...");
-        for (int i = 1; i <= 5; i++) {
-            // Ant ant = new Ant(this, );
+        for (int i = 1; i <= 9; i++) {
+            Ant ant = new Ant(this, Engine.TYPE_WORKER);
+            this.workers.add(ant);
+            System.out.println("Spawned worker ant");
+        }
+        Ant queen = new Ant(this, Engine.TYPE_QUEEN);
+        this.queens.add(queen);
+        System.out.println("Spawned queen ant");
+    }
+
+    public void runLaying(){
+
+    }
+
+    public void runHatching(){    
+        for (int i = 0; i < this.getQueens().size(); i++) {
+            double r = Math.random(); 
+            if (r < 0.80) {
+                Ant ant = new Ant(this, Engine.TYPE_WORKER);
+                this.workers.add(ant);
+                System.out.println("Spawned worker ant");
+            } else if (r < 0.99) {
+                Ant ant = new Ant(this, Engine.TYPE_SOLDIER);
+                this.soldiers.add(ant);
+                System.out.println("Spawned soldier ant");
+            } else {
+                Ant ant = new Ant(this, Engine.TYPE_QUEEN);
+                this.queens.add(ant);
+                System.out.println("Spawned queen ant");
+            }
         }
     }
     
+    public void runEating(){
+
+    }
 }
