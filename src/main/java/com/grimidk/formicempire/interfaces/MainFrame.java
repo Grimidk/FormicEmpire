@@ -17,6 +17,7 @@ public class MainFrame extends JFrame {
     private final JPanel cards;
     private final Engine engine;
     private final GamePanel gamePanel;
+    private final SaveSelectPanel saveSelectPanel;
 
     public MainFrame(Engine engine) {
         super("Formic Empire");
@@ -25,14 +26,14 @@ public class MainFrame extends JFrame {
         this.cards = new JPanel(cardLayout);
 
         // create panels
-        InitPanel initPanel = new InitPanel(this);
-        SaveSelectPanel saveSelectPanel = new SaveSelectPanel(this);
-        HelpPanel helpPanel = new HelpPanel(this);
-        SettingsPanel settingsPanel = new SettingsPanel(this);
-        this.gamePanel = new GamePanel(this);
+    InitPanel initPanel = new InitPanel(this);
+    this.saveSelectPanel = new SaveSelectPanel(this);
+    HelpPanel helpPanel = new HelpPanel(this);
+    SettingsPanel settingsPanel = new SettingsPanel(this);
+    this.gamePanel = new GamePanel(this);
 
-        cards.add(initPanel, CARD_INIT);
-        cards.add(saveSelectPanel, CARD_SAVE);
+    cards.add(initPanel, CARD_INIT);
+    cards.add(saveSelectPanel, CARD_SAVE);
         cards.add(helpPanel, CARD_HELP);
         cards.add(settingsPanel, CARD_SETTINGS);
         cards.add(gamePanel, CARD_GAME);
@@ -50,6 +51,12 @@ public class MainFrame extends JFrame {
     }
 
     public void showCard(String card) {
+        // If showing the save selection card, refresh slots so it reflects disk state immediately
+        if (CARD_SAVE.equals(card)) {
+            try {
+                saveSelectPanel.refreshSlots();
+            } catch (Exception ignore) {}
+        }
         cardLayout.show(cards, card);
     }
 

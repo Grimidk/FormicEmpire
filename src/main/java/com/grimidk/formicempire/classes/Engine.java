@@ -279,9 +279,26 @@ public class Engine extends Thread{
         }
     
     public void loadFile(Savefile savefile){ 
-        Colony colony = new Colony(1, "Grim Colony", true);
+        Colony colony;
+        if (savefile != null) {
+            colony = new Colony(1, "Grim Colony", true, savefile);
+        } else {
+            colony = new Colony(1, "Grim Colony", true);
+        }
+        // If we have a savefile, restore the world's time fields so the UI shows correct time
+        try {
+            if (savefile != null && this.world != null) {
+                this.world.setMinute(savefile.getMinute());
+                this.world.setHour(savefile.getHour());
+                this.world.setDay(savefile.getDay());
+                this.world.setMonth(savefile.getMonth());
+                this.world.setYear(savefile.getYear());
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
         System.out.println("Generating new world...");
-        this.world.startWorld(this.biomes.get(0), colony); 
+        this.world.startWorld(this.biomes.get(0), colony);
     }
     
     public void startUp(Savefile savefile){

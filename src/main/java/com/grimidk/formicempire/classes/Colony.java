@@ -79,6 +79,35 @@ public class Colony {
         this.baseSize = 1;
     }
 
+    /**
+     * Construct a colony initialized from a Savefile summary. This will create simple Ant
+     * instances to match the saved worker/soldier/queen counts so the game UI shows correct totals
+     * and behavior after loading.
+     */
+    public Colony(int id, String name, boolean isPlayer, Savefile save) {
+        this(id, name, isPlayer);
+        if (save == null) return;
+        try {
+            int workersCount = save.getWorkers();
+            int soldiersCount = save.getSoldiers();
+            int queensCount = save.getQueens();
+            for (int i = 0; i < workersCount; i++) {
+                Ant a = new Ant(this, Engine.TYPE_WORKER);
+                this.workers.add(a);
+            }
+            for (int i = 0; i < soldiersCount; i++) {
+                Ant a = new Ant(this, Engine.TYPE_SOLDIER);
+                this.soldiers.add(a);
+            }
+            for (int i = 0; i < queensCount; i++) {
+                Ant a = new Ant(this, Engine.TYPE_QUEEN);
+                this.queens.add(a);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
     public String getName() {
         return name;
     }

@@ -105,14 +105,48 @@ public class GamePanel extends JPanel {
             }
             updatePauseIndicator(true);
             unregisterTickListener();
-            // autosave current world to dedicated autosave file asynchronously before returning
+            // If a last slot is set, perform a user-initiated save to that slot (allowed to overwrite).
+            // This ensures backing out to the menu keeps the user's save as expected.
             try {
                 SaveManager sm = new SaveManager();
                 Engine engine = frame.getEngine();
                 if (engine != null && engine.getWorld() != null) {
-                    sm.saveAutosaveAsync(engine.getWorld(), () -> {
-                        JOptionPane.showMessageDialog(this, "Autosaved", "Autosave", JOptionPane.INFORMATION_MESSAGE);
-                    });
+                    int last = sm.getLastSlot();
+                    if (last > 0) {
+                        // if the last slot exists but has no save file, ask for a name; otherwise use existing slot name
+                        Savefile existing = sm.loadSlot(last);
+                        if (existing == null) {
+                            String name = JOptionPane.showInputDialog(this, "Enter save name for slot " + last + ":", "Name Save", JOptionPane.PLAIN_MESSAGE);
+                            if (name == null || name.trim().isEmpty()) {
+                                // user cancelled naming; fallback to autosave
+                                sm.saveAutosaveAsync(engine.getWorld(), () -> {
+                                    JOptionPane.showMessageDialog(this, "Autosaved", "Autosave", JOptionPane.INFORMATION_MESSAGE);
+                                    frame.showCard(MainFrame.CARD_SAVE);
+                                });
+                                return;
+                            }
+                            final String chosen = name.trim();
+                            sm.saveWorldToSlotUserAsync(engine.getWorld(), last, chosen, () -> {
+                                JOptionPane.showMessageDialog(this, "Saved to slot " + last, "Saved", JOptionPane.INFORMATION_MESSAGE);
+                                frame.showCard(MainFrame.CARD_SAVE);
+                            });
+                            return;
+                        } else {
+                            sm.saveWorldToLastSlotUserAsync(engine.getWorld(), () -> {
+                                JOptionPane.showMessageDialog(this, "Saved to slot " + last, "Saved", JOptionPane.INFORMATION_MESSAGE);
+                                // switch to save UI after save completes so it reflects the updated time
+                                frame.showCard(MainFrame.CARD_SAVE);
+                            });
+                            return; // will switch cards in callback
+                        }
+                    } else {
+                        // no last slot chosen: fallback to autosave so we still persist progress
+                        sm.saveAutosaveAsync(engine.getWorld(), () -> {
+                            JOptionPane.showMessageDialog(this, "Autosaved", "Autosave", JOptionPane.INFORMATION_MESSAGE);
+                            frame.showCard(MainFrame.CARD_SAVE);
+                        });
+                        return; // will switch cards in callback
+                    }
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();

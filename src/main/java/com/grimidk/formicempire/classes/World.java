@@ -122,7 +122,10 @@ public class World {
         Hex startHex = new Hex();
         startHex.setBiome(biome);
         startHex.setColony(colony);
-        colony.startColony();
+        // Only start a default colony (spawn initial ants) if the colony has no ants
+        if (colony.getAntTotal() == 0) {
+            colony.startColony();
+        }
         this.hexes.add(startHex);
     }
 

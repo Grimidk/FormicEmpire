@@ -49,7 +49,7 @@ public class SaveSelectPanel extends JPanel {
         refreshSlots();
     }
 
-    private void refreshSlots() {
+    public void refreshSlots() {
         for (int i = 0; i < 3; i++) {
             Savefile s = saveManager.loadSlot(i + 1);
             if (s == null) {
@@ -57,7 +57,9 @@ public class SaveSelectPanel extends JPanel {
                 slotButtons[i].setText("Create");
                 deleteButtons[i].setVisible(false);
             } else {
-                slotLabels[i].setText(s.getName() + " — Day " + s.getDay() + " H" + s.getHour());
+                // Show total days (including months and years) and do not show hours/minutes
+                int totalDays = s.getDay() + (s.getMonth() * 30) + (s.getYear() * 12 * 30);
+                slotLabels[i].setText(s.getName() + " — " + totalDays + " days");
                 slotButtons[i].setText("Load");
                 deleteButtons[i].setVisible(true);
             }
@@ -72,7 +74,7 @@ public class SaveSelectPanel extends JPanel {
             Savefile save = new Savefile(slotId, name.trim());
             captureGameStateIntoSave(save);
             // perform async save and show confirmation when done
-            saveManager.saveSlotAsync(save, () -> {
+            saveManager.saveUserSlotAsync(save, () -> {
                 saveManager.setLastSlot(slotId);
                 JOptionPane.showMessageDialog(this, "Save completed in slot " + slotId, "Saved", JOptionPane.INFORMATION_MESSAGE);
                 refreshSlots();
