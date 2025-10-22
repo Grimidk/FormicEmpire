@@ -1,0 +1,4 @@
+# Ignore save files and runtime data
+saves/
+.DS_Store/
+target/

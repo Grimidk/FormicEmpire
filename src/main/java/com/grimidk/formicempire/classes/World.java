@@ -159,6 +159,13 @@ public class World {
             this.day = 0;
             this.runMonth();
         }
+        // autosave to dedicated autosave file each day
+        try {
+            SaveManager sm = new SaveManager();
+            sm.saveAutosave(this);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     public void runMonth() {

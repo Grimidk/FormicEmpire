@@ -4,6 +4,7 @@ import com.grimidk.formicempire.classes.Engine;
 import com.grimidk.formicempire.classes.Savefile;
 import com.grimidk.formicempire.classes.World;
 import com.grimidk.formicempire.classes.Colony;
+import com.grimidk.formicempire.classes.SaveManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -104,6 +105,18 @@ public class GamePanel extends JPanel {
             }
             updatePauseIndicator(true);
             unregisterTickListener();
+            // autosave current world to dedicated autosave file asynchronously before returning
+            try {
+                SaveManager sm = new SaveManager();
+                Engine engine = frame.getEngine();
+                if (engine != null && engine.getWorld() != null) {
+                    sm.saveAutosaveAsync(engine.getWorld(), () -> {
+                        JOptionPane.showMessageDialog(this, "Autosaved", "Autosave", JOptionPane.INFORMATION_MESSAGE);
+                    });
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
             frame.showCard(MainFrame.CARD_SAVE);
         });
         // add speed controls on the left of the south panel
