@@ -129,5 +129,57 @@ public class World {
         colony.startColony();
         this.hexes.add(startHex);
     }
-    
+
+    public void runMinute(){
+        System.out.println("Running minute...");
+
+
+        this.minute++;
+        if(this.minute >= 59){
+            this.runHour();
+            this.minute = 0;
+            this.hour++;
+        }
+    }
+
+    public void runHour(){
+        System.out.println("Running hour...");
+
+        
+        this.hour++;
+        if(this.hour >= 23){
+            this.runDay();
+            this.hour = 0;
+            this.day++;
+        }
+    }
+
+    public void runDay(){
+        System.out.println("Running day...");        
+
+
+        this.day++;
+        if(this.day >= 29){
+            this.runMonth();
+            this.day = 0;
+            this.month++;
+        }
+    }
+
+    public void runMonth(){
+        System.out.println("Running month...");
+
+
+        this.month++;
+        if(this.month >= 11){
+            this.runYear();
+            this.month = 0;
+            this.year++;
+        }
+    }
+
+    public void runYear(){  
+        System.out.println("Running year...");
+        this.year++;
+    }
 }

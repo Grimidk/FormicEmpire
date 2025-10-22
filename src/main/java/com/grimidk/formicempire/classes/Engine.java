@@ -260,6 +260,21 @@ public class Engine extends Thread{
     
     @Override
     public void start(){
-        
+        while (!killSwitch) {
+            try {
+                Thread.sleep((long) delay);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            try {
+                semaphore.acquire();
+                // Critical section: update game state here
+                this.world.runMinute();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } finally {
+                semaphore.release();
+            }
+        }
     }
 }

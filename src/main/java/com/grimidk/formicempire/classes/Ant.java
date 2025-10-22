@@ -28,9 +28,23 @@ public class Ant {
     private float speed;
     private float size;
 
-    public Ant(AntType type, AntSubType subType) {
+    public Ant(Colony colony, AntType type) {
         this.type = type;
-        this.subType = subType;
+        this.subType = null;
+        this.maxHealth = (int)(colony.getBaseHealth() * type.getHealtMult());
+        this.health = this.maxHealth;
+        this.maxHunger = (int)(colony.getBaseHunger() * type.getHungerMult());
+        this.hunger = this.maxHunger;
+        this.maxAge = (int)(colony.getBaseAge() * type.getAgeMult());
+        this.age = 0;
+        this.tempRes = colony.getBaseTempRes();
+        this.regen = colony.getBaseRegen() * type.getRegenMult();
+        this.consumption = colony.getBaseConsumption() * type.getConsumptionMult();
+        this.attack = colony.getBaseAttack() * type.getAttackMult();
+        this.attackSpeed = colony.getBaseAttackSpeed() * type.getAttackSpeedMult();
+        this.defense = colony.getBaseDefense() * type.getDefenseMult();
+        this.speed = colony.getBaseSpeed() * type.getSpeedMult();
+        this.size = colony.getBaseSize() * type.getSizeMult();
     }
 
     public AntType getType() {
