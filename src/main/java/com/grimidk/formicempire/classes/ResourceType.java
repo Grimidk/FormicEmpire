@@ -1,22 +1,13 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.grimidk.formicempire.classes;
 
-/**
- *
- * @author juanmendezl
- */
-public class Resource {
+public class ResourceType {
     
     private int id;
     private String name;
-    private int amount;
     private boolean isEdible;
     private boolean isLiquid;
 
-    public Resource(int id, String name, boolean isEdible, boolean isLiquid) {
+    public ResourceType(int id, String name, boolean isEdible, boolean isLiquid) {
         this.id = id;
         this.name = name;
         this.isEdible = isEdible;
@@ -37,14 +28,6 @@ public class Resource {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public int getAmount() {
-        return amount;
-    }
-
-    public void setAmount(int amount) {
-        this.amount = amount;
     }
 
     public boolean isIsEdible() {

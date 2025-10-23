@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.grimidk.formicempire.classes;
 
 import java.util.ArrayList;
@@ -18,6 +14,7 @@ public class World {
     private int temperature;
     private int humidity;
     private ArrayList<Hex> hexes;
+    private int saveSlotId = 0; // 0 = no slot (ad-hoc)
 
     public World() {
         this.minute = 0;
@@ -28,6 +25,14 @@ public class World {
         this.temperature = 25;
         this.humidity = 2;
         this.hexes = new ArrayList<>();
+    }
+
+    public int getSaveSlotId() {
+        return saveSlotId;
+    }
+
+    public void setSaveSlotId(int saveSlotId) {
+        this.saveSlotId = saveSlotId;
     }
 
     public int getMinute() {
@@ -122,11 +127,20 @@ public class World {
         Hex startHex = new Hex();
         startHex.setBiome(biome);
         startHex.setColony(colony);
-        // Only start a default colony (spawn initial ants) if the colony has no ants
         if (colony.getAntTotal() == 0) {
             colony.startColony();
         }
         this.hexes.add(startHex);
+    }
+
+    public void loadWorld(Savefile savefile) {
+        this.minute = savefile.getMinute();
+        this.hour = savefile.getHour();
+        this.day = savefile.getDay();
+        this.month = savefile.getMonth();
+        this.year = savefile.getYear();  
+        Colony colony = new Colony(savefile);  
+        Hex startHex = new Hex();
     }
 
     public void runMinute() {
@@ -162,7 +176,6 @@ public class World {
             this.day = 0;
             this.runMonth();
         }
-        // autosave to dedicated autosave file each day
         try {
             SaveManager sm = new SaveManager();
             sm.saveAutosave(this);

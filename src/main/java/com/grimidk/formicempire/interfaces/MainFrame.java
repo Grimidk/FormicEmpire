@@ -51,7 +51,6 @@ public class MainFrame extends JFrame {
     }
 
     public void showCard(String card) {
-        // If showing the save selection card, refresh slots so it reflects disk state immediately
         if (CARD_SAVE.equals(card)) {
             try {
                 saveSelectPanel.refreshSlots();
@@ -61,7 +60,6 @@ public class MainFrame extends JFrame {
     }
 
     public void openGameWithSave(Savefile savefile) {
-        // show the game panel and notify it to start with the savefile
         showCard(CARD_GAME);
         gamePanel.enterWithSavefile(savefile);
     }

@@ -1,17 +1,9 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.grimidk.formicempire.classes;
 
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.ArrayList;
 
-/**
- *
- * @author juanmendezl
- */
 public class Engine extends Thread{
     
     private World world;
@@ -19,7 +11,7 @@ public class Engine extends Thread{
     private ArrayList<AntSubType> antSubTypes;
     private ArrayList<AntType> antTypes;
     private ArrayList<Biome> biomes;
-    private ArrayList<Resource> resources;
+    private ArrayList<ResourceType> resources;
     private ArrayList<Species> species;
     private ArrayList<TimeOfDay> timesOfDay;
     private ArrayList<Upgrade> upgrades;
@@ -95,11 +87,11 @@ public class Engine extends Thread{
         this.biomes = biomes;
     }
 
-    public ArrayList<Resource> getResources() {
+    public ArrayList<ResourceType> getResources() {
         return resources;
     }
 
-    public void setResources(ArrayList<Resource> resources) {
+    public void setResources(ArrayList<ResourceType> resources) {
         this.resources = resources;
     }
 
@@ -178,13 +170,13 @@ public class Engine extends Thread{
         public static final Biome DESSERT_BIOME = new Biome(8, "Dessert", 50, 0);
 
         // Resources
-        public static final Resource PLANT_RESOURCE = new Resource(1, "Plant Matter", true, false);
-        public static final Resource FUNGI_RESOURCE = new Resource(2, "Fungi Matter", true, false);
-        public static final Resource MEAT_RESOURCE = new Resource(3, "Animal Matter", true, false);
-        public static final Resource WATER_RESOURCE = new Resource(4, "Water", true, true);
-        public static final Resource SYRUP_RESOURCE = new Resource(5, "Syrup", true, true);
-        public static final Resource RESIN_RESOURCE = new Resource(6, "Resin", false, true);
-        public static final Resource ROCK_RESOURCE = new Resource(7, "Mineral", false, false);
+        public static final ResourceType PLANT_RESOURCE = new ResourceType(1, "Plant Matter", true, false);
+        public static final ResourceType FUNGI_RESOURCE = new ResourceType(2, "Fungi Matter", true, false);
+        public static final ResourceType MEAT_RESOURCE = new ResourceType(3, "Animal Matter", true, false);
+        public static final ResourceType WATER_RESOURCE = new ResourceType(4, "Water", true, true);
+        public static final ResourceType SYRUP_RESOURCE = new ResourceType(5, "Syrup", true, true);
+        public static final ResourceType RESIN_RESOURCE = new ResourceType(6, "Resin", false, true);
+        public static final ResourceType ROCK_RESOURCE = new ResourceType(7, "Mineral", false, false);
 
         // Times of Day
         public static final TimeOfDay DAY_TIME = new TimeOfDay(1, "Daytime", 1);
@@ -281,11 +273,10 @@ public class Engine extends Thread{
     public void loadFile(Savefile savefile){ 
         Colony colony;
         if (savefile != null) {
-            colony = new Colony(1, "Grim Colony", true, savefile);
+            colony = new Colony(savefile);
         } else {
             colony = new Colony(1, "Grim Colony", true);
         }
-        // If we have a savefile, restore the world's time fields so the UI shows correct time
         try {
             if (savefile != null && this.world != null) {
                 this.world.setMinute(savefile.getMinute());
@@ -308,6 +299,12 @@ public class Engine extends Thread{
         this.setWorld(world);
         this.loadConstants();
         this.loadFile(savefile);
+        // If starting from a savefile, record its slot id in the world so autosaves are per-slot
+        try {
+            if (savefile != null && this.world != null) {
+                this.world.setSaveSlotId(savefile.getId());
+            }
+        } catch (Exception ignore) {}
     }
     
     @Override

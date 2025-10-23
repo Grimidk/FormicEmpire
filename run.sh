@@ -32,15 +32,22 @@ if [[ ! -f "$PROJECT_ROOT/pom.xml" ]]; then
   exit 2
 fi
 
-# Check for mvn
-if ! command -v mvn >/dev/null 2>&1; then
-  echo "Error: mvn (Maven) not found in PATH. Please install Maven." >&2
+echo "Building project at $PROJECT_ROOT..."
+# Prefer a project-local Maven wrapper if present
+MVN_CMD=""
+if [[ -x "$PROJECT_ROOT/mvnw" ]]; then
+  MVN_CMD="$PROJECT_ROOT/mvnw"
+elif command -v mvn >/dev/null 2>&1; then
+  MVN_CMD="mvn"
+else
+  echo "Error: neither ./mvnw nor mvn (Maven) were found. Please install Maven or add a Maven wrapper to the project." >&2
+  echo "On macOS you can install Maven with Homebrew: brew install maven" >&2
   exit 3
 fi
 
 # Build (clean and package) — uses shade plugin from pom to create an executable jar
-echo "Building project at $PROJECT_ROOT..."
-( cd "$PROJECT_ROOT" && mvn clean package )
+echo "Building project at $PROJECT_ROOT using: $MVN_CMD"
+( cd "$PROJECT_ROOT" && "$MVN_CMD" clean package )
 
 # Find the shaded jar in target/
 JAR_FILE=$(find "$PROJECT_ROOT/target" -maxdepth 1 -type f -name "*jar" -print | head -n 1 || true)

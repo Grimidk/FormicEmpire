@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.grimidk.formicempire.classes;
 
 import java.io.Serializable;
@@ -12,6 +8,8 @@ public class Savefile implements Serializable {
 
     private final int id;
     private final String name;
+    private int colonyId;
+    private String colonyName;
     private float progress;
     private int playTime;
     private int minute;
@@ -35,6 +33,21 @@ public class Savefile implements Serializable {
 
     public String getName() {
         return name;
+    }
+     public int getColonyId() {
+        return colonyId;
+    }
+
+    public void setColonyId(int colonyId) {
+        this.colonyId = colonyId;
+    }
+
+    public String getColonyName() {
+        return colonyName;
+    }
+
+    public void setColonyName(String colonyName) {
+        this.colonyName = colonyName;
     }
 
     public float getProgress() {

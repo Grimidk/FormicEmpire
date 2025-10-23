@@ -2,10 +2,6 @@ package com.grimidk.formicempire.classes;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -14,7 +10,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.nio.file.StandardOpenOption;
 
 public class SaveManager {
 
@@ -26,161 +21,33 @@ public class SaveManager {
         if (!savesDir.exists()) {
             savesDir.mkdirs();
         }
-        // ensure trash folder exists for safe deletes
-        File trash = new File(savesDir, "trash");
-        if (!trash.exists()) trash.mkdirs();
+        // Legacy/trash migration and cleanup removed per request.
     }
 
-    private File lastSlotFile() {
-        return new File(savesDir, "lastslot.txt");
-    }
-
-    public int getLastSlot() {
-        File f = lastSlotFile();
-        if (!f.exists()) return 0;
-        try (BufferedReader r = new BufferedReader(new FileReader(f, StandardCharsets.UTF_8))) {
-            String line = r.readLine();
-            if (line == null) return 0;
-            return Integer.parseInt(line.trim());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return 0;
-        }
-    }
-
-    public void setLastSlot(int slot) {
-        File f = lastSlotFile();
-        try (BufferedWriter w = new BufferedWriter(new FileWriter(f, StandardCharsets.UTF_8))) {
-            w.write(Integer.toString(slot));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    // Internal helper that performs the actual slot save. If allowOverwrite is false, this method will
-    // refuse to overwrite any existing non-empty slot file (even if incoming save is newer) to be extra-safe.
-    private void doSaveSlot(Savefile save, boolean allowOverwrite) throws IOException {
-        File f = new File(savesDir, "slot" + save.getId() + ".json");
-        File tmp = new File(savesDir, "slot" + save.getId() + ".json.tmp");
-        if (save.getPlayTime() == 0) {
-            int computed = computePlayTimeFromSave(save);
-            save.setPlayTime(computed);
-        }
-        // If there is an existing non-empty slot file, attempt to read it and ensure we don't overwrite a
-        // more-played save. If allowOverwrite is false, we refuse to overwrite non-empty files regardless.
-        if (f.exists() && f.length() > 0) {
-            try (java.io.BufferedReader r = java.nio.file.Files.newBufferedReader(f.toPath(), StandardCharsets.UTF_8)) {
-                Savefile existing = readSaveFromReader(r);
-                if (existing != null) {
-                    int existingPlay = existing.getPlayTime() != 0 ? existing.getPlayTime() : computePlayTimeFromSave(existing);
-                    if (!allowOverwrite) {
-                        System.out.println("[SaveManager] Refusing to overwrite slot " + save.getId() + " because allowOverwrite=false");
-                        return; // skip save
-                    }
-                    if (existingPlay > save.getPlayTime()) {
-                        System.out.println("[SaveManager] Not overwriting slot " + save.getId() + " because existing save is newer (" + existingPlay + " > " + save.getPlayTime() + ")");
-                        return; // skip save
-                    }
-                } else {
-                    // couldn't parse existing save but file is non-empty; do not overwrite to be safe
-                    System.out.println("[SaveManager] Existing slot " + save.getId() + " is non-empty but unreadable; skipping overwrite to avoid data loss");
-                    return;
-                }
-            } catch (Exception readEx) {
-                // If we can't read the existing file for any reason, skip overwrite to avoid data loss
-                System.out.println("[SaveManager] Error reading existing slot " + save.getId() + " - skipping overwrite");
-                readEx.printStackTrace();
-                return;
-            }
-        }
-        // check for recent trash entries: if the slot was just deleted, refuse to overwrite for safety
-        // However, user-initiated saves (allowOverwrite==true) should be able to recreate a slot immediately
-        try {
-            if (!allowOverwrite) {
-                File trashDir = new File(savesDir, "trash");
-                if (trashDir.exists() && trashDir.isDirectory()) {
-                    File[] files = trashDir.listFiles((d, name) -> name.startsWith("slot" + save.getId() + ".json.deleted."));
-                    if (files != null && files.length > 0) {
-                        long now = System.currentTimeMillis();
-                        for (File tf : files) {
-                            String[] parts = tf.getName().split("\\.");
-                            try {
-                                long ts = Long.parseLong(parts[parts.length-1]);
-                                // if deleted within last 5 minutes, refuse overwrite
-                                if (now - ts < 5L * 60L * 1000L) {
-                                    System.out.println("[SaveManager] Recent deletion found for slot " + save.getId() + " (" + tf.getName() + ") - refusing overwrite");
-                                    return;
-                                }
-                            } catch (Exception ignore) {}
-                        }
-                    }
-                }
-            } else {
-                // allowOverwrite==true -> user-initiated save: skip recent-deletion guard
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        // write using simple key=value format to avoid external JSON deps
-        try (java.io.BufferedWriter bw = java.nio.file.Files.newBufferedWriter(tmp.toPath(), StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {
+    private void writeManualSave(Savefile save) throws IOException {
+        File f = new File(savesDir, "slot" + save.getId() + ".manual.json");
+        File tmp = new File(savesDir, "slot" + save.getId() + ".manual.json.tmp");
+        if (save.getPlayTime() == 0) save.setPlayTime(computePlayTimeFromSave(save));
+        try (java.io.BufferedWriter bw = java.nio.file.Files.newBufferedWriter(tmp.toPath(), StandardCharsets.UTF_8, java.nio.file.StandardOpenOption.CREATE, java.nio.file.StandardOpenOption.TRUNCATE_EXISTING)) {
             writeSaveToWriter(save, bw);
             bw.flush();
         }
         try {
-            // if target exists and is non-empty, back it up first
-            if (f.exists() && f.length() > 0) {
-                String bakName = "slot" + save.getId() + ".json.bak." + System.currentTimeMillis();
-                File bak = new File(savesDir, bakName);
-                java.nio.file.Files.move(f.toPath(), bak.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-                System.out.println("[SaveManager] Backed up existing slot " + save.getId() + " to " + bak.getName());
-            }
             java.nio.file.Files.move(tmp.toPath(), f.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING, java.nio.file.StandardCopyOption.ATOMIC_MOVE);
         } catch (java.nio.file.AtomicMoveNotSupportedException amnse) {
             java.nio.file.Files.move(tmp.toPath(), f.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
         }
-        System.out.println("[SaveManager] Saved slot " + save.getId() + " to " + f.getAbsolutePath());
-    }
-
-    // Public API for user-initiated saves: these are allowed to overwrite existing slot files when appropriate.
-    public void saveUserSlot(Savefile save) throws IOException {
-        doSaveSlot(save, true);
-    }
-
-    public void saveUserSlotAsync(Savefile save, Runnable onComplete) {
-        executor.submit(() -> {
-            try {
-                doSaveSlot(save, true);
-                if (onComplete != null) SwingUtilities.invokeLater(onComplete);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-    }
-
-    public boolean deleteSlot(int slotId) {
-        File f = new File(savesDir, "slot" + slotId + ".json");
-        if (f.exists()) {
-            try {
-                File trashDir = new File(savesDir, "trash");
-                if (!trashDir.exists()) trashDir.mkdirs();
-                String name = "slot" + slotId + ".json.deleted." + System.currentTimeMillis();
-                File dest = new File(trashDir, name);
-                java.nio.file.Files.move(f.toPath(), dest.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-                System.out.println("[SaveManager] Moved slot " + slotId + " to trash: " + dest.getAbsolutePath());
-                return true;
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                System.out.println("[SaveManager] Failed to move slot " + slotId + " to trash");
-                return false;
-            }
-        }
-        return false;
+        System.out.println("[SaveManager] Wrote manual save for slot " + save.getId() + " -> " + f.getName());
     }
 
     public void saveAutosave(World w) {
         if (w == null) return;
-    File f = new File(savesDir, "autosave.json");
-        Savefile save = new Savefile(0, "autosave");
+        int slotId = 0;
+        try { slotId = w.getSaveSlotId(); } catch (Exception ignore) { slotId = 0; }
+        File f;
+        if (slotId > 0) f = new File(savesDir, "slot" + slotId + ".autosave.json");
+        else f = new File(savesDir, "autosave.json");
+        Savefile save = new Savefile(slotId, "autosave");
         save.setMinute(w.getMinute());
         save.setHour(w.getHour());
         save.setDay(w.getDay());
@@ -197,12 +64,25 @@ public class SaveManager {
                     save.setSoldiers(c.getSoldiers() != null ? c.getSoldiers().size() : 0);
                     save.setQueens(c.getQueens() != null ? c.getQueens().size() : 0);
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            } catch (Exception e) { e.printStackTrace(); }
         }
-        File tmp = new File(savesDir, "autosave.json.tmp");
-        try (java.io.BufferedWriter bw = java.nio.file.Files.newBufferedWriter(tmp.toPath(), StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {
+        File tmp = new File(f.getAbsolutePath() + ".tmp");
+        try {
+            File manual = slotId > 0 ? new File(savesDir, "slot" + slotId + ".manual.json") : null;
+            if (manual != null && manual.exists()) {
+                try (java.io.BufferedReader r = java.nio.file.Files.newBufferedReader(manual.toPath(), StandardCharsets.UTF_8)) {
+                    Savefile existing = readSaveFromReader(r);
+                    if (existing != null) {
+                        int existingPlay = existing.getPlayTime() != 0 ? existing.getPlayTime() : computePlayTimeFromSave(existing);
+                        if (existingPlay > save.getPlayTime()) {
+                            System.out.println("[SaveManager] Manual save for slot " + slotId + " is newer than autosave - skipping autosave");
+                            return;
+                        }
+                    }
+                } catch (Exception ignore) {}
+            }
+        } catch (Exception ex) { ex.printStackTrace(); }
+        try (java.io.BufferedWriter bw = java.nio.file.Files.newBufferedWriter(tmp.toPath(), StandardCharsets.UTF_8, java.nio.file.StandardOpenOption.CREATE, java.nio.file.StandardOpenOption.TRUNCATE_EXISTING)) {
             writeSaveToWriter(save, bw);
             bw.flush();
             try {
@@ -215,25 +95,33 @@ public class SaveManager {
             ex.printStackTrace();
             try { if (tmp.exists()) tmp.delete(); } catch (Exception ignore) {}
         }
-        // Note: we intentionally do NOT copy the autosave into the player's last-used slot automatically
-        // to avoid accidentally overwriting a manual save with an autosave. The autosave remains in
-        // 'autosave.json' and can be restored manually by the player from the save UI if desired.
     }
 
-    public Savefile loadSlot(int slotId) {
-        File f = new File(savesDir, "slot" + slotId + ".json");
-        if (!f.exists()) return null;
-        if (f.length() == 0) {
-            System.out.println("[SaveManager] Found empty save file for slot " + slotId + " - ignoring");
-            return null;
+    public void saveUserSlot(Savefile save) throws IOException {
+        writeManualSave(save);
+    }
+
+    public void saveUserSlotAsync(Savefile save, Runnable onComplete) {
+        executor.submit(() -> {
+            try {
+                writeManualSave(save);
+                if (onComplete != null) SwingUtilities.invokeLater(onComplete);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    public boolean deleteSlot(int slotId) {
+        boolean removed = false;
+        String[] names = new String[] {"slot" + slotId + ".manual.json", "slot" + slotId + ".autosave.json", "slot" + slotId + ".json"};
+        for (String n : names) {
+            File f = new File(savesDir, n);
+            if (f.exists()) {
+                try { f.delete(); removed = true; } catch (Exception ex) { ex.printStackTrace(); }
+            }
         }
-        try (java.io.BufferedReader r = java.nio.file.Files.newBufferedReader(f.toPath(), StandardCharsets.UTF_8)) {
-            Savefile s = readSaveFromReader(r);
-            return s;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+        return removed;
     }
 
     public void saveWorldToSlot(World w, int slotId) {
@@ -258,18 +146,64 @@ public class SaveManager {
                 e.printStackTrace();
             }
         }
+        File f = slotId > 0 ? new File(savesDir, "slot" + slotId + ".autosave.json") : new File(savesDir, "autosave.json");
+        File tmp = new File(f.getAbsolutePath() + ".tmp");
         try {
-            // programmatic world->slot saves should not overwrite existing user saves unless explicitly allowed
-            doSaveSlot(save, false);
+            if (slotId > 0) {
+                File manual = new File(savesDir, "slot" + slotId + ".manual.json");
+                if (manual.exists()) {
+                    try (java.io.BufferedReader r = java.nio.file.Files.newBufferedReader(manual.toPath(), StandardCharsets.UTF_8)) {
+                        Savefile existing = readSaveFromReader(r);
+                        if (existing != null) {
+                            int existingPlay = existing.getPlayTime() != 0 ? existing.getPlayTime() : computePlayTimeFromSave(existing);
+                            if (existingPlay > save.getPlayTime()) {
+                                System.out.println("[SaveManager] Manual save for slot " + slotId + " is newer than autosave - skipping autosave");
+                                return;
+                            }
+                        }
+                    } catch (Exception ignore) {}
+                }
+            }
+        } catch (Exception ex) { ex.printStackTrace(); }
+        try (java.io.BufferedWriter bw = java.nio.file.Files.newBufferedWriter(tmp.toPath(), StandardCharsets.UTF_8, java.nio.file.StandardOpenOption.CREATE, java.nio.file.StandardOpenOption.TRUNCATE_EXISTING)) {
+            writeSaveToWriter(save, bw);
+            bw.flush();
+            try {
+                java.nio.file.Files.move(tmp.toPath(), f.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING, java.nio.file.StandardCopyOption.ATOMIC_MOVE);
+            } catch (java.nio.file.AtomicMoveNotSupportedException amnse) {
+                java.nio.file.Files.move(tmp.toPath(), f.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            }
+            System.out.println("[SaveManager] Autosaved world to " + f.getAbsolutePath() + " (Day " + save.getDay() + " H" + save.getHour() + ")");
         } catch (IOException ex) {
             ex.printStackTrace();
+            try { if (tmp.exists()) tmp.delete(); } catch (Exception ignore) {}
         }
     }
 
-    // User-initiated world->slot save: allow overwriting existing slot (creates backup)
+    public Savefile loadSlot(int slotId) {
+        File manual = new File(savesDir, "slot" + slotId + ".manual.json");
+        File autos = new File(savesDir, "slot" + slotId + ".autosave.json");
+        File legacy = new File(savesDir, "slot" + slotId + ".json");
+        File f = null;
+        if (manual.exists()) f = manual;
+        else if (autos.exists()) f = autos;
+        else if (legacy.exists()) f = legacy;
+        if (f == null) return null;
+        if (f.length() == 0) {
+            System.out.println("[SaveManager] Found empty save file for slot " + slotId + " - ignoring");
+            return null;
+        }
+        try (java.io.BufferedReader r = java.nio.file.Files.newBufferedReader(f.toPath(), StandardCharsets.UTF_8)) {
+            Savefile s = readSaveFromReader(r);
+            return s;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public void saveWorldToSlotUser(World w, int slotId) throws IOException {
         if (w == null) return;
-        // Preserve existing slot name if present, otherwise use a default name
         String slotName = "Save " + slotId;
         try {
             Savefile existing = loadSlot(slotId);
@@ -297,7 +231,7 @@ public class SaveManager {
                 e.printStackTrace();
             }
         }
-        doSaveSlot(save, true);
+        writeManualSave(save);
     }
 
     public void saveWorldToSlotUserAsync(World w, int slotId, Runnable onComplete) {
@@ -311,7 +245,6 @@ public class SaveManager {
         });
     }
 
-    // Save with an explicit name (useful when creating a new slot with user-provided name)
     public void saveWorldToSlotUserAsync(World w, int slotId, String name, Runnable onComplete) {
         executor.submit(() -> {
             try {
@@ -337,21 +270,12 @@ public class SaveManager {
                         }
                     } catch (Exception e) { e.printStackTrace(); }
                 }
-                doSaveSlot(save, true);
+                writeManualSave(save);
                 if (onComplete != null) SwingUtilities.invokeLater(onComplete);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
-    }
-
-    public void saveWorldToLastSlotUserAsync(World w, Runnable onComplete) {
-        int last = getLastSlot();
-        if (last <= 0) {
-            if (onComplete != null) SwingUtilities.invokeLater(onComplete);
-            return;
-        }
-        saveWorldToSlotUserAsync(w, last, onComplete);
     }
 
     private int computePlayTime(World w) {
@@ -366,12 +290,6 @@ public class SaveManager {
         int days = s.getDay() + (s.getMonth() * 30) + (s.getYear() * 12 * 30);
         int totalMinutes = days * 24 * 60 + s.getHour() * 60 + s.getMinute();
         return totalMinutes;
-    }
-
-    public void saveWorldToLastSlot(World w) {
-        int last = getLastSlot();
-        if (last <= 0) return;
-        saveWorldToSlot(w, last);
     }
 
     public void saveSlotAsync(Savefile save, Runnable onComplete) {
@@ -392,7 +310,6 @@ public class SaveManager {
         });
     }
 
-    // Simple serializer: key=value per line, URL-encoded values to be safe
     private void writeSaveToWriter(Savefile s, java.io.BufferedWriter w) throws IOException {
         Map<String, String> m = new HashMap<>();
         m.put("id", Integer.toString(s.getId()));

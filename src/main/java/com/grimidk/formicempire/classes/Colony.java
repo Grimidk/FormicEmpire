@@ -1,18 +1,9 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.grimidk.formicempire.classes;
 
 import java.util.ArrayList;
 
-/**
- *
- * @author juanmendezl
- */
 public class Colony {
     
-    @SuppressWarnings("unused")
     private final int id;
     private String name;
     private Species species;
@@ -27,15 +18,24 @@ public class Colony {
     private ArrayList<Ant> princesses;
     private ArrayList<Ant> queens;
 
-    private Resource plants;
-    private Resource mushrooms;
-    private Resource protein;
-    private Resource water;
-    private Resource syrups;
-    private Resource resins;
-    private Resource minerals;
+    private int plants;
+    private int plantsCapacity;
+    private int mushrooms;
+    private int mushroomsCapacity;
+    private int protein;
+    private int proteinCapacity;
+    private int water;
+    private int waterCapacity; 
+    private int syrups;
+    private int syrupsCapacity;
+    private int resins;
+    private int resinsCapacity;
+    private int minerals;
+    private int mineralsCapacity;
 
-    private int capacity;
+    private int eggsCapacity;
+    private int queensCapacity;
+
     private int researchSpeed;
     private int growthSpeed;
     private int layingRate;
@@ -79,18 +79,24 @@ public class Colony {
         this.baseSize = 1;
     }
 
-    /**
-     * Construct a colony initialized from a Savefile summary. This will create simple Ant
-     * instances to match the saved worker/soldier/queen counts so the game UI shows correct totals
-     * and behavior after loading.
-     */
-    public Colony(int id, String name, boolean isPlayer, Savefile save) {
-        this(id, name, isPlayer);
-        if (save == null) return;
+    public Colony(Savefile savefile) {
+        this.id = savefile.getColonyId();
+        this.name = savefile.getColonyName();
+        this.isPlayer = true;
+        this.eggs = new ArrayList<>();
+        this.larvae = new ArrayList<>();
+        this.pupae = new ArrayList<>();
+        this.workers = new ArrayList<>();
+        this.soldiers = new ArrayList<>();  
+        this.majors = new ArrayList<>();
+        this.drones = new ArrayList<>();
+        this.princesses = new ArrayList<>();
+        this.queens = new ArrayList<>();
+
         try {
-            int workersCount = save.getWorkers();
-            int soldiersCount = save.getSoldiers();
-            int queensCount = save.getQueens();
+            int workersCount = savefile.getWorkers();
+            int soldiersCount = savefile.getSoldiers();
+            int queensCount = savefile.getQueens();
             for (int i = 0; i < workersCount; i++) {
                 Ant a = new Ant(this, Engine.TYPE_WORKER);
                 this.workers.add(a);
@@ -106,6 +112,22 @@ public class Colony {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+
+        this.baseHealth = 100;
+        this.baseHunger = 100;
+        this.baseAge = 180;
+        this.baseTempRes = 25;
+        this.baseRegen = 1;
+        this.baseConsumption = 1;
+        this.baseAttack = 10;
+        this.baseAttackSpeed = 1;
+        this.baseDefense = 5;
+        this.baseSpeed = 1;
+        this.baseSize = 1;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public String getName() {
@@ -208,68 +230,132 @@ public class Colony {
         return eggs.size() + larvae.size() + pupae.size() + workers.size() + soldiers.size() + majors.size() + drones.size() + princesses.size() + queens.size();
     }
 
-    public Resource getPlants() {
+    public int getPlants() {
         return plants;
     }
 
-    public void setPlants(Resource plants) {
+    public void setPlants(int plants) {
         this.plants = plants;
     }
 
-    public Resource getMushrooms() {
+    public int getPlantsCapacity() {
+        return plantsCapacity;
+    }
+
+    public void setPlantsCapacity(int plantsCapacity) {
+        this.plantsCapacity = plantsCapacity;
+    }
+
+    public int getMushrooms() {
         return mushrooms;
     }
 
-    public void setMushrooms(Resource mushrooms) {
+    public void setMushrooms(int mushrooms) {
         this.mushrooms = mushrooms;
     }
 
-    public Resource getProtein() {
+    public int getMushroomsCapacity() {
+        return mushroomsCapacity;
+    }
+
+    public void setMushroomsCapacity(int mushroomsCapacity) {
+        this.mushroomsCapacity = mushroomsCapacity;
+    }
+
+    public int getProtein() {
         return protein;
     }
 
-    public void setProtein(Resource protein) {
+    public void setProtein(int protein) {
         this.protein = protein;
     }
 
-    public Resource getWater() {
+    public int getProteinCapacity() {
+        return proteinCapacity;
+    }
+
+    public void setProteinCapacity(int proteinCapacity) {
+        this.proteinCapacity = proteinCapacity;
+    }
+
+    public int getWater() {
         return water;
     }
 
-    public void setWater(Resource water) {
+    public void setWater(int water) {
         this.water = water;
     }
 
-    public Resource getSyrups() {
+    public int getWaterCapacity() {
+        return waterCapacity;
+    }
+
+    public void setWaterCapacity(int waterCapacity) {
+        this.waterCapacity = waterCapacity;
+    }
+
+    public int getSyrups() {
         return syrups;
     }
 
-    public void setSyrups(Resource syrups) {
+    public void setSyrups(int syrups) {
         this.syrups = syrups;
     }
 
-    public Resource getResins() {
+    public int getSyrupsCapacity() {
+        return syrupsCapacity;
+    }
+
+    public void setSyrupsCapacity(int syrupsCapacity) {
+        this.syrupsCapacity = syrupsCapacity;
+    }
+
+    public int getResins() {
         return resins;
     }
 
-    public void setResins(Resource resins) {
+    public void setResins(int resins) {
         this.resins = resins;
     }
 
-    public Resource getMinerals() {
+    public int getResinsCapacity() {
+        return resinsCapacity;
+    }
+
+    public void setResinsCapacity(int resinsCapacity) {
+        this.resinsCapacity = resinsCapacity;
+    }
+
+    public int getMinerals() {
         return minerals;
     }
 
-    public void setMinerals(Resource minerals) {
+    public void setMinerals(int minerals) {
         this.minerals = minerals;
     }
 
-    public int getCapacity() {
-        return capacity;
+    public int getMineralsCapacity() {
+        return mineralsCapacity;
     }
 
-    public void setCapacity(int capacity) {
-        this.capacity = capacity;
+    public void setMineralsCapacity(int mineralsCapacity) {
+        this.mineralsCapacity = mineralsCapacity;
+    }
+
+    public int getEggsCapacity() {
+        return eggsCapacity;
+    }
+
+    public void setEggsCapacity(int eggsCapacity) {
+        this.eggsCapacity = eggsCapacity;
+    }
+
+    public int getQueensCapacity() {
+        return queensCapacity;
+    }
+
+    public void setQueensCapacity(int queensCapacity) {
+        this.queensCapacity = queensCapacity;
     }
 
     public int getResearchSpeed() {
@@ -402,6 +488,10 @@ public class Colony {
         Ant queen = new Ant(this, Engine.TYPE_QUEEN);
         this.queens.add(queen);
         System.out.println("Spawned queen ant");
+    }
+
+    public void loadColony(Savefile savefile){
+        
     }
 
     public void runLaying(){
