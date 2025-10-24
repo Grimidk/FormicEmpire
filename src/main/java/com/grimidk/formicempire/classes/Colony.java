@@ -120,7 +120,7 @@ public class Colony {
         int soldiersCount = savefile.getSoldiers();
         int queensCount = savefile.getQueens();
 
-        for (int i = 0; i < workersCount; i++) {
+        for (int i = 0; i < eggCount; i++) {
             Ant a = new Ant(this, Engine.TYPE_EGG);
             this.eggs.add(a);
         }
