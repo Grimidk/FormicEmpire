@@ -21,7 +21,6 @@ public class SaveManager {
         if (!savesDir.exists()) {
             savesDir.mkdirs();
         }
-        // Legacy/trash migration and cleanup removed per request.
     }
 
     private void writeManualSave(Savefile save) throws IOException {
@@ -60,9 +59,12 @@ public class SaveManager {
                 Colony c = w.getSpawnHex().getColony();
                 if (c != null) {
                     save.setTotalAnts(c.getAntTotal());
+                    save.setEggs(c.getEggs() != null ? c.getEggs().size() : 0);
                     save.setWorkers(c.getWorkers() != null ? c.getWorkers().size() : 0);
                     save.setSoldiers(c.getSoldiers() != null ? c.getSoldiers().size() : 0);
                     save.setQueens(c.getQueens() != null ? c.getQueens().size() : 0);
+                    save.setMushrooms(c.getMushrooms());
+                    save.setMushroomsCapacity(c.getMushroomsCapacity());
                 }
             } catch (Exception e) { e.printStackTrace(); }
         }
@@ -138,9 +140,12 @@ public class SaveManager {
                 Colony c = w.getSpawnHex().getColony();
                 if (c != null) {
                     save.setTotalAnts(c.getAntTotal());
+                    save.setEggs(c.getEggs() != null ? c.getEggs().size() : 0);
                     save.setWorkers(c.getWorkers() != null ? c.getWorkers().size() : 0);
                     save.setSoldiers(c.getSoldiers() != null ? c.getSoldiers().size() : 0);
                     save.setQueens(c.getQueens() != null ? c.getQueens().size() : 0);
+                    save.setMushrooms(c.getMushrooms());
+                    save.setMushroomsCapacity(c.getMushroomsCapacity());
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -223,9 +228,12 @@ public class SaveManager {
                 Colony c = w.getSpawnHex().getColony();
                 if (c != null) {
                     save.setTotalAnts(c.getAntTotal());
+                    save.setEggs(c.getEggs() != null ? c.getEggs().size() : 0);
                     save.setWorkers(c.getWorkers() != null ? c.getWorkers().size() : 0);
                     save.setSoldiers(c.getSoldiers() != null ? c.getSoldiers().size() : 0);
                     save.setQueens(c.getQueens() != null ? c.getQueens().size() : 0);
+                    save.setMushrooms(c.getMushrooms());
+                    save.setMushroomsCapacity(c.getMushroomsCapacity());    
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -264,9 +272,12 @@ public class SaveManager {
                         Colony c = w.getSpawnHex().getColony();
                         if (c != null) {
                             save.setTotalAnts(c.getAntTotal());
+                            save.setEggs(c.getEggs() != null ? c.getEggs().size() : 0);
                             save.setWorkers(c.getWorkers() != null ? c.getWorkers().size() : 0);
                             save.setSoldiers(c.getSoldiers() != null ? c.getSoldiers().size() : 0);
                             save.setQueens(c.getQueens() != null ? c.getQueens().size() : 0);
+                            save.setMushrooms(c.getMushrooms());
+                            save.setMushroomsCapacity(c.getMushroomsCapacity());  
                         }
                     } catch (Exception e) { e.printStackTrace(); }
                 }
@@ -322,9 +333,12 @@ public class SaveManager {
         m.put("month", Integer.toString(s.getMonth()));
         m.put("year", Integer.toString(s.getYear()));
         m.put("totalAnts", Integer.toString(s.getTotalAnts()));
+        m.put("eggs", Integer.toString(s.getEggs()));
         m.put("workers", Integer.toString(s.getWorkers()));
         m.put("soldiers", Integer.toString(s.getSoldiers()));
         m.put("queens", Integer.toString(s.getQueens()));
+        m.put("mushrooms", Integer.toString(s.getMushrooms()));
+        m.put("mushroomsCapacity", Integer.toString(s.getMushroomsCapacity()));
         for (Map.Entry<String,String> e : m.entrySet()) {
             w.write(e.getKey());
             w.write('=');
@@ -357,9 +371,12 @@ public class SaveManager {
             s.setMonth(Integer.parseInt(m.getOrDefault("month", "0")));
             s.setYear(Integer.parseInt(m.getOrDefault("year", "0")));
             s.setTotalAnts(Integer.parseInt(m.getOrDefault("totalAnts", "0")));
+            s.setEggs(Integer.parseInt(m.getOrDefault("eggs", "0")));
             s.setWorkers(Integer.parseInt(m.getOrDefault("workers", "0")));
             s.setSoldiers(Integer.parseInt(m.getOrDefault("soldiers", "0")));
             s.setQueens(Integer.parseInt(m.getOrDefault("queens", "0")));
+            s.setMushrooms(Integer.parseInt(m.getOrDefault("mushrooms", "0")));
+            s.setMushroomsCapacity(Integer.parseInt(m.getOrDefault("mushroomsCapacity", "0")));
         }
         return s;
     }

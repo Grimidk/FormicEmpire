@@ -16,6 +16,8 @@ public class GamePanel extends JPanel {
     private final JLabel queensLabel;
     private final JLabel soldiersLabel;
     private final JLabel workersLabel;
+    private final JLabel eggsLabel;
+    private final JLabel mushroomsLabel;
     private Runnable tickListener;
     private final JButton playPauseButton;
     private final JLabel minuteLabel;
@@ -50,10 +52,14 @@ public class GamePanel extends JPanel {
         queensLabel = new JLabel("Queens: 0");
         soldiersLabel = new JLabel("Soldiers: 0");
         workersLabel = new JLabel("Workers: 0");
+        eggsLabel = new JLabel("Eggs: 0");
+        mushroomsLabel = new JLabel("Mushrooms: 0");
         stats.add(totalLabel);
         stats.add(queensLabel);
         stats.add(soldiersLabel);
         stats.add(workersLabel);
+        stats.add(eggsLabel);
+        stats.add(mushroomsLabel);
         add(stats, BorderLayout.CENTER);
 
         // Time panel (right)
@@ -74,7 +80,7 @@ public class GamePanel extends JPanel {
         JPanel south = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         speedDownButton = new JButton("Speed-");
         speedUpButton = new JButton("Speed+");
-        tickLabel = new JLabel("Tick: 1000ms");
+        tickLabel = new JLabel("Tick: 500ms");
         speedDownButton.addActionListener(e -> {
             if (speedLevel > 0) speedLevel--;
             applySpeedLevel();
@@ -215,46 +221,46 @@ public class GamePanel extends JPanel {
                 tickLabel.setText("Tick: PAUSED");
                 break;
             case 1:
-                eng.setDelay(1000f);
+                eng.setDelay(250f);
                 eng.resumeEngine();
                 updatePauseIndicator(false);
-                tickLabel.setText("Tick: 1000ms");
+                tickLabel.setText("Tick: 250ms");
                 break;
             case 2:
-                eng.setDelay(500f);
+                eng.setDelay(125f);
                 eng.resumeEngine();
                 updatePauseIndicator(false);
-                tickLabel.setText("Tick: 500ms");
+                tickLabel.setText("Tick: 125ms");
                 break;
             case 3:
-                eng.setDelay(100f);
-                eng.resumeEngine();
-                updatePauseIndicator(false);
-                tickLabel.setText("Tick: 100ms");
-                break;
-            case 4:
                 eng.setDelay(50f);
                 eng.resumeEngine();
                 updatePauseIndicator(false);
                 tickLabel.setText("Tick: 50ms");
                 break;
-            case 5:
+            case 4:
                 eng.setDelay(25f);
                 eng.resumeEngine();
                 updatePauseIndicator(false);
                 tickLabel.setText("Tick: 25ms");
                 break;
-            case 6:
+            case 5:
                 eng.setDelay(10f);
                 eng.resumeEngine();
                 updatePauseIndicator(false);
                 tickLabel.setText("Tick: 10ms");
                 break;
-            default:
-                eng.setDelay(1000f);
+            case 6:
+                eng.setDelay(5f);
                 eng.resumeEngine();
                 updatePauseIndicator(false);
-                tickLabel.setText("Tick: 1000ms");
+                tickLabel.setText("Tick: 5ms");
+                break;
+            default:
+                eng.setDelay(500f);
+                eng.resumeEngine();
+                updatePauseIndicator(false);
+                tickLabel.setText("Tick: 500ms");
         }
     }
 
@@ -271,11 +277,14 @@ public class GamePanel extends JPanel {
         int queens = colony.getQueens() != null ? colony.getQueens().size() : 0;
         int soldiers = colony.getSoldiers() != null ? colony.getSoldiers().size() : 0;
         int workers = colony.getWorkers() != null ? colony.getWorkers().size() : 0;
+        int eggs = colony.getEggs() != null ? colony.getEggs().size() : 0;
 
         totalLabel.setText("Total ants: " + total);
         queensLabel.setText("Queens: " + queens);
         soldiersLabel.setText("Soldiers: " + soldiers);
         workersLabel.setText("Workers: " + workers);
+        eggsLabel.setText("Eggs: " + eggs);
+        mushroomsLabel.setText("Mushrooms: " + colony.getMushrooms());
         minuteLabel.setText("Minute: " + world.getMinute());
         hourLabel.setText("Hour: " + world.getHour());
         dayLabel.setText("Day: " + world.getDay());

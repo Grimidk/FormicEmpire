@@ -18,9 +18,12 @@ public class Savefile implements Serializable {
     private int month;
     private int year;
     private int totalAnts;
+    private int eggs;
     private int workers;
     private int soldiers;
     private int queens;
+    private int mushrooms;
+    private int mushroomsCapacity;
 
     public Savefile(int id, String name) {
         this.id = id;
@@ -114,6 +117,14 @@ public class Savefile implements Serializable {
         this.totalAnts = totalAnts;
     }
 
+    public int getEggs() {
+        return eggs;
+    }
+
+    public void setEggs(int eggs) {
+        this.eggs = eggs;
+    }
+
     public int getWorkers() {
         return workers;
     }
@@ -136,6 +147,22 @@ public class Savefile implements Serializable {
 
     public void setQueens(int queens) {
         this.queens = queens;
+    }
+
+    public int getMushrooms() {
+        return mushrooms;
+    }   
+
+    public void setMushrooms(int mushrooms) {
+        this.mushrooms = mushrooms;
+    }   
+
+    public int getMushroomsCapacity() {
+        return mushroomsCapacity;
+    }   
+
+    public void setMushroomsCapacity(int mushroomsCapacity) {
+        this.mushroomsCapacity = mushroomsCapacity;
     }
 
 }

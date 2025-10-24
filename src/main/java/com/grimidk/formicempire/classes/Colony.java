@@ -66,6 +66,11 @@ public class Colony {
         this.drones = new ArrayList<>();
         this.princesses = new ArrayList<>();
         this.queens = new ArrayList<>();
+
+        this.researchSpeed = 100;
+        this.growthSpeed = 10;
+        this.layingRate = 1;
+        this.parasiteDetection = 10;
         this.baseHealth = 100;
         this.baseHunger = 100;
         this.baseAge = 180;
@@ -77,6 +82,23 @@ public class Colony {
         this.baseDefense = 5;
         this.baseSpeed = 1;
         this.baseSize = 1;
+
+        this.plants = 0;
+        this.plantsCapacity = 1000;
+        this.mushrooms = 0;
+        this.mushroomsCapacity = 1000;
+        this.protein = 0;           
+        this.proteinCapacity = 1000;
+        this.water = 0;
+        this.waterCapacity = 1000;
+        this.syrups = 0;
+        this.syrupsCapacity = 1000;
+        this.resins = 0;
+        this.resinsCapacity = 1000;
+        this.minerals = 0;
+        this.mineralsCapacity = 1000;
+        this.eggsCapacity = 100;
+        this.queensCapacity = 1;
     }
 
     public Colony(Savefile savefile) {
@@ -93,26 +115,32 @@ public class Colony {
         this.princesses = new ArrayList<>();
         this.queens = new ArrayList<>();
 
-        try {
-            int workersCount = savefile.getWorkers();
-            int soldiersCount = savefile.getSoldiers();
-            int queensCount = savefile.getQueens();
-            for (int i = 0; i < workersCount; i++) {
-                Ant a = new Ant(this, Engine.TYPE_WORKER);
-                this.workers.add(a);
-            }
-            for (int i = 0; i < soldiersCount; i++) {
-                Ant a = new Ant(this, Engine.TYPE_SOLDIER);
-                this.soldiers.add(a);
-            }
-            for (int i = 0; i < queensCount; i++) {
-                Ant a = new Ant(this, Engine.TYPE_QUEEN);
-                this.queens.add(a);
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        int eggCount = savefile.getEggs();
+        int workersCount = savefile.getWorkers();
+        int soldiersCount = savefile.getSoldiers();
+        int queensCount = savefile.getQueens();
+
+        for (int i = 0; i < workersCount; i++) {
+            Ant a = new Ant(this, Engine.TYPE_EGG);
+            this.eggs.add(a);
+        }
+        for (int i = 0; i < workersCount; i++) {
+            Ant a = new Ant(this, Engine.TYPE_WORKER);
+            this.workers.add(a);
+        }
+        for (int i = 0; i < soldiersCount; i++) {
+            Ant a = new Ant(this, Engine.TYPE_SOLDIER);
+            this.soldiers.add(a);
+        }
+        for (int i = 0; i < queensCount; i++) {
+            Ant a = new Ant(this, Engine.TYPE_QUEEN);
+            this.queens.add(a);
         }
 
+        this.researchSpeed = 100;
+        this.growthSpeed = 10;
+        this.layingRate = 1;
+        this.parasiteDetection = 10;
         this.baseHealth = 100;
         this.baseHunger = 100;
         this.baseAge = 180;
@@ -124,6 +152,23 @@ public class Colony {
         this.baseDefense = 5;
         this.baseSpeed = 1;
         this.baseSize = 1;
+
+        this.plants = 0;
+        this.plantsCapacity = 1000;
+        this.mushrooms = 0;
+        this.mushroomsCapacity = 1000;
+        this.protein = 0;           
+        this.proteinCapacity = 1000;
+        this.water = 0;
+        this.waterCapacity = 1000;
+        this.syrups = 0;
+        this.syrupsCapacity = 1000;
+        this.resins = 0;
+        this.resinsCapacity = 1000;
+        this.minerals = 0;
+        this.mineralsCapacity = 1000;
+        this.eggsCapacity = 100;
+        this.queensCapacity = 1;
     }
 
     public int getId() {
@@ -228,6 +273,19 @@ public class Colony {
     
     public int getAntTotal() {
         return eggs.size() + larvae.size() + pupae.size() + workers.size() + soldiers.size() + majors.size() + drones.size() + princesses.size() + queens.size();
+    }
+
+    public int getTotalConsumption(){
+        return 
+        (int) (eggs.size() * Engine.TYPE_EGG.getConsumptionMult() * this.getBaseConsumption()) + 
+        (int) (larvae.size() * Engine.TYPE_EGG.getConsumptionMult() * this.getBaseConsumption()) + 
+        (int) (pupae.size() * Engine.TYPE_EGG.getConsumptionMult() * this.getBaseConsumption()) + 
+        (int) (workers.size() * Engine.TYPE_EGG.getConsumptionMult() * this.getBaseConsumption()) + 
+        (int) (soldiers.size() * Engine.TYPE_EGG.getConsumptionMult() * this.getBaseConsumption()) +
+        (int) (majors.size() * Engine.TYPE_EGG.getConsumptionMult() * this.getBaseConsumption()) + 
+        (int) (drones.size() * Engine.TYPE_EGG.getConsumptionMult() * this.getBaseConsumption()) + 
+        (int) (princesses.size() * Engine.TYPE_EGG.getConsumptionMult() * this.getBaseConsumption()) + 
+        (int) (queens.size() * Engine.TYPE_EGG.getConsumptionMult() * this.getBaseConsumption());
     }
 
     public int getPlants() {
@@ -490,16 +548,15 @@ public class Colony {
         System.out.println("Spawned queen ant");
     }
 
-    public void loadColony(Savefile savefile){
-        
-    }
-
     public void runLaying(){
-
+        for (int i = 0; i < (this.getQueens().size() * this.getLayingRate()); i++) {
+            Ant ant = new Ant(this, Engine.TYPE_EGG);
+            this.eggs.add(ant);
+        }
     }
 
     public void runHatching(){    
-        for (int i = 0; i < this.getQueens().size(); i++) {
+        for (int i = 0; i < this.getEggs().size(); i++) {
             double r = Math.random(); 
             if (r < 0.80) {
                 Ant ant = new Ant(this, Engine.TYPE_WORKER);
@@ -515,9 +572,26 @@ public class Colony {
                 System.out.println("Spawned queen ant");
             }
         }
+        this.setEggs(new ArrayList<>());
+    }
+
+    public void runCollecting(){
+        int mush = this.getMushrooms() + (int) ((this.getWorkers().size() * this.getBaseAttackSpeed() * Engine.TYPE_WORKER.getAttackSpeedMult()));
+        if (mush > this.getMushroomsCapacity()) {
+            mush = this.getMushroomsCapacity();
+        }
+        this.setMushrooms(mush);
     }
     
     public void runEating(){
+        this.setMushrooms(this.getMushrooms() - this.getTotalConsumption());
+    }
+
+    public void runEvolving(){
+
+    }
+
+    public void runNuptial(){
 
     }
 }

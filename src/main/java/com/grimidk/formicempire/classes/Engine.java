@@ -24,7 +24,7 @@ public class Engine extends Thread{
     private final CopyOnWriteArrayList<Runnable> tickListeners = new CopyOnWriteArrayList<>();
 
     public Engine() {
-        this.delay = 1000;
+        this.delay = 500;
         this.semaphore = new Semaphore(1);
         this.killSwitch = false;
         this.paused = false;
@@ -299,7 +299,6 @@ public class Engine extends Thread{
         this.setWorld(world);
         this.loadConstants();
         this.loadFile(savefile);
-        // If starting from a savefile, record its slot id in the world so autosaves are per-slot
         try {
             if (savefile != null && this.world != null) {
                 this.world.setSaveSlotId(savefile.getId());

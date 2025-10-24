@@ -141,6 +141,8 @@ public class World {
         this.year = savefile.getYear();  
         Colony colony = new Colony(savefile);  
         Hex startHex = new Hex();
+        startHex.setColony(colony);
+        this.hexes.add(startHex);
     }
 
     public void runMinute() {
@@ -153,29 +155,27 @@ public class World {
 
     public void runHour() {
         this.hour++;
+
+        this.getSpawnHex().getColony().runCollecting();;
+        this.getSpawnHex().getColony().runLaying();
+
         if (this.hour > 23) {
             this.hour = 0;
             this.runDay();
-        }
-
-        try {
-            if (this.hexes != null && !this.hexes.isEmpty()) {
-                Hex spawn = this.getSpawnHex();
-                if (spawn != null && spawn.getColony() != null) {
-                    spawn.getColony().runHatching();
-                }
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
         }
     }
 
     public void runDay() {
         this.day++;
+
+        this.getSpawnHex().getColony().runEating();
+        this.getSpawnHex().getColony().runHatching();
+
         if (this.day > 29) {
             this.day = 0;
             this.runMonth();
         }
+
         try {
             SaveManager sm = new SaveManager();
             sm.saveAutosave(this);
@@ -194,6 +194,8 @@ public class World {
 
     public void runYear() {
         this.year++;
+
+        this.getSpawnHex().getColony().runEating();
     }
 
 }
