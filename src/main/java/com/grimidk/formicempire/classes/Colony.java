@@ -84,19 +84,19 @@ public class Colony {
         this.baseSize = 1;
 
         this.plants = 0;
-        this.plantsCapacity = 1000;
+        this.plantsCapacity = 10000;
         this.mushrooms = 0;
-        this.mushroomsCapacity = 1000;
+        this.mushroomsCapacity = 10000;
         this.protein = 0;           
-        this.proteinCapacity = 1000;
+        this.proteinCapacity = 10000;
         this.water = 0;
-        this.waterCapacity = 1000;
+        this.waterCapacity = 10000;
         this.syrups = 0;
-        this.syrupsCapacity = 1000;
+        this.syrupsCapacity = 10000;
         this.resins = 0;
-        this.resinsCapacity = 1000;
+        this.resinsCapacity = 10000;
         this.minerals = 0;
-        this.mineralsCapacity = 1000;
+        this.mineralsCapacity = 10000;
         this.eggsCapacity = 100;
         this.queensCapacity = 1;
     }
@@ -154,19 +154,19 @@ public class Colony {
         this.baseSize = 1;
 
         this.plants = 0;
-        this.plantsCapacity = 1000;
+        this.plantsCapacity = 10000;
         this.mushrooms = 0;
-        this.mushroomsCapacity = 1000;
+        this.mushroomsCapacity = 10000;
         this.protein = 0;           
-        this.proteinCapacity = 1000;
+        this.proteinCapacity = 10000;
         this.water = 0;
-        this.waterCapacity = 1000;
+        this.waterCapacity = 10000;
         this.syrups = 0;
-        this.syrupsCapacity = 1000;
+        this.syrupsCapacity = 10000;
         this.resins = 0;
-        this.resinsCapacity = 1000;
+        this.resinsCapacity = 10000;
         this.minerals = 0;
-        this.mineralsCapacity = 1000;
+        this.mineralsCapacity = 10000;
         this.eggsCapacity = 100;
         this.queensCapacity = 1;
     }
@@ -541,14 +541,15 @@ public class Colony {
         for (int i = 1; i <= 9; i++) {
             Ant ant = new Ant(this, Engine.TYPE_WORKER);
             this.workers.add(ant);
-            System.out.println("Spawned worker ant");
         }
         Ant queen = new Ant(this, Engine.TYPE_QUEEN);
         this.queens.add(queen);
-        System.out.println("Spawned queen ant");
     }
 
     public void runLaying(){
+        if (this.eggs.size() >= this.getEggsCapacity()) {
+            return;
+        }   
         for (int i = 0; i < (this.getQueens().size() * this.getLayingRate()); i++) {
             Ant ant = new Ant(this, Engine.TYPE_EGG);
             this.eggs.add(ant);
@@ -561,15 +562,17 @@ public class Colony {
             if (r < 0.80) {
                 Ant ant = new Ant(this, Engine.TYPE_WORKER);
                 this.workers.add(ant);
-                System.out.println("Spawned worker ant");
             } else if (r < 0.99) {
                 Ant ant = new Ant(this, Engine.TYPE_SOLDIER);
                 this.soldiers.add(ant);
-                System.out.println("Spawned soldier ant");
             } else {
-                Ant ant = new Ant(this, Engine.TYPE_QUEEN);
-                this.queens.add(ant);
-                System.out.println("Spawned queen ant");
+                if (this.getQueens().size() >= this.getQueensCapacity()) {
+                    Ant ant = new Ant(this, Engine.TYPE_WORKER);
+                    this.workers.add(ant);
+                } else {
+                    Ant ant = new Ant(this, Engine.TYPE_QUEEN);
+                    this.queens.add(ant);
+                }
             }
         }
         this.setEggs(new ArrayList<>());
@@ -584,6 +587,7 @@ public class Colony {
     }
     
     public void runEating(){
+        System.out.println("Consuming mushrooms: " + this.getTotalConsumption());
         this.setMushrooms(this.getMushrooms() - this.getTotalConsumption());
     }
 
