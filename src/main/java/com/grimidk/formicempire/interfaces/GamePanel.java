@@ -26,6 +26,10 @@ public class GamePanel extends JPanel {
     private final JLabel dayLabel;
     private final JLabel monthLabel;
     private final JLabel yearLabel;
+    private final JLabel timeOfDayLabel;
+    private final JLabel moonPhaseLabel;
+    private final JLabel seasonLabel;
+    private final JLabel weatherLabel;
     private final JLabel statusIndicator;
     private final JButton speedUpButton;
     private final JButton speedDownButton;
@@ -72,11 +76,18 @@ public class GamePanel extends JPanel {
         dayLabel = new JLabel("Day: 0");
         monthLabel = new JLabel("Month: 0");
         yearLabel = new JLabel("Year: 0");
+        timeOfDayLabel = new JLabel("Time of Day: Dawn");
+        moonPhaseLabel = new JLabel("Moon Phase: New Moon");
+        seasonLabel = new JLabel("Season: Spring");
+        weatherLabel = new JLabel("Weather: Clear");
         timePanel.add(minuteLabel);
         timePanel.add(hourLabel);
         timePanel.add(dayLabel);
         timePanel.add(monthLabel);
         timePanel.add(yearLabel);
+        timePanel.add(timeOfDayLabel);
+        timePanel.add(moonPhaseLabel);
+        timePanel.add(seasonLabel);
         add(timePanel, BorderLayout.EAST);
 
         // South panel with speed controls, play/pause and back
@@ -290,5 +301,9 @@ public class GamePanel extends JPanel {
         dayLabel.setText("Day: " + world.getDay());
         monthLabel.setText("Month: " + world.getMonth());
         yearLabel.setText("Year: " + world.getYear());
+        timeOfDayLabel.setText("Time of Day: " + world.getTimeOfDay().getName());
+        moonPhaseLabel.setText("Moon Phase: " + world.getMoonPhase().getName());
+        seasonLabel.setText("Season: " + world.getSeason().getName());  
+        weatherLabel.setText("Weather: " + world.getWeather().getName());
     }
 }

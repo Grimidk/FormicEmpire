@@ -14,8 +14,10 @@ public class Engine extends Thread{
     private ArrayList<ResourceType> resources;
     private ArrayList<Species> species;
     private ArrayList<TimeOfDay> timesOfDay;
-    private ArrayList<Upgrade> upgrades;
+    private ArrayList<MoonPhase> moonPhases;
+    private ArrayList<Season> seasons;
     private ArrayList<Weather> weathers;
+    private ArrayList<Upgrade> upgrades;    
     
     private float delay;
     private final Semaphore semaphore;
@@ -35,8 +37,10 @@ public class Engine extends Thread{
         this.resources = new ArrayList<>();
         this.species = new ArrayList<>();
         this.timesOfDay = new ArrayList<>();
-        this.upgrades = new ArrayList<>();
+        this.moonPhases = new ArrayList<>();
+        this.seasons = new ArrayList<>();
         this.weathers = new ArrayList<>();
+        this.upgrades = new ArrayList<>();
     }
 
     public World getWorld() {
@@ -111,12 +115,20 @@ public class Engine extends Thread{
         this.timesOfDay = timesOfDay;
     }
 
-    public ArrayList<Upgrade> getUpgrades() {
-        return upgrades;
+    public ArrayList<MoonPhase> getMoonPhases() {
+        return moonPhases;
     }
 
-    public void setUpgrades(ArrayList<Upgrade> upgrades) {
-        this.upgrades = upgrades;
+    public void setMoonPhases(ArrayList<MoonPhase> moonPhases) {
+        this.moonPhases = moonPhases;
+    }
+
+    public ArrayList<Season> getSeasons() {
+        return seasons;
+    }
+
+    public void setSeasons(ArrayList<Season> seasons) {
+        this.seasons = seasons;
     }
 
     public ArrayList<Weather> getWeathers() {
@@ -125,6 +137,14 @@ public class Engine extends Thread{
 
     public void setWeathers(ArrayList<Weather> weathers) {
         this.weathers = weathers;
+    }
+
+    public ArrayList<Upgrade> getUpgrades() {
+        return upgrades;
+    }
+
+    public void setUpgrades(ArrayList<Upgrade> upgrades) {
+        this.upgrades = upgrades;
     }
 
     public Semaphore getSema() {
@@ -183,6 +203,24 @@ public class Engine extends Thread{
         public static final TimeOfDay DUSK_TIME = new TimeOfDay(2, "Dusk", 5/8);
         public static final TimeOfDay NIGHT_TIME = new TimeOfDay(3, "Nightime", 3/4);
         public static final TimeOfDay DAWN_TIME = new TimeOfDay(4, "Dawn", 5/8);
+        public static final TimeOfDay SOLAR_ECLIPSE_TIME = new TimeOfDay(5, "Solar Eclipse", 3/2);
+        public static final TimeOfDay LUNAR_ECLIPSE_TIME = new TimeOfDay(6, "Lunar Eclipse", 3/2);
+
+        // Moon Phases
+        public static final MoonPhase NEW_MOON_PHASE = new MoonPhase(1, "New Moon", 1);
+        public static final MoonPhase WAXING_CRESCENT_PHASE = new MoonPhase(2, "Waxing Crescent", 3/4);   
+        public static final MoonPhase FIRST_QUARTER_PHASE = new MoonPhase(3, "First Quarter", 1/2);
+        public static final MoonPhase WAXING_GIBBOUS_PHASE = new MoonPhase(4, "Waxing Gibbous", 1/4);
+        public static final MoonPhase FULL_MOON_PHASE = new MoonPhase(5, "Full Moon", 0);
+        public static final MoonPhase WANING_GIBBOUS_PHASE = new MoonPhase(6, "Waning Gibbous", 1/4);
+        public static final MoonPhase LAST_QUARTER_PHASE = new MoonPhase(7, "Last Quarter", 1/2);
+        public static final MoonPhase WANING_CRESCENT_PHASE = new MoonPhase(8, "Waning Crescent", 3/4);
+
+        //Seasons
+        public static final Season SPRING_SEASON = new Season(1, "Spring", 1, 3);
+        public static final Season SUMMER_SEASON = new Season(2, "Summer", 2, 1);
+        public static final Season AUTUMN_SEASON = new Season(3, "Autumn", 1, 2);
+        public static final Season WINTER_SEASON = new Season(4, "Winter", 1/2, 1);
 
         // Weather
         public static final Weather CLEAR_WEATHER = new Weather(1, "Clear", 1, 0);
@@ -236,6 +274,24 @@ public class Engine extends Thread{
             this.timesOfDay.add(DUSK_TIME);
             this.timesOfDay.add(NIGHT_TIME);
             this.timesOfDay.add(DAWN_TIME);
+            this.timesOfDay.add(SOLAR_ECLIPSE_TIME);
+            this.timesOfDay.add(LUNAR_ECLIPSE_TIME);
+
+            System.out.println("Loading phases...");
+            this.moonPhases.add(NEW_MOON_PHASE);
+            this.moonPhases.add(WAXING_CRESCENT_PHASE);   
+            this.moonPhases.add(FIRST_QUARTER_PHASE);
+            this.moonPhases.add(WAXING_GIBBOUS_PHASE);      
+            this.moonPhases.add(FULL_MOON_PHASE);
+            this.moonPhases.add(WANING_GIBBOUS_PHASE);
+            this.moonPhases.add(LAST_QUARTER_PHASE);
+            this.moonPhases.add(WANING_CRESCENT_PHASE);
+
+            System.out.println("Loading seasons...");
+            this.seasons.add(SPRING_SEASON);;
+            this.seasons.add(SUMMER_SEASON);
+            this.seasons.add(AUTUMN_SEASON);
+            this.seasons.add(WINTER_SEASON);
 
             System.out.println("Loading weather...");
             this.weathers.add(CLEAR_WEATHER);
@@ -293,7 +349,6 @@ public class Engine extends Thread{
     }
     
     public void startUp(Savefile savefile){
-        
         System.out.println("Loading new world...");
         World world = new World();
         this.setWorld(world);

@@ -10,6 +10,8 @@ public class World {
     private int month;
     private int year;
     private TimeOfDay timeOfDay;
+    private MoonPhase moonPhase;
+    private Season season;
     private Weather weather;
     private int temperature;
     private int humidity;
@@ -25,6 +27,10 @@ public class World {
         this.temperature = 25;
         this.humidity = 2;
         this.hexes = new ArrayList<>();
+        this.timeOfDay = Engine.DAWN_TIME;
+        this.moonPhase = Engine.NEW_MOON_PHASE;
+        this.season = Engine.SPRING_SEASON;
+        this.weather = Engine.CLEAR_WEATHER;
     }
 
     public int getSaveSlotId() {
@@ -81,6 +87,22 @@ public class World {
 
     public void setTimeOfDay(TimeOfDay timeOfDay) {
         this.timeOfDay = timeOfDay;
+    }
+
+    public MoonPhase getMoonPhase() {
+        return moonPhase;
+    }
+
+    public void setMoonPhase(MoonPhase moonPhase) {
+        this.moonPhase = moonPhase;
+    }
+
+    public Season getSeason() {
+        return season;
+    }
+
+    public void setSeason(Season season) {
+        this.season = season;
     }
 
     public Weather getWeather() {
@@ -159,6 +181,18 @@ public class World {
         this.getSpawnHex().getColony().runCollecting();;
         this.getSpawnHex().getColony().runLaying();
 
+        if (this.hour >= 0 && this.hour < 5) {
+            this.timeOfDay = Engine.NIGHT_TIME;
+        } else if (this.hour >= 5 && this.hour < 7) {
+            this.timeOfDay = Engine.DAWN_TIME;
+        } else if (this.hour >= 7 && this.hour < 18) {
+            this.timeOfDay = Engine.DAY_TIME;
+        } else if (this.hour >= 18 && this.hour < 20) {
+            this.timeOfDay = Engine.DUSK_TIME;
+        } else if (this.hour >= 20 && this.hour <= 23) {
+            this.timeOfDay = Engine.NIGHT_TIME;
+        }
+
         if (this.hour > 23) {
             this.hour = 0;
             this.runDay();
@@ -170,6 +204,26 @@ public class World {
 
         this.getSpawnHex().getColony().runEating();
         this.getSpawnHex().getColony().runHatching();
+
+        if (this.day >= 0 && this.day < 1) {
+            this.moonPhase = Engine.NEW_MOON_PHASE;
+        } else if (this.day >= 1 && this.day < 7) {
+            this.moonPhase = Engine.WAXING_CRESCENT_PHASE;
+        } else if (this.day >= 7 && this.day < 8) {
+            this.moonPhase = Engine.FIRST_QUARTER_PHASE;
+        } else if (this.day >= 8 && this.day < 14) {
+            this.moonPhase = Engine.WAXING_GIBBOUS_PHASE;
+        } else if (this.day >= 14 && this.day < 15) {
+            this.moonPhase = Engine.FULL_MOON_PHASE;
+        } else if (this.day >= 15 && this.day < 21) {
+            this.moonPhase = Engine.WANING_GIBBOUS_PHASE;
+        } else if (this.day >= 21 && this.day < 22) {
+            this.moonPhase = Engine.LAST_QUARTER_PHASE;
+        } else if (this.day >= 22 && this.day < 29) {
+            this.moonPhase = Engine.WANING_CRESCENT_PHASE;
+        } else {
+            this.moonPhase = Engine.NEW_MOON_PHASE;
+        }
 
         if (this.day > 29) {
             this.day = 0;
@@ -186,6 +240,19 @@ public class World {
 
     public void runMonth() {
         this.month++;
+
+        if (this.month >= 0 && this.month < 3) {
+            this.season = Engine.SPRING_SEASON;
+        } else if (this.month >= 3 && this.month < 6) {
+            this.season = Engine.SUMMER_SEASON;
+        } else if (this.month >= 6 && this.month < 7) {
+            this.season = Engine.AUTUMN_SEASON;
+        } else if (this.month >= 9 && this.month < 12) {
+            this.season = Engine.WINTER_SEASON;
+        } else {
+            this.season = Engine.SPRING_SEASON;
+        }
+
         if (this.month > 11) {
             this.month = 0;
             this.runYear();
@@ -195,7 +262,7 @@ public class World {
     public void runYear() {
         this.year++;
 
-        this.getSpawnHex().getColony().runEating();
+        this.getSpawnHex().getColony().runNuptial();
     }
 
 }
