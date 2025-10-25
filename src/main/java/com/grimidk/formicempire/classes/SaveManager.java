@@ -150,7 +150,7 @@ public class SaveManager {
             
             writeSaveToFile(save, f);
             
-            System.out.println("[SaveManager] Autosaved world to " + f.getAbsolutePath() + " (Day " + save.getDay() + " H" + save.getHour() + ")");
+            System.out.println("[SaveManager] Autosaved world to " + f.getAbsolutePath());
         
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -262,6 +262,7 @@ public class SaveManager {
                 Colony c = w.getSpawnHex().getColony();
                 if (c != null) {
                     save.setTotalAnts(c.getAntTotal());
+                    save.setDeadAnts(c.getDeadAnts() != null ? c.getDeadAnts().size() : 0);
                     save.setEggs(c.getEggs() != null ? c.getEggs().size() : 0);
                     save.setWorkers(c.getWorkers() != null ? c.getWorkers().size() : 0);
                     save.setSoldiers(c.getSoldiers() != null ? c.getSoldiers().size() : 0);
@@ -287,6 +288,7 @@ public class SaveManager {
         m.put("month", Integer.toString(s.getMonth()));
         m.put("year", Integer.toString(s.getYear()));
         m.put("totalAnts", Integer.toString(s.getTotalAnts()));
+        m.put("deadAnts", Integer.toString(s.getDeadAnts()));
         m.put("eggs", Integer.toString(s.getEggs()));
         m.put("workers", Integer.toString(s.getWorkers()));
         m.put("soldiers", Integer.toString(s.getSoldiers()));
@@ -330,6 +332,7 @@ public class SaveManager {
             s.setMonth(Integer.parseInt(m.getOrDefault("month", "0")));
             s.setYear(Integer.parseInt(m.getOrDefault("year", "0")));
             s.setTotalAnts(Integer.parseInt(m.getOrDefault("totalAnts", "0")));
+            s.setDeadAnts(Integer.parseInt(m.getOrDefault("deadAnts", "0")));
             s.setEggs(Integer.parseInt(m.getOrDefault("eggs", "0")));
             s.setWorkers(Integer.parseInt(m.getOrDefault("workers", "0")));
             s.setSoldiers(Integer.parseInt(m.getOrDefault("soldiers", "0")));

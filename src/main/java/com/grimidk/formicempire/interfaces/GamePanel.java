@@ -17,6 +17,7 @@ public class GamePanel extends JPanel {
     private final JLabel soldiersLabel;
     private final JLabel workersLabel;
     private final JLabel eggsLabel;
+    private final JLabel deadAntsLabel;
     private final JLabel mushroomsLabel;
     private Runnable tickListener;
     private final JButton playPauseButton;
@@ -53,12 +54,14 @@ public class GamePanel extends JPanel {
         soldiersLabel = new JLabel("Soldiers: 0");
         workersLabel = new JLabel("Workers: 0");
         eggsLabel = new JLabel("Eggs: 0");
+        deadAntsLabel = new JLabel("Dead ants: 0");
         mushroomsLabel = new JLabel("Mushrooms: 0");
         stats.add(totalLabel);
         stats.add(queensLabel);
         stats.add(soldiersLabel);
         stats.add(workersLabel);
         stats.add(eggsLabel);
+        stats.add(deadAntsLabel);   
         stats.add(mushroomsLabel);
         add(stats, BorderLayout.CENTER);
 
@@ -120,17 +123,14 @@ public class GamePanel extends JPanel {
                         try { slotIdLocal = w.getSaveSlotId(); } catch (Exception ignore) { slotIdLocal = 0; }
                         final int capturedSlot = slotIdLocal;
                         if (capturedSlot > 0) {
-                            // Seamless save: never prompt. Use existing save name if present, otherwise default to "Save N".
                             Savefile existing = sm.loadSlot(capturedSlot);
                             String nameToUse = (existing != null && existing.getName() != null && !existing.getName().trim().isEmpty()) ? existing.getName() : ("Save " + capturedSlot);
                             final String chosen = nameToUse;
                             sm.saveWorldToSlotUserAsync(engine.getWorld(), capturedSlot, chosen, () -> {
-                                // silent save, then go back to save screen
                                 frame.showCard(MainFrame.CARD_SAVE);
                             });
                             return;
                         } else {
-                            // No slot assigned: write a global autosave and return
                             sm.saveWorldToSlot(engine.getWorld(), 0);
                             frame.showCard(MainFrame.CARD_SAVE);
                             return;
@@ -141,7 +141,6 @@ public class GamePanel extends JPanel {
             }
             frame.showCard(MainFrame.CARD_SAVE);
         });
-        // add speed controls on the left of the south panel
         south.add(speedDownButton);
         south.add(speedUpButton);
         south.add(tickLabel);
@@ -284,6 +283,7 @@ public class GamePanel extends JPanel {
         soldiersLabel.setText("Soldiers: " + soldiers);
         workersLabel.setText("Workers: " + workers);
         eggsLabel.setText("Eggs: " + eggs);
+        deadAntsLabel.setText("Dead ants: " + colony.getDeadAnts().size());
         mushroomsLabel.setText("Mushrooms: " + colony.getMushrooms());
         minuteLabel.setText("Minute: " + world.getMinute());
         hourLabel.setText("Hour: " + world.getHour());

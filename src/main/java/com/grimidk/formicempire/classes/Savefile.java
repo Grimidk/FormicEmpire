@@ -18,6 +18,7 @@ public class Savefile implements Serializable {
     private int month;
     private int year;
     private int totalAnts;
+    private int deadAnts;
     private int eggs;
     private int workers;
     private int soldiers;
@@ -115,6 +116,14 @@ public class Savefile implements Serializable {
 
     public void setTotalAnts(int totalAnts) {
         this.totalAnts = totalAnts;
+    }
+
+    public int getDeadAnts() {
+        return deadAnts;
+    }
+    
+    public void setDeadAnts(int deadAnts) {
+        this.deadAnts = deadAnts;
     }
 
     public int getEggs() {

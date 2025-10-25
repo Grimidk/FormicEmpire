@@ -17,6 +17,7 @@ public class Colony {
     private ArrayList<Ant> drones;
     private ArrayList<Ant> princesses;
     private ArrayList<Ant> queens;
+    private ArrayList<Ant> deadAnts;
 
     private int plants;
     private int plantsCapacity;
@@ -57,6 +58,7 @@ public class Colony {
         this.id = id;
         this.name = name;
         this.isPlayer = isPlayer;
+        this.deadAnts = new ArrayList<>();
         this.eggs = new ArrayList<>();
         this.larvae = new ArrayList<>();
         this.pupae = new ArrayList<>();
@@ -105,6 +107,7 @@ public class Colony {
         this.id = savefile.getColonyId();
         this.name = savefile.getColonyName();
         this.isPlayer = true;
+        this.deadAnts = new ArrayList<>();
         this.eggs = new ArrayList<>();
         this.larvae = new ArrayList<>();
         this.pupae = new ArrayList<>();
@@ -270,22 +273,31 @@ public class Colony {
     public void setQueens(ArrayList<Ant> queens) {
         this.queens = queens;
     }
+
+    public ArrayList<Ant> getDeadAnts() {
+        return deadAnts;
+    }
+
+    public void setDeadAnts(ArrayList<Ant> deadAnts) {
+        this.deadAnts = deadAnts;
+    }
     
     public int getAntTotal() {
         return eggs.size() + larvae.size() + pupae.size() + workers.size() + soldiers.size() + majors.size() + drones.size() + princesses.size() + queens.size();
     }
 
     public int getTotalConsumption(){
+        System.out.println();
         return 
         (int) (eggs.size() * Engine.TYPE_EGG.getConsumptionMult() * this.getBaseConsumption()) + 
-        (int) (larvae.size() * Engine.TYPE_EGG.getConsumptionMult() * this.getBaseConsumption()) + 
-        (int) (pupae.size() * Engine.TYPE_EGG.getConsumptionMult() * this.getBaseConsumption()) + 
-        (int) (workers.size() * Engine.TYPE_EGG.getConsumptionMult() * this.getBaseConsumption()) + 
-        (int) (soldiers.size() * Engine.TYPE_EGG.getConsumptionMult() * this.getBaseConsumption()) +
-        (int) (majors.size() * Engine.TYPE_EGG.getConsumptionMult() * this.getBaseConsumption()) + 
-        (int) (drones.size() * Engine.TYPE_EGG.getConsumptionMult() * this.getBaseConsumption()) + 
-        (int) (princesses.size() * Engine.TYPE_EGG.getConsumptionMult() * this.getBaseConsumption()) + 
-        (int) (queens.size() * Engine.TYPE_EGG.getConsumptionMult() * this.getBaseConsumption());
+        (int) (larvae.size() * Engine.TYPE_LARVA.getConsumptionMult() * this.getBaseConsumption()) + 
+        (int) (pupae.size() * Engine.TYPE_PUPA.getConsumptionMult() * this.getBaseConsumption()) + 
+        (int) (workers.size() * Engine.TYPE_WORKER.getConsumptionMult() * this.getBaseConsumption()) + 
+        (int) (soldiers.size() * Engine.TYPE_SOLDIER.getConsumptionMult() * this.getBaseConsumption()) +
+        (int) (majors.size() * Engine.TYPE_MAJOR.getConsumptionMult() * this.getBaseConsumption()) + 
+        (int) (drones.size() * Engine.TYPE_DRONE.getConsumptionMult() * this.getBaseConsumption()) + 
+        (int) (princesses.size() * Engine.TYPE_PRINCESS.getConsumptionMult() * this.getBaseConsumption()) + 
+        (int) (queens.size() * Engine.TYPE_QUEEN.getConsumptionMult() * this.getBaseConsumption());
     }
 
     public int getPlants() {
@@ -588,7 +600,92 @@ public class Colony {
     
     public void runEating(){
         System.out.println("Consuming mushrooms: " + this.getTotalConsumption());
-        this.setMushrooms(this.getMushrooms() - this.getTotalConsumption());
+        if (this.getMushrooms() < this.getTotalConsumption()) {
+            int mush = this.getTotalConsumption() - this.getMushrooms();
+                System.out.println("Mushrooms deficit: " + mush);
+            while (mush > 0) {
+                if (this.getDrones().size() > 0) {
+                    this.deadAnts.add(this.getDrones().get(0));
+                    this.drones.remove(0);
+                    mush -= (int) (Engine.TYPE_DRONE.getConsumptionMult() * this.getBaseConsumption());
+                } else if (this.getPrincesses().size() > 0) {
+                    this.deadAnts.add(this.getPrincesses().get(0));
+                    this.princesses.remove(0);
+                    mush -= (int) (Engine.TYPE_PRINCESS.getConsumptionMult() * this.getBaseConsumption());
+                } else if (this.getMajors().size() > 0) {
+                    this.deadAnts.add(this.getMajors().get(0));
+                    this.majors.remove(0);
+                    mush -= (int) (Engine.TYPE_MAJOR.getConsumptionMult() * this.getBaseConsumption());
+                } else if (this.getSoldiers().size() > 0) {
+                    this.deadAnts.add(this.getSoldiers().get(0));
+                    this.soldiers.remove(0);
+                    mush -= (int) (Engine.TYPE_SOLDIER.getConsumptionMult() * this.getBaseConsumption());
+                } else if (this.getLarvae().size() > 0) {
+                    this.deadAnts.add(this.getLarvae().get(0));
+                    this.larvae.remove(0);
+                    mush -= (int) (Engine.TYPE_EGG.getConsumptionMult() * this.getBaseConsumption());
+                } else if (this.getWorkers().size() > 0) {
+                    this.deadAnts.add(this.getWorkers().get(0));
+                    this.workers.remove(0);
+                    mush -= (int) (Engine.TYPE_WORKER.getConsumptionMult() * this.getBaseConsumption());
+                } else if (this.getQueens().size() > 0) {
+                    this.deadAnts.add(this.getQueens().get(0));
+                    this.queens.remove(0);
+                    mush -= (int) (Engine.TYPE_QUEEN.getConsumptionMult() * this.getBaseConsumption());
+                } else {
+                    break;
+                }
+            }
+            this.setMushrooms(0);
+        } else {
+            this.setMushrooms(this.getMushrooms() - this.getTotalConsumption());
+        }
+    }
+
+    public void runAging(){
+        for (Ant ant : this.getWorkers()) {
+            ant.setAge(ant.getAge() + 1);
+            if (ant.getAge() >= ant.getMaxAge()) {
+                this.deadAnts.add(ant);
+                this.workers.remove(ant);
+            }
+        }
+        for (Ant ant : this.getSoldiers()) {
+            ant.setAge(ant.getAge() + 1);  
+            if (ant.getAge() >= ant.getMaxAge()) {
+                this.deadAnts.add(ant);
+                this.soldiers.remove(ant);
+            }
+        } 
+        for (Ant ant : this.getMajors()) {
+            ant.setAge(ant.getAge() + 1);  
+            if (ant.getAge() >= ant.getMaxAge()) {
+                this.deadAnts.add(ant);
+                this.majors.remove(ant);
+            }
+        }
+        for (Ant ant : this.getDrones()) {
+            ant.setAge(ant.getAge() + 1);   
+            if (ant.getAge() >= ant.getMaxAge()) {
+                this.deadAnts.add(ant);
+                this.drones.remove(ant);
+            }
+        } 
+        for (Ant ant : this.getPrincesses()) {
+            ant.setAge(ant.getAge() + 1);   
+            if (ant.getAge() >= ant.getMaxAge()) {
+                this.deadAnts.add(ant);
+                this.princesses.remove(ant);
+            }
+        }
+        for (Ant ant : this.getQueens()) {
+            ant.setAge(ant.getAge() + 1);
+            if (ant.getAge() >= ant.getMaxAge()) {
+                this.deadAnts.add(ant);
+                this.queens.remove(ant);
+            }
+        }
+
     }
 
     public void runEvolving(){

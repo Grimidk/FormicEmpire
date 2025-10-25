@@ -7,7 +7,7 @@ public class Ant {
     private int maxHealth;
     private float hunger;
     private int maxHunger;
-    private float age;
+    private int age;
     private int maxAge;
     private float temp;
     private float tempRes;
@@ -94,7 +94,7 @@ public class Ant {
         this.maxHunger = maxHunger;
     }
 
-    public float getAge() {
+    public int getAge() {
         return age;
     }
 
@@ -182,5 +182,7 @@ public class Ant {
         this.size = size;
     }
     
-    
+    public float getDeathChance() {
+        return (age / maxAge) * 100;
+    }
 }

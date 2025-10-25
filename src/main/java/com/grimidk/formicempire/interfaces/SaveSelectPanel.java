@@ -104,6 +104,7 @@ public class SaveSelectPanel extends JPanel {
                 Colony c = w.getSpawnHex().getColony();
                 if (c != null) {
                     save.setTotalAnts(c.getAntTotal());
+                    save.setDeadAnts(c.getDeadAnts() != null ? c.getDeadAnts().size() : 0);
                     save.setEggs(c.getEggs() != null ? c.getEggs().size() : 0);
                     save.setWorkers(c.getWorkers() != null ? c.getWorkers().size() : 0);
                     save.setSoldiers(c.getSoldiers() != null ? c.getSoldiers().size() : 0);
