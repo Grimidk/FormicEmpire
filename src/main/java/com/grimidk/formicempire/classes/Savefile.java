@@ -20,11 +20,29 @@ public class Savefile implements Serializable {
     private int totalAnts;
     private int deadAnts;
     private int eggs;
+    private int pupae;
+    private int larvae;
     private int workers;
     private int soldiers;
+    private int majors;
+    private int drones;
+    private int princesses;
     private int queens;
+
+    private int plants;
+    private int plantsCapacity;
     private int mushrooms;
     private int mushroomsCapacity;
+    private int protein;
+    private int proteinCapacity;
+    private int water;
+    private int waterCapacity; 
+    private int syrups;
+    private int syrupsCapacity;
+    private int resins;
+    private int resinsCapacity;
+    private int minerals;
+    private int mineralsCapacity;
 
     public Savefile(int id, String name) {
         this.id = id;
@@ -134,6 +152,22 @@ public class Savefile implements Serializable {
         this.eggs = eggs;
     }
 
+    public int getPupae() {
+        return pupae;
+    }
+
+    public void setPupae(int pupae) {
+        this.pupae = pupae;
+    }
+
+    public int getLarvae() {
+        return larvae;
+    }
+
+    public void setLarvae(int larvae) {
+        this.larvae = larvae;
+    }
+
     public int getWorkers() {
         return workers;
     }
@@ -150,12 +184,52 @@ public class Savefile implements Serializable {
         this.soldiers = soldiers;
     }
 
+    public int getMajors() {
+        return majors;
+    }
+
+    public void setMajors(int majors) {
+        this.majors = majors;
+    }
+
+    public int getDrones() {
+        return drones;
+    }
+
+    public void setDrones(int drones) {
+        this.drones = drones;
+    }
+
+    public int getPrincesses() {
+        return princesses;
+    }
+
+    public void setPrincesses(int princesses) {
+        this.princesses = princesses;
+    }
+
     public int getQueens() {
         return queens;
     }
 
     public void setQueens(int queens) {
         this.queens = queens;
+    }
+
+    public int getPlants() {
+        return plants;
+    }
+
+    public void setPlants(int plants) {
+        this.plants = plants;
+    }
+
+    public int getPlantsCapacity() {
+        return plantsCapacity;
+    }
+
+    public void setPlantsCapacity(int plantsCapacity) {
+        this.plantsCapacity = plantsCapacity;
     }
 
     public int getMushrooms() {
@@ -172,6 +246,86 @@ public class Savefile implements Serializable {
 
     public void setMushroomsCapacity(int mushroomsCapacity) {
         this.mushroomsCapacity = mushroomsCapacity;
+    }
+
+    public int getProtein() {
+        return protein;
+    }
+
+    public void setProtein(int protein) {
+        this.protein = protein;
+    }
+
+    public int getProteinCapacity() {
+        return proteinCapacity;
+    }
+
+    public void setProteinCapacity(int proteinCapacity) {
+        this.proteinCapacity = proteinCapacity;
+    }
+
+    public int getWater() {
+        return water;
+    }
+
+    public void setWater(int water) {
+        this.water = water;
+    }
+
+    public int getWaterCapacity() {
+        return waterCapacity;
+    }
+
+    public void setWaterCapacity(int waterCapacity) {
+        this.waterCapacity = waterCapacity;
+    }
+
+    public int getSyrups() {
+        return syrups;
+    }
+
+    public void setSyrups(int syrups) {
+        this.syrups = syrups;
+    }
+
+    public int getSyrupsCapacity() {
+        return syrupsCapacity;
+    }
+
+    public void setSyrupsCapacity(int syrupsCapacity) {
+        this.syrupsCapacity = syrupsCapacity;
+    }
+
+    public int getResins() {
+        return resins;
+    }
+
+    public void setResins(int resins) {
+        this.resins = resins;
+    }
+
+    public int getResinsCapacity() {
+        return resinsCapacity;
+    }
+
+    public void setResinsCapacity(int resinsCapacity) {
+        this.resinsCapacity = resinsCapacity;
+    }
+
+    public int getMinerals() {
+        return minerals;
+    }
+
+    public void setMinerals(int minerals) {
+        this.minerals = minerals;
+    }
+
+    public int getMineralsCapacity() {
+        return mineralsCapacity;
+    }
+
+    public void setMineralsCapacity(int mineralsCapacity) {
+        this.mineralsCapacity = mineralsCapacity;
     }
 
 }

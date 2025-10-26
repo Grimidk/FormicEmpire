@@ -40,6 +40,7 @@ public class Colony {
     private int researchSpeed;
     private int growthSpeed;
     private int layingRate;
+    private float conversionRate;
     private int parasiteDetection;
 
     private int baseHealth;
@@ -72,6 +73,7 @@ public class Colony {
         this.researchSpeed = 100;
         this.growthSpeed = 10;
         this.layingRate = 1;
+        this.conversionRate = 1.0f;
         this.parasiteDetection = 10;
         this.baseHealth = 100;
         this.baseHunger = 100;
@@ -86,19 +88,19 @@ public class Colony {
         this.baseSize = 1;
 
         this.plants = 0;
-        this.plantsCapacity = 10000;
+        this.plantsCapacity = 5000;
         this.mushrooms = 0;
         this.mushroomsCapacity = 10000;
         this.protein = 0;           
-        this.proteinCapacity = 10000;
+        this.proteinCapacity = 2000;
         this.water = 0;
-        this.waterCapacity = 10000;
+        this.waterCapacity = 2000;
         this.syrups = 0;
-        this.syrupsCapacity = 10000;
+        this.syrupsCapacity = 1000;
         this.resins = 0;
-        this.resinsCapacity = 10000;
+        this.resinsCapacity = 1000;
         this.minerals = 0;
-        this.mineralsCapacity = 10000;
+        this.mineralsCapacity = 500;
         this.eggsCapacity = 100;
         this.queensCapacity = 1;
     }
@@ -143,6 +145,7 @@ public class Colony {
         this.researchSpeed = 100;
         this.growthSpeed = 10;
         this.layingRate = 1;
+        this.conversionRate = 1.0f;
         this.parasiteDetection = 10;
         this.baseHealth = 100;
         this.baseHunger = 100;
@@ -157,19 +160,19 @@ public class Colony {
         this.baseSize = 1;
 
         this.plants = 0;
-        this.plantsCapacity = 10000;
+        this.plantsCapacity = 5000;
         this.mushrooms = 0;
         this.mushroomsCapacity = 10000;
         this.protein = 0;           
-        this.proteinCapacity = 10000;
+        this.proteinCapacity = 2000;
         this.water = 0;
-        this.waterCapacity = 10000;
+        this.waterCapacity = 2000;
         this.syrups = 0;
-        this.syrupsCapacity = 10000;
+        this.syrupsCapacity = 1000;
         this.resins = 0;
-        this.resinsCapacity = 10000;
+        this.resinsCapacity = 1000;
         this.minerals = 0;
-        this.mineralsCapacity = 10000;
+        this.mineralsCapacity = 500;
         this.eggsCapacity = 100;
         this.queensCapacity = 1;
     }
@@ -451,6 +454,14 @@ public class Colony {
     public void setLayingRate(int layingRate) {
         this.layingRate = layingRate;
     }
+    
+    public float getConversionRate() {
+        return conversionRate;
+    }
+
+    public void setConversionRate(float conversionRate) {
+        this.conversionRate = conversionRate;
+    }
 
     public int getParasiteDetection() {
         return parasiteDetection;
@@ -591,18 +602,43 @@ public class Colony {
     }
 
     public void runCollecting(){
-        int mush = this.getMushrooms() + (int) ((this.getWorkers().size() * this.getBaseAttackSpeed() * Engine.TYPE_WORKER.getAttackSpeedMult()));
-        if (mush > this.getMushroomsCapacity()) {
-            mush = this.getMushroomsCapacity();
+        int plant = this.getPlants() + (int) ((this.getWorkers().size() * this.getBaseAttackSpeed() * Engine.TYPE_WORKER.getAttackSpeedMult()));
+        if (plant > this.getPlantsCapacity()) {
+            plant = this.getPlantsCapacity();
         }
-        this.setMushrooms(mush);
+        this.setPlants(plant);
+        int protein = this.getProtein() + (int) ((this.getSoldiers().size() * this.getBaseAttackSpeed() * Engine.TYPE_SOLDIER.getAttackSpeedMult()));
+        if (protein > this.getProteinCapacity()) {
+            protein = this.getProteinCapacity();
+        }
+        this.setProtein(protein);
     }
-    
+
+    public void runConverting(){
+        if (this.getMushrooms() >= this.getMushroomsCapacity()) {
+            return;
+        }
+        if (this.getPlants() >= this.getConversionRate()) {
+            this.setPlants(this.getPlants() - (int) this.getConversionRate());
+            if (this.getMushrooms() + ((int) this.getConversionRate()) <= this.getMushroomsCapacity()) {
+                this.setMushrooms(this.getMushrooms() + ((int) this.getConversionRate()));
+            } else {
+                this.setMushrooms(this.getMushroomsCapacity());
+            }
+        }
+        if (this.getProtein() >= this.getConversionRate()) {
+            this.setProtein(this.getProtein() - (int) this.getConversionRate());
+            if (this.getMushrooms() + ((int) this.getConversionRate()) <= this.getMushroomsCapacity()) {
+                this.setMushrooms(this.getMushrooms() + ((int) this.getConversionRate()));
+            } else {
+                this.setMushrooms(this.getMushroomsCapacity());
+            }
+        }
+    }
+
     public void runEating(){
-        System.out.println("Consuming mushrooms: " + this.getTotalConsumption());
         if (this.getMushrooms() < this.getTotalConsumption()) {
             int mush = this.getTotalConsumption() - this.getMushrooms();
-                System.out.println("Mushrooms deficit: " + mush);
             while (mush > 0) {
                 if (this.getDrones().size() > 0) {
                     this.deadAnts.add(this.getDrones().get(0));

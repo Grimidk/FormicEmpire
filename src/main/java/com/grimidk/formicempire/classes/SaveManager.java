@@ -264,11 +264,28 @@ public class SaveManager {
                     save.setTotalAnts(c.getAntTotal());
                     save.setDeadAnts(c.getDeadAnts() != null ? c.getDeadAnts().size() : 0);
                     save.setEggs(c.getEggs() != null ? c.getEggs().size() : 0);
+                    save.setLarvae(c.getLarvae() != null ? c.getLarvae().size() : 0);
+                    save.setPupae(c.getPupae() != null ? c.getPupae().size() : 0);
                     save.setWorkers(c.getWorkers() != null ? c.getWorkers().size() : 0);
                     save.setSoldiers(c.getSoldiers() != null ? c.getSoldiers().size() : 0);
+                    save.setMajors(c.getMajors() != null ? c.getMajors().size() : 0);
+                    save.setDrones(c.getDrones() != null ? c.getDrones().size() : 0);
+                    save.setPrincesses(c.getPrincesses() != null ? c.getPrincesses().size() : 0);
                     save.setQueens(c.getQueens() != null ? c.getQueens().size() : 0);
                     save.setMushrooms(c.getMushrooms());
                     save.setMushroomsCapacity(c.getMushroomsCapacity());
+                    save.setPlants(c.getPlants());
+                    save.setPlantsCapacity(c.getPlantsCapacity());
+                    save.setProtein(c.getProtein());
+                    save.setProteinCapacity(c.getProteinCapacity());
+                    save.setWater(c.getWater());
+                    save.setWaterCapacity(c.getWaterCapacity());
+                    save.setSyrups(c.getSyrups());
+                    save.setSyrupsCapacity(c.getSyrupsCapacity());
+                    save.setResins(c.getResins());
+                    save.setResinsCapacity(c.getResinsCapacity());
+                    save.setMinerals(c.getMinerals());
+                    save.setMineralsCapacity(c.getMineralsCapacity());
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -290,11 +307,28 @@ public class SaveManager {
         m.put("totalAnts", Integer.toString(s.getTotalAnts()));
         m.put("deadAnts", Integer.toString(s.getDeadAnts()));
         m.put("eggs", Integer.toString(s.getEggs()));
+        m.put("larvae", Integer.toString(s.getLarvae()));
+        m.put("pupae", Integer.toString(s.getPupae()));
         m.put("workers", Integer.toString(s.getWorkers()));
         m.put("soldiers", Integer.toString(s.getSoldiers()));
+        m.put("majors", Integer.toString(s.getMajors()));
+        m.put("drones", Integer.toString(s.getDrones()));
+        m.put("princesses", Integer.toString(s.getPrincesses()));
         m.put("queens", Integer.toString(s.getQueens()));
+        m.put("plants", Integer.toString(s.getPlants()));
+        m.put("plantsCapacity", Integer.toString(s.getPlantsCapacity()));
         m.put("mushrooms", Integer.toString(s.getMushrooms()));
         m.put("mushroomsCapacity", Integer.toString(s.getMushroomsCapacity()));
+        m.put("protein", Integer.toString(s.getProtein()));
+        m.put("proteinCapacity", Integer.toString(s.getProteinCapacity()));
+        m.put("water", Integer.toString(s.getWater()));
+        m.put("waterCapacity", Integer.toString(s.getWaterCapacity()));
+        m.put("syrups", Integer.toString(s.getSyrups()));
+        m.put("syrupsCapacity", Integer.toString(s.getSyrupsCapacity()));
+        m.put("resins", Integer.toString(s.getResins()));
+        m.put("resinsCapacity", Integer.toString(s.getResinsCapacity()));
+        m.put("minerals", Integer.toString(s.getMinerals()));
+        m.put("mineralsCapacity", Integer.toString(s.getMineralsCapacity()));
         
         for (Map.Entry<String,String> e : m.entrySet()) {
             w.write(e.getKey());
@@ -334,11 +368,28 @@ public class SaveManager {
             s.setTotalAnts(Integer.parseInt(m.getOrDefault("totalAnts", "0")));
             s.setDeadAnts(Integer.parseInt(m.getOrDefault("deadAnts", "0")));
             s.setEggs(Integer.parseInt(m.getOrDefault("eggs", "0")));
+            s.setLarvae(Integer.parseInt(m.getOrDefault("larvae", "0")));
+            s.setPupae(Integer.parseInt(m.getOrDefault("pupae", "0")));
             s.setWorkers(Integer.parseInt(m.getOrDefault("workers", "0")));
             s.setSoldiers(Integer.parseInt(m.getOrDefault("soldiers", "0")));
+            s.setMajors(Integer.parseInt(m.getOrDefault("majors", "0")));
+            s.setDrones(Integer.parseInt(m.getOrDefault("drones", "0")));
+            s.setPrincesses(Integer.parseInt(m.getOrDefault("princesses", "0")));
             s.setQueens(Integer.parseInt(m.getOrDefault("queens", "0")));
             s.setMushrooms(Integer.parseInt(m.getOrDefault("mushrooms", "0")));
             s.setMushroomsCapacity(Integer.parseInt(m.getOrDefault("mushroomsCapacity", "0")));
+            s.setPlants(Integer.parseInt(m.getOrDefault("plants", "0")));
+            s.setPlantsCapacity(Integer.parseInt(m.getOrDefault("plantsCapacity", "0")));
+            s.setProtein(Integer.parseInt(m.getOrDefault("protein", "0")));
+            s.setProteinCapacity(Integer.parseInt(m.getOrDefault("proteinCapacity", "0")));
+            s.setWater(Integer.parseInt(m.getOrDefault("water", "0")));
+            s.setWaterCapacity(Integer.parseInt(m.getOrDefault("waterCapacity", "0")));
+            s.setSyrups(Integer.parseInt(m.getOrDefault("syrups", "0")));
+            s.setSyrupsCapacity(Integer.parseInt(m.getOrDefault("syrupsCapacity", "0")));
+            s.setResins(Integer.parseInt(m.getOrDefault("resins", "0")));
+            s.setResinsCapacity(Integer.parseInt(m.getOrDefault("resinsCapacity", "0")));
+            s.setMinerals(Integer.parseInt(m.getOrDefault("minerals", "0")));
+            s.setMineralsCapacity(Integer.parseInt(m.getOrDefault("mineralsCapacity", "0")));
         }
         return s;
     }

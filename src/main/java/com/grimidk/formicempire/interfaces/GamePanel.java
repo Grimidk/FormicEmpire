@@ -11,66 +11,87 @@ import java.awt.*;
 
 public class GamePanel extends JPanel {
     private final MainFrame frame;
-    private final JLabel statusLabel;
-    private final JLabel totalLabel;
-    private final JLabel queensLabel;
-    private final JLabel soldiersLabel;
-    private final JLabel workersLabel;
-    private final JLabel eggsLabel;
-    private final JLabel deadAntsLabel;
-    private final JLabel mushroomsLabel;
+    private JLabel statusLabel;
+    private JLabel totalLabel;
+    private JLabel queensLabel;
+    private JLabel princessLabel;
+    private JLabel droneLabel;  
+    private JLabel majorLabel;
+    private JLabel soldiersLabel;
+    private JLabel workersLabel;
+    private JLabel larvaLabel;
+    private JLabel pupaLabel;
+    private JLabel eggsLabel;
+    private JLabel deadAntsLabel;
+    private JLabel mushroomsLabel;
+    private JLabel planLabel;
+    private JLabel proteinLabel;
+    private JLabel waterLabel;  
+    private JLabel syrupLabel;
+    private JLabel resinLabel;
+    private JLabel mineralLabel;
+
     private Runnable tickListener;
-    private final JButton playPauseButton;
-    private final JLabel minuteLabel;
-    private final JLabel hourLabel;
-    private final JLabel dayLabel;
-    private final JLabel monthLabel;
-    private final JLabel yearLabel;
-    private final JLabel timeOfDayLabel;
-    private final JLabel moonPhaseLabel;
-    private final JLabel seasonLabel;
-    private final JLabel weatherLabel;
-    private final JLabel statusIndicator;
-    private final JButton speedUpButton;
-    private final JButton speedDownButton;
-    private final JLabel tickLabel;
+    private JButton playPauseButton;
+    private JLabel minuteLabel;
+    private JLabel hourLabel;
+    private JLabel dayLabel;
+    private JLabel monthLabel;
+    private JLabel yearLabel;
+    private JLabel timeOfDayLabel;
+    private JLabel moonPhaseLabel;
+    private JLabel seasonLabel;
+    private JLabel weatherLabel;
+    private JLabel statusIndicator;
+    private JButton speedUpButton;
+    private JButton speedDownButton;
+    private JLabel tickLabel;
     private volatile boolean engineStarted = false;
-    private int speedLevel = 1; 
+    private int speedLevel = 1;
+
+    private static final float[] SPEED_DELAYS = {
+        -1f,    // Level 0 (Paused)
+        250f,   // Level 1
+        125f,   // Level 2
+        50f,    // Level 3
+        25f,    // Level 4
+        10f,    // Level 5
+        5f      // Level 6
+    };
 
     public GamePanel(MainFrame frame) {
         this.frame = frame;
-        setLayout(new BorderLayout());
-    statusLabel = new JLabel("Game not started");
+        this.tickListener = null;
 
-        // Status panel (indicator + text)
+        initComponents();
+        initLayout();
+        initListeners();
+
+        updateTickLabel(frame.getEngine());
+        updateStatusIndicator(false);
+    }
+
+    private void initComponents() {
+        statusLabel = new JLabel("Game not started");
         statusIndicator = new JLabel();
-        statusIndicator.setOpaque(true);
-        statusIndicator.setBackground(Color.GRAY);
-        statusIndicator.setPreferredSize(new Dimension(12, 12));
-        JPanel north = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        north.add(statusIndicator);
-        north.add(statusLabel);
-        add(north, BorderLayout.NORTH);
-
-        JPanel stats = new JPanel(new GridLayout(4, 1));
         totalLabel = new JLabel("Total ants: 0");
         queensLabel = new JLabel("Queens: 0");
+        princessLabel = new JLabel("Princesses: 0");
+        droneLabel = new JLabel("Drones: 0");
+        majorLabel = new JLabel("Majors: 0");
         soldiersLabel = new JLabel("Soldiers: 0");
         workersLabel = new JLabel("Workers: 0");
+        larvaLabel = new JLabel("Larva: 0");
+        pupaLabel = new JLabel("Pupa: 0");  
         eggsLabel = new JLabel("Eggs: 0");
         deadAntsLabel = new JLabel("Dead ants: 0");
         mushroomsLabel = new JLabel("Mushrooms: 0");
-        stats.add(totalLabel);
-        stats.add(queensLabel);
-        stats.add(soldiersLabel);
-        stats.add(workersLabel);
-        stats.add(eggsLabel);
-        stats.add(deadAntsLabel);   
-        stats.add(mushroomsLabel);
-        add(stats, BorderLayout.CENTER);
-
-        // Time panel (right)
-        JPanel timePanel = new JPanel(new GridLayout(5, 1));
+        planLabel = new JLabel("Plant matter: 0");
+        proteinLabel = new JLabel("Protein: 0");
+        waterLabel = new JLabel("Water: 0");
+        syrupLabel = new JLabel("Syrup: 0");
+        resinLabel = new JLabel("Resin: 0");
+        mineralLabel = new JLabel("Minerals: 0");
         minuteLabel = new JLabel("Minute: 0");
         hourLabel = new JLabel("Hour: 0");
         dayLabel = new JLabel("Day: 0");
@@ -80,6 +101,55 @@ public class GamePanel extends JPanel {
         moonPhaseLabel = new JLabel("Moon Phase: New Moon");
         seasonLabel = new JLabel("Season: Spring");
         weatherLabel = new JLabel("Weather: Clear");
+        speedDownButton = new JButton("Speed-");
+        speedUpButton = new JButton("Speed+");
+        tickLabel = new JLabel("Tick: 500ms");
+        playPauseButton = new JButton("Pause");
+    }
+
+    private void initLayout() {
+        setLayout(new BorderLayout());
+        add(createNorthPanel(), BorderLayout.NORTH);
+        add(createCenterPanel(), BorderLayout.CENTER);
+        add(createEastPanel(), BorderLayout.EAST);
+        add(createSouthPanel(), BorderLayout.SOUTH);
+    }
+
+    private JPanel createNorthPanel() {
+        statusIndicator.setOpaque(true);
+        statusIndicator.setBackground(Color.GRAY);
+        statusIndicator.setPreferredSize(new Dimension(12, 12));
+        JPanel north = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        north.add(statusIndicator);
+        north.add(statusLabel);
+        return north;
+    }
+
+    private JPanel createCenterPanel() {
+        JPanel stats = new JPanel(new GridLayout(4, 1));
+        stats.add(totalLabel);
+        stats.add(queensLabel);
+        stats.add(princessLabel);
+        stats.add(droneLabel);
+        stats.add(majorLabel);
+        stats.add(soldiersLabel);
+        stats.add(workersLabel);
+        stats.add(larvaLabel);
+        stats.add(pupaLabel);
+        stats.add(eggsLabel);
+        stats.add(deadAntsLabel);
+        stats.add(mushroomsLabel);
+        stats.add(planLabel);
+        stats.add(proteinLabel);
+        stats.add(waterLabel);
+        stats.add(syrupLabel);
+        stats.add(resinLabel);
+        stats.add(mineralLabel);
+        return stats;
+    }
+
+    private JPanel createEastPanel() {
+        JPanel timePanel = new JPanel(new GridLayout(5, 1));
         timePanel.add(minuteLabel);
         timePanel.add(hourLabel);
         timePanel.add(dayLabel);
@@ -88,80 +158,99 @@ public class GamePanel extends JPanel {
         timePanel.add(timeOfDayLabel);
         timePanel.add(moonPhaseLabel);
         timePanel.add(seasonLabel);
-        add(timePanel, BorderLayout.EAST);
+        timePanel.add(weatherLabel); 
+        return timePanel;
+    }
 
-        // South panel with speed controls, play/pause and back
+    private JPanel createSouthPanel() {
         JPanel south = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        speedDownButton = new JButton("Speed-");
-        speedUpButton = new JButton("Speed+");
-        tickLabel = new JLabel("Tick: 500ms");
+        south.add(speedDownButton);
+        south.add(speedUpButton);
+        south.add(tickLabel);
+        south.add(playPauseButton);
+        south.add(new JButton("Back")); 
+        return south;
+    }
+
+    private void initListeners() {
         speedDownButton.addActionListener(e -> {
             if (speedLevel > 0) speedLevel--;
             applySpeedLevel();
         });
+
         speedUpButton.addActionListener(e -> {
-            if (speedLevel < 6) speedLevel++;
+            if (speedLevel < SPEED_DELAYS.length - 1) speedLevel++;
             applySpeedLevel();
         });
-        playPauseButton = new JButton("Pause");
+
         playPauseButton.addActionListener(e -> {
             Engine engine = frame.getEngine();
             if (engine == null || !engineStarted) return;
             if (engine.isPaused()) {
                 engine.resumeEngine();
                 playPauseButton.setText("Pause");
-                updatePauseIndicator(false);
+                updateStatusIndicator(false);
             } else {
                 engine.pauseEngine();
                 playPauseButton.setText("Play");
-                updatePauseIndicator(true);
+                updateStatusIndicator(true);
             }
         });
-        JButton back = new JButton("Back");
-        back.addActionListener(e -> {
-            Engine eng = frame.getEngine();
-            if (eng != null) {
-                eng.pauseEngine();
-            }
-            updatePauseIndicator(true);
-            unregisterTickListener();
-            try {
-                SaveManager sm = new SaveManager();
-                Engine engine = frame.getEngine();
-                if (engine != null && engine.getWorld() != null) {
-                        World w = engine.getWorld();
-                        int slotIdLocal = 0;
-                        try { slotIdLocal = w.getSaveSlotId(); } catch (Exception ignore) { slotIdLocal = 0; }
-                        final int capturedSlot = slotIdLocal;
-                        if (capturedSlot > 0) {
-                            Savefile existing = sm.loadSlot(capturedSlot);
-                            String nameToUse = (existing != null && existing.getName() != null && !existing.getName().trim().isEmpty()) ? existing.getName() : ("Save " + capturedSlot);
-                            final String chosen = nameToUse;
-                            sm.saveWorldToSlotUserAsync(engine.getWorld(), capturedSlot, chosen, () -> {
-                                frame.showCard(MainFrame.CARD_SAVE);
-                            });
-                            return;
-                        } else {
-                            sm.saveWorldToSlot(engine.getWorld(), 0);
-                            frame.showCard(MainFrame.CARD_SAVE);
-                            return;
-                        }
-                }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-            frame.showCard(MainFrame.CARD_SAVE);
-        });
-        south.add(speedDownButton);
-        south.add(speedUpButton);
-        south.add(tickLabel);
-        south.add(playPauseButton);
-        south.add(back);
-        add(south, BorderLayout.SOUTH);
 
-        this.tickListener = null;
-        updateTickLabel(frame.getEngine());
-        updatePauseIndicator(false);
+        JPanel southPanel = (JPanel) getComponent(3); // 0=N, 1=C, 2=E, 3=S
+        southPanel.removeAll();
+        
+        JButton back = new JButton("Back");
+        back.addActionListener(e -> handleBackButton());
+
+        southPanel.add(speedDownButton);
+        southPanel.add(speedUpButton);
+        southPanel.add(tickLabel);
+        southPanel.add(playPauseButton);
+        southPanel.add(back);
+    }
+
+    private void handleBackButton() {
+        Engine eng = frame.getEngine();
+        if (eng != null) {
+            eng.pauseEngine();
+        }
+        updateStatusIndicator(true);
+        unregisterTickListener();
+
+        try {
+            SaveManager sm = new SaveManager();
+            Engine engine = frame.getEngine();
+            if (engine != null && engine.getWorld() != null) {
+                World w = engine.getWorld();
+                int slotIdLocal = 0;
+                try {
+                    slotIdLocal = w.getSaveSlotId();
+                } catch (Exception ignore) {
+                    slotIdLocal = 0;
+                }
+                
+                final int capturedSlot = slotIdLocal;
+                if (capturedSlot > 0) {
+                    Savefile existing = sm.loadSlot(capturedSlot);
+                    String nameToUse = (existing != null && existing.getName() != null && !existing.getName().trim().isEmpty())
+                                       ? existing.getName() : ("Save " + capturedSlot);
+                    
+                    sm.saveWorldToSlotUserAsync(engine.getWorld(), capturedSlot, nameToUse, () -> {
+                        frame.showCard(MainFrame.CARD_SAVE);
+                    });
+                    return; 
+                } else {
+                    sm.saveWorldToSlot(engine.getWorld(), 0);
+                    frame.showCard(MainFrame.CARD_SAVE);
+                    return;
+                }
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        
+        frame.showCard(MainFrame.CARD_SAVE);
     }
 
     public void enterWithSavefile(Savefile savefile) {
@@ -188,8 +277,9 @@ public class GamePanel extends JPanel {
         tickListener = () -> SwingUtilities.invokeLater(this::updateCounts);
         engine.addTickListener(tickListener);
         updateTickLabel(engine);
-        updatePauseIndicator(engine.isPaused());
+        updateStatusIndicator(engine.isPaused());
     }
+
     private void unregisterTickListener() {
         if (tickListener != null) {
             Engine engine = frame.getEngine();
@@ -206,7 +296,7 @@ public class GamePanel extends JPanel {
         tickLabel.setText("Tick: " + (long) eng.getDelay() + "ms");
     }
 
-    private void updatePauseIndicator(boolean paused) {
+    private void updateStatusIndicator(boolean paused) {
         if (!engineStarted) {
             statusIndicator.setBackground(Color.GRAY);
             statusLabel.setText("Game not started");
@@ -224,53 +314,21 @@ public class GamePanel extends JPanel {
     private void applySpeedLevel() {
         Engine eng = frame.getEngine();
         if (eng == null) return;
-        switch (speedLevel) {
-            case 0:
-                eng.pauseEngine();
-                updatePauseIndicator(true);
-                tickLabel.setText("Tick: PAUSED");
-                break;
-            case 1:
-                eng.setDelay(250f);
-                eng.resumeEngine();
-                updatePauseIndicator(false);
-                tickLabel.setText("Tick: 250ms");
-                break;
-            case 2:
-                eng.setDelay(125f);
-                eng.resumeEngine();
-                updatePauseIndicator(false);
-                tickLabel.setText("Tick: 125ms");
-                break;
-            case 3:
-                eng.setDelay(50f);
-                eng.resumeEngine();
-                updatePauseIndicator(false);
-                tickLabel.setText("Tick: 50ms");
-                break;
-            case 4:
-                eng.setDelay(25f);
-                eng.resumeEngine();
-                updatePauseIndicator(false);
-                tickLabel.setText("Tick: 25ms");
-                break;
-            case 5:
-                eng.setDelay(10f);
-                eng.resumeEngine();
-                updatePauseIndicator(false);
-                tickLabel.setText("Tick: 10ms");
-                break;
-            case 6:
-                eng.setDelay(5f);
-                eng.resumeEngine();
-                updatePauseIndicator(false);
-                tickLabel.setText("Tick: 5ms");
-                break;
-            default:
-                eng.setDelay(500f);
-                eng.resumeEngine();
-                updatePauseIndicator(false);
-                tickLabel.setText("Tick: 500ms");
+
+        if (speedLevel < 0) speedLevel = 0;
+        if (speedLevel >= SPEED_DELAYS.length) speedLevel = SPEED_DELAYS.length - 1;
+
+        float delay = SPEED_DELAYS[speedLevel];
+
+        if (delay == -1f) { 
+            eng.pauseEngine();
+            updateStatusIndicator(true);
+            tickLabel.setText("Tick: PAUSED");
+        } else {
+            eng.setDelay(delay);
+            eng.resumeEngine();
+            updateStatusIndicator(false);
+            updateTickLabel(eng); 
         }
     }
 
@@ -285,17 +343,34 @@ public class GamePanel extends JPanel {
 
         int total = colony.getAntTotal();
         int queens = colony.getQueens() != null ? colony.getQueens().size() : 0;
+        int princesses = colony.getPrincesses() != null ? colony.getPrincesses().size() : 0;
+        int drones = colony.getDrones() != null ? colony.getDrones().size() : 0;
+        int majors = colony.getMajors() != null ? colony.getMajors().size() : 0;
         int soldiers = colony.getSoldiers() != null ? colony.getSoldiers().size() : 0;
         int workers = colony.getWorkers() != null ? colony.getWorkers().size() : 0;
+        int larva = colony.getLarvae() != null ? colony.getLarvae().size() : 0;
+        int pupa = colony.getPupae() != null ? colony.getPupae().size() : 0;
         int eggs = colony.getEggs() != null ? colony.getEggs().size() : 0;
+        int deadAnts = colony.getDeadAnts() != null ? colony.getDeadAnts().size() : 0;
 
         totalLabel.setText("Total ants: " + total);
         queensLabel.setText("Queens: " + queens);
+        princessLabel.setText("Princesses: " + princesses);
+        droneLabel.setText("Drones: " + drones);
+        majorLabel.setText("Majors: " + majors);
         soldiersLabel.setText("Soldiers: " + soldiers);
         workersLabel.setText("Workers: " + workers);
+        larvaLabel.setText("Larva: " + larva);
+        pupaLabel.setText("Pupa: " + pupa);
         eggsLabel.setText("Eggs: " + eggs);
-        deadAntsLabel.setText("Dead ants: " + colony.getDeadAnts().size());
+        deadAntsLabel.setText("Dead ants: " + deadAnts);
         mushroomsLabel.setText("Mushrooms: " + colony.getMushrooms());
+        planLabel.setText("Plants: " + colony.getPlants());
+        proteinLabel.setText("Protein: " + colony.getProtein());
+        waterLabel.setText("Water: " + colony.getWater());
+        syrupLabel.setText("Syrup: " + colony.getSyrups());
+        resinLabel.setText("Resin: " + colony.getResins());
+        mineralLabel.setText("Minerals: " + colony.getMinerals());
         minuteLabel.setText("Minute: " + world.getMinute());
         hourLabel.setText("Hour: " + world.getHour());
         dayLabel.setText("Day: " + world.getDay());
@@ -303,7 +378,7 @@ public class GamePanel extends JPanel {
         yearLabel.setText("Year: " + world.getYear());
         timeOfDayLabel.setText("Time of Day: " + world.getTimeOfDay().getName());
         moonPhaseLabel.setText("Moon Phase: " + world.getMoonPhase().getName());
-        seasonLabel.setText("Season: " + world.getSeason().getName());  
+        seasonLabel.setText("Season: " + world.getSeason().getName());
         weatherLabel.setText("Weather: " + world.getWeather().getName());
     }
 }

@@ -169,6 +169,9 @@ public class World {
 
     public void runMinute() {
         this.minute++;
+
+        this.getSpawnHex().getColony().runConverting();
+
         if (this.minute > 59) {
             this.minute = 0;
             this.runHour();
