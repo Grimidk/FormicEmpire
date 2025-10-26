@@ -352,6 +352,13 @@ public class GamePanel extends JPanel {
         int pupa = colony.getPupae() != null ? colony.getPupae().size() : 0;
         int eggs = colony.getEggs() != null ? colony.getEggs().size() : 0;
         int deadAnts = colony.getDeadAnts() != null ? colony.getDeadAnts().size() : 0;
+        int mushrooms = colony.getMushrooms();
+        int plants = colony.getPlants();
+        int protein = colony.getProtein();
+        int water = colony.getWater();
+        int syrups = colony.getSyrups();
+        int resins = colony.getResins();    
+        int minerals = colony.getMinerals();
 
         totalLabel.setText("Total ants: " + total);
         queensLabel.setText("Queens: " + queens);
@@ -364,13 +371,13 @@ public class GamePanel extends JPanel {
         pupaLabel.setText("Pupa: " + pupa);
         eggsLabel.setText("Eggs: " + eggs);
         deadAntsLabel.setText("Dead ants: " + deadAnts);
-        mushroomsLabel.setText("Mushrooms: " + colony.getMushrooms());
-        planLabel.setText("Plants: " + colony.getPlants());
-        proteinLabel.setText("Protein: " + colony.getProtein());
-        waterLabel.setText("Water: " + colony.getWater());
-        syrupLabel.setText("Syrup: " + colony.getSyrups());
-        resinLabel.setText("Resin: " + colony.getResins());
-        mineralLabel.setText("Minerals: " + colony.getMinerals());
+        mushroomsLabel.setText("Mushrooms: " + mushrooms);
+        planLabel.setText("Plant matter: " + plants);
+        proteinLabel.setText("Protein: " + protein);
+        waterLabel.setText("Water: " + water);
+        syrupLabel.setText("Syrup: " + syrups);
+        resinLabel.setText("Resin: " + resins);
+        mineralLabel.setText("Minerals: " + minerals);
         minuteLabel.setText("Minute: " + world.getMinute());
         hourLabel.setText("Hour: " + world.getHour());
         dayLabel.setText("Day: " + world.getDay());

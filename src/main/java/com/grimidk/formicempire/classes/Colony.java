@@ -121,13 +121,26 @@ public class Colony {
         this.queens = new ArrayList<>();
 
         int eggCount = savefile.getEggs();
+        int larvaeCount = savefile.getLarvae();
+        int pupaeCount = savefile.getPupae();
         int workersCount = savefile.getWorkers();
         int soldiersCount = savefile.getSoldiers();
+        int majorsCount = savefile.getMajors();
+        int dronesCount = savefile.getDrones();
+        int princessesCount = savefile.getPrincesses();
         int queensCount = savefile.getQueens();
 
         for (int i = 0; i < eggCount; i++) {
             Ant a = new Ant(this, Engine.TYPE_EGG);
             this.eggs.add(a);
+        }
+        for (int i = 0; i < larvaeCount; i++) {
+            Ant a = new Ant(this, Engine.TYPE_LARVA);
+            this.larvae.add(a);
+        }
+        for (int i = 0; i < pupaeCount; i++) {
+            Ant a = new Ant(this, Engine.TYPE_PUPA);
+            this.pupae.add(a);
         }
         for (int i = 0; i < workersCount; i++) {
             Ant a = new Ant(this, Engine.TYPE_WORKER);
@@ -137,10 +150,30 @@ public class Colony {
             Ant a = new Ant(this, Engine.TYPE_SOLDIER);
             this.soldiers.add(a);
         }
+        for (int i = 0; i < majorsCount; i++) {
+            Ant a = new Ant(this, Engine.TYPE_MAJOR);
+            this.majors.add(a);
+        }
+        for (int i = 0; i < dronesCount; i++) {
+            Ant a = new Ant(this, Engine.TYPE_DRONE);
+            this.drones.add(a);
+        }
+        for (int i = 0; i < princessesCount; i++) {
+            Ant a = new Ant(this, Engine.TYPE_PRINCESS);
+            this.princesses.add(a);
+        }
         for (int i = 0; i < queensCount; i++) {
             Ant a = new Ant(this, Engine.TYPE_QUEEN);
             this.queens.add(a);
         }
+
+        this.plants = savefile.getPlants();
+        this.mushrooms = savefile.getMushrooms();
+        this.protein = savefile.getProtein();
+        this.water = savefile.getWater();
+        this.syrups = savefile.getSyrups();
+        this.resins = savefile.getResins();
+        this.minerals = savefile.getMinerals();
 
         this.researchSpeed = 100;
         this.growthSpeed = 10;
@@ -159,19 +192,12 @@ public class Colony {
         this.baseSpeed = 1;
         this.baseSize = 1;
 
-        this.plants = 0;
         this.plantsCapacity = 5000;
-        this.mushrooms = 0;
-        this.mushroomsCapacity = 10000;
-        this.protein = 0;           
+        this.mushroomsCapacity = 10000;        
         this.proteinCapacity = 2000;
-        this.water = 0;
         this.waterCapacity = 2000;
-        this.syrups = 0;
         this.syrupsCapacity = 1000;
-        this.resins = 0;
         this.resinsCapacity = 1000;
-        this.minerals = 0;
         this.mineralsCapacity = 500;
         this.eggsCapacity = 100;
         this.queensCapacity = 1;
@@ -628,8 +654,8 @@ public class Colony {
         }
         if (this.getProtein() >= this.getConversionRate()) {
             this.setProtein(this.getProtein() - (int) this.getConversionRate());
-            if (this.getMushrooms() + ((int) this.getConversionRate()) <= this.getMushroomsCapacity()) {
-                this.setMushrooms(this.getMushrooms() + ((int) this.getConversionRate()));
+            if (this.getMushrooms() + ((int) this.getConversionRate() * 3) <= this.getMushroomsCapacity()) {
+                this.setMushrooms(this.getMushrooms() + ((int) this.getConversionRate() * 3));
             } else {
                 this.setMushrooms(this.getMushroomsCapacity());
             }

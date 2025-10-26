@@ -106,12 +106,22 @@ public class SaveSelectPanel extends JPanel {
                     save.setTotalAnts(c.getAntTotal());
                     save.setDeadAnts(c.getDeadAnts() != null ? c.getDeadAnts().size() : 0);
                     save.setEggs(c.getEggs() != null ? c.getEggs().size() : 0);
+                    save.setLarvae(c.getLarvae() != null ? c.getLarvae().size() : 0);
+                    save.setPupae(c.getPupae() != null ? c.getPupae().size() : 0);
                     save.setWorkers(c.getWorkers() != null ? c.getWorkers().size() : 0);
                     save.setSoldiers(c.getSoldiers() != null ? c.getSoldiers().size() : 0);
+                    save.setMajors(c.getMajors() != null ? c.getMajors().size() : 0);
+                    save.setDrones(c.getDrones() != null ? c.getDrones().size() : 0);
+                    save.setPrincesses(c.getPrincesses() != null ? c.getPrincesses().size() : 0);
                     save.setQueens(c.getQueens() != null ? c.getQueens().size() : 0);
                     
                     save.setMushrooms(c.getMushrooms());
-                    save.setMushroomsCapacity(c.getMushroomsCapacity());
+                    save.setPlants(c.getPlants());
+                    save.setProtein(c.getProtein());
+                    save.setWater(c.getWater());
+                    save.setSyrups(c.getSyrups());
+                    save.setResins(c.getResins());
+                    save.setMinerals(c.getMinerals());
                 }
             }
         }
