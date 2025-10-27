@@ -1,6 +1,11 @@
 package com.grimidk.formicempire.classes;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap; 
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import com.grimidk.formicempire.classes.constants.AntType;
 import com.grimidk.formicempire.classes.constants.Species;
@@ -11,16 +16,9 @@ public class Colony {
     private String name;
     private Species species;
     private boolean isPlayer;
-    private ArrayList<Ant> eggs;
-    private ArrayList<Ant> larvae;
-    private ArrayList<Ant> pupae;
-    private ArrayList<Ant> workers;
-    private ArrayList<Ant> soldiers;
-    private ArrayList<Ant> majors;
-    private ArrayList<Ant> drones;
-    private ArrayList<Ant> princesses;
-    private ArrayList<Ant> queens;
-    private ArrayList<Ant> deadAnts;
+    
+    private final Map<AntType, List<Ant>> antGroups;
+    private final List<Ant> deadAnts;
 
     private int plants;
     private int plantsCapacity;
@@ -57,23 +55,21 @@ public class Colony {
     private int baseSpeed;  
     private int baseSize;
 
-    public Colony(int id, String name, boolean isPlayer) {
-        this.id = id;
-        this.name = name;
-        this.isPlayer = isPlayer;
-        this.deadAnts = new ArrayList<>();
-        this.eggs = new ArrayList<>();
-        this.larvae = new ArrayList<>();
-        this.pupae = new ArrayList<>();
-        this.workers = new ArrayList<>();
-        this.soldiers = new ArrayList<>();  
-        this.majors = new ArrayList<>();
-        this.drones = new ArrayList<>();
-        this.princesses = new ArrayList<>();
-        this.queens = new ArrayList<>();
+    private void initializeLists() {
+        this.antGroups.put(Engine.TYPE_EGG, new ArrayList<Ant>());
+        this.antGroups.put(Engine.TYPE_LARVA, new ArrayList<Ant>());
+        this.antGroups.put(Engine.TYPE_PUPA, new ArrayList<Ant>());
+        this.antGroups.put(Engine.TYPE_WORKER, new ArrayList<Ant>());
+        this.antGroups.put(Engine.TYPE_SOLDIER, new ArrayList<Ant>());
+        this.antGroups.put(Engine.TYPE_MAJOR, new ArrayList<Ant>());
+        this.antGroups.put(Engine.TYPE_DRONE, new ArrayList<Ant>());
+        this.antGroups.put(Engine.TYPE_PRINCESS, new ArrayList<Ant>());
+        this.antGroups.put(Engine.TYPE_QUEEN, new ArrayList<Ant>());
+    }
 
+    private void initializeDefaults() {
         this.researchSpeed = 100;
-        this.growthTime = 10;
+        this.growthTime = 5;
         this.layingRate = 1;
         this.conversionRate = 1.0f;
         this.parasiteDetection = 10;
@@ -106,67 +102,42 @@ public class Colony {
         this.queensCapacity = 4;
     }
 
+    public Colony(int id, String name, boolean isPlayer) {
+        this.id = id;
+        this.name = name;
+        this.isPlayer = isPlayer;
+        this.antGroups = new HashMap<AntType, List<Ant>>();
+        this.deadAnts = new ArrayList<Ant>();
+        
+        initializeLists();
+        initializeDefaults();
+    }
+
+    private void populateAntList(List<Ant> list, int count, AntType type) {
+        for (int i = 0; i < count; i++) {
+            list.add(new Ant(this, type));
+        }
+    }
+
     public Colony(Savefile savefile) {
         this.id = savefile.getColonyId();
         this.name = savefile.getColonyName();
         this.isPlayer = true;
-        this.deadAnts = new ArrayList<>();
-        this.eggs = new ArrayList<>();
-        this.larvae = new ArrayList<>();
-        this.pupae = new ArrayList<>();
-        this.workers = new ArrayList<>();
-        this.soldiers = new ArrayList<>();  
-        this.majors = new ArrayList<>();
-        this.drones = new ArrayList<>();
-        this.princesses = new ArrayList<>();
-        this.queens = new ArrayList<>();
+        this.antGroups = new HashMap<AntType, List<Ant>>();
+        this.deadAnts = new ArrayList<Ant>();
 
-        int eggCount = savefile.getEggs();
-        int larvaeCount = savefile.getLarvae();
-        int pupaeCount = savefile.getPupae();
-        int workersCount = savefile.getWorkers();
-        int soldiersCount = savefile.getSoldiers();
-        int majorsCount = savefile.getMajors();
-        int dronesCount = savefile.getDrones();
-        int princessesCount = savefile.getPrincesses();
-        int queensCount = savefile.getQueens();
+        initializeLists();
+        initializeDefaults(); 
 
-        for (int i = 0; i < eggCount; i++) {
-            Ant a = new Ant(this, Engine.TYPE_EGG);
-            this.eggs.add(a);
-        }
-        for (int i = 0; i < larvaeCount; i++) {
-            Ant a = new Ant(this, Engine.TYPE_LARVA);
-            this.larvae.add(a);
-        }
-        for (int i = 0; i < pupaeCount; i++) {
-            Ant a = new Ant(this, Engine.TYPE_PUPA);
-            this.pupae.add(a);
-        }
-        for (int i = 0; i < workersCount; i++) {
-            Ant a = new Ant(this, Engine.TYPE_WORKER);
-            this.workers.add(a);
-        }
-        for (int i = 0; i < soldiersCount; i++) {
-            Ant a = new Ant(this, Engine.TYPE_SOLDIER);
-            this.soldiers.add(a);
-        }
-        for (int i = 0; i < majorsCount; i++) {
-            Ant a = new Ant(this, Engine.TYPE_MAJOR);
-            this.majors.add(a);
-        }
-        for (int i = 0; i < dronesCount; i++) {
-            Ant a = new Ant(this, Engine.TYPE_DRONE);
-            this.drones.add(a);
-        }
-        for (int i = 0; i < princessesCount; i++) {
-            Ant a = new Ant(this, Engine.TYPE_PRINCESS);
-            this.princesses.add(a);
-        }
-        for (int i = 0; i < queensCount; i++) {
-            Ant a = new Ant(this, Engine.TYPE_QUEEN);
-            this.queens.add(a);
-        }
+        populateAntList(getEggs(), savefile.getEggs(), Engine.TYPE_EGG);
+        populateAntList(getLarvae(), savefile.getLarvae(), Engine.TYPE_LARVA);
+        populateAntList(getPupae(), savefile.getPupae(), Engine.TYPE_PUPA);
+        populateAntList(getWorkers(), savefile.getWorkers(), Engine.TYPE_WORKER);
+        populateAntList(getSoldiers(), savefile.getSoldiers(), Engine.TYPE_SOLDIER);
+        populateAntList(getMajors(), savefile.getMajors(), Engine.TYPE_MAJOR);
+        populateAntList(getDrones(), savefile.getDrones(), Engine.TYPE_DRONE);
+        populateAntList(getPrincesses(), savefile.getPrincesses(), Engine.TYPE_PRINCESS);
+        populateAntList(getQueens(), savefile.getQueens(), Engine.TYPE_QUEEN);
 
         this.plants = savefile.getPlants();
         this.mushrooms = savefile.getMushrooms();
@@ -175,32 +146,6 @@ public class Colony {
         this.syrups = savefile.getSyrups();
         this.resins = savefile.getResins();
         this.minerals = savefile.getMinerals();
-
-        this.researchSpeed = 100;
-        this.growthTime = 10;
-        this.layingRate = 1;
-        this.conversionRate = 1.0f;
-        this.parasiteDetection = 10;
-        this.baseHealth = 100;
-        this.baseAge = 180;
-        this.baseTempRes = 25;
-        this.baseRegen = 1;
-        this.baseConsumption = 1;
-        this.baseAttack = 10;
-        this.baseAttackSpeed = 1;
-        this.baseDefense = 5;
-        this.baseSpeed = 1;
-        this.baseSize = 1;
-
-        this.plantsCapacity = 5000;
-        this.mushroomsCapacity = 10000;        
-        this.proteinCapacity = 2000;
-        this.waterCapacity = 2000;
-        this.syrupsCapacity = 1000;
-        this.resinsCapacity = 1000;
-        this.mineralsCapacity = 500;
-        this.eggsCapacity = 100;
-        this.queensCapacity = 4;
     }
 
     public int getId() {
@@ -223,7 +168,7 @@ public class Colony {
         this.species = species;
     }
 
-    public boolean isIsPlayer() {
+    public boolean isPlayer() {
         return isPlayer;
     }
 
@@ -232,100 +177,104 @@ public class Colony {
     }
 
     public ArrayList<Ant> getEggs() {
-        return eggs;
+        return (ArrayList<Ant>) antGroups.get(Engine.TYPE_EGG);
     }
 
     public void setEggs(ArrayList<Ant> eggs) {
-        this.eggs = eggs;
+        antGroups.put(Engine.TYPE_EGG, eggs);
     }
 
     public ArrayList<Ant> getLarvae() {
-        return larvae;
+        return (ArrayList<Ant>) antGroups.get(Engine.TYPE_LARVA);
     }
 
     public void setLarvae(ArrayList<Ant> larvae) {
-        this.larvae = larvae;
+        antGroups.put(Engine.TYPE_LARVA, larvae);
     }
 
     public ArrayList<Ant> getPupae() {
-        return pupae;
+        return (ArrayList<Ant>) antGroups.get(Engine.TYPE_PUPA);
     }
 
     public void setPupae(ArrayList<Ant> pupae) {
-        this.pupae = pupae;
+        antGroups.put(Engine.TYPE_PUPA, pupae);
     }
 
     public ArrayList<Ant> getWorkers() {
-        return workers;
+        return (ArrayList<Ant>) antGroups.get(Engine.TYPE_WORKER);
     }
 
     public void setWorkers(ArrayList<Ant> workers) {
-        this.workers = workers;
+        antGroups.put(Engine.TYPE_WORKER, workers);
     }
 
     public ArrayList<Ant> getSoldiers() {
-        return soldiers;
+        return (ArrayList<Ant>) antGroups.get(Engine.TYPE_SOLDIER);
     }
 
-    public void setSoldiers(ArrayList<Ant> soliders) {
-        this.soldiers = soliders;
+    public void setSoldiers(ArrayList<Ant> soldiers) {
+        antGroups.put(Engine.TYPE_SOLDIER, soldiers);
     }
 
     public ArrayList<Ant> getMajors() {
-        return majors;
+        return (ArrayList<Ant>) antGroups.get(Engine.TYPE_MAJOR);
     }
 
     public void setMajors(ArrayList<Ant> majors) {
-        this.majors = majors;
+        antGroups.put(Engine.TYPE_MAJOR, majors);
     }
 
     public ArrayList<Ant> getDrones() {
-        return drones;
+        return (ArrayList<Ant>) antGroups.get(Engine.TYPE_DRONE);
     }
 
     public void setDrones(ArrayList<Ant> drones) {
-        this.drones = drones;
+        antGroups.put(Engine.TYPE_DRONE, drones);
     }
 
+
+
     public ArrayList<Ant> getPrincesses() {
-        return princesses;
+        return (ArrayList<Ant>) antGroups.get(Engine.TYPE_PRINCESS);
     }
 
     public void setPrincesses(ArrayList<Ant> princesses) {
-        this.princesses = princesses;
+        antGroups.put(Engine.TYPE_PRINCESS, princesses);
     }
 
     public ArrayList<Ant> getQueens() {
-        return queens;
+        return (ArrayList<Ant>) antGroups.get(Engine.TYPE_QUEEN);
     }
 
     public void setQueens(ArrayList<Ant> queens) {
-        this.queens = queens;
+        antGroups.put(Engine.TYPE_QUEEN, queens);
     }
 
     public ArrayList<Ant> getDeadAnts() {
-        return deadAnts;
+        return (ArrayList<Ant>) deadAnts;
     }
 
     public void setDeadAnts(ArrayList<Ant> deadAnts) {
-        this.deadAnts = deadAnts;
+        this.deadAnts.clear();
+        this.deadAnts.addAll(deadAnts);
     }
     
     public int getAntTotal() {
-        return eggs.size() + larvae.size() + pupae.size() + workers.size() + soldiers.size() + majors.size() + drones.size() + princesses.size() + queens.size();
+        int total = 0;
+        for (List<Ant> list : antGroups.values()) {
+            total += list.size();
+        }
+        return total;
     }
 
     public int getTotalConsumption(){
-        return 
-        (int) (eggs.size() * Engine.TYPE_EGG.getConsumptionMult() * this.getBaseConsumption()) + 
-        (int) (larvae.size() * Engine.TYPE_LARVA.getConsumptionMult() * this.getBaseConsumption()) + 
-        (int) (pupae.size() * Engine.TYPE_PUPA.getConsumptionMult() * this.getBaseConsumption()) + 
-        (int) (workers.size() * Engine.TYPE_WORKER.getConsumptionMult() * this.getBaseConsumption()) + 
-        (int) (soldiers.size() * Engine.TYPE_SOLDIER.getConsumptionMult() * this.getBaseConsumption()) +
-        (int) (majors.size() * Engine.TYPE_MAJOR.getConsumptionMult() * this.getBaseConsumption()) + 
-        (int) (drones.size() * Engine.TYPE_DRONE.getConsumptionMult() * this.getBaseConsumption()) + 
-        (int) (princesses.size() * Engine.TYPE_PRINCESS.getConsumptionMult() * this.getBaseConsumption()) + 
-        (int) (queens.size() * Engine.TYPE_QUEEN.getConsumptionMult() * this.getBaseConsumption());
+        double totalConsumption = 0;
+        for (Map.Entry<AntType, List<Ant>> entry : antGroups.entrySet()) {
+            AntType type = entry.getKey();
+            List<Ant> list = entry.getValue();
+            totalConsumption += (double) list.size() * type.getConsumptionMult() * this.getBaseConsumption();
+        }
+        return (int) totalConsumption;
     }
 
     public int getPlants() {
@@ -577,257 +526,197 @@ public class Colony {
     }
     
     public void startColony() {
-        for (int i = 1; i <= 9; i++) {
-            Ant ant = new Ant(this, Engine.TYPE_WORKER);
-            this.workers.add(ant);
+        List<Ant> workerList = getWorkers();
+        for (int i = 0; i < 9; i++) {
+            workerList.add(new Ant(this, Engine.TYPE_WORKER));
         }
-        Ant queen = new Ant(this, Engine.TYPE_QUEEN);
-        this.queens.add(queen);
+        getQueens().add(new Ant(this, Engine.TYPE_QUEEN));
     }
 
     public void runLaying(){
-        if (this.eggs.size() >= this.getEggsCapacity()) {
+        List<Ant> eggList = getEggs();
+        if (eggList.size() >= this.getEggsCapacity()) {
             return;
         }   
-        for (int i = 0; i < (this.getQueens().size() * this.getLayingRate()); i++) {
-            Ant ant = new Ant(this, Engine.TYPE_EGG);
-            this.eggs.add(ant);
+        
+        int toLay = this.getQueens().size() * this.getLayingRate();
+        for (int i = 0; i < toLay; i++) {
+            if (eggList.size() >= this.getEggsCapacity()) {
+                break; 
+            }
+            eggList.add(new Ant(this, Engine.TYPE_EGG));
+        }
+    }
+
+    private AntType determineHatchType() {
+        double rand = Math.random();
+        if (rand < 0.8) {
+            return Engine.TYPE_WORKER;
+        } else if (rand < 0.90) {
+            return Engine.TYPE_SOLDIER;
+        } else if (rand < 0.97) {
+            // if () {
+            //     return Engine.TYPE_MAJOR;
+            // } else {
+            //     return Engine.TYPE_SOLDIER;
+            // }
+            return Engine.TYPE_SOLDIER;
+        } else if (rand < 0.99) {
+            // if () {
+            //     return Engine.TYPE_DRONE;
+            // } else {
+            //     return Engine.TYPE_SOLDIER;
+            // }
+            return Engine.TYPE_SOLDIER;
+        } else {
+            // if () {
+            //     return Engine.TYPE_PRINCESS;
+            // } else {
+            //     return Engine.TYPE_SOLDIER;
+            // }
+            return Engine.TYPE_SOLDIER;
+        }
+    }
+
+    private void evolveAnts(List<Ant> sourceList, List<Ant> destList, AntType newType) {
+        Iterator<Ant> iterator = sourceList.iterator();
+        while (iterator.hasNext()) {
+            Ant ant = iterator.next();
+            if (ant.getAge() >= this.getGrowthTime()) { 
+                ant.transform(this, newType);
+                destList.add(ant);
+                iterator.remove(); 
+            }
+        }
+    }
+
+    private void hatchPupae() {
+        Iterator<Ant> iterator = getPupae().iterator();
+        while (iterator.hasNext()) {
+            Ant pupa = iterator.next();
+            if (pupa.getAge() < this.getGrowthTime()) {
+                continue;
+            }
+
+            AntType newType = determineHatchType();
+            pupa.transform(this, newType);
+            
+            antGroups.get(newType).add(pupa);
+            iterator.remove();
         }
     }
 
     public void runHatching(){    
-        for (Ant pupa : new ArrayList<>(this.getPupae())) {
-            if (pupa.getAge() >= this.getGrowthTime()) {
-                continue;
-            }
-            AntType newType;
-            double rand = Math.random();
-            if (rand < 0.8) {
-                newType = Engine.TYPE_WORKER;
-            } else if (rand < 0.90) {
-                newType = Engine.TYPE_SOLDIER;
-            } else if (rand < 0.97) {
-                // if () {
-                //     newType = Engine.TYPE_MAJOR;
-                // } else {
-                //     newType = Engine.TYPE_SOLDIER;
-                // }
-                newType = Engine.TYPE_SOLDIER;
-            } else if (rand < 0.99) {
-                // if () {
-                //     newType = Engine.TYPE_DRONE;
-                // } else {
-                //     newType = Engine.TYPE_SOLDIER;
-                // }
-                newType = Engine.TYPE_SOLDIER;
-            } else {
-                // if () {
-                //     newType = Engine.TYPE_PRINCESS;
-                // } else {
-                //     newType = Engine.TYPE_SOLDIER;
-                // }
-                newType = Engine.TYPE_SOLDIER;
-            }
-            pupa.transform(this, newType);
-            this.pupae.remove(pupa);
-            switch (newType.getName()) {
-                case "Worker":
-                    this.workers.add(pupa);
-                    break;
-                case "Soldier":
-                    this.soldiers.add(pupa);
-                    break;
-                case "Major":
-                    this.majors.add(pupa);
-                    break;
-                case "Drone":
-                    this.drones.add(pupa);
-                    break;
-                case "Princess":
-                    this.princesses.add(pupa);
-                    break;
-            }
-        }
+        hatchPupae();
 
-        for (Ant larva : new ArrayList<>(this.getLarvae())) {
-            if (larva.getAge() >= this.getGrowthTime()) {
-                continue;
-            }
-            larva.transform(this, Engine.TYPE_PUPA);
-            this.pupae.add(larva);
-            this.larvae.remove(larva);
-        }
+        evolveAnts(getLarvae(), getPupae(), Engine.TYPE_PUPA);
 
-        for (Ant egg : new ArrayList<>(this.getEggs())) {
-            if (egg.getAge() >= this.getGrowthTime()) {
-                continue;
-            }
-            egg.transform(this, Engine.TYPE_LARVA);
-            this.larvae.add(egg);
-            this.eggs.remove(egg);
-        }
+        evolveAnts(getEggs(), getLarvae(), Engine.TYPE_LARVA);
     }
 
     public void runCollecting(){
-        int plant = this.getPlants() + (int) ((this.getWorkers().size() * this.getBaseAttackSpeed() * Engine.TYPE_WORKER.getAttackSpeedMult()));
-        if (plant > this.getPlantsCapacity()) {
-            plant = this.getPlantsCapacity();
-        }
-        this.setPlants(plant);
-        int protein = this.getProtein() + (int) ((this.getSoldiers().size() * this.getBaseAttackSpeed() * Engine.TYPE_SOLDIER.getAttackSpeedMult()));
-        if (protein > this.getProteinCapacity()) {
-            protein = this.getProteinCapacity();
-        }
-        this.setProtein(protein);
+        int plantGain = (int) ((getWorkers().size() * getBaseAttackSpeed() * Engine.TYPE_WORKER.getAttackSpeedMult()));
+        this.setPlants(Math.min(this.getPlants() + plantGain, this.getPlantsCapacity()));
+
+        int proteinGain = (int) ((getSoldiers().size() * getBaseAttackSpeed() * Engine.TYPE_SOLDIER.getAttackSpeedMult()));
+        this.setProtein(Math.min(this.getProtein() + proteinGain, this.getProteinCapacity()));
     }
 
     public void runConverting(){
         if (this.getMushrooms() >= this.getMushroomsCapacity()) {
             return;
         }
-        if (this.getPlants() >= this.getConversionRate()) {
-            this.setPlants(this.getPlants() - (int) this.getConversionRate());
-            if (this.getMushrooms() + ((int) this.getConversionRate()) <= this.getMushroomsCapacity()) {
-                this.setMushrooms(this.getMushrooms() + ((int) this.getConversionRate()));
-            } else {
-                this.setMushrooms(this.getMushroomsCapacity());
-            }
+
+        int conversionAmount = (int) this.getConversionRate();
+        
+        if (this.getPlants() >= conversionAmount) {
+            this.setPlants(this.getPlants() - conversionAmount);
+            this.setMushrooms(Math.min(this.getMushrooms() + conversionAmount, this.getMushroomsCapacity()));
         }
-        if (this.getProtein() >= this.getConversionRate()) {
-            this.setProtein(this.getProtein() - (int) this.getConversionRate());
-            if (this.getMushrooms() + ((int) this.getConversionRate() * 3) <= this.getMushroomsCapacity()) {
-                this.setMushrooms(this.getMushrooms() + ((int) this.getConversionRate() * 3));
-            } else {
-                this.setMushrooms(this.getMushroomsCapacity());
-            }
+
+        if (this.getMushrooms() >= this.getMushroomsCapacity()) {
+            return;
+        }
+
+        if (this.getProtein() >= conversionAmount) {
+            this.setProtein(this.getProtein() - conversionAmount);
+            int mushroomGain = conversionAmount * 3;
+            this.setMushrooms(Math.min(this.getMushrooms() + mushroomGain, this.getMushroomsCapacity()));
         }
     }
 
     public void runEating(){
-        if (this.getMushrooms() < this.getTotalConsumption()) {
-            int mush = this.getTotalConsumption() - this.getMushrooms();
-            while (mush > 0) {
-                if (this.getDrones().size() > 0) {
-                    this.deadAnts.add(this.getDrones().get(0));
-                    this.drones.remove(0);
-                    mush -= (int) (Engine.TYPE_DRONE.getConsumptionMult() * this.getBaseConsumption());
-                } else if (this.getPrincesses().size() > 0) {
-                    this.deadAnts.add(this.getPrincesses().get(0));
-                    this.princesses.remove(0);
-                    mush -= (int) (Engine.TYPE_PRINCESS.getConsumptionMult() * this.getBaseConsumption());
-                } else if (this.getMajors().size() > 0) {
-                    this.deadAnts.add(this.getMajors().get(0));
-                    this.majors.remove(0);
-                    mush -= (int) (Engine.TYPE_MAJOR.getConsumptionMult() * this.getBaseConsumption());
-                } else if (this.getSoldiers().size() > 0) {
-                    this.deadAnts.add(this.getSoldiers().get(0));
-                    this.soldiers.remove(0);
-                    mush -= (int) (Engine.TYPE_SOLDIER.getConsumptionMult() * this.getBaseConsumption());
-                } else if (this.getLarvae().size() > 0) {
-                    this.deadAnts.add(this.getLarvae().get(0));
-                    this.larvae.remove(0);
-                    mush -= (int) (Engine.TYPE_EGG.getConsumptionMult() * this.getBaseConsumption());
-                } else if (this.getWorkers().size() > 0) {
-                    this.deadAnts.add(this.getWorkers().get(0));
-                    this.workers.remove(0);
-                    mush -= (int) (Engine.TYPE_WORKER.getConsumptionMult() * this.getBaseConsumption());
-                } else if (this.getQueens().size() > 0) {
-                    this.deadAnts.add(this.getQueens().get(0));
-                    this.queens.remove(0);
-                    mush -= (int) (Engine.TYPE_QUEEN.getConsumptionMult() * this.getBaseConsumption());
-                } else {
-                    break;
-                }
+        int totalConsumption = this.getTotalConsumption();
+        if (this.getMushrooms() >= totalConsumption) {
+            this.setMushrooms(this.getMushrooms() - totalConsumption);
+            return;
+        }
+
+        int deficit = totalConsumption - this.getMushrooms();
+        this.setMushrooms(0);
+
+        List<AntType> killOrder = Arrays.asList(
+            Engine.TYPE_DRONE,
+            Engine.TYPE_PRINCESS,
+            Engine.TYPE_MAJOR,
+            Engine.TYPE_SOLDIER,
+            Engine.TYPE_LARVA,
+            Engine.TYPE_WORKER,
+            Engine.TYPE_QUEEN
+        );
+
+        for (AntType typeToKill : killOrder) {
+            List<Ant> list = antGroups.get(typeToKill);
+            int antConsumption = (int) (typeToKill.getConsumptionMult() * this.getBaseConsumption());
+            if (antConsumption <= 0) antConsumption = 1; 
+
+            while (deficit > 0 && !list.isEmpty()) {
+                Ant dead = list.remove(list.size() - 1); 
+                this.deadAnts.add(dead);
+                deficit -= antConsumption;
             }
-            this.setMushrooms(0);
-        } else {
-            this.setMushrooms(this.getMushrooms() - this.getTotalConsumption());
+
+            if (deficit <= 0) {
+                break; 
+            }
         }
     }
 
     public void runAging(){
-        for (Ant ant : this.getEggs()) {
-            ant.setAge(ant.getAge() + 1);
-            if (ant.getAge() >= ant.getMaxAge()) {
-                this.deadAnts.add(ant);
-                this.eggs.remove(ant);
+        for (List<Ant> antList : antGroups.values()) {
+            Iterator<Ant> iterator = antList.iterator();
+            while (iterator.hasNext()) {
+                Ant ant = iterator.next();
+                ant.setAge(ant.getAge() + 1);
+                
+                if (ant.getAge() >= ant.getMaxAge()) {
+                    this.deadAnts.add(ant);
+                    iterator.remove(); 
+                }
             }
         }
-        for (Ant ant : this.getLarvae()) {
-            ant.setAge(ant.getAge() + 1);
-            if (ant.getAge() >= ant.getMaxAge()) {
-                this.deadAnts.add(ant);
-                this.larvae.remove(ant);
-            }
-        }
-        for (Ant ant : this.getPupae()) {
-            ant.setAge(ant.getAge() + 1);
-            if (ant.getAge() >= ant.getMaxAge()) {
-                this.deadAnts.add(ant);
-                this.pupae.remove(ant);
-            }
-        }
-        for (Ant ant : this.getWorkers()) {
-            ant.setAge(ant.getAge() + 1);
-            if (ant.getAge() >= ant.getMaxAge()) {
-                this.deadAnts.add(ant);
-                this.workers.remove(ant);
-            }
-        }
-        for (Ant ant : this.getSoldiers()) {
-            ant.setAge(ant.getAge() + 1);  
-            if (ant.getAge() >= ant.getMaxAge()) {
-                this.deadAnts.add(ant);
-                this.soldiers.remove(ant);
-            }
-        } 
-        for (Ant ant : this.getMajors()) {
-            ant.setAge(ant.getAge() + 1);  
-            if (ant.getAge() >= ant.getMaxAge()) {
-                this.deadAnts.add(ant);
-                this.majors.remove(ant);
-            }
-        }
-        for (Ant ant : this.getDrones()) {
-            ant.setAge(ant.getAge() + 1);   
-            if (ant.getAge() >= ant.getMaxAge()) {
-                this.deadAnts.add(ant);
-                this.drones.remove(ant);
-            }
-        } 
-        for (Ant ant : this.getPrincesses()) {
-            ant.setAge(ant.getAge() + 1);   
-            if (ant.getAge() >= ant.getMaxAge()) {
-                this.deadAnts.add(ant);
-                this.princesses.remove(ant);
-            }
-        }
-        for (Ant ant : this.getQueens()) {
-            ant.setAge(ant.getAge() + 1);
-            if (ant.getAge() >= ant.getMaxAge()) {
-                this.deadAnts.add(ant);
-                this.queens.remove(ant);
-            }
-        }
-
-    }
-
-    public void runEvolving(){
-
     }
 
     public void runNuptial(){
-        for (Ant princess : new ArrayList<>(this.getPrincesses())) {
-            if (this.getQueens().size() < this.getQueensCapacity()) {
-                princess.transform(this, Engine.TYPE_QUEEN);
-                this.queens.add(princess);
-                this.princesses.remove(princess);
-                this.drones.remove(0);
+        List<Ant> princesses = getPrincesses();
+        List<Ant> drones = getDrones();
+        List<Ant> queens = getQueens();
+
+        Iterator<Ant> iterator = princesses.iterator();
+        while (iterator.hasNext()) {
+            if (queens.size() >= this.getQueensCapacity() || drones.isEmpty()) {
+                break;
             }
+            
+            Ant princess = iterator.next();
+            princess.transform(this, Engine.TYPE_QUEEN);
+            queens.add(princess);
+            iterator.remove(); 
+            Ant deadDrone = drones.remove(drones.size() - 1); 
+            this.deadAnts.add(deadDrone);
         }
     }
 
-    public void ruSpreading(){
-
+    public void runSpreading(){
     }
 }

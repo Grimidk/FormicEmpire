@@ -213,6 +213,7 @@ public class World {
 
         this.getSpawnHex().getColony().runEating();
         this.getSpawnHex().getColony().runHatching();
+        this.getSpawnHex().getColony().runAging();
 
         if (this.day >= 0 && this.day < 1) {
             this.moonPhase = Engine.NEW_MOON_PHASE;
@@ -238,13 +239,6 @@ public class World {
             this.day = 0;
             this.runMonth();
         }
-
-        try {
-            SaveManager sm = new SaveManager();
-            sm.saveAutosave(this);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
     }
 
     public void runMonth() {
@@ -260,6 +254,13 @@ public class World {
             this.season = Engine.WINTER_SEASON;
         } else {
             this.season = Engine.SPRING_SEASON;
+        }
+
+        try {
+            SaveManager sm = new SaveManager();
+            sm.saveAutosave(this);
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
 
         if (this.month > 11) {
