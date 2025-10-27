@@ -8,8 +8,6 @@ import java.util.concurrent.Executors;
 import javax.swing.SwingUtilities;
 import java.util.HashMap;
 import java.util.Map;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
@@ -281,62 +279,107 @@ public class SaveManager {
     }
 
     private void writeSaveToWriter(Savefile s, BufferedWriter w) throws IOException {
-        Map<String, String> m = new HashMap<>();
-        m.put("id", Integer.toString(s.getId()));
-        m.put("name", s.getName() != null ? URLEncoder.encode(s.getName(), StandardCharsets.UTF_8.name()) : "");
-        m.put("progress", Float.toString(s.getProgress()));
-        m.put("playTime", Integer.toString(s.getPlayTime()));
-        m.put("minute", Integer.toString(s.getMinute()));
-        m.put("hour", Integer.toString(s.getHour()));
-        m.put("day", Integer.toString(s.getDay()));
-        m.put("month", Integer.toString(s.getMonth()));
-        m.put("year", Integer.toString(s.getYear()));
-        m.put("totalAnts", Integer.toString(s.getTotalAnts()));
-        m.put("deadAnts", Integer.toString(s.getDeadAnts()));
-        m.put("eggs", Integer.toString(s.getEggs()));
-        m.put("larvae", Integer.toString(s.getLarvae()));
-        m.put("pupae", Integer.toString(s.getPupae()));
-        m.put("workers", Integer.toString(s.getWorkers()));
-        m.put("soldiers", Integer.toString(s.getSoldiers()));
-        m.put("majors", Integer.toString(s.getMajors()));
-        m.put("drones", Integer.toString(s.getDrones()));
-        m.put("princesses", Integer.toString(s.getPrincesses()));
-        m.put("queens", Integer.toString(s.getQueens()));
-        m.put("plants", Integer.toString(s.getPlants()));
-        m.put("mushrooms", Integer.toString(s.getMushrooms()));
-        m.put("protein", Integer.toString(s.getProtein()));
-        m.put("water", Integer.toString(s.getWater()));
-        m.put("syrups", Integer.toString(s.getSyrups()));
-        m.put("resins", Integer.toString(s.getResins()));
-        m.put("minerals", Integer.toString(s.getMinerals()));
-        
-        for (Map.Entry<String,String> e : m.entrySet()) {
+        Map<String, Object> m = new HashMap<>();
+        m.put("id", s.getId());
+        m.put("name", s.getName() != null ? s.getName() : "");
+        m.put("progress", s.getProgress());
+        m.put("playTime", s.getPlayTime());
+        m.put("minute", s.getMinute());
+        m.put("hour", s.getHour());
+        m.put("day", s.getDay());
+        m.put("month", s.getMonth());
+        m.put("year", s.getYear());
+        m.put("totalAnts", s.getTotalAnts());
+        m.put("deadAnts", s.getDeadAnts());
+        m.put("eggs", s.getEggs());
+        m.put("larvae", s.getLarvae());
+        m.put("pupae", s.getPupae());
+        m.put("workers", s.getWorkers());
+        m.put("soldiers", s.getSoldiers());
+        m.put("majors", s.getMajors());
+        m.put("drones", s.getDrones());
+        m.put("princesses", s.getPrincesses());
+        m.put("queens", s.getQueens());
+        m.put("plants", s.getPlants());
+        m.put("mushrooms", s.getMushrooms());
+        m.put("protein", s.getProtein());
+        m.put("water", s.getWater());
+        m.put("syrups", s.getSyrups());
+        m.put("resins", s.getResins());
+        m.put("minerals", s.getMinerals());
+
+        w.write("{");
+        w.newLine();
+
+        int i = 0;
+        for (Map.Entry<String, Object> e : m.entrySet()) {
+            w.write("  \""); 
             w.write(e.getKey());
-            w.write('=');
-            w.write(e.getValue() != null ? e.getValue() : "");
+            w.write("\": ");
+
+            Object v = e.getValue();
+            if (v instanceof String) {
+                w.write("\"");
+                w.write(escapeJsonString((String) v));
+                w.write("\"");
+            } else if (v instanceof Number) {
+                w.write(v.toString());
+            } else {
+                w.write("null");
+            }
+
+            if (i < m.size() - 1) {
+                w.write(",");
+            }
             w.newLine();
+            i++;
         }
+
+        w.write("}");
+        w.newLine();
     }
 
     private Savefile readSaveFromReader(BufferedReader r) throws IOException {
         Savefile s = null;
         String line;
         Map<String,String> m = new HashMap<>();
+        
         while ((line = r.readLine()) != null) {
-            int idx = line.indexOf('=');
+            line = line.trim();
+            
+            if (line.equals("{") || line.equals("}") || line.isEmpty()) {
+                continue;
+            }
+
+            int idx = line.indexOf(':');
             if (idx <= 0) continue;
-            String k = line.substring(0, idx);
-            String v = line.substring(idx+1);
+            
+            String k = line.substring(0, idx).trim();
+            if (k.startsWith("\"")) k = k.substring(1);
+            if (k.endsWith("\"")) k = k.substring(0, k.length() - 1);
+
+            String v = line.substring(idx + 1).trim();
+            if (v.endsWith(",")) {
+                v = v.substring(0, v.length() - 1);
+            }
+            
+            if (v.startsWith("\"")) {
+                v = v.substring(1);
+                if (v.endsWith("\"")) {
+                    v = v.substring(0, v.length() - 1);
+                }
+                v = unescapeJsonString(v); 
+            } else if (v.equals("null")) {
+                v = ""; 
+            }
+            
             m.put(k, v);
         }
-        
+
         if (m.containsKey("id") && m.containsKey("name")) {
             int id = Integer.parseInt(m.getOrDefault("id", "0"));
             String name = m.getOrDefault("name", "");
-            try { 
-                name = URLDecoder.decode(name, StandardCharsets.UTF_8.name()); 
-            } catch (Exception ignore) {}
-            
+
             s = new Savefile(id, name);
             s.setProgress(Float.parseFloat(m.getOrDefault("progress", "0")));
             s.setPlayTime(Integer.parseInt(m.getOrDefault("playTime", "0")));
@@ -365,5 +408,27 @@ public class SaveManager {
             s.setMinerals(Integer.parseInt(m.getOrDefault("minerals", "0")));
         }
         return s;
+    }
+
+    private String escapeJsonString(String str) {
+        if (str == null) return "";
+        return str.replace("\\", "\\\\")
+                  .replace("\"", "\\\"")
+                  .replace("\b", "\\b")
+                  .replace("\f", "\\f")
+                  .replace("\n", "\\n")
+                  .replace("\r", "\\r")
+                  .replace("\t", "\\t");
+    }
+
+    private String unescapeJsonString(String str) {
+        if (str == null) return null;
+        return str.replace("\\\\", "\\")
+                  .replace("\\\"", "\"")
+                  .replace("\\b", "\b")
+                  .replace("\\f", "\f")
+                  .replace("\\n", "\n")
+                  .replace("\\r", "\r")
+                  .replace("\\t", "\t");
     }
 }
