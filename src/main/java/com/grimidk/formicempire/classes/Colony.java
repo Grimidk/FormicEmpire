@@ -41,7 +41,7 @@ public class Colony {
     private int queensCapacity;
 
     private int researchSpeed;
-    private int growthSpeed;
+    private int growthTime;
     private int layingRate;
     private float conversionRate;
     private int parasiteDetection;
@@ -73,7 +73,7 @@ public class Colony {
         this.queens = new ArrayList<>();
 
         this.researchSpeed = 100;
-        this.growthSpeed = 10;
+        this.growthTime = 10;
         this.layingRate = 1;
         this.conversionRate = 1.0f;
         this.parasiteDetection = 10;
@@ -103,7 +103,7 @@ public class Colony {
         this.minerals = 0;
         this.mineralsCapacity = 500;
         this.eggsCapacity = 100;
-        this.queensCapacity = 1;
+        this.queensCapacity = 4;
     }
 
     public Colony(Savefile savefile) {
@@ -177,7 +177,7 @@ public class Colony {
         this.minerals = savefile.getMinerals();
 
         this.researchSpeed = 100;
-        this.growthSpeed = 10;
+        this.growthTime = 10;
         this.layingRate = 1;
         this.conversionRate = 1.0f;
         this.parasiteDetection = 10;
@@ -200,7 +200,7 @@ public class Colony {
         this.resinsCapacity = 1000;
         this.mineralsCapacity = 500;
         this.eggsCapacity = 100;
-        this.queensCapacity = 1;
+        this.queensCapacity = 4;
     }
 
     public int getId() {
@@ -316,7 +316,6 @@ public class Colony {
     }
 
     public int getTotalConsumption(){
-        System.out.println();
         return 
         (int) (eggs.size() * Engine.TYPE_EGG.getConsumptionMult() * this.getBaseConsumption()) + 
         (int) (larvae.size() * Engine.TYPE_LARVA.getConsumptionMult() * this.getBaseConsumption()) + 
@@ -465,12 +464,12 @@ public class Colony {
         this.researchSpeed = researchSpeed;
     }
 
-    public int getGrowthSpeed() {
-        return growthSpeed;
+    public int getGrowthTime() {
+        return growthTime;
     }
 
-    public void setGrowthSpeed(int growthSpeed) {
-        this.growthSpeed = growthSpeed;
+    public void setGrowthTime(int growthTime) {
+        this.growthTime = growthTime;
     }
 
     public int getLayingRate() {
@@ -578,7 +577,6 @@ public class Colony {
     }
     
     public void startColony() {
-        System.out.println("Generating new colony...");
         for (int i = 1; i <= 9; i++) {
             Ant ant = new Ant(this, Engine.TYPE_WORKER);
             this.workers.add(ant);
@@ -599,6 +597,9 @@ public class Colony {
 
     public void runHatching(){    
         for (Ant pupa : new ArrayList<>(this.getPupae())) {
+            if (pupa.getAge() >= this.getGrowthTime()) {
+                continue;
+            }
             AntType newType;
             double rand = Math.random();
             if (rand < 0.8) {
@@ -647,18 +648,24 @@ public class Colony {
                     break;
             }
         }
-        
+
         for (Ant larva : new ArrayList<>(this.getLarvae())) {
+            if (larva.getAge() >= this.getGrowthTime()) {
+                continue;
+            }
             larva.transform(this, Engine.TYPE_PUPA);
             this.pupae.add(larva);
             this.larvae.remove(larva);
         }
 
         for (Ant egg : new ArrayList<>(this.getEggs())) {
-        egg.transform(this, Engine.TYPE_LARVA);
-        this.larvae.add(egg);
-        this.eggs.remove(egg);
-    }
+            if (egg.getAge() >= this.getGrowthTime()) {
+                continue;
+            }
+            egg.transform(this, Engine.TYPE_LARVA);
+            this.larvae.add(egg);
+            this.eggs.remove(egg);
+        }
     }
 
     public void runCollecting(){
@@ -739,6 +746,27 @@ public class Colony {
     }
 
     public void runAging(){
+        for (Ant ant : this.getEggs()) {
+            ant.setAge(ant.getAge() + 1);
+            if (ant.getAge() >= ant.getMaxAge()) {
+                this.deadAnts.add(ant);
+                this.eggs.remove(ant);
+            }
+        }
+        for (Ant ant : this.getLarvae()) {
+            ant.setAge(ant.getAge() + 1);
+            if (ant.getAge() >= ant.getMaxAge()) {
+                this.deadAnts.add(ant);
+                this.larvae.remove(ant);
+            }
+        }
+        for (Ant ant : this.getPupae()) {
+            ant.setAge(ant.getAge() + 1);
+            if (ant.getAge() >= ant.getMaxAge()) {
+                this.deadAnts.add(ant);
+                this.pupae.remove(ant);
+            }
+        }
         for (Ant ant : this.getWorkers()) {
             ant.setAge(ant.getAge() + 1);
             if (ant.getAge() >= ant.getMaxAge()) {
@@ -789,7 +817,14 @@ public class Colony {
     }
 
     public void runNuptial(){
-
+        for (Ant princess : new ArrayList<>(this.getPrincesses())) {
+            if (this.getQueens().size() < this.getQueensCapacity()) {
+                princess.transform(this, Engine.TYPE_QUEEN);
+                this.queens.add(princess);
+                this.princesses.remove(princess);
+                this.drones.remove(0);
+            }
+        }
     }
 
     public void ruSpreading(){
