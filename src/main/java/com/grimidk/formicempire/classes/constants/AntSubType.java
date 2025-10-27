@@ -1,11 +1,11 @@
-package com.grimidk.formicempire.classes;
+package com.grimidk.formicempire.classes.constants;
 
-public class AntType {
+public class AntSubType {
 
     private final int id;
+    private AntType antType;
     private String name;
     private float healtMult;
-    private float hungerMult;
     private float attackMult;
     private float ageMult;
     private float regenMult;
@@ -15,11 +15,11 @@ public class AntType {
     private float speedMult;
     private float sizeMult; 
 
-    public AntType(int id, String name, float healtMult, float hungerMult, float attackMult, float ageMult, float regenMult, float consumptionMult, float attackSpeedMult, float defenseMult, float speedMult, float sizeMult) {
+    public AntSubType(int id, AntType antType, String name, float healtMult, float attackMult, float ageMult, float regenMult, float consumptionMult, float attackSpeedMult, float defenseMult, float speedMult, float sizeMult) {
         this.id = id;
+        this.antType = antType;
         this.name = name;
         this.healtMult = healtMult;
-        this.hungerMult = hungerMult;
         this.attackMult = attackMult;
         this.ageMult = ageMult;
         this.regenMult = regenMult;
@@ -32,6 +32,14 @@ public class AntType {
 
     public int getId() {
         return id;
+    }
+
+    public AntType getAntType() {
+        return antType;
+    }
+
+    public void setAntType(AntType antType) {
+        this.antType = antType;
     }
 
     public String getName() {
@@ -48,14 +56,6 @@ public class AntType {
 
     public void setHealtMult(float healtMult) {
         this.healtMult = healtMult;
-    }
-
-    public float getHungerMult() {
-        return hungerMult;
-    }
-
-    public void setHungerMult(float hungerMult) {
-        this.hungerMult = hungerMult;
     }
 
     public float getAttackMult() {

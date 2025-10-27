@@ -1,4 +1,4 @@
-package com.grimidk.formicempire.interfaces;
+package com.grimidk.formicempire.classes.interfaces;
 
 import javax.swing.*;
 import java.awt.*;

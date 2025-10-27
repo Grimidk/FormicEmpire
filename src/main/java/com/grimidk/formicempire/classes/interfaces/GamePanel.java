@@ -1,4 +1,4 @@
-package com.grimidk.formicempire.interfaces;
+package com.grimidk.formicempire.classes.interfaces;
 
 import com.grimidk.formicempire.classes.Engine;
 import com.grimidk.formicempire.classes.Savefile;

@@ -2,6 +2,12 @@ package com.grimidk.formicempire.classes;
 
 import java.util.ArrayList;
 
+import com.grimidk.formicempire.classes.constants.Biome;
+import com.grimidk.formicempire.classes.constants.MoonPhase;
+import com.grimidk.formicempire.classes.constants.Season;
+import com.grimidk.formicempire.classes.constants.TimeOfDay;
+import com.grimidk.formicempire.classes.constants.Weather;
+
 public class World {
 
     private int minute;

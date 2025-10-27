@@ -1,12 +1,12 @@
-package com.grimidk.formicempire.interfaces;
+package com.grimidk.formicempire.classes.interfaces;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class HelpPanel extends JPanel {
+public class SettingsPanel extends JPanel {
     private final MainFrame frame;
 
-    public HelpPanel(MainFrame frame) {
+    public SettingsPanel(MainFrame frame) {
         this.frame = frame;
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
@@ -16,7 +16,7 @@ public class HelpPanel extends JPanel {
         JButton back = new JButton("Back");
     back.addActionListener(e -> this.frame.showCard(MainFrame.CARD_INIT));
 
-        c.gridy = 0; add(new JLabel("Help content"), c);
+        c.gridy = 0; add(new JLabel("Settings content"), c);
         c.gridy = 1; add(back, c);
     }
 }

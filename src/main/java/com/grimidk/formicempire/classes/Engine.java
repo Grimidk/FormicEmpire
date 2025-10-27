@@ -1,6 +1,18 @@
 package com.grimidk.formicempire.classes;
 
 import java.util.concurrent.Semaphore;
+
+import com.grimidk.formicempire.classes.constants.AntStatus;
+import com.grimidk.formicempire.classes.constants.AntSubType;
+import com.grimidk.formicempire.classes.constants.AntType;
+import com.grimidk.formicempire.classes.constants.Biome;
+import com.grimidk.formicempire.classes.constants.MoonPhase;
+import com.grimidk.formicempire.classes.constants.ResourceType;
+import com.grimidk.formicempire.classes.constants.Season;
+import com.grimidk.formicempire.classes.constants.Species;
+import com.grimidk.formicempire.classes.constants.TimeOfDay;
+import com.grimidk.formicempire.classes.constants.Weather;
+
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.ArrayList;
 
@@ -239,15 +251,27 @@ public class Engine extends Thread{
         public static final AntStatus STATUS_ZOMBIFIED = new AntStatus(3, "Zombified");
 
         // Ant Types
-        public static final AntType TYPE_EGG = new AntType(1, "Egg", 1, 1, 0, 1, 0, 0, 0, 0, 0, 1/4);
-        public static final AntType TYPE_LARVA = new AntType(2, "Larva", 1, 1, 1/2, 1, 1/2, 1, 1, 1/2, 1/2, 1/2);
-        public static final AntType TYPE_PUPA = new AntType(3, "Pupa", 1, 1, 0, 1, 1, 0, 0, 1/2, 0, 1);
-        public static final AntType TYPE_WORKER = new AntType(4, "Worker", 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-        public static final AntType TYPE_SOLDIER = new AntType(5, "Soldier", 3, 2, 3, 1, 3, 2, 3, 5, 3, 2);
-        public static final AntType TYPE_MAJOR = new AntType(6, "Major", 10, 10, 15, 5, 20, 5, 2, 50, 2, 5);
-        public static final AntType TYPE_DRONE = new AntType(7, "Drone", 1, 1, 1, 1, 1, 1, 1, 1, 1, 2);
-        public static final AntType TYPE_PRINCESS = new AntType(8, "Princess", 1, 1, 1, 1, 1, 1, 1, 1, 1, 2);
-        public static final AntType TYPE_QUEEN = new AntType(9, "Queen", 50, 50, 2, 50, 50, 10, 1/2, 50, 1/4, 5);
+        public static final AntType TYPE_EGG = new AntType(1, "Egg", 1,  0, 1, 0, 0, 0, 0, 0, 1/4);
+        public static final AntType TYPE_LARVA = new AntType(2, "Larva", 1,  1/2, 1, 1/2, 1, 1, 1/2, 1/2, 1/2);
+        public static final AntType TYPE_PUPA = new AntType(3, "Pupa", 1,  0, 1, 1, 0, 0, 1/2, 0, 1);
+        public static final AntType TYPE_WORKER = new AntType(4, "Worker", 1,  1, 1, 1, 1, 1, 1, 1, 1);
+        public static final AntType TYPE_SOLDIER = new AntType(5, "Soldier", 3,  3, 1, 3, 2, 3, 5, 3, 2);
+        public static final AntType TYPE_MAJOR = new AntType(6, "Major", 10,  15, 5, 20, 5, 2, 50, 2, 5);
+        public static final AntType TYPE_DRONE = new AntType(7, "Drone", 1, 1, 1, 1, 1, 1, 1, 1, 2);
+        public static final AntType TYPE_PRINCESS = new AntType(8, "Princess", 1, 1, 1, 1, 1, 1, 1, 1, 2);
+        public static final AntType TYPE_QUEEN = new AntType(9, "Queen", 50,  2, 50, 50, 10, 1/2, 50, 1/4, 5);
+
+        //Ant Subtypes
+
+        //Ant Roles
+
+        //Species
+
+        //Upgrades
+
+        //Synergies
+
+        //Bug Types
 
         public void loadConstants(){
             System.out.println("Loading biomes...");
@@ -321,9 +345,14 @@ public class Engine extends Thread{
             this.antTypes.add(TYPE_QUEEN);
 
             System.out.println("Loading ant subtypes...");
+
+            System.out.println("Loading ant roles...");
+
+            System.out.println("Loading species...");
+
             System.out.println("Loading upgrades...");
             System.out.println("Loading synergies...");
-            System.out.println("Loading bugs...");
+            System.out.println("Loading bug types...");
         }
     
     public void loadFile(Savefile savefile){ 

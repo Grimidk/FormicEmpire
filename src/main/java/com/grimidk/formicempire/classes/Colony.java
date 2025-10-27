@@ -2,6 +2,9 @@ package com.grimidk.formicempire.classes;
 
 import java.util.ArrayList;
 
+import com.grimidk.formicempire.classes.constants.AntType;
+import com.grimidk.formicempire.classes.constants.Species;
+
 public class Colony {
     
     private final int id;
@@ -44,7 +47,6 @@ public class Colony {
     private int parasiteDetection;
 
     private int baseHealth;
-    private int baseHunger;
     private int baseAge;
     private int baseTempRes;
     private int baseRegen;
@@ -76,7 +78,6 @@ public class Colony {
         this.conversionRate = 1.0f;
         this.parasiteDetection = 10;
         this.baseHealth = 100;
-        this.baseHunger = 100;
         this.baseAge = 180;
         this.baseTempRes = 25;
         this.baseRegen = 1;
@@ -181,7 +182,6 @@ public class Colony {
         this.conversionRate = 1.0f;
         this.parasiteDetection = 10;
         this.baseHealth = 100;
-        this.baseHunger = 100;
         this.baseAge = 180;
         this.baseTempRes = 25;
         this.baseRegen = 1;
@@ -505,14 +505,6 @@ public class Colony {
         this.baseHealth = baseHealth;
     }
 
-    public int getBaseHunger() {
-        return baseHunger;
-    }
-
-    public void setBaseHunger(int baseHunger) {
-        this.baseHunger = baseHunger;
-    }
-
     public int getBaseAge() {
         return baseAge;
     }
@@ -606,25 +598,67 @@ public class Colony {
     }
 
     public void runHatching(){    
-        for (int i = 0; i < this.getEggs().size(); i++) {
-            double r = Math.random(); 
-            if (r < 0.80) {
-                Ant ant = new Ant(this, Engine.TYPE_WORKER);
-                this.workers.add(ant);
-            } else if (r < 0.99) {
-                Ant ant = new Ant(this, Engine.TYPE_SOLDIER);
-                this.soldiers.add(ant);
+        for (Ant pupa : new ArrayList<>(this.getPupae())) {
+            AntType newType;
+            double rand = Math.random();
+            if (rand < 0.8) {
+                newType = Engine.TYPE_WORKER;
+            } else if (rand < 0.90) {
+                newType = Engine.TYPE_SOLDIER;
+            } else if (rand < 0.97) {
+                // if () {
+                //     newType = Engine.TYPE_MAJOR;
+                // } else {
+                //     newType = Engine.TYPE_SOLDIER;
+                // }
+                newType = Engine.TYPE_SOLDIER;
+            } else if (rand < 0.99) {
+                // if () {
+                //     newType = Engine.TYPE_DRONE;
+                // } else {
+                //     newType = Engine.TYPE_SOLDIER;
+                // }
+                newType = Engine.TYPE_SOLDIER;
             } else {
-                if (this.getQueens().size() >= this.getQueensCapacity()) {
-                    Ant ant = new Ant(this, Engine.TYPE_WORKER);
-                    this.workers.add(ant);
-                } else {
-                    Ant ant = new Ant(this, Engine.TYPE_QUEEN);
-                    this.queens.add(ant);
-                }
+                // if () {
+                //     newType = Engine.TYPE_PRINCESS;
+                // } else {
+                //     newType = Engine.TYPE_SOLDIER;
+                // }
+                newType = Engine.TYPE_SOLDIER;
+            }
+            pupa.transform(this, newType);
+            this.pupae.remove(pupa);
+            switch (newType.getName()) {
+                case "Worker":
+                    this.workers.add(pupa);
+                    break;
+                case "Soldier":
+                    this.soldiers.add(pupa);
+                    break;
+                case "Major":
+                    this.majors.add(pupa);
+                    break;
+                case "Drone":
+                    this.drones.add(pupa);
+                    break;
+                case "Princess":
+                    this.princesses.add(pupa);
+                    break;
             }
         }
-        this.setEggs(new ArrayList<>());
+        
+        for (Ant larva : new ArrayList<>(this.getLarvae())) {
+            larva.transform(this, Engine.TYPE_PUPA);
+            this.pupae.add(larva);
+            this.larvae.remove(larva);
+        }
+
+        for (Ant egg : new ArrayList<>(this.getEggs())) {
+        egg.transform(this, Engine.TYPE_LARVA);
+        this.larvae.add(egg);
+        this.eggs.remove(egg);
+    }
     }
 
     public void runCollecting(){
@@ -755,6 +789,10 @@ public class Colony {
     }
 
     public void runNuptial(){
+
+    }
+
+    public void ruSpreading(){
 
     }
 }

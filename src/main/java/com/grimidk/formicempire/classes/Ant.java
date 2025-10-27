@@ -1,12 +1,15 @@
 package com.grimidk.formicempire.classes;
+
+import com.grimidk.formicempire.classes.constants.AntStatus;
+import com.grimidk.formicempire.classes.constants.AntSubType;
+import com.grimidk.formicempire.classes.constants.AntType;
+
 public class Ant {
     private AntType type;
     private AntSubType subType;
     private AntStatus status;
     private float health;
     private int maxHealth;
-    private float hunger;
-    private int maxHunger;
     private int age;
     private int maxAge;
     private float temp;
@@ -24,8 +27,6 @@ public class Ant {
         this.subType = null;
         this.maxHealth = (int)(colony.getBaseHealth() * type.getHealtMult());
         this.health = this.maxHealth;
-        this.maxHunger = (int)(colony.getBaseHunger() * type.getHungerMult());
-        this.hunger = this.maxHunger;
         this.maxAge = (int)(colony.getBaseAge() * type.getAgeMult());
         this.age = 0;
         this.tempRes = colony.getBaseTempRes();
@@ -76,22 +77,6 @@ public class Ant {
 
     public void setMaxHealth(int maxHealth) {
         this.maxHealth = maxHealth;
-    }
-
-    public float getHunger() {
-        return hunger;
-    }
-
-    public void setHunger(int hunger) {
-        this.hunger = hunger;
-    }
-
-    public int getMaxHunger() {
-        return maxHunger;
-    }
-
-    public void setMaxHunger(int maxHunger) {
-        this.maxHunger = maxHunger;
     }
 
     public int getAge() {
@@ -184,5 +169,24 @@ public class Ant {
     
     public float getDeathChance() {
         return (age / maxAge) * 100;
+    }
+
+    public boolean isDead() {
+        return health <= 0;
+    }
+
+    public void transform(Colony colony, AntType newType) {
+        this.type = newType;
+        this.maxHealth = (int)(colony.getBaseHealth() * newType.getHealtMult());
+        this.health = this.maxHealth;
+        this.maxAge = (int)(colony.getBaseAge() * newType.getAgeMult());
+        this.age = 0;
+        this.regen = colony.getBaseRegen() * newType.getRegenMult();
+        this.consumption = colony.getBaseConsumption() * newType.getConsumptionMult();
+        this.attack = colony.getBaseAttack() * newType.getAttackMult();
+        this.attackSpeed = colony.getBaseAttackSpeed() * newType.getAttackSpeedMult();
+        this.defense = colony.getBaseDefense() * newType.getDefenseMult();
+        this.speed = colony.getBaseSpeed() * newType.getSpeedMult();
+        this.size = colony.getBaseSize() * newType.getSizeMult();
     }
 }

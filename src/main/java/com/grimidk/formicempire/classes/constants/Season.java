@@ -1,17 +1,17 @@
-package com.grimidk.formicempire.classes;
+package com.grimidk.formicempire.classes.constants;
 
-public class Weather {
+public class Season {
     
     private int id;
-    private String name;
-    private int humidMod;
+    private String name;    
     private float tempMult;
+    private float humidityMult;
 
-    public Weather(int id, String name, int humidMod, float tempMult) {
+    public Season(int id, String name, float tempMult, float humidityMult) {
         this.id = id;
         this.name = name;
-        this.humidMod = humidMod;
         this.tempMult = tempMult;
+        this.humidityMult = humidityMult;
     }
 
     public int getId() {
@@ -30,14 +30,6 @@ public class Weather {
         this.name = name;
     }
 
-    public int getHumidMult() {
-        return humidMod;
-    }
-
-    public void setHumidMult(int humidMod) {
-        this.humidMod = humidMod;
-    }
-
     public float getTempMult() {
         return tempMult;
     }
@@ -45,5 +37,14 @@ public class Weather {
     public void setTempMult(float tempMult) {
         this.tempMult = tempMult;
     }
-    
+
+    public float getHumidityMult() {
+        return humidityMult;
+    }
+
+    public void setHumidityMult(float humidityMult) {
+        this.humidityMult = humidityMult;
+    }
+
+
 }
