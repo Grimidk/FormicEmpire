@@ -1,4 +1,23 @@
 # Ignore save files and runtime data
 saves/
 .DS_Store/
-target/
+
+# Compiled class files and JARs
+/target/
+
+# Log files
+*.log
+logs/
+
+# IDE-specific files
+.idea/
+*.iml
+*.ipr
+*.iws
+.classpath
+.project
+.settings/
+.vscode/
+
+# Other generated files
+dependency-reduced-pom.xml
