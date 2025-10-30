@@ -1,5 +1,6 @@
 package com.grimidk.formicempire.classes;
 
+import com.grimidk.formicempire.classes.constants.AntRole;
 import com.grimidk.formicempire.classes.constants.AntStatus;
 import com.grimidk.formicempire.classes.constants.AntSubType;
 import com.grimidk.formicempire.classes.constants.AntType;
@@ -7,6 +8,7 @@ import com.grimidk.formicempire.classes.constants.AntType;
 public class Ant {
     private AntType type;
     private AntSubType subType;
+    private AntRole role;
     private AntStatus status;
     private float health;
     private int maxHealth;
@@ -25,6 +27,7 @@ public class Ant {
     public Ant(Colony colony, AntType type) {
         this.type = type;
         this.subType = null;
+        this.role = null;
         this.maxHealth = (int)(colony.getBaseHealth() * type.getHealtMult());
         this.health = this.maxHealth;
         this.maxAge = (int)(colony.getBaseAge() * type.getAgeMult());
@@ -53,6 +56,14 @@ public class Ant {
 
     public void setSubType(AntSubType subType) {
         this.subType = subType;
+    }
+
+    public AntRole getRole() {
+        return role;
+    }
+
+    public void setRole(AntRole role) {
+        this.role = role;
     }
 
     public AntStatus getStatus() {

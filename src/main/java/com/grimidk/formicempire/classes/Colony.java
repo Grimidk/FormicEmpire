@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.grimidk.formicempire.classes.constants.AntType;
+import com.grimidk.formicempire.classes.constants.ColonyRank;
 import com.grimidk.formicempire.classes.constants.Species;
 
 public class Colony {
@@ -16,6 +17,7 @@ public class Colony {
     private String name;
     private Species species;
     private boolean isPlayer;
+    private ColonyRank rank;
     
     private final Map<AntType, List<Ant>> antGroups;
     private final List<Ant> deadAnts;
@@ -85,27 +87,28 @@ public class Colony {
         this.baseSize = 1;
 
         this.plants = 0;
-        this.plantsCapacity = 5000;
+        this.plantsCapacity = 2000;
         this.mushrooms = 0;
-        this.mushroomsCapacity = 10000;
+        this.mushroomsCapacity = 5000;
         this.protein = 0;           
-        this.proteinCapacity = 2000;
+        this.proteinCapacity = 1000;
         this.water = 0;
-        this.waterCapacity = 2000;
+        this.waterCapacity = 1000;
         this.syrups = 0;
-        this.syrupsCapacity = 1000;
+        this.syrupsCapacity = 500;
         this.resins = 0;
-        this.resinsCapacity = 1000;
+        this.resinsCapacity = 200;
         this.minerals = 0;
-        this.mineralsCapacity = 500;
-        this.eggsCapacity = 100;
-        this.queensCapacity = 4;
+        this.mineralsCapacity = 100;
+        this.eggsCapacity = 50;
+        this.queensCapacity = 2;
     }
 
     public Colony(int id, String name, boolean isPlayer) {
         this.id = id;
         this.name = name;
         this.isPlayer = isPlayer;
+        this.rank = Engine.RANK_COLONY;
         this.antGroups = new HashMap<AntType, List<Ant>>();
         this.deadAnts = new ArrayList<Ant>();
         
@@ -123,6 +126,7 @@ public class Colony {
         this.id = savefile.getColonyId();
         this.name = savefile.getColonyName();
         this.isPlayer = true;
+        this.rank = Engine.RANK_COLONY;
         this.antGroups = new HashMap<AntType, List<Ant>>();
         this.deadAnts = new ArrayList<Ant>();
 
@@ -174,6 +178,14 @@ public class Colony {
 
     public void setIsPlayer(boolean isPlayer) {
         this.isPlayer = isPlayer;
+    }
+
+    public ColonyRank getRank() {
+        return rank;
+    }
+
+    public void setRank(ColonyRank rank) {
+        this.rank = rank;
     }
 
     public ArrayList<Ant> getEggs() {
@@ -231,8 +243,6 @@ public class Colony {
     public void setDrones(ArrayList<Ant> drones) {
         antGroups.put(Engine.TYPE_DRONE, drones);
     }
-
-
 
     public ArrayList<Ant> getPrincesses() {
         return (ArrayList<Ant>) antGroups.get(Engine.TYPE_PRINCESS);

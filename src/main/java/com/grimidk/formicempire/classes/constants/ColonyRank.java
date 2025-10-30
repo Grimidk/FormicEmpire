@@ -1,27 +1,18 @@
 package com.grimidk.formicempire.classes.constants;
 
-public class AntRoles {
-    
+public class ColonyRank {
     private final int id;
-    private AntType antType;
     private String name;
+    private long population;
 
-    public AntRoles(int id, AntType antType, String name) {
+    public ColonyRank(int id, String name, long population) {
         this.id = id;
-        this.antType = antType;
         this.name = name;
+        this.population = population;
     }
 
     public int getId() {
         return id;
-    }
-
-    public AntType getAntType() {
-        return antType;
-    }
-
-    public void setAntType(AntType antType) {
-        this.antType = antType;
     }
 
     public String getName() {
@@ -31,5 +22,12 @@ public class AntRoles {
     public void setName(String name) {
         this.name = name;
     }
-    
+
+    public long getPopulation() {
+        return population;
+    }
+
+    public void setPopulation(long population) {
+        this.population = population;
+    }
 }

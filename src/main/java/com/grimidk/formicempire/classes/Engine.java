@@ -2,10 +2,12 @@ package com.grimidk.formicempire.classes;
 
 import java.util.concurrent.Semaphore;
 
+import com.grimidk.formicempire.classes.constants.AntRole;
 import com.grimidk.formicempire.classes.constants.AntStatus;
 import com.grimidk.formicempire.classes.constants.AntSubType;
 import com.grimidk.formicempire.classes.constants.AntType;
 import com.grimidk.formicempire.classes.constants.Biome;
+import com.grimidk.formicempire.classes.constants.ColonyRank;
 import com.grimidk.formicempire.classes.constants.MoonPhase;
 import com.grimidk.formicempire.classes.constants.ResourceType;
 import com.grimidk.formicempire.classes.constants.Season;
@@ -20,9 +22,11 @@ public class Engine extends Thread{
     
     private World world;
     private ArrayList<AntStatus> antstatuses;
-    private ArrayList<AntSubType> antSubTypes;
     private ArrayList<AntType> antTypes;
+    private ArrayList<AntSubType> antSubTypes;
+    private ArrayList<AntRole> antRoles;
     private ArrayList<Biome> biomes;
+    private ArrayList<ColonyRank> colonyRanks;
     private ArrayList<ResourceType> resources;
     private ArrayList<Species> species;
     private ArrayList<TimeOfDay> timesOfDay;
@@ -45,7 +49,9 @@ public class Engine extends Thread{
         this.antstatuses = new ArrayList<>();
         this.antSubTypes = new ArrayList<>();
         this.antTypes = new ArrayList<>();
+        this.antRoles = new ArrayList<>();
         this.biomes = new ArrayList<>();
+        this.colonyRanks = new ArrayList<>();
         this.resources = new ArrayList<>();
         this.species = new ArrayList<>();
         this.timesOfDay = new ArrayList<>();
@@ -79,14 +85,6 @@ public class Engine extends Thread{
         this.antstatuses = antstatuses;
     }
 
-    public ArrayList<AntSubType> getAntSubTypes() {
-        return antSubTypes;
-    }
-
-    public void setAntSubTypes(ArrayList<AntSubType> antSubTypes) {
-        this.antSubTypes = antSubTypes;
-    }
-
     public ArrayList<AntType> getAntTypes() {
         return antTypes;
     }
@@ -95,12 +93,36 @@ public class Engine extends Thread{
         this.antTypes = antTypes;
     }
 
+    public ArrayList<AntSubType> getAntSubTypes() {
+        return antSubTypes;
+    }
+
+    public void setAntSubTypes(ArrayList<AntSubType> antSubTypes) {
+        this.antSubTypes = antSubTypes;
+    }
+
+    public ArrayList<AntRole> getAntRoles() {
+        return antRoles;
+    }
+
+    public void setAntRoles(ArrayList<AntRole> antRoles) {
+        this.antRoles = antRoles;
+    }
+
     public ArrayList<Biome> getBiomes() {
         return biomes;
     }
 
     public void setBiomes(ArrayList<Biome> biomes) {
         this.biomes = biomes;
+    }
+
+    public ArrayList<ColonyRank> getColonyRanks() {
+        return colonyRanks;
+    }
+
+    public void setColonyRanks(ArrayList<ColonyRank> colonyRanks) {
+        this.colonyRanks = colonyRanks;
     }
 
     public ArrayList<ResourceType> getResources() {
@@ -262,9 +284,53 @@ public class Engine extends Thread{
         public static final AntType TYPE_QUEEN = new AntType(9, "Queen", 50,  2, 50, 50, 10, 1/2, 50, 1/4, 5);
 
         //Ant Subtypes
-
+        
         //Ant Roles
+        public static final AntRole ROLE_FORAGER = new AntRole(1, TYPE_WORKER, "Forager");
+        public static final AntRole ROLE_NURSE = new AntRole(2, TYPE_WORKER, "Nurse");
+        public static final AntRole ROLE_BUILDER = new AntRole(3, TYPE_WORKER, "Builder");
+        public static final AntRole ROLE_SCOUT = new AntRole(4, TYPE_WORKER, "Scout");
+        public static final AntRole ROLE_FARMER = new AntRole(5, TYPE_WORKER, "Farmer");
+        public static final AntRole ROLE_RANCHER = new AntRole(6, TYPE_WORKER, "Rancher");
+        public static final AntRole ROLE_GRAVER = new AntRole(7, TYPE_WORKER, "Grave-Keeper");
+        public static final AntRole ROLE_MINER = new AntRole(8, TYPE_WORKER, "Miner");
+        public static final AntRole ROLE_COURIER = new AntRole(9, TYPE_WORKER, "Courier");
+        public static final AntRole ROLE_POTTER = new AntRole(10, TYPE_WORKER, "Portable-Feeder");
+        public static final AntRole ROLE_GUARD = new AntRole(11, TYPE_SOLDIER, "Guard");
+        public static final AntRole ROLE_WARRIOR = new AntRole(12, TYPE_SOLDIER, "Warrior");
+        public static final AntRole ROLE_DEFENDER = new AntRole(13, TYPE_SOLDIER, "Defender");
+        public static final AntRole ROLE_POLICE = new AntRole(14, TYPE_SOLDIER, "Parasite-Police");
+        public static final AntRole ROLE_BOMBER = new AntRole(15, TYPE_SOLDIER, "Bomber");
+        public static final AntRole ROLE_BRUTE = new AntRole(16, TYPE_MAJOR, "Brute");
+        public static final AntRole ROLE_CARRIER = new AntRole(17, TYPE_MAJOR, "Troop-Carrier");
+        public static final AntRole ROLE_ARTILLERY = new AntRole(18, TYPE_MAJOR, "Artillery");
+        public static final AntRole ROLE_SIEGE = new AntRole(19, TYPE_MAJOR, "Siege-Engine");
+        public static final AntRole ROLE_BORER = new AntRole(20, TYPE_MAJOR, "Boring-Machine");
+        public static final AntRole ROLE_DRONE = new AntRole(21, TYPE_DRONE, "Drone");
+        public static final AntRole ROLE_BREEDER = new AntRole(22, TYPE_PRINCESS, "Breeder");
+        public static final AntRole ROLE_DIPLOMAT = new AntRole(23, TYPE_PRINCESS, "Diplomat");
+        public static final AntRole ROLE_LAYER = new AntRole(24, TYPE_QUEEN, "Egg-Layer");
+        public static final AntRole ROLE_RESEARCHER = new AntRole(25, TYPE_QUEEN, "Researcher");
 
+        //Colony Ranks
+        public static final ColonyRank RANK_ANT = new ColonyRank(1, "Ant", 1l);
+        public static final ColonyRank RANK_COLONY = new ColonyRank(2, "Ant", 10l);
+        public static final ColonyRank RANK_COUNTY = new ColonyRank(3, "Ant", 100l);
+        public static final ColonyRank RANK_DUCHY = new ColonyRank(4, "Ant", 1000l);
+        public static final ColonyRank RANK_KINGDOM = new ColonyRank(5, "Ant", 10000l);
+        public static final ColonyRank RANK_EMPIRE = new ColonyRank(6, "Ant", 100000l);
+        public static final ColonyRank RANK_SUPER = new ColonyRank(7, "Ant", 1000000l);
+        public static final ColonyRank RANK_ULTRA = new ColonyRank(8, "Ant", 10000000l);
+        public static final ColonyRank RANK_HYPER = new ColonyRank(9, "Ant", 100000000l);
+        public static final ColonyRank RANK_MEGA = new ColonyRank(10, "Ant", 1000000000l);
+        public static final ColonyRank RANK_ULTIMATE = new ColonyRank(11, "Ant", 10000000000l);
+        public static final ColonyRank RANK_SUPREME = new ColonyRank(12, "Ant", 100000000000l);
+        public static final ColonyRank RANK_GIGA = new ColonyRank(13, "Ant", 1000000000000l);
+
+        // Ant Ultimate-Colony (10.000.000.000)
+        // Ant Supreme-Colony (100.000.000.000)
+        // Ant Giga-Colony (1.000.000.000.000)	
+        
         //Species
 
         //Upgrades
@@ -347,11 +413,50 @@ public class Engine extends Thread{
             System.out.println("Loading ant subtypes...");
 
             System.out.println("Loading ant roles...");
+            this.antRoles.add(ROLE_FORAGER);
+            this.antRoles.add(ROLE_NURSE);
+            this.antRoles.add(ROLE_BUILDER);            
+            this.antRoles.add(ROLE_SCOUT);
+            this.antRoles.add(ROLE_FARMER);
+            this.antRoles.add(ROLE_RANCHER);
+            this.antRoles.add(ROLE_GRAVER);
+            this.antRoles.add(ROLE_MINER);
+            this.antRoles.add(ROLE_COURIER);
+            this.antRoles.add(ROLE_POTTER);
+            this.antRoles.add(ROLE_GUARD);
+            this.antRoles.add(ROLE_WARRIOR);
+            this.antRoles.add(ROLE_DEFENDER);
+            this.antRoles.add(ROLE_POLICE);
+            this.antRoles.add(ROLE_BOMBER);
+            this.antRoles.add(ROLE_BRUTE);
+            this.antRoles.add(ROLE_CARRIER);
+            this.antRoles.add(ROLE_ARTILLERY);  
+            this.antRoles.add(ROLE_SIEGE);
+            this.antRoles.add(ROLE_BORER);
+            this.antRoles.add(ROLE_DRONE);
+            this.antRoles.add(ROLE_BREEDER);    
+            this.antRoles.add(ROLE_DIPLOMAT);
+            this.antRoles.add(ROLE_LAYER);
+            this.antRoles.add(ROLE_RESEARCHER);
+
+            System.out.println("Loading ranks...");
+            this.colonyRanks.add(RANK_ANT);
+            this.colonyRanks.add(RANK_COLONY);
+            this.colonyRanks.add(RANK_COUNTY);
+            this.colonyRanks.add(RANK_DUCHY);
+            this.colonyRanks.add(RANK_KINGDOM);
+            this.colonyRanks.add(RANK_EMPIRE);
+            this.colonyRanks.add(RANK_SUPER);
+            this.colonyRanks.add(RANK_ULTRA);
+            this.colonyRanks.add(RANK_HYPER);
+            this.colonyRanks.add(RANK_MEGA);
 
             System.out.println("Loading species...");
 
             System.out.println("Loading upgrades...");
+
             System.out.println("Loading synergies...");
+
             System.out.println("Loading bug types...");
         }
     
