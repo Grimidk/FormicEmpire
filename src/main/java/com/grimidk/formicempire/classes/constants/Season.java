@@ -1,8 +1,7 @@
 package com.grimidk.formicempire.classes.constants;
 
 public class Season {
-    
-    private int id;
+    private final int id;
     private String name;    
     private float tempMult;
     private float humidityMult;
@@ -16,10 +15,6 @@ public class Season {
 
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getName() {

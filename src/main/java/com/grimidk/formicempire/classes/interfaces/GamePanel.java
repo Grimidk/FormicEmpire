@@ -103,7 +103,7 @@ public class GamePanel extends JPanel {
         weatherLabel = new JLabel("Weather: Clear");
         speedDownButton = new JButton("Speed-");
         speedUpButton = new JButton("Speed+");
-        tickLabel = new JLabel("Tick: 500ms");
+        tickLabel = new JLabel("Tick: 250ms");
         playPauseButton = new JButton("Pause");
     }
 

@@ -16,7 +16,6 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 
 public class SaveManager {
-
     private final File savesDir;
     private final ExecutorService executor = Executors.newSingleThreadExecutor(r -> new Thread(r, "save-worker"));
 

@@ -2,7 +2,7 @@ package com.grimidk.formicempire.classes.constants;
 
 public class Biome {
     
-    private int id;
+    private final int id;
     private String name;
     private int temperature;
     private int humidity; // 0 -> 5
@@ -16,10 +16,6 @@ public class Biome {
 
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getName() {

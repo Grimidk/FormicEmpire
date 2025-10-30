@@ -19,7 +19,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.ArrayList;
 
 public class Engine extends Thread{
-    
     private World world;
     private ArrayList<AntStatus> antstatuses;
     private ArrayList<AntType> antTypes;

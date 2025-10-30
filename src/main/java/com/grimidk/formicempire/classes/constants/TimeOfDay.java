@@ -1,8 +1,7 @@
 package com.grimidk.formicempire.classes.constants;
 
 public class TimeOfDay {
-    
-    private int id;
+    private final int id;
     private String name;
     private float tempMult;
 
@@ -14,10 +13,6 @@ public class TimeOfDay {
 
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getName() {

@@ -12,7 +12,6 @@ import com.grimidk.formicempire.classes.constants.ColonyRank;
 import com.grimidk.formicempire.classes.constants.Species;
 
 public class Colony {
-    
     private final int id;
     private String name;
     private Species species;

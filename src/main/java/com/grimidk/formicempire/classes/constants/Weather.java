@@ -1,8 +1,7 @@
 package com.grimidk.formicempire.classes.constants;
 
 public class Weather {
-    
-    private int id;
+    private final int id;
     private String name;
     private int humidMod;
     private float tempMult;
@@ -17,11 +16,7 @@ public class Weather {
     public int getId() {
         return id;
     }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
+    
     public String getName() {
         return name;
     }

@@ -1,8 +1,7 @@
 package com.grimidk.formicempire.classes.constants;
 
 public class ResourceType {
-    
-    private int id;
+    private final int id;
     private String name;
     private boolean isEdible;
     private boolean isLiquid;
@@ -16,10 +15,6 @@ public class ResourceType {
 
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getName() {
