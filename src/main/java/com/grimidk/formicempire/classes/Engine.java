@@ -325,10 +325,6 @@ public class Engine extends Thread{
         public static final ColonyRank RANK_ULTIMATE = new ColonyRank(11, "Ant", 10000000000l);
         public static final ColonyRank RANK_SUPREME = new ColonyRank(12, "Ant", 100000000000l);
         public static final ColonyRank RANK_GIGA = new ColonyRank(13, "Ant", 1000000000000l);
-
-        // Ant Ultimate-Colony (10.000.000.000)
-        // Ant Supreme-Colony (100.000.000.000)
-        // Ant Giga-Colony (1.000.000.000.000)	
         
         //Species
 
