@@ -41,10 +41,10 @@ public class Engine extends Thread{
     private final CopyOnWriteArrayList<Runnable> tickListeners = new CopyOnWriteArrayList<>();
 
     public Engine() {
-        this.delay = 500;
+        this.delay = 250;
         this.semaphore = new Semaphore(1);
         this.killSwitch = false;
-        this.paused = false;
+        this.paused = true;
         this.antstatuses = new ArrayList<>();
         this.antSubTypes = new ArrayList<>();
         this.antTypes = new ArrayList<>();

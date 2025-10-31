@@ -25,15 +25,14 @@ public class MainFrame extends JFrame {
         this.cardLayout = new CardLayout();
         this.cards = new JPanel(cardLayout);
 
-        // create panels
-    InitPanel initPanel = new InitPanel(this);
-    this.saveSelectPanel = new SaveSelectPanel(this);
-    HelpPanel helpPanel = new HelpPanel(this);
-    SettingsPanel settingsPanel = new SettingsPanel(this);
-    this.gamePanel = new GamePanel(this);
+        InitPanel initPanel = new InitPanel(this);
+        this.saveSelectPanel = new SaveSelectPanel(this);
+        HelpPanel helpPanel = new HelpPanel(this);
+        SettingsPanel settingsPanel = new SettingsPanel(this);
+        this.gamePanel = new GamePanel(this);
 
-    cards.add(initPanel, CARD_INIT);
-    cards.add(saveSelectPanel, CARD_SAVE);
+        cards.add(initPanel, CARD_INIT);
+        cards.add(saveSelectPanel, CARD_SAVE);
         cards.add(helpPanel, CARD_HELP);
         cards.add(settingsPanel, CARD_SETTINGS);
         cards.add(gamePanel, CARD_GAME);

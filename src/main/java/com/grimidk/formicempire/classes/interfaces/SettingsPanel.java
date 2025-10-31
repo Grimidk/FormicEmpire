@@ -14,7 +14,7 @@ public class SettingsPanel extends JPanel {
         c.insets = new Insets(8,8,8,8);
 
         JButton back = new JButton("Back");
-    back.addActionListener(e -> this.frame.showCard(MainFrame.CARD_INIT));
+        back.addActionListener(e -> this.frame.showCard(MainFrame.CARD_INIT));
 
         c.gridy = 0; add(new JLabel("Settings content"), c);
         c.gridy = 1; add(back, c);
