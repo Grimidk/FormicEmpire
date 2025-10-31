@@ -1,9 +1,10 @@
 package com.grimidk.formicempire.classes.interfaces;
 
-import com.grimidk.formicempire.classes.Engine;
-import com.grimidk.formicempire.classes.Savefile;
-
 import javax.swing.*;
+
+import com.grimidk.formicempire.classes.infrasctructure.Engine;
+import com.grimidk.formicempire.classes.infrasctructure.Savefile;
+
 import java.awt.*;
 
 public class MainFrame extends JFrame {

@@ -1,16 +1,20 @@
 package com.grimidk.formicempire.classes.constants;
 
+import javax.swing.ImageIcon;
+
 public class Season {
     private final int id;
     private String name;    
     private float tempMult;
     private float humidityMult;
+    private ImageIcon icon;
 
-    public Season(int id, String name, float tempMult, float humidityMult) {
+    public Season(int id, String name, float tempMult, float humidityMult, ImageIcon icon) {
         this.id = id;
         this.name = name;
         this.tempMult = tempMult;
         this.humidityMult = humidityMult;
+        this.icon = icon;
     }
 
     public int getId() {
@@ -41,5 +45,11 @@ public class Season {
         this.humidityMult = humidityMult;
     }
 
+    public ImageIcon getIcon() {
+        return icon;
+    }
 
+    public void setIcon(ImageIcon icon) {
+        this.icon = icon;
+    }
 }

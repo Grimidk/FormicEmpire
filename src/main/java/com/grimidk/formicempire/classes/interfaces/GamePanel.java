@@ -1,10 +1,15 @@
 package com.grimidk.formicempire.classes.interfaces;
 
-import com.grimidk.formicempire.classes.Engine;
-import com.grimidk.formicempire.classes.Savefile;
 import com.grimidk.formicempire.classes.World;
 import com.grimidk.formicempire.classes.Colony;
-import com.grimidk.formicempire.classes.SaveManager;
+import com.grimidk.formicempire.classes.constants.MoonPhase;
+import com.grimidk.formicempire.classes.constants.Season;
+import com.grimidk.formicempire.classes.constants.TimeOfDay;
+import com.grimidk.formicempire.classes.constants.Weather;
+import com.grimidk.formicempire.classes.infrasctructure.Engine;
+import com.grimidk.formicempire.classes.infrasctructure.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.SaveManager;
+import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -71,15 +76,6 @@ public class GamePanel extends JPanel {
         5f      // Level 6
     };
 
-    private ImageIcon dawnIcon;
-    private ImageIcon dayIcon;
-    private ImageIcon duskIcon;
-    private ImageIcon nightIcon;
-
-    private ImageIcon clearIcon;
-    private ImageIcon rainIcon;
-    private ImageIcon snowIcon;
-
     public GamePanel(MainFrame frame) {
         this.frame = frame;
         this.tickListener = null;
@@ -98,31 +94,31 @@ public class GamePanel extends JPanel {
         statusIndicator = new JLabel();
 
         totalAntLabel = new JLabel("Total ants: 0");
-        queensLabel = new JLabel("Queens: 0");
-        princessLabel = new JLabel("Princesses: 0");
-        droneLabel = new JLabel("Drones: 0");
-        majorLabel = new JLabel("Majors: 0");
-        soldiersLabel = new JLabel("Soldiers: 0");
-        workersLabel = new JLabel("Workers: 0");
-        larvaLabel = new JLabel("Larva: 0");
-        pupaLabel = new JLabel("Pupa: 0");
-        eggsLabel = new JLabel("Eggs: 0");
-        deadAntsLabel = new JLabel("Dead ants: 0");
+        queensLabel = new JLabel("0");
+        princessLabel = new JLabel("0");
+        droneLabel = new JLabel("0");
+        majorLabel = new JLabel("0");
+        soldiersLabel = new JLabel("0");
+        workersLabel = new JLabel("0");
+        pupaLabel = new JLabel("0");
+        larvaLabel = new JLabel("0");
+        eggsLabel = new JLabel("0");
+        deadAntsLabel = new JLabel("Dead: 0"); 
 
         totalResourcesLabel = new JLabel("Total resources: 0");
-        mushroomsLabel = new JLabel("Mushrooms: 0");
-        planLabel = new JLabel("Plant matter: 0");
-        proteinLabel = new JLabel("Protein: 0");
-        waterLabel = new JLabel("Water: 0");
-        syrupLabel = new JLabel("Syrup: 0");
-        resinLabel = new JLabel("Resin: 0");
-        mineralLabel = new JLabel("Minerals: 0");
+        mushroomsLabel = new JLabel("0");
+        planLabel = new JLabel("0");
+        proteinLabel = new JLabel("0");
+        waterLabel = new JLabel("0");
+        syrupLabel = new JLabel("0");
+        resinLabel = new JLabel("0");
+        mineralLabel = new JLabel("0");
 
         dateTimeLabel = new JLabel("00:00 00/00/0000");
-        timeOfDayLabel = new JLabel("Time of Day: Dawn");
-        moonPhaseLabel = new JLabel("Moon Phase: New Moon");
-        seasonLabel = new JLabel("Season: Spring");
-        weatherLabel = new JLabel("Weather: Clear");
+        timeOfDayLabel = new JLabel(); 
+        moonPhaseLabel = new JLabel(); 
+        seasonLabel = new JLabel();    
+        weatherLabel = new JLabel();  
 
         speedDownButton = new JButton("Speed- (-)");
         speedUpButton = new JButton("Speed+ (+)");
@@ -139,8 +135,8 @@ public class GamePanel extends JPanel {
         antsDetailPanel.add(majorLabel);
         antsDetailPanel.add(soldiersLabel);
         antsDetailPanel.add(workersLabel);
-        antsDetailPanel.add(larvaLabel);
         antsDetailPanel.add(pupaLabel);
+        antsDetailPanel.add(larvaLabel);
         antsDetailPanel.add(eggsLabel);
         antsDetailPanel.add(deadAntsLabel);
 
@@ -164,24 +160,48 @@ public class GamePanel extends JPanel {
         timePanel.add(weatherLabel);
         timePanel.add(seasonLabel);
 
-        try {
-            dawnIcon = new ImageIcon(getClass().getResource("/icons/times/dawn.png"));
-            dayIcon = new ImageIcon(getClass().getResource("/icons/times/day.png"));
-            duskIcon = new ImageIcon(getClass().getResource("/icons/times/dusk.png"));
-            nightIcon = new ImageIcon(getClass().getResource("/icons/times/night.png"));
+        // --- Set Static Icons ---
+        queensLabel.setIcon(GameConstants.TYPE_QUEEN.getIcon());
+        princessLabel.setIcon(GameConstants.TYPE_PRINCESS.getIcon());
+        droneLabel.setIcon(GameConstants.TYPE_DRONE.getIcon());
+        majorLabel.setIcon(GameConstants.TYPE_MAJOR.getIcon());
+        soldiersLabel.setIcon(GameConstants.TYPE_SOLDIER.getIcon());
+        workersLabel.setIcon(GameConstants.TYPE_WORKER.getIcon());
+        pupaLabel.setIcon(GameConstants.TYPE_PUPA.getIcon());
+        larvaLabel.setIcon(GameConstants.TYPE_LARVA.getIcon());
+        eggsLabel.setIcon(GameConstants.TYPE_EGG.getIcon());
 
-            clearIcon = new ImageIcon(getClass().getResource("/icons/weather/clear.png"));
-            rainIcon = new ImageIcon(getClass().getResource("/icons/weather/rain.png"));
-            snowIcon = new ImageIcon(getClass().getResource("/icons/weather/snow.png"));
-        } catch (Exception e) {
-            System.err.println("Error loading icons: " + e.getMessage());
-        }
+        queensLabel.setToolTipText(GameConstants.TYPE_QUEEN.getName());
+        princessLabel.setToolTipText(GameConstants.TYPE_PRINCESS.getName());
+        droneLabel.setToolTipText(GameConstants.TYPE_DRONE.getName());
+        majorLabel.setToolTipText(GameConstants.TYPE_MAJOR.getName());
+        soldiersLabel.setToolTipText(GameConstants.TYPE_SOLDIER.getName());
+        workersLabel.setToolTipText(GameConstants.TYPE_WORKER.getName());
+        pupaLabel.setToolTipText(GameConstants.TYPE_PUPA.getName());
+        larvaLabel.setToolTipText(GameConstants.TYPE_LARVA.getName());
+        eggsLabel.setToolTipText(GameConstants.TYPE_EGG.getName());
+
+        mushroomsLabel.setIcon(GameConstants.FUNGI_RESOURCE.getIcon()); 
+        planLabel.setIcon(GameConstants.PLANT_RESOURCE.getIcon());
+        proteinLabel.setIcon(GameConstants.MEAT_RESOURCE.getIcon());  
+        waterLabel.setIcon(GameConstants.WATER_RESOURCE.getIcon());  
+        syrupLabel.setIcon(GameConstants.SYRUP_RESOURCE.getIcon());    
+        resinLabel.setIcon(GameConstants.RESIN_RESOURCE.getIcon());
+        mineralLabel.setIcon(GameConstants.ROCK_RESOURCE.getIcon());
+
+        mushroomsLabel.setToolTipText(GameConstants.FUNGI_RESOURCE.getName());
+        planLabel.setToolTipText(GameConstants.PLANT_RESOURCE.getName());
+        proteinLabel.setToolTipText(GameConstants.MEAT_RESOURCE.getName());
+        waterLabel.setToolTipText(GameConstants.WATER_RESOURCE.getName());
+        syrupLabel.setToolTipText(GameConstants.SYRUP_RESOURCE.getName());
+        resinLabel.setToolTipText(GameConstants.RESIN_RESOURCE.getName());
+        mineralLabel.setToolTipText(GameConstants.ROCK_RESOURCE.getName());
     }
 
     private void initLayout() {
         setLayout(new BorderLayout());
         add(createNorthPanel(), BorderLayout.NORTH);
-        add(createCenterPanel(), BorderLayout.CENTER);
+        add(createCenterPanel(), BorderLayout.WEST); 
         add(createEastPanel(), BorderLayout.EAST);
         add(createSouthPanel(), BorderLayout.SOUTH);
     }
@@ -201,8 +221,15 @@ public class GamePanel extends JPanel {
         stats.setLayout(new BoxLayout(stats, BoxLayout.Y_AXIS));
         stats.add(totalAntLabel);
         stats.add(totalResourcesLabel);
-        stats.add(antsDetailPanel);
-        stats.add(resourcesDetailPanel);
+
+        JPanel antsWrapper = new JPanel(new BorderLayout());
+        antsWrapper.add(antsDetailPanel, BorderLayout.NORTH);
+        stats.add(antsWrapper);
+
+        JPanel resourcesWrapper = new JPanel(new BorderLayout());
+        resourcesWrapper.add(resourcesDetailPanel, BorderLayout.NORTH);
+        stats.add(resourcesWrapper);
+
         return stats;
     }
 
@@ -449,14 +476,14 @@ public class GamePanel extends JPanel {
         int majors = colony.getMajors() != null ? colony.getMajors().size() : 0;
         int soldiers = colony.getSoldiers() != null ? colony.getSoldiers().size() : 0;
         int workers = colony.getWorkers() != null ? colony.getWorkers().size() : 0;
-        int larva = colony.getLarvae() != null ? colony.getLarvae().size() : 0;
         int pupa = colony.getPupae() != null ? colony.getPupae().size() : 0;
+        int larva = colony.getLarvae() != null ? colony.getLarvae().size() : 0;
         int eggs = colony.getEggs() != null ? colony.getEggs().size() : 0;
         int deadAnts = colony.getDeadAnts() != null ? colony.getDeadAnts().size() : 0;
 
-        int mushrooms = colony.getMushrooms();
-        int plants = colony.getPlants();
-        int protein = colony.getProtein();
+        int mushrooms = colony.getMushrooms(); 
+        int plants = colony.getPlants();     
+        int protein = colony.getProtein();  
         int water = colony.getWater();
         int syrups = colony.getSyrups();
         int resins = colony.getResins();
@@ -464,72 +491,44 @@ public class GamePanel extends JPanel {
         int totalResources = mushrooms + plants + protein + water + syrups + resins + minerals;
 
         totalAntLabel.setText("Total ants: " + totalAnts);
-        queensLabel.setText("Queens: " + queens);
-        princessLabel.setText("Princesses: " + princesses);
-        droneLabel.setText("Drones: " + drones);
-        majorLabel.setText("Majors: " + majors);
-        soldiersLabel.setText("Soldiers: " + soldiers);
-        workersLabel.setText("Workers: " + workers);
-        larvaLabel.setText("Larva: " + larva);
-        pupaLabel.setText("Pupa: " + pupa);
-        eggsLabel.setText("Eggs: " + eggs);
+        queensLabel.setText(String.valueOf(queens));
+        princessLabel.setText(String.valueOf(princesses));
+        droneLabel.setText(String.valueOf(drones));
+        majorLabel.setText(String.valueOf(majors));
+        soldiersLabel.setText(String.valueOf(soldiers));
+        workersLabel.setText(String.valueOf(workers));
+        pupaLabel.setText(String.valueOf(pupa));
+        larvaLabel.setText(String.valueOf(larva));
+        eggsLabel.setText(String.valueOf(eggs));
         deadAntsLabel.setText("Dead ants: " + deadAnts);
 
         totalResourcesLabel.setText("Total resources: " + totalResources);
-        mushroomsLabel.setText("Mushrooms: " + mushrooms);
-        planLabel.setText("Plant matter: " + plants);
-        proteinLabel.setText("Protein: " + protein);
-        waterLabel.setText("Water: " + water);
-        syrupLabel.setText("Syrup: " + syrups);
-        resinLabel.setText("Resin: " + resins);
-        mineralLabel.setText("Minerals: " + minerals);
+        mushroomsLabel.setText(String.valueOf(mushrooms));
+        planLabel.setText(String.valueOf(plants));
+        proteinLabel.setText(String.valueOf(protein));
+        waterLabel.setText(String.valueOf(water));
+        syrupLabel.setText(String.valueOf(syrups));
+        resinLabel.setText(String.valueOf(resins));
+        mineralLabel.setText(String.valueOf(minerals));
 
         String dateTime = String.format("%02d:%02d %02d/%02d/%04d",
         world.getHour(), world.getMinute(), world.getDay(), world.getMonth(), world.getYear());
         dateTimeLabel.setText(dateTime);
 
-        String timeOfDayName = world.getTimeOfDay().getName();
-        timeOfDayLabel.setText(null);
-        timeOfDayLabel.setToolTipText(timeOfDayName);
-        switch (timeOfDayName) {
-            case "Dawn":
-                timeOfDayLabel.setIcon(dawnIcon);
-                break;
-            case "Daytime":
-                timeOfDayLabel.setIcon(dayIcon);
-                break;
-            case "Dusk":
-                timeOfDayLabel.setIcon(duskIcon);
-                break;
-            case "Nightime":
-                timeOfDayLabel.setIcon(nightIcon);
-                break;
-            default:
-                timeOfDayLabel.setIcon(null);
-                timeOfDayLabel.setText(timeOfDayName);
-                break;
-        }
+        TimeOfDay currentTimeOfDay = world.getTimeOfDay();
+        timeOfDayLabel.setIcon(currentTimeOfDay.getIcon());
+        timeOfDayLabel.setToolTipText(currentTimeOfDay.getName());
 
-        moonPhaseLabel.setText("Moon Phase: " + world.getMoonPhase().getName());
-        seasonLabel.setText("Season: " + world.getSeason().getName());
+        MoonPhase currentMoonPhase = world.getMoonPhase();
+        moonPhaseLabel.setIcon(currentMoonPhase.getIcon());
+        moonPhaseLabel.setToolTipText(currentMoonPhase.getName());
 
-        String weatherName = world.getWeather().getName();
-        weatherLabel.setText(null);
-        weatherLabel.setToolTipText(weatherName);
-        switch (weatherName) {
-            case "Clear":
-                weatherLabel.setIcon(clearIcon);
-                break;
-            case "Rain":
-                weatherLabel.setIcon(rainIcon);
-                break;
-            case "Snow":
-                weatherLabel.setIcon(snowIcon);
-                break;
-            default:
-                weatherLabel.setIcon(null);
-                weatherLabel.setText(weatherName);
-                break;
-        }
+        Season currentSeason = world.getSeason();
+        seasonLabel.setIcon(currentSeason.getIcon());
+        seasonLabel.setToolTipText(currentSeason.getName());
+
+        Weather currentWeather = world.getWeather();
+        weatherLabel.setIcon(currentWeather.getIcon());
+        weatherLabel.setToolTipText(currentWeather.getName());
     }
 }

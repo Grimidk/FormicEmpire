@@ -1,4 +1,4 @@
-package com.grimidk.formicempire.classes;
+package com.grimidk.formicempire.classes.infrasctructure;
 
 import java.io.Serializable;
 
@@ -16,6 +16,7 @@ public class Savefile implements Serializable {
     private int day;
     private int month;
     private int year;
+    
     private int totalAnts;
     private int deadAnts;
     private int eggs;

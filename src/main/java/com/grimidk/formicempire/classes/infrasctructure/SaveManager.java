@@ -1,4 +1,4 @@
-package com.grimidk.formicempire.classes;
+package com.grimidk.formicempire.classes.infrasctructure;
 
 import java.io.File;
 import java.io.IOException;
@@ -6,6 +6,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.swing.SwingUtilities;
+
+import com.grimidk.formicempire.classes.Colony;
+import com.grimidk.formicempire.classes.World;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.nio.file.Files;

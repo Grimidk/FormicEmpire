@@ -1,9 +1,9 @@
 package com.grimidk.formicempire.classes.interfaces;
 
-import com.grimidk.formicempire.classes.Savefile;
-import com.grimidk.formicempire.classes.SaveManager;
-import com.grimidk.formicempire.classes.Engine;
 import com.grimidk.formicempire.classes.World;
+import com.grimidk.formicempire.classes.infrasctructure.Engine;
+import com.grimidk.formicempire.classes.infrasctructure.SaveManager;
+import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.Colony;
 
 import javax.swing.*;

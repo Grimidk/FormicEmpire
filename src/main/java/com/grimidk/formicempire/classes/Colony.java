@@ -10,6 +10,8 @@ import java.util.Map;
 import com.grimidk.formicempire.classes.constants.AntType;
 import com.grimidk.formicempire.classes.constants.ColonyRank;
 import com.grimidk.formicempire.classes.constants.Species;
+import com.grimidk.formicempire.classes.infrasctructure.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 
 public class Colony {
     private final int id;
@@ -57,15 +59,15 @@ public class Colony {
     private int baseSize;
 
     private void initializeLists() {
-        this.antGroups.put(Engine.TYPE_EGG, new ArrayList<Ant>());
-        this.antGroups.put(Engine.TYPE_LARVA, new ArrayList<Ant>());
-        this.antGroups.put(Engine.TYPE_PUPA, new ArrayList<Ant>());
-        this.antGroups.put(Engine.TYPE_WORKER, new ArrayList<Ant>());
-        this.antGroups.put(Engine.TYPE_SOLDIER, new ArrayList<Ant>());
-        this.antGroups.put(Engine.TYPE_MAJOR, new ArrayList<Ant>());
-        this.antGroups.put(Engine.TYPE_DRONE, new ArrayList<Ant>());
-        this.antGroups.put(Engine.TYPE_PRINCESS, new ArrayList<Ant>());
-        this.antGroups.put(Engine.TYPE_QUEEN, new ArrayList<Ant>());
+        this.antGroups.put(GameConstants.TYPE_EGG, new ArrayList<Ant>());
+        this.antGroups.put(GameConstants.TYPE_LARVA, new ArrayList<Ant>());
+        this.antGroups.put(GameConstants.TYPE_PUPA, new ArrayList<Ant>());
+        this.antGroups.put(GameConstants.TYPE_WORKER, new ArrayList<Ant>());
+        this.antGroups.put(GameConstants.TYPE_SOLDIER, new ArrayList<Ant>());
+        this.antGroups.put(GameConstants.TYPE_MAJOR, new ArrayList<Ant>());
+        this.antGroups.put(GameConstants.TYPE_DRONE, new ArrayList<Ant>());
+        this.antGroups.put(GameConstants.TYPE_PRINCESS, new ArrayList<Ant>());
+        this.antGroups.put(GameConstants.TYPE_QUEEN, new ArrayList<Ant>());
     }
 
     private void initializeDefaults() {
@@ -107,7 +109,7 @@ public class Colony {
         this.id = id;
         this.name = name;
         this.isPlayer = isPlayer;
-        this.rank = Engine.RANK_COLONY;
+        this.rank = GameConstants.RANK_COLONY;
         this.antGroups = new HashMap<AntType, List<Ant>>();
         this.deadAnts = new ArrayList<Ant>();
         
@@ -125,22 +127,23 @@ public class Colony {
         this.id = savefile.getColonyId();
         this.name = savefile.getColonyName();
         this.isPlayer = true;
-        this.rank = Engine.RANK_COLONY;
+        this.rank = GameConstants.RANK_COLONY;
         this.antGroups = new HashMap<AntType, List<Ant>>();
         this.deadAnts = new ArrayList<Ant>();
 
         initializeLists();
         initializeDefaults(); 
 
-        populateAntList(getEggs(), savefile.getEggs(), Engine.TYPE_EGG);
-        populateAntList(getLarvae(), savefile.getLarvae(), Engine.TYPE_LARVA);
-        populateAntList(getPupae(), savefile.getPupae(), Engine.TYPE_PUPA);
-        populateAntList(getWorkers(), savefile.getWorkers(), Engine.TYPE_WORKER);
-        populateAntList(getSoldiers(), savefile.getSoldiers(), Engine.TYPE_SOLDIER);
-        populateAntList(getMajors(), savefile.getMajors(), Engine.TYPE_MAJOR);
-        populateAntList(getDrones(), savefile.getDrones(), Engine.TYPE_DRONE);
-        populateAntList(getPrincesses(), savefile.getPrincesses(), Engine.TYPE_PRINCESS);
-        populateAntList(getQueens(), savefile.getQueens(), Engine.TYPE_QUEEN);
+        populateAntList(getEggs(), savefile.getEggs(), GameConstants.TYPE_EGG);
+        populateAntList(getLarvae(), savefile.getLarvae(), GameConstants.TYPE_LARVA);
+        populateAntList(getPupae(), savefile.getPupae(), GameConstants.TYPE_PUPA);
+        populateAntList(getWorkers(), savefile.getWorkers(), GameConstants.TYPE_WORKER);
+        populateAntList(getSoldiers(), savefile.getSoldiers(), GameConstants.TYPE_SOLDIER);
+        populateAntList(getMajors(), savefile.getMajors(), GameConstants.TYPE_MAJOR);
+        populateAntList(getDrones(), savefile.getDrones(), GameConstants.TYPE_DRONE);
+        populateAntList(getPrincesses(), savefile.getPrincesses(), GameConstants.TYPE_PRINCESS);
+        populateAntList(getQueens(), savefile.getQueens(), GameConstants.TYPE_QUEEN);
+        populateAntList(deadAnts, savefile.getDeadAnts(), GameConstants.TYPE_WORKER);
 
         this.plants = savefile.getPlants();
         this.mushrooms = savefile.getMushrooms();
@@ -188,75 +191,75 @@ public class Colony {
     }
 
     public ArrayList<Ant> getEggs() {
-        return (ArrayList<Ant>) antGroups.get(Engine.TYPE_EGG);
+        return (ArrayList<Ant>) antGroups.get(GameConstants.TYPE_EGG);
     }
 
     public void setEggs(ArrayList<Ant> eggs) {
-        antGroups.put(Engine.TYPE_EGG, eggs);
+        antGroups.put(GameConstants.TYPE_EGG, eggs);
     }
 
     public ArrayList<Ant> getLarvae() {
-        return (ArrayList<Ant>) antGroups.get(Engine.TYPE_LARVA);
+        return (ArrayList<Ant>) antGroups.get(GameConstants.TYPE_LARVA);
     }
 
     public void setLarvae(ArrayList<Ant> larvae) {
-        antGroups.put(Engine.TYPE_LARVA, larvae);
+        antGroups.put(GameConstants.TYPE_LARVA, larvae);
     }
 
     public ArrayList<Ant> getPupae() {
-        return (ArrayList<Ant>) antGroups.get(Engine.TYPE_PUPA);
+        return (ArrayList<Ant>) antGroups.get(GameConstants.TYPE_PUPA);
     }
 
     public void setPupae(ArrayList<Ant> pupae) {
-        antGroups.put(Engine.TYPE_PUPA, pupae);
+        antGroups.put(GameConstants.TYPE_PUPA, pupae);
     }
 
     public ArrayList<Ant> getWorkers() {
-        return (ArrayList<Ant>) antGroups.get(Engine.TYPE_WORKER);
+        return (ArrayList<Ant>) antGroups.get(GameConstants.TYPE_WORKER);
     }
 
     public void setWorkers(ArrayList<Ant> workers) {
-        antGroups.put(Engine.TYPE_WORKER, workers);
+        antGroups.put(GameConstants.TYPE_WORKER, workers);
     }
 
     public ArrayList<Ant> getSoldiers() {
-        return (ArrayList<Ant>) antGroups.get(Engine.TYPE_SOLDIER);
+        return (ArrayList<Ant>) antGroups.get(GameConstants.TYPE_SOLDIER);
     }
 
     public void setSoldiers(ArrayList<Ant> soldiers) {
-        antGroups.put(Engine.TYPE_SOLDIER, soldiers);
+        antGroups.put(GameConstants.TYPE_SOLDIER, soldiers);
     }
 
     public ArrayList<Ant> getMajors() {
-        return (ArrayList<Ant>) antGroups.get(Engine.TYPE_MAJOR);
+        return (ArrayList<Ant>) antGroups.get(GameConstants.TYPE_MAJOR);
     }
 
     public void setMajors(ArrayList<Ant> majors) {
-        antGroups.put(Engine.TYPE_MAJOR, majors);
+        antGroups.put(GameConstants.TYPE_MAJOR, majors);
     }
 
     public ArrayList<Ant> getDrones() {
-        return (ArrayList<Ant>) antGroups.get(Engine.TYPE_DRONE);
+        return (ArrayList<Ant>) antGroups.get(GameConstants.TYPE_DRONE);
     }
 
     public void setDrones(ArrayList<Ant> drones) {
-        antGroups.put(Engine.TYPE_DRONE, drones);
+        antGroups.put(GameConstants.TYPE_DRONE, drones);
     }
 
     public ArrayList<Ant> getPrincesses() {
-        return (ArrayList<Ant>) antGroups.get(Engine.TYPE_PRINCESS);
+        return (ArrayList<Ant>) antGroups.get(GameConstants.TYPE_PRINCESS);
     }
 
     public void setPrincesses(ArrayList<Ant> princesses) {
-        antGroups.put(Engine.TYPE_PRINCESS, princesses);
+        antGroups.put(GameConstants.TYPE_PRINCESS, princesses);
     }
 
     public ArrayList<Ant> getQueens() {
-        return (ArrayList<Ant>) antGroups.get(Engine.TYPE_QUEEN);
+        return (ArrayList<Ant>) antGroups.get(GameConstants.TYPE_QUEEN);
     }
 
     public void setQueens(ArrayList<Ant> queens) {
-        antGroups.put(Engine.TYPE_QUEEN, queens);
+        antGroups.put(GameConstants.TYPE_QUEEN, queens);
     }
 
     public ArrayList<Ant> getDeadAnts() {
@@ -537,9 +540,9 @@ public class Colony {
     public void startColony() {
         List<Ant> workerList = getWorkers();
         for (int i = 0; i < 9; i++) {
-            workerList.add(new Ant(this, Engine.TYPE_WORKER));
+            workerList.add(new Ant(this, GameConstants.TYPE_WORKER));
         }
-        getQueens().add(new Ant(this, Engine.TYPE_QUEEN));
+        getQueens().add(new Ant(this, GameConstants.TYPE_QUEEN));
     }
 
     public void runLaying(){
@@ -553,37 +556,37 @@ public class Colony {
             if (eggList.size() >= this.getEggsCapacity()) {
                 break; 
             }
-            eggList.add(new Ant(this, Engine.TYPE_EGG));
+            eggList.add(new Ant(this, GameConstants.TYPE_EGG));
         }
     }
 
     private AntType determineHatchType() {
         double rand = Math.random();
         if (rand < 0.8) {
-            return Engine.TYPE_WORKER;
+            return GameConstants.TYPE_WORKER;
         } else if (rand < 0.90) {
-            return Engine.TYPE_SOLDIER;
+            return GameConstants.TYPE_SOLDIER;
         } else if (rand < 0.97) {
             // if () {
-            //     return Engine.TYPE_MAJOR;
+            //     return GameConstants.TYPE_MAJOR;
             // } else {
-            //     return Engine.TYPE_SOLDIER;
+            //     return GameConstants.TYPE_SOLDIER;
             // }
-            return Engine.TYPE_SOLDIER;
+            return GameConstants.TYPE_SOLDIER;
         } else if (rand < 0.99) {
             // if () {
-            //     return Engine.TYPE_DRONE;
+            //     return GameConstants.TYPE_DRONE;
             // } else {
-            //     return Engine.TYPE_SOLDIER;
+            //     return GameConstants.TYPE_SOLDIER;
             // }
-            return Engine.TYPE_SOLDIER;
+            return GameConstants.TYPE_SOLDIER;
         } else {
             // if () {
-            //     return Engine.TYPE_PRINCESS;
+            //     return GameConstants.TYPE_PRINCESS;
             // } else {
-            //     return Engine.TYPE_SOLDIER;
+            //     return GameConstants.TYPE_SOLDIER;
             // }
-            return Engine.TYPE_SOLDIER;
+            return GameConstants.TYPE_SOLDIER;
         }
     }
 
@@ -618,16 +621,16 @@ public class Colony {
     public void runHatching(){    
         hatchPupae();
 
-        evolveAnts(getLarvae(), getPupae(), Engine.TYPE_PUPA);
+        evolveAnts(getLarvae(), getPupae(), GameConstants.TYPE_PUPA);
 
-        evolveAnts(getEggs(), getLarvae(), Engine.TYPE_LARVA);
+        evolveAnts(getEggs(), getLarvae(), GameConstants.TYPE_LARVA);
     }
 
     public void runCollecting(){
-        int plantGain = (int) ((getWorkers().size() * getBaseAttackSpeed() * Engine.TYPE_WORKER.getAttackSpeedMult()));
+        int plantGain = (int) ((getWorkers().size() * getBaseAttackSpeed() * GameConstants.TYPE_WORKER.getAttackSpeedMult()));
         this.setPlants(Math.min(this.getPlants() + plantGain, this.getPlantsCapacity()));
 
-        int proteinGain = (int) ((getSoldiers().size() * getBaseAttackSpeed() * Engine.TYPE_SOLDIER.getAttackSpeedMult()));
+        int proteinGain = (int) ((getSoldiers().size() * getBaseAttackSpeed() * GameConstants.TYPE_SOLDIER.getAttackSpeedMult()));
         this.setProtein(Math.min(this.getProtein() + proteinGain, this.getProteinCapacity()));
     }
 
@@ -665,13 +668,13 @@ public class Colony {
         this.setMushrooms(0);
 
         List<AntType> killOrder = Arrays.asList(
-            Engine.TYPE_DRONE,
-            Engine.TYPE_PRINCESS,
-            Engine.TYPE_MAJOR,
-            Engine.TYPE_SOLDIER,
-            Engine.TYPE_LARVA,
-            Engine.TYPE_WORKER,
-            Engine.TYPE_QUEEN
+            GameConstants.TYPE_DRONE,
+            GameConstants.TYPE_PRINCESS,
+            GameConstants.TYPE_MAJOR,
+            GameConstants.TYPE_SOLDIER,
+            GameConstants.TYPE_LARVA,
+            GameConstants.TYPE_WORKER,
+            GameConstants.TYPE_QUEEN
         );
 
         for (AntType typeToKill : killOrder) {
@@ -718,7 +721,7 @@ public class Colony {
             }
             
             Ant princess = iterator.next();
-            princess.transform(this, Engine.TYPE_QUEEN);
+            princess.transform(this, GameConstants.TYPE_QUEEN);
             queens.add(princess);
             iterator.remove(); 
             Ant deadDrone = drones.remove(drones.size() - 1); 

@@ -7,6 +7,9 @@ import com.grimidk.formicempire.classes.constants.MoonPhase;
 import com.grimidk.formicempire.classes.constants.Season;
 import com.grimidk.formicempire.classes.constants.TimeOfDay;
 import com.grimidk.formicempire.classes.constants.Weather;
+import com.grimidk.formicempire.classes.infrasctructure.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.SaveManager;
+import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 
 public class World {
 
@@ -33,10 +36,10 @@ public class World {
         this.temperature = 25;
         this.humidity = 2;
         this.hexes = new ArrayList<>();
-        this.timeOfDay = Engine.DAWN_TIME;
-        this.moonPhase = Engine.NEW_MOON_PHASE;
-        this.season = Engine.SPRING_SEASON;
-        this.weather = Engine.CLEAR_WEATHER;
+        this.timeOfDay = GameConstants.DAWN_TIME;
+        this.moonPhase = GameConstants.NEW_MOON_PHASE;
+        this.season = GameConstants.SPRING_SEASON;
+        this.weather = GameConstants.CLEAR_WEATHER;
     }
 
     public int getSaveSlotId() {
@@ -191,15 +194,15 @@ public class World {
         this.getSpawnHex().getColony().runLaying();
 
         if (this.hour >= 0 && this.hour < 5) {
-            this.timeOfDay = Engine.NIGHT_TIME;
+            this.timeOfDay = GameConstants.NIGHT_TIME;
         } else if (this.hour >= 5 && this.hour < 7) {
-            this.timeOfDay = Engine.DAWN_TIME;
+            this.timeOfDay = GameConstants.DAWN_TIME;
         } else if (this.hour >= 7 && this.hour < 18) {
-            this.timeOfDay = Engine.DAY_TIME;
+            this.timeOfDay = GameConstants.DAY_TIME;
         } else if (this.hour >= 18 && this.hour < 20) {
-            this.timeOfDay = Engine.DUSK_TIME;
+            this.timeOfDay = GameConstants.DUSK_TIME;
         } else if (this.hour >= 20 && this.hour <= 23) {
-            this.timeOfDay = Engine.NIGHT_TIME;
+            this.timeOfDay = GameConstants.NIGHT_TIME;
         }
 
         if (this.hour > 23) {
@@ -216,23 +219,23 @@ public class World {
         this.getSpawnHex().getColony().runAging();
 
         if (this.day >= 0 && this.day < 1) {
-            this.moonPhase = Engine.NEW_MOON_PHASE;
+            this.moonPhase = GameConstants.NEW_MOON_PHASE;
         } else if (this.day >= 1 && this.day < 7) {
-            this.moonPhase = Engine.WAXING_CRESCENT_PHASE;
+            this.moonPhase = GameConstants.WAXING_CRESCENT_PHASE;
         } else if (this.day >= 7 && this.day < 8) {
-            this.moonPhase = Engine.FIRST_QUARTER_PHASE;
+            this.moonPhase = GameConstants.FIRST_QUARTER_PHASE;
         } else if (this.day >= 8 && this.day < 14) {
-            this.moonPhase = Engine.WAXING_GIBBOUS_PHASE;
+            this.moonPhase = GameConstants.WAXING_GIBBOUS_PHASE;
         } else if (this.day >= 14 && this.day < 15) {
-            this.moonPhase = Engine.FULL_MOON_PHASE;
+            this.moonPhase = GameConstants.FULL_MOON_PHASE;
         } else if (this.day >= 15 && this.day < 21) {
-            this.moonPhase = Engine.WANING_GIBBOUS_PHASE;
+            this.moonPhase = GameConstants.WANING_GIBBOUS_PHASE;
         } else if (this.day >= 21 && this.day < 22) {
-            this.moonPhase = Engine.LAST_QUARTER_PHASE;
+            this.moonPhase = GameConstants.LAST_QUARTER_PHASE;
         } else if (this.day >= 22 && this.day < 29) {
-            this.moonPhase = Engine.WANING_CRESCENT_PHASE;
+            this.moonPhase = GameConstants.WANING_CRESCENT_PHASE;
         } else {
-            this.moonPhase = Engine.NEW_MOON_PHASE;
+            this.moonPhase = GameConstants.NEW_MOON_PHASE;
         }
 
         if (this.day > 29) {
@@ -245,15 +248,15 @@ public class World {
         this.month++;
 
         if (this.month >= 0 && this.month < 3) {
-            this.season = Engine.SPRING_SEASON;
+            this.season = GameConstants.SPRING_SEASON;
         } else if (this.month >= 3 && this.month < 6) {
-            this.season = Engine.SUMMER_SEASON;
+            this.season = GameConstants.SUMMER_SEASON;
         } else if (this.month >= 6 && this.month < 7) {
-            this.season = Engine.AUTUMN_SEASON;
+            this.season = GameConstants.AUTUMN_SEASON;
         } else if (this.month >= 9 && this.month < 12) {
-            this.season = Engine.WINTER_SEASON;
+            this.season = GameConstants.WINTER_SEASON;
         } else {
-            this.season = Engine.SPRING_SEASON;
+            this.season = GameConstants.SPRING_SEASON;
         }
 
         try {
