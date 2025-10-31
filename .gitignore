@@ -21,3 +21,4 @@ logs/
 
 # Other generated files
 dependency-reduced-pom.xml
+.DS_Store
