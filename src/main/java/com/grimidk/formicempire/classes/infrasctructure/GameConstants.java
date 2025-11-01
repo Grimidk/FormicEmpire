@@ -144,6 +144,10 @@ public final class GameConstants {
         loadIcon("icons/ants/princess.png"));
     public static final AntType TYPE_QUEEN = new AntType(9, "Queen", 50f, 2f, 50f, 50f, 10f, 1/2f, 50f, 1/4f, 5f, 
         loadIcon("icons/ants/queen.png"));
+    public static final AntType TYPE_DEAD = new AntType(10, "Dead", 0, 0, 0, 0, 0, 0, 0, 0, 0,  
+        loadIcon("icons/ants/dead.png"));
+    public static final AntType TYPE_ZOMBIE = new AntType(11, "Zombie",  1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 
+        loadIcon("icons/ants/zombie.png"));
 
     // --- Ant Subtypes ---
     // (Add definitions here when you have them)
@@ -274,6 +278,8 @@ public final class GameConstants {
         antTypes.add(TYPE_DRONE);
         antTypes.add(TYPE_PRINCESS);
         antTypes.add(TYPE_QUEEN);
+        antTypes.add(TYPE_DEAD);
+        antTypes.add(TYPE_ZOMBIE);
 
         // (Add antSubTypes here when you have them)
 

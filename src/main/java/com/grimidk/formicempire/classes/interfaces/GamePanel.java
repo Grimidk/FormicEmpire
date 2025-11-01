@@ -103,7 +103,7 @@ public class GamePanel extends JPanel {
         pupaLabel = new JLabel("0");
         larvaLabel = new JLabel("0");
         eggsLabel = new JLabel("0");
-        deadAntsLabel = new JLabel("Dead: 0"); 
+        deadAntsLabel = new JLabel("0"); 
 
         totalResourcesLabel = new JLabel("Total resources: 0");
         mushroomsLabel = new JLabel("0");
@@ -170,6 +170,7 @@ public class GamePanel extends JPanel {
         pupaLabel.setIcon(GameConstants.TYPE_PUPA.getIcon());
         larvaLabel.setIcon(GameConstants.TYPE_LARVA.getIcon());
         eggsLabel.setIcon(GameConstants.TYPE_EGG.getIcon());
+        deadAntsLabel.setIcon(GameConstants.TYPE_DEAD.getIcon());
 
         queensLabel.setToolTipText(GameConstants.TYPE_QUEEN.getName());
         princessLabel.setToolTipText(GameConstants.TYPE_PRINCESS.getName());
@@ -180,6 +181,7 @@ public class GamePanel extends JPanel {
         pupaLabel.setToolTipText(GameConstants.TYPE_PUPA.getName());
         larvaLabel.setToolTipText(GameConstants.TYPE_LARVA.getName());
         eggsLabel.setToolTipText(GameConstants.TYPE_EGG.getName());
+        deadAntsLabel.setToolTipText(GameConstants.TYPE_DEAD.getName());
 
         mushroomsLabel.setIcon(GameConstants.FUNGI_RESOURCE.getIcon()); 
         planLabel.setIcon(GameConstants.PLANT_RESOURCE.getIcon());
@@ -500,7 +502,7 @@ public class GamePanel extends JPanel {
         pupaLabel.setText(String.valueOf(pupa));
         larvaLabel.setText(String.valueOf(larva));
         eggsLabel.setText(String.valueOf(eggs));
-        deadAntsLabel.setText("Dead ants: " + deadAnts);
+        deadAntsLabel.setText(String.valueOf(deadAnts));
 
         totalResourcesLabel.setText("Total resources: " + totalResources);
         mushroomsLabel.setText(String.valueOf(mushrooms));

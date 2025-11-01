@@ -4,6 +4,7 @@ import com.grimidk.formicempire.classes.constants.AntRole;
 import com.grimidk.formicempire.classes.constants.AntStatus;
 import com.grimidk.formicempire.classes.constants.AntSubType;
 import com.grimidk.formicempire.classes.constants.AntType;
+import com.grimidk.formicempire.classes.infrasctructure.GameConstants;
 
 public class Ant {
     private AntType type;
@@ -28,6 +29,7 @@ public class Ant {
         this.type = type;
         this.subType = null;
         this.role = null;
+        this.status = GameConstants.STATUS_ALIVE;
         this.maxHealth = (int)(colony.getBaseHealth() * type.getHealtMult());
         this.health = this.maxHealth;
         this.maxAge = (int)(colony.getBaseAge() * type.getAgeMult());
@@ -177,9 +179,19 @@ public class Ant {
     public void setSize(int size) {
         this.size = size;
     }
-    
-    public float getDeathChance() {
-        return (age / maxAge) * 100;
+
+    public void goDie() {
+        this.type = GameConstants.TYPE_DEAD;
+        this.status = GameConstants.STATUS_ALIVE;
+        this.maxHealth = 0;
+        this.health = 0;
+        this.age = 0;
+        this.regen = 0;
+        this.consumption = 0;
+        this.attack = 0;
+        this.attackSpeed = 0;
+        this.defense = 0;
+        this.speed = 0;
     }
 
     public boolean isDead() {

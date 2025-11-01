@@ -1,6 +1,5 @@
-package com.grimidk.formicempire;
+package com.grimidk.formicempire.classes.infrasctructure;
 
-import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.interfaces.MainFrame;
 
 import javax.swing.SwingUtilities;

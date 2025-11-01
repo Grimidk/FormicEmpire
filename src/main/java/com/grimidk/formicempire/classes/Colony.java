@@ -143,7 +143,7 @@ public class Colony {
         populateAntList(getDrones(), savefile.getDrones(), GameConstants.TYPE_DRONE);
         populateAntList(getPrincesses(), savefile.getPrincesses(), GameConstants.TYPE_PRINCESS);
         populateAntList(getQueens(), savefile.getQueens(), GameConstants.TYPE_QUEEN);
-        populateAntList(deadAnts, savefile.getDeadAnts(), GameConstants.TYPE_WORKER);
+        populateAntList(deadAnts, savefile.getDeadAnts(), GameConstants.TYPE_DEAD);
 
         this.plants = savefile.getPlants();
         this.mushrooms = savefile.getMushrooms();
@@ -683,8 +683,9 @@ public class Colony {
             if (antConsumption <= 0) antConsumption = 1; 
 
             while (deficit > 0 && !list.isEmpty()) {
-                Ant dead = list.remove(list.size() - 1); 
-                this.deadAnts.add(dead);
+                Ant deadAnt = list.remove(list.size() - 1); 
+                deadAnt.goDie();
+                this.deadAnts.add(deadAnt);
                 deficit -= antConsumption;
             }
 
@@ -702,6 +703,7 @@ public class Colony {
                 ant.setAge(ant.getAge() + 1);
                 
                 if (ant.getAge() >= ant.getMaxAge()) {
+                    ant.goDie();
                     this.deadAnts.add(ant);
                     iterator.remove(); 
                 }
