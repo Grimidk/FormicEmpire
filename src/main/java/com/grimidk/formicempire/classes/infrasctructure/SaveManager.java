@@ -284,10 +284,10 @@ public class SaveManager {
                     save.setMinerals(c.getMinerals());
 
                     Map<String, Integer> rolesToSave = new HashMap<>();
-                    for (Map.Entry<AntRole, Integer> entry : c.getDesiredRoleCounts().entrySet()) {
+                    for (Map.Entry<AntRole, Integer> entry : c.getAssignedRoleCounts().entrySet()) {
                         rolesToSave.put(entry.getKey().getName(), entry.getValue());
                     }
-                    save.setDesiredRoleCounts(rolesToSave);
+                    save.setAssignedRoleCounts(rolesToSave);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -356,8 +356,8 @@ public class SaveManager {
         writeJsonLine(w, "minerals", s.getMinerals(), false);
 
         // Roles
-        w.write("  \"desiredRoleCounts\": ");
-        w.write(serializeMapToJson(s.getDesiredRoleCounts()));
+        w.write("  \"assignedRoleCounts\": ");
+        w.write(serializeMapToJson(s.getAssignedRoleCounts()));
         w.newLine();
 
         w.write("}");
@@ -434,11 +434,11 @@ public class SaveManager {
             s.setResins(Integer.parseInt(m.getOrDefault("resins", "0")));
             s.setMinerals(Integer.parseInt(m.getOrDefault("minerals", "0")));
             
-            String rolesJson = m.getOrDefault("desiredRoleCounts", "{}");
+            String rolesJson = m.getOrDefault("assignedRoleCounts", "{}");
             if (rolesJson.startsWith("\"")) {
                 rolesJson = unescapeJsonString(rolesJson.substring(1, rolesJson.length() - 1));
             }
-            s.setDesiredRoleCounts(deserializeJsonToMap(rolesJson));
+            s.setAssignedRoleCounts(deserializeJsonToMap(rolesJson));
         }
         return s;
     }

@@ -23,7 +23,7 @@ public class Colony {
     
     private final Map<AntType, List<Ant>> antGroups;
     private final List<Ant> deadAnts;
-    private Map<AntRole, Integer> desiredRoleCounts;
+    private Map<AntRole, Integer> assignedRoleCounts;
 
     private int plants;
     private int plantsCapacity;
@@ -75,10 +75,10 @@ public class Colony {
         this.antGroups.put(GameConstants.TYPE_QUEEN, new ArrayList<Ant>());
     }
 
-    private void initializeDesiredRoles() {
-        this.desiredRoleCounts = new HashMap<>();
+    private void initializeAssignedRoles() {
+        this.assignedRoleCounts = new HashMap<>();
         for (AntRole role : GameConstants.getAntRoles()) {
-            this.desiredRoleCounts.put(role, 0);
+            this.assignedRoleCounts.put(role, 0);
         }
     }
 
@@ -129,7 +129,7 @@ public class Colony {
         
         initializeLists();
         initializeDefaults();
-        initializeDesiredRoles();
+        initializeAssignedRoles();
     }
 
     private void populateAntList(List<Ant> list, int count, AntType type) {
@@ -148,14 +148,14 @@ public class Colony {
 
         initializeLists();
         initializeDefaults(); 
-        initializeDesiredRoles(); 
+        initializeAssignedRoles(); 
 
-        Map<String, Integer> savedRoles = savefile.getDesiredRoleCounts();
+        Map<String, Integer> savedRoles = savefile.getAssignedRoleCounts();
         if (savedRoles != null && !savedRoles.isEmpty()) {
             for (AntRole role : GameConstants.getAntRoles()) {
                 Integer count = savedRoles.get(role.getName());
                 if (count != null) {
-                    this.desiredRoleCounts.put(role, count);
+                    this.assignedRoleCounts.put(role, count);
                 }
             }
         }
@@ -178,6 +178,8 @@ public class Colony {
         this.syrups = savefile.getSyrups();
         this.resins = savefile.getResins();
         this.minerals = savefile.getMinerals();
+
+        runRoleAssignment();
     }
 
     public int getId() {
@@ -591,18 +593,18 @@ public class Colony {
         this.baseSize = baseSize;
     }
 
-    public int getDesiredRoleCount(AntRole role) {
-        return desiredRoleCounts.getOrDefault(role, 0);
+    public int getAssignedRoleCount(AntRole role) {
+        return assignedRoleCounts.getOrDefault(role, 0);
     }
 
-    public void setDesiredRoleCount(AntRole role, int count) {
+    public void setAssignedRoleCount(AntRole role, int count) {
         if (count >= 0) {
-            desiredRoleCounts.put(role, count);
+            assignedRoleCounts.put(role, count);
         }
     }
 
-    public Map<AntRole, Integer> getDesiredRoleCounts() {
-        return desiredRoleCounts;
+    public Map<AntRole, Integer> getAssignedRoleCounts() {
+        return assignedRoleCounts;
     }
     
     public void startColony() {
@@ -612,11 +614,11 @@ public class Colony {
         }
         getQueens().add(new Ant(this, GameConstants.TYPE_QUEEN));
 
-        setDesiredRoleCount(GameConstants.ROLE_LAYER, 1);
-        setDesiredRoleCount(GameConstants.ROLE_NURSE, 2);
-        setDesiredRoleCount(GameConstants.ROLE_FARMER, 1);
-        setDesiredRoleCount(GameConstants.ROLE_GRAVER, 1);
-        setDesiredRoleCount(GameConstants.ROLE_FORAGER, 5);
+        setAssignedRoleCount(GameConstants.ROLE_LAYER, 1);
+        setAssignedRoleCount(GameConstants.ROLE_NURSE, 2);
+        setAssignedRoleCount(GameConstants.ROLE_FARMER, 1);
+        setAssignedRoleCount(GameConstants.ROLE_GRAVER, 1);
+        setAssignedRoleCount(GameConstants.ROLE_FORAGER, 5);
         
         this.getQueens().get(0).setRole(GameConstants.ROLE_LAYER);
         this.getWorkers().get(0).setRole(GameConstants.ROLE_NURSE);
@@ -630,21 +632,37 @@ public class Colony {
         this.getWorkers().get(8).setRole(GameConstants.ROLE_FORAGER);
     }
 
+    private void setDefaultRole(Ant ant, AntType type) {
+        if (type == GameConstants.TYPE_WORKER) {
+            ant.setRole(GameConstants.ROLE_FORAGER);
+        } else if (type == GameConstants.TYPE_SOLDIER) {
+            ant.setRole(GameConstants.ROLE_HUNTER);
+        } else if (type == GameConstants.TYPE_MAJOR) {
+            ant.setRole(GameConstants.ROLE_DEFENDER);
+        } else if (type == GameConstants.TYPE_PRINCESS) {
+            ant.setRole(GameConstants.ROLE_BREEDER);
+        } else if (type == GameConstants.TYPE_QUEEN) {
+            ant.setRole(GameConstants.ROLE_LAYER);
+        } else {
+            ant.setRole(null);
+        }
+    }
+
     private void assignRolesForType(List<Ant> ants, AntType type) {
         List<Ant> availableAnts = new ArrayList<>();
         for (Ant ant : ants) {
-            ant.setRole(null);
+            setDefaultRole(ant, type);
             availableAnts.add(ant);
         }
 
-        for (Map.Entry<AntRole, Integer> entry : desiredRoleCounts.entrySet()) {
+        for (Map.Entry<AntRole, Integer> entry : assignedRoleCounts.entrySet()) {
             AntRole role = entry.getKey();
             if (role.getAntType() != type) continue; 
 
-            int desired = entry.getValue();
+            int assigned = entry.getValue();
             int assignedCount = 0;
             Iterator<Ant> iterator = availableAnts.iterator();
-            while (assignedCount < desired && iterator.hasNext()) {
+            while (assignedCount < assigned && iterator.hasNext()) {
                 Ant antToAssign = iterator.next();
                 antToAssign.setRole(role);
                 iterator.remove();

@@ -19,6 +19,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -118,7 +120,7 @@ public class GamePanel extends JPanel {
         resinLabel = new JLabel("0");
         mineralLabel = new JLabel("0");
 
-        dateTimeLabel = new JLabel("00:00 00/00/0000");
+        dateTimeLabel = new JLabel("00:00 01/01/0000");
         timeOfDayLabel = new JLabel(); 
         moonPhaseLabel = new JLabel(); 
         seasonLabel = new JLabel();    
@@ -212,7 +214,7 @@ public class GamePanel extends JPanel {
         add(createSouthPanel(), BorderLayout.SOUTH);
     }
 
-    private JPanel createNorthPanel() {
+private JPanel createNorthPanel() {
         statusIndicator.setOpaque(true);
         statusIndicator.setBackground(Color.GRAY);
         statusIndicator.setPreferredSize(new Dimension(12, 12));
@@ -287,7 +289,7 @@ public class GamePanel extends JPanel {
         JMenuItem quitToMenu = new JMenuItem("Quit to Main Menu");
 
         backToGame.addActionListener(e -> gameMenu.setVisible(false));
-        manageRoles.addActionListener(e -> showRoleManagementPanel());
+        manageRoles.addActionListener(e -> showRoleManagementDialog(0));
         quitToMenu.addActionListener(e -> handleBackButton());
         
         gameMenu.add(backToGame);
@@ -300,7 +302,7 @@ public class GamePanel extends JPanel {
         });
     }
 
-    private void showRoleManagementPanel() {
+    private void showRoleManagementDialog(int tabIndex) {
         Engine engine = frame.getEngine();
         if (engine == null || engine.getWorld() == null || engine.getWorld().getSpawnHex() == null) {
             return;
@@ -312,12 +314,59 @@ public class GamePanel extends JPanel {
         roleDialog.setLayout(new BorderLayout());
 
         JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.addTab("Workers", createRolePanel(colony, GameConstants.TYPE_WORKER));
-        tabbedPane.addTab("Soldiers", createRolePanel(colony, GameConstants.TYPE_SOLDIER));
-        tabbedPane.addTab("Majors", createRolePanel(colony, GameConstants.TYPE_MAJOR));
-        tabbedPane.addTab("Princesses", createRolePanel(colony, GameConstants.TYPE_PRINCESS));
-        tabbedPane.addTab("Queens", createRolePanel(colony, GameConstants.TYPE_QUEEN));
+        tabbedPane.addTab(GameConstants.TYPE_WORKER.getName(), GameConstants.TYPE_WORKER.getIcon(), createRolePanel(colony, GameConstants.TYPE_WORKER));
+        tabbedPane.addTab(GameConstants.TYPE_SOLDIER.getName(), GameConstants.TYPE_SOLDIER.getIcon(), createRolePanel(colony, GameConstants.TYPE_SOLDIER));
+        tabbedPane.addTab(GameConstants.TYPE_MAJOR.getName(), GameConstants.TYPE_MAJOR.getIcon(), createRolePanel(colony, GameConstants.TYPE_MAJOR));
+        tabbedPane.addTab(GameConstants.TYPE_PRINCESS.getName(), GameConstants.TYPE_PRINCESS.getIcon(), createRolePanel(colony, GameConstants.TYPE_PRINCESS));
+        tabbedPane.addTab(GameConstants.TYPE_QUEEN.getName(), GameConstants.TYPE_QUEEN.getIcon(), createRolePanel(colony, GameConstants.TYPE_QUEEN));
         
+        InputMap inputMap = tabbedPane.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        ActionMap actionMap = tabbedPane.getActionMap();
+
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Q, 0), "selectTab1");
+        actionMap.put("selectTab1", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (tabbedPane.getTabCount() > 0) tabbedPane.setSelectedIndex(0);
+            }
+        });
+
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0), "selectTab2");
+        actionMap.put("selectTab2", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (tabbedPane.getTabCount() > 1) tabbedPane.setSelectedIndex(1);
+            }
+        });
+
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_E, 0), "selectTab3");
+        actionMap.put("selectTab3", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (tabbedPane.getTabCount() > 2) tabbedPane.setSelectedIndex(2);
+            }
+        });
+
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_R, 0), "selectTab4");
+        actionMap.put("selectTab4", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (tabbedPane.getTabCount() > 3) tabbedPane.setSelectedIndex(3);
+            }
+        });
+
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_T, 0), "selectTab5");
+        actionMap.put("selectTab5", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (tabbedPane.getTabCount() > 4) tabbedPane.setSelectedIndex(4);
+            }
+        });
+
+        if (tabIndex >= 0 && tabIndex < tabbedPane.getTabCount()) {
+            tabbedPane.setSelectedIndex(tabIndex);
+        }
+
         roleDialog.add(tabbedPane, BorderLayout.CENTER);
 
         JButton closeButton = new JButton("Close");
@@ -326,8 +375,17 @@ public class GamePanel extends JPanel {
         southPanel.add(closeButton);
         roleDialog.add(southPanel, BorderLayout.SOUTH);
 
+        roleDialog.setPreferredSize(new Dimension(550, 500));
         roleDialog.pack();
         roleDialog.setLocationRelativeTo(frame);
+
+        roleDialog.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowOpened(WindowEvent e) {
+                tabbedPane.requestFocusInWindow();
+            }
+        });
+
         roleDialog.setVisible(true);
     }
 
@@ -338,12 +396,14 @@ public class GamePanel extends JPanel {
 
         int totalAnts = colony.getAntsByType(antType).size();
         
-        JLabel totalLabel = new JLabel("Total " + antType.getName() + "s Available: " + totalAnts);
+        JLabel totalLabel = new JLabel("Total " + antType.getName() + "s: " + totalAnts);
         totalLabel.setFont(totalLabel.getFont().deriveFont(Font.BOLD));
-        JLabel desiredLabel = new JLabel("Total Desired: 0");
+        JLabel assignedLabel = new JLabel("Total Assigned: 0");
+        JLabel unassignedLabel = new JLabel("Unassigned: " + totalAnts);
         
         panel.add(totalLabel);
-        panel.add(desiredLabel);
+        panel.add(assignedLabel);
+        panel.add(unassignedLabel);
         panel.add(new JSeparator(SwingConstants.HORIZONTAL));
         
         Map<AntRole, JSpinner> spinnerMap = new HashMap<>();
@@ -353,14 +413,29 @@ public class GamePanel extends JPanel {
                 JPanel roleRow = new JPanel(new FlowLayout(FlowLayout.LEFT));
                 roleRow.add(new JLabel(role.getName() + ":"));
                 
-                int currentDesired = colony.getDesiredRoleCount(role);
-                SpinnerModel model = new SpinnerNumberModel(currentDesired, 0, 100000, 1);
+                int currentAssigned = colony.getAssignedRoleCount(role);
+                SpinnerModel model = new SpinnerNumberModel(currentAssigned, 0, totalAnts, 1);
                 JSpinner spinner = new JSpinner(model);
                 spinner.setPreferredSize(new Dimension(80, 25));
 
                 spinner.addChangeListener(e -> {
-                    colony.setDesiredRoleCount(role, (Integer) spinner.getValue());
-                    updateRolePanelTotals(totalAnts, desiredLabel, spinnerMap);
+                    int newValue = (Integer) spinner.getValue();
+                    int otherSpinnersTotal = 0;
+                    for (Map.Entry<AntRole, JSpinner> entry : spinnerMap.entrySet()) {
+                        if (entry.getValue() != spinner) {
+                            otherSpinnersTotal += (Integer) entry.getValue().getValue();
+                        }
+                    }
+
+                    int newTotalAssigned = newValue + otherSpinnersTotal;
+                    if (newTotalAssigned > totalAnts) {
+                        int allowedValue = Math.max(0, totalAnts - otherSpinnersTotal);
+                        SwingUtilities.invokeLater(() -> spinner.setValue(allowedValue));
+                        newValue = allowedValue;
+                    }
+                    
+                    colony.setAssignedRoleCount(role, newValue);
+                    updateRolePanelTotals(totalAnts, assignedLabel, unassignedLabel, spinnerMap);
                 });
                 
                 roleRow.add(spinner);
@@ -369,23 +444,31 @@ public class GamePanel extends JPanel {
             }
         }
         
-        updateRolePanelTotals(totalAnts, desiredLabel, spinnerMap);
+        updateRolePanelTotals(totalAnts, assignedLabel, unassignedLabel, spinnerMap);
         return panel;
     }
     
-    private void updateRolePanelTotals(int totalAnts, JLabel desiredLabel, Map<AntRole, JSpinner> spinnerMap) {
-        int totalDesired = 0;
+    private void updateRolePanelTotals(int totalAnts, JLabel assignedLabel, JLabel unassignedLabel, Map<AntRole, JSpinner> spinnerMap) {
+        int totalAssigned = 0;
         for (JSpinner s : spinnerMap.values()) {
-            totalDesired += (Integer) s.getValue();
+            totalAssigned += (Integer) s.getValue();
         }
         
-        desiredLabel.setText("Total Desired: " + totalDesired);
-        if (totalDesired > totalAnts) {
-            desiredLabel.setForeground(Color.RED);
-            desiredLabel.setToolTipText("You have assigned more roles than you have ants.");
+        int unassigned = totalAnts - totalAssigned;
+        
+        assignedLabel.setText("Total Assigned: " + totalAssigned);
+        unassignedLabel.setText("Unassigned: " + unassigned);
+
+        if (totalAssigned > totalAnts) {
+            assignedLabel.setForeground(Color.RED);
+            assignedLabel.setToolTipText("You have assigned more roles than you have ants.");
+            unassignedLabel.setForeground(Color.RED);
+            unassignedLabel.setToolTipText("You have assigned more roles than you have ants.");
         } else {
-            desiredLabel.setForeground(Color.BLACK);
-            desiredLabel.setToolTipText(null);
+            assignedLabel.setForeground(Color.BLACK);
+            assignedLabel.setToolTipText(null);
+            unassignedLabel.setForeground(Color.BLACK);
+            unassignedLabel.setToolTipText(null);
         }
     }
 
@@ -429,6 +512,47 @@ public class GamePanel extends JPanel {
                 } else {
                     menuButton.doClick();
                 }
+            }
+        });
+
+        // Key bindings for role management tabs
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Q, 0), "openRoles1");
+        actionMap.put("openRoles1", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showRoleManagementDialog(0); // Workers
+            }
+        });
+
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0), "openRoles2");
+        actionMap.put("openRoles2", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showRoleManagementDialog(1); // Soldiers
+            }
+        });
+
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_E, 0), "openRoles3");
+        actionMap.put("openRoles3", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showRoleManagementDialog(2); // Majors
+            }
+        });
+
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_R, 0), "openRoles4");
+        actionMap.put("openRoles4", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showRoleManagementDialog(3); // Princesses
+            }
+        });
+
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_T, 0), "openRoles5");
+        actionMap.put("openRoles5", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showRoleManagementDialog(4); // Queens
             }
         });
     }
