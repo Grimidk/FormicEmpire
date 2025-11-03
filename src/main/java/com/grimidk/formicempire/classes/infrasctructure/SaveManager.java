@@ -5,10 +5,13 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.SwingUtilities;
 
 import com.grimidk.formicempire.classes.Colony;
 import com.grimidk.formicempire.classes.World;
+import com.grimidk.formicempire.classes.constants.AntRole;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -122,6 +125,11 @@ public class SaveManager {
 
     public void saveWorldToSlot(World w, int slotId) {
         if (w == null) return;
+        
+        if (slotId == 0) {
+            System.out.println("[SaveManager] Skipping autosave for new game (Slot ID 0).");
+            return;
+        }
 
         File f = getSlotFile(slotId, "autosave");
         Savefile save = new Savefile(slotId, "autosave");
@@ -274,6 +282,12 @@ public class SaveManager {
                     save.setSyrups(c.getSyrups());
                     save.setResins(c.getResins());
                     save.setMinerals(c.getMinerals());
+
+                    Map<String, Integer> rolesToSave = new HashMap<>();
+                    for (Map.Entry<AntRole, Integer> entry : c.getDesiredRoleCounts().entrySet()) {
+                        rolesToSave.put(entry.getKey().getName(), entry.getValue());
+                    }
+                    save.setDesiredRoleCounts(rolesToSave);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -281,62 +295,70 @@ public class SaveManager {
         }
     }
 
-    private void writeSaveToWriter(Savefile s, BufferedWriter w) throws IOException {
-        Map<String, Object> m = new HashMap<>();
-        m.put("id", s.getId());
-        m.put("name", s.getName() != null ? s.getName() : "");
-        m.put("progress", s.getProgress());
-        m.put("playTime", s.getPlayTime());
-        m.put("minute", s.getMinute());
-        m.put("hour", s.getHour());
-        m.put("day", s.getDay());
-        m.put("month", s.getMonth());
-        m.put("year", s.getYear());
-        m.put("totalAnts", s.getTotalAnts());
-        m.put("deadAnts", s.getDeadAnts());
-        m.put("eggs", s.getEggs());
-        m.put("larvae", s.getLarvae());
-        m.put("pupae", s.getPupae());
-        m.put("workers", s.getWorkers());
-        m.put("soldiers", s.getSoldiers());
-        m.put("majors", s.getMajors());
-        m.put("drones", s.getDrones());
-        m.put("princesses", s.getPrincesses());
-        m.put("queens", s.getQueens());
-        m.put("plants", s.getPlants());
-        m.put("mushrooms", s.getMushrooms());
-        m.put("protein", s.getProtein());
-        m.put("water", s.getWater());
-        m.put("syrups", s.getSyrups());
-        m.put("resins", s.getResins());
-        m.put("minerals", s.getMinerals());
+    private void writeJsonLine(BufferedWriter w, String key, Object value, boolean last) throws IOException {
+        w.write("  \"");
+        w.write(escapeJsonString(key));
+        w.write("\": ");
 
+        if (value instanceof String) {
+            w.write("\"");
+            w.write(escapeJsonString((String) value));
+            w.write("\"");
+        } else if (value instanceof Number) {
+            w.write(value.toString());
+        } else {
+            w.write("null");
+        }
+
+        if (!last) {
+            w.write(",");
+        }
+        w.newLine();
+    }
+
+    private void writeSaveToWriter(Savefile s, BufferedWriter w) throws IOException {
         w.write("{");
         w.newLine();
 
-        int i = 0;
-        for (Map.Entry<String, Object> e : m.entrySet()) {
-            w.write("  \""); 
-            w.write(e.getKey());
-            w.write("\": ");
+        // General
+        writeJsonLine(w, "id", s.getId(), false);
+        writeJsonLine(w, "name", s.getName() != null ? s.getName() : "", false);
+        writeJsonLine(w, "progress", s.getProgress(), false);
+        
+        // Time
+        writeJsonLine(w, "playTime", s.getPlayTime(), false);
+        writeJsonLine(w, "minute", s.getMinute(), false);
+        writeJsonLine(w, "hour", s.getHour(), false);
+        writeJsonLine(w, "day", s.getDay(), false);
+        writeJsonLine(w, "month", s.getMonth(), false);
+        writeJsonLine(w, "year", s.getYear(), false);
 
-            Object v = e.getValue();
-            if (v instanceof String) {
-                w.write("\"");
-                w.write(escapeJsonString((String) v));
-                w.write("\"");
-            } else if (v instanceof Number) {
-                w.write(v.toString());
-            } else {
-                w.write("null");
-            }
+        // Ant Counts
+        writeJsonLine(w, "totalAnts", s.getTotalAnts(), false);
+        writeJsonLine(w, "deadAnts", s.getDeadAnts(), false);
+        writeJsonLine(w, "eggs", s.getEggs(), false);
+        writeJsonLine(w, "larvae", s.getLarvae(), false);
+        writeJsonLine(w, "pupae", s.getPupae(), false);
+        writeJsonLine(w, "workers", s.getWorkers(), false);
+        writeJsonLine(w, "soldiers", s.getSoldiers(), false);
+        writeJsonLine(w, "majors", s.getMajors(), false);
+        writeJsonLine(w, "drones", s.getDrones(), false);
+        writeJsonLine(w, "princesses", s.getPrincesses(), false);
+        writeJsonLine(w, "queens", s.getQueens(), false);
 
-            if (i < m.size() - 1) {
-                w.write(",");
-            }
-            w.newLine();
-            i++;
-        }
+        // Resources
+        writeJsonLine(w, "plants", s.getPlants(), false);
+        writeJsonLine(w, "mushrooms", s.getMushrooms(), false);
+        writeJsonLine(w, "protein", s.getProtein(), false);
+        writeJsonLine(w, "water", s.getWater(), false);
+        writeJsonLine(w, "syrups", s.getSyrups(), false);
+        writeJsonLine(w, "resins", s.getResins(), false);
+        writeJsonLine(w, "minerals", s.getMinerals(), false);
+
+        // Roles
+        w.write("  \"desiredRoleCounts\": ");
+        w.write(serializeMapToJson(s.getDesiredRoleCounts()));
+        w.newLine();
 
         w.write("}");
         w.newLine();
@@ -371,7 +393,9 @@ public class SaveManager {
                 if (v.endsWith("\"")) {
                     v = v.substring(0, v.length() - 1);
                 }
-                v = unescapeJsonString(v); 
+                if (k.equals("name")) {
+                     v = unescapeJsonString(v);
+                }
             } else if (v.equals("null")) {
                 v = ""; 
             }
@@ -409,9 +433,57 @@ public class SaveManager {
             s.setSyrups(Integer.parseInt(m.getOrDefault("syrups", "0")));
             s.setResins(Integer.parseInt(m.getOrDefault("resins", "0")));
             s.setMinerals(Integer.parseInt(m.getOrDefault("minerals", "0")));
+            
+            String rolesJson = m.getOrDefault("desiredRoleCounts", "{}");
+            if (rolesJson.startsWith("\"")) {
+                rolesJson = unescapeJsonString(rolesJson.substring(1, rolesJson.length() - 1));
+            }
+            s.setDesiredRoleCounts(deserializeJsonToMap(rolesJson));
         }
         return s;
     }
+
+    private String serializeMapToJson(Map<String, Integer> map) {
+        if (map == null || map.isEmpty()) {
+            return "{}";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("{");
+        int i = 0;
+        for (Map.Entry<String, Integer> entry : map.entrySet()) {
+            sb.append("\"");
+            sb.append(escapeJsonString(entry.getKey()));
+            sb.append("\":");
+            sb.append(entry.getValue());
+            if (i < map.size() - 1) {
+                sb.append(",");
+            }
+            i++;
+        }
+        sb.append("}");
+        return sb.toString();
+    }
+    
+    private static final Pattern JSON_PAIR_PATTERN = Pattern.compile("\"([^\"]*)\":([0-9]+)");
+
+    private Map<String, Integer> deserializeJsonToMap(String json) {
+        Map<String, Integer> map = new HashMap<>();
+        if (json == null || json.length() <= 2) {
+            return map;
+        }
+        Matcher m = JSON_PAIR_PATTERN.matcher(json);
+        while (m.find()) {
+            try {
+                String key = unescapeJsonString(m.group(1));
+                int value = Integer.parseInt(m.group(2));
+                map.put(key, value);
+            } catch (Exception e) {
+                System.err.println("Error parsing role map pair: " + m.group(0));
+            }
+        }
+        return map;
+    }
+
 
     private String escapeJsonString(String str) {
         if (str == null) return "";
@@ -426,12 +498,7 @@ public class SaveManager {
 
     private String unescapeJsonString(String str) {
         if (str == null) return null;
-        return str.replace("\\\\", "\\")
-                  .replace("\\\"", "\"")
-                  .replace("\\b", "\b")
-                  .replace("\\f", "\f")
-                  .replace("\\n", "\n")
-                  .replace("\\r", "\r")
-                  .replace("\\t", "\t");
+        return str.replace("\\\"", "\"")
+                  .replace("\\\\", "\\");
     }
 }

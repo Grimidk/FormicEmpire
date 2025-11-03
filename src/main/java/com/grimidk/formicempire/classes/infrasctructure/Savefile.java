@@ -1,6 +1,8 @@
 package com.grimidk.formicempire.classes.infrasctructure;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Savefile implements Serializable {
 
@@ -44,9 +46,12 @@ public class Savefile implements Serializable {
     private int minerals;
     private int mineralsCapacity;
 
+    private Map<String, Integer> desiredRoleCounts;
+
     public Savefile(int id, String name) {
         this.id = id;
         this.name = name;
+        this.desiredRoleCounts = new HashMap<>();
     }
 
     public int getId() {
@@ -328,4 +333,11 @@ public class Savefile implements Serializable {
         this.mineralsCapacity = mineralsCapacity;
     }
 
+    public Map<String, Integer> getDesiredRoleCounts() {
+        return desiredRoleCounts;
+    }
+
+    public void setDesiredRoleCounts(Map<String, Integer> desiredRoleCounts) {
+        this.desiredRoleCounts = desiredRoleCounts;
+    }
 }

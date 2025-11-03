@@ -48,6 +48,8 @@ public class Colony {
     private int growthTime;
     private int layingRate;
     private float conversionRate;
+    private float nursingRate;
+    private float gravingRate;
     private int parasiteDetection;
 
     private int baseHealth;
@@ -85,6 +87,8 @@ public class Colony {
         this.growthTime = 4;
         this.layingRate = 1;
         this.conversionRate = 1.0f;
+        this.nursingRate = 10f;
+        this.gravingRate = 5f;
         this.parasiteDetection = 10;
         this.baseHealth = 100;
         this.baseAge = 180;
@@ -145,6 +149,16 @@ public class Colony {
         initializeLists();
         initializeDefaults(); 
         initializeDesiredRoles(); 
+
+        Map<String, Integer> savedRoles = savefile.getDesiredRoleCounts();
+        if (savedRoles != null && !savedRoles.isEmpty()) {
+            for (AntRole role : GameConstants.getAntRoles()) {
+                Integer count = savedRoles.get(role.getName());
+                if (count != null) {
+                    this.desiredRoleCounts.put(role, count);
+                }
+            }
+        }
 
         populateAntList(getEggs(), savefile.getEggs(), GameConstants.TYPE_EGG);
         populateAntList(getLarvae(), savefile.getLarvae(), GameConstants.TYPE_LARVA);
@@ -473,6 +487,22 @@ public class Colony {
         this.conversionRate = conversionRate;
     }
 
+    public float getNursingRate() {
+        return nursingRate;
+    }
+
+    public void setNursingRate(float nursingRate) {
+        this.nursingRate = nursingRate;
+    }
+
+    public float getGravingRate() {
+        return gravingRate;
+    }
+
+    public void setGravingRate(float gravingRate) {
+        this.gravingRate = gravingRate;
+    }
+
     public int getParasiteDetection() {
         return parasiteDetection;
     }
@@ -581,6 +611,13 @@ public class Colony {
             workerList.add(new Ant(this, GameConstants.TYPE_WORKER));
         }
         getQueens().add(new Ant(this, GameConstants.TYPE_QUEEN));
+
+        setDesiredRoleCount(GameConstants.ROLE_LAYER, 1);
+        setDesiredRoleCount(GameConstants.ROLE_NURSE, 2);
+        setDesiredRoleCount(GameConstants.ROLE_FARMER, 1);
+        setDesiredRoleCount(GameConstants.ROLE_GRAVER, 1);
+        setDesiredRoleCount(GameConstants.ROLE_FORAGER, 5);
+        
         this.getQueens().get(0).setRole(GameConstants.ROLE_LAYER);
         this.getWorkers().get(0).setRole(GameConstants.ROLE_NURSE);
         this.getWorkers().get(1).setRole(GameConstants.ROLE_NURSE);
@@ -801,7 +838,7 @@ public class Colony {
         int graverCount = countAntsByRole(getWorkers(), GameConstants.ROLE_GRAVER);
         if (graverCount == 0 || getDeadAnts().isEmpty()) return;
 
-        int canClean = graverCount * 5;
+        int canClean = graverCount * (int) gravingRate;
         Iterator<Ant> iterator = getDeadAnts().iterator();
         while (canClean > 0 && iterator.hasNext()) {
             iterator.next();
@@ -814,11 +851,11 @@ public class Colony {
         int nurseCount = countAntsByRole(getWorkers(), GameConstants.ROLE_NURSE);
         int babyAntTotal = this.getEggs().size() +  this.getLarvae().size() +  this.getPupae().size();
 
-        if (babyAntTotal >= nurseCount * 10) {
+        if (babyAntTotal >= nurseCount * nursingRate) {
             return;
         }
 
-        int deficit = babyAntTotal - (nurseCount * 5);
+        int deficit = babyAntTotal - (nurseCount * (int) nursingRate);
 
         List<AntType> killOrder = Arrays.asList(
             GameConstants.TYPE_LARVA,
