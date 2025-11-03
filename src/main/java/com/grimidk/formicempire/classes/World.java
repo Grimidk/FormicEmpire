@@ -30,9 +30,9 @@ public class World {
     public World() {
         this.minute = 0;
         this.hour = 0;
-        this.day = 0;
-        this.month = 0;
-        this.year = 0;
+        this.day = 1;
+        this.month = 1;
+        this.year = 1;
         this.temperature = 25;
         this.humidity = 2;
         this.hexes = new ArrayList<>();
@@ -190,6 +190,7 @@ public class World {
     public void runHour() {
         this.hour++;
 
+        this.getSpawnHex().getColony().runRoleAssignment();
         this.getSpawnHex().getColony().runCollecting();;
         this.getSpawnHex().getColony().runLaying();
 
@@ -217,29 +218,31 @@ public class World {
         this.getSpawnHex().getColony().runEating();
         this.getSpawnHex().getColony().runHatching();
         this.getSpawnHex().getColony().runAging();
+        this.getSpawnHex().getColony().runNursing();
+        this.getSpawnHex().getColony().runGraveKeeping();
 
-        if (this.day >= 0 && this.day < 1) {
+        if (this.day >= 1 && this.day < 2) {
             this.moonPhase = GameConstants.NEW_MOON_PHASE;
-        } else if (this.day >= 1 && this.day < 7) {
+        } else if (this.day >= 2 && this.day < 8) {
             this.moonPhase = GameConstants.WAXING_CRESCENT_PHASE;
-        } else if (this.day >= 7 && this.day < 8) {
+        } else if (this.day >= 8 && this.day < 9) {
             this.moonPhase = GameConstants.FIRST_QUARTER_PHASE;
-        } else if (this.day >= 8 && this.day < 14) {
+        } else if (this.day >= 9 && this.day < 15) {
             this.moonPhase = GameConstants.WAXING_GIBBOUS_PHASE;
-        } else if (this.day >= 14 && this.day < 15) {
+        } else if (this.day >= 15 && this.day < 16) {
             this.moonPhase = GameConstants.FULL_MOON_PHASE;
-        } else if (this.day >= 15 && this.day < 21) {
+        } else if (this.day >= 16 && this.day < 22) {
             this.moonPhase = GameConstants.WANING_GIBBOUS_PHASE;
-        } else if (this.day >= 21 && this.day < 22) {
+        } else if (this.day >= 22 && this.day < 23) {
             this.moonPhase = GameConstants.LAST_QUARTER_PHASE;
-        } else if (this.day >= 22 && this.day < 29) {
+        } else if (this.day >= 23 && this.day < 30) {
             this.moonPhase = GameConstants.WANING_CRESCENT_PHASE;
         } else {
             this.moonPhase = GameConstants.NEW_MOON_PHASE;
         }
 
-        if (this.day > 29) {
-            this.day = 0;
+        if (this.day > 30) {
+            this.day = 1;
             this.runMonth();
         }
     }
@@ -247,13 +250,13 @@ public class World {
     public void runMonth() {
         this.month++;
 
-        if (this.month >= 0 && this.month < 3) {
+        if (this.month >= 1 && this.month < 4) {
             this.season = GameConstants.SPRING_SEASON;
-        } else if (this.month >= 3 && this.month < 6) {
+        } else if (this.month >= 4 && this.month < 7) {
             this.season = GameConstants.SUMMER_SEASON;
-        } else if (this.month >= 6 && this.month < 7) {
+        } else if (this.month >= 7 && this.month < 10) {
             this.season = GameConstants.AUTUMN_SEASON;
-        } else if (this.month >= 9 && this.month < 12) {
+        } else if (this.month >= 10 && this.month < 12) {
             this.season = GameConstants.WINTER_SEASON;
         } else {
             this.season = GameConstants.SPRING_SEASON;
@@ -266,8 +269,8 @@ public class World {
             ex.printStackTrace();
         }
 
-        if (this.month > 11) {
-            this.month = 0;
+        if (this.month > 12) {
+            this.month = 1;
             this.runYear();
         }
     }

@@ -168,16 +168,17 @@ public final class GameConstants {
     public static final AntRole ROLE_DEFENDER = new AntRole(13, TYPE_SOLDIER, "Defender");
     public static final AntRole ROLE_POLICE = new AntRole(14, TYPE_SOLDIER, "Parasite-Police");
     public static final AntRole ROLE_BOMBER = new AntRole(15, TYPE_SOLDIER, "Bomber");
-    public static final AntRole ROLE_BRUTE = new AntRole(16, TYPE_MAJOR, "Brute");
-    public static final AntRole ROLE_CARRIER = new AntRole(17, TYPE_MAJOR, "Troop-Carrier");
-    public static final AntRole ROLE_ARTILLERY = new AntRole(18, TYPE_MAJOR, "Artillery");
-    public static final AntRole ROLE_SIEGE = new AntRole(19, TYPE_MAJOR, "Siege-Engine");
-    public static final AntRole ROLE_BORER = new AntRole(20, TYPE_MAJOR, "Boring-Machine");
-    public static final AntRole ROLE_DRONE = new AntRole(21, TYPE_DRONE, "Drone");
-    public static final AntRole ROLE_BREEDER = new AntRole(22, TYPE_PRINCESS, "Breeder");
-    public static final AntRole ROLE_DIPLOMAT = new AntRole(23, TYPE_PRINCESS, "Diplomat");
-    public static final AntRole ROLE_LAYER = new AntRole(24, TYPE_QUEEN, "Egg-Layer");
-    public static final AntRole ROLE_RESEARCHER = new AntRole(25, TYPE_QUEEN, "Researcher");
+    public static final AntRole ROLE_HUNTER = new AntRole(16, TYPE_SOLDIER, "Hunter");
+    public static final AntRole ROLE_BRUTE = new AntRole(17, TYPE_MAJOR, "Brute");
+    public static final AntRole ROLE_CARRIER = new AntRole(18, TYPE_MAJOR, "Troop-Carrier");
+    public static final AntRole ROLE_ARTILLERY = new AntRole(19, TYPE_MAJOR, "Artillery");
+    public static final AntRole ROLE_SIEGE = new AntRole(20, TYPE_MAJOR, "Siege-Engine");
+    public static final AntRole ROLE_BORER = new AntRole(21, TYPE_MAJOR, "Boring-Machine");
+    public static final AntRole ROLE_DRONE = new AntRole(22, TYPE_DRONE, "Drone");
+    public static final AntRole ROLE_BREEDER = new AntRole(23, TYPE_PRINCESS, "Breeder");
+    public static final AntRole ROLE_DIPLOMAT = new AntRole(24, TYPE_PRINCESS, "Diplomat");
+    public static final AntRole ROLE_LAYER = new AntRole(25, TYPE_QUEEN, "Egg-Layer");
+    public static final AntRole ROLE_RESEARCHER = new AntRole(26, TYPE_QUEEN, "Researcher");
 
     // --- Colony Ranks ---
     public static final ColonyRank RANK_ANT = new ColonyRank(1, "Ant", 1l);
@@ -298,6 +299,7 @@ public final class GameConstants {
         antRoles.add(ROLE_DEFENDER);
         antRoles.add(ROLE_POLICE);
         antRoles.add(ROLE_BOMBER);
+        antRoles.add(ROLE_HUNTER);
         antRoles.add(ROLE_BRUTE);
         antRoles.add(ROLE_CARRIER);
         antRoles.add(ROLE_ARTILLERY);

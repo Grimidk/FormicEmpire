@@ -2,6 +2,8 @@ package com.grimidk.formicempire.classes.interfaces;
 
 import com.grimidk.formicempire.classes.World;
 import com.grimidk.formicempire.classes.Colony;
+import com.grimidk.formicempire.classes.constants.AntRole;
+import com.grimidk.formicempire.classes.constants.AntType;
 import com.grimidk.formicempire.classes.constants.MoonPhase;
 import com.grimidk.formicempire.classes.constants.Season;
 import com.grimidk.formicempire.classes.constants.TimeOfDay;
@@ -17,6 +19,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.util.HashMap;
+import java.util.Map;
 
 public class GamePanel extends JPanel {
     private final MainFrame frame;
@@ -279,16 +283,112 @@ public class GamePanel extends JPanel {
 
         gameMenu = new JPopupMenu();
         JMenuItem backToGame = new JMenuItem("Back to Game");
+        JMenuItem manageRoles = new JMenuItem("Manage Roles");
         JMenuItem quitToMenu = new JMenuItem("Quit to Main Menu");
 
+        backToGame.addActionListener(e -> gameMenu.setVisible(false));
+        manageRoles.addActionListener(e -> showRoleManagementPanel());
         quitToMenu.addActionListener(e -> handleBackButton());
+        
         gameMenu.add(backToGame);
+        gameMenu.add(manageRoles);
+        gameMenu.add(new JSeparator());
         gameMenu.add(quitToMenu);
 
         menuButton.addActionListener(e -> {
             gameMenu.show(menuButton, 0, -gameMenu.getPreferredSize().height);
         });
     }
+
+    private void showRoleManagementPanel() {
+        Engine engine = frame.getEngine();
+        if (engine == null || engine.getWorld() == null || engine.getWorld().getSpawnHex() == null) {
+            return;
+        }
+        Colony colony = engine.getWorld().getSpawnHex().getColony();
+        if (colony == null) return;
+
+        JDialog roleDialog = new JDialog(frame, "Manage Ant Roles", true);
+        roleDialog.setLayout(new BorderLayout());
+
+        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane.addTab("Workers", createRolePanel(colony, GameConstants.TYPE_WORKER));
+        tabbedPane.addTab("Soldiers", createRolePanel(colony, GameConstants.TYPE_SOLDIER));
+        tabbedPane.addTab("Majors", createRolePanel(colony, GameConstants.TYPE_MAJOR));
+        tabbedPane.addTab("Princesses", createRolePanel(colony, GameConstants.TYPE_PRINCESS));
+        tabbedPane.addTab("Queens", createRolePanel(colony, GameConstants.TYPE_QUEEN));
+        
+        roleDialog.add(tabbedPane, BorderLayout.CENTER);
+
+        JButton closeButton = new JButton("Close");
+        closeButton.addActionListener(e -> roleDialog.dispose());
+        JPanel southPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        southPanel.add(closeButton);
+        roleDialog.add(southPanel, BorderLayout.SOUTH);
+
+        roleDialog.pack();
+        roleDialog.setLocationRelativeTo(frame);
+        roleDialog.setVisible(true);
+    }
+
+    private JPanel createRolePanel(Colony colony, AntType antType) {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        int totalAnts = colony.getAntsByType(antType).size();
+        
+        JLabel totalLabel = new JLabel("Total " + antType.getName() + "s Available: " + totalAnts);
+        totalLabel.setFont(totalLabel.getFont().deriveFont(Font.BOLD));
+        JLabel desiredLabel = new JLabel("Total Desired: 0");
+        
+        panel.add(totalLabel);
+        panel.add(desiredLabel);
+        panel.add(new JSeparator(SwingConstants.HORIZONTAL));
+        
+        Map<AntRole, JSpinner> spinnerMap = new HashMap<>();
+
+        for (AntRole role : GameConstants.getAntRoles()) {
+            if (role.getAntType() == antType) {
+                JPanel roleRow = new JPanel(new FlowLayout(FlowLayout.LEFT));
+                roleRow.add(new JLabel(role.getName() + ":"));
+                
+                int currentDesired = colony.getDesiredRoleCount(role);
+                SpinnerModel model = new SpinnerNumberModel(currentDesired, 0, 100000, 1);
+                JSpinner spinner = new JSpinner(model);
+                spinner.setPreferredSize(new Dimension(80, 25));
+
+                spinner.addChangeListener(e -> {
+                    colony.setDesiredRoleCount(role, (Integer) spinner.getValue());
+                    updateRolePanelTotals(totalAnts, desiredLabel, spinnerMap);
+                });
+                
+                roleRow.add(spinner);
+                spinnerMap.put(role, spinner);
+                panel.add(roleRow);
+            }
+        }
+        
+        updateRolePanelTotals(totalAnts, desiredLabel, spinnerMap);
+        return panel;
+    }
+    
+    private void updateRolePanelTotals(int totalAnts, JLabel desiredLabel, Map<AntRole, JSpinner> spinnerMap) {
+        int totalDesired = 0;
+        for (JSpinner s : spinnerMap.values()) {
+            totalDesired += (Integer) s.getValue();
+        }
+        
+        desiredLabel.setText("Total Desired: " + totalDesired);
+        if (totalDesired > totalAnts) {
+            desiredLabel.setForeground(Color.RED);
+            desiredLabel.setToolTipText("You have assigned more roles than you have ants.");
+        } else {
+            desiredLabel.setForeground(Color.BLACK);
+            desiredLabel.setToolTipText(null);
+        }
+    }
+
 
     private void initKeyBindings() {
         InputMap inputMap = this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
