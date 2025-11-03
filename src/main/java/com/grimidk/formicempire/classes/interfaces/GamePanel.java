@@ -79,7 +79,8 @@ public class GamePanel extends JPanel {
         50f,    // Level 3
         25f,    // Level 4
         10f,    // Level 5
-        5f      // Level 6
+        5f,     // Level 6
+        1f      // Level 7 (Turbo)
     };
 
     public GamePanel(MainFrame frame) {
@@ -265,7 +266,20 @@ private JPanel createNorthPanel() {
         });
 
         speedUpButton.addActionListener(e -> {
-            if (speedLevel < SPEED_DELAYS.length - 1) speedLevel++;
+            Engine engine = frame.getEngine();
+            if (engine == null) return;
+
+            int maxLevel = SPEED_DELAYS.length - 1; // This is 7
+            
+            // If turbo is NOT allowed, the max level is 6 (5ms)
+            if (!engine.isAllowTurboMode()) {
+                maxLevel = 6;
+            }
+
+            if (speedLevel < maxLevel) {
+                speedLevel++;
+            }
+            
             applySpeedLevel();
         });
 
@@ -583,12 +597,12 @@ private JPanel createNorthPanel() {
                     String nameToUse = (existing != null && existing.getName() != null && !existing.getName().trim().isEmpty())
                                        ? existing.getName() : ("Save " + capturedSlot);
 
-                    sm.saveWorldToSlotUserAsync(engine.getWorld(), capturedSlot, nameToUse, () -> {
+                    sm.saveWorldToSlotUserAsync(engine.getWorld(), engine, capturedSlot, nameToUse, () -> {
                         frame.showCard(MainFrame.CARD_SAVE);
                     });
                     return;
                 } else {
-                    sm.saveWorldToSlot(engine.getWorld(), 0);
+                    sm.saveWorldToSlot(engine.getWorld(), engine, 0);
                     frame.showCard(MainFrame.CARD_SAVE);
                     return;
                 }
@@ -667,8 +681,18 @@ private JPanel createNorthPanel() {
         Engine eng = frame.getEngine();
         if (eng == null) return;
 
-        if (speedLevel < 0) speedLevel = 0;
-        if (speedLevel >= SPEED_DELAYS.length) speedLevel = SPEED_DELAYS.length - 1;
+        // Check bounds, especially if turbo was just turned off
+        int maxLevel = SPEED_DELAYS.length - 1;
+        if (!eng.isAllowTurboMode() && maxLevel == 7) { // 7 is 1ms
+             maxLevel = 6; // 6 is 5ms
+        }
+        
+        if (speedLevel > maxLevel) {
+            speedLevel = maxLevel;
+        }
+        if (speedLevel < 0) {
+            speedLevel = 0;
+        }
 
         float delay = SPEED_DELAYS[speedLevel];
 
@@ -679,7 +703,7 @@ private JPanel createNorthPanel() {
             tickLabel.setText("Tick: PAUSED");
         } else {
             eng.setDelay(delay);
-            eng.resumeEngine();
+            eng.resumeEngine(); // Always resume if not paused
             updateStatusIndicator(false);
             playPauseButton.setText("Pause (Space)");
             updateTickLabel(eng);

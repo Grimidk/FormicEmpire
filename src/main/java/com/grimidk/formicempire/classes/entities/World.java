@@ -7,6 +7,7 @@ import com.grimidk.formicempire.classes.constants.MoonPhase;
 import com.grimidk.formicempire.classes.constants.Season;
 import com.grimidk.formicempire.classes.constants.TimeOfDay;
 import com.grimidk.formicempire.classes.constants.Weather;
+import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
@@ -26,6 +27,7 @@ public class World {
     private int humidity;
     private ArrayList<Hex> hexes;
     private int saveSlotId = 0; // 0 = no slot (ad-hoc)
+    private Engine engine;
 
     public World() {
         this.minute = 0;
@@ -40,6 +42,10 @@ public class World {
         this.moonPhase = GameConstants.NEW_MOON_PHASE;
         this.season = GameConstants.SPRING_SEASON;
         this.weather = GameConstants.CLEAR_WEATHER;
+    }
+
+    public void setEngine(Engine engine) {
+        this.engine = engine;
     }
 
     public int getSaveSlotId() {
@@ -263,8 +269,13 @@ public class World {
         }
 
         try {
-            SaveManager sm = new SaveManager();
-            sm.saveAutosave(this);
+            if (this.engine != null) {
+                int freq = this.engine.getAutosaveFrequency();
+                if (freq > 0 && (this.month % freq == 0)) {
+                    SaveManager sm = new SaveManager();
+                    sm.saveAutosave(this, this.engine);
+                }
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
         }

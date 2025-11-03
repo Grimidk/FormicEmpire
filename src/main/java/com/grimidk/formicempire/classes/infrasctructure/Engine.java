@@ -14,6 +14,13 @@ public class Engine extends Thread {
     private volatile boolean paused;
     private final CopyOnWriteArrayList<Runnable> tickListeners = new CopyOnWriteArrayList<>();
 
+    // Settings
+    private String language = "en";
+    private boolean allowTurboMode = false;
+    private String screenSize = "1000x700";
+    private boolean fullScreen = false;
+    private int autosaveFrequency = 1; // 1 = every month
+
     public Engine() {
         this.delay = 250;
         this.semaphore = new Semaphore(1);
@@ -27,6 +34,9 @@ public class Engine extends Thread {
 
     public void setWorld(World world) {
         this.world = world;
+        if (this.world != null) {
+            this.world.setEngine(this);
+        }
     }
 
     public float getDelay() {
@@ -95,6 +105,15 @@ public class Engine extends Thread {
         System.out.println("Loading new world...");
         World world = new World();
         this.setWorld(world);
+
+        if (savefile != null) {
+            this.setLanguage(savefile.getLanguage());
+            this.setAllowTurboMode(savefile.isAllowTurboMode());
+            this.setScreenSize(savefile.getScreenSize());
+            this.setFullScreen(savefile.isFullScreen());
+            this.setAutosaveFrequency(savefile.getAutosaveFrequency());
+        }
+
         this.loadFile(savefile);
         try {
             if (savefile != null && this.world != null) {
@@ -131,5 +150,47 @@ public class Engine extends Thread {
                 }
             }
         }
+    }
+
+    // Settings Getters and Setters
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = (language != null) ? language : "en";
+    }
+
+    public boolean isAllowTurboMode() {
+        return allowTurboMode;
+    }
+
+    public void setAllowTurboMode(boolean allowTurboMode) {
+        this.allowTurboMode = allowTurboMode;
+    }
+
+    public String getScreenSize() {
+        return screenSize;
+    }
+
+    public void setScreenSize(String screenSize) {
+        this.screenSize = (screenSize != null) ? screenSize : "1000x700";
+    }
+
+    public boolean isFullScreen() {
+        return fullScreen;
+    }
+
+    public void setFullScreen(boolean fullScreen) {
+        this.fullScreen = fullScreen;
+    }
+
+    public int getAutosaveFrequency() {
+        return autosaveFrequency;
+    }
+
+    public void setAutosaveFrequency(int autosaveFrequency) {
+        this.autosaveFrequency = (autosaveFrequency > 0) ? autosaveFrequency : 1;
     }
 }

@@ -48,10 +48,24 @@ public class Savefile implements Serializable {
 
     private Map<String, Integer> assignedRoleCounts;
 
+    // Settings
+    private String language;
+    private boolean allowTurboMode;
+    private String screenSize;
+    private boolean fullScreen;
+    private int autosaveFrequency;
+
     public Savefile(int id, String name) {
         this.id = id;
         this.name = name;
         this.assignedRoleCounts = new HashMap<>();
+        
+        // Default settings
+        this.language = "en";
+        this.allowTurboMode = false;
+        this.screenSize = "1000x700";
+        this.fullScreen = false;
+        this.autosaveFrequency = 1;
     }
 
     public int getId() {
@@ -339,5 +353,47 @@ public class Savefile implements Serializable {
 
     public void setAssignedRoleCounts(Map<String, Integer> assignedRoleCounts) {
         this.assignedRoleCounts = assignedRoleCounts;
+    }
+
+    // Settings Getters and Setters
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
+    public boolean isAllowTurboMode() {
+        return allowTurboMode;
+    }
+
+    public void setAllowTurboMode(boolean allowTurboMode) {
+        this.allowTurboMode = allowTurboMode;
+    }
+
+    public String getScreenSize() {
+        return screenSize;
+    }
+
+    public void setScreenSize(String screenSize) {
+        this.screenSize = screenSize;
+    }
+
+    public boolean isFullScreen() {
+        return fullScreen;
+    }
+
+    public void setFullScreen(boolean fullScreen) {
+        this.fullScreen = fullScreen;
+    }
+
+    public int getAutosaveFrequency() {
+        return autosaveFrequency;
+    }
+
+    public void setAutosaveFrequency(int autosaveFrequency) {
+        this.autosaveFrequency = autosaveFrequency;
     }
 }

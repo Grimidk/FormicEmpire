@@ -19,6 +19,7 @@ public class MainFrame extends JFrame {
     private final Engine engine;
     private final GamePanel gamePanel;
     private final SaveSelectPanel saveSelectPanel;
+    private final SettingsPanel settingsPanel;
 
     public MainFrame(Engine engine) {
         super("Formic Empire");
@@ -29,7 +30,7 @@ public class MainFrame extends JFrame {
         InitPanel initPanel = new InitPanel(this);
         this.saveSelectPanel = new SaveSelectPanel(this);
         HelpPanel helpPanel = new HelpPanel(this);
-        SettingsPanel settingsPanel = new SettingsPanel(this);
+        this.settingsPanel = new SettingsPanel(this);
         this.gamePanel = new GamePanel(this);
 
         cards.add(initPanel, CARD_INIT);
@@ -42,12 +43,35 @@ public class MainFrame extends JFrame {
         getContentPane().add(cards, BorderLayout.CENTER);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1000, 700);
-        setLocationRelativeTo(null);
+        
+        applyEngineSettings();
     }
 
     public Engine getEngine() {
         return engine;
+    }
+
+    public void applyEngineSettings() {
+        if (engine.isFullScreen()) {
+            dispose();
+            setUndecorated(true);
+            setExtendedState(JFrame.MAXIMIZED_BOTH);
+            setVisible(true);
+        } else {
+            dispose();
+            setUndecorated(false);
+            setExtendedState(JFrame.NORMAL);
+            String[] size = engine.getScreenSize().split("x");
+            try {
+                int width = Integer.parseInt(size[0]);
+                int height = Integer.parseInt(size[1]);
+                setSize(width, height);
+            } catch (Exception e) {
+                setSize(1000, 700);
+            }
+            setLocationRelativeTo(null);
+            setVisible(true);
+        }
     }
 
     public void showCard(String card) {
@@ -56,11 +80,17 @@ public class MainFrame extends JFrame {
                 saveSelectPanel.refreshSlots();
             } catch (Exception ignore) {}
         }
+        if (CARD_SETTINGS.equals(card)) {
+            try {
+                settingsPanel.loadSettings();
+            } catch (Exception ignore) {}
+        }
         cardLayout.show(cards, card);
     }
 
     public void openGameWithSave(Savefile savefile) {
         showCard(CARD_GAME);
         gamePanel.enterWithSavefile(savefile);
+        applyEngineSettings();
     }
 }

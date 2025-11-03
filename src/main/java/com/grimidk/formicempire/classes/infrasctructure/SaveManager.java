@@ -77,7 +77,7 @@ public class SaveManager {
         System.out.println("[SaveManager] Wrote manual save for slot " + save.getId() + " -> " + f.getName());
     }
 
-    public void saveAutosave(World w) {
+    public void saveAutosave(World w, Engine e) {
         if (w == null) return;
         int slotId = 0;
         try {
@@ -85,7 +85,7 @@ public class SaveManager {
         } catch (Exception ignore) {
             slotId = 0; 
         }
-        saveWorldToSlot(w, slotId);
+        saveWorldToSlot(w, e, slotId);
     }
 
     public void saveUserSlot(Savefile save) throws IOException {
@@ -123,7 +123,7 @@ public class SaveManager {
         return removed;
     }
 
-    public void saveWorldToSlot(World w, int slotId) {
+    public void saveWorldToSlot(World w, Engine e, int slotId) {
         if (w == null) return;
         
         if (slotId == 0) {
@@ -133,7 +133,7 @@ public class SaveManager {
 
         File f = getSlotFile(slotId, "autosave");
         Savefile save = new Savefile(slotId, "autosave");
-        populateSavefileFromWorld(save, w);
+        populateSavefileFromGame(save, w, e);
 
         try {
             if (slotId > 0) {
@@ -184,7 +184,7 @@ public class SaveManager {
         }
     }
 
-    public void saveWorldToSlotUser(World w, int slotId) throws IOException {
+    public void saveWorldToSlotUser(World w, Engine e, int slotId) throws IOException {
         if (w == null) return;
         
         String slotName = "Save " + slotId;
@@ -196,36 +196,36 @@ public class SaveManager {
         } catch (Exception ignore) {
         }
         
-        saveWorldToSlotUser(w, slotId, slotName);
+        saveWorldToSlotUser(w, e, slotId, slotName);
     }
     
-    public void saveWorldToSlotUser(World w, int slotId, String name) throws IOException {
+    public void saveWorldToSlotUser(World w, Engine e, int slotId, String name) throws IOException {
         if (w == null) return;
         
         String saveName = (name != null && !name.isEmpty()) ? name : ("Save " + slotId);
         Savefile save = new Savefile(slotId, saveName);
-        populateSavefileFromWorld(save, w);
+        populateSavefileFromGame(save, w, e);
         writeManualSave(save);
     }
 
-    public void saveWorldToSlotUserAsync(World w, int slotId, Runnable onComplete) {
+    public void saveWorldToSlotUserAsync(World w, Engine e, int slotId, Runnable onComplete) {
         executor.submit(() -> {
             try {
-                saveWorldToSlotUser(w, slotId); 
+                saveWorldToSlotUser(w, e, slotId); 
                 if (onComplete != null) SwingUtilities.invokeLater(onComplete);
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
         });
     }
 
-    public void saveWorldToSlotUserAsync(World w, int slotId, String name, Runnable onComplete) {
+    public void saveWorldToSlotUserAsync(World w, Engine e, int slotId, String name, Runnable onComplete) {
         executor.submit(() -> {
             try {
-                saveWorldToSlotUser(w, slotId, name); 
+                saveWorldToSlotUser(w, e, slotId, name); 
                 if (onComplete != null) SwingUtilities.invokeLater(onComplete);
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (Exception err) {
+                err.printStackTrace();
             }
         });
     }
@@ -245,20 +245,28 @@ public class SaveManager {
         return computePlayTime(s.getMinute(), s.getHour(), s.getDay(), s.getMonth(), s.getYear());
     }
 
-    public void saveAutosaveAsync(World w, Runnable onComplete) {
+    public void saveAutosaveAsync(World w, Engine e, Runnable onComplete) {
         executor.submit(() -> {
-            saveAutosave(w); 
+            saveAutosave(w, e); 
             if (onComplete != null) SwingUtilities.invokeLater(onComplete);
         });
     }
     
-    private void populateSavefileFromWorld(Savefile save, World w) {
+    private void populateSavefileFromGame(Savefile save, World w, Engine e) {
         save.setMinute(w.getMinute());
         save.setHour(w.getHour());
         save.setDay(w.getDay());
         save.setMonth(w.getMonth());
         save.setYear(w.getYear());
         save.setPlayTime(computePlayTime(w)); 
+
+        if (e != null) {
+            save.setLanguage(e.getLanguage());
+            save.setAllowTurboMode(e.isAllowTurboMode());
+            save.setScreenSize(e.getScreenSize());
+            save.setFullScreen(e.isFullScreen());
+            save.setAutosaveFrequency(e.getAutosaveFrequency());
+        }
         
         if (w.getHexes() != null && !w.getHexes().isEmpty()) {
             try {
@@ -289,8 +297,8 @@ public class SaveManager {
                     }
                     save.setAssignedRoleCounts(rolesToSave);
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
         }
     }
@@ -305,6 +313,8 @@ public class SaveManager {
             w.write(escapeJsonString((String) value));
             w.write("\"");
         } else if (value instanceof Number) {
+            w.write(value.toString());
+        } else if (value instanceof Boolean) {
             w.write(value.toString());
         } else {
             w.write("null");
@@ -354,6 +364,13 @@ public class SaveManager {
         writeJsonLine(w, "syrups", s.getSyrups(), false);
         writeJsonLine(w, "resins", s.getResins(), false);
         writeJsonLine(w, "minerals", s.getMinerals(), false);
+
+        // Settings
+        writeJsonLine(w, "language", s.getLanguage(), false);
+        writeJsonLine(w, "allowTurboMode", s.isAllowTurboMode(), false);
+        writeJsonLine(w, "screenSize", s.getScreenSize(), false);
+        writeJsonLine(w, "fullScreen", s.isFullScreen(), false);
+        writeJsonLine(w, "autosaveFrequency", s.getAutosaveFrequency(), false);
 
         // Roles
         w.write("  \"assignedRoleCounts\": ");
@@ -433,6 +450,13 @@ public class SaveManager {
             s.setSyrups(Integer.parseInt(m.getOrDefault("syrups", "0")));
             s.setResins(Integer.parseInt(m.getOrDefault("resins", "0")));
             s.setMinerals(Integer.parseInt(m.getOrDefault("minerals", "0")));
+
+            // Settings
+            s.setLanguage(m.getOrDefault("language", "en"));
+            s.setAllowTurboMode(Boolean.parseBoolean(m.getOrDefault("allowTurboMode", "false")));
+            s.setScreenSize(m.getOrDefault("screenSize", "1000x700"));
+            s.setFullScreen(Boolean.parseBoolean(m.getOrDefault("fullScreen", "false")));
+            s.setAutosaveFrequency(Integer.parseInt(m.getOrDefault("autosaveFrequency", "1")));
             
             String rolesJson = m.getOrDefault("assignedRoleCounts", "{}");
             if (rolesJson.startsWith("\"")) {

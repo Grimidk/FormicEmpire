@@ -93,6 +93,13 @@ public class SaveSelectPanel extends JPanel {
     private void captureGameStateIntoSave(Savefile save) {
         Engine eng = frame.getEngine();
         if (eng == null) return;
+
+        save.setLanguage(eng.getLanguage());
+        save.setAllowTurboMode(eng.isAllowTurboMode());
+        save.setScreenSize(eng.getScreenSize());
+        save.setFullScreen(eng.isFullScreen());
+        save.setAutosaveFrequency(eng.getAutosaveFrequency());
+
         World w = eng.getWorld();
         if (w != null) {
             save.setMinute(w.getMinute());
