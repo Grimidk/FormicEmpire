@@ -9,9 +9,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.SwingUtilities;
 
-import com.grimidk.formicempire.classes.Colony;
-import com.grimidk.formicempire.classes.World;
 import com.grimidk.formicempire.classes.constants.AntRole;
+import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.World;
 
 import java.util.HashMap;
 import java.util.Map;

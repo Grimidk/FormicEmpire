@@ -1,13 +1,13 @@
 package com.grimidk.formicempire.classes.interfaces;
 
-import com.grimidk.formicempire.classes.World;
-import com.grimidk.formicempire.classes.Colony;
 import com.grimidk.formicempire.classes.constants.AntRole;
 import com.grimidk.formicempire.classes.constants.AntType;
 import com.grimidk.formicempire.classes.constants.MoonPhase;
 import com.grimidk.formicempire.classes.constants.Season;
 import com.grimidk.formicempire.classes.constants.TimeOfDay;
 import com.grimidk.formicempire.classes.constants.Weather;
+import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.World;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.SaveManager;

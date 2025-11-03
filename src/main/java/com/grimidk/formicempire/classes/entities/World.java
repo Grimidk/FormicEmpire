@@ -1,4 +1,4 @@
-package com.grimidk.formicempire.classes;
+package com.grimidk.formicempire.classes.entities;
 
 import java.util.ArrayList;
 

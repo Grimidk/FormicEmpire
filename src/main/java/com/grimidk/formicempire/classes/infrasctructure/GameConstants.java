@@ -1,6 +1,5 @@
 package com.grimidk.formicempire.classes.infrasctructure;
 
-import com.grimidk.formicempire.classes.Upgrade;
 import com.grimidk.formicempire.classes.constants.AntRole;
 import com.grimidk.formicempire.classes.constants.AntStatus;
 import com.grimidk.formicempire.classes.constants.AntSubType;
@@ -13,6 +12,7 @@ import com.grimidk.formicempire.classes.constants.Season;
 import com.grimidk.formicempire.classes.constants.Species;
 import com.grimidk.formicempire.classes.constants.TimeOfDay;
 import com.grimidk.formicempire.classes.constants.Weather;
+import com.grimidk.formicempire.classes.entities.Upgrade;
 
 import java.util.ArrayList;
 import java.util.Collections;

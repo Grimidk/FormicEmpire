@@ -1,4 +1,4 @@
-package com.grimidk.formicempire.classes;
+package com.grimidk.formicempire.classes.entities;
 
 import com.grimidk.formicempire.classes.constants.AntRole;
 import com.grimidk.formicempire.classes.constants.AntStatus;

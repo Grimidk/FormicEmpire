@@ -3,8 +3,8 @@ package com.grimidk.formicempire.classes.infrasctructure;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Semaphore;
 
-import com.grimidk.formicempire.classes.Colony;
-import com.grimidk.formicempire.classes.World;
+import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.World;
 
 public class Engine extends Thread {
     private World world;
