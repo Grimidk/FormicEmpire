@@ -50,9 +50,24 @@ public class GamePanel extends JPanel {
     private JLabel mineralLabel;
     private JLabel totalResourcesLabel;
 
+    private JLabel totalConsumptionLabel;
+    private JLabel totalProductionLabel;
+    private JLabel netMushroomsLabel;
+    private JLabel layingRateLabel;
+    private JLabel nurseCoverageLabel;
+    private JLabel graveKeepingLabel;
+    private JLabel ranchingRateLabel;
+    private JLabel babyAntsLabel;
+    private JLabel adultAntsLabel;
+    
+    private JLabel biomeLabel;
+    private JLabel temperatureLabel;
+    private JLabel humidityLabel;
     private JPanel timePanel;
     private JPanel antsDetailPanel;
     private JPanel resourcesDetailPanel;
+    private JPanel colonyStatsPanel;
+    private JPanel worldInfoPanel;
 
     private Runnable tickListener;
     private JButton playPauseButton;
@@ -123,6 +138,22 @@ public class GamePanel extends JPanel {
         resinLabel = new JLabel("0");
         mineralLabel = new JLabel("0");
 
+        // --- Colony Stats ---
+        totalConsumptionLabel = new JLabel("Consumption: 0/day");
+        totalProductionLabel = new JLabel("Max Food Prod: 0/day");
+        netMushroomsLabel = new JLabel("Net Food: 0/day");
+        layingRateLabel = new JLabel("Laying Rate: 0/day");
+        nurseCoverageLabel = new JLabel("Nurse Coverage: 0/0");
+        graveKeepingLabel = new JLabel("Grave Capacity: 0");
+        ranchingRateLabel = new JLabel("Ranching: 0");
+        babyAntsLabel = new JLabel("Baby Ants: 0");
+        adultAntsLabel = new JLabel("Adult Ants: 0");
+        
+        // --- World Info ---
+        biomeLabel = new JLabel("Biome: N/A");
+        temperatureLabel = new JLabel("Temp: 0°C");
+        humidityLabel = new JLabel("Humidity: 0");
+
         dateTimeLabel = new JLabel("00:00 01/01/0000");
         timeOfDayLabel = new JLabel(); 
         moonPhaseLabel = new JLabel(); 
@@ -138,6 +169,8 @@ public class GamePanel extends JPanel {
         antsDetailPanel = new JPanel();
         antsDetailPanel.setBorder(new TitledBorder("Ants"));
         antsDetailPanel.setLayout(new BoxLayout(antsDetailPanel, BoxLayout.Y_AXIS));
+        antsDetailPanel.add(totalAntLabel);
+        antsDetailPanel.add(new JSeparator(SwingConstants.HORIZONTAL));
         antsDetailPanel.add(queensLabel);
         antsDetailPanel.add(princessLabel);
         antsDetailPanel.add(droneLabel);
@@ -152,6 +185,8 @@ public class GamePanel extends JPanel {
         resourcesDetailPanel = new JPanel();
         resourcesDetailPanel.setBorder(new TitledBorder("Resources"));
         resourcesDetailPanel.setLayout(new BoxLayout(resourcesDetailPanel, BoxLayout.Y_AXIS));
+        resourcesDetailPanel.add(totalResourcesLabel);
+        resourcesDetailPanel.add(new JSeparator(SwingConstants.HORIZONTAL));
         resourcesDetailPanel.add(mushroomsLabel);
         resourcesDetailPanel.add(planLabel);
         resourcesDetailPanel.add(proteinLabel);
@@ -159,6 +194,20 @@ public class GamePanel extends JPanel {
         resourcesDetailPanel.add(syrupLabel);
         resourcesDetailPanel.add(resinLabel);
         resourcesDetailPanel.add(mineralLabel);
+
+        // --- Colony Stats Panel ---
+        colonyStatsPanel = new JPanel();
+        colonyStatsPanel.setBorder(new TitledBorder("Colony Stats"));
+        colonyStatsPanel.setLayout(new BoxLayout(colonyStatsPanel, BoxLayout.Y_AXIS));
+        colonyStatsPanel.add(totalConsumptionLabel);
+        colonyStatsPanel.add(totalProductionLabel);
+        colonyStatsPanel.add(netMushroomsLabel);
+        colonyStatsPanel.add(layingRateLabel);
+        colonyStatsPanel.add(nurseCoverageLabel);
+        colonyStatsPanel.add(graveKeepingLabel);
+        colonyStatsPanel.add(ranchingRateLabel);
+        colonyStatsPanel.add(babyAntsLabel);
+        colonyStatsPanel.add(adultAntsLabel);
 
         timePanel = new JPanel();
         timePanel.setBorder(new TitledBorder("Time"));
@@ -168,6 +217,14 @@ public class GamePanel extends JPanel {
         timePanel.add(moonPhaseLabel);
         timePanel.add(weatherLabel);
         timePanel.add(seasonLabel);
+
+        // --- World Info Panel ---
+        worldInfoPanel = new JPanel();
+        worldInfoPanel.setBorder(new TitledBorder("World"));
+        worldInfoPanel.setLayout(new BoxLayout(worldInfoPanel, BoxLayout.Y_AXIS));
+        worldInfoPanel.add(biomeLabel);
+        worldInfoPanel.add(temperatureLabel);
+        worldInfoPanel.add(humidityLabel);
 
         // --- Set Static Icons ---
         queensLabel.setIcon(GameConstants.TYPE_QUEEN.getIcon());
@@ -230,8 +287,6 @@ private JPanel createNorthPanel() {
     private JPanel createCenterPanel() {
         JPanel stats = new JPanel();
         stats.setLayout(new BoxLayout(stats, BoxLayout.Y_AXIS));
-        stats.add(totalAntLabel);
-        stats.add(totalResourcesLabel);
 
         JPanel antsWrapper = new JPanel(new BorderLayout());
         antsWrapper.add(antsDetailPanel, BorderLayout.NORTH);
@@ -241,6 +296,10 @@ private JPanel createNorthPanel() {
         resourcesWrapper.add(resourcesDetailPanel, BorderLayout.NORTH);
         stats.add(resourcesWrapper);
 
+        JPanel statsWrapper = new JPanel(new BorderLayout());
+        statsWrapper.add(colonyStatsPanel, BorderLayout.NORTH);
+        stats.add(statsWrapper);
+
         return stats;
     }
 
@@ -248,6 +307,7 @@ private JPanel createNorthPanel() {
         JPanel east = new JPanel();
         east.setLayout(new BoxLayout(east, BoxLayout.Y_AXIS));
         east.add(timePanel);
+        east.add(worldInfoPanel);
         return east;
     }
 
@@ -871,6 +931,29 @@ private JPanel createNorthPanel() {
         int larva = colony.getLarvae() != null ? colony.getLarvae().size() : 0;
         int eggs = colony.getEggs() != null ? colony.getEggs().size() : 0;
         int deadAnts = colony.getDeadAnts() != null ? colony.getDeadAnts().size() : 0;
+        
+        // Jobs
+        int totalConsumption = colony.getTotalConsumption();
+        int farmerCount = colony.getAssignedRoleCount(GameConstants.ROLE_FARMER);
+        int conversionPerMinute = ((int) colony.getConversionRate()) * farmerCount;
+        int totalProductionRate = conversionPerMinute * 4 * 60 * 24; 
+        int totalProduction = Math.min(totalProductionRate, colony.getMushroomsCapacity());
+        int netMushrooms = totalProduction - totalConsumption;
+        int layerCount = colony.getAssignedRoleCount(GameConstants.ROLE_LAYER);
+        int hourlyLayingRate = layerCount * colony.getLayingRate();
+        int layingRate = hourlyLayingRate * 24;
+        int nurseCount = colony.getAssignedRoleCount(GameConstants.ROLE_NURSE);
+        int babyAntTotal = eggs + larva + pupa;
+        int nurseCapacity = (int) (nurseCount * colony.getNursingRate());
+        int graverCount = colony.getAssignedRoleCount(GameConstants.ROLE_GRAVER);
+        int graveCapacity = graverCount * (int) colony.getGravingRate();
+        int rancherCount = colony.getAssignedRoleCount(GameConstants.ROLE_RANCHER);
+        // TODO: Add real ranching logic when implemented in Colony.java
+        int ranchingRate = 0; // Placeholder
+
+        // Ant Totals
+        int babyTotal = eggs + larva + pupa;
+        int adultTotal = queens + princesses + drones + majors + soldiers + workers;
 
         int mushrooms = colony.getMushrooms(); 
         int plants = colony.getPlants();     
@@ -902,6 +985,16 @@ private JPanel createNorthPanel() {
         resinLabel.setText(String.valueOf(resins));
         mineralLabel.setText(String.valueOf(minerals));
 
+        totalConsumptionLabel.setText("Consumption: " + totalConsumption + "/day");
+        totalProductionLabel.setText("Max Food Prod: " + totalProduction + "/day");
+        netMushroomsLabel.setText("Net Food: " + netMushrooms + "/day");
+        layingRateLabel.setText("Laying Rate: " + layingRate + "/day");
+        nurseCoverageLabel.setText(String.format("Nurse Coverage: %d/%d", babyAntTotal, nurseCapacity));
+        graveKeepingLabel.setText("Grave Capacity: " + graveCapacity);
+        ranchingRateLabel.setText("Ranching: " + ranchingRate);
+        babyAntsLabel.setText("Baby Ants: " + babyTotal);
+        adultAntsLabel.setText("Adult Ants: " + adultTotal);
+
         String dateTime = String.format("%02d:%02d %02d/%02d/%04d",
         world.getHour(), world.getMinute(), world.getDay(), world.getMonth(), world.getYear());
         dateTimeLabel.setText(dateTime);
@@ -921,5 +1014,13 @@ private JPanel createNorthPanel() {
         Weather currentWeather = world.getWeather();
         weatherLabel.setIcon(currentWeather.getIcon());
         weatherLabel.setToolTipText(currentWeather.getName());
+
+        if (world.getSpawnHex().getBiome() != null) {
+            biomeLabel.setText("Biome: " + world.getSpawnHex().getBiome().getName());
+        } else {
+            biomeLabel.setText("Biome: N/A");
+        }
+        temperatureLabel.setText("Temp: " + world.getTemperature() + "°C");
+        humidityLabel.setText("Humidity: " + world.getHumidity());
     }
 }
