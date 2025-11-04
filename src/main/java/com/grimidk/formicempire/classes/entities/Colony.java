@@ -615,16 +615,15 @@ public class Colony {
         getQueens().add(new Ant(this, GameConstants.TYPE_QUEEN));
 
         setAssignedRoleCount(GameConstants.ROLE_LAYER, 1);
-        setAssignedRoleCount(GameConstants.ROLE_NURSE, 2);
+        setAssignedRoleCount(GameConstants.ROLE_NURSE, 3);
         setAssignedRoleCount(GameConstants.ROLE_FARMER, 1);
-        setAssignedRoleCount(GameConstants.ROLE_GRAVER, 1);
         setAssignedRoleCount(GameConstants.ROLE_FORAGER, 5);
         
         this.getQueens().get(0).setRole(GameConstants.ROLE_LAYER);
         this.getWorkers().get(0).setRole(GameConstants.ROLE_NURSE);
         this.getWorkers().get(1).setRole(GameConstants.ROLE_NURSE);
         this.getWorkers().get(2).setRole(GameConstants.ROLE_FARMER);
-        this.getWorkers().get(3).setRole(GameConstants.ROLE_GRAVER);
+        this.getWorkers().get(3).setRole(GameConstants.ROLE_NURSE);
         this.getWorkers().get(4).setRole(GameConstants.ROLE_FORAGER);
         this.getWorkers().get(5).setRole(GameConstants.ROLE_FORAGER);
         this.getWorkers().get(6).setRole(GameConstants.ROLE_FORAGER);
@@ -641,6 +640,8 @@ public class Colony {
             ant.setRole(GameConstants.ROLE_DEFENDER);
         } else if (type == GameConstants.TYPE_PRINCESS) {
             ant.setRole(GameConstants.ROLE_BREEDER);
+        } else if (type == GameConstants.TYPE_DRONE) {
+            ant.setRole(GameConstants.ROLE_DRONE);
         } else if (type == GameConstants.TYPE_QUEEN) {
             ant.setRole(GameConstants.ROLE_LAYER);
         } else {
@@ -934,6 +935,6 @@ public class Colony {
     }
 
     public void runRanching(){
-        int farmerCount = countAntsByRole(getWorkers(), GameConstants.ROLE_RANCHER);
+        // int farmerCount = countAntsByRole(getWorkers(), GameConstants.ROLE_RANCHER);
     }
 }

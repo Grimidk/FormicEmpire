@@ -52,6 +52,11 @@ public class Savefile implements Serializable {
         this.id = id;
         this.name = name;
         this.assignedRoleCounts = new HashMap<>();
+        this.minute = 0;
+        this.hour = 0;
+        this.day = 1;
+        this.month = 1;
+        this.year = 0; 
     }
 
     public int getId() {

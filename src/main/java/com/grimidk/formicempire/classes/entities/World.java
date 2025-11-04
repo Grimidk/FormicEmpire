@@ -34,7 +34,7 @@ public class World {
         this.hour = 0;
         this.day = 1;
         this.month = 1;
-        this.year = 1;
+        this.year = 0;
         this.temperature = 25;
         this.humidity = 2;
         this.hexes = new ArrayList<>();
