@@ -12,7 +12,13 @@ public class Engine extends Thread {
     private final Semaphore semaphore;
     private boolean killSwitch;
     private volatile boolean paused;
-    private final CopyOnWriteArrayList<Runnable> tickListeners = new CopyOnWriteArrayList<>();
+    
+    // --- Listeners ---
+    private final CopyOnWriteArrayList<Runnable> minuteTickListeners = new CopyOnWriteArrayList<>();
+    private final CopyOnWriteArrayList<Runnable> hourTickListeners = new CopyOnWriteArrayList<>();
+    private final CopyOnWriteArrayList<Runnable> dayTickListeners = new CopyOnWriteArrayList<>();
+    private final CopyOnWriteArrayList<Runnable> monthTickListeners = new CopyOnWriteArrayList<>();
+    
     private final SaveManager settingsSaveManager;
 
     // Settings
@@ -82,12 +88,72 @@ public class Engine extends Thread {
         return this.paused;
     }
 
+    // --- Minute Listeners ---
     public void addTickListener(Runnable r) {
-        if (r != null) tickListeners.add(r);
+        if (r != null) minuteTickListeners.add(r);
+    }
+    public void removeTickListener(Runnable r) {
+        if (r != null) minuteTickListeners.remove(r);
+    }
+    public void notifyMinuteListeners() {
+        for (Runnable r : minuteTickListeners) {
+            try {
+                r.run();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
     }
 
-    public void removeTickListener(Runnable r) {
-        if (r != null) tickListeners.remove(r);
+    // --- Hour Listeners ---
+    public void addHourTickListener(Runnable r) {
+        if (r != null) hourTickListeners.add(r);
+    }
+    public void removeHourTickListener(Runnable r) {
+        if (r != null) hourTickListeners.remove(r);
+    }
+    public void notifyHourListeners() {
+        for (Runnable r : hourTickListeners) {
+            try {
+                r.run();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+    
+    // --- Day Listeners ---
+    public void addDayTickListener(Runnable r) {
+        if (r != null) dayTickListeners.add(r);
+    }
+    public void removeDayTickListener(Runnable r) {
+        if (r != null) dayTickListeners.remove(r);
+    }
+    public void notifyDayListeners() {
+        for (Runnable r : dayTickListeners) {
+            try {
+                r.run();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    // --- Month Listeners ---
+    public void addMonthTickListener(Runnable r) {
+        if (r != null) monthTickListeners.add(r);
+    }
+    public void removeMonthTickListener(Runnable r) {
+        if (r != null) monthTickListeners.remove(r);
+    }
+    public void notifyMonthListeners() {
+        for (Runnable r : monthTickListeners) {
+            try {
+                r.run();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
     }
 
     public void loadFile(Savefile savefile) {
@@ -137,15 +203,11 @@ public class Engine extends Thread {
             if (!paused) {
                 try {
                     semaphore.acquire();
-                    if (this.world != null) this.world.runMinute();
-                    
-                    for (Runnable r : tickListeners) {
-                        try {
-                            r.run();
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                        }
+                    if (this.world != null) {
+                        this.world.runMinute(); 
                     }
+                    notifyMinuteListeners(); 
+                    
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } finally {

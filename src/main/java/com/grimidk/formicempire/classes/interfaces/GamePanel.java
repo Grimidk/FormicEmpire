@@ -28,6 +28,8 @@ import java.util.Map;
 
 public class GamePanel extends JPanel {
     private final MainFrame frame;
+    
+    // --- UI Components ---
     private JLabel statusLabel;
     private JLabel totalAntLabel;
     private JLabel queensLabel;
@@ -63,15 +65,7 @@ public class GamePanel extends JPanel {
     private JLabel biomeLabel;
     private JLabel temperatureLabel;
     private JLabel humidityLabel;
-    private JPanel timePanel;
-    private JPanel antsDetailPanel;
-    private JPanel resourcesDetailPanel;
-    private JPanel colonyStatsPanel;
-    private JPanel worldInfoPanel;
-
-    private Runnable tickListener;
-    private JButton playPauseButton;
-
+    
     private JLabel dateTimeLabel;
     private JLabel timeOfDayLabel;
     private JLabel moonPhaseLabel;
@@ -82,12 +76,61 @@ public class GamePanel extends JPanel {
     private JButton speedUpButton;
     private JButton speedDownButton;
     private JLabel tickLabel;
-
+    private JButton playPauseButton;
     private JButton menuButton;
     private JPopupMenu gameMenu;
+    
+    private JDialog hatchDialog;
+    private JDialog roleDialog;
 
+    // --- State & Engine ---
+    private Runnable minuteTickListener;
+    private Runnable hourTickListener;
+    private Runnable dayTickListener;
+    private Runnable monthTickListener;
+    
     private volatile boolean engineStarted = false;
     private int speedLevel = 1;
+
+    // --- Cached Values for UI Optimization ---
+    private int lastTotalAnts = -1;
+    private int lastQueens = -1;
+    private int lastPrincesses = -1;
+    private int lastDrones = -1;
+    private int lastMajors = -1;
+    private int lastSoldiers = -1;
+    private int lastWorkers = -1;
+    private int lastPupa = -1;
+    private int lastLarva = -1;
+    private int lastEggs = -1;
+    private int lastDeadAnts = -1;
+    private int lastTotalResources = -1;
+    private int lastMushrooms = -1;
+    private int lastPlants = -1;
+    private int lastProtein = -1;
+    private int lastWater = -1;
+    private int lastSyrups = -1;
+    private int lastResins = -1;
+    private int lastMinerals = -1;
+    private int lastTotalConsumption = -1;
+    private int lastTotalProduction = -1;
+    private int lastNetMushrooms = -1;
+    private int lastLayingRate = -1;
+    private int lastBabyAntTotal = -1;
+    private int lastNurseCapacity = -1;
+    private int lastGraveCapacity = -1;
+    private int lastRanchingRate = -1;
+    private int lastBabyTotal = -1;
+    private int lastAdultTotal = -1;
+    private String lastDateTime = "";
+    private String lastBiome = "";
+    private int lastTemperature = -999;
+    private int lastHumidity = -1;
+    private TimeOfDay lastTimeOfDay = null;
+    private MoonPhase lastMoonPhase = null;
+    private Season lastSeason = null;
+    private Weather lastWeather = null;
+
 
     private static final float[] SPEED_DELAYS = {
         -1f,    // Level 0 (Paused)
@@ -102,7 +145,10 @@ public class GamePanel extends JPanel {
 
     public GamePanel(MainFrame frame) {
         this.frame = frame;
-        this.tickListener = null;
+        this.minuteTickListener = null;
+        this.hourTickListener = null;
+        this.dayTickListener = null;
+        this.monthTickListener = null;
 
         initComponents();
         initLayout();
@@ -138,7 +184,6 @@ public class GamePanel extends JPanel {
         resinLabel = new JLabel("0");
         mineralLabel = new JLabel("0");
 
-        // --- Colony Stats ---
         totalConsumptionLabel = new JLabel("Consumption: 0/day");
         totalProductionLabel = new JLabel("Max Food Prod: 0/day");
         netMushroomsLabel = new JLabel("Net Food: 0/day");
@@ -149,7 +194,6 @@ public class GamePanel extends JPanel {
         babyAntsLabel = new JLabel("Baby Ants: 0");
         adultAntsLabel = new JLabel("Adult Ants: 0");
         
-        // --- World Info ---
         biomeLabel = new JLabel("Biome: N/A");
         temperatureLabel = new JLabel("Temp: 0°C");
         humidityLabel = new JLabel("Humidity: 0");
@@ -166,104 +210,55 @@ public class GamePanel extends JPanel {
         playPauseButton = new JButton("Pause");
         menuButton = new JButton("Menu");
 
-        antsDetailPanel = new JPanel();
-        antsDetailPanel.setBorder(new TitledBorder("Ants"));
-        antsDetailPanel.setLayout(new BoxLayout(antsDetailPanel, BoxLayout.Y_AXIS));
-        antsDetailPanel.add(totalAntLabel);
-        antsDetailPanel.add(new JSeparator(SwingConstants.HORIZONTAL));
-        antsDetailPanel.add(queensLabel);
-        antsDetailPanel.add(princessLabel);
-        antsDetailPanel.add(droneLabel);
-        antsDetailPanel.add(majorLabel);
-        antsDetailPanel.add(soldiersLabel);
-        antsDetailPanel.add(workersLabel);
-        antsDetailPanel.add(pupaLabel);
-        antsDetailPanel.add(larvaLabel);
-        antsDetailPanel.add(eggsLabel);
-        antsDetailPanel.add(deadAntsLabel);
+        // --- Set Static Icons & Tooltips ---
+        setupConstantLabel(queensLabel, GameConstants.TYPE_QUEEN);
+        setupConstantLabel(princessLabel, GameConstants.TYPE_PRINCESS);
+        setupConstantLabel(droneLabel, GameConstants.TYPE_DRONE);
+        setupConstantLabel(majorLabel, GameConstants.TYPE_MAJOR);
+        setupConstantLabel(soldiersLabel, GameConstants.TYPE_SOLDIER);
+        setupConstantLabel(workersLabel, GameConstants.TYPE_WORKER);
+        setupConstantLabel(pupaLabel, GameConstants.TYPE_PUPA);
+        setupConstantLabel(larvaLabel, GameConstants.TYPE_LARVA);
+        setupConstantLabel(eggsLabel, GameConstants.TYPE_EGG);
+        setupConstantLabel(deadAntsLabel, GameConstants.TYPE_DEAD);
 
-        resourcesDetailPanel = new JPanel();
-        resourcesDetailPanel.setBorder(new TitledBorder("Resources"));
-        resourcesDetailPanel.setLayout(new BoxLayout(resourcesDetailPanel, BoxLayout.Y_AXIS));
-        resourcesDetailPanel.add(totalResourcesLabel);
-        resourcesDetailPanel.add(new JSeparator(SwingConstants.HORIZONTAL));
-        resourcesDetailPanel.add(mushroomsLabel);
-        resourcesDetailPanel.add(planLabel);
-        resourcesDetailPanel.add(proteinLabel);
-        resourcesDetailPanel.add(waterLabel);
-        resourcesDetailPanel.add(syrupLabel);
-        resourcesDetailPanel.add(resinLabel);
-        resourcesDetailPanel.add(mineralLabel);
-
-        // --- Colony Stats Panel ---
-        colonyStatsPanel = new JPanel();
-        colonyStatsPanel.setBorder(new TitledBorder("Colony Stats"));
-        colonyStatsPanel.setLayout(new BoxLayout(colonyStatsPanel, BoxLayout.Y_AXIS));
-        colonyStatsPanel.add(totalConsumptionLabel);
-        colonyStatsPanel.add(totalProductionLabel);
-        colonyStatsPanel.add(netMushroomsLabel);
-        colonyStatsPanel.add(layingRateLabel);
-        colonyStatsPanel.add(nurseCoverageLabel);
-        colonyStatsPanel.add(graveKeepingLabel);
-        colonyStatsPanel.add(ranchingRateLabel);
-        colonyStatsPanel.add(babyAntsLabel);
-        colonyStatsPanel.add(adultAntsLabel);
-
-        timePanel = new JPanel();
-        timePanel.setBorder(new TitledBorder("Time"));
-        timePanel.setLayout(new BoxLayout(timePanel, BoxLayout.Y_AXIS));
-        timePanel.add(dateTimeLabel);
-        timePanel.add(timeOfDayLabel);
-        timePanel.add(moonPhaseLabel);
-        timePanel.add(weatherLabel);
-        timePanel.add(seasonLabel);
-
-        // --- World Info Panel ---
-        worldInfoPanel = new JPanel();
-        worldInfoPanel.setBorder(new TitledBorder("World"));
-        worldInfoPanel.setLayout(new BoxLayout(worldInfoPanel, BoxLayout.Y_AXIS));
-        worldInfoPanel.add(biomeLabel);
-        worldInfoPanel.add(temperatureLabel);
-        worldInfoPanel.add(humidityLabel);
-
-        // --- Set Static Icons ---
-        queensLabel.setIcon(GameConstants.TYPE_QUEEN.getIcon());
-        princessLabel.setIcon(GameConstants.TYPE_PRINCESS.getIcon());
-        droneLabel.setIcon(GameConstants.TYPE_DRONE.getIcon());
-        majorLabel.setIcon(GameConstants.TYPE_MAJOR.getIcon());
-        soldiersLabel.setIcon(GameConstants.TYPE_SOLDIER.getIcon());
-        workersLabel.setIcon(GameConstants.TYPE_WORKER.getIcon());
-        pupaLabel.setIcon(GameConstants.TYPE_PUPA.getIcon());
-        larvaLabel.setIcon(GameConstants.TYPE_LARVA.getIcon());
-        eggsLabel.setIcon(GameConstants.TYPE_EGG.getIcon());
-        deadAntsLabel.setIcon(GameConstants.TYPE_DEAD.getIcon());
-
-        queensLabel.setToolTipText(GameConstants.TYPE_QUEEN.getName());
-        princessLabel.setToolTipText(GameConstants.TYPE_PRINCESS.getName());
-        droneLabel.setToolTipText(GameConstants.TYPE_DRONE.getName());
-        majorLabel.setToolTipText(GameConstants.TYPE_MAJOR.getName());
-        soldiersLabel.setToolTipText(GameConstants.TYPE_SOLDIER.getName());
-        workersLabel.setToolTipText(GameConstants.TYPE_WORKER.getName());
-        pupaLabel.setToolTipText(GameConstants.TYPE_PUPA.getName());
-        larvaLabel.setToolTipText(GameConstants.TYPE_LARVA.getName());
-        eggsLabel.setToolTipText(GameConstants.TYPE_EGG.getName());
-        deadAntsLabel.setToolTipText(GameConstants.TYPE_DEAD.getName());
-
-        mushroomsLabel.setIcon(GameConstants.FUNGI_RESOURCE.getIcon()); 
-        planLabel.setIcon(GameConstants.PLANT_RESOURCE.getIcon());
-        proteinLabel.setIcon(GameConstants.MEAT_RESOURCE.getIcon());  
-        waterLabel.setIcon(GameConstants.WATER_RESOURCE.getIcon());  
-        syrupLabel.setIcon(GameConstants.SYRUP_RESOURCE.getIcon());    
-        resinLabel.setIcon(GameConstants.RESIN_RESOURCE.getIcon());
-        mineralLabel.setIcon(GameConstants.ROCK_RESOURCE.getIcon());
-
-        mushroomsLabel.setToolTipText(GameConstants.FUNGI_RESOURCE.getName());
-        planLabel.setToolTipText(GameConstants.PLANT_RESOURCE.getName());
-        proteinLabel.setToolTipText(GameConstants.MEAT_RESOURCE.getName());
-        waterLabel.setToolTipText(GameConstants.WATER_RESOURCE.getName());
-        syrupLabel.setToolTipText(GameConstants.SYRUP_RESOURCE.getName());
-        resinLabel.setToolTipText(GameConstants.RESIN_RESOURCE.getName());
-        mineralLabel.setToolTipText(GameConstants.ROCK_RESOURCE.getName());
+        setupConstantLabel(mushroomsLabel, GameConstants.FUNGI_RESOURCE);
+        setupConstantLabel(planLabel, GameConstants.PLANT_RESOURCE);
+        setupConstantLabel(proteinLabel, GameConstants.MEAT_RESOURCE);
+        setupConstantLabel(waterLabel, GameConstants.WATER_RESOURCE);
+        setupConstantLabel(syrupLabel, GameConstants.SYRUP_RESOURCE);
+        setupConstantLabel(resinLabel, GameConstants.RESIN_RESOURCE);
+        setupConstantLabel(mineralLabel, GameConstants.ROCK_RESOURCE);
+    }
+    
+    private void setupConstantLabel(JLabel label, Object constant) {
+        if (constant instanceof AntType) {
+            AntType type = (AntType) constant;
+            label.setIcon(type.getIcon());
+            label.setToolTipText(type.getName());
+        } 
+        else if (constant == GameConstants.FUNGI_RESOURCE) {
+             label.setIcon(GameConstants.FUNGI_RESOURCE.getIcon());
+             label.setToolTipText(GameConstants.FUNGI_RESOURCE.getName());
+        } else if (constant == GameConstants.PLANT_RESOURCE) {
+             label.setIcon(GameConstants.PLANT_RESOURCE.getIcon());
+             label.setToolTipText(GameConstants.PLANT_RESOURCE.getName());
+        } else if (constant == GameConstants.MEAT_RESOURCE) {
+             label.setIcon(GameConstants.MEAT_RESOURCE.getIcon());
+             label.setToolTipText(GameConstants.MEAT_RESOURCE.getName());
+        } else if (constant == GameConstants.WATER_RESOURCE) {
+             label.setIcon(GameConstants.WATER_RESOURCE.getIcon());
+             label.setToolTipText(GameConstants.WATER_RESOURCE.getName());
+        } else if (constant == GameConstants.SYRUP_RESOURCE) {
+             label.setIcon(GameConstants.SYRUP_RESOURCE.getIcon());
+             label.setToolTipText(GameConstants.SYRUP_RESOURCE.getName());
+        } else if (constant == GameConstants.RESIN_RESOURCE) {
+             label.setIcon(GameConstants.RESIN_RESOURCE.getIcon());
+             label.setToolTipText(GameConstants.RESIN_RESOURCE.getName());
+        } else if (constant == GameConstants.ROCK_RESOURCE) {
+             label.setIcon(GameConstants.ROCK_RESOURCE.getIcon());
+             label.setToolTipText(GameConstants.ROCK_RESOURCE.getName());
+        }
     }
 
     private void initLayout() {
@@ -274,7 +269,7 @@ public class GamePanel extends JPanel {
         add(createSouthPanel(), BorderLayout.SOUTH);
     }
 
-private JPanel createNorthPanel() {
+    private JPanel createNorthPanel() {
         statusIndicator.setOpaque(true);
         statusIndicator.setBackground(Color.GRAY);
         statusIndicator.setPreferredSize(new Dimension(12, 12));
@@ -289,26 +284,99 @@ private JPanel createNorthPanel() {
         stats.setLayout(new BoxLayout(stats, BoxLayout.Y_AXIS));
 
         JPanel antsWrapper = new JPanel(new BorderLayout());
-        antsWrapper.add(antsDetailPanel, BorderLayout.NORTH);
+        antsWrapper.add(createAntsDetailPanel(), BorderLayout.NORTH);
         stats.add(antsWrapper);
 
         JPanel resourcesWrapper = new JPanel(new BorderLayout());
-        resourcesWrapper.add(resourcesDetailPanel, BorderLayout.NORTH);
+        resourcesWrapper.add(createResourcesDetailPanel(), BorderLayout.NORTH);
         stats.add(resourcesWrapper);
 
         JPanel statsWrapper = new JPanel(new BorderLayout());
-        statsWrapper.add(colonyStatsPanel, BorderLayout.NORTH);
+        statsWrapper.add(createColonyStatsPanel(), BorderLayout.NORTH);
         stats.add(statsWrapper);
 
         return stats;
+    }
+    
+    private JPanel createAntsDetailPanel() {
+        JPanel antsDetailPanel = new JPanel();
+        antsDetailPanel.setBorder(new TitledBorder("Ants"));
+        antsDetailPanel.setLayout(new BoxLayout(antsDetailPanel, BoxLayout.Y_AXIS));
+        antsDetailPanel.add(totalAntLabel);
+        antsDetailPanel.add(new JSeparator(SwingConstants.HORIZONTAL));
+        antsDetailPanel.add(queensLabel);
+        antsDetailPanel.add(princessLabel);
+        antsDetailPanel.add(droneLabel);
+        antsDetailPanel.add(majorLabel);
+        antsDetailPanel.add(soldiersLabel);
+        antsDetailPanel.add(workersLabel);
+        antsDetailPanel.add(pupaLabel);
+        antsDetailPanel.add(larvaLabel);
+        antsDetailPanel.add(eggsLabel);
+        antsDetailPanel.add(deadAntsLabel);
+        return antsDetailPanel;
+    }
+    
+    private JPanel createResourcesDetailPanel() {
+        JPanel resourcesDetailPanel = new JPanel();
+        resourcesDetailPanel.setBorder(new TitledBorder("Resources"));
+        resourcesDetailPanel.setLayout(new BoxLayout(resourcesDetailPanel, BoxLayout.Y_AXIS));
+        resourcesDetailPanel.add(totalResourcesLabel);
+        resourcesDetailPanel.add(new JSeparator(SwingConstants.HORIZONTAL));
+        resourcesDetailPanel.add(mushroomsLabel);
+        resourcesDetailPanel.add(planLabel);
+        resourcesDetailPanel.add(proteinLabel);
+        resourcesDetailPanel.add(waterLabel);
+        resourcesDetailPanel.add(syrupLabel);
+        resourcesDetailPanel.add(resinLabel);
+        resourcesDetailPanel.add(mineralLabel);
+        return resourcesDetailPanel;
+    }
+    
+    private JPanel createColonyStatsPanel() {
+        JPanel colonyStatsPanel = new JPanel();
+        colonyStatsPanel.setBorder(new TitledBorder("Colony Stats"));
+        colonyStatsPanel.setLayout(new BoxLayout(colonyStatsPanel, BoxLayout.Y_AXIS));
+        colonyStatsPanel.add(totalConsumptionLabel);
+        colonyStatsPanel.add(totalProductionLabel);
+        colonyStatsPanel.add(netMushroomsLabel);
+        colonyStatsPanel.add(layingRateLabel);
+        colonyStatsPanel.add(nurseCoverageLabel);
+        colonyStatsPanel.add(graveKeepingLabel);
+        colonyStatsPanel.add(ranchingRateLabel);
+        colonyStatsPanel.add(babyAntsLabel);
+        colonyStatsPanel.add(adultAntsLabel);
+        return colonyStatsPanel;
     }
 
     private JPanel createEastPanel() {
         JPanel east = new JPanel();
         east.setLayout(new BoxLayout(east, BoxLayout.Y_AXIS));
-        east.add(timePanel);
-        east.add(worldInfoPanel);
+        east.add(createTimePanel());
+        east.add(createWorldInfoPanel());
         return east;
+    }
+    
+    private JPanel createTimePanel() {
+        JPanel timePanel = new JPanel();
+        timePanel.setBorder(new TitledBorder("Time"));
+        timePanel.setLayout(new BoxLayout(timePanel, BoxLayout.Y_AXIS));
+        timePanel.add(dateTimeLabel);
+        timePanel.add(timeOfDayLabel);
+        timePanel.add(moonPhaseLabel);
+        timePanel.add(weatherLabel);
+        timePanel.add(seasonLabel);
+        return timePanel;
+    }
+    
+    private JPanel createWorldInfoPanel() {
+        JPanel worldInfoPanel = new JPanel();
+        worldInfoPanel.setBorder(new TitledBorder("World"));
+        worldInfoPanel.setLayout(new BoxLayout(worldInfoPanel, BoxLayout.Y_AXIS));
+        worldInfoPanel.add(biomeLabel);
+        worldInfoPanel.add(temperatureLabel);
+        worldInfoPanel.add(humidityLabel);
+        return worldInfoPanel;
     }
 
     private JPanel createSouthPanel() {
@@ -321,6 +389,17 @@ private JPanel createNorthPanel() {
         return south;
     }
 
+    private int getMaxSpeedLevel() {
+        Engine engine = frame.getEngine();
+        if (engine == null) return 1;
+        
+        int maxLevel = SPEED_DELAYS.length - 1; 
+        if (!engine.isAllowTurboMode() && maxLevel > 6) {
+            maxLevel = 6;
+        }
+        return maxLevel;
+    }
+
     private void initListeners() {
         speedDownButton.addActionListener(e -> {
             if (speedLevel > 0) speedLevel--;
@@ -328,19 +407,10 @@ private JPanel createNorthPanel() {
         });
 
         speedUpButton.addActionListener(e -> {
-            Engine engine = frame.getEngine();
-            if (engine == null) return;
-
-            int maxLevel = SPEED_DELAYS.length - 1; 
-            
-            if (!engine.isAllowTurboMode()) {
-                maxLevel = 6;
-            }
-
+            int maxLevel = getMaxSpeedLevel();
             if (speedLevel < maxLevel) {
                 speedLevel++;
             }
-            
             applySpeedLevel();
         });
 
@@ -418,19 +488,26 @@ private JPanel createNorthPanel() {
         Colony colony = engine.getWorld().getSpawnHex().getColony();
         if (colony == null) return;
 
-        JDialog hatchDialog = new JDialog(frame, "Manage Pupa Hatch Rates", true);
-        hatchDialog.setLayout(new BorderLayout());
+        if (hatchDialog == null) {
+            hatchDialog = new JDialog(frame, "Manage Pupa Hatch Rates", true);
+            hatchDialog.setLayout(new BorderLayout());
+            
+            JButton closeButton = new JButton("Close");
+            closeButton.addActionListener(e -> hatchDialog.dispose());
+            JPanel southPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+            southPanel.add(closeButton);
+            hatchDialog.add(southPanel, BorderLayout.SOUTH);
+            hatchDialog.setPreferredSize(new Dimension(400, 350));
+        }
         
+        Component oldCenter = ((BorderLayout)hatchDialog.getContentPane().getLayout()).getLayoutComponent(BorderLayout.CENTER);
+        if (oldCenter != null) {
+            hatchDialog.remove(oldCenter);
+        }
+
         JPanel panel = createHatchRatePanel(colony);
         hatchDialog.add(panel, BorderLayout.CENTER);
 
-        JButton closeButton = new JButton("Close");
-        closeButton.addActionListener(e -> hatchDialog.dispose());
-        JPanel southPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        southPanel.add(closeButton);
-        hatchDialog.add(southPanel, BorderLayout.SOUTH);
-
-        hatchDialog.setPreferredSize(new Dimension(400, 350));
         hatchDialog.pack();
         hatchDialog.setLocationRelativeTo(frame);
         hatchDialog.setVisible(true);
@@ -506,7 +583,7 @@ private JPanel createNorthPanel() {
             SpinnerNumberModel model = (SpinnerNumberModel) s.getModel();
             double currentValue = (Double) s.getValue();
             double newMax = currentValue + Math.max(0.0, unassigned);
-            model.setMaximum(newMax);
+            model.setMaximum(Math.max(currentValue, newMax));
         }
     }
 
@@ -518,8 +595,33 @@ private JPanel createNorthPanel() {
         Colony colony = engine.getWorld().getSpawnHex().getColony();
         if (colony == null) return;
 
-        JDialog roleDialog = new JDialog(frame, "Manage Ant Roles", true);
-        roleDialog.setLayout(new BorderLayout());
+        if (roleDialog == null) {
+            roleDialog = new JDialog(frame, "Manage Ant Roles", true);
+            roleDialog.setLayout(new BorderLayout());
+            
+            JButton closeButton = new JButton("Close");
+            closeButton.addActionListener(e -> roleDialog.dispose());
+            JPanel southPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+            southPanel.add(closeButton);
+            roleDialog.add(southPanel, BorderLayout.SOUTH);
+            
+            roleDialog.setPreferredSize(new Dimension(550, 500));
+            
+            roleDialog.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowOpened(WindowEvent e) {
+                    Component centerComp = ((BorderLayout)roleDialog.getContentPane().getLayout()).getLayoutComponent(BorderLayout.CENTER);
+                    if (centerComp instanceof JTabbedPane) {
+                        centerComp.requestFocusInWindow();
+                    }
+                }
+            });
+        }
+        
+        Component oldCenter = ((BorderLayout)roleDialog.getContentPane().getLayout()).getLayoutComponent(BorderLayout.CENTER);
+        if (oldCenter != null) {
+            roleDialog.remove(oldCenter);
+        }
 
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.addTab(GameConstants.TYPE_WORKER.getName(), GameConstants.TYPE_WORKER.getIcon(), createRolePanel(colony, GameConstants.TYPE_WORKER));
@@ -530,72 +632,33 @@ private JPanel createNorthPanel() {
         
         InputMap inputMap = tabbedPane.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
         ActionMap actionMap = tabbedPane.getActionMap();
-
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Q, 0), "selectTab1");
-        actionMap.put("selectTab1", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (tabbedPane.getTabCount() > 0) tabbedPane.setSelectedIndex(0);
-            }
-        });
-
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0), "selectTab2");
-        actionMap.put("selectTab2", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (tabbedPane.getTabCount() > 1) tabbedPane.setSelectedIndex(1);
-            }
-        });
-
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_E, 0), "selectTab3");
-        actionMap.put("selectTab3", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (tabbedPane.getTabCount() > 2) tabbedPane.setSelectedIndex(2);
-            }
-        });
-
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_R, 0), "selectTab4");
-        actionMap.put("selectTab4", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (tabbedPane.getTabCount() > 3) tabbedPane.setSelectedIndex(3);
-            }
-        });
-
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_T, 0), "selectTab5");
-        actionMap.put("selectTab5", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (tabbedPane.getTabCount() > 4) tabbedPane.setSelectedIndex(4);
-            }
-        });
+        
+        addTabSwitchAction(inputMap, actionMap, "selectTab1", KeyEvent.VK_Q, tabbedPane, 0);
+        addTabSwitchAction(inputMap, actionMap, "selectTab2", KeyEvent.VK_W, tabbedPane, 1);
+        addTabSwitchAction(inputMap, actionMap, "selectTab3", KeyEvent.VK_E, tabbedPane, 2);
+        addTabSwitchAction(inputMap, actionMap, "selectTab4", KeyEvent.VK_R, tabbedPane, 3);
+        addTabSwitchAction(inputMap, actionMap, "selectTab5", KeyEvent.VK_T, tabbedPane, 4);
 
         if (tabIndex >= 0 && tabIndex < tabbedPane.getTabCount()) {
             tabbedPane.setSelectedIndex(tabIndex);
         }
-
+        
         roleDialog.add(tabbedPane, BorderLayout.CENTER);
-
-        JButton closeButton = new JButton("Close");
-        closeButton.addActionListener(e -> roleDialog.dispose());
-        JPanel southPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        southPanel.add(closeButton);
-        roleDialog.add(southPanel, BorderLayout.SOUTH);
-
-        roleDialog.setPreferredSize(new Dimension(550, 500));
         roleDialog.pack();
         roleDialog.setLocationRelativeTo(frame);
-
-        roleDialog.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowOpened(WindowEvent e) {
-                tabbedPane.requestFocusInWindow();
-            }
-        });
-
         roleDialog.setVisible(true);
     }
+    
+    private void addTabSwitchAction(InputMap im, ActionMap am, String name, int key, JTabbedPane pane, int index) {
+        im.put(KeyStroke.getKeyStroke(key, 0), name);
+        am.put(name, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (pane.getTabCount() > index) pane.setSelectedIndex(index);
+            }
+        });
+    }
+
 
     private JPanel createRolePanel(Colony colony, AntType antType) {
         JPanel panel = new JPanel();
@@ -724,45 +787,11 @@ private JPanel createNorthPanel() {
         });
 
         // Key bindings for role management tabs
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Q, 0), "openRoles1");
-        actionMap.put("openRoles1", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showRoleManagementDialog(0); // Workers
-            }
-        });
-
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0), "openRoles2");
-        actionMap.put("openRoles2", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showRoleManagementDialog(1); // Soldiers
-            }
-        });
-
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_E, 0), "openRoles3");
-        actionMap.put("openRoles3", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showRoleManagementDialog(2); // Majors
-            }
-        });
-
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_R, 0), "openRoles4");
-        actionMap.put("openRoles4", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showRoleManagementDialog(3); // Princesses
-            }
-        });
-
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_T, 0), "openRoles5");
-        actionMap.put("openRoles5", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showRoleManagementDialog(4); // Queens
-            }
-        });
+        addRoleKeyBinding(inputMap, actionMap, "openRoles1", KeyEvent.VK_Q, 0);
+        addRoleKeyBinding(inputMap, actionMap, "openRoles2", KeyEvent.VK_W, 1);
+        addRoleKeyBinding(inputMap, actionMap, "openRoles3", KeyEvent.VK_E, 2);
+        addRoleKeyBinding(inputMap, actionMap, "openRoles4", KeyEvent.VK_R, 3);
+        addRoleKeyBinding(inputMap, actionMap, "openRoles5", KeyEvent.VK_T, 4);
         
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_P, 0), "openHatchRates");
         actionMap.put("openHatchRates", new AbstractAction() {
@@ -773,13 +802,23 @@ private JPanel createNorthPanel() {
         });
     }
 
+    private void addRoleKeyBinding(InputMap im, ActionMap am, String name, int key, int tab) {
+        im.put(KeyStroke.getKeyStroke(key, 0), name);
+        am.put(name, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showRoleManagementDialog(tab);
+            }
+        });
+    }
+
     private void handleBackButton() {
         Engine eng = frame.getEngine();
         if (eng != null) {
             eng.pauseEngine();
         }
         updateStatusIndicator(true);
-        unregisterTickListener();
+        unregisterTickListeners(); 
 
         try {
             SaveManager sm = new SaveManager();
@@ -804,7 +843,7 @@ private JPanel createNorthPanel() {
                     });
                     return;
                 } else {
-                    sm.saveWorldToSlot(engine.getWorld(), 0);
+                    sm.saveWorldToSlot(engine.getWorld(), 0); 
                     frame.showCard(MainFrame.CARD_SAVE);
                     return;
                 }
@@ -819,41 +858,77 @@ private JPanel createNorthPanel() {
     public void enterWithSavefile(Savefile savefile) {
         statusLabel.setText("Starting game...");
         Engine engine = frame.getEngine();
-        new Thread(() -> {
-            engine.startUp(savefile);
-            SwingUtilities.invokeLater(() -> {
-                statusLabel.setText("Game started");
-                registerTickListener();
-                updateCounts();
-                if (engine != null && !engineStarted) {
-                    engineStarted = true;
-                    engine.start();
+        
+        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                engine.startUp(savefile);
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    get();
+                    statusLabel.setText("Game started");
+                    resetCachedValues(); 
+                    registerTickListeners(); 
+                    updateStaticWorldInfo();
+                    updateMinuteGUI();
+                    updateHourGUI();
+                    updateDayGUI();
+                    updateMonthGUI();
+                    
+                    if (!engineStarted) {
+                        engineStarted = true;
+                        engine.start();
+                    }
+                    if(engine.isPaused()) {
+                        playPauseButton.setText("Play");
+                    } else {
+                        playPauseButton.setText("Pause");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    statusLabel.setText("Error loading game!");
                 }
-                if(engine.isPaused()) {
-                    playPauseButton.setText("Play");
-                } else {
-                    playPauseButton.setText("Pause");
-                }
-            });
-        }).start();
+            }
+        };
+        
+        worker.execute();
     }
 
-    private void registerTickListener() {
-        unregisterTickListener();
+    private void registerTickListeners() {
+        unregisterTickListeners();
         Engine engine = frame.getEngine();
         if (engine == null) return;
-        tickListener = () -> SwingUtilities.invokeLater(this::updateCounts);
-        engine.addTickListener(tickListener);
+        
+        minuteTickListener = () -> SwingUtilities.invokeLater(this::updateMinuteGUI);
+        hourTickListener = () -> SwingUtilities.invokeLater(this::updateHourGUI);
+        dayTickListener = () -> SwingUtilities.invokeLater(this::updateDayGUI);
+        monthTickListener = () -> SwingUtilities.invokeLater(this::updateMonthGUI);
+        
+        engine.addTickListener(minuteTickListener);
+        engine.addHourTickListener(hourTickListener);
+        engine.addDayTickListener(dayTickListener);
+        engine.addMonthTickListener(monthTickListener);
+        
         updateTickLabel(engine);
         updateStatusIndicator(engine.isPaused());
     }
 
-    private void unregisterTickListener() {
-        if (tickListener != null) {
-            Engine engine = frame.getEngine();
-            if (engine != null) engine.removeTickListener(tickListener);
+    private void unregisterTickListeners() {
+        Engine engine = frame.getEngine();
+        if (engine != null) {
+            if (minuteTickListener != null) engine.removeTickListener(minuteTickListener);
+            if (hourTickListener != null) engine.removeHourTickListener(hourTickListener);
+            if (dayTickListener != null) engine.removeDayTickListener(dayTickListener);
+            if (monthTickListener != null) engine.removeMonthTickListener(monthTickListener);
         }
-        tickListener = null;
+        minuteTickListener = null;
+        hourTickListener = null;
+        dayTickListener = null;
+        monthTickListener = null;
     }
 
     private void updateTickLabel(Engine eng) {
@@ -883,17 +958,10 @@ private JPanel createNorthPanel() {
         Engine eng = frame.getEngine();
         if (eng == null) return;
 
-        int maxLevel = SPEED_DELAYS.length - 1;
-        if (!eng.isAllowTurboMode() && maxLevel == 7) {
-             maxLevel = 6; 
-        }
+        int maxLevel = getMaxSpeedLevel();
         
-        if (speedLevel > maxLevel) {
-            speedLevel = maxLevel;
-        }
-        if (speedLevel < 0) {
-            speedLevel = 0;
-        }
+        if (speedLevel > maxLevel) speedLevel = maxLevel;
+        if (speedLevel < 0) speedLevel = 0;
 
         float delay = SPEED_DELAYS[speedLevel];
 
@@ -904,123 +972,356 @@ private JPanel createNorthPanel() {
             tickLabel.setText("Tick: PAUSED");
         } else {
             eng.setDelay(delay);
-            eng.resumeEngine(); 
+            if (!engineStarted || eng.isPaused()) {
+                eng.resumeEngine();
+            }
             updateStatusIndicator(false);
             playPauseButton.setText("Pause");
             updateTickLabel(eng);
         }
     }
 
-    private void updateCounts() {
+    private void resetCachedValues() {
+        lastTotalAnts = -1;
+        lastQueens = -1;
+        lastPrincesses = -1;
+        lastDrones = -1;
+        lastMajors = -1;
+        lastSoldiers = -1;
+        lastWorkers = -1;
+        lastPupa = -1;
+        lastLarva = -1;
+        lastEggs = -1;
+        lastDeadAnts = -1;
+        lastTotalResources = -1;
+        lastMushrooms = -1;
+        lastPlants = -1;
+        lastProtein = -1;
+        lastWater = -1;
+        lastSyrups = -1;
+        lastResins = -1;
+        lastMinerals = -1;
+        lastTotalConsumption = -1;
+        lastTotalProduction = -1;
+        lastNetMushrooms = -1;
+        lastLayingRate = -1;
+        lastBabyAntTotal = -1;
+        lastNurseCapacity = -1;
+        lastGraveCapacity = -1;
+        lastRanchingRate = -1;
+        lastBabyTotal = -1;
+        lastAdultTotal = -1;
+        lastDateTime = "";
+        lastBiome = "";
+        lastTemperature = -999;
+        lastHumidity = -1;
+        lastTimeOfDay = null;
+        lastMoonPhase = null;
+        lastSeason = null;
+        lastWeather = null;
+    }
+
+    // --- Event-Driven Update Methods ---
+    private void updateStaticWorldInfo() {
+        World world = frame.getEngine().getWorld();
+        if (world == null) return;
+        
+        String biomeName = (world.getSpawnHex().getBiome() != null) ? "Biome: " + world.getSpawnHex().getBiome().getName() : "Biome: N/A";
+        if (!biomeName.equals(lastBiome)) {
+            biomeLabel.setText(biomeName);
+            lastBiome = biomeName;
+        }
+        
+        int temp = world.getTemperature();
+        if (temp != lastTemperature) {
+            temperatureLabel.setText("Temp: " + temp + "°C");
+            lastTemperature = temp;
+        }
+        
+        int humidity = world.getHumidity();
+        if (humidity != lastHumidity) {
+            humidityLabel.setText("Humidity: " + humidity);
+            lastHumidity = humidity;
+        }
+
+        Weather currentWeather = world.getWeather();
+        if (currentWeather != lastWeather) {
+            weatherLabel.setIcon(currentWeather.getIcon());
+            weatherLabel.setToolTipText(currentWeather.getName());
+            lastWeather = currentWeather;
+        }
+    }
+
+    private void updateMinuteGUI() {
         Engine engine = frame.getEngine();
         if (engine == null) return;
         World world = engine.getWorld();
         if (world == null) return;
-        if (world.getHexes() == null || world.getHexes().isEmpty()) return;
         Colony colony = world.getSpawnHex().getColony();
         if (colony == null) return;
 
-        int totalAnts = colony.getAntTotal();
-        int queens = colony.getQueens() != null ? colony.getQueens().size() : 0;
-        int princesses = colony.getPrincesses() != null ? colony.getPrincesses().size() : 0;
-        int drones = colony.getDrones() != null ? colony.getDrones().size() : 0;
-        int majors = colony.getMajors() != null ? colony.getMajors().size() : 0;
-        int soldiers = colony.getSoldiers() != null ? colony.getSoldiers().size() : 0;
-        int workers = colony.getWorkers() != null ? colony.getWorkers().size() : 0;
-        int pupa = colony.getPupae() != null ? colony.getPupae().size() : 0;
-        int larva = colony.getLarvae() != null ? colony.getLarvae().size() : 0;
-        int eggs = colony.getEggs() != null ? colony.getEggs().size() : 0;
-        int deadAnts = colony.getDeadAnts() != null ? colony.getDeadAnts().size() : 0;
+        // --- Time ---
+        String dateTime = String.format("%02d:%02d %02d/%02d/%04d",
+            world.getHour(), world.getMinute(), world.getDay(), world.getMonth(), world.getYear());
+        if (!dateTime.equals(lastDateTime)) {
+            dateTimeLabel.setText(dateTime);
+            lastDateTime = dateTime;
+        }
+
+        // --- Resources ---
+        int mushrooms = colony.getMushrooms(); 
+        int plants = colony.getPlants();     
+        int protein = colony.getProtein();  
+        int water = colony.getWater(); 
+        int syrups = colony.getSyrups();
+        int resins = colony.getResins();
+        int minerals = colony.getMinerals();
+        int totalResources = mushrooms + plants + protein + water + syrups + resins + minerals;
         
-        // Jobs
-        int totalConsumption = colony.getTotalConsumption();
+        if (totalResources != lastTotalResources) {
+            totalResourcesLabel.setText("Total resources: " + totalResources);
+            lastTotalResources = totalResources;
+        }
+        if (mushrooms != lastMushrooms) {
+            mushroomsLabel.setText(String.valueOf(mushrooms));
+            lastMushrooms = mushrooms;
+        }
+        if (plants != lastPlants) {
+            planLabel.setText(String.valueOf(plants));
+            lastPlants = plants;
+        }
+        if (protein != lastProtein) {
+            proteinLabel.setText(String.valueOf(protein));
+            lastProtein = protein;
+        }
+        if (water != lastWater) {
+            waterLabel.setText(String.valueOf(water));
+            lastWater = water;
+        }
+        if (syrups != lastSyrups) {
+            syrupLabel.setText(String.valueOf(syrups));
+            lastSyrups = syrups;
+        }
+        if (resins != lastResins) {
+            resinLabel.setText(String.valueOf(resins));
+            lastResins = resins;
+        }
+        if (minerals != lastMinerals) {
+            mineralLabel.setText(String.valueOf(minerals));
+            lastMinerals = minerals;
+        }
+        
+        // --- Net Food ---
+        int totalConsumption = colony.getTotalConsumption(); 
         int farmerCount = colony.getAssignedRoleCount(GameConstants.ROLE_FARMER);
         int conversionPerMinute = ((int) colony.getConversionRate()) * farmerCount;
         int totalProductionRate = conversionPerMinute * 4 * 60 * 24; 
         int totalProduction = Math.min(totalProductionRate, colony.getMushroomsCapacity());
         int netMushrooms = totalProduction - totalConsumption;
+
+        if (netMushrooms != lastNetMushrooms) {
+            netMushroomsLabel.setText(String.format("Net Food: %d/day", netMushrooms));
+            lastNetMushrooms = netMushrooms;
+        }
+    }
+
+    private void updateHourGUI() {
+        Engine engine = frame.getEngine();
+        if (engine == null) return;
+        World world = engine.getWorld();
+        if (world == null) return;
+        Colony colony = world.getSpawnHex().getColony();
+        if (colony == null) return;
+
+        // --- Time of Day ---
+        TimeOfDay currentTimeOfDay = world.getTimeOfDay();
+        if (currentTimeOfDay != lastTimeOfDay) {
+            timeOfDayLabel.setIcon(currentTimeOfDay.getIcon());
+            timeOfDayLabel.setToolTipText(currentTimeOfDay.getName());
+            lastTimeOfDay = currentTimeOfDay;
+        }
+
+        // --- Eggs ---
+        int eggs = colony.getEggs() != null ? colony.getEggs().size() : 0;
+        if (eggs != lastEggs) {
+            eggsLabel.setText(String.valueOf(eggs));
+            lastEggs = eggs;
+        }
+        
+        // --- Resources ---
+        int plants = colony.getPlants();     
+        int protein = colony.getProtein();  
+        if (plants != lastPlants) {
+            planLabel.setText(String.valueOf(plants));
+            lastPlants = plants;
+        }
+        if (protein != lastProtein) {
+            proteinLabel.setText(String.valueOf(protein));
+            lastProtein = protein;
+        }
+
+        // --- Colony Stats ---
+        int totalConsumption = colony.getTotalConsumption();
+        if (totalConsumption != lastTotalConsumption) {
+            totalConsumptionLabel.setText(String.format("Consumption: %d/day", totalConsumption));
+            lastTotalConsumption = totalConsumption;
+        }
+
+        int farmerCount = colony.getAssignedRoleCount(GameConstants.ROLE_FARMER);
+        int conversionPerMinute = ((int) colony.getConversionRate()) * farmerCount;
+        int totalProductionRate = conversionPerMinute * 4 * 60 * 24; 
+        int totalProduction = Math.min(totalProductionRate, colony.getMushroomsCapacity());
+        if (totalProduction != lastTotalProduction) {
+            totalProductionLabel.setText(String.format("Max Food Prod: %d/day", totalProduction));
+            lastTotalProduction = totalProduction;
+        }
+
         int layerCount = colony.getAssignedRoleCount(GameConstants.ROLE_LAYER);
         int hourlyLayingRate = layerCount * colony.getLayingRate();
         int layingRate = hourlyLayingRate * 24;
+        if (layingRate != lastLayingRate) {
+            layingRateLabel.setText(String.format("Laying Rate: %d/day", layingRate));
+            lastLayingRate = layingRate;
+        }
+
         int nurseCount = colony.getAssignedRoleCount(GameConstants.ROLE_NURSE);
-        int babyAntTotal = eggs + larva + pupa;
+        int babyAntTotal = colony.getEggs().size() + colony.getLarvae().size() + colony.getPupae().size();
         int nurseCapacity = (int) (nurseCount * colony.getNursingRate());
+        if (babyAntTotal != lastBabyAntTotal || nurseCapacity != lastNurseCapacity) {
+            nurseCoverageLabel.setText(String.format("Nurse Coverage: %d/%d", babyAntTotal, nurseCapacity));
+            lastBabyAntTotal = babyAntTotal;
+            lastNurseCapacity = nurseCapacity;
+        }
+
         int graverCount = colony.getAssignedRoleCount(GameConstants.ROLE_GRAVER);
         int graveCapacity = graverCount * (int) colony.getGravingRate();
-        int rancherCount = colony.getAssignedRoleCount(GameConstants.ROLE_RANCHER);
-        // TODO: Add real ranching logic when implemented in Colony.java
-        int ranchingRate = 0; // Placeholder
+        if (graveCapacity != lastGraveCapacity) {
+            graveKeepingLabel.setText("Grave Capacity: " + graveCapacity);
+            lastGraveCapacity = graveCapacity;
+        }
 
-        // Ant Totals
+        int rancherCount = colony.getAssignedRoleCount(GameConstants.ROLE_RANCHER);
+        int ranchingRate = 0; // Placeholder
+        if (ranchingRate != lastRanchingRate) {
+            ranchingRateLabel.setText("Ranching: " + ranchingRate);
+            lastRanchingRate = ranchingRate;
+        }
+    }
+
+    private void updateDayGUI() {
+        Engine engine = frame.getEngine();
+        if (engine == null) return;
+        World world = engine.getWorld();
+        if (world == null) return;
+        Colony colony = world.getSpawnHex().getColony();
+        if (colony == null) return;
+
+        // --- Moon Phase ---
+        MoonPhase currentMoonPhase = world.getMoonPhase();
+        if (currentMoonPhase != lastMoonPhase) {
+            moonPhaseLabel.setIcon(currentMoonPhase.getIcon());
+            moonPhaseLabel.setToolTipText(currentMoonPhase.getName());
+            lastMoonPhase = currentMoonPhase;
+        }
+
+        // --- Ant Counts ---
+        int totalAnts = colony.getAntTotal();
+        if (totalAnts != lastTotalAnts) {
+            totalAntLabel.setText("Total ants: " + totalAnts);
+            lastTotalAnts = totalAnts;
+        }
+
+        int queens = colony.getQueens() != null ? colony.getQueens().size() : 0;
+        if (queens != lastQueens) {
+            queensLabel.setText(String.valueOf(queens));
+            lastQueens = queens;
+        }
+        
+        int princesses = colony.getPrincesses() != null ? colony.getPrincesses().size() : 0;
+        if (princesses != lastPrincesses) {
+            princessLabel.setText(String.valueOf(princesses));
+            lastPrincesses = princesses;
+        }
+
+        int drones = colony.getDrones() != null ? colony.getDrones().size() : 0;
+        if (drones != lastDrones) {
+            droneLabel.setText(String.valueOf(drones));
+            lastDrones = drones;
+        }
+
+        int majors = colony.getMajors() != null ? colony.getMajors().size() : 0;
+        if (majors != lastMajors) {
+            majorLabel.setText(String.valueOf(majors));
+            lastMajors = majors;
+        }
+
+        int soldiers = colony.getSoldiers() != null ? colony.getSoldiers().size() : 0;
+        if (soldiers != lastSoldiers) {
+            soldiersLabel.setText(String.valueOf(soldiers));
+            lastSoldiers = soldiers;
+        }
+
+        int workers = colony.getWorkers() != null ? colony.getWorkers().size() : 0;
+        if (workers != lastWorkers) {
+            workersLabel.setText(String.valueOf(workers));
+            lastWorkers = workers;
+        }
+
+        int pupa = colony.getPupae() != null ? colony.getPupae().size() : 0;
+        if (pupa != lastPupa) {
+            pupaLabel.setText(String.valueOf(pupa));
+            lastPupa = pupa;
+        }
+
+        int larva = colony.getLarvae() != null ? colony.getLarvae().size() : 0;
+        if (larva != lastLarva) {
+            larvaLabel.setText(String.valueOf(larva));
+            lastLarva = larva;
+        }
+
+        int eggs = colony.getEggs() != null ? colony.getEggs().size() : 0;
+        if (eggs != lastEggs) {
+            eggsLabel.setText(String.valueOf(eggs));
+            lastEggs = eggs;
+        }
+
+        int deadAnts = colony.getDeadAnts() != null ? colony.getDeadAnts().size() : 0;
+        if (deadAnts != lastDeadAnts) {
+            deadAntsLabel.setText(String.valueOf(deadAnts));
+            lastDeadAnts = deadAnts;
+        }
+        
+        // --- Ant Totals ---
         int babyTotal = eggs + larva + pupa;
+        if (babyTotal != lastBabyTotal) {
+            babyAntsLabel.setText("Baby Ants: " + babyTotal);
+            lastBabyTotal = babyTotal;
+        }
+        
         int adultTotal = queens + princesses + drones + majors + soldiers + workers;
+        if (adultTotal != lastAdultTotal) {
+            adultAntsLabel.setText("Adult Ants: " + adultTotal);
+            lastAdultTotal = adultTotal;
+        }
 
         int mushrooms = colony.getMushrooms(); 
-        int plants = colony.getPlants();     
-        int protein = colony.getProtein();  
-        int water = colony.getWater();
-        int syrups = colony.getSyrups();
-        int resins = colony.getResins();
-        int minerals = colony.getMinerals();
-        int totalResources = mushrooms + plants + protein + water + syrups + resins + minerals;
+        if (mushrooms != lastMushrooms) {
+            mushroomsLabel.setText(String.valueOf(mushrooms));
+            lastMushrooms = mushrooms;
+        }
+    }
 
-        totalAntLabel.setText("Total ants: " + totalAnts);
-        queensLabel.setText(String.valueOf(queens));
-        princessLabel.setText(String.valueOf(princesses));
-        droneLabel.setText(String.valueOf(drones));
-        majorLabel.setText(String.valueOf(majors));
-        soldiersLabel.setText(String.valueOf(soldiers));
-        workersLabel.setText(String.valueOf(workers));
-        pupaLabel.setText(String.valueOf(pupa));
-        larvaLabel.setText(String.valueOf(larva));
-        eggsLabel.setText(String.valueOf(eggs));
-        deadAntsLabel.setText(String.valueOf(deadAnts));
-
-        totalResourcesLabel.setText("Total resources: " + totalResources);
-        mushroomsLabel.setText(String.valueOf(mushrooms));
-        planLabel.setText(String.valueOf(plants));
-        proteinLabel.setText(String.valueOf(protein));
-        waterLabel.setText(String.valueOf(water));
-        syrupLabel.setText(String.valueOf(syrups));
-        resinLabel.setText(String.valueOf(resins));
-        mineralLabel.setText(String.valueOf(minerals));
-
-        totalConsumptionLabel.setText("Consumption: " + totalConsumption + "/day");
-        totalProductionLabel.setText("Max Food Prod: " + totalProduction + "/day");
-        netMushroomsLabel.setText("Net Food: " + netMushrooms + "/day");
-        layingRateLabel.setText("Laying Rate: " + layingRate + "/day");
-        nurseCoverageLabel.setText(String.format("Nurse Coverage: %d/%d", babyAntTotal, nurseCapacity));
-        graveKeepingLabel.setText("Grave Capacity: " + graveCapacity);
-        ranchingRateLabel.setText("Ranching: " + ranchingRate);
-        babyAntsLabel.setText("Baby Ants: " + babyTotal);
-        adultAntsLabel.setText("Adult Ants: " + adultTotal);
-
-        String dateTime = String.format("%02d:%02d %02d/%02d/%04d",
-        world.getHour(), world.getMinute(), world.getDay(), world.getMonth(), world.getYear());
-        dateTimeLabel.setText(dateTime);
-
-        TimeOfDay currentTimeOfDay = world.getTimeOfDay();
-        timeOfDayLabel.setIcon(currentTimeOfDay.getIcon());
-        timeOfDayLabel.setToolTipText(currentTimeOfDay.getName());
-
-        MoonPhase currentMoonPhase = world.getMoonPhase();
-        moonPhaseLabel.setIcon(currentMoonPhase.getIcon());
-        moonPhaseLabel.setToolTipText(currentMoonPhase.getName());
+    private void updateMonthGUI() {
+        Engine engine = frame.getEngine();
+        if (engine == null) return;
+        World world = engine.getWorld();
+        if (world == null) return;
 
         Season currentSeason = world.getSeason();
-        seasonLabel.setIcon(currentSeason.getIcon());
-        seasonLabel.setToolTipText(currentSeason.getName());
-
-        Weather currentWeather = world.getWeather();
-        weatherLabel.setIcon(currentWeather.getIcon());
-        weatherLabel.setToolTipText(currentWeather.getName());
-
-        if (world.getSpawnHex().getBiome() != null) {
-            biomeLabel.setText("Biome: " + world.getSpawnHex().getBiome().getName());
-        } else {
-            biomeLabel.setText("Biome: N/A");
+        if (currentSeason != lastSeason) {
+            seasonLabel.setIcon(currentSeason.getIcon());
+            seasonLabel.setToolTipText(currentSeason.getName());
+            lastSeason = currentSeason;
         }
-        temperatureLabel.setText("Temp: " + world.getTemperature() + "°C");
-        humidityLabel.setText("Humidity: " + world.getHumidity());
     }
 }

@@ -213,6 +213,11 @@ public class World {
             this.timeOfDay = GameConstants.NIGHT_TIME;
         }
 
+        // --- Notify Hour Listeners ---
+        if (engine != null) {
+            engine.notifyHourListeners();
+        }
+
         if (this.hour > 23) {
             this.hour = 0;
             this.runDay();
@@ -248,6 +253,11 @@ public class World {
             this.moonPhase = GameConstants.NEW_MOON_PHASE;
         }
 
+        // --- Notify Day Listeners ---
+        if (engine != null) {
+            engine.notifyDayListeners();
+        }
+
         if (this.day > 30) {
             this.day = 1;
             this.runMonth();
@@ -279,6 +289,11 @@ public class World {
             }
         } catch (Exception ex) {
             ex.printStackTrace();
+        }
+
+        // --- Notify Month Listeners ---
+        if (engine != null) {
+            engine.notifyMonthListeners();
         }
 
         if (this.month > 12) {

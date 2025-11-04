@@ -385,8 +385,6 @@ public class SaveManager {
         writeJsonLine(w, "hatchRateDrone", s.getHatchRateDrone(), false);
         writeJsonLine(w, "hatchRatePrincess", s.getHatchRatePrincess(), false);
 
-        // Settings removed
-
         // Roles
         w.write("  \"assignedRoleCounts\": ");
         w.write(serializeMapToJson(s.getAssignedRoleCounts()));
@@ -471,8 +469,6 @@ public class SaveManager {
             s.setHatchRateMajor(Float.parseFloat(m.getOrDefault("hatchRateMajor", "5.0")));
             s.setHatchRateDrone(Float.parseFloat(m.getOrDefault("hatchRateDrone", "5.0")));
             s.setHatchRatePrincess(Float.parseFloat(m.getOrDefault("hatchRatePrincess", "5.0")));
-
-            // Settings removed
             
             String rolesJson = m.getOrDefault("assignedRoleCounts", "{}");
             if (rolesJson.startsWith("\"")) {
