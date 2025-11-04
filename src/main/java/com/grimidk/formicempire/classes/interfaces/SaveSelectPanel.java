@@ -68,18 +68,28 @@ public class SaveSelectPanel extends JPanel {
     private void onCreateOrLoad(int slotId, int idx) {
         Savefile existing = saveManager.loadSlot(slotId);
         if (existing == null) {
+            // --- Create New Game ---
             String name = JOptionPane.showInputDialog(this, "Enter save name:", "Create Save", JOptionPane.PLAIN_MESSAGE);
             if (name == null || name.trim().isEmpty()) return;
+            
             Savefile save = new Savefile(slotId, name.trim());
-            captureGameStateIntoSave(save);
+            captureGameStateIntoSave(save); 
+            
             saveManager.saveUserSlotAsync(save, () -> {
-                JOptionPane.showMessageDialog(this, "Save completed in slot " + slotId, "Saved", JOptionPane.INFORMATION_MESSAGE);
+                Savefile newSave = saveManager.loadSlot(slotId);
+                if (newSave != null) {
+                    HelpPanel.showTutorialDialog(frame);
+                    frame.openGameWithSave(newSave);
+                } else {
+                    JOptionPane.showMessageDialog(frame, "Failed to create new save file.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
                 refreshSlots();
             });
         } else {
+            // --- Load Existing Game ---
             frame.openGameWithSave(existing);
+            refreshSlots();
         }
-        refreshSlots();
     }
 
     private void onDelete(int slotId, int idx) {
@@ -93,14 +103,8 @@ public class SaveSelectPanel extends JPanel {
     private void captureGameStateIntoSave(Savefile save) {
         Engine eng = frame.getEngine();
         if (eng == null) return;
-
-        save.setLanguage(eng.getLanguage());
-        save.setAllowTurboMode(eng.isAllowTurboMode());
-        save.setScreenSize(eng.getScreenSize());
-        save.setFullScreen(eng.isFullScreen());
-        save.setAutosaveFrequency(eng.getAutosaveFrequency());
-
         World w = eng.getWorld();
+        
         if (w != null) {
             save.setMinute(w.getMinute());
             save.setHour(w.getHour());

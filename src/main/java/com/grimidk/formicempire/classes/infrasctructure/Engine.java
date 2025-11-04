@@ -13,6 +13,7 @@ public class Engine extends Thread {
     private boolean killSwitch;
     private volatile boolean paused;
     private final CopyOnWriteArrayList<Runnable> tickListeners = new CopyOnWriteArrayList<>();
+    private final SaveManager settingsSaveManager;
 
     // Settings
     private String language = "en";
@@ -26,6 +27,16 @@ public class Engine extends Thread {
         this.semaphore = new Semaphore(1);
         this.killSwitch = false;
         this.paused = true;
+        this.settingsSaveManager = new SaveManager();
+        this.loadGlobalSettings();
+    }
+
+    public void loadGlobalSettings() {
+        this.settingsSaveManager.loadSettings(this);
+    }
+
+    public void saveGlobalSettings() {
+        this.settingsSaveManager.saveSettings(this);
     }
 
     public World getWorld() {
@@ -105,14 +116,6 @@ public class Engine extends Thread {
         System.out.println("Loading new world...");
         World world = new World();
         this.setWorld(world);
-
-        if (savefile != null) {
-            this.setLanguage(savefile.getLanguage());
-            this.setAllowTurboMode(savefile.isAllowTurboMode());
-            this.setScreenSize(savefile.getScreenSize());
-            this.setFullScreen(savefile.isFullScreen());
-            this.setAutosaveFrequency(savefile.getAutosaveFrequency());
-        }
 
         this.loadFile(savefile);
         try {

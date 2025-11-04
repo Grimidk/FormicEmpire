@@ -42,7 +42,7 @@ public class SettingsPanel extends JPanel {
 
         // Screen Size
         c.gridy = 1; c.gridx = 0; add(new JLabel("Screen Size:"), c);
-        sizeCombo = new JComboBox<>(new String[]{"1000x700", "1280x720", "1600x900", "1920x1080"});
+        sizeCombo = new JComboBox<>(new String[]{"1000x700", "1280x720", "1600x900", "1920x1000"});
         sizeCombo.setEditable(true);
         c.gridx = 1; add(sizeCombo, c);
 
@@ -109,6 +109,7 @@ public class SettingsPanel extends JPanel {
             engine.setAutosaveFrequency(selectedFreq.value);
         }
 
+        engine.saveGlobalSettings(); 
         frame.applyEngineSettings();
         JOptionPane.showMessageDialog(this, "Settings saved and applied.", "Settings", JOptionPane.INFORMATION_MESSAGE);
     }

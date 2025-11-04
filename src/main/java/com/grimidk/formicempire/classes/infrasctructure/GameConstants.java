@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.swing.ImageIcon;
-import java.net.URL; // Import URL
+import java.net.URL; 
 
 public final class GameConstants {
     private GameConstants() {}
@@ -100,7 +100,7 @@ public final class GameConstants {
     public static final Season WINTER_SEASON = new Season(4, "Winter", 1/2f, 1, 
         loadIcon("icons/seasons/winter.png"));
 
-    // Weather
+    // --- Weather ---
     public static final Weather CLEAR_WEATHER = new Weather(1, "Clear", 1, 0, 
         loadIcon("icons/weather/clear.png"));
     public static final Weather RAIN_WEATHER = new Weather(2, "Rain", 1, 1, 

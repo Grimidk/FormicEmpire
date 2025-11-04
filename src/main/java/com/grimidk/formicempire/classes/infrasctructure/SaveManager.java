@@ -48,6 +48,10 @@ public class SaveManager {
         return new File(savesDir, fileName);
     }
 
+    private File getSettingsFile() {
+        return new File(savesDir, "settings.json");
+    }
+
     private void writeSaveToFile(Savefile save, File targetFile) throws IOException {
         File tmp = new File(targetFile.getAbsolutePath() + ".tmp");
         try (BufferedWriter bw = Files.newBufferedWriter(tmp.toPath(), StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {
@@ -85,7 +89,7 @@ public class SaveManager {
         } catch (Exception ignore) {
             slotId = 0; 
         }
-        saveWorldToSlot(w, e, slotId);
+        saveWorldToSlot(w, slotId);
     }
 
     public void saveUserSlot(Savefile save) throws IOException {
@@ -123,7 +127,7 @@ public class SaveManager {
         return removed;
     }
 
-    public void saveWorldToSlot(World w, Engine e, int slotId) {
+    public void saveWorldToSlot(World w, int slotId) {
         if (w == null) return;
         
         if (slotId == 0) {
@@ -131,9 +135,20 @@ public class SaveManager {
             return;
         }
 
+        String nameToUse = "Autosave"; 
+        File manualFile = getSlotFile(slotId, "manual");
+        if (manualFile.exists() && manualFile.length() > 0) {
+            try (BufferedReader r = Files.newBufferedReader(manualFile.toPath(), StandardCharsets.UTF_8)) {
+                Savefile existingManual = readSaveFromReader(r);
+                if (existingManual != null && existingManual.getName() != null && !existingManual.getName().trim().isEmpty()) {
+                    nameToUse = existingManual.getName(); 
+                }
+            } catch (Exception ignore) {}
+        }
+
         File f = getSlotFile(slotId, "autosave");
-        Savefile save = new Savefile(slotId, "autosave");
-        populateSavefileFromGame(save, w, e);
+        Savefile save = new Savefile(slotId, nameToUse);
+        populateSavefileFromGame(save, w);
 
         try {
             if (slotId > 0) {
@@ -184,7 +199,7 @@ public class SaveManager {
         }
     }
 
-    public void saveWorldToSlotUser(World w, Engine e, int slotId) throws IOException {
+    public void saveWorldToSlotUser(World w, int slotId) throws IOException {
         if (w == null) return;
         
         String slotName = "Save " + slotId;
@@ -196,22 +211,22 @@ public class SaveManager {
         } catch (Exception ignore) {
         }
         
-        saveWorldToSlotUser(w, e, slotId, slotName);
+        saveWorldToSlotUser(w, slotId, slotName);
     }
     
-    public void saveWorldToSlotUser(World w, Engine e, int slotId, String name) throws IOException {
+    public void saveWorldToSlotUser(World w, int slotId, String name) throws IOException {
         if (w == null) return;
         
         String saveName = (name != null && !name.isEmpty()) ? name : ("Save " + slotId);
         Savefile save = new Savefile(slotId, saveName);
-        populateSavefileFromGame(save, w, e);
+        populateSavefileFromGame(save, w);
         writeManualSave(save);
     }
 
     public void saveWorldToSlotUserAsync(World w, Engine e, int slotId, Runnable onComplete) {
         executor.submit(() -> {
             try {
-                saveWorldToSlotUser(w, e, slotId); 
+                saveWorldToSlotUser(w, slotId); 
                 if (onComplete != null) SwingUtilities.invokeLater(onComplete);
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -222,7 +237,7 @@ public class SaveManager {
     public void saveWorldToSlotUserAsync(World w, Engine e, int slotId, String name, Runnable onComplete) {
         executor.submit(() -> {
             try {
-                saveWorldToSlotUser(w, e, slotId, name); 
+                saveWorldToSlotUser(w, slotId, name); 
                 if (onComplete != null) SwingUtilities.invokeLater(onComplete);
             } catch (Exception err) {
                 err.printStackTrace();
@@ -252,21 +267,13 @@ public class SaveManager {
         });
     }
     
-    private void populateSavefileFromGame(Savefile save, World w, Engine e) {
+    private void populateSavefileFromGame(Savefile save, World w) {
         save.setMinute(w.getMinute());
         save.setHour(w.getHour());
         save.setDay(w.getDay());
         save.setMonth(w.getMonth());
         save.setYear(w.getYear());
         save.setPlayTime(computePlayTime(w)); 
-
-        if (e != null) {
-            save.setLanguage(e.getLanguage());
-            save.setAllowTurboMode(e.isAllowTurboMode());
-            save.setScreenSize(e.getScreenSize());
-            save.setFullScreen(e.isFullScreen());
-            save.setAutosaveFrequency(e.getAutosaveFrequency());
-        }
         
         if (w.getHexes() != null && !w.getHexes().isEmpty()) {
             try {
@@ -365,12 +372,7 @@ public class SaveManager {
         writeJsonLine(w, "resins", s.getResins(), false);
         writeJsonLine(w, "minerals", s.getMinerals(), false);
 
-        // Settings
-        writeJsonLine(w, "language", s.getLanguage(), false);
-        writeJsonLine(w, "allowTurboMode", s.isAllowTurboMode(), false);
-        writeJsonLine(w, "screenSize", s.getScreenSize(), false);
-        writeJsonLine(w, "fullScreen", s.isFullScreen(), false);
-        writeJsonLine(w, "autosaveFrequency", s.getAutosaveFrequency(), false);
+        // Settings removed
 
         // Roles
         w.write("  \"assignedRoleCounts\": ");
@@ -451,12 +453,7 @@ public class SaveManager {
             s.setResins(Integer.parseInt(m.getOrDefault("resins", "0")));
             s.setMinerals(Integer.parseInt(m.getOrDefault("minerals", "0")));
 
-            // Settings
-            s.setLanguage(m.getOrDefault("language", "en"));
-            s.setAllowTurboMode(Boolean.parseBoolean(m.getOrDefault("allowTurboMode", "false")));
-            s.setScreenSize(m.getOrDefault("screenSize", "1000x700"));
-            s.setFullScreen(Boolean.parseBoolean(m.getOrDefault("fullScreen", "false")));
-            s.setAutosaveFrequency(Integer.parseInt(m.getOrDefault("autosaveFrequency", "1")));
+            // Settings removed
             
             String rolesJson = m.getOrDefault("assignedRoleCounts", "{}");
             if (rolesJson.startsWith("\"")) {
@@ -524,5 +521,93 @@ public class SaveManager {
         if (str == null) return null;
         return str.replace("\\\"", "\"")
                   .replace("\\\\", "\\");
+    }
+
+    // --- Settings Management ---
+
+    public void saveSettings(Engine engine) {
+        File f = getSettingsFile();
+        File tmp = new File(f.getAbsolutePath() + ".tmp");
+
+        try (BufferedWriter w = Files.newBufferedWriter(tmp.toPath(), StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {
+            w.write("{");
+            w.newLine();
+            writeJsonLine(w, "language", engine.getLanguage(), false);
+            writeJsonLine(w, "allowTurboMode", engine.isAllowTurboMode(), false);
+            writeJsonLine(w, "screenSize", engine.getScreenSize(), false);
+            writeJsonLine(w, "fullScreen", engine.isFullScreen(), false);
+            writeJsonLine(w, "autosaveFrequency", engine.getAutosaveFrequency(), true);
+            w.write("}");
+            w.newLine();
+            w.flush();
+        } catch (IOException e) {
+            try { if (tmp.exists()) tmp.delete(); } catch (Exception ignore) {}
+            e.printStackTrace();
+            return;
+        }
+
+        try {
+            Files.move(tmp.toPath(), f.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+        } catch (AtomicMoveNotSupportedException amnse) {
+            try {
+                Files.move(tmp.toPath(), f.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (IOException e) {
+            try { if (tmp.exists()) tmp.delete(); } catch (Exception ignore) {}
+            e.printStackTrace();
+        }
+        System.out.println("[SaveManager] Saved global settings.");
+    }
+
+    public void loadSettings(Engine engine) {
+        File f = getSettingsFile();
+        if (!f.exists() || f.length() == 0) {
+            System.out.println("[SaveManager] settings.json not found, using defaults.");
+            return;
+        }
+
+        Map<String,String> m = new HashMap<>();
+        try (BufferedReader r = Files.newBufferedReader(f.toPath(), StandardCharsets.UTF_8)) {
+            String line;
+            while ((line = r.readLine()) != null) {
+                line = line.trim();
+                if (line.equals("{") || line.equals("}") || line.isEmpty()) continue;
+
+                int idx = line.indexOf(':');
+                if (idx <= 0) continue;
+                
+                String k = line.substring(0, idx).trim();
+                if (k.startsWith("\"")) k = k.substring(1);
+                if (k.endsWith("\"")) k = k.substring(0, k.length() - 1);
+
+                String v = line.substring(idx + 1).trim();
+                if (v.endsWith(",")) v = v.substring(0, v.length() - 1);
+                
+                if (v.startsWith("\"")) {
+                    v = v.substring(1);
+                    if (v.endsWith("\"")) v = v.substring(0, v.length() - 1);
+                } else if (v.equals("null")) {
+                    v = ""; 
+                }
+                m.put(k, v);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        try {
+            engine.setLanguage(m.getOrDefault("language", engine.getLanguage()));
+            engine.setAllowTurboMode(Boolean.parseBoolean(m.getOrDefault("allowTurboMode", String.valueOf(engine.isAllowTurboMode()))));
+            engine.setScreenSize(m.getOrDefault("screenSize", engine.getScreenSize()));
+            engine.setFullScreen(Boolean.parseBoolean(m.getOrDefault("fullScreen", String.valueOf(engine.isFullScreen()))));
+            engine.setAutosaveFrequency(Integer.parseInt(m.getOrDefault("autosaveFrequency", String.valueOf(engine.getAutosaveFrequency()))));
+            System.out.println("[SaveManager] Global settings loaded.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("[SaveManager] Error parsing settings.json, using defaults.");
+        }
     }
 }

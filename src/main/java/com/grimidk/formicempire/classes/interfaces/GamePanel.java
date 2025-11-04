@@ -269,9 +269,8 @@ private JPanel createNorthPanel() {
             Engine engine = frame.getEngine();
             if (engine == null) return;
 
-            int maxLevel = SPEED_DELAYS.length - 1; // This is 7
+            int maxLevel = SPEED_DELAYS.length - 1; 
             
-            // If turbo is NOT allowed, the max level is 6 (5ms)
             if (!engine.isAllowTurboMode()) {
                 maxLevel = 6;
             }
@@ -300,14 +299,44 @@ private JPanel createNorthPanel() {
         gameMenu = new JPopupMenu();
         JMenuItem backToGame = new JMenuItem("Back to Game");
         JMenuItem manageRoles = new JMenuItem("Manage Roles");
+        JMenuItem openSettings = new JMenuItem("Settings");
+        JMenuItem showTutorial = new JMenuItem("Show Tutorial");
         JMenuItem quitToMenu = new JMenuItem("Quit to Main Menu");
 
         backToGame.addActionListener(e -> gameMenu.setVisible(false));
         manageRoles.addActionListener(e -> showRoleManagementDialog(0));
+        
+        openSettings.addActionListener(e -> {
+            Engine engine = frame.getEngine();
+            if (engine != null) {
+                engine.pauseEngine();
+            }
+            playPauseButton.setText("Play (Space)");
+            updateStatusIndicator(true);
+
+            try {
+                SaveManager sm = new SaveManager();
+                if (engine != null && engine.getWorld() != null) {
+                    sm.saveAutosaveAsync(engine.getWorld(), engine, () -> {
+                        frame.showCard(MainFrame.CARD_SETTINGS);
+                    });
+                } else {
+                    frame.showCard(MainFrame.CARD_SETTINGS);
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                frame.showCard(MainFrame.CARD_SETTINGS);
+            }
+        });
+        
+        showTutorial.addActionListener(e -> HelpPanel.showTutorialDialog(frame));
+        
         quitToMenu.addActionListener(e -> handleBackButton());
         
         gameMenu.add(backToGame);
         gameMenu.add(manageRoles);
+        gameMenu.add(openSettings);
+        gameMenu.add(showTutorial);
         gameMenu.add(new JSeparator());
         gameMenu.add(quitToMenu);
 
@@ -602,7 +631,7 @@ private JPanel createNorthPanel() {
                     });
                     return;
                 } else {
-                    sm.saveWorldToSlot(engine.getWorld(), engine, 0);
+                    sm.saveWorldToSlot(engine.getWorld(), 0);
                     frame.showCard(MainFrame.CARD_SAVE);
                     return;
                 }
@@ -681,10 +710,9 @@ private JPanel createNorthPanel() {
         Engine eng = frame.getEngine();
         if (eng == null) return;
 
-        // Check bounds, especially if turbo was just turned off
         int maxLevel = SPEED_DELAYS.length - 1;
-        if (!eng.isAllowTurboMode() && maxLevel == 7) { // 7 is 1ms
-             maxLevel = 6; // 6 is 5ms
+        if (!eng.isAllowTurboMode() && maxLevel == 7) {
+             maxLevel = 6; 
         }
         
         if (speedLevel > maxLevel) {
@@ -703,7 +731,7 @@ private JPanel createNorthPanel() {
             tickLabel.setText("Tick: PAUSED");
         } else {
             eng.setDelay(delay);
-            eng.resumeEngine(); // Always resume if not paused
+            eng.resumeEngine(); 
             updateStatusIndicator(false);
             playPauseButton.setText("Pause (Space)");
             updateTickLabel(eng);
