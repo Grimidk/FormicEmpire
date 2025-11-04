@@ -63,6 +63,12 @@ public class Colony {
     private int baseSpeed;  
     private int baseSize;
 
+    private float hatchRateWorker;
+    private float hatchRateSoldier;
+    private float hatchRateMajor;
+    private float hatchRateDrone;
+    private float hatchRatePrincess;
+
     private void initializeLists() {
         this.antGroups.put(GameConstants.TYPE_EGG, new ArrayList<Ant>());
         this.antGroups.put(GameConstants.TYPE_LARVA, new ArrayList<Ant>());
@@ -117,6 +123,12 @@ public class Colony {
         this.mineralsCapacity = 100;
         this.eggsCapacity = 50;
         this.queensCapacity = 2;
+
+        this.hatchRateWorker = 90.0f;
+        this.hatchRateSoldier = 10.0f;
+        this.hatchRateMajor = 0.0f;
+        this.hatchRateDrone = 0.0f;
+        this.hatchRatePrincess = 0.0f;
     }
 
     public Colony(int id, String name, boolean isPlayer) {
@@ -159,6 +171,12 @@ public class Colony {
                 }
             }
         }
+        
+        this.hatchRateWorker = savefile.getHatchRateWorker();
+        this.hatchRateSoldier = savefile.getHatchRateSoldier();
+        this.hatchRateMajor = savefile.getHatchRateMajor();
+        this.hatchRateDrone = savefile.getHatchRateDrone();
+        this.hatchRatePrincess = savefile.getHatchRatePrincess();
 
         populateAntList(getEggs(), savefile.getEggs(), GameConstants.TYPE_EGG);
         populateAntList(getLarvae(), savefile.getLarvae(), GameConstants.TYPE_LARVA);
@@ -607,6 +625,34 @@ public class Colony {
         return assignedRoleCounts;
     }
     
+    public float getHatchRateWorker() { return hatchRateWorker; }
+    public void setHatchRateWorker(float hatchRateWorker) { this.hatchRateWorker = hatchRateWorker; }
+    public float getHatchRateSoldier() { return hatchRateSoldier; }
+    public void setHatchRateSoldier(float hatchRateSoldier) { this.hatchRateSoldier = hatchRateSoldier; }
+    public float getHatchRateMajor() { return hatchRateMajor; }
+    public void setHatchRateMajor(float hatchRateMajor) { this.hatchRateMajor = hatchRateMajor; }
+    public float getHatchRateDrone() { return hatchRateDrone; }
+    public void setHatchRateDrone(float hatchRateDrone) { this.hatchRateDrone = hatchRateDrone; }
+    public float getHatchRatePrincess() { return hatchRatePrincess; }
+    public void setHatchRatePrincess(float hatchRatePrincess) { this.hatchRatePrincess = hatchRatePrincess; }
+
+    public float getHatchRate(AntType type) {
+        if (type == GameConstants.TYPE_WORKER) return hatchRateWorker;
+        if (type == GameConstants.TYPE_SOLDIER) return hatchRateSoldier;
+        if (type == GameConstants.TYPE_MAJOR) return hatchRateMajor;
+        if (type == GameConstants.TYPE_DRONE) return hatchRateDrone;
+        if (type == GameConstants.TYPE_PRINCESS) return hatchRatePrincess;
+        return 0f;
+    }
+
+    public void setHatchRate(AntType type, float rate) {
+        if (type == GameConstants.TYPE_WORKER) this.hatchRateWorker = rate;
+        else if (type == GameConstants.TYPE_SOLDIER) this.hatchRateSoldier = rate;
+        else if (type == GameConstants.TYPE_MAJOR) this.hatchRateMajor = rate;
+        else if (type == GameConstants.TYPE_DRONE) this.hatchRateDrone = rate;
+        else if (type == GameConstants.TYPE_PRINCESS) this.hatchRatePrincess = rate;
+    }
+
     public void startColony() {
         List<Ant> workerList = getWorkers();
         for (int i = 0; i < 9; i++) {
@@ -691,33 +737,30 @@ public class Colony {
     }
 
     private AntType determineHatchType() {
-        double rand = Math.random();
-        if (rand < 0.8) {
+        double rand = Math.random() * 100.0;
+        double cumulative = 0.0;
+
+        cumulative += this.hatchRateWorker;
+        if (rand < cumulative) {
             return GameConstants.TYPE_WORKER;
-        } else if (rand < 0.90) {
-            return GameConstants.TYPE_SOLDIER;
-        } else if (rand < 0.97) {
-            // if () {
-            //     return GameConstants.TYPE_MAJOR;
-            // } else {
-            //     return GameConstants.TYPE_SOLDIER;
-            // }
-            return GameConstants.TYPE_SOLDIER;
-        } else if (rand < 0.99) {
-            // if () {
-            //     return GameConstants.TYPE_DRONE;
-            // } else {
-            //     return GameConstants.TYPE_SOLDIER;
-            // }
-            return GameConstants.TYPE_SOLDIER;
-        } else {
-            // if () {
-            //     return GameConstants.TYPE_PRINCESS;
-            // } else {
-            //     return GameConstants.TYPE_SOLDIER;
-            // }
+        }
+
+        cumulative += this.hatchRateSoldier;
+        if (rand < cumulative) {
             return GameConstants.TYPE_SOLDIER;
         }
+        
+        cumulative += this.hatchRateMajor;
+        if (rand < cumulative) {
+            return GameConstants.TYPE_MAJOR;
+        }
+
+        cumulative += this.hatchRateDrone;
+        if (rand < cumulative) {
+            return GameConstants.TYPE_DRONE;
+        }
+        
+        return GameConstants.TYPE_PRINCESS;
     }
 
     private void evolveAnts(List<Ant> sourceList, List<Ant> destList, AntType newType) {

@@ -46,6 +46,12 @@ public class Savefile implements Serializable {
     private int minerals;
     private int mineralsCapacity;
 
+    private float hatchRateWorker;
+    private float hatchRateSoldier;
+    private float hatchRateMajor;
+    private float hatchRateDrone;
+    private float hatchRatePrincess;
+
     private Map<String, Integer> assignedRoleCounts;
 
     public Savefile(int id, String name) {
@@ -57,6 +63,12 @@ public class Savefile implements Serializable {
         this.day = 1;
         this.month = 1;
         this.year = 0; 
+
+        this.hatchRateWorker = 70.0f;
+        this.hatchRateSoldier = 15.0f;
+        this.hatchRateMajor = 5.0f;
+        this.hatchRateDrone = 5.0f;
+        this.hatchRatePrincess = 5.0f;
     }
 
     public int getId() {
@@ -337,6 +349,17 @@ public class Savefile implements Serializable {
     public void setMineralsCapacity(int mineralsCapacity) {
         this.mineralsCapacity = mineralsCapacity;
     }
+
+    public float getHatchRateWorker() { return hatchRateWorker; }
+    public void setHatchRateWorker(float hatchRateWorker) { this.hatchRateWorker = hatchRateWorker; }
+    public float getHatchRateSoldier() { return hatchRateSoldier; }
+    public void setHatchRateSoldier(float hatchRateSoldier) { this.hatchRateSoldier = hatchRateSoldier; }
+    public float getHatchRateMajor() { return hatchRateMajor; }
+    public void setHatchRateMajor(float hatchRateMajor) { this.hatchRateMajor = hatchRateMajor; }
+    public float getHatchRateDrone() { return hatchRateDrone; }
+    public void setHatchRateDrone(float hatchRateDrone) { this.hatchRateDrone = hatchRateDrone; }
+    public float getHatchRatePrincess() { return hatchRatePrincess; }
+    public void setHatchRatePrincess(float hatchRatePrincess) { this.hatchRatePrincess = hatchRatePrincess; }
 
     public Map<String, Integer> getAssignedRoleCounts() {
         return assignedRoleCounts;

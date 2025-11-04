@@ -21,7 +21,9 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class GamePanel extends JPanel {
@@ -127,11 +129,11 @@ public class GamePanel extends JPanel {
         seasonLabel = new JLabel();    
         weatherLabel = new JLabel();  
 
-        speedDownButton = new JButton("Speed- (-)");
-        speedUpButton = new JButton("Speed+ (+)");
+        speedDownButton = new JButton("Speed-");
+        speedUpButton = new JButton("Speed+");
         tickLabel = new JLabel("Tick: 250ms");
-        playPauseButton = new JButton("Pause (Space)");
-        menuButton = new JButton("Menu (ESC)");
+        playPauseButton = new JButton("Pause");
+        menuButton = new JButton("Menu");
 
         antsDetailPanel = new JPanel();
         antsDetailPanel.setBorder(new TitledBorder("Ants"));
@@ -287,11 +289,11 @@ private JPanel createNorthPanel() {
             if (engine == null || !engineStarted) return;
             if (engine.isPaused()) {
                 engine.resumeEngine();
-                playPauseButton.setText("Pause (Space)");
+                playPauseButton.setText("Pause");
                 updateStatusIndicator(false);
             } else {
                 engine.pauseEngine();
-                playPauseButton.setText("Play (Space)");
+                playPauseButton.setText("Play");
                 updateStatusIndicator(true);
             }
         });
@@ -299,19 +301,21 @@ private JPanel createNorthPanel() {
         gameMenu = new JPopupMenu();
         JMenuItem backToGame = new JMenuItem("Back to Game");
         JMenuItem manageRoles = new JMenuItem("Manage Roles");
+        JMenuItem manageHatchRates = new JMenuItem("Manage Hatch Rates");
         JMenuItem openSettings = new JMenuItem("Settings");
         JMenuItem showTutorial = new JMenuItem("Show Tutorial");
         JMenuItem quitToMenu = new JMenuItem("Quit to Main Menu");
 
         backToGame.addActionListener(e -> gameMenu.setVisible(false));
         manageRoles.addActionListener(e -> showRoleManagementDialog(0));
+        manageHatchRates.addActionListener(e -> showHatchRateDialog());
         
         openSettings.addActionListener(e -> {
             Engine engine = frame.getEngine();
             if (engine != null) {
                 engine.pauseEngine();
             }
-            playPauseButton.setText("Play (Space)");
+            playPauseButton.setText("Play");
             updateStatusIndicator(true);
 
             try {
@@ -335,6 +339,7 @@ private JPanel createNorthPanel() {
         
         gameMenu.add(backToGame);
         gameMenu.add(manageRoles);
+        gameMenu.add(manageHatchRates);
         gameMenu.add(openSettings);
         gameMenu.add(showTutorial);
         gameMenu.add(new JSeparator());
@@ -343,6 +348,106 @@ private JPanel createNorthPanel() {
         menuButton.addActionListener(e -> {
             gameMenu.show(menuButton, 0, -gameMenu.getPreferredSize().height);
         });
+    }
+
+    private void showHatchRateDialog() {
+        Engine engine = frame.getEngine();
+        if (engine == null || engine.getWorld() == null || engine.getWorld().getSpawnHex() == null) {
+            return;
+        }
+        Colony colony = engine.getWorld().getSpawnHex().getColony();
+        if (colony == null) return;
+
+        JDialog hatchDialog = new JDialog(frame, "Manage Pupa Hatch Rates", true);
+        hatchDialog.setLayout(new BorderLayout());
+        
+        JPanel panel = createHatchRatePanel(colony);
+        hatchDialog.add(panel, BorderLayout.CENTER);
+
+        JButton closeButton = new JButton("Close");
+        closeButton.addActionListener(e -> hatchDialog.dispose());
+        JPanel southPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        southPanel.add(closeButton);
+        hatchDialog.add(southPanel, BorderLayout.SOUTH);
+
+        hatchDialog.setPreferredSize(new Dimension(400, 350));
+        hatchDialog.pack();
+        hatchDialog.setLocationRelativeTo(frame);
+        hatchDialog.setVisible(true);
+    }
+
+    private JPanel createHatchRatePanel(Colony colony) {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JLabel totalLabel = new JLabel("Total: 100.00%");
+        totalLabel.setFont(totalLabel.getFont().deriveFont(Font.BOLD));
+        
+        panel.add(new JLabel("Set hatch chance for new ants:"));
+        panel.add(totalLabel);
+        panel.add(new JSeparator(SwingConstants.HORIZONTAL));
+        
+        Map<AntType, JSpinner> spinnerMap = new HashMap<>();
+        List<AntType> typesToRate = Arrays.asList(
+            GameConstants.TYPE_WORKER,
+            GameConstants.TYPE_SOLDIER,
+            GameConstants.TYPE_MAJOR,
+            GameConstants.TYPE_DRONE,
+            GameConstants.TYPE_PRINCESS
+        );
+
+        for (AntType type : typesToRate) {
+            JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            
+            JLabel typeLabel = new JLabel(type.getIcon());
+            typeLabel.setToolTipText(type.getName());
+            row.add(typeLabel);
+            
+            float currentRate = colony.getHatchRate(type);
+            SpinnerModel model = new SpinnerNumberModel((double)currentRate, 0.0, 100.0, 0.01);
+            JSpinner spinner = new JSpinner(model);
+            spinner.setPreferredSize(new Dimension(80, 25));
+
+            spinner.addChangeListener(e -> {
+                double newValue = (Double) spinner.getValue();
+                colony.setHatchRate(type, (float)newValue);
+                updateHatchRateTotals(colony, totalLabel, spinnerMap);
+            });
+            
+            spinnerMap.put(type, spinner);
+            row.add(spinner);
+            panel.add(row);
+        }
+        
+        updateHatchRateTotals(colony, totalLabel, spinnerMap);
+        return panel;
+    }
+
+    private void updateHatchRateTotals(Colony colony, JLabel totalLabel, Map<AntType, JSpinner> spinnerMap) {
+        double totalAssigned = 0.0;
+        for (JSpinner s : spinnerMap.values()) {
+            totalAssigned += (Double) s.getValue();
+        }
+        
+        double unassigned = 100.0 - totalAssigned;
+        
+        totalLabel.setText(String.format("Total: %.2f%%", totalAssigned));
+        
+        if (Math.abs(unassigned) > 0.01) { 
+            totalLabel.setForeground(Color.RED);
+            totalLabel.setToolTipText(String.format("Warning: Total is not 100%%. You are %.2f%% over/under.", -unassigned));
+        } else {
+            totalLabel.setForeground(Color.BLACK);
+            totalLabel.setToolTipText("Total is 100%");
+        }
+
+        for (JSpinner s : spinnerMap.values()) {
+            SpinnerNumberModel model = (SpinnerNumberModel) s.getModel();
+            double currentValue = (Double) s.getValue();
+            double newMax = currentValue + Math.max(0.0, unassigned);
+            model.setMaximum(newMax);
+        }
     }
 
     private void showRoleManagementDialog(int tabIndex) {
@@ -598,6 +703,14 @@ private JPanel createNorthPanel() {
                 showRoleManagementDialog(4); // Queens
             }
         });
+        
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_P, 0), "openHatchRates");
+        actionMap.put("openHatchRates", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showHatchRateDialog();
+            }
+        });
     }
 
     private void handleBackButton() {
@@ -657,9 +770,9 @@ private JPanel createNorthPanel() {
                     engine.start();
                 }
                 if(engine.isPaused()) {
-                    playPauseButton.setText("Play (Space)");
+                    playPauseButton.setText("Play");
                 } else {
-                    playPauseButton.setText("Pause (Space)");
+                    playPauseButton.setText("Pause");
                 }
             });
         }).start();
@@ -727,13 +840,13 @@ private JPanel createNorthPanel() {
         if (delay == -1f) {
             eng.pauseEngine();
             updateStatusIndicator(true);
-            playPauseButton.setText("Play (Space)");
+            playPauseButton.setText("Play");
             tickLabel.setText("Tick: PAUSED");
         } else {
             eng.setDelay(delay);
             eng.resumeEngine(); 
             updateStatusIndicator(false);
-            playPauseButton.setText("Pause (Space)");
+            playPauseButton.setText("Pause");
             updateTickLabel(eng);
         }
     }

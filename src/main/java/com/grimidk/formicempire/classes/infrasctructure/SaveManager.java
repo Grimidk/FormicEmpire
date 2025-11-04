@@ -298,6 +298,12 @@ public class SaveManager {
                     save.setResins(c.getResins());
                     save.setMinerals(c.getMinerals());
 
+                    save.setHatchRateWorker(c.getHatchRateWorker());
+                    save.setHatchRateSoldier(c.getHatchRateSoldier());
+                    save.setHatchRateMajor(c.getHatchRateMajor());
+                    save.setHatchRateDrone(c.getHatchRateDrone());
+                    save.setHatchRatePrincess(c.getHatchRatePrincess());
+
                     Map<String, Integer> rolesToSave = new HashMap<>();
                     for (Map.Entry<AntRole, Integer> entry : c.getAssignedRoleCounts().entrySet()) {
                         rolesToSave.put(entry.getKey().getName(), entry.getValue());
@@ -371,6 +377,13 @@ public class SaveManager {
         writeJsonLine(w, "syrups", s.getSyrups(), false);
         writeJsonLine(w, "resins", s.getResins(), false);
         writeJsonLine(w, "minerals", s.getMinerals(), false);
+
+        // Hatch Rates
+        writeJsonLine(w, "hatchRateWorker", s.getHatchRateWorker(), false);
+        writeJsonLine(w, "hatchRateSoldier", s.getHatchRateSoldier(), false);
+        writeJsonLine(w, "hatchRateMajor", s.getHatchRateMajor(), false);
+        writeJsonLine(w, "hatchRateDrone", s.getHatchRateDrone(), false);
+        writeJsonLine(w, "hatchRatePrincess", s.getHatchRatePrincess(), false);
 
         // Settings removed
 
@@ -452,6 +465,12 @@ public class SaveManager {
             s.setSyrups(Integer.parseInt(m.getOrDefault("syrups", "0")));
             s.setResins(Integer.parseInt(m.getOrDefault("resins", "0")));
             s.setMinerals(Integer.parseInt(m.getOrDefault("minerals", "0")));
+
+            s.setHatchRateWorker(Float.parseFloat(m.getOrDefault("hatchRateWorker", "70.0")));
+            s.setHatchRateSoldier(Float.parseFloat(m.getOrDefault("hatchRateSoldier", "15.0")));
+            s.setHatchRateMajor(Float.parseFloat(m.getOrDefault("hatchRateMajor", "5.0")));
+            s.setHatchRateDrone(Float.parseFloat(m.getOrDefault("hatchRateDrone", "5.0")));
+            s.setHatchRatePrincess(Float.parseFloat(m.getOrDefault("hatchRatePrincess", "5.0")));
 
             // Settings removed
             
