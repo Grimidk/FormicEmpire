@@ -199,6 +199,7 @@ public class World {
         this.getSpawnHex().getColony().runRoleAssignment();
         this.getSpawnHex().getColony().runCollecting();;
         this.getSpawnHex().getColony().runLaying();
+        this.getSpawnHex().getColony().runRanching();
 
         if (this.hour >= 0 && this.hour < 5) {
             this.timeOfDay = GameConstants.NIGHT_TIME;

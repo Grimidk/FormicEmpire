@@ -34,6 +34,18 @@ public class HelpPanel extends JPanel {
                 "all the genetic knowledge of every ant species. You must unlock it and " +
                 "take over the world as the dominant species." +
                 "</p></html>";
+        
+        // Game Info Text
+        String gameInfo = "<html><p style='width: 350px;'>" +
+                "<b>Basic Tips:</b><br>" +
+                "Your main food is <b>Fungi</b> (Mushrooms), which ants will eat daily. " +
+                "Assign <b>Workers</b> (Q) to <b>Forager</b> roles to gather Plants and <b>Soldiers</b> (W) to <b>Hunter</b> roles to gather Protein. " +
+                "Assign <b>Farmers</b> (Q) to convert Plants and Protein into Fungi." +
+                "<br><br>" +
+                "Assign <b>Nurses</b> (Q) to care for your <b>Eggs, Larvae, and Pupae</b>. Without enough nurses, your young may die!" +
+                "<br><br>" +
+                "Use the <b>Hatch Rates</b> (P) menu to control what type of ants your Pupae become." +
+                "</p></html>";
 
         // Hotkey Panel
         JPanel hotkeyPanel = new JPanel(new GridLayout(0, 2, 10, 5)); 
@@ -69,11 +81,15 @@ public class HelpPanel extends JPanel {
 
         hotkeyPanel.add(new JLabel("Queen Roles:"));
         hotkeyPanel.add(new JLabel("T"));
+        
+        hotkeyPanel.add(new JLabel("Hatch Rates:"));
+        hotkeyPanel.add(new JLabel("P"));
 
         // Main Panel for JOptionPane
         JPanel mainPanel = new JPanel(new BorderLayout(0, 15));
         mainPanel.add(new JLabel(story), BorderLayout.NORTH);
-        mainPanel.add(hotkeyPanel, BorderLayout.CENTER);
+        mainPanel.add(new JLabel(gameInfo), BorderLayout.CENTER);
+        mainPanel.add(hotkeyPanel, BorderLayout.SOUTH);
 
         JOptionPane.showMessageDialog(
                 parent,
