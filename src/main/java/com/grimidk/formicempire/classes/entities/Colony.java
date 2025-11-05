@@ -50,6 +50,7 @@ public class Colony {
     private float conversionRate;
     private float nursingRate;
     private float gravingRate;
+    private float collectingRate;
     private int parasiteDetection;
 
     private int baseHealth;
@@ -95,6 +96,7 @@ public class Colony {
         this.conversionRate = 1.0f;
         this.nursingRate = 10f;
         this.gravingRate = 5f;
+        this.collectingRate = 1f;
         this.parasiteDetection = 10;
         this.baseHealth = 100;
         this.baseAge = 180;
@@ -339,6 +341,15 @@ public class Colony {
         return (int) totalConsumption;
     }
 
+    public int getTotalProduction(){
+        int foragerCount = this.getAssignedRoleCount(GameConstants.ROLE_FORAGER);
+        int hunterCount = this.getAssignedRoleCount(GameConstants.ROLE_HUNTER);
+        int farmerCount = this.getAssignedRoleCount(GameConstants.ROLE_FARMER);
+        int collectionPerHour = ((int) this.getCollectingRate()) * (foragerCount + hunterCount);
+        int totalProductionRate = (int) (Math.min((conversionRate * farmerCount) * 60, collectionPerHour)) * 4 * 24; 
+        return Math.min(totalProductionRate, this.getMushroomsCapacity());
+    }
+
     public int getPlants() {
         return plants;
     }
@@ -521,6 +532,14 @@ public class Colony {
 
     public void setGravingRate(float gravingRate) {
         this.gravingRate = gravingRate;
+    }
+
+    public float getCollectingRate() {
+        return collectingRate;
+    }
+
+    public void setCollectingRate(float collectingRate) {
+        this.collectingRate = collectingRate;
     }
 
     public int getParasiteDetection() {
@@ -932,29 +951,33 @@ public class Colony {
 
         for (AntType typeToKill : killOrder) {
             List<Ant> list = antGroups.get(typeToKill);
-            while (deficit > 0 && !list.isEmpty()) {
-                Ant deadAnt = list.remove(list.size() - 1); 
-                double rand = Math.random();
-                if (rand > 0.5) {
-                    deadAnt.goDie();
-                }
-                this.deadAnts.add(deadAnt);
-                deficit -= 1;
-            }
 
-            if (deficit <= 0) {
-                break; 
+            for (int i = list.size() - 1; i >= 0; i--) {
+                
+                if (deficit <= 0) {
+                    break; 
+                }
+
+                Ant antToCull = list.get(i);
+                double rand = Math.random();
+                if (rand > 0.5) { 
+                    list.remove(i); 
+                    antToCull.goDie(); 
+                    this.deadAnts.add(antToCull);
+                    deficit -= 1;
+                    
+                } 
             }
         }
     }
 
     public void runCollecting(){
         int foragerCount = countAntsByRole(getWorkers(), GameConstants.ROLE_FORAGER);
-        int plantGain = (int) (foragerCount * getBaseAttackSpeed() * GameConstants.TYPE_WORKER.getAttackSpeedMult());
+        int plantGain = (int) (foragerCount * getBaseAttackSpeed() * collectingRate);
         this.setPlants(Math.min(this.getPlants() + plantGain, this.getPlantsCapacity()));
 
         int hunterCount = countAntsByRole(getSoldiers(), GameConstants.ROLE_HUNTER);
-        int proteinGain = (int) (hunterCount * getBaseAttackSpeed() * GameConstants.TYPE_SOLDIER.getAttackSpeedMult());
+        int proteinGain = (int) (hunterCount * getBaseAttackSpeed() * collectingRate);
         this.setProtein(Math.min(this.getProtein() + proteinGain, this.getProteinCapacity()));
     }
 

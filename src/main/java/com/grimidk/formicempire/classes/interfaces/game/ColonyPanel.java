@@ -180,12 +180,8 @@ public class ColonyPanel extends JPanel {
         if (minerals != lastMinerals) mineralLabel.setText(String.valueOf(minerals));
 
         // Stats (Minute)
-        int farmerCount = colony.getAssignedRoleCount(GameConstants.ROLE_FARMER);
-        int conversionPerMinute = ((int) colony.getConversionRate()) * farmerCount;
-        int totalProductionRate = conversionPerMinute * 4 * 60 * 24; 
-        int totalProduction = Math.min(totalProductionRate, colony.getMushroomsCapacity());
         int totalConsumption = colony.getTotalConsumption();
-        int netMushrooms = totalProduction - totalConsumption;
+        int netMushrooms = colony.getTotalProduction() - totalConsumption;
         if (netMushrooms != -1) netMushroomsLabel.setText(String.format("Net Food: %d/day", netMushrooms));
         
         // Update cached values
@@ -213,11 +209,7 @@ public class ColonyPanel extends JPanel {
         int totalConsumption = colony.getTotalConsumption();
         if (totalConsumption != lastTotalConsumption) totalConsumptionLabel.setText(String.format("Consumption: %d/day", totalConsumption));
         
-        int farmerCount = colony.getAssignedRoleCount(GameConstants.ROLE_FARMER);
-        int conversionPerMinute = ((int) colony.getConversionRate()) * farmerCount;
-        int totalProductionRate = conversionPerMinute * 4 * 60 * 24; 
-        int totalProduction = Math.min(totalProductionRate, colony.getMushroomsCapacity());
-        if (totalProduction != -1) totalProductionLabel.setText(String.format("Max Food Prod: %d/day", totalProduction));
+        if (colony.getTotalProduction() != -1) totalProductionLabel.setText(String.format("Max Food Prod: %d/day", colony.getTotalProduction()));
 
         int layerCount = colony.getAssignedRoleCount(GameConstants.ROLE_LAYER);
         int hourlyLayingRate = layerCount * colony.getLayingRate();
