@@ -94,29 +94,28 @@ public class GamePanel extends JPanel {
 
         // 1. Colony Panel (Left)
         gbc.gridx = 0;
-        gbc.anchor = GridBagConstraints.NORTHWEST; // Stick to the top-left corner
-        gbc.weightx = 0.0; // Don't take extra horizontal space
-        gbc.fill = GridBagConstraints.VERTICAL; // Fill vertically
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.weightx = 0.0; 
+        gbc.fill = GridBagConstraints.VERTICAL; 
         center.add(colonyPanel, gbc);
 
         // 2. Spacer (Middle)
         gbc.gridx = 1;
-        gbc.weightx = 1.0; // This component absorbs all the remaining horizontal space
+        gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.BOTH; 
-        center.add(new JPanel(), gbc); // Use an empty JPanel as a spacer/filler
+        center.add(new JPanel(), gbc); 
 
         // 3. World Panel (Right)
         gbc.gridx = 2;
-        gbc.anchor = GridBagConstraints.NORTHEAST; // Stick to the top-right corner
-        gbc.weightx = 0.0; // Don't take extra horizontal space
-        gbc.fill = GridBagConstraints.VERTICAL; // Fill vertically
+        gbc.anchor = GridBagConstraints.NORTHEAST; 
+        gbc.weightx = 0.0; 
+        gbc.fill = GridBagConstraints.VERTICAL; 
         center.add(worldPanel, gbc);
         
         return center;
     }
     
     // --- Dialog Methods ---
-
     private void showHatchRateDialog() {
         Engine engine = frame.getEngine();
         Colony colony = engine != null && engine.getWorld() != null && engine.getWorld().getSpawnHex() != null ? engine.getWorld().getSpawnHex().getColony() : null;
@@ -150,7 +149,6 @@ public class GamePanel extends JPanel {
     }
     
     // --- Engine Control & Setup ---
-    
     public boolean isEngineStarted() {
         return engineStarted;
     }

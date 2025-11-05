@@ -57,7 +57,7 @@ public class SaveSelectPanel extends JPanel {
                 slotButtons[i].setText("Create");
                 deleteButtons[i].setVisible(false);
             } else {
-                int totalDays = s.getDay() + (s.getMonth() * 30) + (s.getYear() * 12 * 30);
+                int totalDays = (s.getDay() - 1) + ((s.getMonth() - 1) * 30) + (s.getYear() * 12 * 30);
                 slotLabels[i].setText(s.getName() + " — " + totalDays + " days");
                 slotButtons[i].setText("Load");
                 deleteButtons[i].setVisible(true);
@@ -72,18 +72,16 @@ public class SaveSelectPanel extends JPanel {
             String name = JOptionPane.showInputDialog(this, "Enter save name:", "Create Save", JOptionPane.PLAIN_MESSAGE);
             if (name == null || name.trim().isEmpty()) return;
             
-            Savefile save = new Savefile(slotId, name.trim());
-            captureGameStateIntoSave(save); 
-            
+            Savefile save = new Savefile(slotId, name.trim());            
             saveManager.saveUserSlotAsync(save, () -> {
                 Savefile newSave = saveManager.loadSlot(slotId);
                 if (newSave != null) {
+                    refreshSlots(); 
                     HelpPanel.showTutorialDialog(frame);
-                    frame.openGameWithSave(newSave);
+                    frame.openGameWithSave(newSave); 
                 } else {
                     JOptionPane.showMessageDialog(frame, "Failed to create new save file.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
-                refreshSlots();
             });
         } else {
             // --- Load Existing Game ---
@@ -98,43 +96,5 @@ public class SaveSelectPanel extends JPanel {
         boolean ok = saveManager.deleteSlot(slotId);
         if (!ok) JOptionPane.showMessageDialog(this, "Failed to delete save (file may not exist).");
         refreshSlots();
-    }
-
-    private void captureGameStateIntoSave(Savefile save) {
-        Engine eng = frame.getEngine();
-        if (eng == null) return;
-        World w = eng.getWorld();
-        
-        if (w != null) {
-            save.setMinute(w.getMinute());
-            save.setHour(w.getHour());
-            save.setDay(w.getDay());
-            save.setMonth(w.getMonth());
-            save.setYear(w.getYear());
-            if (w.getHexes() != null && !w.getHexes().isEmpty()) {
-                Colony c = w.getSpawnHex().getColony();
-                if (c != null) {
-                    save.setTotalAnts(c.getAntTotal());
-                    save.setDeadAnts(c.getDeadAnts() != null ? c.getDeadAnts().size() : 0);
-                    save.setEggs(c.getEggs() != null ? c.getEggs().size() : 0);
-                    save.setLarvae(c.getLarvae() != null ? c.getLarvae().size() : 0);
-                    save.setPupae(c.getPupae() != null ? c.getPupae().size() : 0);
-                    save.setWorkers(c.getWorkers() != null ? c.getWorkers().size() : 0);
-                    save.setSoldiers(c.getSoldiers() != null ? c.getSoldiers().size() : 0);
-                    save.setMajors(c.getMajors() != null ? c.getMajors().size() : 0);
-                    save.setDrones(c.getDrones() != null ? c.getDrones().size() : 0);
-                    save.setPrincesses(c.getPrincesses() != null ? c.getPrincesses().size() : 0);
-                    save.setQueens(c.getQueens() != null ? c.getQueens().size() : 0);
-                    
-                    save.setMushrooms(c.getMushrooms());
-                    save.setPlants(c.getPlants());
-                    save.setProtein(c.getProtein());
-                    save.setWater(c.getWater());
-                    save.setSyrups(c.getSyrups());
-                    save.setResins(c.getResins());
-                    save.setMinerals(c.getMinerals());
-                }
-            }
-        }
     }
 }

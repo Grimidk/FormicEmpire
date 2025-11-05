@@ -246,7 +246,7 @@ public class SaveManager {
     }
 
     private int computePlayTime(int minute, int hour, int day, int month, int year) {
-        int days = day + (month * 30) + (year * 12 * 30);
+        int days = (day - 1) + ((month - 1) * 30) + (year * 12 * 30);
         return (days * 24 * 60) + (hour * 60) + minute;
     }
 
@@ -519,7 +519,6 @@ public class SaveManager {
         }
         return map;
     }
-
 
     private String escapeJsonString(String str) {
         if (str == null) return "";
