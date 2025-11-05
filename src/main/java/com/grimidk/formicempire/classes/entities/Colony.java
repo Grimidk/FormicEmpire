@@ -108,11 +108,11 @@ public class Colony {
         this.baseSize = 1;
 
         this.plants = 0;
-        this.plantsCapacity = 2000;
+        this.plantsCapacity = 4000;
         this.mushrooms = 0;
-        this.mushroomsCapacity = 5000;
+        this.mushroomsCapacity = 8000;
         this.protein = 0;           
-        this.proteinCapacity = 1000;
+        this.proteinCapacity = 2000;
         this.water = 0;
         this.waterCapacity = 1000;
         this.syrups = 0;
@@ -918,7 +918,7 @@ public class Colony {
         int nurseCount = countAntsByRole(getWorkers(), GameConstants.ROLE_NURSE);
         int babyAntTotal = this.getEggs().size() +  this.getLarvae().size() +  this.getPupae().size();
 
-        if (babyAntTotal >= nurseCount * nursingRate) {
+        if (babyAntTotal <= nurseCount * nursingRate) {
             return;
         }
 
@@ -935,7 +935,7 @@ public class Colony {
             while (deficit > 0 && !list.isEmpty()) {
                 Ant deadAnt = list.remove(list.size() - 1); 
                 double rand = Math.random();
-                if (rand > 0.8) {
+                if (rand > 0.5) {
                     deadAnt.goDie();
                 }
                 this.deadAnts.add(deadAnt);
@@ -953,8 +953,8 @@ public class Colony {
         int plantGain = (int) (foragerCount * getBaseAttackSpeed() * GameConstants.TYPE_WORKER.getAttackSpeedMult());
         this.setPlants(Math.min(this.getPlants() + plantGain, this.getPlantsCapacity()));
 
-        int warriorCount = countAntsByRole(getSoldiers(), GameConstants.ROLE_HUNTER);
-        int proteinGain = (int) (warriorCount * getBaseAttackSpeed() * GameConstants.TYPE_SOLDIER.getAttackSpeedMult());
+        int hunterCount = countAntsByRole(getSoldiers(), GameConstants.ROLE_HUNTER);
+        int proteinGain = (int) (hunterCount * getBaseAttackSpeed() * GameConstants.TYPE_SOLDIER.getAttackSpeedMult());
         this.setProtein(Math.min(this.getProtein() + proteinGain, this.getProteinCapacity()));
     }
 

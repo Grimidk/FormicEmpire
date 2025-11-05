@@ -21,6 +21,26 @@ public class MainFrame extends JFrame {
     private final SaveSelectPanel saveSelectPanel;
     private final SettingsPanel settingsPanel;
 
+    public CardLayout getCardLayout() {
+        return cardLayout;
+    }
+
+    public JPanel getCards() {
+        return cards;
+    }
+
+    public GamePanel getGamePanel() {
+        return gamePanel;
+    }
+
+    public SaveSelectPanel getSaveSelectPanel() {
+        return saveSelectPanel;
+    }
+
+    public SettingsPanel getSettingsPanel() {
+        return settingsPanel;
+    }
+
     public MainFrame(Engine engine) {
         super("Formic Empire");
         this.engine = engine;
