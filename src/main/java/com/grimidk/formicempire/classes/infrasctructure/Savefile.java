@@ -64,11 +64,11 @@ public class Savefile implements Serializable {
         this.month = 1;
         this.year = 0; 
 
-        this.hatchRateWorker = 70.0f;
-        this.hatchRateSoldier = 15.0f;
-        this.hatchRateMajor = 5.0f;
-        this.hatchRateDrone = 5.0f;
-        this.hatchRatePrincess = 5.0f;
+        this.hatchRateWorker = 90.0f;
+        this.hatchRateSoldier = 10.0f;
+        this.hatchRateMajor = 0.0f;
+        this.hatchRateDrone = 0.0f;
+        this.hatchRatePrincess = 0.0f;
     }
 
     public int getId() {

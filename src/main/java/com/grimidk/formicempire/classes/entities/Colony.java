@@ -750,17 +750,22 @@ public class Colony {
             return GameConstants.TYPE_SOLDIER;
         }
         
-        cumulative += this.hatchRateMajor;
-        if (rand < cumulative) {
-            return GameConstants.TYPE_MAJOR;
-        }
+        // cumulative += this.hatchRateMajor;
+        // if (rand < cumulative) {
+        //     return GameConstants.TYPE_MAJOR;
+        // }
 
-        cumulative += this.hatchRateDrone;
-        if (rand < cumulative) {
-            return GameConstants.TYPE_DRONE;
-        }
+        // cumulative += this.hatchRateDrone;
+        // if (rand < cumulative) {
+        //     return GameConstants.TYPE_DRONE;
+        // }
+
+        // cumulative += this.hatchRatePrincess;
+        // if (rand < cumulative) {
+        //     return GameConstants.TYPE_PRINCESS;
+        // }
         
-        return GameConstants.TYPE_PRINCESS;
+        return GameConstants.TYPE_WORKER;
     }
 
     private void evolveAnts(List<Ant> sourceList, List<Ant> destList, AntType newType) {
