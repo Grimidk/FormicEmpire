@@ -12,7 +12,6 @@ import com.grimidk.formicempire.classes.constants.Season;
 import com.grimidk.formicempire.classes.constants.Species;
 import com.grimidk.formicempire.classes.constants.TimeOfDay;
 import com.grimidk.formicempire.classes.constants.Weather;
-import com.grimidk.formicempire.classes.entities.Upgrade;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -198,9 +197,6 @@ public final class GameConstants {
     // --- Species ---
     // (Add definitions here when you have them)
 
-    // --- Upgrades ---
-    // (Add definitions here when you have them)
-
     // --- Lists to hold the constants ---
     private static final List<Biome> biomes = new ArrayList<>();
     private static final List<ResourceType> resources = new ArrayList<>();
@@ -214,7 +210,6 @@ public final class GameConstants {
     private static final List<AntRole> antRoles = new ArrayList<>();
     private static final List<ColonyRank> colonyRanks = new ArrayList<>();
     private static final List<Species> species = new ArrayList<>();
-    private static final List<Upgrade> upgrades = new ArrayList<>();
     
     // --- Static initializer block ---
     static {
@@ -326,7 +321,6 @@ public final class GameConstants {
         colonyRanks.add(RANK_GIGA);
         
         // (Add species here when you have them)
-        // (Add upgrades here when you have them)
     }
     
     // --- Public Static Getters (Unmodifiable) ---
@@ -377,9 +371,5 @@ public final class GameConstants {
 
     public static List<Species> getSpecies() {
         return Collections.unmodifiableList(species);
-    }
-
-    public static List<Upgrade> getUpgrades() {
-        return Collections.unmodifiableList(upgrades);
     }
 }

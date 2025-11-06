@@ -4,10 +4,10 @@ import javax.swing.ImageIcon;
 
 public class Weather {
     private final int id;
-    private String name;
-    private int humidMod;
-    private float tempMult;
-    private ImageIcon icon;
+    private final String name;
+    private final int humidMod;
+    private final float tempMult;
+    private final ImageIcon icon;
 
     public Weather(int id, String name, int humidMod, float tempMult, ImageIcon icon) {
         this.id = id;
@@ -24,32 +24,16 @@ public class Weather {
     public String getName() {
         return name;
     }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
+    
     public int getHumidMult() {
         return humidMod;
-    }
-
-    public void setHumidMult(int humidMod) {
-        this.humidMod = humidMod;
     }
 
     public float getTempMult() {
         return tempMult;
     }
-
-    public void setTempMult(float tempMult) {
-        this.tempMult = tempMult;
-    }
     
     public ImageIcon getIcon() {
         return icon;
-    }
-
-    public void setIcon(ImageIcon icon) {
-        this.icon = icon;
     }
 }

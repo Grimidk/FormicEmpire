@@ -4,8 +4,8 @@ import javax.swing.ImageIcon;
 
 public class AntRole {
     private final int id;
-    private AntType antType;
-    private String name;
+    private final AntType antType;
+    private final String name;
     private ImageIcon icon;
 
     public AntRole(int id, AntType antType, String name) {
@@ -23,24 +23,11 @@ public class AntRole {
         return antType;
     }
 
-    public void setAntType(AntType antType) {
-        this.antType = antType;
-    }
-
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public ImageIcon getIcon() {
         return icon;
     }
-
-    public void setIcon(ImageIcon icon) {
-        this.icon = icon;
-    }
-    
 }

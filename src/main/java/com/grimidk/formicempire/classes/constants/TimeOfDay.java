@@ -4,9 +4,9 @@ import javax.swing.ImageIcon;
 
 public class TimeOfDay {
     private final int id;
-    private String name;
-    private float tempMult;
-    private ImageIcon icon;
+    private final String name;
+    private final float tempMult;
+    private final ImageIcon icon;
 
     public TimeOfDay(int id, String name, float tempMult, ImageIcon icon) {
         this.id = id;
@@ -23,24 +23,11 @@ public class TimeOfDay {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public float getTempMult() {
         return tempMult;
     }
 
-    public void setTempMult(float tempMult) {
-        this.tempMult = tempMult;
-    }
-    
     public ImageIcon getIcon() {
         return icon;
     }
-
-    public void setIcon(ImageIcon icon) {
-        this.icon = icon;
-    }
-
 }

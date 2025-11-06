@@ -91,6 +91,4 @@ public class Hex {
     public void setSouthEast(Hex southEast) {
         this.southEast = southEast;
     }
-
-    
 }

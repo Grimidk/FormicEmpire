@@ -4,7 +4,7 @@ import javax.swing.ImageIcon;
 
 public class AntStatus {
     private final int id;
-    private String name;
+    private final String name;
     private ImageIcon icon;
 
     public AntStatus(int id, String name) {
@@ -19,10 +19,6 @@ public class AntStatus {
 
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public ImageIcon getIcon() {

@@ -185,7 +185,7 @@ public class World {
     public void runMinute() {
         this.minute++;
 
-        this.getSpawnHex().getColony().runConverting();
+        this.getSpawnHex().getColony().runMinutelyJobs();
 
         if (this.minute > 59) {
             this.minute = 0;
@@ -196,10 +196,7 @@ public class World {
     public void runHour() {
         this.hour++;
 
-        this.getSpawnHex().getColony().runRoleAssignment();
-        this.getSpawnHex().getColony().runCollecting();;
-        this.getSpawnHex().getColony().runLaying();
-        this.getSpawnHex().getColony().runRanching();
+        this.getSpawnHex().getColony().runHourlyJobs();
 
         if (this.hour >= 0 && this.hour < 5) {
             this.timeOfDay = GameConstants.NIGHT_TIME;
@@ -227,11 +224,7 @@ public class World {
     public void runDay() {
         this.day++;
 
-        this.getSpawnHex().getColony().runEating();
-        this.getSpawnHex().getColony().runHatching();
-        this.getSpawnHex().getColony().runAging();
-        this.getSpawnHex().getColony().runNursing();
-        this.getSpawnHex().getColony().runGraveKeeping();
+        this.getSpawnHex().getColony().runDailyJobs();
 
         if (this.day >= 1 && this.day < 2) {
             this.moonPhase = GameConstants.NEW_MOON_PHASE;
@@ -305,7 +298,7 @@ public class World {
     public void runYear() {
         this.year++;
 
-        this.getSpawnHex().getColony().runNuptial();
+        this.getSpawnHex().getColony().runYearlyJobs();
     }
 
 }

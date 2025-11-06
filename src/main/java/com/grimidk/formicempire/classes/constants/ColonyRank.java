@@ -4,8 +4,8 @@ import javax.swing.ImageIcon;
 
 public class ColonyRank {
     private final int id;
-    private String name;
-    private long population;
+    private final String name;
+    private final long population;
     private ImageIcon icon;
 
     public ColonyRank(int id, String name, long population) {
@@ -23,18 +23,10 @@ public class ColonyRank {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public long getPopulation() {
         return population;
     }
-
-    public void setPopulation(long population) {
-        this.population = population;
-    }
-
+    
     public ImageIcon getIcon() {
         return icon;
     }

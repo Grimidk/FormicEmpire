@@ -6,11 +6,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.grimidk.formicempire.classes.constants.AntRole;
 import com.grimidk.formicempire.classes.constants.AntType;
 import com.grimidk.formicempire.classes.constants.ColonyRank;
 import com.grimidk.formicempire.classes.constants.Species;
+import com.grimidk.formicempire.classes.constants.Upgrade;
 import com.grimidk.formicempire.classes.infrasctructure.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 
@@ -24,6 +27,7 @@ public class Colony {
     private final Map<AntType, List<Ant>> antGroups;
     private final List<Ant> deadAnts;
     private Map<AntRole, Integer> assignedRoleCounts;
+    private final Set<Upgrade> upgrades;
 
     private int plants;
     private int plantsCapacity;
@@ -43,8 +47,11 @@ public class Colony {
     private int eggsCapacity;
     private int queensCapacity;
     private int aphidCapacity;
+    private int aphids;
 
     private int researchSpeed;
+    private int researchPoints;
+
     private int growthTime;
     private int layingRate;
     private float conversionRate;
@@ -90,7 +97,9 @@ public class Colony {
     }
 
     private void initializeDefaults() {
-        this.researchSpeed = 100;
+        this.researchSpeed = 10;
+        this.researchPoints = 0;
+
         this.growthTime = 4;
         this.layingRate = 1;
         this.conversionRate = 1.0f;
@@ -123,14 +132,21 @@ public class Colony {
         this.resinsCapacity = 200;
         this.minerals = 0;
         this.mineralsCapacity = 100;
+
         this.eggsCapacity = 50;
         this.queensCapacity = 2;
+        this.aphidCapacity = 10;
+        this.aphids = 0;
 
         this.hatchRateWorker = 90.0f;
         this.hatchRateSoldier = 10.0f;
         this.hatchRateMajor = 0.0f;
         this.hatchRateDrone = 0.0f;
         this.hatchRatePrincess = 0.0f;
+    }
+
+    private void initializeUpgrades() {
+
     }
 
     public Colony(int id, String name, boolean isPlayer) {
@@ -140,10 +156,12 @@ public class Colony {
         this.rank = GameConstants.RANK_COLONY;
         this.antGroups = new HashMap<AntType, List<Ant>>();
         this.deadAnts = new ArrayList<Ant>();
+        this.upgrades = new HashSet<>();
         
         initializeLists();
         initializeDefaults();
         initializeAssignedRoles();
+        initializeUpgrades();
     }
 
     private void populateAntList(List<Ant> list, int count, AntType type) {
@@ -159,6 +177,7 @@ public class Colony {
         this.rank = GameConstants.RANK_COLONY;
         this.antGroups = new HashMap<AntType, List<Ant>>();
         this.deadAnts = new ArrayList<Ant>();
+        this.upgrades = new HashSet<>();
 
         initializeLists();
         initializeDefaults(); 
@@ -331,6 +350,14 @@ public class Colony {
         return total;
     }
 
+    public boolean hasUpgrade(Upgrade upgrade) {
+        return this.upgrades.contains(upgrade);
+    }
+
+    public void unlockUpgrade(Upgrade upgrade) {
+        this.upgrades.add(upgrade); 
+    }
+
     public int getTotalConsumption(){
         double totalConsumption = 0;
         for (Map.Entry<AntType, List<Ant>> entry : antGroups.entrySet()) {
@@ -346,7 +373,7 @@ public class Colony {
         int hunterCount = this.getAssignedRoleCount(GameConstants.ROLE_HUNTER);
         int farmerCount = this.getAssignedRoleCount(GameConstants.ROLE_FARMER);
         int collectionPerHour = ((int) this.getCollectingRate()) * (foragerCount + hunterCount);
-        int totalProductionRate = (int) (Math.min((conversionRate * farmerCount) * 60, collectionPerHour)) * 4 * 24; 
+        int totalProductionRate = (int) (Math.min((conversionRate * farmerCount) * 60, collectionPerHour)) * 3 * 24; 
         return Math.min(totalProductionRate, this.getMushroomsCapacity());
     }
 
@@ -486,12 +513,28 @@ public class Colony {
         this.aphidCapacity = aphidCapacity;
     }
 
+    public int getAphids() {
+        return aphids;
+    }
+
+    public void setAphids(int aphids) {
+        this.aphids = aphids;
+    }
+
     public int getResearchSpeed() {
         return researchSpeed;
     }
 
     public void setResearchSpeed(int researchSpeed) {
         this.researchSpeed = researchSpeed;
+    }
+
+    public int getResearchPoints() {
+        return researchPoints;
+    }
+
+    public void setResearchPoints(int researchPoints) {
+        this.researchPoints = researchPoints;
     }
 
     public int getGrowthTime() {
@@ -899,12 +942,17 @@ public class Colony {
         }
     }
 
-    public void runSpreading(){
+    public void runSpreading() {
+    }
+
+
+    public void runInfection() {
+
     }
 
     // --- Ant Jobs (Role dependant) --- //
 
-    public void runLaying(){
+    public void runLaying() {
         int layerCount = countAntsByRole(getQueens(), GameConstants.ROLE_LAYER);
         List<Ant> eggList = getEggs();
         if (eggList.size() >= this.getEggsCapacity()) {
@@ -920,7 +968,12 @@ public class Colony {
         }
     }
 
-    public void runGraveKeeping(){
+    public void runResearch() {
+        int layerCount = countAntsByRole(getQueens(), GameConstants.ROLE_RESEARCHER);
+        this.researchPoints += layerCount * researchSpeed;
+    }
+
+    public void runGraveKeeping() {
         int graverCount = countAntsByRole(getWorkers(), GameConstants.ROLE_GRAVER);
         if (graverCount == 0 || getDeadAnts().isEmpty()) return;
 
@@ -933,7 +986,7 @@ public class Colony {
         }
     }
 
-    public void runNursing(){
+    public void runNursing() {
         int nurseCount = countAntsByRole(getWorkers(), GameConstants.ROLE_NURSE);
         int babyAntTotal = this.getEggs().size() +  this.getLarvae().size() +  this.getPupae().size();
 
@@ -971,17 +1024,17 @@ public class Colony {
         }
     }
 
-    public void runCollecting(){
+    public void runCollecting() {
         int foragerCount = countAntsByRole(getWorkers(), GameConstants.ROLE_FORAGER);
-        int plantGain = (int) (foragerCount * getBaseAttackSpeed() * collectingRate);
+        int plantGain = (int) (foragerCount * collectingRate);
         this.setPlants(Math.min(this.getPlants() + plantGain, this.getPlantsCapacity()));
 
         int hunterCount = countAntsByRole(getSoldiers(), GameConstants.ROLE_HUNTER);
-        int proteinGain = (int) (hunterCount * getBaseAttackSpeed() * collectingRate);
+        int proteinGain = (int) (hunterCount * collectingRate);
         this.setProtein(Math.min(this.getProtein() + proteinGain, this.getProteinCapacity()));
     }
 
-    public void runConverting(){
+    public void runConverting() {
         int farmerCount = countAntsByRole(getWorkers(), GameConstants.ROLE_FARMER);
         if (this.getMushrooms() >= this.getMushroomsCapacity()) {
             return;
@@ -1000,12 +1053,52 @@ public class Colony {
 
         if (this.getProtein() >= conversionAmount) {
             this.setProtein(this.getProtein() - conversionAmount);
-            int mushroomGain = conversionAmount * 3;
+            int mushroomGain = conversionAmount * 2;
             this.setMushrooms(Math.min(this.getMushrooms() + mushroomGain, this.getMushroomsCapacity()));
         }
     }
 
-    public void runRanching(){
-        // int farmerCount = countAntsByRole(getWorkers(), GameConstants.ROLE_RANCHER);
+    public void runRanching() {
+        int syrupGain = (int) (aphids);
+        this.setSyrups(Math.min(this.getSyrups() + syrupGain, this.getSyrupsCapacity()));
+    }
+
+    public void runHerding() {
+        int farmerCount = countAntsByRole(getWorkers(), GameConstants.ROLE_RANCHER);
+        if (aphids < (aphidCapacity * farmerCount)) {
+            this.setAphids(Math.min(this.getAphids() + (aphidCapacity * farmerCount), this.getSyrupsCapacity()));
+        } else if (aphids > (aphidCapacity * farmerCount)) {
+            this.aphids = aphidCapacity * farmerCount;
+        }
+    }
+
+    // --- Job Packer (Minutely/Hourly/Daily/Monthly/Yearly) --- //
+    public void runMinutelyJobs() {
+        this.runConverting();
+    }
+
+    public void runHourlyJobs() {
+        this.runRoleAssignment();
+        this.runCollecting();;
+        this.runLaying();
+        this.runResearch();
+        this.runRanching();
+    }
+
+    public void runDailyJobs() {
+        this.runEating();
+        this.runHatching();
+        this.runAging();
+        this.runNursing();
+        this.runGraveKeeping();
+        this.runHerding();
+    }
+
+    public void runMonthlyJobs() {
+
+    }
+
+    public void runYearlyJobs() {
+        this.runNuptial();
     }
 }
