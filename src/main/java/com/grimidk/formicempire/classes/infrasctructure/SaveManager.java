@@ -10,11 +10,15 @@ import java.util.regex.Pattern;
 import javax.swing.SwingUtilities;
 
 import com.grimidk.formicempire.classes.constants.AntRole;
+import com.grimidk.formicempire.classes.constants.Upgrade;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.World;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
@@ -309,6 +313,15 @@ public class SaveManager {
                         rolesToSave.put(entry.getKey().getName(), entry.getValue());
                     }
                     save.setAssignedRoleCounts(rolesToSave);
+
+                    Set<Upgrade> colonyUpgrades = c.getUnlockedUpgrades();
+                    List<Integer> upgradeIds = new ArrayList<>();
+                    if (colonyUpgrades != null) {
+                        for (Upgrade up : colonyUpgrades) {
+                            upgradeIds.add(up.getId());
+                        }
+                    }
+                    save.setUnlockedUpgradeIds(upgradeIds);
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -385,6 +398,12 @@ public class SaveManager {
         writeJsonLine(w, "hatchRateDrone", s.getHatchRateDrone(), false);
         writeJsonLine(w, "hatchRatePrincess", s.getHatchRatePrincess(), false);
 
+        // Upgrades
+        w.write("  \"unlockedUpgradeIds\": ");
+        w.write(serializeListToJson(s.getUnlockedUpgradeIds()));
+        w.write(","); 
+        w.newLine();
+
         // Roles
         w.write("  \"assignedRoleCounts\": ");
         w.write(serializeMapToJson(s.getAssignedRoleCounts()));
@@ -426,6 +445,8 @@ public class SaveManager {
                 if (k.equals("name")) {
                      v = unescapeJsonString(v);
                 }
+            } else if (v.startsWith("[")) { 
+                v = v.substring(0, v.length());
             } else if (v.equals("null")) {
                 v = ""; 
             }
@@ -475,8 +496,27 @@ public class SaveManager {
                 rolesJson = unescapeJsonString(rolesJson.substring(1, rolesJson.length() - 1));
             }
             s.setAssignedRoleCounts(deserializeJsonToMap(rolesJson));
+
+            String upgradesJson = m.getOrDefault("unlockedUpgradeIds", "[]");
+            s.setUnlockedUpgradeIds(deserializeJsonToList(upgradesJson));
         }
         return s;
+    }
+
+    private String serializeListToJson(List<Integer> list) {
+        if (list == null || list.isEmpty()) {
+            return "[]";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (int i = 0; i < list.size(); i++) {
+            sb.append(list.get(i));
+            if (i < list.size() - 1) {
+                sb.append(",");
+            }
+        }
+        sb.append("]");
+        return sb.toString();
     }
 
     private String serializeMapToJson(Map<String, Integer> map) {
@@ -518,6 +558,28 @@ public class SaveManager {
             }
         }
         return map;
+    }
+
+    private List<Integer> deserializeJsonToList(String json) {
+        List<Integer> list = new ArrayList<>();
+        if (json == null || json.length() <= 2) {
+            return list;
+        }
+        
+        String content = json.substring(1, json.length() - 1);
+        if (content.isEmpty()) {
+            return list;
+        }
+        
+        String[] parts = content.split(",");
+        for (String part : parts) {
+            try {
+                list.add(Integer.parseInt(part.trim()));
+            } catch (NumberFormatException e) {
+                System.err.println("Error parsing upgrade ID: " + part);
+            }
+        }
+        return list;
     }
 
     private String escapeJsonString(String str) {

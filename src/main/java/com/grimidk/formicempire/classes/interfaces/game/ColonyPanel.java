@@ -160,7 +160,7 @@ public class ColonyPanel extends JPanel {
     // --- Update Methods ---
 
     public void updateMinuteData(Colony colony) {
-        // Resources (Minute)
+        // Resources 
         int mushrooms = colony.getMushrooms(); 
         int plants = colony.getPlants();     
         int protein = colony.getProtein();  
@@ -179,7 +179,7 @@ public class ColonyPanel extends JPanel {
         if (resins != lastResins) resinLabel.setText(String.valueOf(resins));
         if (minerals != lastMinerals) mineralLabel.setText(String.valueOf(minerals));
 
-        // Stats (Minute)
+        // Stats 
         int totalConsumption = colony.getTotalConsumption();
         int netMushrooms = colony.getTotalProduction() - totalConsumption;
         if (netMushrooms != -1) netMushroomsLabel.setText(String.format("Net Food: %d/day", netMushrooms));
@@ -195,17 +195,17 @@ public class ColonyPanel extends JPanel {
     }
 
     public void updateHourData(Colony colony) {
-        // Ants (Hour: Eggs)
+        // Ants
         int eggs = colony.getEggs() != null ? colony.getEggs().size() : 0;
         if (eggs != lastEggs) eggsLabel.setText(String.valueOf(eggs));
         
-        // Resources (Hour: Plants/Protein)
+        // Resources
         int plants = colony.getPlants();     
         int protein = colony.getProtein();  
         if (plants != lastPlants) planLabel.setText(String.valueOf(plants));
         if (protein != lastProtein) proteinLabel.setText(String.valueOf(protein));
         
-        // Stats (Hour: Daily Rates/Coverage)
+        // Stats
         int totalConsumption = colony.getTotalConsumption();
         if (totalConsumption != lastTotalConsumption) totalConsumptionLabel.setText(String.format("Consumption: %d/day", totalConsumption));
         

@@ -15,6 +15,7 @@ import com.grimidk.formicempire.classes.constants.ColonyRank;
 import com.grimidk.formicempire.classes.constants.Species;
 import com.grimidk.formicempire.classes.constants.Upgrade;
 import com.grimidk.formicempire.classes.infrasctructure.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.GameUpgrades;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 
 public class Colony {
@@ -29,6 +30,7 @@ public class Colony {
     private Map<AntRole, Integer> assignedRoleCounts;
     private final Set<Upgrade> upgrades;
 
+    // Resources
     private int plants;
     private int plantsCapacity;
     private int mushrooms;
@@ -44,14 +46,17 @@ public class Colony {
     private int minerals;
     private int mineralsCapacity;
 
+    // Capacities
     private int eggsCapacity;
     private int queensCapacity;
     private int aphidCapacity;
     private int aphids;
 
+    // Research
     private int researchSpeed;
     private int researchPoints;
 
+    // Rates
     private int growthTime;
     private int layingRate;
     private float conversionRate;
@@ -60,6 +65,7 @@ public class Colony {
     private float collectingRate;
     private int parasiteDetection;
 
+    // Base Stats
     private int baseHealth;
     private int baseAge;
     private int baseTempRes;
@@ -71,6 +77,7 @@ public class Colony {
     private int baseSpeed;  
     private int baseSize;
 
+    // Hatch Rates
     private float hatchRateWorker;
     private float hatchRateSoldier;
     private float hatchRateMajor;
@@ -78,15 +85,15 @@ public class Colony {
     private float hatchRatePrincess;
 
     private void initializeLists() {
-        this.antGroups.put(GameConstants.TYPE_EGG, new ArrayList<Ant>());
-        this.antGroups.put(GameConstants.TYPE_LARVA, new ArrayList<Ant>());
-        this.antGroups.put(GameConstants.TYPE_PUPA, new ArrayList<Ant>());
-        this.antGroups.put(GameConstants.TYPE_WORKER, new ArrayList<Ant>());
-        this.antGroups.put(GameConstants.TYPE_SOLDIER, new ArrayList<Ant>());
-        this.antGroups.put(GameConstants.TYPE_MAJOR, new ArrayList<Ant>());
-        this.antGroups.put(GameConstants.TYPE_DRONE, new ArrayList<Ant>());
-        this.antGroups.put(GameConstants.TYPE_PRINCESS, new ArrayList<Ant>());
-        this.antGroups.put(GameConstants.TYPE_QUEEN, new ArrayList<Ant>());
+        this.antGroups.put(GameConstants.TYPE_EGG, new ArrayList<>());
+        this.antGroups.put(GameConstants.TYPE_LARVA, new ArrayList<>());
+        this.antGroups.put(GameConstants.TYPE_PUPA, new ArrayList<>());
+        this.antGroups.put(GameConstants.TYPE_WORKER, new ArrayList<>());
+        this.antGroups.put(GameConstants.TYPE_SOLDIER, new ArrayList<>());
+        this.antGroups.put(GameConstants.TYPE_MAJOR, new ArrayList<>());
+        this.antGroups.put(GameConstants.TYPE_DRONE, new ArrayList<>());
+        this.antGroups.put(GameConstants.TYPE_PRINCESS, new ArrayList<>());
+        this.antGroups.put(GameConstants.TYPE_QUEEN, new ArrayList<>());
     }
 
     private void initializeAssignedRoles() {
@@ -107,6 +114,7 @@ public class Colony {
         this.gravingRate = 5f;
         this.collectingRate = 1f;
         this.parasiteDetection = 10;
+
         this.baseHealth = 100;
         this.baseAge = 180;
         this.baseTempRes = 25;
@@ -134,7 +142,7 @@ public class Colony {
         this.mineralsCapacity = 100;
 
         this.eggsCapacity = 50;
-        this.queensCapacity = 2;
+        this.queensCapacity = 1;
         this.aphidCapacity = 10;
         this.aphids = 0;
 
@@ -146,7 +154,34 @@ public class Colony {
     }
 
     private void initializeUpgrades() {
+        this.upgrades.add(GameUpgrades.TYPE_EGG);
+        this.upgrades.add(GameUpgrades.TYPE_SOLDIER);
+        this.upgrades.add(GameUpgrades.TYPE_QUEEN);
+        this.upgrades.add(GameUpgrades.ROLE_FORAGER);
+        this.upgrades.add(GameUpgrades.ROLE_FARMER);
+        this.upgrades.add(GameUpgrades.ROLE_NURSE);
+        this.upgrades.add(GameUpgrades.ROLE_LAYER);
+    }
 
+    private void loadUpgrades(Savefile savefile) {
+        List<Integer> unlockedIds = savefile.getUnlockedUpgradeIds(); 
+
+        if (unlockedIds == null || unlockedIds.isEmpty()) {
+            initializeUpgrades();
+            return;
+        }
+
+        Map<Integer, Upgrade> allUpgrades = new HashMap<>();
+        for (Upgrade up : GameUpgrades.getUpgrades()) {
+            allUpgrades.put(up.getId(), up);
+        }
+
+        for (Integer id : unlockedIds) {
+            Upgrade upgradeToUnlock = allUpgrades.get(id);
+            if (upgradeToUnlock != null) {
+                this.upgrades.add(upgradeToUnlock);
+            }
+        }
     }
 
     public Colony(int id, String name, boolean isPlayer) {
@@ -154,20 +189,14 @@ public class Colony {
         this.name = name;
         this.isPlayer = isPlayer;
         this.rank = GameConstants.RANK_COLONY;
-        this.antGroups = new HashMap<AntType, List<Ant>>();
-        this.deadAnts = new ArrayList<Ant>();
+        this.antGroups = new HashMap<>();
+        this.deadAnts = new ArrayList<>();
         this.upgrades = new HashSet<>();
         
         initializeLists();
         initializeDefaults();
-        initializeAssignedRoles();
         initializeUpgrades();
-    }
-
-    private void populateAntList(List<Ant> list, int count, AntType type) {
-        for (int i = 0; i < count; i++) {
-            list.add(new Ant(this, type));
-        }
+        initializeAssignedRoles();
     }
 
     public Colony(Savefile savefile) {
@@ -175,12 +204,13 @@ public class Colony {
         this.name = savefile.getColonyName();
         this.isPlayer = true;
         this.rank = GameConstants.RANK_COLONY;
-        this.antGroups = new HashMap<AntType, List<Ant>>();
-        this.deadAnts = new ArrayList<Ant>();
+        this.antGroups = new HashMap<>();
+        this.deadAnts = new ArrayList<>();
         this.upgrades = new HashSet<>();
 
         initializeLists();
         initializeDefaults(); 
+        loadUpgrades(savefile); 
         initializeAssignedRoles(); 
 
         Map<String, Integer> savedRoles = savefile.getAssignedRoleCounts();
@@ -221,133 +251,62 @@ public class Colony {
         runRoleAssignment();
     }
 
-    public int getId() {
-        return id;
+    private void populateAntList(List<Ant> list, int count, AntType type) {
+        for (int i = 0; i < count; i++) {
+            list.add(new Ant(this, type));
+        }
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Species getSpecies() {
-        return species;
-    }
-
-    public void setSpecies(Species species) {
-        this.species = species;
-    }
-
-    public boolean isPlayer() {
-        return isPlayer;
-    }
-
-    public void setIsPlayer(boolean isPlayer) {
-        this.isPlayer = isPlayer;
-    }
-
-    public ColonyRank getRank() {
-        return rank;
-    }
-
-    public void setRank(ColonyRank rank) {
-        this.rank = rank;
-    }
+    // --- Getters and Setters ---
+    public int getId() { return id; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public Species getSpecies() { return species; }
+    public void setSpecies(Species species) { this.species = species; }
+    public boolean isPlayer() { return isPlayer; }
+    public void setIsPlayer(boolean isPlayer) { this.isPlayer = isPlayer; }
+    public ColonyRank getRank() { return rank; }
+    public void setRank(ColonyRank rank) { this.rank = rank; }
 
     public List<Ant> getAntsByType(AntType type) {
         return antGroups.getOrDefault(type, new ArrayList<>());
     }
     
-    public ArrayList<Ant> getEggs() {
-        return (ArrayList<Ant>) antGroups.get(GameConstants.TYPE_EGG);
-    }
+    public List<Ant> getEggs() { return antGroups.get(GameConstants.TYPE_EGG); }
+    public void setEggs(List<Ant> eggs) { antGroups.put(GameConstants.TYPE_EGG, eggs); }
 
-    public void setEggs(ArrayList<Ant> eggs) {
-        antGroups.put(GameConstants.TYPE_EGG, eggs);
-    }
+    public List<Ant> getLarvae() { return antGroups.get(GameConstants.TYPE_LARVA); }
+    public void setLarvae(List<Ant> larvae) { antGroups.put(GameConstants.TYPE_LARVA, larvae); }
 
-    public ArrayList<Ant> getLarvae() {
-        return (ArrayList<Ant>) antGroups.get(GameConstants.TYPE_LARVA);
-    }
+    public List<Ant> getPupae() { return antGroups.get(GameConstants.TYPE_PUPA); }
+    public void setPupae(List<Ant> pupae) { antGroups.put(GameConstants.TYPE_PUPA, pupae); }
 
-    public void setLarvae(ArrayList<Ant> larvae) {
-        antGroups.put(GameConstants.TYPE_LARVA, larvae);
-    }
+    public List<Ant> getWorkers() { return antGroups.get(GameConstants.TYPE_WORKER); }
+    public void setWorkers(List<Ant> workers) { antGroups.put(GameConstants.TYPE_WORKER, workers); }
 
-    public ArrayList<Ant> getPupae() {
-        return (ArrayList<Ant>) antGroups.get(GameConstants.TYPE_PUPA);
-    }
+    public List<Ant> getSoldiers() { return antGroups.get(GameConstants.TYPE_SOLDIER); }
+    public void setSoldiers(List<Ant> soldiers) { antGroups.put(GameConstants.TYPE_SOLDIER, soldiers); }
 
-    public void setPupae(ArrayList<Ant> pupae) {
-        antGroups.put(GameConstants.TYPE_PUPA, pupae);
-    }
+    public List<Ant> getMajors() { return antGroups.get(GameConstants.TYPE_MAJOR); }
+    public void setMajors(List<Ant> majors) { antGroups.put(GameConstants.TYPE_MAJOR, majors); }
 
-    public ArrayList<Ant> getWorkers() {
-        return (ArrayList<Ant>) antGroups.get(GameConstants.TYPE_WORKER);
-    }
+    public List<Ant> getDrones() { return antGroups.get(GameConstants.TYPE_DRONE); }
+    public void setDrones(List<Ant> drones) { antGroups.put(GameConstants.TYPE_DRONE, drones); }
 
-    public void setWorkers(ArrayList<Ant> workers) {
-        antGroups.put(GameConstants.TYPE_WORKER, workers);
-    }
+    public List<Ant> getPrincesses() { return antGroups.get(GameConstants.TYPE_PRINCESS); }
+    public void setPrincesses(List<Ant> princesses) { antGroups.put(GameConstants.TYPE_PRINCESS, princesses); }
 
-    public ArrayList<Ant> getSoldiers() {
-        return (ArrayList<Ant>) antGroups.get(GameConstants.TYPE_SOLDIER);
-    }
+    public List<Ant> getQueens() { return antGroups.get(GameConstants.TYPE_QUEEN); }
+    public void setQueens(List<Ant> queens) { antGroups.put(GameConstants.TYPE_QUEEN, queens); }
 
-    public void setSoldiers(ArrayList<Ant> soldiers) {
-        antGroups.put(GameConstants.TYPE_SOLDIER, soldiers);
-    }
-
-    public ArrayList<Ant> getMajors() {
-        return (ArrayList<Ant>) antGroups.get(GameConstants.TYPE_MAJOR);
-    }
-
-    public void setMajors(ArrayList<Ant> majors) {
-        antGroups.put(GameConstants.TYPE_MAJOR, majors);
-    }
-
-    public ArrayList<Ant> getDrones() {
-        return (ArrayList<Ant>) antGroups.get(GameConstants.TYPE_DRONE);
-    }
-
-    public void setDrones(ArrayList<Ant> drones) {
-        antGroups.put(GameConstants.TYPE_DRONE, drones);
-    }
-
-    public ArrayList<Ant> getPrincesses() {
-        return (ArrayList<Ant>) antGroups.get(GameConstants.TYPE_PRINCESS);
-    }
-
-    public void setPrincesses(ArrayList<Ant> princesses) {
-        antGroups.put(GameConstants.TYPE_PRINCESS, princesses);
-    }
-
-    public ArrayList<Ant> getQueens() {
-        return (ArrayList<Ant>) antGroups.get(GameConstants.TYPE_QUEEN);
-    }
-
-    public void setQueens(ArrayList<Ant> queens) {
-        antGroups.put(GameConstants.TYPE_QUEEN, queens);
-    }
-
-    public ArrayList<Ant> getDeadAnts() {
-        return (ArrayList<Ant>) deadAnts;
-    }
-
-    public void setDeadAnts(ArrayList<Ant> deadAnts) {
+    public List<Ant> getDeadAnts() { return deadAnts; }
+    public void setDeadAnts(List<Ant> deadAnts) {
         this.deadAnts.clear();
         this.deadAnts.addAll(deadAnts);
     }
     
     public int getAntTotal() {
-        int total = 0;
-        for (List<Ant> list : antGroups.values()) {
-            total += list.size();
-        }
-        return total;
+        return antGroups.values().stream().mapToInt(List::size).sum();
     }
 
     public boolean hasUpgrade(Upgrade upgrade) {
@@ -358,12 +317,14 @@ public class Colony {
         this.upgrades.add(upgrade); 
     }
 
+    public Set<Upgrade> getUnlockedUpgrades() {
+        return this.upgrades;
+    }
+
     public int getTotalConsumption(){
         double totalConsumption = 0;
         for (Map.Entry<AntType, List<Ant>> entry : antGroups.entrySet()) {
-            AntType type = entry.getKey();
-            List<Ant> list = entry.getValue();
-            totalConsumption += (double) list.size() * type.getConsumptionMult() * this.getBaseConsumption();
+            totalConsumption += (double) entry.getValue().size() * entry.getKey().getConsumptionMult() * this.getBaseConsumption();
         }
         return (int) totalConsumption;
     }
@@ -377,302 +338,89 @@ public class Colony {
         return Math.min(totalProductionRate, this.getMushroomsCapacity());
     }
 
-    public int getPlants() {
-        return plants;
-    }
-
-    public void setPlants(int plants) {
-        this.plants = plants;
-    }
-
-    public int getPlantsCapacity() {
-        return plantsCapacity;
-    }
-
-    public void setPlantsCapacity(int plantsCapacity) {
-        this.plantsCapacity = plantsCapacity;
-    }
-
-    public int getMushrooms() {
-        return mushrooms;
-    }
-
-    public void setMushrooms(int mushrooms) {
-        this.mushrooms = mushrooms;
-    }
-
-    public int getMushroomsCapacity() {
-        return mushroomsCapacity;
-    }
-
-    public void setMushroomsCapacity(int mushroomsCapacity) {
-        this.mushroomsCapacity = mushroomsCapacity;
-    }
-
-    public int getProtein() {
-        return protein;
-    }
-
-    public void setProtein(int protein) {
-        this.protein = protein;
-    }
-
-    public int getProteinCapacity() {
-        return proteinCapacity;
-    }
-
-    public void setProteinCapacity(int proteinCapacity) {
-        this.proteinCapacity = proteinCapacity;
-    }
-
-    public int getWater() {
-        return water;
-    }
-
-    public void setWater(int water) {
-        this.water = water;
-    }
-
-    public int getWaterCapacity() {
-        return waterCapacity;
-    }
-
-    public void setWaterCapacity(int waterCapacity) {
-        this.waterCapacity = waterCapacity;
-    }
-
-    public int getSyrups() {
-        return syrups;
-    }
-
-    public void setSyrups(int syrups) {
-        this.syrups = syrups;
-    }
-
-    public int getSyrupsCapacity() {
-        return syrupsCapacity;
-    }
-
-    public void setSyrupsCapacity(int syrupsCapacity) {
-        this.syrupsCapacity = syrupsCapacity;
-    }
-
-    public int getResins() {
-        return resins;
-    }
-
-    public void setResins(int resins) {
-        this.resins = resins;
-    }
-
-    public int getResinsCapacity() {
-        return resinsCapacity;
-    }
-
-    public void setResinsCapacity(int resinsCapacity) {
-        this.resinsCapacity = resinsCapacity;
-    }
-
-    public int getMinerals() {
-        return minerals;
-    }
-
-    public void setMinerals(int minerals) {
-        this.minerals = minerals;
-    }
-
-    public int getMineralsCapacity() {
-        return mineralsCapacity;
-    }
-
-    public void setMineralsCapacity(int mineralsCapacity) {
-        this.mineralsCapacity = mineralsCapacity;
-    }
-
-    public int getEggsCapacity() {
-        return eggsCapacity;
-    }
-
-    public void setEggsCapacity(int eggsCapacity) {
-        this.eggsCapacity = eggsCapacity;
-    }
-
-    public int getQueensCapacity() {
-        return queensCapacity;
-    }
-
-    public void setQueensCapacity(int queensCapacity) {
-        this.queensCapacity = queensCapacity;
-    }
-
-    public int getAphidCapacity() {
-        return aphidCapacity;
-    }
-
-    public void setAphidCapacity(int aphidCapacity) {
-        this.aphidCapacity = aphidCapacity;
-    }
-
-    public int getAphids() {
-        return aphids;
-    }
-
-    public void setAphids(int aphids) {
-        this.aphids = aphids;
-    }
-
-    public int getResearchSpeed() {
-        return researchSpeed;
-    }
-
-    public void setResearchSpeed(int researchSpeed) {
-        this.researchSpeed = researchSpeed;
-    }
-
-    public int getResearchPoints() {
-        return researchPoints;
-    }
-
-    public void setResearchPoints(int researchPoints) {
-        this.researchPoints = researchPoints;
-    }
-
-    public int getGrowthTime() {
-        return growthTime;
-    }
-
-    public void setGrowthTime(int growthTime) {
-        this.growthTime = growthTime;
-    }
-
-    public int getLayingRate() {
-        return layingRate;
-    }
-
-    public void setLayingRate(int layingRate) {
-        this.layingRate = layingRate;
-    }
-    
-    public float getConversionRate() {
-        return conversionRate;
-    }
-
-    public void setConversionRate(float conversionRate) {
-        this.conversionRate = conversionRate;
-    }
-
-    public float getNursingRate() {
-        return nursingRate;
-    }
-
-    public void setNursingRate(float nursingRate) {
-        this.nursingRate = nursingRate;
-    }
-
-    public float getGravingRate() {
-        return gravingRate;
-    }
-
-    public void setGravingRate(float gravingRate) {
-        this.gravingRate = gravingRate;
-    }
-
-    public float getCollectingRate() {
-        return collectingRate;
-    }
-
-    public void setCollectingRate(float collectingRate) {
-        this.collectingRate = collectingRate;
-    }
-
-    public int getParasiteDetection() {
-        return parasiteDetection;
-    }
-
-    public void setParasiteDetection(int parasiteDetection) {
-        this.parasiteDetection = parasiteDetection;
-    }
-
-    public int getBaseHealth() {
-    return baseHealth;
-    }
-
-    public void setBaseHealth(int baseHealth) {
-        this.baseHealth = baseHealth;
-    }
-
-    public int getBaseAge() {
-        return baseAge;
-    }
-
-    public void setBaseAge(int baseAge) {
-        this.baseAge = baseAge;
-    }
-
-    public int getBaseTempRes() {
-        return baseTempRes;
-    }
-
-    public void setBaseTempRes(int baseTempRes) {
-        this.baseTempRes = baseTempRes;
-    }
-
-    public int getBaseRegen() {
-        return baseRegen;
-    }
-
-    public void setBaseRegen(int baseRegen) {
-        this.baseRegen = baseRegen;
-    }
-
-    public int getBaseConsumption() {
-        return baseConsumption;
-    }
-
-    public void setBaseConsumption(int baseConsumption) {
-        this.baseConsumption = baseConsumption;
-    }
-
-    public int getBaseAttack() {
-        return baseAttack;
-    }
-
-    public void setBaseAttack(int baseAttack) {
-        this.baseAttack = baseAttack;
-    }
-
-    public int getBaseAttackSpeed() {
-        return baseAttackSpeed;
-    }
-
-    public void setBaseAttackSpeed(int baseAttackSpeed) {
-        this.baseAttackSpeed = baseAttackSpeed;
-    }
-
-    public int getBaseDefense() {
-        return baseDefense;
-    }
-
-    public void setBaseDefense(int baseDefense) {
-        this.baseDefense = baseDefense;
-    }
-
-    public int getBaseSpeed() {
-        return baseSpeed;
-    }
-
-    public void setBaseSpeed(int baseSpeed) {
-        this.baseSpeed = baseSpeed;
-    }
-
-    public int getBaseSize() {
-        return baseSize;
-    }
-
-    public void setBaseSize(int baseSize) {
-        this.baseSize = baseSize;
-    }
-
+    // Resource Getters/Setters
+    public int getPlants() { return plants; }
+    public void setPlants(int plants) { this.plants = plants; }
+    public int getPlantsCapacity() { return plantsCapacity; }
+    public void setPlantsCapacity(int plantsCapacity) { this.plantsCapacity = plantsCapacity; }
+    public int getMushrooms() { return mushrooms; }
+    public void setMushrooms(int mushrooms) { this.mushrooms = mushrooms; }
+    public int getMushroomsCapacity() { return mushroomsCapacity; }
+    public void setMushroomsCapacity(int mushroomsCapacity) { this.mushroomsCapacity = mushroomsCapacity; }
+    public int getProtein() { return protein; }
+    public void setProtein(int protein) { this.protein = protein; }
+    public int getProteinCapacity() { return proteinCapacity; }
+    public void setProteinCapacity(int proteinCapacity) { this.proteinCapacity = proteinCapacity; }
+    public int getWater() { return water; }
+    public void setWater(int water) { this.water = water; }
+    public int getWaterCapacity() { return waterCapacity; }
+    public void setWaterCapacity(int waterCapacity) { this.waterCapacity = waterCapacity; }
+    public int getSyrups() { return syrups; }
+    public void setSyrups(int syrups) { this.syrups = syrups; }
+    public int getSyrupsCapacity() { return syrupsCapacity; }
+    public void setSyrupsCapacity(int syrupsCapacity) { this.syrupsCapacity = syrupsCapacity; }
+    public int getResins() { return resins; }
+    public void setResins(int resins) { this.resins = resins; }
+    public int getResinsCapacity() { return resinsCapacity; }
+    public void setResinsCapacity(int resinsCapacity) { this.resinsCapacity = resinsCapacity; }
+    public int getMinerals() { return minerals; }
+    public void setMinerals(int minerals) { this.minerals = minerals; }
+    public int getMineralsCapacity() { return mineralsCapacity; }
+    public void setMineralsCapacity(int mineralsCapacity) { this.mineralsCapacity = mineralsCapacity; }
+
+    // Other Capacities
+    public int getEggsCapacity() { return eggsCapacity; }
+    public void setEggsCapacity(int eggsCapacity) { this.eggsCapacity = eggsCapacity; }
+    public int getQueensCapacity() { return queensCapacity; }
+    public void setQueensCapacity(int queensCapacity) { this.queensCapacity = queensCapacity; }
+    public int getAphidCapacity() { return aphidCapacity; }
+    public void setAphidCapacity(int aphidCapacity) { this.aphidCapacity = aphidCapacity; }
+    public int getAphids() { return aphids; }
+    public void setAphids(int aphids) { this.aphids = aphids; }
+
+    // Research & Rates
+    public int getResearchSpeed() { return researchSpeed; }
+    public void setResearchSpeed(int researchSpeed) { this.researchSpeed = researchSpeed; }
+    public int getResearchPoints() { return researchPoints; }
+    public void setResearchPoints(int researchPoints) { this.researchPoints = researchPoints; }
+    public int getGrowthTime() { return growthTime; }
+    public void setGrowthTime(int growthTime) { this.growthTime = growthTime; }
+    public int getLayingRate() { return layingRate; }
+    public void setLayingRate(int layingRate) { this.layingRate = layingRate; }
+    public float getConversionRate() { return conversionRate; }
+    public void setConversionRate(float conversionRate) { this.conversionRate = conversionRate; }
+    public float getNursingRate() { return nursingRate; }
+    public void setNursingRate(float nursingRate) { this.nursingRate = nursingRate; }
+    public float getGravingRate() { return gravingRate; }
+    public void setGravingRate(float gravingRate) { this.gravingRate = gravingRate; }
+    public float getCollectingRate() { return collectingRate; }
+    public void setCollectingRate(float collectingRate) { this.collectingRate = collectingRate; }
+    public int getParasiteDetection() { return parasiteDetection; }
+    public void setParasiteDetection(int parasiteDetection) { this.parasiteDetection = parasiteDetection; }
+
+    // Base Stats
+    public int getBaseHealth() { return baseHealth; }
+    public void setBaseHealth(int baseHealth) { this.baseHealth = baseHealth; }
+    public int getBaseAge() { return baseAge; }
+    public void setBaseAge(int baseAge) { this.baseAge = baseAge; }
+    public int getBaseTempRes() { return baseTempRes; }
+    public void setBaseTempRes(int baseTempRes) { this.baseTempRes = baseTempRes; }
+    public int getBaseRegen() { return baseRegen; }
+    public void setBaseRegen(int baseRegen) { this.baseRegen = baseRegen; }
+    public int getBaseConsumption() { return baseConsumption; }
+    public void setBaseConsumption(int baseConsumption) { this.baseConsumption = baseConsumption; }
+    public int getBaseAttack() { return baseAttack; }
+    public void setBaseAttack(int baseAttack) { this.baseAttack = baseAttack; }
+    public int getBaseAttackSpeed() { return baseAttackSpeed; }
+    public void setBaseAttackSpeed(int baseAttackSpeed) { this.baseAttackSpeed = baseAttackSpeed; }
+    public int getBaseDefense() { return baseDefense; }
+    public void setBaseDefense(int baseDefense) { this.baseDefense = baseDefense; }
+    public int getBaseSpeed() { return baseSpeed; }
+    public void setBaseSpeed(int baseSpeed) { this.baseSpeed = baseSpeed; }
+    public int getBaseSize() { return baseSize; }
+    public void setBaseSize(int baseSize) { this.baseSize = baseSize; }
+
+    // Role Counts
     public int getAssignedRoleCount(AntRole role) {
         return assignedRoleCounts.getOrDefault(role, 0);
     }
@@ -687,6 +435,7 @@ public class Colony {
         return assignedRoleCounts;
     }
     
+    // Hatch Rates
     public float getHatchRateWorker() { return hatchRateWorker; }
     public void setHatchRateWorker(float hatchRateWorker) { this.hatchRateWorker = hatchRateWorker; }
     public float getHatchRateSoldier() { return hatchRateSoldier; }
@@ -715,6 +464,7 @@ public class Colony {
         else if (type == GameConstants.TYPE_PRINCESS) this.hatchRatePrincess = rate;
     }
 
+    // --- Starting Colony ---
     public void startColony() {
         List<Ant> workerList = getWorkers();
         for (int i = 0; i < 9; i++) {
@@ -739,6 +489,7 @@ public class Colony {
         this.getWorkers().get(8).setRole(GameConstants.ROLE_FORAGER);
     }
 
+    // --- Role Assignment Logic ---
     private void setDefaultRole(Ant ant, AntType type) {
         if (type == GameConstants.TYPE_WORKER) {
             ant.setRole(GameConstants.ROLE_FORAGER);
@@ -758,23 +509,28 @@ public class Colony {
     }
 
     private void assignRolesForType(List<Ant> ants, AntType type) {
-        List<Ant> availableAnts = new ArrayList<>();
         for (Ant ant : ants) {
             setDefaultRole(ant, type);
-            availableAnts.add(ant);
         }
 
-        for (Map.Entry<AntRole, Integer> entry : assignedRoleCounts.entrySet()) {
-            AntRole role = entry.getKey();
-            if (role.getAntType() != type) continue; 
+        List<Ant> availableAnts = new ArrayList<>(ants); 
+        Iterator<Map.Entry<AntRole, Integer>> roleIterator = assignedRoleCounts.entrySet().iterator();
 
-            int assigned = entry.getValue();
+        while(roleIterator.hasNext()) {
+            Map.Entry<AntRole, Integer> entry = roleIterator.next();
+            AntRole role = entry.getKey();
+            if (role.getAntType() != type) continue;
+
+            int desiredCount = entry.getValue();
             int assignedCount = 0;
-            Iterator<Ant> iterator = availableAnts.iterator();
-            while (assignedCount < assigned && iterator.hasNext()) {
-                Ant antToAssign = iterator.next();
-                antToAssign.setRole(role);
-                iterator.remove();
+             
+            Iterator<Ant> antIterator = availableAnts.iterator();
+            while (assignedCount < desiredCount && antIterator.hasNext()) {
+                Ant antToAssign = antIterator.next();
+                if (antToAssign.getRole() != role) {
+                    antToAssign.setRole(role);
+                }
+                antIterator.remove(); 
                 assignedCount++;
             }
         }
@@ -798,6 +554,7 @@ public class Colony {
         return count;
     }
 
+    // --- Hatching Logic ---
     private AntType determineHatchType() {
         double rand = Math.random() * 100.0;
         double cumulative = 0.0;
@@ -807,25 +564,31 @@ public class Colony {
             return GameConstants.TYPE_WORKER;
         }
 
-        cumulative += this.hatchRateSoldier;
-        if (rand < cumulative) {
-            return GameConstants.TYPE_SOLDIER;
+        if (hasUpgrade(GameUpgrades.TYPE_SOLDIER)) {
+            cumulative += this.hatchRateSoldier;
+            if (rand < cumulative) {
+                return GameConstants.TYPE_SOLDIER;
+            }
         }
         
-        // cumulative += this.hatchRateMajor;
-        // if (rand < cumulative) {
-        //     return GameConstants.TYPE_MAJOR;
-        // }
+        if (hasUpgrade(GameUpgrades.TYPE_MAJOR)) {
+            cumulative += this.hatchRateMajor;
+            if (rand < cumulative) {
+                return GameConstants.TYPE_MAJOR;
+            }
+        }
 
-        // cumulative += this.hatchRateDrone;
-        // if (rand < cumulative) {
-        //     return GameConstants.TYPE_DRONE;
-        // }
+        if (hasUpgrade(GameUpgrades.TYPE_PRINCESS)) {
+            cumulative += this.hatchRateDrone;
+            if (rand < cumulative) {
+                return GameConstants.TYPE_DRONE;
+            }
 
-        // cumulative += this.hatchRatePrincess;
-        // if (rand < cumulative) {
-        //     return GameConstants.TYPE_PRINCESS;
-        // }
+            cumulative += this.hatchRatePrincess;
+            if (rand < cumulative) {
+                return GameConstants.TYPE_PRINCESS;
+            }
+        }
         
         return GameConstants.TYPE_WORKER;
     }
@@ -858,13 +621,10 @@ public class Colony {
         }
     }
 
-    // --- Routine Colony Activities (Always happen) --- //
-
+    // --- Routine Colony Activities --- //
     public void runHatching(){    
         hatchPupae();
-
         evolveAnts(getLarvae(), getPupae(), GameConstants.TYPE_PUPA);
-
         evolveAnts(getEggs(), getLarvae(), GameConstants.TYPE_LARVA);
     }
 
@@ -900,9 +660,7 @@ public class Colony {
                 deficit -= antConsumption;
             }
 
-            if (deficit <= 0) {
-                break; 
-            }
+            if (deficit <= 0) break; 
         }
     }
 
@@ -927,6 +685,8 @@ public class Colony {
         List<Ant> drones = getDrones();
         List<Ant> queens = getQueens();
 
+        if (!hasUpgrade(GameUpgrades.TYPE_PRINCESS)) return;
+
         Iterator<Ant> iterator = princesses.iterator();
         while (iterator.hasNext()) {
             if (queens.size() >= this.getQueensCapacity() || drones.isEmpty()) {
@@ -938,39 +698,31 @@ public class Colony {
             queens.add(princess);
             iterator.remove(); 
             Ant deadDrone = drones.remove(drones.size() - 1); 
+            deadDrone.goDie();
             this.deadAnts.add(deadDrone);
         }
     }
 
-    public void runSpreading() {
-    }
+    public void runSpreading() { }
+    public void runInfection() { }
 
-
-    public void runInfection() {
-
-    }
-
-    // --- Ant Jobs (Role dependant) --- //
-
+    // --- Ant Jobs --- //
     public void runLaying() {
         int layerCount = countAntsByRole(getQueens(), GameConstants.ROLE_LAYER);
         List<Ant> eggList = getEggs();
-        if (eggList.size() >= this.getEggsCapacity()) {
-            return;
-        }   
+        int spaceAvailable = this.getEggsCapacity() - eggList.size();
+        if (spaceAvailable <= 0) return;   
         
-        int toLay = layerCount * this.getLayingRate();
+        int toLay = Math.min(layerCount * this.getLayingRate(), spaceAvailable);
         for (int i = 0; i < toLay; i++) {
-            if (eggList.size() >= this.getEggsCapacity()) {
-                break; 
-            }
             eggList.add(new Ant(this, GameConstants.TYPE_EGG));
         }
     }
 
     public void runResearch() {
-        int layerCount = countAntsByRole(getQueens(), GameConstants.ROLE_RESEARCHER);
-        this.researchPoints += layerCount * researchSpeed;
+        if (!hasUpgrade(GameUpgrades.ROLE_RESEARCHER)) return;
+        int researcherCount = countAntsByRole(getQueens(), GameConstants.ROLE_RESEARCHER);
+        this.researchPoints += researcherCount * researchSpeed;
     }
 
     public void runGraveKeeping() {
@@ -1004,21 +756,15 @@ public class Colony {
 
         for (AntType typeToKill : killOrder) {
             List<Ant> list = antGroups.get(typeToKill);
-
             for (int i = list.size() - 1; i >= 0; i--) {
-                
-                if (deficit <= 0) {
-                    break; 
-                }
+                if (deficit <= 0) break; 
 
-                Ant antToCull = list.get(i);
-                double rand = Math.random();
-                if (rand > 0.5) { 
+                if (Math.random() > 0.5) { 
+                    Ant antToCull = list.get(i);
                     list.remove(i); 
                     antToCull.goDie(); 
                     this.deadAnts.add(antToCull);
-                    deficit -= 1;
-                    
+                    deficit--;
                 } 
             }
         }
@@ -1029,9 +775,11 @@ public class Colony {
         int plantGain = (int) (foragerCount * collectingRate);
         this.setPlants(Math.min(this.getPlants() + plantGain, this.getPlantsCapacity()));
 
-        int hunterCount = countAntsByRole(getSoldiers(), GameConstants.ROLE_HUNTER);
-        int proteinGain = (int) (hunterCount * collectingRate);
-        this.setProtein(Math.min(this.getProtein() + proteinGain, this.getProteinCapacity()));
+        if (hasUpgrade(GameUpgrades.ROLE_HUNTER)) {
+            int hunterCount = countAntsByRole(getSoldiers(), GameConstants.ROLE_HUNTER);
+            int proteinGain = (int) (hunterCount * collectingRate);
+            this.setProtein(Math.min(this.getProtein() + proteinGain, this.getProteinCapacity()));
+        }
     }
 
     public void runConverting() {
@@ -1047,9 +795,7 @@ public class Colony {
             this.setMushrooms(Math.min(this.getMushrooms() + conversionAmount, this.getMushroomsCapacity()));
         }
 
-        if (this.getMushrooms() >= this.getMushroomsCapacity()) {
-            return;
-        }
+        if (this.getMushrooms() >= this.getMushroomsCapacity()) return;
 
         if (this.getProtein() >= conversionAmount) {
             this.setProtein(this.getProtein() - conversionAmount);
@@ -1059,20 +805,24 @@ public class Colony {
     }
 
     public void runRanching() {
-        int syrupGain = (int) (aphids);
+        if (!hasUpgrade(GameUpgrades.ROLE_RANCHER)) return;
+        int syrupGain = (int) (aphids); 
         this.setSyrups(Math.min(this.getSyrups() + syrupGain, this.getSyrupsCapacity()));
     }
 
     public void runHerding() {
-        int farmerCount = countAntsByRole(getWorkers(), GameConstants.ROLE_RANCHER);
-        if (aphids < (aphidCapacity * farmerCount)) {
-            this.setAphids(Math.min(this.getAphids() + (aphidCapacity * farmerCount), this.getSyrupsCapacity()));
-        } else if (aphids > (aphidCapacity * farmerCount)) {
-            this.aphids = aphidCapacity * farmerCount;
+         if (!hasUpgrade(GameUpgrades.ROLE_RANCHER)) return;
+        int rancherCount = countAntsByRole(getWorkers(), GameConstants.ROLE_RANCHER);
+        int maxSustainableAphids = aphidCapacity * rancherCount;
+        
+        if (aphids < maxSustainableAphids) {
+            this.setAphids(Math.min(this.getAphids() + rancherCount, maxSustainableAphids));
+        } else if (aphids > maxSustainableAphids) {
+            this.aphids = maxSustainableAphids;
         }
     }
 
-    // --- Job Packer (Minutely/Hourly/Daily/Monthly/Yearly) --- //
+    // --- Job Packer --- //
     public void runMinutelyJobs() {
         this.runConverting();
     }
@@ -1094,7 +844,7 @@ public class Colony {
         this.runHerding();
     }
 
-    public void runMonthlyJobs() {
+    public void runMonthlyJobs() { 
 
     }
 

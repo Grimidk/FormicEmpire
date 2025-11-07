@@ -1,7 +1,9 @@
 package com.grimidk.formicempire.classes.infrasctructure;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Savefile implements Serializable {
@@ -53,11 +55,13 @@ public class Savefile implements Serializable {
     private float hatchRatePrincess;
 
     private Map<String, Integer> assignedRoleCounts;
+    private List<Integer> unlockedUpgradeIds;
 
     public Savefile(int id, String name) {
         this.id = id;
         this.name = name;
         this.assignedRoleCounts = new HashMap<>();
+        this.unlockedUpgradeIds = new ArrayList<>(); 
         this.minute = 0;
         this.hour = 0;
         this.day = 1;
@@ -367,5 +371,13 @@ public class Savefile implements Serializable {
 
     public void setAssignedRoleCounts(Map<String, Integer> assignedRoleCounts) {
         this.assignedRoleCounts = assignedRoleCounts;
+    }
+    
+    public List<Integer> getUnlockedUpgradeIds() {
+        return unlockedUpgradeIds;
+    }
+
+    public void setUnlockedUpgradeIds(List<Integer> unlockedUpgradeIds) {
+        this.unlockedUpgradeIds = unlockedUpgradeIds;
     }
 }
