@@ -3,10 +3,11 @@ package com.grimidk.formicempire.classes.interfaces.game;
 import com.grimidk.formicempire.classes.constants.AntType;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.infrasctructure.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.GameUpgrades;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,13 +51,21 @@ public class HatchRateDialog extends JDialog {
         panel.add(totalLabel);
         panel.add(new JSeparator(SwingConstants.HORIZONTAL));
         
-        List<AntType> typesToRate = Arrays.asList(
-            GameConstants.TYPE_WORKER,
-            GameConstants.TYPE_SOLDIER,
-            GameConstants.TYPE_MAJOR,
-            GameConstants.TYPE_DRONE,
-            GameConstants.TYPE_PRINCESS
-        );
+        // Build the list of types dynamically based on unlocked upgrades
+        List<AntType> typesToRate = new ArrayList<>();
+        if (colony.hasUpgrade(GameUpgrades.TYPE_WORKER)) {
+            typesToRate.add(GameConstants.TYPE_WORKER);
+        }
+        if (colony.hasUpgrade(GameUpgrades.TYPE_SOLDIER)) {
+            typesToRate.add(GameConstants.TYPE_SOLDIER);
+        }
+        if (colony.hasUpgrade(GameUpgrades.TYPE_MAJOR)) {
+            typesToRate.add(GameConstants.TYPE_MAJOR);
+        }
+        if (colony.hasUpgrade(GameUpgrades.TYPE_PRINCESS)) {
+            typesToRate.add(GameConstants.TYPE_DRONE);
+            typesToRate.add(GameConstants.TYPE_PRINCESS);
+        }
 
         for (AntType type : typesToRate) {
             JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT));

@@ -4,6 +4,7 @@ import com.grimidk.formicempire.classes.constants.AntType;
 import com.grimidk.formicempire.classes.constants.ResourceType;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.infrasctructure.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.GameUpgrades; 
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -59,13 +60,26 @@ public class ColonyPanel extends JPanel {
     public ColonyPanel() {
         initComponents();
         initLayout();
+        
+        syrupLabel.setVisible(false);
+        resinLabel.setVisible(false);
+        mineralLabel.setVisible(false);
+        queensLabel.setVisible(false);
+        princessLabel.setVisible(false);
+        droneLabel.setVisible(false);
+        majorLabel.setVisible(false);
+        soldiersLabel.setVisible(false);
+        layingRateLabel.setVisible(false);
+        nurseCoverageLabel.setVisible(false);
+        graveKeepingLabel.setVisible(false);
+        ranchingRateLabel.setVisible(false);
     }
     
-    // Helper to configure labels 
     private void setupConstantLabel(JLabel label, AntType type) {
         label.setIcon(type.getIcon());
         label.setToolTipText(type.getName());
     }
+
     private void setupConstantLabel(JLabel label, ResourceType resource) { 
         label.setIcon(resource.getIcon());
         label.setToolTipText(resource.getName());
@@ -175,9 +189,11 @@ public class ColonyPanel extends JPanel {
         if (plants != lastPlants) planLabel.setText(String.valueOf(plants));
         if (protein != lastProtein) proteinLabel.setText(String.valueOf(protein));
         if (water != lastWater) waterLabel.setText(String.valueOf(water));
-        if (syrups != lastSyrups) syrupLabel.setText(String.valueOf(syrups));
-        if (resins != lastResins) resinLabel.setText(String.valueOf(resins));
-        if (minerals != lastMinerals) mineralLabel.setText(String.valueOf(minerals));
+
+        // Show/Hide resource labels based on upgrades
+        boolean hasRanching = colony.hasUpgrade(GameUpgrades.ROLE_RANCHER);
+        syrupLabel.setVisible(hasRanching);
+        if (hasRanching && syrups != lastSyrups) syrupLabel.setText(String.valueOf(syrups));
 
         // Stats 
         int totalConsumption = colony.getTotalConsumption();
@@ -203,7 +219,10 @@ public class ColonyPanel extends JPanel {
         int plants = colony.getPlants();     
         int protein = colony.getProtein();  
         if (plants != lastPlants) planLabel.setText(String.valueOf(plants));
-        if (protein != lastProtein) proteinLabel.setText(String.valueOf(protein));
+        
+        boolean hasHunter = colony.hasUpgrade(GameUpgrades.ROLE_HUNTER);
+        proteinLabel.setVisible(hasHunter);
+        if (hasHunter && protein != lastProtein) proteinLabel.setText(String.valueOf(protein));
         
         // Stats
         int totalConsumption = colony.getTotalConsumption();
@@ -211,21 +230,37 @@ public class ColonyPanel extends JPanel {
         
         if (colony.getTotalProduction() != -1) totalProductionLabel.setText(String.format("Max Food Prod: %d/day", colony.getTotalProduction()));
 
-        int layerCount = colony.getAssignedRoleCount(GameConstants.ROLE_LAYER);
-        int hourlyLayingRate = layerCount * colony.getLayingRate();
-        int layingRate = hourlyLayingRate * 24;
-        if (layingRate != -1) layingRateLabel.setText(String.format("Laying Rate: %d/day", layingRate));
+        boolean hasLayer = colony.hasUpgrade(GameUpgrades.ROLE_LAYER);
+        layingRateLabel.setVisible(hasLayer);
+        if (hasLayer) {
+            int layerCount = colony.getAssignedRoleCount(GameConstants.ROLE_LAYER);
+            int hourlyLayingRate = layerCount * colony.getLayingRate();
+            int layingRate = hourlyLayingRate * 24;
+            layingRateLabel.setText(String.format("Laying Rate: %d/day", layingRate));
+        }
+        
+        boolean hasNurse = colony.hasUpgrade(GameUpgrades.ROLE_NURSE);
+        nurseCoverageLabel.setVisible(hasNurse);
+        if (hasNurse) {
+            int nurseCount = colony.getAssignedRoleCount(GameConstants.ROLE_NURSE);
+            int babyAntTotal = colony.getEggs().size() + colony.getLarvae().size() + colony.getPupae().size();
+            int nurseCapacity = (int) (nurseCount * colony.getNursingRate());
+            nurseCoverageLabel.setText(String.format("Nurse Coverage: %d/%d", babyAntTotal, nurseCapacity));
+        }
 
-        int nurseCount = colony.getAssignedRoleCount(GameConstants.ROLE_NURSE);
-        int babyAntTotal = colony.getEggs().size() + colony.getLarvae().size() + colony.getPupae().size();
-        int nurseCapacity = (int) (nurseCount * colony.getNursingRate());
-        nurseCoverageLabel.setText(String.format("Nurse Coverage: %d/%d", babyAntTotal, nurseCapacity));
+        boolean hasGraver = colony.hasUpgrade(GameUpgrades.ROLE_GRAVER);
+        graveKeepingLabel.setVisible(hasGraver);
+        if(hasGraver) {
+            int graverCount = colony.getAssignedRoleCount(GameConstants.ROLE_GRAVER);
+            int graveCapacity = graverCount * (int) colony.getGravingRate();
+            graveKeepingLabel.setText("Grave Capacity: " + graveCapacity);
+        }
 
-        int graverCount = colony.getAssignedRoleCount(GameConstants.ROLE_GRAVER);
-        int graveCapacity = graverCount * (int) colony.getGravingRate();
-        graveKeepingLabel.setText("Grave Capacity: " + graveCapacity);
-
-        ranchingRateLabel.setText("Ranching: 0");
+        boolean hasRancher = colony.hasUpgrade(GameUpgrades.ROLE_RANCHER);
+        ranchingRateLabel.setVisible(hasRancher);
+        if (hasRancher) {
+            ranchingRateLabel.setText("Ranching: " + colony.getAphids()); 
+        }
 
         lastEggs = eggs; 
         lastPlants = plants; 
@@ -236,14 +271,32 @@ public class ColonyPanel extends JPanel {
     public void updateDayData(Colony colony) {
         int totalAnts = colony.getAntTotal();
         totalAntLabel.setText("Total ants: " + totalAnts);
+
+        queensLabel.setVisible(colony.hasUpgrade(GameUpgrades.TYPE_QUEEN));
         queensLabel.setText(String.valueOf(colony.getQueens() != null ? colony.getQueens().size() : 0));
+        
+        boolean hasPrincess = colony.hasUpgrade(GameUpgrades.TYPE_PRINCESS);
+        princessLabel.setVisible(hasPrincess);
         princessLabel.setText(String.valueOf(colony.getPrincesses() != null ? colony.getPrincesses().size() : 0));
+        droneLabel.setVisible(hasPrincess);
         droneLabel.setText(String.valueOf(colony.getDrones() != null ? colony.getDrones().size() : 0));
+        
+        majorLabel.setVisible(colony.hasUpgrade(GameUpgrades.TYPE_MAJOR));
         majorLabel.setText(String.valueOf(colony.getMajors() != null ? colony.getMajors().size() : 0));
+        
+        soldiersLabel.setVisible(colony.hasUpgrade(GameUpgrades.TYPE_SOLDIER));
         soldiersLabel.setText(String.valueOf(colony.getSoldiers() != null ? colony.getSoldiers().size() : 0));
+        
+        workersLabel.setVisible(colony.hasUpgrade(GameUpgrades.TYPE_WORKER));
         workersLabel.setText(String.valueOf(colony.getWorkers() != null ? colony.getWorkers().size() : 0));
+        
+        boolean hasBabies = colony.hasUpgrade(GameUpgrades.TYPE_EGG);
+        pupaLabel.setVisible(hasBabies);
         pupaLabel.setText(String.valueOf(colony.getPupae() != null ? colony.getPupae().size() : 0));
+        larvaLabel.setVisible(hasBabies);
         larvaLabel.setText(String.valueOf(colony.getLarvae() != null ? colony.getLarvae().size() : 0));
+        eggsLabel.setVisible(hasBabies);
+        
         deadAntsLabel.setText(String.valueOf(colony.getDeadAnts() != null ? colony.getDeadAnts().size() : 0));
 
         if (colony.getMushrooms() != lastMushrooms) mushroomsLabel.setText(String.valueOf(colony.getMushrooms()));

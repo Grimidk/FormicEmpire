@@ -12,7 +12,7 @@ public final class GameUpgrades {
 
     // --- Upgrades ---
     // -- Types --
-    public static final Upgrade TYPE_EGG = new Upgrade(1, "Egg, Larva and Pupa Type", "Brand New Ants", "Unlocks the baby ant types, allowing new ants to be born. The colony can hold 50 of each type of baby ant.", null );
+    public static final Upgrade TYPE_EGG = new Upgrade(1, "Egg, Larva and Pupa Type", "Brand New Ants", "Unlocks the baby ant types, allowing new ants to be born. The colony can hold 50 of each type of baby ant. Each stage takes 4 days to grow out of.", null );
     public static final Upgrade TYPE_WORKER = new Upgrade(2, "Worker Type", "Means of Production", "Unlocks the worker type, so your colony can sustain itself.", TYPE_EGG );
     public static final Upgrade TYPE_SOLDIER = new Upgrade(3, "Soldier Type", "The Red Army", "Unlocks the soldier type, you can now defend your colony.", TYPE_EGG );
     public static final Upgrade TYPE_MAJOR = new Upgrade(4, "Major Type", "Ant Tanks", "Unlocks the major type, the bulkiest ants around.", TYPE_SOLDIER );
@@ -27,49 +27,31 @@ public final class GameUpgrades {
     public static final Upgrade ROLE_LAYER = new Upgrade(12, "Egg Layer Role", "Ant Factory", "Allows queens to lay new eggs. 1 ant can lay 1 egg per hour.", TYPE_QUEEN );
     public static final Upgrade ROLE_RANCHER = new Upgrade(13, "Rancher Role", "Aphid Rancher", "Allows workers to ranch aphids. 1 ant can handle 10 aphids and herd 1 additional aphid per day. Each aphid produces 1 hoenydew (syrup) and your colony has a capacity of 500.", ROLE_FORAGER );
     public static final Upgrade ROLE_RESEARCHER = new Upgrade(14, "Research Role", "Ant Science", "Allows queens to generate reserach points. 1 ant research 1 point per hour.", TYPE_QUEEN );
-
-
-    // public static final AntRole ROLE_BUILDER = new AntRole(3, TYPE_WORKER, "Builder");
-    // public static final AntRole ROLE_SCOUT = new AntRole(4, TYPE_WORKER, "Scout");
-    // public static final AntRole ROLE_MINER = new AntRole(8, TYPE_WORKER, "Miner");
-    // public static final AntRole ROLE_COURIER = new AntRole(9, TYPE_WORKER, "Courier");
-    // public static final AntRole ROLE_POTTER = new AntRole(10, TYPE_WORKER, "Portable-Feeder");
-
-    // public static final AntRole ROLE_GUARD = new AntRole(11, TYPE_SOLDIER, "Guard");
-    // public static final AntRole ROLE_WARRIOR = new AntRole(12, TYPE_SOLDIER, "Warrior");
-    // public static final AntRole ROLE_DEFENDER = new AntRole(13, TYPE_SOLDIER, "Defender");
-    // public static final AntRole ROLE_POLICE = new AntRole(14, TYPE_SOLDIER, "Parasite-Police");
-    // public static final AntRole ROLE_BOMBER = new AntRole(15, TYPE_SOLDIER, "Bomber");
-
-    // public static final AntRole ROLE_BRUTE = new AntRole(17, TYPE_MAJOR, "Brute");
-    // public static final AntRole ROLE_CARRIER = new AntRole(18, TYPE_MAJOR, "Troop-Carrier");
-    // public static final AntRole ROLE_ARTILLERY = new AntRole(19, TYPE_MAJOR, "Artillery");
-    // public static final AntRole ROLE_SIEGE = new AntRole(20, TYPE_MAJOR, "Siege-Engine");
-    // public static final AntRole ROLE_BORER = new AntRole(21, TYPE_MAJOR, "Boring-Machine");
-
-    // public static final AntRole ROLE_DRONE = new AntRole(22, TYPE_DRONE, "Drone");
-    // public static final AntRole ROLE_BREEDER = new AntRole(23, TYPE_PRINCESS, "Breeder");
-    // public static final AntRole ROLE_DIPLOMAT = new AntRole(24, TYPE_PRINCESS, "Diplomat");
-
-        // this.growthTime = 4;
-        // this.parasiteDetection = 10;
-
-        // this.baseHealth = 100;
-        // this.baseAge = 180;
-        // this.baseTempRes = 25;
-        // this.baseRegen = 1;
-        // this.baseConsumption = 1;
-        // this.baseAttack = 10;
-        // this.baseAttackSpeed = 1;
-        // this.baseDefense = 5;
-        // this.baseSpeed = 1;
-        // this.baseSize = 1;
+    public static final Upgrade ROLE_BUILDER = new Upgrade(15, "Builde Role", "", "", TYPE_WORKER );
+    public static final Upgrade ROLE_SCOUT = new Upgrade(16, "Scout Role", "", "", TYPE_WORKER );
+    public static final Upgrade ROLE_MINER = new Upgrade(17, "Miner Role", "", "", TYPE_WORKER );        // this.mineralsCapacity = 100;
+    public static final Upgrade ROLE_COURIER = new Upgrade(18, "Courier Role", "", "", TYPE_WORKER );
+    public static final Upgrade ROLE_POTTER = new Upgrade(19, "Portable-Feeder Role", "", "", TYPE_WORKER );
+    public static final Upgrade ROLE_GUARD = new Upgrade(20, "Guard Role", "", "", TYPE_SOLDIER );
+    public static final Upgrade ROLE_WARRIOR = new Upgrade(21, "Warrior Role", "", "", TYPE_SOLDIER );
+    public static final Upgrade ROLE_DEFENDER = new Upgrade(22, "Defender Role", "", "", TYPE_SOLDIER );
+    public static final Upgrade ROLE_POLICE = new Upgrade(23, "Parasite-Police Role", "", "", TYPE_SOLDIER );  // this.parasiteDetection = 10;
+    public static final Upgrade ROLE_BOMBER = new Upgrade(24, "Bomber Role", "", "", TYPE_SOLDIER );
+    public static final Upgrade ROLE_BRUTE = new Upgrade(25, "Brute Role", "", "", TYPE_MAJOR );
+    public static final Upgrade ROLE_CARRIER = new Upgrade(26, "Carrier Role", "", "", TYPE_MAJOR );
+    public static final Upgrade ROLE_ARTILLERY = new Upgrade(27, "Artillery Role", "", "", TYPE_MAJOR );
+    public static final Upgrade ROLE_SIEGE = new Upgrade(28, "Siege-Machine Role", "", "", TYPE_MAJOR );
+    public static final Upgrade ROLE_BORER = new Upgrade(29, "Tunel-Borer Role", "", "", TYPE_MAJOR );
+    public static final Upgrade ROLE_BREEDER = new Upgrade(30,"Breeder Roles", "", "", TYPE_PRINCESS );
+    public static final Upgrade ROLE_DIPLOMAT = new Upgrade(31, "Diplomat Role", "", "", TYPE_PRINCESS );
+    // -- Stats -- 
+    public static final Upgrade STAT_SKELETON = new Upgrade(32, "Basic Skeletons", "Basic Exoskeletons", "The basic defense stats for all the ants in your colony before multipliers. 100 health points, 5 defense points and 1 health point recovered per second.", TYPE_EGG );
+    public static final Upgrade STAT_ACID = new Upgrade(33, "Acid Spiting", "Acidic Spit", "The basic offensive stats for all the ants in your colony before multipliers. 10 attack points, 1 attack per second and 1 speed point.", TYPE_EGG );
+    public static final Upgrade STAT_LONGEVITY = new Upgrade(34, "Basic Longevity", "Standard Lifespan", "The basic life stats for all the ants in your colony before multipliers. 180 day lifespan, 25% temperature resistance and 4 days to grow per infant stage.", TYPE_EGG );
 
         // this.waterCapacity = 1000;
         // this.resinsCapacity = 200;
-        // this.mineralsCapacity = 100;
 
-    // -- Stats -- 
 
     // -- Powers --
 
@@ -96,6 +78,11 @@ public final class GameUpgrades {
         upgrades.add(ROLE_GRAVER);
         upgrades.add(ROLE_HUNTER);
         upgrades.add(ROLE_LAYER);
+        upgrades.add(ROLE_RANCHER);
+        upgrades.add(ROLE_RESEARCHER);
+        upgrades.add(STAT_SKELETON);
+        upgrades.add(STAT_ACID);
+        upgrades.add(STAT_LONGEVITY);
 
         synergies.add(null);
     }

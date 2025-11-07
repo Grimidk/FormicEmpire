@@ -146,8 +146,8 @@ public class Colony {
         this.aphidCapacity = 10;
         this.aphids = 0;
 
-        this.hatchRateWorker = 90.0f;
-        this.hatchRateSoldier = 10.0f;
+        this.hatchRateWorker = 100.0f;
+        this.hatchRateSoldier = 0.0f;
         this.hatchRateMajor = 0.0f;
         this.hatchRateDrone = 0.0f;
         this.hatchRatePrincess = 0.0f;
@@ -155,12 +155,15 @@ public class Colony {
 
     private void initializeUpgrades() {
         this.upgrades.add(GameUpgrades.TYPE_EGG);
-        this.upgrades.add(GameUpgrades.TYPE_SOLDIER);
         this.upgrades.add(GameUpgrades.TYPE_QUEEN);
+        this.upgrades.add(GameUpgrades.TYPE_WORKER);
         this.upgrades.add(GameUpgrades.ROLE_FORAGER);
         this.upgrades.add(GameUpgrades.ROLE_FARMER);
         this.upgrades.add(GameUpgrades.ROLE_NURSE);
         this.upgrades.add(GameUpgrades.ROLE_LAYER);
+        this.upgrades.add(GameUpgrades.STAT_SKELETON);
+        this.upgrades.add(GameUpgrades.STAT_ACID);
+        this.upgrades.add(GameUpgrades.STAT_LONGEVITY);
     }
 
     private void loadUpgrades(Savefile savefile) {
@@ -330,9 +333,9 @@ public class Colony {
     }
 
     public int getTotalProduction(){
-        int foragerCount = this.getAssignedRoleCount(GameConstants.ROLE_FORAGER);
-        int hunterCount = this.getAssignedRoleCount(GameConstants.ROLE_HUNTER);
-        int farmerCount = this.getAssignedRoleCount(GameConstants.ROLE_FARMER);
+        int foragerCount = this.countAntsByRole(getWorkers(), GameConstants.ROLE_FORAGER);
+        int hunterCount = this.countAntsByRole(getSoldiers(), GameConstants.ROLE_HUNTER);
+        int farmerCount = this.countAntsByRole(getWorkers(), GameConstants.ROLE_FARMER);
         int collectionPerHour = ((int) this.getCollectingRate()) * (foragerCount + hunterCount);
         int totalProductionRate = (int) (Math.min((conversionRate * farmerCount) * 60, collectionPerHour)) * 3 * 24; 
         return Math.min(totalProductionRate, this.getMushroomsCapacity());
@@ -489,37 +492,40 @@ public class Colony {
         this.getWorkers().get(8).setRole(GameConstants.ROLE_FORAGER);
     }
 
-    // --- Role Assignment Logic ---
-    private void setDefaultRole(Ant ant, AntType type) {
+    private AntRole getDefaultRoleForType(AntType type) {
         if (type == GameConstants.TYPE_WORKER) {
-            ant.setRole(GameConstants.ROLE_FORAGER);
+            return GameConstants.ROLE_FORAGER;
         } else if (type == GameConstants.TYPE_SOLDIER) {
-            ant.setRole(GameConstants.ROLE_HUNTER);
+            return GameConstants.ROLE_HUNTER;
         } else if (type == GameConstants.TYPE_MAJOR) {
-            ant.setRole(GameConstants.ROLE_DEFENDER);
+            return GameConstants.ROLE_BRUTE; 
         } else if (type == GameConstants.TYPE_PRINCESS) {
-            ant.setRole(GameConstants.ROLE_BREEDER);
+            return GameConstants.ROLE_BREEDER;
         } else if (type == GameConstants.TYPE_DRONE) {
-            ant.setRole(GameConstants.ROLE_DRONE);
+            return GameConstants.ROLE_DRONE;
         } else if (type == GameConstants.TYPE_QUEEN) {
-            ant.setRole(GameConstants.ROLE_LAYER);
-        } else {
-            ant.setRole(null);
+            return GameConstants.ROLE_LAYER;
         }
+        return null; 
     }
 
     private void assignRolesForType(List<Ant> ants, AntType type) {
+        AntRole defaultRole = getDefaultRoleForType(type);
+        if (defaultRole == null) return; 
+
         for (Ant ant : ants) {
-            setDefaultRole(ant, type);
+            ant.setRole(defaultRole);
         }
 
         List<Ant> availableAnts = new ArrayList<>(ants); 
+        
         Iterator<Map.Entry<AntRole, Integer>> roleIterator = assignedRoleCounts.entrySet().iterator();
-
         while(roleIterator.hasNext()) {
             Map.Entry<AntRole, Integer> entry = roleIterator.next();
             AntRole role = entry.getKey();
+            
             if (role.getAntType() != type) continue;
+            if (role.equals(defaultRole)) continue; 
 
             int desiredCount = entry.getValue();
             int assignedCount = 0;
@@ -527,13 +533,12 @@ public class Colony {
             Iterator<Ant> antIterator = availableAnts.iterator();
             while (assignedCount < desiredCount && antIterator.hasNext()) {
                 Ant antToAssign = antIterator.next();
-                if (antToAssign.getRole() != role) {
-                    antToAssign.setRole(role);
-                }
-                antIterator.remove(); 
+                antToAssign.setRole(role); 
+                antIterator.remove();
                 assignedCount++;
             }
         }
+        assignedRoleCounts.put(defaultRole, availableAnts.size());
     }
 
     public void runRoleAssignment() {
@@ -845,7 +850,7 @@ public class Colony {
     }
 
     public void runMonthlyJobs() { 
-
+        this.runInfection();
     }
 
     public void runYearlyJobs() {

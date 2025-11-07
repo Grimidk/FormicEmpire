@@ -2,8 +2,10 @@ package com.grimidk.formicempire.classes.interfaces.game;
 
 import com.grimidk.formicempire.classes.constants.AntRole;
 import com.grimidk.formicempire.classes.constants.AntType;
+import com.grimidk.formicempire.classes.constants.Upgrade; 
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.infrasctructure.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.GameUpgrades;
 
 import javax.swing.*;
 import java.awt.*;
@@ -29,7 +31,7 @@ public class RoleManagementDialog extends JDialog {
         add(tabbedPane, BorderLayout.CENTER);
         add(createSouthPanel(), BorderLayout.SOUTH);
         
-        initTabs();
+        initTabs(); 
         initKeyBindings();
         
         addWindowListener(new WindowAdapter() {
@@ -52,11 +54,21 @@ public class RoleManagementDialog extends JDialog {
     }
     
     private void initTabs() {
-        tabbedPane.addTab(GameConstants.TYPE_WORKER.getName(), GameConstants.TYPE_WORKER.getIcon(), createRolePanel(GameConstants.TYPE_WORKER));
-        tabbedPane.addTab(GameConstants.TYPE_SOLDIER.getName(), GameConstants.TYPE_SOLDIER.getIcon(), createRolePanel(GameConstants.TYPE_SOLDIER));
-        tabbedPane.addTab(GameConstants.TYPE_MAJOR.getName(), GameConstants.TYPE_MAJOR.getIcon(), createRolePanel(GameConstants.TYPE_MAJOR));
-        tabbedPane.addTab(GameConstants.TYPE_PRINCESS.getName(), GameConstants.TYPE_PRINCESS.getIcon(), createRolePanel(GameConstants.TYPE_PRINCESS));
-        tabbedPane.addTab(GameConstants.TYPE_QUEEN.getName(), GameConstants.TYPE_QUEEN.getIcon(), createRolePanel(GameConstants.TYPE_QUEEN));
+        if (colony.hasUpgrade(GameUpgrades.TYPE_WORKER)) {
+            tabbedPane.addTab(GameConstants.TYPE_WORKER.getName(), GameConstants.TYPE_WORKER.getIcon(), createRolePanel(GameConstants.TYPE_WORKER));
+        }
+        if (colony.hasUpgrade(GameUpgrades.TYPE_SOLDIER)) {
+            tabbedPane.addTab(GameConstants.TYPE_SOLDIER.getName(), GameConstants.TYPE_SOLDIER.getIcon(), createRolePanel(GameConstants.TYPE_SOLDIER));
+        }
+        if (colony.hasUpgrade(GameUpgrades.TYPE_MAJOR)) {
+            tabbedPane.addTab(GameConstants.TYPE_MAJOR.getName(), GameConstants.TYPE_MAJOR.getIcon(), createRolePanel(GameConstants.TYPE_MAJOR));
+        }
+        if (colony.hasUpgrade(GameUpgrades.TYPE_PRINCESS)) {
+            tabbedPane.addTab(GameConstants.TYPE_PRINCESS.getName(), GameConstants.TYPE_PRINCESS.getIcon(), createRolePanel(GameConstants.TYPE_PRINCESS));
+        }
+        if (colony.hasUpgrade(GameUpgrades.TYPE_QUEEN)) {
+            tabbedPane.addTab(GameConstants.TYPE_QUEEN.getName(), GameConstants.TYPE_QUEEN.getIcon(), createRolePanel(GameConstants.TYPE_QUEEN));
+        }
     }
     
     public void selectTab(int tabIndex) {
@@ -81,9 +93,24 @@ public class RoleManagementDialog extends JDialog {
         am.put(name, new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (tabbedPane.getTabCount() > index) tabbedPane.setSelectedIndex(index);
+                if (tabbedPane.getTabCount() > index) {
+                    tabbedPane.setSelectedIndex(index);
+                }
             }
         });
+    }
+
+    private Upgrade getUpgradeForRole(AntRole role) {
+        if (role == GameConstants.ROLE_FORAGER) return GameUpgrades.ROLE_FORAGER;
+        if (role == GameConstants.ROLE_NURSE) return GameUpgrades.ROLE_NURSE;
+        if (role == GameConstants.ROLE_FARMER) return GameUpgrades.ROLE_FARMER;
+        if (role == GameConstants.ROLE_GRAVER) return GameUpgrades.ROLE_GRAVER;
+        if (role == GameConstants.ROLE_HUNTER) return GameUpgrades.ROLE_HUNTER;
+        if (role == GameConstants.ROLE_LAYER) return GameUpgrades.ROLE_LAYER;
+        if (role == GameConstants.ROLE_RANCHER) return GameUpgrades.ROLE_RANCHER;
+        if (role == GameConstants.ROLE_RESEARCHER) return GameUpgrades.ROLE_RESEARCHER;
+
+        return null; 
     }
 
     private JPanel createRolePanel(AntType antType) {
@@ -107,37 +134,42 @@ public class RoleManagementDialog extends JDialog {
 
         for (AntRole role : GameConstants.getAntRoles()) {
             if (role.getAntType() == antType) {
-                JPanel roleRow = new JPanel(new FlowLayout(FlowLayout.LEFT));
-                roleRow.add(new JLabel(role.getName() + ":"));
                 
-                int currentAssigned = colony.getAssignedRoleCount(role);
-                SpinnerModel model = new SpinnerNumberModel(currentAssigned, 0, Integer.MAX_VALUE, 1); 
-                JSpinner spinner = new JSpinner(model);
-                spinner.setPreferredSize(new Dimension(80, 25));
-
-                spinner.addChangeListener(e -> {
-                    int newValue = (Integer) spinner.getValue();
-                    int otherSpinnersTotal = 0;
-                    for (Map.Entry<AntRole, JSpinner> entry : spinnerMap.entrySet()) {
-                        if (entry.getValue() != spinner) {
-                            otherSpinnersTotal += (Integer) entry.getValue().getValue();
-                        }
-                    }
-
-                    int newTotalAssigned = newValue + otherSpinnersTotal;
-                    if (newTotalAssigned > totalAnts) {
-                        int allowedValue = Math.max(0, totalAnts - otherSpinnersTotal);
-                        SwingUtilities.invokeLater(() -> spinner.setValue(allowedValue));
-                        newValue = allowedValue;
-                    }
+                Upgrade roleUpgrade = getUpgradeForRole(role);
+                
+                if (roleUpgrade != null && colony.hasUpgrade(roleUpgrade)) {
+                    JPanel roleRow = new JPanel(new FlowLayout(FlowLayout.LEFT));
+                    roleRow.add(new JLabel(role.getName() + ":"));
                     
-                    colony.setAssignedRoleCount(role, newValue);
-                    updateRolePanelTotals(totalAnts, assignedLabel, unassignedLabel, spinnerMap);
-                });
-                
-                roleRow.add(spinner);
-                spinnerMap.put(role, spinner);
-                panel.add(roleRow);
+                    int currentAssigned = colony.getAssignedRoleCount(role);
+                    SpinnerModel model = new SpinnerNumberModel(currentAssigned, 0, Integer.MAX_VALUE, 1); 
+                    JSpinner spinner = new JSpinner(model);
+                    spinner.setPreferredSize(new Dimension(80, 25));
+
+                    spinner.addChangeListener(e -> {
+                        int newValue = (Integer) spinner.getValue();
+                        int otherSpinnersTotal = 0;
+                        for (Map.Entry<AntRole, JSpinner> entry : spinnerMap.entrySet()) {
+                            if (entry.getValue() != spinner) {
+                                otherSpinnersTotal += (Integer) entry.getValue().getValue();
+                            }
+                        }
+
+                        int newTotalAssigned = newValue + otherSpinnersTotal;
+                        if (newTotalAssigned > totalAnts) {
+                            int allowedValue = Math.max(0, totalAnts - otherSpinnersTotal);
+                            SwingUtilities.invokeLater(() -> spinner.setValue(allowedValue));
+                            newValue = allowedValue;
+                        }
+                        
+                        colony.setAssignedRoleCount(role, newValue);
+                        updateRolePanelTotals(totalAnts, assignedLabel, unassignedLabel, spinnerMap);
+                    });
+                    
+                    roleRow.add(spinner);
+                    spinnerMap.put(role, spinner);
+                    panel.add(roleRow);
+                }
             }
         }
         
