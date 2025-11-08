@@ -74,7 +74,7 @@ public class TriggerManager {
             return;
         }
         
-        if (colony.getDeadAnts().size() >= 30) {
+        if (colony.getDeadAnts().size() >= 100) {
             fireTrigger(GameUpgrades.ROLE_GRAVER, 
                         "A Smelly Problem", 
                         "The bodies are piling up! Your workers have developed the Grave-Keeper role to clean the colony and prevent disease.");

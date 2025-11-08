@@ -283,6 +283,11 @@ public class SaveManager {
             try {
                 Colony c = w.getSpawnHex().getColony();
                 if (c != null) {
+                    // --- IDs ---
+                    save.setColonyId(c.getId());
+                    save.setColonyName(c.getName());
+                    
+                    // --- Ant Counts ---
                     save.setTotalAnts(c.getAntTotal());
                     save.setDeadAnts(c.getDeadAnts() != null ? c.getDeadAnts().size() : 0);
                     save.setEggs(c.getEggs() != null ? c.getEggs().size() : 0);
@@ -294,7 +299,9 @@ public class SaveManager {
                     save.setDrones(c.getDrones() != null ? c.getDrones().size() : 0);
                     save.setPrincesses(c.getPrincesses() != null ? c.getPrincesses().size() : 0);
                     save.setQueens(c.getQueens() != null ? c.getQueens().size() : 0);
-                    save.setMushrooms(c.getMushrooms() );
+                    
+                    // --- Resources ---
+                    save.setMushrooms(c.getMushrooms());
                     save.setPlants(c.getPlants());
                     save.setProtein(c.getProtein());
                     save.setWater(c.getWater());
@@ -302,12 +309,23 @@ public class SaveManager {
                     save.setResins(c.getResins());
                     save.setMinerals(c.getMinerals());
 
+                    // --- Resource Capacities ---
+                    save.setMushroomsCapacity(c.getMushroomsCapacity());
+                    save.setPlantsCapacity(c.getPlantsCapacity());
+                    save.setProteinCapacity(c.getProteinCapacity());
+                    save.setWaterCapacity(c.getWaterCapacity());
+                    save.setSyrupsCapacity(c.getSyrupsCapacity());
+                    save.setResinsCapacity(c.getResinsCapacity());
+                    save.setMineralsCapacity(c.getMineralsCapacity());
+
+                    // --- Hatch Rates ---
                     save.setHatchRateWorker(c.getHatchRateWorker());
                     save.setHatchRateSoldier(c.getHatchRateSoldier());
                     save.setHatchRateMajor(c.getHatchRateMajor());
                     save.setHatchRateDrone(c.getHatchRateDrone());
                     save.setHatchRatePrincess(c.getHatchRatePrincess());
 
+                    // --- Roles & Upgrades ---
                     Map<String, Integer> rolesToSave = new HashMap<>();
                     for (Map.Entry<AntRole, Integer> entry : c.getAssignedRoleCounts().entrySet()) {
                         rolesToSave.put(entry.getKey().getName(), entry.getValue());
@@ -322,6 +340,20 @@ public class SaveManager {
                         }
                     }
                     save.setUnlockedUpgradeIds(upgradeIds);
+                    
+                    // --- New Stats ---
+                    save.setAphids(c.getAphids());
+                    save.setResearchPoints(c.getResearchPoints());
+                    save.setResearchSpeed(c.getResearchSpeed());
+                    save.setGrowthTime(c.getGrowthTime());
+                    save.setLayingRate(c.getLayingRate());
+                    save.setConversionRate(c.getConversionRate());
+                    save.setNursingRate(c.getNursingRate());
+                    save.setGravingRate(c.getGravingRate());
+                    save.setCollectingRate(c.getCollectingRate());
+                    save.setAphidCapacity(c.getAphidCapacity());
+                    save.setEggsCapacity(c.getEggsCapacity());
+                    save.setQueensCapacity(c.getQueensCapacity());
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -359,6 +391,8 @@ public class SaveManager {
         // General
         writeJsonLine(w, "id", s.getId(), false);
         writeJsonLine(w, "name", s.getName() != null ? s.getName() : "", false);
+        writeJsonLine(w, "colonyId", s.getColonyId(), false);
+        writeJsonLine(w, "colonyName", s.getColonyName() != null ? s.getColonyName() : "", false);
         writeJsonLine(w, "progress", s.getProgress(), false);
         
         // Time
@@ -391,12 +425,35 @@ public class SaveManager {
         writeJsonLine(w, "resins", s.getResins(), false);
         writeJsonLine(w, "minerals", s.getMinerals(), false);
 
+        // Resource Capacities
+        writeJsonLine(w, "plantsCapacity", s.getPlantsCapacity(), false);
+        writeJsonLine(w, "mushroomsCapacity", s.getMushroomsCapacity(), false);
+        writeJsonLine(w, "proteinCapacity", s.getProteinCapacity(), false);
+        writeJsonLine(w, "waterCapacity", s.getWaterCapacity(), false);
+        writeJsonLine(w, "syrupsCapacity", s.getSyrupsCapacity(), false);
+        writeJsonLine(w, "resinsCapacity", s.getResinsCapacity(), false);
+        writeJsonLine(w, "mineralsCapacity", s.getMineralsCapacity(), false);
+
         // Hatch Rates
         writeJsonLine(w, "hatchRateWorker", s.getHatchRateWorker(), false);
         writeJsonLine(w, "hatchRateSoldier", s.getHatchRateSoldier(), false);
         writeJsonLine(w, "hatchRateMajor", s.getHatchRateMajor(), false);
         writeJsonLine(w, "hatchRateDrone", s.getHatchRateDrone(), false);
         writeJsonLine(w, "hatchRatePrincess", s.getHatchRatePrincess(), false);
+
+        // New Stats
+        writeJsonLine(w, "aphids", s.getAphids(), false);
+        writeJsonLine(w, "researchPoints", s.getResearchPoints(), false);
+        writeJsonLine(w, "researchSpeed", s.getResearchSpeed(), false);
+        writeJsonLine(w, "growthTime", s.getGrowthTime(), false);
+        writeJsonLine(w, "layingRate", s.getLayingRate(), false);
+        writeJsonLine(w, "conversionRate", s.getConversionRate(), false);
+        writeJsonLine(w, "nursingRate", s.getNursingRate(), false);
+        writeJsonLine(w, "gravingRate", s.getGravingRate(), false);
+        writeJsonLine(w, "collectingRate", s.getCollectingRate(), false);
+        writeJsonLine(w, "aphidCapacity", s.getAphidCapacity(), false);
+        writeJsonLine(w, "eggsCapacity", s.getEggsCapacity(), false);
+        writeJsonLine(w, "queensCapacity", s.getQueensCapacity(), false);
 
         // Upgrades
         w.write("  \"unlockedUpgradeIds\": ");
@@ -442,7 +499,7 @@ public class SaveManager {
                 if (v.endsWith("\"")) {
                     v = v.substring(0, v.length() - 1);
                 }
-                if (k.equals("name")) {
+                if (k.equals("name") || k.equals("colonyName")) { // Also unescape colonyName
                      v = unescapeJsonString(v);
                 }
             } else if (v.startsWith("[")) { 
@@ -459,6 +516,8 @@ public class SaveManager {
             String name = m.getOrDefault("name", "");
 
             s = new Savefile(id, name);
+            s.setColonyId(Integer.parseInt(m.getOrDefault("colonyId", "0")));
+            s.setColonyName(m.getOrDefault("colonyName", ""));
             s.setProgress(Float.parseFloat(m.getOrDefault("progress", "0")));
             s.setPlayTime(Integer.parseInt(m.getOrDefault("playTime", "0")));
             s.setMinute(Integer.parseInt(m.getOrDefault("minute", "0")));
@@ -466,6 +525,8 @@ public class SaveManager {
             s.setDay(Integer.parseInt(m.getOrDefault("day", "0")));
             s.setMonth(Integer.parseInt(m.getOrDefault("month", "0")));
             s.setYear(Integer.parseInt(m.getOrDefault("year", "0")));
+            
+            // Ant Counts
             s.setTotalAnts(Integer.parseInt(m.getOrDefault("totalAnts", "0")));
             s.setDeadAnts(Integer.parseInt(m.getOrDefault("deadAnts", "0")));
             s.setEggs(Integer.parseInt(m.getOrDefault("eggs", "0")));
@@ -477,6 +538,8 @@ public class SaveManager {
             s.setDrones(Integer.parseInt(m.getOrDefault("drones", "0")));
             s.setPrincesses(Integer.parseInt(m.getOrDefault("princesses", "0")));
             s.setQueens(Integer.parseInt(m.getOrDefault("queens", "0")));
+            
+            // Resources
             s.setMushrooms(Integer.parseInt(m.getOrDefault("mushrooms", "0")));
             s.setPlants(Integer.parseInt(m.getOrDefault("plants", "0")));
             s.setProtein(Integer.parseInt(m.getOrDefault("protein", "0")));
@@ -485,12 +548,37 @@ public class SaveManager {
             s.setResins(Integer.parseInt(m.getOrDefault("resins", "0")));
             s.setMinerals(Integer.parseInt(m.getOrDefault("minerals", "0")));
 
-            s.setHatchRateWorker(Float.parseFloat(m.getOrDefault("hatchRateWorker", "70.0")));
-            s.setHatchRateSoldier(Float.parseFloat(m.getOrDefault("hatchRateSoldier", "15.0")));
-            s.setHatchRateMajor(Float.parseFloat(m.getOrDefault("hatchRateMajor", "5.0")));
-            s.setHatchRateDrone(Float.parseFloat(m.getOrDefault("hatchRateDrone", "5.0")));
-            s.setHatchRatePrincess(Float.parseFloat(m.getOrDefault("hatchRatePrincess", "5.0")));
+            // Resource Capacities
+            s.setMushroomsCapacity(Integer.parseInt(m.getOrDefault("mushroomsCapacity", "8000")));
+            s.setPlantsCapacity(Integer.parseInt(m.getOrDefault("plantsCapacity", "4000")));
+            s.setProteinCapacity(Integer.parseInt(m.getOrDefault("proteinCapacity", "2000")));
+            s.setWaterCapacity(Integer.parseInt(m.getOrDefault("waterCapacity", "1000")));
+            s.setSyrupsCapacity(Integer.parseInt(m.getOrDefault("syrupsCapacity", "500")));
+            s.setResinsCapacity(Integer.parseInt(m.getOrDefault("resinsCapacity", "200")));
+            s.setMineralsCapacity(Integer.parseInt(m.getOrDefault("mineralsCapacity", "100")));
+
+            // Hatch Rates
+            s.setHatchRateWorker(Float.parseFloat(m.getOrDefault("hatchRateWorker", "100.0")));
+            s.setHatchRateSoldier(Float.parseFloat(m.getOrDefault("hatchRateSoldier", "0.0")));
+            s.setHatchRateMajor(Float.parseFloat(m.getOrDefault("hatchRateMajor", "0.0")));
+            s.setHatchRateDrone(Float.parseFloat(m.getOrDefault("hatchRateDrone", "0.0")));
+            s.setHatchRatePrincess(Float.parseFloat(m.getOrDefault("hatchRatePrincess", "0.0")));
             
+            // New Stats
+            s.setAphids(Integer.parseInt(m.getOrDefault("aphids", "0")));
+            s.setResearchPoints(Integer.parseInt(m.getOrDefault("researchPoints", "0")));
+            s.setResearchSpeed(Integer.parseInt(m.getOrDefault("researchSpeed", "1")));
+            s.setGrowthTime(Integer.parseInt(m.getOrDefault("growthTime", "4")));
+            s.setLayingRate(Integer.parseInt(m.getOrDefault("layingRate", "1")));
+            s.setConversionRate(Float.parseFloat(m.getOrDefault("conversionRate", "1.0")));
+            s.setNursingRate(Float.parseFloat(m.getOrDefault("nursingRate", "10.0")));
+            s.setGravingRate(Float.parseFloat(m.getOrDefault("gravingRate", "5.0")));
+            s.setCollectingRate(Float.parseFloat(m.getOrDefault("collectingRate", "1.0")));
+            s.setAphidCapacity(Integer.parseInt(m.getOrDefault("aphidCapacity", "10")));
+            s.setEggsCapacity(Integer.parseInt(m.getOrDefault("eggsCapacity", "50")));
+            s.setQueensCapacity(Integer.parseInt(m.getOrDefault("queensCapacity", "1")));
+
+            // Roles & Upgrades
             String rolesJson = m.getOrDefault("assignedRoleCounts", "{}");
             if (rolesJson.startsWith("\"")) {
                 rolesJson = unescapeJsonString(rolesJson.substring(1, rolesJson.length() - 1));

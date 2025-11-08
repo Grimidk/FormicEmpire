@@ -190,14 +190,6 @@ public class Engine extends Thread {
             }
         } catch (Exception ignore) {
         }
-
-        if (this.world.getSpawnHex() != null && this.world.getSpawnHex().getColony() != null) {
-            Colony colony = this.world.getSpawnHex().getColony();
-            
-            TriggerManager triggerManager = new TriggerManager(this.world, colony, this);
-            
-            triggerManager.registerListeners();
-        }
     }
 
     @Override

@@ -203,8 +203,8 @@ public class Colony {
     }
 
     public Colony(Savefile savefile) {
-        this.id = savefile.getColonyId();
-        this.name = savefile.getColonyName();
+        this.id = savefile.getColonyId() > 0 ? savefile.getColonyId() : savefile.getId();
+        this.name = savefile.getColonyName() != null && !savefile.getColonyName().isEmpty() ? savefile.getColonyName() : savefile.getName();
         this.isPlayer = true;
         this.rank = GameConstants.RANK_COLONY;
         this.antGroups = new HashMap<>();
@@ -213,9 +213,9 @@ public class Colony {
 
         initializeLists();
         initializeDefaults(); 
-        loadUpgrades(savefile); 
+        loadUpgrades(savefile);
         initializeAssignedRoles(); 
-
+        
         Map<String, Integer> savedRoles = savefile.getAssignedRoleCounts();
         if (savedRoles != null && !savedRoles.isEmpty()) {
             for (AntRole role : GameConstants.getAntRoles()) {
@@ -226,12 +226,14 @@ public class Colony {
             }
         }
         
+        // Hatch Rates
         this.hatchRateWorker = savefile.getHatchRateWorker();
         this.hatchRateSoldier = savefile.getHatchRateSoldier();
         this.hatchRateMajor = savefile.getHatchRateMajor();
         this.hatchRateDrone = savefile.getHatchRateDrone();
         this.hatchRatePrincess = savefile.getHatchRatePrincess();
 
+        // Ant populations
         populateAntList(getEggs(), savefile.getEggs(), GameConstants.TYPE_EGG);
         populateAntList(getLarvae(), savefile.getLarvae(), GameConstants.TYPE_LARVA);
         populateAntList(getPupae(), savefile.getPupae(), GameConstants.TYPE_PUPA);
@@ -243,6 +245,7 @@ public class Colony {
         populateAntList(getQueens(), savefile.getQueens(), GameConstants.TYPE_QUEEN);
         populateAntList(deadAnts, savefile.getDeadAnts(), GameConstants.TYPE_DEAD);
 
+        // Resources
         this.plants = savefile.getPlants();
         this.mushrooms = savefile.getMushrooms();
         this.protein = savefile.getProtein();
@@ -250,8 +253,31 @@ public class Colony {
         this.syrups = savefile.getSyrups();
         this.resins = savefile.getResins();
         this.minerals = savefile.getMinerals();
+        
+        // Resource Capacities
+        this.plantsCapacity = savefile.getPlantsCapacity();
+        this.mushroomsCapacity = savefile.getMushroomsCapacity();
+        this.proteinCapacity = savefile.getProteinCapacity();
+        this.waterCapacity = savefile.getWaterCapacity();
+        this.syrupsCapacity = savefile.getSyrupsCapacity();
+        this.resinsCapacity = savefile.getResinsCapacity();
+        this.mineralsCapacity = savefile.getMineralsCapacity();
 
-        runRoleAssignment();
+        // New Stats
+        this.aphids = savefile.getAphids();
+        this.researchPoints = savefile.getResearchPoints();
+        this.researchSpeed = savefile.getResearchSpeed();
+        this.growthTime = savefile.getGrowthTime();
+        this.layingRate = savefile.getLayingRate();
+        this.conversionRate = savefile.getConversionRate();
+        this.nursingRate = savefile.getNursingRate();
+        this.gravingRate = savefile.getGravingRate();
+        this.collectingRate = savefile.getCollectingRate();
+        this.aphidCapacity = savefile.getAphidCapacity();
+        this.eggsCapacity = savefile.getEggsCapacity();
+        this.queensCapacity = savefile.getQueensCapacity();
+
+        runRoleAssignment(); 
     }
 
     private void populateAntList(List<Ant> list, int count, AntType type) {
