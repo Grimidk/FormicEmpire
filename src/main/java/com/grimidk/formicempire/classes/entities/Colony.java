@@ -104,7 +104,7 @@ public class Colony {
     }
 
     private void initializeDefaults() {
-        this.researchSpeed = 10;
+        this.researchSpeed = 1;
         this.researchPoints = 0;
 
         this.growthTime = 4;

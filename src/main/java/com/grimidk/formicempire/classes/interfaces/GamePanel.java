@@ -5,6 +5,7 @@ import com.grimidk.formicempire.classes.entities.World;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
+import com.grimidk.formicempire.classes.infrasctructure.TriggerManager; // ADDED
 import com.grimidk.formicempire.classes.interfaces.game.ColonyPanel;
 import com.grimidk.formicempire.classes.interfaces.game.ControlPanel;
 import com.grimidk.formicempire.classes.interfaces.game.HatchRateDialog;
@@ -217,6 +218,18 @@ public class GamePanel extends JPanel {
                     updateDayGUI();
                     updateMonthGUI();
                     
+                    World world = engine.getWorld();
+                    if (world != null && world.getSpawnHex() != null && world.getSpawnHex().getColony() != null) {
+                        Colony colony = world.getSpawnHex().getColony();
+                        
+                        TriggerManager triggerManager = new TriggerManager(world, colony, engine);
+                        
+                        if (frame instanceof TriggerManager.TriggerListener) {
+                            triggerManager.addListener((TriggerManager.TriggerListener) frame);
+                        }
+                        triggerManager.registerListeners();
+                    }
+                    
                     if (!engineStarted) {
                         engineStarted = true;
                         engine.start();
@@ -282,6 +295,13 @@ public class GamePanel extends JPanel {
     }
 
     // --- Event-Driven Update Methods ---
+    public void refreshAllGUIData() {
+        updateMinuteGUI();
+        updateHourGUI();
+        updateDayGUI();
+        updateMonthGUI();
+    }
+
     private void updateStaticWorldInfo() {
         World world = frame.getEngine().getWorld();
         if (world == null) return;

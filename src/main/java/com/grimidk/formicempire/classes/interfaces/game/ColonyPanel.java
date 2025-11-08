@@ -38,8 +38,10 @@ public class ColonyPanel extends JPanel {
     private final JLabel netMushroomsLabel = new JLabel("Net Food: 0/day");
     private final JLabel layingRateLabel = new JLabel("Laying Rate: 0/day");
     private final JLabel nurseCoverageLabel = new JLabel("Nurse Coverage: 0/0");
-    private final JLabel graveKeepingLabel = new JLabel("Grave Capacity: 0");
-    private final JLabel ranchingRateLabel = new JLabel("Ranching: 0");
+    private final JLabel graveKeepingLabel = new JLabel("Grave Cleaning: 0/0");
+    private final JLabel aphidCountLabel = new JLabel("Aphids: 0/0");
+    private final JLabel researchPointsLabel = new JLabel("Research: 0");
+    private final JLabel researchRateLabel = new JLabel("Research Rate: 0/day");
     private final JLabel babyAntsLabel = new JLabel("Baby Ants: 0");
     private final JLabel adultAntsLabel = new JLabel("Adult Ants: 0");
     
@@ -72,7 +74,9 @@ public class ColonyPanel extends JPanel {
         layingRateLabel.setVisible(false);
         nurseCoverageLabel.setVisible(false);
         graveKeepingLabel.setVisible(false);
-        ranchingRateLabel.setVisible(false);
+        aphidCountLabel.setVisible(false);
+        researchPointsLabel.setVisible(false);
+        researchRateLabel.setVisible(false);
     }
     
     private void setupConstantLabel(JLabel label, AntType type) {
@@ -165,7 +169,9 @@ public class ColonyPanel extends JPanel {
         panel.add(layingRateLabel);
         panel.add(nurseCoverageLabel);
         panel.add(graveKeepingLabel);
-        panel.add(ranchingRateLabel);
+        panel.add(aphidCountLabel);
+        panel.add(researchPointsLabel);
+        panel.add(researchRateLabel);
         panel.add(babyAntsLabel);
         panel.add(adultAntsLabel);
         return panel;
@@ -248,18 +254,14 @@ public class ColonyPanel extends JPanel {
             nurseCoverageLabel.setText(String.format("Nurse Coverage: %d/%d", babyAntTotal, nurseCapacity));
         }
 
-        boolean hasGraver = colony.hasUpgrade(GameUpgrades.ROLE_GRAVER);
-        graveKeepingLabel.setVisible(hasGraver);
-        if(hasGraver) {
-            int graverCount = colony.getAssignedRoleCount(GameConstants.ROLE_GRAVER);
-            int graveCapacity = graverCount * (int) colony.getGravingRate();
-            graveKeepingLabel.setText("Grave Capacity: " + graveCapacity);
-        }
-
-        boolean hasRancher = colony.hasUpgrade(GameUpgrades.ROLE_RANCHER);
-        ranchingRateLabel.setVisible(hasRancher);
-        if (hasRancher) {
-            ranchingRateLabel.setText("Ranching: " + colony.getAphids()); 
+        boolean hasResearcher = colony.hasUpgrade(GameUpgrades.ROLE_RESEARCHER);
+        researchPointsLabel.setVisible(hasResearcher);
+        researchRateLabel.setVisible(hasResearcher);
+        if (hasResearcher) {
+            researchPointsLabel.setText("Research: " + colony.getResearchPoints());
+            int researcherCount = colony.getAssignedRoleCount(GameConstants.ROLE_RESEARCHER);
+            int researchPerDay = researcherCount * colony.getResearchSpeed() * 24;
+            researchRateLabel.setText("Research Rate: " + researchPerDay + "/day");
         }
 
         lastEggs = eggs; 
@@ -300,6 +302,23 @@ public class ColonyPanel extends JPanel {
         deadAntsLabel.setText(String.valueOf(colony.getDeadAnts() != null ? colony.getDeadAnts().size() : 0));
 
         if (colony.getMushrooms() != lastMushrooms) mushroomsLabel.setText(String.valueOf(colony.getMushrooms()));
+        
+        boolean hasGraver = colony.hasUpgrade(GameUpgrades.ROLE_GRAVER);
+        graveKeepingLabel.setVisible(hasGraver);
+        if(hasGraver) {
+            int graverCount = colony.getAssignedRoleCount(GameConstants.ROLE_GRAVER);
+            int graveCapacity = graverCount * (int) colony.getGravingRate();
+            int currentDead = colony.getDeadAnts() != null ? colony.getDeadAnts().size() : 0;
+            graveKeepingLabel.setText(String.format("Grave Cleaning: %d/%d", currentDead, graveCapacity));
+        }
+
+        boolean hasRancher = colony.hasUpgrade(GameUpgrades.ROLE_RANCHER);
+        aphidCountLabel.setVisible(hasRancher);
+        if (hasRancher) {
+            int rancherCount = colony.getAssignedRoleCount(GameConstants.ROLE_RANCHER);
+            int maxSustainableAphids = colony.getAphidCapacity() * rancherCount;
+            aphidCountLabel.setText(String.format("Aphids: %d/%d", colony.getAphids(), maxSustainableAphids));
+        }
         
         int eggs = colony.getEggs() != null ? colony.getEggs().size() : 0;
         int larva = colony.getLarvae() != null ? colony.getLarvae().size() : 0;

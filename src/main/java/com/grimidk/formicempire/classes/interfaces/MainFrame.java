@@ -1,13 +1,13 @@
 package com.grimidk.formicempire.classes.interfaces;
 
 import javax.swing.*;
-
+import com.grimidk.formicempire.classes.constants.Upgrade;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
-
+import com.grimidk.formicempire.classes.infrasctructure.TriggerManager; 
 import java.awt.*;
 
-public class MainFrame extends JFrame {
+public class MainFrame extends JFrame implements TriggerManager.TriggerListener {
     public static final String CARD_INIT = "INIT";
     public static final String CARD_SAVE = "SAVE";
     public static final String CARD_HELP = "HELP";
@@ -112,5 +112,14 @@ public class MainFrame extends JFrame {
         showCard(CARD_GAME);
         gamePanel.enterWithSavefile(savefile);
         applyEngineSettings();
+    }
+    
+    @Override
+    public void onUpgradeTriggered(Upgrade unlockedUpgrade, String title, String message) {
+        JOptionPane.showMessageDialog(this, message, title, JOptionPane.INFORMATION_MESSAGE);
+
+        if (gamePanel != null) {
+            gamePanel.refreshAllGUIData();
+        }
     }
 }
