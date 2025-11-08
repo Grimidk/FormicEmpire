@@ -362,7 +362,11 @@ public class Colony {
         int foragerCount = this.countAntsByRole(getWorkers(), GameConstants.ROLE_FORAGER);
         int hunterCount = this.countAntsByRole(getSoldiers(), GameConstants.ROLE_HUNTER);
         int farmerCount = this.countAntsByRole(getWorkers(), GameConstants.ROLE_FARMER);
-        int collectionPerHour = ((int) this.getCollectingRate()) * (foragerCount + hunterCount);
+        
+        double plantCollection = foragerCount * 0.5 * this.getCollectingRate();
+        double proteinCollection = hunterCount * this.getCollectingRate();
+        
+        int collectionPerHour = (int) (plantCollection + proteinCollection);
         int totalProductionRate = (int) (Math.min((conversionRate * farmerCount) * 60, collectionPerHour)) * 3 * 24; 
         return Math.min(totalProductionRate, this.getMushroomsCapacity());
     }
@@ -652,7 +656,7 @@ public class Colony {
         }
     }
 
-    // --- Routine Colony Activities --- //
+    // --- Routine Colony Activities ---
     public void runHatching(){    
         hatchPupae();
         evolveAnts(getLarvae(), getPupae(), GameConstants.TYPE_PUPA);
@@ -660,38 +664,86 @@ public class Colony {
     }
 
     public void runEating(){
-        int totalConsumption = this.getTotalConsumption();
-        if (this.getMushrooms() >= totalConsumption) {
-            this.setMushrooms(this.getMushrooms() - totalConsumption);
-            return;
+        //Water
+        List<Ant> thirstyAnts = new ArrayList<>();
+        int waterAvailable = this.getWater();
+        List<AntType> eatOrder = Arrays.asList(
+             GameConstants.TYPE_QUEEN,
+            GameConstants.TYPE_WORKER,
+            GameConstants.TYPE_LARVA,
+            GameConstants.TYPE_SOLDIER,
+            GameConstants.TYPE_MAJOR,
+            GameConstants.TYPE_PRINCESS,
+            GameConstants.TYPE_DRONE
+        );
+        
+        for (AntType type : eatOrder) {
+            List<Ant> list = antGroups.get(type);
+            for (Ant ant : list) {
+                if (waterAvailable >= 1) {
+                    waterAvailable -= 1;
+                } else {
+                    thirstyAnts.add(ant);
+                }
+            }
+        }
+        this.setWater(waterAvailable);
+
+        //Food
+        int mushroomsAvailable = this.getMushrooms();
+        List<Ant> hungryAnts = new ArrayList<>();
+        
+        for (AntType type : eatOrder) {
+            int consumptionPerAnt = (int) (type.getConsumptionMult() * this.getBaseConsumption());
+            if (consumptionPerAnt <= 0) consumptionPerAnt = 1; 
+            if (type == GameConstants.TYPE_EGG || type == GameConstants.TYPE_PUPA) continue;
+
+            List<Ant> list = antGroups.get(type);
+            for (Ant ant : list) {
+                if (mushroomsAvailable >= consumptionPerAnt) {
+                    mushroomsAvailable -= consumptionPerAnt;
+                } else {
+                    hungryAnts.add(ant);
+                }
+            }
+        }
+        this.setMushrooms(mushroomsAvailable);
+
+        //Syrup
+        Set<Ant> antsInNeed = new HashSet<>(thirstyAnts);
+        antsInNeed.addAll(hungryAnts);
+        
+        int syrupAvailable = hasUpgrade(GameUpgrades.ROLE_RANCHER) ? this.getSyrups() : 0;
+        
+        Iterator<Ant> needIterator = antsInNeed.iterator();
+        while (needIterator.hasNext() && syrupAvailable > 0) {
+            Ant ant = needIterator.next();
+            syrupAvailable -= 1;
+            
+            needIterator.remove(); 
+            thirstyAnts.remove(ant);
+            hungryAnts.remove(ant);
+        }
+        this.setSyrups(syrupAvailable);
+        
+        //Death
+        Set<Ant> antsToKill = new HashSet<>();
+        for (Ant ant : thirstyAnts) {
+            if (Math.random() < 0.25) {
+                antsToKill.add(ant);
+            }
+        }
+        
+        for (Ant ant : hungryAnts) {
+            antsToKill.add(ant); 
         }
 
-        int deficit = totalConsumption - this.getMushrooms();
-        this.setMushrooms(0);
-
-        List<AntType> killOrder = Arrays.asList(
-            GameConstants.TYPE_DRONE,
-            GameConstants.TYPE_PRINCESS,
-            GameConstants.TYPE_MAJOR,
-            GameConstants.TYPE_SOLDIER,
-            GameConstants.TYPE_LARVA,
-            GameConstants.TYPE_WORKER,
-            GameConstants.TYPE_QUEEN
-        );
-
-        for (AntType typeToKill : killOrder) {
-            List<Ant> list = antGroups.get(typeToKill);
-            int antConsumption = (int) (typeToKill.getConsumptionMult() * this.getBaseConsumption());
-            if (antConsumption <= 0) antConsumption = 1; 
-
-            while (deficit > 0 && !list.isEmpty()) {
-                Ant deadAnt = list.remove(list.size() - 1); 
-                deadAnt.goDie();
-                this.deadAnts.add(deadAnt);
-                deficit -= antConsumption;
+        for (Ant ant : antsToKill) {
+            if (ant.getStatus() == GameConstants.STATUS_ALIVE ) { 
+                ant.goDie();
+                this.deadAnts.add(ant);
+                antGroups.get(ant.getType()).remove(ant);
             }
-
-            if (deficit <= 0) break; 
         }
     }
 
@@ -803,8 +855,22 @@ public class Colony {
 
     public void runCollecting() {
         int foragerCount = countAntsByRole(getWorkers(), GameConstants.ROLE_FORAGER);
-        int plantGain = (int) (foragerCount * collectingRate);
-        this.setPlants(Math.min(this.getPlants() + plantGain, this.getPlantsCapacity()));
+        int plantGain = 0;
+        int waterGain = 0;
+        
+        for (int i = 0; i < foragerCount; i++) {
+            if (Math.random() < 0.5) {
+                waterGain++;
+            } else {
+                plantGain++;
+            }
+        }
+        
+        int effectivePlantGain = (int) (plantGain * collectingRate);
+        int effectiveWaterGain = (int) (waterGain * collectingRate);
+
+        this.setPlants(Math.min(this.getPlants() + effectivePlantGain, this.getPlantsCapacity()));
+        this.setWater(Math.min(this.getWater() + effectiveWaterGain, this.getWaterCapacity()));
 
         if (hasUpgrade(GameUpgrades.ROLE_HUNTER)) {
             int hunterCount = countAntsByRole(getSoldiers(), GameConstants.ROLE_HUNTER);

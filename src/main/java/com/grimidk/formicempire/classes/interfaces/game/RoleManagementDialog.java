@@ -166,6 +166,8 @@ public class RoleManagementDialog extends JDialog {
                         updateRolePanelTotals(totalAnts, assignedLabel, unassignedLabel, spinnerMap);
                     });
                     
+                    disableSpinnerLetterInput(spinner);
+                    
                     roleRow.add(spinner);
                     spinnerMap.put(role, spinner);
                     panel.add(roleRow);
@@ -175,6 +177,19 @@ public class RoleManagementDialog extends JDialog {
         
         updateRolePanelTotals(totalAnts, assignedLabel, unassignedLabel, spinnerMap);
         return panel;
+    }
+    
+    private void disableSpinnerLetterInput(JSpinner spinner) {
+        if (spinner.getEditor() instanceof JSpinner.DefaultEditor) {
+            JFormattedTextField textField = ((JSpinner.DefaultEditor) spinner.getEditor()).getTextField();
+            textField.addKeyListener(new java.awt.event.KeyAdapter() {
+                public void keyTyped(java.awt.event.KeyEvent e) {
+                    if (Character.isLetter(e.getKeyChar())) {
+                        e.consume(); 
+                    }
+                }
+            });
+        }
     }
     
     private void updateRolePanelTotals(int totalAnts, JLabel assignedLabel, JLabel unassignedLabel, Map<AntRole, JSpinner> spinnerMap) {

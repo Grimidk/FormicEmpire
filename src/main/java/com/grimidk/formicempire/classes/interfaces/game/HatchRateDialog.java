@@ -16,7 +16,7 @@ public class HatchRateDialog extends JDialog {
 
     private final Colony colony;
     private final Map<AntType, JSpinner> spinnerMap = new HashMap<>();
-    private final JLabel totalLabel = new JLabel("Total: 100.00%");
+    private final JLabel totalLabel = new JLabel("Total: 100.0%");
 
     public HatchRateDialog(JFrame owner, Colony colony) {
         super(owner, "Manage Pupa Hatch Rates", true);
@@ -75,7 +75,7 @@ public class HatchRateDialog extends JDialog {
             row.add(typeLabel);
             
             float currentRate = colony.getHatchRate(type);
-            SpinnerModel model = new SpinnerNumberModel((double)currentRate, 0.0, 100.0, 0.01);
+            SpinnerModel model = new SpinnerNumberModel((double)currentRate, 0.0, 100.0, 0.1);
             JSpinner spinner = new JSpinner(model);
             spinner.setPreferredSize(new Dimension(80, 25));
 
@@ -84,6 +84,8 @@ public class HatchRateDialog extends JDialog {
                 colony.setHatchRate(type, (float)newValue);
                 updateHatchRateTotals();
             });
+            
+            disableSpinnerLetterInput(spinner); 
             
             spinnerMap.put(type, spinner);
             row.add(spinner);
@@ -94,6 +96,19 @@ public class HatchRateDialog extends JDialog {
         return panel;
     }
 
+    private void disableSpinnerLetterInput(JSpinner spinner) {
+        if (spinner.getEditor() instanceof JSpinner.DefaultEditor) {
+            JFormattedTextField textField = ((JSpinner.DefaultEditor) spinner.getEditor()).getTextField();
+            textField.addKeyListener(new java.awt.event.KeyAdapter() {
+                public void keyTyped(java.awt.event.KeyEvent e) {
+                    if (Character.isLetter(e.getKeyChar())) {
+                        e.consume();
+                    }
+                }
+            });
+        }
+    }
+
     private void updateHatchRateTotals() {
         double totalAssigned = 0.0;
         for (JSpinner s : spinnerMap.values()) {
@@ -102,11 +117,11 @@ public class HatchRateDialog extends JDialog {
         
         double unassigned = 100.0 - totalAssigned;
         
-        totalLabel.setText(String.format("Total: %.2f%%", totalAssigned));
+        totalLabel.setText(String.format("Total: %.1f%%", totalAssigned));
         
-        if (Math.abs(unassigned) > 0.01) { 
+        if (Math.abs(unassigned) > 0.1) { 
             totalLabel.setForeground(Color.RED);
-            totalLabel.setToolTipText(String.format("Warning: Total is not 100%%. You are %.2f%% over/under.", -unassigned));
+            totalLabel.setToolTipText(String.format("Warning: Total is not 100%%. You are %.1f%% over/under.", -unassigned));
         } else {
             totalLabel.setForeground(Color.BLACK);
             totalLabel.setToolTipText("Total is 100%");

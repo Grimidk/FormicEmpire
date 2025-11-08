@@ -49,6 +49,13 @@ public class ControlPanel extends JPanel {
 
     private void initLayout() {
         setLayout(new FlowLayout(FlowLayout.RIGHT));
+        
+        // Prevent buttons from stealing focus from the global key listener
+        speedDownButton.setFocusable(false);
+        speedUpButton.setFocusable(false);
+        playPauseButton.setFocusable(false);
+        menuButton.setFocusable(false);
+        
         add(speedDownButton);
         add(speedUpButton);
         add(tickLabel);
