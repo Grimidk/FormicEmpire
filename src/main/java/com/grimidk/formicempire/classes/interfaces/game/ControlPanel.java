@@ -16,6 +16,7 @@ public class ControlPanel extends JPanel {
     private final MainFrame frame;
     private final Runnable handleBackButtonCallback;
     private final Runnable showHatchRateDialogCallback;
+    private final Runnable showResearchDialogCallback;
     private final RoleManagementCallback showRoleManagementDialogCallback;
 
     // --- UI Components ---
@@ -25,6 +26,7 @@ public class ControlPanel extends JPanel {
     private final JButton playPauseButton = new JButton("Pause");
     private final JButton menuButton = new JButton("Menu");
     private final JPopupMenu gameMenu = new JPopupMenu();
+    private JMenuItem manageResearch;
     
     // --- State ---
     private int speedLevel = 1;
@@ -35,10 +37,15 @@ public class ControlPanel extends JPanel {
         void showDialog(int tabIndex);
     }
 
-    public ControlPanel(MainFrame frame, Runnable handleBackButtonCallback, Runnable showHatchRateDialogCallback, RoleManagementCallback showRoleManagementDialogCallback) {
+    public ControlPanel(MainFrame frame, 
+                        Runnable handleBackButtonCallback, 
+                        Runnable showHatchRateDialogCallback, 
+                        Runnable showResearchDialogCallback, 
+                        RoleManagementCallback showRoleManagementDialogCallback) {
         this.frame = frame;
         this.handleBackButtonCallback = handleBackButtonCallback;
         this.showHatchRateDialogCallback = showHatchRateDialogCallback;
+        this.showResearchDialogCallback = showResearchDialogCallback;
         this.showRoleManagementDialogCallback = showRoleManagementDialogCallback;
 
         initLayout();
@@ -133,6 +140,7 @@ public class ControlPanel extends JPanel {
         JMenuItem backToGame = new JMenuItem("Back to Game");
         JMenuItem manageRoles = new JMenuItem("Manage Roles (Q/W/E/R/T)");
         JMenuItem manageHatchRates = new JMenuItem("Manage Hatch Rates (P)");
+        manageResearch = new JMenuItem("Research (Y)");
         JMenuItem openSettings = new JMenuItem("Settings");
         JMenuItem showTutorial = new JMenuItem("Show Tutorial");
         JMenuItem quitToMenu = new JMenuItem("Quit to Main Menu");
@@ -140,6 +148,8 @@ public class ControlPanel extends JPanel {
         backToGame.addActionListener(e -> gameMenu.setVisible(false));
         manageRoles.addActionListener(e -> showRoleManagementDialogCallback.showDialog(0));
         manageHatchRates.addActionListener(e -> showHatchRateDialogCallback.run());
+        manageResearch.addActionListener(e -> showResearchDialogCallback.run());
+        manageResearch.setVisible(false); 
         
         openSettings.addActionListener(e -> {
             Engine engine = frame.getEngine();
@@ -173,6 +183,7 @@ public class ControlPanel extends JPanel {
         gameMenu.add(backToGame);
         gameMenu.add(manageRoles);
         gameMenu.add(manageHatchRates);
+        gameMenu.add(manageResearch);
         gameMenu.add(openSettings);
         gameMenu.add(showTutorial);
         gameMenu.add(new JSeparator());
@@ -239,6 +250,16 @@ public class ControlPanel extends JPanel {
                 showHatchRateDialogCallback.run();
             }
         });
+        
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, 0), "openResearch");
+        actionMap.put("openResearch", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (manageResearch.isVisible()) {
+                    showResearchDialogCallback.run();
+                }
+            }
+        });
     }
     
     private void addRoleKeyBinding(InputMap im, ActionMap am, String name, int key, int tab) {
@@ -261,5 +282,11 @@ public class ControlPanel extends JPanel {
     
     public void setPlayPauseButtonText(boolean isPaused) {
         playPauseButton.setText(isPaused ? "Play" : "Pause");
+    }
+
+    public void updateResearchMenu(boolean visible) {
+        if (manageResearch != null) {
+            manageResearch.setVisible(visible);
+        }
     }
 }

@@ -6,13 +6,15 @@ public class Upgrade {
     private final String flavorName;
     private final String description;
     private final Upgrade requirement;
+    private final int cost;
 
-    public Upgrade(int id, String name, String flavorName, String description, Upgrade requirement) {
+    public Upgrade(int id, String name, String flavorName, String description, Upgrade requirement, int cost) {
         this.id = id;
         this.name = name;
         this.flavorName = flavorName;
         this.description = description;
         this.requirement = requirement;
+        this.cost = cost;
     }
 
     public int getId() {
@@ -33,5 +35,9 @@ public class Upgrade {
 
     public Upgrade getRequirement() {
         return requirement;
+    }
+
+    public int getCost() {
+        return cost;
     }
 }

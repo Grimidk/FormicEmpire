@@ -24,9 +24,9 @@ public class TriggerManager {
     public void registerListeners() {
         engine.addMonthTickListener(this::checkMonthlyTriggers);
         engine.addDayTickListener(this::checkDailyTriggers);
+        engine.addHourTickListener(this::checkHourlyTriggers); 
     }
 
-    // --- Listener Interface for Popups ---
     public interface TriggerListener {
         void onUpgradeTriggered(Upgrade unlockedUpgrade, String title, String message);
     }
@@ -54,6 +54,10 @@ public class TriggerManager {
         checkGraveKeeperUnlock();
     }
 
+    private void checkHourlyTriggers() {
+        checkResearchAbilityUnlock();
+    }
+
     // --- Specific Trigger Logic ---
     private void checkResearchRoleUnlock() {
         if (colony.hasUpgrade(GameUpgrades.ROLE_RESEARCHER)) {
@@ -74,10 +78,22 @@ public class TriggerManager {
             return;
         }
         
-        if (colony.getDeadAnts().size() >= 100) {
+        if (colony.getDeadAnts().size() >= 100) { 
             fireTrigger(GameUpgrades.ROLE_GRAVER, 
                         "A Smelly Problem", 
                         "The bodies are piling up! Your workers have developed the Grave-Keeper role to clean the colony and prevent disease.");
+        }
+    }
+    
+    private void checkResearchAbilityUnlock() {
+        if (colony.hasUpgrade(GameUpgrades.ABILITY_RESEARCH)) {
+            return;
+        }
+        
+        if (colony.getResearchPoints() >= 100) {
+            fireTrigger(GameUpgrades.ABILITY_RESEARCH, 
+                        "Scientific Breakthrough", 
+                        "Your colony has accumulated 100 Research Points! You can now access the Research panel from the game menu to purchase new upgrades.");
         }
     }
 }
