@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashSet;
 import java.util.Set;
+import java.awt.Point;
+import javax.swing.ImageIcon;
+import java.util.concurrent.CopyOnWriteArrayList; 
 
 import com.grimidk.formicempire.classes.constants.AntRole;
 import com.grimidk.formicempire.classes.constants.AntType;
@@ -26,7 +29,7 @@ public class Colony {
     private ColonyRank rank;
     
     private final Map<AntType, List<Ant>> antGroups;
-    private final List<Ant> deadAnts;
+    private final List<Ant> deadAnts; 
     private Map<AntRole, Integer> assignedRoleCounts;
     private final Set<Upgrade> upgrades;
 
@@ -84,16 +87,19 @@ public class Colony {
     private float hatchRateDrone;
     private float hatchRatePrincess;
 
+    private int gameAreaWidth = 1;
+    private int gameAreaHeight = 1;
+
     private void initializeLists() {
-        this.antGroups.put(GameConstants.TYPE_EGG, new ArrayList<>());
-        this.antGroups.put(GameConstants.TYPE_LARVA, new ArrayList<>());
-        this.antGroups.put(GameConstants.TYPE_PUPA, new ArrayList<>());
-        this.antGroups.put(GameConstants.TYPE_WORKER, new ArrayList<>());
-        this.antGroups.put(GameConstants.TYPE_SOLDIER, new ArrayList<>());
-        this.antGroups.put(GameConstants.TYPE_MAJOR, new ArrayList<>());
-        this.antGroups.put(GameConstants.TYPE_DRONE, new ArrayList<>());
-        this.antGroups.put(GameConstants.TYPE_PRINCESS, new ArrayList<>());
-        this.antGroups.put(GameConstants.TYPE_QUEEN, new ArrayList<>());
+        this.antGroups.put(GameConstants.TYPE_EGG, new CopyOnWriteArrayList<>());
+        this.antGroups.put(GameConstants.TYPE_LARVA, new CopyOnWriteArrayList<>());
+        this.antGroups.put(GameConstants.TYPE_PUPA, new CopyOnWriteArrayList<>());
+        this.antGroups.put(GameConstants.TYPE_WORKER, new CopyOnWriteArrayList<>());
+        this.antGroups.put(GameConstants.TYPE_SOLDIER, new CopyOnWriteArrayList<>());
+        this.antGroups.put(GameConstants.TYPE_MAJOR, new CopyOnWriteArrayList<>());
+        this.antGroups.put(GameConstants.TYPE_DRONE, new CopyOnWriteArrayList<>());
+        this.antGroups.put(GameConstants.TYPE_PRINCESS, new CopyOnWriteArrayList<>());
+        this.antGroups.put(GameConstants.TYPE_QUEEN, new CopyOnWriteArrayList<>());
     }
 
     private void initializeAssignedRoles() {
@@ -193,7 +199,7 @@ public class Colony {
         this.isPlayer = isPlayer;
         this.rank = GameConstants.RANK_COLONY;
         this.antGroups = new HashMap<>();
-        this.deadAnts = new ArrayList<>();
+        this.deadAnts = new CopyOnWriteArrayList<>(); 
         this.upgrades = new HashSet<>();
         
         initializeLists();
@@ -208,7 +214,7 @@ public class Colony {
         this.isPlayer = true;
         this.rank = GameConstants.RANK_COLONY;
         this.antGroups = new HashMap<>();
-        this.deadAnts = new ArrayList<>();
+        this.deadAnts = new CopyOnWriteArrayList<>(); 
         this.upgrades = new HashSet<>();
 
         initializeLists();
@@ -280,9 +286,36 @@ public class Colony {
         runRoleAssignment(); 
     }
 
+    private Point getRandomPosition(ImageIcon sprite) {
+        int w = (sprite != null) ? sprite.getIconWidth() : 0;
+        int h = (sprite != null) ? sprite.getIconHeight() : 0;
+        
+        int boundX = Math.max(1, gameAreaWidth - w);
+        int boundY = Math.max(1, gameAreaHeight - h);
+        
+        int x = (int) (Math.random() * boundX);
+        int y = (int) (Math.random() * boundY);
+        return new Point(x, y);
+    }
+
     private void populateAntList(List<Ant> list, int count, AntType type) {
         for (int i = 0; i < count; i++) {
-            list.add(new Ant(this, type));
+            Ant newAnt = new Ant(this, type);
+            list.add(newAnt);
+        }
+    }
+    
+    private void randomizeAllAntPositions() {
+        for (Map.Entry<AntType, List<Ant>> entry : antGroups.entrySet()) {
+            AntType type = entry.getKey();
+            if (type == GameConstants.TYPE_DEAD) continue;
+            
+            ImageIcon sprite = type.getSprite();
+            List<Ant> ants = entry.getValue();
+            
+            for (Ant ant : ants) {
+                ant.setPosition(getRandomPosition(sprite));
+            }
         }
     }
 
@@ -298,7 +331,7 @@ public class Colony {
     public void setRank(ColonyRank rank) { this.rank = rank; }
 
     public List<Ant> getAntsByType(AntType type) {
-        return antGroups.getOrDefault(type, new ArrayList<>());
+        return antGroups.getOrDefault(type, new CopyOnWriteArrayList<>());
     }
     
     public List<Ant> getEggs() { return antGroups.get(GameConstants.TYPE_EGG); }
@@ -453,6 +486,17 @@ public class Colony {
     public int getBaseSize() { return baseSize; }
     public void setBaseSize(int baseSize) { this.baseSize = baseSize; }
 
+    public void setGameAreaDimensions(int width, int height) {
+        boolean firstTimeUpdate = (this.gameAreaWidth == 1 && this.gameAreaHeight == 1 && width > 1 && height > 1);
+        
+        this.gameAreaWidth = width;
+        this.gameAreaHeight = height;
+
+        if (firstTimeUpdate) {
+            randomizeAllAntPositions();
+        }
+    }
+
     // Role Counts
     public int getAssignedRoleCount(AntRole role) {
         return assignedRoleCounts.getOrDefault(role, 0);
@@ -501,9 +545,11 @@ public class Colony {
     public void startColony() {
         List<Ant> workerList = getWorkers();
         for (int i = 0; i < 9; i++) {
-            workerList.add(new Ant(this, GameConstants.TYPE_WORKER));
+            Ant worker = new Ant(this, GameConstants.TYPE_WORKER);
+            workerList.add(worker);
         }
-        getQueens().add(new Ant(this, GameConstants.TYPE_QUEEN));
+        Ant queen = new Ant(this, GameConstants.TYPE_QUEEN);
+        getQueens().add(queen);
 
         setAssignedRoleCount(GameConstants.ROLE_LAYER, 1);
         setAssignedRoleCount(GameConstants.ROLE_NURSE, 3);
@@ -629,34 +675,40 @@ public class Colony {
     }
 
     private void evolveAnts(List<Ant> sourceList, List<Ant> destList, AntType newType) {
-        Iterator<Ant> iterator = sourceList.iterator();
-        while (iterator.hasNext()) {
-            Ant ant = iterator.next();
-            if (ant.getAge() >= this.getGrowthTime()) { 
-                ant.transform(this, newType);
-                destList.add(ant);
-                iterator.remove(); 
+        List<Ant> antsToEvolve = new ArrayList<>();
+        for (Ant ant : sourceList) {
+            if (ant.getAge() >= this.getGrowthTime()) {
+                antsToEvolve.add(ant);
             }
         }
+        
+        for (Ant ant : antsToEvolve) {
+            ant.transform(this, newType);
+            destList.add(ant);
+        }
+        
+        sourceList.removeAll(antsToEvolve);
     }
 
     private void hatchPupae() {
-        Iterator<Ant> iterator = getPupae().iterator();
-        while (iterator.hasNext()) {
-            Ant pupa = iterator.next();
-            if (pupa.getAge() < this.getGrowthTime()) {
-                continue;
+        List<Ant> pupaeToHatch = new ArrayList<>();
+        for (Ant pupa : getPupae()) {
+            if (pupa.getAge() >= this.getGrowthTime()) {
+                pupaeToHatch.add(pupa);
             }
+        }
 
+        for (Ant pupa : pupaeToHatch) {
             AntType newType = determineHatchType();
             pupa.transform(this, newType);
             
             antGroups.get(newType).add(pupa);
-            iterator.remove();
         }
+        
+        getPupae().removeAll(pupaeToHatch);
     }
 
-    // --- Routine Colony Activities ---
+    // --- Routine Colony Activities --- 
     public void runHatching(){    
         hatchPupae();
         evolveAnts(getLarvae(), getPupae(), GameConstants.TYPE_PUPA);
@@ -664,20 +716,19 @@ public class Colony {
     }
 
     public void runEating(){
-        //Water
+        // --- 1. Water Consumption ---
         List<Ant> thirstyAnts = new ArrayList<>();
         int waterAvailable = this.getWater();
-        List<AntType> eatOrder = Arrays.asList(
-             GameConstants.TYPE_QUEEN,
+        List<AntType> adultDrinkOrder = Arrays.asList(
+            GameConstants.TYPE_QUEEN,
             GameConstants.TYPE_WORKER,
-            GameConstants.TYPE_LARVA,
             GameConstants.TYPE_SOLDIER,
             GameConstants.TYPE_MAJOR,
             GameConstants.TYPE_PRINCESS,
             GameConstants.TYPE_DRONE
         );
         
-        for (AntType type : eatOrder) {
+        for (AntType type : adultDrinkOrder) {
             List<Ant> list = antGroups.get(type);
             for (Ant ant : list) {
                 if (waterAvailable >= 1) {
@@ -689,8 +740,18 @@ public class Colony {
         }
         this.setWater(waterAvailable);
 
-        //Food
+        // --- 2. Food Consumption ---
         int mushroomsAvailable = this.getMushrooms();
+        List<AntType> eatOrder = Arrays.asList(
+            GameConstants.TYPE_QUEEN,
+            GameConstants.TYPE_WORKER,
+            GameConstants.TYPE_LARVA,
+            GameConstants.TYPE_SOLDIER,
+            GameConstants.TYPE_MAJOR,
+            GameConstants.TYPE_PRINCESS,
+            GameConstants.TYPE_DRONE
+        );
+        
         List<Ant> hungryAnts = new ArrayList<>();
         
         for (AntType type : eatOrder) {
@@ -709,7 +770,7 @@ public class Colony {
         }
         this.setMushrooms(mushroomsAvailable);
 
-        //Syrup
+        // --- 3. Syrup Phase ---
         Set<Ant> antsInNeed = new HashSet<>(thirstyAnts);
         antsInNeed.addAll(hungryAnts);
         
@@ -726,7 +787,7 @@ public class Colony {
         }
         this.setSyrups(syrupAvailable);
         
-        //Death
+        // --- 4. Death Phase ---
         Set<Ant> antsToKill = new HashSet<>();
         for (Ant ant : thirstyAnts) {
             if (Math.random() < 0.25) {
@@ -739,25 +800,42 @@ public class Colony {
         }
 
         for (Ant ant : antsToKill) {
-            if (ant.getStatus() == GameConstants.STATUS_ALIVE ) { 
+            if (ant.isAlive()) { 
+                
+                AntType originalType = ant.getType(); 
+                
                 ant.goDie();
                 this.deadAnts.add(ant);
-                antGroups.get(ant.getType()).remove(ant);
+
+                List<Ant> antList = antGroups.get(originalType);
+                if (antList != null) {
+                    antList.remove(ant);
+                }
             }
         }
     }
 
     public void runAging(){
+        List<Ant> antsToKill = new ArrayList<>();
         for (List<Ant> antList : antGroups.values()) {
-            Iterator<Ant> iterator = antList.iterator();
-            while (iterator.hasNext()) {
-                Ant ant = iterator.next();
+            for (Ant ant : antList) {
                 ant.setAge(ant.getAge() + 1);
                 
                 if (ant.getAge() >= ant.getMaxAge()) {
-                    ant.goDie();
-                    this.deadAnts.add(ant);
-                    iterator.remove(); 
+                    antsToKill.add(ant);
+                }
+            }
+        }
+        
+        for (Ant ant : antsToKill) {
+             if (ant.isAlive()) { 
+                AntType originalType = ant.getType(); 
+                ant.goDie();
+                this.deadAnts.add(ant);
+
+                List<Ant> antList = antGroups.get(originalType);
+                if (antList != null) {
+                    antList.remove(ant);
                 }
             }
         }
@@ -770,26 +848,32 @@ public class Colony {
 
         if (!hasUpgrade(GameUpgrades.TYPE_PRINCESS)) return;
 
-        Iterator<Ant> iterator = princesses.iterator();
-        while (iterator.hasNext()) {
+        List<Ant> princessesToEvolve = new ArrayList<>();
+        
+        for (Ant princess : princesses) {
             if (queens.size() >= this.getQueensCapacity() || drones.isEmpty()) {
                 break;
             }
-            
-            Ant princess = iterator.next();
+            if (drones.size() > 0) {
+                 princessesToEvolve.add(princess);
+                 Ant deadDrone = drones.remove(drones.size() - 1); 
+                 deadDrone.goDie();
+                 this.deadAnts.add(deadDrone);
+            }
+        }
+
+        for (Ant princess : princessesToEvolve) {
             princess.transform(this, GameConstants.TYPE_QUEEN);
             queens.add(princess);
-            iterator.remove(); 
-            Ant deadDrone = drones.remove(drones.size() - 1); 
-            deadDrone.goDie();
-            this.deadAnts.add(deadDrone);
         }
+        
+        princesses.removeAll(princessesToEvolve);
     }
 
     public void runSpreading() { }
     public void runInfection() { }
 
-    // --- Ant Jobs --- //
+    // --- Ant Jobs ---
     public void runLaying() {
         int layerCount = countAntsByRole(getQueens(), GameConstants.ROLE_LAYER);
         List<Ant> eggList = getEggs();
@@ -798,7 +882,9 @@ public class Colony {
         
         int toLay = Math.min(layerCount * this.getLayingRate(), spaceAvailable);
         for (int i = 0; i < toLay; i++) {
-            eggList.add(new Ant(this, GameConstants.TYPE_EGG));
+            Ant newEgg = new Ant(this, GameConstants.TYPE_EGG);
+            newEgg.setPosition(getRandomPosition(GameConstants.TYPE_EGG.getSprite()));
+            eggList.add(newEgg);
         }
     }
 
@@ -808,19 +894,24 @@ public class Colony {
         this.researchPoints += researcherCount * researchSpeed;
     }
 
+    // --- MODIFIED: Safe removal ---
     public void runGraveKeeping() {
         int graverCount = countAntsByRole(getWorkers(), GameConstants.ROLE_GRAVER);
         if (graverCount == 0 || getDeadAnts().isEmpty()) return;
 
         int canClean = graverCount * (int) gravingRate;
-        Iterator<Ant> iterator = getDeadAnts().iterator();
-        while (canClean > 0 && iterator.hasNext()) {
-            iterator.next();
-            iterator.remove();
+        List<Ant> antsToRemove = new ArrayList<>();
+        
+        for (Ant deadAnt : getDeadAnts()) {
+            if (canClean <= 0) break;
+            antsToRemove.add(deadAnt);
             canClean--;
         }
+        
+        getDeadAnts().removeAll(antsToRemove);
     }
 
+    // --- MODIFIED: Safe removal (using index is fine, but this is safer if logic changes) ---
     public void runNursing() {
         int nurseCount = countAntsByRole(getWorkers(), GameConstants.ROLE_NURSE);
         int babyAntTotal = this.getEggs().size() +  this.getLarvae().size() +  this.getPupae().size();
@@ -838,17 +929,28 @@ public class Colony {
         );
 
         for (AntType typeToKill : killOrder) {
+            if (deficit <= 0) break;
+            
             List<Ant> list = antGroups.get(typeToKill);
-            for (int i = list.size() - 1; i >= 0; i--) {
-                if (deficit <= 0) break; 
-
+            List<Ant> antsToCull = new ArrayList<>();
+            
+            // Iterate safely
+            for (Ant ant : list) {
+                if (deficit <= 0) break;
+                
                 if (Math.random() > 0.5) { 
-                    Ant antToCull = list.get(i);
-                    list.remove(i); 
-                    antToCull.goDie(); 
-                    this.deadAnts.add(antToCull);
+                    antsToCull.add(ant);
                     deficit--;
                 } 
+            }
+            
+            // Remove safely
+            for (Ant antToCull : antsToCull) {
+                if (antToCull.isAlive()) {
+                    antToCull.goDie(); 
+                    this.deadAnts.add(antToCull);
+                    list.remove(antToCull);
+                }
             }
         }
     }
@@ -919,7 +1021,7 @@ public class Colony {
         }
     }
 
-    // --- Job Packer --- //
+    // --- Job Packer --- 
     public void runMinutelyJobs() {
         this.runConverting();
     }

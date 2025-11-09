@@ -6,6 +6,8 @@ import com.grimidk.formicempire.classes.constants.AntSubType;
 import com.grimidk.formicempire.classes.constants.AntType;
 import com.grimidk.formicempire.classes.infrasctructure.GameConstants;
 
+import java.awt.Point;
+
 public class Ant {
     private AntType type;
     private AntSubType subType;
@@ -25,6 +27,9 @@ public class Ant {
     private float speed;
     private float size;
 
+    private int x;
+    private int y;
+
     public Ant(Colony colony, AntType type) {
         this.type = type;
         this.subType = null;
@@ -42,6 +47,9 @@ public class Ant {
         this.defense = colony.getBaseDefense() * type.getDefenseMult();
         this.speed = colony.getBaseSpeed() * type.getSpeedMult();
         this.size = colony.getBaseSize() * type.getSizeMult();
+
+        this.x = 0; 
+        this.y = 0;
     }
 
     public AntType getType() {
@@ -194,8 +202,8 @@ public class Ant {
         this.speed = 0;
     }
 
-    public boolean isDead() {
-        return health <= 0;
+    public boolean isAlive() {
+        return this.getStatus() == GameConstants.STATUS_ALIVE;
     }
 
     public void transform(Colony colony, AntType newType) {
@@ -211,5 +219,18 @@ public class Ant {
         this.defense = colony.getBaseDefense() * newType.getDefenseMult();
         this.speed = colony.getBaseSpeed() * newType.getSpeedMult();
         this.size = colony.getBaseSize() * newType.getSizeMult();
+    }
+
+    public int getX() { return x; }
+    public int getY() { return y; }
+    
+    public void setPosition(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+    
+    public void setPosition(Point p) {
+        this.x = p.x;
+        this.y = p.y;
     }
 }

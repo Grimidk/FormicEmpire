@@ -9,6 +9,7 @@ import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.TriggerManager;
 import com.grimidk.formicempire.classes.interfaces.game.ColonyPanel;
 import com.grimidk.formicempire.classes.interfaces.game.ControlPanel;
+import com.grimidk.formicempire.classes.interfaces.game.GameAreaPanel;
 import com.grimidk.formicempire.classes.interfaces.game.HatchRateDialog;
 import com.grimidk.formicempire.classes.interfaces.game.ResearchDialog;
 import com.grimidk.formicempire.classes.interfaces.game.RoleManagementDialog;
@@ -28,6 +29,7 @@ public class GamePanel extends JPanel {
     private ColonyPanel colonyPanel; 
     private WorldPanel worldPanel;  
     private ControlPanel controlPanel;
+    private GameAreaPanel gameAreaPanel;
     
     // --- Refactored Dialogs ---
     private HatchRateDialog hatchDialog;
@@ -59,6 +61,7 @@ public class GamePanel extends JPanel {
         // Initialize new encapsulated panels
         colonyPanel = new ColonyPanel();
         worldPanel = new WorldPanel();
+        gameAreaPanel = new GameAreaPanel();
     }
     
     private void initControlPanelCallbacks() {
@@ -108,11 +111,11 @@ public class GamePanel extends JPanel {
         gbc.fill = GridBagConstraints.VERTICAL; 
         center.add(colonyPanel, gbc);
 
-        // 2. Spacer (Middle)
+        // 2. Game Area (Middle)
         gbc.gridx = 1;
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.BOTH; 
-        center.add(new JPanel(), gbc); 
+        center.add(gameAreaPanel, gbc); 
 
         // 3. World Panel (Right)
         gbc.gridx = 2;
@@ -232,24 +235,27 @@ public class GamePanel extends JPanel {
                     statusLabel.setText("Game started");
                     
                     registerTickListeners(); 
+                    
+                    World world = engine.getWorld();
+                    Colony colony = null;
+                    if (world != null && world.getSpawnHex() != null && world.getSpawnHex().getColony() != null) {
+                        colony = world.getSpawnHex().getColony();
+                        
+                        gameAreaPanel.setColony(colony);
+                        
+                        TriggerManager triggerManager = new TriggerManager(world, colony, engine);
+                        if (frame instanceof TriggerManager.TriggerListener) {
+                            triggerManager.addListener((TriggerManager.TriggerListener) frame);
+                        }
+                        triggerManager.registerListeners();
+                    }
+                    
                     updateStaticWorldInfo();
                     
                     updateMinuteGUI();
                     updateHourGUI();
                     updateDayGUI();
                     updateMonthGUI();
-                    
-                    World world = engine.getWorld();
-                    if (world != null && world.getSpawnHex() != null && world.getSpawnHex().getColony() != null) {
-                        Colony colony = world.getSpawnHex().getColony();
-                        
-                        TriggerManager triggerManager = new TriggerManager(world, colony, engine);
-                        
-                        if (frame instanceof TriggerManager.TriggerListener) {
-                            triggerManager.addListener((TriggerManager.TriggerListener) frame);
-                        }
-                        triggerManager.registerListeners();
-                    }
                     
                     if (!engineStarted) {
                         engineStarted = true;
@@ -326,7 +332,13 @@ public class GamePanel extends JPanel {
     private void updateStaticWorldInfo() {
         World world = frame.getEngine().getWorld();
         if (world == null) return;
+        
         worldPanel.updateStaticData(world);
+        
+        if (world.getSpawnHex() != null && world.getSpawnHex().getBiome() != null) {
+            String biomeName = world.getSpawnHex().getBiome().getName();
+            gameAreaPanel.setBackgroundByBiome(biomeName);
+        }
     }
 
     private void updateMinuteGUI() {
@@ -335,8 +347,16 @@ public class GamePanel extends JPanel {
         Colony colony = world != null && world.getSpawnHex() != null ? world.getSpawnHex().getColony() : null;
         if (world == null || colony == null) return;
 
+        int w = gameAreaPanel.getWidth();
+        int h = gameAreaPanel.getHeight();
+        if (w > 1 && h > 1) {
+            colony.setGameAreaDimensions(w, h);
+        }
+
         worldPanel.updateMinuteData(world);
         colonyPanel.updateMinuteData(colony);
+        
+        gameAreaPanel.repaint(); 
     }
 
     private void updateHourGUI() {

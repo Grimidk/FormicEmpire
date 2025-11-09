@@ -126,27 +126,27 @@ public final class GameConstants {
 
     // --- Ant Types ---
     public static final AntType TYPE_EGG = new AntType(1, "Egg", 1f, 0f, 1f, 0f, 0f, 0f, 0f, 0f, 1/4f, 
-        loadIcon("icons/ants/egg.png"));
+        loadIcon("icons/ants/egg.png"), loadIcon("sprites/ants/egg.png"));
     public static final AntType TYPE_LARVA = new AntType(2, "Larva", 1f, 1/2f, 1f, 1/2f, 1f, 1f, 1/2f, 1/2f, 1/2f, 
-        loadIcon("icons/ants/larva.png"));
+        loadIcon("icons/ants/larva.png"), loadIcon("sprites/ants/larva.png"));
     public static final AntType TYPE_PUPA = new AntType(3, "Pupa", 1f, 0f, 1f, 1f, 0f, 0f, 1/2f, 0f, 1f, 
-        loadIcon("icons/ants/pupa.png"));
+        loadIcon("icons/ants/pupa.png"), loadIcon("sprites/ants/pupa.png"));
     public static final AntType TYPE_WORKER = new AntType(4, "Worker", 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 
-        loadIcon("icons/ants/worker.png"));
+        loadIcon("icons/ants/worker.png"), loadIcon("sprites/ants/worker.png"));
     public static final AntType TYPE_SOLDIER = new AntType(5, "Soldier", 3f, 3f, 1f, 3f, 2f, 3f, 5f, 3f, 2f, 
-        loadIcon("icons/ants/soldier.png"));
+        loadIcon("icons/ants/soldier.png"), loadIcon("sprites/ants/soldier.png"));
     public static final AntType TYPE_MAJOR = new AntType(6, "Major", 10f, 15f, 5f, 20f, 5f, 2f, 50f, 2f, 5f, 
-        loadIcon("icons/ants/major.png"));
+        loadIcon("icons/ants/major.png"), loadIcon("sprites/ants/major.png"));
     public static final AntType TYPE_DRONE = new AntType(7, "Drone", 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 2f, 
-        loadIcon("icons/ants/drone.png"));
+        loadIcon("icons/ants/drone.png"), loadIcon("sprites/ants/drone.png"));
     public static final AntType TYPE_PRINCESS = new AntType(8, "Princess", 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 2f, 
-        loadIcon("icons/ants/princess.png"));
+        loadIcon("icons/ants/princess.png"), loadIcon("sprites/ants/princess.png"));
     public static final AntType TYPE_QUEEN = new AntType(9, "Queen", 50f, 2f, 50f, 50f, 10f, 1/2f, 50f, 1/4f, 5f, 
-        loadIcon("icons/ants/queen.png"));
+        loadIcon("icons/ants/queen.png"), loadIcon("sprites/ants/queen.png"));
     public static final AntType TYPE_DEAD = new AntType(10, "Dead", 0, 0, 0, 0, 0, 0, 0, 0, 0,  
-        loadIcon("icons/ants/dead.png"));
+        loadIcon("icons/ants/dead.png"), loadIcon("sprites/ants/dead.png"));
     public static final AntType TYPE_ZOMBIE = new AntType(11, "Zombie",  1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 
-        loadIcon("icons/ants/zombie.png"));
+        loadIcon("icons/ants/zombie.png"), loadIcon("sprites/ants/zombie.png"));
 
     // --- Ant Subtypes ---
     // (Add definitions here when you have them)
