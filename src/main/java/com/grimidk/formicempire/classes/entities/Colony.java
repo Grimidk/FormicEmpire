@@ -14,6 +14,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.grimidk.formicempire.classes.constants.AntRole;
 import com.grimidk.formicempire.classes.constants.AntType;
+import com.grimidk.formicempire.classes.constants.Building;
 import com.grimidk.formicempire.classes.constants.ColonyRank;
 import com.grimidk.formicempire.classes.constants.Species;
 import com.grimidk.formicempire.classes.constants.Upgrade;
@@ -32,26 +33,18 @@ public class Colony {
     private final List<Ant> deadAnts; 
     private Map<AntRole, Integer> assignedRoleCounts;
     private final Set<Upgrade> upgrades;
+    private final Set<Building> buildings;
 
     // Resources
     private int plants;
-    private int plantsCapacity;
     private int mushrooms;
-    private int mushroomsCapacity;
     private int protein;
-    private int proteinCapacity;
     private int water;
-    private int waterCapacity; 
     private int syrups;
-    private int syrupsCapacity;
     private int resins;
-    private int resinsCapacity;
     private int minerals;
-    private int mineralsCapacity;
 
     // Capacities
-    private int eggsCapacity;
-    private int queensCapacity;
     private int aphidCapacity;
     private int aphids;
 
@@ -133,22 +126,13 @@ public class Colony {
         this.baseSize = 1;
 
         this.plants = 0;
-        this.plantsCapacity = 4000;
         this.mushrooms = 0;
-        this.mushroomsCapacity = 8000;
         this.protein = 0;           
-        this.proteinCapacity = 2000;
         this.water = 0;
-        this.waterCapacity = 1000;
         this.syrups = 0;
-        this.syrupsCapacity = 500;
         this.resins = 0;
-        this.resinsCapacity = 200;
         this.minerals = 0;
-        this.mineralsCapacity = 100;
 
-        this.eggsCapacity = 50;
-        this.queensCapacity = 1;
         this.aphidCapacity = 10;
         this.aphids = 0;
 
@@ -193,6 +177,35 @@ public class Colony {
         }
     }
 
+    private void initializeBuildings() {
+        this.buildings.add(GameUpgrades.ROYAL_CHAMBER_0);
+        this.buildings.add(GameUpgrades.EGG_CHAMBER_0);
+        this.buildings.add(GameUpgrades.MUSHROOM_CHAMBER_0);
+        this.buildings.add(GameUpgrades.PLANT_CHAMBER_0);
+        this.buildings.add(GameUpgrades.WATER_RESERVOIR_0);
+    }
+
+    private void laodBuildings(Savefile savefile) {
+        List<Integer> unlockedIds = savefile.getUnlockedBuildingIds(); 
+
+        if (unlockedIds == null || unlockedIds.isEmpty()) {
+            initializeBuildings();
+            return;
+        }
+
+        Map<Integer, Building> allBuildings = new HashMap<>();
+        for (Building up : GameUpgrades.getBuildings()) {
+            allBuildings.put(up.getId(), up);
+        }
+
+        for (Integer id : unlockedIds) {
+            Building buildingToUnlock = allBuildings.get(id);
+            if (buildingToUnlock != null) {
+                this.buildings.add(buildingToUnlock);
+            }
+        }
+    }
+
     public Colony(int id, String name, boolean isPlayer) {
         this.id = id;
         this.name = name;
@@ -201,10 +214,12 @@ public class Colony {
         this.antGroups = new HashMap<>();
         this.deadAnts = new CopyOnWriteArrayList<>(); 
         this.upgrades = new HashSet<>();
+        this.buildings = new HashSet<>();
         
         initializeLists();
         initializeDefaults();
         initializeUpgrades();
+        initializeBuildings();
         initializeAssignedRoles();
     }
 
@@ -216,10 +231,12 @@ public class Colony {
         this.antGroups = new HashMap<>();
         this.deadAnts = new CopyOnWriteArrayList<>(); 
         this.upgrades = new HashSet<>();
+        this.buildings = new HashSet<>();
 
         initializeLists();
         initializeDefaults(); 
         loadUpgrades(savefile);
+        laodBuildings(savefile);
         initializeAssignedRoles(); 
         
         Map<String, Integer> savedRoles = savefile.getAssignedRoleCounts();
@@ -259,15 +276,6 @@ public class Colony {
         this.syrups = savefile.getSyrups();
         this.resins = savefile.getResins();
         this.minerals = savefile.getMinerals();
-        
-        // Resource Capacities
-        this.plantsCapacity = savefile.getPlantsCapacity();
-        this.mushroomsCapacity = savefile.getMushroomsCapacity();
-        this.proteinCapacity = savefile.getProteinCapacity();
-        this.waterCapacity = savefile.getWaterCapacity();
-        this.syrupsCapacity = savefile.getSyrupsCapacity();
-        this.resinsCapacity = savefile.getResinsCapacity();
-        this.mineralsCapacity = savefile.getMineralsCapacity();
 
         // New Stats
         this.aphids = savefile.getAphids();
@@ -280,8 +288,6 @@ public class Colony {
         this.gravingRate = savefile.getGravingRate();
         this.collectingRate = savefile.getCollectingRate();
         this.aphidCapacity = savefile.getAphidCapacity();
-        this.eggsCapacity = savefile.getEggsCapacity();
-        this.queensCapacity = savefile.getQueensCapacity();
 
         runRoleAssignment(); 
     }
@@ -383,6 +389,18 @@ public class Colony {
         return this.upgrades;
     }
 
+    public boolean hasBuilding(Building building) {
+        return this.buildings.contains(building);
+    }
+
+    public void unlockBuilding(Building building) {
+        this.buildings.add(building); 
+    }
+
+    public Set<Building> getUnlockedBuildings() {
+        return this.buildings;
+    }
+
     public int getTotalConsumption(){
         double totalConsumption = 0;
         for (Map.Entry<AntType, List<Ant>> entry : antGroups.entrySet()) {
@@ -407,38 +425,66 @@ public class Colony {
     // Resource Getters/Setters
     public int getPlants() { return plants; }
     public void setPlants(int plants) { this.plants = plants; }
-    public int getPlantsCapacity() { return plantsCapacity; }
-    public void setPlantsCapacity(int plantsCapacity) { this.plantsCapacity = plantsCapacity; }
     public int getMushrooms() { return mushrooms; }
     public void setMushrooms(int mushrooms) { this.mushrooms = mushrooms; }
-    public int getMushroomsCapacity() { return mushroomsCapacity; }
-    public void setMushroomsCapacity(int mushroomsCapacity) { this.mushroomsCapacity = mushroomsCapacity; }
     public int getProtein() { return protein; }
     public void setProtein(int protein) { this.protein = protein; }
-    public int getProteinCapacity() { return proteinCapacity; }
-    public void setProteinCapacity(int proteinCapacity) { this.proteinCapacity = proteinCapacity; }
     public int getWater() { return water; }
     public void setWater(int water) { this.water = water; }
-    public int getWaterCapacity() { return waterCapacity; }
-    public void setWaterCapacity(int waterCapacity) { this.waterCapacity = waterCapacity; }
     public int getSyrups() { return syrups; }
     public void setSyrups(int syrups) { this.syrups = syrups; }
-    public int getSyrupsCapacity() { return syrupsCapacity; }
-    public void setSyrupsCapacity(int syrupsCapacity) { this.syrupsCapacity = syrupsCapacity; }
     public int getResins() { return resins; }
     public void setResins(int resins) { this.resins = resins; }
-    public int getResinsCapacity() { return resinsCapacity; }
-    public void setResinsCapacity(int resinsCapacity) { this.resinsCapacity = resinsCapacity; }
     public int getMinerals() { return minerals; }
     public void setMinerals(int minerals) { this.minerals = minerals; }
-    public int getMineralsCapacity() { return mineralsCapacity; }
-    public void setMineralsCapacity(int mineralsCapacity) { this.mineralsCapacity = mineralsCapacity; }
+
+    public int getPlantsCapacity() { 
+        if (this.hasBuilding(GameUpgrades.PLANT_CHAMBER_1)) {return 10000;
+        } else if (this.hasBuilding(GameUpgrades.PLANT_CHAMBER_0)) {return 4000; 
+        } else {return 0;}
+    }
+    public int getMushroomsCapacity() { 
+        if (this.hasBuilding(GameUpgrades.MUSHROOM_CHAMBER_1)) {return 15000;
+        } else if (this.hasBuilding(GameUpgrades.MUSHROOM_CHAMBER_0)) {return 8000; 
+        } else {return 0;}
+    }
+    public int getProteinCapacity() { 
+        if (this.hasBuilding(GameUpgrades.MEAT_CHAMBER_1)) {return 5000;
+        } else if (this.hasBuilding(GameUpgrades.MEAT_CHAMBER_0)) {return 2000; 
+        } else {return 0;}
+    }
+    public int getWaterCapacity() {
+        if (this.hasBuilding(GameUpgrades.WATER_RESERVOIR_1)) {return 2500;
+        } else if (this.hasBuilding(GameUpgrades.WATER_RESERVOIR_0)) {return 1000; 
+        } else {return 0;}
+    }
+    public int getSyrupsCapacity() { 
+        if (this.hasBuilding(GameUpgrades.SYRUP_RESERVOIR_1)) {return 1200;
+        } else if (this.hasBuilding(GameUpgrades.SYRUP_RESERVOIR_0)) {return 500; 
+        } else {return 0;}
+    }
+    public int getResinsCapacity() { 
+        if (this.hasBuilding(GameUpgrades.RESIN_RESERVOIR_1)) {return 500;
+        } else if (this.hasBuilding(GameUpgrades.RESIN_RESERVOIR_0)) {return 200; 
+        } else {return 0;}
+    }
+    public int getMineralsCapacity() { 
+        if (this.hasBuilding(GameUpgrades.ROCK_WAREHOUSE_1)) {return 250;
+        } else if (this.hasBuilding(GameUpgrades.ROCK_WAREHOUSE_0)) {return 100; 
+        } else {return 0;}
+    }
 
     // Other Capacities
-    public int getEggsCapacity() { return eggsCapacity; }
-    public void setEggsCapacity(int eggsCapacity) { this.eggsCapacity = eggsCapacity; }
-    public int getQueensCapacity() { return queensCapacity; }
-    public void setQueensCapacity(int queensCapacity) { this.queensCapacity = queensCapacity; }
+    public int getEggsCapacity() {
+        if (this.hasBuilding(GameUpgrades.EGG_CHAMBER_1)) {return 80;
+        } else if (this.hasBuilding(GameUpgrades.EGG_CHAMBER_0)) {return 50; 
+        } else {return 0;}
+    }
+    public int getQueensCapacity() {
+        if (this.hasBuilding(GameUpgrades.ROYAL_CHAMBER_1)) {return 2;
+        } else if (this.hasBuilding(GameUpgrades.ROYAL_CHAMBER_0)) {return 1; 
+        } else {return 0;}
+    }
     public int getAphidCapacity() { return aphidCapacity; }
     public void setAphidCapacity(int aphidCapacity) { this.aphidCapacity = aphidCapacity; }
     public int getAphids() { return aphids; }
@@ -1017,6 +1063,10 @@ public class Colony {
         }
     }
 
+    public void runBuilding() {
+
+    }
+
     // --- Job Packer --- 
     public void runMinutelyJobs() {
         this.runConverting();
@@ -1028,6 +1078,7 @@ public class Colony {
         this.runLaying();
         this.runResearch();
         this.runRanching();
+        this.runBuilding();
     }
 
     public void runDailyJobs() {

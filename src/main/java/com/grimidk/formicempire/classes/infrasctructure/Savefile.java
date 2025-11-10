@@ -34,19 +34,12 @@ public class Savefile implements Serializable {
     private int queens;
 
     private int plants;
-    private int plantsCapacity;
     private int mushrooms;
-    private int mushroomsCapacity;
     private int protein;
-    private int proteinCapacity;
     private int water;
-    private int waterCapacity; 
     private int syrups;
-    private int syrupsCapacity;
     private int resins;
-    private int resinsCapacity;
     private int minerals;
-    private int mineralsCapacity;
 
     private float hatchRateWorker;
     private float hatchRateSoldier;
@@ -56,7 +49,8 @@ public class Savefile implements Serializable {
 
     private Map<String, Integer> assignedRoleCounts;
     private List<Integer> unlockedUpgradeIds;
-    
+    private List<Integer> unlockedBuildingIds;
+
     private int aphids;
     private int researchPoints;
     private int researchSpeed;
@@ -67,14 +61,13 @@ public class Savefile implements Serializable {
     private float gravingRate;
     private float collectingRate;
     private int aphidCapacity;
-    private int eggsCapacity;
-    private int queensCapacity;
 
     public Savefile(int id, String name) {
         this.id = id;
         this.name = name;
         this.assignedRoleCounts = new HashMap<>();
         this.unlockedUpgradeIds = new ArrayList<>(); 
+        this.unlockedBuildingIds = new ArrayList<>(); 
         this.minute = 0;
         this.hour = 0;
         this.day = 1;
@@ -97,16 +90,6 @@ public class Savefile implements Serializable {
         this.gravingRate = 5f;
         this.collectingRate = 1f;
         this.aphidCapacity = 10;
-        this.eggsCapacity = 50;
-        this.queensCapacity = 1;
-        
-        this.plantsCapacity = 4000;
-        this.mushroomsCapacity = 8000;
-        this.proteinCapacity = 2000;
-        this.waterCapacity = 1000;
-        this.syrupsCapacity = 500;
-        this.resinsCapacity = 200;
-        this.mineralsCapacity = 100;
     }
 
     public int getId() {
@@ -284,14 +267,6 @@ public class Savefile implements Serializable {
         this.plants = plants;
     }
 
-    public int getPlantsCapacity() {
-        return plantsCapacity;
-    }
-
-    public void setPlantsCapacity(int plantsCapacity) {
-        this.plantsCapacity = plantsCapacity;
-    }
-
     public int getMushrooms() {
         return mushrooms;
     }   
@@ -300,28 +275,12 @@ public class Savefile implements Serializable {
         this.mushrooms = mushrooms;
     }   
 
-    public int getMushroomsCapacity() {
-        return mushroomsCapacity;
-    }   
-
-    public void setMushroomsCapacity(int mushroomsCapacity) {
-        this.mushroomsCapacity = mushroomsCapacity;
-    }
-
     public int getProtein() {
         return protein;
     }
 
     public void setProtein(int protein) {
         this.protein = protein;
-    }
-
-    public int getProteinCapacity() {
-        return proteinCapacity;
-    }
-
-    public void setProteinCapacity(int proteinCapacity) {
-        this.proteinCapacity = proteinCapacity;
     }
 
     public int getWater() {
@@ -332,28 +291,12 @@ public class Savefile implements Serializable {
         this.water = water;
     }
 
-    public int getWaterCapacity() {
-        return waterCapacity;
-    }
-
-    public void setWaterCapacity(int waterCapacity) {
-        this.waterCapacity = waterCapacity;
-    }
-
     public int getSyrups() {
         return syrups;
     }
 
     public void setSyrups(int syrups) {
         this.syrups = syrups;
-    }
-
-    public int getSyrupsCapacity() {
-        return syrupsCapacity;
-    }
-
-    public void setSyrupsCapacity(int syrupsCapacity) {
-        this.syrupsCapacity = syrupsCapacity;
     }
 
     public int getResins() {
@@ -364,28 +307,12 @@ public class Savefile implements Serializable {
         this.resins = resins;
     }
 
-    public int getResinsCapacity() {
-        return resinsCapacity;
-    }
-
-    public void setResinsCapacity(int resinsCapacity) {
-        this.resinsCapacity = resinsCapacity;
-    }
-
     public int getMinerals() {
         return minerals;
     }
 
     public void setMinerals(int minerals) {
         this.minerals = minerals;
-    }
-
-    public int getMineralsCapacity() {
-        return mineralsCapacity;
-    }
-
-    public void setMineralsCapacity(int mineralsCapacity) {
-        this.mineralsCapacity = mineralsCapacity;
     }
 
     public float getHatchRateWorker() { return hatchRateWorker; }
@@ -413,6 +340,14 @@ public class Savefile implements Serializable {
 
     public void setUnlockedUpgradeIds(List<Integer> unlockedUpgradeIds) {
         this.unlockedUpgradeIds = unlockedUpgradeIds;
+    }
+        
+    public List<Integer> getUnlockedBuildingIds() {
+        return unlockedBuildingIds;
+    }
+
+    public void setUnlockedBuildingIds(List<Integer> unlockedBuildingIds) {
+        this.unlockedBuildingIds = unlockedBuildingIds;
     }
 
     public int getAphids() { return aphids; }
@@ -444,10 +379,4 @@ public class Savefile implements Serializable {
 
     public int getAphidCapacity() { return aphidCapacity; }
     public void setAphidCapacity(int aphidCapacity) { this.aphidCapacity = aphidCapacity; }
-
-    public int getEggsCapacity() { return eggsCapacity; }
-    public void setEggsCapacity(int eggsCapacity) { this.eggsCapacity = eggsCapacity; }
-
-    public int getQueensCapacity() { return queensCapacity; }
-    public void setQueensCapacity(int queensCapacity) { this.queensCapacity = queensCapacity; }
 }

@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 import javax.swing.SwingUtilities;
 
 import com.grimidk.formicempire.classes.constants.AntRole;
+import com.grimidk.formicempire.classes.constants.Building;
 import com.grimidk.formicempire.classes.constants.Upgrade;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.World;
@@ -325,15 +326,6 @@ public class SaveManager {
                     save.setResins(c.getResins());
                     save.setMinerals(c.getMinerals());
 
-                    // --- Resource Capacities ---
-                    save.setMushroomsCapacity(c.getMushroomsCapacity());
-                    save.setPlantsCapacity(c.getPlantsCapacity());
-                    save.setProteinCapacity(c.getProteinCapacity());
-                    save.setWaterCapacity(c.getWaterCapacity());
-                    save.setSyrupsCapacity(c.getSyrupsCapacity());
-                    save.setResinsCapacity(c.getResinsCapacity());
-                    save.setMineralsCapacity(c.getMineralsCapacity());
-
                     // --- Hatch Rates ---
                     save.setHatchRateWorker(c.getHatchRateWorker());
                     save.setHatchRateSoldier(c.getHatchRateSoldier());
@@ -356,6 +348,15 @@ public class SaveManager {
                         }
                     }
                     save.setUnlockedUpgradeIds(upgradeIds);
+
+                    Set<Building> colonyBuildings = c.getUnlockedBuildings();
+                    List<Integer> buildiingIds = new ArrayList<>();
+                    if (colonyBuildings != null) {
+                        for (Building up : colonyBuildings) {
+                            buildiingIds.add(up.getId());
+                        }
+                    }
+                    save.setUnlockedBuildingIds(buildiingIds);
                     
                     // --- New Stats ---
                     save.setAphids(c.getAphids());
@@ -368,8 +369,6 @@ public class SaveManager {
                     save.setGravingRate(c.getGravingRate());
                     save.setCollectingRate(c.getCollectingRate());
                     save.setAphidCapacity(c.getAphidCapacity());
-                    save.setEggsCapacity(c.getEggsCapacity());
-                    save.setQueensCapacity(c.getQueensCapacity());
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -441,15 +440,6 @@ public class SaveManager {
         writeJsonLine(w, "resins", s.getResins(), false);
         writeJsonLine(w, "minerals", s.getMinerals(), false);
 
-        // Resource Capacities
-        writeJsonLine(w, "plantsCapacity", s.getPlantsCapacity(), false);
-        writeJsonLine(w, "mushroomsCapacity", s.getMushroomsCapacity(), false);
-        writeJsonLine(w, "proteinCapacity", s.getProteinCapacity(), false);
-        writeJsonLine(w, "waterCapacity", s.getWaterCapacity(), false);
-        writeJsonLine(w, "syrupsCapacity", s.getSyrupsCapacity(), false);
-        writeJsonLine(w, "resinsCapacity", s.getResinsCapacity(), false);
-        writeJsonLine(w, "mineralsCapacity", s.getMineralsCapacity(), false);
-
         // Hatch Rates
         writeJsonLine(w, "hatchRateWorker", s.getHatchRateWorker(), false);
         writeJsonLine(w, "hatchRateSoldier", s.getHatchRateSoldier(), false);
@@ -468,12 +458,16 @@ public class SaveManager {
         writeJsonLine(w, "gravingRate", s.getGravingRate(), false);
         writeJsonLine(w, "collectingRate", s.getCollectingRate(), false);
         writeJsonLine(w, "aphidCapacity", s.getAphidCapacity(), false);
-        writeJsonLine(w, "eggsCapacity", s.getEggsCapacity(), false);
-        writeJsonLine(w, "queensCapacity", s.getQueensCapacity(), false);
 
         // Upgrades
         w.write("  \"unlockedUpgradeIds\": ");
         w.write(serializeListToJson(s.getUnlockedUpgradeIds()));
+        w.write(","); 
+        w.newLine();
+
+        // Buildings
+        w.write("  \"unlockedBuildingIds\": ");
+        w.write(serializeListToJson(s.getUnlockedBuildingIds()));
         w.write(","); 
         w.newLine();
 
@@ -564,15 +558,6 @@ public class SaveManager {
             s.setResins(Integer.parseInt(m.getOrDefault("resins", "0")));
             s.setMinerals(Integer.parseInt(m.getOrDefault("minerals", "0")));
 
-            // Resource Capacities
-            s.setMushroomsCapacity(Integer.parseInt(m.getOrDefault("mushroomsCapacity", "8000")));
-            s.setPlantsCapacity(Integer.parseInt(m.getOrDefault("plantsCapacity", "4000")));
-            s.setProteinCapacity(Integer.parseInt(m.getOrDefault("proteinCapacity", "2000")));
-            s.setWaterCapacity(Integer.parseInt(m.getOrDefault("waterCapacity", "1000")));
-            s.setSyrupsCapacity(Integer.parseInt(m.getOrDefault("syrupsCapacity", "500")));
-            s.setResinsCapacity(Integer.parseInt(m.getOrDefault("resinsCapacity", "200")));
-            s.setMineralsCapacity(Integer.parseInt(m.getOrDefault("mineralsCapacity", "100")));
-
             // Hatch Rates
             s.setHatchRateWorker(Float.parseFloat(m.getOrDefault("hatchRateWorker", "100.0")));
             s.setHatchRateSoldier(Float.parseFloat(m.getOrDefault("hatchRateSoldier", "0.0")));
@@ -591,8 +576,6 @@ public class SaveManager {
             s.setGravingRate(Float.parseFloat(m.getOrDefault("gravingRate", "5.0")));
             s.setCollectingRate(Float.parseFloat(m.getOrDefault("collectingRate", "1.0")));
             s.setAphidCapacity(Integer.parseInt(m.getOrDefault("aphidCapacity", "10")));
-            s.setEggsCapacity(Integer.parseInt(m.getOrDefault("eggsCapacity", "50")));
-            s.setQueensCapacity(Integer.parseInt(m.getOrDefault("queensCapacity", "1")));
 
             // Roles & Upgrades
             String rolesJson = m.getOrDefault("assignedRoleCounts", "{}");
@@ -603,6 +586,9 @@ public class SaveManager {
 
             String upgradesJson = m.getOrDefault("unlockedUpgradeIds", "[]");
             s.setUnlockedUpgradeIds(deserializeJsonToList(upgradesJson));
+
+            String buildingsJson = m.getOrDefault("unlockedBuildingIds", "[]");
+            s.setUnlockedBuildingIds(deserializeJsonToList(buildingsJson));
         }
         return s;
     }
