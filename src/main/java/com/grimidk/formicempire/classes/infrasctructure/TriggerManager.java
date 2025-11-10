@@ -14,6 +14,7 @@ public class TriggerManager {
     private final Engine engine;
     
     private final List<TriggerListener> listeners = new ArrayList<>();
+    private boolean colonyDeathFired = false;
 
     public TriggerManager(World world, Colony colony, Engine engine) {
         this.world = world;
@@ -29,6 +30,7 @@ public class TriggerManager {
 
     public interface TriggerListener {
         void onUpgradeTriggered(Upgrade unlockedUpgrade, String title, String message);
+        void onColonyDeath();
     }
     
     public void addListener(TriggerListener listener) {
@@ -44,6 +46,14 @@ public class TriggerManager {
             });
         }
     }
+    
+    private void fireColonyDeath() {
+        for (TriggerListener listener : listeners) {
+            SwingUtilities.invokeLater(() -> {
+                listener.onColonyDeath();
+            });
+        }
+    }
 
     // --- Trigger Check Methods ---
     private void checkMonthlyTriggers() {
@@ -52,6 +62,7 @@ public class TriggerManager {
     
     private void checkDailyTriggers() {
         checkGraveKeeperUnlock();
+        checkColonyDeath();
     }
 
     private void checkHourlyTriggers() {
@@ -94,6 +105,17 @@ public class TriggerManager {
             fireTrigger(GameUpgrades.ABILITY_RESEARCH, 
                         "Scientific Breakthrough", 
                         "Your colony has accumulated 100 Research Points! You can now access the Research panel (Y) from the game menu to purchase new upgrades.");
+        }
+    }
+    
+    private void checkColonyDeath() {
+        if (colonyDeathFired || !colony.hasUpgrade(GameUpgrades.TYPE_QUEEN)) {
+            return;
+        }
+        
+        if (colony.getQueens() != null && colony.getQueens().size() <= 0) {
+            colonyDeathFired = true;
+            fireColonyDeath();
         }
     }
 }

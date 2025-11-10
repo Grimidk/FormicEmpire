@@ -215,6 +215,18 @@ public class GamePanel extends JPanel {
 
         frame.showCard(MainFrame.CARD_SAVE);
     }
+    
+    public void quitToMenuWithoutSaving() {
+        Engine eng = frame.getEngine();
+        if (eng != null) {
+            eng.pauseEngine();
+        }
+        updateStatusIndicator(true);
+        if (controlPanel != null) controlPanel.setPlayPauseButtonText(true);
+        unregisterTickListeners(); 
+
+        frame.showCard(MainFrame.CARD_SAVE);
+    }
 
     public void enterWithSavefile(Savefile savefile) {
         statusLabel.setText("Starting game...");

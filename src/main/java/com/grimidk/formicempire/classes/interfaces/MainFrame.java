@@ -3,6 +3,7 @@ package com.grimidk.formicempire.classes.interfaces;
 import javax.swing.*;
 import com.grimidk.formicempire.classes.constants.Upgrade;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
+import com.grimidk.formicempire.classes.infrasctructure.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.TriggerManager; 
 import java.awt.*;
@@ -116,10 +117,71 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
     
     @Override
     public void onUpgradeTriggered(Upgrade unlockedUpgrade, String title, String message) {
+        boolean wasPaused = engine.isPaused();
+        if (!wasPaused) {
+            engine.pauseEngine();
+            if (gamePanel != null) gamePanel.updateStatusIndicator(true);
+        }
+        
         JOptionPane.showMessageDialog(this, message, title, JOptionPane.INFORMATION_MESSAGE);
+        
+        if (!wasPaused) {
+            engine.resumeEngine();
+            if (gamePanel != null) gamePanel.updateStatusIndicator(false);
+        }
 
         if (gamePanel != null) {
             gamePanel.refreshAllGUIData();
+        }
+    }
+    
+    @Override
+    public void onColonyDeath() {
+        engine.pauseEngine();
+        if (gamePanel != null) gamePanel.updateStatusIndicator(true);
+
+        String[] options = {"Reload Last Save", "Go to Main Menu"};
+        String title = "Your Colony Has Perished";
+        String message = "Your last queen has died, and the colony cannot continue.\nWhat would you like to do?";
+
+        int choice = JOptionPane.showOptionDialog(
+                this,
+                message,
+                title,
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE,
+                null,
+                options,
+                options[0]
+        );
+
+        if (choice == 0) { 
+            int slotId = (engine.getWorld() != null) ? engine.getWorld().getSaveSlotId() : 0;
+            
+            if (slotId == 0) {
+                JOptionPane.showMessageDialog(this, "This was a new game with no save file. Returning to main menu.", "Load Failed", JOptionPane.ERROR_MESSAGE);
+                handleQuitToMenu();
+            } else {
+                SaveManager sm = new SaveManager();
+                Savefile saveToLoad = sm.loadAutosaveForSlot(slotId);
+                
+                if (saveToLoad != null) {
+                    openGameWithSave(saveToLoad);
+                } else {
+                    JOptionPane.showMessageDialog(this, "No autosave found for this slot. Returning to main menu.", "Load Failed", JOptionPane.ERROR_MESSAGE);
+                    handleQuitToMenu();
+                }
+            }
+        } else {
+            handleQuitToMenu();
+        }
+    }
+    
+    private void handleQuitToMenu() {
+        if (gamePanel != null) {
+            gamePanel.quitToMenuWithoutSaving();
+        } else {
+            showCard(CARD_SAVE);
         }
     }
 }

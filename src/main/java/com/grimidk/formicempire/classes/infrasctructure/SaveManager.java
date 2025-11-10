@@ -37,7 +37,7 @@ public class SaveManager {
         }
     }
 
-    private File getSlotFile(int slotId, String type) {
+    public File getSlotFile(int slotId, String type) {
         String fileName;
         switch (type) {
             case "manual":
@@ -178,6 +178,22 @@ public class SaveManager {
         
         } catch (IOException ex) {
             ex.printStackTrace();
+        }
+    }
+    
+    public Savefile loadAutosaveForSlot(int slotId) {
+        if (slotId <= 0) return null;
+
+        File autos = getSlotFile(slotId, "autosave");
+        if (!autos.exists() || autos.length() == 0) {
+            return null; 
+        }
+
+        try (BufferedReader r = Files.newBufferedReader(autos.toPath(), StandardCharsets.UTF_8)) {
+            return readSaveFromReader(r);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
     }
 
