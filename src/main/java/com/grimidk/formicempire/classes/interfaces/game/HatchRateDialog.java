@@ -51,7 +51,6 @@ public class HatchRateDialog extends JDialog {
         panel.add(totalLabel);
         panel.add(new JSeparator(SwingConstants.HORIZONTAL));
         
-        // Build the list of types dynamically based on unlocked upgrades
         List<AntType> typesToRate = new ArrayList<>();
         if (colony.hasUpgrade(GameUpgrades.TYPE_WORKER)) {
             typesToRate.add(GameConstants.TYPE_WORKER);

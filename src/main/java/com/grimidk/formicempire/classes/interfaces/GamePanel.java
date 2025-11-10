@@ -58,7 +58,6 @@ public class GamePanel extends JPanel {
         statusLabel = new JLabel("Game not started");
         statusIndicator = new JLabel();
         
-        // Initialize new encapsulated panels
         colonyPanel = new ColonyPanel();
         worldPanel = new WorldPanel();
         gameAreaPanel = new GameAreaPanel();

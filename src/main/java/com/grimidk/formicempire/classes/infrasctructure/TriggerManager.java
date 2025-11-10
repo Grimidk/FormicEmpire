@@ -93,7 +93,7 @@ public class TriggerManager {
         if (colony.getResearchPoints() >= 100) {
             fireTrigger(GameUpgrades.ABILITY_RESEARCH, 
                         "Scientific Breakthrough", 
-                        "Your colony has accumulated 100 Research Points! You can now access the Research panel from the game menu to purchase new upgrades.");
+                        "Your colony has accumulated 100 Research Points! You can now access the Research panel (Y) from the game menu to purchase new upgrades.");
         }
     }
 }

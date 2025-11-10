@@ -894,7 +894,6 @@ public class Colony {
         this.researchPoints += researcherCount * researchSpeed;
     }
 
-    // --- MODIFIED: Safe removal ---
     public void runGraveKeeping() {
         int graverCount = countAntsByRole(getWorkers(), GameConstants.ROLE_GRAVER);
         if (graverCount == 0 || getDeadAnts().isEmpty()) return;
@@ -911,7 +910,6 @@ public class Colony {
         getDeadAnts().removeAll(antsToRemove);
     }
 
-    // --- MODIFIED: Safe removal (using index is fine, but this is safer if logic changes) ---
     public void runNursing() {
         int nurseCount = countAntsByRole(getWorkers(), GameConstants.ROLE_NURSE);
         int babyAntTotal = this.getEggs().size() +  this.getLarvae().size() +  this.getPupae().size();
@@ -934,7 +932,6 @@ public class Colony {
             List<Ant> list = antGroups.get(typeToKill);
             List<Ant> antsToCull = new ArrayList<>();
             
-            // Iterate safely
             for (Ant ant : list) {
                 if (deficit <= 0) break;
                 
@@ -944,7 +941,6 @@ public class Colony {
                 } 
             }
             
-            // Remove safely
             for (Ant antToCull : antsToCull) {
                 if (antToCull.isAlive()) {
                     antToCull.goDie(); 

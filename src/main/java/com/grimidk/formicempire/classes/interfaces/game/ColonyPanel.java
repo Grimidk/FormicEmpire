@@ -196,7 +196,6 @@ public class ColonyPanel extends JPanel {
         if (protein != lastProtein) proteinLabel.setText(String.valueOf(protein));
         if (water != lastWater) waterLabel.setText(String.valueOf(water));
 
-        // Show/Hide resource labels based on upgrades
         boolean hasRanching = colony.hasUpgrade(GameUpgrades.ROLE_RANCHER);
         syrupLabel.setVisible(hasRanching);
         if (hasRanching && syrups != lastSyrups) syrupLabel.setText(String.valueOf(syrups));

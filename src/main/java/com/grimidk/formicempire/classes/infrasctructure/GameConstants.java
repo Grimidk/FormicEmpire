@@ -323,7 +323,7 @@ public final class GameConstants {
         // (Add species here when you have them)
     }
     
-    // --- Public Static Getters (Unmodifiable) ---
+    // --- Public Static Getters ---
     
     public static List<Biome> getBiomes() {
         return Collections.unmodifiableList(biomes);

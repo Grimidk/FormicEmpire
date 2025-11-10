@@ -499,7 +499,7 @@ public class SaveManager {
                 if (v.endsWith("\"")) {
                     v = v.substring(0, v.length() - 1);
                 }
-                if (k.equals("name") || k.equals("colonyName")) { // Also unescape colonyName
+                if (k.equals("name") || k.equals("colonyName")) { 
                      v = unescapeJsonString(v);
                 }
             } else if (v.startsWith("[")) { 
