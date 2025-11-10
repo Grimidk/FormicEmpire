@@ -8,14 +8,19 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ResearchDialog extends JDialog {
 
     private final Colony colony;
     private final JPanel listPanel;
     private final JLabel researchPointsLabel;
+    
+    private final Map<JButton, Upgrade> buttonUpgradeMap = new HashMap<>();
 
     public ResearchDialog(JFrame owner, Colony colony) {
         super(owner, "Research & Development", true);
@@ -46,12 +51,18 @@ public class ResearchDialog extends JDialog {
         southPanel.add(closeButton);
         add(southPanel, BorderLayout.SOUTH);
         
+        getRootPane().registerKeyboardAction(e -> dispose(),
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                JComponent.WHEN_IN_FOCUSED_WINDOW);
+        
         pack();
         setLocationRelativeTo(owner);
     }
 
     private void refreshDialog() {
         listPanel.removeAll();
+        buttonUpgradeMap.clear();
+        
         updateResearchPointsLabel();
 
         int currentRP = colony.getResearchPoints();
@@ -61,12 +72,13 @@ public class ResearchDialog extends JDialog {
         for (Upgrade upgrade : allUpgrades) {
             boolean owned = colony.hasUpgrade(upgrade);
             boolean reqMet = (upgrade.getRequirement() == null || colony.hasUpgrade(upgrade.getRequirement()));
-            boolean isResearchable = (upgrade.getCost() > 0);
 
-            if (!owned && reqMet && isResearchable) {
+            if (!owned && reqMet) {
                 availableUpgrades.add(upgrade);
             }
         }
+
+        availableUpgrades.sort((u1, u2) -> Integer.compare(u1.getCost(), u2.getCost()));
 
         if (availableUpgrades.isEmpty()) {
             listPanel.add(new JLabel("  No new research available at this time."));
@@ -92,7 +104,17 @@ public class ResearchDialog extends JDialog {
         // Info Panel (Name, Description)
         JPanel infoPanel = new JPanel();
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
-        infoPanel.add(new JLabel("<html><p>" + upgrade.getDescription() + "</p></html>"));
+
+        JTextArea descriptionArea = new JTextArea(upgrade.getDescription());
+        descriptionArea.setWrapStyleWord(true);
+        descriptionArea.setLineWrap(true);
+        descriptionArea.setEditable(false);
+        descriptionArea.setFocusable(false);
+        descriptionArea.setBackground(panel.getBackground());
+        descriptionArea.setFont(infoPanel.getFont());
+        descriptionArea.setBorder(null);
+        infoPanel.add(descriptionArea);
+
         panel.add(infoPanel, BorderLayout.CENTER);
 
         // Action Panel (Button, Cost)
@@ -125,7 +147,31 @@ public class ResearchDialog extends JDialog {
         actionPanel.add(purchaseButton);
         panel.add(actionPanel, BorderLayout.EAST);
 
+        buttonUpgradeMap.put(purchaseButton, upgrade);
+
         return panel;
+    }
+
+    public void liveUpdate() {
+        if (!isShowing()) {
+            return; 
+        }
+
+        updateResearchPointsLabel();
+
+        int currentRP = colony.getResearchPoints();
+        for (Map.Entry<JButton, Upgrade> entry : buttonUpgradeMap.entrySet()) {
+            JButton button = entry.getKey();
+            Upgrade upgrade = entry.getValue();
+
+            if (currentRP < upgrade.getCost()) {
+                button.setEnabled(false);
+                button.setToolTipText("Not enough Research Points");
+            } else {
+                button.setEnabled(true);
+                button.setToolTipText(null);
+            }
+        }
     }
 
     public void showDialog() {

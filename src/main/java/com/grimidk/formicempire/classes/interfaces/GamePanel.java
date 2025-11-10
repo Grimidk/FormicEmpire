@@ -367,6 +367,10 @@ public class GamePanel extends JPanel {
         worldPanel.updateHourData(world);
         colonyPanel.updateHourData(colony);
         
+        if (researchDialog != null && researchDialog.isShowing()) {
+            researchDialog.liveUpdate();
+        }
+        
         if (controlPanel != null) {
             controlPanel.updateResearchMenu(colony.hasUpgrade(GameUpgrades.ABILITY_RESEARCH));
         }
@@ -380,6 +384,10 @@ public class GamePanel extends JPanel {
 
         worldPanel.updateDayData(world);
         colonyPanel.updateDayData(colony);
+        
+        if (roleDialog != null && roleDialog.isShowing()) {
+            roleDialog.liveUpdate();
+        }
     }
 
     private void updateMonthGUI() {
