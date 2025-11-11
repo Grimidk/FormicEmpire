@@ -1,5 +1,7 @@
 package com.grimidk.formicempire.classes.constants;
 
+import javax.swing.ImageIcon;
+
 public class Building {
     private final int id;
     private final String name;
@@ -9,6 +11,8 @@ public class Building {
     private final int resinCost;
     private final int mineralCost;
     private final int buildTime;
+    private ImageIcon icon;
+    private ImageIcon sprite;
 
     public Building(int id, String name,int level, String description, Building requirement, int resinCost, int mineralCost, int buildTime) {
         this.id = id;
@@ -19,6 +23,8 @@ public class Building {
         this.resinCost = resinCost;
         this.mineralCost = mineralCost;
         this.buildTime = buildTime;
+        this.icon = icon;
+        this.sprite = sprite;
     }
 
     public int getId() {
@@ -51,5 +57,13 @@ public class Building {
 
     public int getBuildTime() {
         return buildTime;
+    }
+
+    public ImageIcon getIcon() {
+        return icon;
+    }
+
+    public ImageIcon getSprite() {
+        return sprite;
     }
 }

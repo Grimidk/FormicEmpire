@@ -7,9 +7,9 @@ public class Biome {
     private final String name;
     private final int temperature;
     private final int humidity; // 0 -> 5
-    private ImageIcon icon;
+    private final ImageIcon icon;
 
-    public Biome(int id, String name, int temperature, int humidity) {
+    public Biome(int id, String name, int temperature, int humidity, ImageIcon icon) {
         this.id = id;
         this.name = name;
         this.temperature = temperature;
@@ -35,9 +35,5 @@ public class Biome {
 
     public ImageIcon getIcon() {
         return icon;
-    }
-
-    public void setIcon(ImageIcon icon) {
-        this.icon = icon;
     }
 }

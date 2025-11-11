@@ -1,5 +1,7 @@
 package com.grimidk.formicempire.classes.constants;
 
+import javax.swing.ImageIcon;
+
 public class AntSubType {
 
     private final int id;
@@ -13,6 +15,7 @@ public class AntSubType {
     private final float defenseMult;
     private final float speedMult;
     private final float sizeMult; 
+    private ImageIcon icon;
 
     public AntSubType(int id, AntType antType, String name, float healtMult, float attackMult, float regenMult, float consumptionMult, float attackSpeedMult, float defenseMult, float speedMult, float sizeMult) {
         this.id = id;
@@ -26,6 +29,7 @@ public class AntSubType {
         this.defenseMult = defenseMult;
         this.speedMult = speedMult;
         this.sizeMult = sizeMult;
+        this.icon = icon;
     }
 
     public int getId() {
@@ -70,5 +74,9 @@ public class AntSubType {
 
     public float getSizeMult() {
         return sizeMult;
+    }
+
+    public ImageIcon getIcon() {
+        return icon;
     }
 }

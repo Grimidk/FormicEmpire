@@ -902,36 +902,39 @@ public class Colony {
         }
     }
 
-    public void runNuptial(){
+    public void runNuptial() {
         List<Ant> princesses = getPrincesses();
         List<Ant> drones = getDrones();
-        List<Ant> queens = getQueens();
 
         if (!hasUpgrade(GameUpgrades.TYPE_PRINCESS)) return;
 
         List<Ant> princessesToEvolve = new ArrayList<>();
         
         for (Ant princess : princesses) {
-            if (queens.size() >= this.getQueensCapacity() || drones.isEmpty()) {
-                break;
-            }
-            if (drones.size() > 0) {
-                 princessesToEvolve.add(princess);
-                 Ant deadDrone = drones.remove(drones.size() - 1); 
-                 deadDrone.goDie();
-                 this.deadAnts.add(deadDrone);
-            }
+            boolean hasQueenSpace = (getQueens().size() + princessesToEvolve.size()) < this.getQueensCapacity();
+            
+            boolean hasDrones = !drones.isEmpty();            
+            if (hasQueenSpace && hasDrones) {
+                princessesToEvolve.add(princess);
+                Ant deadDrone = drones.remove(drones.size() - 1); 
+                deadDrone.goDie();
+                this.deadAnts.add(deadDrone);
+            } 
         }
 
         for (Ant princess : princessesToEvolve) {
             princess.transform(this, GameConstants.TYPE_QUEEN);
-            queens.add(princess);
+            getQueens().add(princess);
         }
         
         princesses.removeAll(princessesToEvolve);
+        runSpreading(princesses); 
     }
 
-    public void runSpreading() { }
+    public void runSpreading(List<Ant> princesses) { 
+
+    }
+    
     public void runInfection() { 
         if (this.deadAnts.size() < 100) {
             return;

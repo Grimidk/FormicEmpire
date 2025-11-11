@@ -6,9 +6,9 @@ public class ColonyRank {
     private final int id;
     private final String name;
     private final long population;
-    private ImageIcon icon;
+    private final ImageIcon icon;
 
-    public ColonyRank(int id, String name, long population) {
+    public ColonyRank(int id, String name, long population, ImageIcon icon) {
         this.id = id;
         this.name = name;
         this.population = population;
@@ -29,9 +29,5 @@ public class ColonyRank {
     
     public ImageIcon getIcon() {
         return icon;
-    }
-
-    public void setIcon(ImageIcon icon) {
-        this.icon = icon;
     }
 }

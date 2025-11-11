@@ -32,14 +32,22 @@ public final class GameConstants {
     }
 
     // --- Biomes ---
-    public static final Biome PLAINS_BIOME = new Biome(1, "Plains", 25, 2);
-    public static final Biome FOREST_BIOME = new Biome(2, "Forest", 20, 3);
-    public static final Biome JUNGLE_BIOME = new Biome(3, "Jungle", 30, 4);
-    public static final Biome SWAMP_BIOME = new Biome(4, "Swamp", 25, 5);
-    public static final Biome URBAN_BIOME = new Biome(5, "Urban", 30, 1);
-    public static final Biome TUNDRA_BIOME = new Biome(6, "Tundra", 5, 2);
-    public static final Biome TAIGA_BIOME = new Biome(7, "Taiga", 10, 1);
-    public static final Biome DESSERT_BIOME = new Biome(8, "Dessert", 50, 0);
+    public static final Biome PLAINS_BIOME = new Biome(1, "Plains", 25, 2, 
+        loadIcon("icons/biomes/plains.png"));
+    public static final Biome FOREST_BIOME = new Biome(2, "Forest", 20, 3, 
+        loadIcon("icons/biomes/forest.png"));
+    public static final Biome JUNGLE_BIOME = new Biome(3, "Jungle", 30, 4, 
+        loadIcon("icons/biomes/jungle.png"));
+    public static final Biome SWAMP_BIOME = new Biome(4, "Swamp", 25, 5, 
+        loadIcon("icons/biomes/swamp.png"));
+    public static final Biome URBAN_BIOME = new Biome(5, "Urban", 30, 1, 
+        loadIcon("icons/biomes/urban.png"));
+    public static final Biome TUNDRA_BIOME = new Biome(6, "Tundra", 5, 2, 
+        loadIcon("icons/biomes/tundra.png"));
+    public static final Biome TAIGA_BIOME = new Biome(7, "Taiga", 10, 1, 
+        loadIcon("icons/biomes/taiga.png"));
+    public static final Biome DESSERT_BIOME = new Biome(8, "Dessert", 50, 0, 
+        loadIcon("icons/biomes/dessert.png"));
 
     // --- Resources ---
     public static final ResourceType PLANT_RESOURCE = new ResourceType(1, "Plant Matter", true, false, 
@@ -120,9 +128,12 @@ public final class GameConstants {
         loadIcon("icons/weather/frog-rain.png"));
 
     // --- Ant Status ---
-    public static final AntStatus STATUS_ALIVE = new AntStatus(1, "Alive");
-    public static final AntStatus STATUS_DEAD = new AntStatus(2, "Dead");
-    public static final AntStatus STATUS_ZOMBIFIED = new AntStatus(3, "Zombified");
+    public static final AntStatus STATUS_ALIVE = new AntStatus(1, "Alive", 
+        loadIcon("icons/status/alive.png"));
+    public static final AntStatus STATUS_DEAD = new AntStatus(2, "Dead", 
+        loadIcon("icons/status/dead.png"));
+    public static final AntStatus STATUS_ZOMBIFIED = new AntStatus(3, "Zombified", 
+        loadIcon("icons/status/zombified.png"));
 
     // --- Ant Types ---
     public static final AntType TYPE_EGG = new AntType(1, "Egg", 1f, 0f, 0f, 0f, 0f, 0f, 0f, 1/4f, 
@@ -180,19 +191,32 @@ public final class GameConstants {
     public static final AntRole ROLE_RESEARCHER = new AntRole(26, TYPE_QUEEN, "Researcher");
 
     // --- Colony Ranks ---
-    public static final ColonyRank RANK_ANT = new ColonyRank(1, "Ant", 1l);
-    public static final ColonyRank RANK_COLONY = new ColonyRank(2, "Ant", 10l);
-    public static final ColonyRank RANK_COUNTY = new ColonyRank(3, "Ant", 100l);
-    public static final ColonyRank RANK_DUCHY = new ColonyRank(4, "Ant", 1000l);
-    public static final ColonyRank RANK_KINGDOM = new ColonyRank(5, "Ant", 10000l);
-    public static final ColonyRank RANK_EMPIRE = new ColonyRank(6, "Ant", 100000l);
-    public static final ColonyRank RANK_SUPER = new ColonyRank(7, "Ant", 1000000l);
-    public static final ColonyRank RANK_ULTRA = new ColonyRank(8, "Ant", 10000000l);
-    public static final ColonyRank RANK_HYPER = new ColonyRank(9, "Ant", 100000000l);
-    public static final ColonyRank RANK_MEGA = new ColonyRank(10, "Ant", 1000000000l);
-    public static final ColonyRank RANK_ULTIMATE = new ColonyRank(11, "Ant", 10000000000l);
-    public static final ColonyRank RANK_SUPREME = new ColonyRank(12, "Ant", 100000000000l);
-    public static final ColonyRank RANK_GIGA = new ColonyRank(13, "Ant", 1000000000000l);
+    public static final ColonyRank RANK_ANT = new ColonyRank(1, "Ant", 1l, 
+        loadIcon("icons/ranks/ant.png"));
+    public static final ColonyRank RANK_COLONY = new ColonyRank(2, "Ant Colony", 10l, 
+        loadIcon("icons/ranks/colony.png"));
+    public static final ColonyRank RANK_COUNTY = new ColonyRank(3, "Ant County", 100l, 
+        loadIcon("icons/ranks/county.png"));
+    public static final ColonyRank RANK_DUCHY = new ColonyRank(4, "Ant Duchy", 1000l, 
+        loadIcon("icons/ranks/duchy.png"));
+    public static final ColonyRank RANK_KINGDOM = new ColonyRank(5, "Ant Queendom", 10000l, 
+        loadIcon("icons/ranks/kingdom.png"));
+    public static final ColonyRank RANK_EMPIRE = new ColonyRank(6, "Ant Empire", 100000l, 
+        loadIcon("icons/ranks/empire.png"));
+    public static final ColonyRank RANK_SUPER = new ColonyRank(7, "Ant Super Colony", 1000000l, 
+        loadIcon("icons/ranks/super.png"));
+    public static final ColonyRank RANK_ULTRA = new ColonyRank(8, "Ant Ultra Colony", 10000000l, 
+        loadIcon("icons/ranks/ultra.png"));
+    public static final ColonyRank RANK_HYPER = new ColonyRank(9, "Ant Hyper Colony", 100000000l, 
+        loadIcon("icons/ranks/hyper.png"));
+    public static final ColonyRank RANK_MEGA = new ColonyRank(10, "Ant Mega Colony", 1000000000l, 
+        loadIcon("icons/ranks/mega.png"));
+    public static final ColonyRank RANK_ULTIMATE = new ColonyRank(11, "Ant Ultimate Colony", 10000000000l, 
+        loadIcon("icons/ranks/ultimate.png"));
+    public static final ColonyRank RANK_SUPREME = new ColonyRank(12, "Ant Supreme Colony", 100000000000l, 
+        loadIcon("icons/ranks/supreme.png"));
+    public static final ColonyRank RANK_GIGA = new ColonyRank(13, "Ant Giga Colony", 1000000000000l, 
+        loadIcon("icons/ranks/giga.png"));
     
     // --- Species ---
     // (Add definitions here when you have them)

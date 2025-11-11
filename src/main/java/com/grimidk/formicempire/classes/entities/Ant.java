@@ -213,13 +213,12 @@ public class Ant {
     public int getX() { return x; }
     public int getY() { return y; }
     
-    public void setPosition(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
-    
     public void setPosition(Point p) {
         this.x = p.x;
         this.y = p.y;
+    }
+
+    public void move(Point p) {
+        
     }
 }
