@@ -82,6 +82,10 @@ public class Colony {
 
     private int gameAreaWidth = 1;
     private int gameAreaHeight = 1;
+    
+    // Building Project
+    private Building currentBuildingProject = null;
+    private double buildingProgressHours = 0.0;
 
     private void initializeLists() {
         this.antGroups.put(GameConstants.TYPE_EGG, new CopyOnWriteArrayList<>());
@@ -399,6 +403,24 @@ public class Colony {
 
     public Set<Building> getUnlockedBuildings() {
         return this.buildings;
+    }
+    
+    public Building getCurrentBuildingProject() { return currentBuildingProject; }
+    public double getBuildingProgressHours() { return buildingProgressHours; }
+
+    public boolean startBuildingProject(Building building) {
+        if (currentBuildingProject != null) return false; 
+        
+        if (getMinerals() < building.getMineralCost() || getResins() < building.getResinCost()) {
+            return false; 
+        }
+        
+        setMinerals(getMinerals() - building.getMineralCost());
+        setResins(getResins() - building.getResinCost());
+        
+        this.currentBuildingProject = building;
+        this.buildingProgressHours = 0.0;
+        return true;
     }
 
     public int getTotalConsumption(){
@@ -1064,7 +1086,30 @@ public class Colony {
     }
 
     public void runBuilding() {
+        if (currentBuildingProject == null) {
+            return;
+        }
+        
+        int builderCount = getAssignedRoleCount(GameConstants.ROLE_BUILDER);
+        if (builderCount <= 0) {
+            return;
+        }
+        
+        double efficiency = builderCount / 100.0;
+        if (efficiency <= 0) {
+            return;
+        }
 
+        this.buildingProgressHours += 1.0; 
+        
+        double requiredHours = currentBuildingProject.getBuildTime() / efficiency;
+        
+        if (this.buildingProgressHours >= requiredHours) {
+            this.buildings.add(currentBuildingProject);
+            
+            this.currentBuildingProject = null;
+            this.buildingProgressHours = 0.0;
+        }
     }
 
     // --- Job Packer --- 

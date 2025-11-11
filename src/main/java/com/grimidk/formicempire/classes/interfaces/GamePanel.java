@@ -7,6 +7,7 @@ import com.grimidk.formicempire.classes.infrasctructure.GameUpgrades;
 import com.grimidk.formicempire.classes.infrasctructure.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.TriggerManager;
+import com.grimidk.formicempire.classes.interfaces.game.BuildDialog;
 import com.grimidk.formicempire.classes.interfaces.game.ColonyPanel;
 import com.grimidk.formicempire.classes.interfaces.game.ControlPanel;
 import com.grimidk.formicempire.classes.interfaces.game.GameAreaPanel;
@@ -17,6 +18,8 @@ import com.grimidk.formicempire.classes.interfaces.game.WorldPanel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class GamePanel extends JPanel {
     private final MainFrame frame;
@@ -35,6 +38,7 @@ public class GamePanel extends JPanel {
     private HatchRateDialog hatchDialog;
     private RoleManagementDialog roleDialog;
     private ResearchDialog researchDialog;
+    private BuildDialog buildDialog;
 
     // --- State & Engine ---
     private Runnable minuteTickListener;
@@ -68,6 +72,7 @@ public class GamePanel extends JPanel {
         
         Runnable showHatchRateDialogCallback = this::showHatchRateDialog;
         Runnable showResearchDialogCallback = this::showResearchDialog;
+        Runnable showBuildDialogCallback = this::showBuildDialog;
         
         ControlPanel.RoleManagementCallback showRoleManagementDialogCallback = this::showRoleManagementDialog;
         
@@ -75,6 +80,7 @@ public class GamePanel extends JPanel {
                                         handleBackButtonCallback, 
                                         showHatchRateDialogCallback, 
                                         showResearchDialogCallback,
+                                        showBuildDialogCallback,
                                         showRoleManagementDialogCallback);
     }
 
@@ -156,6 +162,7 @@ public class GamePanel extends JPanel {
              roleDialog = new RoleManagementDialog(frame, colony);
         }
         
+        roleDialog.selectTab(tabIndex);
         roleDialog.showDialog(tabIndex);
     }
 
@@ -170,6 +177,22 @@ public class GamePanel extends JPanel {
         }
         
         researchDialog.showDialog();
+    }
+    
+    private void showBuildDialog() {
+        Engine engine = frame.getEngine();
+        Colony colony = engine != null && engine.getWorld() != null && engine.getWorld().getSpawnHex() != null ? engine.getWorld().getSpawnHex().getColony() : null;
+        if (colony == null) return;
+
+        if (buildDialog == null || buildDialog.getOwner() != frame) {
+            if (buildDialog != null) buildDialog.dispose();
+            buildDialog = new BuildDialog(frame, colony);
+        } else {
+             buildDialog.dispose();
+             buildDialog = new BuildDialog(frame, colony);
+        }
+        
+        buildDialog.showDialog();
     }
     
     // --- Engine Control & Setup ---
@@ -383,8 +406,13 @@ public class GamePanel extends JPanel {
             researchDialog.liveUpdate();
         }
         
+        if (buildDialog != null && buildDialog.isShowing()) {
+            buildDialog.liveUpdate();
+        }
+        
         if (controlPanel != null) {
             controlPanel.updateResearchMenu(colony.hasUpgrade(GameUpgrades.ABILITY_RESEARCH));
+            controlPanel.updateBuildMenu(colony.hasUpgrade(GameUpgrades.ABILITY_BUILD));
         }
     }
 

@@ -26,9 +26,9 @@ public final class GameUpgrades {
     public static final Upgrade ROLE_GRAVER = new Upgrade(10, "Grave-Keeper Role", "Grim Reaper", "Allows workers to bury dead ants. 1 ant can take care of 5 dead ants, too many dead ants can attract disease.", TYPE_WORKER, 0 );
     public static final Upgrade ROLE_HUNTER = new Upgrade(11, "Hunter Role", "Hunter Instinct", "Allows soldiers to gather animal matter.  1 ant can collect 1 resource per hour.", TYPE_SOLDIER, 0 );
     public static final Upgrade ROLE_LAYER = new Upgrade(12, "Egg Layer Role", "Ant Factory", "Allows queens to lay new eggs. 1 ant can lay 1 egg per hour.", TYPE_QUEEN, 0 );
-    public static final Upgrade ROLE_RANCHER = new Upgrade(13, "Rancher Role", "Aphid Rancher", "Allows workers to ranch aphids. 1 ant can handle 10 aphids and herd 1 additional aphid per day. Each aphid produces 1 hoenydew (syrup).", ROLE_FORAGER, 250 );
+    public static final Upgrade ROLE_RANCHER = new Upgrade(13, "Rancher Role", "Aphid Rancher", "Allows workers to ranch aphids. 1 ant can handle 10 aphids and herd 1 additional aphid per day. Each aphid produces 1 hoenydew (syrup).", ROLE_FORAGER, 500 );
     public static final Upgrade ROLE_RESEARCHER = new Upgrade(14, "Research Role", "Ant Science", "Allows queens to generate reserach points. 1 ant research 1 point per hour.", TYPE_QUEEN, 0 );
-    public static final Upgrade ROLE_BUILDER = new Upgrade(15, "Builde Role", "Base Building", "Allows workers to build new rooms in the colony.", TYPE_WORKER, 500 );
+    public static final Upgrade ROLE_BUILDER = new Upgrade(15, "Builde Role", "Base Building", "Allows workers to build new rooms in the colony.", TYPE_WORKER, 250 );
     public static final Upgrade ROLE_SCOUT = new Upgrade(16, "Scout Role", "Adventure's Call", "", TYPE_WORKER, 0 );
     public static final Upgrade ROLE_MINER = new Upgrade(17, "Miner Role", "Yearn For The Mines", "", TYPE_WORKER, 0 );     
     public static final Upgrade ROLE_COURIER = new Upgrade(18, "Courier Role", "Logistic Network", "", TYPE_WORKER, 0 );
@@ -38,7 +38,7 @@ public final class GameUpgrades {
     public static final Upgrade ROLE_DEFENDER = new Upgrade(22, "Defender Role", "Royal Shield", "", TYPE_SOLDIER, 0 );
     public static final Upgrade ROLE_POLICE = new Upgrade(23, "Parasite-Police Role", "Police Brutality", "", TYPE_SOLDIER, 0 );  // this.parasiteDetection = 10;
     public static final Upgrade ROLE_BOMBER = new Upgrade(24, "Bomber Role", "Explosive Finish", "", TYPE_SOLDIER, 0 );
-    public static final Upgrade ROLE_BRUTE = new Upgrade(25, "Brute Role", "Heavy Trooper", "", TYPE_MAJOR, 0 );
+    public static final Upgrade ROLE_BRUTE = new Upgrade(25, "Brute Role", "Heavy Trooper", "Allows majors to become massive menaces in battle.", TYPE_MAJOR, 0 );
     public static final Upgrade ROLE_CARRIER = new Upgrade(26, "Carrier Role", "Troop Transport", "", TYPE_MAJOR, 0 );
     public static final Upgrade ROLE_ARTILLERY = new Upgrade(27, "Artillery Role", "Long Range Artillery", "", TYPE_MAJOR, 0 );
     public static final Upgrade ROLE_SIEGE = new Upgrade(28, "Siege-Machine Role", "Siege Technology", "", TYPE_MAJOR, 0 );
@@ -52,9 +52,9 @@ public final class GameUpgrades {
     public static final Upgrade STAT_ACID = new Upgrade(35, "Acid Spiting", "Acidic Spit", "The basic offensive stats for all the ants in your colony before multipliers. 10 attack points, 1 attack per second and 1 speed point.", TYPE_EGG, 0 );
     public static final Upgrade STAT_LONGEVITY = new Upgrade(36, "Basic Longevity", "Standard Lifespan", "The basic life stats for all the ants in your colony before multipliers. 180 day lifespan, 25% temperature resistance and 4 days to grow per infant stage.", TYPE_EGG, 0 );
     // -- Abilities --
-    public static final Upgrade ABILITY_RESEARCH = new Upgrade(35, "Research", "Micro Microscopes", "Allows you to research more ant technology by using research points, go to the research menu (Y).", ROLE_RESEARCHER, 0 );
-    public static final Upgrade ABILITY_BUILD = new Upgrade(36, "Building", "Brick And Mortar", "Allows you to build parts of your colony, you can build in the build menu (U).", ROLE_BUILDER, 0 );
-    public static final Upgrade ABILITY_SPREAD = new Upgrade(37, "Spreading", "Colony Colonization", "Allows you to build satellite colonies, you see them in world map (I).", ROLE_BREEDER, 0 );
+    public static final Upgrade ABILITY_RESEARCH = new Upgrade(37, "Research", "Micro Microscopes", "Allows you to research more ant technology by using research points, go to the research menu (Y).", ROLE_RESEARCHER, 0 );
+    public static final Upgrade ABILITY_BUILD = new Upgrade(38, "Building", "Brick And Mortar", "Allows you to build parts of your colony, you can build in the build menu (U).", ROLE_BUILDER, 0 );
+    public static final Upgrade ABILITY_SPREAD = new Upgrade(39, "Spreading", "Colony Colonization", "Allows you to build satellite colonies, you see them in world map (I).", ROLE_BREEDER, 0 );
     // --- Buildings ---
     // -- Tier 0 --
     public static final Building ROYAL_CHAMBER_0 = new Building(1, "Basic Royal Chamber", 0, "The base queen chamber for the colony, holds 1 queen.", null, 0, 0, 0);
@@ -67,15 +67,15 @@ public final class GameUpgrades {
     public static final Building ROCK_WAREHOUSE_0 = new Building(8, "Basic Mineral Warehouse", 0, "The base mineral warehouse for the colony, holds 100 mineral rocks.", null, 0, 0, 50);
     public static final Building RESIN_RESERVOIR_0 = new Building(9, "Basic Resin Reservoir", 0, "The base resin reservoir for the colony, holds 200 resin drops.", null, 0, 0, 50);
     // -- Tier 1 --
-    public static final Building ROYAL_CHAMBER_1 = new Building(10, "Expanded Royal Chamber", 1, "The upgraded queen chamber for the colony, holds 2 queens.", ROYAL_CHAMBER_0, 0, 0, 500);
-    public static final Building EGG_CHAMBER_1 = new Building(11, "Expanded Egg Chamber", 1, "The upgraded egg chamber for the colony, holds 80 juvenile ants of each type.", EGG_CHAMBER_0, 0, 0, 0);
-    public static final Building MUSHROOM_CHAMBER_1 = new Building(12, "Expanded Mushroom Chamber", 1, "The upgraded mushroom chamber for the colony, holds 15000 mushroom matter.", MUSHROOM_CHAMBER_0, 0, 0, 0);
-    public static final Building PLANT_CHAMBER_1 = new Building(13, "Expanded Plant Chamber", 1, "The upgraded plant chamber for the colony, holds 10000 plant matter.", PLANT_CHAMBER_0, 0, 0, 0);
-    public static final Building WATER_RESERVOIR_1 = new Building(14, "Expanded Water Reservoir", 1, "The upgraded water reservoir for the colony, holds 2500 water drops.", WATER_RESERVOIR_0, 0, 0, 0);
-    public static final Building MEAT_CHAMBER_1 = new Building(15, "Expanded Protein Chamber", 1, "The upgraded protein chamber for the colony, holds 5000 animal matter.", MEAT_CHAMBER_0, 0, 0, 0);
-    public static final Building SYRUP_RESERVOIR_1 = new Building(16, "Expanded Syrups Reservoir", 1, "The upgraded syrup reservoir for the colony, holds 1200 syrup drops.", SYRUP_RESERVOIR_0, 0, 0, 0);
-    public static final Building ROCK_WAREHOUSE_1 = new Building(17, "Expanded Mineral Warehouse", 1, "The upgraded mineral warehouse for the colony, holds 250 mineral rocks.", ROCK_WAREHOUSE_0, 0, 0, 0);
-    public static final Building RESIN_RESERVOIR_1 = new Building(18, "Expanded Resin Reservoir", 1, "The upgraded resin reservoir for the colony, holds 500 resin drops.", RESIN_RESERVOIR_0, 0, 0, 0);
+    public static final Building ROYAL_CHAMBER_1 = new Building(10, "Expanded Royal Chamber", 1, "The upgraded queen chamber for the colony, holds 2 queens.", ROYAL_CHAMBER_0, 0, 0, 1000);
+    public static final Building EGG_CHAMBER_1 = new Building(11, "Expanded Egg Chamber", 1, "The upgraded egg chamber for the colony, holds 80 juvenile ants of each type.", EGG_CHAMBER_0, 0, 0, 100);
+    public static final Building MUSHROOM_CHAMBER_1 = new Building(12, "Expanded Mushroom Chamber", 1, "The upgraded mushroom chamber for the colony, holds 15000 mushroom matter.", MUSHROOM_CHAMBER_0, 0, 0, 150);
+    public static final Building PLANT_CHAMBER_1 = new Building(13, "Expanded Plant Chamber", 1, "The upgraded plant chamber for the colony, holds 10000 plant matter.", PLANT_CHAMBER_0, 0, 0, 180);
+    public static final Building WATER_RESERVOIR_1 = new Building(14, "Expanded Water Reservoir", 1, "The upgraded water reservoir for the colony, holds 2500 water drops.", WATER_RESERVOIR_0, 0, 0, 250);
+    public static final Building MEAT_CHAMBER_1 = new Building(15, "Expanded Protein Chamber", 1, "The upgraded protein chamber for the colony, holds 5000 animal matter.", MEAT_CHAMBER_0, 0, 0, 200);
+    public static final Building SYRUP_RESERVOIR_1 = new Building(16, "Expanded Syrups Reservoir", 1, "The upgraded syrup reservoir for the colony, holds 1200 syrup drops.", SYRUP_RESERVOIR_0, 0, 0, 250);
+    public static final Building ROCK_WAREHOUSE_1 = new Building(17, "Expanded Mineral Warehouse", 1, "The upgraded mineral warehouse for the colony, holds 250 mineral rocks.", ROCK_WAREHOUSE_0, 0, 0, 500);
+    public static final Building RESIN_RESERVOIR_1 = new Building(18, "Expanded Resin Reservoir", 1, "The upgraded resin reservoir for the colony, holds 500 resin drops.", RESIN_RESERVOIR_0, 0, 0, 400);
     // -- Tier 2 --
     // -- Tier 3 --
     // -- Tier 4 --
@@ -105,6 +105,7 @@ public final class GameUpgrades {
         upgrades.add(ROLE_LAYER);
         upgrades.add(ROLE_RANCHER);
         upgrades.add(ROLE_BUILDER);
+        upgrades.add(ROLE_BRUTE);
         upgrades.add(ROLE_BREEDER);
         upgrades.add(ROLE_RESEARCHER);
         upgrades.add(STAT_SKELETON);

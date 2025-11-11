@@ -67,6 +67,11 @@ public class TriggerManager {
 
     private void checkHourlyTriggers() {
         checkResearchAbilityUnlock();
+        checkBuildAbilityUnlock();
+        checkHunterRoleUnlock();
+        checkBreederRoleUnlock();
+        checkBruteRoleUnlock();
+        checkSpreadAbilityUnlock();
     }
 
     // --- Specific Trigger Logic ---
@@ -105,6 +110,66 @@ public class TriggerManager {
             fireTrigger(GameUpgrades.ABILITY_RESEARCH, 
                         "Scientific Breakthrough", 
                         "Your colony has accumulated 100 Research Points! You can now access the Research panel (Y) from the game menu to purchase new upgrades.");
+        }
+    }
+    
+    private void checkBuildAbilityUnlock() {
+        if (colony.hasUpgrade(GameUpgrades.ABILITY_BUILD)) {
+            return;
+        }
+        
+        if (colony.hasUpgrade(GameUpgrades.ROLE_BUILDER)) {
+            fireTrigger(GameUpgrades.ABILITY_BUILD, 
+                        "Construction Unlocked", 
+                        "Your ants have learned the basics of construction! You can now access the Build panel (U) from the game menu.");
+        }
+    }
+    
+    private void checkHunterRoleUnlock() {
+        if (colony.hasUpgrade(GameUpgrades.ROLE_HUNTER)) {
+            return;
+        }
+        
+        if (colony.hasUpgrade(GameUpgrades.TYPE_SOLDIER)) {
+            fireTrigger(GameUpgrades.ROLE_HUNTER,
+                        "Hunter Instinct",
+                        "Unlocking the Soldier ant type has automatically unlocked the 'Hunter' role for them.");
+        }
+    }
+    
+    private void checkBreederRoleUnlock() {
+        if (colony.hasUpgrade(GameUpgrades.ROLE_BREEDER)) {
+            return;
+        }
+        
+        if (colony.hasUpgrade(GameUpgrades.TYPE_PRINCESS)) {
+            fireTrigger(GameUpgrades.ROLE_BREEDER,
+                        "Nuptial Flights",
+                        "Unlocking the Princess and Drone ant types has automatically unlocked the 'Breeder' role.");
+        }
+    }
+    
+    private void checkBruteRoleUnlock() {
+        if (colony.hasUpgrade(GameUpgrades.ROLE_BRUTE)) {
+            return;
+        }
+        
+        if (colony.hasUpgrade(GameUpgrades.TYPE_MAJOR)) {
+            fireTrigger(GameUpgrades.ROLE_BRUTE,
+                        "Heavy Trooper",
+                        "Unlocking the Major ant type has automatically unlocked the 'Brute' role for them.");
+        }
+    }
+    
+    private void checkSpreadAbilityUnlock() {
+        if (colony.hasUpgrade(GameUpgrades.ABILITY_SPREAD)) {
+            return;
+        }
+        
+        if (colony.hasUpgrade(GameUpgrades.ROLE_BREEDER)) {
+            fireTrigger(GameUpgrades.ABILITY_SPREAD,
+                        "Colony Colonization",
+                        "With the ability to breed new queens, your colony now understands how to spread. You can found new colonies from the world map (I).");
         }
     }
     

@@ -73,7 +73,7 @@ public class ResearchDialog extends JDialog {
             boolean owned = colony.hasUpgrade(upgrade);
             boolean reqMet = (upgrade.getRequirement() == null || colony.hasUpgrade(upgrade.getRequirement()));
 
-            if (!owned && reqMet) {
+            if (!owned && reqMet && upgrade.getCost() > 0) {
                 availableUpgrades.add(upgrade);
             }
         }
