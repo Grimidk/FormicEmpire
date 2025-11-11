@@ -63,7 +63,6 @@ public class Colony {
 
     // Base Stats
     private int baseHealth;
-    private int baseAge;
     private int baseTempRes;
     private int baseRegen;
     private int baseConsumption;
@@ -119,7 +118,6 @@ public class Colony {
         this.parasiteDetection = 10;
 
         this.baseHealth = 100;
-        this.baseAge = 180;
         this.baseTempRes = 25;
         this.baseRegen = 1;
         this.baseConsumption = 1;
@@ -535,8 +533,6 @@ public class Colony {
     // Base Stats
     public int getBaseHealth() { return baseHealth; }
     public void setBaseHealth(int baseHealth) { this.baseHealth = baseHealth; }
-    public int getBaseAge() { return baseAge; }
-    public void setBaseAge(int baseAge) { this.baseAge = baseAge; }
     public int getBaseTempRes() { return baseTempRes; }
     public void setBaseTempRes(int baseTempRes) { this.baseTempRes = baseTempRes; }
     public int getBaseRegen() { return baseRegen; }
@@ -889,9 +885,6 @@ public class Colony {
             for (Ant ant : antList) {
                 ant.setAge(ant.getAge() + 1);
                 
-                if (ant.getAge() >= ant.getMaxAge()) {
-                    antsToKill.add(ant);
-                }
             }
         }
         
@@ -939,7 +932,13 @@ public class Colony {
     }
 
     public void runSpreading() { }
-    public void runInfection() { }
+    public void runInfection() { 
+        if (this.deadAnts.size() < 100) {
+            return;
+        } else {
+
+        }
+    }
 
     // --- Ant Jobs ---
     public void runLaying() {

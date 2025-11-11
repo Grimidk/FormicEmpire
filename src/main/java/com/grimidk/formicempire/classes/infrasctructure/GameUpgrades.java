@@ -16,9 +16,9 @@ public final class GameUpgrades {
     public static final Upgrade TYPE_EGG = new Upgrade(1, "Egg, Larva and Pupa Type", "Brand New Ants", "Unlocks the juvenile ant types, allowing new ants to be born. Each stage takes 4 days to grow out of.", null, 0 );
     public static final Upgrade TYPE_WORKER = new Upgrade(2, "Worker Type", "Means of Production", "Unlocks the worker type, so your colony can sustain itself.", TYPE_EGG, 0 );
     public static final Upgrade TYPE_SOLDIER = new Upgrade(3, "Soldier Type", "The Red Army", "Unlocks the soldier type, you can now defend your colony.", TYPE_EGG, 100 );
-    public static final Upgrade TYPE_MAJOR = new Upgrade(4, "Major Type", "Ant Tanks", "Unlocks the major type, the bulkiest ants around.", TYPE_SOLDIER, 5000 );
+    public static final Upgrade TYPE_MAJOR = new Upgrade(4, "Major Type", "Ant Tanks", "Unlocks the major type, the bulkiest ants around.", TYPE_SOLDIER, 0 );
     public static final Upgrade TYPE_PRINCESS = new Upgrade(5, "Princess and Drone Types", "Winged Ants", "Unlocks the princess and drone types, so new colonies can exist or you can get more queens.", TYPE_EGG,3000 );
-    public static final Upgrade TYPE_QUEEN = new Upgrade(6, "Queen Type", "Ant Royalty", "Unlocks the queen type, the leader of the colony.", TYPE_PRINCESS, 10000 );
+    public static final Upgrade TYPE_QUEEN = new Upgrade(6, "Queen Type", "Ant Royalty", "Unlocks the queen type, the leader of the colony.", TYPE_PRINCESS, 0 );
     // -- Roles --
     public static final Upgrade ROLE_FORAGER = new Upgrade(7, "Forager Role", "Nature's Bounty", "Allows workers to collect plants and mushrooms. 1 ant can collect 1 resource per hour.", TYPE_WORKER, 0 );
     public static final Upgrade ROLE_NURSE = new Upgrade(8, "Nurse Role", "Maternity Leave", "Allows workers to take care of juvenile ants. 1 ant can take care of 10 babies, excess babies can perish overnight.", TYPE_WORKER, 0 );

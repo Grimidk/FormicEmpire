@@ -3,25 +3,23 @@ package com.grimidk.formicempire.classes.constants;
 public class AntSubType {
 
     private final int id;
-    private AntType antType;
-    private String name;
-    private float healtMult;
-    private float attackMult;
-    private float ageMult;
-    private float regenMult;
-    private float consumptionMult;
-    private float attackSpeedMult;
-    private float defenseMult;
-    private float speedMult;
-    private float sizeMult; 
+    private final AntType antType;
+    private final String name;
+    private final float healtMult;
+    private final float attackMult;
+    private final float regenMult;
+    private final float consumptionMult;
+    private final float attackSpeedMult;
+    private final float defenseMult;
+    private final float speedMult;
+    private final float sizeMult; 
 
-    public AntSubType(int id, AntType antType, String name, float healtMult, float attackMult, float ageMult, float regenMult, float consumptionMult, float attackSpeedMult, float defenseMult, float speedMult, float sizeMult) {
+    public AntSubType(int id, AntType antType, String name, float healtMult, float attackMult, float regenMult, float consumptionMult, float attackSpeedMult, float defenseMult, float speedMult, float sizeMult) {
         this.id = id;
         this.antType = antType;
         this.name = name;
         this.healtMult = healtMult;
         this.attackMult = attackMult;
-        this.ageMult = ageMult;
         this.regenMult = regenMult;
         this.consumptionMult = consumptionMult;
         this.attackSpeedMult = attackSpeedMult;
@@ -38,89 +36,39 @@ public class AntSubType {
         return antType;
     }
 
-    public void setAntType(AntType antType) {
-        this.antType = antType;
-    }
-
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public float getHealtMult() {
         return healtMult;
     }
 
-    public void setHealtMult(float healtMult) {
-        this.healtMult = healtMult;
-    }
-
     public float getAttackMult() {
         return attackMult;
-    }
-
-    public void setAttackMult(float attackMult) {
-        this.attackMult = attackMult;
-    }
-
-    public float getAgeMult() {
-        return ageMult;
-    }
-
-    public void setAgeMult(float ageMult) {
-        this.ageMult = ageMult;
     }
 
     public float getRegenMult() {
         return regenMult;
     }
 
-    public void setRegenMult(float regenMult) {
-        this.regenMult = regenMult;
-    }
-
     public float getConsumptionMult() {
         return consumptionMult;
-    }
-
-    public void setConsumptionMult(float consumptionMult) {
-        this.consumptionMult = consumptionMult;
     }
 
     public float getAttackSpeedMult() {
         return attackSpeedMult;
     }
 
-    public void setAttackSpeedMult(float attackSpeedMult) {
-        this.attackSpeedMult = attackSpeedMult;
-    }
-
     public float getDefenseMult() {
         return defenseMult;
-    }
-
-    public void setDefenseMult(float defenseMult) {
-        this.defenseMult = defenseMult;
     }
 
     public float getSpeedMult() {
         return speedMult;
     }
 
-    public void setSpeedMult(float speedMult) {
-        this.speedMult = speedMult;
-    }
-
     public float getSizeMult() {
         return sizeMult;
     }
-
-    public void setSizeMult(float sizeMult) {
-        this.sizeMult = sizeMult;
-    }
-    
-    
 }

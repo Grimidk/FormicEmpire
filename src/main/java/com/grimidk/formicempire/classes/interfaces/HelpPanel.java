@@ -17,6 +17,15 @@ public class HelpPanel extends JPanel {
         JButton showTutorial = new JButton("Show Tutorial");
         showTutorial.addActionListener(e -> showTutorialDialog(frame));
 
+        // JButton showTutorial = new JButton("Tips & Tricks");
+        // showTutorial.addActionListener(e -> showTutorialDialog(frame));
+
+        // JButton showTutorial = new JButton("Hotkeys");
+        // showTutorial.addActionListener(e -> showTutorialDialog(frame));
+
+        // JButton showTutorial = new JButton("Ant Dictionary");
+        // showTutorial.addActionListener(e -> showTutorialDialog(frame));
+
         JButton back = new JButton("Back");
         back.addActionListener(e -> this.frame.showCard(MainFrame.CARD_INIT));
 

@@ -18,8 +18,6 @@ import com.grimidk.formicempire.classes.interfaces.game.WorldPanel;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 public class GamePanel extends JPanel {
     private final MainFrame frame;

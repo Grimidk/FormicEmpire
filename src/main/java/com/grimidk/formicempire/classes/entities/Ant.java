@@ -16,7 +16,6 @@ public class Ant {
     private float health;
     private int maxHealth;
     private int age;
-    private int maxAge;
     private float temp;
     private float tempRes;
     private float regen;
@@ -37,7 +36,6 @@ public class Ant {
         this.status = GameConstants.STATUS_ALIVE;
         this.maxHealth = (int)(colony.getBaseHealth() * type.getHealtMult());
         this.health = this.maxHealth;
-        this.maxAge = (int)(colony.getBaseAge() * type.getAgeMult());
         this.age = 0;
         this.tempRes = colony.getBaseTempRes();
         this.regen = colony.getBaseRegen() * type.getRegenMult();
@@ -106,14 +104,6 @@ public class Ant {
 
     public void setAge(int age) {
         this.age = age;
-    }
-
-    public int getMaxAge() {
-        return maxAge;
-    }
-
-    public void setMaxAge(int maxAge) {
-        this.maxAge = maxAge;
     }
 
     public float getTemp() {
@@ -210,7 +200,6 @@ public class Ant {
         this.type = newType;
         this.maxHealth = (int)(colony.getBaseHealth() * newType.getHealtMult());
         this.health = this.maxHealth;
-        this.maxAge = (int)(colony.getBaseAge() * newType.getAgeMult());
         this.age = 0;
         this.regen = colony.getBaseRegen() * newType.getRegenMult();
         this.consumption = colony.getBaseConsumption() * newType.getConsumptionMult();

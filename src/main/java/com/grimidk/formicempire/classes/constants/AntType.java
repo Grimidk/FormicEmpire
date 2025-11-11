@@ -7,7 +7,6 @@ public class AntType {
     private final String name;
     private final float healtMult;
     private final float attackMult;
-    private final float ageMult;
     private final float regenMult;
     private final float consumptionMult;
     private final float attackSpeedMult;
@@ -17,12 +16,11 @@ public class AntType {
     private final ImageIcon icon;
     private final ImageIcon sprite;
 
-    public AntType(int id, String name, float healtMult, float attackMult, float ageMult, float regenMult, float consumptionMult, float attackSpeedMult, float defenseMult, float speedMult, float sizeMult, ImageIcon icon, ImageIcon sprite) {
+    public AntType(int id, String name, float healtMult, float attackMult, float regenMult, float consumptionMult, float attackSpeedMult, float defenseMult, float speedMult, float sizeMult, ImageIcon icon, ImageIcon sprite) {
         this.id = id;
         this.name = name;
         this.healtMult = healtMult;
         this.attackMult = attackMult;
-        this.ageMult = ageMult;
         this.regenMult = regenMult;
         this.consumptionMult = consumptionMult;
         this.attackSpeedMult = attackSpeedMult;
@@ -47,10 +45,6 @@ public class AntType {
 
     public float getAttackMult() {
         return attackMult;
-    }
-
-    public float getAgeMult() {
-        return ageMult;
     }
 
     public float getRegenMult() {
