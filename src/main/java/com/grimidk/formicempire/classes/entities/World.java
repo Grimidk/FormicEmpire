@@ -2,6 +2,8 @@ package com.grimidk.formicempire.classes.entities;
 
 import java.util.ArrayList;
 
+import javax.swing.ImageIcon;
+
 import com.grimidk.formicempire.classes.constants.Biome;
 import com.grimidk.formicempire.classes.constants.MoonPhase;
 import com.grimidk.formicempire.classes.constants.Season;
@@ -43,6 +45,9 @@ public class World {
         this.season = GameConstants.SPRING_SEASON;
         this.weather = GameConstants.CLEAR_WEATHER;
     }
+
+    // ... (Getters and Setters omitted for brevity, same as before) ... 
+    // Note: Ensure previous getters/setters remain
 
     public void setEngine(Engine engine) {
         this.engine = engine;
@@ -155,7 +160,28 @@ public class World {
     public Hex getSpawnHex() {
         return this.hexes.get(0);
     }
+    
+    public ImageIcon getTemperatureIcon() {
+        if (temperature <= 0) {
+            return GameConstants.ICON_TEMP_FREEZING;
+        } else if (temperature > 0 && temperature <= 10) {
+            return GameConstants.ICON_TEMP_COLD;
+        } else if (temperature > 10 && temperature <= 20) {
+            return GameConstants.ICON_TEMP_CHILLY;
+        } else if (temperature > 20 && temperature <= 30) {
+            return GameConstants.ICON_TEMP_GOOD;
+        } else if (temperature > 30 && temperature <= 40) {
+            return GameConstants.ICON_TEMP_WARM;
+        } else {
+            return GameConstants.ICON_TEMP_HOT;
+        }
+    }
 
+    public ImageIcon getHumidityIcon() {
+        int index = Math.max(0, Math.min(humidity, GameConstants.humidity.size() - 1));
+        return GameConstants.humidity.get(index);
+    }
+    
     public void generateWorld() {
 
     }

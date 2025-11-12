@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.interfaces.game;
 
 import com.grimidk.formicempire.classes.constants.AntType;
+import com.grimidk.formicempire.classes.constants.ColonyRank;
 import com.grimidk.formicempire.classes.constants.ResourceType;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.infrasctructure.GameConstants;
@@ -8,9 +9,13 @@ import com.grimidk.formicempire.classes.infrasctructure.GameUpgrades;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+import java.awt.Component;
 
 public class ColonyPanel extends JPanel {
 
+    // --- Rank Components ---
+    private final JLabel rankLabel = new JLabel("Colony Rank");
+    
     // --- Resources Components ---
     private final JLabel totalResourcesLabel = new JLabel("Total resources: 0");
     private final JLabel mushroomsLabel = new JLabel("0");
@@ -57,6 +62,7 @@ public class ColonyPanel extends JPanel {
     private int lastBabyTotal = -1;
     private int lastAdultTotal = -1;
     private int lastEggs = -1;
+    private ColonyRank lastRank = null;
 
 
     public ColonyPanel() {
@@ -110,6 +116,13 @@ public class ColonyPanel extends JPanel {
         setupConstantLabel(larvaLabel, GameConstants.TYPE_LARVA);
         setupConstantLabel(eggsLabel, GameConstants.TYPE_EGG);
         setupConstantLabel(deadAntsLabel, GameConstants.TYPE_DEAD);
+
+        // Special Icons & Tooltips
+        aphidCountLabel.setIcon(GameConstants.ICON_APHID);
+        aphidCountLabel.setToolTipText("Aphids");
+        
+        researchPointsLabel.setIcon(GameConstants.ICON_RESEARCH);
+        researchPointsLabel.setToolTipText("Research Points");
     }
 
     private void initLayout() {
@@ -163,6 +176,11 @@ public class ColonyPanel extends JPanel {
         JPanel panel = new JPanel();
         panel.setBorder(new TitledBorder("Colony Stats"));
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        
+        rankLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        panel.add(rankLabel);
+        panel.add(new JSeparator(SwingConstants.HORIZONTAL));
+        
         panel.add(totalConsumptionLabel);
         panel.add(totalProductionLabel);
         panel.add(netMushroomsLabel);
@@ -272,6 +290,14 @@ public class ColonyPanel extends JPanel {
     public void updateDayData(Colony colony) {
         int totalAnts = colony.getAntTotal();
         totalAntLabel.setText("Total ants: " + totalAnts);
+        
+        // Rank Update
+        ColonyRank currentRank = colony.getRank();
+        if (currentRank != lastRank) {
+            rankLabel.setText(currentRank.getName());
+            rankLabel.setIcon(currentRank.getIcon());
+            lastRank = currentRank;
+        }
 
         queensLabel.setVisible(colony.hasUpgrade(GameUpgrades.TYPE_QUEEN));
         queensLabel.setText(String.valueOf(colony.getQueens() != null ? colony.getQueens().size() : 0));

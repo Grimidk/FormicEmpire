@@ -31,6 +31,22 @@ public final class GameConstants {
         return new ImageIcon(resourceUrl);
     }
 
+    // --- Misc Icons ---
+    public static final ImageIcon ICON_APHID = loadIcon("icons/misc/aphid.png");
+    public static final ImageIcon ICON_RESEARCH = loadIcon("icons/misc/research.png");
+    public static final ImageIcon ICON_TEMP_FREEZING = loadIcon("icons/misc/temp/freezing.png");
+    public static final ImageIcon ICON_TEMP_COLD = loadIcon("icons/misc/temp/cold.png");
+    public static final ImageIcon ICON_TEMP_CHILLY = loadIcon("icons/misc/temp/chilly.png");
+    public static final ImageIcon ICON_TEMP_GOOD = loadIcon("icons/misc/temp/good.png");
+    public static final ImageIcon ICON_TEMP_WARM = loadIcon("icons/misc/temp/warm.png");
+    public static final ImageIcon ICON_TEMP_HOT = loadIcon("icons/misc/temp/hot.png");
+    public static final ImageIcon ICON_HUMID_0 =loadIcon("icons/misc/humid/humid0.png");
+    public static final ImageIcon ICON_HUMID_1 =loadIcon("icons/misc/humid/humid1.png");
+    public static final ImageIcon ICON_HUMID_2 =loadIcon("icons/misc/humid/humid2.png");
+    public static final ImageIcon ICON_HUMID_3 =loadIcon("icons/misc/humid/humid3.png");
+    public static final ImageIcon ICON_HUMID_4 =loadIcon("icons/misc/humid/humid4.png");
+    public static final ImageIcon ICON_HUMID_5 =loadIcon("icons/misc/humid/humid5.png");
+
     // --- Biomes ---
     public static final Biome PLAINS_BIOME = new Biome(1, "Plains", 25, 2, 
         loadIcon("icons/biomes/plains.png"));
@@ -236,6 +252,9 @@ public final class GameConstants {
     private static final List<AntRole> antRoles = new ArrayList<>();
     private static final List<ColonyRank> colonyRanks = new ArrayList<>();
     private static final List<Species> species = new ArrayList<>();
+    public static final List<ImageIcon> humidity = new ArrayList<>();
+    private static final List<ImageIcon> temperature = new ArrayList<>();
+    private static final List<ImageIcon> misc = new ArrayList<>();
     
     // --- Static initializer block ---
     static {
@@ -347,6 +366,23 @@ public final class GameConstants {
         colonyRanks.add(RANK_ULTIMATE);
         colonyRanks.add(RANK_SUPREME);
         colonyRanks.add(RANK_GIGA);
+
+        temperature.add(ICON_TEMP_FREEZING);
+        temperature.add(ICON_TEMP_COLD);
+        temperature.add(ICON_TEMP_CHILLY);
+        temperature.add(ICON_TEMP_GOOD);
+        temperature.add(ICON_TEMP_WARM);
+        temperature.add(ICON_TEMP_HOT);
+
+        humidity.add(ICON_HUMID_0);
+        humidity.add(ICON_HUMID_1);
+        humidity.add(ICON_HUMID_2);
+        humidity.add(ICON_HUMID_3);
+        humidity.add(ICON_HUMID_4);
+        humidity.add(ICON_HUMID_5);
+
+        misc.add(ICON_APHID);
+        misc.add(ICON_RESEARCH);
         
         // (Add species here when you have them)
     }

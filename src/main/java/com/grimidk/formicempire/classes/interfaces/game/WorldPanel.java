@@ -8,6 +8,7 @@ import com.grimidk.formicempire.classes.entities.World;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+import java.awt.*;
 
 public class WorldPanel extends JPanel {
     
@@ -19,9 +20,9 @@ public class WorldPanel extends JPanel {
     private final JLabel weatherLabel = new JLabel();  
 
     // --- World Components ---
-    private final JLabel biomeLabel = new JLabel("Biome: N/A");
-    private final JLabel temperatureLabel = new JLabel("Temp: 0°C");
-    private final JLabel humidityLabel = new JLabel("Humidity: 0");
+    private final JLabel biomeLabel = new JLabel(); 
+    private final JLabel temperatureLabel = new JLabel(); 
+    private final JLabel humidityLabel = new JLabel(); 
 
     // --- Cached Values ---
     private String lastDateTime = "";
@@ -38,13 +39,27 @@ public class WorldPanel extends JPanel {
     }
     
     private void initLayout() {
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
         
         JPanel timePanel = createTimePanel();
         JPanel infoPanel = createWorldInfoPanel();
         
-        add(timePanel);
-        add(infoPanel);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.NORTH;
+        add(timePanel, gbc);
+        
+        gbc.gridy = 1;
+        gbc.weighty = 0.0; 
+        add(infoPanel, gbc);
+        
+        gbc.gridy = 2;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        add(Box.createGlue(), gbc);
     }
     
     private JPanel createTimePanel() {
@@ -77,7 +92,11 @@ public class WorldPanel extends JPanel {
         // Biome
         String biomeName = (world.getSpawnHex().getBiome() != null) ? "Biome: " + world.getSpawnHex().getBiome().getName() : "Biome: N/A";
         if (!biomeName.equals(lastBiome)) {
-            biomeLabel.setText(biomeName);
+            biomeLabel.setText(""); 
+            biomeLabel.setToolTipText(biomeName);
+            if (world.getSpawnHex().getBiome() != null) {
+                biomeLabel.setIcon(world.getSpawnHex().getBiome().getIcon());
+            }
             lastBiome = biomeName;
         }
     }
@@ -110,12 +129,16 @@ public class WorldPanel extends JPanel {
         // Temperature & Humidity
         int temp = world.getTemperature();
         if (temp != lastTemperature) {
-            temperatureLabel.setText("Temp: " + temp + "°C");
+            temperatureLabel.setText("");
+            temperatureLabel.setToolTipText("Temp: " + temp + "°C");
+            temperatureLabel.setIcon(world.getTemperatureIcon());
             lastTemperature = temp;
         }
         int humidity = world.getHumidity();
         if (humidity != lastHumidity) {
-            humidityLabel.setText("Humidity: " + humidity);
+            humidityLabel.setText("");
+            humidityLabel.setToolTipText("Humidity: " + humidity);
+            humidityLabel.setIcon(world.getHumidityIcon());
             lastHumidity = humidity;
         }
     }

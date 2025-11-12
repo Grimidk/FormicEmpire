@@ -1159,6 +1159,7 @@ public class Colony {
     }
 
     public void runDailyJobs() {
+        this.rankUp();
         this.runEating();
         this.runHatching();
         this.runAging();
@@ -1169,7 +1170,6 @@ public class Colony {
 
     public void runMonthlyJobs() { 
         this.runInfection();
-        this.rankUp();
     }
 
     public void runYearlyJobs() {
