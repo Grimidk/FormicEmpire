@@ -46,9 +46,6 @@ public class World {
         this.weather = GameConstants.CLEAR_WEATHER;
     }
 
-    // ... (Getters and Setters omitted for brevity, same as before) ... 
-    // Note: Ensure previous getters/setters remain
-
     public void setEngine(Engine engine) {
         this.engine = engine;
     }

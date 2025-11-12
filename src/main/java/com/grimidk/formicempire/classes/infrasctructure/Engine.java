@@ -175,7 +175,8 @@ public class Engine extends Thread {
             ex.printStackTrace();
         }
         System.out.println("Generating new world...");
-        this.world.startWorld(GameConstants.getBiomes().get(0), colony);
+        //Hard coded biome
+        this.world.startWorld(GameConstants.PLAINS_BIOME, colony);
     }
 
     public void startUp(Savefile savefile) {

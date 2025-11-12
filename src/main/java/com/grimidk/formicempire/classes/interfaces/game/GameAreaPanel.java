@@ -29,8 +29,13 @@ public class GameAreaPanel extends JPanel {
 
     private void loadImages() {
         biomeTextureCache.put("Plains", loadImage("/backgrounds/biomes/PlainsTile.png"));
-        // biomeTextureCache.put("Forest", loadImage("/backgrounds/biomes/ForestTile.png"));
-        // biomeTextureCache.put("Jungle", loadImage("/backgrounds/biomes/JungleTile.png"));
+        biomeTextureCache.put("Forest", loadImage("/backgrounds/biomes/ForestTile.png"));
+        biomeTextureCache.put("Jungle", loadImage("/backgrounds/biomes/JungleTile.png"));
+        biomeTextureCache.put("Swamp", loadImage("/backgrounds/biomes/SwampTile.png"));
+        biomeTextureCache.put("Tundra", loadImage("/backgrounds/biomes/TundraTile.png"));
+        biomeTextureCache.put("Taiga", loadImage("/backgrounds/biomes/TaigaTile.png"));
+        biomeTextureCache.put("Dessert", loadImage("/backgrounds/biomes/DessertTile.png"));
+        biomeTextureCache.put("Urban", loadImage("/backgrounds/biomes/UrbanTile.png"));
     }
 
     private Image loadImage(String path) {
