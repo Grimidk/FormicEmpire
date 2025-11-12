@@ -773,6 +773,36 @@ public class Colony {
     }
 
     // --- Routine Colony Activities --- 
+    public void rankUp() {
+        if (getAntTotal() >= GameConstants.RANK_GIGA.getPopulation()) {
+            setRank(GameConstants.RANK_GIGA);
+        } else if (getAntTotal() >= GameConstants.RANK_SUPREME.getPopulation()) {
+            setRank(GameConstants.RANK_SUPREME);
+        } else if (getAntTotal() >= GameConstants.RANK_ULTIMATE.getPopulation()) {
+            setRank(GameConstants.RANK_ULTIMATE);
+        } else if (getAntTotal() >= GameConstants.RANK_MEGA.getPopulation()) {
+            setRank(GameConstants.RANK_MEGA);
+        } else if (getAntTotal() >= GameConstants.RANK_HYPER.getPopulation()) {
+            setRank(GameConstants.RANK_HYPER);
+        } else if (getAntTotal() >= GameConstants.RANK_ULTRA.getPopulation()) {
+            setRank(GameConstants.RANK_ULTRA);
+        } else if (getAntTotal() >= GameConstants.RANK_SUPER.getPopulation()) {
+            setRank(GameConstants.RANK_SUPER);
+        } else if (getAntTotal() >= GameConstants.RANK_EMPIRE.getPopulation()) {
+            setRank(GameConstants.RANK_EMPIRE);
+        } else if (getAntTotal() >= GameConstants.RANK_KINGDOM.getPopulation()) {
+            setRank(GameConstants.RANK_KINGDOM);
+        } else if (getAntTotal() >= GameConstants.RANK_DUCHY.getPopulation()) {
+            setRank(GameConstants.RANK_DUCHY);
+        } else if (getAntTotal() >= GameConstants.RANK_COUNTY.getPopulation()) {
+            setRank(GameConstants.RANK_COUNTY);
+        } else if (getAntTotal() >= GameConstants.RANK_COLONY.getPopulation()) {
+            setRank(GameConstants.RANK_COLONY);
+        } else {
+            setRank(GameConstants.RANK_ANT);
+        }
+    }
+
     public void runHatching(){    
         hatchPupae();
         evolveAnts(getLarvae(), getPupae(), GameConstants.TYPE_PUPA);
@@ -1139,6 +1169,7 @@ public class Colony {
 
     public void runMonthlyJobs() { 
         this.runInfection();
+        this.rankUp();
     }
 
     public void runYearlyJobs() {
