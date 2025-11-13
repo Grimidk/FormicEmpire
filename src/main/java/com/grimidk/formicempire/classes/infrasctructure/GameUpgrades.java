@@ -28,7 +28,7 @@ public final class GameUpgrades {
     public static final Upgrade ROLE_LAYER = new Upgrade(12, "Egg Layer Role", "Ant Factory", "Allows queens to lay new eggs. 1 ant can lay 1 egg per hour.", TYPE_QUEEN, 0 );
     public static final Upgrade ROLE_RANCHER = new Upgrade(13, "Rancher Role", "Aphid Rancher", "Allows workers to ranch aphids. 1 ant can handle 10 aphids and herd 1 additional aphid per day. Each aphid produces 1 hoenydew (syrup).", ROLE_FORAGER, 500 );
     public static final Upgrade ROLE_RESEARCHER = new Upgrade(14, "Research Role", "Ant Science", "Allows queens to generate reserach points. 1 ant research 1 point per hour.", TYPE_QUEEN, 0 );
-    public static final Upgrade ROLE_BUILDER = new Upgrade(15, "Builde Role", "Base Building", "Allows workers to build new rooms in the colony.", TYPE_WORKER, 250 );
+    public static final Upgrade ROLE_BUILDER = new Upgrade(15, "Builder Role", "Base Building", "Allows workers to build new rooms in the colony.", TYPE_WORKER, 250 );
     public static final Upgrade ROLE_SCOUT = new Upgrade(16, "Scout Role", "Adventure's Call", "", TYPE_WORKER, 0 );
     public static final Upgrade ROLE_MINER = new Upgrade(17, "Miner Role", "Yearn For The Mines", "", TYPE_WORKER, 0 );     
     public static final Upgrade ROLE_COURIER = new Upgrade(18, "Courier Role", "Logistic Network", "", TYPE_WORKER, 0 );
@@ -55,6 +55,7 @@ public final class GameUpgrades {
     public static final Upgrade ABILITY_RESEARCH = new Upgrade(37, "Research", "Micro Microscopes", "Allows you to research more ant technology by using research points, go to the research menu (Y).", ROLE_RESEARCHER, 0 );
     public static final Upgrade ABILITY_BUILD = new Upgrade(38, "Building", "Brick And Mortar", "Allows you to build parts of your colony, you can build in the build menu (U).", ROLE_BUILDER, 0 );
     public static final Upgrade ABILITY_SPREAD = new Upgrade(39, "Spreading", "Colony Colonization", "Allows you to build satellite colonies, you see them in world map (I).", ROLE_BREEDER, 0 );
+    public static final Upgrade ABILITY_RESIN = new Upgrade(40, "Resin Harvest", "Resin Resonation", "Allows your to foragers to harvest resin while foraging plants as a bonus, there is 1% chance each foraging run.", ROLE_FORAGER, 5000 );
     // --- Buildings ---
     // -- Tier 0 --
     public static final Building ROYAL_CHAMBER_0 = new Building(1, "Basic Royal Chamber", 0, "The base queen chamber for the colony, holds 1 queen.", null, 0, 0, 0);
@@ -77,6 +78,15 @@ public final class GameUpgrades {
     public static final Building ROCK_WAREHOUSE_1 = new Building(17, "Expanded Mineral Warehouse", 1, "The upgraded mineral warehouse for the colony, holds 250 mineral rocks.", ROCK_WAREHOUSE_0, 0, 0, 500);
     public static final Building RESIN_RESERVOIR_1 = new Building(18, "Expanded Resin Reservoir", 1, "The upgraded resin reservoir for the colony, holds 500 resin drops.", RESIN_RESERVOIR_0, 0, 0, 400);
     // -- Tier 2 --
+    public static final Building ROYAL_CHAMBER_2 = new Building(19, "Reinforced Royal Chamber", 2, "The resin-reinforced queen chamber for the colony, holds 4 queens.", ROYAL_CHAMBER_1, 500, 0, 3000);
+    public static final Building EGG_CHAMBER_2 = new Building(20, "Reinforced Egg Chamber", 2, "The resin-reinforced egg chamber for the colony, holds 150 juvenile ants of each type.", EGG_CHAMBER_1, 200, 0, 1000);
+    public static final Building MUSHROOM_CHAMBER_2 = new Building(21, "Reinforced Mushroom Chamber", 2, "The resin-reinforced mushroom chamber for the colony, holds 40000 mushroom matter.", MUSHROOM_CHAMBER_1, 250, 0, 800);
+    public static final Building PLANT_CHAMBER_2 = new Building(22, "Reinforced Plant Chamber", 2, "The resin-reinforced plant chamber for the colony, holds 25000 plant matter.", PLANT_CHAMBER_1, 200, 0, 1000);
+    public static final Building WATER_RESERVOIR_2 = new Building(23, "Reinforced Water Reservoir", 2, "The resin-reinforced water reservoir for the colony, holds 10000 water drops.", WATER_RESERVOIR_1, 300, 0, 1200);
+    public static final Building MEAT_CHAMBER_2 = new Building(24, "Reinforced Protein Chamber", 2, "The resin-reinforced protein chamber for the colony, holds 15000 animal matter.", MEAT_CHAMBER_1, 350, 0, 1500);
+    public static final Building SYRUP_RESERVOIR_2 = new Building(25, "Reinforced Syrups Reservoir", 2, "The resin-reinforced syrup reservoir for the colony, holds 3500 syrup drops.", SYRUP_RESERVOIR_1, 350, 0, 1500);
+    public static final Building ROCK_WAREHOUSE_2 = new Building(26, "Reinforced Mineral Warehouse", 2, "The resin-reinforced mineral warehouse for the colony, holds 750 mineral rocks.", ROCK_WAREHOUSE_1, 450, 0, 2500);
+    public static final Building RESIN_RESERVOIR_2 = new Building(27, "Reinforced Resin Reservoir", 2, "The resin-reinforced resin reservoir for the colony, holds 1200 resin drops.", RESIN_RESERVOIR_1, 400, 0, 2000);
     // -- Tier 3 --
     // -- Tier 4 --
     // -- Tier 5 --
@@ -114,6 +124,7 @@ public final class GameUpgrades {
         upgrades.add(ABILITY_RESEARCH);
         upgrades.add(ABILITY_BUILD);
         upgrades.add(ABILITY_SPREAD);
+        upgrades.add(ABILITY_RESIN);
 
         buildings.add(ROYAL_CHAMBER_0);
         buildings.add(EGG_CHAMBER_0);
@@ -133,6 +144,15 @@ public final class GameUpgrades {
         buildings.add(SYRUP_RESERVOIR_1);
         buildings.add(ROCK_WAREHOUSE_1);
         buildings.add(RESIN_RESERVOIR_1);
+        buildings.add(ROYAL_CHAMBER_2);
+        buildings.add(EGG_CHAMBER_2);
+        buildings.add(MUSHROOM_CHAMBER_2);
+        buildings.add(PLANT_CHAMBER_2);
+        buildings.add(WATER_RESERVOIR_2);
+        buildings.add(MEAT_CHAMBER_2);
+        buildings.add(SYRUP_RESERVOIR_2);
+        buildings.add(ROCK_WAREHOUSE_2);
+        buildings.add(RESIN_RESERVOIR_2);
     }
 
     public static List<Upgrade> getUpgrades() {

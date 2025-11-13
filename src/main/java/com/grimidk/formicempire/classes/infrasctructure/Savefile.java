@@ -85,7 +85,7 @@ public class Savefile implements Serializable {
         this.researchSpeed = 1;
         this.growthTime = 4;
         this.layingRate = 1;
-        this.conversionRate = 1.0f;
+        this.conversionRate = 0.1f;
         this.nursingRate = 10f;
         this.gravingRate = 5f;
         this.collectingRate = 1f;

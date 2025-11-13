@@ -111,7 +111,7 @@ public class Colony {
 
         this.growthTime = 4;
         this.layingRate = 1;
-        this.conversionRate = 1.0f;
+        this.conversionRate = 0.1f;
         this.nursingRate = 10f;
         this.gravingRate = 5f;
         this.collectingRate = 1f;
@@ -459,49 +459,58 @@ public class Colony {
     public void setMinerals(int minerals) { this.minerals = minerals; }
 
     public int getPlantsCapacity() { 
-        if (this.hasBuilding(GameUpgrades.PLANT_CHAMBER_1)) {return 10000;
+        if (this.hasBuilding(GameUpgrades.PLANT_CHAMBER_2)) {return 25000;
+        } else if (this.hasBuilding(GameUpgrades.PLANT_CHAMBER_1)) {return 10000;
         } else if (this.hasBuilding(GameUpgrades.PLANT_CHAMBER_0)) {return 4000; 
         } else {return 0;}
     }
     public int getMushroomsCapacity() { 
-        if (this.hasBuilding(GameUpgrades.MUSHROOM_CHAMBER_1)) {return 15000;
+        if (this.hasBuilding(GameUpgrades.MUSHROOM_CHAMBER_2)) {return 40000;
+        } else if (this.hasBuilding(GameUpgrades.MUSHROOM_CHAMBER_1)) {return 15000;
         } else if (this.hasBuilding(GameUpgrades.MUSHROOM_CHAMBER_0)) {return 8000; 
         } else {return 0;}
     }
     public int getProteinCapacity() { 
-        if (this.hasBuilding(GameUpgrades.MEAT_CHAMBER_1)) {return 5000;
+        if (this.hasBuilding(GameUpgrades.MEAT_CHAMBER_2)) {return 15000;
+        } else if (this.hasBuilding(GameUpgrades.MEAT_CHAMBER_1)) {return 5000;
         } else if (this.hasBuilding(GameUpgrades.MEAT_CHAMBER_0)) {return 2000; 
         } else {return 0;}
     }
     public int getWaterCapacity() {
-        if (this.hasBuilding(GameUpgrades.WATER_RESERVOIR_1)) {return 2500;
+        if (this.hasBuilding(GameUpgrades.WATER_RESERVOIR_2)) {return 10000;
+        } else if (this.hasBuilding(GameUpgrades.WATER_RESERVOIR_1)) {return 2500;
         } else if (this.hasBuilding(GameUpgrades.WATER_RESERVOIR_0)) {return 1000; 
         } else {return 0;}
     }
     public int getSyrupsCapacity() { 
-        if (this.hasBuilding(GameUpgrades.SYRUP_RESERVOIR_1)) {return 1200;
+        if (this.hasBuilding(GameUpgrades.SYRUP_RESERVOIR_2)) {return 3500;
+        } else if (this.hasBuilding(GameUpgrades.SYRUP_RESERVOIR_1)) {return 1200;
         } else if (this.hasBuilding(GameUpgrades.SYRUP_RESERVOIR_0)) {return 500; 
         } else {return 0;}
     }
     public int getResinsCapacity() { 
-        if (this.hasBuilding(GameUpgrades.RESIN_RESERVOIR_1)) {return 500;
+        if (this.hasBuilding(GameUpgrades.RESIN_RESERVOIR_2)) {return 1200;
+        } else if (this.hasBuilding(GameUpgrades.RESIN_RESERVOIR_1)) {return 500;
         } else if (this.hasBuilding(GameUpgrades.RESIN_RESERVOIR_0)) {return 200; 
         } else {return 0;}
     }
     public int getMineralsCapacity() { 
-        if (this.hasBuilding(GameUpgrades.ROCK_WAREHOUSE_1)) {return 250;
+        if (this.hasBuilding(GameUpgrades.ROCK_WAREHOUSE_2)) {return 750;
+        } else if (this.hasBuilding(GameUpgrades.ROCK_WAREHOUSE_1)) {return 250;
         } else if (this.hasBuilding(GameUpgrades.ROCK_WAREHOUSE_0)) {return 100; 
         } else {return 0;}
     }
 
     // Other Capacities
     public int getEggsCapacity() {
-        if (this.hasBuilding(GameUpgrades.EGG_CHAMBER_1)) {return 80;
+        if (this.hasBuilding(GameUpgrades.EGG_CHAMBER_2)) {return 150;
+        } else if (this.hasBuilding(GameUpgrades.EGG_CHAMBER_1)) {return 80;
         } else if (this.hasBuilding(GameUpgrades.EGG_CHAMBER_0)) {return 50; 
         } else {return 0;}
     }
     public int getQueensCapacity() {
-        if (this.hasBuilding(GameUpgrades.ROYAL_CHAMBER_1)) {return 2;
+        if (this.hasBuilding(GameUpgrades.ROYAL_CHAMBER_2)) {return 4;
+        } else if (this.hasBuilding(GameUpgrades.ROYAL_CHAMBER_1)) {return 2;
         } else if (this.hasBuilding(GameUpgrades.ROYAL_CHAMBER_0)) {return 1; 
         } else {return 0;}
     }
@@ -1066,9 +1075,11 @@ public class Colony {
         
         int effectivePlantGain = (int) (plantGain * collectingRate);
         int effectiveWaterGain = (int) (waterGain * collectingRate);
+        int effectiveResinGain = (int) (plantGain * (collectingRate / 100));
 
         this.setPlants(Math.min(this.getPlants() + effectivePlantGain, this.getPlantsCapacity()));
         this.setWater(Math.min(this.getWater() + effectiveWaterGain, this.getWaterCapacity()));
+        if (hasUpgrade(GameUpgrades.ABILITY_RESIN)) this.setResins(Math.min(this.getResins() + effectiveResinGain, this.getResinsCapacity()));
 
         if (hasUpgrade(GameUpgrades.ROLE_HUNTER)) {
             int hunterCount = countAntsByRole(getSoldiers(), GameConstants.ROLE_HUNTER);
@@ -1079,23 +1090,23 @@ public class Colony {
 
     public void runConverting() {
         int farmerCount = countAntsByRole(getWorkers(), GameConstants.ROLE_FARMER);
-        if (this.getMushrooms() >= this.getMushroomsCapacity()) {
-            return;
-        }
-
-        int conversionAmount = ((int) this.getConversionRate()) * farmerCount;
         
-        if (this.getPlants() >= conversionAmount) {
-            this.setPlants(this.getPlants() - conversionAmount);
-            this.setMushrooms(Math.min(this.getMushrooms() + conversionAmount, this.getMushroomsCapacity()));
-        }
-
         if (this.getMushrooms() >= this.getMushroomsCapacity()) return;
 
-        if (this.getProtein() >= conversionAmount) {
-            this.setProtein(this.getProtein() - conversionAmount);
-            int mushroomGain = conversionAmount * 2;
-            this.setMushrooms(Math.min(this.getMushrooms() + mushroomGain, this.getMushroomsCapacity()));
+        if (Math.random() <= conversionRate) {
+            if (this.getPlants() >= farmerCount) {
+                this.setPlants(this.getPlants() - farmerCount);
+                this.setMushrooms(Math.min(this.getMushrooms() + farmerCount, this.getMushroomsCapacity()));
+            }
+        }
+        if (this.getMushrooms() >= this.getMushroomsCapacity()) return;
+
+        if (Math.random() <= conversionRate) {
+            if (this.getProtein() >= farmerCount) {
+                this.setProtein(this.getProtein() - farmerCount);
+                int mushroomGain = farmerCount * 2;
+                this.setMushrooms(Math.min(this.getMushrooms() + mushroomGain, this.getMushroomsCapacity()));
+            }
         }
     }
 

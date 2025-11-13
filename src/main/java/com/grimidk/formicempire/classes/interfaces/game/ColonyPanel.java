@@ -218,6 +218,14 @@ public class ColonyPanel extends JPanel {
         syrupLabel.setVisible(hasRanching);
         if (hasRanching && syrups != lastSyrups) syrupLabel.setText(String.valueOf(syrups));
 
+        boolean hasResinResonation = colony.hasUpgrade(GameUpgrades.ABILITY_RESIN);
+        resinLabel.setVisible(hasResinResonation);
+        if (hasResinResonation && resins != lastResins) resinLabel.setText(String.valueOf(resins));
+
+        boolean hasMining = colony.hasUpgrade(GameUpgrades.ROLE_MINER);
+        mineralLabel.setVisible(hasMining);
+        if (hasMining && minerals != lastMinerals) mineralLabel.setText(String.valueOf(minerals));
+
         // Stats 
         int totalConsumption = colony.getTotalConsumption();
         int netMushrooms = colony.getTotalProduction() - totalConsumption;

@@ -7,6 +7,7 @@ import com.grimidk.formicempire.classes.constants.AntType;
 import com.grimidk.formicempire.classes.constants.Biome;
 import com.grimidk.formicempire.classes.constants.ColonyRank;
 import com.grimidk.formicempire.classes.constants.MoonPhase;
+import com.grimidk.formicempire.classes.constants.MoveStatus;
 import com.grimidk.formicempire.classes.constants.ResourceType;
 import com.grimidk.formicempire.classes.constants.Season;
 import com.grimidk.formicempire.classes.constants.Species;
@@ -151,6 +152,13 @@ public final class GameConstants {
     public static final AntStatus STATUS_ZOMBIFIED = new AntStatus(3, "Zombified", 
         loadIcon("icons/status/zombified.png"));
 
+    // --- Move Status ---
+    public static final MoveStatus MOVE_STATIC = new MoveStatus(1, "Static", 0);
+    public static final MoveStatus MOVE_WANDER = new MoveStatus(2, "Wandering", 1/2f);
+    public static final MoveStatus MOVE_MARCH = new MoveStatus(3, "Marching", 1f);
+    public static final MoveStatus MOVE_SPEED = new MoveStatus(4, "Speed Marching", 3/2f);
+    public static final MoveStatus MOVE_FLY = new MoveStatus(5, "Flying", 3f);
+
     // --- Ant Types ---
     public static final AntType TYPE_EGG = new AntType(1, "Egg", 1f, 0f, 0f, 0f, 0f, 0f, 0f, 1/4f, 
         loadIcon("icons/ants/egg.png"), loadIcon("sprites/ants/egg.png"));
@@ -207,6 +215,7 @@ public final class GameConstants {
     public static final AntRole ROLE_RESEARCHER = new AntRole(26, TYPE_QUEEN, "Researcher");
     public static final AntRole ROLE_MILITIA = new AntRole(27, TYPE_WORKER, "Militia Auxiliary");
     public static final AntRole ROLE_CATCHER = new AntRole(28, TYPE_SOLDIER, "Catcher");
+    public static final AntRole ROLE_CRANE = new AntRole(29, TYPE_MAJOR, "Construction Crane");
 
     // --- Colony Ranks ---
     public static final ColonyRank RANK_ANT = new ColonyRank(1, "Ant", 1l, 
@@ -247,6 +256,7 @@ public final class GameConstants {
     private static final List<Season> seasons = new ArrayList<>();
     private static final List<Weather> weathers = new ArrayList<>();
     private static final List<AntStatus> antStatuses = new ArrayList<>();
+    private static final List<MoveStatus> moveStatuses = new ArrayList<>();
     private static final List<AntType> antTypes = new ArrayList<>();
     private static final List<AntSubType> antSubTypes = new ArrayList<>();
     private static final List<AntRole> antRoles = new ArrayList<>();
@@ -310,6 +320,12 @@ public final class GameConstants {
         antStatuses.add(STATUS_DEAD);
         antStatuses.add(STATUS_ZOMBIFIED);
 
+        moveStatuses.add(MOVE_STATIC);
+        moveStatuses.add(MOVE_WANDER);
+        moveStatuses.add(MOVE_MARCH);
+        moveStatuses.add(MOVE_SPEED);
+        moveStatuses.add(MOVE_FLY);
+
         antTypes.add(TYPE_EGG);
         antTypes.add(TYPE_LARVA);
         antTypes.add(TYPE_PUPA);
@@ -352,6 +368,7 @@ public final class GameConstants {
         antRoles.add(ROLE_RESEARCHER);
         antRoles.add(ROLE_MILITIA);
         antRoles.add(ROLE_CATCHER);
+        antRoles.add(ROLE_CRANE);
 
         colonyRanks.add(RANK_ANT);
         colonyRanks.add(RANK_COLONY);

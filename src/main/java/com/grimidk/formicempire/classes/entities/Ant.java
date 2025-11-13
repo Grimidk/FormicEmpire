@@ -4,6 +4,7 @@ import com.grimidk.formicempire.classes.constants.AntRole;
 import com.grimidk.formicempire.classes.constants.AntStatus;
 import com.grimidk.formicempire.classes.constants.AntSubType;
 import com.grimidk.formicempire.classes.constants.AntType;
+import com.grimidk.formicempire.classes.constants.MoveStatus;
 import com.grimidk.formicempire.classes.infrasctructure.GameConstants;
 
 import java.awt.Point;
@@ -26,14 +27,17 @@ public class Ant {
     private float speed;
     private float size;
 
+    private MoveStatus moveStatus;
     private int x;
     private int y;
+    private int r;
 
     public Ant(Colony colony, AntType type) {
         this.type = type;
         this.subType = null;
         this.role = null;
         this.status = GameConstants.STATUS_ALIVE;
+        this.moveStatus = GameConstants.MOVE_STATIC;
         this.maxHealth = (int)(colony.getBaseHealth() * type.getHealtMult());
         this.health = this.maxHealth;
         this.age = 0;
@@ -210,8 +214,13 @@ public class Ant {
         this.size = colony.getBaseSize() * newType.getSizeMult();
     }
 
+    public MoveStatus getMoveStatus() { return moveStatus; }
+    public void setMoveStatus(MoveStatus moveStatus) { this.moveStatus = moveStatus; }
+
     public int getX() { return x; }
     public int getY() { return y; }
+    public int getR() { return r; }
+    public void setR(int r) { this.r = r; }
     
     public void setPosition(Point p) {
         this.x = p.x;
@@ -220,5 +229,10 @@ public class Ant {
 
     public void move(Point p) {
         
+    }
+
+    public void moveTo(Point p) {
+        int distanceX = p.x - this.getX();
+        int distanceY = p.y - this.getY();
     }
 }
