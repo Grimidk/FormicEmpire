@@ -9,7 +9,7 @@ import com.grimidk.formicempire.classes.constants.TimeOfDay;
 import com.grimidk.formicempire.classes.constants.Upgrade;
 import com.grimidk.formicempire.classes.constants.Weather;
 import com.grimidk.formicempire.classes.infrasctructure.GameConstants;
-import com.grimidk.formicempire.classes.infrasctructure.GameUpgrades;
+import com.grimidk.formicempire.classes.infrasctructure.GameUnlocks;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -34,8 +34,8 @@ public class HelpPanel extends JPanel {
         mainTabs.addTab("Getting Started", createGettingStartedPanel());
         mainTabs.addTab("Hotkeys", createHotkeysPanel());
         mainTabs.addTab("Ant Types", createAntTypesPanel());
-        mainTabs.addTab("Upgrades", createDictionaryPanel(GameUpgrades.getUpgrades(), null));
-        mainTabs.addTab("Buildings", createDictionaryPanel(null, GameUpgrades.getBuildings()));
+        mainTabs.addTab("Upgrades", createDictionaryPanel(GameUnlocks.getUpgrades(), null));
+        mainTabs.addTab("Buildings", createDictionaryPanel(null, GameUnlocks.getBuildings()));
         mainTabs.addTab("World", createWorldPanel());
 
         add(mainTabs, BorderLayout.CENTER);

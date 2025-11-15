@@ -5,7 +5,7 @@ import com.grimidk.formicempire.classes.constants.ColonyRank;
 import com.grimidk.formicempire.classes.constants.ResourceType;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.infrasctructure.GameConstants;
-import com.grimidk.formicempire.classes.infrasctructure.GameUpgrades; 
+import com.grimidk.formicempire.classes.infrasctructure.GameUnlocks; 
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -214,15 +214,15 @@ public class ColonyPanel extends JPanel {
         if (protein != lastProtein) proteinLabel.setText(String.valueOf(protein));
         if (water != lastWater) waterLabel.setText(String.valueOf(water));
 
-        boolean hasRanching = colony.hasUpgrade(GameUpgrades.ROLE_RANCHER);
+        boolean hasRanching = colony.hasUpgrade(GameUnlocks.ROLE_RANCHER);
         syrupLabel.setVisible(hasRanching);
         if (hasRanching && syrups != lastSyrups) syrupLabel.setText(String.valueOf(syrups));
 
-        boolean hasResinResonation = colony.hasUpgrade(GameUpgrades.ABILITY_RESIN);
+        boolean hasResinResonation = colony.hasUpgrade(GameUnlocks.ABILITY_RESIN);
         resinLabel.setVisible(hasResinResonation);
         if (hasResinResonation && resins != lastResins) resinLabel.setText(String.valueOf(resins));
 
-        boolean hasMining = colony.hasUpgrade(GameUpgrades.ROLE_MINER);
+        boolean hasMining = colony.hasUpgrade(GameUnlocks.ROLE_MINER);
         mineralLabel.setVisible(hasMining);
         if (hasMining && minerals != lastMinerals) mineralLabel.setText(String.valueOf(minerals));
 
@@ -251,7 +251,7 @@ public class ColonyPanel extends JPanel {
         int protein = colony.getProtein();  
         if (plants != lastPlants) planLabel.setText(String.valueOf(plants));
         
-        boolean hasHunter = colony.hasUpgrade(GameUpgrades.ROLE_HUNTER);
+        boolean hasHunter = colony.hasUpgrade(GameUnlocks.ROLE_HUNTER);
         proteinLabel.setVisible(hasHunter);
         if (hasHunter && protein != lastProtein) proteinLabel.setText(String.valueOf(protein));
         
@@ -261,7 +261,7 @@ public class ColonyPanel extends JPanel {
         
         if (colony.getTotalProduction() != -1) totalProductionLabel.setText(String.format("Max Food Prod: %d/day", colony.getTotalProduction()));
 
-        boolean hasLayer = colony.hasUpgrade(GameUpgrades.ROLE_LAYER);
+        boolean hasLayer = colony.hasUpgrade(GameUnlocks.ROLE_LAYER);
         layingRateLabel.setVisible(hasLayer);
         if (hasLayer) {
             int layerCount = colony.getAssignedRoleCount(GameConstants.ROLE_LAYER);
@@ -270,7 +270,7 @@ public class ColonyPanel extends JPanel {
             layingRateLabel.setText(String.format("Laying Rate: %d/day", layingRate));
         }
         
-        boolean hasNurse = colony.hasUpgrade(GameUpgrades.ROLE_NURSE);
+        boolean hasNurse = colony.hasUpgrade(GameUnlocks.ROLE_NURSE);
         nurseCoverageLabel.setVisible(hasNurse);
         if (hasNurse) {
             int nurseCount = colony.getAssignedRoleCount(GameConstants.ROLE_NURSE);
@@ -279,7 +279,7 @@ public class ColonyPanel extends JPanel {
             nurseCoverageLabel.setText(String.format("Nurse Coverage: %d/%d", babyAntTotal, nurseCapacity));
         }
 
-        boolean hasResearcher = colony.hasUpgrade(GameUpgrades.ROLE_RESEARCHER);
+        boolean hasResearcher = colony.hasUpgrade(GameUnlocks.ROLE_RESEARCHER);
         researchPointsLabel.setVisible(hasResearcher);
         researchRateLabel.setVisible(hasResearcher);
         if (hasResearcher) {
@@ -307,25 +307,25 @@ public class ColonyPanel extends JPanel {
             lastRank = currentRank;
         }
 
-        queensLabel.setVisible(colony.hasUpgrade(GameUpgrades.TYPE_QUEEN));
+        queensLabel.setVisible(colony.hasUpgrade(GameUnlocks.TYPE_QUEEN));
         queensLabel.setText(String.valueOf(colony.getQueens() != null ? colony.getQueens().size() : 0));
         
-        boolean hasPrincess = colony.hasUpgrade(GameUpgrades.TYPE_PRINCESS);
+        boolean hasPrincess = colony.hasUpgrade(GameUnlocks.TYPE_PRINCESS);
         princessLabel.setVisible(hasPrincess);
         princessLabel.setText(String.valueOf(colony.getPrincesses() != null ? colony.getPrincesses().size() : 0));
         droneLabel.setVisible(hasPrincess);
         droneLabel.setText(String.valueOf(colony.getDrones() != null ? colony.getDrones().size() : 0));
         
-        majorLabel.setVisible(colony.hasUpgrade(GameUpgrades.TYPE_MAJOR));
+        majorLabel.setVisible(colony.hasUpgrade(GameUnlocks.TYPE_MAJOR));
         majorLabel.setText(String.valueOf(colony.getMajors() != null ? colony.getMajors().size() : 0));
         
-        soldiersLabel.setVisible(colony.hasUpgrade(GameUpgrades.TYPE_SOLDIER));
+        soldiersLabel.setVisible(colony.hasUpgrade(GameUnlocks.TYPE_SOLDIER));
         soldiersLabel.setText(String.valueOf(colony.getSoldiers() != null ? colony.getSoldiers().size() : 0));
         
-        workersLabel.setVisible(colony.hasUpgrade(GameUpgrades.TYPE_WORKER));
+        workersLabel.setVisible(colony.hasUpgrade(GameUnlocks.TYPE_WORKER));
         workersLabel.setText(String.valueOf(colony.getWorkers() != null ? colony.getWorkers().size() : 0));
         
-        boolean hasBabies = colony.hasUpgrade(GameUpgrades.TYPE_EGG);
+        boolean hasBabies = colony.hasUpgrade(GameUnlocks.TYPE_EGG);
         pupaLabel.setVisible(hasBabies);
         pupaLabel.setText(String.valueOf(colony.getPupae() != null ? colony.getPupae().size() : 0));
         larvaLabel.setVisible(hasBabies);
@@ -336,7 +336,7 @@ public class ColonyPanel extends JPanel {
 
         if (colony.getMushrooms() != lastMushrooms) mushroomsLabel.setText(String.valueOf(colony.getMushrooms()));
         
-        boolean hasGraver = colony.hasUpgrade(GameUpgrades.ROLE_GRAVER);
+        boolean hasGraver = colony.hasUpgrade(GameUnlocks.ROLE_GRAVER);
         graveKeepingLabel.setVisible(hasGraver);
         if(hasGraver) {
             int graverCount = colony.getAssignedRoleCount(GameConstants.ROLE_GRAVER);
@@ -345,7 +345,7 @@ public class ColonyPanel extends JPanel {
             graveKeepingLabel.setText(String.format("Grave Cleaning: %d/%d", currentDead, graveCapacity));
         }
 
-        boolean hasRancher = colony.hasUpgrade(GameUpgrades.ROLE_RANCHER);
+        boolean hasRancher = colony.hasUpgrade(GameUnlocks.ROLE_RANCHER);
         aphidCountLabel.setVisible(hasRancher);
         if (hasRancher) {
             int rancherCount = colony.getAssignedRoleCount(GameConstants.ROLE_RANCHER);

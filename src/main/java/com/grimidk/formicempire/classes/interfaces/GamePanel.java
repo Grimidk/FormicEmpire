@@ -3,7 +3,7 @@ package com.grimidk.formicempire.classes.interfaces;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.World;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
-import com.grimidk.formicempire.classes.infrasctructure.GameUpgrades;
+import com.grimidk.formicempire.classes.infrasctructure.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.TriggerManager;
@@ -409,8 +409,8 @@ public class GamePanel extends JPanel {
         }
         
         if (controlPanel != null) {
-            controlPanel.updateResearchMenu(colony.hasUpgrade(GameUpgrades.ABILITY_RESEARCH));
-            controlPanel.updateBuildMenu(colony.hasUpgrade(GameUpgrades.ABILITY_BUILD));
+            controlPanel.updateResearchMenu(colony.hasUpgrade(GameUnlocks.ABILITY_RESEARCH));
+            controlPanel.updateBuildMenu(colony.hasUpgrade(GameUnlocks.ABILITY_BUILD));
         }
     }
 

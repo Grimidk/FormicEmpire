@@ -76,105 +76,105 @@ public class TriggerManager {
 
     // --- Specific Trigger Logic ---
     private void checkResearchRoleUnlock() {
-        if (colony.hasUpgrade(GameUpgrades.ROLE_RESEARCHER)) {
+        if (colony.hasUpgrade(GameUnlocks.ROLE_RESEARCHER)) {
             return;
         }
 
         boolean timeMet = world.getYear() > 0 || world.getMonth() > 1;
 
         if (timeMet) {
-            fireTrigger(GameUpgrades.ROLE_RESEARCHER, 
+            fireTrigger(GameUnlocks.ROLE_RESEARCHER, 
                         "New Ideas", 
                         "A month has passed. Your Queen has grown wise and can now dedicate time to Research, unlocking the Researcher role!");
         }
     }
     
     private void checkGraveKeeperUnlock() {
-        if (colony.hasUpgrade(GameUpgrades.ROLE_GRAVER)) {
+        if (colony.hasUpgrade(GameUnlocks.ROLE_GRAVER)) {
             return;
         }
         
         if (colony.getDeadAnts().size() >= 100) { 
-            fireTrigger(GameUpgrades.ROLE_GRAVER, 
+            fireTrigger(GameUnlocks.ROLE_GRAVER, 
                         "A Smelly Problem", 
                         "The bodies are piling up! Your workers have developed the Grave-Keeper role to clean the colony and prevent disease.");
         }
     }
     
     private void checkResearchAbilityUnlock() {
-        if (colony.hasUpgrade(GameUpgrades.ABILITY_RESEARCH)) {
+        if (colony.hasUpgrade(GameUnlocks.ABILITY_RESEARCH)) {
             return;
         }
         
         if (colony.getResearchPoints() >= 100) {
-            fireTrigger(GameUpgrades.ABILITY_RESEARCH, 
+            fireTrigger(GameUnlocks.ABILITY_RESEARCH, 
                         "Scientific Breakthrough", 
                         "Your colony has accumulated 100 Research Points! You can now access the Research panel (Y) from the game menu to purchase new upgrades.");
         }
     }
     
     private void checkBuildAbilityUnlock() {
-        if (colony.hasUpgrade(GameUpgrades.ABILITY_BUILD)) {
+        if (colony.hasUpgrade(GameUnlocks.ABILITY_BUILD)) {
             return;
         }
         
-        if (colony.hasUpgrade(GameUpgrades.ROLE_BUILDER)) {
-            fireTrigger(GameUpgrades.ABILITY_BUILD, 
+        if (colony.hasUpgrade(GameUnlocks.ROLE_BUILDER)) {
+            fireTrigger(GameUnlocks.ABILITY_BUILD, 
                         "Construction Unlocked", 
                         "Your ants have learned the basics of construction! You can now access the Build panel (U) from the game menu.");
         }
     }
     
     private void checkHunterRoleUnlock() {
-        if (colony.hasUpgrade(GameUpgrades.ROLE_HUNTER)) {
+        if (colony.hasUpgrade(GameUnlocks.ROLE_HUNTER)) {
             return;
         }
         
-        if (colony.hasUpgrade(GameUpgrades.TYPE_SOLDIER)) {
-            fireTrigger(GameUpgrades.ROLE_HUNTER,
+        if (colony.hasUpgrade(GameUnlocks.TYPE_SOLDIER)) {
+            fireTrigger(GameUnlocks.ROLE_HUNTER,
                         "Hunter Instinct",
                         "Unlocking the Soldier ant type has automatically unlocked the 'Hunter' role for them.");
         }
     }
     
     private void checkBreederRoleUnlock() {
-        if (colony.hasUpgrade(GameUpgrades.ROLE_BREEDER)) {
+        if (colony.hasUpgrade(GameUnlocks.ROLE_BREEDER)) {
             return;
         }
         
-        if (colony.hasUpgrade(GameUpgrades.TYPE_PRINCESS)) {
-            fireTrigger(GameUpgrades.ROLE_BREEDER,
+        if (colony.hasUpgrade(GameUnlocks.TYPE_PRINCESS)) {
+            fireTrigger(GameUnlocks.ROLE_BREEDER,
                         "Nuptial Flights",
                         "Unlocking the Princess and Drone ant types has automatically unlocked the 'Breeder' role.");
         }
     }
     
     private void checkBruteRoleUnlock() {
-        if (colony.hasUpgrade(GameUpgrades.ROLE_BRUTE)) {
+        if (colony.hasUpgrade(GameUnlocks.ROLE_BRUTE)) {
             return;
         }
         
-        if (colony.hasUpgrade(GameUpgrades.TYPE_MAJOR)) {
-            fireTrigger(GameUpgrades.ROLE_BRUTE,
+        if (colony.hasUpgrade(GameUnlocks.TYPE_MAJOR)) {
+            fireTrigger(GameUnlocks.ROLE_BRUTE,
                         "Heavy Trooper",
                         "Unlocking the Major ant type has automatically unlocked the 'Brute' role for them.");
         }
     }
     
     private void checkSpreadAbilityUnlock() {
-        if (colony.hasUpgrade(GameUpgrades.ABILITY_SPREAD)) {
+        if (colony.hasUpgrade(GameUnlocks.ABILITY_SPREAD)) {
             return;
         }
         
-        if (colony.hasUpgrade(GameUpgrades.ROLE_BREEDER)) {
-            fireTrigger(GameUpgrades.ABILITY_SPREAD,
+        if (colony.hasUpgrade(GameUnlocks.ROLE_BREEDER)) {
+            fireTrigger(GameUnlocks.ABILITY_SPREAD,
                         "Colony Colonization",
                         "With the ability to breed new queens, your colony now understands how to spread. You can found new colonies from the world map (I).");
         }
     }
     
     private void checkColonyDeath() {
-        if (colonyDeathFired || !colony.hasUpgrade(GameUpgrades.TYPE_QUEEN)) {
+        if (colonyDeathFired || !colony.hasUpgrade(GameUnlocks.TYPE_QUEEN)) {
             return;
         }
         

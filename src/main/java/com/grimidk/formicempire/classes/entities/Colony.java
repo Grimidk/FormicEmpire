@@ -19,7 +19,7 @@ import com.grimidk.formicempire.classes.constants.ColonyRank;
 import com.grimidk.formicempire.classes.constants.Species;
 import com.grimidk.formicempire.classes.constants.Upgrade;
 import com.grimidk.formicempire.classes.infrasctructure.GameConstants;
-import com.grimidk.formicempire.classes.infrasctructure.GameUpgrades;
+import com.grimidk.formicempire.classes.infrasctructure.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 
 public class Colony {
@@ -146,16 +146,16 @@ public class Colony {
     }
 
     private void initializeUpgrades() {
-        this.upgrades.add(GameUpgrades.TYPE_EGG);
-        this.upgrades.add(GameUpgrades.TYPE_QUEEN);
-        this.upgrades.add(GameUpgrades.TYPE_WORKER);
-        this.upgrades.add(GameUpgrades.ROLE_FORAGER);
-        this.upgrades.add(GameUpgrades.ROLE_FARMER);
-        this.upgrades.add(GameUpgrades.ROLE_NURSE);
-        this.upgrades.add(GameUpgrades.ROLE_LAYER);
-        this.upgrades.add(GameUpgrades.STAT_SKELETON);
-        this.upgrades.add(GameUpgrades.STAT_ACID);
-        this.upgrades.add(GameUpgrades.STAT_LONGEVITY);
+        this.upgrades.add(GameUnlocks.TYPE_EGG);
+        this.upgrades.add(GameUnlocks.TYPE_QUEEN);
+        this.upgrades.add(GameUnlocks.TYPE_WORKER);
+        this.upgrades.add(GameUnlocks.ROLE_FORAGER);
+        this.upgrades.add(GameUnlocks.ROLE_FARMER);
+        this.upgrades.add(GameUnlocks.ROLE_NURSE);
+        this.upgrades.add(GameUnlocks.ROLE_LAYER);
+        this.upgrades.add(GameUnlocks.STAT_SKELETON);
+        this.upgrades.add(GameUnlocks.STAT_ACID);
+        this.upgrades.add(GameUnlocks.STAT_LONGEVITY);
     }
 
     private void loadUpgrades(Savefile savefile) {
@@ -167,7 +167,7 @@ public class Colony {
         }
 
         Map<Integer, Upgrade> allUpgrades = new HashMap<>();
-        for (Upgrade up : GameUpgrades.getUpgrades()) {
+        for (Upgrade up : GameUnlocks.getUpgrades()) {
             allUpgrades.put(up.getId(), up);
         }
 
@@ -180,11 +180,11 @@ public class Colony {
     }
 
     private void initializeBuildings() {
-        this.buildings.add(GameUpgrades.ROYAL_CHAMBER_0);
-        this.buildings.add(GameUpgrades.EGG_CHAMBER_0);
-        this.buildings.add(GameUpgrades.MUSHROOM_CHAMBER_0);
-        this.buildings.add(GameUpgrades.PLANT_CHAMBER_0);
-        this.buildings.add(GameUpgrades.WATER_RESERVOIR_0);
+        this.buildings.add(GameUnlocks.ROYAL_CHAMBER_0);
+        this.buildings.add(GameUnlocks.EGG_CHAMBER_0);
+        this.buildings.add(GameUnlocks.MUSHROOM_CHAMBER_0);
+        this.buildings.add(GameUnlocks.PLANT_CHAMBER_0);
+        this.buildings.add(GameUnlocks.WATER_RESERVOIR_0);
     }
 
     private void laodBuildings(Savefile savefile) {
@@ -196,7 +196,7 @@ public class Colony {
         }
 
         Map<Integer, Building> allBuildings = new HashMap<>();
-        for (Building up : GameUpgrades.getBuildings()) {
+        for (Building up : GameUnlocks.getBuildings()) {
             allBuildings.put(up.getId(), up);
         }
 
@@ -459,59 +459,59 @@ public class Colony {
     public void setMinerals(int minerals) { this.minerals = minerals; }
 
     public int getPlantsCapacity() { 
-        if (this.hasBuilding(GameUpgrades.PLANT_CHAMBER_2)) {return 25000;
-        } else if (this.hasBuilding(GameUpgrades.PLANT_CHAMBER_1)) {return 10000;
-        } else if (this.hasBuilding(GameUpgrades.PLANT_CHAMBER_0)) {return 4000; 
+        if (this.hasBuilding(GameUnlocks.PLANT_CHAMBER_2)) {return 25000;
+        } else if (this.hasBuilding(GameUnlocks.PLANT_CHAMBER_1)) {return 10000;
+        } else if (this.hasBuilding(GameUnlocks.PLANT_CHAMBER_0)) {return 4000; 
         } else {return 0;}
     }
     public int getMushroomsCapacity() { 
-        if (this.hasBuilding(GameUpgrades.MUSHROOM_CHAMBER_2)) {return 40000;
-        } else if (this.hasBuilding(GameUpgrades.MUSHROOM_CHAMBER_1)) {return 15000;
-        } else if (this.hasBuilding(GameUpgrades.MUSHROOM_CHAMBER_0)) {return 8000; 
+        if (this.hasBuilding(GameUnlocks.MUSHROOM_CHAMBER_2)) {return 40000;
+        } else if (this.hasBuilding(GameUnlocks.MUSHROOM_CHAMBER_1)) {return 15000;
+        } else if (this.hasBuilding(GameUnlocks.MUSHROOM_CHAMBER_0)) {return 8000; 
         } else {return 0;}
     }
     public int getProteinCapacity() { 
-        if (this.hasBuilding(GameUpgrades.MEAT_CHAMBER_2)) {return 15000;
-        } else if (this.hasBuilding(GameUpgrades.MEAT_CHAMBER_1)) {return 5000;
-        } else if (this.hasBuilding(GameUpgrades.MEAT_CHAMBER_0)) {return 2000; 
+        if (this.hasBuilding(GameUnlocks.MEAT_CHAMBER_2)) {return 15000;
+        } else if (this.hasBuilding(GameUnlocks.MEAT_CHAMBER_1)) {return 5000;
+        } else if (this.hasBuilding(GameUnlocks.MEAT_CHAMBER_0)) {return 2000; 
         } else {return 0;}
     }
     public int getWaterCapacity() {
-        if (this.hasBuilding(GameUpgrades.WATER_RESERVOIR_2)) {return 10000;
-        } else if (this.hasBuilding(GameUpgrades.WATER_RESERVOIR_1)) {return 2500;
-        } else if (this.hasBuilding(GameUpgrades.WATER_RESERVOIR_0)) {return 1000; 
+        if (this.hasBuilding(GameUnlocks.WATER_RESERVOIR_2)) {return 10000;
+        } else if (this.hasBuilding(GameUnlocks.WATER_RESERVOIR_1)) {return 2500;
+        } else if (this.hasBuilding(GameUnlocks.WATER_RESERVOIR_0)) {return 1000; 
         } else {return 0;}
     }
     public int getSyrupsCapacity() { 
-        if (this.hasBuilding(GameUpgrades.SYRUP_RESERVOIR_2)) {return 3500;
-        } else if (this.hasBuilding(GameUpgrades.SYRUP_RESERVOIR_1)) {return 1200;
-        } else if (this.hasBuilding(GameUpgrades.SYRUP_RESERVOIR_0)) {return 500; 
+        if (this.hasBuilding(GameUnlocks.SYRUP_RESERVOIR_2)) {return 3500;
+        } else if (this.hasBuilding(GameUnlocks.SYRUP_RESERVOIR_1)) {return 1200;
+        } else if (this.hasBuilding(GameUnlocks.SYRUP_RESERVOIR_0)) {return 500; 
         } else {return 0;}
     }
     public int getResinsCapacity() { 
-        if (this.hasBuilding(GameUpgrades.RESIN_RESERVOIR_2)) {return 1200;
-        } else if (this.hasBuilding(GameUpgrades.RESIN_RESERVOIR_1)) {return 500;
-        } else if (this.hasBuilding(GameUpgrades.RESIN_RESERVOIR_0)) {return 200; 
+        if (this.hasBuilding(GameUnlocks.RESIN_RESERVOIR_2)) {return 1200;
+        } else if (this.hasBuilding(GameUnlocks.RESIN_RESERVOIR_1)) {return 500;
+        } else if (this.hasBuilding(GameUnlocks.RESIN_RESERVOIR_0)) {return 200; 
         } else {return 0;}
     }
     public int getMineralsCapacity() { 
-        if (this.hasBuilding(GameUpgrades.ROCK_WAREHOUSE_2)) {return 750;
-        } else if (this.hasBuilding(GameUpgrades.ROCK_WAREHOUSE_1)) {return 250;
-        } else if (this.hasBuilding(GameUpgrades.ROCK_WAREHOUSE_0)) {return 100; 
+        if (this.hasBuilding(GameUnlocks.ROCK_WAREHOUSE_2)) {return 750;
+        } else if (this.hasBuilding(GameUnlocks.ROCK_WAREHOUSE_1)) {return 250;
+        } else if (this.hasBuilding(GameUnlocks.ROCK_WAREHOUSE_0)) {return 100; 
         } else {return 0;}
     }
 
     // Other Capacities
     public int getEggsCapacity() {
-        if (this.hasBuilding(GameUpgrades.EGG_CHAMBER_2)) {return 150;
-        } else if (this.hasBuilding(GameUpgrades.EGG_CHAMBER_1)) {return 80;
-        } else if (this.hasBuilding(GameUpgrades.EGG_CHAMBER_0)) {return 50; 
+        if (this.hasBuilding(GameUnlocks.EGG_CHAMBER_2)) {return 150;
+        } else if (this.hasBuilding(GameUnlocks.EGG_CHAMBER_1)) {return 80;
+        } else if (this.hasBuilding(GameUnlocks.EGG_CHAMBER_0)) {return 50; 
         } else {return 0;}
     }
     public int getQueensCapacity() {
-        if (this.hasBuilding(GameUpgrades.ROYAL_CHAMBER_2)) {return 4;
-        } else if (this.hasBuilding(GameUpgrades.ROYAL_CHAMBER_1)) {return 2;
-        } else if (this.hasBuilding(GameUpgrades.ROYAL_CHAMBER_0)) {return 1; 
+        if (this.hasBuilding(GameUnlocks.ROYAL_CHAMBER_2)) {return 4;
+        } else if (this.hasBuilding(GameUnlocks.ROYAL_CHAMBER_1)) {return 2;
+        } else if (this.hasBuilding(GameUnlocks.ROYAL_CHAMBER_0)) {return 1; 
         } else {return 0;}
     }
     public int getAphidCapacity() { return aphidCapacity; }
@@ -718,21 +718,21 @@ public class Colony {
             return GameConstants.TYPE_WORKER;
         }
 
-        if (hasUpgrade(GameUpgrades.TYPE_SOLDIER)) {
+        if (hasUpgrade(GameUnlocks.TYPE_SOLDIER)) {
             cumulative += this.hatchRateSoldier;
             if (rand < cumulative) {
                 return GameConstants.TYPE_SOLDIER;
             }
         }
         
-        if (hasUpgrade(GameUpgrades.TYPE_MAJOR)) {
+        if (hasUpgrade(GameUnlocks.TYPE_MAJOR)) {
             cumulative += this.hatchRateMajor;
             if (rand < cumulative) {
                 return GameConstants.TYPE_MAJOR;
             }
         }
 
-        if (hasUpgrade(GameUpgrades.TYPE_PRINCESS)) {
+        if (hasUpgrade(GameUnlocks.TYPE_PRINCESS)) {
             cumulative += this.hatchRateDrone;
             if (rand < cumulative) {
                 return GameConstants.TYPE_DRONE;
@@ -877,7 +877,7 @@ public class Colony {
         Set<Ant> antsInNeed = new HashSet<>(thirstyAnts);
         antsInNeed.addAll(hungryAnts);
         
-        int syrupAvailable = hasUpgrade(GameUpgrades.ROLE_RANCHER) ? this.getSyrups() : 0;
+        int syrupAvailable = hasUpgrade(GameUnlocks.ROLE_RANCHER) ? this.getSyrups() : 0;
         
         Iterator<Ant> needIterator = antsInNeed.iterator();
         while (needIterator.hasNext() && syrupAvailable > 0) {
@@ -945,7 +945,7 @@ public class Colony {
         List<Ant> princesses = getPrincesses();
         List<Ant> drones = getDrones();
 
-        if (!hasUpgrade(GameUpgrades.TYPE_PRINCESS)) return;
+        if (!hasUpgrade(GameUnlocks.TYPE_PRINCESS)) return;
 
         List<Ant> princessesToEvolve = new ArrayList<>();
         
@@ -998,7 +998,7 @@ public class Colony {
     }
 
     public void runResearch() {
-        if (!hasUpgrade(GameUpgrades.ROLE_RESEARCHER)) return;
+        if (!hasUpgrade(GameUnlocks.ROLE_RESEARCHER)) return;
         int researcherCount = countAntsByRole(getQueens(), GameConstants.ROLE_RESEARCHER);
         this.researchPoints += researcherCount * researchSpeed;
     }
@@ -1079,9 +1079,9 @@ public class Colony {
 
         this.setPlants(Math.min(this.getPlants() + effectivePlantGain, this.getPlantsCapacity()));
         this.setWater(Math.min(this.getWater() + effectiveWaterGain, this.getWaterCapacity()));
-        if (hasUpgrade(GameUpgrades.ABILITY_RESIN)) this.setResins(Math.min(this.getResins() + effectiveResinGain, this.getResinsCapacity()));
+        if (hasUpgrade(GameUnlocks.ABILITY_RESIN)) this.setResins(Math.min(this.getResins() + effectiveResinGain, this.getResinsCapacity()));
 
-        if (hasUpgrade(GameUpgrades.ROLE_HUNTER)) {
+        if (hasUpgrade(GameUnlocks.ROLE_HUNTER)) {
             int hunterCount = countAntsByRole(getSoldiers(), GameConstants.ROLE_HUNTER);
             int proteinGain = (int) (hunterCount * collectingRate);
             this.setProtein(Math.min(this.getProtein() + proteinGain, this.getProteinCapacity()));
@@ -1111,13 +1111,13 @@ public class Colony {
     }
 
     public void runRanching() {
-        if (!hasUpgrade(GameUpgrades.ROLE_RANCHER)) return;
+        if (!hasUpgrade(GameUnlocks.ROLE_RANCHER)) return;
         int syrupGain = (int) (aphids); 
         this.setSyrups(Math.min(this.getSyrups() + syrupGain, this.getSyrupsCapacity()));
     }
 
     public void runHerding() {
-         if (!hasUpgrade(GameUpgrades.ROLE_RANCHER)) return;
+         if (!hasUpgrade(GameUnlocks.ROLE_RANCHER)) return;
         int rancherCount = countAntsByRole(getWorkers(), GameConstants.ROLE_RANCHER);
         int maxSustainableAphids = aphidCapacity * rancherCount;
         

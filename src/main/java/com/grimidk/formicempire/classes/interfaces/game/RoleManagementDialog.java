@@ -5,7 +5,7 @@ import com.grimidk.formicempire.classes.constants.AntType;
 import com.grimidk.formicempire.classes.constants.Upgrade; 
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.infrasctructure.GameConstants;
-import com.grimidk.formicempire.classes.infrasctructure.GameUpgrades;
+import com.grimidk.formicempire.classes.infrasctructure.GameUnlocks;
 
 import javax.swing.*;
 import java.awt.*;
@@ -61,11 +61,11 @@ public class RoleManagementDialog extends JDialog {
     }
     
     private void initTabs() {
-        addRoleTab(GameConstants.TYPE_WORKER, GameUpgrades.TYPE_WORKER);
-        addRoleTab(GameConstants.TYPE_SOLDIER, GameUpgrades.TYPE_SOLDIER);
-        addRoleTab(GameConstants.TYPE_MAJOR, GameUpgrades.TYPE_MAJOR);
-        addRoleTab(GameConstants.TYPE_PRINCESS, GameUpgrades.TYPE_PRINCESS);
-        addRoleTab(GameConstants.TYPE_QUEEN, GameUpgrades.TYPE_QUEEN);
+        addRoleTab(GameConstants.TYPE_WORKER, GameUnlocks.TYPE_WORKER);
+        addRoleTab(GameConstants.TYPE_SOLDIER, GameUnlocks.TYPE_SOLDIER);
+        addRoleTab(GameConstants.TYPE_MAJOR, GameUnlocks.TYPE_MAJOR);
+        addRoleTab(GameConstants.TYPE_PRINCESS, GameUnlocks.TYPE_PRINCESS);
+        addRoleTab(GameConstants.TYPE_QUEEN, GameUnlocks.TYPE_QUEEN);
     }
     
     private void addRoleTab(AntType type, Upgrade requiredUpgrade) {
@@ -106,16 +106,16 @@ public class RoleManagementDialog extends JDialog {
     }
 
     private static Upgrade getUpgradeForRole(AntRole role) {
-        if (role == GameConstants.ROLE_FORAGER) return GameUpgrades.ROLE_FORAGER;
-        if (role == GameConstants.ROLE_NURSE) return GameUpgrades.ROLE_NURSE;
-        if (role == GameConstants.ROLE_FARMER) return GameUpgrades.ROLE_FARMER;
-        if (role == GameConstants.ROLE_GRAVER) return GameUpgrades.ROLE_GRAVER;
-        if (role == GameConstants.ROLE_HUNTER) return GameUpgrades.ROLE_HUNTER;
-        if (role == GameConstants.ROLE_LAYER) return GameUpgrades.ROLE_LAYER;
-        if (role == GameConstants.ROLE_RANCHER) return GameUpgrades.ROLE_RANCHER;
-        if (role == GameConstants.ROLE_BUILDER) return GameUpgrades.ROLE_BUILDER;
-        if (role == GameConstants.ROLE_BREEDER) return GameUpgrades.ROLE_BREEDER;
-        if (role == GameConstants.ROLE_RESEARCHER) return GameUpgrades.ROLE_RESEARCHER;
+        if (role == GameConstants.ROLE_FORAGER) return GameUnlocks.ROLE_FORAGER;
+        if (role == GameConstants.ROLE_NURSE) return GameUnlocks.ROLE_NURSE;
+        if (role == GameConstants.ROLE_FARMER) return GameUnlocks.ROLE_FARMER;
+        if (role == GameConstants.ROLE_GRAVER) return GameUnlocks.ROLE_GRAVER;
+        if (role == GameConstants.ROLE_HUNTER) return GameUnlocks.ROLE_HUNTER;
+        if (role == GameConstants.ROLE_LAYER) return GameUnlocks.ROLE_LAYER;
+        if (role == GameConstants.ROLE_RANCHER) return GameUnlocks.ROLE_RANCHER;
+        if (role == GameConstants.ROLE_BUILDER) return GameUnlocks.ROLE_BUILDER;
+        if (role == GameConstants.ROLE_BREEDER) return GameUnlocks.ROLE_BREEDER;
+        if (role == GameConstants.ROLE_RESEARCHER) return GameUnlocks.ROLE_RESEARCHER;
 
         return null; 
     }

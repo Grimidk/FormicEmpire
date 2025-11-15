@@ -3,7 +3,7 @@ package com.grimidk.formicempire.classes.interfaces.game;
 import com.grimidk.formicempire.classes.constants.Building;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.infrasctructure.GameConstants;
-import com.grimidk.formicempire.classes.infrasctructure.GameUpgrades;
+import com.grimidk.formicempire.classes.infrasctructure.GameUnlocks;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -83,7 +83,7 @@ public class BuildDialog extends JDialog {
             listPanel.add(createProgressPanel(currentProject));
         } else {
             // --- Show Available Buildings ---
-            List<Building> allBuildings = GameUpgrades.getBuildings();
+            List<Building> allBuildings = GameUnlocks.getBuildings();
             List<Building> availableBuildings = new ArrayList<>();
 
             for (Building building : allBuildings) {

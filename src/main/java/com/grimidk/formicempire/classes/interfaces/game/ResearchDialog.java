@@ -2,7 +2,7 @@ package com.grimidk.formicempire.classes.interfaces.game;
 
 import com.grimidk.formicempire.classes.constants.Upgrade;
 import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.infrasctructure.GameUpgrades;
+import com.grimidk.formicempire.classes.infrasctructure.GameUnlocks;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -66,7 +66,7 @@ public class ResearchDialog extends JDialog {
         updateResearchPointsLabel();
 
         int currentRP = colony.getResearchPoints();
-        List<Upgrade> allUpgrades = GameUpgrades.getUpgrades();
+        List<Upgrade> allUpgrades = GameUnlocks.getUpgrades();
         List<Upgrade> availableUpgrades = new ArrayList<>();
 
         for (Upgrade upgrade : allUpgrades) {

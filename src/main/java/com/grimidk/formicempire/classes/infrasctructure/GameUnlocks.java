@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public final class GameUpgrades {
-    private GameUpgrades() {}
+public final class GameUnlocks {
+    private GameUnlocks() {}
 
     // --- Upgrades ---
     // -- Types --
