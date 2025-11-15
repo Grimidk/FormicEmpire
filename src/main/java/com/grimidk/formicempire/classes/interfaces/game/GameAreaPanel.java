@@ -7,6 +7,7 @@ import com.grimidk.formicempire.classes.infrasctructure.GameConstants;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
@@ -73,7 +74,6 @@ public class GameAreaPanel extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        // 1. Draw the tiled background
         if (backgroundImage != null) {
             int tileWidth = backgroundImage.getWidth(this);
             int tileHeight = backgroundImage.getHeight(this);
@@ -90,19 +90,35 @@ public class GameAreaPanel extends JPanel {
             }
         }
         
-        // 2. Draw the ants
         if (colony != null) {
             Graphics2D g2d = (Graphics2D) g;
+            
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
             for (AntType type : GameConstants.getAntTypes()) {
                 if (type == GameConstants.TYPE_DEAD) continue; 
 
-                ImageIcon sprite = type.getSprite();
-                if (sprite == null) continue; 
+                ImageIcon spriteIcon = type.getSprite();
+                if (spriteIcon == null) continue; 
+                
+                Image sprite = spriteIcon.getImage();
+                int w = spriteIcon.getIconWidth();
+                int h = spriteIcon.getIconHeight();
 
                 List<Ant> ants = colony.getAntsByType(type);
                 for (Ant ant : ants) {
-                    sprite.paintIcon(this, g2d, ant.getX(), ant.getY());
+                    AffineTransform oldTransform = g2d.getTransform();
+                    
+                    double centerX = ant.getX() + (w / 2.0);
+                    double centerY = ant.getY() + (h / 2.0);
+                    g2d.translate(centerX, centerY);
+                    
+                    g2d.rotate(Math.toRadians(ant.getR()));
+                    
+                    g2d.drawImage(sprite, -w / 2, -h / 2, this);
+                    
+                    g2d.setTransform(oldTransform);
                 }
             }
         }

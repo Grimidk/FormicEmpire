@@ -1155,9 +1155,44 @@ public class Colony {
         }
     }
 
+    // --- Physics & Movement ---  
+    public void runPhysics() {
+        for (List<Ant> antList : antGroups.values()) {
+            for (Ant ant : antList) {
+                if (ant.isAlive()) {
+                    ant.updatePosition();
+                }
+            }
+        }
+    }
+
+    private void assignRandomMovements() {
+        List<AntType> mobileTypes = Arrays.asList(
+            GameConstants.TYPE_WORKER, 
+            GameConstants.TYPE_SOLDIER,
+            GameConstants.TYPE_MAJOR,
+            GameConstants.TYPE_QUEEN,
+            GameConstants.TYPE_PRINCESS,
+            GameConstants.TYPE_DRONE
+        );
+
+        for (AntType type : mobileTypes) {
+            List<Ant> ants = getAntsByType(type);
+            for (Ant ant : ants) {
+                if (ant.getMoveStatus() == GameConstants.MOVE_STATIC) {
+                    if (Math.random() < 0.001) { 
+                        Point randomDest = getRandomPosition(type.getSprite());
+                        ant.moveTo(randomDest);
+                    }
+                }
+            }
+        }
+    }
+
     // --- Job Packer --- 
     public void runMinutelyJobs() {
         this.runConverting();
+        this.assignRandomMovements();
     }
 
     public void runHourlyJobs() {

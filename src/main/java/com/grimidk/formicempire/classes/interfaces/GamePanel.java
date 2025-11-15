@@ -385,6 +385,8 @@ public class GamePanel extends JPanel {
             colony.setGameAreaDimensions(w, h);
         }
 
+        colony.runPhysics(); 
+
         worldPanel.updateMinuteData(world);
         colonyPanel.updateMinuteData(colony);
         

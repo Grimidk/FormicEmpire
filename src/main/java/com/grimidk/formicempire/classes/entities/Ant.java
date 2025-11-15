@@ -30,7 +30,11 @@ public class Ant {
     private MoveStatus moveStatus;
     private int x;
     private int y;
-    private int r;
+    private int r; 
+    
+    private double preciseX;
+    private double preciseY;
+    private Point targetPosition;
 
     public Ant(Colony colony, AntType type) {
         this.type = type;
@@ -52,139 +56,63 @@ public class Ant {
 
         this.x = 0; 
         this.y = 0;
+        this.preciseX = 0.0;
+        this.preciseY = 0.0;
+        this.r = 0;
     }
 
-    public AntType getType() {
-        return type;
-    }
+    public AntType getType() { return type; }
+    public void setType(AntType type) { this.type = type; }
 
-    public void setType(AntType type) {
-        this.type = type;
-    }
+    public AntSubType getSubType() { return subType; }
+    public void setSubType(AntSubType subType) { this.subType = subType; }
 
-    public AntSubType getSubType() {
-        return subType;
-    }
+    public AntRole getRole() { return role; }
+    public void setRole(AntRole role) { this.role = role; }
 
-    public void setSubType(AntSubType subType) {
-        this.subType = subType;
-    }
+    public AntStatus getStatus() { return status; }
+    public void setStatus(AntStatus status) { this.status = status; }
 
-    public AntRole getRole() {
-        return role;
-    }
+    public float getHealth() { return health; }
+    public void setHealth(int health) { this.health = health; }
 
-    public void setRole(AntRole role) {
-        this.role = role;
-    }
+    public int getMaxHealth() { return maxHealth; }
+    public void setMaxHealth(int maxHealth) { this.maxHealth = maxHealth; }
 
-    public AntStatus getStatus() {
-        return status;
-    }
+    public int getAge() { return age; }
+    public void setAge(int age) { this.age = age; }
 
-    public void setStatus(AntStatus status) {
-        this.status = status;
-    }
+    public float getTemp() { return temp; }
+    public void setTemp(float temp) { this.temp = temp; }
 
-    public float getHealth() {
-        return health;
-    }
+    public float getTempRes() { return tempRes; }
+    public void setTempRes(float tempRes) { this.tempRes = tempRes; }
 
-    public void setHealth(int health) {
-        this.health = health;
-    }
+    public float getRegen() { return regen; }
+    public void setRegen(int regen) { this.regen = regen; }
 
-    public int getMaxHealth() {
-        return maxHealth;
-    }
+    public float getConsumption() { return consumption; }
+    public void setConsumption(float consumption) { this.consumption = consumption; }
 
-    public void setMaxHealth(int maxHealth) {
-        this.maxHealth = maxHealth;
-    }
+    public float getAttack() { return attack; }
+    public void setAttack(int attack) { this.attack = attack; }
 
-    public int getAge() {
-        return age;
-    }
+    public float getAttackSpeed() { return attackSpeed; }
+    public void setAttackSpeed(int attackSpeed) { this.attackSpeed = attackSpeed; }
 
-    public void setAge(int age) {
-        this.age = age;
-    }
+    public float getDefense() { return defense; }
+    public void setDefense(int defense) { this.defense = defense; }
 
-    public float getTemp() {
-        return temp;
-    }
+    public float getSpeed() { return speed; }
+    public void setSpeed(int speed) { this.speed = speed; }
 
-    public void setTemp(float temp) {
-        this.temp = temp;
-    }
-
-    public float getTempRes() {
-        return tempRes;
-    }
-
-    public void setTempRes(float tempRes) {
-        this.tempRes = tempRes;
-    }
-
-    public float getRegen() {
-        return regen;
-    }
-
-    public void setRegen(int regen) {
-        this.regen = regen;
-    }
-
-    public float getConsumption() {
-        return consumption;
-    }
-
-    public void setConsumption(float consumption) {
-        this.consumption = consumption;
-    }
-
-    public float getAttack() {
-        return attack;
-    }
-
-    public void setAttack(int attack) {
-        this.attack = attack;
-    }
-
-    public float getAttackSpeed() {
-        return attackSpeed;
-    }
-
-    public void setAttackSpeed(int attackSpeed) {
-        this.attackSpeed = attackSpeed;
-    }
-
-    public float getDefense() {
-        return defense;
-    }
-
-    public void setDefense(int defense) {
-        this.defense = defense;
-    }
-
-    public float getSpeed() {
-        return speed;
-    }
-
-    public void setSpeed(int speed) {
-        this.speed = speed;
-    }
-
-    public float getSize() {
-        return size;
-    }
-
-    public void setSize(int size) {
-        this.size = size;
-    }
+    public float getSize() { return size; }
+    public void setSize(int size) { this.size = size; }
 
     public void goDie() {
         this.type = GameConstants.TYPE_DEAD;
         this.status = GameConstants.STATUS_ALIVE;
+        this.moveStatus = GameConstants.MOVE_STATIC;
         this.maxHealth = 0;
         this.health = 0;
         this.age = 0;
@@ -225,14 +153,54 @@ public class Ant {
     public void setPosition(Point p) {
         this.x = p.x;
         this.y = p.y;
-    }
-
-    public void move(Point p) {
-        
+        this.preciseX = p.x;
+        this.preciseY = p.y;
+        this.targetPosition = null;
+        this.moveStatus = GameConstants.MOVE_STATIC;
     }
 
     public void moveTo(Point p) {
-        int distanceX = p.x - this.getX();
-        int distanceY = p.y - this.getY();
+        this.targetPosition = p;
+        this.moveStatus = GameConstants.MOVE_WANDER; 
+        calculateRotation();
+    }
+
+    public void updatePosition() {
+        if (targetPosition == null || this.moveStatus == GameConstants.MOVE_STATIC) return;
+
+        double dx = targetPosition.x - this.preciseX;
+        double dy = targetPosition.y - this.preciseY;
+        double distance = Math.sqrt(dx * dx + dy * dy);
+        
+        double currentSpeed = this.speed * this.moveStatus.getSpeedMult();
+
+        if (distance <= currentSpeed) {
+            this.preciseX = targetPosition.x;
+            this.preciseY = targetPosition.y;
+            this.x = targetPosition.x;
+            this.y = targetPosition.y;
+            this.targetPosition = null;
+            this.moveStatus = GameConstants.MOVE_STATIC;
+        } else {
+            this.preciseX += (dx / distance) * currentSpeed;
+            this.preciseY += (dy / distance) * currentSpeed;
+            
+            this.x = (int) this.preciseX;
+            this.y = (int) this.preciseY;
+            
+            calculateRotation();
+        }
+    }
+
+    private void calculateRotation() {
+        if (targetPosition == null) return;
+
+        double dx = targetPosition.x - this.preciseX;
+        double dy = targetPosition.y - this.preciseY;
+        
+        double theta = Math.atan2(dy, dx);
+        
+        int degrees = (int) Math.toDegrees(theta);
+        this.r = (degrees + 90 + 360) % 360; 
     }
 }
