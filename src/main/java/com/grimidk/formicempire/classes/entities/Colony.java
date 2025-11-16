@@ -1180,7 +1180,7 @@ public class Colony {
             List<Ant> ants = getAntsByType(type);
             for (Ant ant : ants) {
                if (ant.getMoveStatus() == GameConstants.MOVE_WANDER && !ant.isMoving()) {
-                    if (Math.random() < 0.02) { 
+                    if (Math.random() < 0.001) { 
                         Point randomDest = getRandomPosition(type.getSprite());
                         ant.moveTo(randomDest);
                     }
