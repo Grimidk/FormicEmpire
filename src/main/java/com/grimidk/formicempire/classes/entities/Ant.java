@@ -165,6 +165,10 @@ public class Ant {
         calculateRotation();
     }
 
+    public boolean isMoving() {
+        return this.targetPosition != null;
+    }
+
     public void updatePosition() {
         if (targetPosition == null || this.moveStatus == GameConstants.MOVE_STATIC) return;
 

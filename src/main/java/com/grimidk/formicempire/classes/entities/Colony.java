@@ -1179,8 +1179,8 @@ public class Colony {
         for (AntType type : mobileTypes) {
             List<Ant> ants = getAntsByType(type);
             for (Ant ant : ants) {
-                if (ant.getMoveStatus() == GameConstants.MOVE_STATIC) {
-                    if (Math.random() < 0.001) { 
+               if (ant.getMoveStatus() == GameConstants.MOVE_WANDER && !ant.isMoving()) {
+                    if (Math.random() < 0.02) { 
                         Point randomDest = getRandomPosition(type.getSprite());
                         ant.moveTo(randomDest);
                     }
