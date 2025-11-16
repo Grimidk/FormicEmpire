@@ -2,11 +2,13 @@ package com.grimidk.formicempire.classes.interfaces;
 
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.World;
+import com.grimidk.formicempire.classes.infrasctructure.AlertManager;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.TriggerManager;
+import com.grimidk.formicempire.classes.interfaces.game.AlertPanel; 
 import com.grimidk.formicempire.classes.interfaces.game.BuildDialog;
 import com.grimidk.formicempire.classes.interfaces.game.ColonyPanel;
 import com.grimidk.formicempire.classes.interfaces.game.ControlPanel;
@@ -22,23 +24,22 @@ import java.awt.*;
 public class GamePanel extends JPanel {
     private final MainFrame frame;
     
-    // --- Core UI Components ---
     private JLabel statusLabel;
     private JLabel statusIndicator;
     
-    // --- Refactored Sub-Panels ---
     private ColonyPanel colonyPanel; 
     private WorldPanel worldPanel;  
+    private AlertPanel alertPanel; 
     private ControlPanel controlPanel;
     private GameAreaPanel gameAreaPanel;
     
-    // --- Refactored Dialogs ---
     private HatchRateDialog hatchDialog;
     private RoleManagementDialog roleDialog;
     private ResearchDialog researchDialog;
     private BuildDialog buildDialog;
 
-    // --- State & Engine ---
+    private AlertManager alertManager;
+
     private Runnable minuteTickListener;
     private Runnable hourTickListener;
     private Runnable dayTickListener;
@@ -62,16 +63,15 @@ public class GamePanel extends JPanel {
         
         colonyPanel = new ColonyPanel();
         worldPanel = new WorldPanel();
+        alertPanel = new AlertPanel();
         gameAreaPanel = new GameAreaPanel();
     }
     
     private void initControlPanelCallbacks() {
         Runnable handleBackButtonCallback = this::handleBackButton;
-        
         Runnable showHatchRateDialogCallback = this::showHatchRateDialog;
         Runnable showResearchDialogCallback = this::showResearchDialog;
         Runnable showBuildDialogCallback = this::showBuildDialog;
-        
         ControlPanel.RoleManagementCallback showRoleManagementDialogCallback = this::showRoleManagementDialog;
         
         controlPanel = new ControlPanel(frame, 
@@ -120,22 +120,25 @@ public class GamePanel extends JPanel {
         gbc.fill = GridBagConstraints.BOTH; 
         center.add(gameAreaPanel, gbc); 
 
-        // 3. World Panel (Right)
+        // 3. Right Panel Container (World + Alert)
+        JPanel rightPanel = new JPanel(new BorderLayout());
+        rightPanel.setOpaque(false);
+        rightPanel.add(worldPanel, BorderLayout.NORTH);
+        rightPanel.add(alertPanel, BorderLayout.CENTER); 
+
         gbc.gridx = 2;
         gbc.anchor = GridBagConstraints.NORTHEAST; 
         gbc.weightx = 0.0; 
         gbc.fill = GridBagConstraints.VERTICAL; 
-        center.add(worldPanel, gbc);
+        center.add(rightPanel, gbc);
         
         return center;
     }
-    
-    // --- Dialog Methods ---
+
     private void showHatchRateDialog() {
         Engine engine = frame.getEngine();
         Colony colony = engine != null && engine.getWorld() != null && engine.getWorld().getSpawnHex() != null ? engine.getWorld().getSpawnHex().getColony() : null;
         if (colony == null) return;
-
         if (hatchDialog == null || hatchDialog.getOwner() != frame) {
             if (hatchDialog != null) hatchDialog.dispose();
             hatchDialog = new HatchRateDialog(frame, colony);
@@ -143,7 +146,6 @@ public class GamePanel extends JPanel {
              hatchDialog.dispose();
              hatchDialog = new HatchRateDialog(frame, colony);
         }
-        
         hatchDialog.showDialog();
     }
 
@@ -151,7 +153,6 @@ public class GamePanel extends JPanel {
         Engine engine = frame.getEngine();
         Colony colony = engine != null && engine.getWorld() != null && engine.getWorld().getSpawnHex() != null ? engine.getWorld().getSpawnHex().getColony() : null;
         if (colony == null) return;
-
         if (roleDialog == null || roleDialog.getOwner() != frame) {
             if (roleDialog != null) roleDialog.dispose();
             roleDialog = new RoleManagementDialog(frame, colony);
@@ -159,7 +160,6 @@ public class GamePanel extends JPanel {
              roleDialog.dispose();
              roleDialog = new RoleManagementDialog(frame, colony);
         }
-        
         roleDialog.selectTab(tabIndex);
         roleDialog.showDialog(tabIndex);
     }
@@ -168,12 +168,10 @@ public class GamePanel extends JPanel {
         Engine engine = frame.getEngine();
         Colony colony = engine != null && engine.getWorld() != null && engine.getWorld().getSpawnHex() != null ? engine.getWorld().getSpawnHex().getColony() : null;
         if (colony == null) return;
-
         if (researchDialog == null || researchDialog.getOwner() != frame) {
             if (researchDialog != null) researchDialog.dispose();
             researchDialog = new ResearchDialog(frame, colony);
         }
-        
         researchDialog.showDialog();
     }
     
@@ -181,7 +179,6 @@ public class GamePanel extends JPanel {
         Engine engine = frame.getEngine();
         Colony colony = engine != null && engine.getWorld() != null && engine.getWorld().getSpawnHex() != null ? engine.getWorld().getSpawnHex().getColony() : null;
         if (colony == null) return;
-
         if (buildDialog == null || buildDialog.getOwner() != frame) {
             if (buildDialog != null) buildDialog.dispose();
             buildDialog = new BuildDialog(frame, colony);
@@ -189,37 +186,27 @@ public class GamePanel extends JPanel {
              buildDialog.dispose();
              buildDialog = new BuildDialog(frame, colony);
         }
-        
         buildDialog.showDialog();
     }
     
-    // --- Engine Control & Setup ---
-    public boolean isEngineStarted() {
-        return engineStarted;
-    }
+    public boolean isEngineStarted() { return engineStarted; }
 
     private void handleBackButton() {
         Engine eng = frame.getEngine();
-        if (eng != null) {
-            eng.pauseEngine();
-        }
+        if (eng != null) eng.pauseEngine();
         updateStatusIndicator(true);
         controlPanel.setPlayPauseButtonText(true);
         unregisterTickListeners(); 
-
         try {
             SaveManager sm = new SaveManager();
             Engine engine = frame.getEngine();
             if (engine != null && engine.getWorld() != null) {
                 World w = engine.getWorld();
                 int slotIdLocal = w.getSaveSlotId();
-                
                 final int capturedSlot = slotIdLocal;
                 if (capturedSlot > 0) {
                     Savefile existing = sm.loadSlot(capturedSlot);
-                    String nameToUse = (existing != null && existing.getName() != null && !existing.getName().trim().isEmpty())
-                                       ? existing.getName() : ("Save " + capturedSlot);
-
+                    String nameToUse = (existing != null && existing.getName() != null && !existing.getName().trim().isEmpty()) ? existing.getName() : ("Save " + capturedSlot);
                     sm.saveWorldToSlotUserAsync(engine.getWorld(), engine, capturedSlot, nameToUse, () -> {
                         frame.showCard(MainFrame.CARD_SAVE);
                     });
@@ -233,19 +220,15 @@ public class GamePanel extends JPanel {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-
         frame.showCard(MainFrame.CARD_SAVE);
     }
     
     public void quitToMenuWithoutSaving() {
         Engine eng = frame.getEngine();
-        if (eng != null) {
-            eng.pauseEngine();
-        }
+        if (eng != null) eng.pauseEngine();
         updateStatusIndicator(true);
         if (controlPanel != null) controlPanel.setPlayPauseButtonText(true);
         unregisterTickListeners(); 
-
         frame.showCard(MainFrame.CARD_SAVE);
     }
 
@@ -265,16 +248,16 @@ public class GamePanel extends JPanel {
                 try {
                     get();
                     statusLabel.setText("Game started");
-                    
                     registerTickListeners(); 
                     
                     World world = engine.getWorld();
                     Colony colony = null;
                     if (world != null && world.getSpawnHex() != null && world.getSpawnHex().getColony() != null) {
                         colony = world.getSpawnHex().getColony();
-                        
                         gameAreaPanel.setColony(colony);
                         
+                        alertManager = new AlertManager(colony, alertPanel);
+
                         TriggerManager triggerManager = new TriggerManager(world, colony, engine);
                         if (frame instanceof TriggerManager.TriggerListener) {
                             triggerManager.addListener((TriggerManager.TriggerListener) frame);
@@ -283,7 +266,6 @@ public class GamePanel extends JPanel {
                     }
                     
                     updateStaticWorldInfo();
-                    
                     updateMinuteGUI();
                     updateHourGUI();
                     updateDayGUI();
@@ -301,7 +283,6 @@ public class GamePanel extends JPanel {
                 }
             }
         };
-        
         worker.execute();
     }
 
@@ -353,7 +334,6 @@ public class GamePanel extends JPanel {
         }
     }
 
-    // --- Event-Driven Update Methods ---
     public void refreshAllGUIData() {
         updateMinuteGUI();
         updateHourGUI();
@@ -364,9 +344,7 @@ public class GamePanel extends JPanel {
     private void updateStaticWorldInfo() {
         World world = frame.getEngine().getWorld();
         if (world == null) return;
-        
         worldPanel.updateStaticData(world);
-        
         if (world.getSpawnHex() != null && world.getSpawnHex().getBiome() != null) {
             String biomeName = world.getSpawnHex().getBiome().getName();
             gameAreaPanel.setBackgroundByBiome(biomeName);
@@ -389,7 +367,6 @@ public class GamePanel extends JPanel {
 
         worldPanel.updateMinuteData(world);
         colonyPanel.updateMinuteData(colony);
-        
         gameAreaPanel.repaint(); 
     }
 
@@ -405,11 +382,9 @@ public class GamePanel extends JPanel {
         if (researchDialog != null && researchDialog.isShowing()) {
             researchDialog.liveUpdate();
         }
-        
         if (buildDialog != null && buildDialog.isShowing()) {
             buildDialog.liveUpdate();
         }
-        
         if (controlPanel != null) {
             controlPanel.updateResearchMenu(colony.hasUpgrade(GameUnlocks.ABILITY_RESEARCH));
             controlPanel.updateBuildMenu(colony.hasUpgrade(GameUnlocks.ABILITY_BUILD));
@@ -425,6 +400,10 @@ public class GamePanel extends JPanel {
         worldPanel.updateDayData(world);
         colonyPanel.updateDayData(colony);
         
+        if (alertManager != null) {
+            alertManager.checkStatus();
+        }
+
         if (roleDialog != null && roleDialog.isShowing()) {
             roleDialog.liveUpdate();
         }
@@ -434,7 +413,6 @@ public class GamePanel extends JPanel {
         Engine engine = frame.getEngine();
         World world = engine != null ? engine.getWorld() : null;
         if (world == null) return;
-
         worldPanel.updateMonthData(world);
     }
 }
