@@ -1,15 +1,11 @@
 package com.grimidk.formicempire.classes.entities;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.HashSet;
 import java.util.Set;
-import java.awt.Point;
-import javax.swing.ImageIcon;
 import java.util.concurrent.CopyOnWriteArrayList; 
 
 import com.grimidk.formicempire.classes.constants.AntRole;
@@ -22,22 +18,28 @@ import com.grimidk.formicempire.classes.infrasctructure.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 
+import com.grimidk.formicempire.classes.entities.services.ColonyStatsService;
+import com.grimidk.formicempire.classes.entities.services.ColonyResourceService;
+import com.grimidk.formicempire.classes.entities.services.ColonyPopulationService;
+import com.grimidk.formicempire.classes.entities.services.ColonyMaintenanceService;
+import com.grimidk.formicempire.classes.entities.services.ColonyPhysicsService;
+
 public class Colony {
-    // Basic 
+    // --- Basic Data ---
     private final int id;
     private String name;
     private Species species;
     private boolean isPlayer;
     private ColonyRank rank;
     
-    // Helper structures
+    // --- Population Data ---
     private final Map<AntType, List<Ant>> antGroups;
     private final List<Ant> deadAnts; 
     private Map<AntRole, Integer> assignedRoleCounts;
     private final Set<Upgrade> upgrades;
     private final Set<Building> buildings;
 
-    // Resources
+    // --- Resource Data ---
     private int plants;
     private int mushrooms;
     private int protein;
@@ -48,26 +50,38 @@ public class Colony {
     private int aphids;
     private int researchPoints;
 
-    // Hatch Rates
+    // --- Hatch Rate Data ---
     private float hatchRateWorker;
     private float hatchRateSoldier;
     private float hatchRateMajor;
     private float hatchRateDrone;
     private float hatchRatePrincess;
 
-    // Misc. 
-    private int totalDeaths;
-
-    // Panel size
+    // --- Misc. Data ---
+    private int totalDeaths = 0;
     private int gameAreaWidth = 1;
     private int gameAreaHeight = 1;
-    
-    // Building Project
     private Building currentBuildingProject = null;
     private double buildingProgressHours = 0.0;
-
     private final List<String> eventLog = new ArrayList<>();
 
+    // --- Service Dependencies ---
+    private transient ColonyStatsService statsService;
+    private transient ColonyResourceService resourceService;
+    private transient ColonyPopulationService populationService;
+    private transient ColonyMaintenanceService maintenanceService;
+    private transient ColonyPhysicsService physicsService;
+
+    // --- Service Initializer ---
+    private void initializeServices() {
+        this.statsService = new ColonyStatsService();
+        this.resourceService = new ColonyResourceService();
+        this.populationService = new ColonyPopulationService();
+        this.maintenanceService = new ColonyMaintenanceService();
+        this.physicsService = new ColonyPhysicsService();
+    }
+
+    // --- Initialization Methods ---
     private void initializeLists() {
         this.antGroups.put(GameConstants.TYPE_EGG, new CopyOnWriteArrayList<>());
         this.antGroups.put(GameConstants.TYPE_LARVA, new CopyOnWriteArrayList<>());
@@ -161,6 +175,7 @@ public class Colony {
         }
     }
 
+    // --- Constructors ---
     public Colony(int id, String name, boolean isPlayer) {
         this.id = id;
         this.name = name;
@@ -176,6 +191,8 @@ public class Colony {
         initializeUpgrades();
         initializeBuildings();
         initializeAssignedRoles();
+        
+        initializeServices(); 
     }
 
     public Colony(Savefile savefile) {
@@ -193,6 +210,7 @@ public class Colony {
         loadUpgrades(savefile);
         laodBuildings(savefile);
         initializeAssignedRoles(); 
+        initializeServices();
         
         Map<String, Integer> savedRoles = savefile.getAssignedRoleCounts();
         if (savedRoles != null && !savedRoles.isEmpty()) {
@@ -235,16 +253,7 @@ public class Colony {
         runRoleAssignment(); 
     }
     
-    private Point getRandomPosition(ImageIcon sprite) {
-        int w = (sprite != null) ? sprite.getIconWidth() : 0;
-        int h = (sprite != null) ? sprite.getIconHeight() : 0;
-        int boundX = Math.max(1, gameAreaWidth - w);
-        int boundY = Math.max(1, gameAreaHeight - h);
-        int x = (int) (Math.random() * boundX);
-        int y = (int) (Math.random() * boundY);
-        return new Point(x, y);
-    }
-
+    // --- Population Initializer ---
     private void populateAntList(List<Ant> list, int count, AntType type) {
         for (int i = 0; i < count; i++) {
             Ant newAnt = new Ant(this, type);
@@ -253,17 +262,11 @@ public class Colony {
     }
     
     private void randomizeAllAntPositions() {
-        for (Map.Entry<AntType, List<Ant>> entry : antGroups.entrySet()) {
-            AntType type = entry.getKey();
-            if (type == GameConstants.TYPE_DEAD) continue;
-            ImageIcon sprite = type.getSprite();
-            List<Ant> ants = entry.getValue();
-            for (Ant ant : ants) {
-                ant.setPosition(getRandomPosition(sprite));
-            }
-        }
+        if (physicsService == null) initializeServices(); 
+        physicsService.randomizeAllAntPositions(this);
     }
-
+    
+    // --- Event Log  ---
     public void logEvent(String message) {
         synchronized (eventLog) {
             eventLog.add(message);
@@ -289,9 +292,8 @@ public class Colony {
     public ColonyRank getRank() { return rank; }
     public void setRank(ColonyRank rank) { this.rank = rank; }
 
-    public List<Ant> getAntsByType(AntType type) {
-        return antGroups.getOrDefault(type, new CopyOnWriteArrayList<>());
-    }
+    public Map<AntType, List<Ant>> getAntGroups() { return antGroups; } 
+    public List<Ant> getAntsByType(AntType type) { return antGroups.getOrDefault(type, new CopyOnWriteArrayList<>()); }
     public List<Ant> getEggs() { return antGroups.get(GameConstants.TYPE_EGG); }
     public void setEggs(List<Ant> eggs) { antGroups.put(GameConstants.TYPE_EGG, eggs); }
     public List<Ant> getLarvae() { return antGroups.get(GameConstants.TYPE_LARVA); }
@@ -318,26 +320,16 @@ public class Colony {
     public int getAntTotal() {
         return antGroups.values().stream().mapToInt(List::size).sum();
     }
-    public boolean hasUpgrade(Upgrade upgrade) {
-        return this.upgrades.contains(upgrade);
-    }
-    public void unlockUpgrade(Upgrade upgrade) {
-        this.upgrades.add(upgrade); 
-    }
-    public Set<Upgrade> getUnlockedUpgrades() {
-        return this.upgrades;
-    }
-    public boolean hasBuilding(Building building) {
-        return this.buildings.contains(building);
-    }
-    public void unlockBuilding(Building building) {
-        this.buildings.add(building); 
-    }
-    public Set<Building> getUnlockedBuildings() {
-        return this.buildings;
-    }
+    public boolean hasUpgrade(Upgrade upgrade) { return this.upgrades.contains(upgrade); }
+    public void unlockUpgrade(Upgrade upgrade) { this.upgrades.add(upgrade); }
+    public Set<Upgrade> getUnlockedUpgrades() { return this.upgrades; }
+    public boolean hasBuilding(Building building) { return this.buildings.contains(building); }
+    public void unlockBuilding(Building building) { this.buildings.add(building); }
+    public Set<Building> getUnlockedBuildings() { return this.buildings; }
     public Building getCurrentBuildingProject() { return currentBuildingProject; }
+    public void setCurrentBuildingProject(Building b) { this.currentBuildingProject = b; } // Added setter
     public double getBuildingProgressHours() { return buildingProgressHours; }
+    public void setBuildingProgressHours(double d) { this.buildingProgressHours = d; } // Added setter
 
     public boolean startBuildingProject(Building building) {
         if (currentBuildingProject != null) return false; 
@@ -349,25 +341,6 @@ public class Colony {
         this.currentBuildingProject = building;
         this.buildingProgressHours = 0.0;
         return true;
-    }
-
-    public int getTotalConsumption(){
-        double totalConsumption = 0;
-        for (Map.Entry<AntType, List<Ant>> entry : antGroups.entrySet()) {
-            totalConsumption += (double) entry.getValue().size() * entry.getKey().getConsumptionMult() * this.getBaseConsumption();
-        }
-        return (int) totalConsumption;
-    }
-
-    public int getTotalProduction(){
-        int foragerCount = countAntsByRole(getWorkers(), GameConstants.ROLE_FORAGER);
-        int hunterCount = countAntsByRole(getSoldiers(), GameConstants.ROLE_HUNTER);
-        int farmerCount = countAntsByRole(getWorkers(), GameConstants.ROLE_FARMER);
-        double plantCollection = foragerCount * 0.5 * getCollectingRate();
-        double proteinCollection = hunterCount * getCollectingRate();
-        int collectionPerHour = (int) (plantCollection + proteinCollection);
-        int totalProductionRate = (int) (Math.min((getConversionRate() * farmerCount) * 60, collectionPerHour)) * 3 * 24; 
-        return Math.min(totalProductionRate, getMushroomsCapacity());
     }
     
     public int getPlants() { return plants; }
@@ -384,137 +357,11 @@ public class Colony {
     public void setResins(int resins) { this.resins = resins; }
     public int getMinerals() { return minerals; }
     public void setMinerals(int minerals) { this.minerals = minerals; }
-    
-    public int getPlantsCapacity() { 
-        if (this.hasBuilding(GameUnlocks.PLANT_CHAMBER_2)) {return 25000;
-        } else if (this.hasBuilding(GameUnlocks.PLANT_CHAMBER_1)) {return 10000;
-        } else if (this.hasBuilding(GameUnlocks.PLANT_CHAMBER_0)) {return 4000; 
-        } else {return 0;}
-    }
-    public int getMushroomsCapacity() { 
-        if (this.hasBuilding(GameUnlocks.MUSHROOM_CHAMBER_2)) {return 40000;
-        } else if (this.hasBuilding(GameUnlocks.MUSHROOM_CHAMBER_1)) {return 15000;
-        } else if (this.hasBuilding(GameUnlocks.MUSHROOM_CHAMBER_0)) {return 8000; 
-        } else {return 0;}
-    }
-    public int getProteinCapacity() { 
-        if (this.hasBuilding(GameUnlocks.MEAT_CHAMBER_2)) {return 15000;
-        } else if (this.hasBuilding(GameUnlocks.MEAT_CHAMBER_1)) {return 5000;
-        } else if (this.hasBuilding(GameUnlocks.MEAT_CHAMBER_0)) {return 2000; 
-        } else {return 0;}
-    }
-    public int getWaterCapacity() {
-        if (this.hasBuilding(GameUnlocks.WATER_RESERVOIR_2)) {return 10000;
-        } else if (this.hasBuilding(GameUnlocks.WATER_RESERVOIR_1)) {return 2500;
-        } else if (this.hasBuilding(GameUnlocks.WATER_RESERVOIR_0)) {return 1000; 
-        } else {return 0;}
-    }
-    public int getSyrupsCapacity() { 
-        if (this.hasBuilding(GameUnlocks.SYRUP_RESERVOIR_2)) {return 3500;
-        } else if (this.hasBuilding(GameUnlocks.SYRUP_RESERVOIR_1)) {return 1200;
-        } else if (this.hasBuilding(GameUnlocks.SYRUP_RESERVOIR_0)) {return 500; 
-        } else {return 0;}
-    }
-    public int getResinsCapacity() { 
-        if (this.hasBuilding(GameUnlocks.RESIN_RESERVOIR_2)) {return 1200;
-        } else if (this.hasBuilding(GameUnlocks.RESIN_RESERVOIR_1)) {return 500;
-        } else if (this.hasBuilding(GameUnlocks.RESIN_RESERVOIR_0)) {return 200; 
-        } else {return 0;}
-    }
-    public int getMineralsCapacity() { 
-        if (this.hasBuilding(GameUnlocks.ROCK_WAREHOUSE_2)) {return 750;
-        } else if (this.hasBuilding(GameUnlocks.ROCK_WAREHOUSE_1)) {return 250;
-        } else if (this.hasBuilding(GameUnlocks.ROCK_WAREHOUSE_0)) {return 100; 
-        } else {return 0;}
-    }
-    public int getEggsCapacity() {
-        if (this.hasBuilding(GameUnlocks.EGG_CHAMBER_2)) {return 150;
-        } else if (this.hasBuilding(GameUnlocks.EGG_CHAMBER_1)) {return 80;
-        } else if (this.hasBuilding(GameUnlocks.EGG_CHAMBER_0)) {return 50; 
-        } else {return 0;}
-    }
-    public int getQueensCapacity() {
-        if (this.hasBuilding(GameUnlocks.ROYAL_CHAMBER_2)) {return 4;
-        } else if (this.hasBuilding(GameUnlocks.ROYAL_CHAMBER_1)) {return 2;
-        } else if (this.hasBuilding(GameUnlocks.ROYAL_CHAMBER_0)) {return 1; 
-        } else {return 0;}
-    }
-    public int getAphidCapacity() {
-        if (this.hasUpgrade(GameUnlocks.ROLE_RANCHER)) {return 10;
-        } else {return 0;}
-    }
+
     public int getAphids() { return aphids; }
     public void setAphids(int aphids) { this.aphids = aphids; }
-    public int getResearchSpeed() {
-        if (this.hasUpgrade(GameUnlocks.ROLE_RESEARCHER)) {return 1;
-        } else {return 0;}
-    }
     public int getResearchPoints() { return researchPoints; }
     public void setResearchPoints(int researchPoints) { this.researchPoints = researchPoints; }
-    public int getGrowthTime() {
-        if (this.hasUpgrade(GameUnlocks.TYPE_EGG)) {return 4;
-        } else {return 0;}
-    }
-    public float getLayingRate() {
-        if (this.hasUpgrade(GameUnlocks.ROLE_LAYER)) {return 1f;
-        } else {return 0;}
-    }
-    public float getConversionRate() {
-        if (this.hasUpgrade(GameUnlocks.ROLE_FARMER)) {return 0.1f;
-        } else {return 0;}
-    }
-    public float getNursingRate() {
-        if (this.hasUpgrade(GameUnlocks.ROLE_NURSE)) {return 10f;
-        } else {return 0;}
-    }
-    public float getGravingRate() {
-        if (this.hasUpgrade(GameUnlocks.ROLE_GRAVER)) {return 5f;
-        } else {return 0;}
-    }
-    public float getCollectingRate() {
-        if (this.hasUpgrade(GameUnlocks.ROLE_FORAGER)) {return 1f;
-        } else {return 0;}
-    }
-    public float getParasiteDetection() {
-        if (this.hasUpgrade(GameUnlocks.ROLE_POLICE)) {return 10f;
-        } else {return 0;}
-    }
-    public int getBaseHealth() {
-        if (this.hasUpgrade(GameUnlocks.STAT_SKELETON)) {return 100;
-        } else {return 0;}
-    }
-    public int getBaseTempRes() {
-        if (this.hasUpgrade(GameUnlocks.STAT_LONGEVITY)) {return 25;
-        } else {return 0;}
-    }
-    public int getBaseRegen() {
-        if (this.hasUpgrade(GameUnlocks.STAT_SKELETON)) {return 1;
-        } else {return 0;}
-    }
-    public int getBaseConsumption() {
-        if (this.hasUpgrade(GameUnlocks.STAT_LONGEVITY)) {return 1;
-        } else {return 0;}
-    }
-    public int getBaseAttack() {
-        if (this.hasUpgrade(GameUnlocks.STAT_ACID)) {return 10;
-        } else {return 0;}
-    }
-    public int getBaseAttackSpeed() {
-        if (this.hasUpgrade(GameUnlocks.STAT_ACID)) {return 1;
-        } else {return 0;}
-    }
-    public int getBaseDefense() {
-        if (this.hasUpgrade(GameUnlocks.STAT_SKELETON)) {return 5;
-        } else {return 0;}
-    }
-    public int getBaseSpeed() {
-        if (this.hasUpgrade(GameUnlocks.STAT_ACID)) {return 1;
-        } else {return 0;}
-    }
-    public int getBaseSize(){
-        if (this.hasUpgrade(GameUnlocks.STAT_LONGEVITY)) {return 1;
-        } else {return 0;}
-    }
 
     public void setGameAreaDimensions(int width, int height) {
         boolean firstTimeUpdate = (this.gameAreaWidth == 1 && this.gameAreaHeight == 1 && width > 1 && height > 1);
@@ -524,7 +371,10 @@ public class Colony {
             randomizeAllAntPositions();
         }
     }
-    
+    // --- Getters needed by ColonyPhysicsService ---
+    public int getGameAreaWidth() { return this.gameAreaWidth; }
+    public int getGameAreaHeight() { return this.gameAreaHeight; }
+
     public int getAssignedRoleCount(AntRole role) { return assignedRoleCounts.getOrDefault(role, 0); }
     public void setAssignedRoleCount(AntRole role, int count) { if (count >= 0) assignedRoleCounts.put(role, count); }
     public Map<AntRole, Integer> getAssignedRoleCounts() { return assignedRoleCounts; }
@@ -559,6 +409,51 @@ public class Colony {
     public int getTotalDeaths () { return totalDeaths; }
     public void setTotalDeaths (int totalDeaths) { this.totalDeaths = totalDeaths; }
 
+    // --- Public getters for services ---
+    public ColonyStatsService getStatsService() { return this.statsService; }
+    public ColonyResourceService getResourceService() { return this.resourceService; }
+    public ColonyPopulationService getPopulationService() { return this.populationService; }
+    public ColonyMaintenanceService getMaintenanceService() { return this.maintenanceService; }
+    public ColonyPhysicsService getPhysicsService() { return this.physicsService; }
+
+    // --- Aggregate Stats---
+    public int getTotalConsumption(){ return statsService.getTotalConsumption(this); }
+    public int getTotalProduction(){ return statsService.getTotalProduction(this); }
+
+    // --- Capacities ---
+    public int getPlantsCapacity() { return statsService.getPlantsCapacity(this); }
+    public int getMushroomsCapacity() { return statsService.getMushroomsCapacity(this); }
+    public int getProteinCapacity() { return statsService.getProteinCapacity(this); }
+    public int getWaterCapacity() { return statsService.getWaterCapacity(this); }
+    public int getSyrupsCapacity() { return statsService.getSyrupsCapacity(this); }
+    public int getResinsCapacity() { return statsService.getResinsCapacity(this); }
+    public int getMineralsCapacity() { return statsService.getMineralsCapacity(this); }
+    public int getEggsCapacity() { return statsService.getEggsCapacity(this); }
+    public int getQueensCapacity() { return statsService.getQueensCapacity(this); }
+    public int getAphidCapacity() { return statsService.getAphidCapacity(this); }
+
+    // --- Rates ---
+    public int getResearchSpeed() { return statsService.getResearchSpeed(this); }
+    public int getGrowthTime() { return statsService.getGrowthTime(this); }
+    public float getLayingRate() { return statsService.getLayingRate(this); }
+    public float getConversionRate() { return statsService.getConversionRate(this); }
+    public float getNursingRate() { return statsService.getNursingRate(this); }
+    public float getGravingRate() { return statsService.getGravingRate(this); }
+    public float getCollectingRate() { return statsService.getCollectingRate(this); }
+    public float getParasiteDetection() { return statsService.getParasiteDetection(this); }
+
+    // --- Base Stats ---
+    public int getBaseHealth() { return statsService.getBaseHealth(this); }
+    public int getBaseTempRes() { return statsService.getBaseTempRes(this); }
+    public int getBaseRegen() { return statsService.getBaseRegen(this); }
+    public int getBaseConsumption() { return statsService.getBaseConsumption(this); }
+    public int getBaseAttack() { return statsService.getBaseAttack(this); }
+    public int getBaseAttackSpeed() { return statsService.getBaseAttackSpeed(this); }
+    public int getBaseDefense() { return statsService.getBaseDefense(this); }
+    public int getBaseSpeed() { return statsService.getBaseSpeed(this); }
+    public int getBaseSize(){ return statsService.getBaseSize(this); }
+
+    // --- Colony Setup ---
     public void startColony() {
         List<Ant> workerList = getWorkers();
         for (int i = 0; i < 9; i++) {
@@ -583,452 +478,27 @@ public class Colony {
         this.getWorkers().get(8).setRole(GameConstants.ROLE_FORAGER);
     }
 
-    private AntRole getDefaultRoleForType(AntType type) {
-        if (type == GameConstants.TYPE_WORKER) return GameConstants.ROLE_FORAGER;
-        else if (type == GameConstants.TYPE_SOLDIER) return GameConstants.ROLE_HUNTER;
-        else if (type == GameConstants.TYPE_MAJOR) return GameConstants.ROLE_BRUTE; 
-        else if (type == GameConstants.TYPE_PRINCESS) return GameConstants.ROLE_BREEDER;
-        else if (type == GameConstants.TYPE_DRONE) return GameConstants.ROLE_DRONE;
-        else if (type == GameConstants.TYPE_QUEEN) return GameConstants.ROLE_LAYER;
-        return null; 
-    }
+    // --- Simulation Logic Methods ---
+    public void runRoleAssignment() { populationService.runRoleAssignment(this); }
+    public void runHatching(){ populationService.runHatching(this); }
+    public void rankUp() { populationService.rankUp(this); }
+    public void runLaying() { populationService.runLaying(this); }
+    public void runAging(){ populationService.runAging(this); }
+    public void runNursing() { populationService.runNursing(this); }
+    public void runNuptial() { populationService.runNuptial(this); }
+    public void runEating(){ maintenanceService.runEating(this); }
+    public void runGraveKeeping() { maintenanceService.runGraveKeeping(this); }
+    public void runResearch() { maintenanceService.runResearch(this); }
+    public void runBuilding() { maintenanceService.runBuilding(this); }
+    public void runInfection() { maintenanceService.runInfection(this); }
+    public void runCollecting() { resourceService.runCollecting(this); }
+    public void runConverting() { resourceService.runConverting(this); }
+    public void runRanching() { resourceService.runRanching(this); }
+    public void runHerding() { resourceService.runHerding(this); }
+    public void runPhysics() { physicsService.runPhysics(this); }
+    public void assignRandomMovements() { physicsService.assignRandomMovements(this); }
 
-    private void assignRolesForType(List<Ant> ants, AntType type) {
-        AntRole defaultRole = getDefaultRoleForType(type);
-        if (defaultRole == null) return; 
-        for (Ant ant : ants) {
-            ant.setRole(defaultRole);
-        }
-        List<Ant> availableAnts = new ArrayList<>(ants); 
-        Iterator<Map.Entry<AntRole, Integer>> roleIterator = assignedRoleCounts.entrySet().iterator();
-        while(roleIterator.hasNext()) {
-            Map.Entry<AntRole, Integer> entry = roleIterator.next();
-            AntRole role = entry.getKey();
-            if (role.getAntType() != type) continue;
-            if (role.equals(defaultRole)) continue; 
-            int desiredCount = entry.getValue();
-            int assignedCount = 0;
-            Iterator<Ant> antIterator = availableAnts.iterator();
-            while (assignedCount < desiredCount && antIterator.hasNext()) {
-                Ant antToAssign = antIterator.next();
-                antToAssign.setRole(role); 
-                antIterator.remove();
-                assignedCount++;
-            }
-        }
-        assignedRoleCounts.put(defaultRole, availableAnts.size());
-    }
-
-    public void runRoleAssignment() {
-        assignRolesForType(getWorkers(), GameConstants.TYPE_WORKER);
-        assignRolesForType(getSoldiers(), GameConstants.TYPE_SOLDIER);
-        assignRolesForType(getMajors(), GameConstants.TYPE_MAJOR);
-        assignRolesForType(getPrincesses(), GameConstants.TYPE_PRINCESS);
-        assignRolesForType(getQueens(), GameConstants.TYPE_QUEEN);
-    }
-
-    private int countAntsByRole(List<Ant> antList, AntRole role) {
-        int count = 0;
-        for (Ant ant : antList) {
-            if (role.equals(ant.getRole())) {
-                count++;
-            }
-        }
-        return count;
-    }
-
-    private AntType determineHatchType() {
-        double rand = Math.random() * 100.0;
-        double cumulative = 0.0;
-        cumulative += this.hatchRateWorker;
-        if (rand < cumulative) return GameConstants.TYPE_WORKER;
-        if (hasUpgrade(GameUnlocks.TYPE_SOLDIER)) {
-            cumulative += this.hatchRateSoldier;
-            if (rand < cumulative) return GameConstants.TYPE_SOLDIER;
-        }
-        if (hasUpgrade(GameUnlocks.TYPE_MAJOR)) {
-            cumulative += this.hatchRateMajor;
-            if (rand < cumulative) return GameConstants.TYPE_MAJOR;
-        }
-        if (hasUpgrade(GameUnlocks.TYPE_PRINCESS)) {
-            cumulative += this.hatchRateDrone;
-            if (rand < cumulative) return GameConstants.TYPE_DRONE;
-            cumulative += this.hatchRatePrincess;
-            if (rand < cumulative) return GameConstants.TYPE_PRINCESS;
-        }
-        return GameConstants.TYPE_WORKER;
-    }
-
-    private void evolveAnts(List<Ant> sourceList, List<Ant> destList, AntType newType) {
-        List<Ant> antsToEvolve = new ArrayList<>();
-        for (Ant ant : sourceList) {
-            if (ant.getAge() >= this.getGrowthTime()) {
-                antsToEvolve.add(ant);
-            }
-        }
-        for (Ant ant : antsToEvolve) {
-            ant.transform(this, newType);
-            destList.add(ant);
-        }
-        sourceList.removeAll(antsToEvolve);
-    }
-
-    private void hatchPupae() {
-        List<Ant> pupaeToHatch = new ArrayList<>();
-        for (Ant pupa : getPupae()) {
-            if (pupa.getAge() >= this.getGrowthTime()) {
-                pupaeToHatch.add(pupa);
-            }
-        }
-        for (Ant pupa : pupaeToHatch) {
-            AntType newType = determineHatchType();
-            pupa.transform(this, newType);
-            antGroups.get(newType).add(pupa);
-        }
-        getPupae().removeAll(pupaeToHatch);
-    }
-
-    public void rankUp() {
-        if (getAntTotal() >= GameConstants.RANK_GIGA.getPopulation()) setRank(GameConstants.RANK_GIGA);
-        else if (getAntTotal() >= GameConstants.RANK_SUPREME.getPopulation()) setRank(GameConstants.RANK_SUPREME);
-        else if (getAntTotal() >= GameConstants.RANK_ULTIMATE.getPopulation()) setRank(GameConstants.RANK_ULTIMATE);
-        else if (getAntTotal() >= GameConstants.RANK_MEGA.getPopulation()) setRank(GameConstants.RANK_MEGA);
-        else if (getAntTotal() >= GameConstants.RANK_HYPER.getPopulation()) setRank(GameConstants.RANK_HYPER);
-        else if (getAntTotal() >= GameConstants.RANK_ULTRA.getPopulation()) setRank(GameConstants.RANK_ULTRA);
-        else if (getAntTotal() >= GameConstants.RANK_SUPER.getPopulation()) setRank(GameConstants.RANK_SUPER);
-        else if (getAntTotal() >= GameConstants.RANK_EMPIRE.getPopulation()) setRank(GameConstants.RANK_EMPIRE);
-        else if (getAntTotal() >= GameConstants.RANK_KINGDOM.getPopulation()) setRank(GameConstants.RANK_KINGDOM);
-        else if (getAntTotal() >= GameConstants.RANK_DUCHY.getPopulation()) setRank(GameConstants.RANK_DUCHY);
-        else if (getAntTotal() >= GameConstants.RANK_COUNTY.getPopulation()) setRank(GameConstants.RANK_COUNTY);
-        else if (getAntTotal() >= GameConstants.RANK_COLONY.getPopulation()) setRank(GameConstants.RANK_COLONY);
-        else setRank(GameConstants.RANK_ANT);
-    }
-
-    public void runHatching(){    
-        hatchPupae();
-        evolveAnts(getLarvae(), getPupae(), GameConstants.TYPE_PUPA);
-        evolveAnts(getEggs(), getLarvae(), GameConstants.TYPE_LARVA);
-    }
-
-    public void runEating(){
-        // --- 1. Water Consumption ---
-        List<Ant> thirstyAnts = new ArrayList<>();
-        int waterAvailable = this.getWater();
-        List<AntType> adultDrinkOrder = Arrays.asList(
-            GameConstants.TYPE_QUEEN, GameConstants.TYPE_WORKER, GameConstants.TYPE_SOLDIER,
-            GameConstants.TYPE_MAJOR, GameConstants.TYPE_PRINCESS, GameConstants.TYPE_DRONE
-        );
-        for (AntType type : adultDrinkOrder) {
-            List<Ant> list = antGroups.get(type);
-            for (Ant ant : list) {
-                if (waterAvailable >= 1) {
-                    waterAvailable -= 1;
-                } else {
-                    thirstyAnts.add(ant);
-                }
-            }
-        }
-        this.setWater(waterAvailable);
-        // --- 2. Food Consumption ---
-        int mushroomsAvailable = this.getMushrooms();
-        List<AntType> eatOrder = Arrays.asList(
-            GameConstants.TYPE_QUEEN, GameConstants.TYPE_WORKER, GameConstants.TYPE_LARVA,
-            GameConstants.TYPE_SOLDIER, GameConstants.TYPE_MAJOR, GameConstants.TYPE_PRINCESS, GameConstants.TYPE_DRONE
-        );
-        List<Ant> hungryAnts = new ArrayList<>();
-        for (AntType type : eatOrder) {
-            int consumptionPerAnt = (int) (type.getConsumptionMult() * this.getBaseConsumption());
-            if (consumptionPerAnt <= 0) consumptionPerAnt = 1; 
-            if (type == GameConstants.TYPE_EGG || type == GameConstants.TYPE_PUPA) continue;
-            List<Ant> list = antGroups.get(type);
-            for (Ant ant : list) {
-                if (mushroomsAvailable >= consumptionPerAnt) {
-                    mushroomsAvailable -= consumptionPerAnt;
-                } else {
-                    hungryAnts.add(ant);
-                }
-            }
-        }
-        this.setMushrooms(mushroomsAvailable);
-        // --- 3. Syrup Phase ---
-        Set<Ant> antsInNeed = new HashSet<>(thirstyAnts);
-        antsInNeed.addAll(hungryAnts);
-        int syrupAvailable = hasUpgrade(GameUnlocks.ROLE_RANCHER) ? this.getSyrups() : 0;
-        Iterator<Ant> needIterator = antsInNeed.iterator();
-        while (needIterator.hasNext() && syrupAvailable > 0) {
-            Ant ant = needIterator.next();
-            syrupAvailable -= 1;
-            needIterator.remove(); 
-            thirstyAnts.remove(ant);
-            hungryAnts.remove(ant);
-        }
-        this.setSyrups(syrupAvailable);
-        // --- 4. Death Phase ---
-        Set<Ant> antsToKill = new HashSet<>();
-        for (Ant ant : thirstyAnts) {
-            if (Math.random() < 0.25) antsToKill.add(ant);
-        }
-        for (Ant ant : hungryAnts) {
-            antsToKill.add(ant); 
-        }
-        for (Ant ant : antsToKill) {
-            if (ant.isAlive()) { 
-                AntType originalType = ant.getType(); 
-                ant.goDie();
-                totalDeaths += 1;
-                this.deadAnts.add(ant);
-                List<Ant> antList = antGroups.get(originalType);
-                if (antList != null) antList.remove(ant);
-            }
-        }
-    }
-
-    public void runAging(){
-        List<Ant> antsToKill = new ArrayList<>();
-        for (List<Ant> antList : antGroups.values()) {
-            for (Ant ant : antList) {
-                ant.setAge(ant.getAge() + 1);
-            }
-        }
-        for (Ant ant : antsToKill) {
-             if (ant.isAlive()) { 
-                AntType originalType = ant.getType(); 
-                ant.goDie();
-                this.deadAnts.add(ant);
-                List<Ant> antList = antGroups.get(originalType);
-                if (antList != null) antList.remove(ant);
-            }
-        }
-    }
-
-    public void runNuptial() {
-        List<Ant> princesses = getPrincesses();
-        List<Ant> drones = getDrones();
-
-        if (!hasUpgrade(GameUnlocks.TYPE_PRINCESS)) return;
-
-        List<Ant> princessesToEvolve = new ArrayList<>();
-        boolean flightOccurred = false;
-        
-        for (Ant princess : princesses) {
-            boolean hasQueenSpace = (getQueens().size() + princessesToEvolve.size()) < this.getQueensCapacity();
-            
-            boolean hasDrones = !drones.isEmpty();            
-            if (hasQueenSpace && hasDrones) {
-                princessesToEvolve.add(princess);
-                Ant deadDrone = drones.remove(drones.size() - 1); 
-                deadDrone.goDie();
-                this.deadAnts.add(deadDrone);
-                flightOccurred = true;
-            } 
-        }
-
-        for (Ant princess : princessesToEvolve) {
-            princess.transform(this, GameConstants.TYPE_QUEEN);
-            getQueens().add(princess);
-        }
-        
-        princesses.removeAll(princessesToEvolve);
-        runSpreading(princesses); 
-        
-        if (flightOccurred) {
-            logEvent("CRITICAL: Nuptial Flight Occurred");
-        }
-    }
-
-    public void runSpreading(List<Ant> princesses) { 
-        // Placeholder
-    }
-    
-    public void runInfection() { 
-        if (this.deadAnts.size() < 100) {
-            return;
-        }
-    }
-
-    public void runLaying() {
-        int layerCount = countAntsByRole(getQueens(), GameConstants.ROLE_LAYER);
-        List<Ant> eggList = getEggs();
-        int spaceAvailable = this.getEggsCapacity() - eggList.size();
-        if (spaceAvailable <= 0) return;   
-        
-        int toLay = Math.min(layerCount * (int) this.getLayingRate(), spaceAvailable);
-        for (int i = 0; i < toLay; i++) {
-            Ant newEgg = new Ant(this, GameConstants.TYPE_EGG);
-            newEgg.setPosition(getRandomPosition(GameConstants.TYPE_EGG.getSprite()));
-            eggList.add(newEgg);
-        }
-    }
-
-    public void runResearch() {
-        if (!hasUpgrade(GameUnlocks.ROLE_RESEARCHER)) return;
-        int researcherCount = countAntsByRole(getQueens(), GameConstants.ROLE_RESEARCHER);
-        this.researchPoints += researcherCount * getResearchSpeed();
-    }
-
-    public void runGraveKeeping() {
-        int graverCount = countAntsByRole(getWorkers(), GameConstants.ROLE_GRAVER);
-        if (graverCount == 0 || getDeadAnts().isEmpty()) return;
-        int canClean = graverCount * (int) getGravingRate();
-        List<Ant> antsToRemove = new ArrayList<>();
-        for (Ant deadAnt : getDeadAnts()) {
-            if (canClean <= 0) break;
-            antsToRemove.add(deadAnt);
-            canClean--;
-        }
-        getDeadAnts().removeAll(antsToRemove);
-    }
-
-    public void runNursing() {
-        int nurseCount = countAntsByRole(getWorkers(), GameConstants.ROLE_NURSE);
-        int babyAntTotal = this.getEggs().size() +  this.getLarvae().size() +  this.getPupae().size();
-
-        if (babyAntTotal <= nurseCount * getNursingRate()) {
-            return;
-        }
-
-        int deficit = babyAntTotal - (nurseCount * (int) getNursingRate());
-        List<AntType> killOrder = Arrays.asList(GameConstants.TYPE_LARVA, GameConstants.TYPE_EGG, GameConstants.TYPE_PUPA);
-
-        int deathCount = 0;
-
-        for (AntType typeToKill : killOrder) {
-            if (deficit <= 0) break;
-            List<Ant> list = antGroups.get(typeToKill);
-            List<Ant> antsToCull = new ArrayList<>();
-            
-            for (Ant ant : list) {
-                if (deficit <= 0) break;
-                if (Math.random() > 0.5) { 
-                    antsToCull.add(ant);
-                    deficit--;
-                } 
-            }
-            
-            for (Ant antToCull : antsToCull) {
-                if (antToCull.isAlive()) {
-                    antToCull.goDie(); 
-                    this.deadAnts.add(antToCull);
-                    list.remove(antToCull);
-                    deathCount++;
-                }
-            }
-        }
-        
-        if (deathCount > 0) {
-            logEvent("WARNING: " + deathCount + " Juveniles Died (Nursing)");
-        }
-    }
-
-    public void runCollecting() {
-        int foragerCount = countAntsByRole(getWorkers(), GameConstants.ROLE_FORAGER);
-        int plantGain = 0;
-        int waterGain = 0;
-        for (int i = 0; i < foragerCount; i++) {
-            if (Math.random() < 0.5) waterGain++;
-            else plantGain++;
-        }
-        int effectivePlantGain = (int) (plantGain * getCollectingRate());
-        int effectiveWaterGain = (int) (waterGain * getCollectingRate());
-        int effectiveResinGain = (int) (plantGain * (getCollectingRate() / 100));
-        this.setPlants(Math.min(this.getPlants() + effectivePlantGain, this.getPlantsCapacity()));
-        this.setWater(Math.min(this.getWater() + effectiveWaterGain, this.getWaterCapacity()));
-        if (hasUpgrade(GameUnlocks.ABILITY_RESIN)) this.setResins(Math.min(this.getResins() + effectiveResinGain, this.getResinsCapacity()));
-        if (hasUpgrade(GameUnlocks.ROLE_HUNTER)) {
-            int hunterCount = countAntsByRole(getSoldiers(), GameConstants.ROLE_HUNTER);
-            int proteinGain = (int) (hunterCount * getCollectingRate());
-            this.setProtein(Math.min(this.getProtein() + proteinGain, this.getProteinCapacity()));
-        }
-    }
-
-    public void runConverting() {
-        int farmerCount = countAntsByRole(getWorkers(), GameConstants.ROLE_FARMER);
-        if (this.getMushrooms() >= this.getMushroomsCapacity()) return;
-        if (Math.random() <= getConversionRate()) {
-            if (this.getPlants() >= farmerCount) {
-                this.setPlants(this.getPlants() - farmerCount);
-                this.setMushrooms(Math.min(this.getMushrooms() + farmerCount, this.getMushroomsCapacity()));
-            }
-        }
-        if (this.getMushrooms() >= this.getMushroomsCapacity()) return;
-        if (Math.random() <= getConversionRate()) {
-            if (this.getProtein() >= farmerCount) {
-                this.setProtein(this.getProtein() - farmerCount);
-                int mushroomGain = farmerCount * 2;
-                this.setMushrooms(Math.min(this.getMushrooms() + mushroomGain, this.getMushroomsCapacity()));
-            }
-        }
-    }
-
-    public void runRanching() {
-        if (!hasUpgrade(GameUnlocks.ROLE_RANCHER)) return;
-        int syrupGain = (int) (aphids); 
-        this.setSyrups(Math.min(this.getSyrups() + syrupGain, this.getSyrupsCapacity()));
-    }
-
-    public void runHerding() {
-         if (!hasUpgrade(GameUnlocks.ROLE_RANCHER)) return;
-        int rancherCount = countAntsByRole(getWorkers(), GameConstants.ROLE_RANCHER);
-        int maxSustainableAphids = getAphidCapacity() * rancherCount;
-        if (aphids < maxSustainableAphids) {
-            this.setAphids(Math.min(this.getAphids() + rancherCount, maxSustainableAphids));
-        } else if (aphids > maxSustainableAphids) {
-            this.aphids = maxSustainableAphids;
-        }
-    }
-
-    public void runBuilding() {
-        if (currentBuildingProject == null) return;
-        int builderCount = getAssignedRoleCount(GameConstants.ROLE_BUILDER);
-        if (builderCount <= 0) return;
-        
-        double efficiency = builderCount / 100.0;
-        if (efficiency <= 0) return;
-
-        this.buildingProgressHours += 1.0; 
-        double requiredHours = currentBuildingProject.getBuildTime() / efficiency;
-        
-        if (this.buildingProgressHours >= requiredHours) {
-            this.buildings.add(currentBuildingProject);
-            logEvent("SUCCESS: Built " + currentBuildingProject.getName());
-            this.currentBuildingProject = null;
-            this.buildingProgressHours = 0.0;
-        }
-    }
-
-    public void runPhysics() {
-        for (List<Ant> antList : antGroups.values()) {
-            for (Ant ant : antList) {
-                if (ant.isAlive()) {
-                    ant.updatePosition();
-                }
-            }
-        }
-    }
-
-    private void assignRandomMovements() {
-        List<AntType> mobileTypes = Arrays.asList(
-            GameConstants.TYPE_WORKER, 
-            GameConstants.TYPE_SOLDIER,
-            GameConstants.TYPE_MAJOR,
-            GameConstants.TYPE_QUEEN,
-            GameConstants.TYPE_PRINCESS,
-            GameConstants.TYPE_DRONE
-        );
-
-        for (AntType type : mobileTypes) {
-            List<Ant> ants = getAntsByType(type);
-            for (Ant ant : ants) {
-               if (ant.getMoveStatus() == GameConstants.MOVE_STATIC && !ant.isMoving()) {
-                    if (Math.random() < 0.001) { 
-                        Point randomDest = getRandomPosition(type.getSprite());
-                        ant.moveTo(randomDest);
-                    }
-                }
-            }
-        }
-    }
-
+    // --- Job Schedulers ---
     public void runMinutelyJobs() {
         this.runConverting();
         this.assignRandomMovements();
@@ -1036,7 +506,7 @@ public class Colony {
 
     public void runHourlyJobs() {
         this.runRoleAssignment();
-        this.runCollecting();;
+        this.runCollecting();
         this.runLaying();
         this.runResearch();
         this.runRanching();
