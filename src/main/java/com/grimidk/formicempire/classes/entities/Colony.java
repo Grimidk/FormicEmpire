@@ -8,6 +8,12 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList; 
 
+import com.grimidk.formicempire.classes.entities.services.ColonyStatsService;
+import com.grimidk.formicempire.classes.entities.services.ColonyResourceService;
+import com.grimidk.formicempire.classes.entities.services.ColonyPopulationService;
+import com.grimidk.formicempire.classes.entities.services.ColonyMaintenanceService;
+import com.grimidk.formicempire.classes.entities.services.ColonyPhysicsService;
+
 import com.grimidk.formicempire.classes.constants.AntRole;
 import com.grimidk.formicempire.classes.constants.AntType;
 import com.grimidk.formicempire.classes.constants.Building;
@@ -18,11 +24,6 @@ import com.grimidk.formicempire.classes.infrasctructure.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 
-import com.grimidk.formicempire.classes.entities.services.ColonyStatsService;
-import com.grimidk.formicempire.classes.entities.services.ColonyResourceService;
-import com.grimidk.formicempire.classes.entities.services.ColonyPopulationService;
-import com.grimidk.formicempire.classes.entities.services.ColonyMaintenanceService;
-import com.grimidk.formicempire.classes.entities.services.ColonyPhysicsService;
 
 public class Colony {
     // --- Basic Data ---
@@ -34,7 +35,7 @@ public class Colony {
     
     // --- Population Data ---
     private final Map<AntType, List<Ant>> antGroups;
-    private final List<Ant> deadAnts; 
+    private final List<Ant> deadAnts;
     private Map<AntRole, Integer> assignedRoleCounts;
     private final Set<Upgrade> upgrades;
     private final Set<Building> buildings;
@@ -58,7 +59,7 @@ public class Colony {
     private float hatchRatePrincess;
 
     // --- Misc. Data ---
-    private int totalDeaths = 0;
+    private int totalDeaths;
     private int gameAreaWidth = 1;
     private int gameAreaHeight = 1;
     private Building currentBuildingProject = null;
@@ -201,7 +202,7 @@ public class Colony {
         this.isPlayer = true;
         this.rank = GameConstants.RANK_COLONY;
         this.antGroups = new HashMap<>();
-        this.deadAnts = new CopyOnWriteArrayList<>(); 
+        this.deadAnts = new CopyOnWriteArrayList<>();
         this.upgrades = new HashSet<>();
         this.buildings = new HashSet<>();
 
@@ -210,7 +211,8 @@ public class Colony {
         loadUpgrades(savefile);
         laodBuildings(savefile);
         initializeAssignedRoles(); 
-        initializeServices();
+
+        initializeServices(); 
         
         Map<String, Integer> savedRoles = savefile.getAssignedRoleCounts();
         if (savedRoles != null && !savedRoles.isEmpty()) {
@@ -250,9 +252,9 @@ public class Colony {
         this.aphids = savefile.getAphids();
         this.researchPoints = savefile.getResearchPoints();
 
-        runRoleAssignment(); 
+        runRoleAssignment();
     }
-    
+        
     // --- Population Initializer ---
     private void populateAntList(List<Ant> list, int count, AntType type) {
         for (int i = 0; i < count; i++) {
@@ -282,6 +284,7 @@ public class Colony {
         return consumed;
     }
 
+    // --- Getters/Setters ---
     public int getId() { return id; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
@@ -327,9 +330,9 @@ public class Colony {
     public void unlockBuilding(Building building) { this.buildings.add(building); }
     public Set<Building> getUnlockedBuildings() { return this.buildings; }
     public Building getCurrentBuildingProject() { return currentBuildingProject; }
-    public void setCurrentBuildingProject(Building b) { this.currentBuildingProject = b; } // Added setter
+    public void setCurrentBuildingProject(Building b) { this.currentBuildingProject = b; }
     public double getBuildingProgressHours() { return buildingProgressHours; }
-    public void setBuildingProgressHours(double d) { this.buildingProgressHours = d; } // Added setter
+    public void setBuildingProgressHours(double d) { this.buildingProgressHours = d; }
 
     public boolean startBuildingProject(Building building) {
         if (currentBuildingProject != null) return false; 
@@ -371,7 +374,6 @@ public class Colony {
             randomizeAllAntPositions();
         }
     }
-    // --- Getters needed by ColonyPhysicsService ---
     public int getGameAreaWidth() { return this.gameAreaWidth; }
     public int getGameAreaHeight() { return this.gameAreaHeight; }
 
@@ -416,11 +418,8 @@ public class Colony {
     public ColonyMaintenanceService getMaintenanceService() { return this.maintenanceService; }
     public ColonyPhysicsService getPhysicsService() { return this.physicsService; }
 
-    // --- Aggregate Stats---
     public int getTotalConsumption(){ return statsService.getTotalConsumption(this); }
     public int getTotalProduction(){ return statsService.getTotalProduction(this); }
-
-    // --- Capacities ---
     public int getPlantsCapacity() { return statsService.getPlantsCapacity(this); }
     public int getMushroomsCapacity() { return statsService.getMushroomsCapacity(this); }
     public int getProteinCapacity() { return statsService.getProteinCapacity(this); }
@@ -431,8 +430,6 @@ public class Colony {
     public int getEggsCapacity() { return statsService.getEggsCapacity(this); }
     public int getQueensCapacity() { return statsService.getQueensCapacity(this); }
     public int getAphidCapacity() { return statsService.getAphidCapacity(this); }
-
-    // --- Rates ---
     public int getResearchSpeed() { return statsService.getResearchSpeed(this); }
     public int getGrowthTime() { return statsService.getGrowthTime(this); }
     public float getLayingRate() { return statsService.getLayingRate(this); }
@@ -441,8 +438,6 @@ public class Colony {
     public float getGravingRate() { return statsService.getGravingRate(this); }
     public float getCollectingRate() { return statsService.getCollectingRate(this); }
     public float getParasiteDetection() { return statsService.getParasiteDetection(this); }
-
-    // --- Base Stats ---
     public int getBaseHealth() { return statsService.getBaseHealth(this); }
     public int getBaseTempRes() { return statsService.getBaseTempRes(this); }
     public int getBaseRegen() { return statsService.getBaseRegen(this); }

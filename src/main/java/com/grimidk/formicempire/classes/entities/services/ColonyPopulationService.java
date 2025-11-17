@@ -14,16 +14,6 @@ import java.util.Map;
 public class ColonyPopulationService {
 
     // --- Role Management ---
-    public int countAntsByRole(List<Ant> antList, AntRole role) {
-        int count = 0;
-        for (Ant ant : antList) {
-            if (role.equals(ant.getRole())) {
-                count++;
-            }
-        }
-        return count;
-    }
-
     private AntRole getDefaultRoleForType(AntType type) {
         if (type == GameConstants.TYPE_WORKER) return GameConstants.ROLE_FORAGER;
         else if (type == GameConstants.TYPE_SOLDIER) return GameConstants.ROLE_HUNTER;
@@ -106,7 +96,7 @@ public class ColonyPopulationService {
             }
         }
         for (Ant ant : antsToEvolve) {
-            ant.transform(colony, newType);
+            ant.transform(colony, newType); 
             destList.add(ant);
         }
         sourceList.removeAll(antsToEvolve);
@@ -136,8 +126,9 @@ public class ColonyPopulationService {
     }
 
     public void runLaying(Colony colony) {
-        int layerCount = countAntsByRole(colony.getQueens(), GameConstants.ROLE_LAYER);
+        int layerCount = colony.getAssignedRoleCount(GameConstants.ROLE_LAYER);
         List<Ant> eggList = colony.getEggs();
+        
         int spaceAvailable = colony.getStatsService().getEggsCapacity(colony) - eggList.size();
         if (spaceAvailable <= 0) return;   
         
@@ -169,7 +160,7 @@ public class ColonyPopulationService {
 
     public void runNursing(Colony colony) {
         ColonyStatsService stats = colony.getStatsService();
-        int nurseCount = countAntsByRole(colony.getWorkers(), GameConstants.ROLE_NURSE);
+        int nurseCount = colony.getAssignedRoleCount(GameConstants.ROLE_NURSE);
         int babyAntTotal = colony.getEggs().size() +  colony.getLarvae().size() +  colony.getPupae().size();
         float nursingRate = stats.getNursingRate(colony);
 

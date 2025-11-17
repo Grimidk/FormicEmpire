@@ -42,7 +42,7 @@ public class Ant {
         this.role = null;
         this.status = GameConstants.STATUS_ALIVE;
         this.moveStatus = GameConstants.MOVE_STATIC;
-        this.maxHealth = (int)(colony.getBaseHealth() * type.getHealtMult());
+        this.maxHealth = (int)(colony.getBaseHealth() * type.getHealtMult()); 
         this.health = this.maxHealth;
         this.age = 0;
         this.tempRes = colony.getBaseTempRes();
@@ -162,7 +162,7 @@ public class Ant {
     public void moveTo(Point p) {
         this.targetPosition = p;
         this.moveStatus = GameConstants.MOVE_WANDER; 
-        calculateRotation();
+        calculateRotation(); 
     }
 
     public boolean isMoving() {
@@ -191,8 +191,6 @@ public class Ant {
             
             this.x = (int) this.preciseX;
             this.y = (int) this.preciseY;
-            
-            calculateRotation();
         }
     }
 

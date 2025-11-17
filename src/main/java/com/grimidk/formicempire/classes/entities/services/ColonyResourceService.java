@@ -1,27 +1,16 @@
 package com.grimidk.formicempire.classes.entities.services;
 
-import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.constants.AntRole;
 import com.grimidk.formicempire.classes.infrasctructure.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.GameUnlocks;
-import java.util.List;
+
 
 public class ColonyResourceService {
-    private int countAntsByRole(List<Ant> antList, AntRole role) {
-        int count = 0;
-        for (Ant ant : antList) {
-            if (role.equals(ant.getRole())) {
-                count++;
-            }
-        }
-        return count;
-    }
-
     public void runCollecting(Colony colony) {
         ColonyStatsService stats = colony.getStatsService();
 
-        int foragerCount = countAntsByRole(colony.getWorkers(), GameConstants.ROLE_FORAGER);
+        int foragerCount = colony.getAssignedRoleCount(GameConstants.ROLE_FORAGER);
+        
         int plantGain = 0;
         int waterGain = 0;
         for (int i = 0; i < foragerCount; i++) {
@@ -41,7 +30,7 @@ public class ColonyResourceService {
         }
         
         if (colony.hasUpgrade(GameUnlocks.ROLE_HUNTER)) {
-            int hunterCount = countAntsByRole(colony.getSoldiers(), GameConstants.ROLE_HUNTER);
+            int hunterCount = colony.getAssignedRoleCount(GameConstants.ROLE_HUNTER);
             int proteinGain = (int) (hunterCount * stats.getCollectingRate(colony));
             colony.setProtein(Math.min(colony.getProtein() + proteinGain, stats.getProteinCapacity(colony)));
         }
@@ -49,7 +38,7 @@ public class ColonyResourceService {
 
     public void runConverting(Colony colony) {
         ColonyStatsService stats = colony.getStatsService();
-        int farmerCount = countAntsByRole(colony.getWorkers(), GameConstants.ROLE_FARMER);
+        int farmerCount = colony.getAssignedRoleCount(GameConstants.ROLE_FARMER);
         
         if (colony.getMushrooms() >= stats.getMushroomsCapacity(colony)) return;
         
@@ -83,7 +72,7 @@ public class ColonyResourceService {
          if (!colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) return;
          
         ColonyStatsService stats = colony.getStatsService();
-        int rancherCount = countAntsByRole(colony.getWorkers(), GameConstants.ROLE_RANCHER);
+        int rancherCount = colony.getAssignedRoleCount(GameConstants.ROLE_RANCHER);
         int maxSustainableAphids = stats.getAphidCapacity(colony) * rancherCount;
         
         if (colony.getAphids() < maxSustainableAphids) {
