@@ -78,16 +78,13 @@ public class AlertManager {
         // }
     }
     
-    private void checkAvailableResearch() {
+private void checkAvailableResearch() {
         if (!colony.hasUpgrade(GameUnlocks.ABILITY_RESEARCH)) return;
-        
-        int points = colony.getResearchPoints();
-        
         for (Upgrade u : GameUnlocks.getUpgrades()) {
-            if (!colony.hasUpgrade(u)) {
-                if (points >= u.getCost() && colony.hasUpgrade(u.getRequirement())) {
+            if (!colony.hasUpgrade(u)) {         
+                if (( u.getCost() > 0) && (u.getRequirement() == null || colony.hasUpgrade(u.getRequirement())) && (colony.getResearchPoints() >= u.getCost()) ) {
                     addAlert("RESEARCH", "Research Available", COL_BLACK, 5000);
-                    return;
+                    return; 
                 }
             }
         }
