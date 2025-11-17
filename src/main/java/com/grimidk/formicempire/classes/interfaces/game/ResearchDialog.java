@@ -19,7 +19,8 @@ public class ResearchDialog extends JDialog {
     private final Colony colony;
     private final JPanel listPanel;
     private final JLabel researchPointsLabel;
-    
+    private final JScrollPane scrollPane;
+
     private final Map<JButton, Upgrade> buttonUpgradeMap = new HashMap<>();
 
     public ResearchDialog(JFrame owner, Colony colony) {
@@ -40,7 +41,7 @@ public class ResearchDialog extends JDialog {
         // Center Panel (list of upgrades)
         listPanel = new JPanel();
         listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
-        JScrollPane scrollPane = new JScrollPane(listPanel);
+        scrollPane = new JScrollPane(listPanel); 
         scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         add(scrollPane, BorderLayout.CENTER);
 
@@ -53,6 +54,10 @@ public class ResearchDialog extends JDialog {
         
         getRootPane().registerKeyboardAction(e -> dispose(),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                JComponent.WHEN_IN_FOCUSED_WINDOW);
+        
+        getRootPane().registerKeyboardAction(e -> dispose(),
+                KeyStroke.getKeyStroke(KeyEvent.VK_Y, 0),
                 JComponent.WHEN_IN_FOCUSED_WINDOW);
         
         pack();
@@ -91,6 +96,8 @@ public class ResearchDialog extends JDialog {
 
         listPanel.revalidate();
         listPanel.repaint();
+        
+        SwingUtilities.invokeLater(() -> scrollPane.getViewport().setViewPosition(new Point(0, 0)));
     }
     
     private void updateResearchPointsLabel() {

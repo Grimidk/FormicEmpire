@@ -6,22 +6,26 @@ import com.grimidk.formicempire.classes.infrasctructure.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.GameUnlocks;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.HashMap; 
 import java.util.List;
+import java.util.Map; 
 
 public class BuildDialog extends JDialog {
 
     private final Colony colony;
     private final JPanel listPanel;
+    private final JScrollPane scrollPane;
     private final JLabel mineralsLabel;
     private final JLabel resinLabel;
     private final JLabel buildersLabel;
-    private JButton buildButton; 
-    private Building buildingToBuild;
+    
+    private final Map<JButton, Building> buttonBuildingMap = new HashMap<>();
 
     public BuildDialog(JFrame owner, Colony colony) {
         super(owner, "Colony Construction", true);
@@ -50,7 +54,7 @@ public class BuildDialog extends JDialog {
         // Center Panel (list of buildings or current project)
         listPanel = new JPanel();
         listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
-        JScrollPane scrollPane = new JScrollPane(listPanel);
+        scrollPane = new JScrollPane(listPanel); 
         scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         add(scrollPane, BorderLayout.CENTER);
 
@@ -65,14 +69,17 @@ public class BuildDialog extends JDialog {
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_IN_FOCUSED_WINDOW);
         
+        getRootPane().registerKeyboardAction(e -> dispose(),
+                KeyStroke.getKeyStroke(KeyEvent.VK_U, 0),
+                JComponent.WHEN_IN_FOCUSED_WINDOW);
+        
         pack();
         setLocationRelativeTo(owner);
     }
 
     private void refreshDialog() {
         listPanel.removeAll();
-        buildButton = null;
-        buildingToBuild = null;
+        buttonBuildingMap.clear();
         
         updateResourceLabels();
 
@@ -109,6 +116,8 @@ public class BuildDialog extends JDialog {
 
         listPanel.revalidate();
         listPanel.repaint();
+        
+        SwingUtilities.invokeLater(() -> scrollPane.getViewport().setViewPosition(new Point(0, 0)));
     }
     
     private void updateResourceLabels() {
@@ -145,8 +154,7 @@ public class BuildDialog extends JDialog {
         JButton purchaseButton = new JButton("Build");
         purchaseButton.setFocusable(false);
         
-        this.buildButton = purchaseButton; 
-        this.buildingToBuild = building; 
+        buttonBuildingMap.put(purchaseButton, building);
         updateBuildButtonState(purchaseButton, building);
 
         purchaseButton.addActionListener(e -> {
@@ -196,6 +204,22 @@ public class BuildDialog extends JDialog {
         JLabel buildersLabel = new JLabel(String.format("%d Builders (%.0f%% speed)", builderCount, efficiency * 100));
         buildersLabel.setHorizontalAlignment(SwingConstants.CENTER);
         panel.add(buildersLabel, BorderLayout.SOUTH);
+        
+        JButton cancelButton = new JButton("Cancel");
+        cancelButton.setFocusable(false);
+        cancelButton.addActionListener(e -> {
+            colony.setMinerals(colony.getMinerals() + project.getMineralCost());
+            colony.setResins(colony.getResins() + project.getResinCost());
+            
+            colony.setCurrentBuildingProject(null);
+            colony.setBuildingProgressHours(0.0);
+            
+            refreshDialog();
+        });
+        
+        JPanel eastPanel = new JPanel(new GridBagLayout()); 
+        eastPanel.add(cancelButton);
+        panel.add(eastPanel, BorderLayout.EAST);
 
         return panel;
     }
@@ -226,32 +250,39 @@ public class BuildDialog extends JDialog {
         
         Building currentProject = colony.getCurrentBuildingProject();
         if (currentProject != null) {
-            if (!(listPanel.getComponent(0) instanceof JPanel) || 
-                !(((TitledBorder)((JPanel)listPanel.getComponent(0)).getBorder()).getTitle().contains(currentProject.getName()))) {
-                refreshDialog();
-            } else {
+            if (listPanel.getComponentCount() > 0 && listPanel.getComponent(0) instanceof JPanel) {
                 JPanel progressPanel = (JPanel) listPanel.getComponent(0);
-                JProgressBar progressBar = (JProgressBar) progressPanel.getComponent(0); 
-                JLabel buildersLabel = (JLabel) progressPanel.getComponent(1); 
-
-                int builderCount = colony.getAssignedRoleCount(GameConstants.ROLE_BUILDER);
-                double efficiency = (builderCount > 0) ? (builderCount / 100.0) : 0.0;
-                double requiredHours = (efficiency > 0) ? (currentProject.getBuildTime() / efficiency) : Double.POSITIVE_INFINITY;
-                double progressHours = colony.getBuildingProgressHours();
-                
-                int progressPercent = 0;
-                if (requiredHours > 0 && !Double.isInfinite(requiredHours)) {
-                    progressPercent = (int) ((progressHours / requiredHours) * 100);
+                Border b = progressPanel.getBorder();
+                if (b instanceof TitledBorder && ((TitledBorder)b).getTitle().contains(currentProject.getName())) {
+                    JProgressBar progressBar = (JProgressBar) progressPanel.getComponent(0); 
+                    JLabel buildersLabel = (JLabel) progressPanel.getComponent(1); 
+    
+                    int builderCount = colony.getAssignedRoleCount(GameConstants.ROLE_BUILDER);
+                    double efficiency = (builderCount > 0) ? (builderCount / 100.0) : 0.0;
+                    double requiredHours = (efficiency > 0) ? (currentProject.getBuildTime() / efficiency) : Double.POSITIVE_INFINITY;
+                    double progressHours = colony.getBuildingProgressHours();
+                    
+                    int progressPercent = 0;
+                    if (requiredHours > 0 && !Double.isInfinite(requiredHours)) {
+                        progressPercent = (int) ((progressHours / requiredHours) * 100);
+                    }
+                    
+                    progressBar.setValue(progressPercent);
+                    progressBar.setString(String.format("%.1f / %.1f Hours", progressHours, requiredHours));
+                    buildersLabel.setText(String.format("%d Builders (%.0f%% speed)", builderCount, efficiency * 100));
+                } else {
+                     refreshDialog(); 
                 }
-                
-                progressBar.setValue(progressPercent);
-                progressBar.setString(String.format("%.1f / %.1f Hours", progressHours, requiredHours));
-                buildersLabel.setText(String.format("%d Builders (%.0f%% speed)", builderCount, efficiency * 100));
+            } else {
+                refreshDialog(); 
             }
         } else {
-            if (buildButton != null && buildingToBuild != null) {
-                updateBuildButtonState(buildButton, buildingToBuild);
+            if (!buttonBuildingMap.isEmpty()) {
+                for (Map.Entry<JButton, Building> entry : buttonBuildingMap.entrySet()) {
+                    updateBuildButtonState(entry.getKey(), entry.getValue());
+                }
             } else if (listPanel.getComponentCount() > 0 && listPanel.getComponent(0) instanceof JPanel) {
+
                 refreshDialog();
             }
         }

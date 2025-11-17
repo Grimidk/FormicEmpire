@@ -33,6 +33,10 @@ public class HatchRateDialog extends JDialog {
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_IN_FOCUSED_WINDOW);
         
+        getRootPane().registerKeyboardAction(e -> dispose(),
+                KeyStroke.getKeyStroke(KeyEvent.VK_P, 0),
+                JComponent.WHEN_IN_FOCUSED_WINDOW);
+        
         pack();
         setLocationRelativeTo(owner);
     }
