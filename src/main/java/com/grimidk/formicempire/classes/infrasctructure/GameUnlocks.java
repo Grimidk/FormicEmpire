@@ -22,7 +22,7 @@ public final class GameUnlocks {
     // -- Roles --
     public static final Upgrade ROLE_FORAGER = new Upgrade(7, "Forager Role", "Nature's Bounty", "Allows workers to collect plants and mushrooms. 1 ant can collect 1 resource per hour.", TYPE_WORKER, 0 );
     public static final Upgrade ROLE_NURSE = new Upgrade(8, "Nurse Role", "Maternity Leave", "Allows workers to take care of juvenile ants. 1 ant can take care of 10 babies, excess babies can perish overnight.", TYPE_WORKER, 0 );
-    public static final Upgrade ROLE_FARMER = new Upgrade(9, "Farmer Role", "Grandpa's Farm", "Allows workers to convert plant and animal matter into mushroom. 1 ant can convert 1 plant and 1 protein per minute, in a 1:1 and 1:2 ratio respectively.", TYPE_WORKER, 0 );
+    public static final Upgrade ROLE_FARMER = new Upgrade(9, "Farmer Role", "Grandpa's Farm", "Allows workers to convert plant and animal matter into mushroom. 1 ant can convert 0.1 plant and 0.1 protein per minute, in a 1:1 and 1:2 ratio respectively.", TYPE_WORKER, 0 );
     public static final Upgrade ROLE_GRAVER = new Upgrade(10, "Grave-Keeper Role", "Grim Reaper", "Allows workers to bury dead ants. 1 ant can take care of 5 dead ants, too many dead ants can attract disease.", TYPE_WORKER, 0 );
     public static final Upgrade ROLE_HUNTER = new Upgrade(11, "Hunter Role", "Hunter Instinct", "Allows soldiers to gather animal matter.  1 ant can collect 1 resource per hour.", TYPE_SOLDIER, 0 );
     public static final Upgrade ROLE_LAYER = new Upgrade(12, "Egg Layer Role", "Ant Factory", "Allows queens to lay new eggs. 1 ant can lay 1 egg per hour.", TYPE_QUEEN, 0 );
@@ -50,7 +50,7 @@ public final class GameUnlocks {
     // -- Stats -- 
     public static final Upgrade STAT_SKELETON = new Upgrade(34, "Basic Skeletons", "Basic Exoskeletons", "The basic defense stats for all the ants in your colony before multipliers. 100 health points, 5 defense points and 1 health point recovered per second.", TYPE_EGG, 0 );
     public static final Upgrade STAT_ACID = new Upgrade(35, "Acid Spiting", "Acidic Spit", "The basic offensive stats for all the ants in your colony before multipliers. 10 attack points, 1 attack per second and 1 speed point.", TYPE_EGG, 0 );
-    public static final Upgrade STAT_LONGEVITY = new Upgrade(36, "Basic Longevity", "Standard Lifespan", "The basic life stats for all the ants in your colony before multipliers. 180 day lifespan, 25% temperature resistance and 4 days to grow per infant stage.", TYPE_EGG, 0 );
+    public static final Upgrade STAT_LONGEVITY = new Upgrade(36, "Basic Longevity", "Standard Lifespan", "The basic life stats for all the ants in your colony before multipliers. 180 day lifespan, 25% temperature resistance, 1 unit of size and consumes 1 food per day.", TYPE_EGG, 0 );
     // -- Abilities --
     public static final Upgrade ABILITY_RESEARCH = new Upgrade(37, "Research", "Micro Microscopes", "Allows you to research more ant technology by using research points, go to the research menu (Y).", ROLE_RESEARCHER, 0 );
     public static final Upgrade ABILITY_BUILD = new Upgrade(38, "Building", "Brick And Mortar", "Allows you to build parts of your colony, you can build in the build menu (U).", ROLE_BUILDER, 0 );

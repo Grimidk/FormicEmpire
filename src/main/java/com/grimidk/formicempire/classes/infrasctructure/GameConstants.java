@@ -35,12 +35,16 @@ public final class GameConstants {
     // --- Misc Icons ---
     public static final ImageIcon ICON_APHID = loadIcon("icons/misc/aphid.png");
     public static final ImageIcon ICON_RESEARCH = loadIcon("icons/misc/research.png");
+    
+    // --- Temperatures ---
     public static final ImageIcon ICON_TEMP_FREEZING = loadIcon("icons/misc/temp/freezing.png");
     public static final ImageIcon ICON_TEMP_COLD = loadIcon("icons/misc/temp/cold.png");
     public static final ImageIcon ICON_TEMP_CHILLY = loadIcon("icons/misc/temp/chilly.png");
     public static final ImageIcon ICON_TEMP_GOOD = loadIcon("icons/misc/temp/good.png");
     public static final ImageIcon ICON_TEMP_WARM = loadIcon("icons/misc/temp/warm.png");
     public static final ImageIcon ICON_TEMP_HOT = loadIcon("icons/misc/temp/hot.png");
+
+    // --- Humidity
     public static final ImageIcon ICON_HUMID_0 =loadIcon("icons/misc/humid/humid0.png");
     public static final ImageIcon ICON_HUMID_1 =loadIcon("icons/misc/humid/humid1.png");
     public static final ImageIcon ICON_HUMID_2 =loadIcon("icons/misc/humid/humid2.png");

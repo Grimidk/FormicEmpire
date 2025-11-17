@@ -361,14 +361,6 @@ public class SaveManager {
                     // --- New Stats ---
                     save.setAphids(c.getAphids());
                     save.setResearchPoints(c.getResearchPoints());
-                    save.setResearchSpeed(c.getResearchSpeed());
-                    save.setGrowthTime(c.getGrowthTime());
-                    save.setLayingRate(c.getLayingRate());
-                    save.setConversionRate(c.getConversionRate());
-                    save.setNursingRate(c.getNursingRate());
-                    save.setGravingRate(c.getGravingRate());
-                    save.setCollectingRate(c.getCollectingRate());
-                    save.setAphidCapacity(c.getAphidCapacity());
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -450,14 +442,6 @@ public class SaveManager {
         // New Stats
         writeJsonLine(w, "aphids", s.getAphids(), false);
         writeJsonLine(w, "researchPoints", s.getResearchPoints(), false);
-        writeJsonLine(w, "researchSpeed", s.getResearchSpeed(), false);
-        writeJsonLine(w, "growthTime", s.getGrowthTime(), false);
-        writeJsonLine(w, "layingRate", s.getLayingRate(), false);
-        writeJsonLine(w, "conversionRate", s.getConversionRate(), false);
-        writeJsonLine(w, "nursingRate", s.getNursingRate(), false);
-        writeJsonLine(w, "gravingRate", s.getGravingRate(), false);
-        writeJsonLine(w, "collectingRate", s.getCollectingRate(), false);
-        writeJsonLine(w, "aphidCapacity", s.getAphidCapacity(), false);
 
         // Upgrades
         w.write("  \"unlockedUpgradeIds\": ");
@@ -568,14 +552,6 @@ public class SaveManager {
             // New Stats
             s.setAphids(Integer.parseInt(m.getOrDefault("aphids", "0")));
             s.setResearchPoints(Integer.parseInt(m.getOrDefault("researchPoints", "0")));
-            s.setResearchSpeed(Integer.parseInt(m.getOrDefault("researchSpeed", "1")));
-            s.setGrowthTime(Integer.parseInt(m.getOrDefault("growthTime", "4")));
-            s.setLayingRate(Integer.parseInt(m.getOrDefault("layingRate", "1")));
-            s.setConversionRate(Float.parseFloat(m.getOrDefault("conversionRate", "1.0")));
-            s.setNursingRate(Float.parseFloat(m.getOrDefault("nursingRate", "10.0")));
-            s.setGravingRate(Float.parseFloat(m.getOrDefault("gravingRate", "5.0")));
-            s.setCollectingRate(Float.parseFloat(m.getOrDefault("collectingRate", "1.0")));
-            s.setAphidCapacity(Integer.parseInt(m.getOrDefault("aphidCapacity", "10")));
 
             // Roles & Upgrades
             String rolesJson = m.getOrDefault("assignedRoleCounts", "{}");

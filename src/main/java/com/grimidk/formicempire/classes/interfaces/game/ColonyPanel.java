@@ -265,7 +265,7 @@ public class ColonyPanel extends JPanel {
         layingRateLabel.setVisible(hasLayer);
         if (hasLayer) {
             int layerCount = colony.getAssignedRoleCount(GameConstants.ROLE_LAYER);
-            int hourlyLayingRate = layerCount * colony.getLayingRate();
+            int hourlyLayingRate = layerCount * (int) colony.getLayingRate();
             int layingRate = hourlyLayingRate * 24;
             layingRateLabel.setText(String.format("Laying Rate: %d/day", layingRate));
         }

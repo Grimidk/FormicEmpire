@@ -53,14 +53,6 @@ public class Savefile implements Serializable {
 
     private int aphids;
     private int researchPoints;
-    private int researchSpeed;
-    private int growthTime;
-    private int layingRate;
-    private float conversionRate;
-    private float nursingRate;
-    private float gravingRate;
-    private float collectingRate;
-    private int aphidCapacity;
 
     public Savefile(int id, String name) {
         this.id = id;
@@ -82,14 +74,6 @@ public class Savefile implements Serializable {
 
         this.aphids = 0;
         this.researchPoints = 0;
-        this.researchSpeed = 1;
-        this.growthTime = 4;
-        this.layingRate = 1;
-        this.conversionRate = 0.1f;
-        this.nursingRate = 10f;
-        this.gravingRate = 5f;
-        this.collectingRate = 1f;
-        this.aphidCapacity = 10;
     }
 
     public int getId() {
@@ -355,28 +339,4 @@ public class Savefile implements Serializable {
 
     public int getResearchPoints() { return researchPoints; }
     public void setResearchPoints(int researchPoints) { this.researchPoints = researchPoints; }
-
-    public int getResearchSpeed() { return researchSpeed; }
-    public void setResearchSpeed(int researchSpeed) { this.researchSpeed = researchSpeed; }
-
-    public int getGrowthTime() { return growthTime; }
-    public void setGrowthTime(int growthTime) { this.growthTime = growthTime; }
-
-    public int getLayingRate() { return layingRate; }
-    public void setLayingRate(int layingRate) { this.layingRate = layingRate; }
-
-    public float getConversionRate() { return conversionRate; }
-    public void setConversionRate(float conversionRate) { this.conversionRate = conversionRate; }
-
-    public float getNursingRate() { return nursingRate; }
-    public void setNursingRate(float nursingRate) { this.nursingRate = nursingRate; }
-
-    public float getGravingRate() { return gravingRate; }
-    public void setGravingRate(float gravingRate) { this.gravingRate = gravingRate; }
-
-    public float getCollectingRate() { return collectingRate; }
-    public void setCollectingRate(float collectingRate) { this.collectingRate = collectingRate; }
-
-    public int getAphidCapacity() { return aphidCapacity; }
-    public void setAphidCapacity(int aphidCapacity) { this.aphidCapacity = aphidCapacity; }
 }

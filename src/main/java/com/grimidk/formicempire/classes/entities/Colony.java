@@ -23,12 +23,14 @@ import com.grimidk.formicempire.classes.infrasctructure.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 
 public class Colony {
+    // Basic 
     private final int id;
     private String name;
     private Species species;
     private boolean isPlayer;
     private ColonyRank rank;
     
+    // Helper structures
     private final Map<AntType, List<Ant>> antGroups;
     private final List<Ant> deadAnts; 
     private Map<AntRole, Integer> assignedRoleCounts;
@@ -43,34 +45,8 @@ public class Colony {
     private int syrups;
     private int resins;
     private int minerals;
-
-    // Capacities
-    private int aphidCapacity;
     private int aphids;
-
-    // Research
-    private int researchSpeed;
     private int researchPoints;
-
-    // Rates
-    private int growthTime;
-    private int layingRate;
-    private float conversionRate;
-    private float nursingRate;
-    private float gravingRate;
-    private float collectingRate;
-    private int parasiteDetection;
-
-    // Base Stats
-    private int baseHealth;
-    private int baseTempRes;
-    private int baseRegen;
-    private int baseConsumption;
-    private int baseAttack;
-    private int baseAttackSpeed;
-    private int baseDefense;
-    private int baseSpeed;  
-    private int baseSize;
 
     // Hatch Rates
     private float hatchRateWorker;
@@ -79,6 +55,10 @@ public class Colony {
     private float hatchRateDrone;
     private float hatchRatePrincess;
 
+    // Misc. 
+    private int totalDeaths;
+
+    // Panel size
     private int gameAreaWidth = 1;
     private int gameAreaHeight = 1;
     
@@ -108,24 +88,7 @@ public class Colony {
     }
     
     private void initializeDefaults() {
-        this.researchSpeed = 1;
         this.researchPoints = 0;
-        this.growthTime = 4;
-        this.layingRate = 1;
-        this.conversionRate = 0.1f;
-        this.nursingRate = 10f;
-        this.gravingRate = 5f;
-        this.collectingRate = 1f;
-        this.parasiteDetection = 10;
-        this.baseHealth = 100;
-        this.baseTempRes = 25;
-        this.baseRegen = 1;
-        this.baseConsumption = 1;
-        this.baseAttack = 10;
-        this.baseAttackSpeed = 1;
-        this.baseDefense = 5;
-        this.baseSpeed = 1;
-        this.baseSize = 1;
         this.plants = 0;
         this.mushrooms = 0;
         this.protein = 0;           
@@ -133,7 +96,6 @@ public class Colony {
         this.syrups = 0;
         this.resins = 0;
         this.minerals = 0;
-        this.aphidCapacity = 10;
         this.aphids = 0;
         this.hatchRateWorker = 100.0f;
         this.hatchRateSoldier = 0.0f;
@@ -269,14 +231,6 @@ public class Colony {
 
         this.aphids = savefile.getAphids();
         this.researchPoints = savefile.getResearchPoints();
-        this.researchSpeed = savefile.getResearchSpeed();
-        this.growthTime = savefile.getGrowthTime();
-        this.layingRate = savefile.getLayingRate();
-        this.conversionRate = savefile.getConversionRate();
-        this.nursingRate = savefile.getNursingRate();
-        this.gravingRate = savefile.getGravingRate();
-        this.collectingRate = savefile.getCollectingRate();
-        this.aphidCapacity = savefile.getAphidCapacity();
 
         runRoleAssignment(); 
     }
@@ -406,14 +360,14 @@ public class Colony {
     }
 
     public int getTotalProduction(){
-        int foragerCount = this.countAntsByRole(getWorkers(), GameConstants.ROLE_FORAGER);
-        int hunterCount = this.countAntsByRole(getSoldiers(), GameConstants.ROLE_HUNTER);
-        int farmerCount = this.countAntsByRole(getWorkers(), GameConstants.ROLE_FARMER);
-        double plantCollection = foragerCount * 0.5 * this.getCollectingRate();
-        double proteinCollection = hunterCount * this.getCollectingRate();
+        int foragerCount = countAntsByRole(getWorkers(), GameConstants.ROLE_FORAGER);
+        int hunterCount = countAntsByRole(getSoldiers(), GameConstants.ROLE_HUNTER);
+        int farmerCount = countAntsByRole(getWorkers(), GameConstants.ROLE_FARMER);
+        double plantCollection = foragerCount * 0.5 * getCollectingRate();
+        double proteinCollection = hunterCount * getCollectingRate();
         int collectionPerHour = (int) (plantCollection + proteinCollection);
-        int totalProductionRate = (int) (Math.min((conversionRate * farmerCount) * 60, collectionPerHour)) * 3 * 24; 
-        return Math.min(totalProductionRate, this.getMushroomsCapacity());
+        int totalProductionRate = (int) (Math.min((getConversionRate() * farmerCount) * 60, collectionPerHour)) * 3 * 24; 
+        return Math.min(totalProductionRate, getMushroomsCapacity());
     }
     
     public int getPlants() { return plants; }
@@ -485,48 +439,82 @@ public class Colony {
         } else if (this.hasBuilding(GameUnlocks.ROYAL_CHAMBER_0)) {return 1; 
         } else {return 0;}
     }
-    public int getAphidCapacity() { return aphidCapacity; }
-    public void setAphidCapacity(int aphidCapacity) { this.aphidCapacity = aphidCapacity; }
+    public int getAphidCapacity() {
+        if (this.hasUpgrade(GameUnlocks.ROLE_RANCHER)) {return 10;
+        } else {return 0;}
+    }
     public int getAphids() { return aphids; }
     public void setAphids(int aphids) { this.aphids = aphids; }
-
-    public int getResearchSpeed() { return researchSpeed; }
-    public void setResearchSpeed(int researchSpeed) { this.researchSpeed = researchSpeed; }
+    public int getResearchSpeed() {
+        if (this.hasUpgrade(GameUnlocks.ROLE_RESEARCHER)) {return 1;
+        } else {return 0;}
+    }
     public int getResearchPoints() { return researchPoints; }
     public void setResearchPoints(int researchPoints) { this.researchPoints = researchPoints; }
-    public int getGrowthTime() { return growthTime; }
-    public void setGrowthTime(int growthTime) { this.growthTime = growthTime; }
-    public int getLayingRate() { return layingRate; }
-    public void setLayingRate(int layingRate) { this.layingRate = layingRate; }
-    public float getConversionRate() { return conversionRate; }
-    public void setConversionRate(float conversionRate) { this.conversionRate = conversionRate; }
-    public float getNursingRate() { return nursingRate; }
-    public void setNursingRate(float nursingRate) { this.nursingRate = nursingRate; }
-    public float getGravingRate() { return gravingRate; }
-    public void setGravingRate(float gravingRate) { this.gravingRate = gravingRate; }
-    public float getCollectingRate() { return collectingRate; }
-    public void setCollectingRate(float collectingRate) { this.collectingRate = collectingRate; }
-    public int getParasiteDetection() { return parasiteDetection; }
-    public void setParasiteDetection(int parasiteDetection) { this.parasiteDetection = parasiteDetection; }
-
-    public int getBaseHealth() { return baseHealth; }
-    public void setBaseHealth(int baseHealth) { this.baseHealth = baseHealth; }
-    public int getBaseTempRes() { return baseTempRes; }
-    public void setBaseTempRes(int baseTempRes) { this.baseTempRes = baseTempRes; }
-    public int getBaseRegen() { return baseRegen; }
-    public void setBaseRegen(int baseRegen) { this.baseRegen = baseRegen; }
-    public int getBaseConsumption() { return baseConsumption; }
-    public void setBaseConsumption(int baseConsumption) { this.baseConsumption = baseConsumption; }
-    public int getBaseAttack() { return baseAttack; }
-    public void setBaseAttack(int baseAttack) { this.baseAttack = baseAttack; }
-    public int getBaseAttackSpeed() { return baseAttackSpeed; }
-    public void setBaseAttackSpeed(int baseAttackSpeed) { this.baseAttackSpeed = baseAttackSpeed; }
-    public int getBaseDefense() { return baseDefense; }
-    public void setBaseDefense(int baseDefense) { this.baseDefense = baseDefense; }
-    public int getBaseSpeed() { return baseSpeed; }
-    public void setBaseSpeed(int baseSpeed) { this.baseSpeed = baseSpeed; }
-    public int getBaseSize() { return baseSize; }
-    public void setBaseSize(int baseSize) { this.baseSize = baseSize; }
+    public int getGrowthTime() {
+        if (this.hasUpgrade(GameUnlocks.TYPE_EGG)) {return 4;
+        } else {return 0;}
+    }
+    public float getLayingRate() {
+        if (this.hasUpgrade(GameUnlocks.ROLE_LAYER)) {return 1f;
+        } else {return 0;}
+    }
+    public float getConversionRate() {
+        if (this.hasUpgrade(GameUnlocks.ROLE_FARMER)) {return 0.1f;
+        } else {return 0;}
+    }
+    public float getNursingRate() {
+        if (this.hasUpgrade(GameUnlocks.ROLE_NURSE)) {return 10f;
+        } else {return 0;}
+    }
+    public float getGravingRate() {
+        if (this.hasUpgrade(GameUnlocks.ROLE_GRAVER)) {return 5f;
+        } else {return 0;}
+    }
+    public float getCollectingRate() {
+        if (this.hasUpgrade(GameUnlocks.ROLE_FORAGER)) {return 1f;
+        } else {return 0;}
+    }
+    public float getParasiteDetection() {
+        if (this.hasUpgrade(GameUnlocks.ROLE_POLICE)) {return 10f;
+        } else {return 0;}
+    }
+    public int getBaseHealth() {
+        if (this.hasUpgrade(GameUnlocks.STAT_SKELETON)) {return 100;
+        } else {return 0;}
+    }
+    public int getBaseTempRes() {
+        if (this.hasUpgrade(GameUnlocks.STAT_LONGEVITY)) {return 25;
+        } else {return 0;}
+    }
+    public int getBaseRegen() {
+        if (this.hasUpgrade(GameUnlocks.STAT_SKELETON)) {return 1;
+        } else {return 0;}
+    }
+    public int getBaseConsumption() {
+        if (this.hasUpgrade(GameUnlocks.STAT_LONGEVITY)) {return 1;
+        } else {return 0;}
+    }
+    public int getBaseAttack() {
+        if (this.hasUpgrade(GameUnlocks.STAT_ACID)) {return 10;
+        } else {return 0;}
+    }
+    public int getBaseAttackSpeed() {
+        if (this.hasUpgrade(GameUnlocks.STAT_ACID)) {return 1;
+        } else {return 0;}
+    }
+    public int getBaseDefense() {
+        if (this.hasUpgrade(GameUnlocks.STAT_SKELETON)) {return 5;
+        } else {return 0;}
+    }
+    public int getBaseSpeed() {
+        if (this.hasUpgrade(GameUnlocks.STAT_ACID)) {return 1;
+        } else {return 0;}
+    }
+    public int getBaseSize(){
+        if (this.hasUpgrade(GameUnlocks.STAT_LONGEVITY)) {return 1;
+        } else {return 0;}
+    }
 
     public void setGameAreaDimensions(int width, int height) {
         boolean firstTimeUpdate = (this.gameAreaWidth == 1 && this.gameAreaHeight == 1 && width > 1 && height > 1);
@@ -567,6 +555,9 @@ public class Colony {
         else if (type == GameConstants.TYPE_DRONE) this.hatchRateDrone = rate;
         else if (type == GameConstants.TYPE_PRINCESS) this.hatchRatePrincess = rate;
     }
+
+    public int getTotalDeaths () { return totalDeaths; }
+    public void setTotalDeaths (int totalDeaths) { this.totalDeaths = totalDeaths; }
 
     public void startColony() {
         List<Ant> workerList = getWorkers();
@@ -784,6 +775,7 @@ public class Colony {
             if (ant.isAlive()) { 
                 AntType originalType = ant.getType(); 
                 ant.goDie();
+                totalDeaths += 1;
                 this.deadAnts.add(ant);
                 List<Ant> antList = antGroups.get(originalType);
                 if (antList != null) antList.remove(ant);
@@ -860,7 +852,7 @@ public class Colony {
         int spaceAvailable = this.getEggsCapacity() - eggList.size();
         if (spaceAvailable <= 0) return;   
         
-        int toLay = Math.min(layerCount * this.getLayingRate(), spaceAvailable);
+        int toLay = Math.min(layerCount * (int) this.getLayingRate(), spaceAvailable);
         for (int i = 0; i < toLay; i++) {
             Ant newEgg = new Ant(this, GameConstants.TYPE_EGG);
             newEgg.setPosition(getRandomPosition(GameConstants.TYPE_EGG.getSprite()));
@@ -871,13 +863,13 @@ public class Colony {
     public void runResearch() {
         if (!hasUpgrade(GameUnlocks.ROLE_RESEARCHER)) return;
         int researcherCount = countAntsByRole(getQueens(), GameConstants.ROLE_RESEARCHER);
-        this.researchPoints += researcherCount * researchSpeed;
+        this.researchPoints += researcherCount * getResearchSpeed();
     }
 
     public void runGraveKeeping() {
         int graverCount = countAntsByRole(getWorkers(), GameConstants.ROLE_GRAVER);
         if (graverCount == 0 || getDeadAnts().isEmpty()) return;
-        int canClean = graverCount * (int) gravingRate;
+        int canClean = graverCount * (int) getGravingRate();
         List<Ant> antsToRemove = new ArrayList<>();
         for (Ant deadAnt : getDeadAnts()) {
             if (canClean <= 0) break;
@@ -891,11 +883,11 @@ public class Colony {
         int nurseCount = countAntsByRole(getWorkers(), GameConstants.ROLE_NURSE);
         int babyAntTotal = this.getEggs().size() +  this.getLarvae().size() +  this.getPupae().size();
 
-        if (babyAntTotal <= nurseCount * nursingRate) {
+        if (babyAntTotal <= nurseCount * getNursingRate()) {
             return;
         }
 
-        int deficit = babyAntTotal - (nurseCount * (int) nursingRate);
+        int deficit = babyAntTotal - (nurseCount * (int) getNursingRate());
         List<AntType> killOrder = Arrays.asList(GameConstants.TYPE_LARVA, GameConstants.TYPE_EGG, GameConstants.TYPE_PUPA);
 
         int deathCount = 0;
@@ -936,15 +928,15 @@ public class Colony {
             if (Math.random() < 0.5) waterGain++;
             else plantGain++;
         }
-        int effectivePlantGain = (int) (plantGain * collectingRate);
-        int effectiveWaterGain = (int) (waterGain * collectingRate);
-        int effectiveResinGain = (int) (plantGain * (collectingRate / 100));
+        int effectivePlantGain = (int) (plantGain * getCollectingRate());
+        int effectiveWaterGain = (int) (waterGain * getCollectingRate());
+        int effectiveResinGain = (int) (plantGain * (getCollectingRate() / 100));
         this.setPlants(Math.min(this.getPlants() + effectivePlantGain, this.getPlantsCapacity()));
         this.setWater(Math.min(this.getWater() + effectiveWaterGain, this.getWaterCapacity()));
         if (hasUpgrade(GameUnlocks.ABILITY_RESIN)) this.setResins(Math.min(this.getResins() + effectiveResinGain, this.getResinsCapacity()));
         if (hasUpgrade(GameUnlocks.ROLE_HUNTER)) {
             int hunterCount = countAntsByRole(getSoldiers(), GameConstants.ROLE_HUNTER);
-            int proteinGain = (int) (hunterCount * collectingRate);
+            int proteinGain = (int) (hunterCount * getCollectingRate());
             this.setProtein(Math.min(this.getProtein() + proteinGain, this.getProteinCapacity()));
         }
     }
@@ -952,14 +944,14 @@ public class Colony {
     public void runConverting() {
         int farmerCount = countAntsByRole(getWorkers(), GameConstants.ROLE_FARMER);
         if (this.getMushrooms() >= this.getMushroomsCapacity()) return;
-        if (Math.random() <= conversionRate) {
+        if (Math.random() <= getConversionRate()) {
             if (this.getPlants() >= farmerCount) {
                 this.setPlants(this.getPlants() - farmerCount);
                 this.setMushrooms(Math.min(this.getMushrooms() + farmerCount, this.getMushroomsCapacity()));
             }
         }
         if (this.getMushrooms() >= this.getMushroomsCapacity()) return;
-        if (Math.random() <= conversionRate) {
+        if (Math.random() <= getConversionRate()) {
             if (this.getProtein() >= farmerCount) {
                 this.setProtein(this.getProtein() - farmerCount);
                 int mushroomGain = farmerCount * 2;
@@ -977,7 +969,7 @@ public class Colony {
     public void runHerding() {
          if (!hasUpgrade(GameUnlocks.ROLE_RANCHER)) return;
         int rancherCount = countAntsByRole(getWorkers(), GameConstants.ROLE_RANCHER);
-        int maxSustainableAphids = aphidCapacity * rancherCount;
+        int maxSustainableAphids = getAphidCapacity() * rancherCount;
         if (aphids < maxSustainableAphids) {
             this.setAphids(Math.min(this.getAphids() + rancherCount, maxSustainableAphids));
         } else if (aphids > maxSustainableAphids) {
