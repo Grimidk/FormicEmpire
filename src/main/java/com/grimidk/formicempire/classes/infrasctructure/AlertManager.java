@@ -21,6 +21,7 @@ public class AlertManager {
     private final Color COL_GREEN = new Color(0, 120, 0);
     private final Color COL_ORANGE = new Color(200, 100, 0);
     private final Color COL_BLUE = new Color(0, 0, 180);
+    private final Color COL_BLACK = new Color(0,0,0);
 
     public AlertManager(Colony colony, AlertPanel panel) {
         this.colony = colony;
@@ -38,11 +39,11 @@ public class AlertManager {
         List<String> events = colony.consumeEvents();
         for (String msg : events) {
             if (msg.startsWith("CRITICAL")) {
-                addAlert("CRIT", msg.replace("CRITICAL: ", ""), COL_RED, 30000);
+                addAlert("CRIT", msg.replace("CRITICAL: ", ""), COL_BLACK, 30000);
             } else if (msg.startsWith("SUCCESS")) {
-                addAlert("SUCC", msg.replace("SUCCESS: ", ""), COL_GREEN, 15000);
+                addAlert("SUCC", msg.replace("SUCCESS: ", ""), COL_BLACK, 15000);
             } else if (msg.startsWith("WARNING")) {
-                addAlert("WARN", msg.replace("WARNING: ", ""), COL_ORANGE, 20000);
+                addAlert("WARN", msg.replace("WARNING: ", ""), COL_BLACK, 20000);
             } else {
                 addAlert("INFO", msg, Color.BLACK, 10000);
             }
@@ -51,6 +52,8 @@ public class AlertManager {
         checkResourceWarning();
         checkAvailableResearch();
         checkAvailableBuildings();
+        checkUnassignedAnts();
+        checkBodyPile();
 
         SwingUtilities.invokeLater(() -> panel.updateAlerts(new ArrayList<>(activeAlerts)));
     }
@@ -65,11 +68,14 @@ public class AlertManager {
         int consumption = colony.getTotalConsumption();
         
         if (consumption > production && colony.getMushrooms() < consumption * 24) {
-             addAlert("STARVE", "Starvation Risk", COL_RED, 5000);
+            addAlert("STARVE", "Starvation Risk", COL_BLACK, 5000);
         }
     }
 
     private void checkUnassignedAnts() {
+        // if (colony.getUnassignedAnts >= 0) {
+        //      addAlert("JOBS", "There are unassigned ants: " + colony.getUnassignedAnts, COL_BLACK, 5000);
+        // }
     }
     
     private void checkAvailableResearch() {
@@ -79,9 +85,9 @@ public class AlertManager {
         
         for (Upgrade u : GameUnlocks.getUpgrades()) {
             if (!colony.hasUpgrade(u)) {
-                if (points >= u.getCost()) {
-                     addAlert("RESEARCH", "Research Available", COL_BLUE, 5000);
-                     return;
+                if (points >= u.getCost() && colony.hasUpgrade(u.getRequirement())) {
+                    addAlert("RESEARCH", "Research Available", COL_BLACK, 5000);
+                    return;
                 }
             }
         }
@@ -93,11 +99,17 @@ public class AlertManager {
 
         for (Building b : GameUnlocks.getBuildings()) {
             if (!colony.hasBuilding(b)) {
-                if (colony.getMinerals() >= b.getMineralCost() && colony.getResins() >= b.getResinCost()) {
-                     addAlert("BUILD", "Can Build: " + b.getName(), COL_GREEN, 5000);
-                     return; 
+                if (colony.getMinerals() >= b.getMineralCost() && colony.getResins() >= b.getResinCost() && colony.hasBuilding(b.getRequirement())) {
+                    addAlert("BUILD", "Can Build: " + b.getName(), COL_BLACK, 5000);
+                    return; 
                 }
             }
+        }
+    }
+
+    private void checkBodyPile() {
+        if (colony.getDeadAnts().size() >= 500) {
+            addAlert("DEAD", "Infection risk, too many bodies: " + colony.getDeadAnts().size(), COL_BLACK, 5000);
         }
     }
 }
