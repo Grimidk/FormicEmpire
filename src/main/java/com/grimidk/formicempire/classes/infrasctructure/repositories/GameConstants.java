@@ -1,18 +1,18 @@
-package com.grimidk.formicempire.classes.infrasctructure;
+package com.grimidk.formicempire.classes.infrasctructure.repositories;
 
-import com.grimidk.formicempire.classes.constants.AntRole;
-import com.grimidk.formicempire.classes.constants.AntStatus;
-import com.grimidk.formicempire.classes.constants.AntSubType;
-import com.grimidk.formicempire.classes.constants.AntType;
-import com.grimidk.formicempire.classes.constants.Biome;
 import com.grimidk.formicempire.classes.constants.ColonyRank;
-import com.grimidk.formicempire.classes.constants.MoonPhase;
-import com.grimidk.formicempire.classes.constants.MoveStatus;
 import com.grimidk.formicempire.classes.constants.ResourceType;
-import com.grimidk.formicempire.classes.constants.Season;
 import com.grimidk.formicempire.classes.constants.Species;
-import com.grimidk.formicempire.classes.constants.TimeOfDay;
-import com.grimidk.formicempire.classes.constants.Weather;
+import com.grimidk.formicempire.classes.constants.ant.AntRole;
+import com.grimidk.formicempire.classes.constants.ant.AntStatus;
+import com.grimidk.formicempire.classes.constants.ant.AntSubType;
+import com.grimidk.formicempire.classes.constants.ant.AntType;
+import com.grimidk.formicempire.classes.constants.ant.MoveStatus;
+import com.grimidk.formicempire.classes.constants.world.Biome;
+import com.grimidk.formicempire.classes.constants.world.MoonPhase;
+import com.grimidk.formicempire.classes.constants.world.Season;
+import com.grimidk.formicempire.classes.constants.world.TimeOfDay;
+import com.grimidk.formicempire.classes.constants.world.Weather;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -1,7 +1,7 @@
 package com.grimidk.formicempire.classes.interfaces;
 
-import com.grimidk.formicempire.classes.infrasctructure.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
+import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 
 import javax.swing.*;
 import java.awt.*;

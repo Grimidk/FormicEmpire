@@ -1,4 +1,4 @@
-package com.grimidk.formicempire.classes.constants;
+package com.grimidk.formicempire.classes.constants.world;
 
 import javax.swing.ImageIcon;
 

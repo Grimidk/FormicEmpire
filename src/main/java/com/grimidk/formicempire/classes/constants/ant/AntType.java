@@ -1,11 +1,9 @@
-package com.grimidk.formicempire.classes.constants;
+package com.grimidk.formicempire.classes.constants.ant;
 
 import javax.swing.ImageIcon;
 
-public class AntSubType {
-
+public class AntType {
     private final int id;
-    private final AntType antType;
     private final String name;
     private final float healtMult;
     private final float attackMult;
@@ -15,11 +13,11 @@ public class AntSubType {
     private final float defenseMult;
     private final float speedMult;
     private final float sizeMult; 
-    private ImageIcon icon;
+    private final ImageIcon icon;
+    private final ImageIcon sprite;
 
-    public AntSubType(int id, AntType antType, String name, float healtMult, float attackMult, float regenMult, float consumptionMult, float attackSpeedMult, float defenseMult, float speedMult, float sizeMult) {
+    public AntType(int id, String name, float healtMult, float attackMult, float regenMult, float consumptionMult, float attackSpeedMult, float defenseMult, float speedMult, float sizeMult, ImageIcon icon, ImageIcon sprite) {
         this.id = id;
-        this.antType = antType;
         this.name = name;
         this.healtMult = healtMult;
         this.attackMult = attackMult;
@@ -30,14 +28,11 @@ public class AntSubType {
         this.speedMult = speedMult;
         this.sizeMult = sizeMult;
         this.icon = icon;
+        this.sprite = sprite;
     }
 
     public int getId() {
         return id;
-    }
-
-    public AntType getAntType() {
-        return antType;
     }
 
     public String getName() {
@@ -78,5 +73,9 @@ public class AntSubType {
 
     public ImageIcon getIcon() {
         return icon;
+    }
+
+    public ImageIcon getSprite() {
+        return sprite;
     }
 }

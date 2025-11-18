@@ -1,4 +1,4 @@
-package com.grimidk.formicempire.classes.interfaces.game;
+package com.grimidk.formicempire.classes.interfaces.game.panels;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;

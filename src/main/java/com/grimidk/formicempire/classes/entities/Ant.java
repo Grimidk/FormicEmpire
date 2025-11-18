@@ -1,11 +1,11 @@
 package com.grimidk.formicempire.classes.entities;
 
-import com.grimidk.formicempire.classes.constants.AntRole;
-import com.grimidk.formicempire.classes.constants.AntStatus;
-import com.grimidk.formicempire.classes.constants.AntSubType;
-import com.grimidk.formicempire.classes.constants.AntType;
-import com.grimidk.formicempire.classes.constants.MoveStatus;
-import com.grimidk.formicempire.classes.infrasctructure.GameConstants;
+import com.grimidk.formicempire.classes.constants.ant.AntRole;
+import com.grimidk.formicempire.classes.constants.ant.AntStatus;
+import com.grimidk.formicempire.classes.constants.ant.AntSubType;
+import com.grimidk.formicempire.classes.constants.ant.AntType;
+import com.grimidk.formicempire.classes.constants.ant.MoveStatus;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 
 import java.awt.Point;
 

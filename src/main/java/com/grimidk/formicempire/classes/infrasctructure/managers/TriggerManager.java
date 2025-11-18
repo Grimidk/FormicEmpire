@@ -1,8 +1,11 @@
-package com.grimidk.formicempire.classes.infrasctructure;
+package com.grimidk.formicempire.classes.infrasctructure.managers;
 
+import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.entities.World;
-import com.grimidk.formicempire.classes.constants.Upgrade;
+import com.grimidk.formicempire.classes.infrasctructure.Engine;
+import com.grimidk.formicempire.classes.infrasctructure.World;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
+
 import javax.swing.SwingUtilities;
 import java.util.ArrayList;
 import java.util.List;

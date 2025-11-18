@@ -1,22 +1,22 @@
 package com.grimidk.formicempire.classes.interfaces;
 
 import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.entities.World;
-import com.grimidk.formicempire.classes.infrasctructure.AlertManager;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
-import com.grimidk.formicempire.classes.infrasctructure.GameUnlocks;
-import com.grimidk.formicempire.classes.infrasctructure.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
-import com.grimidk.formicempire.classes.infrasctructure.TriggerManager;
-import com.grimidk.formicempire.classes.interfaces.game.AlertPanel; 
-import com.grimidk.formicempire.classes.interfaces.game.BuildDialog;
-import com.grimidk.formicempire.classes.interfaces.game.ColonyPanel;
-import com.grimidk.formicempire.classes.interfaces.game.ControlPanel;
-import com.grimidk.formicempire.classes.interfaces.game.GameAreaPanel;
-import com.grimidk.formicempire.classes.interfaces.game.HatchRateDialog;
-import com.grimidk.formicempire.classes.interfaces.game.ResearchDialog;
-import com.grimidk.formicempire.classes.interfaces.game.RoleManagementDialog;
-import com.grimidk.formicempire.classes.interfaces.game.WorldPanel;
+import com.grimidk.formicempire.classes.infrasctructure.World;
+import com.grimidk.formicempire.classes.infrasctructure.managers.AlertManager;
+import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
+import com.grimidk.formicempire.classes.infrasctructure.managers.TriggerManager;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
+import com.grimidk.formicempire.classes.interfaces.game.dialogs.BuildDialog;
+import com.grimidk.formicempire.classes.interfaces.game.dialogs.HatchRateDialog;
+import com.grimidk.formicempire.classes.interfaces.game.dialogs.ResearchDialog;
+import com.grimidk.formicempire.classes.interfaces.game.dialogs.RoleManagementDialog;
+import com.grimidk.formicempire.classes.interfaces.game.panels.AlertPanel;
+import com.grimidk.formicempire.classes.interfaces.game.panels.ColonyPanel;
+import com.grimidk.formicempire.classes.interfaces.game.panels.ControlPanel;
+import com.grimidk.formicempire.classes.interfaces.game.panels.GameAreaPanel;
+import com.grimidk.formicempire.classes.interfaces.game.panels.WorldPanel;
 
 import javax.swing.*;
 import java.awt.*;

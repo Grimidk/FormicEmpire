@@ -1,17 +1,15 @@
-package com.grimidk.formicempire.classes.constants;
+package com.grimidk.formicempire.classes.constants.ant;
 
 import javax.swing.ImageIcon;
 
-public class MoveStatus {
+public class AntStatus {
     private final int id;
     private final String name;
-    private final float speedMult;
-    private ImageIcon icon;
-   
-    public MoveStatus(int id, String name, float speedMult) {
+    private final ImageIcon icon;
+
+    public AntStatus(int id, String name, ImageIcon icon) {
         this.id = id;
         this.name = name;
-        this.speedMult = speedMult;
         this.icon = icon;
     }
 
@@ -21,10 +19,6 @@ public class MoveStatus {
 
     public String getName() {
         return name;
-    }
-
-    public float getSpeedMult() {
-        return speedMult;
     }
 
     public ImageIcon getIcon() {

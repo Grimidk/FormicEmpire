@@ -1,12 +1,12 @@
-package com.grimidk.formicempire.classes.infrasctructure;
-
-import com.grimidk.formicempire.classes.constants.Building;
-import com.grimidk.formicempire.classes.constants.Synergy;
-import com.grimidk.formicempire.classes.constants.Upgrade;
+package com.grimidk.formicempire.classes.infrasctructure.repositories;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import com.grimidk.formicempire.classes.constants.unlocks.Building;
+import com.grimidk.formicempire.classes.constants.unlocks.Synergy;
+import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 
 public final class GameUnlocks {
     private GameUnlocks() {}

@@ -13,16 +13,15 @@ import com.grimidk.formicempire.classes.entities.services.ColonyResourceService;
 import com.grimidk.formicempire.classes.entities.services.ColonyPopulationService;
 import com.grimidk.formicempire.classes.entities.services.ColonyMaintenanceService;
 import com.grimidk.formicempire.classes.entities.services.ColonyPhysicsService;
-
-import com.grimidk.formicempire.classes.constants.AntRole;
-import com.grimidk.formicempire.classes.constants.AntType;
-import com.grimidk.formicempire.classes.constants.Building;
 import com.grimidk.formicempire.classes.constants.ColonyRank;
 import com.grimidk.formicempire.classes.constants.Species;
-import com.grimidk.formicempire.classes.constants.Upgrade;
-import com.grimidk.formicempire.classes.infrasctructure.GameConstants;
-import com.grimidk.formicempire.classes.infrasctructure.GameUnlocks;
+import com.grimidk.formicempire.classes.constants.ant.AntRole;
+import com.grimidk.formicempire.classes.constants.ant.AntType;
+import com.grimidk.formicempire.classes.constants.unlocks.Building;
+import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 
 
 public class Colony {

@@ -2,10 +2,11 @@ package com.grimidk.formicempire.classes.entities.services;
 
 import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.constants.AntRole;
-import com.grimidk.formicempire.classes.constants.AntType;
-import com.grimidk.formicempire.classes.infrasctructure.GameConstants;
-import com.grimidk.formicempire.classes.infrasctructure.GameUnlocks;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
+import com.grimidk.formicempire.classes.constants.ant.AntRole;
+import com.grimidk.formicempire.classes.constants.ant.AntType;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;

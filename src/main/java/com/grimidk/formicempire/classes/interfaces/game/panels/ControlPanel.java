@@ -1,7 +1,7 @@
-package com.grimidk.formicempire.classes.interfaces.game;
+package com.grimidk.formicempire.classes.interfaces.game.panels;
 
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
-import com.grimidk.formicempire.classes.infrasctructure.SaveManager;
+import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.interfaces.HelpPanel;
 import com.grimidk.formicempire.classes.interfaces.MainFrame;
 

@@ -1,10 +1,11 @@
-package com.grimidk.formicempire.classes.infrasctructure;
+package com.grimidk.formicempire.classes.infrasctructure.managers;
 
-import com.grimidk.formicempire.classes.constants.Building;
-import com.grimidk.formicempire.classes.constants.Upgrade;
+import com.grimidk.formicempire.classes.constants.unlocks.Building;
+import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.interfaces.game.AlertPanel;
-import com.grimidk.formicempire.classes.interfaces.game.AlertPanel.Alert;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
+import com.grimidk.formicempire.classes.interfaces.game.panels.AlertPanel;
+import com.grimidk.formicempire.classes.interfaces.game.panels.AlertPanel.Alert;
 
 import java.awt.Color;
 import java.util.ArrayList;

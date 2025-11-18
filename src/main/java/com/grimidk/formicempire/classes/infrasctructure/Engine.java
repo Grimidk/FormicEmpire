@@ -4,7 +4,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Semaphore;
 
 import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.entities.World;
+import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 
 public class Engine extends Thread {
     private World world;

@@ -1,18 +1,18 @@
-package com.grimidk.formicempire.classes.entities;
+package com.grimidk.formicempire.classes.infrasctructure;
 
 import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 
-import com.grimidk.formicempire.classes.constants.Biome;
-import com.grimidk.formicempire.classes.constants.MoonPhase;
-import com.grimidk.formicempire.classes.constants.Season;
-import com.grimidk.formicempire.classes.constants.TimeOfDay;
-import com.grimidk.formicempire.classes.constants.Weather;
-import com.grimidk.formicempire.classes.infrasctructure.Engine;
-import com.grimidk.formicempire.classes.infrasctructure.GameConstants;
-import com.grimidk.formicempire.classes.infrasctructure.SaveManager;
-import com.grimidk.formicempire.classes.infrasctructure.Savefile;
+import com.grimidk.formicempire.classes.constants.world.Biome;
+import com.grimidk.formicempire.classes.constants.world.MoonPhase;
+import com.grimidk.formicempire.classes.constants.world.Season;
+import com.grimidk.formicempire.classes.constants.world.TimeOfDay;
+import com.grimidk.formicempire.classes.constants.world.Weather;
+import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 
 public class World {
 

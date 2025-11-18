@@ -1,15 +1,15 @@
 package com.grimidk.formicempire.classes.interfaces;
 
-import com.grimidk.formicempire.classes.constants.AntType;
-import com.grimidk.formicempire.classes.constants.Building;
-import com.grimidk.formicempire.classes.constants.MoonPhase;
 import com.grimidk.formicempire.classes.constants.ResourceType;
-import com.grimidk.formicempire.classes.constants.Season;
-import com.grimidk.formicempire.classes.constants.TimeOfDay;
-import com.grimidk.formicempire.classes.constants.Upgrade;
-import com.grimidk.formicempire.classes.constants.Weather;
-import com.grimidk.formicempire.classes.infrasctructure.GameConstants;
-import com.grimidk.formicempire.classes.infrasctructure.GameUnlocks;
+import com.grimidk.formicempire.classes.constants.ant.AntType;
+import com.grimidk.formicempire.classes.constants.unlocks.Building;
+import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
+import com.grimidk.formicempire.classes.constants.world.MoonPhase;
+import com.grimidk.formicempire.classes.constants.world.Season;
+import com.grimidk.formicempire.classes.constants.world.TimeOfDay;
+import com.grimidk.formicempire.classes.constants.world.Weather;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;

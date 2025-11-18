@@ -1,11 +1,11 @@
-package com.grimidk.formicempire.classes.interfaces.game;
+package com.grimidk.formicempire.classes.interfaces.game.panels;
 
-import com.grimidk.formicempire.classes.constants.AntType;
 import com.grimidk.formicempire.classes.constants.ColonyRank;
 import com.grimidk.formicempire.classes.constants.ResourceType;
+import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.infrasctructure.GameConstants;
-import com.grimidk.formicempire.classes.infrasctructure.GameUnlocks; 
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;

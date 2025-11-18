@@ -1,6 +1,6 @@
 package com.grimidk.formicempire.classes.entities;
 
-import com.grimidk.formicempire.classes.constants.Biome;
+import com.grimidk.formicempire.classes.constants.world.Biome;
 
 public class Hex {
     

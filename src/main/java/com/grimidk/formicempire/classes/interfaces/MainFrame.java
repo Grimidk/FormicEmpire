@@ -1,11 +1,13 @@
 package com.grimidk.formicempire.classes.interfaces;
 
 import javax.swing.*;
-import com.grimidk.formicempire.classes.constants.Upgrade;
+
+import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
-import com.grimidk.formicempire.classes.infrasctructure.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
-import com.grimidk.formicempire.classes.infrasctructure.TriggerManager; 
+import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
+import com.grimidk.formicempire.classes.infrasctructure.managers.TriggerManager;
+
 import java.awt.*;
 
 public class MainFrame extends JFrame implements TriggerManager.TriggerListener {

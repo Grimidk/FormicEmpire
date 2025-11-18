@@ -1,15 +1,17 @@
-package com.grimidk.formicempire.classes.constants;
+package com.grimidk.formicempire.classes.constants.world;
 
 import javax.swing.ImageIcon;
 
-public class AntStatus {
+public class TimeOfDay {
     private final int id;
     private final String name;
+    private final float tempMult;
     private final ImageIcon icon;
 
-    public AntStatus(int id, String name, ImageIcon icon) {
+    public TimeOfDay(int id, String name, float tempMult, ImageIcon icon) {
         this.id = id;
         this.name = name;
+        this.tempMult = tempMult;
         this.icon = icon;
     }
 
@@ -19,6 +21,10 @@ public class AntStatus {
 
     public String getName() {
         return name;
+    }
+
+    public float getTempMult() {
+        return tempMult;
     }
 
     public ImageIcon getIcon() {

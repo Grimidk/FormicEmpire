@@ -1,4 +1,4 @@
-package com.grimidk.formicempire.classes.infrasctructure;
+package com.grimidk.formicempire.classes.infrasctructure.managers;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,11 +9,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.SwingUtilities;
 
-import com.grimidk.formicempire.classes.constants.AntRole;
-import com.grimidk.formicempire.classes.constants.Building;
-import com.grimidk.formicempire.classes.constants.Upgrade;
+import com.grimidk.formicempire.classes.constants.ant.AntRole;
+import com.grimidk.formicempire.classes.constants.unlocks.Building;
+import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.entities.World;
+import com.grimidk.formicempire.classes.infrasctructure.Engine;
+import com.grimidk.formicempire.classes.infrasctructure.Savefile;
+import com.grimidk.formicempire.classes.infrasctructure.World;
 
 import java.util.ArrayList;
 import java.util.HashMap;

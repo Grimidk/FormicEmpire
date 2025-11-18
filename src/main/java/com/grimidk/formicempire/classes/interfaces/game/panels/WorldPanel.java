@@ -1,10 +1,10 @@
-package com.grimidk.formicempire.classes.interfaces.game;
+package com.grimidk.formicempire.classes.interfaces.game.panels;
 
-import com.grimidk.formicempire.classes.constants.MoonPhase;
-import com.grimidk.formicempire.classes.constants.Season;
-import com.grimidk.formicempire.classes.constants.TimeOfDay;
-import com.grimidk.formicempire.classes.constants.Weather;
-import com.grimidk.formicempire.classes.entities.World;
+import com.grimidk.formicempire.classes.constants.world.MoonPhase;
+import com.grimidk.formicempire.classes.constants.world.Season;
+import com.grimidk.formicempire.classes.constants.world.TimeOfDay;
+import com.grimidk.formicempire.classes.constants.world.Weather;
+import com.grimidk.formicempire.classes.infrasctructure.World;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
