@@ -20,6 +20,9 @@ public class ColonyResourceService {
         
         int effectivePlantGain = (int) (plantGain * stats.getCollectingRate(colony));
         int effectiveWaterGain = (int) (waterGain * stats.getCollectingRate(colony));
+        if (colony.hasBuilding(GameUnlocks.PASSIVE_WATER)) {
+            effectiveWaterGain += colony.getWaterCapacity() / 10;
+        }
         int effectiveResinGain = (int) (plantGain * (stats.getCollectingRate(colony) / 100));
         
         colony.setPlants(Math.min(colony.getPlants() + effectivePlantGain, stats.getPlantsCapacity(colony)));
@@ -73,6 +76,9 @@ public class ColonyResourceService {
          
         ColonyStatsService stats = colony.getStatsService();
         int rancherCount = colony.getAssignedRoleCount(GameConstants.ROLE_RANCHER);
+        if(colony.hasBuilding(GameUnlocks.PASSIVE_APHID)) {
+            rancherCount += 1;
+        }
         int maxSustainableAphids = stats.getAphidCapacity(colony) * rancherCount;
         
         if (colony.getAphids() < maxSustainableAphids) {

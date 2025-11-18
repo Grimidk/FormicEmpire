@@ -36,7 +36,7 @@ public final class GameUnlocks {
     public static final Upgrade ROLE_GUARD = new Upgrade(20, "Guard Role", "Ant Bouncers", "", TYPE_SOLDIER, 0 );
     public static final Upgrade ROLE_WARRIOR = new Upgrade(21, "Warrior Role", "Phalanx Formation", "", TYPE_SOLDIER, 0 );
     public static final Upgrade ROLE_DEFENDER = new Upgrade(22, "Defender Role", "Royal Shield", "", TYPE_SOLDIER, 0 );
-    public static final Upgrade ROLE_POLICE = new Upgrade(23, "Parasite-Police Role", "Police Brutality", "", TYPE_SOLDIER, 0 );  // this.parasiteDetection = 10;
+    public static final Upgrade ROLE_POLICE = new Upgrade(23, "Parasite-Police Role", "Police Brutality", "Allows soldiers to detect parasitic bugs disguising as your ants, each one can check 10 ants per day", TYPE_SOLDIER, 0 ); 
     public static final Upgrade ROLE_BOMBER = new Upgrade(24, "Bomber Role", "Explosive Finish", "", TYPE_SOLDIER, 0 );
     public static final Upgrade ROLE_BRUTE = new Upgrade(25, "Brute Role", "Heavy Trooper", "Allows majors to become massive menaces in battle.", TYPE_MAJOR, 0 );
     public static final Upgrade ROLE_CARRIER = new Upgrade(26, "Carrier Role", "Troop Transport", "", TYPE_MAJOR, 0 );
@@ -47,15 +47,22 @@ public final class GameUnlocks {
     public static final Upgrade ROLE_DIPLOMAT = new Upgrade(31, "Diplomat Role", "Mighter Than The Sword", "", TYPE_PRINCESS, 0 );
     public static final Upgrade ROLE_MILITIA = new Upgrade(32, "Militia Role", "Worker Militia Auxiliary", "", TYPE_WORKER, 0 );
     public static final Upgrade ROLE_CATCHER = new Upgrade(33, "Catcher Role", "Bug Catching", "", TYPE_SOLDIER, 0 );
+    public static final Upgrade ROLE_CRANE = new Upgrade(34, "Construction Crane Role", "Heavy Duty", "", TYPE_MAJOR, 0 );
     // -- Stats -- 
-    public static final Upgrade STAT_SKELETON = new Upgrade(34, "Basic Skeletons", "Basic Exoskeletons", "The basic defense stats for all the ants in your colony before multipliers. 100 health points, 5 defense points and 1 health point recovered per second.", TYPE_EGG, 0 );
-    public static final Upgrade STAT_ACID = new Upgrade(35, "Acid Spiting", "Acidic Spit", "The basic offensive stats for all the ants in your colony before multipliers. 10 attack points, 1 attack per second and 1 speed point.", TYPE_EGG, 0 );
-    public static final Upgrade STAT_LONGEVITY = new Upgrade(36, "Basic Longevity", "Standard Lifespan", "The basic life stats for all the ants in your colony before multipliers. 180 day lifespan, 25% temperature resistance, 1 unit of size and consumes 1 food per day.", TYPE_EGG, 0 );
+    public static final Upgrade STAT_SKELETON = new Upgrade(101, "Basic Skeletons", "Basic Exoskeletons", "The basic defense stats for all the ants in your colony before multipliers. 100 health points, 5 defense points and 1 health point recovered per second.", TYPE_EGG, 0 );
+    public static final Upgrade STAT_ACID = new Upgrade(102, "Acid Spiting", "Acidic Spit", "The basic offensive stats for all the ants in your colony before multipliers. 10 attack points, 1 attack per second and 1 speed point.", TYPE_EGG, 0 );
+    public static final Upgrade STAT_LONGEVITY = new Upgrade(103, "Basic Longevity", "Standard Lifespan", "The basic life stats for all the ants in your colony before multipliers. 180 day lifespan, 25% temperature resistance, 1 unit of size and consumes 1 food per day.", TYPE_EGG, 0 );
+    public static final Upgrade STAT_RESEARCH_1 = new Upgrade(104, "Improved Research Efficiency", "Micro Scopes", "Increases research speed by 1 point per hour.", ROLE_RESEARCHER, 800 );
+    public static final Upgrade STAT_RESEARCH_2 = new Upgrade(105, "Advanced Research Efficiency", "Miniature Laboratories", "Increases research speed by 2 more points per hour.", STAT_RESEARCH_1, 2500 );
+    public static final Upgrade STAT_RESEARCH_3 = new Upgrade(106, "Perfected Research Efficiency", "Nano Technology", "Increases research speed by 4 more points per hour.", STAT_RESEARCH_2, 12000 );
+    public static final Upgrade STAT_GROWTH_1 = new Upgrade(107, "Imprpved Growth", "Egg Incubating", "Decreases juvenile growth time by 1 day.", TYPE_EGG, 3500 );
+    public static final Upgrade STAT_GROWTH_2 = new Upgrade(108, "Advanced Growth", "Larval Education", "Decreases juvenile growth time by 1 more day.", STAT_GROWTH_1, 9000 );
+    public static final Upgrade STAT_GROWTH_3 = new Upgrade(109, "Perfected Growth", "Pupal Bedding", "Decreases juvenile growth time by 1 more day.", STAT_GROWTH_2, 20000 );
     // -- Abilities --
-    public static final Upgrade ABILITY_RESEARCH = new Upgrade(37, "Research", "Micro Microscopes", "Allows you to research more ant technology by using research points, go to the research menu (Y).", ROLE_RESEARCHER, 0 );
-    public static final Upgrade ABILITY_BUILD = new Upgrade(38, "Building", "Brick And Mortar", "Allows you to build parts of your colony, you can build in the build menu (U).", ROLE_BUILDER, 0 );
-    public static final Upgrade ABILITY_SPREAD = new Upgrade(39, "Spreading", "Colony Colonization", "Allows you to build satellite colonies, you see them in world map (I).", ROLE_BREEDER, 0 );
-    public static final Upgrade ABILITY_RESIN = new Upgrade(40, "Resin Harvest", "Resin Resonation", "Allows your to foragers to harvest resin while foraging plants as a bonus, there is 1% chance each foraging run.", ROLE_FORAGER, 5000 );
+    public static final Upgrade ABILITY_RESEARCH = new Upgrade(201, "Research", "Micro Microscopes", "Allows you to research more ant technology by using research points, go to the research menu (Y).", ROLE_RESEARCHER, 0 );
+    public static final Upgrade ABILITY_BUILD = new Upgrade(202, "Building", "Brick And Mortar", "Allows you to build parts of your colony, you can build in the build menu (U).", ROLE_BUILDER, 0 );
+    public static final Upgrade ABILITY_SPREAD = new Upgrade(203, "Spreading", "Colony Colonization", "Allows you to build satellite colonies, you see them in world map (I).", ROLE_BREEDER, 0 );
+    public static final Upgrade ABILITY_RESIN = new Upgrade(204, "Resin Harvest", "Resin Resonation", "Allows your to foragers to harvest resin while foraging plants as a bonus, there is 1% chance each foraging run.", ROLE_FORAGER, 5000 );
     // --- Buildings ---
     // -- Tier 0 --
     public static final Building ROYAL_CHAMBER_0 = new Building(1, "Basic Royal Chamber", 0, "The base queen chamber for the colony, holds 1 queen.", null, 0, 0, 0);
@@ -91,7 +98,9 @@ public final class GameUnlocks {
     // -- Tier 4 --
     // -- Tier 5 --
     // -- Tier Misc. --
-
+    public static final Building PASSIVE_LAB = new Building(101, "Passive Experiments", 0, "Enables passive research gain even if there are no ants assigned, simulates 1 researcher.", ROYAL_CHAMBER_1, 150, 0, 800);
+    public static final Building PASSIVE_WATER = new Building(102, "Passive Water Collector", 0, "Enables passive water collection even if there are no ants assigned, at 10% your water capacity.", WATER_RESERVOIR_1, 100, 0, 500);
+    public static final Building PASSIVE_APHID = new Building(103, "Passive Aphid Ranch", 0, "Enables your colony to hold more aphids that will never escape, simulates 1 rancher.", SYRUP_RESERVOIR_1, 200, 0, 1000);
     // --- Synergies ---
 
 
@@ -118,9 +127,16 @@ public final class GameUnlocks {
         upgrades.add(ROLE_BRUTE);
         upgrades.add(ROLE_BREEDER);
         upgrades.add(ROLE_RESEARCHER);
+        upgrades.add(ROLE_POLICE);
         upgrades.add(STAT_SKELETON);
         upgrades.add(STAT_ACID);
         upgrades.add(STAT_LONGEVITY);
+        upgrades.add(STAT_RESEARCH_1);
+        upgrades.add(STAT_RESEARCH_2);
+        upgrades.add(STAT_RESEARCH_3);
+        upgrades.add(STAT_GROWTH_1);
+        upgrades.add(STAT_GROWTH_2);
+        upgrades.add(STAT_GROWTH_3);
         upgrades.add(ABILITY_RESEARCH);
         upgrades.add(ABILITY_BUILD);
         upgrades.add(ABILITY_SPREAD);
@@ -153,6 +169,9 @@ public final class GameUnlocks {
         buildings.add(SYRUP_RESERVOIR_2);
         buildings.add(ROCK_WAREHOUSE_2);
         buildings.add(RESIN_RESERVOIR_2);
+        buildings.add(PASSIVE_LAB);
+        buildings.add(PASSIVE_WATER);
+        buildings.add(PASSIVE_APHID);
     }
 
     public static List<Upgrade> getUpgrades() {

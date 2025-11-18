@@ -115,6 +115,10 @@ public class ColonyMaintenanceService {
         if (!colony.hasUpgrade(GameUnlocks.ROLE_RESEARCHER)) return;
         int researcherCount = colony.getAssignedRoleCount(GameConstants.ROLE_RESEARCHER);
         
+        if (colony.hasBuilding(GameUnlocks.PASSIVE_LAB)) {
+            researcherCount += 1; 
+        }
+        
         colony.setResearchPoints(colony.getResearchPoints() + (researcherCount * colony.getStatsService().getResearchSpeed(colony)));
     }
 

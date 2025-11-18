@@ -204,6 +204,10 @@ public class ColonyPopulationService {
         // Placeholder
     }
 
+    public void runPolicing(Colony colony) {
+        // Placeholder
+    }
+
     public void runNuptial(Colony colony) {
         List<Ant> princesses = colony.getPrincesses();
         List<Ant> drones = colony.getDrones();

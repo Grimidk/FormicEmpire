@@ -9,8 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ColonyStatsService {
-
-    // --- Capacity Calculations ---
+    // --- Capacities ---
     public int getPlantsCapacity(Colony colony) { 
         if (colony.hasBuilding(GameUnlocks.PLANT_CHAMBER_2)) {return 25000;
         } else if (colony.hasBuilding(GameUnlocks.PLANT_CHAMBER_1)) {return 10000;
@@ -70,13 +69,19 @@ public class ColonyStatsService {
         } else {return 0;}
     }
 
-    // --- Rate Calculations ---
+    // --- Rates ---
     public int getResearchSpeed(Colony colony) {
-        if (colony.hasUpgrade(GameUnlocks.ROLE_RESEARCHER)) {return 1;
+        if (colony.hasUpgrade(GameUnlocks.STAT_RESEARCH_3)) {return 8;
+        } else if (colony.hasUpgrade(GameUnlocks.STAT_RESEARCH_2)) {return 4;
+        } else if (colony.hasUpgrade(GameUnlocks.STAT_RESEARCH_1)) {return 2;
+        } else if (colony.hasUpgrade(GameUnlocks.ROLE_RESEARCHER)) {return 1;
         } else {return 0;}
     }
     public int getGrowthTime(Colony colony) {
-        if (colony.hasUpgrade(GameUnlocks.TYPE_EGG)) {return 4;
+        if (colony.hasUpgrade(GameUnlocks.STAT_GROWTH_3)) {return 1;
+        } else if (colony.hasUpgrade(GameUnlocks.STAT_GROWTH_2)) {return 2;
+        } else if (colony.hasUpgrade(GameUnlocks.STAT_GROWTH_1)) {return 3;
+        } else if (colony.hasUpgrade(GameUnlocks.TYPE_EGG)) {return 4;
         } else {return 0;}
     }
     public float getLayingRate(Colony colony) {
@@ -104,8 +109,7 @@ public class ColonyStatsService {
         } else {return 0;}
     }
     
-    // --- Base Stat Calculations ---
-
+    // --- Stats ---
     public int getBaseHealth(Colony colony) {
         if (colony.hasUpgrade(GameUnlocks.STAT_SKELETON)) {return 100;
         } else {return 0;}
@@ -143,7 +147,7 @@ public class ColonyStatsService {
         } else {return 0;}
     }
 
-    // --- Aggregate Calculations ---
+    // --- Aggregates ---
     public int getTotalConsumption(Colony colony){
         double totalConsumption = 0;
         for (Map.Entry<AntType, List<Ant>> entry : colony.getAntGroups().entrySet()) {
