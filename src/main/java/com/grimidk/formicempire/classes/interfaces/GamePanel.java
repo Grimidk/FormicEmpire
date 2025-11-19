@@ -168,8 +168,12 @@ public class GamePanel extends JPanel {
         Engine engine = frame.getEngine();
         Colony colony = engine != null && engine.getWorld() != null && engine.getWorld().getSpawnHex() != null ? engine.getWorld().getSpawnHex().getColony() : null;
         if (colony == null) return;
+                
         if (researchDialog == null || researchDialog.getOwner() != frame) {
             if (researchDialog != null) researchDialog.dispose();
+            researchDialog = new ResearchDialog(frame, colony);
+        } else {
+            researchDialog.dispose();
             researchDialog = new ResearchDialog(frame, colony);
         }
         researchDialog.showDialog();

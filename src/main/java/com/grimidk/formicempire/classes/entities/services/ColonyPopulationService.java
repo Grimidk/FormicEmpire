@@ -7,6 +7,7 @@ import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 
+import java.awt.Point; 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -136,6 +137,11 @@ public class ColonyPopulationService {
         int toLay = Math.min(layerCount * (int) colony.getStatsService().getLayingRate(colony), spaceAvailable);
         for (int i = 0; i < toLay; i++) {
             Ant newEgg = new Ant(colony, GameConstants.TYPE_EGG);
+            
+            ColonyPhysicsService physics = colony.getPhysicsService();
+            Point spawnPos = physics.getRandomPosition(colony, GameConstants.TYPE_EGG.getSprite());
+            newEgg.setPosition(spawnPos);
+
             eggList.add(newEgg);
         }
     }

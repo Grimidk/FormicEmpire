@@ -347,8 +347,8 @@ public class HelpPanel extends JPanel {
         String gameInfo = "<html><p style='width: 350px;'>" +
                 "<b>Basic Tips:</b><br>" +
                 "Your main food is <b>Fungi</b> (Mushrooms), which ants will eat daily. " +
-                "Assign <b>Workers</b> (Q) to <b>Forager</b> roles to gather Plants and <b>Soldiers</b> (W) to <b>Hunter</b> roles to gather Protein. " +
-                "Assign <b>Farmers</b> (Q) to convert Plants and Protein into Fungi." +
+                "Assign <b>Workers</b> (Q) to <b>Forager</b> roles to gather Plants and Water. Without them your ants will die!" +
+                "Assign <b>Farmers</b> (Q) to convert Plants into Fungi. One farmer can handle 10 <b>Forager</b>." +
                 "<br><br>" +
                 "Assign <b>Nurses</b> (Q) to care for your <b>Eggs, Larvae, and Pupae</b>. Without enough nurses, your young may die!" +
                 "<br><br>" +
