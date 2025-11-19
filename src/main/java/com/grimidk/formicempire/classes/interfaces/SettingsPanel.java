@@ -3,7 +3,12 @@ package com.grimidk.formicempire.classes.interfaces;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 
 import javax.swing.*;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.HashSet;
+import java.util.Set;
 
 public class SettingsPanel extends JPanel {
     private final MainFrame frame;
@@ -49,6 +54,7 @@ public class SettingsPanel extends JPanel {
         // Full Screen
         c.gridy = 2; c.gridx = 0; add(new JLabel("Full Screen:"), c);
         fullScreenCheck = new JCheckBox();
+        setupNavigation(fullScreenCheck);
         c.gridx = 1; add(fullScreenCheck, c);
 
         // Autosave Frequency
@@ -65,15 +71,18 @@ public class SettingsPanel extends JPanel {
         // Turbo Mode
         c.gridy = 4; c.gridx = 0; add(new JLabel("Allow Turbo Mode:"), c);
         turboCheck = new JCheckBox();
+        setupNavigation(turboCheck);
         c.gridx = 1; add(turboCheck, c);
 
         // Buttons
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton saveButton = new JButton("Save & Apply");
         saveButton.addActionListener(e -> saveSettings());
+        setupNavigation(saveButton);
 
         JButton backButton = new JButton("Back");
         backButton.addActionListener(e -> this.frame.showCard(MainFrame.CARD_INIT));
+        setupNavigation(backButton);
         
         buttonPanel.add(saveButton);
         buttonPanel.add(backButton);
@@ -81,6 +90,48 @@ public class SettingsPanel extends JPanel {
         c.gridy = 5; c.gridx = 0; c.gridwidth = 2; c.fill = GridBagConstraints.NONE;
         c.anchor = GridBagConstraints.CENTER;
         add(buttonPanel, c);
+        addAncestorListener(new AncestorListener() {
+            @Override
+            public void ancestorAdded(AncestorEvent event) {
+                backButton.requestFocusInWindow();
+            }
+
+            @Override
+            public void ancestorRemoved(AncestorEvent event) {}
+
+            @Override
+            public void ancestorMoved(AncestorEvent event) {}
+        });
+    }
+    
+    private void setupNavigation(JComponent component) {
+        if (component instanceof JButton) {
+            component.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke("ENTER"), "pressed");
+            component.getActionMap().put("pressed", new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    ((JButton)component).doClick();
+                }
+            });
+        } else if (component instanceof JCheckBox) {
+            component.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke("ENTER"), "pressed");
+            component.getActionMap().put("pressed", new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    ((JCheckBox)component).doClick();
+                }
+            });
+        }
+
+        Set<AWTKeyStroke> forwardKeys = new HashSet<>(component.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
+        forwardKeys.add(KeyStroke.getKeyStroke("DOWN"));
+        forwardKeys.add(KeyStroke.getKeyStroke("RIGHT"));
+        component.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, forwardKeys);
+
+        Set<AWTKeyStroke> backwardKeys = new HashSet<>(component.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
+        backwardKeys.add(KeyStroke.getKeyStroke("UP"));
+        backwardKeys.add(KeyStroke.getKeyStroke("LEFT"));
+        component.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, backwardKeys);
     }
 
     public void loadSettings() {

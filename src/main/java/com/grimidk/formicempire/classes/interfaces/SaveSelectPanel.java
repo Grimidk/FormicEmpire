@@ -4,7 +4,12 @@ import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 
 import javax.swing.*;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.HashSet;
+import java.util.Set;
 
 public class SaveSelectPanel extends JPanel {
     private final MainFrame frame;
@@ -28,6 +33,10 @@ public class SaveSelectPanel extends JPanel {
             slotButtons[i] = new JButton("Create");
             deleteButtons[i] = new JButton("Delete");
             deleteButtons[i].setVisible(false);
+            
+            setupNavigation(slotButtons[i]);
+            setupNavigation(deleteButtons[i]);
+
             int idx = i;
             slotButtons[i].addActionListener(e -> onCreateOrLoad(slotId, idx));
             deleteButtons[i].addActionListener(e -> onDelete(slotId, idx));
@@ -37,13 +46,50 @@ public class SaveSelectPanel extends JPanel {
         }
 
         JButton back = new JButton("Back");
+        setupNavigation(back);
         back.addActionListener(e -> {
             frame.showCard(MainFrame.CARD_INIT);
         });
 
         c.gridx = 0; c.gridy = 4; c.gridwidth = 2; add(back, c);
 
+        addAncestorListener(new AncestorListener() {
+            @Override
+            public void ancestorAdded(AncestorEvent event) {
+                if (slotButtons[0] != null) {
+                    slotButtons[0].requestFocusInWindow();
+                }
+            }
+
+            @Override
+            public void ancestorRemoved(AncestorEvent event) {}
+
+            @Override
+            public void ancestorMoved(AncestorEvent event) {}
+        });
+
         refreshSlots();
+    }
+    
+ 
+    private void setupNavigation(JButton button) {
+        button.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke("ENTER"), "pressed");
+        button.getActionMap().put("pressed", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                button.doClick();
+            }
+        });
+
+        Set<AWTKeyStroke> forwardKeys = new HashSet<>(button.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
+        forwardKeys.add(KeyStroke.getKeyStroke("DOWN"));
+        forwardKeys.add(KeyStroke.getKeyStroke("RIGHT"));
+        button.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, forwardKeys);
+
+        Set<AWTKeyStroke> backwardKeys = new HashSet<>(button.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
+        backwardKeys.add(KeyStroke.getKeyStroke("UP"));
+        backwardKeys.add(KeyStroke.getKeyStroke("LEFT"));
+        button.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, backwardKeys);
     }
 
     public void refreshSlots() {
@@ -65,7 +111,6 @@ public class SaveSelectPanel extends JPanel {
     private void onCreateOrLoad(int slotId, int idx) {
         Savefile existing = saveManager.loadSlot(slotId);
         if (existing == null) {
-            // --- Create New Game ---
             String name = JOptionPane.showInputDialog(this, "Enter save name:", "Create Save", JOptionPane.PLAIN_MESSAGE);
             if (name == null || name.trim().isEmpty()) return;
             
@@ -81,7 +126,6 @@ public class SaveSelectPanel extends JPanel {
                 }
             });
         } else {
-            // --- Load Existing Game ---
             frame.openGameWithSave(existing);
             refreshSlots();
         }

@@ -13,12 +13,17 @@ import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class HelpPanel extends JPanel {
     private final MainFrame frame;
@@ -38,14 +43,61 @@ public class HelpPanel extends JPanel {
         mainTabs.addTab("Buildings", createDictionaryPanel(null, GameUnlocks.getBuildings()));
         mainTabs.addTab("World", createWorldPanel());
 
+        setupTabPaneNavigation(mainTabs);
+
         add(mainTabs, BorderLayout.CENTER);
 
-        // Back button
         JPanel southPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton back = new JButton("Back");
         back.addActionListener(e -> this.frame.showCard(MainFrame.CARD_INIT));
+        
+        setupButtonNavigation(back);
+        
         southPanel.add(back);
         add(southPanel, BorderLayout.SOUTH);
+
+        addAncestorListener(new AncestorListener() {
+            @Override
+            public void ancestorAdded(AncestorEvent event) {
+                back.requestFocusInWindow();
+            }
+
+            @Override
+            public void ancestorRemoved(AncestorEvent event) {}
+
+            @Override
+            public void ancestorMoved(AncestorEvent event) {}
+        });
+    }
+    
+    private void setupButtonNavigation(JButton button) {
+        button.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke("ENTER"), "pressed");
+        button.getActionMap().put("pressed", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                button.doClick();
+            }
+        });
+
+        Set<AWTKeyStroke> forwardKeys = new HashSet<>(button.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
+        forwardKeys.add(KeyStroke.getKeyStroke("DOWN"));
+        forwardKeys.add(KeyStroke.getKeyStroke("RIGHT"));
+        button.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, forwardKeys);
+
+        Set<AWTKeyStroke> backwardKeys = new HashSet<>(button.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
+        backwardKeys.add(KeyStroke.getKeyStroke("UP"));
+        backwardKeys.add(KeyStroke.getKeyStroke("LEFT"));
+        button.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, backwardKeys);
+    }
+
+    private void setupTabPaneNavigation(JTabbedPane tabs) {
+        Set<AWTKeyStroke> forwardKeys = new HashSet<>(tabs.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
+        forwardKeys.add(KeyStroke.getKeyStroke("DOWN"));
+        tabs.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, forwardKeys);
+
+        Set<AWTKeyStroke> backwardKeys = new HashSet<>(tabs.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
+        backwardKeys.add(KeyStroke.getKeyStroke("UP"));
+        tabs.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, backwardKeys);
     }
 
     private JComponent createWelcomePanel() {
