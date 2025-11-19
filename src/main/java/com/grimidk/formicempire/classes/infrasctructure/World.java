@@ -1,8 +1,8 @@
 package com.grimidk.formicempire.classes.infrasctructure;
 
 import java.util.ArrayList;
-
-import javax.swing.ImageIcon;
+import java.util.List;
+import java.util.Random;
 
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.Humidity;
@@ -32,6 +32,7 @@ public class World {
     private ArrayList<Hex> hexes;
     private int saveSlotId = 0; // 0 = no slot (ad-hoc)
     private Engine engine;
+    private Random random;
 
     public World() {
         this.minute = 0;
@@ -46,6 +47,7 @@ public class World {
         this.moonPhase = GameConstants.NEW_MOON_PHASE;
         this.season = GameConstants.SPRING_SEASON;
         this.weather = GameConstants.CLEAR_WEATHER;
+        this.random = new Random();
     }
 
     public void setEngine(Engine engine) {
@@ -106,6 +108,7 @@ public class World {
 
     public void setTimeOfDay(TimeOfDay timeOfDay) {
         this.timeOfDay = timeOfDay;
+        updateEnvironmentalConditions();
     }
 
     public MoonPhase getMoonPhase() {
@@ -122,6 +125,7 @@ public class World {
 
     public void setSeason(Season season) {
         this.season = season;
+        updateEnvironmentalConditions();
     }
 
     public Weather getWeather() {
@@ -130,6 +134,7 @@ public class World {
 
     public void setWeather(Weather weather) {
         this.weather = weather;
+        updateEnvironmentalConditions();
     }
 
     public int getTemperature() {
@@ -157,6 +162,7 @@ public class World {
     }
 
     public Hex getSpawnHex() {
+        if (this.hexes.isEmpty()) return null;
         return this.hexes.get(0);
     }
     
@@ -179,7 +185,7 @@ public class World {
     }
 
     public Humidity getHumidityIcon() {
-        if (humidity == 0) {
+        if (humidity <= 0) {
             return GameConstants.HUMID_0;
         } else if (humidity == 1) {
             return GameConstants.HUMID_1;
@@ -206,6 +212,7 @@ public class World {
             colony.startColony();
         }
         this.hexes.add(startHex);
+        updateEnvironmentalConditions();
     }
 
     public void loadWorld(Savefile savefile) {
@@ -218,12 +225,79 @@ public class World {
         Hex startHex = new Hex();
         startHex.setColony(colony);
         this.hexes.add(startHex);
+        updateEnvironmentalConditions();
+    }
+    
+    private void updateEnvironmentalConditions() {
+        if (this.getSpawnHex() == null || this.getSpawnHex().getBiome() == null) {
+            return;
+        }
+
+        Biome baseBiome = this.getSpawnHex().getBiome();
+        
+        float calcTemp = baseBiome.getTemperature();
+        float calcHumid = baseBiome.isIsHumid();
+
+        if (this.season != null) {
+            calcTemp *= this.season.getTempMult();
+            calcHumid *= this.season.getHumidityMult();
+        }
+
+        if (this.timeOfDay != null) {
+            calcTemp *= this.timeOfDay.getTempMult();
+        }
+
+        if (this.weather != null) {
+            calcTemp *= this.weather.getTempMult();
+            calcHumid += this.weather.getHumidMult(); 
+        }
+
+        this.temperature = Math.round(calcTemp);
+
+        int finalHumid = Math.round(calcHumid);
+        if (finalHumid < 0) finalHumid = 0;
+        if (finalHumid > 5) finalHumid = 5;
+        this.humidity = finalHumid;
+    }
+
+    private void randomizeWeather() {
+        List<Weather> possibleWeathers = new ArrayList<>();
+        
+        possibleWeathers.add(GameConstants.CLEAR_WEATHER);
+        possibleWeathers.add(GameConstants.CLEAR_WEATHER);
+        
+        if (random.nextInt(1000) == 0) {
+            this.setWeather(GameConstants.FROG_WEATHER);
+            return;
+        }
+
+        if (this.season == GameConstants.WINTER_SEASON) {
+            possibleWeathers.add(GameConstants.SNOW_WEATHER);
+            possibleWeathers.add(GameConstants.HEAVY_SNOW_WEATHER);
+            possibleWeathers.add(GameConstants.WIND_WEATHER);
+        } else if (this.season == GameConstants.SUMMER_SEASON) {
+            possibleWeathers.add(GameConstants.RAIN_WEATHER);
+            possibleWeathers.add(GameConstants.THUNDER_WEATHER);
+            possibleWeathers.add(GameConstants.HEAT_WEATHER);
+        } else {
+            possibleWeathers.add(GameConstants.RAIN_WEATHER);
+            possibleWeathers.add(GameConstants.HEAVY_RAIN_WEATHER);
+            possibleWeathers.add(GameConstants.WIND_WEATHER);
+        }
+
+        Weather newWeather = possibleWeathers.get(random.nextInt(possibleWeathers.size()));
+        
+        if (this.weather != newWeather) {
+            this.setWeather(newWeather);
+        }
     }
 
     public void runMinute() {
         this.minute++;
 
-        this.getSpawnHex().getColony().runMinutelyJobs();
+        if (this.getSpawnHex() != null) {
+             this.getSpawnHex().getColony().runMinutelyJobs();
+        }
 
         if (this.minute > 59) {
             this.minute = 0;
@@ -234,21 +308,24 @@ public class World {
     public void runHour() {
         this.hour++;
 
-        this.getSpawnHex().getColony().runHourlyJobs();
-
-        if (this.hour >= 0 && this.hour < 5) {
-            this.timeOfDay = GameConstants.NIGHT_TIME;
-        } else if (this.hour >= 5 && this.hour < 7) {
-            this.timeOfDay = GameConstants.DAWN_TIME;
-        } else if (this.hour >= 7 && this.hour < 18) {
-            this.timeOfDay = GameConstants.DAY_TIME;
-        } else if (this.hour >= 18 && this.hour < 20) {
-            this.timeOfDay = GameConstants.DUSK_TIME;
-        } else if (this.hour >= 20 && this.hour <= 23) {
-            this.timeOfDay = GameConstants.NIGHT_TIME;
+        if (this.getSpawnHex() != null) {
+            this.getSpawnHex().getColony().runHourlyJobs();
         }
 
-        // --- Notify Hour Listeners ---
+        if (this.hour >= 0 && this.hour < 5) {
+            this.setTimeOfDay(GameConstants.NIGHT_TIME);
+        } else if (this.hour >= 5 && this.hour < 7) {
+            this.setTimeOfDay(GameConstants.DAWN_TIME);
+        } else if (this.hour >= 7 && this.hour < 18) {
+            this.setTimeOfDay(GameConstants.DAY_TIME);
+        } else if (this.hour >= 18 && this.hour < 20) {
+            this.setTimeOfDay(GameConstants.DUSK_TIME);
+        } else if (this.hour >= 20 && this.hour <= 23) {
+            this.setTimeOfDay(GameConstants.NIGHT_TIME);
+        }
+        
+        updateEnvironmentalConditions();
+
         if (engine != null) {
             engine.notifyHourListeners();
         }
@@ -262,7 +339,9 @@ public class World {
     public void runDay() {
         this.day++;
 
-        this.getSpawnHex().getColony().runDailyJobs();
+        if (this.getSpawnHex() != null) {
+            this.getSpawnHex().getColony().runDailyJobs();
+        }
 
         if (this.day >= 1 && this.day < 2) {
             this.moonPhase = GameConstants.NEW_MOON_PHASE;
@@ -284,7 +363,6 @@ public class World {
             this.moonPhase = GameConstants.NEW_MOON_PHASE;
         }
 
-        // --- Notify Day Listeners ---
         if (engine != null) {
             engine.notifyDayListeners();
         }
@@ -299,15 +377,15 @@ public class World {
         this.month++;
 
         if (this.month >= 1 && this.month < 4) {
-            this.season = GameConstants.SPRING_SEASON;
+            this.setSeason(GameConstants.SPRING_SEASON);
         } else if (this.month >= 4 && this.month < 7) {
-            this.season = GameConstants.SUMMER_SEASON;
+            this.setSeason(GameConstants.SUMMER_SEASON);
         } else if (this.month >= 7 && this.month < 10) {
-            this.season = GameConstants.AUTUMN_SEASON;
+            this.setSeason(GameConstants.AUTUMN_SEASON);
         } else if (this.month >= 10 && this.month < 12) {
-            this.season = GameConstants.WINTER_SEASON;
+            this.setSeason(GameConstants.WINTER_SEASON);
         } else {
-            this.season = GameConstants.SPRING_SEASON;
+            this.setSeason(GameConstants.SPRING_SEASON);
         }
 
         try {
@@ -322,7 +400,6 @@ public class World {
             ex.printStackTrace();
         }
 
-        // --- Notify Month Listeners ---
         if (engine != null) {
             engine.notifyMonthListeners();
         }
@@ -335,8 +412,9 @@ public class World {
 
     public void runYear() {
         this.year++;
-
-        this.getSpawnHex().getColony().runYearlyJobs();
+        if (this.getSpawnHex() != null) {
+            this.getSpawnHex().getColony().runYearlyJobs();
+        }
     }
 
 }

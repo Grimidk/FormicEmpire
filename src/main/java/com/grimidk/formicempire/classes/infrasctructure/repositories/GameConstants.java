@@ -39,19 +39,19 @@ public final class GameConstants {
     public static final ImageIcon ICON_RESEARCH = loadIcon("icons/misc/research.png");
     
     // --- Temperatures ---
-    public static final Temperature TEMP_FREEZING = new Temperature(1, "Freezing", 0,
+    public static final Temperature TEMP_FREEZING = new Temperature(1, "Freezing", 5,
         loadIcon("icons/misc/temp/freezing.png"));
-    public static final Temperature TEMP_COLD = new Temperature(2, "Cold", 10,
+    public static final Temperature TEMP_COLD = new Temperature(2, "Cold", 15,
         loadIcon("icons/misc/temp/cold.png"));
     public static final Temperature TEMP_CHILLY = new Temperature(3, "Chilly", 20,
         loadIcon("icons/misc/temp/chilly.png"));
-    public static final Temperature TEMP_GOOD = new Temperature(4, "Good", 30,
+    public static final Temperature TEMP_GOOD = new Temperature(4, "Good", 28,
         loadIcon("icons/misc/temp/good.png"));
-    public static final Temperature TEMP_WARM = new Temperature(5, "Warm", 40,
+    public static final Temperature TEMP_WARM = new Temperature(5, "Warm", 35,
         loadIcon("icons/misc/temp/warm.png"));
-    public static final Temperature TEMP_HOT = new Temperature(6, "Hot", 50,
+    public static final Temperature TEMP_HOT = new Temperature(6, "Hot", 45,
         loadIcon("icons/misc/temp/hot.png"));
-    public static final Temperature TEMP_BURNING = new Temperature(7, "Burning", 60,
+    public static final Temperature TEMP_BURNING = new Temperature(7, "Burning", 100, // Cap high
         loadIcon("icons/misc/temp/burning.png"));
 
     // --- Humidity
@@ -71,19 +71,19 @@ public final class GameConstants {
     // --- Biomes ---
     public static final Biome PLAINS_BIOME = new Biome(1, "Plains", 25, 2, 
         loadIcon("icons/biomes/plains.png"));
-    public static final Biome FOREST_BIOME = new Biome(2, "Forest", 20, 3, 
+    public static final Biome FOREST_BIOME = new Biome(2, "Forest", 22, 3, 
         loadIcon("icons/biomes/forest.png"));
     public static final Biome JUNGLE_BIOME = new Biome(3, "Jungle", 30, 4, 
         loadIcon("icons/biomes/jungle.png"));
-    public static final Biome SWAMP_BIOME = new Biome(4, "Swamp", 25, 5, 
+    public static final Biome SWAMP_BIOME = new Biome(4, "Swamp", 26, 5, 
         loadIcon("icons/biomes/swamp.png"));
-    public static final Biome URBAN_BIOME = new Biome(5, "Urban", 30, 1, 
+    public static final Biome URBAN_BIOME = new Biome(5, "Urban", 28, 1, 
         loadIcon("icons/biomes/urban.png"));
     public static final Biome TUNDRA_BIOME = new Biome(6, "Tundra", 5, 2, 
         loadIcon("icons/biomes/tundra.png"));
-    public static final Biome TAIGA_BIOME = new Biome(7, "Taiga", 10, 1, 
+    public static final Biome TAIGA_BIOME = new Biome(7, "Taiga", 12, 1, 
         loadIcon("icons/biomes/taiga.png"));
-    public static final Biome DESSERT_BIOME = new Biome(8, "Dessert", 50, 0, 
+    public static final Biome DESSERT_BIOME = new Biome(8, "Dessert", 45, 0, 
         loadIcon("icons/biomes/dessert.png"));
 
     // --- Resources ---
@@ -103,17 +103,17 @@ public final class GameConstants {
         loadIcon("icons/resources/mineral.png"));
 
     // --- Times of Day ---
-    public static final TimeOfDay DAY_TIME = new TimeOfDay(1, "Daytime", 1f,
+    public static final TimeOfDay DAY_TIME = new TimeOfDay(1, "Daytime", 1.05f,
         loadIcon("icons/times/day.png"));
-    public static final TimeOfDay DUSK_TIME = new TimeOfDay(2, "Dusk", 5/8f,
+    public static final TimeOfDay DUSK_TIME = new TimeOfDay(2, "Dusk", 0.95f,
         loadIcon("icons/times/dusk.png"));
-    public static final TimeOfDay NIGHT_TIME = new TimeOfDay(3, "Nightime", 3/4f,
+    public static final TimeOfDay NIGHT_TIME = new TimeOfDay(3, "Nightime", 0.85f,
         loadIcon("icons/times/night.png"));
-    public static final TimeOfDay DAWN_TIME = new TimeOfDay(4, "Dawn", 5/8f,
+    public static final TimeOfDay DAWN_TIME = new TimeOfDay(4, "Dawn", 0.90f,
         loadIcon("icons/times/dawn.png"));
-    public static final TimeOfDay SOLAR_ECLIPSE_TIME = new TimeOfDay(5, "Solar Eclipse", 3/2f,
+    public static final TimeOfDay SOLAR_ECLIPSE_TIME = new TimeOfDay(5, "Solar Eclipse", 0.7f,
         loadIcon("icons/times/solar-eclipse.png"));
-    public static final TimeOfDay LUNAR_ECLIPSE_TIME = new TimeOfDay(6, "Lunar Eclipse", 3/2f,
+    public static final TimeOfDay LUNAR_ECLIPSE_TIME = new TimeOfDay(6, "Lunar Eclipse", 0.85f,
         loadIcon("icons/times/lunar-eclipse.png"));
 
     // --- Moon Phases ---
@@ -135,33 +135,33 @@ public final class GameConstants {
         loadIcon("icons/moon/waning-crescent.png"));
 
     // --- Seasons ---
-    public static final Season SPRING_SEASON = new Season(1, "Spring", 1f, 3, 
+    public static final Season SPRING_SEASON = new Season(1, "Spring", 1.0f, 1.0f, 
         loadIcon("icons/seasons/spring.png"));
-    public static final Season SUMMER_SEASON = new Season(2, "Summer", 2f, 1, 
+    public static final Season SUMMER_SEASON = new Season(2, "Summer", 1.15f, 0.8f, 
         loadIcon("icons/seasons/summer.png"));
-    public static final Season AUTUMN_SEASON = new Season(3, "Autumn", 1f, 2, 
+    public static final Season AUTUMN_SEASON = new Season(3, "Autumn", 0.95f, 1.1f, 
         loadIcon("icons/seasons/autumn.png"));
-    public static final Season WINTER_SEASON = new Season(4, "Winter", 1/2f, 1, 
+    public static final Season WINTER_SEASON = new Season(4, "Winter", 0.7f, 1.2f, 
         loadIcon("icons/seasons/winter.png"));
 
     // --- Weather ---
-    public static final Weather CLEAR_WEATHER = new Weather(1, "Clear", 1, 0, 
+    public static final Weather CLEAR_WEATHER = new Weather(1, "Clear", 0, 1.0f, 
         loadIcon("icons/weather/clear.png"));
-    public static final Weather RAIN_WEATHER = new Weather(2, "Rain", 1, 1, 
+    public static final Weather RAIN_WEATHER = new Weather(2, "Rain", 1, 0.95f, 
         loadIcon("icons/weather/rain.png"));
-    public static final Weather SNOW_WEATHER = new Weather(3, "Snow", 1, 1, 
+    public static final Weather SNOW_WEATHER = new Weather(3, "Snow", 1, 0.8f, 
         loadIcon("icons/weather/snow.png"));
-    public static final Weather HEAVY_RAIN_WEATHER = new Weather(4, "Heavy Rain", 1, 3, 
+    public static final Weather HEAVY_RAIN_WEATHER = new Weather(4, "Heavy Rain", 2, 0.9f, 
         loadIcon("icons/weather/heavy-rain.png"));
-    public static final Weather THUNDER_WEATHER = new Weather(5, "Thunder Storm", 1, 2, 
+    public static final Weather THUNDER_WEATHER = new Weather(5, "Thunder Storm", 2, 0.9f, 
         loadIcon("icons/weather/thunder.png"));
-    public static final Weather HEAVY_SNOW_WEATHER = new Weather(6, "Snow Storm", 1, 2, 
+    public static final Weather HEAVY_SNOW_WEATHER = new Weather(6, "Snow Storm", 2, 0.7f, 
         loadIcon("icons/weather/heavy-snow.png"));
-    public static final Weather WIND_WEATHER = new Weather(7, "Heavy Wind", 1, -1, 
+    public static final Weather WIND_WEATHER = new Weather(7, "Heavy Wind", -1, 0.95f, 
         loadIcon("icons/weather/heavy-wind.png"));
-    public static final Weather HEAT_WEATHER = new Weather(8, "Heat Wave", 2, -2, 
+    public static final Weather HEAT_WEATHER = new Weather(8, "Heat Wave", -2, 1.2f, 
         loadIcon("icons/weather/heat-wave.png"));
-    public static final Weather FROG_WEATHER = new Weather(9, "Frog Rain", 1, 0, 
+    public static final Weather FROG_WEATHER = new Weather(9, "Frog Rain", 3, 1.0f, 
         loadIcon("icons/weather/frog-rain.png"));
 
     // --- Ant Status ---
