@@ -9,8 +9,10 @@ import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.misc.Species;
 import com.grimidk.formicempire.classes.constants.world.Biome;
+import com.grimidk.formicempire.classes.constants.world.Humidity;
 import com.grimidk.formicempire.classes.constants.world.MoonPhase;
 import com.grimidk.formicempire.classes.constants.world.Season;
+import com.grimidk.formicempire.classes.constants.world.Temperature;
 import com.grimidk.formicempire.classes.constants.world.TimeOfDay;
 import com.grimidk.formicempire.classes.constants.world.Weather;
 
@@ -37,20 +39,34 @@ public final class GameConstants {
     public static final ImageIcon ICON_RESEARCH = loadIcon("icons/misc/research.png");
     
     // --- Temperatures ---
-    public static final ImageIcon ICON_TEMP_FREEZING = loadIcon("icons/misc/temp/freezing.png");
-    public static final ImageIcon ICON_TEMP_COLD = loadIcon("icons/misc/temp/cold.png");
-    public static final ImageIcon ICON_TEMP_CHILLY = loadIcon("icons/misc/temp/chilly.png");
-    public static final ImageIcon ICON_TEMP_GOOD = loadIcon("icons/misc/temp/good.png");
-    public static final ImageIcon ICON_TEMP_WARM = loadIcon("icons/misc/temp/warm.png");
-    public static final ImageIcon ICON_TEMP_HOT = loadIcon("icons/misc/temp/hot.png");
+    public static final Temperature TEMP_FREEZING = new Temperature(1, "Freezing", 0,
+        loadIcon("icons/misc/temp/freezing.png"));
+    public static final Temperature TEMP_COLD = new Temperature(2, "Cold", 10,
+        loadIcon("icons/misc/temp/cold.png"));
+    public static final Temperature TEMP_CHILLY = new Temperature(3, "Chilly", 20,
+        loadIcon("icons/misc/temp/chilly.png"));
+    public static final Temperature TEMP_GOOD = new Temperature(4, "Good", 30,
+        loadIcon("icons/misc/temp/good.png"));
+    public static final Temperature TEMP_WARM = new Temperature(5, "Warm", 40,
+        loadIcon("icons/misc/temp/warm.png"));
+    public static final Temperature TEMP_HOT = new Temperature(6, "Hot", 50,
+        loadIcon("icons/misc/temp/hot.png"));
+    public static final Temperature TEMP_BURNING = new Temperature(7, "Burning", 60,
+        loadIcon("icons/misc/temp/burning.png"));
 
     // --- Humidity
-    public static final ImageIcon ICON_HUMID_0 =loadIcon("icons/misc/humid/humid0.png");
-    public static final ImageIcon ICON_HUMID_1 =loadIcon("icons/misc/humid/humid1.png");
-    public static final ImageIcon ICON_HUMID_2 =loadIcon("icons/misc/humid/humid2.png");
-    public static final ImageIcon ICON_HUMID_3 =loadIcon("icons/misc/humid/humid3.png");
-    public static final ImageIcon ICON_HUMID_4 =loadIcon("icons/misc/humid/humid4.png");
-    public static final ImageIcon ICON_HUMID_5 =loadIcon("icons/misc/humid/humid5.png");
+    public static final Humidity HUMID_0 = new Humidity(1, "Arid", 0,
+        loadIcon("icons/misc/humid/humid0.png"));
+    public static final Humidity HUMID_1 = new Humidity(2, "Dry", 1, 
+        loadIcon("icons/misc/humid/humid1.png"));
+    public static final Humidity HUMID_2 = new Humidity(3, "Normal", 2, 
+        loadIcon("icons/misc/humid/humid2.png"));
+    public static final Humidity HUMID_3 = new Humidity(4, "Humid", 3, 
+        loadIcon("icons/misc/humid/humid3.png"));
+    public static final Humidity HUMID_4 = new Humidity(5, "Moist", 4, 
+        loadIcon("icons/misc/humid/humid4.png"));
+    public static final Humidity HUMID_5 = new Humidity(6, "Saturated", 5, 
+        loadIcon("icons/misc/humid/humid5.png"));
 
     // --- Biomes ---
     public static final Biome PLAINS_BIOME = new Biome(1, "Plains", 25, 2, 
@@ -266,8 +282,8 @@ public final class GameConstants {
     private static final List<AntRole> antRoles = new ArrayList<>();
     private static final List<ColonyRank> colonyRanks = new ArrayList<>();
     private static final List<Species> species = new ArrayList<>();
-    public static final List<ImageIcon> humidity = new ArrayList<>();
-    private static final List<ImageIcon> temperature = new ArrayList<>();
+    private static final List<Humidity> humidity = new ArrayList<>();
+    private static final List<Temperature> temperature = new ArrayList<>();
     private static final List<ImageIcon> misc = new ArrayList<>();
     
     // --- Static initializer block ---
@@ -388,19 +404,20 @@ public final class GameConstants {
         colonyRanks.add(RANK_SUPREME);
         colonyRanks.add(RANK_GIGA);
 
-        temperature.add(ICON_TEMP_FREEZING);
-        temperature.add(ICON_TEMP_COLD);
-        temperature.add(ICON_TEMP_CHILLY);
-        temperature.add(ICON_TEMP_GOOD);
-        temperature.add(ICON_TEMP_WARM);
-        temperature.add(ICON_TEMP_HOT);
+        temperature.add(TEMP_FREEZING);
+        temperature.add(TEMP_COLD);
+        temperature.add(TEMP_CHILLY);
+        temperature.add(TEMP_GOOD);
+        temperature.add(TEMP_WARM);
+        temperature.add(TEMP_HOT);
+        temperature.add(TEMP_BURNING);
 
-        humidity.add(ICON_HUMID_0);
-        humidity.add(ICON_HUMID_1);
-        humidity.add(ICON_HUMID_2);
-        humidity.add(ICON_HUMID_3);
-        humidity.add(ICON_HUMID_4);
-        humidity.add(ICON_HUMID_5);
+        humidity.add(HUMID_0);
+        humidity.add(HUMID_1);
+        humidity.add(HUMID_2);
+        humidity.add(HUMID_3);
+        humidity.add(HUMID_4);
+        humidity.add(HUMID_5);
 
         misc.add(ICON_APHID);
         misc.add(ICON_RESEARCH);

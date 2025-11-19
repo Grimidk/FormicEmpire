@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import javax.swing.ImageIcon;
 
 import com.grimidk.formicempire.classes.constants.world.Biome;
+import com.grimidk.formicempire.classes.constants.world.Humidity;
 import com.grimidk.formicempire.classes.constants.world.MoonPhase;
 import com.grimidk.formicempire.classes.constants.world.Season;
+import com.grimidk.formicempire.classes.constants.world.Temperature;
 import com.grimidk.formicempire.classes.constants.world.TimeOfDay;
 import com.grimidk.formicempire.classes.constants.world.Weather;
 import com.grimidk.formicempire.classes.entities.Colony;
@@ -158,25 +160,38 @@ public class World {
         return this.hexes.get(0);
     }
     
-    public ImageIcon getTemperatureIcon() {
-        if (temperature <= 0) {
-            return GameConstants.ICON_TEMP_FREEZING;
-        } else if (temperature > 0 && temperature <= 10) {
-            return GameConstants.ICON_TEMP_COLD;
-        } else if (temperature > 10 && temperature <= 20) {
-            return GameConstants.ICON_TEMP_CHILLY;
-        } else if (temperature > 20 && temperature <= 30) {
-            return GameConstants.ICON_TEMP_GOOD;
-        } else if (temperature > 30 && temperature <= 40) {
-            return GameConstants.ICON_TEMP_WARM;
+    public Temperature getTemperatureIcon() {
+        if (temperature <= GameConstants.TEMP_FREEZING.getMaxTemp()) {
+            return GameConstants.TEMP_FREEZING;
+        } else if (temperature <= GameConstants.TEMP_COLD.getMaxTemp()) {
+            return GameConstants.TEMP_COLD;
+        } else if (temperature <= GameConstants.TEMP_CHILLY.getMaxTemp()) {
+            return GameConstants.TEMP_CHILLY;
+        } else if (temperature <= GameConstants.TEMP_GOOD.getMaxTemp()) {
+            return GameConstants.TEMP_GOOD;
+        } else if (temperature <= GameConstants.TEMP_WARM.getMaxTemp()) {
+            return GameConstants.TEMP_WARM;
+        } else if (temperature <= GameConstants.TEMP_HOT.getMaxTemp()) {
+            return GameConstants.TEMP_HOT;
         } else {
-            return GameConstants.ICON_TEMP_HOT;
+            return GameConstants.TEMP_BURNING;
         }
     }
 
-    public ImageIcon getHumidityIcon() {
-        int index = Math.max(0, Math.min(humidity, GameConstants.humidity.size() - 1));
-        return GameConstants.humidity.get(index);
+    public Humidity getHumidityIcon() {
+        if (humidity == 0) {
+            return GameConstants.HUMID_0;
+        } else if (humidity == 1) {
+            return GameConstants.HUMID_1;
+        } else if (humidity == 2) {
+            return GameConstants.HUMID_2;
+        } else if (humidity == 3) {
+            return GameConstants.HUMID_3;
+        } else if (humidity == 4) {
+            return GameConstants.HUMID_4;
+        } else {
+            return GameConstants.HUMID_5;
+        }
     }
     
     public void generateWorld() {

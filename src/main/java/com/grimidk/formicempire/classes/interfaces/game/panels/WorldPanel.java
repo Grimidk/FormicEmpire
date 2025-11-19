@@ -130,15 +130,15 @@ public class WorldPanel extends JPanel {
         int temp = world.getTemperature();
         if (temp != lastTemperature) {
             temperatureLabel.setText("");
-            temperatureLabel.setToolTipText("Temp: " + temp + "°C");
-            temperatureLabel.setIcon(world.getTemperatureIcon());
+            temperatureLabel.setToolTipText("Temp: " + temp + "°C" + " (" + world.getTemperatureIcon().getName() + ")");
+            temperatureLabel.setIcon(world.getTemperatureIcon().getIcon());
             lastTemperature = temp;
         }
         int humidity = world.getHumidity();
         if (humidity != lastHumidity) {
             humidityLabel.setText("");
-            humidityLabel.setToolTipText("Humidity: " + humidity);
-            humidityLabel.setIcon(world.getHumidityIcon());
+            humidityLabel.setToolTipText("Humidity: " + world.getHumidityIcon().getName());
+            humidityLabel.setIcon(world.getHumidityIcon().getIcon());
             lastHumidity = humidity;
         }
     }
