@@ -7,11 +7,13 @@ import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 
-import java.awt.Point; 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class ColonyPopulationService {
 
@@ -127,25 +129,6 @@ public class ColonyPopulationService {
         evolveAnts(colony, colony.getEggs(), colony.getLarvae(), GameConstants.TYPE_LARVA);
     }
 
-    public void runLaying(Colony colony) {
-        int layerCount = colony.getAssignedRoleCount(GameConstants.ROLE_LAYER);
-        List<Ant> eggList = colony.getEggs();
-        
-        int spaceAvailable = colony.getStatsService().getEggsCapacity(colony) - eggList.size();
-        if (spaceAvailable <= 0) return;   
-        
-        int toLay = Math.min(layerCount * (int) colony.getStatsService().getLayingRate(colony), spaceAvailable);
-        for (int i = 0; i < toLay; i++) {
-            Ant newEgg = new Ant(colony, GameConstants.TYPE_EGG);
-            
-            ColonyPhysicsService physics = colony.getPhysicsService();
-            Point spawnPos = physics.getRandomPosition(colony, GameConstants.TYPE_EGG.getSprite());
-            newEgg.setPosition(spawnPos);
-
-            eggList.add(newEgg);
-        }
-    }
-
     public void runAging(Colony colony){
         List<Ant> antsToKill = new ArrayList<>();
         for (List<Ant> antList : colony.getAntGroups().values()) {
@@ -164,91 +147,97 @@ public class ColonyPopulationService {
             }
         }
     }
-
-    public void runNursing(Colony colony) {
+    
+    public void runEating(Colony colony){
         ColonyStatsService stats = colony.getStatsService();
-        int nurseCount = colony.getAssignedRoleCount(GameConstants.ROLE_NURSE);
-        int babyAntTotal = colony.getEggs().size() +  colony.getLarvae().size() +  colony.getPupae().size();
-        float nursingRate = stats.getNursingRate(colony);
-
-        if (babyAntTotal <= nurseCount * nursingRate) {
-            return;
-        }
-
-        int deficit = babyAntTotal - (nurseCount * (int) nursingRate);
-        List<AntType> killOrder = List.of(GameConstants.TYPE_LARVA, GameConstants.TYPE_EGG, GameConstants.TYPE_PUPA);
-        int deathCount = 0;
-
-        for (AntType typeToKill : killOrder) {
-            if (deficit <= 0) break;
-            List<Ant> list = colony.getAntsByType(typeToKill);
-            List<Ant> antsToCull = new ArrayList<>();
-            
+        
+        // --- 1. Water Consumption ---
+        List<Ant> thirstyAnts = new ArrayList<>();
+        int waterAvailable = colony.getWater();
+        List<AntType> adultDrinkOrder = Arrays.asList(
+            GameConstants.TYPE_QUEEN, GameConstants.TYPE_WORKER, GameConstants.TYPE_SOLDIER,
+            GameConstants.TYPE_MAJOR, GameConstants.TYPE_PRINCESS, GameConstants.TYPE_DRONE
+        );
+        for (AntType type : adultDrinkOrder) {
+            List<Ant> list = colony.getAntsByType(type);
             for (Ant ant : list) {
-                if (deficit <= 0) break;
-                if (Math.random() > 0.5) { 
-                    antsToCull.add(ant);
-                    deficit--;
-                } 
-            }
-            
-            for (Ant antToCull : antsToCull) {
-                if (antToCull.isAlive()) {
-                    antToCull.goDie(); 
-                    colony.getDeadAnts().add(antToCull);
-                    list.remove(antToCull);
-                    deathCount++;
+                if (waterAvailable >= 1) {
+                    waterAvailable -= 1;
+                } else {
+                    thirstyAnts.add(ant);
                 }
             }
         }
+        colony.setWater(waterAvailable);
         
-        if (deathCount > 0) {
-            colony.logEvent("WARNING: " + deathCount + " Juveniles Died (Nursing)");
+        // --- 2. Food Consumption ---
+        int mushroomsAvailable = colony.getMushrooms();
+        List<AntType> eatOrder = Arrays.asList(
+            GameConstants.TYPE_QUEEN, GameConstants.TYPE_WORKER, GameConstants.TYPE_LARVA,
+            GameConstants.TYPE_SOLDIER, GameConstants.TYPE_MAJOR, GameConstants.TYPE_PRINCESS, GameConstants.TYPE_DRONE
+        );
+        List<Ant> hungryAnts = new ArrayList<>();
+        for (AntType type : eatOrder) {
+            int consumptionPerAnt = (int) (type.getConsumptionMult() * stats.getBaseConsumption(colony));
+            if (consumptionPerAnt <= 0) consumptionPerAnt = 1; 
+            if (type == GameConstants.TYPE_EGG || type == GameConstants.TYPE_PUPA) continue;
+            
+            List<Ant> list = colony.getAntsByType(type);
+            for (Ant ant : list) {
+                if (mushroomsAvailable >= consumptionPerAnt) {
+                    mushroomsAvailable -= consumptionPerAnt;
+                } else {
+                    hungryAnts.add(ant);
+                }
+            }
+        }
+        colony.setMushrooms(mushroomsAvailable);
+        
+        // --- 3. Syrup Phase ---
+        Set<Ant> antsInNeed = new HashSet<>(thirstyAnts);
+        antsInNeed.addAll(hungryAnts);
+        int syrupAvailable = colony.hasUpgrade(GameUnlocks.ROLE_RANCHER) ? colony.getSyrups() : 0;
+        
+        Iterator<Ant> needIterator = antsInNeed.iterator();
+        while (needIterator.hasNext() && syrupAvailable > 0) {
+            Ant ant = needIterator.next();
+            syrupAvailable -= 1;
+            needIterator.remove(); 
+            thirstyAnts.remove(ant);
+            hungryAnts.remove(ant);
+        }
+        colony.setSyrups(syrupAvailable);
+        
+        // --- 4. Death Phase ---
+        Set<Ant> antsToKill = new HashSet<>();
+        for (Ant ant : thirstyAnts) {
+            if (Math.random() < 0.25) antsToKill.add(ant);
+        }
+        for (Ant ant : hungryAnts) {
+            antsToKill.add(ant); 
+        }
+        
+        for (Ant ant : antsToKill) {
+            if (ant.isAlive()) { 
+                AntType originalType = ant.getType(); 
+                ant.goDie();
+                colony.setTotalDeaths(colony.getTotalDeaths() + 1);
+                colony.getDeadAnts().add(ant);
+                List<Ant> antList = colony.getAntsByType(originalType);
+                if (antList != null) antList.remove(ant);
+            }
+        }
+
+        if (antsToKill.size() > 0) {
+            colony.logEvent("WARNING: " + antsToKill.size() + " Ants Died (Starvation/Dehydration)");
         }
     }
     
-    public void runSpreading(Colony colony, List<Ant> princesses) { 
-        // Placeholder
-    }
-
-    public void runPolicing(Colony colony) {
-        // Placeholder
-    }
-
-    public void runNuptial(Colony colony) {
-        List<Ant> princesses = colony.getPrincesses();
-        List<Ant> drones = colony.getDrones();
-
-        if (!colony.hasUpgrade(GameUnlocks.TYPE_PRINCESS)) return;
-
-        List<Ant> princessesToEvolve = new ArrayList<>();
-        boolean flightOccurred = false;
-        int queenCapacity = colony.getStatsService().getQueensCapacity(colony);
-        
-        for (Ant princess : princesses) {
-            boolean hasQueenSpace = (colony.getQueens().size() + princessesToEvolve.size()) < queenCapacity;
-            boolean hasDrones = !drones.isEmpty();     
-            
-            if (hasQueenSpace && hasDrones) {
-                princessesToEvolve.add(princess);
-                Ant deadDrone = drones.remove(drones.size() - 1); 
-                deadDrone.goDie();
-                colony.getDeadAnts().add(deadDrone);
-                flightOccurred = true;
-            } 
+    public void runInfection(Colony colony) { 
+        if (colony.getDeadAnts().size() < 100) {
+            return;
         }
-
-        for (Ant princess : princessesToEvolve) {
-            princess.transform(colony, GameConstants.TYPE_QUEEN);
-            colony.getQueens().add(princess);
-        }
-        
-        princesses.removeAll(princessesToEvolve);
-        runSpreading(colony, princesses); 
-        
-        if (flightOccurred) {
-            colony.logEvent("CRITICAL: Nuptial Flight Occurred");
-        }
+        // Placeholder for infection logic
     }
 
     public void rankUp(Colony colony) {

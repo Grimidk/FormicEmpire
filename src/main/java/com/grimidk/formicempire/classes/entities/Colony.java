@@ -9,9 +9,8 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList; 
 
 import com.grimidk.formicempire.classes.entities.services.ColonyStatsService;
-import com.grimidk.formicempire.classes.entities.services.ColonyResourceService;
+import com.grimidk.formicempire.classes.entities.services.ColonyLabourService;
 import com.grimidk.formicempire.classes.entities.services.ColonyPopulationService;
-import com.grimidk.formicempire.classes.entities.services.ColonyMaintenanceService;
 import com.grimidk.formicempire.classes.entities.services.ColonyPhysicsService;
 import com.grimidk.formicempire.classes.constants.ColonyRank;
 import com.grimidk.formicempire.classes.constants.Species;
@@ -67,17 +66,15 @@ public class Colony {
 
     // --- Service Dependencies ---
     private transient ColonyStatsService statsService;
-    private transient ColonyResourceService resourceService;
+    private transient ColonyLabourService labourService;
     private transient ColonyPopulationService populationService;
-    private transient ColonyMaintenanceService maintenanceService;
     private transient ColonyPhysicsService physicsService;
 
     // --- Service Initializer ---
     private void initializeServices() {
         this.statsService = new ColonyStatsService();
-        this.resourceService = new ColonyResourceService();
+        this.labourService = new ColonyLabourService();
         this.populationService = new ColonyPopulationService();
-        this.maintenanceService = new ColonyMaintenanceService();
         this.physicsService = new ColonyPhysicsService();
     }
 
@@ -412,9 +409,8 @@ public class Colony {
 
     // --- Public getters for services ---
     public ColonyStatsService getStatsService() { return this.statsService; }
-    public ColonyResourceService getResourceService() { return this.resourceService; }
+    public ColonyLabourService getLabourService() { return this.labourService; }
     public ColonyPopulationService getPopulationService() { return this.populationService; }
-    public ColonyMaintenanceService getMaintenanceService() { return this.maintenanceService; }
     public ColonyPhysicsService getPhysicsService() { return this.physicsService; }
 
     public int getTotalConsumption(){ return statsService.getTotalConsumption(this); }
@@ -476,19 +472,19 @@ public class Colony {
     public void runRoleAssignment() { populationService.runRoleAssignment(this); }
     public void runHatching(){ populationService.runHatching(this); }
     public void rankUp() { populationService.rankUp(this); }
-    public void runLaying() { populationService.runLaying(this); }
+    public void runLaying() { labourService.runLaying(this); }
     public void runAging(){ populationService.runAging(this); }
-    public void runNursing() { populationService.runNursing(this); }
-    public void runNuptial() { populationService.runNuptial(this); }
-    public void runEating(){ maintenanceService.runEating(this); }
-    public void runGraveKeeping() { maintenanceService.runGraveKeeping(this); }
-    public void runResearch() { maintenanceService.runResearch(this); }
-    public void runBuilding() { maintenanceService.runBuilding(this); }
-    public void runInfection() { maintenanceService.runInfection(this); }
-    public void runCollecting() { resourceService.runCollecting(this); }
-    public void runConverting() { resourceService.runConverting(this); }
-    public void runRanching() { resourceService.runRanching(this); }
-    public void runHerding() { resourceService.runHerding(this); }
+    public void runNursing() { labourService.runNursing(this); }
+    public void runNuptial() { labourService.runNuptial(this); }
+    public void runEating(){ populationService.runEating(this); }
+    public void runGraveKeeping() { labourService.runGraveKeeping(this); }
+    public void runResearch() { labourService.runResearch(this); }
+    public void runBuilding() { labourService.runBuilding(this); }
+    public void runInfection() { populationService.runInfection(this); }
+    public void runCollecting() { labourService.runCollecting(this); }
+    public void runConverting() { labourService.runConverting(this); }
+    public void runRanching() { labourService.runRanching(this); }
+    public void runHerding() { labourService.runHerding(this); }
     public void runPhysics() { physicsService.runPhysics(this); }
     public void assignRandomMovements() { physicsService.assignRandomMovements(this); }
 

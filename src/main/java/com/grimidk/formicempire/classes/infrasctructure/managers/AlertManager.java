@@ -79,7 +79,7 @@ public class AlertManager {
         // }
     }
     
-private void checkAvailableResearch() {
+    private void checkAvailableResearch() {
         if (!colony.hasUpgrade(GameUnlocks.ABILITY_RESEARCH)) return;
         for (Upgrade u : GameUnlocks.getUpgrades()) {
             if (!colony.hasUpgrade(u)) {         
