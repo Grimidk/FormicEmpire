@@ -2,32 +2,22 @@ package com.grimidk.formicempire.classes.constants.ant;
 
 import javax.swing.ImageIcon;
 
-public class MoveStatus {
-    private final int id;
-    private final String name;
+import com.grimidk.formicempire.classes.constants.Constant;
+
+public class MoveStatus extends Constant {
     private final float speedMult;
-    private ImageIcon icon;
    
-    public MoveStatus(int id, String name, float speedMult) {
-        this.id = id;
-        this.name = name;
+    public MoveStatus(int id, String name, float speedMult, ImageIcon icon) {
+        super(id, name, icon);
         this.speedMult = speedMult;
-        this.icon = icon;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
+    // Backwards-compatible constructor (no icon)
+    public MoveStatus(int id, String name, float speedMult) {
+        this(id, name, speedMult, null);
     }
 
     public float getSpeedMult() {
         return speedMult;
-    }
-
-    public ImageIcon getIcon() {
-        return icon;
     }
 }

@@ -2,37 +2,31 @@ package com.grimidk.formicempire.classes.constants.unlocks;
 
 import javax.swing.ImageIcon;
 
-public class Building {
-    private final int id;
-    private final String name;
+import com.grimidk.formicempire.classes.constants.Constant;
+
+public class Building extends Constant {
     private final int level;
     private final String description;
     private final Building requirement;
     private final int resinCost;
     private final int mineralCost;
     private final int buildTime;
-    private ImageIcon icon;
-    private ImageIcon sprite;
+    private final ImageIcon sprite;
 
-    public Building(int id, String name,int level, String description, Building requirement, int resinCost, int mineralCost, int buildTime) {
-        this.id = id;
-        this.name = name;
+    public Building(int id, String name,int level, String description, Building requirement, int resinCost, int mineralCost, int buildTime, ImageIcon icon, ImageIcon sprite) {
+        super(id, name, icon);
         this.level = level;
         this.description = description;
         this.requirement = requirement;
         this.resinCost = resinCost;
         this.mineralCost = mineralCost;
         this.buildTime = buildTime;
-        this.icon = icon;
         this.sprite = sprite;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
+    // Backwards-compatible constructor (no icon/sprite)
+    public Building(int id, String name,int level, String description, Building requirement, int resinCost, int mineralCost, int buildTime) {
+        this(id, name, level, description, requirement, resinCost, mineralCost, buildTime, null, null);
     }
 
     public int getLevel() {
@@ -57,10 +51,6 @@ public class Building {
 
     public int getBuildTime() {
         return buildTime;
-    }
-
-    public ImageIcon getIcon() {
-        return icon;
     }
 
     public ImageIcon getSprite() {

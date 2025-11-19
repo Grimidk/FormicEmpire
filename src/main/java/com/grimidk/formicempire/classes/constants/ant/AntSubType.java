@@ -2,11 +2,11 @@ package com.grimidk.formicempire.classes.constants.ant;
 
 import javax.swing.ImageIcon;
 
-public class AntSubType {
+import com.grimidk.formicempire.classes.constants.Constant;
 
-    private final int id;
+public class AntSubType extends Constant {
+
     private final AntType antType;
-    private final String name;
     private final float healtMult;
     private final float attackMult;
     private final float regenMult;
@@ -15,12 +15,10 @@ public class AntSubType {
     private final float defenseMult;
     private final float speedMult;
     private final float sizeMult; 
-    private ImageIcon icon;
 
-    public AntSubType(int id, AntType antType, String name, float healtMult, float attackMult, float regenMult, float consumptionMult, float attackSpeedMult, float defenseMult, float speedMult, float sizeMult) {
-        this.id = id;
+    public AntSubType(int id, AntType antType, String name, float healtMult, float attackMult, float regenMult, float consumptionMult, float attackSpeedMult, float defenseMult, float speedMult, float sizeMult, ImageIcon icon) {
+        super(id, name, icon);
         this.antType = antType;
-        this.name = name;
         this.healtMult = healtMult;
         this.attackMult = attackMult;
         this.regenMult = regenMult;
@@ -29,19 +27,15 @@ public class AntSubType {
         this.defenseMult = defenseMult;
         this.speedMult = speedMult;
         this.sizeMult = sizeMult;
-        this.icon = icon;
     }
 
-    public int getId() {
-        return id;
+    // Backwards-compatible constructor (no icon)
+    public AntSubType(int id, AntType antType, String name, float healtMult, float attackMult, float regenMult, float consumptionMult, float attackSpeedMult, float defenseMult, float speedMult, float sizeMult) {
+        this(id, antType, name, healtMult, attackMult, regenMult, consumptionMult, attackSpeedMult, defenseMult, speedMult, sizeMult, null);
     }
 
     public AntType getAntType() {
         return antType;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public float getHealtMult() {
@@ -74,9 +68,5 @@ public class AntSubType {
 
     public float getSizeMult() {
         return sizeMult;
-    }
-
-    public ImageIcon getIcon() {
-        return icon;
     }
 }

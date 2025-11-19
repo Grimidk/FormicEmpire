@@ -1,13 +1,13 @@
 package com.grimidk.formicempire.classes.infrasctructure.repositories;
 
-import com.grimidk.formicempire.classes.constants.ColonyRank;
-import com.grimidk.formicempire.classes.constants.ResourceType;
-import com.grimidk.formicempire.classes.constants.Species;
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntStatus;
 import com.grimidk.formicempire.classes.constants.ant.AntSubType;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.ant.MoveStatus;
+import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
+import com.grimidk.formicempire.classes.constants.misc.ResourceType;
+import com.grimidk.formicempire.classes.constants.misc.Species;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.MoonPhase;
 import com.grimidk.formicempire.classes.constants.world.Season;

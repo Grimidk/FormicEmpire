@@ -2,32 +2,22 @@ package com.grimidk.formicempire.classes.constants.ant;
 
 import javax.swing.ImageIcon;
 
-public class AntRole {
-    private final int id;
-    private final AntType antType;
-    private final String name;
-    private ImageIcon icon;
+import com.grimidk.formicempire.classes.constants.Constant;
 
-    public AntRole(int id, AntType antType, String name) {
-        this.id = id;
+public class AntRole extends Constant {
+    private final AntType antType;
+
+    public AntRole(int id, AntType antType, String name, ImageIcon icon) {
+        super(id, name, icon);
         this.antType = antType;
-        this.name = name;
-        this.icon = icon;
     }
 
-    public int getId() {
-        return id;
+    // Backwards-compatible constructor (no icon)
+    public AntRole(int id, AntType antType, String name) {
+        this(id, antType, name, null);
     }
 
     public AntType getAntType() {
         return antType;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public ImageIcon getIcon() {
-        return icon;
     }
 }
