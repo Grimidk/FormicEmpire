@@ -264,7 +264,7 @@ public class World {
         List<Weather> possibleWeathers = new ArrayList<>();
         
         possibleWeathers.add(GameConstants.CLEAR_WEATHER);
-        possibleWeathers.add(GameConstants.CLEAR_WEATHER);
+        possibleWeathers.add(GameConstants.CLEAR_WEATHER); 
         
         if (random.nextInt(1000) == 0) {
             this.setWeather(GameConstants.FROG_WEATHER);
@@ -272,14 +272,17 @@ public class World {
         }
 
         if (this.season == GameConstants.WINTER_SEASON) {
+            // Winter Events
             possibleWeathers.add(GameConstants.SNOW_WEATHER);
             possibleWeathers.add(GameConstants.HEAVY_SNOW_WEATHER);
             possibleWeathers.add(GameConstants.WIND_WEATHER);
         } else if (this.season == GameConstants.SUMMER_SEASON) {
+            // Summer Events
             possibleWeathers.add(GameConstants.RAIN_WEATHER);
             possibleWeathers.add(GameConstants.THUNDER_WEATHER);
             possibleWeathers.add(GameConstants.HEAT_WEATHER);
         } else {
+            // Spring/Autumn Events
             possibleWeathers.add(GameConstants.RAIN_WEATHER);
             possibleWeathers.add(GameConstants.HEAVY_RAIN_WEATHER);
             possibleWeathers.add(GameConstants.WIND_WEATHER);
@@ -326,6 +329,10 @@ public class World {
         
         updateEnvironmentalConditions();
 
+        if (random.nextInt(100) < 10) { 
+            randomizeWeather();
+        }
+
         if (engine != null) {
             engine.notifyHourListeners();
         }
@@ -340,7 +347,7 @@ public class World {
         this.day++;
 
         if (this.getSpawnHex() != null) {
-            this.getSpawnHex().getColony().runDailyJobs(getTemperatureIcon());
+            this.getSpawnHex().getColony().runDailyJobs(this.getTemperatureIcon());
         }
 
         if (this.day >= 1 && this.day < 2) {

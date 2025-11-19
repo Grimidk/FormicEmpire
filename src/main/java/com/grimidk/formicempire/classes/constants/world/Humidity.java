@@ -8,7 +8,7 @@ public class Humidity extends Constant {
     private final int humidityLevel;
 
     public Humidity(int id, String name, int humidityLevel, ImageIcon icon) {
-        super(id, name, null);
+        super(id, name, icon);
         this.humidityLevel = humidityLevel;
     }
     
