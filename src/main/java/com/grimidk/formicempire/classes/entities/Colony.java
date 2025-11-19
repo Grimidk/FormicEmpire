@@ -18,6 +18,7 @@ import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
 import com.grimidk.formicempire.classes.constants.misc.Species;
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
+import com.grimidk.formicempire.classes.constants.world.Temperature;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
@@ -476,7 +477,7 @@ public class Colony {
     public void runAging(){ populationService.runAging(this); }
     public void runNursing() { labourService.runNursing(this); }
     public void runNuptial() { labourService.runNuptial(this); }
-    public void runEating(){ populationService.runEating(this); }
+    public void runEating(Temperature currentTemp){ populationService.runEating(this, currentTemp); }
     public void runGraveKeeping() { labourService.runGraveKeeping(this); }
     public void runResearch() { labourService.runResearch(this); }
     public void runBuilding() { labourService.runBuilding(this); }
@@ -503,9 +504,9 @@ public class Colony {
         this.runBuilding();
     }
 
-    public void runDailyJobs() {
+    public void runDailyJobs(Temperature currentTemp) {
         this.rankUp();
-        this.runEating();
+        this.runEating(currentTemp);
         this.runHatching();
         this.runAging();
         this.runNursing();

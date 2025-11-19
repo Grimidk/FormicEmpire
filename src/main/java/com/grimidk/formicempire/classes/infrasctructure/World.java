@@ -340,7 +340,7 @@ public class World {
         this.day++;
 
         if (this.getSpawnHex() != null) {
-            this.getSpawnHex().getColony().runDailyJobs();
+            this.getSpawnHex().getColony().runDailyJobs(getTemperatureIcon());
         }
 
         if (this.day >= 1 && this.day < 2) {

@@ -51,13 +51,17 @@ public final class GameUnlocks {
     // -- Stats -- 
     public static final Upgrade STAT_SKELETON = new Upgrade(101, "Basic Skeletons", "Basic Exoskeletons", "The basic defense stats for all the ants in your colony before multipliers. 100 health points, 5 defense points and 1 health point recovered per second.", TYPE_EGG, 0 );
     public static final Upgrade STAT_ACID = new Upgrade(102, "Acid Spiting", "Acidic Spit", "The basic offensive stats for all the ants in your colony before multipliers. 10 attack points, 1 attack per second and 1 speed point.", TYPE_EGG, 0 );
-    public static final Upgrade STAT_LONGEVITY = new Upgrade(103, "Basic Longevity", "Standard Lifespan", "The basic life stats for all the ants in your colony before multipliers. 180 day lifespan, 25% temperature resistance, 1 unit of size and consumes 1 food per day.", TYPE_EGG, 0 );
+    public static final Upgrade STAT_LONGEVITY = new Upgrade(103, "Basic Longevity", "Standard Lifespan", "The basic life stats for all the ants in your colony before multipliers. 180 day lifespan, 25% temperature resistance, 20% thirst resistance, 1 unit of size and consumes 1 food per day.", TYPE_EGG, 0 );
     public static final Upgrade STAT_RESEARCH_1 = new Upgrade(104, "Improved Research Efficiency", "Micro Scopes", "Increases research speed by 1 point per hour.", ROLE_RESEARCHER, 800 );
     public static final Upgrade STAT_RESEARCH_2 = new Upgrade(105, "Advanced Research Efficiency", "Miniature Laboratories", "Increases research speed by 2 more points per hour.", STAT_RESEARCH_1, 2500 );
     public static final Upgrade STAT_RESEARCH_3 = new Upgrade(106, "Perfected Research Efficiency", "Nano Technology", "Increases research speed by 4 more points per hour.", STAT_RESEARCH_2, 12000 );
-    public static final Upgrade STAT_GROWTH_1 = new Upgrade(107, "Imprpved Growth", "Egg Incubating", "Decreases juvenile growth time by 1 day.", TYPE_EGG, 3500 );
+    public static final Upgrade STAT_GROWTH_1 = new Upgrade(107, "Improved Growth", "Egg Incubating", "Decreases juvenile growth time by 1 day.", TYPE_EGG, 3500 );
     public static final Upgrade STAT_GROWTH_2 = new Upgrade(108, "Advanced Growth", "Larval Education", "Decreases juvenile growth time by 1 more day.", STAT_GROWTH_1, 9000 );
     public static final Upgrade STAT_GROWTH_3 = new Upgrade(109, "Perfected Growth", "Pupal Bedding", "Decreases juvenile growth time by 1 more day.", STAT_GROWTH_2, 20000 );
+    public static final Upgrade STAT_THIRST_1 = new Upgrade(110, "Improved Metabolism", "Water Retention", "Increases the colony's thirst resistance to 40%.", STAT_LONGEVITY, 1500 );
+    public static final Upgrade STAT_THIRST_2 = new Upgrade(111, "Advanced Metabolism", "Camel Ants", "Increases the colony's thirst resistance to 60%.", STAT_THIRST_1, 5000 );
+    public static final Upgrade STAT_THIRST_3 = new Upgrade(112, "Perfected Metabolism", "Hydro-Lock Shells", "Increases the colony's thirst resistance to 80%.", STAT_THIRST_2, 15000 );
+
     // -- Abilities --
     public static final Upgrade ABILITY_RESEARCH = new Upgrade(201, "Research", "Micro Microscopes", "Allows you to research more ant technology by using research points, go to the research menu (Y).", ROLE_RESEARCHER, 0 );
     public static final Upgrade ABILITY_BUILD = new Upgrade(202, "Building", "Brick And Mortar", "Allows you to build parts of your colony, you can build in the build menu (U).", ROLE_BUILDER, 0 );
@@ -137,6 +141,9 @@ public final class GameUnlocks {
         upgrades.add(STAT_GROWTH_1);
         upgrades.add(STAT_GROWTH_2);
         upgrades.add(STAT_GROWTH_3);
+        upgrades.add(STAT_THIRST_1);
+        upgrades.add(STAT_THIRST_2);
+        upgrades.add(STAT_THIRST_3);
         upgrades.add(ABILITY_RESEARCH);
         upgrades.add(ABILITY_BUILD);
         upgrades.add(ABILITY_SPREAD);

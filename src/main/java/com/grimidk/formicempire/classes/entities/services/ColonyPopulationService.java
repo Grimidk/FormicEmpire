@@ -6,6 +6,7 @@ import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstan
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
+import com.grimidk.formicempire.classes.constants.world.Temperature;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,8 +15,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Random;
 
 public class ColonyPopulationService {
+    
+    private Random random = new Random();
 
     // --- Role Management ---
     private AntRole getDefaultRoleForType(AntType type) {
@@ -148,7 +152,7 @@ public class ColonyPopulationService {
         }
     }
     
-    public void runEating(Colony colony){
+    public void runEating(Colony colony, Temperature currentTemp){
         ColonyStatsService stats = colony.getStatsService();
         
         // --- 1. Water Consumption ---
@@ -158,9 +162,16 @@ public class ColonyPopulationService {
             GameConstants.TYPE_QUEEN, GameConstants.TYPE_WORKER, GameConstants.TYPE_SOLDIER,
             GameConstants.TYPE_MAJOR, GameConstants.TYPE_PRINCESS, GameConstants.TYPE_DRONE
         );
+        
+        int resistanceChance = stats.getThirstResistance(colony, currentTemp);
+
         for (AntType type : adultDrinkOrder) {
             List<Ant> list = colony.getAntsByType(type);
             for (Ant ant : list) {
+                if (random.nextInt(100) < resistanceChance) {
+                    continue; 
+                }
+
                 if (waterAvailable >= 1) {
                     waterAvailable -= 1;
                 } else {

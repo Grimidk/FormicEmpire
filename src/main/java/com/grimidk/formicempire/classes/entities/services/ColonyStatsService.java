@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.entities.services;
 
 import com.grimidk.formicempire.classes.constants.ant.AntType;
+import com.grimidk.formicempire.classes.constants.world.Temperature;
 import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
@@ -146,6 +147,27 @@ public class ColonyStatsService {
     public int getBaseSize(Colony colony){
         if (colony.hasUpgrade(GameUnlocks.STAT_LONGEVITY)) {return 1;
         } else {return 0;}
+    }
+    
+    public int getThirstResistance(Colony colony, Temperature temp) {
+        int resistance = 20; 
+        if (colony.hasUpgrade(GameUnlocks.STAT_THIRST_3)) {
+            resistance = 80;
+        } else if (colony.hasUpgrade(GameUnlocks.STAT_THIRST_2)) {
+            resistance = 60;
+        } else if (colony.hasUpgrade(GameUnlocks.STAT_THIRST_1)) {
+            resistance = 40;
+        }
+        if (temp != null) {
+            if (temp == GameConstants.TEMP_WARM) {
+                resistance /= 2;
+            } else if (temp == GameConstants.TEMP_HOT) {
+                resistance /= 4;
+            } else if (temp == GameConstants.TEMP_BURNING) {
+                resistance /= 8;
+            }
+        }
+        return resistance;
     }
 
     // --- Aggregates ---
