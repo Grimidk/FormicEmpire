@@ -12,7 +12,7 @@ public class AntRole extends Constant {
         this.antType = antType;
     }
 
-    // Backwards-compatible constructor (no icon)
+    //(no icon)
     public AntRole(int id, AntType antType, String name) {
         this(id, antType, name, null);
     }

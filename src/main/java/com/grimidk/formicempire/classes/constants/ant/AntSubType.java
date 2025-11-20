@@ -29,7 +29,7 @@ public class AntSubType extends Constant {
         this.sizeMult = sizeMult;
     }
 
-    // Backwards-compatible constructor (no icon)
+    //(no icon)
     public AntSubType(int id, AntType antType, String name, float healtMult, float attackMult, float regenMult, float consumptionMult, float attackSpeedMult, float defenseMult, float speedMult, float sizeMult) {
         this(id, antType, name, healtMult, attackMult, regenMult, consumptionMult, attackSpeedMult, defenseMult, speedMult, sizeMult, null);
     }

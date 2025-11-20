@@ -155,7 +155,7 @@ public class ColonyPopulationService {
     public void runEating(Colony colony, Temperature currentTemp){
         ColonyStatsService stats = colony.getStatsService();
         
-        // --- 1. Water Consumption ---
+        // --- Water Consumption ---
         List<Ant> thirstyAnts = new ArrayList<>();
         int waterAvailable = colony.getWater();
         List<AntType> adultDrinkOrder = Arrays.asList(
@@ -181,7 +181,7 @@ public class ColonyPopulationService {
         }
         colony.setWater(waterAvailable);
         
-        // --- 2. Food Consumption ---
+        // --- Food Consumption ---
         int mushroomsAvailable = colony.getMushrooms();
         List<AntType> eatOrder = Arrays.asList(
             GameConstants.TYPE_QUEEN, GameConstants.TYPE_WORKER, GameConstants.TYPE_LARVA,
@@ -204,7 +204,7 @@ public class ColonyPopulationService {
         }
         colony.setMushrooms(mushroomsAvailable);
         
-        // --- 3. Syrup Phase ---
+        // --- Syrup Phase ---
         Set<Ant> antsInNeed = new HashSet<>(thirstyAnts);
         antsInNeed.addAll(hungryAnts);
         int syrupAvailable = colony.hasUpgrade(GameUnlocks.ROLE_RANCHER) ? colony.getSyrups() : 0;
@@ -219,7 +219,7 @@ public class ColonyPopulationService {
         }
         colony.setSyrups(syrupAvailable);
         
-        // --- 4. Death Phase ---
+        // --- Death Phase ---
         Set<Ant> antsToKill = new HashSet<>();
         for (Ant ant : thirstyAnts) {
             if (Math.random() < 0.25) antsToKill.add(ant);
@@ -248,7 +248,7 @@ public class ColonyPopulationService {
         if (colony.getDeadAnts().size() < 100) {
             return;
         }
-        // Placeholder for infection logic
+        // Placeholder
     }
 
     public void rankUp(Colony colony) {

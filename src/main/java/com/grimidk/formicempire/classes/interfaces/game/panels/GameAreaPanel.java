@@ -19,6 +19,10 @@ public class GameAreaPanel extends JPanel {
     private final Map<String, Image> biomeTextureCache = new HashMap<>();
     
     private Colony colony;
+    
+    // 0 = Overworld, 1 = Underworld
+    private int currentDimension = 0; 
+    private String currentBiomeName = "Plains";
 
     public GameAreaPanel() {
         loadImages();
@@ -35,8 +39,9 @@ public class GameAreaPanel extends JPanel {
         biomeTextureCache.put("Swamp", loadImage("/backgrounds/biomes/SwampTile.png"));
         biomeTextureCache.put("Tundra", loadImage("/backgrounds/biomes/TundraTile.png"));
         biomeTextureCache.put("Taiga", loadImage("/backgrounds/biomes/TaigaTile.png"));
-        biomeTextureCache.put("Dessert", loadImage("/backgrounds/biomes/DessertTile.png"));
+        biomeTextureCache.put("Dessert", loadImage("/backgrounds/biomes/DessertTile.png")); 
         biomeTextureCache.put("Urban", loadImage("/backgrounds/biomes/UrbanTile.png"));
+        biomeTextureCache.put("Underground", loadImage("/backgrounds/colony/UndergroundTile.png"));
     }
 
     private Image loadImage(String path) {
@@ -56,18 +61,32 @@ public class GameAreaPanel extends JPanel {
     public void setColony(Colony colony) {
         this.colony = colony;
     }
+    
+    public void toggleDimension() {
+        if (currentDimension == 0) {
+            currentDimension = 1;
+        } else {
+            currentDimension = 0;
+        }
+        updateBackground();
+        repaint();
+    }
+    
+    public int getCurrentDimension() {
+        return currentDimension;
+    }
+    
+    private void updateBackground() {
+        if (currentDimension == 1) {
+            this.backgroundImage = biomeTextureCache.get("Underground");
+        } else {
+            this.backgroundImage = biomeTextureCache.getOrDefault(currentBiomeName, biomeTextureCache.get("Plains"));
+        }
+    }
 
     public void setBackgroundByBiome(String biomeName) {
-        Image newBg = biomeTextureCache.get(biomeName);
-        
-        if (newBg == null) {
-            newBg = biomeTextureCache.get("Plains");
-        }
-        
-        if (this.backgroundImage != newBg) {
-            this.backgroundImage = newBg;
-            repaint();
-        }
+        this.currentBiomeName = biomeName;
+        updateBackground();
     }
 
     @Override
@@ -108,6 +127,8 @@ public class GameAreaPanel extends JPanel {
 
                 List<Ant> ants = colony.getAntsByType(type);
                 for (Ant ant : ants) {
+                    if (ant.getDimension() != currentDimension) continue;
+                    
                     AffineTransform oldTransform = g2d.getTransform();
                     
                     double centerX = ant.getX() + (w / 2.0);

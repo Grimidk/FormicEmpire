@@ -35,10 +35,10 @@ public class ColonyPhysicsService {
         }
     }
 
-    public void runPhysics(Colony colony) {
+    public void runPhysics(Colony colony, int activeDimension) {
         for (List<Ant> antList : colony.getAntGroups().values()) {
             for (Ant ant : antList) {
-                if (ant.isAlive()) {
+                if (ant.isAlive() && ant.getDimension() == activeDimension) {
                     ant.updatePosition();
                 }
             }

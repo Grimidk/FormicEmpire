@@ -18,10 +18,6 @@ public class AlertManager {
     private final AlertPanel panel;
     private final List<Alert> activeAlerts = new ArrayList<>();
     
-    private final Color COL_RED = new Color(180, 0, 0);
-    private final Color COL_GREEN = new Color(0, 120, 0);
-    private final Color COL_ORANGE = new Color(200, 100, 0);
-    private final Color COL_BLUE = new Color(0, 0, 180);
     private final Color COL_BLACK = new Color(0,0,0);
 
     public AlertManager(Colony colony, AlertPanel panel) {

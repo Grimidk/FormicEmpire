@@ -12,7 +12,7 @@ public class MoveStatus extends Constant {
         this.speedMult = speedMult;
     }
 
-    // Backwards-compatible constructor (no icon)
+    //(no icon)
     public MoveStatus(int id, String name, float speedMult) {
         this(id, name, speedMult, null);
     }

@@ -40,33 +40,33 @@ public final class GameConstants {
     
     // --- Temperatures ---
     public static final Temperature TEMP_FREEZING = new Temperature(1, "Freezing", 5,
-        loadIcon("icons/misc/temp/freezing.png"));
+        loadIcon("icons/temp/freezing.png"));
     public static final Temperature TEMP_COLD = new Temperature(2, "Cold", 15,
-        loadIcon("icons/misc/temp/cold.png"));
+        loadIcon("icons/temp/cold.png"));
     public static final Temperature TEMP_CHILLY = new Temperature(3, "Chilly", 20,
-        loadIcon("icons/misc/temp/chilly.png"));
+        loadIcon("icons/temp/chilly.png"));
     public static final Temperature TEMP_GOOD = new Temperature(4, "Good", 28,
-        loadIcon("icons/misc/temp/good.png"));
+        loadIcon("icons/temp/good.png"));
     public static final Temperature TEMP_WARM = new Temperature(5, "Warm", 35,
-        loadIcon("icons/misc/temp/warm.png"));
+        loadIcon("icons/temp/warm.png"));
     public static final Temperature TEMP_HOT = new Temperature(6, "Hot", 45,
-        loadIcon("icons/misc/temp/hot.png"));
+        loadIcon("icons/temp/hot.png"));
     public static final Temperature TEMP_BURNING = new Temperature(7, "Burning", 100, // Cap high
-        loadIcon("icons/misc/temp/burning.png"));
+        loadIcon("icons/temp/burning.png"));
 
     // --- Humidity
     public static final Humidity HUMID_0 = new Humidity(1, "Arid", 0,
-        loadIcon("icons/misc/humid/humid0.png"));
+        loadIcon("icons/humid/humid0.png"));
     public static final Humidity HUMID_1 = new Humidity(2, "Dry", 1, 
-        loadIcon("icons/misc/humid/humid1.png"));
+        loadIcon("icons/humid/humid1.png"));
     public static final Humidity HUMID_2 = new Humidity(3, "Normal", 2, 
-        loadIcon("icons/misc/humid/humid2.png"));
+        loadIcon("icons/humid/humid2.png"));
     public static final Humidity HUMID_3 = new Humidity(4, "Humid", 3, 
-        loadIcon("icons/misc/humid/humid3.png"));
+        loadIcon("icons/humid/humid3.png"));
     public static final Humidity HUMID_4 = new Humidity(5, "Moist", 4, 
-        loadIcon("icons/misc/humid/humid4.png"));
+        loadIcon("icons/humid/humid4.png"));
     public static final Humidity HUMID_5 = new Humidity(6, "Saturated", 5, 
-        loadIcon("icons/misc/humid/humid5.png"));
+        loadIcon("icons/humid/humid5.png"));
 
     // --- Biomes ---
     public static final Biome PLAINS_BIOME = new Biome(1, "Plains", 25, 2, 
@@ -204,7 +204,6 @@ public final class GameConstants {
         loadIcon("icons/ants/zombie.png"), loadIcon("sprites/ants/zombie.png"));
 
     // --- Ant Subtypes ---
-    // (Add definitions here when you have them)
 
     // --- Ant Roles ---
     public static final AntRole ROLE_FORAGER = new AntRole(1, TYPE_WORKER, "Forager");
@@ -266,7 +265,6 @@ public final class GameConstants {
         loadIcon("icons/ranks/giga.png"));
     
     // --- Species ---
-    // (Add definitions here when you have them)
 
     // --- Lists to hold the constants ---
     private static final List<Biome> biomes = new ArrayList<>();
@@ -358,8 +356,6 @@ public final class GameConstants {
         antTypes.add(TYPE_DEAD);
         antTypes.add(TYPE_ZOMBIE);
 
-        // (Add antSubTypes here when you have them)
-
         antRoles.add(ROLE_FORAGER);
         antRoles.add(ROLE_NURSE);
         antRoles.add(ROLE_BUILDER);
@@ -422,7 +418,6 @@ public final class GameConstants {
         misc.add(ICON_APHID);
         misc.add(ICON_RESEARCH);
         
-        // (Add species here when you have them)
     }
     
     // --- Public Static Getters ---

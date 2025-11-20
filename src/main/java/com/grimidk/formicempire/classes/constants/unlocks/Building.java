@@ -24,7 +24,7 @@ public class Building extends Constant {
         this.sprite = sprite;
     }
 
-    // Backwards-compatible constructor (no icon/sprite)
+    //(no icon/sprite)
     public Building(int id, String name,int level, String description, Building requirement, int resinCost, int mineralCost, int buildTime) {
         this(id, name, level, description, requirement, resinCost, mineralCost, buildTime, null, null);
     }

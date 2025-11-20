@@ -486,7 +486,11 @@ public class Colony {
     public void runConverting() { labourService.runConverting(this); }
     public void runRanching() { labourService.runRanching(this); }
     public void runHerding() { labourService.runHerding(this); }
-    public void runPhysics() { physicsService.runPhysics(this); }
+    
+    public void runPhysics(int activeDimension) { 
+        physicsService.runPhysics(this, activeDimension); 
+    }
+    
     public void assignRandomMovements() { physicsService.assignRandomMovements(this); }
 
     // --- Job Schedulers ---

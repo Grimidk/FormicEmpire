@@ -74,12 +74,19 @@ public class GamePanel extends JPanel {
         Runnable showBuildDialogCallback = this::showBuildDialog;
         ControlPanel.RoleManagementCallback showRoleManagementDialogCallback = this::showRoleManagementDialog;
         
+        Runnable toggleViewCallback = () -> {
+            if (gameAreaPanel != null) {
+                gameAreaPanel.toggleDimension();
+            }
+        };
+        
         controlPanel = new ControlPanel(frame, 
                                         handleBackButtonCallback, 
                                         showHatchRateDialogCallback, 
                                         showResearchDialogCallback,
                                         showBuildDialogCallback,
-                                        showRoleManagementDialogCallback);
+                                        showRoleManagementDialogCallback,
+                                        toggleViewCallback);
     }
 
     private void initLayout() {
@@ -107,20 +114,20 @@ public class GamePanel extends JPanel {
         gbc.gridy = 0;
         gbc.weighty = 1.0; 
 
-        // 1. Colony Panel (Left)
+        // Colony Panel (Left)
         gbc.gridx = 0;
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.weightx = 0.0; 
         gbc.fill = GridBagConstraints.VERTICAL; 
         center.add(colonyPanel, gbc);
 
-        // 2. Game Area (Middle)
+        // Game Area (Middle)
         gbc.gridx = 1;
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.BOTH; 
         center.add(gameAreaPanel, gbc); 
 
-        // 3. Right Panel Container (World + Alert)
+        // Right Panel Container (World + Alert)
         JPanel rightPanel = new JPanel(new BorderLayout());
         rightPanel.setOpaque(false);
         rightPanel.add(worldPanel, BorderLayout.NORTH);
@@ -367,7 +374,7 @@ public class GamePanel extends JPanel {
             colony.setGameAreaDimensions(w, h);
         }
 
-        colony.runPhysics(); 
+        colony.runPhysics(gameAreaPanel.getCurrentDimension()); 
 
         worldPanel.updateMinuteData(world);
         colonyPanel.updateMinuteData(colony);

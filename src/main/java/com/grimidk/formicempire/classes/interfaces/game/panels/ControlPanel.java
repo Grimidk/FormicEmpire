@@ -19,6 +19,7 @@ public class ControlPanel extends JPanel {
     private final Runnable showResearchDialogCallback;
     private final Runnable showBuildDialogCallback;
     private final RoleManagementCallback showRoleManagementDialogCallback;
+    private final Runnable toggleViewCallback;
 
     // --- UI Components ---
     private final JButton speedUpButton = new JButton("Speed+");
@@ -44,13 +45,15 @@ public class ControlPanel extends JPanel {
                         Runnable showHatchRateDialogCallback, 
                         Runnable showResearchDialogCallback, 
                         Runnable showBuildDialogCallback,
-                        RoleManagementCallback showRoleManagementDialogCallback) {
+                        RoleManagementCallback showRoleManagementDialogCallback,
+                        Runnable toggleViewCallback) { 
         this.frame = frame;
         this.handleBackButtonCallback = handleBackButtonCallback;
         this.showHatchRateDialogCallback = showHatchRateDialogCallback;
         this.showResearchDialogCallback = showResearchDialogCallback;
         this.showBuildDialogCallback = showBuildDialogCallback;
         this.showRoleManagementDialogCallback = showRoleManagementDialogCallback;
+        this.toggleViewCallback = toggleViewCallback;
 
         initLayout();
         initListeners();
@@ -141,6 +144,7 @@ public class ControlPanel extends JPanel {
 
         // --- Game Menu Setup ---
         JMenuItem backToGame = new JMenuItem("Back to Game");
+        JMenuItem toggleView = new JMenuItem("Toggle View (A)");
         JMenuItem manageRoles = new JMenuItem("Manage Roles (Q/W/E/R/T)");
         JMenuItem manageHatchRates = new JMenuItem("Manage Hatch Rates (P)");
         manageResearch = new JMenuItem("Research (Y)");
@@ -150,6 +154,7 @@ public class ControlPanel extends JPanel {
         JMenuItem quitToMenu = new JMenuItem("Quit to Main Menu");
 
         backToGame.addActionListener(e -> gameMenu.setVisible(false));
+        toggleView.addActionListener(e -> toggleViewCallback.run());
         manageRoles.addActionListener(e -> showRoleManagementDialogCallback.showDialog(0));
         manageHatchRates.addActionListener(e -> showHatchRateDialogCallback.run());
         
@@ -189,6 +194,7 @@ public class ControlPanel extends JPanel {
         quitToMenu.addActionListener(e -> handleBackButtonCallback.run());
         
         gameMenu.add(backToGame);
+        gameMenu.add(toggleView);
         gameMenu.add(manageRoles);
         gameMenu.add(manageHatchRates);
         gameMenu.add(manageResearch);
@@ -212,6 +218,15 @@ public class ControlPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 playPauseButton.doClick();
+            }
+        });
+
+        // Toggle View (Overworld/Underworld)
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0), "toggleView");
+        actionMap.put("toggleView", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                toggleViewCallback.run();
             }
         });
 

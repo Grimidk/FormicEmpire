@@ -27,6 +27,9 @@ public class Ant {
     private float speed;
     private float size;
 
+    // 0 = Overworld, 1 = Underworld
+    private int dimension; 
+
     private MoveStatus moveStatus;
     private int x;
     private int y;
@@ -53,6 +56,8 @@ public class Ant {
         this.defense = colony.getBaseDefense() * type.getDefenseMult();
         this.speed = colony.getBaseSpeed() * type.getSpeedMult();
         this.size = colony.getBaseSize() * type.getSizeMult();
+        
+        this.dimension = 0;
 
         this.x = 0; 
         this.y = 0;
@@ -108,6 +113,9 @@ public class Ant {
 
     public float getSize() { return size; }
     public void setSize(int size) { this.size = size; }
+
+    public int getDimension() { return dimension; }
+    public void setDimension(int dimension) { this.dimension = dimension; }
 
     public void goDie() {
         this.type = GameConstants.TYPE_DEAD;
