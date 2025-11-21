@@ -1,9 +1,11 @@
 package com.grimidk.formicempire.classes.entities.services;
 
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Colony;
@@ -13,10 +15,33 @@ import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks
 
 public class ColonyLabourService {
     
+    // --- Job Counter ---
+    private int countActiveAnts(Colony colony, AntRole role, int requiredDimension, Rectangle requiredRoom) {
+        int count = 0;
+        List<Ant> allAdults = new ArrayList<>();
+        allAdults.addAll(colony.getWorkers());
+        allAdults.addAll(colony.getSoldiers());
+        allAdults.addAll(colony.getMajors());
+        allAdults.addAll(colony.getQueens()); 
+        
+        for (Ant ant : allAdults) {
+            if (!ant.isAlive()) continue;
+            if (ant.getRole() != role) continue;
+            if (ant.getDimension() != requiredDimension) continue;            
+            if (requiredDimension == 1 && requiredRoom != null) {
+                if (!requiredRoom.contains(ant.getX(), ant.getY())) {
+                    continue; 
+                }
+            }
+            
+            count++;
+        }
+        return count;
+    }
+
     public void runCollecting(Colony colony) {
         ColonyStatsService stats = colony.getStatsService();
-
-        int foragerCount = colony.getAssignedRoleCount(GameConstants.ROLE_FORAGER);
+        int foragerCount = countActiveAnts(colony, GameConstants.ROLE_FORAGER, 0, null);
         
         int plantGain = 0;
         int waterGain = 0;
@@ -40,7 +65,7 @@ public class ColonyLabourService {
         }
         
         if (colony.hasUpgrade(GameUnlocks.ROLE_HUNTER)) {
-            int hunterCount = colony.getAssignedRoleCount(GameConstants.ROLE_HUNTER);
+            int hunterCount = countActiveAnts(colony, GameConstants.ROLE_HUNTER, 0, null);
             int proteinGain = (int) (hunterCount * stats.getCollectingRate(colony));
             colony.setProtein(Math.min(colony.getProtein() + proteinGain, stats.getProteinCapacity(colony)));
         }
@@ -48,7 +73,7 @@ public class ColonyLabourService {
 
     public void runConverting(Colony colony) {
         ColonyStatsService stats = colony.getStatsService();
-        int farmerCount = colony.getAssignedRoleCount(GameConstants.ROLE_FARMER);
+        int farmerCount = countActiveAnts(colony, GameConstants.ROLE_FARMER, 1, colony.getFarmBounds());
         
         if (colony.getMushrooms() >= stats.getMushroomsCapacity(colony)) return;
         
@@ -82,7 +107,8 @@ public class ColonyLabourService {
          if (!colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) return;
          
         ColonyStatsService stats = colony.getStatsService();
-        int rancherCount = colony.getAssignedRoleCount(GameConstants.ROLE_RANCHER);
+        int rancherCount = countActiveAnts(colony, GameConstants.ROLE_RANCHER, 0, null);
+        
         if(colony.hasBuilding(GameUnlocks.PASSIVE_APHID)) {
             rancherCount += 1;
         }
@@ -96,7 +122,8 @@ public class ColonyLabourService {
     }
 
     public void runLaying(Colony colony) {
-        int layerCount = colony.getAssignedRoleCount(GameConstants.ROLE_LAYER);
+        int layerCount = countActiveAnts(colony, GameConstants.ROLE_LAYER, 1, colony.getRoyalBounds());
+        
         List<Ant> eggList = colony.getEggs();
         
         int spaceAvailable = colony.getStatsService().getEggsCapacity(colony) - eggList.size();
@@ -106,9 +133,14 @@ public class ColonyLabourService {
         for (int i = 0; i < toLay; i++) {
             Ant newEgg = new Ant(colony, GameConstants.TYPE_EGG);
             
-            ColonyPhysicsService physics = colony.getPhysicsService();
-            Point spawnPos = physics.getRandomPosition(colony, GameConstants.TYPE_EGG.getSprite());
-            newEgg.setPosition(spawnPos);
+            newEgg.setDimension(1);
+            Rectangle nursery = colony.getNurseryBounds();
+            if (nursery != null) {
+                Point spawnPos = colony.getPhysicsService().getSpecificRoomPoint(colony, nursery);
+                newEgg.setPosition(spawnPos);
+            } else {
+                newEgg.setPosition(new Point(0, 0));
+            }
 
             eggList.add(newEgg);
         }
@@ -116,7 +148,8 @@ public class ColonyLabourService {
 
     public void runNursing(Colony colony) {
         ColonyStatsService stats = colony.getStatsService();
-        int nurseCount = colony.getAssignedRoleCount(GameConstants.ROLE_NURSE);
+        int nurseCount = countActiveAnts(colony, GameConstants.ROLE_NURSE, 1, colony.getNurseryBounds());
+        
         int babyAntTotal = colony.getEggs().size() +  colony.getLarvae().size() +  colony.getPupae().size();
         float nursingRate = stats.getNursingRate(colony);
 
@@ -189,6 +222,7 @@ public class ColonyLabourService {
 
         for (Ant princess : princessesToEvolve) {
             princess.transform(colony, GameConstants.TYPE_QUEEN);
+            princess.setDimension(1); 
             colony.getQueens().add(princess);
         }
         
@@ -218,7 +252,7 @@ public class ColonyLabourService {
 
     public void runResearch(Colony colony) {
         if (!colony.hasUpgrade(GameUnlocks.ROLE_RESEARCHER)) return;
-        int researcherCount = colony.getAssignedRoleCount(GameConstants.ROLE_RESEARCHER);
+        int researcherCount = countActiveAnts(colony, GameConstants.ROLE_RESEARCHER, 1, colony.getRoyalBounds());
         
         if (colony.hasBuilding(GameUnlocks.PASSIVE_LAB)) {
             researcherCount += 1; 
@@ -230,7 +264,7 @@ public class ColonyLabourService {
     public void runBuilding(Colony colony) {
         if (colony.getCurrentBuildingProject() == null) return;
         
-        int builderCount = colony.getAssignedRoleCount(GameConstants.ROLE_BUILDER);
+        int builderCount = countActiveAnts(colony, GameConstants.ROLE_BUILDER, 1, null);        
         if (builderCount <= 0) return;
         
         double efficiency = builderCount / 100.0;

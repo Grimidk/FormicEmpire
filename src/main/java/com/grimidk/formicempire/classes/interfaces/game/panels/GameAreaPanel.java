@@ -126,6 +126,14 @@ public class GameAreaPanel extends JPanel {
         
         if (currentDimension == 1) {
             drawUnderworldStructure(g2d);
+            if (colony != null && entranceBounds != null) {
+                // Mapping as requested:
+                // Room 1 (Top Left): Storage
+                // Room 2 (Top Right): Farm
+                // Room 3 (Bottom Left): Nursery
+                // Room 4 (Bottom Right): Royal Chamber
+                colony.setRoomBounds(entranceBounds, room1Bounds, room2Bounds, room3Bounds, room4Bounds);
+            }
         }
         
         drawAnts(g2d);

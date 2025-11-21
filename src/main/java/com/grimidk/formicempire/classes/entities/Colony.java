@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList; 
+import java.awt.Rectangle; 
 
 import com.grimidk.formicempire.classes.entities.services.ColonyStatsService;
 import com.grimidk.formicempire.classes.entities.services.ColonyLabourService;
@@ -64,6 +65,13 @@ public class Colony {
     private Building currentBuildingProject = null;
     private double buildingProgressHours = 0.0;
     private final List<String> eventLog = new ArrayList<>();
+
+    // --- Room Bounds ---
+    private Rectangle entranceBounds;
+    private Rectangle storageBounds; // Room 1 (Top Left)
+    private Rectangle farmBounds;    // Room 2 (Top Right)
+    private Rectangle nurseryBounds; // Room 3 (Bottom Left)
+    private Rectangle royalBounds;   // Room 4 (Bottom Right)
 
     // --- Service Dependencies ---
     private transient ColonyStatsService statsService;
@@ -256,6 +264,16 @@ public class Colony {
     private void populateAntList(List<Ant> list, int count, AntType type) {
         for (int i = 0; i < count; i++) {
             Ant newAnt = new Ant(this, type);
+            
+            if (type == GameConstants.TYPE_EGG || 
+                type == GameConstants.TYPE_LARVA || 
+                type == GameConstants.TYPE_PUPA || 
+                type == GameConstants.TYPE_QUEEN) {
+                newAnt.setDimension(1);
+            } 
+            else {
+                newAnt.setDimension(0); 
+            }
             list.add(newAnt);
         }
     }
@@ -407,6 +425,35 @@ public class Colony {
 
     public int getTotalDeaths () { return totalDeaths; }
     public void setTotalDeaths (int totalDeaths) { this.totalDeaths = totalDeaths; }
+    
+    // --- Room Bounds Getters/Setters ---
+    public void setRoomBounds(Rectangle entrance, Rectangle storage, Rectangle farm, Rectangle nursery, Rectangle royal) {
+        this.entranceBounds = entrance;
+        this.storageBounds = storage;
+        this.farmBounds = farm;
+        this.nurseryBounds = nursery;
+        this.royalBounds = royal;
+    }
+    
+    public Rectangle getEntranceBounds() { return entranceBounds; }
+    public Rectangle getStorageBounds() { return storageBounds; }
+    public Rectangle getFarmBounds() { return farmBounds; }
+    public Rectangle getNurseryBounds() { return nurseryBounds; }
+    public Rectangle getRoyalBounds() { return royalBounds; }
+    
+    public Rectangle getTargetRoomForAnt(Ant ant) {
+        if (ant.getType() == GameConstants.TYPE_QUEEN) return royalBounds;
+        if (ant.getType() == GameConstants.TYPE_EGG || ant.getType() == GameConstants.TYPE_LARVA || ant.getType() == GameConstants.TYPE_PUPA) return nurseryBounds;
+        
+        AntRole role = ant.getRole();
+        if (role == null) return storageBounds; 
+        
+        if (role == GameConstants.ROLE_NURSE) return nurseryBounds;
+        if (role == GameConstants.ROLE_FARMER) return farmBounds;
+        if (role == GameConstants.ROLE_FORAGER || role == GameConstants.ROLE_HUNTER) return storageBounds;
+        
+        return storageBounds; // Default
+    }
 
     // --- Public getters for services ---
     public ColonyStatsService getStatsService() { return this.statsService; }
@@ -449,24 +496,46 @@ public class Colony {
         List<Ant> workerList = getWorkers();
         for (int i = 0; i < 9; i++) {
             Ant worker = new Ant(this, GameConstants.TYPE_WORKER);
+            worker.setDimension(0);
             workerList.add(worker);
         }
         Ant queen = new Ant(this, GameConstants.TYPE_QUEEN);
+        queen.setDimension(1); 
         getQueens().add(queen);
+        
         setAssignedRoleCount(GameConstants.ROLE_LAYER, 1);
         setAssignedRoleCount(GameConstants.ROLE_NURSE, 3);
         setAssignedRoleCount(GameConstants.ROLE_FARMER, 1);
         setAssignedRoleCount(GameConstants.ROLE_FORAGER, 5);
         this.getQueens().get(0).setRole(GameConstants.ROLE_LAYER);
+        
+        // Assign roles and dimensions
         this.getWorkers().get(0).setRole(GameConstants.ROLE_NURSE);
+        this.getWorkers().get(0).setDimension(1);
+        
         this.getWorkers().get(1).setRole(GameConstants.ROLE_NURSE);
+        this.getWorkers().get(1).setDimension(1);
+        
         this.getWorkers().get(2).setRole(GameConstants.ROLE_FARMER);
+        this.getWorkers().get(2).setDimension(1);
+        
         this.getWorkers().get(3).setRole(GameConstants.ROLE_NURSE);
+        this.getWorkers().get(3).setDimension(1);
+        
         this.getWorkers().get(4).setRole(GameConstants.ROLE_FORAGER);
+        this.getWorkers().get(4).setDimension(0);
+        
         this.getWorkers().get(5).setRole(GameConstants.ROLE_FORAGER);
+        this.getWorkers().get(5).setDimension(0);
+        
         this.getWorkers().get(6).setRole(GameConstants.ROLE_FORAGER);
+        this.getWorkers().get(6).setDimension(0);
+        
         this.getWorkers().get(7).setRole(GameConstants.ROLE_FORAGER);
+        this.getWorkers().get(7).setDimension(0);
+        
         this.getWorkers().get(8).setRole(GameConstants.ROLE_FORAGER);
+        this.getWorkers().get(8).setDimension(0);
     }
 
     // --- Simulation Logic Methods ---
