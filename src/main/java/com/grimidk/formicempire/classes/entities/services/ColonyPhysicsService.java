@@ -14,6 +14,11 @@ import javax.swing.ImageIcon;
 
 public class ColonyPhysicsService {
 
+    int padTop = 56;
+    int padBottom = 72;
+    int padHallSide = 64;
+    int padAwaySide = 64;
+
     public void randomizeAllAntPositions(Colony colony) {
         for (Map.Entry<AntType, List<Ant>> entry : colony.getAntGroups().entrySet()) {
             AntType type = entry.getKey();
@@ -52,7 +57,7 @@ public class ColonyPhysicsService {
     public void runPhysics(Colony colony, int activeDimension) {
         for (List<Ant> antList : colony.getAntGroups().values()) {
             for (Ant ant : antList) {
-                if (ant.isAlive()) {
+                if (ant.isAlive() && ant.getDimension() == activeDimension) {
                     updateAntLogic(colony, ant);
                     ant.updatePosition();
                 }
@@ -63,10 +68,8 @@ public class ColonyPhysicsService {
     private void updateAntLogic(Colony colony, Ant ant) {
         if (ant.isMoving()) return; 
 
-        int dim = ant.getDimension();
-        
+        int dim = ant.getDimension(); 
         Point overworldEntrance = new Point(colony.getGameAreaWidth() / 2, colony.getGameAreaHeight() / 2);
-        
         boolean shouldBeInside = shouldBeInColony(ant);
 
         // --- OVERWORLD LOGIC ---
@@ -95,33 +98,33 @@ public class ColonyPhysicsService {
             Rectangle targetRoom = colony.getTargetRoomForAnt(ant);
             
             if (!shouldBeInside) {
-                 Rectangle entranceRect = colony.getEntranceBounds();
-                 if (entranceRect == null) return; 
+                Rectangle entranceRect = colony.getEntranceBounds();
+                if (entranceRect == null) return; 
                  
-                 Point exitPoint = new Point((int)entranceRect.getCenterX(), entranceRect.y);
+                Point exitPoint = new Point((int)entranceRect.getCenterX(), entranceRect.y);
                  
-                 double dist = dist(ant.getX(), ant.getY(), exitPoint.x, exitPoint.y);
-                 if (dist < 15) {
-                     ant.setDimension(0);
-                     ant.setPosition(overworldEntrance);
-                     ant.moveTo(null);
-                 } else {
-                     navigateToPointInUnderworld(colony, ant, exitPoint);
-                 }
+                double dist = dist(ant.getX(), ant.getY(), exitPoint.x, exitPoint.y);
+                if (dist < 15) {
+                    ant.setDimension(0);
+                    ant.setPosition(overworldEntrance);
+                    ant.moveTo(null);
+                } else {
+                    navigateToPointInUnderworld(colony, ant, exitPoint);
+                }
             } else {
                 if (targetRoom == null) return;
 
                 if (ant.getType() == GameConstants.TYPE_EGG || ant.getType() == GameConstants.TYPE_PUPA) {
-                     if (!isPointInSpecificBounds(colony, targetRoom, ant.getX(), ant.getY())) {
-                         Point safeSpot = getSpecificRoomPoint(colony, targetRoom);
-                         ant.setPosition(safeSpot);
-                         ant.moveTo(null);
-                     } else {
-                         if (ant.getType() == GameConstants.TYPE_LARVA && Math.random() < 0.01) {
-                             ant.moveTo(getSpecificRoomPoint(colony, targetRoom));
-                         }
-                     }
-                     return; 
+                    if (!isPointInSpecificBounds(colony, targetRoom, ant.getX(), ant.getY())) {
+                        Point safeSpot = getSpecificRoomPoint(colony, targetRoom);
+                        ant.setPosition(safeSpot);
+                        ant.moveTo(null);
+                    } else {
+                        if (ant.getType() == GameConstants.TYPE_LARVA && Math.random() < 0.01) {
+                            ant.moveTo(getSpecificRoomPoint(colony, targetRoom));
+                        }
+                    }
+                    return; 
                 }
 
                 if (targetRoom.contains(ant.getX(), ant.getY())) {
@@ -140,11 +143,6 @@ public class ColonyPhysicsService {
     public Point getSpecificRoomPoint(Colony colony, Rectangle r) {
         Rectangle entrance = colony.getEntranceBounds();
         if (entrance == null) return new Point(r.x, r.y); 
-        
-        int padTop = 64;
-        int padBottom = 64;
-        int padHallSide = 32;
-        int padAwaySide = 96;
         
         int minX, maxX, minY, maxY;
         
@@ -172,10 +170,7 @@ public class ColonyPhysicsService {
         Rectangle entrance = colony.getEntranceBounds();
         if (entrance == null) return r.contains(x, y);
         
-        int padTop = 64;
-        int padBottom = 64;
-        int padHallSide = 32;
-        int padAwaySide = 96;
+        
         
         int minX, maxX, minY, maxY;
         
@@ -234,9 +229,5 @@ public class ColonyPhysicsService {
 
     private double dist(int x1, int y1, int x2, int y2) {
         return Math.sqrt(Math.pow(x2-x1, 2) + Math.pow(y2-y1, 2));
-    }
-
-    public void assignRandomMovements(Colony colony) {
-       // Logic delegated to updateAntLogic
     }
 }

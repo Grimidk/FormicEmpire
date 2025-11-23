@@ -161,8 +161,12 @@ public final class GameConstants {
         loadIcon("icons/weather/heavy-wind.png"));
     public static final Weather HEAT_WEATHER = new Weather(8, "Heat Wave", -2, 1.2f, 
         loadIcon("icons/weather/heat-wave.png"));
-    public static final Weather FROG_WEATHER = new Weather(9, "Frog Rain", 3, 1.0f, 
+    public static final Weather FOG_WEATHER = new Weather(9, "Fog", 0, 0.9f, 
+        loadIcon("icons/weather/fog.png"));
+    public static final Weather FROG_WEATHER = new Weather(10, "Frog Rain", 3, 1.0f, 
         loadIcon("icons/weather/frog-rain.png"));
+    public static final Weather BLOOD_WEATHER = new Weather(11, "Blood Rain", 2, 0.85f, 
+        loadIcon("icons/weather/blood-rain.png"));
 
     // --- Ant Status ---
     public static final AntStatus STATUS_ALIVE = new AntStatus(1, "Alive", 
@@ -178,6 +182,7 @@ public final class GameConstants {
     public static final MoveStatus MOVE_MARCH = new MoveStatus(3, "Marching", 1f);
     public static final MoveStatus MOVE_SPEED = new MoveStatus(4, "Speed Marching", 3/2f);
     public static final MoveStatus MOVE_FLY = new MoveStatus(5, "Flying", 3f);
+    public static final MoveStatus MOVE_PATROL = new MoveStatus(6, "Patrolling", 1f);
 
     // --- Ant Types ---
     public static final AntType TYPE_EGG = new AntType(1, "Egg", 1f, 0f, 0f, 0f, 0f, 0f, 0f, 1/4f, 
@@ -235,6 +240,7 @@ public final class GameConstants {
     public static final AntRole ROLE_MILITIA = new AntRole(27, TYPE_WORKER, "Militia Auxiliary");
     public static final AntRole ROLE_CATCHER = new AntRole(28, TYPE_SOLDIER, "Catcher");
     public static final AntRole ROLE_CRANE = new AntRole(29, TYPE_MAJOR, "Construction Crane");
+    public static final AntRole ROLE_TRANSPORT = new AntRole(30, TYPE_MAJOR, "Resource Transport");
 
     // --- Colony Ranks ---
     public static final ColonyRank RANK_ANT = new ColonyRank(1, "Ant", 1l, 

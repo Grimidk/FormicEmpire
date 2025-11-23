@@ -559,13 +559,10 @@ public class Colony {
     public void runPhysics(int activeDimension) { 
         physicsService.runPhysics(this, activeDimension); 
     }
-    
-    public void assignRandomMovements() { physicsService.assignRandomMovements(this); }
 
     // --- Job Schedulers ---
     public void runMinutelyJobs() {
         this.runConverting();
-        this.assignRandomMovements();
     }
 
     public void runHourlyJobs() {

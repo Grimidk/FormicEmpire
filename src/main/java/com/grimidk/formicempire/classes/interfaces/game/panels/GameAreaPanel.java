@@ -127,7 +127,6 @@ public class GameAreaPanel extends JPanel {
         if (currentDimension == 1) {
             drawUnderworldStructure(g2d);
             if (colony != null && entranceBounds != null) {
-                // Mapping as requested:
                 // Room 1 (Top Left): Storage
                 // Room 2 (Top Right): Farm
                 // Room 3 (Bottom Left): Nursery
