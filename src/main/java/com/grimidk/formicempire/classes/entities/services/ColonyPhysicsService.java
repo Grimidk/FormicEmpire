@@ -14,12 +14,18 @@ import javax.swing.ImageIcon;
 
 public class ColonyPhysicsService {
 
-    int padTop = 56;
-    int padBottom = 72;
-    int padHallSide = 64;
-    int padAwaySide = 64;
+    int padTop = 48;
+    int padBottom = 48;
+    int padBack = 64; 
+    int padHall = 16;
+    int antSize = 40; 
+    
+    final int ROOM_SIZE = 256;
+    final int HALL_WIDTH = 128;
 
     public void randomizeAllAntPositions(Colony colony) {
+        int virtualWidth = colony.getGameAreaWidth() > 100 ? colony.getGameAreaWidth() : 1280;
+
         for (Map.Entry<AntType, List<Ant>> entry : colony.getAntGroups().entrySet()) {
             AntType type = entry.getKey();
             if (type == GameConstants.TYPE_DEAD) continue;
@@ -28,19 +34,67 @@ public class ColonyPhysicsService {
             List<Ant> ants = entry.getValue();
             
             for (Ant ant : ants) {
-                if (ant.getDimension() == 1) {
-                    Rectangle targetRoom = colony.getTargetRoomForAnt(ant);
-                    if (targetRoom != null) {
-                        Point safeSpot = getSpecificRoomPoint(colony, targetRoom);
-                        ant.setPosition(safeSpot);
-                    } else {
-                        ant.setPosition(new Point(0,0)); 
+                boolean belongsInUnderworld = ant.getDimension() == 1 || shouldBeInColony(ant);
+
+                if (belongsInUnderworld) {
+                    if (ant.getDimension() != 1) {
+                        ant.setDimension(1);
                     }
+
+                    Rectangle targetRoom = colony.getTargetRoomForAnt(ant);
+                    
+                    if (targetRoom == null) {
+                        targetRoom = estimateRoomBounds(colony, ant, virtualWidth);
+                    }
+                    
+                    Point safeSpot = getSpecificRoomPoint(colony, targetRoom, virtualWidth);
+                    ant.setPosition(safeSpot);
                 } else {
                     ant.setPosition(getRandomOverworldPosition(colony, sprite));
                 }
             }
         }
+    }
+    
+    private Rectangle estimateRoomBounds(Colony colony, Ant ant, int gameWidth) {
+        int centerX = gameWidth / 2;
+        int hallX = centerX - (HALL_WIDTH / 2);      
+        
+        AntType type = ant.getType();
+        AntRole role = ant.getRole();
+
+        int roomIndex;
+
+        if (type == GameConstants.TYPE_QUEEN) {
+            roomIndex = 4; // Royal
+        } else if (type == GameConstants.TYPE_EGG || type == GameConstants.TYPE_LARVA || type == GameConstants.TYPE_PUPA) {
+            roomIndex = 3; // Nursery
+        } else if (role == GameConstants.ROLE_NURSE) {
+            roomIndex = 3; // Nursery
+        } else if (role == GameConstants.ROLE_FARMER) {
+            roomIndex = 2; // Farm
+        } else {
+            roomIndex = 1; // Storage
+        }
+        
+        int x = 0;
+        int y = 0;
+        
+        if (roomIndex == 1) { // Top Left
+            x = hallX - ROOM_SIZE;
+            y = 0;
+        } else if (roomIndex == 2) { // Top Right
+            x = hallX + HALL_WIDTH;
+            y = 0;
+        } else if (roomIndex == 3) { // Bottom Left
+            x = hallX - ROOM_SIZE;
+            y = ROOM_SIZE;
+        } else if (roomIndex == 4) { // Bottom Right
+            x = hallX + HALL_WIDTH;
+            y = ROOM_SIZE;
+        }
+        
+        return new Rectangle(x, y, ROOM_SIZE, ROOM_SIZE);
     }
     
     private Point getRandomOverworldPosition(Colony colony, ImageIcon sprite) {
@@ -95,13 +149,34 @@ public class ColonyPhysicsService {
         
         // --- UNDERWORLD LOGIC ---
         else if (dim == 1) {
+            if (ant.getX() == 0 && ant.getY() == 0) {
+                 int virtualWidth = colony.getGameAreaWidth() > 100 ? colony.getGameAreaWidth() : 1280;
+                 Rectangle targetRoom = colony.getTargetRoomForAnt(ant);
+                 if (targetRoom == null) {
+                     targetRoom = estimateRoomBounds(colony, ant, virtualWidth);
+                 }
+                 Point safeSpot = getSpecificRoomPoint(colony, targetRoom, virtualWidth);
+                 ant.setPosition(safeSpot);
+                 ant.moveTo(null);
+                 return;
+            }
+            
             Rectangle targetRoom = colony.getTargetRoomForAnt(ant);
+            
+            if (targetRoom == null) {
+                int virtualWidth = colony.getGameAreaWidth() > 100 ? colony.getGameAreaWidth() : 1280;
+                targetRoom = estimateRoomBounds(colony, ant, virtualWidth);
+            }
             
             if (!shouldBeInside) {
                 Rectangle entranceRect = colony.getEntranceBounds();
-                if (entranceRect == null) return; 
-                 
-                Point exitPoint = new Point((int)entranceRect.getCenterX(), entranceRect.y);
+                int centerX = colony.getGameAreaWidth() / 2;
+                Point exitPoint;
+                if (entranceRect != null) {
+                    exitPoint = new Point((int)entranceRect.getCenterX(), entranceRect.y);
+                } else {
+                    exitPoint = new Point(centerX, 0);
+                }
                  
                 double dist = dist(ant.getX(), ant.getY(), exitPoint.x, exitPoint.y);
                 if (dist < 15) {
@@ -112,24 +187,24 @@ public class ColonyPhysicsService {
                     navigateToPointInUnderworld(colony, ant, exitPoint);
                 }
             } else {
-                if (targetRoom == null) return;
-
+                // Static ants logic
                 if (ant.getType() == GameConstants.TYPE_EGG || ant.getType() == GameConstants.TYPE_PUPA) {
                     if (!isPointInSpecificBounds(colony, targetRoom, ant.getX(), ant.getY())) {
-                        Point safeSpot = getSpecificRoomPoint(colony, targetRoom);
+                        Point safeSpot = getSpecificRoomPoint(colony, targetRoom, colony.getGameAreaWidth());
                         ant.setPosition(safeSpot);
                         ant.moveTo(null);
                     } else {
                         if (ant.getType() == GameConstants.TYPE_LARVA && Math.random() < 0.01) {
-                            ant.moveTo(getSpecificRoomPoint(colony, targetRoom));
+                            ant.moveTo(getSpecificRoomPoint(colony, targetRoom, colony.getGameAreaWidth()));
                         }
                     }
                     return; 
                 }
 
-                if (targetRoom.contains(ant.getX(), ant.getY())) {
+                // Active ants logic
+                if (isPointInSpecificBounds(colony, targetRoom, ant.getX(), ant.getY())) {
                     if (Math.random() < 0.02) {
-                         Point wanderDest = getSpecificRoomPoint(colony, targetRoom);
+                         Point wanderDest = getSpecificRoomPoint(colony, targetRoom, colony.getGameAreaWidth());
                          ant.moveTo(wanderDest);
                     }
                 } else {
@@ -141,50 +216,62 @@ public class ColonyPhysicsService {
     }
     
     public Point getSpecificRoomPoint(Colony colony, Rectangle r) {
-        Rectangle entrance = colony.getEntranceBounds();
-        if (entrance == null) return new Point(r.x, r.y); 
-        
-        int minX, maxX, minY, maxY;
-        
-        minY = r.y + padTop;
-        maxY = r.y + r.height - padBottom;
+        return getSpecificRoomPoint(colony, r, colony.getGameAreaWidth());
+    }
 
-        if (r.getCenterX() < entrance.getCenterX()) {
-            minX = r.x + padAwaySide;
-            maxX = r.x + r.width - padHallSide;
+    public Point getSpecificRoomPoint(Colony colony, Rectangle r, int gameWidth) {
+        Rectangle entrance = colony.getEntranceBounds();
+        int hallCenterX;
+        
+        if (entrance != null) {
+            hallCenterX = (int)entrance.getCenterX();
         } else {
-            minX = r.x + padHallSide;
-            maxX = r.x + r.width - padAwaySide;
+            hallCenterX = (gameWidth > 100 ? gameWidth : 1280) / 2;
         }
         
-        if (maxX <= minX) { minX = r.x; maxX = r.x + r.width; }
-        if (maxY <= minY) { minY = r.y; maxY = r.y + r.height; }
+        int minY = r.y + padTop;
+        int maxY = r.y + r.height - padBottom;        
+        int validMaxY = maxY - antSize;
+        if (validMaxY < minY) validMaxY = minY;
 
-        int tx = minX + (int)(Math.random() * (maxX - minX));
-        int ty = minY + (int)(Math.random() * (maxY - minY));
+        int minX, maxX;
+        
+        if (r.getCenterX() < hallCenterX) {
+            minX = r.x + padBack;
+            maxX = r.x + r.width - padHall;
+        } else {
+            minX = r.x + padHall;
+            maxX = r.x + r.width - padBack;
+        }
+        
+        int validMaxX = maxX - antSize;
+        if (validMaxX < minX) validMaxX = minX;
+        int tx = minX + (int)(Math.random() * (validMaxX - minX + 1));
+        int ty = minY + (int)(Math.random() * (validMaxY - minY + 1));
         
         return new Point(tx, ty);
     }
     
     private boolean isPointInSpecificBounds(Colony colony, Rectangle r, int x, int y) {
         Rectangle entrance = colony.getEntranceBounds();
-        if (entrance == null) return r.contains(x, y);
+        int hallCenterX = (entrance != null) ? (int)entrance.getCenterX() : (colony.getGameAreaWidth()/2);
         
-        
-        
-        int minX, maxX, minY, maxY;
-        
-        minY = r.y + padTop;
-        maxY = r.y + r.height - padBottom;
+        int minY = r.y + padTop;
+        int maxY = r.y + r.height - padBottom - antSize; 
 
-        if (r.getCenterX() < entrance.getCenterX()) {
-            minX = r.x + padAwaySide;
-            maxX = r.x + r.width - padHallSide;
+        int minX, maxX;
+
+        if (r.getCenterX() < hallCenterX) {
+            minX = r.x + padBack;
+            maxX = r.x + r.width - padHall - antSize;
         } else {
-            minX = r.x + padHallSide;
-            maxX = r.x + r.width - padAwaySide;
+            minX = r.x + padHall;
+            maxX = r.x + r.width - padBack - antSize;
         }
         
+        if (maxX < minX) maxX = minX;
+        if (maxY < minY) maxY = minY;
+
         return (x >= minX && x <= maxX && y >= minY && y <= maxY);
     }
 
@@ -208,23 +295,55 @@ public class ColonyPhysicsService {
 
     private void navigateToPointInUnderworld(Colony colony, Ant ant, Point finalDest) {
         Rectangle entranceRect = colony.getEntranceBounds();
-        if (entranceRect == null) return;
+        int hallCenterX;
+        int hallWidth;
+        
+        if (entranceRect != null) {
+            hallCenterX = (int)entranceRect.getCenterX();
+            hallWidth = entranceRect.width;
+        } else {
+            hallCenterX = colony.getGameAreaWidth() / 2;
+            hallWidth = HALL_WIDTH;
+        }
 
         int currentX = ant.getX();
-        int currentY = ant.getY();
-        int centerX = (int)entranceRect.getCenterX();
+        int currentY = ant.getY();        
+        boolean goingDown = finalDest.y > currentY;
+        int laneX = goingDown ? (hallCenterX - 30) : (hallCenterX - 10);
         
-        if (Math.abs(currentX - centerX) > 20) {
-            ant.moveTo(new Point(centerX, currentY));
-            return;
-        }
+        // --- Navigation Logic ---        
+        boolean insideRoom = Math.abs(currentX - hallCenterX) > (hallWidth / 2 + 10);
+        
+        if (insideRoom) {
+            int roomHeight = 256;
+            int roomRowStart = (currentY / roomHeight) * roomHeight;
+            int doorY = roomRowStart + (roomHeight / 2) - 20;
+            
+            if (Math.abs(currentY - doorY) > 10) {
+                ant.moveTo(new Point(currentX, doorY));
+            } else {
+                ant.moveTo(new Point(laneX, currentY));
+            }
+        } else {
+            boolean targetIsRoom = Math.abs(finalDest.x - hallCenterX) > (hallWidth / 2);
+            int targetY = finalDest.y;
 
-        if (Math.abs(currentY - finalDest.y) > 20) {
-            ant.moveTo(new Point(centerX, finalDest.y));
-            return;
+            if (targetIsRoom) {
+                int roomHeight = 256;
+                int destRowStart = (finalDest.y / roomHeight) * roomHeight;
+                targetY = destRowStart + (roomHeight / 2) - 20;
+            }
+            
+            if (Math.abs(currentY - targetY) > 10) {                
+                if (Math.abs(currentX - laneX) > 5) {
+                    ant.moveTo(new Point(laneX, currentY));
+                } else {
+                    ant.moveTo(new Point(laneX, targetY));
+                }
+            } else {
+                ant.moveTo(finalDest);
+            }
         }
-        
-        ant.moveTo(finalDest);
     }
 
     private double dist(int x1, int y1, int x2, int y2) {
