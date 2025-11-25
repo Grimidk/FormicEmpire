@@ -4,6 +4,7 @@ import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,27 +19,30 @@ public class GameAreaPanel extends JPanel {
     private Image backgroundImage;
     private final Map<String, Image> biomeTextureCache = new HashMap<>();
     
+    // --- Room Images ---
     private Image basicRoomImg;
     private Image firstHallwayImg;
-    private Image middleHallwayImg;
+    private Image middleHallwayImg;    
+    private Image antHillImg;
+    private Image basicYardImg;
     
     private Colony colony;
     
     private int currentDimension = 0; 
     private String currentBiomeName = "Plains";
 
+    // --- Bounds ---
     public Rectangle entranceBounds;
-    public Rectangle middleHallwayBounds;
     public Rectangle room1Bounds; 
     public Rectangle room2Bounds; 
     public Rectangle room3Bounds; 
     public Rectangle room4Bounds; 
+    public Rectangle rancherYardBounds;
+    public Rectangle graverYardBounds;
 
     public GameAreaPanel() {
         loadImages();
-        
         this.backgroundImage = biomeTextureCache.getOrDefault("Plains", null);
-        
         setOpaque(true);
     }
 
@@ -55,7 +59,9 @@ public class GameAreaPanel extends JPanel {
         
         basicRoomImg = loadImage("/sprites/buildings/basicRoom.png");
         firstHallwayImg = loadImage("/sprites/buildings/firstHallway.png");
-        middleHallwayImg = loadImage("/sprites/buildings/middleHallway.png");
+        middleHallwayImg = loadImage("/sprites/buildings/middleHallway.png"); 
+        antHillImg = loadImage("/sprites/buildings/antHill.png");
+        basicYardImg = loadImage("/sprites/buildings/basicYard.png");
     }
 
     private Image loadImage(String path) {
@@ -63,8 +69,6 @@ public class GameAreaPanel extends JPanel {
             URL imgUrl = getClass().getResource(path);
             if (imgUrl != null) {
                 return new ImageIcon(imgUrl).getImage();
-            } else {
-                System.err.println("CRITICAL ERROR: Resource not found: " + path);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -77,11 +81,7 @@ public class GameAreaPanel extends JPanel {
     }
     
     public void toggleDimension() {
-        if (currentDimension == 0) {
-            currentDimension = 1;
-        } else {
-            currentDimension = 0;
-        }
+        currentDimension = (currentDimension == 0) ? 1 : 0;
         updateBackground();
         repaint();
     }
@@ -111,11 +111,9 @@ public class GameAreaPanel extends JPanel {
         if (backgroundImage != null) {
             int tileWidth = backgroundImage.getWidth(this);
             int tileHeight = backgroundImage.getHeight(this);
-            
             if (tileWidth > 0 && tileHeight > 0) { 
                 int panelWidth = getWidth();
                 int panelHeight = getHeight();
-
                 for (int x = 0; x < panelWidth; x += tileWidth) {
                     for (int y = 0; y < panelHeight; y += tileHeight) {
                         g.drawImage(backgroundImage, x, y, this);
@@ -124,26 +122,75 @@ public class GameAreaPanel extends JPanel {
             }
         }
         
-        if (currentDimension == 1) {
-            drawUnderworldStructure(g2d);
-            if (colony != null && entranceBounds != null) {
-                // Room 1 (Top Left): Storage
-                // Room 2 (Top Right): Farm
-                // Room 3 (Bottom Left): Nursery
-                // Room 4 (Bottom Right): Royal Chamber
-                colony.setRoomBounds(entranceBounds, room1Bounds, room2Bounds, room3Bounds, room4Bounds);
+        if (colony != null) {
+            if (currentDimension == 1) {
+                drawUnderworldStructure(g2d);
+            } else {
+                drawOverworldStructure(g2d);
             }
+            
+            colony.setRoomBounds(entranceBounds, room1Bounds, room2Bounds, room3Bounds, room4Bounds, rancherYardBounds, graverYardBounds);
         }
         
         drawAnts(g2d);
     }
+    
+    private void drawOverworldStructure(Graphics2D g2d) {
+        int panelWidth = getWidth();
+        int panelHeight = getHeight();
+        
+        // --- Entrance ---
+        if (antHillImg != null) {
+            int w = antHillImg.getWidth(this);
+            int h = antHillImg.getHeight(this);
+            int x = (panelWidth / 2) - (w / 2);
+            int y = (panelHeight / 2) - (h / 2);
+            
+            g2d.drawImage(antHillImg, x, y, this);            
+            entranceBounds = new Rectangle(x, y, w, h);
+        }
+        
+        // --- Rancher Yard ---
+        if (colony.hasUpgrade(GameUnlocks.ROLE_RANCHER) && basicYardImg != null) {
+            int w = basicYardImg.getWidth(this);
+            int h = basicYardImg.getHeight(this);
+            int x = 10; 
+            int y = 10; 
+            
+            g2d.drawImage(basicYardImg, x, y, this);
+            rancherYardBounds = new Rectangle(x, y, w, h);
+        } else {
+            rancherYardBounds = null;
+        }
+
+        // --- Graver Yard ---
+        if (colony.hasUpgrade(GameUnlocks.ROLE_GRAVER) && basicYardImg != null) {
+            int w = basicYardImg.getWidth(this);
+            int h = basicYardImg.getHeight(this);
+            int x = panelWidth - w - 10;
+            int y = panelHeight - h - 10;
+            
+            AffineTransform old = g2d.getTransform();
+            double rotateCenterX = x + (w / 2.0);
+            double rotateCenterY = y + (h / 2.0);
+            
+            g2d.rotate(Math.toRadians(180), rotateCenterX, rotateCenterY);
+            g2d.drawImage(basicYardImg, x, y, this);
+            g2d.setTransform(old);
+            
+            graverYardBounds = new Rectangle(x, y, w, h);
+        } else {
+            graverYardBounds = null;
+        }
+    }
 
     private void drawUnderworldStructure(Graphics2D g2d) {
-        if (firstHallwayImg == null || basicRoomImg == null) return;
+        if (firstHallwayImg == null || basicRoomImg == null || middleHallwayImg == null) return;
 
         int panelWidth = getWidth();
         int topMargin = 0; 
         
+        // --- ROW 1 ---
         int hallW = firstHallwayImg.getWidth(this);
         int hallH = firstHallwayImg.getHeight(this);
         int centerX = panelWidth / 2;
@@ -155,8 +202,6 @@ public class GameAreaPanel extends JPanel {
         
         int roomW = basicRoomImg.getWidth(this);
         int roomH = basicRoomImg.getHeight(this);
-        
-        // --- ROW 1 ---
         int roomY = hallY;
         
         int leftRoomX = hallX - roomW;

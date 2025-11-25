@@ -72,6 +72,8 @@ public class Colony {
     private Rectangle farmBounds;    // Room 2 (Top Right)
     private Rectangle nurseryBounds; // Room 3 (Bottom Left)
     private Rectangle royalBounds;   // Room 4 (Bottom Right)
+    private Rectangle rancherBounds; // Top Far Left (Ranch)
+    private Rectangle graverBounds;  // Bottom Far Right (Graveyard)
 
     // --- Service Dependencies ---
     private transient ColonyStatsService statsService;
@@ -164,8 +166,8 @@ public class Colony {
     }
     
     private void laodBuildings(Savefile savefile) {
-        List<Integer> unlockedIds = savefile.getUnlockedBuildingIds(); 
-        if (unlockedIds == null || unlockedIds.isEmpty()) {
+        List<Integer> unlockedBuildingIds = savefile.getUnlockedBuildingIds(); 
+        if (unlockedBuildingIds == null || unlockedBuildingIds.isEmpty()) {
             initializeBuildings();
             return;
         }
@@ -173,7 +175,7 @@ public class Colony {
         for (Building up : GameUnlocks.getBuildings()) {
             allBuildings.put(up.getId(), up);
         }
-        for (Integer id : unlockedIds) {
+        for (Integer id : unlockedBuildingIds) {
             Building buildingToUnlock = allBuildings.get(id);
             if (buildingToUnlock != null) {
                 this.buildings.add(buildingToUnlock);
@@ -427,12 +429,14 @@ public class Colony {
     public void setTotalDeaths (int totalDeaths) { this.totalDeaths = totalDeaths; }
     
     // --- Room Bounds Getters/Setters ---
-    public void setRoomBounds(Rectangle entrance, Rectangle storage, Rectangle farm, Rectangle nursery, Rectangle royal) {
+    public void setRoomBounds(Rectangle entrance, Rectangle storage, Rectangle farm, Rectangle nursery, Rectangle royal, Rectangle rancher, Rectangle graver) {
         this.entranceBounds = entrance;
         this.storageBounds = storage;
         this.farmBounds = farm;
         this.nurseryBounds = nursery;
         this.royalBounds = royal;
+        this.rancherBounds = rancher;
+        this.graverBounds = graver;
     }
     
     public Rectangle getEntranceBounds() { return entranceBounds; }
@@ -440,6 +444,8 @@ public class Colony {
     public Rectangle getFarmBounds() { return farmBounds; }
     public Rectangle getNurseryBounds() { return nurseryBounds; }
     public Rectangle getRoyalBounds() { return royalBounds; }
+    public Rectangle getRancherBounds() { return rancherBounds; }
+    public Rectangle getGraverBounds() { return graverBounds; }
     
     public Rectangle getTargetRoomForAnt(Ant ant) {
         if (ant.getType() == GameConstants.TYPE_QUEEN) return royalBounds;
@@ -451,6 +457,8 @@ public class Colony {
         if (role == GameConstants.ROLE_NURSE) return nurseryBounds;
         if (role == GameConstants.ROLE_FARMER) return farmBounds;
         if (role == GameConstants.ROLE_FORAGER || role == GameConstants.ROLE_HUNTER) return storageBounds;
+        if (role == GameConstants.ROLE_RANCHER && rancherBounds != null) return rancherBounds;
+        if (role == GameConstants.ROLE_GRAVER && graverBounds != null) return graverBounds;
         
         return storageBounds; // Default
     }
