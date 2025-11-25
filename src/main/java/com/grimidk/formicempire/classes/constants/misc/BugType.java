@@ -5,15 +5,16 @@ import javax.swing.ImageIcon;
 import com.grimidk.formicempire.classes.constants.Constant;
 
 public class BugType extends Constant{
-    private float baseHealth;
-    private float baseRegen; 
-    private float baseAttack;
-    private float baseAttackSpeed;
-    private float baseDefense;
-    private float baseSpeed;
-    private float baseSize;
+    private final float baseHealth;
+    private final float baseRegen; 
+    private final float baseAttack;
+    private final float baseAttackSpeed;
+    private final float baseDefense;
+    private final float baseSpeed;
+    private final float baseSize;
+    private final ImageIcon sprite;
 
-    public BugType(int id, String name, float baseHealth, float baseRegen, float baseAttack, float baseAttackSpeed, float baseDefense, float baseSpeed, float baseSize, ImageIcon icon) {
+    public BugType(int id, String name, float baseHealth, float baseRegen, float baseAttack, float baseAttackSpeed, float baseDefense, float baseSpeed, float baseSize, ImageIcon icon, ImageIcon sprite) {
         super(id, name, icon);
         this.baseHealth = baseHealth;
         this.baseRegen = baseRegen;
@@ -22,11 +23,12 @@ public class BugType extends Constant{
         this.baseDefense = baseDefense;
         this.baseSpeed = baseSpeed;
         this.baseSize = baseSize;
+        this.sprite = sprite;
     }
 
     //no icon
-    public BugType(int id, String name, float baseHealth, float baseRegen, float baseAttack, float baseAttackSpeed, float baseDefense, float baseSpeed, float baseSize) {
-        this(id, name, baseHealth, baseRegen, baseAttack, baseAttackSpeed, baseDefense, baseSpeed, baseSize, null);
+    public BugType(int id, String name, float baseHealth, float baseRegen, float baseAttack, float baseAttackSpeed, float baseDefense, float baseSpeed, float baseSize, ImageIcon sprite) {
+        this(id, name, baseHealth, baseRegen, baseAttack, baseAttackSpeed, baseDefense, baseSpeed, baseSize, null, sprite);
     }
 
     public float getBaseHealth() {
@@ -55,5 +57,9 @@ public class BugType extends Constant{
 
     public float getBaseSize() {
         return baseSize;
+    }
+
+    public ImageIcon getSprite() {
+        return sprite;
     }
 }

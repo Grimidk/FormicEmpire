@@ -143,7 +143,7 @@ public class ColonyPopulationService {
         
         for (Ant ant : antsToKill) {
              if (ant.isAlive()) { 
-                AntType originalType = ant.getType(); 
+                AntType originalType = ant.getAntType(); 
                 ant.goDie();
                 colony.getDeadAnts().add(ant);
                 List<Ant> antList = colony.getAntsByType(originalType);
@@ -230,7 +230,7 @@ public class ColonyPopulationService {
         
         for (Ant ant : antsToKill) {
             if (ant.isAlive()) { 
-                AntType originalType = ant.getType(); 
+                AntType originalType = ant.getAntType(); 
                 ant.goDie();
                 colony.setTotalDeaths(colony.getTotalDeaths() + 1);
                 colony.getDeadAnts().add(ant);

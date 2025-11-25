@@ -2,6 +2,7 @@ package com.grimidk.formicempire.classes.interfaces.game.panels;
 
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.entities.Ant;
+import com.grimidk.formicempire.classes.entities.Bug;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
@@ -139,6 +140,7 @@ public class GameAreaPanel extends JPanel {
         }
         
         drawAnts(g2d);
+        drawBugs(g2d);
     }
     
     private void drawOverworldStructure(Graphics2D g2d) {
@@ -165,10 +167,7 @@ public class GameAreaPanel extends JPanel {
             
             g2d.drawImage(basicYardImg, x, y, this);
             rancherYardBounds = new Rectangle(x, y, w, h);
-            
-            if (aphidImg != null && colony.getAphids() > 0) {
-                drawStaticItems(g2d, aphidImg, rancherYardBounds, colony.getAphids());
-            }
+                        
         } else {
             rancherYardBounds = null;
         }
@@ -310,6 +309,36 @@ public class GameAreaPanel extends JPanel {
                 
                 g2d.setTransform(oldTransform);
             }
+        }
+    }
+
+    private void drawBugs(Graphics2D g2d) {
+        if (colony == null) return;
+        
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        
+        for (Bug bug : colony.getBugs()) {
+            if (bug.getDimension() != currentDimension) continue;
+            
+            ImageIcon spriteIcon = bug.getBugType().getSprite();
+            if (spriteIcon == null) continue;
+            
+            Image sprite = spriteIcon.getImage();
+            int w = spriteIcon.getIconWidth();
+            int h = spriteIcon.getIconHeight();
+            
+            AffineTransform oldTransform = g2d.getTransform();
+            
+            double centerX = bug.getX() + (w / 2.0);
+            double centerY = bug.getY() + (h / 2.0);
+            g2d.translate(centerX, centerY);
+            
+            g2d.rotate(Math.toRadians(bug.getR()));
+            
+            g2d.drawImage(sprite, -w / 2, -h / 2, this);
+            
+            g2d.setTransform(oldTransform);
         }
     }
 }

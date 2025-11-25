@@ -36,6 +36,9 @@ public class Colony {
     // --- Population Data ---
     private final Map<AntType, List<Ant>> antGroups;
     private final List<Ant> deadAnts;
+    // New list for general Bugs (Aphids, etc)
+    private final List<Bug> bugs; 
+    
     private Map<AntRole, Integer> assignedRoleCounts;
     private final Set<Upgrade> upgrades;
     private final Set<Building> buildings;
@@ -48,7 +51,7 @@ public class Colony {
     private int syrups;
     private int resins;
     private int minerals;
-    private int aphids;
+    private int aphids; // Kept for count/save compatibility, but logic moves to 'bugs' list
     private int researchPoints;
 
     // --- Hatch Rate Data ---
@@ -68,12 +71,12 @@ public class Colony {
 
     // --- Room Bounds ---
     private Rectangle entranceBounds;
-    private Rectangle storageBounds; // Room 1 (Top Left)
-    private Rectangle farmBounds;    // Room 2 (Top Right)
-    private Rectangle nurseryBounds; // Room 3 (Bottom Left)
-    private Rectangle royalBounds;   // Room 4 (Bottom Right)
-    private Rectangle rancherBounds; // Top Far Left (Ranch)
-    private Rectangle graverBounds;  // Bottom Far Right (Graveyard)
+    private Rectangle storageBounds; 
+    private Rectangle farmBounds;    
+    private Rectangle nurseryBounds; 
+    private Rectangle royalBounds;   
+    private Rectangle rancherBounds; 
+    private Rectangle graverBounds;  
 
     // --- Service Dependencies ---
     private transient ColonyStatsService statsService;
@@ -191,6 +194,7 @@ public class Colony {
         this.rank = GameConstants.RANK_COLONY;
         this.antGroups = new HashMap<>();
         this.deadAnts = new CopyOnWriteArrayList<>(); 
+        this.bugs = new CopyOnWriteArrayList<>();
         this.upgrades = new HashSet<>();
         this.buildings = new HashSet<>();
         
@@ -210,6 +214,7 @@ public class Colony {
         this.rank = GameConstants.RANK_COLONY;
         this.antGroups = new HashMap<>();
         this.deadAnts = new CopyOnWriteArrayList<>();
+        this.bugs = new CopyOnWriteArrayList<>();
         this.upgrades = new HashSet<>();
         this.buildings = new HashSet<>();
 
@@ -257,6 +262,12 @@ public class Colony {
         this.minerals = savefile.getMinerals();
 
         this.aphids = savefile.getAphids();
+        
+        // Populate actual Bug objects for Aphids based on save count
+        for(int i=0; i<this.aphids; i++) {
+            this.bugs.add(new Bug(GameConstants.TYPE_APHID));
+        }
+        
         this.researchPoints = savefile.getResearchPoints();
 
         runRoleAssignment();
@@ -337,6 +348,10 @@ public class Colony {
         this.deadAnts.clear();
         this.deadAnts.addAll(deadAnts);
     }
+    
+    // Getter for general bugs
+    public List<Bug> getBugs() { return bugs; }
+    
     public int getAntTotal() {
         return antGroups.values().stream().mapToInt(List::size).sum();
     }
@@ -379,7 +394,27 @@ public class Colony {
     public void setMinerals(int minerals) { this.minerals = minerals; }
 
     public int getAphids() { return aphids; }
-    public void setAphids(int aphids) { this.aphids = aphids; }
+    
+    // Updates both the count and the bug list to stay in sync
+    public void setAphids(int count) { 
+        if (count > this.aphids) {
+            int diff = count - this.aphids;
+            for(int i=0; i<diff; i++) this.bugs.add(new Bug(GameConstants.TYPE_APHID));
+        } else if (count < this.aphids) {
+            int diff = this.aphids - count;
+            // Remove aphids from the bug list
+            for(int i=0; i<diff; i++) {
+                for(Bug b : this.bugs) {
+                    if (b.getBugType() == GameConstants.TYPE_APHID) {
+                        this.bugs.remove(b);
+                        break;
+                    }
+                }
+            }
+        }
+        this.aphids = count; 
+    }
+    
     public int getResearchPoints() { return researchPoints; }
     public void setResearchPoints(int researchPoints) { this.researchPoints = researchPoints; }
 
@@ -448,8 +483,8 @@ public class Colony {
     public Rectangle getGraverBounds() { return graverBounds; }
     
     public Rectangle getTargetRoomForAnt(Ant ant) {
-        if (ant.getType() == GameConstants.TYPE_QUEEN) return royalBounds;
-        if (ant.getType() == GameConstants.TYPE_EGG || ant.getType() == GameConstants.TYPE_LARVA || ant.getType() == GameConstants.TYPE_PUPA) return nurseryBounds;
+        if (ant.getAntType() == GameConstants.TYPE_QUEEN) return royalBounds;
+        if (ant.getAntType() == GameConstants.TYPE_EGG || ant.getAntType() == GameConstants.TYPE_LARVA || ant.getAntType() == GameConstants.TYPE_PUPA) return nurseryBounds;
         
         AntRole role = ant.getRole();
         if (role == null) return storageBounds; 

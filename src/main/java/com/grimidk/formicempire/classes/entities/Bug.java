@@ -35,6 +35,8 @@ public class Bug {
     private Point targetPosition;
 
     public Bug(BugType type) {
+        this.type = type;
+        
         this.status = GameConstants.STATUS_ALIVE;
         this.moveStatus = GameConstants.MOVE_STATIC;
         this.maxHealth = (int)(type.getBaseHealth()); 
@@ -56,8 +58,8 @@ public class Bug {
         this.r = 0;
     }
 
-    public BugType getType() { return type; }
-    public void setType(BugType type) { this.type = type; }
+    public BugType getBugType() { return type; } 
+    public void setBugType(BugType type) { this.type = type; }
 
     public AntStatus getStatus() { return status; }
     public void setStatus(AntStatus status) { this.status = status; }

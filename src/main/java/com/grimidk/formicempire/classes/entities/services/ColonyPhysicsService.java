@@ -3,6 +3,7 @@ package com.grimidk.formicempire.classes.entities.services;
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.entities.Ant;
+import com.grimidk.formicempire.classes.entities.Bug;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 
@@ -51,6 +52,14 @@ public class ColonyPhysicsService {
                 }
             }
         }
+        
+        for (Bug bug : colony.getBugs()) {
+            if (bug.getBugType() == GameConstants.TYPE_APHID && colony.getRancherBounds() != null) {
+                bug.setPosition(getSpecificRoomPoint(colony, colony.getRancherBounds(), virtualWidth));
+            } else {
+                bug.setPosition(getRandomOverworldPosition(colony, bug.getBugType().getSprite()));
+            }
+        }
     }
     
     private Rectangle estimateRoomBounds(Colony colony, Ant ant, int gameWidth) {
@@ -68,7 +77,7 @@ public class ColonyPhysicsService {
 
         // --- Underworld Estimation ---
         int roomIndex;
-        AntType type = ant.getType();
+        AntType type = ant.getAntType();
         AntRole role = ant.getRole();
 
         if (type == GameConstants.TYPE_QUEEN) {
@@ -129,6 +138,7 @@ public class ColonyPhysicsService {
 
     // --- Main Physics Loop ---
     public void runPhysics(Colony colony, int activeDimension) {
+        // Ants
         for (List<Ant> antList : colony.getAntGroups().values()) {
             for (Ant ant : antList) {
                 if (ant.isAlive() && ant.getDimension() == activeDimension) {
@@ -136,6 +146,38 @@ public class ColonyPhysicsService {
                     ant.updatePosition();
                 }
             }
+        }
+        
+        // Bugs
+        for (Bug bug : colony.getBugs()) {
+            if (bug.isAlive() && bug.getDimension() == activeDimension) {
+                updateBugLogic(colony, bug);
+                bug.updatePosition();
+            }
+        }
+    }
+
+    private void updateBugLogic(Colony colony, Bug bug) {
+        if (bug.isMoving()) return;
+
+        int dim = bug.getDimension();
+
+        if (dim == 0 && bug.getBugType() == GameConstants.TYPE_APHID) {
+            Rectangle yard = colony.getRancherBounds();
+            if (yard != null) {
+                if (isPointInSpecificBounds(colony, yard, bug.getX(), bug.getY())) {
+                    if (Math.random() < 0.02) {
+                        Point wanderDest = getSpecificRoomPoint(colony, yard, colony.getGameAreaWidth());
+                        bug.moveTo(wanderDest);
+                    }
+                } else {
+                    Point yardCenter = new Point((int)yard.getCenterX(), (int)yard.getCenterY());
+                    bug.moveTo(yardCenter);
+                }
+            }
+        }
+        else if (dim == 0) {
+            wanderOverworldCarefully(colony, bug);
         }
     }
 
@@ -244,10 +286,10 @@ public class ColonyPhysicsService {
         }
     }
 
-    private void wanderOverworldCarefully(Colony colony, Ant ant) {
+    private void wanderOverworldCarefully(Colony colony, Bug bug) {
         if (Math.random() < 0.01) {
-            Point p = getRandomOverworldPosition(colony, ant.getType().getSprite());
-            ant.moveTo(p);
+            Point p = getRandomOverworldPosition(colony, bug.getBugType().getSprite());
+            bug.moveTo(p);
         }
     }
     
@@ -307,7 +349,7 @@ public class ColonyPhysicsService {
     }
 
     private boolean shouldBeInColony(Ant ant) {
-        AntType type = ant.getType();
+        AntType type = ant.getAntType();
         
         if (type == GameConstants.TYPE_EGG || 
             type == GameConstants.TYPE_LARVA || 
