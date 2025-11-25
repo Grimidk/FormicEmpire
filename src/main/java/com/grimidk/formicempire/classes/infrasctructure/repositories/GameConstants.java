@@ -5,6 +5,7 @@ import com.grimidk.formicempire.classes.constants.ant.AntStatus;
 import com.grimidk.formicempire.classes.constants.ant.AntSubType;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.ant.MoveStatus;
+import com.grimidk.formicempire.classes.constants.misc.BugType;
 import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.misc.Species;
@@ -183,6 +184,12 @@ public final class GameConstants {
     public static final MoveStatus MOVE_SPEED = new MoveStatus(4, "Speed Marching", 3/2f);
     public static final MoveStatus MOVE_FLY = new MoveStatus(5, "Flying", 3f);
     public static final MoveStatus MOVE_PATROL = new MoveStatus(6, "Patrolling", 1f);
+
+    // --- Bug Types ---
+    public static final BugType TYPE_ANT = new BugType(1, "Ant", 1, 1, 1, 1, 1, 1, 1,
+        loadIcon("icons/ants/worker.png"));
+    public static final BugType TYPE_APHID = new BugType(2, "Aphid", 1, 1, 0, 0, 5, 0.5f, 1,
+        loadIcon("icons/misc/aphid.png"));
 
     // --- Ant Types ---
     public static final AntType TYPE_EGG = new AntType(1, "Egg", 1f, 0f, 0f, 0f, 0f, 0f, 0f, 1/4f, 

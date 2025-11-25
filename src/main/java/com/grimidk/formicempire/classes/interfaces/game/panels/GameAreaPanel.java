@@ -13,18 +13,21 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 public class GameAreaPanel extends JPanel {
 
     private Image backgroundImage;
     private final Map<String, Image> biomeTextureCache = new HashMap<>();
     
-    // --- Room Images ---
+    // --- Images ---
     private Image basicRoomImg;
     private Image firstHallwayImg;
     private Image middleHallwayImg;    
     private Image antHillImg;
-    private Image basicYardImg;
+    private Image basicYardImg;    
+    private Image aphidImg;
+    private Image deadBodyImg;
     
     private Colony colony;
     
@@ -59,9 +62,12 @@ public class GameAreaPanel extends JPanel {
         
         basicRoomImg = loadImage("/sprites/buildings/basicRoom.png");
         firstHallwayImg = loadImage("/sprites/buildings/firstHallway.png");
-        middleHallwayImg = loadImage("/sprites/buildings/middleHallway.png"); 
+        middleHallwayImg = loadImage("/sprites/buildings/middleHallway.png");  
         antHillImg = loadImage("/sprites/buildings/antHill.png");
         basicYardImg = loadImage("/sprites/buildings/basicYard.png");
+    
+        aphidImg = loadImage("/sprites/pets/aphid.png");
+        deadBodyImg = loadImage("/sprites/ants/dead.png");
     }
 
     private Image loadImage(String path) {
@@ -159,6 +165,10 @@ public class GameAreaPanel extends JPanel {
             
             g2d.drawImage(basicYardImg, x, y, this);
             rancherYardBounds = new Rectangle(x, y, w, h);
+            
+            if (aphidImg != null && colony.getAphids() > 0) {
+                drawStaticItems(g2d, aphidImg, rancherYardBounds, colony.getAphids());
+            }
         } else {
             rancherYardBounds = null;
         }
@@ -176,11 +186,39 @@ public class GameAreaPanel extends JPanel {
             
             g2d.rotate(Math.toRadians(180), rotateCenterX, rotateCenterY);
             g2d.drawImage(basicYardImg, x, y, this);
-            g2d.setTransform(old);
             
             graverYardBounds = new Rectangle(x, y, w, h);
+            
+            if (deadBodyImg != null && colony.getDeadAnts() != null && !colony.getDeadAnts().isEmpty()) {
+                 drawStaticItemsLocal(g2d, deadBodyImg, x, y, w, h, colony.getDeadAnts().size());
+            }
+
+            g2d.setTransform(old);
+            
         } else {
             graverYardBounds = null;
+        }
+    }
+    
+    private void drawStaticItems(Graphics2D g2d, Image img, Rectangle bounds, int count) {
+        drawStaticItemsLocal(g2d, img, bounds.x, bounds.y, bounds.width, bounds.height, count);
+    }
+    
+    private void drawStaticItemsLocal(Graphics2D g2d, Image img, int rx, int ry, int rw, int rh, int count) {
+        int imgW = img.getWidth(this);
+        int imgH = img.getHeight(this);
+        
+        int areaW = Math.max(1, rw - imgW);
+        int areaH = Math.max(1, rh - imgH);
+
+        for (int i = 0; i < count; i++) {
+             long seed = i * 999999L;
+             Random rng = new Random(seed);
+             
+             int dx = rng.nextInt(areaW);
+             int dy = rng.nextInt(areaH);
+             
+             g2d.drawImage(img, rx + dx, ry + dy, this);
         }
     }
 
