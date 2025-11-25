@@ -27,7 +27,6 @@ public class GameAreaPanel extends JPanel {
     private Image middleHallwayImg;    
     private Image antHillImg;
     private Image basicYardImg;    
-    private Image aphidImg;
     private Image deadBodyImg;
     
     private Colony colony;
@@ -67,7 +66,6 @@ public class GameAreaPanel extends JPanel {
         antHillImg = loadImage("/sprites/buildings/antHill.png");
         basicYardImg = loadImage("/sprites/buildings/basicYard.png");
     
-        aphidImg = loadImage("/sprites/pets/aphid.png");
         deadBodyImg = loadImage("/sprites/ants/dead.png");
     }
 
@@ -189,7 +187,18 @@ public class GameAreaPanel extends JPanel {
             graverYardBounds = new Rectangle(x, y, w, h);
             
             if (deadBodyImg != null && colony.getDeadAnts() != null && !colony.getDeadAnts().isEmpty()) {
-                 drawStaticItemsLocal(g2d, deadBodyImg, x, y, w, h, colony.getDeadAnts().size());
+                // Local Padding: Back=Left (64), Hall=Right (16), Top=48, Bottom=48
+                int padBack = 64; 
+                int padHall = 16;
+                int padTop = 48;
+                int padBottom = 48;
+                
+                int safeX = x + padBack;
+                int safeY = y + padTop;
+                int safeW = w - padBack - padHall;
+                int safeH = h - padTop - padBottom;
+                
+                drawStaticItemsLocal(g2d, deadBodyImg, safeX, safeY, safeW, safeH, colony.getDeadAnts().size());
             }
 
             g2d.setTransform(old);
@@ -197,10 +206,6 @@ public class GameAreaPanel extends JPanel {
         } else {
             graverYardBounds = null;
         }
-    }
-    
-    private void drawStaticItems(Graphics2D g2d, Image img, Rectangle bounds, int count) {
-        drawStaticItemsLocal(g2d, img, bounds.x, bounds.y, bounds.width, bounds.height, count);
     }
     
     private void drawStaticItemsLocal(Graphics2D g2d, Image img, int rx, int ry, int rw, int rh, int count) {
@@ -211,13 +216,28 @@ public class GameAreaPanel extends JPanel {
         int areaH = Math.max(1, rh - imgH);
 
         for (int i = 0; i < count; i++) {
-             long seed = i * 999999L;
-             Random rng = new Random(seed);
-             
-             int dx = rng.nextInt(areaW);
-             int dy = rng.nextInt(areaH);
-             
-             g2d.drawImage(img, rx + dx, ry + dy, this);
+            long seed = i * 999999L;
+            Random rng = new Random(seed);
+            
+            int dx = rng.nextInt(areaW);
+            int dy = rng.nextInt(areaH);
+            
+            // Random Rotation Logic
+            float angle = rng.nextFloat() * 360.0f; 
+
+            AffineTransform old = g2d.getTransform();
+            
+            // Calculate center of where the body is drawn
+            double centerX = rx + dx + (imgW / 2.0);
+            double centerY = ry + dy + (imgH / 2.0);
+            
+            g2d.translate(centerX, centerY);
+            g2d.rotate(Math.toRadians(angle));
+            
+            // Draw centered at (0,0) relative to the translation
+            g2d.drawImage(img, -imgW / 2, -imgH / 2, this);
+            
+            g2d.setTransform(old);
         }
     }
 
@@ -298,15 +318,11 @@ public class GameAreaPanel extends JPanel {
                 if (ant.getDimension() != currentDimension) continue;
                 
                 AffineTransform oldTransform = g2d.getTransform();
-                
                 double centerX = ant.getX() + (w / 2.0);
                 double centerY = ant.getY() + (h / 2.0);
-                g2d.translate(centerX, centerY);
-                
+                g2d.translate(centerX, centerY);       
                 g2d.rotate(Math.toRadians(ant.getR()));
-                
                 g2d.drawImage(sprite, -w / 2, -h / 2, this);
-                
                 g2d.setTransform(oldTransform);
             }
         }
@@ -333,11 +349,8 @@ public class GameAreaPanel extends JPanel {
             double centerX = bug.getX() + (w / 2.0);
             double centerY = bug.getY() + (h / 2.0);
             g2d.translate(centerX, centerY);
-            
             g2d.rotate(Math.toRadians(bug.getR()));
-            
             g2d.drawImage(sprite, -w / 2, -h / 2, this);
-            
             g2d.setTransform(oldTransform);
         }
     }

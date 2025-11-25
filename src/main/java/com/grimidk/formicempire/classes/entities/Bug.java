@@ -55,7 +55,6 @@ public class Bug {
         this.y = 0;
         this.preciseX = 0.0;
         this.preciseY = 0.0;
-        this.r = 0;
     }
 
     public BugType getBugType() { return type; } 
