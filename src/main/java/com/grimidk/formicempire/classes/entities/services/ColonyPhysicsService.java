@@ -15,464 +15,274 @@ import java.util.Map;
 import javax.swing.ImageIcon;
 
 public class ColonyPhysicsService {
-    int padTop = 48;
-    int padBottom = 48;
-    int padBack = 64; 
-    int padHall = 16;    
-    int antSize = 40;     
+    private final int padTop = 48;
+    private final int padBottom = 48;
+    private final int padBack = 64; 
+    private final int padHall = 16;    
+    private final int antSize = 40;     
     
-    final int ROOM_SIZE = 256;
-    final int HALL_WIDTH = 128;
+    private final int ROOM_SIZE = 256;
+    private final int HALL_WIDTH = 128;
 
+    // --- Initialization ---
     public void randomizeAllAntPositions(Colony colony) {
-        int virtualWidth = colony.getGameAreaWidth() > 100 ? colony.getGameAreaWidth() : 1280;
+        int virtualWidth = Math.max(colony.getGameAreaWidth(), 1280);
 
+        // Randomize Ants
         for (Map.Entry<AntType, List<Ant>> entry : colony.getAntGroups().entrySet()) {
-            AntType type = entry.getKey();
-            if (type == GameConstants.TYPE_DEAD) continue;
+            if (entry.getKey() == GameConstants.TYPE_DEAD) continue;
             
-            ImageIcon sprite = type.getSprite();
-            List<Ant> ants = entry.getValue();
-            
-            for (Ant ant : ants) {
-                boolean belongsInUnderworld = ant.getDimension() == 1 || shouldBeInColony(ant);
-
-                if (belongsInUnderworld) {
-                    if (ant.getDimension() != 1) {
-                        ant.setDimension(1);
-                    }
-
-                    Rectangle targetRoom = colony.getTargetRoomForAnt(ant);                    
-                    if (targetRoom == null) {
-                        targetRoom = estimateRoomBounds(colony, ant, virtualWidth);
-                    }                    
-                    Point safeSpot = getSpecificRoomPoint(colony, targetRoom, virtualWidth);
-                    ant.setPosition(safeSpot);
+            ImageIcon sprite = entry.getKey().getSprite();
+            for (Ant ant : entry.getValue()) {
+                if (ant.getDimension() == 1 || shouldBeInColony(ant)) {
+                    ant.setDimension(1);
+                    Rectangle room = getRoomForAnt(colony, ant, virtualWidth);
+                    ant.setPosition(getRandomPointInRoom(colony, room, virtualWidth));
                 } else {
                     ant.setPosition(getRandomOverworldPosition(colony, sprite));
                 }
             }
         }
         
-        // --- Fix for Bugs (Aphids) ---
+        // Randomize Bugs 
         for (Bug bug : colony.getBugs()) {
-            if (bug.getBugType() == GameConstants.TYPE_APHID) {
-                if (colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) {
-                    // Upgrade exists: Place in yard (Estimated or Real)
-                    Rectangle yard = getOrEstimateRancherBounds(colony);
-                    bug.setPosition(getSpecificRoomPoint(colony, yard, virtualWidth));
-                } else {
-                    // No Upgrade: Send to Limbo
-                    bug.setPosition(new Point(-1000, -1000));
-                }
+            if (bug.getBugType() == GameConstants.TYPE_APHID && colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) {
+                Rectangle yard = getOrEstimateRancherBounds(colony);
+                bug.setPosition(getRandomPointInRoom(colony, yard, virtualWidth));
             } else {
-                bug.setPosition(getRandomOverworldPosition(colony, bug.getBugType().getSprite()));
+                bug.setPosition(new Point(-1000, -1000));
             }
         }
     }
 
-    // --- Helpers to Estimate Overworld Yards if Rendering hasn't happened yet ---
-    private Rectangle getOrEstimateRancherBounds(Colony colony) {
-        if (colony.getRancherBounds() != null) return colony.getRancherBounds();
-        // Fallback: GameAreaPanel puts it at 10, 10. Assume standard size 256x256
-        return new Rectangle(10, 10, 256, 256);
-    }
-    
-    private Rectangle getOrEstimateGraverBounds(Colony colony) {
-        if (colony.getGraverBounds() != null) return colony.getGraverBounds();
-        // Fallback: GameAreaPanel puts it at bottom right.
-        int w = colony.getGameAreaWidth();
-        int h = colony.getGameAreaHeight();
-        return new Rectangle(w - 270, h - 270, 256, 256); // approx position
-    }
-    
-    private Rectangle estimateRoomBounds(Colony colony, Ant ant, int gameWidth) {
-        int centerX = gameWidth / 2;
-        int hallX = centerX - (HALL_WIDTH / 2);
-        
-        // --- Overworld Estimation ---
-        if (ant.getRole() == GameConstants.ROLE_RANCHER) {
-             return getOrEstimateRancherBounds(colony);
-        }
-        if (ant.getRole() == GameConstants.ROLE_GRAVER) {
-             return getOrEstimateGraverBounds(colony);
-        }
-
-        // --- Underworld Estimation ---
-        int roomIndex;
-        AntType type = ant.getAntType();
-        AntRole role = ant.getRole();
-
-        if (type == GameConstants.TYPE_QUEEN) {
-            roomIndex = 4; // Royal
-        } else if (type == GameConstants.TYPE_EGG || type == GameConstants.TYPE_LARVA || type == GameConstants.TYPE_PUPA) {
-            roomIndex = 3; // Nursery
-        } else if (role == GameConstants.ROLE_NURSE) {
-            roomIndex = 3; // Nursery
-        } else if (role == GameConstants.ROLE_FARMER) {
-            roomIndex = 2; // Farm
-        } else {
-            roomIndex = 1; // Storage
-        }
-        
-        int x = 0;
-        int y = 0;        
-        if (roomIndex == 1) { // Top Left
-            x = hallX - ROOM_SIZE;
-            y = 0;
-        } else if (roomIndex == 2) { // Top Right
-            x = hallX + HALL_WIDTH;
-            y = 0;
-        } else if (roomIndex == 3) { // Bottom Left
-            x = hallX - ROOM_SIZE;
-            y = ROOM_SIZE;
-        } else if (roomIndex == 4) { // Bottom Right
-            x = hallX + HALL_WIDTH;
-            y = ROOM_SIZE;
-        }
-        
-        return new Rectangle(x, y, ROOM_SIZE, ROOM_SIZE);
-    }
-    
-    private Point getRandomOverworldPosition(Colony colony, ImageIcon sprite) {
-        int w = (sprite != null) ? sprite.getIconWidth() : 0;
-        int h = (sprite != null) ? sprite.getIconHeight() : 0;
-        int boundX = Math.max(1, colony.getGameAreaWidth() - w);
-        int boundY = Math.max(1, colony.getGameAreaHeight() - h);
-        
-        for (int i = 0; i < 10; i++) {
-            int x = (int) (Math.random() * boundX);
-            int y = (int) (Math.random() * boundY);
-            Point p = new Point(x, y);
-            
-            if (isOverworldPointValid(colony, p)) {
-                return p;
-            }
-        }
-        return new Point(boundX/2, boundY/2);
-    }
-    
-    private boolean isOverworldPointValid(Colony colony, Point p) {
-        if (colony.getEntranceBounds() != null && colony.getEntranceBounds().contains(p)) return false; // AntHill
-        
-        // Strict Check: Don't walk into yards if they exist
-        Rectangle rancher = getOrEstimateRancherBounds(colony);
-        if (colony.hasUpgrade(GameUnlocks.ROLE_RANCHER) && rancher.contains(p)) return false;
-        
-        Rectangle graver = getOrEstimateGraverBounds(colony);
-        if (colony.hasUpgrade(GameUnlocks.ROLE_GRAVER) && graver.contains(p)) return false;
-
-        return true;
-    }
-
-    // --- Main Physics Loop ---
+    // --- Main Loop ---
     public void runPhysics(Colony colony, int activeDimension) {
-        // Ants
+        // Update Ants
         for (List<Ant> antList : colony.getAntGroups().values()) {
             for (Ant ant : antList) {
                 if (ant.isAlive() && ant.getDimension() == activeDimension) {
-                    updateAntLogic(colony, ant);
+                    if (!ant.isMoving()) {
+                        updateAntLogic(colony, ant);
+                    }
                     ant.updatePosition();
                 }
             }
         }
         
-        // Bugs
+        // Update Bugs
         for (Bug bug : colony.getBugs()) {
             if (bug.isAlive() && bug.getDimension() == activeDimension) {
-                updateBugLogic(colony, bug);
+                if (!bug.isMoving()) {
+                    updateBugLogic(colony, bug);
+                }
                 bug.updatePosition();
             }
         }
     }
 
-    private void updateBugLogic(Colony colony, Bug bug) {
-        if (bug.isMoving()) return;
-
-        int dim = bug.getDimension();
-
-        // --- APHID LOGIC ---
-        if (dim == 0 && bug.getBugType() == GameConstants.TYPE_APHID) {
-            
-            if (!colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) {
-                // No upgrade = No existence.
-                bug.setPosition(new Point(-1000, -1000));
-                return;
-            }
-
-            Rectangle yard = getOrEstimateRancherBounds(colony);
-            
-            // Check if Bug is physically inside the yard bounds
-            if (isPointInSpecificBounds(colony, yard, bug.getX(), bug.getY())) {
-                // We are inside! Wander happily.
-                if (Math.random() < 0.05) { // 5% chance to pick new spot
-                    Point wanderDest = getSpecificRoomPoint(colony, yard, colony.getGameAreaWidth());
-                    bug.moveTo(wanderDest);
-                }
-            } else {
-                // We are outside! Run back to the yard center.
-                Point yardCenter = new Point((int)yard.getCenterX(), (int)yard.getCenterY());
-                bug.moveTo(yardCenter);
-            }
-            return; 
-        }
-
-        // Generic bug logic
-        if (dim == 0) {
-            wanderOverworldCarefully(colony, bug);
-        }
-    }
-
+    // --- Logic Updates ---
     private void updateAntLogic(Colony colony, Ant ant) {
-        if (ant.isMoving()) return; 
+        if (ant.getDimension() == 0) {
+            handleOverworldAnt(colony, ant);
+        } else {
+            handleUnderworldAnt(colony, ant);
+        }
+    }
 
-        int dim = ant.getDimension(); 
-        
-        // --- OVERWORLD LOGIC ---
-        if (dim == 0) {
+    private void updateBugLogic(Colony colony, Bug bug) {
+        if (bug.getDimension() == 0 && bug.getBugType() == GameConstants.TYPE_APHID) {
+            if (colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) {
+                Rectangle yard = getOrEstimateRancherBounds(colony);
+                wanderInBoundaries(colony, bug, yard, 0.05);
+            } else {
+                bug.setPosition(new Point(-1000, -1000));
+            }
+        }
+    }
+
+    private void handleOverworldAnt(Colony colony, Ant ant) {
+        if (shouldBeInColony(ant)) {
+            // Go home
+            Point entrance = getEntrancePoint(colony);
+            if (dist(ant.getX(), ant.getY(), entrance.x, entrance.y) < 30) {
+                ant.setDimension(1);
+                ant.setPosition(new Point(colony.getGameAreaWidth()/2, 50));
+            } else {
+                ant.moveTo(entrance);
+            }
+        } else {
+            // Work outside
             AntRole role = ant.getRole();
-            boolean isRancher = role == GameConstants.ROLE_RANCHER;
-            boolean isGraver = role == GameConstants.ROLE_GRAVER;
-            boolean shouldBeInside = shouldBeInColony(ant) && !isRancher && !isGraver;
-            
-            Point entrancePoint = new Point(colony.getGameAreaWidth() / 2, colony.getGameAreaHeight() / 2);
+            if (role == GameConstants.ROLE_RANCHER) {
+                wanderInBoundaries(colony, ant, getOrEstimateRancherBounds(colony), 0.05);
+            } else if (role == GameConstants.ROLE_GRAVER) {
+                wanderInBoundaries(colony, ant, getOrEstimateGraverBounds(colony), 0.05);
+            } else {
+                // Wander freely
+                if (Math.random() < 0.01) {
+                    ant.moveTo(getRandomOverworldPosition(colony, ant.getAntType().getSprite()));
+                }
+            }
+        }
+    }
+
+    private void handleUnderworldAnt(Colony colony, Ant ant) {
+        int virtualWidth = Math.max(colony.getGameAreaWidth(), 1280);
+        Rectangle room = getRoomForAnt(colony, ant, virtualWidth);
+
+        if (ant.getX() == 0 && ant.getY() == 0) {
+            ant.setPosition(getRandomPointInRoom(colony, room, virtualWidth));
+            ant.moveTo(null); 
+            return;
+        }
+
+        if (ant.getAntType() == GameConstants.TYPE_EGG || ant.getAntType() == GameConstants.TYPE_PUPA) {
+            if (!isPointInRoom(colony, room, ant.getX(), ant.getY())) {
+                ant.setPosition(getRandomPointInRoom(colony, room, virtualWidth));
+            }
+            return;
+        }
+
+        boolean roleBelongsOutside = !shouldBeInColony(ant);
+        
+        if (roleBelongsOutside) {
+            Point exit = new Point(colony.getGameAreaWidth() / 2, 20);
             if (colony.getEntranceBounds() != null) {
-                Rectangle ent = colony.getEntranceBounds(); 
-                entrancePoint = new Point((int)ent.getCenterX(), (int)ent.getCenterY());
+                exit = new Point((int)colony.getEntranceBounds().getCenterX(), colony.getEntranceBounds().y + 20);
             }
 
-            if (shouldBeInside) {
-                double dist = dist(ant.getX(), ant.getY(), entrancePoint.x, entrancePoint.y);
-                if (dist < 30) {
-                    ant.setDimension(1);
-                    ant.setPosition(new Point(colony.getGameAreaWidth()/2, 50));
-                    ant.moveTo(null); 
-                } else {
-                    ant.moveTo(entrancePoint);
-                }
+            if (dist(ant.getX(), ant.getY(), exit.x, exit.y) < 30) {
+                ant.setDimension(0);
+                ant.setPosition(getEntrancePoint(colony));
             } else {
-                // Logic for Overworld Workers (Ranchers / Gravers)
-                if (isRancher || isGraver) {
-                    Rectangle yard;
-                    if (isRancher) yard = getOrEstimateRancherBounds(colony);
-                    else yard = getOrEstimateGraverBounds(colony);
-                    
-                    if (isPointInSpecificBounds(colony, yard, ant.getX(), ant.getY())) {
-                         // Inside the yard -> Wander
-                         if (Math.random() < 0.05) {
-                             Point wanderDest = getSpecificRoomPoint(colony, yard, colony.getGameAreaWidth());
-                             ant.moveTo(wanderDest);
-                        }
-                    } else {
-                        // Outside the yard -> Go to Center
-                        Point yardCenter = new Point((int)yard.getCenterX(), (int)yard.getCenterY());
-                        ant.moveTo(yardCenter);
-                    }
-                } else {
-                    wanderOverworldCarefully(colony, ant);
-                }
+                navigateUnderworld(colony, ant, exit);
             }
-        }
-        
-        // --- UNDERWORLD LOGIC ---
-        else if (dim == 1) {
-             if (ant.getX() == 0 && ant.getY() == 0) {
-                int virtualWidth = colony.getGameAreaWidth() > 100 ? colony.getGameAreaWidth() : 1280;
-                Rectangle targetRoom = colony.getTargetRoomForAnt(ant);
-                if (targetRoom == null) {
-                    targetRoom = estimateRoomBounds(colony, ant, virtualWidth);
-                }
-                Point safeSpot = getSpecificRoomPoint(colony, targetRoom, virtualWidth);
-                ant.setPosition(safeSpot);
-                ant.moveTo(null);
-                return;
-            }
-            
-            Rectangle targetRoom = colony.getTargetRoomForAnt(ant);            
-            if (targetRoom == null) {
-                int virtualWidth = colony.getGameAreaWidth() > 100 ? colony.getGameAreaWidth() : 1280;
-                targetRoom = estimateRoomBounds(colony, ant, virtualWidth);
-            }
-            
-            boolean roleBelongsOutside = (ant.getRole() == GameConstants.ROLE_FORAGER || 
-                                          ant.getRole() == GameConstants.ROLE_HUNTER ||
-                                          ant.getRole() == GameConstants.ROLE_RANCHER ||
-                                          ant.getRole() == GameConstants.ROLE_GRAVER);
-
-            if (roleBelongsOutside) {
-                // Exit logic ...
-                Rectangle entranceRect = colony.getEntranceBounds(); 
-                Point exitPoint;
-                if (entranceRect != null) {
-                    exitPoint = new Point((int)entranceRect.getCenterX(), entranceRect.y + 20);
-                } else {
-                    exitPoint = new Point(colony.getGameAreaWidth() / 2, 20);
-                }
-                 
-                double dist = dist(ant.getX(), ant.getY(), exitPoint.x, exitPoint.y);
-                if (dist < 30) {
-                    ant.setDimension(0); 
-                    ant.setPosition(new Point(colony.getGameAreaWidth()/2, colony.getGameAreaHeight()/2));
-                    ant.moveTo(null);
-                } else {
-                    navigateToPointInUnderworld(colony, ant, exitPoint);
-                }
-            } else {
-                // --- INDOOR RESIDENTS (Queens, Larvae, Nurses) ---
-                if (isPointInSpecificBounds(colony, targetRoom, ant.getX(), ant.getY())) {
-                    // We are safely inside. Wander around!
-                    if (Math.random() < 0.05) { // Increased chance so they move more often
-                        Point wanderDest = getSpecificRoomPoint(colony, targetRoom, colony.getGameAreaWidth());
-                        ant.moveTo(wanderDest);
-                    }
-                } else {
-                    // We are drifting or just spawned. Go to room center.
-                    Point roomCenter = new Point((int)targetRoom.getCenterX(), (int)targetRoom.getCenterY());
-                    navigateToPointInUnderworld(colony, ant, roomCenter);
-                }
-            }
-        }
-    }
-
-    private void wanderOverworldCarefully(Colony colony, Bug bug) {
-        if (Math.random() < 0.01) {
-            Point p = getRandomOverworldPosition(colony, bug.getBugType().getSprite());
-            bug.moveTo(p);
-        }
-    }
-    
-    public Point getSpecificRoomPoint(Colony colony, Rectangle r) {
-        return getSpecificRoomPoint(colony, r, colony.getGameAreaWidth());
-    }
-
-    public Point getSpecificRoomPoint(Colony colony, Rectangle r, int gameWidth) {
-        int minY = r.y + padTop;
-        int maxY = r.y + r.height - padBottom - antSize;        
-        if (maxY < minY) maxY = minY;
-        boolean isRightSide = r.getCenterX() > (gameWidth / 2);
-        int minX, maxX;
-        
-        if (isRightSide) {
-             minX = r.x + padHall; 
-             maxX = r.x + r.width - padBack - antSize;
         } else {
-             minX = r.x + padBack;
-             maxX = r.x + r.width - padHall - antSize;
+            wanderInBoundaries(colony, ant, room, 0.10);
+            
+            if (!isPointInRoom(colony, room, ant.getX(), ant.getY()) && 
+                dist(ant.getX(), ant.getY(), room.getCenterX(), room.getCenterY()) > 300) {
+                Point center = new Point((int)room.getCenterX(), (int)room.getCenterY());
+                navigateUnderworld(colony, ant, center);
+            }
         }
-
-        if (maxX < minX) {
-            int center = r.x + (r.width/2) - (antSize/2);
-            minX = center;
-            maxX = center;
-        }
-        
-        int tx = minX + (int)(Math.random() * (maxX - minX + 1));
-        int ty = minY + (int)(Math.random() * (maxY - minY + 1));
-        
-        return new Point(tx, ty);
     }
-    
-    private boolean isPointInSpecificBounds(Colony colony, Rectangle r, int x, int y) {
+
+    private void wanderInBoundaries(Colony colony, Bug entity, Rectangle bounds, double chance) {
+        if (isPointInRoom(colony, bounds, entity.getX(), entity.getY())) {
+            if (Math.random() < chance) {
+                entity.moveTo(getRandomPointInRoom(colony, bounds, colony.getGameAreaWidth()));
+            }
+        } else {
+            entity.moveTo(new Point((int)bounds.getCenterX(), (int)bounds.getCenterY()));
+        }
+    }
+
+    private void navigateUnderworld(Colony colony, Ant ant, Point dest) {
+        int hallX = colony.getGameAreaWidth() / 2;
+        if (colony.getEntranceBounds() != null) hallX = (int)colony.getEntranceBounds().getCenterX();
+
+        boolean inRoom = Math.abs(ant.getX() - hallX) > (HALL_WIDTH / 2 + 10);
+        
+        if (inRoom) {
+            int roomY = (ant.getY() / 256) * 256 + 128;
+            ant.moveTo(new Point(hallX, roomY));
+        } else {
+            if (Math.abs(ant.getY() - dest.y) > 10) {
+                ant.moveTo(new Point(hallX, dest.y));
+            } else {
+                ant.moveTo(dest);
+            }
+        }
+    }
+
+    // --- Helpers & Bounds ---
+    public Point getSpecificRoomPoint(Colony c, Rectangle r) { return getRandomPointInRoom(c, r, c.getGameAreaWidth()); }
+    public Point getSpecificRoomPoint(Colony c, Rectangle r, int w) { return getRandomPointInRoom(c, r, w); }
+
+    private Point getRandomPointInRoom(Colony colony, Rectangle r, int gameWidth) {
+        Rectangle bounds = getWalkableRoomBounds(colony, r, gameWidth);
+        int x = bounds.x + (int)(Math.random() * bounds.width);
+        int y = bounds.y + (int)(Math.random() * bounds.height);
+        return new Point(x, y);
+    }
+
+    private boolean isPointInRoom(Colony colony, Rectangle r, int x, int y) {
         if (r == null) return false;
-        
-        int gameWidth = colony.getGameAreaWidth();
-        boolean isRightSide = r.getCenterX() > (gameWidth / 2);
+        return getWalkableRoomBounds(colony, r, colony.getGameAreaWidth()).contains(x, y);
+    }
 
+    private Rectangle getWalkableRoomBounds(Colony colony, Rectangle r, int gameWidth) {
+        int hallCenterX = (colony.getEntranceBounds() != null) ? (int)colony.getEntranceBounds().getCenterX() : gameWidth/2;
+        boolean isRightSide = r.getCenterX() > hallCenterX;
+
+        int minX = isRightSide ? (r.x + padHall) : (r.x + padBack);
+        int maxX = isRightSide ? (r.x + r.width - padBack - antSize) : (r.x + r.width - padHall - antSize);
         int minY = r.y + padTop;
-        int maxY = r.y + r.height - padBottom - antSize; 
-        if (maxY < minY) maxY = minY;
-
-        int minX, maxX;
-        if (isRightSide) {
-             minX = r.x + padHall; 
-             maxX = r.x + r.width - padBack - antSize;
-        } else {
-             minX = r.x + padBack;
-             maxX = r.x + r.width - padHall - antSize;
-        }
+        int maxY = Math.max(minY, r.y + r.height - padBottom - antSize);
         
         if (maxX < minX) maxX = minX; 
+        
+        return new Rectangle(minX, minY, maxX - minX, maxY - minY);
+    }
 
-        return (x >= minX && x <= maxX && y >= minY && y <= maxY);
+    private Rectangle getRoomForAnt(Colony colony, Ant ant, int gameWidth) {
+        Rectangle defined = colony.getTargetRoomForAnt(ant);
+        if (defined != null) return defined;
+
+        return estimateRoomBounds(colony, ant, gameWidth);
+    }
+
+    private Rectangle estimateRoomBounds(Colony colony, Ant ant, int gameWidth) {
+        if (ant.getRole() == GameConstants.ROLE_RANCHER) return getOrEstimateRancherBounds(colony);
+        if (ant.getRole() == GameConstants.ROLE_GRAVER) return getOrEstimateGraverBounds(colony);
+
+        // 1=TL, 2=TR, 3=BL, 4=BR
+        int index = 1; // Default Storage
+        AntType t = ant.getAntType();
+        if (t == GameConstants.TYPE_QUEEN) index = 4;
+        else if (t == GameConstants.TYPE_EGG || t == GameConstants.TYPE_LARVA || t == GameConstants.TYPE_PUPA || ant.getRole() == GameConstants.ROLE_NURSE) index = 3;
+        else if (ant.getRole() == GameConstants.ROLE_FARMER) index = 2;
+
+        int cx = gameWidth / 2;
+        int x = (index % 2 == 0) ? (cx + HALL_WIDTH/2) : (cx - HALL_WIDTH/2 - ROOM_SIZE);
+        int y = (index > 2) ? ROOM_SIZE : 0;
+        
+        return new Rectangle(x, y, ROOM_SIZE, ROOM_SIZE);
+    }
+    
+    private Rectangle getOrEstimateRancherBounds(Colony colony) {
+        if (colony.getRancherBounds() != null) return colony.getRancherBounds();
+        return new Rectangle(10, 10, 256, 256);
+    }
+
+    private Rectangle getOrEstimateGraverBounds(Colony colony) {
+        if (colony.getGraverBounds() != null) return colony.getGraverBounds();
+        return new Rectangle(colony.getGameAreaWidth() - 270, colony.getGameAreaHeight() - 270, 256, 256);
+    }
+
+    private Point getRandomOverworldPosition(Colony colony, ImageIcon sprite) {
+        int w = (sprite != null) ? sprite.getIconWidth() : 0;
+        int h = (sprite != null) ? sprite.getIconHeight() : 0;
+        int maxX = Math.max(1, colony.getGameAreaWidth() - w);
+        int maxY = Math.max(1, colony.getGameAreaHeight() - h);
+        return new Point((int)(Math.random() * maxX), (int)(Math.random() * maxY));
+    }
+    
+    private Point getEntrancePoint(Colony colony) {
+        if (colony.getEntranceBounds() != null) 
+            return new Point((int)colony.getEntranceBounds().getCenterX(), (int)colony.getEntranceBounds().getCenterY());
+        return new Point(colony.getGameAreaWidth()/2, colony.getGameAreaHeight()/2);
     }
 
     private boolean shouldBeInColony(Ant ant) {
-        AntType type = ant.getAntType();
-        
-        if (type == GameConstants.TYPE_EGG || 
-            type == GameConstants.TYPE_LARVA || 
-            type == GameConstants.TYPE_PUPA || 
-            type == GameConstants.TYPE_QUEEN) {
-            return true;
-        }
-        
-        AntRole role = ant.getRole();
-        
-        if (role == GameConstants.ROLE_RANCHER || 
-            role == GameConstants.ROLE_GRAVER || 
-            role == GameConstants.ROLE_FORAGER || 
-            role == GameConstants.ROLE_HUNTER) {
-            return false;
-        }
-        
-        return true;
+        AntType t = ant.getAntType();
+        if (t == GameConstants.TYPE_EGG || t == GameConstants.TYPE_LARVA || t == GameConstants.TYPE_PUPA || t == GameConstants.TYPE_QUEEN) return true;
+        AntRole r = ant.getRole();
+        return !(r == GameConstants.ROLE_RANCHER || r == GameConstants.ROLE_GRAVER || r == GameConstants.ROLE_FORAGER || r == GameConstants.ROLE_HUNTER);
     }
 
-    private void navigateToPointInUnderworld(Colony colony, Ant ant, Point finalDest) {
-        Rectangle entranceRect = colony.getEntranceBounds();
-        int hallCenterX;
-        int hallWidth;
-        
-        if (entranceRect != null) {
-            hallCenterX = (int)entranceRect.getCenterX();
-            hallWidth = entranceRect.width;
-        } else {
-            hallCenterX = colony.getGameAreaWidth() / 2;
-            hallWidth = HALL_WIDTH;
-        }
-
-        int currentX = ant.getX();
-        int currentY = ant.getY();
-        boolean goingDown = finalDest.y > currentY;
-        int laneX = goingDown ? (hallCenterX - 30) : (hallCenterX - 10);
-        
-        boolean insideRoom = Math.abs(currentX - hallCenterX) > (hallWidth / 2 + 10);
-        
-        if (insideRoom) {
-            //Exit Room
-            int roomHeight = 256;
-            int roomRowStart = (currentY / roomHeight) * roomHeight;
-            int exitDoorY = roomRowStart + (roomHeight / 2) - 30;
-    
-            if (Math.abs(currentY - exitDoorY) > 10) {
-                ant.moveTo(new Point(currentX, exitDoorY));
-            } else {
-                ant.moveTo(new Point(laneX, currentY));
-            }
-        } else {
-            //Hallway Travel
-            boolean targetIsRoom = Math.abs(finalDest.x - hallCenterX) > (hallWidth / 2);
-            int targetY = finalDest.y;
-
-            if (targetIsRoom) {
-                int roomHeight = 256;
-                int destRowStart = (finalDest.y / roomHeight) * roomHeight;
-                targetY = destRowStart + (roomHeight / 2) - 10;
-            }
-            
-            if (Math.abs(currentY - targetY) > 10) {
-                if (Math.abs(currentX - laneX) > 5) {
-                    ant.moveTo(new Point(laneX, currentY));
-                } else {
-                    ant.moveTo(new Point(laneX, targetY));
-                }
-            } else {
-                ant.moveTo(finalDest);
-            }
-        }
-    }
-
-    private double dist(int x1, int y1, int x2, int y2) {
+    private double dist(double x1, double y1, double x2, double y2) {
         return Math.sqrt(Math.pow(x2-x1, 2) + Math.pow(y2-y1, 2));
     }
 }

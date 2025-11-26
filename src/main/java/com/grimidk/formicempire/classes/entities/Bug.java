@@ -91,7 +91,7 @@ public class Bug {
     public void setDefense(int defense) { this.defense = defense; }
 
     public float getSpeed() { return speed; }
-    public void setSpeed(int speed) { this.speed = speed; }
+    public void setSpeed(float speed) { this.speed = speed; }
 
     public float getSize() { return size; }
     public void setSize(int size) { this.size = size; }
@@ -152,6 +152,7 @@ public class Bug {
         double distance = Math.sqrt(dx * dx + dy * dy);
         
         double currentSpeed = this.speed * this.moveStatus.getSpeedMult();
+        if (currentSpeed <= 0.01) currentSpeed = 0.01;
 
         if (distance <= currentSpeed) {
             this.preciseX = targetPosition.x;

@@ -7,7 +7,8 @@ import java.util.Map;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList; 
-import java.awt.Rectangle; 
+import java.awt.Rectangle;
+import java.awt.Point; 
 
 import com.grimidk.formicempire.classes.entities.services.ColonyStatsService;
 import com.grimidk.formicempire.classes.entities.services.ColonyLabourService;
@@ -36,7 +37,6 @@ public class Colony {
     // --- Population Data ---
     private final Map<AntType, List<Ant>> antGroups;
     private final List<Ant> deadAnts;
-    // New list for general Bugs (Aphids, etc)
     private final List<Bug> bugs; 
     
     private Map<AntRole, Integer> assignedRoleCounts;
@@ -51,7 +51,7 @@ public class Colony {
     private int syrups;
     private int resins;
     private int minerals;
-    private int aphids; // Kept for count/save compatibility, but logic moves to 'bugs' list
+    private int aphids; 
     private int researchPoints;
 
     // --- Hatch Rate Data ---
@@ -263,7 +263,6 @@ public class Colony {
 
         this.aphids = savefile.getAphids();
         
-        // Populate actual Bug objects for Aphids based on save count
         for(int i=0; i<this.aphids; i++) {
             this.bugs.add(new Bug(GameConstants.TYPE_APHID));
         }
@@ -349,7 +348,6 @@ public class Colony {
         this.deadAnts.addAll(deadAnts);
     }
     
-    // Getter for general bugs
     public List<Bug> getBugs() { return bugs; }
     
     public int getAntTotal() {
@@ -394,15 +392,24 @@ public class Colony {
     public void setMinerals(int minerals) { this.minerals = minerals; }
 
     public int getAphids() { return aphids; }
-    
-    // Updates both the count and the bug list to stay in sync
     public void setAphids(int count) { 
         if (count > this.aphids) {
-            int diff = count - this.aphids;
-            for(int i=0; i<diff; i++) this.bugs.add(new Bug(GameConstants.TYPE_APHID));
+            int diff = count - this.aphids;  
+            Rectangle yard = getRancherBounds();
+            if (yard == null) yard = new Rectangle(10, 10, 256, 256); 
+
+            for(int i=0; i<diff; i++) {
+                Bug newBug = new Bug(GameConstants.TYPE_APHID);
+                
+                if (physicsService != null) {
+                    Point spawnPos = physicsService.getSpecificRoomPoint(this, yard);
+                    newBug.setPosition(spawnPos);
+                }
+                
+                this.bugs.add(newBug);
+            }
         } else if (count < this.aphids) {
             int diff = this.aphids - count;
-            // Remove aphids from the bug list
             for(int i=0; i<diff; i++) {
                 for(Bug b : this.bugs) {
                     if (b.getBugType() == GameConstants.TYPE_APHID) {
