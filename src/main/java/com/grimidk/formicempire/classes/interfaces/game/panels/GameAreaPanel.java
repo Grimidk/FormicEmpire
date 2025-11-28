@@ -316,6 +316,16 @@ public class GameAreaPanel extends JPanel {
                 g2d.translate(centerX, centerY);       
                 g2d.rotate(Math.toRadians(ant.getR()));
                 g2d.drawImage(sprite, -w / 2, -h / 2, this);
+                
+                // --- Visual Indicator for Carrying ---
+                if (ant.getCarrying() != null && ant.getCarrying().getIcon() != null) {
+                    g2d.rotate(Math.toRadians(-ant.getR()));
+                    Image resourceIcon = ant.getCarrying().getIcon().getImage();
+                    int iconW = 20; 
+                    int iconH = 20;
+                    g2d.drawImage(resourceIcon, -iconW/2, -h/2 - iconH, iconW, iconH, this);
+                }
+                
                 g2d.setTransform(oldTransform);
             }
         }

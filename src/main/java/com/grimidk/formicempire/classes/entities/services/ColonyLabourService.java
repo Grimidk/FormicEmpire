@@ -376,8 +376,29 @@ public class ColonyLabourService {
                 quantity = 100; // Small
             }
         }
+
+        int gameW = colony.getGameAreaWidth();
+        int gameH = colony.getGameAreaHeight();
+        int buffer = 300;
         
-        ResourceSource source = new ResourceSource(selectedType, quantity, 0, 0); 
+        int sourceX, sourceY;
+        int side = random.nextInt(4); // 0=Top, 1=Right, 2=Bottom, 3=Left
+        
+        if (side == 0) { // Top
+             sourceX = random.nextInt(Math.max(1, gameW));
+             sourceY = -buffer;
+        } else if (side == 1) { // Right
+             sourceX = gameW + buffer;
+             sourceY = random.nextInt(Math.max(1, gameH));
+        } else if (side == 2) { // Bottom
+             sourceX = random.nextInt(Math.max(1, gameW));
+             sourceY = gameH + buffer;
+        } else { // Left
+             sourceX = -buffer;
+             sourceY = random.nextInt(Math.max(1, gameH));
+        }
+        
+        ResourceSource source = new ResourceSource(selectedType, quantity, sourceX, sourceY); 
         colony.getLocationService().addSource(colony, source);
     }
 

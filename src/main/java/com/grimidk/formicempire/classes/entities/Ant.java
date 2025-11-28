@@ -3,13 +3,15 @@ package com.grimidk.formicempire.classes.entities;
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntSubType;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
+import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 
 public class Ant extends Bug {
     private AntType type;
     private AntSubType subType;
     private AntRole role;
-    private float tempRes;
+    private float tempRes;    
+    private ResourceType carrying;
 
     public Ant(Colony colony, AntType type) {
         super(GameConstants.TYPE_ANT); 
@@ -17,6 +19,7 @@ public class Ant extends Bug {
         this.type = type;
         this.subType = null;
         this.role = null;
+        this.carrying = null;
         
         this.setStatus(GameConstants.STATUS_ALIVE);
         this.setMaxHealth((int)(colony.getBaseHealth() * type.getHealtMult())); 
@@ -48,9 +51,13 @@ public class Ant extends Bug {
     public float getTempRes() { return tempRes; }
     public void setTempRes(float tempRes) { this.tempRes = tempRes; }
 
+    public ResourceType getCarrying() { return carrying; }
+    public void setCarrying(ResourceType carrying) { this.carrying = carrying; }
+
     @Override
     public void goDie() {
         this.type = GameConstants.TYPE_DEAD; 
+        this.carrying = null; 
         super.goDie();
     }
 
