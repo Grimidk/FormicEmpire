@@ -187,7 +187,6 @@ public class GameAreaPanel extends JPanel {
             graverYardBounds = new Rectangle(x, y, w, h);
             
             if (deadBodyImg != null && colony.getDeadAnts() != null && !colony.getDeadAnts().isEmpty()) {
-                // Local Padding: Back=Left (64), Hall=Right (16), Top=48, Bottom=48
                 int padBack = 64; 
                 int padHall = 16;
                 int padTop = 48;
@@ -222,21 +221,15 @@ public class GameAreaPanel extends JPanel {
             int dx = rng.nextInt(areaW);
             int dy = rng.nextInt(areaH);
             
-            // Random Rotation Logic
             float angle = rng.nextFloat() * 360.0f; 
-
             AffineTransform old = g2d.getTransform();
             
-            // Calculate center of where the body is drawn
             double centerX = rx + dx + (imgW / 2.0);
             double centerY = ry + dy + (imgH / 2.0);
             
             g2d.translate(centerX, centerY);
-            g2d.rotate(Math.toRadians(angle));
-            
-            // Draw centered at (0,0) relative to the translation
+            g2d.rotate(Math.toRadians(angle));            
             g2d.drawImage(img, -imgW / 2, -imgH / 2, this);
-            
             g2d.setTransform(old);
         }
     }

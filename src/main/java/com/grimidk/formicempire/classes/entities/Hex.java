@@ -3,7 +3,6 @@ package com.grimidk.formicempire.classes.entities;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 
 public class Hex {
-    
     private Biome biome;
     private Colony colony;
     private Hex north;
@@ -25,7 +24,7 @@ public class Hex {
     }
     
     public Hex(){
-        
+    
     }
 
     public Biome getBiome() {

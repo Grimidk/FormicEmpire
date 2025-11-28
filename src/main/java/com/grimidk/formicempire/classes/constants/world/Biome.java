@@ -7,18 +7,22 @@ import com.grimidk.formicempire.classes.constants.Constant;
 public class Biome extends Constant{
     private final int temperature;
     private final int humidity; // 0 -> 5
+    private final float plantAbundance;
+    private final float animalAbundance;
+    private final float mineralAbundance;
 
-    public Biome(int id, String name, int temperature, int humidity, ImageIcon icon) {
+    public Biome(int id, String name, int temperature, int humidity, float plantAbundance, float animalAbundance, float mineralAbundance, ImageIcon icon) {
         super(id, name, icon);
         this.temperature = temperature;
         this.humidity = humidity;
+        this.plantAbundance = plantAbundance;
+        this.animalAbundance = animalAbundance;
+        this.mineralAbundance = mineralAbundance;
     }
 
-    public int getTemperature() {
-        return temperature;
-    }
-
-    public int isIsHumid() {
-        return humidity;
-    }
+    public int getTemperature() { return temperature; }
+    public int isIsHumid() { return humidity; }
+    public float getPlantAbundance() { return plantAbundance; }
+    public float getAnimalAbundance() { return animalAbundance; }
+    public float getMineralAbundance() { return mineralAbundance; }
 }

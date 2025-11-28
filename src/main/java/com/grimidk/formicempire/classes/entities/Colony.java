@@ -12,6 +12,7 @@ import java.awt.Point;
 
 import com.grimidk.formicempire.classes.entities.services.ColonyStatsService;
 import com.grimidk.formicempire.classes.entities.services.ColonyLabourService;
+import com.grimidk.formicempire.classes.entities.services.ColonyLocationService;
 import com.grimidk.formicempire.classes.entities.services.ColonyPopulationService;
 import com.grimidk.formicempire.classes.entities.services.ColonyPhysicsService;
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
@@ -83,6 +84,7 @@ public class Colony {
     private transient ColonyLabourService labourService;
     private transient ColonyPopulationService populationService;
     private transient ColonyPhysicsService physicsService;
+    private transient ColonyLocationService locationService;
 
     // --- Service Initializer ---
     private void initializeServices() {
@@ -605,6 +607,7 @@ public class Colony {
     public void runConverting() { labourService.runConverting(this); }
     public void runRanching() { labourService.runRanching(this); }
     public void runHerding() { labourService.runHerding(this); }
+    public void runScoutting() { labourService.runScoutting(this); }
     
     public void runPhysics(int activeDimension) { 
         physicsService.runPhysics(this, activeDimension); 
@@ -632,6 +635,7 @@ public class Colony {
         this.runNursing();
         this.runGraveKeeping();
         this.runHerding();
+        this.runScoutting();
     }
 
     public void runMonthlyJobs() { 

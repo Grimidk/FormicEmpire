@@ -52,7 +52,7 @@ public final class GameConstants {
         loadIcon("icons/temp/warm.png"));
     public static final Temperature TEMP_HOT = new Temperature(6, "Hot", 45,
         loadIcon("icons/temp/hot.png"));
-    public static final Temperature TEMP_BURNING = new Temperature(7, "Burning", 100, // Cap high
+    public static final Temperature TEMP_BURNING = new Temperature(7, "Burning", 100,
         loadIcon("icons/temp/burning.png"));
 
     // --- Humidity
@@ -70,21 +70,21 @@ public final class GameConstants {
         loadIcon("icons/humid/humid5.png"));
 
     // --- Biomes ---
-    public static final Biome PLAINS_BIOME = new Biome(1, "Plains", 25, 2, 
+    public static final Biome PLAINS_BIOME = new Biome(1, "Plains", 25, 2, 1f, 1f, 0f,
         loadIcon("icons/biomes/plains.png"));
-    public static final Biome FOREST_BIOME = new Biome(2, "Forest", 22, 3, 
+    public static final Biome FOREST_BIOME = new Biome(2, "Forest", 22, 3, 2f, 2f, 0.1f,
         loadIcon("icons/biomes/forest.png"));
-    public static final Biome JUNGLE_BIOME = new Biome(3, "Jungle", 30, 4, 
+    public static final Biome JUNGLE_BIOME = new Biome(3, "Jungle", 30, 4, 2.5f, 2.5f, 0.2f,
         loadIcon("icons/biomes/jungle.png"));
-    public static final Biome SWAMP_BIOME = new Biome(4, "Swamp", 26, 5, 
+    public static final Biome SWAMP_BIOME = new Biome(4, "Swamp", 26, 5, 1.5f, 1.5f, 0f,
         loadIcon("icons/biomes/swamp.png"));
-    public static final Biome URBAN_BIOME = new Biome(5, "Urban", 28, 1, 
+    public static final Biome URBAN_BIOME = new Biome(5, "Urban", 28, 1, 0.5f, 0.5f, 0.5f,
         loadIcon("icons/biomes/urban.png"));
-    public static final Biome TUNDRA_BIOME = new Biome(6, "Tundra", 5, 2, 
+    public static final Biome TUNDRA_BIOME = new Biome(6, "Tundra", 5, 2, 0.2f, 0.2f, 0.3f,
         loadIcon("icons/biomes/tundra.png"));
-    public static final Biome TAIGA_BIOME = new Biome(7, "Taiga", 12, 1, 
+    public static final Biome TAIGA_BIOME = new Biome(7, "Taiga", 12, 1, 0.4f, 0.3f, 0.5f,
         loadIcon("icons/biomes/taiga.png"));
-    public static final Biome DESSERT_BIOME = new Biome(8, "Dessert", 45, 0, 
+    public static final Biome DESSERT_BIOME = new Biome(8, "Dessert", 45, 0, 0.05f, 0.02f, 1f,
         loadIcon("icons/biomes/dessert.png"));
 
     // --- Resources ---

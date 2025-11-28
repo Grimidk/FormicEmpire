@@ -70,6 +70,10 @@ public class ColonyStatsService {
         if (colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) {return 10;
         } else {return 0;}
     }
+    public int getSourceCapacity(Colony colony) {
+        if (colony.hasUpgrade(GameUnlocks.STAT_LOGISTICS_1)) {return 5;
+        } else {return 1;}
+    }
 
     // --- Rates ---
     public int getResearchSpeed(Colony colony) {
@@ -110,6 +114,10 @@ public class ColonyStatsService {
         if (colony.hasUpgrade(GameUnlocks.ROLE_POLICE)) {return 10f;
         } else {return 0;}
     }
+    public float getScoutingRate(Colony colony) {
+        if (colony.hasUpgrade(GameUnlocks.ROLE_SCOUT)) {return 0.1f;
+        } else {return 0;}
+    }
     
     // --- Stats ---
     public int getBaseHealth(Colony colony) {
@@ -148,7 +156,6 @@ public class ColonyStatsService {
         if (colony.hasUpgrade(GameUnlocks.STAT_LONGEVITY)) {return 1;
         } else {return 0;}
     }
-    
     public int getThirstResistance(Colony colony, Temperature temp) {
         int resistance = 20; 
         if (colony.hasUpgrade(GameUnlocks.STAT_THIRST_3)) {

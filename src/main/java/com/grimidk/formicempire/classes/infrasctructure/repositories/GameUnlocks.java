@@ -29,7 +29,7 @@ public final class GameUnlocks {
     public static final Upgrade ROLE_RANCHER = new Upgrade(13, "Rancher Role", "Aphid Rancher", "Allows workers to ranch aphids. 1 ant can handle 10 aphids and herd 1 additional aphid per day. Each aphid produces 1 hoenydew (syrup).", ROLE_FORAGER, 500 );
     public static final Upgrade ROLE_RESEARCHER = new Upgrade(14, "Research Role", "Ant Science", "Allows queens to generate reserach points. 1 ant research 1 point per hour.", TYPE_QUEEN, 0 );
     public static final Upgrade ROLE_BUILDER = new Upgrade(15, "Builder Role", "Base Building", "Allows workers to build new rooms in the colony.", TYPE_WORKER, 250 );
-    public static final Upgrade ROLE_SCOUT = new Upgrade(16, "Scout Role", "Adventure's Call", "", TYPE_WORKER, 0 );
+    public static final Upgrade ROLE_SCOUT = new Upgrade(16, "Scout Role", "Adventure's Call", "Allows workers to go find new sources of resources, each scout has 10% chance each day to encounter a plant source.", TYPE_WORKER, 600 );
     public static final Upgrade ROLE_MINER = new Upgrade(17, "Miner Role", "Yearn For The Mines", "", TYPE_WORKER, 0 );     
     public static final Upgrade ROLE_COURIER = new Upgrade(18, "Courier Role", "Logistic Network", "", TYPE_WORKER, 0 );
     public static final Upgrade ROLE_POTTER = new Upgrade(19, "Portable-Feeder Role", "A Helping Hand", "", TYPE_WORKER, 0 );
@@ -61,7 +61,7 @@ public final class GameUnlocks {
     public static final Upgrade STAT_THIRST_1 = new Upgrade(110, "Improved Metabolism", "Water Retention", "Increases the colony's thirst resistance to 40%.", STAT_LONGEVITY, 1500 );
     public static final Upgrade STAT_THIRST_2 = new Upgrade(111, "Advanced Metabolism", "Camel Ants", "Increases the colony's thirst resistance to 60%.", STAT_THIRST_1, 5000 );
     public static final Upgrade STAT_THIRST_3 = new Upgrade(112, "Perfected Metabolism", "Hydro-Lock Shells", "Increases the colony's thirst resistance to 80%.", STAT_THIRST_2, 15000 );
-
+    public static final Upgrade STAT_LOGISTICS_1 = new Upgrade(113, "Improved Logistics", "Ant Spreadsheets", "Allows your colony to manage 5 sources of each resource", ROLE_SCOUT, 0);
     // -- Abilities --
     public static final Upgrade ABILITY_RESEARCH = new Upgrade(201, "Research", "Micro Microscopes", "Allows you to research more ant technology by using research points, go to the research menu (Y).", ROLE_RESEARCHER, 0 );
     public static final Upgrade ABILITY_BUILD = new Upgrade(202, "Building", "Brick And Mortar", "Allows you to build parts of your colony, you can build in the build menu (U).", ROLE_BUILDER, 0 );
@@ -122,6 +122,7 @@ public final class GameUnlocks {
         upgrades.add(TYPE_QUEEN);
         upgrades.add(ROLE_FORAGER);
         upgrades.add(ROLE_NURSE);
+        upgrades.add(ROLE_SCOUT);
         upgrades.add(ROLE_FARMER);
         upgrades.add(ROLE_GRAVER);
         upgrades.add(ROLE_HUNTER);

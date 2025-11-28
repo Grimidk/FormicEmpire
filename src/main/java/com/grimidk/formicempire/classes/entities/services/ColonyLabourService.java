@@ -191,6 +191,10 @@ public class ColonyLabourService {
         // Placeholder
     }
 
+    public void runScoutting(Colony colony) {
+        // Placeholder
+    }
+
     public void runNuptial(Colony colony) {
         List<Ant> princesses = colony.getPrincesses();
         List<Ant> drones = colony.getDrones();
