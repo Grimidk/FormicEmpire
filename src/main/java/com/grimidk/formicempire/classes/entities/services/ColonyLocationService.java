@@ -33,6 +33,14 @@ public class ColonyLocationService {
                 .mapToInt(ResourceSource::getQuantity)
                 .sum();
     }
+    
+    public boolean isSourceFull(Colony colony, ResourceType type) {
+        int capacity = colony.getStatsService().getSourceCapacity(colony);
+        long count = discoveredSources.stream()
+                .filter(s -> s.getResourceType() == type)
+                .count();
+        return count >= capacity;
+    }
 
     public void addSource(Colony colony, ResourceSource source) {
         int capacity = colony.getStatsService().getSourceCapacity(colony);

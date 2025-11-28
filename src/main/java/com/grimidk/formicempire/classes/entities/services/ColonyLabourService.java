@@ -83,6 +83,7 @@ public class ColonyLabourService {
                         colony.setPlants(colony.getPlants() + actualGathered);
                         plantPower -= actualGathered;
                         
+                        // Resin Chance (Bonus)
                         if (colony.hasUpgrade(GameUnlocks.ABILITY_RESIN)) {
                             int resinSpace = stats.getResinsCapacity(colony) - colony.getResins();
                             if (resinSpace > 0 && Math.random() < 0.01) {
@@ -157,6 +158,7 @@ public class ColonyLabourService {
             }
         }
 
+        // Passive Water (Dew)
         if (colony.hasBuilding(GameUnlocks.PASSIVE_WATER)) {
             int gain = colony.getStatsService().getWaterCapacity(colony) / 10;
             colony.setWater(Math.min(colony.getWater() + gain, stats.getWaterCapacity(colony)));
@@ -318,11 +320,21 @@ public class ColonyLabourService {
     }
 
     private void generateAndAddSource(Colony colony, Biome biome) {
+        ColonyLocationService locations = colony.getLocationService();
         List<ResourceType> possibleTypes = new ArrayList<>();
-        if (colony.hasUpgrade(GameUnlocks.ROLE_FORAGER)) possibleTypes.add(GameConstants.PLANT_RESOURCE);
-        if (colony.hasUpgrade(GameUnlocks.ROLE_HUNTER)) possibleTypes.add(GameConstants.MEAT_RESOURCE);
-        if (colony.hasUpgrade(GameUnlocks.ROLE_MINER)) possibleTypes.add(GameConstants.ROCK_RESOURCE);
-        possibleTypes.add(GameConstants.WATER_RESOURCE); 
+        
+        if (colony.hasUpgrade(GameUnlocks.ROLE_FORAGER) && !locations.isSourceFull(colony, GameConstants.PLANT_RESOURCE)) {
+            possibleTypes.add(GameConstants.PLANT_RESOURCE);
+        }
+        if (colony.hasUpgrade(GameUnlocks.ROLE_HUNTER) && !locations.isSourceFull(colony, GameConstants.MEAT_RESOURCE)) {
+            possibleTypes.add(GameConstants.MEAT_RESOURCE);
+        }
+        if (colony.hasUpgrade(GameUnlocks.ROLE_MINER) && !locations.isSourceFull(colony, GameConstants.ROCK_RESOURCE)) {
+            possibleTypes.add(GameConstants.ROCK_RESOURCE);
+        }
+        if (!locations.isSourceFull(colony, GameConstants.WATER_RESOURCE)) {
+            possibleTypes.add(GameConstants.WATER_RESOURCE); 
+        }
 
         if (possibleTypes.isEmpty()) return;
         ResourceType selectedType = possibleTypes.get(random.nextInt(possibleTypes.size()));
@@ -333,25 +345,35 @@ public class ColonyLabourService {
             if (selectedType == GameConstants.PLANT_RESOURCE) abundance = biome.getPlantAbundance();
             else if (selectedType == GameConstants.MEAT_RESOURCE) abundance = biome.getAnimalAbundance();
             else if (selectedType == GameConstants.ROCK_RESOURCE) abundance = biome.getMineralAbundance();
-            else if (selectedType == GameConstants.WATER_RESOURCE) abundance = biome.isIsHumid() / 5.0f; 
+            else if (selectedType == GameConstants.WATER_RESOURCE) {
+                int h = biome.isIsHumid();
+                if (h >= 5) abundance = 0.9f;     
+                else if (h == 4) abundance = 0.7f;
+                else if (h == 3) abundance = 0.5f; 
+                else if (h == 2) abundance = 0.3f;
+                else if (h == 1) abundance = 0.1f; 
+                else abundance = 0.0f;    
+            }
         } else {
             abundance = 0.5f; 
         }
 
         // None (0)
         if (abundance <= 0) return; 
-        // Small (100)
-        int quantity = 100; 
-        // Medium (1000)
-        if (random.nextFloat() < abundance) {
-            quantity = 1000;
-            // Big (10000)
-            if (random.nextFloat() < abundance) {
-                quantity = 10000;
-                // Huge (100000)
-                if (random.nextFloat() < abundance) {
-                    quantity = 100000;
-                }
+        
+        int quantity = 100; // Small
+        float roll = random.nextFloat();
+        
+        if (roll < abundance) {
+            quantity = 100000; // Huge
+        } else {
+            float subRoll = random.nextFloat();
+            if (subRoll < 0.33f) {
+                quantity = 10000; // Big
+            } else if (subRoll < 0.66f) {
+                quantity = 1000; // Medium
+            } else {
+                quantity = 100; // Small
             }
         }
         
