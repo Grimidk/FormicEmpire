@@ -4,7 +4,7 @@ import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 
 public class ResourceSource {
     private final ResourceType resourceType;
-    private final int quantity;
+    private int quantity; 
     private final int x;
     private final int y;
 
@@ -21,6 +21,11 @@ public class ResourceSource {
 
     public int getQuantity() {
         return quantity;
+    }
+    
+    public void decreaseQuantity(int amount) {
+        this.quantity -= amount;
+        if (this.quantity < 0) this.quantity = 0;
     }
 
     public int getX() {

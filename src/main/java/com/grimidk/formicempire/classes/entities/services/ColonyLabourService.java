@@ -4,17 +4,23 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
+import com.grimidk.formicempire.classes.constants.misc.ResourceType;
+import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.ResourceSource;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 
 
 public class ColonyLabourService {
     
+    private final Random random = new Random();
+
     // --- Job Counter ---
     private int countActiveAnts(Colony colony, AntRole role) {
         int count = 0;
@@ -35,33 +41,110 @@ public class ColonyLabourService {
 
     public void runCollecting(Colony colony) {
         ColonyStatsService stats = colony.getStatsService();
-        int foragerCount = countActiveAnts(colony, GameConstants.ROLE_FORAGER);
+        ColonyLocationService locations = colony.getLocationService();
         
-        int plantGain = 0;
-        int waterGain = 0;
-        for (int i = 0; i < foragerCount; i++) {
-            if (Math.random() < 0.5) waterGain++;
-            else plantGain++;
+        // --- Plants (Foragers) ---
+        if (colony.hasUpgrade(GameUnlocks.ROLE_FORAGER)) {
+            int foragerCount = countActiveAnts(colony, GameConstants.ROLE_FORAGER);
+            if (foragerCount > 0) {
+                float rate = stats.getCollectingRate(colony); 
+                int totalGatherPower = (int) (foragerCount * rate);
+                
+                List<ResourceSource> plantSources = locations.getSourcesByType(GameConstants.PLANT_RESOURCE);
+                
+                for (ResourceSource source : plantSources) {
+                    if (totalGatherPower <= 0) break;
+                    
+                    int spaceAvailable = stats.getPlantsCapacity(colony) - colony.getPlants();
+                    if (spaceAvailable <= 0) break;
+
+                    int gatherAmount = Math.min(totalGatherPower, spaceAvailable);
+                    int actualGathered = locations.gatherFromSource(colony, source, gatherAmount);
+                    
+                    colony.setPlants(colony.getPlants() + actualGathered);
+                    totalGatherPower -= actualGathered;
+                    
+                    // Resin Chance (Bonus)
+                    if (colony.hasUpgrade(GameUnlocks.ABILITY_RESIN)) {
+                        int resinSpace = stats.getResinsCapacity(colony) - colony.getResins();
+                        if (resinSpace > 0 && Math.random() < 0.01) {
+                             colony.setResins(colony.getResins() + 1);
+                        }
+                    }
+                }
+            }
         }
         
-        int effectivePlantGain = (int) (plantGain * stats.getCollectingRate(colony));
-        int effectiveWaterGain = (int) (waterGain * stats.getCollectingRate(colony));
-        if (colony.hasBuilding(GameUnlocks.PASSIVE_WATER)) {
-            effectiveWaterGain += colony.getWaterCapacity() / 10;
-        }
-        int effectiveResinGain = (int) (plantGain * (stats.getCollectingRate(colony) / 100));
-        
-        colony.setPlants(Math.min(colony.getPlants() + effectivePlantGain, stats.getPlantsCapacity(colony)));
-        colony.setWater(Math.min(colony.getWater() + effectiveWaterGain, stats.getWaterCapacity(colony)));
-        
-        if (colony.hasUpgrade(GameUnlocks.ABILITY_RESIN)) {
-             colony.setResins(Math.min(colony.getResins() + effectiveResinGain, stats.getResinsCapacity(colony)));
-        }
-        
+        // --- Meat/Protein (Hunters) ---
         if (colony.hasUpgrade(GameUnlocks.ROLE_HUNTER)) {
             int hunterCount = countActiveAnts(colony, GameConstants.ROLE_HUNTER);
-            int proteinGain = (int) (hunterCount * stats.getCollectingRate(colony));
-            colony.setProtein(Math.min(colony.getProtein() + proteinGain, stats.getProteinCapacity(colony)));
+            if (hunterCount > 0) {
+                float rate = stats.getCollectingRate(colony); 
+                int totalGatherPower = (int) (hunterCount * rate);
+                
+                List<ResourceSource> meatSources = locations.getSourcesByType(GameConstants.MEAT_RESOURCE);
+                
+                for (ResourceSource source : meatSources) {
+                    if (totalGatherPower <= 0) break;
+                    
+                    int spaceAvailable = stats.getProteinCapacity(colony) - colony.getProtein();
+                    if (spaceAvailable <= 0) break;
+
+                    int gatherAmount = Math.min(totalGatherPower, spaceAvailable);
+                    int actualGathered = locations.gatherFromSource(colony, source, gatherAmount);
+                    
+                    colony.setProtein(colony.getProtein() + actualGathered);
+                    totalGatherPower -= actualGathered;
+                }
+            }
+        }
+
+        // --- Minerals (Miners) ---
+        if (colony.hasUpgrade(GameUnlocks.ROLE_MINER)) {
+            int minerCount = countActiveAnts(colony, GameConstants.ROLE_MINER);
+            if (minerCount > 0) {
+                float rate = stats.getCollectingRate(colony); 
+                int totalGatherPower = (int) (minerCount * rate);
+                
+                List<ResourceSource> mineralSources = locations.getSourcesByType(GameConstants.ROCK_RESOURCE);
+                
+                for (ResourceSource source : mineralSources) {
+                    if (totalGatherPower <= 0) break;
+                    
+                    int spaceAvailable = stats.getMineralsCapacity(colony) - colony.getMinerals();
+                    if (spaceAvailable <= 0) break;
+
+                    int gatherAmount = Math.min(totalGatherPower, spaceAvailable);
+                    int actualGathered = locations.gatherFromSource(colony, source, gatherAmount);
+                    
+                    colony.setMinerals(colony.getMinerals() + actualGathered);
+                    totalGatherPower -= actualGathered;
+                }
+            }
+        }
+        
+        // --- Water (Foragers/Sources) ---
+        int foragerCount = countActiveAnts(colony, GameConstants.ROLE_FORAGER);
+        if (foragerCount > 0) {
+             List<ResourceSource> waterSources = locations.getSourcesByType(GameConstants.WATER_RESOURCE);
+             int totalGatherPower = (int) (foragerCount * stats.getCollectingRate(colony));
+             
+             for (ResourceSource source : waterSources) {
+                if (totalGatherPower <= 0) break;
+                int spaceAvailable = stats.getWaterCapacity(colony) - colony.getWater();
+                if (spaceAvailable <= 0) break;
+                
+                int gatherAmount = Math.min(totalGatherPower, spaceAvailable);
+                int actualGathered = locations.gatherFromSource(colony, source, gatherAmount);
+                colony.setWater(colony.getWater() + actualGathered);
+                totalGatherPower -= actualGathered;
+             }
+        }
+
+        // Passive Water (Dew)
+        if (colony.hasBuilding(GameUnlocks.PASSIVE_WATER)) {
+            int gain = colony.getStatsService().getWaterCapacity(colony) / 10;
+            colony.setWater(Math.min(colony.getWater() + gain, stats.getWaterCapacity(colony)));
         }
     }
 
@@ -191,8 +274,74 @@ public class ColonyLabourService {
         // Placeholder
     }
 
-    public void runScoutting(Colony colony) {
-        // Placeholder
+    public void runScoutting(Colony colony, Biome biome) {
+        if (!colony.hasUpgrade(GameUnlocks.ROLE_SCOUT)) return;
+
+        int scoutCount = countActiveAnts(colony, GameConstants.ROLE_SCOUT);
+        if (scoutCount == 0) return;
+
+        float chancePerScout = colony.getStatsService().getScoutingRate(colony); 
+        float totalChance = scoutCount * chancePerScout;
+
+        while (totalChance > 0) {
+            boolean found = false;
+            
+            if (totalChance >= 1.0f) {
+                found = true;
+                totalChance -= 1.0f;
+            } else {
+                if (random.nextFloat() < totalChance) {
+                    found = true;
+                }
+                totalChance = 0; 
+            }
+
+            if (found) {
+                generateAndAddSource(colony, biome);
+            }
+        }
+    }
+
+    private void generateAndAddSource(Colony colony, Biome biome) {
+        List<ResourceType> possibleTypes = new ArrayList<>();
+        if (colony.hasUpgrade(GameUnlocks.ROLE_FORAGER)) possibleTypes.add(GameConstants.PLANT_RESOURCE);
+        if (colony.hasUpgrade(GameUnlocks.ROLE_HUNTER)) possibleTypes.add(GameConstants.MEAT_RESOURCE);
+        if (colony.hasUpgrade(GameUnlocks.ROLE_MINER)) possibleTypes.add(GameConstants.ROCK_RESOURCE);
+        possibleTypes.add(GameConstants.WATER_RESOURCE); 
+
+        if (possibleTypes.isEmpty()) return;
+        ResourceType selectedType = possibleTypes.get(random.nextInt(possibleTypes.size()));
+        
+        float abundance = 0f;
+        
+        if (biome != null) {
+            if (selectedType == GameConstants.PLANT_RESOURCE) abundance = biome.getPlantAbundance();
+            else if (selectedType == GameConstants.MEAT_RESOURCE) abundance = biome.getAnimalAbundance();
+            else if (selectedType == GameConstants.ROCK_RESOURCE) abundance = biome.getMineralAbundance();
+            else if (selectedType == GameConstants.WATER_RESOURCE) abundance = biome.isIsHumid() / 5.0f; 
+        } else {
+             abundance = 0.5f; 
+        }
+
+        // None (0)
+        if (abundance <= 0) return; 
+        // Small (100)
+        int quantity = 100; 
+        // Medium (1000)
+        if (random.nextFloat() < abundance) {
+            quantity = 1000;
+            // Big (10000)
+            if (random.nextFloat() < abundance) {
+                quantity = 10000;
+                // Huge (100000)
+                if (random.nextFloat() < abundance) {
+                    quantity = 100000;
+                }
+            }
+        }
+        
+        ResourceSource source = new ResourceSource(selectedType, quantity, 0, 0); 
+        colony.getLocationService().addSource(colony, source);
     }
 
     public void runNuptial(Colony colony) {

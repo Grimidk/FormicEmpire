@@ -347,7 +347,7 @@ public class World {
         this.day++;
 
         if (this.getSpawnHex() != null) {
-            this.getSpawnHex().getColony().runDailyJobs(this.getTemperatureIcon());
+            this.getSpawnHex().getColony().runDailyJobs(this.getTemperatureIcon(), this.getSpawnHex().getBiome());
         }
 
         if (this.day >= 1 && this.day < 2) {
@@ -423,5 +423,4 @@ public class World {
             this.getSpawnHex().getColony().runYearlyJobs();
         }
     }
-
 }

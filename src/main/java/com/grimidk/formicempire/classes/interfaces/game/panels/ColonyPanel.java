@@ -4,6 +4,7 @@ import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.services.ColonyLocationService;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 
@@ -58,6 +59,12 @@ public class ColonyPanel extends JPanel {
     private int lastSyrups = -1; 
     private int lastResins = -1; 
     private int lastMinerals = -1; 
+    
+    private int lastPlantsAvailable = -1;
+    private int lastProteinAvailable = -1;
+    private int lastWaterAvailable = -1;
+    private int lastMineralsAvailable = -1;
+    
     private int lastTotalConsumption = -1;
     private int lastBabyTotal = -1;
     private int lastAdultTotal = -1;
@@ -208,11 +215,29 @@ public class ColonyPanel extends JPanel {
         int minerals = colony.getMinerals();
         int totalResources = mushrooms + plants + protein + water + syrups + resins + minerals;
         
+        ColonyLocationService locService = colony.getLocationService();
+        int plantsAvail = locService != null ? locService.getTotalQuantityAvailable(GameConstants.PLANT_RESOURCE) : 0;
+        int proteinAvail = locService != null ? locService.getTotalQuantityAvailable(GameConstants.MEAT_RESOURCE) : 0;
+        int waterAvail = locService != null ? locService.getTotalQuantityAvailable(GameConstants.WATER_RESOURCE) : 0;
+        int mineralsAvail = locService != null ? locService.getTotalQuantityAvailable(GameConstants.ROCK_RESOURCE) : 0;
+
         if (totalResources != -1) totalResourcesLabel.setText("Total resources: " + totalResources);
         if (mushrooms != lastMushrooms) mushroomsLabel.setText(String.valueOf(mushrooms));
-        if (plants != lastPlants) planLabel.setText(String.valueOf(plants));
-        if (protein != lastProtein) proteinLabel.setText(String.valueOf(protein));
-        if (water != lastWater) waterLabel.setText(String.valueOf(water));
+        
+        if (plants != lastPlants || plantsAvail != lastPlantsAvailable) {
+            planLabel.setText(plants + " / (" + plantsAvail + ")");
+            lastPlantsAvailable = plantsAvail;
+        }
+        
+        if (protein != lastProtein || proteinAvail != lastProteinAvailable) {
+            proteinLabel.setText(protein + " / (" + proteinAvail + ")");
+            lastProteinAvailable = proteinAvail;
+        }
+        
+        if (water != lastWater || waterAvail != lastWaterAvailable) {
+            waterLabel.setText(water + " / (" + waterAvail + ")");
+            lastWaterAvailable = waterAvail;
+        }
 
         boolean hasRanching = colony.hasUpgrade(GameUnlocks.ROLE_RANCHER);
         syrupLabel.setVisible(hasRanching);
@@ -224,7 +249,10 @@ public class ColonyPanel extends JPanel {
 
         boolean hasMining = colony.hasUpgrade(GameUnlocks.ROLE_MINER);
         mineralLabel.setVisible(hasMining);
-        if (hasMining && minerals != lastMinerals) mineralLabel.setText(String.valueOf(minerals));
+        if (hasMining && (minerals != lastMinerals || mineralsAvail != lastMineralsAvailable)) {
+             mineralLabel.setText(minerals + " / (" + mineralsAvail + ")");
+             lastMineralsAvailable = mineralsAvail;
+        }
 
         // Stats 
         int totalConsumption = colony.getTotalConsumption();
@@ -246,14 +274,11 @@ public class ColonyPanel extends JPanel {
         int eggs = colony.getEggs() != null ? colony.getEggs().size() : 0;
         if (eggs != lastEggs) eggsLabel.setText(String.valueOf(eggs));
         
-        // Resources
         int plants = colony.getPlants();     
         int protein = colony.getProtein();  
-        if (plants != lastPlants) planLabel.setText(String.valueOf(plants));
         
         boolean hasHunter = colony.hasUpgrade(GameUnlocks.ROLE_HUNTER);
         proteinLabel.setVisible(hasHunter);
-        if (hasHunter && protein != lastProtein) proteinLabel.setText(String.valueOf(protein));
         
         // Stats
         int totalConsumption = colony.getTotalConsumption();

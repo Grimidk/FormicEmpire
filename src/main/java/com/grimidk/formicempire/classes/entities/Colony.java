@@ -19,8 +19,10 @@ import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
 import com.grimidk.formicempire.classes.constants.misc.Species;
+import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
+import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.Temperature;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
@@ -92,6 +94,7 @@ public class Colony {
         this.labourService = new ColonyLabourService();
         this.populationService = new ColonyPopulationService();
         this.physicsService = new ColonyPhysicsService();
+        this.locationService = new ColonyLocationService();
     }
 
     // --- Initialization Methods ---
@@ -512,6 +515,7 @@ public class Colony {
     public ColonyLabourService getLabourService() { return this.labourService; }
     public ColonyPopulationService getPopulationService() { return this.populationService; }
     public ColonyPhysicsService getPhysicsService() { return this.physicsService; }
+    public ColonyLocationService getLocationService() { return this.locationService; }
 
     public int getTotalConsumption(){ return statsService.getTotalConsumption(this); }
     public int getTotalProduction(){ return statsService.getTotalProduction(this); }
@@ -542,6 +546,7 @@ public class Colony {
     public int getBaseDefense() { return statsService.getBaseDefense(this); }
     public int getBaseSpeed() { return statsService.getBaseSpeed(this); }
     public int getBaseSize(){ return statsService.getBaseSize(this); }
+    public int getSourceCapacity() { return statsService.getSourceCapacity(this); }
 
     // --- Colony Setup ---
     public void startColony() {
@@ -588,6 +593,14 @@ public class Colony {
         
         this.getWorkers().get(8).setRole(GameConstants.ROLE_FORAGER);
         this.getWorkers().get(8).setDimension(0);
+
+        if (locationService != null) {
+            ResourceSource initialPlant = new ResourceSource(GameConstants.PLANT_RESOURCE, 10000, 0, 0);
+            ResourceSource initialWater = new ResourceSource(GameConstants.WATER_RESOURCE, 10000, 0, 0);
+            
+            this.locationService.addSource(this, initialPlant);
+            this.locationService.addSource(this, initialWater);
+        }
     }
 
     // --- Simulation Logic Methods ---
@@ -607,7 +620,9 @@ public class Colony {
     public void runConverting() { labourService.runConverting(this); }
     public void runRanching() { labourService.runRanching(this); }
     public void runHerding() { labourService.runHerding(this); }
-    public void runScoutting() { labourService.runScoutting(this); }
+    
+    // Updated signature:
+    public void runScoutting(Biome biome) { labourService.runScoutting(this, biome); }
     
     public void runPhysics(int activeDimension) { 
         physicsService.runPhysics(this, activeDimension); 
@@ -627,7 +642,8 @@ public class Colony {
         this.runBuilding();
     }
 
-    public void runDailyJobs(Temperature currentTemp) {
+    // Updated signature:
+    public void runDailyJobs(Temperature currentTemp, Biome biome) {
         this.rankUp();
         this.runEating(currentTemp);
         this.runHatching();
@@ -635,7 +651,7 @@ public class Colony {
         this.runNursing();
         this.runGraveKeeping();
         this.runHerding();
-        this.runScoutting();
+        this.runScoutting(biome);
     }
 
     public void runMonthlyJobs() { 
