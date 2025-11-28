@@ -145,6 +145,7 @@ public final class GameUnlocks {
         upgrades.add(STAT_THIRST_1);
         upgrades.add(STAT_THIRST_2);
         upgrades.add(STAT_THIRST_3);
+        upgrades.add(STAT_LOGISTICS_1);
         upgrades.add(ABILITY_RESEARCH);
         upgrades.add(ABILITY_BUILD);
         upgrades.add(ABILITY_SPREAD);

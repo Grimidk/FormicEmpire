@@ -273,6 +273,31 @@ public class Colony {
         }
         
         this.researchPoints = savefile.getResearchPoints();
+        
+        if (savefile.getSavedResourceSources() != null && this.locationService != null) {
+            List<ResourceType> allTypes = GameConstants.getResources();
+            
+            for (Savefile.SavedResourceSource s : savefile.getSavedResourceSources()) {
+                ResourceType type = null;
+                for (ResourceType rt : allTypes) {
+                    if (rt.getId() == s.typeId) {
+                        type = rt;
+                        break;
+                    }
+                }
+                
+                if (type != null) {
+                    ResourceSource rs = new ResourceSource(
+                        type,
+                        s.currentQuantity,
+                        s.initialQuantity,
+                        s.x,
+                        s.y
+                    );
+                    this.locationService.addSource(this, rs);
+                }
+            }
+        }
 
         runRoleAssignment();
     }
@@ -594,6 +619,7 @@ public class Colony {
         this.getWorkers().get(8).setRole(GameConstants.ROLE_FORAGER);
         this.getWorkers().get(8).setDimension(0);
 
+        // Add initial sources (Big Plant and Big Water as requested)
         if (locationService != null) {
             ResourceSource initialPlant = new ResourceSource(GameConstants.PLANT_RESOURCE, 10000, 0, 0);
             ResourceSource initialWater = new ResourceSource(GameConstants.WATER_RESOURCE, 10000, 0, 0);

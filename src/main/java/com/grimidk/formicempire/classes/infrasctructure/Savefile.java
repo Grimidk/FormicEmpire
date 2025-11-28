@@ -50,6 +50,7 @@ public class Savefile implements Serializable {
     private Map<String, Integer> assignedRoleCounts;
     private List<Integer> unlockedUpgradeIds;
     private List<Integer> unlockedBuildingIds;
+    private List<SavedResourceSource> savedResourceSources;
 
     private int aphids;
     private int researchPoints;
@@ -60,6 +61,7 @@ public class Savefile implements Serializable {
         this.assignedRoleCounts = new HashMap<>();
         this.unlockedUpgradeIds = new ArrayList<>(); 
         this.unlockedBuildingIds = new ArrayList<>(); 
+        this.savedResourceSources = new ArrayList<>();
         this.minute = 0;
         this.hour = 0;
         this.day = 1;
@@ -74,6 +76,23 @@ public class Savefile implements Serializable {
 
         this.aphids = 0;
         this.researchPoints = 0;
+    }
+
+    public static class SavedResourceSource implements Serializable {
+        private static final long serialVersionUID = 1L;
+        public int typeId;
+        public int currentQuantity;
+        public int initialQuantity;
+        public int x;
+        public int y;
+
+        public SavedResourceSource(int typeId, int currentQuantity, int initialQuantity, int x, int y) {
+            this.typeId = typeId;
+            this.currentQuantity = currentQuantity;
+            this.initialQuantity = initialQuantity;
+            this.x = x;
+            this.y = y;
+        }
     }
 
     public int getId() {
@@ -332,6 +351,14 @@ public class Savefile implements Serializable {
 
     public void setUnlockedBuildingIds(List<Integer> unlockedBuildingIds) {
         this.unlockedBuildingIds = unlockedBuildingIds;
+    }
+    
+    public List<SavedResourceSource> getSavedResourceSources() {
+        return savedResourceSources;
+    }
+
+    public void setSavedResourceSources(List<SavedResourceSource> savedResourceSources) {
+        this.savedResourceSources = savedResourceSources;
     }
 
     public int getAphids() { return aphids; }

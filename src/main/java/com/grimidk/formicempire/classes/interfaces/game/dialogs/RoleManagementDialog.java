@@ -119,6 +119,7 @@ public class RoleManagementDialog extends JDialog {
 
     private static Upgrade getUpgradeForRole(AntRole role) {
         if (role == GameConstants.ROLE_FORAGER) return GameUnlocks.ROLE_FORAGER;
+        if (role == GameConstants.ROLE_SCOUT) return GameUnlocks.ROLE_SCOUT;
         if (role == GameConstants.ROLE_NURSE) return GameUnlocks.ROLE_NURSE;
         if (role == GameConstants.ROLE_FARMER) return GameUnlocks.ROLE_FARMER;
         if (role == GameConstants.ROLE_GRAVER) return GameUnlocks.ROLE_GRAVER;

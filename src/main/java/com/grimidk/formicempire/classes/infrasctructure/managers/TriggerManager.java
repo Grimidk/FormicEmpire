@@ -2,8 +2,10 @@ package com.grimidk.formicempire.classes.infrasctructure.managers;
 
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.ResourceSource;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 
 import javax.swing.SwingUtilities;
@@ -75,6 +77,7 @@ public class TriggerManager {
         checkBreederRoleUnlock();
         checkBruteRoleUnlock();
         checkSpreadAbilityUnlock();
+        checkScoutRoleUnlock();
     }
 
     // --- Specific Trigger Logic ---
@@ -173,6 +176,24 @@ public class TriggerManager {
             fireTrigger(GameUnlocks.ABILITY_SPREAD,
                         "Colony Colonization",
                         "With the ability to breed new queens, your colony now understands how to spread. You can found new colonies from the world map (I).");
+        }
+    }
+    
+    private void checkScoutRoleUnlock() {
+        if (colony.hasUpgrade(GameUnlocks.ROLE_SCOUT)) return;
+        
+        if (colony.getLocationService() != null && colony.getLocationService().getDiscoveredSources() != null) {
+            for (ResourceSource source : colony.getLocationService().getDiscoveredSources()) {
+                if (source.getResourceType() == GameConstants.PLANT_RESOURCE && source.getInitialQuantity() == 10000) {
+                    int collected = source.getInitialQuantity() - source.getQuantity();
+                    if (collected >= 6000) {
+                         fireTrigger(GameUnlocks.ROLE_SCOUT, 
+                                     "Adventure's Call", 
+                                     "We have depleted more than half of our main plant source! Our workers feel the need to explore for new lands, unlocking the Scout role!");
+                    }
+                    break; 
+                }
+            }
         }
     }
     

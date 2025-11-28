@@ -43,7 +43,7 @@ public class ColonyLabourService {
         ColonyStatsService stats = colony.getStatsService();
         ColonyLocationService locations = colony.getLocationService();
         
-        // --- Plants (Foragers) ---
+        // --- Foragers (Plants & Water) ---
         if (colony.hasUpgrade(GameUnlocks.ROLE_FORAGER)) {
             int foragerCount = countActiveAnts(colony, GameConstants.ROLE_FORAGER);
             if (foragerCount > 0) {
@@ -51,25 +51,59 @@ public class ColonyLabourService {
                 int totalGatherPower = (int) (foragerCount * rate);
                 
                 List<ResourceSource> plantSources = locations.getSourcesByType(GameConstants.PLANT_RESOURCE);
+                boolean canGatherPlants = !plantSources.isEmpty() && (stats.getPlantsCapacity(colony) - colony.getPlants() > 0);
                 
-                for (ResourceSource source : plantSources) {
-                    if (totalGatherPower <= 0) break;
-                    
-                    int spaceAvailable = stats.getPlantsCapacity(colony) - colony.getPlants();
-                    if (spaceAvailable <= 0) break;
+                List<ResourceSource> waterSources = locations.getSourcesByType(GameConstants.WATER_RESOURCE);
+                boolean canGatherWater = !waterSources.isEmpty() && (stats.getWaterCapacity(colony) - colony.getWater() > 0);
+                
+                int plantPower = 0;
+                int waterPower = 0;
+                
+                if (canGatherPlants && canGatherWater) {
+                    for (int i = 0; i < totalGatherPower; i++) {
+                        if (random.nextBoolean()) plantPower++;
+                        else waterPower++;
+                    }
+                } else if (canGatherPlants) {
+                    plantPower = totalGatherPower;
+                } else if (canGatherWater) {
+                    waterPower = totalGatherPower;
+                }
+                
+                if (plantPower > 0) {
+                    for (ResourceSource source : plantSources) {
+                        if (plantPower <= 0) break;
+                        
+                        int spaceAvailable = stats.getPlantsCapacity(colony) - colony.getPlants();
+                        if (spaceAvailable <= 0) break;
 
-                    int gatherAmount = Math.min(totalGatherPower, spaceAvailable);
-                    int actualGathered = locations.gatherFromSource(colony, source, gatherAmount);
-                    
-                    colony.setPlants(colony.getPlants() + actualGathered);
-                    totalGatherPower -= actualGathered;
-                    
-                    // Resin Chance (Bonus)
-                    if (colony.hasUpgrade(GameUnlocks.ABILITY_RESIN)) {
-                        int resinSpace = stats.getResinsCapacity(colony) - colony.getResins();
-                        if (resinSpace > 0 && Math.random() < 0.01) {
-                             colony.setResins(colony.getResins() + 1);
+                        int gatherAmount = Math.min(plantPower, spaceAvailable);
+                        int actualGathered = locations.gatherFromSource(colony, source, gatherAmount);
+                        
+                        colony.setPlants(colony.getPlants() + actualGathered);
+                        plantPower -= actualGathered;
+                        
+                        if (colony.hasUpgrade(GameUnlocks.ABILITY_RESIN)) {
+                            int resinSpace = stats.getResinsCapacity(colony) - colony.getResins();
+                            if (resinSpace > 0 && Math.random() < 0.01) {
+                                 colony.setResins(colony.getResins() + 1);
+                            }
                         }
+                    }
+                }
+                
+                if (waterPower > 0) {
+                    for (ResourceSource source : waterSources) {
+                        if (waterPower <= 0) break;
+                        
+                        int spaceAvailable = stats.getWaterCapacity(colony) - colony.getWater();
+                        if (spaceAvailable <= 0) break;
+                        
+                        int gatherAmount = Math.min(waterPower, spaceAvailable);
+                        int actualGathered = locations.gatherFromSource(colony, source, gatherAmount);
+                        
+                        colony.setWater(colony.getWater() + actualGathered);
+                        waterPower -= actualGathered;
                     }
                 }
             }
@@ -122,26 +156,7 @@ public class ColonyLabourService {
                 }
             }
         }
-        
-        // --- Water (Foragers/Sources) ---
-        int foragerCount = countActiveAnts(colony, GameConstants.ROLE_FORAGER);
-        if (foragerCount > 0) {
-             List<ResourceSource> waterSources = locations.getSourcesByType(GameConstants.WATER_RESOURCE);
-             int totalGatherPower = (int) (foragerCount * stats.getCollectingRate(colony));
-             
-             for (ResourceSource source : waterSources) {
-                if (totalGatherPower <= 0) break;
-                int spaceAvailable = stats.getWaterCapacity(colony) - colony.getWater();
-                if (spaceAvailable <= 0) break;
-                
-                int gatherAmount = Math.min(totalGatherPower, spaceAvailable);
-                int actualGathered = locations.gatherFromSource(colony, source, gatherAmount);
-                colony.setWater(colony.getWater() + actualGathered);
-                totalGatherPower -= actualGathered;
-             }
-        }
 
-        // Passive Water (Dew)
         if (colony.hasBuilding(GameUnlocks.PASSIVE_WATER)) {
             int gain = colony.getStatsService().getWaterCapacity(colony) / 10;
             colony.setWater(Math.min(colony.getWater() + gain, stats.getWaterCapacity(colony)));
@@ -320,7 +335,7 @@ public class ColonyLabourService {
             else if (selectedType == GameConstants.ROCK_RESOURCE) abundance = biome.getMineralAbundance();
             else if (selectedType == GameConstants.WATER_RESOURCE) abundance = biome.isIsHumid() / 5.0f; 
         } else {
-             abundance = 0.5f; 
+            abundance = 0.5f; 
         }
 
         // None (0)

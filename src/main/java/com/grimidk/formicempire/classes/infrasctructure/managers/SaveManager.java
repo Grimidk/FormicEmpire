@@ -13,6 +13,7 @@ import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.ResourceSource;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.World;
@@ -363,6 +364,21 @@ public class SaveManager {
                     // --- New Stats ---
                     save.setAphids(c.getAphids());
                     save.setResearchPoints(c.getResearchPoints());
+                    
+                    // --- Resource Sources ---
+                    List<Savefile.SavedResourceSource> savedSources = new ArrayList<>();
+                    if (c.getLocationService() != null && c.getLocationService().getDiscoveredSources() != null) {
+                        for (ResourceSource rs : c.getLocationService().getDiscoveredSources()) {
+                             savedSources.add(new Savefile.SavedResourceSource(
+                                 rs.getResourceType().getId(),
+                                 rs.getQuantity(),
+                                 rs.getInitialQuantity(),
+                                 rs.getX(),
+                                 rs.getY()
+                             ));
+                        }
+                    }
+                    save.setSavedResourceSources(savedSources);
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -460,6 +476,12 @@ public class SaveManager {
         // Roles
         w.write("  \"assignedRoleCounts\": ");
         w.write(serializeMapToJson(s.getAssignedRoleCounts()));
+        w.write(",");
+        w.newLine();
+        
+        // Resource Sources
+        w.write("  \"savedResourceSources\": ");
+        w.write(serializeSourcesToJson(s.getSavedResourceSources()));
         w.newLine();
 
         w.write("}");
@@ -567,6 +589,10 @@ public class SaveManager {
 
             String buildingsJson = m.getOrDefault("unlockedBuildingIds", "[]");
             s.setUnlockedBuildingIds(deserializeJsonToList(buildingsJson));
+            
+            // Saved Resource Sources
+            String sourcesJson = m.getOrDefault("savedResourceSources", "[]");
+            s.setSavedResourceSources(deserializeJsonToSources(sourcesJson));
         }
         return s;
     }
@@ -605,6 +631,29 @@ public class SaveManager {
             i++;
         }
         sb.append("}");
+        return sb.toString();
+    }
+    
+    private String serializeSourcesToJson(List<Savefile.SavedResourceSource> sources) {
+        if (sources == null || sources.isEmpty()) {
+            return "[]";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (int i = 0; i < sources.size(); i++) {
+            Savefile.SavedResourceSource s = sources.get(i);
+            sb.append("{");
+            sb.append("\"typeId\":").append(s.typeId).append(","); 
+            sb.append("\"qty\":").append(s.currentQuantity).append(",");
+            sb.append("\"init\":").append(s.initialQuantity).append(",");
+            sb.append("\"x\":").append(s.x).append(",");
+            sb.append("\"y\":").append(s.y);
+            sb.append("}");
+            if (i < sources.size() - 1) {
+                sb.append(",");
+            }
+        }
+        sb.append("]");
         return sb.toString();
     }
     
@@ -647,6 +696,49 @@ public class SaveManager {
                 System.err.println("Error parsing upgrade ID: " + part);
             }
         }
+        return list;
+    }
+    
+    private List<Savefile.SavedResourceSource> deserializeJsonToSources(String json) {
+        List<Savefile.SavedResourceSource> list = new ArrayList<>();
+        if (json == null || json.length() <= 2) return list;
+        
+        String inner = json.substring(1, json.length() - 1);
+        if (inner.isEmpty()) return list;
+
+        String[] objects = inner.split("\\},");
+        
+        for (String objStr : objects) {
+            if (!objStr.endsWith("}")) objStr += "}";
+            
+            int typeId = 0; 
+            int qty = 0;
+            int init = 0;
+            int x = 0;
+            int y = 0;
+            
+            try {
+                String clean = objStr.replace("{", "").replace("}", "");
+                String[] fields = clean.split(",");
+                for (String f : fields) {
+                    String[] kv = f.split(":");
+                    if (kv.length == 2) {
+                        String k = kv[0].replace("\"", "").trim();
+                        String v = kv[1].replace("\"", "").trim();
+                        
+                        if (k.equals("typeId")) typeId = Integer.parseInt(v); 
+                        else if (k.equals("qty")) qty = Integer.parseInt(v);
+                        else if (k.equals("init")) init = Integer.parseInt(v);
+                        else if (k.equals("x")) x = Integer.parseInt(v);
+                        else if (k.equals("y")) y = Integer.parseInt(v);
+                    }
+                }
+                list.add(new Savefile.SavedResourceSource(typeId, qty, init, x, y));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        
         return list;
     }
 
