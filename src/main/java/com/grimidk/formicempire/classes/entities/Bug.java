@@ -21,13 +21,11 @@ public class Bug {
     private float defense;
     private float speed;
     private float size;
-
-    // 0 = Overworld, 1 = Underworld
-    private int dimension; 
-
+    
     private MoveStatus moveStatus;
     private int x;
     private int y;
+    private int dimension; 
     private int r; 
     
     private double preciseX;

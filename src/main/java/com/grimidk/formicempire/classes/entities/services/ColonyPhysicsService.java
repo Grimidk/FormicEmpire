@@ -5,8 +5,10 @@ import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Bug;
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.infrasctructure.Room;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
 
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -16,7 +18,7 @@ import javax.swing.ImageIcon;
 
 public class ColonyPhysicsService {
     // --- Constants ---
-    private final int ROOM_SIZE = 256;
+    private final int ROOM_SIZE = 256; 
     private final int HALL_WIDTH = 128;
     private final int PAD_WALL = 64; 
     private final int PAD_DOOR = 20; 
@@ -60,11 +62,12 @@ public class ColonyPhysicsService {
             
             ImageIcon sprite = entry.getKey().getSprite();
             for (Ant ant : entry.getValue()) {
-                if (ant.getDimension() == 1 || shouldBeInColony(ant)) {
-                    ant.setDimension(1);
+                if (ant.getDimension() == WorldSpaces.UNDERWORLD.getId() || shouldBeInColony(ant)) {
+                    ant.setDimension(WorldSpaces.UNDERWORLD.getId());
                     Rectangle targetRoom = getTargetRoomForAnt(colony, ant, virtualWidth);
                     ant.setPosition(getRandomPointInRoom(colony, targetRoom, virtualWidth));
                 } else {
+                    ant.setDimension(WorldSpaces.OVERWORLD.getId());
                     ant.setPosition(getRandomOverworldPosition(colony, sprite));
                 }
             }
@@ -72,7 +75,7 @@ public class ColonyPhysicsService {
         
         for (Bug bug : colony.getBugs()) {
             if (bug.getBugType() == GameConstants.TYPE_APHID && colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) {
-                Rectangle yard = getOrEstimateRancherBounds(colony);
+                Rectangle yard = getRoomBounds(colony, WorldSpaces.RANCHER_YARD);
                 bug.setPosition(getRandomPointInRoom(colony, yard, virtualWidth));
             } else {
                 bug.setPosition(new Point(-1000, -1000));
@@ -82,7 +85,7 @@ public class ColonyPhysicsService {
 
     // --- AI Logic ---
     private void updateAntLogic(Colony colony, Ant ant) {
-        if (ant.getDimension() == 0) {
+        if (ant.getDimension() == WorldSpaces.OVERWORLD.getId()) {
             handleOverworldAnt(colony, ant);
         } else {
             handleUnderworldAnt(colony, ant);
@@ -90,9 +93,9 @@ public class ColonyPhysicsService {
     }
 
     private void updateBugLogic(Colony colony, Bug bug) {
-        if (bug.getDimension() == 0 && bug.getBugType() == GameConstants.TYPE_APHID) {
+        if (bug.getDimension() == WorldSpaces.OVERWORLD.getId() && bug.getBugType() == GameConstants.TYPE_APHID) {
             if (colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) {
-                Rectangle yard = getOrEstimateRancherBounds(colony);
+                Rectangle yard = getRoomBounds(colony, WorldSpaces.RANCHER_YARD);
                 wanderInBoundaries(colony, bug, yard, 0.05);
             } else {
                 bug.setPosition(new Point(-1000, -1000));
@@ -105,7 +108,7 @@ public class ColonyPhysicsService {
             // Go Home
             Point entrance = getEntrancePoint(colony);
             if (dist(ant.getX(), ant.getY(), entrance.x, entrance.y) < 30) {
-                ant.setDimension(1);
+                ant.setDimension(WorldSpaces.UNDERWORLD.getId());
                 ant.setPosition(new Point(colony.getGameAreaWidth()/2, 50));
             } else {
                 ant.moveTo(entrance);
@@ -113,8 +116,11 @@ public class ColonyPhysicsService {
         } else {
             // Wander Outside
             Rectangle yard = null;
-            if (ant.getRole() == GameConstants.ROLE_RANCHER) yard = getOrEstimateRancherBounds(colony);
-            else if (ant.getRole() == GameConstants.ROLE_GRAVER) yard = getOrEstimateGraverBounds(colony);
+            if (ant.getRole() == GameConstants.ROLE_RANCHER) {
+                yard = getRoomBounds(colony, WorldSpaces.RANCHER_YARD);
+            } else if (ant.getRole() == GameConstants.ROLE_GRAVER) {
+                yard = getRoomBounds(colony, WorldSpaces.GRAVEYARD);
+            }
 
             if (yard != null) {
                 wanderInBoundaries(colony, ant, yard, 0.05);
@@ -150,7 +156,7 @@ public class ColonyPhysicsService {
             }
             
             if (dist(ant.getX(), ant.getY(), exit.x, exit.y) < 30) {
-                ant.setDimension(0);
+                ant.setDimension(WorldSpaces.OVERWORLD.getId());
                 ant.setPosition(getEntrancePoint(colony));
             } else {
                 navigateUnderworld(colony, ant, exit);
@@ -212,31 +218,48 @@ public class ColonyPhysicsService {
     }
 
     // --- Room Logic & Estimates ---
-    private Rectangle getTargetRoomForAnt(Colony colony, Ant ant, int gameWidth) {
+    public Rectangle getTargetRoomForAnt(Colony colony, Ant ant, int gameWidth) {
         Rectangle defined = colony.getTargetRoomForAnt(ant);
         if (defined != null) return defined;
-        return estimateRoomBounds(colony, ant.getAntType(), ant.getRole(), gameWidth);
+        
+        Room room = findRoomForAnt(ant);
+        return getRoomBounds(colony, room);
     }
 
-    private Rectangle estimateRoomBounds(Colony colony, AntType type, AntRole role, int gameWidth) {
-        // Grid: 1=TL, 2=TR, 3=BL, 4=BR
-        int cx = gameWidth / 2;
-        int hallX = cx - (HALL_WIDTH / 2);
+    private Room findRoomForAnt(Ant ant) {
+        if (isAllowedInRoom(WorldSpaces.NURSERY, ant)) return WorldSpaces.NURSERY;
+        if (isAllowedInRoom(WorldSpaces.FARM, ant)) return WorldSpaces.FARM;
+        if (isAllowedInRoom(WorldSpaces.ROYAL_CHAMBER, ant)) return WorldSpaces.ROYAL_CHAMBER;
+        
+        return WorldSpaces.STORAGE;
+    }
+    
+    private boolean isAllowedInRoom(Room room, Ant ant) {
+        if (room == null || ant == null) return false;
 
-        // Nursery
-        if (type == GameConstants.TYPE_EGG || type == GameConstants.TYPE_LARVA || type == GameConstants.TYPE_PUPA || role == GameConstants.ROLE_NURSE) {
-            return new Rectangle(hallX - ROOM_SIZE, ROOM_SIZE, ROOM_SIZE, ROOM_SIZE);
+        AntType type = ant.getAntType();
+        if (type != null && room.getAllowedAntTypes().contains(type)) {
+            return true;
         }
-        // Farm 
-        if (role == GameConstants.ROLE_FARMER) {
-            return new Rectangle(hallX + HALL_WIDTH, 0, ROOM_SIZE, ROOM_SIZE);
+        
+        AntRole role = ant.getRole();
+        if (role != null && room.getAllowedAntRoles().contains(role)) {
+            return true;
         }
-        // Royal Chamber
-        if (type == GameConstants.TYPE_QUEEN) {
-            return new Rectangle(hallX + HALL_WIDTH, ROOM_SIZE, ROOM_SIZE, ROOM_SIZE);
+
+        return false;
+    }
+
+    public Rectangle getRoomBounds(Colony colony, Room room) {
+        int x = room.getFloorPoint().x;
+        int y = room.getFloorPoint().y;
+        
+        if (room.getDimension() == WorldSpaces.UNDERWORLD) {
+            int cx = colony.getGameAreaWidth() / 2;
+            x += cx;
         }
-        // Storage 
-        return new Rectangle(hallX - ROOM_SIZE, 0, ROOM_SIZE, ROOM_SIZE);
+        
+        return new Rectangle(x, y, room.getWidth(), room.getHeight());
     }
 
     private void wanderInBoundaries(Colony colony, Bug entity, Rectangle bounds, double chance) {
@@ -276,16 +299,6 @@ public class ColonyPhysicsService {
     }
 
     // --- Overworld Helpers ---
-    private Rectangle getOrEstimateRancherBounds(Colony colony) {
-        if (colony.getRancherBounds() != null) return colony.getRancherBounds();
-        return new Rectangle(10, 10, 256, 256);
-    }
-
-    private Rectangle getOrEstimateGraverBounds(Colony colony) {
-        if (colony.getGraverBounds() != null) return colony.getGraverBounds();
-        return new Rectangle(colony.getGameAreaWidth() - 270, colony.getGameAreaHeight() - 270, 256, 256);
-    }
-
     private Point getRandomOverworldPosition(Colony colony, ImageIcon sprite) {
         int w = (sprite != null) ? sprite.getIconWidth() : 0;
         int h = (sprite != null) ? sprite.getIconHeight() : 0;
@@ -301,10 +314,11 @@ public class ColonyPhysicsService {
     }
     
     private boolean shouldBeInColony(Ant ant) {
-        AntType t = ant.getAntType();
-        if (t == GameConstants.TYPE_EGG || t == GameConstants.TYPE_LARVA || t == GameConstants.TYPE_PUPA || t == GameConstants.TYPE_QUEEN) return true;
-        AntRole r = ant.getRole();
-        if (r == GameConstants.ROLE_NURSE || r == GameConstants.ROLE_FARMER || r == GameConstants.ROLE_LAYER) return true;
+        if (isAllowedInRoom(WorldSpaces.NURSERY, ant)) return true;
+        if (isAllowedInRoom(WorldSpaces.FARM, ant)) return true;
+        if (isAllowedInRoom(WorldSpaces.ROYAL_CHAMBER, ant)) return true;
+        if (isAllowedInRoom(WorldSpaces.STORAGE, ant)) return true; 
+        
         return false;
     }
 

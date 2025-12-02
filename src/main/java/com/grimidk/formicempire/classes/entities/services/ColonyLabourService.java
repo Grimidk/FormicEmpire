@@ -15,6 +15,7 @@ import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
 
 
 public class ColonyLabourService {
@@ -227,8 +228,9 @@ public class ColonyLabourService {
         for (int i = 0; i < toLay; i++) {
             Ant newEgg = new Ant(colony, GameConstants.TYPE_EGG);
             
-            newEgg.setDimension(1);
-            Rectangle nursery = colony.getNurseryBounds();
+            newEgg.setDimension(WorldSpaces.UNDERWORLD.getId());            
+            Rectangle nursery = colony.getPhysicsService().getRoomBounds(colony, WorldSpaces.NURSERY);
+            
             if (nursery != null) {
                 Point spawnPos = colony.getPhysicsService().getSpecificRoomPoint(colony, nursery);
                 newEgg.setPosition(spawnPos);
