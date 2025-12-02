@@ -68,7 +68,13 @@ public class ColonyPhysicsService {
                     ant.setPosition(getRandomPointInRoom(colony, targetRoom, virtualWidth));
                 } else {
                     ant.setDimension(WorldSpaces.OVERWORLD.getId());
-                    ant.setPosition(getRandomOverworldPosition(colony, sprite));
+                    
+                    Rectangle yard = getOverworldJobBounds(colony, ant);
+                    if (yard != null) {
+                        ant.setPosition(getRandomPointInRoom(colony, yard, virtualWidth));
+                    } else {
+                        ant.setPosition(getRandomOverworldPosition(colony, sprite));
+                    }
                 }
             }
         }
@@ -105,26 +111,28 @@ public class ColonyPhysicsService {
 
     private void handleOverworldAnt(Colony colony, Ant ant) {
         if (shouldBeInColony(ant)) {
-            // Go Home
             Point entrance = getEntrancePoint(colony);
             if (dist(ant.getX(), ant.getY(), entrance.x, entrance.y) < 30) {
+                ant.setCarrying(null);
+                ant.setCarryingSec(null);
                 ant.setDimension(WorldSpaces.UNDERWORLD.getId());
                 ant.setPosition(new Point(colony.getGameAreaWidth()/2, 50));
             } else {
                 ant.moveTo(entrance);
             }
         } else {
-            // Wander Outside
-            Rectangle yard = null;
-            if (ant.getRole() == GameConstants.ROLE_RANCHER) {
-                yard = getRoomBounds(colony, WorldSpaces.RANCHER_YARD);
-            } else if (ant.getRole() == GameConstants.ROLE_GRAVER) {
-                yard = getRoomBounds(colony, WorldSpaces.GRAVEYARD);
-            }
+            Rectangle yard = getOverworldJobBounds(colony, ant);
 
             if (yard != null) {
-                wanderInBoundaries(colony, ant, yard, 0.05);
+                if (isPointInSafeBounds(colony, yard, ant.getX(), ant.getY())) {
+                    if (Math.random() < 0.05) {
+                        ant.moveTo(getRandomPointInRoom(colony, yard, colony.getGameAreaWidth()));
+                    }
+                } else {
+                    ant.moveTo(new Point((int)yard.getCenterX(), (int)yard.getCenterY()));
+                }
             } else {
+                // Scouts / Wanderers
                 if (Math.random() < 0.01) {
                     ant.moveTo(getRandomOverworldPosition(colony, ant.getAntType().getSprite()));
                 }
@@ -142,6 +150,7 @@ public class ColonyPhysicsService {
             return;
         }
 
+        // Eggs/Pupae don't move unless stuck in wall
         if (ant.getAntType() == GameConstants.TYPE_EGG || ant.getAntType() == GameConstants.TYPE_PUPA) {
             if (!isPointInSafeBounds(colony, myRoom, ant.getX(), ant.getY())) {
                 ant.setPosition(getRandomPointInRoom(colony, myRoom, virtualWidth));
@@ -149,6 +158,7 @@ public class ColonyPhysicsService {
             return;
         }
 
+        // Exit Logic
         if (!shouldBeInColony(ant)) {
             Point exit = new Point(colony.getGameAreaWidth() / 2, -50);
             if (colony.getEntranceBounds() != null) {
@@ -164,6 +174,7 @@ public class ColonyPhysicsService {
             return;
         }
 
+        // Job Logic
         if (isPointInSafeBounds(colony, myRoom, ant.getX(), ant.getY())) {
             if (Math.random() < 0.10) {
                 ant.moveTo(getRandomPointInRoom(colony, myRoom, virtualWidth));
@@ -180,8 +191,13 @@ public class ColonyPhysicsService {
         if (colony.getEntranceBounds() != null) hallCenterX = (int)colony.getEntranceBounds().getCenterX();
         
         int currentX = ant.getX();
-        int currentY = ant.getY();
+        int currentY = ant.getY();  
         
+        // Lane Logic: Left=Up, Right=Down
+        boolean goingDown = finalDest.y > currentY;
+        int laneOffset = 30;
+        int targetLaneX = goingDown ? (hallCenterX + laneOffset) : (hallCenterX - laneOffset);
+
         boolean insideRoom = Math.abs(currentX - hallCenterX) > (HALL_WIDTH / 2 + 10);
 
         if (insideRoom) {
@@ -189,12 +205,14 @@ public class ColonyPhysicsService {
             int exitDoorY = roomRowStart + (ROOM_SIZE / 2);
 
             if (Math.abs(currentY - exitDoorY) > 10) {
+                // Align to door Y
                 ant.moveTo(new Point(currentX, exitDoorY));
             } else {
-                int laneX = (currentX < hallCenterX) ? (hallCenterX - 30) : (hallCenterX + 30);
-                ant.moveTo(new Point(laneX, currentY));
+                // Exit room to target lane
+                ant.moveTo(new Point(targetLaneX, currentY));
             }
         } else {
+            // In Hallway
             boolean destIsRoom = Math.abs(finalDest.x - hallCenterX) > (HALL_WIDTH / 2);
             int targetY = finalDest.y;
 
@@ -203,16 +221,17 @@ public class ColonyPhysicsService {
                 targetY = destRowStart + (ROOM_SIZE / 2);
             }
 
-            if (Math.abs(currentY - targetY) > 10) {
-                int laneX = (ant.getX() < hallCenterX) ? (hallCenterX - 30) : (hallCenterX + 30);
-                
-                if (Math.abs(currentX - laneX) > 10) {
-                     ant.moveTo(new Point(laneX, currentY));
-                } else {
-                     ant.moveTo(new Point(laneX, targetY));
-                }
+            // Get in Lane
+            if (Math.abs(currentX - targetLaneX) > 5) {
+                ant.moveTo(new Point(targetLaneX, currentY));
             } else {
-                ant.moveTo(finalDest);
+                // Follow Lane
+                if (Math.abs(currentY - targetY) > 10) {
+                     ant.moveTo(new Point(targetLaneX, targetY));
+                } else {
+                     // Turn into destination
+                     ant.moveTo(finalDest);
+                }
             }
         }
     }
@@ -224,6 +243,16 @@ public class ColonyPhysicsService {
         
         Room room = findRoomForAnt(ant);
         return getRoomBounds(colony, room);
+    }
+    
+    private Rectangle getOverworldJobBounds(Colony colony, Ant ant) {
+        if (ant.getRole() == GameConstants.ROLE_RANCHER) {
+            return getRoomBounds(colony, WorldSpaces.RANCHER_YARD);
+        } 
+        if (ant.getRole() == GameConstants.ROLE_GRAVER) {
+            return getRoomBounds(colony, WorldSpaces.GRAVEYARD);
+        }
+        return null;
     }
 
     private Room findRoomForAnt(Ant ant) {
@@ -251,6 +280,18 @@ public class ColonyPhysicsService {
     }
 
     public Rectangle getRoomBounds(Colony colony, Room room) {
+        if (room == WorldSpaces.RANCHER_YARD) {
+            if (colony.getRancherBounds() != null) return colony.getRancherBounds();
+            return new Rectangle(10, 10, room.getWidth(), room.getHeight());
+        }
+        
+        if (room == WorldSpaces.GRAVEYARD) {
+            if (colony.getGraverBounds() != null) return colony.getGraverBounds();
+            int x = Math.max(0, colony.getGameAreaWidth() - room.getWidth() - 10);
+            int y = Math.max(0, colony.getGameAreaHeight() - room.getHeight() - 10);
+            return new Rectangle(x, y, room.getWidth(), room.getHeight());
+        }
+
         int x = room.getFloorPoint().x;
         int y = room.getFloorPoint().y;
         
@@ -280,11 +321,19 @@ public class ColonyPhysicsService {
     }
 
     private Rectangle getSafeWalkableBounds(Colony colony, Rectangle r, int gameWidth) {
+        boolean isUnderworld = (r.y < 0) || (r.y > 2000) || (Math.abs(r.x - gameWidth/2) < 500); // Heuristic
         int hallCenterX = (colony.getEntranceBounds() != null) ? (int)colony.getEntranceBounds().getCenterX() : gameWidth/2;
         boolean isRightSide = r.getCenterX() > hallCenterX;
+        int pLeft = PAD_WALL;
+        int pRight = PAD_WALL;
+        
+        if (Math.abs(r.getCenterX() - hallCenterX) < (r.getWidth() + 200)) {
+             if (isRightSide) pLeft = PAD_DOOR; 
+             else pRight = PAD_DOOR;        
+        }
 
-        int minX = isRightSide ? (r.x + PAD_DOOR) : (r.x + PAD_WALL);
-        int maxX = isRightSide ? (r.x + r.width - PAD_WALL - ANT_SIZE) : (r.x + r.width - PAD_DOOR - ANT_SIZE);
+        int minX = r.x + pLeft;
+        int maxX = r.x + r.width - pRight - ANT_SIZE;
         
         int minY = r.y + PAD_TOP;
         int maxY = Math.max(minY, r.y + r.height - PAD_BOTTOM - ANT_SIZE);

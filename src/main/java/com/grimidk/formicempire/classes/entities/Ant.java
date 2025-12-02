@@ -12,6 +12,7 @@ public class Ant extends Bug {
     private AntRole role;
     private float tempRes;    
     private ResourceType carrying;
+    private ResourceType carryingSec;
 
     public Ant(Colony colony, AntType type) {
         super(GameConstants.TYPE_ANT); 
@@ -20,6 +21,7 @@ public class Ant extends Bug {
         this.subType = null;
         this.role = null;
         this.carrying = null;
+        this.carryingSec = null;
         
         this.setStatus(GameConstants.STATUS_ALIVE);
         this.setMaxHealth((int)(colony.getBaseHealth() * type.getHealtMult())); 
@@ -54,10 +56,14 @@ public class Ant extends Bug {
     public ResourceType getCarrying() { return carrying; }
     public void setCarrying(ResourceType carrying) { this.carrying = carrying; }
 
+     public ResourceType getCarryingSec() { return carryingSec; }
+    public void setCarryingSec(ResourceType carryingSec) { this.carryingSec = carryingSec; }
+
     @Override
     public void goDie() {
         this.type = GameConstants.TYPE_DEAD; 
         this.carrying = null; 
+        this.carryingSec = null;
         super.goDie();
     }
 
