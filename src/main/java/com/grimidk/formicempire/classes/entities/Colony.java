@@ -208,7 +208,6 @@ public class Colony {
         initializeUpgrades();
         initializeBuildings();
         initializeAssignedRoles();
-        
         initializeServices(); 
     }
 
@@ -228,7 +227,6 @@ public class Colony {
         loadUpgrades(savefile);
         laodBuildings(savefile);
         initializeAssignedRoles(); 
-
         initializeServices(); 
         
         Map<String, Integer> savedRoles = savefile.getAssignedRoleCounts();
@@ -619,7 +617,6 @@ public class Colony {
         this.getWorkers().get(8).setRole(GameConstants.ROLE_FORAGER);
         this.getWorkers().get(8).setDimension(0);
 
-        // Add initial sources (Big Plant and Big Water as requested)
         if (locationService != null) {
             ResourceSource initialPlant = new ResourceSource(GameConstants.PLANT_RESOURCE, 10000, 0, 0);
             ResourceSource initialWater = new ResourceSource(GameConstants.WATER_RESOURCE, 10000, 0, 0);

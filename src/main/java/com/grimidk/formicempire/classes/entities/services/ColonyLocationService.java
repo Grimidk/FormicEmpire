@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
+import com.grimidk.formicempire.classes.infrasctructure.NeoPoint;
+import com.grimidk.formicempire.classes.infrasctructure.Room;
 
 public class ColonyLocationService {
     
@@ -17,6 +19,7 @@ public class ColonyLocationService {
         this.discoveredSources = new ArrayList<>();
     }
 
+    // --- Resource Source Management ---
     public List<ResourceSource> getDiscoveredSources() {
         return Collections.unmodifiableList(discoveredSources);
     }
@@ -76,5 +79,26 @@ public class ColonyLocationService {
         }
         
         return gathered;
+    }
+
+    // --- Routing Management ---
+    public void calculateRoute(Room from, Room to) {
+        int leftLane = 0;
+        int rightLane = 1;
+        int colonyEntance = 0;
+        int colonyExit = 1;
+        int worldExit = 1;
+        
+        if (from.getDimension().getId() == 0 && to.getDimension().getId() == 0) {
+           
+        } else  if (from.getDimension().getId() == 0 && to.getDimension().getId() == 1) {
+
+        } else if (from.getDimension().getId() == 1 && to.getDimension().getId() == 0) {
+            
+        } else if (from.getDimension().getId() == 1 && to.getDimension().getId() == 1) {
+            
+        } else {
+            
+        }
     }
 }

@@ -321,7 +321,7 @@ public class ColonyPhysicsService {
     }
 
     private Rectangle getSafeWalkableBounds(Colony colony, Rectangle r, int gameWidth) {
-        boolean isUnderworld = (r.y < 0) || (r.y > 2000) || (Math.abs(r.x - gameWidth/2) < 500); // Heuristic
+        boolean isUnderworld = (r.y < 0) || (r.y > 2000) || (Math.abs(r.x - gameWidth/2) < 500); 
         int hallCenterX = (colony.getEntranceBounds() != null) ? (int)colony.getEntranceBounds().getCenterX() : gameWidth/2;
         boolean isRightSide = r.getCenterX() > hallCenterX;
         int pLeft = PAD_WALL;

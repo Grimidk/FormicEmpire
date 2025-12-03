@@ -3,6 +3,7 @@ package com.grimidk.formicempire.classes.entities;
 import com.grimidk.formicempire.classes.constants.ant.AntStatus;
 import com.grimidk.formicempire.classes.constants.ant.MoveStatus;
 import com.grimidk.formicempire.classes.constants.misc.BugType;
+import com.grimidk.formicempire.classes.infrasctructure.Room;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 
 import java.awt.Point;
@@ -31,6 +32,7 @@ public class Bug {
     private double preciseX;
     private double preciseY;
     private Point targetPosition;
+    private Room currentRoom;
 
     public Bug(BugType type) {
         this.type = type;
@@ -96,6 +98,9 @@ public class Bug {
 
     public int getDimension() { return dimension; }
     public void setDimension(int dimension) { this.dimension = dimension; }
+
+    public Room getCurrentRoom() { return currentRoom; }
+    public void setCurrentRoom(Room currentRoom) { this.currentRoom = currentRoom; }
 
     public void goDie() {
         this.status = GameConstants.STATUS_ALIVE;
