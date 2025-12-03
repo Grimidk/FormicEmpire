@@ -1,9 +1,13 @@
 package com.grimidk.formicempire.classes.entities;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntSubType;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
+import com.grimidk.formicempire.classes.infrasctructure.NeoPoint;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
 
@@ -14,6 +18,9 @@ public class Ant extends Bug {
     private float tempRes;    
     private ResourceType carrying;
     private ResourceType carryingSec;
+    
+    // --- Navigation Queue ---
+    private Queue<NeoPoint> route = new LinkedList<>();
 
     public Ant(Colony colony, AntType type) {
         super(GameConstants.TYPE_ANT); 
@@ -60,11 +67,38 @@ public class Ant extends Bug {
      public ResourceType getCarryingSec() { return carryingSec; }
     public void setCarryingSec(ResourceType carryingSec) { this.carryingSec = carryingSec; }
 
+    // --- Route Management Methods ---
+    public void setRoute(Queue<NeoPoint> route) {
+        this.route = route;
+    }
+    
+    public Queue<NeoPoint> getRoute() {
+        return this.route;
+    }
+    
+    public boolean hasRoute() {
+        return this.route != null && !this.route.isEmpty();
+    }
+    
+    public NeoPoint getNextRoutePoint() {
+        if (this.route != null && !this.route.isEmpty()) {
+            return this.route.poll();
+        }
+        return null;
+    }
+    
+    public void clearRoute() {
+        if (this.route != null) {
+            this.route.clear();
+        }
+    }
+
     @Override
     public void goDie() {
         this.type = GameConstants.TYPE_DEAD; 
         this.carrying = null; 
         this.carryingSec = null;
+        this.clearRoute();
         super.goDie();
     }
 
