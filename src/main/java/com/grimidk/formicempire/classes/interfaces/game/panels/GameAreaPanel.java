@@ -4,8 +4,10 @@ import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Bug;
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.infrasctructure.Dimension;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
 
 import javax.swing.*;
 import java.awt.*;
@@ -31,7 +33,7 @@ public class GameAreaPanel extends JPanel {
     
     private Colony colony;
     
-    private int currentDimension = 0; 
+    private Dimension currentDimension = WorldSpaces.OVERWORLD; 
     private String currentBiomeName = "Plains";
 
     // --- Bounds ---
@@ -86,12 +88,12 @@ public class GameAreaPanel extends JPanel {
     }
     
     public void toggleDimension() {
-        currentDimension = (currentDimension == 0) ? 1 : 0;
+        currentDimension = (currentDimension == WorldSpaces.OVERWORLD) ? WorldSpaces.UNDERWORLD : WorldSpaces.OVERWORLD;
         updateBackground();
         repaint();
     }
     
-    public int getCurrentDimension() {
+    public Dimension getCurrentDimension() {
         return currentDimension;
     }
 
@@ -101,7 +103,7 @@ public class GameAreaPanel extends JPanel {
     }
     
     private void updateBackground() {
-        if (currentDimension == 1) {
+        if (currentDimension == WorldSpaces.UNDERWORLD) {
             this.backgroundImage = biomeTextureCache.get("Underground");
         } else {
             this.backgroundImage = biomeTextureCache.getOrDefault(currentBiomeName, biomeTextureCache.get("Plains"));
@@ -128,7 +130,7 @@ public class GameAreaPanel extends JPanel {
         }
         
         if (colony != null) {
-            if (currentDimension == 1) {
+            if (currentDimension == WorldSpaces.UNDERWORLD) {
                 drawUnderworldStructure(g2d);
             } else {
                 drawOverworldStructure(g2d);

@@ -24,9 +24,11 @@ import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.Temperature;
+import com.grimidk.formicempire.classes.infrasctructure.Dimension;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
 
 
 public class Colony {
@@ -309,10 +311,10 @@ public class Colony {
                 type == GameConstants.TYPE_LARVA || 
                 type == GameConstants.TYPE_PUPA || 
                 type == GameConstants.TYPE_QUEEN) {
-                newAnt.setDimension(1);
+                newAnt.setDimension(WorldSpaces.UNDERWORLD);
             } 
             else {
-                newAnt.setDimension(0); 
+                newAnt.setDimension(WorldSpaces.OVERWORLD); 
             }
             list.add(newAnt);
         }
@@ -576,11 +578,11 @@ public class Colony {
         List<Ant> workerList = getWorkers();
         for (int i = 0; i < 9; i++) {
             Ant worker = new Ant(this, GameConstants.TYPE_WORKER);
-            worker.setDimension(0);
+            worker.setDimension(WorldSpaces.OVERWORLD);
             workerList.add(worker);
         }
         Ant queen = new Ant(this, GameConstants.TYPE_QUEEN);
-        queen.setDimension(1); 
+        queen.setDimension(WorldSpaces.UNDERWORLD); 
         getQueens().add(queen);
         
         setAssignedRoleCount(GameConstants.ROLE_LAYER, 1);
@@ -591,31 +593,31 @@ public class Colony {
         
         // Assign roles and dimensions
         this.getWorkers().get(0).setRole(GameConstants.ROLE_NURSE);
-        this.getWorkers().get(0).setDimension(1);
+        this.getWorkers().get(0).setDimension(WorldSpaces.UNDERWORLD);
         
         this.getWorkers().get(1).setRole(GameConstants.ROLE_NURSE);
-        this.getWorkers().get(1).setDimension(1);
+        this.getWorkers().get(1).setDimension(WorldSpaces.UNDERWORLD);
         
         this.getWorkers().get(2).setRole(GameConstants.ROLE_FARMER);
-        this.getWorkers().get(2).setDimension(1);
+        this.getWorkers().get(2).setDimension(WorldSpaces.UNDERWORLD);
         
         this.getWorkers().get(3).setRole(GameConstants.ROLE_NURSE);
-        this.getWorkers().get(3).setDimension(1);
+        this.getWorkers().get(3).setDimension(WorldSpaces.UNDERWORLD);
         
         this.getWorkers().get(4).setRole(GameConstants.ROLE_FORAGER);
-        this.getWorkers().get(4).setDimension(0);
+        this.getWorkers().get(4).setDimension(WorldSpaces.OVERWORLD);
         
         this.getWorkers().get(5).setRole(GameConstants.ROLE_FORAGER);
-        this.getWorkers().get(5).setDimension(0);
+        this.getWorkers().get(5).setDimension(WorldSpaces.OVERWORLD);
         
         this.getWorkers().get(6).setRole(GameConstants.ROLE_FORAGER);
-        this.getWorkers().get(6).setDimension(0);
+        this.getWorkers().get(6).setDimension(WorldSpaces.OVERWORLD);
         
         this.getWorkers().get(7).setRole(GameConstants.ROLE_FORAGER);
-        this.getWorkers().get(7).setDimension(0);
+        this.getWorkers().get(7).setDimension(WorldSpaces.OVERWORLD);
         
         this.getWorkers().get(8).setRole(GameConstants.ROLE_FORAGER);
-        this.getWorkers().get(8).setDimension(0);
+        this.getWorkers().get(8).setDimension(WorldSpaces.OVERWORLD);
 
         if (locationService != null) {
             ResourceSource initialPlant = new ResourceSource(GameConstants.PLANT_RESOURCE, 10000, 0, 0);
@@ -647,7 +649,7 @@ public class Colony {
     // Updated signature:
     public void runScoutting(Biome biome) { labourService.runScoutting(this, biome); }
     
-    public void runPhysics(int activeDimension) { 
+    public void runPhysics(Dimension activeDimension) { 
         physicsService.runPhysics(this, activeDimension); 
     }
 

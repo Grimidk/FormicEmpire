@@ -3,8 +3,10 @@ package com.grimidk.formicempire.classes.entities;
 import com.grimidk.formicempire.classes.constants.ant.AntStatus;
 import com.grimidk.formicempire.classes.constants.ant.MoveStatus;
 import com.grimidk.formicempire.classes.constants.misc.BugType;
+import com.grimidk.formicempire.classes.infrasctructure.Dimension;
 import com.grimidk.formicempire.classes.infrasctructure.Room;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
 
 import java.awt.Point;
 
@@ -26,7 +28,7 @@ public class Bug {
     private MoveStatus moveStatus;
     private int x;
     private int y;
-    private int dimension; 
+    private Dimension dimension; 
     private int r; 
     
     private double preciseX;
@@ -49,7 +51,7 @@ public class Bug {
         this.speed = type.getBaseSpeed();
         this.size = type.getBaseSize();
         
-        this.dimension = 0;
+        this.dimension = WorldSpaces.OVERWORLD;
 
         this.x = 0; 
         this.y = 0;
@@ -96,8 +98,8 @@ public class Bug {
     public float getSize() { return size; }
     public void setSize(int size) { this.size = size; }
 
-    public int getDimension() { return dimension; }
-    public void setDimension(int dimension) { this.dimension = dimension; }
+    public Dimension getDimension() { return dimension; }
+    public void setDimension(Dimension dimension) { this.dimension = dimension; }
 
     public Room getCurrentRoom() { return currentRoom; }
     public void setCurrentRoom(Room currentRoom) { this.currentRoom = currentRoom; }

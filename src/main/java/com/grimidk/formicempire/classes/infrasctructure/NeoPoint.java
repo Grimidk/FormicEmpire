@@ -3,15 +3,14 @@ package com.grimidk.formicempire.classes.infrasctructure;
 import java.awt.Point;
 
 public class NeoPoint extends Point {
-    private final int dimension;
-    // 0 = Overworld, 1 = Underworld, 2 = Mainworld
+    private final Dimension dimension;
 
-    public NeoPoint(int x, int y, int dimension) {
+    public NeoPoint(int x, int y, Dimension dimension) {
         super(x, y);
         this.dimension = dimension;
     }
 
-    public int getDimension() {
+    public Dimension getDimension() {
         return dimension;
     }
 }

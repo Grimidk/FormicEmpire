@@ -5,6 +5,7 @@ import com.grimidk.formicempire.classes.constants.ant.AntSubType;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
 
 public class Ant extends Bug {
     private AntType type;
@@ -38,7 +39,7 @@ public class Ant extends Bug {
         this.setSpeed(colony.getBaseSpeed() * type.getSpeedMult());
         this.setSize((int)(colony.getBaseSize() * type.getSizeMult()));
         
-        this.setDimension(0);
+        this.setDimension(WorldSpaces.OVERWORLD);
     }
     
     public AntType getAntType() { return type; }

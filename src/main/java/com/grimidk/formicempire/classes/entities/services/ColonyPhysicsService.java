@@ -5,6 +5,8 @@ import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Bug;
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.infrasctructure.Dimension;
+import com.grimidk.formicempire.classes.infrasctructure.NeoPoint;
 import com.grimidk.formicempire.classes.infrasctructure.Room;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
@@ -17,17 +19,9 @@ import java.util.Map;
 import javax.swing.ImageIcon;
 
 public class ColonyPhysicsService {
-    // --- Constants ---
-    private final int ROOM_SIZE = 256; 
-    private final int HALL_WIDTH = 128;
-    private final int PAD_WALL = 64; 
-    private final int PAD_DOOR = 20; 
-    private final int PAD_TOP = 48;
-    private final int PAD_BOTTOM = 48;
-    private final int ANT_SIZE = 40;
 
     // --- Main Physics Loop ---
-    public void runPhysics(Colony colony, int activeDimension) {
+    public void runPhysics(Colony colony, Dimension activeDimension) {
         // Ants
         for (List<Ant> antList : colony.getAntGroups().values()) {
             for (Ant ant : antList) {
@@ -62,12 +56,12 @@ public class ColonyPhysicsService {
             
             ImageIcon sprite = entry.getKey().getSprite();
             for (Ant ant : entry.getValue()) {
-                if (ant.getDimension() == WorldSpaces.UNDERWORLD.getId() || shouldBeInColony(ant)) {
-                    ant.setDimension(WorldSpaces.UNDERWORLD.getId());
+                if (ant.getDimension() == WorldSpaces.UNDERWORLD || shouldBeInColony(ant)) {
+                    ant.setDimension(WorldSpaces.UNDERWORLD);
                     Rectangle targetRoom = getTargetRoomForAnt(colony, ant, virtualWidth);
                     ant.setPosition(getRandomPointInRoom(colony, targetRoom, virtualWidth));
                 } else {
-                    ant.setDimension(WorldSpaces.OVERWORLD.getId());
+                    ant.setDimension(WorldSpaces.OVERWORLD);
                     
                     Rectangle yard = getOverworldJobBounds(colony, ant);
                     if (yard != null) {
@@ -91,7 +85,7 @@ public class ColonyPhysicsService {
 
     // --- AI Logic ---
     private void updateAntLogic(Colony colony, Ant ant) {
-        if (ant.getDimension() == WorldSpaces.OVERWORLD.getId()) {
+        if (ant.getDimension() == WorldSpaces.OVERWORLD) {
             handleOverworldAnt(colony, ant);
         } else {
             handleUnderworldAnt(colony, ant);
@@ -99,7 +93,7 @@ public class ColonyPhysicsService {
     }
 
     private void updateBugLogic(Colony colony, Bug bug) {
-        if (bug.getDimension() == WorldSpaces.OVERWORLD.getId() && bug.getBugType() == GameConstants.TYPE_APHID) {
+        if (bug.getDimension() == WorldSpaces.OVERWORLD && bug.getBugType() == GameConstants.TYPE_APHID) {
             if (colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) {
                 Rectangle yard = getRoomBounds(colony, WorldSpaces.RANCHER_YARD);
                 wanderInBoundaries(colony, bug, yard, 0.05);
@@ -111,11 +105,12 @@ public class ColonyPhysicsService {
 
     private void handleOverworldAnt(Colony colony, Ant ant) {
         if (shouldBeInColony(ant)) {
-            Point entrance = getEntrancePoint(colony);
+            NeoPoint entrance = colony.getLocationService().getColonyEntrance(colony);
+            
             if (dist(ant.getX(), ant.getY(), entrance.x, entrance.y) < 30) {
                 ant.setCarrying(null);
                 ant.setCarryingSec(null);
-                ant.setDimension(WorldSpaces.UNDERWORLD.getId());
+                ant.setDimension(WorldSpaces.UNDERWORLD);
                 ant.setPosition(new Point(colony.getGameAreaWidth()/2, 50));
             } else {
                 ant.moveTo(entrance);
@@ -160,14 +155,11 @@ public class ColonyPhysicsService {
 
         // Exit Logic
         if (!shouldBeInColony(ant)) {
-            Point exit = new Point(colony.getGameAreaWidth() / 2, -50);
-            if (colony.getEntranceBounds() != null) {
-                exit = new Point((int)colony.getEntranceBounds().getCenterX(), -50);
-            }
+            NeoPoint exit = colony.getLocationService().getColonyExit(colony);
             
             if (dist(ant.getX(), ant.getY(), exit.x, exit.y) < 30) {
-                ant.setDimension(WorldSpaces.OVERWORLD.getId());
-                ant.setPosition(getEntrancePoint(colony));
+                ant.setDimension(WorldSpaces.OVERWORLD);
+                ant.setPosition(colony.getLocationService().getColonyEntrance(colony));
             } else {
                 navigateUnderworld(colony, ant, exit);
             }
@@ -187,22 +179,21 @@ public class ColonyPhysicsService {
 
     // --- Navigation System ---
     private void navigateUnderworld(Colony colony, Ant ant, Point finalDest) {
-        int hallCenterX = colony.getGameAreaWidth() / 2;
-        if (colony.getEntranceBounds() != null) hallCenterX = (int)colony.getEntranceBounds().getCenterX();
+        ColonyLocationService locations = colony.getLocationService();
+        int hallCenterX = locations.getHallwayCenterX(colony);
         
         int currentX = ant.getX();
         int currentY = ant.getY();  
         
         // Lane Logic: Left=Up, Right=Down
         boolean goingDown = finalDest.y > currentY;
-        int laneOffset = 30;
-        int targetLaneX = goingDown ? (hallCenterX + laneOffset) : (hallCenterX - laneOffset);
+        int targetLaneX = locations.getLaneCenter(colony, goingDown);
 
-        boolean insideRoom = Math.abs(currentX - hallCenterX) > (HALL_WIDTH / 2 + 10);
+        boolean insideRoom = Math.abs(currentX - hallCenterX) > (ColonyLocationService.HALL_WIDTH / 2 + 10);
 
         if (insideRoom) {
-            int roomRowStart = (currentY / ROOM_SIZE) * ROOM_SIZE;
-            int exitDoorY = roomRowStart + (ROOM_SIZE / 2);
+            int roomRowStart = (currentY / ColonyLocationService.ROOM_SIZE) * ColonyLocationService.ROOM_SIZE;
+            int exitDoorY = roomRowStart + (ColonyLocationService.ROOM_SIZE / 2);
 
             if (Math.abs(currentY - exitDoorY) > 10) {
                 // Align to door Y
@@ -213,12 +204,12 @@ public class ColonyPhysicsService {
             }
         } else {
             // In Hallway
-            boolean destIsRoom = Math.abs(finalDest.x - hallCenterX) > (HALL_WIDTH / 2);
+            boolean destIsRoom = Math.abs(finalDest.x - hallCenterX) > (ColonyLocationService.HALL_WIDTH / 2);
             int targetY = finalDest.y;
 
             if (destIsRoom) {
-                int destRowStart = (finalDest.y / ROOM_SIZE) * ROOM_SIZE;
-                targetY = destRowStart + (ROOM_SIZE / 2);
+                int destRowStart = (finalDest.y / ColonyLocationService.ROOM_SIZE) * ColonyLocationService.ROOM_SIZE;
+                targetY = destRowStart + (ColonyLocationService.ROOM_SIZE / 2);
             }
 
             // Get in Lane
@@ -296,7 +287,7 @@ public class ColonyPhysicsService {
         int y = room.getFloorPoint().y;
         
         if (room.getDimension() == WorldSpaces.UNDERWORLD) {
-            int cx = colony.getGameAreaWidth() / 2;
+            int cx = colony.getLocationService().getHallwayCenterX(colony);
             x += cx;
         }
         
@@ -322,21 +313,22 @@ public class ColonyPhysicsService {
 
     private Rectangle getSafeWalkableBounds(Colony colony, Rectangle r, int gameWidth) {
         boolean isUnderworld = (r.y < 0) || (r.y > 2000) || (Math.abs(r.x - gameWidth/2) < 500); 
-        int hallCenterX = (colony.getEntranceBounds() != null) ? (int)colony.getEntranceBounds().getCenterX() : gameWidth/2;
+        int hallCenterX = colony.getLocationService().getHallwayCenterX(colony);
+        
         boolean isRightSide = r.getCenterX() > hallCenterX;
-        int pLeft = PAD_WALL;
-        int pRight = PAD_WALL;
+        int pLeft = ColonyLocationService.PAD_WALL;
+        int pRight = ColonyLocationService.PAD_WALL;
         
         if (Math.abs(r.getCenterX() - hallCenterX) < (r.getWidth() + 200)) {
-             if (isRightSide) pLeft = PAD_DOOR; 
-             else pRight = PAD_DOOR;        
+             if (isRightSide) pLeft = ColonyLocationService.PAD_DOOR; 
+             else pRight = ColonyLocationService.PAD_DOOR;        
         }
 
         int minX = r.x + pLeft;
-        int maxX = r.x + r.width - pRight - ANT_SIZE;
+        int maxX = r.x + r.width - pRight - ColonyLocationService.ANT_SIZE;
         
-        int minY = r.y + PAD_TOP;
-        int maxY = Math.max(minY, r.y + r.height - PAD_BOTTOM - ANT_SIZE);
+        int minY = r.y + ColonyLocationService.PAD_TOP;
+        int maxY = Math.max(minY, r.y + r.height - ColonyLocationService.PAD_BOTTOM - ColonyLocationService.ANT_SIZE);
         
         if (maxX < minX) maxX = minX; 
         return new Rectangle(minX, minY, maxX - minX, maxY - minY);
@@ -354,12 +346,6 @@ public class ColonyPhysicsService {
         int maxX = Math.max(1, colony.getGameAreaWidth() - w);
         int maxY = Math.max(1, colony.getGameAreaHeight() - h);
         return new Point((int)(Math.random() * maxX), (int)(Math.random() * maxY));
-    }
-    
-    private Point getEntrancePoint(Colony colony) {
-        if (colony.getEntranceBounds() != null) 
-            return new Point((int)colony.getEntranceBounds().getCenterX(), (int)colony.getEntranceBounds().getCenterY());
-        return new Point(colony.getGameAreaWidth()/2, colony.getGameAreaHeight()/2);
     }
     
     private boolean shouldBeInColony(Ant ant) {

@@ -305,7 +305,7 @@ public class ColonyLabourService {
         for (int i = 0; i < toLay; i++) {
             Ant newEgg = new Ant(colony, GameConstants.TYPE_EGG);
             
-            newEgg.setDimension(WorldSpaces.UNDERWORLD.getId());            
+            newEgg.setDimension(WorldSpaces.UNDERWORLD);            
             Rectangle nursery = colony.getPhysicsService().getRoomBounds(colony, WorldSpaces.NURSERY);
             
             if (nursery != null) {
@@ -509,7 +509,7 @@ public class ColonyLabourService {
 
         for (Ant princess : princessesToEvolve) {
             princess.transform(colony, GameConstants.TYPE_QUEEN);
-            princess.setDimension(1); 
+            princess.setDimension(WorldSpaces.UNDERWORLD); 
             colony.getQueens().add(princess);
         }
         
