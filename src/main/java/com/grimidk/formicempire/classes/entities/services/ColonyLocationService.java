@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import java.awt.Point;
 import java.awt.Rectangle;
 
+import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Colony;
@@ -16,6 +17,7 @@ import com.grimidk.formicempire.classes.entities.ResourceSource;
 import com.grimidk.formicempire.classes.infrasctructure.Dimension;
 import com.grimidk.formicempire.classes.infrasctructure.NeoPoint;
 import com.grimidk.formicempire.classes.infrasctructure.Room;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
 
 public class ColonyLocationService {
@@ -97,6 +99,40 @@ public class ColonyLocationService {
         }
         
         return gathered;
+    }
+
+    public ResourceSource findNearestRelevantSource(Colony colony, Ant ant) {
+        List<ResourceType> targetTypes = new ArrayList<>();
+        AntRole role = ant.getRole();
+
+        if (role == GameConstants.ROLE_FORAGER) {
+            targetTypes.add(GameConstants.PLANT_RESOURCE);
+            targetTypes.add(GameConstants.WATER_RESOURCE);
+        } else if (role == GameConstants.ROLE_HUNTER) {
+            targetTypes.add(GameConstants.MEAT_RESOURCE);
+        } else if (role == GameConstants.ROLE_MINER) {
+            targetTypes.add(GameConstants.ROCK_RESOURCE);
+        }
+
+        ResourceSource nearest = null;
+        double minDistance = Double.MAX_VALUE;
+
+        for (ResourceSource source : discoveredSources) {
+            if (source.getQuantity() <= 0) continue;
+
+            if (targetTypes.contains(source.getResourceType())) {
+                double dist = Math.pow(source.getX() - ant.getX(), 2) + Math.pow(source.getY() - ant.getY(), 2);
+                if (dist < minDistance) {
+                    minDistance = dist;
+                    nearest = source;
+                }
+            }
+        }
+        return nearest;
+    }
+    
+    public Room createTempRoomAtPoint(Point p, Dimension dim) {
+        return new Room(9999, "TempTarget", dim, 10, 10, false, p, p, p, p, null, null, null);
     }
 
     // --- Routing Coordinates ---

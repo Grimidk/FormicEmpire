@@ -5,6 +5,7 @@ import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Bug;
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.ResourceSource;
 import com.grimidk.formicempire.classes.infrasctructure.Dimension;
 import com.grimidk.formicempire.classes.infrasctructure.NeoPoint;
 import com.grimidk.formicempire.classes.infrasctructure.Room;
@@ -26,18 +27,28 @@ public class ColonyPhysicsService {
         // Ants
         for (List<Ant> antList : colony.getAntGroups().values()) {
             for (Ant ant : antList) {
-                if (ant.isAlive() && ant.getDimension() == activeDimension) {
-                    
-                    if (!ant.isMoving() && ant.hasRoute()) {
-                        processNextRoutePoint(ant);
-                    }
+                if (!ant.isAlive()) continue;
 
-                    if (!ant.isMoving() && !ant.hasRoute()) {
-                        updateAntLogic(colony, ant);
-                    }
-                    
-                    ant.updatePosition();
+                // Feature: Ants in both dimensions run
+                // Optimization: "Less resources" for inactive dimension
+                boolean isActiveDim = (ant.getDimension() == activeDimension);
+                
+                // Active ants run logic every frame. 
+                // Inactive ants only run AI Logic 5% of the time to save resources, but always animate.
+                boolean shouldRunAI = isActiveDim || (Math.random() < 0.05);
+
+                // 1. Queue Consumption Logic (Always run to keep them moving)
+                if (!ant.isMoving() && ant.hasRoute()) {
+                    processNextRoutePoint(ant);
                 }
+
+                // 2. Decision Logic (Throttled for inactive dimension)
+                if (!ant.isMoving() && !ant.hasRoute() && shouldRunAI) {
+                    updateAntLogic(colony, ant);
+                }
+                
+                // 3. Movement (Always run)
+                ant.updatePosition();
             }
         }
         
@@ -55,9 +66,10 @@ public class ColonyPhysicsService {
     private void processNextRoutePoint(Ant ant) {
         NeoPoint next = ant.getNextRoutePoint();
         if (next != null) {
+            // Check for Dimension Switch (Teleportation)
             if (next.getDimension() != ant.getDimension()) {
                 ant.setDimension(next.getDimension());
-                ant.setPosition(next); 
+                ant.setPosition(next); // Teleport instantly to the door/exit
             } else {
                 ant.moveTo(next);
             }
@@ -66,9 +78,8 @@ public class ColonyPhysicsService {
 
     // --- Initialization ---
     public void randomizeAllAntPositions(Colony colony) {
-        if (colony.getGameAreaWidth() <= 100) return;
-
-        int virtualWidth = colony.getGameAreaWidth();
+        // Fix: Use default width if game area not yet initialized to prevent 0,0 bunching
+        int virtualWidth = Math.max(colony.getGameAreaWidth(), 2000);
 
         for (Map.Entry<AntType, List<Ant>> entry : colony.getAntGroups().entrySet()) {
             if (entry.getKey() == GameConstants.TYPE_DEAD) continue;
@@ -105,10 +116,70 @@ public class ColonyPhysicsService {
 
     // --- AI Logic ---
     private void updateAntLogic(Colony colony, Ant ant) {
+        if (isGatherer(ant)) {
+            handleGathererLogic(colony, ant);
+            return;
+        }
+
         if (ant.getDimension() == WorldSpaces.OVERWORLD) {
             handleOverworldAnt(colony, ant);
         } else {
             handleUnderworldAnt(colony, ant);
+        }
+    }
+    
+    private boolean isGatherer(Ant ant) {
+        AntRole r = ant.getRole();
+        return r == GameConstants.ROLE_FORAGER || r == GameConstants.ROLE_HUNTER || r == GameConstants.ROLE_MINER;
+    }
+
+    private void handleGathererLogic(Colony colony, Ant ant) {
+        if (ant.getCarrying() != null) {
+            Room storage = WorldSpaces.STORAGE;
+            
+            if (isAntInRoom(colony, ant, storage)) {
+                ant.setCarrying(null);
+                ant.setCarryingSec(null);
+            } else {
+                Room current = getRoomContainingAnt(colony, ant);
+                Queue<NeoPoint> route = colony.getLocationService().calculateRoute(colony, current, storage, ant);
+                ant.setRoute(route);
+            }
+            return;
+        }
+
+        ResourceSource target = colony.getLocationService().findNearestRelevantSource(colony, ant);
+        
+        if (target != null) {
+            double d = dist(ant.getX(), ant.getY(), target.getX(), target.getY());
+            
+            if (d < 50 && ant.getDimension() == WorldSpaces.OVERWORLD) {
+                ant.setCarrying(target.getResourceType());
+            } else {
+                ant.setCarrying(null);
+                ant.setCarryingSec(null);
+                
+                Room current = getRoomContainingAnt(colony, ant);
+                Room sourceRoom = colony.getLocationService().createTempRoomAtPoint(
+                    new Point(target.getX(), target.getY()), 
+                    WorldSpaces.OVERWORLD
+                );
+                
+                Queue<NeoPoint> route = colony.getLocationService().calculateRoute(colony, current, sourceRoom, ant);
+                ant.setRoute(route);
+            }
+        } else {
+            if (ant.getDimension() == WorldSpaces.OVERWORLD) {
+                 if (Math.random() < 0.01) {
+                    if (ant.getRole() == GameConstants.ROLE_SCOUT || isGatherer(ant)) {
+                         ant.moveTo(getRandomScoutPosition(colony));
+                    } else {
+                         ant.moveTo(getRandomOverworldPosition(colony, ant.getAntType().getSprite()));
+                    }
+                }
+            } else {
+                 handleUnderworldAnt(colony, ant); 
+            }
         }
     }
 
@@ -153,8 +224,13 @@ public class ColonyPhysicsService {
                     ant.setRoute(route);
                 }
             } else {
+                // Scouts / Wanderers
                 if (Math.random() < 0.01) {
-                    ant.moveTo(getRandomOverworldPosition(colony, ant.getAntType().getSprite()));
+                    if (ant.getRole() == GameConstants.ROLE_SCOUT) {
+                        ant.moveTo(getRandomScoutPosition(colony));
+                    } else {
+                        ant.moveTo(getRandomOverworldPosition(colony, ant.getAntType().getSprite()));
+                    }
                 }
             }
         }
@@ -220,6 +296,11 @@ public class ColonyPhysicsService {
         }
         
         return null; 
+    }
+    
+    private boolean isAntInRoom(Colony colony, Ant ant, Room room) {
+        return ant.getDimension() == room.getDimension() 
+            && getRoomBounds(colony, room).contains(ant.getX(), ant.getY());
     }
 
     // --- Room Logic & Estimates ---
@@ -337,9 +418,26 @@ public class ColonyPhysicsService {
     private Point getRandomOverworldPosition(Colony colony, ImageIcon sprite) {
         int w = (sprite != null) ? sprite.getIconWidth() : 0;
         int h = (sprite != null) ? sprite.getIconHeight() : 0;
-        int maxX = Math.max(1, colony.getGameAreaWidth() - w);
-        int maxY = Math.max(1, colony.getGameAreaHeight() - h);
+        int width = Math.max(colony.getGameAreaWidth(), 2000);
+        int height = Math.max(colony.getGameAreaHeight(), 2000);
+        
+        int maxX = Math.max(1, width - w);
+        int maxY = Math.max(1, height - h);
         return new Point((int)(Math.random() * maxX), (int)(Math.random() * maxY));
+    }
+
+    private Point getRandomScoutPosition(Colony colony) {
+        int width = Math.max(colony.getGameAreaWidth(), 2000);
+        int height = Math.max(colony.getGameAreaHeight(), 2000);
+        
+        int minX = -500;
+        int maxX = width + 500;
+        int minY = -500;
+        int maxY = height + 500;
+        
+        int x = minX + (int)(Math.random() * (maxX - minX));
+        int y = minY + (int)(Math.random() * (maxY - minY));
+        return new Point(x, y);
     }
     
     private boolean shouldBeInColony(Ant ant) {
