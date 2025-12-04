@@ -28,17 +28,14 @@ public class ColonyPhysicsService {
             for (Ant ant : antList) {
                 if (ant.isAlive() && ant.getDimension() == activeDimension) {
                     
-                    // 1. Queue Consumption Logic
                     if (!ant.isMoving() && ant.hasRoute()) {
                         processNextRoutePoint(ant);
                     }
 
-                    // 2. Decision Logic
                     if (!ant.isMoving() && !ant.hasRoute()) {
                         updateAntLogic(colony, ant);
                     }
                     
-                    // 3. Movement
                     ant.updatePosition();
                 }
             }
@@ -58,10 +55,9 @@ public class ColonyPhysicsService {
     private void processNextRoutePoint(Ant ant) {
         NeoPoint next = ant.getNextRoutePoint();
         if (next != null) {
-            // Check for Dimension Switch (Teleportation)
             if (next.getDimension() != ant.getDimension()) {
                 ant.setDimension(next.getDimension());
-                ant.setPosition(next); // Teleport instantly to the door/exit
+                ant.setPosition(next); 
             } else {
                 ant.moveTo(next);
             }
@@ -79,7 +75,7 @@ public class ColonyPhysicsService {
             
             ImageIcon sprite = entry.getKey().getSprite();
             for (Ant ant : entry.getValue()) {
-                ant.clearRoute(); // Clear old routes on reset
+                ant.clearRoute(); 
                 if (ant.getDimension() == WorldSpaces.UNDERWORLD || shouldBeInColony(ant)) {
                     ant.setDimension(WorldSpaces.UNDERWORLD);
                     Rectangle targetRoom = getTargetRoomForAnt(colony, ant, virtualWidth);
@@ -129,7 +125,6 @@ public class ColonyPhysicsService {
 
     private void handleOverworldAnt(Colony colony, Ant ant) {
         if (shouldBeInColony(ant)) {
-            // Ant should be inside, but is outside.
             NeoPoint entrance = colony.getLocationService().getColonyEntrance(colony);
             
             if (dist(ant.getX(), ant.getY(), entrance.x, entrance.y) < 30) {
@@ -138,7 +133,6 @@ public class ColonyPhysicsService {
                 ant.setDimension(WorldSpaces.UNDERWORLD);
                 ant.setPosition(new Point(colony.getGameAreaWidth()/2, 50));
             } else {
-                // Generate Route to Nursery/Storage (Home)
                 Room target = findRoomForAnt(ant);
                 Room current = getRoomContainingAnt(colony, ant); 
                 Queue<NeoPoint> route = colony.getLocationService().calculateRoute(colony, current, target, ant);
@@ -153,14 +147,12 @@ public class ColonyPhysicsService {
                         ant.moveTo(getRandomPointInRoom(colony, yard, colony.getGameAreaWidth()));
                     }
                 } else {
-                    // Go To Yard using Complex Route (Lanes)
                     Room targetRoom = (ant.getRole() == GameConstants.ROLE_GRAVER) ? WorldSpaces.GRAVEYARD : WorldSpaces.RANCHER_YARD;
                     Room current = getRoomContainingAnt(colony, ant); 
                     Queue<NeoPoint> route = colony.getLocationService().calculateRoute(colony, current, targetRoom, ant);
                     ant.setRoute(route);
                 }
             } else {
-                // Scouts / Wanderers
                 if (Math.random() < 0.01) {
                     ant.moveTo(getRandomOverworldPosition(colony, ant.getAntType().getSprite()));
                 }
@@ -184,7 +176,6 @@ public class ColonyPhysicsService {
             return;
         }
 
-        // Exit Logic (Needs to go Outside)
         if (!shouldBeInColony(ant)) {
             Room targetRoom = null;
             if (ant.getRole() == GameConstants.ROLE_RANCHER) targetRoom = WorldSpaces.RANCHER_YARD;
@@ -193,7 +184,6 @@ public class ColonyPhysicsService {
             Room current = getRoomContainingAnt(colony, ant); 
 
             if (targetRoom == null) {
-                // Generic Surface Route
                 Queue<NeoPoint> route = colony.getLocationService().calculateRoute(colony, current, new Room(999, "Surface", WorldSpaces.OVERWORLD, 0,0,false,null,colony.getLocationService().getColonyEntrance(colony),null,null,null,null,null), ant);
                 ant.setRoute(route);
             } else {
@@ -203,13 +193,11 @@ public class ColonyPhysicsService {
             return;
         }
 
-        // Inside Logic (Work/Wander)
         if (isPointInSafeBounds(colony, myRoom, ant.getX(), ant.getY())) {
             if (Math.random() < 0.10) {
                 ant.moveTo(getRandomPointInRoom(colony, myRoom, virtualWidth));
             }
         } else {
-            // Not in correct room -> Calculate Route to correct room
             Room targetRoom = findRoomForAnt(ant);
             Room current = getRoomContainingAnt(colony, ant); 
             
@@ -218,25 +206,20 @@ public class ColonyPhysicsService {
         }
     }
     
-    // --- Helper: Find where the ant currently is ---
     private Room getRoomContainingAnt(Colony colony, Ant ant) {
-        // FIX: Ensure we only detect rooms that match the ant's current dimension.
-        // This prevents Overworld ants from "detecting" Underworld rooms beneath them and teleporting.
         
         if (ant.getDimension() == WorldSpaces.UNDERWORLD) {
-            // Check Underworld Rooms
             if (getRoomBounds(colony, WorldSpaces.STORAGE).contains(ant.getX(), ant.getY())) return WorldSpaces.STORAGE;
             if (getRoomBounds(colony, WorldSpaces.NURSERY).contains(ant.getX(), ant.getY())) return WorldSpaces.NURSERY;
             if (getRoomBounds(colony, WorldSpaces.FARM).contains(ant.getX(), ant.getY())) return WorldSpaces.FARM;
             if (getRoomBounds(colony, WorldSpaces.ROYAL_CHAMBER).contains(ant.getX(), ant.getY())) return WorldSpaces.ROYAL_CHAMBER;
         } 
         else if (ant.getDimension() == WorldSpaces.OVERWORLD) {
-            // Check Overworld Yards
             if (getRoomBounds(colony, WorldSpaces.RANCHER_YARD).contains(ant.getX(), ant.getY())) return WorldSpaces.RANCHER_YARD;
             if (getRoomBounds(colony, WorldSpaces.GRAVEYARD).contains(ant.getX(), ant.getY())) return WorldSpaces.GRAVEYARD;
         }
         
-        return null; // In Hallway or Open World
+        return null; 
     }
 
     // --- Room Logic & Estimates ---
@@ -324,7 +307,6 @@ public class ColonyPhysicsService {
     }
 
     private Rectangle getSafeWalkableBounds(Colony colony, Rectangle r, int gameWidth) {
-        boolean isUnderworld = (r.y < 0) || (r.y > 2000) || (Math.abs(r.x - gameWidth/2) < 500); 
         int hallCenterX = colony.getLocationService().getHallwayCenterX(colony);
         
         boolean isRightSide = r.getCenterX() > hallCenterX;
