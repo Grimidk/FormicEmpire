@@ -248,6 +248,8 @@ public final class GameConstants {
     public static final AntRole ROLE_CATCHER = new AntRole(28, TYPE_SOLDIER, "Catcher");
     public static final AntRole ROLE_CRANE = new AntRole(29, TYPE_MAJOR, "Construction Crane");
     public static final AntRole ROLE_TRANSPORT = new AntRole(30, TYPE_MAJOR, "Resource Transport");
+    public static final AntRole ROLE_ASSISTANT = new AntRole(31, TYPE_PRINCESS, "Lab Assistant");
+    public static final AntRole ROLE_ESCORT = new AntRole(32, TYPE_SOLDIER, "Convoy Escort");
 
     // --- Colony Ranks ---
     public static final ColonyRank RANK_ANT = new ColonyRank(1, "Ant", 1l, 
@@ -398,6 +400,9 @@ public final class GameConstants {
         antRoles.add(ROLE_MILITIA);
         antRoles.add(ROLE_CATCHER);
         antRoles.add(ROLE_CRANE);
+        antRoles.add(ROLE_TRANSPORT);
+        antRoles.add(ROLE_ASSISTANT);
+        antRoles.add(ROLE_ESCORT);
 
         colonyRanks.add(RANK_ANT);
         colonyRanks.add(RANK_COLONY);

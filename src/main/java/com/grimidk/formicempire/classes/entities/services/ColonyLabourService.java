@@ -237,7 +237,10 @@ public class ColonyLabourService {
             int currentWater = colony.getWater();
             int maxWater = stats.getWaterCapacity(colony);
             if (currentWater < maxWater) {
-                int gain = Math.max(1, maxWater / 100); 
+                int gain = (int)(maxWater * 0.10f);
+                if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
+                    gain = (int)(maxWater * 0.20f);
+                }
                 colony.setWater(Math.min(currentWater + gain, maxWater));
             }
         }
@@ -246,6 +249,11 @@ public class ColonyLabourService {
     public void runConverting(Colony colony) {
         ColonyStatsService stats = colony.getStatsService();
         int farmerCount = countActiveAnts(colony, GameConstants.ROLE_FARMER);
+        if (colony.hasBuilding(GameUnlocks.PASSIVE_FARM)) {
+            if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
+                farmerCount += 2;
+            } else { farmerCount += 1; } 
+        }
         
         if (colony.getMushrooms() >= stats.getMushroomsCapacity(colony)) return;
         
@@ -281,9 +289,10 @@ public class ColonyLabourService {
         ColonyStatsService stats = colony.getStatsService();
         int rancherCount = countActiveAnts(colony, GameConstants.ROLE_RANCHER);
         
-        if(colony.hasBuilding(GameUnlocks.PASSIVE_APHID)) {
-            rancherCount += 1;
-        }
+        if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
+                rancherCount += 2;
+            } else { rancherCount += 1; }
+        
         int maxSustainableAphids = stats.getAphidCapacity(colony) * rancherCount;
         
         if (colony.getAphids() < maxSustainableAphids) {
@@ -322,6 +331,10 @@ public class ColonyLabourService {
     public void runNursing(Colony colony) {
         ColonyStatsService stats = colony.getStatsService();
         int nurseCount = countActiveAnts(colony, GameConstants.ROLE_NURSE);
+
+        if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
+                nurseCount += 2;
+            } else { nurseCount += 1; }
         
         int babyAntTotal = colony.getEggs().size() +  colony.getLarvae().size() +  colony.getPupae().size();
         float nursingRate = stats.getNursingRate(colony);
@@ -523,6 +536,10 @@ public class ColonyLabourService {
 
     public void runGraveKeeping(Colony colony) {
         int graverCount = colony.getAssignedRoleCount(GameConstants.ROLE_GRAVER);
+
+        if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
+                graverCount += 2;
+            } else { graverCount += 1; }
         
         if (graverCount == 0 || colony.getDeadAnts().isEmpty()) return;
         
@@ -541,9 +558,9 @@ public class ColonyLabourService {
         if (!colony.hasUpgrade(GameUnlocks.ROLE_RESEARCHER)) return;
         int researcherCount = countActiveAnts(colony, GameConstants.ROLE_RESEARCHER);
         
-        if (colony.hasBuilding(GameUnlocks.PASSIVE_LAB)) {
-            researcherCount += 1; 
-        }
+        if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
+                researcherCount += 2;
+            } else { researcherCount += 1; }
         
         colony.setResearchPoints(colony.getResearchPoints() + (researcherCount * colony.getStatsService().getResearchSpeed(colony)));
     }

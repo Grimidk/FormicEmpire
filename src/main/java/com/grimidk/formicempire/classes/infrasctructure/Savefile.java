@@ -54,6 +54,7 @@ public class Savefile implements Serializable {
 
     private int aphids;
     private int researchPoints;
+    private int totalDeaths;
 
     public Savefile(int id, String name) {
         this.id = id;
@@ -76,6 +77,7 @@ public class Savefile implements Serializable {
 
         this.aphids = 0;
         this.researchPoints = 0;
+        this.totalDeaths = 0;
     }
 
     public static class SavedResourceSource implements Serializable {
@@ -366,4 +368,7 @@ public class Savefile implements Serializable {
 
     public int getResearchPoints() { return researchPoints; }
     public void setResearchPoints(int researchPoints) { this.researchPoints = researchPoints; }
+
+    public int getTotalDeaths() { return totalDeaths; }
+    public void setTotalDeaths(int totalDeaths) { this.totalDeaths = totalDeaths; }
 }

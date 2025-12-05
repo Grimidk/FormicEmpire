@@ -18,6 +18,7 @@ public class Ant extends Bug {
     private float tempRes;    
     private ResourceType carrying;
     private ResourceType carryingSec;
+    private AntType carryngAnt;
     
     // --- Navigation Queue ---
     private Queue<NeoPoint> route = new LinkedList<>();
@@ -64,8 +65,11 @@ public class Ant extends Bug {
     public ResourceType getCarrying() { return carrying; }
     public void setCarrying(ResourceType carrying) { this.carrying = carrying; }
 
-     public ResourceType getCarryingSec() { return carryingSec; }
+    public ResourceType getCarryingSec() { return carryingSec; }
     public void setCarryingSec(ResourceType carryingSec) { this.carryingSec = carryingSec; }
+
+    public AntType getCarryngAnt() { return carryngAnt; }
+    public void setCarryngAnt(AntType carryngAnt) { this.carryngAnt = carryngAnt; }
 
     // --- Route Management Methods ---
     public void setRoute(Queue<NeoPoint> route) {
@@ -98,6 +102,7 @@ public class Ant extends Bug {
         this.type = GameConstants.TYPE_DEAD; 
         this.carrying = null; 
         this.carryingSec = null;
+        this.carryngAnt = null;
         this.clearRoute();
         super.goDie();
     }

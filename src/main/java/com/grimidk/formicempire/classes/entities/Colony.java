@@ -121,6 +121,7 @@ public class Colony {
     
     private void initializeDefaults() {
         this.researchPoints = 0;
+        this.totalDeaths = 0;
         this.plants = 0;
         this.mushrooms = 0;
         this.protein = 0;           
@@ -273,6 +274,7 @@ public class Colony {
         }
         
         this.researchPoints = savefile.getResearchPoints();
+        this.totalDeaths = savefile.getTotalDeaths();
         
         if (savefile.getSavedResourceSources() != null && this.locationService != null) {
             List<ResourceType> allTypes = GameConstants.getResources();

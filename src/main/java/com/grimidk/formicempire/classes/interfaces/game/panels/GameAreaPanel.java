@@ -320,7 +320,7 @@ public class GameAreaPanel extends JPanel {
                 g2d.drawImage(sprite, -w / 2, -h / 2, this);
                 
                 // --- Visual Indicator for Carrying ---
-                if (ant.getCarrying() != null && ant.getCarrying().getIcon() != null) {
+                if (ant.getCarrying() != null) {
                     g2d.rotate(Math.toRadians(-ant.getR()));
                     Image resourceIcon = ant.getCarrying().getIcon().getImage();
                     int iconW = 20; 

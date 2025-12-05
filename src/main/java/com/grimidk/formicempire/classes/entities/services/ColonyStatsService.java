@@ -91,7 +91,10 @@ public class ColonyStatsService {
         } else {return 0;}
     }
     public float getLayingRate(Colony colony) {
-        if (colony.hasUpgrade(GameUnlocks.ROLE_LAYER)) {return 1f;
+        if (colony.hasUpgrade(GameUnlocks.STAT_LAYING_3)) {return 6f;
+        } else if (colony.hasUpgrade(GameUnlocks.STAT_LAYING_2)) {return 4f;
+        } else if (colony.hasUpgrade(GameUnlocks.STAT_LAYING_1)) {return 2f;
+        } else if (colony.hasUpgrade(GameUnlocks.ROLE_LAYER)) {return 1f;
         } else {return 0;}
     }
     public float getConversionRate(Colony colony) {
@@ -115,7 +118,10 @@ public class ColonyStatsService {
         } else {return 0;}
     }
     public float getScoutingRate(Colony colony) {
-        if (colony.hasUpgrade(GameUnlocks.ROLE_SCOUT)) {return 0.1f;
+        if (colony.hasUpgrade(GameUnlocks.STAT_SCOUTING_3)) {return 0.8f;
+        } else if (colony.hasUpgrade(GameUnlocks.STAT_SCOUTING_2)) {return 0.4f;
+        } else if (colony.hasUpgrade(GameUnlocks.STAT_SCOUTING_1)) {return 0.2f;
+        } else if (colony.hasUpgrade(GameUnlocks.ROLE_SCOUT)) {return 0.1f;
         } else {return 0;}
     }
     

@@ -10,7 +10,6 @@ import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 
 public final class GameUnlocks {
     private GameUnlocks() {}
-
     // --- Upgrades ---
     // -- Types --
     public static final Upgrade TYPE_EGG = new Upgrade(1, "Egg, Larva and Pupa Type", "Brand New Ants", "Unlocks the juvenile ant types, allowing new ants to be born. Each stage takes 4 days to grow out of.", null, 0 );
@@ -48,6 +47,9 @@ public final class GameUnlocks {
     public static final Upgrade ROLE_MILITIA = new Upgrade(32, "Militia Role", "Worker Militia Auxiliary", "", TYPE_WORKER, 0 );
     public static final Upgrade ROLE_CATCHER = new Upgrade(33, "Catcher Role", "Bug Catching", "", TYPE_SOLDIER, 0 );
     public static final Upgrade ROLE_CRANE = new Upgrade(34, "Construction Crane Role", "Heavy Duty", "", TYPE_MAJOR, 0 );
+    public static final Upgrade ROLE_TRANSPORT = new Upgrade(35, "Resource Transport Role", "Heavy Lifting", "", TYPE_MAJOR, 0 );
+    public static final Upgrade ROLE_ASSISTANT = new Upgrade(36, "Lab Assistant Role", "Scientific Aid", "", TYPE_PRINCESS, 0 );
+    public static final Upgrade ROLE_ESCORT = new Upgrade(37, "Convoy Escort Role", "Protective Detail", "", TYPE_SOLDIER, 0 );
     // -- Stats -- 
     public static final Upgrade STAT_SKELETON = new Upgrade(101, "Basic Skeletons", "Basic Exoskeletons", "The basic defense stats for all the ants in your colony before multipliers. 100 health points, 5 defense points and 1 health point recovered per second.", TYPE_EGG, 0 );
     public static final Upgrade STAT_ACID = new Upgrade(102, "Acid Spiting", "Acidic Spit", "The basic offensive stats for all the ants in your colony before multipliers. 10 attack points, 1 attack per second and 1 speed point.", TYPE_EGG, 0 );
@@ -61,7 +63,17 @@ public final class GameUnlocks {
     public static final Upgrade STAT_THIRST_1 = new Upgrade(110, "Improved Metabolism", "Water Retention", "Increases the colony's thirst resistance to 40%.", STAT_LONGEVITY, 1500 );
     public static final Upgrade STAT_THIRST_2 = new Upgrade(111, "Advanced Metabolism", "Camel Ants", "Increases the colony's thirst resistance to 60%.", STAT_THIRST_1, 5000 );
     public static final Upgrade STAT_THIRST_3 = new Upgrade(112, "Perfected Metabolism", "Hydro-Lock Shells", "Increases the colony's thirst resistance to 80%.", STAT_THIRST_2, 15000 );
-    public static final Upgrade STAT_LOGISTICS_1 = new Upgrade(113, "Improved Logistics", "Ant Spreadsheets", "Allows your colony to manage 5 sources of each resource", ROLE_SCOUT, 600);
+    public static final Upgrade STAT_LOGISTICS_1 = new Upgrade(113, "Improved Logistics", "Ant Spreadsheets", "Allows your colony to manage 5 sources of each resource.", ROLE_SCOUT, 600);
+    public static final Upgrade STAT_PASSIVE_1 = new Upgrade(114, "Passive Worker Efficiency", "Active Passiveness", "Increases the efficiency of passive worker buildings by another 1.", STAT_RESEARCH_3, 25000);
+    public static final Upgrade STAT_LAYING_1 = new Upgrade(115, "Improved Egg Laying", "Double Yolks", "Increases egg laying rate by 1 egg per hour.", ROLE_LAYER, 5000);
+    public static final Upgrade STAT_LAYING_2 = new Upgrade(116, "Advanced Egg Laying", "Quadruplet Eggs", "Increases egg laying rate by 2 more eggs per hour.", STAT_LAYING_1, 15000);
+    public static final Upgrade STAT_LAYING_3 = new Upgrade(117, "Perfected Egg Laying", "Half a dozen", "Increases egg laying rate by anoter 2 more eggs per hour.", STAT_LAYING_2, 80000);
+    public static final Upgrade STAT_SCOUTING_1 = new Upgrade(118, "Improved Scouting", "Ant Maps", "Increases scouting rate by 0.1 chance per day.", ROLE_SCOUT, 4000);
+    public static final Upgrade STAT_SCOUTING_2 = new Upgrade(119, "Advanced Scouting", "Scouting Kits", "Increases scouting rate by another 0.2 chance per day.", STAT_SCOUTING_1, 15000);
+    public static final Upgrade STAT_SCOUTING_3 = new Upgrade(120, "Perfected Scouting", "Exploration Drones", "Increases scouting rate by another 0.3 chance per day.", STAT_SCOUTING_2, 50000);
+    public static final Upgrade STAT_FARMING_1 = new Upgrade(121, "Improved Farming", "Fertilizers", "Increases farming conversion rate by 0.1 per minute.", ROLE_FARMER, 4500);
+    public static final Upgrade STAT_FARMING_2 = new Upgrade(122, "Advanced Farming", "Pesticides", "Increases farming conversion rate by another 0.2 per minute.", STAT_FARMING_1, 16000);
+    public static final Upgrade STAT_FARMING_3 = new Upgrade(123, "Perfected Farming", "Genetic Modification", "Increases farming conversion rate by another 0.4 per minute.", STAT_FARMING_2, 60000);
     // -- Abilities --
     public static final Upgrade ABILITY_RESEARCH = new Upgrade(201, "Research", "Micro Microscopes", "Allows you to research more ant technology by using research points, go to the research menu (Y).", ROLE_RESEARCHER, 0 );
     public static final Upgrade ABILITY_BUILD = new Upgrade(202, "Building", "Brick And Mortar", "Allows you to build parts of your colony, you can build in the build menu (U).", ROLE_BUILDER, 0 );
@@ -105,6 +117,9 @@ public final class GameUnlocks {
     public static final Building PASSIVE_LAB = new Building(101, "Passive Experiments", 0, "Enables passive research gain even if there are no ants assigned, simulates 1 researcher.", ROYAL_CHAMBER_1, 150, 0, 800);
     public static final Building PASSIVE_WATER = new Building(102, "Passive Water Collector", 0, "Enables passive water collection even if there are no ants assigned, at 10% your water capacity.", WATER_RESERVOIR_1, 100, 0, 500);
     public static final Building PASSIVE_APHID = new Building(103, "Passive Aphid Ranch", 0, "Enables your colony to hold more aphids that will never escape, simulates 1 rancher.", SYRUP_RESERVOIR_1, 200, 0, 1000);
+    public static final Building PASSIVE_NURSE = new Building(104, "Passive Nursery", 0, "Enables passive baby care even if there are no ants assigned, simulates 1 nurse.", EGG_CHAMBER_1, 150, 0, 700);
+    public static final Building PASSIVE_FARM = new Building(105, "Passive Farm", 0, "Enables passive farming even if there are no ants assigned, simulates 1 farmer.", MUSHROOM_CHAMBER_1, 200, 0, 900);
+    public static final Building PASSIVE_GRAVE = new Building(106, "Passive Graveyard", 0, "Enables passive grave keeping even if there are no ants assigned, simulates 1 graver.", MEAT_CHAMBER_1, 150, 0, 600);
     // --- Synergies ---
 
 
@@ -146,6 +161,16 @@ public final class GameUnlocks {
         upgrades.add(STAT_THIRST_2);
         upgrades.add(STAT_THIRST_3);
         upgrades.add(STAT_LOGISTICS_1);
+        upgrades.add(STAT_PASSIVE_1);
+        upgrades.add(STAT_LAYING_1);
+        upgrades.add(STAT_LAYING_2);
+        upgrades.add(STAT_LAYING_3);
+        upgrades.add(STAT_SCOUTING_1);
+        upgrades.add(STAT_SCOUTING_2);
+        upgrades.add(STAT_SCOUTING_3);
+        upgrades.add(STAT_FARMING_1);
+        upgrades.add(STAT_FARMING_2);
+        upgrades.add(STAT_FARMING_3);
         upgrades.add(ABILITY_RESEARCH);
         upgrades.add(ABILITY_BUILD);
         upgrades.add(ABILITY_SPREAD);
@@ -181,6 +206,9 @@ public final class GameUnlocks {
         buildings.add(PASSIVE_LAB);
         buildings.add(PASSIVE_WATER);
         buildings.add(PASSIVE_APHID);
+        buildings.add(PASSIVE_NURSE);
+        buildings.add(PASSIVE_FARM);
+        buildings.add(PASSIVE_GRAVE);
     }
 
     public static List<Upgrade> getUpgrades() {
