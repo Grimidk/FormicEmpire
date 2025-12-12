@@ -326,7 +326,7 @@ public class GameAreaPanel extends JPanel {
                     int iconW = 20; 
                     int iconH = 20;
                     g2d.drawImage(resourceIcon, -iconW/2, -h/2 - iconH, iconW, iconH, this);
-                }
+                } 
                 
                 g2d.setTransform(oldTransform);
             }

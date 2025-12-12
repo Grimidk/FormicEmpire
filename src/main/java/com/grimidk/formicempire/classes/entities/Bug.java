@@ -23,7 +23,6 @@ public class Bug {
     private float attackSpeed;
     private float defense;
     private float speed;
-    private float size;
     
     private MoveStatus moveStatus;
     private int x;
@@ -49,7 +48,6 @@ public class Bug {
         this.attackSpeed = type.getBaseAttackSpeed();
         this.defense = type.getBaseDefense() ;
         this.speed = type.getBaseSpeed();
-        this.size = type.getBaseSize();
         
         this.dimension = WorldSpaces.OVERWORLD;
 
@@ -94,9 +92,6 @@ public class Bug {
 
     public float getSpeed() { return speed; }
     public void setSpeed(float speed) { this.speed = speed; }
-
-    public float getSize() { return size; }
-    public void setSize(int size) { this.size = size; }
 
     public Dimension getDimension() { return dimension; }
     public void setDimension(Dimension dimension) { this.dimension = dimension; }

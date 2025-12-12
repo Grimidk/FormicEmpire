@@ -45,7 +45,6 @@ public class Ant extends Bug {
         this.setAttackSpeed((int)(colony.getBaseAttackSpeed() * type.getAttackSpeedMult()));
         this.setDefense((int)(colony.getBaseDefense() * type.getDefenseMult()));        
         this.setSpeed(colony.getBaseSpeed() * type.getSpeedMult());
-        this.setSize((int)(colony.getBaseSize() * type.getSizeMult()));
         
         this.setDimension(WorldSpaces.OVERWORLD);
     }
@@ -118,6 +117,5 @@ public class Ant extends Bug {
         this.setAttackSpeed((int)(colony.getBaseAttackSpeed() * newType.getAttackSpeedMult()));
         this.setDefense((int)(colony.getBaseDefense() * newType.getDefenseMult()));
         this.setSpeed(colony.getBaseSpeed() * newType.getSpeedMult());
-        this.setSize((int)(colony.getBaseSize() * newType.getSizeMult()));
     }
 }

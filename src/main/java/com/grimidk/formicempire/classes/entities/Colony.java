@@ -572,7 +572,6 @@ public class Colony {
     public int getBaseAttackSpeed() { return statsService.getBaseAttackSpeed(this); }
     public int getBaseDefense() { return statsService.getBaseDefense(this); }
     public int getBaseSpeed() { return statsService.getBaseSpeed(this); }
-    public int getBaseSize(){ return statsService.getBaseSize(this); }
     public int getSourceCapacity() { return statsService.getSourceCapacity(this); }
 
     // --- Colony Setup ---

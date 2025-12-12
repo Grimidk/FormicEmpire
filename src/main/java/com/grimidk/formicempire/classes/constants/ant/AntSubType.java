@@ -14,9 +14,8 @@ public class AntSubType extends Constant {
     private final float attackSpeedMult;
     private final float defenseMult;
     private final float speedMult;
-    private final float sizeMult; 
 
-    public AntSubType(int id, AntType antType, String name, float healtMult, float attackMult, float regenMult, float consumptionMult, float attackSpeedMult, float defenseMult, float speedMult, float sizeMult, ImageIcon icon) {
+    public AntSubType(int id, AntType antType, String name, float healtMult, float attackMult, float regenMult, float consumptionMult, float attackSpeedMult, float defenseMult, float speedMult, ImageIcon icon) {
         super(id, name, icon);
         this.antType = antType;
         this.healtMult = healtMult;
@@ -26,12 +25,11 @@ public class AntSubType extends Constant {
         this.attackSpeedMult = attackSpeedMult;
         this.defenseMult = defenseMult;
         this.speedMult = speedMult;
-        this.sizeMult = sizeMult;
     }
 
     //(no icon)
-    public AntSubType(int id, AntType antType, String name, float healtMult, float attackMult, float regenMult, float consumptionMult, float attackSpeedMult, float defenseMult, float speedMult, float sizeMult) {
-        this(id, antType, name, healtMult, attackMult, regenMult, consumptionMult, attackSpeedMult, defenseMult, speedMult, sizeMult, null);
+    public AntSubType(int id, AntType antType, String name, float healtMult, float attackMult, float regenMult, float consumptionMult, float attackSpeedMult, float defenseMult, float speedMult) {
+        this(id, antType, name, healtMult, attackMult, regenMult, consumptionMult, attackSpeedMult, defenseMult, speedMult, null);
     }
 
     public AntType getAntType() {
@@ -66,7 +64,4 @@ public class AntSubType extends Constant {
         return speedMult;
     }
 
-    public float getSizeMult() {
-        return sizeMult;
-    }
 }

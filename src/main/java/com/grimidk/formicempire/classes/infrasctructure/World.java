@@ -261,16 +261,20 @@ public class World {
     }
 
     private void randomizeWeather() {
+        if (random.nextInt(1000) == 0) {
+            if (random.nextBoolean()) {
+                this.setWeather(GameConstants.FROG_WEATHER);
+            } else {
+                this.setWeather(GameConstants.BLOOD_WEATHER);
+            }
+            return;
+        }
+
         List<Weather> possibleWeathers = new ArrayList<>();
         
         possibleWeathers.add(GameConstants.CLEAR_WEATHER);
         possibleWeathers.add(GameConstants.CLEAR_WEATHER); 
         
-        if (random.nextInt(1000) == 0) {
-            this.setWeather(GameConstants.FROG_WEATHER);
-            return;
-        }
-
         if (this.season == GameConstants.WINTER_SEASON) {
             // Winter Events
             possibleWeathers.add(GameConstants.SNOW_WEATHER);
@@ -315,23 +319,24 @@ public class World {
             this.getSpawnHex().getColony().runHourlyJobs();
         }
 
-        if (this.hour >= 0 && this.hour < 5) {
-            this.setTimeOfDay(GameConstants.NIGHT_TIME);
-        } else if (this.hour >= 5 && this.hour < 7) {
-            this.setTimeOfDay(GameConstants.DAWN_TIME);
-        } else if (this.hour >= 7 && this.hour < 18) {
-            this.setTimeOfDay(GameConstants.DAY_TIME);
-        } else if (this.hour >= 18 && this.hour < 20) {
-            this.setTimeOfDay(GameConstants.DUSK_TIME);
-        } else if (this.hour >= 20 && this.hour <= 23) {
-            this.setTimeOfDay(GameConstants.NIGHT_TIME);
+        boolean isEclipse = (this.timeOfDay == GameConstants.SOLAR_ECLIPSE_TIME || 
+                             this.timeOfDay == GameConstants.LUNAR_ECLIPSE_TIME);
+
+        if (!isEclipse) {
+            if (this.hour >= 0 && this.hour < 5) {
+                this.setTimeOfDay(GameConstants.NIGHT_TIME);
+            } else if (this.hour >= 5 && this.hour < 7) {
+                this.setTimeOfDay(GameConstants.DAWN_TIME);
+            } else if (this.hour >= 7 && this.hour < 18) {
+                this.setTimeOfDay(GameConstants.DAY_TIME);
+            } else if (this.hour >= 18 && this.hour < 20) {
+                this.setTimeOfDay(GameConstants.DUSK_TIME);
+            } else if (this.hour >= 20 && this.hour <= 23) {
+                this.setTimeOfDay(GameConstants.NIGHT_TIME);
+            }
         }
         
         updateEnvironmentalConditions();
-
-        if (random.nextInt(100) < 10) { 
-            randomizeWeather();
-        }
 
         if (engine != null) {
             engine.notifyHourListeners();
@@ -348,6 +353,18 @@ public class World {
 
         if (this.getSpawnHex() != null) {
             this.getSpawnHex().getColony().runDailyJobs(this.getTemperatureIcon(), this.getSpawnHex().getBiome());
+        }
+
+        randomizeWeather();
+
+        if (random.nextInt(1000) == 0) {
+            if (random.nextBoolean()) {
+                this.setTimeOfDay(GameConstants.SOLAR_ECLIPSE_TIME);
+            } else {
+                this.setTimeOfDay(GameConstants.LUNAR_ECLIPSE_TIME);
+            }
+        } else {
+            this.setTimeOfDay(GameConstants.NIGHT_TIME);
         }
 
         if (this.day >= 1 && this.day < 2) {
