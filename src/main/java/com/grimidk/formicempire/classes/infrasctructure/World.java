@@ -316,7 +316,7 @@ public class World {
         this.hour++;
 
         if (this.getSpawnHex() != null) {
-            this.getSpawnHex().getColony().runHourlyJobs();
+            this.getSpawnHex().getColony().runHourlyJobs(getSpawnHex().getBiome());
         }
 
         boolean isEclipse = (this.timeOfDay == GameConstants.SOLAR_ECLIPSE_TIME || 

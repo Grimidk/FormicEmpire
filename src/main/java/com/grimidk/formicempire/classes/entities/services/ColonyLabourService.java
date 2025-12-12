@@ -43,14 +43,15 @@ public class ColonyLabourService {
     private int countActiveAnts(Colony colony, AntRole role) {
         return getWorkingAnts(colony, role).size();
     }
-
-    private int processGathering(Colony colony, List<ResourceSource> sources, int powerAvailable, ResourceType type) {
-        if (sources == null || sources.isEmpty()) return 0;
+    
+    private int processGathering(Colony colony, List<ResourceSource> sources, int powerAvailable, ResourceType type, List<Ant> workers) {
+        if (sources == null || sources.isEmpty() || workers.isEmpty()) return 0;
         
         ColonyStatsService stats = colony.getStatsService();
         ColonyLocationService locations = colony.getLocationService();
         
         int totalGathered = 0;
+        int workerIndex = 0;
 
         for (ResourceSource source : sources) {
             if (powerAvailable <= 0) break;
@@ -77,15 +78,34 @@ public class ColonyLabourService {
             if (actualGathered > 0) {
                 if (type == GameConstants.PLANT_RESOURCE) {
                     colony.setPlants(colony.getPlants() + actualGathered); 
-                    if (colony.hasUpgrade(GameUnlocks.ABILITY_RESIN)) {
-                        calculateResinBonus(colony, actualGathered);
+                    
+                    
+                    for(int i = 0; i < actualGathered; i++) {
+                        if (workerIndex >= workers.size()) workerIndex = 0;
+                        Ant worker = workers.get(workerIndex);
+                        worker.setCarrying(type);
+                        
+                        if (colony.hasUpgrade(GameUnlocks.ABILITY_RESIN)) {
+                             if (random.nextInt(100) < 1) {
+                                 int resinSpace = stats.getResinsCapacity(colony) - colony.getResins();
+                                 if (resinSpace > 0) {
+                                     colony.setResins(colony.getResins() + 1);
+                                     worker.setCarryingSec(GameConstants.RESIN_RESOURCE);
+                                 }
+                             }
+                        }
+                        workerIndex++;
                     }
-                } else if (type == GameConstants.WATER_RESOURCE) {
-                    colony.setWater(colony.getWater() + actualGathered);
-                } else if (type == GameConstants.MEAT_RESOURCE) {
-                    colony.setProtein(colony.getProtein() + actualGathered);
-                } else if (type == GameConstants.ROCK_RESOURCE) {
-                    colony.setMinerals(colony.getMinerals() + actualGathered);
+                    
+                } else {
+                    if (type == GameConstants.WATER_RESOURCE) colony.setWater(colony.getWater() + actualGathered);
+                    else if (type == GameConstants.MEAT_RESOURCE) colony.setProtein(colony.getProtein() + actualGathered);
+                    else if (type == GameConstants.ROCK_RESOURCE) colony.setMinerals(colony.getMinerals() + actualGathered);
+                    
+                    for(Ant w : workers) {
+                        w.setCarrying(type);
+                        w.setCarryingSec(null);
+                    }
                 }
                 
                 powerAvailable -= actualGathered;
@@ -95,70 +115,11 @@ public class ColonyLabourService {
         return totalGathered;
     }
 
-    private void calculateResinBonus(Colony colony, int plantsGathered) {
-        int guaranteed = plantsGathered / 100;
-        int remainder = plantsGathered % 100;
-        
-        int totalGain = guaranteed;
-        if (remainder > 0 && random.nextInt(100) < remainder) {
-            totalGain++;
-        }
-        
-        if (totalGain > 0) {
-            int space = colony.getStatsService().getResinsCapacity(colony) - colony.getResins();
-            colony.setResins(colony.getResins() + Math.min(totalGain, space));
-        }
-    }
-
-    private int splitGatherPower(int totalPower) {
-        if (totalPower < 20) {
-            int split = 0;
-            for (int i = 0; i < totalPower; i++) {
-                if (random.nextBoolean()) split++;
-            }
-            return split;
-        }
-        int base = totalPower / 2;
-        int variance = (int)(totalPower * 0.15f); 
-        if (variance > 0) base += (random.nextInt(variance * 2) - variance);
-        return Math.max(0, Math.min(totalPower, base));
-    }
-
     private boolean hasSpace(Colony colony, ResourceType type) {
         ColonyStatsService stats = colony.getStatsService();
         if (type == GameConstants.PLANT_RESOURCE) return stats.getPlantsCapacity(colony) > colony.getPlants();
         if (type == GameConstants.WATER_RESOURCE) return stats.getWaterCapacity(colony) > colony.getWater();
         return false;
-    }
-
-    private void updateVisuals(List<Ant> ants, ResourceType primary, ResourceType secondary) {
-        if (ants.isEmpty()) return;
-
-        if (primary != null && secondary != null) {
-            int splitIndex = ants.size() / 2;
-            for (int i = 0; i < ants.size(); i++) {
-                Ant ant = ants.get(i);
-                if (i < splitIndex) {
-                    ant.setCarrying(primary);
-                    ant.setCarryingSec(null);
-                } else {
-                    ant.setCarrying(secondary);
-                    ant.setCarryingSec(null);
-                }
-            }
-        } 
-        else if (primary != null) {
-            for (Ant ant : ants) {
-                ant.setCarrying(primary);
-                ant.setCarryingSec(null); 
-            }
-        } 
-        else {
-            for (Ant ant : ants) {
-                ant.setCarrying(null);
-                ant.setCarryingSec(null);
-            }
-        }
     }
 
     public void runCollecting(Colony colony) {
@@ -168,43 +129,20 @@ public class ColonyLabourService {
         // --- Foragers ---
         if (colony.hasUpgrade(GameUnlocks.ROLE_FORAGER)) {
             List<Ant> foragers = getWorkingAnts(colony, GameConstants.ROLE_FORAGER);
-            
             if (!foragers.isEmpty()) {
+                for(Ant a : foragers) a.clearLoad();
+                
                 int totalPower = (int) (foragers.size() * stats.getCollectingRate(colony));
-                
-                boolean needPlants = hasSpace(colony, GameConstants.PLANT_RESOURCE);
-                boolean needWater = hasSpace(colony, GameConstants.WATER_RESOURCE);
-                
                 List<ResourceSource> plantSources = locations.getSourcesByType(GameConstants.PLANT_RESOURCE);
-                List<ResourceSource> waterSources = locations.getSourcesByType(GameConstants.WATER_RESOURCE);
                 
-                int plantPower = 0;
-                int waterPower = 0;
-                
-                if (needPlants && !plantSources.isEmpty() && needWater && !waterSources.isEmpty()) {
-                    plantPower = splitGatherPower(totalPower); 
-                    waterPower = totalPower - plantPower;
-                } else if (needPlants && !plantSources.isEmpty()) {
-                    plantPower = totalPower;
-                } else if (needWater && !waterSources.isEmpty()) {
-                    waterPower = totalPower;
+                if (!plantSources.isEmpty() && hasSpace(colony, GameConstants.PLANT_RESOURCE)) {
+                    processGathering(colony, plantSources, totalPower, GameConstants.PLANT_RESOURCE, foragers);
+                } else {
+                    List<ResourceSource> waterSources = locations.getSourcesByType(GameConstants.WATER_RESOURCE);
+                    if (!waterSources.isEmpty() && hasSpace(colony, GameConstants.WATER_RESOURCE)) {
+                        processGathering(colony, waterSources, totalPower, GameConstants.WATER_RESOURCE, foragers);
+                    }
                 }
-                
-                int gatheredPlants = 0;
-                int gatheredWater = 0;
-
-                if (plantPower > 0) gatheredPlants = processGathering(colony, plantSources, plantPower, GameConstants.PLANT_RESOURCE);
-                if (waterPower > 0) gatheredWater = processGathering(colony, waterSources, waterPower, GameConstants.WATER_RESOURCE);
-
-                ResourceType type1 = (gatheredPlants > 0) ? GameConstants.PLANT_RESOURCE : null;
-                ResourceType type2 = (gatheredWater > 0) ? GameConstants.WATER_RESOURCE : null;
-                
-                if (type1 == null && type2 != null) {
-                    type1 = type2;
-                    type2 = null;
-                }
-
-                updateVisuals(foragers, type1, type2);
             }
         }
         
@@ -212,11 +150,10 @@ public class ColonyLabourService {
         if (colony.hasUpgrade(GameUnlocks.ROLE_HUNTER)) {
             List<Ant> hunters = getWorkingAnts(colony, GameConstants.ROLE_HUNTER);
             if (!hunters.isEmpty()) {
+                for(Ant a : hunters) a.clearLoad();
                 int totalPower = (int) (hunters.size() * stats.getCollectingRate(colony));
                 List<ResourceSource> sources = locations.getSourcesByType(GameConstants.MEAT_RESOURCE);
-                int gathered = processGathering(colony, sources, totalPower, GameConstants.MEAT_RESOURCE);
-                
-                updateVisuals(hunters, (gathered > 0 ? GameConstants.MEAT_RESOURCE : null), null);
+                processGathering(colony, sources, totalPower, GameConstants.MEAT_RESOURCE, hunters);
             }
         }
 
@@ -224,11 +161,10 @@ public class ColonyLabourService {
         if (colony.hasUpgrade(GameUnlocks.ROLE_MINER)) {
             List<Ant> miners = getWorkingAnts(colony, GameConstants.ROLE_MINER);
             if (!miners.isEmpty()) {
+                for(Ant a : miners) a.clearLoad();
                 int totalPower = (int) (miners.size() * stats.getCollectingRate(colony));
                 List<ResourceSource> sources = locations.getSourcesByType(GameConstants.ROCK_RESOURCE);
-                int gathered = processGathering(colony, sources, totalPower, GameConstants.ROCK_RESOURCE);
-                
-                updateVisuals(miners, (gathered > 0 ? GameConstants.ROCK_RESOURCE : null), null);
+                processGathering(colony, sources, totalPower, GameConstants.ROCK_RESOURCE, miners);
             }
         }
 
@@ -280,11 +216,12 @@ public class ColonyLabourService {
         
         ColonyStatsService stats = colony.getStatsService();
         int syrupGain = (int) (colony.getAphids()); 
+        colony.setPlants(Math.max(0, colony.getPlants() - syrupGain));
         colony.setSyrups(Math.min(colony.getSyrups() + syrupGain, stats.getSyrupsCapacity(colony)));
     }
 
-    public void runHerding(Colony colony) {
-         if (!colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) return;
+    public void runHerding(Colony colony, Biome biome) {
+        if (!colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) return;
          
         ColonyStatsService stats = colony.getStatsService();
         int rancherCount = countActiveAnts(colony, GameConstants.ROLE_RANCHER);
@@ -295,11 +232,12 @@ public class ColonyLabourService {
         
         int maxSustainableAphids = stats.getAphidCapacity(colony) * rancherCount;
         
-        if (colony.getAphids() < maxSustainableAphids) {
-            colony.setAphids(Math.min(colony.getAphids() + rancherCount, maxSustainableAphids));
-        } else if (colony.getAphids() > maxSustainableAphids) {
-            colony.setAphids(maxSustainableAphids);
-        }
+        if (biome.getPlantAbundance() >= 0.5f)
+            if (colony.getAphids() < maxSustainableAphids) {
+                colony.setAphids(Math.min(colony.getAphids() + rancherCount, maxSustainableAphids));
+            } else if (colony.getAphids() > maxSustainableAphids) {
+                colony.setAphids(maxSustainableAphids);
+            }
     }
 
     public void runLaying(Colony colony) {
@@ -330,7 +268,8 @@ public class ColonyLabourService {
 
     public void runNursing(Colony colony) {
         ColonyStatsService stats = colony.getStatsService();
-        int nurseCount = countActiveAnts(colony, GameConstants.ROLE_NURSE);
+        List<Ant> nurses = getWorkingAnts(colony, GameConstants.ROLE_NURSE);
+        int nurseCount = nurses.size();
 
         if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
                 nurseCount += 2;
@@ -338,6 +277,16 @@ public class ColonyLabourService {
         
         int babyAntTotal = colony.getEggs().size() +  colony.getLarvae().size() +  colony.getPupae().size();
         float nursingRate = stats.getNursingRate(colony);
+        
+        for (Ant nurse : nurses) {
+            nurse.clearLoad(); // Reset
+            if (babyAntTotal > 0 && Math.random() < 0.30) {
+                double r = Math.random();
+                if (r < 0.33) nurse.setCarryingAnt(GameConstants.TYPE_EGG);
+                else if (r < 0.66) nurse.setCarryingAnt(GameConstants.TYPE_LARVA);
+                else nurse.setCarryingAnt(GameConstants.TYPE_PUPA);
+            }
+        }
 
         if (babyAntTotal <= nurseCount * nursingRate) {
             return;
@@ -535,13 +484,22 @@ public class ColonyLabourService {
     }
 
     public void runGraveKeeping(Colony colony) {
-        int graverCount = colony.getAssignedRoleCount(GameConstants.ROLE_GRAVER);
+        List<Ant> gravers = getWorkingAnts(colony, GameConstants.ROLE_GRAVER);
+        int graverCount = gravers.size();
 
         if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
                 graverCount += 2;
             } else { graverCount += 1; }
         
-        if (graverCount == 0 || colony.getDeadAnts().isEmpty()) return;
+        boolean hasBodies = !colony.getDeadAnts().isEmpty();
+        for (Ant graver : gravers) {
+            graver.clearLoad();
+            if (hasBodies && Math.random() < 0.5) {
+                graver.setCarryingAnt(GameConstants.TYPE_DEAD);
+            }
+        }
+        
+        if (graverCount == 0 || !hasBodies) return;
         
         int canClean = graverCount * (int) colony.getStatsService().getGravingRate(colony);
         List<Ant> antsToRemove = new ArrayList<>();

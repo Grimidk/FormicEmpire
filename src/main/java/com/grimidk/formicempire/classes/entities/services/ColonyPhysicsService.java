@@ -24,35 +24,25 @@ public class ColonyPhysicsService {
 
     // --- Main Physics Loop ---
     public void runPhysics(Colony colony, Dimension activeDimension) {
-        // Ants
         for (List<Ant> antList : colony.getAntGroups().values()) {
             for (Ant ant : antList) {
                 if (!ant.isAlive()) continue;
 
-                // Feature: Ants in both dimensions run
-                // Optimization: "Less resources" for inactive dimension
                 boolean isActiveDim = (ant.getDimension() == activeDimension);
-                
-                // Active ants run logic every frame. 
-                // Inactive ants only run AI Logic 5% of the time to save resources, but always animate.
                 boolean shouldRunAI = isActiveDim || (Math.random() < 0.05);
 
-                // 1. Queue Consumption Logic (Always run to keep them moving)
                 if (!ant.isMoving() && ant.hasRoute()) {
                     processNextRoutePoint(ant);
                 }
 
-                // 2. Decision Logic (Throttled for inactive dimension)
                 if (!ant.isMoving() && !ant.hasRoute() && shouldRunAI) {
                     updateAntLogic(colony, ant);
                 }
                 
-                // 3. Movement (Always run)
                 ant.updatePosition();
             }
         }
         
-        // Bugs
         for (Bug bug : colony.getBugs()) {
             if (bug.isAlive() && bug.getDimension() == activeDimension) {
                 if (!bug.isMoving()) {
@@ -66,19 +56,16 @@ public class ColonyPhysicsService {
     private void processNextRoutePoint(Ant ant) {
         NeoPoint next = ant.getNextRoutePoint();
         if (next != null) {
-            // Check for Dimension Switch (Teleportation)
             if (next.getDimension() != ant.getDimension()) {
                 ant.setDimension(next.getDimension());
-                ant.setPosition(next); // Teleport instantly to the door/exit
+                ant.setPosition(next); 
             } else {
                 ant.moveTo(next);
             }
         }
     }
 
-    // --- Initialization ---
     public void randomizeAllAntPositions(Colony colony) {
-        // Fix: Use default width if game area not yet initialized to prevent 0,0 bunching
         int virtualWidth = Math.max(colony.getGameAreaWidth(), 2000);
 
         for (Map.Entry<AntType, List<Ant>> entry : colony.getAntGroups().entrySet()) {
@@ -134,12 +121,11 @@ public class ColonyPhysicsService {
     }
 
     private void handleGathererLogic(Colony colony, Ant ant) {
-        if (ant.getCarrying() != null) {
+        if (ant.getCarrying() != null || ant.getCarryingAnt() != null) {
             Room storage = WorldSpaces.STORAGE;
             
             if (isAntInRoom(colony, ant, storage)) {
-                ant.setCarrying(null);
-                ant.setCarryingSec(null);
+                ant.clearLoad();
             } else {
                 Room current = getRoomContainingAnt(colony, ant);
                 Queue<NeoPoint> route = colony.getLocationService().calculateRoute(colony, current, storage, ant);
@@ -156,8 +142,7 @@ public class ColonyPhysicsService {
             if (d < 50 && ant.getDimension() == WorldSpaces.OVERWORLD) {
                 ant.setCarrying(target.getResourceType());
             } else {
-                ant.setCarrying(null);
-                ant.setCarryingSec(null);
+                ant.clearLoad();
                 
                 Room current = getRoomContainingAnt(colony, ant);
                 Room sourceRoom = colony.getLocationService().createTempRoomAtPoint(
@@ -199,8 +184,7 @@ public class ColonyPhysicsService {
             NeoPoint entrance = colony.getLocationService().getColonyEntrance(colony);
             
             if (dist(ant.getX(), ant.getY(), entrance.x, entrance.y) < 30) {
-                ant.setCarrying(null);
-                ant.setCarryingSec(null);
+                ant.clearLoad();
                 ant.setDimension(WorldSpaces.UNDERWORLD);
                 ant.setPosition(new Point(colony.getGameAreaWidth()/2, 50));
             } else {
@@ -224,7 +208,6 @@ public class ColonyPhysicsService {
                     ant.setRoute(route);
                 }
             } else {
-                // Scouts / Wanderers
                 if (Math.random() < 0.01) {
                     if (ant.getRole() == GameConstants.ROLE_SCOUT) {
                         ant.moveTo(getRandomScoutPosition(colony));
@@ -283,7 +266,6 @@ public class ColonyPhysicsService {
     }
     
     private Room getRoomContainingAnt(Colony colony, Ant ant) {
-        
         if (ant.getDimension() == WorldSpaces.UNDERWORLD) {
             if (getRoomBounds(colony, WorldSpaces.STORAGE).contains(ant.getX(), ant.getY())) return WorldSpaces.STORAGE;
             if (getRoomBounds(colony, WorldSpaces.NURSERY).contains(ant.getX(), ant.getY())) return WorldSpaces.NURSERY;
@@ -294,7 +276,6 @@ public class ColonyPhysicsService {
             if (getRoomBounds(colony, WorldSpaces.RANCHER_YARD).contains(ant.getX(), ant.getY())) return WorldSpaces.RANCHER_YARD;
             if (getRoomBounds(colony, WorldSpaces.GRAVEYARD).contains(ant.getX(), ant.getY())) return WorldSpaces.GRAVEYARD;
         }
-        
         return null; 
     }
     
@@ -414,7 +395,6 @@ public class ColonyPhysicsService {
         return getSafeWalkableBounds(colony, r, colony.getGameAreaWidth()).contains(x, y);
     }
 
-    // --- Overworld Helpers ---
     private Point getRandomOverworldPosition(Colony colony, ImageIcon sprite) {
         int w = (sprite != null) ? sprite.getIconWidth() : 0;
         int h = (sprite != null) ? sprite.getIconHeight() : 0;

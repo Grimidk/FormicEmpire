@@ -645,7 +645,7 @@ public class Colony {
     public void runCollecting() { labourService.runCollecting(this); }
     public void runConverting() { labourService.runConverting(this); }
     public void runRanching() { labourService.runRanching(this); }
-    public void runHerding() { labourService.runHerding(this); }
+    public void runHerding(Biome biome) { labourService.runHerding(this, biome); }
     
     // Updated signature:
     public void runScoutting(Biome biome) { labourService.runScoutting(this, biome); }
@@ -659,7 +659,7 @@ public class Colony {
         this.runConverting();
     }
 
-    public void runHourlyJobs() {
+    public void runHourlyJobs(Biome biome) {
         this.runRoleAssignment();
         this.runCollecting();
         this.runLaying();
@@ -676,7 +676,7 @@ public class Colony {
         this.runAging();
         this.runNursing();
         this.runGraveKeeping();
-        this.runHerding();
+        this.runHerding(biome);
         this.runScoutting(biome);
     }
 
