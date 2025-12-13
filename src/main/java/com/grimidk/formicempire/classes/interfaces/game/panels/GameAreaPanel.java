@@ -44,6 +44,7 @@ public class GameAreaPanel extends JPanel {
     public Rectangle room4Bounds; 
     public Rectangle rancherYardBounds;
     public Rectangle graverYardBounds;
+    public Rectangle breederRoomBounds;
 
     public GameAreaPanel() {
         loadImages();
@@ -136,7 +137,7 @@ public class GameAreaPanel extends JPanel {
                 drawOverworldStructure(g2d);
             }
             
-            colony.setRoomBounds(entranceBounds, room1Bounds, room2Bounds, room3Bounds, room4Bounds, rancherYardBounds, graverYardBounds);
+            colony.setRoomBounds(entranceBounds, room1Bounds, room2Bounds, room3Bounds, room4Bounds, rancherYardBounds, graverYardBounds, breederRoomBounds);
         }
         
         drawAnts(g2d);
@@ -242,7 +243,7 @@ public class GameAreaPanel extends JPanel {
         int panelWidth = getWidth();
         int topMargin = 0; 
         
-        // --- ROW 1 ---
+        // --- ROW 1 (Floor 1) ---
         int hallW = firstHallwayImg.getWidth(this);
         int hallH = firstHallwayImg.getHeight(this);
         int centerX = panelWidth / 2;
@@ -273,7 +274,7 @@ public class GameAreaPanel extends JPanel {
         
         g2d.setTransform(old);
 
-        // --- ROW 2 ---
+        // --- ROW 2 (Floor 2) ---
         int secondRowYOffset = 256; 
         int roomY2 = hallY + secondRowYOffset;
 
@@ -290,6 +291,18 @@ public class GameAreaPanel extends JPanel {
         room4Bounds = new Rectangle(rightRoomX, roomY2, roomW, roomH);
         
         g2d.setTransform(old2);
+        
+        // --- ROW 3 (Floor 3 ) ---
+        if (colony.hasUpgrade(GameUnlocks.ROLE_BREEDER)) {
+            int thirdRowYOffset = 512;
+            int roomY3 = hallY + thirdRowYOffset;
+            
+            g2d.drawImage(middleHallwayImg, hallX, roomY3, this);            
+            g2d.drawImage(basicRoomImg, leftRoomX, roomY3, this);
+            breederRoomBounds = new Rectangle(leftRoomX, roomY3, roomW, roomH);
+        } else {
+            breederRoomBounds = null;
+        }
     }
 
     private void drawAnts(Graphics2D g2d) {
@@ -319,12 +332,12 @@ public class GameAreaPanel extends JPanel {
                 g2d.rotate(Math.toRadians(ant.getR()));
                 g2d.drawImage(sprite, -w / 2, -h / 2, this);
                 
+                // Carrying
                 if (ant.getCarrying() != null) {
-                    g2d.rotate(Math.toRadians(-ant.getR())); 
+                    g2d.rotate(Math.toRadians(-ant.getR()));
                     Image resourceIcon = ant.getCarrying().getIcon().getImage();
                     int iconW = 20; 
-                    int iconH = 20;
-                    
+                    int iconH = 20;                    
                     g2d.drawImage(resourceIcon, -iconW/2, -h/2 - iconH, iconW, iconH, this);
                     
                     if (ant.getCarryingSec() != null) {

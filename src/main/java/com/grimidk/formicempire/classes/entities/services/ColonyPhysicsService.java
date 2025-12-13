@@ -24,6 +24,7 @@ public class ColonyPhysicsService {
 
     // --- Main Physics Loop ---
     public void runPhysics(Colony colony, Dimension activeDimension) {
+        // Ants
         for (List<Ant> antList : colony.getAntGroups().values()) {
             for (Ant ant : antList) {
                 if (!ant.isAlive()) continue;
@@ -43,6 +44,7 @@ public class ColonyPhysicsService {
             }
         }
         
+        // Bugs
         for (Bug bug : colony.getBugs()) {
             if (bug.isAlive() && bug.getDimension() == activeDimension) {
                 if (!bug.isMoving()) {
@@ -188,7 +190,7 @@ public class ColonyPhysicsService {
                 ant.setDimension(WorldSpaces.UNDERWORLD);
                 ant.setPosition(new Point(colony.getGameAreaWidth()/2, 50));
             } else {
-                Room target = findRoomForAnt(ant);
+                Room target = findRoomForAnt(colony, ant);
                 Room current = getRoomContainingAnt(colony, ant); 
                 Queue<NeoPoint> route = colony.getLocationService().calculateRoute(colony, current, target, ant);
                 ant.setRoute(route);
@@ -257,7 +259,7 @@ public class ColonyPhysicsService {
                 ant.moveTo(getRandomPointInRoom(colony, myRoom, virtualWidth));
             }
         } else {
-            Room targetRoom = findRoomForAnt(ant);
+            Room targetRoom = findRoomForAnt(colony, ant);
             Room current = getRoomContainingAnt(colony, ant); 
             
             Queue<NeoPoint> route = colony.getLocationService().calculateRoute(colony, current, targetRoom, ant);
@@ -271,6 +273,11 @@ public class ColonyPhysicsService {
             if (getRoomBounds(colony, WorldSpaces.NURSERY).contains(ant.getX(), ant.getY())) return WorldSpaces.NURSERY;
             if (getRoomBounds(colony, WorldSpaces.FARM).contains(ant.getX(), ant.getY())) return WorldSpaces.FARM;
             if (getRoomBounds(colony, WorldSpaces.ROYAL_CHAMBER).contains(ant.getX(), ant.getY())) return WorldSpaces.ROYAL_CHAMBER;
+            
+            // Check Breeder Room
+            if (colony.getBreederBounds() != null && colony.getBreederBounds().contains(ant.getX(), ant.getY())) {
+                return WorldSpaces.BREEDER_CHAMBER;
+            }
         } 
         else if (ant.getDimension() == WorldSpaces.OVERWORLD) {
             if (getRoomBounds(colony, WorldSpaces.RANCHER_YARD).contains(ant.getX(), ant.getY())) return WorldSpaces.RANCHER_YARD;
@@ -286,10 +293,14 @@ public class ColonyPhysicsService {
 
     // --- Room Logic & Estimates ---
     public Rectangle getTargetRoomForAnt(Colony colony, Ant ant, int gameWidth) {
+        if (ant.getRole() == GameConstants.ROLE_BUILDER && colony.getCurrentBuildingProject() != null) {
+            return getRoomBounds(colony, WorldSpaces.CONSTRUCTION_SITE);
+        }
+
         Rectangle defined = colony.getTargetRoomForAnt(ant);
         if (defined != null) return defined;
         
-        Room room = findRoomForAnt(ant);
+        Room room = findRoomForAnt(colony, ant);
         return getRoomBounds(colony, room);
     }
     
@@ -303,7 +314,18 @@ public class ColonyPhysicsService {
         return null;
     }
 
-    private Room findRoomForAnt(Ant ant) {
+    private Room findRoomForAnt(Colony colony, Ant ant) {
+        // Construction check
+        if (ant.getRole() == GameConstants.ROLE_BUILDER && colony.getCurrentBuildingProject() != null) {
+            return WorldSpaces.CONSTRUCTION_SITE;
+        }
+        
+        if (ant.getAntType() == GameConstants.TYPE_DRONE || ant.getRole() == GameConstants.ROLE_BREEDER) {
+            if (colony.hasUpgrade(GameUnlocks.ROLE_BREEDER)) {
+                return WorldSpaces.BREEDER_CHAMBER;
+            }
+        }
+
         if (isAllowedInRoom(WorldSpaces.NURSERY, ant)) return WorldSpaces.NURSERY;
         if (isAllowedInRoom(WorldSpaces.FARM, ant)) return WorldSpaces.FARM;
         if (isAllowedInRoom(WorldSpaces.ROYAL_CHAMBER, ant)) return WorldSpaces.ROYAL_CHAMBER;
@@ -338,6 +360,22 @@ public class ColonyPhysicsService {
             int x = Math.max(0, colony.getGameAreaWidth() - room.getWidth() - 10);
             int y = Math.max(0, colony.getGameAreaHeight() - room.getHeight() - 10);
             return new Rectangle(x, y, room.getWidth(), room.getHeight());
+        }
+        
+        if (room == WorldSpaces.BREEDER_CHAMBER) {
+            if (colony.getBreederBounds() != null) return colony.getBreederBounds();
+            int cx = colony.getLocationService().getHallwayCenterX(colony);
+            return new Rectangle(cx - 256, 512, 256, 256);
+        }
+
+        if (room == WorldSpaces.CONSTRUCTION_SITE) {
+            int cx = colony.getLocationService().getHallwayCenterX(colony);
+            int bottomY = 512; 
+            if (colony.hasUpgrade(GameUnlocks.ROLE_BREEDER)) {
+                bottomY = 768;
+            }
+            int size = 100;
+            return new Rectangle(cx - (size/2), bottomY, size, size);
         }
 
         int x = room.getFloorPoint().x;
@@ -425,6 +463,9 @@ public class ColonyPhysicsService {
         if (isAllowedInRoom(WorldSpaces.FARM, ant)) return true;
         if (isAllowedInRoom(WorldSpaces.ROYAL_CHAMBER, ant)) return true;
         if (isAllowedInRoom(WorldSpaces.STORAGE, ant)) return true; 
+        
+        if (ant.getRole() == GameConstants.ROLE_BUILDER) return true;
+        if (ant.getRole() == GameConstants.ROLE_BREEDER || ant.getAntType() == GameConstants.TYPE_DRONE) return true;
         
         return false;
     }

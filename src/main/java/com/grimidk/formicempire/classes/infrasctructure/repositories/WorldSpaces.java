@@ -116,4 +116,37 @@ public final class WorldSpaces {
         List.of(GameConstants.TYPE_DEAD),
         List.of()
     );
+
+    public static final Room BREEDER_CHAMBER = new Room(
+        300, 
+        "Breeder Chamber", 
+        UNDERWORLD, 
+        ROOM_SIZE, 
+        ROOM_SIZE, 
+        true, 
+        new Point(REL_X_LEFT, 512), 
+        new Point(REL_X_LEFT + 128, 512 + 128), 
+        new Point(REL_X_LEFT + 256, 512 + 128),
+        new Point(REL_X_LEFT + 256, 512 + 128),
+        List.of(GameConstants.ROLE_BREEDER), 
+        List.of(GameConstants.TYPE_DRONE),
+        List.of()
+    );
+
+    // Dynamic Construction Site (Default coords are placeholders)
+    public static final Room CONSTRUCTION_SITE = new Room(
+        999, 
+        "Construction Site", 
+        UNDERWORLD, 
+        100, 
+        100, 
+        false, 
+        new Point(0, 0), 
+        new Point(0, 0), 
+        new Point(0, 0), 
+        new Point(0, 0),
+        List.of(GameConstants.ROLE_BUILDER), 
+        List.of(),
+        List.of()
+    );
 }

@@ -32,6 +32,7 @@ import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces
 
 
 public class Colony {
+    
     // --- Basic Data ---
     private final int id;
     private String name;
@@ -81,7 +82,8 @@ public class Colony {
     private Rectangle nurseryBounds; 
     private Rectangle royalBounds;   
     private Rectangle rancherBounds; 
-    private Rectangle graverBounds;  
+    private Rectangle graverBounds;
+    private Rectangle breederBounds; 
 
     // --- Service Dependencies ---
     private transient ColonyStatsService statsService;
@@ -503,7 +505,7 @@ public class Colony {
     public void setTotalDeaths (int totalDeaths) { this.totalDeaths = totalDeaths; }
     
     // --- Room Bounds Getters/Setters ---
-    public void setRoomBounds(Rectangle entrance, Rectangle storage, Rectangle farm, Rectangle nursery, Rectangle royal, Rectangle rancher, Rectangle graver) {
+    public void setRoomBounds(Rectangle entrance, Rectangle storage, Rectangle farm, Rectangle nursery, Rectangle royal, Rectangle rancher, Rectangle graver, Rectangle breeder) {
         this.entranceBounds = entrance;
         this.storageBounds = storage;
         this.farmBounds = farm;
@@ -511,6 +513,11 @@ public class Colony {
         this.royalBounds = royal;
         this.rancherBounds = rancher;
         this.graverBounds = graver;
+        this.breederBounds = breeder;
+    }
+    
+    public void setRoomBounds(Rectangle entrance, Rectangle storage, Rectangle farm, Rectangle nursery, Rectangle royal, Rectangle rancher, Rectangle graver) {
+        setRoomBounds(entrance, storage, farm, nursery, royal, rancher, graver, null);
     }
     
     public Rectangle getEntranceBounds() { return entranceBounds; }
@@ -520,10 +527,12 @@ public class Colony {
     public Rectangle getRoyalBounds() { return royalBounds; }
     public Rectangle getRancherBounds() { return rancherBounds; }
     public Rectangle getGraverBounds() { return graverBounds; }
+    public Rectangle getBreederBounds() { return breederBounds; }
     
     public Rectangle getTargetRoomForAnt(Ant ant) {
         if (ant.getAntType() == GameConstants.TYPE_QUEEN) return royalBounds;
-        if (ant.getAntType() == GameConstants.TYPE_EGG || ant.getAntType() == GameConstants.TYPE_LARVA || ant.getAntType() == GameConstants.TYPE_PUPA) return nurseryBounds;
+        if (ant.getAntType() == GameConstants.TYPE_EGG || ant.getAntType() == GameConstants.TYPE_LARVA || ant.getAntType() == GameConstants.TYPE_PUPA) return nurseryBounds;        
+        if (ant.getAntType() == GameConstants.TYPE_DRONE) return breederBounds; 
         
         AntRole role = ant.getRole();
         if (role == null) return storageBounds; 
@@ -533,6 +542,7 @@ public class Colony {
         if (role == GameConstants.ROLE_FORAGER || role == GameConstants.ROLE_HUNTER) return storageBounds;
         if (role == GameConstants.ROLE_RANCHER && rancherBounds != null) return rancherBounds;
         if (role == GameConstants.ROLE_GRAVER && graverBounds != null) return graverBounds;
+        if (role == GameConstants.ROLE_BREEDER && breederBounds != null) return breederBounds;
         
         return storageBounds; // Default
     }
@@ -646,8 +656,6 @@ public class Colony {
     public void runConverting() { labourService.runConverting(this); }
     public void runRanching() { labourService.runRanching(this); }
     public void runHerding(Biome biome) { labourService.runHerding(this, biome); }
-    
-    // Updated signature:
     public void runScoutting(Biome biome) { labourService.runScoutting(this, biome); }
     
     public void runPhysics(Dimension activeDimension) { 
@@ -659,7 +667,7 @@ public class Colony {
         this.runConverting();
     }
 
-    public void runHourlyJobs(Biome biome) {
+    public void runHourlyJobs() {
         this.runRoleAssignment();
         this.runCollecting();
         this.runLaying();
@@ -668,7 +676,6 @@ public class Colony {
         this.runBuilding();
     }
 
-    // Updated signature:
     public void runDailyJobs(Temperature currentTemp, Biome biome) {
         this.rankUp();
         this.runEating(currentTemp);
@@ -676,7 +683,7 @@ public class Colony {
         this.runAging();
         this.runNursing();
         this.runGraveKeeping();
-        this.runHerding(biome);
+        this.runHerding(biome); 
         this.runScoutting(biome);
     }
 

@@ -180,6 +180,8 @@ public class ColonyLocationService {
         Rectangle dynamicBounds = null;
         if (room.getId() == 201) dynamicBounds = colony.getGraverBounds(); // Graveyard
         else if (room.getId() == 200) dynamicBounds = colony.getRancherBounds(); // Rancher
+        else if (room.getId() == 300) dynamicBounds = colony.getBreederBounds(); // Breeder
+        else if (room.getId() == 999) dynamicBounds = colony.getPhysicsService().getRoomBounds(colony, WorldSpaces.CONSTRUCTION_SITE); // Construction
 
         if (dynamicBounds != null) {
             return new NeoPoint((int)dynamicBounds.getCenterX(), (int)dynamicBounds.getCenterY(), room.getDimension());
