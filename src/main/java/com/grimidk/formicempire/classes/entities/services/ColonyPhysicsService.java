@@ -315,7 +315,6 @@ public class ColonyPhysicsService {
     }
 
     private Room findRoomForAnt(Colony colony, Ant ant) {
-        // Construction check
         if (ant.getRole() == GameConstants.ROLE_BUILDER && colony.getCurrentBuildingProject() != null) {
             return WorldSpaces.CONSTRUCTION_SITE;
         }

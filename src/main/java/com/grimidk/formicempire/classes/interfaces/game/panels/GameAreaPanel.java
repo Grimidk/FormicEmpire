@@ -332,17 +332,22 @@ public class GameAreaPanel extends JPanel {
                 g2d.rotate(Math.toRadians(ant.getR()));
                 g2d.drawImage(sprite, -w / 2, -h / 2, this);
                 
-                // Carrying
-                if (ant.getCarrying() != null) {
-                    g2d.rotate(Math.toRadians(-ant.getR()));
+                if (ant.getCarrying() != null && ant.getCarrying().getIcon() != null) {
+                    g2d.rotate(Math.toRadians(-ant.getR())); 
                     Image resourceIcon = ant.getCarrying().getIcon().getImage();
-                    int iconW = 20; 
-                    int iconH = 20;                    
-                    g2d.drawImage(resourceIcon, -iconW/2, -h/2 - iconH, iconW, iconH, this);
                     
-                    if (ant.getCarryingSec() != null) {
-                        Image secIcon = ant.getCarryingSec().getIcon().getImage();
-                        g2d.drawImage(secIcon, -iconW/2 + 10, -h/2 - iconH + 5, iconW, iconH, this);
+                    if (resourceIcon != null) {
+                        int iconW = 20; 
+                        int iconH = 20;
+                        
+                        g2d.drawImage(resourceIcon, -iconW/2, -h/2 - iconH, iconW, iconH, this);
+                        
+                        if (ant.getCarryingSec() != null && ant.getCarryingSec().getIcon() != null) {
+                            Image secIcon = ant.getCarryingSec().getIcon().getImage();
+                            if (secIcon != null) {
+                                g2d.drawImage(secIcon, -iconW/2 + 10, -h/2 - iconH + 5, iconW, iconH, this);
+                            }
+                        }
                     }
                 } 
                 

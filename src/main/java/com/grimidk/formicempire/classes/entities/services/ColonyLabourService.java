@@ -79,7 +79,6 @@ public class ColonyLabourService {
                 if (type == GameConstants.PLANT_RESOURCE) {
                     colony.setPlants(colony.getPlants() + actualGathered); 
                     
-                    
                     for(int i = 0; i < actualGathered; i++) {
                         if (workerIndex >= workers.size()) workerIndex = 0;
                         Ant worker = workers.get(workerIndex);
@@ -232,12 +231,13 @@ public class ColonyLabourService {
         
         int maxSustainableAphids = stats.getAphidCapacity(colony) * rancherCount;
         
-        if (biome.getPlantAbundance() >= 0.5f)
+        if (biome != null && biome.getPlantAbundance() >= 0.5f) {
             if (colony.getAphids() < maxSustainableAphids) {
                 colony.setAphids(Math.min(colony.getAphids() + rancherCount, maxSustainableAphids));
             } else if (colony.getAphids() > maxSustainableAphids) {
                 colony.setAphids(maxSustainableAphids);
             }
+        }
     }
 
     public void runLaying(Colony colony) {
@@ -514,13 +514,21 @@ public class ColonyLabourService {
 
     public void runResearch(Colony colony) {
         if (!colony.hasUpgrade(GameUnlocks.ROLE_RESEARCHER)) return;
+        
         int researcherCount = countActiveAnts(colony, GameConstants.ROLE_RESEARCHER);
         
-        if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
+        if (colony.hasBuilding(GameUnlocks.PASSIVE_LAB)) {
+            if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
                 researcherCount += 2;
-            } else { researcherCount += 1; }
+            } else { 
+                researcherCount += 1; 
+            }
+        }
         
-        colony.setResearchPoints(colony.getResearchPoints() + (researcherCount * colony.getStatsService().getResearchSpeed(colony)));
+        if (researcherCount > 0) {
+            int gain = researcherCount * colony.getStatsService().getResearchSpeed(colony);
+            colony.setResearchPoints(colony.getResearchPoints() + gain);
+        }
     }
 
     public void runBuilding(Colony colony) {
