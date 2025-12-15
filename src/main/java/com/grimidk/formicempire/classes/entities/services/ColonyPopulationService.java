@@ -245,10 +245,59 @@ public class ColonyPopulationService {
     }
     
     public void runInfection(Colony colony) { 
-        if (colony.getDeadAnts().size() < 100) {
+        int deadBodyCount = colony.getDeadAnts().size();
+        int baseDeaths = 0;
+        String infectionLevel = "";
+
+        if (deadBodyCount >= 5000) {
+            baseDeaths = 100;
+            infectionLevel = "Massive";
+        } else if (deadBodyCount >= 1500) {
+            baseDeaths = 25;
+            infectionLevel = "Medium";
+        } else if (deadBodyCount >= 500) {
+            baseDeaths = 5;
+            infectionLevel = "Small";
+        } else {
             return;
         }
-        // Placeholder
+
+        float mitigation = colony.getStatsService().getInfectionMitigation(colony);
+        int finalDeaths = (int) (baseDeaths * mitigation);
+        
+        if (finalDeaths <= 0) return;
+
+        List<Ant> victims = new ArrayList<>();
+        List<AntType> killableTypes = Arrays.asList(GameConstants.TYPE_WORKER, GameConstants.TYPE_SOLDIER, GameConstants.TYPE_MAJOR);
+        
+        int killed = 0;
+        for (AntType type : killableTypes) {
+            if (killed >= finalDeaths) break;
+            List<Ant> population = colony.getAntsByType(type);
+            
+            for (Ant ant : population) {
+                if (killed >= finalDeaths) break;
+                if (random.nextFloat() < 0.1) {
+                    victims.add(ant);
+                    killed++;
+                }
+            }
+        }
+
+        for (Ant victim : victims) {
+            if (victim.isAlive()) {
+                AntType originalType = victim.getAntType();
+                victim.goDie();
+                colony.setTotalDeaths(colony.getTotalDeaths() + 1);
+                colony.getDeadAnts().add(victim);
+                List<Ant> antList = colony.getAntsByType(originalType);
+                if (antList != null) antList.remove(victim);
+            }
+        }
+        
+        if (killed > 0) {
+            colony.logEvent("INFECTION ALERT: " + killed + " ants died from a " + infectionLevel + " infection due to " + deadBodyCount + " rotting bodies!");
+        }
     }
 
     public void rankUp(Colony colony) {

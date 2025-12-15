@@ -522,6 +522,33 @@ public class ColonyLabourService {
         }
         colony.getDeadAnts().removeAll(antsToRemove);
     }
+    
+    public void runComposting(Colony colony) {
+        if (!colony.hasBuilding(GameUnlocks.BUILDING_COMPOSTER)) return;
+        
+        List<Ant> deadAnts = colony.getDeadAnts();
+        int totalDead = deadAnts.size();
+        if (totalDead == 0) return;
+        
+        int toCompost = (int) (totalDead * 0.10);
+        if (toCompost == 0) return;
+        
+        List<Ant> antsToRemove = new ArrayList<>();
+        for (int i = 0; i < toCompost; i++) {
+             if (i < deadAnts.size()) {
+                 antsToRemove.add(deadAnts.get(i));
+             }
+        }
+        deadAnts.removeAll(antsToRemove);
+
+        int mushroomGain = toCompost * 4; 
+        int capacity = colony.getStatsService().getMushroomsCapacity(colony);
+        colony.setMushrooms(Math.min(colony.getMushrooms() + mushroomGain, capacity));
+        
+        if (toCompost > 10) {
+            colony.logEvent("COMPOST: Recycled " + toCompost + " bodies into " + mushroomGain + " mushroom matter.");
+        }
+    }
 
     public void runResearch(Colony colony) {
         if (!colony.hasUpgrade(GameUnlocks.ROLE_RESEARCHER)) return;

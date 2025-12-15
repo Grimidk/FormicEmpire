@@ -657,6 +657,7 @@ public class Colony {
     public void runRanching() { labourService.runRanching(this); }
     public void runHerding(Biome biome) { labourService.runHerding(this, biome); }
     public void runScoutting(Biome biome) { labourService.runScoutting(this, biome); }
+    public void runComposting() { labourService.runComposting(this); }
     
     public void forceNuptialFlight() {
         if (!hasUpgrade(GameUnlocks.ABILITY_FORCED_FLIGHT)) return;
@@ -700,10 +701,11 @@ public class Colony {
         this.runGraveKeeping();
         this.runHerding(biome); 
         this.runScoutting(biome);
+        this.runInfection(); 
+        this.runComposting();
     }
 
     public void runMonthlyJobs() { 
-        this.runInfection();
     }
 
     public void runYearlyJobs() {

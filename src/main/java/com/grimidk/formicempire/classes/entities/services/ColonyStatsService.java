@@ -124,7 +124,13 @@ public class ColonyStatsService {
         } else if (colony.hasUpgrade(GameUnlocks.ROLE_SCOUT)) {return 0.1f;
         } else {return 0;}
     }
-    
+    public float getInfectionMitigation(Colony colony) {
+        if (colony.hasUpgrade(GameUnlocks.STAT_INFECTION_3)) { return 0.4f; 
+        } else if (colony.hasUpgrade(GameUnlocks.STAT_INFECTION_2)) { return 0.6f;
+        } else if (colony.hasUpgrade(GameUnlocks.STAT_INFECTION_1)) { return 0.8f;
+        } else { return 1.0f; } 
+    }
+
     // --- Stats ---
     public int getBaseHealth(Colony colony) {
         if (colony.hasUpgrade(GameUnlocks.STAT_SKELETON)) {return 100;
