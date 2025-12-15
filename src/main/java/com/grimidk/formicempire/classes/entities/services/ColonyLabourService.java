@@ -5,6 +5,7 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
@@ -29,7 +30,9 @@ public class ColonyLabourService {
         allAdults.addAll(colony.getWorkers());
         allAdults.addAll(colony.getSoldiers());
         allAdults.addAll(colony.getMajors());
-        allAdults.addAll(colony.getQueens()); 
+        allAdults.addAll(colony.getQueens());
+        allAdults.addAll(colony.getPrincesses()); 
+        allAdults.addAll(colony.getDrones());
         
         for (Ant ant : allAdults) {
             if (!ant.isAlive()) continue;
@@ -324,8 +327,10 @@ public class ColonyLabourService {
         }
     }
     
-    public void runSpreading(Colony colony, List<Ant> princesses) { 
-        // Placeholder
+    public void runSpreading(Colony colony, int potentialSatellites) { 
+        if (potentialSatellites > 0) {
+            colony.logEvent("SPREADING: " + potentialSatellites + " new satellite colonies will spawn in adjacent hexes.");
+        }
     }
 
     public void runPolicing(Colony colony) {
@@ -447,39 +452,45 @@ public class ColonyLabourService {
     }
 
     public void runNuptial(Colony colony) {
-        List<Ant> princesses = colony.getPrincesses();
-        List<Ant> drones = colony.getDrones();
-
         if (!colony.hasUpgrade(GameUnlocks.TYPE_PRINCESS)) return;
 
-        List<Ant> princessesToEvolve = new ArrayList<>();
-        boolean flightOccurred = false;
-        int queenCapacity = colony.getStatsService().getQueensCapacity(colony);
-        
-        for (Ant princess : princesses) {
-            boolean hasQueenSpace = (colony.getQueens().size() + princessesToEvolve.size()) < queenCapacity;
-            boolean hasDrones = !drones.isEmpty();     
-            
-            if (hasQueenSpace && hasDrones) {
-                princessesToEvolve.add(princess);
-                Ant deadDrone = drones.remove(drones.size() - 1); 
-                deadDrone.goDie();
-                colony.getDeadAnts().add(deadDrone);
-                flightOccurred = true;
-            } 
+        List<Ant> allDrones = new ArrayList<>(colony.getDrones());
+        List<Ant> breederPrincesses = colony.getPrincesses().stream()
+            .filter(p -> p.getRole() == GameConstants.ROLE_BREEDER)
+            .collect(Collectors.toList());
+
+        if (allDrones.isEmpty() || breederPrincesses.isEmpty()) return;
+        colony.getDrones().clear(); 
+        colony.getPrincesses().removeAll(breederPrincesses);
+
+        int potentialQueens = Math.min(allDrones.size(), breederPrincesses.size());
+        int currentQueens = colony.getQueens().size();
+        int maxQueens = colony.getStatsService().getQueensCapacity(colony);
+        int spaceAvailable = maxQueens - currentQueens;
+        int queensToAdd = 0;
+        int queensLeaving = potentialQueens;
+
+        if (spaceAvailable > 0) {
+            queensToAdd = Math.min(spaceAvailable, potentialQueens);
+            queensLeaving = potentialQueens - queensToAdd;
         }
 
-        for (Ant princess : princessesToEvolve) {
-            princess.transform(colony, GameConstants.TYPE_QUEEN);
-            princess.setDimension(WorldSpaces.UNDERWORLD); 
-            colony.getQueens().add(princess);
+        for (int i = 0; i < queensToAdd; i++) {
+            Ant newQueen = new Ant(colony, GameConstants.TYPE_QUEEN);
+            newQueen.setDimension(WorldSpaces.UNDERWORLD); 
+            
+            Rectangle royal = colony.getPhysicsService().getRoomBounds(colony, WorldSpaces.ROYAL_CHAMBER);
+            if (royal != null) {
+                newQueen.setPosition(colony.getPhysicsService().getSpecificRoomPoint(colony, royal));
+            }
+
+            colony.getQueens().add(newQueen);
         }
+
+        colony.logEvent("CRITICAL: Nuptial Flight Occurred. " + queensToAdd + " new Queens joined.");
         
-        princesses.removeAll(princessesToEvolve);
-        runSpreading(colony, princesses); 
-        
-        if (flightOccurred) {
-            colony.logEvent("CRITICAL: Nuptial Flight Occurred");
+        if (queensLeaving > 0) {
+            runSpreading(colony, queensLeaving);
         }
     }
 
@@ -515,8 +526,7 @@ public class ColonyLabourService {
     public void runResearch(Colony colony) {
         if (!colony.hasUpgrade(GameUnlocks.ROLE_RESEARCHER)) return;
         
-        int researcherCount = countActiveAnts(colony, GameConstants.ROLE_RESEARCHER);
-        
+        int researcherCount = countActiveAnts(colony, GameConstants.ROLE_RESEARCHER);        
         if (colony.hasBuilding(GameUnlocks.PASSIVE_LAB)) {
             if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
                 researcherCount += 2;
@@ -524,10 +534,15 @@ public class ColonyLabourService {
                 researcherCount += 1; 
             }
         }
-        
-        if (researcherCount > 0) {
-            int gain = researcherCount * colony.getStatsService().getResearchSpeed(colony);
-            colony.setResearchPoints(colony.getResearchPoints() + gain);
+
+        int assistantCount = countActiveAnts(colony, GameConstants.ROLE_ASSISTANT);        
+        if (researcherCount > 0 || assistantCount > 0) {
+            int speed = colony.getStatsService().getResearchSpeed(colony);
+            
+            int queenGain = researcherCount * speed;
+            int assistantGain = (int) (assistantCount * (speed / 5.0));
+
+            colony.setResearchPoints(colony.getResearchPoints() + queenGain + assistantGain);
         }
     }
 

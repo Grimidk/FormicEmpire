@@ -19,6 +19,7 @@ public class ControlPanel extends JPanel {
     private final Runnable showResearchDialogCallback;
     private final Runnable showBuildDialogCallback;
     private final RoleManagementCallback showRoleManagementDialogCallback;
+    private final Runnable showAbilitiesDialogCallback;
     private final Runnable toggleViewCallback;
 
     // --- UI Components ---
@@ -30,6 +31,7 @@ public class ControlPanel extends JPanel {
     private final JPopupMenu gameMenu = new JPopupMenu();
     private JMenuItem manageResearch;
     private JMenuItem manageBuilding;
+    private JMenuItem manageAbilities;
     
     // --- State ---
     private int speedLevel = 1;
@@ -46,6 +48,7 @@ public class ControlPanel extends JPanel {
                         Runnable showResearchDialogCallback, 
                         Runnable showBuildDialogCallback,
                         RoleManagementCallback showRoleManagementDialogCallback,
+                        Runnable showAbilitiesDialogCallback,
                         Runnable toggleViewCallback) { 
         this.frame = frame;
         this.handleBackButtonCallback = handleBackButtonCallback;
@@ -53,6 +56,7 @@ public class ControlPanel extends JPanel {
         this.showResearchDialogCallback = showResearchDialogCallback;
         this.showBuildDialogCallback = showBuildDialogCallback;
         this.showRoleManagementDialogCallback = showRoleManagementDialogCallback;
+        this.showAbilitiesDialogCallback = showAbilitiesDialogCallback;
         this.toggleViewCallback = toggleViewCallback;
 
         initLayout();
@@ -149,6 +153,7 @@ public class ControlPanel extends JPanel {
         JMenuItem manageHatchRates = new JMenuItem("Manage Hatch Rates (P)");
         manageResearch = new JMenuItem("Research (Y)");
         manageBuilding = new JMenuItem("Build (U)");
+        manageAbilities = new JMenuItem("Abilities (Z)");
         JMenuItem openSettings = new JMenuItem("Settings");
         JMenuItem showTutorial = new JMenuItem("Show Tutorial");
         JMenuItem quitToMenu = new JMenuItem("Quit to Main Menu");
@@ -163,6 +168,9 @@ public class ControlPanel extends JPanel {
         
         manageBuilding.addActionListener(e -> showBuildDialogCallback.run());
         manageBuilding.setVisible(false);
+        
+        manageAbilities.addActionListener(e -> showAbilitiesDialogCallback.run());
+        manageAbilities.setVisible(false);
         
         openSettings.addActionListener(e -> {
             Engine engine = frame.getEngine();
@@ -199,6 +207,7 @@ public class ControlPanel extends JPanel {
         gameMenu.add(manageHatchRates);
         gameMenu.add(manageResearch);
         gameMenu.add(manageBuilding);
+        gameMenu.add(manageAbilities);
         gameMenu.add(openSettings);
         gameMenu.add(showTutorial);
         gameMenu.add(new JSeparator());
@@ -294,6 +303,16 @@ public class ControlPanel extends JPanel {
                 }
             }
         });
+        
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, 0), "openAbilities");
+        actionMap.put("openAbilities", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (manageAbilities.isVisible()) {
+                    showAbilitiesDialogCallback.run();
+                }
+            }
+        });
     }
     
     private void addRoleKeyBinding(InputMap im, ActionMap am, String name, int key, int tab) {
@@ -327,6 +346,12 @@ public class ControlPanel extends JPanel {
     public void updateBuildMenu(boolean visible) {
         if (manageBuilding != null) {
             manageBuilding.setVisible(visible);
+        }
+    }
+    
+    public void updateAbilitiesMenu(boolean visible) {
+        if (manageAbilities != null) {
+            manageAbilities.setVisible(visible);
         }
     }
 }

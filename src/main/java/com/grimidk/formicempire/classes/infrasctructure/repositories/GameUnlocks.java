@@ -35,20 +35,20 @@ public final class GameUnlocks {
     public static final Upgrade ROLE_GUARD = new Upgrade(20, "Guard Role", "Ant Bouncers", "", TYPE_SOLDIER, 0 );
     public static final Upgrade ROLE_WARRIOR = new Upgrade(21, "Warrior Role", "Phalanx Formation", "", TYPE_SOLDIER, 0 );
     public static final Upgrade ROLE_DEFENDER = new Upgrade(22, "Defender Role", "Royal Shield", "", TYPE_SOLDIER, 0 );
-    public static final Upgrade ROLE_POLICE = new Upgrade(23, "Parasite-Police Role", "Police Brutality", "Allows soldiers to detect parasitic bugs disguising as your ants, each one can check 10 ants per day", TYPE_SOLDIER, 0 ); 
+    public static final Upgrade ROLE_POLICE = new Upgrade(23, "Parasite-Police Role", "Police Brutality", "Allows soldiers to detect parasitic bugs disguising as your ants, each one can check 10 ants per day.", TYPE_SOLDIER, 0 ); 
     public static final Upgrade ROLE_BOMBER = new Upgrade(24, "Bomber Role", "Explosive Finish", "", TYPE_SOLDIER, 0 );
     public static final Upgrade ROLE_BRUTE = new Upgrade(25, "Brute Role", "Heavy Trooper", "Allows majors to become massive menaces in battle.", TYPE_MAJOR, 0 );
     public static final Upgrade ROLE_CARRIER = new Upgrade(26, "Carrier Role", "Troop Transport", "", TYPE_MAJOR, 0 );
     public static final Upgrade ROLE_ARTILLERY = new Upgrade(27, "Artillery Role", "Long Range Artillery", "", TYPE_MAJOR, 0 );
     public static final Upgrade ROLE_SIEGE = new Upgrade(28, "Siege-Machine Role", "Siege Technology", "", TYPE_MAJOR, 0 );
     public static final Upgrade ROLE_BORER = new Upgrade(29, "Tunel-Borer Role", "Ant Excavator", "", TYPE_MAJOR, 0 );
-    public static final Upgrade ROLE_BREEDER = new Upgrade(30,"Breeder Roles", "Nuptial Flights", "Allows Princesses and Drones to go to nuptial flights and get more queens", TYPE_PRINCESS, 0 );
+    public static final Upgrade ROLE_BREEDER = new Upgrade(30,"Breeder Roles", "Nuptial Flights", "Allows Princesses and Drones to go to nuptial flights and get more queens or spread to new places.", TYPE_PRINCESS, 0 );
     public static final Upgrade ROLE_DIPLOMAT = new Upgrade(31, "Diplomat Role", "Mighter Than The Sword", "", TYPE_PRINCESS, 0 );
     public static final Upgrade ROLE_MILITIA = new Upgrade(32, "Militia Role", "Worker Militia Auxiliary", "", TYPE_WORKER, 0 );
     public static final Upgrade ROLE_CATCHER = new Upgrade(33, "Catcher Role", "Bug Catching", "", TYPE_SOLDIER, 0 );
     public static final Upgrade ROLE_CRANE = new Upgrade(34, "Construction Crane Role", "Heavy Duty", "", TYPE_MAJOR, 0 );
     public static final Upgrade ROLE_TRANSPORT = new Upgrade(35, "Resource Transport Role", "Heavy Lifting", "", TYPE_MAJOR, 0 );
-    public static final Upgrade ROLE_ASSISTANT = new Upgrade(36, "Lab Assistant Role", "Scientific Aid", "", TYPE_PRINCESS, 0 );
+    public static final Upgrade ROLE_ASSISTANT = new Upgrade(36, "Lab Assistant Role", "Lab Internship", "Allows princesses to help research with 1/5 the efficency of queens.", TYPE_PRINCESS, 1500 );
     public static final Upgrade ROLE_ESCORT = new Upgrade(37, "Convoy Escort Role", "Protective Detail", "", TYPE_SOLDIER, 0 );
     // -- Stats -- 
     public static final Upgrade STAT_SKELETON = new Upgrade(101, "Basic Skeletons", "Basic Exoskeletons", "The basic defense stats for all the ants in your colony before multipliers. 100 health points, 5 defense points and 1 health point recovered per second.", TYPE_EGG, 0 );
@@ -79,6 +79,7 @@ public final class GameUnlocks {
     public static final Upgrade ABILITY_BUILD = new Upgrade(202, "Building", "Brick And Mortar", "Allows you to build parts of your colony, you can build in the build menu (U).", ROLE_BUILDER, 0 );
     public static final Upgrade ABILITY_SPREAD = new Upgrade(203, "Spreading", "Colony Colonization", "Allows you to build satellite colonies, you see them in world map (I).", ROLE_BREEDER, 0 );
     public static final Upgrade ABILITY_RESIN = new Upgrade(204, "Resin Harvest", "Resin Resonation", "Allows your to foragers to harvest resin while foraging plants as a bonus, there is 1% chance each foraging run.", ROLE_FORAGER, 5000 );
+    public static final Upgrade ABILITY_FORCED_FLIGHT = new Upgrade(505, "Forced Nuptial Flights", "Royal Decree", "Allows you to force a nuptial flight by spending 1000 research points.", ROLE_BREEDER, 9000);
     // --- Buildings ---
     // -- Tier 0 --
     public static final Building ROYAL_CHAMBER_0 = new Building(1, "Basic Royal Chamber", 0, "The base queen chamber for the colony, holds 1 queen.", null, 0, 0, 0);
@@ -146,6 +147,7 @@ public final class GameUnlocks {
         upgrades.add(ROLE_BUILDER);
         upgrades.add(ROLE_BRUTE);
         upgrades.add(ROLE_BREEDER);
+        upgrades.add(ROLE_ASSISTANT);
         upgrades.add(ROLE_RESEARCHER);
         upgrades.add(ROLE_POLICE);
         upgrades.add(STAT_SKELETON);
@@ -175,6 +177,7 @@ public final class GameUnlocks {
         upgrades.add(ABILITY_BUILD);
         upgrades.add(ABILITY_SPREAD);
         upgrades.add(ABILITY_RESIN);
+        upgrades.add(ABILITY_FORCED_FLIGHT);
 
         buildings.add(ROYAL_CHAMBER_0);
         buildings.add(EGG_CHAMBER_0);

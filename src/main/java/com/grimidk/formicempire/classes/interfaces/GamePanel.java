@@ -8,6 +8,7 @@ import com.grimidk.formicempire.classes.infrasctructure.managers.AlertManager;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TriggerManager;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
+import com.grimidk.formicempire.classes.interfaces.game.dialogs.AbilitiesDialog;
 import com.grimidk.formicempire.classes.interfaces.game.dialogs.BuildDialog;
 import com.grimidk.formicempire.classes.interfaces.game.dialogs.HatchRateDialog;
 import com.grimidk.formicempire.classes.interfaces.game.dialogs.ResearchDialog;
@@ -37,6 +38,7 @@ public class GamePanel extends JPanel {
     private RoleManagementDialog roleDialog;
     private ResearchDialog researchDialog;
     private BuildDialog buildDialog;
+    private AbilitiesDialog abilitiesDialog;
 
     private AlertManager alertManager;
 
@@ -72,6 +74,7 @@ public class GamePanel extends JPanel {
         Runnable showHatchRateDialogCallback = this::showHatchRateDialog;
         Runnable showResearchDialogCallback = this::showResearchDialog;
         Runnable showBuildDialogCallback = this::showBuildDialog;
+        Runnable showAbilitiesDialogCallback = this::showAbilitiesDialog;
         ControlPanel.RoleManagementCallback showRoleManagementDialogCallback = this::showRoleManagementDialog;
         
         Runnable toggleViewCallback = () -> {
@@ -86,6 +89,7 @@ public class GamePanel extends JPanel {
                                         showResearchDialogCallback,
                                         showBuildDialogCallback,
                                         showRoleManagementDialogCallback,
+                                        showAbilitiesDialogCallback,
                                         toggleViewCallback);
     }
 
@@ -198,6 +202,20 @@ public class GamePanel extends JPanel {
              buildDialog = new BuildDialog(frame, colony);
         }
         buildDialog.showDialog();
+    }
+
+    private void showAbilitiesDialog() {
+        Engine engine = frame.getEngine();
+        Colony colony = engine != null && engine.getWorld() != null && engine.getWorld().getSpawnHex() != null ? engine.getWorld().getSpawnHex().getColony() : null;
+        if (colony == null) return;
+        if (abilitiesDialog == null || abilitiesDialog.getOwner() != frame) {
+            if (abilitiesDialog != null) abilitiesDialog.dispose();
+            abilitiesDialog = new AbilitiesDialog(frame, colony);
+        } else {
+            abilitiesDialog.dispose();
+            abilitiesDialog = new AbilitiesDialog(frame, colony);
+        }
+        abilitiesDialog.showDialog();
     }
     
     public boolean isEngineStarted() { return engineStarted; }
@@ -396,9 +414,13 @@ public class GamePanel extends JPanel {
         if (buildDialog != null && buildDialog.isShowing()) {
             buildDialog.liveUpdate();
         }
+        if (abilitiesDialog != null && abilitiesDialog.isShowing()) {
+            abilitiesDialog.liveUpdate();
+        }
         if (controlPanel != null) {
             controlPanel.updateResearchMenu(colony.hasUpgrade(GameUnlocks.ABILITY_RESEARCH));
             controlPanel.updateBuildMenu(colony.hasUpgrade(GameUnlocks.ABILITY_BUILD));
+            controlPanel.updateAbilitiesMenu(colony.hasUpgrade(GameUnlocks.ABILITY_FORCED_FLIGHT));
         }
     }
 

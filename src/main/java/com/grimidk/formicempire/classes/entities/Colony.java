@@ -658,6 +658,21 @@ public class Colony {
     public void runHerding(Biome biome) { labourService.runHerding(this, biome); }
     public void runScoutting(Biome biome) { labourService.runScoutting(this, biome); }
     
+    public void forceNuptialFlight() {
+        if (!hasUpgrade(GameUnlocks.ABILITY_FORCED_FLIGHT)) return;
+        if (this.researchPoints < 1000) return;
+        boolean hasDrones = !getDrones().isEmpty();
+        boolean hasBreeders = getPrincesses().stream().anyMatch(p -> p.getRole() == GameConstants.ROLE_BREEDER);
+        
+        if (!hasDrones || !hasBreeders) {
+             logEvent("FAILURE: Cannot force flight. Missing Drones or Breeder Princesses.");
+             return;
+        }
+
+        this.researchPoints -= 1000;
+        this.labourService.runNuptial(this);
+    }
+    
     public void runPhysics(Dimension activeDimension) { 
         physicsService.runPhysics(this, activeDimension); 
     }

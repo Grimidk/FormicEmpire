@@ -305,12 +305,21 @@ public class ColonyPanel extends JPanel {
         }
 
         boolean hasResearcher = colony.hasUpgrade(GameUnlocks.ROLE_RESEARCHER);
-        researchPointsLabel.setVisible(hasResearcher);
-        researchRateLabel.setVisible(hasResearcher);
-        if (hasResearcher) {
+        boolean hasAssistant = colony.hasUpgrade(GameUnlocks.ROLE_ASSISTANT);
+        
+        researchPointsLabel.setVisible(hasResearcher || hasAssistant);
+        researchRateLabel.setVisible(hasResearcher || hasAssistant);
+        
+        if (hasResearcher || hasAssistant) {
             researchPointsLabel.setText("Research: " + colony.getResearchPoints());
+            
             int researcherCount = colony.getAssignedRoleCount(GameConstants.ROLE_RESEARCHER);
-            int researchPerDay = researcherCount * colony.getResearchSpeed() * 24;
+            int assistantCount = colony.getAssignedRoleCount(GameConstants.ROLE_ASSISTANT);
+            int speed = colony.getResearchSpeed();
+            int hourlyQueen = researcherCount * speed;
+            int hourlyAssistant = (int) (assistantCount * (speed / 5.0)); 
+            
+            int researchPerDay = (hourlyQueen + hourlyAssistant) * 24;
             researchRateLabel.setText("Research Rate: " + researchPerDay + "/day");
         }
 

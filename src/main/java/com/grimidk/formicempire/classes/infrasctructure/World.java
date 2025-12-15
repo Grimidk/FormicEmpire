@@ -363,6 +363,12 @@ public class World {
             } else {
                 this.setTimeOfDay(GameConstants.LUNAR_ECLIPSE_TIME);
             }
+            
+            if (this.getSpawnHex() != null && this.getSpawnHex().getColony() != null) {
+                this.getSpawnHex().getColony().getLabourService().runNuptial(this.getSpawnHex().getColony());
+                this.getSpawnHex().getColony().logEvent("EVENT: The Eclipse has triggered a spontaneous Nuptial Flight!");
+            }
+            
         } else {
             this.setTimeOfDay(GameConstants.NIGHT_TIME);
         }

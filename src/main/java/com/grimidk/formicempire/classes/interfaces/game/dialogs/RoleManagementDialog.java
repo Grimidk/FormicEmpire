@@ -129,6 +129,7 @@ public class RoleManagementDialog extends JDialog {
         if (role == GameConstants.ROLE_BUILDER) return GameUnlocks.ROLE_BUILDER;
         if (role == GameConstants.ROLE_BREEDER) return GameUnlocks.ROLE_BREEDER;
         if (role == GameConstants.ROLE_RESEARCHER) return GameUnlocks.ROLE_RESEARCHER;
+        if (role == GameConstants.ROLE_ASSISTANT) return GameUnlocks.ROLE_ASSISTANT;
 
         return null; 
     }
