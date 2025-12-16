@@ -244,25 +244,25 @@ public class ColonyPopulationService {
         }
     }
     
-    public void runInfection(Colony colony) { 
+    public void runContamination(Colony colony) { 
         int deadBodyCount = colony.getDeadAnts().size();
         int baseDeaths = 0;
-        String infectionLevel = "";
+        String contaminationLevel = "";
 
         if (deadBodyCount >= 5000) {
             baseDeaths = 100;
-            infectionLevel = "Massive";
+            contaminationLevel = "Massive";
         } else if (deadBodyCount >= 1500) {
             baseDeaths = 25;
-            infectionLevel = "Medium";
+            contaminationLevel = "Medium";
         } else if (deadBodyCount >= 500) {
             baseDeaths = 5;
-            infectionLevel = "Small";
+            contaminationLevel = "Small";
         } else {
             return;
         }
 
-        float mitigation = colony.getStatsService().getInfectionMitigation(colony);
+        float mitigation = colony.getStatsService().getContaminationMitigation(colony);
         int finalDeaths = (int) (baseDeaths * mitigation);
         
         if (finalDeaths <= 0) return;
@@ -296,7 +296,7 @@ public class ColonyPopulationService {
         }
         
         if (killed > 0) {
-            colony.logEvent("INFECTION ALERT: " + killed + " ants died from a " + infectionLevel + " infection due to " + deadBodyCount + " rotting bodies!");
+            colony.logEvent("CONTAMINATION ALERT: " + killed + " ants died from a " + contaminationLevel + " contamination due to " + deadBodyCount + " rotting bodies!");
         }
     }
 

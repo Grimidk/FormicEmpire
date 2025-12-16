@@ -103,7 +103,7 @@ public class AlertManager {
 
     private void checkBodyPile() {
         if (colony.getDeadAnts().size() >= 500) {
-            addAlert("DEAD", "Infection risk, too many bodies: " + colony.getDeadAnts().size(), COL_BLACK, 5000);
+            addAlert("DEAD", "Contamination risk, too many bodies: " + colony.getDeadAnts().size(), COL_BLACK, 5000);
         }
     }
 }

@@ -651,7 +651,7 @@ public class Colony {
     public void runGraveKeeping() { labourService.runGraveKeeping(this); }
     public void runResearch() { labourService.runResearch(this); }
     public void runBuilding() { labourService.runBuilding(this); }
-    public void runInfection() { populationService.runInfection(this); }
+    public void runContamination() { populationService.runContamination(this); }
     public void runCollecting() { labourService.runCollecting(this); }
     public void runConverting() { labourService.runConverting(this); }
     public void runRanching() { labourService.runRanching(this); }
@@ -701,7 +701,7 @@ public class Colony {
         this.runGraveKeeping();
         this.runHerding(biome); 
         this.runScoutting(biome);
-        this.runInfection(); 
+        this.runContamination(); 
         this.runComposting();
     }
 

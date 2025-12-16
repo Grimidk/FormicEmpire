@@ -527,10 +527,7 @@ public class ColonyLabourService {
         if (!colony.hasBuilding(GameUnlocks.BUILDING_COMPOSTER)) return;
         
         List<Ant> deadAnts = colony.getDeadAnts();
-        int totalDead = deadAnts.size();
-        if (totalDead == 0) return;
-        
-        int toCompost = (int) (totalDead * 0.10);
+        int toCompost = deadAnts.size();
         if (toCompost == 0) return;
         
         List<Ant> antsToRemove = new ArrayList<>();

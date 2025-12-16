@@ -74,9 +74,9 @@ public final class GameUnlocks {
     public static final Upgrade STAT_FARMING_1 = new Upgrade(121, "Improved Farming", "Fertilizers", "Increases farming conversion rate by 0.1 per minute.", ROLE_FARMER, 4500);
     public static final Upgrade STAT_FARMING_2 = new Upgrade(122, "Advanced Farming", "Pesticides", "Increases farming conversion rate by another 0.2 per minute.", STAT_FARMING_1, 16000);
     public static final Upgrade STAT_FARMING_3 = new Upgrade(123, "Perfected Farming", "Genetic Modification", "Increases farming conversion rate by another 0.4 per minute.", STAT_FARMING_2, 60000);
-    public static final Upgrade STAT_INFECTION_1 = new Upgrade(124, "Improved Hygiene", "Body Disposal", "Reduces infection death rate by 20%.", ROLE_GRAVER, 2000);
-    public static final Upgrade STAT_INFECTION_2 = new Upgrade(125, "Advanced Hygiene", "Clean Environment", "Reduces infection death rate by 40%.", STAT_INFECTION_1, 8000);
-    public static final Upgrade STAT_INFECTION_3 = new Upgrade(126, "Perfected Hygiene", "Isolation Protocols", "Reduces infection death rate by 60%.", STAT_INFECTION_2, 25000);
+    public static final Upgrade STAT_CONTAMINATION_1 = new Upgrade(124, "Improved Hygiene", "Body Disposal", "Reduces contamination death rate by 20%.", ROLE_GRAVER, 2000);
+    public static final Upgrade STAT_CONTAMINATION_2 = new Upgrade(125, "Advanced Hygiene", "Clean Environment", "Reduces contamination death rate by 40%.", STAT_CONTAMINATION_1, 8000);
+    public static final Upgrade STAT_CONTAMINATION_3 = new Upgrade(126, "Perfected Hygiene", "Isolation Protocols", "Reduces contamination death rate by 60%.", STAT_CONTAMINATION_2, 25000);
 
     // -- Abilities --
     public static final Upgrade ABILITY_RESEARCH = new Upgrade(201, "Research", "Micro Microscopes", "Allows you to research more ant technology by using research points, go to the research menu (Y).", ROLE_RESEARCHER, 0 );
@@ -125,7 +125,7 @@ public final class GameUnlocks {
     public static final Building PASSIVE_NURSE = new Building(104, "Passive Nursery", 0, "Enables passive baby care even if there are no ants assigned, simulates 1 nurse.", EGG_CHAMBER_1, 150, 0, 700);
     public static final Building PASSIVE_FARM = new Building(105, "Passive Farm", 0, "Enables passive farming even if there are no ants assigned, simulates 1 farmer.", MUSHROOM_CHAMBER_1, 200, 0, 900);
     public static final Building PASSIVE_GRAVE = new Building(106, "Passive Graveyard", 0, "Enables passive grave keeping even if there are no ants assigned, simulates 1 graver.", MEAT_CHAMBER_1, 150, 0, 600);
-    public static final Building BUILDING_COMPOSTER = new Building(107, "Composter", 0, "Turns 10% of dead bodies into mushrooms daily. 1 body to 4 mushrooms matter.", PASSIVE_GRAVE, 500, 0, 1000);
+    public static final Building BUILDING_COMPOSTER = new Building(107, "Composter", 0, "Turns dead bodies into mushrooms daily. 1 body to 4 mushrooms matter.", PASSIVE_GRAVE, 500, 0, 1000);
 
     // --- Synergies ---
 
@@ -179,9 +179,9 @@ public final class GameUnlocks {
         upgrades.add(STAT_FARMING_1);
         upgrades.add(STAT_FARMING_2);
         upgrades.add(STAT_FARMING_3);
-        upgrades.add(STAT_INFECTION_1);
-        upgrades.add(STAT_INFECTION_2);
-        upgrades.add(STAT_INFECTION_3);
+        upgrades.add(STAT_CONTAMINATION_1);
+        upgrades.add(STAT_CONTAMINATION_2);
+        upgrades.add(STAT_CONTAMINATION_3);
         upgrades.add(ABILITY_RESEARCH);
         upgrades.add(ABILITY_BUILD);
         upgrades.add(ABILITY_SPREAD);
