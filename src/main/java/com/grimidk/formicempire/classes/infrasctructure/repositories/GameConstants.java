@@ -189,7 +189,9 @@ public final class GameConstants {
     public static final BugType TYPE_ANT = new BugType(1, "Ant", 1, 1, 1, 1, 1, 1,
         loadIcon("icons/ants/worker.png"), loadIcon("sprites/ants/worker.png"));
     public static final BugType TYPE_APHID = new BugType(2, "Aphid", 1, 1, 0, 0, 5, 0.5f,
-        loadIcon("icons/misc/aphid.png") , loadIcon("sprites/pets/aphid.png"));
+        loadIcon("icons/bugs/aphid.png") , loadIcon("sprites/bugs/aphid.png"));
+    public static final BugType TYPE_PARASITE = new BugType(3, "Ant Parasite", 1, 1, 0, 0, 1, 1,
+        loadIcon("icons/bugs/parasite.png") , loadIcon("sprites/bugs/parasite.png"));
 
     // --- Ant Types ---
     public static final AntType TYPE_EGG = new AntType(1, "Egg", 1f, 0f, 0f, 0f, 0f, 0f, 0f,

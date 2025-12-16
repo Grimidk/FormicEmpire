@@ -35,7 +35,7 @@ public final class GameUnlocks {
     public static final Upgrade ROLE_GUARD = new Upgrade(20, "Guard Role", "Ant Bouncers", "", TYPE_SOLDIER, 0 );
     public static final Upgrade ROLE_WARRIOR = new Upgrade(21, "Warrior Role", "Phalanx Formation", "", TYPE_SOLDIER, 0 );
     public static final Upgrade ROLE_DEFENDER = new Upgrade(22, "Defender Role", "Royal Shield", "", TYPE_SOLDIER, 0 );
-    public static final Upgrade ROLE_POLICE = new Upgrade(23, "Parasite-Police Role", "Police Brutality", "Allows soldiers to detect parasitic bugs disguising as your ants, each one can check 10 ants per day.", TYPE_SOLDIER, 0 ); 
+    public static final Upgrade ROLE_POLICE = new Upgrade(23, "Parasite-Police Role", "Police Brutality", "Allows soldiers to detect parasitic bugs disguising as your ants, each one has a 10% chance to detect parasites per day.", TYPE_SOLDIER, 0 ); 
     public static final Upgrade ROLE_BOMBER = new Upgrade(24, "Bomber Role", "Explosive Finish", "", TYPE_SOLDIER, 0 );
     public static final Upgrade ROLE_BRUTE = new Upgrade(25, "Brute Role", "Heavy Trooper", "Allows majors to become massive menaces in battle.", TYPE_MAJOR, 0 );
     public static final Upgrade ROLE_CARRIER = new Upgrade(26, "Carrier Role", "Troop Transport", "", TYPE_MAJOR, 0 );
@@ -77,6 +77,12 @@ public final class GameUnlocks {
     public static final Upgrade STAT_CONTAMINATION_1 = new Upgrade(124, "Improved Hygiene", "Body Disposal", "Reduces contamination death rate by 20%.", ROLE_GRAVER, 2000);
     public static final Upgrade STAT_CONTAMINATION_2 = new Upgrade(125, "Advanced Hygiene", "Clean Environment", "Reduces contamination death rate by 40%.", STAT_CONTAMINATION_1, 8000);
     public static final Upgrade STAT_CONTAMINATION_3 = new Upgrade(126, "Perfected Hygiene", "Isolation Protocols", "Reduces contamination death rate by 60%.", STAT_CONTAMINATION_2, 25000);
+    public static final Upgrade STAT_GRAVING_1 = new Upgrade(127, "Improved Graving", "Shallow Graves", "Increases graving rate by 5 per day.", ROLE_GRAVER, 1500);
+    public static final Upgrade STAT_GRAVING_2 = new Upgrade(128, "Advanced Graving", "Mass Graves", "Increases graving rate by anoter 6 per day.", STAT_GRAVING_1, 6500);
+    public static final Upgrade STAT_GRAVING_3 = new Upgrade(129, "Perfected Graving", "Structured Graveyard", "Increases graving rate by anoter 8 per day.", STAT_GRAVING_2, 40000);
+    public static final Upgrade STAT_POLICING_1 = new Upgrade(130, "Improved Policing", "Profiling", "Increases policing rate to 20% per day.", ROLE_POLICE, 3000);
+    public static final Upgrade STAT_POLICING_2 = new Upgrade(131, "Advanced Policing", "Police Database", "Increases policing rate to 35% per day.", STAT_POLICING_1, 14000);
+    public static final Upgrade STAT_POLICING_3 = new Upgrade(132, "Perfected Policing", "Surveillance Drones", "Increases policing rate to 55% per day.", STAT_POLICING_2, 42000);
 
     // -- Abilities --
     public static final Upgrade ABILITY_RESEARCH = new Upgrade(201, "Research", "Micro Microscopes", "Allows you to research more ant technology by using research points, go to the research menu (Y).", ROLE_RESEARCHER, 0 );
@@ -182,6 +188,12 @@ public final class GameUnlocks {
         upgrades.add(STAT_CONTAMINATION_1);
         upgrades.add(STAT_CONTAMINATION_2);
         upgrades.add(STAT_CONTAMINATION_3);
+        upgrades.add(STAT_GRAVING_1);
+        upgrades.add(STAT_GRAVING_2);
+        upgrades.add(STAT_GRAVING_3);
+        upgrades.add(STAT_POLICING_1);
+        upgrades.add(STAT_POLICING_2);
+        upgrades.add(STAT_POLICING_3);
         upgrades.add(ABILITY_RESEARCH);
         upgrades.add(ABILITY_BUILD);
         upgrades.add(ABILITY_SPREAD);

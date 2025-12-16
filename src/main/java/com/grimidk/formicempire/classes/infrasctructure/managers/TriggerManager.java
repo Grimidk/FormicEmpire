@@ -63,6 +63,7 @@ public class TriggerManager {
     // --- Trigger Check Methods ---
     private void checkMonthlyTriggers() {
         checkResearchRoleUnlock();
+        checkPoliceRoleUnlock();
     }
     
     private void checkDailyTriggers() {
@@ -187,13 +188,23 @@ public class TriggerManager {
                 if (source.getResourceType() == GameConstants.PLANT_RESOURCE && source.getInitialQuantity() == 10000) {
                     int collected = source.getInitialQuantity() - source.getQuantity();
                     if (collected >= 6000) {
-                         fireTrigger(GameUnlocks.ROLE_SCOUT, 
-                                     "Adventure's Call", 
-                                     "We have depleted more than half of our main plant source! Our workers feel the need to explore for new lands, unlocking the Scout role!");
+                        fireTrigger(GameUnlocks.ROLE_SCOUT, 
+                                    "Adventure's Call", 
+                                    "We have depleted more than half of our main plant source! Our workers feel the need to explore for new lands, unlocking the Scout role!");
                     }
                     break; 
                 }
             }
+        }
+    }
+
+    private void checkPoliceRoleUnlock() {
+        if (colony.hasUpgrade(GameUnlocks.ROLE_POLICE)) return;
+        
+        if (colony.getRank().getPopulation() >= 1000) {
+            fireTrigger(GameUnlocks.ROLE_SCOUT, 
+                "Adventure's Call", 
+                "The colony has become so prosperous that parasitic ants may infiltrate it!");
         }
     }
     

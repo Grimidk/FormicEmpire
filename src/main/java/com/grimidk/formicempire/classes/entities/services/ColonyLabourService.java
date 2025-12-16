@@ -337,6 +337,10 @@ public class ColonyLabourService {
         // Placeholder
     }
 
+    public void runParasiting(Colony colony){
+        // Placeholder
+    }
+
     public void runScoutting(Colony colony, Biome biome) {
         if (!colony.hasUpgrade(GameUnlocks.ROLE_SCOUT)) return;
 

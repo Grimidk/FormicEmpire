@@ -98,7 +98,10 @@ public class ColonyStatsService {
         } else {return 0;}
     }
     public float getConversionRate(Colony colony) {
-        if (colony.hasUpgrade(GameUnlocks.ROLE_FARMER)) {return 0.1f;
+        if (colony.hasUpgrade(GameUnlocks.STAT_FARMING_3)) {return 0.8f;
+        } else if (colony.hasUpgrade(GameUnlocks.STAT_FARMING_2)) {return 0.4f;
+        } else if (colony.hasUpgrade(GameUnlocks.STAT_FARMING_1)) {return 0.2f;
+        } else if (colony.hasUpgrade(GameUnlocks.ROLE_FARMER)) {return 0.1f;
         } else {return 0;}
     }
     public float getNursingRate(Colony colony) {
@@ -106,7 +109,10 @@ public class ColonyStatsService {
         } else {return 0;}
     }
     public float getGravingRate(Colony colony) {
-        if (colony.hasUpgrade(GameUnlocks.ROLE_GRAVER)) {return 5f;
+        if (colony.hasUpgrade(GameUnlocks.STAT_GRAVING_3)) {return 24f;
+        } else if (colony.hasUpgrade(GameUnlocks.STAT_GRAVING_2)) {return 16f;
+        } else if (colony.hasUpgrade(GameUnlocks.STAT_GRAVING_1)) {return 10f;
+        } else if (colony.hasUpgrade(GameUnlocks.ROLE_GRAVER)) {return 5f;
         } else {return 0;}
     }
     public float getCollectingRate(Colony colony) {
@@ -114,7 +120,10 @@ public class ColonyStatsService {
         } else {return 0;}
     }
     public float getParasiteDetection(Colony colony) {
-        if (colony.hasUpgrade(GameUnlocks.ROLE_POLICE)) {return 10f;
+        if (colony.hasUpgrade(GameUnlocks.STAT_POLICING_3)) {return 0.55f;
+        } else if (colony.hasUpgrade(GameUnlocks.STAT_POLICING_2)) {return 0.35f;
+        } else if (colony.hasUpgrade(GameUnlocks.STAT_POLICING_1)) {return 0.2f;
+        } else if (colony.hasUpgrade(GameUnlocks.ROLE_POLICE)) {return 0.1f;
         } else {return 0;}
     }
     public float getScoutingRate(Colony colony) {
