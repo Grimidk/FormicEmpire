@@ -202,8 +202,8 @@ public class TriggerManager {
         if (colony.hasUpgrade(GameUnlocks.ROLE_POLICE)) return;
         
         if (colony.getRank().getPopulation() >= 1000) {
-            fireTrigger(GameUnlocks.ROLE_SCOUT, 
-                "Adventure's Call", 
+            fireTrigger(GameUnlocks.ROLE_POLICE, 
+                "Parasitic Infestation", 
                 "The colony has become so prosperous that parasitic ants may infiltrate it!");
         }
     }

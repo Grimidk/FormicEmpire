@@ -12,6 +12,7 @@ import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.entities.Ant;
+import com.grimidk.formicempire.classes.entities.Bug;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
@@ -282,7 +283,7 @@ public class ColonyLabourService {
         float nursingRate = stats.getNursingRate(colony);
         
         for (Ant nurse : nurses) {
-            nurse.clearLoad(); // Reset
+            nurse.clearLoad();
             if (babyAntTotal > 0 && Math.random() < 0.30) {
                 double r = Math.random();
                 if (r < 0.33) nurse.setCarryingAnt(GameConstants.TYPE_EGG);
@@ -334,11 +335,42 @@ public class ColonyLabourService {
     }
 
     public void runPolicing(Colony colony) {
-        // Placeholder
-    }
+        if (!colony.hasUpgrade(GameUnlocks.ROLE_POLICE)) return;
+        
+        int parasiteCount = colony.getParasiteCount();
+        if (parasiteCount == 0) return;
+        
+        List<Ant> police = getWorkingAnts(colony, GameConstants.ROLE_POLICE);
+        if (police.isEmpty()) return;
+        
+        float detectionRate = colony.getStatsService().getParasiteDetection(colony);
+        int parasitesKilled = 0;
+        
+        List<Bug> parasites = new ArrayList<>();
+        for (Bug b : colony.getBugs()) {
+            if (b.getBugType() == GameConstants.TYPE_PARASITE) {
+                parasites.add(b);
+            }
+        }
 
-    public void runParasiting(Colony colony){
-        // Placeholder
+        for (Ant officer : police) {
+            if (parasites.isEmpty()) break;
+            
+            if (random.nextFloat() < detectionRate) {
+                Bug caughtParasite = parasites.remove(0);
+                colony.getBugs().remove(caughtParasite); 
+                
+                int currentProtein = colony.getProtein();
+                int maxProtein = colony.getStatsService().getProteinCapacity(colony);
+                colony.setProtein(Math.min(currentProtein + 4, maxProtein));
+                
+                parasitesKilled++;
+            }
+        }
+        
+        if (parasitesKilled > 0) {
+            colony.logEvent("POLICE: Eliminated " + parasitesKilled + " parasites.");
+        }
     }
 
     public void runScoutting(Colony colony, Biome biome) {

@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.interfaces.game.panels;
 
 import com.grimidk.formicempire.classes.constants.ant.AntType;
+import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Bug;
 import com.grimidk.formicempire.classes.entities.Colony;
@@ -332,9 +333,10 @@ public class GameAreaPanel extends JPanel {
                 g2d.rotate(Math.toRadians(ant.getR()));
                 g2d.drawImage(sprite, -w / 2, -h / 2, this);
                 
-                if (ant.getCarrying() != null && ant.getCarrying().getIcon() != null) {
+                ResourceType carried = ant.getCarrying();
+                if (carried != null && carried.getIcon() != null) {
                     g2d.rotate(Math.toRadians(-ant.getR())); 
-                    Image resourceIcon = ant.getCarrying().getIcon().getImage();
+                    Image resourceIcon = carried.getIcon().getImage();
                     
                     if (resourceIcon != null) {
                         int iconW = 20; 
@@ -342,8 +344,9 @@ public class GameAreaPanel extends JPanel {
                         
                         g2d.drawImage(resourceIcon, -iconW/2, -h/2 - iconH, iconW, iconH, this);
                         
-                        if (ant.getCarryingSec() != null && ant.getCarryingSec().getIcon() != null) {
-                            Image secIcon = ant.getCarryingSec().getIcon().getImage();
+                        ResourceType carriedSec = ant.getCarryingSec();
+                        if (carriedSec != null && carriedSec.getIcon() != null) {
+                            Image secIcon = carriedSec.getIcon().getImage();
                             if (secIcon != null) {
                                 g2d.drawImage(secIcon, -iconW/2 + 10, -h/2 - iconH + 5, iconW, iconH, this);
                             }

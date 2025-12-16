@@ -36,7 +36,7 @@ public final class GameConstants {
     }
 
     // --- Misc Icons ---
-    public static final ImageIcon ICON_APHID = loadIcon("icons/misc/aphid.png");
+    public static final ImageIcon ICON_APHID = loadIcon("icons/bugs/aphid.png");
     public static final ImageIcon ICON_RESEARCH = loadIcon("icons/misc/research.png");
     
     // --- Temperatures ---

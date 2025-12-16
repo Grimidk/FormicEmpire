@@ -384,6 +384,35 @@ public class Colony {
     
     public List<Bug> getBugs() { return bugs; }
     
+    public int getParasiteCount() {
+        int count = 0;
+        for (Bug b : bugs) {
+            if (b.getBugType() == GameConstants.TYPE_PARASITE) {
+                count++;
+            }
+        }
+        return count;
+    }
+    
+    public String getParasiteCountDisplay() {
+        if (!hasUpgrade(GameUnlocks.ROLE_POLICE)) {
+            return "???";
+        }
+        int actual = getParasiteCount();
+        if (actual == 0) return "~ 0";
+        
+        double fuzz = Math.random() * 0.2; 
+        boolean up = Math.random() > 0.5;
+        
+        int display = actual;
+        if (up) display += (int)(actual * fuzz);
+        else display -= (int)(actual * fuzz);
+        
+        if (display < 0) display = 0;
+        
+        return "~ " + display;
+    }
+    
     public int getAntTotal() {
         return antGroups.values().stream().mapToInt(List::size).sum();
     }
@@ -658,7 +687,9 @@ public class Colony {
     public void runHerding(Biome biome) { labourService.runHerding(this, biome); }
     public void runScoutting(Biome biome) { labourService.runScoutting(this, biome); }
     public void runComposting() { labourService.runComposting(this); }
-    
+    public void runParasitation() { populationService.runParasitation(this); }
+    public void runPolicing() { labourService.runPolicing(this); }
+
     public void forceNuptialFlight() {
         if (!hasUpgrade(GameUnlocks.ABILITY_FORCED_FLIGHT)) return;
         if (this.researchPoints < 1000) return;
@@ -703,9 +734,11 @@ public class Colony {
         this.runScoutting(biome);
         this.runContamination(); 
         this.runComposting();
+        this.runPolicing(); 
     }
 
     public void runMonthlyJobs() { 
+        this.runParasitation();
     }
 
     public void runYearlyJobs() {

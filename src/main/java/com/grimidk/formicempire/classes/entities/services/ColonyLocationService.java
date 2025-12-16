@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -36,7 +37,7 @@ public class ColonyLocationService {
     private final List<ResourceSource> discoveredSources;
 
     public ColonyLocationService() {
-        this.discoveredSources = new ArrayList<>();
+        this.discoveredSources = new CopyOnWriteArrayList<>();
     }
 
     // --- Resource Source Management ---
@@ -118,7 +119,7 @@ public class ColonyLocationService {
         double minDistance = Double.MAX_VALUE;
 
         for (ResourceSource source : discoveredSources) {
-            if (source.getQuantity() <= 0) continue;
+            if (source == null || source.getQuantity() <= 0) continue;
 
             if (targetTypes.contains(source.getResourceType())) {
                 double dist = Math.pow(source.getX() - ant.getX(), 2) + Math.pow(source.getY() - ant.getY(), 2);

@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.entities.services;
 
 import com.grimidk.formicempire.classes.entities.Ant;
+import com.grimidk.formicempire.classes.entities.Bug;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
@@ -16,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Random;
+import java.awt.Point;
+import java.awt.Rectangle;
 
 public class ColonyPopulationService {
     
@@ -202,6 +205,18 @@ public class ColonyPopulationService {
                 }
             }
         }
+
+        // --- Parasite Consumption ---
+        int parasiteCount = colony.getParasiteCount();
+        if (parasiteCount > 0) {
+            int parasiteConsumption = parasiteCount * 1; 
+            if (mushroomsAvailable >= parasiteConsumption) {
+                mushroomsAvailable -= parasiteConsumption;
+            } else {
+                mushroomsAvailable = 0;
+            }
+        }
+
         colony.setMushrooms(mushroomsAvailable);
         
         // --- Syrup Phase ---
@@ -298,6 +313,33 @@ public class ColonyPopulationService {
         if (killed > 0) {
             colony.logEvent("CONTAMINATION ALERT: " + killed + " ants died from a " + contaminationLevel + " contamination due to " + deadBodyCount + " rotting bodies!");
         }
+    }
+
+    public void runParasitation(Colony colony) {
+        if (colony.getAntTotal() < 1000) return;
+        
+        int spawnAmount = Math.max(10, (int)(colony.getAntTotal() * 0.01));
+        int existingParasites = colony.getParasiteCount();
+
+        if (existingParasites > 0) {
+            spawnAmount += (int)(existingParasites * 0.50);
+        }
+        
+        if (spawnAmount <= 0) return;
+        
+        Rectangle spawnArea = colony.getStorageBounds(); 
+        if (spawnArea == null) spawnArea = new Rectangle(0, 0, 100, 100);
+
+        for (int i = 0; i < spawnAmount; i++) {
+            Bug parasite = new Bug(GameConstants.TYPE_PARASITE);
+            if (colony.getPhysicsService() != null) {
+                Point spawnPos = colony.getPhysicsService().getSpecificRoomPoint(colony, spawnArea);
+                parasite.setPosition(spawnPos);
+            }
+            colony.getBugs().add(parasite);
+        }
+        
+        colony.logEvent("ALERT: A parasitic infestation has spread! " + spawnAmount + " new parasites detected.");
     }
 
     public void rankUp(Colony colony) {

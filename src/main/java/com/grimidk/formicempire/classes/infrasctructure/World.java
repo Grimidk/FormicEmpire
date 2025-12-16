@@ -406,6 +406,10 @@ public class World {
     public void runMonth() {
         this.month++;
 
+        if (this.getSpawnHex() != null) {
+            this.getSpawnHex().getColony().runMonthlyJobs();
+        }
+
         if (this.month >= 1 && this.month < 4) {
             this.setSeason(GameConstants.SPRING_SEASON);
         } else if (this.month >= 4 && this.month < 7) {
@@ -442,6 +446,7 @@ public class World {
 
     public void runYear() {
         this.year++;
+
         if (this.getSpawnHex() != null) {
             this.getSpawnHex().getColony().runYearlyJobs();
         }

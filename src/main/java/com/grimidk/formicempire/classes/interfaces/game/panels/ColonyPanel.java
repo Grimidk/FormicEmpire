@@ -46,6 +46,8 @@ public class ColonyPanel extends JPanel {
     private final JLabel nurseCoverageLabel = new JLabel("Nurse Coverage: 0/0");
     private final JLabel graveKeepingLabel = new JLabel("Grave Cleaning: 0/0");
     private final JLabel aphidCountLabel = new JLabel("Aphids: 0/0");
+    private final JLabel parasiteCountLabel = new JLabel("Parasites: ???"); 
+    private final JLabel policeStatsLabel = new JLabel("Policing: 0"); 
     private final JLabel researchPointsLabel = new JLabel("Research: 0");
     private final JLabel researchRateLabel = new JLabel("Research Rate: 0/day");
     private final JLabel babyAntsLabel = new JLabel("Baby Ants: 0");
@@ -88,6 +90,8 @@ public class ColonyPanel extends JPanel {
         nurseCoverageLabel.setVisible(false);
         graveKeepingLabel.setVisible(false);
         aphidCountLabel.setVisible(false);
+        parasiteCountLabel.setVisible(false);
+        policeStatsLabel.setVisible(false);
         researchPointsLabel.setVisible(false);
         researchRateLabel.setVisible(false);
     }
@@ -128,6 +132,12 @@ public class ColonyPanel extends JPanel {
         aphidCountLabel.setIcon(GameConstants.ICON_APHID);
         aphidCountLabel.setToolTipText("Aphids");
         
+        parasiteCountLabel.setIcon(GameConstants.TYPE_PARASITE.getIcon());
+        parasiteCountLabel.setToolTipText("Parasites in Colony");
+        
+        policeStatsLabel.setIcon(GameConstants.TYPE_SOLDIER.getIcon());
+        policeStatsLabel.setToolTipText("Policing Efficency");
+
         researchPointsLabel.setIcon(GameConstants.ICON_RESEARCH);
         researchPointsLabel.setToolTipText("Research Points");
     }
@@ -195,6 +205,8 @@ public class ColonyPanel extends JPanel {
         panel.add(nurseCoverageLabel);
         panel.add(graveKeepingLabel);
         panel.add(aphidCountLabel);
+        panel.add(parasiteCountLabel);
+        panel.add(policeStatsLabel);
         panel.add(researchPointsLabel);
         panel.add(researchRateLabel);
         panel.add(babyAntsLabel);
@@ -385,6 +397,18 @@ public class ColonyPanel extends JPanel {
             int rancherCount = colony.getAssignedRoleCount(GameConstants.ROLE_RANCHER);
             int maxSustainableAphids = colony.getAphidCapacity() * rancherCount;
             aphidCountLabel.setText(String.format("Aphids: %d/%d", colony.getAphids(), maxSustainableAphids));
+        }
+        
+        boolean hasPolice = colony.hasUpgrade(GameUnlocks.ROLE_POLICE);
+        parasiteCountLabel.setVisible(hasPolice);
+        policeStatsLabel.setVisible(hasPolice);
+        
+        if (hasPolice) {
+            parasiteCountLabel.setText("Parasites: " + colony.getParasiteCountDisplay());
+            
+            float detection = colony.getStatsService().getParasiteDetection(colony) * 100f;
+            int policeCount = colony.getAssignedRoleCount(GameConstants.ROLE_POLICE);
+            policeStatsLabel.setText(String.format("%d detections per day", Math.round(policeCount * detection)));
         }
         
         int eggs = colony.getEggs() != null ? colony.getEggs().size() : 0;
