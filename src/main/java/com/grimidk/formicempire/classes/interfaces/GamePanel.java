@@ -110,37 +110,35 @@ public class GamePanel extends JPanel {
         return north;
     }
 
-    private JPanel createCenterPanel() {
+   private JPanel createCenterPanel() {
         JPanel center = new JPanel(new GridBagLayout());
         
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.gridy = 0;
         gbc.weighty = 1.0; 
+        gbc.fill = GridBagConstraints.BOTH;
 
-        // Colony Panel (Left)
+        // --- Colony Panel (Left) ---
+        colonyPanel.setPreferredSize(new Dimension(200, 0));
         gbc.gridx = 0;
-        gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.weightx = 0.0; 
-        gbc.fill = GridBagConstraints.VERTICAL; 
         center.add(colonyPanel, gbc);
 
-        // Game Area (Middle)
+        // --- Game Area (Middle) ---
         gbc.gridx = 1;
-        gbc.weightx = 1.0;
-        gbc.fill = GridBagConstraints.BOTH; 
+        gbc.weightx = 0.6; 
         center.add(gameAreaPanel, gbc); 
 
-        // Right Panel Container (World + Alert)
+        // --- Right Panel Container (World + Alert) ---
         JPanel rightPanel = new JPanel(new BorderLayout());
         rightPanel.setOpaque(false);
+        rightPanel.setPreferredSize(new Dimension(230, 0));
         rightPanel.add(worldPanel, BorderLayout.NORTH);
         rightPanel.add(alertPanel, BorderLayout.CENTER); 
 
         gbc.gridx = 2;
-        gbc.anchor = GridBagConstraints.NORTHEAST; 
-        gbc.weightx = 0.0; 
-        gbc.fill = GridBagConstraints.VERTICAL; 
+        gbc.weightx = 0.0;
         center.add(rightPanel, gbc);
         
         return center;

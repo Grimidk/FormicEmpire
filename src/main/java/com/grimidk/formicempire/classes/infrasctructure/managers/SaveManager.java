@@ -363,6 +363,7 @@ public class SaveManager {
                     
                     // --- New Stats ---
                     save.setAphids(c.getAphids());
+                    save.setParasites(c.getParasiteCount());
                     save.setResearchPoints(c.getResearchPoints());
                     save.setTotalDeaths(c.getDeadAnts() != null ? c.getDeadAnts().size() : 0);
                     
@@ -460,6 +461,7 @@ public class SaveManager {
 
         // New Stats
         writeJsonLine(w, "aphids", s.getAphids(), false);
+        writeJsonLine(w, "parasites", s.getParasites(), false);
         writeJsonLine(w, "researchPoints", s.getResearchPoints(), false);
         writeJsonLine(w, "totalDeaths", s.getTotalDeaths(), false);
 
@@ -577,6 +579,7 @@ public class SaveManager {
             
             // New Stats
             s.setAphids(Integer.parseInt(m.getOrDefault("aphids", "0")));
+            s.setParasites(Integer.parseInt(m.getOrDefault("parasites", "0")));
             s.setResearchPoints(Integer.parseInt(m.getOrDefault("researchPoints", "0")));
             s.setTotalDeaths(Integer.parseInt(m.getOrDefault("totalDeaths", "0")));
 

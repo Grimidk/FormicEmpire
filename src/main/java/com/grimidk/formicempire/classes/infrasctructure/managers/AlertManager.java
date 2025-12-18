@@ -36,11 +36,15 @@ public class AlertManager {
         List<String> events = colony.consumeEvents();
         for (String msg : events) {
             if (msg.startsWith("CRITICAL")) {
-                addAlert("CRIT", msg.replace("CRITICAL: ", ""), COL_BLACK, 30000);
+                String shortMsg = msg.replace("CRITICAL: ", "").replace(" new Queens joined", " Queens In");
+                addAlert("CRIT", shortMsg, COL_BLACK, 30000);
             } else if (msg.startsWith("SUCCESS")) {
-                addAlert("SUCC", msg.replace("SUCCESS: ", ""), COL_BLACK, 15000);
+                addAlert("SUCC", msg.replace("SUCCESS: ", "Built: "), COL_BLACK, 15000);
             } else if (msg.startsWith("WARNING")) {
-                addAlert("WARN", msg.replace("WARNING: ", ""), COL_BLACK, 20000);
+                String shortWarn = msg.replace("WARNING: ", "").replace(" Juveniles Died (Nursing)", " Babies Lost");
+                addAlert("WARN", shortWarn, COL_BLACK, 20000);
+            } else if (msg.startsWith("COMPOST")) {
+                addAlert("COMP", "Bio-Recycling Active", Color.BLACK, 10000);
             } else {
                 addAlert("INFO", msg, Color.BLACK, 10000);
             }
@@ -49,7 +53,6 @@ public class AlertManager {
         checkResourceWarning();
         checkAvailableResearch();
         checkAvailableBuildings();
-        checkUnassignedAnts();
         checkBodyPile();
 
         SwingUtilities.invokeLater(() -> panel.updateAlerts(new ArrayList<>(activeAlerts)));
@@ -63,26 +66,19 @@ public class AlertManager {
     private void checkResourceWarning() {
         int production = colony.getTotalProduction();
         int consumption = colony.getTotalConsumption();
-        
         if (consumption > production && colony.getMushrooms() < consumption * 24) {
-            addAlert("STARVE", "Starvation Risk", COL_BLACK, 5000);
+            addAlert("STARVE", "Starvation Risk!", COL_BLACK, 5000);
         }
     }
 
-    private void checkUnassignedAnts() {
-        // if (colony.getUnassignedAnts >= 0) {
-        //      addAlert("JOBS", "There are unassigned ants: " + colony.getUnassignedAnts, COL_BLACK, 5000);
-        // }
-    }
-    
     private void checkAvailableResearch() {
         if (!colony.hasUpgrade(GameUnlocks.ABILITY_RESEARCH)) return;
         for (Upgrade u : GameUnlocks.getUpgrades()) {
-            if (!colony.hasUpgrade(u)) {         
-                if (( u.getCost() > 0) && (u.getRequirement() == null || colony.hasUpgrade(u.getRequirement())) && (colony.getResearchPoints() >= u.getCost()) ) {
-                    addAlert("RESEARCH", "Research Available", COL_BLACK, 5000);
-                    return; 
-                }
+            if (!colony.hasUpgrade(u) && u.getCost() > 0 && 
+               (u.getRequirement() == null || colony.hasUpgrade(u.getRequirement())) && 
+               colony.getResearchPoints() >= u.getCost()) {
+                addAlert("RESEARCH", "New Research Available", COL_BLACK, 5000);
+                return; 
             }
         }
     }
@@ -92,18 +88,18 @@ public class AlertManager {
         if (colony.getCurrentBuildingProject() != null) return; 
 
         for (Building b : GameUnlocks.getBuildings()) {
-            if (!colony.hasBuilding(b)) {
-                if (colony.getMinerals() >= b.getMineralCost() && colony.getResins() >= b.getResinCost() && colony.hasBuilding(b.getRequirement())) {
-                    addAlert("BUILD", "Can Build: " + b.getName(), COL_BLACK, 5000);
-                    return; 
-                }
+            if (!colony.hasBuilding(b) && colony.getMinerals() >= b.getMineralCost() && 
+                colony.getResins() >= b.getResinCost() && colony.hasBuilding(b.getRequirement())) {
+                addAlert("BUILD", "Can Build: " + b.getName(), COL_BLACK, 5000);
+                return; 
             }
         }
     }
 
     private void checkBodyPile() {
-        if (colony.getDeadAnts().size() >= 500) {
-            addAlert("DEAD", "Contamination risk, too many bodies: " + colony.getDeadAnts().size(), COL_BLACK, 5000);
+        int deadCount = colony.getDeadAnts().size();
+        if (deadCount >= 500) {
+            addAlert("DEAD", "Body Pile High: " + deadCount, COL_BLACK, 5000);
         }
     }
 }

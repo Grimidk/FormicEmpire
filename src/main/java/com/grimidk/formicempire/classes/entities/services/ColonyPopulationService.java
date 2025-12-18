@@ -255,7 +255,7 @@ public class ColonyPopulationService {
         }
 
         if (antsToKill.size() > 0) {
-            colony.logEvent("WARNING: " + antsToKill.size() + " Ants Died (Starvation/Dehydration)");
+            colony.logEvent(antsToKill.size() + " Ants Died (Starvation/Dehydration)");
         }
     }
     
@@ -311,7 +311,7 @@ public class ColonyPopulationService {
         }
         
         if (killed > 0) {
-            colony.logEvent("CONTAMINATION ALERT: " + killed + " ants died from a " + contaminationLevel + " contamination due to " + deadBodyCount + " rotting bodies!");
+            colony.logEvent(killed + " ants died from a " + contaminationLevel + " contamination due to rotting bodies!");
         }
     }
 
@@ -339,7 +339,7 @@ public class ColonyPopulationService {
             colony.getBugs().add(parasite);
         }
         
-        colony.logEvent("ALERT: A parasitic infestation has spread! " + spawnAmount + " new parasites detected.");
+        colony.logEvent("A parasitic infestation has spread! " + spawnAmount + " new parasites detected.");
     }
 
     public void rankUp(Colony colony) {

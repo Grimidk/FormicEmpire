@@ -125,7 +125,7 @@ public class ColonyLabourService {
         return false;
     }
 
-    public void runCollecting(Colony colony) {
+public void runCollecting(Colony colony) {
         ColonyStatsService stats = colony.getStatsService();
         ColonyLocationService locations = colony.getLocationService();
         
@@ -137,14 +137,22 @@ public class ColonyLabourService {
                 
                 int totalPower = (int) (foragers.size() * stats.getCollectingRate(colony));
                 List<ResourceSource> plantSources = locations.getSourcesByType(GameConstants.PLANT_RESOURCE);
-                
-                if (!plantSources.isEmpty() && hasSpace(colony, GameConstants.PLANT_RESOURCE)) {
+                List<ResourceSource> waterSources = locations.getSourcesByType(GameConstants.WATER_RESOURCE);
+
+                boolean canCollectPlants = !plantSources.isEmpty() && hasSpace(colony, GameConstants.PLANT_RESOURCE);
+                boolean canCollectWater = !waterSources.isEmpty() && hasSpace(colony, GameConstants.WATER_RESOURCE);
+
+                if (canCollectPlants && canCollectWater) {
+                    int halfPower = totalPower / 2;
+                    int remainingPower = totalPower - halfPower;
+                    int plantsGathered = processGathering(colony, plantSources, halfPower, GameConstants.PLANT_RESOURCE, foragers);
+                    int waterPower = remainingPower + (halfPower - plantsGathered);
+                    
+                    processGathering(colony, waterSources, waterPower, GameConstants.WATER_RESOURCE, foragers);
+                } else if (canCollectPlants) {
                     processGathering(colony, plantSources, totalPower, GameConstants.PLANT_RESOURCE, foragers);
-                } else {
-                    List<ResourceSource> waterSources = locations.getSourcesByType(GameConstants.WATER_RESOURCE);
-                    if (!waterSources.isEmpty() && hasSpace(colony, GameConstants.WATER_RESOURCE)) {
-                        processGathering(colony, waterSources, totalPower, GameConstants.WATER_RESOURCE, foragers);
-                    }
+                } else if (canCollectWater) {
+                    processGathering(colony, waterSources, totalPower, GameConstants.WATER_RESOURCE, foragers);
                 }
             }
         }
@@ -324,13 +332,13 @@ public class ColonyLabourService {
         }
         
         if (deathCount > 0) {
-            colony.logEvent("WARNING: " + deathCount + " Juveniles Died (Nursing)");
+            colony.logEvent(deathCount + " Juveniles Died (Nursing)");
         }
     }
     
     public void runSpreading(Colony colony, int potentialSatellites) { 
         if (potentialSatellites > 0) {
-            colony.logEvent("SPREADING: " + potentialSatellites + " new satellite colonies will spawn in adjacent hexes.");
+            colony.logEvent(potentialSatellites + " new satellite colonies will spawn in adjacent hexes.");
         }
     }
 
@@ -369,7 +377,7 @@ public class ColonyLabourService {
         }
         
         if (parasitesKilled > 0) {
-            colony.logEvent("POLICE: Eliminated " + parasitesKilled + " parasites.");
+            colony.logEvent("Eliminated " + parasitesKilled + " parasites.");
         }
     }
 
@@ -523,7 +531,7 @@ public class ColonyLabourService {
             colony.getQueens().add(newQueen);
         }
 
-        colony.logEvent("CRITICAL: Nuptial Flight Occurred. " + queensToAdd + " new Queens joined.");
+        colony.logEvent("Nuptial Flight Occurred. " + queensToAdd + " new Queens joined.");
         
         if (queensLeaving > 0) {
             runSpreading(colony, queensLeaving);
@@ -579,7 +587,7 @@ public class ColonyLabourService {
         colony.setMushrooms(Math.min(colony.getMushrooms() + mushroomGain, capacity));
         
         if (toCompost > 10) {
-            colony.logEvent("COMPOST: Recycled " + toCompost + " bodies into " + mushroomGain + " mushroom matter.");
+            colony.logEvent("Recycled " + toCompost + " bodies into mushroom matter.");
         }
     }
 
@@ -620,7 +628,7 @@ public class ColonyLabourService {
         
         if (colony.getBuildingProgressHours() >= requiredHours) {
             colony.unlockBuilding(colony.getCurrentBuildingProject());
-            colony.logEvent("SUCCESS: Built " + colony.getCurrentBuildingProject().getName());
+            colony.logEvent("Built " + colony.getCurrentBuildingProject().getName());
             colony.setCurrentBuildingProject(null);
             colony.setBuildingProgressHours(0.0);
         }

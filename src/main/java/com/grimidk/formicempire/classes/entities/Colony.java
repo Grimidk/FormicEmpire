@@ -697,7 +697,7 @@ public class Colony {
         boolean hasBreeders = getPrincesses().stream().anyMatch(p -> p.getRole() == GameConstants.ROLE_BREEDER);
         
         if (!hasDrones || !hasBreeders) {
-             logEvent("FAILURE: Cannot force flight. Missing Drones or Breeder Princesses.");
+             logEvent("Cannot force flight. Missing Drones or Breeder Princesses.");
              return;
         }
 

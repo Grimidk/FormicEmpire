@@ -75,15 +75,15 @@ public class ColonyLocationService {
 
         if (count < capacity) {
             this.discoveredSources.add(source);
-            colony.logEvent("SCOUT: Found new " + source.getResourceType().getName() + " source (" + source.getQuantity() + ")");
+            colony.logEvent("Found new " + source.getResourceType().getName() + " source.");
         } else {
-            colony.logEvent("SCOUT: Found " + source.getResourceType().getName() + " but capacity is full.");
+            colony.logEvent("Found " + source.getResourceType().getName() + " but capacity is full.");
         }
     }
 
     public void removeSource(Colony colony, ResourceSource source) {
         if (this.discoveredSources.remove(source)) {
-            colony.logEvent("DEPLETED: A " + source.getResourceType().getName() + " source has been exhausted.");
+            colony.logEvent("A " + source.getResourceType().getName() + " source has been exhausted.");
         }
     }
     

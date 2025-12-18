@@ -366,7 +366,7 @@ public class World {
             
             if (this.getSpawnHex() != null && this.getSpawnHex().getColony() != null) {
                 this.getSpawnHex().getColony().getLabourService().runNuptial(this.getSpawnHex().getColony());
-                this.getSpawnHex().getColony().logEvent("EVENT: The Eclipse has triggered a spontaneous Nuptial Flight!");
+                this.getSpawnHex().getColony().logEvent("The Eclipse has triggered a spontaneous Nuptial Flight!");
             }
             
         } else {

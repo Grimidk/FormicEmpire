@@ -53,6 +53,7 @@ public class Savefile implements Serializable {
     private List<SavedResourceSource> savedResourceSources;
 
     private int aphids;
+    private int parasites;
     private int researchPoints;
     private int totalDeaths;
 
@@ -76,6 +77,7 @@ public class Savefile implements Serializable {
         this.hatchRatePrincess = 0.0f;
 
         this.aphids = 0;
+        this.parasites = 0;
         this.researchPoints = 0;
         this.totalDeaths = 0;
     }
@@ -365,6 +367,9 @@ public class Savefile implements Serializable {
 
     public int getAphids() { return aphids; }
     public void setAphids(int aphids) { this.aphids = aphids; }
+
+    public int getParasites() { return parasites; }
+    public void setParasites(int parasites) { this.parasites = parasites; }
 
     public int getResearchPoints() { return researchPoints; }
     public void setResearchPoints(int researchPoints) { this.researchPoints = researchPoints; }
