@@ -408,7 +408,7 @@ public class ColonyPanel extends JPanel {
             
             float detection = colony.getStatsService().getParasiteDetection(colony) * 100f;
             int policeCount = colony.getAssignedRoleCount(GameConstants.ROLE_POLICE);
-            policeStatsLabel.setText(String.format("%d detections per day", Math.round(policeCount * detection)));
+            policeStatsLabel.setText(String.format("Detection rate: %d/day", Math.round(policeCount * detection)));
         }
         
         int eggs = colony.getEggs() != null ? colony.getEggs().size() : 0;

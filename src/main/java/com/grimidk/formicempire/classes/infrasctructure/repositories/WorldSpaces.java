@@ -31,7 +31,7 @@ public final class WorldSpaces {
         new Point(REL_X_LEFT, 0),
         new Point(REL_X_LEFT + 128, 128), 
         new Point(REL_X_LEFT + 256, 128),
-        new Point(REL_X_LEFT + 256, 128), 
+        new Point(REL_X_LEFT + 256, 88), 
         List.of(GameConstants.ROLE_LAYER), 
         List.of(), 
         List.of()
@@ -47,7 +47,7 @@ public final class WorldSpaces {
         new Point(REL_X_LEFT, ROOM_SIZE), 
         new Point(REL_X_LEFT + 128, ROOM_SIZE + 128), 
         new Point(REL_X_LEFT + 256, ROOM_SIZE + 128),
-        new Point(REL_X_LEFT + 256, ROOM_SIZE + 128),
+        new Point(REL_X_LEFT + 256, ROOM_SIZE + 88),
         List.of(GameConstants.ROLE_NURSE), 
         List.of(GameConstants.TYPE_EGG, GameConstants.TYPE_LARVA, GameConstants.TYPE_PUPA),
         List.of()
@@ -63,7 +63,7 @@ public final class WorldSpaces {
         new Point(REL_X_RIGHT, 0), 
         new Point(REL_X_RIGHT + 128, 128), 
         new Point(REL_X_RIGHT, 128), 
-        new Point(REL_X_RIGHT, 128),
+        new Point(REL_X_RIGHT, 88),
         List.of(GameConstants.ROLE_FARMER), 
         List.of(),
         List.of()
@@ -79,7 +79,7 @@ public final class WorldSpaces {
         new Point(REL_X_RIGHT, ROOM_SIZE), 
         new Point(REL_X_RIGHT + 128, ROOM_SIZE + 128), 
         new Point(REL_X_RIGHT, ROOM_SIZE + 128),
-        new Point(REL_X_RIGHT, ROOM_SIZE + 128),
+        new Point(REL_X_RIGHT, ROOM_SIZE + 88),
         List.of(),
         List.of(GameConstants.TYPE_QUEEN),
         List.of()
@@ -95,7 +95,7 @@ public final class WorldSpaces {
         new Point(10, 10), 
         new Point(10 + 128, 10 + 128), 
         new Point(10, 10), 
-        new Point(10, 10),
+        new Point(10, -30),
         List.of(GameConstants.ROLE_RANCHER), 
         List.of(),
         List.of(GameConstants.TYPE_APHID)
@@ -111,7 +111,7 @@ public final class WorldSpaces {
         new Point(2000, 2000),
         new Point(2000 + 128, 2000 + 128), 
         new Point(2000, 2000), 
-        new Point(2000, 2000),
+        new Point(2000, 1960),
         List.of(GameConstants.ROLE_GRAVER), 
         List.of(GameConstants.TYPE_DEAD),
         List.of()
@@ -127,7 +127,7 @@ public final class WorldSpaces {
         new Point(REL_X_LEFT, 512), 
         new Point(REL_X_LEFT + 128, 512 + 128), 
         new Point(REL_X_LEFT + 256, 512 + 128),
-        new Point(REL_X_LEFT + 256, 512 + 128),
+        new Point(REL_X_LEFT + 256, 512 + 88),
         List.of(GameConstants.ROLE_BREEDER), 
         List.of(GameConstants.TYPE_DRONE),
         List.of()
@@ -141,7 +141,7 @@ public final class WorldSpaces {
         100, 
         100, 
         false, 
-        new Point(0, 0), 
+        new Point(0, 0),  
         new Point(0, 0), 
         new Point(0, 0), 
         new Point(0, 0),

@@ -207,7 +207,7 @@ public class ColonyPopulationService {
         }
 
         // --- Parasite Consumption ---
-        int parasiteCount = colony.getParasiteCount();
+        int parasiteCount = colony.getParasites();
         if (parasiteCount > 0) {
             int parasiteConsumption = parasiteCount * 1; 
             if (mushroomsAvailable >= parasiteConsumption) {
@@ -319,7 +319,7 @@ public class ColonyPopulationService {
         if (colony.getAntTotal() < 1000) return;
         
         int spawnAmount = Math.max(10, (int)(colony.getAntTotal() * 0.01));
-        int existingParasites = colony.getParasiteCount();
+        int existingParasites = colony.getParasites();
 
         if (existingParasites > 0) {
             spawnAmount += (int)(existingParasites * 0.50);

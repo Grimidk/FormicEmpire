@@ -308,7 +308,7 @@ public class ColonyLocationService {
             }
 
             int startY = (from != null) ? getResolvedPoint(colony, from, "EXIT").y : ant.getY();
-            int uwLaneX = getLaneCenter(colony, true); // Up
+            int uwLaneX = getLaneCenter(colony, true);
 
             route.add(new NeoPoint(uwLaneX, startY, WorldSpaces.UNDERWORLD));
             route.add(new NeoPoint(uwLaneX, colExit.y, WorldSpaces.UNDERWORLD));

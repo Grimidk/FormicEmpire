@@ -363,7 +363,7 @@ public class SaveManager {
                     
                     // --- New Stats ---
                     save.setAphids(c.getAphids());
-                    save.setParasites(c.getParasiteCount());
+                    save.setParasites(c.getParasites());
                     save.setResearchPoints(c.getResearchPoints());
                     save.setTotalDeaths(c.getDeadAnts() != null ? c.getDeadAnts().size() : 0);
                     

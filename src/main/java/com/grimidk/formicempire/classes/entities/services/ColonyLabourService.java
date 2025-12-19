@@ -239,7 +239,7 @@ public void runCollecting(Colony colony) {
         
         if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
                 rancherCount += 2;
-            } else { rancherCount += 1; }
+        } else { rancherCount += 1; }
         
         int maxSustainableAphids = stats.getAphidCapacity(colony) * rancherCount;
         
@@ -285,7 +285,7 @@ public void runCollecting(Colony colony) {
 
         if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
                 nurseCount += 2;
-            } else { nurseCount += 1; }
+        } else { nurseCount += 1; }
         
         int babyAntTotal = colony.getEggs().size() +  colony.getLarvae().size() +  colony.getPupae().size();
         float nursingRate = stats.getNursingRate(colony);
@@ -345,7 +345,7 @@ public void runCollecting(Colony colony) {
     public void runPolicing(Colony colony) {
         if (!colony.hasUpgrade(GameUnlocks.ROLE_POLICE)) return;
         
-        int parasiteCount = colony.getParasiteCount();
+        int parasiteCount = colony.getParasites();
         if (parasiteCount == 0) return;
         
         List<Ant> police = getWorkingAnts(colony, GameConstants.ROLE_POLICE);
@@ -571,16 +571,10 @@ public void runCollecting(Colony colony) {
         if (!colony.hasBuilding(GameUnlocks.BUILDING_COMPOSTER)) return;
         
         List<Ant> deadAnts = colony.getDeadAnts();
-        int toCompost = deadAnts.size();
+        List<Ant> gravers = getWorkingAnts(colony, GameConstants.ROLE_GRAVER);
+        int graverCount = gravers.size();
+        int toCompost = (int) colony.getStatsService().getGravingRate(colony) * gravers.size();
         if (toCompost == 0) return;
-        
-        List<Ant> antsToRemove = new ArrayList<>();
-        for (int i = 0; i < toCompost; i++) {
-             if (i < deadAnts.size()) {
-                 antsToRemove.add(deadAnts.get(i));
-             }
-        }
-        deadAnts.removeAll(antsToRemove);
 
         int mushroomGain = toCompost * 4; 
         int capacity = colony.getStatsService().getMushroomsCapacity(colony);

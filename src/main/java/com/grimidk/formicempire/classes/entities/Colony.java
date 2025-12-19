@@ -58,6 +58,7 @@ public class Colony {
     private int resins;
     private int minerals;
     private int aphids; 
+    private int parasites;
     private int researchPoints;
 
     // --- Hatch Rate Data ---
@@ -132,6 +133,7 @@ public class Colony {
         this.resins = 0;
         this.minerals = 0;
         this.aphids = 0;
+        this.parasites = 0;
         this.hatchRateWorker = 100.0f;
         this.hatchRateSoldier = 0.0f;
         this.hatchRateMajor = 0.0f;
@@ -270,9 +272,14 @@ public class Colony {
         this.minerals = savefile.getMinerals();
 
         this.aphids = savefile.getAphids();
+        this.parasites = savefile.getParasites();
         
         for(int i=0; i<this.aphids; i++) {
             this.bugs.add(new Bug(GameConstants.TYPE_APHID));
+        }
+
+        for(int i=0; i<this.parasites; i++) {
+            this.bugs.add(new Bug(GameConstants.TYPE_PARASITE));
         }
         
         this.researchPoints = savefile.getResearchPoints();
@@ -384,21 +391,11 @@ public class Colony {
     
     public List<Bug> getBugs() { return bugs; }
     
-    public int getParasiteCount() {
-        int count = 0;
-        for (Bug b : bugs) {
-            if (b.getBugType() == GameConstants.TYPE_PARASITE) {
-                count++;
-            }
-        }
-        return count;
-    }
-    
     public String getParasiteCountDisplay() {
         if (!hasUpgrade(GameUnlocks.ROLE_POLICE)) {
             return "???";
         }
-        int actual = getParasiteCount();
+        int actual = getParasites();
         if (actual == 0) return "~ 0";
         
         double fuzz = Math.random() * 0.2; 
@@ -484,7 +481,38 @@ public class Colony {
         }
         this.aphids = count; 
     }
-    
+
+    public int getParasites() { return parasites; }
+    public void setParasites(int count) { 
+        if (count > this.parasites) {
+            int diff = count - this.parasites;  
+            Rectangle yard = getGraverBounds();
+            if (yard == null) yard = new Rectangle(2000, 2000, 256, 256);
+
+            for(int i=0; i<diff; i++) {
+                Bug newBug = new Bug(GameConstants.TYPE_PARASITE);
+                
+                if (physicsService != null) {
+                    Point spawnPos = physicsService.getSpecificRoomPoint(this, yard);
+                    newBug.setPosition(spawnPos);
+                }
+
+                this.bugs.add(newBug);
+            }
+        } else if (count < this.parasites) {
+            int diff = this.parasites - count;
+            for(int i=0; i<diff; i++) {
+                for(Bug b : this.bugs) {
+                    if (b.getBugType() == GameConstants.TYPE_PARASITE) {
+                        this.bugs.remove(b);
+                        break;
+                    }
+                }
+            }
+        }
+        this.parasites = count; 
+    }
+
     public int getResearchPoints() { return researchPoints; }
     public void setResearchPoints(int researchPoints) { this.researchPoints = researchPoints; }
 
