@@ -327,8 +327,7 @@ public class ColonyPopulationService {
         
         if (spawnAmount <= 0) return;
         
-        Rectangle spawnArea = colony.getStorageBounds(); 
-        if (spawnArea == null) spawnArea = new Rectangle(0, 0, 100, 100);
+        Rectangle spawnArea = new Rectangle(2000, 2000, 256, 256);
 
         for (int i = 0; i < spawnAmount; i++) {
             Bug parasite = new Bug(GameConstants.TYPE_PARASITE);

@@ -292,6 +292,7 @@ public final class GameConstants {
     private static final List<Weather> weathers = new ArrayList<>();
     private static final List<AntStatus> antStatuses = new ArrayList<>();
     private static final List<MoveStatus> moveStatuses = new ArrayList<>();
+    private static final List<BugType> bugTypes = new ArrayList<>();
     private static final List<AntType> antTypes = new ArrayList<>();
     private static final List<AntSubType> antSubTypes = new ArrayList<>();
     private static final List<AntRole> antRoles = new ArrayList<>();
@@ -360,6 +361,10 @@ public final class GameConstants {
         moveStatuses.add(MOVE_MARCH);
         moveStatuses.add(MOVE_SPEED);
         moveStatuses.add(MOVE_FLY);
+
+        bugTypes.add(TYPE_ANT);
+        bugTypes.add(TYPE_APHID);
+        bugTypes.add(TYPE_PARASITE);
 
         antTypes.add(TYPE_EGG);
         antTypes.add(TYPE_LARVA);

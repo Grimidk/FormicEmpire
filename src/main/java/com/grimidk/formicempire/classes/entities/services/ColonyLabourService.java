@@ -238,7 +238,7 @@ public void runCollecting(Colony colony) {
         int rancherCount = countActiveAnts(colony, GameConstants.ROLE_RANCHER);
         
         if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
-                rancherCount += 2;
+            rancherCount += 2;
         } else { rancherCount += 1; }
         
         int maxSustainableAphids = stats.getAphidCapacity(colony) * rancherCount;
@@ -378,6 +378,7 @@ public void runCollecting(Colony colony) {
         
         if (parasitesKilled > 0) {
             colony.logEvent("Eliminated " + parasitesKilled + " parasites.");
+            colony.setParasites(Math.max(0, colony.getParasites() - parasitesKilled));
         }
     }
 

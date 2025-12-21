@@ -271,13 +271,11 @@ public class Colony {
         this.resins = savefile.getResins();
         this.minerals = savefile.getMinerals();
 
-        this.aphids = savefile.getAphids();
-        this.parasites = savefile.getParasites();
-        
+        this.aphids = savefile.getAphids(); 
         for(int i=0; i<this.aphids; i++) {
             this.bugs.add(new Bug(GameConstants.TYPE_APHID));
         }
-
+        this.parasites = savefile.getParasites();
         for(int i=0; i<this.parasites; i++) {
             this.bugs.add(new Bug(GameConstants.TYPE_PARASITE));
         }
@@ -396,7 +394,7 @@ public class Colony {
             return "???";
         }
         int actual = getParasites();
-        if (actual == 0) return "~ 0";
+        if (actual == 0) return "~0";
         
         double fuzz = Math.random() * 0.2; 
         boolean up = Math.random() > 0.5;
@@ -407,7 +405,7 @@ public class Colony {
         
         if (display < 0) display = 0;
         
-        return "~ " + display;
+        return "~" + actual; //Unfuzzed for now
     }
     
     public int getAntTotal() {
@@ -486,8 +484,7 @@ public class Colony {
     public void setParasites(int count) { 
         if (count > this.parasites) {
             int diff = count - this.parasites;  
-            Rectangle yard = getGraverBounds();
-            if (yard == null) yard = new Rectangle(2000, 2000, 256, 256);
+            Rectangle yard = new Rectangle(2000, 2000, 256, 256);
 
             for(int i=0; i<diff; i++) {
                 Bug newBug = new Bug(GameConstants.TYPE_PARASITE);
@@ -587,19 +584,17 @@ public class Colony {
     public Rectangle getBreederBounds() { return breederBounds; }
     
     public Rectangle getTargetRoomForAnt(Ant ant) {
+        AntRole role = ant.getRole();
         if (ant.getAntType() == GameConstants.TYPE_QUEEN) return royalBounds;
         if (ant.getAntType() == GameConstants.TYPE_EGG || ant.getAntType() == GameConstants.TYPE_LARVA || ant.getAntType() == GameConstants.TYPE_PUPA) return nurseryBounds;        
-        if (ant.getAntType() == GameConstants.TYPE_DRONE) return breederBounds; 
-        
-        AntRole role = ant.getRole();
-        if (role == null) return storageBounds; 
-        
+        if (ant.getAntType() == GameConstants.TYPE_DRONE) return breederBounds;
         if (role == GameConstants.ROLE_NURSE) return nurseryBounds;
         if (role == GameConstants.ROLE_FARMER) return farmBounds;
         if (role == GameConstants.ROLE_FORAGER || role == GameConstants.ROLE_HUNTER) return storageBounds;
         if (role == GameConstants.ROLE_RANCHER && rancherBounds != null) return rancherBounds;
         if (role == GameConstants.ROLE_GRAVER && graverBounds != null) return graverBounds;
         if (role == GameConstants.ROLE_BREEDER && breederBounds != null) return breederBounds;
+        if (role == GameConstants.ROLE_ASSISTANT && royalBounds != null) return royalBounds;
         
         return storageBounds; // Default
     }
@@ -725,8 +720,8 @@ public class Colony {
         boolean hasBreeders = getPrincesses().stream().anyMatch(p -> p.getRole() == GameConstants.ROLE_BREEDER);
         
         if (!hasDrones || !hasBreeders) {
-             logEvent("Cannot force flight. Missing Drones or Breeder Princesses.");
-             return;
+            logEvent("Cannot force flight. Missing Drones or Breeder Princesses.");
+            return;
         }
 
         this.researchPoints -= 1000;

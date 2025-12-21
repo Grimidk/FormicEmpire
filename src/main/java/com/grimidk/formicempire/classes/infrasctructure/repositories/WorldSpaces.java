@@ -50,7 +50,7 @@ public final class WorldSpaces {
         new Point(REL_X_LEFT + 256, ROOM_SIZE + 88),
         List.of(GameConstants.ROLE_NURSE), 
         List.of(GameConstants.TYPE_EGG, GameConstants.TYPE_LARVA, GameConstants.TYPE_PUPA),
-        List.of()
+        List.of(GameConstants.TYPE_PARASITE)
     );
 
     public static final Room FARM = new Room(
@@ -66,7 +66,7 @@ public final class WorldSpaces {
         new Point(REL_X_RIGHT, 88),
         List.of(GameConstants.ROLE_FARMER), 
         List.of(),
-        List.of()
+       List.of(GameConstants.TYPE_PARASITE)
     );
 
     public static final Room ROYAL_CHAMBER = new Room(
@@ -80,8 +80,24 @@ public final class WorldSpaces {
         new Point(REL_X_RIGHT + 128, ROOM_SIZE + 128), 
         new Point(REL_X_RIGHT, ROOM_SIZE + 128),
         new Point(REL_X_RIGHT, ROOM_SIZE + 88),
-        List.of(),
+        List.of(GameConstants.ROLE_ASSISTANT),
         List.of(GameConstants.TYPE_QUEEN),
+        List.of()
+    );
+
+     public static final Room BREEDER_CHAMBER = new Room(
+        104, 
+        "Breeder Chamber", 
+        UNDERWORLD, 
+        ROOM_SIZE, 
+        ROOM_SIZE, 
+        true, 
+        new Point(REL_X_LEFT, 512), 
+        new Point(REL_X_LEFT + 128, 512 + 128), 
+        new Point(REL_X_LEFT + 256, 512 + 128),
+        new Point(REL_X_LEFT + 256, 512 + 88),
+        List.of(GameConstants.ROLE_BREEDER), 
+        List.of(GameConstants.TYPE_DRONE),
         List.of()
     );
 
@@ -114,22 +130,6 @@ public final class WorldSpaces {
         new Point(2000, 1960),
         List.of(GameConstants.ROLE_GRAVER), 
         List.of(GameConstants.TYPE_DEAD),
-        List.of()
-    );
-
-    public static final Room BREEDER_CHAMBER = new Room(
-        300, 
-        "Breeder Chamber", 
-        UNDERWORLD, 
-        ROOM_SIZE, 
-        ROOM_SIZE, 
-        true, 
-        new Point(REL_X_LEFT, 512), 
-        new Point(REL_X_LEFT + 128, 512 + 128), 
-        new Point(REL_X_LEFT + 256, 512 + 128),
-        new Point(REL_X_LEFT + 256, 512 + 88),
-        List.of(GameConstants.ROLE_BREEDER), 
-        List.of(GameConstants.TYPE_DRONE),
         List.of()
     );
 

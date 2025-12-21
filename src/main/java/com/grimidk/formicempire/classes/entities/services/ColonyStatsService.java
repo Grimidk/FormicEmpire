@@ -139,6 +139,26 @@ public class ColonyStatsService {
         } else if (colony.hasUpgrade(GameUnlocks.STAT_CONTAMINATION_1)) { return 0.8f;
         } else { return 1.0f; } 
     }
+    public int getThirstResistance(Colony colony, Temperature temp) {
+        int resistance = 20; 
+        if (colony.hasUpgrade(GameUnlocks.STAT_THIRST_3)) {
+            resistance = 80;
+        } else if (colony.hasUpgrade(GameUnlocks.STAT_THIRST_2)) {
+            resistance = 60;
+        } else if (colony.hasUpgrade(GameUnlocks.STAT_THIRST_1)) {
+            resistance = 40;
+        }
+        if (temp != null) {
+            if (temp == GameConstants.TEMP_WARM) {
+                resistance /= 2;
+            } else if (temp == GameConstants.TEMP_HOT) {
+                resistance /= 4;
+            } else if (temp == GameConstants.TEMP_BURNING) {
+                resistance /= 8;
+            }
+        }
+        return 20;
+    }
 
     // --- Stats ---
     public int getBaseHealth(Colony colony) {
@@ -177,28 +197,7 @@ public class ColonyStatsService {
         if (colony.hasUpgrade(GameUnlocks.STAT_LONGEVITY)) {return 1;
         } else {return 0;}
     }
-    public int getThirstResistance(Colony colony, Temperature temp) {
-        int resistance = 20; 
-        if (colony.hasUpgrade(GameUnlocks.STAT_THIRST_3)) {
-            resistance = 80;
-        } else if (colony.hasUpgrade(GameUnlocks.STAT_THIRST_2)) {
-            resistance = 60;
-        } else if (colony.hasUpgrade(GameUnlocks.STAT_THIRST_1)) {
-            resistance = 40;
-        }
-        if (temp != null) {
-            if (temp == GameConstants.TEMP_WARM) {
-                resistance /= 2;
-            } else if (temp == GameConstants.TEMP_HOT) {
-                resistance /= 4;
-            } else if (temp == GameConstants.TEMP_BURNING) {
-                resistance /= 8;
-            }
-        }
-        return resistance;
-    }
-
-    // --- Aggregates ---
+    // --- Aggregates (Daily) ---
     public int getTotalConsumption(Colony colony){
         double totalConsumption = 0;
         for (Map.Entry<AntType, List<Ant>> entry : colony.getAntGroups().entrySet()) {

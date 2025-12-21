@@ -128,7 +128,7 @@ public final class GameUnlocks {
     public static final Building PASSIVE_LAB = new Building(101, "Passive Experiments", 0, "Enables passive research gain even if there are no ants assigned, simulates 1 researcher.", ROYAL_CHAMBER_1, 150, 0, 800);
     public static final Building PASSIVE_WATER = new Building(102, "Passive Water Collector", 0, "Enables passive water collection even if there are no ants assigned, at 10% your water capacity.", WATER_RESERVOIR_1, 100, 0, 500);
     public static final Building PASSIVE_APHID = new Building(103, "Passive Aphid Ranch", 0, "Enables your colony to hold more aphids that will never escape, simulates 1 rancher.", SYRUP_RESERVOIR_1, 200, 0, 1000);
-    public static final Building PASSIVE_NURSE = new Building(104, "Passive Nursery", 0, "Enables passive baby care even if there are no ants assigned, simulates 1 nurse.", EGG_CHAMBER_1, 150, 0, 700);
+    public static final Building PASSIVE_NURSE = new Building(104, "Passive Nursery", 0, "Enables passive juvenile care even if there are no ants assigned, simulates 1 nurse.", EGG_CHAMBER_1, 150, 0, 700);
     public static final Building PASSIVE_FARM = new Building(105, "Passive Farm", 0, "Enables passive farming even if there are no ants assigned, simulates 1 farmer.", MUSHROOM_CHAMBER_1, 200, 0, 900);
     public static final Building PASSIVE_GRAVE = new Building(106, "Passive Graveyard", 0, "Enables passive grave keeping even if there are no ants assigned, simulates 1 graver.", MEAT_CHAMBER_1, 150, 0, 600);
     public static final Building BUILDING_COMPOSTER = new Building(107, "Composter", 0, "Turns dead bodies into mushrooms daily. 1 body to 4 mushrooms matter.", PASSIVE_GRAVE, 500, 0, 1000);

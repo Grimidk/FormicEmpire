@@ -406,16 +406,16 @@ public class ColonyPanel extends JPanel {
         if (hasPolice) {
             parasiteCountLabel.setText("Parasites: " + colony.getParasiteCountDisplay());
             
-            float detection = colony.getStatsService().getParasiteDetection(colony) * 100f;
+            float detection = colony.getStatsService().getParasiteDetection(colony);
             int policeCount = colony.getAssignedRoleCount(GameConstants.ROLE_POLICE);
-            policeStatsLabel.setText(String.format("Detection rate: %d/day", Math.round(policeCount * detection)));
+            policeStatsLabel.setText(String.format("Detection rate: ~%d/day", Math.round(policeCount * detection)));
         }
         
         int eggs = colony.getEggs() != null ? colony.getEggs().size() : 0;
         int larva = colony.getLarvae() != null ? colony.getLarvae().size() : 0;
         int pupa = colony.getPupae() != null ? colony.getPupae().size() : 0;
         int babyTotal = eggs + larva + pupa;
-        if (babyTotal != lastBabyTotal) babyAntsLabel.setText("Baby Ants: " + babyTotal);
+        if (babyTotal != lastBabyTotal) babyAntsLabel.setText("Juvenile Ants: " + babyTotal);
 
         int adultTotal = (colony.getQueens().size() + colony.getPrincesses().size() + colony.getDrones().size() + 
                           colony.getMajors().size() + colony.getSoldiers().size() + colony.getWorkers().size());
