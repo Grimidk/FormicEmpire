@@ -70,7 +70,7 @@ public final class GameUnlocks {
     public static final Upgrade STAT_LAYING_3 = new Upgrade(117, "Perfected Egg Laying", "Half a dozen", "Increases egg laying rate by anoter 2 more eggs per hour.", STAT_LAYING_2, 80000);
     public static final Upgrade STAT_SCOUTING_1 = new Upgrade(118, "Improved Scouting", "Ant Maps", "Increases scouting rate by 0.1 chance per day.", ROLE_SCOUT, 4000);
     public static final Upgrade STAT_SCOUTING_2 = new Upgrade(119, "Advanced Scouting", "Scouting Kits", "Increases scouting rate by another 0.2 chance per day.", STAT_SCOUTING_1, 15000);
-    public static final Upgrade STAT_SCOUTING_3 = new Upgrade(120, "Perfected Scouting", "Exploration Drones", "Increases scouting rate by another 0.3 chance per day.", STAT_SCOUTING_2, 50000);
+    public static final Upgrade STAT_SCOUTING_3 = new Upgrade(120, "Perfected Scouting", "Exploration Drones", "Increases scouting rate by another 0.3 chance per day.", STAT_SCOUTING_2, 35000);
     public static final Upgrade STAT_FARMING_1 = new Upgrade(121, "Improved Farming", "Fertilizers", "Increases farming conversion rate by 0.1 per minute.", ROLE_FARMER, 4500);
     public static final Upgrade STAT_FARMING_2 = new Upgrade(122, "Advanced Farming", "Pesticides", "Increases farming conversion rate by another 0.2 per minute.", STAT_FARMING_1, 16000);
     public static final Upgrade STAT_FARMING_3 = new Upgrade(123, "Perfected Farming", "Genetic Modification", "Increases farming conversion rate by another 0.4 per minute.", STAT_FARMING_2, 60000);

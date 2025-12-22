@@ -275,9 +275,12 @@ public class Colony {
         for(int i=0; i<this.aphids; i++) {
             this.bugs.add(new Bug(GameConstants.TYPE_APHID));
         }
+
         this.parasites = savefile.getParasites();
         for(int i=0; i<this.parasites; i++) {
-            this.bugs.add(new Bug(GameConstants.TYPE_PARASITE));
+            Bug p = new Bug(GameConstants.TYPE_PARASITE);
+            p.setDimension(WorldSpaces.UNDERWORLD); // Ensure they stay in the colony
+            this.bugs.add(p);
         }
         
         this.researchPoints = savefile.getResearchPoints();
@@ -484,16 +487,17 @@ public class Colony {
     public void setParasites(int count) { 
         if (count > this.parasites) {
             int diff = count - this.parasites;  
-            Rectangle yard = new Rectangle(2000, 2000, 256, 256);
+            Rectangle spawnRoom = getStorageBounds();
+            if (spawnRoom == null) spawnRoom = new Rectangle(0, 0, 256, 256);
 
             for(int i=0; i<diff; i++) {
                 Bug newBug = new Bug(GameConstants.TYPE_PARASITE);
+                newBug.setDimension(WorldSpaces.UNDERWORLD);
                 
                 if (physicsService != null) {
-                    Point spawnPos = physicsService.getSpecificRoomPoint(this, yard);
+                    Point spawnPos = physicsService.getSpecificRoomPoint(this, spawnRoom);
                     newBug.setPosition(spawnPos);
                 }
-
                 this.bugs.add(newBug);
             }
         } else if (count < this.parasites) {

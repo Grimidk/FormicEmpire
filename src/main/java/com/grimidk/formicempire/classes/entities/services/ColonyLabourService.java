@@ -12,7 +12,6 @@ import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.entities.Ant;
-import com.grimidk.formicempire.classes.entities.Bug;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
@@ -354,25 +353,15 @@ public void runCollecting(Colony colony) {
         float detectionRate = colony.getStatsService().getParasiteDetection(colony);
         int parasitesKilled = 0;
         
-        List<Bug> parasites = new ArrayList<>();
-        for (Bug b : colony.getBugs()) {
-            if (b.getBugType() == GameConstants.TYPE_PARASITE) {
-                parasites.add(b);
-            }
-        }
-
         for (Ant officer : police) {
-            if (parasites.isEmpty()) break;
+            if (parasitesKilled >= parasiteCount) break;
             
             if (random.nextFloat() < detectionRate) {
-                Bug caughtParasite = parasites.remove(0);
-                colony.getBugs().remove(caughtParasite); 
+                parasitesKilled++;
                 
                 int currentProtein = colony.getProtein();
                 int maxProtein = colony.getStatsService().getProteinCapacity(colony);
                 colony.setProtein(Math.min(currentProtein + 4, maxProtein));
-                
-                parasitesKilled++;
             }
         }
         

@@ -184,11 +184,12 @@ public class ColonyPhysicsService {
             }
         }
         else if (bug.getBugType() == GameConstants.TYPE_PARASITE) {
-            Rectangle currentRoom = null;
-            if (bug.getDimension() == WorldSpaces.UNDERWORLD) {
-                currentRoom = getRoomBounds(colony, WorldSpaces.STORAGE);
-                if (Math.random() < 0.3) currentRoom = getRoomBounds(colony, WorldSpaces.FARM);
+            if (bug.getDimension() != WorldSpaces.UNDERWORLD) {
+                bug.setDimension(WorldSpaces.UNDERWORLD);
             }
+
+            Rectangle currentRoom = getRoomBounds(colony, WorldSpaces.STORAGE);
+            if (Math.random() < 0.3) currentRoom = getRoomBounds(colony, WorldSpaces.FARM);
 
             if (currentRoom != null) {
                 wanderInBoundaries(colony, bug, currentRoom, 0.05);

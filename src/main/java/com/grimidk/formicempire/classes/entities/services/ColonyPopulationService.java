@@ -1,7 +1,6 @@
 package com.grimidk.formicempire.classes.entities.services;
 
 import com.grimidk.formicempire.classes.entities.Ant;
-import com.grimidk.formicempire.classes.entities.Bug;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
@@ -17,8 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Random;
-import java.awt.Point;
-import java.awt.Rectangle;
 
 public class ColonyPopulationService {
     
@@ -327,16 +324,7 @@ public class ColonyPopulationService {
         
         if (spawnAmount <= 0) return;
         
-        Rectangle spawnArea = new Rectangle(2000, 2000, 256, 256);
-
-        for (int i = 0; i < spawnAmount; i++) {
-            Bug parasite = new Bug(GameConstants.TYPE_PARASITE);
-            if (colony.getPhysicsService() != null) {
-                Point spawnPos = colony.getPhysicsService().getSpecificRoomPoint(colony, spawnArea);
-                parasite.setPosition(spawnPos);
-            }
-            colony.getBugs().add(parasite);
-        }
+        colony.setParasites(colony.getParasites() + spawnAmount);
         
         colony.logEvent("A parasitic infestation has spread! " + spawnAmount + " new parasites detected.");
     }
