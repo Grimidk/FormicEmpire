@@ -8,7 +8,7 @@ The game will eventually be published but I don't care about profits.
 
 Requirements:
     Java 17
-    Electricity (Optional)
+    and Electricity (Optional)
 
 Running the game (bash):
     ./mvnw clean install
