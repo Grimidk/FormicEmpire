@@ -146,7 +146,7 @@ public class ColonyLocationService {
 
     public int getLaneCenter(Colony colony, boolean goingDown) {
         int center = getHallwayCenterX(colony);
-        return goingDown ? center : (center - LANE_OFFSET);
+        return goingDown ? (center - LANE_OFFSET) : (center - LANE_OFFSET/6);
     }
 
     public NeoPoint getColonyEntrance(Colony colony) {
@@ -295,7 +295,7 @@ public class ColonyLocationService {
             route.add(colEnt); 
             route.add(colExit); 
 
-            int uwLaneX = getLaneCenter(colony, false); 
+            int uwLaneX = getLaneCenter(colony, true); 
             NeoPoint destEntry = getResolvedPoint(colony, to, "ENTRY");
             int targetY = destEntry.y;
 
@@ -312,7 +312,7 @@ public class ColonyLocationService {
             }
 
             int startY = (from != null) ? getResolvedPoint(colony, from, "EXIT").y : ant.getY();
-            int uwLaneX = getLaneCenter(colony, true);
+            int uwLaneX = getLaneCenter(colony, false);
 
             route.add(new NeoPoint(uwLaneX, startY, WorldSpaces.UNDERWORLD));
             route.add(new NeoPoint(uwLaneX, colExit.y, WorldSpaces.UNDERWORLD));
