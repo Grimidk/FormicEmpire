@@ -81,7 +81,7 @@ public class AbilitiesDialog extends JDialog {
                 1000, 
                 e -> {
                     colony.forceNuptialFlight();
-                    refreshDialog(); // Refresh UI after action
+                    refreshDialog(); 
                 },
                 canTriggerNuptial()
             );
@@ -89,8 +89,6 @@ public class AbilitiesDialog extends JDialog {
             listPanel.add(Box.createVerticalStrut(10));
             hasAnyAbility = true;
         }
-
-        // Add more active abilities here as you create them...
 
         if (!hasAnyAbility) {
             JLabel empty = new JLabel("No active abilities unlocked yet.");
@@ -148,12 +146,9 @@ public class AbilitiesDialog extends JDialog {
         return panel;
     }
     
-    // Call this if you keep the dialog open while the game runs to update buttons in real-time
     public void liveUpdate() {
         if (!isShowing()) return;
         updateResearchPointsLabel();
-        // Since we rebuild the list on refresh, simple live updates might require full refresh 
-        // or keeping references to buttons. For now, simple refresh is safer.
         refreshDialog(); 
     }
 }

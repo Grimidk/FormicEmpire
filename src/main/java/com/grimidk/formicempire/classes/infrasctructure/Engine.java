@@ -219,7 +219,7 @@ public class Engine extends Thread {
         }
     }
 
-    // Settings Getters and Setters
+    // -- Settings Getters and Setters --
 
     public String getLanguage() {
         return language;

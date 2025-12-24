@@ -415,14 +415,14 @@ public class SaveManager {
         w.write("{");
         w.newLine();
 
-        // General
+        // - General -
         writeJsonLine(w, "id", s.getId(), false);
         writeJsonLine(w, "name", s.getName() != null ? s.getName() : "", false);
         writeJsonLine(w, "colonyId", s.getColonyId(), false);
         writeJsonLine(w, "colonyName", s.getColonyName() != null ? s.getColonyName() : "", false);
         writeJsonLine(w, "progress", s.getProgress(), false);
         
-        // Time
+        // - Time -
         writeJsonLine(w, "playTime", s.getPlayTime(), false);
         writeJsonLine(w, "minute", s.getMinute(), false);
         writeJsonLine(w, "hour", s.getHour(), false);
@@ -430,7 +430,7 @@ public class SaveManager {
         writeJsonLine(w, "month", s.getMonth(), false);
         writeJsonLine(w, "year", s.getYear(), false);
 
-        // Ant Counts
+        // - Ant Counts -
         writeJsonLine(w, "totalAnts", s.getTotalAnts(), false);
         writeJsonLine(w, "deadAnts", s.getDeadAnts(), false);
         writeJsonLine(w, "eggs", s.getEggs(), false);
@@ -443,7 +443,7 @@ public class SaveManager {
         writeJsonLine(w, "princesses", s.getPrincesses(), false);
         writeJsonLine(w, "queens", s.getQueens(), false);
 
-        // Resources
+        // - Resources -
         writeJsonLine(w, "plants", s.getPlants(), false);
         writeJsonLine(w, "mushrooms", s.getMushrooms(), false);
         writeJsonLine(w, "protein", s.getProtein(), false);
@@ -452,38 +452,38 @@ public class SaveManager {
         writeJsonLine(w, "resins", s.getResins(), false);
         writeJsonLine(w, "minerals", s.getMinerals(), false);
 
-        // Hatch Rates
+        // - Hatch Rates -
         writeJsonLine(w, "hatchRateWorker", s.getHatchRateWorker(), false);
         writeJsonLine(w, "hatchRateSoldier", s.getHatchRateSoldier(), false);
         writeJsonLine(w, "hatchRateMajor", s.getHatchRateMajor(), false);
         writeJsonLine(w, "hatchRateDrone", s.getHatchRateDrone(), false);
         writeJsonLine(w, "hatchRatePrincess", s.getHatchRatePrincess(), false);
 
-        // New Stats
+        // - New Stats -
         writeJsonLine(w, "aphids", s.getAphids(), false);
         writeJsonLine(w, "parasites", s.getParasites(), false);
         writeJsonLine(w, "researchPoints", s.getResearchPoints(), false);
         writeJsonLine(w, "totalDeaths", s.getTotalDeaths(), false);
 
-        // Upgrades
+        // - Upgrades -
         w.write("  \"unlockedUpgradeIds\": ");
         w.write(serializeListToJson(s.getUnlockedUpgradeIds()));
         w.write(","); 
         w.newLine();
 
-        // Buildings
+        // - Buildings -
         w.write("  \"unlockedBuildingIds\": ");
         w.write(serializeListToJson(s.getUnlockedBuildingIds()));
         w.write(","); 
         w.newLine();
 
-        // Roles
+        // - Roles-
         w.write("  \"assignedRoleCounts\": ");
         w.write(serializeMapToJson(s.getAssignedRoleCounts()));
         w.write(",");
         w.newLine();
         
-        // Resource Sources
+        // - Resource Sources -
         w.write("  \"savedResourceSources\": ");
         w.write(serializeSourcesToJson(s.getSavedResourceSources()));
         w.newLine();

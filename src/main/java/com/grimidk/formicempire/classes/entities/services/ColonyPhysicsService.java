@@ -24,7 +24,7 @@ public class ColonyPhysicsService {
 
     // --- Main Physics Loop ---
     public void runPhysics(Colony colony, Dimension activeDimension) {
-        // Ants
+        // -- Ants --
         for (List<Ant> antList : colony.getAntGroups().values()) {
             for (Ant ant : antList) {
                 if (!ant.isAlive()) continue;
@@ -44,7 +44,7 @@ public class ColonyPhysicsService {
             }
         }
         
-        // Bugs
+        // -- Bugs --
         for (Bug bug : colony.getBugs()) {
             if (bug.isAlive() && bug.getDimension() == activeDimension) {
                 if (!bug.isMoving()) {
@@ -290,7 +290,6 @@ public class ColonyPhysicsService {
             if (getRoomBounds(colony, WorldSpaces.FARM).contains(ant.getX(), ant.getY())) return WorldSpaces.FARM;
             if (getRoomBounds(colony, WorldSpaces.ROYAL_CHAMBER).contains(ant.getX(), ant.getY())) return WorldSpaces.ROYAL_CHAMBER;
             
-            // Check Breeder Room
             if (colony.getBreederBounds() != null && colony.getBreederBounds().contains(ant.getX(), ant.getY())) {
                 return WorldSpaces.BREEDER_CHAMBER;
             }

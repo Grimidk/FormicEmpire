@@ -271,7 +271,6 @@ public class ColonyPanel extends JPanel {
         int netMushrooms = colony.getTotalProduction() - totalConsumption;
         if (netMushrooms != -1) netMushroomsLabel.setText(String.format("Net Food: %d/day", netMushrooms));
         
-        // Update cached values
         lastMushrooms = mushrooms; 
         lastPlants = plants; 
         lastProtein = protein; 

@@ -279,7 +279,7 @@ public class Colony {
         this.parasites = savefile.getParasites();
         for(int i=0; i<this.parasites; i++) {
             Bug p = new Bug(GameConstants.TYPE_PARASITE);
-            p.setDimension(WorldSpaces.UNDERWORLD); // Ensure they stay in the colony
+            p.setDimension(WorldSpaces.UNDERWORLD);
             this.bugs.add(p);
         }
         
@@ -392,25 +392,6 @@ public class Colony {
     
     public List<Bug> getBugs() { return bugs; }
     
-    public String getParasiteCountDisplay() {
-        if (!hasUpgrade(GameUnlocks.ROLE_POLICE)) {
-            return "???";
-        }
-        int actual = getParasites();
-        if (actual == 0) return "~0";
-        
-        double fuzz = Math.random() * 0.2; 
-        boolean up = Math.random() > 0.5;
-        
-        int display = actual;
-        if (up) display += (int)(actual * fuzz);
-        else display -= (int)(actual * fuzz);
-        
-        if (display < 0) display = 0;
-        
-        return "~" + actual; //Unfuzzed for now
-    }
-    
     public int getAntTotal() {
         return antGroups.values().stream().mapToInt(List::size).sum();
     }
@@ -512,6 +493,25 @@ public class Colony {
             }
         }
         this.parasites = count; 
+    }
+
+    public String getParasiteCountDisplay() {
+        if (!hasUpgrade(GameUnlocks.ROLE_POLICE)) {
+            return "???";
+        }
+        int actual = getParasites();
+        if (actual == 0) return "~0";
+        
+        double fuzz = Math.random() * 0.2; 
+        boolean up = Math.random() > 0.5;
+        
+        int display = actual;
+        if (up) display += (int)(actual * fuzz);
+        else display -= (int)(actual * fuzz);
+        
+        if (display < 0) display = 0;
+        
+        return "~" + display;
     }
 
     public int getResearchPoints() { return researchPoints; }
