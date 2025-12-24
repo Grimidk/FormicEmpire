@@ -21,6 +21,22 @@ public final class WorldSpaces {
     private static final int REL_X_RIGHT = (HALL_WIDTH / 2);
     
     // --- Colony Rooms ---
+    public static final Room SURFACE = new Room(
+        50, 
+        "Surface", 
+        OVERWORLD, 
+        0, 
+        0, 
+        false, 
+        new Point(0, 0), 
+        new Point(0, 0), 
+        new Point(0, 0), 
+        new Point(0, 0),
+        List.of(), 
+        List.of(),
+        List.of()
+    );
+
     public static final Room STORAGE = new Room(
         100, 
         "Storage", 
@@ -133,7 +149,6 @@ public final class WorldSpaces {
         List.of()
     );
 
-    // Dynamic Construction Site (Default coords are placeholders)
     public static final Room CONSTRUCTION_SITE = new Room(
         999, 
         "Construction Site", 

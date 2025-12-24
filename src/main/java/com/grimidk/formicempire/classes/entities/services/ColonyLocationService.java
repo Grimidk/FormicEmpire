@@ -177,6 +177,10 @@ public class ColonyLocationService {
     // --- Helpers Points ---
         private NeoPoint getResolvedPoint(Colony colony, Room room, String pointType) {
         if (room == null) return null;
+
+        if (room.getId() == WorldSpaces.SURFACE.getId()) {
+            return getColonyEntrance(colony);
+        }
         
         Rectangle dynamicBounds = null;
         if (room.getId() == 201) dynamicBounds = colony.getGraverBounds(); // Graveyard

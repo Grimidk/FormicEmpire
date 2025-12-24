@@ -76,19 +76,30 @@ public class ColonyPhysicsService {
             ImageIcon sprite = entry.getKey().getSprite();
             for (Ant ant : entry.getValue()) {
                 ant.clearRoute(); 
-                if (ant.getDimension() == WorldSpaces.UNDERWORLD || shouldBeInColony(ant)) {
-                    ant.setDimension(WorldSpaces.UNDERWORLD);
-                    Rectangle targetRoom = getTargetRoomForAnt(colony, ant, virtualWidth);
-                    ant.setPosition(getRandomPointInRoom(colony, targetRoom, virtualWidth));
-                } else {
-                    ant.setDimension(WorldSpaces.OVERWORLD);
-                    
-                    Rectangle yard = getOverworldJobBounds(colony, ant);
-                    if (yard != null) {
-                        ant.setPosition(getRandomPointInRoom(colony, yard, virtualWidth));
-                    } else {
-                        ant.setPosition(getRandomOverworldPosition(colony, sprite));
-                    }
+                
+                Rectangle targetRoom = getTargetRoomForAnt(colony, ant, virtualWidth);
+                
+                // If we have a specific room inside, go there.
+                if (targetRoom != null) {
+                     ant.setDimension(WorldSpaces.UNDERWORLD);
+                     ant.setPosition(getRandomPointInRoom(colony, targetRoom, virtualWidth));
+                } 
+                // If we don't have a room inside...
+                else {
+                     // If we strictly *must* be inside (shouldBeInColony), fallback to Storage 
+                     if (shouldBeInColony(ant)) {
+                          ant.setDimension(WorldSpaces.UNDERWORLD);
+                          ant.setPosition(getRandomPointInRoom(colony, getRoomBounds(colony, WorldSpaces.STORAGE), virtualWidth));
+                     } else {
+                          // Otherwise, go outside
+                          ant.setDimension(WorldSpaces.OVERWORLD);
+                          Rectangle yard = getOverworldJobBounds(colony, ant);
+                          if (yard != null) {
+                              ant.setPosition(getRandomPointInRoom(colony, yard, virtualWidth));
+                          } else {
+                              ant.setPosition(getRandomOverworldPosition(colony, sprite));
+                          }
+                     }
                 }
             }
         }
@@ -207,6 +218,8 @@ public class ColonyPhysicsService {
                 ant.setPosition(new Point(colony.getGameAreaWidth()/2, 50));
             } else {
                 Room target = findRoomForAnt(colony, ant);
+                if (target == null) target = WorldSpaces.STORAGE;
+
                 Room current = getRoomContainingAnt(colony, ant); 
                 Queue<NeoPoint> route = colony.getLocationService().calculateRoute(colony, current, target, ant);
                 ant.setRoute(route);
@@ -241,6 +254,16 @@ public class ColonyPhysicsService {
         int virtualWidth = Math.max(colony.getGameAreaWidth(), 1280);
         Rectangle myRoom = getTargetRoomForAnt(colony, ant, virtualWidth);
 
+        if (myRoom == null) {
+             if (ant.getX() == 0 && ant.getY() == 0) {
+                 ant.setPosition(new Point(colony.getGameAreaWidth()/2, 0));
+             }
+             
+             Queue<NeoPoint> route = colony.getLocationService().calculateRoute(colony, getRoomContainingAnt(colony, ant), WorldSpaces.SURFACE, ant);
+             ant.setRoute(route);
+             return;
+        }
+
         if (ant.getX() == 0 && ant.getY() == 0) {
             ant.setPosition(new Point((int)myRoom.getCenterX(), (int)myRoom.getCenterY()));
             return;
@@ -261,7 +284,7 @@ public class ColonyPhysicsService {
             Room current = getRoomContainingAnt(colony, ant); 
 
             if (targetRoom == null) {
-                Queue<NeoPoint> route = colony.getLocationService().calculateRoute(colony, current, new Room(999, "Surface", WorldSpaces.OVERWORLD, 0,0,false,null,colony.getLocationService().getColonyEntrance(colony),null,null,null,null,null), ant);
+                Queue<NeoPoint> route = colony.getLocationService().calculateRoute(colony, current, WorldSpaces.SURFACE, ant);
                 ant.setRoute(route);
             } else {
                 Queue<NeoPoint> route = colony.getLocationService().calculateRoute(colony, current, targetRoom, ant);
@@ -276,6 +299,8 @@ public class ColonyPhysicsService {
             }
         } else {
             Room targetRoom = findRoomForAnt(colony, ant);
+            if (targetRoom == null) targetRoom = WorldSpaces.STORAGE; 
+
             Room current = getRoomContainingAnt(colony, ant); 
             
             Queue<NeoPoint> route = colony.getLocationService().calculateRoute(colony, current, targetRoom, ant);
@@ -319,7 +344,9 @@ public class ColonyPhysicsService {
         if (defined != null) return defined;
         
         Room room = findRoomForAnt(colony, ant);
-        return getRoomBounds(colony, room);
+        if (room != null) return getRoomBounds(colony, room);
+        
+        return null;
     }
     
     private Rectangle getOverworldJobBounds(Colony colony, Ant ant) {
@@ -349,7 +376,7 @@ public class ColonyPhysicsService {
         if (isAllowedInRoom(WorldSpaces.FARM, ant)) return WorldSpaces.FARM;
         if (isAllowedInRoom(WorldSpaces.ROYAL_CHAMBER, ant)) return WorldSpaces.ROYAL_CHAMBER;
         
-        return WorldSpaces.STORAGE;
+        return null;
     }
     
     private boolean isAllowedInRoom(Room room, Ant ant) {

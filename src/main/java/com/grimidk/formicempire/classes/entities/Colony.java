@@ -594,13 +594,12 @@ public class Colony {
         if (ant.getAntType() == GameConstants.TYPE_DRONE) return breederBounds;
         if (role == GameConstants.ROLE_NURSE) return nurseryBounds;
         if (role == GameConstants.ROLE_FARMER) return farmBounds;
-        if (role == GameConstants.ROLE_FORAGER || role == GameConstants.ROLE_HUNTER) return storageBounds;
         if (role == GameConstants.ROLE_RANCHER && rancherBounds != null) return rancherBounds;
         if (role == GameConstants.ROLE_GRAVER && graverBounds != null) return graverBounds;
         if (role == GameConstants.ROLE_BREEDER && breederBounds != null) return breederBounds;
         if (role == GameConstants.ROLE_ASSISTANT && royalBounds != null) return royalBounds;
         
-        return storageBounds; // Default
+        return null; // Default - Outside
     }
 
     // --- Public getters for services ---
