@@ -56,6 +56,9 @@ public class Savefile implements Serializable {
     private int parasites;
     private int researchPoints;
     private int totalDeaths;
+    
+    private int worldRadius;
+    private List<SavedHex> worldHexes;
 
     public Savefile(int id, String name) {
         this.id = id;
@@ -64,11 +67,13 @@ public class Savefile implements Serializable {
         this.unlockedUpgradeIds = new ArrayList<>(); 
         this.unlockedBuildingIds = new ArrayList<>(); 
         this.savedResourceSources = new ArrayList<>();
+        this.worldHexes = new ArrayList<>();
         this.minute = 0;
         this.hour = 0;
         this.day = 1;
         this.month = 1;
         this.year = 0; 
+        this.worldRadius = 7;
 
         this.hatchRateWorker = 100.0f;
         this.hatchRateSoldier = 0.0f;
@@ -96,6 +101,25 @@ public class Savefile implements Serializable {
             this.initialQuantity = initialQuantity;
             this.x = x;
             this.y = y;
+        }
+    }
+    
+    public static class SavedHex implements Serializable {
+        private static final long serialVersionUID = 1L;
+        public int q;
+        public int r;
+        public int biomeId;
+        public boolean hasColony;
+        public int timeOffset;
+        public int weatherId;
+
+        public SavedHex(int q, int r, int biomeId, boolean hasColony, int timeOffset, int weatherId) {
+            this.q = q;
+            this.r = r;
+            this.biomeId = biomeId;
+            this.hasColony = hasColony;
+            this.timeOffset = timeOffset;
+            this.weatherId = weatherId;
         }
     }
 
@@ -376,4 +400,20 @@ public class Savefile implements Serializable {
 
     public int getTotalDeaths() { return totalDeaths; }
     public void setTotalDeaths(int totalDeaths) { this.totalDeaths = totalDeaths; }
+    
+    public int getWorldRadius() {
+        return worldRadius;
+    }
+    
+    public void setWorldRadius(int worldRadius) {
+        this.worldRadius = worldRadius;
+    }
+    
+    public List<SavedHex> getWorldHexes() {
+        return worldHexes;
+    }
+    
+    public void setWorldHexes(List<SavedHex> worldHexes) {
+        this.worldHexes = worldHexes;
+    }
 }

@@ -11,6 +11,7 @@ import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks
 import com.grimidk.formicempire.classes.interfaces.game.dialogs.AbilitiesDialog;
 import com.grimidk.formicempire.classes.interfaces.game.dialogs.BuildDialog;
 import com.grimidk.formicempire.classes.interfaces.game.dialogs.HatchRateDialog;
+import com.grimidk.formicempire.classes.interfaces.game.dialogs.MapDialog;
 import com.grimidk.formicempire.classes.interfaces.game.dialogs.ResearchDialog;
 import com.grimidk.formicempire.classes.interfaces.game.dialogs.RoleManagementDialog;
 import com.grimidk.formicempire.classes.interfaces.game.panels.AlertPanel;
@@ -39,6 +40,7 @@ public class GamePanel extends JPanel {
     private ResearchDialog researchDialog;
     private BuildDialog buildDialog;
     private AbilitiesDialog abilitiesDialog;
+    private MapDialog mapDialog;
 
     private AlertManager alertManager;
 
@@ -75,6 +77,7 @@ public class GamePanel extends JPanel {
         Runnable showResearchDialogCallback = this::showResearchDialog;
         Runnable showBuildDialogCallback = this::showBuildDialog;
         Runnable showAbilitiesDialogCallback = this::showAbilitiesDialog;
+        Runnable showMapDialogCallback = this::showMapDialog; 
         ControlPanel.RoleManagementCallback showRoleManagementDialogCallback = this::showRoleManagementDialog;
         
         Runnable toggleViewCallback = () -> {
@@ -90,7 +93,8 @@ public class GamePanel extends JPanel {
                                         showBuildDialogCallback,
                                         showRoleManagementDialogCallback,
                                         showAbilitiesDialogCallback,
-                                        toggleViewCallback);
+                                        toggleViewCallback,
+                                        showMapDialogCallback); 
     }
 
     private void initLayout() {
@@ -214,6 +218,20 @@ public class GamePanel extends JPanel {
             abilitiesDialog = new AbilitiesDialog(frame, colony);
         }
         abilitiesDialog.showDialog();
+    }
+
+    private void showMapDialog() {
+        Engine engine = frame.getEngine();
+        World world = engine != null ? engine.getWorld() : null;
+        if (world == null) return;
+        if (mapDialog == null || mapDialog.getOwner() != frame) {
+            if (mapDialog != null) mapDialog.dispose();
+            mapDialog = new MapDialog(frame, world);
+        } else {
+            mapDialog.dispose();
+            mapDialog = new MapDialog(frame, world);
+        }
+        mapDialog.showDialog();
     }
     
     public boolean isEngineStarted() { return engineStarted; }

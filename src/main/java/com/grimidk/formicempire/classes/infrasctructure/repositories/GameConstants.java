@@ -86,7 +86,15 @@ public final class GameConstants {
         loadIcon("icons/biomes/taiga.png"));
     public static final Biome DESSERT_BIOME = new Biome(8, "Dessert", 45, 0, 0.05f, 0.02f, 1f,
         loadIcon("icons/biomes/dessert.png"));
-
+    public static final Biome MOUNTAIN_BIOME = new Biome(9, "Mountain", 12, 1, 0.1f, 0.3f, 2f,
+        loadIcon("icons/biomes/mountain.png"));
+    public static final Biome VOLCANIC_BIOME = new Biome(10, "Volcanic", 60, 0, 0.01f, 0.01f, 5f,
+        loadIcon("icons/biomes/volcanic.png"));
+    public static final Biome LAKE_BIOME = new Biome(11, "Lake", 25, 5, 0.5f, 0.5f, 0f,
+        loadIcon("icons/biomes/lake.png"));
+    public static final Biome OCEAN_BIOME = new Biome(12, "Ocean", 20, 5, 0.2f, 0.2f, 0f,
+        loadIcon("icons/biomes/ocean.png"));
+    
     // --- Resources ---
     public static final ResourceType PLANT_RESOURCE = new ResourceType(1, "Plant Matter", true, false, 
         loadIcon("icons/resources/plant.png"));

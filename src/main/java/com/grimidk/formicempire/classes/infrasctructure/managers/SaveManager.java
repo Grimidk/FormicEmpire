@@ -13,6 +13,7 @@ import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
@@ -297,7 +298,19 @@ public class SaveManager {
         save.setDay(w.getDay());
         save.setMonth(w.getMonth());
         save.setYear(w.getYear());
-        save.setPlayTime(computePlayTime(w)); 
+        save.setPlayTime(computePlayTime(w));
+        save.setWorldRadius(w.getWorldRadius());
+        
+        if (w.getHexes() != null) {
+            List<Savefile.SavedHex> hexList = new ArrayList<>();
+            for (Hex h : w.getHexes()) {
+                boolean hasColony = (h.getColony() != null);
+                int biomeId = (h.getBiome() != null) ? h.getBiome().getId() : 1;
+                int weatherId = (h.getLocalWeather() != null) ? h.getLocalWeather().getId() : 1;
+                hexList.add(new Savefile.SavedHex(h.getQ(), h.getR(), biomeId, hasColony, h.getTimeOffset(), weatherId));
+            }
+            save.setWorldHexes(hexList);
+        }
         
         if (w.getHexes() != null && !w.getHexes().isEmpty()) {
             try {
@@ -464,6 +477,9 @@ public class SaveManager {
         writeJsonLine(w, "parasites", s.getParasites(), false);
         writeJsonLine(w, "researchPoints", s.getResearchPoints(), false);
         writeJsonLine(w, "totalDeaths", s.getTotalDeaths(), false);
+        
+        // - World Settings -
+        writeJsonLine(w, "worldRadius", s.getWorldRadius(), false);
 
         // - Upgrades -
         w.write("  \"unlockedUpgradeIds\": ");
@@ -486,6 +502,12 @@ public class SaveManager {
         // - Resource Sources -
         w.write("  \"savedResourceSources\": ");
         w.write(serializeSourcesToJson(s.getSavedResourceSources()));
+        w.write(","); 
+        w.newLine();
+        
+        // - Hex Grid -
+        w.write("  \"worldHexes\": ");
+        w.write(serializeHexesToJson(s.getWorldHexes()));
         w.newLine();
 
         w.write("}");
@@ -582,6 +604,9 @@ public class SaveManager {
             s.setParasites(Integer.parseInt(m.getOrDefault("parasites", "0")));
             s.setResearchPoints(Integer.parseInt(m.getOrDefault("researchPoints", "0")));
             s.setTotalDeaths(Integer.parseInt(m.getOrDefault("totalDeaths", "0")));
+            
+            // World
+            s.setWorldRadius(Integer.parseInt(m.getOrDefault("worldRadius", "7")));
 
             // Roles & Upgrades
             String rolesJson = m.getOrDefault("assignedRoleCounts", "{}");
@@ -599,6 +624,10 @@ public class SaveManager {
             // Saved Resource Sources
             String sourcesJson = m.getOrDefault("savedResourceSources", "[]");
             s.setSavedResourceSources(deserializeJsonToSources(sourcesJson));
+            
+            // Saved Hexes
+            String hexesJson = m.getOrDefault("worldHexes", "[]");
+            s.setWorldHexes(deserializeJsonToHexes(hexesJson));
         }
         return s;
     }
@@ -656,6 +685,30 @@ public class SaveManager {
             sb.append("\"y\":").append(s.y);
             sb.append("}");
             if (i < sources.size() - 1) {
+                sb.append(",");
+            }
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+    
+    private String serializeHexesToJson(List<Savefile.SavedHex> hexes) {
+        if (hexes == null || hexes.isEmpty()) {
+            return "[]";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (int i = 0; i < hexes.size(); i++) {
+            Savefile.SavedHex h = hexes.get(i);
+            sb.append("{");
+            sb.append("\"q\":").append(h.q).append(",");
+            sb.append("\"r\":").append(h.r).append(",");
+            sb.append("\"b\":").append(h.biomeId).append(",");
+            sb.append("\"c\":").append(h.hasColony).append(",");
+            sb.append("\"t\":").append(h.timeOffset).append(","); 
+            sb.append("\"w\":").append(h.weatherId); 
+            sb.append("}");
+            if (i < hexes.size() - 1) {
                 sb.append(",");
             }
         }
@@ -745,6 +798,50 @@ public class SaveManager {
             }
         }
         
+        return list;
+    }
+    
+    private List<Savefile.SavedHex> deserializeJsonToHexes(String json) {
+        List<Savefile.SavedHex> list = new ArrayList<>();
+        if (json == null || json.length() <= 2) return list;
+        
+        String inner = json.substring(1, json.length() - 1);
+        if (inner.isEmpty()) return list;
+        
+        String[] objects = inner.split("\\},");
+        
+        for (String objStr : objects) {
+            if (!objStr.endsWith("}")) objStr += "}";
+            
+            int q = 0;
+            int r = 0;
+            int b = 0;
+            boolean c = false;
+            int t = 0; 
+            int w = 1; 
+            
+            try {
+                String clean = objStr.replace("{", "").replace("}", "");
+                String[] fields = clean.split(",");
+                for (String f : fields) {
+                    String[] kv = f.split(":");
+                    if (kv.length == 2) {
+                        String k = kv[0].replace("\"", "").trim();
+                        String v = kv[1].replace("\"", "").trim();
+                        
+                        if (k.equals("q")) q = Integer.parseInt(v);
+                        else if (k.equals("r")) r = Integer.parseInt(v);
+                        else if (k.equals("b")) b = Integer.parseInt(v);
+                        else if (k.equals("c")) c = Boolean.parseBoolean(v);
+                        else if (k.equals("t")) t = Integer.parseInt(v);
+                        else if (k.equals("w")) w = Integer.parseInt(v);
+                    }
+                }
+                list.add(new Savefile.SavedHex(q, r, b, c, t, w));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         return list;
     }
 

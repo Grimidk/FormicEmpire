@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.entities;
 
 import com.grimidk.formicempire.classes.constants.world.Biome;
+import com.grimidk.formicempire.classes.constants.world.Weather;
 
 public class Hex {
     private Biome biome;
@@ -11,6 +12,12 @@ public class Hex {
     private Hex south;
     private Hex southWest;
     private Hex southEast;
+    
+    private int q;
+    private int r;
+    
+    private int timeOffset; 
+    private Weather localWeather;
 
     public Hex(Biome biome, Colony colony, Hex north, Hex northWest, Hex northEast, Hex south, Hex southWest, Hex southEast) {
         this.biome = biome;
@@ -89,5 +96,37 @@ public class Hex {
 
     public void setSouthEast(Hex southEast) {
         this.southEast = southEast;
+    }
+
+    public int getQ() {
+        return q;
+    }
+
+    public void setQ(int q) {
+        this.q = q;
+    }
+
+    public int getR() {
+        return r;
+    }
+
+    public void setR(int r) {
+        this.r = r;
+    }
+
+    public int getTimeOffset() {
+        return timeOffset;
+    }
+
+    public void setTimeOffset(int timeOffset) {
+        this.timeOffset = timeOffset;
+    }
+
+    public Weather getLocalWeather() {
+        return localWeather;
+    }
+
+    public void setLocalWeather(Weather localWeather) {
+        this.localWeather = localWeather;
     }
 }
