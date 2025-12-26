@@ -34,9 +34,7 @@ public class World {
     private ArrayList<Hex> hexes;
     private int saveSlotId = 0; // 0 = no slot (ad-hoc)
     private Engine engine;
-    private Random random;
-    
-    // World Generation Settings
+    private Random random;    
     private int worldRadius = 7; 
 
     public World() {
@@ -177,21 +175,12 @@ public class World {
     public Hex getSpawnHex() {
         if (this.hexes == null || this.hexes.isEmpty()) return null;
         
-        // Prioritize finding the hex with the colony
-        for (Hex h : this.hexes) {
-            if (h.getColony() != null) {
-                return h;
-            }
-        }
-        
-        // Fallback: Return (0,0) center hex if no colony exists yet
         for (Hex h : this.hexes) {
             if (h.getQ() == 0 && h.getR() == 0) {
                 return h;
             }
         }
         
-        // Final fallback
         return this.hexes.get(0);
     }
     
@@ -229,19 +218,12 @@ public class World {
         }
     }
     
-    /**
-     * Generates a hexagonal grid world.
-     * @param startBiome The biome for the center hex (0,0).
-     * @param size The number of rings around the center.
-     * @param startColony The colony to place at the center.
-     */
     public void generateWorld(Biome startBiome, int size, Colony startColony) {
         System.out.println("Generating World... Size: " + size + " rings.");
         this.worldRadius = size;
         this.hexes.clear();
         Map<String, Hex> hexMap = new HashMap<>();
 
-        // 1. Generate Hexes using Axial Coordinates (q, r)
         for (int q = -size; q <= size; q++) {
             int r1 = Math.max(-size, -q - size);
             int r2 = Math.min(size, -q + size);
@@ -251,18 +233,12 @@ public class World {
                 Hex hex = new Hex();
                 hex.setQ(q);
                 hex.setR(r);
-                
-                // Simple Timezone logic: q coordinate roughly maps to longitude
-                // Let's say every column (q) shifts time by +1 or -1 hour. 
-                // q=0 is UTC equivalent (no offset).
                 hex.setTimeOffset(q); 
-                
-                // Initial Random Weather
                 hex.setLocalWeather(getRandomWeather());
 
                 if (dist == 0) {
                     hex.setBiome(startBiome);
-                    hex.setColony(startColony); // Ensure colony is set here
+                    hex.setColony(startColony); 
                 } else {
                     hex.setBiome(getBiomeForRing(dist));
                     hex.setColony(null);
@@ -273,10 +249,7 @@ public class World {
             }
         }
 
-        // 2. Link Neighbors
-        linkNeighbors(hexMap);
-        
-        // 3. Print World to Console
+        linkNeighbors(hexMap);        
         printWorldToConsole(size, hexMap);
     }
     
@@ -303,32 +276,47 @@ public class World {
             case 1:
                 options.add(GameConstants.PLAINS_BIOME);
                 options.add(GameConstants.FOREST_BIOME);
+                options.add(GameConstants.JUNGLE_BIOME);
                 break;
             case 2:
                 options.add(GameConstants.FOREST_BIOME);
                 options.add(GameConstants.JUNGLE_BIOME);
+                options.add(GameConstants.SWAMP_BIOME);
                 break;
             case 3:
                 options.add(GameConstants.JUNGLE_BIOME);
                 options.add(GameConstants.SWAMP_BIOME);
+                options.add(GameConstants.DESSERT_BIOME);
                 break;
             case 4:
                 options.add(GameConstants.SWAMP_BIOME);
+                options.add(GameConstants.DESSERT_BIOME);
                 options.add(GameConstants.TAIGA_BIOME);
+                options.add(GameConstants.URBAN_BIOME);
                 break;
             case 5:
                 options.add(GameConstants.TAIGA_BIOME);
                 options.add(GameConstants.TUNDRA_BIOME);
+                options.add(GameConstants.DESSERT_BIOME);
+                options.add(GameConstants.URBAN_BIOME);
+                options.add(GameConstants.LAKE_BIOME);
                 break;
             case 6:
+                options.add(GameConstants.TUNDRA_BIOME);
                 options.add(GameConstants.DESSERT_BIOME);
                 options.add(GameConstants.MOUNTAIN_BIOME);
+                options.add(GameConstants.URBAN_BIOME);
+                options.add(GameConstants.LAKE_BIOME);
                 break;
             case 7:
+                options.add(GameConstants.TUNDRA_BIOME);
+                options.add(GameConstants.DESSERT_BIOME);
+                options.add(GameConstants.MOUNTAIN_BIOME);
+                options.add(GameConstants.URBAN_BIOME);
                 options.add(GameConstants.VOLCANIC_BIOME);
                 break;
             default:
-                options.add(GameConstants.VOLCANIC_BIOME);
+                options.add(GameConstants.OCEAN_BIOME);
                 break;
         }
         
@@ -386,7 +374,7 @@ public class World {
         if (colony.getAntTotal() == 0) {
             colony.startColony();
         }
-        generateWorld(biome, 7, colony);
+        generateWorld(biome, 8, colony);
         updateEnvironmentalConditions();
     }
 
@@ -396,8 +384,7 @@ public class World {
         this.day = savefile.getDay();
         this.month = savefile.getMonth();
         this.year = savefile.getYear();  
-        // Load radius from save or default to 7 if invalid/zero
-        this.worldRadius = (savefile.getWorldRadius() > 0) ? savefile.getWorldRadius() : 7;
+        this.worldRadius = (savefile.getWorldRadius() > 0) ? savefile.getWorldRadius() : 8;
         
         Colony colony = new Colony(savefile);  
         
@@ -405,7 +392,6 @@ public class World {
         Map<String, Hex> hexMap = new HashMap<>();
         
         if (savefile.getWorldHexes() != null && !savefile.getWorldHexes().isEmpty()) {
-            // Load grid from save
             for (Savefile.SavedHex sh : savefile.getWorldHexes()) {
                 Hex hex = new Hex();
                 hex.setQ(sh.q);
@@ -423,12 +409,9 @@ public class World {
                 hexMap.put(sh.q + "," + sh.r, hex);
                 this.hexes.add(hex);
             }
-            // Link after loading all
             linkNeighbors(hexMap);
             System.out.println("Loaded world grid from savefile (" + this.hexes.size() + " hexes).");
         } else {
-            // FALLBACK: Old save or no map data found.
-            // Generate a complete world using the loaded colony data.
             System.out.println("No map data in save (or old save version). Generating fresh world map for existing colony.");
             generateWorld(GameConstants.PLAINS_BIOME, this.worldRadius, colony);
         }
@@ -442,11 +425,6 @@ public class World {
         }
 
         Biome baseBiome = this.getSpawnHex().getBiome();
-        
-        // Determine temperature/humidity based on Base Biome + Season + Local Weather
-        // Note: TimeOfDay also affects this, but TimeOfDay logic in runHour sets global time.
-        // If we want local time, we'd adjust based on spawn hex offset.
-        
         float calcTemp = baseBiome.getTemperature();
         float calcHumid = baseBiome.isIsHumid();
 
@@ -459,7 +437,6 @@ public class World {
             calcTemp *= this.timeOfDay.getTempMult();
         }
 
-        // Use the Spawn Hex's LOCAL weather, falling back to global if needed
         Weather localW = this.getSpawnHex().getLocalWeather();
         if (localW == null) localW = this.weather;
         
@@ -477,7 +454,6 @@ public class World {
     }
 
     private void randomizeWeather() {
-        // Global Weather Randomization (optional now if we rely on local)
         if (random.nextInt(1000) == 0) {
             if (random.nextBoolean()) {
                 this.setWeather(GameConstants.FROG_WEATHER);
@@ -485,7 +461,6 @@ public class World {
                 this.setWeather(GameConstants.BLOOD_WEATHER);
             }
         } else {
-            // ... existing random logic for global ...
             List<Weather> possibleWeathers = new ArrayList<>();
             possibleWeathers.add(GameConstants.CLEAR_WEATHER);
             possibleWeathers.add(GameConstants.CLEAR_WEATHER);
@@ -508,9 +483,8 @@ public class World {
             }
         }
         
-        // randomize local weather for all hexes occasionally
         for (Hex h : this.hexes) {
-             if (random.nextInt(100) < 5) { // 5% chance to change per day
+             if (random.nextInt(100) < 5) { 
                  h.setLocalWeather(getRandomWeather());
              }
         }
