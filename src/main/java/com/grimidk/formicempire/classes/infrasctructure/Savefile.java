@@ -73,7 +73,7 @@ public class Savefile implements Serializable {
         this.day = 1;
         this.month = 1;
         this.year = 0; 
-        this.worldRadius = 7;
+        this.worldRadius = 8;
 
         this.hatchRateWorker = 100.0f;
         this.hatchRateSoldier = 0.0f;

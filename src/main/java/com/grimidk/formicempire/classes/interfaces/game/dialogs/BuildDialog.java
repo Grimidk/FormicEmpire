@@ -146,7 +146,6 @@ public class BuildDialog extends JDialog {
 
         panel.add(infoPanel, BorderLayout.CENTER);
 
-        // Action Panel (Button, Cost)
         JPanel actionPanel = new JPanel();
         actionPanel.setLayout(new BoxLayout(actionPanel, BoxLayout.Y_AXIS));
         actionPanel.setBorder(new EmptyBorder(0, 0, 0, 5));
@@ -163,7 +162,6 @@ public class BuildDialog extends JDialog {
             }
         });
 
-        // Cost Labels
         String costString = String.format("<html>%d Minerals<br>%d Resin<br>%d Hours (base)</html>",
             building.getMineralCost(), building.getResinCost(), building.getBuildTime());
         

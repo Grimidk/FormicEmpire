@@ -35,7 +35,7 @@ public class World {
     private int saveSlotId = 0; // 0 = no slot (ad-hoc)
     private Engine engine;
     private Random random;    
-    private int worldRadius = 7; 
+    private int worldRadius = 8; 
 
     public World() {
         this.minute = 0;
@@ -344,7 +344,7 @@ public class World {
     }
 
     private void printWorldToConsole(int size, Map<String, Hex> hexMap) {
-        System.out.println("\n--- Generated World Map (First Letter of Biome) ---\n");
+        System.out.println("\n--- Generated World Map ---\n");
         for (int r = -size; r <= size; r++) {
             StringBuilder line = new StringBuilder();
             
