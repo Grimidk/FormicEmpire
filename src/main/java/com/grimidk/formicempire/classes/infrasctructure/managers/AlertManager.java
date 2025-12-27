@@ -19,6 +19,8 @@ public class AlertManager {
     private final List<Alert> activeAlerts = new ArrayList<>();
     
     private final Color COL_BLACK = new Color(0,0,0);
+    
+    private final int durationDefault = 10000;
 
     public AlertManager(Colony colony, AlertPanel panel) {
         this.colony = colony;
@@ -37,16 +39,28 @@ public class AlertManager {
         for (String msg : events) {
             if (msg.startsWith("CRITICAL")) {
                 String shortMsg = msg.replace("CRITICAL: ", "").replace(" new Queens joined", " Queens In");
-                addAlert("CRIT", shortMsg, COL_BLACK, 30000);
-            } else if (msg.startsWith("SUCCESS")) {
-                addAlert("SUCC", msg.replace("SUCCESS: ", "Built: "), COL_BLACK, 15000);
-            } else if (msg.startsWith("WARNING")) {
+                addAlert("CRIT", shortMsg, COL_BLACK, durationDefault); 
+            } 
+            else if (msg.startsWith("DEATH:")) {
+                String cleanMsg = msg.replace("DEATH: ", "");
+                addAlert("DEATH", cleanMsg, COL_BLACK, durationDefault);
+            }
+            else if (msg.startsWith("WARNING")) {
                 String shortWarn = msg.replace("WARNING: ", "").replace(" Juveniles Died (Nursing)", " Babies Lost");
-                addAlert("WARN", shortWarn, COL_BLACK, 20000);
-            } else if (msg.startsWith("COMPOST")) {
-                addAlert("COMP", "Bio-Recycling Active", Color.BLACK, 10000);
-            } else {
-                addAlert("INFO", msg, Color.BLACK, 10000);
+                addAlert("WARN", shortWarn, COL_BLACK, durationDefault);
+            } 
+            else if (msg.startsWith("SUCCESS")) {
+                addAlert("SUCC", msg.replace("SUCCESS: ", "Built: "), COL_BLACK, durationDefault);
+            } 
+            else if (msg.startsWith("COMPOST")) {
+                String display = msg.replace("COMPOST: Recycled ", "Recycled ").replace(" bodies into mushroom matter.", " Bodies");
+                addAlert("COMP", display, COL_BLACK, durationDefault);
+            } 
+            else if (msg.contains("Nuptial Flight")) {
+                addAlert("NUPTIAL", "Nuptial Flight Occurred", COL_BLACK, durationDefault);
+            }
+            else {
+                addAlert("INFO", msg, COL_BLACK, durationDefault);
             }
         }
 
@@ -67,7 +81,7 @@ public class AlertManager {
         int production = colony.getTotalProduction();
         int consumption = colony.getTotalConsumption();
         if (consumption > production && colony.getMushrooms() < consumption * 24) {
-            addAlert("STARVE", "Starvation Risk!", COL_BLACK, 5000);
+            addAlert("STARVE", "Starvation Risk!", COL_BLACK, durationDefault);
         }
     }
 
@@ -77,7 +91,7 @@ public class AlertManager {
             if (!colony.hasUpgrade(u) && u.getCost() > 0 && 
                (u.getRequirement() == null || colony.hasUpgrade(u.getRequirement())) && 
                colony.getResearchPoints() >= u.getCost()) {
-                addAlert("RESEARCH", "New Research Available", COL_BLACK, 5000);
+                addAlert("RESEARCH", "New Research Available", COL_BLACK, durationDefault);
                 return; 
             }
         }
@@ -90,7 +104,7 @@ public class AlertManager {
         for (Building b : GameUnlocks.getBuildings()) {
             if (!colony.hasBuilding(b) && colony.getMinerals() >= b.getMineralCost() && 
                 colony.getResins() >= b.getResinCost() && colony.hasBuilding(b.getRequirement())) {
-                addAlert("BUILD", "Can Build: " + b.getName(), COL_BLACK, 5000);
+                addAlert("BUILD", "Can Build: " + b.getName(), COL_BLACK, durationDefault);
                 return; 
             }
         }
@@ -99,7 +113,7 @@ public class AlertManager {
     private void checkBodyPile() {
         int deadCount = colony.getDeadAnts().size();
         if (deadCount >= 500) {
-            addAlert("DEAD", "Body Pile High: " + deadCount, COL_BLACK, 5000);
+            addAlert("DEAD", "Body Pile High: " + deadCount, COL_BLACK, durationDefault);
         }
     }
 }
