@@ -639,60 +639,6 @@ public class Colony {
     public int getBaseSpeed() { return statsService.getBaseSpeed(this); }
     public int getSourceCapacity() { return statsService.getSourceCapacity(this); }
 
-    // --- Colony Setup ---
-    public void startColony() {
-        List<Ant> workerList = getWorkers();
-        for (int i = 0; i < 9; i++) {
-            Ant worker = new Ant(this, GameConstants.TYPE_WORKER);
-            worker.setDimension(WorldSpaces.OVERWORLD);
-            workerList.add(worker);
-        }
-        Ant queen = new Ant(this, GameConstants.TYPE_QUEEN);
-        queen.setDimension(WorldSpaces.UNDERWORLD); 
-        getQueens().add(queen);
-        
-        setAssignedRoleCount(GameConstants.ROLE_LAYER, 1);
-        setAssignedRoleCount(GameConstants.ROLE_NURSE, 3);
-        setAssignedRoleCount(GameConstants.ROLE_FARMER, 1);
-        setAssignedRoleCount(GameConstants.ROLE_FORAGER, 5);
-        this.getQueens().get(0).setRole(GameConstants.ROLE_LAYER);
-        
-        // Assign roles and dimensions
-        this.getWorkers().get(0).setRole(GameConstants.ROLE_NURSE);
-        this.getWorkers().get(0).setDimension(WorldSpaces.UNDERWORLD);
-        
-        this.getWorkers().get(1).setRole(GameConstants.ROLE_NURSE);
-        this.getWorkers().get(1).setDimension(WorldSpaces.UNDERWORLD);
-        
-        this.getWorkers().get(2).setRole(GameConstants.ROLE_FARMER);
-        this.getWorkers().get(2).setDimension(WorldSpaces.UNDERWORLD);
-        
-        this.getWorkers().get(3).setRole(GameConstants.ROLE_NURSE);
-        this.getWorkers().get(3).setDimension(WorldSpaces.UNDERWORLD);
-        
-        this.getWorkers().get(4).setRole(GameConstants.ROLE_FORAGER);
-        this.getWorkers().get(4).setDimension(WorldSpaces.OVERWORLD);
-        
-        this.getWorkers().get(5).setRole(GameConstants.ROLE_FORAGER);
-        this.getWorkers().get(5).setDimension(WorldSpaces.OVERWORLD);
-        
-        this.getWorkers().get(6).setRole(GameConstants.ROLE_FORAGER);
-        this.getWorkers().get(6).setDimension(WorldSpaces.OVERWORLD);
-        
-        this.getWorkers().get(7).setRole(GameConstants.ROLE_FORAGER);
-        this.getWorkers().get(7).setDimension(WorldSpaces.OVERWORLD);
-        
-        this.getWorkers().get(8).setRole(GameConstants.ROLE_FORAGER);
-        this.getWorkers().get(8).setDimension(WorldSpaces.OVERWORLD);
-
-        if (locationService != null) {
-            ResourceSource initialPlant = new ResourceSource(GameConstants.PLANT_RESOURCE, 10000, 0, 0);
-            ResourceSource initialWater = new ResourceSource(GameConstants.WATER_RESOURCE, 10000, 0, 0);
-            
-            this.locationService.addSource(this, initialPlant);
-            this.locationService.addSource(this, initialWater);
-        }
-    }
 
     // --- Simulation Logic Methods ---
     public void runRoleAssignment() { populationService.runRoleAssignment(this); }

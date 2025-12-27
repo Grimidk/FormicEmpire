@@ -15,6 +15,7 @@ import com.grimidk.formicempire.classes.constants.world.TimeOfDay;
 import com.grimidk.formicempire.classes.constants.world.Weather;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.entities.services.ColonyStarterService;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 
@@ -371,9 +372,15 @@ public class World {
     }
 
     public void startWorld(Biome biome, Colony colony) {
+        System.out.println("[World] startWorld called. Colony ants before init: " + colony.getAntTotal());
+
         if (colony.getAntTotal() == 0) {
-            colony.startColony();
+            ColonyStarterService starterService = new ColonyStarterService();
+            starterService.initializeNewColony(colony);
         }
+        
+        System.out.println("[World] Colony ants after init: " + colony.getAntTotal());
+
         generateWorld(biome, 8, colony);
         updateEnvironmentalConditions();
     }
@@ -387,6 +394,12 @@ public class World {
         this.worldRadius = (savefile.getWorldRadius() > 0) ? savefile.getWorldRadius() : 8;
         
         Colony colony = new Colony(savefile);  
+
+        if (colony.getAntTotal() == 0) {
+            System.out.println("[World] RECOVERY: Loaded save has 0 ants. Running ColonyStarterService to repair.");
+            ColonyStarterService starterService = new ColonyStarterService();
+            starterService.initializeNewColony(colony);
+        }
         
         this.hexes.clear();
         Map<String, Hex> hexMap = new HashMap<>();
