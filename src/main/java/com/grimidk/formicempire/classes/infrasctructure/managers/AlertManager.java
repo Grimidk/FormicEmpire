@@ -46,7 +46,7 @@ public class AlertManager {
                 addAlert("DEATH", cleanMsg, COL_BLACK, durationDefault);
             }
             else if (msg.startsWith("WARNING")) {
-                String shortWarn = msg.replace("WARNING: ", "").replace(" Juveniles Died (Nursing)", " Babies Lost");
+                String shortWarn = msg.replace("WARNING: ", "").replace(" Juveniles Died (Nursing)", " Juveniles Lost");
                 addAlert("WARN", shortWarn, COL_BLACK, durationDefault);
             } 
             else if (msg.startsWith("SUCCESS")) {

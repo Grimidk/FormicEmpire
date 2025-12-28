@@ -579,7 +579,7 @@ public void runCollecting(Colony colony) {
         int capacity = colony.getStatsService().getMushroomsCapacity(colony);
         colony.setMushrooms(Math.min(colony.getMushrooms() + mushroomGain, capacity));
         
-        if (actualToCompost > 10) {
+        if (actualToCompost > 0) {
             colony.logEvent("COMPOST: Recycled " + actualToCompost + " bodies into mushroom matter.");
         }
     }

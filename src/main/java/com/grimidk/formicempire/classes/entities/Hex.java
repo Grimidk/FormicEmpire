@@ -18,6 +18,7 @@ public class Hex {
     
     private int timeOffset; 
     private Weather localWeather;
+    private boolean isActive;
 
     public Hex(Biome biome, Colony colony, Hex north, Hex northWest, Hex northEast, Hex south, Hex southWest, Hex southEast) {
         this.biome = biome;
@@ -28,105 +29,62 @@ public class Hex {
         this.south = south;
         this.southWest = southWest;
         this.southEast = southEast;
+        this.isActive = false;
     }
     
     public Hex(){
+        this.isActive = false;
+    }
+
+    public Biome getBiome() { return biome; }
+
+    public void setBiome(Biome biome) { this.biome = biome; }
+
+    public Colony getColony() { return colony; }
+
+    public void setColony(Colony colony) { this.colony = colony; }
+
+    public Hex getNorth() { return north; }
+
+    public void setNorth(Hex north) { this.north = north; }
+
+    public Hex getNorthWest() { return northWest; }
+
+    public void setNorthWest(Hex northWest) { this.northWest = northWest; }
+
+    public Hex getNorthEast() { return northEast; }
+
+    public void setNorthEast(Hex northEast) { this.northEast = northEast; }
+
+    public Hex getSouth() { return south; }
+
+    public void setSouth(Hex south) { this.south = south; }
+
+    public Hex getSouthWest() { return southWest; }
+
+    public void setSouthWest(Hex southWest) { this.southWest = southWest; }
+
+    public Hex getSouthEast() { return southEast; }
+
+    public void setSouthEast(Hex southEast) { this.southEast = southEast; }
+
+    public int getQ() { return q; }
+
+    public void setQ(int q) { this.q = q; }
+
+    public int getR() { return r; }
+
+    public void setR(int r) { this.r = r; }
+
+    public int getTimeOffset() { return timeOffset;}
+
+    public void setTimeOffset(int timeOffset) { this.timeOffset = timeOffset; }
+
+    public Weather getLocalWeather() { return localWeather; }
+
+    public void setLocalWeather(Weather localWeather) { this.localWeather = localWeather;}
+
+    public boolean isActive() { return isActive; }
     
-    }
-
-    public Biome getBiome() {
-        return biome;
-    }
-
-    public void setBiome(Biome biome) {
-        this.biome = biome;
-    }
-
-    public Colony getColony() {
-        return colony;
-    }
-
-    public void setColony(Colony colony) {
-        this.colony = colony;
-    }
-
-    public Hex getNorth() {
-        return north;
-    }
-
-    public void setNorth(Hex north) {
-        this.north = north;
-    }
-
-    public Hex getNorthWest() {
-        return northWest;
-    }
-
-    public void setNorthWest(Hex northWest) {
-        this.northWest = northWest;
-    }
-
-    public Hex getNorthEast() {
-        return northEast;
-    }
-
-    public void setNorthEast(Hex northEast) {
-        this.northEast = northEast;
-    }
-
-    public Hex getSouth() {
-        return south;
-    }
-
-    public void setSouth(Hex south) {
-        this.south = south;
-    }
-
-    public Hex getSouthWest() {
-        return southWest;
-    }
-
-    public void setSouthWest(Hex southWest) {
-        this.southWest = southWest;
-    }
-
-    public Hex getSouthEast() {
-        return southEast;
-    }
-
-    public void setSouthEast(Hex southEast) {
-        this.southEast = southEast;
-    }
-
-    public int getQ() {
-        return q;
-    }
-
-    public void setQ(int q) {
-        this.q = q;
-    }
-
-    public int getR() {
-        return r;
-    }
-
-    public void setR(int r) {
-        this.r = r;
-    }
-
-    public int getTimeOffset() {
-        return timeOffset;
-    }
-
-    public void setTimeOffset(int timeOffset) {
-        this.timeOffset = timeOffset;
-    }
-
-    public Weather getLocalWeather() {
-        return localWeather;
-    }
-
-    public void setLocalWeather(Weather localWeather) {
-        this.localWeather = localWeather;
-    }
+    public void setActive(boolean isActive) { this.isActive = isActive; }
 }

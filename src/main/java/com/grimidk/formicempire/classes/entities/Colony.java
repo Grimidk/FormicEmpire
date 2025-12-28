@@ -39,6 +39,7 @@ public class Colony {
     private Species species;
     private boolean isPlayer;
     private ColonyRank rank;
+    private boolean isActive;
     
     // --- Population Data ---
     private final Map<AntType, List<Ant>> antGroups;
@@ -180,7 +181,7 @@ public class Colony {
         this.buildings.add(GameUnlocks.WATER_RESERVOIR_0);
     }
     
-    private void laodBuildings(Savefile savefile) {
+    private void loadBuildings(Savefile savefile) {
         List<Integer> unlockedBuildingIds = savefile.getUnlockedBuildingIds(); 
         if (unlockedBuildingIds == null || unlockedBuildingIds.isEmpty()) {
             initializeBuildings();
@@ -232,7 +233,7 @@ public class Colony {
         initializeLists();
         initializeDefaults(); 
         loadUpgrades(savefile);
-        laodBuildings(savefile);
+        loadBuildings(savefile);
         initializeAssignedRoles(); 
         initializeServices(); 
         
