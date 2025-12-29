@@ -15,26 +15,22 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet; 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class RoleManagementDialog extends JDialog {
+public class RoleManagementDialog extends ZeroDialog {
 
     private final Colony colony;
     private final JTabbedPane tabbedPane = new JTabbedPane();
     private final List<RolePanel> rolePanels = new ArrayList<>();
 
     public RoleManagementDialog(JFrame owner, Colony colony) {
-        super(owner, "Manage Ant Roles", true);
+        super(owner, "Manage Ant Roles", new Dimension(550, 500));
         this.colony = colony;
 
-        setLayout(new BorderLayout());
-        setPreferredSize(new Dimension(550, 500));
-        
         add(tabbedPane, BorderLayout.CENTER);
-        add(createSouthPanel(), BorderLayout.SOUTH);
         
         initTabs(); 
         initKeyBindings();
@@ -46,21 +42,20 @@ public class RoleManagementDialog extends JDialog {
                 tabbedPane.requestFocusInWindow();
             }
         });
-        
-        getRootPane().registerKeyboardAction(e -> dispose(),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_IN_FOCUSED_WINDOW);
-        
-        pack();
-        setLocationRelativeTo(owner);
+    }
+
+    @Override
+    protected void refreshDialog() {
+        // For RoleManagement, refreshing is checking active tabs/roles
+        // We do this via liveUpdate mostly, but basic checks here
+        for (RolePanel panel : rolePanels) {
+            panel.updateData();
+        }
     }
     
-    private JPanel createSouthPanel() {
-        JButton closeButton = new JButton("Close");
-        closeButton.addActionListener(e -> dispose());
-        JPanel southPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        southPanel.add(closeButton);
-        return southPanel;
+    public void showDialog(int tabIndex) {
+        selectTab(tabIndex);
+        super.showDialog();
     }
     
     private void initTabs() {
@@ -135,6 +130,7 @@ public class RoleManagementDialog extends JDialog {
         return null; 
     }
 
+    @Override
     public void liveUpdate() {
         if (!isShowing()) {
             return;
@@ -142,11 +138,6 @@ public class RoleManagementDialog extends JDialog {
         for (RolePanel panel : rolePanels) {
             panel.updateData();
         }
-    }
-    
-    public void showDialog(int tabIndex) {
-        selectTab(tabIndex);
-        setVisible(true);
     }
     
     private static class RolePanel extends JPanel {

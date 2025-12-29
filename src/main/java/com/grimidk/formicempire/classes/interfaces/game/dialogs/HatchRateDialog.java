@@ -13,63 +13,39 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class HatchRateDialog extends JDialog {
+public class HatchRateDialog extends ZeroDialog {
 
     private final Colony colony;
     private final Map<AntType, JSpinner> spinnerMap = new HashMap<>();
     private final JLabel totalLabel = new JLabel("Total: 100.0%");
+    private final JPanel centerPanel;
 
     public HatchRateDialog(JFrame owner, Colony colony) {
-        super(owner, "Manage Pupa Hatch Rates", true);
+        super(owner, "Manage Pupa Hatch Rates", new Dimension(400, 350));
         this.colony = colony;
         
-        setLayout(new BorderLayout());
-        setPreferredSize(new Dimension(400, 350));
+        centerPanel = new JPanel();
+        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
+        centerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         
-        add(createCenterPanel(), BorderLayout.CENTER);
-        add(createSouthPanel(), BorderLayout.SOUTH);
+        add(centerPanel, BorderLayout.CENTER);
         
-        getRootPane().registerKeyboardAction(e -> dispose(),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_IN_FOCUSED_WINDOW);
-        
-        getRootPane().registerKeyboardAction(e -> dispose(),
-                KeyStroke.getKeyStroke(KeyEvent.VK_P, 0),
-                JComponent.WHEN_IN_FOCUSED_WINDOW);
-        
-        pack();
-        setLocationRelativeTo(owner);
+        registerCloseKey(KeyEvent.VK_P);
     }
     
-    private JPanel createSouthPanel() {
-        JButton closeButton = new JButton("Close");
-        closeButton.addActionListener(e -> dispose());
-        JPanel southPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        southPanel.add(closeButton);
-        return southPanel;
-    }
-
-    private JPanel createCenterPanel() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
+    @Override
+    protected void refreshDialog() {
+        centerPanel.removeAll();
+        spinnerMap.clear();
         totalLabel.setFont(totalLabel.getFont().deriveFont(Font.BOLD));
-        
-        panel.add(new JLabel("Set hatch chance for new ants:"));
-        panel.add(totalLabel);
-        panel.add(new JSeparator(SwingConstants.HORIZONTAL));
+        centerPanel.add(new JLabel("Set hatch chance for new ants:"));
+        centerPanel.add(totalLabel);
+        centerPanel.add(new JSeparator(SwingConstants.HORIZONTAL));
         
         List<AntType> typesToRate = new ArrayList<>();
-        if (colony.hasUpgrade(GameUnlocks.TYPE_WORKER)) {
-            typesToRate.add(GameConstants.TYPE_WORKER);
-        }
-        if (colony.hasUpgrade(GameUnlocks.TYPE_SOLDIER)) {
-            typesToRate.add(GameConstants.TYPE_SOLDIER);
-        }
-        if (colony.hasUpgrade(GameUnlocks.TYPE_MAJOR)) {
-            typesToRate.add(GameConstants.TYPE_MAJOR);
-        }
+        if (colony.hasUpgrade(GameUnlocks.TYPE_WORKER)) typesToRate.add(GameConstants.TYPE_WORKER);
+        if (colony.hasUpgrade(GameUnlocks.TYPE_SOLDIER)) typesToRate.add(GameConstants.TYPE_SOLDIER);
+        if (colony.hasUpgrade(GameUnlocks.TYPE_MAJOR)) typesToRate.add(GameConstants.TYPE_MAJOR);
         if (colony.hasUpgrade(GameUnlocks.TYPE_PRINCESS)) {
             typesToRate.add(GameConstants.TYPE_DRONE);
             typesToRate.add(GameConstants.TYPE_PRINCESS);
@@ -97,11 +73,12 @@ public class HatchRateDialog extends JDialog {
             
             spinnerMap.put(type, spinner);
             row.add(spinner);
-            panel.add(row);
+            centerPanel.add(row);
         }
         
         updateHatchRateTotals();
-        return panel;
+        centerPanel.revalidate();
+        centerPanel.repaint();
     }
 
     private void disableSpinnerLetterInput(JSpinner spinner) {
@@ -141,9 +118,5 @@ public class HatchRateDialog extends JDialog {
             double newMax = currentValue + Math.max(0.0, unassigned);
             model.setMaximum(Math.max(currentValue, newMax));
         }
-    }
-    
-    public void showDialog() {
-        setVisible(true);
     }
 }

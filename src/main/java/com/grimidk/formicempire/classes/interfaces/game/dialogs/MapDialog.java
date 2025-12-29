@@ -9,52 +9,29 @@ import java.awt.event.KeyEvent;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MapDialog extends JDialog {
+public class MapDialog extends ZeroDialog {
 
     private final World world;
     private final JTextArea mapArea;
 
     public MapDialog(JFrame owner, World world) {
-        super(owner, "World Map", true);
+        super(owner, "World Map", new Dimension(800, 600));
         this.world = world;
-
-        setLayout(new BorderLayout());
-        setPreferredSize(new Dimension(800, 600));
 
         mapArea = new JTextArea();
         mapArea.setFont(new Font("Monospaced", Font.BOLD, 14));
         mapArea.setEditable(false);
+        mapArea.setFocusable(false); 
         mapArea.setBackground(new Color(30, 30, 30));
         mapArea.setForeground(Color.GREEN);
         
         add(new JScrollPane(mapArea), BorderLayout.CENTER);
 
-        JButton closeButton = new JButton("Close");
-        closeButton.addActionListener(e -> dispose());
-        
-        JButton refreshButton = new JButton("Refresh");
-        refreshButton.addActionListener(e -> refreshMap());
-
-        JPanel south = new JPanel();
-        south.add(refreshButton);
-        south.add(closeButton);
-        add(south, BorderLayout.SOUTH);
-
-        // Close on Escape
-        getRootPane().registerKeyboardAction(e -> dispose(),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_IN_FOCUSED_WINDOW);
-
-        pack();
-        setLocationRelativeTo(owner);
+        registerCloseKey(KeyEvent.VK_I);
     }
 
-    public void showDialog() {
-        refreshMap();
-        setVisible(true);
-    }
-
-    private void refreshMap() {
+    @Override
+    protected void refreshDialog() {
         if (world == null) {
             mapArea.setText("No world loaded.");
             return;
@@ -68,9 +45,7 @@ public class MapDialog extends JDialog {
             hexMap.put(h.getQ() + "," + h.getR(), h);
         }
 
-        // Ascii Hex Grid Logic
         for (int r = -size; r <= size; r++) {
-            // Indentation for hex layout
             for (int k = 0; k < Math.abs(r); k++) sb.append("  "); 
 
             int q1 = Math.max(-size, -r - size);
@@ -100,5 +75,6 @@ public class MapDialog extends JDialog {
         sb.append(" S  : Swamp     V  : Volcanic\n");
         
         mapArea.setText(sb.toString());
+        mapArea.setCaretPosition(0);
     }
 }
