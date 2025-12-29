@@ -88,14 +88,14 @@ public class WorldPanel extends ZeroGamePanel {
     }
     
     public void updateStaticData(World world) {
-        if (world == null || world.getSpawnHex() == null) return;
+        if (world == null || world.getActiveHex() == null) return;
         
-        String biomeName = (world.getSpawnHex().getBiome() != null) ? "Biome: " + world.getSpawnHex().getBiome().getName() : "Biome: N/A";
+        String biomeName = (world.getActiveHex().getBiome() != null) ? "Biome: " + world.getActiveHex().getBiome().getName() : "Biome: N/A";
         if (!biomeName.equals(lastBiome)) {
             biomeLabel.setText(""); 
             biomeLabel.setToolTipText(biomeName);
-            if (world.getSpawnHex().getBiome() != null) {
-                biomeLabel.setIcon(world.getSpawnHex().getBiome().getIcon());
+            if (world.getActiveHex().getBiome() != null) {
+                biomeLabel.setIcon(world.getActiveHex().getBiome().getIcon());
             }
             lastBiome = biomeName;
         }

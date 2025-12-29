@@ -9,9 +9,14 @@ import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstan
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 
 import javax.swing.*;
-import java.awt.Component;
+import java.awt.*;
 
 public class ColonyPanel extends ZeroGamePanel {
+
+    // --- Container Components ---
+    private JPanel contentPanel;
+    private JPanel emptyPanel;
+    private boolean isShowingContent = true;
 
     // --- Rank Components ---
     private final JLabel rankLabel = new JLabel("Colony Rank");
@@ -75,8 +80,7 @@ public class ColonyPanel extends ZeroGamePanel {
     private ColonyRank lastRank = null;
 
     public ColonyPanel() {
-        super(new BoxLayout(null, BoxLayout.Y_AXIS)); 
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));        
+        super(new CardLayout()); 
         initComponents();
         initLayout();
     }
@@ -130,6 +134,15 @@ public class ColonyPanel extends ZeroGamePanel {
         policeStatsLabel.setToolTipText("Policing Efficency");
         researchPointsLabel.setIcon(GameConstants.ICON_RESEARCH);
         researchPointsLabel.setToolTipText("Research Points");
+        
+        // Panels
+        contentPanel = new JPanel();
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+        
+        emptyPanel = new JPanel(new BorderLayout());
+        JLabel noColonyLabel = new JLabel("No Colony Detected", SwingConstants.CENTER);
+        noColonyLabel.setForeground(Color.GRAY);
+        emptyPanel.add(noColonyLabel, BorderLayout.CENTER);
     }
 
     private void setupConstantLabel(JLabel label, AntType type) {
@@ -144,9 +157,22 @@ public class ColonyPanel extends ZeroGamePanel {
 
     @Override
     protected void initLayout() {
-        add(createResourcesDetailPanel());
-        add(createAntsDetailPanel());
-        add(createColonyStatsPanel());
+        contentPanel.add(createResourcesDetailPanel());
+        contentPanel.add(createAntsDetailPanel());
+        contentPanel.add(createColonyStatsPanel());
+        add(contentPanel, "CONTENT");
+        add(emptyPanel, "EMPTY");
+    }
+    
+    private void setView(boolean showContent) {
+        if (this.isShowingContent == showContent) return;
+        CardLayout cl = (CardLayout) getLayout();
+        if (showContent) {
+            cl.show(this, "CONTENT");
+        } else {
+            cl.show(this, "EMPTY");
+        }
+        this.isShowingContent = showContent;
     }
     
     private JPanel createResourcesDetailPanel() {
@@ -205,6 +231,12 @@ public class ColonyPanel extends ZeroGamePanel {
     }
 
     public void updateMinuteData(Colony colony) {
+        if (colony == null) {
+            setView(false);
+            return;
+        }
+        setView(true);
+
         int mushrooms = colony.getMushrooms(); 
         int plants = colony.getPlants();     
         int protein = colony.getProtein();  
@@ -267,6 +299,11 @@ public class ColonyPanel extends ZeroGamePanel {
     }
 
     public void updateHourData(Colony colony) {
+        if (colony == null) {
+            setView(false);
+            return;
+        }
+
         int eggs = colony.getEggs() != null ? colony.getEggs().size() : 0;
         if (eggs != lastEggs) eggsLabel.setText(String.valueOf(eggs));
         
@@ -314,6 +351,11 @@ public class ColonyPanel extends ZeroGamePanel {
     }
 
     public void updateDayData(Colony colony) {
+        if (colony == null) {
+            setView(false);
+            return;
+        }
+        
         int totalAnts = colony.getAntTotal();
         totalAntLabel.setText("Total ants: " + totalAnts);
         

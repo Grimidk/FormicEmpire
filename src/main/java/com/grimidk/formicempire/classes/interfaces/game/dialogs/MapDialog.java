@@ -8,15 +8,21 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 public class MapDialog extends ZeroDialog {
 
     private final World world;
     private final JTextArea mapArea;
+    private final JButton randomTravelButton;
+    private final JButton homeButton; 
+    private final JButton closeButton;
+    private final Runnable onHexChange;
 
-    public MapDialog(JFrame owner, World world) {
+    public MapDialog(JFrame owner, World world, Runnable onHexChange) {
         super(owner, "World Map", new Dimension(800, 600));
         this.world = world;
+        this.onHexChange = onHexChange;
 
         mapArea = new JTextArea();
         mapArea.setFont(new Font("Monospaced", Font.BOLD, 14));
@@ -25,9 +31,57 @@ public class MapDialog extends ZeroDialog {
         mapArea.setBackground(new Color(30, 30, 30));
         mapArea.setForeground(Color.GREEN);
         
+        // Random Travel 
+        randomTravelButton = new JButton("Random Hex (Test)");
+        randomTravelButton.setFocusable(false);
+        randomTravelButton.addActionListener(e -> travelToRandomHex());
+        
+        // Home Button
+        homeButton = new JButton("Go to Home");
+        homeButton.setFocusable(false);
+        homeButton.addActionListener(e -> travelToHomeHex());
+
+        // Close Button
+        closeButton = new JButton("Close");
+        closeButton.setFocusable(false);
+        closeButton.addActionListener(e -> dispose());
+
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        bottomPanel.add(homeButton);
+        bottomPanel.add(randomTravelButton);
+        bottomPanel.add(closeButton);
+        
         add(new JScrollPane(mapArea), BorderLayout.CENTER);
+        add(bottomPanel, BorderLayout.SOUTH);
 
         registerCloseKey(KeyEvent.VK_I);
+    }
+    
+    private void travelToRandomHex() {
+        if (world == null || world.getHexes().isEmpty()) return;
+        
+        java.util.List<Hex> hexes = world.getHexes();
+        Hex randomHex = hexes.get(new Random().nextInt(hexes.size()));
+        
+        changeHex(randomHex);
+    }
+
+    private void travelToHomeHex() {
+        if (world == null) return;
+        Hex homeHex = world.getSpawnHex();
+        if (homeHex != null) {
+            changeHex(homeHex);
+        }
+    }
+
+    private void changeHex(Hex newHex) {
+        if (newHex == null) return;
+        world.changeActiveHex(newHex);
+        refreshDialog();
+        
+        if (onHexChange != null) {
+            onHexChange.run();
+        }
     }
 
     @Override
@@ -39,6 +93,7 @@ public class MapDialog extends ZeroDialog {
         
         StringBuilder sb = new StringBuilder();
         int size = world.getWorldRadius();
+        Hex activeHex = world.getActiveHex();
         
         Map<String, Hex> hexMap = new HashMap<>();
         for (Hex h : world.getHexes()) {
@@ -55,7 +110,10 @@ public class MapDialog extends ZeroDialog {
                 Hex hex = hexMap.get(q + "," + r);
                 if (hex != null && hex.getBiome() != null) {
                     char c = hex.getBiome().getName().charAt(0);
-                    if (hex.getColony() != null) {
+                    
+                    if (hex == activeHex) {
+                        sb.append("<").append(c).append("> ");
+                    } else if (hex.getColony() != null) {
                         sb.append("[").append(c).append("] ");
                     } else {
                         sb.append(" ").append(c).append("  ");
@@ -68,7 +126,8 @@ public class MapDialog extends ZeroDialog {
         }
         
         sb.append("\nLegend:\n");
-        sb.append("[X] : Colony Location (Center)\n");
+        sb.append("<X> : Active Hex (You are here)\n");
+        sb.append("[X] : Colony Location\n");
         sb.append(" P  : Plains    T  : Taiga/Tundra\n");
         sb.append(" F  : Forest    D  : Desert\n");
         sb.append(" J  : Jungle    M  : Mountain\n");

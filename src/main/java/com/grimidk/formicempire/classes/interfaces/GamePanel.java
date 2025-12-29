@@ -212,14 +212,13 @@ public class GamePanel extends ZeroGamePanel {
         
         if (mapDialog == null || mapDialog.getOwner() != frame) {
             if (mapDialog != null) mapDialog.dispose();
-            mapDialog = new MapDialog(frame, world);
+            mapDialog = new MapDialog(frame, world, this::refreshAllGUIData);
         }
         mapDialog.showDialog();
     }
     
     private Colony getColonyFromEngine(Engine engine) {
-        return engine != null && engine.getWorld() != null && engine.getWorld().getSpawnHex() != null 
-               ? engine.getWorld().getSpawnHex().getColony() : null;
+        return engine != null && engine.getWorld() != null && engine.getWorld().getActiveHex() != null ? engine.getWorld().getActiveHex().getColony() : null;
     }
     
     public boolean isEngineStarted() { return engineStarted; }
@@ -282,8 +281,8 @@ public class GamePanel extends ZeroGamePanel {
                     
                     World world = engine.getWorld();
                     Colony colony = null;
-                    if (world != null && world.getSpawnHex() != null && world.getSpawnHex().getColony() != null) {
-                        colony = world.getSpawnHex().getColony();
+                    if (world != null && world.getActiveHex() != null && world.getActiveHex().getColony() != null) {
+                        colony = world.getActiveHex().getColony();
                         gameAreaPanel.setColony(colony);
                         
                         alertManager = new AlertManager(colony, alertPanel);
@@ -372,8 +371,8 @@ public class GamePanel extends ZeroGamePanel {
         World world = frame.getEngine().getWorld();
         if (world == null) return;
         worldPanel.updateStaticData(world);
-        if (world.getSpawnHex() != null && world.getSpawnHex().getBiome() != null) {
-            String biomeName = world.getSpawnHex().getBiome().getName();
+        if (world.getActiveHex() != null && world.getActiveHex().getBiome() != null) {
+            String biomeName = world.getActiveHex().getBiome().getName();
             gameAreaPanel.setBackgroundByBiome(biomeName);
         }
     }
@@ -381,16 +380,21 @@ public class GamePanel extends ZeroGamePanel {
     private void updateMinuteGUI() {
         Engine engine = frame.getEngine();
         World world = engine != null ? engine.getWorld() : null;
-        Colony colony = world != null && world.getSpawnHex() != null ? world.getSpawnHex().getColony() : null;
-        if (world == null || colony == null) return;
+        Colony colony = world != null && world.getActiveHex() != null ? world.getActiveHex().getColony() : null;
+        
+        gameAreaPanel.setColony(colony);        
+        updateStaticWorldInfo(); 
+        
+        if (world == null) return;
 
-        int w = gameAreaPanel.getWidth();
-        int h = gameAreaPanel.getHeight();
-        if (w > 1 && h > 1) {
-            colony.setGameAreaDimensions(w, h);
+        if (colony != null) {
+            int w = gameAreaPanel.getWidth();
+            int h = gameAreaPanel.getHeight();
+            if (w > 1 && h > 1) {
+                colony.setGameAreaDimensions(w, h);
+            }
+            colony.runPhysics(gameAreaPanel.getCurrentDimension()); 
         }
-
-        colony.runPhysics(gameAreaPanel.getCurrentDimension()); 
 
         worldPanel.updateMinuteData(world);
         colonyPanel.updateMinuteData(colony);
@@ -400,33 +404,41 @@ public class GamePanel extends ZeroGamePanel {
     private void updateHourGUI() {
         Engine engine = frame.getEngine();
         World world = engine != null ? engine.getWorld() : null;
-        Colony colony = world != null && world.getSpawnHex() != null ? world.getSpawnHex().getColony() : null;
-        if (world == null || colony == null) return;
+        Colony colony = world != null && world.getActiveHex() != null ? world.getActiveHex().getColony() : null;
+        if (world == null) return;
 
         worldPanel.updateHourData(world);
         colonyPanel.updateHourData(colony);
         
-        if (researchDialog != null && researchDialog.isShowing()) {
-            researchDialog.liveUpdate();
-        }
-        if (buildDialog != null && buildDialog.isShowing()) {
-            buildDialog.liveUpdate();
-        }
-        if (abilitiesDialog != null && abilitiesDialog.isShowing()) {
-            abilitiesDialog.liveUpdate();
-        }
-        if (controlPanel != null) {
-            controlPanel.updateResearchMenu(colony.hasUpgrade(GameUnlocks.ABILITY_RESEARCH));
-            controlPanel.updateBuildMenu(colony.hasUpgrade(GameUnlocks.ABILITY_BUILD));
-            controlPanel.updateAbilitiesMenu(colony.hasUpgrade(GameUnlocks.ABILITY_FORCED_FLIGHT));
+        if (colony != null) {
+            if (researchDialog != null && researchDialog.isShowing()) {
+                researchDialog.liveUpdate();
+            }
+            if (buildDialog != null && buildDialog.isShowing()) {
+                buildDialog.liveUpdate();
+            }
+            if (abilitiesDialog != null && abilitiesDialog.isShowing()) {
+                abilitiesDialog.liveUpdate();
+            }
+            if (controlPanel != null) {
+                controlPanel.updateResearchMenu(colony.hasUpgrade(GameUnlocks.ABILITY_RESEARCH));
+                controlPanel.updateBuildMenu(colony.hasUpgrade(GameUnlocks.ABILITY_BUILD));
+                controlPanel.updateAbilitiesMenu(colony.hasUpgrade(GameUnlocks.ABILITY_FORCED_FLIGHT));
+            }
+        } else {
+             if (controlPanel != null) {
+                controlPanel.updateResearchMenu(false);
+                controlPanel.updateBuildMenu(false);
+                controlPanel.updateAbilitiesMenu(false);
+            }
         }
     }
 
     private void updateDayGUI() {
         Engine engine = frame.getEngine();
         World world = engine != null ? engine.getWorld() : null;
-        Colony colony = world != null && world.getSpawnHex() != null ? world.getSpawnHex().getColony() : null;
-        if (world == null || colony == null) return;
+        Colony colony = world != null && world.getActiveHex() != null ? world.getActiveHex().getColony() : null;
+        if (world == null) return;
 
         worldPanel.updateDayData(world);
         colonyPanel.updateDayData(colony);

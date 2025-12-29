@@ -33,6 +33,7 @@ public class World {
     private int temperature;
     private int humidity;
     private ArrayList<Hex> hexes;
+    private Hex activeHex; 
     private int saveSlotId = 0; // 0 = no slot (ad-hoc)
     private Engine engine;
     private Random random;    
@@ -185,6 +186,29 @@ public class World {
         return this.hexes.get(0);
     }
     
+    public Hex getActiveHex() {
+        return activeHex;
+    }
+    
+    public void changeActiveHex(Hex newHex) {
+        if (newHex == null || !hexes.contains(newHex)) return;
+
+        if (this.activeHex != null) {
+            this.activeHex.setActive(false);
+            if (this.activeHex.getColony() != null) {
+                this.activeHex.getColony().setActive(false);
+            }
+        }
+
+        this.activeHex = newHex;
+        this.activeHex.setActive(true);
+        if (this.activeHex.getColony() != null) {
+            this.activeHex.getColony().setActive(true);
+        }
+        
+        updateEnvironmentalConditions();
+    }
+
     public Temperature getTemperatureIcon() {
         if (temperature <= GameConstants.TEMP_FREEZING.getMaxTemp()) {
             return GameConstants.TEMP_FREEZING;
@@ -236,10 +260,12 @@ public class World {
                 hex.setR(r);
                 hex.setTimeOffset(q); 
                 hex.setLocalWeather(getRandomWeather());
+                hex.setActive(false); 
 
                 if (dist == 0) {
                     hex.setBiome(startBiome);
                     hex.setColony(startColony); 
+                    startColony.setActive(true);
                 } else {
                     hex.setBiome(getBiomeForRing(dist));
                     hex.setColony(null);
@@ -382,6 +408,7 @@ public class World {
         System.out.println("[World] Colony ants after init: " + colony.getAntTotal());
 
         generateWorld(biome, 8, colony);
+        changeActiveHex(getSpawnHex()); 
         updateEnvironmentalConditions();
     }
 
@@ -412,6 +439,7 @@ public class World {
                 hex.setBiome(getBiomeById(sh.biomeId));
                 hex.setTimeOffset(sh.timeOffset);
                 hex.setLocalWeather(getWeatherById(sh.weatherId));
+                hex.setActive(false); 
                 
                 if (sh.hasColony) {
                     hex.setColony(colony);
@@ -429,15 +457,16 @@ public class World {
             generateWorld(GameConstants.PLAINS_BIOME, this.worldRadius, colony);
         }
 
+        changeActiveHex(getSpawnHex()); 
         updateEnvironmentalConditions();
     }
     
     private void updateEnvironmentalConditions() {
-        if (this.getSpawnHex() == null || this.getSpawnHex().getBiome() == null) {
+        if (this.activeHex == null || this.activeHex.getBiome() == null) {
             return;
         }
 
-        Biome baseBiome = this.getSpawnHex().getBiome();
+        Biome baseBiome = this.activeHex.getBiome();
         float calcTemp = baseBiome.getTemperature();
         float calcHumid = baseBiome.isIsHumid();
 
@@ -450,7 +479,7 @@ public class World {
             calcTemp *= this.timeOfDay.getTempMult();
         }
 
-        Weather localW = this.getSpawnHex().getLocalWeather();
+        Weather localW = this.activeHex.getLocalWeather();
         if (localW == null) localW = this.weather;
         
         if (localW != null) {
@@ -505,9 +534,11 @@ public class World {
 
     public void runMinute() {
         this.minute++;
-
-        if (this.getSpawnHex() != null && this.getSpawnHex().getColony() != null) {
-             this.getSpawnHex().getColony().runMinutelyJobs();
+        
+        for (Hex hex : this.hexes) {
+            if (hex.getColony() != null) {
+                hex.getColony().runMinutelyJobs();
+            }
         }
 
         if (this.minute > 59) {
@@ -518,9 +549,11 @@ public class World {
 
     public void runHour() {
         this.hour++;
-
-        if (this.getSpawnHex() != null && this.getSpawnHex().getColony() != null) {
-            this.getSpawnHex().getColony().runHourlyJobs();
+        
+        for (Hex hex : this.hexes) {
+            if (hex.getColony() != null) {
+                hex.getColony().runHourlyJobs();
+            }
         }
 
         boolean isEclipse = (this.timeOfDay == GameConstants.SOLAR_ECLIPSE_TIME || 
@@ -554,9 +587,11 @@ public class World {
 
     public void runDay() {
         this.day++;
-
-        if (this.getSpawnHex() != null && this.getSpawnHex().getColony() != null) {
-            this.getSpawnHex().getColony().runDailyJobs(this.getTemperatureIcon(), this.getSpawnHex().getBiome());
+        
+        for (Hex hex : this.hexes) {
+            if (hex.getColony() != null) {
+                hex.getColony().runDailyJobs(this.getTemperatureIcon(), hex.getBiome());
+            }
         }
 
         randomizeWeather();
@@ -568,9 +603,11 @@ public class World {
                 this.setTimeOfDay(GameConstants.LUNAR_ECLIPSE_TIME);
             }
             
-            if (this.getSpawnHex() != null && this.getSpawnHex().getColony() != null) {
-                this.getSpawnHex().getColony().getLabourService().runNuptial(this.getSpawnHex().getColony());
-                this.getSpawnHex().getColony().logEvent("The Eclipse has triggered a spontaneous Nuptial Flight!");
+            for (Hex hex : this.hexes) {
+                if (hex.getColony() != null) {
+                    hex.getColony().getLabourService().runNuptial(hex.getColony());
+                    hex.getColony().logEvent("The Eclipse has triggered a spontaneous Nuptial Flight!");
+                }
             }
             
         } else {
@@ -609,9 +646,11 @@ public class World {
 
     public void runMonth() {
         this.month++;
-
-        if (this.getSpawnHex() != null && this.getSpawnHex().getColony() != null) {
-            this.getSpawnHex().getColony().runMonthlyJobs();
+        
+        for (Hex hex : this.hexes) {
+            if (hex.getColony() != null) {
+                hex.getColony().runMonthlyJobs();
+            }
         }
 
         if (this.month >= 1 && this.month < 4) {
@@ -650,9 +689,11 @@ public class World {
 
     public void runYear() {
         this.year++;
-
-        if (this.getSpawnHex() != null && this.getSpawnHex().getColony() != null) {
-            this.getSpawnHex().getColony().runYearlyJobs();
+        
+        for (Hex hex : this.hexes) {
+            if (hex.getColony() != null) {
+                hex.getColony().runYearlyJobs();
+            }
         }
     }
 }

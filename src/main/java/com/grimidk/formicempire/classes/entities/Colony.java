@@ -140,6 +140,7 @@ public class Colony {
         this.hatchRateMajor = 0.0f;
         this.hatchRateDrone = 0.0f;
         this.hatchRatePrincess = 0.0f;
+        this.isActive = false;
     }
 
     private void initializeUpgrades() {
@@ -364,6 +365,8 @@ public class Colony {
     public void setIsPlayer(boolean isPlayer) { this.isPlayer = isPlayer; }
     public ColonyRank getRank() { return rank; }
     public void setRank(ColonyRank rank) { this.rank = rank; }
+    public boolean isActive() { return isActive; }
+    public void setActive(boolean isActive) { this.isActive = isActive; }
 
     public Map<AntType, List<Ant>> getAntGroups() { return antGroups; } 
     public List<Ant> getAntsByType(AntType type) { return antGroups.getOrDefault(type, new CopyOnWriteArrayList<>()); }
