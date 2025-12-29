@@ -8,22 +8,13 @@ import com.grimidk.formicempire.classes.infrasctructure.managers.AlertManager;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TriggerManager;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
-import com.grimidk.formicempire.classes.interfaces.game.dialogs.AbilitiesDialog;
-import com.grimidk.formicempire.classes.interfaces.game.dialogs.BuildDialog;
-import com.grimidk.formicempire.classes.interfaces.game.dialogs.HatchRateDialog;
-import com.grimidk.formicempire.classes.interfaces.game.dialogs.MapDialog;
-import com.grimidk.formicempire.classes.interfaces.game.dialogs.ResearchDialog;
-import com.grimidk.formicempire.classes.interfaces.game.dialogs.RoleManagementDialog;
-import com.grimidk.formicempire.classes.interfaces.game.panels.AlertPanel;
-import com.grimidk.formicempire.classes.interfaces.game.panels.ColonyPanel;
-import com.grimidk.formicempire.classes.interfaces.game.panels.ControlPanel;
-import com.grimidk.formicempire.classes.interfaces.game.panels.GameAreaPanel;
-import com.grimidk.formicempire.classes.interfaces.game.panels.WorldPanel;
+import com.grimidk.formicempire.classes.interfaces.game.dialogs.*;
+import com.grimidk.formicempire.classes.interfaces.game.gamepanels.*;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class GamePanel extends JPanel {
+public class GamePanel extends ZeroGamePanel {
     private final MainFrame frame;
     
     private JLabel statusLabel;
@@ -52,16 +43,17 @@ public class GamePanel extends JPanel {
     private volatile boolean engineStarted = false;
     
     public GamePanel(MainFrame frame) {
+        super(new BorderLayout()); 
         this.frame = frame;
         
         initComponents();
         initControlPanelCallbacks();
-        initLayout();
-        
+        initLayout();        
         updateStatusIndicator(false);
     }
 
-    private void initComponents() {
+    @Override
+    protected void initComponents() {
         statusLabel = new JLabel("Game not started");
         statusIndicator = new JLabel();
         
@@ -97,11 +89,15 @@ public class GamePanel extends JPanel {
                                         showMapDialogCallback); 
     }
 
-    private void initLayout() {
-        setLayout(new BorderLayout());
+    @Override
+    protected void initLayout() {
         add(createNorthPanel(), BorderLayout.NORTH);
         add(createCenterPanel(), BorderLayout.CENTER); 
-        add(controlPanel, BorderLayout.SOUTH);
+        // ControlPanel might be null if called before initControlPanelCallbacks
+        // But since we call initControlPanelCallbacks before initLayout in constructor, it's fine.
+        if (controlPanel != null) {
+            add(controlPanel, BorderLayout.SOUTH);
+        }
     }
 
     private JPanel createNorthPanel() {
@@ -148,45 +144,38 @@ public class GamePanel extends JPanel {
         return center;
     }
 
+    // --- Dialog Methods ---
     private void showHatchRateDialog() {
         Engine engine = frame.getEngine();
-        Colony colony = engine != null && engine.getWorld() != null && engine.getWorld().getSpawnHex() != null ? engine.getWorld().getSpawnHex().getColony() : null;
+        Colony colony = getColonyFromEngine(engine);
         if (colony == null) return;
+        
         if (hatchDialog == null || hatchDialog.getOwner() != frame) {
             if (hatchDialog != null) hatchDialog.dispose();
             hatchDialog = new HatchRateDialog(frame, colony);
-        } else {
-             hatchDialog.dispose();
-             hatchDialog = new HatchRateDialog(frame, colony);
         }
         hatchDialog.showDialog();
     }
 
     private void showRoleManagementDialog(int tabIndex) {
         Engine engine = frame.getEngine();
-        Colony colony = engine != null && engine.getWorld() != null && engine.getWorld().getSpawnHex() != null ? engine.getWorld().getSpawnHex().getColony() : null;
+        Colony colony = getColonyFromEngine(engine);
         if (colony == null) return;
+        
         if (roleDialog == null || roleDialog.getOwner() != frame) {
             if (roleDialog != null) roleDialog.dispose();
             roleDialog = new RoleManagementDialog(frame, colony);
-        } else {
-             roleDialog.dispose();
-             roleDialog = new RoleManagementDialog(frame, colony);
         }
-        roleDialog.selectTab(tabIndex);
         roleDialog.showDialog(tabIndex);
     }
 
     private void showResearchDialog() {
         Engine engine = frame.getEngine();
-        Colony colony = engine != null && engine.getWorld() != null && engine.getWorld().getSpawnHex() != null ? engine.getWorld().getSpawnHex().getColony() : null;
+        Colony colony = getColonyFromEngine(engine);
         if (colony == null) return;
                 
         if (researchDialog == null || researchDialog.getOwner() != frame) {
             if (researchDialog != null) researchDialog.dispose();
-            researchDialog = new ResearchDialog(frame, colony);
-        } else {
-            researchDialog.dispose();
             researchDialog = new ResearchDialog(frame, colony);
         }
         researchDialog.showDialog();
@@ -194,27 +183,23 @@ public class GamePanel extends JPanel {
     
     private void showBuildDialog() {
         Engine engine = frame.getEngine();
-        Colony colony = engine != null && engine.getWorld() != null && engine.getWorld().getSpawnHex() != null ? engine.getWorld().getSpawnHex().getColony() : null;
+        Colony colony = getColonyFromEngine(engine);
         if (colony == null) return;
+        
         if (buildDialog == null || buildDialog.getOwner() != frame) {
             if (buildDialog != null) buildDialog.dispose();
             buildDialog = new BuildDialog(frame, colony);
-        } else {
-             buildDialog.dispose();
-             buildDialog = new BuildDialog(frame, colony);
         }
         buildDialog.showDialog();
     }
 
     private void showAbilitiesDialog() {
         Engine engine = frame.getEngine();
-        Colony colony = engine != null && engine.getWorld() != null && engine.getWorld().getSpawnHex() != null ? engine.getWorld().getSpawnHex().getColony() : null;
+        Colony colony = getColonyFromEngine(engine);
         if (colony == null) return;
+        
         if (abilitiesDialog == null || abilitiesDialog.getOwner() != frame) {
             if (abilitiesDialog != null) abilitiesDialog.dispose();
-            abilitiesDialog = new AbilitiesDialog(frame, colony);
-        } else {
-            abilitiesDialog.dispose();
             abilitiesDialog = new AbilitiesDialog(frame, colony);
         }
         abilitiesDialog.showDialog();
@@ -224,14 +209,17 @@ public class GamePanel extends JPanel {
         Engine engine = frame.getEngine();
         World world = engine != null ? engine.getWorld() : null;
         if (world == null) return;
+        
         if (mapDialog == null || mapDialog.getOwner() != frame) {
             if (mapDialog != null) mapDialog.dispose();
             mapDialog = new MapDialog(frame, world);
-        } else {
-            mapDialog.dispose();
-            mapDialog = new MapDialog(frame, world);
         }
         mapDialog.showDialog();
+    }
+    
+    private Colony getColonyFromEngine(Engine engine) {
+        return engine != null && engine.getWorld() != null && engine.getWorld().getSpawnHex() != null 
+               ? engine.getWorld().getSpawnHex().getColony() : null;
     }
     
     public boolean isEngineStarted() { return engineStarted; }
@@ -248,24 +236,21 @@ public class GamePanel extends JPanel {
             if (engine != null && engine.getWorld() != null) {
                 World w = engine.getWorld();
                 int slotIdLocal = w.getSaveSlotId();
-                final int capturedSlot = slotIdLocal;
-                if (capturedSlot > 0) {
-                    Savefile existing = sm.loadSlot(capturedSlot);
-                    String nameToUse = (existing != null && existing.getName() != null && !existing.getName().trim().isEmpty()) ? existing.getName() : ("Save " + capturedSlot);
-                    sm.saveWorldToSlotUserAsync(engine.getWorld(), engine, capturedSlot, nameToUse, () -> {
+                if (slotIdLocal > 0) {
+                    Savefile existing = sm.loadSlot(slotIdLocal);
+                    String nameToUse = (existing != null && existing.getName() != null && !existing.getName().trim().isEmpty()) ? existing.getName() : ("Save " + slotIdLocal);
+                    sm.saveWorldToSlotUserAsync(engine.getWorld(), engine, slotIdLocal, nameToUse, () -> {
                         frame.showCard(MainFrame.CARD_SAVE);
                     });
-                    return;
                 } else {
                     sm.saveWorldToSlot(engine.getWorld(), 0); 
                     frame.showCard(MainFrame.CARD_SAVE);
-                    return;
                 }
             }
         } catch (Exception ex) {
             ex.printStackTrace();
+            frame.showCard(MainFrame.CARD_SAVE);
         }
-        frame.showCard(MainFrame.CARD_SAVE);
     }
     
     public void quitToMenuWithoutSaving() {
@@ -311,10 +296,7 @@ public class GamePanel extends JPanel {
                     }
                     
                     updateStaticWorldInfo();
-                    updateMinuteGUI();
-                    updateHourGUI();
-                    updateDayGUI();
-                    updateMonthGUI();
+                    refreshAllGUIData();
                     
                     if (!engineStarted) {
                         engineStarted = true;

@@ -1,4 +1,4 @@
-package com.grimidk.formicempire.classes.interfaces.game.panels;
+package com.grimidk.formicempire.classes.interfaces.game.gamepanels;
 
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
@@ -11,7 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
-public class ControlPanel extends JPanel {
+public class ControlPanel extends ZeroGamePanel {
 
     private final MainFrame frame;
     private final Runnable handleBackButtonCallback;
@@ -36,7 +36,6 @@ public class ControlPanel extends JPanel {
     
     // --- State ---
     private int speedLevel = 1;
-    
     private static final float[] SPEED_DELAYS = { 250f, 125f, 60f, 30f, 15f, 5f, 1f}; 
     
     public interface RoleManagementCallback {
@@ -52,6 +51,8 @@ public class ControlPanel extends JPanel {
                         Runnable showAbilitiesDialogCallback,
                         Runnable toggleViewCallback,
                         Runnable showMapDialogCallback) {
+        super(new FlowLayout(FlowLayout.RIGHT));
+        
         this.frame = frame;
         this.handleBackButtonCallback = handleBackButtonCallback;
         this.showHatchRateDialogCallback = showHatchRateDialogCallback;
@@ -62,20 +63,23 @@ public class ControlPanel extends JPanel {
         this.toggleViewCallback = toggleViewCallback;
         this.showMapDialogCallback = showMapDialogCallback;
 
-        initLayout();
+        initComponents();
+        initLayout();        
         initListeners();
         initKeyBindings();
         updateTickLabel(frame.getEngine());
     }
 
-    private void initLayout() {
-        setLayout(new FlowLayout(FlowLayout.RIGHT));
-        
+    @Override
+    protected void initComponents() {
         speedDownButton.setFocusable(false);
         speedUpButton.setFocusable(false);
         playPauseButton.setFocusable(false);
         menuButton.setFocusable(false);
-        
+    }
+
+    @Override
+    protected void initLayout() {
         add(speedDownButton);
         add(speedUpButton);
         add(tickLabel);
@@ -99,7 +103,6 @@ public class ControlPanel extends JPanel {
         if (eng == null) return;
 
         int maxLevel = getMaxSpeedLevel();
-        
         if (speedLevel > maxLevel) speedLevel = maxLevel;
         if (speedLevel < 0) speedLevel = 0;
 

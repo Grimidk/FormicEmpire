@@ -1,4 +1,4 @@
-package com.grimidk.formicempire.classes.interfaces.game.panels;
+package com.grimidk.formicempire.classes.interfaces.game.gamepanels;
 
 import com.grimidk.formicempire.classes.constants.world.MoonPhase;
 import com.grimidk.formicempire.classes.constants.world.Season;
@@ -7,10 +7,9 @@ import com.grimidk.formicempire.classes.constants.world.Weather;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 
 import javax.swing.*;
-import javax.swing.border.TitledBorder;
 import java.awt.*;
 
-public class WorldPanel extends JPanel {
+public class WorldPanel extends ZeroGamePanel {
     
     // --- Time Components ---
     private final JLabel dateTimeLabel = new JLabel("00:00 01/01/0000");
@@ -35,11 +34,17 @@ public class WorldPanel extends JPanel {
     private int lastHumidity = -1;
 
     public WorldPanel() {
+        super(new GridBagLayout());
+        initComponents();
         initLayout();
     }
     
-    private void initLayout() {
-        setLayout(new GridBagLayout());
+    @Override
+    protected void initComponents() {
+    }
+
+    @Override
+    protected void initLayout() {
         GridBagConstraints gbc = new GridBagConstraints();
         
         JPanel timePanel = createTimePanel();
@@ -63,8 +68,7 @@ public class WorldPanel extends JPanel {
     }
     
     private JPanel createTimePanel() {
-        JPanel panel = new JPanel();
-        panel.setBorder(new TitledBorder("Time"));
+        JPanel panel = createTitledPanel("Time", null);
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.add(dateTimeLabel);
         panel.add(timeOfDayLabel);
@@ -75,8 +79,7 @@ public class WorldPanel extends JPanel {
     }
 
     private JPanel createWorldInfoPanel() {
-        JPanel panel = new JPanel();
-        panel.setBorder(new TitledBorder("World"));
+        JPanel panel = createTitledPanel("World", null);
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.add(biomeLabel);
         panel.add(temperatureLabel);
@@ -84,12 +87,9 @@ public class WorldPanel extends JPanel {
         return panel;
     }
     
-    // --- Update Methods ---
-
     public void updateStaticData(World world) {
         if (world == null || world.getSpawnHex() == null) return;
         
-        // Biome
         String biomeName = (world.getSpawnHex().getBiome() != null) ? "Biome: " + world.getSpawnHex().getBiome().getName() : "Biome: N/A";
         if (!biomeName.equals(lastBiome)) {
             biomeLabel.setText(""); 
@@ -102,7 +102,6 @@ public class WorldPanel extends JPanel {
     }
     
     public void updateMinuteData(World world) {
-        // Date/Time
         String dateTime = String.format("%02d:%02d %02d/%02d/%04d",
             world.getHour(), world.getMinute(), world.getDay(), world.getMonth(), world.getYear());
         if (!dateTime.equals(lastDateTime)) {
@@ -112,7 +111,6 @@ public class WorldPanel extends JPanel {
     }
     
     public void updateHourData(World world) {
-        // Time of Day and Weather
         TimeOfDay currentTimeOfDay = world.getTimeOfDay();
         if (currentTimeOfDay != lastTimeOfDay) {
             timeOfDayLabel.setIcon(currentTimeOfDay.getIcon());
@@ -126,7 +124,6 @@ public class WorldPanel extends JPanel {
             lastWeather = currentWeather;
         }
         
-        // Temperature & Humidity
         int temp = world.getTemperature();
         if (temp != lastTemperature) {
             temperatureLabel.setText("");
@@ -144,7 +141,6 @@ public class WorldPanel extends JPanel {
     }
 
     public void updateDayData(World world) {
-        // Moon Phase
         MoonPhase currentMoonPhase = world.getMoonPhase();
         if (currentMoonPhase != lastMoonPhase) {
             moonPhaseLabel.setIcon(currentMoonPhase.getIcon());
@@ -154,7 +150,6 @@ public class WorldPanel extends JPanel {
     }
 
     public void updateMonthData(World world) {
-        // Season
         Season currentSeason = world.getSeason();
         if (currentSeason != lastSeason) {
             seasonLabel.setIcon(currentSeason.getIcon());
