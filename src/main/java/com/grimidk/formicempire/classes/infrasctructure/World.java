@@ -38,6 +38,8 @@ public class World {
     private Engine engine;
     private Random random;    
     private int worldRadius = 8; 
+    
+    private int colonyIdCounter = 2;
 
     public World() {
         this.minute = 0;
@@ -248,6 +250,9 @@ public class World {
         this.worldRadius = size;
         this.hexes.clear();
         Map<String, Hex> hexMap = new HashMap<>();
+        ColonyStarterService starterService = new ColonyStarterService();
+        
+        this.colonyIdCounter = startColony.getId() + 1;
 
         for (int q = -size; q <= size; q++) {
             int r1 = Math.max(-size, -q - size);
@@ -267,8 +272,16 @@ public class World {
                     hex.setColony(startColony); 
                     startColony.setActive(true);
                 } else {
-                    hex.setBiome(getBiomeForRing(dist));
-                    hex.setColony(null);
+                    Biome ringBiome = getBiomeForRing(dist);
+                    hex.setBiome(ringBiome);
+                    
+                    if (dist > 1 && !isWaterBiome(ringBiome) && random.nextInt(100) < 20) {
+                        Colony aiColony = new Colony(this.colonyIdCounter++, "Wild Colony " + colonyIdCounter, false);
+                        starterService.initializeNewColony(aiColony);
+                        hex.setColony(aiColony);
+                    } else {
+                        hex.setColony(null);
+                    }
                 }
                 
                 hexMap.put(q + "," + r, hex);
@@ -278,6 +291,10 @@ public class World {
 
         linkNeighbors(hexMap);        
         printWorldToConsole(size, hexMap);
+    }
+    
+    private boolean isWaterBiome(Biome biome) {
+        return biome == GameConstants.OCEAN_BIOME || biome == GameConstants.LAKE_BIOME;
     }
     
     private void linkNeighbors(Map<String, Hex> hexMap) {
@@ -387,7 +404,12 @@ public class World {
                 Hex hex = hexMap.get(q + "," + r);
                 if (hex != null) {
                     char c = hex.getBiome().getName().charAt(0);
-                    line.append(c).append(" ");
+                    if (hex.getColony() != null) {
+                        if (hex.getColony().isPlayer()) line.append("[P] ");
+                        else line.append("{E} ");
+                    } else {
+                        line.append(c).append(" ");
+                    }
                 } else {
                     line.append("  ");
                 }
@@ -430,7 +452,9 @@ public class World {
         
         this.hexes.clear();
         Map<String, Hex> hexMap = new HashMap<>();
-        
+
+        int maxId = colony.getId();
+
         if (savefile.getWorldHexes() != null && !savefile.getWorldHexes().isEmpty()) {
             for (Savefile.SavedHex sh : savefile.getWorldHexes()) {
                 Hex hex = new Hex();
@@ -442,7 +466,14 @@ public class World {
                 hex.setActive(false); 
                 
                 if (sh.hasColony) {
-                    hex.setColony(colony);
+                    if (sh.q == 0 && sh.r == 0) {
+                        hex.setColony(colony);
+                    } else {
+                        Colony aiColony = new Colony(++maxId, "Wild Colony", false);
+                        ColonyStarterService starterService = new ColonyStarterService();
+                        starterService.initializeNewColony(aiColony);
+                        hex.setColony(aiColony);
+                    }
                 } else {
                     hex.setColony(null);
                 }
@@ -457,6 +488,7 @@ public class World {
             generateWorld(GameConstants.PLAINS_BIOME, this.worldRadius, colony);
         }
 
+        this.colonyIdCounter = maxId + 1;
         changeActiveHex(getSpawnHex()); 
         updateEnvironmentalConditions();
     }

@@ -13,7 +13,8 @@ import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces
 public class ColonyStarterService {
 
     public void initializeNewColony(Colony colony) {
-        System.out.println("[ColonyStarterService] Initializing new colony: " + colony.getName());
+        String type = colony.isPlayer() ? "Player" : "AI";
+        System.out.println("[ColonyStarterService] Initializing new " + type + " colony: " + colony.getName());
         clearColonyLists(colony);
 
         try {
@@ -21,7 +22,6 @@ public class ColonyStarterService {
             queen.setDimension(WorldSpaces.UNDERWORLD); 
             queen.setRole(GameConstants.ROLE_LAYER);
             colony.getQueens().add(queen);
-            System.out.println("[ColonyStarterService] Queen created and added.");
         } catch (Exception e) {
             System.err.println("[ColonyStarterService] Error creating Queen: " + e.getMessage());
             e.printStackTrace();
@@ -33,7 +33,6 @@ public class ColonyStarterService {
                 Ant worker = new Ant(colony, GameConstants.TYPE_WORKER);
                 workerList.add(worker);
             }
-            System.out.println("[ColonyStarterService] 9 Workers created and added.");
         } else {
             System.err.println("[ColonyStarterService] Critical Error: Worker list is null.");
         }
@@ -60,7 +59,7 @@ public class ColonyStarterService {
                 
                 colony.getLocationService().addSource(colony, initialPlant);
                 colony.getLocationService().addSource(colony, initialWater);
-                System.out.println("[ColonyStarterService] Initial resources added.");
+                System.out.println("[ColonyStarterService] Player initial resources added.");
             }
         }
         
@@ -68,7 +67,7 @@ public class ColonyStarterService {
             colony.getPhysicsService().randomizeAllAntPositions(colony);
         }
         
-        System.out.println("[ColonyStarterService] Initialization complete. Final Ant Total: " + colony.getAntTotal());
+        System.out.println("[ColonyStarterService] Initialization complete for " + colony.getName() + " (ID: " + colony.getId() + "). Total Ants: " + colony.getAntTotal());
     }
 
     private void clearColonyLists(Colony colony) {

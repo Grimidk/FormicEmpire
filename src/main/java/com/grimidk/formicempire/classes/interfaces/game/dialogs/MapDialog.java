@@ -54,7 +54,8 @@ public class MapDialog extends ZeroDialog {
         add(new JScrollPane(mapArea), BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
 
-        registerCloseKey(KeyEvent.VK_I);
+        registerCloseKey(KeyEvent.VK_I);        
+        refreshDialog();
     }
     
     private void travelToRandomHex() {
@@ -114,7 +115,11 @@ public class MapDialog extends ZeroDialog {
                     if (hex == activeHex) {
                         sb.append("<").append(c).append("> ");
                     } else if (hex.getColony() != null) {
-                        sb.append("[").append(c).append("] ");
+                        if (hex.getColony().isPlayer()) {
+                            sb.append("[").append(c).append("] ");
+                        } else {
+                            sb.append("{").append(c).append("} ");
+                        }
                     } else {
                         sb.append(" ").append(c).append("  ");
                     }
@@ -127,7 +132,8 @@ public class MapDialog extends ZeroDialog {
         
         sb.append("\nLegend:\n");
         sb.append("<X> : Active Hex (You are here)\n");
-        sb.append("[X] : Colony Location\n");
+        sb.append("[X] : Player Colony\n");
+        sb.append("{X} : Wild Colony\n");
         sb.append(" P  : Plains    T  : Taiga/Tundra\n");
         sb.append(" F  : Forest    D  : Desert\n");
         sb.append(" J  : Jungle    M  : Mountain\n");
