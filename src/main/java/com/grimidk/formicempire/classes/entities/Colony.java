@@ -15,6 +15,7 @@ import com.grimidk.formicempire.classes.entities.services.ColonyLabourService;
 import com.grimidk.formicempire.classes.entities.services.ColonyLocationService;
 import com.grimidk.formicempire.classes.entities.services.ColonyPopulationService;
 import com.grimidk.formicempire.classes.entities.services.ColonyPhysicsService;
+import com.grimidk.formicempire.classes.entities.services.ColonySumarizationService;
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
@@ -93,6 +94,7 @@ public class Colony {
     private transient ColonyPopulationService populationService;
     private transient ColonyPhysicsService physicsService;
     private transient ColonyLocationService locationService;
+    private transient ColonySumarizationService sumarizationService;
 
     // --- Service Initializer ---
     private void initializeServices() {
@@ -101,6 +103,7 @@ public class Colony {
         this.populationService = new ColonyPopulationService();
         this.physicsService = new ColonyPhysicsService();
         this.locationService = new ColonyLocationService();
+        this.sumarizationService = new ColonySumarizationService();
     }
 
     // --- Initialization Methods ---
@@ -612,6 +615,7 @@ public class Colony {
     public ColonyPopulationService getPopulationService() { return this.populationService; }
     public ColonyPhysicsService getPhysicsService() { return this.physicsService; }
     public ColonyLocationService getLocationService() { return this.locationService; }
+    public ColonySumarizationService getSumarizationService() { return this.sumarizationService; }
 
     public int getTotalConsumption(){ return statsService.getTotalConsumption(this); }
     public int getTotalProduction(){ return statsService.getTotalProduction(this); }
@@ -682,39 +686,54 @@ public class Colony {
     }
     
     public void runPhysics(Dimension activeDimension) { 
-        physicsService.runPhysics(this, activeDimension); 
+        if (this.isActive) {
+            physicsService.runPhysics(this, activeDimension); 
+        }
     }
 
     // --- Job Schedulers ---
     public void runMinutelyJobs() {
-        this.runConverting();
+        if (this.isActive) {
+            this.runConverting();
+        }
     }
 
     public void runHourlyJobs() {
-        this.runRoleAssignment();
-        this.runCollecting();
-        this.runLaying();
-        this.runResearch();
-        this.runRanching();
-        this.runBuilding();
+        if (this.isActive) {
+            this.runRoleAssignment();
+            this.runCollecting();
+            this.runLaying();
+            this.runResearch();
+            this.runRanching();
+            this.runBuilding();
+        } else {
+            this.populationService.runRoleAssignment(this); 
+            this.sumarizationService.runHourlyLite(this);
+        }
     }
 
     public void runDailyJobs(Temperature currentTemp, Biome biome) {
-        this.rankUp();
-        this.runEating(currentTemp);
-        this.runHatching();
-        this.runAging();
-        this.runNursing();
-        this.runGraveKeeping();
-        this.runHerding(biome); 
-        this.runScoutting(biome);
-        this.runContamination(); 
-        this.runComposting();
-        this.runPolicing(); 
+        if (this.isActive) {
+            this.rankUp();
+            this.runEating(currentTemp);
+            this.runHatching();
+            this.runAging();
+            this.runNursing();
+            this.runGraveKeeping();
+            this.runHerding(biome); 
+            this.runScoutting(biome);
+            this.runContamination(); 
+            this.runComposting();
+            this.runPolicing(); 
+        } else {
+            this.sumarizationService.runDailyLite(this);
+        }
     }
 
     public void runMonthlyJobs() { 
-        this.runParasitation();
+        if (this.isActive || this.isPlayer) {
+             this.runParasitation();
+        }
     }
 
     public void runYearlyJobs() {

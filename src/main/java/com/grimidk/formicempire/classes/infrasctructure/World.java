@@ -38,8 +38,7 @@ public class World {
     private Engine engine;
     private Random random;    
     private int worldRadius = 8; 
-    
-    private int colonyIdCounter = 2;
+    private int colonyIdCounter = 1;
 
     public World() {
         this.minute = 0;
