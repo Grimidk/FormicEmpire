@@ -41,6 +41,15 @@ public class WorldPanel extends ZeroGamePanel {
     
     @Override
     protected void initComponents() {
+        biomeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        temperatureLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        humidityLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        
+        dateTimeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        timeOfDayLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        moonPhaseLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        seasonLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        weatherLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
     }
 
     @Override
@@ -67,6 +76,29 @@ public class WorldPanel extends ZeroGamePanel {
         add(Box.createGlue(), gbc);
     }
     
+    public void reset() {
+        lastDateTime = "";
+        lastTimeOfDay = null;
+        lastMoonPhase = null;
+        lastSeason = null;
+        lastWeather = null;
+        lastBiome = "";
+        lastTemperature = -999;
+        lastHumidity = -1;
+        
+        dateTimeLabel.setText("00:00 01/01/0000");
+        biomeLabel.setText("");
+        biomeLabel.setIcon(null);
+        temperatureLabel.setText("");
+        temperatureLabel.setIcon(null);
+        humidityLabel.setText("");
+        humidityLabel.setIcon(null);
+        timeOfDayLabel.setIcon(null);
+        moonPhaseLabel.setIcon(null);
+        seasonLabel.setIcon(null);
+        weatherLabel.setIcon(null);
+    }
+    
     private JPanel createTimePanel() {
         JPanel panel = createTitledPanel("Time", null);
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -90,14 +122,16 @@ public class WorldPanel extends ZeroGamePanel {
     public void updateStaticData(World world) {
         if (world == null || world.getActiveHex() == null) return;
         
-        String biomeName = (world.getActiveHex().getBiome() != null) ? "Biome: " + world.getActiveHex().getBiome().getName() : "Biome: N/A";
-        if (!biomeName.equals(lastBiome)) {
-            biomeLabel.setText(""); 
-            biomeLabel.setToolTipText(biomeName);
+        String name = (world.getActiveHex().getBiome() != null) ? world.getActiveHex().getBiome().getName() : "N/A";
+        String fullTooltip = "Biome: " + name;
+        
+        if (!fullTooltip.equals(lastBiome)) {
+            biomeLabel.setText(name); 
+            biomeLabel.setToolTipText(fullTooltip);
             if (world.getActiveHex().getBiome() != null) {
                 biomeLabel.setIcon(world.getActiveHex().getBiome().getIcon());
             }
-            lastBiome = biomeName;
+            lastBiome = fullTooltip;
         }
     }
     

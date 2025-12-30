@@ -159,8 +159,8 @@ public class Colony {
         this.upgrades.add(GameUnlocks.STAT_LONGEVITY);
     }
     
-    private void loadUpgrades(Savefile savefile) {
-        List<Integer> unlockedIds = savefile.getUnlockedUpgradeIds(); 
+    private void loadUpgrades(Savefile.SavedColony savedColony) {
+        List<Integer> unlockedIds = savedColony.unlockedUpgradeIds; 
         if (unlockedIds == null || unlockedIds.isEmpty()) {
             initializeUpgrades();
             return;
@@ -185,8 +185,8 @@ public class Colony {
         this.buildings.add(GameUnlocks.WATER_RESERVOIR_0);
     }
     
-    private void loadBuildings(Savefile savefile) {
-        List<Integer> unlockedBuildingIds = savefile.getUnlockedBuildingIds(); 
+    private void loadBuildings(Savefile.SavedColony savedColony) {
+        List<Integer> unlockedBuildingIds = savedColony.unlockedBuildingIds; 
         if (unlockedBuildingIds == null || unlockedBuildingIds.isEmpty()) {
             initializeBuildings();
             return;
@@ -223,10 +223,10 @@ public class Colony {
         initializeServices(); 
     }
 
-    public Colony(Savefile savefile) {
-        this.id = savefile.getColonyId() > 0 ? savefile.getColonyId() : savefile.getId();
-        this.name = savefile.getColonyName() != null && !savefile.getColonyName().isEmpty() ? savefile.getColonyName() : savefile.getName();
-        this.isPlayer = true;
+    public Colony(Savefile.SavedColony savedColony) {
+        this.id = savedColony.id;
+        this.name = savedColony.name;
+        this.isPlayer = savedColony.isPlayer;
         this.rank = GameConstants.RANK_COLONY;
         this.antGroups = new HashMap<>();
         this.deadAnts = new CopyOnWriteArrayList<>();
@@ -236,12 +236,12 @@ public class Colony {
 
         initializeLists();
         initializeDefaults(); 
-        loadUpgrades(savefile);
-        loadBuildings(savefile);
+        loadUpgrades(savedColony);
+        loadBuildings(savedColony);
         initializeAssignedRoles(); 
         initializeServices(); 
         
-        Map<String, Integer> savedRoles = savefile.getAssignedRoleCounts();
+        Map<String, Integer> savedRoles = savedColony.assignedRoleCounts;
         if (savedRoles != null && !savedRoles.isEmpty()) {
             for (AntRole role : GameConstants.getAntRoles()) {
                 Integer count = savedRoles.get(role.getName());
@@ -251,50 +251,50 @@ public class Colony {
             }
         }
         
-        this.hatchRateWorker = savefile.getHatchRateWorker();
-        this.hatchRateSoldier = savefile.getHatchRateSoldier();
-        this.hatchRateMajor = savefile.getHatchRateMajor();
-        this.hatchRateDrone = savefile.getHatchRateDrone();
-        this.hatchRatePrincess = savefile.getHatchRatePrincess();
+        this.hatchRateWorker = savedColony.hatchRateWorker;
+        this.hatchRateSoldier = savedColony.hatchRateSoldier;
+        this.hatchRateMajor = savedColony.hatchRateMajor;
+        this.hatchRateDrone = savedColony.hatchRateDrone;
+        this.hatchRatePrincess = savedColony.hatchRatePrincess;
 
-        populateAntList(getEggs(), savefile.getEggs(), GameConstants.TYPE_EGG);
-        populateAntList(getLarvae(), savefile.getLarvae(), GameConstants.TYPE_LARVA);
-        populateAntList(getPupae(), savefile.getPupae(), GameConstants.TYPE_PUPA);
-        populateAntList(getWorkers(), savefile.getWorkers(), GameConstants.TYPE_WORKER);
-        populateAntList(getSoldiers(), savefile.getSoldiers(), GameConstants.TYPE_SOLDIER);
-        populateAntList(getMajors(), savefile.getMajors(), GameConstants.TYPE_MAJOR);
-        populateAntList(getDrones(), savefile.getDrones(), GameConstants.TYPE_DRONE);
-        populateAntList(getPrincesses(), savefile.getPrincesses(), GameConstants.TYPE_PRINCESS);
-        populateAntList(getQueens(), savefile.getQueens(), GameConstants.TYPE_QUEEN);
-        populateAntList(deadAnts, savefile.getDeadAnts(), GameConstants.TYPE_DEAD);
+        populateAntList(getEggs(), savedColony.eggs, GameConstants.TYPE_EGG);
+        populateAntList(getLarvae(), savedColony.larvae, GameConstants.TYPE_LARVA);
+        populateAntList(getPupae(), savedColony.pupae, GameConstants.TYPE_PUPA);
+        populateAntList(getWorkers(), savedColony.workers, GameConstants.TYPE_WORKER);
+        populateAntList(getSoldiers(), savedColony.soldiers, GameConstants.TYPE_SOLDIER);
+        populateAntList(getMajors(), savedColony.majors, GameConstants.TYPE_MAJOR);
+        populateAntList(getDrones(), savedColony.drones, GameConstants.TYPE_DRONE);
+        populateAntList(getPrincesses(), savedColony.princesses, GameConstants.TYPE_PRINCESS);
+        populateAntList(getQueens(), savedColony.queens, GameConstants.TYPE_QUEEN);
+        populateAntList(deadAnts, savedColony.deadAnts, GameConstants.TYPE_DEAD);
 
-        this.plants = savefile.getPlants();
-        this.mushrooms = savefile.getMushrooms();
-        this.protein = savefile.getProtein();
-        this.water = savefile.getWater();
-        this.syrups = savefile.getSyrups();
-        this.resins = savefile.getResins();
-        this.minerals = savefile.getMinerals();
+        this.plants = savedColony.plants;
+        this.mushrooms = savedColony.mushrooms;
+        this.protein = savedColony.protein;
+        this.water = savedColony.water;
+        this.syrups = savedColony.syrups;
+        this.resins = savedColony.resins;
+        this.minerals = savedColony.minerals;
 
-        this.aphids = savefile.getAphids(); 
+        this.aphids = savedColony.aphids; 
         for(int i=0; i<this.aphids; i++) {
             this.bugs.add(new Bug(GameConstants.TYPE_APHID));
         }
 
-        this.parasites = savefile.getParasites();
+        this.parasites = savedColony.parasites;
         for(int i=0; i<this.parasites; i++) {
             Bug p = new Bug(GameConstants.TYPE_PARASITE);
             p.setDimension(WorldSpaces.UNDERWORLD);
             this.bugs.add(p);
         }
         
-        this.researchPoints = savefile.getResearchPoints();
-        this.totalDeaths = savefile.getTotalDeaths();
+        this.researchPoints = savedColony.researchPoints;
+        this.totalDeaths = savedColony.totalDeaths;
         
-        if (savefile.getSavedResourceSources() != null && this.locationService != null) {
+        if (savedColony.savedResourceSources != null && this.locationService != null) {
             List<ResourceType> allTypes = GameConstants.getResources();
             
-            for (Savefile.SavedResourceSource s : savefile.getSavedResourceSources()) {
+            for (Savefile.SavedResourceSource s : savedColony.savedResourceSources) {
                 ResourceType type = null;
                 for (ResourceType rt : allTypes) {
                     if (rt.getId() == s.typeId) {

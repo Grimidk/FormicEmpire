@@ -391,10 +391,8 @@ public class World {
         for (int r = -size; r <= size; r++) {
             StringBuilder line = new StringBuilder();
             
-            for (int s = 0; s < Math.abs(r); s++) line.append(" "); 
-            if (r < 0) {
-                 for(int s=0; s < (size + r); s++) line.append(" ");
-            }
+            int indent = Math.abs(r);
+            for (int s = 0; s < indent; s++) line.append(" ");
             
             int q1 = Math.max(-size, -r - size);
             int q2 = Math.min(size, -r + size);
@@ -402,10 +400,14 @@ public class World {
             for (int q = q1; q <= q2; q++) {
                 Hex hex = hexMap.get(q + "," + r);
                 if (hex != null) {
-                    char c = hex.getBiome().getName().charAt(0);
+                    char c = (hex.getBiome().getName().length() > 0) ? hex.getBiome().getName().charAt(0) : '?';
+                    
                     if (hex.getColony() != null) {
-                        if (hex.getColony().isPlayer()) line.append("[P] ");
-                        else line.append("{E} ");
+                        if (hex.getColony().isPlayer()) {
+                            line.append("P ");
+                        } else {
+                            line.append("E ");
+                        }
                     } else {
                         line.append(c).append(" ");
                     }
@@ -441,18 +443,19 @@ public class World {
         this.year = savefile.getYear();  
         this.worldRadius = (savefile.getWorldRadius() > 0) ? savefile.getWorldRadius() : 8;
         
-        Colony colony = new Colony(savefile);  
-
-        if (colony.getAntTotal() == 0) {
-            System.out.println("[World] RECOVERY: Loaded save has 0 ants. Running ColonyStarterService to repair.");
-            ColonyStarterService starterService = new ColonyStarterService();
-            starterService.initializeNewColony(colony);
-        }
-        
         this.hexes.clear();
         Map<String, Hex> hexMap = new HashMap<>();
+        Map<String, Colony> loadedColonies = new HashMap<>();
+        int maxId = 0;
 
-        int maxId = colony.getId();
+        if (savefile.getColonies() != null) {
+            for (Savefile.SavedColony sc : savefile.getColonies()) {
+                Colony c = new Colony(sc);
+                String key = sc.q + "," + sc.r;
+                loadedColonies.put(key, c);
+                if (c.getId() > maxId) maxId = c.getId();
+            }
+        }
 
         if (savefile.getWorldHexes() != null && !savefile.getWorldHexes().isEmpty()) {
             for (Savefile.SavedHex sh : savefile.getWorldHexes()) {
@@ -464,15 +467,11 @@ public class World {
                 hex.setLocalWeather(getWeatherById(sh.weatherId));
                 hex.setActive(false); 
                 
-                if (sh.hasColony) {
-                    if (sh.q == 0 && sh.r == 0) {
-                        hex.setColony(colony);
-                    } else {
-                        Colony aiColony = new Colony(++maxId, "Wild Colony", false);
-                        ColonyStarterService starterService = new ColonyStarterService();
-                        starterService.initializeNewColony(aiColony);
-                        hex.setColony(aiColony);
-                    }
+                String key = sh.q + "," + sh.r;
+                if (loadedColonies.containsKey(key)) {
+                    hex.setColony(loadedColonies.get(key));
+                } else if (sh.hasColony) {
+                    hex.setColony(null);
                 } else {
                     hex.setColony(null);
                 }
@@ -481,9 +480,27 @@ public class World {
                 this.hexes.add(hex);
             }
             linkNeighbors(hexMap);
-            System.out.println("Loaded world grid from savefile (" + this.hexes.size() + " hexes).");
+            System.out.println("Loaded world grid from savefile (" + this.hexes.size() + " hexes, " + loadedColonies.size() + " colonies).");
         } else {
             System.out.println("No map data in save (or old save version). Generating fresh world map for existing colony.");
+            
+            Colony colony = null;
+            for (Colony c : loadedColonies.values()) {
+                if (c.isPlayer()) {
+                    colony = c;
+                    break;
+                }
+            }
+             
+            if (colony == null) {
+                colony = new Colony(1, "Grim Colony", true);
+            }
+             
+            if (colony.getAntTotal() == 0) {
+                ColonyStarterService starter = new ColonyStarterService();
+                starter.initializeNewColony(colony);
+            }
+             
             generateWorld(GameConstants.PLAINS_BIOME, this.worldRadius, colony);
         }
 

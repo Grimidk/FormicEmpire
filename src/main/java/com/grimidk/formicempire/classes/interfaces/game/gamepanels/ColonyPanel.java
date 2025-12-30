@@ -175,6 +175,28 @@ public class ColonyPanel extends ZeroGamePanel {
         this.isShowingContent = showContent;
     }
     
+    // --- Reset Method ---
+    public void reset() {
+        lastMushrooms = -1;
+        lastPlants = -1;
+        lastProtein = -1;
+        lastWater = -1;
+        lastSyrups = -1;
+        lastResins = -1;
+        lastMinerals = -1;
+        lastPlantsAvailable = -1;
+        lastProteinAvailable = -1;
+        lastWaterAvailable = -1;
+        lastMineralsAvailable = -1;
+        lastTotalConsumption = -1;
+        lastBabyTotal = -1;
+        lastAdultTotal = -1;
+        lastEggs = -1;
+        lastRank = null;
+        
+        setView(false);
+    }
+    
     private JPanel createResourcesDetailPanel() {
         JPanel panel = createTitledPanel("Resources", new BoxLayout(null, BoxLayout.Y_AXIS));
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS)); 

@@ -13,6 +13,7 @@ import com.grimidk.formicempire.classes.interfaces.game.gamepanels.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 
 public class GamePanel extends ZeroGamePanel {
     private final MainFrame frame;
@@ -34,6 +35,7 @@ public class GamePanel extends ZeroGamePanel {
     private MapDialog mapDialog;
 
     private AlertManager alertManager;
+    private TriggerManager triggerManager; 
 
     private Runnable minuteTickListener;
     private Runnable hourTickListener;
@@ -79,22 +81,20 @@ public class GamePanel extends ZeroGamePanel {
         };
         
         controlPanel = new ControlPanel(frame, 
-                                        handleBackButtonCallback, 
-                                        showHatchRateDialogCallback, 
-                                        showResearchDialogCallback,
-                                        showBuildDialogCallback,
-                                        showRoleManagementDialogCallback,
-                                        showAbilitiesDialogCallback,
-                                        toggleViewCallback,
-                                        showMapDialogCallback); 
+            handleBackButtonCallback, 
+            showHatchRateDialogCallback, 
+            showResearchDialogCallback,
+            showBuildDialogCallback,
+            showRoleManagementDialogCallback,
+            showAbilitiesDialogCallback,
+            toggleViewCallback,
+            showMapDialogCallback); 
     }
 
     @Override
     protected void initLayout() {
         add(createNorthPanel(), BorderLayout.NORTH);
         add(createCenterPanel(), BorderLayout.CENTER); 
-        // ControlPanel might be null if called before initControlPanelCallbacks
-        // But since we call initControlPanelCallbacks before initLayout in constructor, it's fine.
         if (controlPanel != null) {
             add(controlPanel, BorderLayout.SOUTH);
         }
@@ -223,12 +223,43 @@ public class GamePanel extends ZeroGamePanel {
     
     public boolean isEngineStarted() { return engineStarted; }
 
+    // --- Cleanup Methods ---
+    private void disposeAllDialogs() {
+        if (hatchDialog != null) { hatchDialog.dispose(); hatchDialog = null; }
+        if (roleDialog != null) { roleDialog.dispose(); roleDialog = null; }
+        if (researchDialog != null) { researchDialog.dispose(); researchDialog = null; }
+        if (buildDialog != null) { buildDialog.dispose(); buildDialog = null; }
+        if (abilitiesDialog != null) { abilitiesDialog.dispose(); abilitiesDialog = null; }
+        if (mapDialog != null) { mapDialog.dispose(); mapDialog = null; }
+    }
+
+    private void cleanupSession() {
+        disposeAllDialogs();
+        unregisterTickListeners();
+        
+        if (gameAreaPanel != null) gameAreaPanel.resetView();
+        if (colonyPanel != null) colonyPanel.reset();
+        if (worldPanel != null) worldPanel.reset();
+        if (alertPanel != null) alertPanel.updateAlerts(new ArrayList<>());
+        
+        Engine eng = frame.getEngine();
+        if (eng != null) {
+            eng.pauseEngine();
+        }
+        updateStatusIndicator(true);
+        if (controlPanel != null) {
+            controlPanel.setPlayPauseButtonText(true);
+        }
+        
+        this.triggerManager = null; 
+        this.engineStarted = false;
+        statusLabel.setText("Game not started");
+    }
+
     private void handleBackButton() {
         Engine eng = frame.getEngine();
         if (eng != null) eng.pauseEngine();
-        updateStatusIndicator(true);
-        controlPanel.setPlayPauseButtonText(true);
-        unregisterTickListeners(); 
+        
         try {
             SaveManager sm = new SaveManager();
             Engine engine = frame.getEngine();
@@ -239,25 +270,27 @@ public class GamePanel extends ZeroGamePanel {
                     Savefile existing = sm.loadSlot(slotIdLocal);
                     String nameToUse = (existing != null && existing.getName() != null && !existing.getName().trim().isEmpty()) ? existing.getName() : ("Save " + slotIdLocal);
                     sm.saveWorldToSlotUserAsync(engine.getWorld(), engine, slotIdLocal, nameToUse, () -> {
+                        cleanupSession();
                         frame.showCard(MainFrame.CARD_SAVE);
                     });
                 } else {
-                    sm.saveWorldToSlot(engine.getWorld(), 0); 
+                    sm.saveWorldToSlot(engine.getWorld(), 0);
+                    cleanupSession();
                     frame.showCard(MainFrame.CARD_SAVE);
                 }
+            } else {
+                cleanupSession();
+                frame.showCard(MainFrame.CARD_SAVE);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
+            cleanupSession();
             frame.showCard(MainFrame.CARD_SAVE);
         }
     }
     
     public void quitToMenuWithoutSaving() {
-        Engine eng = frame.getEngine();
-        if (eng != null) eng.pauseEngine();
-        updateStatusIndicator(true);
-        if (controlPanel != null) controlPanel.setPlayPauseButtonText(true);
-        unregisterTickListeners(); 
+        cleanupSession();
         frame.showCard(MainFrame.CARD_SAVE);
     }
 
@@ -287,7 +320,7 @@ public class GamePanel extends ZeroGamePanel {
                         
                         alertManager = new AlertManager(colony, alertPanel);
 
-                        TriggerManager triggerManager = new TriggerManager(world, colony, engine);
+                        triggerManager = new TriggerManager(world, colony, engine);
                         if (frame instanceof TriggerManager.TriggerListener) {
                             triggerManager.addListener((TriggerManager.TriggerListener) frame);
                         }
@@ -299,7 +332,9 @@ public class GamePanel extends ZeroGamePanel {
                     
                     if (!engineStarted) {
                         engineStarted = true;
-                        engine.start();
+                        if (!engine.isAlive()) {
+                            engine.start();
+                        }
                     }
                     controlPanel.setPlayPauseButtonText(engine.isPaused());
                     

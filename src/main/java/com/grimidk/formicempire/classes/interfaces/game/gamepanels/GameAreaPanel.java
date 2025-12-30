@@ -99,6 +99,14 @@ public class GameAreaPanel extends ZeroGamePanel {
         this.colony = colony;
     }
     
+    public void resetView() {
+        this.currentDimension = WorldSpaces.OVERWORLD;
+        this.currentBiomeName = "Plains";
+        this.colony = null;
+        this.backgroundImage = biomeTextureCache.get("Plains");
+        repaint();
+    }
+    
     public void toggleDimension() {
         currentDimension = (currentDimension == WorldSpaces.OVERWORLD) ? WorldSpaces.UNDERWORLD : WorldSpaces.OVERWORLD;
         updateBackground();
