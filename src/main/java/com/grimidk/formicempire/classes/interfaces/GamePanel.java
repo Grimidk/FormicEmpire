@@ -148,7 +148,7 @@ public class GamePanel extends ZeroGamePanel {
     private void showHatchRateDialog() {
         Engine engine = frame.getEngine();
         Colony colony = getColonyFromEngine(engine);
-        if (colony == null) return;
+        if (colony == null || !colony.isPlayer()) return;
         
         if (hatchDialog == null || hatchDialog.getOwner() != frame) {
             if (hatchDialog != null) hatchDialog.dispose();
@@ -160,7 +160,7 @@ public class GamePanel extends ZeroGamePanel {
     private void showRoleManagementDialog(int tabIndex) {
         Engine engine = frame.getEngine();
         Colony colony = getColonyFromEngine(engine);
-        if (colony == null) return;
+        if (colony == null || !colony.isPlayer()) return;
         
         if (roleDialog == null || roleDialog.getOwner() != frame) {
             if (roleDialog != null) roleDialog.dispose();
@@ -172,7 +172,7 @@ public class GamePanel extends ZeroGamePanel {
     private void showResearchDialog() {
         Engine engine = frame.getEngine();
         Colony colony = getColonyFromEngine(engine);
-        if (colony == null) return;
+        if (colony == null || !colony.isPlayer()) return;
                 
         if (researchDialog == null || researchDialog.getOwner() != frame) {
             if (researchDialog != null) researchDialog.dispose();
@@ -184,7 +184,7 @@ public class GamePanel extends ZeroGamePanel {
     private void showBuildDialog() {
         Engine engine = frame.getEngine();
         Colony colony = getColonyFromEngine(engine);
-        if (colony == null) return;
+        if (colony == null || !colony.isPlayer()) return;
         
         if (buildDialog == null || buildDialog.getOwner() != frame) {
             if (buildDialog != null) buildDialog.dispose();
@@ -196,7 +196,7 @@ public class GamePanel extends ZeroGamePanel {
     private void showAbilitiesDialog() {
         Engine engine = frame.getEngine();
         Colony colony = getColonyFromEngine(engine);
-        if (colony == null) return;
+        if (colony == null || !colony.isPlayer()) return;
         
         if (abilitiesDialog == null || abilitiesDialog.getOwner() != frame) {
             if (abilitiesDialog != null) abilitiesDialog.dispose();
@@ -445,7 +445,8 @@ public class GamePanel extends ZeroGamePanel {
         worldPanel.updateHourData(world);
         colonyPanel.updateHourData(colony);
         
-        if (colony != null) {
+        // Ensure buttons are only active if it is the player's colony
+        if (colony != null && colony.isPlayer()) {
             if (researchDialog != null && researchDialog.isShowing()) {
                 researchDialog.liveUpdate();
             }
