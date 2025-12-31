@@ -275,7 +275,8 @@ public class World {
                     hex.setBiome(ringBiome);
                     
                     if (dist > 1 && !isWaterBiome(ringBiome) && random.nextInt(100) < 20) {
-                        Colony aiColony = new Colony(this.colonyIdCounter++, "Wild Colony " + colonyIdCounter, false);
+                        int newId = this.colonyIdCounter++;
+                        Colony aiColony = new Colony(newId, "Wild Colony " + newId, false);
                         starterService.initializeNewColony(aiColony);
                         hex.setColony(aiColony);
                     } else {

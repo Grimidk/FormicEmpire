@@ -474,6 +474,13 @@ public class SaveManager {
         writeJsonLine(w, "resins", sc.resins, false);
         writeJsonLine(w, "minerals", sc.minerals, false);
         
+        // Hatch Rates
+        writeJsonLine(w, "hatchRateWorker", sc.hatchRateWorker, false);
+        writeJsonLine(w, "hatchRateSoldier", sc.hatchRateSoldier, false);
+        writeJsonLine(w, "hatchRateMajor", sc.hatchRateMajor, false);
+        writeJsonLine(w, "hatchRateDrone", sc.hatchRateDrone, false);
+        writeJsonLine(w, "hatchRatePrincess", sc.hatchRatePrincess, false);
+        
         writeJsonLine(w, "aphids", sc.aphids, false);
         writeJsonLine(w, "parasites", sc.parasites, false);
         writeJsonLine(w, "researchPoints", sc.researchPoints, false);
@@ -632,6 +639,13 @@ public class SaveManager {
         sc.syrups = Integer.parseInt(map.getOrDefault("syrups", "0"));
         sc.resins = Integer.parseInt(map.getOrDefault("resins", "0"));
         sc.minerals = Integer.parseInt(map.getOrDefault("minerals", "0"));
+
+        // Hatch Rates
+        sc.hatchRateWorker = Float.parseFloat(map.getOrDefault("hatchRateWorker", "0.0"));
+        sc.hatchRateSoldier = Float.parseFloat(map.getOrDefault("hatchRateSoldier", "0.0"));
+        sc.hatchRateMajor = Float.parseFloat(map.getOrDefault("hatchRateMajor", "0.0"));
+        sc.hatchRateDrone = Float.parseFloat(map.getOrDefault("hatchRateDrone", "0.0"));
+        sc.hatchRatePrincess = Float.parseFloat(map.getOrDefault("hatchRatePrincess", "0.0"));
         
         sc.aphids = Integer.parseInt(map.getOrDefault("aphids", "0"));
         sc.parasites = Integer.parseInt(map.getOrDefault("parasites", "0"));
