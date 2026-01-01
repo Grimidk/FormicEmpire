@@ -1,4 +1,4 @@
-package com.grimidk.formicempire.classes.interfaces.game.panels;
+package com.grimidk.formicempire.classes.interfaces.game.gamepanels;
 
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-public class GameAreaPanel extends JPanel {
+public class GameAreaPanel extends ZeroGamePanel {
 
     private Image backgroundImage;
     private final Map<String, Image> biomeTextureCache = new HashMap<>();
@@ -33,7 +33,6 @@ public class GameAreaPanel extends JPanel {
     private Image deadBodyImg;
     
     private Colony colony;
-    
     private Dimension currentDimension = WorldSpaces.OVERWORLD; 
     private String currentBiomeName = "Plains";
 
@@ -48,9 +47,20 @@ public class GameAreaPanel extends JPanel {
     public Rectangle breederRoomBounds;
 
     public GameAreaPanel() {
+        super(null); 
+        setOpaque(true);
+        initComponents();
+        initLayout();
+    }
+    
+    @Override
+    protected void initComponents() {
         loadImages();
         this.backgroundImage = biomeTextureCache.getOrDefault("Plains", null);
-        setOpaque(true);
+    }
+    
+    @Override
+    protected void initLayout() {
     }
 
     private void loadImages() {
@@ -87,6 +97,14 @@ public class GameAreaPanel extends JPanel {
     
     public void setColony(Colony colony) {
         this.colony = colony;
+    }
+    
+    public void resetView() {
+        this.currentDimension = WorldSpaces.OVERWORLD;
+        this.currentBiomeName = "Plains";
+        this.colony = null;
+        this.backgroundImage = biomeTextureCache.get("Plains");
+        repaint();
     }
     
     public void toggleDimension() {

@@ -1,4 +1,4 @@
-package com.grimidk.formicempire.classes.interfaces.game.panels;
+package com.grimidk.formicempire.classes.interfaces.game.gamepanels;
 
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
@@ -11,7 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
-public class ControlPanel extends JPanel {
+public class ControlPanel extends ZeroGamePanel {
 
     private final MainFrame frame;
     private final Runnable handleBackButtonCallback;
@@ -21,6 +21,7 @@ public class ControlPanel extends JPanel {
     private final RoleManagementCallback showRoleManagementDialogCallback;
     private final Runnable showAbilitiesDialogCallback;
     private final Runnable toggleViewCallback;
+    private final Runnable showMapDialogCallback;
 
     // --- UI Components ---
     private final JButton speedUpButton = new JButton("Speed+");
@@ -35,7 +36,6 @@ public class ControlPanel extends JPanel {
     
     // --- State ---
     private int speedLevel = 1;
-    
     private static final float[] SPEED_DELAYS = { 250f, 125f, 60f, 30f, 15f, 5f, 1f}; 
     
     public interface RoleManagementCallback {
@@ -49,7 +49,10 @@ public class ControlPanel extends JPanel {
                         Runnable showBuildDialogCallback,
                         RoleManagementCallback showRoleManagementDialogCallback,
                         Runnable showAbilitiesDialogCallback,
-                        Runnable toggleViewCallback) { 
+                        Runnable toggleViewCallback,
+                        Runnable showMapDialogCallback) {
+        super(new FlowLayout(FlowLayout.RIGHT));
+        
         this.frame = frame;
         this.handleBackButtonCallback = handleBackButtonCallback;
         this.showHatchRateDialogCallback = showHatchRateDialogCallback;
@@ -58,21 +61,25 @@ public class ControlPanel extends JPanel {
         this.showRoleManagementDialogCallback = showRoleManagementDialogCallback;
         this.showAbilitiesDialogCallback = showAbilitiesDialogCallback;
         this.toggleViewCallback = toggleViewCallback;
+        this.showMapDialogCallback = showMapDialogCallback;
 
-        initLayout();
+        initComponents();
+        initLayout();        
         initListeners();
         initKeyBindings();
         updateTickLabel(frame.getEngine());
     }
 
-    private void initLayout() {
-        setLayout(new FlowLayout(FlowLayout.RIGHT));
-        
+    @Override
+    protected void initComponents() {
         speedDownButton.setFocusable(false);
         speedUpButton.setFocusable(false);
         playPauseButton.setFocusable(false);
         menuButton.setFocusable(false);
-        
+    }
+
+    @Override
+    protected void initLayout() {
         add(speedDownButton);
         add(speedUpButton);
         add(tickLabel);
@@ -96,7 +103,6 @@ public class ControlPanel extends JPanel {
         if (eng == null) return;
 
         int maxLevel = getMaxSpeedLevel();
-        
         if (speedLevel > maxLevel) speedLevel = maxLevel;
         if (speedLevel < 0) speedLevel = 0;
 
@@ -149,6 +155,7 @@ public class ControlPanel extends JPanel {
         // --- Game Menu Setup ---
         JMenuItem backToGame = new JMenuItem("Back to Game");
         JMenuItem toggleView = new JMenuItem("Toggle View (A)");
+        JMenuItem showMap = new JMenuItem("World Map (I)"); 
         JMenuItem manageRoles = new JMenuItem("Manage Roles (Q/W/E/R/T)");
         JMenuItem manageHatchRates = new JMenuItem("Manage Hatch Rates (P)");
         manageResearch = new JMenuItem("Research (Y)");
@@ -160,6 +167,7 @@ public class ControlPanel extends JPanel {
 
         backToGame.addActionListener(e -> gameMenu.setVisible(false));
         toggleView.addActionListener(e -> toggleViewCallback.run());
+        showMap.addActionListener(e -> showMapDialogCallback.run()); 
         manageRoles.addActionListener(e -> showRoleManagementDialogCallback.showDialog(0));
         manageHatchRates.addActionListener(e -> showHatchRateDialogCallback.run());
         
@@ -203,6 +211,7 @@ public class ControlPanel extends JPanel {
         
         gameMenu.add(backToGame);
         gameMenu.add(toggleView);
+        gameMenu.add(showMap);
         gameMenu.add(manageRoles);
         gameMenu.add(manageHatchRates);
         gameMenu.add(manageResearch);
@@ -230,7 +239,6 @@ public class ControlPanel extends JPanel {
             }
         });
 
-        // Toggle View (Overworld/Underworld)
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0), "toggleView");
         actionMap.put("toggleView", new AbstractAction() {
             @Override
@@ -269,7 +277,6 @@ public class ControlPanel extends JPanel {
             }
         });
 
-        // Key bindings for role management tabs
         addRoleKeyBinding(inputMap, actionMap, "openRoles1", KeyEvent.VK_Q, 0);
         addRoleKeyBinding(inputMap, actionMap, "openRoles2", KeyEvent.VK_W, 1);
         addRoleKeyBinding(inputMap, actionMap, "openRoles3", KeyEvent.VK_E, 2);
@@ -301,6 +308,14 @@ public class ControlPanel extends JPanel {
                 if (manageBuilding.isVisible()) {
                     showBuildDialogCallback.run();
                 }
+            }
+        });
+
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_I, 0), "openMap");
+        actionMap.put("openMap", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showMapDialogCallback.run();
             }
         });
         

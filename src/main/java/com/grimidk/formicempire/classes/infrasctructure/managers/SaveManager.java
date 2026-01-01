@@ -13,6 +13,7 @@ import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
@@ -22,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
@@ -297,310 +297,368 @@ public class SaveManager {
         save.setDay(w.getDay());
         save.setMonth(w.getMonth());
         save.setYear(w.getYear());
-        save.setPlayTime(computePlayTime(w)); 
+        save.setPlayTime(computePlayTime(w));
+        save.setWorldRadius(w.getWorldRadius());
         
-        if (w.getHexes() != null && !w.getHexes().isEmpty()) {
-            try {
-                Colony c = w.getSpawnHex().getColony();
-                if (c != null) {
-                    // --- IDs ---
-                    save.setColonyId(c.getId());
-                    save.setColonyName(c.getName());
-                    
-                    // --- Ant Counts ---
-                    save.setTotalAnts(c.getAntTotal());
-                    save.setDeadAnts(c.getDeadAnts() != null ? c.getDeadAnts().size() : 0);
-                    save.setEggs(c.getEggs() != null ? c.getEggs().size() : 0);
-                    save.setLarvae(c.getLarvae() != null ? c.getLarvae().size() : 0);
-                    save.setPupae(c.getPupae() != null ? c.getPupae().size() : 0);
-                    save.setWorkers(c.getWorkers() != null ? c.getWorkers().size() : 0);
-                    save.setSoldiers(c.getSoldiers() != null ? c.getSoldiers().size() : 0);
-                    save.setMajors(c.getMajors() != null ? c.getMajors().size() : 0);
-                    save.setDrones(c.getDrones() != null ? c.getDrones().size() : 0);
-                    save.setPrincesses(c.getPrincesses() != null ? c.getPrincesses().size() : 0);
-                    save.setQueens(c.getQueens() != null ? c.getQueens().size() : 0);
-                    
-                    // --- Resources ---
-                    save.setMushrooms(c.getMushrooms());
-                    save.setPlants(c.getPlants());
-                    save.setProtein(c.getProtein());
-                    save.setWater(c.getWater());
-                    save.setSyrups(c.getSyrups());
-                    save.setResins(c.getResins());
-                    save.setMinerals(c.getMinerals());
+        List<Savefile.SavedHex> hexList = new ArrayList<>();
+        List<Savefile.SavedColony> colonyList = new ArrayList<>();
 
-                    // --- Hatch Rates ---
-                    save.setHatchRateWorker(c.getHatchRateWorker());
-                    save.setHatchRateSoldier(c.getHatchRateSoldier());
-                    save.setHatchRateMajor(c.getHatchRateMajor());
-                    save.setHatchRateDrone(c.getHatchRateDrone());
-                    save.setHatchRatePrincess(c.getHatchRatePrincess());
-
-                    // --- Roles & Upgrades ---
-                    Map<String, Integer> rolesToSave = new HashMap<>();
+        if (w.getHexes() != null) {
+            for (Hex h : w.getHexes()) {
+                boolean hasColony = (h.getColony() != null);
+                int biomeId = (h.getBiome() != null) ? h.getBiome().getId() : 1;
+                int weatherId = (h.getLocalWeather() != null) ? h.getLocalWeather().getId() : 1;
+                hexList.add(new Savefile.SavedHex(h.getQ(), h.getR(), biomeId, hasColony, h.getTimeOffset(), weatherId));
+                
+                if (hasColony) {
+                    Colony c = h.getColony();
+                    Savefile.SavedColony sc = new Savefile.SavedColony();
+                    
+                    // ID & Location
+                    sc.id = c.getId();
+                    sc.name = c.getName();
+                    sc.isPlayer = c.isPlayer();
+                    sc.q = h.getQ();
+                    sc.r = h.getR();
+                    
+                    // Counts
+                    sc.totalAnts = c.getAntTotal();
+                    sc.deadAnts = c.getDeadAnts().size();
+                    sc.eggs = c.getEggs().size();
+                    sc.larvae = c.getLarvae().size();
+                    sc.pupae = c.getPupae().size();
+                    sc.workers = c.getWorkers().size();
+                    sc.soldiers = c.getSoldiers().size();
+                    sc.majors = c.getMajors().size();
+                    sc.drones = c.getDrones().size();
+                    sc.princesses = c.getPrincesses().size();
+                    sc.queens = c.getQueens().size();
+                    
+                    // Resources
+                    sc.mushrooms = c.getMushrooms();
+                    sc.plants = c.getPlants();
+                    sc.protein = c.getProtein();
+                    sc.water = c.getWater();
+                    sc.syrups = c.getSyrups();
+                    sc.resins = c.getResins();
+                    sc.minerals = c.getMinerals();
+                    
+                    // Rates
+                    sc.hatchRateWorker = c.getHatchRateWorker();
+                    sc.hatchRateSoldier = c.getHatchRateSoldier();
+                    sc.hatchRateMajor = c.getHatchRateMajor();
+                    sc.hatchRateDrone = c.getHatchRateDrone();
+                    sc.hatchRatePrincess = c.getHatchRatePrincess();
+                    
+                    // Stats
+                    sc.aphids = c.getAphids();
+                    sc.parasites = c.getParasites();
+                    sc.researchPoints = c.getResearchPoints();
+                    sc.totalDeaths = c.getTotalDeaths();
+                    
+                    // Maps/Lists
                     for (Map.Entry<AntRole, Integer> entry : c.getAssignedRoleCounts().entrySet()) {
-                        rolesToSave.put(entry.getKey().getName(), entry.getValue());
+                        sc.assignedRoleCounts.put(entry.getKey().getName(), entry.getValue());
                     }
-                    save.setAssignedRoleCounts(rolesToSave);
-
-                    Set<Upgrade> colonyUpgrades = c.getUnlockedUpgrades();
-                    List<Integer> upgradeIds = new ArrayList<>();
-                    if (colonyUpgrades != null) {
-                        for (Upgrade up : colonyUpgrades) {
-                            upgradeIds.add(up.getId());
-                        }
-                    }
-                    save.setUnlockedUpgradeIds(upgradeIds);
-
-                    Set<Building> colonyBuildings = c.getUnlockedBuildings();
-                    List<Integer> buildiingIds = new ArrayList<>();
-                    if (colonyBuildings != null) {
-                        for (Building up : colonyBuildings) {
-                            buildiingIds.add(up.getId());
-                        }
-                    }
-                    save.setUnlockedBuildingIds(buildiingIds);
                     
-                    // --- New Stats ---
-                    save.setAphids(c.getAphids());
-                    save.setParasites(c.getParasites());
-                    save.setResearchPoints(c.getResearchPoints());
-                    save.setTotalDeaths(c.getDeadAnts() != null ? c.getDeadAnts().size() : 0);
+                    for (Upgrade up : c.getUnlockedUpgrades()) sc.unlockedUpgradeIds.add(up.getId());
+                    for (Building b : c.getUnlockedBuildings()) sc.unlockedBuildingIds.add(b.getId());
                     
-                    // --- Resource Sources ---
-                    List<Savefile.SavedResourceSource> savedSources = new ArrayList<>();
-                    if (c.getLocationService() != null && c.getLocationService().getDiscoveredSources() != null) {
+                    if (c.getLocationService() != null) {
                         for (ResourceSource rs : c.getLocationService().getDiscoveredSources()) {
-                             savedSources.add(new Savefile.SavedResourceSource(
-                                 rs.getResourceType().getId(),
-                                 rs.getQuantity(),
-                                 rs.getInitialQuantity(),
-                                 rs.getX(),
-                                 rs.getY()
+                             sc.savedResourceSources.add(new Savefile.SavedResourceSource(
+                                 rs.getResourceType().getId(), rs.getQuantity(), rs.getInitialQuantity(), rs.getX(), rs.getY()
                              ));
                         }
                     }
-                    save.setSavedResourceSources(savedSources);
+                    colonyList.add(sc);
+                    
+                    if (c.isPlayer()) {
+                        save.setColonyId(c.getId());
+                        save.setColonyName(c.getName());
+                        save.setTotalAnts(c.getAntTotal());
+                        save.setWorkers(c.getWorkers().size());
+                        save.setQueens(c.getQueens().size());
+                        save.setDeadAnts(c.getDeadAnts().size());
+                        
+                        save.setMushrooms(c.getMushrooms());
+                        save.setPlants(c.getPlants());
+                        save.setProtein(c.getProtein());
+                        save.setWater(c.getWater());
+                        save.setSyrups(c.getSyrups());
+                        save.setResins(c.getResins());
+                        save.setMinerals(c.getMinerals());
+                    }
                 }
-            } catch (Exception ex) {
-                ex.printStackTrace();
             }
         }
-    }
-
-    private void writeJsonLine(BufferedWriter w, String key, Object value, boolean last) throws IOException {
-        w.write("  \"");
-        w.write(escapeJsonString(key));
-        w.write("\": ");
-
-        if (value instanceof String) {
-            w.write("\"");
-            w.write(escapeJsonString((String) value));
-            w.write("\"");
-        } else if (value instanceof Number) {
-            w.write(value.toString());
-        } else if (value instanceof Boolean) {
-            w.write(value.toString());
-        } else {
-            w.write("null");
-        }
-
-        if (!last) {
-            w.write(",");
-        }
-        w.newLine();
+        
+        save.setWorldHexes(hexList);
+        save.setColonies(colonyList);
     }
 
     private void writeSaveToWriter(Savefile s, BufferedWriter w) throws IOException {
         w.write("{");
         w.newLine();
 
-        // - General -
+        // - Global -
         writeJsonLine(w, "id", s.getId(), false);
         writeJsonLine(w, "name", s.getName() != null ? s.getName() : "", false);
-        writeJsonLine(w, "colonyId", s.getColonyId(), false);
-        writeJsonLine(w, "colonyName", s.getColonyName() != null ? s.getColonyName() : "", false);
-        writeJsonLine(w, "progress", s.getProgress(), false);
-        
-        // - Time -
         writeJsonLine(w, "playTime", s.getPlayTime(), false);
         writeJsonLine(w, "minute", s.getMinute(), false);
         writeJsonLine(w, "hour", s.getHour(), false);
         writeJsonLine(w, "day", s.getDay(), false);
         writeJsonLine(w, "month", s.getMonth(), false);
         writeJsonLine(w, "year", s.getYear(), false);
-
-        // - Ant Counts -
+        writeJsonLine(w, "worldRadius", s.getWorldRadius(), false);
+        
+        // - Root Summary Data (For UI compatibility) - 
+        writeJsonLine(w, "colonyId", s.getColonyId(), false);
+        writeJsonLine(w, "colonyName", s.getColonyName(), false);
         writeJsonLine(w, "totalAnts", s.getTotalAnts(), false);
-        writeJsonLine(w, "deadAnts", s.getDeadAnts(), false);
-        writeJsonLine(w, "eggs", s.getEggs(), false);
-        writeJsonLine(w, "larvae", s.getLarvae(), false);
-        writeJsonLine(w, "pupae", s.getPupae(), false);
         writeJsonLine(w, "workers", s.getWorkers(), false);
-        writeJsonLine(w, "soldiers", s.getSoldiers(), false);
-        writeJsonLine(w, "majors", s.getMajors(), false);
-        writeJsonLine(w, "drones", s.getDrones(), false);
-        writeJsonLine(w, "princesses", s.getPrincesses(), false);
         writeJsonLine(w, "queens", s.getQueens(), false);
-
-        // - Resources -
-        writeJsonLine(w, "plants", s.getPlants(), false);
-        writeJsonLine(w, "mushrooms", s.getMushrooms(), false);
-        writeJsonLine(w, "protein", s.getProtein(), false);
-        writeJsonLine(w, "water", s.getWater(), false);
-        writeJsonLine(w, "syrups", s.getSyrups(), false);
-        writeJsonLine(w, "resins", s.getResins(), false);
-        writeJsonLine(w, "minerals", s.getMinerals(), false);
-
-        // - Hatch Rates -
-        writeJsonLine(w, "hatchRateWorker", s.getHatchRateWorker(), false);
-        writeJsonLine(w, "hatchRateSoldier", s.getHatchRateSoldier(), false);
-        writeJsonLine(w, "hatchRateMajor", s.getHatchRateMajor(), false);
-        writeJsonLine(w, "hatchRateDrone", s.getHatchRateDrone(), false);
-        writeJsonLine(w, "hatchRatePrincess", s.getHatchRatePrincess(), false);
-
-        // - New Stats -
-        writeJsonLine(w, "aphids", s.getAphids(), false);
-        writeJsonLine(w, "parasites", s.getParasites(), false);
-        writeJsonLine(w, "researchPoints", s.getResearchPoints(), false);
-        writeJsonLine(w, "totalDeaths", s.getTotalDeaths(), false);
-
-        // - Upgrades -
-        w.write("  \"unlockedUpgradeIds\": ");
-        w.write(serializeListToJson(s.getUnlockedUpgradeIds()));
+        writeJsonLine(w, "deadAnts", s.getDeadAnts(), false);
+        
+        // - Hexes -
+        w.write("  \"worldHexes\": ");
+        w.write(serializeHexesToJson(s.getWorldHexes()));
         w.write(","); 
-        w.newLine();
-
-        // - Buildings -
-        w.write("  \"unlockedBuildingIds\": ");
-        w.write(serializeListToJson(s.getUnlockedBuildingIds()));
-        w.write(","); 
-        w.newLine();
-
-        // - Roles-
-        w.write("  \"assignedRoleCounts\": ");
-        w.write(serializeMapToJson(s.getAssignedRoleCounts()));
-        w.write(",");
         w.newLine();
         
-        // - Resource Sources -
-        w.write("  \"savedResourceSources\": ");
-        w.write(serializeSourcesToJson(s.getSavedResourceSources()));
+        // - Colonies (Iterate list) -
+        w.write("  \"colonies\": [");
         w.newLine();
-
+        
+        List<Savefile.SavedColony> cols = s.getColonies();
+        if (cols != null) {
+            for(int i=0; i<cols.size(); i++) {
+                writeSavedColony(w, cols.get(i), (i == cols.size() - 1));
+            }
+        }
+        w.write("  ]");
+        
+        w.newLine();
         w.write("}");
+        w.newLine();
+    }
+    
+    private void writeSavedColony(BufferedWriter w, Savefile.SavedColony sc, boolean isLast) throws IOException {
+        w.write("    {");
+        w.newLine();
+        // ID & Loc
+        writeJsonLine(w, "id", sc.id, false);
+        writeJsonLine(w, "name", sc.name, false);
+        writeJsonLine(w, "isPlayer", sc.isPlayer, false);
+        writeJsonLine(w, "q", sc.q, false);
+        writeJsonLine(w, "r", sc.r, false);
+        
+        // Stats
+        writeJsonLine(w, "totalAnts", sc.totalAnts, false);
+        writeJsonLine(w, "workers", sc.workers, false);
+        writeJsonLine(w, "eggs", sc.eggs, false);
+        writeJsonLine(w, "larvae", sc.larvae, false);
+        writeJsonLine(w, "pupae", sc.pupae, false);
+        writeJsonLine(w, "soldiers", sc.soldiers, false);
+        writeJsonLine(w, "majors", sc.majors, false);
+        writeJsonLine(w, "drones", sc.drones, false);
+        writeJsonLine(w, "princesses", sc.princesses, false);
+        writeJsonLine(w, "queens", sc.queens, false);
+        writeJsonLine(w, "deadAnts", sc.deadAnts, false);
+        
+        writeJsonLine(w, "mushrooms", sc.mushrooms, false);
+        writeJsonLine(w, "plants", sc.plants, false);
+        writeJsonLine(w, "protein", sc.protein, false);
+        writeJsonLine(w, "water", sc.water, false);
+        writeJsonLine(w, "syrups", sc.syrups, false);
+        writeJsonLine(w, "resins", sc.resins, false);
+        writeJsonLine(w, "minerals", sc.minerals, false);
+        
+        // Hatch Rates
+        writeJsonLine(w, "hatchRateWorker", sc.hatchRateWorker, false);
+        writeJsonLine(w, "hatchRateSoldier", sc.hatchRateSoldier, false);
+        writeJsonLine(w, "hatchRateMajor", sc.hatchRateMajor, false);
+        writeJsonLine(w, "hatchRateDrone", sc.hatchRateDrone, false);
+        writeJsonLine(w, "hatchRatePrincess", sc.hatchRatePrincess, false);
+        
+        writeJsonLine(w, "aphids", sc.aphids, false);
+        writeJsonLine(w, "parasites", sc.parasites, false);
+        writeJsonLine(w, "researchPoints", sc.researchPoints, false);
+        writeJsonLine(w, "totalDeaths", sc.totalDeaths, false);
+
+        // Serialized Lists within Colony
+        w.write("      \"assignedRoleCounts\": " + serializeMapToJson(sc.assignedRoleCounts) + ","); w.newLine();
+        w.write("      \"unlockedUpgradeIds\": " + serializeListToJson(sc.unlockedUpgradeIds) + ","); w.newLine();
+        w.write("      \"unlockedBuildingIds\": " + serializeListToJson(sc.unlockedBuildingIds) + ","); w.newLine();
+        w.write("      \"savedResourceSources\": " + serializeSourcesToJson(sc.savedResourceSources)); w.newLine(); // Last item
+        
+        w.write("    }");
+        if (!isLast) w.write(",");
+        w.newLine();
+    }
+
+    private void writeJsonLine(BufferedWriter w, String key, Object value, boolean last) throws IOException {
+        w.write("    \""); // Indent
+        w.write(escapeJsonString(key));
+        w.write("\": ");
+        if (value instanceof String) {
+            w.write("\"" + escapeJsonString((String)value) + "\"");
+        } else {
+            w.write(String.valueOf(value));
+        }
+        if (!last) w.write(",");
         w.newLine();
     }
 
     private Savefile readSaveFromReader(BufferedReader r) throws IOException {
-        Savefile s = null;
+        StringBuilder sb = new StringBuilder();
         String line;
-        Map<String,String> m = new HashMap<>();
+        while((line = r.readLine()) != null) sb.append(line);
+        String json = sb.toString();
         
-        while ((line = r.readLine()) != null) {
-            line = line.trim();
-            
-            if (line.equals("{") || line.equals("}") || line.isEmpty()) {
-                continue;
-            }
+        Map<String, String> rootMap = parseTopLevelJson(json);
+        
+        int id = Integer.parseInt(rootMap.getOrDefault("id", "0"));
+        String name = rootMap.getOrDefault("name", "");
+        Savefile s = new Savefile(id, name);
+        
+        s.setPlayTime(Integer.parseInt(rootMap.getOrDefault("playTime", "0")));
+        s.setMinute(Integer.parseInt(rootMap.getOrDefault("minute", "0")));
+        s.setHour(Integer.parseInt(rootMap.getOrDefault("hour", "0")));
+        s.setDay(Integer.parseInt(rootMap.getOrDefault("day", "1")));
+        s.setMonth(Integer.parseInt(rootMap.getOrDefault("month", "1")));
+        s.setYear(Integer.parseInt(rootMap.getOrDefault("year", "0")));
+        s.setWorldRadius(Integer.parseInt(rootMap.getOrDefault("worldRadius", "8")));
+        
+        // --- Populate Root Summary Data ---
+        s.setColonyId(Integer.parseInt(rootMap.getOrDefault("colonyId", "0")));
+        s.setColonyName(rootMap.getOrDefault("colonyName", ""));
+        s.setTotalAnts(Integer.parseInt(rootMap.getOrDefault("totalAnts", "0")));
+        s.setWorkers(Integer.parseInt(rootMap.getOrDefault("workers", "0")));
+        s.setQueens(Integer.parseInt(rootMap.getOrDefault("queens", "0")));
+        s.setDeadAnts(Integer.parseInt(rootMap.getOrDefault("deadAnts", "0")));
 
-            int idx = line.indexOf(':');
-            if (idx <= 0) continue;
-            
-            String k = line.substring(0, idx).trim();
-            if (k.startsWith("\"")) k = k.substring(1);
-            if (k.endsWith("\"")) k = k.substring(0, k.length() - 1);
-
-            String v = line.substring(idx + 1).trim();
-            if (v.endsWith(",")) {
-                v = v.substring(0, v.length() - 1);
-            }
-            
-            if (v.startsWith("\"")) {
-                v = v.substring(1);
-                if (v.endsWith("\"")) {
-                    v = v.substring(0, v.length() - 1);
-                }
-                if (k.equals("name") || k.equals("colonyName")) { 
-                     v = unescapeJsonString(v);
-                }
-            } else if (v.startsWith("[")) { 
-                v = v.substring(0, v.length());
-            } else if (v.equals("null")) {
-                v = ""; 
-            }
-            
-            m.put(k, v);
-        }
-
-        if (m.containsKey("id") && m.containsKey("name")) {
-            int id = Integer.parseInt(m.getOrDefault("id", "0"));
-            String name = m.getOrDefault("name", "");
-
-            s = new Savefile(id, name);
-            s.setColonyId(Integer.parseInt(m.getOrDefault("colonyId", "0")));
-            s.setColonyName(m.getOrDefault("colonyName", ""));
-            s.setProgress(Float.parseFloat(m.getOrDefault("progress", "0")));
-            s.setPlayTime(Integer.parseInt(m.getOrDefault("playTime", "0")));
-            s.setMinute(Integer.parseInt(m.getOrDefault("minute", "0")));
-            s.setHour(Integer.parseInt(m.getOrDefault("hour", "0")));
-            s.setDay(Integer.parseInt(m.getOrDefault("day", "0")));
-            s.setMonth(Integer.parseInt(m.getOrDefault("month", "0")));
-            s.setYear(Integer.parseInt(m.getOrDefault("year", "0")));
-            
-            // Ant Counts
-            s.setTotalAnts(Integer.parseInt(m.getOrDefault("totalAnts", "0")));
-            s.setDeadAnts(Integer.parseInt(m.getOrDefault("deadAnts", "0")));
-            s.setEggs(Integer.parseInt(m.getOrDefault("eggs", "0")));
-            s.setLarvae(Integer.parseInt(m.getOrDefault("larvae", "0")));
-            s.setPupae(Integer.parseInt(m.getOrDefault("pupae", "0")));
-            s.setWorkers(Integer.parseInt(m.getOrDefault("workers", "0")));
-            s.setSoldiers(Integer.parseInt(m.getOrDefault("soldiers", "0")));
-            s.setMajors(Integer.parseInt(m.getOrDefault("majors", "0")));
-            s.setDrones(Integer.parseInt(m.getOrDefault("drones", "0")));
-            s.setPrincesses(Integer.parseInt(m.getOrDefault("princesses", "0")));
-            s.setQueens(Integer.parseInt(m.getOrDefault("queens", "0")));
-            
-            // Resources
-            s.setMushrooms(Integer.parseInt(m.getOrDefault("mushrooms", "0")));
-            s.setPlants(Integer.parseInt(m.getOrDefault("plants", "0")));
-            s.setProtein(Integer.parseInt(m.getOrDefault("protein", "0")));
-            s.setWater(Integer.parseInt(m.getOrDefault("water", "0")));
-            s.setSyrups(Integer.parseInt(m.getOrDefault("syrups", "0")));
-            s.setResins(Integer.parseInt(m.getOrDefault("resins", "0")));
-            s.setMinerals(Integer.parseInt(m.getOrDefault("minerals", "0")));
-
-            // Hatch Rates
-            s.setHatchRateWorker(Float.parseFloat(m.getOrDefault("hatchRateWorker", "100.0")));
-            s.setHatchRateSoldier(Float.parseFloat(m.getOrDefault("hatchRateSoldier", "0.0")));
-            s.setHatchRateMajor(Float.parseFloat(m.getOrDefault("hatchRateMajor", "0.0")));
-            s.setHatchRateDrone(Float.parseFloat(m.getOrDefault("hatchRateDrone", "0.0")));
-            s.setHatchRatePrincess(Float.parseFloat(m.getOrDefault("hatchRatePrincess", "0.0")));
-            
-            // New Stats
-            s.setAphids(Integer.parseInt(m.getOrDefault("aphids", "0")));
-            s.setParasites(Integer.parseInt(m.getOrDefault("parasites", "0")));
-            s.setResearchPoints(Integer.parseInt(m.getOrDefault("researchPoints", "0")));
-            s.setTotalDeaths(Integer.parseInt(m.getOrDefault("totalDeaths", "0")));
-
-            // Roles & Upgrades
-            String rolesJson = m.getOrDefault("assignedRoleCounts", "{}");
-            if (rolesJson.startsWith("\"")) {
-                rolesJson = unescapeJsonString(rolesJson.substring(1, rolesJson.length() - 1));
-            }
-            s.setAssignedRoleCounts(deserializeJsonToMap(rolesJson));
-
-            String upgradesJson = m.getOrDefault("unlockedUpgradeIds", "[]");
-            s.setUnlockedUpgradeIds(deserializeJsonToList(upgradesJson));
-
-            String buildingsJson = m.getOrDefault("unlockedBuildingIds", "[]");
-            s.setUnlockedBuildingIds(deserializeJsonToList(buildingsJson));
-            
-            // Saved Resource Sources
-            String sourcesJson = m.getOrDefault("savedResourceSources", "[]");
-            s.setSavedResourceSources(deserializeJsonToSources(sourcesJson));
-        }
+        s.setWorldHexes(deserializeJsonToHexes(rootMap.get("worldHexes")));
+        List<Savefile.SavedColony> colonies = deserializeJsonToColonies(rootMap.get("colonies"));
+        s.setColonies(colonies);
+        
         return s;
+    }
+
+    // --- Manual Parser Helpers ---
+    
+    private Map<String, String> parseTopLevelJson(String json) {
+        Map<String, String> map = new HashMap<>();
+        json = json.trim();
+        if(json.startsWith("{")) json = json.substring(1);
+        if(json.endsWith("}")) json = json.substring(0, json.length()-1);
+        
+        boolean inQuote = false;
+        int braceDepth = 0;
+        int bracketDepth = 0;
+        int start = 0;
+        
+        for(int i=0; i<json.length(); i++) {
+            char c = json.charAt(i);
+            if (c == '"' && (i==0 || json.charAt(i-1) != '\\')) inQuote = !inQuote;
+            if (!inQuote) {
+                if (c == '{') braceDepth++;
+                if (c == '}') braceDepth--;
+                if (c == '[') bracketDepth++;
+                if (c == ']') bracketDepth--;
+                
+                if (c == ',' && braceDepth == 0 && bracketDepth == 0) {
+                    parsePair(json.substring(start, i), map);
+                    start = i+1;
+                }
+            }
+        }
+        if (start < json.length()) parsePair(json.substring(start), map);
+        
+        return map;
+    }
+    
+    private void parsePair(String pair, Map<String, String> map) {
+        int idx = pair.indexOf(':');
+        if (idx > 0) {
+            String k = pair.substring(0, idx).trim().replace("\"", "");
+            String v = pair.substring(idx+1).trim();
+            if (v.startsWith("\"") && v.endsWith("\"")) v = v.substring(1, v.length()-1);
+            map.put(k, v);
+        }
+    }
+    
+    private List<Savefile.SavedColony> deserializeJsonToColonies(String jsonArray) {
+        List<Savefile.SavedColony> list = new ArrayList<>();
+        if (jsonArray == null || !jsonArray.startsWith("[")) return list;
+        
+        String content = jsonArray.substring(1, jsonArray.lastIndexOf("]"));        
+        int braceDepth = 0;
+        int start = 0;
+        for(int i=0; i<content.length(); i++) {
+            char c = content.charAt(i);
+            if (c == '{') braceDepth++;
+            if (c == '}') {
+                braceDepth--;
+                if (braceDepth == 0) {
+                    String colJson = content.substring(start, i+1);
+                    list.add(parseColonyObject(colJson));
+                    while(i+1 < content.length() && (content.charAt(i+1) == ',' || Character.isWhitespace(content.charAt(i+1)))) i++;
+                    start = i+1;
+                }
+            }
+        }
+        return list;
+    }
+    
+    private Savefile.SavedColony parseColonyObject(String json) {
+        Savefile.SavedColony sc = new Savefile.SavedColony();
+        Map<String, String> map = parseTopLevelJson(json); 
+        
+        sc.id = Integer.parseInt(map.getOrDefault("id", "0"));
+        sc.name = map.getOrDefault("name", "Colony");
+        sc.isPlayer = Boolean.parseBoolean(map.getOrDefault("isPlayer", "false"));
+        sc.q = Integer.parseInt(map.getOrDefault("q", "0"));
+        sc.r = Integer.parseInt(map.getOrDefault("r", "0"));
+        sc.totalAnts = Integer.parseInt(map.getOrDefault("totalAnts", "0"));
+        sc.workers = Integer.parseInt(map.getOrDefault("workers", "0"));
+        sc.eggs = Integer.parseInt(map.getOrDefault("eggs", "0"));
+        sc.larvae = Integer.parseInt(map.getOrDefault("larvae", "0"));
+        sc.pupae = Integer.parseInt(map.getOrDefault("pupae", "0"));
+        sc.soldiers = Integer.parseInt(map.getOrDefault("soldiers", "0"));
+        sc.majors = Integer.parseInt(map.getOrDefault("majors", "0"));
+        sc.drones = Integer.parseInt(map.getOrDefault("drones", "0"));
+        sc.princesses = Integer.parseInt(map.getOrDefault("princesses", "0"));
+        sc.queens = Integer.parseInt(map.getOrDefault("queens", "0"));
+        sc.deadAnts = Integer.parseInt(map.getOrDefault("deadAnts", "0"));
+        
+        sc.plants = Integer.parseInt(map.getOrDefault("plants", "0"));
+        sc.mushrooms = Integer.parseInt(map.getOrDefault("mushrooms", "0"));
+        sc.protein = Integer.parseInt(map.getOrDefault("protein", "0"));
+        sc.water = Integer.parseInt(map.getOrDefault("water", "0"));
+        sc.syrups = Integer.parseInt(map.getOrDefault("syrups", "0"));
+        sc.resins = Integer.parseInt(map.getOrDefault("resins", "0"));
+        sc.minerals = Integer.parseInt(map.getOrDefault("minerals", "0"));
+
+        // Hatch Rates
+        sc.hatchRateWorker = Float.parseFloat(map.getOrDefault("hatchRateWorker", "0.0"));
+        sc.hatchRateSoldier = Float.parseFloat(map.getOrDefault("hatchRateSoldier", "0.0"));
+        sc.hatchRateMajor = Float.parseFloat(map.getOrDefault("hatchRateMajor", "0.0"));
+        sc.hatchRateDrone = Float.parseFloat(map.getOrDefault("hatchRateDrone", "0.0"));
+        sc.hatchRatePrincess = Float.parseFloat(map.getOrDefault("hatchRatePrincess", "0.0"));
+        
+        sc.aphids = Integer.parseInt(map.getOrDefault("aphids", "0"));
+        sc.parasites = Integer.parseInt(map.getOrDefault("parasites", "0"));
+        sc.researchPoints = Integer.parseInt(map.getOrDefault("researchPoints", "0"));
+        sc.totalDeaths = Integer.parseInt(map.getOrDefault("totalDeaths", "0"));
+        
+        // Nested structures
+        sc.assignedRoleCounts = deserializeJsonToMap(map.get("assignedRoleCounts"));
+        sc.unlockedUpgradeIds = deserializeJsonToList(map.get("unlockedUpgradeIds"));
+        sc.unlockedBuildingIds = deserializeJsonToList(map.get("unlockedBuildingIds"));
+        sc.savedResourceSources = deserializeJsonToSources(map.get("savedResourceSources"));
+        
+        return sc;
     }
 
     private String serializeListToJson(List<Integer> list) {
@@ -656,6 +714,30 @@ public class SaveManager {
             sb.append("\"y\":").append(s.y);
             sb.append("}");
             if (i < sources.size() - 1) {
+                sb.append(",");
+            }
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+    
+    private String serializeHexesToJson(List<Savefile.SavedHex> hexes) {
+        if (hexes == null || hexes.isEmpty()) {
+            return "[]";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (int i = 0; i < hexes.size(); i++) {
+            Savefile.SavedHex h = hexes.get(i);
+            sb.append("{");
+            sb.append("\"q\":").append(h.q).append(",");
+            sb.append("\"r\":").append(h.r).append(",");
+            sb.append("\"b\":").append(h.biomeId).append(",");
+            sb.append("\"c\":").append(h.hasColony).append(",");
+            sb.append("\"t\":").append(h.timeOffset).append(","); 
+            sb.append("\"w\":").append(h.weatherId); 
+            sb.append("}");
+            if (i < hexes.size() - 1) {
                 sb.append(",");
             }
         }
@@ -745,6 +827,50 @@ public class SaveManager {
             }
         }
         
+        return list;
+    }
+    
+    private List<Savefile.SavedHex> deserializeJsonToHexes(String json) {
+        List<Savefile.SavedHex> list = new ArrayList<>();
+        if (json == null || json.length() <= 2) return list;
+        
+        String inner = json.substring(1, json.length() - 1);
+        if (inner.isEmpty()) return list;
+        
+        String[] objects = inner.split("\\},");
+        
+        for (String objStr : objects) {
+            if (!objStr.endsWith("}")) objStr += "}";
+            
+            int q = 0;
+            int r = 0;
+            int b = 0;
+            boolean c = false;
+            int t = 0; 
+            int w = 1; 
+            
+            try {
+                String clean = objStr.replace("{", "").replace("}", "");
+                String[] fields = clean.split(",");
+                for (String f : fields) {
+                    String[] kv = f.split(":");
+                    if (kv.length == 2) {
+                        String k = kv[0].replace("\"", "").trim();
+                        String v = kv[1].replace("\"", "").trim();
+                        
+                        if (k.equals("q")) q = Integer.parseInt(v);
+                        else if (k.equals("r")) r = Integer.parseInt(v);
+                        else if (k.equals("b")) b = Integer.parseInt(v);
+                        else if (k.equals("c")) c = Boolean.parseBoolean(v);
+                        else if (k.equals("t")) t = Integer.parseInt(v);
+                        else if (k.equals("w")) w = Integer.parseInt(v);
+                    }
+                }
+                list.add(new Savefile.SavedHex(q, r, b, c, t, w));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         return list;
     }
 

@@ -79,27 +79,23 @@ public class ColonyPhysicsService {
                 
                 Rectangle targetRoom = getTargetRoomForAnt(colony, ant, virtualWidth);
                 
-                // If we have a specific room inside, go there.
                 if (targetRoom != null) {
-                     ant.setDimension(WorldSpaces.UNDERWORLD);
-                     ant.setPosition(getRandomPointInRoom(colony, targetRoom, virtualWidth));
+                    ant.setDimension(WorldSpaces.UNDERWORLD);
+                    ant.setPosition(getRandomPointInRoom(colony, targetRoom, virtualWidth));
                 } 
-                // If we don't have a room inside...
                 else {
-                     // If we strictly *must* be inside (shouldBeInColony), fallback to Storage 
                      if (shouldBeInColony(ant)) {
-                          ant.setDimension(WorldSpaces.UNDERWORLD);
-                          ant.setPosition(getRandomPointInRoom(colony, getRoomBounds(colony, WorldSpaces.STORAGE), virtualWidth));
-                     } else {
-                          // Otherwise, go outside
-                          ant.setDimension(WorldSpaces.OVERWORLD);
-                          Rectangle yard = getOverworldJobBounds(colony, ant);
-                          if (yard != null) {
-                              ant.setPosition(getRandomPointInRoom(colony, yard, virtualWidth));
-                          } else {
-                              ant.setPosition(getRandomOverworldPosition(colony, sprite));
-                          }
-                     }
+                        ant.setDimension(WorldSpaces.UNDERWORLD);
+                        ant.setPosition(getRandomPointInRoom(colony, getRoomBounds(colony, WorldSpaces.STORAGE), virtualWidth));
+                    } else {
+                        ant.setDimension(WorldSpaces.OVERWORLD);
+                        Rectangle yard = getOverworldJobBounds(colony, ant);
+                        if (yard != null) {
+                            ant.setPosition(getRandomPointInRoom(colony, yard, virtualWidth));
+                        } else {
+                            ant.setPosition(getRandomOverworldPosition(colony, sprite));
+                        }
+                    }
                 }
             }
         }

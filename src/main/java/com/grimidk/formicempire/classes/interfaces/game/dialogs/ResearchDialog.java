@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ResearchDialog extends JDialog {
+public class ResearchDialog extends ZeroDialog {
 
     private final Colony colony;
     private final JPanel listPanel;
@@ -24,13 +24,9 @@ public class ResearchDialog extends JDialog {
     private final Map<JButton, Upgrade> buttonUpgradeMap = new HashMap<>();
 
     public ResearchDialog(JFrame owner, Colony colony) {
-        super(owner, "Research & Development", true);
+        super(owner, "Research & Development", new Dimension(600, 500));
         this.colony = colony;
-        
-        setLayout(new BorderLayout());
-        setPreferredSize(new Dimension(600, 500));
 
-        // Header Panel (shows current RP)
         JPanel northPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         northPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
         researchPointsLabel = new JLabel();
@@ -38,33 +34,17 @@ public class ResearchDialog extends JDialog {
         northPanel.add(researchPointsLabel);
         add(northPanel, BorderLayout.NORTH);
 
-        // Center Panel (list of upgrades)
         listPanel = new JPanel();
         listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
         scrollPane = new JScrollPane(listPanel); 
         scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         add(scrollPane, BorderLayout.CENTER);
 
-        // South Panel (Close button)
-        JPanel southPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton closeButton = new JButton("Close");
-        closeButton.addActionListener(e -> dispose());
-        southPanel.add(closeButton);
-        add(southPanel, BorderLayout.SOUTH);
-        
-        getRootPane().registerKeyboardAction(e -> dispose(),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_IN_FOCUSED_WINDOW);
-        
-        getRootPane().registerKeyboardAction(e -> dispose(),
-                KeyStroke.getKeyStroke(KeyEvent.VK_Y, 0),
-                JComponent.WHEN_IN_FOCUSED_WINDOW);
-        
-        pack();
-        setLocationRelativeTo(owner);
+        registerCloseKey(KeyEvent.VK_Y);
     }
 
-    private void refreshDialog() {
+    @Override
+    protected void refreshDialog() {
         listPanel.removeAll();
         buttonUpgradeMap.clear();
         
@@ -108,7 +88,6 @@ public class ResearchDialog extends JDialog {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBorder(new TitledBorder(upgrade.getFlavorName()));
 
-        // Info Panel (Name, Description)
         JPanel infoPanel = new JPanel();
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
 
@@ -121,10 +100,8 @@ public class ResearchDialog extends JDialog {
         descriptionArea.setFont(infoPanel.getFont());
         descriptionArea.setBorder(null);
         infoPanel.add(descriptionArea);
-
         panel.add(infoPanel, BorderLayout.CENTER);
 
-        // Action Panel (Button, Cost)
         JPanel actionPanel = new JPanel();
         actionPanel.setLayout(new BoxLayout(actionPanel, BoxLayout.Y_AXIS));
         actionPanel.setBorder(new EmptyBorder(0, 0, 0, 5));
@@ -159,6 +136,7 @@ public class ResearchDialog extends JDialog {
         return panel;
     }
 
+    @Override
     public void liveUpdate() {
         if (!isShowing()) {
             return; 
@@ -179,10 +157,5 @@ public class ResearchDialog extends JDialog {
                 button.setToolTipText(null);
             }
         }
-    }
-
-    public void showDialog() {
-        refreshDialog();
-        setVisible(true);
     }
 }

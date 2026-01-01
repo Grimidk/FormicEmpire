@@ -18,7 +18,8 @@ public class Ant extends Bug {
     private float tempRes;    
     private ResourceType carrying;
     private ResourceType carryingSec;
-    private AntType carryingAnt; 
+    private AntType carryingAnt;   
+    private String causeOfDeath;
     
     // --- Navigation Queue ---
     private Queue<NeoPoint> route = new LinkedList<>();
@@ -32,6 +33,7 @@ public class Ant extends Bug {
         this.carrying = null;
         this.carryingSec = null;
         this.carryingAnt = null;
+        this.causeOfDeath = "Unknown"; 
         
         this.setStatus(GameConstants.STATUS_ALIVE);
         this.setMaxHealth((int)(colony.getBaseHealth() * type.getHealtMult())); 
@@ -70,6 +72,8 @@ public class Ant extends Bug {
 
     public AntType getCarryingAnt() { return carryingAnt; }
     public void setCarryingAnt(AntType carryingAnt) { this.carryingAnt = carryingAnt; }
+    
+    public String getCauseOfDeath() { return causeOfDeath; }
 
     // --- Route Management Methods ---
     public void setRoute(Queue<NeoPoint> route) {
@@ -105,8 +109,14 @@ public class Ant extends Bug {
 
     @Override
     public void goDie() {
+        goDie(null, "Unknown");
+    }
+
+    public void goDie(Colony colony, String reason) {
         this.type = GameConstants.TYPE_DEAD; 
-        this.clearLoad();
+        this.causeOfDeath = reason;
+        
+        this.clearLoad();        
         this.clearRoute();
         super.goDie();
     }

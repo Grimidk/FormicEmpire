@@ -1,4 +1,4 @@
-package com.grimidk.formicempire.classes.interfaces.game.panels;
+package com.grimidk.formicempire.classes.interfaces.game.gamepanels;
 
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
@@ -9,10 +9,14 @@ import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstan
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 
 import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import java.awt.Component;
+import java.awt.*;
 
-public class ColonyPanel extends JPanel {
+public class ColonyPanel extends ZeroGamePanel {
+
+    // --- Container Components ---
+    private JPanel contentPanel;
+    private JPanel emptyPanel;
+    private boolean isShowingContent = true;
 
     // --- Rank Components ---
     private final JLabel rankLabel = new JLabel("Colony Rank");
@@ -26,6 +30,7 @@ public class ColonyPanel extends JPanel {
     private final JLabel syrupLabel = new JLabel("0");
     private final JLabel resinLabel = new JLabel("0");
     private final JLabel mineralLabel = new JLabel("0");
+    
     // --- Ant Components ---
     private final JLabel totalAntLabel = new JLabel("Total ants: 0");
     private final JLabel queensLabel = new JLabel("0");
@@ -38,6 +43,7 @@ public class ColonyPanel extends JPanel {
     private final JLabel larvaLabel = new JLabel("0");
     private final JLabel eggsLabel = new JLabel("0");
     private final JLabel deadAntsLabel = new JLabel("0");
+    
     // --- Stats Components ---
     private final JLabel totalConsumptionLabel = new JLabel("Consumption: 0/day");
     private final JLabel totalProductionLabel = new JLabel("Max Food Prod: 0/day");
@@ -73,11 +79,14 @@ public class ColonyPanel extends JPanel {
     private int lastEggs = -1;
     private ColonyRank lastRank = null;
 
-
     public ColonyPanel() {
+        super(new CardLayout()); 
         initComponents();
         initLayout();
-        
+    }
+
+    @Override
+    protected void initComponents() {
         syrupLabel.setVisible(false);
         resinLabel.setVisible(false);
         mineralLabel.setVisible(false);
@@ -94,19 +103,7 @@ public class ColonyPanel extends JPanel {
         policeStatsLabel.setVisible(false);
         researchPointsLabel.setVisible(false);
         researchRateLabel.setVisible(false);
-    }
-    
-    private void setupConstantLabel(JLabel label, AntType type) {
-        label.setIcon(type.getIcon());
-        label.setToolTipText(type.getName());
-    }
 
-    private void setupConstantLabel(JLabel label, ResourceType resource) { 
-        label.setIcon(resource.getIcon());
-        label.setToolTipText(resource.getName());
-    }
-
-    private void initComponents() {
         // Resources Setup
         setupConstantLabel(mushroomsLabel, GameConstants.FUNGI_RESOURCE);
         setupConstantLabel(planLabel, GameConstants.PLANT_RESOURCE);
@@ -131,33 +128,78 @@ public class ColonyPanel extends JPanel {
         // Special Icons & Tooltips
         aphidCountLabel.setIcon(GameConstants.ICON_APHID);
         aphidCountLabel.setToolTipText("Aphids");
-        
         parasiteCountLabel.setIcon(GameConstants.TYPE_PARASITE.getIcon());
         parasiteCountLabel.setToolTipText("Parasites in Colony");
-        
         policeStatsLabel.setIcon(GameConstants.TYPE_SOLDIER.getIcon());
         policeStatsLabel.setToolTipText("Policing Efficency");
-
         researchPointsLabel.setIcon(GameConstants.ICON_RESEARCH);
         researchPointsLabel.setToolTipText("Research Points");
+        
+        // Panels
+        contentPanel = new JPanel();
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+        
+        emptyPanel = new JPanel(new BorderLayout());
+        JLabel noColonyLabel = new JLabel("No Colony Detected", SwingConstants.CENTER);
+        noColonyLabel.setForeground(Color.GRAY);
+        emptyPanel.add(noColonyLabel, BorderLayout.CENTER);
     }
 
-    private void initLayout() {
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        
-        JPanel resourcesPanel = createResourcesDetailPanel();
-        JPanel antsPanel = createAntsDetailPanel();
-        JPanel statsPanel = createColonyStatsPanel();
+    private void setupConstantLabel(JLabel label, AntType type) {
+        label.setIcon(type.getIcon());
+        label.setToolTipText(type.getName());
+    }
 
-        add(resourcesPanel);
-        add(antsPanel);
-        add(statsPanel);
+    private void setupConstantLabel(JLabel label, ResourceType resource) { 
+        label.setIcon(resource.getIcon());
+        label.setToolTipText(resource.getName());
+    }
+
+    @Override
+    protected void initLayout() {
+        contentPanel.add(createResourcesDetailPanel());
+        contentPanel.add(createAntsDetailPanel());
+        contentPanel.add(createColonyStatsPanel());
+        add(contentPanel, "CONTENT");
+        add(emptyPanel, "EMPTY");
+    }
+    
+    private void setView(boolean showContent) {
+        if (this.isShowingContent == showContent) return;
+        CardLayout cl = (CardLayout) getLayout();
+        if (showContent) {
+            cl.show(this, "CONTENT");
+        } else {
+            cl.show(this, "EMPTY");
+        }
+        this.isShowingContent = showContent;
+    }
+    
+    // --- Reset Method ---
+    public void reset() {
+        lastMushrooms = -1;
+        lastPlants = -1;
+        lastProtein = -1;
+        lastWater = -1;
+        lastSyrups = -1;
+        lastResins = -1;
+        lastMinerals = -1;
+        lastPlantsAvailable = -1;
+        lastProteinAvailable = -1;
+        lastWaterAvailable = -1;
+        lastMineralsAvailable = -1;
+        lastTotalConsumption = -1;
+        lastBabyTotal = -1;
+        lastAdultTotal = -1;
+        lastEggs = -1;
+        lastRank = null;
+        
+        setView(false);
     }
     
     private JPanel createResourcesDetailPanel() {
-        JPanel panel = new JPanel();
-        panel.setBorder(new TitledBorder("Resources"));
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        JPanel panel = createTitledPanel("Resources", new BoxLayout(null, BoxLayout.Y_AXIS));
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS)); 
         panel.add(totalResourcesLabel);
         panel.add(new JSeparator(SwingConstants.HORIZONTAL));
         panel.add(mushroomsLabel);
@@ -171,8 +213,7 @@ public class ColonyPanel extends JPanel {
     }
     
     private JPanel createAntsDetailPanel() {
-        JPanel panel = new JPanel();
-        panel.setBorder(new TitledBorder("Ants"));
+        JPanel panel = createTitledPanel("Ants", new BoxLayout(null, BoxLayout.Y_AXIS));
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.add(totalAntLabel);
         panel.add(new JSeparator(SwingConstants.HORIZONTAL));
@@ -190,14 +231,11 @@ public class ColonyPanel extends JPanel {
     }
 
     private JPanel createColonyStatsPanel() {
-        JPanel panel = new JPanel();
-        panel.setBorder(new TitledBorder("Colony Stats"));
+        JPanel panel = createTitledPanel("Colony Stats", new BoxLayout(null, BoxLayout.Y_AXIS));
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        
         rankLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         panel.add(rankLabel);
         panel.add(new JSeparator(SwingConstants.HORIZONTAL));
-        
         panel.add(totalConsumptionLabel);
         panel.add(totalProductionLabel);
         panel.add(netMushroomsLabel);
@@ -214,10 +252,13 @@ public class ColonyPanel extends JPanel {
         return panel;
     }
 
-    // --- Update Methods ---
-
     public void updateMinuteData(Colony colony) {
-        // Resources 
+        if (colony == null) {
+            setView(false);
+            return;
+        }
+        setView(true);
+
         int mushrooms = colony.getMushrooms(); 
         int plants = colony.getPlants();     
         int protein = colony.getProtein();  
@@ -266,7 +307,6 @@ public class ColonyPanel extends JPanel {
              lastMineralsAvailable = mineralsAvail;
         }
 
-        // Stats 
         int totalConsumption = colony.getTotalConsumption();
         int netMushrooms = colony.getTotalProduction() - totalConsumption;
         if (netMushrooms != -1) netMushroomsLabel.setText(String.format("Net Food: %d/day", netMushrooms));
@@ -281,20 +321,19 @@ public class ColonyPanel extends JPanel {
     }
 
     public void updateHourData(Colony colony) {
-        // Ants
+        if (colony == null) {
+            setView(false);
+            return;
+        }
+
         int eggs = colony.getEggs() != null ? colony.getEggs().size() : 0;
         if (eggs != lastEggs) eggsLabel.setText(String.valueOf(eggs));
-        
-        int plants = colony.getPlants();     
-        int protein = colony.getProtein();  
         
         boolean hasHunter = colony.hasUpgrade(GameUnlocks.ROLE_HUNTER);
         proteinLabel.setVisible(hasHunter);
         
-        // Stats
         int totalConsumption = colony.getTotalConsumption();
         if (totalConsumption != lastTotalConsumption) totalConsumptionLabel.setText(String.format("Consumption: %d/day", totalConsumption));
-        
         if (colony.getTotalProduction() != -1) totalProductionLabel.setText(String.format("Max Food Prod: %d/day", colony.getTotalProduction()));
 
         boolean hasLayer = colony.hasUpgrade(GameUnlocks.ROLE_LAYER);
@@ -302,8 +341,7 @@ public class ColonyPanel extends JPanel {
         if (hasLayer) {
             int layerCount = colony.getAssignedRoleCount(GameConstants.ROLE_LAYER);
             int hourlyLayingRate = layerCount * (int) colony.getLayingRate();
-            int layingRate = hourlyLayingRate * 24;
-            layingRateLabel.setText(String.format("Laying Rate: %d/day", layingRate));
+            layingRateLabel.setText(String.format("Laying Rate: %d/day", hourlyLayingRate * 24));
         }
         
         boolean hasNurse = colony.hasUpgrade(GameUnlocks.ROLE_NURSE);
@@ -317,34 +355,32 @@ public class ColonyPanel extends JPanel {
 
         boolean hasResearcher = colony.hasUpgrade(GameUnlocks.ROLE_RESEARCHER);
         boolean hasAssistant = colony.hasUpgrade(GameUnlocks.ROLE_ASSISTANT);
-        
         researchPointsLabel.setVisible(hasResearcher || hasAssistant);
         researchRateLabel.setVisible(hasResearcher || hasAssistant);
         
         if (hasResearcher || hasAssistant) {
             researchPointsLabel.setText("Research: " + colony.getResearchPoints());
-            
             int researcherCount = colony.getAssignedRoleCount(GameConstants.ROLE_RESEARCHER);
             int assistantCount = colony.getAssignedRoleCount(GameConstants.ROLE_ASSISTANT);
             int speed = colony.getResearchSpeed();
             int hourlyQueen = researcherCount * speed;
             int hourlyAssistant = (int) (assistantCount * (speed / 5.0)); 
-            
-            int researchPerDay = (hourlyQueen + hourlyAssistant) * 24;
-            researchRateLabel.setText("Research Rate: " + researchPerDay + "/day");
+            researchRateLabel.setText("Research Rate: " + (hourlyQueen + hourlyAssistant) * 24 + "/day");
         }
 
         lastEggs = eggs; 
-        lastPlants = plants; 
-        lastProtein = protein; 
         lastTotalConsumption = totalConsumption;
     }
 
     public void updateDayData(Colony colony) {
+        if (colony == null) {
+            setView(false);
+            return;
+        }
+        
         int totalAnts = colony.getAntTotal();
         totalAntLabel.setText("Total ants: " + totalAnts);
         
-        // Rank Update
         ColonyRank currentRank = colony.getRank();
         if (currentRank != lastRank) {
             rankLabel.setText(currentRank.getName());
@@ -401,10 +437,8 @@ public class ColonyPanel extends JPanel {
         boolean hasPolice = colony.hasUpgrade(GameUnlocks.ROLE_POLICE);
         parasiteCountLabel.setVisible(hasPolice);
         policeStatsLabel.setVisible(hasPolice);
-        
         if (hasPolice) {
             parasiteCountLabel.setText("Parasites: " + colony.getParasiteCountDisplay());
-            
             float detection = colony.getStatsService().getParasiteDetection(colony);
             int policeCount = colony.getAssignedRoleCount(GameConstants.ROLE_POLICE);
             policeStatsLabel.setText(String.format("Detection rate: ~%d/day", Math.round(policeCount * detection)));
@@ -416,8 +450,7 @@ public class ColonyPanel extends JPanel {
         int babyTotal = eggs + larva + pupa;
         if (babyTotal != lastBabyTotal) babyAntsLabel.setText("Juvenile Ants: " + babyTotal);
 
-        int adultTotal = (colony.getQueens().size() + colony.getPrincesses().size() + colony.getDrones().size() + 
-                          colony.getMajors().size() + colony.getSoldiers().size() + colony.getWorkers().size());
+        int adultTotal = (colony.getQueens().size() + colony.getPrincesses().size() + colony.getDrones().size() + colony.getMajors().size() + colony.getSoldiers().size() + colony.getWorkers().size());
         if (adultTotal != lastAdultTotal) adultAntsLabel.setText("Adult Ants: " + adultTotal);
 
         lastMushrooms = colony.getMushrooms(); 

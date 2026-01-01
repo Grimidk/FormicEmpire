@@ -13,24 +13,19 @@ import java.awt.event.KeyEvent;
 import java.util.HashMap;
 import java.util.Map;
 
-public class AbilitiesDialog extends JDialog {
+public class AbilitiesDialog extends ZeroDialog {
 
     private final Colony colony;
     private final JPanel listPanel;
     private final JLabel researchPointsLabel;
     private final JScrollPane scrollPane;
 
-    // Track active ability buttons
     private final Map<JButton, Upgrade> abilityButtons = new HashMap<>();
 
     public AbilitiesDialog(JFrame owner, Colony colony) {
-        super(owner, "Colony Operations", true);
+        super(owner, "Colony Operations", new Dimension(500, 400));
         this.colony = colony;
         
-        setLayout(new BorderLayout());
-        setPreferredSize(new Dimension(500, 400));
-
-        // Header (Research Points Status)
         JPanel northPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         northPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
         researchPointsLabel = new JLabel();
@@ -38,35 +33,17 @@ public class AbilitiesDialog extends JDialog {
         northPanel.add(researchPointsLabel);
         add(northPanel, BorderLayout.NORTH);
 
-        // Center (List of Abilities)
         listPanel = new JPanel();
         listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
         scrollPane = new JScrollPane(listPanel); 
         scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         add(scrollPane, BorderLayout.CENTER);
-
-        // Footer (Close)
-        JPanel southPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton closeButton = new JButton("Close");
-        closeButton.addActionListener(e -> dispose());
-        southPanel.add(closeButton);
-        add(southPanel, BorderLayout.SOUTH);
         
-        // Key bindings
-        getRootPane().registerKeyboardAction(e -> dispose(),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_IN_FOCUSED_WINDOW);
-        
-        pack();
-        setLocationRelativeTo(owner);
+        registerCloseKey(KeyEvent.VK_Z);
     }
 
-    public void showDialog() {
-        refreshDialog();
-        setVisible(true);
-    }
-
-    private void refreshDialog() {
+    @Override
+    protected void refreshDialog() {
         listPanel.removeAll();
         abilityButtons.clear();
         
@@ -74,7 +51,6 @@ public class AbilitiesDialog extends JDialog {
         
         boolean hasAnyAbility = false;
 
-        // --- Forced Nuptial Flight ---
         if (colony.hasUpgrade(GameUnlocks.ABILITY_FORCED_FLIGHT)) {
             JPanel p = createAbilityPanel("Forced Nuptial Flight", 
                 "Spend 1000 RP to immediately trigger a nuptial flight.\nRequires Drones and Breeder Princesses.",
@@ -146,6 +122,7 @@ public class AbilitiesDialog extends JDialog {
         return panel;
     }
     
+    @Override
     public void liveUpdate() {
         if (!isShowing()) return;
         updateResearchPointsLabel();

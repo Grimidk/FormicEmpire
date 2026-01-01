@@ -100,17 +100,19 @@ public class Bug {
     public void setCurrentRoom(Room currentRoom) { this.currentRoom = currentRoom; }
 
     public void goDie() {
-        this.status = GameConstants.STATUS_ALIVE;
-        this.moveStatus = GameConstants.MOVE_STATIC;
+        this.status = GameConstants.STATUS_DEAD;
+        
         this.maxHealth = 0;
         this.health = 0;
-        this.age = 0;
         this.regen = 0;
         this.consumption = 0;
         this.attack = 0;
         this.attackSpeed = 0;
         this.defense = 0;
         this.speed = 0;
+        
+        this.moveStatus = GameConstants.MOVE_STATIC;
+        this.targetPosition = null;
     }
 
     public boolean isAlive() {

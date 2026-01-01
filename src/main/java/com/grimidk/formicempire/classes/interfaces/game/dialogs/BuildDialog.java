@@ -12,11 +12,11 @@ import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.HashMap; 
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map; 
+import java.util.Map;
 
-public class BuildDialog extends JDialog {
+public class BuildDialog extends ZeroDialog {
 
     private final Colony colony;
     private final JPanel listPanel;
@@ -28,13 +28,9 @@ public class BuildDialog extends JDialog {
     private final Map<JButton, Building> buttonBuildingMap = new HashMap<>();
 
     public BuildDialog(JFrame owner, Colony colony) {
-        super(owner, "Colony Construction", true);
+        super(owner, "Colony Construction", new Dimension(600, 500));
         this.colony = colony;
-        
-        setLayout(new BorderLayout());
-        setPreferredSize(new Dimension(600, 500));
 
-        // Header Panel (shows current resources)
         JPanel northPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         northPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
         mineralsLabel = new JLabel();
@@ -51,33 +47,17 @@ public class BuildDialog extends JDialog {
         northPanel.add(buildersLabel);
         add(northPanel, BorderLayout.NORTH);
 
-        // Center Panel (list of buildings or current project)
         listPanel = new JPanel();
         listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
         scrollPane = new JScrollPane(listPanel); 
         scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         add(scrollPane, BorderLayout.CENTER);
-
-        // South Panel (Close button)
-        JPanel southPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton closeButton = new JButton("Close");
-        closeButton.addActionListener(e -> dispose());
-        southPanel.add(closeButton);
-        add(southPanel, BorderLayout.SOUTH);
         
-        getRootPane().registerKeyboardAction(e -> dispose(),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_IN_FOCUSED_WINDOW);
-        
-        getRootPane().registerKeyboardAction(e -> dispose(),
-                KeyStroke.getKeyStroke(KeyEvent.VK_U, 0),
-                JComponent.WHEN_IN_FOCUSED_WINDOW);
-        
-        pack();
-        setLocationRelativeTo(owner);
+        registerCloseKey(KeyEvent.VK_U);
     }
 
-    private void refreshDialog() {
+    @Override
+    protected void refreshDialog() {
         listPanel.removeAll();
         buttonBuildingMap.clear();
         
@@ -86,10 +66,8 @@ public class BuildDialog extends JDialog {
         Building currentProject = colony.getCurrentBuildingProject();
 
         if (currentProject != null) {
-            // --- Show Current Project Progress ---
             listPanel.add(createProgressPanel(currentProject));
         } else {
-            // --- Show Available Buildings ---
             List<Building> allBuildings = GameUnlocks.getBuildings();
             List<Building> availableBuildings = new ArrayList<>();
 
@@ -130,7 +108,6 @@ public class BuildDialog extends JDialog {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBorder(new TitledBorder(building.getName()));
 
-        // Info Panel (Description)
         JPanel infoPanel = new JPanel();
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
 
@@ -143,10 +120,8 @@ public class BuildDialog extends JDialog {
         descriptionArea.setFont(infoPanel.getFont());
         descriptionArea.setBorder(null);
         infoPanel.add(descriptionArea);
-
         panel.add(infoPanel, BorderLayout.CENTER);
 
-        // Action Panel (Button, Cost)
         JPanel actionPanel = new JPanel();
         actionPanel.setLayout(new BoxLayout(actionPanel, BoxLayout.Y_AXIS));
         actionPanel.setBorder(new EmptyBorder(0, 0, 0, 5));
@@ -163,7 +138,6 @@ public class BuildDialog extends JDialog {
             }
         });
 
-        // Cost Labels
         String costString = String.format("<html>%d Minerals<br>%d Resin<br>%d Hours (base)</html>",
             building.getMineralCost(), building.getResinCost(), building.getBuildTime());
         
@@ -210,10 +184,8 @@ public class BuildDialog extends JDialog {
         cancelButton.addActionListener(e -> {
             colony.setMinerals(colony.getMinerals() + project.getMineralCost());
             colony.setResins(colony.getResins() + project.getResinCost());
-            
             colony.setCurrentBuildingProject(null);
             colony.setBuildingProgressHours(0.0);
-            
             refreshDialog();
         });
         
@@ -241,10 +213,9 @@ public class BuildDialog extends JDialog {
         }
     }
 
+    @Override
     public void liveUpdate() {
-        if (!isShowing()) {
-            return;
-        }
+        if (!isShowing()) return;
 
         updateResourceLabels();
         
@@ -282,14 +253,8 @@ public class BuildDialog extends JDialog {
                     updateBuildButtonState(entry.getKey(), entry.getValue());
                 }
             } else if (listPanel.getComponentCount() > 0 && listPanel.getComponent(0) instanceof JPanel) {
-
                 refreshDialog();
             }
         }
-    }
-
-    public void showDialog() {
-        refreshDialog();
-        setVisible(true);
     }
 }

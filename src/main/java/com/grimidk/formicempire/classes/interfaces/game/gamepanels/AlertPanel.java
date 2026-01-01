@@ -1,20 +1,26 @@
-package com.grimidk.formicempire.classes.interfaces.game.panels;
+package com.grimidk.formicempire.classes.interfaces.game.gamepanels;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.util.List;
 
-public class AlertPanel extends JPanel {
+public class AlertPanel extends ZeroGamePanel {
 
-    private final JPanel listPanel;
-    private final JScrollPane scrollPane;
+    private JPanel listPanel;
+    private JScrollPane scrollPane;
 
     public AlertPanel() {
-        setLayout(new BorderLayout());
-        setPreferredSize(new Dimension(250, 150));
-        setBorder(BorderFactory.createTitledBorder("Alerts"));
+        super(new BorderLayout());        
+        initComponents();
+        initLayout();
+    }
 
+    @Override
+    protected void initComponents() {
+        setPreferredSize(new Dimension(250, 150));
+        setTitledBorder("Alerts");
+        
         listPanel = new JPanel();
         listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
         listPanel.setBackground(Color.WHITE); 
@@ -23,7 +29,10 @@ public class AlertPanel extends JPanel {
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setBorder(null);
-        
+    }
+
+    @Override
+    protected void initLayout() {
         add(scrollPane, BorderLayout.CENTER);
     }
 

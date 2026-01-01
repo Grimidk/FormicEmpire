@@ -158,34 +158,29 @@ public class Engine extends Thread {
     }
 
     public void loadFile(Savefile savefile) {
-        Colony colony;
+        if (this.world == null) {
+            System.err.println("CRITICAL: World object is null in Engine.loadFile");
+            return;
+        }
+
         if (savefile != null) {
-            colony = new Colony(savefile);
+            System.out.println("Loading existing world state from Savefile ID: " + savefile.getId());
+            this.world.loadWorld(savefile);
         } else {
-            colony = new Colony(1, "Grim Colony", true);
+            System.out.println("Generating new world...");
+            Colony colony = new Colony(1, "Grim Colony", true);
+            // Hard coded biome for now 
+            this.world.startWorld(GameConstants.PLAINS_BIOME, colony);
         }
-        try {
-            if (savefile != null && this.world != null) {
-                this.world.setMinute(savefile.getMinute());
-                this.world.setHour(savefile.getHour());
-                this.world.setDay(savefile.getDay());
-                this.world.setMonth(savefile.getMonth());
-                this.world.setYear(savefile.getYear());
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        System.out.println("Generating new world...");
-        //Hard coded biome
-        this.world.startWorld(GameConstants.PLAINS_BIOME, colony);
     }
 
     public void startUp(Savefile savefile) {
-        System.out.println("Loading new world...");
+        System.out.println("Starting up Engine...");
         World world = new World();
         this.setWorld(world);
 
         this.loadFile(savefile);
+        
         try {
             if (savefile != null && this.world != null) {
                 this.world.setSaveSlotId(savefile.getId());

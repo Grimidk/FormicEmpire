@@ -135,20 +135,27 @@ public class ColonyPopulationService {
 
     public void runAging(Colony colony){
         List<Ant> antsToKill = new ArrayList<>();
+
         for (List<Ant> antList : colony.getAntGroups().values()) {
             for (Ant ant : antList) {
                 ant.setAge(ant.getAge() + 1);
             }
         }
         
+        int agedDeaths = 0;
         for (Ant ant : antsToKill) {
              if (ant.isAlive()) { 
                 AntType originalType = ant.getAntType(); 
-                ant.goDie();
+                ant.goDie(colony, "Old Age");
                 colony.getDeadAnts().add(ant);
                 List<Ant> antList = colony.getAntsByType(originalType);
                 if (antList != null) antList.remove(ant);
+                agedDeaths++;
             }
+        }
+        
+        if (agedDeaths > 0) {
+            colony.logEvent("DEATH: " + agedDeaths + " Ants died of Old Age");
         }
     }
     
@@ -240,19 +247,21 @@ public class ColonyPopulationService {
             antsToKill.add(ant); 
         }
         
+        int starvationCount = 0;
         for (Ant ant : antsToKill) {
             if (ant.isAlive()) { 
                 AntType originalType = ant.getAntType(); 
-                ant.goDie();
+                ant.goDie(colony, "Starvation/Dehydration");
                 colony.setTotalDeaths(colony.getTotalDeaths() + 1);
                 colony.getDeadAnts().add(ant);
                 List<Ant> antList = colony.getAntsByType(originalType);
                 if (antList != null) antList.remove(ant);
+                starvationCount++;
             }
         }
 
-        if (antsToKill.size() > 0) {
-            colony.logEvent(antsToKill.size() + " Ants Died (Starvation/Dehydration)");
+        if (starvationCount > 0) {
+            colony.logEvent("DEATH: " + starvationCount + " Ants died of Starvation/Dehydration");
         }
     }
     
@@ -299,7 +308,7 @@ public class ColonyPopulationService {
         for (Ant victim : victims) {
             if (victim.isAlive()) {
                 AntType originalType = victim.getAntType();
-                victim.goDie();
+                victim.goDie(colony, "Contamination");
                 colony.setTotalDeaths(colony.getTotalDeaths() + 1);
                 colony.getDeadAnts().add(victim);
                 List<Ant> antList = colony.getAntsByType(originalType);
@@ -308,7 +317,7 @@ public class ColonyPopulationService {
         }
         
         if (killed > 0) {
-            colony.logEvent(killed + " ants died from a " + contaminationLevel + " contamination due to rotting bodies!");
+            colony.logEvent("DEATH: " + killed + " Ants died from " + contaminationLevel + " Contamination");
         }
     }
 

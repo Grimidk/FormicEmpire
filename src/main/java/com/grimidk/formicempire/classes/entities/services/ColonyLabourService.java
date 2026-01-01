@@ -322,7 +322,7 @@ public void runCollecting(Colony colony) {
             
             for (Ant antToCull : antsToCull) {
                 if (antToCull.isAlive()) {
-                    antToCull.goDie(); 
+                    antToCull.goDie(colony, "Lack of Care");
                     colony.getDeadAnts().add(antToCull);
                     list.remove(antToCull);
                     deathCount++;
@@ -331,7 +331,7 @@ public void runCollecting(Colony colony) {
         }
         
         if (deathCount > 0) {
-            colony.logEvent(deathCount + " Juveniles Died (Nursing)");
+            colony.logEvent("DEATH: " + deathCount + " Juveniles died (Lack of Care)");
         }
     }
     
@@ -563,15 +563,24 @@ public void runCollecting(Colony colony) {
         List<Ant> deadAnts = colony.getDeadAnts();
         List<Ant> gravers = getWorkingAnts(colony, GameConstants.ROLE_GRAVER);
         int graverCount = gravers.size();
-        int toCompost = (int) colony.getStatsService().getGravingRate(colony) * gravers.size();
-        if (toCompost == 0) return;
+        int potentialCompost = (int) colony.getStatsService().getGravingRate(colony) * gravers.size();
+        
+        if (potentialCompost == 0 || deadAnts.isEmpty()) return;
 
-        int mushroomGain = toCompost * 4; 
+        int actualToCompost = Math.min(potentialCompost, deadAnts.size());
+        
+        List<Ant> compostedAnts = new ArrayList<>();
+        for(int i = 0; i < actualToCompost; i++) {
+            compostedAnts.add(deadAnts.get(i));
+        }
+        deadAnts.removeAll(compostedAnts);
+
+        int mushroomGain = actualToCompost * 4; 
         int capacity = colony.getStatsService().getMushroomsCapacity(colony);
         colony.setMushrooms(Math.min(colony.getMushrooms() + mushroomGain, capacity));
         
-        if (toCompost > 10) {
-            colony.logEvent("Recycled " + toCompost + " bodies into mushroom matter.");
+        if (actualToCompost > 0) {
+            colony.logEvent("COMPOST: Recycled " + actualToCompost + " bodies into mushroom matter.");
         }
     }
 
@@ -612,7 +621,7 @@ public void runCollecting(Colony colony) {
         
         if (colony.getBuildingProgressHours() >= requiredHours) {
             colony.unlockBuilding(colony.getCurrentBuildingProject());
-            colony.logEvent("Built " + colony.getCurrentBuildingProject().getName());
+            colony.logEvent("SUCCESS: Built " + colony.getCurrentBuildingProject().getName());
             colony.setCurrentBuildingProject(null);
             colony.setBuildingProgressHours(0.0);
         }
