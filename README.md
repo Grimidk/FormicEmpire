@@ -1,6 +1,6 @@
 A game about ants developed solely on Java, autism, energy drinks, and cigarettes. 
 I refuse to use an engine or learn proper UI/UX. 
-Copilot is being used to help me code, and all art is made using Aseprite with my own trackpad. 
+Copilot is being used to help me debug, and all art is made using Aseprite with my own trackpad. 
 
 I'll be taking a rest until mid-January to focus on my thesis after finishing the commits for 2025. 
 
