@@ -13,7 +13,7 @@ To Feature:
 Needed for launch (v1.0) (Launch Version):
 	design map and buttons and that (use simple colors and icons) and shows small tooltip of colonies
 	colonizing and trade routes (async with roles and incoming outgoing recurrent and one time and travel time and danger level and boring tunnels) 
-  new colonies and civilizations-species (species empress?) (research inheritance)
+  	new colonies and civilizations-species (species empress?) (research inheritance)
 	new biome sprites and icons	
 	breeders go out of the colony 
 	auxiliary room sprites (storage (resources), farm (shroom), nurse (bedding), royal (nests and science)) and expansion (breeder room)
@@ -53,5 +53,4 @@ Needed for launch (v1.0) (Launch Version):
 
 Post launch (v1.1) (Improvements Update):
     (Secret for now)
-
 

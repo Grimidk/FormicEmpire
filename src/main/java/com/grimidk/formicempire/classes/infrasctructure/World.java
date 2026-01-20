@@ -274,7 +274,7 @@ public class World {
                     Biome ringBiome = getBiomeForRing(dist);
                     hex.setBiome(ringBiome);
                     
-                    if (dist > 1 && !isWaterBiome(ringBiome) && random.nextInt(100) < 20) {
+                    if (dist > 1 && !isWaterBiome(ringBiome) && random.nextInt(100) < 30) {
                         int newId = this.colonyIdCounter++;
                         Colony aiColony = new Colony(newId, "Wild Colony " + newId, false);
                         starterService.initializeNewColony(aiColony);
@@ -418,7 +418,6 @@ public class World {
             }
             System.out.println(line.toString());
         }
-        System.out.println("\n--------------------------------------------------\n");
     }
 
     public void startWorld(Biome biome, Colony colony) {

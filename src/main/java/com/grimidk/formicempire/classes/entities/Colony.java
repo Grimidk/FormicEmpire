@@ -10,12 +10,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.awt.Rectangle;
 import java.awt.Point; 
 
-import com.grimidk.formicempire.classes.entities.services.ColonyStatsService;
-import com.grimidk.formicempire.classes.entities.services.ColonyLabourService;
-import com.grimidk.formicempire.classes.entities.services.ColonyLocationService;
-import com.grimidk.formicempire.classes.entities.services.ColonyPopulationService;
-import com.grimidk.formicempire.classes.entities.services.ColonyPhysicsService;
-import com.grimidk.formicempire.classes.entities.services.ColonySumarizationService;
+import com.grimidk.formicempire.classes.entities.services.*; 
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
@@ -95,6 +90,7 @@ public class Colony {
     private transient ColonyPhysicsService physicsService;
     private transient ColonyLocationService locationService;
     private transient ColonySumarizationService sumarizationService;
+    private transient ColonyStatTrackingService trackingService;
 
     // --- Service Initializer ---
     private void initializeServices() {
@@ -104,6 +100,7 @@ public class Colony {
         this.physicsService = new ColonyPhysicsService();
         this.locationService = new ColonyLocationService();
         this.sumarizationService = new ColonySumarizationService();
+        this.trackingService = new ColonyStatTrackingService(); 
     }
 
     // --- Initialization Methods ---
@@ -241,6 +238,10 @@ public class Colony {
         initializeAssignedRoles(); 
         initializeServices(); 
         
+        if (this.trackingService != null && savedColony.deathStatistics != null) {
+            this.trackingService.loadStatistics(savedColony.deathStatistics);
+        }
+        
         Map<String, Integer> savedRoles = savedColony.assignedRoleCounts;
         if (savedRoles != null && !savedRoles.isEmpty()) {
             for (AntRole role : GameConstants.getAntRoles()) {
@@ -356,6 +357,16 @@ public class Colony {
             eventLog.clear();
         }
         return consumed;
+    }
+
+    // --- Death Tracking Wrapper ---
+    public void recordAntDeath(Ant ant, String cause) {
+        if (ant == null) return;
+        this.totalDeaths++;
+        this.deadAnts.add(ant);
+        if (trackingService != null) {
+            trackingService.recordDeath(cause);
+        }
     }
 
     // --- Getters/Setters ---
@@ -616,6 +627,7 @@ public class Colony {
     public ColonyPhysicsService getPhysicsService() { return this.physicsService; }
     public ColonyLocationService getLocationService() { return this.locationService; }
     public ColonySumarizationService getSumarizationService() { return this.sumarizationService; }
+    public ColonyStatTrackingService getTrackingService() { return this.trackingService; }
 
     public int getTotalConsumption(){ return statsService.getTotalConsumption(this); }
     public int getTotalProduction(){ return statsService.getTotalProduction(this); }

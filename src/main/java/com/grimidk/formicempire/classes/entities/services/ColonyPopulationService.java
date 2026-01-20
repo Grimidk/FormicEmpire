@@ -147,7 +147,8 @@ public class ColonyPopulationService {
              if (ant.isAlive()) { 
                 AntType originalType = ant.getAntType(); 
                 ant.goDie(colony, "Old Age");
-                colony.getDeadAnts().add(ant);
+                colony.recordAntDeath(ant, "Old Age");
+                
                 List<Ant> antList = colony.getAntsByType(originalType);
                 if (antList != null) antList.remove(ant);
                 agedDeaths++;
@@ -251,9 +252,11 @@ public class ColonyPopulationService {
         for (Ant ant : antsToKill) {
             if (ant.isAlive()) { 
                 AntType originalType = ant.getAntType(); 
-                ant.goDie(colony, "Starvation/Dehydration");
-                colony.setTotalDeaths(colony.getTotalDeaths() + 1);
-                colony.getDeadAnts().add(ant);
+                
+                String cause = thirstyAnts.contains(ant) ? "Dehydration" : "Starvation";
+                ant.goDie(colony, cause);
+                colony.recordAntDeath(ant, cause);
+                
                 List<Ant> antList = colony.getAntsByType(originalType);
                 if (antList != null) antList.remove(ant);
                 starvationCount++;
@@ -309,8 +312,8 @@ public class ColonyPopulationService {
             if (victim.isAlive()) {
                 AntType originalType = victim.getAntType();
                 victim.goDie(colony, "Contamination");
-                colony.setTotalDeaths(colony.getTotalDeaths() + 1);
-                colony.getDeadAnts().add(victim);
+                colony.recordAntDeath(victim, "Contamination");
+
                 List<Ant> antList = colony.getAntsByType(originalType);
                 if (antList != null) antList.remove(victim);
             }
