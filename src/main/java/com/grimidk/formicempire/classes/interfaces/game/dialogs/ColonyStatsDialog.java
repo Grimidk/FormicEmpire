@@ -2,7 +2,6 @@ package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
-import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.services.ColonyLocationService;
@@ -128,50 +127,66 @@ public class ColonyStatsDialog extends ZeroDialog {
         ColonyStatsService stats = colony.getStatsService();
         ColonyLocationService loc = colony.getLocationService();
         
-        int totalProd = stats.getTotalProduction(colony);
-        int totalCons = stats.getTotalConsumption(colony);
-        
+        // --- Plants ---
+        int plantProd = stats.getPlantProduction(colony);
+        int plantCons = stats.getPlantConsumption(colony);
         addResourceRow(model, GameConstants.PLANT_RESOURCE.getIcon(), "Plants", colony.getPlants(), stats.getPlantsCapacity(colony), 
             loc.getSourcesByType(GameConstants.PLANT_RESOURCE).size(), stats.getSourceCapacity(colony),
-            GameConstants.PLANT_RESOURCE);
+            plantProd, plantCons);
             
+        // --- Mushrooms ---
+        int mushProd = stats.getTotalProduction(colony);
+        int mushCons = stats.getTotalConsumption(colony);
         addResourceRow(model, GameConstants.FUNGI_RESOURCE.getIcon(), "Mushrooms", colony.getMushrooms(), stats.getMushroomsCapacity(colony), 
-            0, 0, GameConstants.FUNGI_RESOURCE);
+            0, 0, mushProd, mushCons);
             
+        // --- Protein ---
+        int protProd = stats.getProteinProduction(colony);
+        int protCons = stats.getProteinConsumption(colony);
         addResourceRow(model, GameConstants.MEAT_RESOURCE.getIcon(), "Protein", colony.getProtein(), stats.getProteinCapacity(colony), 
             loc.getSourcesByType(GameConstants.MEAT_RESOURCE).size(), stats.getSourceCapacity(colony),
-            GameConstants.MEAT_RESOURCE);
+            protProd, protCons);
             
+        // --- Water ---
+        int waterProd = stats.getWaterProduction(colony);
+        int waterCons = stats.getWaterConsumption(colony);
         addResourceRow(model, GameConstants.WATER_RESOURCE.getIcon(), "Water", colony.getWater(), stats.getWaterCapacity(colony), 
             loc.getSourcesByType(GameConstants.WATER_RESOURCE).size(), stats.getSourceCapacity(colony),
-            GameConstants.WATER_RESOURCE);
+            waterProd, waterCons);
 
+        // --- Minerals ---
+        int minProd = stats.getMineralProduction(colony);
+        int minCons = stats.getMineralConsumption(colony);
         addResourceRow(model, GameConstants.ROCK_RESOURCE.getIcon(), "Minerals", colony.getMinerals(), stats.getMineralsCapacity(colony), 
             loc.getSourcesByType(GameConstants.ROCK_RESOURCE).size(), stats.getSourceCapacity(colony),
-            GameConstants.ROCK_RESOURCE);
+            minProd, minCons);
             
+        // --- Syrups/Resins  ---
         addResourceRow(model, GameConstants.SYRUP_RESOURCE.getIcon(), "Syrups", colony.getSyrups(), stats.getSyrupsCapacity(colony), 
-            0, 0, null);
+            0, 0, 0, 0);
             
         addResourceRow(model, GameConstants.RESIN_RESOURCE.getIcon(), "Resins", colony.getResins(), stats.getResinsCapacity(colony), 
-            0, 0, null);
+            0, 0, 0, 0);
 
+        // --- Summaries ---
         model.addRow(new Object[]{null, "------", "---", "---", "---", "---", "---", "---"});
-        model.addRow(new Object[]{null, "Total Food", "---", "---", "---", totalProd, totalCons, (totalProd - totalCons)});
+        int netFood = mushProd - mushCons;
+        model.addRow(new Object[]{null, "Total Food", "---", "---", "---", mushProd, mushCons, (netFood >= 0 ? "+" : "") + netFood});
     }
 
-    private void addResourceRow(DefaultTableModel model, ImageIcon icon, String name, int current, int cap, int sources, int maxSources, ResourceType type) {
+    private void addResourceRow(DefaultTableModel model, ImageIcon icon, String name, int current, int cap, int sources, int maxSources, int production, int consumption) {
         
         String sourceStr = (maxSources > 0) ? sources + " / " + maxSources : "N/A";
-        String prodStr = "---";
-        String consStr = "---";
-        String netStr = "---";
-
-        if (type == GameConstants.FUNGI_RESOURCE) {
-             prodStr = String.valueOf(colony.getStatsService().getTotalProduction(colony));
-             consStr = String.valueOf(colony.getStatsService().getTotalConsumption(colony));
-             int net = Integer.parseInt(prodStr) - Integer.parseInt(consStr);
-             netStr = (net >= 0 ? "+" : "") + net;
+        String prodStr = String.valueOf(production);
+        String consStr = String.valueOf(consumption);
+        
+        int net = production - consumption;
+        String netStr = (net >= 0 ? "+" : "") + net;
+        
+        if (name.equals("Syrups") || name.equals("Resins")) {
+             if (production == 0 && consumption == 0) {
+                 prodStr = "---"; consStr = "---"; netStr = "---";
+             }
         }
 
         model.addRow(new Object[]{icon, name, current, cap, sourceStr, prodStr, consStr, netStr});
