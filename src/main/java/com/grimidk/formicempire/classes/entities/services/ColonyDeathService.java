@@ -4,13 +4,13 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ColonyStatTrackingService {
+public class ColonyDeathService {
     
     private final Map<String, Integer> deathCauses = new ConcurrentHashMap<>();
     private final Map<String, Integer> lifetimeProduction = new ConcurrentHashMap<>();
     private final Map<String, Integer> lifetimeConsumption = new ConcurrentHashMap<>();
 
-    public ColonyStatTrackingService() {
+    public ColonyDeathService() {
         initializeCauses();
     }
 

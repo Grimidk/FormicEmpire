@@ -90,7 +90,7 @@ public class Colony {
     private transient ColonyPhysicsService physicsService;
     private transient ColonyLocationService locationService;
     private transient ColonySumarizationService sumarizationService;
-    private transient ColonyStatTrackingService trackingService;
+    private transient ColonyDeathService trackingService;
 
     // --- Service Initializer ---
     private void initializeServices() {
@@ -100,7 +100,7 @@ public class Colony {
         this.physicsService = new ColonyPhysicsService();
         this.locationService = new ColonyLocationService();
         this.sumarizationService = new ColonySumarizationService();
-        this.trackingService = new ColonyStatTrackingService(); 
+        this.trackingService = new ColonyDeathService(); 
     }
 
     // --- Initialization Methods ---
@@ -644,7 +644,7 @@ public class Colony {
     public ColonyPhysicsService getPhysicsService() { return this.physicsService; }
     public ColonyLocationService getLocationService() { return this.locationService; }
     public ColonySumarizationService getSumarizationService() { return this.sumarizationService; }
-    public ColonyStatTrackingService getTrackingService() { return this.trackingService; }
+    public ColonyDeathService getTrackingService() { return this.trackingService; }
 
     public int getTotalConsumption(){ return statsService.getTotalConsumption(this); }
     public int getTotalProduction(){ return statsService.getTotalProduction(this); }
