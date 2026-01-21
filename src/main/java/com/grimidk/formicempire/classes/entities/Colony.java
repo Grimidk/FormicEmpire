@@ -10,12 +10,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.awt.Rectangle;
 import java.awt.Point; 
 
-import com.grimidk.formicempire.classes.entities.services.ColonyStatsService;
-import com.grimidk.formicempire.classes.entities.services.ColonyLabourService;
-import com.grimidk.formicempire.classes.entities.services.ColonyLocationService;
-import com.grimidk.formicempire.classes.entities.services.ColonyPopulationService;
-import com.grimidk.formicempire.classes.entities.services.ColonyPhysicsService;
-import com.grimidk.formicempire.classes.entities.services.ColonySumarizationService;
+import com.grimidk.formicempire.classes.entities.services.*; 
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
@@ -95,6 +90,7 @@ public class Colony {
     private transient ColonyPhysicsService physicsService;
     private transient ColonyLocationService locationService;
     private transient ColonySumarizationService sumarizationService;
+    private transient ColonyDeathService trackingService;
 
     // --- Service Initializer ---
     private void initializeServices() {
@@ -104,6 +100,7 @@ public class Colony {
         this.physicsService = new ColonyPhysicsService();
         this.locationService = new ColonyLocationService();
         this.sumarizationService = new ColonySumarizationService();
+        this.trackingService = new ColonyDeathService(); 
     }
 
     // --- Initialization Methods ---
@@ -241,6 +238,10 @@ public class Colony {
         initializeAssignedRoles(); 
         initializeServices(); 
         
+        if (this.trackingService != null && savedColony.deathStatistics != null) {
+            this.trackingService.loadStatistics(savedColony.deathStatistics);
+        }
+        
         Map<String, Integer> savedRoles = savedColony.assignedRoleCounts;
         if (savedRoles != null && !savedRoles.isEmpty()) {
             for (AntRole role : GameConstants.getAntRoles()) {
@@ -358,6 +359,16 @@ public class Colony {
         return consumed;
     }
 
+    // --- Death Tracking Wrapper ---
+    public void recordAntDeath(Ant ant, String cause) {
+        if (ant == null) return;
+        this.totalDeaths++;
+        this.deadAnts.add(ant);
+        if (trackingService != null) {
+            trackingService.recordDeath(cause);
+        }
+    }
+
     // --- Getters/Setters ---
     public int getId() { return id; }
     public String getName() { return name; }
@@ -425,71 +436,89 @@ public class Colony {
         return true;
     }
     
+    // --- Resource Getters/Setters with Clamping ---
     public int getPlants() { return plants; }
-    public void setPlants(int plants) { this.plants = plants; }
+    public void setPlants(int plants) { 
+        this.plants = Math.max(0, Math.min(plants, getPlantsCapacity())); 
+    }
     public int getMushrooms() { return mushrooms; }
-    public void setMushrooms(int mushrooms) { this.mushrooms = mushrooms; }
+    public void setMushrooms(int mushrooms) { 
+        this.mushrooms = Math.max(0, Math.min(mushrooms, getMushroomsCapacity())); 
+    }
     public int getProtein() { return protein; }
-    public void setProtein(int protein) { this.protein = protein; }
+    public void setProtein(int protein) { 
+        this.protein = Math.max(0, Math.min(protein, getProteinCapacity())); 
+    }
     public int getWater() { return water; }
-    public void setWater(int water) { this.water = water; }
+    public void setWater(int water) { 
+        this.water = Math.max(0, Math.min(water, getWaterCapacity())); 
+    }
     public int getSyrups() { return syrups; }
-    public void setSyrups(int syrups) { this.syrups = syrups; }
+    public void setSyrups(int syrups) { 
+        this.syrups = Math.max(0, Math.min(syrups, getSyrupsCapacity())); 
+    }
     public int getResins() { return resins; }
-    public void setResins(int resins) { this.resins = resins; }
+    public void setResins(int resins) { 
+        this.resins = Math.max(0, Math.min(resins, getResinsCapacity())); 
+    }
     public int getMinerals() { return minerals; }
-    public void setMinerals(int minerals) { this.minerals = minerals; }
+    public void setMinerals(int minerals) { 
+        this.minerals = Math.max(0, Math.min(minerals, getMineralsCapacity())); 
+    }
 
     public int getAphids() { return aphids; }
     public void setAphids(int count) { 
-        if (count > this.aphids) {
-            int diff = count - this.aphids;  
-            Rectangle yard = getRancherBounds();
-            if (yard == null) yard = new Rectangle(10, 10, 256, 256); 
-
-            for(int i=0; i<diff; i++) {
-                Bug newBug = new Bug(GameConstants.TYPE_APHID);
-                
-                if (physicsService != null) {
-                    Point spawnPos = physicsService.getSpecificRoomPoint(this, yard);
-                    newBug.setPosition(spawnPos);
+        this.aphids = Math.max(0, count); 
+        
+        if (this.bugs.stream().filter(b -> b.getBugType() == GameConstants.TYPE_APHID).count() != this.aphids) {
+            long currentAphids = this.bugs.stream().filter(b -> b.getBugType() == GameConstants.TYPE_APHID).count();
+            if (currentAphids < this.aphids) {
+                 int diff = this.aphids - (int)currentAphids;
+                 Rectangle yard = getRancherBounds();
+                 if (yard == null) yard = new Rectangle(10, 10, 256, 256); 
+                 for(int i=0; i<diff; i++) {
+                    Bug newBug = new Bug(GameConstants.TYPE_APHID);
+                    if (physicsService != null) {
+                        Point spawnPos = physicsService.getSpecificRoomPoint(this, yard);
+                        newBug.setPosition(spawnPos);
+                    }
+                    this.bugs.add(newBug);
                 }
-                
-                this.bugs.add(newBug);
-            }
-        } else if (count < this.aphids) {
-            int diff = this.aphids - count;
-            for(int i=0; i<diff; i++) {
-                for(Bug b : this.bugs) {
-                    if (b.getBugType() == GameConstants.TYPE_APHID) {
-                        this.bugs.remove(b);
-                        break;
+            } else {
+                int diff = (int)currentAphids - this.aphids;
+                for(int i=0; i<diff; i++) {
+                    for(Bug b : this.bugs) {
+                        if (b.getBugType() == GameConstants.TYPE_APHID) {
+                            this.bugs.remove(b);
+                            break;
+                        }
                     }
                 }
             }
         }
-        this.aphids = count; 
     }
 
     public int getParasites() { return parasites; }
     public void setParasites(int count) { 
-        if (count > this.parasites) {
-            int diff = count - this.parasites;  
-            Rectangle spawnRoom = getStorageBounds();
-            if (spawnRoom == null) spawnRoom = new Rectangle(0, 0, 256, 256);
+        this.parasites = Math.max(0, count);
+        
+        long currentParasites = this.bugs.stream().filter(b -> b.getBugType() == GameConstants.TYPE_PARASITE).count();
+        if (currentParasites < this.parasites) {
+             int diff = this.parasites - (int)currentParasites;
+             Rectangle spawnRoom = getStorageBounds();
+             if (spawnRoom == null) spawnRoom = new Rectangle(0, 0, 256, 256);
 
-            for(int i=0; i<diff; i++) {
+             for(int i=0; i<diff; i++) {
                 Bug newBug = new Bug(GameConstants.TYPE_PARASITE);
                 newBug.setDimension(WorldSpaces.UNDERWORLD);
-                
                 if (physicsService != null) {
                     Point spawnPos = physicsService.getSpecificRoomPoint(this, spawnRoom);
                     newBug.setPosition(spawnPos);
                 }
                 this.bugs.add(newBug);
             }
-        } else if (count < this.parasites) {
-            int diff = this.parasites - count;
+        } else if (currentParasites > this.parasites) {
+            int diff = (int)currentParasites - this.parasites;
             for(int i=0; i<diff; i++) {
                 for(Bug b : this.bugs) {
                     if (b.getBugType() == GameConstants.TYPE_PARASITE) {
@@ -499,7 +528,6 @@ public class Colony {
                 }
             }
         }
-        this.parasites = count; 
     }
 
     public String getParasiteCountDisplay() {
@@ -616,6 +644,7 @@ public class Colony {
     public ColonyPhysicsService getPhysicsService() { return this.physicsService; }
     public ColonyLocationService getLocationService() { return this.locationService; }
     public ColonySumarizationService getSumarizationService() { return this.sumarizationService; }
+    public ColonyDeathService getTrackingService() { return this.trackingService; }
 
     public int getTotalConsumption(){ return statsService.getTotalConsumption(this); }
     public int getTotalProduction(){ return statsService.getTotalProduction(this); }

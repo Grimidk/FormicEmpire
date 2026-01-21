@@ -20,6 +20,7 @@ public class ControlPanel extends ZeroGamePanel {
     private final Runnable showBuildDialogCallback;
     private final RoleManagementCallback showRoleManagementDialogCallback;
     private final Runnable showAbilitiesDialogCallback;
+    private final Runnable showStatsDialogCallback; 
     private final Runnable toggleViewCallback;
     private final Runnable showMapDialogCallback;
 
@@ -49,6 +50,7 @@ public class ControlPanel extends ZeroGamePanel {
                         Runnable showBuildDialogCallback,
                         RoleManagementCallback showRoleManagementDialogCallback,
                         Runnable showAbilitiesDialogCallback,
+                        Runnable showStatsDialogCallback,
                         Runnable toggleViewCallback,
                         Runnable showMapDialogCallback) {
         super(new FlowLayout(FlowLayout.RIGHT));
@@ -60,6 +62,7 @@ public class ControlPanel extends ZeroGamePanel {
         this.showBuildDialogCallback = showBuildDialogCallback;
         this.showRoleManagementDialogCallback = showRoleManagementDialogCallback;
         this.showAbilitiesDialogCallback = showAbilitiesDialogCallback;
+        this.showStatsDialogCallback = showStatsDialogCallback;
         this.toggleViewCallback = toggleViewCallback;
         this.showMapDialogCallback = showMapDialogCallback;
 
@@ -156,6 +159,7 @@ public class ControlPanel extends ZeroGamePanel {
         JMenuItem backToGame = new JMenuItem("Back to Game");
         JMenuItem toggleView = new JMenuItem("Toggle View (A)");
         JMenuItem showMap = new JMenuItem("World Map (I)"); 
+        JMenuItem showStats = new JMenuItem("Colony Statistics (X)");
         JMenuItem manageRoles = new JMenuItem("Manage Roles (Q/W/E/R/T)");
         JMenuItem manageHatchRates = new JMenuItem("Manage Hatch Rates (P)");
         manageResearch = new JMenuItem("Research (Y)");
@@ -168,6 +172,7 @@ public class ControlPanel extends ZeroGamePanel {
         backToGame.addActionListener(e -> gameMenu.setVisible(false));
         toggleView.addActionListener(e -> toggleViewCallback.run());
         showMap.addActionListener(e -> showMapDialogCallback.run()); 
+        showStats.addActionListener(e -> showStatsDialogCallback.run());
         manageRoles.addActionListener(e -> showRoleManagementDialogCallback.showDialog(0));
         manageHatchRates.addActionListener(e -> showHatchRateDialogCallback.run());
         
@@ -212,6 +217,7 @@ public class ControlPanel extends ZeroGamePanel {
         gameMenu.add(backToGame);
         gameMenu.add(toggleView);
         gameMenu.add(showMap);
+        gameMenu.add(showStats); // Added to menu
         gameMenu.add(manageRoles);
         gameMenu.add(manageHatchRates);
         gameMenu.add(manageResearch);
@@ -244,6 +250,14 @@ public class ControlPanel extends ZeroGamePanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 toggleViewCallback.run();
+            }
+        });
+        
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, 0), "openStats");
+        actionMap.put("openStats", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showStatsDialogCallback.run();
             }
         });
 

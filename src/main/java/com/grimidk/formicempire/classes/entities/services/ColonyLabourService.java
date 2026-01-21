@@ -323,7 +323,8 @@ public void runCollecting(Colony colony) {
             for (Ant antToCull : antsToCull) {
                 if (antToCull.isAlive()) {
                     antToCull.goDie(colony, "Lack of Care");
-                    colony.getDeadAnts().add(antToCull);
+                    colony.recordAntDeath(antToCull, "Lack of Care");
+                    
                     list.remove(antToCull);
                     deathCount++;
                 }

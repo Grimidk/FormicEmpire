@@ -361,6 +361,11 @@ public class SaveManager {
                         sc.assignedRoleCounts.put(entry.getKey().getName(), entry.getValue());
                     }
                     
+                    // --- Save Death Statistics ---
+                    if (c.getTrackingService() != null) {
+                        sc.deathStatistics = new HashMap<>(c.getTrackingService().getDeathStatistics());
+                    }
+
                     for (Upgrade up : c.getUnlockedUpgrades()) sc.unlockedUpgradeIds.add(up.getId());
                     for (Building b : c.getUnlockedBuildings()) sc.unlockedBuildingIds.add(b.getId());
                     
@@ -488,6 +493,7 @@ public class SaveManager {
 
         // Serialized Lists within Colony
         w.write("      \"assignedRoleCounts\": " + serializeMapToJson(sc.assignedRoleCounts) + ","); w.newLine();
+        w.write("      \"deathStatistics\": " + serializeMapToJson(sc.deathStatistics) + ","); w.newLine();
         w.write("      \"unlockedUpgradeIds\": " + serializeListToJson(sc.unlockedUpgradeIds) + ","); w.newLine();
         w.write("      \"unlockedBuildingIds\": " + serializeListToJson(sc.unlockedBuildingIds) + ","); w.newLine();
         w.write("      \"savedResourceSources\": " + serializeSourcesToJson(sc.savedResourceSources)); w.newLine(); // Last item
@@ -498,7 +504,7 @@ public class SaveManager {
     }
 
     private void writeJsonLine(BufferedWriter w, String key, Object value, boolean last) throws IOException {
-        w.write("    \""); // Indent
+        w.write("    \"");
         w.write(escapeJsonString(key));
         w.write("\": ");
         if (value instanceof String) {
@@ -654,6 +660,7 @@ public class SaveManager {
         
         // Nested structures
         sc.assignedRoleCounts = deserializeJsonToMap(map.get("assignedRoleCounts"));
+        sc.deathStatistics = deserializeJsonToMap(map.get("deathStatistics"));
         sc.unlockedUpgradeIds = deserializeJsonToList(map.get("unlockedUpgradeIds"));
         sc.unlockedBuildingIds = deserializeJsonToList(map.get("unlockedBuildingIds"));
         sc.savedResourceSources = deserializeJsonToSources(map.get("savedResourceSources"));

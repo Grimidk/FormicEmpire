@@ -157,7 +157,7 @@ public class ColonyStatsService {
                 resistance /= 8;
             }
         }
-        return 20;
+        return resistance;
     }
 
     // --- Stats ---
@@ -197,25 +197,91 @@ public class ColonyStatsService {
         if (colony.hasUpgrade(GameUnlocks.STAT_LONGEVITY)) {return 1;
         } else {return 0;}
     }
-    // --- Aggregates (Daily) ---
-    public int getTotalConsumption(Colony colony){
-        double totalConsumption = 0;
-        for (Map.Entry<AntType, List<Ant>> entry : colony.getAntGroups().entrySet()) {
-            totalConsumption += (double) entry.getValue().size() * entry.getKey().getConsumptionMult() * getBaseConsumption(colony);
+    
+    // --- Granular Aggregates (Daily Estimates) ---
+    public int getPlantProduction(Colony colony) {
+        int foragerCount = colony.getAssignedRoleCount(GameConstants.ROLE_FORAGER);
+        double plantPower = foragerCount * getCollectingRate(colony) * 24.0;
+        return (int) (plantPower * 0.5); 
+    }
+    public int getPlantConsumption(Colony colony) {
+        int farmerCount = colony.getAssignedRoleCount(GameConstants.ROLE_FARMER);
+        if (colony.hasBuilding(GameUnlocks.PASSIVE_FARM)) {
+             if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) farmerCount += 2;
+             else farmerCount += 1;
         }
-        return (int) totalConsumption;
+        double demand = farmerCount * getConversionRate(colony) * 1440.0;
+        int available = getPlantProduction(colony) + colony.getPlants();
+        return Math.min((int)demand, available);
+    }
+
+    public int getWaterProduction(Colony colony) {
+        int foragerCount = colony.getAssignedRoleCount(GameConstants.ROLE_FORAGER);
+        double foragePotential = foragerCount * getCollectingRate(colony) * 24.0;
+        
+        double passiveGeneration = 0;
+        if (colony.hasBuilding(GameUnlocks.PASSIVE_WATER)) {
+            double pct = colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1) ? 0.20 : 0.10;
+            passiveGeneration = getWaterCapacity(colony) * pct * 24.0;
+        }
+        return (int) ((foragePotential * 0.5) + passiveGeneration);
+    }
+    public int getWaterConsumption(Colony colony) {
+        int totalAnts = colony.getAntTotal();
+        double baseResistance = 0.20;
+        if (colony.hasUpgrade(GameUnlocks.STAT_THIRST_3)) baseResistance = 0.80;
+        else if (colony.hasUpgrade(GameUnlocks.STAT_THIRST_2)) baseResistance = 0.60;
+        else if (colony.hasUpgrade(GameUnlocks.STAT_THIRST_1)) baseResistance = 0.40;
+        
+        return (int) (totalAnts * (1.0 - baseResistance));
+    }
+
+    public int getProteinProduction(Colony colony) {
+        int hunterCount = colony.getAssignedRoleCount(GameConstants.ROLE_HUNTER);
+        return (int) (hunterCount * getCollectingRate(colony) * 24.0);
+    }
+    public int getProteinConsumption(Colony colony) {
+        int farmerCount = colony.getAssignedRoleCount(GameConstants.ROLE_FARMER);
+         if (colony.hasBuilding(GameUnlocks.PASSIVE_FARM)) {
+             if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) farmerCount += 2;
+             else farmerCount += 1;
+        }
+        double demand = farmerCount * getConversionRate(colony) * 1440.0;
+        int available = getProteinProduction(colony) + colony.getProtein();
+        return Math.min((int)demand, available);
+    }
+
+    public int getMineralProduction(Colony colony) {
+        int minerCount = colony.getAssignedRoleCount(GameConstants.ROLE_MINER);
+        return (int) (minerCount * getCollectingRate(colony) * 24.0 );
+    }
+    public int getMineralConsumption(Colony colony) {
+        return 0;
     }
 
     public int getTotalProduction(Colony colony){
-        int foragerCount = colony.getAssignedRoleCount(GameConstants.ROLE_FORAGER);
-        int hunterCount = colony.getAssignedRoleCount(GameConstants.ROLE_HUNTER);
         int farmerCount = colony.getAssignedRoleCount(GameConstants.ROLE_FARMER);
-
-        double plantCollection = foragerCount * 0.5 * getCollectingRate(colony);
-        double proteinCollection = hunterCount * getCollectingRate(colony);
-        int collectionPerHour = (int) (plantCollection + proteinCollection);
-        int totalProductionRate = (int) (Math.min((getConversionRate(colony) * farmerCount) * 60, collectionPerHour)) * 3 * 24; 
+        if (colony.hasBuilding(GameUnlocks.PASSIVE_FARM)) {
+            if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) farmerCount += 2;
+            else farmerCount += 1;
+        }
         
-        return Math.min(totalProductionRate, getMushroomsCapacity(colony));
+        double potentialOutput = farmerCount * getConversionRate(colony) * 1440.0;
+        
+        int sustainableInput = getPlantProduction(colony) + colony.getPlants() + ((getProteinProduction(colony) + colony.getProtein()) * 2);
+                               
+        return Math.min((int)potentialOutput, sustainableInput);
+    }
+
+    public int getTotalConsumption(Colony colony){
+        double totalConsumption = 0;
+        for (Map.Entry<AntType, List<Ant>> entry : colony.getAntGroups().entrySet()) {
+            double typeMult = entry.getKey().getConsumptionMult();
+            int perAnt = (int)(typeMult * getBaseConsumption(colony));
+            if (perAnt <= 0) perAnt = 1;
+            
+            totalConsumption += entry.getValue().size() * perAnt;
+        }
+        return (int) totalConsumption;
     }
 }

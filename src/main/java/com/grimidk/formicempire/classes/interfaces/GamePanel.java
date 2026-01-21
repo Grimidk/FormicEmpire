@@ -33,6 +33,7 @@ public class GamePanel extends ZeroGamePanel {
     private BuildDialog buildDialog;
     private AbilitiesDialog abilitiesDialog;
     private MapDialog mapDialog;
+    private ColonyStatsDialog statsDialog; 
 
     private AlertManager alertManager;
     private TriggerManager triggerManager; 
@@ -72,6 +73,7 @@ public class GamePanel extends ZeroGamePanel {
         Runnable showBuildDialogCallback = this::showBuildDialog;
         Runnable showAbilitiesDialogCallback = this::showAbilitiesDialog;
         Runnable showMapDialogCallback = this::showMapDialog; 
+        Runnable showStatsDialogCallback = this::showStatsDialog;
         ControlPanel.RoleManagementCallback showRoleManagementDialogCallback = this::showRoleManagementDialog;
         
         Runnable toggleViewCallback = () -> {
@@ -87,6 +89,7 @@ public class GamePanel extends ZeroGamePanel {
             showBuildDialogCallback,
             showRoleManagementDialogCallback,
             showAbilitiesDialogCallback,
+            showStatsDialogCallback,
             toggleViewCallback,
             showMapDialogCallback); 
     }
@@ -216,6 +219,18 @@ public class GamePanel extends ZeroGamePanel {
         }
         mapDialog.showDialog();
     }
+
+    private void showStatsDialog() {
+        Engine engine = frame.getEngine();
+        Colony colony = getColonyFromEngine(engine);
+        if (colony == null || !colony.isPlayer()) return;
+
+        if (statsDialog == null || statsDialog.getOwner() != frame) {
+            if (statsDialog != null) statsDialog.dispose();
+            statsDialog = new ColonyStatsDialog(frame, colony, engine);
+        }
+        statsDialog.showDialog();
+    }
     
     private Colony getColonyFromEngine(Engine engine) {
         return engine != null && engine.getWorld() != null && engine.getWorld().getActiveHex() != null ? engine.getWorld().getActiveHex().getColony() : null;
@@ -231,6 +246,7 @@ public class GamePanel extends ZeroGamePanel {
         if (buildDialog != null) { buildDialog.dispose(); buildDialog = null; }
         if (abilitiesDialog != null) { abilitiesDialog.dispose(); abilitiesDialog = null; }
         if (mapDialog != null) { mapDialog.dispose(); mapDialog = null; }
+        if (statsDialog != null) { statsDialog.dispose(); statsDialog = null; }
     }
 
     private void cleanupSession() {
@@ -445,7 +461,6 @@ public class GamePanel extends ZeroGamePanel {
         worldPanel.updateHourData(world);
         colonyPanel.updateHourData(colony);
         
-        // Ensure buttons are only active if it is the player's colony
         if (colony != null && colony.isPlayer()) {
             if (researchDialog != null && researchDialog.isShowing()) {
                 researchDialog.liveUpdate();
@@ -455,6 +470,9 @@ public class GamePanel extends ZeroGamePanel {
             }
             if (abilitiesDialog != null && abilitiesDialog.isShowing()) {
                 abilitiesDialog.liveUpdate();
+            }
+            if (statsDialog != null && statsDialog.isShowing()) {
+                statsDialog.liveUpdate();
             }
             if (controlPanel != null) {
                 controlPanel.updateResearchMenu(colony.hasUpgrade(GameUnlocks.ABILITY_RESEARCH));

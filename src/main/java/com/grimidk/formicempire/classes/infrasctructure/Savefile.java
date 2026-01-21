@@ -72,6 +72,7 @@ public class Savefile implements Serializable {
         public int aphids, parasites;
         public int researchPoints, totalDeaths;
         public Map<String, Integer> assignedRoleCounts = new HashMap<>();
+        public Map<String, Integer> deathStatistics = new HashMap<>();
         public List<Integer> unlockedUpgradeIds = new ArrayList<>();
         public List<Integer> unlockedBuildingIds = new ArrayList<>();
         public List<SavedResourceSource> savedResourceSources = new ArrayList<>();
