@@ -1,20 +1,32 @@
 Here is the current roadmap of features and fixes:
 
 To Fix: 
+	Urgent:
+	
+	High:
+	summarization too powerful (don’t dehydrate / nursing )
+	stats for npc
+	basic npc ai so they can snowball
+
+	Mid:
+	rounding errors
+	upgrades dialog (research, building, assimilation, synergies)
+	ants staying unassigned and alert if they do so and default kinda works	
+
+	Low:
 	colony scroll down
 	not dynamic colony sprites while stretching screen 
-    summarization too powerful (don’t dehydrate / nursing )
-    ants staying unassigned and alert if they do so and default kinda works
-    builders act weird af in build zone
-    soldier tab not seeable
-    plants not going to full capacity and production may be wrong
-
+	builders act weird af in build zone
+	soldier tab not seeable without reloading after unlocking
+	reorganize repositories
+	
 To Feature:
 Needed for launch (v1.0) (Launch Version):
+	Priority:
 	design map and buttons and that (use simple colors and icons) and shows small tooltip of colonies
-	colonizing and trade routes (async with roles and incoming outgoing recurrent and one time and travel time and danger level and boring tunnels) 
-  	new colonies and civilizations-species (species empress?) (research inheritance)
-	new biome sprites and icons	
+
+	Everything else:
+	colonizing and trade routes (async with roles and incoming outgoing recurrent and one time and travel time and danger level and boring tunnels) and new colonies and civilizations-species (species empress?) (research inheritance)	
 	breeders go out of the colony 
 	auxiliary room sprites (storage (resources), farm (shroom), nurse (bedding), royal (nests and science)) and expansion (breeder room)
 	more settings (allow idle to forage, allow unassigned, choose default, change roles to proportions (may use by npc), fuzzed parasites, arachnophobia mode ?)
@@ -32,15 +44,15 @@ Needed for launch (v1.0) (Launch Version):
 	more buildings
 	more roles (commander and captain roles, air force)
 	more enemies
-	ai scripts for npc colonies
+	more stats (world, kills, historic productions, graphs?)
 	diplomacy and diplomatic reputation and alliances and wars
 	battle system 
 	rework tutorial and obscure unlocks
 	rework menus and key binds and how the ui looks
-	rework stats with graphs for deaths, consumptions and productions, stats dialog and rework how stats are displayed with summarization
 	rework start and choose difficulty / biome / species
 	rework abilities and alerts and triggers (new classes?)
 	rework saves to be cleaner
+	rework manager and aux files
 	ant menus
 	music and sounds and settings for them
 	langs (ENG, SPA, POR, FRE, GER, RUS, CHN, JAP)
@@ -49,6 +61,7 @@ Needed for launch (v1.0) (Launch Version):
 	start animation and general animations
 	package into playable
 	register Grim Games
+	versioning
 	cleanup code (no placeholders) and refactor inefficiencies with inheritance and stuff, hexagonal architecture, async functions and clean comments 
 
 Post launch (v1.1) (Improvements Update):
