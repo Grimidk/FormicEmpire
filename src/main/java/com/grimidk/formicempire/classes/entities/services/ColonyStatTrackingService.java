@@ -28,14 +28,13 @@ public class ColonyStatTrackingService {
     public void recordDeath(String cause) {
         String key = "Other";
         if (cause != null) {
-            if (cause.contains("Starvation") || cause.contains("Dehydration")) key = "Starvation"; 
-            else if (cause.equalsIgnoreCase("Starvation")) key = "Starvation";
+            if (cause.equalsIgnoreCase("Starvation")) key = "Starvation";
             else if (cause.equalsIgnoreCase("Dehydration")) key = "Dehydration";
             else if (cause.equalsIgnoreCase("Old Age")) key = "Old Age";
-            else if (cause.contains("Contamination")) key = "Contamination";
+            else if (cause.equalsIgnoreCase("Contamination")) key = "Contamination";
             else if (cause.equalsIgnoreCase("Lack of Care")) key = "Lack of Care";
-            else if (cause.contains("Parasite") || cause.equalsIgnoreCase("Illness")) key = "Illness";
-            else if (cause.equalsIgnoreCase("Combat") || cause.equalsIgnoreCase("War")) key = "Conflict";
+            else if (cause.equalsIgnoreCase("Illness")) key = "Illness";
+            else if (cause.equalsIgnoreCase("Combat")) key = "Conflict";
         }
         
         deathCauses.merge(key, 1, Integer::sum);

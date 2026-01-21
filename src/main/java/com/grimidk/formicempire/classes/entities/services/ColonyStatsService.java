@@ -157,7 +157,7 @@ public class ColonyStatsService {
                 resistance /= 8;
             }
         }
-        return 20;
+        return resistance;
     }
 
     // --- Stats ---

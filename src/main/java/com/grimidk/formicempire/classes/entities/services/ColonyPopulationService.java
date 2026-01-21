@@ -239,32 +239,41 @@ public class ColonyPopulationService {
         }
         colony.setSyrups(syrupAvailable);
         
-        // --- Death Phase ---
-        Set<Ant> antsToKill = new HashSet<>();
-        for (Ant ant : thirstyAnts) {
-            if (Math.random() < 0.25) antsToKill.add(ant);
-        }
-        for (Ant ant : hungryAnts) {
-            antsToKill.add(ant); 
-        }
-        
+        // --- Death Phase ---        
         int starvationCount = 0;
-        for (Ant ant : antsToKill) {
-            if (ant.isAlive()) { 
-                AntType originalType = ant.getAntType(); 
-                
-                String cause = thirstyAnts.contains(ant) ? "Dehydration" : "Starvation";
-                ant.goDie(colony, cause);
-                colony.recordAntDeath(ant, cause);
+        int dehydrationCount = 0;
+        
+        for (Ant ant : thirstyAnts) {
+            if (ant.isAlive()) {
+                AntType originalType = ant.getAntType();
+                ant.goDie(colony, "Dehydration");
+                colony.recordAntDeath(ant, "Dehydration");
                 
                 List<Ant> antList = colony.getAntsByType(originalType);
                 if (antList != null) antList.remove(ant);
+                
+                dehydrationCount++;
+            }
+        }
+        
+        for (Ant ant : hungryAnts) {
+            if (ant.isAlive()) {
+                AntType originalType = ant.getAntType();
+                ant.goDie(colony, "Starvation");
+                colony.recordAntDeath(ant, "Starvation");
+                
+                List<Ant> antList = colony.getAntsByType(originalType);
+                if (antList != null) antList.remove(ant);
+                
                 starvationCount++;
             }
         }
 
         if (starvationCount > 0) {
-            colony.logEvent("DEATH: " + starvationCount + " Ants died of Starvation/Dehydration");
+            colony.logEvent("DEATH: " + starvationCount + " Ants died of Starvation");
+        }
+        if (dehydrationCount > 0) {
+            colony.logEvent("DEATH: " + dehydrationCount + " Ants died of Dehydration");
         }
     }
     
