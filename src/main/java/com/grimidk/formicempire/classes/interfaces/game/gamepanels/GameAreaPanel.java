@@ -72,6 +72,11 @@ public class GameAreaPanel extends ZeroGamePanel {
         biomeTextureCache.put("Taiga", loadImage("/backgrounds/biomes/TaigaTile.png"));
         biomeTextureCache.put("Dessert", loadImage("/backgrounds/biomes/DessertTile.png")); 
         biomeTextureCache.put("Urban", loadImage("/backgrounds/biomes/UrbanTile.png"));
+        biomeTextureCache.put("Mountain", loadImage("/backgrounds/biomes/MountainTile.png"));
+        biomeTextureCache.put("Volcanic", loadImage("/backgrounds/biomes/VolcanicTile.png"));
+        biomeTextureCache.put("Lake", loadImage("/backgrounds/biomes/LakeTile.png"));
+        biomeTextureCache.put("Ocean", loadImage("/backgrounds/biomes/OceanTile.png"));
+        
         biomeTextureCache.put("Underground", loadImage("/backgrounds/colony/UndergroundTile.png"));
         
         basicRoomImg = loadImage("/sprites/buildings/basicRoom.png");
