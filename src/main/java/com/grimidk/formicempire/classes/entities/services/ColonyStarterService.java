@@ -15,6 +15,12 @@ public class ColonyStarterService {
     public void initializeNewColony(Colony colony) {
         String type = colony.isPlayer() ? "Player" : "AI";
         System.out.println("[ColonyStarterService] Initializing new " + type + " colony: " + colony.getName());
+        
+        if (!colony.isPlayer()) {
+            colony.setAutomationEnabled(true);
+            System.out.println("[ColonyStarterService] Automation ENABLED for NPC colony.");
+        }
+        
         clearColonyLists(colony);
 
         try {
@@ -59,7 +65,6 @@ public class ColonyStarterService {
                 
                 colony.getLocationService().addSource(colony, initialPlant);
                 colony.getLocationService().addSource(colony, initialWater);
-                System.out.println("[ColonyStarterService] Player initial resources added.");
             }
         }
         

@@ -36,6 +36,7 @@ public class Colony {
     private boolean isPlayer;
     private ColonyRank rank;
     private boolean isActive;
+    private boolean automationEnabled = false; 
     
     // --- Population Data ---
     private final Map<AntType, List<Ant>> antGroups;
@@ -91,6 +92,7 @@ public class Colony {
     private transient ColonyLocationService locationService;
     private transient ColonySumarizationService sumarizationService;
     private transient ColonyDeathService trackingService;
+    private transient ColonyAutomationService automationService;
 
     // --- Service Initializer ---
     private void initializeServices() {
@@ -100,7 +102,8 @@ public class Colony {
         this.physicsService = new ColonyPhysicsService();
         this.locationService = new ColonyLocationService();
         this.sumarizationService = new ColonySumarizationService();
-        this.trackingService = new ColonyDeathService(); 
+        this.trackingService = new ColonyDeathService();
+        this.automationService = new ColonyAutomationService(); 
     }
 
     // --- Initialization Methods ---
@@ -381,6 +384,8 @@ public class Colony {
     public void setRank(ColonyRank rank) { this.rank = rank; }
     public boolean isActive() { return isActive; }
     public void setActive(boolean isActive) { this.isActive = isActive; }
+    public boolean isAutomationEnabled() { return automationEnabled; }
+    public void setAutomationEnabled(boolean automationEnabled) { this.automationEnabled = automationEnabled; }
 
     public Map<AntType, List<Ant>> getAntGroups() { return antGroups; } 
     public List<Ant> getAntsByType(AntType type) { return antGroups.getOrDefault(type, new CopyOnWriteArrayList<>()); }
@@ -729,6 +734,9 @@ public class Colony {
 
     public void runHourlyJobs() {
         if (this.isActive) {
+            if (this.automationEnabled) {
+                this.automationService.runAutomation(this);
+            }
             this.runRoleAssignment();
             this.runCollecting();
             this.runLaying();
@@ -736,6 +744,9 @@ public class Colony {
             this.runRanching();
             this.runBuilding();
         } else {
+            if (this.automationEnabled) {
+                this.automationService.runAutomation(this);
+            }
             this.populationService.runRoleAssignment(this); 
             this.sumarizationService.runHourlyLite(this);
         }

@@ -223,7 +223,7 @@ public class GamePanel extends ZeroGamePanel {
     private void showStatsDialog() {
         Engine engine = frame.getEngine();
         Colony colony = getColonyFromEngine(engine);
-        if (colony == null || !colony.isPlayer()) return;
+        if (colony == null) return;
 
         if (statsDialog == null || statsDialog.getOwner() != frame) {
             if (statsDialog != null) statsDialog.dispose();
