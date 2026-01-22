@@ -217,7 +217,7 @@ public class ControlPanel extends ZeroGamePanel {
         gameMenu.add(backToGame);
         gameMenu.add(toggleView);
         gameMenu.add(showMap);
-        gameMenu.add(showStats); // Added to menu
+        gameMenu.add(showStats);
         gameMenu.add(manageRoles);
         gameMenu.add(manageHatchRates);
         gameMenu.add(manageResearch);
@@ -250,14 +250,6 @@ public class ControlPanel extends ZeroGamePanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 toggleViewCallback.run();
-            }
-        });
-        
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, 0), "openStats");
-        actionMap.put("openStats", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showStatsDialogCallback.run();
             }
         });
 
@@ -330,6 +322,14 @@ public class ControlPanel extends ZeroGamePanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 showMapDialogCallback.run();
+            }
+        });
+
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, 0), "openStats");
+        actionMap.put("openStats", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showStatsDialogCallback.run();
             }
         });
         
