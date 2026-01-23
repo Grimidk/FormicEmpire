@@ -533,9 +533,13 @@ public void runCollecting(Colony colony) {
         List<Ant> gravers = getWorkingAnts(colony, GameConstants.ROLE_GRAVER);
         int graverCount = gravers.size();
 
-        if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
+        if (colony.hasBuilding(GameUnlocks.PASSIVE_GRAVE)) {
+            if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
                 graverCount += 2;
-            } else { graverCount += 1; }
+            } else { 
+                graverCount += 1; 
+            }
+        }
         
         boolean hasBodies = !colony.getDeadAnts().isEmpty();
         for (Ant graver : gravers) {
