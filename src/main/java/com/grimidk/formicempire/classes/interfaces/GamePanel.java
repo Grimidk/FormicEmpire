@@ -33,7 +33,7 @@ public class GamePanel extends ZeroGamePanel {
     private BuildDialog buildDialog;
     private AbilitiesDialog abilitiesDialog;
     private MapDialog mapDialog;
-    private ColonyStatsDialog statsDialog; 
+    private StatsDialog statsDialog; 
 
     private AlertManager alertManager;
     private TriggerManager triggerManager; 
@@ -227,7 +227,7 @@ public class GamePanel extends ZeroGamePanel {
 
         if (statsDialog == null || statsDialog.getOwner() != frame) {
             if (statsDialog != null) statsDialog.dispose();
-            statsDialog = new ColonyStatsDialog(frame, colony, engine);
+            statsDialog = new StatsDialog(frame, colony, engine);
         }
         statsDialog.showDialog();
     }
