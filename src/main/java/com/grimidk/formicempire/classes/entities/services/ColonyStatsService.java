@@ -226,14 +226,25 @@ public class ColonyStatsService {
         }
         return (int) ((foragePotential * 0.5) + passiveGeneration);
     }
+    
     public int getWaterConsumption(Colony colony) {
-        int totalAnts = colony.getAntTotal();
+        int adultAnts = 0;
+        adultAnts += colony.getWorkers().size();
+        adultAnts += colony.getSoldiers().size();
+        adultAnts += colony.getMajors().size();
+        adultAnts += colony.getDrones().size();
+        adultAnts += colony.getPrincesses().size();
+        adultAnts += colony.getQueens().size();
+
         double baseResistance = 0.20;
         if (colony.hasUpgrade(GameUnlocks.STAT_THIRST_3)) baseResistance = 0.80;
         else if (colony.hasUpgrade(GameUnlocks.STAT_THIRST_2)) baseResistance = 0.60;
         else if (colony.hasUpgrade(GameUnlocks.STAT_THIRST_1)) baseResistance = 0.40;
         
-        return (int) (totalAnts * (1.0 - baseResistance));
+        double consumption = adultAnts * (1.0 - baseResistance);
+        if (adultAnts > 0 && consumption < 1.0) return 1;
+        
+        return (int) Math.ceil(consumption);
     }
 
     public int getProteinProduction(Colony colony) {
