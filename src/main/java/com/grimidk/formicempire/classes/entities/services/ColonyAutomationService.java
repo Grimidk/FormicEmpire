@@ -41,133 +41,119 @@ public class ColonyAutomationService {
         int totalWorkers = colony.getWorkers().size();
         if (totalWorkers == 0) return;
 
-        int remainingWorkforce = totalWorkers;
+        int remaining = totalWorkers;
+        
+        // 1. Farmers
+        int farmers = 0;
+        if (remaining > 0) {
+            int toAdd = Math.min(MIN_FARMERS, remaining);
+            farmers += toAdd;
+            remaining -= toAdd;
+        }
+
+        // 2. Foragers
+        int foragers = 0;
+        if (remaining > 0) {
+            int toAdd = Math.min(MIN_FORAGERS, remaining);
+            foragers += toAdd;
+            remaining -= toAdd;
+        }
+
+        // 3. Nurses 
+        int nurses = 0;
+        if (remaining > 0) {
+            int toAdd = Math.min(MIN_NURSES, remaining);
+            nurses += toAdd;
+            remaining -= toAdd;
+        }
+
         ColonyStatsService stats = colony.getStatsService();
 
-        int assignedNurses = MIN_NURSES;
-        int totalBrood = colony.getEggs().size() + colony.getLarvae().size() + colony.getPupae().size();
-        float nursingRate = stats.getNursingRate(colony);
-        
-        if (nursingRate > 0) {
-            int currentCapacity = (int) (assignedNurses * nursingRate);
-            if (currentCapacity < totalBrood) {
-                int deficit = totalBrood - currentCapacity;
-                int extraNursesNeeded = (int) Math.ceil(deficit / nursingRate);
-                assignedNurses += extraNursesNeeded;
+        // 4. Gravers
+        int gravers = 0;
+        if (remaining > 0) {
+            int deadBodies = colony.getDeadAnts().size();
+            if (deadBodies > 0) {
+                float dailyCleaningRate = stats.getGravingRate(colony) * 24.0f;
+                if (dailyCleaningRate > 0) {
+                    int needed = (int) Math.ceil(deadBodies / (dailyCleaningRate * 5.0f)); 
+                    gravers = Math.min(needed, remaining);
+                    remaining -= gravers;
+                }
             }
         }
-        assignedNurses = Math.min(assignedNurses, remainingWorkforce);
-        targets.put(GameConstants.ROLE_NURSE, assignedNurses);
-        remainingWorkforce -= assignedNurses;
-        if (remainingWorkforce <= 0) return;
+        targets.put(GameConstants.ROLE_GRAVER, gravers);
 
-        int assignedGravers = 0;
-        int deadBodies = colony.getDeadAnts().size();
-        if (deadBodies > 0) {
-            float dailyCleaningRate = stats.getGravingRate(colony) * 24.0f; 
-            if (dailyCleaningRate > 0) {
-                float totalCleaningNeeded = deadBodies; 
-                float targetDays = 10.0f;
-                int needed = (int) Math.ceil(totalCleaningNeeded / (dailyCleaningRate * targetDays));
-                assignedGravers = Math.min(needed, remainingWorkforce);
+        // 5. Extra Nurses
+        if (remaining > 0) {
+            int totalBrood = colony.getEggs().size() + colony.getLarvae().size() + colony.getPupae().size();
+            float nursingRate = stats.getNursingRate(colony);
+            if (nursingRate > 0) {
+                int currentCapacity = (int) (nurses * nursingRate);
+                if (currentCapacity < totalBrood) {
+                    int deficit = totalBrood - currentCapacity;
+                    int extraNeeded = (int) Math.ceil(deficit / nursingRate);
+                    int toAdd = Math.min(extraNeeded, remaining);
+                    nurses += toAdd;
+                    remaining -= toAdd;
+                }
             }
         }
-        targets.put(GameConstants.ROLE_GRAVER, assignedGravers);
-        remainingWorkforce -= assignedGravers;
-        if (remainingWorkforce <= 0) return;
+        targets.put(GameConstants.ROLE_NURSE, nurses);
 
-        int assignedForagers = Math.min(MIN_FORAGERS, remainingWorkforce);
-        remainingWorkforce -= assignedForagers;
-        
-        int assignedFarmers = 0;
-        if (remainingWorkforce > 0) {
-            assignedFarmers = Math.min(MIN_FARMERS, remainingWorkforce);
-            remainingWorkforce -= assignedFarmers;
-        }
-
-        if (remainingWorkforce > 0) {
+        // 6. Extra Farmers
+        if (remaining > 0) {
             int totalConsumption = stats.getTotalConsumption(colony);
-            float conversionRate = stats.getConversionRate(colony); 
-            double productionPerFarmer = conversionRate * 1440.0; 
-
+            float conversionRate = stats.getConversionRate(colony);
+            double productionPerFarmer = conversionRate * 1440.0;
+            
             if (productionPerFarmer > 0) {
-                int currentProduction = (int) (assignedFarmers * productionPerFarmer);
-                boolean needsFood = currentProduction < totalConsumption || colony.getMushrooms() < stats.getMushroomsCapacity(colony) * 0.1;
+                int currentProduction = (int) (farmers * productionPerFarmer);
+                boolean needsFood = currentProduction < totalConsumption || colony.getMushrooms() < stats.getMushroomsCapacity(colony) * 0.2;
                 
                 if (needsFood) {
                     int deficit = totalConsumption - currentProduction;
-                    int extraFarmersNeeded = (int) Math.ceil(deficit / productionPerFarmer);
-                    if (colony.getMushrooms() < stats.getMushroomsCapacity(colony) * 0.2) {
-                        extraFarmersNeeded += 1;
-                    }
-                    int extraAssigned = Math.min(extraFarmersNeeded, remainingWorkforce);
-                    assignedFarmers += extraAssigned;
-                    remainingWorkforce -= extraAssigned;
+                    int extraNeeded = (int) Math.ceil(deficit / productionPerFarmer);
+                    if (colony.getMushrooms() < stats.getMushroomsCapacity(colony) * 0.1) extraNeeded++; 
+                    
+                    int toAdd = Math.min(extraNeeded, remaining);
+                    farmers += toAdd;
+                    remaining -= toAdd;
                 }
             }
         }
-        targets.put(GameConstants.ROLE_FARMER, assignedFarmers);
+        targets.put(GameConstants.ROLE_FARMER, farmers);
 
-        if (remainingWorkforce > 0) {
-            double plantDemand = assignedFarmers * stats.getConversionRate(colony) * 1440.0;
-            float collectingRate = stats.getCollectingRate(colony);
-            double productionPerForager = collectingRate * 24.0 * 0.5;
-
-            if (productionPerForager > 0) {
-                int currentPlantProd = (int) (assignedForagers * productionPerForager);
-                boolean needsPlants = currentPlantProd < plantDemand || colony.getPlants() < stats.getPlantsCapacity(colony) * 0.1;
-
-                if (needsPlants) {
-                    double deficit = plantDemand - currentPlantProd;
-                    int extraForagersNeeded = (int) Math.ceil(deficit / productionPerForager);
-                     if (colony.getPlants() < stats.getPlantsCapacity(colony) * 0.2) {
-                        extraForagersNeeded += 2;
-                    }
-                    int extraAssigned = Math.min(extraForagersNeeded, remainingWorkforce);
-                    assignedForagers += extraAssigned;
-                    remainingWorkforce -= extraAssigned;
-                }
-            }
+        // 7. Ranchers
+        if (remaining > 0 && colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) {
+             int toAdd = Math.min(2, remaining);
+             targets.put(GameConstants.ROLE_RANCHER, toAdd);
+             remaining -= toAdd;
         }
-        targets.put(GameConstants.ROLE_FORAGER, assignedForagers);
-        if (remainingWorkforce <= 0) return;
 
-        if (colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) {
-            int syrupCapacity = stats.getSyrupsCapacity(colony);
-            int currentSyrup = colony.getSyrups();
-            int syrupDeficit = syrupCapacity - currentSyrup;
-
-            if (syrupDeficit > 0) {
-                double dailySyrupGoal = syrupDeficit / 10.0;
-                
-                int aphidCapacityPerRancher = stats.getAphidCapacity(colony);
-                if (aphidCapacityPerRancher > 0) {
-                     int neededAphids = (int) Math.ceil(dailySyrupGoal);
-                     int neededRanchers = (int) Math.ceil((double)neededAphids / aphidCapacityPerRancher);
-                     
-                     int assignedRanchers = Math.min(neededRanchers, remainingWorkforce);
-                     targets.put(GameConstants.ROLE_RANCHER, assignedRanchers);
-                     remainingWorkforce -= assignedRanchers;
-                }
-            }
+        // 8. Scouts
+        if (remaining > 0 && colony.hasUpgrade(GameUnlocks.ROLE_SCOUT)) {
+            int scoutTarget = farmers; 
+            int toAdd = Math.min(scoutTarget, remaining);
+            targets.put(GameConstants.ROLE_SCOUT, toAdd);
+            remaining -= toAdd;
         }
-        if (remainingWorkforce <= 0) return;
 
-        if (colony.getCurrentBuildingProject() != null) {
-            boolean plantsFull = colony.getPlants() >= stats.getPlantsCapacity(colony);
-            boolean waterFull = colony.getWater() >= stats.getWaterCapacity(colony);
-
-            if (plantsFull && waterFull) {
-                int maxBuilders = totalWorkers / 2;
-                int assignedBuilders = Math.min(maxBuilders, remainingWorkforce);
-                targets.put(GameConstants.ROLE_BUILDER, assignedBuilders);
-                remainingWorkforce -= assignedBuilders;
+        // 9. Builders
+        if (remaining > 0 && colony.getCurrentBuildingProject() != null) {
+            boolean secureResources = colony.getPlants() > 100 && colony.getWater() > 100;
+            if (secureResources) {
+                int toAdd = Math.min(remaining, 5); 
+                targets.put(GameConstants.ROLE_BUILDER, toAdd);
+                remaining -= toAdd;
             }
         }
 
-        if (remainingWorkforce > 0) {
-            targets.put(GameConstants.ROLE_FORAGER, targets.get(GameConstants.ROLE_FORAGER) + remainingWorkforce);
+        // 10. Extra Foragers
+        if (remaining > 0) {
+            foragers += remaining;
         }
+        targets.put(GameConstants.ROLE_FORAGER, foragers);
     }
 
     private void calculateSoldierQuotas(Colony colony, Map<AntRole, Integer> targets) {
@@ -177,6 +163,7 @@ public class ColonyAutomationService {
         int remainingSoldiers = totalSoldiers;
         ColonyStatsService stats = colony.getStatsService();
 
+        // 1. Police
         int assignedPolice = 0;
         if (colony.getParasites() > 0 && colony.hasUpgrade(GameUnlocks.ROLE_POLICE)) {
             int maxPolice = (int) (totalSoldiers * 0.20);
@@ -185,6 +172,8 @@ public class ColonyAutomationService {
             if (assignedPolice == 0 && maxPolice > 0 && remainingSoldiers > 0) assignedPolice = 1;
         }
         targets.put(GameConstants.ROLE_POLICE, assignedPolice);
+
+        // 2. Hunters
         remainingSoldiers -= assignedPolice;
 
         boolean proteinNeeded = colony.getProtein() < stats.getProteinCapacity(colony);
@@ -198,9 +187,11 @@ public class ColonyAutomationService {
         int totalPrincesses = colony.getPrincesses().size();
         if (totalPrincesses == 0) return;
         
+        // 1. Assistants
         int assistantCount = (int) (totalPrincesses * 0.10);
         targets.put(GameConstants.ROLE_ASSISTANT, assistantCount);
         
+        // 2. Breeders
         int breederCount = totalPrincesses - assistantCount;
         targets.put(GameConstants.ROLE_BREEDER, breederCount);
     }
@@ -215,6 +206,7 @@ public class ColonyAutomationService {
 
         if (totalAnts >= waterCapacity && colony.hasUpgrade(GameUnlocks.ROLE_RESEARCHER)) {
             if (totalQueens == 1) {
+                // 1. Researchera
                 targets.put(GameConstants.ROLE_RESEARCHER, 1);
             } else {
                 int half = totalQueens / 2;
@@ -222,6 +214,7 @@ public class ColonyAutomationService {
                 int layers = totalQueens - half;
                 
                 targets.put(GameConstants.ROLE_RESEARCHER, researchers);
+                // 2. Layers
                 targets.put(GameConstants.ROLE_LAYER, layers);
             }
         } else {
