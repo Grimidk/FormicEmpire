@@ -270,6 +270,7 @@ public class StatsDialog extends ZeroDialog {
         for (AntType type : GameConstants.getAntTypes()) {
             List<Ant> ants = colony.getAntsByType(type);
             int count = ants.size();
+            
             if (count == 0) continue;
 
             model.addRow(new Object[]{type.getIcon(), type.getName(), "Total", count});
@@ -278,11 +279,6 @@ public class StatsDialog extends ZeroDialog {
                 totalJuvenile += count;
             } else if (type != GameConstants.TYPE_DEAD) {
                 totalAdult += count;
-            }
-
-            if (type == GameConstants.TYPE_WORKER || type == GameConstants.TYPE_SOLDIER || 
-                type == GameConstants.TYPE_MAJOR || type == GameConstants.TYPE_PRINCESS || 
-                type == GameConstants.TYPE_QUEEN) {
                 
                 for (AntRole role : GameConstants.getAntRoles()) {
                     if (role.getAntType() == type) {
@@ -305,8 +301,53 @@ public class StatsDialog extends ZeroDialog {
         DefaultTableModel model = (DefaultTableModel) ratesTable.getModel();
         model.setRowCount(0);
         ColonyStatsService stats = colony.getStatsService();
+        
+        // Foragers
+        if (colony.hasUpgrade(GameUnlocks.ROLE_FORAGER)) {
+            int count = colony.getAssignedRoleCount(GameConstants.ROLE_FORAGER);
+            float rate = stats.getCollectingRate(colony);
+            int daily = (int)(count * rate * 24); 
+            model.addRow(new Object[]{"Foraging", count + " Foragers", rate + " /hr", "~" + daily + " pwr/day"});
+        }
 
-        // 1. Research
+        // Farmers
+        if (colony.hasUpgrade(GameUnlocks.ROLE_FARMER)) {
+            int count = colony.getAssignedRoleCount(GameConstants.ROLE_FARMER);
+            float rate = stats.getConversionRate(colony);
+            int daily = (int)(count * rate * 1440);
+            model.addRow(new Object[]{"Farming", count + " Farmers", rate + " /min", "~" + daily + " convert/day"});
+        }
+
+        // Hunters
+        if (colony.hasUpgrade(GameUnlocks.ROLE_HUNTER)) {
+            int count = colony.getAssignedRoleCount(GameConstants.ROLE_HUNTER);
+            float rate = stats.getCollectingRate(colony);
+            int daily = (int)(count * rate * 24);
+            model.addRow(new Object[]{"Hunting", count + " Hunters", rate + " /hr", "~" + daily + " pwr/day"});
+        }
+
+        // Miners
+        if (colony.hasUpgrade(GameUnlocks.ROLE_MINER)) {
+            int count = colony.getAssignedRoleCount(GameConstants.ROLE_MINER);
+            float rate = stats.getCollectingRate(colony);
+            int daily = (int)(count * rate * 24);
+            model.addRow(new Object[]{"Mining", count + " Miners", rate + " /hr", "~" + daily + " pwr/day"});
+        }
+        
+        // Scouts
+        if (colony.hasUpgrade(GameUnlocks.ROLE_SCOUT)) {
+            int count = colony.getAssignedRoleCount(GameConstants.ROLE_SCOUT);
+            float rate = stats.getScoutingRate(colony);
+            model.addRow(new Object[]{"Scouting", count + " Scouts", String.format("%.0f%%", rate * 100) + " /hr", "Finds resources"});
+        }
+
+        // Builders
+        if (colony.getCurrentBuildingProject() != null) {
+            int count = colony.getAssignedRoleCount(GameConstants.ROLE_BUILDER);
+            model.addRow(new Object[]{"Construction", count + " Builders", "1.0 hr/tick", "Project: " + colony.getCurrentBuildingProject().getName()});
+        }
+        
+        // Research
         boolean hasResearcher = colony.hasUpgrade(GameUnlocks.ROLE_RESEARCHER) || colony.hasUpgrade(GameUnlocks.ROLE_ASSISTANT);
         if (hasResearcher) {
             int researchers = colony.getAssignedRoleCount(GameConstants.ROLE_RESEARCHER);
@@ -323,43 +364,43 @@ public class StatsDialog extends ZeroDialog {
                 "+" + totalDaily + " pts/day"});
         }
 
-        // 2. Laying
+        // Egg Laying
         if (colony.hasUpgrade(GameUnlocks.ROLE_LAYER)) {
             int layers = colony.getAssignedRoleCount(GameConstants.ROLE_LAYER);
             float rate = stats.getLayingRate(colony);
             int dailyProduction = (int)(layers * rate * 24);
-            model.addRow(new Object[]{"Egg Laying", layers + " Layers", rate + "/hour/ant", "+" + dailyProduction + " eggs/day"});
+            model.addRow(new Object[]{"Egg Laying", layers + " Layers", rate + "/hr", "+" + dailyProduction + " eggs/day"});
         }
 
-        // 3. Nursing
+        // Nursing
         if (colony.hasUpgrade(GameUnlocks.ROLE_NURSE)) {
             int nurses = colony.getAssignedRoleCount(GameConstants.ROLE_NURSE);
             int babies = colony.getEggs().size() + colony.getLarvae().size() + colony.getPupae().size();
             float capacityPerNurse = stats.getNursingRate(colony);
             int totalCapacity = (int)(nurses * capacityPerNurse);
             
-            model.addRow(new Object[]{"Nursing", nurses + " Nurses", totalCapacity + " Capacity", babies + " / " + totalCapacity + " Load"});
+            model.addRow(new Object[]{"Nursing", nurses + " Nurses", totalCapacity + " Cap", babies + " / " + totalCapacity + " Load"});
         }
 
-        // 4. Grave Keeping
+        // Grave Keeping
         if (colony.hasUpgrade(GameUnlocks.ROLE_GRAVER)) {
             int gravers = colony.getAssignedRoleCount(GameConstants.ROLE_GRAVER);
             int dead = colony.getDeadAnts().size();
             float capacityPerGraver = stats.getGravingRate(colony);
             int totalCapacity = (int)(gravers * capacityPerGraver);
             
-            model.addRow(new Object[]{"Grave Keeping", gravers + " Gravers", totalCapacity + " Capacity", dead + " / " + totalCapacity + " Load"});
+            model.addRow(new Object[]{"Grave Keeping", gravers + " Gravers", totalCapacity + " Cap", dead + " / " + totalCapacity + " Load"});
         }
 
-        // 5. Ranching
+        // Ranching
         if (colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) {
             int ranchers = colony.getAssignedRoleCount(GameConstants.ROLE_RANCHER);
             int capacityPerRancher = stats.getAphidCapacity(colony);
             int maxAphids = ranchers * capacityPerRancher;
-            model.addRow(new Object[]{"Ranching", ranchers + " Ranchers", maxAphids + " Capacity", colony.getAphids() + " / " + maxAphids + " Aphids"});
+            model.addRow(new Object[]{"Ranching", ranchers + " Ranchers", maxAphids + " Cap", colony.getAphids() + " / " + maxAphids + " Aphids"});
         }
 
-        // 6. Policing
+        // Policing
         if (colony.hasUpgrade(GameUnlocks.ROLE_POLICE)) {
             int police = colony.getAssignedRoleCount(GameConstants.ROLE_POLICE);
             float detection = stats.getParasiteDetection(colony);
