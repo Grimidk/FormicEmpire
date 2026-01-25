@@ -76,7 +76,19 @@ public class ColonyAutomationService {
             if (deadBodies > 0) {
                 float dailyCleaningRate = stats.getGravingRate(colony) * 24.0f;
                 if (dailyCleaningRate > 0) {
-                    int needed = (int) Math.ceil(deadBodies / (dailyCleaningRate * 5.0f)); 
+                    // Default behavior: maintain a slow steady cleanup
+                    float daysToClear = 5.0f;
+
+                    // If approaching contamination threshold (500), prioritize cleanup
+                    if (deadBodies >= 400) {
+                        daysToClear = 1.0f; 
+                    }
+                    // If hitting medium/massive contamination (1500+), emergency cleanup
+                    if (deadBodies >= 1400) {
+                        daysToClear = 0.5f;
+                    }
+
+                    int needed = (int) Math.ceil(deadBodies / (dailyCleaningRate * daysToClear)); 
                     gravers = Math.min(needed, remaining);
                     remaining -= gravers;
                 }
