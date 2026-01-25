@@ -25,6 +25,7 @@ public class RoleManagementDialog extends ZeroDialog {
     private final Colony colony;
     private final JTabbedPane tabbedPane = new JTabbedPane();
     private final List<RolePanel> rolePanels = new ArrayList<>();
+    private final Set<AntType> initializedTypes = new HashSet<>();
 
     public RoleManagementDialog(JFrame owner, Colony colony) {
         super(owner, "Manage Ant Roles", new Dimension(550, 500));
@@ -46,12 +47,14 @@ public class RoleManagementDialog extends ZeroDialog {
 
     @Override
     protected void refreshDialog() {
+        initTabs();
         for (RolePanel panel : rolePanels) {
             panel.updateData();
         }
     }
     
     public void showDialog(int tabIndex) {
+        refreshDialog(); 
         selectTab(tabIndex);
         super.showDialog();
     }
@@ -74,10 +77,15 @@ public class RoleManagementDialog extends ZeroDialog {
     }
     
     private void addRoleTab(AntType type, Upgrade requiredUpgrade) {
+        if (initializedTypes.contains(type)) {
+            return;
+        }
+
         if (colony.hasUpgrade(requiredUpgrade)) {
             RolePanel panel = new RolePanel(colony, type);
             rolePanels.add(panel);
             tabbedPane.addTab(type.getName(), type.getIcon(), panel);
+            initializedTypes.add(type);
         }
     }
     
@@ -143,6 +151,7 @@ public class RoleManagementDialog extends ZeroDialog {
         if (!isShowing()) {
             return;
         }
+        initTabs();
         for (RolePanel panel : rolePanels) {
             panel.updateData();
         }
