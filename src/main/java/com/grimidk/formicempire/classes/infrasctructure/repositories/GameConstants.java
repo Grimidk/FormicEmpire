@@ -35,263 +35,7 @@ public final class GameConstants {
         return new ImageIcon(resourceUrl);
     }
 
-    // --- Misc Icons ---
-    public static final ImageIcon ICON_APHID = loadIcon("icons/bugs/aphid.png");
-    public static final ImageIcon ICON_RESEARCH = loadIcon("icons/misc/research.png");
-    
-    // --- Temperatures ---
-    public static final Temperature TEMP_FREEZING = new Temperature(1, "Freezing", 5,
-        loadIcon("icons/temp/freezing.png"));
-    public static final Temperature TEMP_COLD = new Temperature(2, "Cold", 15,
-        loadIcon("icons/temp/cold.png"));
-    public static final Temperature TEMP_CHILLY = new Temperature(3, "Chilly", 20,
-        loadIcon("icons/temp/chilly.png"));
-    public static final Temperature TEMP_GOOD = new Temperature(4, "Good", 28,
-        loadIcon("icons/temp/good.png"));
-    public static final Temperature TEMP_WARM = new Temperature(5, "Warm", 35,
-        loadIcon("icons/temp/warm.png"));
-    public static final Temperature TEMP_HOT = new Temperature(6, "Hot", 45,
-        loadIcon("icons/temp/hot.png"));
-    public static final Temperature TEMP_BURNING = new Temperature(7, "Burning", 100,
-        loadIcon("icons/temp/burning.png"));
-
-    // --- Humidity
-    public static final Humidity HUMID_0 = new Humidity(1, "Arid", 0,
-        loadIcon("icons/humid/humid0.png"));
-    public static final Humidity HUMID_1 = new Humidity(2, "Dry", 1, 
-        loadIcon("icons/humid/humid1.png"));
-    public static final Humidity HUMID_2 = new Humidity(3, "Normal", 2, 
-        loadIcon("icons/humid/humid2.png"));
-    public static final Humidity HUMID_3 = new Humidity(4, "Humid", 3, 
-        loadIcon("icons/humid/humid3.png"));
-    public static final Humidity HUMID_4 = new Humidity(5, "Moist", 4, 
-        loadIcon("icons/humid/humid4.png"));
-    public static final Humidity HUMID_5 = new Humidity(6, "Saturated", 5, 
-        loadIcon("icons/humid/humid5.png"));
-
-    // --- Biomes ---
-    public static final Biome PLAINS_BIOME = new Biome(1, "Plains", 25, 2, 1f, 1f, 0f,
-        loadIcon("icons/biomes/plains.png"));
-    public static final Biome FOREST_BIOME = new Biome(2, "Forest", 22, 3, 2f, 2f, 0.1f,
-        loadIcon("icons/biomes/forest.png"));
-    public static final Biome JUNGLE_BIOME = new Biome(3, "Jungle", 30, 4, 2.5f, 2.5f, 0.2f,
-        loadIcon("icons/biomes/jungle.png"));
-    public static final Biome SWAMP_BIOME = new Biome(4, "Swamp", 26, 5, 1.5f, 1.5f, 0f,
-        loadIcon("icons/biomes/swamp.png"));
-    public static final Biome URBAN_BIOME = new Biome(5, "Urban", 28, 1, 0.5f, 0.5f, 0.5f,
-        loadIcon("icons/biomes/urban.png"));
-    public static final Biome TUNDRA_BIOME = new Biome(6, "Tundra", 5, 2, 0.2f, 0.2f, 0.3f,
-        loadIcon("icons/biomes/tundra.png"));
-    public static final Biome TAIGA_BIOME = new Biome(7, "Taiga", 12, 1, 0.4f, 0.3f, 0.5f,
-        loadIcon("icons/biomes/taiga.png"));
-    public static final Biome DESSERT_BIOME = new Biome(8, "Dessert", 45, 0, 0.05f, 0.02f, 1f,
-        loadIcon("icons/biomes/dessert.png"));
-    public static final Biome MOUNTAIN_BIOME = new Biome(9, "Mountain", 12, 1, 0.1f, 0.3f, 2f,
-        loadIcon("icons/biomes/mountain.png"));
-    public static final Biome VOLCANIC_BIOME = new Biome(10, "Volcanic", 60, 0, 0.01f, 0.01f, 5f,
-        loadIcon("icons/biomes/volcanic.png"));
-    public static final Biome LAKE_BIOME = new Biome(11, "Lake", 25, 5, 0.5f, 0.5f, 0f,
-        loadIcon("icons/biomes/lake.png"));
-    public static final Biome OCEAN_BIOME = new Biome(12, "Ocean", 20, 5, 0.2f, 0.2f, 0f,
-        loadIcon("icons/biomes/ocean.png"));
-    
-    // --- Resources ---
-    public static final ResourceType PLANT_RESOURCE = new ResourceType(1, "Plant Matter", true, false, 
-        loadIcon("icons/resources/plant.png"));
-    public static final ResourceType FUNGI_RESOURCE = new ResourceType(2, "Fungi Matter", true, false, 
-        loadIcon("icons/resources/mushroom.png"));
-    public static final ResourceType MEAT_RESOURCE = new ResourceType(3, "Animal Matter", true, false, 
-        loadIcon("icons/resources/protein.png"));
-    public static final ResourceType WATER_RESOURCE = new ResourceType(4, "Water", true, true, 
-        loadIcon("icons/resources/water.png"));
-    public static final ResourceType SYRUP_RESOURCE = new ResourceType(5, "Syrup", true, true, 
-        loadIcon("icons/resources/syrup.png"));
-    public static final ResourceType RESIN_RESOURCE = new ResourceType(6, "Resin", false, true, 
-        loadIcon("icons/resources/resin.png"));
-    public static final ResourceType ROCK_RESOURCE = new ResourceType(7, "Mineral", false, false, 
-        loadIcon("icons/resources/mineral.png"));
-
-    // --- Times of Day ---
-    public static final TimeOfDay DAY_TIME = new TimeOfDay(1, "Daytime", 1.05f,
-        loadIcon("icons/times/day.png"));
-    public static final TimeOfDay DUSK_TIME = new TimeOfDay(2, "Dusk", 0.95f,
-        loadIcon("icons/times/dusk.png"));
-    public static final TimeOfDay NIGHT_TIME = new TimeOfDay(3, "Nightime", 0.85f,
-        loadIcon("icons/times/night.png"));
-    public static final TimeOfDay DAWN_TIME = new TimeOfDay(4, "Dawn", 0.90f,
-        loadIcon("icons/times/dawn.png"));
-    public static final TimeOfDay SOLAR_ECLIPSE_TIME = new TimeOfDay(5, "Solar Eclipse", 0.7f,
-        loadIcon("icons/times/solar-eclipse.png"));
-    public static final TimeOfDay LUNAR_ECLIPSE_TIME = new TimeOfDay(6, "Lunar Eclipse", 0.85f,
-        loadIcon("icons/times/lunar-eclipse.png"));
-
-    // --- Moon Phases ---
-    public static final MoonPhase NEW_MOON_PHASE = new MoonPhase(1, "New Moon", 1f, 
-        loadIcon("icons/moon/new-moon.png"));
-    public static final MoonPhase WAXING_CRESCENT_PHASE = new MoonPhase(2, "Waxing Crescent", 3/4f,
-        loadIcon("icons/moon/waxing-crescent.png"));
-    public static final MoonPhase FIRST_QUARTER_PHASE = new MoonPhase(3, "First Quarter", 1/2f, 
-        loadIcon("icons/moon/first-quarter.png"));
-    public static final MoonPhase WAXING_GIBBOUS_PHASE = new MoonPhase(4, "Waxing Gibbous", 1/4f, 
-        loadIcon("icons/moon/waxing-gibbous.png"));
-    public static final MoonPhase FULL_MOON_PHASE = new MoonPhase(5, "Full Moon", 0f, 
-        loadIcon("icons/moon/full-moon.png"));
-    public static final MoonPhase WANING_GIBBOUS_PHASE = new MoonPhase(6, "Waning Gibbous", 1/4f, 
-        loadIcon("icons/moon/waning-gibbous.png"));
-    public static final MoonPhase LAST_QUARTER_PHASE = new MoonPhase(7, "Last Quarter", 1/2f, 
-        loadIcon("icons/moon/third-quarter.png"));
-    public static final MoonPhase WANING_CRESCENT_PHASE = new MoonPhase(8, "Waning Crescent", 3/4f, 
-        loadIcon("icons/moon/waning-crescent.png"));
-
-    // --- Seasons ---
-    public static final Season SPRING_SEASON = new Season(1, "Spring", 1.0f, 1.0f, 
-        loadIcon("icons/seasons/spring.png"));
-    public static final Season SUMMER_SEASON = new Season(2, "Summer", 1.15f, 0.8f, 
-        loadIcon("icons/seasons/summer.png"));
-    public static final Season AUTUMN_SEASON = new Season(3, "Autumn", 0.95f, 1.1f, 
-        loadIcon("icons/seasons/autumn.png"));
-    public static final Season WINTER_SEASON = new Season(4, "Winter", 0.7f, 1.2f, 
-        loadIcon("icons/seasons/winter.png"));
-
-    // --- Weather ---
-    public static final Weather CLEAR_WEATHER = new Weather(1, "Clear", 0, 1.0f, 
-        loadIcon("icons/weather/clear.png"));
-    public static final Weather RAIN_WEATHER = new Weather(2, "Rain", 1, 0.95f, 
-        loadIcon("icons/weather/rain.png"));
-    public static final Weather SNOW_WEATHER = new Weather(3, "Snow", 1, 0.8f, 
-        loadIcon("icons/weather/snow.png"));
-    public static final Weather HEAVY_RAIN_WEATHER = new Weather(4, "Heavy Rain", 2, 0.9f, 
-        loadIcon("icons/weather/heavy-rain.png"));
-    public static final Weather THUNDER_WEATHER = new Weather(5, "Thunder Storm", 2, 0.9f, 
-        loadIcon("icons/weather/thunder.png"));
-    public static final Weather HEAVY_SNOW_WEATHER = new Weather(6, "Snow Storm", 2, 0.7f, 
-        loadIcon("icons/weather/heavy-snow.png"));
-    public static final Weather WIND_WEATHER = new Weather(7, "Heavy Wind", -1, 0.95f, 
-        loadIcon("icons/weather/heavy-wind.png"));
-    public static final Weather HEAT_WEATHER = new Weather(8, "Heat Wave", -2, 1.2f, 
-        loadIcon("icons/weather/heat-wave.png"));
-    public static final Weather FOG_WEATHER = new Weather(9, "Fog", 0, 0.9f, 
-        loadIcon("icons/weather/fog.png"));
-    public static final Weather FROG_WEATHER = new Weather(10, "Frog Rain", 3, 1.0f, 
-        loadIcon("icons/weather/frog-rain.png"));
-    public static final Weather BLOOD_WEATHER = new Weather(11, "Blood Rain", 2, 0.85f, 
-        loadIcon("icons/weather/blood-rain.png"));
-
-    // --- Ant Status ---
-    public static final AntStatus STATUS_ALIVE = new AntStatus(1, "Alive", 
-        loadIcon("icons/status/alive.png"));
-    public static final AntStatus STATUS_DEAD = new AntStatus(2, "Dead", 
-        loadIcon("icons/status/dead.png"));
-    public static final AntStatus STATUS_ZOMBIFIED = new AntStatus(3, "Zombified", 
-        loadIcon("icons/status/zombified.png"));
-
-    // --- Move Status ---
-    public static final MoveStatus MOVE_STATIC = new MoveStatus(1, "Static", 0);
-    public static final MoveStatus MOVE_WANDER = new MoveStatus(2, "Wandering", 1/2f);
-    public static final MoveStatus MOVE_MARCH = new MoveStatus(3, "Marching", 1f);
-    public static final MoveStatus MOVE_SPEED = new MoveStatus(4, "Speed Marching", 3/2f);
-    public static final MoveStatus MOVE_FLY = new MoveStatus(5, "Flying", 3f);
-    public static final MoveStatus MOVE_PATROL = new MoveStatus(6, "Patrolling", 1f);
-
-    // --- Bug Types ---
-    public static final BugType TYPE_ANT = new BugType(1, "Ant", 1, 1, 1, 1, 1, 1,
-        loadIcon("icons/ants/worker.png"), loadIcon("sprites/ants/worker.png"));
-    public static final BugType TYPE_APHID = new BugType(2, "Aphid", 1, 1, 0, 0, 5, 0.5f,
-        loadIcon("icons/bugs/aphid.png") , loadIcon("sprites/bugs/aphid.png"));
-    public static final BugType TYPE_PARASITE = new BugType(3, "Ant Parasite", 1, 1, 0, 0, 1, 1,
-        loadIcon("icons/bugs/parasite.png") , loadIcon("sprites/bugs/parasite.png"));
-
-    // --- Ant Types ---
-    public static final AntType TYPE_EGG = new AntType(1, "Egg", 1f, 0f, 0f, 0f, 0f, 0f, 0f,
-        loadIcon("icons/ants/egg.png"), loadIcon("sprites/ants/egg.png"));
-    public static final AntType TYPE_LARVA = new AntType(2, "Larva", 1f, 1/2f, 1/2f, 1f, 1f, 1/2f, 1/2f,
-        loadIcon("icons/ants/larva.png"), loadIcon("sprites/ants/larva.png"));
-    public static final AntType TYPE_PUPA = new AntType(3, "Pupa", 1f, 0f, 1f, 0f, 0f, 1/2f, 0f,
-        loadIcon("icons/ants/pupa.png"), loadIcon("sprites/ants/pupa.png"));
-    public static final AntType TYPE_WORKER = new AntType(4, "Worker", 1f, 1f, 1f, 1f, 1f, 1f, 1f, 
-        loadIcon("icons/ants/worker.png"), loadIcon("sprites/ants/worker.png"));
-    public static final AntType TYPE_SOLDIER = new AntType(5, "Soldier", 3f, 3f, 3f, 2f, 3f, 5f, 3f, 
-        loadIcon("icons/ants/soldier.png"), loadIcon("sprites/ants/soldier.png"));
-    public static final AntType TYPE_MAJOR = new AntType(6, "Major", 10f, 15f, 20f, 5f, 2f, 50f, 2f, 
-        loadIcon("icons/ants/major.png"), loadIcon("sprites/ants/major.png"));
-    public static final AntType TYPE_DRONE = new AntType(7, "Drone", 1f, 1f, 1f, 1f, 1f, 1f, 1f, 
-        loadIcon("icons/ants/drone.png"), loadIcon("sprites/ants/drone.png"));
-    public static final AntType TYPE_PRINCESS = new AntType(8, "Princess", 1f, 1f, 1f, 1f, 1f, 1f, 1f, 
-        loadIcon("icons/ants/princess.png"), loadIcon("sprites/ants/princess.png"));
-    public static final AntType TYPE_QUEEN = new AntType(9, "Queen", 50f, 2f, 50f, 10f, 1/2f, 50f, 1/4f, 
-        loadIcon("icons/ants/queen.png"), loadIcon("sprites/ants/queen.png"));
-    public static final AntType TYPE_DEAD = new AntType(10, "Dead", 0, 0, 0, 0, 0, 0, 0,
-        loadIcon("icons/ants/dead.png"), loadIcon("sprites/ants/dead.png"));
-    public static final AntType TYPE_ZOMBIE = new AntType(11, "Zombie",  1f, 1f, 1f, 1f, 1f, 1f, 1f, 
-        loadIcon("icons/ants/zombie.png"), loadIcon("sprites/ants/zombie.png"));
-
-    // --- Ant Subtypes ---
-
-    // --- Ant Roles ---
-    public static final AntRole ROLE_FORAGER = new AntRole(1, TYPE_WORKER, "Forager");
-    public static final AntRole ROLE_NURSE = new AntRole(2, TYPE_WORKER, "Nurse");
-    public static final AntRole ROLE_BUILDER = new AntRole(3, TYPE_WORKER, "Builder");
-    public static final AntRole ROLE_SCOUT = new AntRole(4, TYPE_WORKER, "Scout");
-    public static final AntRole ROLE_FARMER = new AntRole(5, TYPE_WORKER, "Farmer");
-    public static final AntRole ROLE_RANCHER = new AntRole(6, TYPE_WORKER, "Rancher");
-    public static final AntRole ROLE_GRAVER = new AntRole(7, TYPE_WORKER, "Grave-Keeper");
-    public static final AntRole ROLE_MINER = new AntRole(8, TYPE_WORKER, "Miner");
-    public static final AntRole ROLE_COURIER = new AntRole(9, TYPE_WORKER, "Courier");
-    public static final AntRole ROLE_POTTER = new AntRole(10, TYPE_WORKER, "Portable-Feeder");
-    public static final AntRole ROLE_GUARD = new AntRole(11, TYPE_SOLDIER, "Guard");
-    public static final AntRole ROLE_WARRIOR = new AntRole(12, TYPE_SOLDIER, "Warrior");
-    public static final AntRole ROLE_DEFENDER = new AntRole(13, TYPE_SOLDIER, "Defender");
-    public static final AntRole ROLE_POLICE = new AntRole(14, TYPE_SOLDIER, "Parasite-Police");
-    public static final AntRole ROLE_BOMBER = new AntRole(15, TYPE_SOLDIER, "Bomber");
-    public static final AntRole ROLE_HUNTER = new AntRole(16, TYPE_SOLDIER, "Hunter");
-    public static final AntRole ROLE_BRUTE = new AntRole(17, TYPE_MAJOR, "Brute");
-    public static final AntRole ROLE_CARRIER = new AntRole(18, TYPE_MAJOR, "Troop-Carrier");
-    public static final AntRole ROLE_ARTILLERY = new AntRole(19, TYPE_MAJOR, "Artillery");
-    public static final AntRole ROLE_SIEGE = new AntRole(20, TYPE_MAJOR, "Siege-Engine");
-    public static final AntRole ROLE_BORER = new AntRole(21, TYPE_MAJOR, "Boring-Machine");
-    public static final AntRole ROLE_DRONE = new AntRole(22, TYPE_DRONE, "Drone");
-    public static final AntRole ROLE_BREEDER = new AntRole(23, TYPE_PRINCESS, "Breeder");
-    public static final AntRole ROLE_DIPLOMAT = new AntRole(24, TYPE_PRINCESS, "Diplomat");
-    public static final AntRole ROLE_LAYER = new AntRole(25, TYPE_QUEEN, "Egg-Layer");
-    public static final AntRole ROLE_RESEARCHER = new AntRole(26, TYPE_QUEEN, "Researcher");
-    public static final AntRole ROLE_MILITIA = new AntRole(27, TYPE_WORKER, "Militia Auxiliary");
-    public static final AntRole ROLE_CATCHER = new AntRole(28, TYPE_SOLDIER, "Catcher");
-    public static final AntRole ROLE_CRANE = new AntRole(29, TYPE_MAJOR, "Construction Crane");
-    public static final AntRole ROLE_TRANSPORT = new AntRole(30, TYPE_MAJOR, "Resource Transport");
-    public static final AntRole ROLE_ASSISTANT = new AntRole(31, TYPE_PRINCESS, "Lab Assistant");
-    public static final AntRole ROLE_ESCORT = new AntRole(32, TYPE_SOLDIER, "Convoy Escort");
-
-    // --- Colony Ranks ---
-    public static final ColonyRank RANK_ANT = new ColonyRank(1, "Ant", 1l, 
-        loadIcon("icons/ranks/ant.png"));
-    public static final ColonyRank RANK_COLONY = new ColonyRank(2, "Ant Colony", 10l, 
-        loadIcon("icons/ranks/colony.png"));
-    public static final ColonyRank RANK_COUNTY = new ColonyRank(3, "Ant County", 100l, 
-        loadIcon("icons/ranks/county.png"));
-    public static final ColonyRank RANK_DUCHY = new ColonyRank(4, "Ant Duchy", 1000l, 
-        loadIcon("icons/ranks/duchy.png"));
-    public static final ColonyRank RANK_KINGDOM = new ColonyRank(5, "Ant Queendom", 10000l, 
-        loadIcon("icons/ranks/kingdom.png"));
-    public static final ColonyRank RANK_EMPIRE = new ColonyRank(6, "Ant Empire", 100000l, 
-        loadIcon("icons/ranks/empire.png"));
-    public static final ColonyRank RANK_SUPER = new ColonyRank(7, "Ant Super Colony", 1000000l, 
-        loadIcon("icons/ranks/super.png"));
-    public static final ColonyRank RANK_ULTRA = new ColonyRank(8, "Ant Ultra Colony", 10000000l, 
-        loadIcon("icons/ranks/ultra.png"));
-    public static final ColonyRank RANK_HYPER = new ColonyRank(9, "Ant Hyper Colony", 100000000l, 
-        loadIcon("icons/ranks/hyper.png"));
-    public static final ColonyRank RANK_MEGA = new ColonyRank(10, "Ant Mega Colony", 1000000000l, 
-        loadIcon("icons/ranks/mega.png"));
-    public static final ColonyRank RANK_ULTIMATE = new ColonyRank(11, "Ant Ultimate Colony", 10000000000l, 
-        loadIcon("icons/ranks/ultimate.png"));
-    public static final ColonyRank RANK_SUPREME = new ColonyRank(12, "Ant Supreme Colony", 100000000000l, 
-        loadIcon("icons/ranks/supreme.png"));
-    public static final ColonyRank RANK_GIGA = new ColonyRank(13, "Ant Giga Colony", 1000000000000l, 
-        loadIcon("icons/ranks/giga.png"));
-    
-    // --- Species ---
-
-    // --- Lists to hold the constants ---
+    // --- Lists ---
     private static final List<Biome> biomes = new ArrayList<>();
     private static final List<ResourceType> resources = new ArrayList<>();
     private static final List<TimeOfDay> timesOfDay = new ArrayList<>();
@@ -309,152 +53,395 @@ public final class GameConstants {
     private static final List<Humidity> humidity = new ArrayList<>();
     private static final List<Temperature> temperature = new ArrayList<>();
     private static final List<ImageIcon> misc = new ArrayList<>();
+
+    // --- Misc Icons ---
+    public static final ImageIcon ICON_APHID = loadIcon("icons/bugs/aphid.png");
+    static { misc.add(ICON_APHID); }
+    public static final ImageIcon ICON_RESEARCH = loadIcon("icons/misc/research.png");
+    static { misc.add(ICON_RESEARCH); }
+
+    // --- Temperatures ---
+    public static final Temperature TEMP_FREEZING = new Temperature(1, "Freezing", 5,
+        loadIcon("icons/temp/freezing.png"));
+    static { temperature.add(TEMP_FREEZING); }
+    public static final Temperature TEMP_COLD = new Temperature(2, "Cold", 15,
+        loadIcon("icons/temp/cold.png"));
+    static { temperature.add(TEMP_COLD); }
+    public static final Temperature TEMP_CHILLY = new Temperature(3, "Chilly", 20,
+        loadIcon("icons/temp/chilly.png"));
+    static { temperature.add(TEMP_CHILLY); }
+    public static final Temperature TEMP_GOOD = new Temperature(4, "Good", 28,
+        loadIcon("icons/temp/good.png"));
+    static { temperature.add(TEMP_GOOD); }
+    public static final Temperature TEMP_WARM = new Temperature(5, "Warm", 35,
+        loadIcon("icons/temp/warm.png"));
+    static { temperature.add(TEMP_WARM); }
+    public static final Temperature TEMP_HOT = new Temperature(6, "Hot", 45,
+        loadIcon("icons/temp/hot.png"));
+    static { temperature.add(TEMP_HOT); }    
+    public static final Temperature TEMP_BURNING = new Temperature(7, "Burning", 100,
+        loadIcon("icons/temp/burning.png"));
+    static { temperature.add(TEMP_BURNING); }    
+
+    // --- Humidity
+    public static final Humidity HUMID_0 = new Humidity(1, "Arid", 0,
+        loadIcon("icons/humid/humid0.png"));
+    static { humidity.add(HUMID_0); }    
+    public static final Humidity HUMID_1 = new Humidity(2, "Dry", 1, 
+        loadIcon("icons/humid/humid1.png"));
+    static { humidity.add(HUMID_1); }
+    public static final Humidity HUMID_2 = new Humidity(3, "Normal", 2, 
+        loadIcon("icons/humid/humid2.png"));
+    static { humidity.add(HUMID_2); }
+    public static final Humidity HUMID_3 = new Humidity(4, "Humid", 3, 
+        loadIcon("icons/humid/humid3.png"));
+    static { humidity.add(HUMID_3); }
+    public static final Humidity HUMID_4 = new Humidity(5, "Moist", 4, 
+        loadIcon("icons/humid/humid4.png"));
+    static { humidity.add(HUMID_4); }
+    public static final Humidity HUMID_5 = new Humidity(6, "Saturated", 5, 
+        loadIcon("icons/humid/humid5.png"));
+    static { humidity.add(HUMID_5); }
+
+    // --- Biomes ---
+    public static final Biome PLAINS_BIOME = new Biome(1, "Plains", 25, 2, 1f, 1f, 0f,
+        loadIcon("icons/biomes/plains.png"));
+    static { biomes.add(PLAINS_BIOME); }
+    public static final Biome FOREST_BIOME = new Biome(2, "Forest", 22, 3, 2f, 2f, 0.1f,
+        loadIcon("icons/biomes/forest.png"));
+    static { biomes.add(FOREST_BIOME); }
+    public static final Biome JUNGLE_BIOME = new Biome(3, "Jungle", 30, 4, 2.5f, 2.5f, 0.2f,
+        loadIcon("icons/biomes/jungle.png"));
+    static { biomes.add(JUNGLE_BIOME); }
+    public static final Biome SWAMP_BIOME = new Biome(4, "Swamp", 26, 5, 1.5f, 1.5f, 0f,
+        loadIcon("icons/biomes/swamp.png"));
+    static { biomes.add(SWAMP_BIOME); }
+    public static final Biome URBAN_BIOME = new Biome(5, "Urban", 28, 1, 0.5f, 0.5f, 0.5f,
+        loadIcon("icons/biomes/urban.png"));
+    static { biomes.add(URBAN_BIOME); }
+    public static final Biome TUNDRA_BIOME = new Biome(6, "Tundra", 5, 2, 0.2f, 0.2f, 0.3f,
+        loadIcon("icons/biomes/tundra.png"));
+    static { biomes.add(TUNDRA_BIOME); }
+    public static final Biome TAIGA_BIOME = new Biome(7, "Taiga", 12, 1, 0.4f, 0.3f, 0.5f,
+        loadIcon("icons/biomes/taiga.png"));
+    static { biomes.add(TAIGA_BIOME); }
+    public static final Biome DESSERT_BIOME = new Biome(8, "Dessert", 45, 0, 0.05f, 0.02f, 1f,
+        loadIcon("icons/biomes/dessert.png"));
+    static { biomes.add(DESSERT_BIOME); }
+    public static final Biome MOUNTAIN_BIOME = new Biome(9, "Mountain", 12, 1, 0.1f, 0.3f, 2f,
+        loadIcon("icons/biomes/mountain.png"));
+    static { biomes.add(MOUNTAIN_BIOME); }
+    public static final Biome VOLCANIC_BIOME = new Biome(10, "Volcanic", 60, 0, 0.01f, 0.01f, 5f,
+        loadIcon("icons/biomes/volcanic.png"));
+    static { biomes.add(VOLCANIC_BIOME); }
+    public static final Biome LAKE_BIOME = new Biome(11, "Lake", 25, 5, 0.5f, 0.5f, 0f,
+        loadIcon("icons/biomes/lake.png"));
+    static { biomes.add(LAKE_BIOME); }
+    public static final Biome OCEAN_BIOME = new Biome(12, "Ocean", 20, 5, 0.2f, 0.2f, 0f,
+        loadIcon("icons/biomes/ocean.png"));
+    static { biomes.add(OCEAN_BIOME); }
     
-    // --- Static initializer block ---
-    static {
-        biomes.add(PLAINS_BIOME);
-        biomes.add(FOREST_BIOME);
-        biomes.add(JUNGLE_BIOME);
-        biomes.add(SWAMP_BIOME);
-        biomes.add(URBAN_BIOME);
-        biomes.add(TUNDRA_BIOME);
-        biomes.add(TAIGA_BIOME);
-        biomes.add(DESSERT_BIOME);
+    // --- Resources ---
+    public static final ResourceType PLANT_RESOURCE = new ResourceType(1, "Plant Matter", true, false, 
+        loadIcon("icons/resources/plant.png"));
+    static { resources.add(PLANT_RESOURCE); }
+    public static final ResourceType FUNGI_RESOURCE = new ResourceType(2, "Fungi Matter", true, false, 
+        loadIcon("icons/resources/mushroom.png"));
+    static { resources.add(FUNGI_RESOURCE); }
+    public static final ResourceType MEAT_RESOURCE = new ResourceType(3, "Animal Matter", true, false, 
+        loadIcon("icons/resources/protein.png"));
+    static { resources.add(MEAT_RESOURCE); }
+    public static final ResourceType WATER_RESOURCE = new ResourceType(4, "Water", true, true, 
+        loadIcon("icons/resources/water.png"));
+    static { resources.add(WATER_RESOURCE); }
+    public static final ResourceType SYRUP_RESOURCE = new ResourceType(5, "Syrup", true, true, 
+        loadIcon("icons/resources/syrup.png"));
+    static { resources.add(SYRUP_RESOURCE); }
+    public static final ResourceType RESIN_RESOURCE = new ResourceType(6, "Resin", false, true, 
+        loadIcon("icons/resources/resin.png"));
+    static { resources.add(RESIN_RESOURCE); }
+    public static final ResourceType ROCK_RESOURCE = new ResourceType(7, "Mineral", false, false, 
+        loadIcon("icons/resources/mineral.png"));
+    static { resources.add(ROCK_RESOURCE); }
 
-        resources.add(PLANT_RESOURCE);
-        resources.add(FUNGI_RESOURCE);
-        resources.add(MEAT_RESOURCE);
-        resources.add(WATER_RESOURCE);
-        resources.add(SYRUP_RESOURCE);
-        resources.add(RESIN_RESOURCE);
-        resources.add(ROCK_RESOURCE);
+    // --- Times of Day ---
+    public static final TimeOfDay DAY_TIME = new TimeOfDay(1, "Daytime", 1.05f,
+        loadIcon("icons/times/day.png"));
+    static { timesOfDay.add(DAY_TIME); }
+    public static final TimeOfDay DUSK_TIME = new TimeOfDay(2, "Dusk", 0.95f,
+        loadIcon("icons/times/dusk.png"));
+    static { timesOfDay.add(DUSK_TIME); }
+    public static final TimeOfDay NIGHT_TIME = new TimeOfDay(3, "Nightime", 0.85f,
+        loadIcon("icons/times/night.png"));
+    static { timesOfDay.add(NIGHT_TIME); }
+    public static final TimeOfDay DAWN_TIME = new TimeOfDay(4, "Dawn", 0.90f,
+        loadIcon("icons/times/dawn.png"));
+    static { timesOfDay.add(DAWN_TIME); }
+    public static final TimeOfDay SOLAR_ECLIPSE_TIME = new TimeOfDay(5, "Solar Eclipse", 0.7f,
+        loadIcon("icons/times/solar-eclipse.png"));
+    static { timesOfDay.add(SOLAR_ECLIPSE_TIME); }
+    public static final TimeOfDay LUNAR_ECLIPSE_TIME = new TimeOfDay(6, "Lunar Eclipse", 0.85f,
+        loadIcon("icons/times/lunar-eclipse.png"));
+    static { timesOfDay.add(LUNAR_ECLIPSE_TIME); }
 
-        timesOfDay.add(DAY_TIME);
-        timesOfDay.add(DUSK_TIME);
-        timesOfDay.add(NIGHT_TIME);
-        timesOfDay.add(DAWN_TIME);
-        timesOfDay.add(SOLAR_ECLIPSE_TIME);
-        timesOfDay.add(LUNAR_ECLIPSE_TIME);
+    // --- Moon Phases ---
+    public static final MoonPhase NEW_MOON_PHASE = new MoonPhase(1, "New Moon", 1f, 
+        loadIcon("icons/moon/new-moon.png"));
+    static { moonPhases.add(NEW_MOON_PHASE); }
+    public static final MoonPhase WAXING_CRESCENT_PHASE = new MoonPhase(2, "Waxing Crescent", 3/4f,
+        loadIcon("icons/moon/waxing-crescent.png"));
+    static { moonPhases.add(WAXING_CRESCENT_PHASE); }
+    public static final MoonPhase FIRST_QUARTER_PHASE = new MoonPhase(3, "First Quarter", 1/2f, 
+        loadIcon("icons/moon/first-quarter.png"));
+    static { moonPhases.add(FIRST_QUARTER_PHASE); }
+    public static final MoonPhase WAXING_GIBBOUS_PHASE = new MoonPhase(4, "Waxing Gibbous", 1/4f, 
+        loadIcon("icons/moon/waxing-gibbous.png"));
+    static { moonPhases.add(WAXING_GIBBOUS_PHASE); }
+    public static final MoonPhase FULL_MOON_PHASE = new MoonPhase(5, "Full Moon", 0f, 
+        loadIcon("icons/moon/full-moon.png"));
+    static { moonPhases.add(FULL_MOON_PHASE); }
+    public static final MoonPhase WANING_GIBBOUS_PHASE = new MoonPhase(6, "Waning Gibbous", 1/4f, 
+        loadIcon("icons/moon/waning-gibbous.png"));
+    static { moonPhases.add(WANING_GIBBOUS_PHASE); }
+    public static final MoonPhase LAST_QUARTER_PHASE = new MoonPhase(7, "Last Quarter", 1/2f, 
+        loadIcon("icons/moon/third-quarter.png"));
+    static { moonPhases.add(LAST_QUARTER_PHASE); }
+    public static final MoonPhase WANING_CRESCENT_PHASE = new MoonPhase(8, "Waning Crescent", 3/4f, 
+        loadIcon("icons/moon/waning-crescent.png"));
+    static { moonPhases.add(WANING_CRESCENT_PHASE); }
 
-        moonPhases.add(NEW_MOON_PHASE);
-        moonPhases.add(WAXING_CRESCENT_PHASE);
-        moonPhases.add(FIRST_QUARTER_PHASE);
-        moonPhases.add(WAXING_GIBBOUS_PHASE);
-        moonPhases.add(FULL_MOON_PHASE);
-        moonPhases.add(WANING_GIBBOUS_PHASE);
-        moonPhases.add(LAST_QUARTER_PHASE);
-        moonPhases.add(WANING_CRESCENT_PHASE);
+    // --- Seasons ---
+    public static final Season SPRING_SEASON = new Season(1, "Spring", 1.0f, 1.0f, 
+        loadIcon("icons/seasons/spring.png"));
+    static { seasons.add(SPRING_SEASON); }
+    public static final Season SUMMER_SEASON = new Season(2, "Summer", 1.15f, 0.8f, 
+        loadIcon("icons/seasons/summer.png"));
+    static { seasons.add(SUMMER_SEASON); }
+    public static final Season AUTUMN_SEASON = new Season(3, "Autumn", 0.95f, 1.1f, 
+        loadIcon("icons/seasons/autumn.png"));
+    static { seasons.add(AUTUMN_SEASON); }
+    public static final Season WINTER_SEASON = new Season(4, "Winter", 0.7f, 1.2f, 
+        loadIcon("icons/seasons/winter.png"));
+    static { seasons.add(WINTER_SEASON); }
 
-        seasons.add(SPRING_SEASON);
-        seasons.add(SUMMER_SEASON);
-        seasons.add(AUTUMN_SEASON);
-        seasons.add(WINTER_SEASON);
+    // --- Weather ---
+    public static final Weather CLEAR_WEATHER = new Weather(1, "Clear", 0, 1.0f, 
+        loadIcon("icons/weather/clear.png"));
+    static { weathers.add(CLEAR_WEATHER); }
+    public static final Weather RAIN_WEATHER = new Weather(2, "Rain", 1, 0.95f, 
+        loadIcon("icons/weather/rain.png"));
+    static { weathers.add(RAIN_WEATHER); }
+    public static final Weather SNOW_WEATHER = new Weather(3, "Snow", 1, 0.8f, 
+        loadIcon("icons/weather/snow.png"));
+    static { weathers.add(SNOW_WEATHER); }
+    public static final Weather HEAVY_RAIN_WEATHER = new Weather(4, "Heavy Rain", 2, 0.9f, 
+        loadIcon("icons/weather/heavy-rain.png"));
+    static { weathers.add(HEAVY_RAIN_WEATHER); }
+    public static final Weather THUNDER_WEATHER = new Weather(5, "Thunder Storm", 2, 0.9f, 
+        loadIcon("icons/weather/thunder.png"));
+    static { weathers.add(THUNDER_WEATHER); }
+    public static final Weather HEAVY_SNOW_WEATHER = new Weather(6, "Snow Storm", 2, 0.7f, 
+        loadIcon("icons/weather/heavy-snow.png"));
+    static { weathers.add(HEAVY_SNOW_WEATHER); }
+    public static final Weather WIND_WEATHER = new Weather(7, "Heavy Wind", -1, 0.95f, 
+        loadIcon("icons/weather/heavy-wind.png"));
+        static { weathers.add(WIND_WEATHER); }
+    public static final Weather HEAT_WEATHER = new Weather(8, "Heat Wave", -2, 1.2f, 
+        loadIcon("icons/weather/heat-wave.png"));
+    static { weathers.add(HEAT_WEATHER); }
+    public static final Weather FOG_WEATHER = new Weather(9, "Fog", 0, 0.9f, 
+        loadIcon("icons/weather/fog.png"));
+    static { weathers.add(FOG_WEATHER); }
+    public static final Weather FROG_WEATHER = new Weather(10, "Frog Rain", 3, 1.0f, 
+        loadIcon("icons/weather/frog-rain.png"));
+    static { weathers.add(FROG_WEATHER); }
+    public static final Weather BLOOD_WEATHER = new Weather(11, "Blood Rain", 2, 0.85f, 
+        loadIcon("icons/weather/blood-rain.png"));
+    static { weathers.add(BLOOD_WEATHER); }
 
-        weathers.add(CLEAR_WEATHER);
-        weathers.add(RAIN_WEATHER);
-        weathers.add(SNOW_WEATHER);
-        weathers.add(HEAVY_RAIN_WEATHER);
-        weathers.add(THUNDER_WEATHER);
-        weathers.add(HEAVY_SNOW_WEATHER);
-        weathers.add(WIND_WEATHER);
-        weathers.add(HEAT_WEATHER);
-        weathers.add(FROG_WEATHER);
+    // --- Ant Status ---
+    public static final AntStatus STATUS_ALIVE = new AntStatus(1, "Alive", 
+        loadIcon("icons/status/alive.png"));
+    static { antStatuses.add(STATUS_ALIVE); }
+    public static final AntStatus STATUS_DEAD = new AntStatus(2, "Dead", 
+        loadIcon("icons/status/dead.png"));
+    static { antStatuses.add(STATUS_DEAD); }
+    public static final AntStatus STATUS_ZOMBIFIED = new AntStatus(3, "Zombified", 
+        loadIcon("icons/status/zombified.png"));
+    static { antStatuses.add(STATUS_ZOMBIFIED); }
 
-        antStatuses.add(STATUS_ALIVE);
-        antStatuses.add(STATUS_DEAD);
-        antStatuses.add(STATUS_ZOMBIFIED);
+    // --- Move Status ---
+    public static final MoveStatus MOVE_STATIC = new MoveStatus(1, "Static", 0);
+    static { moveStatuses.add(MOVE_STATIC); }
+    public static final MoveStatus MOVE_WANDER = new MoveStatus(2, "Wandering", 1/2f);
+    static { moveStatuses.add(MOVE_WANDER); }
+    public static final MoveStatus MOVE_MARCH = new MoveStatus(3, "Marching", 1f);
+    static { moveStatuses.add(MOVE_MARCH); }
+    public static final MoveStatus MOVE_SPEED = new MoveStatus(4, "Speed Marching", 3/2f);
+    static { moveStatuses.add(MOVE_SPEED); }
+    public static final MoveStatus MOVE_FLY = new MoveStatus(5, "Flying", 3f);
+    static { moveStatuses.add(MOVE_FLY); }
+    public static final MoveStatus MOVE_PATROL = new MoveStatus(6, "Patrolling", 1f);
+    static { moveStatuses.add(MOVE_PATROL); }
 
-        moveStatuses.add(MOVE_STATIC);
-        moveStatuses.add(MOVE_WANDER);
-        moveStatuses.add(MOVE_MARCH);
-        moveStatuses.add(MOVE_SPEED);
-        moveStatuses.add(MOVE_FLY);
+    // --- Bug Types ---
+    public static final BugType TYPE_ANT = new BugType(1, "Ant", 1, 1, 1, 1, 1, 1,
+        loadIcon("icons/ants/worker.png"), loadIcon("sprites/ants/worker.png"));
+    static { bugTypes.add(TYPE_ANT); }
+    public static final BugType TYPE_APHID = new BugType(2, "Aphid", 1, 1, 0, 0, 5, 0.5f,
+        loadIcon("icons/bugs/aphid.png") , loadIcon("sprites/bugs/aphid.png"));
+    static { bugTypes.add(TYPE_APHID); }
+    public static final BugType TYPE_PARASITE = new BugType(3, "Ant Parasite", 1, 1, 0, 0, 1, 1,
+        loadIcon("icons/bugs/parasite.png") , loadIcon("sprites/bugs/parasite.png"));
+    static { bugTypes.add(TYPE_PARASITE); }
 
-        bugTypes.add(TYPE_ANT);
-        bugTypes.add(TYPE_APHID);
-        bugTypes.add(TYPE_PARASITE);
+    // --- Ant Types ---
+    public static final AntType TYPE_EGG = new AntType(1, "Egg", 1f, 0f, 0f, 0f, 0f, 0f, 0f,
+        loadIcon("icons/ants/egg.png"), loadIcon("sprites/ants/egg.png"));
+    static { antTypes.add(TYPE_EGG); }    
+    public static final AntType TYPE_LARVA = new AntType(2, "Larva", 1f, 1/2f, 1/2f, 1f, 1f, 1/2f, 1/2f,
+        loadIcon("icons/ants/larva.png"), loadIcon("sprites/ants/larva.png"));
+    static { antTypes.add(TYPE_LARVA); }
+    public static final AntType TYPE_PUPA = new AntType(3, "Pupa", 1f, 0f, 1f, 0f, 0f, 1/2f, 0f,
+        loadIcon("icons/ants/pupa.png"), loadIcon("sprites/ants/pupa.png"));
+    static { antTypes.add(TYPE_PUPA); }
+    public static final AntType TYPE_WORKER = new AntType(4, "Worker", 1f, 1f, 1f, 1f, 1f, 1f, 1f, 
+        loadIcon("icons/ants/worker.png"), loadIcon("sprites/ants/worker.png"));
+    static { antTypes.add(TYPE_WORKER); }
+    public static final AntType TYPE_SOLDIER = new AntType(5, "Soldier", 3f, 3f, 3f, 2f, 3f, 5f, 3f, 
+        loadIcon("icons/ants/soldier.png"), loadIcon("sprites/ants/soldier.png"));
+    static { antTypes.add(TYPE_SOLDIER); }
+    public static final AntType TYPE_MAJOR = new AntType(6, "Major", 10f, 15f, 20f, 5f, 2f, 50f, 2f, 
+        loadIcon("icons/ants/major.png"), loadIcon("sprites/ants/major.png"));
+    static { antTypes.add(TYPE_MAJOR); }
+    public static final AntType TYPE_DRONE = new AntType(7, "Drone", 1f, 1f, 1f, 1f, 1f, 1f, 1f, 
+        loadIcon("icons/ants/drone.png"), loadIcon("sprites/ants/drone.png"));
+    static { antTypes.add(TYPE_DRONE); }
+    public static final AntType TYPE_PRINCESS = new AntType(8, "Princess", 1f, 1f, 1f, 1f, 1f, 1f, 1f, 
+        loadIcon("icons/ants/princess.png"), loadIcon("sprites/ants/princess.png"));
+    static { antTypes.add(TYPE_PRINCESS); }
+    public static final AntType TYPE_QUEEN = new AntType(9, "Queen", 50f, 2f, 50f, 10f, 1/2f, 50f, 1/4f, 
+        loadIcon("icons/ants/queen.png"), loadIcon("sprites/ants/queen.png"));
+    static { antTypes.add(TYPE_QUEEN); }
+    public static final AntType TYPE_DEAD = new AntType(10, "Dead", 0, 0, 0, 0, 0, 0, 0,
+        loadIcon("icons/ants/dead.png"), loadIcon("sprites/ants/dead.png"));
+    static { antTypes.add(TYPE_DEAD); }
+    public static final AntType TYPE_ZOMBIE = new AntType(11, "Zombie",  1f, 1f, 1f, 1f, 1f, 1f, 1f, 
+        loadIcon("icons/ants/zombie.png"), loadIcon("sprites/ants/zombie.png"));
+    static { antTypes.add(TYPE_ZOMBIE); }
 
-        antTypes.add(TYPE_EGG);
-        antTypes.add(TYPE_LARVA);
-        antTypes.add(TYPE_PUPA);
-        antTypes.add(TYPE_WORKER);
-        antTypes.add(TYPE_SOLDIER);
-        antTypes.add(TYPE_MAJOR);
-        antTypes.add(TYPE_DRONE);
-        antTypes.add(TYPE_PRINCESS);
-        antTypes.add(TYPE_QUEEN);
-        antTypes.add(TYPE_DEAD);
-        antTypes.add(TYPE_ZOMBIE);
+    // --- Ant Subtypes ---
 
-        antRoles.add(ROLE_FORAGER);
-        antRoles.add(ROLE_NURSE);
-        antRoles.add(ROLE_BUILDER);
-        antRoles.add(ROLE_SCOUT);
-        antRoles.add(ROLE_FARMER);
-        antRoles.add(ROLE_RANCHER);
-        antRoles.add(ROLE_GRAVER);
-        antRoles.add(ROLE_MINER);
-        antRoles.add(ROLE_COURIER);
-        antRoles.add(ROLE_POTTER);
-        antRoles.add(ROLE_GUARD);
-        antRoles.add(ROLE_WARRIOR);
-        antRoles.add(ROLE_DEFENDER);
-        antRoles.add(ROLE_POLICE);
-        antRoles.add(ROLE_BOMBER);
-        antRoles.add(ROLE_HUNTER);
-        antRoles.add(ROLE_BRUTE);
-        antRoles.add(ROLE_CARRIER);
-        antRoles.add(ROLE_ARTILLERY);
-        antRoles.add(ROLE_SIEGE);
-        antRoles.add(ROLE_BORER);
-        antRoles.add(ROLE_DRONE);
-        antRoles.add(ROLE_BREEDER);
-        antRoles.add(ROLE_DIPLOMAT);
-        antRoles.add(ROLE_LAYER);
-        antRoles.add(ROLE_RESEARCHER);
-        antRoles.add(ROLE_MILITIA);
-        antRoles.add(ROLE_CATCHER);
-        antRoles.add(ROLE_CRANE);
-        antRoles.add(ROLE_TRANSPORT);
-        antRoles.add(ROLE_ASSISTANT);
-        antRoles.add(ROLE_ESCORT);
+    // --- Ant Roles ---
+    public static final AntRole ROLE_FORAGER = new AntRole(1, TYPE_WORKER, "Forager");
+    static { antRoles.add(ROLE_FORAGER); }
+    public static final AntRole ROLE_NURSE = new AntRole(2, TYPE_WORKER, "Nurse");
+    static { antRoles.add(ROLE_NURSE); }
+    public static final AntRole ROLE_BUILDER = new AntRole(3, TYPE_WORKER, "Builder");
+    static { antRoles.add(ROLE_BUILDER); }
+    public static final AntRole ROLE_SCOUT = new AntRole(4, TYPE_WORKER, "Scout");
+    static { antRoles.add(ROLE_SCOUT); }
+    public static final AntRole ROLE_FARMER = new AntRole(5, TYPE_WORKER, "Farmer");
+    static { antRoles.add(ROLE_FARMER); }
+    public static final AntRole ROLE_RANCHER = new AntRole(6, TYPE_WORKER, "Rancher");
+    static { antRoles.add(ROLE_RANCHER); }
+    public static final AntRole ROLE_GRAVER = new AntRole(7, TYPE_WORKER, "Grave-Keeper");
+    static { antRoles.add(ROLE_GRAVER); }
+    public static final AntRole ROLE_MINER = new AntRole(8, TYPE_WORKER, "Miner");
+    static { antRoles.add(ROLE_MINER); }
+    public static final AntRole ROLE_COURIER = new AntRole(9, TYPE_WORKER, "Courier");
+    static { antRoles.add(ROLE_COURIER); }
+    public static final AntRole ROLE_POTTER = new AntRole(10, TYPE_WORKER, "Portable-Feeder");
+    static { antRoles.add(ROLE_POTTER); }
+    public static final AntRole ROLE_GUARD = new AntRole(11, TYPE_SOLDIER, "Guard");
+    static { antRoles.add(ROLE_GUARD); }
+    public static final AntRole ROLE_WARRIOR = new AntRole(12, TYPE_SOLDIER, "Warrior");
+    static { antRoles.add(ROLE_WARRIOR); }
+    public static final AntRole ROLE_DEFENDER = new AntRole(13, TYPE_SOLDIER, "Defender");
+    static { antRoles.add(ROLE_DEFENDER); }
+    public static final AntRole ROLE_POLICE = new AntRole(14, TYPE_SOLDIER, "Parasite-Police");
+    static { antRoles.add(ROLE_POLICE); }
+    public static final AntRole ROLE_BOMBER = new AntRole(15, TYPE_SOLDIER, "Bomber");
+    static { antRoles.add(ROLE_BOMBER); }
+    public static final AntRole ROLE_HUNTER = new AntRole(16, TYPE_SOLDIER, "Hunter");
+    static { antRoles.add(ROLE_HUNTER); }
+    public static final AntRole ROLE_BRUTE = new AntRole(17, TYPE_MAJOR, "Brute");
+    static { antRoles.add(ROLE_BRUTE); }
+    public static final AntRole ROLE_CARRIER = new AntRole(18, TYPE_MAJOR, "Troop-Carrier");
+    static { antRoles.add(ROLE_CARRIER); }
+    public static final AntRole ROLE_ARTILLERY = new AntRole(19, TYPE_MAJOR, "Artillery");
+    static { antRoles.add(ROLE_ARTILLERY); }
+    public static final AntRole ROLE_SIEGE = new AntRole(20, TYPE_MAJOR, "Siege-Engine");
+    static { antRoles.add(ROLE_SIEGE); }
+    public static final AntRole ROLE_BORER = new AntRole(21, TYPE_MAJOR, "Boring-Machine");
+    static { antRoles.add(ROLE_BORER); }
+    public static final AntRole ROLE_DRONE = new AntRole(22, TYPE_DRONE, "Drone");
+    static { antRoles.add(ROLE_DRONE); }
+    public static final AntRole ROLE_BREEDER = new AntRole(23, TYPE_PRINCESS, "Breeder");
+    static { antRoles.add(ROLE_BREEDER); }
+    public static final AntRole ROLE_DIPLOMAT = new AntRole(24, TYPE_PRINCESS, "Diplomat");
+    static { antRoles.add(ROLE_DIPLOMAT); }
+    public static final AntRole ROLE_LAYER = new AntRole(25, TYPE_QUEEN, "Egg-Layer");
+    static { antRoles.add(ROLE_LAYER); }
+    public static final AntRole ROLE_RESEARCHER = new AntRole(26, TYPE_QUEEN, "Researcher");
+    static { antRoles.add(ROLE_RESEARCHER); }
+    public static final AntRole ROLE_MILITIA = new AntRole(27, TYPE_WORKER, "Militia Auxiliary");
+    static { antRoles.add(ROLE_MILITIA); }
+    public static final AntRole ROLE_CATCHER = new AntRole(28, TYPE_SOLDIER, "Catcher");
+    static { antRoles.add(ROLE_CATCHER); }
+    public static final AntRole ROLE_CRANE = new AntRole(29, TYPE_MAJOR, "Construction Crane");
+    static { antRoles.add(ROLE_CRANE); }
+    public static final AntRole ROLE_TRANSPORT = new AntRole(30, TYPE_MAJOR, "Resource Transport");
+    static { antRoles.add(ROLE_TRANSPORT); }
+    public static final AntRole ROLE_ASSISTANT = new AntRole(31, TYPE_PRINCESS, "Lab Assistant");
+    static { antRoles.add(ROLE_ASSISTANT); }
+    public static final AntRole ROLE_ESCORT = new AntRole(32, TYPE_SOLDIER, "Convoy Escort");
+    static { antRoles.add(ROLE_ESCORT); }
 
-        colonyRanks.add(RANK_ANT);
-        colonyRanks.add(RANK_COLONY);
-        colonyRanks.add(RANK_COUNTY);
-        colonyRanks.add(RANK_DUCHY);
-        colonyRanks.add(RANK_KINGDOM);
-        colonyRanks.add(RANK_EMPIRE);
-        colonyRanks.add(RANK_SUPER);
-        colonyRanks.add(RANK_ULTRA);
-        colonyRanks.add(RANK_HYPER);
-        colonyRanks.add(RANK_MEGA);
-        colonyRanks.add(RANK_ULTIMATE);
-        colonyRanks.add(RANK_SUPREME);
-        colonyRanks.add(RANK_GIGA);
-
-        temperature.add(TEMP_FREEZING);
-        temperature.add(TEMP_COLD);
-        temperature.add(TEMP_CHILLY);
-        temperature.add(TEMP_GOOD);
-        temperature.add(TEMP_WARM);
-        temperature.add(TEMP_HOT);
-        temperature.add(TEMP_BURNING);
-
-        humidity.add(HUMID_0);
-        humidity.add(HUMID_1);
-        humidity.add(HUMID_2);
-        humidity.add(HUMID_3);
-        humidity.add(HUMID_4);
-        humidity.add(HUMID_5);
-
-        misc.add(ICON_APHID);
-        misc.add(ICON_RESEARCH);
-        
-    }
+    // --- Colony Ranks ---
+    public static final ColonyRank RANK_ANT = new ColonyRank(1, "Ant", 1l, 
+        loadIcon("icons/ranks/ant.png"));
+    static { colonyRanks.add(RANK_ANT); }
+    public static final ColonyRank RANK_COLONY = new ColonyRank(2, "Ant Colony", 10l, 
+        loadIcon("icons/ranks/colony.png"));
+    static { colonyRanks.add(RANK_COLONY); }
+    public static final ColonyRank RANK_COUNTY = new ColonyRank(3, "Ant County", 100l, 
+        loadIcon("icons/ranks/county.png"));
+    static { colonyRanks.add(RANK_COUNTY); }
+    public static final ColonyRank RANK_DUCHY = new ColonyRank(4, "Ant Duchy", 1000l, 
+        loadIcon("icons/ranks/duchy.png"));
+    static { colonyRanks.add(RANK_DUCHY); }
+    public static final ColonyRank RANK_KINGDOM = new ColonyRank(5, "Ant Queendom", 10000l, 
+        loadIcon("icons/ranks/kingdom.png"));
+    static { colonyRanks.add(RANK_KINGDOM); }
+    public static final ColonyRank RANK_EMPIRE = new ColonyRank(6, "Ant Empire", 100000l, 
+        loadIcon("icons/ranks/empire.png"));
+    static { colonyRanks.add(RANK_EMPIRE); }
+    public static final ColonyRank RANK_SUPER = new ColonyRank(7, "Ant Super Colony", 1000000l, 
+        loadIcon("icons/ranks/super.png"));
+    static { colonyRanks.add(RANK_SUPER); }
+    public static final ColonyRank RANK_ULTRA = new ColonyRank(8, "Ant Ultra Colony", 10000000l, 
+        loadIcon("icons/ranks/ultra.png"));
+    static { colonyRanks.add(RANK_ULTRA); }
+    public static final ColonyRank RANK_HYPER = new ColonyRank(9, "Ant Hyper Colony", 100000000l, 
+        loadIcon("icons/ranks/hyper.png"));
+    static { colonyRanks.add(RANK_HYPER); }
+    public static final ColonyRank RANK_MEGA = new ColonyRank(10, "Ant Mega Colony", 1000000000l, 
+        loadIcon("icons/ranks/mega.png"));
+    static { colonyRanks.add(RANK_MEGA); }
+    public static final ColonyRank RANK_ULTIMATE = new ColonyRank(11, "Ant Ultimate Colony", 10000000000l, 
+        loadIcon("icons/ranks/ultimate.png"));
+    static { colonyRanks.add(RANK_ULTIMATE); }
+    public static final ColonyRank RANK_SUPREME = new ColonyRank(12, "Ant Supreme Colony", 100000000000l, 
+        loadIcon("icons/ranks/supreme.png"));
+    static { colonyRanks.add(RANK_SUPREME); }
+    public static final ColonyRank RANK_GIGA = new ColonyRank(13, "Ant Giga Colony", 1000000000000l, 
+        loadIcon("icons/ranks/giga.png"));
+    static { colonyRanks.add(RANK_GIGA); }
     
-    // --- Public Static Getters ---
+    // --- Species ---
     
+    // --- Getters ---
     public static List<Biome> getBiomes() {
         return Collections.unmodifiableList(biomes);
     }
