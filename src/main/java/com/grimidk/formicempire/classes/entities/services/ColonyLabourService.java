@@ -59,28 +59,28 @@ public class ColonyLabourService {
         for (ResourceSource source : sources) {
             if (powerAvailable <= 0) break;
         
-            int current = 0;
-            int max = 0;
+            double current = 0;
+            double max = 0;
             
             if (type == GameConstants.PLANT_RESOURCE) {
-                current = colony.getPlants(); max = stats.getPlantsCapacity(colony);
+                current = colony.getPlantsPrecise(); max = stats.getPlantsCapacity(colony);
             } else if (type == GameConstants.WATER_RESOURCE) {
-                current = colony.getWater(); max = stats.getWaterCapacity(colony);
+                current = colony.getWaterPrecise(); max = stats.getWaterCapacity(colony);
             } else if (type == GameConstants.MEAT_RESOURCE) {
-                current = colony.getProtein(); max = stats.getProteinCapacity(colony);
+                current = colony.getProteinPrecise(); max = stats.getProteinCapacity(colony);
             } else if (type == GameConstants.ROCK_RESOURCE) {
-                current = colony.getMinerals(); max = stats.getMineralsCapacity(colony);
+                current = colony.getMineralsPrecise(); max = stats.getMineralsCapacity(colony);
             }
             
-            int space = max - current;
+            double space = max - current;
             if (space <= 0) break; 
 
-            int gatherAmount = Math.min(powerAvailable, space);
+            int gatherAmount = Math.min(powerAvailable, (int) Math.ceil(space));
             int actualGathered = locations.gatherFromSource(colony, source, gatherAmount);
             
             if (actualGathered > 0) {
                 if (type == GameConstants.PLANT_RESOURCE) {
-                    colony.setPlants(colony.getPlants() + actualGathered); 
+                    colony.setPlants(colony.getPlantsPrecise() + actualGathered); 
                     
                     for(int i = 0; i < actualGathered; i++) {
                         if (workerIndex >= workers.size()) workerIndex = 0;
@@ -89,9 +89,9 @@ public class ColonyLabourService {
                         
                         if (colony.hasUpgrade(GameUnlocks.ABILITY_RESIN)) {
                              if (random.nextInt(100) < 1) {
-                                 int resinSpace = stats.getResinsCapacity(colony) - colony.getResins();
+                                 double resinSpace = stats.getResinsCapacity(colony) - colony.getResinsPrecise();
                                  if (resinSpace > 0) {
-                                     colony.setResins(colony.getResins() + 1);
+                                     colony.setResins(colony.getResinsPrecise() + 1);
                                      worker.setCarryingSec(GameConstants.RESIN_RESOURCE);
                                  }
                              }
@@ -100,9 +100,9 @@ public class ColonyLabourService {
                     }
                     
                 } else {
-                    if (type == GameConstants.WATER_RESOURCE) colony.setWater(colony.getWater() + actualGathered);
-                    else if (type == GameConstants.MEAT_RESOURCE) colony.setProtein(colony.getProtein() + actualGathered);
-                    else if (type == GameConstants.ROCK_RESOURCE) colony.setMinerals(colony.getMinerals() + actualGathered);
+                    if (type == GameConstants.WATER_RESOURCE) colony.setWater(colony.getWaterPrecise() + actualGathered);
+                    else if (type == GameConstants.MEAT_RESOURCE) colony.setProtein(colony.getProteinPrecise() + actualGathered);
+                    else if (type == GameConstants.ROCK_RESOURCE) colony.setMinerals(colony.getMineralsPrecise() + actualGathered);
                     
                     for(Ant w : workers) {
                         w.setCarrying(type);
@@ -124,7 +124,7 @@ public class ColonyLabourService {
         return false;
     }
 
-public void runCollecting(Colony colony) {
+    public void runCollecting(Colony colony) {
         ColonyStatsService stats = colony.getStatsService();
         ColonyLocationService locations = colony.getLocationService();
         
@@ -180,12 +180,12 @@ public void runCollecting(Colony colony) {
 
         // --- Passive Water ---
         if (colony.hasBuilding(GameUnlocks.PASSIVE_WATER)) {
-            int currentWater = colony.getWater();
-            int maxWater = stats.getWaterCapacity(colony);
+            double currentWater = colony.getWaterPrecise();
+            double maxWater = stats.getWaterCapacity(colony);
             if (currentWater < maxWater) {
-                int gain = (int)(maxWater * 0.10f);
+                double gain = (maxWater * 0.10);
                 if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
-                    gain = (int)(maxWater * 0.20f);
+                    gain = (maxWater * 0.20);
                 }
                 colony.setWater(Math.min(currentWater + gain, maxWater));
             }
@@ -204,19 +204,19 @@ public void runCollecting(Colony colony) {
         if (colony.getMushrooms() >= stats.getMushroomsCapacity(colony)) return;
         
         if (Math.random() <= stats.getConversionRate(colony)) {
-            if (colony.getPlants() >= farmerCount) {
-                colony.setPlants(colony.getPlants() - farmerCount);
-                colony.setMushrooms(Math.min(colony.getMushrooms() + farmerCount, stats.getMushroomsCapacity(colony)));
+            if (colony.getPlantsPrecise() >= farmerCount) {
+                colony.setPlants(colony.getPlantsPrecise() - farmerCount);
+                colony.setMushrooms(Math.min(colony.getMushroomsPrecise() + farmerCount, (double)stats.getMushroomsCapacity(colony)));
             }
         }
         
         if (colony.getMushrooms() >= stats.getMushroomsCapacity(colony)) return;
         
         if (Math.random() <= stats.getConversionRate(colony)) {
-            if (colony.getProtein() >= farmerCount) {
-                colony.setProtein(colony.getProtein() - farmerCount);
+            if (colony.getProteinPrecise() >= farmerCount) {
+                colony.setProtein(colony.getProteinPrecise() - farmerCount);
                 int mushroomGain = farmerCount * 2;
-                colony.setMushrooms(Math.min(colony.getMushrooms() + mushroomGain, stats.getMushroomsCapacity(colony)));
+                colony.setMushrooms(Math.min(colony.getMushroomsPrecise() + mushroomGain, (double)stats.getMushroomsCapacity(colony)));
             }
         }
     }
@@ -224,10 +224,12 @@ public void runCollecting(Colony colony) {
     public void runRanching(Colony colony) {
         if (!colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) return;
         
+        colony.setAphids(colony.getAphids()); 
+        
         ColonyStatsService stats = colony.getStatsService();
         int syrupGain = (int) (colony.getAphids()); 
-        colony.setPlants(Math.max(0, colony.getPlants() - syrupGain));
-        colony.setSyrups(Math.min(colony.getSyrups() + syrupGain, stats.getSyrupsCapacity(colony)));
+        colony.setPlants(Math.max(0, colony.getPlantsPrecise() - syrupGain));
+        colony.setSyrups(Math.min(colony.getSyrupsPrecise() + syrupGain, (double)stats.getSyrupsCapacity(colony)));
     }
 
     public void runHerding(Colony colony, Biome biome) {
@@ -360,8 +362,8 @@ public void runCollecting(Colony colony) {
             if (random.nextFloat() < detectionRate) {
                 parasitesKilled++;
                 
-                int currentProtein = colony.getProtein();
-                int maxProtein = colony.getStatsService().getProteinCapacity(colony);
+                double currentProtein = colony.getProteinPrecise();
+                double maxProtein = colony.getStatsService().getProteinCapacity(colony);
                 colony.setProtein(Math.min(currentProtein + 4, maxProtein));
             }
         }
@@ -533,9 +535,13 @@ public void runCollecting(Colony colony) {
         List<Ant> gravers = getWorkingAnts(colony, GameConstants.ROLE_GRAVER);
         int graverCount = gravers.size();
 
-        if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
+        if (colony.hasBuilding(GameUnlocks.PASSIVE_GRAVE)) {
+            if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
                 graverCount += 2;
-            } else { graverCount += 1; }
+            } else { 
+                graverCount += 1; 
+            }
+        }
         
         boolean hasBodies = !colony.getDeadAnts().isEmpty();
         for (Ant graver : gravers) {
@@ -578,7 +584,7 @@ public void runCollecting(Colony colony) {
 
         int mushroomGain = actualToCompost * 4; 
         int capacity = colony.getStatsService().getMushroomsCapacity(colony);
-        colony.setMushrooms(Math.min(colony.getMushrooms() + mushroomGain, capacity));
+        colony.setMushrooms(Math.min(colony.getMushroomsPrecise() + mushroomGain, (double)capacity));
         
         if (actualToCompost > 0) {
             colony.logEvent("COMPOST: Recycled " + actualToCompost + " bodies into mushroom matter.");

@@ -25,6 +25,7 @@ public class RoleManagementDialog extends ZeroDialog {
     private final Colony colony;
     private final JTabbedPane tabbedPane = new JTabbedPane();
     private final List<RolePanel> rolePanels = new ArrayList<>();
+    private final Set<AntType> initializedTypes = new HashSet<>();
 
     public RoleManagementDialog(JFrame owner, Colony colony) {
         super(owner, "Manage Ant Roles", new Dimension(550, 500));
@@ -46,14 +47,14 @@ public class RoleManagementDialog extends ZeroDialog {
 
     @Override
     protected void refreshDialog() {
-        // For RoleManagement, refreshing is checking active tabs/roles
-        // We do this via liveUpdate mostly, but basic checks here
+        initTabs();
         for (RolePanel panel : rolePanels) {
             panel.updateData();
         }
     }
     
     public void showDialog(int tabIndex) {
+        refreshDialog(); 
         selectTab(tabIndex);
         super.showDialog();
     }
@@ -76,10 +77,15 @@ public class RoleManagementDialog extends ZeroDialog {
     }
     
     private void addRoleTab(AntType type, Upgrade requiredUpgrade) {
+        if (initializedTypes.contains(type)) {
+            return;
+        }
+
         if (colony.hasUpgrade(requiredUpgrade)) {
             RolePanel panel = new RolePanel(colony, type);
             rolePanels.add(panel);
             tabbedPane.addTab(type.getName(), type.getIcon(), panel);
+            initializedTypes.add(type);
         }
     }
     
@@ -112,6 +118,16 @@ public class RoleManagementDialog extends ZeroDialog {
         });
     }
 
+    private static AntRole getDefaultRoleForType(AntType type) {
+        if (type == GameConstants.TYPE_WORKER) return GameConstants.ROLE_FORAGER;
+        else if (type == GameConstants.TYPE_SOLDIER) return GameConstants.ROLE_HUNTER;
+        else if (type == GameConstants.TYPE_MAJOR) return GameConstants.ROLE_BRUTE; 
+        else if (type == GameConstants.TYPE_PRINCESS) return GameConstants.ROLE_BREEDER;
+        else if (type == GameConstants.TYPE_DRONE) return GameConstants.ROLE_DRONE;
+        else if (type == GameConstants.TYPE_QUEEN) return GameConstants.ROLE_LAYER;
+        return null; 
+    }
+
     private static Upgrade getUpgradeForRole(AntRole role) {
         if (role == GameConstants.ROLE_FORAGER) return GameUnlocks.ROLE_FORAGER;
         if (role == GameConstants.ROLE_SCOUT) return GameUnlocks.ROLE_SCOUT;
@@ -135,6 +151,7 @@ public class RoleManagementDialog extends ZeroDialog {
         if (!isShowing()) {
             return;
         }
+        initTabs();
         for (RolePanel panel : rolePanels) {
             panel.updateData();
         }
@@ -206,6 +223,7 @@ public class RoleManagementDialog extends ZeroDialog {
 
             spinner.addChangeListener(e -> {
                 int newValue = (Integer) spinner.getValue();
+                
                 int otherSpinnersTotal = 0;
                 for (Map.Entry<AntRole, JSpinner> entry : spinnerMap.entrySet()) {
                     if (entry.getValue() != spinner) {
@@ -217,8 +235,31 @@ public class RoleManagementDialog extends ZeroDialog {
                 int newTotalAssigned = newValue + otherSpinnersTotal;
 
                 if (newTotalAssigned > currentTotalAnts) {
+
+                    AntRole defaultRole = getDefaultRoleForType(antType);
+                    
+                    if (defaultRole != null && !role.equals(defaultRole) && spinnerMap.containsKey(defaultRole)) {
+                        
+                        int deficit = newTotalAssigned - currentTotalAnts;
+                        JSpinner defaultSpinner = spinnerMap.get(defaultRole);
+                        int defaultCount = (Integer) defaultSpinner.getValue();
+                        
+                        if (defaultCount >= deficit) {
+                            int newDefaultCount = defaultCount - deficit;
+                            defaultSpinner.setValue(newDefaultCount);
+                            colony.setAssignedRoleCount(defaultRole, newDefaultCount);
+                            
+                            colony.setAssignedRoleCount(role, newValue);
+                            updateData();
+                            return; 
+                        }
+                    }
+                    
                     int allowedValue = Math.max(0, currentTotalAnts - otherSpinnersTotal);
-                    SwingUtilities.invokeLater(() -> spinner.setValue(allowedValue));
+                    
+                    final int finalAllowed = allowedValue;
+                    SwingUtilities.invokeLater(() -> spinner.setValue(finalAllowed));
+                    
                     newValue = allowedValue;
                 }
                 
@@ -235,6 +276,13 @@ public class RoleManagementDialog extends ZeroDialog {
         
         void updateData() {
             checkAndAddRoles();
+            
+            for (Map.Entry<AntRole, JSpinner> entry : spinnerMap.entrySet()) {
+                int colonyValue = colony.getAssignedRoleCount(entry.getKey());
+                if ((Integer)entry.getValue().getValue() != colonyValue) {
+                    entry.getValue().setValue(colonyValue);
+                }
+            }
             
             int totalAnts = colony.getAntsByType(antType).size();
             totalLabel.setText("Total " + antType.getName() + "s: " + totalAnts);

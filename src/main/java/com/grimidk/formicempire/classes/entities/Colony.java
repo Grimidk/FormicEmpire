@@ -36,6 +36,7 @@ public class Colony {
     private boolean isPlayer;
     private ColonyRank rank;
     private boolean isActive;
+    private boolean automationEnabled = false; 
     
     // --- Population Data ---
     private final Map<AntType, List<Ant>> antGroups;
@@ -47,13 +48,14 @@ public class Colony {
     private final Set<Building> buildings;
 
     // --- Resource Data ---
-    private int plants;
-    private int mushrooms;
-    private int protein;
-    private int water;
-    private int syrups;
-    private int resins;
-    private int minerals;
+    private double plants;
+    private double mushrooms;
+    private double protein;
+    private double water;
+    private double syrups;
+    private double resins;
+    private double minerals;
+    
     private int aphids; 
     private int parasites;
     private int researchPoints;
@@ -91,6 +93,7 @@ public class Colony {
     private transient ColonyLocationService locationService;
     private transient ColonySumarizationService sumarizationService;
     private transient ColonyDeathService trackingService;
+    private transient ColonyAutomationService automationService;
 
     // --- Service Initializer ---
     private void initializeServices() {
@@ -100,7 +103,8 @@ public class Colony {
         this.physicsService = new ColonyPhysicsService();
         this.locationService = new ColonyLocationService();
         this.sumarizationService = new ColonySumarizationService();
-        this.trackingService = new ColonyDeathService(); 
+        this.trackingService = new ColonyDeathService();
+        this.automationService = new ColonyAutomationService(); 
     }
 
     // --- Initialization Methods ---
@@ -381,6 +385,8 @@ public class Colony {
     public void setRank(ColonyRank rank) { this.rank = rank; }
     public boolean isActive() { return isActive; }
     public void setActive(boolean isActive) { this.isActive = isActive; }
+    public boolean isAutomationEnabled() { return automationEnabled; }
+    public void setAutomationEnabled(boolean automationEnabled) { this.automationEnabled = automationEnabled; }
 
     public Map<AntType, List<Ant>> getAntGroups() { return antGroups; } 
     public List<Ant> getAntsByType(AntType type) { return antGroups.getOrDefault(type, new CopyOnWriteArrayList<>()); }
@@ -436,62 +442,75 @@ public class Colony {
         return true;
     }
     
-    // --- Resource Getters/Setters with Clamping ---
-    public int getPlants() { return plants; }
-    public void setPlants(int plants) { 
-        this.plants = Math.max(0, Math.min(plants, getPlantsCapacity())); 
+    // --- Resource Getters/Setters ---
+    public int getPlants() { return (int) plants; }
+    public int getMushrooms() { return (int) mushrooms; }
+    public int getProtein() { return (int) protein; }
+    public int getWater() { return (int) water; }
+    public int getSyrups() { return (int) syrups; }
+    public int getResins() { return (int) resins; }
+    public int getMinerals() { return (int) minerals; }
+
+    public double getPlantsPrecise() { return plants; }
+    public double getMushroomsPrecise() { return mushrooms; }
+    public double getProteinPrecise() { return protein; }
+    public double getWaterPrecise() { return water; }
+    public double getSyrupsPrecise() { return syrups; }
+    public double getResinsPrecise() { return resins; }
+    public double getMineralsPrecise() { return minerals; }
+    
+    public void setPlants(double plants) { 
+        this.plants = Math.max(0, Math.min(plants, (double)getPlantsCapacity())); 
     }
-    public int getMushrooms() { return mushrooms; }
-    public void setMushrooms(int mushrooms) { 
-        this.mushrooms = Math.max(0, Math.min(mushrooms, getMushroomsCapacity())); 
+    public void setMushrooms(double mushrooms) { 
+        this.mushrooms = Math.max(0, Math.min(mushrooms, (double)getMushroomsCapacity())); 
     }
-    public int getProtein() { return protein; }
-    public void setProtein(int protein) { 
-        this.protein = Math.max(0, Math.min(protein, getProteinCapacity())); 
+    public void setProtein(double protein) { 
+        this.protein = Math.max(0, Math.min(protein, (double)getProteinCapacity())); 
     }
-    public int getWater() { return water; }
-    public void setWater(int water) { 
-        this.water = Math.max(0, Math.min(water, getWaterCapacity())); 
+    public void setWater(double water) { 
+        this.water = Math.max(0, Math.min(water, (double)getWaterCapacity())); 
     }
-    public int getSyrups() { return syrups; }
-    public void setSyrups(int syrups) { 
-        this.syrups = Math.max(0, Math.min(syrups, getSyrupsCapacity())); 
+    public void setSyrups(double syrups) { 
+        this.syrups = Math.max(0, Math.min(syrups, (double)getSyrupsCapacity())); 
     }
-    public int getResins() { return resins; }
-    public void setResins(int resins) { 
-        this.resins = Math.max(0, Math.min(resins, getResinsCapacity())); 
+    public void setResins(double resins) { 
+        this.resins = Math.max(0, Math.min(resins, (double)getResinsCapacity())); 
     }
-    public int getMinerals() { return minerals; }
-    public void setMinerals(int minerals) { 
-        this.minerals = Math.max(0, Math.min(minerals, getMineralsCapacity())); 
+    public void setMinerals(double minerals) { 
+        this.minerals = Math.max(0, Math.min(minerals, (double)getMineralsCapacity())); 
     }
 
     public int getAphids() { return aphids; }
     public void setAphids(int count) { 
-        this.aphids = Math.max(0, count); 
+        int rancherCount = getAssignedRoleCount(GameConstants.ROLE_RANCHER);
+        int maxAphids = Integer.MAX_VALUE;
+        if (statsService != null) {
+            maxAphids = statsService.getAphidCapacity(this) * rancherCount;
+        }
         
-        if (this.bugs.stream().filter(b -> b.getBugType() == GameConstants.TYPE_APHID).count() != this.aphids) {
-            long currentAphids = this.bugs.stream().filter(b -> b.getBugType() == GameConstants.TYPE_APHID).count();
-            if (currentAphids < this.aphids) {
-                 int diff = this.aphids - (int)currentAphids;
-                 Rectangle yard = getRancherBounds();
-                 if (yard == null) yard = new Rectangle(10, 10, 256, 256); 
-                 for(int i=0; i<diff; i++) {
-                    Bug newBug = new Bug(GameConstants.TYPE_APHID);
-                    if (physicsService != null) {
-                        Point spawnPos = physicsService.getSpecificRoomPoint(this, yard);
-                        newBug.setPosition(spawnPos);
-                    }
-                    this.bugs.add(newBug);
+        this.aphids = Math.max(0, Math.min(count, maxAphids)); 
+        
+        long currentAphids = this.bugs.stream().filter(b -> b.getBugType() == GameConstants.TYPE_APHID).count();
+        if (currentAphids < this.aphids) {
+             int diff = this.aphids - (int)currentAphids;
+             Rectangle yard = getRancherBounds();
+             if (yard == null) yard = new Rectangle(10, 10, 256, 256); 
+             for(int i=0; i<diff; i++) {
+                Bug newBug = new Bug(GameConstants.TYPE_APHID);
+                if (physicsService != null) {
+                    Point spawnPos = physicsService.getSpecificRoomPoint(this, yard);
+                    newBug.setPosition(spawnPos);
                 }
-            } else {
-                int diff = (int)currentAphids - this.aphids;
-                for(int i=0; i<diff; i++) {
-                    for(Bug b : this.bugs) {
-                        if (b.getBugType() == GameConstants.TYPE_APHID) {
-                            this.bugs.remove(b);
-                            break;
-                        }
+                this.bugs.add(newBug);
+            }
+        } else if (currentAphids > this.aphids) {
+            int diff = (int)currentAphids - this.aphids;
+            for(int i=0; i<diff; i++) {
+                for(Bug b : this.bugs) {
+                    if (b.getBugType() == GameConstants.TYPE_APHID) {
+                        this.bugs.remove(b);
+                        break;
                     }
                 }
             }
@@ -729,13 +748,19 @@ public class Colony {
 
     public void runHourlyJobs() {
         if (this.isActive) {
+            if (this.automationEnabled) {
+                this.automationService.runAutomation(this);
+            }
             this.runRoleAssignment();
-            this.runCollecting();
             this.runLaying();
             this.runResearch();
             this.runRanching();
             this.runBuilding();
+            this.runCollecting(); 
         } else {
+            if (this.automationEnabled) {
+                this.automationService.runAutomation(this);
+            }
             this.populationService.runRoleAssignment(this); 
             this.sumarizationService.runHourlyLite(this);
         }

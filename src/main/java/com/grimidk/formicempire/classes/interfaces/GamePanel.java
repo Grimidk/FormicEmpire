@@ -28,12 +28,11 @@ public class GamePanel extends ZeroGamePanel {
     private GameAreaPanel gameAreaPanel;
     
     private HatchRateDialog hatchDialog;
-    private RoleManagementDialog roleDialog;
-    private ResearchDialog researchDialog;
-    private BuildDialog buildDialog;
+    private RoleManagementDialog roleDialog;    
+    private UpgradeDialog upgradeDialog; 
     private AbilitiesDialog abilitiesDialog;
     private MapDialog mapDialog;
-    private ColonyStatsDialog statsDialog; 
+    private StatsDialog statsDialog; 
 
     private AlertManager alertManager;
     private TriggerManager triggerManager; 
@@ -68,9 +67,9 @@ public class GamePanel extends ZeroGamePanel {
     
     private void initControlPanelCallbacks() {
         Runnable handleBackButtonCallback = this::handleBackButton;
-        Runnable showHatchRateDialogCallback = this::showHatchRateDialog;
+        Runnable showHatchRateDialogCallback = this::showHatchRateDialog;        
         Runnable showResearchDialogCallback = this::showResearchDialog;
-        Runnable showBuildDialogCallback = this::showBuildDialog;
+        Runnable showBuildDialogCallback = this::showBuildDialog;  
         Runnable showAbilitiesDialogCallback = this::showAbilitiesDialog;
         Runnable showMapDialogCallback = this::showMapDialog; 
         Runnable showStatsDialogCallback = this::showStatsDialog;
@@ -176,12 +175,12 @@ public class GamePanel extends ZeroGamePanel {
         Engine engine = frame.getEngine();
         Colony colony = getColonyFromEngine(engine);
         if (colony == null || !colony.isPlayer()) return;
-                
-        if (researchDialog == null || researchDialog.getOwner() != frame) {
-            if (researchDialog != null) researchDialog.dispose();
-            researchDialog = new ResearchDialog(frame, colony);
+        
+        if (upgradeDialog == null || upgradeDialog.getOwner() != frame) {
+            if (upgradeDialog != null) upgradeDialog.dispose();
+            upgradeDialog = new UpgradeDialog(frame, colony);
         }
-        researchDialog.showDialog();
+        upgradeDialog.showDialog(UpgradeDialog.TAB_RESEARCH);
     }
     
     private void showBuildDialog() {
@@ -189,11 +188,11 @@ public class GamePanel extends ZeroGamePanel {
         Colony colony = getColonyFromEngine(engine);
         if (colony == null || !colony.isPlayer()) return;
         
-        if (buildDialog == null || buildDialog.getOwner() != frame) {
-            if (buildDialog != null) buildDialog.dispose();
-            buildDialog = new BuildDialog(frame, colony);
+        if (upgradeDialog == null || upgradeDialog.getOwner() != frame) {
+            if (upgradeDialog != null) upgradeDialog.dispose();
+            upgradeDialog = new UpgradeDialog(frame, colony);
         }
-        buildDialog.showDialog();
+        upgradeDialog.showDialog(UpgradeDialog.TAB_BUILD);
     }
 
     private void showAbilitiesDialog() {
@@ -223,12 +222,13 @@ public class GamePanel extends ZeroGamePanel {
     private void showStatsDialog() {
         Engine engine = frame.getEngine();
         Colony colony = getColonyFromEngine(engine);
-        if (colony == null || !colony.isPlayer()) return;
+        if (colony == null) return;
 
-        if (statsDialog == null || statsDialog.getOwner() != frame) {
-            if (statsDialog != null) statsDialog.dispose();
-            statsDialog = new ColonyStatsDialog(frame, colony, engine);
+        if (statsDialog != null) {
+            statsDialog.dispose();
         }
+        
+        statsDialog = new StatsDialog(frame, colony, engine);
         statsDialog.showDialog();
     }
     
@@ -242,8 +242,7 @@ public class GamePanel extends ZeroGamePanel {
     private void disposeAllDialogs() {
         if (hatchDialog != null) { hatchDialog.dispose(); hatchDialog = null; }
         if (roleDialog != null) { roleDialog.dispose(); roleDialog = null; }
-        if (researchDialog != null) { researchDialog.dispose(); researchDialog = null; }
-        if (buildDialog != null) { buildDialog.dispose(); buildDialog = null; }
+        if (upgradeDialog != null) { upgradeDialog.dispose(); upgradeDialog = null; }
         if (abilitiesDialog != null) { abilitiesDialog.dispose(); abilitiesDialog = null; }
         if (mapDialog != null) { mapDialog.dispose(); mapDialog = null; }
         if (statsDialog != null) { statsDialog.dispose(); statsDialog = null; }
@@ -462,11 +461,8 @@ public class GamePanel extends ZeroGamePanel {
         colonyPanel.updateHourData(colony);
         
         if (colony != null && colony.isPlayer()) {
-            if (researchDialog != null && researchDialog.isShowing()) {
-                researchDialog.liveUpdate();
-            }
-            if (buildDialog != null && buildDialog.isShowing()) {
-                buildDialog.liveUpdate();
+            if (upgradeDialog != null && upgradeDialog.isShowing()) {
+                upgradeDialog.liveUpdate();
             }
             if (abilitiesDialog != null && abilitiesDialog.isShowing()) {
                 abilitiesDialog.liveUpdate();

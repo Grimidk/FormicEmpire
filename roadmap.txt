@@ -4,20 +4,15 @@ To Fix:
 	Urgent:
 	
 	High:
-	summarization too powerful (don’t dehydrate / nursing )
-	stats for npc
-	basic npc ai so they can snowball
 
 	Mid:
-	rounding errors
-	upgrades dialog (research, building, assimilation, synergies)
-	ants staying unassigned and alert if they do so and default kinda works	
+	automate scouting, graving, researching and building 
+	handle colony death when not main or playable
 
 	Low:
 	colony scroll down
 	not dynamic colony sprites while stretching screen 
 	builders act weird af in build zone
-	soldier tab not seeable without reloading after unlocking
 	reorganize repositories
 	
 To Feature:
@@ -27,12 +22,14 @@ Needed for launch (v1.0) (Launch Version):
 
 	Everything else:
 	colonizing and trade routes (async with roles and incoming outgoing recurrent and one time and travel time and danger level and boring tunnels) and new colonies and civilizations-species (species empress?) (research inheritance)	
-	breeders go out of the colony 
+	breeders go out of the colony in nuptial
 	auxiliary room sprites (storage (resources), farm (shroom), nurse (bedding), royal (nests and science)) and expansion (breeder room)
 	more settings (allow idle to forage, allow unassigned, choose default, change roles to proportions (may use by npc), fuzzed parasites, arachnophobia mode ?)
 	more species and more bugs (constants and icons)
 	assimilation of species for upgrades and research assimilation system
 	assimilated species get added to a pool for drones and avoid genetic estagnation
+	assimilation Multi queen (Pharaoh ants), Super majors (Marauder ants), Trap-jaw (Trap jaw ants), Honey-pot (Honey pot ants), Door-head (Turtle ants), Wood burrowing (Carpenter ants), Silk weaving (Weaver ants), Rafting (Flood plains ants), Fire venom (Fire ants), Jumping (Jet ants), Gliding (Gliding ants), Stinging (Bullet ants), Swarming (Army ants), Stealth (Ghost ants), Fast bitting (Dracula ants), Heat resistance (Saharan silver ants), Deadly venom (Harvester ants), Self destruction (Exploding ants), Far sight (Bulldog ants), Hive building (Shining black ants), Location sensing (Desert ants)
+	civ/specie ascension with ranks and unlocking (Automation, Cloning ants, Taming bugs, Bone smithing)
 	ant subtypes (enable by role /  exclusion) checks with new sprites 
 	more communism (?)
 	visual filters for weather, time of day, biome etc.
@@ -43,25 +40,27 @@ Needed for launch (v1.0) (Launch Version):
 	more upgrades (stronger start)
 	more buildings
 	more roles (commander and captain roles, air force)
-	more enemies
-	more stats (world, kills, historic productions, graphs?)
-	diplomacy and diplomatic reputation and alliances and wars
-	battle system 
+	more enemies ( Rebel ant colonies, Bugs, Arachnids, Reptiles, Birds, Rodents, Zombie ant colonies, Parasitic ants)
+	more stats (kills, historic productions, graphs?)
+	diplomacy and diplomatic reputation and alliances and wars 
+	battle system (mass battle in land and air)
+	synergies ( Super majors + Chemical throwing = Artillery ants; Self destruction + Acid spitting = Corrosive bombs; Silk weaving + Hive building = Web building; Airforce ants + self destruction = Airbomber ants)
+	non-ant assimilation ( Winged workers (Bees), Spiked larvae, Chemical throwing (Bombardier beetle), Chirping (Grass hopper), Diving, Mineralized exoskeletons, Rock mining, Bioluminescence (Fireflies), Static electricity generation, Pollination (Flies) )
 	rework tutorial and obscure unlocks
 	rework menus and key binds and how the ui looks
 	rework start and choose difficulty / biome / species
 	rework abilities and alerts and triggers (new classes?)
 	rework saves to be cleaner
 	rework manager and aux files
-	ant menus
+	ant menus (detailed per ant)
 	music and sounds and settings for them
 	langs (ENG, SPA, POR, FRE, GER, RUS, CHN, JAP)
 	good interfaces with sauce, fonts with spice, cool cursor
-	warning screen
+	warning screen for arthropophobia 
 	start animation and general animations
 	package into playable
-	register Grim Games
-	versioning
+	register Grim Games or Grimidk in steam as dev team
+	versioning to go back to previous stable patches
 	cleanup code (no placeholders) and refactor inefficiencies with inheritance and stuff, hexagonal architecture, async functions and clean comments 
 
 Post launch (v1.1) (Improvements Update):

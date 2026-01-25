@@ -2,6 +2,7 @@ package com.grimidk.formicempire.classes.infrasctructure.managers;
 
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
@@ -15,7 +16,7 @@ import java.util.List;
 public class TriggerManager {
 
     private final World world;
-    private final Colony colony;
+    private final Colony playerColony;
     private final Engine engine;
     
     private final List<TriggerListener> listeners = new ArrayList<>();
@@ -23,7 +24,7 @@ public class TriggerManager {
 
     public TriggerManager(World world, Colony colony, Engine engine) {
         this.world = world;
-        this.colony = colony;
+        this.playerColony = colony;
         this.engine = engine;
     }
 
@@ -43,7 +44,7 @@ public class TriggerManager {
     }
     
     private void fireTrigger(Upgrade upgrade, String title, String message) {
-        colony.unlockUpgrade(upgrade);
+        playerColony.unlockUpgrade(upgrade);
         
         for (TriggerListener listener : listeners) {
             SwingUtilities.invokeLater(() -> {
@@ -60,7 +61,7 @@ public class TriggerManager {
         }
     }
 
-    // --- Trigger Check Methods ---
+    // --- Schedule Checks ---
     private void checkMonthlyTriggers() {
         checkResearchRoleUnlock();
         checkPoliceRoleUnlock();
@@ -69,6 +70,7 @@ public class TriggerManager {
     private void checkDailyTriggers() {
         checkGraveKeeperUnlock();
         checkColonyDeath();
+        checkAllNPCTriggers();
     }
 
     private void checkHourlyTriggers() {
@@ -81,14 +83,80 @@ public class TriggerManager {
         checkScoutRoleUnlock();
     }
 
-    // --- Specific Trigger Logic ---
-    private void checkResearchRoleUnlock() {
-        if (colony.hasUpgrade(GameUnlocks.ROLE_RESEARCHER)) {
-            return;
+    private void checkAllNPCTriggers() {
+        if (world == null || world.getHexes() == null) return;
+
+        for (Hex hex : world.getHexes()) {
+            Colony npc = hex.getColony();
+            if (npc == null || npc.isPlayer()) continue;
+
+            checkNPCResearcher(npc);
+            checkNPCGraver(npc);
+            checkNPCScout(npc);
+            checkNPCPolice(npc);
+            checkNPCUnitRoles(npc);
+            checkNPCAbilities(npc);
         }
+    }
+
+    private void checkNPCResearcher(Colony npc) {
+        if (npc.hasUpgrade(GameUnlocks.ROLE_RESEARCHER)) return;
+        if (npc.getAntTotal() > 20) {
+            npc.unlockUpgrade(GameUnlocks.ROLE_RESEARCHER);
+        }
+    }
+
+    private void checkNPCGraver(Colony npc) {
+        if (npc.hasUpgrade(GameUnlocks.ROLE_GRAVER)) return;
+        if (npc.getDeadAnts().size() >= 20) {
+            npc.unlockUpgrade(GameUnlocks.ROLE_GRAVER);
+        }
+    }
+
+    private void checkNPCScout(Colony npc) {
+        if (npc.hasUpgrade(GameUnlocks.ROLE_SCOUT)) return;
+        boolean lowFood = npc.getPlants() < (npc.getStatsService().getPlantsCapacity(npc) * 0.2);
+        boolean highPop = npc.getAntTotal() > 50;
+        if (lowFood || highPop) {
+            npc.unlockUpgrade(GameUnlocks.ROLE_SCOUT);
+        }
+    }
+
+    private void checkNPCPolice(Colony npc) {
+        if (npc.hasUpgrade(GameUnlocks.ROLE_POLICE)) return;
+        if (npc.getRank().getPopulation() >= 1000) {
+            npc.unlockUpgrade(GameUnlocks.ROLE_POLICE);
+        }
+    }
+
+    private void checkNPCUnitRoles(Colony npc) {
+        if (!npc.hasUpgrade(GameUnlocks.ROLE_HUNTER) && npc.hasUpgrade(GameUnlocks.TYPE_SOLDIER)) {
+            npc.unlockUpgrade(GameUnlocks.ROLE_HUNTER);
+        }
+        if (!npc.hasUpgrade(GameUnlocks.ROLE_BREEDER) && npc.hasUpgrade(GameUnlocks.TYPE_PRINCESS)) {
+            npc.unlockUpgrade(GameUnlocks.ROLE_BREEDER);
+        }
+        if (!npc.hasUpgrade(GameUnlocks.ROLE_BRUTE) && npc.hasUpgrade(GameUnlocks.TYPE_MAJOR)) {
+            npc.unlockUpgrade(GameUnlocks.ROLE_BRUTE);
+        }
+    }
+
+    private void checkNPCAbilities(Colony npc) {
+        if (!npc.hasUpgrade(GameUnlocks.ABILITY_RESEARCH) && npc.getResearchPoints() >= 100) {
+            npc.unlockUpgrade(GameUnlocks.ABILITY_RESEARCH);
+        }
+        if (!npc.hasUpgrade(GameUnlocks.ABILITY_BUILD) && npc.hasUpgrade(GameUnlocks.ROLE_BUILDER)) {
+            npc.unlockUpgrade(GameUnlocks.ABILITY_BUILD);
+        }
+        if (!npc.hasUpgrade(GameUnlocks.ABILITY_SPREAD) && npc.hasUpgrade(GameUnlocks.ROLE_BREEDER)) {
+            npc.unlockUpgrade(GameUnlocks.ABILITY_SPREAD);
+        }
+    }
+
+    private void checkResearchRoleUnlock() {
+        if (playerColony.hasUpgrade(GameUnlocks.ROLE_RESEARCHER)) return;
 
         boolean timeMet = world.getYear() > 0 || world.getMonth() > 1;
-
         if (timeMet) {
             fireTrigger(GameUnlocks.ROLE_RESEARCHER, 
                         "New Ideas", 
@@ -97,11 +165,9 @@ public class TriggerManager {
     }
     
     private void checkGraveKeeperUnlock() {
-        if (colony.hasUpgrade(GameUnlocks.ROLE_GRAVER)) {
-            return;
-        }
+        if (playerColony.hasUpgrade(GameUnlocks.ROLE_GRAVER)) return;
         
-        if (colony.getDeadAnts().size() >= 100) { 
+        if (playerColony.getDeadAnts().size() >= 100) { 
             fireTrigger(GameUnlocks.ROLE_GRAVER, 
                         "A Smelly Problem", 
                         "The bodies are piling up! Your workers have developed the Grave-Keeper role to clean the colony and prevent disease.");
@@ -109,11 +175,9 @@ public class TriggerManager {
     }
     
     private void checkResearchAbilityUnlock() {
-        if (colony.hasUpgrade(GameUnlocks.ABILITY_RESEARCH)) {
-            return;
-        }
+        if (playerColony.hasUpgrade(GameUnlocks.ABILITY_RESEARCH)) return;
         
-        if (colony.getResearchPoints() >= 100) {
+        if (playerColony.getResearchPoints() >= 100) {
             fireTrigger(GameUnlocks.ABILITY_RESEARCH, 
                         "Scientific Breakthrough", 
                         "Your colony has accumulated 100 Research Points! You can now access the Research panel (Y) from the game menu to purchase new upgrades.");
@@ -121,11 +185,9 @@ public class TriggerManager {
     }
     
     private void checkBuildAbilityUnlock() {
-        if (colony.hasUpgrade(GameUnlocks.ABILITY_BUILD)) {
-            return;
-        }
+        if (playerColony.hasUpgrade(GameUnlocks.ABILITY_BUILD)) return;
         
-        if (colony.hasUpgrade(GameUnlocks.ROLE_BUILDER)) {
+        if (playerColony.hasUpgrade(GameUnlocks.ROLE_BUILDER)) {
             fireTrigger(GameUnlocks.ABILITY_BUILD, 
                         "Construction Unlocked", 
                         "Your ants have learned the basics of construction! You can now access the Build panel (U) from the game menu.");
@@ -133,11 +195,9 @@ public class TriggerManager {
     }
     
     private void checkHunterRoleUnlock() {
-        if (colony.hasUpgrade(GameUnlocks.ROLE_HUNTER)) {
-            return;
-        }
+        if (playerColony.hasUpgrade(GameUnlocks.ROLE_HUNTER)) return;
         
-        if (colony.hasUpgrade(GameUnlocks.TYPE_SOLDIER)) {
+        if (playerColony.hasUpgrade(GameUnlocks.TYPE_SOLDIER)) {
             fireTrigger(GameUnlocks.ROLE_HUNTER,
                         "Hunter Instinct",
                         "Unlocking the Soldier ant type has automatically unlocked the 'Hunter' role for them.");
@@ -145,11 +205,9 @@ public class TriggerManager {
     }
     
     private void checkBreederRoleUnlock() {
-        if (colony.hasUpgrade(GameUnlocks.ROLE_BREEDER)) {
-            return;
-        }
+        if (playerColony.hasUpgrade(GameUnlocks.ROLE_BREEDER)) return;
         
-        if (colony.hasUpgrade(GameUnlocks.TYPE_PRINCESS)) {
+        if (playerColony.hasUpgrade(GameUnlocks.TYPE_PRINCESS)) {
             fireTrigger(GameUnlocks.ROLE_BREEDER,
                         "Nuptial Flights",
                         "Unlocking the Princess and Drone ant types has automatically unlocked the 'Breeder' role.");
@@ -157,11 +215,9 @@ public class TriggerManager {
     }
     
     private void checkBruteRoleUnlock() {
-        if (colony.hasUpgrade(GameUnlocks.ROLE_BRUTE)) {
-            return;
-        }
+        if (playerColony.hasUpgrade(GameUnlocks.ROLE_BRUTE)) return;
         
-        if (colony.hasUpgrade(GameUnlocks.TYPE_MAJOR)) {
+        if (playerColony.hasUpgrade(GameUnlocks.TYPE_MAJOR)) {
             fireTrigger(GameUnlocks.ROLE_BRUTE,
                         "Heavy Trooper",
                         "Unlocking the Major ant type has automatically unlocked the 'Brute' role for them.");
@@ -169,11 +225,9 @@ public class TriggerManager {
     }
     
     private void checkSpreadAbilityUnlock() {
-        if (colony.hasUpgrade(GameUnlocks.ABILITY_SPREAD)) {
-            return;
-        }
+        if (playerColony.hasUpgrade(GameUnlocks.ABILITY_SPREAD)) return;
         
-        if (colony.hasUpgrade(GameUnlocks.ROLE_BREEDER)) {
+        if (playerColony.hasUpgrade(GameUnlocks.ROLE_BREEDER)) {
             fireTrigger(GameUnlocks.ABILITY_SPREAD,
                         "Colony Colonization",
                         "With the ability to breed new queens, your colony now understands how to spread. You can found new colonies from the world map (I).");
@@ -181,10 +235,10 @@ public class TriggerManager {
     }
     
     private void checkScoutRoleUnlock() {
-        if (colony.hasUpgrade(GameUnlocks.ROLE_SCOUT)) return;
+        if (playerColony.hasUpgrade(GameUnlocks.ROLE_SCOUT)) return;
         
-        if (colony.getLocationService() != null && colony.getLocationService().getDiscoveredSources() != null) {
-            for (ResourceSource source : colony.getLocationService().getDiscoveredSources()) {
+        if (playerColony.getLocationService() != null && playerColony.getLocationService().getDiscoveredSources() != null) {
+            for (ResourceSource source : playerColony.getLocationService().getDiscoveredSources()) {
                 if (source.getResourceType() == GameConstants.PLANT_RESOURCE && source.getInitialQuantity() == 10000) {
                     int collected = source.getInitialQuantity() - source.getQuantity();
                     if (collected >= 6000) {
@@ -199,9 +253,9 @@ public class TriggerManager {
     }
 
     private void checkPoliceRoleUnlock() {
-        if (colony.hasUpgrade(GameUnlocks.ROLE_POLICE)) return;
+        if (playerColony.hasUpgrade(GameUnlocks.ROLE_POLICE)) return;
         
-        if (colony.getRank().getPopulation() >= 1000) {
+        if (playerColony.getRank().getPopulation() >= 1000) {
             fireTrigger(GameUnlocks.ROLE_POLICE, 
                 "Parasitic Infestation", 
                 "The colony has become so prosperous that parasitic ants may infiltrate it!");
@@ -209,11 +263,11 @@ public class TriggerManager {
     }
     
     private void checkColonyDeath() {
-        if (colonyDeathFired || !colony.hasUpgrade(GameUnlocks.TYPE_QUEEN)) {
+        if (colonyDeathFired || !playerColony.hasUpgrade(GameUnlocks.TYPE_QUEEN)) {
             return;
         }
         
-        if (colony.getQueens() != null && colony.getQueens().size() <= 0) {
+        if (playerColony.getQueens() != null && playerColony.getQueens().size() <= 0) {
             colonyDeathFired = true;
             fireColonyDeath();
         }
