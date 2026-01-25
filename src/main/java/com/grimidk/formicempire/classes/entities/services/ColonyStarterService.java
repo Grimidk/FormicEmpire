@@ -5,6 +5,7 @@ import java.util.List;
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
 import com.grimidk.formicempire.classes.infrasctructure.Dimension;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
@@ -93,5 +94,23 @@ public class ColonyStarterService {
             worker.setRole(role);
             worker.setDimension(dim);
         }
+    }
+
+    public void dismantleColony(Hex hex) {
+        if (hex == null || hex.getColony() == null) return;
+        Colony colony = hex.getColony();
+
+        if (colony.isPlayer()) return;
+
+        System.out.println("[ColonyStarterService] Dismantling dead NPC colony: " + colony.getName() + " at Hex (" + hex.getQ() + ", " + hex.getR() + ")");
+
+        colony.setActive(false);
+        colony.setAutomationEnabled(false);
+
+        clearColonyLists(colony);
+        if (colony.getDeadAnts() != null) colony.getDeadAnts().clear();
+        if (colony.getBugs() != null) colony.getBugs().clear();
+
+        hex.setColony(null);
     }
 }

@@ -641,6 +641,14 @@ public class World {
                 hex.getColony().runDailyJobs(this.getTemperatureIcon(), hex.getBiome());
             }
         }
+        
+        ColonyStarterService starter = new ColonyStarterService();
+        for (Hex hex : this.hexes) {
+            Colony c = hex.getColony();
+            if (c != null && !c.isPlayer() && c.getQueens().isEmpty()) {
+                starter.dismantleColony(hex);
+            }
+        }
 
         randomizeWeather();
 
