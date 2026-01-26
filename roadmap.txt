@@ -6,7 +6,7 @@ To Fix (By decreasing priority) :
 	High:
 
 	Mid:
-	hatch rate spinner taking away from worker like roles do
+	npc has too few builders
 
 	Low:
 	colony scroll down
@@ -19,7 +19,7 @@ Needed for launch (v1.0) (Launch Version):
 	design map and buttons and that (use simple colors and icons) and shows small tooltip of colonies
 
 	Everything else :
-	colonizing and new colonies and civilizations-species (species empress?) (research inheritance)	
+	colonizing and new colonies and civilizations-species (research inheritance)	
 	trade routes (async with roles and incoming outgoing recurrent and one time and travel time and danger level and boring tunnels)
 	breeders go out of the colony in nuptial
 	auxiliary room sprites (storage (resources), farm (shroom), nurse (bedding), royal (nests and science)) and expansion (breeder room)

@@ -187,7 +187,7 @@ public class StatsDialog extends ZeroDialog {
             }
             
             model.addRow(new Object[]{"Environment", "Temperature", world.getTemperature() + "°C"});
-            model.addRow(new Object[]{"Environment", "Humidity", world.getHumidity() + "%"});
+            model.addRow(new Object[]{"Environment", "Humidity", world.getHumidity()});
         }
     }
 
