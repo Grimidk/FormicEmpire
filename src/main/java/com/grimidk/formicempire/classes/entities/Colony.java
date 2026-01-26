@@ -767,6 +767,10 @@ public class Colony {
     }
 
     public void runDailyJobs(Temperature currentTemp, Biome biome) {
+        if (this.automationEnabled) {
+            this.automationService.runDailyAutomation(this);
+        }
+
         if (this.isActive) {
             this.rankUp();
             this.runEating(currentTemp);

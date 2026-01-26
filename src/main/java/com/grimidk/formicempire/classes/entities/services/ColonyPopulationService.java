@@ -127,7 +127,37 @@ public class ColonyPopulationService {
         colony.getPupae().removeAll(pupaeToHatch);
     }
 
-    public void runHatching(Colony colony){    
+    private void adjustNPCHatchRates(Colony colony) {
+        float s = 0f;
+        float m = 0f;
+        float p = 0f;
+        float d = 0f;
+
+        if (colony.hasUpgrade(GameUnlocks.TYPE_SOLDIER)) {
+            s = 15.0f;
+        }
+        if (colony.hasUpgrade(GameUnlocks.TYPE_MAJOR)) {
+            m = 5.0f;
+        }
+        if (colony.hasUpgrade(GameUnlocks.TYPE_PRINCESS)) {
+            p = 4.0f;
+            d = 1.0f;
+        }
+
+        float w = 100.0f - (s + m + p + d);
+
+        colony.setHatchRate(GameConstants.TYPE_WORKER, w);
+        colony.setHatchRate(GameConstants.TYPE_SOLDIER, s);
+        colony.setHatchRate(GameConstants.TYPE_MAJOR, m);
+        colony.setHatchRate(GameConstants.TYPE_PRINCESS, p);
+        colony.setHatchRate(GameConstants.TYPE_DRONE, d);
+    }
+
+    public void runHatching(Colony colony){
+        if (!colony.isPlayer()) {
+            adjustNPCHatchRates(colony);
+        }
+
         hatchPupae(colony);
         evolveAnts(colony, colony.getLarvae(), colony.getPupae(), GameConstants.TYPE_PUPA);
         evolveAnts(colony, colony.getEggs(), colony.getLarvae(), GameConstants.TYPE_LARVA);
