@@ -4,8 +4,6 @@ To Fix (By decreasing priority) :
 	Urgent:
 	
 	High:
-	more scouts and farmers for npc
-	npc sources and starting sources on random locations
 
 	Mid:
 
