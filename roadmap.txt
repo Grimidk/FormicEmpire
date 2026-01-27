@@ -4,14 +4,16 @@ To Fix (By decreasing priority) :
 	Urgent:
 	
 	High:
+	more scouts and farmers for npc
+	npc sources and starting sources on random locations
 
 	Mid:
-	npc has too few builders
 
 	Low:
 	colony scroll down
 	not dynamic colony sprites while stretching screen 
 	builders act weird af in build zone
+	somehow syrup spawned when building reservoir or unlocking??
 	
 To Feature (to be done in order):
 Needed for launch (v1.0) (Launch Version):

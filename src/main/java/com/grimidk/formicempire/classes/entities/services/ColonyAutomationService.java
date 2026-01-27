@@ -210,7 +210,8 @@ public class ColonyAutomationService {
         if (remaining > 0 && colony.getCurrentBuildingProject() != null) {
             boolean secureResources = colony.getPlants() > 100 && colony.getWater() > 100;
             if (secureResources) {
-                int toAdd = Math.min(remaining, 5); 
+                int builderTarget = (int) (totalWorkers * 0.3);
+                int toAdd = Math.min(remaining, builderTarget); 
                 targets.put(GameConstants.ROLE_BUILDER, toAdd);
                 remaining -= toAdd;
             }
@@ -273,7 +274,7 @@ public class ColonyAutomationService {
 
         if (totalAnts >= waterCapacity && colony.hasUpgrade(GameUnlocks.ROLE_RESEARCHER)) {
             if (totalQueens == 1) {
-                // 1. Researchera
+                // 1. Researchers
                 targets.put(GameConstants.ROLE_RESEARCHER, 1);
             } else {
                 int half = totalQueens / 2;
@@ -282,7 +283,7 @@ public class ColonyAutomationService {
                 
                 targets.put(GameConstants.ROLE_RESEARCHER, researchers);
                 // 2. Layers
-                targets.put(GameConstants.ROLE_LAYER, layers);
+                targets.put(GameConstants.ROLE_LAYER, researchers);
             }
         } else {
             targets.put(GameConstants.ROLE_LAYER, totalQueens);
