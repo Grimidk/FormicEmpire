@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.entities.services;
 
 import java.util.List;
+import java.util.Random;
 
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.entities.Ant;
@@ -12,6 +13,8 @@ import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstan
 import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
 
 public class ColonyStarterService {
+
+    private final Random random = new Random();
 
     public void initializeNewColony(Colony colony) {
         String type = colony.isPlayer() ? "Player" : "AI";
@@ -61,8 +64,15 @@ public class ColonyStarterService {
 
         if (colony.getLocationService() != null) {
             if (colony.getLocationService().getDiscoveredSources().isEmpty()) {
-                ResourceSource initialPlant = new ResourceSource(GameConstants.PLANT_RESOURCE, 10000, 0, 0);
-                ResourceSource initialWater = new ResourceSource(GameConstants.WATER_RESOURCE, 10000, 0, 0);
+                int range = 300;
+                
+                int pX = random.nextInt((range * 2) + 1) - range;
+                int pY = random.nextInt((range * 2) + 1) - range;
+                ResourceSource initialPlant = new ResourceSource(GameConstants.PLANT_RESOURCE, 10000, pX, pY);
+                
+                int wX = random.nextInt((range * 2) + 1) - range;
+                int wY = random.nextInt((range * 2) + 1) - range;
+                ResourceSource initialWater = new ResourceSource(GameConstants.WATER_RESOURCE, 10000, wX, wY);
                 
                 colony.getLocationService().addSource(colony, initialPlant);
                 colony.getLocationService().addSource(colony, initialWater);

@@ -143,8 +143,10 @@ public class ColonyAutomationService {
                         daysToClear = 0.5f;
                     }
 
-                    int needed = (int) Math.ceil(deadBodies / (dailyCleaningRate * daysToClear)); 
-                    gravers = Math.min(needed, remaining);
+                    int needed = (int) Math.ceil(deadBodies / (dailyCleaningRate * daysToClear));                    
+                    int doubleNeeded = needed * 2;
+                    
+                    gravers = Math.min(doubleNeeded, remaining);
                     remaining -= gravers;
                 }
             }
@@ -180,9 +182,10 @@ public class ColonyAutomationService {
                 
                 if (needsFood) {
                     int deficit = totalConsumption - currentProduction;
-                    int extraNeeded = (int) Math.ceil(deficit / productionPerFarmer);
-                    if (colony.getMushrooms() < stats.getMushroomsCapacity(colony) * 0.1) extraNeeded++; 
+                    int baseNeeded = (int) Math.ceil(deficit / productionPerFarmer);
+                    if (colony.getMushrooms() < stats.getMushroomsCapacity(colony) * 0.1) baseNeeded++; 
                     
+                    int extraNeeded = baseNeeded * 3;
                     int toAdd = Math.min(extraNeeded, remaining);
                     farmers += toAdd;
                     remaining -= toAdd;
@@ -191,11 +194,11 @@ public class ColonyAutomationService {
         }
         targets.put(GameConstants.ROLE_FARMER, farmers);
 
-        // 7. Ranchers
+        // 7. Ranchers 
         if (remaining > 0 && colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) {
-             int toAdd = Math.min(2, remaining);
-             targets.put(GameConstants.ROLE_RANCHER, toAdd);
-             remaining -= toAdd;
+            int toAdd = Math.min(4, remaining);
+            targets.put(GameConstants.ROLE_RANCHER, toAdd);
+            remaining -= toAdd;
         }
 
         // 8. Scouts
