@@ -446,12 +446,12 @@ public class StatsDialog extends ZeroDialog {
         DefaultTableModel model = (DefaultTableModel) deathTable.getModel();
         model.setRowCount(0);
 
-        if (colony.getTrackingService() == null) {
-            model.addRow(new Object[]{"Tracking Service Not Initialized", 0});
+        if (colony.getPopulationService() == null) {
+            model.addRow(new Object[]{"Population Service Not Initialized", 0});
             return;
         }
 
-        Map<String, Integer> stats = colony.getTrackingService().getDeathStatistics();
+        Map<String, Integer> stats = colony.getPopulationService().getDeathStatistics();
         
         for (Map.Entry<String, Integer> entry : stats.entrySet()) {
             model.addRow(new Object[]{entry.getKey(), entry.getValue()});

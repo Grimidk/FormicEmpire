@@ -37,60 +37,21 @@ public class ColonySumarizationService {
         ColonyStatsService stats = colony.getStatsService();
         ColonyLocationService loc = colony.getLocationService();
         
-        int foragerCount = colony.getAssignedRoleCount(GameConstants.ROLE_FORAGER);
-        int hunterCount = colony.getAssignedRoleCount(GameConstants.ROLE_HUNTER);
-        int minerCount = colony.getAssignedRoleCount(GameConstants.ROLE_MINER);
-        int farmerCount = colony.getAssignedRoleCount(GameConstants.ROLE_FARMER);
-
-        if (colony.hasBuilding(GameUnlocks.PASSIVE_FARM)) {
-            if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) farmerCount += 2;
-            else farmerCount += 1;
-        }
-
-        float collectionRate = stats.getCollectingRate(colony);        
-
-        float plantSplit = 0.5f;
-        float waterSplit = 0.5f;
-        
-        float convertRate = stats.getConversionRate(colony);
-        int plantsNeededPerHour = (int)(farmerCount * convertRate * 60); 
-        
-        boolean lowPlants = colony.getPlants() < (plantsNeededPerHour * 24);
-        boolean waterFull = colony.getWater() >= stats.getWaterCapacity(colony);
-        boolean plantsFull = colony.getPlants() >= stats.getPlantsCapacity(colony);
-
-        if ((lowPlants && !plantsFull) || (!plantsFull && waterFull)) {
-            plantSplit = 0.9f;
-            waterSplit = 0.1f;
-        } else if (plantsFull && !waterFull) {
-            plantSplit = 0.1f;
-            waterSplit = 0.9f;
-        }
-
-        float rawPlantGain = foragerCount * plantSplit * collectionRate;
-        int plantGain = (int) rawPlantGain;
-        if (random.nextFloat() < (rawPlantGain - plantGain)) plantGain++;
-
-        float passiveWater = 0;
-        if (colony.hasBuilding(GameUnlocks.PASSIVE_WATER)) {
-            float dailyPct = colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1) ? 0.20f : 0.10f;
-            passiveWater = (stats.getWaterCapacity(colony) * dailyPct) / 24.0f;
-        }
-
-        float rawWaterGain = (foragerCount * waterSplit * collectionRate) + passiveWater;
-        int waterGain = (int) rawWaterGain;
-        if (random.nextFloat() < (rawWaterGain - waterGain)) waterGain++;
-
-        float rawMeatGain = hunterCount * collectionRate;
-        int meatGain = (int) rawMeatGain;
-        if (random.nextFloat() < (rawMeatGain - meatGain)) meatGain++;
-        
-        float rawRockGain = minerCount * collectionRate;
-        int rockGain = (int) rawRockGain;
-        if (random.nextFloat() < (rawRockGain - rockGain)) rockGain++;
+        int plantGain = probabilisticRound(stats.getPlantProductionHourly(colony));
+        int waterGain = probabilisticRound(stats.getWaterProductionHourly(colony));
+        int meatGain = probabilisticRound(stats.getProteinProductionHourly(colony));
+        int rockGain = probabilisticRound(stats.getMineralProductionHourly(colony));
 
         if (loc.getTotalQuantityAvailable(GameConstants.PLANT_RESOURCE) <= 0) plantGain = 0;
-        if (loc.getTotalQuantityAvailable(GameConstants.WATER_RESOURCE) <= 0) waterGain = (int)passiveWater; 
+
+        if (loc.getTotalQuantityAvailable(GameConstants.WATER_RESOURCE) <= 0) {
+            double passiveOnly = 0; 
+             if (colony.hasBuilding(GameUnlocks.PASSIVE_WATER)) {
+                double dailyPct = colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1) ? 0.20 : 0.10;
+                passiveOnly = (stats.getWaterCapacity(colony) * dailyPct) / 24.0;
+            }
+            waterGain = probabilisticRound(passiveOnly);
+        }
         if (loc.getTotalQuantityAvailable(GameConstants.MEAT_RESOURCE) <= 0) meatGain = 0;
         if (loc.getTotalQuantityAvailable(GameConstants.ROCK_RESOURCE) <= 0) rockGain = 0;
 
@@ -100,9 +61,10 @@ public class ColonySumarizationService {
         addResource(colony, colony.getMinerals(), rockGain, stats.getMineralsCapacity(colony), GameConstants.ROCK_RESOURCE);
 
         if (colony.getMushrooms() < stats.getMushroomsCapacity(colony)) {
-            float rawConvert = farmerCount * convertRate * 60;
-            int maxConvert = (int) rawConvert;
-            if (random.nextFloat() < (rawConvert - maxConvert)) maxConvert++;
+            int farmerCount = stats.getEffectiveFarmerCount(colony);
+            float convertRate = stats.getConversionRate(colony);
+            
+            int maxConvert = probabilisticRound(farmerCount * convertRate * 60);
             
             if (maxConvert > 0) {
                 int actualConverted = 0;
@@ -129,6 +91,11 @@ public class ColonySumarizationService {
         }
     }
 
+    private int probabilisticRound(double value) {
+        int floor = (int) value;
+        return (random.nextDouble() < (value - floor)) ? floor + 1 : floor;
+    }
+
     private void addResource(Colony colony, int current, int gain, int max, ResourceType type) {
         if (gain <= 0) return;
         int newValue = Math.min(current + gain, max);
@@ -147,10 +114,7 @@ public class ColonySumarizationService {
         int spaceAvailable = colony.getStatsService().getEggsCapacity(colony) - colony.getEggs().size();
         if (spaceAvailable <= 0) return;
 
-        float rawLay = layerCount * colony.getStatsService().getLayingRate(colony);
-        int toLay = (int) rawLay;
-        if (random.nextFloat() < (rawLay - toLay)) toLay++;
-        
+        int toLay = probabilisticRound(layerCount * colony.getStatsService().getLayingRate(colony));
         toLay = Math.min(toLay, spaceAvailable);
         
         List<Ant> eggs = colony.getEggs();

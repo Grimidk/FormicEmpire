@@ -4,7 +4,6 @@ To Fix (By decreasing priority) :
 	Urgent:
 	
 	High:
-	save colony rank
 
 	Mid:
 
@@ -17,10 +16,10 @@ To Fix (By decreasing priority) :
 To Feature (to be done in order):
 Needed for launch (v1.0) (Launch Version):
 	Priority:
-
-	Everything else :
 	colonizing and new colonies and civilizations-species (research inheritance)	
 	trade routes (async with roles and incoming outgoing recurrent and one time and travel time and danger level and boring tunnels)
+
+	Everything else :
 	breeders go out of the colony in nuptial
 	auxiliary room sprites (storage (resources), farm (shroom), nurse (bedding), royal (nests and science)) and expansion (breeder room)
 	more settings (allow idle to forage, allow unassigned, choose default, change roles to proportions (may use by npc), fuzzed parasites, arachnophobia mode ?)
@@ -75,4 +74,3 @@ Post launch (v1.1) (Improvements Update):
 
 Post launch (v1.2) (Civilization Update):
 	(Secret for now)
-

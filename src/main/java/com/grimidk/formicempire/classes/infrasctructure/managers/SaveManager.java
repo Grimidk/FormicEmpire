@@ -362,9 +362,9 @@ public class SaveManager {
                         sc.assignedRoleCounts.put(entry.getKey().getName(), entry.getValue());
                     }
                     
-                    // --- Save Death Statistics ---
-                    if (c.getTrackingService() != null) {
-                        sc.deathStatistics = new HashMap<>(c.getTrackingService().getDeathStatistics());
+                    // Death Statistics
+                    if (c.getPopulationService() != null) {
+                        sc.deathStatistics = new HashMap<>(c.getPopulationService().getDeathStatistics());
                     }
 
                     for (Upgrade up : c.getUnlockedUpgrades()) sc.unlockedUpgradeIds.add(up.getId());

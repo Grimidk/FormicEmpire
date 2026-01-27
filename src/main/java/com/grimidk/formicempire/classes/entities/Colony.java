@@ -26,7 +26,6 @@ import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstan
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
 
-
 public class Colony {
     
     // --- Basic Data ---
@@ -92,7 +91,6 @@ public class Colony {
     private transient ColonyPhysicsService physicsService;
     private transient ColonyLocationService locationService;
     private transient ColonySumarizationService sumarizationService;
-    private transient ColonyDeathService trackingService;
     private transient ColonyAutomationService automationService;
 
     // --- Service Initializer ---
@@ -103,7 +101,6 @@ public class Colony {
         this.physicsService = new ColonyPhysicsService();
         this.locationService = new ColonyLocationService();
         this.sumarizationService = new ColonySumarizationService();
-        this.trackingService = new ColonyDeathService();
         this.automationService = new ColonyAutomationService(); 
     }
 
@@ -242,8 +239,8 @@ public class Colony {
         initializeAssignedRoles(); 
         initializeServices(); 
         
-        if (this.trackingService != null && savedColony.deathStatistics != null) {
-            this.trackingService.loadStatistics(savedColony.deathStatistics);
+        if (this.populationService != null && savedColony.deathStatistics != null) {
+            this.populationService.loadDeathStatistics(savedColony.deathStatistics);
         }
         
         Map<String, Integer> savedRoles = savedColony.assignedRoleCounts;
@@ -329,7 +326,6 @@ public class Colony {
     private void populateAntList(List<Ant> list, int count, AntType type) {
         for (int i = 0; i < count; i++) {
             Ant newAnt = new Ant(this, type);
-            
             if (type == GameConstants.TYPE_EGG || 
                 type == GameConstants.TYPE_LARVA || 
                 type == GameConstants.TYPE_PUPA || 
@@ -369,8 +365,8 @@ public class Colony {
         if (ant == null) return;
         this.totalDeaths++;
         this.deadAnts.add(ant);
-        if (trackingService != null) {
-            trackingService.recordDeath(cause);
+        if (populationService != null) {
+            populationService.recordDeath(cause);
         }
     }
 
@@ -664,7 +660,7 @@ public class Colony {
     public ColonyPhysicsService getPhysicsService() { return this.physicsService; }
     public ColonyLocationService getLocationService() { return this.locationService; }
     public ColonySumarizationService getSumarizationService() { return this.sumarizationService; }
-    public ColonyDeathService getTrackingService() { return this.trackingService; }
+    public ColonyAutomationService getAutomationService() { return this.automationService; }
 
     public int getTotalConsumption(){ return statsService.getTotalConsumption(this); }
     public int getTotalProduction(){ return statsService.getTotalProduction(this); }
