@@ -2,10 +2,13 @@ Here is the current roadmap of features and fixes:
 
 To Fix (By decreasing priority) : 
 	Urgent:
+	civs are shit but at least they dont break everything
 	
 	High:
 
 	Mid:
+	double wide hex map border to mape civ borders
+	map tooltip needs to show civ
 
 	Low:
 	colony scroll down
