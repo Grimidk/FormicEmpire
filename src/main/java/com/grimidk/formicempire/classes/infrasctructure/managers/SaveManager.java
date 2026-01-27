@@ -317,6 +317,7 @@ public class SaveManager {
                     // ID & Location
                     sc.id = c.getId();
                     sc.name = c.getName();
+                    sc.rankName = c.getRank() != null ? c.getRank().getName() : "Colony";
                     sc.isPlayer = c.isPlayer();
                     sc.q = h.getQ();
                     sc.r = h.getR();
@@ -454,6 +455,7 @@ public class SaveManager {
         // ID & Loc
         writeJsonLine(w, "id", sc.id, false);
         writeJsonLine(w, "name", sc.name, false);
+        writeJsonLine(w, "rank", sc.rankName, false);
         writeJsonLine(w, "isPlayer", sc.isPlayer, false);
         writeJsonLine(w, "q", sc.q, false);
         writeJsonLine(w, "r", sc.r, false);
@@ -623,6 +625,7 @@ public class SaveManager {
         
         sc.id = Integer.parseInt(map.getOrDefault("id", "0"));
         sc.name = map.getOrDefault("name", "Colony");
+        sc.rankName = map.getOrDefault("rank", "Colony");
         sc.isPlayer = Boolean.parseBoolean(map.getOrDefault("isPlayer", "false"));
         sc.q = Integer.parseInt(map.getOrDefault("q", "0"));
         sc.r = Integer.parseInt(map.getOrDefault("r", "0"));

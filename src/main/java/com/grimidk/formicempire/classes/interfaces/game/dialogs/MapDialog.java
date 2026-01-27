@@ -82,6 +82,9 @@ public class MapDialog extends ZeroDialog {
 
         public HexMapPanel() {
             setBackground(Color.WHITE);
+            // Register with ToolTipManager to ensure getToolTipText is called
+            ToolTipManager.sharedInstance().registerComponent(this);
+
             addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
@@ -107,6 +110,52 @@ public class MapDialog extends ZeroDialog {
             
             this.hexRadius = (int) Math.min(Math.min(maxRadiusW, maxRadiusH), 55);
             if (this.hexRadius < 10) this.hexRadius = 10; 
+        }
+
+        @Override
+        public String getToolTipText(MouseEvent e) {
+            if (world == null || world.getHexes() == null) return null;
+
+            Point p = e.getPoint();
+            Point centerOffset = getCenterOffset();
+
+            for (Hex hex : world.getHexes()) {
+                Polygon poly = getHexPolygon(hex, centerOffset.x, centerOffset.y);
+                if (poly.contains(p)) {
+                    StringBuilder sb = new StringBuilder("<html>");
+                    
+                    // 1. Biome Name
+                    if (hex.getBiome() != null) {
+                        sb.append("<b>Biome:</b> ").append(hex.getBiome().getName());
+                    } else {
+                        sb.append("<b>Biome:</b> Unknown");
+                    }
+                    
+                    // 2. Colony Info
+                    Colony c = hex.getColony();
+                    if (c != null) {
+                        if (c.getRank() != null) {
+                            sb.append("<br><b>Rank:</b> ").append(c.getRank().getName());
+                        }
+                        
+                        if (c.getSpecies() != null) {
+                            sb.append("<br><b>Species:</b> ").append(c.getSpecies().getName());
+                        } else {
+                            sb.append("<br><b>Species:</b> Unknown");
+                        }
+                        
+                        if (c.getName() != null) {
+                            sb.append("<br><i>").append(c.getName()).append("</i>");
+                        }
+                    } else {
+                        sb.append("<br><i>Empty</i>");
+                    }
+                    
+                    sb.append("</html>");
+                    return sb.toString();
+                }
+            }
+            return null; // No hex under cursor
         }
 
         private void handleMouseClick(Point p) {
@@ -168,7 +217,7 @@ public class MapDialog extends ZeroDialog {
             g2d.fillPolygon(poly);
 
             // 2. Draw Biome Icon
-            float scale = 0.9f;
+            float scale = 0.85f;
             int iconSize = (int)(hexRadius * scale); 
             
             if (biome != null && biome.getIcon() != null) {
@@ -198,7 +247,7 @@ public class MapDialog extends ZeroDialog {
             // 4. Draw Border
             g2d.setStroke(new BasicStroke(isActive ? 3 : 1));
             if (isActive) {
-                g2d.setColor(Color.BLUE); 
+                g2d.setColor(Color.CYAN); 
             } else {
                 g2d.setColor(Color.BLACK); 
             }
@@ -232,7 +281,7 @@ public class MapDialog extends ZeroDialog {
             }
 
             Color avgColor = calculateAverageColor(biome.getIcon());
-            avgColor = lighten(avgColor, 0.3f); 
+            avgColor = lighten(avgColor, 0.5f); 
             
             biomeColorCache.put(biome.getId(), avgColor);
             return avgColor;

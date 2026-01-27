@@ -4,6 +4,7 @@ To Fix (By decreasing priority) :
 	Urgent:
 	
 	High:
+	save colony rank
 
 	Mid:
 
@@ -16,7 +17,6 @@ To Fix (By decreasing priority) :
 To Feature (to be done in order):
 Needed for launch (v1.0) (Launch Version):
 	Priority:
-	design map and buttons and that (use simple colors and icons) and shows small tooltip of colonies
 
 	Everything else :
 	colonizing and new colonies and civilizations-species (research inheritance)	

@@ -322,6 +322,7 @@ public class Colony {
         }
 
         runRoleAssignment();
+        rankUp();
     }
         
     // --- Population Initializer ---

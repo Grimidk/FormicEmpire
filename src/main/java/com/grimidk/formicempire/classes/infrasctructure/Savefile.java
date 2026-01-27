@@ -60,6 +60,7 @@ public class Savefile implements Serializable {
         
         public int id;
         public String name;
+        public String rankName;
         public boolean isPlayer;
         public int q; 
         public int r;        
