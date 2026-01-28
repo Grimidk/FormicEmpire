@@ -49,10 +49,10 @@ public class World {
         this.temperature = 25;
         this.humidity = 2;
         this.hexes = new ArrayList<>();
-        this.timeOfDay = GameConstants.DAWN_TIME;
-        this.moonPhase = GameConstants.NEW_MOON_PHASE;
-        this.season = GameConstants.SPRING_SEASON;
-        this.weather = GameConstants.CLEAR_WEATHER;
+        this.timeOfDay = GameConstants.TIME_DAWN;
+        this.moonPhase = GameConstants.PHASE_NEW_MOON;
+        this.season = GameConstants.SEASON_SPRING;
+        this.weather = GameConstants.WEATHER_CLEAR;
         this.random = new Random();
     }
 
@@ -294,7 +294,7 @@ public class World {
     }
     
     private boolean isWaterBiome(Biome biome) {
-        return biome == GameConstants.OCEAN_BIOME || biome == GameConstants.LAKE_BIOME;
+        return biome == GameConstants.BIOME_OCEAN || biome == GameConstants.BIOME_LAKE;
     }
     
     private void linkNeighbors(Map<String, Hex> hexMap) {
@@ -318,49 +318,49 @@ public class World {
         
         switch (ring) {
             case 1:
-                options.add(GameConstants.PLAINS_BIOME);
-                options.add(GameConstants.FOREST_BIOME);
-                options.add(GameConstants.JUNGLE_BIOME);
+                options.add(GameConstants.BIOME_PLAINS);
+                options.add(GameConstants.BIOME_FOREST);
+                options.add(GameConstants.BIOME_JUNGLE);
                 break;
             case 2:
-                options.add(GameConstants.FOREST_BIOME);
-                options.add(GameConstants.JUNGLE_BIOME);
-                options.add(GameConstants.SWAMP_BIOME);
+                options.add(GameConstants.BIOME_FOREST);
+                options.add(GameConstants.BIOME_JUNGLE);
+                options.add(GameConstants.BIOME_SWAMP);
                 break;
             case 3:
-                options.add(GameConstants.JUNGLE_BIOME);
-                options.add(GameConstants.SWAMP_BIOME);
-                options.add(GameConstants.DESSERT_BIOME);
+                options.add(GameConstants.BIOME_JUNGLE);
+                options.add(GameConstants.BIOME_SWAMP);
+                options.add(GameConstants.BIOME_DESERT);
                 break;
             case 4:
-                options.add(GameConstants.SWAMP_BIOME);
-                options.add(GameConstants.DESSERT_BIOME);
-                options.add(GameConstants.TAIGA_BIOME);
-                options.add(GameConstants.URBAN_BIOME);
+                options.add(GameConstants.BIOME_SWAMP);
+                options.add(GameConstants.BIOME_DESERT);
+                options.add(GameConstants.BIOME_TAIGA);
+                options.add(GameConstants.BIOME_URBAN);
                 break;
             case 5:
-                options.add(GameConstants.TAIGA_BIOME);
-                options.add(GameConstants.TUNDRA_BIOME);
-                options.add(GameConstants.DESSERT_BIOME);
-                options.add(GameConstants.URBAN_BIOME);
-                options.add(GameConstants.LAKE_BIOME);
+                options.add(GameConstants.BIOME_TAIGA);
+                options.add(GameConstants.BIOME_TUNDRA);
+                options.add(GameConstants.BIOME_DESERT);
+                options.add(GameConstants.BIOME_URBAN);
+                options.add(GameConstants.BIOME_LAKE);
                 break;
             case 6:
-                options.add(GameConstants.TUNDRA_BIOME);
-                options.add(GameConstants.DESSERT_BIOME);
-                options.add(GameConstants.MOUNTAIN_BIOME);
-                options.add(GameConstants.URBAN_BIOME);
-                options.add(GameConstants.LAKE_BIOME);
+                options.add(GameConstants.BIOME_TUNDRA);
+                options.add(GameConstants.BIOME_DESERT);
+                options.add(GameConstants.BIOME_MOUNTAIN);
+                options.add(GameConstants.BIOME_URBAN);
+                options.add(GameConstants.BIOME_LAKE);
                 break;
             case 7:
-                options.add(GameConstants.TUNDRA_BIOME);
-                options.add(GameConstants.DESSERT_BIOME);
-                options.add(GameConstants.MOUNTAIN_BIOME);
-                options.add(GameConstants.URBAN_BIOME);
-                options.add(GameConstants.VOLCANIC_BIOME);
+                options.add(GameConstants.BIOME_TUNDRA);
+                options.add(GameConstants.BIOME_DESERT);
+                options.add(GameConstants.BIOME_MOUNTAIN);
+                options.add(GameConstants.BIOME_URBAN);
+                options.add(GameConstants.BIOME_VOLCANIC);
                 break;
             default:
-                options.add(GameConstants.OCEAN_BIOME);
+                options.add(GameConstants.BIOME_OCEAN);
                 break;
         }
         
@@ -371,14 +371,14 @@ public class World {
         for(Biome b : GameConstants.getBiomes()) {
             if (b.getId() == id) return b;
         }
-        return GameConstants.PLAINS_BIOME;
+        return GameConstants.BIOME_PLAINS;
     }
     
     private Weather getWeatherById(int id) {
         for (Weather w : GameConstants.getWeathers()) {
             if (w.getId() == id) return w;
         }
-        return GameConstants.CLEAR_WEATHER;
+        return GameConstants.WEATHER_CLEAR;
     }
     
     private Weather getRandomWeather() {
@@ -500,8 +500,8 @@ public class World {
                 ColonyStarterService starter = new ColonyStarterService();
                 starter.initializeNewColony(colony);
             }
-             
-            generateWorld(GameConstants.PLAINS_BIOME, this.worldRadius, colony);
+
+            generateWorld(GameConstants.BIOME_PLAINS, this.worldRadius, colony);
         }
 
         this.colonyIdCounter = maxId + 1;
@@ -546,26 +546,26 @@ public class World {
     private void randomizeWeather() {
         if (random.nextInt(1000) == 0) {
             if (random.nextBoolean()) {
-                this.setWeather(GameConstants.FROG_WEATHER);
+                this.setWeather(GameConstants.WEATHER_FROG);
             } else {
-                this.setWeather(GameConstants.BLOOD_WEATHER);
+                this.setWeather(GameConstants.WEATHER_BLOOD);
             }
         } else {
             List<Weather> possibleWeathers = new ArrayList<>();
-            possibleWeathers.add(GameConstants.CLEAR_WEATHER);
-            possibleWeathers.add(GameConstants.CLEAR_WEATHER);
-            if (this.season == GameConstants.WINTER_SEASON) {
-                possibleWeathers.add(GameConstants.SNOW_WEATHER);
-                possibleWeathers.add(GameConstants.HEAVY_SNOW_WEATHER);
-                possibleWeathers.add(GameConstants.WIND_WEATHER);
-            } else if (this.season == GameConstants.SUMMER_SEASON) {
-                possibleWeathers.add(GameConstants.RAIN_WEATHER);
-                possibleWeathers.add(GameConstants.THUNDER_WEATHER);
-                possibleWeathers.add(GameConstants.HEAT_WEATHER);
+            possibleWeathers.add(GameConstants.WEATHER_CLEAR);
+            possibleWeathers.add(GameConstants.WEATHER_CLEAR);
+            if (this.season == GameConstants.SEASON_WINTER) {
+                possibleWeathers.add(GameConstants.WEATHER_SNOW);
+                possibleWeathers.add(GameConstants.WEATHER_HEAVY_SNOW);
+                possibleWeathers.add(GameConstants.WEATHER_WIND);
+            } else if (this.season == GameConstants.SEASON_SUMMER) {
+                possibleWeathers.add(GameConstants.WEATHER_RAIN);
+                possibleWeathers.add(GameConstants.WEATHER_THUNDER);
+                possibleWeathers.add(GameConstants.WEATHER_HEAT);
             } else {
-                possibleWeathers.add(GameConstants.RAIN_WEATHER);
-                possibleWeathers.add(GameConstants.HEAVY_RAIN_WEATHER);
-                possibleWeathers.add(GameConstants.WIND_WEATHER);
+                possibleWeathers.add(GameConstants.WEATHER_RAIN);
+                possibleWeathers.add(GameConstants.WEATHER_HEAVY_RAIN);
+                possibleWeathers.add(GameConstants.WEATHER_WIND);
             }
             Weather newWeather = possibleWeathers.get(random.nextInt(possibleWeathers.size()));
             if (this.weather != newWeather) {
@@ -604,20 +604,20 @@ public class World {
             }
         }
 
-        boolean isEclipse = (this.timeOfDay == GameConstants.SOLAR_ECLIPSE_TIME || 
-                             this.timeOfDay == GameConstants.LUNAR_ECLIPSE_TIME);
+        boolean isEclipse = (this.timeOfDay == GameConstants.TIME_SOLAR_ECLIPSE || 
+                             this.timeOfDay == GameConstants.TIME_LUNAR_ECLIPSE);
 
         if (!isEclipse) {
             if (this.hour >= 0 && this.hour < 5) {
-                this.setTimeOfDay(GameConstants.NIGHT_TIME);
+                this.setTimeOfDay(GameConstants.TIME_NIGHT);
             } else if (this.hour >= 5 && this.hour < 7) {
-                this.setTimeOfDay(GameConstants.DAWN_TIME);
+                this.setTimeOfDay(GameConstants.TIME_DAWN);
             } else if (this.hour >= 7 && this.hour < 18) {
-                this.setTimeOfDay(GameConstants.DAY_TIME);
+                this.setTimeOfDay(GameConstants.TIME_DAY);
             } else if (this.hour >= 18 && this.hour < 20) {
-                this.setTimeOfDay(GameConstants.DUSK_TIME);
+                this.setTimeOfDay(GameConstants.TIME_DUSK);
             } else if (this.hour >= 20 && this.hour <= 23) {
-                this.setTimeOfDay(GameConstants.NIGHT_TIME);
+                this.setTimeOfDay(GameConstants.TIME_NIGHT);
             }
         }
         
@@ -654,9 +654,9 @@ public class World {
 
         if (random.nextInt(1000) == 0) {
             if (random.nextBoolean()) {
-                this.setTimeOfDay(GameConstants.SOLAR_ECLIPSE_TIME);
+                this.setTimeOfDay(GameConstants.TIME_SOLAR_ECLIPSE);
             } else {
-                this.setTimeOfDay(GameConstants.LUNAR_ECLIPSE_TIME);
+                this.setTimeOfDay(GameConstants.TIME_LUNAR_ECLIPSE);
             }
             
             for (Hex hex : this.hexes) {
@@ -667,27 +667,27 @@ public class World {
             }
             
         } else {
-            this.setTimeOfDay(GameConstants.NIGHT_TIME);
+            this.setTimeOfDay(GameConstants.TIME_NIGHT);
         }
 
         if (this.day >= 1 && this.day < 2) {
-            this.moonPhase = GameConstants.NEW_MOON_PHASE;
+            this.moonPhase = GameConstants.PHASE_NEW_MOON;
         } else if (this.day >= 2 && this.day < 8) {
-            this.moonPhase = GameConstants.WAXING_CRESCENT_PHASE;
+            this.moonPhase = GameConstants.PHASE_WAXING_CRESCENT;
         } else if (this.day >= 8 && this.day < 9) {
-            this.moonPhase = GameConstants.FIRST_QUARTER_PHASE;
+            this.moonPhase = GameConstants.PHASE_FIRST_QUARTER;
         } else if (this.day >= 9 && this.day < 15) {
-            this.moonPhase = GameConstants.WAXING_GIBBOUS_PHASE;
+            this.moonPhase = GameConstants.PHASE_WAXING_GIBBOUS;
         } else if (this.day >= 15 && this.day < 16) {
-            this.moonPhase = GameConstants.FULL_MOON_PHASE;
+            this.moonPhase = GameConstants.PHASE_FULL_MOON;
         } else if (this.day >= 16 && this.day < 22) {
-            this.moonPhase = GameConstants.WANING_GIBBOUS_PHASE;
+            this.moonPhase = GameConstants.PHASE_WANING_GIBBOUS;
         } else if (this.day >= 22 && this.day < 23) {
-            this.moonPhase = GameConstants.LAST_QUARTER_PHASE;
+            this.moonPhase = GameConstants.PHASE_LAST_QUARTER;
         } else if (this.day >= 23 && this.day < 30) {
-            this.moonPhase = GameConstants.WANING_CRESCENT_PHASE;
+            this.moonPhase = GameConstants.PHASE_WANING_CRESCENT;
         } else {
-            this.moonPhase = GameConstants.NEW_MOON_PHASE;
+            this.moonPhase = GameConstants.PHASE_NEW_MOON;
         }
 
         if (engine != null) {
@@ -710,15 +710,15 @@ public class World {
         }
 
         if (this.month >= 1 && this.month < 4) {
-            this.setSeason(GameConstants.SPRING_SEASON);
+            this.setSeason(GameConstants.SEASON_SPRING);
         } else if (this.month >= 4 && this.month < 7) {
-            this.setSeason(GameConstants.SUMMER_SEASON);
+            this.setSeason(GameConstants.SEASON_SUMMER);
         } else if (this.month >= 7 && this.month < 10) {
-            this.setSeason(GameConstants.AUTUMN_SEASON);
+            this.setSeason(GameConstants.SEASON_AUTUMN);
         } else if (this.month >= 10 && this.month < 12) {
-            this.setSeason(GameConstants.WINTER_SEASON);
+            this.setSeason(GameConstants.SEASON_WINTER);
         } else {
-            this.setSeason(GameConstants.SPRING_SEASON);
+            this.setSeason(GameConstants.SEASON_SPRING);
         }
 
         try {

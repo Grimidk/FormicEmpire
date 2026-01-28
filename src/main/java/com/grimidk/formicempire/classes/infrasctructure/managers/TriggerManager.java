@@ -239,7 +239,7 @@ public class TriggerManager {
         
         if (playerColony.getLocationService() != null && playerColony.getLocationService().getDiscoveredSources() != null) {
             for (ResourceSource source : playerColony.getLocationService().getDiscoveredSources()) {
-                if (source.getResourceType() == GameConstants.PLANT_RESOURCE && source.getInitialQuantity() == 10000) {
+                if (source.getResourceType() == GameConstants.RESOURCE_PLANT && source.getInitialQuantity() == 10000) {
                     int collected = source.getInitialQuantity() - source.getQuantity();
                     if (collected >= 6000) {
                         fireTrigger(GameUnlocks.ROLE_SCOUT, 

@@ -105,13 +105,13 @@ public class ColonyPanel extends ZeroGamePanel {
         researchRateLabel.setVisible(false);
 
         // Resources Setup
-        setupConstantLabel(mushroomsLabel, GameConstants.FUNGI_RESOURCE);
-        setupConstantLabel(planLabel, GameConstants.PLANT_RESOURCE);
-        setupConstantLabel(proteinLabel, GameConstants.MEAT_RESOURCE);
-        setupConstantLabel(waterLabel, GameConstants.WATER_RESOURCE);
-        setupConstantLabel(syrupLabel, GameConstants.SYRUP_RESOURCE);
-        setupConstantLabel(resinLabel, GameConstants.RESIN_RESOURCE);
-        setupConstantLabel(mineralLabel, GameConstants.ROCK_RESOURCE);
+        setupConstantLabel(mushroomsLabel, GameConstants.RESOURCE_FUNGI);
+        setupConstantLabel(planLabel, GameConstants.RESOURCE_PLANT);
+        setupConstantLabel(proteinLabel, GameConstants.RESOURCE_MEAT);
+        setupConstantLabel(waterLabel, GameConstants.RESOURCE_WATER);
+        setupConstantLabel(syrupLabel, GameConstants.RESOURCE_SYRUP);
+        setupConstantLabel(resinLabel, GameConstants.RESOURCE_RESIN);
+        setupConstantLabel(mineralLabel, GameConstants.RESOURCE_ROCK);
         
         // Ants Setup
         setupConstantLabel(queensLabel, GameConstants.TYPE_QUEEN);
@@ -269,10 +269,10 @@ public class ColonyPanel extends ZeroGamePanel {
         int totalResources = mushrooms + plants + protein + water + syrups + resins + minerals;
         
         ColonyLocationService locService = colony.getLocationService();
-        int plantsAvail = locService != null ? locService.getTotalQuantityAvailable(GameConstants.PLANT_RESOURCE) : 0;
-        int proteinAvail = locService != null ? locService.getTotalQuantityAvailable(GameConstants.MEAT_RESOURCE) : 0;
-        int waterAvail = locService != null ? locService.getTotalQuantityAvailable(GameConstants.WATER_RESOURCE) : 0;
-        int mineralsAvail = locService != null ? locService.getTotalQuantityAvailable(GameConstants.ROCK_RESOURCE) : 0;
+        int plantsAvail = locService != null ? locService.getTotalQuantityAvailable(GameConstants.RESOURCE_PLANT) : 0;
+        int proteinAvail = locService != null ? locService.getTotalQuantityAvailable(GameConstants.RESOURCE_MEAT) : 0;
+        int waterAvail = locService != null ? locService.getTotalQuantityAvailable(GameConstants.RESOURCE_WATER) : 0;
+        int mineralsAvail = locService != null ? locService.getTotalQuantityAvailable(GameConstants.RESOURCE_ROCK) : 0;
 
         if (totalResources != -1) totalResourcesLabel.setText("Total resources: " + totalResources);
         if (mushrooms != lastMushrooms) mushroomsLabel.setText(String.valueOf(mushrooms));

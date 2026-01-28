@@ -62,13 +62,13 @@ public class ColonyLabourService {
             double current = 0;
             double max = 0;
             
-            if (type == GameConstants.PLANT_RESOURCE) {
+            if (type == GameConstants.RESOURCE_PLANT) {
                 current = colony.getPlantsPrecise(); max = stats.getPlantsCapacity(colony);
-            } else if (type == GameConstants.WATER_RESOURCE) {
+            } else if (type == GameConstants.RESOURCE_WATER) {
                 current = colony.getWaterPrecise(); max = stats.getWaterCapacity(colony);
-            } else if (type == GameConstants.MEAT_RESOURCE) {
+            } else if (type == GameConstants.RESOURCE_MEAT) {
                 current = colony.getProteinPrecise(); max = stats.getProteinCapacity(colony);
-            } else if (type == GameConstants.ROCK_RESOURCE) {
+            } else if (type == GameConstants.RESOURCE_ROCK) {
                 current = colony.getMineralsPrecise(); max = stats.getMineralsCapacity(colony);
             }
             
@@ -79,7 +79,7 @@ public class ColonyLabourService {
             int actualGathered = locations.gatherFromSource(colony, source, gatherAmount);
             
             if (actualGathered > 0) {
-                if (type == GameConstants.PLANT_RESOURCE) {
+                if (type == GameConstants.RESOURCE_PLANT) {
                     colony.setPlants(colony.getPlantsPrecise() + actualGathered); 
                     
                     for(int i = 0; i < actualGathered; i++) {
@@ -92,7 +92,7 @@ public class ColonyLabourService {
                                  double resinSpace = stats.getResinsCapacity(colony) - colony.getResinsPrecise();
                                  if (resinSpace > 0) {
                                      colony.setResins(colony.getResinsPrecise() + 1);
-                                     worker.setCarryingSec(GameConstants.RESIN_RESOURCE);
+                                     worker.setCarryingSec(GameConstants.RESOURCE_RESIN);
                                  }
                              }
                         }
@@ -100,9 +100,9 @@ public class ColonyLabourService {
                     }
                     
                 } else {
-                    if (type == GameConstants.WATER_RESOURCE) colony.setWater(colony.getWaterPrecise() + actualGathered);
-                    else if (type == GameConstants.MEAT_RESOURCE) colony.setProtein(colony.getProteinPrecise() + actualGathered);
-                    else if (type == GameConstants.ROCK_RESOURCE) colony.setMinerals(colony.getMineralsPrecise() + actualGathered);
+                    if (type == GameConstants.RESOURCE_WATER) colony.setWater(colony.getWaterPrecise() + actualGathered);
+                    else if (type == GameConstants.RESOURCE_MEAT) colony.setProtein(colony.getProteinPrecise() + actualGathered);
+                    else if (type == GameConstants.RESOURCE_ROCK) colony.setMinerals(colony.getMineralsPrecise() + actualGathered);
                     
                     for(Ant w : workers) {
                         w.setCarrying(type);
@@ -119,8 +119,8 @@ public class ColonyLabourService {
 
     private boolean hasSpace(Colony colony, ResourceType type) {
         ColonyStatsService stats = colony.getStatsService();
-        if (type == GameConstants.PLANT_RESOURCE) return stats.getPlantsCapacity(colony) > colony.getPlants();
-        if (type == GameConstants.WATER_RESOURCE) return stats.getWaterCapacity(colony) > colony.getWater();
+        if (type == GameConstants.RESOURCE_PLANT) return stats.getPlantsCapacity(colony) > colony.getPlants();
+        if (type == GameConstants.RESOURCE_WATER) return stats.getWaterCapacity(colony) > colony.getWater();
         return false;
     }
 
@@ -135,23 +135,22 @@ public class ColonyLabourService {
                 for(Ant a : foragers) a.clearLoad();
                 
                 int totalPower = (int) (foragers.size() * stats.getCollectingRate(colony));
-                List<ResourceSource> plantSources = locations.getSourcesByType(GameConstants.PLANT_RESOURCE);
-                List<ResourceSource> waterSources = locations.getSourcesByType(GameConstants.WATER_RESOURCE);
+                List<ResourceSource> plantSources = locations.getSourcesByType(GameConstants.RESOURCE_PLANT);
+                List<ResourceSource> waterSources = locations.getSourcesByType(GameConstants.RESOURCE_WATER);
 
-                boolean canCollectPlants = !plantSources.isEmpty() && hasSpace(colony, GameConstants.PLANT_RESOURCE);
-                boolean canCollectWater = !waterSources.isEmpty() && hasSpace(colony, GameConstants.WATER_RESOURCE);
-
+                boolean canCollectPlants = !plantSources.isEmpty() && hasSpace(colony, GameConstants.RESOURCE_PLANT);
+                boolean canCollectWater = !waterSources.isEmpty() && hasSpace(colony, GameConstants.RESOURCE_WATER);
                 if (canCollectPlants && canCollectWater) {
                     int halfPower = totalPower / 2;
                     int remainingPower = totalPower - halfPower;
-                    int plantsGathered = processGathering(colony, plantSources, halfPower, GameConstants.PLANT_RESOURCE, foragers);
+                    int plantsGathered = processGathering(colony, plantSources, halfPower, GameConstants.RESOURCE_PLANT, foragers);
                     int waterPower = remainingPower + (halfPower - plantsGathered);
                     
-                    processGathering(colony, waterSources, waterPower, GameConstants.WATER_RESOURCE, foragers);
+                    processGathering(colony, waterSources, waterPower, GameConstants.RESOURCE_WATER, foragers);
                 } else if (canCollectPlants) {
-                    processGathering(colony, plantSources, totalPower, GameConstants.PLANT_RESOURCE, foragers);
+                    processGathering(colony, plantSources, totalPower, GameConstants.RESOURCE_PLANT, foragers);
                 } else if (canCollectWater) {
-                    processGathering(colony, waterSources, totalPower, GameConstants.WATER_RESOURCE, foragers);
+                    processGathering(colony, waterSources, totalPower, GameConstants.RESOURCE_WATER, foragers);
                 }
             }
         }
@@ -162,8 +161,8 @@ public class ColonyLabourService {
             if (!hunters.isEmpty()) {
                 for(Ant a : hunters) a.clearLoad();
                 int totalPower = (int) (hunters.size() * stats.getCollectingRate(colony));
-                List<ResourceSource> sources = locations.getSourcesByType(GameConstants.MEAT_RESOURCE);
-                processGathering(colony, sources, totalPower, GameConstants.MEAT_RESOURCE, hunters);
+                List<ResourceSource> sources = locations.getSourcesByType(GameConstants.RESOURCE_MEAT);
+                processGathering(colony, sources, totalPower, GameConstants.RESOURCE_MEAT, hunters);
             }
         }
 
@@ -173,8 +172,8 @@ public class ColonyLabourService {
             if (!miners.isEmpty()) {
                 for(Ant a : miners) a.clearLoad();
                 int totalPower = (int) (miners.size() * stats.getCollectingRate(colony));
-                List<ResourceSource> sources = locations.getSourcesByType(GameConstants.ROCK_RESOURCE);
-                processGathering(colony, sources, totalPower, GameConstants.ROCK_RESOURCE, miners);
+                List<ResourceSource> sources = locations.getSourcesByType(GameConstants.RESOURCE_ROCK);
+                processGathering(colony, sources, totalPower, GameConstants.RESOURCE_ROCK, miners);
             }
         }
 
@@ -406,17 +405,17 @@ public class ColonyLabourService {
         ColonyLocationService locations = colony.getLocationService();
         List<ResourceType> possibleTypes = new ArrayList<>();
         
-        if (colony.hasUpgrade(GameUnlocks.ROLE_FORAGER) && !locations.isSourceFull(colony, GameConstants.PLANT_RESOURCE)) {
-            possibleTypes.add(GameConstants.PLANT_RESOURCE);
+        if (colony.hasUpgrade(GameUnlocks.ROLE_FORAGER) && !locations.isSourceFull(colony, GameConstants.RESOURCE_PLANT)) {
+            possibleTypes.add(GameConstants.RESOURCE_PLANT);
         }
-        if (colony.hasUpgrade(GameUnlocks.ROLE_HUNTER) && !locations.isSourceFull(colony, GameConstants.MEAT_RESOURCE)) {
-            possibleTypes.add(GameConstants.MEAT_RESOURCE);
+        if (colony.hasUpgrade(GameUnlocks.ROLE_HUNTER) && !locations.isSourceFull(colony, GameConstants.RESOURCE_MEAT)) {
+            possibleTypes.add(GameConstants.RESOURCE_MEAT);
         }
-        if (colony.hasUpgrade(GameUnlocks.ROLE_MINER) && !locations.isSourceFull(colony, GameConstants.ROCK_RESOURCE)) {
-            possibleTypes.add(GameConstants.ROCK_RESOURCE);
+        if (colony.hasUpgrade(GameUnlocks.ROLE_MINER) && !locations.isSourceFull(colony, GameConstants.RESOURCE_ROCK)) {
+            possibleTypes.add(GameConstants.RESOURCE_ROCK);
         }
-        if (!locations.isSourceFull(colony, GameConstants.WATER_RESOURCE)) {
-            possibleTypes.add(GameConstants.WATER_RESOURCE); 
+        if (!locations.isSourceFull(colony, GameConstants.RESOURCE_WATER)) {
+            possibleTypes.add(GameConstants.RESOURCE_WATER); 
         }
 
         if (possibleTypes.isEmpty()) return;
@@ -425,10 +424,10 @@ public class ColonyLabourService {
         float abundance = 0f;
         
         if (biome != null) {
-            if (selectedType == GameConstants.PLANT_RESOURCE) abundance = biome.getPlantAbundance();
-            else if (selectedType == GameConstants.MEAT_RESOURCE) abundance = biome.getAnimalAbundance();
-            else if (selectedType == GameConstants.ROCK_RESOURCE) abundance = biome.getMineralAbundance();
-            else if (selectedType == GameConstants.WATER_RESOURCE) {
+            if (selectedType == GameConstants.RESOURCE_PLANT) abundance = biome.getPlantAbundance();
+            else if (selectedType == GameConstants.RESOURCE_MEAT) abundance = biome.getAnimalAbundance();
+            else if (selectedType == GameConstants.RESOURCE_ROCK) abundance = biome.getMineralAbundance();
+            else if (selectedType == GameConstants.RESOURCE_WATER) {
                 int h = biome.isIsHumid();
                 if (h >= 5) abundance = 0.9f;     
                 else if (h == 4) abundance = 0.7f;

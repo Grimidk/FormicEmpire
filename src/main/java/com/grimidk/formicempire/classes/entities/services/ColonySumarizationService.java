@@ -42,9 +42,9 @@ public class ColonySumarizationService {
         int meatGain = probabilisticRound(stats.getProteinProductionHourly(colony));
         int rockGain = probabilisticRound(stats.getMineralProductionHourly(colony));
 
-        if (loc.getTotalQuantityAvailable(GameConstants.PLANT_RESOURCE) <= 0) plantGain = 0;
+        if (loc.getTotalQuantityAvailable(GameConstants.RESOURCE_PLANT) <= 0) plantGain = 0;
 
-        if (loc.getTotalQuantityAvailable(GameConstants.WATER_RESOURCE) <= 0) {
+        if (loc.getTotalQuantityAvailable(GameConstants.RESOURCE_WATER) <= 0) {
             double passiveOnly = 0; 
              if (colony.hasBuilding(GameUnlocks.PASSIVE_WATER)) {
                 double dailyPct = colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1) ? 0.20 : 0.10;
@@ -52,13 +52,13 @@ public class ColonySumarizationService {
             }
             waterGain = probabilisticRound(passiveOnly);
         }
-        if (loc.getTotalQuantityAvailable(GameConstants.MEAT_RESOURCE) <= 0) meatGain = 0;
-        if (loc.getTotalQuantityAvailable(GameConstants.ROCK_RESOURCE) <= 0) rockGain = 0;
+        if (loc.getTotalQuantityAvailable(GameConstants.RESOURCE_MEAT) <= 0) meatGain = 0;
+        if (loc.getTotalQuantityAvailable(GameConstants.RESOURCE_ROCK) <= 0) rockGain = 0;
 
-        addResource(colony, colony.getPlants(), plantGain, stats.getPlantsCapacity(colony), GameConstants.PLANT_RESOURCE);
-        addResource(colony, colony.getWater(), waterGain, stats.getWaterCapacity(colony), GameConstants.WATER_RESOURCE);
-        addResource(colony, colony.getProtein(), meatGain, stats.getProteinCapacity(colony), GameConstants.MEAT_RESOURCE);
-        addResource(colony, colony.getMinerals(), rockGain, stats.getMineralsCapacity(colony), GameConstants.ROCK_RESOURCE);
+        addResource(colony, colony.getPlants(), plantGain, stats.getPlantsCapacity(colony), GameConstants.RESOURCE_PLANT);
+        addResource(colony, colony.getWater(), waterGain, stats.getWaterCapacity(colony), GameConstants.RESOURCE_WATER);
+        addResource(colony, colony.getProtein(), meatGain, stats.getProteinCapacity(colony), GameConstants.RESOURCE_MEAT);
+        addResource(colony, colony.getMinerals(), rockGain, stats.getMineralsCapacity(colony), GameConstants.RESOURCE_ROCK);
 
         if (colony.getMushrooms() < stats.getMushroomsCapacity(colony)) {
             int farmerCount = stats.getEffectiveFarmerCount(colony);
@@ -85,7 +85,7 @@ public class ColonySumarizationService {
                 }
                 
                 if (actualConverted > 0) {
-                    addResource(colony, colony.getMushrooms(), actualConverted, stats.getMushroomsCapacity(colony), GameConstants.FUNGI_RESOURCE);
+                    addResource(colony, colony.getMushrooms(), actualConverted, stats.getMushroomsCapacity(colony), GameConstants.RESOURCE_FUNGI);
                 }
             }
         }
@@ -100,11 +100,11 @@ public class ColonySumarizationService {
         if (gain <= 0) return;
         int newValue = Math.min(current + gain, max);
         
-        if (type == GameConstants.PLANT_RESOURCE) colony.setPlants(newValue);
-        else if (type == GameConstants.WATER_RESOURCE) colony.setWater(newValue);
-        else if (type == GameConstants.MEAT_RESOURCE) colony.setProtein(newValue);
-        else if (type == GameConstants.ROCK_RESOURCE) colony.setMinerals(newValue);
-        else if (type == GameConstants.FUNGI_RESOURCE) colony.setMushrooms(newValue);
+        if (type == GameConstants.RESOURCE_PLANT) colony.setPlants(newValue);
+        else if (type == GameConstants.RESOURCE_WATER) colony.setWater(newValue);
+        else if (type == GameConstants.RESOURCE_MEAT) colony.setProtein(newValue);
+        else if (type == GameConstants.RESOURCE_ROCK) colony.setMinerals(newValue);
+        else if (type == GameConstants.RESOURCE_FUNGI) colony.setMushrooms(newValue);
     }
 
     private void simulateLaying(Colony colony) {

@@ -307,9 +307,9 @@ public class UpgradeDialog extends ZeroDialog {
             JPanel northPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
             northPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
             mineralsLabel = new JLabel();
-            mineralsLabel.setIcon(GameConstants.ROCK_RESOURCE.getIcon());
+            mineralsLabel.setIcon(GameConstants.RESOURCE_ROCK.getIcon());
             resinLabel = new JLabel();
-            resinLabel.setIcon(GameConstants.RESIN_RESOURCE.getIcon());
+            resinLabel.setIcon(GameConstants.RESOURCE_RESIN.getIcon());
             buildersLabel = new JLabel();
             buildersLabel.setIcon(GameConstants.ROLE_BUILDER.getIcon());
 

@@ -68,11 +68,11 @@ public class ColonyStarterService {
                 
                 int pX = random.nextInt((range * 2) + 1) - range;
                 int pY = random.nextInt((range * 2) + 1) - range;
-                ResourceSource initialPlant = new ResourceSource(GameConstants.PLANT_RESOURCE, 10000, pX, pY);
+                ResourceSource initialPlant = new ResourceSource(GameConstants.RESOURCE_PLANT, 10000, pX, pY);
                 
                 int wX = random.nextInt((range * 2) + 1) - range;
                 int wY = random.nextInt((range * 2) + 1) - range;
-                ResourceSource initialWater = new ResourceSource(GameConstants.WATER_RESOURCE, 10000, wX, wY);
+                ResourceSource initialWater = new ResourceSource(GameConstants.RESOURCE_WATER, 10000, wX, wY);
                 
                 colony.getLocationService().addSource(colony, initialPlant);
                 colony.getLocationService().addSource(colony, initialWater);

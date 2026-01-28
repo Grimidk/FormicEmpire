@@ -201,42 +201,42 @@ public class StatsDialog extends ZeroDialog {
         // --- Plants ---
         int plantProd = stats.getPlantProduction(colony);
         int plantCons = stats.getPlantConsumption(colony);
-        addResourceRow(model, GameConstants.PLANT_RESOURCE.getIcon(), "Plants", colony.getPlants(), stats.getPlantsCapacity(colony), 
-            loc != null ? loc.getSourcesByType(GameConstants.PLANT_RESOURCE).size() : 0, stats.getSourceCapacity(colony),
+        addResourceRow(model, GameConstants.RESOURCE_PLANT.getIcon(), "Plants", colony.getPlants(), stats.getPlantsCapacity(colony), 
+            loc != null ? loc.getSourcesByType(GameConstants.RESOURCE_PLANT).size() : 0, stats.getSourceCapacity(colony),
             plantProd, plantCons);
             
         // --- Mushrooms ---
         int mushProd = stats.getTotalProduction(colony);
         int mushCons = stats.getTotalConsumption(colony);
-        addResourceRow(model, GameConstants.FUNGI_RESOURCE.getIcon(), "Mushrooms", colony.getMushrooms(), stats.getMushroomsCapacity(colony), 
+        addResourceRow(model, GameConstants.RESOURCE_FUNGI.getIcon(), "Mushrooms", colony.getMushrooms(), stats.getMushroomsCapacity(colony), 
             0, 0, mushProd, mushCons);
             
         // --- Protein ---
         int protProd = stats.getProteinProduction(colony);
         int protCons = stats.getProteinConsumption(colony);
-        addResourceRow(model, GameConstants.MEAT_RESOURCE.getIcon(), "Protein", colony.getProtein(), stats.getProteinCapacity(colony), 
-            loc != null ? loc.getSourcesByType(GameConstants.MEAT_RESOURCE).size() : 0, stats.getSourceCapacity(colony),
+        addResourceRow(model, GameConstants.RESOURCE_MEAT.getIcon(), "Protein", colony.getProtein(), stats.getProteinCapacity(colony), 
+            loc != null ? loc.getSourcesByType(GameConstants.RESOURCE_MEAT).size() : 0, stats.getSourceCapacity(colony),
             protProd, protCons);
             
         // --- Water ---
         int waterProd = stats.getWaterProduction(colony);
         int waterCons = stats.getWaterConsumption(colony);
-        addResourceRow(model, GameConstants.WATER_RESOURCE.getIcon(), "Water", colony.getWater(), stats.getWaterCapacity(colony), 
-            loc != null ? loc.getSourcesByType(GameConstants.WATER_RESOURCE).size() : 0, stats.getSourceCapacity(colony),
+        addResourceRow(model, GameConstants.RESOURCE_WATER.getIcon(), "Water", colony.getWater(), stats.getWaterCapacity(colony), 
+            loc != null ? loc.getSourcesByType(GameConstants.RESOURCE_WATER).size() : 0, stats.getSourceCapacity(colony),
             waterProd, waterCons);
 
         // --- Minerals ---
         int minProd = stats.getMineralProduction(colony);
         int minCons = stats.getMineralConsumption(colony);
-        addResourceRow(model, GameConstants.ROCK_RESOURCE.getIcon(), "Minerals", colony.getMinerals(), stats.getMineralsCapacity(colony), 
-            loc != null ? loc.getSourcesByType(GameConstants.ROCK_RESOURCE).size() : 0, stats.getSourceCapacity(colony),
+        addResourceRow(model, GameConstants.RESOURCE_ROCK.getIcon(), "Minerals", colony.getMinerals(), stats.getMineralsCapacity(colony), 
+            loc != null ? loc.getSourcesByType(GameConstants.RESOURCE_ROCK).size() : 0, stats.getSourceCapacity(colony),
             minProd, minCons);
             
         // --- Syrups/Resins  ---
-        addResourceRow(model, GameConstants.SYRUP_RESOURCE.getIcon(), "Syrups", colony.getSyrups(), stats.getSyrupsCapacity(colony), 
+        addResourceRow(model, GameConstants.RESOURCE_SYRUP.getIcon(), "Syrups", colony.getSyrups(), stats.getSyrupsCapacity(colony), 
             0, 0, 0, 0);
             
-        addResourceRow(model, GameConstants.RESIN_RESOURCE.getIcon(), "Resins", colony.getResins(), stats.getResinsCapacity(colony), 
+        addResourceRow(model, GameConstants.RESOURCE_RESIN.getIcon(), "Resins", colony.getResins(), stats.getResinsCapacity(colony), 
             0, 0, 0, 0);
 
         model.addRow(new Object[]{null, "------", "---", "---", "---", "---", "---", "---"});

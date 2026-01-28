@@ -107,12 +107,12 @@ public class ColonyLocationService {
         AntRole role = ant.getRole();
 
         if (role == GameConstants.ROLE_FORAGER) {
-            targetTypes.add(GameConstants.PLANT_RESOURCE);
-            targetTypes.add(GameConstants.WATER_RESOURCE);
+            targetTypes.add(GameConstants.RESOURCE_PLANT);
+            targetTypes.add(GameConstants.RESOURCE_WATER);
         } else if (role == GameConstants.ROLE_HUNTER) {
-            targetTypes.add(GameConstants.MEAT_RESOURCE);
+            targetTypes.add(GameConstants.RESOURCE_MEAT);
         } else if (role == GameConstants.ROLE_MINER) {
-            targetTypes.add(GameConstants.ROCK_RESOURCE);
+            targetTypes.add(GameConstants.RESOURCE_ROCK);
         }
 
         ResourceSource nearest = null;
