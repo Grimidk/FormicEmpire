@@ -5,6 +5,7 @@ To Fix (By decreasing priority) :
 	civs are shit but at least they dont break everything
 	
 	High:
+	building menu not opening right away like rolemgmt does
 
 	Mid:
 	double wide hex map border to mape civ borders

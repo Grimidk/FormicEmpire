@@ -5,9 +5,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
 import com.grimidk.formicempire.classes.constants.misc.Species;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.services.CivilizationAutomationService;
+import com.grimidk.formicempire.classes.entities.services.CivilizationStarterService;
+import com.grimidk.formicempire.classes.entities.services.CivilizationStatService;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 
@@ -17,16 +20,15 @@ public class Civilization {
     private String name;
     private boolean isPlayer;
     private Species species;
-    
-    // Global Resources
+    private ColonyRank rank;    
     private int researchPoints;
     private final Set<Upgrade> unlockedUpgrades;
-    
-    // Children
     private final List<Colony> colonies;
 
     // Services
     private transient CivilizationAutomationService automationService;
+    private transient CivilizationStarterService starterService;
+    private transient CivilizationStatService statService;
 
     public Civilization(int id, String name, boolean isPlayer) {
         this.id = id;
@@ -121,6 +123,8 @@ public class Civilization {
     public void setPlayer(boolean player) { isPlayer = player; }
     public Species getSpecies() { return species; }
     public void setSpecies(Species species) { this.species = species; }
+    public ColonyRank getRank() { return rank; }
+    public void setRank(ColonyRank rank) { this.rank = rank; }
 
     public int getResearchPoints() { return researchPoints; }
     public void setResearchPoints(int researchPoints) { this.researchPoints = researchPoints; }

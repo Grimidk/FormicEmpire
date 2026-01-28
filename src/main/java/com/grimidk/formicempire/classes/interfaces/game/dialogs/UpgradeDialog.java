@@ -85,7 +85,7 @@ public class UpgradeDialog extends ZeroDialog {
         }
 
         // --- Assimilations Tab ---
-        if (false) { // To implement
+        if (colony.hasUpgrade(GameUnlocks.ABILITY_ASSIMILATION)) { // To implement
             if (assimilationPanel == null) {
                 assimilationPanel = createPlaceholderPanel("Assimilations - Coming Soon");
             }
@@ -94,7 +94,7 @@ public class UpgradeDialog extends ZeroDialog {
         }
 
         // --- Synergies Tab ---
-        if (false) { // To implement
+        if (colony.hasUpgrade(GameUnlocks.ABILITY_SYNERGY)) { // To implement
             if (synergyPanel == null) {
                 synergyPanel = createPlaceholderPanel("Synergies - Coming Soon");
             }

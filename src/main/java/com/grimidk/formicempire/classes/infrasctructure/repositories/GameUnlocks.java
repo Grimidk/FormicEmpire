@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.grimidk.formicempire.classes.constants.unlocks.Building;
-import com.grimidk.formicempire.classes.constants.unlocks.Synergy;
-import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
+import com.grimidk.formicempire.classes.constants.unlocks.*;
 
 public final class GameUnlocks {
     private GameUnlocks() {}
@@ -14,6 +12,7 @@ public final class GameUnlocks {
     private static final List<Upgrade> upgrades = new ArrayList<>();
     private static final List<Building> buildings = new ArrayList<>();
     private static final List<Synergy> synergies = new ArrayList<>();
+    private static final List<Assimilation> assimilations = new ArrayList<>();
 
     // --- Upgrades ---
     // -- Types --
@@ -149,6 +148,10 @@ public final class GameUnlocks {
     static { upgrades.add(ABILITY_SPREAD); }
     public static final Upgrade ABILITY_RESIN = new Upgrade(204, "Resin Harvest", "Resin Resonation", "Allows your to foragers to harvest resin while foraging plants as a bonus, there is 1% chance each foraging run.", ROLE_FORAGER, 5000 );
     static { upgrades.add(ABILITY_RESIN); }
+    public static final Upgrade ABILITY_SYNERGY = new Upgrade(205, "Synergies", "Collaborative Effort", "Allows the use of synergies by combining two upgrades to make a third more powerful upgrade.", ABILITY_RESEARCH, 0);
+    static { upgrades.add(ABILITY_SYNERGY); }
+    public static final Upgrade ABILITY_ASSIMILATION = new Upgrade(206, "Assimilation", "Genetic Assimilation", "Allows the use of assimilations to change the genetic code of your species and gain new abilities from other species.", ABILITY_RESEARCH, 0);
+    static { upgrades.add(ABILITY_ASSIMILATION); }
     public static final Upgrade ABILITY_FORCED_FLIGHT = new Upgrade(505, "Forced Nuptial Flights", "Royal Decree", "Allows you to force a nuptial flight by spending 1000 research points.", ROLE_BREEDER, 9000);
     static { upgrades.add(ABILITY_FORCED_FLIGHT); }
 
@@ -211,6 +214,24 @@ public final class GameUnlocks {
     public static final Building RESIN_RESERVOIR_2 = new Building(27, "Reinforced Resin Reservoir", 2, "The resin-reinforced resin reservoir for the colony, holds 1200 resin drops.", RESIN_RESERVOIR_1, 400, 0, 2000);
     static { buildings.add(RESIN_RESERVOIR_2); }
     // -- Tier 3 --
+    public static final Building ROYAL_CHAMBER_3 = new Building(28, "Fortified Royal Chamber", 3, "The further fortified queen chamber for the colony, holds 10 queens.", ROYAL_CHAMBER_2, 1000, 0, 15000);
+    static { buildings.add(ROYAL_CHAMBER_3); }
+    public static final Building EGG_CHAMBER_3 = new Building(29, "Fortified Egg Chamber", 3, "The further fortified egg chamber for the colony, holds 500 juvenile ants of each type.", EGG_CHAMBER_2, 500, 0, 5000);
+    static { buildings.add(EGG_CHAMBER_3); }
+    public static final Building MUSHROOM_CHAMBER_3 = new Building(30, "Fortified Mushroom Chamber", 3, "The further fortified mushroom chamber for the colony, holds 100000 mushroom matter.", MUSHROOM_CHAMBER_2, 800, 0, 5000);
+    static { buildings.add(MUSHROOM_CHAMBER_3); }   
+    public static final Building PLANT_CHAMBER_3 = new Building(31, "Fortified Plant Chamber", 3, "The further fortified plant chamber for the colony, holds 60000 plant matter.", PLANT_CHAMBER_2, 700, 0, 5000);
+    static { buildings.add(PLANT_CHAMBER_3); }
+    public static final Building WATER_RESERVOIR_3 = new Building(32, "Fortified Water Reservoir", 3, "The further fortified water reservoir for the colony, holds 25000 water drops.", WATER_RESERVOIR_2, 900, 0, 5000);
+    static { buildings.add(WATER_RESERVOIR_3); }
+    public static final Building MEAT_CHAMBER_3 = new Building(33, "Fortified Protein Chamber", 3, "The further fortified protein chamber for the colony, holds 40000 animal matter.", MEAT_CHAMBER_2, 850, 0, 10000);
+    static { buildings.add(MEAT_CHAMBER_3); }
+    public static final Building SYRUP_RESERVOIR_3 = new Building(34, "Fortified Syrups Reservoir", 3, "The further fortified syrup reservoir for the colony, holds 10000 syrup drops.", SYRUP_RESERVOIR_2, 800, 0, 10000);
+    static { buildings.add(SYRUP_RESERVOIR_3); }
+    public static final Building ROCK_WAREHOUSE_3 = new Building(35, "Fortified Mineral Warehouse", 3, "The further fortified mineral warehouse for the colony, holds 2500 mineral rocks.", ROCK_WAREHOUSE_2, 950, 0, 10000);
+    static { buildings.add(ROCK_WAREHOUSE_3); }
+    public static final Building RESIN_RESERVOIR_3 = new Building(36, "Fortified Resin Reservoir", 3, "The further fortified resin reservoir for the colony, holds 3000 resin drops.", RESIN_RESERVOIR_2, 900, 0, 10000);
+    static { buildings.add(RESIN_RESERVOIR_3); }
     // -- Tier 4 --
     // -- Tier 5 --
     // -- Tier Misc. --
@@ -244,5 +265,9 @@ public final class GameUnlocks {
 
     public static List<Synergy> getSynergies() {
         return Collections.unmodifiableList(synergies);
+    }
+
+    public static List<Assimilation> getAssimilations() {
+        return Collections.unmodifiableList(assimilations);
     }
 }
