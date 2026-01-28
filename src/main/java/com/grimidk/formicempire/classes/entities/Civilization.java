@@ -1,9 +1,12 @@
 package com.grimidk.formicempire.classes.entities;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
 import com.grimidk.formicempire.classes.constants.misc.Species;
@@ -12,6 +15,7 @@ import com.grimidk.formicempire.classes.entities.services.CivilizationAutomation
 import com.grimidk.formicempire.classes.entities.services.CivilizationStarterService;
 import com.grimidk.formicempire.classes.entities.services.CivilizationStatService;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 
 public class Civilization {
@@ -20,93 +24,88 @@ public class Civilization {
     private String name;
     private boolean isPlayer;
     private Species species;
-    private ColonyRank rank;    
     private int researchPoints;
+    
+    // Global Data
     private final Set<Upgrade> unlockedUpgrades;
     private final List<Colony> colonies;
+    private final Map<String, Integer> globalDeathStatistics;
 
     // Services
     private transient CivilizationAutomationService automationService;
     private transient CivilizationStarterService starterService;
     private transient CivilizationStatService statService;
 
-    public Civilization(int id, String name, boolean isPlayer) {
+    public Civilization(int id, String name, boolean isPlayer, Species species) {
         this.id = id;
         this.name = name;
         this.isPlayer = isPlayer;
+        this.species = species;
         this.colonies = new ArrayList<>();
         this.unlockedUpgrades = new HashSet<>();
+        this.globalDeathStatistics = new ConcurrentHashMap<>();
         this.researchPoints = 0;
-        this.automationService = new CivilizationAutomationService();
         
-        initializeUpgrades();
+        initializeServices();
     }
     
-    // public Civilization(Savefile.SavedCivilization savedCiv) {
-    //     this.id = savedCiv.id;
-    //     this.name = savedCiv.name;
-    //     this.isPlayer = savedCiv.isPlayer;
-    //     this.researchPoints = savedCiv.researchPoints;
-    //     this.colonies = new ArrayList<>();
-    //     this.unlockedUpgrades = new HashSet<>();
-    //     this.automationService = new CivilizationAutomationService();
-
-    //     if (savedCiv.unlockedUpgradeIds != null) {
-    //         for (Integer upId : savedCiv.unlockedUpgradeIds) {
-    //             for (Upgrade u : GameUnlocks.getUpgrades()) {
-    //                 if (u.getId() == upId) {
-    //                     this.unlockedUpgrades.add(u);
-    //                     break;
-    //                 }
-    //             }
-    //         }
-    //     } else {
-    //         initializeUpgrades();
-    //     }
-    // }
-
-    private void initializeUpgrades() {
-        this.unlockedUpgrades.add(GameUnlocks.TYPE_EGG);
-        this.unlockedUpgrades.add(GameUnlocks.TYPE_QUEEN);
-        this.unlockedUpgrades.add(GameUnlocks.TYPE_WORKER);
-        this.unlockedUpgrades.add(GameUnlocks.ROLE_FORAGER);
-        this.unlockedUpgrades.add(GameUnlocks.ROLE_FARMER);
-        this.unlockedUpgrades.add(GameUnlocks.ROLE_NURSE);
-        this.unlockedUpgrades.add(GameUnlocks.ROLE_LAYER);
-        this.unlockedUpgrades.add(GameUnlocks.STAT_SKELETON);
-        this.unlockedUpgrades.add(GameUnlocks.STAT_ACID);
-        this.unlockedUpgrades.add(GameUnlocks.STAT_LONGEVITY);
-    }
-
-    // --- Core Logic ---
-    public void runHourlyJobs() {
-        for (Colony colony : colonies) {
-            colony.runHourlyJobs();
+    public Civilization(Savefile.SavedCivilization savedCiv) {
+        this.id = savedCiv.id;
+        this.name = savedCiv.name;
+        this.isPlayer = savedCiv.isPlayer;
+        this.researchPoints = savedCiv.researchPoints;
+        
+        this.species = GameConstants.SPECIES_OMNI; 
+        for(Species s : GameConstants.getSpecies()) {
+            if (s.getId() == savedCiv.speciesId) {
+                this.species = s;
+                break;
+            }
         }
+
+        this.colonies = new ArrayList<>();
+        this.unlockedUpgrades = new HashSet<>();
+        this.globalDeathStatistics = new ConcurrentHashMap<>();
+        
+        if (savedCiv.deathStatistics != null) {
+            this.globalDeathStatistics.putAll(savedCiv.deathStatistics);
+        }
+
+        if (savedCiv.unlockedUpgradeIds != null) {
+            Map<Integer, Upgrade> allUpgrades = new HashMap<>();
+            for (Upgrade u : GameUnlocks.getUpgrades()) {
+                allUpgrades.put(u.getId(), u);
+            }
+            for (Integer upId : savedCiv.unlockedUpgradeIds) {
+                Upgrade u = allUpgrades.get(upId);
+                if (u != null) {
+                    this.unlockedUpgrades.add(u);
+                }
+            }
+        }
+        
+        initializeServices();
     }
 
-    public void runDailyJobs(Object tempIcon, Object biome) {
+    private void initializeServices() {
+        this.automationService = new CivilizationAutomationService();
+        this.starterService = new CivilizationStarterService();
+        this.statService = new CivilizationStatService();
+    }
+
+    // --- Logic ---
+    public void runDailyJobs() {
         this.automationService.runDailyAutomation(this);
-        for (Colony colony : colonies) {
-        }
     }
-
-    public void runMonthlyJobs() {
-        for (Colony colony : colonies) {
-            colony.runMonthlyJobs();
-        }
-    }
-
-    public void runYearlyJobs() {
-        for (Colony colony : colonies) {
-            colony.runYearlyJobs();
-        }
+    
+    public void recordDeath(String cause) {
+        this.globalDeathStatistics.merge(cause, 1, Integer::sum);
     }
 
     public void addColony(Colony colony) {
         if (!colonies.contains(colony)) {
             colonies.add(colony);
-            // colony.setCivilization(this); 
+            colony.setCivilization(this); 
         }
     }
 
@@ -115,7 +114,6 @@ public class Civilization {
     }
 
     // --- Getters & Setters ---
-
     public int getId() { return id; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
@@ -123,8 +121,6 @@ public class Civilization {
     public void setPlayer(boolean player) { isPlayer = player; }
     public Species getSpecies() { return species; }
     public void setSpecies(Species species) { this.species = species; }
-    public ColonyRank getRank() { return rank; }
-    public void setRank(ColonyRank rank) { this.rank = rank; }
 
     public int getResearchPoints() { return researchPoints; }
     public void setResearchPoints(int researchPoints) { this.researchPoints = researchPoints; }
@@ -135,4 +131,8 @@ public class Civilization {
     public void unlockUpgrade(Upgrade upgrade) { unlockedUpgrades.add(upgrade); }
 
     public List<Colony> getColonies() { return colonies; }
+    
+    public Map<String, Integer> getGlobalDeathStatistics() { return globalDeathStatistics; }
+    
+    public CivilizationStarterService getStarterService() { return starterService; }
 }

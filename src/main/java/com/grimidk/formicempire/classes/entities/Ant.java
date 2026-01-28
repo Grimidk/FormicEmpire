@@ -133,4 +133,20 @@ public class Ant extends Bug {
         this.setDefense((int)(colony.getBaseDefense() * newType.getDefenseMult()));
         this.setSpeed(colony.getBaseSpeed() * newType.getSpeedMult());
     }
+
+    public void updateStatsFromColony(Colony colony) {
+        this.setMaxHealth((int)(colony.getBaseHealth() * type.getHealtMult()));
+        
+        if (this.getHealth() > this.getMaxHealth()) {
+            this.setHealth(this.getMaxHealth());
+        }
+        
+        this.tempRes = colony.getBaseTempRes();
+        this.setRegen((int)(colony.getBaseRegen() * type.getRegenMult()));
+        this.setConsumption(colony.getBaseConsumption() * type.getConsumptionMult());
+        this.setAttack((int)(colony.getBaseAttack() * type.getAttackMult()));
+        this.setAttackSpeed((int)(colony.getBaseAttackSpeed() * type.getAttackSpeedMult()));
+        this.setDefense((int)(colony.getBaseDefense() * type.getDefenseMult()));        
+        this.setSpeed(colony.getBaseSpeed() * type.getSpeedMult());
+    }
 }

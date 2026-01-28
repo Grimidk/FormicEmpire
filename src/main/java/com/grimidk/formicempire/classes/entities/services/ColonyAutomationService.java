@@ -2,7 +2,6 @@ package com.grimidk.formicempire.classes.entities.services;
 
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
-import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
@@ -32,31 +31,7 @@ public class ColonyAutomationService {
         if (colony.isPlayer()) return;
         if (!colony.isAutomationEnabled()) return;
 
-        checkAndBuyUpgrades(colony);
         checkAndConstructBuildings(colony);
-    }
-
-    private void checkAndBuyUpgrades(Colony colony) {
-        List<Upgrade> candidates = new ArrayList<>();
-        for (Upgrade u : GameUnlocks.getUpgrades()) {
-            boolean notOwned = !colony.hasUpgrade(u);
-            boolean reqMet = (u.getRequirement() == null || colony.hasUpgrade(u.getRequirement()));
-            boolean validCost = u.getCost() > 0;
-            boolean canAfford = colony.getResearchPoints() >= u.getCost();
-
-            if (notOwned && reqMet && validCost && canAfford) {
-                candidates.add(u);
-            }
-        }
-        
-        if (!candidates.isEmpty()) {
-            candidates.sort(Comparator.comparingInt(Upgrade::getCost));
-            Upgrade target = candidates.get(0);
-            
-            colony.setResearchPoints(colony.getResearchPoints() - target.getCost());
-            colony.unlockUpgrade(target);
-            colony.logEvent("AUTOMATION: Researched " + target.getName());
-        }
     }
 
     private void checkAndConstructBuildings(Colony colony) {

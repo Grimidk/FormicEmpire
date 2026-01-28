@@ -11,10 +11,8 @@ import java.util.List;
 public class CivilizationAutomationService {
 
     public void runDailyAutomation(Civilization civ) {
-        if (civ.isPlayer()) return; // Player manages their own tech
+        if (civ.isPlayer()) return;
         
-        // Check global policy settings if you add them later
-        // For now, NPCs always try to buy upgrades
         checkAndBuyUpgrades(civ);
     }
 
@@ -33,14 +31,12 @@ public class CivilizationAutomationService {
         }
         
         if (!candidates.isEmpty()) {
-            // Simple AI: Buy cheapest available
             candidates.sort(Comparator.comparingInt(Upgrade::getCost));
             Upgrade target = candidates.get(0);
             
             civ.setResearchPoints(civ.getResearchPoints() - target.getCost());
             civ.unlockUpgrade(target);
             
-            // Log for the first colony to give some world feedback
             if (!civ.getColonies().isEmpty()) {
                 civ.getColonies().get(0).logEvent("CIVILIZATION: Researched " + target.getName());
             }

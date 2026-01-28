@@ -169,7 +169,6 @@ public class Engine extends Thread {
         } else {
             System.out.println("Generating new world...");
             Colony colony = new Colony(1, "Grim Colony", true);
-            // Hard coded biome for now 
             this.world.startWorld(GameConstants.BIOME_PLAINS, colony);
         }
     }

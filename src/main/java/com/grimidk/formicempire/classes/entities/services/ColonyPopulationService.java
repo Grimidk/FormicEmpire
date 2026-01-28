@@ -42,12 +42,20 @@ public class ColonyPopulationService {
     }
 
     public void recordDeath(String cause) {
+        recordDeath(cause, null);
+    }
+
+    public void recordDeath(String cause, Colony colony) {
         String key = "Other";
         if (cause != null) {
             if (deathCauses.containsKey(cause)) key = cause;
             else if (cause.equalsIgnoreCase("Combat")) key = "Conflict";
         }
         deathCauses.merge(key, 1, Integer::sum);
+        
+        if (colony != null && colony.getCivilization() != null) {
+            colony.getCivilization().recordDeath(key);
+        }
     }
 
     public Map<String, Integer> getDeathStatistics() {

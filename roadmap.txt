@@ -2,10 +2,12 @@ Here is the current roadmap of features and fixes:
 
 To Fix (By decreasing priority) : 
 	Urgent:
-	civs are shit but at least they dont break everything
 	
 	High:
 	building menu not opening right away like rolemgmt does
+	enemies need leafcutter species
+	tooltip civ name
+	civ rank
 
 	Mid:
 	double wide hex map border to mape civ borders
@@ -21,9 +23,9 @@ To Feature (to be done in order):
 Needed for launch (v1.0) (Launch Version):
 	Priority:
 	colonizing and new colonies and civilizations-species (research inheritance)	
-	trade routes (async with roles and incoming outgoing recurrent and one time and travel time and danger level and boring tunnels)
 
 	Everything else :
+	trade routes (async with roles and incoming outgoing recurrent and one time and travel time and danger level and boring tunnels)
 	breeders go out of the colony in nuptial
 	auxiliary room sprites (storage (resources), farm (shroom), nurse (bedding), royal (nests and science)) and expansion (breeder room)
 	more settings (allow idle to forage, allow unassigned, choose default, change roles to proportions (may use by npc), fuzzed parasites, arachnophobia mode ?)

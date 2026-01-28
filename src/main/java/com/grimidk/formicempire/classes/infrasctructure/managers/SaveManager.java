@@ -12,6 +12,7 @@ import javax.swing.SwingUtilities;
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
+import com.grimidk.formicempire.classes.entities.Civilization;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
@@ -302,7 +303,29 @@ public class SaveManager {
         
         List<Savefile.SavedHex> hexList = new ArrayList<>();
         List<Savefile.SavedColony> colonyList = new ArrayList<>();
+        List<Savefile.SavedCivilization> civList = new ArrayList<>();
 
+        // Save Civilizations
+        if (w.getCivilizations() != null) {
+            for (Civilization civ : w.getCivilizations()) {
+                Savefile.SavedCivilization sc = new Savefile.SavedCivilization();
+                sc.id = civ.getId();
+                sc.name = civ.getName();
+                sc.isPlayer = civ.isPlayer();
+                sc.researchPoints = civ.getResearchPoints();
+                sc.speciesId = civ.getSpecies() != null ? civ.getSpecies().getId() : 1;
+                
+                for(Upgrade u : civ.getUnlockedUpgrades()) {
+                    sc.unlockedUpgradeIds.add(u.getId());
+                }
+                
+                sc.deathStatistics = new HashMap<>(civ.getGlobalDeathStatistics());
+                civList.add(sc);
+            }
+        }
+        save.setCivilizations(civList);
+
+        // Save Hexes & Colonies
         if (w.getHexes() != null) {
             for (Hex h : w.getHexes()) {
                 boolean hasColony = (h.getColony() != null);
@@ -316,6 +339,7 @@ public class SaveManager {
                     
                     // ID & Location
                     sc.id = c.getId();
+                    sc.civId = (c.getCivilization() != null) ? c.getCivilization().getId() : 0;
                     sc.name = c.getName();
                     sc.rankName = c.getRank() != null ? c.getRank().getName() : "Colony";
                     sc.isPlayer = c.isPlayer();
@@ -354,7 +378,6 @@ public class SaveManager {
                     // Stats
                     sc.aphids = c.getAphids();
                     sc.parasites = c.getParasites();
-                    sc.researchPoints = c.getResearchPoints();
                     sc.totalDeaths = c.getTotalDeaths();
                     
                     // Maps/Lists
@@ -362,12 +385,10 @@ public class SaveManager {
                         sc.assignedRoleCounts.put(entry.getKey().getName(), entry.getValue());
                     }
                     
-                    // Death Statistics
                     if (c.getPopulationService() != null) {
-                        sc.deathStatistics = new HashMap<>(c.getPopulationService().getDeathStatistics());
+                        sc.localDeathStatistics = new HashMap<>(c.getPopulationService().getDeathStatistics());
                     }
 
-                    for (Upgrade up : c.getUnlockedUpgrades()) sc.unlockedUpgradeIds.add(up.getId());
                     for (Building b : c.getUnlockedBuildings()) sc.unlockedBuildingIds.add(b.getId());
                     
                     if (c.getLocationService() != null) {
@@ -418,7 +439,7 @@ public class SaveManager {
         writeJsonLine(w, "year", s.getYear(), false);
         writeJsonLine(w, "worldRadius", s.getWorldRadius(), false);
         
-        // - Root Summary Data (For UI compatibility) - 
+        // - Root Summary Data - 
         writeJsonLine(w, "colonyId", s.getColonyId(), false);
         writeJsonLine(w, "colonyName", s.getColonyName(), false);
         writeJsonLine(w, "totalAnts", s.getTotalAnts(), false);
@@ -432,7 +453,19 @@ public class SaveManager {
         w.write(","); 
         w.newLine();
         
-        // - Colonies (Iterate list) -
+        // - Civilizations -
+        w.write("  \"civilizations\": [");
+        w.newLine();
+        List<Savefile.SavedCivilization> civs = s.getCivilizations();
+        if (civs != null) {
+             for(int i=0; i<civs.size(); i++) {
+                writeSavedCivilization(w, civs.get(i), (i == civs.size() - 1));
+            }
+        }
+        w.write("  ],");
+        w.newLine();
+
+        // - Colonies -
         w.write("  \"colonies\": [");
         w.newLine();
         
@@ -449,11 +482,27 @@ public class SaveManager {
         w.newLine();
     }
     
+    private void writeSavedCivilization(BufferedWriter w, Savefile.SavedCivilization sc, boolean isLast) throws IOException {
+        w.write("    {");
+        w.newLine();
+        writeJsonLine(w, "id", sc.id, false);
+        writeJsonLine(w, "name", sc.name, false);
+        writeJsonLine(w, "isPlayer", sc.isPlayer, false);
+        writeJsonLine(w, "speciesId", sc.speciesId, false);
+        writeJsonLine(w, "researchPoints", sc.researchPoints, false);
+        w.write("      \"unlockedUpgradeIds\": " + serializeListToJson(sc.unlockedUpgradeIds) + ","); w.newLine();
+        w.write("      \"deathStatistics\": " + serializeMapToJson(sc.deathStatistics)); w.newLine(); // Last item
+        w.write("    }");
+        if (!isLast) w.write(",");
+        w.newLine();
+    }
+    
     private void writeSavedColony(BufferedWriter w, Savefile.SavedColony sc, boolean isLast) throws IOException {
         w.write("    {");
         w.newLine();
         // ID & Loc
         writeJsonLine(w, "id", sc.id, false);
+        writeJsonLine(w, "civId", sc.civId, false);
         writeJsonLine(w, "name", sc.name, false);
         writeJsonLine(w, "rank", sc.rankName, false);
         writeJsonLine(w, "isPlayer", sc.isPlayer, false);
@@ -490,15 +539,13 @@ public class SaveManager {
         
         writeJsonLine(w, "aphids", sc.aphids, false);
         writeJsonLine(w, "parasites", sc.parasites, false);
-        writeJsonLine(w, "researchPoints", sc.researchPoints, false);
         writeJsonLine(w, "totalDeaths", sc.totalDeaths, false);
 
         // Serialized Lists within Colony
         w.write("      \"assignedRoleCounts\": " + serializeMapToJson(sc.assignedRoleCounts) + ","); w.newLine();
-        w.write("      \"deathStatistics\": " + serializeMapToJson(sc.deathStatistics) + ","); w.newLine();
-        w.write("      \"unlockedUpgradeIds\": " + serializeListToJson(sc.unlockedUpgradeIds) + ","); w.newLine();
+        w.write("      \"localDeathStatistics\": " + serializeMapToJson(sc.localDeathStatistics) + ","); w.newLine();
         w.write("      \"unlockedBuildingIds\": " + serializeListToJson(sc.unlockedBuildingIds) + ","); w.newLine();
-        w.write("      \"savedResourceSources\": " + serializeSourcesToJson(sc.savedResourceSources)); w.newLine(); // Last item
+        w.write("      \"savedResourceSources\": " + serializeSourcesToJson(sc.savedResourceSources)); w.newLine(); 
         
         w.write("    }");
         if (!isLast) w.write(",");
@@ -547,6 +594,10 @@ public class SaveManager {
         s.setDeadAnts(Integer.parseInt(rootMap.getOrDefault("deadAnts", "0")));
 
         s.setWorldHexes(deserializeJsonToHexes(rootMap.get("worldHexes")));
+        
+        List<Savefile.SavedCivilization> civs = deserializeJsonToCivilizations(rootMap.get("civilizations"));
+        s.setCivilizations(civs);
+        
         List<Savefile.SavedColony> colonies = deserializeJsonToColonies(rootMap.get("colonies"));
         s.setColonies(colonies);
         
@@ -596,6 +647,42 @@ public class SaveManager {
         }
     }
     
+    private List<Savefile.SavedCivilization> deserializeJsonToCivilizations(String jsonArray) {
+        List<Savefile.SavedCivilization> list = new ArrayList<>();
+        if (jsonArray == null || !jsonArray.startsWith("[")) return list;
+        
+        String content = jsonArray.substring(1, jsonArray.lastIndexOf("]"));        
+        int braceDepth = 0;
+        int start = 0;
+        for(int i=0; i<content.length(); i++) {
+            char c = content.charAt(i);
+            if (c == '{') braceDepth++;
+            if (c == '}') {
+                braceDepth--;
+                if (braceDepth == 0) {
+                    String civJson = content.substring(start, i+1);
+                    list.add(parseCivilizationObject(civJson));
+                    while(i+1 < content.length() && (content.charAt(i+1) == ',' || Character.isWhitespace(content.charAt(i+1)))) i++;
+                    start = i+1;
+                }
+            }
+        }
+        return list;
+    }
+    
+    private Savefile.SavedCivilization parseCivilizationObject(String json) {
+        Savefile.SavedCivilization sc = new Savefile.SavedCivilization();
+        Map<String, String> map = parseTopLevelJson(json);
+        sc.id = Integer.parseInt(map.getOrDefault("id", "0"));
+        sc.name = map.getOrDefault("name", "Empire");
+        sc.isPlayer = Boolean.parseBoolean(map.getOrDefault("isPlayer", "false"));
+        sc.speciesId = Integer.parseInt(map.getOrDefault("speciesId", "1"));
+        sc.researchPoints = Integer.parseInt(map.getOrDefault("researchPoints", "0"));
+        sc.unlockedUpgradeIds = deserializeJsonToList(map.get("unlockedUpgradeIds"));
+        sc.deathStatistics = deserializeJsonToMap(map.get("deathStatistics"));
+        return sc;
+    }
+
     private List<Savefile.SavedColony> deserializeJsonToColonies(String jsonArray) {
         List<Savefile.SavedColony> list = new ArrayList<>();
         if (jsonArray == null || !jsonArray.startsWith("[")) return list;
@@ -624,6 +711,7 @@ public class SaveManager {
         Map<String, String> map = parseTopLevelJson(json); 
         
         sc.id = Integer.parseInt(map.getOrDefault("id", "0"));
+        sc.civId = Integer.parseInt(map.getOrDefault("civId", "0"));
         sc.name = map.getOrDefault("name", "Colony");
         sc.rankName = map.getOrDefault("rank", "Colony");
         sc.isPlayer = Boolean.parseBoolean(map.getOrDefault("isPlayer", "false"));
@@ -658,13 +746,11 @@ public class SaveManager {
         
         sc.aphids = Integer.parseInt(map.getOrDefault("aphids", "0"));
         sc.parasites = Integer.parseInt(map.getOrDefault("parasites", "0"));
-        sc.researchPoints = Integer.parseInt(map.getOrDefault("researchPoints", "0"));
         sc.totalDeaths = Integer.parseInt(map.getOrDefault("totalDeaths", "0"));
         
         // Nested structures
         sc.assignedRoleCounts = deserializeJsonToMap(map.get("assignedRoleCounts"));
-        sc.deathStatistics = deserializeJsonToMap(map.get("deathStatistics"));
-        sc.unlockedUpgradeIds = deserializeJsonToList(map.get("unlockedUpgradeIds"));
+        sc.localDeathStatistics = deserializeJsonToMap(map.get("localDeathStatistics"));
         sc.unlockedBuildingIds = deserializeJsonToList(map.get("unlockedBuildingIds"));
         sc.savedResourceSources = deserializeJsonToSources(map.get("savedResourceSources"));
         

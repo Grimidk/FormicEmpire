@@ -30,8 +30,8 @@ public class Colony {
     
     // --- Basic Data ---
     private final int id;
+    private Civilization civilization;
     private String name;
-    private Species species;
     private boolean isPlayer;
     private ColonyRank rank;
     private boolean isActive;
@@ -43,7 +43,6 @@ public class Colony {
     private final List<Bug> bugs; 
     
     private Map<AntRole, Integer> assignedRoleCounts;
-    private final Set<Upgrade> upgrades;
     private final Set<Building> buildings;
 
     // --- Resource Data ---
@@ -57,7 +56,6 @@ public class Colony {
     
     private int aphids; 
     private int parasites;
-    private int researchPoints;
 
     // --- Hatch Rate Data ---
     private float hatchRateWorker;
@@ -125,7 +123,6 @@ public class Colony {
     }
     
     private void initializeDefaults() {
-        this.researchPoints = 0;
         this.totalDeaths = 0;
         this.plants = 0;
         this.mushrooms = 0;
@@ -142,37 +139,6 @@ public class Colony {
         this.hatchRateDrone = 0.0f;
         this.hatchRatePrincess = 0.0f;
         this.isActive = false;
-    }
-
-    private void initializeUpgrades() {
-        this.upgrades.add(GameUnlocks.TYPE_EGG);
-        this.upgrades.add(GameUnlocks.TYPE_QUEEN);
-        this.upgrades.add(GameUnlocks.TYPE_WORKER);
-        this.upgrades.add(GameUnlocks.ROLE_FORAGER);
-        this.upgrades.add(GameUnlocks.ROLE_FARMER);
-        this.upgrades.add(GameUnlocks.ROLE_NURSE);
-        this.upgrades.add(GameUnlocks.ROLE_LAYER);
-        this.upgrades.add(GameUnlocks.STAT_SKELETON);
-        this.upgrades.add(GameUnlocks.STAT_ACID);
-        this.upgrades.add(GameUnlocks.STAT_LONGEVITY);
-    }
-    
-    private void loadUpgrades(Savefile.SavedColony savedColony) {
-        List<Integer> unlockedIds = savedColony.unlockedUpgradeIds; 
-        if (unlockedIds == null || unlockedIds.isEmpty()) {
-            initializeUpgrades();
-            return;
-        }
-        Map<Integer, Upgrade> allUpgrades = new HashMap<>();
-        for (Upgrade up : GameUnlocks.getUpgrades()) {
-            allUpgrades.put(up.getId(), up);
-        }
-        for (Integer id : unlockedIds) {
-            Upgrade upgradeToUnlock = allUpgrades.get(id);
-            if (upgradeToUnlock != null) {
-                this.upgrades.add(upgradeToUnlock);
-            }
-        }
     }
 
     private void initializeBuildings() {
@@ -210,12 +176,10 @@ public class Colony {
         this.antGroups = new HashMap<>();
         this.deadAnts = new CopyOnWriteArrayList<>(); 
         this.bugs = new CopyOnWriteArrayList<>();
-        this.upgrades = new HashSet<>();
         this.buildings = new HashSet<>();
         
         initializeLists();
         initializeDefaults();
-        initializeUpgrades();
         initializeBuildings();
         initializeAssignedRoles();
         initializeServices(); 
@@ -229,18 +193,16 @@ public class Colony {
         this.antGroups = new HashMap<>();
         this.deadAnts = new CopyOnWriteArrayList<>();
         this.bugs = new CopyOnWriteArrayList<>();
-        this.upgrades = new HashSet<>();
         this.buildings = new HashSet<>();
 
         initializeLists();
         initializeDefaults(); 
-        loadUpgrades(savedColony);
         loadBuildings(savedColony);
         initializeAssignedRoles(); 
         initializeServices(); 
         
-        if (this.populationService != null && savedColony.deathStatistics != null) {
-            this.populationService.loadDeathStatistics(savedColony.deathStatistics);
+        if (this.populationService != null && savedColony.localDeathStatistics != null) {
+            this.populationService.loadDeathStatistics(savedColony.localDeathStatistics);
         }
         
         Map<String, Integer> savedRoles = savedColony.assignedRoleCounts;
@@ -290,7 +252,6 @@ public class Colony {
             this.bugs.add(p);
         }
         
-        this.researchPoints = savedColony.researchPoints;
         this.totalDeaths = savedColony.totalDeaths;
         
         if (savedColony.savedResourceSources != null && this.locationService != null) {
@@ -366,7 +327,7 @@ public class Colony {
         this.totalDeaths++;
         this.deadAnts.add(ant);
         if (populationService != null) {
-            populationService.recordDeath(cause);
+            populationService.recordDeath(cause, this);
         }
     }
 
@@ -374,8 +335,38 @@ public class Colony {
     public int getId() { return id; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
-    public Species getSpecies() { return species; }
-    public void setSpecies(Species species) { this.species = species; }
+    
+    public Civilization getCivilization() { return civilization; }
+    public void setCivilization(Civilization civilization) { this.civilization = civilization; }
+
+    // Delegates to Civilization
+    public Species getSpecies() { 
+        return civilization != null ? civilization.getSpecies() : GameConstants.SPECIES_OMNI; 
+    }
+    public void setSpecies(Species species) { 
+        if (civilization != null) civilization.setSpecies(species); 
+    }
+    
+    public int getResearchPoints() { 
+        return civilization != null ? civilization.getResearchPoints() : 0; 
+    }
+    public void setResearchPoints(int points) { 
+        if (civilization != null) civilization.setResearchPoints(points); 
+    }
+    public void addResearchPoints(int amount) {
+        if (civilization != null) civilization.addResearchPoints(amount);
+    }
+    
+    public boolean hasUpgrade(Upgrade upgrade) {
+        return civilization != null && civilization.hasUpgrade(upgrade);
+    }
+    public void unlockUpgrade(Upgrade upgrade) {
+        if (civilization != null) civilization.unlockUpgrade(upgrade);
+    }
+    public Set<Upgrade> getUnlockedUpgrades() {
+        return civilization != null ? civilization.getUnlockedUpgrades() : new HashSet<>();
+    }
+    
     public boolean isPlayer() { return isPlayer; }
     public void setIsPlayer(boolean isPlayer) { this.isPlayer = isPlayer; }
     public ColonyRank getRank() { return rank; }
@@ -416,9 +407,7 @@ public class Colony {
     public int getAntTotal() {
         return antGroups.values().stream().mapToInt(List::size).sum();
     }
-    public boolean hasUpgrade(Upgrade upgrade) { return this.upgrades.contains(upgrade); }
-    public void unlockUpgrade(Upgrade upgrade) { this.upgrades.add(upgrade); }
-    public Set<Upgrade> getUnlockedUpgrades() { return this.upgrades; }
+
     public boolean hasBuilding(Building building) { return this.buildings.contains(building); }
     public void unlockBuilding(Building building) { this.buildings.add(building); }
     public Set<Building> getUnlockedBuildings() { return this.buildings; }
@@ -564,9 +553,6 @@ public class Colony {
         
         return "~" + display;
     }
-
-    public int getResearchPoints() { return researchPoints; }
-    public void setResearchPoints(int researchPoints) { this.researchPoints = researchPoints; }
 
     public void setGameAreaDimensions(int width, int height) {
         boolean firstTimeUpdate = (this.gameAreaWidth == 1 && this.gameAreaHeight == 1 && width > 1 && height > 1);
@@ -717,7 +703,7 @@ public class Colony {
 
     public void forceNuptialFlight() {
         if (!hasUpgrade(GameUnlocks.ABILITY_FORCED_FLIGHT)) return;
-        if (this.researchPoints < 1000) return;
+        if (getResearchPoints() < 1000) return;
         boolean hasDrones = !getDrones().isEmpty();
         boolean hasBreeders = getPrincesses().stream().anyMatch(p -> p.getRole() == GameConstants.ROLE_BREEDER);
         
@@ -726,7 +712,7 @@ public class Colony {
             return;
         }
 
-        this.researchPoints -= 1000;
+        addResearchPoints(-1000);
         this.labourService.runNuptial(this);
     }
     
@@ -793,5 +779,13 @@ public class Colony {
 
     public void runYearlyJobs() {
         this.runNuptial();
+    }
+    
+    public void refreshAntStats() {
+        for (List<Ant> list : antGroups.values()) {
+            for (Ant a : list) {
+                a.updateStatsFromColony(this);
+            }
+        }
     }
 }
