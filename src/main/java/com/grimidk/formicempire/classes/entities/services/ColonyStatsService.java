@@ -28,7 +28,7 @@ public class ColonyStatsService {
         return 0;
     }
     public int getProteinCapacity(Colony colony) { 
-        if (colony.hasBuilding(GameUnlocks.MEAT_CHAMBER_2)) return 40000;
+        if (colony.hasBuilding(GameUnlocks.MEAT_CHAMBER_3)) return 40000;
         if (colony.hasBuilding(GameUnlocks.MEAT_CHAMBER_2)) return 15000;
         if (colony.hasBuilding(GameUnlocks.MEAT_CHAMBER_1)) return 5000;
         if (colony.hasBuilding(GameUnlocks.MEAT_CHAMBER_0)) return 2000; 

@@ -33,7 +33,7 @@ public class StatsDialog extends ZeroDialog {
     private final JTabbedPane tabbedPane;
     
     private JTable generalTable;
-    private JTable civTable; // New Civilization Table
+    private JTable civTable;
     private JTable resourcesTable;
     private JTable populationTable;
     private JTable ratesTable;
@@ -52,7 +52,7 @@ public class StatsDialog extends ZeroDialog {
         add(tabbedPane, BorderLayout.CENTER);
         
         initGeneralTab();
-        initCivilizationTab(); // Initialize new tab
+        initCivilizationTab();
         initResourceTab();
         initPopulationTab();
         initRatesTab();
@@ -177,7 +177,8 @@ public class StatsDialog extends ZeroDialog {
         // Colony Info
         model.addRow(new Object[]{"Colony", "Name", colony.getName()});
         model.addRow(new Object[]{"Colony", "Rank", colony.getRank().getName()});
-        model.addRow(new Object[]{"Colony", "Species", colony.getSpecies() != null ? colony.getSpecies().toString() : "Unknown"});
+        model.addRow(new Object[]{"Colony", "Species", colony.getSpecies() != null ? colony.getSpecies().getName() : "Unknown"});
+        model.addRow(new Object[]{"Colony", "Species (Scientific)", colony.getSpecies() != null ? colony.getSpecies().getScientific() : "Unknown"});
         model.addRow(new Object[]{"Colony", "ID", colony.getId()});
 
         // World Info
@@ -399,7 +400,7 @@ public class StatsDialog extends ZeroDialog {
             model.addRow(new Object[]{"Construction", count + " Builders", "1.0 hr/tick", "Project: " + colony.getCurrentBuildingProject().getName()});
         }
         
-        // Research (Displayed as Local Contribution)
+        // Research
         boolean hasResearcher = colony.hasUpgrade(GameUnlocks.ROLE_RESEARCHER) || colony.hasUpgrade(GameUnlocks.ROLE_ASSISTANT);
         if (hasResearcher) {
             int researchers = colony.getAssignedRoleCount(GameConstants.ROLE_RESEARCHER);

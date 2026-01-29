@@ -339,7 +339,12 @@ public class Colony {
     public void setName(String name) { this.name = name; }
     
     public Civilization getCivilization() { return civilization; }
-    public void setCivilization(Civilization civilization) { this.civilization = civilization; }
+    public void setCivilization(Civilization civilization) { 
+        this.civilization = civilization; 
+        if (civilization != null && !civilization.getColonies().contains(this)) {
+            civilization.addColony(this); 
+        }
+    }
 
     // Delegates to Civilization
     public Species getSpecies() { 
