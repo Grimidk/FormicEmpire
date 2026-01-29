@@ -247,7 +247,7 @@ public class MapDialog extends ZeroDialog {
             // 4. Draw Border
             g2d.setStroke(new BasicStroke(isActive ? 3 : 1));
             if (isActive) {
-                g2d.setColor(Color.CYAN); 
+                g2d.setColor(Color.RED); 
             } else {
                 g2d.setColor(Color.BLACK); 
             }

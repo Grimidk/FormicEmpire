@@ -464,9 +464,12 @@ public class ColonyLabourService {
 
         int gameW = colony.getGameAreaWidth();
         int gameH = colony.getGameAreaHeight();
+
+        if (gameW <= 100) gameW = 2560;
+        if (gameH <= 100) gameH = 1440;
         
-        int bufferMin = 150;
-        int bufferMax = 450;
+        int bufferMin = 400; 
+        int bufferMax = 900;
         int randomBuffer = bufferMin + random.nextInt(bufferMax - bufferMin);
         
         int sourceX, sourceY;
