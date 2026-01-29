@@ -7,14 +7,12 @@ To Fix (By decreasing priority) :
 	Game Breaking:
 	
 	High:
-	building menu not opening right away like rolemgmt does
-	civ rank (colony pop sum) (new names for colony, new icons for civ, otherwise recycle)
+	autosaves not showing in select 
 	loading world/game screen
 	npc again has too few builders
 
 	Mid:
 	double wide hex map border to mape civ borders
-	map tooltip needs to show civ
 	legend for map
 
 	Low:
@@ -23,13 +21,12 @@ To Fix (By decreasing priority) :
 	builders act weird af in build zone
 
 	Can't reproduce:
-	npc generating way too much research
 	
 To Feature (to be done in order):
 Needed for launch (v1.0) (Launch Version):
 	Priority:
 	colonizing and new colonies (spreading)	
-	first round of species and assimilations
+	first round of species and assimilations (and handle civ death to earn civs)
 
 	Everything else :
 	trade routes (async with roles and incoming outgoing recurrent and one time and travel time and danger level and boring tunnels)

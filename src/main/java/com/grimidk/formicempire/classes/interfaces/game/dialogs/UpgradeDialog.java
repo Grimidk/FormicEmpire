@@ -77,7 +77,7 @@ public class UpgradeDialog extends ZeroDialog {
         }
 
         // --- Build Tab ---
-        if (colony.hasUpgrade(GameUnlocks.ABILITY_BUILD)) {
+        if (colony.hasUpgrade(GameUnlocks.ROLE_BUILDER)) {
             if (buildPanel == null) buildPanel = new BuildPanel(colony);
             buildPanel.updateData();
             tabbedPane.addTab("Construction", GameConstants.ROLE_BUILDER.getIcon(), buildPanel);
@@ -253,7 +253,8 @@ public class UpgradeDialog extends ZeroDialog {
                 if (colony.getResearchPoints() >= upgrade.getCost()) {
                     colony.setResearchPoints(colony.getResearchPoints() - upgrade.getCost());
                     colony.unlockUpgrade(upgrade);
-                    updateData();
+                    
+                    UpgradeDialog.this.refreshDialog();
                 }
             });
 
