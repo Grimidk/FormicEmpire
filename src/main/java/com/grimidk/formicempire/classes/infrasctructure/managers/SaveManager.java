@@ -312,6 +312,7 @@ public class SaveManager {
                 sc.id = civ.getId();
                 sc.name = civ.getName();
                 sc.isPlayer = civ.isPlayer();
+                sc.rankName = civ.getRank() != null ? civ.getRank().getName() : "Ant";
                 sc.researchPoints = civ.getResearchPoints();
                 sc.speciesId = civ.getSpecies() != null ? civ.getSpecies().getId() : 1;
                 
@@ -488,6 +489,7 @@ public class SaveManager {
         writeJsonLine(w, "id", sc.id, false);
         writeJsonLine(w, "name", sc.name, false);
         writeJsonLine(w, "isPlayer", sc.isPlayer, false);
+        writeJsonLine(w, "rank", sc.rankName, false);
         writeJsonLine(w, "speciesId", sc.speciesId, false);
         writeJsonLine(w, "researchPoints", sc.researchPoints, false);
         w.write("      \"unlockedUpgradeIds\": " + serializeListToJson(sc.unlockedUpgradeIds) + ","); w.newLine();
@@ -676,6 +678,7 @@ public class SaveManager {
         sc.id = Integer.parseInt(map.getOrDefault("id", "0"));
         sc.name = map.getOrDefault("name", "Empire");
         sc.isPlayer = Boolean.parseBoolean(map.getOrDefault("isPlayer", "false"));
+        sc.rankName = map.getOrDefault("rank", "Ant");
         sc.speciesId = Integer.parseInt(map.getOrDefault("speciesId", "1"));
         sc.researchPoints = Integer.parseInt(map.getOrDefault("researchPoints", "0"));
         sc.unlockedUpgradeIds = deserializeJsonToList(map.get("unlockedUpgradeIds"));

@@ -2,6 +2,7 @@ package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
 import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
 import com.grimidk.formicempire.classes.constants.world.Biome;
+import com.grimidk.formicempire.classes.entities.Civilization;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.infrasctructure.World;
@@ -146,6 +147,15 @@ public class MapDialog extends ZeroDialog {
                         
                         if (c.getName() != null) {
                             sb.append("<br><i>").append(c.getName()).append("</i>");
+                        }
+
+                        // Added Civ Info
+                        Civilization civ = c.getCivilization();
+                        if (civ != null) {
+                            sb.append("<br><b>Civ:</b> ").append(civ.getName());
+                            if (civ.getRank() != null) {
+                                sb.append("<br><b>Civ Rank:</b> ").append(civ.getRank().getName());
+                            }
                         }
                     } else {
                         sb.append("<br><i>Empty</i>");

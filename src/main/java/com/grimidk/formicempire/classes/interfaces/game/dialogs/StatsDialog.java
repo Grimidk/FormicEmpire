@@ -95,11 +95,16 @@ public class StatsDialog extends ZeroDialog {
         return new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) { return false; }
+            
             @Override
             public Class<?> getColumnClass(int columnIndex) {
-                if (getRowCount() > 0) {
-                    Object val = getValueAt(0, columnIndex);
-                    if (val != null) return val.getClass();
+                // Scan rows to find the first non-null value to determine class
+                // This fixes the issue where the first row has a null icon, causing the column to be treated as Object
+                for (int row = 0; row < getRowCount(); row++) {
+                    Object val = getValueAt(row, columnIndex);
+                    if (val != null) {
+                        return val.getClass();
+                    }
                 }
                 return Object.class;
             }
@@ -122,20 +127,32 @@ public class StatsDialog extends ZeroDialog {
     }
     
     private void initCivilizationTab() {
-        String[] columns = {"Scope", "Metric", "Value"};
+        String[] columns = {"", "Scope", "Metric", "Value"};
         civTable = new JTable(createIconModel(columns));
+        
+        civTable.getColumnModel().getColumn(0).setMaxWidth(40);
+        civTable.getColumnModel().getColumn(0).setPreferredWidth(40);
+        
         tabbedPane.addTab("Civilization", createTablePane(civTable));
     }
 
     private void initResourceTab() {
         String[] columns = {"", "Resource", "Current", "Capacity", "Sources", "Prod/Day", "Cons/Day", "Net"};
         resourcesTable = new JTable(createIconModel(columns));
+        
+        resourcesTable.getColumnModel().getColumn(0).setMaxWidth(40);
+        resourcesTable.getColumnModel().getColumn(0).setPreferredWidth(40);
+        
         tabbedPane.addTab("Economy (Local)", createTablePane(resourcesTable));
     }
 
     private void initPopulationTab() {
         String[] columns = {"", "Type", "Role", "Count"};
         populationTable = new JTable(createIconModel(columns));
+        
+        populationTable.getColumnModel().getColumn(0).setMaxWidth(40);
+        populationTable.getColumnModel().getColumn(0).setPreferredWidth(40);
+
         tabbedPane.addTab("Population (Local)", createTablePane(populationTable));
     }
 
@@ -212,36 +229,40 @@ public class StatsDialog extends ZeroDialog {
         
         Civilization civ = colony.getCivilization();
         if (civ == null) {
-            model.addRow(new Object[]{"Error", "Status", "No Civilization Linked"});
+            model.addRow(new Object[]{null, "Error", "Status", "No Civilization Linked"});
             return;
         }
 
         // Basic Info
-        model.addRow(new Object[]{"Empire", "Name", civ.getName()});
-        model.addRow(new Object[]{"Empire", "Total Colonies", civStatsService.getTotalColonies(civ)});
-        model.addRow(new Object[]{"Empire", "Global Population", civStatsService.getTotalPopulation(civ)});
+        model.addRow(new Object[]{null, "Empire", "Name", civ.getName()});
+        model.addRow(new Object[]{civ.getRank().getIcon(), "Empire", "Rank", civ.getRank().getName()}); 
+        model.addRow(new Object[]{null, "Empire", "Total Colonies", civStatsService.getTotalColonies(civ)});
+        model.addRow(new Object[]{null, "Empire", "Global Population", civStatsService.getTotalPopulation(civ)});
 
         // Research
-        model.addRow(new Object[]{null, "------", "------"});
-        model.addRow(new Object[]{"Research", "Stored Points", civ.getResearchPoints()});
-        model.addRow(new Object[]{"Research", "Global Rate", "+" + civStatsService.getGlobalResearchRateDaily(civ) + " pts/day"});
+        model.addRow(new Object[]{null, null, "------", "------"});
+        model.addRow(new Object[]{GameConstants.ICON_RESEARCH, "Research", "Stored Points", civ.getResearchPoints()});
+        model.addRow(new Object[]{null, "Research", "Global Rate", "+" + civStatsService.getGlobalResearchRateDaily(civ) + " pts/day"});
 
         // Global Resources
-        model.addRow(new Object[]{null, "------", "------"});
+        model.addRow(new Object[]{null, null, "------", "------"});
         Map<String, Integer> resources = civStatsService.getGlobalResources(civ);
-        model.addRow(new Object[]{"Resources", "Total Plants", resources.get("Plants")});
-        model.addRow(new Object[]{"Resources", "Total Mushrooms", resources.get("Mushrooms")});
-        model.addRow(new Object[]{"Resources", "Total Protein", resources.get("Protein")});
-        model.addRow(new Object[]{"Resources", "Total Water", resources.get("Water")});
-        model.addRow(new Object[]{"Resources", "Total Minerals", resources.get("Minerals")});
+        
+        model.addRow(new Object[]{GameConstants.RESOURCE_PLANT.getIcon(), "Resources", "Total Plants", resources.get("Plants")});
+        model.addRow(new Object[]{GameConstants.RESOURCE_FUNGI.getIcon(), "Resources", "Total Mushrooms", resources.get("Mushrooms")});
+        model.addRow(new Object[]{GameConstants.RESOURCE_MEAT.getIcon(), "Resources", "Total Protein", resources.get("Protein")});
+        model.addRow(new Object[]{GameConstants.RESOURCE_WATER.getIcon(), "Resources", "Total Water", resources.get("Water")});
+        model.addRow(new Object[]{GameConstants.RESOURCE_SYRUP.getIcon(), "Resources", "Total Syrups", resources.getOrDefault("Syrups", 0)});
+        model.addRow(new Object[]{GameConstants.RESOURCE_RESIN.getIcon(), "Resources", "Total Resins", resources.getOrDefault("Resins", 0)});
+        model.addRow(new Object[]{GameConstants.RESOURCE_ROCK.getIcon(), "Resources", "Total Minerals", resources.get("Minerals")});
         
         // Global Deaths
-        model.addRow(new Object[]{null, "------", "------"});
+        model.addRow(new Object[]{null, null, "------", "------"});
         int totalDeaths = 0;
         if (civ.getGlobalDeathStatistics() != null) {
             totalDeaths = civ.getGlobalDeathStatistics().values().stream().mapToInt(Integer::intValue).sum();
         }
-        model.addRow(new Object[]{"Mortality", "Global Deaths", totalDeaths});
+        model.addRow(new Object[]{GameConstants.STATUS_DEAD.getIcon(), "Mortality", "Global Deaths", totalDeaths});
     }
 
     private void updateResourceData() {

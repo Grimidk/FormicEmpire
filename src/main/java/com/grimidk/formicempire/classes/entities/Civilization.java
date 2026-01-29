@@ -46,6 +46,7 @@ public class Civilization {
         this.unlockedUpgrades = new HashSet<>();
         this.globalDeathStatistics = new ConcurrentHashMap<>();
         this.researchPoints = 0;
+        this.rank = GameConstants.RANK_ANT;
         
         initializeServices();
     }
@@ -86,6 +87,9 @@ public class Civilization {
         }
         
         initializeServices();
+        
+        // Calculate rank after initialization based on current stats
+        rankUp();
     }
 
     private void initializeServices() {
@@ -97,6 +101,25 @@ public class Civilization {
     // --- Logic ---
     public void runDailyJobs() {
         this.automationService.runDailyAutomation(this);
+        this.rankUp();
+    }
+    
+    private void rankUp() {
+        int total = this.statService.getTotalPopulation(this);
+        
+        if (total >= GameConstants.RANK_GIGA.getPopulation()) this.rank = GameConstants.RANK_GIGA;
+        else if (total >= GameConstants.RANK_SUPREME.getPopulation()) this.rank = GameConstants.RANK_SUPREME;
+        else if (total >= GameConstants.RANK_ULTIMATE.getPopulation()) this.rank = GameConstants.RANK_ULTIMATE;
+        else if (total >= GameConstants.RANK_MEGA.getPopulation()) this.rank = GameConstants.RANK_MEGA;
+        else if (total >= GameConstants.RANK_HYPER.getPopulation()) this.rank = GameConstants.RANK_HYPER;
+        else if (total >= GameConstants.RANK_ULTRA.getPopulation()) this.rank = GameConstants.RANK_ULTRA;
+        else if (total >= GameConstants.RANK_SUPER.getPopulation()) this.rank = GameConstants.RANK_SUPER;
+        else if (total >= GameConstants.RANK_EMPIRE.getPopulation()) this.rank = GameConstants.RANK_EMPIRE;
+        else if (total >= GameConstants.RANK_KINGDOM.getPopulation()) this.rank = GameConstants.RANK_KINGDOM;
+        else if (total >= GameConstants.RANK_DUCHY.getPopulation()) this.rank = GameConstants.RANK_DUCHY;
+        else if (total >= GameConstants.RANK_COUNTY.getPopulation()) this.rank = GameConstants.RANK_COUNTY;
+        else if (total >= GameConstants.RANK_COLONY.getPopulation()) this.rank = GameConstants.RANK_COLONY;
+        else this.rank = GameConstants.RANK_ANT;
     }
     
     public void recordDeath(String cause) {
@@ -107,11 +130,14 @@ public class Civilization {
         if (!colonies.contains(colony)) {
             colonies.add(colony);
             colony.setCivilization(this); 
+            // Update rank immediately when acquiring new power
+            rankUp();
         }
     }
 
     public void removeColony(Colony colony) {
         colonies.remove(colony);
+        rankUp();
     }
 
     // --- Getters & Setters ---
@@ -122,6 +148,9 @@ public class Civilization {
     public void setPlayer(boolean player) { isPlayer = player; }
     public Species getSpecies() { return species; }
     public void setSpecies(Species species) { this.species = species; }
+    
+    public ColonyRank getRank() { return rank; }
+    public void setRank(ColonyRank rank) { this.rank = rank; }
 
     public int getResearchPoints() { return researchPoints; }
     public void setResearchPoints(int researchPoints) { this.researchPoints = researchPoints; }

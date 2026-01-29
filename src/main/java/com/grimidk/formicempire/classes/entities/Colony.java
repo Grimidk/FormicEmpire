@@ -341,8 +341,11 @@ public class Colony {
     public Civilization getCivilization() { return civilization; }
     public void setCivilization(Civilization civilization) { 
         this.civilization = civilization; 
-        if (civilization != null && !civilization.getColonies().contains(this)) {
-            civilization.addColony(this); 
+        if (civilization != null) {
+            if (!civilization.getColonies().contains(this)) {
+                civilization.addColony(this); 
+            }
+            refreshAntStats();
         }
     }
 
