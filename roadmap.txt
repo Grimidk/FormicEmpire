@@ -2,16 +2,21 @@ Here is the current roadmap of features and fixes:
 
 To Fix (By decreasing priority) : 
 	Urgent:
+	leaf cap with worker weird might be ui issue
 	
 	High:
 	building menu not opening right away like rolemgmt does
 	enemies need leafcutter species
 	tooltip civ name
-	civ rank
+	civ rank (colony pop sum) (new names for colony, new icons for civ, otherwise recycle)
+	turbo speed while running other stuff breaks calculations
+	loading world/game screen
+	civ stats
 
 	Mid:
 	double wide hex map border to mape civ borders
 	map tooltip needs to show civ
+	legend for map
 
 	Low:
 	colony scroll down
@@ -22,7 +27,8 @@ To Fix (By decreasing priority) :
 To Feature (to be done in order):
 Needed for launch (v1.0) (Launch Version):
 	Priority:
-	colonizing and new colonies and civilizations-species (research inheritance)	
+	colonizing and new colonies (spreading)	
+	first round of species and assimilations
 
 	Everything else :
 	trade routes (async with roles and incoming outgoing recurrent and one time and travel time and danger level and boring tunnels)
@@ -30,6 +36,7 @@ Needed for launch (v1.0) (Launch Version):
 	auxiliary room sprites (storage (resources), farm (shroom), nurse (bedding), royal (nests and science)) and expansion (breeder room)
 	more settings (allow idle to forage, allow unassigned, choose default, change roles to proportions (may use by npc), fuzzed parasites, arachnophobia mode ?)
 	more species and more bugs (constants and icons)
+	civ and colony name maker (player input and random)
 	assimilation of species for upgrades and research assimilation system
 	assimilated species get added to a pool for drones and avoid genetic stagnation
 	assimilation (	Multi queen (Pharaoh ants), Super majors (Marauder ants), Trap-jaw (Trap jaw ants), Honey-pot (Honey pot ants), Door-head (Turtle ants), Wood burrowing (Carpenter ants), Silk weaving (Weaver ants), Rafting (Flood plains ants), Fire venom (Fire ants), Jumping (Jet ants), Gliding (Gliding ants), Stinging (Bullet ants), Swarming (Army ants), Stealth (Ghost ants), Fast bitting (Dracula ants), Heat resistance (Saharan silver ants), Deadly venom (Harvester ants), Self destruction (Exploding ants), Far sight (Bulldog ants), Hive building (Shining black ants), Location sensing (Desert ants))

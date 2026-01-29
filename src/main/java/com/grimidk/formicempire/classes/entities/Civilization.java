@@ -25,6 +25,7 @@ public class Civilization {
     private boolean isPlayer;
     private Species species;
     private int researchPoints;
+    private ColonyRank rank;
     
     // Global Data
     private final Set<Upgrade> unlockedUpgrades;
@@ -135,4 +136,6 @@ public class Civilization {
     public Map<String, Integer> getGlobalDeathStatistics() { return globalDeathStatistics; }
     
     public CivilizationStarterService getStarterService() { return starterService; }
+    public CivilizationStatService getStatService() { return statService; }
+
 }

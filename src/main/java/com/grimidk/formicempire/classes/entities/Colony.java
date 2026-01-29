@@ -173,6 +173,7 @@ public class Colony {
         this.name = name;
         this.isPlayer = isPlayer;
         this.rank = GameConstants.RANK_COLONY;
+        this.automationEnabled = !isPlayer;
         this.antGroups = new HashMap<>();
         this.deadAnts = new CopyOnWriteArrayList<>(); 
         this.bugs = new CopyOnWriteArrayList<>();
@@ -189,6 +190,7 @@ public class Colony {
         this.id = savedColony.id;
         this.name = savedColony.name;
         this.isPlayer = savedColony.isPlayer;
+        this.automationEnabled = !this.isPlayer;
         this.rank = GameConstants.RANK_COLONY;
         this.antGroups = new HashMap<>();
         this.deadAnts = new CopyOnWriteArrayList<>();

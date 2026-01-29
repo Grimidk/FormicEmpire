@@ -24,7 +24,7 @@ public class ColonyPanel extends ZeroGamePanel {
     // --- Resources Components ---
     private final JLabel totalResourcesLabel = new JLabel("Total resources: 0");
     private final JLabel mushroomsLabel = new JLabel("0");
-    private final JLabel planLabel = new JLabel("0");
+    private final JLabel plantLabel = new JLabel("0");
     private final JLabel proteinLabel = new JLabel("0");
     private final JLabel waterLabel = new JLabel("0");
     private final JLabel syrupLabel = new JLabel("0");
@@ -106,7 +106,7 @@ public class ColonyPanel extends ZeroGamePanel {
 
         // Resources Setup
         setupConstantLabel(mushroomsLabel, GameConstants.RESOURCE_FUNGI);
-        setupConstantLabel(planLabel, GameConstants.RESOURCE_PLANT);
+        setupConstantLabel(plantLabel, GameConstants.RESOURCE_PLANT);
         setupConstantLabel(proteinLabel, GameConstants.RESOURCE_MEAT);
         setupConstantLabel(waterLabel, GameConstants.RESOURCE_WATER);
         setupConstantLabel(syrupLabel, GameConstants.RESOURCE_SYRUP);
@@ -203,7 +203,7 @@ public class ColonyPanel extends ZeroGamePanel {
         panel.add(totalResourcesLabel);
         panel.add(new JSeparator(SwingConstants.HORIZONTAL));
         panel.add(mushroomsLabel);
-        panel.add(planLabel);
+        panel.add(plantLabel);
         panel.add(proteinLabel);
         panel.add(waterLabel);
         panel.add(syrupLabel);
@@ -278,7 +278,7 @@ public class ColonyPanel extends ZeroGamePanel {
         if (mushrooms != lastMushrooms) mushroomsLabel.setText(String.valueOf(mushrooms));
         
         if (plants != lastPlants || plantsAvail != lastPlantsAvailable) {
-            planLabel.setText(plants + " / (" + plantsAvail + ")");
+            plantLabel.setText(plants + " / (" + plantsAvail + ")");
             lastPlantsAvailable = plantsAvail;
         }
         

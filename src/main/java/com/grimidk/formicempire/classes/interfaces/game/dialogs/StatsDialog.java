@@ -5,7 +5,9 @@ import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.world.Season;
 import com.grimidk.formicempire.classes.constants.world.Weather;
 import com.grimidk.formicempire.classes.entities.Ant;
+import com.grimidk.formicempire.classes.entities.Civilization;
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.services.CivilizationStatService;
 import com.grimidk.formicempire.classes.entities.services.ColonyLocationService;
 import com.grimidk.formicempire.classes.entities.services.ColonyStatsService;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
@@ -26,9 +28,12 @@ public class StatsDialog extends ZeroDialog {
 
     private final Colony colony;
     private final Engine engine;
+    private final CivilizationStatService civStatsService; 
+    
     private final JTabbedPane tabbedPane;
     
     private JTable generalTable;
+    private JTable civTable; // New Civilization Table
     private JTable resourcesTable;
     private JTable populationTable;
     private JTable ratesTable;
@@ -41,11 +46,13 @@ public class StatsDialog extends ZeroDialog {
         super(owner, "Colony Statistics", new Dimension(800, 600));
         this.colony = colony;
         this.engine = engine;
+        this.civStatsService = new CivilizationStatService(); 
         
         tabbedPane = new JTabbedPane();
         add(tabbedPane, BorderLayout.CENTER);
         
         initGeneralTab();
+        initCivilizationTab(); // Initialize new tab
         initResourceTab();
         initPopulationTab();
         initRatesTab();
@@ -113,17 +120,23 @@ public class StatsDialog extends ZeroDialog {
         generalTable = new JTable(createIconModel(columns));
         tabbedPane.addTab("General & World", createTablePane(generalTable));
     }
+    
+    private void initCivilizationTab() {
+        String[] columns = {"Scope", "Metric", "Value"};
+        civTable = new JTable(createIconModel(columns));
+        tabbedPane.addTab("Civilization", createTablePane(civTable));
+    }
 
     private void initResourceTab() {
         String[] columns = {"", "Resource", "Current", "Capacity", "Sources", "Prod/Day", "Cons/Day", "Net"};
         resourcesTable = new JTable(createIconModel(columns));
-        tabbedPane.addTab("Economy", createTablePane(resourcesTable));
+        tabbedPane.addTab("Economy (Local)", createTablePane(resourcesTable));
     }
 
     private void initPopulationTab() {
         String[] columns = {"", "Type", "Role", "Count"};
         populationTable = new JTable(createIconModel(columns));
-        tabbedPane.addTab("Population", createTablePane(populationTable));
+        tabbedPane.addTab("Population (Local)", createTablePane(populationTable));
     }
 
     private void initRatesTab() {
@@ -149,6 +162,7 @@ public class StatsDialog extends ZeroDialog {
     @Override
     protected void refreshDialog() {
         updateGeneralData();
+        updateCivilizationData(); 
         updateResourceData();
         updatePopulationData();
         updateRatesData();
@@ -189,6 +203,44 @@ public class StatsDialog extends ZeroDialog {
             model.addRow(new Object[]{"Environment", "Temperature", world.getTemperature() + "°C"});
             model.addRow(new Object[]{"Environment", "Humidity", world.getHumidity()});
         }
+    }
+
+    private void updateCivilizationData() {
+        DefaultTableModel model = (DefaultTableModel) civTable.getModel();
+        model.setRowCount(0);
+        
+        Civilization civ = colony.getCivilization();
+        if (civ == null) {
+            model.addRow(new Object[]{"Error", "Status", "No Civilization Linked"});
+            return;
+        }
+
+        // Basic Info
+        model.addRow(new Object[]{"Empire", "Name", civ.getName()});
+        model.addRow(new Object[]{"Empire", "Total Colonies", civStatsService.getTotalColonies(civ)});
+        model.addRow(new Object[]{"Empire", "Global Population", civStatsService.getTotalPopulation(civ)});
+
+        // Research
+        model.addRow(new Object[]{null, "------", "------"});
+        model.addRow(new Object[]{"Research", "Stored Points", civ.getResearchPoints()});
+        model.addRow(new Object[]{"Research", "Global Rate", "+" + civStatsService.getGlobalResearchRateDaily(civ) + " pts/day"});
+
+        // Global Resources
+        model.addRow(new Object[]{null, "------", "------"});
+        Map<String, Integer> resources = civStatsService.getGlobalResources(civ);
+        model.addRow(new Object[]{"Resources", "Total Plants", resources.get("Plants")});
+        model.addRow(new Object[]{"Resources", "Total Mushrooms", resources.get("Mushrooms")});
+        model.addRow(new Object[]{"Resources", "Total Protein", resources.get("Protein")});
+        model.addRow(new Object[]{"Resources", "Total Water", resources.get("Water")});
+        model.addRow(new Object[]{"Resources", "Total Minerals", resources.get("Minerals")});
+        
+        // Global Deaths
+        model.addRow(new Object[]{null, "------", "------"});
+        int totalDeaths = 0;
+        if (civ.getGlobalDeathStatistics() != null) {
+            totalDeaths = civ.getGlobalDeathStatistics().values().stream().mapToInt(Integer::intValue).sum();
+        }
+        model.addRow(new Object[]{"Mortality", "Global Deaths", totalDeaths});
     }
 
     private void updateResourceData() {
@@ -347,7 +399,7 @@ public class StatsDialog extends ZeroDialog {
             model.addRow(new Object[]{"Construction", count + " Builders", "1.0 hr/tick", "Project: " + colony.getCurrentBuildingProject().getName()});
         }
         
-        // Research
+        // Research (Displayed as Local Contribution)
         boolean hasResearcher = colony.hasUpgrade(GameUnlocks.ROLE_RESEARCHER) || colony.hasUpgrade(GameUnlocks.ROLE_ASSISTANT);
         if (hasResearcher) {
             int researchers = colony.getAssignedRoleCount(GameConstants.ROLE_RESEARCHER);
@@ -360,7 +412,7 @@ public class StatsDialog extends ZeroDialog {
             
             model.addRow(new Object[]{"Research", 
                 researchers + " Res / " + assistants + " Asst", 
-                colony.getResearchPoints() + " Points", 
+                "Local Output", 
                 "+" + totalDaily + " pts/day"});
         }
 

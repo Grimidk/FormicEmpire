@@ -27,6 +27,7 @@ public class ColonySumarizationService {
         simulateEating(colony);
         colony.getPopulationService().runHatching(colony);
         colony.getPopulationService().runAging(colony);
+        simulateGraveKeeping(colony);
         
         if (colony.isPlayer()) {
             colony.getPopulationService().runContamination(colony);
@@ -209,6 +210,31 @@ public class ColonySumarizationService {
             removed++;
         }
         return removed;
+    }
+    
+    private void simulateGraveKeeping(Colony colony) {
+        int graverCount = colony.getAssignedRoleCount(GameConstants.ROLE_GRAVER);
+        
+        if (colony.hasBuilding(GameUnlocks.PASSIVE_GRAVE)) {
+            if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) graverCount += 2;
+            else graverCount += 1;
+        }
+
+        if (graverCount <= 0) return;
+        
+        float gravingRate = colony.getStatsService().getGravingRate(colony);
+        int cleanCapacity = (int) (graverCount * gravingRate);
+        
+        if (cleanCapacity <= 0) return;
+
+        List<Ant> deadAnts = colony.getDeadAnts();
+        int removed = 0;
+        
+        for (int i = deadAnts.size() - 1; i >= 0; i--) {
+            if (removed >= cleanCapacity) break;
+            deadAnts.remove(i);
+            removed++;
+        }
     }
 
     private void simulateResearch(Colony colony) {
