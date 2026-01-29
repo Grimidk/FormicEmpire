@@ -227,7 +227,10 @@ public class ColonyLabourService {
         
         ColonyStatsService stats = colony.getStatsService();
         int syrupGain = (int) (colony.getAphids()); 
-        colony.setPlants(Math.max(0, colony.getPlantsPrecise() - syrupGain));
+        
+        double plantConsumption = syrupGain * 0.10; 
+
+        colony.setPlants(Math.max(0, colony.getPlantsPrecise() - plantConsumption));
         colony.setSyrups(Math.min(colony.getSyrupsPrecise() + syrupGain, (double)stats.getSyrupsCapacity(colony)));
     }
 

@@ -2,7 +2,8 @@ Here is the current roadmap of features and fixes:
 
 To Fix (By decreasing priority) : 
 	Urgent:
-	leaf cap with worker weird might be ui issue
+	slow ants god knows why the fuck (fixes by realoading)
+	sources might be spawing in visible area
 	
 	High:
 	building menu not opening right away like rolemgmt does
