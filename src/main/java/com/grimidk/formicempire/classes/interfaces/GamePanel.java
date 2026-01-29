@@ -345,13 +345,15 @@ public class GamePanel extends ZeroGamePanel {
                     updateStaticWorldInfo();
                     refreshAllGUIData();
                     
-                    if (!engineStarted) {
-                        engineStarted = true;
-                        if (!engine.isAlive()) {
-                            engine.start();
+                    SwingUtilities.invokeLater(() -> {
+                        if (!engineStarted) {
+                            engineStarted = true;
+                            if (!engine.isAlive()) {
+                                engine.start();
+                            }
                         }
-                    }
-                    controlPanel.setPlayPauseButtonText(engine.isPaused());
+                        controlPanel.setPlayPauseButtonText(engine.isPaused());
+                    });
                     
                 } catch (Exception e) {
                     e.printStackTrace();

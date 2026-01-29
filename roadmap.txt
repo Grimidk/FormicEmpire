@@ -6,12 +6,8 @@ To Fix (By decreasing priority) :
 	
 	High:
 	building menu not opening right away like rolemgmt does
-	enemies need leafcutter species
-	tooltip civ name
 	civ rank (colony pop sum) (new names for colony, new icons for civ, otherwise recycle)
-	turbo speed while running other stuff breaks calculations
 	loading world/game screen
-	civ stats
 
 	Mid:
 	double wide hex map border to mape civ borders
@@ -22,6 +18,8 @@ To Fix (By decreasing priority) :
 	colony scroll down
 	not dynamic colony sprites while stretching screen 
 	builders act weird af in build zone
+
+	Can't reproduce:
 	somehow syrup spawned when building reservoir or unlocking??
 	
 To Feature (to be done in order):
