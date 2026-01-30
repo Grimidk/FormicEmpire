@@ -134,6 +134,35 @@ public class GameAreaPanel extends ZeroGamePanel {
             this.backgroundImage = biomeTextureCache.getOrDefault(currentBiomeName, biomeTextureCache.get("Plains"));
         }
     }
+    
+    public void refreshSize(int viewportWidth, int viewportHeight) {
+        if (currentDimension == WorldSpaces.OVERWORLD) {
+            if (getWidth() != viewportWidth || getHeight() != viewportHeight) {
+                setPreferredSize(new java.awt.Dimension(viewportWidth, viewportHeight));
+                revalidate();
+            }
+        } else {
+            int requiredHeight = calculateUnderworldHeight();
+            int finalHeight = Math.max(requiredHeight, viewportHeight);
+            
+            if (getWidth() != viewportWidth || getHeight() != finalHeight) {
+                setPreferredSize(new java.awt.Dimension(viewportWidth, finalHeight));
+                revalidate();
+            }
+        }
+    }
+
+    private int calculateUnderworldHeight() {
+        int maxY = 512; 
+        
+        int roomHeight = (basicRoomImg != null) ? basicRoomImg.getHeight(this) : 200;
+        
+        if (colony != null && colony.hasUpgrade(GameUnlocks.ROLE_BREEDER)) {
+            maxY = 512 + 256;
+        }
+        
+        return maxY + roomHeight + 50;
+    }
 
     @Override
     protected void paintComponent(Graphics g) {

@@ -8,11 +8,14 @@ import com.grimidk.formicempire.classes.infrasctructure.managers.AlertManager;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TriggerManager;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
 import com.grimidk.formicempire.classes.interfaces.game.dialogs.*;
 import com.grimidk.formicempire.classes.interfaces.game.gamepanels.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.util.ArrayList;
 
 public class GamePanel extends ZeroGamePanel {
@@ -26,6 +29,7 @@ public class GamePanel extends ZeroGamePanel {
     private AlertPanel alertPanel; 
     private ControlPanel controlPanel;
     private GameAreaPanel gameAreaPanel;
+    private JScrollPane gameScrollPane;
     
     private HatchRateDialog hatchDialog;
     private RoleManagementDialog roleDialog;    
@@ -63,6 +67,20 @@ public class GamePanel extends ZeroGamePanel {
         worldPanel = new WorldPanel();
         alertPanel = new AlertPanel();
         gameAreaPanel = new GameAreaPanel();
+        
+        gameScrollPane = new JScrollPane(gameAreaPanel);
+        gameScrollPane.setBorder(null);
+        gameScrollPane.getViewport().setOpaque(false);
+        gameScrollPane.setOpaque(false);
+        gameScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        gameScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        gameScrollPane.getVerticalScrollBar().setUnitIncrement(16);        
+        gameScrollPane.getViewport().addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                updateGameAreaSize();
+            }
+        });
     }
     
     private void initControlPanelCallbacks() {
@@ -78,6 +96,12 @@ public class GamePanel extends ZeroGamePanel {
         Runnable toggleViewCallback = () -> {
             if (gameAreaPanel != null) {
                 gameAreaPanel.toggleDimension();
+                
+                updateGameAreaSize();
+                
+                if (gameAreaPanel.getCurrentDimension() == WorldSpaces.OVERWORLD) {
+                    gameScrollPane.getVerticalScrollBar().setValue(0);
+                }
             }
         };
         
@@ -91,6 +115,13 @@ public class GamePanel extends ZeroGamePanel {
             showStatsDialogCallback,
             toggleViewCallback,
             showMapDialogCallback); 
+    }
+    
+    private void updateGameAreaSize() {
+        if (gameAreaPanel != null && gameScrollPane != null) {
+            java.awt.Dimension viewportSize = gameScrollPane.getViewport().getSize();
+            gameAreaPanel.refreshSize(viewportSize.width, viewportSize.height);
+        }
     }
 
     @Override
@@ -123,19 +154,22 @@ public class GamePanel extends ZeroGamePanel {
 
         // --- Colony Panel (Left) ---
         colonyPanel.setPreferredSize(new Dimension(200, 0));
+        colonyPanel.setMinimumSize(new Dimension(200, 0));
         gbc.gridx = 0;
         gbc.weightx = 0.0; 
         center.add(colonyPanel, gbc);
 
         // --- Game Area (Middle) ---
+        gameScrollPane.setPreferredSize(new Dimension(100, 0));
         gbc.gridx = 1;
         gbc.weightx = 0.6; 
-        center.add(gameAreaPanel, gbc); 
+        center.add(gameScrollPane, gbc); 
 
         // --- Right Panel Container (World + Alert) ---
         JPanel rightPanel = new JPanel(new BorderLayout());
         rightPanel.setOpaque(false);
         rightPanel.setPreferredSize(new Dimension(230, 0));
+        rightPanel.setMinimumSize(new Dimension(230, 0));
         rightPanel.add(worldPanel, BorderLayout.NORTH);
         rightPanel.add(alertPanel, BorderLayout.CENTER); 
 
@@ -363,6 +397,7 @@ public class GamePanel extends ZeroGamePanel {
                     
                     updateStaticWorldInfo();
                     refreshAllGUIData();
+                    updateGameAreaSize();
                     
                     SwingUtilities.invokeLater(() -> {
                         if (!engineStarted) {
@@ -482,6 +517,10 @@ public class GamePanel extends ZeroGamePanel {
         worldPanel.updateHourData(world);
         colonyPanel.updateHourData(colony);
         
+        if (colony != null && colony.isPlayer()) {
+            updateGameAreaSize();
+        }
+
         if (colony != null && colony.isPlayer()) {
             if (upgradeDialog != null && upgradeDialog.isShowing()) {
                 upgradeDialog.liveUpdate();
