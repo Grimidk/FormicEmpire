@@ -11,7 +11,7 @@ To Fix (By decreasing priority) :
 	(nothing right now)
 
 	Mid:
-	building syrup reservoir adds syrup but it seems just the label since its over capacity
+	resin and syrup dont have an estimated production
 
 	Low:
 	colony scroll down

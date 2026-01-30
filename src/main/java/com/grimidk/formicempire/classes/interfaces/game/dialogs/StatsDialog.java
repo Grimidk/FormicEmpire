@@ -318,10 +318,10 @@ public class StatsDialog extends ZeroDialog {
             
         // --- Syrups/Resins  ---
         addResourceRow(model, GameConstants.RESOURCE_SYRUP.getIcon(), "Syrups", colony.getSyrups(), stats.getSyrupsCapacity(colony), 
-            0, 0, 0, 0);
+            0, 0, colony.getAphids(), 0);
             
         addResourceRow(model, GameConstants.RESOURCE_RESIN.getIcon(), "Resins", colony.getResins(), stats.getResinsCapacity(colony), 
-            0, 0, 0, 0);
+            0, 0, (int) (plantProd * 0.01), 0);
 
         model.addRow(new Object[]{null, "------", "---", "---", "---", "---", "---", "---"});
         int netFood = mushProd - mushCons;
@@ -337,9 +337,9 @@ public class StatsDialog extends ZeroDialog {
         String netStr = (net >= 0 ? "+" : "") + net;
         
         if (name.equals("Syrups") || name.equals("Resins")) {
-             if (production == 0 && consumption == 0) {
-                 prodStr = "---"; consStr = "---"; netStr = "---";
-             }
+            if (production == 0 && consumption == 0) {
+                prodStr = "---"; consStr = "---"; netStr = "---";
+            }
         }
         model.addRow(new Object[]{icon, name, current, cap, sourceStr, prodStr, consStr, netStr});
     }

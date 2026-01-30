@@ -88,13 +88,13 @@ public class ColonyLabourService {
                         worker.setCarrying(type);
                         
                         if (colony.hasUpgrade(GameUnlocks.ABILITY_RESIN)) {
-                             if (random.nextInt(100) < 1) {
-                                 double resinSpace = stats.getResinsCapacity(colony) - colony.getResinsPrecise();
-                                 if (resinSpace > 0) {
-                                     colony.setResins(colony.getResinsPrecise() + 1);
-                                     worker.setCarryingSec(GameConstants.RESOURCE_RESIN);
-                                 }
-                             }
+                            if (random.nextInt(100) < 1) {
+                                double resinSpace = stats.getResinsCapacity(colony) - colony.getResinsPrecise();
+                                if (resinSpace > 0) {
+                                    colony.setResins(colony.getResinsPrecise() + 1);
+                                    worker.setCarryingSec(GameConstants.RESOURCE_RESIN);
+                                }
+                            }
                         }
                         workerIndex++;
                     }
@@ -230,8 +230,10 @@ public class ColonyLabourService {
         
         double plantConsumption = syrupGain * 0.10; 
 
-        colony.setPlants(Math.max(0, colony.getPlantsPrecise() - plantConsumption));
-        colony.setSyrups(Math.min(colony.getSyrupsPrecise() + syrupGain, (double)stats.getSyrupsCapacity(colony)));
+        if (colony.getPlantsPrecise() >= plantConsumption) {
+            colony.setPlants(Math.max(0, colony.getPlantsPrecise() - plantConsumption));
+            colony.setSyrups(Math.min(colony.getSyrupsPrecise() + syrupGain, (double)stats.getSyrupsCapacity(colony)));
+        }
     }
 
     public void runHerding(Colony colony, Biome biome) {
