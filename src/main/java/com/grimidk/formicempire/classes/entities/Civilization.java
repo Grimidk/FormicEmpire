@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.awt.Color;
 
 import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
 import com.grimidk.formicempire.classes.constants.misc.Species;
@@ -26,6 +27,7 @@ public class Civilization {
     private Species species;
     private int researchPoints;
     private ColonyRank rank;
+    private Color color;
     
     // Global Data
     private final Set<Upgrade> unlockedUpgrades;
@@ -48,6 +50,7 @@ public class Civilization {
         this.researchPoints = 0;
         this.rank = GameConstants.RANK_ANT;
         
+        initializeColor();
         initializeServices();
     }
     
@@ -86,9 +89,9 @@ public class Civilization {
             }
         }
         
+        initializeColor();
         initializeServices();
         
-        // Calculate rank after initialization based on current stats
         rankUp();
     }
 
@@ -96,6 +99,15 @@ public class Civilization {
         this.automationService = new CivilizationAutomationService();
         this.starterService = new CivilizationStarterService();
         this.statService = new CivilizationStatService();
+    }
+    
+    private void initializeColor() {
+        if (this.isPlayer) {
+            this.color = new Color(0, 191, 255); 
+        } else {
+            float hue = (this.id * 0.618033988749895f) % 1.0f;
+            this.color = Color.getHSBColor(hue, 0.75f, 0.95f);
+        }
     }
 
     // --- Logic ---
@@ -130,7 +142,6 @@ public class Civilization {
         if (!colonies.contains(colony)) {
             colonies.add(colony);
             colony.setCivilization(this); 
-            // Update rank immediately when acquiring new power
             rankUp();
         }
     }
@@ -145,9 +156,15 @@ public class Civilization {
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
     public boolean isPlayer() { return isPlayer; }
-    public void setPlayer(boolean player) { isPlayer = player; }
+    public void setPlayer(boolean player) { 
+        isPlayer = player; 
+        initializeColor(); 
+    }
     public Species getSpecies() { return species; }
     public void setSpecies(Species species) { this.species = species; }
+    
+    public Color getColor() { return color; }
+    public void setColor(Color color) { this.color = color; }
     
     public ColonyRank getRank() { return rank; }
     public void setRank(ColonyRank rank) { this.rank = rank; }

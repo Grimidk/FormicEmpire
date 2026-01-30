@@ -313,6 +313,24 @@ public class GamePanel extends ZeroGamePanel {
         statusLabel.setText("Starting game...");
         Engine engine = frame.getEngine();
         
+        JDialog loadingDialog = new JDialog(frame, "Loading", true);
+        loadingDialog.setUndecorated(true);
+        loadingDialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
+        panel.setBackground(Color.DARK_GRAY);
+
+        JLabel label = new JLabel("Loading game, please wait...", SwingConstants.CENTER);
+        label.setForeground(Color.WHITE);
+        label.setFont(new Font("SansSerif", Font.BOLD, 18));
+        label.setBorder(BorderFactory.createEmptyBorder(30, 60, 30, 60));
+
+        panel.add(label, BorderLayout.CENTER);
+        loadingDialog.add(panel);
+        loadingDialog.pack();
+        loadingDialog.setLocationRelativeTo(frame);
+
         SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
             @Override
             protected Void doInBackground() throws Exception {
@@ -322,6 +340,7 @@ public class GamePanel extends ZeroGamePanel {
 
             @Override
             protected void done() {
+                loadingDialog.dispose();
                 try {
                     get();
                     statusLabel.setText("Game started");
@@ -362,6 +381,7 @@ public class GamePanel extends ZeroGamePanel {
             }
         };
         worker.execute();
+        loadingDialog.setVisible(true);
     }
 
     private void registerTickListeners() {

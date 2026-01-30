@@ -77,13 +77,22 @@ public class MapDialog extends ZeroDialog {
     }
 
     private class HexMapPanel extends JPanel {
-        private int hexRadius = 26; 
-        
+        private int hexRadius = 26;  
         private final Map<Integer, Color> biomeColorCache = new HashMap<>();
+        private final Map<Point, Hex> hexLookup = new HashMap<>();
+
+        // Side 0 (Vertices 0-1): East (+1, 0)
+        // Side 1 (Vertices 1-2): South-East (0, +1)
+        // Side 2 (Vertices 2-3): South-West (-1, +1)
+        // Side 3 (Vertices 3-4): West (-1, 0)
+        // Side 4 (Vertices 4-5): North-West (0, -1)
+        // Side 5 (Vertices 5-0): North-East (+1, -1)
+        private final int[][] NEIGHBOR_OFFSETS = {
+            {1, 0}, {0, 1}, {-1, 1}, {-1, 0}, {0, -1}, {1, -1}
+        };
 
         public HexMapPanel() {
             setBackground(Color.WHITE);
-            // Register with ToolTipManager to ensure getToolTipText is called
             ToolTipManager.sharedInstance().registerComponent(this);
 
             addMouseListener(new MouseAdapter() {
@@ -125,14 +134,12 @@ public class MapDialog extends ZeroDialog {
                 if (poly.contains(p)) {
                     StringBuilder sb = new StringBuilder("<html>");
                     
-                    // 1. Biome Name
                     if (hex.getBiome() != null) {
                         sb.append("<b>Biome:</b> ").append(hex.getBiome().getName());
                     } else {
                         sb.append("<b>Biome:</b> Unknown");
                     }
                     
-                    // 2. Colony Info
                     Colony c = hex.getColony();
                     if (c != null) {
                         if (c.getRank() != null) {
@@ -149,7 +156,6 @@ public class MapDialog extends ZeroDialog {
                             sb.append("<br><i>").append(c.getName()).append("</i>");
                         }
 
-                        // Added Civ Info
                         Civilization civ = c.getCivilization();
                         if (civ != null) {
                             sb.append("<br><b>Civ:</b> ").append(civ.getName());
@@ -165,7 +171,7 @@ public class MapDialog extends ZeroDialog {
                     return sb.toString();
                 }
             }
-            return null; // No hex under cursor
+            return null;
         }
 
         private void handleMouseClick(Point p) {
@@ -189,15 +195,25 @@ public class MapDialog extends ZeroDialog {
             
             calculateHexSize();
 
+            hexLookup.clear();
+            for (Hex h : world.getHexes()) {
+                hexLookup.put(new Point(h.getQ(), h.getR()), h);
+            }
+
             Graphics2D g2d = (Graphics2D) g;
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            g2d.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 
             Point centerOffset = getCenterOffset();
             Hex activeHex = world.getActiveHex();
 
             for (Hex hex : world.getHexes()) {
-                drawHex(g2d, hex, centerOffset.x, centerOffset.y, hex == activeHex);
+                drawHex(g2d, hex, centerOffset.x, centerOffset.y, false);
+            }
+
+            if (activeHex != null) {
+                drawHex(g2d, activeHex, centerOffset.x, centerOffset.y, true);
             }
         }
         
@@ -205,63 +221,108 @@ public class MapDialog extends ZeroDialog {
             return new Point(getWidth() / 2, getHeight() / 2);
         }
 
-        private void drawHex(Graphics2D g2d, Hex hex, int centerX, int centerY, boolean isActive) {
+        private void drawHex(Graphics2D g2d, Hex hex, int centerX, int centerY, boolean isSelectionPass) {
             Polygon poly = getHexPolygon(hex, centerX, centerY);
-            Rectangle bounds = poly.getBounds();
-            int cx = (int)bounds.getCenterX();
-            int cy = (int)bounds.getCenterY();
             
-            // 1. Fill Background
-            Biome biome = hex.getBiome();
-            Color fillColor = Color.LIGHT_GRAY;
-            
-            if (biome != null) {
-                fillColor = getBiomeColor(biome);
-            }
-            
-            if (!isActive) {
-                fillColor = fadeToWhite(fillColor, 0.4f); 
-            }
-            
-            g2d.setColor(fillColor);
-            g2d.fillPolygon(poly);
-
-            // 2. Draw Biome Icon
-            float scale = 0.85f;
-            int iconSize = (int)(hexRadius * scale); 
-            
-            if (biome != null && biome.getIcon() != null) {
-                Image icon = biome.getIcon().getImage();
-                int iconX = cx - (iconSize / 2);
-                int iconY = cy - (iconSize / 2);
+            if (!isSelectionPass) {
+                // --- 1. Fill Background ---
+                Rectangle bounds = poly.getBounds();
+                int cx = (int)bounds.getCenterX();
+                int cy = (int)bounds.getCenterY();
                 
-                g2d.drawImage(icon, iconX, iconY, iconSize, iconSize, null);
+                Biome biome = hex.getBiome();
+                Color fillColor = Color.LIGHT_GRAY;
+                
+                if (biome != null) {
+                    fillColor = getBiomeColor(biome);
+                }
+                
+                if (hex != world.getActiveHex()) {
+                    fillColor = fadeToWhite(fillColor, 0.4f); 
+                }
+                
+                g2d.setColor(fillColor);
+                g2d.fillPolygon(poly);
+
+                // --- 2. Draw Icons ---
+                float scale = 0.85f;
+                int iconSize = (int)(hexRadius * scale); 
+                
+                if (biome != null && biome.getIcon() != null) {
+                    Image icon = biome.getIcon().getImage();
+                    int iconX = cx - (iconSize / 2);
+                    int iconY = cy - (iconSize / 2);
+                    g2d.drawImage(icon, iconX, iconY, iconSize, iconSize, null);
+                }
+
+                if (hex.getColony() != null) {
+                    Colony c = hex.getColony();
+                    ColonyRank rank = c.getRank();
+                    
+                    if (rank != null && rank.getIcon() != null) {
+                        Image rankImg = rank.getIcon().getImage();
+                        int rankSize = (int)(hexRadius * scale);                    
+                        int rankX = cx - (rankSize / 2);
+                        int rankY = cy - (rankSize / 2) - (int)(hexRadius * scale); 
+                        g2d.drawImage(rankImg, rankX, rankY, rankSize, rankSize, null);
+                    }
+                }
+
+                // --- 3. Draw Smart Borders ---
+                drawMergedBorders(g2d, hex, poly);
+
+            } else {
+                g2d.setColor(Color.RED);
+                g2d.setStroke(new BasicStroke(3));
+                g2d.drawPolygon(poly);
+            }
+        }
+
+        private void drawMergedBorders(Graphics2D g2d, Hex currentHex, Polygon poly) {
+            int currentCivId = -1;
+            Color civColor = Color.BLACK;
+            boolean hasCiv = false;
+
+            if (currentHex.getColony() != null && currentHex.getColony().getCivilization() != null) {
+                currentCivId = currentHex.getColony().getCivilization().getId();
+                civColor = currentHex.getColony().getCivilization().getColor();
+                hasCiv = true;
             }
 
-            // 3. Draw Colony Rank 
-            if (hex.getColony() != null) {
-                Colony c = hex.getColony();
-                ColonyRank rank = c.getRank();
-                
-                if (rank != null && rank.getIcon() != null) {
-                    Image rankImg = rank.getIcon().getImage();
+            g2d.setColor(civColor);
+            
+            for (int i = 0; i < 6; i++) {
+                Point p1 = new Point(poly.xpoints[i], poly.ypoints[i]);
+                Point p2 = new Point(poly.xpoints[(i + 1) % 6], poly.ypoints[(i + 1) % 6]);
+
+                boolean shouldDrawEdge = true;
+
+                if (hasCiv) {
+                    int[] offset = NEIGHBOR_OFFSETS[i];
+                    int nQ = currentHex.getQ() + offset[0];
+                    int nR = currentHex.getR() + offset[1];
                     
-                    int rankSize = (int)(hexRadius * scale);                    
-                    int rankX = cx - (rankSize / 2);
-                    int rankY = cy - (rankSize / 2) - (int)(hexRadius * scale); 
-                    
-                    g2d.drawImage(rankImg, rankX, rankY, rankSize, rankSize, null);
+                    Hex neighbor = hexLookup.get(new Point(nQ, nR));
+
+                    if (neighbor != null && neighbor.getColony() != null && neighbor.getColony().getCivilization() != null) {
+                        int neighborCivId = neighbor.getColony().getCivilization().getId();
+                        if (neighborCivId == currentCivId) {
+                            shouldDrawEdge = false;
+                        }
+                    }
+                } else {
+                    g2d.setStroke(new BasicStroke(1));
+                    g2d.setColor(Color.BLACK);
+                }
+
+                if (shouldDrawEdge) {
+                    if (hasCiv) {
+                        g2d.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                        g2d.setColor(civColor);
+                    }
+                    g2d.drawLine(p1.x, p1.y, p2.x, p2.y);
                 }
             }
-
-            // 4. Draw Border
-            g2d.setStroke(new BasicStroke(isActive ? 3 : 1));
-            if (isActive) {
-                g2d.setColor(Color.RED); 
-            } else {
-                g2d.setColor(Color.BLACK); 
-            }
-            g2d.drawPolygon(poly);
         }
 
         private Polygon getHexPolygon(Hex hex, int offsetX, int offsetY) {

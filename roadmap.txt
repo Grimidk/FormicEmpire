@@ -8,12 +8,10 @@ To Fix (By decreasing priority) :
 	(nothing right now)
 	
 	High:
-	loading world/game screen
-	npc again has too few builders
+	(nothing right now)
 
 	Mid:
-	double wide hex map border to mape civ borders
-	legend for map
+	building syrup reservoir adds syrup but it seems just the label since its over capacity
 
 	Low:
 	colony scroll down
