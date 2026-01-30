@@ -73,7 +73,7 @@ public class ColonyAutomationService {
         int remaining = colony.getWorkers().size();
         if (remaining == 0) return;
 
-        // 1. Minimum Essentials
+        // Essentials
         int farmers = assignMinimum(remaining, MIN_FARMERS);
         remaining -= farmers;
         
@@ -85,24 +85,21 @@ public class ColonyAutomationService {
 
         ColonyStatsService stats = colony.getStatsService();
 
-        // 2. Critical Graving
         int gravers = calculateGraverNeeds(colony, remaining, stats);
         remaining -= gravers;
         targets.put(GameConstants.ROLE_GRAVER, gravers);
 
-        // 3. Nurse Scaling
         int extraNurses = calculateExtraNurseNeeds(colony, remaining, nurses, stats);
         nurses += extraNurses;
         remaining -= extraNurses;
         targets.put(GameConstants.ROLE_NURSE, nurses);
 
-        // 4. Farmer Scaling
         int extraFarmers = calculateExtraFarmerNeeds(colony, remaining, farmers, stats);
         farmers += extraFarmers;
         remaining -= extraFarmers;
         targets.put(GameConstants.ROLE_FARMER, farmers);
 
-        // 5. Specialized Roles
+        // Specialized
         if (remaining > 0 && colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) {
             int toAdd = Math.min(farmers, remaining);
             targets.put(GameConstants.ROLE_RANCHER, toAdd);
@@ -115,14 +112,33 @@ public class ColonyAutomationService {
             remaining -= toAdd;
         }
 
-        if (remaining > 0 && colony.hasUpgrade(GameUnlocks.ROLE_BUILDER)) {
-            int builderTarget = (int) (colony.getWorkers().size() * 0.3);
-            int toAdd = Math.min(remaining, builderTarget); 
-            targets.put(GameConstants.ROLE_BUILDER, toAdd);
+        if (remaining > 0 && colony.hasUpgrade(GameUnlocks.ROLE_MINER)) {
+            int minerTarget = (int) (colony.getWorkers().size() * 0.15);
+            int toAdd = Math.min(remaining, minerTarget);
+            
+            if (colony.getMinerals() >= colony.getMineralsCapacity()) {
+                toAdd = Math.min(remaining, 1);
+            }
+            
+            targets.put(GameConstants.ROLE_MINER, toAdd);
             remaining -= toAdd;
         }
 
-        // 6. Remaining Foragers
+        if (remaining > 0 && colony.hasUpgrade(GameUnlocks.ROLE_BUILDER)) {
+            if (colony.getCurrentBuildingProject() != null) {
+                int builderTarget = (int) (colony.getWorkers().size() * 0.3);
+                int toAdd = Math.min(remaining, builderTarget); 
+                
+                if (toAdd == 0 && remaining > 0) toAdd = 1;
+                
+                targets.put(GameConstants.ROLE_BUILDER, toAdd);
+                remaining -= toAdd;
+            } else {
+                 targets.put(GameConstants.ROLE_BUILDER, 0);
+            }
+        }
+
+        // Remaining
         if (remaining > 0) {
             foragers += remaining;
         }
@@ -192,7 +208,6 @@ public class ColonyAutomationService {
         int remainingSoldiers = colony.getSoldiers().size();
         if (remainingSoldiers == 0) return;
 
-        // 1. Police
         int assignedPolice = 0;
         if (colony.getParasites() > 0 && colony.hasUpgrade(GameUnlocks.ROLE_POLICE)) {
             int maxPolice = (int) (colony.getSoldiers().size() * 0.20);
@@ -203,7 +218,6 @@ public class ColonyAutomationService {
         targets.put(GameConstants.ROLE_POLICE, assignedPolice);
         remainingSoldiers -= assignedPolice;
 
-        // 2. Hunters
         boolean proteinNeeded = colony.getProtein() < colony.getStatsService().getProteinCapacity(colony);
         if (proteinNeeded && colony.hasUpgrade(GameUnlocks.ROLE_HUNTER)) {
             targets.put(GameConstants.ROLE_HUNTER, remainingSoldiers);
@@ -214,11 +228,9 @@ public class ColonyAutomationService {
         int totalPrincesses = colony.getPrincesses().size();
         if (totalPrincesses == 0) return;
         
-        // 1. Assistants
         int assistantCount = (int) (totalPrincesses * 0.10);
         targets.put(GameConstants.ROLE_ASSISTANT, assistantCount);
         
-        // 2. Breeders
         int breederCount = totalPrincesses - assistantCount;
         targets.put(GameConstants.ROLE_BREEDER, breederCount);
     }

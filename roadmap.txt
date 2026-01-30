@@ -5,6 +5,7 @@ To Fix (By decreasing priority) :
 	late game performance (physics too taxing)
 
 	Game Breaking:
+	(nothing right now)
 	
 	High:
 	loading world/game screen
@@ -83,5 +84,5 @@ Post launch (v1.1) (Improvements Update):
 	global stats from all players (needs api and consent)
 	socials screen with discord server and instgram
 
-Post launch (v1.2) (Civilization Update):
+Post launch (v1.2) (Society Update):
 	(Secret for now)

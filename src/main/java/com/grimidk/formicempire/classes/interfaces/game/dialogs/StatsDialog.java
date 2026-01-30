@@ -239,6 +239,16 @@ public class StatsDialog extends ZeroDialog {
         model.addRow(new Object[]{null, "Empire", "Total Colonies", civStatsService.getTotalColonies(civ)});
         model.addRow(new Object[]{null, "Empire", "Global Population", civStatsService.getTotalPopulation(civ)});
 
+        // Unlocks
+        model.addRow(new Object[]{null, null, "------", "------"});
+        model.addRow(new Object[]{null, "Progress", "Upgrades Researched", civ.getUnlockedUpgrades().size()});
+        
+        int totalBuildings = 0;
+        for (Colony c : civ.getColonies()) {
+            totalBuildings += c.getUnlockedBuildings().size();
+        }
+        model.addRow(new Object[]{null, "Progress", "Total Buildings Built", totalBuildings});
+
         // Research
         model.addRow(new Object[]{null, null, "------", "------"});
         model.addRow(new Object[]{GameConstants.ICON_RESEARCH, "Research", "Stored Points", civ.getResearchPoints()});
