@@ -11,7 +11,7 @@ To Fix (By decreasing priority) :
 	(nothing right now)
 
 	Mid:
-	resin and syrup dont have an estimated production
+	(nothing right now)
 
 	Low:
 	colony scroll down
@@ -26,6 +26,8 @@ Needed for launch (v1.0) (Launch Version):
 	Priority:
 	colonizing and new colonies (spreading to adjacent for pc and npc) (trigger civ menu to easily handle colony relations and go to)
 	first round of species and assimilations (and handle civ death to earn civs)
+	trade routes (async with roles and incoming outgoing recurrent and one time and travel time and danger level and boring tunnels)
+	2 colonies unlocks civ menu, 3 unlocks trade routes, 7 unlocks tunnels
 
 	Everything else :
 	trade routes (async with roles and incoming outgoing recurrent and one time and travel time and danger level and boring tunnels)

@@ -74,6 +74,7 @@ public final class GameUnlocks {
     public static final Upgrade ROLE_ASSISTANT = new Upgrade(36, "Lab Assistant Role", "Lab Internship", "Allows princesses to help research with 1/5 the efficency of queens.", TYPE_PRINCESS, 1500 );
     static { upgrades.add(ROLE_ASSISTANT); }
     public static final Upgrade ROLE_ESCORT = new Upgrade(37, "Convoy Escort Role", "Protective Detail", "", TYPE_SOLDIER, 0 );
+    public static final Upgrade ROLE_ENGINEER = new Upgrade(38, "Excavator Role", "Tunnel Engineering", "Allows workers to dig tunnels for safer trade routes.", TYPE_WORKER, 0 );
     // -- Stats -- 
     public static final Upgrade STAT_SKELETON = new Upgrade(101, "Basic Skeletons", "Basic Exoskeletons", "The basic defense stats for all the ants in your colony before multipliers. 100 health points, 5 defense points and 1 health point recovered per second.", TYPE_EGG, 0 );
     static { upgrades.add(STAT_SKELETON); }
@@ -154,6 +155,8 @@ public final class GameUnlocks {
     static { upgrades.add(ABILITY_ASSIMILATION); }
     public static final Upgrade ABILITY_FORCED_FLIGHT = new Upgrade(505, "Forced Nuptial Flights", "Royal Decree", "Allows you to force a nuptial flight by spending 1000 research points.", ROLE_BREEDER, 9000);
     static { upgrades.add(ABILITY_FORCED_FLIGHT); }
+    public static final Upgrade ABILITY_CIVILIZATION = new Upgrade(506, "Ant Civilization", "Ant Society", "Allows the civilization management screen to see all the colonies in your civilization.", ABILITY_SPREAD, 0);
+    static { upgrades.add(ABILITY_CIVILIZATION); }
 
     // --- Buildings ---
     // -- Tier 0 --

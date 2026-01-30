@@ -397,6 +397,8 @@ public final class GameConstants {
     static { antRoles.add(ROLE_ASSISTANT); }
     public static final AntRole ROLE_ESCORT = new AntRole(32, TYPE_SOLDIER, "Convoy Escort");
     static { antRoles.add(ROLE_ESCORT); }
+    public static final AntRole ROLE_ENGINEER = new AntRole(33, TYPE_WORKER, "Excavator");
+    static { antRoles.add(ROLE_ENGINEER); }
 
     // --- Colony Ranks ---
     public static final ColonyRank RANK_ANT = new ColonyRank(1, "Ant", 1l, 
