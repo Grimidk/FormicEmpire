@@ -18,6 +18,8 @@ public class SaveSelectPanel extends JPanel {
     private final JButton[] slotButtons = new JButton[3];
     private final JButton[] deleteButtons = new JButton[3];
     private final JLabel[] slotLabels = new JLabel[3];
+    
+    private final Savefile[] cachedSaves = new Savefile[3];
 
     public SaveSelectPanel(MainFrame frame) {
         this.frame = frame;
@@ -67,11 +69,8 @@ public class SaveSelectPanel extends JPanel {
             @Override
             public void ancestorMoved(AncestorEvent event) {}
         });
-
-        refreshSlots();
     }
     
- 
     private void setupNavigation(JButton button) {
         button.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke("ENTER"), "pressed");
         button.getActionMap().put("pressed", new AbstractAction() {
@@ -95,6 +94,8 @@ public class SaveSelectPanel extends JPanel {
     public void refreshSlots() {
         for (int i = 0; i < 3; i++) {
             Savefile s = saveManager.loadSlot(i + 1);
+            cachedSaves[i] = s;
+
             if (s == null) {
                 slotLabels[i].setText("Empty slot");
                 slotButtons[i].setText("Create");
@@ -109,16 +110,18 @@ public class SaveSelectPanel extends JPanel {
     }
 
     private void onCreateOrLoad(int slotId, int idx) {
-        Savefile existing = saveManager.loadSlot(slotId);
+        Savefile existing = cachedSaves[idx];
+        
         if (existing == null) {
             String name = JOptionPane.showInputDialog(this, "Enter save name:", "Create Save", JOptionPane.PLAIN_MESSAGE);
             if (name == null || name.trim().isEmpty()) return;
             
             Savefile save = new Savefile(slotId, name.trim());            
             saveManager.saveUserSlotAsync(save, () -> {
-                Savefile newSave = saveManager.loadSlot(slotId);
+                refreshSlots(); 
+
+                Savefile newSave = cachedSaves[idx];
                 if (newSave != null) {
-                    refreshSlots(); 
                     HelpPanel.showTutorialDialog(frame);
                     frame.openGameWithSave(newSave); 
                 } else {
@@ -127,7 +130,6 @@ public class SaveSelectPanel extends JPanel {
             });
         } else {
             frame.openGameWithSave(existing);
-            refreshSlots();
         }
     }
 

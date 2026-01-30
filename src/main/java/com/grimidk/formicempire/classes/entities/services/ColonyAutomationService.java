@@ -104,7 +104,7 @@ public class ColonyAutomationService {
 
         // 5. Specialized Roles
         if (remaining > 0 && colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) {
-            int toAdd = Math.min(4, remaining);
+            int toAdd = Math.min(farmers, remaining);
             targets.put(GameConstants.ROLE_RANCHER, toAdd);
             remaining -= toAdd;
         }
@@ -115,14 +115,11 @@ public class ColonyAutomationService {
             remaining -= toAdd;
         }
 
-        if (remaining > 0 && colony.getCurrentBuildingProject() != null) {
-            boolean secureResources = colony.getPlants() > 100 && colony.getWater() > 100;
-            if (secureResources) {
-                int builderTarget = (int) (colony.getWorkers().size() * 0.3);
-                int toAdd = Math.min(remaining, builderTarget); 
-                targets.put(GameConstants.ROLE_BUILDER, toAdd);
-                remaining -= toAdd;
-            }
+        if (remaining > 0 && colony.hasUpgrade(GameUnlocks.ROLE_BUILDER)) {
+            int builderTarget = (int) (colony.getWorkers().size() * 0.3);
+            int toAdd = Math.min(remaining, builderTarget); 
+            targets.put(GameConstants.ROLE_BUILDER, toAdd);
+            remaining -= toAdd;
         }
 
         // 6. Remaining Foragers

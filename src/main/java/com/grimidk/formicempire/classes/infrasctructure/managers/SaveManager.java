@@ -86,6 +86,8 @@ public class SaveManager {
         if (save.getPlayTime() == 0) {
             save.setPlayTime(computePlayTimeFromSave(save));
         }
+        save.setTimestamp(System.currentTimeMillis());
+        
         writeSaveToFile(save, f); 
         System.out.println("[SaveManager] Wrote manual save for slot " + save.getId() + " -> " + f.getName());
     }
@@ -168,7 +170,7 @@ public class SaveManager {
                         if (existing != null) {
                             int existingPlay = existing.getPlayTime() != 0 ? existing.getPlayTime() : computePlayTimeFromSave(existing);
                             if (existingPlay > save.getPlayTime()) {
-                                System.out.println("[SaveManager] Manual save for slot " + slotId + " is newer than autosave - skipping autosave");
+                                System.out.println("[SaveManager] Manual save for slot " + slotId + " has more playtime than autosave - skipping autosave");
                                 return;
                             }
                         }
@@ -203,25 +205,45 @@ public class SaveManager {
     }
 
     public Savefile loadSlot(int slotId) {
-        File manual = getSlotFile(slotId, "manual");
-        File autos = getSlotFile(slotId, "autosave");
+        File manualFile = getSlotFile(slotId, "manual");
+        File autosaveFile = getSlotFile(slotId, "autosave");
 
-        File f = null;
-        if (manual.exists()) f = manual;
-        else if (autos.exists()) f = autos;
+        Savefile manualSave = null;
+        Savefile autosave = null;
 
-        if (f == null) return null;
-        if (f.length() == 0) {
-            System.out.println("[SaveManager] Found empty save file for slot " + slotId + " - ignoring");
-            return null;
+        if (manualFile.exists() && manualFile.length() > 0) {
+            try (BufferedReader r = Files.newBufferedReader(manualFile.toPath(), StandardCharsets.UTF_8)) {
+                manualSave = readSaveFromReader(r);
+            } catch (Exception e) {
+                System.err.println("[SaveManager] Failed to read manual save for slot " + slotId);
+                e.printStackTrace();
+            }
         }
-        
-        try (BufferedReader r = Files.newBufferedReader(f.toPath(), StandardCharsets.UTF_8)) {
-            return readSaveFromReader(r);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+
+        if (autosaveFile.exists() && autosaveFile.length() > 0) {
+            try (BufferedReader r = Files.newBufferedReader(autosaveFile.toPath(), StandardCharsets.UTF_8)) {
+                autosave = readSaveFromReader(r);
+            } catch (Exception e) {
+                System.err.println("[SaveManager] Failed to read autosave for slot " + slotId);
+                e.printStackTrace();
+            }
         }
+
+        if (manualSave != null && autosave != null) {
+            if (autosave.getTimestamp() > manualSave.getTimestamp()) {
+                System.out.println("[SaveManager] Loading autosave for slot " + slotId);
+                return autosave;
+            } else {
+                System.out.println("[SaveManager] Loading manual save for slot " + slotId);
+                return manualSave;
+            }
+        } else if (manualSave != null) {
+            return manualSave;
+        } else if (autosave != null) {
+            return autosave;
+        }
+
+        return null;
     }
 
     public void saveWorldToSlotUser(World w, int slotId) throws IOException {
@@ -293,6 +315,7 @@ public class SaveManager {
     }
     
     private void populateSavefileFromGame(Savefile save, World w) {
+        save.setTimestamp(System.currentTimeMillis()); 
         save.setMinute(w.getMinute());
         save.setHour(w.getHour());
         save.setDay(w.getDay());
@@ -432,6 +455,7 @@ public class SaveManager {
         // - Global -
         writeJsonLine(w, "id", s.getId(), false);
         writeJsonLine(w, "name", s.getName() != null ? s.getName() : "", false);
+        writeJsonLine(w, "timestamp", s.getTimestamp(), false);
         writeJsonLine(w, "playTime", s.getPlayTime(), false);
         writeJsonLine(w, "minute", s.getMinute(), false);
         writeJsonLine(w, "hour", s.getHour(), false);
@@ -579,6 +603,7 @@ public class SaveManager {
         String name = rootMap.getOrDefault("name", "");
         Savefile s = new Savefile(id, name);
         
+        s.setTimestamp(Long.parseLong(rootMap.getOrDefault("timestamp", "0")));
         s.setPlayTime(Integer.parseInt(rootMap.getOrDefault("playTime", "0")));
         s.setMinute(Integer.parseInt(rootMap.getOrDefault("minute", "0")));
         s.setHour(Integer.parseInt(rootMap.getOrDefault("hour", "0")));

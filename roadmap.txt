@@ -7,7 +7,6 @@ To Fix (By decreasing priority) :
 	Game Breaking:
 	
 	High:
-	autosaves not showing in select 
 	loading world/game screen
 	npc again has too few builders
 
@@ -21,17 +20,18 @@ To Fix (By decreasing priority) :
 	builders act weird af in build zone
 
 	Can't reproduce:
+	(nothing right now)
 	
 To Feature (to be done in order):
 Needed for launch (v1.0) (Launch Version):
 	Priority:
-	colonizing and new colonies (spreading)	
+	colonizing and new colonies (spreading to adjacent for pc and npc) (trigger civ menu to easily handle colony relations and go to)
 	first round of species and assimilations (and handle civ death to earn civs)
 
 	Everything else :
 	trade routes (async with roles and incoming outgoing recurrent and one time and travel time and danger level and boring tunnels)
 	breeders go out of the colony in nuptial
-	auxiliary room sprites (storage (resources), farm (shroom), nurse (bedding), royal (nests and science)) and expansion (breeder room)
+	auxiliary room sprites (storage (resources), farm (shroom), nurse (bedding), royal (nests and science))
 	more settings (allow idle to forage, allow unassigned, choose default, change roles to proportions (may use by npc), fuzzed parasites, arachnophobia mode ?)
 	more species and more bugs (constants and icons)
 	civ and colony name maker (player input and random)

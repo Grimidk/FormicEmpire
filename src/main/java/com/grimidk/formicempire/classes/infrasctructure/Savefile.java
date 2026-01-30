@@ -13,6 +13,7 @@ public class Savefile implements Serializable {
     // --- Global Save Data ---
     private final int id; 
     private final String name; 
+    private long timestamp;
     private int playTime;
     private int minute;
     private int hour;
@@ -46,6 +47,7 @@ public class Savefile implements Serializable {
     public Savefile(int id, String name) {
         this.id = id;
         this.name = name;
+        this.timestamp = System.currentTimeMillis();
         this.worldHexes = new ArrayList<>();
         this.colonies = new ArrayList<>();
         this.civilizations = new ArrayList<>();
@@ -133,6 +135,9 @@ public class Savefile implements Serializable {
 
     public int getId() { return id; }
     public String getName() { return name; }
+
+    public long getTimestamp() { return timestamp; }
+    public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
 
     public int getPlayTime() { return playTime; }
     public void setPlayTime(int playTime) { this.playTime = playTime; }
