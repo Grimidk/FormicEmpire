@@ -79,6 +79,9 @@ public class Savefile implements Serializable {
         public String name;
         public String rankName;
         public boolean isPlayer;
+        public boolean isPrimary;
+        public boolean isAutomated;
+        public int age;
         public int q; 
         public int r;        
         public float progress;

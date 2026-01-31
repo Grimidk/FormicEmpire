@@ -73,29 +73,29 @@ public class CivilizationManagementDialog extends ZeroDialog {
     }
 
     private void initUI() {
-        String[] columns = {"", "Rank", "Name", "Population", "Age", "Biome", "Automation", "Actions"};
+        String[] columns = {"", "Rank", "Type", "Name", "Population", "Age", "Biome", "Automation", "Actions/Status"};
         
         model = new DefaultTableModel(columns, 0) {
             @Override
             public Class<?> getColumnClass(int columnIndex) {
                 switch (columnIndex) {
                     case 0: return Icon.class;
-                    case 3: return Integer.class; 
-                    case 5: return Biome.class; 
-                    case 6: return Boolean.class;
+                    case 4: return Integer.class; 
+                    case 6: return Biome.class; 
+                    case 7: return Boolean.class;
                     default: return Object.class;
                 }
             }
 
             @Override
             public boolean isCellEditable(int row, int column) {
-                return column == 6 || column == 7;
+                return column == 7 || column == 8;
             }
         };
 
         model.addTableModelListener(e -> {
-            if (e.getColumn() == 6 && e.getFirstRow() >= 0 && e.getFirstRow() < displayedColonies.size()) {
-                boolean isChecked = (Boolean) model.getValueAt(e.getFirstRow(), 6);
+            if (e.getColumn() == 7 && e.getFirstRow() >= 0 && e.getFirstRow() < displayedColonies.size()) {
+                boolean isChecked = (Boolean) model.getValueAt(e.getFirstRow(), 7);
                 Colony c = displayedColonies.get(e.getFirstRow());
                 c.setAutomationEnabled(isChecked);
             }
@@ -115,15 +115,21 @@ public class CivilizationManagementDialog extends ZeroDialog {
         table.getColumnModel().getColumn(0).setPreferredWidth(50);
         
         table.getColumnModel().getColumn(1).setPreferredWidth(100);
-        table.getColumnModel().getColumn(2).setPreferredWidth(200); 
-        table.getColumnModel().getColumn(4).setPreferredWidth(80); 
-        table.getColumnModel().getColumn(6).setMaxWidth(100);
-        table.getColumnModel().getColumn(7).setMinWidth(160); 
+        table.getColumnModel().getColumn(2).setPreferredWidth(80);
+        table.getColumnModel().getColumn(3).setPreferredWidth(200);
+        table.getColumnModel().getColumn(5).setPreferredWidth(80); 
+        table.getColumnModel().getColumn(7).setMaxWidth(100);
+        table.getColumnModel().getColumn(8).setMinWidth(160); 
 
         // Custom Renderers
-        table.getColumnModel().getColumn(5).setCellRenderer(new BiomeRenderer());
-        table.getColumnModel().getColumn(7).setCellRenderer(new ActionPanelRenderer());
-        table.getColumnModel().getColumn(7).setCellEditor(new ActionPanelEditor());
+        table.getColumnModel().getColumn(6).setCellRenderer(new BiomeRenderer());
+        table.getColumnModel().getColumn(8).setCellRenderer(new ActionPanelRenderer());
+        table.getColumnModel().getColumn(8).setCellEditor(new ActionPanelEditor());
+        
+        // Center text for Type
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+        table.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
 
         JScrollPane scrollPane = new JScrollPane(table);
         add(scrollPane, BorderLayout.CENTER);
@@ -140,7 +146,10 @@ public class CivilizationManagementDialog extends ZeroDialog {
         World world = engine.getWorld();
 
         displayedColonies.addAll(rawColonies);
-        displayedColonies.sort(Comparator.comparingInt(Colony::getAntTotal).reversed());
+        displayedColonies.sort(
+            Comparator.comparing(Colony::isPrimary).reversed()
+            .thenComparingInt(Colony::getAntTotal).reversed()
+        );
 
         for (Colony colony : displayedColonies) {
             Biome biome = null;
@@ -152,16 +161,19 @@ public class CivilizationManagementDialog extends ZeroDialog {
                     }
                 }
             }
+            
+            String typeStr = colony.isPrimary() ? "PRIMARY" : "Exp.";
 
             Object[] rowData = new Object[] {
                 colony.getRank().getIcon(),      
-                colony.getRank().getName(),      
+                colony.getRank().getName(),
+                typeStr,
                 colony.getName(),                 
                 colony.getAntTotal(),              
                 colony.getAge(),                   
                 biome,                              
                 colony.isAutomationEnabled(),       
-                colony                             
+                colony                      
             };
             
             model.addRow(rowData);
@@ -196,19 +208,36 @@ public class CivilizationManagementDialog extends ZeroDialog {
     private static class ActionPanelRenderer extends JPanel implements TableCellRenderer {
         private final JButton editBtn;
         private final JButton viewBtn;
+        private final JProgressBar progressBar;
+        private final JLabel statusLabel;
 
         public ActionPanelRenderer() {
-            setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+            setLayout(new CardLayout());
             setOpaque(true);
 
+            // Active View
+            JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 5));
+            btnPanel.setOpaque(false);
             editBtn = new JButton("Edit");
             editBtn.setMargin(new Insets(2, 8, 2, 8));
-            
             viewBtn = new JButton("View");
             viewBtn.setMargin(new Insets(2, 8, 2, 8));
+            btnPanel.add(editBtn);
+            btnPanel.add(viewBtn);
 
-            add(editBtn);
-            add(viewBtn);
+            // Loading View
+            JPanel progressPanel = new JPanel(new BorderLayout());
+            progressPanel.setOpaque(false);
+            progressPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            progressBar = new JProgressBar(0, 7);
+            progressBar.setStringPainted(true);
+            statusLabel = new JLabel("Maturing...", SwingConstants.CENTER);
+            statusLabel.setFont(statusLabel.getFont().deriveFont(10f));
+            progressPanel.add(statusLabel, BorderLayout.NORTH);
+            progressPanel.add(progressBar, BorderLayout.CENTER);
+
+            add(btnPanel, "BUTTONS");
+            add(progressPanel, "PROGRESS");
         }
 
         @Override
@@ -218,50 +247,96 @@ public class CivilizationManagementDialog extends ZeroDialog {
             } else {
                 setBackground(table.getBackground());
             }
+
+            if (value instanceof Colony) {
+                Colony c = (Colony) value;
+                CardLayout cl = (CardLayout) getLayout();
+                
+                if (c.getAge() >= 7) {
+                    cl.show(this, "BUTTONS");
+                } else {
+                    cl.show(this, "PROGRESS");
+                    progressBar.setValue(c.getAge());
+                    progressBar.setString(c.getAge() + " / 7 Days");
+                }
+            }
             return this;
         }
     }
 
     private class ActionPanelEditor extends AbstractCellEditor implements TableCellEditor {
-        private final JPanel panel;
+        private final JPanel container;
+        private final JPanel btnPanel;
+        private final JPanel progressPanel;
         private final JButton editBtn;
         private final JButton viewBtn;
-        private Colony currentChar;
+        private final JProgressBar progressBar;
+        private final JLabel statusLabel;
+        
+        private Colony currentColony;
+        private final CardLayout cardLayout;
 
         public ActionPanelEditor() {
-            panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 5));
-            panel.setOpaque(true);
+            cardLayout = new CardLayout();
+            container = new JPanel(cardLayout);
+            container.setOpaque(true);
+
+            // Buttons
+            btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 5));
+            btnPanel.setOpaque(false);
 
             editBtn = new JButton("Edit");
             editBtn.setMargin(new Insets(2, 8, 2, 8));
             editBtn.addActionListener(e -> {
                 fireEditingStopped();
-                performEdit(currentChar);
+                performEdit(currentColony);
             });
 
             viewBtn = new JButton("View");
             viewBtn.setMargin(new Insets(2, 8, 2, 8));
             viewBtn.addActionListener(e -> {
                 fireEditingStopped();
-                performView(currentChar);
+                performView(currentColony);
             });
 
-            panel.add(editBtn);
-            panel.add(viewBtn);
+            btnPanel.add(editBtn);
+            btnPanel.add(viewBtn);
+
+            // Progress
+            progressPanel = new JPanel(new BorderLayout());
+            progressPanel.setOpaque(false);
+            progressPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            progressBar = new JProgressBar(0, 7);
+            progressBar.setStringPainted(true);
+            statusLabel = new JLabel("Maturing...", SwingConstants.CENTER);
+            statusLabel.setFont(statusLabel.getFont().deriveFont(10f));
+            progressPanel.add(statusLabel, BorderLayout.NORTH);
+            progressPanel.add(progressBar, BorderLayout.CENTER);
+
+            container.add(btnPanel, "BUTTONS");
+            container.add(progressPanel, "PROGRESS");
         }
 
         @Override
         public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
             if (value instanceof Colony) {
-                this.currentChar = (Colony) value;
+                this.currentColony = (Colony) value;
+                container.setBackground(table.getSelectionBackground());
+                
+                if (currentColony.getAge() >= 7) {
+                    cardLayout.show(container, "BUTTONS");
+                } else {
+                    cardLayout.show(container, "PROGRESS");
+                    progressBar.setValue(currentColony.getAge());
+                    progressBar.setString(currentColony.getAge() + " / 7 Days");
+                }
             }
-            panel.setBackground(table.getSelectionBackground());
-            return panel;
+            return container;
         }
 
         @Override
         public Object getCellEditorValue() {
-            return currentChar;
+            return currentColony;
         }
     }
 

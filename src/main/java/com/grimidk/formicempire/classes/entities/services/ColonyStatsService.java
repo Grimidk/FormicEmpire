@@ -85,6 +85,13 @@ public class ColonyStatsService {
         return 1;
     }
 
+    // --- Limits ---
+    public int getCivilizationColonyLimit(Colony colony) {
+        if (colony.hasUpgrade(GameUnlocks.ABILITY_SPREAD_2)) return 9999;
+        if (colony.hasUpgrade(GameUnlocks.ABILITY_SPREAD)) return 2;
+        return 1;
+    }
+
     // --- Rates ---
     public int getResearchSpeed(Colony colony) {
         if (colony.hasUpgrade(GameUnlocks.STAT_RESEARCH_3)) return 8;

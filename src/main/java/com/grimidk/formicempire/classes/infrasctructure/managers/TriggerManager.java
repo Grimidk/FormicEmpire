@@ -9,7 +9,7 @@ import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,7 +81,7 @@ public class TriggerManager {
         checkBruteRoleUnlock();
         checkSpreadAbilityUnlock();
         checkScoutRoleUnlock();
-        checkCivilizationAbilityUnlock();
+        checkCivilizationTriggers();
     }
 
     private void checkAllNPCTriggers() {
@@ -259,17 +259,37 @@ public class TriggerManager {
         if (playerColony.getRank().getPopulation() >= 1000) {
             fireTrigger(GameUnlocks.ROLE_POLICE, 
                 "Parasitic Infestation", 
-                "The colony has become so prosperous that parasitic ants may infiltrate it!");
+                "The colony has become so prosperous that parasitic bugs may infiltrate it!");
         }
     }
     
-    private void checkCivilizationAbilityUnlock() {
-        if (playerColony.hasUpgrade(GameUnlocks.ABILITY_CIVILIZATION)) return;
+    private void checkCivilizationTriggers() {
+        if (playerColony.getCivilization() == null) return;
         
-        if (playerColony.getCivilization() != null && playerColony.getCivilization().getColonies().size() >= 2) {
+        int colonyCount = playerColony.getCivilization().getColonies().size();
+
+        if (colonyCount >= 2 && !playerColony.hasUpgrade(GameUnlocks.ABILITY_CIVILIZATION)) {
             fireTrigger(GameUnlocks.ABILITY_CIVILIZATION,
                 "Ant Civilization",
                 "Your civilization grows! With a second colony established, you can now manage your entire Civilization. Press (S) to open the Civilization menu.");
+        }
+        
+        if (colonyCount >= 3 && !playerColony.hasUpgrade(GameUnlocks.ABILITY_TRADE)) {
+            fireTrigger(GameUnlocks.ABILITY_TRADE,
+                "Trade Networks",
+                "With three colonies, your ants have learned to transport resources efficiently between nests. Trade Routes unlocked!");
+        }
+
+        if (colonyCount >= 5 && !playerColony.hasUpgrade(GameUnlocks.ABILITY_SPREAD_2)) {
+            fireTrigger(GameUnlocks.ABILITY_SPREAD_2,
+                "Mass Colonization",
+                "Your empire is expanding rapidly! The limit on new colonies has been removed.");
+        }
+        
+        if (colonyCount >= 7 && !playerColony.hasUpgrade(GameUnlocks.ABILITY_AUTOMATION)) {
+            fireTrigger(GameUnlocks.ABILITY_AUTOMATION,
+                "Automation Era",
+                "Your civilization is vast. You can now automate colony management to focus on expansion.");
         }
     }
     

@@ -348,6 +348,20 @@ public class ColonyLabourService {
     
     public void runSpreading(Colony colony, int potentialSatellites, World world, Hex currentHex) { 
         if (potentialSatellites <= 0 || world == null || currentHex == null) return;
+        
+        Civilization civ = colony.getCivilization();
+        if (civ == null) return;
+
+        int currentCount = civ.getColonies().size();
+        int maxCount = colony.getStatsService().getCivilizationColonyLimit(colony);
+        int slotsAvailable = maxCount - currentCount;
+        
+        if (slotsAvailable <= 0) {
+            colony.logEvent("Spreading failed: Civilization colony limit reached (" + currentCount + "/" + maxCount + ").");
+            return;
+        }
+
+        int satellitesToSpawn = Math.min(potentialSatellites, slotsAvailable);
 
         List<Hex> neighbors = new ArrayList<>();
         neighbors.add(currentHex.getNorth());
@@ -361,11 +375,10 @@ public class ColonyLabourService {
         Collections.shuffle(neighbors);
         
         int satellitesSpawned = 0;
-        Civilization civ = colony.getCivilization();
         ColonyStarterService starter = new ColonyStarterService();
         
         for (Hex neighbor : neighbors) {
-            if (satellitesSpawned >= potentialSatellites) break;
+            if (satellitesSpawned >= satellitesToSpawn) break; 
             
             if (neighbor.getColony() == null) {
                 int newId = world.getNextColonyId();

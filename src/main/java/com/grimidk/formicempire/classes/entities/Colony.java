@@ -126,7 +126,6 @@ public class Colony {
     }
     
     private void initializeDefaults() {
-        this.totalDeaths = 0;
         this.plants = 0;
         this.mushrooms = 0;
         this.protein = 0;           
@@ -142,7 +141,6 @@ public class Colony {
         this.hatchRateDrone = 0.0f;
         this.hatchRatePrincess = 0.0f;
         this.isActive = false;
-        this.age = 0;
     }
 
     private void initializeBuildings() {
@@ -178,6 +176,8 @@ public class Colony {
         this.isPlayer = isPlayer;
         this.rank = GameConstants.RANK_COLONY;
         this.automationEnabled = !isPlayer;
+        this.totalDeaths = 0;
+        this.age = 0;
         this.antGroups = new HashMap<>();
         this.deadAnts = new CopyOnWriteArrayList<>(); 
         this.bugs = new CopyOnWriteArrayList<>();
@@ -194,7 +194,12 @@ public class Colony {
         this.id = savedColony.id;
         this.name = savedColony.name;
         this.isPlayer = savedColony.isPlayer;
-        this.automationEnabled = !this.isPlayer;
+        
+        this.isPrimary = savedColony.isPrimary;
+        this.automationEnabled = savedColony.isAutomated;
+        this.age = savedColony.age;
+        this.totalDeaths = savedColony.totalDeaths;
+        
         this.rank = GameConstants.RANK_COLONY;
         this.antGroups = new HashMap<>();
         this.deadAnts = new CopyOnWriteArrayList<>();

@@ -145,7 +145,7 @@ public final class GameUnlocks {
     static { upgrades.add(ABILITY_RESEARCH); }
     public static final Upgrade ABILITY_BUILD = new Upgrade(202, "Building", "Brick And Mortar", "Allows you to build parts of your colony, you can build in the build menu (U).", ROLE_BUILDER, 0 );
     static { upgrades.add(ABILITY_BUILD); }
-    public static final Upgrade ABILITY_SPREAD = new Upgrade(203, "Spreading", "Colony Colonization", "Allows you to build satellite colonies, you see them in world map (I).", ROLE_BREEDER, 0 );
+    public static final Upgrade ABILITY_SPREAD = new Upgrade(203, "Spreading", "Colony Colonization", "Allows you to build satellite colonies, 1 colony at the time, you see them in world map (I).", ROLE_BREEDER, 0 );
     static { upgrades.add(ABILITY_SPREAD); }
     public static final Upgrade ABILITY_RESIN = new Upgrade(204, "Resin Harvest", "Resin Resonation", "Allows your to foragers to harvest resin while foraging plants as a bonus, there is 1% chance each foraging run.", ROLE_FORAGER, 5000 );
     static { upgrades.add(ABILITY_RESIN); }
@@ -157,6 +157,13 @@ public final class GameUnlocks {
     static { upgrades.add(ABILITY_FORCED_FLIGHT); }
     public static final Upgrade ABILITY_CIVILIZATION = new Upgrade(506, "Ant Civilization", "Ant Society", "Allows the civilization management screen to see all the colonies in your civilization.", ABILITY_SPREAD, 0);
     static { upgrades.add(ABILITY_CIVILIZATION); }
+    public static final Upgrade ABILITY_TRADE = new Upgrade(507, "Trade Routes", "Ant Trade", "Allows your colonies to trade resources with each other, manageable in the civilization management screen.", ABILITY_CIVILIZATION, 0);
+    static { upgrades.add(ABILITY_TRADE); }
+    public static final Upgrade ABILITY_SPREAD_2 = new Upgrade(508, "Advanced Spreading", "Mass Colonization", "Allows you to build more satellite colonies at the time, taking away the limit.", ABILITY_SPREAD, 0);
+    static { upgrades.add(ABILITY_SPREAD_2); }
+    public static final Upgrade ABILITY_AUTOMATION = new Upgrade(509, "Automation", "Ant Automation", "Allows your colonies to be automated in the civilization management screen.", ABILITY_CIVILIZATION, 0);
+    static { upgrades.add(ABILITY_AUTOMATION); }
+    public static final Upgrade ABILITY_TUNNELS =  new Upgrade(510, "Tunnel Networks", "Subterranean Highways", "Allows your colonies to build tunnel networks between each other for faster and safer resource transport.", ABILITY_TRADE, 150000);
 
     // --- Buildings ---
     // -- Tier 0 --

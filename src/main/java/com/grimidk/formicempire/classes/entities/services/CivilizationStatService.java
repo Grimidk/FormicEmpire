@@ -62,13 +62,9 @@ public class CivilizationStatService {
         int totalDaily = 0;
 
         for (Colony c : civ.getColonies()) {
-            // Replicating logic from Colony logic to ensure consistency
             int researchers = c.getAssignedRoleCount(GameConstants.ROLE_RESEARCHER);
-            int assistants = c.getAssignedRoleCount(GameConstants.ROLE_ASSISTANT);
-            
-            // Use local colony stats to account for local upgrades/buildings
+            int assistants = c.getAssignedRoleCount(GameConstants.ROLE_ASSISTANT);            
             int baseSpeed = c.getStatsService().getResearchSpeed(c);
-            
             int hourlyQueen = researchers * baseSpeed;
             int hourlyAssistant = (int) (assistants * (baseSpeed / 5.0));
             
