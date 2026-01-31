@@ -82,6 +82,7 @@ public class TriggerManager {
         checkSpreadAbilityUnlock();
         checkScoutRoleUnlock();
         checkCivilizationTriggers();
+        checkAbilityMenuHint();
     }
 
     private void checkAllNPCTriggers() {
@@ -290,6 +291,19 @@ public class TriggerManager {
             fireTrigger(GameUnlocks.ABILITY_AUTOMATION,
                 "Automation Era",
                 "Your civilization is vast. You can now automate colony management to focus on expansion.");
+        }
+    }
+
+    private void checkAbilityMenuHint() {
+        if (playerColony.hasUpgrade(GameUnlocks.ABILITY_ABILITY)) return;
+        
+        // abilities to trigger
+        boolean hasActionAbilities = playerColony.hasUpgrade(GameUnlocks.ABILITY_FORCED_FLIGHT);
+        
+        if (hasActionAbilities) {
+            fireTrigger(GameUnlocks.ABILITY_ABILITY, 
+                "Colony Operations", 
+                "You have gained a special active ability! You can now access the Colony Operations menu by pressing (Z).");
         }
     }
     

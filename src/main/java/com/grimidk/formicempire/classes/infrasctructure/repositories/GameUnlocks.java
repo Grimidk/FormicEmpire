@@ -163,7 +163,9 @@ public final class GameUnlocks {
     static { upgrades.add(ABILITY_SPREAD_2); }
     public static final Upgrade ABILITY_AUTOMATION = new Upgrade(509, "Automation", "Ant Automation", "Allows your colonies to be automated in the civilization management screen.", ABILITY_CIVILIZATION, 0);
     static { upgrades.add(ABILITY_AUTOMATION); }
-    public static final Upgrade ABILITY_TUNNELS =  new Upgrade(510, "Tunnel Networks", "Subterranean Highways", "Allows your colonies to build tunnel networks between each other for faster and safer resource transport.", ABILITY_TRADE, 150000);
+    public static final Upgrade ABILITY_TUNNELS =  new Upgrade(510, "Tunnel Networks", "Subterranean Highways", "Allows your colonies to build tunnel networks between each other for faster and safer resource transport.", ABILITY_TRADE, 150000);    
+    public static final Upgrade ABILITY_ABILITY = new Upgrade(900, "Ability Menu", "Abilities Unlocked", "Allows you to see the abilities menu.", null, 0);
+    static { upgrades.add(ABILITY_ABILITY); }
 
     // --- Buildings ---
     // -- Tier 0 --

@@ -57,6 +57,8 @@ public class AbilitiesDialog extends ZeroDialog {
 
         if (colony.hasUpgrade(GameUnlocks.ABILITY_FORCED_FLIGHT)) {
             int currentCost = colony.getNuptialFlightCost();
+            String failureReason = getNuptialFailureReason(currentCost);
+            boolean enabled = (failureReason == null);
             
             JPanel p = createAbilityPanel("Forced Nuptial Flight", 
                 "Spend " + currentCost + " RP to immediately trigger a nuptial flight.\nRequires Drones and Breeder Princesses.",
@@ -86,7 +88,8 @@ public class AbilitiesDialog extends ZeroDialog {
                         }
                     }
                 },
-                canTriggerNuptial(currentCost)
+                enabled,
+                failureReason
             );
             listPanel.add(p);
             listPanel.add(Box.createVerticalStrut(10));
@@ -105,18 +108,18 @@ public class AbilitiesDialog extends ZeroDialog {
         listPanel.repaint();
     }
     
-    private boolean canTriggerNuptial(int cost) {
-        if (colony.getResearchPoints() < cost) return false;
-        boolean hasDrones = !colony.getDrones().isEmpty();
-        boolean hasBreeders = colony.getPrincesses().stream().anyMatch(p -> p.getRole() == GameConstants.ROLE_BREEDER);
-        return hasDrones && hasBreeders;
+    private String getNuptialFailureReason(int cost) {
+        if (colony.getResearchPoints() < cost) return "Not enough Research Points (" + cost + " needed).";
+        if (colony.getDrones().isEmpty()) return "No Drones available in the colony.";
+        if (colony.getPrincesses().stream().noneMatch(p -> p.getRole() == GameConstants.ROLE_BREEDER)) return "No Breeder Princesses available.";
+        return null;
     }
 
     private void updateResearchPointsLabel() {
         researchPointsLabel.setText("Research Points: " + colony.getResearchPoints());
     }
 
-    private JPanel createAbilityPanel(String title, String desc, int rpCost, java.awt.event.ActionListener action, boolean enabled) {
+    private JPanel createAbilityPanel(String title, String desc, int rpCost, java.awt.event.ActionListener action, boolean enabled, String tooltip) {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBorder(new TitledBorder(title));
 
@@ -136,6 +139,12 @@ public class AbilitiesDialog extends ZeroDialog {
         JButton btn = new JButton("Trigger");
         btn.setEnabled(enabled);
         btn.addActionListener(action);
+        
+        if (!enabled && tooltip != null) {
+            btn.setToolTipText(tooltip);
+        } else {
+            btn.setToolTipText(null);
+        }
         
         JLabel costLabel = new JLabel(rpCost + " RP");
         costLabel.setAlignmentX(Component.CENTER_ALIGNMENT);

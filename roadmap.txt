@@ -39,6 +39,7 @@ Needed for launch (v1.0) (Launch Version):
 	assimilated species get added to a pool for drones and avoid genetic stagnation
 	assimilation (	Multi queen (Pharaoh ants), Super majors (Marauder ants), Trap-jaw (Trap jaw ants), Honey-pot (Honey pot ants), Door-head (Turtle ants), Wood burrowing (Carpenter ants), Silk weaving (Weaver ants), Rafting (Flood plains ants), Fire venom (Fire ants), Jumping (Jet ants), Gliding (Gliding ants), Stinging (Bullet ants), Swarming (Army ants), Stealth (Ghost ants), Fast bitting (Dracula ants), Heat resistance (Saharan silver ants), Deadly venom (Harvester ants), Self destruction (Exploding ants), Far sight (Bulldog ants), Hive building (Shining black ants), Location sensing (Desert ants))
 	ant subtypes (enable by role /  exclusion) checks with new sprites 
+	revamp story and lore and maybe intro screen
 	more communism (?)
 	visual filters for weather, time of day, biome etc.
 	research tree
