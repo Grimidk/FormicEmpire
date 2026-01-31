@@ -2,19 +2,21 @@ Here is the current roadmap of features and fixes:
 
 To Fix (By decreasing priority) : 
 	Important not Urgent:
-	late game performance (physics too taxing)
+	late game performance (physics too taxing, may need to deload ants outside of area or update less when >50k ants)
 
 	Game Breaking:
 	(nothing right now)
 	
 	High:
-	(nothing right now)
+	role mgnt appears to not be correctly tracking active player colony
+	implement primary colony
+	automation shouldn't be enabled unless unlocked and activated (maybe check in civ dialog)
 
 	Mid:
-	(nothing right now)
+	hex borders not clear, need to be double wide
+	force fligth needs to have scaling price
 
 	Low:
-	colony scroll down
 	not dynamic colony sprites while stretching screen 
 	builders act weird af in build zone
 
@@ -24,7 +26,8 @@ To Fix (By decreasing priority) :
 To Feature (to be done in order):
 Needed for launch (v1.0) (Launch Version):
 	Priority:
-	colonizing and new colonies (spreading to adjacent for pc and npc) (trigger civ menu to easily handle colony relations and go to)
+	trigger civ menu to easily handle colony relations and go to, limit first spreading to 1 the first time (maybe upgradeable)
+	wait time for colonies to be done
 	first round of species and assimilations (and handle civ death to earn civs)
 	trade routes (async with roles and incoming outgoing recurrent and one time and travel time and danger level and boring tunnels)
 	2 colonies unlocks civ menu, 3 unlocks trade routes, 7 unlocks tunnels

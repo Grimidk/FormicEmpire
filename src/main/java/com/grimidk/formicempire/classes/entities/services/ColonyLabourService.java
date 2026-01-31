@@ -3,6 +3,7 @@ package com.grimidk.formicempire.classes.entities.services;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -12,8 +13,11 @@ import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.entities.Ant;
+import com.grimidk.formicempire.classes.entities.Civilization;
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
+import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
@@ -342,9 +346,50 @@ public class ColonyLabourService {
         }
     }
     
-    public void runSpreading(Colony colony, int potentialSatellites) { 
-        if (potentialSatellites > 0) {
-            colony.logEvent(potentialSatellites + " new satellite colonies will spawn in adjacent hexes.");
+    public void runSpreading(Colony colony, int potentialSatellites, World world, Hex currentHex) { 
+        if (potentialSatellites <= 0 || world == null || currentHex == null) return;
+
+        List<Hex> neighbors = new ArrayList<>();
+        neighbors.add(currentHex.getNorth());
+        neighbors.add(currentHex.getNorthEast());
+        neighbors.add(currentHex.getSouthEast());
+        neighbors.add(currentHex.getSouth());
+        neighbors.add(currentHex.getSouthWest());
+        neighbors.add(currentHex.getNorthWest());
+        
+        neighbors.removeIf(h -> h == null);
+        Collections.shuffle(neighbors);
+        
+        int satellitesSpawned = 0;
+        Civilization civ = colony.getCivilization();
+        ColonyStarterService starter = new ColonyStarterService();
+        
+        for (Hex neighbor : neighbors) {
+            if (satellitesSpawned >= potentialSatellites) break;
+            
+            if (neighbor.getColony() == null) {
+                int newId = world.getNextColonyId();
+                String newName = colony.getName() + " " + newId;
+                
+                Colony satellite = new Colony(newId, newName, colony.isPlayer());
+                satellite.setCivilization(civ); 
+                satellite.setActive(false); 
+                satellite.setAutomationEnabled(!colony.isPlayer()); 
+                satellite.setRank(GameConstants.RANK_COLONY);
+                
+                starter.initializeNewColony(satellite);
+                
+                neighbor.setColony(satellite);
+                
+                satellitesSpawned++;
+                colony.logEvent("Established new satellite colony at (" + neighbor.getQ() + ", " + neighbor.getR() + ")");
+            }
+        }
+        
+        if (satellitesSpawned > 0) {
+            colony.logEvent(satellitesSpawned + " satellites established.");
+        } else {
+            colony.logEvent("Spreading failed: No suitable adjacent lands found.");
         }
     }
 
@@ -495,7 +540,7 @@ public class ColonyLabourService {
         colony.getLocationService().addSource(colony, source);
     }
 
-    public void runNuptial(Colony colony) {
+    public void runNuptial(Colony colony, World world, Hex currentHex) {
         if (!colony.hasUpgrade(GameUnlocks.TYPE_PRINCESS)) return;
 
         List<Ant> allDrones = new ArrayList<>(colony.getDrones());
@@ -534,7 +579,7 @@ public class ColonyLabourService {
         colony.logEvent("Nuptial Flight Occurred. " + queensToAdd + " new Queens joined.");
         
         if (queensLeaving > 0) {
-            runSpreading(colony, queensLeaving);
+            runSpreading(colony, queensLeaving, world, currentHex);
         }
     }
 

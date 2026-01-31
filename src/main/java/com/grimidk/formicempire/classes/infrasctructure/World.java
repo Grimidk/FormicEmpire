@@ -59,6 +59,10 @@ public class World {
         this.weather = GameConstants.WEATHER_CLEAR;
         this.random = new Random();
     }
+    
+    public synchronized int getNextColonyId() {
+        return colonyIdCounter++;
+    }
 
     public void setEngine(Engine engine) {
         this.engine = engine;
@@ -716,7 +720,7 @@ public class World {
             
             for (Hex hex : this.hexes) {
                 if (hex.getColony() != null) {
-                    hex.getColony().getLabourService().runNuptial(hex.getColony());
+                    hex.getColony().getLabourService().runNuptial(hex.getColony(), this, hex);
                     hex.getColony().logEvent("The Eclipse has triggered a spontaneous Nuptial Flight!");
                 }
             }
@@ -803,7 +807,7 @@ public class World {
         
         for (Hex hex : this.hexes) {
             if (hex.getColony() != null) {
-                hex.getColony().runYearlyJobs();
+                hex.getColony().runYearlyJobs(this, hex);
             }
         }
     }

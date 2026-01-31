@@ -22,6 +22,7 @@ import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.Temperature;
 import com.grimidk.formicempire.classes.infrasctructure.Dimension;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
+import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
@@ -36,6 +37,8 @@ public class Colony {
     private ColonyRank rank;
     private boolean isActive;
     private boolean automationEnabled = false; 
+    private boolean isPrimary = false;
+    private int age;
     
     // --- Population Data ---
     private final Map<AntType, List<Ant>> antGroups;
@@ -139,6 +142,7 @@ public class Colony {
         this.hatchRateDrone = 0.0f;
         this.hatchRatePrincess = 0.0f;
         this.isActive = false;
+        this.age = 0;
     }
 
     private void initializeBuildings() {
@@ -337,6 +341,10 @@ public class Colony {
     public int getId() { return id; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
+    public boolean isPrimary() { return isPrimary; }
+    public void setPrimary(boolean isPrimary) { this.isPrimary = isPrimary; }
+    public int getAge() { return age; }
+    public void setAge(int age) { this.age = age; }
     
     public Civilization getCivilization() { return civilization; }
     public void setCivilization(Civilization civilization) { 
@@ -696,7 +704,7 @@ public class Colony {
     public void runLaying() { labourService.runLaying(this); }
     public void runAging(){ populationService.runAging(this); }
     public void runNursing() { labourService.runNursing(this); }
-    public void runNuptial() { labourService.runNuptial(this); }
+    public void runNuptial(World world, Hex currentHex) { labourService.runNuptial(this, world, currentHex); }
     public void runEating(Temperature currentTemp){ populationService.runEating(this, currentTemp); }
     public void runGraveKeeping() { labourService.runGraveKeeping(this); }
     public void runResearch() { labourService.runResearch(this); }
@@ -711,7 +719,7 @@ public class Colony {
     public void runParasitation() { populationService.runParasitation(this); }
     public void runPolicing() { labourService.runPolicing(this); }
 
-    public void forceNuptialFlight() {
+    public void forceNuptialFlight(World world, Hex currentHex) {
         if (!hasUpgrade(GameUnlocks.ABILITY_FORCED_FLIGHT)) return;
         if (getResearchPoints() < 1000) return;
         boolean hasDrones = !getDrones().isEmpty();
@@ -723,7 +731,7 @@ public class Colony {
         }
 
         addResearchPoints(-1000);
-        this.labourService.runNuptial(this);
+        this.labourService.runNuptial(this, world, currentHex);
     }
     
     public void runPhysics(Dimension activeDimension) { 
@@ -779,16 +787,18 @@ public class Colony {
         } else {
             this.sumarizationService.runDailyLite(this);
         }
+
+        this.age++;
     }
 
     public void runMonthlyJobs() { 
         if (this.isActive || this.isPlayer) {
-             this.runParasitation();
+            this.runParasitation();
         }
     }
 
-    public void runYearlyJobs() {
-        this.runNuptial();
+    public void runYearlyJobs(World world, Hex currentHex) {
+        this.runNuptial(world, currentHex);
     }
     
     public void refreshAntStats() {

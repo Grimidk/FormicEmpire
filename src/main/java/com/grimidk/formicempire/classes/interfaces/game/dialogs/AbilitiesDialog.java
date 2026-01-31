@@ -2,8 +2,12 @@ package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.infrasctructure.Engine;
+import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
+import com.grimidk.formicempire.classes.interfaces.MainFrame;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -56,8 +60,29 @@ public class AbilitiesDialog extends ZeroDialog {
                 "Spend 1000 RP to immediately trigger a nuptial flight.\nRequires Drones and Breeder Princesses.",
                 1000, 
                 e -> {
-                    colony.forceNuptialFlight();
-                    refreshDialog(); 
+                    if (getOwner() instanceof MainFrame) {
+                        MainFrame main = (MainFrame) getOwner();
+                        Engine engine = main.getEngine();
+                        if (engine != null) {
+                            World world = engine.getWorld();
+                            if (world != null) {
+                                Hex targetHex = null;
+                                for(Hex h : world.getHexes()) {
+                                    if (h.getColony() == colony) {
+                                        targetHex = h;
+                                        break;
+                                    }
+                                }
+                                
+                                if (targetHex != null) {
+                                    colony.forceNuptialFlight(world, targetHex);
+                                    refreshDialog(); 
+                                } else {
+                                    JOptionPane.showMessageDialog(this, "Error: Could not locate colony on the world map.");
+                                }
+                            }
+                        }
+                    }
                 },
                 canTriggerNuptial()
             );
