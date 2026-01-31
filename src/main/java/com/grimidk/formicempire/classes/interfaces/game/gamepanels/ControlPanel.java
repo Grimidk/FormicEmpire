@@ -23,6 +23,7 @@ public class ControlPanel extends ZeroGamePanel {
     private final Runnable showStatsDialogCallback; 
     private final Runnable toggleViewCallback;
     private final Runnable showMapDialogCallback;
+    private final Runnable showCivilizationDialogCallback;
 
     // --- UI Components ---
     private final JButton speedUpButton = new JButton("Speed+");
@@ -34,6 +35,7 @@ public class ControlPanel extends ZeroGamePanel {
     private JMenuItem manageResearch;
     private JMenuItem manageBuilding;
     private JMenuItem manageAbilities;
+    private JMenuItem manageCivilization;
     
     // --- State ---
     private int speedLevel = 1;
@@ -52,7 +54,8 @@ public class ControlPanel extends ZeroGamePanel {
                         Runnable showAbilitiesDialogCallback,
                         Runnable showStatsDialogCallback,
                         Runnable toggleViewCallback,
-                        Runnable showMapDialogCallback) {
+                        Runnable showMapDialogCallback,
+                        Runnable showCivilizationDialogCallback) {
         super(new FlowLayout(FlowLayout.RIGHT));
         
         this.frame = frame;
@@ -65,6 +68,7 @@ public class ControlPanel extends ZeroGamePanel {
         this.showStatsDialogCallback = showStatsDialogCallback;
         this.toggleViewCallback = toggleViewCallback;
         this.showMapDialogCallback = showMapDialogCallback;
+        this.showCivilizationDialogCallback = showCivilizationDialogCallback;
 
         initComponents();
         initLayout();        
@@ -165,6 +169,7 @@ public class ControlPanel extends ZeroGamePanel {
         manageResearch = new JMenuItem("Research (Y)");
         manageBuilding = new JMenuItem("Build (U)");
         manageAbilities = new JMenuItem("Abilities (Z)");
+        manageCivilization = new JMenuItem("Civilization (S)");
         JMenuItem openSettings = new JMenuItem("Settings");
         JMenuItem showTutorial = new JMenuItem("Show Tutorial");
         JMenuItem quitToMenu = new JMenuItem("Quit to Main Menu");
@@ -184,6 +189,9 @@ public class ControlPanel extends ZeroGamePanel {
         
         manageAbilities.addActionListener(e -> showAbilitiesDialogCallback.run());
         manageAbilities.setVisible(false);
+
+        manageCivilization.addActionListener(e -> showCivilizationDialogCallback.run());
+        manageCivilization.setVisible(false);
         
         openSettings.addActionListener(e -> {
             Engine engine = frame.getEngine();
@@ -223,6 +231,7 @@ public class ControlPanel extends ZeroGamePanel {
         gameMenu.add(manageResearch);
         gameMenu.add(manageBuilding);
         gameMenu.add(manageAbilities);
+        gameMenu.add(manageCivilization);
         gameMenu.add(openSettings);
         gameMenu.add(showTutorial);
         gameMenu.add(new JSeparator());
@@ -342,6 +351,16 @@ public class ControlPanel extends ZeroGamePanel {
                 }
             }
         });
+
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0), "openCivilization");
+        actionMap.put("openCivilization", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (manageCivilization.isVisible()) {
+                    showCivilizationDialogCallback.run();
+                }
+            }
+        });
     }
     
     private void addRoleKeyBinding(InputMap im, ActionMap am, String name, int key, int tab) {
@@ -381,6 +400,12 @@ public class ControlPanel extends ZeroGamePanel {
     public void updateAbilitiesMenu(boolean visible) {
         if (manageAbilities != null) {
             manageAbilities.setVisible(visible);
+        }
+    }
+
+    public void updateCivilizationMenu(boolean visible) {
+        if (manageCivilization != null) {
+            manageCivilization.setVisible(visible);
         }
     }
 }

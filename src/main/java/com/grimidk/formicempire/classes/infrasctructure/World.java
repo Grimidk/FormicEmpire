@@ -543,7 +543,7 @@ public class World {
             }
              
             if (colony == null) {
-                colony = new Colony(1, "Grim Colony", true);
+                colony = new Colony(1, "Player Colony", true);
             }
              
             if (colony.getAntTotal() == 0) {

@@ -81,6 +81,7 @@ public class TriggerManager {
         checkBruteRoleUnlock();
         checkSpreadAbilityUnlock();
         checkScoutRoleUnlock();
+        checkCivilizationAbilityUnlock();
     }
 
     private void checkAllNPCTriggers() {
@@ -159,8 +160,8 @@ public class TriggerManager {
         boolean timeMet = world.getYear() > 0 || world.getMonth() > 1;
         if (timeMet) {
             fireTrigger(GameUnlocks.ROLE_RESEARCHER, 
-                        "New Ideas", 
-                        "A month has passed. Your Queen has grown wise and can now dedicate time to Research, unlocking the Researcher role!");
+                "New Ideas", 
+                "A month has passed. Your Queen has grown wise and can now dedicate time to Research, unlocking the Researcher role!");
         }
     }
     
@@ -169,8 +170,8 @@ public class TriggerManager {
         
         if (playerColony.getDeadAnts().size() >= 100) { 
             fireTrigger(GameUnlocks.ROLE_GRAVER, 
-                        "A Smelly Problem", 
-                        "The bodies are piling up! Your workers have developed the Grave-Keeper role to clean the colony and prevent disease.");
+                "A Smelly Problem", 
+                "The bodies are piling up! Your workers have developed the Grave-Keeper role to clean the colony and prevent disease.");
         }
     }
     
@@ -179,8 +180,8 @@ public class TriggerManager {
         
         if (playerColony.getResearchPoints() >= 100) {
             fireTrigger(GameUnlocks.ABILITY_RESEARCH, 
-                        "Scientific Breakthrough", 
-                        "Your colony has accumulated 100 Research Points! You can now access the Research panel (Y) from the game menu to purchase new upgrades.");
+                "Scientific Breakthrough", 
+                "Your colony has accumulated 100 Research Points! You can now access the Research panel (Y) from the game menu to purchase new upgrades.");
         }
     }
     
@@ -189,8 +190,8 @@ public class TriggerManager {
         
         if (playerColony.hasUpgrade(GameUnlocks.ROLE_BUILDER)) {
             fireTrigger(GameUnlocks.ABILITY_BUILD, 
-                        "Construction Unlocked", 
-                        "Your ants have learned the basics of construction! You can now access the Build panel (U) from the game menu.");
+                "Construction Unlocked", 
+                "Your ants have learned the basics of construction! You can now access the Build panel (U) from the game menu.");
         }
     }
     
@@ -199,8 +200,8 @@ public class TriggerManager {
         
         if (playerColony.hasUpgrade(GameUnlocks.TYPE_SOLDIER)) {
             fireTrigger(GameUnlocks.ROLE_HUNTER,
-                        "Hunter Instinct",
-                        "Unlocking the Soldier ant type has automatically unlocked the 'Hunter' role for them.");
+                "Hunter Instinct",
+                "Unlocking the Soldier ant type has automatically unlocked the 'Hunter' role for them.");
         }
     }
     
@@ -209,8 +210,8 @@ public class TriggerManager {
         
         if (playerColony.hasUpgrade(GameUnlocks.TYPE_PRINCESS)) {
             fireTrigger(GameUnlocks.ROLE_BREEDER,
-                        "Nuptial Flights",
-                        "Unlocking the Princess and Drone ant types has automatically unlocked the 'Breeder' role.");
+                "Nuptial Flights",
+                "Unlocking the Princess and Drone ant types has automatically unlocked the 'Breeder' role.");
         }
     }
     
@@ -219,8 +220,8 @@ public class TriggerManager {
         
         if (playerColony.hasUpgrade(GameUnlocks.TYPE_MAJOR)) {
             fireTrigger(GameUnlocks.ROLE_BRUTE,
-                        "Heavy Trooper",
-                        "Unlocking the Major ant type has automatically unlocked the 'Brute' role for them.");
+                "Heavy Trooper",
+                "Unlocking the Major ant type has automatically unlocked the 'Brute' role for them.");
         }
     }
     
@@ -229,9 +230,9 @@ public class TriggerManager {
         
         if (playerColony.hasUpgrade(GameUnlocks.ROLE_BREEDER)) {
             fireTrigger(GameUnlocks.ABILITY_SPREAD,
-                        "Colony Colonization",
-                        "With the ability to breed new queens, your colony now understands how to spread. You can found new colonies from the world map (I).");
-        }
+                "Colony Colonization",
+                "With the ability to breed new queens, your colony now understands how to spread. You can found new colonies from the world map (I).");
+}
     }
     
     private void checkScoutRoleUnlock() {
@@ -243,8 +244,8 @@ public class TriggerManager {
                     int collected = source.getInitialQuantity() - source.getQuantity();
                     if (collected >= 6000) {
                         fireTrigger(GameUnlocks.ROLE_SCOUT, 
-                                    "Adventure's Call", 
-                                    "We have depleted more than half of our main plant source! Our workers feel the need to explore for new lands, unlocking the Scout role!");
+                            "Adventure's Call", 
+                            "We have depleted more than half of our main plant source! Our workers feel the need to explore for new lands, unlocking the Scout role!");
                     }
                     break; 
                 }
@@ -259,6 +260,16 @@ public class TriggerManager {
             fireTrigger(GameUnlocks.ROLE_POLICE, 
                 "Parasitic Infestation", 
                 "The colony has become so prosperous that parasitic ants may infiltrate it!");
+        }
+    }
+    
+    private void checkCivilizationAbilityUnlock() {
+        if (playerColony.hasUpgrade(GameUnlocks.ABILITY_CIVILIZATION)) return;
+        
+        if (playerColony.getCivilization() != null && playerColony.getCivilization().getColonies().size() >= 2) {
+            fireTrigger(GameUnlocks.ABILITY_CIVILIZATION,
+                "Ant Civilization",
+                "Your civilization grows! With a second colony established, you can now manage your entire Civilization. Press (S) to open the Civilization menu.");
         }
     }
     

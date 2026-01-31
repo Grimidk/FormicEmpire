@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.interfaces;
 
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.World;
@@ -37,6 +38,7 @@ public class GamePanel extends ZeroGamePanel {
     private AbilitiesDialog abilitiesDialog;
     private MapDialog mapDialog;
     private StatsDialog statsDialog; 
+    private CivilizationManagementDialog civDialog;
 
     private AlertManager alertManager;
     private TriggerManager triggerManager; 
@@ -91,6 +93,7 @@ public class GamePanel extends ZeroGamePanel {
         Runnable showAbilitiesDialogCallback = this::showAbilitiesDialog;
         Runnable showMapDialogCallback = this::showMapDialog; 
         Runnable showStatsDialogCallback = this::showStatsDialog;
+        Runnable showCivilizationDialogCallback = this::showCivilizationDialog;
         ControlPanel.RoleManagementCallback showRoleManagementDialogCallback = this::showRoleManagementDialog;
         
         Runnable toggleViewCallback = () -> {
@@ -114,7 +117,8 @@ public class GamePanel extends ZeroGamePanel {
             showAbilitiesDialogCallback,
             showStatsDialogCallback,
             toggleViewCallback,
-            showMapDialogCallback); 
+            showMapDialogCallback,
+            showCivilizationDialogCallback); 
     }
     
     private void updateGameAreaSize() {
@@ -265,6 +269,46 @@ public class GamePanel extends ZeroGamePanel {
         statsDialog = new StatsDialog(frame, colony, engine);
         statsDialog.showDialog();
     }
+
+    private void showCivilizationDialog() {
+        Engine engine = frame.getEngine();
+        Colony colony = getColonyFromEngine(engine);
+        if (colony == null || colony.getCivilization() == null) return;
+
+        if (civDialog != null) {
+            civDialog.dispose();
+        }
+
+        civDialog = new CivilizationManagementDialog(frame, colony.getCivilization(), engine, this::handleGoToColony);
+        civDialog.showDialog();
+    }
+
+    private void handleGoToColony(Colony target) {
+        Engine engine = frame.getEngine();
+        if (engine == null || engine.getWorld() == null) return;
+        
+        World world = engine.getWorld();
+        if (world.getHexes() != null) {
+            for (Hex hex : world.getHexes()) {
+                if (hex.getColony() == target) {
+                    world.changeActiveHex(hex);
+                    
+                    if (gameAreaPanel != null) {
+                        gameAreaPanel.setColony(target);
+                        gameAreaPanel.resetView(); 
+                    }
+                    
+                    refreshAllGUIData();
+                    updateGameAreaSize();
+                    
+                    if (triggerManager != null) {
+
+                    }
+                    break;
+                }
+            }
+        }
+    }
     
     private Colony getColonyFromEngine(Engine engine) {
         return engine != null && engine.getWorld() != null && engine.getWorld().getActiveHex() != null ? engine.getWorld().getActiveHex().getColony() : null;
@@ -280,6 +324,7 @@ public class GamePanel extends ZeroGamePanel {
         if (abilitiesDialog != null) { abilitiesDialog.dispose(); abilitiesDialog = null; }
         if (mapDialog != null) { mapDialog.dispose(); mapDialog = null; }
         if (statsDialog != null) { statsDialog.dispose(); statsDialog = null; }
+        if (civDialog != null) { civDialog.dispose(); civDialog = null; }
     }
 
     private void cleanupSession() {
@@ -531,16 +576,21 @@ public class GamePanel extends ZeroGamePanel {
             if (statsDialog != null && statsDialog.isShowing()) {
                 statsDialog.liveUpdate();
             }
+            if (civDialog != null && civDialog.isShowing()) {
+                civDialog.liveUpdate();
+            }
             if (controlPanel != null) {
                 controlPanel.updateResearchMenu(colony.hasUpgrade(GameUnlocks.ABILITY_RESEARCH));
                 controlPanel.updateBuildMenu(colony.hasUpgrade(GameUnlocks.ABILITY_BUILD));
                 controlPanel.updateAbilitiesMenu(colony.hasUpgrade(GameUnlocks.ABILITY_FORCED_FLIGHT));
+                controlPanel.updateCivilizationMenu(colony.hasUpgrade(GameUnlocks.ABILITY_CIVILIZATION));
             }
         } else {
              if (controlPanel != null) {
                 controlPanel.updateResearchMenu(false);
                 controlPanel.updateBuildMenu(false);
                 controlPanel.updateAbilitiesMenu(false);
+                controlPanel.updateCivilizationMenu(false);
             }
         }
     }
