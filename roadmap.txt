@@ -11,6 +11,7 @@ To Fix (By decreasing priority) :
 	role mgnt appears to not be correctly tracking active player colony
 	implement primary colony
 	automation shouldn't be enabled unless unlocked and activated (maybe check in civ dialog)
+	save primary, auto and age of colony
 
 	Mid:
 	hex borders not clear, need to be double wide
@@ -26,7 +27,7 @@ To Fix (By decreasing priority) :
 To Feature (to be done in order):
 Needed for launch (v1.0) (Launch Version):
 	Priority:
-	trigger civ menu to easily handle colony relations and go to, limit first spreading to 1 the first time (maybe upgradeable)
+	limit first spreading to 1 the first time (maybe upgradeable)
 	wait time for colonies to be done
 	first round of species and assimilations (and handle civ death to earn civs)
 	trade routes (async with roles and incoming outgoing recurrent and one time and travel time and danger level and boring tunnels)
