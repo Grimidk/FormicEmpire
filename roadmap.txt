@@ -9,14 +9,11 @@ To Fix (By decreasing priority) :
 	
 	High:
 	role mgnt appears to not be correctly tracking active player colony
-	maturing needs to happen before starting colony
-	automation shouldn't be enabled unless unlocked (appear in tab)
-	civ management trade tabj
 
 	Mid:
 	hex borders not clear, need to be double wide
-	force fligth needs to have scaling price
 	ability_ability trigger
+	tooltip on why cant force fligt
 
 	Low:
 	not dynamic colony sprites while stretching screen 

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList; 
 import java.awt.Rectangle;
 import java.awt.Point; 
@@ -723,10 +724,23 @@ public class Colony {
     public void runComposting() { labourService.runComposting(this); }
     public void runParasitation() { populationService.runParasitation(this); }
     public void runPolicing() { labourService.runPolicing(this); }
+    
+    public int getNuptialFlightCost() {
+        int base = 1000;
+        int multiplier = 1;
+        if (civilization != null) {
+            multiplier = civilization.getColonies().size();
+        }
+        if (multiplier < 1) multiplier = 1;
+        return base * multiplier;
+    }
 
     public void forceNuptialFlight(World world, Hex currentHex) {
         if (!hasUpgrade(GameUnlocks.ABILITY_FORCED_FLIGHT)) return;
-        if (getResearchPoints() < 1000) return;
+        
+        int cost = getNuptialFlightCost();
+        if (getResearchPoints() < cost) return;
+        
         boolean hasDrones = !getDrones().isEmpty();
         boolean hasBreeders = getPrincesses().stream().anyMatch(p -> p.getRole() == GameConstants.ROLE_BREEDER);
         
@@ -735,7 +749,7 @@ public class Colony {
             return;
         }
 
-        addResearchPoints(-1000);
+        addResearchPoints(-cost);
         this.labourService.runNuptial(this, world, currentHex);
     }
     
@@ -753,6 +767,10 @@ public class Colony {
     }
 
     public void runHourlyJobs() {
+        if (this.age < 7) {
+            return;
+        }
+
         if (this.isActive) {
             if (this.automationEnabled) {
                 this.automationService.runAutomation(this);
@@ -773,13 +791,21 @@ public class Colony {
     }
 
     public void runDailyJobs(Temperature currentTemp, Biome biome) {
+        if (this.age < 7) {
+            this.age++;
+            if (this.age >= 7) {
+                matureColony();
+            }
+            return;
+        }
+
         if (this.automationEnabled) {
             this.automationService.runDailyAutomation(this);
         }
 
         if (this.isActive) {
             this.rankUp();
-            this.runEating(currentTemp);
+            this.runEating(currentTemp); 
             this.runHatching();
             this.runAging();
             this.runNursing();
@@ -794,6 +820,63 @@ public class Colony {
         }
 
         this.age++;
+    }
+
+    public void matureColony() {
+        System.out.println("[Colony] Maturation complete. Spawning workforce for " + this.getName());
+        Random random = new Random();
+
+        List<Ant> workerList = this.getWorkers();
+        for (int i = 0; i < 9; i++) {
+            Ant worker = new Ant(this, GameConstants.TYPE_WORKER);
+            workerList.add(worker);
+        }
+
+        configureWorker(0, GameConstants.ROLE_NURSE, WorldSpaces.UNDERWORLD);
+        configureWorker(1, GameConstants.ROLE_NURSE, WorldSpaces.UNDERWORLD);
+        configureWorker(2, GameConstants.ROLE_FARMER, WorldSpaces.UNDERWORLD);
+        configureWorker(3, GameConstants.ROLE_NURSE, WorldSpaces.UNDERWORLD);
+        configureWorker(4, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
+        configureWorker(5, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
+        configureWorker(6, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
+        configureWorker(7, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
+        configureWorker(8, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
+
+        this.setAssignedRoleCount(GameConstants.ROLE_LAYER, 1);
+        this.setAssignedRoleCount(GameConstants.ROLE_NURSE, 3);
+        this.setAssignedRoleCount(GameConstants.ROLE_FARMER, 1);
+        this.setAssignedRoleCount(GameConstants.ROLE_FORAGER, 5);
+
+        if (this.locationService != null) {
+            if (this.locationService.getDiscoveredSources().isEmpty()) {
+                int range = 300;
+                
+                int pX = random.nextInt((range * 2) + 1) - range;
+                int pY = random.nextInt((range * 2) + 1) - range;
+                ResourceSource initialPlant = new ResourceSource(GameConstants.RESOURCE_PLANT, 10000, pX, pY);
+                
+                int wX = random.nextInt((range * 2) + 1) - range;
+                int wY = random.nextInt((range * 2) + 1) - range;
+                ResourceSource initialWater = new ResourceSource(GameConstants.RESOURCE_WATER, 10000, wX, wY);
+                
+                this.locationService.addSource(this, initialPlant);
+                this.locationService.addSource(this, initialWater);
+            }
+        }
+        
+        if (this.physicsService != null) {
+            this.physicsService.randomizeAllAntPositions(this);
+        }
+
+        this.logEvent("Colony Maturation Complete: Workforce deployed.");
+    }
+    
+    private void configureWorker(int index, AntRole role, Dimension dim) {
+        if (this.getWorkers() != null && index < this.getWorkers().size()) {
+            Ant worker = this.getWorkers().get(index);
+            worker.setRole(role);
+            worker.setDimension(dim);
+        }
     }
 
     public void runMonthlyJobs() { 

@@ -6,6 +6,7 @@ import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -26,10 +27,11 @@ public class CivilizationManagementDialog extends ZeroDialog {
     private final Engine engine;
     private final java.util.function.Consumer<Colony> onGoToColony;
 
-    private JTable table;
-    private DefaultTableModel model;
+    private final JTabbedPane tabbedPane;
+    
+    private OverviewPanel overviewPanel;
+    private TradePanel tradePanel;
 
-    private List<Colony> displayedColonies;     
     private final Runnable refreshTask = this::liveUpdate;
 
     public CivilizationManagementDialog(JFrame owner, Civilization civilization, Engine engine, java.util.function.Consumer<Colony> onGoToColony) {
@@ -37,9 +39,10 @@ public class CivilizationManagementDialog extends ZeroDialog {
         this.civilization = civilization;
         this.engine = engine;
         this.onGoToColony = onGoToColony;
-        this.displayedColonies = new ArrayList<>();
 
-        initUI();
+        tabbedPane = new JTabbedPane();
+        add(tabbedPane, BorderLayout.CENTER);
+
         refreshDialog();
         
         if (this.engine != null) {
@@ -66,127 +69,242 @@ public class CivilizationManagementDialog extends ZeroDialog {
 
     public void liveUpdate() {
         if (!SwingUtilities.isEventDispatchThread()) {
-            SwingUtilities.invokeLater(this::refreshDialog);
-        } else {
-            refreshDialog();
+            SwingUtilities.invokeLater(this::liveUpdate);
+            return;
         }
-    }
 
-    private void initUI() {
-        String[] columns = {"", "Rank", "Type", "Name", "Population", "Age", "Biome", "Automation", "Actions/Status"};
-        
-        model = new DefaultTableModel(columns, 0) {
-            @Override
-            public Class<?> getColumnClass(int columnIndex) {
-                switch (columnIndex) {
-                    case 0: return Icon.class;
-                    case 4: return Integer.class; 
-                    case 6: return Biome.class; 
-                    case 7: return Boolean.class;
-                    default: return Object.class;
-                }
+        if (!isShowing()) return;
+
+        boolean hasTrade = civilization.hasUpgrade(GameUnlocks.ABILITY_TRADE);
+        int expectedTabs = 1 + (hasTrade ? 1 : 0);        
+        boolean currentAuto = civilization.hasUpgrade(GameUnlocks.ABILITY_AUTOMATION);
+        boolean panelAuto = (overviewPanel != null) && overviewPanel.isAutomationEnabledInTable();
+
+        if (tabbedPane.getTabCount() != expectedTabs || currentAuto != panelAuto) {
+            refreshDialog();
+        } else {
+            Component selected = tabbedPane.getSelectedComponent();
+            if (selected instanceof LiveUpdatePanel) {
+                ((LiveUpdatePanel) selected).liveUpdate();
             }
-
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return column == 7 || column == 8;
-            }
-        };
-
-        model.addTableModelListener(e -> {
-            if (e.getColumn() == 7 && e.getFirstRow() >= 0 && e.getFirstRow() < displayedColonies.size()) {
-                boolean isChecked = (Boolean) model.getValueAt(e.getFirstRow(), 7);
-                Colony c = displayedColonies.get(e.getFirstRow());
-                c.setAutomationEnabled(isChecked);
-            }
-        });
-
-        table = new JTable(model);
-        
-        // Aesthetics
-        table.setRowHeight(45); 
-        table.setShowVerticalLines(false);
-        table.setIntercellSpacing(new Dimension(0, 1));
-        table.getTableHeader().setReorderingAllowed(false);
-        table.setFillsViewportHeight(true);
-
-        // Column Sizing
-        table.getColumnModel().getColumn(0).setMaxWidth(50);
-        table.getColumnModel().getColumn(0).setPreferredWidth(50);
-        
-        table.getColumnModel().getColumn(1).setPreferredWidth(100);
-        table.getColumnModel().getColumn(2).setPreferredWidth(80);
-        table.getColumnModel().getColumn(3).setPreferredWidth(200);
-        table.getColumnModel().getColumn(5).setPreferredWidth(80); 
-        table.getColumnModel().getColumn(7).setMaxWidth(100);
-        table.getColumnModel().getColumn(8).setMinWidth(160); 
-
-        // Custom Renderers
-        table.getColumnModel().getColumn(6).setCellRenderer(new BiomeRenderer());
-        table.getColumnModel().getColumn(8).setCellRenderer(new ActionPanelRenderer());
-        table.getColumnModel().getColumn(8).setCellEditor(new ActionPanelEditor());
-        
-        // Center text for Type
-        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
-        table.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
-
-        JScrollPane scrollPane = new JScrollPane(table);
-        add(scrollPane, BorderLayout.CENTER);
+        }
     }
 
     @Override
     protected void refreshDialog() {
-        int selectedRow = table.getSelectedRow();
-        
-        model.setRowCount(0);
-        displayedColonies.clear();
+        int selectedIndex = tabbedPane.getSelectedIndex();
+        if (selectedIndex < 0) selectedIndex = 0;
 
-        List<Colony> rawColonies = civilization.getColonies();
-        World world = engine.getWorld();
+        tabbedPane.removeAll();
 
-        displayedColonies.addAll(rawColonies);
-        displayedColonies.sort(
-            Comparator.comparing(Colony::isPrimary).reversed()
-            .thenComparingInt(Colony::getAntTotal).reversed()
-        );
+        // --- Overview Tab ---
+        boolean currentAuto = civilization.hasUpgrade(GameUnlocks.ABILITY_AUTOMATION);
+        if (overviewPanel == null || overviewPanel.isAutomationEnabledInTable() != currentAuto) {
+            overviewPanel = new OverviewPanel(currentAuto);
+        }
+        overviewPanel.updateData();
+        tabbedPane.addTab("Overview", overviewPanel);
 
-        for (Colony colony : displayedColonies) {
-            Biome biome = null;
-            if (world != null && world.getHexes() != null) {
-                for (Hex hex : world.getHexes()) {
-                    if (hex.getColony() == colony && hex.getBiome() != null) {
-                        biome = hex.getBiome();
-                        break;
-                    }
-                }
+        // --- Trade Tab ---
+        if (civilization.hasUpgrade(GameUnlocks.ABILITY_TRADE)) {
+            if (tradePanel == null) {
+                tradePanel = new TradePanel();
+            }
+            tabbedPane.addTab("Trade", tradePanel);
+        }
+
+        if (selectedIndex < tabbedPane.getTabCount()) {
+            tabbedPane.setSelectedIndex(selectedIndex);
+        }
+    }
+
+    interface LiveUpdatePanel {
+        void liveUpdate();
+        void updateData();
+    }
+
+    private class TradePanel extends JPanel implements LiveUpdatePanel {
+        public TradePanel() {
+            setLayout(new GridBagLayout());
+            add(new JLabel("Trade Routes - Coming Soon"));
+        }
+
+        @Override
+        public void liveUpdate() {
+            // Placeholder
+        }
+
+        @Override
+        public void updateData() {
+            // Placeholder
+        }
+    }
+
+    private class OverviewPanel extends JPanel implements LiveUpdatePanel {
+        private JTable table;
+        private DefaultTableModel model;
+        private List<Colony> displayedColonies;
+        private final boolean showAutomation;
+
+        public OverviewPanel(boolean showAutomation) {
+            super(new BorderLayout());
+            this.showAutomation = showAutomation;
+            this.displayedColonies = new ArrayList<>();
+            initUI();
+        }
+
+        public boolean isAutomationEnabledInTable() {
+            return showAutomation;
+        }
+
+        private void initUI() {
+            String[] columns;
+            if (showAutomation) {
+                columns = new String[]{"", "Rank", "Type", "Name", "Population", "Age (Days)", "Biome", "Automation", "Actions/Status"};
+            } else {
+                columns = new String[]{"", "Rank", "Type", "Name", "Population", "Age (Days)", "Biome", "Actions/Status"};
             }
             
-            String typeStr = colony.isPrimary() ? "PRIMARY" : "Exp.";
+            model = new DefaultTableModel(columns, 0) {
+                @Override
+                public Class<?> getColumnClass(int columnIndex) {
+                    if (columnIndex == 0) return Icon.class;
+                    
+                    if (showAutomation) {
+                        if (columnIndex == 4) return Integer.class; 
+                        if (columnIndex == 6) return Biome.class; 
+                        if (columnIndex == 7) return Boolean.class;
+                    } else {
+                        if (columnIndex == 4) return Integer.class; 
+                        if (columnIndex == 6) return Biome.class; 
+                    }
+                    return Object.class;
+                }
 
-            Object[] rowData = new Object[] {
-                colony.getRank().getIcon(),      
-                colony.getRank().getName(),
-                typeStr,
-                colony.getName(),                 
-                colony.getAntTotal(),              
-                colony.getAge(),                   
-                biome,                              
-                colony.isAutomationEnabled(),       
-                colony                      
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    if (showAutomation) {
+                        return column == 7 || column == 8;
+                    } else {
+                        return column == 7;
+                    }
+                }
             };
+
+            model.addTableModelListener(e -> {
+                if (showAutomation && e.getColumn() == 7 && e.getFirstRow() >= 0 && e.getFirstRow() < displayedColonies.size()) {
+                    boolean isChecked = (Boolean) model.getValueAt(e.getFirstRow(), 7);
+                    Colony c = displayedColonies.get(e.getFirstRow());
+                    c.setAutomationEnabled(isChecked);
+                }
+            });
+
+            table = new JTable(model);
             
-            model.addRow(rowData);
-        }
-        
-        if (selectedRow >= 0 && selectedRow < table.getRowCount()) {
-            table.setRowSelectionInterval(selectedRow, selectedRow);
+            table.setRowHeight(45); 
+            table.setShowVerticalLines(false);
+            table.setIntercellSpacing(new Dimension(0, 1));
+            table.getTableHeader().setReorderingAllowed(false);
+            table.setFillsViewportHeight(true);
+            table.getColumnModel().getColumn(0).setMaxWidth(50);
+            table.getColumnModel().getColumn(0).setPreferredWidth(50);
+            table.getColumnModel().getColumn(1).setPreferredWidth(100);
+            table.getColumnModel().getColumn(2).setPreferredWidth(80);
+            DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+            centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+            table.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
+            table.getColumnModel().getColumn(3).setPreferredWidth(200);   
+            table.getColumnModel().getColumn(5).setPreferredWidth(80); 
+            table.getColumnModel().getColumn(6).setCellRenderer(new BiomeRenderer());
+
+            if (showAutomation) {
+                table.getColumnModel().getColumn(7).setMaxWidth(100);
+                table.getColumnModel().getColumn(8).setMinWidth(160); 
+                table.getColumnModel().getColumn(8).setCellRenderer(new ActionPanelRenderer());
+                table.getColumnModel().getColumn(8).setCellEditor(new ActionPanelEditor());
+            } else {
+                table.getColumnModel().getColumn(7).setMinWidth(160); 
+                table.getColumnModel().getColumn(7).setCellRenderer(new ActionPanelRenderer());
+                table.getColumnModel().getColumn(7).setCellEditor(new ActionPanelEditor());
+            }
+
+            JScrollPane scrollPane = new JScrollPane(table);
+            add(scrollPane, BorderLayout.CENTER);
         }
 
-        table.revalidate();
-        table.repaint();
+        @Override
+        public void liveUpdate() {
+             updateData();
+        }
+
+        @Override
+        public void updateData() {
+            int selectedRow = table.getSelectedRow();
+                        
+            model.setRowCount(0);
+            displayedColonies.clear();
+
+            List<Colony> rawColonies = civilization.getColonies();
+            World world = engine.getWorld();
+
+            displayedColonies.addAll(rawColonies);
+            displayedColonies.sort(
+                Comparator.comparing(Colony::isPrimary).reversed()
+                .thenComparingInt(Colony::getAntTotal).reversed()
+            );
+
+            for (Colony colony : displayedColonies) {
+                Biome biome = null;
+                if (world != null && world.getHexes() != null) {
+                    for (Hex hex : world.getHexes()) {
+                        if (hex.getColony() == colony && hex.getBiome() != null) {
+                            biome = hex.getBiome();
+                            break;
+                        }
+                    }
+                }
+                
+                String typeStr = colony.isPrimary() ? "PRIMARY" : "Exp.";
+
+                Object[] rowData;
+                if (showAutomation) {
+                    rowData = new Object[] {
+                        colony.getRank().getIcon(),      
+                        colony.getRank().getName(),
+                        typeStr,
+                        colony.getName(),                 
+                        colony.getAntTotal(),              
+                        colony.getAge(),                   
+                        biome,                              
+                        colony.isAutomationEnabled(),       
+                        colony                      
+                    };
+                } else {
+                    rowData = new Object[] {
+                        colony.getRank().getIcon(),      
+                        colony.getRank().getName(),
+                        typeStr,
+                        colony.getName(),                 
+                        colony.getAntTotal(),              
+                        colony.getAge(),                   
+                        biome,                              
+                        colony                      
+                    };
+                }
+                
+                model.addRow(rowData);
+            }
+            
+            if (selectedRow >= 0 && selectedRow < table.getRowCount()) {
+                table.setRowSelectionInterval(selectedRow, selectedRow);
+            }
+
+            table.revalidate();
+            table.repaint();
+        }
     }
     
+    // --- Renderers & Editors ---
     private static class BiomeRenderer extends DefaultTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {

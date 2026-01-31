@@ -56,9 +56,11 @@ public class AbilitiesDialog extends ZeroDialog {
         boolean hasAnyAbility = false;
 
         if (colony.hasUpgrade(GameUnlocks.ABILITY_FORCED_FLIGHT)) {
+            int currentCost = colony.getNuptialFlightCost();
+            
             JPanel p = createAbilityPanel("Forced Nuptial Flight", 
-                "Spend 1000 RP to immediately trigger a nuptial flight.\nRequires Drones and Breeder Princesses.",
-                1000, 
+                "Spend " + currentCost + " RP to immediately trigger a nuptial flight.\nRequires Drones and Breeder Princesses.",
+                currentCost, 
                 e -> {
                     if (getOwner() instanceof MainFrame) {
                         MainFrame main = (MainFrame) getOwner();
@@ -84,7 +86,7 @@ public class AbilitiesDialog extends ZeroDialog {
                         }
                     }
                 },
-                canTriggerNuptial()
+                canTriggerNuptial(currentCost)
             );
             listPanel.add(p);
             listPanel.add(Box.createVerticalStrut(10));
@@ -103,8 +105,8 @@ public class AbilitiesDialog extends ZeroDialog {
         listPanel.repaint();
     }
     
-    private boolean canTriggerNuptial() {
-        if (colony.getResearchPoints() < 1000) return false;
+    private boolean canTriggerNuptial(int cost) {
+        if (colony.getResearchPoints() < cost) return false;
         boolean hasDrones = !colony.getDrones().isEmpty();
         boolean hasBreeders = colony.getPrincesses().stream().anyMatch(p -> p.getRole() == GameConstants.ROLE_BREEDER);
         return hasDrones && hasBreeders;

@@ -352,16 +352,7 @@ public class ColonyLabourService {
         Civilization civ = colony.getCivilization();
         if (civ == null) return;
 
-        int currentCount = civ.getColonies().size();
-        int maxCount = colony.getStatsService().getCivilizationColonyLimit(colony);
-        int slotsAvailable = maxCount - currentCount;
-        
-        if (slotsAvailable <= 0) {
-            colony.logEvent("Spreading failed: Civilization colony limit reached (" + currentCount + "/" + maxCount + ").");
-            return;
-        }
-
-        int satellitesToSpawn = Math.min(potentialSatellites, slotsAvailable);
+        int satellitesToSpawn = Math.min(potentialSatellites, colony.getStatsService().getSpreadingLimit(colony));
 
         List<Hex> neighbors = new ArrayList<>();
         neighbors.add(currentHex.getNorth());

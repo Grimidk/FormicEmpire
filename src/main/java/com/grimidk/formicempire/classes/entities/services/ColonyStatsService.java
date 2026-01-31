@@ -86,10 +86,10 @@ public class ColonyStatsService {
     }
 
     // --- Limits ---
-    public int getCivilizationColonyLimit(Colony colony) {
+    public int getSpreadingLimit(Colony colony) {
         if (colony.hasUpgrade(GameUnlocks.ABILITY_SPREAD_2)) return 9999;
-        if (colony.hasUpgrade(GameUnlocks.ABILITY_SPREAD)) return 2;
-        return 1;
+        if (colony.hasUpgrade(GameUnlocks.ABILITY_SPREAD)) return 1;
+        return 0;
     }
 
     // --- Rates ---
