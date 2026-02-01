@@ -13,6 +13,7 @@ import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces
 import com.grimidk.formicempire.classes.interfaces.game.dialogs.*;
 import com.grimidk.formicempire.classes.interfaces.game.gamepanels.*;
 
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
@@ -190,10 +191,10 @@ public class GamePanel extends ZeroGamePanel {
         Colony colony = getColonyFromEngine(engine);
         if (colony == null || !colony.isPlayer()) return;
         
-        if (hatchDialog == null || hatchDialog.getOwner() != frame) {
-            if (hatchDialog != null) hatchDialog.dispose();
-            hatchDialog = new HatchRateDialog(frame, colony);
+        if (hatchDialog != null) {
+            hatchDialog.dispose();
         }
+        hatchDialog = new HatchRateDialog(frame, colony);
         hatchDialog.showDialog();
     }
 
@@ -202,10 +203,10 @@ public class GamePanel extends ZeroGamePanel {
         Colony colony = getColonyFromEngine(engine);
         if (colony == null || !colony.isPlayer()) return;
         
-        if (roleDialog == null || roleDialog.getOwner() != frame) {
-            if (roleDialog != null) roleDialog.dispose();
-            roleDialog = new RoleManagementDialog(frame, colony);
+        if (roleDialog != null) {
+            roleDialog.dispose();
         }
+        roleDialog = new RoleManagementDialog(frame, colony);
         roleDialog.showDialog(tabIndex);
     }
 
@@ -214,10 +215,10 @@ public class GamePanel extends ZeroGamePanel {
         Colony colony = getColonyFromEngine(engine);
         if (colony == null || !colony.isPlayer()) return;
         
-        if (upgradeDialog == null || upgradeDialog.getOwner() != frame) {
-            if (upgradeDialog != null) upgradeDialog.dispose();
-            upgradeDialog = new UpgradeDialog(frame, colony);
+        if (upgradeDialog != null) {
+            upgradeDialog.dispose();
         }
+        upgradeDialog = new UpgradeDialog(frame, colony);
         upgradeDialog.showDialog(UpgradeDialog.TAB_RESEARCH);
     }
     
@@ -226,10 +227,10 @@ public class GamePanel extends ZeroGamePanel {
         Colony colony = getColonyFromEngine(engine);
         if (colony == null || !colony.isPlayer()) return;
         
-        if (upgradeDialog == null || upgradeDialog.getOwner() != frame) {
-            if (upgradeDialog != null) upgradeDialog.dispose();
-            upgradeDialog = new UpgradeDialog(frame, colony);
+        if (upgradeDialog != null) {
+            upgradeDialog.dispose();
         }
+        upgradeDialog = new UpgradeDialog(frame, colony);
         upgradeDialog.showDialog(UpgradeDialog.TAB_BUILD);
     }
 
@@ -238,10 +239,10 @@ public class GamePanel extends ZeroGamePanel {
         Colony colony = getColonyFromEngine(engine);
         if (colony == null || !colony.isPlayer()) return;
         
-        if (abilitiesDialog == null || abilitiesDialog.getOwner() != frame) {
-            if (abilitiesDialog != null) abilitiesDialog.dispose();
-            abilitiesDialog = new AbilitiesDialog(frame, colony);
+        if (abilitiesDialog != null) {
+            abilitiesDialog.dispose();
         }
+        abilitiesDialog = new AbilitiesDialog(frame, colony);
         abilitiesDialog.showDialog();
     }
 
@@ -302,7 +303,7 @@ public class GamePanel extends ZeroGamePanel {
                     updateGameAreaSize();
                     
                     if (triggerManager != null) {
-
+                        // Notify trigger manager of colony switch if needed
                     }
                     break;
                 }

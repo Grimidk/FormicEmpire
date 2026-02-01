@@ -264,7 +264,7 @@ public class CivilizationManagementDialog extends ZeroDialog {
                     }
                 }
                 
-                String typeStr = colony.isPrimary() ? "PRIMARY" : "Exp.";
+                String typeStr = colony.isPrimary() ? "Primary" : "Satellite";
 
                 Object[] rowData;
                 if (showAutomation) {

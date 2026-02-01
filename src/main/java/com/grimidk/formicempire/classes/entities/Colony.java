@@ -729,7 +729,7 @@ public class Colony {
         int base = 1000;
         int multiplier = 1;
         if (civilization != null) {
-            multiplier = civilization.getColonies().size();
+            multiplier = (int) Math.pow(2, civilization.getColonies().size());
         }
         if (multiplier < 1) multiplier = 1;
         return base * multiplier;

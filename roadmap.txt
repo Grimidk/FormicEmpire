@@ -8,12 +8,11 @@ To Fix (By decreasing priority) :
 	(nothing right now)
 	
 	High:
-	role mgnt appears to not be correctly tracking active player colony
+	satelites are not automating properly
 
 	Mid:
 	hex borders not clear, need to be double wide
-	ability_ability trigger
-	tooltip on why cant force fligt
+	npc shouldnt ranch in bad aphid enviorement andd herd while not active
 
 	Low:
 	not dynamic colony sprites while stretching screen 
@@ -33,7 +32,7 @@ Needed for launch (v1.0) (Launch Version):
 	auxiliary room sprites (storage (resources), farm (shroom), nurse (bedding), royal (nests and science))
 	more settings (allow idle to forage, allow unassigned, choose default, fuzzed parasites, arachnophobia mode ?)
 	name randomizer from list 
-	diplomacy and diplomatic reputation and alliances and wars 
+	diplomacy and diplomatic reputation (own and xeno colonies) and alliances (non-agression pacts) and wars 
 	battle system (mass battle in land and air)
 	assimilation of species for upgrades and research assimilation system
 	assimilated species get added to a pool for drones and avoid genetic stagnation
