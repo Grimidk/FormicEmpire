@@ -2,7 +2,7 @@ Here is the current roadmap of features and fixes:
 
 To Fix (By decreasing priority) : 
 	Important not Urgent:
-	late game performance (physics too taxing, may need to deload ants outside of area or update less when >50k ants)
+	late game performance (physics too taxing, may need to deload ants outside of area or update less when >50k ants) maybe look into LWJGL
 
 	Game Breaking:
 	(nothing right now)
@@ -18,6 +18,7 @@ To Fix (By decreasing priority) :
 	not dynamic colony sprites while stretching screen 
 	builders act weird af in build zone
 	breeders go out of the colony in nuptial
+	use savefile name for colony and civilization name and random names for colonies 
 
 	Can't reproduce:
 	(nothing right now)
@@ -31,7 +32,6 @@ Needed for launch (v1.0) (Launch Version):
 	Everything else :
 	auxiliary room sprites (storage (resources), farm (shroom), nurse (bedding), royal (nests and science))
 	more settings (allow idle to forage, allow unassigned, choose default, fuzzed parasites, arachnophobia mode ?)
-	name randomizer from list 
 	diplomacy and diplomatic reputation (own and xeno colonies) and alliances (non-agression pacts) and wars 
 	battle system (mass battle in land and air)
 	assimilation of species for upgrades and research assimilation system
