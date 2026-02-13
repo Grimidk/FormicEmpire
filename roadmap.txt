@@ -10,7 +10,7 @@ To Fix (By decreasing priority) :
 	High:
 	satellites are not automating properly
 	rework tutorial
-	command to run from cmd instead of bash
+	command to run from cmd instead of bash (maybe sh to run everywhere)
 
 	Mid:
 	hex borders not clear, need to be double wide
@@ -36,13 +36,14 @@ Needed for launch (v1.0) (Launch Version):
 	auxiliary room sprites (storage (resources), farm (shroom), nurse (bedding), royal (nests and science))
 	more settings (allow idle to forage, allow unassigned, choose default, fuzzed parasites, arachnophobia mode ?)
 	diplomacy and diplomatic reputation (own and xeno colonies) and alliances (non-aggression pacts) and wars 
+	diplo dialog with stance options (neutral, aggressive, peaceful)
 	battle system (mass battle in land and air)
 	assimilation of species for upgrades and research assimilation system
 	assimilated species get added to a pool for drones and avoid genetic stagnation
 	assimilation (	Multi queen (Pharaoh ants), Super majors (Marauder ants), Trap-jaw (Trap jaw ants), Honey-pot (Honey pot ants), Door-head (Turtle ants), Wood burrowing (Carpenter ants), Silk weaving (Weaver ants), Rafting (Flood plains ants), Fire venom (Fire ants), Jumping (Jet ants), Gliding (Gliding ants), Stinging (Bullet ants), Swarming (Army ants), Stealth (Ghost ants), Fast bitting (Dracula ants), Heat resistance (Saharan silver ants), Deadly venom (Harvester ants), Self destruction (Exploding ants), Far sight (Bulldog ants), Hive building (Shining black ants), Location sensing (Desert ants))
 	ant subtypes (enable by role /  exclusion) checks with new sprites 
 	revamp story and lore and maybe intro screen
-	more communism (?)
+	more socialism (?)
 	visual filters for weather, time of day, biome etc.
 	research tree
 	building tree

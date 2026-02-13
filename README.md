@@ -17,3 +17,9 @@ Requirements:
 Running the game (bash):
     ./mvnw clean install
     java -jar target/FormicEmpire-1.0-SNAPSHOT.jar
+
+Running the game (cmd) (need comfirmation):
+    mvnw clean install && java -jar target\FormicEmpire-1.0-SNAPSHOT.jar
+
+Running the game (powershell) (need comfirmation):
+    ./mvnw clean install; if ($?) { java -jar target\FormicEmpire-1.0-SNAPSHOT.jar }
