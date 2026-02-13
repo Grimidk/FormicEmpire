@@ -388,74 +388,110 @@ public class HelpPanel extends JPanel {
     }
 
     public static void showTutorialDialog(Component parent) {
-        // Story Text
-        String story = "<html><p style='width: 350px;'>" +
+        Window window = SwingUtilities.getWindowAncestor(parent);
+        JDialog dialog = new JDialog(window, "Welcome to Formic Empire!", Dialog.ModalityType.APPLICATION_MODAL);
+        dialog.setLayout(new BorderLayout());
+
+        JPanel cardPanel = new JPanel(new CardLayout());
+        
+        // --- Page 1: Story ---
+        String story = "<html><p style='width: 350px; font-size: 12pt;'>" +
                 "Nearly all other ants are extinct. You are an ant queen and have within you " +
                 "all the genetic knowledge of every ant species. You must unlock it and " +
                 "take over the world as the dominant species." +
                 "</p></html>";
-        
-        // Game Info Text
-        String gameInfo = "<html><p style='width: 350px;'>" +
-                "<b>Basic Tips:</b><br>" +
-                "Your main food is <b>Fungi</b> (Mushrooms), which ants will eat daily. " +
-                "Assign <b>Workers</b> (Q) to <b>Forager</b> roles to gather Plants and Water. Without them your ants will die!" +
-                "Assign <b>Farmers</b> (Q) to convert Plants into Fungi. One farmer can handle 10 <b>Forager</b>." +
-                "<br><br>" +
-                "Assign <b>Nurses</b> (Q) to care for your <b>Eggs, Larvae, and Pupae</b>. Without enough nurses, your young may die!" +
-                "<br><br>" +
+        JPanel page1 = new JPanel(new BorderLayout());
+        page1.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        page1.add(new JLabel(story), BorderLayout.CENTER);
+
+        // --- Page 2: Game Info ---
+        String gameInfo = "<html><p style='width: 350px; font-size: 11pt;'>" +
+                "<b>Basic Tips:</b><br><br>" +
+                "Your main food is <b>Fungi</b> (Mushrooms), which ants will eat daily.<br><br>" +
+                "Assign <b>Workers</b> (Q) to <b>Forager</b> roles to gather Plants and Water. Without them your ants will die!<br><br>" +
+                "Assign <b>Farmers</b> (Q) to convert Plants into Fungi. One farmer can handle 10 <b>Foragers</b>.<br><br>" +
+                "Assign <b>Nurses</b> (Q) to care for your <b>Eggs, Larvae, and Pupae</b>. Without enough nurses, your young may die!<br><br>" +
                 "Use the <b>Hatch Rates</b> (P) menu to control what type of ants your Pupae become." +
                 "</p></html>";
+        JPanel page2 = new JPanel(new BorderLayout());
+        page2.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        page2.add(new JLabel(gameInfo), BorderLayout.CENTER);
 
-        // Hotkey Panel
+        // --- Page 3: Hotkeys ---
         JPanel hotkeyPanel = new JPanel(new GridLayout(0, 2, 10, 5)); 
         hotkeyPanel.setBorder(BorderFactory.createTitledBorder("Hotkeys"));
-
-        hotkeyPanel.add(new JLabel("Pause/Play:"));
-        hotkeyPanel.add(new JLabel("Spacebar"));
-
-        hotkeyPanel.add(new JLabel("Speed Up:"));
-        hotkeyPanel.add(new JLabel("+ (Add)"));
-
-        hotkeyPanel.add(new JLabel("Speed Down:"));
-        hotkeyPanel.add(new JLabel("- (Subtract)"));
-
-        hotkeyPanel.add(new JLabel("Game Menu:"));
-        hotkeyPanel.add(new JLabel("ESC"));
-
-        // Add a visual separator
-        hotkeyPanel.add(new JSeparator(SwingConstants.HORIZONTAL));
-        hotkeyPanel.add(new JSeparator(SwingConstants.HORIZONTAL));
-
-        hotkeyPanel.add(new JLabel("Worker Roles:"));
-        hotkeyPanel.add(new JLabel("Q"));
-
-        hotkeyPanel.add(new JLabel("Soldier Roles:"));
-        hotkeyPanel.add(new JLabel("W"));
-
-        hotkeyPanel.add(new JLabel("Major Roles:"));
-        hotkeyPanel.add(new JLabel("E"));
-
-        hotkeyPanel.add(new JLabel("Princess Roles:"));
-        hotkeyPanel.add(new JLabel("R"));
-
-        hotkeyPanel.add(new JLabel("Queen Roles:"));
-        hotkeyPanel.add(new JLabel("T"));
+        hotkeyPanel.add(new JLabel("Pause/Play:")); hotkeyPanel.add(new JLabel("Spacebar"));
+        hotkeyPanel.add(new JLabel("Speed Up:")); hotkeyPanel.add(new JLabel("+ (Add)"));
+        hotkeyPanel.add(new JLabel("Speed Down:")); hotkeyPanel.add(new JLabel("- (Subtract)"));
+        hotkeyPanel.add(new JLabel("Game Menu:")); hotkeyPanel.add(new JLabel("ESC"));
+        hotkeyPanel.add(new JSeparator(SwingConstants.HORIZONTAL)); hotkeyPanel.add(new JSeparator(SwingConstants.HORIZONTAL));
+        hotkeyPanel.add(new JLabel("Worker Roles:")); hotkeyPanel.add(new JLabel("Q"));
+        hotkeyPanel.add(new JLabel("Soldier Roles:")); hotkeyPanel.add(new JLabel("W"));
+        hotkeyPanel.add(new JLabel("Major Roles:")); hotkeyPanel.add(new JLabel("E"));
+        hotkeyPanel.add(new JLabel("Princess Roles:")); hotkeyPanel.add(new JLabel("R"));
+        hotkeyPanel.add(new JLabel("Queen Roles:")); hotkeyPanel.add(new JLabel("T"));
+        hotkeyPanel.add(new JLabel("Hatch Rates:")); hotkeyPanel.add(new JLabel("P"));
         
-        hotkeyPanel.add(new JLabel("Hatch Rates:"));
-        hotkeyPanel.add(new JLabel("P"));
+        JPanel page3 = new JPanel(new BorderLayout());
+        page3.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        page3.add(hotkeyPanel, BorderLayout.CENTER);
 
-        // Main Panel for JOptionPane
-        JPanel mainPanel = new JPanel(new BorderLayout(0, 15));
-        mainPanel.add(new JLabel(story), BorderLayout.NORTH);
-        mainPanel.add(new JLabel(gameInfo), BorderLayout.CENTER);
-        mainPanel.add(hotkeyPanel, BorderLayout.SOUTH);
+        cardPanel.add(page1, "0");
+        cardPanel.add(page2, "1");
+        cardPanel.add(page3, "2");
 
-        JOptionPane.showMessageDialog(
-                parent,
-                mainPanel,
-                "Welcome to Formic Empire!",
-                JOptionPane.INFORMATION_MESSAGE
-        );
+        // --- Buttons ---
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JButton skipBtn = new JButton("Skip Tutorial");
+        JButton backBtn = new JButton("< Back");
+        JButton nextBtn = new JButton("Next >");
+        JButton finishBtn = new JButton("Finish");
+
+        skipBtn.addActionListener(e -> dialog.dispose());
+        finishBtn.addActionListener(e -> dialog.dispose());
+
+        final int[] currentPage = {0};
+        final int MAX_PAGES = 3;
+
+        Runnable updateButtons = () -> {
+            backBtn.setEnabled(currentPage[0] > 0);
+            if (currentPage[0] == MAX_PAGES - 1) {
+                nextBtn.setVisible(false);
+                finishBtn.setVisible(true);
+            } else {
+                nextBtn.setVisible(true);
+                finishBtn.setVisible(false);
+            }
+            CardLayout cl = (CardLayout) cardPanel.getLayout();
+            cl.show(cardPanel, String.valueOf(currentPage[0]));
+        };
+
+        backBtn.addActionListener(e -> {
+            if (currentPage[0] > 0) {
+                currentPage[0]--;
+                updateButtons.run();
+            }
+        });
+
+        nextBtn.addActionListener(e -> {
+            if (currentPage[0] < MAX_PAGES - 1) {
+                currentPage[0]++;
+                updateButtons.run();
+            }
+        });
+
+        buttonPanel.add(skipBtn);
+        buttonPanel.add(Box.createHorizontalStrut(20)); 
+        buttonPanel.add(backBtn);
+        buttonPanel.add(nextBtn);
+        buttonPanel.add(finishBtn);
+
+        updateButtons.run();
+
+        dialog.add(cardPanel, BorderLayout.CENTER);
+        dialog.add(buttonPanel, BorderLayout.SOUTH);
+        dialog.pack();
+        dialog.setLocationRelativeTo(parent);
+        dialog.setVisible(true);
     }
 }

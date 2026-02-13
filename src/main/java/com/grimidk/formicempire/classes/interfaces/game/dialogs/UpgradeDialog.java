@@ -492,7 +492,11 @@ public class UpgradeDialog extends ZeroDialog {
                 if (listPanel.getComponentCount() > 0 && listPanel.getComponent(0) instanceof JPanel) {
                     JPanel progressPanel = (JPanel) listPanel.getComponent(0);
                     Border b = progressPanel.getBorder();
-                    if (b instanceof TitledBorder && ((TitledBorder) b).getTitle().contains(currentProject.getName())) {
+                    
+                    if (b instanceof TitledBorder && ((TitledBorder) b).getTitle().contains(currentProject.getName())
+                            && progressPanel.getComponentCount() > 0 
+                            && progressPanel.getComponent(0) instanceof JProgressBar) {
+                        
                         JProgressBar progressBar = (JProgressBar) progressPanel.getComponent(0);
                         JLabel buildersLabel = (JLabel) progressPanel.getComponent(1);
 

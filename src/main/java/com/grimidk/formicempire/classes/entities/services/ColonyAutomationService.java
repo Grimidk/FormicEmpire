@@ -20,7 +20,6 @@ public class ColonyAutomationService {
     private static final int MIN_FARMERS = 1;
 
     public void runAutomation(Colony colony) {
-        if (colony.isPlayer()) return;
         if (!colony.isAutomationEnabled()) return;
 
         Map<AntRole, Integer> roleQuotas = calculateNeedsBasedQuotas(colony);
@@ -28,7 +27,6 @@ public class ColonyAutomationService {
     }
 
     public void runDailyAutomation(Colony colony) {
-        if (colony.isPlayer()) return;
         if (!colony.isAutomationEnabled()) return;
 
         checkAndConstructBuildings(colony);
@@ -73,7 +71,6 @@ public class ColonyAutomationService {
         int remaining = colony.getWorkers().size();
         if (remaining == 0) return;
 
-        // Essentials
         int farmers = assignMinimum(remaining, MIN_FARMERS);
         remaining -= farmers;
         
@@ -99,7 +96,6 @@ public class ColonyAutomationService {
         remaining -= extraFarmers;
         targets.put(GameConstants.ROLE_FARMER, farmers);
 
-        // Specialized
         if (remaining > 0 && colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) {
             int toAdd = Math.min(farmers, remaining);
             targets.put(GameConstants.ROLE_RANCHER, toAdd);
@@ -138,7 +134,6 @@ public class ColonyAutomationService {
             }
         }
 
-        // Remaining
         if (remaining > 0) {
             foragers += remaining;
         }

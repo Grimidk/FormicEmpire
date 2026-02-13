@@ -5,17 +5,17 @@ To Fix (By decreasing priority) :
 	late game performance (physics too taxing, may need to deload ants outside of area or update less when >50k ants) maybe look into LWJGL
 
 	Game Breaking:
-	(nothing right now)
+	full screen breaks everything when applied
 	
 	High:
-	satellites are not automating properly
 	rework tutorial
-	command to run from cmd instead of bash (maybe sh to run everywhere)
+	queen cap in panel
 
 	Mid:
 	hex borders not clear, need to be double wide
 	npc shouldn't ranch in bad aphid environment and herd while not active
 	maybe rename civilizations to dinasties
+	run research civ wide
 
 	Low:
 	not dynamic colony sprites while stretching screen 
