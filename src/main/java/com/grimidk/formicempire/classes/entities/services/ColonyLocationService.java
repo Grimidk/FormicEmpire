@@ -23,6 +23,11 @@ import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces
 
 public class ColonyLocationService {
     
+    // --- Anchor Layout Constants ---
+    public static final int ANCHOR_WIDTH = 550;
+    public static final int ANCHOR_HEIGHT = 500;
+    public static final int ANCHOR_CENTER_X = ANCHOR_WIDTH / 2;
+
     // --- Routing & Physics Constants ---
     public static final int ROOM_SIZE = 256; 
     public static final int HALL_WIDTH = 128;
@@ -141,7 +146,7 @@ public class ColonyLocationService {
         if (colony.getEntranceBounds() != null) {
             return (int) colony.getEntranceBounds().getCenterX();
         }
-        return colony.getGameAreaWidth() / 2;
+        return ANCHOR_CENTER_X;
     }
 
     public int getLaneCenter(Colony colony, boolean goingDown) {
@@ -156,7 +161,7 @@ public class ColonyLocationService {
         if (colony.getEntranceBounds() != null) {
             y = (int)colony.getEntranceBounds().getCenterY() - offset;
         } else {
-            y = (colony.getGameAreaHeight() / 2) - offset;
+            y = (ANCHOR_HEIGHT / 2) - offset;
         }
 
         return new NeoPoint(x, y, WorldSpaces.OVERWORLD);

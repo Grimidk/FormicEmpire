@@ -36,6 +36,12 @@ public class GameAreaPanel extends ZeroGamePanel {
     private Dimension currentDimension = WorldSpaces.OVERWORLD; 
     private String currentBiomeName = "Plains";
 
+    // --- Fixed Layout Anchors ---
+    // These ensure that structural components never move when the window resizes,
+    // keeping them perfectly synced with absolute ant coordinates.
+    private final int ANCHOR_WIDTH = 550;
+    private final int ANCHOR_HEIGHT = 500;
+
     // --- Bounds ---
     public Rectangle entranceBounds;
     public Rectangle room1Bounds; 
@@ -198,15 +204,12 @@ public class GameAreaPanel extends ZeroGamePanel {
     }
     
     private void drawOverworldStructure(Graphics2D g2d) {
-        int panelWidth = getWidth();
-        int panelHeight = getHeight();
-        
         // --- Entrance ---
         if (antHillImg != null) {
             int w = antHillImg.getWidth(this);
             int h = antHillImg.getHeight(this);
-            int x = (panelWidth / 2) - (w / 2);
-            int y = (panelHeight / 2) - (h / 2);
+            int x = (ANCHOR_WIDTH / 2) - (w / 2);
+            int y = (ANCHOR_HEIGHT / 2) - (h / 2);
             
             g2d.drawImage(antHillImg, x, y, this);            
             entranceBounds = new Rectangle(x, y, w, h);
@@ -230,8 +233,8 @@ public class GameAreaPanel extends ZeroGamePanel {
         if (colony.hasUpgrade(GameUnlocks.ROLE_GRAVER) && basicYardImg != null) {
             int w = basicYardImg.getWidth(this);
             int h = basicYardImg.getHeight(this);
-            int x = panelWidth - w - 10;
-            int y = panelHeight - h - 10;
+            int x = ANCHOR_WIDTH - w - 10;
+            int y = ANCHOR_HEIGHT - h - 10;
             
             AffineTransform old = g2d.getTransform();
             double rotateCenterX = x + (w / 2.0);
@@ -293,13 +296,12 @@ public class GameAreaPanel extends ZeroGamePanel {
     private void drawUnderworldStructure(Graphics2D g2d) {
         if (firstHallwayImg == null || basicRoomImg == null || middleHallwayImg == null) return;
 
-        int panelWidth = getWidth();
         int topMargin = 0; 
         
         // --- ROW 1 (Floor 1) ---
         int hallW = firstHallwayImg.getWidth(this);
         int hallH = firstHallwayImg.getHeight(this);
-        int centerX = panelWidth / 2;
+        int centerX = ANCHOR_WIDTH / 2;
         int hallX = centerX - (hallW / 2);
         int hallY = topMargin;
         

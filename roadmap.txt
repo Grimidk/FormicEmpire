@@ -19,7 +19,6 @@ To Fix (By decreasing priority) :
 	improve player automation, dont research if excess points, prioritize building, better ratios of roles in general, copy type ratios
 
 	Low:
-	not dynamic colony sprites while stretching screen 
 	builders act weird af in build zone
 	breeders go out of the colony in nuptial
 	use savefile name for colony and civilization name and random names for colonies 
