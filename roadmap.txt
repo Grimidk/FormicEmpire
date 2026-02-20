@@ -5,7 +5,7 @@ To Fix (By decreasing priority) :
 	late game performance (physics too taxing, may need to deload ants outside of area or update less when >50k ants) maybe look into LWJGL
 
 	Game Breaking:
-	full screen breaks everything when applied
+	re-colonization breaks game (colony dies and gets recolonized)
 	
 	High:
 	rework tutorial
@@ -16,6 +16,7 @@ To Fix (By decreasing priority) :
 	npc shouldn't ranch in bad aphid environment and herd while not active
 	maybe rename civilizations to dinasties
 	run research civ wide
+	improve player automation, dont research if excess points, prioritize building, better ratios of roles in general, copy type ratios
 
 	Low:
 	not dynamic colony sprites while stretching screen 

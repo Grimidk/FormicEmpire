@@ -162,6 +162,9 @@ public class SettingsPanel extends JPanel {
 
         engine.saveGlobalSettings(); 
         frame.applyEngineSettings();
-        JOptionPane.showMessageDialog(this, "Settings saved and applied.", "Settings", JOptionPane.INFORMATION_MESSAGE);
+        
+        SwingUtilities.invokeLater(() -> {
+            JOptionPane.showMessageDialog(this, "Settings saved and applied.", "Settings", JOptionPane.INFORMATION_MESSAGE);
+        });
     }
 }

@@ -78,8 +78,12 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         if (engine.isFullScreen()) {
             dispose();
             setUndecorated(true);
-            setExtendedState(JFrame.MAXIMIZED_BOTH);
+            
+            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+            setSize(screenSize);
             setVisible(true);
+            
+            setExtendedState(JFrame.MAXIMIZED_BOTH);
         } else {
             dispose();
             setUndecorated(false);
