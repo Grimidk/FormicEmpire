@@ -516,14 +516,14 @@ public class Colony {
             }
         } else if (currentAphids > this.aphids) {
             int diff = (int)currentAphids - this.aphids;
-            for(int i=0; i<diff; i++) {
-                for(Bug b : this.bugs) {
-                    if (b.getBugType() == GameConstants.TYPE_APHID) {
-                        this.bugs.remove(b);
-                        break;
-                    }
+            List<Bug> toRemove = new ArrayList<>();
+            for (Bug b : this.bugs) {
+                if (b.getBugType() == GameConstants.TYPE_APHID) {
+                    toRemove.add(b);
+                    if (toRemove.size() == diff) break;
                 }
             }
+            this.bugs.removeAll(toRemove);
         }
     }
 
@@ -548,14 +548,14 @@ public class Colony {
             }
         } else if (currentParasites > this.parasites) {
             int diff = (int)currentParasites - this.parasites;
-            for(int i=0; i<diff; i++) {
-                for(Bug b : this.bugs) {
-                    if (b.getBugType() == GameConstants.TYPE_PARASITE) {
-                        this.bugs.remove(b);
-                        break;
-                    }
+            List<Bug> toRemove = new ArrayList<>();
+            for (Bug b : this.bugs) {
+                if (b.getBugType() == GameConstants.TYPE_PARASITE) {
+                    toRemove.add(b);
+                    if (toRemove.size() == diff) break;
                 }
             }
+            this.bugs.removeAll(toRemove);
         }
     }
 

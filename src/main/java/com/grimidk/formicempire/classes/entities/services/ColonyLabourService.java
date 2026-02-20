@@ -371,7 +371,19 @@ public class ColonyLabourService {
         for (Hex neighbor : neighbors) {
             if (satellitesSpawned >= satellitesToSpawn) break; 
             
-            if (neighbor.getColony() == null) {
+            Colony existingColony = neighbor.getColony();
+            boolean isDead = existingColony != null && existingColony.getAntTotal() == 0 && existingColony.getAge() >= 7;
+            
+            if (existingColony == null || isDead) {
+                
+                if (isDead) {
+                    Civilization oldCiv = existingColony.getCivilization();
+                    if (oldCiv != null) {
+                        oldCiv.removeColony(existingColony);
+                    }
+                    existingColony.setCivilization(null);
+                }
+
                 int newId = world.getNextColonyId();
                 String newName = colony.getName() + " " + newId;
                 
