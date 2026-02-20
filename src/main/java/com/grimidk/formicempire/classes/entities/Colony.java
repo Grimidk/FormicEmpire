@@ -851,12 +851,19 @@ public class Colony {
             if (this.locationService.getDiscoveredSources().isEmpty()) {
                 int range = 300;
                 
-                int pX = random.nextInt((range * 2) + 1) - range;
-                int pY = random.nextInt((range * 2) + 1) - range;
+                int centerX = ColonyLocationService.ANCHOR_CENTER_X; 
+                int centerY = ColonyLocationService.ANCHOR_HEIGHT / 2;
+                
+                int pX = centerX + random.nextInt((range * 2) + 1) - range;
+                int pY = centerY + random.nextInt((range * 2) + 1) - range;
+                pX = Math.max(50, pX);
+                pY = Math.max(50, pY);
                 ResourceSource initialPlant = new ResourceSource(GameConstants.RESOURCE_PLANT, 10000, pX, pY);
                 
-                int wX = random.nextInt((range * 2) + 1) - range;
-                int wY = random.nextInt((range * 2) + 1) - range;
+                int wX = centerX + random.nextInt((range * 2) + 1) - range;
+                int wY = centerY + random.nextInt((range * 2) + 1) - range;
+                wX = Math.max(50, wX);
+                wY = Math.max(50, wY);
                 ResourceSource initialWater = new ResourceSource(GameConstants.RESOURCE_WATER, 10000, wX, wY);
                 
                 this.locationService.addSource(this, initialPlant);

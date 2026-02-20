@@ -37,6 +37,7 @@ public class HelpPanel extends JPanel {
         // Add tabs
         mainTabs.addTab("Welcome", createWelcomePanel());
         mainTabs.addTab("Getting Started", createGettingStartedPanel());
+        mainTabs.addTab("Empire Management", createEmpireManagementPanel());
         mainTabs.addTab("Hotkeys", createHotkeysPanel());
         mainTabs.addTab("Ant Types", createAntTypesPanel());
         mainTabs.addTab("Upgrades", createDictionaryPanel(GameUnlocks.getUpgrades(), null));
@@ -105,9 +106,9 @@ public class HelpPanel extends JPanel {
                 "Nearly all other ants are extinct. You are an ant queen and have within you " +
                 "all the genetic knowledge of every ant species. You must unlock it and " +
                 "take over the world as the dominant species. " +
-                "" +
-                "Build up your colony and begin to spread while fighting other ant colonies," +
-                "you will need to adapt to new enviorments by absorbing and researching their abilities." +
+                "<br><br>" +
+                "Build up your colony and begin to spread while fighting other ant colonies, " +
+                "you will need to adapt to new environments by absorbing and researching their abilities." +
                 "</p></html>";
         
         JPanel panel = new JPanel(new GridBagLayout());
@@ -117,24 +118,49 @@ public class HelpPanel extends JPanel {
     }
 
     private JComponent createGettingStartedPanel() {
-        String gameInfo = "<html><p style='width: 450px; font-size: 12pt;'>" +
-                "<b>Basic Tips:</b><br>" +
-                "Your main food is <b>Fungi</b> (Mushrooms), which ants will eat daily. " +
-                "Assign <b>Workers</b> (Q) to <b>Forager</b> roles to gather Plants and <b>Soldiers</b> (W) to <b>Hunter</b> roles to gather Protein. " +
-                "Assign <b>Farmers</b> (Q) to convert Plants and Protein into Fungi." +
-                "<br><br>" +
-                "Assign <b>Nurses</b> (Q) to care for your <b>Eggs, Larvae, and Pupae</b>. Without enough nurses, your young may die!" +
-                "<br><br>" +
-                "Use the <b>Hatch Rates</b> (P) menu to control what type of ants your Pupae become." +
-                "<br><br>" +
-                "Unlock the <b>Researcher</b> role to start generating Research Points (RP). Once you have 100 RP, you'll unlock the <b>Research Menu (Y)</b> to buy powerful upgrades."+
-                "<br><br>" +
-                "Unlock the <b>Builder</b> role to unlock the <b>Build Menu (U)</b>, which lets you construct and upgrade colony buildings." +
-                "</p></html>";
+        String gameInfo = "<html><div style='width: 450px; font-size: 11pt;'>" +
+                "<b>Basic Survival:</b><br>" +
+                "Your ants need <b>Fungi</b> (Mushrooms) to eat and <b>Water</b> to drink every day. Without them, your colony will starve or die of dehydration.<br>" +
+                "- <b>Foragers</b> (Q) gather Plants and Water.<br>" +
+                "- <b>Hunters</b> (W) gather Protein (Meat).<br>" +
+                "- <b>Farmers</b> (Q) convert Plants and Protein into Fungi. At base level, one Farmer can process the resources gathered by 6 Foragers.<br>" +
+                "- <b>Nurses</b> (Q) care for your brood (Eggs, Larvae, Pupae). Neglected brood will perish.<br><br>" +
+                "<b>Watching Your Colony:</b><br>" +
+                "Press <b>A</b> to toggle your view between the <b>Underworld</b>  (inside the nest rooms) and the <b>Overworld</b>  (outside the nest where gathering happens).<br><br>" +
+                "<b>Colony Management:</b><br>" +
+                "Use the <b>Hatch Rates (P)</b> menu to control the ratio of ants born. " +
+                "<b>Researchers</b> generate Research Points (RP) to buy powerful upgrades in the <b>Research Menu (Y)</b>. " +
+                "<b>Builders</b> use Minerals and Resin to construct facilities via the <b>Build Menu (U)</b>.<br>" +
+                "<i>Tip: When assigning roles, if you increase a role's count beyond your available unassigned ants, the system automatically pulls ants from your default workforce (like Foragers or Hunters) to cover the difference!</i><br><br>" +
+                "<b>Advanced Threats:</b><br>" +
+                "- <b>Contamination:</b> Dead ants must be cleared by <b>Gravers</b>, otherwise disease will spread.<br>" +
+                "- <b>Parasites:</b> These pests secretly drain your food. Assign <b>Police</b> to eliminate them.<br>" +
+                "- <b>Depletion:</b> If local resources run dry, assign <b>Scouts</b> to discover new resource nodes." +
+                "</div></html>";
         
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
         panel.add(new JLabel(gameInfo));
+        return panel;
+    }
+
+    private JComponent createEmpireManagementPanel() {
+        String empireInfo = "<html><div style='width: 450px; font-size: 11pt;'>" +
+                "<b>Expanding Your Empire:</b><br>" +
+                "Once you unlock the <b>Breeder</b> role for Princesses, you can perform Nuptial Flights to spread to adjacent lands via the <b>World Map (I)</b> .<br>" +
+                "<i>Tip: Keep an eye on the sky! Rare Solar or Lunar Eclipses will trigger spontaneous, free Nuptial Flights for your colony.</i><br><br>" +
+                "<b>Civilization Milestones:</b><br>" +
+                "- <b>2 Colonies:</b> Unlocks the <b>Civilization Menu (S)</b> to view and manage your entire empire.<br>" +
+                "- <b>3 Colonies:</b> Unlocks <b>Trade Routes</b>, allowing you to transport resources between your nests.<br>" +
+                "- <b>5 Colonies:</b> Unlocks <b>Mass Colonization</b>, removing the limit on establishing satellite colonies.<br>" +
+                "- <b>7 Colonies:</b> Unlocks <b>Automation</b>. You can set NPC colonies to manage their own roles and building queues automatically.<br><br>" +
+                "<b>Evolution:</b><br>" +
+                "Through the Research panel, you can unlock <b>Synergies</b> to combine upgrades, and <b>Assimilations</b> to alter the genetic code of your species entirely." +
+                "</div></html>";
+        
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBorder(new EmptyBorder(20, 20, 20, 20));
+        panel.add(new JLabel(empireInfo));
         return panel;
     }
 
@@ -174,6 +200,7 @@ public class HelpPanel extends JPanel {
         row.add("Spacebar", "Pause / Resume Game");
         row.add("+ (Add)", "Increase Game Speed");
         row.add("- (Subtract)", "Decrease Game Speed");
+        row.add("A", "Toggle Overworld/Underworld View");
         row.add("ESC", "Open Game Menu / Close Dialogs");
         row.addSeparator();
         row.add("Q", "Manage Worker Roles");
@@ -182,9 +209,12 @@ public class HelpPanel extends JPanel {
         row.add("R", "Manage Princess Roles");
         row.add("T", "Manage Queen Roles");
         row.addSeparator();
-        row.add("P", "Open Hatch Rates Menu");
-        row.add("Y", "Open Research Menu");
-        row.add("U", "Open Build Menu");
+        row.add("P", "Hatch Rates Menu");
+        row.add("Y", "Research Menu");
+        row.add("U", "Build Menu");
+        row.add("Z", "Colony Operations Menu");
+        row.add("S", "Civilization Menu");
+        row.add("I", "World Map");
 
         return hotkeyPanel;
     }
@@ -408,37 +438,64 @@ public class HelpPanel extends JPanel {
         String gameInfo = "<html><p style='width: 350px; font-size: 11pt;'>" +
                 "<b>Basic Tips:</b><br><br>" +
                 "Your main food is <b>Fungi</b> (Mushrooms), which ants will eat daily.<br><br>" +
-                "Assign <b>Workers</b> (Q) to <b>Forager</b> roles to gather Plants and Water. Without them your ants will die!<br><br>" +
-                "Assign <b>Farmers</b> (Q) to convert Plants into Fungi. One farmer can handle 10 <b>Foragers</b>.<br><br>" +
-                "Assign <b>Nurses</b> (Q) to care for your <b>Eggs, Larvae, and Pupae</b>. Without enough nurses, your young may die!<br><br>" +
-                "Use the <b>Hatch Rates</b> (P) menu to control what type of ants your Pupae become." +
+                "Assign <b>Workers</b> (Q) to <b>Forager</b> roles to gather Plants and Water. Without them your ants will die of thirst!<br><br>" +
+                "Assign <b>Farmers</b> (Q) to convert gathered Plants into Fungi. One Farmer can generally handle 6 Foragers.<br><br>" +
+                "Assign <b>Nurses</b> (Q) to care for your <b>Eggs, Larvae, and Pupae</b>. Without enough nurses, your young will perish from neglect!<br><br>" +
+                "Press <b>A</b> to toggle your view between the <b>Underworld</b>  and the <b>Overworld</b> .<br><br>" +
+                "<i>QoL Tip: If you assign a new role but have no unassigned ants, the game automatically pulls from your default workforce (like Foragers).</i>" +
                 "</p></html>";
         JPanel page2 = new JPanel(new BorderLayout());
         page2.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         page2.add(new JLabel(gameInfo), BorderLayout.CENTER);
+        
+        // --- Page 3: Threats & Mechanics ---
+        String threatInfo = "<html><p style='width: 350px; font-size: 11pt;'>" +
+                "<b>Colony Threats:</b><br><br>" +
+                "<b>Contamination:</b> Ants naturally die of old age. If bodies pile up, disease will spread and kill your colony. Assign <b>Gravers</b> to clear the dead.<br><br>" +
+                "<b>Parasites:</b> Unseen pests will leech your Fungi reserves. Assign <b>Police</b> to detect and eliminate them.<br><br>" +
+                "<b>Depletion:</b> Resource nodes don't last forever. If your foragers run out of plants or water, assign <b>Scouts</b> to find new resources nearby." +
+                "</p></html>";
+        JPanel page3 = new JPanel(new BorderLayout());
+        page3.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        page3.add(new JLabel(threatInfo), BorderLayout.CENTER);
 
-        // --- Page 3: Hotkeys ---
+        // --- Page 4: Empire Management ---
+        String empireInfo = "<html><p style='width: 350px; font-size: 11pt;'>" +
+                "<b>Empire Management:</b><br><br>" +
+                "As your colony thrives, you will unlock <b>Breeder</b> Princesses. These allow you to establish satellite colonies via the <b>World Map (I)</b> .<br>" +
+                "<i>Tip: Keep an eye on the sky! Rare Solar or Lunar Eclipses will trigger spontaneous, free Nuptial Flights!</i><br><br>" +
+                "Founding multiple colonies unlocks the <b>Civilization Menu (S)</b>. Reaching certain milestones will allow you to construct <b>Trade Routes</b>, remove spreading limits, and even <b>Automate</b> your expanding empire!" +
+                "</p></html>";
+        JPanel page4 = new JPanel(new BorderLayout());
+        page4.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        page4.add(new JLabel(empireInfo), BorderLayout.CENTER);
+
+        // --- Page 5: Hotkeys ---
         JPanel hotkeyPanel = new JPanel(new GridLayout(0, 2, 10, 5)); 
         hotkeyPanel.setBorder(BorderFactory.createTitledBorder("Hotkeys"));
         hotkeyPanel.add(new JLabel("Pause/Play:")); hotkeyPanel.add(new JLabel("Spacebar"));
-        hotkeyPanel.add(new JLabel("Speed Up:")); hotkeyPanel.add(new JLabel("+ (Add)"));
-        hotkeyPanel.add(new JLabel("Speed Down:")); hotkeyPanel.add(new JLabel("- (Subtract)"));
         hotkeyPanel.add(new JLabel("Game Menu:")); hotkeyPanel.add(new JLabel("ESC"));
+        hotkeyPanel.add(new JLabel("Toggle View:")); hotkeyPanel.add(new JLabel("A"));
         hotkeyPanel.add(new JSeparator(SwingConstants.HORIZONTAL)); hotkeyPanel.add(new JSeparator(SwingConstants.HORIZONTAL));
         hotkeyPanel.add(new JLabel("Worker Roles:")); hotkeyPanel.add(new JLabel("Q"));
         hotkeyPanel.add(new JLabel("Soldier Roles:")); hotkeyPanel.add(new JLabel("W"));
         hotkeyPanel.add(new JLabel("Major Roles:")); hotkeyPanel.add(new JLabel("E"));
         hotkeyPanel.add(new JLabel("Princess Roles:")); hotkeyPanel.add(new JLabel("R"));
         hotkeyPanel.add(new JLabel("Queen Roles:")); hotkeyPanel.add(new JLabel("T"));
-        hotkeyPanel.add(new JLabel("Hatch Rates:")); hotkeyPanel.add(new JLabel("P"));
+        hotkeyPanel.add(new JSeparator(SwingConstants.HORIZONTAL)); hotkeyPanel.add(new JSeparator(SwingConstants.HORIZONTAL));
+        hotkeyPanel.add(new JLabel("Build Menu:")); hotkeyPanel.add(new JLabel("U"));
+        hotkeyPanel.add(new JLabel("Civ Menu:")); hotkeyPanel.add(new JLabel("S"));
+        hotkeyPanel.add(new JLabel("World Map:")); hotkeyPanel.add(new JLabel("I"));
         
-        JPanel page3 = new JPanel(new BorderLayout());
-        page3.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
-        page3.add(hotkeyPanel, BorderLayout.CENTER);
+        JPanel page5 = new JPanel(new BorderLayout());
+        page5.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        page5.add(hotkeyPanel, BorderLayout.CENTER);
 
         cardPanel.add(page1, "0");
         cardPanel.add(page2, "1");
         cardPanel.add(page3, "2");
+        cardPanel.add(page4, "3");
+        cardPanel.add(page5, "4");
 
         // --- Buttons ---
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -451,7 +508,7 @@ public class HelpPanel extends JPanel {
         finishBtn.addActionListener(e -> dialog.dispose());
 
         final int[] currentPage = {0};
-        final int MAX_PAGES = 3;
+        final int MAX_PAGES = 5;
 
         Runnable updateButtons = () -> {
             backBtn.setEnabled(currentPage[0] > 0);

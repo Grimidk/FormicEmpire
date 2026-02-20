@@ -33,7 +33,7 @@ public class ColonyPanel extends ZeroGamePanel {
     
     // --- Ant Components ---
     private final JLabel totalAntLabel = new JLabel("Total ants: 0");
-    private final JLabel queensLabel = new JLabel("0");
+    private final JLabel queensLabel = new JLabel("Queens: 0 / 0");
     private final JLabel princessLabel = new JLabel("0");
     private final JLabel droneLabel = new JLabel("0");
     private final JLabel majorLabel = new JLabel("0");
@@ -389,7 +389,9 @@ public class ColonyPanel extends ZeroGamePanel {
         }
 
         queensLabel.setVisible(colony.hasUpgrade(GameUnlocks.TYPE_QUEEN));
-        queensLabel.setText(String.valueOf(colony.getQueens() != null ? colony.getQueens().size() : 0));
+        int queenCount = colony.getQueens() != null ? colony.getQueens().size() : 0;
+        int queenCapacity = colony.getQueensCapacity();
+        queensLabel.setText(queenCount + " / " + queenCapacity);
         
         boolean hasPrincess = colony.hasUpgrade(GameUnlocks.TYPE_PRINCESS);
         princessLabel.setVisible(hasPrincess);

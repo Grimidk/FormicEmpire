@@ -8,8 +8,7 @@ To Fix (By decreasing priority) :
 	re-colonization breaks game (colony dies and gets recolonized)
 	
 	High:
-	rework tutorial
-	queen cap in panel
+	(none right now)
 
 	Mid:
 	hex borders not clear, need to be double wide
