@@ -10,20 +10,20 @@ import java.util.List;
 
 public class DynastyAutomationService {
 
-    public void runDailyAutomation(Dynasty civ) {
-        if (civ.isPlayer()) return;
+    public void runDailyAutomation(Dynasty dynasty) {
+        if (dynasty.isPlayer()) return;
         
-        checkAndBuyUpgrades(civ);
+        checkAndBuyUpgrades(dynasty);
     }
 
-    private void checkAndBuyUpgrades(Dynasty civ) {
+    private void checkAndBuyUpgrades(Dynasty dynasty) {
         List<Upgrade> candidates = new ArrayList<>();
         
         for (Upgrade u : GameUnlocks.getUpgrades()) {
-            boolean notOwned = !civ.hasUpgrade(u);
-            boolean reqMet = (u.getRequirement() == null || civ.hasUpgrade(u.getRequirement()));
+            boolean notOwned = !dynasty.hasUpgrade(u);
+            boolean reqMet = (u.getRequirement() == null || dynasty.hasUpgrade(u.getRequirement()));
             boolean validCost = u.getCost() > 0;
-            boolean canAfford = civ.getResearchPoints() >= u.getCost();
+            boolean canAfford = dynasty.getResearchPoints() >= u.getCost();
 
             if (notOwned && reqMet && validCost && canAfford) {
                 candidates.add(u);
@@ -34,11 +34,11 @@ public class DynastyAutomationService {
             candidates.sort(Comparator.comparingInt(Upgrade::getCost));
             Upgrade target = candidates.get(0);
             
-            civ.setResearchPoints(civ.getResearchPoints() - target.getCost());
-            civ.unlockUpgrade(target);
+            dynasty.setResearchPoints(dynasty.getResearchPoints() - target.getCost());
+            dynasty.unlockUpgrade(target);
             
-            if (!civ.getColonies().isEmpty()) {
-                civ.getColonies().get(0).logEvent("DYNASTY: Researched " + target.getName());
+            if (!dynasty.getColonies().isEmpty()) {
+                dynasty.getColonies().get(0).logEvent("DYNASTY: Researched " + target.getName());
             }
         }
     }

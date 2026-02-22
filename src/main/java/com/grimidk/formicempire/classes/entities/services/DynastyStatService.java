@@ -12,20 +12,20 @@ import java.util.Map;
 
 public class DynastyStatService {
 
-    public int getTotalPopulation(Dynasty civ) {
-        if (civ == null) return 0;
+    public int getTotalPopulation(Dynasty dynasty) {
+        if (dynasty == null) return 0;
         int total = 0;
-        for (Colony c : civ.getColonies()) {
+        for (Colony c : dynasty.getColonies()) {
             total += c.getAntTotal();
         }
         return total;
     }
 
-    public Map<AntType, Integer> getGlobalPopulationByType(Dynasty civ) {
+    public Map<AntType, Integer> getGlobalPopulationByType(Dynasty dynasty) {
         Map<AntType, Integer> totals = new HashMap<>();
-        if (civ == null) return totals;
+        if (dynasty == null) return totals;
 
-        for (Colony c : civ.getColonies()) {
+        for (Colony c : dynasty.getColonies()) {
             for (Map.Entry<AntType, List<Ant>> entry : c.getAntGroups().entrySet()) {
                 totals.merge(entry.getKey(), entry.getValue().size(), Integer::sum);
             }
@@ -33,7 +33,7 @@ public class DynastyStatService {
         return totals;
     }
 
-    public Map<String, Integer> getGlobalResources(Dynasty civ) {
+    public Map<String, Integer> getGlobalResources(Dynasty dynasty) {
         Map<String, Integer> resources = new HashMap<>();
         resources.put("Plants", 0);
         resources.put("Mushrooms", 0);
@@ -43,9 +43,9 @@ public class DynastyStatService {
         resources.put("Resins", 0);
         resources.put("Minerals", 0);
 
-        if (civ == null) return resources;
+        if (dynasty == null) return resources;
 
-        for (Colony c : civ.getColonies()) {
+        for (Colony c : dynasty.getColonies()) {
             resources.merge("Plants", c.getPlants(), Integer::sum);
             resources.merge("Mushrooms", c.getMushrooms(), Integer::sum);
             resources.merge("Protein", c.getProtein(), Integer::sum);
@@ -57,11 +57,11 @@ public class DynastyStatService {
         return resources;
     }
 
-    public int getGlobalResearchRateDaily(Dynasty civ) {
-        if (civ == null) return 0;
+    public int getGlobalResearchRateDaily(Dynasty dynasty) {
+        if (dynasty == null) return 0;
         int totalDaily = 0;
 
-        for (Colony c : civ.getColonies()) {
+        for (Colony c : dynasty.getColonies()) {
             int researchers = c.getAssignedRoleCount(GameConstants.ROLE_RESEARCHER);
             int assistants = c.getAssignedRoleCount(GameConstants.ROLE_ASSISTANT);            
             int baseSpeed = c.getStatsService().getResearchSpeed(c);
@@ -73,7 +73,7 @@ public class DynastyStatService {
         return totalDaily;
     }
     
-    public int getTotalColonies(Dynasty civ) {
-        return civ != null ? civ.getColonies().size() : 0;
+    public int getTotalColonies(Dynasty dynasty) {
+        return dynasty != null ? dynasty.getColonies().size() : 0;
     }
 }

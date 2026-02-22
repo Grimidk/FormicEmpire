@@ -5,21 +5,21 @@ import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks
 
 public class DynastyStarterService {
     
-    public void initializeDynasty(Dynasty civ) {
-        System.out.println("Initialized Civ: " + civ.getName());
+    public void initializeDynasty(Dynasty dynasty) {
+        System.out.println("Initialized Dynasty: " + dynasty.getName());
         
-        civ.unlockUpgrade(GameUnlocks.TYPE_EGG);
-        civ.unlockUpgrade(GameUnlocks.TYPE_QUEEN);
-        civ.unlockUpgrade(GameUnlocks.TYPE_WORKER);
-        civ.unlockUpgrade(GameUnlocks.ROLE_FORAGER);
-        civ.unlockUpgrade(GameUnlocks.ROLE_FARMER);
-        civ.unlockUpgrade(GameUnlocks.ROLE_NURSE);
-        civ.unlockUpgrade(GameUnlocks.ROLE_LAYER);
-        civ.unlockUpgrade(GameUnlocks.STAT_SKELETON);
-        civ.unlockUpgrade(GameUnlocks.STAT_ACID);
-        civ.unlockUpgrade(GameUnlocks.STAT_LONGEVITY);
+        dynasty.unlockUpgrade(GameUnlocks.TYPE_EGG);
+        dynasty.unlockUpgrade(GameUnlocks.TYPE_QUEEN);
+        dynasty.unlockUpgrade(GameUnlocks.TYPE_WORKER);
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_FORAGER);
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_FARMER);
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_NURSE);
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_LAYER);
+        dynasty.unlockUpgrade(GameUnlocks.STAT_SKELETON);
+        dynasty.unlockUpgrade(GameUnlocks.STAT_ACID);
+        dynasty.unlockUpgrade(GameUnlocks.STAT_LONGEVITY);
         
-        if (civ.getSpecies() != null) {
+        if (dynasty.getSpecies() != null) {
         }
     }
 }

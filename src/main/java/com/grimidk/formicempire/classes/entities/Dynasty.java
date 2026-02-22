@@ -54,15 +54,15 @@ public class Dynasty {
         initializeServices();
     }
     
-    public Dynasty(Savefile.SavedDynasty savedCiv) {
-        this.id = savedCiv.id;
-        this.name = savedCiv.name;
-        this.isPlayer = savedCiv.isPlayer;
-        this.researchPoints = savedCiv.researchPoints;
+    public Dynasty(Savefile.SavedDynasty savedDynasty) {
+        this.id = savedDynasty.id;
+        this.name = savedDynasty.name;
+        this.isPlayer = savedDynasty.isPlayer;
+        this.researchPoints = savedDynasty.researchPoints;
         
         this.species = GameConstants.SPECIES_OMNI; 
         for(Species s : GameConstants.getSpecies()) {
-            if (s.getId() == savedCiv.speciesId) {
+            if (s.getId() == savedDynasty.speciesId) {
                 this.species = s;
                 break;
             }
@@ -72,16 +72,16 @@ public class Dynasty {
         this.unlockedUpgrades = new HashSet<>();
         this.globalDeathStatistics = new ConcurrentHashMap<>();
         
-        if (savedCiv.deathStatistics != null) {
-            this.globalDeathStatistics.putAll(savedCiv.deathStatistics);
+        if (savedDynasty.deathStatistics != null) {
+            this.globalDeathStatistics.putAll(savedDynasty.deathStatistics);
         }
 
-        if (savedCiv.unlockedUpgradeIds != null) {
+        if (savedDynasty.unlockedUpgradeIds != null) {
             Map<Integer, Upgrade> allUpgrades = new HashMap<>();
             for (Upgrade u : GameUnlocks.getUpgrades()) {
                 allUpgrades.put(u.getId(), u);
             }
-            for (Integer upId : savedCiv.unlockedUpgradeIds) {
+            for (Integer upId : savedDynasty.unlockedUpgradeIds) {
                 Upgrade u = allUpgrades.get(upId);
                 if (u != null) {
                     this.unlockedUpgrades.add(u);

@@ -85,5 +85,5 @@ Post launch (v1.1) (Improvements Update):
 	global stats from all players (needs api and consent)
 	socials screen with discord server and instagram
 
-Post launch (v1.2) (Civilization Update):
+Post launch (v1.2) (Dynastyilization Update):
 	(Secret for now)
