@@ -2,7 +2,7 @@ package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
 import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
 import com.grimidk.formicempire.classes.constants.world.Biome;
-import com.grimidk.formicempire.classes.entities.Civilization;
+import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.infrasctructure.World;
@@ -156,11 +156,11 @@ public class MapDialog extends ZeroDialog {
                             sb.append("<br><i>").append(c.getName()).append("</i>");
                         }
 
-                        Civilization civ = c.getCivilization();
-                        if (civ != null) {
-                            sb.append("<br><b>Civ:</b> ").append(civ.getName());
-                            if (civ.getRank() != null) {
-                                sb.append("<br><b>Civ Rank:</b> ").append(civ.getRank().getName());
+                        Dynasty dynasty = c.getDynasty();
+                        if (dynasty != null) {
+                            sb.append("<br><b>Dynasty:</b> ").append(dynasty.getName());
+                            if (dynasty.getRank() != null) {
+                                sb.append("<br><b>Dynasty Rank:</b> ").append(dynasty.getRank().getName());
                             }
                         }
                     } else {
@@ -279,17 +279,17 @@ public class MapDialog extends ZeroDialog {
         }
 
         private void drawMergedBorders(Graphics2D g2d, Hex currentHex, Polygon poly) {
-            int currentCivId = -1;
-            Color civColor = Color.BLACK;
-            boolean hasCiv = false;
+            int currentDynastyId = -1;
+            Color dynastyColor = Color.BLACK;
+            boolean hasDynasty = false;
 
-            if (currentHex.getColony() != null && currentHex.getColony().getCivilization() != null) {
-                currentCivId = currentHex.getColony().getCivilization().getId();
-                civColor = currentHex.getColony().getCivilization().getColor();
-                hasCiv = true;
+            if (currentHex.getColony() != null && currentHex.getColony().getDynasty() != null) {
+                currentDynastyId = currentHex.getColony().getDynasty().getId();
+                dynastyColor = currentHex.getColony().getDynasty().getColor();
+                hasDynasty = true;
             }
 
-            g2d.setColor(civColor);
+            g2d.setColor(dynastyColor);
             
             for (int i = 0; i < 6; i++) {
                 Point p1 = new Point(poly.xpoints[i], poly.ypoints[i]);
@@ -297,16 +297,16 @@ public class MapDialog extends ZeroDialog {
 
                 boolean shouldDrawEdge = true;
 
-                if (hasCiv) {
+                if (hasDynasty) {
                     int[] offset = NEIGHBOR_OFFSETS[i];
                     int nQ = currentHex.getQ() + offset[0];
                     int nR = currentHex.getR() + offset[1];
                     
                     Hex neighbor = hexLookup.get(new Point(nQ, nR));
 
-                    if (neighbor != null && neighbor.getColony() != null && neighbor.getColony().getCivilization() != null) {
-                        int neighborCivId = neighbor.getColony().getCivilization().getId();
-                        if (neighborCivId == currentCivId) {
+                    if (neighbor != null && neighbor.getColony() != null && neighbor.getColony().getDynasty() != null) {
+                        int neighborDynastyId = neighbor.getColony().getDynasty().getId();
+                        if (neighborDynastyId == currentDynastyId) {
                             shouldDrawEdge = false;
                         }
                     }
@@ -316,9 +316,9 @@ public class MapDialog extends ZeroDialog {
                 }
 
                 if (shouldDrawEdge) {
-                    if (hasCiv) {
+                    if (hasDynasty) {
                         g2d.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-                        g2d.setColor(civColor);
+                        g2d.setColor(dynastyColor);
                     }
                     g2d.drawLine(p1.x, p1.y, p2.x, p2.y);
                 }

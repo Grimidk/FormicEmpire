@@ -12,14 +12,14 @@ import java.awt.Color;
 import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
 import com.grimidk.formicempire.classes.constants.misc.Species;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
-import com.grimidk.formicempire.classes.entities.services.CivilizationAutomationService;
-import com.grimidk.formicempire.classes.entities.services.CivilizationStarterService;
-import com.grimidk.formicempire.classes.entities.services.CivilizationStatService;
+import com.grimidk.formicempire.classes.entities.services.DynastyAutomationService;
+import com.grimidk.formicempire.classes.entities.services.DynastyStarterService;
+import com.grimidk.formicempire.classes.entities.services.DynastyStatService;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 
-public class Civilization {
+public class Dynasty {
 
     private final int id;
     private String name;
@@ -35,11 +35,11 @@ public class Civilization {
     private final Map<String, Integer> globalDeathStatistics;
 
     // Services
-    private transient CivilizationAutomationService automationService;
-    private transient CivilizationStarterService starterService;
-    private transient CivilizationStatService statService;
+    private transient DynastyAutomationService automationService;
+    private transient DynastyStarterService starterService;
+    private transient DynastyStatService statService;
 
-    public Civilization(int id, String name, boolean isPlayer, Species species) {
+    public Dynasty(int id, String name, boolean isPlayer, Species species) {
         this.id = id;
         this.name = name;
         this.isPlayer = isPlayer;
@@ -54,7 +54,7 @@ public class Civilization {
         initializeServices();
     }
     
-    public Civilization(Savefile.SavedCivilization savedCiv) {
+    public Dynasty(Savefile.SavedDynasty savedCiv) {
         this.id = savedCiv.id;
         this.name = savedCiv.name;
         this.isPlayer = savedCiv.isPlayer;
@@ -96,9 +96,9 @@ public class Civilization {
     }
 
     private void initializeServices() {
-        this.automationService = new CivilizationAutomationService();
-        this.starterService = new CivilizationStarterService();
-        this.statService = new CivilizationStatService();
+        this.automationService = new DynastyAutomationService();
+        this.starterService = new DynastyStarterService();
+        this.statService = new DynastyStatService();
     }
     
     private void initializeColor() {
@@ -141,7 +141,7 @@ public class Civilization {
     public void addColony(Colony colony) {
         if (!colonies.contains(colony)) {
             colonies.add(colony);
-            colony.setCivilization(this); 
+            colony.setDynasty(this); 
             rankUp();
         }
     }
@@ -181,7 +181,7 @@ public class Civilization {
     
     public Map<String, Integer> getGlobalDeathStatistics() { return globalDeathStatistics; }
     
-    public CivilizationStarterService getStarterService() { return starterService; }
-    public CivilizationStatService getStatService() { return statService; }
+    public DynastyStarterService getStarterService() { return starterService; }
+    public DynastyStatService getStatService() { return statService; }
 
 }

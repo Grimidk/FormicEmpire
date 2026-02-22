@@ -53,8 +53,8 @@ public class ColonyPopulationService {
         }
         deathCauses.merge(key, 1, Integer::sum);
         
-        if (colony != null && colony.getCivilization() != null) {
-            colony.getCivilization().recordDeath(key);
+        if (colony != null && colony.getDynasty() != null) {
+            colony.getDynasty().recordDeath(key);
         }
     }
 

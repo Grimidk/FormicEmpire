@@ -12,16 +12,14 @@ public class ColonyStarterService {
         String type = colony.isPlayer() ? "Player" : "AI";
         System.out.println("[ColonyStarterService] Initializing new " + type + " colony: " + colony.getName());
         
-        if (colony.getCivilization() != null) {
-            boolean isFirst = colony.getCivilization().getColonies().size() == 1;
+        if (colony.getDynasty() != null) {
+            boolean isFirst = colony.getDynasty().getColonies().size() == 1;
             colony.setPrimary(isFirst);
             
             if (isFirst) {
                 colony.setAge(7); 
-                System.out.println("[ColonyStarterService] Colony set as PRIMARY (Immediate Access).");
             } else {
                 colony.setAge(0);
-                System.out.println("[ColonyStarterService] Colony set as EXPANSION (7-day maturation).");
             }
         } else {
             colony.setPrimary(true);

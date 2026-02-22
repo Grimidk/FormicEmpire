@@ -32,7 +32,7 @@ public class Colony {
     
     // --- Basic Data ---
     private final int id;
-    private Civilization civilization;
+    private Dynasty dynasty;
     private String name;
     private boolean isPlayer;
     private ColonyRank rank;
@@ -352,43 +352,43 @@ public class Colony {
     public int getAge() { return age; }
     public void setAge(int age) { this.age = age; }
     
-    public Civilization getCivilization() { return civilization; }
-    public void setCivilization(Civilization civilization) { 
-        this.civilization = civilization; 
-        if (civilization != null) {
-            if (!civilization.getColonies().contains(this)) {
-                civilization.addColony(this); 
+    public Dynasty getDynasty() { return dynasty; }
+    public void setDynasty(Dynasty dynasty) { 
+        this.dynasty = dynasty; 
+        if (dynasty != null) {
+            if (!dynasty.getColonies().contains(this)) {
+                dynasty.addColony(this); 
             }
             refreshAntStats();
         }
     }
 
-    // Delegates to Civilization
+    // Delegates to Dynasty
     public Species getSpecies() { 
-        return civilization != null ? civilization.getSpecies() : GameConstants.SPECIES_OMNI; 
+        return dynasty != null ? dynasty.getSpecies() : GameConstants.SPECIES_OMNI; 
     }
     public void setSpecies(Species species) { 
-        if (civilization != null) civilization.setSpecies(species); 
+        if (dynasty != null) dynasty.setSpecies(species); 
     }
     
     public int getResearchPoints() { 
-        return civilization != null ? civilization.getResearchPoints() : 0; 
+        return dynasty != null ? dynasty.getResearchPoints() : 0; 
     }
     public void setResearchPoints(int points) { 
-        if (civilization != null) civilization.setResearchPoints(points); 
+        if (dynasty != null) dynasty.setResearchPoints(points); 
     }
     public void addResearchPoints(int amount) {
-        if (civilization != null) civilization.addResearchPoints(amount);
+        if (dynasty != null) dynasty.addResearchPoints(amount);
     }
     
     public boolean hasUpgrade(Upgrade upgrade) {
-        return civilization != null && civilization.hasUpgrade(upgrade);
+        return dynasty != null && dynasty.hasUpgrade(upgrade);
     }
     public void unlockUpgrade(Upgrade upgrade) {
-        if (civilization != null) civilization.unlockUpgrade(upgrade);
+        if (dynasty != null) dynasty.unlockUpgrade(upgrade);
     }
     public Set<Upgrade> getUnlockedUpgrades() {
-        return civilization != null ? civilization.getUnlockedUpgrades() : new HashSet<>();
+        return dynasty != null ? dynasty.getUnlockedUpgrades() : new HashSet<>();
     }
     
     public boolean isPlayer() { return isPlayer; }
@@ -728,8 +728,8 @@ public class Colony {
     public int getNuptialFlightCost() {
         int base = 1000;
         int multiplier = 1;
-        if (civilization != null) {
-            multiplier = (int) Math.pow(2, civilization.getColonies().size());
+        if (dynasty != null) {
+            multiplier = (int) Math.pow(2, dynasty.getColonies().size());
         }
         if (multiplier < 1) multiplier = 1;
         return base * multiplier;
@@ -809,11 +809,11 @@ public class Colony {
             this.runHatching();
             this.runAging();
             this.runNursing();
+            this.runComposting();
             this.runGraveKeeping();
             this.runHerding(biome); 
             this.runScoutting(biome);
             this.runContamination(); 
-            this.runComposting();
             this.runPolicing(); 
         } else {
             this.sumarizationService.runDailyLite(this);

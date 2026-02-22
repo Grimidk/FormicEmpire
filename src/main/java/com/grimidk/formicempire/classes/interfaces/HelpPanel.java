@@ -149,8 +149,8 @@ public class HelpPanel extends JPanel {
                 "<b>Expanding Your Empire:</b><br>" +
                 "Once you unlock the <b>Breeder</b> role for Princesses, you can perform Nuptial Flights to spread to adjacent lands via the <b>World Map (I)</b> .<br>" +
                 "<i>Tip: Keep an eye on the sky! Rare Solar or Lunar Eclipses will trigger spontaneous, free Nuptial Flights for your colony.</i><br><br>" +
-                "<b>Civilization Milestones:</b><br>" +
-                "- <b>2 Colonies:</b> Unlocks the <b>Civilization Menu (S)</b> to view and manage your entire empire.<br>" +
+                "<b>Dynasty Milestones:</b><br>" +
+                "- <b>2 Colonies:</b> Unlocks the <b>Dynasty Menu (S)</b> to view and manage your entire empire.<br>" +
                 "- <b>3 Colonies:</b> Unlocks <b>Trade Routes</b>, allowing you to transport resources between your nests.<br>" +
                 "- <b>5 Colonies:</b> Unlocks <b>Mass Colonization</b>, removing the limit on establishing satellite colonies.<br>" +
                 "- <b>7 Colonies:</b> Unlocks <b>Automation</b>. You can set NPC colonies to manage their own roles and building queues automatically.<br><br>" +
@@ -213,7 +213,7 @@ public class HelpPanel extends JPanel {
         row.add("Y", "Research Menu");
         row.add("U", "Build Menu");
         row.add("Z", "Colony Operations Menu");
-        row.add("S", "Civilization Menu");
+        row.add("S", "Dynasty Menu");
         row.add("I", "World Map");
 
         return hotkeyPanel;
@@ -464,7 +464,7 @@ public class HelpPanel extends JPanel {
                 "<b>Empire Management:</b><br><br>" +
                 "As your colony thrives, you will unlock <b>Breeder</b> Princesses. These allow you to establish satellite colonies via the <b>World Map (I)</b> .<br>" +
                 "<i>Tip: Keep an eye on the sky! Rare Solar or Lunar Eclipses will trigger spontaneous, free Nuptial Flights!</i><br><br>" +
-                "Founding multiple colonies unlocks the <b>Civilization Menu (S)</b>. Reaching certain milestones will allow you to construct <b>Trade Routes</b>, remove spreading limits, and even <b>Automate</b> your expanding empire!" +
+                "Founding multiple colonies unlocks the <b>Dynasty Menu (S)</b>. Reaching certain milestones will allow you to construct <b>Trade Routes</b>, remove spreading limits, and even <b>Automate</b> your expanding empire!" +
                 "</p></html>";
         JPanel page4 = new JPanel(new BorderLayout());
         page4.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -484,7 +484,7 @@ public class HelpPanel extends JPanel {
         hotkeyPanel.add(new JLabel("Queen Roles:")); hotkeyPanel.add(new JLabel("T"));
         hotkeyPanel.add(new JSeparator(SwingConstants.HORIZONTAL)); hotkeyPanel.add(new JSeparator(SwingConstants.HORIZONTAL));
         hotkeyPanel.add(new JLabel("Build Menu:")); hotkeyPanel.add(new JLabel("U"));
-        hotkeyPanel.add(new JLabel("Civ Menu:")); hotkeyPanel.add(new JLabel("S"));
+        hotkeyPanel.add(new JLabel("Dynasty Menu:")); hotkeyPanel.add(new JLabel("S"));
         hotkeyPanel.add(new JLabel("World Map:")); hotkeyPanel.add(new JLabel("I"));
         
         JPanel page5 = new JPanel(new BorderLayout());

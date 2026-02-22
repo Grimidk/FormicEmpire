@@ -1,7 +1,7 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
 import com.grimidk.formicempire.classes.constants.world.Biome;
-import com.grimidk.formicempire.classes.entities.Civilization;
+import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
@@ -21,9 +21,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class CivilizationManagementDialog extends ZeroDialog {
+public class DynastyManagementDialog extends ZeroDialog {
 
-    private final Civilization civilization;
+    private final Dynasty dynasty;
     private final Engine engine;
     private final java.util.function.Consumer<Colony> onGoToColony;
 
@@ -34,9 +34,9 @@ public class CivilizationManagementDialog extends ZeroDialog {
 
     private final Runnable refreshTask = this::liveUpdate;
 
-    public CivilizationManagementDialog(JFrame owner, Civilization civilization, Engine engine, java.util.function.Consumer<Colony> onGoToColony) {
-        super(owner, "Civilization Management", new Dimension(1100, 700));
-        this.civilization = civilization;
+    public DynastyManagementDialog(JFrame owner, Dynasty dynasty, Engine engine, java.util.function.Consumer<Colony> onGoToColony) {
+        super(owner, "Dynasty Management", new Dimension(1100, 700));
+        this.dynasty = dynasty;
         this.engine = engine;
         this.onGoToColony = onGoToColony;
 
@@ -75,9 +75,9 @@ public class CivilizationManagementDialog extends ZeroDialog {
 
         if (!isShowing()) return;
 
-        boolean hasTrade = civilization.hasUpgrade(GameUnlocks.ABILITY_TRADE);
+        boolean hasTrade = dynasty.hasUpgrade(GameUnlocks.ABILITY_TRADE);
         int expectedTabs = 1 + (hasTrade ? 1 : 0);        
-        boolean currentAuto = civilization.hasUpgrade(GameUnlocks.ABILITY_AUTOMATION);
+        boolean currentAuto = dynasty.hasUpgrade(GameUnlocks.ABILITY_AUTOMATION);
         boolean panelAuto = (overviewPanel != null) && overviewPanel.isAutomationEnabledInTable();
 
         if (tabbedPane.getTabCount() != expectedTabs || currentAuto != panelAuto) {
@@ -98,7 +98,7 @@ public class CivilizationManagementDialog extends ZeroDialog {
         tabbedPane.removeAll();
 
         // --- Overview Tab ---
-        boolean currentAuto = civilization.hasUpgrade(GameUnlocks.ABILITY_AUTOMATION);
+        boolean currentAuto = dynasty.hasUpgrade(GameUnlocks.ABILITY_AUTOMATION);
         if (overviewPanel == null || overviewPanel.isAutomationEnabledInTable() != currentAuto) {
             overviewPanel = new OverviewPanel(currentAuto);
         }
@@ -106,7 +106,7 @@ public class CivilizationManagementDialog extends ZeroDialog {
         tabbedPane.addTab("Overview", overviewPanel);
 
         // --- Trade Tab ---
-        if (civilization.hasUpgrade(GameUnlocks.ABILITY_TRADE)) {
+        if (dynasty.hasUpgrade(GameUnlocks.ABILITY_TRADE)) {
             if (tradePanel == null) {
                 tradePanel = new TradePanel();
             }
@@ -244,7 +244,7 @@ public class CivilizationManagementDialog extends ZeroDialog {
             model.setRowCount(0);
             displayedColonies.clear();
 
-            List<Colony> rawColonies = civilization.getColonies();
+            List<Colony> rawColonies = dynasty.getColonies();
             World world = engine.getWorld();
 
             displayedColonies.addAll(rawColonies);

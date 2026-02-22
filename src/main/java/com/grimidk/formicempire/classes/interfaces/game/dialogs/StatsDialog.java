@@ -5,9 +5,9 @@ import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.world.Season;
 import com.grimidk.formicempire.classes.constants.world.Weather;
 import com.grimidk.formicempire.classes.entities.Ant;
-import com.grimidk.formicempire.classes.entities.Civilization;
+import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.entities.services.CivilizationStatService;
+import com.grimidk.formicempire.classes.entities.services.DynastyStatService;
 import com.grimidk.formicempire.classes.entities.services.ColonyLocationService;
 import com.grimidk.formicempire.classes.entities.services.ColonyStatsService;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
@@ -28,12 +28,12 @@ public class StatsDialog extends ZeroDialog {
 
     private final Colony colony;
     private final Engine engine;
-    private final CivilizationStatService civStatsService; 
+    private final DynastyStatService dynastyStatsService; 
     
     private final JTabbedPane tabbedPane;
     
     private JTable generalTable;
-    private JTable civTable;
+    private JTable dynastyTable;
     private JTable resourcesTable;
     private JTable populationTable;
     private JTable ratesTable;
@@ -46,13 +46,13 @@ public class StatsDialog extends ZeroDialog {
         super(owner, "Colony Statistics", new Dimension(800, 600));
         this.colony = colony;
         this.engine = engine;
-        this.civStatsService = new CivilizationStatService(); 
+        this.dynastyStatsService = new DynastyStatService(); 
         
         tabbedPane = new JTabbedPane();
         add(tabbedPane, BorderLayout.CENTER);
         
         initGeneralTab();
-        initCivilizationTab();
+        initDynastyTab();
         initResourceTab();
         initPopulationTab();
         initRatesTab();
@@ -126,14 +126,14 @@ public class StatsDialog extends ZeroDialog {
         tabbedPane.addTab("General & World", createTablePane(generalTable));
     }
     
-    private void initCivilizationTab() {
+    private void initDynastyTab() {
         String[] columns = {"", "Scope", "Metric", "Value"};
-        civTable = new JTable(createIconModel(columns));
+        dynastyTable = new JTable(createIconModel(columns));
         
-        civTable.getColumnModel().getColumn(0).setMaxWidth(40);
-        civTable.getColumnModel().getColumn(0).setPreferredWidth(40);
+        dynastyTable.getColumnModel().getColumn(0).setMaxWidth(40);
+        dynastyTable.getColumnModel().getColumn(0).setPreferredWidth(40);
         
-        tabbedPane.addTab("Civilization", createTablePane(civTable));
+        tabbedPane.addTab("Dynasty", createTablePane(dynastyTable));
     }
 
     private void initResourceTab() {
@@ -179,7 +179,7 @@ public class StatsDialog extends ZeroDialog {
     @Override
     protected void refreshDialog() {
         updateGeneralData();
-        updateCivilizationData(); 
+        updateDynastyData(); 
         updateResourceData();
         updatePopulationData();
         updateRatesData();
@@ -223,40 +223,40 @@ public class StatsDialog extends ZeroDialog {
         }
     }
 
-    private void updateCivilizationData() {
-        DefaultTableModel model = (DefaultTableModel) civTable.getModel();
+    private void updateDynastyData() {
+        DefaultTableModel model = (DefaultTableModel) dynastyTable.getModel();
         model.setRowCount(0);
         
-        Civilization civ = colony.getCivilization();
-        if (civ == null) {
-            model.addRow(new Object[]{null, "Error", "Status", "No Civilization Linked"});
+        Dynasty dynasty = colony.getDynasty();
+        if (dynasty == null) {
+            model.addRow(new Object[]{null, "Error", "Status", "No Dynasty Linked"});
             return;
         }
 
         // Basic Info
-        model.addRow(new Object[]{null, "Empire", "Name", civ.getName()});
-        model.addRow(new Object[]{civ.getRank().getIcon(), "Empire", "Rank", civ.getRank().getName()}); 
-        model.addRow(new Object[]{null, "Empire", "Total Colonies", civStatsService.getTotalColonies(civ)});
-        model.addRow(new Object[]{null, "Empire", "Global Population", civStatsService.getTotalPopulation(civ)});
+        model.addRow(new Object[]{null, "Empire", "Name", dynasty.getName()});
+        model.addRow(new Object[]{dynasty.getRank().getIcon(), "Empire", "Rank", dynasty.getRank().getName()}); 
+        model.addRow(new Object[]{null, "Empire", "Total Colonies", dynastyStatsService.getTotalColonies(dynasty)});
+        model.addRow(new Object[]{null, "Empire", "Global Population", dynastyStatsService.getTotalPopulation(dynasty)});
 
         // Unlocks
         model.addRow(new Object[]{null, null, "------", "------"});
-        model.addRow(new Object[]{null, "Progress", "Upgrades Researched", civ.getUnlockedUpgrades().size()});
+        model.addRow(new Object[]{null, "Progress", "Upgrades Researched", dynasty.getUnlockedUpgrades().size()});
         
         int totalBuildings = 0;
-        for (Colony c : civ.getColonies()) {
+        for (Colony c : dynasty.getColonies()) {
             totalBuildings += c.getUnlockedBuildings().size();
         }
         model.addRow(new Object[]{null, "Progress", "Total Buildings Built", totalBuildings});
 
         // Research
         model.addRow(new Object[]{null, null, "------", "------"});
-        model.addRow(new Object[]{GameConstants.ICON_RESEARCH, "Research", "Stored Points", civ.getResearchPoints()});
-        model.addRow(new Object[]{null, "Research", "Global Rate", "+" + civStatsService.getGlobalResearchRateDaily(civ) + " pts/day"});
+        model.addRow(new Object[]{GameConstants.ICON_RESEARCH, "Research", "Stored Points", dynasty.getResearchPoints()});
+        model.addRow(new Object[]{null, "Research", "Global Rate", "+" + dynastyStatsService.getGlobalResearchRateDaily(dynasty) + " pts/day"});
 
         // Global Resources
         model.addRow(new Object[]{null, null, "------", "------"});
-        Map<String, Integer> resources = civStatsService.getGlobalResources(civ);
+        Map<String, Integer> resources = dynastyStatsService.getGlobalResources(dynasty);
         
         model.addRow(new Object[]{GameConstants.RESOURCE_PLANT.getIcon(), "Resources", "Total Plants", resources.get("Plants")});
         model.addRow(new Object[]{GameConstants.RESOURCE_FUNGI.getIcon(), "Resources", "Total Mushrooms", resources.get("Mushrooms")});
@@ -269,8 +269,8 @@ public class StatsDialog extends ZeroDialog {
         // Global Deaths
         model.addRow(new Object[]{null, null, "------", "------"});
         int totalDeaths = 0;
-        if (civ.getGlobalDeathStatistics() != null) {
-            totalDeaths = civ.getGlobalDeathStatistics().values().stream().mapToInt(Integer::intValue).sum();
+        if (dynasty.getGlobalDeathStatistics() != null) {
+            totalDeaths = dynasty.getGlobalDeathStatistics().values().stream().mapToInt(Integer::intValue).sum();
         }
         model.addRow(new Object[]{GameConstants.STATUS_DEAD.getIcon(), "Mortality", "Global Deaths", totalDeaths});
     }

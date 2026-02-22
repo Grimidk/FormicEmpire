@@ -13,7 +13,7 @@ import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.entities.Ant;
-import com.grimidk.formicempire.classes.entities.Civilization;
+import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
@@ -21,7 +21,6 @@ import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
-
 
 public class ColonyLabourService {
     
@@ -349,8 +348,8 @@ public class ColonyLabourService {
     public void runSpreading(Colony colony, int potentialSatellites, World world, Hex currentHex) { 
         if (potentialSatellites <= 0 || world == null || currentHex == null) return;
         
-        Civilization civ = colony.getCivilization();
-        if (civ == null) return;
+        Dynasty dynasty = colony.getDynasty();
+        if (dynasty == null) return;
 
         int satellitesToSpawn = Math.min(potentialSatellites, colony.getStatsService().getSpreadingLimit(colony));
 
@@ -377,18 +376,18 @@ public class ColonyLabourService {
             if (existingColony == null || isDead) {
                 
                 if (isDead) {
-                    Civilization oldCiv = existingColony.getCivilization();
-                    if (oldCiv != null) {
-                        oldCiv.removeColony(existingColony);
+                    Dynasty oldDynasty = existingColony.getDynasty();
+                    if (oldDynasty != null) {
+                        oldDynasty.removeColony(existingColony);
                     }
-                    existingColony.setCivilization(null);
+                    existingColony.setDynasty(null);
                 }
 
                 int newId = world.getNextColonyId();
                 String newName = colony.getName() + " " + newId;
                 
                 Colony satellite = new Colony(newId, newName, colony.isPlayer());
-                satellite.setCivilization(civ); 
+                satellite.setDynasty(dynasty); 
                 satellite.setActive(false); 
                 satellite.setAutomationEnabled(!colony.isPlayer()); 
                 satellite.setRank(GameConstants.RANK_COLONY);
@@ -678,7 +677,7 @@ public class ColonyLabourService {
             int queenGain = researcherCount * speed;
             int assistantGain = (int) (assistantCount * (speed / 5.0));
 
-            colony.setResearchPoints(colony.getResearchPoints() + queenGain + assistantGain);
+            colony.addResearchPoints(queenGain + assistantGain);
         }
     }
 

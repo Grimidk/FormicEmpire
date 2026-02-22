@@ -1,22 +1,22 @@
 package com.grimidk.formicempire.classes.entities.services;
 
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
-import com.grimidk.formicempire.classes.entities.Civilization;
+import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class CivilizationAutomationService {
+public class DynastyAutomationService {
 
-    public void runDailyAutomation(Civilization civ) {
+    public void runDailyAutomation(Dynasty civ) {
         if (civ.isPlayer()) return;
         
         checkAndBuyUpgrades(civ);
     }
 
-    private void checkAndBuyUpgrades(Civilization civ) {
+    private void checkAndBuyUpgrades(Dynasty civ) {
         List<Upgrade> candidates = new ArrayList<>();
         
         for (Upgrade u : GameUnlocks.getUpgrades()) {
@@ -38,7 +38,7 @@ public class CivilizationAutomationService {
             civ.unlockUpgrade(target);
             
             if (!civ.getColonies().isEmpty()) {
-                civ.getColonies().get(0).logEvent("CIVILIZATION: Researched " + target.getName());
+                civ.getColonies().get(0).logEvent("DYNASTY: Researched " + target.getName());
             }
         }
     }

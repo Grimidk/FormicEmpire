@@ -13,7 +13,7 @@ import com.grimidk.formicempire.classes.constants.world.Season;
 import com.grimidk.formicempire.classes.constants.world.Temperature;
 import com.grimidk.formicempire.classes.constants.world.TimeOfDay;
 import com.grimidk.formicempire.classes.constants.world.Weather;
-import com.grimidk.formicempire.classes.entities.Civilization;
+import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.services.ColonyStarterService;
@@ -34,14 +34,14 @@ public class World {
     private int temperature;
     private int humidity;
     private ArrayList<Hex> hexes;
-    private List<Civilization> civilizations;
+    private List<Dynasty> dynastys;
     private Hex activeHex; 
     private int saveSlotId = 0; // 0 = no slot (ad-hoc)
     private Engine engine;
     private Random random;    
     private int worldRadius = 8; 
     private int colonyIdCounter = 1;
-    private int civIdCounter = 1;
+    private int dynastyIdCounter = 1;
 
     public World() {
         this.minute = 0;
@@ -52,7 +52,7 @@ public class World {
         this.temperature = 25;
         this.humidity = 2;
         this.hexes = new ArrayList<>();
-        this.civilizations = new ArrayList<>();
+        this.dynastys = new ArrayList<>();
         this.timeOfDay = GameConstants.TIME_DAWN;
         this.moonPhase = GameConstants.PHASE_NEW_MOON;
         this.season = GameConstants.SEASON_SPRING;
@@ -175,7 +175,7 @@ public class World {
         this.hexes = hexes;
     }
     
-    public List<Civilization> getCivilizations() { return civilizations; }
+    public List<Dynasty> getDynastys() { return dynastys; }
     
     public int getWorldRadius() {
         return worldRadius;
@@ -258,14 +258,14 @@ public class World {
         System.out.println("Generating World... Size: " + size + " rings.");
         this.worldRadius = size;
         this.hexes.clear();
-        this.civilizations.clear();
+        this.dynastys.clear();
         Map<String, Hex> hexMap = new HashMap<>();
         ColonyStarterService starterService = new ColonyStarterService();
         
-        Civilization playerCiv = new Civilization(this.civIdCounter++, "Player Empire", true, GameConstants.SPECIES_OMNI);
-        playerCiv.getStarterService().initializeCivilization(playerCiv);
-        playerCiv.addColony(startColony);
-        this.civilizations.add(playerCiv);
+        Dynasty playerDynasty = new Dynasty(this.dynastyIdCounter++, "Player Empire", true, GameConstants.SPECIES_OMNI);
+        playerDynasty.getStarterService().initializeDynasty(playerDynasty);
+        playerDynasty.addColony(startColony);
+        this.dynastys.add(playerDynasty);
         
         this.colonyIdCounter = startColony.getId() + 1;
 
@@ -291,14 +291,14 @@ public class World {
                     hex.setBiome(ringBiome);
                     
                     if (dist > 1 && !isWaterBiome(ringBiome) && random.nextInt(100) < 30) {
-                        int civId = this.civIdCounter++;
-                        Civilization npcCiv = new Civilization(civId, "Leaf Cutter Hive " + civId, false, GameConstants.SPECIES_LEAF);
-                        npcCiv.getStarterService().initializeCivilization(npcCiv);
-                        this.civilizations.add(npcCiv);
+                        int dynastyId = this.dynastyIdCounter++;
+                        Dynasty npcDynasty = new Dynasty(dynastyId, "Leaf Cutter Hive " + dynastyId, false, GameConstants.SPECIES_LEAF);
+                        npcDynasty.getStarterService().initializeDynasty(npcDynasty);
+                        this.dynastys.add(npcDynasty);
                         
                         int colId = this.colonyIdCounter++;
                         Colony aiColony = new Colony(colId, "Wild Colony " + colId, false);
-                        npcCiv.addColony(aiColony);
+                        npcDynasty.addColony(aiColony);
                         
                         starterService.initializeNewColony(aiColony);
                         hex.setColony(aiColony);
@@ -467,20 +467,20 @@ public class World {
         this.worldRadius = (savefile.getWorldRadius() > 0) ? savefile.getWorldRadius() : 8;
         
         this.hexes.clear();
-        this.civilizations.clear();
+        this.dynastys.clear();
         Map<String, Hex> hexMap = new HashMap<>();
         Map<String, Colony> loadedColonies = new HashMap<>();
-        Map<Integer, Civilization> loadedCivs = new HashMap<>();
+        Map<Integer, Dynasty> loadedDynastys = new HashMap<>();
         
         int maxColId = 0;
-        int maxCivId = 0;
+        int maxDynastyId = 0;
 
-        if (savefile.getCivilizations() != null) {
-            for (Savefile.SavedCivilization sc : savefile.getCivilizations()) {
-                Civilization civ = new Civilization(sc);
-                loadedCivs.put(civ.getId(), civ);
-                this.civilizations.add(civ);
-                if (civ.getId() > maxCivId) maxCivId = civ.getId();
+        if (savefile.getDynastys() != null) {
+            for (Savefile.SavedDynasty sc : savefile.getDynastys()) {
+                Dynasty dynasty = new Dynasty(sc);
+                loadedDynastys.put(dynasty.getId(), dynasty);
+                this.dynastys.add(dynasty);
+                if (dynasty.getId() > maxDynastyId) maxDynastyId = dynasty.getId();
             }
         }
         
@@ -491,16 +491,16 @@ public class World {
                 loadedColonies.put(key, c);
                 if (c.getId() > maxColId) maxColId = c.getId();
                 
-                if (loadedCivs.containsKey(sc.civId)) {
-                    loadedCivs.get(sc.civId).addColony(c);
+                if (loadedDynastys.containsKey(sc.dynastyId)) {
+                    loadedDynastys.get(sc.dynastyId).addColony(c);
                 } else {
-                    int newCivId = ++maxCivId;
-                    Civilization adHocCiv = new Civilization(newCivId, c.isPlayer() ? "Player Empire" : "Wild Empire", c.isPlayer(), GameConstants.SPECIES_OMNI);
-                    adHocCiv.getStarterService().initializeCivilization(adHocCiv);
-                    adHocCiv.addColony(c);
-                    this.civilizations.add(adHocCiv);
-                    loadedCivs.put(newCivId, adHocCiv);
-                    System.out.println("Created ad-hoc Civ ID " + newCivId + " for orphan colony " + c.getName());
+                    int newDynastyId = ++maxDynastyId;
+                    Dynasty adHocDynasty = new Dynasty(newDynastyId, c.isPlayer() ? "Player Empire" : "Wild Empire", c.isPlayer(), GameConstants.SPECIES_OMNI);
+                    adHocDynasty.getStarterService().initializeDynasty(adHocDynasty);
+                    adHocDynasty.addColony(c);
+                    this.dynastys.add(adHocDynasty);
+                    loadedDynastys.put(newDynastyId, adHocDynasty);
+                    System.out.println("Created ad-hoc Dynasty ID " + newDynastyId + " for orphan colony " + c.getName());
                 }
                 
                 c.refreshAntStats(); 
@@ -555,7 +555,7 @@ public class World {
         }
 
         this.colonyIdCounter = maxColId + 1;
-        this.civIdCounter = maxCivId + 1;
+        this.dynastyIdCounter = maxDynastyId + 1;
         
         changeActiveHex(getSpawnHex()); 
         updateEnvironmentalConditions();
@@ -688,8 +688,8 @@ public class World {
     public void runDay() {
         this.day++;
         
-        for (Civilization civ : this.civilizations) {
-            civ.runDailyJobs();
+        for (Dynasty dynasty : this.dynastys) {
+            dynasty.runDailyJobs();
         }
         
         for (Hex hex : this.hexes) {
@@ -703,8 +703,8 @@ public class World {
             Colony c = hex.getColony();
             if (c != null && !c.isPlayer() && c.getQueens().isEmpty()) {
                 starter.dismantleColony(hex);
-                if (c.getCivilization() != null) {
-                    c.getCivilization().removeColony(c);
+                if (c.getDynasty() != null) {
+                    c.getDynasty().removeColony(c);
                 }
             }
         }

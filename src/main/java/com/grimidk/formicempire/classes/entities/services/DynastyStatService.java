@@ -2,7 +2,7 @@ package com.grimidk.formicempire.classes.entities.services;
 
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.entities.Ant;
-import com.grimidk.formicempire.classes.entities.Civilization;
+import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 
@@ -10,9 +10,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CivilizationStatService {
+public class DynastyStatService {
 
-    public int getTotalPopulation(Civilization civ) {
+    public int getTotalPopulation(Dynasty civ) {
         if (civ == null) return 0;
         int total = 0;
         for (Colony c : civ.getColonies()) {
@@ -21,7 +21,7 @@ public class CivilizationStatService {
         return total;
     }
 
-    public Map<AntType, Integer> getGlobalPopulationByType(Civilization civ) {
+    public Map<AntType, Integer> getGlobalPopulationByType(Dynasty civ) {
         Map<AntType, Integer> totals = new HashMap<>();
         if (civ == null) return totals;
 
@@ -33,7 +33,7 @@ public class CivilizationStatService {
         return totals;
     }
 
-    public Map<String, Integer> getGlobalResources(Civilization civ) {
+    public Map<String, Integer> getGlobalResources(Dynasty civ) {
         Map<String, Integer> resources = new HashMap<>();
         resources.put("Plants", 0);
         resources.put("Mushrooms", 0);
@@ -57,7 +57,7 @@ public class CivilizationStatService {
         return resources;
     }
 
-    public int getGlobalResearchRateDaily(Civilization civ) {
+    public int getGlobalResearchRateDaily(Dynasty civ) {
         if (civ == null) return 0;
         int totalDaily = 0;
 
@@ -73,7 +73,7 @@ public class CivilizationStatService {
         return totalDaily;
     }
     
-    public int getTotalColonies(Civilization civ) {
+    public int getTotalColonies(Dynasty civ) {
         return civ != null ? civ.getColonies().size() : 0;
     }
 }

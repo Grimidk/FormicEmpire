@@ -19,6 +19,7 @@ public class ColonySumarizationService {
         simulateResearch(colony);
         simulateBuilding(colony); 
         simulateLaying(colony);
+        simulateRanching(colony);
     }
 
     public void runDailyLite(Colony colony) {
@@ -27,7 +28,10 @@ public class ColonySumarizationService {
         simulateEating(colony);
         colony.getPopulationService().runHatching(colony);
         colony.getPopulationService().runAging(colony);
+        
+        simulateComposting(colony);
         simulateGraveKeeping(colony);
+        simulatePolicing(colony);
         
         if (colony.isPlayer()) {
             colony.getPopulationService().runContamination(colony);
@@ -92,6 +96,19 @@ public class ColonySumarizationService {
         }
     }
 
+    private void simulateRanching(Colony colony) {
+        if (!colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) return;
+        
+        ColonyStatsService stats = colony.getStatsService();
+        int syrupGain = colony.getAphids(); 
+        double plantConsumption = syrupGain * 0.10; 
+
+        if (colony.getPlantsPrecise() >= plantConsumption) {
+            colony.setPlants(Math.max(0, colony.getPlantsPrecise() - plantConsumption));
+            colony.setSyrups(Math.min(colony.getSyrupsPrecise() + syrupGain, (double)stats.getSyrupsCapacity(colony)));
+        }
+    }
+
     private int probabilisticRound(double value) {
         int floor = (int) value;
         return (random.nextDouble() < (value - floor)) ? floor + 1 : floor;
@@ -137,8 +154,21 @@ public class ColonySumarizationService {
         if (mushrooms >= totalConsumption) {
             colony.setMushrooms(mushrooms - totalConsumption);
         } else {
+            int deficit = totalConsumption - mushrooms;
             colony.setMushrooms(0);
-            handleStarvation(colony, totalConsumption - mushrooms, "Starvation");
+            
+            int syrups = colony.getSyrups();
+            if (syrups >= deficit) {
+                colony.setSyrups(syrups - deficit);
+                deficit = 0;
+            } else {
+                colony.setSyrups(0);
+                deficit -= syrups;
+            }
+            
+            if (deficit > 0) {
+                handleStarvation(colony, deficit, "Starvation");
+            }
         }
         
         int waterDemand = stats.getWaterConsumption(colony);
@@ -147,8 +177,21 @@ public class ColonySumarizationService {
         if (water >= waterDemand) {
             colony.setWater(water - waterDemand);
         } else {
+            int deficit = waterDemand - water;
             colony.setWater(0);
-            handleStarvation(colony, (waterDemand - water) / 2, "Dehydration");
+            
+            int syrups = colony.getSyrups();
+            if (syrups >= deficit) {
+                colony.setSyrups(syrups - deficit);
+                deficit = 0;
+            } else {
+                colony.setSyrups(0);
+                deficit -= syrups;
+            }
+            
+            if (deficit > 0) {
+                handleStarvation(colony, deficit / 2, "Dehydration");
+            }
         }
     }
 
@@ -167,10 +210,6 @@ public class ColonySumarizationService {
             Ant victim = workers.remove(i);
             colony.recordAntDeath(victim, cause);
             killed++;
-        }
-        
-        if (killed > 5) {
-            colony.logEvent("Background Simulation: " + killed + " ants died of " + cause + ".");
         }
     }
 
@@ -211,6 +250,26 @@ public class ColonySumarizationService {
         }
         return removed;
     }
+
+    private void simulateComposting(Colony colony) {
+        if (!colony.hasBuilding(GameUnlocks.BUILDING_COMPOSTER)) return;
+        
+        List<Ant> deadAnts = colony.getDeadAnts();
+        int graverCount = colony.getAssignedRoleCount(GameConstants.ROLE_GRAVER);
+        int potentialCompost = (int) colony.getStatsService().getGravingRate(colony) * graverCount;
+        
+        if (potentialCompost == 0 || deadAnts.isEmpty()) return;
+
+        int actualToCompost = Math.min(potentialCompost, deadAnts.size());
+        
+        for(int i = 0; i < actualToCompost; i++) {
+            deadAnts.remove(deadAnts.size() - 1);
+        }
+
+        int mushroomGain = actualToCompost * 4; 
+        int capacity = colony.getStatsService().getMushroomsCapacity(colony);
+        colony.setMushrooms(Math.min(colony.getMushroomsPrecise() + mushroomGain, (double)capacity));
+    }
     
     private void simulateGraveKeeping(Colony colony) {
         int graverCount = colony.getAssignedRoleCount(GameConstants.ROLE_GRAVER);
@@ -237,6 +296,34 @@ public class ColonySumarizationService {
         }
     }
 
+    private void simulatePolicing(Colony colony) {
+        if (!colony.hasUpgrade(GameUnlocks.ROLE_POLICE)) return;
+        
+        int parasiteCount = colony.getParasites();
+        if (parasiteCount == 0) return;
+        
+        int policeCount = colony.getAssignedRoleCount(GameConstants.ROLE_POLICE);
+        if (policeCount == 0) return;
+        
+        float detectionRate = colony.getStatsService().getParasiteDetection(colony);
+        int parasitesKilled = 0;
+        
+        for (int i = 0; i < policeCount; i++) {
+            if (parasitesKilled >= parasiteCount) break;
+            if (random.nextFloat() < detectionRate) {
+                parasitesKilled++;
+                
+                double currentProtein = colony.getProteinPrecise();
+                double maxProtein = colony.getStatsService().getProteinCapacity(colony);
+                colony.setProtein(Math.min(currentProtein + 4, maxProtein));
+            }
+        }
+        
+        if (parasitesKilled > 0) {
+            colony.setParasites(Math.max(0, colony.getParasites() - parasitesKilled));
+        }
+    }
+
     private void simulateResearch(Colony colony) {
         if (!colony.hasUpgrade(GameUnlocks.ROLE_RESEARCHER)) return;
         int researcherCount = colony.getAssignedRoleCount(GameConstants.ROLE_RESEARCHER);
@@ -246,8 +333,13 @@ public class ColonySumarizationService {
             else researcherCount += 1;
         }
 
+        int assistantCount = colony.getAssignedRoleCount(GameConstants.ROLE_ASSISTANT);
         int speed = colony.getStatsService().getResearchSpeed(colony);
-        colony.setResearchPoints(colony.getResearchPoints() + (researcherCount * speed));
+        
+        int queenGain = researcherCount * speed;
+        int assistantGain = (int) (assistantCount * (speed / 5.0));
+
+        colony.addResearchPoints(queenGain + assistantGain);
     }
 
     private void simulateBuilding(Colony colony) {

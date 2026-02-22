@@ -39,7 +39,7 @@ public class GamePanel extends ZeroGamePanel {
     private AbilitiesDialog abilitiesDialog;
     private MapDialog mapDialog;
     private StatsDialog statsDialog; 
-    private CivilizationManagementDialog civDialog;
+    private DynastyManagementDialog dynastyDialog;
 
     private AlertManager alertManager;
     private TriggerManager triggerManager; 
@@ -94,7 +94,7 @@ public class GamePanel extends ZeroGamePanel {
         Runnable showAbilitiesDialogCallback = this::showAbilitiesDialog;
         Runnable showMapDialogCallback = this::showMapDialog; 
         Runnable showStatsDialogCallback = this::showStatsDialog;
-        Runnable showCivilizationDialogCallback = this::showCivilizationDialog;
+        Runnable showDynastyDialogCallback = this::showDynastyDialog;
         ControlPanel.RoleManagementCallback showRoleManagementDialogCallback = this::showRoleManagementDialog;
         
         Runnable toggleViewCallback = () -> {
@@ -119,7 +119,7 @@ public class GamePanel extends ZeroGamePanel {
             showStatsDialogCallback,
             toggleViewCallback,
             showMapDialogCallback,
-            showCivilizationDialogCallback); 
+            showDynastyDialogCallback); 
     }
     
     private void updateGameAreaSize() {
@@ -271,17 +271,17 @@ public class GamePanel extends ZeroGamePanel {
         statsDialog.showDialog();
     }
 
-    private void showCivilizationDialog() {
+    private void showDynastyDialog() {
         Engine engine = frame.getEngine();
         Colony colony = getColonyFromEngine(engine);
-        if (colony == null || colony.getCivilization() == null) return;
+        if (colony == null || colony.getDynasty() == null) return;
 
-        if (civDialog != null) {
-            civDialog.dispose();
+        if (dynastyDialog != null) {
+            dynastyDialog.dispose();
         }
 
-        civDialog = new CivilizationManagementDialog(frame, colony.getCivilization(), engine, this::handleGoToColony);
-        civDialog.showDialog();
+        dynastyDialog = new DynastyManagementDialog(frame, colony.getDynasty(), engine, this::handleGoToColony);
+        dynastyDialog.showDialog();
     }
 
     private void handleGoToColony(Colony target) {
@@ -325,7 +325,7 @@ public class GamePanel extends ZeroGamePanel {
         if (abilitiesDialog != null) { abilitiesDialog.dispose(); abilitiesDialog = null; }
         if (mapDialog != null) { mapDialog.dispose(); mapDialog = null; }
         if (statsDialog != null) { statsDialog.dispose(); statsDialog = null; }
-        if (civDialog != null) { civDialog.dispose(); civDialog = null; }
+        if (dynastyDialog != null) { dynastyDialog.dispose(); dynastyDialog = null; }
     }
 
     private void cleanupSession() {
@@ -577,21 +577,21 @@ public class GamePanel extends ZeroGamePanel {
             if (statsDialog != null && statsDialog.isShowing()) {
                 statsDialog.liveUpdate();
             }
-            if (civDialog != null && civDialog.isShowing()) {
-                civDialog.liveUpdate();
+            if (dynastyDialog != null && dynastyDialog.isShowing()) {
+                dynastyDialog.liveUpdate();
             }
             if (controlPanel != null) {
                 controlPanel.updateResearchMenu(colony.hasUpgrade(GameUnlocks.ABILITY_RESEARCH));
                 controlPanel.updateBuildMenu(colony.hasUpgrade(GameUnlocks.ABILITY_BUILD));
                 controlPanel.updateAbilitiesMenu(colony.hasUpgrade(GameUnlocks.ABILITY_FORCED_FLIGHT));
-                controlPanel.updateCivilizationMenu(colony.hasUpgrade(GameUnlocks.ABILITY_CIVILIZATION));
+                controlPanel.updateDynastyMenu(colony.hasUpgrade(GameUnlocks.ABILITY_DYNASTY));
             }
         } else {
              if (controlPanel != null) {
                 controlPanel.updateResearchMenu(false);
                 controlPanel.updateBuildMenu(false);
                 controlPanel.updateAbilitiesMenu(false);
-                controlPanel.updateCivilizationMenu(false);
+                controlPanel.updateDynastyMenu(false);
             }
         }
     }

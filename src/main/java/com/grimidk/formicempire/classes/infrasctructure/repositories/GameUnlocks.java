@@ -155,13 +155,13 @@ public final class GameUnlocks {
     static { upgrades.add(ABILITY_ASSIMILATION); }
     public static final Upgrade ABILITY_FORCED_FLIGHT = new Upgrade(505, "Forced Nuptial Flights", "Royal Decree", "Allows you to force a nuptial flight by spending 1000 research points.", ROLE_BREEDER, 9000);
     static { upgrades.add(ABILITY_FORCED_FLIGHT); }
-    public static final Upgrade ABILITY_CIVILIZATION = new Upgrade(506, "Ant Civilization", "Ant Society", "Allows the civilization management screen to see all the colonies in your civilization.", ABILITY_SPREAD, 0);
-    static { upgrades.add(ABILITY_CIVILIZATION); }
-    public static final Upgrade ABILITY_TRADE = new Upgrade(507, "Trade Routes", "Ant Trade", "Allows your colonies to trade resources with each other, manageable in the civilization management screen.", ABILITY_CIVILIZATION, 0);
+    public static final Upgrade ABILITY_DYNASTY = new Upgrade(506, "Ant Dynasty", "Ant Society", "Allows the dynasty management screen to see all the colonies in your dynasty.", ABILITY_SPREAD, 0);
+    static { upgrades.add(ABILITY_DYNASTY); }
+    public static final Upgrade ABILITY_TRADE = new Upgrade(507, "Trade Routes", "Ant Trade", "Allows your colonies to trade resources with each other, manageable in the dynasty management screen.", ABILITY_DYNASTY, 0);
     static { upgrades.add(ABILITY_TRADE); }
     public static final Upgrade ABILITY_SPREAD_2 = new Upgrade(508, "Advanced Spreading", "Mass Colonization", "Allows you to build more satellite colonies at the time, taking away the limit.", ABILITY_SPREAD, 0);
     static { upgrades.add(ABILITY_SPREAD_2); }
-    public static final Upgrade ABILITY_AUTOMATION = new Upgrade(509, "Automation", "Ant Automation", "Allows your colonies to be automated in the civilization management screen.", ABILITY_CIVILIZATION, 0);
+    public static final Upgrade ABILITY_AUTOMATION = new Upgrade(509, "Automation", "Ant Automation", "Allows your colonies to be automated in the dynasty management screen.", ABILITY_DYNASTY, 0);
     static { upgrades.add(ABILITY_AUTOMATION); }
     public static final Upgrade ABILITY_TUNNELS =  new Upgrade(510, "Tunnel Networks", "Subterranean Highways", "Allows your colonies to build tunnel networks between each other for faster and safer resource transport.", ABILITY_TRADE, 150000);    
     public static final Upgrade ABILITY_ABILITY = new Upgrade(900, "Ability Menu", "Abilities Unlocked", "Allows you to see the abilities menu.", null, 0);

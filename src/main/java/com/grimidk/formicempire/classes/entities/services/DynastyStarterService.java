@@ -1,11 +1,11 @@
 package com.grimidk.formicempire.classes.entities.services;
 
-import com.grimidk.formicempire.classes.entities.Civilization;
+import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 
-public class CivilizationStarterService {
+public class DynastyStarterService {
     
-    public void initializeCivilization(Civilization civ) {
+    public void initializeDynasty(Dynasty civ) {
         System.out.println("Initialized Civ: " + civ.getName());
         
         civ.unlockUpgrade(GameUnlocks.TYPE_EGG);

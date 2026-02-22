@@ -12,7 +12,7 @@ import javax.swing.SwingUtilities;
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
-import com.grimidk.formicempire.classes.entities.Civilization;
+import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
@@ -326,28 +326,28 @@ public class SaveManager {
         
         List<Savefile.SavedHex> hexList = new ArrayList<>();
         List<Savefile.SavedColony> colonyList = new ArrayList<>();
-        List<Savefile.SavedCivilization> civList = new ArrayList<>();
+        List<Savefile.SavedDynasty> dynastyList = new ArrayList<>();
 
-        // Save Civilizations
-        if (w.getCivilizations() != null) {
-            for (Civilization civ : w.getCivilizations()) {
-                Savefile.SavedCivilization sc = new Savefile.SavedCivilization();
-                sc.id = civ.getId();
-                sc.name = civ.getName();
-                sc.isPlayer = civ.isPlayer();
-                sc.rankName = civ.getRank() != null ? civ.getRank().getName() : "Ant";
-                sc.researchPoints = civ.getResearchPoints();
-                sc.speciesId = civ.getSpecies() != null ? civ.getSpecies().getId() : 1;
+        // Save Dynastys
+        if (w.getDynastys() != null) {
+            for (Dynasty dynasty : w.getDynastys()) {
+                Savefile.SavedDynasty sc = new Savefile.SavedDynasty();
+                sc.id = dynasty.getId();
+                sc.name = dynasty.getName();
+                sc.isPlayer = dynasty.isPlayer();
+                sc.rankName = dynasty.getRank() != null ? dynasty.getRank().getName() : "Ant";
+                sc.researchPoints = dynasty.getResearchPoints();
+                sc.speciesId = dynasty.getSpecies() != null ? dynasty.getSpecies().getId() : 1;
                 
-                for(Upgrade u : civ.getUnlockedUpgrades()) {
+                for(Upgrade u : dynasty.getUnlockedUpgrades()) {
                     sc.unlockedUpgradeIds.add(u.getId());
                 }
                 
-                sc.deathStatistics = new HashMap<>(civ.getGlobalDeathStatistics());
-                civList.add(sc);
+                sc.deathStatistics = new HashMap<>(dynasty.getGlobalDeathStatistics());
+                dynastyList.add(sc);
             }
         }
-        save.setCivilizations(civList);
+        save.setDynastys(dynastyList);
 
         // Save Hexes & Colonies
         if (w.getHexes() != null) {
@@ -363,7 +363,7 @@ public class SaveManager {
                     
                     // ID & Location
                     sc.id = c.getId();
-                    sc.civId = (c.getCivilization() != null) ? c.getCivilization().getId() : 0;
+                    sc.dynastyId = (c.getDynasty() != null) ? c.getDynasty().getId() : 0;
                     sc.name = c.getName();
                     sc.rankName = c.getRank() != null ? c.getRank().getName() : "Colony";
                     sc.isPlayer = c.isPlayer();
@@ -481,13 +481,13 @@ public class SaveManager {
         w.write(","); 
         w.newLine();
         
-        // - Civilizations -
-        w.write("  \"civilizations\": [");
+        // - Dynastys -
+        w.write("  \"dynastys\": [");
         w.newLine();
-        List<Savefile.SavedCivilization> civs = s.getCivilizations();
-        if (civs != null) {
-             for(int i=0; i<civs.size(); i++) {
-                writeSavedCivilization(w, civs.get(i), (i == civs.size() - 1));
+        List<Savefile.SavedDynasty> dynastys = s.getDynastys();
+        if (dynastys != null) {
+             for(int i=0; i<dynastys.size(); i++) {
+                writeSavedDynasty(w, dynastys.get(i), (i == dynastys.size() - 1));
             }
         }
         w.write("  ],");
@@ -510,7 +510,7 @@ public class SaveManager {
         w.newLine();
     }
     
-    private void writeSavedCivilization(BufferedWriter w, Savefile.SavedCivilization sc, boolean isLast) throws IOException {
+    private void writeSavedDynasty(BufferedWriter w, Savefile.SavedDynasty sc, boolean isLast) throws IOException {
         w.write("    {");
         w.newLine();
         writeJsonLine(w, "id", sc.id, false);
@@ -531,7 +531,7 @@ public class SaveManager {
         w.newLine();
         // ID & Loc
         writeJsonLine(w, "id", sc.id, false);
-        writeJsonLine(w, "civId", sc.civId, false);
+        writeJsonLine(w, "dynastyId", sc.dynastyId, false);
         writeJsonLine(w, "name", sc.name, false);
         writeJsonLine(w, "rank", sc.rankName, false);
         writeJsonLine(w, "isPlayer", sc.isPlayer, false);
@@ -628,8 +628,8 @@ public class SaveManager {
 
         s.setWorldHexes(deserializeJsonToHexes(rootMap.get("worldHexes")));
         
-        List<Savefile.SavedCivilization> civs = deserializeJsonToCivilizations(rootMap.get("civilizations"));
-        s.setCivilizations(civs);
+        List<Savefile.SavedDynasty> dynastys = deserializeJsonToDynastys(rootMap.get("dynastys"));
+        s.setDynastys(dynastys);
         
         List<Savefile.SavedColony> colonies = deserializeJsonToColonies(rootMap.get("colonies"));
         s.setColonies(colonies);
@@ -680,8 +680,8 @@ public class SaveManager {
         }
     }
     
-    private List<Savefile.SavedCivilization> deserializeJsonToCivilizations(String jsonArray) {
-        List<Savefile.SavedCivilization> list = new ArrayList<>();
+    private List<Savefile.SavedDynasty> deserializeJsonToDynastys(String jsonArray) {
+        List<Savefile.SavedDynasty> list = new ArrayList<>();
         if (jsonArray == null || !jsonArray.startsWith("[")) return list;
         
         String content = jsonArray.substring(1, jsonArray.lastIndexOf("]"));        
@@ -693,8 +693,8 @@ public class SaveManager {
             if (c == '}') {
                 braceDepth--;
                 if (braceDepth == 0) {
-                    String civJson = content.substring(start, i+1);
-                    list.add(parseCivilizationObject(civJson));
+                    String dynastyJson = content.substring(start, i+1);
+                    list.add(parseDynastyObject(dynastyJson));
                     while(i+1 < content.length() && (content.charAt(i+1) == ',' || Character.isWhitespace(content.charAt(i+1)))) i++;
                     start = i+1;
                 }
@@ -703,8 +703,8 @@ public class SaveManager {
         return list;
     }
     
-    private Savefile.SavedCivilization parseCivilizationObject(String json) {
-        Savefile.SavedCivilization sc = new Savefile.SavedCivilization();
+    private Savefile.SavedDynasty parseDynastyObject(String json) {
+        Savefile.SavedDynasty sc = new Savefile.SavedDynasty();
         Map<String, String> map = parseTopLevelJson(json);
         sc.id = Integer.parseInt(map.getOrDefault("id", "0"));
         sc.name = map.getOrDefault("name", "Empire");
@@ -745,7 +745,7 @@ public class SaveManager {
         Map<String, String> map = parseTopLevelJson(json); 
         
         sc.id = Integer.parseInt(map.getOrDefault("id", "0"));
-        sc.civId = Integer.parseInt(map.getOrDefault("civId", "0"));
+        sc.dynastyId = Integer.parseInt(map.getOrDefault("dynastyId", "0"));
         sc.name = map.getOrDefault("name", "Colony");
         sc.rankName = map.getOrDefault("rank", "Colony");
         sc.isPlayer = Boolean.parseBoolean(map.getOrDefault("isPlayer", "false"));

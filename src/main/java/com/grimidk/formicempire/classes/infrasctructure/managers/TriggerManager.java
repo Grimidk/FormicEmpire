@@ -81,7 +81,7 @@ public class TriggerManager {
         checkBruteRoleUnlock();
         checkSpreadAbilityUnlock();
         checkScoutRoleUnlock();
-        checkCivilizationTriggers();
+        checkDynastyTriggers();
         checkAbilityMenuHint();
     }
 
@@ -264,15 +264,15 @@ public class TriggerManager {
         }
     }
     
-    private void checkCivilizationTriggers() {
-        if (playerColony.getCivilization() == null) return;
+    private void checkDynastyTriggers() {
+        if (playerColony.getDynasty() == null) return;
         
-        int colonyCount = playerColony.getCivilization().getColonies().size();
+        int colonyCount = playerColony.getDynasty().getColonies().size();
 
-        if (colonyCount >= 2 && !playerColony.hasUpgrade(GameUnlocks.ABILITY_CIVILIZATION)) {
-            fireTrigger(GameUnlocks.ABILITY_CIVILIZATION,
-                "Ant Civilization",
-                "Your civilization grows! With a second colony established, you can now manage your entire Civilization. Press (S) to open the Civilization menu.");
+        if (colonyCount >= 2 && !playerColony.hasUpgrade(GameUnlocks.ABILITY_DYNASTY)) {
+            fireTrigger(GameUnlocks.ABILITY_DYNASTY,
+                "Ant Dynasty",
+                "Your dynasty grows! With a second colony established, you can now manage your entire Dynasty. Press (S) to open the Dynasty menu.");
         }
         
         if (colonyCount >= 3 && !playerColony.hasUpgrade(GameUnlocks.ABILITY_TRADE)) {
@@ -290,7 +290,7 @@ public class TriggerManager {
         if (colonyCount >= 7 && !playerColony.hasUpgrade(GameUnlocks.ABILITY_AUTOMATION)) {
             fireTrigger(GameUnlocks.ABILITY_AUTOMATION,
                 "Automation Era",
-                "Your civilization is vast. You can now automate colony management to focus on expansion.");
+                "Your dynasty is vast. You can now automate colony management to focus on expansion.");
         }
     }
 

@@ -42,7 +42,7 @@ public class Savefile implements Serializable {
     // --- Collections ---
     private List<SavedHex> worldHexes;
     private List<SavedColony> colonies;
-    private List<SavedCivilization> civilizations;
+    private List<SavedDynasty> dynastys;
 
     public Savefile(int id, String name) {
         this.id = id;
@@ -50,7 +50,7 @@ public class Savefile implements Serializable {
         this.timestamp = System.currentTimeMillis();
         this.worldHexes = new ArrayList<>();
         this.colonies = new ArrayList<>();
-        this.civilizations = new ArrayList<>();
+        this.dynastys = new ArrayList<>();
         this.minute = 0;
         this.hour = 0;
         this.day = 1;
@@ -59,7 +59,7 @@ public class Savefile implements Serializable {
         this.worldRadius = 8;
     }
 
-    public static class SavedCivilization implements Serializable {
+    public static class SavedDynasty implements Serializable {
         private static final long serialVersionUID = 1L;
         public int id;
         public String name;
@@ -75,7 +75,7 @@ public class Savefile implements Serializable {
         private static final long serialVersionUID = 1L;
         
         public int id;
-        public int civId;
+        public int dynastyId;
         public String name;
         public String rankName;
         public boolean isPlayer;
@@ -208,6 +208,6 @@ public class Savefile implements Serializable {
     public List<SavedColony> getColonies() { return colonies; }
     public void setColonies(List<SavedColony> colonies) { this.colonies = colonies; }
 
-    public List<SavedCivilization> getCivilizations() { return civilizations; }
-    public void setCivilizations(List<SavedCivilization> civilizations) { this.civilizations = civilizations; }
+    public List<SavedDynasty> getDynastys() { return dynastys; }
+    public void setDynastys(List<SavedDynasty> dynastys) { this.dynastys = dynastys; }
 }

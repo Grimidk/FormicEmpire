@@ -5,7 +5,7 @@ To Fix (By decreasing priority) :
 	late game performance (physics too taxing, may need to deload ants outside of area or update less when >50k ants) maybe look into LWJGL
 
 	Game Breaking:
-	re-colonization breaks game (colony dies and gets recolonized)
+	(none right now)
 	
 	High:
 	(none right now)
@@ -13,14 +13,15 @@ To Fix (By decreasing priority) :
 	Mid:
 	hex borders not clear, need to be double wide
 	npc shouldn't ranch in bad aphid environment and herd while not active
-	maybe rename civilizations to dinasties
-	run research civ wide
-	improve player automation, dont research if excess points, prioritize building, better ratios of roles in general, copy type ratios
+	maybe rename dynastys to dinasties
+	improve player automation, dont research if excess points, prioritize building, better ratios of roles in general, copy type ratios from parent colony
+	passives not taken into account for colony panel, refactor
 
 	Low:
 	builders act weird af in build zone
 	breeders go out of the colony in nuptial
-	use savefile name for colony and civilization name and random names for colonies 
+	use savefile name for colony and dynasty name and random names for colonies 
+	stat panel has a bunch of wrong names
 
 	Can't reproduce:
 	hex changing not happening (reported by gopher)
@@ -28,7 +29,7 @@ To Fix (By decreasing priority) :
 To Feature (to be done in order):
 Needed for launch (v1.0) (Launch Version):
 	Priority:
-	first round of species and assimilations( multi queen, majors ) (and handle civ death to earn civs)
+	first round of species and assimilations( multi queen, majors ) (and handle dynasty death to earn assimilation)
 	trade routes (async with roles and incoming outgoing recurrent and one time and travel time and danger level and boring tunnels)
 
 	Everything else :
