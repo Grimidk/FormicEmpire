@@ -13,7 +13,6 @@ To Fix (By decreasing priority) :
 	Mid:
 	hex borders not clear, need to be double wide
 	npc shouldn't ranch in bad aphid environment and herd while not active
-	maybe rename dynastys to dinasties
 	improve player automation, dont research if excess points, prioritize building, better ratios of roles in general, copy type ratios from parent colony
 	passives not taken into account for colony panel, refactor
 
@@ -21,7 +20,6 @@ To Fix (By decreasing priority) :
 	builders act weird af in build zone
 	breeders go out of the colony in nuptial
 	use savefile name for colony and dynasty name and random names for colonies 
-	stat panel has a bunch of wrong names
 
 	Can't reproduce:
 	hex changing not happening (reported by gopher)
@@ -85,5 +83,5 @@ Post launch (v1.1) (Improvements Update):
 	global stats from all players (needs api and consent)
 	socials screen with discord server and instagram
 
-Post launch (v1.2) (Dynastyilization Update):
+Post launch (v1.2) (Civilization Update):
 	(Secret for now)

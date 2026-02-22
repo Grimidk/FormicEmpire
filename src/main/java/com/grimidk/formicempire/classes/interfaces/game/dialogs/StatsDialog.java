@@ -43,7 +43,7 @@ public class StatsDialog extends ZeroDialog {
     private final Runnable refreshTask = this::liveUpdate;
 
     public StatsDialog(JFrame owner, Colony colony, Engine engine) {
-        super(owner, "Colony Statistics", new Dimension(800, 600));
+        super(owner, "Statistics", new Dimension(800, 600));
         this.colony = colony;
         this.engine = engine;
         this.dynastyStatsService = new DynastyStatService(); 
@@ -98,8 +98,6 @@ public class StatsDialog extends ZeroDialog {
             
             @Override
             public Class<?> getColumnClass(int columnIndex) {
-                // Scan rows to find the first non-null value to determine class
-                // This fixes the issue where the first row has a null icon, causing the column to be treated as Object
                 for (int row = 0; row < getRowCount(); row++) {
                     Object val = getValueAt(row, columnIndex);
                     if (val != null) {
@@ -234,10 +232,10 @@ public class StatsDialog extends ZeroDialog {
         }
 
         // Basic Info
-        model.addRow(new Object[]{null, "Empire", "Name", dynasty.getName()});
-        model.addRow(new Object[]{dynasty.getRank().getIcon(), "Empire", "Rank", dynasty.getRank().getName()}); 
-        model.addRow(new Object[]{null, "Empire", "Total Colonies", dynastyStatsService.getTotalColonies(dynasty)});
-        model.addRow(new Object[]{null, "Empire", "Global Population", dynastyStatsService.getTotalPopulation(dynasty)});
+        model.addRow(new Object[]{null, "Dynasty", "Name", dynasty.getName()});
+        model.addRow(new Object[]{dynasty.getRank().getIcon(), "Dynasty", "Rank", dynasty.getRank().getName()}); 
+        model.addRow(new Object[]{null, "Dynasty", "Total Colonies", dynastyStatsService.getTotalColonies(dynasty)});
+        model.addRow(new Object[]{null, "Dynasty", "Global Population", dynastyStatsService.getTotalPopulation(dynasty)});
 
         // Unlocks
         model.addRow(new Object[]{null, null, "------", "------"});

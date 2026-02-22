@@ -37,7 +37,7 @@ public class HelpPanel extends JPanel {
         // Add tabs
         mainTabs.addTab("Welcome", createWelcomePanel());
         mainTabs.addTab("Getting Started", createGettingStartedPanel());
-        mainTabs.addTab("Empire Management", createEmpireManagementPanel());
+        mainTabs.addTab("Dynasty Management", createEmpireManagementPanel());
         mainTabs.addTab("Hotkeys", createHotkeysPanel());
         mainTabs.addTab("Ant Types", createAntTypesPanel());
         mainTabs.addTab("Upgrades", createDictionaryPanel(GameUnlocks.getUpgrades(), null));
@@ -146,11 +146,11 @@ public class HelpPanel extends JPanel {
 
     private JComponent createEmpireManagementPanel() {
         String empireInfo = "<html><div style='width: 450px; font-size: 11pt;'>" +
-                "<b>Expanding Your Empire:</b><br>" +
+                "<b>Expanding Your Dynasty:</b><br>" +
                 "Once you unlock the <b>Breeder</b> role for Princesses, you can perform Nuptial Flights to spread to adjacent lands via the <b>World Map (I)</b> .<br>" +
                 "<i>Tip: Keep an eye on the sky! Rare Solar or Lunar Eclipses will trigger spontaneous, free Nuptial Flights for your colony.</i><br><br>" +
                 "<b>Dynasty Milestones:</b><br>" +
-                "- <b>2 Colonies:</b> Unlocks the <b>Dynasty Menu (S)</b> to view and manage your entire empire.<br>" +
+                "- <b>2 Colonies:</b> Unlocks the <b>Dynasty Menu (S)</b> to view and manage your entire dynasty.<br>" +
                 "- <b>3 Colonies:</b> Unlocks <b>Trade Routes</b>, allowing you to transport resources between your nests.<br>" +
                 "- <b>5 Colonies:</b> Unlocks <b>Mass Colonization</b>, removing the limit on establishing satellite colonies.<br>" +
                 "- <b>7 Colonies:</b> Unlocks <b>Automation</b>. You can set NPC colonies to manage their own roles and building queues automatically.<br><br>" +
@@ -419,7 +419,7 @@ public class HelpPanel extends JPanel {
 
     public static void showTutorialDialog(Component parent) {
         Window window = SwingUtilities.getWindowAncestor(parent);
-        JDialog dialog = new JDialog(window, "Welcome to Formic Empire!", Dialog.ModalityType.APPLICATION_MODAL);
+        JDialog dialog = new JDialog(window, "Welcome to Formic Dynasty!", Dialog.ModalityType.APPLICATION_MODAL);
         dialog.setLayout(new BorderLayout());
 
         JPanel cardPanel = new JPanel(new CardLayout());
@@ -459,12 +459,12 @@ public class HelpPanel extends JPanel {
         page3.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         page3.add(new JLabel(threatInfo), BorderLayout.CENTER);
 
-        // --- Page 4: Empire Management ---
+        // --- Page 4: Dynasty Management ---
         String empireInfo = "<html><p style='width: 350px; font-size: 11pt;'>" +
-                "<b>Empire Management:</b><br><br>" +
+                "<b>Dynasty Management:</b><br><br>" +
                 "As your colony thrives, you will unlock <b>Breeder</b> Princesses. These allow you to establish satellite colonies via the <b>World Map (I)</b> .<br>" +
                 "<i>Tip: Keep an eye on the sky! Rare Solar or Lunar Eclipses will trigger spontaneous, free Nuptial Flights!</i><br><br>" +
-                "Founding multiple colonies unlocks the <b>Dynasty Menu (S)</b>. Reaching certain milestones will allow you to construct <b>Trade Routes</b>, remove spreading limits, and even <b>Automate</b> your expanding empire!" +
+                "Founding multiple colonies unlocks the <b>Dynasty Menu (S)</b>. Reaching certain milestones will allow you to construct <b>Trade Routes</b>, remove spreading limits, and even <b>Automate</b> your expanding dynasty!" +
                 "</p></html>";
         JPanel page4 = new JPanel(new BorderLayout());
         page4.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));

@@ -262,7 +262,7 @@ public class World {
         Map<String, Hex> hexMap = new HashMap<>();
         ColonyStarterService starterService = new ColonyStarterService();
         
-        Dynasty playerDynasty = new Dynasty(this.dynastyIdCounter++, "Player Empire", true, GameConstants.SPECIES_OMNI);
+        Dynasty playerDynasty = new Dynasty(this.dynastyIdCounter++, "Player Dynasty", true, GameConstants.SPECIES_OMNI);
         playerDynasty.getStarterService().initializeDynasty(playerDynasty);
         playerDynasty.addColony(startColony);
         this.dynastys.add(playerDynasty);
@@ -495,7 +495,7 @@ public class World {
                     loadedDynastys.get(sc.dynastyId).addColony(c);
                 } else {
                     int newDynastyId = ++maxDynastyId;
-                    Dynasty adHocDynasty = new Dynasty(newDynastyId, c.isPlayer() ? "Player Empire" : "Wild Empire", c.isPlayer(), GameConstants.SPECIES_OMNI);
+                    Dynasty adHocDynasty = new Dynasty(newDynastyId, c.isPlayer() ? "Player Dynasty" : "Wild Dynasty", c.isPlayer(), GameConstants.SPECIES_OMNI);
                     adHocDynasty.getStarterService().initializeDynasty(adHocDynasty);
                     adHocDynasty.addColony(c);
                     this.dynastys.add(adHocDynasty);

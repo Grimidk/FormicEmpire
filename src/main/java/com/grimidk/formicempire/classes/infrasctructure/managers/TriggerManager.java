@@ -284,7 +284,7 @@ public class TriggerManager {
         if (colonyCount >= 5 && !playerColony.hasUpgrade(GameUnlocks.ABILITY_SPREAD_2)) {
             fireTrigger(GameUnlocks.ABILITY_SPREAD_2,
                 "Mass Colonization",
-                "Your empire is expanding rapidly! The limit on new colonies has been removed.");
+                "Your dynasty is expanding rapidly! The limit on new colonies has been removed.");
         }
         
         if (colonyCount >= 7 && !playerColony.hasUpgrade(GameUnlocks.ABILITY_AUTOMATION)) {

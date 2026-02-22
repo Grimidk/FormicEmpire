@@ -707,7 +707,7 @@ public class SaveManager {
         Savefile.SavedDynasty sc = new Savefile.SavedDynasty();
         Map<String, String> map = parseTopLevelJson(json);
         sc.id = Integer.parseInt(map.getOrDefault("id", "0"));
-        sc.name = map.getOrDefault("name", "Empire");
+        sc.name = map.getOrDefault("name", "Dynasty");
         sc.isPlayer = Boolean.parseBoolean(map.getOrDefault("isPlayer", "false"));
         sc.rankName = map.getOrDefault("rank", "Ant");
         sc.speciesId = Integer.parseInt(map.getOrDefault("speciesId", "1"));
