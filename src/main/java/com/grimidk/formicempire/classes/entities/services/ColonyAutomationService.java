@@ -31,8 +31,12 @@ public class ColonyAutomationService {
 
         checkAndConstructBuildings(colony);
     }
+    
+    public void runAutoBuild(Colony colony) {
+        checkAndConstructBuildings(colony);
+    }
 
-    private void checkAndConstructBuildings(Colony colony) {
+    public void checkAndConstructBuildings(Colony colony) {
         if (colony.getCurrentBuildingProject() != null) return;
 
         List<Building> candidates = new ArrayList<>();

@@ -81,6 +81,7 @@ public class Savefile implements Serializable {
         public boolean isPlayer;
         public boolean isCapital;
         public boolean isAutomated;
+        public boolean autoBuildEnabled;
         public int age;
         public int q; 
         public int r;        

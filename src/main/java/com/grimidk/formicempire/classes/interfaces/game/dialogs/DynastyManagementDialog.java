@@ -18,6 +18,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
@@ -78,9 +79,12 @@ public class DynastyManagementDialog extends ZeroDialog {
         boolean hasTrade = dynasty.hasUpgrade(GameUnlocks.ABILITY_TRADE);
         int expectedTabs = 1 + (hasTrade ? 1 : 0);        
         boolean currentAuto = dynasty.hasUpgrade(GameUnlocks.ABILITY_AUTOMATION);
-        boolean panelAuto = (overviewPanel != null) && overviewPanel.isAutomationEnabledInTable();
+        boolean currentAutoBuild = dynasty.hasUpgrade(GameUnlocks.ABILITY_MANAGEMENT);
+        
+        boolean panelAuto = (overviewPanel != null) && overviewPanel.isShowAutomation();
+        boolean panelAutoBuild = (overviewPanel != null) && overviewPanel.isShowAutoBuild();
 
-        if (tabbedPane.getTabCount() != expectedTabs || currentAuto != panelAuto) {
+        if (tabbedPane.getTabCount() != expectedTabs || currentAuto != panelAuto || currentAutoBuild != panelAutoBuild) {
             refreshDialog();
         } else {
             Component selected = tabbedPane.getSelectedComponent();
@@ -97,15 +101,15 @@ public class DynastyManagementDialog extends ZeroDialog {
 
         tabbedPane.removeAll();
 
-        // --- Overview Tab ---
         boolean currentAuto = dynasty.hasUpgrade(GameUnlocks.ABILITY_AUTOMATION);
-        if (overviewPanel == null || overviewPanel.isAutomationEnabledInTable() != currentAuto) {
-            overviewPanel = new OverviewPanel(currentAuto);
+        boolean currentAutoBuild = dynasty.hasUpgrade(GameUnlocks.ABILITY_MANAGEMENT);
+        
+        if (overviewPanel == null || overviewPanel.isShowAutomation() != currentAuto || overviewPanel.isShowAutoBuild() != currentAutoBuild) {
+            overviewPanel = new OverviewPanel(currentAutoBuild, currentAuto);
         }
         overviewPanel.updateData();
         tabbedPane.addTab("Overview", overviewPanel);
 
-        // --- Trade Tab ---
         if (dynasty.hasUpgrade(GameUnlocks.ABILITY_TRADE)) {
             if (tradePanel == null) {
                 tradePanel = new TradePanel();
@@ -131,12 +135,10 @@ public class DynastyManagementDialog extends ZeroDialog {
 
         @Override
         public void liveUpdate() {
-            // Placeholder
         }
 
         @Override
         public void updateData() {
-            // Placeholder
         }
     }
 
@@ -144,58 +146,73 @@ public class DynastyManagementDialog extends ZeroDialog {
         private JTable table;
         private DefaultTableModel model;
         private List<Colony> displayedColonies;
+        private final boolean showAutoBuild;
         private final boolean showAutomation;
+        private int autoBuildCol = -1;
+        private int automationCol = -1;
+        private int actionCol = -1;
 
-        public OverviewPanel(boolean showAutomation) {
+        public OverviewPanel(boolean showAutoBuild, boolean showAutomation) {
             super(new BorderLayout());
+            this.showAutoBuild = showAutoBuild;
             this.showAutomation = showAutomation;
             this.displayedColonies = new ArrayList<>();
             initUI();
         }
 
-        public boolean isAutomationEnabledInTable() {
+        public boolean isShowAutomation() {
             return showAutomation;
         }
 
+        public boolean isShowAutoBuild() {
+            return showAutoBuild;
+        }
+
         private void initUI() {
-            String[] columns;
+            List<String> cols = new ArrayList<>(Arrays.asList("", "Rank", "Type", "Name", "Population", "Age (Days)", "Biome"));
+            
+            if (showAutoBuild) {
+                autoBuildCol = cols.size();
+                cols.add("Auto-Build");
+            }
             if (showAutomation) {
-                columns = new String[]{"", "Rank", "Type", "Name", "Population", "Age (Days)", "Biome", "Automation", "Actions/Status"};
-            } else {
-                columns = new String[]{"", "Rank", "Type", "Name", "Population", "Age (Days)", "Biome", "Actions/Status"};
+                automationCol = cols.size();
+                cols.add("Automation");
             }
             
-            model = new DefaultTableModel(columns, 0) {
+            actionCol = cols.size();
+            cols.add("Actions/Status");
+
+            model = new DefaultTableModel(cols.toArray(new String[0]), 0) {
                 @Override
                 public Class<?> getColumnClass(int columnIndex) {
                     if (columnIndex == 0) return Icon.class;
-                    
-                    if (showAutomation) {
-                        if (columnIndex == 4) return Integer.class; 
-                        if (columnIndex == 6) return Biome.class; 
-                        if (columnIndex == 7) return Boolean.class;
-                    } else {
-                        if (columnIndex == 4) return Integer.class; 
-                        if (columnIndex == 6) return Biome.class; 
-                    }
+                    if (columnIndex == 4) return Integer.class; 
+                    if (columnIndex == 6) return Biome.class; 
+                    if (columnIndex == autoBuildCol || columnIndex == automationCol) return Boolean.class;
                     return Object.class;
                 }
 
                 @Override
                 public boolean isCellEditable(int row, int column) {
-                    if (showAutomation) {
-                        return column == 7 || column == 8;
-                    } else {
-                        return column == 7;
-                    }
+                    return column == autoBuildCol || column == automationCol || column == actionCol;
                 }
             };
 
             model.addTableModelListener(e -> {
-                if (showAutomation && e.getColumn() == 7 && e.getFirstRow() >= 0 && e.getFirstRow() < displayedColonies.size()) {
-                    boolean isChecked = (Boolean) model.getValueAt(e.getFirstRow(), 7);
-                    Colony c = displayedColonies.get(e.getFirstRow());
-                    c.setAutomationEnabled(isChecked);
+                int col = e.getColumn();
+                int row = e.getFirstRow();
+                
+                // Ignore full-row updates (like row insertions) where column is -1
+                if (col < 0) return;
+                
+                if (row >= 0 && row < displayedColonies.size()) {
+                    Colony c = displayedColonies.get(row);
+                    if (col == autoBuildCol) {
+                        c.setAutoBuildEnabled((Boolean) model.getValueAt(row, col));
+                    } else if (col == automationCol) {
+                        c.setAutomationEnabled((Boolean) model.getValueAt(row, col));
+                    }
                 }
             });
 
@@ -206,6 +223,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             table.setIntercellSpacing(new Dimension(0, 1));
             table.getTableHeader().setReorderingAllowed(false);
             table.setFillsViewportHeight(true);
+            
             table.getColumnModel().getColumn(0).setMaxWidth(50);
             table.getColumnModel().getColumn(0).setPreferredWidth(50);
             table.getColumnModel().getColumn(1).setPreferredWidth(100);
@@ -217,16 +235,16 @@ public class DynastyManagementDialog extends ZeroDialog {
             table.getColumnModel().getColumn(5).setPreferredWidth(80); 
             table.getColumnModel().getColumn(6).setCellRenderer(new BiomeRenderer());
 
-            if (showAutomation) {
-                table.getColumnModel().getColumn(7).setMaxWidth(100);
-                table.getColumnModel().getColumn(8).setMinWidth(160); 
-                table.getColumnModel().getColumn(8).setCellRenderer(new ActionPanelRenderer());
-                table.getColumnModel().getColumn(8).setCellEditor(new ActionPanelEditor());
-            } else {
-                table.getColumnModel().getColumn(7).setMinWidth(160); 
-                table.getColumnModel().getColumn(7).setCellRenderer(new ActionPanelRenderer());
-                table.getColumnModel().getColumn(7).setCellEditor(new ActionPanelEditor());
+            if (showAutoBuild) {
+                table.getColumnModel().getColumn(autoBuildCol).setMaxWidth(100);
             }
+            if (showAutomation) {
+                table.getColumnModel().getColumn(automationCol).setMaxWidth(100);
+            }
+
+            table.getColumnModel().getColumn(actionCol).setMinWidth(160); 
+            table.getColumnModel().getColumn(actionCol).setCellRenderer(new ActionPanelRenderer());
+            table.getColumnModel().getColumn(actionCol).setCellEditor(new ActionPanelEditor());
 
             JScrollPane scrollPane = new JScrollPane(table);
             add(scrollPane, BorderLayout.CENTER);
@@ -266,31 +284,19 @@ public class DynastyManagementDialog extends ZeroDialog {
                 
                 String typeStr = colony.isCapital() ? "Capital" : "Satellite";
 
-                Object[] rowData;
-                if (showAutomation) {
-                    rowData = new Object[] {
-                        colony.getRank().getIcon(),      
-                        colony.getRank().getName(),
-                        typeStr,
-                        colony.getName(),                 
-                        colony.getAntTotal(),              
-                        colony.getAge(),                   
-                        biome,                              
-                        colony.isAutomationEnabled(),       
-                        colony                      
-                    };
-                } else {
-                    rowData = new Object[] {
-                        colony.getRank().getIcon(),      
-                        colony.getRank().getName(),
-                        typeStr,
-                        colony.getName(),                 
-                        colony.getAntTotal(),              
-                        colony.getAge(),                   
-                        biome,                              
-                        colony                      
-                    };
-                }
+                Object[] rowData = new Object[model.getColumnCount()];
+                rowData[0] = colony.getRank().getIcon();
+                rowData[1] = colony.getRank().getName();
+                rowData[2] = typeStr;
+                rowData[3] = colony.getName();
+                rowData[4] = colony.getAntTotal();
+                rowData[5] = colony.getAge();
+                rowData[6] = biome;
+                
+                if (showAutoBuild) rowData[autoBuildCol] = colony.isAutoBuildEnabled();
+                if (showAutomation) rowData[automationCol] = colony.isAutomationEnabled();
+                
+                rowData[actionCol] = colony;
                 
                 model.addRow(rowData);
             }
@@ -333,7 +339,6 @@ public class DynastyManagementDialog extends ZeroDialog {
             setLayout(new CardLayout());
             setOpaque(true);
 
-            // Active View
             JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 5));
             btnPanel.setOpaque(false);
             editBtn = new JButton("Edit");
@@ -343,7 +348,6 @@ public class DynastyManagementDialog extends ZeroDialog {
             btnPanel.add(editBtn);
             btnPanel.add(viewBtn);
 
-            // Loading View
             JPanel progressPanel = new JPanel(new BorderLayout());
             progressPanel.setOpaque(false);
             progressPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -399,7 +403,6 @@ public class DynastyManagementDialog extends ZeroDialog {
             container = new JPanel(cardLayout);
             container.setOpaque(true);
 
-            // Buttons
             btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 5));
             btnPanel.setOpaque(false);
 
@@ -420,7 +423,6 @@ public class DynastyManagementDialog extends ZeroDialog {
             btnPanel.add(editBtn);
             btnPanel.add(viewBtn);
 
-            // Progress
             progressPanel = new JPanel(new BorderLayout());
             progressPanel.setOpaque(false);
             progressPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));

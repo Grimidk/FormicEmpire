@@ -164,6 +164,8 @@ public final class GameUnlocks {
     public static final Upgrade ABILITY_AUTOMATION = new Upgrade(509, "Automation", "Ant Automation", "Allows your colonies to be automated in the dynasty management screen.", ABILITY_DYNASTY, 0);
     static { upgrades.add(ABILITY_AUTOMATION); }
     public static final Upgrade ABILITY_TUNNELS =  new Upgrade(510, "Tunnel Networks", "Subterranean Highways", "Allows your colonies to build tunnel networks between each other for faster and safer resource transport.", ABILITY_TRADE, 150000);    
+    public static final Upgrade ABILITY_MANAGEMENT = new Upgrade(511, "Colony Management", "Decentralized Command", "Allows you to let colonies to build by themselves without your direct input.", ABILITY_DYNASTY, 0);
+    static { upgrades.add(ABILITY_MANAGEMENT); }
     public static final Upgrade ABILITY_ABILITY = new Upgrade(900, "Ability Menu", "Abilities Unlocked", "Allows you to see the abilities menu.", null, 0);
     static { upgrades.add(ABILITY_ABILITY); }
 

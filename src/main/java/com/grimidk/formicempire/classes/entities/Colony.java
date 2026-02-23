@@ -38,6 +38,7 @@ public class Colony {
     private ColonyRank rank;
     private boolean isActive;
     private boolean automationEnabled = false; 
+    private boolean autoBuildEnabled = false;
     private boolean isCapital = false;
     private int age;
     
@@ -142,6 +143,7 @@ public class Colony {
         this.hatchRateDrone = 0.0f;
         this.hatchRatePrincess = 0.0f;
         this.isActive = false;
+        this.autoBuildEnabled = false;
     }
 
     private void initializeBuildings() {
@@ -198,6 +200,7 @@ public class Colony {
         
         this.isCapital = savedColony.isCapital;
         this.automationEnabled = savedColony.isAutomated;
+        this.autoBuildEnabled = savedColony.autoBuildEnabled;
         this.age = savedColony.age;
         this.totalDeaths = savedColony.totalDeaths;
         
@@ -399,6 +402,8 @@ public class Colony {
     public void setActive(boolean isActive) { this.isActive = isActive; }
     public boolean isAutomationEnabled() { return automationEnabled; }
     public void setAutomationEnabled(boolean automationEnabled) { this.automationEnabled = automationEnabled; }
+    public boolean isAutoBuildEnabled() { return autoBuildEnabled; }
+    public void setAutoBuildEnabled(boolean autoBuildEnabled) { this.autoBuildEnabled = autoBuildEnabled; }
 
     public Map<AntType, List<Ant>> getAntGroups() { return antGroups; } 
     public List<Ant> getAntsByType(AntType type) { return antGroups.getOrDefault(type, new CopyOnWriteArrayList<>()); }
@@ -801,6 +806,8 @@ public class Colony {
 
         if (this.automationEnabled) {
             this.automationService.runDailyAutomation(this);
+        } else if (this.autoBuildEnabled) {
+            this.automationService.runAutoBuild(this);
         }
 
         if (this.isActive) {

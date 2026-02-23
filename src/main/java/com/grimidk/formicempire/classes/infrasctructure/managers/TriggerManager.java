@@ -281,6 +281,12 @@ public class TriggerManager {
                 "With three colonies, your ants have learned to transport resources efficiently between nests. Trade Routes unlocked!");
         }
 
+        if (colonyCount >= 4 && !playerColony.hasUpgrade(GameUnlocks.ABILITY_MANAGEMENT)) {
+            fireTrigger(GameUnlocks.ABILITY_MANAGEMENT,
+                "Middle Management",
+                "Your dynasty has so many colonies that you need help managing them! You can now let your colonies build by themselves, allowing you to focus on expansion and strategy.");
+        }
+
         if (colonyCount >= 5 && !playerColony.hasUpgrade(GameUnlocks.ABILITY_SPREAD_2)) {
             fireTrigger(GameUnlocks.ABILITY_SPREAD_2,
                 "Mass Colonization",
@@ -297,7 +303,6 @@ public class TriggerManager {
     private void checkAbilityMenuHint() {
         if (playerColony.hasUpgrade(GameUnlocks.ABILITY_ABILITY)) return;
         
-        // abilities to trigger
         boolean hasActionAbilities = playerColony.hasUpgrade(GameUnlocks.ABILITY_FORCED_FLIGHT);
         
         if (hasActionAbilities) {
