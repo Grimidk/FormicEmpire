@@ -68,22 +68,38 @@ public class ColonyAutomationService {
     }
 
     private void calculateWorkerQuotas(Colony colony, Map<AntRole, Integer> targets) {
-        int remaining = colony.getWorkers().size();
+        int totalWorkers = colony.getWorkers().size();
+        int remaining = totalWorkers;
         if (remaining == 0) return;
 
-        int farmers = assignMinimum(remaining, MIN_FARMERS);
+        ColonyStatsService stats = colony.getStatsService();
+
+        int farmerTarget = Math.max(MIN_FARMERS, (int) (totalWorkers * 0.05));
+        int farmers = assignMinimum(remaining, farmerTarget);
         remaining -= farmers;
         
         int foragers = assignMinimum(remaining, MIN_FORAGERS);
         remaining -= foragers;
 
-        int nurses = assignMinimum(remaining, MIN_NURSES);
+        float nursingRate = stats.getNursingRate(colony);
+        int maxBrood = stats.getEggsCapacity(colony) * 3; 
+        int nurseTarget = MIN_NURSES;
+        if (nursingRate > 0) {
+            nurseTarget = Math.max(MIN_NURSES, (int) Math.ceil(maxBrood / nursingRate));
+        }
+        int nurses = assignMinimum(remaining, nurseTarget);
         remaining -= nurses;
 
-        ColonyStatsService stats = colony.getStatsService();
-
-        int gravers = calculateGraverNeeds(colony, remaining, stats);
+        int graverTarget = (int) (totalWorkers * 0.05);
+        int gravers = assignMinimum(remaining, graverTarget);
         remaining -= gravers;
+
+        int totalGraversNeeded = calculateGraverNeeds(colony, remaining + gravers, stats);
+        if (totalGraversNeeded > gravers) {
+            int extraGravers = Math.min(remaining, totalGraversNeeded - gravers);
+            gravers += extraGravers;
+            remaining -= extraGravers;
+        }
         targets.put(GameConstants.ROLE_GRAVER, gravers);
 
         int extraNurses = calculateExtraNurseNeeds(colony, remaining, nurses, stats);
@@ -97,47 +113,52 @@ public class ColonyAutomationService {
         targets.put(GameConstants.ROLE_FARMER, farmers);
 
         if (remaining > 0 && colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) {
-            int toAdd = Math.min(farmers, remaining);
+            int rancherTarget = Math.max(1, (int) (totalWorkers * 0.05));
+            int toAdd = Math.min(rancherTarget, remaining);
             targets.put(GameConstants.ROLE_RANCHER, toAdd);
             remaining -= toAdd;
         }
 
         if (remaining > 0 && colony.hasUpgrade(GameUnlocks.ROLE_SCOUT)) {
-            int toAdd = Math.min(farmers, remaining);
+            int scoutTarget = Math.max(1, (int) (totalWorkers * 0.02));
+            int toAdd = Math.min(scoutTarget, remaining);
             targets.put(GameConstants.ROLE_SCOUT, toAdd);
             remaining -= toAdd;
         }
 
         if (remaining > 0 && colony.hasUpgrade(GameUnlocks.ROLE_MINER)) {
-            int minerTarget = (int) (colony.getWorkers().size() * 0.15);
+            int minerTarget = (int) (totalWorkers * 0.15);
             int toAdd = Math.min(remaining, minerTarget);
             
             if (colony.getMinerals() >= colony.getMineralsCapacity()) {
-                toAdd = Math.min(remaining, 1);
+                toAdd = Math.min(remaining, Math.max(1, (int) (minerTarget * 0.10))); 
             }
             
             targets.put(GameConstants.ROLE_MINER, toAdd);
             remaining -= toAdd;
         }
 
-        if (remaining > 0 && colony.hasUpgrade(GameUnlocks.ROLE_BUILDER)) {
-            if (colony.getCurrentBuildingProject() != null) {
-                int builderTarget = (int) (colony.getWorkers().size() * 0.3);
-                int toAdd = Math.min(remaining, builderTarget); 
-                
-                if (toAdd == 0 && remaining > 0) toAdd = 1;
-                
-                targets.put(GameConstants.ROLE_BUILDER, toAdd);
+        if (remaining > 0) {
+            int foragerMin = (int) (totalWorkers * 0.10);
+            if (foragers < foragerMin) {
+                int toAdd = Math.min(remaining, foragerMin - foragers);
+                foragers += toAdd;
                 remaining -= toAdd;
-            } else {
-                 targets.put(GameConstants.ROLE_BUILDER, 0);
             }
         }
 
-        if (remaining > 0) {
-            foragers += remaining;
+        if (remaining > 0 && colony.hasUpgrade(GameUnlocks.ROLE_BUILDER)) {
+            if (colony.getCurrentBuildingProject() != null) {
+                targets.put(GameConstants.ROLE_BUILDER, remaining);
+                targets.put(GameConstants.ROLE_FORAGER, foragers);
+            } else {
+                targets.put(GameConstants.ROLE_BUILDER, 0);
+                targets.put(GameConstants.ROLE_FORAGER, foragers + remaining);
+            }
+        } else {
+            targets.put(GameConstants.ROLE_BUILDER, 0);
+            targets.put(GameConstants.ROLE_FORAGER, foragers + remaining);
         }
-        targets.put(GameConstants.ROLE_FORAGER, foragers);
     }
     
     private int assignMinimum(int available, int min) {
@@ -213,8 +234,7 @@ public class ColonyAutomationService {
         targets.put(GameConstants.ROLE_POLICE, assignedPolice);
         remainingSoldiers -= assignedPolice;
 
-        boolean proteinNeeded = colony.getProtein() < colony.getStatsService().getProteinCapacity(colony);
-        if (proteinNeeded && colony.hasUpgrade(GameUnlocks.ROLE_HUNTER)) {
+        if (remainingSoldiers > 0 && colony.hasUpgrade(GameUnlocks.ROLE_HUNTER)) {
             targets.put(GameConstants.ROLE_HUNTER, remainingSoldiers);
         }
     }
@@ -223,7 +243,7 @@ public class ColonyAutomationService {
         int totalPrincesses = colony.getPrincesses().size();
         if (totalPrincesses == 0) return;
         
-        int assistantCount = (int) (totalPrincesses * 0.10);
+        int assistantCount = (int) (totalPrincesses * 0.80);
         targets.put(GameConstants.ROLE_ASSISTANT, assistantCount);
         
         int breederCount = totalPrincesses - assistantCount;
@@ -245,7 +265,7 @@ public class ColonyAutomationService {
                 int half = totalQueens / 2;
                 int researchers = half;
                 targets.put(GameConstants.ROLE_RESEARCHER, researchers);
-                targets.put(GameConstants.ROLE_LAYER, researchers);
+                targets.put(GameConstants.ROLE_LAYER, totalQueens - researchers);
             }
         } else {
             targets.put(GameConstants.ROLE_LAYER, totalQueens);
