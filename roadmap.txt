@@ -13,12 +13,12 @@ To Fix (By decreasing priority) :
 	Mid:
 	hex borders not clear, need to be double wide
 	npc shouldn't ranch in bad aphid environment and herd while not active
-	passives not taken into account for colony panel, refactor
 
 	Low:
 	builders act weird af in build zone
 	breeders go out of the colony in nuptial
 	use savefile name for colony and dynasty name and random names for colonies 
+	passives aphid not working
 
 	Can't reproduce:
 	hex changing not happening (reported by gopher)

@@ -284,7 +284,7 @@ public class TriggerManager {
         if (colonyCount >= 4 && !playerColony.hasUpgrade(GameUnlocks.ABILITY_MANAGEMENT)) {
             fireTrigger(GameUnlocks.ABILITY_MANAGEMENT,
                 "Middle Management",
-                "Your dynasty has so many colonies that you need help managing them! You can now let your colonies build by themselves, allowing you to focus on expansion and strategy.");
+                "Your dynasty has so many colonies that you need help managing them! You can now let your colonies build by themselves.");
         }
 
         if (colonyCount >= 5 && !playerColony.hasUpgrade(GameUnlocks.ABILITY_SPREAD_2)) {
@@ -296,7 +296,7 @@ public class TriggerManager {
         if (colonyCount >= 7 && !playerColony.hasUpgrade(GameUnlocks.ABILITY_AUTOMATION)) {
             fireTrigger(GameUnlocks.ABILITY_AUTOMATION,
                 "Automation Era",
-                "Your dynasty is vast. You can now automate colony management to focus on expansion.");
+                "Your dynasty is vast. You can now completely automate colony management.");
         }
     }
 

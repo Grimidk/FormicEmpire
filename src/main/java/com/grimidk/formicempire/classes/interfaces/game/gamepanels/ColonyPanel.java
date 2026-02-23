@@ -348,6 +348,11 @@ public class ColonyPanel extends ZeroGamePanel {
         nurseCoverageLabel.setVisible(hasNurse);
         if (hasNurse) {
             int nurseCount = colony.getAssignedRoleCount(GameConstants.ROLE_NURSE);
+            if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
+                nurseCount += 2;
+            } else {
+                nurseCount += 1;
+            }
             int babyAntTotal = colony.getEggs().size() + colony.getLarvae().size() + colony.getPupae().size();
             int nurseCapacity = (int) (nurseCount * colony.getNursingRate());
             nurseCoverageLabel.setText(String.format("Nurse Coverage: %d/%d", babyAntTotal, nurseCapacity));
@@ -361,6 +366,13 @@ public class ColonyPanel extends ZeroGamePanel {
         if (hasResearcher || hasAssistant) {
             researchPointsLabel.setText("Research: " + colony.getResearchPoints());
             int researcherCount = colony.getAssignedRoleCount(GameConstants.ROLE_RESEARCHER);
+            if (colony.hasBuilding(GameUnlocks.PASSIVE_LAB)) {
+                if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
+                    researcherCount += 2;
+                } else {
+                    researcherCount += 1;
+                }
+            }
             int assistantCount = colony.getAssignedRoleCount(GameConstants.ROLE_ASSISTANT);
             int speed = colony.getResearchSpeed();
             int hourlyQueen = researcherCount * speed;
@@ -423,6 +435,13 @@ public class ColonyPanel extends ZeroGamePanel {
         graveKeepingLabel.setVisible(hasGraver);
         if(hasGraver) {
             int graverCount = colony.getAssignedRoleCount(GameConstants.ROLE_GRAVER);
+            if (colony.hasBuilding(GameUnlocks.PASSIVE_GRAVE)) {
+                if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
+                    graverCount += 2;
+                } else {
+                    graverCount += 1;
+                }
+            }
             int graveCapacity = graverCount * (int) colony.getGravingRate();
             int currentDead = colony.getDeadAnts() != null ? colony.getDeadAnts().size() : 0;
             graveKeepingLabel.setText(String.format("Grave Cleaning: %d/%d", currentDead, graveCapacity));
@@ -432,6 +451,13 @@ public class ColonyPanel extends ZeroGamePanel {
         aphidCountLabel.setVisible(hasRancher);
         if (hasRancher) {
             int rancherCount = colony.getAssignedRoleCount(GameConstants.ROLE_RANCHER);
+            if (colony.hasBuilding(GameUnlocks.PASSIVE_APHID)) {
+                if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
+                    rancherCount += 2;
+                } else {
+                    rancherCount += 1;
+                }
+            }
             int maxSustainableAphids = colony.getAphidCapacity() * rancherCount;
             aphidCountLabel.setText(String.format("Aphids: %d/%d", colony.getAphids(), maxSustainableAphids));
         }

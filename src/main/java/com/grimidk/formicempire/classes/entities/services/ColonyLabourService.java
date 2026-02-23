@@ -225,9 +225,7 @@ public class ColonyLabourService {
 
     public void runRanching(Colony colony) {
         if (!colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) return;
-        
-        colony.setAphids(colony.getAphids()); 
-        
+                
         ColonyStatsService stats = colony.getStatsService();
         int syrupGain = (int) (colony.getAphids()); 
         
@@ -245,9 +243,11 @@ public class ColonyLabourService {
         ColonyStatsService stats = colony.getStatsService();
         int rancherCount = countActiveAnts(colony, GameConstants.ROLE_RANCHER);
         
-        if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
-            rancherCount += 2;
-        } else { rancherCount += 1; }
+        if (colony.hasBuilding(GameUnlocks.PASSIVE_APHID)) {
+            if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
+                rancherCount += 2;
+            } else { rancherCount += 1; } 
+        }
         
         int maxSustainableAphids = stats.getAphidCapacity(colony) * rancherCount;
         
