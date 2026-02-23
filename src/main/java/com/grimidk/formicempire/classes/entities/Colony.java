@@ -95,6 +95,7 @@ public class Colony {
     private transient ColonyLocationService locationService;
     private transient ColonySumarizationService sumarizationService;
     private transient ColonyAutomationService automationService;
+    private transient ColonyResourceService resourceService;
 
     // --- Service Initializer ---
     private void initializeServices() {
@@ -105,6 +106,7 @@ public class Colony {
         this.locationService = new ColonyLocationService();
         this.sumarizationService = new ColonySumarizationService();
         this.automationService = new ColonyAutomationService(); 
+        this.resourceService = new ColonyResourceService();
     }
 
     // --- Initialization Methods ---
@@ -450,8 +452,10 @@ public class Colony {
         if (getMinerals() < building.getMineralCost() || getResins() < building.getResinCost()) {
             return false; 
         }
-        setMinerals(getMinerals() - building.getMineralCost());
-        setResins(getResins() - building.getResinCost());
+        
+        resourceService.consumeResource(this, GameConstants.RESOURCE_ROCK, building.getMineralCost());
+        resourceService.consumeResource(this, GameConstants.RESOURCE_RESIN, building.getResinCost());
+        
         this.currentBuildingProject = building;
         this.buildingProgressHours = 0.0;
         return true;
@@ -475,30 +479,39 @@ public class Colony {
     public double getMineralsPrecise() { return minerals; }
     
     public void setPlants(double plants) { 
-        this.plants = Math.max(0, Math.min(plants, (double)getPlantsCapacity())); 
+        this.plants = Math.max(0, plants); 
     }
     public void setMushrooms(double mushrooms) { 
-        this.mushrooms = Math.max(0, Math.min(mushrooms, (double)getMushroomsCapacity())); 
+        this.mushrooms = Math.max(0, mushrooms); 
     }
     public void setProtein(double protein) { 
-        this.protein = Math.max(0, Math.min(protein, (double)getProteinCapacity())); 
+        this.protein = Math.max(0, protein); 
     }
     public void setWater(double water) { 
-        this.water = Math.max(0, Math.min(water, (double)getWaterCapacity())); 
+        this.water = Math.max(0, water); 
     }
     public void setSyrups(double syrups) { 
-        this.syrups = Math.max(0, Math.min(syrups, (double)getSyrupsCapacity())); 
+        this.syrups = Math.max(0, syrups); 
     }
     public void setResins(double resins) { 
-        this.resins = Math.max(0, Math.min(resins, (double)getResinsCapacity())); 
+        this.resins = Math.max(0, resins); 
     }
     public void setMinerals(double minerals) { 
-        this.minerals = Math.max(0, Math.min(minerals, (double)getMineralsCapacity())); 
+        this.minerals = Math.max(0, minerals); 
     }
 
     public int getAphids() { return aphids; }
     public void setAphids(int count) { 
         int rancherCount = getAssignedRoleCount(GameConstants.ROLE_RANCHER);
+        
+        if (hasBuilding(GameUnlocks.PASSIVE_APHID)) {
+            if (hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
+                rancherCount += 2;
+            } else {
+                rancherCount += 1;
+            }
+        }
+        
         int maxAphids = Integer.MAX_VALUE;
         if (statsService != null) {
             maxAphids = statsService.getAphidCapacity(this) * rancherCount;
@@ -676,6 +689,7 @@ public class Colony {
     public ColonyLocationService getLocationService() { return this.locationService; }
     public ColonySumarizationService getSumarizationService() { return this.sumarizationService; }
     public ColonyAutomationService getAutomationService() { return this.automationService; }
+    public ColonyResourceService getResourceService() { return this.resourceService; }
 
     public int getTotalConsumption(){ return statsService.getTotalConsumption(this); }
     public int getTotalProduction(){ return statsService.getTotalProduction(this); }
@@ -771,7 +785,7 @@ public class Colony {
         }
     }
 
-    public void runHourlyJobs() {
+    public void runHourlyJobs(Biome biome) {
         if (this.age < 7) {
             return;
         }
@@ -791,7 +805,7 @@ public class Colony {
                 this.automationService.runAutomation(this);
             }
             this.populationService.runRoleAssignment(this); 
-            this.sumarizationService.runHourlyLite(this);
+            this.sumarizationService.runHourlyLite(this, biome);
         }
     }
 

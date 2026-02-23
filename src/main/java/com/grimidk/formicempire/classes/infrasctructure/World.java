@@ -671,7 +671,7 @@ public class World {
         
         for (Hex hex : this.hexes) {
             if (hex.getColony() != null) {
-                hex.getColony().runHourlyJobs();
+                hex.getColony().runHourlyJobs(hex.getBiome());
             }
         }
 

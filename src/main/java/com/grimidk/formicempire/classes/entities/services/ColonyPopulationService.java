@@ -11,11 +11,9 @@ import com.grimidk.formicempire.classes.constants.world.Temperature;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -236,42 +234,50 @@ public class ColonyPopulationService {
         }
     }
     
-    public void runEating(Colony colony, Temperature currentTemp){
+    public void runEating(Colony colony, Temperature currentTemp) {
         ColonyStatsService stats = colony.getStatsService();
+        ColonyResourceService resources = colony.getResourceService();
         
-        // --- Water Consumption ---
-        List<Ant> thirstyAnts = new ArrayList<>();
-        int waterAvailable = colony.getWater();
         List<AntType> adultDrinkOrder = Arrays.asList(
             GameConstants.TYPE_QUEEN, GameConstants.TYPE_WORKER, GameConstants.TYPE_SOLDIER,
             GameConstants.TYPE_MAJOR, GameConstants.TYPE_PRINCESS, GameConstants.TYPE_DRONE
         );
         
         int resistanceChance = stats.getThirstResistance(colony, currentTemp);
-
+        List<Ant> thirstyCandidates = new ArrayList<>();
+        
         for (AntType type : adultDrinkOrder) {
             List<Ant> list = colony.getAntsByType(type);
             for (Ant ant : list) {
-                if (random.nextInt(100) < resistanceChance) {
-                    continue; 
-                }
-
-                if (waterAvailable >= 1) {
-                    waterAvailable -= 1;
-                } else {
-                    thirstyAnts.add(ant);
+                if (random.nextInt(100) >= resistanceChance) {
+                    thirstyCandidates.add(ant);
                 }
             }
         }
-        colony.setWater(waterAvailable);
         
-        // --- Food Consumption ---
-        int mushroomsAvailable = colony.getMushrooms();
+        int waterNeeded = thirstyCandidates.size();
+        double consumedWater = resources.consumeResource(colony, GameConstants.RESOURCE_WATER, waterNeeded);
+        double waterDeficit = waterNeeded - consumedWater;
+        
+        if (waterDeficit > 0 && colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) {
+            double syrupConsumed = resources.consumeResource(colony, GameConstants.RESOURCE_SYRUP, waterDeficit);
+            waterDeficit -= syrupConsumed;
+        }
+
+        List<Ant> doomedThirsty = new ArrayList<>();
+        for (int i = 0; i < (int) waterDeficit; i++) {
+            if (i < thirstyCandidates.size()) {
+                doomedThirsty.add(thirstyCandidates.get(i));
+            }
+        }
+
         List<AntType> eatOrder = Arrays.asList(
             GameConstants.TYPE_QUEEN, GameConstants.TYPE_WORKER, GameConstants.TYPE_LARVA,
             GameConstants.TYPE_SOLDIER, GameConstants.TYPE_MAJOR, GameConstants.TYPE_PRINCESS, GameConstants.TYPE_DRONE
         );
-        List<Ant> hungryAnts = new ArrayList<>();
+        
+        List<Ant> hungryCandidates = new ArrayList<>();
+        int foodNeeded = 0;
         int baseConsumption = stats.getBaseConsumption(colony);
 
         for (AntType type : eatOrder) {
@@ -281,45 +287,38 @@ public class ColonyPopulationService {
             
             List<Ant> list = colony.getAntsByType(type);
             for (Ant ant : list) {
-                if (mushroomsAvailable >= consumptionPerAnt) {
-                    mushroomsAvailable -= consumptionPerAnt;
-                } else {
-                    hungryAnts.add(ant);
+                foodNeeded += consumptionPerAnt;
+                hungryCandidates.add(ant); 
+            }
+        }
+
+        int parasiteCount = colony.getParasites();
+        if (parasiteCount > 0) {
+            foodNeeded += parasiteCount; 
+        }
+
+        double consumedFood = resources.consumeResource(colony, GameConstants.RESOURCE_FUNGI, foodNeeded);
+        double foodDeficit = foodNeeded - consumedFood;
+
+        if (foodDeficit > 0 && colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) {
+            double syrupConsumed = resources.consumeResource(colony, GameConstants.RESOURCE_SYRUP, foodDeficit);
+            foodDeficit -= syrupConsumed;
+        }
+
+        List<Ant> doomedHungry = new ArrayList<>();
+        int approxAntsToKill = (int) (foodDeficit / (baseConsumption <= 0 ? 1 : baseConsumption));
+        
+        for (int i = 0; i < approxAntsToKill; i++) {
+            if (i < hungryCandidates.size()) {
+                Ant potentialVictim = hungryCandidates.get(i);
+                if (!doomedThirsty.contains(potentialVictim)) {
+                    doomedHungry.add(potentialVictim);
                 }
             }
         }
 
-        // --- Parasite Consumption ---
-        int parasiteCount = colony.getParasites();
-        if (parasiteCount > 0) {
-            int parasiteConsumption = parasiteCount * 1; 
-            if (mushroomsAvailable >= parasiteConsumption) {
-                mushroomsAvailable -= parasiteConsumption;
-            } else {
-                mushroomsAvailable = 0;
-            }
-        }
-
-        colony.setMushrooms(mushroomsAvailable);
-        
-        // --- Syrup Phase ---
-        Set<Ant> antsInNeed = new HashSet<>(thirstyAnts);
-        antsInNeed.addAll(hungryAnts);
-        int syrupAvailable = colony.hasUpgrade(GameUnlocks.ROLE_RANCHER) ? colony.getSyrups() : 0;
-        
-        Iterator<Ant> needIterator = antsInNeed.iterator();
-        while (needIterator.hasNext() && syrupAvailable > 0) {
-            Ant ant = needIterator.next();
-            syrupAvailable -= 1;
-            needIterator.remove(); 
-            thirstyAnts.remove(ant);
-            hungryAnts.remove(ant);
-        }
-        colony.setSyrups(syrupAvailable);
-        
-        // --- Death Phase ---        
-        processDeaths(colony, thirstyAnts, "Dehydration");
-        processDeaths(colony, hungryAnts, "Starvation");
+        processDeaths(colony, doomedThirsty, "Dehydration");
+        processDeaths(colony, doomedHungry, "Starvation");
     }
 
     private void processDeaths(Colony colony, List<Ant> ants, String cause) {

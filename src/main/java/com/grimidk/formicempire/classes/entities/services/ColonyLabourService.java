@@ -55,6 +55,7 @@ public class ColonyLabourService {
         
         ColonyStatsService stats = colony.getStatsService();
         ColonyLocationService locations = colony.getLocationService();
+        ColonyResourceService resources = colony.getResourceService();
         
         int totalGathered = 0;
         int workerIndex = 0;
@@ -82,9 +83,9 @@ public class ColonyLabourService {
             int actualGathered = locations.gatherFromSource(colony, source, gatherAmount);
             
             if (actualGathered > 0) {
+                resources.addResource(colony, type, actualGathered);
+                
                 if (type == GameConstants.RESOURCE_PLANT) {
-                    colony.setPlants(colony.getPlantsPrecise() + actualGathered); 
-                    
                     for(int i = 0; i < actualGathered; i++) {
                         if (workerIndex >= workers.size()) workerIndex = 0;
                         Ant worker = workers.get(workerIndex);
@@ -92,9 +93,8 @@ public class ColonyLabourService {
                         
                         if (colony.hasUpgrade(GameUnlocks.ABILITY_RESIN)) {
                             if (random.nextInt(100) < 1) {
-                                double resinSpace = stats.getResinsCapacity(colony) - colony.getResinsPrecise();
-                                if (resinSpace > 0) {
-                                    colony.setResins(colony.getResinsPrecise() + 1);
+                                double addedResin = resources.addResource(colony, GameConstants.RESOURCE_RESIN, 1);
+                                if (addedResin > 0) {
                                     worker.setCarryingSec(GameConstants.RESOURCE_RESIN);
                                 }
                             }
@@ -103,10 +103,6 @@ public class ColonyLabourService {
                     }
                     
                 } else {
-                    if (type == GameConstants.RESOURCE_WATER) colony.setWater(colony.getWaterPrecise() + actualGathered);
-                    else if (type == GameConstants.RESOURCE_MEAT) colony.setProtein(colony.getProteinPrecise() + actualGathered);
-                    else if (type == GameConstants.RESOURCE_ROCK) colony.setMinerals(colony.getMineralsPrecise() + actualGathered);
-                    
                     for(Ant w : workers) {
                         w.setCarrying(type);
                         w.setCarryingSec(null);
@@ -120,16 +116,10 @@ public class ColonyLabourService {
         return totalGathered;
     }
 
-    private boolean hasSpace(Colony colony, ResourceType type) {
-        ColonyStatsService stats = colony.getStatsService();
-        if (type == GameConstants.RESOURCE_PLANT) return stats.getPlantsCapacity(colony) > colony.getPlants();
-        if (type == GameConstants.RESOURCE_WATER) return stats.getWaterCapacity(colony) > colony.getWater();
-        return false;
-    }
-
     public void runCollecting(Colony colony) {
         ColonyStatsService stats = colony.getStatsService();
         ColonyLocationService locations = colony.getLocationService();
+        ColonyResourceService resources = colony.getResourceService();
         
         // --- Foragers ---
         if (colony.hasUpgrade(GameUnlocks.ROLE_FORAGER)) {
@@ -141,8 +131,9 @@ public class ColonyLabourService {
                 List<ResourceSource> plantSources = locations.getSourcesByType(GameConstants.RESOURCE_PLANT);
                 List<ResourceSource> waterSources = locations.getSourcesByType(GameConstants.RESOURCE_WATER);
 
-                boolean canCollectPlants = !plantSources.isEmpty() && hasSpace(colony, GameConstants.RESOURCE_PLANT);
-                boolean canCollectWater = !waterSources.isEmpty() && hasSpace(colony, GameConstants.RESOURCE_WATER);
+                boolean canCollectPlants = !plantSources.isEmpty() && resources.hasCapacity(colony, GameConstants.RESOURCE_PLANT);
+                boolean canCollectWater = !waterSources.isEmpty() && resources.hasCapacity(colony, GameConstants.RESOURCE_WATER);
+                
                 if (canCollectPlants && canCollectWater) {
                     int halfPower = totalPower / 2;
                     int remainingPower = totalPower - halfPower;
@@ -182,20 +173,19 @@ public class ColonyLabourService {
 
         // --- Passive Water ---
         if (colony.hasBuilding(GameUnlocks.PASSIVE_WATER)) {
-            double currentWater = colony.getWaterPrecise();
             double maxWater = stats.getWaterCapacity(colony);
-            if (currentWater < maxWater) {
-                double gain = (maxWater * 0.10);
-                if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
-                    gain = (maxWater * 0.20);
-                }
-                colony.setWater(Math.min(currentWater + gain, maxWater));
+            double gain = (maxWater * 0.10);
+            if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
+                gain = (maxWater * 0.20);
             }
+            resources.addResource(colony, GameConstants.RESOURCE_WATER, gain);
         }
     }
 
     public void runConverting(Colony colony) {
         ColonyStatsService stats = colony.getStatsService();
+        ColonyResourceService resources = colony.getResourceService();
+        
         int farmerCount = countActiveAnts(colony, GameConstants.ROLE_FARMER);
         if (colony.hasBuilding(GameUnlocks.PASSIVE_FARM)) {
             if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
@@ -203,22 +193,21 @@ public class ColonyLabourService {
             } else { farmerCount += 1; } 
         }
         
-        if (colony.getMushrooms() >= stats.getMushroomsCapacity(colony)) return;
+        if (!resources.hasCapacity(colony, GameConstants.RESOURCE_FUNGI)) return;
         
         if (Math.random() <= stats.getConversionRate(colony)) {
-            if (colony.getPlantsPrecise() >= farmerCount) {
-                colony.setPlants(colony.getPlantsPrecise() - farmerCount);
-                colony.setMushrooms(Math.min(colony.getMushroomsPrecise() + farmerCount, (double)stats.getMushroomsCapacity(colony)));
+            double consumedPlants = resources.consumeResource(colony, GameConstants.RESOURCE_PLANT, farmerCount);
+            if (consumedPlants > 0) {
+                resources.addResource(colony, GameConstants.RESOURCE_FUNGI, consumedPlants);
             }
         }
         
-        if (colony.getMushrooms() >= stats.getMushroomsCapacity(colony)) return;
+        if (!resources.hasCapacity(colony, GameConstants.RESOURCE_FUNGI)) return;
         
         if (Math.random() <= stats.getConversionRate(colony)) {
-            if (colony.getProteinPrecise() >= farmerCount) {
-                colony.setProtein(colony.getProteinPrecise() - farmerCount);
-                int mushroomGain = farmerCount * 2;
-                colony.setMushrooms(Math.min(colony.getMushroomsPrecise() + mushroomGain, (double)stats.getMushroomsCapacity(colony)));
+            double consumedMeat = resources.consumeResource(colony, GameConstants.RESOURCE_MEAT, farmerCount);
+            if (consumedMeat > 0) {
+                resources.addResource(colony, GameConstants.RESOURCE_FUNGI, consumedMeat * 2);
             }
         }
     }
@@ -226,14 +215,15 @@ public class ColonyLabourService {
     public void runRanching(Colony colony) {
         if (!colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) return;
                 
-        ColonyStatsService stats = colony.getStatsService();
+        ColonyResourceService resources = colony.getResourceService();
         int syrupGain = (int) (colony.getAphids()); 
-        
         double plantConsumption = syrupGain * 0.10; 
 
-        if (colony.getPlantsPrecise() >= plantConsumption) {
-            colony.setPlants(Math.max(0, colony.getPlantsPrecise() - plantConsumption));
-            colony.setSyrups(Math.min(colony.getSyrupsPrecise() + syrupGain, (double)stats.getSyrupsCapacity(colony)));
+        double actualPlantsConsumed = resources.consumeResource(colony, GameConstants.RESOURCE_PLANT, plantConsumption);
+        
+        if (actualPlantsConsumed > 0) {
+            double ratio = actualPlantsConsumed / plantConsumption;
+            resources.addResource(colony, GameConstants.RESOURCE_SYRUP, syrupGain * ratio);
         }
     }
 
@@ -447,10 +437,7 @@ public class ColonyLabourService {
             
             if (random.nextFloat() < detectionRate) {
                 parasitesKilled++;
-                
-                double currentProtein = colony.getProteinPrecise();
-                double maxProtein = colony.getStatsService().getProteinCapacity(colony);
-                colony.setProtein(Math.min(currentProtein + 4, maxProtein));
+                colony.getResourceService().addResource(colony, GameConstants.RESOURCE_MEAT, 4);
             }
         }
         
@@ -672,8 +659,7 @@ public class ColonyLabourService {
         deadAnts.removeAll(compostedAnts);
 
         int mushroomGain = actualToCompost * 4; 
-        int capacity = colony.getStatsService().getMushroomsCapacity(colony);
-        colony.setMushrooms(Math.min(colony.getMushroomsPrecise() + mushroomGain, (double)capacity));
+        colony.getResourceService().addResource(colony, GameConstants.RESOURCE_FUNGI, mushroomGain);
         
         if (actualToCompost > 0) {
             colony.logEvent("COMPOST: Recycled " + actualToCompost + " bodies into mushroom matter.");

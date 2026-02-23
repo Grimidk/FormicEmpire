@@ -8,17 +8,18 @@ To Fix (By decreasing priority) :
 	(none right now)
 	
 	High:
-	(none right now)
+	satellites not dying but being colonizable
+	view button in dynasty screen missing
 
 	Mid:
 	hex borders not clear, need to be double wide
-	npc shouldn't ranch in bad aphid environment and herd while not active
+	npc shouldn't ranch in bad aphid environment and herd while not active (recheck auto and sum in general)
+	save autobuild
 
 	Low:
 	builders act weird af in build zone
 	breeders go out of the colony in nuptial
-	use savefile name for colony and dynasty name and random names for colonies 
-	passives aphid not working
+	mass flight ability
 
 	Can't reproduce:
 	hex changing not happening (reported by gopher)

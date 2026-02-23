@@ -3,7 +3,7 @@ package com.grimidk.formicempire.classes.entities.services;
 import java.util.List;
 import java.util.Random;
 
-import com.grimidk.formicempire.classes.constants.misc.ResourceType;
+import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
@@ -14,12 +14,12 @@ public class ColonySumarizationService {
 
     private final Random random = new Random();
 
-    public void runHourlyLite(Colony colony) {
+    public void runHourlyLite(Colony colony, Biome biome) {
         simulateProduction(colony);
         simulateResearch(colony);
         simulateBuilding(colony); 
         simulateLaying(colony);
-        simulateRanching(colony);
+        simulateRanching(colony, biome);
     }
 
     public void runDailyLite(Colony colony) {
@@ -41,6 +41,7 @@ public class ColonySumarizationService {
     private void simulateProduction(Colony colony) {
         ColonyStatsService stats = colony.getStatsService();
         ColonyLocationService loc = colony.getLocationService();
+        ColonyResourceService resources = colony.getResourceService();
         
         int plantGain = probabilisticRound(stats.getPlantProductionHourly(colony));
         int waterGain = probabilisticRound(stats.getWaterProductionHourly(colony));
@@ -60,12 +61,12 @@ public class ColonySumarizationService {
         if (loc.getTotalQuantityAvailable(GameConstants.RESOURCE_MEAT) <= 0) meatGain = 0;
         if (loc.getTotalQuantityAvailable(GameConstants.RESOURCE_ROCK) <= 0) rockGain = 0;
 
-        addResource(colony, colony.getPlants(), plantGain, stats.getPlantsCapacity(colony), GameConstants.RESOURCE_PLANT);
-        addResource(colony, colony.getWater(), waterGain, stats.getWaterCapacity(colony), GameConstants.RESOURCE_WATER);
-        addResource(colony, colony.getProtein(), meatGain, stats.getProteinCapacity(colony), GameConstants.RESOURCE_MEAT);
-        addResource(colony, colony.getMinerals(), rockGain, stats.getMineralsCapacity(colony), GameConstants.RESOURCE_ROCK);
+        resources.addResource(colony, GameConstants.RESOURCE_PLANT, plantGain);
+        resources.addResource(colony, GameConstants.RESOURCE_WATER, waterGain);
+        resources.addResource(colony, GameConstants.RESOURCE_MEAT, meatGain);
+        resources.addResource(colony, GameConstants.RESOURCE_ROCK, rockGain);
 
-        if (colony.getMushrooms() < stats.getMushroomsCapacity(colony)) {
+        if (resources.hasCapacity(colony, GameConstants.RESOURCE_FUNGI)) {
             int farmerCount = stats.getEffectiveFarmerCount(colony);
             float convertRate = stats.getConversionRate(colony);
             
@@ -74,55 +75,44 @@ public class ColonySumarizationService {
             if (maxConvert > 0) {
                 int actualConverted = 0;
 
-                int plantConvert = Math.min(maxConvert, colony.getPlants());
+                double plantConvert = resources.consumeResource(colony, GameConstants.RESOURCE_PLANT, maxConvert);
                 if (plantConvert > 0) {
-                    colony.setPlants(colony.getPlants() - plantConvert);
                     actualConverted += plantConvert;
                     maxConvert -= plantConvert;
                 }
 
                 if (maxConvert > 0) {
-                    int meatConvert = Math.min(maxConvert, colony.getProtein());
+                    double meatConvert = resources.consumeResource(colony, GameConstants.RESOURCE_MEAT, maxConvert);
                     if (meatConvert > 0) {
-                        colony.setProtein(colony.getProtein() - meatConvert);
                         actualConverted += (meatConvert * 2); 
                     }
                 }
                 
                 if (actualConverted > 0) {
-                    addResource(colony, colony.getMushrooms(), actualConverted, stats.getMushroomsCapacity(colony), GameConstants.RESOURCE_FUNGI);
+                    resources.addResource(colony, GameConstants.RESOURCE_FUNGI, actualConverted);
                 }
             }
         }
     }
 
-    private void simulateRanching(Colony colony) {
+    private void simulateRanching(Colony colony, Biome biome) {
         if (!colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) return;
         
-        ColonyStatsService stats = colony.getStatsService();
+        ColonyResourceService resources = colony.getResourceService();
         int syrupGain = colony.getAphids(); 
         double plantConsumption = syrupGain * 0.10; 
 
-        if (colony.getPlantsPrecise() >= plantConsumption) {
-            colony.setPlants(Math.max(0, colony.getPlantsPrecise() - plantConsumption));
-            colony.setSyrups(Math.min(colony.getSyrupsPrecise() + syrupGain, (double)stats.getSyrupsCapacity(colony)));
+        double actualPlantsConsumed = resources.consumeResource(colony, GameConstants.RESOURCE_PLANT, plantConsumption);
+        
+        if (actualPlantsConsumed > 0) {
+            double ratio = actualPlantsConsumed / plantConsumption;
+            resources.addResource(colony, GameConstants.RESOURCE_SYRUP, syrupGain * ratio);
         }
     }
 
     private int probabilisticRound(double value) {
         int floor = (int) value;
         return (random.nextDouble() < (value - floor)) ? floor + 1 : floor;
-    }
-
-    private void addResource(Colony colony, int current, int gain, int max, ResourceType type) {
-        if (gain <= 0) return;
-        int newValue = Math.min(current + gain, max);
-        
-        if (type == GameConstants.RESOURCE_PLANT) colony.setPlants(newValue);
-        else if (type == GameConstants.RESOURCE_WATER) colony.setWater(newValue);
-        else if (type == GameConstants.RESOURCE_MEAT) colony.setProtein(newValue);
-        else if (type == GameConstants.RESOURCE_ROCK) colony.setMinerals(newValue);
-        else if (type == GameConstants.RESOURCE_FUNGI) colony.setMushrooms(newValue);
     }
 
     private void simulateLaying(Colony colony) {
@@ -146,51 +136,33 @@ public class ColonySumarizationService {
 
     private void simulateEating(Colony colony) {
         ColonyStatsService stats = colony.getStatsService();
+        ColonyResourceService resources = colony.getResourceService();
+        
         int totalConsumption = stats.getTotalConsumption(colony);
         totalConsumption += colony.getParasites();
 
-        int mushrooms = colony.getMushrooms();
+        double consumedFood = resources.consumeResource(colony, GameConstants.RESOURCE_FUNGI, totalConsumption);
+        double foodDeficit = totalConsumption - consumedFood;
         
-        if (mushrooms >= totalConsumption) {
-            colony.setMushrooms(mushrooms - totalConsumption);
-        } else {
-            int deficit = totalConsumption - mushrooms;
-            colony.setMushrooms(0);
+        if (foodDeficit > 0) {
+            double consumedSyrup = resources.consumeResource(colony, GameConstants.RESOURCE_SYRUP, foodDeficit);
+            foodDeficit -= consumedSyrup;
             
-            int syrups = colony.getSyrups();
-            if (syrups >= deficit) {
-                colony.setSyrups(syrups - deficit);
-                deficit = 0;
-            } else {
-                colony.setSyrups(0);
-                deficit -= syrups;
-            }
-            
-            if (deficit > 0) {
-                handleStarvation(colony, deficit, "Starvation");
+            if (foodDeficit > 0) {
+                handleStarvation(colony, (int) foodDeficit, "Starvation");
             }
         }
         
         int waterDemand = stats.getWaterConsumption(colony);
-        int water = colony.getWater();
+        double consumedWater = resources.consumeResource(colony, GameConstants.RESOURCE_WATER, waterDemand);
+        double waterDeficit = waterDemand - consumedWater;
         
-        if (water >= waterDemand) {
-            colony.setWater(water - waterDemand);
-        } else {
-            int deficit = waterDemand - water;
-            colony.setWater(0);
+        if (waterDeficit > 0) {
+            double consumedSyrup = resources.consumeResource(colony, GameConstants.RESOURCE_SYRUP, waterDeficit);
+            waterDeficit -= consumedSyrup;
             
-            int syrups = colony.getSyrups();
-            if (syrups >= deficit) {
-                colony.setSyrups(syrups - deficit);
-                deficit = 0;
-            } else {
-                colony.setSyrups(0);
-                deficit -= syrups;
-            }
-            
-            if (deficit > 0) {
-                handleStarvation(colony, deficit / 2, "Dehydration");
+            if (waterDeficit > 0) {
+                handleStarvation(colony, (int) (waterDeficit / 2), "Dehydration");
             }
         }
     }
@@ -267,8 +239,7 @@ public class ColonySumarizationService {
         }
 
         int mushroomGain = actualToCompost * 4; 
-        int capacity = colony.getStatsService().getMushroomsCapacity(colony);
-        colony.setMushrooms(Math.min(colony.getMushroomsPrecise() + mushroomGain, (double)capacity));
+        colony.getResourceService().addResource(colony, GameConstants.RESOURCE_FUNGI, mushroomGain);
     }
     
     private void simulateGraveKeeping(Colony colony) {
@@ -312,10 +283,7 @@ public class ColonySumarizationService {
             if (parasitesKilled >= parasiteCount) break;
             if (random.nextFloat() < detectionRate) {
                 parasitesKilled++;
-                
-                double currentProtein = colony.getProteinPrecise();
-                double maxProtein = colony.getStatsService().getProteinCapacity(colony);
-                colony.setProtein(Math.min(currentProtein + 4, maxProtein));
+                colony.getResourceService().addResource(colony, GameConstants.RESOURCE_MEAT, 4);
             }
         }
         
