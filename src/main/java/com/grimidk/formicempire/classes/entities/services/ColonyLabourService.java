@@ -393,6 +393,28 @@ public class ColonyLabourService {
                 satellite.setRank(GameConstants.RANK_COLONY);
                 
                 starter.initializeNewColony(satellite);
+
+                Colony primaryColony = null;
+                for (Colony c : dynasty.getColonies()) {
+                    if (c.isCapital()) {
+                        primaryColony = c;
+                        break;
+                    }
+                }
+
+                if (primaryColony != null) {
+                    satellite.setHatchRateWorker(primaryColony.getHatchRateWorker());
+                    satellite.setHatchRateSoldier(primaryColony.getHatchRateSoldier());
+                    satellite.setHatchRateMajor(primaryColony.getHatchRateMajor());
+                    satellite.setHatchRateDrone(primaryColony.getHatchRateDrone());
+                    satellite.setHatchRatePrincess(primaryColony.getHatchRatePrincess());
+                } else {
+                    satellite.setHatchRateWorker(colony.getHatchRateWorker());
+                    satellite.setHatchRateSoldier(colony.getHatchRateSoldier());
+                    satellite.setHatchRateMajor(colony.getHatchRateMajor());
+                    satellite.setHatchRateDrone(colony.getHatchRateDrone());
+                    satellite.setHatchRatePrincess(colony.getHatchRatePrincess());
+                }
                 
                 neighbor.setColony(satellite);
                 

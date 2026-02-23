@@ -38,7 +38,7 @@ public class Colony {
     private ColonyRank rank;
     private boolean isActive;
     private boolean automationEnabled = false; 
-    private boolean isPrimary = false;
+    private boolean isCapital = false;
     private int age;
     
     // --- Population Data ---
@@ -196,7 +196,7 @@ public class Colony {
         this.name = savedColony.name;
         this.isPlayer = savedColony.isPlayer;
         
-        this.isPrimary = savedColony.isPrimary;
+        this.isCapital = savedColony.isCapital;
         this.automationEnabled = savedColony.isAutomated;
         this.age = savedColony.age;
         this.totalDeaths = savedColony.totalDeaths;
@@ -347,8 +347,8 @@ public class Colony {
     public int getId() { return id; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
-    public boolean isPrimary() { return isPrimary; }
-    public void setPrimary(boolean isPrimary) { this.isPrimary = isPrimary; }
+    public boolean isCapital() { return isCapital; }
+    public void setCapital(boolean isCapital) { this.isCapital = isCapital; }
     public int getAge() { return age; }
     public void setAge(int age) { this.age = age; }
     

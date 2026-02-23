@@ -249,7 +249,7 @@ public class DynastyManagementDialog extends ZeroDialog {
 
             displayedColonies.addAll(rawColonies);
             displayedColonies.sort(
-                Comparator.comparing(Colony::isPrimary).reversed()
+                Comparator.comparing(Colony::isCapital).reversed()
                 .thenComparingInt(Colony::getAntTotal).reversed()
             );
 
@@ -264,7 +264,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                     }
                 }
                 
-                String typeStr = colony.isPrimary() ? "Primary" : "Satellite";
+                String typeStr = colony.isCapital() ? "Capital" : "Satellite";
 
                 Object[] rowData;
                 if (showAutomation) {

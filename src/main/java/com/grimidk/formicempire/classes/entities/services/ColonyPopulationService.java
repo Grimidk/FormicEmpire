@@ -200,7 +200,7 @@ public class ColonyPopulationService {
     }
 
     public void runHatching(Colony colony){
-        if (!colony.isPlayer()) {
+        if (!colony.isPlayer() && colony.isCapital()) {
             adjustNPCHatchRates(colony);
         }
 

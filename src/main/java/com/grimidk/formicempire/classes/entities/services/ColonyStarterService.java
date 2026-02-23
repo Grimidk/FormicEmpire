@@ -14,15 +14,31 @@ public class ColonyStarterService {
         
         if (colony.getDynasty() != null) {
             boolean isFirst = colony.getDynasty().getColonies().size() == 1;
-            colony.setPrimary(isFirst);
+            colony.setCapital(isFirst);
             
             if (isFirst) {
                 colony.setAge(7); 
             } else {
                 colony.setAge(0);
+                
+                Colony capitalColony = null;
+                for (Colony c : colony.getDynasty().getColonies()) {
+                    if (c.isCapital() && c != colony) {
+                        capitalColony = c;
+                        break;
+                    }
+                }
+                
+                if (capitalColony != null) {
+                    colony.setHatchRateWorker(capitalColony.getHatchRateWorker());
+                    colony.setHatchRateSoldier(capitalColony.getHatchRateSoldier());
+                    colony.setHatchRateMajor(capitalColony.getHatchRateMajor());
+                    colony.setHatchRateDrone(capitalColony.getHatchRateDrone());
+                    colony.setHatchRatePrincess(capitalColony.getHatchRatePrincess());
+                }
             }
         } else {
-            colony.setPrimary(true);
+            colony.setCapital(true);
             colony.setAge(7);
         }
 

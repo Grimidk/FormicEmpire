@@ -367,7 +367,7 @@ public class SaveManager {
                     sc.name = c.getName();
                     sc.rankName = c.getRank() != null ? c.getRank().getName() : "Colony";
                     sc.isPlayer = c.isPlayer();
-                    sc.isPrimary = c.isPrimary();
+                    sc.isCapital = c.isCapital();
                     sc.isAutomated = c.isAutomationEnabled();
                     sc.age = c.getAge();
                     sc.q = h.getQ();
@@ -535,7 +535,7 @@ public class SaveManager {
         writeJsonLine(w, "name", sc.name, false);
         writeJsonLine(w, "rank", sc.rankName, false);
         writeJsonLine(w, "isPlayer", sc.isPlayer, false);
-        writeJsonLine(w, "isPrimary", sc.isPrimary, false);
+        writeJsonLine(w, "isCapital", sc.isCapital, false);
         writeJsonLine(w, "isAutomated", sc.isAutomated, false);
         writeJsonLine(w, "age", sc.age, false);
         writeJsonLine(w, "q", sc.q, false);
@@ -749,7 +749,7 @@ public class SaveManager {
         sc.name = map.getOrDefault("name", "Colony");
         sc.rankName = map.getOrDefault("rank", "Colony");
         sc.isPlayer = Boolean.parseBoolean(map.getOrDefault("isPlayer", "false"));
-        sc.isPrimary = Boolean.parseBoolean(map.getOrDefault("isPrimary", "false"));
+        sc.isCapital = Boolean.parseBoolean(map.getOrDefault("isCapital", "false"));
         sc.isAutomated = Boolean.parseBoolean(map.getOrDefault("isAutomated", "false"));
         sc.age = Integer.parseInt(map.getOrDefault("age", "0"));
         sc.q = Integer.parseInt(map.getOrDefault("q", "0"));
