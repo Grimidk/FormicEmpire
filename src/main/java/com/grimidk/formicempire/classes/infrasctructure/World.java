@@ -17,6 +17,7 @@ import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.services.ColonyStarterService;
+import com.grimidk.formicempire.classes.entities.services.DynastyDeathService;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 
@@ -717,16 +718,9 @@ public class World {
             }
         }
         
-        ColonyStarterService starter = new ColonyStarterService();
-        for (Hex hex : this.hexes) {
-            Colony c = hex.getColony();
-            if (c != null && !c.isPlayer() && c.getQueens().isEmpty()) {
-                starter.dismantleColony(hex);
-                if (c.getDynasty() != null) {
-                    c.getDynasty().removeColony(c);
-                }
-            }
-        }
+        // --- Process Dynasty/Colony Deaths ---
+        DynastyDeathService deathService = new DynastyDeathService();
+        deathService.processDynastyDeaths(this);
 
         randomizeWeather();
 
@@ -738,7 +732,7 @@ public class World {
             }
             
             for (Hex hex : this.hexes) {
-                if (hex.getColony() != null) {
+                if (hex.getColony() != null && !hex.getColony().getDynasty().isDefeated()) {
                     hex.getColony().getLabourService().runNuptial(hex.getColony(), this, hex);
                     hex.getColony().logEvent("The Eclipse has triggered a spontaneous Nuptial Flight!");
                 }
@@ -782,7 +776,7 @@ public class World {
         this.month++;
         
         for (Hex hex : this.hexes) {
-            if (hex.getColony() != null) {
+            if (hex.getColony() != null && !hex.getColony().getDynasty().isDefeated()) {
                 hex.getColony().runMonthlyJobs();
             }
         }
@@ -825,7 +819,7 @@ public class World {
         this.year++;
         
         for (Hex hex : this.hexes) {
-            if (hex.getColony() != null) {
+            if (hex.getColony() != null && !hex.getColony().getDynasty().isDefeated()) {
                 hex.getColony().runYearlyJobs(this, hex);
             }
         }

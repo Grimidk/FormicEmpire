@@ -1,0 +1,84 @@
+package com.grimidk.formicempire.classes.entities.services;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.infrasctructure.World;
+
+public class DynastyDeathService {
+
+    public void processDynastyDeaths(World world) {
+        ColonyStarterService starter = new ColonyStarterService();
+        
+        for (Dynasty dynasty : world.getDynastys()) {
+            if (dynasty.isDefeated()) continue;
+            
+            List<Colony> deadColonies = new ArrayList<>();
+            boolean capitalDied = false;
+            
+            for (Colony c : dynasty.getColonies()) {
+                if (c.getAntTotal() == 0 && c.getAge() >= 7) {
+                    deadColonies.add(c);
+                    if (c.isCapital()) {
+                        capitalDied = true;
+                    }
+                }
+            }
+            
+            if (deadColonies.isEmpty()) continue;
+            
+            if (deadColonies.size() == dynasty.getColonies().size()) {
+                Colony remnant = deadColonies.stream().filter(Colony::isCapital).findFirst().orElse(deadColonies.get(0));
+                
+                for (Colony dead : deadColonies) {
+                    if (dead == remnant) {
+                        dead.setActive(false);
+                        dead.setAutomationEnabled(false);
+                        dead.logEvent("The last colony has fallen. This is now a dead remnant.");
+                    } else {
+                        Hex hex = findHexForColony(world, dead);
+                        if (hex != null) starter.dismantleColony(hex);
+                    }
+                }
+                
+                dynasty.setDefeated(true);
+                System.out.println("[DynastyDeathService] Dynasty Defeated: " + dynasty.getName());
+                
+            } else {
+                for (Colony dead : deadColonies) {
+                    Hex hex = findHexForColony(world, dead);
+                    if (hex != null) starter.dismantleColony(hex);
+                    dynasty.removeColony(dead);
+                }
+                
+                if (capitalDied) {
+                    Colony newCapital = null;
+                    int maxAnts = -1;
+                    
+                    for (Colony c : dynasty.getColonies()) {
+                        if (c.getAntTotal() > maxAnts) {
+                            maxAnts = c.getAntTotal();
+                            newCapital = c;
+                        }
+                    }
+                    
+                    if (newCapital != null) {
+                        newCapital.setCapital(true);
+                        newCapital.logEvent("PROMOTION: The old capital has fallen. This colony is now the Capital of the " + dynasty.getName() + "!");
+                        System.out.println("[DynastyDeathService] New capital crowned for " + dynasty.getName() + ": " + newCapital.getName());
+                    }
+                }
+            }
+        }
+    }
+    
+    private Hex findHexForColony(World world, Colony colony) {
+        for (Hex h : world.getHexes()) {
+            if (h.getColony() == colony) return h;
+        }
+        return null;
+    }
+}

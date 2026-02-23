@@ -14,7 +14,6 @@ To Fix (By decreasing priority) :
 	Mid:
 	hex borders not clear, need to be double wide
 	npc shouldn't ranch in bad aphid environment and herd while not active (recheck auto and sum in general)
-	save autobuild
 
 	Low:
 	builders act weird af in build zone

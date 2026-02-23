@@ -64,10 +64,12 @@ public class Savefile implements Serializable {
         public int id;
         public String name;
         public boolean isPlayer;
+        public boolean isDefeated;
         public String rankName;
         public int speciesId;
         public int researchPoints;
         public List<Integer> unlockedUpgradeIds = new ArrayList<>();
+        public List<Integer> absorbedDynastyIds = new ArrayList<>();
         public Map<String, Integer> deathStatistics = new HashMap<>();
     }
 

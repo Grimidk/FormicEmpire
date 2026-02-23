@@ -368,6 +368,10 @@ public class ColonyLabourService {
                 if (isDead) {
                     Dynasty oldDynasty = existingColony.getDynasty();
                     if (oldDynasty != null) {
+                        if (!dynasty.getAbsorbedDynastyIds().contains(oldDynasty.getId())) {
+                            dynasty.addAbsorbedDynasty(oldDynasty.getId());
+                            colony.logEvent("DYNASTY: Absorbed the remnants of " + oldDynasty.getName() + "!");
+                        }
                         oldDynasty.removeColony(existingColony);
                     }
                     existingColony.setDynasty(null);

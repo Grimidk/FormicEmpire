@@ -29,10 +29,14 @@ public class Dynasty {
     private ColonyRank rank;
     private Color color;
     
+    // --- State Flags ---
+    private boolean isDefeated; 
+    
     // Global Data
     private final Set<Upgrade> unlockedUpgrades;
     private final List<Colony> colonies;
     private final Map<String, Integer> globalDeathStatistics;
+    private final List<Integer> absorbedDynastyIds;
 
     // Services
     private transient DynastyAutomationService automationService;
@@ -47,8 +51,10 @@ public class Dynasty {
         this.colonies = new ArrayList<>();
         this.unlockedUpgrades = new HashSet<>();
         this.globalDeathStatistics = new ConcurrentHashMap<>();
+        this.absorbedDynastyIds = new ArrayList<>();
         this.researchPoints = 0;
         this.rank = GameConstants.RANK_ANT;
+        this.isDefeated = false;
         
         initializeColor();
         initializeServices();
@@ -59,6 +65,7 @@ public class Dynasty {
         this.name = savedDynasty.name;
         this.isPlayer = savedDynasty.isPlayer;
         this.researchPoints = savedDynasty.researchPoints;
+        this.isDefeated = savedDynasty.isDefeated;
         
         this.species = GameConstants.SPECIES_OMNI; 
         for(Species s : GameConstants.getSpecies()) {
@@ -71,6 +78,11 @@ public class Dynasty {
         this.colonies = new ArrayList<>();
         this.unlockedUpgrades = new HashSet<>();
         this.globalDeathStatistics = new ConcurrentHashMap<>();
+        
+        this.absorbedDynastyIds = new ArrayList<>();
+        if (savedDynasty.absorbedDynastyIds != null) {
+            this.absorbedDynastyIds.addAll(savedDynasty.absorbedDynastyIds);
+        }
         
         if (savedDynasty.deathStatistics != null) {
             this.globalDeathStatistics.putAll(savedDynasty.deathStatistics);
@@ -129,6 +141,7 @@ public class Dynasty {
 
     // --- Logic ---
     public void runDailyJobs() {
+        if (this.isDefeated) return;
         this.automationService.runDailyAutomation(this);
         this.rankUp();
     }
@@ -167,6 +180,12 @@ public class Dynasty {
         colonies.remove(colony);
         rankUp();
     }
+    
+    public void addAbsorbedDynasty(int dynastyId) {
+        if (!absorbedDynastyIds.contains(dynastyId)) {
+            absorbedDynastyIds.add(dynastyId);
+        }
+    }
 
     // --- Getters & Setters ---
     public int getId() { return id; }
@@ -190,11 +209,15 @@ public class Dynasty {
     public void setResearchPoints(int researchPoints) { this.researchPoints = researchPoints; }
     public void addResearchPoints(int amount) { this.researchPoints += amount; }
 
+    public boolean isDefeated() { return isDefeated; }
+    public void setDefeated(boolean isDefeated) { this.isDefeated = isDefeated; }
+
     public Set<Upgrade> getUnlockedUpgrades() { return unlockedUpgrades; }
     public boolean hasUpgrade(Upgrade upgrade) { return unlockedUpgrades.contains(upgrade); }
     public void unlockUpgrade(Upgrade upgrade) { unlockedUpgrades.add(upgrade); }
 
     public List<Colony> getColonies() { return colonies; }
+    public List<Integer> getAbsorbedDynastyIds() { return absorbedDynastyIds; }
     
     public Map<String, Integer> getGlobalDeathStatistics() { return globalDeathStatistics; }
     

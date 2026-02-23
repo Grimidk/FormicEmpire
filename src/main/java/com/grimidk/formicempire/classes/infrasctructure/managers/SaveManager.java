@@ -335,6 +335,7 @@ public class SaveManager {
                 sc.id = dynasty.getId();
                 sc.name = dynasty.getName();
                 sc.isPlayer = dynasty.isPlayer();
+                sc.isDefeated = dynasty.isDefeated();
                 sc.rankName = dynasty.getRank() != null ? dynasty.getRank().getName() : "Ant";
                 sc.researchPoints = dynasty.getResearchPoints();
                 sc.speciesId = dynasty.getSpecies() != null ? dynasty.getSpecies().getId() : 1;
@@ -342,6 +343,7 @@ public class SaveManager {
                 for(Upgrade u : dynasty.getUnlockedUpgrades()) {
                     sc.unlockedUpgradeIds.add(u.getId());
                 }
+                sc.absorbedDynastyIds = new ArrayList<>(dynasty.getAbsorbedDynastyIds());
                 
                 sc.deathStatistics = new HashMap<>(dynasty.getGlobalDeathStatistics());
                 dynastyList.add(sc);
@@ -517,10 +519,12 @@ public class SaveManager {
         writeJsonLine(w, "id", sc.id, false);
         writeJsonLine(w, "name", sc.name, false);
         writeJsonLine(w, "isPlayer", sc.isPlayer, false);
+        writeJsonLine(w, "isDefeated", sc.isDefeated, false);
         writeJsonLine(w, "rank", sc.rankName, false);
         writeJsonLine(w, "speciesId", sc.speciesId, false);
         writeJsonLine(w, "researchPoints", sc.researchPoints, false);
         w.write("      \"unlockedUpgradeIds\": " + serializeListToJson(sc.unlockedUpgradeIds) + ","); w.newLine();
+        w.write("      \"absorbedDynastyIds\": " + serializeListToJson(sc.absorbedDynastyIds) + ","); w.newLine();
         w.write("      \"deathStatistics\": " + serializeMapToJson(sc.deathStatistics)); w.newLine(); // Last item
         w.write("    }");
         if (!isLast) w.write(",");
@@ -711,10 +715,12 @@ public class SaveManager {
         sc.id = Integer.parseInt(map.getOrDefault("id", "0"));
         sc.name = map.getOrDefault("name", "Dynasty");
         sc.isPlayer = Boolean.parseBoolean(map.getOrDefault("isPlayer", "false"));
+        sc.isDefeated = Boolean.parseBoolean(map.getOrDefault("isDefeated", "false"));
         sc.rankName = map.getOrDefault("rank", "Ant");
         sc.speciesId = Integer.parseInt(map.getOrDefault("speciesId", "1"));
         sc.researchPoints = Integer.parseInt(map.getOrDefault("researchPoints", "0"));
         sc.unlockedUpgradeIds = deserializeJsonToList(map.get("unlockedUpgradeIds"));
+        sc.absorbedDynastyIds = deserializeJsonToList(map.get("absorbedDynastyIds"));
         sc.deathStatistics = deserializeJsonToMap(map.get("deathStatistics"));
         return sc;
     }
