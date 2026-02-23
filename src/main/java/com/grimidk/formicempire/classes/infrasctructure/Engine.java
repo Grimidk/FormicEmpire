@@ -168,8 +168,9 @@ public class Engine extends Thread {
             this.world.loadWorld(savefile);
         } else {
             System.out.println("Generating new world...");
-            Colony colony = new Colony(1, "Player Colony", true);
-            this.world.startWorld(GameConstants.BIOME_PLAINS, colony);
+            String baseName = "Player";
+            Colony colony = new Colony(1, baseName + " Prime", true);
+            this.world.startWorld(GameConstants.BIOME_PLAINS, colony, baseName);
         }
     }
 

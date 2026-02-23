@@ -110,6 +110,23 @@ public class Dynasty {
         }
     }
 
+    public String generateNextColonyName() {
+        String baseName = this.name;
+        if (baseName != null && baseName.endsWith(" Dynasty")) {
+            baseName = baseName.substring(0, baseName.length() - 8);
+        } else if (baseName == null) {
+            baseName = "Player";
+        }
+        
+        int count = colonies.size();
+        if (count == 0) return baseName + " Prime";
+        if (count == 1) return "New " + baseName;
+        if (count == 2) return baseName + " Secundus";
+        if (count == 3) return baseName + " Tertius";
+        if (count == 4) return baseName + " Quartus";
+        return baseName + " " + (count + 1);
+    }
+
     // --- Logic ---
     public void runDailyJobs() {
         this.automationService.runDailyAutomation(this);

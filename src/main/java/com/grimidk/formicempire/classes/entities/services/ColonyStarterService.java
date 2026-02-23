@@ -2,18 +2,45 @@ package com.grimidk.formicempire.classes.entities.services;
 
 import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
 
 public class ColonyStarterService {
+    
+    private String formatName(String name) {
+        if (name == null || name.trim().isEmpty()) return "Player";
+        name = name.trim();
+        return name.substring(0, 1).toUpperCase() + name.substring(1);
+    }
 
     public void initializeNewColony(Colony colony) {
         String type = colony.isPlayer() ? "Player" : "AI";
-        System.out.println("[ColonyStarterService] Initializing new " + type + " colony: " + colony.getName());
         
         if (colony.getDynasty() != null) {
-            boolean isFirst = colony.getDynasty().getColonies().size() == 1;
+            Dynasty d = colony.getDynasty();
+            
+            String baseName = d.getName();
+            if (baseName != null && baseName.endsWith(" Dynasty")) {
+                baseName = baseName.substring(0, baseName.length() - 8);
+            }
+            baseName = formatName(baseName);
+            
+            int index = d.getColonies().indexOf(colony);
+            if (index == -1) index = d.getColonies().size(); 
+            
+            String newName;
+            if (index == 0) newName = baseName + " Prime";
+            else if (index == 1) newName = "New " + baseName;
+            else if (index == 2) newName = baseName + " Secundus";
+            else if (index == 3) newName = baseName + " Tertius";
+            else if (index == 4) newName = baseName + " Quartus";
+            else newName = baseName + " " + (index + 1);
+            
+            colony.setName(newName);
+            
+            boolean isFirst = (index == 0);
             colony.setCapital(isFirst);
             
             if (isFirst) {
@@ -22,7 +49,7 @@ public class ColonyStarterService {
                 colony.setAge(0);
                 
                 Colony capitalColony = null;
-                for (Colony c : colony.getDynasty().getColonies()) {
+                for (Colony c : d.getColonies()) {
                     if (c.isCapital() && c != colony) {
                         capitalColony = c;
                         break;
@@ -41,6 +68,8 @@ public class ColonyStarterService {
             colony.setCapital(true);
             colony.setAge(7);
         }
+
+        System.out.println("[ColonyStarterService] Initializing new " + type + " colony: " + colony.getName());
 
         if (!colony.isPlayer()) {
             colony.setAutomationEnabled(true);

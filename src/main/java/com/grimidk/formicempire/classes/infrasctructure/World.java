@@ -254,7 +254,13 @@ public class World {
         }
     }
     
-    public void generateWorld(Biome startBiome, int size, Colony startColony) {
+    private String formatName(String name) {
+        if (name == null || name.trim().isEmpty()) return "Player";
+        name = name.trim();
+        return name.substring(0, 1).toUpperCase() + name.substring(1);
+    }
+    
+    public void generateWorld(Biome startBiome, int size, Colony startColony, String baseName) {
         System.out.println("Generating World... Size: " + size + " rings.");
         this.worldRadius = size;
         this.hexes.clear();
@@ -262,7 +268,9 @@ public class World {
         Map<String, Hex> hexMap = new HashMap<>();
         ColonyStarterService starterService = new ColonyStarterService();
         
-        Dynasty playerDynasty = new Dynasty(this.dynastyIdCounter++, "Player Dynasty", true, GameConstants.SPECIES_OMNI);
+        baseName = formatName(baseName);
+        
+        Dynasty playerDynasty = new Dynasty(this.dynastyIdCounter++, baseName + " Dynasty", true, GameConstants.SPECIES_OMNI);
         playerDynasty.getStarterService().initializeDynasty(playerDynasty);
         playerDynasty.addColony(startColony);
         this.dynastys.add(playerDynasty);
@@ -443,7 +451,7 @@ public class World {
         }
     }
 
-    public void startWorld(Biome biome, Colony colony) {
+    public void startWorld(Biome biome, Colony colony, String baseName) {
         System.out.println("[World] startWorld called. Colony ants before init: " + colony.getAntTotal());
 
         if (colony.getAntTotal() == 0) {
@@ -453,7 +461,8 @@ public class World {
         
         System.out.println("[World] Colony ants after init: " + colony.getAntTotal());
 
-        generateWorld(biome, 8, colony);
+        baseName = formatName(baseName);
+        generateWorld(biome, 8, colony, baseName);
         changeActiveHex(getSpawnHex()); 
         updateEnvironmentalConditions();
     }
@@ -466,6 +475,15 @@ public class World {
         this.year = savefile.getYear();  
         this.worldRadius = (savefile.getWorldRadius() > 0) ? savefile.getWorldRadius() : 8;
         
+        String baseName = "Player";
+        if (savefile.getName() != null && !savefile.getName().trim().isEmpty()) {
+            String sName = savefile.getName().trim();
+            if (!sName.startsWith("Save ") && !sName.equals("Autosave")) {
+                baseName = sName;
+            }
+        }
+        baseName = formatName(baseName);
+
         this.hexes.clear();
         this.dynastys.clear();
         Map<String, Hex> hexMap = new HashMap<>();
@@ -495,7 +513,8 @@ public class World {
                     loadedDynastys.get(sc.dynastyId).addColony(c);
                 } else {
                     int newDynastyId = ++maxDynastyId;
-                    Dynasty adHocDynasty = new Dynasty(newDynastyId, c.isPlayer() ? "Player Dynasty" : "Wild Dynasty", c.isPlayer(), GameConstants.SPECIES_OMNI);
+                    String dynName = c.isPlayer() ? (baseName + " Dynasty") : "Wild Dynasty";
+                    Dynasty adHocDynasty = new Dynasty(newDynastyId, dynName, c.isPlayer(), GameConstants.SPECIES_OMNI);
                     adHocDynasty.getStarterService().initializeDynasty(adHocDynasty);
                     adHocDynasty.addColony(c);
                     this.dynastys.add(adHocDynasty);
@@ -543,7 +562,7 @@ public class World {
             }
              
             if (colony == null) {
-                colony = new Colony(1, "Player Colony", true);
+                colony = new Colony(1, baseName + " Prime", true);
             }
              
             if (colony.getAntTotal() == 0) {
@@ -551,7 +570,7 @@ public class World {
                 starter.initializeNewColony(colony);
             }
 
-            generateWorld(GameConstants.BIOME_PLAINS, this.worldRadius, colony);
+            generateWorld(GameConstants.BIOME_PLAINS, this.worldRadius, colony, baseName);
         }
 
         this.colonyIdCounter = maxColId + 1;
