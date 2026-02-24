@@ -111,9 +111,7 @@ public class ColonyStarterService {
         if (hex == null || hex.getColony() == null) return;
         Colony colony = hex.getColony();
 
-        if (colony.isPlayer()) return;
-
-        System.out.println("[ColonyStarterService] Dismantling dead NPC colony: " + colony.getName() + " at Hex (" + hex.getQ() + ", " + hex.getR() + ")");
+        System.out.println("[ColonyStarterService] Dismantling dead colony: " + colony.getName() + " at Hex (" + hex.getQ() + ", " + hex.getR() + ")");
 
         colony.setActive(false);
         colony.setAutomationEnabled(false);

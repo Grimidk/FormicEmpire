@@ -8,9 +8,7 @@ To Fix (By decreasing priority) :
 	(none right now)
 	
 	High:
-	satellites not dying but being colonizable
 	view button in dynasty screen missing
-	auto build not fucking loading
 
 	Mid:
 	hex borders not clear, need to be double wide

@@ -202,13 +202,6 @@ public class Colony {
         this.name = savedColony.name;
         this.isPlayer = savedColony.isPlayer;
         
-        this.isCapital = savedColony.isCapital;
-        this.automationEnabled = savedColony.isAutomated;
-        this.autoBuildEnabled = savedColony.autoBuildEnabled;
-        this.age = savedColony.age;
-        this.daysWithoutQueen = savedColony.daysWithoutQueen;
-        this.totalDeaths = savedColony.totalDeaths;
-        
         this.rank = GameConstants.RANK_COLONY;
         this.antGroups = new HashMap<>();
         this.deadAnts = new CopyOnWriteArrayList<>();
@@ -217,6 +210,14 @@ public class Colony {
 
         initializeLists();
         initializeDefaults(); 
+        
+        this.isCapital = savedColony.isCapital;
+        this.automationEnabled = savedColony.isAutomated;
+        this.autoBuildEnabled = savedColony.autoBuildEnabled;
+        this.age = savedColony.age;
+        this.daysWithoutQueen = savedColony.daysWithoutQueen;
+        this.totalDeaths = savedColony.totalDeaths;
+
         loadBuildings(savedColony);
         initializeAssignedRoles(); 
         initializeServices(); 
