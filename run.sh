@@ -17,8 +17,8 @@ else
     exit 1
 fi
 
-echo "Building Formic Empire..."
+echo "[Build] Building Formic Empire..."
 $MVN_EXEC clean install
 
-echo "Starting the Game..."
+echo "[Run] Starting the Game..."
 java -jar target/FormicEmpire-1.0-SNAPSHOT.jar

@@ -116,7 +116,7 @@ public class ColonyAutomationService {
         remaining -= extraFarmers;
         targets.put(GameConstants.ROLE_FARMER, farmers);
 
-        if (remaining > 0 && colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) {
+        if (remaining > 0 && colony.hasUpgrade(GameUnlocks.ROLE_RANCHER) && colony.getAphids() > 0) {
             int rancherTarget = Math.max(1, (int) (totalWorkers * 0.05));
             int toAdd = Math.min(rancherTarget, remaining);
             targets.put(GameConstants.ROLE_RANCHER, toAdd);

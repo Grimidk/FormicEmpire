@@ -159,15 +159,15 @@ public class Engine extends Thread {
 
     public void loadFile(Savefile savefile) {
         if (this.world == null) {
-            System.err.println("CRITICAL: World object is null in Engine.loadFile");
+            System.err.println("[Engine] World object is null in Engine.loadFile");
             return;
         }
 
         if (savefile != null) {
-            System.out.println("Loading existing world state from Savefile ID: " + savefile.getId());
+            System.out.println("[Engine] Loading existing world state from Savefile ID: " + savefile.getId());
             this.world.loadWorld(savefile);
         } else {
-            System.out.println("Generating new world...");
+            System.out.println("[Engine] Generating new world...");
             String baseName = "Player";
             Colony colony = new Colony(1, baseName + " Prime", true);
             this.world.startWorld(GameConstants.BIOME_PLAINS, colony, baseName);
@@ -175,7 +175,7 @@ public class Engine extends Thread {
     }
 
     public void startUp(Savefile savefile) {
-        System.out.println("Starting up Engine...");
+        System.out.println("[Engine] Starting up Engine...");
         World world = new World();
         this.setWorld(world);
 

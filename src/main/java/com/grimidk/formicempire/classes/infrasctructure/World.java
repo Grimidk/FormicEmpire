@@ -520,7 +520,7 @@ public class World {
                     adHocDynasty.addColony(c);
                     this.dynastys.add(adHocDynasty);
                     loadedDynastys.put(newDynastyId, adHocDynasty);
-                    System.out.println("Created ad-hoc Dynasty ID " + newDynastyId + " for orphan colony " + c.getName());
+                    System.out.println("[World] Created ad-hoc Dynasty ID " + newDynastyId + " for orphan colony " + c.getName());
                 }
                 
                 c.refreshAntStats(); 
@@ -550,9 +550,9 @@ public class World {
                 this.hexes.add(hex);
             }
             linkNeighbors(hexMap);
-            System.out.println("Loaded world grid from savefile (" + this.hexes.size() + " hexes, " + loadedColonies.size() + " colonies).");
+            System.out.println("[World] Loaded world grid from savefile (" + this.hexes.size() + " hexes, " + loadedColonies.size() + " colonies).");
         } else {
-            System.out.println("No map data in save (or old save version). Generating fresh world map for existing colony.");
+            System.out.println("[World] No map data in save (or old save version). Generating fresh world map for existing colony.");
             
             Colony colony = null;
             for (Colony c : loadedColonies.values()) {

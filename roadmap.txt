@@ -8,11 +8,10 @@ To Fix (By decreasing priority) :
 	(none right now)
 	
 	High:
-	view button in dynasty screen missing
+	(none right now)
 
 	Mid:
-	hex borders not clear, need to be double wide
-	npc shouldn't ranch in bad aphid environment and herd while not active (recheck auto and sum in general)
+	(none right now)
 
 	Low:
 	builders act weird af in build zone

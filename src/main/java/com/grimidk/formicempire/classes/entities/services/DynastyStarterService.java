@@ -6,7 +6,7 @@ import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks
 public class DynastyStarterService {
     
     public void initializeDynasty(Dynasty dynasty) {
-        System.out.println("Initialized Dynasty: " + dynasty.getName());
+        System.out.println("[DynastyStarterService] Initializing Dynasty: " + dynasty.getName());
         
         dynasty.unlockUpgrade(GameUnlocks.TYPE_EGG);
         dynasty.unlockUpgrade(GameUnlocks.TYPE_QUEEN);

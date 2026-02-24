@@ -242,7 +242,8 @@ public class DynastyManagementDialog extends ZeroDialog {
                 table.getColumnModel().getColumn(automationCol).setMaxWidth(100);
             }
 
-            table.getColumnModel().getColumn(actionCol).setMinWidth(160); 
+            table.getColumnModel().getColumn(actionCol).setMinWidth(220);
+            table.getColumnModel().getColumn(actionCol).setPreferredWidth(220);
             table.getColumnModel().getColumn(actionCol).setCellRenderer(new ActionPanelRenderer());
             table.getColumnModel().getColumn(actionCol).setCellEditor(new ActionPanelEditor());
 

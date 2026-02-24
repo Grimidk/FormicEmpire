@@ -289,11 +289,28 @@ public class MapDialog extends ZeroDialog {
                 hasDynasty = true;
             }
 
-            g2d.setColor(dynastyColor);
-            
+            Point[] drawPoints = new Point[6];
+            if (hasDynasty) {
+                Rectangle bounds = poly.getBounds();
+                double cx = bounds.getCenterX();
+                double cy = bounds.getCenterY();
+                double inset = 1.2; 
+                double scale = (hexRadius - inset) / (double)hexRadius;
+                
+                for(int i=0; i<6; i++) {
+                    double dx = poly.xpoints[i] - cx;
+                    double dy = poly.ypoints[i] - cy;
+                    drawPoints[i] = new Point((int)(cx + dx * scale), (int)(cy + dy * scale));
+                }
+            } else {
+                for(int i=0; i<6; i++) {
+                    drawPoints[i] = new Point(poly.xpoints[i], poly.ypoints[i]);
+                }
+            }
+
             for (int i = 0; i < 6; i++) {
-                Point p1 = new Point(poly.xpoints[i], poly.ypoints[i]);
-                Point p2 = new Point(poly.xpoints[(i + 1) % 6], poly.ypoints[(i + 1) % 6]);
+                Point p1 = drawPoints[i];
+                Point p2 = drawPoints[(i + 1) % 6];
 
                 boolean shouldDrawEdge = true;
 
@@ -310,16 +327,15 @@ public class MapDialog extends ZeroDialog {
                             shouldDrawEdge = false;
                         }
                     }
+                    
+                    g2d.setStroke(new BasicStroke(2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                    g2d.setColor(dynastyColor);
                 } else {
-                    g2d.setStroke(new BasicStroke(1));
+                    g2d.setStroke(new BasicStroke(1f));
                     g2d.setColor(Color.BLACK);
                 }
 
                 if (shouldDrawEdge) {
-                    if (hasDynasty) {
-                        g2d.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-                        g2d.setColor(dynastyColor);
-                    }
                     g2d.drawLine(p1.x, p1.y, p2.x, p2.y);
                 }
             }
