@@ -752,12 +752,14 @@ public class Colony {
     
     public int getNuptialFlightCost() {
         int base = 1000;
-        int multiplier = 1;
-        if (dynasty != null) {
-            multiplier = (int) Math.pow(2, dynasty.getColonies().size());
+        int colonyCount = (dynasty != null) ? dynasty.getColonies().size() : 1;
+        long scaledCost = (long) base * (1L + (long) colonyCount * colonyCount);
+        
+        if (scaledCost > Integer.MAX_VALUE - 100000) {
+            return Integer.MAX_VALUE - 100000;
         }
-        if (multiplier < 1) multiplier = 1;
-        return base * multiplier;
+        
+        return (int) scaledCost;
     }
 
     public void forceNuptialFlight(World world, Hex currentHex) {

@@ -29,36 +29,43 @@ public class ColonyPhysicsService {
     // --- Main Physics Loop ---
     public void runPhysics(Colony colony, Dimension activeDimension) {
         // -- Ants --
-        for (List<Ant> antList : colony.getAntGroups().values()) {
-            for (Ant ant : antList) {
-                if (!ant.isAlive()) continue;
+        for (Map.Entry<AntType, List<Ant>> entry : colony.getAntGroups().entrySet()) {
+            List<Ant> antList = entry.getValue();
 
-                boolean isActiveDim = (ant.getDimension() == activeDimension);
-                boolean shouldRunAI = isActiveDim || (Math.random() < 0.05);
+            synchronized (antList) {
+                for (Ant ant : antList) {
+                    if (!ant.isAlive()) continue;
 
-                if (!ant.isMoving() && ant.hasRoute()) {
-                    processNextRoutePoint(ant);
+                    boolean isActiveDim = (ant.getDimension() == activeDimension);
+                    boolean shouldRunAI = isActiveDim || (Math.random() < 0.05);
+
+                    if (!ant.isMoving() && ant.hasRoute()) {
+                        processNextRoutePoint(ant);
+                    }
+
+                    if (!ant.isMoving() && !ant.hasRoute() && shouldRunAI) {
+                        updateAntLogic(colony, ant);
+                    }
+                    
+                    ant.updatePosition();
                 }
-
-                if (!ant.isMoving() && !ant.hasRoute() && shouldRunAI) {
-                    updateAntLogic(colony, ant);
-                }
-                
-                ant.updatePosition();
             }
         }
         
         // -- Bugs --
-        for (Bug bug : colony.getBugs()) {
-            if (bug.isAlive() && bug.getDimension() == activeDimension) {
-                if (!bug.isMoving()) {
-                    updateBugLogic(colony, bug);
+        List<Bug> bugs = colony.getBugs();
+        synchronized (bugs) {
+            for (Bug bug : bugs) {
+                if (bug.isAlive() && bug.getDimension() == activeDimension) {
+                    if (!bug.isMoving()) {
+                        updateBugLogic(colony, bug);
+                    }
+                    bug.updatePosition();
                 }
-                bug.updatePosition();
             }
         }
     }
-    
+
     private void processNextRoutePoint(Ant ant) {
         NeoPoint next = ant.getNextRoutePoint();
         if (next != null) {
@@ -78,42 +85,48 @@ public class ColonyPhysicsService {
             if (entry.getKey() == GameConstants.TYPE_DEAD) continue;
             
             ImageIcon sprite = entry.getKey().getSprite();
-            for (Ant ant : entry.getValue()) {
-                ant.clearRoute(); 
-                
-                Rectangle targetRoom = getTargetRoomForAnt(colony, ant, virtualWidth);
-                
-                if (targetRoom != null) {
-                    ant.setDimension(WorldSpaces.UNDERWORLD);
-                    ant.setPosition(getRandomPointInRoom(colony, targetRoom, virtualWidth));
-                } 
-                else {
-                     if (shouldBeInColony(ant)) {
+            List<Ant> antList = entry.getValue();
+            synchronized (antList) {
+                for (Ant ant : antList) {
+                    ant.clearRoute(); 
+                    
+                    Rectangle targetRoom = getTargetRoomForAnt(colony, ant, virtualWidth);
+                    
+                    if (targetRoom != null) {
                         ant.setDimension(WorldSpaces.UNDERWORLD);
-                        ant.setPosition(getRandomPointInRoom(colony, getRoomBounds(colony, WorldSpaces.STORAGE), virtualWidth));
-                    } else {
-                        ant.setDimension(WorldSpaces.OVERWORLD);
-                        Rectangle yard = getOverworldJobBounds(colony, ant);
-                        if (yard != null) {
-                            ant.setPosition(getRandomPointInRoom(colony, yard, virtualWidth));
+                        ant.setPosition(getRandomPointInRoom(colony, targetRoom, virtualWidth));
+                    } 
+                    else {
+                         if (shouldBeInColony(ant)) {
+                            ant.setDimension(WorldSpaces.UNDERWORLD);
+                            ant.setPosition(getRandomPointInRoom(colony, getRoomBounds(colony, WorldSpaces.STORAGE), virtualWidth));
                         } else {
-                            ant.setPosition(getRandomOverworldPosition(colony, sprite));
+                            ant.setDimension(WorldSpaces.OVERWORLD);
+                            Rectangle yard = getOverworldJobBounds(colony, ant);
+                            if (yard != null) {
+                                ant.setPosition(getRandomPointInRoom(colony, yard, virtualWidth));
+                            } else {
+                                ant.setPosition(getRandomOverworldPosition(colony, sprite));
+                            }
                         }
                     }
                 }
             }
         }
         
-        for (Bug bug : colony.getBugs()) {
-            if (bug.getBugType() == GameConstants.TYPE_APHID && colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) {
-                Rectangle yard = getRoomBounds(colony, WorldSpaces.RANCHER_YARD);
-                bug.setPosition(getRandomPointInRoom(colony, yard, virtualWidth));
-            } else if (bug.getBugType() == GameConstants.TYPE_PARASITE) {
-                bug.setDimension(WorldSpaces.UNDERWORLD);
-                Rectangle hideout = getRoomBounds(colony, WorldSpaces.STORAGE);
-                bug.setPosition(getRandomPointInRoom(colony, hideout, virtualWidth));
-            } else {
-                bug.setPosition(new Point(-1000, -1000));
+        List<Bug> bugs = colony.getBugs();
+        synchronized (bugs) {
+            for (Bug bug : bugs) {
+                if (bug.getBugType() == GameConstants.TYPE_APHID && colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) {
+                    Rectangle yard = getRoomBounds(colony, WorldSpaces.RANCHER_YARD);
+                    bug.setPosition(getRandomPointInRoom(colony, yard, virtualWidth));
+                } else if (bug.getBugType() == GameConstants.TYPE_PARASITE) {
+                    bug.setDimension(WorldSpaces.UNDERWORLD);
+                    Rectangle hideout = getRoomBounds(colony, WorldSpaces.STORAGE);
+                    bug.setPosition(getRandomPointInRoom(colony, hideout, virtualWidth));
+                } else {
+                    bug.setPosition(new Point(-1000, -1000));
+                }
             }
         }
     }
