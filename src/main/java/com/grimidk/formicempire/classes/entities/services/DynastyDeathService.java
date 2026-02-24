@@ -20,7 +20,13 @@ public class DynastyDeathService {
             boolean capitalDied = false;
             
             for (Colony c : dynasty.getColonies()) {
-                if (c.getAntTotal() == 0 && c.getAge() >= 7) {
+                boolean deadFromZeroAnts = c.getAntTotal() == 0 && c.getAge() >= 7;
+                boolean deadFromNoQueens = c.getDaysWithoutQueen() >= 7;
+                
+                if (deadFromZeroAnts || deadFromNoQueens) {
+                    if (deadFromNoQueens && c.getAntTotal() > 0) {
+                        System.out.println("[DynastyDeathService] Colony collapsed due to 7 days without a Queen: " + c.getName());
+                    }
                     deadColonies.add(c);
                     if (c.isCapital()) {
                         capitalDied = true;

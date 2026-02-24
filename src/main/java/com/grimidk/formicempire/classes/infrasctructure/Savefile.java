@@ -85,6 +85,7 @@ public class Savefile implements Serializable {
         public boolean isAutomated;
         public boolean autoBuildEnabled;
         public int age;
+        public int daysWithoutQueen;
         public int q; 
         public int r;        
         public float progress;

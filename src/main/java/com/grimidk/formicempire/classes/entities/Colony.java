@@ -41,6 +41,7 @@ public class Colony {
     private boolean autoBuildEnabled = false;
     private boolean isCapital = false;
     private int age;
+    private int daysWithoutQueen;
     
     // --- Population Data ---
     private final Map<AntType, List<Ant>> antGroups;
@@ -183,6 +184,7 @@ public class Colony {
         this.automationEnabled = !isPlayer;
         this.totalDeaths = 0;
         this.age = 0;
+        this.daysWithoutQueen = 0;
         this.antGroups = new HashMap<>();
         this.deadAnts = new CopyOnWriteArrayList<>(); 
         this.bugs = new CopyOnWriteArrayList<>();
@@ -204,6 +206,7 @@ public class Colony {
         this.automationEnabled = savedColony.isAutomated;
         this.autoBuildEnabled = savedColony.autoBuildEnabled;
         this.age = savedColony.age;
+        this.daysWithoutQueen = savedColony.daysWithoutQueen;
         this.totalDeaths = savedColony.totalDeaths;
         
         this.rank = GameConstants.RANK_COLONY;
@@ -356,6 +359,8 @@ public class Colony {
     public void setCapital(boolean isCapital) { this.isCapital = isCapital; }
     public int getAge() { return age; }
     public void setAge(int age) { this.age = age; }
+    public int getDaysWithoutQueen() { return daysWithoutQueen; }
+    public void setDaysWithoutQueen(int days) { this.daysWithoutQueen = days; }
     
     public Dynasty getDynasty() { return dynasty; }
     public void setDynasty(Dynasty dynasty) { 
@@ -816,6 +821,15 @@ public class Colony {
                 matureColony();
             }
             return;
+        }
+
+        if (this.getQueens().isEmpty()) {
+            this.daysWithoutQueen++;
+            if (this.daysWithoutQueen == 1 || this.daysWithoutQueen == 6) {
+                this.logEvent("WARNING: Colony has no Queen! Days without Queen: " + this.daysWithoutQueen + "/7");
+            }
+        } else {
+            this.daysWithoutQueen = 0;
         }
 
         if (this.automationEnabled) {

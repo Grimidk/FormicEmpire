@@ -373,6 +373,7 @@ public class SaveManager {
                     sc.isAutomated = c.isAutomationEnabled();
                     sc.autoBuildEnabled = c.isAutoBuildEnabled();
                     sc.age = c.getAge();
+                    sc.daysWithoutQueen = c.getDaysWithoutQueen();
                     sc.q = h.getQ();
                     sc.r = h.getR();
                     
@@ -544,6 +545,7 @@ public class SaveManager {
         writeJsonLine(w, "isAutomated", sc.isAutomated, false);
         writeJsonLine(w, "autoBuildEnabled", sc.autoBuildEnabled, false);
         writeJsonLine(w, "age", sc.age, false);
+        writeJsonLine(w, "daysWithoutQueen", sc.daysWithoutQueen, false);
         writeJsonLine(w, "q", sc.q, false);
         writeJsonLine(w, "r", sc.r, false);
         
@@ -761,6 +763,7 @@ public class SaveManager {
         sc.isAutomated = Boolean.parseBoolean(map.getOrDefault("isAutomated", "false"));
         sc.autoBuildEnabled = Boolean.parseBoolean(map.getOrDefault("autoBuildEnabled", "false"));
         sc.age = Integer.parseInt(map.getOrDefault("age", "0"));
+        sc.daysWithoutQueen = Integer.parseInt(map.getOrDefault("daysWithoutQueen", "0"));
         sc.q = Integer.parseInt(map.getOrDefault("q", "0"));
         sc.r = Integer.parseInt(map.getOrDefault("r", "0"));
         sc.totalAnts = Integer.parseInt(map.getOrDefault("totalAnts", "0"));
