@@ -71,6 +71,7 @@ public class TriggerManager {
         checkGraveKeeperUnlock();
         checkColonyDeath();
         checkAllNPCTriggers();
+        checkMassFlightUnlock();
     }
 
     private void checkHourlyTriggers() {
@@ -261,6 +262,17 @@ public class TriggerManager {
             fireTrigger(GameUnlocks.ROLE_POLICE, 
                 "Parasitic Infestation", 
                 "The colony has become so prosperous that parasitic bugs may infiltrate it!");
+        }
+    }
+
+    private void checkMassFlightUnlock() {
+        if (playerColony.getDynasty() == null) return;
+        if (playerColony.hasUpgrade(GameUnlocks.ABILITY_MASS_FLIGHT)) return;
+
+        if (playerColony.getDynasty().getTotalNuptialFlights() >= 10) {
+            fireTrigger(GameUnlocks.ABILITY_MASS_FLIGHT,
+                "Imperial Decree",
+                "Your dynasty has performed 10 nuptial flights! You have unlocked the 'Mass Nuptial Flights' ability in the Colony Operations menu (Z).");
         }
     }
     

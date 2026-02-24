@@ -68,6 +68,7 @@ public class Savefile implements Serializable {
         public String rankName;
         public int speciesId;
         public int researchPoints;
+        public int totalNuptialFlights;
         public List<Integer> unlockedUpgradeIds = new ArrayList<>();
         public List<Integer> absorbedDynastyIds = new ArrayList<>();
         public Map<String, Integer> deathStatistics = new HashMap<>();

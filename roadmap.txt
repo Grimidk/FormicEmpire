@@ -16,7 +16,6 @@ To Fix (By decreasing priority) :
 	Low:
 	builders act weird af in build zone
 	breeders go out of the colony in nuptial
-	mass flight ability
 
 	Can't reproduce:
 	hex changing not happening (reported by gopher)

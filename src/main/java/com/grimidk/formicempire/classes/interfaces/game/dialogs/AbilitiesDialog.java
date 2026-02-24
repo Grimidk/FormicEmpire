@@ -96,6 +96,31 @@ public class AbilitiesDialog extends ZeroDialog {
             hasAnyAbility = true;
         }
 
+        if (colony.hasUpgrade(GameUnlocks.ABILITY_MASS_FLIGHT) && colony.getDynasty() != null) {
+            int massCost = colony.getDynasty().getMassNuptialFlightCost();
+            boolean hasRP = colony.getResearchPoints() >= massCost;
+            String fail = hasRP ? null : "Not enough Research Points (" + massCost + " needed).";
+
+            JPanel mp = createAbilityPanel("Mass Nuptial Flights",
+                "Spend " + massCost + " RP to trigger nuptial flights in ALL capable colonies across your dynasty.",
+                massCost,
+                e -> {
+                    if (getOwner() instanceof MainFrame) {
+                        MainFrame main = (MainFrame) getOwner();
+                        if (main.getEngine() != null && main.getEngine().getWorld() != null) {
+                            colony.getDynasty().runMassNuptialFlight(main.getEngine().getWorld());
+                            refreshDialog();
+                        }
+                    }
+                },
+                hasRP,
+                fail
+            );
+            listPanel.add(mp);
+            listPanel.add(Box.createVerticalStrut(10));
+            hasAnyAbility = true;
+        }
+
         if (!hasAnyAbility) {
             JLabel empty = new JLabel("No active abilities unlocked yet.");
             empty.setAlignmentX(Component.CENTER_ALIGNMENT);

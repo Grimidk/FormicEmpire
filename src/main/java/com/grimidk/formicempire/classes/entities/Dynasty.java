@@ -16,6 +16,7 @@ import com.grimidk.formicempire.classes.entities.services.DynastyAutomationServi
 import com.grimidk.formicempire.classes.entities.services.DynastyStarterService;
 import com.grimidk.formicempire.classes.entities.services.DynastyStatService;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
+import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 
@@ -26,6 +27,7 @@ public class Dynasty {
     private boolean isPlayer;
     private Species species;
     private int researchPoints;
+    private int totalNuptialFlights;
     private ColonyRank rank;
     private Color color;
     
@@ -53,6 +55,7 @@ public class Dynasty {
         this.globalDeathStatistics = new ConcurrentHashMap<>();
         this.absorbedDynastyIds = new ArrayList<>();
         this.researchPoints = 0;
+        this.totalNuptialFlights = 0;
         this.rank = GameConstants.RANK_ANT;
         this.isDefeated = false;
         
@@ -65,6 +68,7 @@ public class Dynasty {
         this.name = savedDynasty.name;
         this.isPlayer = savedDynasty.isPlayer;
         this.researchPoints = savedDynasty.researchPoints;
+        this.totalNuptialFlights = savedDynasty.totalNuptialFlights;
         this.isDefeated = savedDynasty.isDefeated;
         
         this.species = GameConstants.SPECIES_OMNI; 
@@ -186,6 +190,46 @@ public class Dynasty {
             absorbedDynastyIds.add(dynastyId);
         }
     }
+    
+    public void incrementNuptialFlights() {
+        this.totalNuptialFlights++;
+        if (this.totalNuptialFlights >= 10 && !hasUpgrade(GameUnlocks.ABILITY_MASS_FLIGHT)) {
+            unlockUpgrade(GameUnlocks.ABILITY_MASS_FLIGHT);
+        }
+    }
+    
+    public int getMassNuptialFlightCost() {
+        if (colonies.isEmpty()) return 10000;
+        return colonies.get(0).getNuptialFlightCost() * 10;
+    }
+    
+    public void runMassNuptialFlight(World world) {
+        if (!hasUpgrade(GameUnlocks.ABILITY_MASS_FLIGHT)) return;
+        
+        int cost = getMassNuptialFlightCost();
+        if (getResearchPoints() < cost) return;
+        
+        addResearchPoints(-cost);
+        
+        for (Colony colony : new ArrayList<>(colonies)) {
+            Hex hex = null;
+            for (Hex h : world.getHexes()) {
+                if (h.getColony() == colony) {
+                    hex = h;
+                    break;
+                }
+            }
+            
+            if (hex != null) {
+                boolean hasDrones = !colony.getDrones().isEmpty();
+                boolean hasBreeders = colony.getPrincesses().stream().anyMatch(p -> p.getRole() == GameConstants.ROLE_BREEDER);
+                
+                if (hasDrones && hasBreeders) {
+                    colony.getLabourService().runNuptial(colony, world, hex);
+                }
+            }
+        }
+    }
 
     // --- Getters & Setters ---
     public int getId() { return id; }
@@ -208,6 +252,8 @@ public class Dynasty {
     public int getResearchPoints() { return researchPoints; }
     public void setResearchPoints(int researchPoints) { this.researchPoints = researchPoints; }
     public void addResearchPoints(int amount) { this.researchPoints += amount; }
+    
+    public int getTotalNuptialFlights() { return totalNuptialFlights; }
 
     public boolean isDefeated() { return isDefeated; }
     public void setDefeated(boolean isDefeated) { this.isDefeated = isDefeated; }

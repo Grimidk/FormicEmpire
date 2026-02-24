@@ -606,6 +606,10 @@ public class ColonyLabourService {
 
         colony.logEvent("Nuptial Flight Occurred. " + queensToAdd + " new Queens joined.");
         
+        if (colony.getDynasty() != null) {
+            colony.getDynasty().incrementNuptialFlights();
+        }
+        
         if (queensLeaving > 0) {
             runSpreading(colony, queensLeaving, world, currentHex);
         }

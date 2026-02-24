@@ -166,6 +166,8 @@ public final class GameUnlocks {
     public static final Upgrade ABILITY_TUNNELS =  new Upgrade(510, "Tunnel Networks", "Subterranean Highways", "Allows your colonies to build tunnel networks between each other for faster and safer resource transport.", ABILITY_TRADE, 150000);    
     public static final Upgrade ABILITY_MANAGEMENT = new Upgrade(511, "Colony Management", "Decentralized Command", "Allows you to let colonies to build by themselves without your direct input.", ABILITY_DYNASTY, 0);
     static { upgrades.add(ABILITY_MANAGEMENT); }
+    public static final Upgrade ABILITY_MASS_FLIGHT = new Upgrade(512, "Mass Nuptial Flights", "Imperial Decree", "Triggers nuptial flights in all colonies capable of doing so. Costs 10x standard forced flight cost.", ABILITY_FORCED_FLIGHT, 0);
+    static { upgrades.add(ABILITY_MASS_FLIGHT); }
     public static final Upgrade ABILITY_ABILITY = new Upgrade(900, "Ability Menu", "Abilities Unlocked", "Allows you to see the abilities menu.", null, 0);
     static { upgrades.add(ABILITY_ABILITY); }
 

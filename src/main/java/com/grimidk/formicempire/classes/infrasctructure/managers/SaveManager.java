@@ -338,6 +338,7 @@ public class SaveManager {
                 sc.isDefeated = dynasty.isDefeated();
                 sc.rankName = dynasty.getRank() != null ? dynasty.getRank().getName() : "Ant";
                 sc.researchPoints = dynasty.getResearchPoints();
+                sc.totalNuptialFlights = dynasty.getTotalNuptialFlights();
                 sc.speciesId = dynasty.getSpecies() != null ? dynasty.getSpecies().getId() : 1;
                 
                 for(Upgrade u : dynasty.getUnlockedUpgrades()) {
@@ -524,6 +525,7 @@ public class SaveManager {
         writeJsonLine(w, "rank", sc.rankName, false);
         writeJsonLine(w, "speciesId", sc.speciesId, false);
         writeJsonLine(w, "researchPoints", sc.researchPoints, false);
+        writeJsonLine(w, "totalNuptialFlights", sc.totalNuptialFlights, false);
         w.write("      \"unlockedUpgradeIds\": " + serializeListToJson(sc.unlockedUpgradeIds) + ","); w.newLine();
         w.write("      \"absorbedDynastyIds\": " + serializeListToJson(sc.absorbedDynastyIds) + ","); w.newLine();
         w.write("      \"deathStatistics\": " + serializeMapToJson(sc.deathStatistics)); w.newLine(); // Last item
@@ -721,6 +723,7 @@ public class SaveManager {
         sc.rankName = map.getOrDefault("rank", "Ant");
         sc.speciesId = Integer.parseInt(map.getOrDefault("speciesId", "1"));
         sc.researchPoints = Integer.parseInt(map.getOrDefault("researchPoints", "0"));
+        sc.totalNuptialFlights = Integer.parseInt(map.getOrDefault("totalNuptialFlights", "0"));
         sc.unlockedUpgradeIds = deserializeJsonToList(map.get("unlockedUpgradeIds"));
         sc.absorbedDynastyIds = deserializeJsonToList(map.get("absorbedDynastyIds"));
         sc.deathStatistics = deserializeJsonToMap(map.get("deathStatistics"));
