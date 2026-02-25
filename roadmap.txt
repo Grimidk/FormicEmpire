@@ -15,6 +15,7 @@ To Fix (By decreasing priority) :
 
 	Low:
 	breeders go out of the colony in nuptial
+	automated tests?
 
 	Can't reproduce:
 	hex changing not happening (reported by gopher)
