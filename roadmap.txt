@@ -1,50 +1,54 @@
 Here is the current roadmap of features and fixes:
 
-To Fix: 
-	Urgent:
+To Fix (By decreasing priority) : 
+	Important not Urgent:
+	late game performance (physics too taxing, may need to deload ants outside of area or update less when >50k ants) maybe look into LWJGL
+
+	Game Breaking:
+	(none right now)
 	
 	High:
+	(none right now)
 
 	Mid:
-	automate scouting, graving, researching and building 
-	handle colony death when not main or playable
+	(none right now)
 
 	Low:
-	colony scroll down
-	not dynamic colony sprites while stretching screen 
-	builders act weird af in build zone
-	reorganize repositories
+	breeders go out of the colony in nuptial
+
+	Can't reproduce:
+	hex changing not happening (reported by gopher)
 	
-To Feature:
+To Feature (to be done in order):
 Needed for launch (v1.0) (Launch Version):
 	Priority:
-	design map and buttons and that (use simple colors and icons) and shows small tooltip of colonies
+	first round of species and assimilations( multi queen, majors ) (and handle dynasty death to earn assimilation)
+	trade routes (async with roles and incoming outgoing recurrent and one time and travel time and danger level and boring tunnels)
 
-	Everything else:
-	colonizing and trade routes (async with roles and incoming outgoing recurrent and one time and travel time and danger level and boring tunnels) and new colonies and civilizations-species (species empress?) (research inheritance)	
-	breeders go out of the colony in nuptial
-	auxiliary room sprites (storage (resources), farm (shroom), nurse (bedding), royal (nests and science)) and expansion (breeder room)
-	more settings (allow idle to forage, allow unassigned, choose default, change roles to proportions (may use by npc), fuzzed parasites, arachnophobia mode ?)
-	more species and more bugs (constants and icons)
+	Everything else :
+	auxiliary room sprites (storage (resources), farm (shroom), nurse (bedding), royal (nests and science))
+	more settings (allow idle to forage, allow unassigned, choose default, fuzzed parasites, arachnophobia mode ?)
+	diplomacy and diplomatic reputation (own and xeno colonies) and alliances (non-aggression pacts) and wars 
+	diplo dialog with stance options (neutral, aggressive, peaceful)
+	battle system (mass battle in land and air)
 	assimilation of species for upgrades and research assimilation system
-	assimilated species get added to a pool for drones and avoid genetic estagnation
-	assimilation Multi queen (Pharaoh ants), Super majors (Marauder ants), Trap-jaw (Trap jaw ants), Honey-pot (Honey pot ants), Door-head (Turtle ants), Wood burrowing (Carpenter ants), Silk weaving (Weaver ants), Rafting (Flood plains ants), Fire venom (Fire ants), Jumping (Jet ants), Gliding (Gliding ants), Stinging (Bullet ants), Swarming (Army ants), Stealth (Ghost ants), Fast bitting (Dracula ants), Heat resistance (Saharan silver ants), Deadly venom (Harvester ants), Self destruction (Exploding ants), Far sight (Bulldog ants), Hive building (Shining black ants), Location sensing (Desert ants)
-	civ/specie ascension with ranks and unlocking (Automation, Cloning ants, Taming bugs, Bone smithing)
+	assimilated species get added to a pool for drones and avoid genetic stagnation
+	assimilation (	Multi queen (Pharaoh ants), Super majors (Marauder ants), Trap-jaw (Trap jaw ants), Honey-pot (Honey pot ants), Door-head (Turtle ants), Wood burrowing (Carpenter ants), Silk weaving (Weaver ants), Rafting (Flood plains ants), Fire venom (Fire ants), Jumping (Jet ants), Gliding (Gliding ants), Stinging (Bullet ants), Swarming (Army ants), Stealth (Ghost ants), Fast bitting (Dracula ants), Heat resistance (Saharan silver ants), Deadly venom (Harvester ants), Self destruction (Exploding ants), Far sight (Bulldog ants), Hive building (Shining black ants), Location sensing (Desert ants))
 	ant subtypes (enable by role /  exclusion) checks with new sprites 
-	more communism (?)
+	revamp story and lore and maybe intro screen
+	more socialism (?)
 	visual filters for weather, time of day, biome etc.
 	research tree
 	building tree
 	minerals
+	synergies ( Super majors + Chemical throwing = Artillery ants; Self destruction + Acid spitting = Corrosive bombs; Silk weaving + Hive building = Web building; Air-force ants + self destruction = Air-bomber ants)
 	icons for all constants and unlocks
 	more upgrades (stronger start)
 	more buildings
 	more roles (commander and captain roles, air force)
 	more enemies ( Rebel ant colonies, Bugs, Arachnids, Reptiles, Birds, Rodents, Zombie ant colonies, Parasitic ants)
 	more stats (kills, historic productions, graphs?)
-	diplomacy and diplomatic reputation and alliances and wars 
-	battle system (mass battle in land and air)
-	synergies ( Super majors + Chemical throwing = Artillery ants; Self destruction + Acid spitting = Corrosive bombs; Silk weaving + Hive building = Web building; Airforce ants + self destruction = Airbomber ants)
+	more species and more bugs (constants and icons)
 	non-ant assimilation ( Winged workers (Bees), Spiked larvae, Chemical throwing (Bombardier beetle), Chirping (Grass hopper), Diving, Mineralized exoskeletons, Rock mining, Bioluminescence (Fireflies), Static electricity generation, Pollination (Flies) )
 	rework tutorial and obscure unlocks
 	rework menus and key binds and how the ui looks
@@ -52,6 +56,7 @@ Needed for launch (v1.0) (Launch Version):
 	rework abilities and alerts and triggers (new classes?)
 	rework saves to be cleaner
 	rework manager and aux files
+	balance every upgrade
 	ant menus (detailed per ant)
 	music and sounds and settings for them
 	langs (ENG, SPA, POR, FRE, GER, RUS, CHN, JAP)
@@ -61,8 +66,17 @@ Needed for launch (v1.0) (Launch Version):
 	package into playable
 	register Grim Games or Grimidk in steam as dev team
 	versioning to go back to previous stable patches
+	credits screen
 	cleanup code (no placeholders) and refactor inefficiencies with inheritance and stuff, hexagonal architecture, async functions and clean comments 
 
 Post launch (v1.1) (Improvements Update):
-    (Secret for now)
+    engine clean up for reusability
+	console and commands for debugging 
+	native universal modding support
+	custom key bind settings for all keys
+	roadmap screen in game (use this txt)
+	global stats from all players (needs api and consent)
+	socials screen with discord server and instagram
 
+Post launch (v1.2) (Civilization Update):
+	(Secret for now)

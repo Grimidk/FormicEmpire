@@ -15,5 +15,4 @@ Requirements:
     and Electricity (Optional)
 
 Running the game (bash):
-    ./mvnw clean install
-    java -jar target/FormicEmpire-1.0-SNAPSHOT.jar
+    ./run.sh

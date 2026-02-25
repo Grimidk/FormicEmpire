@@ -19,6 +19,8 @@ public class HatchRateDialog extends ZeroDialog {
     private final Map<AntType, JSpinner> spinnerMap = new HashMap<>();
     private final JLabel totalLabel = new JLabel("Total: 100.0%");
     private final JPanel centerPanel;
+    
+    private boolean isAdjusting = false;
 
     public HatchRateDialog(JFrame owner, Colony colony) {
         super(owner, "Manage Pupa Hatch Rates", new Dimension(400, 350));
@@ -34,9 +36,18 @@ public class HatchRateDialog extends ZeroDialog {
     }
     
     @Override
+    public void showDialog() {
+        super.showDialog(); 
+        
+        finalizeHatchRates();
+    }
+
+    @Override
     protected void refreshDialog() {
         centerPanel.removeAll();
         spinnerMap.clear();
+        isAdjusting = false; 
+        
         totalLabel.setFont(totalLabel.getFont().deriveFont(Font.BOLD));
         centerPanel.add(new JLabel("Set hatch chance for new ants:"));
         centerPanel.add(totalLabel);
@@ -63,11 +74,7 @@ public class HatchRateDialog extends ZeroDialog {
             JSpinner spinner = new JSpinner(model);
             spinner.setPreferredSize(new Dimension(80, 25));
 
-            spinner.addChangeListener(e -> {
-                double newValue = (Double) spinner.getValue();
-                colony.setHatchRate(type, (float)newValue);
-                updateHatchRateTotals();
-            });
+            spinner.addChangeListener(e -> handleSpinnerChange(type, spinner));
             
             disableSpinnerLetterInput(spinner); 
             
@@ -79,6 +86,64 @@ public class HatchRateDialog extends ZeroDialog {
         updateHatchRateTotals();
         centerPanel.revalidate();
         centerPanel.repaint();
+    }
+
+    private void handleSpinnerChange(AntType type, JSpinner spinner) {
+        if (isAdjusting) return;
+        isAdjusting = true;
+
+        try {
+            double newValue = (Double) spinner.getValue();
+            double otherTotal = 0.0;
+
+            for (Map.Entry<AntType, JSpinner> entry : spinnerMap.entrySet()) {
+                if (entry.getKey() != type) {
+                    otherTotal += (Double) entry.getValue().getValue();
+                }
+            }
+
+            if (newValue + otherTotal > 100.0) {
+                AntType workerType = GameConstants.TYPE_WORKER;
+                JSpinner workerSpinner = spinnerMap.get(workerType);
+
+                if (type != workerType && workerSpinner != null) {
+                    double workerValue = (Double) workerSpinner.getValue();
+                    double excess = (newValue + otherTotal) - 100.0;
+
+                    if (workerValue >= excess) {
+                        double newWorkerValue = workerValue - excess;
+                        workerSpinner.setValue(newWorkerValue);
+                        colony.setHatchRate(workerType, (float) newWorkerValue);
+                    } else {
+                        newValue = 100.0 - otherTotal;
+                        spinner.setValue(newValue);
+                    }
+                } else {
+                    newValue = 100.0 - otherTotal;
+                    spinner.setValue(newValue);
+                }
+            }
+
+            colony.setHatchRate(type, (float) newValue);
+            updateHatchRateTotals();
+
+        } finally {
+            isAdjusting = false;
+        }
+    }
+
+    private void finalizeHatchRates() {
+        double currentTotal = 0.0;
+        for (JSpinner s : spinnerMap.values()) {
+            currentTotal += (Double) s.getValue();
+        }
+
+        if (currentTotal < 99.99) {
+            double remainder = 100.0 - currentTotal;
+            float currentWorkerRate = colony.getHatchRate(GameConstants.TYPE_WORKER);
+            
+            colony.setHatchRate(GameConstants.TYPE_WORKER, currentWorkerRate + (float) remainder);
+        }
     }
 
     private void disableSpinnerLetterInput(JSpinner spinner) {
@@ -100,23 +165,14 @@ public class HatchRateDialog extends ZeroDialog {
             totalAssigned += (Double) s.getValue();
         }
         
-        double unassigned = 100.0 - totalAssigned;
-        
         totalLabel.setText(String.format("Total: %.1f%%", totalAssigned));
         
-        if (Math.abs(unassigned) > 0.1) { 
+        if (Math.abs(100.0 - totalAssigned) > 0.1) { 
             totalLabel.setForeground(Color.RED);
-            totalLabel.setToolTipText(String.format("Warning: Total is not 100%%. You are %.1f%% over/under.", -unassigned));
+            totalLabel.setToolTipText(String.format("Warning: Total is not 100%%."));
         } else {
             totalLabel.setForeground(Color.BLACK);
             totalLabel.setToolTipText("Total is 100%");
-        }
-
-        for (JSpinner s : spinnerMap.values()) {
-            SpinnerNumberModel model = (SpinnerNumberModel) s.getModel();
-            double currentValue = (Double) s.getValue();
-            double newMax = currentValue + Math.max(0.0, unassigned);
-            model.setMaximum(Math.max(currentValue, newMax));
         }
     }
 }

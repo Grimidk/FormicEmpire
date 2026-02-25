@@ -1,70 +1,54 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
+import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
+import com.grimidk.formicempire.classes.constants.world.Biome;
+import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 public class MapDialog extends ZeroDialog {
 
     private final World world;
-    private final JTextArea mapArea;
-    private final JButton randomTravelButton;
-    private final JButton homeButton; 
+    private final HexMapPanel mapPanel;
+    private final JButton homeButton;
     private final JButton closeButton;
     private final Runnable onHexChange;
 
     public MapDialog(JFrame owner, World world, Runnable onHexChange) {
-        super(owner, "World Map", new Dimension(800, 600));
+        super(owner, "World Map", new Dimension(1000, 800));
         this.world = world;
         this.onHexChange = onHexChange;
 
-        mapArea = new JTextArea();
-        mapArea.setFont(new Font("Monospaced", Font.BOLD, 14));
-        mapArea.setEditable(false);
-        mapArea.setFocusable(false); 
-        mapArea.setBackground(new Color(30, 30, 30));
-        mapArea.setForeground(Color.GREEN);
+        // --- Main Map Panel ---
+        this.mapPanel = new HexMapPanel();
         
-        // Random Travel 
-        randomTravelButton = new JButton("Random Hex (Test)");
-        randomTravelButton.setFocusable(false);
-        randomTravelButton.addActionListener(e -> travelToRandomHex());
-        
-        // Home Button
-        homeButton = new JButton("Go to Home");
+        // --- Buttons ---
+        homeButton = new JButton("Center on Home");
         homeButton.setFocusable(false);
         homeButton.addActionListener(e -> travelToHomeHex());
 
-        // Close Button
         closeButton = new JButton("Close");
         closeButton.setFocusable(false);
         closeButton.addActionListener(e -> dispose());
 
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         bottomPanel.add(homeButton);
-        bottomPanel.add(randomTravelButton);
         bottomPanel.add(closeButton);
-        
-        add(new JScrollPane(mapArea), BorderLayout.CENTER);
+
+        add(mapPanel, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
 
-        registerCloseKey(KeyEvent.VK_I);        
-        refreshDialog();
-    }
-    
-    private void travelToRandomHex() {
-        if (world == null || world.getHexes().isEmpty()) return;
-        
-        java.util.List<Hex> hexes = world.getHexes();
-        Hex randomHex = hexes.get(new Random().nextInt(hexes.size()));
-        
-        changeHex(randomHex);
+        registerCloseKey(KeyEvent.VK_I);
     }
 
     private void travelToHomeHex() {
@@ -78,68 +62,371 @@ public class MapDialog extends ZeroDialog {
     private void changeHex(Hex newHex) {
         if (newHex == null) return;
         world.changeActiveHex(newHex);
-        refreshDialog();
         
         if (onHexChange != null) {
             onHexChange.run();
         }
+        dispose();
     }
 
     @Override
     protected void refreshDialog() {
-        if (world == null) {
-            mapArea.setText("No world loaded.");
-            return;
+        if (mapPanel != null) {
+            mapPanel.repaint();
         }
-        
-        StringBuilder sb = new StringBuilder();
-        int size = world.getWorldRadius();
-        Hex activeHex = world.getActiveHex();
-        
-        Map<String, Hex> hexMap = new HashMap<>();
-        for (Hex h : world.getHexes()) {
-            hexMap.put(h.getQ() + "," + h.getR(), h);
+    }
+
+    private class HexMapPanel extends JPanel {
+        private int hexRadius = 26;  
+        private final Map<Integer, Color> biomeColorCache = new HashMap<>();
+        private final Map<Point, Hex> hexLookup = new HashMap<>();
+
+        // Side 0 (Vertices 0-1): East (+1, 0)
+        // Side 1 (Vertices 1-2): South-East (0, +1)
+        // Side 2 (Vertices 2-3): South-West (-1, +1)
+        // Side 3 (Vertices 3-4): West (-1, 0)
+        // Side 4 (Vertices 4-5): North-West (0, -1)
+        // Side 5 (Vertices 5-0): North-East (+1, -1)
+        private final int[][] NEIGHBOR_OFFSETS = {
+            {1, 0}, {0, 1}, {-1, 1}, {-1, 0}, {0, -1}, {1, -1}
+        };
+
+        public HexMapPanel() {
+            setBackground(Color.WHITE);
+            ToolTipManager.sharedInstance().registerComponent(this);
+
+            addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    handleMouseClick(e.getPoint());
+                }
+            });
         }
 
-        for (int r = -size; r <= size; r++) {
-            for (int k = 0; k < Math.abs(r); k++) sb.append("  "); 
+        private void calculateHexSize() {
+            if (world == null) return;
+            
+            int worldR = world.getWorldRadius();
+            
+            int panelW = getWidth();
+            int panelH = getHeight();
+            
+            if (panelW <= 0 || panelH <= 0) return; 
 
-            int q1 = Math.max(-size, -r - size);
-            int q2 = Math.min(size, -r + size);
+            double hexesAcross = (worldR * 2 + 1) + 1.5; 
+            double hexesHigh = (worldR * 2 + 1) + 1.5; 
+            double maxRadiusW = panelW / (hexesAcross * Math.sqrt(3));
+            double maxRadiusH = panelH / (hexesHigh * 1.5);
+            
+            this.hexRadius = (int) Math.min(Math.min(maxRadiusW, maxRadiusH), 55);
+            if (this.hexRadius < 10) this.hexRadius = 10; 
+        }
 
-            for (int q = q1; q <= q2; q++) {
-                Hex hex = hexMap.get(q + "," + r);
-                if (hex != null && hex.getBiome() != null) {
-                    char c = hex.getBiome().getName().charAt(0);
+        @Override
+        public String getToolTipText(MouseEvent e) {
+            if (world == null || world.getHexes() == null) return null;
+
+            Point p = e.getPoint();
+            Point centerOffset = getCenterOffset();
+
+            for (Hex hex : world.getHexes()) {
+                Polygon poly = getHexPolygon(hex, centerOffset.x, centerOffset.y);
+                if (poly.contains(p)) {
+                    StringBuilder sb = new StringBuilder("<html>");
                     
-                    if (hex == activeHex) {
-                        sb.append("<").append(c).append("> ");
-                    } else if (hex.getColony() != null) {
-                        if (hex.getColony().isPlayer()) {
-                            sb.append("[").append(c).append("] ");
+                    if (hex.getBiome() != null) {
+                        sb.append("<b>Biome:</b> ").append(hex.getBiome().getName());
+                    } else {
+                        sb.append("<b>Biome:</b> Unknown");
+                    }
+                    
+                    Colony c = hex.getColony();
+                    if (c != null) {
+                        if (c.getRank() != null) {
+                            sb.append("<br><b>Rank:</b> ").append(c.getRank().getName());
+                        }
+                        
+                        if (c.getSpecies() != null) {
+                            sb.append("<br><b>Species:</b> ").append(c.getSpecies().getName());
                         } else {
-                            sb.append("{").append(c).append("} ");
+                            sb.append("<br><b>Species:</b> Unknown");
+                        }
+                        
+                        if (c.getName() != null) {
+                            sb.append("<br><i>").append(c.getName()).append("</i>");
+                        }
+
+                        Dynasty dynasty = c.getDynasty();
+                        if (dynasty != null) {
+                            sb.append("<br><b>Dynasty:</b> ").append(dynasty.getName());
+                            if (dynasty.getRank() != null) {
+                                sb.append("<br><b>Dynasty Rank:</b> ").append(dynasty.getRank().getName());
+                            }
                         }
                     } else {
-                        sb.append(" ").append(c).append("  ");
+                        sb.append("<br><i>Empty</i>");
                     }
-                } else {
-                    sb.append(" .  ");
+                    
+                    sb.append("</html>");
+                    return sb.toString();
                 }
             }
-            sb.append("\n");
+            return null;
+        }
+
+        private void handleMouseClick(Point p) {
+            if (world == null || world.getHexes() == null) return;
+
+            Point centerOffset = getCenterOffset();
+
+            for (Hex hex : world.getHexes()) {
+                Polygon poly = getHexPolygon(hex, centerOffset.x, centerOffset.y);
+                if (poly.contains(p)) {
+                    changeHex(hex);
+                    return;
+                }
+            }
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            if (world == null || world.getHexes() == null) return;
+            
+            calculateHexSize();
+
+            hexLookup.clear();
+            for (Hex h : world.getHexes()) {
+                hexLookup.put(new Point(h.getQ(), h.getR()), h);
+            }
+
+            Graphics2D g2d = (Graphics2D) g;
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            g2d.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+
+            Point centerOffset = getCenterOffset();
+            Hex activeHex = world.getActiveHex();
+
+            for (Hex hex : world.getHexes()) {
+                drawHex(g2d, hex, centerOffset.x, centerOffset.y, false);
+            }
+
+            if (activeHex != null) {
+                drawHex(g2d, activeHex, centerOffset.x, centerOffset.y, true);
+            }
         }
         
-        sb.append("\nLegend:\n");
-        sb.append("<X> : Active Hex (You are here)\n");
-        sb.append("[X] : Player Colony\n");
-        sb.append("{X} : Wild Colony\n");
-        sb.append(" P  : Plains    T  : Taiga/Tundra\n");
-        sb.append(" F  : Forest    D  : Desert\n");
-        sb.append(" J  : Jungle    M  : Mountain\n");
-        sb.append(" S  : Swamp     V  : Volcanic\n");
+        private Point getCenterOffset() {
+            return new Point(getWidth() / 2, getHeight() / 2);
+        }
+
+        private void drawHex(Graphics2D g2d, Hex hex, int centerX, int centerY, boolean isSelectionPass) {
+            Polygon poly = getHexPolygon(hex, centerX, centerY);
+            
+            if (!isSelectionPass) {
+                // --- 1. Fill Background ---
+                Rectangle bounds = poly.getBounds();
+                int cx = (int)bounds.getCenterX();
+                int cy = (int)bounds.getCenterY();
+                
+                Biome biome = hex.getBiome();
+                Color fillColor = Color.LIGHT_GRAY;
+                
+                if (biome != null) {
+                    fillColor = getBiomeColor(biome);
+                }
+                
+                if (hex != world.getActiveHex()) {
+                    fillColor = fadeToWhite(fillColor, 0.4f); 
+                }
+                
+                g2d.setColor(fillColor);
+                g2d.fillPolygon(poly);
+
+                // --- 2. Draw Icons ---
+                float scale = 0.85f;
+                int iconSize = (int)(hexRadius * scale); 
+                
+                if (biome != null && biome.getIcon() != null) {
+                    Image icon = biome.getIcon().getImage();
+                    int iconX = cx - (iconSize / 2);
+                    int iconY = cy - (iconSize / 2);
+                    g2d.drawImage(icon, iconX, iconY, iconSize, iconSize, null);
+                }
+
+                if (hex.getColony() != null) {
+                    Colony c = hex.getColony();
+                    ColonyRank rank = c.getRank();
+                    
+                    if (rank != null && rank.getIcon() != null) {
+                        Image rankImg = rank.getIcon().getImage();
+                        int rankSize = (int)(hexRadius * scale);                    
+                        int rankX = cx - (rankSize / 2);
+                        int rankY = cy - (rankSize / 2) - (int)(hexRadius * scale); 
+                        g2d.drawImage(rankImg, rankX, rankY, rankSize, rankSize, null);
+                    }
+                }
+
+                // --- 3. Draw Smart Borders ---
+                drawMergedBorders(g2d, hex, poly);
+
+            } else {
+                g2d.setColor(Color.RED);
+                g2d.setStroke(new BasicStroke(3));
+                g2d.drawPolygon(poly);
+            }
+        }
+
+        private void drawMergedBorders(Graphics2D g2d, Hex currentHex, Polygon poly) {
+            int currentDynastyId = -1;
+            Color dynastyColor = Color.BLACK;
+            boolean hasDynasty = false;
+
+            if (currentHex.getColony() != null && currentHex.getColony().getDynasty() != null) {
+                currentDynastyId = currentHex.getColony().getDynasty().getId();
+                dynastyColor = currentHex.getColony().getDynasty().getColor();
+                hasDynasty = true;
+            }
+
+            Point[] drawPoints = new Point[6];
+            if (hasDynasty) {
+                Rectangle bounds = poly.getBounds();
+                double cx = bounds.getCenterX();
+                double cy = bounds.getCenterY();
+                double inset = 1.2; 
+                double scale = (hexRadius - inset) / (double)hexRadius;
+                
+                for(int i=0; i<6; i++) {
+                    double dx = poly.xpoints[i] - cx;
+                    double dy = poly.ypoints[i] - cy;
+                    drawPoints[i] = new Point((int)(cx + dx * scale), (int)(cy + dy * scale));
+                }
+            } else {
+                for(int i=0; i<6; i++) {
+                    drawPoints[i] = new Point(poly.xpoints[i], poly.ypoints[i]);
+                }
+            }
+
+            for (int i = 0; i < 6; i++) {
+                Point p1 = drawPoints[i];
+                Point p2 = drawPoints[(i + 1) % 6];
+
+                boolean shouldDrawEdge = true;
+
+                if (hasDynasty) {
+                    int[] offset = NEIGHBOR_OFFSETS[i];
+                    int nQ = currentHex.getQ() + offset[0];
+                    int nR = currentHex.getR() + offset[1];
+                    
+                    Hex neighbor = hexLookup.get(new Point(nQ, nR));
+
+                    if (neighbor != null && neighbor.getColony() != null && neighbor.getColony().getDynasty() != null) {
+                        int neighborDynastyId = neighbor.getColony().getDynasty().getId();
+                        if (neighborDynastyId == currentDynastyId) {
+                            shouldDrawEdge = false;
+                        }
+                    }
+                    
+                    g2d.setStroke(new BasicStroke(2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                    g2d.setColor(dynastyColor);
+                } else {
+                    g2d.setStroke(new BasicStroke(1f));
+                    g2d.setColor(Color.BLACK);
+                }
+
+                if (shouldDrawEdge) {
+                    g2d.drawLine(p1.x, p1.y, p2.x, p2.y);
+                }
+            }
+        }
+
+        private Polygon getHexPolygon(Hex hex, int offsetX, int offsetY) {
+            double x = hexRadius * (Math.sqrt(3) * hex.getQ() + Math.sqrt(3) / 2.0 * hex.getR());
+            double y = hexRadius * (3.0 / 2.0 * hex.getR());
+
+            int centerX = (int) (x + offsetX);
+            int centerY = (int) (y + offsetY);
+
+            Polygon poly = new Polygon();
+            for (int i = 0; i < 6; i++) {
+                double angle_rad = Math.PI / 180 * (60 * i - 30);
+                int px = (int) (centerX + hexRadius * Math.cos(angle_rad));
+                int py = (int) (centerY + hexRadius * Math.sin(angle_rad));
+                poly.addPoint(px, py);
+            }
+            return poly;
+        }
+
+        private Color getBiomeColor(Biome biome) {
+            if (biomeColorCache.containsKey(biome.getId())) {
+                return biomeColorCache.get(biome.getId());
+            }
+
+            if (biome.getIcon() == null) {
+                return Color.LIGHT_GRAY;
+            }
+
+            Color avgColor = calculateAverageColor(biome.getIcon());
+            avgColor = lighten(avgColor, 0.5f); 
+            
+            biomeColorCache.put(biome.getId(), avgColor);
+            return avgColor;
+        }
+
+        private Color calculateAverageColor(ImageIcon icon) {
+            try {
+                Image img = icon.getImage();
+                BufferedImage bi = new BufferedImage(
+                    img.getWidth(null), 
+                    img.getHeight(null), 
+                    BufferedImage.TYPE_INT_ARGB
+                );
+                
+                Graphics g = bi.createGraphics();
+                g.drawImage(img, 0, 0, null);
+                g.dispose();
+
+                long sumR = 0, sumG = 0, sumB = 0;
+                long count = 0;
+
+                for (int x = 0; x < bi.getWidth(); x++) {
+                    for (int y = 0; y < bi.getHeight(); y++) {
+                        int pixel = bi.getRGB(x, y);
+                        int alpha = (pixel >> 24) & 0xff;
+                        
+                        if (alpha < 20) continue; 
+                        
+                        if ((x % 3 == 0) && (y % 3 == 0)) { 
+                            sumR += (pixel >> 16) & 0xff;
+                            sumG += (pixel >> 8) & 0xff;
+                            sumB += (pixel) & 0xff;
+                            count++;
+                        }
+                    }
+                }
+
+                if (count == 0) return Color.WHITE;
+
+                return new Color((int)(sumR/count), (int)(sumG/count), (int)(sumB/count));
+                
+            } catch (Exception e) {
+                return Color.LIGHT_GRAY;
+            }
+        }
         
-        mapArea.setText(sb.toString());
-        mapArea.setCaretPosition(0);
+        private Color lighten(Color c, float amount) {
+            int r = Math.min(255, (int)(c.getRed() + (255 - c.getRed()) * amount));
+            int g = Math.min(255, (int)(c.getGreen() + (255 - c.getGreen()) * amount));
+            int b = Math.min(255, (int)(c.getBlue() + (255 - c.getBlue()) * amount));
+            return new Color(r, g, b, c.getAlpha());
+        }
+        
+        private Color fadeToWhite(Color c, float factor) {
+            int r = (int) (c.getRed() * (1 - factor) + 255 * factor);
+            int g = (int) (c.getGreen() * (1 - factor) + 255 * factor);
+            int b = (int) (c.getBlue() * (1 - factor) + 255 * factor);
+            return new Color(r, g, b);
+        }
     }
 }

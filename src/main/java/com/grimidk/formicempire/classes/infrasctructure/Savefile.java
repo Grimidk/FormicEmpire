@@ -13,6 +13,7 @@ public class Savefile implements Serializable {
     // --- Global Save Data ---
     private final int id; 
     private final String name; 
+    private long timestamp;
     private int playTime;
     private int minute;
     private int hour;
@@ -41,12 +42,15 @@ public class Savefile implements Serializable {
     // --- Collections ---
     private List<SavedHex> worldHexes;
     private List<SavedColony> colonies;
+    private List<SavedDynasty> dynastys;
 
     public Savefile(int id, String name) {
         this.id = id;
         this.name = name;
+        this.timestamp = System.currentTimeMillis();
         this.worldHexes = new ArrayList<>();
         this.colonies = new ArrayList<>();
+        this.dynastys = new ArrayList<>();
         this.minute = 0;
         this.hour = 0;
         this.day = 1;
@@ -55,12 +59,34 @@ public class Savefile implements Serializable {
         this.worldRadius = 8;
     }
 
+    public static class SavedDynasty implements Serializable {
+        private static final long serialVersionUID = 1L;
+        public int id;
+        public String name;
+        public boolean isPlayer;
+        public boolean isDefeated;
+        public String rankName;
+        public int speciesId;
+        public int researchPoints;
+        public int totalNuptialFlights;
+        public List<Integer> unlockedUpgradeIds = new ArrayList<>();
+        public List<Integer> absorbedDynastyIds = new ArrayList<>();
+        public Map<String, Integer> deathStatistics = new HashMap<>();
+    }
+
     public static class SavedColony implements Serializable {
         private static final long serialVersionUID = 1L;
         
         public int id;
+        public int dynastyId;
         public String name;
+        public String rankName;
         public boolean isPlayer;
+        public boolean isCapital;
+        public boolean isAutomated;
+        public boolean autoBuildEnabled;
+        public int age;
+        public int daysWithoutQueen;
         public int q; 
         public int r;        
         public float progress;
@@ -70,10 +96,9 @@ public class Savefile implements Serializable {
         public int plants, mushrooms, protein, water, syrups, resins, minerals;        
         public float hatchRateWorker, hatchRateSoldier, hatchRateMajor, hatchRateDrone, hatchRatePrincess;
         public int aphids, parasites;
-        public int researchPoints, totalDeaths;
+        public int totalDeaths;
         public Map<String, Integer> assignedRoleCounts = new HashMap<>();
-        public Map<String, Integer> deathStatistics = new HashMap<>();
-        public List<Integer> unlockedUpgradeIds = new ArrayList<>();
+        public Map<String, Integer> localDeathStatistics = new HashMap<>();
         public List<Integer> unlockedBuildingIds = new ArrayList<>();
         public List<SavedResourceSource> savedResourceSources = new ArrayList<>();
     }
@@ -118,6 +143,9 @@ public class Savefile implements Serializable {
 
     public int getId() { return id; }
     public String getName() { return name; }
+
+    public long getTimestamp() { return timestamp; }
+    public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
 
     public int getPlayTime() { return playTime; }
     public void setPlayTime(int playTime) { this.playTime = playTime; }
@@ -184,4 +212,7 @@ public class Savefile implements Serializable {
 
     public List<SavedColony> getColonies() { return colonies; }
     public void setColonies(List<SavedColony> colonies) { this.colonies = colonies; }
+
+    public List<SavedDynasty> getDynastys() { return dynastys; }
+    public void setDynastys(List<SavedDynasty> dynastys) { this.dynastys = dynastys; }
 }

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList; 
 import java.awt.Rectangle;
 import java.awt.Point; 
@@ -22,21 +23,25 @@ import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.Temperature;
 import com.grimidk.formicempire.classes.infrasctructure.Dimension;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
+import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
-
 
 public class Colony {
     
     // --- Basic Data ---
     private final int id;
+    private Dynasty dynasty;
     private String name;
-    private Species species;
     private boolean isPlayer;
     private ColonyRank rank;
     private boolean isActive;
     private boolean automationEnabled = false; 
+    private boolean autoBuildEnabled = false;
+    private boolean isCapital = false;
+    private int age;
+    private int daysWithoutQueen;
     
     // --- Population Data ---
     private final Map<AntType, List<Ant>> antGroups;
@@ -44,7 +49,6 @@ public class Colony {
     private final List<Bug> bugs; 
     
     private Map<AntRole, Integer> assignedRoleCounts;
-    private final Set<Upgrade> upgrades;
     private final Set<Building> buildings;
 
     // --- Resource Data ---
@@ -58,7 +62,6 @@ public class Colony {
     
     private int aphids; 
     private int parasites;
-    private int researchPoints;
 
     // --- Hatch Rate Data ---
     private float hatchRateWorker;
@@ -92,8 +95,8 @@ public class Colony {
     private transient ColonyPhysicsService physicsService;
     private transient ColonyLocationService locationService;
     private transient ColonySumarizationService sumarizationService;
-    private transient ColonyDeathService trackingService;
     private transient ColonyAutomationService automationService;
+    private transient ColonyResourceService resourceService;
 
     // --- Service Initializer ---
     private void initializeServices() {
@@ -103,8 +106,8 @@ public class Colony {
         this.physicsService = new ColonyPhysicsService();
         this.locationService = new ColonyLocationService();
         this.sumarizationService = new ColonySumarizationService();
-        this.trackingService = new ColonyDeathService();
         this.automationService = new ColonyAutomationService(); 
+        this.resourceService = new ColonyResourceService();
     }
 
     // --- Initialization Methods ---
@@ -128,8 +131,6 @@ public class Colony {
     }
     
     private void initializeDefaults() {
-        this.researchPoints = 0;
-        this.totalDeaths = 0;
         this.plants = 0;
         this.mushrooms = 0;
         this.protein = 0;           
@@ -145,37 +146,7 @@ public class Colony {
         this.hatchRateDrone = 0.0f;
         this.hatchRatePrincess = 0.0f;
         this.isActive = false;
-    }
-
-    private void initializeUpgrades() {
-        this.upgrades.add(GameUnlocks.TYPE_EGG);
-        this.upgrades.add(GameUnlocks.TYPE_QUEEN);
-        this.upgrades.add(GameUnlocks.TYPE_WORKER);
-        this.upgrades.add(GameUnlocks.ROLE_FORAGER);
-        this.upgrades.add(GameUnlocks.ROLE_FARMER);
-        this.upgrades.add(GameUnlocks.ROLE_NURSE);
-        this.upgrades.add(GameUnlocks.ROLE_LAYER);
-        this.upgrades.add(GameUnlocks.STAT_SKELETON);
-        this.upgrades.add(GameUnlocks.STAT_ACID);
-        this.upgrades.add(GameUnlocks.STAT_LONGEVITY);
-    }
-    
-    private void loadUpgrades(Savefile.SavedColony savedColony) {
-        List<Integer> unlockedIds = savedColony.unlockedUpgradeIds; 
-        if (unlockedIds == null || unlockedIds.isEmpty()) {
-            initializeUpgrades();
-            return;
-        }
-        Map<Integer, Upgrade> allUpgrades = new HashMap<>();
-        for (Upgrade up : GameUnlocks.getUpgrades()) {
-            allUpgrades.put(up.getId(), up);
-        }
-        for (Integer id : unlockedIds) {
-            Upgrade upgradeToUnlock = allUpgrades.get(id);
-            if (upgradeToUnlock != null) {
-                this.upgrades.add(upgradeToUnlock);
-            }
-        }
+        this.autoBuildEnabled = false;
     }
 
     private void initializeBuildings() {
@@ -210,15 +181,17 @@ public class Colony {
         this.name = name;
         this.isPlayer = isPlayer;
         this.rank = GameConstants.RANK_COLONY;
+        this.automationEnabled = !isPlayer;
+        this.totalDeaths = 0;
+        this.age = 0;
+        this.daysWithoutQueen = 0;
         this.antGroups = new HashMap<>();
         this.deadAnts = new CopyOnWriteArrayList<>(); 
         this.bugs = new CopyOnWriteArrayList<>();
-        this.upgrades = new HashSet<>();
         this.buildings = new HashSet<>();
         
         initializeLists();
         initializeDefaults();
-        initializeUpgrades();
         initializeBuildings();
         initializeAssignedRoles();
         initializeServices(); 
@@ -228,22 +201,29 @@ public class Colony {
         this.id = savedColony.id;
         this.name = savedColony.name;
         this.isPlayer = savedColony.isPlayer;
+        
         this.rank = GameConstants.RANK_COLONY;
         this.antGroups = new HashMap<>();
         this.deadAnts = new CopyOnWriteArrayList<>();
         this.bugs = new CopyOnWriteArrayList<>();
-        this.upgrades = new HashSet<>();
         this.buildings = new HashSet<>();
 
         initializeLists();
         initializeDefaults(); 
-        loadUpgrades(savedColony);
+        
+        this.isCapital = savedColony.isCapital;
+        this.automationEnabled = savedColony.isAutomated;
+        this.autoBuildEnabled = savedColony.autoBuildEnabled;
+        this.age = savedColony.age;
+        this.daysWithoutQueen = savedColony.daysWithoutQueen;
+        this.totalDeaths = savedColony.totalDeaths;
+
         loadBuildings(savedColony);
         initializeAssignedRoles(); 
         initializeServices(); 
         
-        if (this.trackingService != null && savedColony.deathStatistics != null) {
-            this.trackingService.loadStatistics(savedColony.deathStatistics);
+        if (this.populationService != null && savedColony.localDeathStatistics != null) {
+            this.populationService.loadDeathStatistics(savedColony.localDeathStatistics);
         }
         
         Map<String, Integer> savedRoles = savedColony.assignedRoleCounts;
@@ -293,7 +273,6 @@ public class Colony {
             this.bugs.add(p);
         }
         
-        this.researchPoints = savedColony.researchPoints;
         this.totalDeaths = savedColony.totalDeaths;
         
         if (savedColony.savedResourceSources != null && this.locationService != null) {
@@ -322,13 +301,13 @@ public class Colony {
         }
 
         runRoleAssignment();
+        rankUp();
     }
         
     // --- Population Initializer ---
     private void populateAntList(List<Ant> list, int count, AntType type) {
         for (int i = 0; i < count; i++) {
             Ant newAnt = new Ant(this, type);
-            
             if (type == GameConstants.TYPE_EGG || 
                 type == GameConstants.TYPE_LARVA || 
                 type == GameConstants.TYPE_PUPA || 
@@ -368,8 +347,8 @@ public class Colony {
         if (ant == null) return;
         this.totalDeaths++;
         this.deadAnts.add(ant);
-        if (trackingService != null) {
-            trackingService.recordDeath(cause);
+        if (populationService != null) {
+            populationService.recordDeath(cause, this);
         }
     }
 
@@ -377,8 +356,52 @@ public class Colony {
     public int getId() { return id; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
-    public Species getSpecies() { return species; }
-    public void setSpecies(Species species) { this.species = species; }
+    public boolean isCapital() { return isCapital; }
+    public void setCapital(boolean isCapital) { this.isCapital = isCapital; }
+    public int getAge() { return age; }
+    public void setAge(int age) { this.age = age; }
+    public int getDaysWithoutQueen() { return daysWithoutQueen; }
+    public void setDaysWithoutQueen(int days) { this.daysWithoutQueen = days; }
+    
+    public Dynasty getDynasty() { return dynasty; }
+    public void setDynasty(Dynasty dynasty) { 
+        this.dynasty = dynasty; 
+        if (dynasty != null) {
+            if (!dynasty.getColonies().contains(this)) {
+                dynasty.addColony(this); 
+            }
+            refreshAntStats();
+        }
+    }
+
+    // Delegates to Dynasty
+    public Species getSpecies() { 
+        return dynasty != null ? dynasty.getSpecies() : GameConstants.SPECIES_OMNI; 
+    }
+    public void setSpecies(Species species) { 
+        if (dynasty != null) dynasty.setSpecies(species); 
+    }
+    
+    public int getResearchPoints() { 
+        return dynasty != null ? dynasty.getResearchPoints() : 0; 
+    }
+    public void setResearchPoints(int points) { 
+        if (dynasty != null) dynasty.setResearchPoints(points); 
+    }
+    public void addResearchPoints(int amount) {
+        if (dynasty != null) dynasty.addResearchPoints(amount);
+    }
+    
+    public boolean hasUpgrade(Upgrade upgrade) {
+        return dynasty != null && dynasty.hasUpgrade(upgrade);
+    }
+    public void unlockUpgrade(Upgrade upgrade) {
+        if (dynasty != null) dynasty.unlockUpgrade(upgrade);
+    }
+    public Set<Upgrade> getUnlockedUpgrades() {
+        return dynasty != null ? dynasty.getUnlockedUpgrades() : new HashSet<>();
+    }
+    
     public boolean isPlayer() { return isPlayer; }
     public void setIsPlayer(boolean isPlayer) { this.isPlayer = isPlayer; }
     public ColonyRank getRank() { return rank; }
@@ -387,6 +410,8 @@ public class Colony {
     public void setActive(boolean isActive) { this.isActive = isActive; }
     public boolean isAutomationEnabled() { return automationEnabled; }
     public void setAutomationEnabled(boolean automationEnabled) { this.automationEnabled = automationEnabled; }
+    public boolean isAutoBuildEnabled() { return autoBuildEnabled; }
+    public void setAutoBuildEnabled(boolean autoBuildEnabled) { this.autoBuildEnabled = autoBuildEnabled; }
 
     public Map<AntType, List<Ant>> getAntGroups() { return antGroups; } 
     public List<Ant> getAntsByType(AntType type) { return antGroups.getOrDefault(type, new CopyOnWriteArrayList<>()); }
@@ -419,9 +444,7 @@ public class Colony {
     public int getAntTotal() {
         return antGroups.values().stream().mapToInt(List::size).sum();
     }
-    public boolean hasUpgrade(Upgrade upgrade) { return this.upgrades.contains(upgrade); }
-    public void unlockUpgrade(Upgrade upgrade) { this.upgrades.add(upgrade); }
-    public Set<Upgrade> getUnlockedUpgrades() { return this.upgrades; }
+
     public boolean hasBuilding(Building building) { return this.buildings.contains(building); }
     public void unlockBuilding(Building building) { this.buildings.add(building); }
     public Set<Building> getUnlockedBuildings() { return this.buildings; }
@@ -435,8 +458,10 @@ public class Colony {
         if (getMinerals() < building.getMineralCost() || getResins() < building.getResinCost()) {
             return false; 
         }
-        setMinerals(getMinerals() - building.getMineralCost());
-        setResins(getResins() - building.getResinCost());
+        
+        resourceService.consumeResource(this, GameConstants.RESOURCE_ROCK, building.getMineralCost());
+        resourceService.consumeResource(this, GameConstants.RESOURCE_RESIN, building.getResinCost());
+        
         this.currentBuildingProject = building;
         this.buildingProgressHours = 0.0;
         return true;
@@ -460,30 +485,39 @@ public class Colony {
     public double getMineralsPrecise() { return minerals; }
     
     public void setPlants(double plants) { 
-        this.plants = Math.max(0, Math.min(plants, (double)getPlantsCapacity())); 
+        this.plants = Math.max(0, plants); 
     }
     public void setMushrooms(double mushrooms) { 
-        this.mushrooms = Math.max(0, Math.min(mushrooms, (double)getMushroomsCapacity())); 
+        this.mushrooms = Math.max(0, mushrooms); 
     }
     public void setProtein(double protein) { 
-        this.protein = Math.max(0, Math.min(protein, (double)getProteinCapacity())); 
+        this.protein = Math.max(0, protein); 
     }
     public void setWater(double water) { 
-        this.water = Math.max(0, Math.min(water, (double)getWaterCapacity())); 
+        this.water = Math.max(0, water); 
     }
     public void setSyrups(double syrups) { 
-        this.syrups = Math.max(0, Math.min(syrups, (double)getSyrupsCapacity())); 
+        this.syrups = Math.max(0, syrups); 
     }
     public void setResins(double resins) { 
-        this.resins = Math.max(0, Math.min(resins, (double)getResinsCapacity())); 
+        this.resins = Math.max(0, resins); 
     }
     public void setMinerals(double minerals) { 
-        this.minerals = Math.max(0, Math.min(minerals, (double)getMineralsCapacity())); 
+        this.minerals = Math.max(0, minerals); 
     }
 
     public int getAphids() { return aphids; }
     public void setAphids(int count) { 
         int rancherCount = getAssignedRoleCount(GameConstants.ROLE_RANCHER);
+        
+        if (hasBuilding(GameUnlocks.PASSIVE_APHID)) {
+            if (hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
+                rancherCount += 2;
+            } else {
+                rancherCount += 1;
+            }
+        }
+        
         int maxAphids = Integer.MAX_VALUE;
         if (statsService != null) {
             maxAphids = statsService.getAphidCapacity(this) * rancherCount;
@@ -506,14 +540,14 @@ public class Colony {
             }
         } else if (currentAphids > this.aphids) {
             int diff = (int)currentAphids - this.aphids;
-            for(int i=0; i<diff; i++) {
-                for(Bug b : this.bugs) {
-                    if (b.getBugType() == GameConstants.TYPE_APHID) {
-                        this.bugs.remove(b);
-                        break;
-                    }
+            List<Bug> toRemove = new ArrayList<>();
+            for (Bug b : this.bugs) {
+                if (b.getBugType() == GameConstants.TYPE_APHID) {
+                    toRemove.add(b);
+                    if (toRemove.size() == diff) break;
                 }
             }
+            this.bugs.removeAll(toRemove);
         }
     }
 
@@ -538,14 +572,14 @@ public class Colony {
             }
         } else if (currentParasites > this.parasites) {
             int diff = (int)currentParasites - this.parasites;
-            for(int i=0; i<diff; i++) {
-                for(Bug b : this.bugs) {
-                    if (b.getBugType() == GameConstants.TYPE_PARASITE) {
-                        this.bugs.remove(b);
-                        break;
-                    }
+            List<Bug> toRemove = new ArrayList<>();
+            for (Bug b : this.bugs) {
+                if (b.getBugType() == GameConstants.TYPE_PARASITE) {
+                    toRemove.add(b);
+                    if (toRemove.size() == diff) break;
                 }
             }
+            this.bugs.removeAll(toRemove);
         }
     }
 
@@ -567,9 +601,6 @@ public class Colony {
         
         return "~" + display;
     }
-
-    public int getResearchPoints() { return researchPoints; }
-    public void setResearchPoints(int researchPoints) { this.researchPoints = researchPoints; }
 
     public void setGameAreaDimensions(int width, int height) {
         boolean firstTimeUpdate = (this.gameAreaWidth == 1 && this.gameAreaHeight == 1 && width > 1 && height > 1);
@@ -663,7 +694,8 @@ public class Colony {
     public ColonyPhysicsService getPhysicsService() { return this.physicsService; }
     public ColonyLocationService getLocationService() { return this.locationService; }
     public ColonySumarizationService getSumarizationService() { return this.sumarizationService; }
-    public ColonyDeathService getTrackingService() { return this.trackingService; }
+    public ColonyAutomationService getAutomationService() { return this.automationService; }
+    public ColonyResourceService getResourceService() { return this.resourceService; }
 
     public int getTotalConsumption(){ return statsService.getTotalConsumption(this); }
     public int getTotalProduction(){ return statsService.getTotalProduction(this); }
@@ -703,7 +735,7 @@ public class Colony {
     public void runLaying() { labourService.runLaying(this); }
     public void runAging(){ populationService.runAging(this); }
     public void runNursing() { labourService.runNursing(this); }
-    public void runNuptial() { labourService.runNuptial(this); }
+    public void runNuptial(World world, Hex currentHex) { labourService.runNuptial(this, world, currentHex); }
     public void runEating(Temperature currentTemp){ populationService.runEating(this, currentTemp); }
     public void runGraveKeeping() { labourService.runGraveKeeping(this); }
     public void runResearch() { labourService.runResearch(this); }
@@ -717,10 +749,25 @@ public class Colony {
     public void runComposting() { labourService.runComposting(this); }
     public void runParasitation() { populationService.runParasitation(this); }
     public void runPolicing() { labourService.runPolicing(this); }
+    
+    public int getNuptialFlightCost() {
+        int base = 1000;
+        int colonyCount = (dynasty != null) ? dynasty.getColonies().size() : 1;
+        long scaledCost = (long) base * (1L + (long) colonyCount * colonyCount);
+        
+        if (scaledCost > Integer.MAX_VALUE - 100000) {
+            return Integer.MAX_VALUE - 100000;
+        }
+        
+        return (int) scaledCost;
+    }
 
-    public void forceNuptialFlight() {
+    public void forceNuptialFlight(World world, Hex currentHex) {
         if (!hasUpgrade(GameUnlocks.ABILITY_FORCED_FLIGHT)) return;
-        if (this.researchPoints < 1000) return;
+        
+        int cost = getNuptialFlightCost();
+        if (getResearchPoints() < cost) return;
+        
         boolean hasDrones = !getDrones().isEmpty();
         boolean hasBreeders = getPrincesses().stream().anyMatch(p -> p.getRole() == GameConstants.ROLE_BREEDER);
         
@@ -729,8 +776,8 @@ public class Colony {
             return;
         }
 
-        this.researchPoints -= 1000;
-        this.labourService.runNuptial(this);
+        addResearchPoints(-cost);
+        this.labourService.runNuptial(this, world, currentHex);
     }
     
     public void runPhysics(Dimension activeDimension) { 
@@ -746,7 +793,11 @@ public class Colony {
         }
     }
 
-    public void runHourlyJobs() {
+    public void runHourlyJobs(Biome biome) {
+        if (this.age < 7) {
+            return;
+        }
+
         if (this.isActive) {
             if (this.automationEnabled) {
                 this.automationService.runAutomation(this);
@@ -762,35 +813,132 @@ public class Colony {
                 this.automationService.runAutomation(this);
             }
             this.populationService.runRoleAssignment(this); 
-            this.sumarizationService.runHourlyLite(this);
+            this.sumarizationService.runHourlyLite(this, biome);
         }
     }
 
     public void runDailyJobs(Temperature currentTemp, Biome biome) {
+        if (this.age < 7) {
+            this.age++;
+            if (this.age >= 7) {
+                matureColony();
+            }
+            return;
+        }
+
+        if (this.getQueens().isEmpty()) {
+            this.daysWithoutQueen++;
+            if (this.daysWithoutQueen == 1 || this.daysWithoutQueen == 6) {
+                this.logEvent("WARNING: Colony has no Queen! Days without Queen: " + this.daysWithoutQueen + "/7");
+            }
+        } else {
+            this.daysWithoutQueen = 0;
+        }
+
+        if (this.automationEnabled) {
+            this.automationService.runDailyAutomation(this);
+        } else if (this.autoBuildEnabled) {
+            this.automationService.runAutoBuild(this);
+        }
+
         if (this.isActive) {
             this.rankUp();
-            this.runEating(currentTemp);
+            this.runEating(currentTemp); 
             this.runHatching();
             this.runAging();
             this.runNursing();
+            this.runComposting();
             this.runGraveKeeping();
             this.runHerding(biome); 
             this.runScoutting(biome);
             this.runContamination(); 
-            this.runComposting();
             this.runPolicing(); 
         } else {
             this.sumarizationService.runDailyLite(this);
+        }
+
+        this.age++;
+    }
+
+    public void matureColony() {
+        System.out.println("[Colony] Maturation complete. Spawning workforce for " + this.getName());
+        Random random = new Random();
+
+        List<Ant> workerList = this.getWorkers();
+        for (int i = 0; i < 9; i++) {
+            Ant worker = new Ant(this, GameConstants.TYPE_WORKER);
+            workerList.add(worker);
+        }
+
+        configureWorker(0, GameConstants.ROLE_NURSE, WorldSpaces.UNDERWORLD);
+        configureWorker(1, GameConstants.ROLE_NURSE, WorldSpaces.UNDERWORLD);
+        configureWorker(2, GameConstants.ROLE_FARMER, WorldSpaces.UNDERWORLD);
+        configureWorker(3, GameConstants.ROLE_NURSE, WorldSpaces.UNDERWORLD);
+        configureWorker(4, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
+        configureWorker(5, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
+        configureWorker(6, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
+        configureWorker(7, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
+        configureWorker(8, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
+
+        this.setAssignedRoleCount(GameConstants.ROLE_LAYER, 1);
+        this.setAssignedRoleCount(GameConstants.ROLE_NURSE, 3);
+        this.setAssignedRoleCount(GameConstants.ROLE_FARMER, 1);
+        this.setAssignedRoleCount(GameConstants.ROLE_FORAGER, 5);
+
+        if (this.locationService != null) {
+            if (this.locationService.getDiscoveredSources().isEmpty()) {
+                int range = 300;
+                
+                int centerX = ColonyLocationService.ANCHOR_CENTER_X; 
+                int centerY = ColonyLocationService.ANCHOR_HEIGHT / 2;
+                
+                int pX = centerX + random.nextInt((range * 2) + 1) - range;
+                int pY = centerY + random.nextInt((range * 2) + 1) - range;
+                pX = Math.max(50, pX);
+                pY = Math.max(50, pY);
+                ResourceSource initialPlant = new ResourceSource(GameConstants.RESOURCE_PLANT, 10000, pX, pY);
+                
+                int wX = centerX + random.nextInt((range * 2) + 1) - range;
+                int wY = centerY + random.nextInt((range * 2) + 1) - range;
+                wX = Math.max(50, wX);
+                wY = Math.max(50, wY);
+                ResourceSource initialWater = new ResourceSource(GameConstants.RESOURCE_WATER, 10000, wX, wY);
+                
+                this.locationService.addSource(this, initialPlant);
+                this.locationService.addSource(this, initialWater);
+            }
+        }
+        
+        if (this.physicsService != null) {
+            this.physicsService.randomizeAllAntPositions(this);
+        }
+
+        this.logEvent("Colony Maturation Complete: Workforce deployed.");
+    }
+    
+    private void configureWorker(int index, AntRole role, Dimension dim) {
+        if (this.getWorkers() != null && index < this.getWorkers().size()) {
+            Ant worker = this.getWorkers().get(index);
+            worker.setRole(role);
+            worker.setDimension(dim);
         }
     }
 
     public void runMonthlyJobs() { 
         if (this.isActive || this.isPlayer) {
-             this.runParasitation();
+            this.runParasitation();
         }
     }
 
-    public void runYearlyJobs() {
-        this.runNuptial();
+    public void runYearlyJobs(World world, Hex currentHex) {
+        this.runNuptial(world, currentHex);
+    }
+    
+    public void refreshAntStats() {
+        for (List<Ant> list : antGroups.values()) {
+            for (Ant a : list) {
+                a.updateStatsFromColony(this);
+            }
+        }
     }
 }

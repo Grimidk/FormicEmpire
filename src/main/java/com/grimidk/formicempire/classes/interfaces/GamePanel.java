@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.interfaces;
 
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.World;
@@ -8,11 +9,15 @@ import com.grimidk.formicempire.classes.infrasctructure.managers.AlertManager;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TriggerManager;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
 import com.grimidk.formicempire.classes.interfaces.game.dialogs.*;
 import com.grimidk.formicempire.classes.interfaces.game.gamepanels.*;
 
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.util.ArrayList;
 
 public class GamePanel extends ZeroGamePanel {
@@ -26,6 +31,7 @@ public class GamePanel extends ZeroGamePanel {
     private AlertPanel alertPanel; 
     private ControlPanel controlPanel;
     private GameAreaPanel gameAreaPanel;
+    private JScrollPane gameScrollPane;
     
     private HatchRateDialog hatchDialog;
     private RoleManagementDialog roleDialog;    
@@ -33,6 +39,7 @@ public class GamePanel extends ZeroGamePanel {
     private AbilitiesDialog abilitiesDialog;
     private MapDialog mapDialog;
     private StatsDialog statsDialog; 
+    private DynastyManagementDialog dynastyDialog;
 
     private AlertManager alertManager;
     private TriggerManager triggerManager; 
@@ -63,6 +70,20 @@ public class GamePanel extends ZeroGamePanel {
         worldPanel = new WorldPanel();
         alertPanel = new AlertPanel();
         gameAreaPanel = new GameAreaPanel();
+        
+        gameScrollPane = new JScrollPane(gameAreaPanel);
+        gameScrollPane.setBorder(null);
+        gameScrollPane.getViewport().setOpaque(false);
+        gameScrollPane.setOpaque(false);
+        gameScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        gameScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        gameScrollPane.getVerticalScrollBar().setUnitIncrement(16);        
+        gameScrollPane.getViewport().addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                updateGameAreaSize();
+            }
+        });
     }
     
     private void initControlPanelCallbacks() {
@@ -73,11 +94,18 @@ public class GamePanel extends ZeroGamePanel {
         Runnable showAbilitiesDialogCallback = this::showAbilitiesDialog;
         Runnable showMapDialogCallback = this::showMapDialog; 
         Runnable showStatsDialogCallback = this::showStatsDialog;
+        Runnable showDynastyDialogCallback = this::showDynastyDialog;
         ControlPanel.RoleManagementCallback showRoleManagementDialogCallback = this::showRoleManagementDialog;
         
         Runnable toggleViewCallback = () -> {
             if (gameAreaPanel != null) {
                 gameAreaPanel.toggleDimension();
+                
+                updateGameAreaSize();
+                
+                if (gameAreaPanel.getCurrentDimension() == WorldSpaces.OVERWORLD) {
+                    gameScrollPane.getVerticalScrollBar().setValue(0);
+                }
             }
         };
         
@@ -90,7 +118,15 @@ public class GamePanel extends ZeroGamePanel {
             showAbilitiesDialogCallback,
             showStatsDialogCallback,
             toggleViewCallback,
-            showMapDialogCallback); 
+            showMapDialogCallback,
+            showDynastyDialogCallback); 
+    }
+    
+    private void updateGameAreaSize() {
+        if (gameAreaPanel != null && gameScrollPane != null) {
+            java.awt.Dimension viewportSize = gameScrollPane.getViewport().getSize();
+            gameAreaPanel.refreshSize(viewportSize.width, viewportSize.height);
+        }
     }
 
     @Override
@@ -123,19 +159,22 @@ public class GamePanel extends ZeroGamePanel {
 
         // --- Colony Panel (Left) ---
         colonyPanel.setPreferredSize(new Dimension(200, 0));
+        colonyPanel.setMinimumSize(new Dimension(200, 0));
         gbc.gridx = 0;
         gbc.weightx = 0.0; 
         center.add(colonyPanel, gbc);
 
         // --- Game Area (Middle) ---
+        gameScrollPane.setPreferredSize(new Dimension(100, 0));
         gbc.gridx = 1;
         gbc.weightx = 0.6; 
-        center.add(gameAreaPanel, gbc); 
+        center.add(gameScrollPane, gbc); 
 
         // --- Right Panel Container (World + Alert) ---
         JPanel rightPanel = new JPanel(new BorderLayout());
         rightPanel.setOpaque(false);
         rightPanel.setPreferredSize(new Dimension(230, 0));
+        rightPanel.setMinimumSize(new Dimension(230, 0));
         rightPanel.add(worldPanel, BorderLayout.NORTH);
         rightPanel.add(alertPanel, BorderLayout.CENTER); 
 
@@ -152,10 +191,10 @@ public class GamePanel extends ZeroGamePanel {
         Colony colony = getColonyFromEngine(engine);
         if (colony == null || !colony.isPlayer()) return;
         
-        if (hatchDialog == null || hatchDialog.getOwner() != frame) {
-            if (hatchDialog != null) hatchDialog.dispose();
-            hatchDialog = new HatchRateDialog(frame, colony);
+        if (hatchDialog != null) {
+            hatchDialog.dispose();
         }
+        hatchDialog = new HatchRateDialog(frame, colony);
         hatchDialog.showDialog();
     }
 
@@ -164,10 +203,10 @@ public class GamePanel extends ZeroGamePanel {
         Colony colony = getColonyFromEngine(engine);
         if (colony == null || !colony.isPlayer()) return;
         
-        if (roleDialog == null || roleDialog.getOwner() != frame) {
-            if (roleDialog != null) roleDialog.dispose();
-            roleDialog = new RoleManagementDialog(frame, colony);
+        if (roleDialog != null) {
+            roleDialog.dispose();
         }
+        roleDialog = new RoleManagementDialog(frame, colony);
         roleDialog.showDialog(tabIndex);
     }
 
@@ -176,10 +215,10 @@ public class GamePanel extends ZeroGamePanel {
         Colony colony = getColonyFromEngine(engine);
         if (colony == null || !colony.isPlayer()) return;
         
-        if (upgradeDialog == null || upgradeDialog.getOwner() != frame) {
-            if (upgradeDialog != null) upgradeDialog.dispose();
-            upgradeDialog = new UpgradeDialog(frame, colony);
+        if (upgradeDialog != null) {
+            upgradeDialog.dispose();
         }
+        upgradeDialog = new UpgradeDialog(frame, colony);
         upgradeDialog.showDialog(UpgradeDialog.TAB_RESEARCH);
     }
     
@@ -188,10 +227,10 @@ public class GamePanel extends ZeroGamePanel {
         Colony colony = getColonyFromEngine(engine);
         if (colony == null || !colony.isPlayer()) return;
         
-        if (upgradeDialog == null || upgradeDialog.getOwner() != frame) {
-            if (upgradeDialog != null) upgradeDialog.dispose();
-            upgradeDialog = new UpgradeDialog(frame, colony);
+        if (upgradeDialog != null) {
+            upgradeDialog.dispose();
         }
+        upgradeDialog = new UpgradeDialog(frame, colony);
         upgradeDialog.showDialog(UpgradeDialog.TAB_BUILD);
     }
 
@@ -200,10 +239,10 @@ public class GamePanel extends ZeroGamePanel {
         Colony colony = getColonyFromEngine(engine);
         if (colony == null || !colony.isPlayer()) return;
         
-        if (abilitiesDialog == null || abilitiesDialog.getOwner() != frame) {
-            if (abilitiesDialog != null) abilitiesDialog.dispose();
-            abilitiesDialog = new AbilitiesDialog(frame, colony);
+        if (abilitiesDialog != null) {
+            abilitiesDialog.dispose();
         }
+        abilitiesDialog = new AbilitiesDialog(frame, colony);
         abilitiesDialog.showDialog();
     }
 
@@ -231,6 +270,46 @@ public class GamePanel extends ZeroGamePanel {
         statsDialog = new StatsDialog(frame, colony, engine);
         statsDialog.showDialog();
     }
+
+    private void showDynastyDialog() {
+        Engine engine = frame.getEngine();
+        Colony colony = getColonyFromEngine(engine);
+        if (colony == null || colony.getDynasty() == null) return;
+
+        if (dynastyDialog != null) {
+            dynastyDialog.dispose();
+        }
+
+        dynastyDialog = new DynastyManagementDialog(frame, colony.getDynasty(), engine, this::handleGoToColony);
+        dynastyDialog.showDialog();
+    }
+
+    private void handleGoToColony(Colony target) {
+        Engine engine = frame.getEngine();
+        if (engine == null || engine.getWorld() == null) return;
+        
+        World world = engine.getWorld();
+        if (world.getHexes() != null) {
+            for (Hex hex : world.getHexes()) {
+                if (hex.getColony() == target) {
+                    world.changeActiveHex(hex);
+                    
+                    if (gameAreaPanel != null) {
+                        gameAreaPanel.setColony(target);
+                        gameAreaPanel.resetView(); 
+                    }
+                    
+                    refreshAllGUIData();
+                    updateGameAreaSize();
+                    
+                    if (triggerManager != null) {
+                        // Notify trigger manager of colony switch if needed
+                    }
+                    break;
+                }
+            }
+        }
+    }
     
     private Colony getColonyFromEngine(Engine engine) {
         return engine != null && engine.getWorld() != null && engine.getWorld().getActiveHex() != null ? engine.getWorld().getActiveHex().getColony() : null;
@@ -246,6 +325,7 @@ public class GamePanel extends ZeroGamePanel {
         if (abilitiesDialog != null) { abilitiesDialog.dispose(); abilitiesDialog = null; }
         if (mapDialog != null) { mapDialog.dispose(); mapDialog = null; }
         if (statsDialog != null) { statsDialog.dispose(); statsDialog = null; }
+        if (dynastyDialog != null) { dynastyDialog.dispose(); dynastyDialog = null; }
     }
 
     private void cleanupSession() {
@@ -313,6 +393,24 @@ public class GamePanel extends ZeroGamePanel {
         statusLabel.setText("Starting game...");
         Engine engine = frame.getEngine();
         
+        JDialog loadingDialog = new JDialog(frame, "Loading", true);
+        loadingDialog.setUndecorated(true);
+        loadingDialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
+        panel.setBackground(Color.DARK_GRAY);
+
+        JLabel label = new JLabel("Loading game, please wait...", SwingConstants.CENTER);
+        label.setForeground(Color.WHITE);
+        label.setFont(new Font("SansSerif", Font.BOLD, 18));
+        label.setBorder(BorderFactory.createEmptyBorder(30, 60, 30, 60));
+
+        panel.add(label, BorderLayout.CENTER);
+        loadingDialog.add(panel);
+        loadingDialog.pack();
+        loadingDialog.setLocationRelativeTo(frame);
+
         SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
             @Override
             protected Void doInBackground() throws Exception {
@@ -322,6 +420,7 @@ public class GamePanel extends ZeroGamePanel {
 
             @Override
             protected void done() {
+                loadingDialog.dispose();
                 try {
                     get();
                     statusLabel.setText("Game started");
@@ -344,14 +443,17 @@ public class GamePanel extends ZeroGamePanel {
                     
                     updateStaticWorldInfo();
                     refreshAllGUIData();
+                    updateGameAreaSize();
                     
-                    if (!engineStarted) {
-                        engineStarted = true;
-                        if (!engine.isAlive()) {
-                            engine.start();
+                    SwingUtilities.invokeLater(() -> {
+                        if (!engineStarted) {
+                            engineStarted = true;
+                            if (!engine.isAlive()) {
+                                engine.start();
+                            }
                         }
-                    }
-                    controlPanel.setPlayPauseButtonText(engine.isPaused());
+                        controlPanel.setPlayPauseButtonText(engine.isPaused());
+                    });
                     
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -360,6 +462,7 @@ public class GamePanel extends ZeroGamePanel {
             }
         };
         worker.execute();
+        loadingDialog.setVisible(true);
     }
 
     private void registerTickListeners() {
@@ -461,6 +564,10 @@ public class GamePanel extends ZeroGamePanel {
         colonyPanel.updateHourData(colony);
         
         if (colony != null && colony.isPlayer()) {
+            updateGameAreaSize();
+        }
+
+        if (colony != null && colony.isPlayer()) {
             if (upgradeDialog != null && upgradeDialog.isShowing()) {
                 upgradeDialog.liveUpdate();
             }
@@ -470,16 +577,21 @@ public class GamePanel extends ZeroGamePanel {
             if (statsDialog != null && statsDialog.isShowing()) {
                 statsDialog.liveUpdate();
             }
+            if (dynastyDialog != null && dynastyDialog.isShowing()) {
+                dynastyDialog.liveUpdate();
+            }
             if (controlPanel != null) {
                 controlPanel.updateResearchMenu(colony.hasUpgrade(GameUnlocks.ABILITY_RESEARCH));
                 controlPanel.updateBuildMenu(colony.hasUpgrade(GameUnlocks.ABILITY_BUILD));
                 controlPanel.updateAbilitiesMenu(colony.hasUpgrade(GameUnlocks.ABILITY_FORCED_FLIGHT));
+                controlPanel.updateDynastyMenu(colony.hasUpgrade(GameUnlocks.ABILITY_DYNASTY));
             }
         } else {
              if (controlPanel != null) {
                 controlPanel.updateResearchMenu(false);
                 controlPanel.updateBuildMenu(false);
                 controlPanel.updateAbilitiesMenu(false);
+                controlPanel.updateDynastyMenu(false);
             }
         }
     }

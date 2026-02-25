@@ -9,7 +9,7 @@ import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,6 +71,7 @@ public class TriggerManager {
         checkGraveKeeperUnlock();
         checkColonyDeath();
         checkAllNPCTriggers();
+        checkMassFlightUnlock();
     }
 
     private void checkHourlyTriggers() {
@@ -81,6 +82,8 @@ public class TriggerManager {
         checkBruteRoleUnlock();
         checkSpreadAbilityUnlock();
         checkScoutRoleUnlock();
+        checkDynastyTriggers();
+        checkAbilityMenuHint();
     }
 
     private void checkAllNPCTriggers() {
@@ -159,8 +162,8 @@ public class TriggerManager {
         boolean timeMet = world.getYear() > 0 || world.getMonth() > 1;
         if (timeMet) {
             fireTrigger(GameUnlocks.ROLE_RESEARCHER, 
-                        "New Ideas", 
-                        "A month has passed. Your Queen has grown wise and can now dedicate time to Research, unlocking the Researcher role!");
+                "New Ideas", 
+                "A month has passed. Your Queen has grown wise and can now dedicate time to Research, unlocking the Researcher role!");
         }
     }
     
@@ -169,8 +172,8 @@ public class TriggerManager {
         
         if (playerColony.getDeadAnts().size() >= 100) { 
             fireTrigger(GameUnlocks.ROLE_GRAVER, 
-                        "A Smelly Problem", 
-                        "The bodies are piling up! Your workers have developed the Grave-Keeper role to clean the colony and prevent disease.");
+                "A Smelly Problem", 
+                "The bodies are piling up! Your workers have developed the Grave-Keeper role to clean the colony and prevent disease.");
         }
     }
     
@@ -179,8 +182,8 @@ public class TriggerManager {
         
         if (playerColony.getResearchPoints() >= 100) {
             fireTrigger(GameUnlocks.ABILITY_RESEARCH, 
-                        "Scientific Breakthrough", 
-                        "Your colony has accumulated 100 Research Points! You can now access the Research panel (Y) from the game menu to purchase new upgrades.");
+                "Scientific Breakthrough", 
+                "Your colony has accumulated 100 Research Points! You can now access the Research panel (Y) from the game menu to purchase new upgrades.");
         }
     }
     
@@ -189,8 +192,8 @@ public class TriggerManager {
         
         if (playerColony.hasUpgrade(GameUnlocks.ROLE_BUILDER)) {
             fireTrigger(GameUnlocks.ABILITY_BUILD, 
-                        "Construction Unlocked", 
-                        "Your ants have learned the basics of construction! You can now access the Build panel (U) from the game menu.");
+                "Construction Unlocked", 
+                "Your ants have learned the basics of construction! You can now access the Build panel (U) from the game menu.");
         }
     }
     
@@ -199,8 +202,8 @@ public class TriggerManager {
         
         if (playerColony.hasUpgrade(GameUnlocks.TYPE_SOLDIER)) {
             fireTrigger(GameUnlocks.ROLE_HUNTER,
-                        "Hunter Instinct",
-                        "Unlocking the Soldier ant type has automatically unlocked the 'Hunter' role for them.");
+                "Hunter Instinct",
+                "Unlocking the Soldier ant type has automatically unlocked the 'Hunter' role for them.");
         }
     }
     
@@ -209,8 +212,8 @@ public class TriggerManager {
         
         if (playerColony.hasUpgrade(GameUnlocks.TYPE_PRINCESS)) {
             fireTrigger(GameUnlocks.ROLE_BREEDER,
-                        "Nuptial Flights",
-                        "Unlocking the Princess and Drone ant types has automatically unlocked the 'Breeder' role.");
+                "Nuptial Flights",
+                "Unlocking the Princess and Drone ant types has automatically unlocked the 'Breeder' role.");
         }
     }
     
@@ -219,8 +222,8 @@ public class TriggerManager {
         
         if (playerColony.hasUpgrade(GameUnlocks.TYPE_MAJOR)) {
             fireTrigger(GameUnlocks.ROLE_BRUTE,
-                        "Heavy Trooper",
-                        "Unlocking the Major ant type has automatically unlocked the 'Brute' role for them.");
+                "Heavy Trooper",
+                "Unlocking the Major ant type has automatically unlocked the 'Brute' role for them.");
         }
     }
     
@@ -229,9 +232,9 @@ public class TriggerManager {
         
         if (playerColony.hasUpgrade(GameUnlocks.ROLE_BREEDER)) {
             fireTrigger(GameUnlocks.ABILITY_SPREAD,
-                        "Colony Colonization",
-                        "With the ability to breed new queens, your colony now understands how to spread. You can found new colonies from the world map (I).");
-        }
+                "Colony Colonization",
+                "With the ability to breed new queens, your colony now understands how to spread. You can found new colonies from the world map (I).");
+}
     }
     
     private void checkScoutRoleUnlock() {
@@ -239,12 +242,12 @@ public class TriggerManager {
         
         if (playerColony.getLocationService() != null && playerColony.getLocationService().getDiscoveredSources() != null) {
             for (ResourceSource source : playerColony.getLocationService().getDiscoveredSources()) {
-                if (source.getResourceType() == GameConstants.PLANT_RESOURCE && source.getInitialQuantity() == 10000) {
+                if (source.getResourceType() == GameConstants.RESOURCE_PLANT && source.getInitialQuantity() == 10000) {
                     int collected = source.getInitialQuantity() - source.getQuantity();
                     if (collected >= 6000) {
                         fireTrigger(GameUnlocks.ROLE_SCOUT, 
-                                    "Adventure's Call", 
-                                    "We have depleted more than half of our main plant source! Our workers feel the need to explore for new lands, unlocking the Scout role!");
+                            "Adventure's Call", 
+                            "We have depleted more than half of our main plant source! Our workers feel the need to explore for new lands, unlocking the Scout role!");
                     }
                     break; 
                 }
@@ -258,7 +261,66 @@ public class TriggerManager {
         if (playerColony.getRank().getPopulation() >= 1000) {
             fireTrigger(GameUnlocks.ROLE_POLICE, 
                 "Parasitic Infestation", 
-                "The colony has become so prosperous that parasitic ants may infiltrate it!");
+                "The colony has become so prosperous that parasitic bugs may infiltrate it!");
+        }
+    }
+
+    private void checkMassFlightUnlock() {
+        if (playerColony.getDynasty() == null) return;
+        if (playerColony.hasUpgrade(GameUnlocks.ABILITY_MASS_FLIGHT)) return;
+
+        if (playerColony.getDynasty().getTotalNuptialFlights() >= 10) {
+            fireTrigger(GameUnlocks.ABILITY_MASS_FLIGHT,
+                "Imperial Decree",
+                "Your dynasty has performed 10 nuptial flights! You have unlocked the 'Mass Nuptial Flights' ability in the Colony Operations menu (Z).");
+        }
+    }
+    
+    private void checkDynastyTriggers() {
+        if (playerColony.getDynasty() == null) return;
+        
+        int colonyCount = playerColony.getDynasty().getColonies().size();
+
+        if (colonyCount >= 2 && !playerColony.hasUpgrade(GameUnlocks.ABILITY_DYNASTY)) {
+            fireTrigger(GameUnlocks.ABILITY_DYNASTY,
+                "Ant Dynasty",
+                "Your dynasty grows! With a second colony established, you can now manage your entire Dynasty. Press (S) to open the Dynasty menu.");
+        }
+        
+        if (colonyCount >= 3 && !playerColony.hasUpgrade(GameUnlocks.ABILITY_TRADE)) {
+            fireTrigger(GameUnlocks.ABILITY_TRADE,
+                "Trade Networks",
+                "With three colonies, your ants have learned to transport resources efficiently between nests. Trade Routes unlocked!");
+        }
+
+        if (colonyCount >= 4 && !playerColony.hasUpgrade(GameUnlocks.ABILITY_MANAGEMENT)) {
+            fireTrigger(GameUnlocks.ABILITY_MANAGEMENT,
+                "Middle Management",
+                "Your dynasty has so many colonies that you need help managing them! You can now let your colonies build by themselves.");
+        }
+
+        if (colonyCount >= 5 && !playerColony.hasUpgrade(GameUnlocks.ABILITY_SPREAD_2)) {
+            fireTrigger(GameUnlocks.ABILITY_SPREAD_2,
+                "Mass Colonization",
+                "Your dynasty is expanding rapidly! The limit on new colonies has been removed.");
+        }
+        
+        if (colonyCount >= 7 && !playerColony.hasUpgrade(GameUnlocks.ABILITY_AUTOMATION)) {
+            fireTrigger(GameUnlocks.ABILITY_AUTOMATION,
+                "Automation Era",
+                "Your dynasty is vast. You can now completely automate colony management.");
+        }
+    }
+
+    private void checkAbilityMenuHint() {
+        if (playerColony.hasUpgrade(GameUnlocks.ABILITY_ABILITY)) return;
+        
+        boolean hasActionAbilities = playerColony.hasUpgrade(GameUnlocks.ABILITY_FORCED_FLIGHT);
+        
+        if (hasActionAbilities) {
+            fireTrigger(GameUnlocks.ABILITY_ABILITY, 
+                "Colony Operations", 
+                "You have gained a special active ability! You can now access the Colony Operations menu by pressing (Z).");
         }
     }
     

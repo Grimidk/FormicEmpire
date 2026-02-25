@@ -1,22 +1,76 @@
 package com.grimidk.formicempire.classes.entities.services;
 
-import java.util.List;
-
-import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
-import com.grimidk.formicempire.classes.entities.ResourceSource;
-import com.grimidk.formicempire.classes.infrasctructure.Dimension;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
 
 public class ColonyStarterService {
+    
+    private String formatName(String name) {
+        if (name == null || name.trim().isEmpty()) return "Player";
+        name = name.trim();
+        return name.substring(0, 1).toUpperCase() + name.substring(1);
+    }
 
     public void initializeNewColony(Colony colony) {
         String type = colony.isPlayer() ? "Player" : "AI";
-        System.out.println("[ColonyStarterService] Initializing new " + type + " colony: " + colony.getName());
         
+        if (colony.getDynasty() != null) {
+            Dynasty d = colony.getDynasty();
+            
+            String baseName = d.getName();
+            if (baseName != null && baseName.endsWith(" Dynasty")) {
+                baseName = baseName.substring(0, baseName.length() - 8);
+            }
+            baseName = formatName(baseName);
+            
+            int index = d.getColonies().indexOf(colony);
+            if (index == -1) index = d.getColonies().size(); 
+            
+            String newName;
+            if (index == 0) newName = baseName + " Prime";
+            else if (index == 1) newName = "New " + baseName;
+            else if (index == 2) newName = baseName + " Secundus";
+            else if (index == 3) newName = baseName + " Tertius";
+            else if (index == 4) newName = baseName + " Quartus";
+            else newName = baseName + " " + (index + 1);
+            
+            colony.setName(newName);
+            
+            boolean isFirst = (index == 0);
+            colony.setCapital(isFirst);
+            
+            if (isFirst) {
+                colony.setAge(7); 
+            } else {
+                colony.setAge(0);
+                
+                Colony capitalColony = null;
+                for (Colony c : d.getColonies()) {
+                    if (c.isCapital() && c != colony) {
+                        capitalColony = c;
+                        break;
+                    }
+                }
+                
+                if (capitalColony != null) {
+                    colony.setHatchRateWorker(capitalColony.getHatchRateWorker());
+                    colony.setHatchRateSoldier(capitalColony.getHatchRateSoldier());
+                    colony.setHatchRateMajor(capitalColony.getHatchRateMajor());
+                    colony.setHatchRateDrone(capitalColony.getHatchRateDrone());
+                    colony.setHatchRatePrincess(capitalColony.getHatchRatePrincess());
+                }
+            }
+        } else {
+            colony.setCapital(true);
+            colony.setAge(7);
+        }
+
+        System.out.println("[ColonyStarterService] Initializing new " + type + " colony: " + colony.getName());
+
         if (!colony.isPlayer()) {
             colony.setAutomationEnabled(true);
             System.out.println("[ColonyStarterService] Automation ENABLED for NPC colony.");
@@ -34,46 +88,11 @@ public class ColonyStarterService {
             e.printStackTrace();
         }
 
-        List<Ant> workerList = colony.getWorkers();
-        if (workerList != null) {
-            for (int i = 0; i < 9; i++) {
-                Ant worker = new Ant(colony, GameConstants.TYPE_WORKER);
-                workerList.add(worker);
-            }
-        } else {
-            System.err.println("[ColonyStarterService] Critical Error: Worker list is null.");
-        }
-
-        configureWorker(colony, 0, GameConstants.ROLE_NURSE, WorldSpaces.UNDERWORLD);
-        configureWorker(colony, 1, GameConstants.ROLE_NURSE, WorldSpaces.UNDERWORLD);
-        configureWorker(colony, 2, GameConstants.ROLE_FARMER, WorldSpaces.UNDERWORLD);
-        configureWorker(colony, 3, GameConstants.ROLE_NURSE, WorldSpaces.UNDERWORLD);
-        configureWorker(colony, 4, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
-        configureWorker(colony, 5, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
-        configureWorker(colony, 6, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
-        configureWorker(colony, 7, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
-        configureWorker(colony, 8, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
-
-        colony.setAssignedRoleCount(GameConstants.ROLE_LAYER, 1);
-        colony.setAssignedRoleCount(GameConstants.ROLE_NURSE, 3);
-        colony.setAssignedRoleCount(GameConstants.ROLE_FARMER, 1);
-        colony.setAssignedRoleCount(GameConstants.ROLE_FORAGER, 5);
-
-        if (colony.getLocationService() != null) {
-            if (colony.getLocationService().getDiscoveredSources().isEmpty()) {
-                ResourceSource initialPlant = new ResourceSource(GameConstants.PLANT_RESOURCE, 10000, 0, 0);
-                ResourceSource initialWater = new ResourceSource(GameConstants.WATER_RESOURCE, 10000, 0, 0);
-                
-                colony.getLocationService().addSource(colony, initialPlant);
-                colony.getLocationService().addSource(colony, initialWater);
-            }
+        if (colony.getAge() >= 7) {
+            colony.matureColony();
         }
         
-        if (colony.getPhysicsService() != null) {
-            colony.getPhysicsService().randomizeAllAntPositions(colony);
-        }
-        
-        System.out.println("[ColonyStarterService] Initialization complete for " + colony.getName() + " (ID: " + colony.getId() + "). Total Ants: " + colony.getAntTotal());
+        System.out.println("[ColonyStarterService] Initialization complete for " + colony.getName() + " (ID: " + colony.getId() + "). Current Age: " + colony.getAge());
     }
 
     private void clearColonyLists(Colony colony) {
@@ -88,21 +107,11 @@ public class ColonyStarterService {
         if (colony.getPrincesses() != null) colony.getPrincesses().clear();
     }
 
-    private void configureWorker(Colony colony, int index, AntRole role, Dimension dim) {
-        if (colony.getWorkers() != null && index < colony.getWorkers().size()) {
-            Ant worker = colony.getWorkers().get(index);
-            worker.setRole(role);
-            worker.setDimension(dim);
-        }
-    }
-
     public void dismantleColony(Hex hex) {
         if (hex == null || hex.getColony() == null) return;
         Colony colony = hex.getColony();
 
-        if (colony.isPlayer()) return;
-
-        System.out.println("[ColonyStarterService] Dismantling dead NPC colony: " + colony.getName() + " at Hex (" + hex.getQ() + ", " + hex.getR() + ")");
+        System.out.println("[ColonyStarterService] Dismantling dead colony: " + colony.getName() + " at Hex (" + hex.getQ() + ", " + hex.getR() + ")");
 
         colony.setActive(false);
         colony.setAutomationEnabled(false);

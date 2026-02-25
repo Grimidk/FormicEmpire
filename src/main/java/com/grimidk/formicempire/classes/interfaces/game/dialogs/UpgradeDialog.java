@@ -77,7 +77,7 @@ public class UpgradeDialog extends ZeroDialog {
         }
 
         // --- Build Tab ---
-        if (colony.hasUpgrade(GameUnlocks.ABILITY_BUILD)) {
+        if (colony.hasUpgrade(GameUnlocks.ROLE_BUILDER)) {
             if (buildPanel == null) buildPanel = new BuildPanel(colony);
             buildPanel.updateData();
             tabbedPane.addTab("Construction", GameConstants.ROLE_BUILDER.getIcon(), buildPanel);
@@ -85,7 +85,7 @@ public class UpgradeDialog extends ZeroDialog {
         }
 
         // --- Assimilations Tab ---
-        if (false) { // To implement
+        if (colony.hasUpgrade(GameUnlocks.ABILITY_ASSIMILATION)) { // To implement
             if (assimilationPanel == null) {
                 assimilationPanel = createPlaceholderPanel("Assimilations - Coming Soon");
             }
@@ -94,7 +94,7 @@ public class UpgradeDialog extends ZeroDialog {
         }
 
         // --- Synergies Tab ---
-        if (false) { // To implement
+        if (colony.hasUpgrade(GameUnlocks.ABILITY_SYNERGY)) { // To implement
             if (synergyPanel == null) {
                 synergyPanel = createPlaceholderPanel("Synergies - Coming Soon");
             }
@@ -253,7 +253,8 @@ public class UpgradeDialog extends ZeroDialog {
                 if (colony.getResearchPoints() >= upgrade.getCost()) {
                     colony.setResearchPoints(colony.getResearchPoints() - upgrade.getCost());
                     colony.unlockUpgrade(upgrade);
-                    updateData();
+                    
+                    UpgradeDialog.this.refreshDialog();
                 }
             });
 
@@ -307,9 +308,9 @@ public class UpgradeDialog extends ZeroDialog {
             JPanel northPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
             northPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
             mineralsLabel = new JLabel();
-            mineralsLabel.setIcon(GameConstants.ROCK_RESOURCE.getIcon());
+            mineralsLabel.setIcon(GameConstants.RESOURCE_ROCK.getIcon());
             resinLabel = new JLabel();
-            resinLabel.setIcon(GameConstants.RESIN_RESOURCE.getIcon());
+            resinLabel.setIcon(GameConstants.RESOURCE_RESIN.getIcon());
             buildersLabel = new JLabel();
             buildersLabel.setIcon(GameConstants.ROLE_BUILDER.getIcon());
 
@@ -491,7 +492,11 @@ public class UpgradeDialog extends ZeroDialog {
                 if (listPanel.getComponentCount() > 0 && listPanel.getComponent(0) instanceof JPanel) {
                     JPanel progressPanel = (JPanel) listPanel.getComponent(0);
                     Border b = progressPanel.getBorder();
-                    if (b instanceof TitledBorder && ((TitledBorder) b).getTitle().contains(currentProject.getName())) {
+                    
+                    if (b instanceof TitledBorder && ((TitledBorder) b).getTitle().contains(currentProject.getName())
+                            && progressPanel.getComponentCount() > 0 
+                            && progressPanel.getComponent(0) instanceof JProgressBar) {
+                        
                         JProgressBar progressBar = (JProgressBar) progressPanel.getComponent(0);
                         JLabel buildersLabel = (JLabel) progressPanel.getComponent(1);
 

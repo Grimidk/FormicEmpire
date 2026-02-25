@@ -104,160 +104,160 @@ public final class GameConstants {
     static { humidity.add(HUMID_5); }
 
     // --- Biomes ---
-    public static final Biome PLAINS_BIOME = new Biome(1, "Plains", 25, 2, 1f, 1f, 0f,
+    public static final Biome BIOME_PLAINS = new Biome(1, "Plains", 25, 2, 1f, 1f, 0f,
         loadIcon("icons/biomes/plains.png"));
-    static { biomes.add(PLAINS_BIOME); }
-    public static final Biome FOREST_BIOME = new Biome(2, "Forest", 22, 3, 2f, 2f, 0.1f,
+    static { biomes.add(BIOME_PLAINS); }
+    public static final Biome BIOME_FOREST = new Biome(2, "Forest", 22, 3, 2f, 2f, 0.1f,
         loadIcon("icons/biomes/forest.png"));
-    static { biomes.add(FOREST_BIOME); }
-    public static final Biome JUNGLE_BIOME = new Biome(3, "Jungle", 30, 4, 2.5f, 2.5f, 0.2f,
+    static { biomes.add(BIOME_FOREST); }
+    public static final Biome BIOME_JUNGLE = new Biome(3, "Jungle", 30, 4, 2.5f, 2.5f, 0.2f,
         loadIcon("icons/biomes/jungle.png"));
-    static { biomes.add(JUNGLE_BIOME); }
-    public static final Biome SWAMP_BIOME = new Biome(4, "Swamp", 26, 5, 1.5f, 1.5f, 0f,
+    static { biomes.add(BIOME_JUNGLE); }
+    public static final Biome BIOME_SWAMP = new Biome(4, "Swamp", 26, 5, 1.5f, 1.5f, 0f,
         loadIcon("icons/biomes/swamp.png"));
-    static { biomes.add(SWAMP_BIOME); }
-    public static final Biome URBAN_BIOME = new Biome(5, "Urban", 28, 1, 0.5f, 0.5f, 0.5f,
+    static { biomes.add(BIOME_SWAMP); }
+    public static final Biome BIOME_URBAN = new Biome(5, "Urban", 28, 1, 0.5f, 0.5f, 0.5f,
         loadIcon("icons/biomes/urban.png"));
-    static { biomes.add(URBAN_BIOME); }
-    public static final Biome TUNDRA_BIOME = new Biome(6, "Tundra", 5, 2, 0.2f, 0.2f, 0.3f,
+    static { biomes.add(BIOME_URBAN); }
+    public static final Biome BIOME_TUNDRA = new Biome(6, "Tundra", 5, 2, 0.2f, 0.2f, 0.3f,
         loadIcon("icons/biomes/tundra.png"));
-    static { biomes.add(TUNDRA_BIOME); }
-    public static final Biome TAIGA_BIOME = new Biome(7, "Taiga", 12, 1, 0.4f, 0.3f, 0.5f,
+    static { biomes.add(BIOME_TUNDRA); }
+    public static final Biome BIOME_TAIGA = new Biome(7, "Taiga", 12, 1, 0.4f, 0.3f, 0.5f,
         loadIcon("icons/biomes/taiga.png"));
-    static { biomes.add(TAIGA_BIOME); }
-    public static final Biome DESSERT_BIOME = new Biome(8, "Dessert", 45, 0, 0.05f, 0.02f, 1f,
+    static { biomes.add(BIOME_TAIGA); }
+    public static final Biome BIOME_DESERT = new Biome(8, "Desert", 45, 0, 0.05f, 0.02f, 1f,
         loadIcon("icons/biomes/dessert.png"));
-    static { biomes.add(DESSERT_BIOME); }
-    public static final Biome MOUNTAIN_BIOME = new Biome(9, "Mountain", 12, 1, 0.1f, 0.3f, 2f,
+    static { biomes.add(BIOME_DESERT); }
+    public static final Biome BIOME_MOUNTAIN = new Biome(9, "Mountain", 12, 1, 0.1f, 0.3f, 2f,
         loadIcon("icons/biomes/mountain.png"));
-    static { biomes.add(MOUNTAIN_BIOME); }
-    public static final Biome VOLCANIC_BIOME = new Biome(10, "Volcanic", 60, 0, 0.01f, 0.01f, 5f,
+    static { biomes.add(BIOME_MOUNTAIN); }
+    public static final Biome BIOME_VOLCANIC = new Biome(10, "Volcanic", 60, 0, 0.01f, 0.01f, 5f,
         loadIcon("icons/biomes/volcanic.png"));
-    static { biomes.add(VOLCANIC_BIOME); }
-    public static final Biome LAKE_BIOME = new Biome(11, "Lake", 25, 5, 0.5f, 0.5f, 0f,
+    static { biomes.add(BIOME_VOLCANIC); }
+    public static final Biome BIOME_LAKE = new Biome(11, "Lake", 25, 5, 0.5f, 0.5f, 0f,
         loadIcon("icons/biomes/lake.png"));
-    static { biomes.add(LAKE_BIOME); }
-    public static final Biome OCEAN_BIOME = new Biome(12, "Ocean", 20, 5, 0.2f, 0.2f, 0f,
+    static { biomes.add(BIOME_LAKE); }
+    public static final Biome BIOME_OCEAN = new Biome(12, "Ocean", 20, 5, 0.2f, 0.2f, 0f,
         loadIcon("icons/biomes/ocean.png"));
-    static { biomes.add(OCEAN_BIOME); }
-    
+    static { biomes.add(BIOME_OCEAN); }
+
     // --- Resources ---
-    public static final ResourceType PLANT_RESOURCE = new ResourceType(1, "Plant Matter", true, false, 
+    public static final ResourceType RESOURCE_PLANT = new ResourceType(1, "Plant Matter", true, false, 
         loadIcon("icons/resources/plant.png"));
-    static { resources.add(PLANT_RESOURCE); }
-    public static final ResourceType FUNGI_RESOURCE = new ResourceType(2, "Fungi Matter", true, false, 
+    static { resources.add(RESOURCE_PLANT); }
+    public static final ResourceType RESOURCE_FUNGI = new ResourceType(2, "Fungi Matter", true, false, 
         loadIcon("icons/resources/mushroom.png"));
-    static { resources.add(FUNGI_RESOURCE); }
-    public static final ResourceType MEAT_RESOURCE = new ResourceType(3, "Animal Matter", true, false, 
+    static { resources.add(RESOURCE_FUNGI); }
+    public static final ResourceType RESOURCE_MEAT = new ResourceType(3, "Animal Matter", true, false, 
         loadIcon("icons/resources/protein.png"));
-    static { resources.add(MEAT_RESOURCE); }
-    public static final ResourceType WATER_RESOURCE = new ResourceType(4, "Water", true, true, 
+    static { resources.add(RESOURCE_MEAT); }
+    public static final ResourceType RESOURCE_WATER = new ResourceType(4, "Water", true, true, 
         loadIcon("icons/resources/water.png"));
-    static { resources.add(WATER_RESOURCE); }
-    public static final ResourceType SYRUP_RESOURCE = new ResourceType(5, "Syrup", true, true, 
+    static { resources.add(RESOURCE_WATER); }
+    public static final ResourceType RESOURCE_SYRUP = new ResourceType(5, "Syrup", true, true, 
         loadIcon("icons/resources/syrup.png"));
-    static { resources.add(SYRUP_RESOURCE); }
-    public static final ResourceType RESIN_RESOURCE = new ResourceType(6, "Resin", false, true, 
+    static { resources.add(RESOURCE_SYRUP); }
+    public static final ResourceType RESOURCE_RESIN = new ResourceType(6, "Resin", false, true, 
         loadIcon("icons/resources/resin.png"));
-    static { resources.add(RESIN_RESOURCE); }
-    public static final ResourceType ROCK_RESOURCE = new ResourceType(7, "Mineral", false, false, 
+    static { resources.add(RESOURCE_RESIN); }
+    public static final ResourceType RESOURCE_ROCK = new ResourceType(7, "Mineral", false, false, 
         loadIcon("icons/resources/mineral.png"));
-    static { resources.add(ROCK_RESOURCE); }
+    static { resources.add(RESOURCE_ROCK); }
 
     // --- Times of Day ---
-    public static final TimeOfDay DAY_TIME = new TimeOfDay(1, "Daytime", 1.05f,
+    public static final TimeOfDay TIME_DAY = new TimeOfDay(1, "Daytime", 1.05f,
         loadIcon("icons/times/day.png"));
-    static { timesOfDay.add(DAY_TIME); }
-    public static final TimeOfDay DUSK_TIME = new TimeOfDay(2, "Dusk", 0.95f,
+    static { timesOfDay.add(TIME_DAY); }
+    public static final TimeOfDay TIME_DUSK = new TimeOfDay(2, "Dusk", 0.95f,
         loadIcon("icons/times/dusk.png"));
-    static { timesOfDay.add(DUSK_TIME); }
-    public static final TimeOfDay NIGHT_TIME = new TimeOfDay(3, "Nightime", 0.85f,
+    static { timesOfDay.add(TIME_DUSK); }
+    public static final TimeOfDay TIME_NIGHT = new TimeOfDay(3, "Nightime", 0.85f,
         loadIcon("icons/times/night.png"));
-    static { timesOfDay.add(NIGHT_TIME); }
-    public static final TimeOfDay DAWN_TIME = new TimeOfDay(4, "Dawn", 0.90f,
+    static { timesOfDay.add(TIME_NIGHT); }
+    public static final TimeOfDay TIME_DAWN = new TimeOfDay(4, "Dawn", 0.90f,
         loadIcon("icons/times/dawn.png"));
-    static { timesOfDay.add(DAWN_TIME); }
-    public static final TimeOfDay SOLAR_ECLIPSE_TIME = new TimeOfDay(5, "Solar Eclipse", 0.7f,
+    static { timesOfDay.add(TIME_DAWN); }
+    public static final TimeOfDay TIME_SOLAR_ECLIPSE = new TimeOfDay(5, "Solar Eclipse", 0.7f,
         loadIcon("icons/times/solar-eclipse.png"));
-    static { timesOfDay.add(SOLAR_ECLIPSE_TIME); }
-    public static final TimeOfDay LUNAR_ECLIPSE_TIME = new TimeOfDay(6, "Lunar Eclipse", 0.85f,
+    static { timesOfDay.add(TIME_SOLAR_ECLIPSE); }
+    public static final TimeOfDay TIME_LUNAR_ECLIPSE = new TimeOfDay(6, "Lunar Eclipse", 0.85f,
         loadIcon("icons/times/lunar-eclipse.png"));
-    static { timesOfDay.add(LUNAR_ECLIPSE_TIME); }
+    static { timesOfDay.add(TIME_LUNAR_ECLIPSE); }
 
     // --- Moon Phases ---
-    public static final MoonPhase NEW_MOON_PHASE = new MoonPhase(1, "New Moon", 1f, 
+    public static final MoonPhase PHASE_NEW_MOON = new MoonPhase(1, "New Moon", 1f, 
         loadIcon("icons/moon/new-moon.png"));
-    static { moonPhases.add(NEW_MOON_PHASE); }
-    public static final MoonPhase WAXING_CRESCENT_PHASE = new MoonPhase(2, "Waxing Crescent", 3/4f,
+    static { moonPhases.add(PHASE_NEW_MOON); }
+    public static final MoonPhase PHASE_WAXING_CRESCENT = new MoonPhase(2, "Waxing Crescent", 3/4f,
         loadIcon("icons/moon/waxing-crescent.png"));
-    static { moonPhases.add(WAXING_CRESCENT_PHASE); }
-    public static final MoonPhase FIRST_QUARTER_PHASE = new MoonPhase(3, "First Quarter", 1/2f, 
+    static { moonPhases.add(PHASE_WAXING_CRESCENT); }
+    public static final MoonPhase PHASE_FIRST_QUARTER = new MoonPhase(3, "First Quarter", 1/2f, 
         loadIcon("icons/moon/first-quarter.png"));
-    static { moonPhases.add(FIRST_QUARTER_PHASE); }
-    public static final MoonPhase WAXING_GIBBOUS_PHASE = new MoonPhase(4, "Waxing Gibbous", 1/4f, 
+    static { moonPhases.add(PHASE_FIRST_QUARTER); }
+    public static final MoonPhase PHASE_WAXING_GIBBOUS = new MoonPhase(4, "Waxing Gibbous", 1/4f, 
         loadIcon("icons/moon/waxing-gibbous.png"));
-    static { moonPhases.add(WAXING_GIBBOUS_PHASE); }
-    public static final MoonPhase FULL_MOON_PHASE = new MoonPhase(5, "Full Moon", 0f, 
+    static { moonPhases.add(PHASE_WAXING_GIBBOUS); }
+    public static final MoonPhase PHASE_FULL_MOON = new MoonPhase(5, "Full Moon", 0f, 
         loadIcon("icons/moon/full-moon.png"));
-    static { moonPhases.add(FULL_MOON_PHASE); }
-    public static final MoonPhase WANING_GIBBOUS_PHASE = new MoonPhase(6, "Waning Gibbous", 1/4f, 
+    static { moonPhases.add(PHASE_FULL_MOON); }
+    public static final MoonPhase PHASE_WANING_GIBBOUS = new MoonPhase(6, "Waning Gibbous", 1/4f, 
         loadIcon("icons/moon/waning-gibbous.png"));
-    static { moonPhases.add(WANING_GIBBOUS_PHASE); }
-    public static final MoonPhase LAST_QUARTER_PHASE = new MoonPhase(7, "Last Quarter", 1/2f, 
+    static { moonPhases.add(PHASE_WANING_GIBBOUS); }
+    public static final MoonPhase PHASE_LAST_QUARTER = new MoonPhase(7, "Last Quarter", 1/2f, 
         loadIcon("icons/moon/third-quarter.png"));
-    static { moonPhases.add(LAST_QUARTER_PHASE); }
-    public static final MoonPhase WANING_CRESCENT_PHASE = new MoonPhase(8, "Waning Crescent", 3/4f, 
+    static { moonPhases.add(PHASE_LAST_QUARTER); }
+    public static final MoonPhase PHASE_WANING_CRESCENT = new MoonPhase(8, "Waning Crescent", 3/4f, 
         loadIcon("icons/moon/waning-crescent.png"));
-    static { moonPhases.add(WANING_CRESCENT_PHASE); }
+    static { moonPhases.add(PHASE_WANING_CRESCENT); }
 
     // --- Seasons ---
-    public static final Season SPRING_SEASON = new Season(1, "Spring", 1.0f, 1.0f, 
+    public static final Season SEASON_SPRING = new Season(1, "Spring", 1.0f, 1.0f, 
         loadIcon("icons/seasons/spring.png"));
-    static { seasons.add(SPRING_SEASON); }
-    public static final Season SUMMER_SEASON = new Season(2, "Summer", 1.15f, 0.8f, 
+    static { seasons.add(SEASON_SPRING); }
+    public static final Season SEASON_SUMMER = new Season(2, "Summer", 1.15f, 0.8f, 
         loadIcon("icons/seasons/summer.png"));
-    static { seasons.add(SUMMER_SEASON); }
-    public static final Season AUTUMN_SEASON = new Season(3, "Autumn", 0.95f, 1.1f, 
+    static { seasons.add(SEASON_SUMMER); }
+    public static final Season SEASON_AUTUMN = new Season(3, "Autumn", 0.95f, 1.1f, 
         loadIcon("icons/seasons/autumn.png"));
-    static { seasons.add(AUTUMN_SEASON); }
-    public static final Season WINTER_SEASON = new Season(4, "Winter", 0.7f, 1.2f, 
+    static { seasons.add(SEASON_AUTUMN); }
+    public static final Season SEASON_WINTER = new Season(4, "Winter", 0.7f, 1.2f, 
         loadIcon("icons/seasons/winter.png"));
-    static { seasons.add(WINTER_SEASON); }
+    static { seasons.add(SEASON_WINTER); }
 
     // --- Weather ---
-    public static final Weather CLEAR_WEATHER = new Weather(1, "Clear", 0, 1.0f, 
+    public static final Weather WEATHER_CLEAR = new Weather(1, "Clear", 0, 1.0f, 
         loadIcon("icons/weather/clear.png"));
-    static { weathers.add(CLEAR_WEATHER); }
-    public static final Weather RAIN_WEATHER = new Weather(2, "Rain", 1, 0.95f, 
+    static { weathers.add(WEATHER_CLEAR); }
+    public static final Weather WEATHER_RAIN = new Weather(2, "Rain", 1, 0.95f, 
         loadIcon("icons/weather/rain.png"));
-    static { weathers.add(RAIN_WEATHER); }
-    public static final Weather SNOW_WEATHER = new Weather(3, "Snow", 1, 0.8f, 
+    static { weathers.add(WEATHER_RAIN); }
+    public static final Weather WEATHER_SNOW = new Weather(3, "Snow", 1, 0.8f, 
         loadIcon("icons/weather/snow.png"));
-    static { weathers.add(SNOW_WEATHER); }
-    public static final Weather HEAVY_RAIN_WEATHER = new Weather(4, "Heavy Rain", 2, 0.9f, 
+    static { weathers.add(WEATHER_SNOW); }
+    public static final Weather WEATHER_HEAVY_RAIN = new Weather(4, "Heavy Rain", 2, 0.9f, 
         loadIcon("icons/weather/heavy-rain.png"));
-    static { weathers.add(HEAVY_RAIN_WEATHER); }
-    public static final Weather THUNDER_WEATHER = new Weather(5, "Thunder Storm", 2, 0.9f, 
+    static { weathers.add(WEATHER_HEAVY_RAIN); }
+    public static final Weather WEATHER_THUNDER = new Weather(5, "Thunder Storm", 2, 0.9f, 
         loadIcon("icons/weather/thunder.png"));
-    static { weathers.add(THUNDER_WEATHER); }
-    public static final Weather HEAVY_SNOW_WEATHER = new Weather(6, "Snow Storm", 2, 0.7f, 
+    static { weathers.add(WEATHER_THUNDER); }
+    public static final Weather WEATHER_HEAVY_SNOW = new Weather(6, "Snow Storm", 2, 0.7f, 
         loadIcon("icons/weather/heavy-snow.png"));
-    static { weathers.add(HEAVY_SNOW_WEATHER); }
-    public static final Weather WIND_WEATHER = new Weather(7, "Heavy Wind", -1, 0.95f, 
+    static { weathers.add(WEATHER_HEAVY_SNOW); }
+    public static final Weather WEATHER_WIND = new Weather(7, "Heavy Wind", -1, 0.95f, 
         loadIcon("icons/weather/heavy-wind.png"));
-        static { weathers.add(WIND_WEATHER); }
-    public static final Weather HEAT_WEATHER = new Weather(8, "Heat Wave", -2, 1.2f, 
+        static { weathers.add(WEATHER_WIND); }
+    public static final Weather WEATHER_HEAT = new Weather(8, "Heat Wave", -2, 1.2f, 
         loadIcon("icons/weather/heat-wave.png"));
-    static { weathers.add(HEAT_WEATHER); }
-    public static final Weather FOG_WEATHER = new Weather(9, "Fog", 0, 0.9f, 
+    static { weathers.add(WEATHER_HEAT); }
+    public static final Weather WEATHER_FOG = new Weather(9, "Fog", 0, 0.9f, 
         loadIcon("icons/weather/fog.png"));
-    static { weathers.add(FOG_WEATHER); }
-    public static final Weather FROG_WEATHER = new Weather(10, "Frog Rain", 3, 1.0f, 
+    static { weathers.add(WEATHER_FOG); }
+    public static final Weather WEATHER_FROG = new Weather(10, "Frog Rain", 3, 1.0f, 
         loadIcon("icons/weather/frog-rain.png"));
-    static { weathers.add(FROG_WEATHER); }
-    public static final Weather BLOOD_WEATHER = new Weather(11, "Blood Rain", 2, 0.85f, 
+    static { weathers.add(WEATHER_FROG); }
+    public static final Weather WEATHER_BLOOD = new Weather(11, "Blood Rain", 2, 0.85f, 
         loadIcon("icons/weather/blood-rain.png"));
-    static { weathers.add(BLOOD_WEATHER); }
+    static { weathers.add(WEATHER_BLOOD); }
 
     // --- Ant Status ---
     public static final AntStatus STATUS_ALIVE = new AntStatus(1, "Alive", 
@@ -397,6 +397,8 @@ public final class GameConstants {
     static { antRoles.add(ROLE_ASSISTANT); }
     public static final AntRole ROLE_ESCORT = new AntRole(32, TYPE_SOLDIER, "Convoy Escort");
     static { antRoles.add(ROLE_ESCORT); }
+    public static final AntRole ROLE_ENGINEER = new AntRole(33, TYPE_WORKER, "Excavator");
+    static { antRoles.add(ROLE_ENGINEER); }
 
     // --- Colony Ranks ---
     public static final ColonyRank RANK_ANT = new ColonyRank(1, "Ant", 1l, 
@@ -440,6 +442,10 @@ public final class GameConstants {
     static { colonyRanks.add(RANK_GIGA); }
     
     // --- Species ---
+    public static final Species SPECIES_OMNI = new Species(1, "Omni Ant", "Omniformica Grimunknowni", null, null);
+    static { species.add(SPECIES_OMNI); }
+    public static final Species SPECIES_LEAF = new Species(2, "Leaf-Cutter Ant", "Atta Cephalotes", null, null);
+    static { species.add(SPECIES_LEAF); }
     
     // --- Getters ---
     public static List<Biome> getBiomes() {

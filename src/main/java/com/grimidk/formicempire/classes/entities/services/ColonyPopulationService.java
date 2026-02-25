@@ -10,16 +10,66 @@ import com.grimidk.formicempire.classes.constants.world.Temperature;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ColonyPopulationService {
     
-    private Random random = new Random();
+    private final Random random = new Random();
+    
+    // --- Death Statistics ---
+    private final Map<String, Integer> deathCauses = new ConcurrentHashMap<>();
+
+    public ColonyPopulationService() {
+        initializeDeathCauses();
+    }
+
+    private void initializeDeathCauses() {
+        deathCauses.put("Old Age", 0);
+        deathCauses.put("Starvation", 0);
+        deathCauses.put("Dehydration", 0);
+        deathCauses.put("Contamination", 0);
+        deathCauses.put("Conflict", 0);
+        deathCauses.put("Illness", 0);
+        deathCauses.put("Lack of Care", 0);
+        deathCauses.put("Other", 0);
+    }
+
+    public void recordDeath(String cause) {
+        recordDeath(cause, null);
+    }
+
+    public void recordDeath(String cause, Colony colony) {
+        String key = "Other";
+        if (cause != null) {
+            if (deathCauses.containsKey(cause)) key = cause;
+            else if (cause.equalsIgnoreCase("Combat")) key = "Conflict";
+        }
+        deathCauses.merge(key, 1, Integer::sum);
+        
+        if (colony != null && colony.getDynasty() != null) {
+            colony.getDynasty().recordDeath(key);
+        }
+    }
+
+    public Map<String, Integer> getDeathStatistics() {
+        return Collections.unmodifiableMap(deathCauses);
+    }
+    
+    public void loadDeathStatistics(Map<String, Integer> savedStats) {
+        if (savedStats != null) {
+            this.deathCauses.putAll(savedStats);
+        }
+    }
+
+    public void resetDeathStatistics() {
+        deathCauses.clear();
+        initializeDeathCauses();
+    }
 
     // --- Role Management ---
     private AntRole getDefaultRoleForType(AntType type) {
@@ -41,10 +91,8 @@ public class ColonyPopulationService {
         
         List<Ant> availableAnts = new ArrayList<>(ants); 
         Map<AntRole, Integer> assignedRoleCounts = colony.getAssignedRoleCounts();
-        Iterator<Map.Entry<AntRole, Integer>> roleIterator = assignedRoleCounts.entrySet().iterator();
         
-        while(roleIterator.hasNext()) {
-            Map.Entry<AntRole, Integer> entry = roleIterator.next();
+        for (Map.Entry<AntRole, Integer> entry : assignedRoleCounts.entrySet()) {
             AntRole role = entry.getKey();
             if (role.getAntType() != type) continue;
             if (role.equals(defaultRole)) continue; 
@@ -73,10 +121,12 @@ public class ColonyPopulationService {
 
     // --- Hatching & Lifecycle ---
     private AntType determineHatchType(Colony colony) {
-        double rand = Math.random() * 100.0;
+        double rand = random.nextDouble() * 100.0;
         double cumulative = 0.0;
+        
         cumulative += colony.getHatchRateWorker();
         if (rand < cumulative) return GameConstants.TYPE_WORKER;
+        
         if (colony.hasUpgrade(GameUnlocks.TYPE_SOLDIER)) {
             cumulative += colony.getHatchRateSoldier();
             if (rand < cumulative) return GameConstants.TYPE_SOLDIER;
@@ -127,7 +177,31 @@ public class ColonyPopulationService {
         colony.getPupae().removeAll(pupaeToHatch);
     }
 
-    public void runHatching(Colony colony){    
+    private void adjustNPCHatchRates(Colony colony) {
+        float s = colony.hasUpgrade(GameUnlocks.TYPE_SOLDIER) ? 15.0f : 0f;
+        float m = colony.hasUpgrade(GameUnlocks.TYPE_MAJOR) ? 5.0f : 0f;
+        float p = 0f;
+        float d = 0f;
+        
+        if (colony.hasUpgrade(GameUnlocks.TYPE_PRINCESS)) {
+            p = 4.0f;
+            d = 1.0f;
+        }
+
+        float w = 100.0f - (s + m + p + d);
+
+        colony.setHatchRate(GameConstants.TYPE_WORKER, w);
+        colony.setHatchRate(GameConstants.TYPE_SOLDIER, s);
+        colony.setHatchRate(GameConstants.TYPE_MAJOR, m);
+        colony.setHatchRate(GameConstants.TYPE_PRINCESS, p);
+        colony.setHatchRate(GameConstants.TYPE_DRONE, d);
+    }
+
+    public void runHatching(Colony colony){
+        if (!colony.isPlayer() && colony.isCapital()) {
+            adjustNPCHatchRates(colony);
+        }
+
         hatchPupae(colony);
         evolveAnts(colony, colony.getLarvae(), colony.getPupae(), GameConstants.TYPE_PUPA);
         evolveAnts(colony, colony.getEggs(), colony.getLarvae(), GameConstants.TYPE_LARVA);
@@ -160,120 +234,108 @@ public class ColonyPopulationService {
         }
     }
     
-    public void runEating(Colony colony, Temperature currentTemp){
+    public void runEating(Colony colony, Temperature currentTemp) {
         ColonyStatsService stats = colony.getStatsService();
+        ColonyResourceService resources = colony.getResourceService();
         
-        // --- Water Consumption ---
-        List<Ant> thirstyAnts = new ArrayList<>();
-        int waterAvailable = colony.getWater();
         List<AntType> adultDrinkOrder = Arrays.asList(
-            GameConstants.TYPE_QUEEN, GameConstants.TYPE_WORKER, GameConstants.TYPE_SOLDIER,
-            GameConstants.TYPE_MAJOR, GameConstants.TYPE_PRINCESS, GameConstants.TYPE_DRONE
+            GameConstants.TYPE_DRONE, GameConstants.TYPE_PRINCESS, GameConstants.TYPE_MAJOR,
+            GameConstants.TYPE_SOLDIER, GameConstants.TYPE_WORKER, GameConstants.TYPE_QUEEN
         );
         
         int resistanceChance = stats.getThirstResistance(colony, currentTemp);
-
+        List<Ant> thirstyCandidates = new ArrayList<>();
+        
         for (AntType type : adultDrinkOrder) {
             List<Ant> list = colony.getAntsByType(type);
             for (Ant ant : list) {
-                if (random.nextInt(100) < resistanceChance) {
-                    continue; 
-                }
-
-                if (waterAvailable >= 1) {
-                    waterAvailable -= 1;
-                } else {
-                    thirstyAnts.add(ant);
+                if (random.nextInt(100) >= resistanceChance) {
+                    thirstyCandidates.add(ant);
                 }
             }
         }
-        colony.setWater(waterAvailable);
         
-        // --- Food Consumption ---
-        int mushroomsAvailable = colony.getMushrooms();
+        int waterNeeded = thirstyCandidates.size();
+        double consumedWater = resources.consumeResource(colony, GameConstants.RESOURCE_WATER, waterNeeded);
+        double waterDeficit = waterNeeded - consumedWater;
+        
+        if (waterDeficit > 0 && colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) {
+            double syrupConsumed = resources.consumeResource(colony, GameConstants.RESOURCE_SYRUP, waterDeficit);
+            waterDeficit -= syrupConsumed;
+        }
+
+        List<Ant> doomedThirsty = new ArrayList<>();
+        for (int i = 0; i < (int) waterDeficit; i++) {
+            if (i < thirstyCandidates.size()) {
+                doomedThirsty.add(thirstyCandidates.get(i));
+            }
+        }
+
         List<AntType> eatOrder = Arrays.asList(
-            GameConstants.TYPE_QUEEN, GameConstants.TYPE_WORKER, GameConstants.TYPE_LARVA,
-            GameConstants.TYPE_SOLDIER, GameConstants.TYPE_MAJOR, GameConstants.TYPE_PRINCESS, GameConstants.TYPE_DRONE
+            GameConstants.TYPE_DRONE, GameConstants.TYPE_PRINCESS, GameConstants.TYPE_MAJOR,
+            GameConstants.TYPE_SOLDIER, GameConstants.TYPE_LARVA, GameConstants.TYPE_WORKER, GameConstants.TYPE_QUEEN
         );
-        List<Ant> hungryAnts = new ArrayList<>();
+        
+        List<Ant> hungryCandidates = new ArrayList<>();
+        int foodNeeded = 0;
+        int baseConsumption = stats.getBaseConsumption(colony);
+
         for (AntType type : eatOrder) {
-            int consumptionPerAnt = (int) (type.getConsumptionMult() * stats.getBaseConsumption(colony));
+            int consumptionPerAnt = (int) (type.getConsumptionMult() * baseConsumption);
             if (consumptionPerAnt <= 0) consumptionPerAnt = 1; 
             if (type == GameConstants.TYPE_EGG || type == GameConstants.TYPE_PUPA) continue;
             
             List<Ant> list = colony.getAntsByType(type);
             for (Ant ant : list) {
-                if (mushroomsAvailable >= consumptionPerAnt) {
-                    mushroomsAvailable -= consumptionPerAnt;
-                } else {
-                    hungryAnts.add(ant);
-                }
+                foodNeeded += consumptionPerAnt;
+                hungryCandidates.add(ant); 
             }
         }
 
-        // --- Parasite Consumption ---
         int parasiteCount = colony.getParasites();
         if (parasiteCount > 0) {
-            int parasiteConsumption = parasiteCount * 1; 
-            if (mushroomsAvailable >= parasiteConsumption) {
-                mushroomsAvailable -= parasiteConsumption;
-            } else {
-                mushroomsAvailable = 0;
+            foodNeeded += parasiteCount; 
+        }
+
+        double consumedFood = resources.consumeResource(colony, GameConstants.RESOURCE_FUNGI, foodNeeded);
+        double foodDeficit = foodNeeded - consumedFood;
+
+        if (foodDeficit > 0 && colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) {
+            double syrupConsumed = resources.consumeResource(colony, GameConstants.RESOURCE_SYRUP, foodDeficit);
+            foodDeficit -= syrupConsumed;
+        }
+
+        List<Ant> doomedHungry = new ArrayList<>();
+        int approxAntsToKill = (int) (foodDeficit / (baseConsumption <= 0 ? 1 : baseConsumption));
+        
+        int added = 0;
+        for (int i = 0; i < hungryCandidates.size() && added < approxAntsToKill; i++) {
+            Ant potentialVictim = hungryCandidates.get(i);
+            if (!doomedThirsty.contains(potentialVictim)) {
+                doomedHungry.add(potentialVictim);
+                added++;
             }
         }
 
-        colony.setMushrooms(mushroomsAvailable);
-        
-        // --- Syrup Phase ---
-        Set<Ant> antsInNeed = new HashSet<>(thirstyAnts);
-        antsInNeed.addAll(hungryAnts);
-        int syrupAvailable = colony.hasUpgrade(GameUnlocks.ROLE_RANCHER) ? colony.getSyrups() : 0;
-        
-        Iterator<Ant> needIterator = antsInNeed.iterator();
-        while (needIterator.hasNext() && syrupAvailable > 0) {
-            Ant ant = needIterator.next();
-            syrupAvailable -= 1;
-            needIterator.remove(); 
-            thirstyAnts.remove(ant);
-            hungryAnts.remove(ant);
-        }
-        colony.setSyrups(syrupAvailable);
-        
-        // --- Death Phase ---        
-        int starvationCount = 0;
-        int dehydrationCount = 0;
-        
-        for (Ant ant : thirstyAnts) {
-            if (ant.isAlive()) {
-                AntType originalType = ant.getAntType();
-                ant.goDie(colony, "Dehydration");
-                colony.recordAntDeath(ant, "Dehydration");
-                
-                List<Ant> antList = colony.getAntsByType(originalType);
-                if (antList != null) antList.remove(ant);
-                
-                dehydrationCount++;
-            }
-        }
-        
-        for (Ant ant : hungryAnts) {
-            if (ant.isAlive()) {
-                AntType originalType = ant.getAntType();
-                ant.goDie(colony, "Starvation");
-                colony.recordAntDeath(ant, "Starvation");
-                
-                List<Ant> antList = colony.getAntsByType(originalType);
-                if (antList != null) antList.remove(ant);
-                
-                starvationCount++;
-            }
-        }
+        processDeaths(colony, doomedThirsty, "Dehydration");
+        processDeaths(colony, doomedHungry, "Starvation");
+    }
 
-        if (starvationCount > 0) {
-            colony.logEvent("DEATH: " + starvationCount + " Ants died of Starvation");
+    private void processDeaths(Colony colony, List<Ant> ants, String cause) {
+        int count = 0;
+        for (Ant ant : ants) {
+            if (ant.isAlive()) {
+                AntType originalType = ant.getAntType();
+                ant.goDie(colony, cause);
+                colony.recordAntDeath(ant, cause);
+                
+                List<Ant> antList = colony.getAntsByType(originalType);
+                if (antList != null) antList.remove(ant);
+                count++;
+            }
         }
-        if (dehydrationCount > 0) {
-            colony.logEvent("DEATH: " + dehydrationCount + " Ants died of Dehydration");
+        if (count > 0) {
+            colony.logEvent("DEATH: " + count + " Ants died of " + cause);
         }
     }
     
@@ -317,19 +379,9 @@ public class ColonyPopulationService {
             }
         }
 
-        for (Ant victim : victims) {
-            if (victim.isAlive()) {
-                AntType originalType = victim.getAntType();
-                victim.goDie(colony, "Contamination");
-                colony.recordAntDeath(victim, "Contamination");
-
-                List<Ant> antList = colony.getAntsByType(originalType);
-                if (antList != null) antList.remove(victim);
-            }
-        }
-        
+        processDeaths(colony, victims, "Contamination");
         if (killed > 0) {
-            colony.logEvent("DEATH: " + killed + " Ants died from " + contaminationLevel + " Contamination");
+            colony.logEvent("Contamination Level: " + contaminationLevel);
         }
     }
 
@@ -346,7 +398,6 @@ public class ColonyPopulationService {
         if (spawnAmount <= 0) return;
         
         colony.setParasites(colony.getParasites() + spawnAmount);
-        
         colony.logEvent("A parasitic infestation has spread! " + spawnAmount + " new parasites detected.");
     }
 

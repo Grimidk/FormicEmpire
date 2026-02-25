@@ -13,9 +13,11 @@ import com.grimidk.formicempire.classes.constants.world.Season;
 import com.grimidk.formicempire.classes.constants.world.Temperature;
 import com.grimidk.formicempire.classes.constants.world.TimeOfDay;
 import com.grimidk.formicempire.classes.constants.world.Weather;
+import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.services.ColonyStarterService;
+import com.grimidk.formicempire.classes.entities.services.DynastyDeathService;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 
@@ -33,12 +35,14 @@ public class World {
     private int temperature;
     private int humidity;
     private ArrayList<Hex> hexes;
+    private List<Dynasty> dynastys;
     private Hex activeHex; 
     private int saveSlotId = 0; // 0 = no slot (ad-hoc)
     private Engine engine;
     private Random random;    
     private int worldRadius = 8; 
     private int colonyIdCounter = 1;
+    private int dynastyIdCounter = 1;
 
     public World() {
         this.minute = 0;
@@ -49,11 +53,16 @@ public class World {
         this.temperature = 25;
         this.humidity = 2;
         this.hexes = new ArrayList<>();
-        this.timeOfDay = GameConstants.DAWN_TIME;
-        this.moonPhase = GameConstants.NEW_MOON_PHASE;
-        this.season = GameConstants.SPRING_SEASON;
-        this.weather = GameConstants.CLEAR_WEATHER;
+        this.dynastys = new ArrayList<>();
+        this.timeOfDay = GameConstants.TIME_DAWN;
+        this.moonPhase = GameConstants.PHASE_NEW_MOON;
+        this.season = GameConstants.SEASON_SPRING;
+        this.weather = GameConstants.WEATHER_CLEAR;
         this.random = new Random();
+    }
+    
+    public synchronized int getNextColonyId() {
+        return colonyIdCounter++;
     }
 
     public void setEngine(Engine engine) {
@@ -167,6 +176,8 @@ public class World {
         this.hexes = hexes;
     }
     
+    public List<Dynasty> getDynastys() { return dynastys; }
+    
     public int getWorldRadius() {
         return worldRadius;
     }
@@ -244,12 +255,26 @@ public class World {
         }
     }
     
-    public void generateWorld(Biome startBiome, int size, Colony startColony) {
+    private String formatName(String name) {
+        if (name == null || name.trim().isEmpty()) return "Player";
+        name = name.trim();
+        return name.substring(0, 1).toUpperCase() + name.substring(1);
+    }
+    
+    public void generateWorld(Biome startBiome, int size, Colony startColony, String baseName) {
         System.out.println("Generating World... Size: " + size + " rings.");
         this.worldRadius = size;
         this.hexes.clear();
+        this.dynastys.clear();
         Map<String, Hex> hexMap = new HashMap<>();
         ColonyStarterService starterService = new ColonyStarterService();
+        
+        baseName = formatName(baseName);
+        
+        Dynasty playerDynasty = new Dynasty(this.dynastyIdCounter++, baseName + " Dynasty", true, GameConstants.SPECIES_OMNI);
+        playerDynasty.getStarterService().initializeDynasty(playerDynasty);
+        playerDynasty.addColony(startColony);
+        this.dynastys.add(playerDynasty);
         
         this.colonyIdCounter = startColony.getId() + 1;
 
@@ -275,8 +300,15 @@ public class World {
                     hex.setBiome(ringBiome);
                     
                     if (dist > 1 && !isWaterBiome(ringBiome) && random.nextInt(100) < 30) {
-                        int newId = this.colonyIdCounter++;
-                        Colony aiColony = new Colony(newId, "Wild Colony " + newId, false);
+                        int dynastyId = this.dynastyIdCounter++;
+                        Dynasty npcDynasty = new Dynasty(dynastyId, "Leaf Cutter Hive " + dynastyId, false, GameConstants.SPECIES_LEAF);
+                        npcDynasty.getStarterService().initializeDynasty(npcDynasty);
+                        this.dynastys.add(npcDynasty);
+                        
+                        int colId = this.colonyIdCounter++;
+                        Colony aiColony = new Colony(colId, "Wild Colony " + colId, false);
+                        npcDynasty.addColony(aiColony);
+                        
                         starterService.initializeNewColony(aiColony);
                         hex.setColony(aiColony);
                     } else {
@@ -294,7 +326,7 @@ public class World {
     }
     
     private boolean isWaterBiome(Biome biome) {
-        return biome == GameConstants.OCEAN_BIOME || biome == GameConstants.LAKE_BIOME;
+        return biome == GameConstants.BIOME_OCEAN || biome == GameConstants.BIOME_LAKE;
     }
     
     private void linkNeighbors(Map<String, Hex> hexMap) {
@@ -318,49 +350,49 @@ public class World {
         
         switch (ring) {
             case 1:
-                options.add(GameConstants.PLAINS_BIOME);
-                options.add(GameConstants.FOREST_BIOME);
-                options.add(GameConstants.JUNGLE_BIOME);
+                options.add(GameConstants.BIOME_PLAINS);
+                options.add(GameConstants.BIOME_FOREST);
+                options.add(GameConstants.BIOME_JUNGLE);
                 break;
             case 2:
-                options.add(GameConstants.FOREST_BIOME);
-                options.add(GameConstants.JUNGLE_BIOME);
-                options.add(GameConstants.SWAMP_BIOME);
+                options.add(GameConstants.BIOME_FOREST);
+                options.add(GameConstants.BIOME_JUNGLE);
+                options.add(GameConstants.BIOME_SWAMP);
                 break;
             case 3:
-                options.add(GameConstants.JUNGLE_BIOME);
-                options.add(GameConstants.SWAMP_BIOME);
-                options.add(GameConstants.DESSERT_BIOME);
+                options.add(GameConstants.BIOME_JUNGLE);
+                options.add(GameConstants.BIOME_SWAMP);
+                options.add(GameConstants.BIOME_DESERT);
                 break;
             case 4:
-                options.add(GameConstants.SWAMP_BIOME);
-                options.add(GameConstants.DESSERT_BIOME);
-                options.add(GameConstants.TAIGA_BIOME);
-                options.add(GameConstants.URBAN_BIOME);
+                options.add(GameConstants.BIOME_SWAMP);
+                options.add(GameConstants.BIOME_DESERT);
+                options.add(GameConstants.BIOME_TAIGA);
+                options.add(GameConstants.BIOME_URBAN);
                 break;
             case 5:
-                options.add(GameConstants.TAIGA_BIOME);
-                options.add(GameConstants.TUNDRA_BIOME);
-                options.add(GameConstants.DESSERT_BIOME);
-                options.add(GameConstants.URBAN_BIOME);
-                options.add(GameConstants.LAKE_BIOME);
+                options.add(GameConstants.BIOME_TAIGA);
+                options.add(GameConstants.BIOME_TUNDRA);
+                options.add(GameConstants.BIOME_DESERT);
+                options.add(GameConstants.BIOME_URBAN);
+                options.add(GameConstants.BIOME_LAKE);
                 break;
             case 6:
-                options.add(GameConstants.TUNDRA_BIOME);
-                options.add(GameConstants.DESSERT_BIOME);
-                options.add(GameConstants.MOUNTAIN_BIOME);
-                options.add(GameConstants.URBAN_BIOME);
-                options.add(GameConstants.LAKE_BIOME);
+                options.add(GameConstants.BIOME_TUNDRA);
+                options.add(GameConstants.BIOME_DESERT);
+                options.add(GameConstants.BIOME_MOUNTAIN);
+                options.add(GameConstants.BIOME_URBAN);
+                options.add(GameConstants.BIOME_LAKE);
                 break;
             case 7:
-                options.add(GameConstants.TUNDRA_BIOME);
-                options.add(GameConstants.DESSERT_BIOME);
-                options.add(GameConstants.MOUNTAIN_BIOME);
-                options.add(GameConstants.URBAN_BIOME);
-                options.add(GameConstants.VOLCANIC_BIOME);
+                options.add(GameConstants.BIOME_TUNDRA);
+                options.add(GameConstants.BIOME_DESERT);
+                options.add(GameConstants.BIOME_MOUNTAIN);
+                options.add(GameConstants.BIOME_URBAN);
+                options.add(GameConstants.BIOME_VOLCANIC);
                 break;
             default:
-                options.add(GameConstants.OCEAN_BIOME);
+                options.add(GameConstants.BIOME_OCEAN);
                 break;
         }
         
@@ -371,14 +403,14 @@ public class World {
         for(Biome b : GameConstants.getBiomes()) {
             if (b.getId() == id) return b;
         }
-        return GameConstants.PLAINS_BIOME;
+        return GameConstants.BIOME_PLAINS;
     }
     
     private Weather getWeatherById(int id) {
         for (Weather w : GameConstants.getWeathers()) {
             if (w.getId() == id) return w;
         }
-        return GameConstants.CLEAR_WEATHER;
+        return GameConstants.WEATHER_CLEAR;
     }
     
     private Weather getRandomWeather() {
@@ -420,7 +452,7 @@ public class World {
         }
     }
 
-    public void startWorld(Biome biome, Colony colony) {
+    public void startWorld(Biome biome, Colony colony, String baseName) {
         System.out.println("[World] startWorld called. Colony ants before init: " + colony.getAntTotal());
 
         if (colony.getAntTotal() == 0) {
@@ -430,7 +462,8 @@ public class World {
         
         System.out.println("[World] Colony ants after init: " + colony.getAntTotal());
 
-        generateWorld(biome, 8, colony);
+        baseName = formatName(baseName);
+        generateWorld(biome, 8, colony, baseName);
         changeActiveHex(getSpawnHex()); 
         updateEnvironmentalConditions();
     }
@@ -443,17 +476,54 @@ public class World {
         this.year = savefile.getYear();  
         this.worldRadius = (savefile.getWorldRadius() > 0) ? savefile.getWorldRadius() : 8;
         
+        String baseName = "Player";
+        if (savefile.getName() != null && !savefile.getName().trim().isEmpty()) {
+            String sName = savefile.getName().trim();
+            if (!sName.startsWith("Save ") && !sName.equals("Autosave")) {
+                baseName = sName;
+            }
+        }
+        baseName = formatName(baseName);
+
         this.hexes.clear();
+        this.dynastys.clear();
         Map<String, Hex> hexMap = new HashMap<>();
         Map<String, Colony> loadedColonies = new HashMap<>();
-        int maxId = 0;
+        Map<Integer, Dynasty> loadedDynastys = new HashMap<>();
+        
+        int maxColId = 0;
+        int maxDynastyId = 0;
 
+        if (savefile.getDynastys() != null) {
+            for (Savefile.SavedDynasty sc : savefile.getDynastys()) {
+                Dynasty dynasty = new Dynasty(sc);
+                loadedDynastys.put(dynasty.getId(), dynasty);
+                this.dynastys.add(dynasty);
+                if (dynasty.getId() > maxDynastyId) maxDynastyId = dynasty.getId();
+            }
+        }
+        
         if (savefile.getColonies() != null) {
             for (Savefile.SavedColony sc : savefile.getColonies()) {
                 Colony c = new Colony(sc);
                 String key = sc.q + "," + sc.r;
                 loadedColonies.put(key, c);
-                if (c.getId() > maxId) maxId = c.getId();
+                if (c.getId() > maxColId) maxColId = c.getId();
+                
+                if (loadedDynastys.containsKey(sc.dynastyId)) {
+                    loadedDynastys.get(sc.dynastyId).addColony(c);
+                } else {
+                    int newDynastyId = ++maxDynastyId;
+                    String dynName = c.isPlayer() ? (baseName + " Dynasty") : "Wild Dynasty";
+                    Dynasty adHocDynasty = new Dynasty(newDynastyId, dynName, c.isPlayer(), GameConstants.SPECIES_OMNI);
+                    adHocDynasty.getStarterService().initializeDynasty(adHocDynasty);
+                    adHocDynasty.addColony(c);
+                    this.dynastys.add(adHocDynasty);
+                    loadedDynastys.put(newDynastyId, adHocDynasty);
+                    System.out.println("[World] Created ad-hoc Dynasty ID " + newDynastyId + " for orphan colony " + c.getName());
+                }
+                
+                c.refreshAntStats(); 
             }
         }
 
@@ -480,9 +550,9 @@ public class World {
                 this.hexes.add(hex);
             }
             linkNeighbors(hexMap);
-            System.out.println("Loaded world grid from savefile (" + this.hexes.size() + " hexes, " + loadedColonies.size() + " colonies).");
+            System.out.println("[World] Loaded world grid from savefile (" + this.hexes.size() + " hexes, " + loadedColonies.size() + " colonies).");
         } else {
-            System.out.println("No map data in save (or old save version). Generating fresh world map for existing colony.");
+            System.out.println("[World] No map data in save (or old save version). Generating fresh world map for existing colony.");
             
             Colony colony = null;
             for (Colony c : loadedColonies.values()) {
@@ -493,18 +563,20 @@ public class World {
             }
              
             if (colony == null) {
-                colony = new Colony(1, "Grim Colony", true);
+                colony = new Colony(1, baseName + " Prime", true);
             }
              
             if (colony.getAntTotal() == 0) {
                 ColonyStarterService starter = new ColonyStarterService();
                 starter.initializeNewColony(colony);
             }
-             
-            generateWorld(GameConstants.PLAINS_BIOME, this.worldRadius, colony);
+
+            generateWorld(GameConstants.BIOME_PLAINS, this.worldRadius, colony, baseName);
         }
 
-        this.colonyIdCounter = maxId + 1;
+        this.colonyIdCounter = maxColId + 1;
+        this.dynastyIdCounter = maxDynastyId + 1;
+        
         changeActiveHex(getSpawnHex()); 
         updateEnvironmentalConditions();
     }
@@ -546,26 +618,26 @@ public class World {
     private void randomizeWeather() {
         if (random.nextInt(1000) == 0) {
             if (random.nextBoolean()) {
-                this.setWeather(GameConstants.FROG_WEATHER);
+                this.setWeather(GameConstants.WEATHER_FROG);
             } else {
-                this.setWeather(GameConstants.BLOOD_WEATHER);
+                this.setWeather(GameConstants.WEATHER_BLOOD);
             }
         } else {
             List<Weather> possibleWeathers = new ArrayList<>();
-            possibleWeathers.add(GameConstants.CLEAR_WEATHER);
-            possibleWeathers.add(GameConstants.CLEAR_WEATHER);
-            if (this.season == GameConstants.WINTER_SEASON) {
-                possibleWeathers.add(GameConstants.SNOW_WEATHER);
-                possibleWeathers.add(GameConstants.HEAVY_SNOW_WEATHER);
-                possibleWeathers.add(GameConstants.WIND_WEATHER);
-            } else if (this.season == GameConstants.SUMMER_SEASON) {
-                possibleWeathers.add(GameConstants.RAIN_WEATHER);
-                possibleWeathers.add(GameConstants.THUNDER_WEATHER);
-                possibleWeathers.add(GameConstants.HEAT_WEATHER);
+            possibleWeathers.add(GameConstants.WEATHER_CLEAR);
+            possibleWeathers.add(GameConstants.WEATHER_CLEAR);
+            if (this.season == GameConstants.SEASON_WINTER) {
+                possibleWeathers.add(GameConstants.WEATHER_SNOW);
+                possibleWeathers.add(GameConstants.WEATHER_HEAVY_SNOW);
+                possibleWeathers.add(GameConstants.WEATHER_WIND);
+            } else if (this.season == GameConstants.SEASON_SUMMER) {
+                possibleWeathers.add(GameConstants.WEATHER_RAIN);
+                possibleWeathers.add(GameConstants.WEATHER_THUNDER);
+                possibleWeathers.add(GameConstants.WEATHER_HEAT);
             } else {
-                possibleWeathers.add(GameConstants.RAIN_WEATHER);
-                possibleWeathers.add(GameConstants.HEAVY_RAIN_WEATHER);
-                possibleWeathers.add(GameConstants.WIND_WEATHER);
+                possibleWeathers.add(GameConstants.WEATHER_RAIN);
+                possibleWeathers.add(GameConstants.WEATHER_HEAVY_RAIN);
+                possibleWeathers.add(GameConstants.WEATHER_WIND);
             }
             Weather newWeather = possibleWeathers.get(random.nextInt(possibleWeathers.size()));
             if (this.weather != newWeather) {
@@ -600,24 +672,24 @@ public class World {
         
         for (Hex hex : this.hexes) {
             if (hex.getColony() != null) {
-                hex.getColony().runHourlyJobs();
+                hex.getColony().runHourlyJobs(hex.getBiome());
             }
         }
 
-        boolean isEclipse = (this.timeOfDay == GameConstants.SOLAR_ECLIPSE_TIME || 
-                             this.timeOfDay == GameConstants.LUNAR_ECLIPSE_TIME);
+        boolean isEclipse = (this.timeOfDay == GameConstants.TIME_SOLAR_ECLIPSE || 
+                             this.timeOfDay == GameConstants.TIME_LUNAR_ECLIPSE);
 
         if (!isEclipse) {
             if (this.hour >= 0 && this.hour < 5) {
-                this.setTimeOfDay(GameConstants.NIGHT_TIME);
+                this.setTimeOfDay(GameConstants.TIME_NIGHT);
             } else if (this.hour >= 5 && this.hour < 7) {
-                this.setTimeOfDay(GameConstants.DAWN_TIME);
+                this.setTimeOfDay(GameConstants.TIME_DAWN);
             } else if (this.hour >= 7 && this.hour < 18) {
-                this.setTimeOfDay(GameConstants.DAY_TIME);
+                this.setTimeOfDay(GameConstants.TIME_DAY);
             } else if (this.hour >= 18 && this.hour < 20) {
-                this.setTimeOfDay(GameConstants.DUSK_TIME);
+                this.setTimeOfDay(GameConstants.TIME_DUSK);
             } else if (this.hour >= 20 && this.hour <= 23) {
-                this.setTimeOfDay(GameConstants.NIGHT_TIME);
+                this.setTimeOfDay(GameConstants.TIME_NIGHT);
             }
         }
         
@@ -636,58 +708,58 @@ public class World {
     public void runDay() {
         this.day++;
         
+        for (Dynasty dynasty : this.dynastys) {
+            dynasty.runDailyJobs();
+        }
+        
         for (Hex hex : this.hexes) {
             if (hex.getColony() != null) {
                 hex.getColony().runDailyJobs(this.getTemperatureIcon(), hex.getBiome());
             }
         }
         
-        ColonyStarterService starter = new ColonyStarterService();
-        for (Hex hex : this.hexes) {
-            Colony c = hex.getColony();
-            if (c != null && !c.isPlayer() && c.getQueens().isEmpty()) {
-                starter.dismantleColony(hex);
-            }
-        }
+        // --- Process Dynasty/Colony Deaths ---
+        DynastyDeathService deathService = new DynastyDeathService();
+        deathService.processDynastyDeaths(this);
 
         randomizeWeather();
 
         if (random.nextInt(1000) == 0) {
             if (random.nextBoolean()) {
-                this.setTimeOfDay(GameConstants.SOLAR_ECLIPSE_TIME);
+                this.setTimeOfDay(GameConstants.TIME_SOLAR_ECLIPSE);
             } else {
-                this.setTimeOfDay(GameConstants.LUNAR_ECLIPSE_TIME);
+                this.setTimeOfDay(GameConstants.TIME_LUNAR_ECLIPSE);
             }
             
             for (Hex hex : this.hexes) {
-                if (hex.getColony() != null) {
-                    hex.getColony().getLabourService().runNuptial(hex.getColony());
+                if (hex.getColony() != null && !hex.getColony().getDynasty().isDefeated()) {
+                    hex.getColony().getLabourService().runNuptial(hex.getColony(), this, hex);
                     hex.getColony().logEvent("The Eclipse has triggered a spontaneous Nuptial Flight!");
                 }
             }
             
         } else {
-            this.setTimeOfDay(GameConstants.NIGHT_TIME);
+            this.setTimeOfDay(GameConstants.TIME_NIGHT);
         }
 
         if (this.day >= 1 && this.day < 2) {
-            this.moonPhase = GameConstants.NEW_MOON_PHASE;
+            this.moonPhase = GameConstants.PHASE_NEW_MOON;
         } else if (this.day >= 2 && this.day < 8) {
-            this.moonPhase = GameConstants.WAXING_CRESCENT_PHASE;
+            this.moonPhase = GameConstants.PHASE_WAXING_CRESCENT;
         } else if (this.day >= 8 && this.day < 9) {
-            this.moonPhase = GameConstants.FIRST_QUARTER_PHASE;
+            this.moonPhase = GameConstants.PHASE_FIRST_QUARTER;
         } else if (this.day >= 9 && this.day < 15) {
-            this.moonPhase = GameConstants.WAXING_GIBBOUS_PHASE;
+            this.moonPhase = GameConstants.PHASE_WAXING_GIBBOUS;
         } else if (this.day >= 15 && this.day < 16) {
-            this.moonPhase = GameConstants.FULL_MOON_PHASE;
+            this.moonPhase = GameConstants.PHASE_FULL_MOON;
         } else if (this.day >= 16 && this.day < 22) {
-            this.moonPhase = GameConstants.WANING_GIBBOUS_PHASE;
+            this.moonPhase = GameConstants.PHASE_WANING_GIBBOUS;
         } else if (this.day >= 22 && this.day < 23) {
-            this.moonPhase = GameConstants.LAST_QUARTER_PHASE;
+            this.moonPhase = GameConstants.PHASE_LAST_QUARTER;
         } else if (this.day >= 23 && this.day < 30) {
-            this.moonPhase = GameConstants.WANING_CRESCENT_PHASE;
+            this.moonPhase = GameConstants.PHASE_WANING_CRESCENT;
         } else {
-            this.moonPhase = GameConstants.NEW_MOON_PHASE;
+            this.moonPhase = GameConstants.PHASE_NEW_MOON;
         }
 
         if (engine != null) {
@@ -704,21 +776,21 @@ public class World {
         this.month++;
         
         for (Hex hex : this.hexes) {
-            if (hex.getColony() != null) {
+            if (hex.getColony() != null && !hex.getColony().getDynasty().isDefeated()) {
                 hex.getColony().runMonthlyJobs();
             }
         }
 
         if (this.month >= 1 && this.month < 4) {
-            this.setSeason(GameConstants.SPRING_SEASON);
+            this.setSeason(GameConstants.SEASON_SPRING);
         } else if (this.month >= 4 && this.month < 7) {
-            this.setSeason(GameConstants.SUMMER_SEASON);
+            this.setSeason(GameConstants.SEASON_SUMMER);
         } else if (this.month >= 7 && this.month < 10) {
-            this.setSeason(GameConstants.AUTUMN_SEASON);
+            this.setSeason(GameConstants.SEASON_AUTUMN);
         } else if (this.month >= 10 && this.month < 12) {
-            this.setSeason(GameConstants.WINTER_SEASON);
+            this.setSeason(GameConstants.SEASON_WINTER);
         } else {
-            this.setSeason(GameConstants.SPRING_SEASON);
+            this.setSeason(GameConstants.SEASON_SPRING);
         }
 
         try {
@@ -747,8 +819,8 @@ public class World {
         this.year++;
         
         for (Hex hex : this.hexes) {
-            if (hex.getColony() != null) {
-                hex.getColony().runYearlyJobs();
+            if (hex.getColony() != null && !hex.getColony().getDynasty().isDefeated()) {
+                hex.getColony().runYearlyJobs(this, hex);
             }
         }
     }

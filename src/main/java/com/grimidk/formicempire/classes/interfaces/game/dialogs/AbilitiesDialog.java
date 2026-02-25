@@ -2,8 +2,12 @@ package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.infrasctructure.Engine;
+import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
+import com.grimidk.formicempire.classes.interfaces.MainFrame;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -52,16 +56,67 @@ public class AbilitiesDialog extends ZeroDialog {
         boolean hasAnyAbility = false;
 
         if (colony.hasUpgrade(GameUnlocks.ABILITY_FORCED_FLIGHT)) {
+            int currentCost = colony.getNuptialFlightCost();
+            String failureReason = getNuptialFailureReason(currentCost);
+            boolean enabled = (failureReason == null);
+            
             JPanel p = createAbilityPanel("Forced Nuptial Flight", 
-                "Spend 1000 RP to immediately trigger a nuptial flight.\nRequires Drones and Breeder Princesses.",
-                1000, 
+                "Spend " + currentCost + " RP to immediately trigger a nuptial flight.\nRequires Drones and Breeder Princesses.",
+                currentCost, 
                 e -> {
-                    colony.forceNuptialFlight();
-                    refreshDialog(); 
+                    if (getOwner() instanceof MainFrame) {
+                        MainFrame main = (MainFrame) getOwner();
+                        Engine engine = main.getEngine();
+                        if (engine != null) {
+                            World world = engine.getWorld();
+                            if (world != null) {
+                                Hex targetHex = null;
+                                for(Hex h : world.getHexes()) {
+                                    if (h.getColony() == colony) {
+                                        targetHex = h;
+                                        break;
+                                    }
+                                }
+                                
+                                if (targetHex != null) {
+                                    colony.forceNuptialFlight(world, targetHex);
+                                    refreshDialog(); 
+                                } else {
+                                    JOptionPane.showMessageDialog(this, "Error: Could not locate colony on the world map.");
+                                }
+                            }
+                        }
+                    }
                 },
-                canTriggerNuptial()
+                enabled,
+                failureReason
             );
             listPanel.add(p);
+            listPanel.add(Box.createVerticalStrut(10));
+            hasAnyAbility = true;
+        }
+
+        if (colony.hasUpgrade(GameUnlocks.ABILITY_MASS_FLIGHT) && colony.getDynasty() != null) {
+            int massCost = colony.getDynasty().getMassNuptialFlightCost();
+            boolean hasRP = colony.getResearchPoints() >= massCost;
+            String fail = hasRP ? null : "Not enough Research Points (" + massCost + " needed).";
+
+            JPanel mp = createAbilityPanel("Mass Nuptial Flights",
+                "Spend " + massCost + " RP to trigger nuptial flights in ALL capable colonies across your dynasty.",
+                massCost,
+                e -> {
+                    if (getOwner() instanceof MainFrame) {
+                        MainFrame main = (MainFrame) getOwner();
+                        if (main.getEngine() != null && main.getEngine().getWorld() != null) {
+                            colony.getDynasty().runMassNuptialFlight(main.getEngine().getWorld());
+                            refreshDialog();
+                        }
+                    }
+                },
+                hasRP,
+                fail
+            );
+            listPanel.add(mp);
             listPanel.add(Box.createVerticalStrut(10));
             hasAnyAbility = true;
         }
@@ -78,18 +133,18 @@ public class AbilitiesDialog extends ZeroDialog {
         listPanel.repaint();
     }
     
-    private boolean canTriggerNuptial() {
-        if (colony.getResearchPoints() < 1000) return false;
-        boolean hasDrones = !colony.getDrones().isEmpty();
-        boolean hasBreeders = colony.getPrincesses().stream().anyMatch(p -> p.getRole() == GameConstants.ROLE_BREEDER);
-        return hasDrones && hasBreeders;
+    private String getNuptialFailureReason(int cost) {
+        if (colony.getResearchPoints() < cost) return "Not enough Research Points (" + cost + " needed).";
+        if (colony.getDrones().isEmpty()) return "No Drones available in the colony.";
+        if (colony.getPrincesses().stream().noneMatch(p -> p.getRole() == GameConstants.ROLE_BREEDER)) return "No Breeder Princesses available.";
+        return null;
     }
 
     private void updateResearchPointsLabel() {
         researchPointsLabel.setText("Research Points: " + colony.getResearchPoints());
     }
 
-    private JPanel createAbilityPanel(String title, String desc, int rpCost, java.awt.event.ActionListener action, boolean enabled) {
+    private JPanel createAbilityPanel(String title, String desc, int rpCost, java.awt.event.ActionListener action, boolean enabled, String tooltip) {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBorder(new TitledBorder(title));
 
@@ -109,6 +164,12 @@ public class AbilitiesDialog extends ZeroDialog {
         JButton btn = new JButton("Trigger");
         btn.setEnabled(enabled);
         btn.addActionListener(action);
+        
+        if (!enabled && tooltip != null) {
+            btn.setToolTipText(tooltip);
+        } else {
+            btn.setToolTipText(null);
+        }
         
         JLabel costLabel = new JLabel(rpCost + " RP");
         costLabel.setAlignmentX(Component.CENTER_ALIGNMENT);

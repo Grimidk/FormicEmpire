@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.grimidk.formicempire.classes.constants.unlocks.Building;
-import com.grimidk.formicempire.classes.constants.unlocks.Synergy;
-import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
+import com.grimidk.formicempire.classes.constants.unlocks.*;
 
 public final class GameUnlocks {
     private GameUnlocks() {}
@@ -14,6 +12,7 @@ public final class GameUnlocks {
     private static final List<Upgrade> upgrades = new ArrayList<>();
     private static final List<Building> buildings = new ArrayList<>();
     private static final List<Synergy> synergies = new ArrayList<>();
+    private static final List<Assimilation> assimilations = new ArrayList<>();
 
     // --- Upgrades ---
     // -- Types --
@@ -75,6 +74,7 @@ public final class GameUnlocks {
     public static final Upgrade ROLE_ASSISTANT = new Upgrade(36, "Lab Assistant Role", "Lab Internship", "Allows princesses to help research with 1/5 the efficency of queens.", TYPE_PRINCESS, 1500 );
     static { upgrades.add(ROLE_ASSISTANT); }
     public static final Upgrade ROLE_ESCORT = new Upgrade(37, "Convoy Escort Role", "Protective Detail", "", TYPE_SOLDIER, 0 );
+    public static final Upgrade ROLE_ENGINEER = new Upgrade(38, "Excavator Role", "Tunnel Engineering", "Allows workers to dig tunnels for safer trade routes.", TYPE_WORKER, 0 );
     // -- Stats -- 
     public static final Upgrade STAT_SKELETON = new Upgrade(101, "Basic Skeletons", "Basic Exoskeletons", "The basic defense stats for all the ants in your colony before multipliers. 100 health points, 5 defense points and 1 health point recovered per second.", TYPE_EGG, 0 );
     static { upgrades.add(STAT_SKELETON); }
@@ -145,12 +145,31 @@ public final class GameUnlocks {
     static { upgrades.add(ABILITY_RESEARCH); }
     public static final Upgrade ABILITY_BUILD = new Upgrade(202, "Building", "Brick And Mortar", "Allows you to build parts of your colony, you can build in the build menu (U).", ROLE_BUILDER, 0 );
     static { upgrades.add(ABILITY_BUILD); }
-    public static final Upgrade ABILITY_SPREAD = new Upgrade(203, "Spreading", "Colony Colonization", "Allows you to build satellite colonies, you see them in world map (I).", ROLE_BREEDER, 0 );
+    public static final Upgrade ABILITY_SPREAD = new Upgrade(203, "Spreading", "Colony Colonization", "Allows you to build satellite colonies, 1 colony at the time, you see them in world map (I).", ROLE_BREEDER, 0 );
     static { upgrades.add(ABILITY_SPREAD); }
     public static final Upgrade ABILITY_RESIN = new Upgrade(204, "Resin Harvest", "Resin Resonation", "Allows your to foragers to harvest resin while foraging plants as a bonus, there is 1% chance each foraging run.", ROLE_FORAGER, 5000 );
     static { upgrades.add(ABILITY_RESIN); }
+    public static final Upgrade ABILITY_SYNERGY = new Upgrade(205, "Synergies", "Collaborative Effort", "Allows the use of synergies by combining two upgrades to make a third more powerful upgrade.", ABILITY_RESEARCH, 0);
+    static { upgrades.add(ABILITY_SYNERGY); }
+    public static final Upgrade ABILITY_ASSIMILATION = new Upgrade(206, "Assimilation", "Genetic Assimilation", "Allows the use of assimilations to change the genetic code of your species and gain new abilities from other species.", ABILITY_RESEARCH, 0);
+    static { upgrades.add(ABILITY_ASSIMILATION); }
     public static final Upgrade ABILITY_FORCED_FLIGHT = new Upgrade(505, "Forced Nuptial Flights", "Royal Decree", "Allows you to force a nuptial flight by spending 1000 research points.", ROLE_BREEDER, 9000);
     static { upgrades.add(ABILITY_FORCED_FLIGHT); }
+    public static final Upgrade ABILITY_DYNASTY = new Upgrade(506, "Ant Dynasty", "Ant Society", "Allows the dynasty management screen to see all the colonies in your dynasty.", ABILITY_SPREAD, 0);
+    static { upgrades.add(ABILITY_DYNASTY); }
+    public static final Upgrade ABILITY_TRADE = new Upgrade(507, "Trade Routes", "Ant Trade", "Allows your colonies to trade resources with each other, manageable in the dynasty management screen.", ABILITY_DYNASTY, 0);
+    static { upgrades.add(ABILITY_TRADE); }
+    public static final Upgrade ABILITY_SPREAD_2 = new Upgrade(508, "Advanced Spreading", "Mass Colonization", "Allows you to build more satellite colonies at the time, taking away the limit.", ABILITY_SPREAD, 0);
+    static { upgrades.add(ABILITY_SPREAD_2); }
+    public static final Upgrade ABILITY_AUTOMATION = new Upgrade(509, "Automation", "Ant Automation", "Allows your colonies to be automated in the dynasty management screen.", ABILITY_DYNASTY, 0);
+    static { upgrades.add(ABILITY_AUTOMATION); }
+    public static final Upgrade ABILITY_TUNNELS =  new Upgrade(510, "Tunnel Networks", "Subterranean Highways", "Allows your colonies to build tunnel networks between each other for faster and safer resource transport.", ABILITY_TRADE, 150000);    
+    public static final Upgrade ABILITY_MANAGEMENT = new Upgrade(511, "Colony Management", "Decentralized Command", "Allows you to let colonies to build by themselves without your direct input.", ABILITY_DYNASTY, 0);
+    static { upgrades.add(ABILITY_MANAGEMENT); }
+    public static final Upgrade ABILITY_MASS_FLIGHT = new Upgrade(512, "Mass Nuptial Flights", "Imperial Decree", "Triggers nuptial flights in all colonies capable of doing so. Costs 10x standard forced flight cost.", ABILITY_FORCED_FLIGHT, 0);
+    static { upgrades.add(ABILITY_MASS_FLIGHT); }
+    public static final Upgrade ABILITY_ABILITY = new Upgrade(900, "Ability Menu", "Abilities Unlocked", "Allows you to see the abilities menu.", null, 0);
+    static { upgrades.add(ABILITY_ABILITY); }
 
     // --- Buildings ---
     // -- Tier 0 --
@@ -211,6 +230,24 @@ public final class GameUnlocks {
     public static final Building RESIN_RESERVOIR_2 = new Building(27, "Reinforced Resin Reservoir", 2, "The resin-reinforced resin reservoir for the colony, holds 1200 resin drops.", RESIN_RESERVOIR_1, 400, 0, 2000);
     static { buildings.add(RESIN_RESERVOIR_2); }
     // -- Tier 3 --
+    public static final Building ROYAL_CHAMBER_3 = new Building(28, "Fortified Royal Chamber", 3, "The further fortified queen chamber for the colony, holds 10 queens.", ROYAL_CHAMBER_2, 1000, 0, 15000);
+    static { buildings.add(ROYAL_CHAMBER_3); }
+    public static final Building EGG_CHAMBER_3 = new Building(29, "Fortified Egg Chamber", 3, "The further fortified egg chamber for the colony, holds 500 juvenile ants of each type.", EGG_CHAMBER_2, 500, 0, 5000);
+    static { buildings.add(EGG_CHAMBER_3); }
+    public static final Building MUSHROOM_CHAMBER_3 = new Building(30, "Fortified Mushroom Chamber", 3, "The further fortified mushroom chamber for the colony, holds 100000 mushroom matter.", MUSHROOM_CHAMBER_2, 800, 0, 5000);
+    static { buildings.add(MUSHROOM_CHAMBER_3); }   
+    public static final Building PLANT_CHAMBER_3 = new Building(31, "Fortified Plant Chamber", 3, "The further fortified plant chamber for the colony, holds 60000 plant matter.", PLANT_CHAMBER_2, 700, 0, 5000);
+    static { buildings.add(PLANT_CHAMBER_3); }
+    public static final Building WATER_RESERVOIR_3 = new Building(32, "Fortified Water Reservoir", 3, "The further fortified water reservoir for the colony, holds 25000 water drops.", WATER_RESERVOIR_2, 900, 0, 5000);
+    static { buildings.add(WATER_RESERVOIR_3); }
+    public static final Building MEAT_CHAMBER_3 = new Building(33, "Fortified Protein Chamber", 3, "The further fortified protein chamber for the colony, holds 40000 animal matter.", MEAT_CHAMBER_2, 850, 0, 10000);
+    static { buildings.add(MEAT_CHAMBER_3); }
+    public static final Building SYRUP_RESERVOIR_3 = new Building(34, "Fortified Syrups Reservoir", 3, "The further fortified syrup reservoir for the colony, holds 10000 syrup drops.", SYRUP_RESERVOIR_2, 800, 0, 10000);
+    static { buildings.add(SYRUP_RESERVOIR_3); }
+    public static final Building ROCK_WAREHOUSE_3 = new Building(35, "Fortified Mineral Warehouse", 3, "The further fortified mineral warehouse for the colony, holds 2500 mineral rocks.", ROCK_WAREHOUSE_2, 950, 0, 10000);
+    static { buildings.add(ROCK_WAREHOUSE_3); }
+    public static final Building RESIN_RESERVOIR_3 = new Building(36, "Fortified Resin Reservoir", 3, "The further fortified resin reservoir for the colony, holds 3000 resin drops.", RESIN_RESERVOIR_2, 900, 0, 10000);
+    static { buildings.add(RESIN_RESERVOIR_3); }
     // -- Tier 4 --
     // -- Tier 5 --
     // -- Tier Misc. --
@@ -244,5 +281,9 @@ public final class GameUnlocks {
 
     public static List<Synergy> getSynergies() {
         return Collections.unmodifiableList(synergies);
+    }
+
+    public static List<Assimilation> getAssimilations() {
+        return Collections.unmodifiableList(assimilations);
     }
 }
