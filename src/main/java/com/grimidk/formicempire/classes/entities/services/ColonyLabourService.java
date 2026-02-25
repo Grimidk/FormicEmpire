@@ -305,7 +305,7 @@ public class ColonyLabourService {
         }
 
         int deficit = babyAntTotal - capacity;
-        List<AntType> killOrder = List.of(GameConstants.TYPE_LARVA, GameConstants.TYPE_EGG, GameConstants.TYPE_PUPA);
+        List<AntType> killOrder = List.of(GameConstants.TYPE_EGG, GameConstants.TYPE_LARVA, GameConstants.TYPE_PUPA);
         int deathCount = 0;
 
         for (AntType typeToKill : killOrder) {
