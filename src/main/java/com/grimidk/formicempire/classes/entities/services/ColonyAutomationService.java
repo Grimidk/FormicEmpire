@@ -262,7 +262,7 @@ public class ColonyAutomationService {
         int waterCapacity = colony.getStatsService().getWaterCapacity(colony);
         int totalAnts = colony.getAntTotal();
 
-        if (totalAnts >= waterCapacity && colony.hasUpgrade(GameUnlocks.ROLE_RESEARCHER)) {
+        if (totalAnts >= waterCapacity && colony.hasUpgrade(GameUnlocks.ROLE_RESEARCHER) && colony.getAssignedRoleCount(GameConstants.ROLE_ASSISTANT) <= 25) {
             if (totalQueens == 1) {
                 targets.put(GameConstants.ROLE_RESEARCHER, 1);
             } else {

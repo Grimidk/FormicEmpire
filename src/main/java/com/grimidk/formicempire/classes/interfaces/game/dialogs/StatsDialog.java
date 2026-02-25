@@ -36,6 +36,7 @@ public class StatsDialog extends ZeroDialog {
     private JTable dynastyTable;
     private JTable resourcesTable;
     private JTable populationTable;
+    private JTable localHexTable;
     private JTable ratesTable;
     private JTable unitStatsTable;
     private JTable deathTable;
@@ -55,6 +56,7 @@ public class StatsDialog extends ZeroDialog {
         initDynastyTab();
         initResourceTab();
         initPopulationTab();
+        initLocalHexTab();
         initRatesTab();
         initUnitStatsTab();
         initDeathTab();
@@ -154,6 +156,12 @@ public class StatsDialog extends ZeroDialog {
         tabbedPane.addTab("Population (Local)", createTablePane(populationTable));
     }
 
+    private void initLocalHexTab() {
+        String[] columns = {"Category", "Property", "Value"};
+        localHexTable = new JTable(createIconModel(columns));
+        tabbedPane.addTab("Local Hex", createTablePane(localHexTable));
+    }
+
     private void initRatesTab() {
         String[] columns = {"Activity", "Assigned", "Rate/Capacity", "Coverage/Output"};
         ratesTable = new JTable(createIconModel(columns));
@@ -180,9 +188,57 @@ public class StatsDialog extends ZeroDialog {
         updateDynastyData(); 
         updateResourceData();
         updatePopulationData();
+        updateLocalHexData();
         updateRatesData();
         updateUnitStatsData();
         updateDeathData();
+    }
+
+    private void updateLocalHexData() {
+        DefaultTableModel model = (DefaultTableModel) localHexTable.getModel();
+        model.setRowCount(0);
+
+        World world = engine != null ? engine.getWorld() : null;
+        if (world == null || world.getActiveHex() == null) {
+            model.addRow(new Object[]{"Hex", "Status", "No Active Hex"});
+            return;
+        }
+
+        com.grimidk.formicempire.classes.entities.Hex hex = world.getActiveHex();
+        com.grimidk.formicempire.classes.constants.world.Biome biome = hex.getBiome();
+
+        // Hex Coordinates & Basic Info
+        model.addRow(new Object[]{"Hex", "Coordinates (Q, R)", hex.getQ() + ", " + hex.getR()});
+        
+        Weather localWeather = hex.getLocalWeather();
+        model.addRow(new Object[]{"Hex", "Local Weather", localWeather != null ? localWeather.getName() : "Using Global"});
+
+        if (biome != null) {
+            model.addRow(new Object[]{"Biome", "Name", biome.getName()});
+            model.addRow(new Object[]{"Biome", "Base Temp", biome.getTemperature() + "°C"});
+            model.addRow(new Object[]{"Biome", "Humidity Level", biome.isIsHumid() + " / 5"});
+            model.addRow(new Object[]{"Abundances", "Plants", String.format("%.2f", biome.getPlantAbundance())});
+            model.addRow(new Object[]{"Abundances", "Animals", String.format("%.2f", biome.getAnimalAbundance())});
+            model.addRow(new Object[]{"Abundances", "Minerals", String.format("%.2f", biome.getMineralAbundance())});
+        }
+
+        // Neighbors
+        model.addRow(new Object[]{null, null, "------", "------"});
+        model.addRow(new Object[]{"Neighbors", "North", getHexSummary(hex.getNorth())});
+        model.addRow(new Object[]{"Neighbors", "North-West", getHexSummary(hex.getNorthWest())});
+        model.addRow(new Object[]{"Neighbors", "North-East", getHexSummary(hex.getNorthEast())});
+        model.addRow(new Object[]{"Neighbors", "South", getHexSummary(hex.getSouth())});
+        model.addRow(new Object[]{"Neighbors", "South-West", getHexSummary(hex.getSouthWest())});
+        model.addRow(new Object[]{"Neighbors", "South-East", getHexSummary(hex.getSouthEast())});
+    }
+
+    private String getHexSummary(com.grimidk.formicempire.classes.entities.Hex neighbor) {
+        if (neighbor == null) return "Edge of World";
+        String summary = (neighbor.getBiome() != null ? neighbor.getBiome().getName() : "Unknown");
+        if (neighbor.getColony() != null) {
+            summary += " (Colony: " + neighbor.getColony().getName() + ")";
+        }
+        return summary;
     }
 
     private void updateGeneralData() {

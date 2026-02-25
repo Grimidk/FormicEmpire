@@ -11,7 +11,7 @@ To Fix (By decreasing priority) :
 	(none right now)
 
 	Mid:
-	if auto has 25 > assistants dont have more researchers
+	(none right now)
 
 	Low:
 	breeders go out of the colony in nuptial
