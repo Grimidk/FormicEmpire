@@ -193,16 +193,15 @@ public class ColonyLabourService {
             } else { farmerCount += 1; } 
         }
         
-        if (!resources.hasCapacity(colony, GameConstants.RESOURCE_FUNGI)) return;
+        if (farmerCount <= 0 || !resources.hasCapacity(colony, GameConstants.RESOURCE_FUNGI)) return;
         
         if (Math.random() <= stats.getConversionRate(colony)) {
             double consumedPlants = resources.consumeResource(colony, GameConstants.RESOURCE_PLANT, farmerCount);
             if (consumedPlants > 0) {
                 resources.addResource(colony, GameConstants.RESOURCE_FUNGI, consumedPlants);
+                return;
             }
         }
-        
-        if (!resources.hasCapacity(colony, GameConstants.RESOURCE_FUNGI)) return;
         
         if (Math.random() <= stats.getConversionRate(colony)) {
             double consumedMeat = resources.consumeResource(colony, GameConstants.RESOURCE_MEAT, farmerCount);
@@ -283,7 +282,9 @@ public class ColonyLabourService {
 
         if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
                 nurseCount += 2;
-        } else { nurseCount += 1; }
+        } else if (colony.hasBuilding(GameUnlocks.PASSIVE_LAB)) { 
+            nurseCount += 1; 
+        }
         
         int babyAntTotal = colony.getEggs().size() +  colony.getLarvae().size() +  colony.getPupae().size();
         float nursingRate = stats.getNursingRate(colony);
@@ -298,25 +299,23 @@ public class ColonyLabourService {
             }
         }
 
-        if (babyAntTotal <= nurseCount * nursingRate) {
+        int capacity = (int) (nurseCount * nursingRate);
+        if (babyAntTotal <= capacity) {
             return;
         }
 
-        int deficit = babyAntTotal - (nurseCount * (int) nursingRate);
+        int deficit = babyAntTotal - capacity;
         List<AntType> killOrder = List.of(GameConstants.TYPE_LARVA, GameConstants.TYPE_EGG, GameConstants.TYPE_PUPA);
         int deathCount = 0;
 
         for (AntType typeToKill : killOrder) {
             if (deficit <= 0) break;
             List<Ant> list = colony.getAntsByType(typeToKill);
-            List<Ant> antsToCull = new ArrayList<>();
+            int toCullCount = Math.min(deficit, list.size());
             
-            for (Ant ant : list) {
-                if (deficit <= 0) break;
-                if (Math.random() > 0.5) { 
-                    antsToCull.add(ant);
-                    deficit--;
-                } 
+            List<Ant> antsToCull = new ArrayList<>();
+            for (int i = 0; i < toCullCount; i++) {
+                antsToCull.add(list.get(list.size() - 1 - i));
             }
             
             for (Ant antToCull : antsToCull) {
@@ -326,6 +325,7 @@ public class ColonyLabourService {
                     
                     list.remove(antToCull);
                     deathCount++;
+                    deficit--;
                 }
             }
         }

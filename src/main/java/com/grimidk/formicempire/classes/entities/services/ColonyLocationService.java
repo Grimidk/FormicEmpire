@@ -2,8 +2,11 @@ package com.grimidk.formicempire.classes.entities.services;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
@@ -40,6 +43,9 @@ public class ColonyLocationService {
     public static final int ANT_SIZE = 40;
 
     private final List<ResourceSource> discoveredSources;
+    private final Map<ResourceType, List<ResourceSource>> rankedSourcesCache = new HashMap<>();
+    private long lastRankUpdate = 0;
+    private static final long RANK_UPDATE_INTERVAL_MS = 2000; // Update rankings every 2 seconds
 
     public ColonyLocationService() {
         this.discoveredSources = new CopyOnWriteArrayList<>();
@@ -80,6 +86,7 @@ public class ColonyLocationService {
 
         if (count < capacity) {
             this.discoveredSources.add(source);
+            invalidateCache();
             colony.logEvent("Found new " + source.getResourceType().getName() + " source.");
         } else {
             colony.logEvent("Found " + source.getResourceType().getName() + " but capacity is full.");
@@ -88,7 +95,15 @@ public class ColonyLocationService {
 
     public void removeSource(Colony colony, ResourceSource source) {
         if (this.discoveredSources.remove(source)) {
+            invalidateCache();
             colony.logEvent("A " + source.getResourceType().getName() + " source has been exhausted.");
+        }
+    }
+
+    private void invalidateCache() {
+        synchronized (rankedSourcesCache) {
+            rankedSourcesCache.clear();
+            lastRankUpdate = 0;
         }
     }
     
@@ -107,7 +122,33 @@ public class ColonyLocationService {
         return gathered;
     }
 
+    private void updateRankedCache(Colony colony) {
+        long now = System.currentTimeMillis();
+        if (now - lastRankUpdate < RANK_UPDATE_INTERVAL_MS && !rankedSourcesCache.isEmpty()) return;
+
+        synchronized (rankedSourcesCache) {
+            rankedSourcesCache.clear();
+            int centerX = getHallwayCenterX(colony);
+            int centerY = ANCHOR_HEIGHT / 2;
+
+            for (ResourceType type : GameConstants.getResources()) {
+                List<ResourceSource> sources = discoveredSources.stream()
+                    .filter(s -> s.getResourceType() == type && s.getQuantity() > 0)
+                    .sorted(Comparator.comparingDouble(s -> 
+                        Math.pow(s.getX() - centerX, 2) + Math.pow(s.getY() - centerY, 2)))
+                    .collect(Collectors.toList());
+                
+                if (!sources.isEmpty()) {
+                    rankedSourcesCache.put(type, sources);
+                }
+            }
+            lastRankUpdate = now;
+        }
+    }
+
     public ResourceSource findNearestRelevantSource(Colony colony, Ant ant) {
+        updateRankedCache(colony);
+
         List<ResourceType> targetTypes = new ArrayList<>();
         AntRole role = ant.getRole();
 
@@ -120,21 +161,17 @@ public class ColonyLocationService {
             targetTypes.add(GameConstants.RESOURCE_ROCK);
         }
 
-        ResourceSource nearest = null;
-        double minDistance = Double.MAX_VALUE;
+        for (ResourceType type : targetTypes) {
+            List<ResourceSource> ranked = rankedSourcesCache.get(type);
+            if (ranked == null || ranked.isEmpty()) continue;
 
-        for (ResourceSource source : discoveredSources) {
-            if (source == null || source.getQuantity() <= 0) continue;
-
-            if (targetTypes.contains(source.getResourceType())) {
-                double dist = Math.pow(source.getX() - ant.getX(), 2) + Math.pow(source.getY() - ant.getY(), 2);
-                if (dist < minDistance) {
-                    minDistance = dist;
-                    nearest = source;
-                }
+            if (Math.random() < 0.70 || ranked.size() == 1) {
+                return ranked.get(0);
+            } else {
+                return ranked.get(1 + (int)(Math.random() * (ranked.size() - 1)));
             }
         }
-        return nearest;
+        return null;
     }
     
     public Room createTempRoomAtPoint(Point p, Dimension dim) {

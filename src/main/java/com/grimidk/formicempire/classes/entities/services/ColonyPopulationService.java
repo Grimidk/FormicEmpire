@@ -239,8 +239,8 @@ public class ColonyPopulationService {
         ColonyResourceService resources = colony.getResourceService();
         
         List<AntType> adultDrinkOrder = Arrays.asList(
-            GameConstants.TYPE_QUEEN, GameConstants.TYPE_WORKER, GameConstants.TYPE_SOLDIER,
-            GameConstants.TYPE_MAJOR, GameConstants.TYPE_PRINCESS, GameConstants.TYPE_DRONE
+            GameConstants.TYPE_DRONE, GameConstants.TYPE_PRINCESS, GameConstants.TYPE_MAJOR,
+            GameConstants.TYPE_SOLDIER, GameConstants.TYPE_WORKER, GameConstants.TYPE_QUEEN
         );
         
         int resistanceChance = stats.getThirstResistance(colony, currentTemp);
@@ -272,8 +272,8 @@ public class ColonyPopulationService {
         }
 
         List<AntType> eatOrder = Arrays.asList(
-            GameConstants.TYPE_QUEEN, GameConstants.TYPE_WORKER, GameConstants.TYPE_LARVA,
-            GameConstants.TYPE_SOLDIER, GameConstants.TYPE_MAJOR, GameConstants.TYPE_PRINCESS, GameConstants.TYPE_DRONE
+            GameConstants.TYPE_DRONE, GameConstants.TYPE_PRINCESS, GameConstants.TYPE_MAJOR,
+            GameConstants.TYPE_SOLDIER, GameConstants.TYPE_LARVA, GameConstants.TYPE_WORKER, GameConstants.TYPE_QUEEN
         );
         
         List<Ant> hungryCandidates = new ArrayList<>();
@@ -308,12 +308,12 @@ public class ColonyPopulationService {
         List<Ant> doomedHungry = new ArrayList<>();
         int approxAntsToKill = (int) (foodDeficit / (baseConsumption <= 0 ? 1 : baseConsumption));
         
-        for (int i = 0; i < approxAntsToKill; i++) {
-            if (i < hungryCandidates.size()) {
-                Ant potentialVictim = hungryCandidates.get(i);
-                if (!doomedThirsty.contains(potentialVictim)) {
-                    doomedHungry.add(potentialVictim);
-                }
+        int added = 0;
+        for (int i = 0; i < hungryCandidates.size() && added < approxAntsToKill; i++) {
+            Ant potentialVictim = hungryCandidates.get(i);
+            if (!doomedThirsty.contains(potentialVictim)) {
+                doomedHungry.add(potentialVictim);
+                added++;
             }
         }
 

@@ -11,10 +11,11 @@ To Fix (By decreasing priority) :
 	(none right now)
 
 	Mid:
-	(none right now)
+	if auto has 25 > assistants dont have more researchers
 
 	Low:
 	breeders go out of the colony in nuptial
+	stats dialog doesnt have local data
 
 	Can't reproduce:
 	hex changing not happening (reported by gopher)

@@ -6,7 +6,7 @@ import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstan
 
 public class ColonyResourceService {
 
-    public double addResource(Colony colony, ResourceType type, double amount) {
+    public synchronized double addResource(Colony colony, ResourceType type, double amount) {
         if (amount <= 0) return 0;
         
         ColonyStatsService stats = colony.getStatsService();
@@ -38,7 +38,7 @@ public class ColonyResourceService {
         return actualAdd;
     }
 
-    public double consumeResource(Colony colony, ResourceType type, double amount) {
+    public synchronized double consumeResource(Colony colony, ResourceType type, double amount) {
         if (amount <= 0) return 0;
         double current = 0;
 
@@ -66,7 +66,7 @@ public class ColonyResourceService {
         return actualConsume;
     }
 
-    public boolean hasCapacity(Colony colony, ResourceType type) {
+    public synchronized boolean hasCapacity(Colony colony, ResourceType type) {
         ColonyStatsService stats = colony.getStatsService();
         if (type == GameConstants.RESOURCE_PLANT) return colony.getPlantsPrecise() < stats.getPlantsCapacity(colony);
         if (type == GameConstants.RESOURCE_WATER) return colony.getWaterPrecise() < stats.getWaterCapacity(colony);
