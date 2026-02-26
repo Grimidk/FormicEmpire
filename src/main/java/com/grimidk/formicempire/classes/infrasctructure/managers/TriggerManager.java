@@ -83,6 +83,7 @@ public class TriggerManager {
         checkSpreadAbilityUnlock();
         checkScoutRoleUnlock();
         checkDynastyTriggers();
+        checkAssimilationAbilityUnlock();
         checkAbilityMenuHint();
     }
 
@@ -309,6 +310,17 @@ public class TriggerManager {
             fireTrigger(GameUnlocks.ABILITY_AUTOMATION,
                 "Automation Era",
                 "Your dynasty is vast. You can now completely automate colony management.");
+        }
+    }
+
+    private void checkAssimilationAbilityUnlock() {
+        if (playerColony.getDynasty() == null) return;
+        if (playerColony.hasUpgrade(GameUnlocks.ABILITY_ASSIMILATION)) return;
+
+        if (playerColony.getDynasty().getAbsorbedDynastyIds().size() > 0) {
+            fireTrigger(GameUnlocks.ABILITY_ASSIMILATION,
+                "Genetic Assimilation",
+                "By absorbing the remnants of a defeated dynasty, your ants have learned that genetic traits can be harvested! Genetic Assimilation unlocked in the Upgrades menu (Y).");
         }
     }
 

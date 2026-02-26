@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 import javax.swing.SwingUtilities;
 
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
+import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.Dynasty;
@@ -340,13 +341,25 @@ public class SaveManager {
                 sc.researchPoints = dynasty.getResearchPoints();
                 sc.totalNuptialFlights = dynasty.getTotalNuptialFlights();
                 sc.speciesId = dynasty.getSpecies() != null ? dynasty.getSpecies().getId() : 1;
-                
-                for(Upgrade u : dynasty.getUnlockedUpgrades()) {
-                    sc.unlockedUpgradeIds.add(u.getId());
+                sc.defeatedSpeciesIds = (dynasty.getDefeatedSpeciesIds() != null) ? new ArrayList<>(dynasty.getDefeatedSpeciesIds()) : new ArrayList<>();
+                sc.completedAssimilationIds = new ArrayList<>();
+                if (dynasty.getCompletedAssimilations() != null) {
+                    for (Assimilation a : dynasty.getCompletedAssimilations()) {
+                        sc.completedAssimilationIds.add(a.getId());
+                    }
                 }
-                sc.absorbedDynastyIds = new ArrayList<>(dynasty.getAbsorbedDynastyIds());
+                sc.currentAssimilationId = (dynasty.getCurrentAssimilation() != null) ? dynasty.getCurrentAssimilation().getId() : -1;
+                sc.assimilationProgress = dynasty.getAssimilationProgress();
                 
-                sc.deathStatistics = new HashMap<>(dynasty.getGlobalDeathStatistics());
+                sc.unlockedUpgradeIds = new ArrayList<>();
+                if (dynasty.getUnlockedUpgrades() != null) {
+                    for(Upgrade u : dynasty.getUnlockedUpgrades()) {
+                        sc.unlockedUpgradeIds.add(u.getId());
+                    }
+                }
+                sc.absorbedDynastyIds = (dynasty.getAbsorbedDynastyIds() != null) ? new ArrayList<>(dynasty.getAbsorbedDynastyIds()) : new ArrayList<>();
+                
+                sc.deathStatistics = (dynasty.getGlobalDeathStatistics() != null) ? new HashMap<>(dynasty.getGlobalDeathStatistics()) : new HashMap<>();
                 dynastyList.add(sc);
             }
         }
@@ -526,9 +539,13 @@ public class SaveManager {
         writeJsonLine(w, "speciesId", sc.speciesId, false);
         writeJsonLine(w, "researchPoints", sc.researchPoints, false);
         writeJsonLine(w, "totalNuptialFlights", sc.totalNuptialFlights, false);
+        writeJsonLine(w, "currentAssimilationId", sc.currentAssimilationId, false);
+        writeJsonLine(w, "assimilationProgress", sc.assimilationProgress, false);
         w.write("      \"unlockedUpgradeIds\": " + serializeListToJson(sc.unlockedUpgradeIds) + ","); w.newLine();
         w.write("      \"absorbedDynastyIds\": " + serializeListToJson(sc.absorbedDynastyIds) + ","); w.newLine();
-        w.write("      \"deathStatistics\": " + serializeMapToJson(sc.deathStatistics)); w.newLine(); // Last item
+        w.write("      \"defeatedSpeciesIds\": " + serializeListToJson(sc.defeatedSpeciesIds) + ","); w.newLine();
+        w.write("      \"completedAssimilationIds\": " + serializeListToJson(sc.completedAssimilationIds) + ","); w.newLine();
+        w.write("      \"deathStatistics\": " + serializeMapToJson(sc.deathStatistics)); w.newLine();
         w.write("    }");
         if (!isLast) w.write(",");
         w.newLine();
@@ -724,8 +741,12 @@ public class SaveManager {
         sc.speciesId = Integer.parseInt(map.getOrDefault("speciesId", "1"));
         sc.researchPoints = Integer.parseInt(map.getOrDefault("researchPoints", "0"));
         sc.totalNuptialFlights = Integer.parseInt(map.getOrDefault("totalNuptialFlights", "0"));
+        sc.currentAssimilationId = Integer.parseInt(map.getOrDefault("currentAssimilationId", "-1"));
+        sc.assimilationProgress = Double.parseDouble(map.getOrDefault("assimilationProgress", "0.0"));
         sc.unlockedUpgradeIds = deserializeJsonToList(map.get("unlockedUpgradeIds"));
         sc.absorbedDynastyIds = deserializeJsonToList(map.get("absorbedDynastyIds"));
+        sc.defeatedSpeciesIds = deserializeJsonToList(map.get("defeatedSpeciesIds"));
+        sc.completedAssimilationIds = deserializeJsonToList(map.get("completedAssimilationIds"));
         sc.deathStatistics = deserializeJsonToMap(map.get("deathStatistics"));
         return sc;
     }

@@ -70,9 +70,11 @@ public class ColonyStatsService {
         return 0;
     }
     public int getQueensCapacity(Colony colony) {
-        if (colony.hasBuilding(GameUnlocks.ROYAL_CHAMBER_3)) return 10;
-        if (colony.hasBuilding(GameUnlocks.ROYAL_CHAMBER_2)) return 4;
-        if (colony.hasBuilding(GameUnlocks.ROYAL_CHAMBER_1)) return 2;
+        boolean canMultiQueen = colony.hasUpgrade(GameUnlocks.ASSIMILATED_MULTIQUEEN);
+        
+        if (colony.hasBuilding(GameUnlocks.ROYAL_CHAMBER_3)) return canMultiQueen ? 10 : 1;
+        if (colony.hasBuilding(GameUnlocks.ROYAL_CHAMBER_2)) return canMultiQueen ? 4 : 1;
+        if (colony.hasBuilding(GameUnlocks.ROYAL_CHAMBER_1)) return canMultiQueen ? 2 : 1;
         if (colony.hasBuilding(GameUnlocks.ROYAL_CHAMBER_0)) return 1; 
         return 0;
     }

@@ -1,8 +1,11 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
+import com.grimidk.formicempire.classes.constants.misc.Species;
+import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 
@@ -85,10 +88,11 @@ public class UpgradeDialog extends ZeroDialog {
         }
 
         // --- Assimilations Tab ---
-        if (colony.hasUpgrade(GameUnlocks.ABILITY_ASSIMILATION)) { // To implement
+        if (colony.hasUpgrade(GameUnlocks.ABILITY_ASSIMILATION)) { 
             if (assimilationPanel == null) {
-                assimilationPanel = createPlaceholderPanel("Assimilations - Coming Soon");
+                assimilationPanel = new AssimilationPanel(colony);
             }
+            ((AssimilationPanel) assimilationPanel).updateData();
             tabbedPane.addTab("Assimilations", null, assimilationPanel);
             tabIndexMap.put(TAB_ASSIMILATION, currentIndex++);
         }
@@ -526,6 +530,175 @@ public class UpgradeDialog extends ZeroDialog {
                     }
                 } else if (listPanel.getComponentCount() > 0 && listPanel.getComponent(0) instanceof JPanel) {
                     updateData();
+                }
+            }
+        }
+    }
+
+    private class AssimilationPanel extends JPanel implements LiveUpdatePanel {
+        private final Colony colony;
+        private final JPanel listPanel;
+        private final JScrollPane scrollPane;
+        private final JLabel statusLabel;
+        private final Map<JButton, Assimilation> buttonMap = new HashMap<>();
+
+        public AssimilationPanel(Colony colony) {
+            super(new BorderLayout());
+            this.colony = colony;
+
+            JPanel northPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            statusLabel = new JLabel("Current Assimilation: None");
+            statusLabel.setFont(statusLabel.getFont().deriveFont(Font.BOLD));
+            northPanel.add(statusLabel);
+            add(northPanel, BorderLayout.NORTH);
+
+            listPanel = new JPanel();
+            listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
+            scrollPane = new JScrollPane(listPanel);
+            scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+            add(scrollPane, BorderLayout.CENTER);
+        }
+
+        @Override
+        public void updateData() {
+            listPanel.removeAll();
+            buttonMap.clear();
+
+            Dynasty dynasty = colony.getDynasty();
+            if (dynasty == null) return;
+
+            updateStatusLabel();
+
+            if (dynasty.getCurrentAssimilation() != null) {
+                listPanel.add(createProgressPanel(dynasty.getCurrentAssimilation()));
+            } else {
+                List<Assimilation> all = GameUnlocks.getAssimilations();
+                List<Assimilation> available = new ArrayList<>();
+
+                for (Assimilation a : all) {
+                    int speciesId = -1;
+                    for (Species s : GameConstants.getSpecies()) {
+                        if (s.getAssimilation() == a) {
+                            speciesId = s.getId();
+                            break;
+                        }
+                    }
+
+                    boolean defeated = (speciesId != -1 && dynasty.getDefeatedSpeciesIds().contains(speciesId));
+                    boolean completed = dynasty.isAssimilationCompleted(a);
+
+                    if (defeated && !completed) {
+                        available.add(a);
+                    }
+                }
+
+                if (available.isEmpty()) {
+                    listPanel.add(new JLabel("  No genetic genomes available for assimilation. Defeat other species to unlock."));
+                } else {
+                    for (Assimilation a : available) {
+                        listPanel.add(createAssimilationCard(a));
+                        listPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+                    }
+                }
+            }
+
+            listPanel.revalidate();
+            listPanel.repaint();
+        }
+
+        private void updateStatusLabel() {
+            Dynasty d = colony.getDynasty();
+            if (d == null) return;
+            if (d.getCurrentAssimilation() != null) {
+                statusLabel.setText("Current Assimilation: " + d.getCurrentAssimilation().getName());
+            } else {
+                statusLabel.setText("Current Assimilation: None");
+            }
+        }
+
+        private JPanel createAssimilationCard(Assimilation a) {
+            JPanel panel = new JPanel(new BorderLayout(10, 10));
+            panel.setBorder(new TitledBorder(a.getName()));
+
+            JTextArea desc = new JTextArea(a.getDescription());
+            desc.setWrapStyleWord(true);
+            desc.setLineWrap(true);
+            desc.setEditable(false);
+            desc.setBackground(panel.getBackground());
+            panel.add(desc, BorderLayout.CENTER);
+
+            JPanel east = new JPanel();
+            east.setLayout(new BoxLayout(east, BoxLayout.Y_AXIS));
+            
+            JLabel cost = new JLabel("Target: " + a.getCost());
+            cost.setAlignmentX(Component.CENTER_ALIGNMENT);
+            
+            JButton btn = new JButton("Begin");
+            btn.setAlignmentX(Component.CENTER_ALIGNMENT);
+            btn.addActionListener(e -> {
+                colony.getDynasty().setCurrentAssimilation(a);
+                colony.getDynasty().setAssimilationProgress(0);
+                updateData();
+            });
+
+            east.add(cost);
+            east.add(Box.createRigidArea(new Dimension(0, 5)));
+            east.add(btn);
+            panel.add(east, BorderLayout.EAST);
+
+            return panel;
+        }
+
+        private JPanel createProgressPanel(Assimilation a) {
+            JPanel panel = new JPanel(new BorderLayout(10, 10));
+            panel.setBorder(new TitledBorder("Assimilating: " + a.getName()));
+
+            double prog = colony.getDynasty().getAssimilationProgress();
+            int percent = (int)((prog / a.getCost()) * 100);
+
+            JProgressBar bar = new JProgressBar(0, 100);
+            bar.setValue(percent);
+            bar.setStringPainted(true);
+            bar.setString(String.format("%.1f / %d ( %d%% )", prog, a.getCost(), percent));
+            panel.add(bar, BorderLayout.CENTER);
+
+            JButton cancel = new JButton("Cancel");
+            cancel.addActionListener(e -> {
+                colony.getDynasty().setCurrentAssimilation(null);
+                colony.getDynasty().setAssimilationProgress(0);
+                updateData();
+            });
+            panel.add(cancel, BorderLayout.EAST);
+
+            JLabel info = new JLabel("Assign Researchers to contribute to genetic assimilation.");
+            info.setHorizontalAlignment(SwingConstants.CENTER);
+            panel.add(info, BorderLayout.SOUTH);
+
+            return panel;
+        }
+
+        @Override
+        public void liveUpdate() {
+            Dynasty d = colony.getDynasty();
+            if (d == null || d.getCurrentAssimilation() == null) {
+                if (listPanel.getComponentCount() > 0 && listPanel.getComponent(0) instanceof JPanel) {
+                    JPanel p = (JPanel) listPanel.getComponent(0);
+                    if (p.getBorder() instanceof TitledBorder && ((TitledBorder)p.getBorder()).getTitle().startsWith("Assimilating:")) {
+                        updateData();
+                    }
+                }
+                return;
+            }
+
+            Assimilation a = d.getCurrentAssimilation();
+            if (listPanel.getComponentCount() > 0 && listPanel.getComponent(0) instanceof JPanel) {
+                JPanel p = (JPanel) listPanel.getComponent(0);
+                if (p.getComponentCount() > 0 && p.getComponent(0) instanceof JProgressBar) {
+                    JProgressBar bar = (JProgressBar) p.getComponent(0);
+                    double prog = d.getAssimilationProgress();
+                    int percent = (int)((prog / a.getCost()) * 100);
+                    bar.setValue(percent);
+                    bar.setString(String.format("%.1f / %d ( %d%% )", prog, a.getCost(), percent));
                 }
             }
         }

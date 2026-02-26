@@ -12,6 +12,7 @@ import java.awt.Color;
 import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
 import com.grimidk.formicempire.classes.constants.misc.Species;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
+import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
 import com.grimidk.formicempire.classes.entities.services.DynastyAutomationService;
 import com.grimidk.formicempire.classes.entities.services.DynastyStarterService;
 import com.grimidk.formicempire.classes.entities.services.DynastyStatService;
@@ -39,6 +40,10 @@ public class Dynasty {
     private final List<Colony> colonies;
     private final Map<String, Integer> globalDeathStatistics;
     private final List<Integer> absorbedDynastyIds;
+    private final List<Integer> defeatedSpeciesIds;
+    private final Set<Assimilation> completedAssimilations;
+    private Assimilation currentAssimilation;
+    private double assimilationProgress;
 
     // Services
     private transient DynastyAutomationService automationService;
@@ -54,10 +59,14 @@ public class Dynasty {
         this.unlockedUpgrades = new HashSet<>();
         this.globalDeathStatistics = new ConcurrentHashMap<>();
         this.absorbedDynastyIds = new ArrayList<>();
+        this.defeatedSpeciesIds = new ArrayList<>();
+        this.completedAssimilations = new HashSet<>();
         this.researchPoints = 0;
         this.totalNuptialFlights = 0;
         this.rank = GameConstants.RANK_ANT;
         this.isDefeated = false;
+        this.currentAssimilation = null;
+        this.assimilationProgress = 0;
         
         initializeColor();
         initializeServices();
@@ -70,6 +79,7 @@ public class Dynasty {
         this.researchPoints = savedDynasty.researchPoints;
         this.totalNuptialFlights = savedDynasty.totalNuptialFlights;
         this.isDefeated = savedDynasty.isDefeated;
+        this.assimilationProgress = savedDynasty.assimilationProgress;
         
         this.species = GameConstants.SPECIES_OMNI; 
         for(Species s : GameConstants.getSpecies()) {
@@ -82,10 +92,37 @@ public class Dynasty {
         this.colonies = new ArrayList<>();
         this.unlockedUpgrades = new HashSet<>();
         this.globalDeathStatistics = new ConcurrentHashMap<>();
+        this.completedAssimilations = new HashSet<>();
         
         this.absorbedDynastyIds = new ArrayList<>();
         if (savedDynasty.absorbedDynastyIds != null) {
             this.absorbedDynastyIds.addAll(savedDynasty.absorbedDynastyIds);
+        }
+
+        this.defeatedSpeciesIds = new ArrayList<>();
+        if (savedDynasty.defeatedSpeciesIds != null) {
+            this.defeatedSpeciesIds.addAll(savedDynasty.defeatedSpeciesIds);
+        }
+
+        this.currentAssimilation = null;
+        if (savedDynasty.currentAssimilationId != -1) {
+            for (Assimilation a : GameUnlocks.getAssimilations()) {
+                if (a.getId() == savedDynasty.currentAssimilationId) {
+                    this.currentAssimilation = a;
+                    break;
+                }
+            }
+        }
+
+        if (savedDynasty.completedAssimilationIds != null) {
+            for (Integer assId : savedDynasty.completedAssimilationIds) {
+                for (Assimilation a : GameUnlocks.getAssimilations()) {
+                    if (a.getId() == assId) {
+                        this.completedAssimilations.add(a);
+                        break;
+                    }
+                }
+            }
         }
         
         if (savedDynasty.deathStatistics != null) {
@@ -190,6 +227,12 @@ public class Dynasty {
             absorbedDynastyIds.add(dynastyId);
         }
     }
+
+    public void absorbSpecies(int speciesId) {
+        if (!defeatedSpeciesIds.contains(speciesId)) {
+            defeatedSpeciesIds.add(speciesId);
+        }
+    }
     
     public void incrementNuptialFlights() {
         this.totalNuptialFlights++;
@@ -272,6 +315,17 @@ public class Dynasty {
 
     public List<Colony> getColonies() { return colonies; }
     public List<Integer> getAbsorbedDynastyIds() { return absorbedDynastyIds; }
+    public List<Integer> getDefeatedSpeciesIds() { return defeatedSpeciesIds; }
+
+    public Set<Assimilation> getCompletedAssimilations() { return completedAssimilations; }
+    public boolean isAssimilationCompleted(Assimilation a) { return completedAssimilations.contains(a); }
+    public void completeAssimilation(Assimilation a) { completedAssimilations.add(a); }
+
+    public Assimilation getCurrentAssimilation() { return currentAssimilation; }
+    public void setCurrentAssimilation(Assimilation a) { this.currentAssimilation = a; }
+    public double getAssimilationProgress() { return assimilationProgress; }
+    public void setAssimilationProgress(double progress) { this.assimilationProgress = progress; }
+    public void addAssimilationProgress(double amount) { this.assimilationProgress += amount; }
     
     public Map<String, Integer> getGlobalDeathStatistics() { return globalDeathStatistics; }
     

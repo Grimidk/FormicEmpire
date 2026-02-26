@@ -470,7 +470,7 @@ public final class GameConstants {
     static { species.add(SPECIES_LEAF); }
     public static final Species SPECIES_PHARAOH = new Species(3, "Pharaoh Ant", "Monomorium Pharaonis", "pharaoh/", GameUnlocks.ASSIMILATION_PHARAOH, null);
     static { species.add(SPECIES_PHARAOH); }
-    public static final Species SPECIES_MARAUDER = new Species(4, "Marauder Ant", "Carebara Diversa", "marauder/", null, null);
+    public static final Species SPECIES_MARAUDER = new Species(4, "Marauder Ant", "Carebara Diversa", "marauder/", GameUnlocks.ASSIMILATION_MARAUDER, null);
     static { species.add(SPECIES_MARAUDER); }
     
     // --- Getters ---

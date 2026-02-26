@@ -9,14 +9,13 @@ To Fix (By decreasing priority) :
 	
 	High:
 	base upgrade sets
-	assimilation menu
-	implenment multi queen and majors and improved farming properly 
-	assimilation earning and researching 
-	defeated dynasties list to show available assimilations
 	genetic stagnation (obscured until below (80%))
+	dynasty wide assimilation
 
 	Mid:
-	(none right now)
+	cancel button ins assimilation
+	hotkey for assimilation
+	make stats wider so there is no need to pass
 
 	Low:
 	breeders go out of the colony in nuptial

@@ -8,9 +8,13 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
+import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Dynasty;
@@ -198,7 +202,11 @@ public class ColonyLabourService {
         if (Math.random() <= stats.getConversionRate(colony)) {
             double consumedPlants = resources.consumeResource(colony, GameConstants.RESOURCE_PLANT, farmerCount);
             if (consumedPlants > 0) {
-                resources.addResource(colony, GameConstants.RESOURCE_FUNGI, consumedPlants);
+                double yield = consumedPlants;
+                if (colony.hasUpgrade(GameUnlocks.ASSIMILATED_FARMING)) {
+                    yield += consumedPlants; // +1 extra per plant
+                }
+                resources.addResource(colony, GameConstants.RESOURCE_FUNGI, yield);
                 return;
             }
         }
@@ -206,7 +214,11 @@ public class ColonyLabourService {
         if (Math.random() <= stats.getConversionRate(colony)) {
             double consumedMeat = resources.consumeResource(colony, GameConstants.RESOURCE_MEAT, farmerCount);
             if (consumedMeat > 0) {
-                resources.addResource(colony, GameConstants.RESOURCE_FUNGI, consumedMeat * 2);
+                double yield = consumedMeat * 2;
+                if (colony.hasUpgrade(GameUnlocks.ASSIMILATED_FARMING)) {
+                    yield += consumedMeat; // +1 extra per meat
+                }
+                resources.addResource(colony, GameConstants.RESOURCE_FUNGI, yield);
             }
         }
     }
@@ -370,6 +382,7 @@ public class ColonyLabourService {
                     if (oldDynasty != null) {
                         if (!dynasty.getAbsorbedDynastyIds().contains(oldDynasty.getId())) {
                             dynasty.addAbsorbedDynasty(oldDynasty.getId());
+                            dynasty.absorbSpecies(oldDynasty.getSpecies().getId());
                             colony.logEvent("DYNASTY: Absorbed the remnants of " + oldDynasty.getName() + "!");
                         }
                         oldDynasty.removeColony(existingColony);
@@ -677,6 +690,9 @@ public class ColonyLabourService {
     public void runResearch(Colony colony) {
         if (!colony.hasUpgrade(GameUnlocks.ROLE_RESEARCHER)) return;
         
+        Dynasty dynasty = colony.getDynasty();
+        if (dynasty == null) return;
+
         int researcherCount = countActiveAnts(colony, GameConstants.ROLE_RESEARCHER);        
         if (colony.hasBuilding(GameUnlocks.PASSIVE_LAB)) {
             if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
@@ -690,10 +706,32 @@ public class ColonyLabourService {
         if (researcherCount > 0 || assistantCount > 0) {
             int speed = colony.getStatsService().getResearchSpeed(colony);
             
-            int queenGain = researcherCount * speed;
-            int assistantGain = (int) (assistantCount * (speed / 5.0));
-
-            colony.addResearchPoints(queenGain + assistantGain);
+            if (dynasty.getCurrentAssimilation() != null) {
+                double power = (researcherCount * speed + assistantCount * (speed / 5.0)) / 10.0;
+                dynasty.addAssimilationProgress(power);
+                
+                if (dynasty.getAssimilationProgress() >= dynasty.getCurrentAssimilation().getCost()) {
+                    Assimilation a = dynasty.getCurrentAssimilation();
+                    dynasty.unlockUpgrade(a.getReward());
+                    dynasty.completeAssimilation(a);
+                    colony.logEvent("SUCCESS: " + a.getName() + " completed! Reward: " + a.getReward().getFlavorName());
+                    
+                    if (colony.isPlayer()) {
+                        SwingUtilities.invokeLater(() -> {
+                            JOptionPane.showMessageDialog(null, 
+                                "Genetic Assimilation Complete!\n\n" + a.getName() + " finished.\nUnlocked: " + a.getReward().getFlavorName(),
+                                "Assimilation Success", JOptionPane.INFORMATION_MESSAGE);
+                        });
+                    }
+                    
+                    dynasty.setCurrentAssimilation(null);
+                    dynasty.setAssimilationProgress(0);
+                }
+            } else {
+                int queenGain = researcherCount * speed;
+                int assistantGain = (int) (assistantCount * (speed / 5.0));
+                colony.addResearchPoints(queenGain + assistantGain);
+            }
         }
     }
 
