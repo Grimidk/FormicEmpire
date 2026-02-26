@@ -168,8 +168,13 @@ public final class GameUnlocks {
     static { upgrades.add(ABILITY_MANAGEMENT); }
     public static final Upgrade ABILITY_MASS_FLIGHT = new Upgrade(512, "Mass Nuptial Flights", "Imperial Decree", "Triggers nuptial flights in all colonies capable of doing so. Costs 10x standard forced flight cost.", ABILITY_FORCED_FLIGHT, 0);
     static { upgrades.add(ABILITY_MASS_FLIGHT); }
-    public static final Upgrade ABILITY_ABILITY = new Upgrade(900, "Ability Menu", "Abilities Unlocked", "Allows you to see the abilities menu.", null, 0);
+    public static final Upgrade ABILITY_ABILITY = new Upgrade(900, "Ability Menu", "Abilities Unlocked", "Allows you to see the abilities menu and use active abilities.", null, 0);
     static { upgrades.add(ABILITY_ABILITY); }
+    // -- Assimilated --
+    public static final Upgrade ASSIMILATED_FARMING = new Upgrade(1001, "Assimilated Farming", "Assimilated Farming", "Your dynasty has learned how to farm fungi more efficiently. By getting 1 extra mushroom matter per plant and protein.", ABILITY_ASSIMILATION, 0 );
+    static { upgrades.add(ASSIMILATED_FARMING); }
+    public static final Upgrade ASSIMILATED_MULTIQUEEN = new Upgrade(1002, "Assimilated Multi-Queen", "Assimilated Herding", "Your dynasty can now handle multiple queens in a single colony, still requires the upgrading of the Royal Chamber.", ABILITY_ASSIMILATION, 0 );
+    static { upgrades.add(ASSIMILATED_MULTIQUEEN); }
 
     // --- Buildings ---
     // -- Tier 0 --
@@ -192,7 +197,7 @@ public final class GameUnlocks {
     public static final Building RESIN_RESERVOIR_0 = new Building(9, "Basic Resin Reservoir", 0, "The base resin reservoir for the colony, holds 200 resin drops.", null, 0, 0, 50);
     static { buildings.add(RESIN_RESERVOIR_0); }
     // -- Tier 1 --
-    public static final Building ROYAL_CHAMBER_1 = new Building(10, "Expanded Royal Chamber", 1, "The upgraded queen chamber for the colony, holds 2 queens.", ROYAL_CHAMBER_0, 0, 0, 1000);
+    public static final Building ROYAL_CHAMBER_1 = new Building(10, "Expanded Royal Chamber", 1, "The upgraded queen chamber for the colony, holds 2 queens, still requires Multi-Queen.", ROYAL_CHAMBER_0, 0, 0, 1000);
     static { buildings.add(ROYAL_CHAMBER_1); }
     public static final Building EGG_CHAMBER_1 = new Building(11, "Expanded Egg Chamber", 1, "The upgraded egg chamber for the colony, holds 80 juvenile ants of each type.", EGG_CHAMBER_0, 0, 0, 100);
     static { buildings.add(EGG_CHAMBER_1); }
@@ -211,7 +216,7 @@ public final class GameUnlocks {
     public static final Building RESIN_RESERVOIR_1 = new Building(18, "Expanded Resin Reservoir", 1, "The upgraded resin reservoir for the colony, holds 500 resin drops.", RESIN_RESERVOIR_0, 0, 0, 400);
     static { buildings.add(RESIN_RESERVOIR_1); }
     // -- Tier 2 --
-    public static final Building ROYAL_CHAMBER_2 = new Building(19, "Reinforced Royal Chamber", 2, "The resin-reinforced queen chamber for the colony, holds 4 queens.", ROYAL_CHAMBER_1, 500, 0, 3000);
+    public static final Building ROYAL_CHAMBER_2 = new Building(19, "Reinforced Royal Chamber", 2, "The resin-reinforced queen chamber for the colony, holds 4 queens, still requires Multi-Queen.", ROYAL_CHAMBER_1, 500, 0, 3000);
     static { buildings.add(ROYAL_CHAMBER_2); }
     public static final Building EGG_CHAMBER_2 = new Building(20, "Reinforced Egg Chamber", 2, "The resin-reinforced egg chamber for the colony, holds 150 juvenile ants of each type.", EGG_CHAMBER_1, 200, 0, 1000);
     static { buildings.add(EGG_CHAMBER_2); }
@@ -230,7 +235,7 @@ public final class GameUnlocks {
     public static final Building RESIN_RESERVOIR_2 = new Building(27, "Reinforced Resin Reservoir", 2, "The resin-reinforced resin reservoir for the colony, holds 1200 resin drops.", RESIN_RESERVOIR_1, 400, 0, 2000);
     static { buildings.add(RESIN_RESERVOIR_2); }
     // -- Tier 3 --
-    public static final Building ROYAL_CHAMBER_3 = new Building(28, "Fortified Royal Chamber", 3, "The further fortified queen chamber for the colony, holds 10 queens.", ROYAL_CHAMBER_2, 1000, 0, 15000);
+    public static final Building ROYAL_CHAMBER_3 = new Building(28, "Fortified Royal Chamber", 3, "The further fortified queen chamber for the colony, holds 10 queens, still requires Multi-Queen.", ROYAL_CHAMBER_2, 1000, 0, 15000);
     static { buildings.add(ROYAL_CHAMBER_3); }
     public static final Building EGG_CHAMBER_3 = new Building(29, "Fortified Egg Chamber", 3, "The further fortified egg chamber for the colony, holds 500 juvenile ants of each type.", EGG_CHAMBER_2, 500, 0, 5000);
     static { buildings.add(EGG_CHAMBER_3); }
@@ -267,23 +272,21 @@ public final class GameUnlocks {
     static { buildings.add(BUILDING_COMPOSTER); }
 
     // --- Assimilations ---
+    public static final Assimilation ASSIMILATION_LEAFCUTTER = new Assimilation(1, "Leafcutter Assimilation", "After assimilating the leafcutter ant genome:" + ASSIMILATED_FARMING.getDescription(), ASSIMILATED_FARMING, 5000);
+    static { assimilations.add(ASSIMILATION_LEAFCUTTER); }
+    public static final Assimilation ASSIMILATION_PHARAOH = new Assimilation(2, "Pharaoh Assimilation", "After assimilating the pharaoh ant genome: " + ASSIMILATED_MULTIQUEEN.getDescription(), ASSIMILATED_MULTIQUEEN, 10000);
+    static { assimilations.add(ASSIMILATION_PHARAOH); }
+    public static final Assimilation ASSIMILATION_MARAUDER = new Assimilation(3, "Marauder Assimilation", "After assimilating the marauder ant genome: " + TYPE_MAJOR.getDescription(), TYPE_MAJOR, 15000);
+    static { assimilations.add(ASSIMILATION_MARAUDER); }
 
     // --- Synergies ---
 
     // --- Getters ---
-    public static List<Upgrade> getUpgrades() {
-        return Collections.unmodifiableList(upgrades);
-    }
+    public static List<Upgrade> getUpgrades() { return Collections.unmodifiableList(upgrades); }
 
-    public static List<Building> getBuildings() {
-        return Collections.unmodifiableList(buildings);
-    }
+    public static List<Building> getBuildings() { return Collections.unmodifiableList(buildings); }
 
-    public static List<Synergy> getSynergies() {
-        return Collections.unmodifiableList(synergies);
-    }
+    public static List<Synergy> getSynergies() { return Collections.unmodifiableList(synergies); }
 
-    public static List<Assimilation> getAssimilations() {
-        return Collections.unmodifiableList(assimilations);
-    }
+    public static List<Assimilation> getAssimilations() { return Collections.unmodifiableList(assimilations); }
 }

@@ -442,57 +442,47 @@ public final class GameConstants {
     static { colonyRanks.add(RANK_GIGA); }
     
     // --- Species ---
-    public static final Species SPECIES_OMNI = new Species(1, "Omni Ant", "Omniformica Grimunknowni", null, null);
+    public static final Species SPECIES_OMNI = new Species(1, "Omni Ant", "Omniformica Grimunknowni",  "omni/", null, null);
     static { species.add(SPECIES_OMNI); }
-    public static final Species SPECIES_LEAF = new Species(2, "Leaf-Cutter Ant", "Atta Cephalotes", null, null);
+    public static final Species SPECIES_LEAF = new Species(2, "Leaf-Cutter Ant", "Atta Cephalotes", "leaf/", GameUnlocks.ASSIMILATION_LEAFCUTTER, null);
     static { species.add(SPECIES_LEAF); }
+    public static final Species SPECIES_PHARAOH = new Species(3, "Pharaoh Ant", "Monomorium Pharaonis", "pharaoh/", GameUnlocks.ASSIMILATION_PHARAOH, null);
+    static { species.add(SPECIES_PHARAOH); }
+    public static final Species SPECIES_MARAUDER = new Species(4, "Marauder Ant", "Carebara Diversa", "marauder/", null, null);
+    static { species.add(SPECIES_MARAUDER); }
     
     // --- Getters ---
-    public static List<Biome> getBiomes() {
-        return Collections.unmodifiableList(biomes);
-    }
+    public static List<Biome> getBiomes() { return Collections.unmodifiableList(biomes); }
 
-    public static List<ResourceType> getResources() {
-        return Collections.unmodifiableList(resources);
-    }
+    public static List<ResourceType> getResources() { return Collections.unmodifiableList(resources); }
 
-    public static List<TimeOfDay> getTimesOfDay() {
-        return Collections.unmodifiableList(timesOfDay);
-    }
+    public static List<TimeOfDay> getTimesOfDay() { return Collections.unmodifiableList(timesOfDay); }  
 
-    public static List<MoonPhase> getMoonPhases() {
-        return Collections.unmodifiableList(moonPhases);
-    }
+    public static List<MoonPhase> getMoonPhases() { return Collections.unmodifiableList(moonPhases); }
 
-    public static List<Season> getSeasons() {
-        return Collections.unmodifiableList(seasons);
-    }
+    public static List<Season> getSeasons() { return Collections.unmodifiableList(seasons); }
 
-    public static List<Weather> getWeathers() {
-        return Collections.unmodifiableList(weathers);
-    }
+    public static List<Weather> getWeathers() { return Collections.unmodifiableList(weathers); }
 
-    public static List<AntStatus> getAntStatuses() {
-        return Collections.unmodifiableList(antStatuses);
-    }
+    public static List<AntStatus> getAntStatuses() { return Collections.unmodifiableList(antStatuses); }
 
-    public static List<AntType> getAntTypes() {
-        return Collections.unmodifiableList(antTypes);
-    }
+    public static List<MoveStatus> getMoveStatuses() { return Collections.unmodifiableList(moveStatuses); }
 
-    public static List<AntSubType> getAntSubTypes() {
-        return Collections.unmodifiableList(antSubTypes);
-    }
+    public static List<AntType> getAntTypes() { return Collections.unmodifiableList(antTypes); }
 
-    public static List<AntRole> getAntRoles() {
-        return Collections.unmodifiableList(antRoles);
-    }
+    public static List<AntSubType> getAntSubTypes() {  return Collections.unmodifiableList(antSubTypes); }
 
-    public static List<ColonyRank> getColonyRanks() {
-        return Collections.unmodifiableList(colonyRanks);
-    }
+    public static List<AntRole> getAntRoles() { return Collections.unmodifiableList(antRoles); }
 
-    public static List<Species> getSpecies() {
-        return Collections.unmodifiableList(species);
-    }
+    public static List<ColonyRank> getColonyRanks() { return Collections.unmodifiableList(colonyRanks); }
+
+    public static List<Species> getSpecies() { return Collections.unmodifiableList(species); }
+
+    public static List<Humidity> getHumidity() { return Collections.unmodifiableList(humidity); }
+
+    public static List<Temperature> getTemperature() { return Collections.unmodifiableList(temperature); }
+
+    public static List<BugType> getBugTypes() { return Collections.unmodifiableList(bugTypes); }
+
+    public static List<ImageIcon> getMisc() { return Collections.unmodifiableList(misc); }
 }
