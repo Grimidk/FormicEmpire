@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import com.grimidk.formicempire.classes.constants.misc.Species;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.Humidity;
 import com.grimidk.formicempire.classes.constants.world.MoonPhase;
@@ -301,7 +302,16 @@ public class World {
                     
                     if (dist > 1 && !isWaterBiome(ringBiome) && random.nextInt(100) < 30) {
                         int dynastyId = this.dynastyIdCounter++;
-                        Dynasty npcDynasty = new Dynasty(dynastyId, "Leaf Cutter Hive " + dynastyId, false, GameConstants.SPECIES_LEAF);
+                        
+                        // Random non-omni species
+                        List<Species> allSpecies = GameConstants.getSpecies();
+                        List<Species> nonOmni = new ArrayList<>();
+                        for (Species s : allSpecies) {
+                            if (s.getId() != 1) nonOmni.add(s);
+                        }
+                        Species randomSpecies = nonOmni.isEmpty() ? GameConstants.SPECIES_OMNI : nonOmni.get(random.nextInt(nonOmni.size()));
+                        
+                        Dynasty npcDynasty = new Dynasty(dynastyId, randomSpecies.getName() + " Hive " + dynastyId, false, randomSpecies);
                         npcDynasty.getStarterService().initializeDynasty(npcDynasty);
                         this.dynastys.add(npcDynasty);
                         

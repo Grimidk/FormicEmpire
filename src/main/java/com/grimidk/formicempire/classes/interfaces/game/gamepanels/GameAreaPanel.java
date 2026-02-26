@@ -369,7 +369,7 @@ public class GameAreaPanel extends ZeroGamePanel {
         for (AntType type : GameConstants.getAntTypes()) {
             if (type == GameConstants.TYPE_DEAD) continue; 
 
-            ImageIcon spriteIcon = type.getSprite();
+            ImageIcon spriteIcon = GameConstants.getAntSprite(type, colony.getSpecies());
             if (spriteIcon == null) continue; 
             
             Image sprite = spriteIcon.getImage();
@@ -413,7 +413,7 @@ public class GameAreaPanel extends ZeroGamePanel {
                         g2d.rotate(Math.toRadians(-ant.getR())); 
                     }
                     
-                    ImageIcon carriedSprite = ant.getCarryingAnt().getSprite();
+                    ImageIcon carriedSprite = GameConstants.getAntSprite(ant.getCarryingAnt(), colony.getSpecies());
                     if (carriedSprite != null) {
                         Image cSprite = carriedSprite.getImage();
                         int cW = (int)(w * 0.7);

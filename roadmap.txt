@@ -10,7 +10,6 @@ To Fix (By decreasing priority) :
 	High:
 	base upgrade sets
 	assimilation menu
-	species sprites (marauder - orange, Pharaoh - yellow, leafcutter - light red)
 	implenment multi queen and majors and improved farming properly 
 	assimilation earning and researching 
 	defeated dynasties list to show available assimilations

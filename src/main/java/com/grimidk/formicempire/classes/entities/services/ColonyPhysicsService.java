@@ -84,7 +84,7 @@ public class ColonyPhysicsService {
         for (Map.Entry<AntType, List<Ant>> entry : colony.getAntGroups().entrySet()) {
             if (entry.getKey() == GameConstants.TYPE_DEAD) continue;
             
-            ImageIcon sprite = entry.getKey().getSprite();
+            ImageIcon sprite = GameConstants.getAntSprite(entry.getKey(), colony.getSpecies());
             List<Ant> antList = entry.getValue();
             synchronized (antList) {
                 for (Ant ant : antList) {
@@ -189,7 +189,7 @@ public class ColonyPhysicsService {
                     if (ant.getRole() == GameConstants.ROLE_SCOUT || isGatherer(ant)) {
                          ant.moveTo(getRandomScoutPosition(colony));
                     } else {
-                         ant.moveTo(getRandomOverworldPosition(colony, ant.getAntType().getSprite()));
+                         ant.moveTo(getRandomOverworldPosition(colony, GameConstants.getAntSprite(ant.getAntType(), colony.getSpecies())));
                     }
                 }
             } else {
@@ -256,7 +256,7 @@ public class ColonyPhysicsService {
                     if (ant.getRole() == GameConstants.ROLE_SCOUT) {
                         ant.moveTo(getRandomScoutPosition(colony));
                     } else {
-                        ant.moveTo(getRandomOverworldPosition(colony, ant.getAntType().getSprite()));
+                        ant.moveTo(getRandomOverworldPosition(colony, GameConstants.getAntSprite(ant.getAntType(), colony.getSpecies())));
                     }
                 }
             }
