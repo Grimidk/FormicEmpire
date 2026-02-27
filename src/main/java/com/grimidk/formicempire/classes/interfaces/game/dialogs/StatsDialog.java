@@ -2,11 +2,13 @@ package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
+import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.Season;
 import com.grimidk.formicempire.classes.constants.world.Weather;
 import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.services.DynastyStatService;
 import com.grimidk.formicempire.classes.entities.services.ColonyLocationService;
 import com.grimidk.formicempire.classes.entities.services.ColonyStatsService;
@@ -204,8 +206,8 @@ public class StatsDialog extends ZeroDialog {
             return;
         }
 
-        com.grimidk.formicempire.classes.entities.Hex hex = world.getActiveHex();
-        com.grimidk.formicempire.classes.constants.world.Biome biome = hex.getBiome();
+        Hex hex = world.getActiveHex();
+        Biome biome = hex.getBiome();
 
         // Hex Coordinates & Basic Info
         model.addRow(new Object[]{"Hex", "Coordinates (Q, R)", hex.getQ() + ", " + hex.getR()});
@@ -232,7 +234,7 @@ public class StatsDialog extends ZeroDialog {
         model.addRow(new Object[]{"Neighbors", "South-East", getHexSummary(hex.getSouthEast())});
     }
 
-    private String getHexSummary(com.grimidk.formicempire.classes.entities.Hex neighbor) {
+    private String getHexSummary(Hex neighbor) {
         if (neighbor == null) return "Edge of World";
         String summary = (neighbor.getBiome() != null ? neighbor.getBiome().getName() : "Unknown");
         if (neighbor.getColony() != null) {
