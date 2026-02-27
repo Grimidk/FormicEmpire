@@ -98,7 +98,7 @@ public class UpgradeDialog extends ZeroDialog {
         }
 
         // --- Synergies Tab ---
-        if (colony.hasUpgrade(GameUnlocks.ABILITY_SYNERGY)) { // To implement
+        if (colony.hasUpgrade(GameUnlocks.ABILITY_SYNERGY)) { 
             if (synergyPanel == null) {
                 synergyPanel = createPlaceholderPanel("Synergies - Coming Soon");
             }
@@ -148,6 +148,26 @@ public class UpgradeDialog extends ZeroDialog {
             public void actionPerformed(ActionEvent e) {
                 if (tabIndexMap.containsKey(TAB_BUILD)) {
                     tabbedPane.setSelectedIndex(tabIndexMap.get(TAB_BUILD));
+                }
+            }
+        });
+
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_I, 0), "switchToAssimilation");
+        actionMap.put("switchToAssimilation", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (tabIndexMap.containsKey(TAB_ASSIMILATION)) {
+                    tabbedPane.setSelectedIndex(tabIndexMap.get(TAB_ASSIMILATION));
+                }
+            }
+        });
+
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_O, 0), "switchToSynergy");
+        actionMap.put("switchToSynergy", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (tabIndexMap.containsKey(TAB_SYNERGY)) {
+                    tabbedPane.setSelectedIndex(tabIndexMap.get(TAB_SYNERGY));
                 }
             }
         });
@@ -663,12 +683,16 @@ public class UpgradeDialog extends ZeroDialog {
             panel.add(bar, BorderLayout.CENTER);
 
             JButton cancel = new JButton("Cancel");
+            cancel.setFocusable(false);
             cancel.addActionListener(e -> {
                 colony.getDynasty().setCurrentAssimilation(null);
                 colony.getDynasty().setAssimilationProgress(0);
                 updateData();
             });
-            panel.add(cancel, BorderLayout.EAST);
+            
+            JPanel eastPanel = new JPanel(new GridBagLayout());
+            eastPanel.add(cancel);
+            panel.add(eastPanel, BorderLayout.EAST);
 
             JLabel info = new JLabel("Assign Researchers to contribute to genetic assimilation.");
             info.setHorizontalAlignment(SwingConstants.CENTER);

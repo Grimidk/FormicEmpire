@@ -813,6 +813,7 @@ public class Colony {
                 this.automationService.runAutomation(this);
             }
             this.populationService.runRoleAssignment(this); 
+            this.runResearch();
             this.sumarizationService.runHourlyLite(this, biome);
         }
     }

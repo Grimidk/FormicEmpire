@@ -90,7 +90,9 @@ public class GamePanel extends ZeroGamePanel {
         Runnable handleBackButtonCallback = this::handleBackButton;
         Runnable showHatchRateDialogCallback = this::showHatchRateDialog;        
         Runnable showResearchDialogCallback = this::showResearchDialog;
-        Runnable showBuildDialogCallback = this::showBuildDialog;  
+        Runnable showBuildDialogCallback = this::showBuildDialog;
+        Runnable showAssimilationDialogCallback = this::showAssimilationDialog;
+        Runnable showSynergyDialogCallback = this::showSynergyDialog;
         Runnable showAbilitiesDialogCallback = this::showAbilitiesDialog;
         Runnable showMapDialogCallback = this::showMapDialog; 
         Runnable showStatsDialogCallback = this::showStatsDialog;
@@ -114,6 +116,8 @@ public class GamePanel extends ZeroGamePanel {
             showHatchRateDialogCallback, 
             showResearchDialogCallback,
             showBuildDialogCallback,
+            showAssimilationDialogCallback,
+            showSynergyDialogCallback,
             showRoleManagementDialogCallback,
             showAbilitiesDialogCallback,
             showStatsDialogCallback,
@@ -232,6 +236,30 @@ public class GamePanel extends ZeroGamePanel {
         }
         upgradeDialog = new UpgradeDialog(frame, colony);
         upgradeDialog.showDialog(UpgradeDialog.TAB_BUILD);
+    }
+
+    private void showAssimilationDialog() {
+        Engine engine = frame.getEngine();
+        Colony colony = getColonyFromEngine(engine);
+        if (colony == null || !colony.isPlayer()) return;
+        
+        if (upgradeDialog != null) {
+            upgradeDialog.dispose();
+        }
+        upgradeDialog = new UpgradeDialog(frame, colony);
+        upgradeDialog.showDialog(UpgradeDialog.TAB_ASSIMILATION);
+    }
+
+    private void showSynergyDialog() {
+        Engine engine = frame.getEngine();
+        Colony colony = getColonyFromEngine(engine);
+        if (colony == null || !colony.isPlayer()) return;
+        
+        if (upgradeDialog != null) {
+            upgradeDialog.dispose();
+        }
+        upgradeDialog = new UpgradeDialog(frame, colony);
+        upgradeDialog.showDialog(UpgradeDialog.TAB_SYNERGY);
     }
 
     private void showAbilitiesDialog() {
@@ -583,6 +611,8 @@ public class GamePanel extends ZeroGamePanel {
             if (controlPanel != null) {
                 controlPanel.updateResearchMenu(colony.hasUpgrade(GameUnlocks.ABILITY_RESEARCH));
                 controlPanel.updateBuildMenu(colony.hasUpgrade(GameUnlocks.ABILITY_BUILD));
+                controlPanel.updateAssimilationMenu(colony.hasUpgrade(GameUnlocks.ABILITY_ASSIMILATION));
+                controlPanel.updateSynergyMenu(colony.hasUpgrade(GameUnlocks.ABILITY_SYNERGY));
                 controlPanel.updateAbilitiesMenu(colony.hasUpgrade(GameUnlocks.ABILITY_FORCED_FLIGHT));
                 controlPanel.updateDynastyMenu(colony.hasUpgrade(GameUnlocks.ABILITY_DYNASTY));
             }
@@ -590,6 +620,8 @@ public class GamePanel extends ZeroGamePanel {
              if (controlPanel != null) {
                 controlPanel.updateResearchMenu(false);
                 controlPanel.updateBuildMenu(false);
+                controlPanel.updateAssimilationMenu(false);
+                controlPanel.updateSynergyMenu(false);
                 controlPanel.updateAbilitiesMenu(false);
                 controlPanel.updateDynastyMenu(false);
             }

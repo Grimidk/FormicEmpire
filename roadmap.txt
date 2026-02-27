@@ -10,11 +10,8 @@ To Fix (By decreasing priority) :
 	High:
 	base upgrade sets
 	genetic stagnation (obscured until below (80%))
-	dynasty wide assimilation
 
 	Mid:
-	cancel button ins assimilation
-	hotkey for assimilation
 	make stats wider so there is no need to pass
 
 	Low:

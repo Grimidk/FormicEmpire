@@ -46,7 +46,7 @@ public class StatsDialog extends ZeroDialog {
     private final Runnable refreshTask = this::liveUpdate;
 
     public StatsDialog(JFrame owner, Colony colony, Engine engine) {
-        super(owner, "Statistics", new Dimension(800, 600));
+        super(owner, "Statistics", new Dimension(1000, 600));
         this.colony = colony;
         this.engine = engine;
         this.dynastyStatsService = new DynastyStatService(); 
@@ -463,7 +463,7 @@ public class StatsDialog extends ZeroDialog {
         if (colony.hasUpgrade(GameUnlocks.ROLE_HUNTER)) {
             int count = colony.getAssignedRoleCount(GameConstants.ROLE_HUNTER);
             float rate = stats.getCollectingRate(colony);
-            int daily = (int)(count * rate * 24);
+            int daily = (int)(count * rate * 24); 
             model.addRow(new Object[]{"Hunting", count + " Hunters", rate + " /hr", "~" + daily + " pwr/day"});
         }
 
@@ -471,7 +471,7 @@ public class StatsDialog extends ZeroDialog {
         if (colony.hasUpgrade(GameUnlocks.ROLE_MINER)) {
             int count = colony.getAssignedRoleCount(GameConstants.ROLE_MINER);
             float rate = stats.getCollectingRate(colony);
-            int daily = (int)(count * rate * 24);
+            int daily = (int)(count * rate * 24); 
             model.addRow(new Object[]{"Mining", count + " Miners", rate + " /hr", "~" + daily + " pwr/day"});
         }
         

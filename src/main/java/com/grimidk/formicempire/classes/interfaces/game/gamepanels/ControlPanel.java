@@ -18,6 +18,8 @@ public class ControlPanel extends ZeroGamePanel {
     private final Runnable showHatchRateDialogCallback;
     private final Runnable showResearchDialogCallback;
     private final Runnable showBuildDialogCallback;
+    private final Runnable showAssimilationDialogCallback;
+    private final Runnable showSynergyDialogCallback;
     private final RoleManagementCallback showRoleManagementDialogCallback;
     private final Runnable showAbilitiesDialogCallback;
     private final Runnable showStatsDialogCallback; 
@@ -34,6 +36,8 @@ public class ControlPanel extends ZeroGamePanel {
     private final JPopupMenu gameMenu = new JPopupMenu();
     private JMenuItem manageResearch;
     private JMenuItem manageBuilding;
+    private JMenuItem manageAssimilation;
+    private JMenuItem manageSynergy;
     private JMenuItem manageAbilities;
     private JMenuItem manageDynasty;
     
@@ -50,6 +54,8 @@ public class ControlPanel extends ZeroGamePanel {
                         Runnable showHatchRateDialogCallback, 
                         Runnable showResearchDialogCallback, 
                         Runnable showBuildDialogCallback,
+                        Runnable showAssimilationDialogCallback,
+                        Runnable showSynergyDialogCallback,
                         RoleManagementCallback showRoleManagementDialogCallback,
                         Runnable showAbilitiesDialogCallback,
                         Runnable showStatsDialogCallback,
@@ -63,6 +69,8 @@ public class ControlPanel extends ZeroGamePanel {
         this.showHatchRateDialogCallback = showHatchRateDialogCallback;
         this.showResearchDialogCallback = showResearchDialogCallback;
         this.showBuildDialogCallback = showBuildDialogCallback;
+        this.showAssimilationDialogCallback = showAssimilationDialogCallback;
+        this.showSynergyDialogCallback = showSynergyDialogCallback;
         this.showRoleManagementDialogCallback = showRoleManagementDialogCallback;
         this.showAbilitiesDialogCallback = showAbilitiesDialogCallback;
         this.showStatsDialogCallback = showStatsDialogCallback;
@@ -162,12 +170,14 @@ public class ControlPanel extends ZeroGamePanel {
         // --- Game Menu Setup ---
         JMenuItem backToGame = new JMenuItem("Back to Game");
         JMenuItem toggleView = new JMenuItem("Toggle View (A)");
-        JMenuItem showMap = new JMenuItem("World Map (I)"); 
+        JMenuItem showMap = new JMenuItem("World Map (M)"); 
         JMenuItem showStats = new JMenuItem("Colony Statistics (X)");
         JMenuItem manageRoles = new JMenuItem("Manage Roles (Q/W/E/R/T)");
         JMenuItem manageHatchRates = new JMenuItem("Manage Hatch Rates (P)");
         manageResearch = new JMenuItem("Research (Y)");
         manageBuilding = new JMenuItem("Build (U)");
+        manageAssimilation = new JMenuItem("Assimilation (I)");
+        manageSynergy = new JMenuItem("Synergies (O)");
         manageAbilities = new JMenuItem("Abilities (Z)");
         manageDynasty = new JMenuItem("Dynasty (S)");
         JMenuItem openSettings = new JMenuItem("Settings");
@@ -186,6 +196,12 @@ public class ControlPanel extends ZeroGamePanel {
         
         manageBuilding.addActionListener(e -> showBuildDialogCallback.run());
         manageBuilding.setVisible(false);
+
+        manageAssimilation.addActionListener(e -> showAssimilationDialogCallback.run());
+        manageAssimilation.setVisible(false);
+
+        manageSynergy.addActionListener(e -> showSynergyDialogCallback.run());
+        manageSynergy.setVisible(false);
         
         manageAbilities.addActionListener(e -> showAbilitiesDialogCallback.run());
         manageAbilities.setVisible(false);
@@ -230,6 +246,8 @@ public class ControlPanel extends ZeroGamePanel {
         gameMenu.add(manageHatchRates);
         gameMenu.add(manageResearch);
         gameMenu.add(manageBuilding);
+        gameMenu.add(manageAssimilation);
+        gameMenu.add(manageSynergy);
         gameMenu.add(manageAbilities);
         gameMenu.add(manageDynasty);
         gameMenu.add(openSettings);
@@ -326,7 +344,27 @@ public class ControlPanel extends ZeroGamePanel {
             }
         });
 
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_I, 0), "openMap");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_I, 0), "openAssimilation");
+        actionMap.put("openAssimilation", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (manageAssimilation.isVisible()) {
+                    showAssimilationDialogCallback.run();
+                }
+            }
+        });
+
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_O, 0), "openSynergy");
+        actionMap.put("openSynergy", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (manageSynergy.isVisible()) {
+                    showSynergyDialogCallback.run();
+                }
+            }
+        });
+
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_M, 0), "openMap");
         actionMap.put("openMap", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -394,6 +432,18 @@ public class ControlPanel extends ZeroGamePanel {
     public void updateBuildMenu(boolean visible) {
         if (manageBuilding != null) {
             manageBuilding.setVisible(visible);
+        }
+    }
+
+    public void updateAssimilationMenu(boolean visible) {
+        if (manageAssimilation != null) {
+            manageAssimilation.setVisible(visible);
+        }
+    }
+
+    public void updateSynergyMenu(boolean visible) {
+        if (manageSynergy != null) {
+            manageSynergy.setVisible(visible);
         }
     }
     

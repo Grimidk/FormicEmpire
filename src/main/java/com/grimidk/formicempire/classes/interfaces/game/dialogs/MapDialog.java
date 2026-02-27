@@ -48,7 +48,7 @@ public class MapDialog extends ZeroDialog {
         add(mapPanel, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
 
-        registerCloseKey(KeyEvent.VK_I);
+        registerCloseKey(KeyEvent.VK_M);
     }
 
     private void travelToHomeHex() {
