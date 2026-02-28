@@ -171,9 +171,9 @@ public final class GameUnlocks {
     public static final Upgrade ABILITY_ABILITY = new Upgrade(900, "Ability Menu", "Abilities Unlocked", "Allows you to see the abilities menu and use active abilities.", null, 0);
     static { upgrades.add(ABILITY_ABILITY); }
     // -- Assimilated --
-    public static final Upgrade ASSIMILATED_FARMING = new Upgrade(1001, "Assimilated Farming", "Assimilated Farming", "Your dynasty has learned how to farm fungi more efficiently. By getting 1 extra mushroom matter per plant and protein.", ABILITY_ASSIMILATION, 0 );
+    public static final Upgrade ASSIMILATED_FARMING = new Upgrade(1001, "Assimilated Farming", "Ancenstral Farming Techniques", "Your dynasty has learned how to farm fungi more efficiently. By getting 1 extra mushroom matter per plant and protein.", ABILITY_ASSIMILATION, 0 );
     static { upgrades.add(ASSIMILATED_FARMING); }
-    public static final Upgrade ASSIMILATED_MULTIQUEEN = new Upgrade(1002, "Assimilated Multi-Queen", "Assimilated Herding", "Your dynasty can now handle multiple queens in a single colony, still requires the upgrading of the Royal Chamber.", ABILITY_ASSIMILATION, 0 );
+    public static final Upgrade ASSIMILATED_MULTIQUEEN = new Upgrade(1002, "Assimilated Multi-Queen", "Multi Royal Mandate", "Your dynasty can now handle multiple queens in a single colony, still requires the upgrading of the Royal Chamber.", ABILITY_ASSIMILATION, 0 );
     static { upgrades.add(ASSIMILATED_MULTIQUEEN); }
 
     // --- Buildings ---

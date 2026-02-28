@@ -14,28 +14,36 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
 
 public class DynastyManagementDialog extends ZeroDialog {
 
+    public static final int TAB_OVERVIEW = 0;
+    public static final int TAB_TRADE = 1;
+
     private final Dynasty dynasty;
     private final Engine engine;
-    private final java.util.function.Consumer<Colony> onGoToColony;
+    private final Consumer<Colony> onGoToColony;
 
     private final JTabbedPane tabbedPane;
+    private final Map<Integer, Integer> tabIndexMap = new HashMap<>();
     
     private OverviewPanel overviewPanel;
     private TradePanel tradePanel;
 
     private final Runnable refreshTask = this::liveUpdate;
 
-    public DynastyManagementDialog(JFrame owner, Dynasty dynasty, Engine engine, java.util.function.Consumer<Colony> onGoToColony) {
+    public DynastyManagementDialog(JFrame owner, Dynasty dynasty, Engine engine, Consumer<Colony> onGoToColony) {
         super(owner, "Dynasty Management", new Dimension(1100, 700));
         this.dynasty = dynasty;
         this.engine = engine;
@@ -45,12 +53,17 @@ public class DynastyManagementDialog extends ZeroDialog {
         add(tabbedPane, BorderLayout.CENTER);
 
         refreshDialog();
+        initKeyBindings();
         
         if (this.engine != null) {
             this.engine.addHourTickListener(refreshTask);
         }
 
         this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowOpened(WindowEvent e) {
+                tabbedPane.requestFocusInWindow();
+            }
             @Override
             public void windowClosed(WindowEvent e) {
                 if (engine != null) {
@@ -64,8 +77,17 @@ public class DynastyManagementDialog extends ZeroDialog {
                 }
             }
         });
+    }
 
-        registerCloseKey(KeyEvent.VK_S);
+    public void showDialog(int tabIndex) {
+        setTab(tabIndex);
+        super.showDialog();
+    }
+
+    public void setTab(int tabIndex) {
+        if (tabIndexMap.containsKey(tabIndex)) {
+            tabbedPane.setSelectedIndex(tabIndexMap.get(tabIndex));
+        }
     }
 
     public void liveUpdate() {
@@ -100,6 +122,8 @@ public class DynastyManagementDialog extends ZeroDialog {
         if (selectedIndex < 0) selectedIndex = 0;
 
         tabbedPane.removeAll();
+        tabIndexMap.clear();
+        int currentIndex = 0;
 
         boolean currentAuto = dynasty.hasUpgrade(GameUnlocks.ABILITY_AUTOMATION);
         boolean currentAutoBuild = dynasty.hasUpgrade(GameUnlocks.ABILITY_MANAGEMENT);
@@ -109,17 +133,44 @@ public class DynastyManagementDialog extends ZeroDialog {
         }
         overviewPanel.updateData();
         tabbedPane.addTab("Overview", overviewPanel);
+        tabIndexMap.put(TAB_OVERVIEW, currentIndex++);
 
         if (dynasty.hasUpgrade(GameUnlocks.ABILITY_TRADE)) {
             if (tradePanel == null) {
                 tradePanel = new TradePanel();
             }
             tabbedPane.addTab("Trade", tradePanel);
+            tabIndexMap.put(TAB_TRADE, currentIndex++);
         }
 
         if (selectedIndex < tabbedPane.getTabCount()) {
             tabbedPane.setSelectedIndex(selectedIndex);
         }
+    }
+
+    private void initKeyBindings() {
+        InputMap inputMap = getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        ActionMap actionMap = getRootPane().getActionMap();
+
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0), "switchToOverview");
+        actionMap.put("switchToOverview", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (tabIndexMap.containsKey(TAB_OVERVIEW)) {
+                    tabbedPane.setSelectedIndex(tabIndexMap.get(TAB_OVERVIEW));
+                }
+            }
+        });
+
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0), "switchToTrade");
+        actionMap.put("switchToTrade", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (tabIndexMap.containsKey(TAB_TRADE)) {
+                    tabbedPane.setSelectedIndex(tabIndexMap.get(TAB_TRADE));
+                }
+            }
+        });
     }
 
     interface LiveUpdatePanel {
@@ -207,11 +258,13 @@ public class DynastyManagementDialog extends ZeroDialog {
                 if (col < 0) return;
                 
                 if (row >= 0 && row < displayedColonies.size()) {
-                    Colony c = displayedColonies.get(row);
-                    if (col == autoBuildCol) {
-                        c.setAutoBuildEnabled((Boolean) model.getValueAt(row, col));
-                    } else if (col == automationCol) {
-                        c.setAutomationEnabled((Boolean) model.getValueAt(row, col));
+                    Colony c = displayedColonies.size() > row ? displayedColonies.get(row) : null;
+                    if (c != null) {
+                        if (col == autoBuildCol) {
+                            c.setAutoBuildEnabled((Boolean) model.getValueAt(row, col));
+                        } else if (col == automationCol) {
+                            c.setAutomationEnabled((Boolean) model.getValueAt(row, col));
+                        }
                     }
                 }
             });

@@ -2,6 +2,7 @@ package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
+import com.grimidk.formicempire.classes.constants.misc.Species;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.Season;
 import com.grimidk.formicempire.classes.constants.world.Weather;
@@ -25,6 +26,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class StatsDialog extends ZeroDialog {
 
@@ -253,6 +255,16 @@ public class StatsDialog extends ZeroDialog {
         model.addRow(new Object[]{"Colony", "Species", colony.getSpecies() != null ? colony.getSpecies().getName() : "Unknown"});
         model.addRow(new Object[]{"Colony", "Species (Scientific)", colony.getSpecies() != null ? colony.getSpecies().getScientific() : "Unknown"});
         model.addRow(new Object[]{"Colony", "ID", colony.getId()});
+        model.addRow(new Object[]{"Colony", "Age", colony.getAge() + " days"});
+        
+        if (colony.getQueens().isEmpty()) {
+            model.addRow(new Object[]{"Colony", "Queen Status", "MISSING (" + colony.getDaysWithoutQueen() + " days)"});
+        } else {
+            model.addRow(new Object[]{"Colony", "Queen Status", "Healthy (" + colony.getQueens().size() + " total)"});
+        }
+
+        model.addRow(new Object[]{"Colony", "Automation", colony.isAutomationEnabled() ? "ENABLED" : "Disabled"});
+        model.addRow(new Object[]{"Colony", "Auto-Build", colony.isAutoBuildEnabled() ? "ENABLED" : "Disabled"});
 
         // World Info
         World world = engine != null ? engine.getWorld() : null;
@@ -295,6 +307,23 @@ public class StatsDialog extends ZeroDialog {
         model.addRow(new Object[]{null, "Dynasty", "Total Colonies", dynastyStatsService.getTotalColonies(dynasty)});
         model.addRow(new Object[]{null, "Dynasty", "Global Population", dynastyStatsService.getTotalPopulation(dynasty)});
         model.addRow(new Object[]{null, "Dynasty", "Total Nuptial Flights", dynasty.getTotalNuptialFlights()});
+
+        // Conquest & Expansion
+        model.addRow(new Object[]{null, null, "------", "------"});
+        String defeated = dynasty.getDefeatedSpeciesIds().stream()
+            .map(id -> {
+                for (Species s : GameConstants.getSpecies()) {
+                    if (s.getId() == id) return s.getName();
+                }
+                return "ID:" + id;
+            })
+            .collect(Collectors.joining(", "));
+        model.addRow(new Object[]{null, "Dynasty", "Defeated Species", defeated.isEmpty() ? "None" : defeated});
+        
+        String absorbed = dynasty.getAbsorbedDynastyIds().stream()
+            .map(String::valueOf)
+            .collect(Collectors.joining(", "));
+        model.addRow(new Object[]{null, "Dynasty", "Absorbed IDs", absorbed.isEmpty() ? "None" : absorbed});
 
         // Unlocks
         model.addRow(new Object[]{null, null, "------", "------"});
@@ -453,10 +482,10 @@ public class StatsDialog extends ZeroDialog {
 
         // Farmers
         if (colony.hasUpgrade(GameUnlocks.ROLE_FARMER)) {
-            int count = colony.getAssignedRoleCount(GameConstants.ROLE_FARMER);
+            int count = stats.getEffectiveFarmerCount(colony);
             float rate = stats.getConversionRate(colony);
             int daily = (int)(count * rate * 1440);
-            model.addRow(new Object[]{"Farming", count + " Farmers", rate + " /min", "~" + daily + " convert/day"});
+            model.addRow(new Object[]{"Farming", count + " Eff. Farmers", rate + " /min", "~" + daily + " convert/day"});
         }
 
         // Hunters
@@ -501,7 +530,7 @@ public class StatsDialog extends ZeroDialog {
             
             model.addRow(new Object[]{"Research", 
                 researchers + " Res / " + assistants + " Asst", 
-                "Local Output", 
+                "Contribution", 
                 "+" + totalDaily + " pts/day"});
         }
 

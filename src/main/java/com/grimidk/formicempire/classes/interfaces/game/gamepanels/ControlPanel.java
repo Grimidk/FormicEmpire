@@ -26,6 +26,7 @@ public class ControlPanel extends ZeroGamePanel {
     private final Runnable toggleViewCallback;
     private final Runnable showMapDialogCallback;
     private final Runnable showDynastyDialogCallback;
+    private final Runnable showTradeDialogCallback;
 
     // --- UI Components ---
     private final JButton speedUpButton = new JButton("Speed+");
@@ -40,6 +41,7 @@ public class ControlPanel extends ZeroGamePanel {
     private JMenuItem manageSynergy;
     private JMenuItem manageAbilities;
     private JMenuItem manageDynasty;
+    private JMenuItem manageTrade;
     
     // --- State ---
     private int speedLevel = 1;
@@ -61,7 +63,8 @@ public class ControlPanel extends ZeroGamePanel {
                         Runnable showStatsDialogCallback,
                         Runnable toggleViewCallback,
                         Runnable showMapDialogCallback,
-                        Runnable showDynastyDialogCallback) {
+                        Runnable showDynastyDialogCallback,
+                        Runnable showTradeDialogCallback) {
         super(new FlowLayout(FlowLayout.RIGHT));
         
         this.frame = frame;
@@ -77,6 +80,7 @@ public class ControlPanel extends ZeroGamePanel {
         this.toggleViewCallback = toggleViewCallback;
         this.showMapDialogCallback = showMapDialogCallback;
         this.showDynastyDialogCallback = showDynastyDialogCallback;
+        this.showTradeDialogCallback = showTradeDialogCallback;
 
         initComponents();
         initLayout();        
@@ -169,7 +173,7 @@ public class ControlPanel extends ZeroGamePanel {
 
         // --- Game Menu Setup ---
         JMenuItem backToGame = new JMenuItem("Back to Game");
-        JMenuItem toggleView = new JMenuItem("Toggle View (A)");
+        JMenuItem toggleView = new JMenuItem("Toggle View (Z)");
         JMenuItem showMap = new JMenuItem("World Map (M)"); 
         JMenuItem showStats = new JMenuItem("Colony Statistics (X)");
         JMenuItem manageRoles = new JMenuItem("Manage Roles (Q/W/E/R/T)");
@@ -178,8 +182,10 @@ public class ControlPanel extends ZeroGamePanel {
         manageBuilding = new JMenuItem("Build (U)");
         manageAssimilation = new JMenuItem("Assimilation (I)");
         manageSynergy = new JMenuItem("Synergies (O)");
-        manageAbilities = new JMenuItem("Abilities (Z)");
-        manageDynasty = new JMenuItem("Dynasty (S)");
+        manageAbilities = new JMenuItem("Abilities (C)");
+        manageDynasty = new JMenuItem("Dynasty (A)");
+        manageTrade = new JMenuItem("Trade Routes (S)");
+
         JMenuItem openSettings = new JMenuItem("Settings");
         JMenuItem showTutorial = new JMenuItem("Show Tutorial");
         JMenuItem quitToMenu = new JMenuItem("Quit to Main Menu");
@@ -208,6 +214,9 @@ public class ControlPanel extends ZeroGamePanel {
 
         manageDynasty.addActionListener(e -> showDynastyDialogCallback.run());
         manageDynasty.setVisible(false);
+
+        manageTrade.addActionListener(e -> showTradeDialogCallback.run());
+        manageTrade.setVisible(false);
         
         openSettings.addActionListener(e -> {
             Engine engine = frame.getEngine();
@@ -250,6 +259,7 @@ public class ControlPanel extends ZeroGamePanel {
         gameMenu.add(manageSynergy);
         gameMenu.add(manageAbilities);
         gameMenu.add(manageDynasty);
+        gameMenu.add(manageTrade);
         gameMenu.add(openSettings);
         gameMenu.add(showTutorial);
         gameMenu.add(new JSeparator());
@@ -272,7 +282,7 @@ public class ControlPanel extends ZeroGamePanel {
             }
         });
 
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0), "toggleView");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, 0), "toggleView");
         actionMap.put("toggleView", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -380,7 +390,7 @@ public class ControlPanel extends ZeroGamePanel {
             }
         });
         
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, 0), "openAbilities");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0), "openAbilities");
         actionMap.put("openAbilities", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -390,12 +400,22 @@ public class ControlPanel extends ZeroGamePanel {
             }
         });
 
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0), "openDynasty");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0), "openDynasty");
         actionMap.put("openDynasty", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (manageDynasty.isVisible()) {
                     showDynastyDialogCallback.run();
+                }
+            }
+        });
+
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0), "openTrade");
+        actionMap.put("openTrade", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (manageTrade.isVisible()) {
+                    showTradeDialogCallback.run();
                 }
             }
         });
@@ -456,6 +476,12 @@ public class ControlPanel extends ZeroGamePanel {
     public void updateDynastyMenu(boolean visible) {
         if (manageDynasty != null) {
             manageDynasty.setVisible(visible);
+        }
+    }
+
+    public void updateTradeMenu(boolean visible) {
+        if (manageTrade != null) {
+            manageTrade.setVisible(visible);
         }
     }
 }

@@ -43,7 +43,7 @@ public class AbilitiesDialog extends ZeroDialog {
         scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         add(scrollPane, BorderLayout.CENTER);
         
-        registerCloseKey(KeyEvent.VK_Z);
+        registerCloseKey(KeyEvent.VK_C);
     }
 
     @Override

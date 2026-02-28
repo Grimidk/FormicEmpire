@@ -12,7 +12,7 @@ To Fix (By decreasing priority) :
 	genetic stagnation (obscured until below (80%))
 
 	Mid:
-	make stats wider so there is no need to pass
+	(none right now)
 
 	Low:
 	breeders go out of the colony in nuptial

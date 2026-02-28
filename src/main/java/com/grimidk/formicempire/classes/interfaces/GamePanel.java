@@ -97,6 +97,7 @@ public class GamePanel extends ZeroGamePanel {
         Runnable showMapDialogCallback = this::showMapDialog; 
         Runnable showStatsDialogCallback = this::showStatsDialog;
         Runnable showDynastyDialogCallback = this::showDynastyDialog;
+        Runnable showTradeDialogCallback = this::showTradeDialog;
         ControlPanel.RoleManagementCallback showRoleManagementDialogCallback = this::showRoleManagementDialog;
         
         Runnable toggleViewCallback = () -> {
@@ -123,7 +124,8 @@ public class GamePanel extends ZeroGamePanel {
             showStatsDialogCallback,
             toggleViewCallback,
             showMapDialogCallback,
-            showDynastyDialogCallback); 
+            showDynastyDialogCallback,
+            showTradeDialogCallback); 
     }
     
     private void updateGameAreaSize() {
@@ -304,12 +306,37 @@ public class GamePanel extends ZeroGamePanel {
         Colony colony = getColonyFromEngine(engine);
         if (colony == null || colony.getDynasty() == null) return;
 
+        if (dynastyDialog != null && dynastyDialog.isShowing()) {
+            dynastyDialog.setTab(DynastyManagementDialog.TAB_OVERVIEW);
+            dynastyDialog.requestFocus();
+            return;
+        }
+
         if (dynastyDialog != null) {
             dynastyDialog.dispose();
         }
 
         dynastyDialog = new DynastyManagementDialog(frame, colony.getDynasty(), engine, this::handleGoToColony);
-        dynastyDialog.showDialog();
+        dynastyDialog.showDialog(DynastyManagementDialog.TAB_OVERVIEW);
+    }
+
+    private void showTradeDialog() {
+        Engine engine = frame.getEngine();
+        Colony colony = getColonyFromEngine(engine);
+        if (colony == null || colony.getDynasty() == null) return;
+
+        if (dynastyDialog != null && dynastyDialog.isShowing()) {
+            dynastyDialog.setTab(DynastyManagementDialog.TAB_TRADE);
+            dynastyDialog.requestFocus();
+            return;
+        }
+
+        if (dynastyDialog != null) {
+            dynastyDialog.dispose();
+        }
+
+        dynastyDialog = new DynastyManagementDialog(frame, colony.getDynasty(), engine, this::handleGoToColony);
+        dynastyDialog.showDialog(DynastyManagementDialog.TAB_TRADE);
     }
 
     private void handleGoToColony(Colony target) {
@@ -331,7 +358,6 @@ public class GamePanel extends ZeroGamePanel {
                     updateGameAreaSize();
                     
                     if (triggerManager != null) {
-                        // Notify trigger manager of colony switch if needed
                     }
                     break;
                 }
@@ -615,6 +641,7 @@ public class GamePanel extends ZeroGamePanel {
                 controlPanel.updateSynergyMenu(colony.hasUpgrade(GameUnlocks.ABILITY_SYNERGY));
                 controlPanel.updateAbilitiesMenu(colony.hasUpgrade(GameUnlocks.ABILITY_FORCED_FLIGHT));
                 controlPanel.updateDynastyMenu(colony.hasUpgrade(GameUnlocks.ABILITY_DYNASTY));
+                controlPanel.updateTradeMenu(colony.hasUpgrade(GameUnlocks.ABILITY_TRADE));
             }
         } else {
              if (controlPanel != null) {
@@ -624,6 +651,7 @@ public class GamePanel extends ZeroGamePanel {
                 controlPanel.updateSynergyMenu(false);
                 controlPanel.updateAbilitiesMenu(false);
                 controlPanel.updateDynastyMenu(false);
+                controlPanel.updateTradeMenu(false);
             }
         }
     }
