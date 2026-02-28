@@ -8,8 +8,7 @@ To Fix (By decreasing priority) :
 	(none right now)
 	
 	High:
-	base upgrade sets
-	genetic stagnation (obscured until below (80%))
+	(none right now)
 
 	Mid:
 	(none right now)
@@ -25,6 +24,7 @@ To Feature (to be done in order):
 Needed for launch (v1.0) (Launch Version):
 	Priority:
 	trade routes (async with roles and incoming outgoing recurrent and one time and travel time and danger level and boring tunnels)
+	genetic stagnation (obscured until below (80%)) every nuptial, assimilation gives base 5% after cloning (unlocked after 25?), alliances can increase while allied, stagnation = success chance to spread
 
 	Everything else :
 	auxiliary room sprites (storage (resources), farm (shroom), nurse (bedding), royal (nests and science))

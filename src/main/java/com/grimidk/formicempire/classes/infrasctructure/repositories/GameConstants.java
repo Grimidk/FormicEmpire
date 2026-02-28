@@ -20,6 +20,7 @@ import com.grimidk.formicempire.classes.constants.world.Weather;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import javax.swing.ImageIcon;
 import java.net.URL; 
 import java.util.HashMap;
@@ -464,13 +465,31 @@ public final class GameConstants {
     static { colonyRanks.add(RANK_GIGA); }
     
     // --- Species ---
-    public static final Species SPECIES_OMNI = new Species(1, "Omni Ant", "Omniformica Grimunknowni",  "omni/", null, null);
+    public static final Species SPECIES_OMNI = new Species(1, "Omni Ant", "Omniformica Grimunknowni",  "omni/", null, 
+        Set.of(GameUnlocks.TYPE_EGG, GameUnlocks.TYPE_QUEEN, GameUnlocks.TYPE_WORKER, GameUnlocks.ROLE_FORAGER, 
+            GameUnlocks.ROLE_FARMER, GameUnlocks.ROLE_NURSE, GameUnlocks.ROLE_LAYER, 
+            GameUnlocks.STAT_SKELETON, GameUnlocks.STAT_ACID, GameUnlocks.STAT_LONGEVITY));
     static { species.add(SPECIES_OMNI); }
-    public static final Species SPECIES_LEAF = new Species(2, "Leaf-Cutter Ant", "Atta Cephalotes", "leaf/", GameUnlocks.ASSIMILATION_LEAFCUTTER, null);
+    
+    public static final Species SPECIES_LEAF = new Species(2, "Leaf-Cutter Ant", "Atta Cephalotes", "leaf/", GameUnlocks.ASSIMILATION_LEAFCUTTER, 
+        Set.of(GameUnlocks.TYPE_EGG, GameUnlocks.TYPE_QUEEN, GameUnlocks.TYPE_WORKER, GameUnlocks.ROLE_FORAGER, 
+            GameUnlocks.ROLE_FARMER, GameUnlocks.ROLE_NURSE, GameUnlocks.ROLE_LAYER, 
+            GameUnlocks.STAT_SKELETON, GameUnlocks.STAT_ACID, GameUnlocks.STAT_LONGEVITY,
+            GameUnlocks.ASSIMILATED_FARMING));
     static { species.add(SPECIES_LEAF); }
-    public static final Species SPECIES_PHARAOH = new Species(3, "Pharaoh Ant", "Monomorium Pharaonis", "pharaoh/", GameUnlocks.ASSIMILATION_PHARAOH, null);
+    
+    public static final Species SPECIES_PHARAOH = new Species(3, "Pharaoh Ant", "Monomorium Pharaonis", "pharaoh/", GameUnlocks.ASSIMILATION_PHARAOH, 
+        Set.of(GameUnlocks.TYPE_EGG, GameUnlocks.TYPE_QUEEN, GameUnlocks.TYPE_WORKER, GameUnlocks.ROLE_FORAGER, 
+            GameUnlocks.ROLE_FARMER, GameUnlocks.ROLE_NURSE, GameUnlocks.ROLE_LAYER, 
+            GameUnlocks.STAT_SKELETON, GameUnlocks.STAT_ACID, GameUnlocks.STAT_LONGEVITY,
+            GameUnlocks.ASSIMILATED_MULTIQUEEN));
     static { species.add(SPECIES_PHARAOH); }
-    public static final Species SPECIES_MARAUDER = new Species(4, "Marauder Ant", "Carebara Diversa", "marauder/", GameUnlocks.ASSIMILATION_MARAUDER, null);
+    
+    public static final Species SPECIES_MARAUDER = new Species(4, "Marauder Ant", "Carebara Diversa", "marauder/", GameUnlocks.ASSIMILATION_MARAUDER, 
+        Set.of(GameUnlocks.TYPE_EGG, GameUnlocks.TYPE_QUEEN, GameUnlocks.TYPE_WORKER, GameUnlocks.ROLE_FORAGER, 
+            GameUnlocks.ROLE_FARMER, GameUnlocks.ROLE_NURSE, GameUnlocks.ROLE_LAYER, 
+            GameUnlocks.STAT_SKELETON, GameUnlocks.STAT_ACID, GameUnlocks.STAT_LONGEVITY,
+            GameUnlocks.TYPE_MAJOR));
     static { species.add(SPECIES_MARAUDER); }
     
     // --- Getters ---
