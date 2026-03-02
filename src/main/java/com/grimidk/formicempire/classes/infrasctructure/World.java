@@ -176,6 +176,14 @@ public class World {
     public void setHexes(ArrayList<Hex> hexes) {
         this.hexes = hexes;
     }
+
+    public Hex getHexOfColony(Colony colony) {
+        if (colony == null || hexes == null) return null;
+        for (Hex h : hexes) {
+            if (h.getColony() == colony) return h;
+        }
+        return null;
+    }
     
     public List<Dynasty> getDynastys() { return dynastys; }
     

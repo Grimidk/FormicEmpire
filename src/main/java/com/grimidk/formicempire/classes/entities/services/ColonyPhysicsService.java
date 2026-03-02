@@ -346,7 +346,7 @@ public class ColonyPhysicsService {
 
     // --- Room Logic & Estimates ---
     public Rectangle getTargetRoomForAnt(Colony colony, Ant ant, int gameWidth) {
-        if (ant.getRole() == GameConstants.ROLE_BUILDER && colony.getCurrentBuildingProject() != null) {
+        if ((ant.getRole() == GameConstants.ROLE_BUILDER || ant.getRole() == GameConstants.ROLE_CRANE) && colony.getCurrentBuildingProject() != null) {
             return getRoomBounds(colony, WorldSpaces.CONSTRUCTION_SITE);
         }
         if (ant.getRole() == GameConstants.ROLE_ASSISTANT) {
@@ -373,7 +373,7 @@ public class ColonyPhysicsService {
     }
 
     private Room findRoomForAnt(Colony colony, Ant ant) {
-        if (ant.getRole() == GameConstants.ROLE_BUILDER && colony.getCurrentBuildingProject() != null) {
+        if ((ant.getRole() == GameConstants.ROLE_BUILDER || ant.getRole() == GameConstants.ROLE_CRANE) && colony.getCurrentBuildingProject() != null) {
             return WorldSpaces.CONSTRUCTION_SITE;
         }
         
@@ -523,7 +523,7 @@ public class ColonyPhysicsService {
         if (isAllowedInRoom(WorldSpaces.ROYAL_CHAMBER, ant)) return true;
         if (isAllowedInRoom(WorldSpaces.STORAGE, ant)) return true; 
         
-        if (ant.getRole() == GameConstants.ROLE_BUILDER) return true;
+        if (ant.getRole() == GameConstants.ROLE_BUILDER || ant.getRole() == GameConstants.ROLE_CRANE) return true;
         if (ant.getRole() == GameConstants.ROLE_BREEDER || ant.getAntType() == GameConstants.TYPE_DRONE) return true;
         if (ant.getRole() == GameConstants.ROLE_ASSISTANT) return true;
         

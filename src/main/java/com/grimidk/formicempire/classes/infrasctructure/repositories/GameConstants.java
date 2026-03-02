@@ -9,6 +9,7 @@ import com.grimidk.formicempire.classes.constants.misc.BugType;
 import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.misc.Species;
+import com.grimidk.formicempire.classes.constants.misc.TradeMethod;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.Humidity;
 import com.grimidk.formicempire.classes.constants.world.MoonPhase;
@@ -73,6 +74,7 @@ public final class GameConstants {
     private static final List<AntRole> antRoles = new ArrayList<>();
     private static final List<ColonyRank> colonyRanks = new ArrayList<>();
     private static final List<Species> species = new ArrayList<>();
+    private static final List<TradeMethod> tradeMethods = new ArrayList<>();
     private static final List<Humidity> humidity = new ArrayList<>();
     private static final List<Temperature> temperature = new ArrayList<>();
     private static final List<ImageIcon> misc = new ArrayList<>();
@@ -422,6 +424,8 @@ public final class GameConstants {
     static { antRoles.add(ROLE_ESCORT); }
     public static final AntRole ROLE_ENGINEER = new AntRole(33, TYPE_WORKER, "Excavator");
     static { antRoles.add(ROLE_ENGINEER); }
+    public static final AntRole ROLE_SKYTRANS = new AntRole(34, TYPE_PRINCESS, "Sky Transport");
+    static { antRoles.add(ROLE_SKYTRANS); }
 
     // --- Colony Ranks ---
     public static final ColonyRank RANK_ANT = new ColonyRank(1, "Ant", 1l, 
@@ -491,6 +495,16 @@ public final class GameConstants {
             GameUnlocks.STAT_SKELETON, GameUnlocks.STAT_ACID, GameUnlocks.STAT_LONGEVITY,
             GameUnlocks.TYPE_MAJOR));
     static { species.add(SPECIES_MARAUDER); }
+
+    // --- Trade Methods ---
+    public static final TradeMethod METHOD_LAND = new TradeMethod(1, "Land", 1.0f, 1.0f, 0.35f, null);
+    static { tradeMethods.add(METHOD_LAND); }
+    public static final TradeMethod METHOD_AIR = new TradeMethod(2, "Air", 5.0f, 0.5f, 0.25f, null);
+    static { tradeMethods.add(METHOD_AIR); }
+    public static final TradeMethod METHOD_SEA = new TradeMethod(3, "Sea", 3.0f, 5.0f, 0.15f, null);
+    static { tradeMethods.add(METHOD_SEA); }
+    public static final TradeMethod METHOD_TUNNEL = new TradeMethod(4, "Tunnel", 2.0f, 2.0f, 0.05f, null);
+    static { tradeMethods.add(METHOD_TUNNEL); }
     
     // --- Getters ---
     public static List<Biome> getBiomes() { return Collections.unmodifiableList(biomes); }
@@ -518,6 +532,8 @@ public final class GameConstants {
     public static List<ColonyRank> getColonyRanks() { return Collections.unmodifiableList(colonyRanks); }
 
     public static List<Species> getSpecies() { return Collections.unmodifiableList(species); }
+
+    public static List<TradeMethod> getTradeMethods() { return Collections.unmodifiableList(tradeMethods); }
 
     public static List<Humidity> getHumidity() { return Collections.unmodifiableList(humidity); }
 

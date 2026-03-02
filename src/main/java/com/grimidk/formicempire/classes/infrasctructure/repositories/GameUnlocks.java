@@ -50,7 +50,6 @@ public final class GameUnlocks {
     public static final Upgrade ROLE_SCOUT = new Upgrade(16, "Scout Role", "Adventure's Call", "Allows workers to go find new sources of resources, each scout has 10% chance each day to encounter a plant source.", TYPE_WORKER, 0 );
     static { upgrades.add(ROLE_SCOUT); }
     public static final Upgrade ROLE_MINER = new Upgrade(17, "Miner Role", "Yearn For The Mines", "", TYPE_WORKER, 0 );     
-    public static final Upgrade ROLE_COURIER = new Upgrade(18, "Courier Role", "Logistic Network", "", TYPE_WORKER, 0 );
     public static final Upgrade ROLE_POTTER = new Upgrade(19, "Portable-Feeder Role", "A Helping Hand", "", TYPE_WORKER, 0 );
     public static final Upgrade ROLE_GUARD = new Upgrade(20, "Guard Role", "Ant Bouncers", "", TYPE_SOLDIER, 0 );
     public static final Upgrade ROLE_WARRIOR = new Upgrade(21, "Warrior Role", "Phalanx Formation", "", TYPE_SOLDIER, 0 );
@@ -63,18 +62,61 @@ public final class GameUnlocks {
     public static final Upgrade ROLE_CARRIER = new Upgrade(26, "Carrier Role", "Troop Transport", "", TYPE_MAJOR, 0 );
     public static final Upgrade ROLE_ARTILLERY = new Upgrade(27, "Artillery Role", "Long Range Artillery", "", TYPE_MAJOR, 0 );
     public static final Upgrade ROLE_SIEGE = new Upgrade(28, "Siege-Machine Role", "Siege Technology", "", TYPE_MAJOR, 0 );
-    public static final Upgrade ROLE_BORER = new Upgrade(29, "Tunel-Borer Role", "Ant Excavator", "", TYPE_MAJOR, 0 );
     public static final Upgrade ROLE_BREEDER = new Upgrade(30,"Breeder Roles", "Nuptial Flights", "Allows Princesses and Drones to go to nuptial flights and get more queens or spread to new places.", TYPE_PRINCESS, 0 );
     static { upgrades.add(ROLE_BREEDER); }
     public static final Upgrade ROLE_DIPLOMAT = new Upgrade(31, "Diplomat Role", "Mighter Than The Sword", "", TYPE_PRINCESS, 0 );
     public static final Upgrade ROLE_MILITIA = new Upgrade(32, "Militia Role", "Worker Militia Auxiliary", "", TYPE_WORKER, 0 );
     public static final Upgrade ROLE_CATCHER = new Upgrade(33, "Catcher Role", "Bug Catching", "", TYPE_SOLDIER, 0 );
-    public static final Upgrade ROLE_CRANE = new Upgrade(34, "Construction Crane Role", "Heavy Duty", "", TYPE_MAJOR, 0 );
-    public static final Upgrade ROLE_TRANSPORT = new Upgrade(35, "Resource Transport Role", "Heavy Lifting", "", TYPE_MAJOR, 0 );
+    public static final Upgrade ROLE_CRANE = new Upgrade(34, "Construction Crane Role", "Heavy Duty", "Allows majors to help in the construction of buildings, each one is 25 times as strong.", TYPE_MAJOR, 250000 );
+    static { upgrades.add(ROLE_CRANE); }
     public static final Upgrade ROLE_ASSISTANT = new Upgrade(36, "Lab Assistant Role", "Lab Internship", "Allows princesses to help research with 1/5 the efficency of queens.", TYPE_PRINCESS, 1500 );
     static { upgrades.add(ROLE_ASSISTANT); }
-    public static final Upgrade ROLE_ESCORT = new Upgrade(37, "Convoy Escort Role", "Protective Detail", "", TYPE_SOLDIER, 0 );
-    public static final Upgrade ROLE_ENGINEER = new Upgrade(38, "Excavator Role", "Tunnel Engineering", "Allows workers to dig tunnels for safer trade routes.", TYPE_WORKER, 0 );
+
+    // -- Abilities --
+    public static final Upgrade ABILITY_RESEARCH = new Upgrade(201, "Research", "Micro Microscopes", "Allows you to research more ant technology by using research points, go to the research menu (Y).", ROLE_RESEARCHER, 0 );
+    static { upgrades.add(ABILITY_RESEARCH); }
+    public static final Upgrade ABILITY_BUILD = new Upgrade(202, "Building", "Brick And Mortar", "Allows you to build parts of your colony, you can build in the build menu (U).", ROLE_BUILDER, 0 );
+    static { upgrades.add(ABILITY_BUILD); }
+    public static final Upgrade ABILITY_SPREAD = new Upgrade(203, "Spreading", "Colony Colonization", "Allows you to build satellite colonies, 1 colony at the time, you see them in world map (I).", ROLE_BREEDER, 0 );
+    static { upgrades.add(ABILITY_SPREAD); }
+    public static final Upgrade ABILITY_RESIN = new Upgrade(204, "Resin Harvest", "Resin Resonation", "Allows your to foragers to harvest resin while foraging plants as a bonus, there is 1% chance each foraging run.", ROLE_FORAGER, 5000 );
+    static { upgrades.add(ABILITY_RESIN); }
+    public static final Upgrade ABILITY_SYNERGY = new Upgrade(205, "Synergies", "Collaborative Effort", "Allows the use of synergies by combining two upgrades to make a third more powerful upgrade.", ABILITY_RESEARCH, 0);
+    static { upgrades.add(ABILITY_SYNERGY); }
+    public static final Upgrade ABILITY_ASSIMILATION = new Upgrade(206, "Assimilation", "Genetic Assimilation", "Allows the use of assimilations to change the genetic code of your species and gain new abilities from other species.", ABILITY_RESEARCH, 0);
+    static { upgrades.add(ABILITY_ASSIMILATION); }
+    public static final Upgrade ABILITY_FORCED_FLIGHT = new Upgrade(505, "Forced Nuptial Flights", "Royal Decree", "Allows you to force a nuptial flight by spending 1000 research points.", ROLE_BREEDER, 9000);
+    static { upgrades.add(ABILITY_FORCED_FLIGHT); }
+    public static final Upgrade ABILITY_DYNASTY = new Upgrade(506, "Ant Dynasty", "Ant Society", "Allows the dynasty management screen to see all the colonies in your dynasty.", ABILITY_SPREAD, 0);
+    static { upgrades.add(ABILITY_DYNASTY); }
+    public static final Upgrade ABILITY_TRADE = new Upgrade(507, "Trade Routes", "Ant Trade", "Allows your colonies to trade resources with each other, manageable in the dynasty management screen.", ABILITY_DYNASTY, 0);
+    static { upgrades.add(ABILITY_TRADE); }
+    public static final Upgrade ABILITY_SPREAD_2 = new Upgrade(508, "Advanced Spreading", "Mass Colonization", "Allows you to build more satellite colonies at the time, taking away the limit.", ABILITY_SPREAD, 0);
+    static { upgrades.add(ABILITY_SPREAD_2); }
+    public static final Upgrade ABILITY_AUTOMATION = new Upgrade(509, "Automation", "Ant Automation", "Allows your colonies to be automated in the dynasty management screen.", ABILITY_DYNASTY, 0);
+    static { upgrades.add(ABILITY_AUTOMATION); }
+    public static final Upgrade ABILITY_TUNNELS =  new Upgrade(510, "Tunnel Networks", "Subterranean Highways", "Allows your colonies to build tunnel networks between each other for faster and safer resource transport.", ABILITY_TRADE, 100000);    
+    public static final Upgrade ABILITY_MANAGEMENT = new Upgrade(511, "Colony Management", "Decentralized Command", "Allows you to let colonies to build by themselves without your direct input.", ABILITY_DYNASTY, 0);
+    static { upgrades.add(ABILITY_MANAGEMENT); }
+    public static final Upgrade ABILITY_MASS_FLIGHT = new Upgrade(512, "Mass Nuptial Flights", "Imperial Decree", "Triggers nuptial flights in all colonies capable of doing so. Costs 10x standard forced flight cost.", ABILITY_FORCED_FLIGHT, 0);
+    static { upgrades.add(ABILITY_MASS_FLIGHT); }
+    public static final Upgrade ABILITY_ABILITY = new Upgrade(900, "Ability Menu", "Abilities Unlocked", "Allows you to see the abilities menu and use active abilities.", null, 0);
+    static { upgrades.add(ABILITY_ABILITY); }
+
+    // -- Advanced Roles --
+    public static final Upgrade ROLE_COURIER = new Upgrade(18, "Courier Role", "Logistic Network", "Allows workers to transport resources between colonies.", ABILITY_TRADE, 0 );
+    static { upgrades.add(ROLE_COURIER); }
+    public static final Upgrade ROLE_BORER = new Upgrade(29, "Tunel-Borer Role", "Ant Excavator", "Allows workers to dig tunnels for safer trade routes.", ABILITY_TUNNELS, 0 );
+    static { upgrades.add(ROLE_BORER); }
+    public static final Upgrade ROLE_TRANSPORT = new Upgrade(35, "Resource Transport Role", "Heavy Lifting", "Allows majors to transport more resources for trade routes.", ROLE_COURIER, 100000 );
+    static { upgrades.add(ROLE_TRANSPORT); }
+    public static final Upgrade ROLE_ESCORT = new Upgrade(37, "Convoy Escort Role", "Protective Detail", "Allows soldiers to escort convoys of resources to reduce danger level.", ROLE_COURIER, 80000 );
+    static { upgrades.add(ROLE_ESCORT); }
+    public static final Upgrade ROLE_ENGINEER = new Upgrade(38, "Excavator Role", "Tunnel Engineering", "Allows workers to dig tunnels for safer trade routes.", ROLE_BORER, 0 );
+    static { upgrades.add(ROLE_ENGINEER); }
+    public static final Upgrade ROLE_SKYTRANS = new Upgrade(39, "Sky Transport Role", "Aerial Logistics", "Allows princesses to transport resources for trade routes, reducing travel time but at less capacity.", ROLE_COURIER, 150000 );
+    static { upgrades.add(ROLE_SKYTRANS); }
+
     // -- Stats -- 
     public static final Upgrade STAT_SKELETON = new Upgrade(101, "Basic Skeletons", "Basic Exoskeletons", "The basic defense stats for all the ants in your colony before multipliers. 100 health points, 5 defense points and 1 health point recovered per second.", TYPE_EGG, 0 );
     static { upgrades.add(STAT_SKELETON); }
@@ -140,36 +182,6 @@ public final class GameUnlocks {
     static { upgrades.add(STAT_POLICING_2); }
     public static final Upgrade STAT_POLICING_3 = new Upgrade(132, "Perfected Policing", "Surveillance Drones", "Increases policing rate to 55% per day.", STAT_POLICING_2, 42000);
     static { upgrades.add(STAT_POLICING_3); }
-    // -- Abilities --
-    public static final Upgrade ABILITY_RESEARCH = new Upgrade(201, "Research", "Micro Microscopes", "Allows you to research more ant technology by using research points, go to the research menu (Y).", ROLE_RESEARCHER, 0 );
-    static { upgrades.add(ABILITY_RESEARCH); }
-    public static final Upgrade ABILITY_BUILD = new Upgrade(202, "Building", "Brick And Mortar", "Allows you to build parts of your colony, you can build in the build menu (U).", ROLE_BUILDER, 0 );
-    static { upgrades.add(ABILITY_BUILD); }
-    public static final Upgrade ABILITY_SPREAD = new Upgrade(203, "Spreading", "Colony Colonization", "Allows you to build satellite colonies, 1 colony at the time, you see them in world map (I).", ROLE_BREEDER, 0 );
-    static { upgrades.add(ABILITY_SPREAD); }
-    public static final Upgrade ABILITY_RESIN = new Upgrade(204, "Resin Harvest", "Resin Resonation", "Allows your to foragers to harvest resin while foraging plants as a bonus, there is 1% chance each foraging run.", ROLE_FORAGER, 5000 );
-    static { upgrades.add(ABILITY_RESIN); }
-    public static final Upgrade ABILITY_SYNERGY = new Upgrade(205, "Synergies", "Collaborative Effort", "Allows the use of synergies by combining two upgrades to make a third more powerful upgrade.", ABILITY_RESEARCH, 0);
-    static { upgrades.add(ABILITY_SYNERGY); }
-    public static final Upgrade ABILITY_ASSIMILATION = new Upgrade(206, "Assimilation", "Genetic Assimilation", "Allows the use of assimilations to change the genetic code of your species and gain new abilities from other species.", ABILITY_RESEARCH, 0);
-    static { upgrades.add(ABILITY_ASSIMILATION); }
-    public static final Upgrade ABILITY_FORCED_FLIGHT = new Upgrade(505, "Forced Nuptial Flights", "Royal Decree", "Allows you to force a nuptial flight by spending 1000 research points.", ROLE_BREEDER, 9000);
-    static { upgrades.add(ABILITY_FORCED_FLIGHT); }
-    public static final Upgrade ABILITY_DYNASTY = new Upgrade(506, "Ant Dynasty", "Ant Society", "Allows the dynasty management screen to see all the colonies in your dynasty.", ABILITY_SPREAD, 0);
-    static { upgrades.add(ABILITY_DYNASTY); }
-    public static final Upgrade ABILITY_TRADE = new Upgrade(507, "Trade Routes", "Ant Trade", "Allows your colonies to trade resources with each other, manageable in the dynasty management screen.", ABILITY_DYNASTY, 0);
-    static { upgrades.add(ABILITY_TRADE); }
-    public static final Upgrade ABILITY_SPREAD_2 = new Upgrade(508, "Advanced Spreading", "Mass Colonization", "Allows you to build more satellite colonies at the time, taking away the limit.", ABILITY_SPREAD, 0);
-    static { upgrades.add(ABILITY_SPREAD_2); }
-    public static final Upgrade ABILITY_AUTOMATION = new Upgrade(509, "Automation", "Ant Automation", "Allows your colonies to be automated in the dynasty management screen.", ABILITY_DYNASTY, 0);
-    static { upgrades.add(ABILITY_AUTOMATION); }
-    public static final Upgrade ABILITY_TUNNELS =  new Upgrade(510, "Tunnel Networks", "Subterranean Highways", "Allows your colonies to build tunnel networks between each other for faster and safer resource transport.", ABILITY_TRADE, 150000);    
-    public static final Upgrade ABILITY_MANAGEMENT = new Upgrade(511, "Colony Management", "Decentralized Command", "Allows you to let colonies to build by themselves without your direct input.", ABILITY_DYNASTY, 0);
-    static { upgrades.add(ABILITY_MANAGEMENT); }
-    public static final Upgrade ABILITY_MASS_FLIGHT = new Upgrade(512, "Mass Nuptial Flights", "Imperial Decree", "Triggers nuptial flights in all colonies capable of doing so. Costs 10x standard forced flight cost.", ABILITY_FORCED_FLIGHT, 0);
-    static { upgrades.add(ABILITY_MASS_FLIGHT); }
-    public static final Upgrade ABILITY_ABILITY = new Upgrade(900, "Ability Menu", "Abilities Unlocked", "Allows you to see the abilities menu and use active abilities.", null, 0);
-    static { upgrades.add(ABILITY_ABILITY); }
     // -- Assimilated --
     public static final Upgrade ASSIMILATED_FARMING = new Upgrade(1001, "Assimilated Farming", "Ancenstral Farming Techniques", "Your dynasty has learned how to farm fungi more efficiently. By getting 1 extra mushroom matter per plant and protein.", ABILITY_ASSIMILATION, 0 );
     static { upgrades.add(ASSIMILATED_FARMING); }

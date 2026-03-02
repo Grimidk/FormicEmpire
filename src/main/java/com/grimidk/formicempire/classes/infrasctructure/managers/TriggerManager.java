@@ -83,6 +83,7 @@ public class TriggerManager {
         checkSpreadAbilityUnlock();
         checkScoutRoleUnlock();
         checkDynastyTriggers();
+        checkTradeRoleTriggers();
         checkAssimilationAbilityUnlock();
         checkAbilityMenuHint();
     }
@@ -310,6 +311,18 @@ public class TriggerManager {
             fireTrigger(GameUnlocks.ABILITY_AUTOMATION,
                 "Automation Era",
                 "Your dynasty is vast. You can now completely automate colony management.");
+        }
+    }
+
+    private void checkTradeRoleTriggers() {
+        if (!playerColony.hasUpgrade(GameUnlocks.ABILITY_TRADE)) return;
+
+        if (!playerColony.hasUpgrade(GameUnlocks.ROLE_COURIER)) {
+            fireTrigger(GameUnlocks.ROLE_COURIER, "Logistic Network", "Trade routes require couriers! Workers can now be assigned to transport goods.");
+        }
+
+        if (!playerColony.hasUpgrade(GameUnlocks.ABILITY_TUNNELS)) {
+            fireTrigger(GameUnlocks.ROLE_BORER, "Boring Job", "Trade routes can be dangerous! Majors can now be assigned to dig tunnels for faster, safer trade routes.");
         }
     }
 

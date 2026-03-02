@@ -26,6 +26,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import com.grimidk.formicempire.classes.entities.services.ColonyTradeService;
+import com.grimidk.formicempire.classes.entities.services.DynastyTradeService;
+import com.grimidk.formicempire.classes.constants.misc.ResourceType;
+import com.grimidk.formicempire.classes.constants.ant.AntType;
+import com.grimidk.formicempire.classes.constants.misc.TradeMethod;
+import com.grimidk.formicempire.classes.entities.Trade;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
+
 public class DynastyManagementDialog extends ZeroDialog {
 
     public static final int TAB_OVERVIEW = 0;
@@ -41,6 +49,8 @@ public class DynastyManagementDialog extends ZeroDialog {
     private OverviewPanel overviewPanel;
     private TradePanel tradePanel;
 
+    private final DynastyTradeService dynastyTradeService;
+
     private final Runnable refreshTask = this::liveUpdate;
 
     public DynastyManagementDialog(JFrame owner, Dynasty dynasty, Engine engine, Consumer<Colony> onGoToColony) {
@@ -48,6 +58,7 @@ public class DynastyManagementDialog extends ZeroDialog {
         this.dynasty = dynasty;
         this.engine = engine;
         this.onGoToColony = onGoToColony;
+        this.dynastyTradeService = new DynastyTradeService(dynasty, engine.getTradeManager());
 
         tabbedPane = new JTabbedPane();
         add(tabbedPane, BorderLayout.CENTER);
@@ -179,17 +190,237 @@ public class DynastyManagementDialog extends ZeroDialog {
     }
 
     private class TradePanel extends JPanel implements LiveUpdatePanel {
+        private JTable table;
+        private DefaultTableModel model;
+        private Colony activeColony;
+        private ColonyTradeService colonyTradeService;
+
         public TradePanel() {
-            setLayout(new GridBagLayout());
-            add(new JLabel("Trade Routes - Coming Soon"));
+            super(new BorderLayout());
+            initUI();
+        }
+
+        private void initUI() {
+            String[] cols = {"Neighbor Colony", "Biome", "Distance", "Status", "Action"};
+            model = new DefaultTableModel(cols, 0) {
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return column == 4;
+                }
+            };
+
+            table = new JTable(model);
+            table.setRowHeight(50);
+            
+            table.getColumnModel().getColumn(4).setCellRenderer(new TradeActionRenderer());
+            table.getColumnModel().getColumn(4).setCellEditor(new TradeActionEditor());
+
+            add(new JScrollPane(table), BorderLayout.CENTER);
+            
+            JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            topPanel.add(new JLabel("Trading from Active Colony"));
+            add(topPanel, BorderLayout.NORTH);
         }
 
         @Override
         public void liveUpdate() {
+            updateData();
         }
 
         @Override
         public void updateData() {
+            World world = engine.getWorld();
+            if (world == null) return;
+            
+            activeColony = null;
+            for (Hex h : world.getHexes()) {
+                if (h.isActive() && h.getColony() != null && h.getColony().isPlayer()) {
+                    activeColony = h.getColony();
+                    break;
+                }
+            }
+
+            if (activeColony == null) {
+                model.setRowCount(0);
+                return;
+            }
+
+            colonyTradeService = new ColonyTradeService(activeColony);
+            List<Colony> neighbors = colonyTradeService.getNeighborColonies(world);
+            
+            model.setRowCount(0);
+            for (Colony n : neighbors) {
+                Hex nHex = colonyTradeService.getNeighborHex(world, n);
+                Trade activeTrade = findActiveTradeWith(n);
+                
+                Object[] row = {
+                    n.getName(),
+                    nHex != null ? nHex.getBiome().getName() : "Unknown",
+                    "1 Hex",
+                    activeTrade != null ? (activeTrade.isReturning() ? "Returning (" + activeTrade.getRemainingHours() + "h)" : "Transit (" + activeTrade.getRemainingHours() + "h)") : "None",
+                    n
+                };
+                model.addRow(row);
+            }
+        }
+
+        private Trade findActiveTradeWith(Colony neighbor) {
+            return dynastyTradeService.getColonyTrades(activeColony).stream()
+                .filter(t -> (t.getOrigin().getColony() == activeColony && t.getDestination().getColony() == neighbor) ||
+                             (t.getOrigin().getColony() == neighbor && t.getDestination().getColony() == activeColony))
+                .filter(Trade::isActive)
+                .findFirst().orElse(null);
+        }
+
+        private class TradeActionRenderer extends JPanel implements TableCellRenderer {
+            private final JButton actionBtn = new JButton();
+            public TradeActionRenderer() {
+                setLayout(new FlowLayout(FlowLayout.CENTER, 5, 2));
+                add(actionBtn);
+            }
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Colony neighbor = (Colony) value;
+                Trade trade = findActiveTradeWith(neighbor);
+                actionBtn.setText(trade == null ? "New Trade" : "Manage");
+                setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
+                return this;
+            }
+        }
+
+        private class TradeActionEditor extends AbstractCellEditor implements TableCellEditor {
+            private final JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 2));
+            private final JButton actionBtn = new JButton();
+            private Colony neighbor;
+            public TradeActionEditor() {
+                panel.add(actionBtn);
+                actionBtn.addActionListener(e -> {
+                    fireEditingStopped();
+                    Trade trade = findActiveTradeWith(neighbor);
+                    if (trade == null) {
+                        createNewTrade(neighbor);
+                    } else {
+                        manageTrade(trade);
+                    }
+                });
+            }
+            @Override
+            public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+                neighbor = (Colony) value;
+                Trade trade = findActiveTradeWith(neighbor);
+                actionBtn.setText(trade == null ? "New Trade" : "Manage");
+                return panel;
+            }
+            @Override
+            public Object getCellEditorValue() { return neighbor; }
+        }
+
+        private void createNewTrade(Colony target) {
+            TradeCreationDialog dialog = new TradeCreationDialog((JFrame) SwingUtilities.getWindowAncestor(this), activeColony, target, engine);
+            dialog.setVisible(true);
+            updateData();
+        }
+
+        private void manageTrade(Trade trade) {
+            int res = JOptionPane.showConfirmDialog(this, "Cancel this trade route?", "Manage Trade", JOptionPane.YES_NO_OPTION);
+            if (res == JOptionPane.YES_OPTION) {
+                trade.setActive(false);
+                engine.getTradeManager().removeTrade(trade);
+                updateData();
+            }
+        }
+    }
+
+    private static class TradeCreationDialog extends JDialog {
+        private final Colony origin;
+        private final Colony target;
+        private final Engine engine;
+        private final Map<ResourceType, JTextField> resourceFields = new HashMap<>();
+        private final Map<AntType, JTextField> antFields = new HashMap<>();
+        private final JComboBox<TradeMethod> methodCombo;
+        private final JCheckBox recurrentCheck;
+
+        public TradeCreationDialog(JFrame owner, Colony origin, Colony target, Engine engine) {
+            super(owner, "Create Trade Route to " + target.getName(), true);
+            this.origin = origin;
+            this.target = target;
+            this.engine = engine;
+            setLayout(new BorderLayout());
+            setSize(500, 600);
+            setLocationRelativeTo(owner);
+
+            JPanel mainPanel = new JPanel();
+            mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+            mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+            // Resources
+            mainPanel.add(new JLabel("Resources to send (Load):"));
+            for (ResourceType rt : GameConstants.getResources()) {
+                JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
+                p.add(new JLabel(rt.getName(), rt.getIcon(), JLabel.LEFT));
+                JTextField field = new JTextField("0", 5);
+                p.add(field);
+                resourceFields.put(rt, field);
+                mainPanel.add(p);
+            }
+
+            // Ants
+            mainPanel.add(new JLabel("Ants to assign (Transport):"));
+            for (AntType at : GameConstants.getAntTypes()) {
+                if (at == GameConstants.TYPE_EGG || at == GameConstants.TYPE_LARVA || at == GameConstants.TYPE_PUPA || at == GameConstants.TYPE_DEAD || at == GameConstants.TYPE_ZOMBIE) continue;
+                JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
+                p.add(new JLabel(at.getName(), at.getIcon(), JLabel.LEFT));
+                JTextField field = new JTextField("0", 5);
+                p.add(field);
+                antFields.put(at, field);
+                mainPanel.add(p);
+            }
+
+            // Method & Type
+            JPanel configPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            methodCombo = new JComboBox<>(GameConstants.getTradeMethods().toArray(new TradeMethod[0]));
+            configPanel.add(new JLabel("Method:"));
+            configPanel.add(methodCombo);
+            recurrentCheck = new JCheckBox("Recurrent");
+            configPanel.add(recurrentCheck);
+            mainPanel.add(configPanel);
+
+            add(new JScrollPane(mainPanel), BorderLayout.CENTER);
+
+            JButton createBtn = new JButton("Create Route");
+            createBtn.addActionListener(e -> attemptCreate());
+            add(createBtn, BorderLayout.SOUTH);
+        }
+
+        private void attemptCreate() {
+            Map<ResourceType, Double> load = new HashMap<>();
+            for (Map.Entry<ResourceType, JTextField> entry : resourceFields.entrySet()) {
+                try {
+                    double val = Double.parseDouble(entry.getValue().getText());
+                    if (val > 0) load.put(entry.getKey(), val);
+                } catch (NumberFormatException ignored) {}
+            }
+
+            Map<AntType, Integer> transport = new HashMap<>();
+            for (Map.Entry<AntType, JTextField> entry : antFields.entrySet()) {
+                try {
+                    int val = Integer.parseInt(entry.getValue().getText());
+                    if (val > 0) transport.put(entry.getKey(), val);
+                } catch (NumberFormatException ignored) {}
+            }
+
+            if (load.isEmpty() && transport.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please specify load or transport.");
+                return;
+            }
+
+            World world = engine.getWorld();
+            Hex originHex = world.getHexOfColony(origin);
+            Hex targetHex = world.getHexOfColony(target);
+
+            Trade trade = new Trade(originHex, targetHex, load, transport, recurrentCheck.isSelected(), (TradeMethod) methodCombo.getSelectedItem());
+            engine.getTradeManager().addTrade(trade);
+            dispose();
         }
     }
 

@@ -739,9 +739,15 @@ public class ColonyLabourService {
         if (colony.getCurrentBuildingProject() == null) return;
         
         int builderCount = countActiveAnts(colony, GameConstants.ROLE_BUILDER);        
-        if (builderCount <= 0) return;
+        int craneCount = 0;
+        if (colony.hasUpgrade(GameUnlocks.ROLE_CRANE)) {
+            craneCount = countActiveAnts(colony, GameConstants.ROLE_CRANE);
+        }
+
+        int totalPower = builderCount + (craneCount * 25);
+        if (totalPower <= 0) return;
         
-        double efficiency = builderCount / 100.0;
+        double efficiency = totalPower / 100.0;
         if (efficiency <= 0) return;
 
         colony.setBuildingProgressHours(colony.getBuildingProgressHours() + 1.0);

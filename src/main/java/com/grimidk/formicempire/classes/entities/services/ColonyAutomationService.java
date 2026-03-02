@@ -248,7 +248,13 @@ public class ColonyAutomationService {
         int totalMajors = colony.getMajors().size();
         if (totalMajors == 0) return;
         
-        targets.put(GameConstants.ROLE_BRUTE, totalMajors);
+        if (colony.getCurrentBuildingProject() != null && colony.hasUpgrade(GameUnlocks.ROLE_CRANE)) {
+            targets.put(GameConstants.ROLE_CRANE, totalMajors);
+            targets.put(GameConstants.ROLE_BRUTE, 0);
+        } else {
+            targets.put(GameConstants.ROLE_CRANE, 0);
+            targets.put(GameConstants.ROLE_BRUTE, totalMajors);
+        }
     }
 
     private void calculatePrincessQuotas(Colony colony, Map<AntRole, Integer> targets) {

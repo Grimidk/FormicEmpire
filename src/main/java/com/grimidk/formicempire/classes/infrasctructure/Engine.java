@@ -5,6 +5,7 @@ import java.util.concurrent.Semaphore;
 
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
+import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 
 public class Engine extends Thread {
@@ -14,6 +15,9 @@ public class Engine extends Thread {
     private boolean killSwitch;
     private volatile boolean paused;
     
+    // --- Managers ---
+    private final TradeManager tradeManager;
+
     // --- Listeners ---
     private final CopyOnWriteArrayList<Runnable> minuteTickListeners = new CopyOnWriteArrayList<>();
     private final CopyOnWriteArrayList<Runnable> hourTickListeners = new CopyOnWriteArrayList<>();
@@ -34,8 +38,14 @@ public class Engine extends Thread {
         this.semaphore = new Semaphore(1);
         this.killSwitch = false;
         this.paused = true;
+        this.tradeManager = new TradeManager();
+        this.addHourTickListener(this.tradeManager);
         this.settingsSaveManager = new SaveManager();
         this.loadGlobalSettings();
+    }
+
+    public TradeManager getTradeManager() {
+        return tradeManager;
     }
 
     public void loadGlobalSettings() {
