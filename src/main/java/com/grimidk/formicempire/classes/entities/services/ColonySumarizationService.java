@@ -312,10 +312,10 @@ public class ColonySumarizationService {
 
     private void simulateBuilding(Colony colony) {
         if (colony.getCurrentBuildingProject() == null) return;
-        int builderCount = colony.getAssignedRoleCount(GameConstants.ROLE_BUILDER);
-        if (builderCount <= 0) return;
         
-        double efficiency = builderCount / 100.0;
+        double efficiency = colony.getConstructionEfficiency();
+        if (efficiency <= 0) return;
+        
         colony.setBuildingProgressHours(colony.getBuildingProgressHours() + 1.0);
         
         double required = colony.getCurrentBuildingProject().getBuildTime() / efficiency;

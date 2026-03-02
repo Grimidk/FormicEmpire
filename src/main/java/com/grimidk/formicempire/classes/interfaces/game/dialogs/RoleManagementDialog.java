@@ -142,6 +142,26 @@ public class RoleManagementDialog extends ZeroDialog {
         if (role == GameConstants.ROLE_RESEARCHER) return GameUnlocks.ROLE_RESEARCHER;
         if (role == GameConstants.ROLE_ASSISTANT) return GameUnlocks.ROLE_ASSISTANT;
         if (role == GameConstants.ROLE_POLICE) return GameUnlocks.ROLE_POLICE;
+        if (role == GameConstants.ROLE_MINER) return GameUnlocks.ROLE_MINER;
+        if (role == GameConstants.ROLE_POTTER) return GameUnlocks.ROLE_POTTER;
+        if (role == GameConstants.ROLE_MILITIA) return GameUnlocks.ROLE_MILITIA;
+        if (role == GameConstants.ROLE_COURIER) return GameUnlocks.ROLE_COURIER;
+        if (role == GameConstants.ROLE_ENGINEER) return GameUnlocks.ROLE_ENGINEER;
+        if (role == GameConstants.ROLE_GUARD) return GameUnlocks.ROLE_GUARD;
+        if (role == GameConstants.ROLE_WARRIOR) return GameUnlocks.ROLE_WARRIOR;
+        if (role == GameConstants.ROLE_DEFENDER) return GameUnlocks.ROLE_DEFENDER;
+        if (role == GameConstants.ROLE_BOMBER) return GameUnlocks.ROLE_BOMBER;
+        if (role == GameConstants.ROLE_CATCHER) return GameUnlocks.ROLE_CATCHER;
+        if (role == GameConstants.ROLE_ESCORT) return GameUnlocks.ROLE_ESCORT;
+        if (role == GameConstants.ROLE_BRUTE) return GameUnlocks.ROLE_BRUTE;
+        if (role == GameConstants.ROLE_CARRIER) return GameUnlocks.ROLE_CARRIER;
+        if (role == GameConstants.ROLE_ARTILLERY) return GameUnlocks.ROLE_ARTILLERY;
+        if (role == GameConstants.ROLE_SIEGE) return GameUnlocks.ROLE_SIEGE;
+        if (role == GameConstants.ROLE_BORER) return GameUnlocks.ROLE_BORER;
+        if (role == GameConstants.ROLE_CRANE) return GameUnlocks.ROLE_CRANE;
+        if (role == GameConstants.ROLE_TRANSPORT) return GameUnlocks.ROLE_TRANSPORT;
+        if (role == GameConstants.ROLE_DIPLOMAT) return GameUnlocks.ROLE_DIPLOMAT;
+        if (role == GameConstants.ROLE_SKYTRANS) return GameUnlocks.ROLE_SKYTRANS;
 
         return null; 
     }

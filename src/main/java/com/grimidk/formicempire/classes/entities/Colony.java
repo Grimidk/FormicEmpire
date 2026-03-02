@@ -728,6 +728,7 @@ public class Colony {
     public int getBaseDefense() { return statsService.getBaseDefense(this); }
     public int getBaseSpeed() { return statsService.getBaseSpeed(this); }
     public int getSourceCapacity() { return statsService.getSourceCapacity(this); }
+    public double getConstructionEfficiency() { return statsService.getConstructionEfficiency(this); }
 
 
     // --- Simulation Logic Methods ---

@@ -323,6 +323,7 @@ public class UpgradeDialog extends ZeroDialog {
         private final JLabel mineralsLabel;
         private final JLabel resinLabel;
         private final JLabel buildersLabel;
+        private final JLabel cranesLabel;
         private final Map<JButton, Building> buttonBuildingMap = new HashMap<>();
 
         public BuildPanel(Colony colony) {
@@ -337,12 +338,16 @@ public class UpgradeDialog extends ZeroDialog {
             resinLabel.setIcon(GameConstants.RESOURCE_RESIN.getIcon());
             buildersLabel = new JLabel();
             buildersLabel.setIcon(GameConstants.ROLE_BUILDER.getIcon());
+            cranesLabel = new JLabel();
+            cranesLabel.setIcon(GameConstants.ROLE_CRANE.getIcon());
 
             northPanel.add(mineralsLabel);
             northPanel.add(Box.createRigidArea(new Dimension(10, 0)));
             northPanel.add(resinLabel);
             northPanel.add(Box.createRigidArea(new Dimension(10, 0)));
             northPanel.add(buildersLabel);
+            northPanel.add(Box.createRigidArea(new Dimension(10, 0)));
+            northPanel.add(cranesLabel);
             add(northPanel, BorderLayout.NORTH);
 
             listPanel = new JPanel();
@@ -398,6 +403,13 @@ public class UpgradeDialog extends ZeroDialog {
             mineralsLabel.setText(colony.getMinerals() + "/" + colony.getMineralsCapacity());
             resinLabel.setText(colony.getResins() + "/" + colony.getResinsCapacity());
             buildersLabel.setText(colony.getAssignedRoleCount(GameConstants.ROLE_BUILDER) + " Builders");
+            
+            if (colony.hasUpgrade(GameUnlocks.ROLE_CRANE)) {
+                cranesLabel.setVisible(true);
+                cranesLabel.setText(colony.getAssignedRoleCount(GameConstants.ROLE_CRANE) + " Cranes");
+            } else {
+                cranesLabel.setVisible(false);
+            }
         }
 
         private JPanel createBuildingPanel(Building building) {
@@ -454,7 +466,8 @@ public class UpgradeDialog extends ZeroDialog {
             panel.setBorder(new TitledBorder("Under Construction: " + project.getName()));
 
             int builderCount = colony.getAssignedRoleCount(GameConstants.ROLE_BUILDER);
-            double efficiency = (builderCount > 0) ? (builderCount / 100.0) : 0.0;
+            int craneCount = colony.getAssignedRoleCount(GameConstants.ROLE_CRANE);
+            double efficiency = colony.getConstructionEfficiency();
             double requiredHours = (efficiency > 0) ? (project.getBuildTime() / efficiency) : Double.POSITIVE_INFINITY;
             double progressHours = colony.getBuildingProgressHours();
 
@@ -470,9 +483,13 @@ public class UpgradeDialog extends ZeroDialog {
 
             panel.add(progressBar, BorderLayout.CENTER);
 
-            JLabel buildersLabel = new JLabel(String.format("%d Builders (%.0f%% speed)", builderCount, efficiency * 100));
-            buildersLabel.setHorizontalAlignment(SwingConstants.CENTER);
-            panel.add(buildersLabel, BorderLayout.SOUTH);
+            String buildersStr = builderCount + " Builders";
+            if (colony.hasUpgrade(GameUnlocks.ROLE_CRANE)) {
+                buildersStr += " & " + craneCount + " Cranes";
+            }
+            JLabel progressLabel = new JLabel(String.format("%s (%.0f%% speed)", buildersStr, efficiency * 100));
+            progressLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            panel.add(progressLabel, BorderLayout.SOUTH);
 
             JButton cancelButton = new JButton("Cancel");
             cancelButton.setFocusable(false);
@@ -493,12 +510,13 @@ public class UpgradeDialog extends ZeroDialog {
 
         private void updateBuildButtonState(JButton button, Building building) {
             int builders = colony.getAssignedRoleCount(GameConstants.ROLE_BUILDER);
+            int cranes = colony.getAssignedRoleCount(GameConstants.ROLE_CRANE);
             int minerals = colony.getMinerals();
             int resin = colony.getResins();
 
-            if (builders <= 0) {
+            if (builders <= 0 && cranes <= 0) {
                 button.setEnabled(false);
-                button.setToolTipText("You need at least 1 Builder assigned.");
+                button.setToolTipText("You need at least 1 Builder or Crane assigned.");
             } else if (minerals < building.getMineralCost() || resin < building.getResinCost()) {
                 button.setEnabled(false);
                 button.setToolTipText("Not enough resources.");
@@ -522,10 +540,11 @@ public class UpgradeDialog extends ZeroDialog {
                             && progressPanel.getComponent(0) instanceof JProgressBar) {
                         
                         JProgressBar progressBar = (JProgressBar) progressPanel.getComponent(0);
-                        JLabel buildersLabel = (JLabel) progressPanel.getComponent(1);
+                        JLabel progressLabel = (JLabel) progressPanel.getComponent(1);
 
                         int builderCount = colony.getAssignedRoleCount(GameConstants.ROLE_BUILDER);
-                        double efficiency = (builderCount > 0) ? (builderCount / 100.0) : 0.0;
+                        int craneCount = colony.getAssignedRoleCount(GameConstants.ROLE_CRANE);
+                        double efficiency = colony.getConstructionEfficiency();
                         double requiredHours = (efficiency > 0) ? (currentProject.getBuildTime() / efficiency) : Double.POSITIVE_INFINITY;
                         double progressHours = colony.getBuildingProgressHours();
 
@@ -536,7 +555,12 @@ public class UpgradeDialog extends ZeroDialog {
 
                         progressBar.setValue(progressPercent);
                         progressBar.setString(String.format("%.1f / %.1f Hours", progressHours, requiredHours));
-                        buildersLabel.setText(String.format("%d Builders (%.0f%% speed)", builderCount, efficiency * 100));
+                        
+                        String buildersStr = builderCount + " Builders";
+                        if (colony.hasUpgrade(GameUnlocks.ROLE_CRANE)) {
+                            buildersStr += " & " + craneCount + " Cranes";
+                        }
+                        progressLabel.setText(String.format("%s (%.0f%% speed)", buildersStr, efficiency * 100));
                     } else {
                         updateData();
                     }

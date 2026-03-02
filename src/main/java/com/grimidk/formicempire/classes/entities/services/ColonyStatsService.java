@@ -152,6 +152,17 @@ public class ColonyStatsService {
         if (colony.hasUpgrade(GameUnlocks.ROLE_SCOUT)) return 0.1f;
         return 0f;
     }
+
+    public double getConstructionEfficiency(Colony colony) {
+        int builderCount = colony.getAssignedRoleCount(GameConstants.ROLE_BUILDER);
+        int craneCount = 0;
+        if (colony.hasUpgrade(GameUnlocks.ROLE_CRANE)) {
+            craneCount = colony.getAssignedRoleCount(GameConstants.ROLE_CRANE);
+        }
+        int totalPower = builderCount + (craneCount * 25);
+        return totalPower / 100.0;
+    }
+
     public float getContaminationMitigation(Colony colony) {
         if (colony.hasUpgrade(GameUnlocks.STAT_CONTAMINATION_3)) return 0.4f; 
         if (colony.hasUpgrade(GameUnlocks.STAT_CONTAMINATION_2)) return 0.6f;

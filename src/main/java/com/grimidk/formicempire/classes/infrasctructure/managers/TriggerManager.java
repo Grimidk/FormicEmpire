@@ -321,7 +321,7 @@ public class TriggerManager {
             fireTrigger(GameUnlocks.ROLE_COURIER, "Logistic Network", "Trade routes require couriers! Workers can now be assigned to transport goods.");
         }
 
-        if (!playerColony.hasUpgrade(GameUnlocks.ABILITY_TUNNELS)) {
+        if (playerColony.hasUpgrade(GameUnlocks.ABILITY_TUNNELS) && !playerColony.hasUpgrade(GameUnlocks.ROLE_BORER)) {
             fireTrigger(GameUnlocks.ROLE_BORER, "Boring Job", "Trade routes can be dangerous! Majors can now be assigned to dig tunnels for faster, safer trade routes.");
         }
     }

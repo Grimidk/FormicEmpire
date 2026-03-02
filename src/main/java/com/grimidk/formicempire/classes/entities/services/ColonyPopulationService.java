@@ -177,7 +177,7 @@ public class ColonyPopulationService {
         colony.getPupae().removeAll(pupaeToHatch);
     }
 
-    private void adjustNPCHatchRates(Colony colony) {
+    private void applyAutomatedHatchRates(Colony colony) {
         float s = colony.hasUpgrade(GameUnlocks.TYPE_SOLDIER) ? 15.0f : 0f;
         float m = colony.hasUpgrade(GameUnlocks.TYPE_MAJOR) ? 5.0f : 0f;
         float p = 0f;
@@ -198,8 +198,8 @@ public class ColonyPopulationService {
     }
 
     public void runHatching(Colony colony){
-        if (!colony.isPlayer() && colony.isCapital()) {
-            adjustNPCHatchRates(colony);
+        if (colony.isAutomationEnabled() || (!colony.isPlayer() && colony.isCapital())) {
+            applyAutomatedHatchRates(colony);
         }
 
         hatchPupae(colony);

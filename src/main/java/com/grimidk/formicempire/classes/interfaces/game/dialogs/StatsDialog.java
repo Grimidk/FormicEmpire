@@ -511,8 +511,16 @@ public class StatsDialog extends ZeroDialog {
 
         // Builders
         if (colony.getCurrentBuildingProject() != null) {
-            int count = colony.getAssignedRoleCount(GameConstants.ROLE_BUILDER);
-            model.addRow(new Object[]{"Construction", count + " Builders", "1.0 hr/tick", "Project: " + colony.getCurrentBuildingProject().getName()});
+            int builders = colony.getAssignedRoleCount(GameConstants.ROLE_BUILDER);
+            int cranes = colony.getAssignedRoleCount(GameConstants.ROLE_CRANE);
+            double efficiency = stats.getConstructionEfficiency(colony);
+            
+            String label = builders + " Builders";
+            if (colony.hasUpgrade(GameUnlocks.ROLE_CRANE)) {
+                label += " / " + cranes + " Cranes";
+            }
+            
+            model.addRow(new Object[]{"Construction", label, String.format("%.0f%% efficiency", efficiency * 100), "Project: " + colony.getCurrentBuildingProject().getName()});
         }
         
         // Research
