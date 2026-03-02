@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.entities.services;
 
 import com.grimidk.formicempire.classes.constants.ant.AntType;
+import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Colony;
@@ -33,26 +34,26 @@ public class DynastyStatService {
         return totals;
     }
 
-    public Map<String, Integer> getGlobalResources(Dynasty dynasty) {
-        Map<String, Integer> resources = new HashMap<>();
-        resources.put("Plants", 0);
-        resources.put("Mushrooms", 0);
-        resources.put("Protein", 0);
-        resources.put("Water", 0);
-        resources.put("Syrups", 0);
-        resources.put("Resins", 0);
-        resources.put("Minerals", 0);
+    public Map<ResourceType, Integer> getGlobalResources(Dynasty dynasty) {
+        Map<ResourceType, Integer> resources = new HashMap<>();
+        resources.put(GameConstants.RESOURCE_PLANT, 0);
+        resources.put(GameConstants.RESOURCE_FUNGI, 0);
+        resources.put(GameConstants.RESOURCE_MEAT, 0);
+        resources.put(GameConstants.RESOURCE_WATER, 0);
+        resources.put(GameConstants.RESOURCE_SYRUP, 0);
+        resources.put(GameConstants.RESOURCE_RESIN, 0);
+        resources.put(GameConstants.RESOURCE_ROCK, 0);
 
         if (dynasty == null) return resources;
 
         for (Colony c : dynasty.getColonies()) {
-            resources.merge("Plants", c.getPlants(), Integer::sum);
-            resources.merge("Mushrooms", c.getMushrooms(), Integer::sum);
-            resources.merge("Protein", c.getProtein(), Integer::sum);
-            resources.merge("Water", c.getWater(), Integer::sum);
-            resources.merge("Syrups", c.getSyrups(), Integer::sum);
-            resources.merge("Resins", c.getResins(), Integer::sum);
-            resources.merge("Minerals", c.getMinerals(), Integer::sum);
+            resources.merge(GameConstants.RESOURCE_PLANT, (int) c.getPlants(), Integer::sum);
+            resources.merge(GameConstants.RESOURCE_FUNGI, (int) c.getMushrooms(), Integer::sum);
+            resources.merge(GameConstants.RESOURCE_MEAT, (int) c.getProtein(), Integer::sum);
+            resources.merge(GameConstants.RESOURCE_WATER, (int) c.getWater(), Integer::sum);
+            resources.merge(GameConstants.RESOURCE_SYRUP, (int) c.getSyrups(), Integer::sum);
+            resources.merge(GameConstants.RESOURCE_RESIN, (int) c.getResins(), Integer::sum);
+            resources.merge(GameConstants.RESOURCE_ROCK, (int) c.getMinerals(), Integer::sum);
         }
         return resources;
     }

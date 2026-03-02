@@ -2,6 +2,7 @@ package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
+import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.misc.Species;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.Season;
@@ -304,6 +305,7 @@ public class StatsDialog extends ZeroDialog {
         // Basic Info
         model.addRow(new Object[]{null, "Dynasty", "Name", dynasty.getName()});
         model.addRow(new Object[]{dynasty.getRank().getIcon(), "Dynasty", "Rank", dynasty.getRank().getName()}); 
+        model.addRow(new Object[]{null, "Dynasty", "Species", dynasty.getSpecies() != null ? dynasty.getSpecies().getName() : "Omni"});
         model.addRow(new Object[]{null, "Dynasty", "Total Colonies", dynastyStatsService.getTotalColonies(dynasty)});
         model.addRow(new Object[]{null, "Dynasty", "Global Population", dynastyStatsService.getTotalPopulation(dynasty)});
         model.addRow(new Object[]{null, "Dynasty", "Total Nuptial Flights", dynasty.getTotalNuptialFlights()});
@@ -320,14 +322,10 @@ public class StatsDialog extends ZeroDialog {
             .collect(Collectors.joining(", "));
         model.addRow(new Object[]{null, "Dynasty", "Defeated Species", defeated.isEmpty() ? "None" : defeated});
         
-        String absorbed = dynasty.getAbsorbedDynastyIds().stream()
-            .map(String::valueOf)
-            .collect(Collectors.joining(", "));
-        model.addRow(new Object[]{null, "Dynasty", "Absorbed IDs", absorbed.isEmpty() ? "None" : absorbed});
-
         // Unlocks
         model.addRow(new Object[]{null, null, "------", "------"});
         model.addRow(new Object[]{null, "Progress", "Upgrades Researched", dynasty.getUnlockedUpgrades().size()});
+        model.addRow(new Object[]{null, "Progress", "Completed Assimilations", dynasty.getCompletedAssimilations().size()});
         
         int totalBuildings = 0;
         for (Colony c : dynasty.getColonies()) {
@@ -342,15 +340,15 @@ public class StatsDialog extends ZeroDialog {
 
         // Global Resources
         model.addRow(new Object[]{null, null, "------", "------"});
-        Map<String, Integer> resources = dynastyStatsService.getGlobalResources(dynasty);
+        Map<ResourceType, Integer> resources = dynastyStatsService.getGlobalResources(dynasty);
         
-        model.addRow(new Object[]{GameConstants.RESOURCE_PLANT.getIcon(), "Resources", "Total Plants", resources.get("Plants")});
-        model.addRow(new Object[]{GameConstants.RESOURCE_FUNGI.getIcon(), "Resources", "Total Mushrooms", resources.get("Mushrooms")});
-        model.addRow(new Object[]{GameConstants.RESOURCE_MEAT.getIcon(), "Resources", "Total Protein", resources.get("Protein")});
-        model.addRow(new Object[]{GameConstants.RESOURCE_WATER.getIcon(), "Resources", "Total Water", resources.get("Water")});
-        model.addRow(new Object[]{GameConstants.RESOURCE_SYRUP.getIcon(), "Resources", "Total Syrups", resources.getOrDefault("Syrups", 0)});
-        model.addRow(new Object[]{GameConstants.RESOURCE_RESIN.getIcon(), "Resources", "Total Resins", resources.getOrDefault("Resins", 0)});
-        model.addRow(new Object[]{GameConstants.RESOURCE_ROCK.getIcon(), "Resources", "Total Minerals", resources.get("Minerals")});
+        model.addRow(new Object[]{GameConstants.RESOURCE_PLANT.getIcon(), "Resources", "Total Plants", resources.get(GameConstants.RESOURCE_PLANT)});
+        model.addRow(new Object[]{GameConstants.RESOURCE_FUNGI.getIcon(), "Resources", "Total Mushrooms", resources.get(GameConstants.RESOURCE_FUNGI)});
+        model.addRow(new Object[]{GameConstants.RESOURCE_MEAT.getIcon(), "Resources", "Total Protein", resources.get(GameConstants.RESOURCE_MEAT)});
+        model.addRow(new Object[]{GameConstants.RESOURCE_WATER.getIcon(), "Resources", "Total Water", resources.get(GameConstants.RESOURCE_WATER)});
+        model.addRow(new Object[]{GameConstants.RESOURCE_SYRUP.getIcon(), "Resources", "Total Syrups", resources.getOrDefault(GameConstants.RESOURCE_SYRUP, 0)});
+        model.addRow(new Object[]{GameConstants.RESOURCE_RESIN.getIcon(), "Resources", "Total Resins", resources.getOrDefault(GameConstants.RESOURCE_RESIN, 0)});
+        model.addRow(new Object[]{GameConstants.RESOURCE_ROCK.getIcon(), "Resources", "Total Minerals", resources.get(GameConstants.RESOURCE_ROCK)});
         
         // Global Deaths
         model.addRow(new Object[]{null, null, "------", "------"});
@@ -371,42 +369,42 @@ public class StatsDialog extends ZeroDialog {
         // --- Plants ---
         int plantProd = stats.getPlantProduction(colony);
         int plantCons = stats.getPlantConsumption(colony);
-        addResourceRow(model, GameConstants.RESOURCE_PLANT.getIcon(), "Plants", colony.getPlants(), stats.getPlantsCapacity(colony), 
+        addResourceRow(model, GameConstants.RESOURCE_PLANT.getIcon(), "Plants", (int) colony.getPlants(), stats.getPlantsCapacity(colony), 
             loc != null ? loc.getSourcesByType(GameConstants.RESOURCE_PLANT).size() : 0, stats.getSourceCapacity(colony),
             plantProd, plantCons);
             
         // --- Mushrooms ---
         int mushProd = stats.getTotalProduction(colony);
         int mushCons = stats.getTotalConsumption(colony);
-        addResourceRow(model, GameConstants.RESOURCE_FUNGI.getIcon(), "Mushrooms", colony.getMushrooms(), stats.getMushroomsCapacity(colony), 
+        addResourceRow(model, GameConstants.RESOURCE_FUNGI.getIcon(), "Mushrooms", (int) colony.getMushrooms(), stats.getMushroomsCapacity(colony), 
             0, 0, mushProd, mushCons);
             
         // --- Protein ---
         int protProd = stats.getProteinProduction(colony);
         int protCons = stats.getProteinConsumption(colony);
-        addResourceRow(model, GameConstants.RESOURCE_MEAT.getIcon(), "Protein", colony.getProtein(), stats.getProteinCapacity(colony), 
+        addResourceRow(model, GameConstants.RESOURCE_MEAT.getIcon(), "Protein", (int) colony.getProtein(), stats.getProteinCapacity(colony), 
             loc != null ? loc.getSourcesByType(GameConstants.RESOURCE_MEAT).size() : 0, stats.getSourceCapacity(colony),
             protProd, protCons);
             
         // --- Water ---
         int waterProd = stats.getWaterProduction(colony);
         int waterCons = stats.getWaterConsumption(colony);
-        addResourceRow(model, GameConstants.RESOURCE_WATER.getIcon(), "Water", colony.getWater(), stats.getWaterCapacity(colony), 
+        addResourceRow(model, GameConstants.RESOURCE_WATER.getIcon(), "Water", (int) colony.getWater(), stats.getWaterCapacity(colony), 
             loc != null ? loc.getSourcesByType(GameConstants.RESOURCE_WATER).size() : 0, stats.getSourceCapacity(colony),
             waterProd, waterCons);
 
         // --- Minerals ---
         int minProd = stats.getMineralProduction(colony);
         int minCons = stats.getMineralConsumption(colony);
-        addResourceRow(model, GameConstants.RESOURCE_ROCK.getIcon(), "Minerals", colony.getMinerals(), stats.getMineralsCapacity(colony), 
+        addResourceRow(model, GameConstants.RESOURCE_ROCK.getIcon(), "Minerals", (int) colony.getMinerals(), stats.getMineralsCapacity(colony), 
             loc != null ? loc.getSourcesByType(GameConstants.RESOURCE_ROCK).size() : 0, stats.getSourceCapacity(colony),
             minProd, minCons);
             
         // --- Syrups/Resins  ---
-        addResourceRow(model, GameConstants.RESOURCE_SYRUP.getIcon(), "Syrups", colony.getSyrups(), stats.getSyrupsCapacity(colony), 
+        addResourceRow(model, GameConstants.RESOURCE_SYRUP.getIcon(), "Syrups", (int) colony.getSyrups(), stats.getSyrupsCapacity(colony), 
             0, 0, colony.getAphids(), 0);
             
-        addResourceRow(model, GameConstants.RESOURCE_RESIN.getIcon(), "Resins", colony.getResins(), stats.getResinsCapacity(colony), 
+        addResourceRow(model, GameConstants.RESOURCE_RESIN.getIcon(), "Resins", (int) colony.getResins(), stats.getResinsCapacity(colony), 
             0, 0, (int) (plantProd * 0.01), 0);
 
         model.addRow(new Object[]{null, "------", "---", "---", "---", "---", "---", "---"});

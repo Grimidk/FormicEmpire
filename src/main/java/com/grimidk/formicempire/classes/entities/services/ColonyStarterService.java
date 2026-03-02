@@ -4,8 +4,11 @@ import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.entities.ResourceSource;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
+import java.util.List;
+import java.util.Random;
 
 public class ColonyStarterService {
     
@@ -89,7 +92,7 @@ public class ColonyStarterService {
         }
 
         if (colony.getAge() >= 7) {
-            colony.matureColony();
+            matureColony(colony);
         }
         
         System.out.println("[ColonyStarterService] Initialization complete for " + colony.getName() + " (ID: " + colony.getId() + "). Current Age: " + colony.getAge());
@@ -121,5 +124,61 @@ public class ColonyStarterService {
         if (colony.getBugs() != null) colony.getBugs().clear();
 
         hex.setColony(null);
+    }
+
+    public void matureColony(Colony colony) {
+        System.out.println("[ColonyStarterService] Maturation complete. Spawning workforce for " + colony.getName());
+        Random random = new Random();
+
+        List<Ant> workerList = colony.getWorkers();
+        for (int i = 0; i < 9; i++) {
+            Ant worker = new Ant(colony, GameConstants.TYPE_WORKER);
+            workerList.add(worker);
+        }
+
+        colony.configureWorker(0, GameConstants.ROLE_NURSE, WorldSpaces.UNDERWORLD);
+        colony.configureWorker(1, GameConstants.ROLE_NURSE, WorldSpaces.UNDERWORLD);
+        colony.configureWorker(2, GameConstants.ROLE_FARMER, WorldSpaces.UNDERWORLD);
+        colony.configureWorker(3, GameConstants.ROLE_NURSE, WorldSpaces.UNDERWORLD);
+        colony.configureWorker(4, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
+        colony.configureWorker(5, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
+        colony.configureWorker(6, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
+        colony.configureWorker(7, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
+        colony.configureWorker(8, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
+
+        colony.setAssignedRoleCount(GameConstants.ROLE_LAYER, 1);
+        colony.setAssignedRoleCount(GameConstants.ROLE_NURSE, 3);
+        colony.setAssignedRoleCount(GameConstants.ROLE_FARMER, 1);
+        colony.setAssignedRoleCount(GameConstants.ROLE_FORAGER, 5);
+
+        if (colony.getLocationService() != null) {
+            if (colony.getLocationService().getDiscoveredSources().isEmpty()) {
+                int range = 300;
+                
+                int centerX = ColonyLocationService.ANCHOR_CENTER_X; 
+                int centerY = ColonyLocationService.ANCHOR_HEIGHT / 2;
+                
+                int pX = centerX + random.nextInt((range * 2) + 1) - range;
+                int pY = centerY + random.nextInt((range * 2) + 1) - range;
+                pX = Math.max(50, pX);
+                pY = Math.max(50, pY);
+                ResourceSource initialPlant = new ResourceSource(GameConstants.RESOURCE_PLANT, 10000, pX, pY);
+                
+                int wX = centerX + random.nextInt((range * 2) + 1) - range;
+                int wY = centerY + random.nextInt((range * 2) + 1) - range;
+                wX = Math.max(50, wX);
+                wY = Math.max(50, wY);
+                ResourceSource initialWater = new ResourceSource(GameConstants.RESOURCE_WATER, 10000, wX, wY);
+                
+                colony.getLocationService().addSource(colony, initialPlant);
+                colony.getLocationService().addSource(colony, initialWater);
+            }
+        }
+        
+        if (colony.getPhysicsService() != null) {
+            colony.getPhysicsService().randomizeAllAntPositions(colony);
+        }
+
+        colony.logEvent("Colony Maturation Complete: Workforce deployed.");
     }
 }
