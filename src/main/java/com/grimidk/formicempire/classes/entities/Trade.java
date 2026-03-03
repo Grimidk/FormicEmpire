@@ -2,10 +2,12 @@ package com.grimidk.formicempire.classes.entities;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.misc.TradeMethod;
+import com.grimidk.formicempire.classes.entities.services.ColonyResourceService;
 
 public class Trade {
 
@@ -38,6 +40,36 @@ public class Trade {
         this.remainingHours = this.totalHours;
     }
 
+    public void startTrip() {
+        Colony originColony = origin.getColony();
+        if (originColony == null) {
+            isActive = false;
+            return;
+        }
+
+        // Subtract Resources
+        ColonyResourceService resService = originColony.getResourceService();
+        for (Map.Entry<ResourceType, Double> entry : load.entrySet()) {
+            resService.consumeResource(originColony, entry.getKey(), entry.getValue());
+        }
+
+        // Subtract Ants
+        for (Map.Entry<AntType, Integer> entry : transport.entrySet()) {
+            List<Ant> colonyAnts = originColony.getAntsByType(entry.getKey());
+            int toRemove = entry.getValue();
+            int removed = 0;
+            // Safer to use iterator or clear from end to avoid issues, 
+            // but CopyOnWriteArrayList is safe for remove(0).
+            while (removed < toRemove && !colonyAnts.isEmpty()) {
+                colonyAnts.remove(0);
+                removed++;
+            }
+        }
+        
+        this.isReturning = false;
+        this.remainingHours = this.totalHours;
+    }
+
     public void tick() {
         if (!isActive) return;
         
@@ -50,12 +82,18 @@ public class Trade {
             } else {
                 completeReturn();
                 if (isRecurrent) {
-                    isReturning = false;
-                    remainingHours = totalHours;
+                    startTrip(); // Subtract resources again for the next loop
                 } else {
                     isActive = false;
                 }
             }
+        }
+    }
+
+    public void cancel() {
+        if (isActive) {
+            completeReturn();
+            isActive = false;
         }
     }
 
@@ -69,7 +107,17 @@ public class Trade {
     }
 
     private void completeReturn() {
-
+        Colony originColony = origin.getColony();
+        if (originColony != null) {
+            // Add Ants back
+            for (Map.Entry<AntType, Integer> entry : transport.entrySet()) {
+                List<Ant> colonyAnts = originColony.getAntsByType(entry.getKey());
+                int toAdd = entry.getValue();
+                for (int i = 0; i < toAdd; i++) {
+                    colonyAnts.add(new Ant(originColony, entry.getKey()));
+                }
+            }
+        }
     }
 
     public int getRemainingHours() {

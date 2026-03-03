@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import com.grimidk.formicempire.classes.entities.services.ColonyTradeService;
 import com.grimidk.formicempire.classes.entities.services.DynastyTradeService;
@@ -54,20 +55,26 @@ public class DynastyManagementDialog extends ZeroDialog {
     private final Runnable refreshTask = this::liveUpdate;
 
     public DynastyManagementDialog(JFrame owner, Dynasty dynasty, Engine engine, Consumer<Colony> onGoToColony) {
-        super(owner, "Dynasty Management", new Dimension(1100, 700));
+        super(owner, "Dynasty Management", new Dimension(1100, 750));
         this.dynasty = dynasty;
         this.engine = engine;
         this.onGoToColony = onGoToColony;
         this.dynastyTradeService = new DynastyTradeService(dynasty, engine.getTradeManager());
 
         tabbedPane = new JTabbedPane();
+        tabbedPane.addChangeListener(e -> {
+            Component selected = tabbedPane.getSelectedComponent();
+            if (selected instanceof LiveUpdatePanel) {
+                ((LiveUpdatePanel) selected).updateData();
+            }
+        });
         add(tabbedPane, BorderLayout.CENTER);
 
         refreshDialog();
         initKeyBindings();
         
         if (this.engine != null) {
-            this.engine.addHourTickListener(refreshTask);
+            this.engine.addTickListener(refreshTask);
         }
 
         this.addWindowListener(new WindowAdapter() {
@@ -78,16 +85,18 @@ public class DynastyManagementDialog extends ZeroDialog {
             @Override
             public void windowClosed(WindowEvent e) {
                 if (engine != null) {
-                    engine.removeHourTickListener(refreshTask);
+                    engine.removeTickListener(refreshTask);
                 }
             }
             @Override
             public void windowClosing(WindowEvent e) {
                 if (engine != null) {
-                    engine.removeHourTickListener(refreshTask);
+                    engine.removeTickListener(refreshTask);
                 }
             }
         });
+        
+        setLocationRelativeTo(owner);
     }
 
     public void showDialog(int tabIndex) {
@@ -193,7 +202,7 @@ public class DynastyManagementDialog extends ZeroDialog {
         private JTable table;
         private DefaultTableModel model;
         private Colony activeColony;
-        private ColonyTradeService colonyTradeService;
+        private JLabel activeColonyLabel;
 
         public TradePanel() {
             super(new BorderLayout());
@@ -201,24 +210,41 @@ public class DynastyManagementDialog extends ZeroDialog {
         }
 
         private void initUI() {
-            String[] cols = {"Neighbor Colony", "Biome", "Distance", "Status", "Action"};
+            String[] cols = {"Direction", "Neighbor Colony", "Biome", "Outgoing Status", "Incoming Status", "Actions"};
             model = new DefaultTableModel(cols, 0) {
                 @Override
                 public boolean isCellEditable(int row, int column) {
-                    return column == 4;
+                    return column == 5;
+                }
+                @Override
+                public Class<?> getColumnClass(int columnIndex) {
+                    if (columnIndex == 5) return TradeRowData.class;
+                    return String.class;
                 }
             };
 
             table = new JTable(model);
-            table.setRowHeight(50);
+            table.setRowHeight(45);
+            table.setFont(new Font("SansSerif", Font.PLAIN, 12));
+            table.setForeground(Color.BLACK);
+            table.getTableHeader().setReorderingAllowed(false);
             
-            table.getColumnModel().getColumn(4).setCellRenderer(new TradeActionRenderer());
-            table.getColumnModel().getColumn(4).setCellEditor(new TradeActionEditor());
+            table.getColumnModel().getColumn(5).setCellRenderer(new TradeActionRenderer());
+            table.getColumnModel().getColumn(5).setCellEditor(new TradeActionEditor());
 
             add(new JScrollPane(table), BorderLayout.CENTER);
             
             JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-            topPanel.add(new JLabel("Trading from Active Colony"));
+            JLabel label = new JLabel("Managing Logistics for: ");
+            label.setForeground(Color.BLACK);
+            label.setFont(new Font("SansSerif", Font.PLAIN, 12));
+            topPanel.add(label);
+            
+            activeColonyLabel = new JLabel("None");
+            activeColonyLabel.setForeground(Color.BLACK);
+            activeColonyLabel.setFont(new Font("SansSerif", Font.BOLD, 12));
+            topPanel.add(activeColonyLabel);
+            
             add(topPanel, BorderLayout.NORTH);
         }
 
@@ -232,57 +258,103 @@ public class DynastyManagementDialog extends ZeroDialog {
             World world = engine.getWorld();
             if (world == null) return;
             
-            activeColony = null;
-            for (Hex h : world.getHexes()) {
-                if (h.isActive() && h.getColony() != null && h.getColony().isPlayer()) {
-                    activeColony = h.getColony();
-                    break;
-                }
-            }
+            Hex mapActive = world.getActiveHex();
+            activeColony = (mapActive != null && mapActive.getColony() != null && mapActive.getColony().isPlayer()) 
+                ? mapActive.getColony() 
+                : null;
 
             if (activeColony == null) {
+                activeColonyLabel.setText("N/A");
                 model.setRowCount(0);
                 return;
             }
-
-            colonyTradeService = new ColonyTradeService(activeColony);
-            List<Colony> neighbors = colonyTradeService.getNeighborColonies(world);
             
+            activeColonyLabel.setText(activeColony.getName());
+            Hex currentHex = world.getHexOfColony(activeColony);
+            
+            int selectedRow = table.getSelectedRow();
             model.setRowCount(0);
-            for (Colony n : neighbors) {
-                Hex nHex = colonyTradeService.getNeighborHex(world, n);
-                Trade activeTrade = findActiveTradeWith(n);
+
+            Hex[] adjacent = {
+                currentHex.getNorth(), currentHex.getNorthEast(), currentHex.getSouthEast(),
+                currentHex.getSouth(), currentHex.getSouthWest(), currentHex.getNorthWest()
+            };
+            String[] dirNames = {"North", "North-East", "South-East", "South", "South-West", "North-West"};
+
+            for (int i = 0; i < adjacent.length; i++) {
+                Hex neighborHex = adjacent[i];
+                if (neighborHex == null) continue;
                 
+                Colony neighborColony = neighborHex.getColony();
+                if (neighborColony == null) continue;
+
+                String neighborName = neighborColony.getName();
+                String biomeName = neighborHex.getBiome().getName();
+                
+                Trade outgoing = findTrade(activeColony, neighborColony);
+                Trade incoming = findTrade(neighborColony, activeColony);
+                
+                String outStatus = formatTradeStatus(outgoing);
+                String inStatus = formatTradeStatus(incoming);
+
                 Object[] row = {
-                    n.getName(),
-                    nHex != null ? nHex.getBiome().getName() : "Unknown",
-                    "1 Hex",
-                    activeTrade != null ? (activeTrade.isReturning() ? "Returning (" + activeTrade.getRemainingHours() + "h)" : "Transit (" + activeTrade.getRemainingHours() + "h)") : "None",
-                    n
+                    dirNames[i],
+                    neighborName,
+                    biomeName,
+                    outStatus,
+                    inStatus,
+                    new TradeRowData(neighborColony, outgoing)
                 };
                 model.addRow(row);
             }
+            
+            if (selectedRow >= 0 && selectedRow < table.getRowCount()) {
+                table.setRowSelectionInterval(selectedRow, selectedRow);
+            }
         }
 
-        private Trade findActiveTradeWith(Colony neighbor) {
-            return dynastyTradeService.getColonyTrades(activeColony).stream()
-                .filter(t -> (t.getOrigin().getColony() == activeColony && t.getDestination().getColony() == neighbor) ||
-                             (t.getOrigin().getColony() == neighbor && t.getDestination().getColony() == activeColony))
+        private Trade findTrade(Colony origin, Colony destination) {
+            if (origin == null || destination == null) return null;
+            return engine.getTradeManager().getActiveTrades().stream()
                 .filter(Trade::isActive)
+                .filter(t -> t.getOrigin().getColony() == origin && t.getDestination().getColony() == destination)
                 .findFirst().orElse(null);
+        }
+
+        private String formatTradeStatus(Trade trade) {
+            if (trade == null) return "None";
+            String transit = trade.isReturning() ? "Returning" : "Transit";
+            return transit + " (" + trade.getRemainingHours() + "h)";
+        }
+
+        private class TradeRowData {
+            final Colony neighbor;
+            final Trade outgoingTrade;
+            TradeRowData(Colony neighbor, Trade outgoingTrade) { 
+                this.neighbor = neighbor; 
+                this.outgoingTrade = outgoingTrade; 
+            }
         }
 
         private class TradeActionRenderer extends JPanel implements TableCellRenderer {
             private final JButton actionBtn = new JButton();
             public TradeActionRenderer() {
                 setLayout(new FlowLayout(FlowLayout.CENTER, 5, 2));
+                actionBtn.setFont(new Font("SansSerif", Font.PLAIN, 12));
                 add(actionBtn);
             }
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                Colony neighbor = (Colony) value;
-                Trade trade = findActiveTradeWith(neighbor);
-                actionBtn.setText(trade == null ? "New Trade" : "Manage");
+                if (value instanceof TradeRowData) {
+                    TradeRowData data = (TradeRowData) value;
+                    if (data.neighbor == null) {
+                        actionBtn.setText("Establish");
+                        actionBtn.setEnabled(false);
+                    } else {
+                        actionBtn.setText(data.outgoingTrade == null ? "Establish" : "Manage");
+                        actionBtn.setEnabled(true);
+                    }
+                }
                 setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
                 return this;
             }
@@ -291,43 +363,58 @@ public class DynastyManagementDialog extends ZeroDialog {
         private class TradeActionEditor extends AbstractCellEditor implements TableCellEditor {
             private final JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 2));
             private final JButton actionBtn = new JButton();
-            private Colony neighbor;
+            private TradeRowData currentData;
             public TradeActionEditor() {
+                actionBtn.setFont(new Font("SansSerif", Font.PLAIN, 12));
                 panel.add(actionBtn);
                 actionBtn.addActionListener(e -> {
                     fireEditingStopped();
-                    Trade trade = findActiveTradeWith(neighbor);
-                    if (trade == null) {
-                        createNewTrade(neighbor);
+                    if (currentData == null || currentData.neighbor == null) return;
+                    
+                    if (currentData.outgoingTrade == null) {
+                        establishTrade(currentData.neighbor);
                     } else {
-                        manageTrade(trade);
+                        manageTrade(currentData.outgoingTrade);
                     }
                 });
             }
             @Override
             public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-                neighbor = (Colony) value;
-                Trade trade = findActiveTradeWith(neighbor);
-                actionBtn.setText(trade == null ? "New Trade" : "Manage");
+                currentData = (TradeRowData) value;
+                if (currentData != null) {
+                    if (currentData.neighbor == null) {
+                        actionBtn.setText("Establish");
+                        actionBtn.setEnabled(false);
+                    } else {
+                        actionBtn.setText(currentData.outgoingTrade == null ? "Establish" : "Manage");
+                        actionBtn.setEnabled(true);
+                    }
+                }
                 return panel;
             }
             @Override
-            public Object getCellEditorValue() { return neighbor; }
+            public Object getCellEditorValue() { return currentData; }
         }
 
-        private void createNewTrade(Colony target) {
-            TradeCreationDialog dialog = new TradeCreationDialog((JFrame) SwingUtilities.getWindowAncestor(this), activeColony, target, engine);
+        private void establishTrade(Colony target) {
+            TradeCreationDialog dialog = new TradeCreationDialog(SwingUtilities.getWindowAncestor(this), activeColony, target, engine, null);
             dialog.setVisible(true);
             updateData();
         }
 
         private void manageTrade(Trade trade) {
-            int res = JOptionPane.showConfirmDialog(this, "Cancel this trade route?", "Manage Trade", JOptionPane.YES_NO_OPTION);
-            if (res == JOptionPane.YES_OPTION) {
-                trade.setActive(false);
+            String[] options = {"Modify", "Cancel Route", "Close"};
+            int res = JOptionPane.showOptionDialog(this, "Manage trade route to " + trade.getDestination().getColony().getName(), "Trade Management", 
+                JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
+            
+            if (res == 0) { // Modify
+                TradeCreationDialog dialog = new TradeCreationDialog(SwingUtilities.getWindowAncestor(this), activeColony, trade.getDestination().getColony(), engine, trade);
+                dialog.setVisible(true);
+            } else if (res == 1) { // Cancel
+                trade.cancel();
                 engine.getTradeManager().removeTrade(trade);
-                updateData();
             }
+            updateData();
         }
     }
 
@@ -335,90 +422,191 @@ public class DynastyManagementDialog extends ZeroDialog {
         private final Colony origin;
         private final Colony target;
         private final Engine engine;
-        private final Map<ResourceType, JTextField> resourceFields = new HashMap<>();
-        private final Map<AntType, JTextField> antFields = new HashMap<>();
+        private final Trade existingTrade;
+        private final Map<ResourceType, JSpinner> resourceSpinners = new HashMap<>();
+        private final Map<AntType, JSpinner> antSpinners = new HashMap<>();
         private final JComboBox<TradeMethod> methodCombo;
         private final JCheckBox recurrentCheck;
+        
+        private final JLabel capLabel = new JLabel("Capacity: 0.0 / 0.0");
+        private final JLabel speedLabel = new JLabel("Speed: 0.0x");
+        private final JLabel dangerLabel = new JLabel("Security: 0.0%");
 
-        public TradeCreationDialog(JFrame owner, Colony origin, Colony target, Engine engine) {
-            super(owner, "Create Trade Route to " + target.getName(), true);
+        public TradeCreationDialog(Window owner, Colony origin, Colony target, Engine engine, Trade existingTrade) {
+            super(owner, (existingTrade == null ? "Establish" : "Modify") + " Trade Route", ModalityType.APPLICATION_MODAL);
             this.origin = origin;
             this.target = target;
             this.engine = engine;
+            this.existingTrade = existingTrade;
             setLayout(new BorderLayout());
-            setSize(500, 600);
+            setSize(1000, 800);
             setLocationRelativeTo(owner);
+
+            JPanel headerPanel = new JPanel(new GridLayout(1, 3, 20, 20));
+            headerPanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
+            headerPanel.setBackground(new Color(245, 245, 245));
+            
+            Font statFont = new Font("SansSerif", Font.BOLD, 14);
+            capLabel.setFont(statFont);
+            speedLabel.setFont(statFont);
+            dangerLabel.setFont(statFont);
+            capLabel.setForeground(Color.BLACK);
+            speedLabel.setForeground(Color.BLACK);
+            dangerLabel.setForeground(Color.BLACK);
+            
+            headerPanel.add(capLabel);
+            headerPanel.add(speedLabel);
+            headerPanel.add(dangerLabel);
+            add(headerPanel, BorderLayout.NORTH);
 
             JPanel mainPanel = new JPanel();
             mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-            mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+            mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+            JLabel routeLabel = new JLabel("Route: " + origin.getName() + " -> " + target.getName());
+            routeLabel.setFont(new Font("SansSerif", Font.BOLD, 12));
+            routeLabel.setForeground(Color.BLACK);
+            mainPanel.add(routeLabel);
+            mainPanel.add(Box.createVerticalStrut(15));
 
             // Resources
-            mainPanel.add(new JLabel("Resources to send (Load):"));
+            JPanel resGrid = new JPanel(new GridLayout(0, 2, 15, 8));
+            resGrid.setBorder(BorderFactory.createTitledBorder("Cargo (Load)"));
             for (ResourceType rt : GameConstants.getResources()) {
-                JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
-                p.add(new JLabel(rt.getName(), rt.getIcon(), JLabel.LEFT));
-                JTextField field = new JTextField("0", 5);
-                p.add(field);
-                resourceFields.put(rt, field);
-                mainPanel.add(p);
+                JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 2));
+                JLabel label = new JLabel(rt.getName(), rt.getIcon(), JLabel.LEFT);
+                label.setPreferredSize(new Dimension(160, 25));
+                label.setForeground(Color.BLACK);
+                label.setFont(new Font("SansSerif", Font.PLAIN, 12));
+                p.add(label);
+                
+                double initialVal = (existingTrade != null) ? existingTrade.getLoad().getOrDefault(rt, 0.0) : 0.0;
+                JSpinner s = new JSpinner(new SpinnerNumberModel(initialVal, 0.0, 1000000.0, 10.0));
+                s.setFont(new Font("SansSerif", Font.PLAIN, 12));
+                s.addChangeListener(e -> updateStats());
+                resourceSpinners.put(rt, s);
+                p.add(s);
+                resGrid.add(p);
             }
+            mainPanel.add(resGrid);
+            mainPanel.add(Box.createVerticalStrut(15));
 
             // Ants
-            mainPanel.add(new JLabel("Ants to assign (Transport):"));
-            for (AntType at : GameConstants.getAntTypes()) {
-                if (at == GameConstants.TYPE_EGG || at == GameConstants.TYPE_LARVA || at == GameConstants.TYPE_PUPA || at == GameConstants.TYPE_DEAD || at == GameConstants.TYPE_ZOMBIE) continue;
-                JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
-                p.add(new JLabel(at.getName(), at.getIcon(), JLabel.LEFT));
-                JTextField field = new JTextField("0", 5);
-                p.add(field);
-                antFields.put(at, field);
-                mainPanel.add(p);
+            JPanel antGrid = new JPanel(new GridLayout(0, 2, 15, 8));
+            antGrid.setBorder(BorderFactory.createTitledBorder("Personnel (Filtered)"));
+            List<AntType> tradeAnts = List.of(GameConstants.TYPE_WORKER, GameConstants.TYPE_SOLDIER, GameConstants.TYPE_MAJOR, GameConstants.TYPE_PRINCESS);
+            for (AntType at : tradeAnts) {
+                JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 2));
+                JLabel label = new JLabel(at.getName(), at.getIcon(), JLabel.LEFT);
+                label.setPreferredSize(new Dimension(160, 25));
+                label.setForeground(Color.BLACK);
+                label.setFont(new Font("SansSerif", Font.PLAIN, 12));
+                p.add(label);
+                
+                int initialVal = (existingTrade != null) ? existingTrade.getTransport().getOrDefault(at, 0) : 0;
+                JSpinner s = new JSpinner(new SpinnerNumberModel(initialVal, 0, 1000000, 1));
+                s.setFont(new Font("SansSerif", Font.PLAIN, 12));
+                s.addChangeListener(e -> updateStats());
+                antSpinners.put(at, s);
+                p.add(s);
+                antGrid.add(p);
             }
+            mainPanel.add(antGrid);
+            mainPanel.add(Box.createVerticalStrut(15));
 
-            // Method & Type
-            JPanel configPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            // Logistics Section
+            JPanel configPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 10));
+            configPanel.setBorder(BorderFactory.createTitledBorder("Logistics"));
+            
             methodCombo = new JComboBox<>(GameConstants.getTradeMethods().toArray(new TradeMethod[0]));
-            configPanel.add(new JLabel("Method:"));
+            if (existingTrade != null) methodCombo.setSelectedItem(existingTrade.getMethod());
+            methodCombo.setFont(new Font("SansSerif", Font.PLAIN, 12));
+            methodCombo.setRenderer(new DefaultListCellRenderer() {
+                @Override
+                public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                    super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                    if (value instanceof TradeMethod) setText(((TradeMethod) value).getName());
+                    return this;
+                }
+            });
+            methodCombo.addActionListener(e -> updateStats());
+            JLabel mLabel = new JLabel("Method:");
+            mLabel.setForeground(Color.BLACK);
+            mLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
+            configPanel.add(mLabel);
             configPanel.add(methodCombo);
-            recurrentCheck = new JCheckBox("Recurrent");
+            
+            recurrentCheck = new JCheckBox("Recurrent Route", (existingTrade == null || existingTrade.isRecurrent()));
+            recurrentCheck.setFont(new Font("SansSerif", Font.PLAIN, 12));
+            recurrentCheck.setForeground(Color.BLACK);
+            configPanel.add(Box.createHorizontalStrut(20));
             configPanel.add(recurrentCheck);
             mainPanel.add(configPanel);
 
-            add(new JScrollPane(mainPanel), BorderLayout.CENTER);
+            add(mainPanel, BorderLayout.CENTER);
 
-            JButton createBtn = new JButton("Create Route");
+            JButton createBtn = new JButton(existingTrade == null ? "Confirm Trade Route" : "Update Trade Route");
+            createBtn.setFont(new Font("SansSerif", Font.BOLD, 12));
+            createBtn.setPreferredSize(new Dimension(0, 60));
             createBtn.addActionListener(e -> attemptCreate());
             add(createBtn, BorderLayout.SOUTH);
+            
+            updateStats();
+        }
+
+        private void updateStats() {
+            TradeMethod method = (TradeMethod) methodCombo.getSelectedItem();
+            if (method == null) return;
+
+            double totalLoad = resourceSpinners.values().stream().mapToDouble(s -> (Double) s.getValue()).sum();
+            double totalCap = 0;
+            double totalMitigation = 0;
+            
+            for (Map.Entry<AntType, JSpinner> entry : antSpinners.entrySet()) {
+                int count = (Integer) entry.getValue().getValue();
+                AntType type = entry.getKey();
+                if (type == GameConstants.TYPE_WORKER) totalCap += count * 10;
+                else if (type == GameConstants.TYPE_MAJOR) totalCap += count * 100;
+                else if (type == GameConstants.TYPE_PRINCESS) totalCap += count * 20;
+                else if (type == GameConstants.TYPE_SOLDIER) totalCap += count * 5;
+                totalMitigation += count * (type.getAttackMult() + type.getDefenseMult());
+            }
+            
+            totalCap *= method.getCapacityMult();
+            double speed = method.getSpeedMult();
+            double mitigationPercent = Math.min(100.0, (totalMitigation / (10.0 + method.getDangerFactor() * 50.0)) * 100.0);
+
+            capLabel.setText(String.format("Capacity: %.1f / %.1f", totalLoad, totalCap));
+            speedLabel.setText(String.format("Transit Speed: %.1fx", speed));
+            dangerLabel.setText(String.format("Security: %.1f%%", mitigationPercent));
         }
 
         private void attemptCreate() {
             Map<ResourceType, Double> load = new HashMap<>();
-            for (Map.Entry<ResourceType, JTextField> entry : resourceFields.entrySet()) {
-                try {
-                    double val = Double.parseDouble(entry.getValue().getText());
-                    if (val > 0) load.put(entry.getKey(), val);
-                } catch (NumberFormatException ignored) {}
+            for (Map.Entry<ResourceType, JSpinner> entry : resourceSpinners.entrySet()) {
+                double val = (Double) entry.getValue().getValue();
+                if (val > 0) load.put(entry.getKey(), val);
             }
 
             Map<AntType, Integer> transport = new HashMap<>();
-            for (Map.Entry<AntType, JTextField> entry : antFields.entrySet()) {
-                try {
-                    int val = Integer.parseInt(entry.getValue().getText());
-                    if (val > 0) transport.put(entry.getKey(), val);
-                } catch (NumberFormatException ignored) {}
+            for (Map.Entry<AntType, JSpinner> entry : antSpinners.entrySet()) {
+                int val = (Integer) entry.getValue().getValue();
+                if (val > 0) transport.put(entry.getKey(), val);
             }
 
             if (load.isEmpty() && transport.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Please specify load or transport.");
+                JOptionPane.showMessageDialog(this, "Empty cargo and personnel.");
                 return;
             }
 
-            World world = engine.getWorld();
-            Hex originHex = world.getHexOfColony(origin);
-            Hex targetHex = world.getHexOfColony(target);
+            if (existingTrade != null) {
+                existingTrade.cancel();
+                engine.getTradeManager().removeTrade(existingTrade);
+            }
 
-            Trade trade = new Trade(originHex, targetHex, load, transport, recurrentCheck.isSelected(), (TradeMethod) methodCombo.getSelectedItem());
+            World world = engine.getWorld();
+            Trade trade = new Trade(world.getHexOfColony(origin), world.getHexOfColony(target), load, transport, recurrentCheck.isSelected(), (TradeMethod) methodCombo.getSelectedItem());
+            trade.startTrip(); // Initial subtraction
             engine.getTradeManager().addTrade(trade);
             dispose();
         }
@@ -484,29 +672,24 @@ public class DynastyManagementDialog extends ZeroDialog {
             model.addTableModelListener(e -> {
                 int col = e.getColumn();
                 int row = e.getFirstRow();
-                
-                // Ignore full-row updates (like row insertions) where column is -1
                 if (col < 0) return;
-                
                 if (row >= 0 && row < displayedColonies.size()) {
-                    Colony c = displayedColonies.size() > row ? displayedColonies.get(row) : null;
+                    Colony c = displayedColonies.get(row);
                     if (c != null) {
-                        if (col == autoBuildCol) {
-                            c.setAutoBuildEnabled((Boolean) model.getValueAt(row, col));
-                        } else if (col == automationCol) {
-                            c.setAutomationEnabled((Boolean) model.getValueAt(row, col));
-                        }
+                        if (col == autoBuildCol) c.setAutoBuildEnabled((Boolean) model.getValueAt(row, col));
+                        else if (col == automationCol) c.setAutomationEnabled((Boolean) model.getValueAt(row, col));
                     }
                 }
             });
 
             table = new JTable(model);
-            
             table.setRowHeight(45); 
             table.setShowVerticalLines(false);
             table.setIntercellSpacing(new Dimension(0, 1));
             table.getTableHeader().setReorderingAllowed(false);
             table.setFillsViewportHeight(true);
+            table.setFont(new Font("SansSerif", Font.PLAIN, 12));
+            table.setForeground(Color.BLACK);
             
             table.getColumnModel().getColumn(0).setMaxWidth(50);
             table.getColumnModel().getColumn(0).setPreferredWidth(50);
@@ -519,20 +702,15 @@ public class DynastyManagementDialog extends ZeroDialog {
             table.getColumnModel().getColumn(5).setPreferredWidth(80); 
             table.getColumnModel().getColumn(6).setCellRenderer(new BiomeRenderer());
 
-            if (showAutoBuild) {
-                table.getColumnModel().getColumn(autoBuildCol).setMaxWidth(100);
-            }
-            if (showAutomation) {
-                table.getColumnModel().getColumn(automationCol).setMaxWidth(100);
-            }
+            if (showAutoBuild) table.getColumnModel().getColumn(autoBuildCol).setMaxWidth(100);
+            if (showAutomation) table.getColumnModel().getColumn(automationCol).setMaxWidth(100);
 
             table.getColumnModel().getColumn(actionCol).setMinWidth(220);
             table.getColumnModel().getColumn(actionCol).setPreferredWidth(220);
             table.getColumnModel().getColumn(actionCol).setCellRenderer(new ActionPanelRenderer());
             table.getColumnModel().getColumn(actionCol).setCellEditor(new ActionPanelEditor());
 
-            JScrollPane scrollPane = new JScrollPane(table);
-            add(scrollPane, BorderLayout.CENTER);
+            add(new JScrollPane(table), BorderLayout.CENTER);
         }
 
         @Override
@@ -543,7 +721,6 @@ public class DynastyManagementDialog extends ZeroDialog {
         @Override
         public void updateData() {
             int selectedRow = table.getSelectedRow();
-                        
             model.setRowCount(0);
             displayedColonies.clear();
 
@@ -551,56 +728,40 @@ public class DynastyManagementDialog extends ZeroDialog {
             World world = engine.getWorld();
 
             displayedColonies.addAll(rawColonies);
-            displayedColonies.sort(
-                Comparator.comparing(Colony::isCapital).reversed()
-                .thenComparingInt(Colony::getAntTotal).reversed()
-            );
+            displayedColonies.sort(Comparator.comparing(Colony::isCapital).reversed().thenComparingInt(Colony::getAntTotal).reversed());
 
             for (Colony colony : displayedColonies) {
                 Biome biome = null;
-                if (world != null && world.getHexes() != null) {
+                if (world != null) {
                     for (Hex hex : world.getHexes()) {
-                        if (hex.getColony() == colony && hex.getBiome() != null) {
+                        if (hex.getColony() == colony) {
                             biome = hex.getBiome();
                             break;
                         }
                     }
                 }
                 
-                String typeStr = colony.isCapital() ? "Capital" : "Satellite";
-
                 Object[] rowData = new Object[model.getColumnCount()];
                 rowData[0] = colony.getRank().getIcon();
                 rowData[1] = colony.getRank().getName();
-                rowData[2] = typeStr;
+                rowData[2] = colony.isCapital() ? "Capital" : "Satellite";
                 rowData[3] = colony.getName();
                 rowData[4] = colony.getAntTotal();
                 rowData[5] = colony.getAge();
                 rowData[6] = biome;
-                
                 if (showAutoBuild) rowData[autoBuildCol] = colony.isAutoBuildEnabled();
                 if (showAutomation) rowData[automationCol] = colony.isAutomationEnabled();
-                
                 rowData[actionCol] = colony;
-                
                 model.addRow(rowData);
             }
-            
-            if (selectedRow >= 0 && selectedRow < table.getRowCount()) {
-                table.setRowSelectionInterval(selectedRow, selectedRow);
-            }
-
-            table.revalidate();
-            table.repaint();
+            if (selectedRow >= 0 && selectedRow < table.getRowCount()) table.setRowSelectionInterval(selectedRow, selectedRow);
         }
     }
     
-    // --- Renderers & Editors ---
     private static class BiomeRenderer extends DefaultTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            
             if (value instanceof Biome) {
                 Biome b = (Biome) value;
                 setText(b.getName());
@@ -615,53 +776,38 @@ public class DynastyManagementDialog extends ZeroDialog {
     }
 
     private static class ActionPanelRenderer extends JPanel implements TableCellRenderer {
-        private final JButton editBtn;
-        private final JButton viewBtn;
-        private final JProgressBar progressBar;
-        private final JLabel statusLabel;
+        private final JButton editBtn = new JButton("Edit");
+        private final JButton viewBtn = new JButton("View");
+        private final JButton tradeBtn = new JButton("Trade");
+        private final JProgressBar progressBar = new JProgressBar(0, 7);
+        private final JLabel statusLabel = new JLabel("Maturing...", SwingConstants.CENTER);
 
         public ActionPanelRenderer() {
             setLayout(new CardLayout());
             setOpaque(true);
-
             JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 5));
             btnPanel.setOpaque(false);
-            editBtn = new JButton("Edit");
-            editBtn.setMargin(new Insets(2, 8, 2, 8));
-            viewBtn = new JButton("View");
-            viewBtn.setMargin(new Insets(2, 8, 2, 8));
             btnPanel.add(editBtn);
             btnPanel.add(viewBtn);
-
+            btnPanel.add(tradeBtn);
             JPanel progressPanel = new JPanel(new BorderLayout());
             progressPanel.setOpaque(false);
-            progressPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-            progressBar = new JProgressBar(0, 7);
             progressBar.setStringPainted(true);
-            statusLabel = new JLabel("Maturing...", SwingConstants.CENTER);
             statusLabel.setFont(statusLabel.getFont().deriveFont(10f));
             progressPanel.add(statusLabel, BorderLayout.NORTH);
             progressPanel.add(progressBar, BorderLayout.CENTER);
-
             add(btnPanel, "BUTTONS");
             add(progressPanel, "PROGRESS");
         }
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            if (isSelected) {
-                setBackground(table.getSelectionBackground());
-            } else {
-                setBackground(table.getBackground());
-            }
-
+            setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
             if (value instanceof Colony) {
                 Colony c = (Colony) value;
                 CardLayout cl = (CardLayout) getLayout();
-                
-                if (c.getAge() >= 7) {
-                    cl.show(this, "BUTTONS");
-                } else {
+                if (c.getAge() >= 7) cl.show(this, "BUTTONS");
+                else {
                     cl.show(this, "PROGRESS");
                     progressBar.setValue(c.getAge());
                     progressBar.setString(c.getAge() + " / 7 Days");
@@ -673,51 +819,31 @@ public class DynastyManagementDialog extends ZeroDialog {
 
     private class ActionPanelEditor extends AbstractCellEditor implements TableCellEditor {
         private final JPanel container;
-        private final JPanel btnPanel;
-        private final JPanel progressPanel;
-        private final JButton editBtn;
-        private final JButton viewBtn;
-        private final JProgressBar progressBar;
-        private final JLabel statusLabel;
-        
+        private final JButton editBtn = new JButton("Edit");
+        private final JButton viewBtn = new JButton("View");
+        private final JButton tradeBtn = new JButton("Trade");
+        private final JProgressBar progressBar = new JProgressBar(0, 7);
+        private final JLabel statusLabel = new JLabel("Maturing...", SwingConstants.CENTER);
         private Colony currentColony;
-        private final CardLayout cardLayout;
+        private final CardLayout cardLayout = new CardLayout();
 
         public ActionPanelEditor() {
-            cardLayout = new CardLayout();
             container = new JPanel(cardLayout);
             container.setOpaque(true);
-
-            btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 5));
+            JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 5));
             btnPanel.setOpaque(false);
-
-            editBtn = new JButton("Edit");
-            editBtn.setMargin(new Insets(2, 8, 2, 8));
-            editBtn.addActionListener(e -> {
-                fireEditingStopped();
-                performEdit(currentColony);
-            });
-
-            viewBtn = new JButton("View");
-            viewBtn.setMargin(new Insets(2, 8, 2, 8));
-            viewBtn.addActionListener(e -> {
-                fireEditingStopped();
-                performView(currentColony);
-            });
-
+            editBtn.addActionListener(e -> { fireEditingStopped(); performEdit(currentColony); });
+            viewBtn.addActionListener(e -> { fireEditingStopped(); performView(currentColony); });
+            tradeBtn.addActionListener(e -> { fireEditingStopped(); performManageTrade(currentColony); });
             btnPanel.add(editBtn);
             btnPanel.add(viewBtn);
-
-            progressPanel = new JPanel(new BorderLayout());
+            btnPanel.add(tradeBtn);
+            JPanel progressPanel = new JPanel(new BorderLayout());
             progressPanel.setOpaque(false);
-            progressPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-            progressBar = new JProgressBar(0, 7);
             progressBar.setStringPainted(true);
-            statusLabel = new JLabel("Maturing...", SwingConstants.CENTER);
             statusLabel.setFont(statusLabel.getFont().deriveFont(10f));
             progressPanel.add(statusLabel, BorderLayout.NORTH);
             progressPanel.add(progressBar, BorderLayout.CENTER);
-
             container.add(btnPanel, "BUTTONS");
             container.add(progressPanel, "PROGRESS");
         }
@@ -727,10 +853,8 @@ public class DynastyManagementDialog extends ZeroDialog {
             if (value instanceof Colony) {
                 this.currentColony = (Colony) value;
                 container.setBackground(table.getSelectionBackground());
-                
-                if (currentColony.getAge() >= 7) {
-                    cardLayout.show(container, "BUTTONS");
-                } else {
+                if (currentColony.getAge() >= 7) cardLayout.show(container, "BUTTONS");
+                else {
                     cardLayout.show(container, "PROGRESS");
                     progressBar.setValue(currentColony.getAge());
                     progressBar.setString(currentColony.getAge() + " / 7 Days");
@@ -738,14 +862,10 @@ public class DynastyManagementDialog extends ZeroDialog {
             }
             return container;
         }
-
         @Override
-        public Object getCellEditorValue() {
-            return currentColony;
-        }
+        public Object getCellEditorValue() { return currentColony; }
     }
 
-    // --- Actions ---
     private void performEdit(Colony colony) {
         if (colony == null) return;
         String newName = JOptionPane.showInputDialog(this, "Enter new name for " + colony.getName(), colony.getName());
@@ -760,6 +880,23 @@ public class DynastyManagementDialog extends ZeroDialog {
         if (onGoToColony != null) {
             onGoToColony.accept(colony);
             dispose();
+        }
+    }
+
+    private void performManageTrade(Colony colony) {
+        if (colony == null) return;
+        
+        // Force the world to change active hex to this colony
+        World world = engine.getWorld();
+        if (world != null) {
+            Hex target = world.getHexOfColony(colony);
+            if (target != null) {
+                world.changeActiveHex(target);
+            }
+        }
+
+        if (tabIndexMap.containsKey(TAB_TRADE)) {
+            tabbedPane.setSelectedIndex(tabIndexMap.get(TAB_TRADE));
         }
     }
 }

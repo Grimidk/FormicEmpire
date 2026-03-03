@@ -8,10 +8,15 @@ To Fix (By decreasing priority) :
 	(none right now)
 	
 	High:
-	Trade create
+	tunnel building
+	method restrictions
+	trade capacities stats
+	liquid/solid items
 
 	Mid:
 	trading from active colony
+	"view convoy" option
+	trade stats
 
 	Low:
 	sort colonies by biggest
