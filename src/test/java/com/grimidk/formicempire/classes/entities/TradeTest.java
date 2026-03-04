@@ -41,37 +41,28 @@ public class TradeTest {
     @Test
     public void testCapacityCheckFailsWhenFull() {
         Trade trade = new Trade(originHex, destHex, load, transport, false, GameConstants.METHOD_LAND);
-        
         origin.setPlants(200); 
-
         destination.setPlants(destination.getPlantsCapacity());
-
         trade.startTrip();
-        
         assertFalse(trade.isActive(), "Trade should be cancelled if destination is full/over capacity");
     }
 
     @Test
     public void testCapacityCheckSucceedsWhenNotFull() {
         destination.unlockBuilding(GameUnlocks.PLANT_CHAMBER_0); 
-        
         origin.unlockBuilding(GameUnlocks.PLANT_CHAMBER_0);
         origin.setPlants(200);
-
         Trade trade = new Trade(originHex, destHex, load, transport, false, GameConstants.METHOD_LAND);
         trade.startTrip();
-
         assertTrue(trade.isActive(), "Trade should be active if destination has capacity");
     }
 
     @Test
     public void testDurationCalculation() throws NoSuchFieldException, IllegalAccessException {
         Trade trade = new Trade(originHex, destHex, load, transport, false, GameConstants.METHOD_LAND);
-        
         Field totalHoursField = Trade.class.getDeclaredField("totalHours");
         totalHoursField.setAccessible(true);
         int hours = (int) totalHoursField.get(trade);
-        
         assertEquals(168, hours, "Duration should be 168 hours for base speed");
         
         Trade airTrade = new Trade(originHex, destHex, load, transport, false, GameConstants.METHOD_AIR);
@@ -80,7 +71,7 @@ public class TradeTest {
     }
 
     @Test
-    public void testSecurityLoss() throws NoSuchFieldException, IllegalAccessException {
+    public void testSecurityLossWithWorkers() throws NoSuchFieldException, IllegalAccessException {
         destination.unlockBuilding(GameUnlocks.PLANT_CHAMBER_0);
         origin.unlockBuilding(GameUnlocks.PLANT_CHAMBER_0);
         origin.setPlants(200);
@@ -94,6 +85,27 @@ public class TradeTest {
         
         trade.tick();
         
-        assertEquals(50.0, destination.getPlantsPrecise(), 0.01, "Destination should receive 50% of load due to 0.5 security");
+        assertEquals(18.18, destination.getPlantsPrecise(), 0.01, "Destination should receive ~18% of load with low security (10 workers)");
+    }
+
+    @Test
+    public void testSecurityLossWithSoldiers() throws NoSuchFieldException, IllegalAccessException {
+        destination.unlockBuilding(GameUnlocks.PLANT_CHAMBER_0);
+        origin.unlockBuilding(GameUnlocks.PLANT_CHAMBER_0);
+        origin.setPlants(200);
+
+        transport.clear();
+        transport.put(GameConstants.TYPE_SOLDIER, 50);
+
+        Trade trade = new Trade(originHex, destHex, load, transport, false, GameConstants.METHOD_LAND);
+        trade.startTrip();
+        
+        Field remainingHoursField = Trade.class.getDeclaredField("remainingHours");
+        remainingHoursField.setAccessible(true);
+        remainingHoursField.set(trade, 1);
+        
+        trade.tick();
+        
+        assertEquals(100.0, destination.getPlantsPrecise(), 0.01, "Destination should receive 100% of load with high security (50 soldiers)");
     }
 }

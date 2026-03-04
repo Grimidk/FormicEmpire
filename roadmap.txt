@@ -8,13 +8,11 @@ To Fix (By decreasing priority) :
 	(none right now)
 	
 	High:
+	creating sometimes not succesfull
+	wait for return to update
 	ants locking to colony
-	validate doesnt send with overcap with message and red letters
-	trade speed
-	refactor security 
-	take into account methods for multipliers
-	save routes and tunnels
 	reclose tabs with same letter
+	tunnels too easy to build
 
 	Mid:
 	"view convoy" option using going and returning biomes for tiles, or underground or air
@@ -35,6 +33,7 @@ To Feature (to be done in order):
 Needed for launch (v1.0) (Launch Version):
 	Priority:
 	genetic stagnation (obscured until below (80%)) every nuptial, assimilation gives base 5% after cloning (unlocked after 25?), alliances can increase while allied, stagnation = success chance to spread and drones from assimilated
+	good interfaces with sauce, fonts with spice, cool cursor
 
 	Everything else :
 	ant speed and biome depletion and further located sources take more time and sustainability of biome 
@@ -72,7 +71,6 @@ Needed for launch (v1.0) (Launch Version):
 	ant menus (detailed per ant)
 	music and sounds and settings for them
 	langs (ENG, SPA, POR, FRE, GER, RUS, CHN, JAP)
-	good interfaces with sauce, fonts with spice, cool cursor
 	warning screen for arthropophobia 
 	start animation and general animations
 	package into playable
@@ -89,6 +87,8 @@ Post launch (v1.1) (Improvements Update):
 	roadmap screen in game (use this txt)
 	global stats from all players (needs api and consent)
 	socials screen with discord server and instagram
+	more langs 
+	link to IRL documentation for ant facts
 
 Post launch (v1.2) (Civilization Update):
 	(Secret for now)

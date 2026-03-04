@@ -96,6 +96,7 @@ public final class GameUnlocks {
     public static final Upgrade ABILITY_AUTOMATION = new Upgrade(509, "Automation", "Ant Automation", "Allows your colonies to be automated in the dynasty management screen.", ABILITY_DYNASTY, 0);
     static { upgrades.add(ABILITY_AUTOMATION); }
     public static final Upgrade ABILITY_TUNNELS =  new Upgrade(510, "Tunnel Networks", "Subterranean Highways", "Allows your colonies to build tunnel networks between each other for faster and safer resource transport.", ABILITY_TRADE, 100000);    
+    static { upgrades.add(ABILITY_TUNNELS); }
     public static final Upgrade ABILITY_MANAGEMENT = new Upgrade(511, "Colony Management", "Decentralized Command", "Allows you to let colonies to build by themselves without your direct input.", ABILITY_DYNASTY, 0);
     static { upgrades.add(ABILITY_MANAGEMENT); }
     public static final Upgrade ABILITY_MASS_FLIGHT = new Upgrade(512, "Mass Nuptial Flights", "Imperial Decree", "Triggers nuptial flights in all colonies capable of doing so. Costs 10x standard forced flight cost.", ABILITY_FORCED_FLIGHT, 0);
@@ -106,13 +107,13 @@ public final class GameUnlocks {
     // -- Advanced Roles --
     public static final Upgrade ROLE_COURIER = new Upgrade(18, "Courier Role", "Logistic Network", "Allows workers to transport resources between colonies.", ABILITY_TRADE, 0 );
     static { upgrades.add(ROLE_COURIER); }
-    public static final Upgrade ROLE_BORER = new Upgrade(29, "Tunel-Borer Role", "Ant Excavator", "Allows workers to dig tunnels for safer trade routes.", ABILITY_TUNNELS, 0 );
+    public static final Upgrade ROLE_BORER = new Upgrade(29, "Tunnel-Borer Role", "Ant Excavator", "Allows workers to dig tunnels for safer trade routes.", ABILITY_TUNNELS, 0 );
     static { upgrades.add(ROLE_BORER); }
     public static final Upgrade ROLE_TRANSPORT = new Upgrade(35, "Resource Transport Role", "Heavy Lifting", "Allows majors to transport more resources for trade routes.", ROLE_COURIER, 100000 );
     static { upgrades.add(ROLE_TRANSPORT); }
     public static final Upgrade ROLE_ESCORT = new Upgrade(37, "Convoy Escort Role", "Protective Detail", "Allows soldiers to escort convoys of resources to reduce danger level.", ROLE_COURIER, 80000 );
     static { upgrades.add(ROLE_ESCORT); }
-    public static final Upgrade ROLE_ENGINEER = new Upgrade(38, "Excavator Role", "Tunnel Engineering", "Allows workers to dig tunnels for safer trade routes but at 1/100th of the efficiency.", ROLE_BORER, 50000 );
+    public static final Upgrade ROLE_ENGINEER = new Upgrade(38, "Tunnel Engineer Role", "Tunnel Engineering", "Allows workers to dig tunnels for safer trade routes but at 1/100th of the efficiency.", ROLE_BORER, 50000 );
     static { upgrades.add(ROLE_ENGINEER); }
     public static final Upgrade ROLE_SKYTRANS = new Upgrade(39, "Sky Transport Role", "Aerial Logistics", "Allows princesses to transport resources for trade routes, reducing travel time but at less capacity.", ROLE_COURIER, 150000 );
     static { upgrades.add(ROLE_SKYTRANS); }

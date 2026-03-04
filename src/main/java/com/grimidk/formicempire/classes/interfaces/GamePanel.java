@@ -457,7 +457,6 @@ public class GamePanel extends ZeroGamePanel {
 
         JLabel label = new JLabel("Loading game, please wait...", SwingConstants.CENTER);
         label.setForeground(Color.WHITE);
-        label.setFont(new Font("SansSerif", Font.BOLD, 18));
         label.setBorder(BorderFactory.createEmptyBorder(30, 60, 30, 60));
 
         panel.add(label, BorderLayout.CENTER);

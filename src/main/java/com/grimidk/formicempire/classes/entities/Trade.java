@@ -37,7 +37,7 @@ public class Trade {
     }
 
     private void calculateHours() {
-        float baseHours = 168f; // 7 days
+        float baseHours = 168f;
 
         float methodSpeed = method.getSpeedMult();
         
@@ -127,10 +127,30 @@ public class Trade {
         Colony originColony = origin.getColony();
         if (originColony == null) return;
         
-        double security = originColony.getStatsService().getBaseTradeSecurity(originColony);
+        double baseSec = originColony.getStatsService().getBaseTradeSecurity(originColony);
+        double totalSec = 0;
+        
+        for (Map.Entry<AntType, Integer> entry : transport.entrySet()) {
+            int count = entry.getValue();
+            if (count <= 0) continue;
+
+            AntType type = entry.getKey();
+            if (type == GameConstants.TYPE_WORKER) totalSec += count * baseSec * 1.0;
+            else if (type == GameConstants.TYPE_MAJOR) totalSec += count * baseSec * 2.5;
+            else if (type == GameConstants.TYPE_SOLDIER) totalSec += count * baseSec * 10.0;
+            else if (type == GameConstants.TYPE_PRINCESS) totalSec += count * baseSec * 1.0;
+        }
+
+        double dangerFactor = method.getDangerFactor();
+        double mitigationPercent = 100.0;
+        if (dangerFactor > 0) {
+            mitigationPercent = Math.min(100.0, (totalSec / (10.0 + dangerFactor * 50.0)) * 100.0);
+        }
+        
+        double securityFactor = mitigationPercent / 100.0;
         
         for (Map.Entry<ResourceType, Double> entry : load.entrySet()) {
-            load.put(entry.getKey(), entry.getValue() * security);
+            load.put(entry.getKey(), entry.getValue() * securityFactor);
         }
     }
 

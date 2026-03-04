@@ -398,7 +398,7 @@ public final class GameConstants {
     static { antRoles.add(ROLE_ARTILLERY); }
     public static final AntRole ROLE_SIEGE = new AntRole(20, TYPE_MAJOR, "Siege-Engine");
     static { antRoles.add(ROLE_SIEGE); }
-    public static final AntRole ROLE_BORER = new AntRole(21, TYPE_MAJOR, "Boring-Machine");
+    public static final AntRole ROLE_BORER = new AntRole(21, TYPE_MAJOR, "Tunnel Borer");
     static { antRoles.add(ROLE_BORER); }
     public static final AntRole ROLE_DRONE = new AntRole(22, TYPE_DRONE, "Drone");
     static { antRoles.add(ROLE_DRONE); }
@@ -422,7 +422,7 @@ public final class GameConstants {
     static { antRoles.add(ROLE_ASSISTANT); }
     public static final AntRole ROLE_ESCORT = new AntRole(32, TYPE_SOLDIER, "Convoy Escort");
     static { antRoles.add(ROLE_ESCORT); }
-    public static final AntRole ROLE_ENGINEER = new AntRole(33, TYPE_WORKER, "Excavator");
+    public static final AntRole ROLE_ENGINEER = new AntRole(33, TYPE_WORKER, "Tunnel Engineer");
     static { antRoles.add(ROLE_ENGINEER); }
     public static final AntRole ROLE_SKYTRANS = new AntRole(34, TYPE_PRINCESS, "Sky Transport");
     static { antRoles.add(ROLE_SKYTRANS); }

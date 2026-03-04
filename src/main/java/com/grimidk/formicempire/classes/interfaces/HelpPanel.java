@@ -370,7 +370,6 @@ public class HelpPanel extends JPanel {
         descriptionArea.setWrapStyleWord(true);
         descriptionArea.setLineWrap(true);
         descriptionArea.setEditable(false);
-        descriptionArea.setFont(new Font("SansSerif", Font.PLAIN, 14));
         descriptionArea.setBorder(new EmptyBorder(10, 10, 10, 10));
         
         JScrollPane textScrollPane = new JScrollPane(descriptionArea);

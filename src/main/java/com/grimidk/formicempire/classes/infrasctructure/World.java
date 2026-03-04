@@ -5,8 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.lang.reflect.Field;
 
+import com.grimidk.formicempire.classes.constants.ant.AntType;
+import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.misc.Species;
+import com.grimidk.formicempire.classes.constants.misc.TradeMethod;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.Humidity;
 import com.grimidk.formicempire.classes.constants.world.MoonPhase;
@@ -17,6 +21,8 @@ import com.grimidk.formicempire.classes.constants.world.Weather;
 import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.entities.Trade;
+import com.grimidk.formicempire.classes.entities.Tunnel;
 import com.grimidk.formicempire.classes.entities.services.ColonyStarterService;
 import com.grimidk.formicempire.classes.entities.services.DynastyDeathService;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
@@ -62,6 +68,10 @@ public class World {
         this.random = new Random();
     }
     
+    public Engine getEngine() {
+        return engine;
+    }
+
     public synchronized int getNextColonyId() {
         return colonyIdCounter++;
     }
@@ -592,11 +602,77 @@ public class World {
             generateWorld(GameConstants.BIOME_PLAINS, this.worldRadius, colony, baseName);
         }
 
+        if (savefile.getDynastys() != null) {
+            for (Savefile.SavedDynasty sd : savefile.getDynastys()) {
+                Dynasty d = loadedDynastys.get(sd.id);
+                if (d != null && sd.tunnels != null) {
+                    for (Savefile.SavedTunnel st : sd.tunnels) {
+                        Hex hA = getHexAt(st.qA, st.rA);
+                        Hex hB = getHexAt(st.qB, st.rB);
+                        if (hA != null && hB != null) {
+                            Tunnel tunnel = new Tunnel(hA, hB, st.totalCost);
+                            try {
+                                Field pf = Tunnel.class.getDeclaredField("progress");
+                                Field icf = Tunnel.class.getDeclaredField("isComplete");
+                                pf.setAccessible(true);
+                                icf.setAccessible(true);
+                                pf.set(tunnel, st.progress);
+                                icf.set(tunnel, st.isComplete);
+                            } catch (Exception e) { e.printStackTrace(); }
+                            d.addTunnel(tunnel);
+                        }
+                    }
+                }
+            }
+        }
+
+        if (savefile.getTrades() != null && engine != null && engine.getTradeManager() != null) {
+            engine.getTradeManager().getActiveTrades().forEach(t -> engine.getTradeManager().removeTrade(t));
+            for (Savefile.SavedTrade st : savefile.getTrades()) {
+                Hex hO = getHexAt(st.qOrigin, st.rOrigin);
+                Hex hD = getHexAt(st.qDest, st.rDest);
+                if (hO != null && hD != null) {
+                    Map<ResourceType, Double> load = new HashMap<>();
+                    for (Map.Entry<Integer, Double> e : st.load.entrySet()) {
+                        GameConstants.getResources().stream().filter(r -> r.getId() == e.getKey()).findFirst().ifPresent(r -> load.put(r, e.getValue()));
+                    }
+                    Map<AntType, Integer> trans = new HashMap<>();
+                    for (Map.Entry<Integer, Integer> e : st.transport.entrySet()) {
+                        GameConstants.getAntTypes().stream().filter(at -> at.getId() == e.getKey()).findFirst().ifPresent(at -> trans.put(at, e.getValue()));
+                    }
+                    TradeMethod method = GameConstants.getTradeMethods().stream().filter(m -> m.getId() == st.methodId).findFirst().orElse(GameConstants.METHOD_LAND);
+                    
+                    Trade trade = new Trade(hO, hD, load, trans, st.isRecurrent, method);
+                    trade.setActive(st.isActive);
+                    try {
+                        Field th = Trade.class.getDeclaredField("totalHours");
+                        Field rh = Trade.class.getDeclaredField("remainingHours");
+                        Field ret = Trade.class.getDeclaredField("isReturning");
+                        th.setAccessible(true);
+                        rh.setAccessible(true);
+                        ret.setAccessible(true);
+                        th.set(trade, st.totalHours);
+                        rh.set(trade, st.remainingHours);
+                        ret.set(trade, st.isReturning);
+                    } catch (Exception e) { e.printStackTrace(); }
+                    engine.getTradeManager().addTrade(trade);
+                }
+            }
+        }
+
         this.colonyIdCounter = maxColId + 1;
         this.dynastyIdCounter = maxDynastyId + 1;
         
         changeActiveHex(getSpawnHex()); 
         updateEnvironmentalConditions();
+    }
+
+    public Hex getHexAt(int q, int r) {
+        if (hexes == null) return null;
+        for (Hex h : hexes) {
+            if (h.getQ() == q && h.getR() == r) return h;
+        }
+        return null;
     }
     
     private void updateEnvironmentalConditions() {

@@ -200,6 +200,7 @@ public class DynastyManagementDialog extends ZeroDialog {
         private DefaultTableModel model;
         private Colony activeColony;
         private JLabel activeColonyLabel;
+        private boolean tunnelsVisible = true;
 
         public TradePanel() {
             super(new BorderLayout());
@@ -207,44 +208,61 @@ public class DynastyManagementDialog extends ZeroDialog {
         }
 
         private void initUI() {
-            String[] cols = {"Direction", "Neighbor Colony", "Tunnel Status", "Outgoing Route", "Incoming Route", "Actions"};
-            model = new DefaultTableModel(cols, 0) {
+            removeAll();
+            tunnelsVisible = dynasty.hasUpgrade(GameUnlocks.ABILITY_TUNNELS);
+            
+            List<String> cols = new ArrayList<>(List.of("Direction", "Neighbor Colony"));
+            if (tunnelsVisible) cols.add("Tunnel Status");
+            cols.addAll(List.of("Outgoing Route", "Incoming Route", "Actions"));
+
+            model = new DefaultTableModel(cols.toArray(), 0) {
                 @Override
                 public boolean isCellEditable(int row, int column) {
-                    return column == 5 || column == 2;
+                    int last = getColumnCount() - 1;
+                    if (tunnelsVisible) return column == last || column == 2;
+                    return column == last;
                 }
                 @Override
                 public Class<?> getColumnClass(int columnIndex) {
-                    if (columnIndex == 5 || columnIndex == 2) return TradeRowData.class;
+                    int last = getColumnCount() - 1;
+                    if (tunnelsVisible) {
+                        if (columnIndex == last || columnIndex == 2) return TradeRowData.class;
+                    } else {
+                        if (columnIndex == last) return TradeRowData.class;
+                    }
                     return String.class;
                 }
             };
 
             table = new JTable(model);
             table.setRowHeight(45);
-            table.setFont(new Font("SansSerif", Font.PLAIN, 12));
-            table.setForeground(Color.BLACK);
             table.getTableHeader().setReorderingAllowed(false);
             
-            table.getColumnModel().getColumn(2).setCellRenderer(new TunnelCellRenderer());
-            table.getColumnModel().getColumn(2).setCellEditor(new TunnelCellEditor());
-            table.getColumnModel().getColumn(5).setCellRenderer(new TradeActionRenderer());
-            table.getColumnModel().getColumn(5).setCellEditor(new TradeActionEditor());
+            if (tunnelsVisible) {
+                table.getColumnModel().getColumn(2).setCellRenderer(new TunnelCellRenderer());
+                table.getColumnModel().getColumn(2).setCellEditor(new TunnelCellEditor());
+                table.getColumnModel().getColumn(5).setCellRenderer(new TradeActionRenderer());
+                table.getColumnModel().getColumn(5).setCellEditor(new TradeActionEditor());
+            } else {
+                table.getColumnModel().getColumn(4).setCellRenderer(new TradeActionRenderer());
+                table.getColumnModel().getColumn(4).setCellEditor(new TradeActionEditor());
+            }
 
             add(new JScrollPane(table), BorderLayout.CENTER);
             
             JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
             JLabel label = new JLabel("Managing Logistics for: ");
             label.setForeground(Color.BLACK);
-            label.setFont(new Font("SansSerif", Font.PLAIN, 12));
             topPanel.add(label);
             
             activeColonyLabel = new JLabel("None");
             activeColonyLabel.setForeground(Color.BLACK);
-            activeColonyLabel.setFont(new Font("SansSerif", Font.BOLD, 12));
+            activeColonyLabel.setFont(activeColonyLabel.getFont().deriveFont(Font.BOLD));
             topPanel.add(activeColonyLabel);
             
             add(topPanel, BorderLayout.NORTH);
+            revalidate();
+            repaint();
         }
 
         @Override
@@ -254,6 +272,10 @@ public class DynastyManagementDialog extends ZeroDialog {
 
         @Override
         public void updateData() {
+            if (tunnelsVisible != dynasty.hasUpgrade(GameUnlocks.ABILITY_TUNNELS)) {
+                initUI();
+            }
+
             World world = engine.getWorld();
             if (world == null) return;
             
@@ -269,8 +291,8 @@ public class DynastyManagementDialog extends ZeroDialog {
             }
             
             activeColonyLabel.setText(activeColony.getName());
+
             Hex currentHex = world.getHexOfColony(activeColony);
-            
             int selectedRow = table.getSelectedRow();
             model.setRowCount(0);
 
@@ -297,15 +319,12 @@ public class DynastyManagementDialog extends ZeroDialog {
                 String inStatus = formatTradeStatus(incoming);
 
                 TradeRowData rowData = new TradeRowData(neighborColony, neighborHex, outgoing, tunnel);
-                Object[] row = {
-                    dirNames[i],
-                    neighborName,
-                    rowData, 
-                    outStatus,
-                    inStatus,
-                    rowData  
-                };
-                model.addRow(row);
+                
+                if (tunnelsVisible) {
+                    model.addRow(new Object[]{dirNames[i], neighborName, rowData, outStatus, inStatus, rowData});
+                } else {
+                    model.addRow(new Object[]{dirNames[i], neighborName, outStatus, inStatus, rowData});
+                }
             }
             
             if (selectedRow >= 0 && selectedRow < table.getRowCount()) {
@@ -335,10 +354,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 setLayout(new BorderLayout(5, 5));
                 setOpaque(true);
                 progressBar.setStringPainted(true);
-                progressBar.setFont(new Font("SansSerif", Font.PLAIN, 10));
                 label.setHorizontalAlignment(JLabel.CENTER);
-                label.setFont(new Font("SansSerif", Font.PLAIN, 12));
-                buildBtn.setFont(new Font("SansSerif", Font.PLAIN, 11));
             }
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -389,7 +405,6 @@ public class DynastyManagementDialog extends ZeroDialog {
             private final JButton buildBtn = new JButton("Build Tunnel");
             private TradeRowData currentData;
             public TunnelCellEditor() {
-                buildBtn.setFont(new Font("SansSerif", Font.PLAIN, 11));
                 panel.add(buildBtn, BorderLayout.CENTER);
                 buildBtn.addActionListener(e -> {
                     if (currentData != null && currentData.tunnel == null) {
@@ -433,7 +448,6 @@ public class DynastyManagementDialog extends ZeroDialog {
             private final JButton actionBtn = new JButton();
             public TradeActionRenderer() {
                 setLayout(new FlowLayout(FlowLayout.CENTER, 5, 2));
-                actionBtn.setFont(new Font("SansSerif", Font.PLAIN, 12));
                 add(actionBtn);
             }
             @Override
@@ -458,7 +472,6 @@ public class DynastyManagementDialog extends ZeroDialog {
             private final JButton actionBtn = new JButton();
             private TradeRowData currentData;
             public TradeActionEditor() {
-                actionBtn.setFont(new Font("SansSerif", Font.PLAIN, 12));
                 panel.add(actionBtn);
                 actionBtn.addActionListener(e -> {
                     fireEditingStopped();
@@ -521,9 +534,11 @@ public class DynastyManagementDialog extends ZeroDialog {
         private final Map<AntType, JSpinner> antSpinners = new HashMap<>();
         private final JComboBox<TradeMethod> methodCombo;
         private final JCheckBox recurrentCheck;
+        private final JButton createBtn;
         
         private final JLabel capLabel = new JLabel("Capacity: 0.0 / 0.0");
-        private final JLabel speedLabel = new JLabel("Speed: 0.0x");
+        private final JLabel speedLabel = new JLabel("Transit Speed: 0.0x");
+        private final JLabel timeLabel = new JLabel("Travel Time: 0h");
         private final JLabel dangerLabel = new JLabel("Security: 0.0%");
 
         public TradeCreationDialog(Window owner, Colony origin, Colony target, Engine engine, Trade existingTrade) {
@@ -536,20 +551,22 @@ public class DynastyManagementDialog extends ZeroDialog {
             setSize(1000, 800);
             setLocationRelativeTo(owner);
 
-            JPanel headerPanel = new JPanel(new GridLayout(1, 3, 20, 20));
+            JPanel headerPanel = new JPanel(new GridLayout(1, 4, 20, 20));
             headerPanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
             headerPanel.setBackground(new Color(245, 245, 245));
             
-            Font statFont = new Font("SansSerif", Font.BOLD, 14);
-            capLabel.setFont(statFont);
-            speedLabel.setFont(statFont);
-            dangerLabel.setFont(statFont);
+            capLabel.setFont(capLabel.getFont().deriveFont(Font.BOLD, 14f));
+            speedLabel.setFont(speedLabel.getFont().deriveFont(Font.BOLD, 14f));
+            timeLabel.setFont(timeLabel.getFont().deriveFont(Font.BOLD, 14f));
+            dangerLabel.setFont(dangerLabel.getFont().deriveFont(Font.BOLD, 14f));
             capLabel.setForeground(Color.BLACK);
             speedLabel.setForeground(Color.BLACK);
+            timeLabel.setForeground(Color.BLACK);
             dangerLabel.setForeground(Color.BLACK);
             
             headerPanel.add(capLabel);
             headerPanel.add(speedLabel);
+            headerPanel.add(timeLabel);
             headerPanel.add(dangerLabel);
             add(headerPanel, BorderLayout.NORTH);
 
@@ -558,7 +575,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
             JLabel routeLabel = new JLabel("Route: " + origin.getName() + " -> " + target.getName());
-            routeLabel.setFont(new Font("SansSerif", Font.BOLD, 12));
+            routeLabel.setFont(routeLabel.getFont().deriveFont(Font.BOLD));
             routeLabel.setForeground(Color.BLACK);
             mainPanel.add(routeLabel);
             mainPanel.add(Box.createVerticalStrut(15));
@@ -572,12 +589,10 @@ public class DynastyManagementDialog extends ZeroDialog {
                 JLabel label = new JLabel(rt.getName(), rt.getIcon(), JLabel.LEFT);
                 label.setPreferredSize(new Dimension(160, 25));
                 label.setForeground(Color.BLACK);
-                label.setFont(new Font("SansSerif", Font.PLAIN, 12));
                 p.add(label);
                 
                 double initialVal = (existingTrade != null) ? existingTrade.getLoad().getOrDefault(rt, 0.0) : 0.0;
                 JSpinner s = new JSpinner(new SpinnerNumberModel(initialVal, 0.0, 1000000.0, 10.0));
-                s.setFont(new Font("SansSerif", Font.PLAIN, 12));
                 s.addChangeListener(e -> updateStats());
                 resourceSpinners.put(rt, s);
                 p.add(s);
@@ -608,12 +623,10 @@ public class DynastyManagementDialog extends ZeroDialog {
                 JLabel label = new JLabel(labelName + " (" + available + ")", at.getIcon(), JLabel.LEFT);
                 label.setPreferredSize(new Dimension(200, 25));
                 label.setForeground(Color.BLACK);
-                label.setFont(new Font("SansSerif", Font.PLAIN, 12));
                 p.add(label);
                 
                 int initialVal = (existingTrade != null) ? existingTrade.getTransport().getOrDefault(at, 0) : 0;
                 JSpinner s = new JSpinner(new SpinnerNumberModel(initialVal, 0, available, 1));
-                s.setFont(new Font("SansSerif", Font.PLAIN, 12));
                 s.addChangeListener(e -> {
                     updateStats();
                     updateAvailableMethods();
@@ -632,7 +645,6 @@ public class DynastyManagementDialog extends ZeroDialog {
             updateAvailableMethods();
 
             if (existingTrade != null) methodCombo.setSelectedItem(existingTrade.getMethod());
-            methodCombo.setFont(new Font("SansSerif", Font.PLAIN, 12));
             methodCombo.setRenderer(new DefaultListCellRenderer() {
                 @Override
                 public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -644,12 +656,10 @@ public class DynastyManagementDialog extends ZeroDialog {
             methodCombo.addActionListener(e -> updateStats());
             JLabel mLabel = new JLabel("Method:");
             mLabel.setForeground(Color.BLACK);
-            mLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
             configPanel.add(mLabel);
             configPanel.add(methodCombo);
             
             recurrentCheck = new JCheckBox("Recurrent Route", (existingTrade == null || existingTrade.isRecurrent()));
-            recurrentCheck.setFont(new Font("SansSerif", Font.PLAIN, 12));
             recurrentCheck.setForeground(Color.BLACK);
             configPanel.add(Box.createHorizontalStrut(20));
             configPanel.add(recurrentCheck);
@@ -657,8 +667,8 @@ public class DynastyManagementDialog extends ZeroDialog {
 
             add(mainPanel, BorderLayout.CENTER);
 
-            JButton createBtn = new JButton(existingTrade == null ? "Confirm Trade Route" : "Update Trade Route");
-            createBtn.setFont(new Font("SansSerif", Font.BOLD, 12));
+            createBtn = new JButton(existingTrade == null ? "Confirm Trade Route" : "Update Trade Route");
+            createBtn.setFont(createBtn.getFont().deriveFont(Font.BOLD));
             createBtn.setPreferredSize(new Dimension(0, 60));
             createBtn.addActionListener(e -> attemptCreate());
             add(createBtn, BorderLayout.SOUTH);
@@ -675,11 +685,8 @@ public class DynastyManagementDialog extends ZeroDialog {
             for (Map.Entry<AntType, JSpinner> entry : antSpinners.entrySet()) {
                 int count = (Integer) entry.getValue().getValue();
                 if (count > 0) {
-                    if (entry.getKey() != GameConstants.TYPE_PRINCESS) {
-                        princessesOnly = false;
-                    } else {
-                        anyPrincesses = true;
-                    }
+                    if (entry.getKey() != GameConstants.TYPE_PRINCESS) { princessesOnly = false; }
+                    else { anyPrincesses = true; }
                 }
             }
             if (!anyPrincesses) princessesOnly = false;
@@ -715,18 +722,22 @@ public class DynastyManagementDialog extends ZeroDialog {
             if (method == null) return;
 
             double totalLoad = resourceSpinners.values().stream().mapToDouble(s -> (Double) s.getValue()).sum();
-            
             double baseCap = origin.getStatsService().getBaseTradeCapacity(origin);
             double baseSec = origin.getStatsService().getBaseTradeSecurity(origin);
             
             double totalCap = 0;
             double totalSec = 0;
+            float totalAntSpeed = 0;
+            int totalAnts = 0;
             
             for (Map.Entry<AntType, JSpinner> entry : antSpinners.entrySet()) {
                 int count = (Integer) entry.getValue().getValue();
                 if (count <= 0) continue;
 
                 AntType type = entry.getKey();
+                totalAnts += count;
+                totalAntSpeed += type.getSpeedMult() * count;
+
                 if (type == GameConstants.TYPE_WORKER) { 
                     totalCap += count * baseCap * 1.0;
                     totalSec += count * baseSec * 1.0;
@@ -734,7 +745,6 @@ public class DynastyManagementDialog extends ZeroDialog {
                     totalCap += count * baseCap * 5.0;
                     totalSec += count * baseSec * 2.5;
                 } else if (type == GameConstants.TYPE_SOLDIER) { 
-                    totalCap += count * baseCap * 0.0;
                     totalSec += count * baseSec * 10.0;
                 } else if (type == GameConstants.TYPE_PRINCESS) {
                     totalCap += count * baseCap * 1.0;
@@ -743,19 +753,41 @@ public class DynastyManagementDialog extends ZeroDialog {
             }
             
             totalCap *= method.getCapacityMult();
-            double speed = method.getSpeedMult();
+            
+            float methodSpeed = method.getSpeedMult();
+            float workerSpeed = GameConstants.TYPE_WORKER.getSpeedMult();
+            float avgAntSpeed = (totalAnts > 0) ? (totalAntSpeed / totalAnts) : workerSpeed;
+            float speedFactor = methodSpeed * (avgAntSpeed / workerSpeed);
+            
+            World world = engine.getWorld();
+            Tunnel tunnel = origin.getDynasty().getTunnelBetween(world.getHexOfColony(origin), world.getHexOfColony(target));
+            if (tunnel != null && tunnel.isComplete()) speedFactor *= 1.5f;
+
+            int hours = Math.max(1, Math.round(168f / speedFactor));
             
             double dangerFactor = method.getDangerFactor();
-            double mitigationPercent = 0;
+            double mitigationPercent = 100.0;
             if (dangerFactor > 0) {
                 mitigationPercent = Math.min(100.0, (totalSec / (10.0 + dangerFactor * 50.0)) * 100.0);
-            } else {
-                mitigationPercent = 100.0;
             }
 
+            boolean overCap = totalLoad > totalCap;
+            boolean noLoad = totalLoad <= 0;
+            boolean noAnts = totalAnts <= 0;
+
             capLabel.setText(String.format("Capacity: %.1f / %.1f", totalLoad, totalCap));
-            speedLabel.setText(String.format("Transit Speed: %.1fx", speed));
+            capLabel.setForeground(overCap ? Color.RED : Color.BLACK);
+            
+            speedLabel.setText(String.format("Transit Speed: %.2fx", speedFactor));
+            timeLabel.setText(String.format("Travel Time: %dh", hours));
             dangerLabel.setText(String.format("Security: %.1f%%", mitigationPercent));
+            dangerLabel.setForeground(mitigationPercent < 100 ? new Color(180, 100, 0) : new Color(0, 120, 0));
+
+            createBtn.setEnabled(!overCap && !noAnts && !noLoad);
+            if (overCap) createBtn.setToolTipText("Cargo exceeds transport capacity!");
+            else if (noAnts) createBtn.setToolTipText("No ants assigned to transport!");
+            else if (noLoad) createBtn.setToolTipText("No resources selected for trade!");
+            else createBtn.setToolTipText(null);
         }
 
         private void attemptCreate() {
@@ -771,8 +803,12 @@ public class DynastyManagementDialog extends ZeroDialog {
                 if (val > 0) transport.put(entry.getKey(), val);
             }
 
-            if (load.isEmpty() && transport.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Empty cargo and personnel.");
+            if (load.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Cargo cannot be empty.");
+                return;
+            }
+            if (transport.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Must assign at least one ant for transport.");
                 return;
             }
 
@@ -871,7 +907,6 @@ public class DynastyManagementDialog extends ZeroDialog {
             table.setIntercellSpacing(new Dimension(0, 1));
             table.getTableHeader().setReorderingAllowed(false);
             table.setFillsViewportHeight(true);
-            table.setFont(new Font("SansSerif", Font.PLAIN, 12));
             table.setForeground(Color.BLACK);
             
             table.getColumnModel().getColumn(0).setMaxWidth(50);
