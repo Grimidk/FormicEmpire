@@ -343,7 +343,8 @@ public class DynastyManagementDialog extends ZeroDialog {
         private String formatTradeStatus(Trade trade) {
             if (trade == null) return "None";
             String transit = trade.isReturning() ? "Returning" : "Transit";
-            return transit + " (" + trade.getRemainingHours() + "h)";
+            String pending = trade.hasPendingUpdate() ? " [MODIFIED]" : "";
+            return transit + " (" + trade.getRemainingHours() + "h)" + pending;
         }
 
         private class TunnelCellRenderer extends JPanel implements TableCellRenderer {
@@ -518,7 +519,7 @@ public class DynastyManagementDialog extends ZeroDialog {
 
         private void startTunnel(Hex targetHex) {
             Hex originHex = engine.getWorld().getHexOfColony(activeColony);
-            Tunnel tunnel = new Tunnel(originHex, targetHex, 50000.0); 
+            Tunnel tunnel = new Tunnel(originHex, targetHex, GameConstants.TUNNEL_WORK_REQUIRED); 
             dynasty.addTunnel(tunnel);
             activeColony.setCurrentTunnelProject(tunnel);
             updateData();
@@ -540,6 +541,8 @@ public class DynastyManagementDialog extends ZeroDialog {
         private final JLabel speedLabel = new JLabel("Transit Speed: 0.0x");
         private final JLabel timeLabel = new JLabel("Travel Time: 0h");
         private final JLabel dangerLabel = new JLabel("Security: 0.0%");
+
+        private double totalTransportCapacity = 0.0;
 
         public TradeCreationDialog(Window owner, Colony origin, Colony target, Engine engine, Trade existingTrade) {
             super(owner, (existingTrade == null ? "Establish" : "Modify") + " Trade Route", ModalityType.APPLICATION_MODAL);
@@ -591,11 +594,18 @@ public class DynastyManagementDialog extends ZeroDialog {
                 label.setForeground(Color.BLACK);
                 p.add(label);
                 
+                double available = getColonyResource(rt);
                 double initialVal = (existingTrade != null) ? existingTrade.getLoad().getOrDefault(rt, 0.0) : 0.0;
-                JSpinner s = new JSpinner(new SpinnerNumberModel(initialVal, 0.0, 1000000.0, 10.0));
+                JSpinner s = new JSpinner(new SpinnerNumberModel(initialVal, 0.0, available, 10.0));
                 s.addChangeListener(e -> updateStats());
                 resourceSpinners.put(rt, s);
                 p.add(s);
+
+                JButton maxBtn = new JButton("Max");
+                maxBtn.setMargin(new Insets(2, 5, 2, 5));
+                maxBtn.addActionListener(e -> setMaxResource(rt));
+                p.add(maxBtn);
+
                 resGrid.add(p);
             }
             mainPanel.add(resGrid);
@@ -628,8 +638,8 @@ public class DynastyManagementDialog extends ZeroDialog {
                 int initialVal = (existingTrade != null) ? existingTrade.getTransport().getOrDefault(at, 0) : 0;
                 JSpinner s = new JSpinner(new SpinnerNumberModel(initialVal, 0, available, 1));
                 s.addChangeListener(e -> {
-                    updateStats();
                     updateAvailableMethods();
+                    updateStats();
                 });
                 antSpinners.put(at, s);
                 p.add(s);
@@ -674,6 +684,29 @@ public class DynastyManagementDialog extends ZeroDialog {
             add(createBtn, BorderLayout.SOUTH);
             
             updateStats();
+        }
+
+        private double getColonyResource(ResourceType rt) {
+            if (rt == GameConstants.RESOURCE_PLANT) return origin.getPlantsPrecise();
+            if (rt == GameConstants.RESOURCE_FUNGI) return origin.getMushroomsPrecise();
+            if (rt == GameConstants.RESOURCE_MEAT) return origin.getProteinPrecise();
+            if (rt == GameConstants.RESOURCE_ROCK) return origin.getMineralsPrecise();
+            if (rt == GameConstants.RESOURCE_SYRUP) return origin.getSyrupsPrecise();
+            if (rt == GameConstants.RESOURCE_RESIN) return origin.getResinsPrecise();
+            return 0.0;
+        }
+
+        private void setMaxResource(ResourceType rt) {
+            double currentLoad = 0.0;
+            for (Map.Entry<ResourceType, JSpinner> entry : resourceSpinners.entrySet()) {
+                if (entry.getKey() != rt) {
+                    currentLoad += (Double) entry.getValue().getValue();
+                }
+            }
+            double remainingCap = Math.max(0.0, totalTransportCapacity - currentLoad);
+            double available = getColonyResource(rt);
+            double maxToSet = Math.min(available, remainingCap);
+            resourceSpinners.get(rt).setValue(maxToSet);
         }
 
         private void updateAvailableMethods() {
@@ -753,6 +786,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             }
             
             totalCap *= method.getCapacityMult();
+            this.totalTransportCapacity = totalCap;
             
             float methodSpeed = method.getSpeedMult();
             float workerSpeed = GameConstants.TYPE_WORKER.getSpeedMult();
@@ -819,14 +853,14 @@ public class DynastyManagementDialog extends ZeroDialog {
             }
 
             if (existingTrade != null) {
-                existingTrade.cancel();
-                engine.getTradeManager().removeTrade(existingTrade);
+                existingTrade.setPendingUpdate(load, transport, recurrentCheck.isSelected(), method);
+                JOptionPane.showMessageDialog(this, "Modifications queued. They will apply once the convoy returns to home base.");
+            } else {
+                World world = engine.getWorld();
+                Trade trade = new Trade(world.getHexOfColony(origin), world.getHexOfColony(target), load, transport, recurrentCheck.isSelected(), method);
+                trade.startTrip();
+                engine.getTradeManager().addTrade(trade);
             }
-
-            World world = engine.getWorld();
-            Trade trade = new Trade(world.getHexOfColony(origin), world.getHexOfColony(target), load, transport, recurrentCheck.isSelected(), method);
-            trade.startTrip();
-            engine.getTradeManager().addTrade(trade);
             dispose();
         }
     }

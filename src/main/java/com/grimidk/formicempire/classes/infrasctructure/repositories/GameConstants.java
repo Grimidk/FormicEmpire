@@ -506,6 +506,9 @@ public final class GameConstants {
     public static final TradeMethod METHOD_TUNNEL = new TradeMethod(4, "Tunnel", 2.0f, 2.0f, 0.05f, null);
     static { tradeMethods.add(METHOD_TUNNEL); }
     
+    // --- Construction Costs ---
+    public static final double TUNNEL_WORK_REQUIRED = 5000000.0;
+    
     // --- Getters ---
     public static List<Biome> getBiomes() { return Collections.unmodifiableList(biomes); }
 

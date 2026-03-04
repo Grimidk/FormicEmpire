@@ -9,10 +9,7 @@ To Fix (By decreasing priority) :
 	
 	High:
 	creating sometimes not succesfull
-	wait for return to update
-	ants locking to colony
 	reclose tabs with same letter
-	tunnels too easy to build
 
 	Mid:
 	"view convoy" option using going and returning biomes for tiles, or underground or air

@@ -44,6 +44,7 @@ public class ColonyLabourService {
         
         for (Ant ant : allAdults) {
             if (!ant.isAlive()) continue;
+            if (ant.isOnTrade()) continue;
             if (ant.getRole() == role) {
                 workers.add(ant);
             }

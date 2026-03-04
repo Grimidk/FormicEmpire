@@ -1,5 +1,6 @@
 package com.grimidk.formicempire.classes.entities;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
@@ -16,23 +17,32 @@ public class Trade {
     private final Hex destination;
     private final Map<ResourceType, Double> load;
     private final Map<AntType, Integer> transport;
-    private final boolean isRecurrent;
-    private final TradeMethod method;
+    private final List<Ant> antsOnTrip;
+    private boolean isRecurrent;
+    private TradeMethod method;
     private boolean isActive;
     
     private int totalHours;
     private int remainingHours;
     private boolean isReturning;
 
+    private Map<ResourceType, Double> pendingLoad;
+    private Map<AntType, Integer> pendingTransport;
+    private Boolean pendingRecurrent;
+    private TradeMethod pendingMethod;
+    private boolean hasPendingUpdate;
+
     public Trade(Hex origin, Hex destination, Map<ResourceType, Double> load, Map<AntType, Integer> transport, boolean isRecurrent, TradeMethod method) {
         this.origin = origin;
         this.destination = destination;
         this.load = new HashMap<>(load);
         this.transport = new HashMap<>(transport);
+        this.antsOnTrip = new ArrayList<>();
         this.isRecurrent = isRecurrent;
         this.method = method;
         this.isActive = true;
         this.isReturning = false;
+        this.hasPendingUpdate = false;
         calculateHours();
     }
 
@@ -79,6 +89,7 @@ public class Trade {
                 if (!destResService.hasCapacity(destColony, rt)) {
                     originColony.logEvent("TRADE: Cancelled. " + destColony.getName() + " is full.");
                     isActive = false;
+                    releaseAnts();
                     return;
                 }
             }
@@ -89,13 +100,19 @@ public class Trade {
             resService.consumeResource(originColony, entry.getKey(), entry.getValue());
         }
 
-        for (Map.Entry<AntType, Integer> entry : transport.entrySet()) {
-            List<Ant> colonyAnts = originColony.getAntsByType(entry.getKey());
-            int toRemove = entry.getValue();
-            int removed = 0;
-            while (removed < toRemove && !colonyAnts.isEmpty()) {
-                colonyAnts.remove(0);
-                removed++;
+        if (antsOnTrip.isEmpty()) {
+            for (Map.Entry<AntType, Integer> entry : transport.entrySet()) {
+                List<Ant> colonyAnts = originColony.getAntsByType(entry.getKey());
+                int needed = entry.getValue();
+                int found = 0;
+                for (Ant ant : colonyAnts) {
+                    if (found >= needed) break;
+                    if (!ant.isOnTrade() && ant.isAlive()) {
+                        ant.setOnTrade(true);
+                        antsOnTrip.add(ant);
+                        found++;
+                    }
+                }
             }
         }
         
@@ -113,7 +130,13 @@ public class Trade {
                 isReturning = true;
                 remainingHours = totalHours;
             } else {
-                completeReturn();
+                if (hasPendingUpdate) {
+                    releaseAnts();
+                    applyPendingUpdate();
+                } else {
+                    completeReturn();
+                }
+
                 if (isRecurrent) {
                     startTrip();
                 } else {
@@ -168,16 +191,16 @@ public class Trade {
     }
 
     private void completeReturn() {
-        Colony originColony = origin.getColony();
-        if (originColony != null) {
-            for (Map.Entry<AntType, Integer> entry : transport.entrySet()) {
-                List<Ant> colonyAnts = originColony.getAntsByType(entry.getKey());
-                int toAdd = entry.getValue();
-                for (int i = 0; i < toAdd; i++) {
-                    colonyAnts.add(new Ant(originColony, entry.getKey()));
-                }
-            }
+        if (!isRecurrent) {
+            releaseAnts();
         }
+    }
+
+    private void releaseAnts() {
+        for (Ant ant : antsOnTrip) {
+            ant.setOnTrade(false);
+        }
+        antsOnTrip.clear();
     }
 
     public void cancel() {
@@ -191,9 +214,28 @@ public class Trade {
                     originColony.logEvent("TRADE: Route to " + destination.getColony().getName() + " cancelled. Resources refunded.");
                 }
             }
-            completeReturn();
+            releaseAnts();
             isActive = false;
         }
+    }
+
+    public void setPendingUpdate(Map<ResourceType, Double> load, Map<AntType, Integer> transport, boolean isRecurrent, TradeMethod method) {
+        this.pendingLoad = new HashMap<>(load);
+        this.pendingTransport = new HashMap<>(transport);
+        this.pendingRecurrent = isRecurrent;
+        this.pendingMethod = method;
+        this.hasPendingUpdate = true;
+    }
+
+    private void applyPendingUpdate() {
+        this.load.clear();
+        this.load.putAll(pendingLoad);
+        this.transport.clear();
+        this.transport.putAll(pendingTransport);
+        this.isRecurrent = pendingRecurrent;
+        this.method = pendingMethod;
+        this.hasPendingUpdate = false;
+        calculateHours();
     }
 
     public int getRemainingHours() {
@@ -234,5 +276,9 @@ public class Trade {
 
     public void setActive(boolean isActive) {
         this.isActive = isActive;
+    }
+
+    public boolean hasPendingUpdate() {
+        return hasPendingUpdate;
     }
 }
