@@ -8,7 +8,6 @@ To Fix (By decreasing priority) :
 	(none right now)
 	
 	High:
-	creating sometimes not succesfull
 	reclose tabs with same letter
 
 	Mid:

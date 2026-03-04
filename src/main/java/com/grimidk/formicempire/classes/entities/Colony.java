@@ -307,6 +307,11 @@ public class Colony {
     }
         
     // --- Population Initializer ---
+    public void addAnts(AntType type, int count) {
+        List<Ant> list = getAntsByType(type);
+        populateAntList(list, count, type);
+    }
+
     private void populateAntList(List<Ant> list, int count, AntType type) {
         for (int i = 0; i < count; i++) {
             Ant newAnt = new Ant(this, type);

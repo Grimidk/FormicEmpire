@@ -75,11 +75,11 @@ public class Trade {
         this.remainingHours = this.totalHours;
     }
 
-    public void startTrip() {
+    public boolean startTrip() {
         Colony originColony = origin.getColony();
         if (originColony == null) {
             isActive = false;
-            return;
+            return false;
         }
 
         Colony destColony = destination.getColony();
@@ -90,17 +90,23 @@ public class Trade {
                     originColony.logEvent("TRADE: Cancelled. " + destColony.getName() + " is full.");
                     isActive = false;
                     releaseAnts();
-                    return;
+                    return false;
                 }
             }
         }
 
-        ColonyResourceService resService = originColony.getResourceService();
-        for (Map.Entry<ResourceType, Double> entry : load.entrySet()) {
-            resService.consumeResource(originColony, entry.getKey(), entry.getValue());
-        }
-
+        // Validate ant availability first
         if (antsOnTrip.isEmpty()) {
+            for (Map.Entry<AntType, Integer> entry : transport.entrySet()) {
+                List<Ant> colonyAnts = originColony.getAntsByType(entry.getKey());
+                long availableCount = colonyAnts.stream().filter(a -> !a.isOnTrade() && a.isAlive()).count();
+                if (availableCount < entry.getValue()) {
+                    originColony.logEvent("TRADE: Cancelled. Not enough available " + entry.getKey().getName() + "s.");
+                    isActive = false;
+                    return false;
+                }
+            }
+
             for (Map.Entry<AntType, Integer> entry : transport.entrySet()) {
                 List<Ant> colonyAnts = originColony.getAntsByType(entry.getKey());
                 int needed = entry.getValue();
@@ -115,9 +121,15 @@ public class Trade {
                 }
             }
         }
+
+        ColonyResourceService resService = originColony.getResourceService();
+        for (Map.Entry<ResourceType, Double> entry : load.entrySet()) {
+            resService.consumeResource(originColony, entry.getKey(), entry.getValue());
+        }
         
         this.isReturning = false;
         this.remainingHours = this.totalHours;
+        return true;
     }
 
     public void tick() {
@@ -146,9 +158,23 @@ public class Trade {
         }
     }
 
-    private void applySecurityLoss() {
+    private void deliverLoad() {
+        Colony dest = destination.getColony();
+        if (dest != null) {
+            Map<ResourceType, Double> securedLoad = calculateSecuredLoad();
+            for (Map.Entry<ResourceType, Double> entry : securedLoad.entrySet()) {
+                dest.getResourceService().addResource(dest, entry.getKey(), entry.getValue());
+            }
+            if (origin.getColony() != null) {
+                origin.getColony().logEvent("TRADE: Trade arrived at " + dest.getName() + " successfully.");
+            }
+        }
+    }
+
+    private Map<ResourceType, Double> calculateSecuredLoad() {
         Colony originColony = origin.getColony();
-        if (originColony == null) return;
+        Map<ResourceType, Double> securedLoad = new HashMap<>(load);
+        if (originColony == null) return securedLoad;
         
         double baseSec = originColony.getStatsService().getBaseTradeSecurity(originColony);
         double totalSec = 0;
@@ -172,22 +198,10 @@ public class Trade {
         
         double securityFactor = mitigationPercent / 100.0;
         
-        for (Map.Entry<ResourceType, Double> entry : load.entrySet()) {
-            load.put(entry.getKey(), entry.getValue() * securityFactor);
+        for (Map.Entry<ResourceType, Double> entry : securedLoad.entrySet()) {
+            entry.setValue(entry.getValue() * securityFactor);
         }
-    }
-
-    private void deliverLoad() {
-        Colony dest = destination.getColony();
-        if (dest != null) {
-            applySecurityLoss();
-            for (Map.Entry<ResourceType, Double> entry : load.entrySet()) {
-                dest.getResourceService().addResource(dest, entry.getKey(), entry.getValue());
-            }
-            if (origin.getColony() != null) {
-                origin.getColony().logEvent("TRADE: Trade arrived at " + dest.getName() + " successfully.");
-            }
-        }
+        return securedLoad;
     }
 
     private void completeReturn() {
