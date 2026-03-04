@@ -87,6 +87,11 @@ public class ColonyStatsService {
         return 1;
     }
 
+    // --- Trade ---
+    public double getBaseTradeCapacity(Colony colony) { return 50.0; }
+
+    public double getBaseTradeSecurity(Colony colony) { return 0.5; }
+
     // --- Limits ---
     public int getSpreadingLimit(Colony colony) {
         if (colony.hasUpgrade(GameUnlocks.ABILITY_SPREAD_2)) return 9999;

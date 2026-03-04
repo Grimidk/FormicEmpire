@@ -112,7 +112,7 @@ public final class GameUnlocks {
     static { upgrades.add(ROLE_TRANSPORT); }
     public static final Upgrade ROLE_ESCORT = new Upgrade(37, "Convoy Escort Role", "Protective Detail", "Allows soldiers to escort convoys of resources to reduce danger level.", ROLE_COURIER, 80000 );
     static { upgrades.add(ROLE_ESCORT); }
-    public static final Upgrade ROLE_ENGINEER = new Upgrade(38, "Excavator Role", "Tunnel Engineering", "Allows workers to dig tunnels for safer trade routes.", ROLE_BORER, 0 );
+    public static final Upgrade ROLE_ENGINEER = new Upgrade(38, "Excavator Role", "Tunnel Engineering", "Allows workers to dig tunnels for safer trade routes but at 1/100th of the efficiency.", ROLE_BORER, 50000 );
     static { upgrades.add(ROLE_ENGINEER); }
     public static final Upgrade ROLE_SKYTRANS = new Upgrade(39, "Sky Transport Role", "Aerial Logistics", "Allows princesses to transport resources for trade routes, reducing travel time but at less capacity.", ROLE_COURIER, 150000 );
     static { upgrades.add(ROLE_SKYTRANS); }

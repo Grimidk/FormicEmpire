@@ -74,6 +74,7 @@ public class Colony {
     private int gameAreaWidth = 1;
     private int gameAreaHeight = 1;
     private Building currentBuildingProject = null;
+    private Tunnel currentTunnelProject = null;
     private double buildingProgressHours = 0.0;
     private final List<String> eventLog = new ArrayList<>();
 
@@ -451,6 +452,8 @@ public class Colony {
     public Set<Building> getUnlockedBuildings() { return this.buildings; }
     public Building getCurrentBuildingProject() { return currentBuildingProject; }
     public void setCurrentBuildingProject(Building b) { this.currentBuildingProject = b; }
+    public Tunnel getCurrentTunnelProject() { return currentTunnelProject; }
+    public void setCurrentTunnelProject(Tunnel t) { this.currentTunnelProject = t; }
     public double getBuildingProgressHours() { return buildingProgressHours; }
     public void setBuildingProgressHours(double d) { this.buildingProgressHours = d; }
 
@@ -810,6 +813,7 @@ public class Colony {
             this.runResearch();
             this.runRanching();
             this.runBuilding();
+            this.labourService.runTunnelConstruction(this);
             this.runCollecting(); 
         } else {
             if (this.automationEnabled) {
@@ -817,6 +821,7 @@ public class Colony {
             }
             this.populationService.runRoleAssignment(this); 
             this.runResearch();
+            this.labourService.runTunnelConstruction(this);
             this.sumarizationService.runHourlyLite(this, biome);
         }
     }

@@ -8,6 +8,7 @@ import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.misc.TradeMethod;
 import com.grimidk.formicempire.classes.entities.services.ColonyResourceService;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 
 public class Trade {
 
@@ -36,7 +37,31 @@ public class Trade {
     }
 
     private void calculateHours() {
-        this.totalHours = Math.max(1, Math.round(12f / method.getSpeedMult()));
+        float baseHours = 168f; // 7 days
+
+        float methodSpeed = method.getSpeedMult();
+        
+        float workerSpeed = GameConstants.TYPE_WORKER.getSpeedMult();
+        float totalAntSpeed = 0;
+        int totalAnts = 0;
+        
+        for (Map.Entry<AntType, Integer> entry : transport.entrySet()) {
+            totalAntSpeed += entry.getKey().getSpeedMult() * entry.getValue();
+            totalAnts += entry.getValue();
+        }
+        
+        float avgAntSpeed = (totalAnts > 0) ? (totalAntSpeed / totalAnts) : workerSpeed;
+        float speedFactor = methodSpeed * (avgAntSpeed / workerSpeed);
+        
+        Colony originColony = origin.getColony();
+        if (originColony != null && originColony.getDynasty() != null) {
+            Tunnel tunnel = originColony.getDynasty().getTunnelBetween(origin, destination);
+            if (tunnel != null && tunnel.isComplete()) {
+                speedFactor *= 1.5f;
+            }
+        }
+
+        this.totalHours = Math.max(1, Math.round(baseHours / speedFactor));
         this.remainingHours = this.totalHours;
     }
 
@@ -47,19 +72,27 @@ public class Trade {
             return;
         }
 
-        // Subtract Resources
+        Colony destColony = destination.getColony();
+        if (destColony != null) {
+            ColonyResourceService destResService = destColony.getResourceService();
+            for (ResourceType rt : load.keySet()) {
+                if (!destResService.hasCapacity(destColony, rt)) {
+                    originColony.logEvent("TRADE: Cancelled. " + destColony.getName() + " is full.");
+                    isActive = false;
+                    return;
+                }
+            }
+        }
+
         ColonyResourceService resService = originColony.getResourceService();
         for (Map.Entry<ResourceType, Double> entry : load.entrySet()) {
             resService.consumeResource(originColony, entry.getKey(), entry.getValue());
         }
 
-        // Subtract Ants
         for (Map.Entry<AntType, Integer> entry : transport.entrySet()) {
             List<Ant> colonyAnts = originColony.getAntsByType(entry.getKey());
             int toRemove = entry.getValue();
             int removed = 0;
-            // Safer to use iterator or clear from end to avoid issues, 
-            // but CopyOnWriteArrayList is safe for remove(0).
             while (removed < toRemove && !colonyAnts.isEmpty()) {
                 colonyAnts.remove(0);
                 removed++;
@@ -82,7 +115,7 @@ public class Trade {
             } else {
                 completeReturn();
                 if (isRecurrent) {
-                    startTrip(); // Subtract resources again for the next loop
+                    startTrip();
                 } else {
                     isActive = false;
                 }
@@ -90,18 +123,26 @@ public class Trade {
         }
     }
 
-    public void cancel() {
-        if (isActive) {
-            completeReturn();
-            isActive = false;
+    private void applySecurityLoss() {
+        Colony originColony = origin.getColony();
+        if (originColony == null) return;
+        
+        double security = originColony.getStatsService().getBaseTradeSecurity(originColony);
+        
+        for (Map.Entry<ResourceType, Double> entry : load.entrySet()) {
+            load.put(entry.getKey(), entry.getValue() * security);
         }
     }
 
     private void deliverLoad() {
         Colony dest = destination.getColony();
         if (dest != null) {
+            applySecurityLoss();
             for (Map.Entry<ResourceType, Double> entry : load.entrySet()) {
                 dest.getResourceService().addResource(dest, entry.getKey(), entry.getValue());
+            }
+            if (origin.getColony() != null) {
+                origin.getColony().logEvent("TRADE: Trade arrived at " + dest.getName() + " successfully.");
             }
         }
     }
@@ -109,7 +150,6 @@ public class Trade {
     private void completeReturn() {
         Colony originColony = origin.getColony();
         if (originColony != null) {
-            // Add Ants back
             for (Map.Entry<AntType, Integer> entry : transport.entrySet()) {
                 List<Ant> colonyAnts = originColony.getAntsByType(entry.getKey());
                 int toAdd = entry.getValue();
@@ -117,6 +157,22 @@ public class Trade {
                     colonyAnts.add(new Ant(originColony, entry.getKey()));
                 }
             }
+        }
+    }
+
+    public void cancel() {
+        if (isActive) {
+            if (!isReturning) {
+                Colony originColony = origin.getColony();
+                if (originColony != null) {
+                    for (Map.Entry<ResourceType, Double> entry : load.entrySet()) {
+                        originColony.getResourceService().addResource(originColony, entry.getKey(), entry.getValue());
+                    }
+                    originColony.logEvent("TRADE: Route to " + destination.getColony().getName() + " cancelled. Resources refunded.");
+                }
+            }
+            completeReturn();
+            isActive = false;
         }
     }
 

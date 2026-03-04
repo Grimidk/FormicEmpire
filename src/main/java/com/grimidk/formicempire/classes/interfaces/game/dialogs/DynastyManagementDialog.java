@@ -4,6 +4,7 @@ import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.entities.Tunnel;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
@@ -25,9 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
-import com.grimidk.formicempire.classes.entities.services.ColonyTradeService;
 import com.grimidk.formicempire.classes.entities.services.DynastyTradeService;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
@@ -50,8 +49,6 @@ public class DynastyManagementDialog extends ZeroDialog {
     private OverviewPanel overviewPanel;
     private TradePanel tradePanel;
 
-    private final DynastyTradeService dynastyTradeService;
-
     private final Runnable refreshTask = this::liveUpdate;
 
     public DynastyManagementDialog(JFrame owner, Dynasty dynasty, Engine engine, Consumer<Colony> onGoToColony) {
@@ -59,7 +56,7 @@ public class DynastyManagementDialog extends ZeroDialog {
         this.dynasty = dynasty;
         this.engine = engine;
         this.onGoToColony = onGoToColony;
-        this.dynastyTradeService = new DynastyTradeService(dynasty, engine.getTradeManager());
+        new DynastyTradeService(dynasty, engine.getTradeManager());
 
         tabbedPane = new JTabbedPane();
         tabbedPane.addChangeListener(e -> {
@@ -159,7 +156,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             if (tradePanel == null) {
                 tradePanel = new TradePanel();
             }
-            tabbedPane.addTab("Trade", tradePanel);
+            tabbedPane.addTab("Logistics", tradePanel);
             tabIndexMap.put(TAB_TRADE, currentIndex++);
         }
 
@@ -210,15 +207,15 @@ public class DynastyManagementDialog extends ZeroDialog {
         }
 
         private void initUI() {
-            String[] cols = {"Direction", "Neighbor Colony", "Biome", "Outgoing Status", "Incoming Status", "Actions"};
+            String[] cols = {"Direction", "Neighbor Colony", "Tunnel Status", "Outgoing Route", "Incoming Route", "Actions"};
             model = new DefaultTableModel(cols, 0) {
                 @Override
                 public boolean isCellEditable(int row, int column) {
-                    return column == 5;
+                    return column == 5 || column == 2;
                 }
                 @Override
                 public Class<?> getColumnClass(int columnIndex) {
-                    if (columnIndex == 5) return TradeRowData.class;
+                    if (columnIndex == 5 || columnIndex == 2) return TradeRowData.class;
                     return String.class;
                 }
             };
@@ -229,6 +226,8 @@ public class DynastyManagementDialog extends ZeroDialog {
             table.setForeground(Color.BLACK);
             table.getTableHeader().setReorderingAllowed(false);
             
+            table.getColumnModel().getColumn(2).setCellRenderer(new TunnelCellRenderer());
+            table.getColumnModel().getColumn(2).setCellEditor(new TunnelCellEditor());
             table.getColumnModel().getColumn(5).setCellRenderer(new TradeActionRenderer());
             table.getColumnModel().getColumn(5).setCellEditor(new TradeActionEditor());
 
@@ -289,7 +288,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 if (neighborColony == null) continue;
 
                 String neighborName = neighborColony.getName();
-                String biomeName = neighborHex.getBiome().getName();
+                Tunnel tunnel = dynasty.getTunnelBetween(currentHex, neighborHex);
                 
                 Trade outgoing = findTrade(activeColony, neighborColony);
                 Trade incoming = findTrade(neighborColony, activeColony);
@@ -297,13 +296,14 @@ public class DynastyManagementDialog extends ZeroDialog {
                 String outStatus = formatTradeStatus(outgoing);
                 String inStatus = formatTradeStatus(incoming);
 
+                TradeRowData rowData = new TradeRowData(neighborColony, neighborHex, outgoing, tunnel);
                 Object[] row = {
                     dirNames[i],
                     neighborName,
-                    biomeName,
+                    rowData, 
                     outStatus,
                     inStatus,
-                    new TradeRowData(neighborColony, outgoing)
+                    rowData  
                 };
                 model.addRow(row);
             }
@@ -327,12 +327,105 @@ public class DynastyManagementDialog extends ZeroDialog {
             return transit + " (" + trade.getRemainingHours() + "h)";
         }
 
+        private class TunnelCellRenderer extends JPanel implements TableCellRenderer {
+            private final JProgressBar progressBar = new JProgressBar(0, 100);
+            private final JLabel label = new JLabel();
+            private final JButton buildBtn = new JButton("Build Tunnel");
+            public TunnelCellRenderer() {
+                setLayout(new BorderLayout(5, 5));
+                setOpaque(true);
+                progressBar.setStringPainted(true);
+                progressBar.setFont(new Font("SansSerif", Font.PLAIN, 10));
+                label.setHorizontalAlignment(JLabel.CENTER);
+                label.setFont(new Font("SansSerif", Font.PLAIN, 12));
+                buildBtn.setFont(new Font("SansSerif", Font.PLAIN, 11));
+            }
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
+                removeAll();
+                if (value instanceof TradeRowData) {
+                    TradeRowData data = (TradeRowData) value;
+                    if (data.tunnel == null) {
+                        boolean sameDynasty = data.neighbor != null && data.neighbor.getDynasty() == activeColony.getDynasty();
+                        if (sameDynasty) {
+                            boolean alreadyBuilding = activeColony.getCurrentTunnelProject() != null;
+                            buildBtn.setEnabled(!alreadyBuilding);
+                            buildBtn.setToolTipText(alreadyBuilding ? "This colony is already sponsoring a tunnel project." : null);
+                            add(buildBtn, BorderLayout.CENTER);
+                        } else {
+                            label.setText("N/A");
+                            label.setForeground(Color.GRAY);
+                            add(label, BorderLayout.CENTER);
+                        }
+                    } else if (data.tunnel.isComplete()) {
+                        label.setText("Built");
+                        label.setForeground(new Color(0, 128, 0));
+                        add(label, BorderLayout.CENTER);
+                    } else {
+                        double pct = (data.tunnel.getProgress() / data.tunnel.getTotalCost()) * 100;
+                        progressBar.setValue((int) pct);
+                        progressBar.setString(String.format("%.0f%%", pct));
+                        
+                        int engineers = activeColony.getAssignedRoleCount(GameConstants.ROLE_ENGINEER);
+                        int borers = activeColony.getAssignedRoleCount(GameConstants.ROLE_BORER);
+                        if (engineers <= 0 && borers <= 0) {
+                            progressBar.setForeground(Color.RED);
+                            progressBar.setToolTipText("No Engineers or Borers assigned to progress construction!");
+                        } else {
+                            progressBar.setForeground(UIManager.getColor("ProgressBar.foreground"));
+                            progressBar.setToolTipText(null);
+                        }
+                        
+                        add(progressBar, BorderLayout.CENTER);
+                    }
+                }
+                return this;
+            }
+        }
+
+        private class TunnelCellEditor extends AbstractCellEditor implements TableCellEditor {
+            private final JPanel panel = new JPanel(new BorderLayout());
+            private final JButton buildBtn = new JButton("Build Tunnel");
+            private TradeRowData currentData;
+            public TunnelCellEditor() {
+                buildBtn.setFont(new Font("SansSerif", Font.PLAIN, 11));
+                panel.add(buildBtn, BorderLayout.CENTER);
+                buildBtn.addActionListener(e -> {
+                    if (currentData != null && currentData.tunnel == null) {
+                        int engineers = activeColony.getAssignedRoleCount(GameConstants.ROLE_ENGINEER);
+                        int borers = activeColony.getAssignedRoleCount(GameConstants.ROLE_BORER);
+                        
+                        if (engineers <= 0 && borers <= 0) {
+                            JOptionPane.showMessageDialog(panel, 
+                                "You must assign at least one Engineer or Tunnel Borer to this colony to start tunnel construction.",
+                                "Labor Required", JOptionPane.WARNING_MESSAGE);
+                        } else {
+                            startTunnel(currentData.neighborHex);
+                        }
+                    }
+                    fireEditingStopped();
+                });
+            }
+            @Override
+            public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+                currentData = (TradeRowData) value;
+                return panel;
+            }
+            @Override
+            public Object getCellEditorValue() { return currentData; }
+        }
+
         private class TradeRowData {
             final Colony neighbor;
+            final Hex neighborHex;
             final Trade outgoingTrade;
-            TradeRowData(Colony neighbor, Trade outgoingTrade) { 
+            final Tunnel tunnel;
+            TradeRowData(Colony neighbor, Hex neighborHex, Trade outgoingTrade, Tunnel tunnel) { 
                 this.neighbor = neighbor; 
+                this.neighborHex = neighborHex;
                 this.outgoingTrade = outgoingTrade; 
+                this.tunnel = tunnel;
             }
         }
 
@@ -370,7 +463,6 @@ public class DynastyManagementDialog extends ZeroDialog {
                 actionBtn.addActionListener(e -> {
                     fireEditingStopped();
                     if (currentData == null || currentData.neighbor == null) return;
-                    
                     if (currentData.outgoingTrade == null) {
                         establishTrade(currentData.neighbor);
                     } else {
@@ -382,13 +474,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
                 currentData = (TradeRowData) value;
                 if (currentData != null) {
-                    if (currentData.neighbor == null) {
-                        actionBtn.setText("Establish");
-                        actionBtn.setEnabled(false);
-                    } else {
-                        actionBtn.setText(currentData.outgoingTrade == null ? "Establish" : "Manage");
-                        actionBtn.setEnabled(true);
-                    }
+                    actionBtn.setText(currentData.outgoingTrade == null ? "Establish" : "Manage");
                 }
                 return panel;
             }
@@ -407,13 +493,21 @@ public class DynastyManagementDialog extends ZeroDialog {
             int res = JOptionPane.showOptionDialog(this, "Manage trade route to " + trade.getDestination().getColony().getName(), "Trade Management", 
                 JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
             
-            if (res == 0) { // Modify
+            if (res == 0) {
                 TradeCreationDialog dialog = new TradeCreationDialog(SwingUtilities.getWindowAncestor(this), activeColony, trade.getDestination().getColony(), engine, trade);
                 dialog.setVisible(true);
-            } else if (res == 1) { // Cancel
+            } else if (res == 1) {
                 trade.cancel();
                 engine.getTradeManager().removeTrade(trade);
             }
+            updateData();
+        }
+
+        private void startTunnel(Hex targetHex) {
+            Hex originHex = engine.getWorld().getHexOfColony(activeColony);
+            Tunnel tunnel = new Tunnel(originHex, targetHex, 50000.0); 
+            dynasty.addTunnel(tunnel);
+            activeColony.setCurrentTunnelProject(tunnel);
             updateData();
         }
     }
@@ -469,10 +563,11 @@ public class DynastyManagementDialog extends ZeroDialog {
             mainPanel.add(routeLabel);
             mainPanel.add(Box.createVerticalStrut(15));
 
-            // Resources
             JPanel resGrid = new JPanel(new GridLayout(0, 2, 15, 8));
             resGrid.setBorder(BorderFactory.createTitledBorder("Cargo (Load)"));
             for (ResourceType rt : GameConstants.getResources()) {
+                if (rt.isIsLiquid()) continue;
+
                 JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 2));
                 JLabel label = new JLabel(rt.getName(), rt.getIcon(), JLabel.LEFT);
                 label.setPreferredSize(new Dimension(160, 25));
@@ -491,22 +586,38 @@ public class DynastyManagementDialog extends ZeroDialog {
             mainPanel.add(resGrid);
             mainPanel.add(Box.createVerticalStrut(15));
 
-            // Ants
             JPanel antGrid = new JPanel(new GridLayout(0, 2, 15, 8));
-            antGrid.setBorder(BorderFactory.createTitledBorder("Personnel (Filtered)"));
+            antGrid.setBorder(BorderFactory.createTitledBorder("Personnel (Assigned Logistics Roles)"));
+            
+            Map<AntType, Integer> availableRoles = new HashMap<>();
+            availableRoles.put(GameConstants.TYPE_WORKER, origin.getAssignedRoleCount(GameConstants.ROLE_COURIER));
+            availableRoles.put(GameConstants.TYPE_MAJOR, origin.getAssignedRoleCount(GameConstants.ROLE_TRANSPORT));
+            availableRoles.put(GameConstants.TYPE_SOLDIER, origin.getAssignedRoleCount(GameConstants.ROLE_ESCORT));
+            availableRoles.put(GameConstants.TYPE_PRINCESS, origin.getAssignedRoleCount(GameConstants.ROLE_SKYTRANS));
+
             List<AntType> tradeAnts = List.of(GameConstants.TYPE_WORKER, GameConstants.TYPE_SOLDIER, GameConstants.TYPE_MAJOR, GameConstants.TYPE_PRINCESS);
             for (AntType at : tradeAnts) {
                 JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 2));
-                JLabel label = new JLabel(at.getName(), at.getIcon(), JLabel.LEFT);
-                label.setPreferredSize(new Dimension(160, 25));
+                String labelName = at.getName();
+                if (at == GameConstants.TYPE_WORKER) labelName = "Couriers";
+                else if (at == GameConstants.TYPE_MAJOR) labelName = "Transports";
+                else if (at == GameConstants.TYPE_SOLDIER) labelName = "Escorts";
+                else if (at == GameConstants.TYPE_PRINCESS) labelName = "Flyers";
+                
+                int available = availableRoles.getOrDefault(at, 0);
+                JLabel label = new JLabel(labelName + " (" + available + ")", at.getIcon(), JLabel.LEFT);
+                label.setPreferredSize(new Dimension(200, 25));
                 label.setForeground(Color.BLACK);
                 label.setFont(new Font("SansSerif", Font.PLAIN, 12));
                 p.add(label);
                 
                 int initialVal = (existingTrade != null) ? existingTrade.getTransport().getOrDefault(at, 0) : 0;
-                JSpinner s = new JSpinner(new SpinnerNumberModel(initialVal, 0, 1000000, 1));
+                JSpinner s = new JSpinner(new SpinnerNumberModel(initialVal, 0, available, 1));
                 s.setFont(new Font("SansSerif", Font.PLAIN, 12));
-                s.addChangeListener(e -> updateStats());
+                s.addChangeListener(e -> {
+                    updateStats();
+                    updateAvailableMethods();
+                });
                 antSpinners.put(at, s);
                 p.add(s);
                 antGrid.add(p);
@@ -514,11 +625,12 @@ public class DynastyManagementDialog extends ZeroDialog {
             mainPanel.add(antGrid);
             mainPanel.add(Box.createVerticalStrut(15));
 
-            // Logistics Section
             JPanel configPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 10));
             configPanel.setBorder(BorderFactory.createTitledBorder("Logistics"));
             
-            methodCombo = new JComboBox<>(GameConstants.getTradeMethods().toArray(new TradeMethod[0]));
+            methodCombo = new JComboBox<>();
+            updateAvailableMethods();
+
             if (existingTrade != null) methodCombo.setSelectedItem(existingTrade.getMethod());
             methodCombo.setFont(new Font("SansSerif", Font.PLAIN, 12));
             methodCombo.setRenderer(new DefaultListCellRenderer() {
@@ -554,27 +666,92 @@ public class DynastyManagementDialog extends ZeroDialog {
             updateStats();
         }
 
+        private void updateAvailableMethods() {
+            TradeMethod current = (TradeMethod) methodCombo.getSelectedItem();
+            methodCombo.removeAllItems();
+            
+            boolean princessesOnly = true;
+            boolean anyPrincesses = false;
+            for (Map.Entry<AntType, JSpinner> entry : antSpinners.entrySet()) {
+                int count = (Integer) entry.getValue().getValue();
+                if (count > 0) {
+                    if (entry.getKey() != GameConstants.TYPE_PRINCESS) {
+                        princessesOnly = false;
+                    } else {
+                        anyPrincesses = true;
+                    }
+                }
+            }
+            if (!anyPrincesses) princessesOnly = false;
+
+            World world = engine.getWorld();
+            Hex hA = world.getHexOfColony(origin);
+            Hex hB = world.getHexOfColony(target);
+            Tunnel tunnel = origin.getDynasty().getTunnelBetween(hA, hB);
+
+            for (TradeMethod m : GameConstants.getTradeMethods()) {
+                if (m == GameConstants.METHOD_SEA) continue; 
+                if (m == GameConstants.METHOD_TUNNEL) {
+                    if (tunnel == null || !tunnel.isComplete()) continue;
+                }
+                if (m == GameConstants.METHOD_AIR) {
+                    if (!princessesOnly) continue; 
+                }
+                methodCombo.addItem(m);
+            }
+            
+            if (current != null) {
+                for (int i = 0; i < methodCombo.getItemCount(); i++) {
+                    if (methodCombo.getItemAt(i) == current) {
+                        methodCombo.setSelectedIndex(i);
+                        break;
+                    }
+                }
+            }
+        }
+
         private void updateStats() {
             TradeMethod method = (TradeMethod) methodCombo.getSelectedItem();
             if (method == null) return;
 
             double totalLoad = resourceSpinners.values().stream().mapToDouble(s -> (Double) s.getValue()).sum();
+            
+            double baseCap = origin.getStatsService().getBaseTradeCapacity(origin);
+            double baseSec = origin.getStatsService().getBaseTradeSecurity(origin);
+            
             double totalCap = 0;
-            double totalMitigation = 0;
+            double totalSec = 0;
             
             for (Map.Entry<AntType, JSpinner> entry : antSpinners.entrySet()) {
                 int count = (Integer) entry.getValue().getValue();
+                if (count <= 0) continue;
+
                 AntType type = entry.getKey();
-                if (type == GameConstants.TYPE_WORKER) totalCap += count * 10;
-                else if (type == GameConstants.TYPE_MAJOR) totalCap += count * 100;
-                else if (type == GameConstants.TYPE_PRINCESS) totalCap += count * 20;
-                else if (type == GameConstants.TYPE_SOLDIER) totalCap += count * 5;
-                totalMitigation += count * (type.getAttackMult() + type.getDefenseMult());
+                if (type == GameConstants.TYPE_WORKER) { 
+                    totalCap += count * baseCap * 1.0;
+                    totalSec += count * baseSec * 1.0;
+                } else if (type == GameConstants.TYPE_MAJOR) { 
+                    totalCap += count * baseCap * 5.0;
+                    totalSec += count * baseSec * 2.5;
+                } else if (type == GameConstants.TYPE_SOLDIER) { 
+                    totalCap += count * baseCap * 0.0;
+                    totalSec += count * baseSec * 10.0;
+                } else if (type == GameConstants.TYPE_PRINCESS) {
+                    totalCap += count * baseCap * 1.0;
+                    totalSec += count * baseSec * 1.0;
+                }
             }
             
             totalCap *= method.getCapacityMult();
             double speed = method.getSpeedMult();
-            double mitigationPercent = Math.min(100.0, (totalMitigation / (10.0 + method.getDangerFactor() * 50.0)) * 100.0);
+            
+            double dangerFactor = method.getDangerFactor();
+            double mitigationPercent = 0;
+            if (dangerFactor > 0) {
+                mitigationPercent = Math.min(100.0, (totalSec / (10.0 + dangerFactor * 50.0)) * 100.0);
+            } else {
+                mitigationPercent = 100.0;
+            }
 
             capLabel.setText(String.format("Capacity: %.1f / %.1f", totalLoad, totalCap));
             speedLabel.setText(String.format("Transit Speed: %.1fx", speed));
@@ -599,14 +776,20 @@ public class DynastyManagementDialog extends ZeroDialog {
                 return;
             }
 
+            TradeMethod method = (TradeMethod) methodCombo.getSelectedItem();
+            if (method == null) {
+                JOptionPane.showMessageDialog(this, "No valid logistics method available.");
+                return;
+            }
+
             if (existingTrade != null) {
                 existingTrade.cancel();
                 engine.getTradeManager().removeTrade(existingTrade);
             }
 
             World world = engine.getWorld();
-            Trade trade = new Trade(world.getHexOfColony(origin), world.getHexOfColony(target), load, transport, recurrentCheck.isSelected(), (TradeMethod) methodCombo.getSelectedItem());
-            trade.startTrip(); // Initial subtraction
+            Trade trade = new Trade(world.getHexOfColony(origin), world.getHexOfColony(target), load, transport, recurrentCheck.isSelected(), method);
+            trade.startTrip();
             engine.getTradeManager().addTrade(trade);
             dispose();
         }
@@ -778,7 +961,6 @@ public class DynastyManagementDialog extends ZeroDialog {
     private static class ActionPanelRenderer extends JPanel implements TableCellRenderer {
         private final JButton editBtn = new JButton("Edit");
         private final JButton viewBtn = new JButton("View");
-        private final JButton tradeBtn = new JButton("Trade");
         private final JProgressBar progressBar = new JProgressBar(0, 7);
         private final JLabel statusLabel = new JLabel("Maturing...", SwingConstants.CENTER);
 
@@ -789,7 +971,6 @@ public class DynastyManagementDialog extends ZeroDialog {
             btnPanel.setOpaque(false);
             btnPanel.add(editBtn);
             btnPanel.add(viewBtn);
-            btnPanel.add(tradeBtn);
             JPanel progressPanel = new JPanel(new BorderLayout());
             progressPanel.setOpaque(false);
             progressBar.setStringPainted(true);
@@ -821,7 +1002,6 @@ public class DynastyManagementDialog extends ZeroDialog {
         private final JPanel container;
         private final JButton editBtn = new JButton("Edit");
         private final JButton viewBtn = new JButton("View");
-        private final JButton tradeBtn = new JButton("Trade");
         private final JProgressBar progressBar = new JProgressBar(0, 7);
         private final JLabel statusLabel = new JLabel("Maturing...", SwingConstants.CENTER);
         private Colony currentColony;
@@ -834,10 +1014,8 @@ public class DynastyManagementDialog extends ZeroDialog {
             btnPanel.setOpaque(false);
             editBtn.addActionListener(e -> { fireEditingStopped(); performEdit(currentColony); });
             viewBtn.addActionListener(e -> { fireEditingStopped(); performView(currentColony); });
-            tradeBtn.addActionListener(e -> { fireEditingStopped(); performManageTrade(currentColony); });
             btnPanel.add(editBtn);
             btnPanel.add(viewBtn);
-            btnPanel.add(tradeBtn);
             JPanel progressPanel = new JPanel(new BorderLayout());
             progressPanel.setOpaque(false);
             progressBar.setStringPainted(true);
@@ -880,23 +1058,6 @@ public class DynastyManagementDialog extends ZeroDialog {
         if (onGoToColony != null) {
             onGoToColony.accept(colony);
             dispose();
-        }
-    }
-
-    private void performManageTrade(Colony colony) {
-        if (colony == null) return;
-        
-        // Force the world to change active hex to this colony
-        World world = engine.getWorld();
-        if (world != null) {
-            Hex target = world.getHexOfColony(colony);
-            if (target != null) {
-                world.changeActiveHex(target);
-            }
-        }
-
-        if (tabIndexMap.containsKey(TAB_TRADE)) {
-            tabbedPane.setSelectedIndex(tabIndexMap.get(TAB_TRADE));
         }
     }
 }

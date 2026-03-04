@@ -21,6 +21,7 @@ import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
+import com.grimidk.formicempire.classes.entities.Tunnel;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
@@ -737,18 +738,39 @@ public class ColonyLabourService {
 
     public void runBuilding(Colony colony) {
         if (colony.getCurrentBuildingProject() == null) return;
-        
+
         double efficiency = colony.getStatsService().getConstructionEfficiency(colony);
         if (efficiency <= 0) return;
 
         colony.setBuildingProgressHours(colony.getBuildingProgressHours() + 1.0);
         double requiredHours = colony.getCurrentBuildingProject().getBuildTime() / efficiency;
-        
+
         if (colony.getBuildingProgressHours() >= requiredHours) {
             colony.unlockBuilding(colony.getCurrentBuildingProject());
             colony.logEvent("SUCCESS: Built " + colony.getCurrentBuildingProject().getName());
             colony.setCurrentBuildingProject(null);
             colony.setBuildingProgressHours(0.0);
+        }
+    }
+
+    public void runTunnelConstruction(Colony colony) {
+        Tunnel tunnel = colony.getCurrentTunnelProject();
+        if (tunnel == null || tunnel.isComplete()) {
+            colony.setCurrentTunnelProject(null);
+            return;
+        }
+
+        int engineers = colony.getAssignedRoleCount(GameConstants.ROLE_ENGINEER);
+        int borers = colony.getAssignedRoleCount(GameConstants.ROLE_BORER);
+
+        if (engineers <= 0 && borers <= 0) return;
+
+        double hourlyProgress = (engineers * 1.0) + (borers * 100.0);
+        tunnel.addProgress(hourlyProgress);
+
+        if (tunnel.isComplete()) {
+            colony.logEvent("SUCCESS: Tunnel connection completed!");
+            colony.setCurrentTunnelProject(null);
         }
     }
 }

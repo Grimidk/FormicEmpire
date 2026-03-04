@@ -8,20 +8,25 @@ To Fix (By decreasing priority) :
 	(none right now)
 	
 	High:
-	tunnel building
-	method restrictions
-	trade capacities stats
-	liquid/solid items
+	ants locking to colony
+	validate doesnt send with overcap with message and red letters
+	trade speed
+	refactor security 
+	take into account methods for multipliers
+	save routes and tunnels
+	reclose tabs with same letter
 
 	Mid:
-	trading from active colony
-	"view convoy" option
-	trade stats
+	"view convoy" option using going and returning biomes for tiles, or underground or air
+	optimize bilateral trade button
+	map legend
 
 	Low:
 	sort colonies by biggest
 	capital on stats dynasty, recheck in general
 	breeders go out of the colony in nuptial
+	logistic room with tunnel and use dimension 2
+	update stats, automation, tutorials, inheritance and directives (periodically)
 
 	Can't reproduce:
 	(none right now)
@@ -29,7 +34,6 @@ To Fix (By decreasing priority) :
 To Feature (to be done in order):
 Needed for launch (v1.0) (Launch Version):
 	Priority:
-	trade routes (async with roles and incoming outgoing recurrent and one time and travel time and danger level and boring tunnels) and logistics room to go out
 	genetic stagnation (obscured until below (80%)) every nuptial, assimilation gives base 5% after cloning (unlocked after 25?), alliances can increase while allied, stagnation = success chance to spread and drones from assimilated
 
 	Everything else :

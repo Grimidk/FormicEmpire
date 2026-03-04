@@ -38,6 +38,7 @@ public class Dynasty {
     // Global Data
     private final Set<Upgrade> unlockedUpgrades;
     private final List<Colony> colonies;
+    private final List<Tunnel> tunnels;
     private final Map<String, Integer> globalDeathStatistics;
     private final List<Integer> absorbedDynastyIds;
     private final List<Integer> defeatedSpeciesIds;
@@ -57,6 +58,7 @@ public class Dynasty {
         this.species = species;
         this.colonies = new ArrayList<>();
         this.unlockedUpgrades = new HashSet<>();
+        this.tunnels = new ArrayList<>();
         this.globalDeathStatistics = new ConcurrentHashMap<>();
         this.absorbedDynastyIds = new ArrayList<>();
         this.defeatedSpeciesIds = new ArrayList<>();
@@ -91,6 +93,7 @@ public class Dynasty {
 
         this.colonies = new ArrayList<>();
         this.unlockedUpgrades = new HashSet<>();
+        this.tunnels = new ArrayList<>();
         this.globalDeathStatistics = new ConcurrentHashMap<>();
         this.completedAssimilations = new HashSet<>();
         
@@ -280,6 +283,20 @@ public class Dynasty {
                 }
             }
         }
+    }
+
+    public List<Tunnel> getTunnels() { return tunnels; }
+    public void addTunnel(Tunnel tunnel) {
+        if (!tunnels.contains(tunnel)) {
+            tunnels.add(tunnel);
+        }
+    }
+
+    public Tunnel getTunnelBetween(Hex a, Hex b) {
+        return tunnels.stream()
+            .filter(t -> t.connects(a, b))
+            .findFirst()
+            .orElse(null);
     }
 
     // --- Getters & Setters ---
