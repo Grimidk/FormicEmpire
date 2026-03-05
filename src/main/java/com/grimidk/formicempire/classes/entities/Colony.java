@@ -87,6 +87,7 @@ public class Colony {
     private Rectangle rancherBounds; 
     private Rectangle graverBounds;
     private Rectangle breederBounds; 
+    private Rectangle transitBounds; 
 
     // --- Service Dependencies ---
     private transient ColonyStatsService statsService;
@@ -657,7 +658,7 @@ public class Colony {
     public void setTotalDeaths (int totalDeaths) { this.totalDeaths = totalDeaths; }
     
     // --- Room Bounds Getters/Setters ---
-    public void setRoomBounds(Rectangle entrance, Rectangle storage, Rectangle farm, Rectangle nursery, Rectangle royal, Rectangle rancher, Rectangle graver, Rectangle breeder) {
+    public void setRoomBounds(Rectangle entrance, Rectangle storage, Rectangle farm, Rectangle nursery, Rectangle royal, Rectangle rancher, Rectangle graver, Rectangle breeder, Rectangle transit) {
         this.entranceBounds = entrance;
         this.storageBounds = storage;
         this.farmBounds = farm;
@@ -666,12 +667,13 @@ public class Colony {
         this.rancherBounds = rancher;
         this.graverBounds = graver;
         this.breederBounds = breeder;
+        this.transitBounds = transit;
     }
-    
+
     public void setRoomBounds(Rectangle entrance, Rectangle storage, Rectangle farm, Rectangle nursery, Rectangle royal, Rectangle rancher, Rectangle graver) {
-        setRoomBounds(entrance, storage, farm, nursery, royal, rancher, graver, null);
+        setRoomBounds(entrance, storage, farm, nursery, royal, rancher, graver, null, null);
     }
-    
+
     public Rectangle getEntranceBounds() { return entranceBounds; }
     public Rectangle getStorageBounds() { return storageBounds; }
     public Rectangle getFarmBounds() { return farmBounds; }
@@ -680,7 +682,7 @@ public class Colony {
     public Rectangle getRancherBounds() { return rancherBounds; }
     public Rectangle getGraverBounds() { return graverBounds; }
     public Rectangle getBreederBounds() { return breederBounds; }
-    
+    public Rectangle getTransitBounds() { return transitBounds; }    
     public Rectangle getTargetRoomForAnt(Ant ant) {
         AntRole role = ant.getRole();
         if (ant.getAntType() == GameConstants.TYPE_QUEEN) return royalBounds;

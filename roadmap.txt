@@ -11,13 +11,13 @@ To Fix (By decreasing priority) :
 	(none right now)
 
 	Mid:
-	"view convoy" option using going and returning biomes for tiles, or underground or air
 	optimize bilateral trade button
 	map legend
 
 	Low:
 	breeders go out of the colony in nuptial
-	logistic room with tunnel and use dimension 2
+	"view convoy" option using going and returning biomes for tiles, or underground or air
+	logistic physics use dimension 2
 
 	Can't reproduce:
 	(none right now)

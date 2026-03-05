@@ -117,6 +117,22 @@ public final class WorldSpaces {
         List.of()
     );
 
+    public static final Room TRANSIT_CHAMBER = new Room(
+        105, 
+        "Transit Chamber", 
+        UNDERWORLD, 
+        512, 
+        ROOM_SIZE, 
+        false, 
+        new Point(REL_X_RIGHT, 512), 
+        new Point(REL_X_RIGHT + 256, 512 + 128), 
+        new Point(REL_X_RIGHT, 512 + 128), 
+        new Point(REL_X_RIGHT, 512 + 88),
+        List.of(GameConstants.ROLE_BORER, GameConstants.ROLE_ENGINEER, GameConstants.ROLE_COURIER, GameConstants.ROLE_ESCORT, GameConstants.ROLE_TRANSPORT, GameConstants.ROLE_SKYTRANS), 
+        List.of(),
+        List.of()
+    );
+
     public static final Room RANCHER_YARD = new Room(
         200, 
         "Aphid Pen", 

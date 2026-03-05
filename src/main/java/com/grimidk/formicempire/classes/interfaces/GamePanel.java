@@ -77,7 +77,9 @@ public class GamePanel extends ZeroGamePanel {
         gameScrollPane.setOpaque(false);
         gameScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         gameScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        gameScrollPane.getVerticalScrollBar().setUnitIncrement(16);        
+        gameScrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        gameScrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
+        
         gameScrollPane.getViewport().addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
