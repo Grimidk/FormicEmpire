@@ -216,6 +216,11 @@ public class GamePanel extends ZeroGamePanel {
         Colony colony = getColonyFromEngine(engine);
         if (colony == null || !colony.isPlayer()) return;
         
+        if (roleDialog != null && roleDialog.getColony() != colony) {
+            roleDialog.dispose();
+            roleDialog = null;
+        }
+
         if (roleDialog != null && roleDialog.isTabOpen(tabType)) {
             roleDialog.dispose();
             return;

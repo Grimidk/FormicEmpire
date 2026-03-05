@@ -8,7 +8,7 @@ To Fix (By decreasing priority) :
 	(none right now)
 	
 	High:
-	(none right now)
+	close trade button
 
 	Mid:
 	optimize bilateral trade button
