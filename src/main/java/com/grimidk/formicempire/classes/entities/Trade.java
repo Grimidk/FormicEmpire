@@ -16,9 +16,11 @@ public class Trade {
     private final Hex origin;
     private final Hex destination;
     private final Map<ResourceType, Double> load;
+    private final Map<ResourceType, Double> returnLoad;
     private final Map<AntType, Integer> transport;
     private final List<Ant> antsOnTrip;
     private boolean isRecurrent;
+    private boolean isBilateral;
     private TradeMethod method;
     private boolean isActive;
     
@@ -27,18 +29,22 @@ public class Trade {
     private boolean isReturning;
 
     private Map<ResourceType, Double> pendingLoad;
+    private Map<ResourceType, Double> pendingReturnLoad;
     private Map<AntType, Integer> pendingTransport;
     private Boolean pendingRecurrent;
+    private Boolean pendingIsBilateral;
     private TradeMethod pendingMethod;
     private boolean hasPendingUpdate;
 
-    public Trade(Hex origin, Hex destination, Map<ResourceType, Double> load, Map<AntType, Integer> transport, boolean isRecurrent, TradeMethod method) {
+    public Trade(Hex origin, Hex destination, Map<ResourceType, Double> load, Map<ResourceType, Double> returnLoad, Map<AntType, Integer> transport, boolean isRecurrent, boolean isBilateral, TradeMethod method) {
         this.origin = origin;
         this.destination = destination;
         this.load = new HashMap<>(load);
+        this.returnLoad = returnLoad != null ? new HashMap<>(returnLoad) : new HashMap<>();
         this.transport = new HashMap<>(transport);
         this.antsOnTrip = new ArrayList<>();
         this.isRecurrent = isRecurrent;
+        this.isBilateral = isBilateral;
         this.method = method;
         this.isActive = true;
         this.isReturning = false;
@@ -126,9 +132,16 @@ public class Trade {
         if (remainingHours <= 0) {
             if (!isReturning) {
                 deliverLoad();
+                if (isBilateral) {
+                    pickupReturnLoad();
+                }
                 isReturning = true;
                 remainingHours = totalHours;
             } else {
+                if (isBilateral) {
+                    deliverReturnLoad();
+                }
+
                 if (hasPendingUpdate) {
                     releaseAnts();
                     applyPendingUpdate();
@@ -148,7 +161,7 @@ public class Trade {
     private void deliverLoad() {
         Colony dest = destination.getColony();
         if (dest != null) {
-            Map<ResourceType, Double> securedLoad = calculateSecuredLoad();
+            Map<ResourceType, Double> securedLoad = calculateSecuredLoad(load);
             for (Map.Entry<ResourceType, Double> entry : securedLoad.entrySet()) {
                 dest.getResourceService().addResource(dest, entry.getKey(), entry.getValue());
             }
@@ -158,9 +171,31 @@ public class Trade {
         }
     }
 
-    private Map<ResourceType, Double> calculateSecuredLoad() {
+    private void pickupReturnLoad() {
+        Colony destColony = destination.getColony();
+        if (destColony != null && !returnLoad.isEmpty()) {
+            ColonyResourceService resService = destColony.getResourceService();
+            for (Map.Entry<ResourceType, Double> entry : returnLoad.entrySet()) {
+                resService.consumeResource(destColony, entry.getKey(), entry.getValue());
+            }
+            destColony.logEvent("TRADE: Convoy from " + origin.getColony().getName() + " picked up return cargo.");
+        }
+    }
+
+    private void deliverReturnLoad() {
         Colony originColony = origin.getColony();
-        Map<ResourceType, Double> securedLoad = new HashMap<>(load);
+        if (originColony != null) {
+            Map<ResourceType, Double> securedLoad = calculateSecuredLoad(returnLoad);
+            for (Map.Entry<ResourceType, Double> entry : securedLoad.entrySet()) {
+                originColony.getResourceService().addResource(originColony, entry.getKey(), entry.getValue());
+            }
+            originColony.logEvent("TRADE: Bilateral convoy returned with " + securedLoad.size() + " resource types.");
+        }
+    }
+
+    private Map<ResourceType, Double> calculateSecuredLoad(Map<ResourceType, Double> cargo) {
+        Colony originColony = origin.getColony();
+        Map<ResourceType, Double> securedLoad = new HashMap<>(cargo);
         if (originColony == null) return securedLoad;
         
         double baseSec = originColony.getStatsService().getBaseTradeSecurity(originColony);
@@ -220,10 +255,12 @@ public class Trade {
         }
     }
 
-    public void setPendingUpdate(Map<ResourceType, Double> load, Map<AntType, Integer> transport, boolean isRecurrent, TradeMethod method) {
+    public void setPendingUpdate(Map<ResourceType, Double> load, Map<ResourceType, Double> returnLoad, Map<AntType, Integer> transport, boolean isRecurrent, boolean isBilateral, TradeMethod method) {
         this.pendingLoad = new HashMap<>(load);
+        this.pendingReturnLoad = returnLoad != null ? new HashMap<>(returnLoad) : new HashMap<>();
         this.pendingTransport = new HashMap<>(transport);
         this.pendingRecurrent = isRecurrent;
+        this.pendingIsBilateral = isBilateral;
         this.pendingMethod = method;
         this.hasPendingUpdate = true;
     }
@@ -231,9 +268,12 @@ public class Trade {
     private void applyPendingUpdate() {
         this.load.clear();
         this.load.putAll(pendingLoad);
+        this.returnLoad.clear();
+        this.returnLoad.putAll(pendingReturnLoad);
         this.transport.clear();
         this.transport.putAll(pendingTransport);
         this.isRecurrent = pendingRecurrent;
+        this.isBilateral = pendingIsBilateral;
         this.method = pendingMethod;
         this.hasPendingUpdate = false;
         calculateHours();
@@ -259,12 +299,20 @@ public class Trade {
         return load;
     }
 
+    public Map<ResourceType, Double> getReturnLoad() {
+        return returnLoad;
+    }
+
     public Map<AntType, Integer> getTransport() {
         return transport;
     }
 
     public boolean isRecurrent() {
         return isRecurrent;
+    }
+
+    public boolean isBilateral() {
+        return isBilateral;
     }
 
     public TradeMethod getMethod() {
@@ -281,5 +329,29 @@ public class Trade {
 
     public boolean hasPendingUpdate() {
         return hasPendingUpdate;
+    }
+
+    public Map<ResourceType, Double> getPendingLoad() {
+        return pendingLoad;
+    }
+
+    public Map<ResourceType, Double> getPendingReturnLoad() {
+        return pendingReturnLoad;
+    }
+
+    public Map<AntType, Integer> getPendingTransport() {
+        return pendingTransport;
+    }
+
+    public boolean isPendingRecurrent() {
+        return pendingRecurrent != null ? pendingRecurrent : isRecurrent;
+    }
+
+    public boolean isPendingBilateral() {
+        return pendingIsBilateral != null ? pendingIsBilateral : isBilateral;
+    }
+
+    public TradeMethod getPendingMethod() {
+        return pendingMethod != null ? pendingMethod : method;
     }
 }

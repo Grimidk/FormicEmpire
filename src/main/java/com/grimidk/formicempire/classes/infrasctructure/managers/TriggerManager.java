@@ -313,6 +313,14 @@ public class TriggerManager {
                 "Automation Era",
                 "Your dynasty is vast. You can now completely automate colony management.");
         }
+
+        if (engine.getTradeManager() != null && engine.getTradeManager().getActiveTrades().size() >= 5) {
+            if (!playerColony.hasUpgrade(GameUnlocks.ABILITY_BILATERAL_TRADE)) {
+                fireTrigger(GameUnlocks.ABILITY_BILATERAL_TRADE,
+                    "Two-Way Logistics",
+                    "Your trade network is so busy that your ants have learned to bring resources back on their return trips! Bilateral Trade unlocked.");
+            }
+        }
     }
 
     private void checkTradeRoleTriggers() {

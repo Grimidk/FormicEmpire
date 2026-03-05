@@ -396,6 +396,7 @@ public class SaveManager {
                 st.qDest = t.getDestination().getQ();
                 st.rDest = t.getDestination().getR();
                 st.isRecurrent = t.isRecurrent();
+                st.isBilateral = t.isBilateral();
                 st.methodId = t.getMethod().getId();
                 st.isActive = t.isActive();
                 
@@ -412,6 +413,9 @@ public class SaveManager {
                 
                 for (Map.Entry<ResourceType, Double> e : t.getLoad().entrySet()) {
                     st.load.put(e.getKey().getId(), e.getValue());
+                }
+                for (Map.Entry<ResourceType, Double> e : t.getReturnLoad().entrySet()) {
+                    st.returnLoad.put(e.getKey().getId(), e.getValue());
                 }
                 for (Map.Entry<AntType, Integer> e : t.getTransport().entrySet()) {
                     st.transport.put(e.getKey().getId(), e.getValue());

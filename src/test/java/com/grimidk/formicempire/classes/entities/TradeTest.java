@@ -43,7 +43,7 @@ public class TradeTest {
 
     @Test
     public void testCapacityCheckNowSucceedsWhenFull() {
-        Trade trade = new Trade(originHex, destHex, load, transport, false, GameConstants.METHOD_LAND);
+        Trade trade = new Trade(originHex, destHex, load, null, transport, false, false, GameConstants.METHOD_LAND);
         origin.setPlants(200); 
         destination.setPlants(destination.getPlantsCapacity());
         boolean started = trade.startTrip();
@@ -56,7 +56,7 @@ public class TradeTest {
         destination.unlockBuilding(GameUnlocks.PLANT_CHAMBER_0); 
         origin.unlockBuilding(GameUnlocks.PLANT_CHAMBER_0);
         origin.setPlants(200);
-        Trade trade = new Trade(originHex, destHex, load, transport, false, GameConstants.METHOD_LAND);
+        Trade trade = new Trade(originHex, destHex, load, null, transport, false, false, GameConstants.METHOD_LAND);
         boolean started = trade.startTrip();
         assertTrue(started, "Trade should start if destination has capacity");
         assertTrue(trade.isActive(), "Trade should be active if destination has capacity");
@@ -64,13 +64,13 @@ public class TradeTest {
 
     @Test
     public void testDurationCalculation() throws NoSuchFieldException, IllegalAccessException {
-        Trade trade = new Trade(originHex, destHex, load, transport, false, GameConstants.METHOD_LAND);
+        Trade trade = new Trade(originHex, destHex, load, null, transport, false, false, GameConstants.METHOD_LAND);
         Field totalHoursField = Trade.class.getDeclaredField("totalHours");
         totalHoursField.setAccessible(true);
         int hours = (int) totalHoursField.get(trade);
         assertEquals(168, hours, "Duration should be 168 hours for base speed");
         
-        Trade airTrade = new Trade(originHex, destHex, load, transport, false, GameConstants.METHOD_AIR);
+        Trade airTrade = new Trade(originHex, destHex, load, null, transport, false, false, GameConstants.METHOD_AIR);
         int airHours = (int) totalHoursField.get(airTrade);
         assertEquals(34, airHours, "Duration should be 34 hours for Air speed (5x)");
     }
@@ -81,7 +81,7 @@ public class TradeTest {
         origin.unlockBuilding(GameUnlocks.PLANT_CHAMBER_0);
         origin.setPlants(200);
 
-        Trade trade = new Trade(originHex, destHex, load, transport, false, GameConstants.METHOD_LAND);
+        Trade trade = new Trade(originHex, destHex, load, null, transport, false, false, GameConstants.METHOD_LAND);
         trade.startTrip();
         
         Field remainingHoursField = Trade.class.getDeclaredField("remainingHours");
@@ -102,7 +102,7 @@ public class TradeTest {
         transport.clear();
         transport.put(GameConstants.TYPE_SOLDIER, 50);
 
-        Trade trade = new Trade(originHex, destHex, load, transport, false, GameConstants.METHOD_LAND);
+        Trade trade = new Trade(originHex, destHex, load, null, transport, false, false, GameConstants.METHOD_LAND);
         trade.startTrip();
 
         Field remainingHoursField = Trade.class.getDeclaredField("remainingHours");
@@ -118,7 +118,7 @@ public class TradeTest {
     public void testAntsNotRemovedDuringTrade() {
         int initialCount = origin.getAntTotal();
         
-        Trade trade = new Trade(originHex, destHex, load, transport, false, GameConstants.METHOD_LAND);
+        Trade trade = new Trade(originHex, destHex, load, null, transport, false, false, GameConstants.METHOD_LAND);
         trade.startTrip();
 
         assertEquals(initialCount, origin.getAntTotal(), "Ants should NOT be removed from colony during trade");
@@ -133,7 +133,7 @@ public class TradeTest {
         destination.unlockBuilding(GameUnlocks.PLANT_CHAMBER_0);
         origin.setPlants(500);
 
-        Trade trade = new Trade(originHex, destHex, load, transport, true, GameConstants.METHOD_LAND);
+        Trade trade = new Trade(originHex, destHex, load, null, transport, true, false, GameConstants.METHOD_LAND);
         trade.startTrip();
 
         Map<ResourceType, Double> newLoad = new HashMap<>();
@@ -141,7 +141,7 @@ public class TradeTest {
         Map<AntType, Integer> newTransport = new HashMap<>();
         newTransport.put(GameConstants.TYPE_WORKER, 15);
 
-        trade.setPendingUpdate(newLoad, newTransport, true, GameConstants.METHOD_AIR);
+        trade.setPendingUpdate(newLoad, null, newTransport, true, false, GameConstants.METHOD_AIR);
         assertTrue(trade.hasPendingUpdate());
 
         Field remainingHoursField = Trade.class.getDeclaredField("remainingHours");
@@ -171,7 +171,7 @@ public class TradeTest {
         }
 
         transport.put(GameConstants.TYPE_WORKER, 10);
-        Trade trade = new Trade(originHex, destHex, load, transport, false, GameConstants.METHOD_LAND);
+        Trade trade = new Trade(originHex, destHex, load, null, transport, false, false, GameConstants.METHOD_LAND);
         boolean started = trade.startTrip();
 
         assertFalse(started, "Trade should not start if not enough ants are available");
@@ -191,7 +191,7 @@ public class TradeTest {
         origin.getWorkers().clear();
         
         transport.put(GameConstants.TYPE_WORKER, 1);
-        Trade trade = new Trade(originHex, destHex, load, transport, false, GameConstants.METHOD_LAND);
+        Trade trade = new Trade(originHex, destHex, load, null, transport, false, false, GameConstants.METHOD_LAND);
 
         boolean started = trade.startTrip();
         assertFalse(started, "Trade should not start if no ants are found");

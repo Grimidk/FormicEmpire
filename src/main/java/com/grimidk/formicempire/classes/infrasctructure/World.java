@@ -636,13 +636,19 @@ public class World {
                     for (Map.Entry<Integer, Double> e : st.load.entrySet()) {
                         GameConstants.getResources().stream().filter(r -> r.getId() == e.getKey()).findFirst().ifPresent(r -> load.put(r, e.getValue()));
                     }
+                    Map<ResourceType, Double> returnLoad = new HashMap<>();
+                    if (st.returnLoad != null) {
+                        for (Map.Entry<Integer, Double> e : st.returnLoad.entrySet()) {
+                            GameConstants.getResources().stream().filter(r -> r.getId() == e.getKey()).findFirst().ifPresent(r -> returnLoad.put(r, e.getValue()));
+                        }
+                    }
                     Map<AntType, Integer> trans = new HashMap<>();
                     for (Map.Entry<Integer, Integer> e : st.transport.entrySet()) {
                         GameConstants.getAntTypes().stream().filter(at -> at.getId() == e.getKey()).findFirst().ifPresent(at -> trans.put(at, e.getValue()));
                     }
                     TradeMethod method = GameConstants.getTradeMethods().stream().filter(m -> m.getId() == st.methodId).findFirst().orElse(GameConstants.METHOD_LAND);
                     
-                    Trade trade = new Trade(hO, hD, load, trans, st.isRecurrent, method);
+                    Trade trade = new Trade(hO, hD, load, returnLoad, trans, st.isRecurrent, st.isBilateral, method);
                     trade.setActive(st.isActive);
                     try {
                         Field th = Trade.class.getDeclaredField("totalHours");

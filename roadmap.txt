@@ -8,11 +8,11 @@ To Fix (By decreasing priority) :
 	(none right now)
 	
 	High:
-	close trade button
+	(none right now)
 
 	Mid:
-	optimize bilateral trade button
 	map legend
+	pause/play in dialogs
 
 	Low:
 	breeders go out of the colony in nuptial

@@ -97,6 +97,8 @@ public final class GameUnlocks {
     static { upgrades.add(ABILITY_AUTOMATION); }
     public static final Upgrade ABILITY_TUNNELS =  new Upgrade(510, "Tunnel Networks", "Subterranean Highways", "Allows your colonies to build tunnel networks between each other for faster and safer resource transport.", ABILITY_TRADE, 100000);    
     static { upgrades.add(ABILITY_TUNNELS); }
+    public static final Upgrade ABILITY_BILATERAL_TRADE = new Upgrade(513, "Bilateral Trade", "Two-Way Logistics", "Allows your trade convoys to bring resources back on their return trip.", ABILITY_TRADE, 0);
+    static { upgrades.add(ABILITY_BILATERAL_TRADE); }
     public static final Upgrade ABILITY_MANAGEMENT = new Upgrade(511, "Colony Management", "Decentralized Command", "Allows you to let colonies to build by themselves without your direct input.", ABILITY_DYNASTY, 0);
     static { upgrades.add(ABILITY_MANAGEMENT); }
     public static final Upgrade ABILITY_MASS_FLIGHT = new Upgrade(512, "Mass Nuptial Flights", "Imperial Decree", "Triggers nuptial flights in all colonies capable of doing so. Costs 10x standard forced flight cost.", ABILITY_FORCED_FLIGHT, 0);

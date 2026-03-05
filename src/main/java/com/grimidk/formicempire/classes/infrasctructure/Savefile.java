@@ -160,8 +160,10 @@ public class Savefile implements Serializable {
         public int qOrigin, rOrigin;
         public int qDest, rDest;
         public Map<Integer, Double> load = new HashMap<>();
+        public Map<Integer, Double> returnLoad = new HashMap<>();
         public Map<Integer, Integer> transport = new HashMap<>();
         public boolean isRecurrent;
+        public boolean isBilateral;
         public int methodId;
         public boolean isActive;
         public int totalHours;

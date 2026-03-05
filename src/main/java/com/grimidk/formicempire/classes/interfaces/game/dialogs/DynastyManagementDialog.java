@@ -328,6 +328,13 @@ public class DynastyManagementDialog extends ZeroDialog {
                 String outStatus = formatTradeStatus(outgoing);
                 String inStatus = formatTradeStatus(incoming);
 
+                if (outgoing == null && incoming != null && (incoming.hasPendingUpdate() ? incoming.isPendingBilateral() : incoming.isBilateral())) {
+                    outStatus = "(Bilateral)";
+                }
+                if (incoming == null && outgoing != null && (outgoing.hasPendingUpdate() ? outgoing.isPendingBilateral() : outgoing.isBilateral())) {
+                    inStatus = "(Bilateral)";
+                }
+
                 TradeRowData rowData = new TradeRowData(neighborColony, neighborHex, outgoing, tunnel);
                 
                 if (tunnelsVisible) {
@@ -555,10 +562,13 @@ public class DynastyManagementDialog extends ZeroDialog {
         private final Engine engine;
         private final Trade existingTrade;
         private final Map<ResourceType, JSpinner> resourceSpinners = new HashMap<>();
+        private final Map<ResourceType, JSpinner> returnResourceSpinners = new HashMap<>();
         private final Map<AntType, JSpinner> antSpinners = new HashMap<>();
         private final JComboBox<TradeMethod> methodCombo;
         private final JCheckBox recurrentCheck;
+        private final JCheckBox bilateralCheck;
         private final JButton createBtn;
+        private final JButton optimizeBtn;
         
         private final JLabel capLabel = new JLabel("Capacity: 0.0 / 0.0");
         private final JLabel speedLabel = new JLabel("Transit Speed: 0.0x");
@@ -618,7 +628,14 @@ public class DynastyManagementDialog extends ZeroDialog {
                 p.add(label);
                 
                 double available = getColonyResource(rt);
-                double initialVal = (existingTrade != null) ? existingTrade.getLoad().getOrDefault(rt, 0.0) : 0.0;
+                double initialVal = 0.0;
+                if (existingTrade != null) {
+                    if (existingTrade.hasPendingUpdate() && existingTrade.getPendingLoad() != null) {
+                        initialVal = existingTrade.getPendingLoad().getOrDefault(rt, 0.0);
+                    } else {
+                        initialVal = existingTrade.getLoad().getOrDefault(rt, 0.0);
+                    }
+                }
                 JSpinner s = new JSpinner(new SpinnerNumberModel(initialVal, 0.0, available, 10.0));
                 s.addChangeListener(e -> updateStats());
                 resourceSpinners.put(rt, s);
@@ -634,6 +651,41 @@ public class DynastyManagementDialog extends ZeroDialog {
             mainPanel.add(resGrid);
             mainPanel.add(Box.createVerticalStrut(15));
 
+            JPanel bilateralPanel = new JPanel(new GridLayout(0, 2, 15, 8));
+            bilateralPanel.setBorder(BorderFactory.createTitledBorder("Cargo (Return Load)"));
+            for (ResourceType rt : GameConstants.getResources()) {
+                if (rt.isIsLiquid()) continue;
+                JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 2));
+                JLabel label = new JLabel(rt.getName(), rt.getIcon(), JLabel.LEFT);
+                label.setPreferredSize(new Dimension(160, 25));
+                label.setForeground(Color.BLACK);
+                p.add(label);
+                
+                double initialVal = 0.0;
+                if (existingTrade != null) {
+                    if (existingTrade.hasPendingUpdate() && existingTrade.getPendingReturnLoad() != null) {
+                        initialVal = existingTrade.getPendingReturnLoad().getOrDefault(rt, 0.0);
+                    } else {
+                        initialVal = existingTrade.getReturnLoad().getOrDefault(rt, 0.0);
+                    }
+                }
+                JSpinner s = new JSpinner(new SpinnerNumberModel(initialVal, 0.0, 1000000.0, 10.0));
+                s.addChangeListener(e -> updateStats());
+                returnResourceSpinners.put(rt, s);
+                p.add(s);
+
+                JButton maxBtn = new JButton("Max");
+                maxBtn.setMargin(new Insets(2, 5, 2, 5));
+                maxBtn.addActionListener(e -> setMaxResource(rt, true));
+                p.add(maxBtn);
+
+                bilateralPanel.add(p);
+            }
+            boolean isBilateral = (existingTrade != null) ? (existingTrade.hasPendingUpdate() ? existingTrade.isPendingBilateral() : existingTrade.isBilateral()) : false;
+            bilateralPanel.setVisible(isBilateral);
+            mainPanel.add(bilateralPanel);
+            mainPanel.add(Box.createVerticalStrut(15));
+
             JPanel antGrid = new JPanel(new GridLayout(0, 2, 15, 8));
             antGrid.setBorder(BorderFactory.createTitledBorder("Personnel (Assigned Logistics Roles)"));
             
@@ -642,6 +694,19 @@ public class DynastyManagementDialog extends ZeroDialog {
             availableRoles.put(GameConstants.TYPE_MAJOR, origin.getAssignedRoleCount(GameConstants.ROLE_TRANSPORT));
             availableRoles.put(GameConstants.TYPE_SOLDIER, origin.getAssignedRoleCount(GameConstants.ROLE_ESCORT));
             availableRoles.put(GameConstants.TYPE_PRINCESS, origin.getAssignedRoleCount(GameConstants.ROLE_SKYTRANS));
+
+            if (engine.getTradeManager() != null) {
+                for (Trade t : engine.getTradeManager().getActiveTrades()) {
+                    if (t == existingTrade || !t.isActive()) continue;
+                    if (t.getOrigin().getColony() == origin) {
+                        Map<AntType, Integer> trans = t.hasPendingUpdate() ? t.getPendingTransport() : t.getTransport();
+                        for (Map.Entry<AntType, Integer> entry : trans.entrySet()) {
+                            int current = availableRoles.getOrDefault(entry.getKey(), 0);
+                            availableRoles.put(entry.getKey(), Math.max(0, current - entry.getValue()));
+                        }
+                    }
+                }
+            }
 
             List<AntType> tradeAnts = List.of(GameConstants.TYPE_WORKER, GameConstants.TYPE_SOLDIER, GameConstants.TYPE_MAJOR, GameConstants.TYPE_PRINCESS);
             for (AntType at : tradeAnts) {
@@ -658,7 +723,14 @@ public class DynastyManagementDialog extends ZeroDialog {
                 label.setForeground(Color.BLACK);
                 p.add(label);
                 
-                int initialVal = (existingTrade != null) ? existingTrade.getTransport().getOrDefault(at, 0) : 0;
+                int initialVal = 0;
+                if (existingTrade != null) {
+                    if (existingTrade.hasPendingUpdate() && existingTrade.getPendingTransport() != null) {
+                        initialVal = existingTrade.getPendingTransport().getOrDefault(at, 0);
+                    } else {
+                        initialVal = existingTrade.getTransport().getOrDefault(at, 0);
+                    }
+                }
                 JSpinner s = new JSpinner(new SpinnerNumberModel(initialVal, 0, available, 1));
                 s.addChangeListener(e -> {
                     updateAvailableMethods();
@@ -677,7 +749,10 @@ public class DynastyManagementDialog extends ZeroDialog {
             methodCombo = new JComboBox<>();
             updateAvailableMethods();
 
-            if (existingTrade != null) methodCombo.setSelectedItem(existingTrade.getMethod());
+            if (existingTrade != null) {
+                TradeMethod m = existingTrade.hasPendingUpdate() ? existingTrade.getPendingMethod() : existingTrade.getMethod();
+                methodCombo.setSelectedItem(m);
+            }
             methodCombo.setRenderer(new DefaultListCellRenderer() {
                 @Override
                 public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -692,15 +767,29 @@ public class DynastyManagementDialog extends ZeroDialog {
             configPanel.add(mLabel);
             configPanel.add(methodCombo);
             
-            recurrentCheck = new JCheckBox("Recurrent Route", (existingTrade == null || existingTrade.isRecurrent()));
+            boolean initialRecurrent = (existingTrade != null) ? (existingTrade.hasPendingUpdate() ? existingTrade.isPendingRecurrent() : existingTrade.isRecurrent()) : true;
+            recurrentCheck = new JCheckBox("Recurrent Route", initialRecurrent);
             recurrentCheck.setForeground(Color.BLACK);
             configPanel.add(Box.createHorizontalStrut(20));
             configPanel.add(recurrentCheck);
+            
+            boolean initialBilateral = (existingTrade != null) ? (existingTrade.hasPendingUpdate() ? existingTrade.isPendingBilateral() : existingTrade.isBilateral()) : false;
+            bilateralCheck = new JCheckBox("Bilateral Trade", initialBilateral);
+            bilateralCheck.setForeground(Color.BLACK);
+            bilateralCheck.setVisible(origin.hasUpgrade(GameUnlocks.ABILITY_BILATERAL_TRADE));
+            bilateralCheck.addActionListener(e -> {
+                bilateralPanel.setVisible(bilateralCheck.isSelected());
+                revalidate();
+                repaint();
+                updateStats();
+            });
+            configPanel.add(Box.createHorizontalStrut(20));
+            configPanel.add(bilateralCheck);
             mainPanel.add(configPanel);
 
             add(mainPanel, BorderLayout.CENTER);
 
-            JPanel footerPanel = new JPanel(new GridLayout(1, 2, 10, 0));
+            JPanel footerPanel = new JPanel(new GridLayout(1, 0, 10, 0));
             footerPanel.setPreferredSize(new Dimension(0, 60));
             footerPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
@@ -708,11 +797,18 @@ public class DynastyManagementDialog extends ZeroDialog {
             createBtn.setFont(createBtn.getFont().deriveFont(Font.BOLD));
             createBtn.addActionListener(e -> attemptCreate());
             
+            optimizeBtn = new JButton("Bilateral Optimization");
+            optimizeBtn.setFont(optimizeBtn.getFont().deriveFont(Font.BOLD));
+            optimizeBtn.setForeground(new Color(0, 120, 0));
+            optimizeBtn.setVisible(false);
+            optimizeBtn.addActionListener(e -> performOptimization());
+            
             JButton cancelBtn = new JButton("Cancel");
             cancelBtn.setFont(cancelBtn.getFont().deriveFont(Font.BOLD));
             cancelBtn.addActionListener(e -> dispose());
             
             footerPanel.add(createBtn);
+            footerPanel.add(optimizeBtn);
             footerPanel.add(cancelBtn);
             add(footerPanel, BorderLayout.SOUTH);
             
@@ -729,17 +825,32 @@ public class DynastyManagementDialog extends ZeroDialog {
             return 0.0;
         }
 
+        private double getTargetColonyResource(ResourceType rt) {
+            if (rt == GameConstants.RESOURCE_PLANT) return target.getPlantsPrecise();
+            if (rt == GameConstants.RESOURCE_FUNGI) return target.getMushroomsPrecise();
+            if (rt == GameConstants.RESOURCE_MEAT) return target.getProteinPrecise();
+            if (rt == GameConstants.RESOURCE_ROCK) return target.getMineralsPrecise();
+            if (rt == GameConstants.RESOURCE_SYRUP) return target.getSyrupsPrecise();
+            if (rt == GameConstants.RESOURCE_RESIN) return target.getResinsPrecise();
+            return 0.0;
+        }
+
         private void setMaxResource(ResourceType rt) {
+            setMaxResource(rt, false);
+        }
+
+        private void setMaxResource(ResourceType rt, boolean isReturn) {
+            Map<ResourceType, JSpinner> spinners = isReturn ? returnResourceSpinners : resourceSpinners;
             double currentLoad = 0.0;
-            for (Map.Entry<ResourceType, JSpinner> entry : resourceSpinners.entrySet()) {
+            for (Map.Entry<ResourceType, JSpinner> entry : spinners.entrySet()) {
                 if (entry.getKey() != rt) {
                     currentLoad += (Double) entry.getValue().getValue();
                 }
             }
             double remainingCap = Math.max(0.0, totalTransportCapacity - currentLoad);
-            double available = getColonyResource(rt);
+            double available = isReturn ? getTargetColonyResource(rt) : getColonyResource(rt);
             double maxToSet = Math.min(available, remainingCap);
-            resourceSpinners.get(rt).setValue(maxToSet);
+            spinners.get(rt).setValue(maxToSet);
         }
 
         private void updateAvailableMethods() {
@@ -788,6 +899,8 @@ public class DynastyManagementDialog extends ZeroDialog {
             if (method == null) return;
 
             double totalLoad = resourceSpinners.values().stream().mapToDouble(s -> (Double) s.getValue()).sum();
+            double totalReturnLoad = returnResourceSpinners.values().stream().mapToDouble(s -> (Double) s.getValue()).sum();
+            
             double baseCap = origin.getStatsService().getBaseTradeCapacity(origin);
             double baseSec = origin.getStatsService().getBaseTradeSecurity(origin);
             
@@ -838,11 +951,11 @@ public class DynastyManagementDialog extends ZeroDialog {
                 mitigationPercent = Math.min(100.0, (totalSec / (10.0 + dangerFactor * 50.0)) * 100.0);
             }
 
-            boolean overCap = totalLoad > totalCap;
-            boolean noLoad = totalLoad <= 0;
+            boolean overCap = totalLoad > totalCap || (bilateralCheck.isSelected() && totalReturnLoad > totalCap);
+            boolean noLoad = totalLoad <= 0 && (!bilateralCheck.isSelected() || totalReturnLoad <= 0);
             boolean noAnts = totalAnts <= 0;
 
-            capLabel.setText(String.format("Capacity: %.1f / %.1f", totalLoad, totalCap));
+            capLabel.setText(String.format("Capacity: %.1f / %.1f", Math.max(totalLoad, bilateralCheck.isSelected() ? totalReturnLoad : 0), totalCap));
             capLabel.setForeground(overCap ? Color.RED : Color.BLACK);
             
             speedLabel.setText(String.format("Transit Speed: %.2fx", speedFactor));
@@ -855,6 +968,57 @@ public class DynastyManagementDialog extends ZeroDialog {
             else if (noAnts) createBtn.setToolTipText("No ants assigned to transport!");
             else if (noLoad) createBtn.setToolTipText("No resources selected for trade!");
             else createBtn.setToolTipText(null);
+
+            // Optimization check
+            if (origin.hasUpgrade(GameUnlocks.ABILITY_BILATERAL_TRADE) && !bilateralCheck.isSelected()) {
+                Trade incoming = findIncomingTrade();
+                if (incoming != null) {
+                    double incomingTotal = incoming.getLoad().values().stream().mapToDouble(Double::doubleValue).sum();
+                    if (incomingTotal <= totalCap) {
+                        optimizeBtn.setVisible(true);
+                    } else {
+                        optimizeBtn.setVisible(false);
+                    }
+                } else {
+                    optimizeBtn.setVisible(false);
+                }
+            } else {
+                optimizeBtn.setVisible(false);
+            }
+        }
+
+        private Trade findIncomingTrade() {
+            if (engine.getTradeManager() == null) return null;
+            for (Trade t : engine.getTradeManager().getActiveTrades()) {
+                if (t.getOrigin().getColony() == target && t.getDestination().getColony() == origin) {
+                    return t;
+                }
+            }
+            return null;
+        }
+
+        private void performOptimization() {
+            Trade incoming = findIncomingTrade();
+            if (incoming == null) return;
+
+            int res = JOptionPane.showConfirmDialog(this, 
+                "Merge incoming route from " + target.getName() + " into this bilateral convoy?\n" +
+                "The other convoy will be cancelled and this one will handle both ways.", 
+                "Bilateral Optimization", JOptionPane.YES_NO_OPTION);
+            
+            if (res == JOptionPane.YES_OPTION) {
+                bilateralCheck.setSelected(true);
+                bilateralCheck.getActionListeners()[0].actionPerformed(new ActionEvent(bilateralCheck, ActionEvent.ACTION_PERFORMED, null));
+
+                for (Map.Entry<ResourceType, Double> entry : incoming.getLoad().entrySet()) {
+                    JSpinner s = returnResourceSpinners.get(entry.getKey());
+                    if (s != null) s.setValue(entry.getValue());
+                }
+
+                incoming.cancel();
+                engine.getTradeManager().removeTrade(incoming);
+                updateStats();
+            }
         }
 
         private void attemptCreate() {
@@ -864,13 +1028,21 @@ public class DynastyManagementDialog extends ZeroDialog {
                 if (val > 0) load.put(entry.getKey(), val);
             }
 
+            Map<ResourceType, Double> returnLoad = new HashMap<>();
+            if (bilateralCheck.isSelected()) {
+                for (Map.Entry<ResourceType, JSpinner> entry : returnResourceSpinners.entrySet()) {
+                    double val = (Double) entry.getValue().getValue();
+                    if (val > 0) returnLoad.put(entry.getKey(), val);
+                }
+            }
+
             Map<AntType, Integer> transport = new HashMap<>();
             for (Map.Entry<AntType, JSpinner> entry : antSpinners.entrySet()) {
                 int val = (Integer) entry.getValue().getValue();
                 if (val > 0) transport.put(entry.getKey(), val);
             }
 
-            if (load.isEmpty()) {
+            if (load.isEmpty() && returnLoad.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Cargo cannot be empty.");
                 return;
             }
@@ -886,7 +1058,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             }
 
             if (existingTrade != null) {
-                existingTrade.setPendingUpdate(load, transport, recurrentCheck.isSelected(), method);
+                existingTrade.setPendingUpdate(load, returnLoad, transport, recurrentCheck.isSelected(), bilateralCheck.isSelected(), method);
                 JOptionPane.showMessageDialog(this, "Modifications queued. They will apply once the convoy returns to home base.");
             } else {
                 World world = engine.getWorld();
@@ -898,7 +1070,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                     return;
                 }
 
-                Trade trade = new Trade(originHex, targetHex, load, transport, recurrentCheck.isSelected(), method);
+                Trade trade = new Trade(originHex, targetHex, load, returnLoad, transport, recurrentCheck.isSelected(), bilateralCheck.isSelected(), method);
                 boolean started = trade.startTrip();
                 
                 if (started) {
