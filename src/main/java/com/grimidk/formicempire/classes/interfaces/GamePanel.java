@@ -197,6 +197,11 @@ public class GamePanel extends ZeroGamePanel {
         Colony colony = getColonyFromEngine(engine);
         if (colony == null || !colony.isPlayer()) return;
         
+        if (hatchDialog != null && hatchDialog.isShowing()) {
+            hatchDialog.dispose();
+            return;
+        }
+        
         if (hatchDialog != null) {
             hatchDialog.dispose();
         }
@@ -204,22 +209,44 @@ public class GamePanel extends ZeroGamePanel {
         hatchDialog.showDialog();
     }
 
-    private void showRoleManagementDialog(int tabIndex) {
+    private void showRoleManagementDialog(int tabType) {
         Engine engine = frame.getEngine();
         Colony colony = getColonyFromEngine(engine);
         if (colony == null || !colony.isPlayer()) return;
+        
+        if (roleDialog != null && roleDialog.isTabOpen(tabType)) {
+            roleDialog.dispose();
+            return;
+        }
+
+        if (roleDialog != null && roleDialog.isShowing()) {
+            roleDialog.selectTab(tabType);
+            roleDialog.requestFocus();
+            return;
+        }
         
         if (roleDialog != null) {
             roleDialog.dispose();
         }
         roleDialog = new RoleManagementDialog(frame, colony);
-        roleDialog.showDialog(tabIndex);
+        roleDialog.showDialog(tabType);
     }
 
     private void showResearchDialog() {
         Engine engine = frame.getEngine();
         Colony colony = getColonyFromEngine(engine);
         if (colony == null || !colony.isPlayer()) return;
+        
+        if (upgradeDialog != null && upgradeDialog.isTabOpen(UpgradeDialog.TAB_RESEARCH)) {
+            upgradeDialog.dispose();
+            return;
+        }
+
+        if (upgradeDialog != null && upgradeDialog.isShowing()) {
+            upgradeDialog.setTab(UpgradeDialog.TAB_RESEARCH);
+            upgradeDialog.requestFocus();
+            return;
+        }
         
         if (upgradeDialog != null) {
             upgradeDialog.dispose();
@@ -233,6 +260,17 @@ public class GamePanel extends ZeroGamePanel {
         Colony colony = getColonyFromEngine(engine);
         if (colony == null || !colony.isPlayer()) return;
         
+        if (upgradeDialog != null && upgradeDialog.isTabOpen(UpgradeDialog.TAB_BUILD)) {
+            upgradeDialog.dispose();
+            return;
+        }
+
+        if (upgradeDialog != null && upgradeDialog.isShowing()) {
+            upgradeDialog.setTab(UpgradeDialog.TAB_BUILD);
+            upgradeDialog.requestFocus();
+            return;
+        }
+        
         if (upgradeDialog != null) {
             upgradeDialog.dispose();
         }
@@ -244,6 +282,17 @@ public class GamePanel extends ZeroGamePanel {
         Engine engine = frame.getEngine();
         Colony colony = getColonyFromEngine(engine);
         if (colony == null || !colony.isPlayer()) return;
+        
+        if (upgradeDialog != null && upgradeDialog.isTabOpen(UpgradeDialog.TAB_ASSIMILATION)) {
+            upgradeDialog.dispose();
+            return;
+        }
+
+        if (upgradeDialog != null && upgradeDialog.isShowing()) {
+            upgradeDialog.setTab(UpgradeDialog.TAB_ASSIMILATION);
+            upgradeDialog.requestFocus();
+            return;
+        }
         
         if (upgradeDialog != null) {
             upgradeDialog.dispose();
@@ -257,6 +306,17 @@ public class GamePanel extends ZeroGamePanel {
         Colony colony = getColonyFromEngine(engine);
         if (colony == null || !colony.isPlayer()) return;
         
+        if (upgradeDialog != null && upgradeDialog.isTabOpen(UpgradeDialog.TAB_SYNERGY)) {
+            upgradeDialog.dispose();
+            return;
+        }
+
+        if (upgradeDialog != null && upgradeDialog.isShowing()) {
+            upgradeDialog.setTab(UpgradeDialog.TAB_SYNERGY);
+            upgradeDialog.requestFocus();
+            return;
+        }
+        
         if (upgradeDialog != null) {
             upgradeDialog.dispose();
         }
@@ -268,6 +328,11 @@ public class GamePanel extends ZeroGamePanel {
         Engine engine = frame.getEngine();
         Colony colony = getColonyFromEngine(engine);
         if (colony == null || !colony.isPlayer()) return;
+        
+        if (abilitiesDialog != null && abilitiesDialog.isShowing()) {
+            abilitiesDialog.dispose();
+            return;
+        }
         
         if (abilitiesDialog != null) {
             abilitiesDialog.dispose();
@@ -281,6 +346,11 @@ public class GamePanel extends ZeroGamePanel {
         World world = engine != null ? engine.getWorld() : null;
         if (world == null) return;
         
+        if (mapDialog != null && mapDialog.isShowing()) {
+            mapDialog.dispose();
+            return;
+        }
+        
         if (mapDialog == null || mapDialog.getOwner() != frame) {
             if (mapDialog != null) mapDialog.dispose();
             mapDialog = new MapDialog(frame, world, this::refreshAllGUIData);
@@ -292,6 +362,11 @@ public class GamePanel extends ZeroGamePanel {
         Engine engine = frame.getEngine();
         Colony colony = getColonyFromEngine(engine);
         if (colony == null) return;
+
+        if (statsDialog != null && statsDialog.isShowing()) {
+            statsDialog.dispose();
+            return;
+        }
 
         if (statsDialog != null) {
             statsDialog.dispose();
@@ -305,6 +380,11 @@ public class GamePanel extends ZeroGamePanel {
         Engine engine = frame.getEngine();
         Colony colony = getColonyFromEngine(engine);
         if (colony == null || colony.getDynasty() == null) return;
+
+        if (dynastyDialog != null && dynastyDialog.isTabOpen(DynastyManagementDialog.TAB_OVERVIEW)) {
+            dynastyDialog.dispose();
+            return;
+        }
 
         if (dynastyDialog != null && dynastyDialog.isShowing()) {
             dynastyDialog.setTab(DynastyManagementDialog.TAB_OVERVIEW);
@@ -324,6 +404,11 @@ public class GamePanel extends ZeroGamePanel {
         Engine engine = frame.getEngine();
         Colony colony = getColonyFromEngine(engine);
         if (colony == null || colony.getDynasty() == null) return;
+
+        if (dynastyDialog != null && dynastyDialog.isTabOpen(DynastyManagementDialog.TAB_TRADE)) {
+            dynastyDialog.dispose();
+            return;
+        }
 
         if (dynastyDialog != null && dynastyDialog.isShowing()) {
             dynastyDialog.setTab(DynastyManagementDialog.TAB_TRADE);

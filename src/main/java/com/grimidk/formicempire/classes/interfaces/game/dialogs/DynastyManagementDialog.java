@@ -100,6 +100,12 @@ public class DynastyManagementDialog extends ZeroDialog {
         setTab(tabIndex);
         super.showDialog();
     }
+    
+    public boolean isTabOpen(int tabIndex) {
+        if (!isShowing()) return false;
+        Integer index = tabIndexMap.get(tabIndex);
+        return index != null && tabbedPane.getSelectedIndex() == index;
+    }
 
     public void setTab(int tabIndex) {
         if (tabIndexMap.containsKey(tabIndex)) {
@@ -169,21 +175,25 @@ public class DynastyManagementDialog extends ZeroDialog {
         InputMap inputMap = getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         ActionMap actionMap = getRootPane().getActionMap();
 
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0), "switchToOverview");
-        actionMap.put("switchToOverview", new AbstractAction() {
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0), "toggleOverview");
+        actionMap.put("toggleOverview", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (tabIndexMap.containsKey(TAB_OVERVIEW)) {
+                if (isTabOpen(TAB_OVERVIEW)) {
+                    dispose();
+                } else if (tabIndexMap.containsKey(TAB_OVERVIEW)) {
                     tabbedPane.setSelectedIndex(tabIndexMap.get(TAB_OVERVIEW));
                 }
             }
         });
 
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0), "switchToTrade");
-        actionMap.put("switchToTrade", new AbstractAction() {
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0), "toggleTrade");
+        actionMap.put("toggleTrade", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (tabIndexMap.containsKey(TAB_TRADE)) {
+                if (isTabOpen(TAB_TRADE)) {
+                    dispose();
+                } else if (tabIndexMap.containsKey(TAB_TRADE)) {
                     tabbedPane.setSelectedIndex(tabIndexMap.get(TAB_TRADE));
                 }
             }
@@ -910,7 +920,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 @Override
                 public Class<?> getColumnClass(int columnIndex) {
                     if (columnIndex == 0) return Icon.class;
-                    if (columnIndex == 4) return Integer.class; 
+                    if (columnIndex == 4) return Integer.class;
                     if (columnIndex == 6) return Biome.class; 
                     if (columnIndex == autoBuildCol || columnIndex == automationCol) return Boolean.class;
                     return Object.class;
@@ -947,11 +957,24 @@ public class DynastyManagementDialog extends ZeroDialog {
             table.getColumnModel().getColumn(0).setPreferredWidth(50);
             table.getColumnModel().getColumn(1).setPreferredWidth(100);
             table.getColumnModel().getColumn(2).setPreferredWidth(80);
+            
             DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
             centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+            
+            DefaultTableCellRenderer paddedRenderer = new DefaultTableCellRenderer() {
+                @Override
+                public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                    super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                    setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 0));
+                    return this;
+                }
+            };
+            
             table.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
-            table.getColumnModel().getColumn(3).setPreferredWidth(200);   
-            table.getColumnModel().getColumn(5).setPreferredWidth(80); 
+            table.getColumnModel().getColumn(3).setPreferredWidth(200); 
+            table.getColumnModel().getColumn(4).setPreferredWidth(100);
+            table.getColumnModel().getColumn(5).setPreferredWidth(80);
+            table.getColumnModel().getColumn(5).setCellRenderer(paddedRenderer);
             table.getColumnModel().getColumn(6).setCellRenderer(new BiomeRenderer());
 
             if (showAutoBuild) table.getColumnModel().getColumn(autoBuildCol).setMaxWidth(100);
@@ -980,7 +1003,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             World world = engine.getWorld();
 
             displayedColonies.addAll(rawColonies);
-            displayedColonies.sort(Comparator.comparing(Colony::isCapital).reversed().thenComparingInt(Colony::getAntTotal).reversed());
+            displayedColonies.sort(Comparator.comparingInt(Colony::getAntTotal).reversed());
 
             for (Colony colony : displayedColonies) {
                 Biome biome = null;

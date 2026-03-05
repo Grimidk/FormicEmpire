@@ -22,10 +22,17 @@ import java.util.Set;
 
 public class RoleManagementDialog extends ZeroDialog {
 
+    public static final int TAB_WORKER = 0;
+    public static final int TAB_SOLDIER = 1;
+    public static final int TAB_MAJOR = 2;
+    public static final int TAB_PRINCESS = 3;
+    public static final int TAB_QUEEN = 4;
+
     private final Colony colony;
     private final JTabbedPane tabbedPane = new JTabbedPane();
     private final List<RolePanel> rolePanels = new ArrayList<>();
     private final Set<AntType> initializedTypes = new HashSet<>();
+    private final Map<Integer, Integer> tabIndexMap = new HashMap<>();
 
     public RoleManagementDialog(JFrame owner, Colony colony) {
         super(owner, "Manage Ant Roles", new Dimension(550, 500));
@@ -53,18 +60,40 @@ public class RoleManagementDialog extends ZeroDialog {
         }
     }
     
-    public void showDialog(int tabIndex) {
+    public void showDialog(int tabType) {
         refreshDialog(); 
-        selectTab(tabIndex);
+        selectTab(tabType);
         super.showDialog();
     }
     
+    public boolean isTabOpen(int tabType) {
+        if (!isShowing()) return false;
+        Integer index = tabIndexMap.get(tabType);
+        return index != null && tabbedPane.getSelectedIndex() == index;
+    }
+    
     private void initTabs() {
-        addRoleTab(GameConstants.TYPE_WORKER, GameUnlocks.TYPE_WORKER);
-        addRoleTab(GameConstants.TYPE_SOLDIER, GameUnlocks.TYPE_SOLDIER);
-        addRoleTab(GameConstants.TYPE_MAJOR, GameUnlocks.TYPE_MAJOR);
-        addRoleTab(GameConstants.TYPE_PRINCESS, GameUnlocks.TYPE_PRINCESS);
-        addRoleTab(GameConstants.TYPE_QUEEN, GameUnlocks.TYPE_QUEEN);
+        tabbedPane.removeAll();
+        tabIndexMap.clear();
+        rolePanels.clear();
+        initializedTypes.clear();
+
+        int currentIndex = 0;
+        if (addRoleTab(GameConstants.TYPE_WORKER, GameUnlocks.TYPE_WORKER)) {
+            tabIndexMap.put(TAB_WORKER, currentIndex++);
+        }
+        if (addRoleTab(GameConstants.TYPE_SOLDIER, GameUnlocks.TYPE_SOLDIER)) {
+            tabIndexMap.put(TAB_SOLDIER, currentIndex++);
+        }
+        if (addRoleTab(GameConstants.TYPE_MAJOR, GameUnlocks.TYPE_MAJOR)) {
+            tabIndexMap.put(TAB_MAJOR, currentIndex++);
+        }
+        if (addRoleTab(GameConstants.TYPE_PRINCESS, GameUnlocks.TYPE_PRINCESS)) {
+            tabIndexMap.put(TAB_PRINCESS, currentIndex++);
+        }
+        if (addRoleTab(GameConstants.TYPE_QUEEN, GameUnlocks.TYPE_QUEEN)) {
+            tabIndexMap.put(TAB_QUEEN, currentIndex++);
+        }
     }
     
     private void initListeners() {
@@ -76,9 +105,9 @@ public class RoleManagementDialog extends ZeroDialog {
         });
     }
     
-    private void addRoleTab(AntType type, Upgrade requiredUpgrade) {
+    private boolean addRoleTab(AntType type, Upgrade requiredUpgrade) {
         if (initializedTypes.contains(type)) {
-            return;
+            return false;
         }
 
         if (colony.hasUpgrade(requiredUpgrade)) {
@@ -86,12 +115,14 @@ public class RoleManagementDialog extends ZeroDialog {
             rolePanels.add(panel);
             tabbedPane.addTab(type.getName(), type.getIcon(), panel);
             initializedTypes.add(type);
+            return true;
         }
+        return false;
     }
     
-    public void selectTab(int tabIndex) {
-        if (tabIndex >= 0 && tabIndex < tabbedPane.getTabCount()) {
-            tabbedPane.setSelectedIndex(tabIndex);
+    public void selectTab(int tabType) {
+        if (tabIndexMap.containsKey(tabType)) {
+            tabbedPane.setSelectedIndex(tabIndexMap.get(tabType));
         }
     }
 
@@ -99,20 +130,22 @@ public class RoleManagementDialog extends ZeroDialog {
         InputMap inputMap = tabbedPane.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
         ActionMap actionMap = tabbedPane.getActionMap();
         
-        addTabSwitchAction(inputMap, actionMap, "selectTab1", KeyEvent.VK_Q, 0);
-        addTabSwitchAction(inputMap, actionMap, "selectTab2", KeyEvent.VK_W, 1);
-        addTabSwitchAction(inputMap, actionMap, "selectTab3", KeyEvent.VK_E, 2);
-        addTabSwitchAction(inputMap, actionMap, "selectTab4", KeyEvent.VK_R, 3);
-        addTabSwitchAction(inputMap, actionMap, "selectTab5", KeyEvent.VK_T, 4);
+        addTabSwitchAction(inputMap, actionMap, "toggleTab1", KeyEvent.VK_Q, TAB_WORKER);
+        addTabSwitchAction(inputMap, actionMap, "toggleTab2", KeyEvent.VK_W, TAB_SOLDIER);
+        addTabSwitchAction(inputMap, actionMap, "toggleTab3", KeyEvent.VK_E, TAB_MAJOR);
+        addTabSwitchAction(inputMap, actionMap, "toggleTab4", KeyEvent.VK_R, TAB_PRINCESS);
+        addTabSwitchAction(inputMap, actionMap, "toggleTab5", KeyEvent.VK_T, TAB_QUEEN);
     }
     
-    private void addTabSwitchAction(InputMap im, ActionMap am, String name, int key, int index) {
+    private void addTabSwitchAction(InputMap im, ActionMap am, String name, int key, int tabType) {
         im.put(KeyStroke.getKeyStroke(key, 0), name);
         am.put(name, new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (tabbedPane.getTabCount() > index) {
-                    tabbedPane.setSelectedIndex(index);
+                if (isTabOpen(tabType)) {
+                    dispose();
+                } else if (tabIndexMap.containsKey(tabType)) {
+                    tabbedPane.setSelectedIndex(tabIndexMap.get(tabType));
                 }
             }
         });

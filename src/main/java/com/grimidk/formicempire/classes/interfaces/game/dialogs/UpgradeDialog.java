@@ -64,6 +64,18 @@ public class UpgradeDialog extends ZeroDialog {
         super.showDialog();
     }
 
+    public void setTab(int tabType) {
+        if (tabIndexMap.containsKey(tabType)) {
+            tabbedPane.setSelectedIndex(tabIndexMap.get(tabType));
+        }
+    }
+    
+    public boolean isTabOpen(int tabType) {
+        if (!isShowing()) return false;
+        Integer index = tabIndexMap.get(tabType);
+        return index != null && tabbedPane.getSelectedIndex() == index;
+    }
+
     @Override
     protected void refreshDialog() {
         tabbedPane.removeAll();
@@ -132,41 +144,49 @@ public class UpgradeDialog extends ZeroDialog {
         InputMap inputMap = getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         ActionMap actionMap = getRootPane().getActionMap();
 
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, 0), "switchToResearch");
-        actionMap.put("switchToResearch", new AbstractAction() {
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, 0), "toggleResearch");
+        actionMap.put("toggleResearch", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (tabIndexMap.containsKey(TAB_RESEARCH)) {
+                if (isTabOpen(TAB_RESEARCH)) {
+                    dispose();
+                } else if (tabIndexMap.containsKey(TAB_RESEARCH)) {
                     tabbedPane.setSelectedIndex(tabIndexMap.get(TAB_RESEARCH));
                 }
             }
         });
 
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0), "switchToBuild");
-        actionMap.put("switchToBuild", new AbstractAction() {
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0), "toggleBuild");
+        actionMap.put("toggleBuild", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (tabIndexMap.containsKey(TAB_BUILD)) {
+                if (isTabOpen(TAB_BUILD)) {
+                    dispose();
+                } else if (tabIndexMap.containsKey(TAB_BUILD)) {
                     tabbedPane.setSelectedIndex(tabIndexMap.get(TAB_BUILD));
                 }
             }
         });
 
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_I, 0), "switchToAssimilation");
-        actionMap.put("switchToAssimilation", new AbstractAction() {
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_I, 0), "toggleAssimilation");
+        actionMap.put("toggleAssimilation", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (tabIndexMap.containsKey(TAB_ASSIMILATION)) {
+                if (isTabOpen(TAB_ASSIMILATION)) {
+                    dispose();
+                } else if (tabIndexMap.containsKey(TAB_ASSIMILATION)) {
                     tabbedPane.setSelectedIndex(tabIndexMap.get(TAB_ASSIMILATION));
                 }
             }
         });
 
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_O, 0), "switchToSynergy");
-        actionMap.put("switchToSynergy", new AbstractAction() {
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_O, 0), "toggleSynergy");
+        actionMap.put("toggleSynergy", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (tabIndexMap.containsKey(TAB_SYNERGY)) {
+                if (isTabOpen(TAB_SYNERGY)) {
+                    dispose();
+                } else if (tabIndexMap.containsKey(TAB_SYNERGY)) {
                     tabbedPane.setSelectedIndex(tabIndexMap.get(TAB_SYNERGY));
                 }
             }
