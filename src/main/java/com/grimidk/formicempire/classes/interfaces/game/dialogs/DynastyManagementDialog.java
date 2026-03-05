@@ -344,10 +344,23 @@ public class DynastyManagementDialog extends ZeroDialog {
 
         private Trade findTrade(Colony origin, Colony destination) {
             if (origin == null || destination == null) return null;
-            return engine.getTradeManager().getActiveTrades().stream()
-                .filter(Trade::isActive)
-                .filter(t -> t.getOrigin().getColony() == origin && t.getDestination().getColony() == destination)
-                .findFirst().orElse(null);
+            List<Trade> all = engine.getTradeManager().getActiveTrades();
+            
+            for (Trade t : all) {
+                if (!t.isActive()) continue;
+                Colony tOrigin = t.getOrigin().getColony();
+                Colony tDest = t.getDestination().getColony();
+                
+                if (tOrigin == origin && tDest == destination) {
+                    return t;
+                }
+                
+                if (tOrigin != null && tDest != null && 
+                    tOrigin.getId() == origin.getId() && tDest.getId() == destination.getId()) {
+                    return t;
+                }
+            }
+            return null;
         }
 
         private String formatTradeStatus(Trade trade) {
@@ -867,9 +880,25 @@ public class DynastyManagementDialog extends ZeroDialog {
                 JOptionPane.showMessageDialog(this, "Modifications queued. They will apply once the convoy returns to home base.");
             } else {
                 World world = engine.getWorld();
-                Trade trade = new Trade(world.getHexOfColony(origin), world.getHexOfColony(target), load, transport, recurrentCheck.isSelected(), method);
-                trade.startTrip();
-                engine.getTradeManager().addTrade(trade);
+                Hex originHex = world.getHexOfColony(origin);
+                Hex targetHex = world.getHexOfColony(target);
+                
+                if (originHex == null || targetHex == null) {
+                    JOptionPane.showMessageDialog(this, "Internal error: could not locate colonies on map.");
+                    return;
+                }
+
+                Trade trade = new Trade(originHex, targetHex, load, transport, recurrentCheck.isSelected(), method);
+                boolean started = trade.startTrip();
+                
+                if (started) {
+                    if (engine.getTradeManager() != null) {
+                        engine.getTradeManager().addTrade(trade);
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(this, "Failed to start trade trip. Check colony logs for details.");
+                    return;
+                }
             }
             dispose();
         }

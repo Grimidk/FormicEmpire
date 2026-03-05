@@ -82,19 +82,6 @@ public class Trade {
             return false;
         }
 
-        Colony destColony = destination.getColony();
-        if (destColony != null) {
-            ColonyResourceService destResService = destColony.getResourceService();
-            for (ResourceType rt : load.keySet()) {
-                if (!destResService.hasCapacity(destColony, rt)) {
-                    originColony.logEvent("TRADE: Cancelled. " + destColony.getName() + " is full.");
-                    isActive = false;
-                    releaseAnts();
-                    return false;
-                }
-            }
-        }
-
         // Validate ant availability first
         if (antsOnTrip.isEmpty()) {
             for (Map.Entry<AntType, Integer> entry : transport.entrySet()) {

@@ -42,13 +42,13 @@ public class TradeTest {
     }
 
     @Test
-    public void testCapacityCheckFailsWhenFull() {
+    public void testCapacityCheckNowSucceedsWhenFull() {
         Trade trade = new Trade(originHex, destHex, load, transport, false, GameConstants.METHOD_LAND);
         origin.setPlants(200); 
         destination.setPlants(destination.getPlantsCapacity());
         boolean started = trade.startTrip();
-        assertFalse(started, "Trade should not start if destination is full/over capacity");
-        assertFalse(trade.isActive(), "Trade should be cancelled if destination is full/over capacity");
+        assertTrue(started, "Trade should now start even if destination is full (will deliver partial/zero later)");
+        assertTrue(trade.isActive(), "Trade should be active even if destination is full");
     }
 
     @Test
