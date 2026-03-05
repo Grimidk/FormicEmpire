@@ -299,6 +299,22 @@ public class Dynasty {
             .orElse(null);
     }
 
+    public Colony getCapital() {
+        return colonies.stream()
+            .filter(Colony::isCapital)
+            .findFirst()
+            .orElse(null);
+    }
+
+    public void setCapital(Colony colony) {
+        if (colony != null && !colonies.contains(colony)) {
+            addColony(colony);
+        }
+        for (Colony c : colonies) {
+            c.setCapital(c == colony);
+        }
+    }
+
     // --- Getters & Setters ---
     public int getId() { return id; }
     public String getName() { return name; }

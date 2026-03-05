@@ -198,23 +198,18 @@ public class HelpPanel extends JPanel {
         
         HotkeyRow row = new HotkeyRow();
         row.add("Spacebar", "Pause / Resume Game");
-        row.add("+ (Add)", "Increase Game Speed");
-        row.add("- (Subtract)", "Decrease Game Speed");
+        row.add("+ / -", "Increase / Decrease Game Speed");
         row.add("A", "Toggle Overworld/Underworld View");
         row.add("ESC", "Open Game Menu / Close Dialogs");
         row.addSeparator();
-        row.add("Q", "Manage Worker Roles");
-        row.add("W", "Manage Soldier Roles");
-        row.add("E", "Manage Major Roles");
-        row.add("R", "Manage Princess Roles");
-        row.add("T", "Manage Queen Roles");
+        row.add("Q / W / E / R / T", "Manage Roles (Press again to close)");
         row.addSeparator();
-        row.add("P", "Hatch Rates Menu");
-        row.add("Y", "Research Menu");
-        row.add("U", "Build Menu");
-        row.add("Z", "Colony Operations Menu");
-        row.add("S", "Dynasty Menu");
-        row.add("I", "World Map");
+        row.add("P", "Hatch Rates Menu (Toggles)");
+        row.add("Y / U / I / O", "Upgrade Tabs (Research, Build, etc. Toggles)");
+        row.add("Z", "Colony Operations Menu (Toggles)");
+        row.add("S / A", "Dynasty Tabs (Overview, Trade. Toggles)");
+        row.add("M", "World Map (Toggles)");
+        row.add("X", "Statistics (Toggles)");
 
         return hotkeyPanel;
     }
@@ -476,15 +471,13 @@ public class HelpPanel extends JPanel {
         hotkeyPanel.add(new JLabel("Game Menu:")); hotkeyPanel.add(new JLabel("ESC"));
         hotkeyPanel.add(new JLabel("Toggle View:")); hotkeyPanel.add(new JLabel("A"));
         hotkeyPanel.add(new JSeparator(SwingConstants.HORIZONTAL)); hotkeyPanel.add(new JSeparator(SwingConstants.HORIZONTAL));
-        hotkeyPanel.add(new JLabel("Worker Roles:")); hotkeyPanel.add(new JLabel("Q"));
-        hotkeyPanel.add(new JLabel("Soldier Roles:")); hotkeyPanel.add(new JLabel("W"));
-        hotkeyPanel.add(new JLabel("Major Roles:")); hotkeyPanel.add(new JLabel("E"));
-        hotkeyPanel.add(new JLabel("Princess Roles:")); hotkeyPanel.add(new JLabel("R"));
-        hotkeyPanel.add(new JLabel("Queen Roles:")); hotkeyPanel.add(new JLabel("T"));
+        hotkeyPanel.add(new JLabel("Roles (Q-T):")); hotkeyPanel.add(new JLabel("Toggle Menus"));
+        hotkeyPanel.add(new JLabel("Upgrades (Y-O):")); hotkeyPanel.add(new JLabel("Toggle Menus"));
         hotkeyPanel.add(new JSeparator(SwingConstants.HORIZONTAL)); hotkeyPanel.add(new JSeparator(SwingConstants.HORIZONTAL));
-        hotkeyPanel.add(new JLabel("Build Menu:")); hotkeyPanel.add(new JLabel("U"));
-        hotkeyPanel.add(new JLabel("Dynasty Menu:")); hotkeyPanel.add(new JLabel("S"));
-        hotkeyPanel.add(new JLabel("World Map:")); hotkeyPanel.add(new JLabel("I"));
+        hotkeyPanel.add(new JLabel("Hatch Rates:")); hotkeyPanel.add(new JLabel("P (Toggle)"));
+        hotkeyPanel.add(new JLabel("Dynasty (S/A):")); hotkeyPanel.add(new JLabel("Toggle Menus"));
+        hotkeyPanel.add(new JLabel("World Map:")); hotkeyPanel.add(new JLabel("M (Toggle)"));
+        hotkeyPanel.add(new JLabel("Stats:")); hotkeyPanel.add(new JLabel("X (Toggle)"));
         
         JPanel page5 = new JPanel(new BorderLayout());
         page5.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));

@@ -306,6 +306,10 @@ public class StatsDialog extends ZeroDialog {
         model.addRow(new Object[]{null, "Dynasty", "Name", dynasty.getName()});
         model.addRow(new Object[]{dynasty.getRank().getIcon(), "Dynasty", "Rank", dynasty.getRank().getName()}); 
         model.addRow(new Object[]{null, "Dynasty", "Species", dynasty.getSpecies() != null ? dynasty.getSpecies().getName() : "Omni"});
+        
+        Colony capital = dynasty.getCapital();
+        model.addRow(new Object[]{null, "Dynasty", "Capital", (capital != null ? capital.getName() : "None")});
+        
         model.addRow(new Object[]{null, "Dynasty", "Total Colonies", dynastyStatsService.getTotalColonies(dynasty)});
         model.addRow(new Object[]{null, "Dynasty", "Global Population", dynastyStatsService.getTotalPopulation(dynasty)});
         model.addRow(new Object[]{null, "Dynasty", "Total Nuptial Flights", dynasty.getTotalNuptialFlights()});
@@ -342,13 +346,13 @@ public class StatsDialog extends ZeroDialog {
         model.addRow(new Object[]{null, null, "------", "------"});
         Map<ResourceType, Integer> resources = dynastyStatsService.getGlobalResources(dynasty);
         
-        model.addRow(new Object[]{GameConstants.RESOURCE_PLANT.getIcon(), "Resources", "Total Plants", resources.get(GameConstants.RESOURCE_PLANT)});
-        model.addRow(new Object[]{GameConstants.RESOURCE_FUNGI.getIcon(), "Resources", "Total Mushrooms", resources.get(GameConstants.RESOURCE_FUNGI)});
-        model.addRow(new Object[]{GameConstants.RESOURCE_MEAT.getIcon(), "Resources", "Total Protein", resources.get(GameConstants.RESOURCE_MEAT)});
-        model.addRow(new Object[]{GameConstants.RESOURCE_WATER.getIcon(), "Resources", "Total Water", resources.get(GameConstants.RESOURCE_WATER)});
-        model.addRow(new Object[]{GameConstants.RESOURCE_SYRUP.getIcon(), "Resources", "Total Syrups", resources.getOrDefault(GameConstants.RESOURCE_SYRUP, 0)});
-        model.addRow(new Object[]{GameConstants.RESOURCE_RESIN.getIcon(), "Resources", "Total Resins", resources.getOrDefault(GameConstants.RESOURCE_RESIN, 0)});
-        model.addRow(new Object[]{GameConstants.RESOURCE_ROCK.getIcon(), "Resources", "Total Minerals", resources.get(GameConstants.RESOURCE_ROCK)});
+        model.addRow(new Object[]{GameConstants.RESOURCE_PLANT.getIcon(), "Resources", "Global Plants", resources.get(GameConstants.RESOURCE_PLANT)});
+        model.addRow(new Object[]{GameConstants.RESOURCE_FUNGI.getIcon(), "Resources", "Global Mushrooms", resources.get(GameConstants.RESOURCE_FUNGI)});
+        model.addRow(new Object[]{GameConstants.RESOURCE_MEAT.getIcon(), "Resources", "Global Protein", resources.get(GameConstants.RESOURCE_MEAT)});
+        model.addRow(new Object[]{GameConstants.RESOURCE_WATER.getIcon(), "Resources", "Global Water", resources.get(GameConstants.RESOURCE_WATER)});
+        model.addRow(new Object[]{GameConstants.RESOURCE_SYRUP.getIcon(), "Resources", "Global Syrups", resources.getOrDefault(GameConstants.RESOURCE_SYRUP, 0)});
+        model.addRow(new Object[]{GameConstants.RESOURCE_RESIN.getIcon(), "Resources", "Global Resins", resources.getOrDefault(GameConstants.RESOURCE_RESIN, 0)});
+        model.addRow(new Object[]{GameConstants.RESOURCE_ROCK.getIcon(), "Resources", "Global Minerals", resources.getOrDefault(GameConstants.RESOURCE_ROCK, 0)});
         
         // Global Deaths
         model.addRow(new Object[]{null, null, "------", "------"});

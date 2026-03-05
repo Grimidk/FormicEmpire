@@ -16,10 +16,8 @@ To Fix (By decreasing priority) :
 	map legend
 
 	Low:
-	capital on stats dynasty, recheck in general
 	breeders go out of the colony in nuptial
 	logistic room with tunnel and use dimension 2
-	update stats, automation, tutorials, inheritance and directives (periodically)
 
 	Can't reproduce:
 	(none right now)

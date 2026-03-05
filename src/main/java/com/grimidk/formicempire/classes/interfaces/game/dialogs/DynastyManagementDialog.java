@@ -1020,7 +1020,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 rowData[0] = colony.getRank().getIcon();
                 rowData[1] = colony.getRank().getName();
                 rowData[2] = colony.isCapital() ? "Capital" : "Satellite";
-                rowData[3] = colony.getName();
+                rowData[3] = (colony.isCapital() ? "★ " : "") + colony.getName();
                 rowData[4] = colony.getAntTotal();
                 rowData[5] = colony.getAge();
                 rowData[6] = biome;

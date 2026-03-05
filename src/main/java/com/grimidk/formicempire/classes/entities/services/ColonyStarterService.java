@@ -44,20 +44,14 @@ public class ColonyStarterService {
             colony.setName(newName);
             
             boolean isFirst = (index == 0);
-            colony.setCapital(isFirst);
-            
             if (isFirst) {
+                d.setCapital(colony);
                 colony.setAge(7); 
             } else {
+                colony.setCapital(false);
                 colony.setAge(0);
                 
-                Colony capitalColony = null;
-                for (Colony c : d.getColonies()) {
-                    if (c.isCapital() && c != colony) {
-                        capitalColony = c;
-                        break;
-                    }
-                }
+                Colony capitalColony = d.getCapital();
                 
                 if (capitalColony != null) {
                     colony.setHatchRateWorker(capitalColony.getHatchRateWorker());
