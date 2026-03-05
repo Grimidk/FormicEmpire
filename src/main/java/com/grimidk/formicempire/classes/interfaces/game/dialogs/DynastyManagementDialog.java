@@ -700,11 +700,21 @@ public class DynastyManagementDialog extends ZeroDialog {
 
             add(mainPanel, BorderLayout.CENTER);
 
+            JPanel footerPanel = new JPanel(new GridLayout(1, 2, 10, 0));
+            footerPanel.setPreferredSize(new Dimension(0, 60));
+            footerPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+
             createBtn = new JButton(existingTrade == null ? "Confirm Trade Route" : "Update Trade Route");
             createBtn.setFont(createBtn.getFont().deriveFont(Font.BOLD));
-            createBtn.setPreferredSize(new Dimension(0, 60));
             createBtn.addActionListener(e -> attemptCreate());
-            add(createBtn, BorderLayout.SOUTH);
+            
+            JButton cancelBtn = new JButton("Cancel");
+            cancelBtn.setFont(cancelBtn.getFont().deriveFont(Font.BOLD));
+            cancelBtn.addActionListener(e -> dispose());
+            
+            footerPanel.add(createBtn);
+            footerPanel.add(cancelBtn);
+            add(footerPanel, BorderLayout.SOUTH);
             
             updateStats();
         }
