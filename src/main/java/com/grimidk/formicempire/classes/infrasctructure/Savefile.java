@@ -169,6 +169,15 @@ public class Savefile implements Serializable {
         public int totalHours;
         public int remainingHours;
         public boolean isReturning;
+        
+        // Pending Updates
+        public boolean hasPendingUpdate;
+        public Map<Integer, Double> pendingLoad = new HashMap<>();
+        public Map<Integer, Double> pendingReturnLoad = new HashMap<>();
+        public Map<Integer, Integer> pendingTransport = new HashMap<>();
+        public boolean pendingRecurrent;
+        public boolean pendingIsBilateral;
+        public int pendingMethodId;
     }
 
     // --- Getters & Setters ---

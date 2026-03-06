@@ -420,6 +420,30 @@ public class SaveManager {
                 for (Map.Entry<AntType, Integer> e : t.getTransport().entrySet()) {
                     st.transport.put(e.getKey().getId(), e.getValue());
                 }
+
+                // Save Pending
+                st.hasPendingUpdate = t.hasPendingUpdate();
+                if (st.hasPendingUpdate) {
+                    st.pendingRecurrent = t.isPendingRecurrent();
+                    st.pendingIsBilateral = t.isPendingBilateral();
+                    st.pendingMethodId = t.getPendingMethod().getId();
+                    if (t.getPendingLoad() != null) {
+                        for (Map.Entry<ResourceType, Double> e : t.getPendingLoad().entrySet()) {
+                            st.pendingLoad.put(e.getKey().getId(), e.getValue());
+                        }
+                    }
+                    if (t.getPendingReturnLoad() != null) {
+                        for (Map.Entry<ResourceType, Double> e : t.getPendingReturnLoad().entrySet()) {
+                            st.pendingReturnLoad.put(e.getKey().getId(), e.getValue());
+                        }
+                    }
+                    if (t.getPendingTransport() != null) {
+                        for (Map.Entry<AntType, Integer> e : t.getPendingTransport().entrySet()) {
+                            st.pendingTransport.put(e.getKey().getId(), e.getValue());
+                        }
+                    }
+                }
+                
                 savedTrades.add(st);
             }
         }
@@ -1040,6 +1064,7 @@ public class SaveManager {
             sb.append("\"qd\":").append(t.qDest).append(",");
             sb.append("\"rd\":").append(t.rDest).append(",");
             sb.append("\"ir\":").append(t.isRecurrent).append(",");
+            sb.append("\"ib\":").append(t.isBilateral).append(",");
             sb.append("\"mid\":").append(t.methodId).append(",");
             sb.append("\"ia\":").append(t.isActive).append(",");
             sb.append("\"th\":").append(t.totalHours).append(",");
@@ -1049,10 +1074,36 @@ public class SaveManager {
             Map<String, Double> loadStrMap = new HashMap<>();
             for (Map.Entry<Integer, Double> e : t.load.entrySet()) loadStrMap.put(String.valueOf(e.getKey()), e.getValue());
             sb.append("\"load\":").append(serializeDoubleMapToJson(loadStrMap)).append(",");
+
+            Map<String, Double> returnLoadStrMap = new HashMap<>();
+            for (Map.Entry<Integer, Double> e : t.returnLoad.entrySet()) returnLoadStrMap.put(String.valueOf(e.getKey()), e.getValue());
+            sb.append("\"rload\":").append(serializeDoubleMapToJson(returnLoadStrMap)).append(",");
             
             Map<String, Integer> transportStrMap = new HashMap<>();
             for (Map.Entry<Integer, Integer> e : t.transport.entrySet()) transportStrMap.put(String.valueOf(e.getKey()), e.getValue());
-            sb.append("\"trans\":").append(serializeMapToJson(transportStrMap));
+            sb.append("\"trans\":").append(serializeMapToJson(transportStrMap)).append(",");
+
+            // Pending Updates
+            sb.append("\"hpu\":").append(t.hasPendingUpdate).append(",");
+            if (t.hasPendingUpdate) {
+                sb.append("\"pir\":").append(t.pendingRecurrent).append(",");
+                sb.append("\"pib\":").append(t.pendingIsBilateral).append(",");
+                sb.append("\"pmid\":").append(t.pendingMethodId).append(",");
+                
+                Map<String, Double> pLoadStrMap = new HashMap<>();
+                for (Map.Entry<Integer, Double> e : t.pendingLoad.entrySet()) pLoadStrMap.put(String.valueOf(e.getKey()), e.getValue());
+                sb.append("\"pload\":").append(serializeDoubleMapToJson(pLoadStrMap)).append(",");
+
+                Map<String, Double> pReturnLoadStrMap = new HashMap<>();
+                for (Map.Entry<Integer, Double> e : t.pendingReturnLoad.entrySet()) pReturnLoadStrMap.put(String.valueOf(e.getKey()), e.getValue());
+                sb.append("\"prload\":").append(serializeDoubleMapToJson(pReturnLoadStrMap)).append(",");
+
+                Map<String, Integer> pTransportStrMap = new HashMap<>();
+                for (Map.Entry<Integer, Integer> e : t.pendingTransport.entrySet()) pTransportStrMap.put(String.valueOf(e.getKey()), e.getValue());
+                sb.append("\"ptrans\":").append(serializeMapToJson(pTransportStrMap));
+            } else {
+                sb.setLength(sb.length() - 1);
+            }
             
             sb.append("}");
             if (i < trades.size() - 1) sb.append(",");
@@ -1268,6 +1319,7 @@ public class SaveManager {
                         st.qDest = Integer.parseInt(m.getOrDefault("qd", "0"));
                         st.rDest = Integer.parseInt(m.getOrDefault("rd", "0"));
                         st.isRecurrent = Boolean.parseBoolean(m.getOrDefault("ir", "false"));
+                        st.isBilateral = Boolean.parseBoolean(m.getOrDefault("ib", "false"));
                         st.methodId = Integer.parseInt(m.getOrDefault("mid", "1"));
                         st.isActive = Boolean.parseBoolean(m.getOrDefault("ia", "false"));
                         st.totalHours = Integer.parseInt(m.getOrDefault("th", "0"));
@@ -1276,9 +1328,29 @@ public class SaveManager {
                         
                         Map<String, Double> loadMap = deserializeJsonToDoubleMap(m.get("load"));
                         for (Map.Entry<String, Double> e : loadMap.entrySet()) st.load.put(Integer.parseInt(e.getKey()), e.getValue());
+
+                        Map<String, Double> rLoadMap = deserializeJsonToDoubleMap(m.get("rload"));
+                        for (Map.Entry<String, Double> e : rLoadMap.entrySet()) st.returnLoad.put(Integer.parseInt(e.getKey()), e.getValue());
                         
                         Map<String, Integer> transMap = deserializeJsonToMap(m.get("trans"));
                         for (Map.Entry<String, Integer> e : transMap.entrySet()) st.transport.put(Integer.parseInt(e.getKey()), e.getValue());
+
+                        // Pending
+                        st.hasPendingUpdate = Boolean.parseBoolean(m.getOrDefault("hpu", "false"));
+                        if (st.hasPendingUpdate) {
+                            st.pendingRecurrent = Boolean.parseBoolean(m.getOrDefault("pir", "false"));
+                            st.pendingIsBilateral = Boolean.parseBoolean(m.getOrDefault("pib", "false"));
+                            st.pendingMethodId = Integer.parseInt(m.getOrDefault("pmid", "1"));
+
+                            Map<String, Double> pLoadMap = deserializeJsonToDoubleMap(m.get("pload"));
+                            for (Map.Entry<String, Double> e : pLoadMap.entrySet()) st.pendingLoad.put(Integer.parseInt(e.getKey()), e.getValue());
+
+                            Map<String, Double> pReturnLoadMap = deserializeJsonToDoubleMap(m.get("prload"));
+                            for (Map.Entry<String, Double> e : pReturnLoadMap.entrySet()) st.pendingReturnLoad.put(Integer.parseInt(e.getKey()), e.getValue());
+
+                            Map<String, Integer> pTransMap = deserializeJsonToMap(m.get("ptrans"));
+                            for (Map.Entry<String, Integer> e : pTransMap.entrySet()) st.pendingTransport.put(Integer.parseInt(e.getKey()), e.getValue());
+                        }
                         
                         list.add(st);
                     }

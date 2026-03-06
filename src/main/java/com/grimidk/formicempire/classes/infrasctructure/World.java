@@ -620,6 +620,15 @@ public class World {
                                 icf.set(tunnel, st.isComplete);
                             } catch (Exception e) { e.printStackTrace(); }
                             d.addTunnel(tunnel);
+                            
+                            if (!st.isComplete) {
+                                if (hA.getColony() != null && hA.getColony().getDynasty() == d) {
+                                    hA.getColony().setCurrentTunnelProject(tunnel);
+                                }
+                                if (hB.getColony() != null && hB.getColony().getDynasty() == d) {
+                                    hB.getColony().setCurrentTunnelProject(tunnel);
+                                }
+                            }
                         }
                     }
                 }
@@ -650,6 +659,24 @@ public class World {
                     
                     Trade trade = new Trade(hO, hD, load, returnLoad, trans, st.isRecurrent, st.isBilateral, method);
                     trade.setActive(st.isActive);
+
+                    if (st.hasPendingUpdate) {
+                        Map<ResourceType, Double> pLoad = new HashMap<>();
+                        for (Map.Entry<Integer, Double> e : st.pendingLoad.entrySet()) {
+                            GameConstants.getResources().stream().filter(r -> r.getId() == e.getKey()).findFirst().ifPresent(r -> pLoad.put(r, e.getValue()));
+                        }
+                        Map<ResourceType, Double> pReturnLoad = new HashMap<>();
+                        for (Map.Entry<Integer, Double> e : st.pendingReturnLoad.entrySet()) {
+                            GameConstants.getResources().stream().filter(r -> r.getId() == e.getKey()).findFirst().ifPresent(r -> pReturnLoad.put(r, e.getValue()));
+                        }
+                        Map<AntType, Integer> pTrans = new HashMap<>();
+                        for (Map.Entry<Integer, Integer> e : st.pendingTransport.entrySet()) {
+                            GameConstants.getAntTypes().stream().filter(at -> at.getId() == e.getKey()).findFirst().ifPresent(at -> pTrans.put(at, e.getValue()));
+                        }
+                        TradeMethod pMethod = GameConstants.getTradeMethods().stream().filter(m -> m.getId() == st.pendingMethodId).findFirst().orElse(method);
+                        trade.setPendingUpdate(pLoad, pReturnLoad, pTrans, st.pendingRecurrent, st.pendingIsBilateral, pMethod);
+                    }
+
                     try {
                         Field th = Trade.class.getDeclaredField("totalHours");
                         Field rh = Trade.class.getDeclaredField("remainingHours");
