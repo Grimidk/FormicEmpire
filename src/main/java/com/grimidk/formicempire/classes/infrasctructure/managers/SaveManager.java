@@ -346,6 +346,8 @@ public class SaveManager {
                 sc.researchPoints = dynasty.getResearchPoints();
                 sc.totalNuptialFlights = dynasty.getTotalNuptialFlights();
                 sc.speciesId = dynasty.getSpecies() != null ? dynasty.getSpecies().getId() : 1;
+                sc.defaultAutomationEnabled = dynasty.isDefaultAutomationEnabled();
+                sc.defaultAutoBuildEnabled = dynasty.isDefaultAutoBuildEnabled();
                 sc.defeatedSpeciesIds = (dynasty.getDefeatedSpeciesIds() != null) ? new ArrayList<>(dynasty.getDefeatedSpeciesIds()) : new ArrayList<>();
                 sc.completedAssimilationIds = new ArrayList<>();
                 if (dynasty.getCompletedAssimilations() != null) {
@@ -627,6 +629,8 @@ public class SaveManager {
         writeJsonLine(w, "speciesId", sc.speciesId, false);
         writeJsonLine(w, "researchPoints", sc.researchPoints, false);
         writeJsonLine(w, "totalNuptialFlights", sc.totalNuptialFlights, false);
+        writeJsonLine(w, "defaultAutomationEnabled", sc.defaultAutomationEnabled, false);
+        writeJsonLine(w, "defaultAutoBuildEnabled", sc.defaultAutoBuildEnabled, false);
         writeJsonLine(w, "currentAssimilationId", sc.currentAssimilationId, false);
         writeJsonLine(w, "assimilationProgress", sc.assimilationProgress, false);
         w.write("      \"unlockedUpgradeIds\": " + serializeListToJson(sc.unlockedUpgradeIds) + ","); w.newLine();
@@ -838,6 +842,8 @@ public class SaveManager {
         sc.speciesId = Integer.parseInt(map.getOrDefault("speciesId", "1"));
         sc.researchPoints = Integer.parseInt(map.getOrDefault("researchPoints", "0"));
         sc.totalNuptialFlights = Integer.parseInt(map.getOrDefault("totalNuptialFlights", "0"));
+        sc.defaultAutomationEnabled = Boolean.parseBoolean(map.getOrDefault("defaultAutomationEnabled", "false"));
+        sc.defaultAutoBuildEnabled = Boolean.parseBoolean(map.getOrDefault("defaultAutoBuildEnabled", "false"));
         sc.currentAssimilationId = Integer.parseInt(map.getOrDefault("currentAssimilationId", "-1"));
         sc.assimilationProgress = Double.parseDouble(map.getOrDefault("assimilationProgress", "0.0"));
         sc.unlockedUpgradeIds = deserializeJsonToList(map.get("unlockedUpgradeIds"));
@@ -1102,6 +1108,7 @@ public class SaveManager {
                 for (Map.Entry<Integer, Integer> e : t.pendingTransport.entrySet()) pTransportStrMap.put(String.valueOf(e.getKey()), e.getValue());
                 sb.append("\"ptrans\":").append(serializeMapToJson(pTransportStrMap));
             } else {
+                // remove trailing comma if no pending updates
                 sb.setLength(sb.length() - 1);
             }
             

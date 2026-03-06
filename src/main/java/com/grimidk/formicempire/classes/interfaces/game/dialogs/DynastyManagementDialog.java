@@ -1095,12 +1095,30 @@ public class DynastyManagementDialog extends ZeroDialog {
         private int autoBuildCol = -1;
         private int automationCol = -1;
         private int actionCol = -1;
+        
+        // Sorting
+        private final JComboBox<String> sortCombo;
+        private Comparator<Colony> currentSorter;
+
+        // Default Toggles
+        private JCheckBox defaultAutoBuildCheck;
+        private JCheckBox defaultAutomationCheck;
 
         public OverviewPanel(boolean showAutoBuild, boolean showAutomation) {
             super(new BorderLayout());
             this.showAutoBuild = showAutoBuild;
             this.showAutomation = showAutomation;
             this.displayedColonies = new ArrayList<>();
+            
+            this.currentSorter = Comparator.comparingInt(Colony::getAntTotal).reversed();
+            this.sortCombo = new JComboBox<>(new String[]{
+                "Population (Highest First)", 
+                "Population (Lowest First)", 
+                "Age (Oldest First)", 
+                "Age (Newest First)"
+            });
+            this.sortCombo.addActionListener(e -> updateSorter());
+            
             initUI();
         }
 
@@ -1111,8 +1129,59 @@ public class DynastyManagementDialog extends ZeroDialog {
         public boolean isShowAutoBuild() {
             return showAutoBuild;
         }
+        
+        private void updateSorter() {
+            int idx = sortCombo.getSelectedIndex();
+            switch (idx) {
+                case 0: currentSorter = Comparator.comparingInt(Colony::getAntTotal).reversed(); break;
+                case 1: currentSorter = Comparator.comparingInt(Colony::getAntTotal); break;
+                case 2: currentSorter = Comparator.comparingInt(Colony::getAge).reversed(); break;
+                case 3: currentSorter = Comparator.comparingInt(Colony::getAge); break;
+            }
+            updateData();
+        }
 
         private void initUI() {
+            // --- Top Controls ---
+            JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 10));
+            topPanel.setBackground(new Color(240, 240, 240));
+            topPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
+            
+            // Sort
+            JPanel sortPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+            sortPanel.setOpaque(false);
+            JLabel sortLabel = new JLabel("Sort by:");
+            sortLabel.setForeground(Color.BLACK);
+            sortPanel.add(sortLabel);
+            sortPanel.add(sortCombo);
+            topPanel.add(sortPanel);
+            
+            topPanel.add(Box.createHorizontalStrut(20));
+
+            // Default Toggles
+            if (showAutoBuild) {
+                defaultAutoBuildCheck = new JCheckBox("Default Auto-Build");
+                defaultAutoBuildCheck.setOpaque(false);
+                defaultAutoBuildCheck.setForeground(Color.BLACK);
+                defaultAutoBuildCheck.setToolTipText("Automatically enable Auto-Build for all new colonies established by this dynasty.");
+                defaultAutoBuildCheck.setSelected(dynasty.isDefaultAutoBuildEnabled());
+                defaultAutoBuildCheck.addActionListener(e -> dynasty.setDefaultAutoBuildEnabled(defaultAutoBuildCheck.isSelected()));
+                topPanel.add(defaultAutoBuildCheck);
+            }
+            
+            if (showAutomation) {
+                defaultAutomationCheck = new JCheckBox("Default Automation");
+                defaultAutomationCheck.setOpaque(false);
+                defaultAutomationCheck.setForeground(Color.BLACK);
+                defaultAutomationCheck.setToolTipText("Automatically enable Automation for all new colonies established by this dynasty.");
+                defaultAutomationCheck.setSelected(dynasty.isDefaultAutomationEnabled());
+                defaultAutomationCheck.addActionListener(e -> dynasty.setDefaultAutomationEnabled(defaultAutomationCheck.isSelected()));
+                topPanel.add(defaultAutomationCheck);
+            }
+            
+            add(topPanel, BorderLayout.NORTH);
+
+            // --- Table ---
             List<String> cols = new ArrayList<>(Arrays.asList("", "Rank", "Type", "Name", "Population", "Age (Days)", "Biome"));
             
             if (showAutoBuild) {
@@ -1133,7 +1202,8 @@ public class DynastyManagementDialog extends ZeroDialog {
                     if (columnIndex == 0) return Icon.class;
                     if (columnIndex == 4) return Integer.class;
                     if (columnIndex == 6) return Biome.class; 
-                    if (columnIndex == autoBuildCol || columnIndex == automationCol) return Boolean.class;
+                    if (autoBuildCol != -1 && columnIndex == autoBuildCol) return Boolean.class;
+                    if (automationCol != -1 && columnIndex == automationCol) return Boolean.class;
                     return Object.class;
                 }
 
@@ -1214,7 +1284,9 @@ public class DynastyManagementDialog extends ZeroDialog {
             World world = engine.getWorld();
 
             displayedColonies.addAll(rawColonies);
-            displayedColonies.sort(Comparator.comparingInt(Colony::getAntTotal).reversed());
+            if (currentSorter != null) {
+                displayedColonies.sort(currentSorter);
+            }
 
             for (Colony colony : displayedColonies) {
                 Biome biome = null;

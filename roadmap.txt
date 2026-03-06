@@ -13,9 +13,7 @@ To Fix (By decreasing priority) :
 	Mid:
 	map legend
 	pause/play in dialogs
-	sort colony by size or age 
 	colnies in water biome
-	automation by default
 
 	Low:
 	breeders go out of the colony in nuptial

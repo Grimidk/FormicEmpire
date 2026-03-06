@@ -6,6 +6,7 @@ import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
 import java.util.List;
 import java.util.Random;
@@ -59,6 +60,12 @@ public class ColonyStarterService {
                     colony.setHatchRateMajor(capitalColony.getHatchRateMajor());
                     colony.setHatchRateDrone(capitalColony.getHatchRateDrone());
                     colony.setHatchRatePrincess(capitalColony.getHatchRatePrincess());
+                }
+                if (d.isDefaultAutomationEnabled() && d.hasUpgrade(GameUnlocks.ABILITY_AUTOMATION)) {
+                    colony.setAutomationEnabled(true);
+                }
+                if (d.isDefaultAutoBuildEnabled() && d.hasUpgrade(GameUnlocks.ABILITY_MANAGEMENT)) {
+                    colony.setAutoBuildEnabled(true);
                 }
             }
         } else {

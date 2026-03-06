@@ -71,6 +71,8 @@ public class Savefile implements Serializable {
         public int speciesId;
         public int researchPoints;
         public int totalNuptialFlights;
+        public boolean defaultAutomationEnabled;
+        public boolean defaultAutoBuildEnabled;
         public List<Integer> unlockedUpgradeIds = new ArrayList<>();
         public List<Integer> absorbedDynastyIds = new ArrayList<>();
         public List<Integer> defeatedSpeciesIds = new ArrayList<>();

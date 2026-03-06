@@ -36,6 +36,8 @@ public class Dynasty {
     private boolean isDefeated; 
     
     // Global Data
+    private boolean defaultAutomationEnabled;
+    private boolean defaultAutoBuildEnabled;
     private final Set<Upgrade> unlockedUpgrades;
     private final List<Colony> colonies;
     private final List<Tunnel> tunnels;
@@ -69,6 +71,8 @@ public class Dynasty {
         this.isDefeated = false;
         this.currentAssimilation = null;
         this.assimilationProgress = 0;
+        this.defaultAutomationEnabled = false;
+        this.defaultAutoBuildEnabled = false;
         
         initializeColor();
         initializeServices();
@@ -82,6 +86,8 @@ public class Dynasty {
         this.totalNuptialFlights = savedDynasty.totalNuptialFlights;
         this.isDefeated = savedDynasty.isDefeated;
         this.assimilationProgress = savedDynasty.assimilationProgress;
+        this.defaultAutomationEnabled = savedDynasty.defaultAutomationEnabled;
+        this.defaultAutoBuildEnabled = savedDynasty.defaultAutoBuildEnabled;
         
         this.species = GameConstants.SPECIES_OMNI; 
         for(Species s : GameConstants.getSpecies()) {
@@ -341,6 +347,12 @@ public class Dynasty {
 
     public boolean isDefeated() { return isDefeated; }
     public void setDefeated(boolean isDefeated) { this.isDefeated = isDefeated; }
+
+    public boolean isDefaultAutomationEnabled() { return defaultAutomationEnabled; }
+    public void setDefaultAutomationEnabled(boolean enabled) { this.defaultAutomationEnabled = enabled; }
+
+    public boolean isDefaultAutoBuildEnabled() { return defaultAutoBuildEnabled; }
+    public void setDefaultAutoBuildEnabled(boolean enabled) { this.defaultAutoBuildEnabled = enabled; }
 
     public Set<Upgrade> getUnlockedUpgrades() { return unlockedUpgrades; }
     public boolean hasUpgrade(Upgrade upgrade) { return unlockedUpgrades.contains(upgrade); }
