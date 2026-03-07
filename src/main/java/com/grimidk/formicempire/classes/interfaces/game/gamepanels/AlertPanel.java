@@ -1,5 +1,7 @@
 package com.grimidk.formicempire.classes.interfaces.game.gamepanels;
 
+import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -23,12 +25,13 @@ public class AlertPanel extends ZeroGamePanel {
         
         listPanel = new JPanel();
         listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
-        listPanel.setBackground(Color.WHITE); 
+        listPanel.setBackground(AssetStyles.BACKGROUND_LIGHT); 
 
         scrollPane = new JScrollPane(listPanel);
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setBorder(null);
+        scrollPane.getViewport().setBackground(AssetStyles.BACKGROUND_LIGHT);
     }
 
     @Override
@@ -41,7 +44,7 @@ public class AlertPanel extends ZeroGamePanel {
         
         if (alerts.isEmpty()) {
             JLabel emptyLabel = new JLabel("No alerts");
-            emptyLabel.setForeground(Color.LIGHT_GRAY);
+            emptyLabel.setForeground(AssetStyles.BACKGROUND_SECONDARY);
             emptyLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             listPanel.add(Box.createVerticalGlue());
             listPanel.add(emptyLabel);
@@ -49,10 +52,10 @@ public class AlertPanel extends ZeroGamePanel {
         } else {
             for (Alert alert : alerts) {
                 JPanel itemPanel = new JPanel(new BorderLayout());
-                itemPanel.setBackground(Color.WHITE);
+                itemPanel.setBackground(AssetStyles.BACKGROUND_LIGHT);
                 itemPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
                 itemPanel.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY),
+                    BorderFactory.createMatteBorder(0, 0, 1, 0, AssetStyles.BACKGROUND_SECONDARY),
                     new EmptyBorder(2, 5, 2, 5)
                 ));
 

@@ -18,6 +18,7 @@ import com.grimidk.formicempire.classes.entities.services.DynastyStarterService;
 import com.grimidk.formicempire.classes.entities.services.DynastyStatService;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.World;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 
@@ -165,7 +166,7 @@ public class Dynasty {
     
     private void initializeColor() {
         if (this.isPlayer) {
-            this.color = new Color(0, 191, 255); 
+            this.color = AssetStyles.COLOR_LIGHT_BLUE; 
         } else {
             float hue = (this.id * 0.618033988749895f) % 1.0f;
             this.color = Color.getHSBColor(hue, 0.75f, 0.95f);

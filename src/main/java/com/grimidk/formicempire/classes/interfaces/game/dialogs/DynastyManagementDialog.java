@@ -7,6 +7,7 @@ import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.Tunnel;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 
 import javax.swing.*;
@@ -261,13 +262,15 @@ public class DynastyManagementDialog extends ZeroDialog {
             add(new JScrollPane(table), BorderLayout.CENTER);
             
             JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            topPanel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
+            
             JLabel label = new JLabel("Managing Logistics for: ");
-            label.setForeground(Color.BLACK);
+            label.setForeground(AssetStyles.FONT_COLOR);
             topPanel.add(label);
             
             activeColonyLabel = new JLabel("None");
-            activeColonyLabel.setForeground(Color.BLACK);
-            activeColonyLabel.setFont(activeColonyLabel.getFont().deriveFont(Font.BOLD));
+            activeColonyLabel.setForeground(AssetStyles.FONT_COLOR);
+            activeColonyLabel.setFont(AssetStyles.FONT_BOLD);
             topPanel.add(activeColonyLabel);
             
             add(topPanel, BorderLayout.NORTH);
@@ -402,12 +405,12 @@ public class DynastyManagementDialog extends ZeroDialog {
                             add(buildBtn, BorderLayout.CENTER);
                         } else {
                             label.setText("N/A");
-                            label.setForeground(Color.GRAY);
+                            label.setForeground(AssetStyles.BACKGROUND_SECONDARY);
                             add(label, BorderLayout.CENTER);
                         }
                     } else if (data.tunnel.isComplete()) {
                         label.setText("Built");
-                        label.setForeground(new Color(0, 128, 0));
+                        label.setForeground(AssetStyles.FONT_COLOR_SUCCESS);
                         add(label, BorderLayout.CENTER);
                     } else {
                         double pct = (data.tunnel.getProgress() / data.tunnel.getTotalCost()) * 100;
@@ -417,7 +420,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                         int engineers = activeColony.getAssignedRoleCount(GameConstants.ROLE_ENGINEER);
                         int borers = activeColony.getAssignedRoleCount(GameConstants.ROLE_BORER);
                         if (engineers <= 0 && borers <= 0) {
-                            progressBar.setForeground(Color.RED);
+                            progressBar.setForeground(AssetStyles.FONT_COLOR_ERROR);
                             progressBar.setToolTipText("No Engineers or Borers assigned to progress construction!");
                         } else {
                             progressBar.setForeground(UIManager.getColor("ProgressBar.foreground"));
@@ -589,16 +592,16 @@ public class DynastyManagementDialog extends ZeroDialog {
 
             JPanel headerPanel = new JPanel(new GridLayout(1, 4, 20, 20));
             headerPanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
-            headerPanel.setBackground(new Color(245, 245, 245));
+            headerPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
             
-            capLabel.setFont(capLabel.getFont().deriveFont(Font.BOLD, 14f));
-            speedLabel.setFont(speedLabel.getFont().deriveFont(Font.BOLD, 14f));
-            timeLabel.setFont(timeLabel.getFont().deriveFont(Font.BOLD, 14f));
-            dangerLabel.setFont(dangerLabel.getFont().deriveFont(Font.BOLD, 14f));
-            capLabel.setForeground(Color.BLACK);
-            speedLabel.setForeground(Color.BLACK);
-            timeLabel.setForeground(Color.BLACK);
-            dangerLabel.setForeground(Color.BLACK);
+            capLabel.setFont(AssetStyles.FONT_BOLD.deriveFont(14f));
+            speedLabel.setFont(AssetStyles.FONT_BOLD.deriveFont(14f));
+            timeLabel.setFont(AssetStyles.FONT_BOLD.deriveFont(14f));
+            dangerLabel.setFont(AssetStyles.FONT_BOLD.deriveFont(14f));
+            capLabel.setForeground(AssetStyles.FONT_COLOR);
+            speedLabel.setForeground(AssetStyles.FONT_COLOR);
+            timeLabel.setForeground(AssetStyles.FONT_COLOR);
+            dangerLabel.setForeground(AssetStyles.FONT_COLOR);
             
             headerPanel.add(capLabel);
             headerPanel.add(speedLabel);
@@ -609,22 +612,25 @@ public class DynastyManagementDialog extends ZeroDialog {
             JPanel mainPanel = new JPanel();
             mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
             mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+            mainPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
 
             JLabel routeLabel = new JLabel("Route: " + origin.getName() + " -> " + target.getName());
-            routeLabel.setFont(routeLabel.getFont().deriveFont(Font.BOLD));
-            routeLabel.setForeground(Color.BLACK);
+            routeLabel.setFont(AssetStyles.FONT_BOLD);
+            routeLabel.setForeground(AssetStyles.FONT_COLOR);
             mainPanel.add(routeLabel);
             mainPanel.add(Box.createVerticalStrut(15));
 
             JPanel resGrid = new JPanel(new GridLayout(0, 2, 15, 8));
             resGrid.setBorder(BorderFactory.createTitledBorder("Cargo (Load)"));
+            resGrid.setBackground(AssetStyles.BACKGROUND_COLOR);
             for (ResourceType rt : GameConstants.getResources()) {
                 if (rt.isIsLiquid()) continue;
 
                 JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 2));
+                p.setOpaque(false);
                 JLabel label = new JLabel(rt.getName(), rt.getIcon(), JLabel.LEFT);
                 label.setPreferredSize(new Dimension(160, 25));
-                label.setForeground(Color.BLACK);
+                label.setForeground(AssetStyles.FONT_COLOR);
                 p.add(label);
                 
                 double available = getColonyResource(rt);
@@ -653,12 +659,14 @@ public class DynastyManagementDialog extends ZeroDialog {
 
             JPanel bilateralPanel = new JPanel(new GridLayout(0, 2, 15, 8));
             bilateralPanel.setBorder(BorderFactory.createTitledBorder("Cargo (Return Load)"));
+            bilateralPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
             for (ResourceType rt : GameConstants.getResources()) {
                 if (rt.isIsLiquid()) continue;
                 JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 2));
+                p.setOpaque(false);
                 JLabel label = new JLabel(rt.getName(), rt.getIcon(), JLabel.LEFT);
                 label.setPreferredSize(new Dimension(160, 25));
-                label.setForeground(Color.BLACK);
+                label.setForeground(AssetStyles.FONT_COLOR);
                 p.add(label);
                 
                 double initialVal = 0.0;
@@ -688,6 +696,7 @@ public class DynastyManagementDialog extends ZeroDialog {
 
             JPanel antGrid = new JPanel(new GridLayout(0, 2, 15, 8));
             antGrid.setBorder(BorderFactory.createTitledBorder("Personnel (Assigned Logistics Roles)"));
+            antGrid.setBackground(AssetStyles.BACKGROUND_COLOR);
             
             Map<AntType, Integer> availableRoles = new HashMap<>();
             availableRoles.put(GameConstants.TYPE_WORKER, origin.getAssignedRoleCount(GameConstants.ROLE_COURIER));
@@ -711,6 +720,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             List<AntType> tradeAnts = List.of(GameConstants.TYPE_WORKER, GameConstants.TYPE_SOLDIER, GameConstants.TYPE_MAJOR, GameConstants.TYPE_PRINCESS);
             for (AntType at : tradeAnts) {
                 JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 2));
+                p.setOpaque(false);
                 String labelName = at.getName();
                 if (at == GameConstants.TYPE_WORKER) labelName = "Couriers";
                 else if (at == GameConstants.TYPE_MAJOR) labelName = "Transports";
@@ -720,7 +730,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 int available = availableRoles.getOrDefault(at, 0);
                 JLabel label = new JLabel(labelName + " (" + available + ")", at.getIcon(), JLabel.LEFT);
                 label.setPreferredSize(new Dimension(200, 25));
-                label.setForeground(Color.BLACK);
+                label.setForeground(AssetStyles.FONT_COLOR);
                 p.add(label);
                 
                 int initialVal = 0;
@@ -745,6 +755,7 @@ public class DynastyManagementDialog extends ZeroDialog {
 
             JPanel configPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 10));
             configPanel.setBorder(BorderFactory.createTitledBorder("Logistics"));
+            configPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
             
             methodCombo = new JComboBox<>();
             updateAvailableMethods();
@@ -763,19 +774,21 @@ public class DynastyManagementDialog extends ZeroDialog {
             });
             methodCombo.addActionListener(e -> updateStats());
             JLabel mLabel = new JLabel("Method:");
-            mLabel.setForeground(Color.BLACK);
+            mLabel.setForeground(AssetStyles.FONT_COLOR);
             configPanel.add(mLabel);
             configPanel.add(methodCombo);
             
             boolean initialRecurrent = (existingTrade != null) ? (existingTrade.hasPendingUpdate() ? existingTrade.isPendingRecurrent() : existingTrade.isRecurrent()) : true;
             recurrentCheck = new JCheckBox("Recurrent Route", initialRecurrent);
-            recurrentCheck.setForeground(Color.BLACK);
+            recurrentCheck.setForeground(AssetStyles.FONT_COLOR);
+            recurrentCheck.setOpaque(false);
             configPanel.add(Box.createHorizontalStrut(20));
             configPanel.add(recurrentCheck);
             
             boolean initialBilateral = (existingTrade != null) ? (existingTrade.hasPendingUpdate() ? existingTrade.isPendingBilateral() : existingTrade.isBilateral()) : false;
             bilateralCheck = new JCheckBox("Bilateral Trade", initialBilateral);
-            bilateralCheck.setForeground(Color.BLACK);
+            bilateralCheck.setForeground(AssetStyles.FONT_COLOR);
+            bilateralCheck.setOpaque(false);
             bilateralCheck.setVisible(origin.hasUpgrade(GameUnlocks.ABILITY_BILATERAL_TRADE));
             bilateralCheck.addActionListener(e -> {
                 bilateralPanel.setVisible(bilateralCheck.isSelected());
@@ -787,24 +800,25 @@ public class DynastyManagementDialog extends ZeroDialog {
             configPanel.add(bilateralCheck);
             mainPanel.add(configPanel);
 
-            add(mainPanel, BorderLayout.CENTER);
+            add(new JScrollPane(mainPanel), BorderLayout.CENTER);
 
             JPanel footerPanel = new JPanel(new GridLayout(1, 0, 10, 0));
             footerPanel.setPreferredSize(new Dimension(0, 60));
             footerPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+            footerPanel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
 
             createBtn = new JButton(existingTrade == null ? "Confirm Trade Route" : "Update Trade Route");
-            createBtn.setFont(createBtn.getFont().deriveFont(Font.BOLD));
+            createBtn.setFont(AssetStyles.FONT_BOLD);
             createBtn.addActionListener(e -> attemptCreate());
             
             optimizeBtn = new JButton("Bilateral Optimization");
-            optimizeBtn.setFont(optimizeBtn.getFont().deriveFont(Font.BOLD));
-            optimizeBtn.setForeground(new Color(0, 120, 0));
+            optimizeBtn.setFont(AssetStyles.FONT_BOLD);
+            optimizeBtn.setForeground(AssetStyles.FONT_COLOR_SUCCESS);
             optimizeBtn.setVisible(false);
             optimizeBtn.addActionListener(e -> performOptimization());
             
             JButton cancelBtn = new JButton("Cancel");
-            cancelBtn.setFont(cancelBtn.getFont().deriveFont(Font.BOLD));
+            cancelBtn.setFont(AssetStyles.FONT_BOLD);
             cancelBtn.addActionListener(e -> dispose());
             
             footerPanel.add(createBtn);
@@ -956,12 +970,12 @@ public class DynastyManagementDialog extends ZeroDialog {
             boolean noAnts = totalAnts <= 0;
 
             capLabel.setText(String.format("Capacity: %.1f / %.1f", Math.max(totalLoad, bilateralCheck.isSelected() ? totalReturnLoad : 0), totalCap));
-            capLabel.setForeground(overCap ? Color.RED : Color.BLACK);
+            capLabel.setForeground(overCap ? AssetStyles.FONT_COLOR_ERROR : AssetStyles.FONT_COLOR);
             
             speedLabel.setText(String.format("Transit Speed: %.2fx", speedFactor));
             timeLabel.setText(String.format("Travel Time: %dh", hours));
             dangerLabel.setText(String.format("Security: %.1f%%", mitigationPercent));
-            dangerLabel.setForeground(mitigationPercent < 100 ? new Color(180, 100, 0) : new Color(0, 120, 0));
+            dangerLabel.setForeground(mitigationPercent < 100 ? AssetStyles.FONT_COLOR_WARNING : AssetStyles.FONT_COLOR_SUCCESS);
 
             createBtn.setEnabled(!overCap && !noAnts && !noLoad);
             if (overCap) createBtn.setToolTipText("Cargo exceeds transport capacity!");
@@ -1144,14 +1158,14 @@ public class DynastyManagementDialog extends ZeroDialog {
         private void initUI() {
             // --- Top Controls ---
             JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 10));
-            topPanel.setBackground(new Color(240, 240, 240));
-            topPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
+            topPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
+            topPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, AssetStyles.BORDER_COLOR));
             
             // Sort
             JPanel sortPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
             sortPanel.setOpaque(false);
             JLabel sortLabel = new JLabel("Sort by:");
-            sortLabel.setForeground(Color.BLACK);
+            sortLabel.setForeground(AssetStyles.FONT_COLOR);
             sortPanel.add(sortLabel);
             sortPanel.add(sortCombo);
             topPanel.add(sortPanel);
@@ -1162,7 +1176,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             if (showAutoBuild) {
                 defaultAutoBuildCheck = new JCheckBox("Default Auto-Build");
                 defaultAutoBuildCheck.setOpaque(false);
-                defaultAutoBuildCheck.setForeground(Color.BLACK);
+                defaultAutoBuildCheck.setForeground(AssetStyles.FONT_COLOR);
                 defaultAutoBuildCheck.setToolTipText("Automatically enable Auto-Build for all new colonies established by this dynasty.");
                 defaultAutoBuildCheck.setSelected(dynasty.isDefaultAutoBuildEnabled());
                 defaultAutoBuildCheck.addActionListener(e -> dynasty.setDefaultAutoBuildEnabled(defaultAutoBuildCheck.isSelected()));
@@ -1172,7 +1186,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             if (showAutomation) {
                 defaultAutomationCheck = new JCheckBox("Default Automation");
                 defaultAutomationCheck.setOpaque(false);
-                defaultAutomationCheck.setForeground(Color.BLACK);
+                defaultAutomationCheck.setForeground(AssetStyles.FONT_COLOR);
                 defaultAutomationCheck.setToolTipText("Automatically enable Automation for all new colonies established by this dynasty.");
                 defaultAutomationCheck.setSelected(dynasty.isDefaultAutomationEnabled());
                 defaultAutomationCheck.addActionListener(e -> dynasty.setDefaultAutomationEnabled(defaultAutomationCheck.isSelected()));
@@ -1232,7 +1246,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             table.setIntercellSpacing(new Dimension(0, 1));
             table.getTableHeader().setReorderingAllowed(false);
             table.setFillsViewportHeight(true);
-            table.setForeground(Color.BLACK);
+            table.setForeground(AssetStyles.FONT_COLOR);
             
             table.getColumnModel().getColumn(0).setMaxWidth(50);
             table.getColumnModel().getColumn(0).setPreferredWidth(50);
@@ -1349,7 +1363,8 @@ public class DynastyManagementDialog extends ZeroDialog {
             JPanel progressPanel = new JPanel(new BorderLayout());
             progressPanel.setOpaque(false);
             progressBar.setStringPainted(true);
-            statusLabel.setFont(statusLabel.getFont().deriveFont(10f));
+            statusLabel.setFont(AssetStyles.FONT_SMALL);
+            statusLabel.setForeground(AssetStyles.FONT_COLOR);
             progressPanel.add(statusLabel, BorderLayout.NORTH);
             progressPanel.add(progressBar, BorderLayout.CENTER);
             add(btnPanel, "BUTTONS");
@@ -1394,7 +1409,8 @@ public class DynastyManagementDialog extends ZeroDialog {
             JPanel progressPanel = new JPanel(new BorderLayout());
             progressPanel.setOpaque(false);
             progressBar.setStringPainted(true);
-            statusLabel.setFont(statusLabel.getFont().deriveFont(10f));
+            statusLabel.setFont(AssetStyles.FONT_SMALL);
+            statusLabel.setForeground(AssetStyles.FONT_COLOR);
             progressPanel.add(statusLabel, BorderLayout.NORTH);
             progressPanel.add(progressBar, BorderLayout.CENTER);
             container.add(btnPanel, "BUTTONS");

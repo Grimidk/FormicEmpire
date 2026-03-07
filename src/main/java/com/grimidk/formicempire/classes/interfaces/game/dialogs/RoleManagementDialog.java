@@ -4,6 +4,7 @@ import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 
@@ -233,13 +234,19 @@ public class RoleManagementDialog extends ZeroDialog {
 
             setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
             setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+            setBackground(AssetStyles.BACKGROUND_COLOR);
 
             int totalAnts = colony.getAntsByType(antType).size();
             
             totalLabel = new JLabel("Total " + antType.getName() + "s: " + totalAnts);
             totalLabel.setFont(totalLabel.getFont().deriveFont(Font.BOLD));
+            totalLabel.setForeground(AssetStyles.FONT_COLOR);
+            
             assignedLabel = new JLabel("Total Assigned: 0");
+            assignedLabel.setForeground(AssetStyles.FONT_COLOR);
+            
             unassignedLabel = new JLabel("Unassigned: " + totalAnts);
+            unassignedLabel.setForeground(AssetStyles.FONT_COLOR);
             
             add(totalLabel);
             add(assignedLabel);
@@ -276,7 +283,10 @@ public class RoleManagementDialog extends ZeroDialog {
 
         private void addRoleRow(AntRole role) {
             JPanel roleRow = new JPanel(new FlowLayout(FlowLayout.LEFT));
-            roleRow.add(new JLabel(role.getName() + ":"));
+            roleRow.setOpaque(false);
+            JLabel label = new JLabel(role.getName() + ":");
+            label.setForeground(AssetStyles.FONT_COLOR);
+            roleRow.add(label);
             
             int currentAssigned = colony.getAssignedRoleCount(role);
             SpinnerModel model = new SpinnerNumberModel(currentAssigned, 0, Integer.MAX_VALUE, 1); 
@@ -374,14 +384,14 @@ public class RoleManagementDialog extends ZeroDialog {
                 unassignedLabel.setText("Unassigned: " + unassigned);
 
                 if (totalAssigned > totalAnts) {
-                    assignedLabel.setForeground(Color.RED);
+                    assignedLabel.setForeground(AssetStyles.FONT_COLOR_ERROR);
                     assignedLabel.setToolTipText("You have assigned more roles than you have ants.");
-                    unassignedLabel.setForeground(Color.RED);
+                    unassignedLabel.setForeground(AssetStyles.FONT_COLOR_ERROR);
                     unassignedLabel.setToolTipText("You have assigned more roles than you have ants.");
                 } else {
-                    assignedLabel.setForeground(Color.BLACK);
+                    assignedLabel.setForeground(AssetStyles.FONT_COLOR);
                     assignedLabel.setToolTipText(null);
-                    unassignedLabel.setForeground(Color.BLACK);
+                    unassignedLabel.setForeground(AssetStyles.FONT_COLOR);
                     unassignedLabel.setToolTipText(null);
                 }
             } finally {

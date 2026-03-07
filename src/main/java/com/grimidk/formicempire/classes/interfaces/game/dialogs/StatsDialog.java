@@ -16,10 +16,12 @@ import com.grimidk.formicempire.classes.entities.services.ColonyLocationService;
 import com.grimidk.formicempire.classes.entities.services.ColonyStatsService;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -120,7 +122,22 @@ public class StatsDialog extends ZeroDialog {
         table.setRowHeight(24);
         table.setShowVerticalLines(false);
         table.setIntercellSpacing(new Dimension(0, 1));
-        return new JScrollPane(table);
+        table.setBackground(AssetStyles.UI_BG_PRIMARY);
+        table.setForeground(AssetStyles.TEXT_NORMAL);
+        table.setSelectionBackground(AssetStyles.UI_BG_SECONDARY);
+        table.setSelectionForeground(AssetStyles.TEXT_HEADER);
+        table.setFont(AssetStyles.FONT_NORMAL);
+        
+        DefaultTableCellRenderer headerRenderer = new DefaultTableCellRenderer();
+        headerRenderer.setBackground(AssetStyles.UI_BG_SECONDARY);
+        headerRenderer.setForeground(AssetStyles.TEXT_HEADER);
+        headerRenderer.setFont(AssetStyles.FONT_BOLD);
+        table.getTableHeader().setDefaultRenderer(headerRenderer);
+        
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.getViewport().setBackground(AssetStyles.UI_BG_PRIMARY);
+        scrollPane.setBorder(null);
+        return scrollPane;
     }
 
     // --- Tab Initialization ---

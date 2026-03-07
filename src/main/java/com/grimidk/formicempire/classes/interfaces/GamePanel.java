@@ -8,6 +8,7 @@ import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.managers.AlertManager;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TriggerManager;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
 import com.grimidk.formicempire.classes.interfaces.game.dialogs.*;
@@ -148,7 +149,7 @@ public class GamePanel extends ZeroGamePanel {
 
     private JPanel createNorthPanel() {
         statusIndicator.setOpaque(true);
-        statusIndicator.setBackground(Color.GRAY);
+        statusIndicator.setBackground(AssetStyles.BACKGROUND_SECONDARY);
         statusIndicator.setPreferredSize(new Dimension(12, 12));
         JPanel north = new JPanel(new FlowLayout(FlowLayout.LEFT));
         north.add(statusIndicator);
@@ -544,11 +545,11 @@ public class GamePanel extends ZeroGamePanel {
         loadingDialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
-        panel.setBackground(Color.DARK_GRAY);
+        panel.setBorder(BorderFactory.createLineBorder(AssetStyles.BACKGROUND_SECONDARY, 2));
+        panel.setBackground(AssetStyles.BACKGROUND_DARK);
 
         JLabel label = new JLabel("Loading game, please wait...", SwingConstants.CENTER);
-        label.setForeground(Color.WHITE);
+        label.setForeground(AssetStyles.FONT_COLOR_BRIGHT);
         label.setBorder(BorderFactory.createEmptyBorder(30, 60, 30, 60));
 
         panel.add(label, BorderLayout.CENTER);
@@ -645,15 +646,15 @@ public class GamePanel extends ZeroGamePanel {
 
     public void updateStatusIndicator(boolean paused) {
         if (!engineStarted) {
-            statusIndicator.setBackground(Color.GRAY);
+            statusIndicator.setBackground(AssetStyles.BACKGROUND_SECONDARY);
             statusLabel.setText("Game not started");
             return;
         }
         if (paused) {
-            statusIndicator.setBackground(Color.RED);
+            statusIndicator.setBackground(AssetStyles.FONT_COLOR_WARNING);
             statusLabel.setText("Paused");
         } else {
-            statusIndicator.setBackground(Color.GREEN);
+            statusIndicator.setBackground(AssetStyles.FONT_COLOR_SUCCESS);
             statusLabel.setText("Running");
         }
     }
