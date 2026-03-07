@@ -66,7 +66,6 @@ Needed for launch (v1.0) (Launch Version):
 	langs (ENG, SPA, POR, FRE, GER, RUS, CHN, JAP)
 	warning screen for arthropophobia 
 	start animation and general animations
-	package into playable
 	register Grim Games or Grimidk in steam as dev team
 	versioning to go back to previous stable patches
 	credits screen

@@ -74,6 +74,49 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>com.akathist.maven.plugins.launch4j</groupId>
+                <artifactId>launch4j-maven-plugin</artifactId>
+                <version>2.5.1</version>
+                <executions>
+                    <execution>
+                        <id>l4j-clui</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>launch4j</goal>
+                        </goals>
+                        <configuration>
+                            <headerType>gui</headerType>
+                            <jar>${project.build.directory}/${project.artifactId}-${project.version}.jar</jar>
+                            <outfile>${project.build.directory}/FormicEmpire.exe</outfile>
+                            <icon>src/main/resources/icon.ico</icon>
+                            <downloadUrl>http://java.com/download</downloadUrl>
+                            <classPath>
+                                <mainClass>com.grimidk.formicempire.FormicEmpire</mainClass>
+                                <preCp>anything</preCp>
+                            </classPath>
+                            <jre>
+                                <path>./jre</path>
+                                <requires64Bit>false</requires64Bit>
+                                <minVersion>17</minVersion>
+                                <requiresJdk>false</requiresJdk>
+                            </jre>
+                            <versionInfo>
+                                <fileVersion>1.0.0.0</fileVersion>
+                                <txtFileVersion>${project.version}</txtFileVersion>
+                                <fileDescription>${project.name}</fileDescription>
+                                <copyright>2026</copyright>
+                                <productVersion>1.0.0.0</productVersion>
+                                <txtProductVersion>1.0.0.0</txtProductVersion>
+                                <productName>${project.name}</productName>
+                                <companyName>GrimIDK</companyName>
+                                <internalName>FormicEmpire</internalName>
+                                <originalFilename>FormicEmpire.exe</originalFilename>
+                            </versionInfo>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.1.2</version>
