@@ -166,4 +166,18 @@ public class AssetStyles {
         }
         return Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
     }
+
+    public static Image loadImage(String path) {
+        try {
+            URL url = AssetStyles.class.getResource(path);
+            if (url != null) {
+                return new ImageIcon(url).getImage();
+            } else {
+                System.err.println("Resource not found: " + path);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

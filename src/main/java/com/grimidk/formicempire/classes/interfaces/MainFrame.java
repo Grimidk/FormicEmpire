@@ -51,6 +51,10 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
 
     public MainFrame(Engine engine) {
         super("Formic Empire");
+        Image icon = AssetStyles.loadImage("/icon.ico");
+        if (icon != null) {
+            setIconImage(icon);
+        }
         this.engine = engine;
         this.cardLayout = new CardLayout();
         this.cards = new JPanel(cardLayout);

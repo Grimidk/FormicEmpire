@@ -4,6 +4,12 @@
     <groupId>com.grimidk</groupId>
     <artifactId>FormicEmpire</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <name>FormicEmpire</name>
+    <description>A game about ants.</description>
+    <inceptionYear>2026</inceptionYear>
+    <organization>
+        <name>GrimIDK</name>
+    </organization>
     <dependencies>
         <dependency>
             <groupId>com.google.code.gson</groupId>
