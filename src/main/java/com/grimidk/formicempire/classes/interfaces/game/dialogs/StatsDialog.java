@@ -2,20 +2,26 @@ package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
+import com.grimidk.formicempire.classes.constants.misc.ResourceType;
+import com.grimidk.formicempire.classes.constants.misc.Species;
+import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.Season;
 import com.grimidk.formicempire.classes.constants.world.Weather;
 import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.services.DynastyStatService;
 import com.grimidk.formicempire.classes.entities.services.ColonyLocationService;
 import com.grimidk.formicempire.classes.entities.services.ColonyStatsService;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -23,6 +29,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class StatsDialog extends ZeroDialog {
 
@@ -44,7 +51,7 @@ public class StatsDialog extends ZeroDialog {
     private final Runnable refreshTask = this::liveUpdate;
 
     public StatsDialog(JFrame owner, Colony colony, Engine engine) {
-        super(owner, "Statistics", new Dimension(800, 600));
+        super(owner, "Statistics", new Dimension(1000, 600));
         this.colony = colony;
         this.engine = engine;
         this.dynastyStatsService = new DynastyStatService(); 
@@ -115,7 +122,22 @@ public class StatsDialog extends ZeroDialog {
         table.setRowHeight(24);
         table.setShowVerticalLines(false);
         table.setIntercellSpacing(new Dimension(0, 1));
-        return new JScrollPane(table);
+        table.setBackground(AssetStyles.UI_BG_PRIMARY);
+        table.setForeground(AssetStyles.TEXT_NORMAL);
+        table.setSelectionBackground(AssetStyles.UI_BG_SECONDARY);
+        table.setSelectionForeground(AssetStyles.TEXT_HEADER);
+        table.setFont(AssetStyles.FONT_NORMAL);
+        
+        DefaultTableCellRenderer headerRenderer = new DefaultTableCellRenderer();
+        headerRenderer.setBackground(AssetStyles.UI_BG_SECONDARY);
+        headerRenderer.setForeground(AssetStyles.TEXT_HEADER);
+        headerRenderer.setFont(AssetStyles.FONT_BOLD);
+        table.getTableHeader().setDefaultRenderer(headerRenderer);
+        
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.getViewport().setBackground(AssetStyles.UI_BG_PRIMARY);
+        scrollPane.setBorder(null);
+        return scrollPane;
     }
 
     // --- Tab Initialization ---
@@ -204,8 +226,8 @@ public class StatsDialog extends ZeroDialog {
             return;
         }
 
-        com.grimidk.formicempire.classes.entities.Hex hex = world.getActiveHex();
-        com.grimidk.formicempire.classes.constants.world.Biome biome = hex.getBiome();
+        Hex hex = world.getActiveHex();
+        Biome biome = hex.getBiome();
 
         // Hex Coordinates & Basic Info
         model.addRow(new Object[]{"Hex", "Coordinates (Q, R)", hex.getQ() + ", " + hex.getR()});
@@ -232,7 +254,7 @@ public class StatsDialog extends ZeroDialog {
         model.addRow(new Object[]{"Neighbors", "South-East", getHexSummary(hex.getSouthEast())});
     }
 
-    private String getHexSummary(com.grimidk.formicempire.classes.entities.Hex neighbor) {
+    private String getHexSummary(Hex neighbor) {
         if (neighbor == null) return "Edge of World";
         String summary = (neighbor.getBiome() != null ? neighbor.getBiome().getName() : "Unknown");
         if (neighbor.getColony() != null) {
@@ -251,6 +273,16 @@ public class StatsDialog extends ZeroDialog {
         model.addRow(new Object[]{"Colony", "Species", colony.getSpecies() != null ? colony.getSpecies().getName() : "Unknown"});
         model.addRow(new Object[]{"Colony", "Species (Scientific)", colony.getSpecies() != null ? colony.getSpecies().getScientific() : "Unknown"});
         model.addRow(new Object[]{"Colony", "ID", colony.getId()});
+        model.addRow(new Object[]{"Colony", "Age", colony.getAge() + " days"});
+        
+        if (colony.getQueens().isEmpty()) {
+            model.addRow(new Object[]{"Colony", "Queen Status", "MISSING (" + colony.getDaysWithoutQueen() + " days)"});
+        } else {
+            model.addRow(new Object[]{"Colony", "Queen Status", "Healthy (" + colony.getQueens().size() + " total)"});
+        }
+
+        model.addRow(new Object[]{"Colony", "Automation", colony.isAutomationEnabled() ? "ENABLED" : "Disabled"});
+        model.addRow(new Object[]{"Colony", "Auto-Build", colony.isAutoBuildEnabled() ? "ENABLED" : "Disabled"});
 
         // World Info
         World world = engine != null ? engine.getWorld() : null;
@@ -290,13 +322,31 @@ public class StatsDialog extends ZeroDialog {
         // Basic Info
         model.addRow(new Object[]{null, "Dynasty", "Name", dynasty.getName()});
         model.addRow(new Object[]{dynasty.getRank().getIcon(), "Dynasty", "Rank", dynasty.getRank().getName()}); 
+        model.addRow(new Object[]{null, "Dynasty", "Species", dynasty.getSpecies() != null ? dynasty.getSpecies().getName() : "Omni"});
+        
+        Colony capital = dynasty.getCapital();
+        model.addRow(new Object[]{null, "Dynasty", "Capital", (capital != null ? capital.getName() : "None")});
+        
         model.addRow(new Object[]{null, "Dynasty", "Total Colonies", dynastyStatsService.getTotalColonies(dynasty)});
         model.addRow(new Object[]{null, "Dynasty", "Global Population", dynastyStatsService.getTotalPopulation(dynasty)});
         model.addRow(new Object[]{null, "Dynasty", "Total Nuptial Flights", dynasty.getTotalNuptialFlights()});
 
+        // Conquest & Expansion
+        model.addRow(new Object[]{null, null, "------", "------"});
+        String defeated = dynasty.getDefeatedSpeciesIds().stream()
+            .map(id -> {
+                for (Species s : GameConstants.getSpecies()) {
+                    if (s.getId() == id) return s.getName();
+                }
+                return "ID:" + id;
+            })
+            .collect(Collectors.joining(", "));
+        model.addRow(new Object[]{null, "Dynasty", "Defeated Species", defeated.isEmpty() ? "None" : defeated});
+        
         // Unlocks
         model.addRow(new Object[]{null, null, "------", "------"});
         model.addRow(new Object[]{null, "Progress", "Upgrades Researched", dynasty.getUnlockedUpgrades().size()});
+        model.addRow(new Object[]{null, "Progress", "Completed Assimilations", dynasty.getCompletedAssimilations().size()});
         
         int totalBuildings = 0;
         for (Colony c : dynasty.getColonies()) {
@@ -311,15 +361,15 @@ public class StatsDialog extends ZeroDialog {
 
         // Global Resources
         model.addRow(new Object[]{null, null, "------", "------"});
-        Map<String, Integer> resources = dynastyStatsService.getGlobalResources(dynasty);
+        Map<ResourceType, Integer> resources = dynastyStatsService.getGlobalResources(dynasty);
         
-        model.addRow(new Object[]{GameConstants.RESOURCE_PLANT.getIcon(), "Resources", "Total Plants", resources.get("Plants")});
-        model.addRow(new Object[]{GameConstants.RESOURCE_FUNGI.getIcon(), "Resources", "Total Mushrooms", resources.get("Mushrooms")});
-        model.addRow(new Object[]{GameConstants.RESOURCE_MEAT.getIcon(), "Resources", "Total Protein", resources.get("Protein")});
-        model.addRow(new Object[]{GameConstants.RESOURCE_WATER.getIcon(), "Resources", "Total Water", resources.get("Water")});
-        model.addRow(new Object[]{GameConstants.RESOURCE_SYRUP.getIcon(), "Resources", "Total Syrups", resources.getOrDefault("Syrups", 0)});
-        model.addRow(new Object[]{GameConstants.RESOURCE_RESIN.getIcon(), "Resources", "Total Resins", resources.getOrDefault("Resins", 0)});
-        model.addRow(new Object[]{GameConstants.RESOURCE_ROCK.getIcon(), "Resources", "Total Minerals", resources.get("Minerals")});
+        model.addRow(new Object[]{GameConstants.RESOURCE_PLANT.getIcon(), "Resources", "Global Plants", resources.get(GameConstants.RESOURCE_PLANT)});
+        model.addRow(new Object[]{GameConstants.RESOURCE_FUNGI.getIcon(), "Resources", "Global Mushrooms", resources.get(GameConstants.RESOURCE_FUNGI)});
+        model.addRow(new Object[]{GameConstants.RESOURCE_MEAT.getIcon(), "Resources", "Global Protein", resources.get(GameConstants.RESOURCE_MEAT)});
+        model.addRow(new Object[]{GameConstants.RESOURCE_WATER.getIcon(), "Resources", "Global Water", resources.get(GameConstants.RESOURCE_WATER)});
+        model.addRow(new Object[]{GameConstants.RESOURCE_SYRUP.getIcon(), "Resources", "Global Syrups", resources.getOrDefault(GameConstants.RESOURCE_SYRUP, 0)});
+        model.addRow(new Object[]{GameConstants.RESOURCE_RESIN.getIcon(), "Resources", "Global Resins", resources.getOrDefault(GameConstants.RESOURCE_RESIN, 0)});
+        model.addRow(new Object[]{GameConstants.RESOURCE_ROCK.getIcon(), "Resources", "Global Minerals", resources.getOrDefault(GameConstants.RESOURCE_ROCK, 0)});
         
         // Global Deaths
         model.addRow(new Object[]{null, null, "------", "------"});
@@ -340,42 +390,42 @@ public class StatsDialog extends ZeroDialog {
         // --- Plants ---
         int plantProd = stats.getPlantProduction(colony);
         int plantCons = stats.getPlantConsumption(colony);
-        addResourceRow(model, GameConstants.RESOURCE_PLANT.getIcon(), "Plants", colony.getPlants(), stats.getPlantsCapacity(colony), 
+        addResourceRow(model, GameConstants.RESOURCE_PLANT.getIcon(), "Plants", (int) colony.getPlants(), stats.getPlantsCapacity(colony), 
             loc != null ? loc.getSourcesByType(GameConstants.RESOURCE_PLANT).size() : 0, stats.getSourceCapacity(colony),
             plantProd, plantCons);
             
         // --- Mushrooms ---
         int mushProd = stats.getTotalProduction(colony);
         int mushCons = stats.getTotalConsumption(colony);
-        addResourceRow(model, GameConstants.RESOURCE_FUNGI.getIcon(), "Mushrooms", colony.getMushrooms(), stats.getMushroomsCapacity(colony), 
+        addResourceRow(model, GameConstants.RESOURCE_FUNGI.getIcon(), "Mushrooms", (int) colony.getMushrooms(), stats.getMushroomsCapacity(colony), 
             0, 0, mushProd, mushCons);
             
         // --- Protein ---
         int protProd = stats.getProteinProduction(colony);
         int protCons = stats.getProteinConsumption(colony);
-        addResourceRow(model, GameConstants.RESOURCE_MEAT.getIcon(), "Protein", colony.getProtein(), stats.getProteinCapacity(colony), 
+        addResourceRow(model, GameConstants.RESOURCE_MEAT.getIcon(), "Protein", (int) colony.getProtein(), stats.getProteinCapacity(colony), 
             loc != null ? loc.getSourcesByType(GameConstants.RESOURCE_MEAT).size() : 0, stats.getSourceCapacity(colony),
             protProd, protCons);
             
         // --- Water ---
         int waterProd = stats.getWaterProduction(colony);
         int waterCons = stats.getWaterConsumption(colony);
-        addResourceRow(model, GameConstants.RESOURCE_WATER.getIcon(), "Water", colony.getWater(), stats.getWaterCapacity(colony), 
+        addResourceRow(model, GameConstants.RESOURCE_WATER.getIcon(), "Water", (int) colony.getWater(), stats.getWaterCapacity(colony), 
             loc != null ? loc.getSourcesByType(GameConstants.RESOURCE_WATER).size() : 0, stats.getSourceCapacity(colony),
             waterProd, waterCons);
 
         // --- Minerals ---
         int minProd = stats.getMineralProduction(colony);
         int minCons = stats.getMineralConsumption(colony);
-        addResourceRow(model, GameConstants.RESOURCE_ROCK.getIcon(), "Minerals", colony.getMinerals(), stats.getMineralsCapacity(colony), 
+        addResourceRow(model, GameConstants.RESOURCE_ROCK.getIcon(), "Minerals", (int) colony.getMinerals(), stats.getMineralsCapacity(colony), 
             loc != null ? loc.getSourcesByType(GameConstants.RESOURCE_ROCK).size() : 0, stats.getSourceCapacity(colony),
             minProd, minCons);
             
         // --- Syrups/Resins  ---
-        addResourceRow(model, GameConstants.RESOURCE_SYRUP.getIcon(), "Syrups", colony.getSyrups(), stats.getSyrupsCapacity(colony), 
+        addResourceRow(model, GameConstants.RESOURCE_SYRUP.getIcon(), "Syrups", (int) colony.getSyrups(), stats.getSyrupsCapacity(colony), 
             0, 0, colony.getAphids(), 0);
             
-        addResourceRow(model, GameConstants.RESOURCE_RESIN.getIcon(), "Resins", colony.getResins(), stats.getResinsCapacity(colony), 
+        addResourceRow(model, GameConstants.RESOURCE_RESIN.getIcon(), "Resins", (int) colony.getResins(), stats.getResinsCapacity(colony), 
             0, 0, (int) (plantProd * 0.01), 0);
 
         model.addRow(new Object[]{null, "------", "---", "---", "---", "---", "---", "---"});
@@ -451,17 +501,17 @@ public class StatsDialog extends ZeroDialog {
 
         // Farmers
         if (colony.hasUpgrade(GameUnlocks.ROLE_FARMER)) {
-            int count = colony.getAssignedRoleCount(GameConstants.ROLE_FARMER);
+            int count = stats.getEffectiveFarmerCount(colony);
             float rate = stats.getConversionRate(colony);
             int daily = (int)(count * rate * 1440);
-            model.addRow(new Object[]{"Farming", count + " Farmers", rate + " /min", "~" + daily + " convert/day"});
+            model.addRow(new Object[]{"Farming", count + " Eff. Farmers", rate + " /min", "~" + daily + " convert/day"});
         }
 
         // Hunters
         if (colony.hasUpgrade(GameUnlocks.ROLE_HUNTER)) {
             int count = colony.getAssignedRoleCount(GameConstants.ROLE_HUNTER);
             float rate = stats.getCollectingRate(colony);
-            int daily = (int)(count * rate * 24);
+            int daily = (int)(count * rate * 24); 
             model.addRow(new Object[]{"Hunting", count + " Hunters", rate + " /hr", "~" + daily + " pwr/day"});
         }
 
@@ -469,7 +519,7 @@ public class StatsDialog extends ZeroDialog {
         if (colony.hasUpgrade(GameUnlocks.ROLE_MINER)) {
             int count = colony.getAssignedRoleCount(GameConstants.ROLE_MINER);
             float rate = stats.getCollectingRate(colony);
-            int daily = (int)(count * rate * 24);
+            int daily = (int)(count * rate * 24); 
             model.addRow(new Object[]{"Mining", count + " Miners", rate + " /hr", "~" + daily + " pwr/day"});
         }
         
@@ -482,8 +532,16 @@ public class StatsDialog extends ZeroDialog {
 
         // Builders
         if (colony.getCurrentBuildingProject() != null) {
-            int count = colony.getAssignedRoleCount(GameConstants.ROLE_BUILDER);
-            model.addRow(new Object[]{"Construction", count + " Builders", "1.0 hr/tick", "Project: " + colony.getCurrentBuildingProject().getName()});
+            int builders = colony.getAssignedRoleCount(GameConstants.ROLE_BUILDER);
+            int cranes = colony.getAssignedRoleCount(GameConstants.ROLE_CRANE);
+            double efficiency = stats.getConstructionEfficiency(colony);
+            
+            String label = builders + " Builders";
+            if (colony.hasUpgrade(GameUnlocks.ROLE_CRANE)) {
+                label += " / " + cranes + " Cranes";
+            }
+            
+            model.addRow(new Object[]{"Construction", label, String.format("%.0f%% efficiency", efficiency * 100), "Project: " + colony.getCurrentBuildingProject().getName()});
         }
         
         // Research
@@ -499,7 +557,7 @@ public class StatsDialog extends ZeroDialog {
             
             model.addRow(new Object[]{"Research", 
                 researchers + " Res / " + assistants + " Asst", 
-                "Local Output", 
+                "Contribution", 
                 "+" + totalDaily + " pts/day"});
         }
 

@@ -6,6 +6,7 @@ import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.infrasctructure.World;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
 
 import javax.swing.*;
 import java.awt.*;
@@ -42,13 +43,14 @@ public class MapDialog extends ZeroDialog {
         closeButton.addActionListener(e -> dispose());
 
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        bottomPanel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
         bottomPanel.add(homeButton);
         bottomPanel.add(closeButton);
 
         add(mapPanel, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
 
-        registerCloseKey(KeyEvent.VK_I);
+        registerCloseKey(KeyEvent.VK_M);
     }
 
     private void travelToHomeHex() {
@@ -81,18 +83,12 @@ public class MapDialog extends ZeroDialog {
         private final Map<Integer, Color> biomeColorCache = new HashMap<>();
         private final Map<Point, Hex> hexLookup = new HashMap<>();
 
-        // Side 0 (Vertices 0-1): East (+1, 0)
-        // Side 1 (Vertices 1-2): South-East (0, +1)
-        // Side 2 (Vertices 2-3): South-West (-1, +1)
-        // Side 3 (Vertices 3-4): West (-1, 0)
-        // Side 4 (Vertices 4-5): North-West (0, -1)
-        // Side 5 (Vertices 5-0): North-East (+1, -1)
         private final int[][] NEIGHBOR_OFFSETS = {
             {1, 0}, {0, 1}, {-1, 1}, {-1, 0}, {0, -1}, {1, -1}
         };
 
         public HexMapPanel() {
-            setBackground(Color.WHITE);
+            setBackground(AssetStyles.BACKGROUND_LIGHT);
             ToolTipManager.sharedInstance().registerComponent(this);
 
             addMouseListener(new MouseAdapter() {
@@ -231,7 +227,7 @@ public class MapDialog extends ZeroDialog {
                 int cy = (int)bounds.getCenterY();
                 
                 Biome biome = hex.getBiome();
-                Color fillColor = Color.LIGHT_GRAY;
+                Color fillColor = AssetStyles.BACKGROUND_COLOR;
                 
                 if (biome != null) {
                     fillColor = getBiomeColor(biome);
@@ -272,7 +268,7 @@ public class MapDialog extends ZeroDialog {
                 drawMergedBorders(g2d, hex, poly);
 
             } else {
-                g2d.setColor(Color.RED);
+                g2d.setColor(AssetStyles.FONT_COLOR_ERROR);
                 g2d.setStroke(new BasicStroke(3));
                 g2d.drawPolygon(poly);
             }
@@ -280,7 +276,7 @@ public class MapDialog extends ZeroDialog {
 
         private void drawMergedBorders(Graphics2D g2d, Hex currentHex, Polygon poly) {
             int currentDynastyId = -1;
-            Color dynastyColor = Color.BLACK;
+            Color dynastyColor = AssetStyles.BORDER_COLOR;
             boolean hasDynasty = false;
 
             if (currentHex.getColony() != null && currentHex.getColony().getDynasty() != null) {
@@ -332,7 +328,7 @@ public class MapDialog extends ZeroDialog {
                     g2d.setColor(dynastyColor);
                 } else {
                     g2d.setStroke(new BasicStroke(1f));
-                    g2d.setColor(Color.BLACK);
+                    g2d.setColor(AssetStyles.BORDER_COLOR);
                 }
 
                 if (shouldDrawEdge) {
@@ -364,7 +360,7 @@ public class MapDialog extends ZeroDialog {
             }
 
             if (biome.getIcon() == null) {
-                return Color.LIGHT_GRAY;
+                return AssetStyles.BACKGROUND_COLOR;
             }
 
             Color avgColor = calculateAverageColor(biome.getIcon());
@@ -406,12 +402,12 @@ public class MapDialog extends ZeroDialog {
                     }
                 }
 
-                if (count == 0) return Color.WHITE;
+                if (count == 0) return AssetStyles.BACKGROUND_LIGHT;
 
                 return new Color((int)(sumR/count), (int)(sumG/count), (int)(sumB/count));
                 
             } catch (Exception e) {
-                return Color.LIGHT_GRAY;
+                return AssetStyles.BACKGROUND_COLOR;
             }
         }
         

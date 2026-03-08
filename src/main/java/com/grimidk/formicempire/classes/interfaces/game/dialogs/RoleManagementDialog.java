@@ -4,6 +4,7 @@ import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 
@@ -22,10 +23,17 @@ import java.util.Set;
 
 public class RoleManagementDialog extends ZeroDialog {
 
+    public static final int TAB_WORKER = 0;
+    public static final int TAB_SOLDIER = 1;
+    public static final int TAB_MAJOR = 2;
+    public static final int TAB_PRINCESS = 3;
+    public static final int TAB_QUEEN = 4;
+
     private final Colony colony;
     private final JTabbedPane tabbedPane = new JTabbedPane();
     private final List<RolePanel> rolePanels = new ArrayList<>();
     private final Set<AntType> initializedTypes = new HashSet<>();
+    private final Map<Integer, Integer> tabIndexMap = new HashMap<>();
 
     public RoleManagementDialog(JFrame owner, Colony colony) {
         super(owner, "Manage Ant Roles", new Dimension(550, 500));
@@ -45,6 +53,10 @@ public class RoleManagementDialog extends ZeroDialog {
         });
     }
 
+    public Colony getColony() {
+        return colony;
+    }
+
     @Override
     protected void refreshDialog() {
         initTabs();
@@ -53,18 +65,42 @@ public class RoleManagementDialog extends ZeroDialog {
         }
     }
     
-    public void showDialog(int tabIndex) {
+    public void showDialog(int tabType) {
         refreshDialog(); 
-        selectTab(tabIndex);
+        selectTab(tabType);
         super.showDialog();
     }
     
+    public boolean isTabOpen(int tabType) {
+        if (!isShowing()) return false;
+        Integer index = tabIndexMap.get(tabType);
+        return index != null && tabbedPane.getSelectedIndex() == index;
+    }
+    
     private void initTabs() {
-        addRoleTab(GameConstants.TYPE_WORKER, GameUnlocks.TYPE_WORKER);
-        addRoleTab(GameConstants.TYPE_SOLDIER, GameUnlocks.TYPE_SOLDIER);
-        addRoleTab(GameConstants.TYPE_MAJOR, GameUnlocks.TYPE_MAJOR);
-        addRoleTab(GameConstants.TYPE_PRINCESS, GameUnlocks.TYPE_PRINCESS);
-        addRoleTab(GameConstants.TYPE_QUEEN, GameUnlocks.TYPE_QUEEN);
+        int previousSelectedIndex = tabbedPane.getSelectedIndex();
+        int currentIndex = 0;
+        tabIndexMap.clear();
+        
+        if (addRoleTab(GameConstants.TYPE_WORKER, GameUnlocks.TYPE_WORKER, currentIndex)) {
+            tabIndexMap.put(TAB_WORKER, currentIndex++);
+        }
+        if (addRoleTab(GameConstants.TYPE_SOLDIER, GameUnlocks.TYPE_SOLDIER, currentIndex)) {
+            tabIndexMap.put(TAB_SOLDIER, currentIndex++);
+        }
+        if (addRoleTab(GameConstants.TYPE_MAJOR, GameUnlocks.TYPE_MAJOR, currentIndex)) {
+            tabIndexMap.put(TAB_MAJOR, currentIndex++);
+        }
+        if (addRoleTab(GameConstants.TYPE_PRINCESS, GameUnlocks.TYPE_PRINCESS, currentIndex)) {
+            tabIndexMap.put(TAB_PRINCESS, currentIndex++);
+        }
+        if (addRoleTab(GameConstants.TYPE_QUEEN, GameUnlocks.TYPE_QUEEN, currentIndex)) {
+            tabIndexMap.put(TAB_QUEEN, currentIndex++);
+        }
+
+        if (previousSelectedIndex >= 0 && previousSelectedIndex < tabbedPane.getTabCount()) {
+            tabbedPane.setSelectedIndex(previousSelectedIndex);
+        }
     }
     
     private void initListeners() {
@@ -76,22 +112,25 @@ public class RoleManagementDialog extends ZeroDialog {
         });
     }
     
-    private void addRoleTab(AntType type, Upgrade requiredUpgrade) {
-        if (initializedTypes.contains(type)) {
-            return;
+    private boolean addRoleTab(AntType type, Upgrade requiredUpgrade, int expectedIndex) {
+        if (!colony.hasUpgrade(requiredUpgrade)) {
+            return false;
         }
 
-        if (colony.hasUpgrade(requiredUpgrade)) {
-            RolePanel panel = new RolePanel(colony, type);
-            rolePanels.add(panel);
-            tabbedPane.addTab(type.getName(), type.getIcon(), panel);
-            initializedTypes.add(type);
+        if (initializedTypes.contains(type)) {
+            return true;
         }
+
+        RolePanel panel = new RolePanel(colony, type);
+        rolePanels.add(panel);
+        tabbedPane.insertTab(type.getName(), type.getIcon(), panel, null, expectedIndex);
+        initializedTypes.add(type);
+        return true;
     }
     
-    public void selectTab(int tabIndex) {
-        if (tabIndex >= 0 && tabIndex < tabbedPane.getTabCount()) {
-            tabbedPane.setSelectedIndex(tabIndex);
+    public void selectTab(int tabType) {
+        if (tabIndexMap.containsKey(tabType)) {
+            tabbedPane.setSelectedIndex(tabIndexMap.get(tabType));
         }
     }
 
@@ -99,20 +138,22 @@ public class RoleManagementDialog extends ZeroDialog {
         InputMap inputMap = tabbedPane.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
         ActionMap actionMap = tabbedPane.getActionMap();
         
-        addTabSwitchAction(inputMap, actionMap, "selectTab1", KeyEvent.VK_Q, 0);
-        addTabSwitchAction(inputMap, actionMap, "selectTab2", KeyEvent.VK_W, 1);
-        addTabSwitchAction(inputMap, actionMap, "selectTab3", KeyEvent.VK_E, 2);
-        addTabSwitchAction(inputMap, actionMap, "selectTab4", KeyEvent.VK_R, 3);
-        addTabSwitchAction(inputMap, actionMap, "selectTab5", KeyEvent.VK_T, 4);
+        addTabSwitchAction(inputMap, actionMap, "toggleTab1", KeyEvent.VK_Q, TAB_WORKER);
+        addTabSwitchAction(inputMap, actionMap, "toggleTab2", KeyEvent.VK_W, TAB_SOLDIER);
+        addTabSwitchAction(inputMap, actionMap, "toggleTab3", KeyEvent.VK_E, TAB_MAJOR);
+        addTabSwitchAction(inputMap, actionMap, "toggleTab4", KeyEvent.VK_R, TAB_PRINCESS);
+        addTabSwitchAction(inputMap, actionMap, "toggleTab5", KeyEvent.VK_T, TAB_QUEEN);
     }
     
-    private void addTabSwitchAction(InputMap im, ActionMap am, String name, int key, int index) {
+    private void addTabSwitchAction(InputMap im, ActionMap am, String name, int key, int tabType) {
         im.put(KeyStroke.getKeyStroke(key, 0), name);
         am.put(name, new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (tabbedPane.getTabCount() > index) {
-                    tabbedPane.setSelectedIndex(index);
+                if (isTabOpen(tabType)) {
+                    dispose();
+                } else if (tabIndexMap.containsKey(tabType)) {
+                    tabbedPane.setSelectedIndex(tabIndexMap.get(tabType));
                 }
             }
         });
@@ -142,6 +183,26 @@ public class RoleManagementDialog extends ZeroDialog {
         if (role == GameConstants.ROLE_RESEARCHER) return GameUnlocks.ROLE_RESEARCHER;
         if (role == GameConstants.ROLE_ASSISTANT) return GameUnlocks.ROLE_ASSISTANT;
         if (role == GameConstants.ROLE_POLICE) return GameUnlocks.ROLE_POLICE;
+        if (role == GameConstants.ROLE_MINER) return GameUnlocks.ROLE_MINER;
+        if (role == GameConstants.ROLE_POTTER) return GameUnlocks.ROLE_POTTER;
+        if (role == GameConstants.ROLE_MILITIA) return GameUnlocks.ROLE_MILITIA;
+        if (role == GameConstants.ROLE_COURIER) return GameUnlocks.ROLE_COURIER;
+        if (role == GameConstants.ROLE_ENGINEER) return GameUnlocks.ROLE_ENGINEER;
+        if (role == GameConstants.ROLE_GUARD) return GameUnlocks.ROLE_GUARD;
+        if (role == GameConstants.ROLE_WARRIOR) return GameUnlocks.ROLE_WARRIOR;
+        if (role == GameConstants.ROLE_DEFENDER) return GameUnlocks.ROLE_DEFENDER;
+        if (role == GameConstants.ROLE_BOMBER) return GameUnlocks.ROLE_BOMBER;
+        if (role == GameConstants.ROLE_CATCHER) return GameUnlocks.ROLE_CATCHER;
+        if (role == GameConstants.ROLE_ESCORT) return GameUnlocks.ROLE_ESCORT;
+        if (role == GameConstants.ROLE_BRUTE) return GameUnlocks.ROLE_BRUTE;
+        if (role == GameConstants.ROLE_CARRIER) return GameUnlocks.ROLE_CARRIER;
+        if (role == GameConstants.ROLE_ARTILLERY) return GameUnlocks.ROLE_ARTILLERY;
+        if (role == GameConstants.ROLE_SIEGE) return GameUnlocks.ROLE_SIEGE;
+        if (role == GameConstants.ROLE_BORER) return GameUnlocks.ROLE_BORER;
+        if (role == GameConstants.ROLE_CRANE) return GameUnlocks.ROLE_CRANE;
+        if (role == GameConstants.ROLE_TRANSPORT) return GameUnlocks.ROLE_TRANSPORT;
+        if (role == GameConstants.ROLE_DIPLOMAT) return GameUnlocks.ROLE_DIPLOMAT;
+        if (role == GameConstants.ROLE_SKYTRANS) return GameUnlocks.ROLE_SKYTRANS;
 
         return null; 
     }
@@ -151,7 +212,6 @@ public class RoleManagementDialog extends ZeroDialog {
         if (!isShowing()) {
             return;
         }
-        initTabs();
         for (RolePanel panel : rolePanels) {
             panel.updateData();
         }
@@ -166,6 +226,7 @@ public class RoleManagementDialog extends ZeroDialog {
         private final Map<AntRole, JSpinner> spinnerMap = new HashMap<>();
         
         private final Set<AntRole> displayedRoles = new HashSet<>();
+        private boolean isUpdating = false;
 
         RolePanel(Colony colony, AntType antType) {
             this.colony = colony;
@@ -173,13 +234,19 @@ public class RoleManagementDialog extends ZeroDialog {
 
             setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
             setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+            setBackground(AssetStyles.BACKGROUND_COLOR);
 
             int totalAnts = colony.getAntsByType(antType).size();
             
             totalLabel = new JLabel("Total " + antType.getName() + "s: " + totalAnts);
             totalLabel.setFont(totalLabel.getFont().deriveFont(Font.BOLD));
+            totalLabel.setForeground(AssetStyles.FONT_COLOR);
+            
             assignedLabel = new JLabel("Total Assigned: 0");
+            assignedLabel.setForeground(AssetStyles.FONT_COLOR);
+            
             unassignedLabel = new JLabel("Unassigned: " + totalAnts);
+            unassignedLabel.setForeground(AssetStyles.FONT_COLOR);
             
             add(totalLabel);
             add(assignedLabel);
@@ -203,6 +270,8 @@ public class RoleManagementDialog extends ZeroDialog {
                         addRoleRow(role);
                         displayedRoles.add(role);
                         addedAny = true;
+                    } else {
+                        // System.out.println("[RoleDialog] Colony missing upgrade for role: " + role.getName());
                     }
                 }
             }
@@ -214,7 +283,10 @@ public class RoleManagementDialog extends ZeroDialog {
 
         private void addRoleRow(AntRole role) {
             JPanel roleRow = new JPanel(new FlowLayout(FlowLayout.LEFT));
-            roleRow.add(new JLabel(role.getName() + ":"));
+            roleRow.setOpaque(false);
+            JLabel label = new JLabel(role.getName() + ":");
+            label.setForeground(AssetStyles.FONT_COLOR);
+            roleRow.add(label);
             
             int currentAssigned = colony.getAssignedRoleCount(role);
             SpinnerModel model = new SpinnerNumberModel(currentAssigned, 0, Integer.MAX_VALUE, 1); 
@@ -222,6 +294,7 @@ public class RoleManagementDialog extends ZeroDialog {
             spinner.setPreferredSize(new Dimension(80, 25));
 
             spinner.addChangeListener(e -> {
+                if (isUpdating) return;
                 int newValue = (Integer) spinner.getValue();
                 
                 int otherSpinnersTotal = 0;
@@ -246,7 +319,12 @@ public class RoleManagementDialog extends ZeroDialog {
                         
                         if (defaultCount >= deficit) {
                             int newDefaultCount = defaultCount - deficit;
-                            defaultSpinner.setValue(newDefaultCount);
+                            isUpdating = true;
+                            try {
+                                defaultSpinner.setValue(newDefaultCount);
+                            } finally {
+                                isUpdating = false;
+                            }
                             colony.setAssignedRoleCount(defaultRole, newDefaultCount);
                             
                             colony.setAssignedRoleCount(role, newValue);
@@ -258,9 +336,14 @@ public class RoleManagementDialog extends ZeroDialog {
                     int allowedValue = Math.max(0, currentTotalAnts - otherSpinnersTotal);
                     
                     final int finalAllowed = allowedValue;
-                    SwingUtilities.invokeLater(() -> spinner.setValue(finalAllowed));
+                    isUpdating = true;
+                    try {
+                        spinner.setValue(finalAllowed);
+                    } finally {
+                        isUpdating = false;
+                    }
                     
-                    newValue = allowedValue;
+                    newValue = finalAllowed;
                 }
                 
                 colony.setAssignedRoleCount(role, newValue);
@@ -275,38 +358,44 @@ public class RoleManagementDialog extends ZeroDialog {
         }
         
         void updateData() {
-            checkAndAddRoles();
-            
-            for (Map.Entry<AntRole, JSpinner> entry : spinnerMap.entrySet()) {
-                int colonyValue = colony.getAssignedRoleCount(entry.getKey());
-                if ((Integer)entry.getValue().getValue() != colonyValue) {
-                    entry.getValue().setValue(colonyValue);
+            if (isUpdating) return;
+            isUpdating = true;
+            try {
+                checkAndAddRoles();
+                
+                for (Map.Entry<AntRole, JSpinner> entry : spinnerMap.entrySet()) {
+                    int colonyValue = colony.getAssignedRoleCount(entry.getKey());
+                    if ((Integer)entry.getValue().getValue() != colonyValue) {
+                        entry.getValue().setValue(colonyValue);
+                    }
                 }
-            }
-            
-            int totalAnts = colony.getAntsByType(antType).size();
-            totalLabel.setText("Total " + antType.getName() + "s: " + totalAnts);
+                
+                int totalAnts = colony.getAntsByType(antType).size();
+                totalLabel.setText("Total " + antType.getName() + "s: " + totalAnts);
 
-            int totalAssigned = 0;
-            for (JSpinner s : spinnerMap.values()) {
-                totalAssigned += (Integer) s.getValue();
-            }
-            
-            int unassigned = totalAnts - totalAssigned;
-            
-            assignedLabel.setText("Total Assigned: " + totalAssigned);
-            unassignedLabel.setText("Unassigned: " + unassigned);
+                int totalAssigned = 0;
+                for (JSpinner s : spinnerMap.values()) {
+                    totalAssigned += (Integer) s.getValue();
+                }
+                
+                int unassigned = totalAnts - totalAssigned;
+                
+                assignedLabel.setText("Total Assigned: " + totalAssigned);
+                unassignedLabel.setText("Unassigned: " + unassigned);
 
-            if (totalAssigned > totalAnts) {
-                assignedLabel.setForeground(Color.RED);
-                assignedLabel.setToolTipText("You have assigned more roles than you have ants.");
-                unassignedLabel.setForeground(Color.RED);
-                unassignedLabel.setToolTipText("You have assigned more roles than you have ants.");
-            } else {
-                assignedLabel.setForeground(Color.BLACK);
-                assignedLabel.setToolTipText(null);
-                unassignedLabel.setForeground(Color.BLACK);
-                unassignedLabel.setToolTipText(null);
+                if (totalAssigned > totalAnts) {
+                    assignedLabel.setForeground(AssetStyles.FONT_COLOR_ERROR);
+                    assignedLabel.setToolTipText("You have assigned more roles than you have ants.");
+                    unassignedLabel.setForeground(AssetStyles.FONT_COLOR_ERROR);
+                    unassignedLabel.setToolTipText("You have assigned more roles than you have ants.");
+                } else {
+                    assignedLabel.setForeground(AssetStyles.FONT_COLOR);
+                    assignedLabel.setToolTipText(null);
+                    unassignedLabel.setForeground(AssetStyles.FONT_COLOR);
+                    unassignedLabel.setToolTipText(null);
+                }
+            } finally {
+                isUpdating = false;
             }
         }
         

@@ -5,6 +5,7 @@ import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.services.ColonyLocationService;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 
@@ -138,21 +139,25 @@ public class ColonyPanel extends ZeroGamePanel {
         // Panels
         contentPanel = new JPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+        contentPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
         
         emptyPanel = new JPanel(new BorderLayout());
+        emptyPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
         JLabel noColonyLabel = new JLabel("No Colony Detected", SwingConstants.CENTER);
-        noColonyLabel.setForeground(Color.GRAY);
+        noColonyLabel.setForeground(AssetStyles.BACKGROUND_SECONDARY);
         emptyPanel.add(noColonyLabel, BorderLayout.CENTER);
     }
 
     private void setupConstantLabel(JLabel label, AntType type) {
         label.setIcon(type.getIcon());
         label.setToolTipText(type.getName());
+        label.setForeground(AssetStyles.FONT_COLOR);
     }
 
     private void setupConstantLabel(JLabel label, ResourceType resource) { 
         label.setIcon(resource.getIcon());
         label.setToolTipText(resource.getName());
+        label.setForeground(AssetStyles.FONT_COLOR);
     }
 
     @Override
@@ -200,6 +205,7 @@ public class ColonyPanel extends ZeroGamePanel {
     private JPanel createResourcesDetailPanel() {
         JPanel panel = createTitledPanel("Resources", new BoxLayout(null, BoxLayout.Y_AXIS));
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS)); 
+        totalResourcesLabel.setForeground(AssetStyles.FONT_COLOR);
         panel.add(totalResourcesLabel);
         panel.add(new JSeparator(SwingConstants.HORIZONTAL));
         panel.add(mushroomsLabel);
@@ -215,6 +221,7 @@ public class ColonyPanel extends ZeroGamePanel {
     private JPanel createAntsDetailPanel() {
         JPanel panel = createTitledPanel("Ants", new BoxLayout(null, BoxLayout.Y_AXIS));
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        totalAntLabel.setForeground(AssetStyles.FONT_COLOR);
         panel.add(totalAntLabel);
         panel.add(new JSeparator(SwingConstants.HORIZONTAL));
         panel.add(queensLabel);
@@ -234,8 +241,24 @@ public class ColonyPanel extends ZeroGamePanel {
         JPanel panel = createTitledPanel("Colony Stats", new BoxLayout(null, BoxLayout.Y_AXIS));
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         rankLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        rankLabel.setForeground(AssetStyles.FONT_COLOR);
         panel.add(rankLabel);
         panel.add(new JSeparator(SwingConstants.HORIZONTAL));
+        
+        totalConsumptionLabel.setForeground(AssetStyles.FONT_COLOR);
+        totalProductionLabel.setForeground(AssetStyles.FONT_COLOR);
+        netMushroomsLabel.setForeground(AssetStyles.FONT_COLOR);
+        layingRateLabel.setForeground(AssetStyles.FONT_COLOR);
+        nurseCoverageLabel.setForeground(AssetStyles.FONT_COLOR);
+        graveKeepingLabel.setForeground(AssetStyles.FONT_COLOR);
+        aphidCountLabel.setForeground(AssetStyles.FONT_COLOR);
+        parasiteCountLabel.setForeground(AssetStyles.FONT_COLOR);
+        policeStatsLabel.setForeground(AssetStyles.FONT_COLOR);
+        researchPointsLabel.setForeground(AssetStyles.FONT_COLOR);
+        researchRateLabel.setForeground(AssetStyles.FONT_COLOR);
+        babyAntsLabel.setForeground(AssetStyles.FONT_COLOR);
+        adultAntsLabel.setForeground(AssetStyles.FONT_COLOR);
+
         panel.add(totalConsumptionLabel);
         panel.add(totalProductionLabel);
         panel.add(netMushroomsLabel);

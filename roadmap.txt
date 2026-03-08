@@ -11,30 +11,34 @@ To Fix (By decreasing priority) :
 	(none right now)
 
 	Mid:
-	(none right now)
+	map legend
+	pause/play in dialogs
+	colnies in water biome
 
 	Low:
 	breeders go out of the colony in nuptial
-	automated tests?
+	"view convoy" option using going and returning biomes for tiles, or underground or air
+	logistic physics use dimension 2
 
 	Can't reproduce:
-	hex changing not happening (reported by gopher)
+	(none right now)
 	
 To Feature (to be done in order):
 Needed for launch (v1.0) (Launch Version):
 	Priority:
-	first round of species and assimilations( multi queen, majors ) (and handle dynasty death to earn assimilation)
-	trade routes (async with roles and incoming outgoing recurrent and one time and travel time and danger level and boring tunnels)
+	genetic stagnation (obscured until below (80%)) every nuptial, assimilation gives base 5% after cloning (unlocked after empire rank), alliances can increase while allied, stagnation = success chance to spread and drones from assimilated
+	font
 
 	Everything else :
+	ant speed and biome depletion and further located sources take more time and sustainability of biome 
 	auxiliary room sprites (storage (resources), farm (shroom), nurse (bedding), royal (nests and science))
 	more settings (allow idle to forage, allow unassigned, choose default, fuzzed parasites, arachnophobia mode ?)
+	automate NPC to spread
 	diplomacy and diplomatic reputation (own and xeno colonies) and alliances (non-aggression pacts) and wars 
+	rebellions and rebel colonies
 	diplo dialog with stance options (neutral, aggressive, peaceful)
 	battle system (mass battle in land and air)
-	assimilation of species for upgrades and research assimilation system
-	assimilated species get added to a pool for drones and avoid genetic stagnation
-	assimilation (	Multi queen (Pharaoh ants), Super majors (Marauder ants), Trap-jaw (Trap jaw ants), Honey-pot (Honey pot ants), Door-head (Turtle ants), Wood burrowing (Carpenter ants), Silk weaving (Weaver ants), Rafting (Flood plains ants), Fire venom (Fire ants), Jumping (Jet ants), Gliding (Gliding ants), Stinging (Bullet ants), Swarming (Army ants), Stealth (Ghost ants), Fast bitting (Dracula ants), Heat resistance (Saharan silver ants), Deadly venom (Harvester ants), Self destruction (Exploding ants), Far sight (Bulldog ants), Hive building (Shining black ants), Location sensing (Desert ants))
+	assimilations ( Trap-jaw (Trap jaw ants), Honey-pot (Honey pot ants), Door-head (Turtle ants), Wood burrowing (Carpenter ants), Silk weaving (Weaver ants), Rafting (Flood plains ants), Fire venom (Fire ants), Jumping (Jet ants), Gliding (Gliding ants), Stinging (Bullet ants), Swarming (Army ants), Stealth (Ghost ants), Fast bitting (Dracula ants), Heat resistance (Saharan silver ants), Deadly venom (Harvester ants), Self destruction (Exploding ants), Far sight (Bulldog ants), Hive building (Shining black ants), Location sensing (Desert ants))
 	ant subtypes (enable by role /  exclusion) checks with new sprites 
 	revamp story and lore and maybe intro screen
 	more socialism (?)
@@ -44,14 +48,14 @@ Needed for launch (v1.0) (Launch Version):
 	minerals
 	synergies ( Super majors + Chemical throwing = Artillery ants; Self destruction + Acid spitting = Corrosive bombs; Silk weaving + Hive building = Web building; Air-force ants + self destruction = Air-bomber ants)
 	icons for all constants and unlocks
-	more upgrades (stronger start)
+	more upgrades
 	more buildings
 	more roles (commander and captain roles, air force)
 	more enemies ( Rebel ant colonies, Bugs, Arachnids, Reptiles, Birds, Rodents, Zombie ant colonies, Parasitic ants)
 	more stats (kills, historic productions, graphs?)
-	more species and more bugs (constants and icons)
+	more bugs (constants and icons)
 	non-ant assimilation ( Winged workers (Bees), Spiked larvae, Chemical throwing (Bombardier beetle), Chirping (Grass hopper), Diving, Mineralized exoskeletons, Rock mining, Bioluminescence (Fireflies), Static electricity generation, Pollination (Flies) )
-	rework tutorial and obscure unlocks
+	rework tutorial and obscure unlocks in menus
 	rework menus and key binds and how the ui looks
 	rework start and choose difficulty / biome / species
 	rework abilities and alerts and triggers (new classes?)
@@ -61,10 +65,8 @@ Needed for launch (v1.0) (Launch Version):
 	ant menus (detailed per ant)
 	music and sounds and settings for them
 	langs (ENG, SPA, POR, FRE, GER, RUS, CHN, JAP)
-	good interfaces with sauce, fonts with spice, cool cursor
 	warning screen for arthropophobia 
 	start animation and general animations
-	package into playable
 	register Grim Games or Grimidk in steam as dev team
 	versioning to go back to previous stable patches
 	credits screen
@@ -78,6 +80,8 @@ Post launch (v1.1) (Improvements Update):
 	roadmap screen in game (use this txt)
 	global stats from all players (needs api and consent)
 	socials screen with discord server and instagram
+	more langs 
+	link to IRL documentation for ant facts
 
 Post launch (v1.2) (Civilization Update):
 	(Secret for now)

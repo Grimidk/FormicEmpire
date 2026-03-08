@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.interfaces;
 
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
 
 import javax.swing.*;
 import javax.swing.event.AncestorEvent;
@@ -35,30 +36,57 @@ public class SettingsPanel extends JPanel {
         this.frame = frame;
         this.engine = frame.getEngine();
         setLayout(new GridBagLayout());
+        setBackground(AssetStyles.BACKGROUND_COLOR);
+        
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
         c.insets = new Insets(8, 8, 8, 8);
         c.anchor = GridBagConstraints.WEST;
 
         // Language
-        c.gridy = 0; c.gridx = 0; add(new JLabel("Language:"), c);
+        c.gridy = 0; c.gridx = 0; 
+        JLabel langLabel = new JLabel("Language:");
+        langLabel.setFont(AssetStyles.FONT_NORMAL);
+        langLabel.setForeground(AssetStyles.FONT_COLOR);
+        add(langLabel, c);
+        
         languageCombo = new JComboBox<>(new String[]{"en", "es", "de"});
+        styleComboBox(languageCombo);
         c.gridx = 1; add(languageCombo, c);
 
         // Screen Size
-        c.gridy = 1; c.gridx = 0; add(new JLabel("Screen Size:"), c);
+        c.gridy = 1; c.gridx = 0; 
+        JLabel sizeLabel = new JLabel("Screen Size:");
+        sizeLabel.setFont(AssetStyles.FONT_NORMAL);
+        sizeLabel.setForeground(AssetStyles.FONT_COLOR);
+        add(sizeLabel, c);
+        
         sizeCombo = new JComboBox<>(new String[]{"1000x700", "1280x720", "1600x900", "1920x1000"});
+        styleComboBox(sizeCombo);
         sizeCombo.setEditable(true);
+        // Style the editor component if possible, but JComboBox.setEditable(true) makes it tricky.
+        // Usually better to leave basic styling or rely on UIManager defaults for the editor.
         c.gridx = 1; add(sizeCombo, c);
 
         // Full Screen
-        c.gridy = 2; c.gridx = 0; add(new JLabel("Full Screen:"), c);
+        c.gridy = 2; c.gridx = 0; 
+        JLabel fsLabel = new JLabel("Full Screen:");
+        fsLabel.setFont(AssetStyles.FONT_NORMAL);
+        fsLabel.setForeground(AssetStyles.FONT_COLOR);
+        add(fsLabel, c);
+        
         fullScreenCheck = new JCheckBox();
+        styleCheckBox(fullScreenCheck);
         setupNavigation(fullScreenCheck);
         c.gridx = 1; add(fullScreenCheck, c);
 
         // Autosave Frequency
-        c.gridy = 3; c.gridx = 0; add(new JLabel("Autosave Frequency:"), c);
+        c.gridy = 3; c.gridx = 0; 
+        JLabel autoLabel = new JLabel("Autosave Frequency:");
+        autoLabel.setFont(AssetStyles.FONT_NORMAL);
+        autoLabel.setForeground(AssetStyles.FONT_COLOR);
+        add(autoLabel, c);
+        
         autosaveCombo = new JComboBox<>(new AutosaveOption[]{
                 new AutosaveOption("Every Month", 1),
                 new AutosaveOption("Every 3 Months", 3),
@@ -66,21 +94,32 @@ public class SettingsPanel extends JPanel {
                 new AutosaveOption("Every Year (12 Months)", 12),
                 new AutosaveOption("Disabled", 0)
         });
+        styleComboBox(autosaveCombo);
         c.gridx = 1; add(autosaveCombo, c);
         
         // Turbo Mode
-        c.gridy = 4; c.gridx = 0; add(new JLabel("Allow Turbo Mode:"), c);
+        c.gridy = 4; c.gridx = 0; 
+        JLabel turboLabel = new JLabel("Allow Turbo Mode:");
+        turboLabel.setFont(AssetStyles.FONT_NORMAL);
+        turboLabel.setForeground(AssetStyles.FONT_COLOR);
+        add(turboLabel, c);
+        
         turboCheck = new JCheckBox();
+        styleCheckBox(turboCheck);
         setupNavigation(turboCheck);
         c.gridx = 1; add(turboCheck, c);
 
         // Buttons
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        buttonPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        
         JButton saveButton = new JButton("Save & Apply");
+        styleButton(saveButton);
         saveButton.addActionListener(e -> saveSettings());
         setupNavigation(saveButton);
 
         JButton backButton = new JButton("Back");
+        styleButton(backButton);
         backButton.addActionListener(e -> this.frame.showCard(MainFrame.CARD_INIT));
         setupNavigation(backButton);
         
@@ -90,6 +129,7 @@ public class SettingsPanel extends JPanel {
         c.gridy = 5; c.gridx = 0; c.gridwidth = 2; c.fill = GridBagConstraints.NONE;
         c.anchor = GridBagConstraints.CENTER;
         add(buttonPanel, c);
+        
         addAncestorListener(new AncestorListener() {
             @Override
             public void ancestorAdded(AncestorEvent event) {
@@ -102,6 +142,24 @@ public class SettingsPanel extends JPanel {
             @Override
             public void ancestorMoved(AncestorEvent event) {}
         });
+    }
+    
+    private void styleComboBox(JComboBox<?> box) {
+        box.setFont(AssetStyles.FONT_NORMAL);
+        box.setBackground(AssetStyles.BACKGROUND_SECONDARY);
+        box.setForeground(AssetStyles.FONT_COLOR);
+    }
+    
+    private void styleCheckBox(JCheckBox box) {
+        box.setBackground(AssetStyles.BACKGROUND_COLOR);
+        box.setForeground(AssetStyles.FONT_COLOR);
+        box.setFont(AssetStyles.FONT_NORMAL);
+    }
+    
+    private void styleButton(JButton btn) {
+        btn.setFont(AssetStyles.FONT_BOLD);
+        btn.setBackground(AssetStyles.BACKGROUND_SECONDARY);
+        btn.setForeground(AssetStyles.FONT_COLOR);
     }
     
     private void setupNavigation(JComponent component) {

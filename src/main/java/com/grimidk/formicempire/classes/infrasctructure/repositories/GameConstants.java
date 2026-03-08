@@ -9,6 +9,7 @@ import com.grimidk.formicempire.classes.constants.misc.BugType;
 import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.misc.Species;
+import com.grimidk.formicempire.classes.constants.misc.TradeMethod;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.Humidity;
 import com.grimidk.formicempire.classes.constants.world.MoonPhase;
@@ -20,19 +21,42 @@ import com.grimidk.formicempire.classes.constants.world.Weather;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import javax.swing.ImageIcon;
 import java.net.URL; 
+import java.util.HashMap;
+import java.util.Map;
 
 public final class GameConstants {
     private GameConstants() {}
 
+    private static final Map<String, ImageIcon> iconCache = new HashMap<>();
+
     private static ImageIcon loadIcon(String path) {
+        if (iconCache.containsKey(path)) return iconCache.get(path);
+        
         URL resourceUrl = Thread.currentThread().getContextClassLoader().getResource(path);
         if (resourceUrl == null) {
             System.err.println("CRITICAL ERROR: Resource not found: " + path);
             return null; 
         }
-        return new ImageIcon(resourceUrl);
+        ImageIcon icon = new ImageIcon(resourceUrl);
+        iconCache.put(path, icon);
+        return icon;
+    }
+
+    public static ImageIcon getAntSprite(AntType type, Species species) {
+        if (type == null) return null;
+        
+        String path;
+        if (type == TYPE_EGG || type == TYPE_LARVA || type == TYPE_PUPA || type == TYPE_DEAD || type == TYPE_ZOMBIE) {
+            path = "sprites/ants/" + type.getSpriteName();
+        } else {
+            String dir = (species != null) ? species.getDirectory() : "omni/";
+            path = "sprites/ants/" + dir + type.getSpriteName();
+        }
+        
+        return loadIcon(path);
     }
 
     // --- Lists ---
@@ -50,6 +74,7 @@ public final class GameConstants {
     private static final List<AntRole> antRoles = new ArrayList<>();
     private static final List<ColonyRank> colonyRanks = new ArrayList<>();
     private static final List<Species> species = new ArrayList<>();
+    private static final List<TradeMethod> tradeMethods = new ArrayList<>();
     private static final List<Humidity> humidity = new ArrayList<>();
     private static final List<Temperature> temperature = new ArrayList<>();
     private static final List<ImageIcon> misc = new ArrayList<>();
@@ -286,7 +311,7 @@ public final class GameConstants {
 
     // --- Bug Types ---
     public static final BugType TYPE_ANT = new BugType(1, "Ant", 1, 1, 1, 1, 1, 1,
-        loadIcon("icons/ants/worker.png"), loadIcon("sprites/ants/worker.png"));
+        loadIcon("icons/ants/omni/worker.png"), loadIcon("sprites/ants/omni/worker.png"));
     static { bugTypes.add(TYPE_ANT); }
     public static final BugType TYPE_APHID = new BugType(2, "Aphid", 1, 1, 0, 0, 5, 0.5f,
         loadIcon("icons/bugs/aphid.png") , loadIcon("sprites/bugs/aphid.png"));
@@ -297,37 +322,37 @@ public final class GameConstants {
 
     // --- Ant Types ---
     public static final AntType TYPE_EGG = new AntType(1, "Egg", 1f, 0f, 0f, 0f, 0f, 0f, 0f,
-        loadIcon("icons/ants/egg.png"), loadIcon("sprites/ants/egg.png"));
+        loadIcon("icons/ants/egg.png"), "egg.png");
     static { antTypes.add(TYPE_EGG); }    
     public static final AntType TYPE_LARVA = new AntType(2, "Larva", 1f, 1/2f, 1/2f, 1f, 1f, 1/2f, 1/2f,
-        loadIcon("icons/ants/larva.png"), loadIcon("sprites/ants/larva.png"));
+        loadIcon("icons/ants/larva.png"), "larva.png");
     static { antTypes.add(TYPE_LARVA); }
     public static final AntType TYPE_PUPA = new AntType(3, "Pupa", 1f, 0f, 1f, 0f, 0f, 1/2f, 0f,
-        loadIcon("icons/ants/pupa.png"), loadIcon("sprites/ants/pupa.png"));
+        loadIcon("icons/ants/pupa.png"), "pupa.png");
     static { antTypes.add(TYPE_PUPA); }
     public static final AntType TYPE_WORKER = new AntType(4, "Worker", 1f, 1f, 1f, 1f, 1f, 1f, 1f, 
-        loadIcon("icons/ants/worker.png"), loadIcon("sprites/ants/worker.png"));
+        loadIcon("icons/ants/omni/worker.png"), "worker.png");
     static { antTypes.add(TYPE_WORKER); }
     public static final AntType TYPE_SOLDIER = new AntType(5, "Soldier", 3f, 3f, 3f, 2f, 3f, 5f, 3f, 
-        loadIcon("icons/ants/soldier.png"), loadIcon("sprites/ants/soldier.png"));
+        loadIcon("icons/ants/omni/soldier.png"), "soldier.png");
     static { antTypes.add(TYPE_SOLDIER); }
     public static final AntType TYPE_MAJOR = new AntType(6, "Major", 10f, 15f, 20f, 5f, 2f, 50f, 2f, 
-        loadIcon("icons/ants/major.png"), loadIcon("sprites/ants/major.png"));
+        loadIcon("icons/ants/omni/major.png"), "major.png");
     static { antTypes.add(TYPE_MAJOR); }
     public static final AntType TYPE_DRONE = new AntType(7, "Drone", 1f, 1f, 1f, 1f, 1f, 1f, 1f, 
-        loadIcon("icons/ants/drone.png"), loadIcon("sprites/ants/drone.png"));
+        loadIcon("icons/ants/omni/drone.png"), "drone.png");
     static { antTypes.add(TYPE_DRONE); }
     public static final AntType TYPE_PRINCESS = new AntType(8, "Princess", 1f, 1f, 1f, 1f, 1f, 1f, 1f, 
-        loadIcon("icons/ants/princess.png"), loadIcon("sprites/ants/princess.png"));
+        loadIcon("icons/ants/omni/princess.png"), "princess.png");
     static { antTypes.add(TYPE_PRINCESS); }
     public static final AntType TYPE_QUEEN = new AntType(9, "Queen", 50f, 2f, 50f, 10f, 1/2f, 50f, 1/4f, 
-        loadIcon("icons/ants/queen.png"), loadIcon("sprites/ants/queen.png"));
+        loadIcon("icons/ants/omni/queen.png"), "queen.png");
     static { antTypes.add(TYPE_QUEEN); }
     public static final AntType TYPE_DEAD = new AntType(10, "Dead", 0, 0, 0, 0, 0, 0, 0,
-        loadIcon("icons/ants/dead.png"), loadIcon("sprites/ants/dead.png"));
+        loadIcon("icons/ants/dead.png"), "dead.png");
     static { antTypes.add(TYPE_DEAD); }
     public static final AntType TYPE_ZOMBIE = new AntType(11, "Zombie",  1f, 1f, 1f, 1f, 1f, 1f, 1f, 
-        loadIcon("icons/ants/zombie.png"), loadIcon("sprites/ants/zombie.png"));
+        loadIcon("icons/ants/zombie.png"), "zombie.png");
     static { antTypes.add(TYPE_ZOMBIE); }
 
     // --- Ant Subtypes ---
@@ -373,7 +398,7 @@ public final class GameConstants {
     static { antRoles.add(ROLE_ARTILLERY); }
     public static final AntRole ROLE_SIEGE = new AntRole(20, TYPE_MAJOR, "Siege-Engine");
     static { antRoles.add(ROLE_SIEGE); }
-    public static final AntRole ROLE_BORER = new AntRole(21, TYPE_MAJOR, "Boring-Machine");
+    public static final AntRole ROLE_BORER = new AntRole(21, TYPE_MAJOR, "Tunnel Borer");
     static { antRoles.add(ROLE_BORER); }
     public static final AntRole ROLE_DRONE = new AntRole(22, TYPE_DRONE, "Drone");
     static { antRoles.add(ROLE_DRONE); }
@@ -397,8 +422,10 @@ public final class GameConstants {
     static { antRoles.add(ROLE_ASSISTANT); }
     public static final AntRole ROLE_ESCORT = new AntRole(32, TYPE_SOLDIER, "Convoy Escort");
     static { antRoles.add(ROLE_ESCORT); }
-    public static final AntRole ROLE_ENGINEER = new AntRole(33, TYPE_WORKER, "Excavator");
+    public static final AntRole ROLE_ENGINEER = new AntRole(33, TYPE_WORKER, "Tunnel Engineer");
     static { antRoles.add(ROLE_ENGINEER); }
+    public static final AntRole ROLE_SKYTRANS = new AntRole(34, TYPE_PRINCESS, "Sky Transport");
+    static { antRoles.add(ROLE_SKYTRANS); }
 
     // --- Colony Ranks ---
     public static final ColonyRank RANK_ANT = new ColonyRank(1, "Ant", 1l, 
@@ -442,57 +469,80 @@ public final class GameConstants {
     static { colonyRanks.add(RANK_GIGA); }
     
     // --- Species ---
-    public static final Species SPECIES_OMNI = new Species(1, "Omni Ant", "Omniformica Grimunknowni", null, null);
+    public static final Species SPECIES_OMNI = new Species(1, "Omni Ant", "Omniformica Grimunknowni",  "omni/", null, 
+        Set.of(GameUnlocks.TYPE_EGG, GameUnlocks.TYPE_QUEEN, GameUnlocks.TYPE_WORKER, GameUnlocks.ROLE_FORAGER, 
+            GameUnlocks.ROLE_FARMER, GameUnlocks.ROLE_NURSE, GameUnlocks.ROLE_LAYER, 
+            GameUnlocks.STAT_SKELETON, GameUnlocks.STAT_ACID, GameUnlocks.STAT_LONGEVITY));
     static { species.add(SPECIES_OMNI); }
-    public static final Species SPECIES_LEAF = new Species(2, "Leaf-Cutter Ant", "Atta Cephalotes", null, null);
+    
+    public static final Species SPECIES_LEAF = new Species(2, "Leaf-Cutter Ant", "Atta Cephalotes", "leaf/", GameUnlocks.ASSIMILATION_LEAFCUTTER, 
+        Set.of(GameUnlocks.TYPE_EGG, GameUnlocks.TYPE_QUEEN, GameUnlocks.TYPE_WORKER, GameUnlocks.ROLE_FORAGER, 
+            GameUnlocks.ROLE_FARMER, GameUnlocks.ROLE_NURSE, GameUnlocks.ROLE_LAYER, 
+            GameUnlocks.STAT_SKELETON, GameUnlocks.STAT_ACID, GameUnlocks.STAT_LONGEVITY,
+            GameUnlocks.ASSIMILATED_FARMING));
     static { species.add(SPECIES_LEAF); }
     
+    public static final Species SPECIES_PHARAOH = new Species(3, "Pharaoh Ant", "Monomorium Pharaonis", "pharaoh/", GameUnlocks.ASSIMILATION_PHARAOH, 
+        Set.of(GameUnlocks.TYPE_EGG, GameUnlocks.TYPE_QUEEN, GameUnlocks.TYPE_WORKER, GameUnlocks.ROLE_FORAGER, 
+            GameUnlocks.ROLE_FARMER, GameUnlocks.ROLE_NURSE, GameUnlocks.ROLE_LAYER, 
+            GameUnlocks.STAT_SKELETON, GameUnlocks.STAT_ACID, GameUnlocks.STAT_LONGEVITY,
+            GameUnlocks.ASSIMILATED_MULTIQUEEN));
+    static { species.add(SPECIES_PHARAOH); }
+    
+    public static final Species SPECIES_MARAUDER = new Species(4, "Marauder Ant", "Carebara Diversa", "marauder/", GameUnlocks.ASSIMILATION_MARAUDER, 
+        Set.of(GameUnlocks.TYPE_EGG, GameUnlocks.TYPE_QUEEN, GameUnlocks.TYPE_WORKER, GameUnlocks.ROLE_FORAGER, 
+            GameUnlocks.ROLE_FARMER, GameUnlocks.ROLE_NURSE, GameUnlocks.ROLE_LAYER, 
+            GameUnlocks.STAT_SKELETON, GameUnlocks.STAT_ACID, GameUnlocks.STAT_LONGEVITY,
+            GameUnlocks.TYPE_MAJOR));
+    static { species.add(SPECIES_MARAUDER); }
+
+    // --- Trade Methods ---
+    public static final TradeMethod METHOD_LAND = new TradeMethod(1, "Land", 1.0f, 1.0f, 0.35f, null);
+    static { tradeMethods.add(METHOD_LAND); }
+    public static final TradeMethod METHOD_AIR = new TradeMethod(2, "Air", 5.0f, 0.5f, 0.25f, null);
+    static { tradeMethods.add(METHOD_AIR); }
+    public static final TradeMethod METHOD_SEA = new TradeMethod(3, "Sea", 3.0f, 5.0f, 0.15f, null);
+    static { tradeMethods.add(METHOD_SEA); }
+    public static final TradeMethod METHOD_TUNNEL = new TradeMethod(4, "Tunnel", 2.0f, 2.0f, 0.05f, null);
+    static { tradeMethods.add(METHOD_TUNNEL); }
+    
+    // --- Construction Costs ---
+    public static final double TUNNEL_WORK_REQUIRED = 5000000.0;
+    
     // --- Getters ---
-    public static List<Biome> getBiomes() {
-        return Collections.unmodifiableList(biomes);
-    }
+    public static List<Biome> getBiomes() { return Collections.unmodifiableList(biomes); }
 
-    public static List<ResourceType> getResources() {
-        return Collections.unmodifiableList(resources);
-    }
+    public static List<ResourceType> getResources() { return Collections.unmodifiableList(resources); }
 
-    public static List<TimeOfDay> getTimesOfDay() {
-        return Collections.unmodifiableList(timesOfDay);
-    }
+    public static List<TimeOfDay> getTimesOfDay() { return Collections.unmodifiableList(timesOfDay); }  
 
-    public static List<MoonPhase> getMoonPhases() {
-        return Collections.unmodifiableList(moonPhases);
-    }
+    public static List<MoonPhase> getMoonPhases() { return Collections.unmodifiableList(moonPhases); }
 
-    public static List<Season> getSeasons() {
-        return Collections.unmodifiableList(seasons);
-    }
+    public static List<Season> getSeasons() { return Collections.unmodifiableList(seasons); }
 
-    public static List<Weather> getWeathers() {
-        return Collections.unmodifiableList(weathers);
-    }
+    public static List<Weather> getWeathers() { return Collections.unmodifiableList(weathers); }
 
-    public static List<AntStatus> getAntStatuses() {
-        return Collections.unmodifiableList(antStatuses);
-    }
+    public static List<AntStatus> getAntStatuses() { return Collections.unmodifiableList(antStatuses); }
 
-    public static List<AntType> getAntTypes() {
-        return Collections.unmodifiableList(antTypes);
-    }
+    public static List<MoveStatus> getMoveStatuses() { return Collections.unmodifiableList(moveStatuses); }
 
-    public static List<AntSubType> getAntSubTypes() {
-        return Collections.unmodifiableList(antSubTypes);
-    }
+    public static List<AntType> getAntTypes() { return Collections.unmodifiableList(antTypes); }
 
-    public static List<AntRole> getAntRoles() {
-        return Collections.unmodifiableList(antRoles);
-    }
+    public static List<AntSubType> getAntSubTypes() {  return Collections.unmodifiableList(antSubTypes); }
 
-    public static List<ColonyRank> getColonyRanks() {
-        return Collections.unmodifiableList(colonyRanks);
-    }
+    public static List<AntRole> getAntRoles() { return Collections.unmodifiableList(antRoles); }
 
-    public static List<Species> getSpecies() {
-        return Collections.unmodifiableList(species);
-    }
+    public static List<ColonyRank> getColonyRanks() { return Collections.unmodifiableList(colonyRanks); }
+
+    public static List<Species> getSpecies() { return Collections.unmodifiableList(species); }
+
+    public static List<TradeMethod> getTradeMethods() { return Collections.unmodifiableList(tradeMethods); }
+
+    public static List<Humidity> getHumidity() { return Collections.unmodifiableList(humidity); }
+
+    public static List<Temperature> getTemperature() { return Collections.unmodifiableList(temperature); }
+
+    public static List<BugType> getBugTypes() { return Collections.unmodifiableList(bugTypes); }
+
+    public static List<ImageIcon> getMisc() { return Collections.unmodifiableList(misc); }
 }

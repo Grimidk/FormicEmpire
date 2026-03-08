@@ -70,9 +70,11 @@ public class ColonyStatsService {
         return 0;
     }
     public int getQueensCapacity(Colony colony) {
-        if (colony.hasBuilding(GameUnlocks.ROYAL_CHAMBER_3)) return 10;
-        if (colony.hasBuilding(GameUnlocks.ROYAL_CHAMBER_2)) return 4;
-        if (colony.hasBuilding(GameUnlocks.ROYAL_CHAMBER_1)) return 2;
+        boolean canMultiQueen = colony.hasUpgrade(GameUnlocks.ASSIMILATED_MULTIQUEEN);
+        
+        if (colony.hasBuilding(GameUnlocks.ROYAL_CHAMBER_3)) return canMultiQueen ? 10 : 1;
+        if (colony.hasBuilding(GameUnlocks.ROYAL_CHAMBER_2)) return canMultiQueen ? 4 : 1;
+        if (colony.hasBuilding(GameUnlocks.ROYAL_CHAMBER_1)) return canMultiQueen ? 2 : 1;
         if (colony.hasBuilding(GameUnlocks.ROYAL_CHAMBER_0)) return 1; 
         return 0;
     }
@@ -84,6 +86,11 @@ public class ColonyStatsService {
         if (colony.hasUpgrade(GameUnlocks.STAT_LOGISTICS_1)) return 5;
         return 1;
     }
+
+    // --- Trade ---
+    public double getBaseTradeCapacity(Colony colony) { return 50.0; }
+
+    public double getBaseTradeSecurity(Colony colony) { return 0.5; }
 
     // --- Limits ---
     public int getSpreadingLimit(Colony colony) {
@@ -150,6 +157,17 @@ public class ColonyStatsService {
         if (colony.hasUpgrade(GameUnlocks.ROLE_SCOUT)) return 0.1f;
         return 0f;
     }
+
+    public double getConstructionEfficiency(Colony colony) {
+        int builderCount = colony.getAssignedRoleCount(GameConstants.ROLE_BUILDER);
+        int craneCount = 0;
+        if (colony.hasUpgrade(GameUnlocks.ROLE_CRANE)) {
+            craneCount = colony.getAssignedRoleCount(GameConstants.ROLE_CRANE);
+        }
+        int totalPower = builderCount + (craneCount * 25);
+        return totalPower / 100.0;
+    }
+
     public float getContaminationMitigation(Colony colony) {
         if (colony.hasUpgrade(GameUnlocks.STAT_CONTAMINATION_3)) return 0.4f; 
         if (colony.hasUpgrade(GameUnlocks.STAT_CONTAMINATION_2)) return 0.6f;

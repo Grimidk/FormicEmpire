@@ -50,7 +50,6 @@ public final class GameUnlocks {
     public static final Upgrade ROLE_SCOUT = new Upgrade(16, "Scout Role", "Adventure's Call", "Allows workers to go find new sources of resources, each scout has 10% chance each day to encounter a plant source.", TYPE_WORKER, 0 );
     static { upgrades.add(ROLE_SCOUT); }
     public static final Upgrade ROLE_MINER = new Upgrade(17, "Miner Role", "Yearn For The Mines", "", TYPE_WORKER, 0 );     
-    public static final Upgrade ROLE_COURIER = new Upgrade(18, "Courier Role", "Logistic Network", "", TYPE_WORKER, 0 );
     public static final Upgrade ROLE_POTTER = new Upgrade(19, "Portable-Feeder Role", "A Helping Hand", "", TYPE_WORKER, 0 );
     public static final Upgrade ROLE_GUARD = new Upgrade(20, "Guard Role", "Ant Bouncers", "", TYPE_SOLDIER, 0 );
     public static final Upgrade ROLE_WARRIOR = new Upgrade(21, "Warrior Role", "Phalanx Formation", "", TYPE_SOLDIER, 0 );
@@ -63,18 +62,64 @@ public final class GameUnlocks {
     public static final Upgrade ROLE_CARRIER = new Upgrade(26, "Carrier Role", "Troop Transport", "", TYPE_MAJOR, 0 );
     public static final Upgrade ROLE_ARTILLERY = new Upgrade(27, "Artillery Role", "Long Range Artillery", "", TYPE_MAJOR, 0 );
     public static final Upgrade ROLE_SIEGE = new Upgrade(28, "Siege-Machine Role", "Siege Technology", "", TYPE_MAJOR, 0 );
-    public static final Upgrade ROLE_BORER = new Upgrade(29, "Tunel-Borer Role", "Ant Excavator", "", TYPE_MAJOR, 0 );
     public static final Upgrade ROLE_BREEDER = new Upgrade(30,"Breeder Roles", "Nuptial Flights", "Allows Princesses and Drones to go to nuptial flights and get more queens or spread to new places.", TYPE_PRINCESS, 0 );
     static { upgrades.add(ROLE_BREEDER); }
     public static final Upgrade ROLE_DIPLOMAT = new Upgrade(31, "Diplomat Role", "Mighter Than The Sword", "", TYPE_PRINCESS, 0 );
     public static final Upgrade ROLE_MILITIA = new Upgrade(32, "Militia Role", "Worker Militia Auxiliary", "", TYPE_WORKER, 0 );
     public static final Upgrade ROLE_CATCHER = new Upgrade(33, "Catcher Role", "Bug Catching", "", TYPE_SOLDIER, 0 );
-    public static final Upgrade ROLE_CRANE = new Upgrade(34, "Construction Crane Role", "Heavy Duty", "", TYPE_MAJOR, 0 );
-    public static final Upgrade ROLE_TRANSPORT = new Upgrade(35, "Resource Transport Role", "Heavy Lifting", "", TYPE_MAJOR, 0 );
+    public static final Upgrade ROLE_CRANE = new Upgrade(34, "Construction Crane Role", "Heavy Duty", "Allows majors to help in the construction of buildings, each one is 25 times as strong.", TYPE_MAJOR, 250000 );
+    static { upgrades.add(ROLE_CRANE); }
     public static final Upgrade ROLE_ASSISTANT = new Upgrade(36, "Lab Assistant Role", "Lab Internship", "Allows princesses to help research with 1/5 the efficency of queens.", TYPE_PRINCESS, 1500 );
     static { upgrades.add(ROLE_ASSISTANT); }
-    public static final Upgrade ROLE_ESCORT = new Upgrade(37, "Convoy Escort Role", "Protective Detail", "", TYPE_SOLDIER, 0 );
-    public static final Upgrade ROLE_ENGINEER = new Upgrade(38, "Excavator Role", "Tunnel Engineering", "Allows workers to dig tunnels for safer trade routes.", TYPE_WORKER, 0 );
+
+    // -- Abilities --
+    public static final Upgrade ABILITY_RESEARCH = new Upgrade(201, "Research", "Micro Microscopes", "Allows you to research more ant technology by using research points, go to the research menu (Y).", ROLE_RESEARCHER, 0 );
+    static { upgrades.add(ABILITY_RESEARCH); }
+    public static final Upgrade ABILITY_BUILD = new Upgrade(202, "Building", "Brick And Mortar", "Allows you to build parts of your colony, you can build in the build menu (U).", ROLE_BUILDER, 0 );
+    static { upgrades.add(ABILITY_BUILD); }
+    public static final Upgrade ABILITY_SPREAD = new Upgrade(203, "Spreading", "Colony Colonization", "Allows you to build satellite colonies, 1 colony at the time, you see them in world map (I).", ROLE_BREEDER, 0 );
+    static { upgrades.add(ABILITY_SPREAD); }
+    public static final Upgrade ABILITY_RESIN = new Upgrade(204, "Resin Harvest", "Resin Resonation", "Allows your to foragers to harvest resin while foraging plants as a bonus, there is 1% chance each foraging run.", ROLE_FORAGER, 5000 );
+    static { upgrades.add(ABILITY_RESIN); }
+    public static final Upgrade ABILITY_SYNERGY = new Upgrade(205, "Synergies", "Collaborative Effort", "Allows the use of synergies by combining two upgrades to make a third more powerful upgrade.", ABILITY_RESEARCH, 0);
+    static { upgrades.add(ABILITY_SYNERGY); }
+    public static final Upgrade ABILITY_ASSIMILATION = new Upgrade(206, "Assimilation", "Genetic Assimilation", "Allows the use of assimilations to change the genetic code of your species and gain new abilities from other species.", ABILITY_RESEARCH, 0);
+    static { upgrades.add(ABILITY_ASSIMILATION); }
+    public static final Upgrade ABILITY_FORCED_FLIGHT = new Upgrade(505, "Forced Nuptial Flights", "Royal Decree", "Allows you to force a nuptial flight by spending 1000 research points.", ROLE_BREEDER, 9000);
+    static { upgrades.add(ABILITY_FORCED_FLIGHT); }
+    public static final Upgrade ABILITY_DYNASTY = new Upgrade(506, "Ant Dynasty", "Ant Society", "Allows the dynasty management screen to see all the colonies in your dynasty.", ABILITY_SPREAD, 0);
+    static { upgrades.add(ABILITY_DYNASTY); }
+    public static final Upgrade ABILITY_TRADE = new Upgrade(507, "Trade Routes", "Ant Trade", "Allows your colonies to trade resources with each other, manageable in the dynasty management screen.", ABILITY_DYNASTY, 0);
+    static { upgrades.add(ABILITY_TRADE); }
+    public static final Upgrade ABILITY_SPREAD_2 = new Upgrade(508, "Advanced Spreading", "Mass Colonization", "Allows you to build more satellite colonies at the time, taking away the limit.", ABILITY_SPREAD, 0);
+    static { upgrades.add(ABILITY_SPREAD_2); }
+    public static final Upgrade ABILITY_AUTOMATION = new Upgrade(509, "Automation", "Ant Automation", "Allows your colonies to be automated in the dynasty management screen.", ABILITY_DYNASTY, 0);
+    static { upgrades.add(ABILITY_AUTOMATION); }
+    public static final Upgrade ABILITY_TUNNELS =  new Upgrade(510, "Tunnel Networks", "Subterranean Highways", "Allows your colonies to build tunnel networks between each other for faster and safer resource transport.", ABILITY_TRADE, 100000);    
+    static { upgrades.add(ABILITY_TUNNELS); }
+    public static final Upgrade ABILITY_BILATERAL_TRADE = new Upgrade(513, "Bilateral Trade", "Two-Way Logistics", "Allows your trade convoys to bring resources back on their return trip.", ABILITY_TRADE, 0);
+    static { upgrades.add(ABILITY_BILATERAL_TRADE); }
+    public static final Upgrade ABILITY_MANAGEMENT = new Upgrade(511, "Colony Management", "Decentralized Command", "Allows you to let colonies to build by themselves without your direct input.", ABILITY_DYNASTY, 0);
+    static { upgrades.add(ABILITY_MANAGEMENT); }
+    public static final Upgrade ABILITY_MASS_FLIGHT = new Upgrade(512, "Mass Nuptial Flights", "Imperial Decree", "Triggers nuptial flights in all colonies capable of doing so. Costs 10x standard forced flight cost.", ABILITY_FORCED_FLIGHT, 0);
+    static { upgrades.add(ABILITY_MASS_FLIGHT); }
+    public static final Upgrade ABILITY_ABILITY = new Upgrade(900, "Ability Menu", "Abilities Unlocked", "Allows you to see the abilities menu and use active abilities.", null, 0);
+    static { upgrades.add(ABILITY_ABILITY); }
+
+    // -- Advanced Roles --
+    public static final Upgrade ROLE_COURIER = new Upgrade(18, "Courier Role", "Logistic Network", "Allows workers to transport resources between colonies.", ABILITY_TRADE, 0 );
+    static { upgrades.add(ROLE_COURIER); }
+    public static final Upgrade ROLE_BORER = new Upgrade(29, "Tunnel-Borer Role", "Ant Excavator", "Allows workers to dig tunnels for safer trade routes.", ABILITY_TUNNELS, 0 );
+    static { upgrades.add(ROLE_BORER); }
+    public static final Upgrade ROLE_TRANSPORT = new Upgrade(35, "Resource Transport Role", "Heavy Lifting", "Allows majors to transport more resources for trade routes.", ROLE_COURIER, 100000 );
+    static { upgrades.add(ROLE_TRANSPORT); }
+    public static final Upgrade ROLE_ESCORT = new Upgrade(37, "Convoy Escort Role", "Protective Detail", "Allows soldiers to escort convoys of resources to reduce danger level.", ROLE_COURIER, 80000 );
+    static { upgrades.add(ROLE_ESCORT); }
+    public static final Upgrade ROLE_ENGINEER = new Upgrade(38, "Tunnel Engineer Role", "Tunnel Engineering", "Allows workers to dig tunnels for safer trade routes but at 1/100th of the efficiency.", ROLE_BORER, 50000 );
+    static { upgrades.add(ROLE_ENGINEER); }
+    public static final Upgrade ROLE_SKYTRANS = new Upgrade(39, "Sky Transport Role", "Aerial Logistics", "Allows princesses to transport resources for trade routes, reducing travel time but at less capacity.", ROLE_COURIER, 150000 );
+    static { upgrades.add(ROLE_SKYTRANS); }
+
     // -- Stats -- 
     public static final Upgrade STAT_SKELETON = new Upgrade(101, "Basic Skeletons", "Basic Exoskeletons", "The basic defense stats for all the ants in your colony before multipliers. 100 health points, 5 defense points and 1 health point recovered per second.", TYPE_EGG, 0 );
     static { upgrades.add(STAT_SKELETON); }
@@ -140,36 +185,11 @@ public final class GameUnlocks {
     static { upgrades.add(STAT_POLICING_2); }
     public static final Upgrade STAT_POLICING_3 = new Upgrade(132, "Perfected Policing", "Surveillance Drones", "Increases policing rate to 55% per day.", STAT_POLICING_2, 42000);
     static { upgrades.add(STAT_POLICING_3); }
-    // -- Abilities --
-    public static final Upgrade ABILITY_RESEARCH = new Upgrade(201, "Research", "Micro Microscopes", "Allows you to research more ant technology by using research points, go to the research menu (Y).", ROLE_RESEARCHER, 0 );
-    static { upgrades.add(ABILITY_RESEARCH); }
-    public static final Upgrade ABILITY_BUILD = new Upgrade(202, "Building", "Brick And Mortar", "Allows you to build parts of your colony, you can build in the build menu (U).", ROLE_BUILDER, 0 );
-    static { upgrades.add(ABILITY_BUILD); }
-    public static final Upgrade ABILITY_SPREAD = new Upgrade(203, "Spreading", "Colony Colonization", "Allows you to build satellite colonies, 1 colony at the time, you see them in world map (I).", ROLE_BREEDER, 0 );
-    static { upgrades.add(ABILITY_SPREAD); }
-    public static final Upgrade ABILITY_RESIN = new Upgrade(204, "Resin Harvest", "Resin Resonation", "Allows your to foragers to harvest resin while foraging plants as a bonus, there is 1% chance each foraging run.", ROLE_FORAGER, 5000 );
-    static { upgrades.add(ABILITY_RESIN); }
-    public static final Upgrade ABILITY_SYNERGY = new Upgrade(205, "Synergies", "Collaborative Effort", "Allows the use of synergies by combining two upgrades to make a third more powerful upgrade.", ABILITY_RESEARCH, 0);
-    static { upgrades.add(ABILITY_SYNERGY); }
-    public static final Upgrade ABILITY_ASSIMILATION = new Upgrade(206, "Assimilation", "Genetic Assimilation", "Allows the use of assimilations to change the genetic code of your species and gain new abilities from other species.", ABILITY_RESEARCH, 0);
-    static { upgrades.add(ABILITY_ASSIMILATION); }
-    public static final Upgrade ABILITY_FORCED_FLIGHT = new Upgrade(505, "Forced Nuptial Flights", "Royal Decree", "Allows you to force a nuptial flight by spending 1000 research points.", ROLE_BREEDER, 9000);
-    static { upgrades.add(ABILITY_FORCED_FLIGHT); }
-    public static final Upgrade ABILITY_DYNASTY = new Upgrade(506, "Ant Dynasty", "Ant Society", "Allows the dynasty management screen to see all the colonies in your dynasty.", ABILITY_SPREAD, 0);
-    static { upgrades.add(ABILITY_DYNASTY); }
-    public static final Upgrade ABILITY_TRADE = new Upgrade(507, "Trade Routes", "Ant Trade", "Allows your colonies to trade resources with each other, manageable in the dynasty management screen.", ABILITY_DYNASTY, 0);
-    static { upgrades.add(ABILITY_TRADE); }
-    public static final Upgrade ABILITY_SPREAD_2 = new Upgrade(508, "Advanced Spreading", "Mass Colonization", "Allows you to build more satellite colonies at the time, taking away the limit.", ABILITY_SPREAD, 0);
-    static { upgrades.add(ABILITY_SPREAD_2); }
-    public static final Upgrade ABILITY_AUTOMATION = new Upgrade(509, "Automation", "Ant Automation", "Allows your colonies to be automated in the dynasty management screen.", ABILITY_DYNASTY, 0);
-    static { upgrades.add(ABILITY_AUTOMATION); }
-    public static final Upgrade ABILITY_TUNNELS =  new Upgrade(510, "Tunnel Networks", "Subterranean Highways", "Allows your colonies to build tunnel networks between each other for faster and safer resource transport.", ABILITY_TRADE, 150000);    
-    public static final Upgrade ABILITY_MANAGEMENT = new Upgrade(511, "Colony Management", "Decentralized Command", "Allows you to let colonies to build by themselves without your direct input.", ABILITY_DYNASTY, 0);
-    static { upgrades.add(ABILITY_MANAGEMENT); }
-    public static final Upgrade ABILITY_MASS_FLIGHT = new Upgrade(512, "Mass Nuptial Flights", "Imperial Decree", "Triggers nuptial flights in all colonies capable of doing so. Costs 10x standard forced flight cost.", ABILITY_FORCED_FLIGHT, 0);
-    static { upgrades.add(ABILITY_MASS_FLIGHT); }
-    public static final Upgrade ABILITY_ABILITY = new Upgrade(900, "Ability Menu", "Abilities Unlocked", "Allows you to see the abilities menu.", null, 0);
-    static { upgrades.add(ABILITY_ABILITY); }
+    // -- Assimilated --
+    public static final Upgrade ASSIMILATED_FARMING = new Upgrade(1001, "Assimilated Farming", "Ancenstral Farming Techniques", "Your dynasty has learned how to farm fungi more efficiently. By getting 1 extra mushroom matter per plant and protein.", ABILITY_ASSIMILATION, 0 );
+    static { upgrades.add(ASSIMILATED_FARMING); }
+    public static final Upgrade ASSIMILATED_MULTIQUEEN = new Upgrade(1002, "Assimilated Multi-Queen", "Multi Royal Mandate", "Your dynasty can now handle multiple queens in a single colony, still requires the upgrading of the Royal Chamber.", ABILITY_ASSIMILATION, 0 );
+    static { upgrades.add(ASSIMILATED_MULTIQUEEN); }
 
     // --- Buildings ---
     // -- Tier 0 --
@@ -192,7 +212,7 @@ public final class GameUnlocks {
     public static final Building RESIN_RESERVOIR_0 = new Building(9, "Basic Resin Reservoir", 0, "The base resin reservoir for the colony, holds 200 resin drops.", null, 0, 0, 50);
     static { buildings.add(RESIN_RESERVOIR_0); }
     // -- Tier 1 --
-    public static final Building ROYAL_CHAMBER_1 = new Building(10, "Expanded Royal Chamber", 1, "The upgraded queen chamber for the colony, holds 2 queens.", ROYAL_CHAMBER_0, 0, 0, 1000);
+    public static final Building ROYAL_CHAMBER_1 = new Building(10, "Expanded Royal Chamber", 1, "The upgraded queen chamber for the colony, holds 2 queens, still requires Multi-Queen.", ROYAL_CHAMBER_0, 0, 0, 1000);
     static { buildings.add(ROYAL_CHAMBER_1); }
     public static final Building EGG_CHAMBER_1 = new Building(11, "Expanded Egg Chamber", 1, "The upgraded egg chamber for the colony, holds 80 juvenile ants of each type.", EGG_CHAMBER_0, 0, 0, 100);
     static { buildings.add(EGG_CHAMBER_1); }
@@ -211,7 +231,7 @@ public final class GameUnlocks {
     public static final Building RESIN_RESERVOIR_1 = new Building(18, "Expanded Resin Reservoir", 1, "The upgraded resin reservoir for the colony, holds 500 resin drops.", RESIN_RESERVOIR_0, 0, 0, 400);
     static { buildings.add(RESIN_RESERVOIR_1); }
     // -- Tier 2 --
-    public static final Building ROYAL_CHAMBER_2 = new Building(19, "Reinforced Royal Chamber", 2, "The resin-reinforced queen chamber for the colony, holds 4 queens.", ROYAL_CHAMBER_1, 500, 0, 3000);
+    public static final Building ROYAL_CHAMBER_2 = new Building(19, "Reinforced Royal Chamber", 2, "The resin-reinforced queen chamber for the colony, holds 4 queens, still requires Multi-Queen.", ROYAL_CHAMBER_1, 500, 0, 3000);
     static { buildings.add(ROYAL_CHAMBER_2); }
     public static final Building EGG_CHAMBER_2 = new Building(20, "Reinforced Egg Chamber", 2, "The resin-reinforced egg chamber for the colony, holds 150 juvenile ants of each type.", EGG_CHAMBER_1, 200, 0, 1000);
     static { buildings.add(EGG_CHAMBER_2); }
@@ -230,7 +250,7 @@ public final class GameUnlocks {
     public static final Building RESIN_RESERVOIR_2 = new Building(27, "Reinforced Resin Reservoir", 2, "The resin-reinforced resin reservoir for the colony, holds 1200 resin drops.", RESIN_RESERVOIR_1, 400, 0, 2000);
     static { buildings.add(RESIN_RESERVOIR_2); }
     // -- Tier 3 --
-    public static final Building ROYAL_CHAMBER_3 = new Building(28, "Fortified Royal Chamber", 3, "The further fortified queen chamber for the colony, holds 10 queens.", ROYAL_CHAMBER_2, 1000, 0, 15000);
+    public static final Building ROYAL_CHAMBER_3 = new Building(28, "Fortified Royal Chamber", 3, "The further fortified queen chamber for the colony, holds 10 queens, still requires Multi-Queen.", ROYAL_CHAMBER_2, 1000, 0, 15000);
     static { buildings.add(ROYAL_CHAMBER_3); }
     public static final Building EGG_CHAMBER_3 = new Building(29, "Fortified Egg Chamber", 3, "The further fortified egg chamber for the colony, holds 500 juvenile ants of each type.", EGG_CHAMBER_2, 500, 0, 5000);
     static { buildings.add(EGG_CHAMBER_3); }
@@ -267,23 +287,21 @@ public final class GameUnlocks {
     static { buildings.add(BUILDING_COMPOSTER); }
 
     // --- Assimilations ---
+    public static final Assimilation ASSIMILATION_LEAFCUTTER = new Assimilation(1, "Leafcutter Assimilation", "After assimilating the leafcutter ant genome:" + ASSIMILATED_FARMING.getDescription(), ASSIMILATED_FARMING, 5000);
+    static { assimilations.add(ASSIMILATION_LEAFCUTTER); }
+    public static final Assimilation ASSIMILATION_PHARAOH = new Assimilation(2, "Pharaoh Assimilation", "After assimilating the pharaoh ant genome: " + ASSIMILATED_MULTIQUEEN.getDescription(), ASSIMILATED_MULTIQUEEN, 10000);
+    static { assimilations.add(ASSIMILATION_PHARAOH); }
+    public static final Assimilation ASSIMILATION_MARAUDER = new Assimilation(3, "Marauder Assimilation", "After assimilating the marauder ant genome: " + TYPE_MAJOR.getDescription(), TYPE_MAJOR, 15000);
+    static { assimilations.add(ASSIMILATION_MARAUDER); }
 
     // --- Synergies ---
 
     // --- Getters ---
-    public static List<Upgrade> getUpgrades() {
-        return Collections.unmodifiableList(upgrades);
-    }
+    public static List<Upgrade> getUpgrades() { return Collections.unmodifiableList(upgrades); }
 
-    public static List<Building> getBuildings() {
-        return Collections.unmodifiableList(buildings);
-    }
+    public static List<Building> getBuildings() { return Collections.unmodifiableList(buildings); }
 
-    public static List<Synergy> getSynergies() {
-        return Collections.unmodifiableList(synergies);
-    }
+    public static List<Synergy> getSynergies() { return Collections.unmodifiableList(synergies); }
 
-    public static List<Assimilation> getAssimilations() {
-        return Collections.unmodifiableList(assimilations);
-    }
+    public static List<Assimilation> getAssimilations() { return Collections.unmodifiableList(assimilations); }
 }

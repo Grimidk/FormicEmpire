@@ -83,6 +83,9 @@ public class TriggerManager {
         checkSpreadAbilityUnlock();
         checkScoutRoleUnlock();
         checkDynastyTriggers();
+        checkTradeRoleTriggers();
+        checkTunnelRoleUnlock();
+        checkAssimilationAbilityUnlock();
         checkAbilityMenuHint();
     }
 
@@ -309,6 +312,41 @@ public class TriggerManager {
             fireTrigger(GameUnlocks.ABILITY_AUTOMATION,
                 "Automation Era",
                 "Your dynasty is vast. You can now completely automate colony management.");
+        }
+
+        if (engine.getTradeManager() != null && engine.getTradeManager().getActiveTrades().size() >= 5) {
+            if (!playerColony.hasUpgrade(GameUnlocks.ABILITY_BILATERAL_TRADE)) {
+                fireTrigger(GameUnlocks.ABILITY_BILATERAL_TRADE,
+                    "Two-Way Logistics",
+                    "Your trade network is so busy that your ants have learned to bring resources back on their return trips! Bilateral Trade unlocked.");
+            }
+        }
+    }
+
+    private void checkTradeRoleTriggers() {
+        if (!playerColony.hasUpgrade(GameUnlocks.ABILITY_TRADE)) return;
+
+        if (!playerColony.hasUpgrade(GameUnlocks.ROLE_COURIER)) {
+            fireTrigger(GameUnlocks.ROLE_COURIER, "Logistic Network", "Trade routes require couriers! Workers can now be assigned to transport goods.");
+        }
+    }
+
+    private void checkTunnelRoleUnlock() {
+        if (!playerColony.hasUpgrade(GameUnlocks.ABILITY_TUNNELS)) return;
+
+        if (!playerColony.hasUpgrade(GameUnlocks.ROLE_BORER)) {
+            fireTrigger(GameUnlocks.ROLE_BORER, "Boring Job", "Trade routes can be dangerous! Majors can now be assigned to dig tunnels for faster, safer trade routes.");
+        }
+    }
+
+    private void checkAssimilationAbilityUnlock() {
+        if (playerColony.getDynasty() == null) return;
+        if (playerColony.hasUpgrade(GameUnlocks.ABILITY_ASSIMILATION)) return;
+
+        if (playerColony.getDynasty().getAbsorbedDynastyIds().size() > 0) {
+            fireTrigger(GameUnlocks.ABILITY_ASSIMILATION,
+                "Genetic Assimilation",
+                "By absorbing the remnants of a defeated dynasty, your ants have learned that genetic traits can be harvested! Genetic Assimilation unlocked in the Upgrades menu (Y).");
         }
     }
 

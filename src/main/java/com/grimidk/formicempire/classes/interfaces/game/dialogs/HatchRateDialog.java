@@ -2,6 +2,7 @@ package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 
@@ -29,6 +30,7 @@ public class HatchRateDialog extends ZeroDialog {
         centerPanel = new JPanel();
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
         centerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        centerPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
         
         add(centerPanel, BorderLayout.CENTER);
         
@@ -48,8 +50,13 @@ public class HatchRateDialog extends ZeroDialog {
         spinnerMap.clear();
         isAdjusting = false; 
         
-        totalLabel.setFont(totalLabel.getFont().deriveFont(Font.BOLD));
-        centerPanel.add(new JLabel("Set hatch chance for new ants:"));
+        totalLabel.setFont(AssetStyles.FONT_BOLD);
+        totalLabel.setForeground(AssetStyles.FONT_COLOR);
+        
+        JLabel descLabel = new JLabel("Set hatch chance for new ants:");
+        descLabel.setForeground(AssetStyles.FONT_COLOR);
+        
+        centerPanel.add(descLabel);
         centerPanel.add(totalLabel);
         centerPanel.add(new JSeparator(SwingConstants.HORIZONTAL));
         
@@ -64,6 +71,7 @@ public class HatchRateDialog extends ZeroDialog {
 
         for (AntType type : typesToRate) {
             JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            row.setOpaque(false);
             
             JLabel typeLabel = new JLabel(type.getIcon());
             typeLabel.setToolTipText(type.getName());
@@ -168,10 +176,10 @@ public class HatchRateDialog extends ZeroDialog {
         totalLabel.setText(String.format("Total: %.1f%%", totalAssigned));
         
         if (Math.abs(100.0 - totalAssigned) > 0.1) { 
-            totalLabel.setForeground(Color.RED);
+            totalLabel.setForeground(AssetStyles.FONT_COLOR_ERROR);
             totalLabel.setToolTipText(String.format("Warning: Total is not 100%%."));
         } else {
-            totalLabel.setForeground(Color.BLACK);
+            totalLabel.setForeground(AssetStyles.FONT_COLOR);
             totalLabel.setToolTipText("Total is 100%");
         }
     }

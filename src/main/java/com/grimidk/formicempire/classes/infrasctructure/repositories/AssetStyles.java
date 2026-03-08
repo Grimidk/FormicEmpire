@@ -1,0 +1,183 @@
+package com.grimidk.formicempire.classes.infrasctructure.repositories;
+
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Font;
+import java.awt.FontFormatException;
+import java.awt.Image;
+import java.awt.Point;
+import java.awt.Toolkit;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.UIManager;
+import javax.swing.border.Border;
+
+public class AssetStyles {
+    // --- Palette ---
+    public static final Color COLOR_ABSOLUTE_BLACK = new Color(0, 0, 0);
+    public static final Color COLOR_ABSOLUTE_WHITE = new Color(255, 255, 255);
+    public static final Color COLOR_DARK_GRAY = new Color(67, 67, 67);
+    public static final Color COLOR_MEDIUM_GRAY = new Color(103, 103, 103);
+    public static final Color COLOR_LIGHT_GRAY = new Color(157, 157, 157);
+    public static final Color COLOR_DARK_RED = new Color(117, 23, 23);
+    public static final Color COLOR_MEDIUM_RED = new Color(190, 38, 51);
+    public static final Color COLOR_LIGHT_RED = new Color(224, 111, 139);
+    public static final Color COLOR_DARK_ORANGE = new Color(73, 60, 43);
+    public static final Color COLOR_MEDIUM_ORANGE = new Color(164, 100, 34);
+    public static final Color COLOR_LIGHT_ORANGE = new Color(235, 137, 49);
+    public static final Color COLOR_LIGHT_YELLOW = new Color(247, 226, 107);
+    public static final Color COLOR_MEDIUM_GREEN = new Color(68, 137, 26);
+    public static final Color COLOR_LIGHT_GREEN = new Color(163, 206, 39);
+    public static final Color COLOR_DARK_TEAL = new Color(47, 72, 78);
+    public static final Color COLOR_DARK_BLUE = new Color(27, 38, 50);
+    public static final Color COLOR_MEDIUM_BLUE = new Color(0, 87, 132);
+    public static final Color COLOR_LIGHT_BLUE = new Color(49, 162, 242);
+    public static final Color COLOR_LIGHTEST_BLUE = new Color(178, 220, 239);
+    public static final Color COLOR_MEDIUM_PURPLE = new Color(148, 39, 196);
+    public static final Color COLOR_LIGHT_PURPLE = new Color(174, 126, 229);
+
+    // --- Global Style References ---
+    public static final Color BACKGROUND_COLOR = COLOR_LIGHT_GRAY;
+    public static final Color BACKGROUND_SECONDARY = COLOR_MEDIUM_GRAY;
+    public static final Color BACKGROUND_DARK = COLOR_DARK_GRAY;
+    public static final Color BACKGROUND_LIGHT = COLOR_ABSOLUTE_WHITE;
+    
+    public static final Color FONT_COLOR = COLOR_ABSOLUTE_BLACK;
+    public static final Color FONT_COLOR_BRIGHT = COLOR_ABSOLUTE_WHITE;
+    public static final Color FONT_COLOR_HEADER = COLOR_DARK_BLUE;
+    public static final Color FONT_COLOR_SUCCESS = COLOR_MEDIUM_GREEN;
+    public static final Color FONT_COLOR_ERROR = COLOR_DARK_RED;
+    public static final Color FONT_COLOR_WARNING = COLOR_DARK_RED;
+    public static final Color FONT_COLOR_HIGHLIGHT = COLOR_MEDIUM_BLUE;
+    public static final Color FONT_COLOR_VALUE = COLOR_MEDIUM_PURPLE;
+    
+    public static final Color BORDER_COLOR = COLOR_ABSOLUTE_BLACK;
+    public static final Color PLAYER_COLOR = COLOR_MEDIUM_BLUE;
+
+    public static final Color UI_BG_PRIMARY = BACKGROUND_COLOR;
+    public static final Color UI_BG_SECONDARY = BACKGROUND_SECONDARY;
+    public static final Color UI_BG_HEADER = BACKGROUND_SECONDARY;
+    public static final Color UI_BORDER_COLOR = BORDER_COLOR;
+    
+    public static final Color TEXT_NORMAL = FONT_COLOR;
+    public static final Color TEXT_HEADER = FONT_COLOR_HEADER;
+    public static final Color TEXT_SUCCESS = FONT_COLOR_SUCCESS;
+    public static final Color TEXT_ERROR = FONT_COLOR_ERROR;
+    public static final Color TEXT_WARNING = FONT_COLOR_WARNING;
+    
+    public static final Color PLAYER_FACTION = PLAYER_COLOR;
+
+    public static final Border PANEL_BORDER = BorderFactory.createLineBorder(UI_BORDER_COLOR, 2);
+    
+    private static Font customFont;
+
+    static {
+        try (InputStream is = AssetStyles.class.getResourceAsStream("/fonts/font.ttf")) {
+            if (is != null) {
+                customFont = Font.createFont(Font.TRUETYPE_FONT, is);
+            } else {
+                customFont = new Font("Monospaced", Font.PLAIN, 12);
+            }
+        } catch (FontFormatException | IOException e) {
+            customFont = new Font("Monospaced", Font.PLAIN, 12);
+        }
+    }
+
+    public static final Font FONT_NORMAL = customFont.deriveFont(12f);
+    public static final Font FONT_BOLD = customFont.deriveFont(Font.BOLD, 12f);
+    public static final Font FONT_TITLE = customFont.deriveFont(Font.BOLD, 18f);
+    public static final Font FONT_SMALL = customFont.deriveFont(10f);
+
+    public static void applyGlobalStyles() {
+        UIManager.put("Panel.background", BACKGROUND_COLOR);
+        UIManager.put("Panel.foreground", FONT_COLOR);
+        
+        UIManager.put("Label.background", BACKGROUND_COLOR);
+        UIManager.put("Label.foreground", FONT_COLOR);
+        UIManager.put("Label.font", FONT_NORMAL);
+        
+        UIManager.put("Button.background", BACKGROUND_SECONDARY);
+        UIManager.put("Button.foreground", COLOR_ABSOLUTE_BLACK);
+        UIManager.put("Button.font", FONT_BOLD);
+        
+        UIManager.put("TabbedPane.background", BACKGROUND_SECONDARY);
+        UIManager.put("TabbedPane.foreground", FONT_COLOR);
+        UIManager.put("TabbedPane.selected", BACKGROUND_COLOR);
+        UIManager.put("TabbedPane.font", FONT_BOLD);
+        
+        UIManager.put("Table.background", BACKGROUND_COLOR);
+        UIManager.put("Table.foreground", FONT_COLOR);
+        UIManager.put("Table.gridColor", BACKGROUND_SECONDARY);
+        UIManager.put("Table.selectionBackground", BACKGROUND_SECONDARY);
+        UIManager.put("Table.selectionForeground", FONT_COLOR_HEADER);
+        UIManager.put("Table.font", FONT_NORMAL);
+        
+        UIManager.put("TableHeader.background", BACKGROUND_SECONDARY);
+        UIManager.put("TableHeader.foreground", FONT_COLOR_HEADER);
+        UIManager.put("TableHeader.font", FONT_BOLD);
+        
+        UIManager.put("ProgressBar.background", BACKGROUND_DARK);
+        UIManager.put("ProgressBar.foreground", FONT_COLOR_SUCCESS);
+        UIManager.put("ProgressBar.selectionBackground", COLOR_ABSOLUTE_BLACK);
+        UIManager.put("ProgressBar.selectionForeground", COLOR_ABSOLUTE_WHITE);
+        UIManager.put("ProgressBar.font", FONT_SMALL);
+        
+        UIManager.put("CheckBox.background", BACKGROUND_COLOR);
+        UIManager.put("CheckBox.foreground", FONT_COLOR);
+        UIManager.put("CheckBox.font", FONT_NORMAL);
+        
+        UIManager.put("ComboBox.background", BACKGROUND_SECONDARY);
+        UIManager.put("ComboBox.foreground", FONT_COLOR);
+        UIManager.put("ComboBox.font", FONT_NORMAL);
+        
+        UIManager.put("TextArea.background", BACKGROUND_COLOR);
+        UIManager.put("TextArea.foreground", FONT_COLOR);
+        UIManager.put("TextArea.font", FONT_NORMAL);
+        
+        UIManager.put("List.background", BACKGROUND_COLOR);
+        UIManager.put("List.foreground", FONT_COLOR);
+        UIManager.put("List.selectionBackground", BACKGROUND_SECONDARY);
+        UIManager.put("List.selectionForeground", FONT_COLOR_HEADER);
+        UIManager.put("List.font", FONT_NORMAL);
+
+        UIManager.put("SplitPane.background", BACKGROUND_COLOR);
+        UIManager.put("SplitPane.dividerSize", 5);
+
+        UIManager.put("ScrollPane.background", BACKGROUND_COLOR);
+        UIManager.put("Viewport.background", BACKGROUND_COLOR);
+        
+        UIManager.put("TitledBorder.titleColor", FONT_COLOR_HEADER);
+        UIManager.put("TitledBorder.font", FONT_BOLD);
+        UIManager.put("TitledBorder.border", PANEL_BORDER);
+    }
+
+    public static Cursor loadCustomCursor(String path, String name) {
+        try {
+            URL url = AssetStyles.class.getResource(path);
+            if (url != null) {
+                Image img = new ImageIcon(url).getImage();
+                return Toolkit.getDefaultToolkit().createCustomCursor(img, new Point(0, 0), name);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
+    }
+
+    public static Image loadImage(String path) {
+        try {
+            URL url = AssetStyles.class.getResource(path);
+            if (url != null) {
+                return new ImageIcon(url).getImage();
+            } else {
+                System.err.println("Resource not found: " + path);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+}

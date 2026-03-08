@@ -84,7 +84,7 @@ public class ColonyPhysicsService {
         for (Map.Entry<AntType, List<Ant>> entry : colony.getAntGroups().entrySet()) {
             if (entry.getKey() == GameConstants.TYPE_DEAD) continue;
             
-            ImageIcon sprite = entry.getKey().getSprite();
+            ImageIcon sprite = GameConstants.getAntSprite(entry.getKey(), colony.getSpecies());
             List<Ant> antList = entry.getValue();
             synchronized (antList) {
                 for (Ant ant : antList) {
@@ -189,7 +189,7 @@ public class ColonyPhysicsService {
                     if (ant.getRole() == GameConstants.ROLE_SCOUT || isGatherer(ant)) {
                          ant.moveTo(getRandomScoutPosition(colony));
                     } else {
-                         ant.moveTo(getRandomOverworldPosition(colony, ant.getAntType().getSprite()));
+                         ant.moveTo(getRandomOverworldPosition(colony, GameConstants.getAntSprite(ant.getAntType(), colony.getSpecies())));
                     }
                 }
             } else {
@@ -256,7 +256,7 @@ public class ColonyPhysicsService {
                     if (ant.getRole() == GameConstants.ROLE_SCOUT) {
                         ant.moveTo(getRandomScoutPosition(colony));
                     } else {
-                        ant.moveTo(getRandomOverworldPosition(colony, ant.getAntType().getSprite()));
+                        ant.moveTo(getRandomOverworldPosition(colony, GameConstants.getAntSprite(ant.getAntType(), colony.getSpecies())));
                     }
                 }
             }
@@ -331,6 +331,9 @@ public class ColonyPhysicsService {
             if (colony.getBreederBounds() != null && colony.getBreederBounds().contains(ant.getX(), ant.getY())) {
                 return WorldSpaces.BREEDER_CHAMBER;
             }
+            if (colony.getTransitBounds() != null && colony.getTransitBounds().contains(ant.getX(), ant.getY())) {
+                return WorldSpaces.TRANSIT_CHAMBER;
+            }
         } 
         else if (ant.getDimension() == WorldSpaces.OVERWORLD) {
             if (getRoomBounds(colony, WorldSpaces.RANCHER_YARD).contains(ant.getX(), ant.getY())) return WorldSpaces.RANCHER_YARD;
@@ -346,7 +349,7 @@ public class ColonyPhysicsService {
 
     // --- Room Logic & Estimates ---
     public Rectangle getTargetRoomForAnt(Colony colony, Ant ant, int gameWidth) {
-        if (ant.getRole() == GameConstants.ROLE_BUILDER && colony.getCurrentBuildingProject() != null) {
+        if ((ant.getRole() == GameConstants.ROLE_BUILDER || ant.getRole() == GameConstants.ROLE_CRANE) && colony.getCurrentBuildingProject() != null) {
             return getRoomBounds(colony, WorldSpaces.CONSTRUCTION_SITE);
         }
         if (ant.getRole() == GameConstants.ROLE_ASSISTANT) {
@@ -373,13 +376,20 @@ public class ColonyPhysicsService {
     }
 
     private Room findRoomForAnt(Colony colony, Ant ant) {
-        if (ant.getRole() == GameConstants.ROLE_BUILDER && colony.getCurrentBuildingProject() != null) {
+        if ((ant.getRole() == GameConstants.ROLE_BUILDER || ant.getRole() == GameConstants.ROLE_CRANE) && colony.getCurrentBuildingProject() != null) {
             return WorldSpaces.CONSTRUCTION_SITE;
         }
         
         if (ant.getAntType() == GameConstants.TYPE_DRONE || ant.getRole() == GameConstants.ROLE_BREEDER) {
             if (colony.hasUpgrade(GameUnlocks.ROLE_BREEDER)) {
                 return WorldSpaces.BREEDER_CHAMBER;
+            }
+        }
+        
+        if ((ant.getRole() == GameConstants.ROLE_BORER || ant.getRole() == GameConstants.ROLE_ENGINEER)) {
+            boolean hasTunnels = colony.getDynasty() != null && !colony.getDynasty().getTunnels().isEmpty();
+            if (hasTunnels) {
+                return WorldSpaces.TRANSIT_CHAMBER;
             }
         }
         
@@ -425,6 +435,12 @@ public class ColonyPhysicsService {
             if (colony.getBreederBounds() != null) return colony.getBreederBounds();
             int cx = ANCHOR_CENTER_X;
             return new Rectangle(cx - 256, 512, 256, 256);
+        }
+
+        if (room == WorldSpaces.TRANSIT_CHAMBER) {
+            if (colony.getTransitBounds() != null) return colony.getTransitBounds();
+            int cx = ANCHOR_CENTER_X;
+            return new Rectangle(cx + 64, 512, 512, 256);
         }
 
         if (room == WorldSpaces.CONSTRUCTION_SITE) {
@@ -523,7 +539,7 @@ public class ColonyPhysicsService {
         if (isAllowedInRoom(WorldSpaces.ROYAL_CHAMBER, ant)) return true;
         if (isAllowedInRoom(WorldSpaces.STORAGE, ant)) return true; 
         
-        if (ant.getRole() == GameConstants.ROLE_BUILDER) return true;
+        if (ant.getRole() == GameConstants.ROLE_BUILDER || ant.getRole() == GameConstants.ROLE_CRANE) return true;
         if (ant.getRole() == GameConstants.ROLE_BREEDER || ant.getAntType() == GameConstants.TYPE_DRONE) return true;
         if (ant.getRole() == GameConstants.ROLE_ASSISTANT) return true;
         

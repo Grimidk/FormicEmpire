@@ -43,6 +43,7 @@ public class Savefile implements Serializable {
     private List<SavedHex> worldHexes;
     private List<SavedColony> colonies;
     private List<SavedDynasty> dynastys;
+    private List<SavedTrade> trades;
 
     public Savefile(int id, String name) {
         this.id = id;
@@ -51,6 +52,7 @@ public class Savefile implements Serializable {
         this.worldHexes = new ArrayList<>();
         this.colonies = new ArrayList<>();
         this.dynastys = new ArrayList<>();
+        this.trades = new ArrayList<>();
         this.minute = 0;
         this.hour = 0;
         this.day = 1;
@@ -69,9 +71,16 @@ public class Savefile implements Serializable {
         public int speciesId;
         public int researchPoints;
         public int totalNuptialFlights;
+        public boolean defaultAutomationEnabled;
+        public boolean defaultAutoBuildEnabled;
         public List<Integer> unlockedUpgradeIds = new ArrayList<>();
         public List<Integer> absorbedDynastyIds = new ArrayList<>();
+        public List<Integer> defeatedSpeciesIds = new ArrayList<>();
+        public List<Integer> completedAssimilationIds = new ArrayList<>();
+        public int currentAssimilationId = -1;
+        public double assimilationProgress = 0;
         public Map<String, Integer> deathStatistics = new HashMap<>();
+        public List<SavedTunnel> tunnels = new ArrayList<>();
     }
 
     public static class SavedColony implements Serializable {
@@ -137,6 +146,40 @@ public class Savefile implements Serializable {
             this.timeOffset = timeOffset;
             this.weatherId = weatherId;
         }
+    }
+
+    public static class SavedTunnel implements Serializable {
+        private static final long serialVersionUID = 1L;
+        public int qA, rA;
+        public int qB, rB;
+        public double progress;
+        public double totalCost;
+        public boolean isComplete;
+    }
+
+    public static class SavedTrade implements Serializable {
+        private static final long serialVersionUID = 1L;
+        public int qOrigin, rOrigin;
+        public int qDest, rDest;
+        public Map<Integer, Double> load = new HashMap<>();
+        public Map<Integer, Double> returnLoad = new HashMap<>();
+        public Map<Integer, Integer> transport = new HashMap<>();
+        public boolean isRecurrent;
+        public boolean isBilateral;
+        public int methodId;
+        public boolean isActive;
+        public int totalHours;
+        public int remainingHours;
+        public boolean isReturning;
+        
+        // Pending Updates
+        public boolean hasPendingUpdate;
+        public Map<Integer, Double> pendingLoad = new HashMap<>();
+        public Map<Integer, Double> pendingReturnLoad = new HashMap<>();
+        public Map<Integer, Integer> pendingTransport = new HashMap<>();
+        public boolean pendingRecurrent;
+        public boolean pendingIsBilateral;
+        public int pendingMethodId;
     }
 
     // --- Getters & Setters ---
@@ -215,4 +258,7 @@ public class Savefile implements Serializable {
 
     public List<SavedDynasty> getDynastys() { return dynastys; }
     public void setDynastys(List<SavedDynasty> dynastys) { this.dynastys = dynastys; }
+
+    public List<SavedTrade> getTrades() { return trades; }
+    public void setTrades(List<SavedTrade> trades) { this.trades = trades; }
 }

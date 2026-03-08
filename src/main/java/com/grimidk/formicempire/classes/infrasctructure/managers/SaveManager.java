@@ -7,15 +7,21 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.lang.reflect.Field;
 import javax.swing.SwingUtilities;
 
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
+import com.grimidk.formicempire.classes.constants.ant.AntType;
+import com.grimidk.formicempire.classes.constants.misc.ResourceType;
+import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
+import com.grimidk.formicempire.classes.entities.Trade;
+import com.grimidk.formicempire.classes.entities.Tunnel;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.World;
@@ -159,7 +165,7 @@ public class SaveManager {
 
         File f = getSlotFile(slotId, "autosave");
         Savefile save = new Savefile(slotId, nameToUse);
-        populateSavefileFromGame(save, w);
+        populateSavefileFromGame(save, w, w.getEngine());
 
         try {
             if (slotId > 0) {
@@ -266,7 +272,7 @@ public class SaveManager {
         
         String saveName = (name != null && !name.isEmpty()) ? name : ("Save " + slotId);
         Savefile save = new Savefile(slotId, saveName);
-        populateSavefileFromGame(save, w);
+        populateSavefileFromGame(save, w, w.getEngine());
         writeManualSave(save);
     }
 
@@ -314,7 +320,7 @@ public class SaveManager {
         });
     }
     
-    private void populateSavefileFromGame(Savefile save, World w) {
+    private void populateSavefileFromGame(Savefile save, World w, Engine engine) {
         save.setTimestamp(System.currentTimeMillis()); 
         save.setMinute(w.getMinute());
         save.setHour(w.getHour());
@@ -340,17 +346,110 @@ public class SaveManager {
                 sc.researchPoints = dynasty.getResearchPoints();
                 sc.totalNuptialFlights = dynasty.getTotalNuptialFlights();
                 sc.speciesId = dynasty.getSpecies() != null ? dynasty.getSpecies().getId() : 1;
-                
-                for(Upgrade u : dynasty.getUnlockedUpgrades()) {
-                    sc.unlockedUpgradeIds.add(u.getId());
+                sc.defaultAutomationEnabled = dynasty.isDefaultAutomationEnabled();
+                sc.defaultAutoBuildEnabled = dynasty.isDefaultAutoBuildEnabled();
+                sc.defeatedSpeciesIds = (dynasty.getDefeatedSpeciesIds() != null) ? new ArrayList<>(dynasty.getDefeatedSpeciesIds()) : new ArrayList<>();
+                sc.completedAssimilationIds = new ArrayList<>();
+                if (dynasty.getCompletedAssimilations() != null) {
+                    for (Assimilation a : dynasty.getCompletedAssimilations()) {
+                        sc.completedAssimilationIds.add(a.getId());
+                    }
                 }
-                sc.absorbedDynastyIds = new ArrayList<>(dynasty.getAbsorbedDynastyIds());
+                sc.currentAssimilationId = (dynasty.getCurrentAssimilation() != null) ? dynasty.getCurrentAssimilation().getId() : -1;
+                sc.assimilationProgress = dynasty.getAssimilationProgress();
                 
-                sc.deathStatistics = new HashMap<>(dynasty.getGlobalDeathStatistics());
+                sc.unlockedUpgradeIds = new ArrayList<>();
+                if (dynasty.getUnlockedUpgrades() != null) {
+                    for(Upgrade u : dynasty.getUnlockedUpgrades()) {
+                        sc.unlockedUpgradeIds.add(u.getId());
+                    }
+                }
+                sc.absorbedDynastyIds = (dynasty.getAbsorbedDynastyIds() != null) ? new ArrayList<>(dynasty.getAbsorbedDynastyIds()) : new ArrayList<>();
+                
+                sc.deathStatistics = (dynasty.getGlobalDeathStatistics() != null) ? new HashMap<>(dynasty.getGlobalDeathStatistics()) : new HashMap<>();
+                
+                // Save Tunnels
+                if (dynasty.getTunnels() != null) {
+                    for (Tunnel t : dynasty.getTunnels()) {
+                        Savefile.SavedTunnel st = new Savefile.SavedTunnel();
+                        st.qA = t.getHexA().getQ();
+                        st.rA = t.getHexA().getR();
+                        st.qB = t.getHexB().getQ();
+                        st.rB = t.getHexB().getR();
+                        st.progress = t.getProgress();
+                        st.totalCost = t.getTotalCost();
+                        st.isComplete = t.isComplete();
+                        sc.tunnels.add(st);
+                    }
+                }
+
                 dynastyList.add(sc);
             }
         }
         save.setDynastys(dynastyList);
+
+        // Save Trades
+        List<Savefile.SavedTrade> savedTrades = new ArrayList<>();
+        if (engine != null && engine.getTradeManager() != null) {
+            for (Trade t : engine.getTradeManager().getActiveTrades()) {
+                Savefile.SavedTrade st = new Savefile.SavedTrade();
+                st.qOrigin = t.getOrigin().getQ();
+                st.rOrigin = t.getOrigin().getR();
+                st.qDest = t.getDestination().getQ();
+                st.rDest = t.getDestination().getR();
+                st.isRecurrent = t.isRecurrent();
+                st.isBilateral = t.isBilateral();
+                st.methodId = t.getMethod().getId();
+                st.isActive = t.isActive();
+                
+                try {
+                    Field th = Trade.class.getDeclaredField("totalHours");
+                    Field rh = Trade.class.getDeclaredField("remainingHours");
+                    th.setAccessible(true);
+                    rh.setAccessible(true);
+                    st.totalHours = (int) th.get(t);
+                    st.remainingHours = (int) rh.get(t);
+                } catch (Exception ignore) {}
+                
+                st.isReturning = t.isReturning();
+                
+                for (Map.Entry<ResourceType, Double> e : t.getLoad().entrySet()) {
+                    st.load.put(e.getKey().getId(), e.getValue());
+                }
+                for (Map.Entry<ResourceType, Double> e : t.getReturnLoad().entrySet()) {
+                    st.returnLoad.put(e.getKey().getId(), e.getValue());
+                }
+                for (Map.Entry<AntType, Integer> e : t.getTransport().entrySet()) {
+                    st.transport.put(e.getKey().getId(), e.getValue());
+                }
+
+                // Save Pending
+                st.hasPendingUpdate = t.hasPendingUpdate();
+                if (st.hasPendingUpdate) {
+                    st.pendingRecurrent = t.isPendingRecurrent();
+                    st.pendingIsBilateral = t.isPendingBilateral();
+                    st.pendingMethodId = t.getPendingMethod().getId();
+                    if (t.getPendingLoad() != null) {
+                        for (Map.Entry<ResourceType, Double> e : t.getPendingLoad().entrySet()) {
+                            st.pendingLoad.put(e.getKey().getId(), e.getValue());
+                        }
+                    }
+                    if (t.getPendingReturnLoad() != null) {
+                        for (Map.Entry<ResourceType, Double> e : t.getPendingReturnLoad().entrySet()) {
+                            st.pendingReturnLoad.put(e.getKey().getId(), e.getValue());
+                        }
+                    }
+                    if (t.getPendingTransport() != null) {
+                        for (Map.Entry<AntType, Integer> e : t.getPendingTransport().entrySet()) {
+                            st.pendingTransport.put(e.getKey().getId(), e.getValue());
+                        }
+                    }
+                }
+                
+                savedTrades.add(st);
+            }
+        }
+        save.setTrades(savedTrades);
 
         // Save Hexes & Colonies
         if (w.getHexes() != null) {
@@ -498,6 +597,10 @@ public class SaveManager {
         w.write("  ],");
         w.newLine();
 
+        // - Trades -
+        w.write("  \"trades\": " + serializeTradesToJson(s.getTrades()) + ",");
+        w.newLine();
+
         // - Colonies -
         w.write("  \"colonies\": [");
         w.newLine();
@@ -526,9 +629,16 @@ public class SaveManager {
         writeJsonLine(w, "speciesId", sc.speciesId, false);
         writeJsonLine(w, "researchPoints", sc.researchPoints, false);
         writeJsonLine(w, "totalNuptialFlights", sc.totalNuptialFlights, false);
+        writeJsonLine(w, "defaultAutomationEnabled", sc.defaultAutomationEnabled, false);
+        writeJsonLine(w, "defaultAutoBuildEnabled", sc.defaultAutoBuildEnabled, false);
+        writeJsonLine(w, "currentAssimilationId", sc.currentAssimilationId, false);
+        writeJsonLine(w, "assimilationProgress", sc.assimilationProgress, false);
         w.write("      \"unlockedUpgradeIds\": " + serializeListToJson(sc.unlockedUpgradeIds) + ","); w.newLine();
         w.write("      \"absorbedDynastyIds\": " + serializeListToJson(sc.absorbedDynastyIds) + ","); w.newLine();
-        w.write("      \"deathStatistics\": " + serializeMapToJson(sc.deathStatistics)); w.newLine(); // Last item
+        w.write("      \"defeatedSpeciesIds\": " + serializeListToJson(sc.defeatedSpeciesIds) + ","); w.newLine();
+        w.write("      \"completedAssimilationIds\": " + serializeListToJson(sc.completedAssimilationIds) + ","); w.newLine();
+        w.write("      \"deathStatistics\": " + serializeMapToJson(sc.deathStatistics) + ","); w.newLine();
+        w.write("      \"tunnels\": " + serializeTunnelsToJson(sc.tunnels)); w.newLine();
         w.write("    }");
         if (!isLast) w.write(",");
         w.newLine();
@@ -643,6 +753,8 @@ public class SaveManager {
         
         List<Savefile.SavedColony> colonies = deserializeJsonToColonies(rootMap.get("colonies"));
         s.setColonies(colonies);
+
+        s.setTrades(deserializeJsonToTrades(rootMap.get("trades")));
         
         return s;
     }
@@ -651,6 +763,7 @@ public class SaveManager {
     
     private Map<String, String> parseTopLevelJson(String json) {
         Map<String, String> map = new HashMap<>();
+        if (json == null) return map;
         json = json.trim();
         if(json.startsWith("{")) json = json.substring(1);
         if(json.endsWith("}")) json = json.substring(0, json.length()-1);
@@ -694,7 +807,10 @@ public class SaveManager {
         List<Savefile.SavedDynasty> list = new ArrayList<>();
         if (jsonArray == null || !jsonArray.startsWith("[")) return list;
         
-        String content = jsonArray.substring(1, jsonArray.lastIndexOf("]"));        
+        int lastIdx = jsonArray.lastIndexOf("]");
+        if (lastIdx <= 1) return list;
+        
+        String content = jsonArray.substring(1, lastIdx);        
         int braceDepth = 0;
         int start = 0;
         for(int i=0; i<content.length(); i++) {
@@ -704,7 +820,9 @@ public class SaveManager {
                 braceDepth--;
                 if (braceDepth == 0) {
                     String dynastyJson = content.substring(start, i+1);
-                    list.add(parseDynastyObject(dynastyJson));
+                    if (!dynastyJson.trim().isEmpty()) {
+                        list.add(parseDynastyObject(dynastyJson));
+                    }
                     while(i+1 < content.length() && (content.charAt(i+1) == ',' || Character.isWhitespace(content.charAt(i+1)))) i++;
                     start = i+1;
                 }
@@ -724,9 +842,16 @@ public class SaveManager {
         sc.speciesId = Integer.parseInt(map.getOrDefault("speciesId", "1"));
         sc.researchPoints = Integer.parseInt(map.getOrDefault("researchPoints", "0"));
         sc.totalNuptialFlights = Integer.parseInt(map.getOrDefault("totalNuptialFlights", "0"));
+        sc.defaultAutomationEnabled = Boolean.parseBoolean(map.getOrDefault("defaultAutomationEnabled", "false"));
+        sc.defaultAutoBuildEnabled = Boolean.parseBoolean(map.getOrDefault("defaultAutoBuildEnabled", "false"));
+        sc.currentAssimilationId = Integer.parseInt(map.getOrDefault("currentAssimilationId", "-1"));
+        sc.assimilationProgress = Double.parseDouble(map.getOrDefault("assimilationProgress", "0.0"));
         sc.unlockedUpgradeIds = deserializeJsonToList(map.get("unlockedUpgradeIds"));
         sc.absorbedDynastyIds = deserializeJsonToList(map.get("absorbedDynastyIds"));
+        sc.defeatedSpeciesIds = deserializeJsonToList(map.get("defeatedSpeciesIds"));
+        sc.completedAssimilationIds = deserializeJsonToList(map.get("completedAssimilationIds"));
         sc.deathStatistics = deserializeJsonToMap(map.get("deathStatistics"));
+        sc.tunnels = deserializeJsonToTunnels(map.get("tunnels"));
         return sc;
     }
 
@@ -734,7 +859,10 @@ public class SaveManager {
         List<Savefile.SavedColony> list = new ArrayList<>();
         if (jsonArray == null || !jsonArray.startsWith("[")) return list;
         
-        String content = jsonArray.substring(1, jsonArray.lastIndexOf("]"));        
+        int lastIdx = jsonArray.lastIndexOf("]");
+        if (lastIdx <= 1) return list;
+        
+        String content = jsonArray.substring(1, lastIdx);        
         int braceDepth = 0;
         int start = 0;
         for(int i=0; i<content.length(); i++) {
@@ -744,7 +872,9 @@ public class SaveManager {
                 braceDepth--;
                 if (braceDepth == 0) {
                     String colJson = content.substring(start, i+1);
-                    list.add(parseColonyObject(colJson));
+                    if (!colJson.trim().isEmpty()) {
+                        list.add(parseColonyObject(colJson));
+                    }
                     while(i+1 < content.length() && (content.charAt(i+1) == ',' || Character.isWhitespace(content.charAt(i+1)))) i++;
                     start = i+1;
                 }
@@ -845,6 +975,20 @@ public class SaveManager {
         sb.append("}");
         return sb.toString();
     }
+
+    private String serializeDoubleMapToJson(Map<String, Double> map) {
+        if (map == null || map.isEmpty()) return "{}";
+        StringBuilder sb = new StringBuilder();
+        sb.append("{");
+        int i = 0;
+        for (Map.Entry<String, Double> entry : map.entrySet()) {
+            sb.append("\"").append(escapeJsonString(entry.getKey())).append("\":").append(entry.getValue());
+            if (i < map.size() - 1) sb.append(",");
+            i++;
+        }
+        sb.append("}");
+        return sb.toString();
+    }
     
     private String serializeSourcesToJson(List<Savefile.SavedResourceSource> sources) {
         if (sources == null || sources.isEmpty()) {
@@ -892,8 +1036,90 @@ public class SaveManager {
         sb.append("]");
         return sb.toString();
     }
+
+    private String serializeTunnelsToJson(List<Savefile.SavedTunnel> tunnels) {
+        if (tunnels == null || tunnels.isEmpty()) return "[]";
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (int i = 0; i < tunnels.size(); i++) {
+            Savefile.SavedTunnel t = tunnels.get(i);
+            sb.append("{");
+            sb.append("\"qA\":").append(t.qA).append(",");
+            sb.append("\"rA\":").append(t.rA).append(",");
+            sb.append("\"qB\":").append(t.qB).append(",");
+            sb.append("\"rB\":").append(t.rB).append(",");
+            sb.append("\"p\":").append(t.progress).append(",");
+            sb.append("\"tc\":").append(t.totalCost).append(",");
+            sb.append("\"ic\":").append(t.isComplete);
+            sb.append("}");
+            if (i < tunnels.size() - 1) sb.append(",");
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
+    private String serializeTradesToJson(List<Savefile.SavedTrade> trades) {
+        if (trades == null || trades.isEmpty()) return "[]";
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (int i = 0; i < trades.size(); i++) {
+            Savefile.SavedTrade t = trades.get(i);
+            sb.append("{");
+            sb.append("\"qo\":").append(t.qOrigin).append(",");
+            sb.append("\"ro\":").append(t.rOrigin).append(",");
+            sb.append("\"qd\":").append(t.qDest).append(",");
+            sb.append("\"rd\":").append(t.rDest).append(",");
+            sb.append("\"ir\":").append(t.isRecurrent).append(",");
+            sb.append("\"ib\":").append(t.isBilateral).append(",");
+            sb.append("\"mid\":").append(t.methodId).append(",");
+            sb.append("\"ia\":").append(t.isActive).append(",");
+            sb.append("\"th\":").append(t.totalHours).append(",");
+            sb.append("\"rh\":").append(t.remainingHours).append(",");
+            sb.append("\"ret\":").append(t.isReturning).append(",");
+            
+            Map<String, Double> loadStrMap = new HashMap<>();
+            for (Map.Entry<Integer, Double> e : t.load.entrySet()) loadStrMap.put(String.valueOf(e.getKey()), e.getValue());
+            sb.append("\"load\":").append(serializeDoubleMapToJson(loadStrMap)).append(",");
+
+            Map<String, Double> returnLoadStrMap = new HashMap<>();
+            for (Map.Entry<Integer, Double> e : t.returnLoad.entrySet()) returnLoadStrMap.put(String.valueOf(e.getKey()), e.getValue());
+            sb.append("\"rload\":").append(serializeDoubleMapToJson(returnLoadStrMap)).append(",");
+            
+            Map<String, Integer> transportStrMap = new HashMap<>();
+            for (Map.Entry<Integer, Integer> e : t.transport.entrySet()) transportStrMap.put(String.valueOf(e.getKey()), e.getValue());
+            sb.append("\"trans\":").append(serializeMapToJson(transportStrMap)).append(",");
+
+            // Pending Updates
+            sb.append("\"hpu\":").append(t.hasPendingUpdate).append(",");
+            if (t.hasPendingUpdate) {
+                sb.append("\"pir\":").append(t.pendingRecurrent).append(",");
+                sb.append("\"pib\":").append(t.pendingIsBilateral).append(",");
+                sb.append("\"pmid\":").append(t.pendingMethodId).append(",");
+                
+                Map<String, Double> pLoadStrMap = new HashMap<>();
+                for (Map.Entry<Integer, Double> e : t.pendingLoad.entrySet()) pLoadStrMap.put(String.valueOf(e.getKey()), e.getValue());
+                sb.append("\"pload\":").append(serializeDoubleMapToJson(pLoadStrMap)).append(",");
+
+                Map<String, Double> pReturnLoadStrMap = new HashMap<>();
+                for (Map.Entry<Integer, Double> e : t.pendingReturnLoad.entrySet()) pReturnLoadStrMap.put(String.valueOf(e.getKey()), e.getValue());
+                sb.append("\"prload\":").append(serializeDoubleMapToJson(pReturnLoadStrMap)).append(",");
+
+                Map<String, Integer> pTransportStrMap = new HashMap<>();
+                for (Map.Entry<Integer, Integer> e : t.pendingTransport.entrySet()) pTransportStrMap.put(String.valueOf(e.getKey()), e.getValue());
+                sb.append("\"ptrans\":").append(serializeMapToJson(pTransportStrMap));
+            } else {
+                // remove trailing comma if no pending updates
+                sb.setLength(sb.length() - 1);
+            }
+            
+            sb.append("}");
+            if (i < trades.size() - 1) sb.append(",");
+        }
+        sb.append("]");
+        return sb.toString();
+    }
     
-    private static final Pattern JSON_PAIR_PATTERN = Pattern.compile("\"([^\"]*)\":([0-9]+)");
+    private static final Pattern JSON_PAIR_PATTERN = Pattern.compile("\"([^\"]*)\":([0-9.]+)");
 
     private Map<String, Integer> deserializeJsonToMap(String json) {
         Map<String, Integer> map = new HashMap<>();
@@ -904,15 +1130,31 @@ public class SaveManager {
         while (m.find()) {
             try {
                 String key = unescapeJsonString(m.group(1));
-                int value = Integer.parseInt(m.group(2));
+                int value = (int) Double.parseDouble(m.group(2));
                 map.put(key, value);
             } catch (Exception e) {
-                System.err.println("Error parsing role map pair: " + m.group(0));
+                System.err.println("Error parsing map pair: " + m.group(0));
             }
         }
         return map;
     }
 
+    private Map<String, Double> deserializeJsonToDoubleMap(String json) {
+        Map<String, Double> map = new HashMap<>();
+        if (json == null || json.length() <= 2) return map;
+        String content = json.substring(1, json.length() - 1);
+        String[] parts = content.split(",");
+        for (String part : parts) {
+            String[] kv = part.split(":");
+            if (kv.length == 2) {
+                String k = kv[0].trim().replace("\"", "");
+                double v = Double.parseDouble(kv[1].trim());
+                map.put(k, v);
+            }
+        }
+        return map;
+    }
+    
     private List<Integer> deserializeJsonToList(String json) {
         List<Integer> list = new ArrayList<>();
         if (json == null || json.length() <= 2) {
@@ -929,7 +1171,7 @@ public class SaveManager {
             try {
                 list.add(Integer.parseInt(part.trim()));
             } catch (NumberFormatException e) {
-                System.err.println("Error parsing upgrade ID: " + part);
+                System.err.println("Error parsing list ID: " + part);
             }
         }
         return list;
@@ -1017,6 +1259,111 @@ public class SaveManager {
                 list.add(new Savefile.SavedHex(q, r, b, c, t, w));
             } catch (Exception e) {
                 e.printStackTrace();
+            }
+        }
+        return list;
+    }
+
+    private List<Savefile.SavedTunnel> deserializeJsonToTunnels(String jsonArray) {
+        List<Savefile.SavedTunnel> list = new ArrayList<>();
+        if (jsonArray == null || !jsonArray.startsWith("[")) return list;
+        
+        int lastIdx = jsonArray.lastIndexOf("]");
+        if (lastIdx <= 1) return list;
+        
+        String content = jsonArray.substring(1, lastIdx);
+        int braceDepth = 0;
+        int start = 0;
+        for(int i=0; i<content.length(); i++) {
+            char c = content.charAt(i);
+            if (c == '{') braceDepth++;
+            if (c == '}') {
+                braceDepth--;
+                if (braceDepth == 0) {
+                    String tunnelJson = content.substring(start, i+1);
+                    if (!tunnelJson.trim().isEmpty()) {
+                        Savefile.SavedTunnel st = new Savefile.SavedTunnel();
+                        Map<String, String> m = parseTopLevelJson(tunnelJson);
+                        st.qA = Integer.parseInt(m.getOrDefault("qA", "0"));
+                        st.rA = Integer.parseInt(m.getOrDefault("rA", "0"));
+                        st.qB = Integer.parseInt(m.getOrDefault("qB", "0"));
+                        st.rB = Integer.parseInt(m.getOrDefault("rB", "0"));
+                        st.progress = Double.parseDouble(m.getOrDefault("p", "0"));
+                        st.totalCost = Double.parseDouble(m.getOrDefault("tc", "0"));
+                        st.isComplete = Boolean.parseBoolean(m.getOrDefault("ic", "false"));
+                        list.add(st);
+                    }
+                    while(i+1 < content.length() && (content.charAt(i+1) == ',' || Character.isWhitespace(content.charAt(i+1)))) i++;
+                    start = i+1;
+                }
+            }
+        }
+        return list;
+    }
+
+    private List<Savefile.SavedTrade> deserializeJsonToTrades(String jsonArray) {
+        List<Savefile.SavedTrade> list = new ArrayList<>();
+        if (jsonArray == null || !jsonArray.startsWith("[")) return list;
+        
+        int lastIdx = jsonArray.lastIndexOf("]");
+        if (lastIdx <= 1) return list;
+        
+        String content = jsonArray.substring(1, lastIdx);
+        int braceDepth = 0;
+        int start = 0;
+        for(int i=0; i<content.length(); i++) {
+            char c = content.charAt(i);
+            if (c == '{') braceDepth++;
+            if (c == '}') {
+                braceDepth--;
+                if (braceDepth == 0) {
+                    String tradeJson = content.substring(start, i+1);
+                    if (!tradeJson.trim().isEmpty()) {
+                        Savefile.SavedTrade st = new Savefile.SavedTrade();
+                        Map<String, String> m = parseTopLevelJson(tradeJson);
+                        st.qOrigin = Integer.parseInt(m.getOrDefault("qo", "0"));
+                        st.rOrigin = Integer.parseInt(m.getOrDefault("ro", "0"));
+                        st.qDest = Integer.parseInt(m.getOrDefault("qd", "0"));
+                        st.rDest = Integer.parseInt(m.getOrDefault("rd", "0"));
+                        st.isRecurrent = Boolean.parseBoolean(m.getOrDefault("ir", "false"));
+                        st.isBilateral = Boolean.parseBoolean(m.getOrDefault("ib", "false"));
+                        st.methodId = Integer.parseInt(m.getOrDefault("mid", "1"));
+                        st.isActive = Boolean.parseBoolean(m.getOrDefault("ia", "false"));
+                        st.totalHours = Integer.parseInt(m.getOrDefault("th", "0"));
+                        st.remainingHours = Integer.parseInt(m.getOrDefault("rh", "0"));
+                        st.isReturning = Boolean.parseBoolean(m.getOrDefault("ret", "false"));
+                        
+                        Map<String, Double> loadMap = deserializeJsonToDoubleMap(m.get("load"));
+                        for (Map.Entry<String, Double> e : loadMap.entrySet()) st.load.put(Integer.parseInt(e.getKey()), e.getValue());
+
+                        Map<String, Double> rLoadMap = deserializeJsonToDoubleMap(m.get("rload"));
+                        for (Map.Entry<String, Double> e : rLoadMap.entrySet()) st.returnLoad.put(Integer.parseInt(e.getKey()), e.getValue());
+                        
+                        Map<String, Integer> transMap = deserializeJsonToMap(m.get("trans"));
+                        for (Map.Entry<String, Integer> e : transMap.entrySet()) st.transport.put(Integer.parseInt(e.getKey()), e.getValue());
+
+                        // Pending
+                        st.hasPendingUpdate = Boolean.parseBoolean(m.getOrDefault("hpu", "false"));
+                        if (st.hasPendingUpdate) {
+                            st.pendingRecurrent = Boolean.parseBoolean(m.getOrDefault("pir", "false"));
+                            st.pendingIsBilateral = Boolean.parseBoolean(m.getOrDefault("pib", "false"));
+                            st.pendingMethodId = Integer.parseInt(m.getOrDefault("pmid", "1"));
+
+                            Map<String, Double> pLoadMap = deserializeJsonToDoubleMap(m.get("pload"));
+                            for (Map.Entry<String, Double> e : pLoadMap.entrySet()) st.pendingLoad.put(Integer.parseInt(e.getKey()), e.getValue());
+
+                            Map<String, Double> pReturnLoadMap = deserializeJsonToDoubleMap(m.get("prload"));
+                            for (Map.Entry<String, Double> e : pReturnLoadMap.entrySet()) st.pendingReturnLoad.put(Integer.parseInt(e.getKey()), e.getValue());
+
+                            Map<String, Integer> pTransMap = deserializeJsonToMap(m.get("ptrans"));
+                            for (Map.Entry<String, Integer> e : pTransMap.entrySet()) st.pendingTransport.put(Integer.parseInt(e.getKey()), e.getValue());
+                        }
+                        
+                        list.add(st);
+                    }
+                    while(i+1 < content.length() && (content.charAt(i+1) == ',' || Character.isWhitespace(content.charAt(i+1)))) i++;
+                    start = i+1;
+                }
             }
         }
         return list;

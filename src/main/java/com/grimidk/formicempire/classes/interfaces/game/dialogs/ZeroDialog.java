@@ -1,5 +1,7 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
+import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -11,13 +13,17 @@ public abstract class ZeroDialog extends JDialog {
     public ZeroDialog(JFrame owner, String title, Dimension preferredSize) {
         super(owner, title, true);
         
+        getContentPane().setBackground(AssetStyles.UI_BG_PRIMARY);
         setLayout(new BorderLayout());
         if (preferredSize != null) {
             setPreferredSize(preferredSize);
         }
 
         southPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        southPanel.setBackground(AssetStyles.UI_BG_SECONDARY);
+        
         JButton closeButton = new JButton("Close");
+        closeButton.setFont(AssetStyles.FONT_NORMAL);
         closeButton.addActionListener(e -> dispose());
         southPanel.add(closeButton);
         add(southPanel, BorderLayout.SOUTH);

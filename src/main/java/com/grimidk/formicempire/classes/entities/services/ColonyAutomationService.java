@@ -65,6 +65,7 @@ public class ColonyAutomationService {
 
         calculateWorkerQuotas(colony, targets);
         calculateSoldierQuotas(colony, targets);
+        calculateMajorQuotas(colony, targets);
         calculatePrincessQuotas(colony, targets);
         calculateQueenQuotas(colony, targets);
 
@@ -240,6 +241,19 @@ public class ColonyAutomationService {
 
         if (remainingSoldiers > 0 && colony.hasUpgrade(GameUnlocks.ROLE_HUNTER)) {
             targets.put(GameConstants.ROLE_HUNTER, remainingSoldiers);
+        }
+    }
+
+    private void calculateMajorQuotas(Colony colony, Map<AntRole, Integer> targets) {
+        int totalMajors = colony.getMajors().size();
+        if (totalMajors == 0) return;
+        
+        if (colony.getCurrentBuildingProject() != null && colony.hasUpgrade(GameUnlocks.ROLE_CRANE)) {
+            targets.put(GameConstants.ROLE_CRANE, totalMajors);
+            targets.put(GameConstants.ROLE_BRUTE, 0);
+        } else {
+            targets.put(GameConstants.ROLE_CRANE, 0);
+            targets.put(GameConstants.ROLE_BRUTE, totalMajors);
         }
     }
 

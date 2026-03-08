@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList; 
 import java.awt.Rectangle;
 import java.awt.Point; 
@@ -19,14 +18,14 @@ import com.grimidk.formicempire.classes.constants.misc.Species;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
-import com.grimidk.formicempire.classes.constants.world.Biome;
-import com.grimidk.formicempire.classes.constants.world.Temperature;
 import com.grimidk.formicempire.classes.infrasctructure.Dimension;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
+import com.grimidk.formicempire.classes.constants.world.Biome;
+import com.grimidk.formicempire.classes.constants.world.Temperature;
 
 public class Colony {
     
@@ -75,6 +74,7 @@ public class Colony {
     private int gameAreaWidth = 1;
     private int gameAreaHeight = 1;
     private Building currentBuildingProject = null;
+    private Tunnel currentTunnelProject = null;
     private double buildingProgressHours = 0.0;
     private final List<String> eventLog = new ArrayList<>();
 
@@ -87,6 +87,7 @@ public class Colony {
     private Rectangle rancherBounds; 
     private Rectangle graverBounds;
     private Rectangle breederBounds; 
+    private Rectangle transitBounds; 
 
     // --- Service Dependencies ---
     private transient ColonyStatsService statsService;
@@ -97,6 +98,7 @@ public class Colony {
     private transient ColonySumarizationService sumarizationService;
     private transient ColonyAutomationService automationService;
     private transient ColonyResourceService resourceService;
+    private transient ColonyStarterService starterService;
 
     // --- Service Initializer ---
     private void initializeServices() {
@@ -108,6 +110,7 @@ public class Colony {
         this.sumarizationService = new ColonySumarizationService();
         this.automationService = new ColonyAutomationService(); 
         this.resourceService = new ColonyResourceService();
+        this.starterService = new ColonyStarterService();
     }
 
     // --- Initialization Methods ---
@@ -305,6 +308,11 @@ public class Colony {
     }
         
     // --- Population Initializer ---
+    public void addAnts(AntType type, int count) {
+        List<Ant> list = getAntsByType(type);
+        populateAntList(list, count, type);
+    }
+
     private void populateAntList(List<Ant> list, int count, AntType type) {
         for (int i = 0; i < count; i++) {
             Ant newAnt = new Ant(this, type);
@@ -450,6 +458,8 @@ public class Colony {
     public Set<Building> getUnlockedBuildings() { return this.buildings; }
     public Building getCurrentBuildingProject() { return currentBuildingProject; }
     public void setCurrentBuildingProject(Building b) { this.currentBuildingProject = b; }
+    public Tunnel getCurrentTunnelProject() { return currentTunnelProject; }
+    public void setCurrentTunnelProject(Tunnel t) { this.currentTunnelProject = t; }
     public double getBuildingProgressHours() { return buildingProgressHours; }
     public void setBuildingProgressHours(double d) { this.buildingProgressHours = d; }
 
@@ -648,7 +658,7 @@ public class Colony {
     public void setTotalDeaths (int totalDeaths) { this.totalDeaths = totalDeaths; }
     
     // --- Room Bounds Getters/Setters ---
-    public void setRoomBounds(Rectangle entrance, Rectangle storage, Rectangle farm, Rectangle nursery, Rectangle royal, Rectangle rancher, Rectangle graver, Rectangle breeder) {
+    public void setRoomBounds(Rectangle entrance, Rectangle storage, Rectangle farm, Rectangle nursery, Rectangle royal, Rectangle rancher, Rectangle graver, Rectangle breeder, Rectangle transit) {
         this.entranceBounds = entrance;
         this.storageBounds = storage;
         this.farmBounds = farm;
@@ -657,12 +667,13 @@ public class Colony {
         this.rancherBounds = rancher;
         this.graverBounds = graver;
         this.breederBounds = breeder;
+        this.transitBounds = transit;
     }
-    
+
     public void setRoomBounds(Rectangle entrance, Rectangle storage, Rectangle farm, Rectangle nursery, Rectangle royal, Rectangle rancher, Rectangle graver) {
-        setRoomBounds(entrance, storage, farm, nursery, royal, rancher, graver, null);
+        setRoomBounds(entrance, storage, farm, nursery, royal, rancher, graver, null, null);
     }
-    
+
     public Rectangle getEntranceBounds() { return entranceBounds; }
     public Rectangle getStorageBounds() { return storageBounds; }
     public Rectangle getFarmBounds() { return farmBounds; }
@@ -671,7 +682,7 @@ public class Colony {
     public Rectangle getRancherBounds() { return rancherBounds; }
     public Rectangle getGraverBounds() { return graverBounds; }
     public Rectangle getBreederBounds() { return breederBounds; }
-    
+    public Rectangle getTransitBounds() { return transitBounds; }    
     public Rectangle getTargetRoomForAnt(Ant ant) {
         AntRole role = ant.getRole();
         if (ant.getAntType() == GameConstants.TYPE_QUEEN) return royalBounds;
@@ -696,6 +707,7 @@ public class Colony {
     public ColonySumarizationService getSumarizationService() { return this.sumarizationService; }
     public ColonyAutomationService getAutomationService() { return this.automationService; }
     public ColonyResourceService getResourceService() { return this.resourceService; }
+    public ColonyStarterService getStarterService() { return this.starterService; }
 
     public int getTotalConsumption(){ return statsService.getTotalConsumption(this); }
     public int getTotalProduction(){ return statsService.getTotalProduction(this); }
@@ -726,6 +738,7 @@ public class Colony {
     public int getBaseDefense() { return statsService.getBaseDefense(this); }
     public int getBaseSpeed() { return statsService.getBaseSpeed(this); }
     public int getSourceCapacity() { return statsService.getSourceCapacity(this); }
+    public double getConstructionEfficiency() { return statsService.getConstructionEfficiency(this); }
 
 
     // --- Simulation Logic Methods ---
@@ -807,12 +820,15 @@ public class Colony {
             this.runResearch();
             this.runRanching();
             this.runBuilding();
+            this.labourService.runTunnelConstruction(this);
             this.runCollecting(); 
         } else {
             if (this.automationEnabled) {
                 this.automationService.runAutomation(this);
             }
             this.populationService.runRoleAssignment(this); 
+            this.runResearch();
+            this.labourService.runTunnelConstruction(this);
             this.sumarizationService.runHourlyLite(this, biome);
         }
     }
@@ -861,62 +877,10 @@ public class Colony {
     }
 
     public void matureColony() {
-        System.out.println("[Colony] Maturation complete. Spawning workforce for " + this.getName());
-        Random random = new Random();
-
-        List<Ant> workerList = this.getWorkers();
-        for (int i = 0; i < 9; i++) {
-            Ant worker = new Ant(this, GameConstants.TYPE_WORKER);
-            workerList.add(worker);
-        }
-
-        configureWorker(0, GameConstants.ROLE_NURSE, WorldSpaces.UNDERWORLD);
-        configureWorker(1, GameConstants.ROLE_NURSE, WorldSpaces.UNDERWORLD);
-        configureWorker(2, GameConstants.ROLE_FARMER, WorldSpaces.UNDERWORLD);
-        configureWorker(3, GameConstants.ROLE_NURSE, WorldSpaces.UNDERWORLD);
-        configureWorker(4, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
-        configureWorker(5, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
-        configureWorker(6, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
-        configureWorker(7, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
-        configureWorker(8, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
-
-        this.setAssignedRoleCount(GameConstants.ROLE_LAYER, 1);
-        this.setAssignedRoleCount(GameConstants.ROLE_NURSE, 3);
-        this.setAssignedRoleCount(GameConstants.ROLE_FARMER, 1);
-        this.setAssignedRoleCount(GameConstants.ROLE_FORAGER, 5);
-
-        if (this.locationService != null) {
-            if (this.locationService.getDiscoveredSources().isEmpty()) {
-                int range = 300;
-                
-                int centerX = ColonyLocationService.ANCHOR_CENTER_X; 
-                int centerY = ColonyLocationService.ANCHOR_HEIGHT / 2;
-                
-                int pX = centerX + random.nextInt((range * 2) + 1) - range;
-                int pY = centerY + random.nextInt((range * 2) + 1) - range;
-                pX = Math.max(50, pX);
-                pY = Math.max(50, pY);
-                ResourceSource initialPlant = new ResourceSource(GameConstants.RESOURCE_PLANT, 10000, pX, pY);
-                
-                int wX = centerX + random.nextInt((range * 2) + 1) - range;
-                int wY = centerY + random.nextInt((range * 2) + 1) - range;
-                wX = Math.max(50, wX);
-                wY = Math.max(50, wY);
-                ResourceSource initialWater = new ResourceSource(GameConstants.RESOURCE_WATER, 10000, wX, wY);
-                
-                this.locationService.addSource(this, initialPlant);
-                this.locationService.addSource(this, initialWater);
-            }
-        }
-        
-        if (this.physicsService != null) {
-            this.physicsService.randomizeAllAntPositions(this);
-        }
-
-        this.logEvent("Colony Maturation Complete: Workforce deployed.");
+        starterService.matureColony(this);
     }
     
-    private void configureWorker(int index, AntRole role, Dimension dim) {
+    public void configureWorker(int index, AntRole role, Dimension dim) {
         if (this.getWorkers() != null && index < this.getWorkers().size()) {
             Ant worker = this.getWorkers().get(index);
             worker.setRole(role);

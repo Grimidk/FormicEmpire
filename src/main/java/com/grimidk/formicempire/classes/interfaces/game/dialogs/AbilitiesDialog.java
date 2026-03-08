@@ -5,6 +5,7 @@ import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 import com.grimidk.formicempire.classes.interfaces.MainFrame;
@@ -31,19 +32,23 @@ public class AbilitiesDialog extends ZeroDialog {
         this.colony = colony;
         
         JPanel northPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        northPanel.setBackground(AssetStyles.UI_BG_SECONDARY);
         northPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
         researchPointsLabel = new JLabel();
-        researchPointsLabel.setFont(researchPointsLabel.getFont().deriveFont(Font.BOLD));
+        researchPointsLabel.setFont(AssetStyles.FONT_BOLD);
+        researchPointsLabel.setForeground(AssetStyles.TEXT_HEADER);
         northPanel.add(researchPointsLabel);
         add(northPanel, BorderLayout.NORTH);
 
         listPanel = new JPanel();
+        listPanel.setBackground(AssetStyles.UI_BG_PRIMARY);
         listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
         scrollPane = new JScrollPane(listPanel); 
+        scrollPane.getViewport().setBackground(AssetStyles.UI_BG_PRIMARY);
         scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         add(scrollPane, BorderLayout.CENTER);
         
-        registerCloseKey(KeyEvent.VK_Z);
+        registerCloseKey(KeyEvent.VK_C);
     }
 
     @Override
@@ -123,6 +128,8 @@ public class AbilitiesDialog extends ZeroDialog {
 
         if (!hasAnyAbility) {
             JLabel empty = new JLabel("No active abilities unlocked yet.");
+            empty.setForeground(AssetStyles.TEXT_NORMAL);
+            empty.setFont(AssetStyles.FONT_NORMAL);
             empty.setAlignmentX(Component.CENTER_ALIGNMENT);
             listPanel.add(Box.createVerticalGlue());
             listPanel.add(empty);
@@ -146,7 +153,12 @@ public class AbilitiesDialog extends ZeroDialog {
 
     private JPanel createAbilityPanel(String title, String desc, int rpCost, java.awt.event.ActionListener action, boolean enabled, String tooltip) {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBorder(new TitledBorder(title));
+        panel.setBackground(AssetStyles.UI_BG_SECONDARY);
+        
+        TitledBorder border = new TitledBorder(AssetStyles.PANEL_BORDER, title);
+        border.setTitleColor(AssetStyles.TEXT_HEADER);
+        border.setTitleFont(AssetStyles.FONT_BOLD);
+        panel.setBorder(border);
 
         JTextArea descriptionArea = new JTextArea(desc);
         descriptionArea.setWrapStyleWord(true);
@@ -154,14 +166,17 @@ public class AbilitiesDialog extends ZeroDialog {
         descriptionArea.setEditable(false);
         descriptionArea.setFocusable(false);
         descriptionArea.setBackground(panel.getBackground());
-        descriptionArea.setFont(new JLabel().getFont());
+        descriptionArea.setForeground(AssetStyles.TEXT_NORMAL);
+        descriptionArea.setFont(AssetStyles.FONT_NORMAL);
         
         panel.add(descriptionArea, BorderLayout.CENTER);
 
         JPanel actionPanel = new JPanel();
+        actionPanel.setOpaque(false);
         actionPanel.setLayout(new BoxLayout(actionPanel, BoxLayout.Y_AXIS));
         
         JButton btn = new JButton("Trigger");
+        btn.setFont(AssetStyles.FONT_BOLD);
         btn.setEnabled(enabled);
         btn.addActionListener(action);
         
@@ -172,6 +187,8 @@ public class AbilitiesDialog extends ZeroDialog {
         }
         
         JLabel costLabel = new JLabel(rpCost + " RP");
+        costLabel.setForeground(AssetStyles.FONT_COLOR_VALUE);
+        costLabel.setFont(AssetStyles.FONT_BOLD);
         costLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         btn.setAlignmentX(Component.CENTER_ALIGNMENT);
         

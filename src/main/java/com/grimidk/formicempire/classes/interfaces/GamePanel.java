@@ -8,6 +8,7 @@ import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.managers.AlertManager;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TriggerManager;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
 import com.grimidk.formicempire.classes.interfaces.game.dialogs.*;
@@ -77,7 +78,9 @@ public class GamePanel extends ZeroGamePanel {
         gameScrollPane.setOpaque(false);
         gameScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         gameScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        gameScrollPane.getVerticalScrollBar().setUnitIncrement(16);        
+        gameScrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        gameScrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
+        
         gameScrollPane.getViewport().addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
@@ -90,11 +93,14 @@ public class GamePanel extends ZeroGamePanel {
         Runnable handleBackButtonCallback = this::handleBackButton;
         Runnable showHatchRateDialogCallback = this::showHatchRateDialog;        
         Runnable showResearchDialogCallback = this::showResearchDialog;
-        Runnable showBuildDialogCallback = this::showBuildDialog;  
+        Runnable showBuildDialogCallback = this::showBuildDialog;
+        Runnable showAssimilationDialogCallback = this::showAssimilationDialog;
+        Runnable showSynergyDialogCallback = this::showSynergyDialog;
         Runnable showAbilitiesDialogCallback = this::showAbilitiesDialog;
         Runnable showMapDialogCallback = this::showMapDialog; 
         Runnable showStatsDialogCallback = this::showStatsDialog;
         Runnable showDynastyDialogCallback = this::showDynastyDialog;
+        Runnable showTradeDialogCallback = this::showTradeDialog;
         ControlPanel.RoleManagementCallback showRoleManagementDialogCallback = this::showRoleManagementDialog;
         
         Runnable toggleViewCallback = () -> {
@@ -114,12 +120,15 @@ public class GamePanel extends ZeroGamePanel {
             showHatchRateDialogCallback, 
             showResearchDialogCallback,
             showBuildDialogCallback,
+            showAssimilationDialogCallback,
+            showSynergyDialogCallback,
             showRoleManagementDialogCallback,
             showAbilitiesDialogCallback,
             showStatsDialogCallback,
             toggleViewCallback,
             showMapDialogCallback,
-            showDynastyDialogCallback); 
+            showDynastyDialogCallback,
+            showTradeDialogCallback); 
     }
     
     private void updateGameAreaSize() {
@@ -140,7 +149,7 @@ public class GamePanel extends ZeroGamePanel {
 
     private JPanel createNorthPanel() {
         statusIndicator.setOpaque(true);
-        statusIndicator.setBackground(Color.GRAY);
+        statusIndicator.setBackground(AssetStyles.BACKGROUND_SECONDARY);
         statusIndicator.setPreferredSize(new Dimension(12, 12));
         JPanel north = new JPanel(new FlowLayout(FlowLayout.LEFT));
         north.add(statusIndicator);
@@ -191,6 +200,11 @@ public class GamePanel extends ZeroGamePanel {
         Colony colony = getColonyFromEngine(engine);
         if (colony == null || !colony.isPlayer()) return;
         
+        if (hatchDialog != null && hatchDialog.isShowing()) {
+            hatchDialog.dispose();
+            return;
+        }
+        
         if (hatchDialog != null) {
             hatchDialog.dispose();
         }
@@ -198,22 +212,49 @@ public class GamePanel extends ZeroGamePanel {
         hatchDialog.showDialog();
     }
 
-    private void showRoleManagementDialog(int tabIndex) {
+    private void showRoleManagementDialog(int tabType) {
         Engine engine = frame.getEngine();
         Colony colony = getColonyFromEngine(engine);
         if (colony == null || !colony.isPlayer()) return;
+        
+        if (roleDialog != null && roleDialog.getColony() != colony) {
+            roleDialog.dispose();
+            roleDialog = null;
+        }
+
+        if (roleDialog != null && roleDialog.isTabOpen(tabType)) {
+            roleDialog.dispose();
+            return;
+        }
+
+        if (roleDialog != null && roleDialog.isShowing()) {
+            roleDialog.selectTab(tabType);
+            roleDialog.requestFocus();
+            return;
+        }
         
         if (roleDialog != null) {
             roleDialog.dispose();
         }
         roleDialog = new RoleManagementDialog(frame, colony);
-        roleDialog.showDialog(tabIndex);
+        roleDialog.showDialog(tabType);
     }
 
     private void showResearchDialog() {
         Engine engine = frame.getEngine();
         Colony colony = getColonyFromEngine(engine);
         if (colony == null || !colony.isPlayer()) return;
+        
+        if (upgradeDialog != null && upgradeDialog.isTabOpen(UpgradeDialog.TAB_RESEARCH)) {
+            upgradeDialog.dispose();
+            return;
+        }
+
+        if (upgradeDialog != null && upgradeDialog.isShowing()) {
+            upgradeDialog.setTab(UpgradeDialog.TAB_RESEARCH);
+            upgradeDialog.requestFocus();
+            return;
+        }
         
         if (upgradeDialog != null) {
             upgradeDialog.dispose();
@@ -227,6 +268,17 @@ public class GamePanel extends ZeroGamePanel {
         Colony colony = getColonyFromEngine(engine);
         if (colony == null || !colony.isPlayer()) return;
         
+        if (upgradeDialog != null && upgradeDialog.isTabOpen(UpgradeDialog.TAB_BUILD)) {
+            upgradeDialog.dispose();
+            return;
+        }
+
+        if (upgradeDialog != null && upgradeDialog.isShowing()) {
+            upgradeDialog.setTab(UpgradeDialog.TAB_BUILD);
+            upgradeDialog.requestFocus();
+            return;
+        }
+        
         if (upgradeDialog != null) {
             upgradeDialog.dispose();
         }
@@ -234,10 +286,61 @@ public class GamePanel extends ZeroGamePanel {
         upgradeDialog.showDialog(UpgradeDialog.TAB_BUILD);
     }
 
+    private void showAssimilationDialog() {
+        Engine engine = frame.getEngine();
+        Colony colony = getColonyFromEngine(engine);
+        if (colony == null || !colony.isPlayer()) return;
+        
+        if (upgradeDialog != null && upgradeDialog.isTabOpen(UpgradeDialog.TAB_ASSIMILATION)) {
+            upgradeDialog.dispose();
+            return;
+        }
+
+        if (upgradeDialog != null && upgradeDialog.isShowing()) {
+            upgradeDialog.setTab(UpgradeDialog.TAB_ASSIMILATION);
+            upgradeDialog.requestFocus();
+            return;
+        }
+        
+        if (upgradeDialog != null) {
+            upgradeDialog.dispose();
+        }
+        upgradeDialog = new UpgradeDialog(frame, colony);
+        upgradeDialog.showDialog(UpgradeDialog.TAB_ASSIMILATION);
+    }
+
+    private void showSynergyDialog() {
+        Engine engine = frame.getEngine();
+        Colony colony = getColonyFromEngine(engine);
+        if (colony == null || !colony.isPlayer()) return;
+        
+        if (upgradeDialog != null && upgradeDialog.isTabOpen(UpgradeDialog.TAB_SYNERGY)) {
+            upgradeDialog.dispose();
+            return;
+        }
+
+        if (upgradeDialog != null && upgradeDialog.isShowing()) {
+            upgradeDialog.setTab(UpgradeDialog.TAB_SYNERGY);
+            upgradeDialog.requestFocus();
+            return;
+        }
+        
+        if (upgradeDialog != null) {
+            upgradeDialog.dispose();
+        }
+        upgradeDialog = new UpgradeDialog(frame, colony);
+        upgradeDialog.showDialog(UpgradeDialog.TAB_SYNERGY);
+    }
+
     private void showAbilitiesDialog() {
         Engine engine = frame.getEngine();
         Colony colony = getColonyFromEngine(engine);
         if (colony == null || !colony.isPlayer()) return;
+        
+        if (abilitiesDialog != null && abilitiesDialog.isShowing()) {
+            abilitiesDialog.dispose();
+            return;
+        }
         
         if (abilitiesDialog != null) {
             abilitiesDialog.dispose();
@@ -251,6 +354,11 @@ public class GamePanel extends ZeroGamePanel {
         World world = engine != null ? engine.getWorld() : null;
         if (world == null) return;
         
+        if (mapDialog != null && mapDialog.isShowing()) {
+            mapDialog.dispose();
+            return;
+        }
+        
         if (mapDialog == null || mapDialog.getOwner() != frame) {
             if (mapDialog != null) mapDialog.dispose();
             mapDialog = new MapDialog(frame, world, this::refreshAllGUIData);
@@ -262,6 +370,11 @@ public class GamePanel extends ZeroGamePanel {
         Engine engine = frame.getEngine();
         Colony colony = getColonyFromEngine(engine);
         if (colony == null) return;
+
+        if (statsDialog != null && statsDialog.isShowing()) {
+            statsDialog.dispose();
+            return;
+        }
 
         if (statsDialog != null) {
             statsDialog.dispose();
@@ -276,12 +389,47 @@ public class GamePanel extends ZeroGamePanel {
         Colony colony = getColonyFromEngine(engine);
         if (colony == null || colony.getDynasty() == null) return;
 
+        if (dynastyDialog != null && dynastyDialog.isTabOpen(DynastyManagementDialog.TAB_OVERVIEW)) {
+            dynastyDialog.dispose();
+            return;
+        }
+
+        if (dynastyDialog != null && dynastyDialog.isShowing()) {
+            dynastyDialog.setTab(DynastyManagementDialog.TAB_OVERVIEW);
+            dynastyDialog.requestFocus();
+            return;
+        }
+
         if (dynastyDialog != null) {
             dynastyDialog.dispose();
         }
 
         dynastyDialog = new DynastyManagementDialog(frame, colony.getDynasty(), engine, this::handleGoToColony);
-        dynastyDialog.showDialog();
+        dynastyDialog.showDialog(DynastyManagementDialog.TAB_OVERVIEW);
+    }
+
+    private void showTradeDialog() {
+        Engine engine = frame.getEngine();
+        Colony colony = getColonyFromEngine(engine);
+        if (colony == null || colony.getDynasty() == null) return;
+
+        if (dynastyDialog != null && dynastyDialog.isTabOpen(DynastyManagementDialog.TAB_TRADE)) {
+            dynastyDialog.dispose();
+            return;
+        }
+
+        if (dynastyDialog != null && dynastyDialog.isShowing()) {
+            dynastyDialog.setTab(DynastyManagementDialog.TAB_TRADE);
+            dynastyDialog.requestFocus();
+            return;
+        }
+
+        if (dynastyDialog != null) {
+            dynastyDialog.dispose();
+        }
+
+        dynastyDialog = new DynastyManagementDialog(frame, colony.getDynasty(), engine, this::handleGoToColony);
+        dynastyDialog.showDialog(DynastyManagementDialog.TAB_TRADE);
     }
 
     private void handleGoToColony(Colony target) {
@@ -303,7 +451,6 @@ public class GamePanel extends ZeroGamePanel {
                     updateGameAreaSize();
                     
                     if (triggerManager != null) {
-                        // Notify trigger manager of colony switch if needed
                     }
                     break;
                 }
@@ -398,12 +545,11 @@ public class GamePanel extends ZeroGamePanel {
         loadingDialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
-        panel.setBackground(Color.DARK_GRAY);
+        panel.setBorder(BorderFactory.createLineBorder(AssetStyles.BACKGROUND_SECONDARY, 2));
+        panel.setBackground(AssetStyles.BACKGROUND_DARK);
 
         JLabel label = new JLabel("Loading game, please wait...", SwingConstants.CENTER);
-        label.setForeground(Color.WHITE);
-        label.setFont(new Font("SansSerif", Font.BOLD, 18));
+        label.setForeground(AssetStyles.FONT_COLOR_BRIGHT);
         label.setBorder(BorderFactory.createEmptyBorder(30, 60, 30, 60));
 
         panel.add(label, BorderLayout.CENTER);
@@ -500,15 +646,15 @@ public class GamePanel extends ZeroGamePanel {
 
     public void updateStatusIndicator(boolean paused) {
         if (!engineStarted) {
-            statusIndicator.setBackground(Color.GRAY);
+            statusIndicator.setBackground(AssetStyles.BACKGROUND_SECONDARY);
             statusLabel.setText("Game not started");
             return;
         }
         if (paused) {
-            statusIndicator.setBackground(Color.RED);
+            statusIndicator.setBackground(AssetStyles.FONT_COLOR_WARNING);
             statusLabel.setText("Paused");
         } else {
-            statusIndicator.setBackground(Color.GREEN);
+            statusIndicator.setBackground(AssetStyles.FONT_COLOR_SUCCESS);
             statusLabel.setText("Running");
         }
     }
@@ -583,15 +729,21 @@ public class GamePanel extends ZeroGamePanel {
             if (controlPanel != null) {
                 controlPanel.updateResearchMenu(colony.hasUpgrade(GameUnlocks.ABILITY_RESEARCH));
                 controlPanel.updateBuildMenu(colony.hasUpgrade(GameUnlocks.ABILITY_BUILD));
+                controlPanel.updateAssimilationMenu(colony.hasUpgrade(GameUnlocks.ABILITY_ASSIMILATION));
+                controlPanel.updateSynergyMenu(colony.hasUpgrade(GameUnlocks.ABILITY_SYNERGY));
                 controlPanel.updateAbilitiesMenu(colony.hasUpgrade(GameUnlocks.ABILITY_FORCED_FLIGHT));
                 controlPanel.updateDynastyMenu(colony.hasUpgrade(GameUnlocks.ABILITY_DYNASTY));
+                controlPanel.updateTradeMenu(colony.hasUpgrade(GameUnlocks.ABILITY_TRADE));
             }
         } else {
              if (controlPanel != null) {
                 controlPanel.updateResearchMenu(false);
                 controlPanel.updateBuildMenu(false);
+                controlPanel.updateAssimilationMenu(false);
+                controlPanel.updateSynergyMenu(false);
                 controlPanel.updateAbilitiesMenu(false);
                 controlPanel.updateDynastyMenu(false);
+                controlPanel.updateTradeMenu(false);
             }
         }
     }

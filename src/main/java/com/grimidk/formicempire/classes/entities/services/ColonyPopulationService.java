@@ -85,11 +85,19 @@ public class ColonyPopulationService {
     private void assignRolesForType(Colony colony, List<Ant> ants, AntType type) {
         AntRole defaultRole = getDefaultRoleForType(type);
         if (defaultRole == null) return; 
+        
+        List<Ant> tradeAnts = new ArrayList<>();
+        List<Ant> availableAnts = new ArrayList<>();
+        
         for (Ant ant : ants) {
-            ant.setRole(defaultRole);
+            if (ant.isOnTrade()) {
+                tradeAnts.add(ant);
+            } else {
+                ant.setRole(defaultRole);
+                availableAnts.add(ant);
+            }
         }
         
-        List<Ant> availableAnts = new ArrayList<>(ants); 
         Map<AntRole, Integer> assignedRoleCounts = colony.getAssignedRoleCounts();
         
         for (Map.Entry<AntRole, Integer> entry : assignedRoleCounts.entrySet()) {
@@ -98,17 +106,25 @@ public class ColonyPopulationService {
             if (role.equals(defaultRole)) continue; 
             
             int desiredCount = entry.getValue();
+            
+            int currentlyOnTradeWithThisRole = 0;
+            for (Ant ta : tradeAnts) {
+                if (ta.getRole() != null && ta.getRole().equals(role)) {
+                    currentlyOnTradeWithThisRole++;
+                }
+            }
+            
+            int neededCount = Math.max(0, desiredCount - currentlyOnTradeWithThisRole);
             int assignedCount = 0;
             Iterator<Ant> antIterator = availableAnts.iterator();
             
-            while (assignedCount < desiredCount && antIterator.hasNext()) {
+            while (assignedCount < neededCount && antIterator.hasNext()) {
                 Ant antToAssign = antIterator.next();
                 antToAssign.setRole(role); 
                 antIterator.remove();
                 assignedCount++;
             }
         }
-        assignedRoleCounts.put(defaultRole, availableAnts.size());
     }
 
     public void runRoleAssignment(Colony colony) {
@@ -177,7 +193,7 @@ public class ColonyPopulationService {
         colony.getPupae().removeAll(pupaeToHatch);
     }
 
-    private void adjustNPCHatchRates(Colony colony) {
+    private void applyAutomatedHatchRates(Colony colony) {
         float s = colony.hasUpgrade(GameUnlocks.TYPE_SOLDIER) ? 15.0f : 0f;
         float m = colony.hasUpgrade(GameUnlocks.TYPE_MAJOR) ? 5.0f : 0f;
         float p = 0f;
@@ -198,8 +214,8 @@ public class ColonyPopulationService {
     }
 
     public void runHatching(Colony colony){
-        if (!colony.isPlayer() && colony.isCapital()) {
-            adjustNPCHatchRates(colony);
+        if (colony.isAutomationEnabled() || (!colony.isPlayer() && colony.isCapital())) {
+            applyAutomatedHatchRates(colony);
         }
 
         hatchPupae(colony);

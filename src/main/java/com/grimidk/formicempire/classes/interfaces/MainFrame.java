@@ -7,8 +7,10 @@ import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TriggerManager;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
 
 import java.awt.*;
+import java.awt.event.MouseEvent;
 
 public class MainFrame extends JFrame implements TriggerManager.TriggerListener {
     public static final String CARD_INIT = "INIT";
@@ -23,6 +25,9 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
     private final GamePanel gamePanel;
     private final SaveSelectPanel saveSelectPanel;
     private final SettingsPanel settingsPanel;
+
+    private Cursor cursorNormal;
+    private Cursor cursorClick;
 
     public CardLayout getCardLayout() {
         return cardLayout;
@@ -46,9 +51,15 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
 
     public MainFrame(Engine engine) {
         super("Formic Empire");
+        Image icon = AssetStyles.loadImage("/icon.ico");
+        if (icon != null) {
+            setIconImage(icon);
+        }
         this.engine = engine;
         this.cardLayout = new CardLayout();
         this.cards = new JPanel(cardLayout);
+
+        initCursors();
 
         InitPanel initPanel = new InitPanel(this);
         this.saveSelectPanel = new SaveSelectPanel(this);
@@ -68,6 +79,24 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         applyEngineSettings();
+    }
+
+    private void initCursors() {
+        cursorNormal = AssetStyles.loadCustomCursor("/icons/ui/cursor_normal.png", "AntCursorNormal");
+        cursorClick = AssetStyles.loadCustomCursor("/icons/ui/cursor_click.png", "AntCursorClick");
+        
+        setCursor(cursorNormal);
+
+        Toolkit.getDefaultToolkit().addAWTEventListener(event -> {
+            if (event instanceof MouseEvent) {
+                MouseEvent me = (MouseEvent) event;
+                if (me.getID() == MouseEvent.MOUSE_PRESSED) {
+                    setCursor(cursorClick);
+                } else if (me.getID() == MouseEvent.MOUSE_RELEASED) {
+                    setCursor(cursorNormal);
+                }
+            }
+        }, AWTEvent.MOUSE_EVENT_MASK);
     }
 
     public Engine getEngine() {
