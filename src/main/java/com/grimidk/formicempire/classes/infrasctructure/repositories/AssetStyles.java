@@ -41,6 +41,30 @@ public class AssetStyles {
     public static final Color COLOR_MEDIUM_PURPLE = new Color(148, 39, 196);
     public static final Color COLOR_LIGHT_PURPLE = new Color(174, 126, 229);
 
+    // --- Overlay Colors ---
+    private static final int OVERLAY_ALPHA = 40;
+    public static final Color OVERLAY_DAWN = new Color(235, 137, 49, OVERLAY_ALPHA);
+    public static final Color OVERLAY_DAY = new Color(255, 255, 255, 0);
+    public static final Color OVERLAY_DUSK = new Color(148, 39, 196, OVERLAY_ALPHA);
+    public static final Color OVERLAY_NIGHT = new Color(27, 38, 50, OVERLAY_ALPHA + 40);
+    public static final Color OVERLAY_SOLAR_ECLIPSE = new Color(0, 0, 0, OVERLAY_ALPHA + 80);
+    public static final Color OVERLAY_LUNAR_ECLIPSE = new Color(117, 23, 23, OVERLAY_ALPHA + 40);
+    
+    public static final Color OVERLAY_CLEAR = new Color(255, 255, 255, 0);
+    public static final Color OVERLAY_RAIN = new Color(49, 162, 242, OVERLAY_ALPHA);
+    public static final Color OVERLAY_HEAVY_RAIN = new Color(0, 87, 132, OVERLAY_ALPHA + 20);
+    public static final Color OVERLAY_SNOW = new Color(255, 255, 255, OVERLAY_ALPHA);
+    public static final Color OVERLAY_HEAVY_SNOW = new Color(178, 220, 239, OVERLAY_ALPHA + 20); 
+    public static final Color OVERLAY_THUNDER = new Color(67, 67, 67, OVERLAY_ALPHA + 30);
+    public static final Color OVERLAY_WIND = new Color(157, 157, 157, OVERLAY_ALPHA);
+    public static final Color OVERLAY_HEAT = new Color(247, 226, 107, OVERLAY_ALPHA); 
+    public static final Color OVERLAY_FOG = new Color(157, 157, 157, OVERLAY_ALPHA + 40);
+    public static final Color OVERLAY_FROG = new Color(68, 137, 26, OVERLAY_ALPHA);
+    public static final Color OVERLAY_BLOOD = new Color(190, 38, 51, OVERLAY_ALPHA + 20);
+    public static final Color OVERLAY_SANDSTORM = new Color(164, 100, 34, OVERLAY_ALPHA + 30); 
+    public static final Color OVERLAY_PYROCLASTIC = new Color(67, 67, 67, OVERLAY_ALPHA + 50);
+    public static final Color OVERLAY_ACID_RAIN = new Color(163, 206, 39, OVERLAY_ALPHA + 20);
+
     // --- Global Style References ---
     public static final Color BACKGROUND_COLOR = COLOR_LIGHT_GRAY;
     public static final Color BACKGROUND_SECONDARY = COLOR_MEDIUM_GRAY;

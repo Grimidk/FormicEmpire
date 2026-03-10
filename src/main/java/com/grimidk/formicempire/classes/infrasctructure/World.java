@@ -316,17 +316,16 @@ public class World {
                 hex.setQ(q);
                 hex.setR(r);
                 hex.setTimeOffset(q); 
-                hex.setLocalWeather(getRandomWeather());
+                
+                Biome ringBiome = (dist == 0) ? startBiome : getBiomeForRing(dist);
+                hex.setBiome(ringBiome);
+                hex.setLocalWeather(getRandomWeather(ringBiome));
                 hex.setActive(false); 
 
                 if (dist == 0) {
-                    hex.setBiome(startBiome);
                     hex.setColony(startColony); 
                     startColony.setActive(true);
                 } else {
-                    Biome ringBiome = getBiomeForRing(dist);
-                    hex.setBiome(ringBiome);
-                    
                     if (dist > 1 && !isWaterBiome(ringBiome) && random.nextInt(100) < 30) {
                         int dynastyId = this.dynastyIdCounter++;
                         
@@ -452,9 +451,26 @@ public class World {
         return GameConstants.WEATHER_CLEAR;
     }
     
-    private Weather getRandomWeather() {
+    private Weather getRandomWeather(Biome biome) {
         if (random == null) random = new Random();
-        List<Weather> weathers = GameConstants.getWeathers();
+        List<Weather> weathers = new ArrayList<>(GameConstants.getWeathers());
+        
+        weathers.remove(GameConstants.WEATHER_SAND_STORM);
+        weathers.remove(GameConstants.WEATHER_PYROCLASTIC_FOG);
+        weathers.remove(GameConstants.WEATHER_ACID_RAIN);
+        
+        if (biome != null) {
+            if (biome == GameConstants.BIOME_DESERT && random.nextInt(100) < 20) {
+                return GameConstants.WEATHER_SAND_STORM;
+            }
+            if (biome == GameConstants.BIOME_VOLCANIC && random.nextInt(100) < 30) {
+                return GameConstants.WEATHER_PYROCLASTIC_FOG;
+            }
+            if (biome == GameConstants.BIOME_URBAN && random.nextInt(100) < 15) {
+                return GameConstants.WEATHER_ACID_RAIN;
+            }
+        }
+        
         return weathers.get(random.nextInt(weathers.size()));
     }
 
@@ -789,7 +805,7 @@ public class World {
         
         for (Hex h : this.hexes) {
              if (random.nextInt(100) < 5) { 
-                 h.setLocalWeather(getRandomWeather());
+                 h.setLocalWeather(getRandomWeather(h.getBiome()));
              }
         }
     }

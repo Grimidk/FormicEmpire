@@ -71,6 +71,7 @@ public class GamePanel extends ZeroGamePanel {
         worldPanel = new WorldPanel();
         alertPanel = new AlertPanel();
         gameAreaPanel = new GameAreaPanel();
+        gameAreaPanel.setEngine(frame.getEngine());
         
         gameScrollPane = new JScrollPane(gameAreaPanel);
         gameScrollPane.setBorder(null);

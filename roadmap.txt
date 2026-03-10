@@ -26,7 +26,7 @@ Needed for launch (v1.0) (Launch Version):
 	Priority:
 	genetic stagnation (obscured until below (80%)) every nuptial, assimilation gives base 5% after cloning (unlocked after empire rank), alliances can increase while allied, stagnation = success chance to spread and drones from assimilated
 	font
-	visual filters for weather, time of day, biome etc. and sand storm and ash cloud
+	visual filters for weather, time of day, biome etc. and sand storm and ash cloud, maybe transparent panels overlay
 	prepare for localization and SPA 
 
 	Everything else :
@@ -62,7 +62,7 @@ Needed for launch (v1.0) (Launch Version):
 	rework manager and aux files
 	balance every upgrade
 	ant menus (detailed per ant)
-	music and sounds and settings for them
+	music and sounds and settings for them and player panel
 	langs (ENG, SPA, POR, FRE, GER, RUS, CHN, JAP)
 	warning screen for arthropophobia 
 	start animation and general animations

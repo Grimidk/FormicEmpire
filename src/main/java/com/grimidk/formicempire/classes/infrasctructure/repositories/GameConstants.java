@@ -190,22 +190,22 @@ public final class GameConstants {
     static { resources.add(RESOURCE_ROCK); }
 
     // --- Times of Day ---
-    public static final TimeOfDay TIME_DAY = new TimeOfDay(1, "Daytime", 1.05f,
+    public static final TimeOfDay TIME_DAY = new TimeOfDay(1, "Daytime", 1.05f, AssetStyles.OVERLAY_DAY,
         loadIcon("icons/times/day.png"));
     static { timesOfDay.add(TIME_DAY); }
-    public static final TimeOfDay TIME_DUSK = new TimeOfDay(2, "Dusk", 0.95f,
+    public static final TimeOfDay TIME_DUSK = new TimeOfDay(2, "Dusk", 0.95f, AssetStyles.OVERLAY_DUSK,
         loadIcon("icons/times/dusk.png"));
     static { timesOfDay.add(TIME_DUSK); }
-    public static final TimeOfDay TIME_NIGHT = new TimeOfDay(3, "Nightime", 0.85f,
+    public static final TimeOfDay TIME_NIGHT = new TimeOfDay(3, "Nightime", 0.85f, AssetStyles.OVERLAY_NIGHT,
         loadIcon("icons/times/night.png"));
     static { timesOfDay.add(TIME_NIGHT); }
-    public static final TimeOfDay TIME_DAWN = new TimeOfDay(4, "Dawn", 0.90f,
+    public static final TimeOfDay TIME_DAWN = new TimeOfDay(4, "Dawn", 0.90f, AssetStyles.OVERLAY_DAWN,
         loadIcon("icons/times/dawn.png"));
     static { timesOfDay.add(TIME_DAWN); }
-    public static final TimeOfDay TIME_SOLAR_ECLIPSE = new TimeOfDay(5, "Solar Eclipse", 0.7f,
+    public static final TimeOfDay TIME_SOLAR_ECLIPSE = new TimeOfDay(5, "Solar Eclipse", 0.7f, AssetStyles.OVERLAY_SOLAR_ECLIPSE,
         loadIcon("icons/times/solar-eclipse.png"));
     static { timesOfDay.add(TIME_SOLAR_ECLIPSE); }
-    public static final TimeOfDay TIME_LUNAR_ECLIPSE = new TimeOfDay(6, "Lunar Eclipse", 0.85f,
+    public static final TimeOfDay TIME_LUNAR_ECLIPSE = new TimeOfDay(6, "Lunar Eclipse", 0.85f, AssetStyles.OVERLAY_LUNAR_ECLIPSE,
         loadIcon("icons/times/lunar-eclipse.png"));
     static { timesOfDay.add(TIME_LUNAR_ECLIPSE); }
 
@@ -250,39 +250,48 @@ public final class GameConstants {
     static { seasons.add(SEASON_WINTER); }
 
     // --- Weather ---
-    public static final Weather WEATHER_CLEAR = new Weather(1, "Clear", 0, 1.0f, 
+    public static final Weather WEATHER_CLEAR = new Weather(1, "Clear", 0, 1.0f, AssetStyles.OVERLAY_CLEAR,
         loadIcon("icons/weather/clear.png"));
     static { weathers.add(WEATHER_CLEAR); }
-    public static final Weather WEATHER_RAIN = new Weather(2, "Rain", 1, 0.95f, 
+    public static final Weather WEATHER_RAIN = new Weather(2, "Rain", 1, 0.95f, AssetStyles.OVERLAY_RAIN,
         loadIcon("icons/weather/rain.png"));
     static { weathers.add(WEATHER_RAIN); }
-    public static final Weather WEATHER_SNOW = new Weather(3, "Snow", 1, 0.8f, 
+    public static final Weather WEATHER_SNOW = new Weather(3, "Snow", 1, 0.8f, AssetStyles.OVERLAY_SNOW,
         loadIcon("icons/weather/snow.png"));
     static { weathers.add(WEATHER_SNOW); }
-    public static final Weather WEATHER_HEAVY_RAIN = new Weather(4, "Heavy Rain", 2, 0.9f, 
+    public static final Weather WEATHER_HEAVY_RAIN = new Weather(4, "Heavy Rain", 2, 0.9f, AssetStyles.OVERLAY_HEAVY_RAIN,
         loadIcon("icons/weather/heavy-rain.png"));
     static { weathers.add(WEATHER_HEAVY_RAIN); }
-    public static final Weather WEATHER_THUNDER = new Weather(5, "Thunder Storm", 2, 0.9f, 
+    public static final Weather WEATHER_THUNDER = new Weather(5, "Thunder Storm", 2, 0.9f, AssetStyles.OVERLAY_THUNDER,
         loadIcon("icons/weather/thunder.png"));
     static { weathers.add(WEATHER_THUNDER); }
-    public static final Weather WEATHER_HEAVY_SNOW = new Weather(6, "Snow Storm", 2, 0.7f, 
+    public static final Weather WEATHER_HEAVY_SNOW = new Weather(6, "Snow Storm", 2, 0.7f, AssetStyles.OVERLAY_HEAVY_SNOW,
         loadIcon("icons/weather/heavy-snow.png"));
     static { weathers.add(WEATHER_HEAVY_SNOW); }
-    public static final Weather WEATHER_WIND = new Weather(7, "Heavy Wind", -1, 0.95f, 
+    public static final Weather WEATHER_WIND = new Weather(7, "Heavy Wind", -1, 0.95f, AssetStyles.OVERLAY_WIND,
         loadIcon("icons/weather/heavy-wind.png"));
         static { weathers.add(WEATHER_WIND); }
-    public static final Weather WEATHER_HEAT = new Weather(8, "Heat Wave", -2, 1.2f, 
+    public static final Weather WEATHER_HEAT = new Weather(8, "Heat Wave", -2, 1.2f, AssetStyles.OVERLAY_HEAT,
         loadIcon("icons/weather/heat-wave.png"));
     static { weathers.add(WEATHER_HEAT); }
-    public static final Weather WEATHER_FOG = new Weather(9, "Fog", 0, 0.9f, 
+    public static final Weather WEATHER_FOG = new Weather(9, "Fog", 0, 0.9f, AssetStyles.OVERLAY_FOG,
         loadIcon("icons/weather/fog.png"));
     static { weathers.add(WEATHER_FOG); }
-    public static final Weather WEATHER_FROG = new Weather(10, "Frog Rain", 3, 1.0f, 
+    public static final Weather WEATHER_FROG = new Weather(10, "Frog Rain", 3, 1.0f, AssetStyles.OVERLAY_FROG,
         loadIcon("icons/weather/frog-rain.png"));
     static { weathers.add(WEATHER_FROG); }
-    public static final Weather WEATHER_BLOOD = new Weather(11, "Blood Rain", 2, 0.85f, 
+    public static final Weather WEATHER_BLOOD = new Weather(11, "Blood Rain", 2, 0.85f, AssetStyles.OVERLAY_BLOOD,
         loadIcon("icons/weather/blood-rain.png"));
     static { weathers.add(WEATHER_BLOOD); }
+    public static final Weather WEATHER_SAND_STORM = new Weather(12, "Sand Storm", -1, 0.8f, AssetStyles.OVERLAY_SANDSTORM,
+        loadIcon("icons/weather/sand-storm.png"));
+    static { weathers.add(WEATHER_SAND_STORM); }
+    public static final Weather WEATHER_PYROCLASTIC_FOG = new Weather(13, "Pyroclastic Fog", 0, 0.5f, AssetStyles.OVERLAY_PYROCLASTIC,
+        loadIcon("icons/weather/pyro-fog.png"));
+    static { weathers.add(WEATHER_PYROCLASTIC_FOG); }
+    public static final Weather WEATHER_ACID_RAIN = new Weather(14, "Acid Rain", 1, 0.75f, AssetStyles.OVERLAY_ACID_RAIN,
+        loadIcon("icons/weather/acid-rain.png"));
+    static { weathers.add(WEATHER_ACID_RAIN); }
 
     // --- Ant Status ---
     public static final AntStatus STATUS_ALIVE = new AntStatus(1, "Alive", 
