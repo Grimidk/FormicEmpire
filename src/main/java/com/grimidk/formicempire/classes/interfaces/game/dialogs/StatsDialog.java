@@ -7,7 +7,6 @@ import com.grimidk.formicempire.classes.constants.misc.Species;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.Season;
 import com.grimidk.formicempire.classes.constants.world.Weather;
-import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
@@ -18,7 +17,6 @@ import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -27,6 +25,8 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -38,6 +38,7 @@ public class StatsDialog extends ZeroDialog {
     private final DynastyStatService dynastyStatsService; 
     
     private final JTabbedPane tabbedPane;
+    private JCheckBox dynastyModeToggle;
     
     private JTable generalTable;
     private JTable dynastyTable;
@@ -51,11 +52,28 @@ public class StatsDialog extends ZeroDialog {
     private final Runnable refreshTask = this::liveUpdate;
 
     public StatsDialog(JFrame owner, Colony colony, Engine engine) {
-        super(owner, "Statistics", new Dimension(1000, 600));
+        super(owner, "Statistics", new Dimension(1000, 650));
         this.colony = colony;
         this.engine = engine;
         this.dynastyStatsService = new DynastyStatService(); 
         
+        setLayout(new BorderLayout());
+        
+        // --- Top Toggle Panel ---
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        topPanel.setBackground(AssetStyles.UI_BG_SECONDARY);
+        dynastyModeToggle = new JCheckBox("Dynasty Mode");
+        dynastyModeToggle.setOpaque(false);
+        dynastyModeToggle.setFont(AssetStyles.FONT_BOLD);
+        dynastyModeToggle.setForeground(AssetStyles.TEXT_HEADER);
+        dynastyModeToggle.setFocusable(false);
+        dynastyModeToggle.addActionListener(e -> {
+            updateTabTitles();
+            refreshDialog();
+        });
+        topPanel.add(dynastyModeToggle);
+        add(topPanel, BorderLayout.NORTH);
+
         tabbedPane = new JTabbedPane();
         add(tabbedPane, BorderLayout.CENTER);
         
@@ -68,6 +86,7 @@ public class StatsDialog extends ZeroDialog {
         initUnitStatsTab();
         initDeathTab();
         
+        updateTabTitles();
         refreshDialog();
 
         if (this.engine != null) {
@@ -90,6 +109,19 @@ public class StatsDialog extends ZeroDialog {
         });
 
         registerCloseKey(KeyEvent.VK_X);
+    }
+
+    private void updateTabTitles() {
+        boolean dynastyMode = dynastyModeToggle.isSelected();
+
+        tabbedPane.setTitleAt(0, "General & World");
+        tabbedPane.setTitleAt(1, "Dynasty Overview");
+        tabbedPane.setTitleAt(2, "Economy ");
+        tabbedPane.setTitleAt(3, "Population ");
+        tabbedPane.setTitleAt(4, "Local Hex");
+        tabbedPane.setTitleAt(5, "Rates & Jobs ");
+        tabbedPane.setTitleAt(6, "Unit Stats ");
+        tabbedPane.setTitleAt(7, "Mortality ");
     }
 
     public void liveUpdate() {
@@ -155,7 +187,7 @@ public class StatsDialog extends ZeroDialog {
         dynastyTable.getColumnModel().getColumn(0).setMaxWidth(40);
         dynastyTable.getColumnModel().getColumn(0).setPreferredWidth(40);
         
-        tabbedPane.addTab("Dynasty", createTablePane(dynastyTable));
+        tabbedPane.addTab("Dynasty Overview", createTablePane(dynastyTable));
     }
 
     private void initResourceTab() {
@@ -165,7 +197,7 @@ public class StatsDialog extends ZeroDialog {
         resourcesTable.getColumnModel().getColumn(0).setMaxWidth(40);
         resourcesTable.getColumnModel().getColumn(0).setPreferredWidth(40);
         
-        tabbedPane.addTab("Economy (Local)", createTablePane(resourcesTable));
+        tabbedPane.addTab("Economy", createTablePane(resourcesTable));
     }
 
     private void initPopulationTab() {
@@ -175,7 +207,7 @@ public class StatsDialog extends ZeroDialog {
         populationTable.getColumnModel().getColumn(0).setMaxWidth(40);
         populationTable.getColumnModel().getColumn(0).setPreferredWidth(40);
 
-        tabbedPane.addTab("Population (Local)", createTablePane(populationTable));
+        tabbedPane.addTab("Population", createTablePane(populationTable));
     }
 
     private void initLocalHexTab() {
@@ -267,22 +299,36 @@ public class StatsDialog extends ZeroDialog {
         DefaultTableModel model = (DefaultTableModel) generalTable.getModel();
         model.setRowCount(0);
 
-        // Colony Info
-        model.addRow(new Object[]{"Colony", "Name", colony.getName()});
-        model.addRow(new Object[]{"Colony", "Rank", colony.getRank().getName()});
-        model.addRow(new Object[]{"Colony", "Species", colony.getSpecies() != null ? colony.getSpecies().getName() : "Unknown"});
-        model.addRow(new Object[]{"Colony", "Species (Scientific)", colony.getSpecies() != null ? colony.getSpecies().getScientific() : "Unknown"});
-        model.addRow(new Object[]{"Colony", "ID", colony.getId()});
-        model.addRow(new Object[]{"Colony", "Age", colony.getAge() + " days"});
-        
-        if (colony.getQueens().isEmpty()) {
-            model.addRow(new Object[]{"Colony", "Queen Status", "MISSING (" + colony.getDaysWithoutQueen() + " days)"});
+        if (dynastyModeToggle.isSelected()) {
+            Dynasty dynasty = colony.getDynasty();
+            if (dynasty != null) {
+                model.addRow(new Object[]{"Dynasty", "Name", dynasty.getName()});
+                model.addRow(new Object[]{"Dynasty", "Rank", dynasty.getRank().getName()});
+                model.addRow(new Object[]{"Dynasty", "Species", dynasty.getSpecies() != null ? dynasty.getSpecies().getName() : "Unknown"});
+                model.addRow(new Object[]{"Dynasty", "Total Colonies", dynasty.getColonies().size()});
+                model.addRow(new Object[]{"Dynasty", "Global Population", dynastyStatsService.getTotalPopulation(dynasty)});
+                
+                int totalQueens = dynasty.getColonies().stream().mapToInt(c -> c.getQueens().size()).sum();
+                model.addRow(new Object[]{"Dynasty", "Global Queens", totalQueens});
+            }
         } else {
-            model.addRow(new Object[]{"Colony", "Queen Status", "Healthy (" + colony.getQueens().size() + " total)"});
-        }
+            // Colony Info
+            model.addRow(new Object[]{"Colony", "Name", colony.getName()});
+            model.addRow(new Object[]{"Colony", "Rank", colony.getRank().getName()});
+            model.addRow(new Object[]{"Colony", "Species", colony.getSpecies() != null ? colony.getSpecies().getName() : "Unknown"});
+            model.addRow(new Object[]{"Colony", "Species (Scientific)", colony.getSpecies() != null ? colony.getSpecies().getScientific() : "Unknown"});
+            model.addRow(new Object[]{"Colony", "ID", colony.getId()});
+            model.addRow(new Object[]{"Colony", "Age", colony.getAge() + " days"});
+            
+            if (colony.getQueens().isEmpty()) {
+                model.addRow(new Object[]{"Colony", "Queen Status", "MISSING (" + colony.getDaysWithoutQueen() + " days)"});
+            } else {
+                model.addRow(new Object[]{"Colony", "Queen Status", "Healthy (" + colony.getQueens().size() + " total)"});
+            }
 
-        model.addRow(new Object[]{"Colony", "Automation", colony.isAutomationEnabled() ? "ENABLED" : "Disabled"});
-        model.addRow(new Object[]{"Colony", "Auto-Build", colony.isAutoBuildEnabled() ? "ENABLED" : "Disabled"});
+            model.addRow(new Object[]{"Colony", "Automation", colony.isAutomationEnabled() ? "ENABLED" : "Disabled"});
+            model.addRow(new Object[]{"Colony", "Auto-Build", colony.isAutoBuildEnabled() ? "ENABLED" : "Disabled"});
+        }
 
         // World Info
         World world = engine != null ? engine.getWorld() : null;
@@ -384,53 +430,73 @@ public class StatsDialog extends ZeroDialog {
         DefaultTableModel model = (DefaultTableModel) resourcesTable.getModel();
         model.setRowCount(0);
 
-        ColonyStatsService stats = colony.getStatsService();
-        ColonyLocationService loc = colony.getLocationService();
-        
-        // --- Plants ---
-        int plantProd = stats.getPlantProduction(colony);
-        int plantCons = stats.getPlantConsumption(colony);
-        addResourceRow(model, GameConstants.RESOURCE_PLANT.getIcon(), "Plants", (int) colony.getPlants(), stats.getPlantsCapacity(colony), 
-            loc != null ? loc.getSourcesByType(GameConstants.RESOURCE_PLANT).size() : 0, stats.getSourceCapacity(colony),
-            plantProd, plantCons);
-            
-        // --- Mushrooms ---
-        int mushProd = stats.getTotalProduction(colony);
-        int mushCons = stats.getTotalConsumption(colony);
-        addResourceRow(model, GameConstants.RESOURCE_FUNGI.getIcon(), "Mushrooms", (int) colony.getMushrooms(), stats.getMushroomsCapacity(colony), 
-            0, 0, mushProd, mushCons);
-            
-        // --- Protein ---
-        int protProd = stats.getProteinProduction(colony);
-        int protCons = stats.getProteinConsumption(colony);
-        addResourceRow(model, GameConstants.RESOURCE_MEAT.getIcon(), "Protein", (int) colony.getProtein(), stats.getProteinCapacity(colony), 
-            loc != null ? loc.getSourcesByType(GameConstants.RESOURCE_MEAT).size() : 0, stats.getSourceCapacity(colony),
-            protProd, protCons);
-            
-        // --- Water ---
-        int waterProd = stats.getWaterProduction(colony);
-        int waterCons = stats.getWaterConsumption(colony);
-        addResourceRow(model, GameConstants.RESOURCE_WATER.getIcon(), "Water", (int) colony.getWater(), stats.getWaterCapacity(colony), 
-            loc != null ? loc.getSourcesByType(GameConstants.RESOURCE_WATER).size() : 0, stats.getSourceCapacity(colony),
-            waterProd, waterCons);
+        List<Colony> coloniesToCount = new ArrayList<>();
+        if (dynastyModeToggle.isSelected() && colony.getDynasty() != null) {
+            coloniesToCount.addAll(colony.getDynasty().getColonies());
+        } else {
+            coloniesToCount.add(colony);
+        }
 
-        // --- Minerals ---
-        int minProd = stats.getMineralProduction(colony);
-        int minCons = stats.getMineralConsumption(colony);
-        addResourceRow(model, GameConstants.RESOURCE_ROCK.getIcon(), "Minerals", (int) colony.getMinerals(), stats.getMineralsCapacity(colony), 
-            loc != null ? loc.getSourcesByType(GameConstants.RESOURCE_ROCK).size() : 0, stats.getSourceCapacity(colony),
-            minProd, minCons);
-            
-        // --- Syrups/Resins  ---
-        addResourceRow(model, GameConstants.RESOURCE_SYRUP.getIcon(), "Syrups", (int) colony.getSyrups(), stats.getSyrupsCapacity(colony), 
-            0, 0, colony.getAphids(), 0);
-            
-        addResourceRow(model, GameConstants.RESOURCE_RESIN.getIcon(), "Resins", (int) colony.getResins(), stats.getResinsCapacity(colony), 
-            0, 0, (int) (plantProd * 0.01), 0);
+        long totalPlants = 0, totalMushrooms = 0, totalProtein = 0, totalWater = 0, totalSyrups = 0, totalResins = 0, totalMinerals = 0;
+        int capPlants = 0, capMushrooms = 0, capProtein = 0, capWater = 0, capSyrups = 0, capResins = 0, capMinerals = 0;
+        int sourcesPlants = 0, sourcesProtein = 0, sourcesWater = 0, sourcesMinerals = 0;
+        int maxSources = 0;
+        int prodPlants = 0, prodMushrooms = 0, prodProtein = 0, prodWater = 0, prodSyrups = 0, prodResins = 0, prodMinerals = 0;
+        int consPlants = 0, consMushrooms = 0, consProtein = 0, consWater = 0, consMinerals = 0;
+
+        for (Colony c : coloniesToCount) {
+            ColonyStatsService cs = c.getStatsService();
+            ColonyLocationService ls = c.getLocationService();
+
+            totalPlants += c.getPlants();
+            totalMushrooms += c.getMushrooms();
+            totalProtein += c.getProtein();
+            totalWater += c.getWater();
+            totalSyrups += c.getSyrups();
+            totalResins += c.getResins();
+            totalMinerals += c.getMinerals();
+
+            capPlants += cs.getPlantsCapacity(c);
+            capMushrooms += cs.getMushroomsCapacity(c);
+            capProtein += cs.getProteinCapacity(c);
+            capWater += cs.getWaterCapacity(c);
+            capSyrups += cs.getSyrupsCapacity(c);
+            capResins += cs.getResinsCapacity(c);
+            capMinerals += cs.getMineralsCapacity(c);
+
+            if (ls != null) {
+                sourcesPlants += ls.getSourcesByType(GameConstants.RESOURCE_PLANT).size();
+                sourcesProtein += ls.getSourcesByType(GameConstants.RESOURCE_MEAT).size();
+                sourcesWater += ls.getSourcesByType(GameConstants.RESOURCE_WATER).size();
+                sourcesMinerals += ls.getSourcesByType(GameConstants.RESOURCE_ROCK).size();
+            }
+            maxSources += cs.getSourceCapacity(c);
+
+            prodPlants += cs.getPlantProduction(c);
+            prodMushrooms += cs.getTotalProduction(c);
+            prodProtein += cs.getProteinProduction(c);
+            prodWater += cs.getWaterProduction(c);
+            prodMinerals += cs.getMineralProduction(c);
+            prodSyrups += c.getAphids();
+            prodResins += (int)(cs.getPlantProduction(c) * 0.01);
+
+            consPlants += cs.getPlantConsumption(c);
+            consMushrooms += cs.getTotalConsumption(c);
+            consProtein += cs.getProteinConsumption(c);
+            consWater += cs.getWaterConsumption(c);
+        }
+
+        addResourceRow(model, GameConstants.RESOURCE_PLANT.getIcon(), "Plants", (int)totalPlants, capPlants, sourcesPlants, maxSources, prodPlants, consPlants);
+        addResourceRow(model, GameConstants.RESOURCE_FUNGI.getIcon(), "Mushrooms", (int)totalMushrooms, capMushrooms, 0, 0, prodMushrooms, consMushrooms);
+        addResourceRow(model, GameConstants.RESOURCE_MEAT.getIcon(), "Protein", (int)totalProtein, capProtein, sourcesProtein, maxSources, prodProtein, consProtein);
+        addResourceRow(model, GameConstants.RESOURCE_WATER.getIcon(), "Water", (int)totalWater, capWater, sourcesWater, maxSources, prodWater, consWater);
+        addResourceRow(model, GameConstants.RESOURCE_ROCK.getIcon(), "Minerals", (int)totalMinerals, capMinerals, sourcesMinerals, maxSources, prodMinerals, consMinerals);
+        addResourceRow(model, GameConstants.RESOURCE_SYRUP.getIcon(), "Syrups", (int)totalSyrups, capSyrups, 0, 0, prodSyrups, 0);
+        addResourceRow(model, GameConstants.RESOURCE_RESIN.getIcon(), "Resins", (int)totalResins, capResins, 0, 0, prodResins, 0);
 
         model.addRow(new Object[]{null, "------", "---", "---", "---", "---", "---", "---"});
-        int netFood = mushProd - mushCons;
-        model.addRow(new Object[]{null, "Total Food", "---", "---", "---", mushProd, mushCons, (netFood >= 0 ? "+" : "") + netFood});
+        int netFood = prodMushrooms - consMushrooms;
+        model.addRow(new Object[]{null, "Total Food", "---", "---", "---", prodMushrooms, consMushrooms, (netFood >= 0 ? "+" : "") + netFood});
     }
 
     private void addResourceRow(DefaultTableModel model, ImageIcon icon, String name, int current, int cap, int sources, int maxSources, int production, int consumption) {
@@ -453,27 +519,52 @@ public class StatsDialog extends ZeroDialog {
         DefaultTableModel model = (DefaultTableModel) populationTable.getModel();
         model.setRowCount(0);
 
+        List<Colony> coloniesToCount = new ArrayList<>();
+        if (dynastyModeToggle.isSelected() && colony.getDynasty() != null) {
+            coloniesToCount.addAll(colony.getDynasty().getColonies());
+        } else {
+            coloniesToCount.add(colony);
+        }
+
+        Map<AntType, Integer> typeTotals = new HashMap<>();
+        Map<AntRole, Integer> roleTotals = new HashMap<>();
         int totalJuvenile = 0;
         int totalAdult = 0;
+        int grandTotal = 0;
+
+        for (Colony c : coloniesToCount) {
+            grandTotal += c.getAntTotal();
+            for (AntType type : GameConstants.getAntTypes()) {
+                int count = c.getAntsByType(type).size();
+                if (count > 0) {
+                    typeTotals.merge(type, count, Integer::sum);
+                    if (type == GameConstants.TYPE_EGG || type == GameConstants.TYPE_LARVA || type == GameConstants.TYPE_PUPA) {
+                        totalJuvenile += count;
+                    } else if (type != GameConstants.TYPE_DEAD) {
+                        totalAdult += count;
+                    }
+                }
+            }
+            for (AntRole role : GameConstants.getAntRoles()) {
+                int count = c.getAssignedRoleCount(role);
+                if (count > 0) {
+                    roleTotals.merge(role, count, Integer::sum);
+                }
+            }
+        }
 
         for (AntType type : GameConstants.getAntTypes()) {
-            List<Ant> ants = colony.getAntsByType(type);
-            int count = ants.size();
-            
-            if (count == 0) continue;
+            Integer count = typeTotals.get(type);
+            if (count == null || count == 0) continue;
 
             model.addRow(new Object[]{type.getIcon(), type.getName(), "Total", count});
 
-            if (type == GameConstants.TYPE_EGG || type == GameConstants.TYPE_LARVA || type == GameConstants.TYPE_PUPA) {
-                totalJuvenile += count;
-            } else if (type != GameConstants.TYPE_DEAD) {
-                totalAdult += count;
-                
+            if (type != GameConstants.TYPE_EGG && type != GameConstants.TYPE_LARVA && type != GameConstants.TYPE_PUPA && type != GameConstants.TYPE_DEAD) {
                 for (AntRole role : GameConstants.getAntRoles()) {
                     if (role.getAntType() == type) {
-                        int roleCount = colony.getAssignedRoleCount(role);
-                        if (roleCount > 0) {
-                            model.addRow(new Object[]{null, "", role.getName(), roleCount});
+                        Integer rCount = roleTotals.get(role);
+                        if (rCount != null && rCount > 0) {
+                            model.addRow(new Object[]{null, "", role.getName(), rCount});
                         }
                     }
                 }
@@ -483,127 +574,86 @@ public class StatsDialog extends ZeroDialog {
         model.addRow(new Object[]{null, "------", "------", "------"});
         model.addRow(new Object[]{null, "Summary", "Total Adults", totalAdult});
         model.addRow(new Object[]{null, "Summary", "Total Juveniles", totalJuvenile});
-        model.addRow(new Object[]{null, "Summary", "Colony Total", colony.getAntTotal()});
+        model.addRow(new Object[]{null, "Summary", dynastyModeToggle.isSelected() ? "Dynasty Total" : "Colony Total", grandTotal});
     }
 
     private void updateRatesData() {
         DefaultTableModel model = (DefaultTableModel) ratesTable.getModel();
         model.setRowCount(0);
-        ColonyStatsService stats = colony.getStatsService();
-        
-        // Foragers
-        if (colony.hasUpgrade(GameUnlocks.ROLE_FORAGER)) {
-            int count = colony.getAssignedRoleCount(GameConstants.ROLE_FORAGER);
-            float rate = stats.getCollectingRate(colony);
-            int daily = (int)(count * rate * 24); 
-            model.addRow(new Object[]{"Foraging", count + " Foragers", rate + " /hr", "~" + daily + " pwr/day"});
+
+        List<Colony> coloniesToCount = new ArrayList<>();
+        if (dynastyModeToggle.isSelected() && colony.getDynasty() != null) {
+            coloniesToCount.addAll(colony.getDynasty().getColonies());
+        } else {
+            coloniesToCount.add(colony);
         }
 
-        // Farmers
-        if (colony.hasUpgrade(GameUnlocks.ROLE_FARMER)) {
-            int count = stats.getEffectiveFarmerCount(colony);
-            float rate = stats.getConversionRate(colony);
-            int daily = (int)(count * rate * 1440);
-            model.addRow(new Object[]{"Farming", count + " Eff. Farmers", rate + " /min", "~" + daily + " convert/day"});
-        }
+        // We'll aggregate counts and daily totals
+        int foragers = 0, dailyForage = 0;
+        int farmers = 0, dailyFarm = 0;
+        int hunters = 0, dailyHunt = 0;
+        int miners = 0, dailyMine = 0;
+        int scouts = 0;
+        int researchers = 0, assistants = 0, dailyRP = 0;
+        int layers = 0, dailyEggs = 0;
+        int nurses = 0, babies = 0, nurseCap = 0;
+        int gravers = 0, deadAnts = 0, graveCap = 0;
+        int ranchers = 0, aphidCap = 0, aphids = 0;
+        int police = 0, parasites = 0, dailyDetect = 0;
 
-        // Hunters
-        if (colony.hasUpgrade(GameUnlocks.ROLE_HUNTER)) {
-            int count = colony.getAssignedRoleCount(GameConstants.ROLE_HUNTER);
-            float rate = stats.getCollectingRate(colony);
-            int daily = (int)(count * rate * 24); 
-            model.addRow(new Object[]{"Hunting", count + " Hunters", rate + " /hr", "~" + daily + " pwr/day"});
-        }
-
-        // Miners
-        if (colony.hasUpgrade(GameUnlocks.ROLE_MINER)) {
-            int count = colony.getAssignedRoleCount(GameConstants.ROLE_MINER);
-            float rate = stats.getCollectingRate(colony);
-            int daily = (int)(count * rate * 24); 
-            model.addRow(new Object[]{"Mining", count + " Miners", rate + " /hr", "~" + daily + " pwr/day"});
-        }
-        
-        // Scouts
-        if (colony.hasUpgrade(GameUnlocks.ROLE_SCOUT)) {
-            int count = colony.getAssignedRoleCount(GameConstants.ROLE_SCOUT);
-            float rate = stats.getScoutingRate(colony);
-            model.addRow(new Object[]{"Scouting", count + " Scouts", String.format("%.0f%%", rate * 100) + " /hr", "Finds resources"});
-        }
-
-        // Builders
-        if (colony.getCurrentBuildingProject() != null) {
-            int builders = colony.getAssignedRoleCount(GameConstants.ROLE_BUILDER);
-            int cranes = colony.getAssignedRoleCount(GameConstants.ROLE_CRANE);
-            double efficiency = stats.getConstructionEfficiency(colony);
+        for (Colony c : coloniesToCount) {
+            ColonyStatsService cs = c.getStatsService();
             
-            String label = builders + " Builders";
-            if (colony.hasUpgrade(GameUnlocks.ROLE_CRANE)) {
-                label += " / " + cranes + " Cranes";
-            }
-            
-            model.addRow(new Object[]{"Construction", label, String.format("%.0f%% efficiency", efficiency * 100), "Project: " + colony.getCurrentBuildingProject().getName()});
-        }
-        
-        // Research
-        boolean hasResearcher = colony.hasUpgrade(GameUnlocks.ROLE_RESEARCHER) || colony.hasUpgrade(GameUnlocks.ROLE_ASSISTANT);
-        if (hasResearcher) {
-            int researchers = colony.getAssignedRoleCount(GameConstants.ROLE_RESEARCHER);
-            int assistants = colony.getAssignedRoleCount(GameConstants.ROLE_ASSISTANT);
-            int baseSpeed = stats.getResearchSpeed(colony);
-            
-            int hourlyQueen = researchers * baseSpeed;
-            int hourlyAssistant = (int) (assistants * (baseSpeed / 5.0));
-            int totalDaily = (hourlyQueen + hourlyAssistant) * 24;
-            
-            model.addRow(new Object[]{"Research", 
-                researchers + " Res / " + assistants + " Asst", 
-                "Contribution", 
-                "+" + totalDaily + " pts/day"});
+            foragers += c.getAssignedRoleCount(GameConstants.ROLE_FORAGER);
+            dailyForage += cs.getPlantProduction(c) + cs.getWaterProduction(c);
+
+            farmers += cs.getEffectiveFarmerCount(c);
+            dailyFarm += (int)(cs.getEffectiveFarmerCount(c) * cs.getConversionRate(c) * 1440);
+
+            hunters += c.getAssignedRoleCount(GameConstants.ROLE_HUNTER);
+            dailyHunt += cs.getProteinProduction(c);
+
+            miners += c.getAssignedRoleCount(GameConstants.ROLE_MINER);
+            dailyMine += cs.getMineralProduction(c);
+
+            scouts += c.getAssignedRoleCount(GameConstants.ROLE_SCOUT);
+
+            researchers += c.getAssignedRoleCount(GameConstants.ROLE_RESEARCHER);
+            assistants += c.getAssignedRoleCount(GameConstants.ROLE_ASSISTANT);
+            int baseSpeed = cs.getResearchSpeed(c);
+            dailyRP += (researchers * baseSpeed + (int)(assistants * (baseSpeed / 5.0))) * 24;
+
+            layers += c.getAssignedRoleCount(GameConstants.ROLE_LAYER);
+            dailyEggs += (int)(c.getAssignedRoleCount(GameConstants.ROLE_LAYER) * cs.getLayingRate(c) * 24);
+
+            nurses += c.getAssignedRoleCount(GameConstants.ROLE_NURSE);
+            babies += c.getEggs().size() + c.getLarvae().size() + c.getPupae().size();
+            nurseCap += (int)(c.getAssignedRoleCount(GameConstants.ROLE_NURSE) * cs.getNursingRate(c));
+
+            gravers += c.getAssignedRoleCount(GameConstants.ROLE_GRAVER);
+            deadAnts += c.getDeadAnts().size();
+            graveCap += (int)(c.getAssignedRoleCount(GameConstants.ROLE_GRAVER) * cs.getGravingRate(c));
+
+            ranchers += c.getAssignedRoleCount(GameConstants.ROLE_RANCHER);
+            aphids += c.getAphids();
+            aphidCap += c.getAssignedRoleCount(GameConstants.ROLE_RANCHER) * cs.getAphidCapacity(c);
+
+            police += c.getAssignedRoleCount(GameConstants.ROLE_POLICE);
+            parasites += c.getParasites();
+            dailyDetect += Math.round(c.getAssignedRoleCount(GameConstants.ROLE_POLICE) * cs.getParasiteDetection(c));
         }
 
-        // Egg Laying
-        if (colony.hasUpgrade(GameUnlocks.ROLE_LAYER)) {
-            int layers = colony.getAssignedRoleCount(GameConstants.ROLE_LAYER);
-            float rate = stats.getLayingRate(colony);
-            int dailyProduction = (int)(layers * rate * 24);
-            model.addRow(new Object[]{"Egg Laying", layers + " Layers", rate + "/hr", "+" + dailyProduction + " eggs/day"});
-        }
-
-        // Nursing
-        if (colony.hasUpgrade(GameUnlocks.ROLE_NURSE)) {
-            int nurses = colony.getAssignedRoleCount(GameConstants.ROLE_NURSE);
-            int babies = colony.getEggs().size() + colony.getLarvae().size() + colony.getPupae().size();
-            float capacityPerNurse = stats.getNursingRate(colony);
-            int totalCapacity = (int)(nurses * capacityPerNurse);
-            
-            model.addRow(new Object[]{"Nursing", nurses + " Nurses", totalCapacity + " Cap", babies + " / " + totalCapacity + " Load"});
-        }
-
-        // Grave Keeping
-        if (colony.hasUpgrade(GameUnlocks.ROLE_GRAVER)) {
-            int gravers = colony.getAssignedRoleCount(GameConstants.ROLE_GRAVER);
-            int dead = colony.getDeadAnts().size();
-            float capacityPerGraver = stats.getGravingRate(colony);
-            int totalCapacity = (int)(gravers * capacityPerGraver);
-            
-            model.addRow(new Object[]{"Grave Keeping", gravers + " Gravers", totalCapacity + " Cap", dead + " / " + totalCapacity + " Load"});
-        }
-
-        // Ranching
-        if (colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) {
-            int ranchers = colony.getAssignedRoleCount(GameConstants.ROLE_RANCHER);
-            int capacityPerRancher = stats.getAphidCapacity(colony);
-            int maxAphids = ranchers * capacityPerRancher;
-            model.addRow(new Object[]{"Ranching", ranchers + " Ranchers", maxAphids + " Cap", colony.getAphids() + " / " + maxAphids + " Aphids"});
-        }
-
-        // Policing
-        if (colony.hasUpgrade(GameUnlocks.ROLE_POLICE)) {
-            int police = colony.getAssignedRoleCount(GameConstants.ROLE_POLICE);
-            float detection = stats.getParasiteDetection(colony);
-            int dailyDetection = Math.round(police * detection);
-            model.addRow(new Object[]{"Policing", police + " Police", colony.getParasiteCountDisplay() + " Parasites", "~" + dailyDetection + " det./day"});
-        }
+        if (foragers > 0) model.addRow(new Object[]{"Foraging", foragers + " Foragers", "Combined", "~" + dailyForage + " res/day"});
+        if (farmers > 0) model.addRow(new Object[]{"Farming", farmers + " Eff. Farmers", "Combined", "~" + dailyFarm + " convert/day"});
+        if (hunters > 0) model.addRow(new Object[]{"Hunting", hunters + " Hunters", "Combined", "~" + dailyHunt + " pwr/day"});
+        if (miners > 0) model.addRow(new Object[]{"Mining", miners + " Miners", "Combined", "~" + dailyMine + " pwr/day"});
+        if (scouts > 0) model.addRow(new Object[]{"Scouting", scouts + " Scouts", "---", "Finding resources"});
+        if (researchers + assistants > 0) model.addRow(new Object[]{"Research", researchers + " Res / " + assistants + " Asst", "Combined", "+" + dailyRP + " pts/day"});
+        if (layers > 0) model.addRow(new Object[]{"Egg Laying", layers + " Layers", "Combined", "+" + dailyEggs + " eggs/day"});
+        if (nurses > 0) model.addRow(new Object[]{"Nursing", nurses + " Nurses", nurseCap + " Cap", babies + " / " + nurseCap + " Load"});
+        if (gravers > 0) model.addRow(new Object[]{"Grave Keeping", gravers + " Gravers", graveCap + " Cap", deadAnts + " / " + graveCap + " Load"});
+        if (ranchers > 0) model.addRow(new Object[]{"Ranching", ranchers + " Ranchers", aphidCap + " Cap", aphids + " / " + aphidCap + " Aphids"});
+        if (police > 0) model.addRow(new Object[]{"Policing", police + " Police", parasites + " Parasites", "~" + dailyDetect + " det./day"});
     }
 
     private void updateUnitStatsData() {
@@ -611,6 +661,8 @@ public class StatsDialog extends ZeroDialog {
         model.setRowCount(0);
         ColonyStatsService stats = colony.getStatsService();
 
+        // Unit stats are generally the same across the species/dynasty due to global upgrades,
+        // but we'll show them based on the current colony's perspective.
         int hp = stats.getBaseHealth(colony);
         if (hp > 0) model.addRow(new Object[]{"Base Health", hp, "Hitpoints per worker"});
 
@@ -643,18 +695,35 @@ public class StatsDialog extends ZeroDialog {
         DefaultTableModel model = (DefaultTableModel) deathTable.getModel();
         model.setRowCount(0);
 
-        if (colony.getPopulationService() == null) {
-            model.addRow(new Object[]{"Population Service Not Initialized", 0});
-            return;
+        List<Colony> coloniesToCount = new ArrayList<>();
+        if (dynastyModeToggle.isSelected() && colony.getDynasty() != null) {
+            coloniesToCount.addAll(colony.getDynasty().getColonies());
+        } else {
+            coloniesToCount.add(colony);
         }
 
-        Map<String, Integer> stats = colony.getPopulationService().getDeathStatistics();
+        Map<String, Integer> aggregateDeaths = new HashMap<>();
+        int totalDeaths = 0;
+
+        for (Colony c : coloniesToCount) {
+            if (c.getPopulationService() != null) {
+                Map<String, Integer> stats = c.getPopulationService().getDeathStatistics();
+                for (Map.Entry<String, Integer> entry : stats.entrySet()) {
+                    aggregateDeaths.merge(entry.getKey(), entry.getValue(), Integer::sum);
+                }
+                totalDeaths += c.getTotalDeaths();
+            }
+        }
         
-        for (Map.Entry<String, Integer> entry : stats.entrySet()) {
-            model.addRow(new Object[]{entry.getKey(), entry.getValue()});
+        if (aggregateDeaths.isEmpty()) {
+            model.addRow(new Object[]{"No deaths recorded", 0});
+        } else {
+            for (Map.Entry<String, Integer> entry : aggregateDeaths.entrySet()) {
+                model.addRow(new Object[]{entry.getKey(), entry.getValue()});
+            }
         }
         
         model.addRow(new Object[]{"------", "------"});
-        model.addRow(new Object[]{"Total Deaths", colony.getTotalDeaths()});
+        model.addRow(new Object[]{dynastyModeToggle.isSelected() ? "Dynasty Total" : "Colony Total", totalDeaths});
     }
 }

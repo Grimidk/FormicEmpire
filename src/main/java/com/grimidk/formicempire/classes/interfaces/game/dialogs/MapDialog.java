@@ -9,29 +9,36 @@ import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MapDialog extends ZeroDialog {
 
     private final World world;
     private final HexMapPanel mapPanel;
+    private final LegendPanel legendPanel;
     private final JButton homeButton;
     private final JButton closeButton;
     private final Runnable onHexChange;
 
     public MapDialog(JFrame owner, World world, Runnable onHexChange) {
-        super(owner, "World Map", new Dimension(1000, 800));
+        super(owner, "World Map", new Dimension(1100, 800));
         this.world = world;
         this.onHexChange = onHexChange;
 
         // --- Main Map Panel ---
         this.mapPanel = new HexMapPanel();
+        
+        // --- Legend Panel ---
+        this.legendPanel = new LegendPanel();
         
         // --- Buttons ---
         homeButton = new JButton("Center on Home");
@@ -47,6 +54,7 @@ public class MapDialog extends ZeroDialog {
         bottomPanel.add(homeButton);
         bottomPanel.add(closeButton);
 
+        add(legendPanel, BorderLayout.WEST);
         add(mapPanel, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
 
@@ -58,6 +66,19 @@ public class MapDialog extends ZeroDialog {
         Hex homeHex = world.getSpawnHex();
         if (homeHex != null) {
             changeHex(homeHex);
+        }
+    }
+
+    private void selectHex(Hex newHex) {
+        if (newHex == null) return;
+        world.changeActiveHex(newHex);
+        
+        if (onHexChange != null) {
+            onHexChange.run();
+        }
+        
+        if (mapPanel != null) {
+            mapPanel.repaint();
         }
     }
 
@@ -75,6 +96,124 @@ public class MapDialog extends ZeroDialog {
     protected void refreshDialog() {
         if (mapPanel != null) {
             mapPanel.repaint();
+        }
+        if (legendPanel != null) {
+            legendPanel.updateLegend();
+        }
+    }
+
+    private class LegendPanel extends JPanel {
+        private final JPanel content;
+
+        public LegendPanel() {
+            setLayout(new BorderLayout());
+            setBackground(AssetStyles.BACKGROUND_COLOR);
+            setPreferredSize(new Dimension(220, 0));
+            setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, AssetStyles.BORDER_COLOR));
+
+            JLabel title = new JLabel("Dynasty Legend", SwingConstants.CENTER);
+            title.setFont(AssetStyles.FONT_BOLD);
+            title.setForeground(AssetStyles.FONT_COLOR_HEADER);
+            title.setBorder(new EmptyBorder(10, 5, 10, 5));
+            add(title, BorderLayout.NORTH);
+
+            content = new JPanel();
+            content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
+            content.setBackground(AssetStyles.BACKGROUND_COLOR);
+            content.setBorder(new EmptyBorder(5, 10, 5, 5));
+            
+            JScrollPane scroll = new JScrollPane(content);
+            scroll.setBorder(null);
+            scroll.setOpaque(false);
+            scroll.getViewport().setOpaque(false);
+            add(scroll, BorderLayout.CENTER);
+
+            updateLegend();
+        }
+
+        public void updateLegend() {
+            content.removeAll();
+            if (world == null || world.getHexes() == null) return;
+
+            Map<Integer, Dynasty> activeDynastiesMap = new HashMap<>();
+            for (Hex h : world.getHexes()) {
+                if (h.getColony() != null && h.getColony().getDynasty() != null) {
+                    Dynasty d = h.getColony().getDynasty();
+                    activeDynastiesMap.put(d.getId(), d);
+                }
+            }
+
+            List<Dynasty> sortedDynasties = new ArrayList<>(activeDynastiesMap.values());
+            sortedDynasties.sort((d1, d2) -> {
+                int p1 = d1.getStatService().getTotalPopulation(d1);
+                int p2 = d2.getStatService().getTotalPopulation(d2);
+                return Integer.compare(p2, p1);
+            });
+
+            for (Dynasty d : sortedDynasties) {
+                JPanel item = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 2));
+                item.setOpaque(false);
+                item.setAlignmentX(Component.LEFT_ALIGNMENT);
+                item.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                item.setToolTipText("Click to view " + d.getName() + " Capital");
+
+                item.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        Colony capital = d.getCapital();
+                        if (capital != null) {
+                            Hex capitalHex = world.getHexOfColony(capital);
+                            if (capitalHex != null) {
+                                selectHex(capitalHex);
+                            }
+                        }
+                    }
+                    @Override
+                    public void mouseEntered(MouseEvent e) {
+                        item.setOpaque(true);
+                        item.setBackground(AssetStyles.BACKGROUND_SECONDARY);
+                        item.repaint();
+                    }
+                    @Override
+                    public void mouseExited(MouseEvent e) {
+                        item.setOpaque(false);
+                        item.repaint();
+                    }
+                });
+
+                // Color box
+                JPanel colorBox = new JPanel();
+                colorBox.setPreferredSize(new Dimension(12, 12));
+                colorBox.setBackground(d.getColor());
+                colorBox.setBorder(BorderFactory.createLineBorder(AssetStyles.COLOR_ABSOLUTE_BLACK, 1));
+                item.add(colorBox);
+
+                // Species icon
+                if (d.getSpecies() != null && d.getSpecies().getIcon() != null) {
+                    JLabel icon = new JLabel(d.getSpecies().getIcon());
+                    item.add(icon);
+                }
+
+                // Name
+                JLabel name = new JLabel(d.getName());
+                name.setFont(AssetStyles.FONT_SMALL);
+                name.setForeground(AssetStyles.FONT_COLOR);
+                if (d.isPlayer()) {
+                    name.setFont(AssetStyles.FONT_BOLD.deriveFont(10f));
+                    name.setText(name.getText() + " (You)");
+                }
+                
+                int pop = d.getStatService().getTotalPopulation(d);
+                name.setToolTipText("Population: " + pop);
+                
+                item.add(name);
+
+                content.add(item);
+                content.add(Box.createRigidArea(new Dimension(0, 2)));
+            }
+
+            content.revalidate();
+            content.repaint();
         }
     }
 
