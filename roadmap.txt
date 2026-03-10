@@ -11,9 +11,7 @@ To Fix (By decreasing priority) :
 	(none right now)
 
 	Mid:
-	random dynasty name using species and biome
 	pause/play in dialogs, consistent dialog size so the pause can be seen
-	toggle for colony/dynasty wide stats
 
 	Low:
 	breeders go out of the colony in nuptial

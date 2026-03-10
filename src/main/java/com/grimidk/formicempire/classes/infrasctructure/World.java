@@ -25,6 +25,7 @@ import com.grimidk.formicempire.classes.entities.Trade;
 import com.grimidk.formicempire.classes.entities.Tunnel;
 import com.grimidk.formicempire.classes.entities.services.ColonyStarterService;
 import com.grimidk.formicempire.classes.entities.services.DynastyDeathService;
+import com.grimidk.formicempire.classes.entities.services.DynastyNamingService;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 
@@ -50,6 +51,7 @@ public class World {
     private int worldRadius = 8; 
     private int colonyIdCounter = 1;
     private int dynastyIdCounter = 1;
+    private final DynastyNamingService namingService;
 
     public World() {
         this.minute = 0;
@@ -66,6 +68,7 @@ public class World {
         this.season = GameConstants.SEASON_SPRING;
         this.weather = GameConstants.WEATHER_CLEAR;
         this.random = new Random();
+        this.namingService = new DynastyNamingService();
     }
     
     public Engine getEngine() {
@@ -289,9 +292,15 @@ public class World {
         ColonyStarterService starterService = new ColonyStarterService();
         
         baseName = formatName(baseName);
+        String dynName = baseName + " Dynasty";
+        namingService.registerUsedName(dynName);
         
-        Dynasty playerDynasty = new Dynasty(this.dynastyIdCounter++, baseName + " Dynasty", true, GameConstants.SPECIES_OMNI);
+        Dynasty playerDynasty = new Dynasty(this.dynastyIdCounter++, dynName, true, GameConstants.SPECIES_OMNI);
         playerDynasty.getStarterService().initializeDynasty(playerDynasty);
+        
+        String capName = namingService.generateCapitalName(dynName);
+        startColony.setName(capName);
+        
         playerDynasty.addColony(startColony);
         this.dynastys.add(playerDynasty);
         
@@ -329,12 +338,14 @@ public class World {
                         }
                         Species randomSpecies = nonOmni.isEmpty() ? GameConstants.SPECIES_OMNI : nonOmni.get(random.nextInt(nonOmni.size()));
                         
-                        Dynasty npcDynasty = new Dynasty(dynastyId, randomSpecies.getName() + " Hive " + dynastyId, false, randomSpecies);
+                        String npcDynName = namingService.generateDynastyName(randomSpecies);
+                        Dynasty npcDynasty = new Dynasty(dynastyId, npcDynName, false, randomSpecies);
                         npcDynasty.getStarterService().initializeDynasty(npcDynasty);
                         this.dynastys.add(npcDynasty);
                         
                         int colId = this.colonyIdCounter++;
-                        Colony aiColony = new Colony(colId, "Wild Colony " + colId, false);
+                        String npcCapName = namingService.generateCapitalName(npcDynName);
+                        Colony aiColony = new Colony(colId, npcCapName, false);
                         npcDynasty.addColony(aiColony);
                         
                         starterService.initializeNewColony(aiColony);
@@ -527,6 +538,7 @@ public class World {
                 Dynasty dynasty = new Dynasty(sc);
                 loadedDynastys.put(dynasty.getId(), dynasty);
                 this.dynastys.add(dynasty);
+                namingService.registerUsedName(dynasty.getName());
                 if (dynasty.getId() > maxDynastyId) maxDynastyId = dynasty.getId();
             }
         }
@@ -543,6 +555,7 @@ public class World {
                 } else {
                     int newDynastyId = ++maxDynastyId;
                     String dynName = c.isPlayer() ? (baseName + " Dynasty") : "Wild Dynasty";
+                    namingService.registerUsedName(dynName);
                     Dynasty adHocDynasty = new Dynasty(newDynastyId, dynName, c.isPlayer(), GameConstants.SPECIES_OMNI);
                     adHocDynasty.getStarterService().initializeDynasty(adHocDynasty);
                     adHocDynasty.addColony(c);
@@ -591,7 +604,9 @@ public class World {
             }
              
             if (colony == null) {
-                colony = new Colony(1, baseName + " Prime", true);
+                String playerDynName = baseName + " Dynasty";
+                String playerCapName = namingService.generateCapitalName(playerDynName);
+                colony = new Colony(1, playerCapName, true);
             }
              
             if (colony.getAntTotal() == 0) {
