@@ -2,6 +2,7 @@ package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 import com.grimidk.formicempire.classes.interfaces.MainFrame;
 
 import javax.swing.*;
@@ -27,7 +28,7 @@ public abstract class ZeroDialog extends JDialog {
         southPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         southPanel.setBackground(AssetStyles.UI_BG_SECONDARY);
         
-        JButton closeButton = new JButton("Close");
+        JButton closeButton = new JButton(LanguageStrings.UI_CLOSE);
         closeButton.setFont(AssetStyles.FONT_NORMAL);
         closeButton.setFocusable(false);
         closeButton.addActionListener(e -> dispose());

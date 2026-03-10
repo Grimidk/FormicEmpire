@@ -1,5 +1,7 @@
 package com.grimidk.formicempire.classes.interfaces;
 
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
+
 import javax.swing.*;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
@@ -18,10 +20,10 @@ public class InitPanel extends JPanel {
         c.fill = GridBagConstraints.HORIZONTAL;
         c.insets = new Insets(8, 8, 8, 8);
 
-        JButton play = new JButton("Play");
-        JButton help = new JButton("Help");
-        JButton settings = new JButton("Settings");
-        JButton quit = new JButton("Quit");
+        JButton play = new JButton(LanguageStrings.UI_PLAY);
+        JButton help = new JButton(LanguageStrings.UI_HELP);
+        JButton settings = new JButton(LanguageStrings.UI_SETTINGS);
+        JButton quit = new JButton(LanguageStrings.UI_QUIT);
 
         play.addActionListener(e -> this.frame.showCard(MainFrame.CARD_SAVE));
         help.addActionListener(e -> this.frame.showCard(MainFrame.CARD_HELP));

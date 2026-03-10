@@ -11,6 +11,7 @@ import com.grimidk.formicempire.classes.infrasctructure.managers.TriggerManager;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 import com.grimidk.formicempire.classes.interfaces.game.dialogs.*;
 import com.grimidk.formicempire.classes.interfaces.game.gamepanels.*;
 
@@ -64,7 +65,7 @@ public class GamePanel extends ZeroGamePanel {
 
     @Override
     protected void initComponents() {
-        statusLabel = new JLabel("Game not started");
+        statusLabel = new JLabel(LanguageStrings.UI_NOT_STARTED);
         statusIndicator = new JLabel();
         
         colonyPanel = new ColonyPanel();
@@ -496,7 +497,7 @@ public class GamePanel extends ZeroGamePanel {
         
         this.triggerManager = null; 
         this.engineStarted = false;
-        statusLabel.setText("Game not started");
+        statusLabel.setText(LanguageStrings.UI_NOT_STARTED);
     }
 
     private void handleBackButton() {
@@ -538,7 +539,7 @@ public class GamePanel extends ZeroGamePanel {
     }
 
     public void enterWithSavefile(Savefile savefile) {
-        statusLabel.setText("Starting game...");
+        statusLabel.setText(LanguageStrings.UI_STARTING);
         Engine engine = frame.getEngine();
         
         JDialog loadingDialog = new JDialog(frame, "Loading", true);
@@ -549,7 +550,7 @@ public class GamePanel extends ZeroGamePanel {
         panel.setBorder(BorderFactory.createLineBorder(AssetStyles.BORDER_COLOR, AssetStyles.BORDER_THICKNESS_EXTERNAL));
         panel.setBackground(AssetStyles.BACKGROUND_DARK);
 
-        JLabel label = new JLabel("Loading game, please wait...", SwingConstants.CENTER);
+        JLabel label = new JLabel(LanguageStrings.UI_LOADING_WAIT, SwingConstants.CENTER);
         label.setForeground(AssetStyles.FONT_COLOR_BRIGHT);
         label.setBorder(BorderFactory.createEmptyBorder(30, 60, 30, 60));
 
@@ -570,7 +571,7 @@ public class GamePanel extends ZeroGamePanel {
                 loadingDialog.dispose();
                 try {
                     get();
-                    statusLabel.setText("Game started");
+                    statusLabel.setText(LanguageStrings.UI_RUNNING);
                     registerTickListeners(); 
                     
                     World world = engine.getWorld();
@@ -604,7 +605,7 @@ public class GamePanel extends ZeroGamePanel {
                     
                 } catch (Exception e) {
                     e.printStackTrace();
-                    statusLabel.setText("Error loading game!");
+                    statusLabel.setText(LanguageStrings.UI_ERROR_LOADING);
                 }
             }
         };
@@ -648,15 +649,15 @@ public class GamePanel extends ZeroGamePanel {
     public void updateStatusIndicator(boolean paused) {
         if (!engineStarted) {
             statusIndicator.setBackground(AssetStyles.BACKGROUND_SECONDARY);
-            statusLabel.setText("Game not started");
+            statusLabel.setText(LanguageStrings.UI_NOT_STARTED);
             return;
         }
         if (paused) {
             statusIndicator.setBackground(AssetStyles.FONT_COLOR_WARNING);
-            statusLabel.setText("Paused");
+            statusLabel.setText(LanguageStrings.UI_PAUSED_TICK);
         } else {
             statusIndicator.setBackground(AssetStyles.FONT_COLOR_SUCCESS);
-            statusLabel.setText("Running");
+            statusLabel.setText(LanguageStrings.UI_RUNNING);
         }
     }
 

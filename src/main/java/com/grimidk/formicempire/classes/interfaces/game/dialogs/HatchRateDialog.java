@@ -5,6 +5,7 @@ import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,13 +19,13 @@ public class HatchRateDialog extends ZeroDialog {
 
     private final Colony colony;
     private final Map<AntType, JSpinner> spinnerMap = new HashMap<>();
-    private final JLabel totalLabel = new JLabel("Total: 100.0%");
+    private final JLabel totalLabel = new JLabel(String.format(LanguageStrings.HATCH_TOTAL, 100.0f));
     private final JPanel centerPanel;
     
     private boolean isAdjusting = false;
 
     public HatchRateDialog(JFrame owner, Colony colony) {
-        super(owner, "Manage Pupa Hatch Rates", AssetStyles.DEFAULT_DIALOG_SIZE);
+        super(owner, LanguageStrings.DIALOG_HATCH_RATES_TITLE, AssetStyles.DEFAULT_DIALOG_SIZE);
         this.colony = colony;
         
         JPanel outer = new JPanel(new GridBagLayout());
@@ -60,7 +61,7 @@ public class HatchRateDialog extends ZeroDialog {
         totalLabel.setFont(AssetStyles.FONT_BOLD);
         totalLabel.setForeground(AssetStyles.FONT_COLOR);
         
-        JLabel descLabel = new JLabel("Set hatch chance for new ants:");
+        JLabel descLabel = new JLabel(LanguageStrings.HATCH_DESC);
         descLabel.setForeground(AssetStyles.FONT_COLOR);
         
         centerPanel.add(descLabel);
@@ -180,14 +181,14 @@ public class HatchRateDialog extends ZeroDialog {
             totalAssigned += (Double) s.getValue();
         }
         
-        totalLabel.setText(String.format("Total: %.1f%%", totalAssigned));
+        totalLabel.setText(String.format(LanguageStrings.HATCH_TOTAL, totalAssigned));
         
         if (Math.abs(100.0 - totalAssigned) > 0.1) { 
             totalLabel.setForeground(AssetStyles.FONT_COLOR_ERROR);
-            totalLabel.setToolTipText(String.format("Warning: Total is not 100%%."));
+            totalLabel.setToolTipText(LanguageStrings.HATCH_WARNING_TOTAL);
         } else {
             totalLabel.setForeground(AssetStyles.FONT_COLOR);
-            totalLabel.setToolTipText("Total is 100%");
+            totalLabel.setToolTipText(LanguageStrings.HATCH_TOTAL_OK);
         }
     }
 }

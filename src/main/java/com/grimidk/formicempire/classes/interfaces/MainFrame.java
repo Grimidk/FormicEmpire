@@ -8,6 +8,7 @@ import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TriggerManager;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -50,7 +51,7 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
     }
 
     public MainFrame(Engine engine) {
-        super("Formic Empire");
+        super(LanguageStrings.UI_APP_TITLE);
         Image icon = AssetStyles.loadImage("/icon.ico");
         if (icon != null) {
             setIconImage(icon);
@@ -175,9 +176,9 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         engine.pauseEngine();
         if (gamePanel != null) gamePanel.updateStatusIndicator(true);
 
-        String[] options = {"Reload Last Save", "Go to Main Menu"};
-        String title = "Your Colony Has Perished";
-        String message = "Your last queen has died, and the colony cannot continue.\nWhat would you like to do?";
+        String[] options = {LanguageStrings.DEATH_OPTIONS_RELOAD, LanguageStrings.DEATH_OPTIONS_MENU};
+        String title = LanguageStrings.DEATH_TITLE;
+        String message = LanguageStrings.DEATH_MESSAGE;
 
         int choice = JOptionPane.showOptionDialog(
                 this,
@@ -194,7 +195,7 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
             int slotId = (engine.getWorld() != null) ? engine.getWorld().getSaveSlotId() : 0;
             
             if (slotId == 0) {
-                JOptionPane.showMessageDialog(this, "This was a new game with no save file. Returning to main menu.", "Load Failed", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, LanguageStrings.DEATH_LOAD_FAILED_NEW_GAME, LanguageStrings.DEATH_LOAD_FAILED_TITLE, JOptionPane.ERROR_MESSAGE);
                 handleQuitToMenu();
             } else {
                 SaveManager sm = new SaveManager();
@@ -203,7 +204,7 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
                 if (saveToLoad != null) {
                     openGameWithSave(saveToLoad);
                 } else {
-                    JOptionPane.showMessageDialog(this, "No autosave found for this slot. Returning to main menu.", "Load Failed", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, LanguageStrings.DEATH_LOAD_FAILED_NO_AUTOSAVE, LanguageStrings.DEATH_LOAD_FAILED_TITLE, JOptionPane.ERROR_MESSAGE);
                     handleQuitToMenu();
                 }
             }

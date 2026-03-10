@@ -7,6 +7,7 @@ import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -30,7 +31,7 @@ public class MapDialog extends ZeroDialog {
     private final Runnable onHexChange;
 
     public MapDialog(JFrame owner, World world, Runnable onHexChange) {
-        super(owner, "World Map", AssetStyles.DEFAULT_DIALOG_SIZE);
+        super(owner, LanguageStrings.DIALOG_MAP_TITLE, AssetStyles.DEFAULT_DIALOG_SIZE);
         this.world = world;
         this.onHexChange = onHexChange;
 
@@ -41,11 +42,11 @@ public class MapDialog extends ZeroDialog {
         this.legendPanel = new LegendPanel();
         
         // --- Buttons ---
-        homeButton = new JButton("Center on Home");
+        homeButton = new JButton(LanguageStrings.MAP_HOME_BUTTON);
         homeButton.setFocusable(false);
         homeButton.addActionListener(e -> travelToHomeHex());
 
-        closeButton = new JButton("Close");
+        closeButton = new JButton(LanguageStrings.UI_CLOSE);
         closeButton.setFocusable(false);
         closeButton.addActionListener(e -> dispose());
 
@@ -111,7 +112,7 @@ public class MapDialog extends ZeroDialog {
             setPreferredSize(new Dimension(220, 0));
             setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, AssetStyles.BORDER_COLOR));
 
-            JLabel title = new JLabel("Dynasty Legend", SwingConstants.CENTER);
+            JLabel title = new JLabel(LanguageStrings.MAP_LEGEND_TITLE, SwingConstants.CENTER);
             title.setFont(AssetStyles.FONT_BOLD);
             title.setForeground(AssetStyles.FONT_COLOR_HEADER);
             title.setBorder(new EmptyBorder(10, 5, 10, 5));
@@ -155,7 +156,7 @@ public class MapDialog extends ZeroDialog {
                 item.setOpaque(false);
                 item.setAlignmentX(Component.LEFT_ALIGNMENT);
                 item.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                item.setToolTipText("Click to view " + d.getName() + " Capital");
+                item.setToolTipText(String.format(LanguageStrings.MAP_CLICK_VIEW_CAPITAL, d.getName()));
 
                 item.addMouseListener(new MouseAdapter() {
                     @Override
@@ -195,16 +196,19 @@ public class MapDialog extends ZeroDialog {
                 }
 
                 // Name
-                JLabel name = new JLabel(d.getName());
+                String nameStr = d.getName();
+                if (d.isPlayer()) {
+                    nameStr += LanguageStrings.MAP_YOU_PLAYER;
+                }
+                JLabel name = new JLabel(nameStr);
                 name.setFont(AssetStyles.FONT_SMALL);
                 name.setForeground(AssetStyles.FONT_COLOR);
                 if (d.isPlayer()) {
                     name.setFont(AssetStyles.FONT_BOLD.deriveFont(10f));
-                    name.setText(name.getText() + " (You)");
                 }
                 
                 int pop = d.getStatService().getTotalPopulation(d);
-                name.setToolTipText("Population: " + pop);
+                name.setToolTipText(String.format(LanguageStrings.MAP_POPULATION_FORMAT, pop));
                 
                 item.add(name);
 
@@ -270,21 +274,21 @@ public class MapDialog extends ZeroDialog {
                     StringBuilder sb = new StringBuilder("<html>");
                     
                     if (hex.getBiome() != null) {
-                        sb.append("<b>Biome:</b> ").append(hex.getBiome().getName());
+                        sb.append(LanguageStrings.MAP_TOOLTIP_BIOME).append(hex.getBiome().getName());
                     } else {
-                        sb.append("<b>Biome:</b> Unknown");
+                        sb.append(LanguageStrings.MAP_TOOLTIP_BIOME).append(LanguageStrings.STAT_UNKNOWN);
                     }
                     
                     Colony c = hex.getColony();
                     if (c != null) {
                         if (c.getRank() != null) {
-                            sb.append("<br><b>Rank:</b> ").append(c.getRank().getName());
+                            sb.append(LanguageStrings.MAP_TOOLTIP_RANK).append(c.getRank().getName());
                         }
                         
                         if (c.getSpecies() != null) {
-                            sb.append("<br><b>Species:</b> ").append(c.getSpecies().getName());
+                            sb.append(LanguageStrings.MAP_TOOLTIP_SPECIES).append(c.getSpecies().getName());
                         } else {
-                            sb.append("<br><b>Species:</b> Unknown");
+                            sb.append(LanguageStrings.MAP_TOOLTIP_SPECIES).append(LanguageStrings.STAT_UNKNOWN);
                         }
                         
                         if (c.getName() != null) {
@@ -293,13 +297,13 @@ public class MapDialog extends ZeroDialog {
 
                         Dynasty dynasty = c.getDynasty();
                         if (dynasty != null) {
-                            sb.append("<br><b>Dynasty:</b> ").append(dynasty.getName());
+                            sb.append(LanguageStrings.MAP_TOOLTIP_DYNASTY).append(dynasty.getName());
                             if (dynasty.getRank() != null) {
-                                sb.append("<br><b>Dynasty Rank:</b> ").append(dynasty.getRank().getName());
+                                sb.append(LanguageStrings.MAP_TOOLTIP_DYNASTY_RANK).append(dynasty.getRank().getName());
                             }
                         }
                     } else {
-                        sb.append("<br><i>Empty</i>");
+                        sb.append(LanguageStrings.MAP_TOOLTIP_EMPTY);
                     }
                     
                     sb.append("</html>");

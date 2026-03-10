@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.interfaces.game.gamepanels;
 
 import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -21,7 +22,7 @@ public class AlertPanel extends ZeroGamePanel {
     @Override
     protected void initComponents() {
         setPreferredSize(new Dimension(250, 150));
-        setTitledBorder("Alerts");
+        setTitledBorder(LanguageStrings.PANEL_ALERTS);
         
         listPanel = new JPanel();
         listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
@@ -43,7 +44,7 @@ public class AlertPanel extends ZeroGamePanel {
         listPanel.removeAll();
         
         if (alerts.isEmpty()) {
-            JLabel emptyLabel = new JLabel("No alerts");
+            JLabel emptyLabel = new JLabel(LanguageStrings.PANEL_NO_ALERTS);
             emptyLabel.setForeground(AssetStyles.BACKGROUND_SECONDARY);
             emptyLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             listPanel.add(Box.createVerticalGlue());

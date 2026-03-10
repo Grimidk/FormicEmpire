@@ -8,6 +8,7 @@ import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 import com.grimidk.formicempire.classes.interfaces.MainFrame;
 
 import javax.swing.*;
@@ -28,7 +29,7 @@ public class AbilitiesDialog extends ZeroDialog {
     private final Map<JButton, Upgrade> abilityButtons = new HashMap<>();
 
     public AbilitiesDialog(JFrame owner, Colony colony) {
-        super(owner, "Colony Operations", AssetStyles.DEFAULT_DIALOG_SIZE);
+        super(owner, LanguageStrings.DIALOG_ABILITIES_TITLE, AssetStyles.DEFAULT_DIALOG_SIZE);
         this.colony = colony;
         
         JPanel northPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -65,8 +66,8 @@ public class AbilitiesDialog extends ZeroDialog {
             String failureReason = getNuptialFailureReason(currentCost);
             boolean enabled = (failureReason == null);
             
-            JPanel p = createAbilityPanel("Forced Nuptial Flight", 
-                "Spend " + currentCost + " RP to immediately trigger a nuptial flight.\nRequires Drones and Breeder Princesses.",
+            JPanel p = createAbilityPanel(LanguageStrings.ABILITY_FORCED_FLIGHT, 
+                String.format(LanguageStrings.ABILITY_FORCED_FLIGHT_DESC, currentCost),
                 currentCost, 
                 e -> {
                     if (getOwner() instanceof MainFrame main) {
@@ -86,7 +87,7 @@ public class AbilitiesDialog extends ZeroDialog {
                                     colony.forceNuptialFlight(world, targetHex);
                                     refreshDialog(); 
                                 } else {
-                                    JOptionPane.showMessageDialog(this, "Error: Could not locate colony on the world map.");
+                                    JOptionPane.showMessageDialog(this, LanguageStrings.ABILITY_ERROR_LOCATE_COLONY);
                                 }
                             }
                         }
@@ -103,10 +104,10 @@ public class AbilitiesDialog extends ZeroDialog {
         if (colony.hasUpgrade(GameUnlocks.ABILITY_MASS_FLIGHT) && colony.getDynasty() != null) {
             int massCost = colony.getDynasty().getMassNuptialFlightCost();
             boolean hasRP = colony.getResearchPoints() >= massCost;
-            String fail = hasRP ? null : "Not enough Research Points (" + massCost + " needed).";
+            String fail = hasRP ? null : String.format(LanguageStrings.ABILITY_ERROR_NOT_ENOUGH_RP, massCost);
 
-            JPanel mp = createAbilityPanel("Mass Nuptial Flights",
-                "Spend " + massCost + " RP to trigger nuptial flights in ALL capable colonies across your dynasty.",
+            JPanel mp = createAbilityPanel(LanguageStrings.ABILITY_MASS_FLIGHT,
+                String.format(LanguageStrings.ABILITY_MASS_FLIGHT_DESC, massCost),
                 massCost,
                 e -> {
                     if (getOwner() instanceof MainFrame main) {
@@ -125,7 +126,7 @@ public class AbilitiesDialog extends ZeroDialog {
         }
 
         if (!hasAnyAbility) {
-            JLabel empty = new JLabel("No active abilities unlocked yet.");
+            JLabel empty = new JLabel(LanguageStrings.ABILITY_NO_ABILITIES);
             empty.setForeground(AssetStyles.TEXT_NORMAL);
             empty.setFont(AssetStyles.FONT_NORMAL);
             empty.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -139,14 +140,14 @@ public class AbilitiesDialog extends ZeroDialog {
     }
     
     private String getNuptialFailureReason(int cost) {
-        if (colony.getResearchPoints() < cost) return "Not enough Research Points (" + cost + " needed).";
-        if (colony.getDrones().isEmpty()) return "No Drones available in the colony.";
-        if (colony.getPrincesses().stream().noneMatch(p -> p.getRole() == GameConstants.ROLE_BREEDER)) return "No Breeder Princesses available.";
+        if (colony.getResearchPoints() < cost) return String.format(LanguageStrings.ABILITY_ERROR_NOT_ENOUGH_RP, cost);
+        if (colony.getDrones().isEmpty()) return LanguageStrings.ABILITY_ERROR_NO_DRONES;
+        if (colony.getPrincesses().stream().noneMatch(p -> p.getRole() == GameConstants.ROLE_BREEDER)) return LanguageStrings.ABILITY_ERROR_NO_BREEDERS;
         return null;
     }
 
     private void updateResearchPointsLabel() {
-        researchPointsLabel.setText("Research Points: " + colony.getResearchPoints());
+        researchPointsLabel.setText(String.format(LanguageStrings.ABILITY_RP_LABEL, colony.getResearchPoints()));
     }
 
     private JPanel createAbilityPanel(String title, String desc, int rpCost, java.awt.event.ActionListener action, boolean enabled, String tooltip) {
@@ -173,7 +174,7 @@ public class AbilitiesDialog extends ZeroDialog {
         actionPanel.setOpaque(false);
         actionPanel.setLayout(new BoxLayout(actionPanel, BoxLayout.Y_AXIS));
         
-        JButton btn = new JButton("Trigger");
+        JButton btn = new JButton(LanguageStrings.UI_TRIGGER);
         btn.setFont(AssetStyles.FONT_BOLD);
         btn.setEnabled(enabled);
         btn.setFocusable(false);
@@ -185,7 +186,7 @@ public class AbilitiesDialog extends ZeroDialog {
             btn.setToolTipText(null);
         }
         
-        JLabel costLabel = new JLabel(rpCost + " RP");
+        JLabel costLabel = new JLabel(String.format(LanguageStrings.UPGRADE_COST_RP, rpCost));
         costLabel.setForeground(AssetStyles.TEXT_NORMAL);
         costLabel.setFont(AssetStyles.FONT_BOLD);
         costLabel.setAlignmentX(Component.CENTER_ALIGNMENT);

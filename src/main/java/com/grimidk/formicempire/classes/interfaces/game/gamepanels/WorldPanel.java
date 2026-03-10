@@ -5,6 +5,7 @@ import com.grimidk.formicempire.classes.constants.world.Season;
 import com.grimidk.formicempire.classes.constants.world.TimeOfDay;
 import com.grimidk.formicempire.classes.constants.world.Weather;
 import com.grimidk.formicempire.classes.infrasctructure.World;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 
 import javax.swing.*;
 import java.awt.*;
@@ -100,7 +101,7 @@ public class WorldPanel extends ZeroGamePanel {
     }
     
     private JPanel createTimePanel() {
-        JPanel panel = createTitledPanel("Time", null);
+        JPanel panel = createTitledPanel(LanguageStrings.PANEL_TIME, null);
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.add(dateTimeLabel);
         panel.add(timeOfDayLabel);
@@ -111,7 +112,7 @@ public class WorldPanel extends ZeroGamePanel {
     }
 
     private JPanel createWorldInfoPanel() {
-        JPanel panel = createTitledPanel("World", null);
+        JPanel panel = createTitledPanel(LanguageStrings.PANEL_WORLD, null);
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.add(biomeLabel);
         panel.add(temperatureLabel);
@@ -122,8 +123,8 @@ public class WorldPanel extends ZeroGamePanel {
     public void updateStaticData(World world) {
         if (world == null || world.getActiveHex() == null) return;
         
-        String name = (world.getActiveHex().getBiome() != null) ? world.getActiveHex().getBiome().getName() : "N/A";
-        String fullTooltip = "Biome: " + name;
+        String name = (world.getActiveHex().getBiome() != null) ? world.getActiveHex().getBiome().getName() : LanguageStrings.WORLD_NA;
+        String fullTooltip = LanguageStrings.WORLD_BIOME_PREFIX + name;
         
         if (!fullTooltip.equals(lastBiome)) {
             biomeLabel.setText(name); 
@@ -161,14 +162,14 @@ public class WorldPanel extends ZeroGamePanel {
         int temp = world.getTemperature();
         if (temp != lastTemperature) {
             temperatureLabel.setText("");
-            temperatureLabel.setToolTipText("Temp: " + temp + "°C" + " (" + world.getTemperatureIcon().getName() + ")");
+            temperatureLabel.setToolTipText(LanguageStrings.WORLD_TEMP_PREFIX + temp + "°C" + " (" + world.getTemperatureIcon().getName() + ")");
             temperatureLabel.setIcon(world.getTemperatureIcon().getIcon());
             lastTemperature = temp;
         }
         int humidity = world.getHumidity();
         if (humidity != lastHumidity) {
             humidityLabel.setText("");
-            humidityLabel.setToolTipText("Humidity: " + world.getHumidityIcon().getName());
+            humidityLabel.setToolTipText(LanguageStrings.WORLD_HUMIDITY_PREFIX + world.getHumidityIcon().getName());
             humidityLabel.setIcon(world.getHumidityIcon().getIcon());
             lastHumidity = humidity;
         }

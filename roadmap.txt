@@ -26,9 +26,7 @@ Needed for launch (v1.0) (Launch Version):
 	Priority:
 	genetic stagnation (obscured until below (80%)) every nuptial, assimilation gives base 5% after cloning (unlocked after empire rank), alliances can increase while allied, stagnation = success chance to spread and drones from assimilated
 	font
-	visual filters for weather, time of day, biome etc. and sand storm and ash cloud, maybe transparent panels overlay
-	prepare for localization and SPA 
-
+	Spanish localization
 	Everything else :
 	ant speed and biome depletion and further located sources take more time and sustainability of biome 
 	auxiliary room sprites (storage (resources), farm (shroom), nurse (bedding), royal (nests and science))
