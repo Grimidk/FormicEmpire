@@ -11,7 +11,7 @@ To Fix (By decreasing priority) :
 	(none right now)
 
 	Mid:
-	pause/play in dialogs, consistent dialog size so the pause can be seen
+	(none right now)
 
 	Low:
 	breeders go out of the colony in nuptial

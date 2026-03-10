@@ -44,7 +44,7 @@ public class UpgradeDialog extends ZeroDialog {
     private int targetTab = -1;
 
     public UpgradeDialog(JFrame owner, Colony colony) {
-        super(owner, "Colony Upgrades", new Dimension(650, 600));
+        super(owner, "Colony Upgrades", AssetStyles.DEFAULT_DIALOG_SIZE);
         this.colony = colony;
 
         tabbedPane = new JTabbedPane();

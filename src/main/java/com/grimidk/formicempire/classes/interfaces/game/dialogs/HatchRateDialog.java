@@ -24,15 +24,22 @@ public class HatchRateDialog extends ZeroDialog {
     private boolean isAdjusting = false;
 
     public HatchRateDialog(JFrame owner, Colony colony) {
-        super(owner, "Manage Pupa Hatch Rates", new Dimension(400, 350));
+        super(owner, "Manage Pupa Hatch Rates", AssetStyles.DEFAULT_DIALOG_SIZE);
         this.colony = colony;
         
+        JPanel outer = new JPanel(new GridBagLayout());
+        outer.setBackground(AssetStyles.BACKGROUND_COLOR);
+
         centerPanel = new JPanel();
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
-        centerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        centerPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        centerPanel.setBorder(BorderFactory.createCompoundBorder(
+            AssetStyles.PANEL_BORDER,
+            BorderFactory.createEmptyBorder(20, 20, 20, 20)
+        ));
+        centerPanel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
         
-        add(centerPanel, BorderLayout.CENTER);
+        outer.add(centerPanel);
+        add(outer, BorderLayout.CENTER);
         
         registerCloseKey(KeyEvent.VK_P);
     }

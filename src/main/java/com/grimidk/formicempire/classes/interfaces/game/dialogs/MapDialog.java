@@ -30,7 +30,7 @@ public class MapDialog extends ZeroDialog {
     private final Runnable onHexChange;
 
     public MapDialog(JFrame owner, World world, Runnable onHexChange) {
-        super(owner, "World Map", new Dimension(1100, 800));
+        super(owner, "World Map", AssetStyles.DEFAULT_DIALOG_SIZE);
         this.world = world;
         this.onHexChange = onHexChange;
 

@@ -72,6 +72,8 @@ public class AssetStyles {
     
     public static final Color PLAYER_FACTION = PLAYER_COLOR;
 
+    public static final java.awt.Dimension DEFAULT_DIALOG_SIZE = new java.awt.Dimension(1000, 650);
+
     public static final int BORDER_THICKNESS_EXTERNAL = 2;
     public static final int BORDER_THICKNESS_INTERNAL = 1;
 

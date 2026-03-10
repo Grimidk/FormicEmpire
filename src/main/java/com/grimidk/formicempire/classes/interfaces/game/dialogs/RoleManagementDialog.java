@@ -36,7 +36,7 @@ public class RoleManagementDialog extends ZeroDialog {
     private final Map<Integer, Integer> tabIndexMap = new HashMap<>();
 
     public RoleManagementDialog(JFrame owner, Colony colony) {
-        super(owner, "Manage Ant Roles", new Dimension(550, 500));
+        super(owner, "Manage Ant Roles", AssetStyles.DEFAULT_DIALOG_SIZE);
         this.colony = colony;
 
         add(tabbedPane, BorderLayout.CENTER);

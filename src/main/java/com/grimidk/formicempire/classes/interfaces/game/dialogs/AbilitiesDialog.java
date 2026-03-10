@@ -28,7 +28,7 @@ public class AbilitiesDialog extends ZeroDialog {
     private final Map<JButton, Upgrade> abilityButtons = new HashMap<>();
 
     public AbilitiesDialog(JFrame owner, Colony colony) {
-        super(owner, "Colony Operations", new Dimension(500, 400));
+        super(owner, "Colony Operations", AssetStyles.DEFAULT_DIALOG_SIZE);
         this.colony = colony;
         
         JPanel northPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -69,8 +69,7 @@ public class AbilitiesDialog extends ZeroDialog {
                 "Spend " + currentCost + " RP to immediately trigger a nuptial flight.\nRequires Drones and Breeder Princesses.",
                 currentCost, 
                 e -> {
-                    if (getOwner() instanceof MainFrame) {
-                        MainFrame main = (MainFrame) getOwner();
+                    if (getOwner() instanceof MainFrame main) {
                         Engine engine = main.getEngine();
                         if (engine != null) {
                             World world = engine.getWorld();
@@ -110,8 +109,7 @@ public class AbilitiesDialog extends ZeroDialog {
                 "Spend " + massCost + " RP to trigger nuptial flights in ALL capable colonies across your dynasty.",
                 massCost,
                 e -> {
-                    if (getOwner() instanceof MainFrame) {
-                        MainFrame main = (MainFrame) getOwner();
+                    if (getOwner() instanceof MainFrame main) {
                         if (main.getEngine() != null && main.getEngine().getWorld() != null) {
                             colony.getDynasty().runMassNuptialFlight(main.getEngine().getWorld());
                             refreshDialog();
@@ -178,6 +176,7 @@ public class AbilitiesDialog extends ZeroDialog {
         JButton btn = new JButton("Trigger");
         btn.setFont(AssetStyles.FONT_BOLD);
         btn.setEnabled(enabled);
+        btn.setFocusable(false);
         btn.addActionListener(action);
         
         if (!enabled && tooltip != null) {
@@ -187,7 +186,7 @@ public class AbilitiesDialog extends ZeroDialog {
         }
         
         JLabel costLabel = new JLabel(rpCost + " RP");
-        costLabel.setForeground(AssetStyles.FONT_COLOR_VALUE);
+        costLabel.setForeground(AssetStyles.TEXT_NORMAL);
         costLabel.setFont(AssetStyles.FONT_BOLD);
         costLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         btn.setAlignmentX(Component.CENTER_ALIGNMENT);

@@ -1,13 +1,19 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
+import com.grimidk.formicempire.classes.constants.ant.AntType;
+import com.grimidk.formicempire.classes.constants.misc.ResourceType;
+import com.grimidk.formicempire.classes.constants.misc.TradeMethod;
 import com.grimidk.formicempire.classes.constants.world.Biome;
-import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.entities.Trade;
 import com.grimidk.formicempire.classes.entities.Tunnel;
+import com.grimidk.formicempire.classes.entities.services.DynastyTradeService;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 
 import javax.swing.*;
@@ -28,13 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import com.grimidk.formicempire.classes.entities.services.DynastyTradeService;
-import com.grimidk.formicempire.classes.constants.misc.ResourceType;
-import com.grimidk.formicempire.classes.constants.ant.AntType;
-import com.grimidk.formicempire.classes.constants.misc.TradeMethod;
-import com.grimidk.formicempire.classes.entities.Trade;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
-
 public class DynastyManagementDialog extends ZeroDialog {
 
     public static final int TAB_OVERVIEW = 0;
@@ -53,13 +52,14 @@ public class DynastyManagementDialog extends ZeroDialog {
     private final Runnable refreshTask = this::liveUpdate;
 
     public DynastyManagementDialog(JFrame owner, Dynasty dynasty, Engine engine, Consumer<Colony> onGoToColony) {
-        super(owner, "Dynasty Management", new Dimension(1100, 750));
+        super(owner, "Dynasty Management", AssetStyles.DEFAULT_DIALOG_SIZE);
         this.dynasty = dynasty;
         this.engine = engine;
         this.onGoToColony = onGoToColony;
         new DynastyTradeService(dynasty, engine.getTradeManager());
 
         tabbedPane = new JTabbedPane();
+        tabbedPane.setFocusable(false);
         tabbedPane.addChangeListener(e -> {
             Component selected = tabbedPane.getSelectedComponent();
             if (selected instanceof LiveUpdatePanel) {
@@ -248,6 +248,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             table = new JTable(model);
             table.setRowHeight(45);
             table.getTableHeader().setReorderingAllowed(false);
+            table.setFocusable(false);
             
             if (tunnelsVisible) {
                 table.getColumnModel().getColumn(2).setCellRenderer(new TunnelCellRenderer());
@@ -389,6 +390,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 setOpaque(true);
                 progressBar.setStringPainted(true);
                 label.setHorizontalAlignment(JLabel.CENTER);
+                buildBtn.setFocusable(false);
             }
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -439,6 +441,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             private final JButton buildBtn = new JButton("Build Tunnel");
             private TradeRowData currentData;
             public TunnelCellEditor() {
+                buildBtn.setFocusable(false);
                 panel.add(buildBtn, BorderLayout.CENTER);
                 buildBtn.addActionListener(e -> {
                     if (currentData != null && currentData.tunnel == null) {
@@ -482,6 +485,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             private final JButton actionBtn = new JButton();
             public TradeActionRenderer() {
                 setLayout(new FlowLayout(FlowLayout.CENTER, 5, 2));
+                actionBtn.setFocusable(false);
                 add(actionBtn);
             }
             @Override
@@ -506,6 +510,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             private final JButton actionBtn = new JButton();
             private TradeRowData currentData;
             public TradeActionEditor() {
+                actionBtn.setFocusable(false);
                 panel.add(actionBtn);
                 actionBtn.addActionListener(e -> {
                     fireEditingStopped();
@@ -643,11 +648,13 @@ public class DynastyManagementDialog extends ZeroDialog {
                     }
                 }
                 JSpinner s = new JSpinner(new SpinnerNumberModel(initialVal, 0.0, available, 10.0));
+                s.setFocusable(false);
                 s.addChangeListener(e -> updateStats());
                 resourceSpinners.put(rt, s);
                 p.add(s);
 
                 JButton maxBtn = new JButton("Max");
+                maxBtn.setFocusable(false);
                 maxBtn.setMargin(new Insets(2, 5, 2, 5));
                 maxBtn.addActionListener(e -> setMaxResource(rt));
                 p.add(maxBtn);
@@ -678,11 +685,13 @@ public class DynastyManagementDialog extends ZeroDialog {
                     }
                 }
                 JSpinner s = new JSpinner(new SpinnerNumberModel(initialVal, 0.0, 1000000.0, 10.0));
+                s.setFocusable(false);
                 s.addChangeListener(e -> updateStats());
                 returnResourceSpinners.put(rt, s);
                 p.add(s);
 
                 JButton maxBtn = new JButton("Max");
+                maxBtn.setFocusable(false);
                 maxBtn.setMargin(new Insets(2, 5, 2, 5));
                 maxBtn.addActionListener(e -> setMaxResource(rt, true));
                 p.add(maxBtn);
@@ -742,6 +751,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                     }
                 }
                 JSpinner s = new JSpinner(new SpinnerNumberModel(initialVal, 0, available, 1));
+                s.setFocusable(false);
                 s.addChangeListener(e -> {
                     updateAvailableMethods();
                     updateStats();
@@ -758,6 +768,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             configPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
             
             methodCombo = new JComboBox<>();
+            methodCombo.setFocusable(false);
             updateAvailableMethods();
 
             if (existingTrade != null) {
@@ -780,6 +791,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             
             boolean initialRecurrent = (existingTrade != null) ? (existingTrade.hasPendingUpdate() ? existingTrade.isPendingRecurrent() : existingTrade.isRecurrent()) : true;
             recurrentCheck = new JCheckBox("Recurrent Route", initialRecurrent);
+            recurrentCheck.setFocusable(false);
             recurrentCheck.setForeground(AssetStyles.FONT_COLOR);
             recurrentCheck.setOpaque(false);
             configPanel.add(Box.createHorizontalStrut(20));
@@ -787,6 +799,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             
             boolean initialBilateral = (existingTrade != null) ? (existingTrade.hasPendingUpdate() ? existingTrade.isPendingBilateral() : existingTrade.isBilateral()) : false;
             bilateralCheck = new JCheckBox("Bilateral Trade", initialBilateral);
+            bilateralCheck.setFocusable(false);
             bilateralCheck.setForeground(AssetStyles.FONT_COLOR);
             bilateralCheck.setOpaque(false);
             bilateralCheck.setVisible(origin.hasUpgrade(GameUnlocks.ABILITY_BILATERAL_TRADE));
@@ -808,16 +821,19 @@ public class DynastyManagementDialog extends ZeroDialog {
             footerPanel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
 
             createBtn = new JButton(existingTrade == null ? "Confirm Trade Route" : "Update Trade Route");
+            createBtn.setFocusable(false);
             createBtn.setFont(AssetStyles.FONT_BOLD);
             createBtn.addActionListener(e -> attemptCreate());
             
             optimizeBtn = new JButton("Bilateral Optimization");
+            optimizeBtn.setFocusable(false);
             optimizeBtn.setFont(AssetStyles.FONT_BOLD);
             optimizeBtn.setForeground(AssetStyles.FONT_COLOR_SUCCESS);
             optimizeBtn.setVisible(false);
             optimizeBtn.addActionListener(e -> performOptimization());
             
             JButton cancelBtn = new JButton("Cancel");
+            cancelBtn.setFocusable(false);
             cancelBtn.setFont(AssetStyles.FONT_BOLD);
             cancelBtn.addActionListener(e -> dispose());
             
@@ -983,7 +999,6 @@ public class DynastyManagementDialog extends ZeroDialog {
             else if (noLoad) createBtn.setToolTipText("No resources selected for trade!");
             else createBtn.setToolTipText(null);
 
-            // Optimization check
             if (origin.hasUpgrade(GameUnlocks.ABILITY_BILATERAL_TRADE) && !bilateralCheck.isSelected()) {
                 Trade incoming = findIncomingTrade();
                 if (incoming != null) {
@@ -1110,11 +1125,9 @@ public class DynastyManagementDialog extends ZeroDialog {
         private int automationCol = -1;
         private int actionCol = -1;
         
-        // Sorting
         private final JComboBox<String> sortCombo;
         private Comparator<Colony> currentSorter;
 
-        // Default Toggles
         private JCheckBox defaultAutoBuildCheck;
         private JCheckBox defaultAutomationCheck;
 
@@ -1131,6 +1144,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 "Age (Oldest First)", 
                 "Age (Newest First)"
             });
+            this.sortCombo.setFocusable(false);
             this.sortCombo.addActionListener(e -> updateSorter());
             
             initUI();
@@ -1156,12 +1170,10 @@ public class DynastyManagementDialog extends ZeroDialog {
         }
 
         private void initUI() {
-            // --- Top Controls ---
             JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 10));
             topPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
             topPanel.setBorder(BorderFactory.createMatteBorder(0, 0, AssetStyles.BORDER_THICKNESS_INTERNAL, 0, AssetStyles.BORDER_COLOR));
             
-            // Sort
             JPanel sortPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
             sortPanel.setOpaque(false);
             JLabel sortLabel = new JLabel("Sort by:");
@@ -1172,9 +1184,9 @@ public class DynastyManagementDialog extends ZeroDialog {
             
             topPanel.add(Box.createHorizontalStrut(20));
 
-            // Default Toggles
             if (showAutoBuild) {
                 defaultAutoBuildCheck = new JCheckBox("Default Auto-Build");
+                defaultAutoBuildCheck.setFocusable(false);
                 defaultAutoBuildCheck.setOpaque(false);
                 defaultAutoBuildCheck.setForeground(AssetStyles.FONT_COLOR);
                 defaultAutoBuildCheck.setToolTipText("Automatically enable Auto-Build for all new colonies established by this dynasty.");
@@ -1185,6 +1197,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             
             if (showAutomation) {
                 defaultAutomationCheck = new JCheckBox("Default Automation");
+                defaultAutomationCheck.setFocusable(false);
                 defaultAutomationCheck.setOpaque(false);
                 defaultAutomationCheck.setForeground(AssetStyles.FONT_COLOR);
                 defaultAutomationCheck.setToolTipText("Automatically enable Automation for all new colonies established by this dynasty.");
@@ -1195,7 +1208,6 @@ public class DynastyManagementDialog extends ZeroDialog {
             
             add(topPanel, BorderLayout.NORTH);
 
-            // --- Table ---
             List<String> cols = new ArrayList<>(Arrays.asList("", "Rank", "Type", "Name", "Population", "Age (Days)", "Biome"));
             
             if (showAutoBuild) {
@@ -1247,6 +1259,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             table.getTableHeader().setReorderingAllowed(false);
             table.setFillsViewportHeight(true);
             table.setForeground(AssetStyles.FONT_COLOR);
+            table.setFocusable(false);
             
             table.getColumnModel().getColumn(0).setMaxWidth(50);
             table.getColumnModel().getColumn(0).setPreferredWidth(50);
@@ -1358,6 +1371,8 @@ public class DynastyManagementDialog extends ZeroDialog {
             setOpaque(true);
             JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 5));
             btnPanel.setOpaque(false);
+            editBtn.setFocusable(false);
+            viewBtn.setFocusable(false);
             btnPanel.add(editBtn);
             btnPanel.add(viewBtn);
             JPanel progressPanel = new JPanel(new BorderLayout());
@@ -1402,6 +1417,8 @@ public class DynastyManagementDialog extends ZeroDialog {
             container.setOpaque(true);
             JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 5));
             btnPanel.setOpaque(false);
+            editBtn.setFocusable(false);
+            viewBtn.setFocusable(false);
             editBtn.addActionListener(e -> { fireEditingStopped(); performEdit(currentColony); });
             viewBtn.addActionListener(e -> { fireEditingStopped(); performView(currentColony); });
             btnPanel.add(editBtn);

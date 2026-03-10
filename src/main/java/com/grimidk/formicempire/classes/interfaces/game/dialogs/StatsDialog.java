@@ -52,7 +52,7 @@ public class StatsDialog extends ZeroDialog {
     private final Runnable refreshTask = this::liveUpdate;
 
     public StatsDialog(JFrame owner, Colony colony, Engine engine) {
-        super(owner, "Statistics", new Dimension(1000, 650));
+        super(owner, "Statistics", AssetStyles.DEFAULT_DIALOG_SIZE);
         this.colony = colony;
         this.engine = engine;
         this.dynastyStatsService = new DynastyStatService(); 
