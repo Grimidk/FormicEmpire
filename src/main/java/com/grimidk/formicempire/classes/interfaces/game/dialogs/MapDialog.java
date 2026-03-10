@@ -88,7 +88,7 @@ public class MapDialog extends ZeroDialog {
         };
 
         public HexMapPanel() {
-            setBackground(AssetStyles.BACKGROUND_LIGHT);
+            setBackground(AssetStyles.BACKGROUND_COLOR);
             ToolTipManager.sharedInstance().registerComponent(this);
 
             addMouseListener(new MouseAdapter() {
@@ -234,7 +234,7 @@ public class MapDialog extends ZeroDialog {
                 }
                 
                 if (hex != world.getActiveHex()) {
-                    fillColor = fadeToWhite(fillColor, 0.4f); 
+                    fillColor = fadeToBackground(fillColor, 0.4f); 
                 }
                 
                 g2d.setColor(fillColor);
@@ -402,7 +402,7 @@ public class MapDialog extends ZeroDialog {
                     }
                 }
 
-                if (count == 0) return AssetStyles.BACKGROUND_LIGHT;
+                if (count == 0) return AssetStyles.BACKGROUND_COLOR;
 
                 return new Color((int)(sumR/count), (int)(sumG/count), (int)(sumB/count));
                 
@@ -412,16 +412,18 @@ public class MapDialog extends ZeroDialog {
         }
         
         private Color lighten(Color c, float amount) {
-            int r = Math.min(255, (int)(c.getRed() + (255 - c.getRed()) * amount));
-            int g = Math.min(255, (int)(c.getGreen() + (255 - c.getGreen()) * amount));
-            int b = Math.min(255, (int)(c.getBlue() + (255 - c.getBlue()) * amount));
+            Color bg = AssetStyles.BACKGROUND_COLOR;
+            int r = Math.min(255, (int)(c.getRed() + (bg.getRed() - c.getRed()) * amount));
+            int g = Math.min(255, (int)(c.getGreen() + (bg.getGreen() - c.getGreen()) * amount));
+            int b = Math.min(255, (int)(c.getBlue() + (bg.getBlue() - c.getBlue()) * amount));
             return new Color(r, g, b, c.getAlpha());
         }
         
-        private Color fadeToWhite(Color c, float factor) {
-            int r = (int) (c.getRed() * (1 - factor) + 255 * factor);
-            int g = (int) (c.getGreen() * (1 - factor) + 255 * factor);
-            int b = (int) (c.getBlue() * (1 - factor) + 255 * factor);
+        private Color fadeToBackground(Color c, float factor) {
+            Color bg = AssetStyles.BACKGROUND_COLOR;
+            int r = (int) (c.getRed() * (1 - factor) + bg.getRed() * factor);
+            int g = (int) (c.getGreen() * (1 - factor) + bg.getGreen() * factor);
+            int b = (int) (c.getBlue() * (1 - factor) + bg.getBlue() * factor);
             return new Color(r, g, b);
         }
     }

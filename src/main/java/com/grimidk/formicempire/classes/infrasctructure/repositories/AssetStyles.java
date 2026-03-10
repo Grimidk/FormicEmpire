@@ -12,6 +12,8 @@ import java.io.InputStream;
 import java.net.URL;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
+import javax.swing.JSeparator;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 
@@ -70,8 +72,19 @@ public class AssetStyles {
     
     public static final Color PLAYER_FACTION = PLAYER_COLOR;
 
-    public static final Border PANEL_BORDER = BorderFactory.createLineBorder(UI_BORDER_COLOR, 2);
+    public static final int BORDER_THICKNESS_EXTERNAL = 2;
+    public static final int BORDER_THICKNESS_INTERNAL = 1;
+
+    public static final Border PANEL_BORDER = BorderFactory.createLineBorder(UI_BORDER_COLOR, BORDER_THICKNESS_EXTERNAL);
+    public static final Border INTERNAL_BORDER = BorderFactory.createLineBorder(UI_BORDER_COLOR, BORDER_THICKNESS_INTERNAL);
     
+    public static JSeparator createInternalSeparator() {
+        JSeparator sep = new JSeparator(SwingConstants.HORIZONTAL);
+        sep.setForeground(COLOR_ABSOLUTE_BLACK);
+        sep.setBackground(COLOR_ABSOLUTE_BLACK);
+        return sep;
+    }
+
     private static Font customFont;
 
     static {
@@ -148,6 +161,11 @@ public class AssetStyles {
 
         UIManager.put("ScrollPane.background", BACKGROUND_COLOR);
         UIManager.put("Viewport.background", BACKGROUND_COLOR);
+        
+        UIManager.put("Separator.foreground", COLOR_ABSOLUTE_BLACK);
+        UIManager.put("Separator.background", COLOR_ABSOLUTE_BLACK);
+        UIManager.put("JSeparator.foreground", COLOR_ABSOLUTE_BLACK);
+        UIManager.put("JSeparator.background", COLOR_ABSOLUTE_BLACK);
         
         UIManager.put("TitledBorder.titleColor", FONT_COLOR_HEADER);
         UIManager.put("TitledBorder.font", FONT_BOLD);

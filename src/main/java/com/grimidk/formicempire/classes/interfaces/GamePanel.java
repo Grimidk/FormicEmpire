@@ -545,7 +545,7 @@ public class GamePanel extends ZeroGamePanel {
         loadingDialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBorder(BorderFactory.createLineBorder(AssetStyles.BACKGROUND_SECONDARY, 2));
+        panel.setBorder(BorderFactory.createLineBorder(AssetStyles.BORDER_COLOR, AssetStyles.BORDER_THICKNESS_EXTERNAL));
         panel.setBackground(AssetStyles.BACKGROUND_DARK);
 
         JLabel label = new JLabel("Loading game, please wait...", SwingConstants.CENTER);

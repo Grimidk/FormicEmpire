@@ -13,7 +13,7 @@ To Fix (By decreasing priority) :
 	Mid:
 	map legend
 	pause/play in dialogs
-	colnies in water biome
+	toggle for colony/dynasty wide stats
 
 	Low:
 	breeders go out of the colony in nuptial
@@ -28,6 +28,9 @@ Needed for launch (v1.0) (Launch Version):
 	Priority:
 	genetic stagnation (obscured until below (80%)) every nuptial, assimilation gives base 5% after cloning (unlocked after empire rank), alliances can increase while allied, stagnation = success chance to spread and drones from assimilated
 	font
+	visual filters for weather, time of day, biome etc. and sand storm and ash cloud
+	prepare for localization and SPA 
+	change zip to include jar and edit itch
 
 	Everything else :
 	ant speed and biome depletion and further located sources take more time and sustainability of biome 
@@ -42,12 +45,11 @@ Needed for launch (v1.0) (Launch Version):
 	ant subtypes (enable by role /  exclusion) checks with new sprites 
 	revamp story and lore and maybe intro screen
 	more socialism (?)
-	visual filters for weather, time of day, biome etc.
 	research tree
 	building tree
 	minerals
 	synergies ( Super majors + Chemical throwing = Artillery ants; Self destruction + Acid spitting = Corrosive bombs; Silk weaving + Hive building = Web building; Air-force ants + self destruction = Air-bomber ants)
-	icons for all constants and unlocks
+	icons for all constants and unlocks (roles, move and trade methods, upgrades, buildings, assimilations,  synergies)
 	more upgrades
 	more buildings
 	more roles (commander and captain roles, air force)

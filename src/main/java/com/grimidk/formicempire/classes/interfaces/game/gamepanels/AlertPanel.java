@@ -25,13 +25,13 @@ public class AlertPanel extends ZeroGamePanel {
         
         listPanel = new JPanel();
         listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
-        listPanel.setBackground(AssetStyles.BACKGROUND_LIGHT); 
+        listPanel.setBackground(AssetStyles.BACKGROUND_COLOR); 
 
         scrollPane = new JScrollPane(listPanel);
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setBorder(null);
-        scrollPane.getViewport().setBackground(AssetStyles.BACKGROUND_LIGHT);
+        scrollPane.getViewport().setBackground(AssetStyles.BACKGROUND_COLOR);
     }
 
     @Override
@@ -52,10 +52,10 @@ public class AlertPanel extends ZeroGamePanel {
         } else {
             for (Alert alert : alerts) {
                 JPanel itemPanel = new JPanel(new BorderLayout());
-                itemPanel.setBackground(AssetStyles.BACKGROUND_LIGHT);
+                itemPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
                 itemPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
                 itemPanel.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createMatteBorder(0, 0, 1, 0, AssetStyles.BACKGROUND_SECONDARY),
+                    BorderFactory.createMatteBorder(0, 0, AssetStyles.BORDER_THICKNESS_INTERNAL, 0, AssetStyles.BORDER_COLOR),
                     new EmptyBorder(2, 5, 2, 5)
                 ));
 

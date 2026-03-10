@@ -58,7 +58,7 @@ public class HatchRateDialog extends ZeroDialog {
         
         centerPanel.add(descLabel);
         centerPanel.add(totalLabel);
-        centerPanel.add(new JSeparator(SwingConstants.HORIZONTAL));
+        centerPanel.add(AssetStyles.createInternalSeparator());
         
         List<AntType> typesToRate = new ArrayList<>();
         if (colony.hasUpgrade(GameUnlocks.TYPE_WORKER)) typesToRate.add(GameConstants.TYPE_WORKER);

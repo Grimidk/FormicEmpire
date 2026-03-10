@@ -251,7 +251,7 @@ public class RoleManagementDialog extends ZeroDialog {
             add(totalLabel);
             add(assignedLabel);
             add(unassignedLabel);
-            add(new JSeparator(SwingConstants.HORIZONTAL));
+            add(AssetStyles.createInternalSeparator());
 
             checkAndAddRoles();
             

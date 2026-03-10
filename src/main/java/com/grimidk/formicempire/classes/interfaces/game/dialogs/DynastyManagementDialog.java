@@ -1159,7 +1159,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             // --- Top Controls ---
             JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 10));
             topPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
-            topPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, AssetStyles.BORDER_COLOR));
+            topPanel.setBorder(BorderFactory.createMatteBorder(0, 0, AssetStyles.BORDER_THICKNESS_INTERNAL, 0, AssetStyles.BORDER_COLOR));
             
             // Sort
             JPanel sortPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));

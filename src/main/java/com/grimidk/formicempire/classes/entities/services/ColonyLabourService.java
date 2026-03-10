@@ -374,6 +374,10 @@ public class ColonyLabourService {
         for (Hex neighbor : neighbors) {
             if (satellitesSpawned >= satellitesToSpawn) break; 
             
+            if (neighbor.getBiome() == GameConstants.BIOME_OCEAN || neighbor.getBiome() == GameConstants.BIOME_LAKE) {
+                continue;
+            }
+            
             Colony existingColony = neighbor.getColony();
             boolean isDead = existingColony != null && existingColony.getAntTotal() == 0 && existingColony.getAge() >= 7;
             

@@ -207,7 +207,7 @@ public class ColonyPanel extends ZeroGamePanel {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS)); 
         totalResourcesLabel.setForeground(AssetStyles.FONT_COLOR);
         panel.add(totalResourcesLabel);
-        panel.add(new JSeparator(SwingConstants.HORIZONTAL));
+        panel.add(AssetStyles.createInternalSeparator());
         panel.add(mushroomsLabel);
         panel.add(plantLabel);
         panel.add(proteinLabel);
@@ -223,7 +223,7 @@ public class ColonyPanel extends ZeroGamePanel {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         totalAntLabel.setForeground(AssetStyles.FONT_COLOR);
         panel.add(totalAntLabel);
-        panel.add(new JSeparator(SwingConstants.HORIZONTAL));
+        panel.add(AssetStyles.createInternalSeparator());
         panel.add(queensLabel);
         panel.add(princessLabel);
         panel.add(droneLabel);
@@ -243,7 +243,7 @@ public class ColonyPanel extends ZeroGamePanel {
         rankLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         rankLabel.setForeground(AssetStyles.FONT_COLOR);
         panel.add(rankLabel);
-        panel.add(new JSeparator(SwingConstants.HORIZONTAL));
+        panel.add(AssetStyles.createInternalSeparator());
         
         totalConsumptionLabel.setForeground(AssetStyles.FONT_COLOR);
         totalProductionLabel.setForeground(AssetStyles.FONT_COLOR);

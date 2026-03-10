@@ -472,28 +472,28 @@ public final class GameConstants {
     public static final Species SPECIES_OMNI = new Species(1, "Omni Ant", "Omniformica Grimunknowni",  "omni/", null, 
         Set.of(GameUnlocks.TYPE_EGG, GameUnlocks.TYPE_QUEEN, GameUnlocks.TYPE_WORKER, GameUnlocks.ROLE_FORAGER, 
             GameUnlocks.ROLE_FARMER, GameUnlocks.ROLE_NURSE, GameUnlocks.ROLE_LAYER, 
-            GameUnlocks.STAT_SKELETON, GameUnlocks.STAT_ACID, GameUnlocks.STAT_LONGEVITY));
+            GameUnlocks.STAT_SKELETON, GameUnlocks.STAT_ACID, GameUnlocks.STAT_LONGEVITY), loadIcon("icons/species/omni.png"));
     static { species.add(SPECIES_OMNI); }
     
     public static final Species SPECIES_LEAF = new Species(2, "Leaf-Cutter Ant", "Atta Cephalotes", "leaf/", GameUnlocks.ASSIMILATION_LEAFCUTTER, 
         Set.of(GameUnlocks.TYPE_EGG, GameUnlocks.TYPE_QUEEN, GameUnlocks.TYPE_WORKER, GameUnlocks.ROLE_FORAGER, 
             GameUnlocks.ROLE_FARMER, GameUnlocks.ROLE_NURSE, GameUnlocks.ROLE_LAYER, 
             GameUnlocks.STAT_SKELETON, GameUnlocks.STAT_ACID, GameUnlocks.STAT_LONGEVITY,
-            GameUnlocks.ASSIMILATED_FARMING));
+            GameUnlocks.ASSIMILATED_FARMING), loadIcon("icons/species/leaf.png"));
     static { species.add(SPECIES_LEAF); }
     
     public static final Species SPECIES_PHARAOH = new Species(3, "Pharaoh Ant", "Monomorium Pharaonis", "pharaoh/", GameUnlocks.ASSIMILATION_PHARAOH, 
         Set.of(GameUnlocks.TYPE_EGG, GameUnlocks.TYPE_QUEEN, GameUnlocks.TYPE_WORKER, GameUnlocks.ROLE_FORAGER, 
             GameUnlocks.ROLE_FARMER, GameUnlocks.ROLE_NURSE, GameUnlocks.ROLE_LAYER, 
             GameUnlocks.STAT_SKELETON, GameUnlocks.STAT_ACID, GameUnlocks.STAT_LONGEVITY,
-            GameUnlocks.ASSIMILATED_MULTIQUEEN));
+            GameUnlocks.ASSIMILATED_MULTIQUEEN) ,loadIcon("icons/species/pharaoh.png"));
     static { species.add(SPECIES_PHARAOH); }
     
     public static final Species SPECIES_MARAUDER = new Species(4, "Marauder Ant", "Carebara Diversa", "marauder/", GameUnlocks.ASSIMILATION_MARAUDER, 
         Set.of(GameUnlocks.TYPE_EGG, GameUnlocks.TYPE_QUEEN, GameUnlocks.TYPE_WORKER, GameUnlocks.ROLE_FORAGER, 
             GameUnlocks.ROLE_FARMER, GameUnlocks.ROLE_NURSE, GameUnlocks.ROLE_LAYER, 
             GameUnlocks.STAT_SKELETON, GameUnlocks.STAT_ACID, GameUnlocks.STAT_LONGEVITY,
-            GameUnlocks.TYPE_MAJOR));
+            GameUnlocks.TYPE_MAJOR) ,loadIcon("icons/species/marauder.png"));
     static { species.add(SPECIES_MARAUDER); }
 
     // --- Trade Methods ---
