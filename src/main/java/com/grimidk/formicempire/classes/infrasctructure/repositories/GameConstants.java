@@ -284,13 +284,13 @@ public final class GameConstants {
         loadIcon("icons/weather/blood-rain.png"));
     static { weathers.add(WEATHER_BLOOD); }
     public static final Weather WEATHER_SAND_STORM = new Weather(12, LanguageStrings.WEATHER_SAND_STORM, -1, 0.8f, AssetStyles.OVERLAY_SANDSTORM,
-        loadIcon("icons/weather/heat-wave.png"));
+        loadIcon("icons/weather/sand-storm.png"));
     static { weathers.add(WEATHER_SAND_STORM); }
     public static final Weather WEATHER_PYROCLASTIC_FOG = new Weather(13, LanguageStrings.WEATHER_PYROCLASTIC_FOG, 0, 0.5f, AssetStyles.OVERLAY_PYROCLASTIC,
-        loadIcon("icons/weather/fog.png"));
+        loadIcon("icons/weather/pyro-fog.png"));
     static { weathers.add(WEATHER_PYROCLASTIC_FOG); }
     public static final Weather WEATHER_ACID_RAIN = new Weather(14, LanguageStrings.WEATHER_ACID_RAIN, 1, 0.75f, AssetStyles.OVERLAY_ACID_RAIN,
-        loadIcon("icons/weather/rain.png"));
+        loadIcon("icons/weather/acid-rain.png"));
     static { weathers.add(WEATHER_ACID_RAIN); }
 
     // --- Ant Status ---

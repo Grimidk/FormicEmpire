@@ -214,11 +214,16 @@ public class Engine extends Thread {
     @Override
     public void run() {
         while (!killSwitch) {
-            try {
-                Thread.sleep((long) delay);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            if (!allowTurboMode) {
+                try {
+                    Thread.sleep((long) delay);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                Thread.yield();
             }
+
             if (!paused) {
                 try {
                     semaphore.acquire();

@@ -70,6 +70,8 @@ public class SpanishTranslation implements Translation {
         es.put("UI_ERROR", "Error");
         es.put("UI_NEXT", "Siguiente");
         es.put("UI_FINISH", "Finalizar");
+        es.put("UI_CONFIRM_EXIT_TITLE", "Confirmar Salida");
+        es.put("UI_CONFIRM_EXIT_MSG", "¡Tienes progreso sin guardar! ¿Estás seguro de que quieres salir?");
 
         es.put("PANEL_ALERTS", "Alertas");
         es.put("PANEL_NO_ALERTS", "Sin alertas");

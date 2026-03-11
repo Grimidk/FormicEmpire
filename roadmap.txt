@@ -29,7 +29,7 @@ Needed for launch (v1.0) (Launch Version):
 	promo video
 
 	Everything else :
-	ant speed and biome depletion and further located sources take more time and sustainability of biome 
+	ant speed and biome depletion and further located sources take more time and sustainability of biome, source sprites by size
 	auxiliary room sprites (storage (resources), farm (shroom), nurse (bedding), royal (nests and science))
 	more settings (choose default, fuzzed parasites)
 	automate NPC to spread

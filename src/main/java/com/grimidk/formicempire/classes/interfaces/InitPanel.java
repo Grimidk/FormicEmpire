@@ -70,7 +70,7 @@ public class InitPanel extends JPanel {
         repaint();
     }
     
-    private void refreshTranslations() {
+    public void refreshTranslations() {
         play.setText(LanguageStrings.get(LanguageStrings.UI_PLAY));
         help.setText(LanguageStrings.get(LanguageStrings.UI_HELP));
         settings.setText(LanguageStrings.get(LanguageStrings.UI_SETTINGS));

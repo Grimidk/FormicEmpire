@@ -132,6 +132,9 @@ public final class LanguageStrings {
     public static final String UI_ERROR = "UI_ERROR";
     public static final String UI_NEXT = "UI_NEXT";
     public static final String UI_FINISH = "UI_FINISH";
+    
+    public static final String UI_CONFIRM_EXIT_TITLE = "UI_CONFIRM_EXIT_TITLE";
+    public static final String UI_CONFIRM_EXIT_MSG = "UI_CONFIRM_EXIT_MSG";
 
     public static final String PANEL_ALERTS = "PANEL_ALERTS";
     public static final String PANEL_NO_ALERTS = "PANEL_NO_ALERTS";

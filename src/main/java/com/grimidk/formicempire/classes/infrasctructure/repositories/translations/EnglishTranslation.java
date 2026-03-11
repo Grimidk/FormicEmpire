@@ -70,6 +70,8 @@ public class EnglishTranslation implements Translation {
         en.put("UI_ERROR", "Error");
         en.put("UI_NEXT", "Next");
         en.put("UI_FINISH", "Finish");
+        en.put("UI_CONFIRM_EXIT_TITLE", "Confirm Exit");
+        en.put("UI_CONFIRM_EXIT_MSG", "You have unsaved progress! Are you sure you want to exit?");
 
         en.put("PANEL_ALERTS", "Alerts");
         en.put("PANEL_NO_ALERTS", "No alerts");
