@@ -40,6 +40,10 @@ public class Engine extends Thread {
     private int masterVolume = 80;
     private int musicVolume = 70;
     private int sfxVolume = 100;
+    
+    private boolean pauseOnFocusLoss = true;
+    private boolean confirmOnQuit = true;
+    private boolean showTooltips = true;
 
     public Engine() {
         this.delay = 250;
@@ -313,5 +317,29 @@ public class Engine extends Thread {
 
     public void setSfxVolume(int sfxVolume) {
         this.sfxVolume = sfxVolume;
+    }
+
+    public boolean isPauseOnFocusLoss() {
+        return pauseOnFocusLoss;
+    }
+
+    public void setPauseOnFocusLoss(boolean pauseOnFocusLoss) {
+        this.pauseOnFocusLoss = pauseOnFocusLoss;
+    }
+
+    public boolean isConfirmOnQuit() {
+        return confirmOnQuit;
+    }
+
+    public void setConfirmOnQuit(boolean confirmOnQuit) {
+        this.confirmOnQuit = confirmOnQuit;
+    }
+
+    public boolean isShowTooltips() {
+        return showTooltips;
+    }
+
+    public void setShowTooltips(boolean showTooltips) {
+        this.showTooltips = showTooltips;
     }
 }

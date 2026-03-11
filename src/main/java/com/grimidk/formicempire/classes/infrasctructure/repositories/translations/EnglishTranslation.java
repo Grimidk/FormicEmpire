@@ -379,6 +379,9 @@ public class EnglishTranslation implements Translation {
         
         en.put("SETTINGS_VISUAL_FILTERS", "Visual Filters:");
         en.put("SETTINGS_ARACHNOPHOBIA", "Arachnophobia Mode:");
+        en.put("SETTINGS_PAUSE_FOCUS", "Pause on Focus Loss:");
+        en.put("SETTINGS_CONFIRM_QUIT", "Confirm on Quit:");
+        en.put("SETTINGS_SHOW_TOOLTIPS", "Show UI Tooltips:");
         
         en.put("SETTINGS_MASTER_VOL", "Master Volume:");
         en.put("SETTINGS_MUSIC_VOL", "Music Volume:");

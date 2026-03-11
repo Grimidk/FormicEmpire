@@ -8,7 +8,6 @@ import javax.swing.*;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.List;
@@ -17,17 +16,31 @@ public class SettingsPanel extends JPanel {
     private final MainFrame frame;
     private final Engine engine;
 
+    private JTabbedPane tabbedPane;
+    
+    // --- General Tab ---
     private JComboBox<LanguageOption> languageCombo;
+    private JComboBox<AutosaveOption> autosaveCombo;
     private JCheckBox turboCheck;
+    private JCheckBox arachnophobiaCheck;
+    private JCheckBox pauseFocusCheck;
+    private JCheckBox confirmQuitCheck;
+    private JCheckBox showTooltipsCheck;
+    
+    // --- Video Tab ---
     private JComboBox<String> sizeCombo;
     private JCheckBox fullScreenCheck;
-    private JComboBox<AutosaveOption> autosaveCombo;
+    private JCheckBox visualFiltersCheck;
     
-    private JLabel langLabel;
-    private JLabel sizeLabel;
-    private JLabel fsLabel;
-    private JLabel autoLabel;
-    private JLabel turboLabel;
+    // --- Audio Tab ---
+    private JSlider masterVolSlider;
+    private JSlider musicVolSlider;
+    private JSlider sfxVolSlider;
+    
+    private JLabel langLabel, autoLabel, turboLabel, arachLabel, pauseFocusLabel, confirmQuitLabel, tooltipsLabel;
+    private JLabel sizeLabel, fsLabel, visualFiltersLabel;
+    private JLabel masterLabel, musicLabel, sfxLabel;
+    
     private JButton saveButton;
     private JButton backButton;
 
@@ -56,10 +69,36 @@ public class SettingsPanel extends JPanel {
     public SettingsPanel(MainFrame frame) {
         this.frame = frame;
         this.engine = frame.getEngine();
-        setLayout(new GridBagLayout());
+        setLayout(new BorderLayout());
         setBackground(AssetStyles.BACKGROUND_COLOR);
         
+        tabbedPane = new JTabbedPane();
+        tabbedPane.setFont(AssetStyles.FONT_BOLD);
+        tabbedPane.setBackground(AssetStyles.BACKGROUND_SECONDARY);
+        tabbedPane.setForeground(AssetStyles.FONT_COLOR);
+        
         initUI();
+        
+        add(tabbedPane, BorderLayout.CENTER);
+        
+        JPanel southPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        southPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        
+        saveButton = new JButton();
+        styleButton(saveButton);
+        saveButton.addActionListener(e -> saveSettings());
+        setupNavigation(saveButton);
+
+        backButton = new JButton();
+        styleButton(backButton);
+        backButton.addActionListener(e -> this.frame.showCard(MainFrame.CARD_INIT));
+        setupNavigation(backButton);
+        
+        southPanel.add(saveButton);
+        southPanel.add(backButton);
+        add(southPanel, BorderLayout.SOUTH);
+        
+        refreshTranslations();
         
         LanguageStrings.addListener(this::refreshTranslations);
 
@@ -68,28 +107,35 @@ public class SettingsPanel extends JPanel {
             public void ancestorAdded(AncestorEvent event) {
                 backButton.requestFocusInWindow();
             }
-
             @Override
             public void ancestorRemoved(AncestorEvent event) {}
-
             @Override
             public void ancestorMoved(AncestorEvent event) {}
         });
     }
     
     private void initUI() {
-        removeAll();
+        tabbedPane.removeAll();
+        
+        tabbedPane.addTab("General", createGeneralTab());
+        tabbedPane.addTab("Video", createVideoTab());
+        tabbedPane.addTab("Audio", createAudioTab());
+    }
+    
+    private JPanel createGeneralTab() {
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBackground(AssetStyles.BACKGROUND_COLOR);
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
-        c.insets = new Insets(8, 8, 8, 8);
+        c.insets = new Insets(5, 15, 5, 15);
         c.anchor = GridBagConstraints.WEST;
 
         // Language
         c.gridy = 0; c.gridx = 0; 
-        langLabel = new JLabel(LanguageStrings.get(LanguageStrings.SETTINGS_LANGUAGE));
+        langLabel = new JLabel();
         langLabel.setFont(AssetStyles.FONT_NORMAL);
         langLabel.setForeground(AssetStyles.FONT_COLOR);
-        add(langLabel, c);
+        panel.add(langLabel, c);
         
         List<String> codes = LanguageStrings.getAvailableLanguageCodes();
         LanguageOption[] options = new LanguageOption[codes.size()];
@@ -98,92 +144,195 @@ public class SettingsPanel extends JPanel {
         }
         languageCombo = new JComboBox<>(options);
         styleComboBox(languageCombo);
-        c.gridx = 1; add(languageCombo, c);
-
-        // Screen Size
-        c.gridy = 1; c.gridx = 0; 
-        sizeLabel = new JLabel(LanguageStrings.get(LanguageStrings.SETTINGS_SCREEN_SIZE));
-        sizeLabel.setFont(AssetStyles.FONT_NORMAL);
-        sizeLabel.setForeground(AssetStyles.FONT_COLOR);
-        add(sizeLabel, c);
-        
-        sizeCombo = new JComboBox<>(new String[]{"1000x700", "1280x720", "1600x900", "1920x1000"});
-        styleComboBox(sizeCombo);
-        sizeCombo.setEditable(true);
-        c.gridx = 1; add(sizeCombo, c);
-
-        // Full Screen
-        c.gridy = 2; c.gridx = 0; 
-        fsLabel = new JLabel(LanguageStrings.get(LanguageStrings.SETTINGS_FULLSCREEN));
-        fsLabel.setFont(AssetStyles.FONT_NORMAL);
-        fsLabel.setForeground(AssetStyles.FONT_COLOR);
-        add(fsLabel, c);
-        
-        fullScreenCheck = new JCheckBox();
-        styleCheckBox(fullScreenCheck);
-        setupNavigation(fullScreenCheck);
-        c.gridx = 1; add(fullScreenCheck, c);
+        c.gridx = 1; panel.add(languageCombo, c);
 
         // Autosave Frequency
-        c.gridy = 3; c.gridx = 0; 
-        autoLabel = new JLabel(LanguageStrings.get(LanguageStrings.SETTINGS_AUTOSAVE));
+        c.gridy = 1; c.gridx = 0; 
+        autoLabel = new JLabel();
         autoLabel.setFont(AssetStyles.FONT_NORMAL);
         autoLabel.setForeground(AssetStyles.FONT_COLOR);
-        add(autoLabel, c);
+        panel.add(autoLabel, c);
         
-        autosaveCombo = new JComboBox<>(new AutosaveOption[]{
-                new AutosaveOption(LanguageStrings.get(LanguageStrings.SETTINGS_EVERY_MONTH), 1),
-                new AutosaveOption(LanguageStrings.get(LanguageStrings.SETTINGS_EVERY_3_MONTHS), 3),
-                new AutosaveOption(LanguageStrings.get(LanguageStrings.SETTINGS_EVERY_6_MONTHS), 6),
-                new AutosaveOption(LanguageStrings.get(LanguageStrings.SETTINGS_EVERY_YEAR), 12),
-                new AutosaveOption(LanguageStrings.get(LanguageStrings.UI_DISABLED), 0)
-        });
+        autosaveCombo = new JComboBox<>();
         styleComboBox(autosaveCombo);
-        c.gridx = 1; add(autosaveCombo, c);
+        c.gridx = 1; panel.add(autosaveCombo, c);
         
         // Turbo Mode
-        c.gridy = 4; c.gridx = 0; 
-        turboLabel = new JLabel(LanguageStrings.get(LanguageStrings.SETTINGS_TURBO));
+        c.gridy = 2; c.gridx = 0; 
+        turboLabel = new JLabel();
         turboLabel.setFont(AssetStyles.FONT_NORMAL);
         turboLabel.setForeground(AssetStyles.FONT_COLOR);
-        add(turboLabel, c);
+        panel.add(turboLabel, c);
         
         turboCheck = new JCheckBox();
         styleCheckBox(turboCheck);
-        setupNavigation(turboCheck);
-        c.gridx = 1; add(turboCheck, c);
-
-        // Buttons
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        buttonPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        c.gridx = 1; panel.add(turboCheck, c);
         
-        saveButton = new JButton(LanguageStrings.get(LanguageStrings.SETTINGS_SAVE_APPLY));
-        styleButton(saveButton);
-        saveButton.addActionListener(e -> saveSettings());
-        setupNavigation(saveButton);
-
-        backButton = new JButton(LanguageStrings.get(LanguageStrings.UI_BACK));
-        styleButton(backButton);
-        backButton.addActionListener(e -> this.frame.showCard(MainFrame.CARD_INIT));
-        setupNavigation(backButton);
+        // Arachnophobia
+        c.gridy = 3; c.gridx = 0;
+        arachLabel = new JLabel();
+        arachLabel.setFont(AssetStyles.FONT_NORMAL);
+        arachLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(arachLabel, c);
         
-        buttonPanel.add(saveButton);
-        buttonPanel.add(backButton);
-
-        c.gridy = 5; c.gridx = 0; c.gridwidth = 2; c.fill = GridBagConstraints.NONE;
-        c.anchor = GridBagConstraints.CENTER;
-        add(buttonPanel, c);
+        arachnophobiaCheck = new JCheckBox();
+        styleCheckBox(arachnophobiaCheck);
+        c.gridx = 1; panel.add(arachnophobiaCheck, c);
         
-        revalidate();
-        repaint();
+        // Pause on Focus Loss
+        c.gridy = 4; c.gridx = 0;
+        pauseFocusLabel = new JLabel();
+        pauseFocusLabel.setFont(AssetStyles.FONT_NORMAL);
+        pauseFocusLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(pauseFocusLabel, c);
+        
+        pauseFocusCheck = new JCheckBox();
+        styleCheckBox(pauseFocusCheck);
+        c.gridx = 1; panel.add(pauseFocusCheck, c);
+        
+        // Confirm on Quit
+        c.gridy = 5; c.gridx = 0;
+        confirmQuitLabel = new JLabel();
+        confirmQuitLabel.setFont(AssetStyles.FONT_NORMAL);
+        confirmQuitLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(confirmQuitLabel, c);
+        
+        confirmQuitCheck = new JCheckBox();
+        styleCheckBox(confirmQuitCheck);
+        c.gridx = 1; panel.add(confirmQuitCheck, c);
+        
+        // Show Tooltips
+        c.gridy = 6; c.gridx = 0;
+        tooltipsLabel = new JLabel();
+        tooltipsLabel.setFont(AssetStyles.FONT_NORMAL);
+        tooltipsLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(tooltipsLabel, c);
+        
+        showTooltipsCheck = new JCheckBox();
+        styleCheckBox(showTooltipsCheck);
+        c.gridx = 1; panel.add(showTooltipsCheck, c);
+        
+        return panel;
+    }
+    
+    private JPanel createVideoTab() {
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.insets = new Insets(10, 15, 10, 15);
+        c.anchor = GridBagConstraints.WEST;
+
+        // Screen Size
+        c.gridy = 0; c.gridx = 0; 
+        sizeLabel = new JLabel();
+        sizeLabel.setFont(AssetStyles.FONT_NORMAL);
+        sizeLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(sizeLabel, c);
+        
+        String[] commonResolutions = {"1000x700", "1280x720", "1366x768", "1440x900", "1600x900", "1920x1080", "2560x1440"};
+        sizeCombo = new JComboBox<>(commonResolutions);
+        styleComboBox(sizeCombo);
+        sizeCombo.setEditable(false);
+        c.gridx = 1; panel.add(sizeCombo, c);
+
+        // Full Screen
+        c.gridy = 1; c.gridx = 0; 
+        fsLabel = new JLabel();
+        fsLabel.setFont(AssetStyles.FONT_NORMAL);
+        fsLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(fsLabel, c);
+        
+        fullScreenCheck = new JCheckBox();
+        styleCheckBox(fullScreenCheck);
+        c.gridx = 1; panel.add(fullScreenCheck, c);
+
+        // Visual Filters
+        c.gridy = 2; c.gridx = 0;
+        visualFiltersLabel = new JLabel();
+        visualFiltersLabel.setFont(AssetStyles.FONT_NORMAL);
+        visualFiltersLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(visualFiltersLabel, c);
+        
+        visualFiltersCheck = new JCheckBox();
+        styleCheckBox(visualFiltersCheck);
+        c.gridx = 1; panel.add(visualFiltersCheck, c);
+        
+        return panel;
+    }
+    
+    private JPanel createAudioTab() {
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.insets = new Insets(10, 15, 10, 15);
+        c.anchor = GridBagConstraints.WEST;
+        c.weightx = 1.0;
+
+        // Master Volume
+        c.gridy = 0; c.gridx = 0; 
+        masterLabel = new JLabel();
+        masterLabel.setFont(AssetStyles.FONT_NORMAL);
+        masterLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(masterLabel, c);
+        
+        masterVolSlider = createVolumeSlider();
+        c.gridx = 1; panel.add(masterVolSlider, c);
+
+        // Music Volume
+        c.gridy = 1; c.gridx = 0; 
+        musicLabel = new JLabel();
+        musicLabel.setFont(AssetStyles.FONT_NORMAL);
+        musicLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(musicLabel, c);
+        
+        musicVolSlider = createVolumeSlider();
+        c.gridx = 1; panel.add(musicVolSlider, c);
+
+        // SFX Volume
+        c.gridy = 2; c.gridx = 0; 
+        sfxLabel = new JLabel();
+        sfxLabel.setFont(AssetStyles.FONT_NORMAL);
+        sfxLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(sfxLabel, c);
+        
+        sfxVolSlider = createVolumeSlider();
+        c.gridx = 1; panel.add(sfxVolSlider, c);
+        
+        return panel;
+    }
+    
+    private JSlider createVolumeSlider() {
+        JSlider slider = new JSlider(0, 100);
+        slider.setBackground(AssetStyles.BACKGROUND_COLOR);
+        slider.setForeground(AssetStyles.FONT_COLOR_HEADER);
+        slider.setMajorTickSpacing(20);
+        slider.setPaintTicks(true);
+        return slider;
     }
     
     private void refreshTranslations() {
+        tabbedPane.setTitleAt(0, LanguageStrings.get(LanguageStrings.SETTINGS_TAB_GENERAL));
+        tabbedPane.setTitleAt(1, LanguageStrings.get(LanguageStrings.SETTINGS_TAB_VIDEO));
+        tabbedPane.setTitleAt(2, LanguageStrings.get(LanguageStrings.SETTINGS_TAB_AUDIO));
+        
         langLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_LANGUAGE));
-        sizeLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_SCREEN_SIZE));
-        fsLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_FULLSCREEN));
         autoLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_AUTOSAVE));
         turboLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_TURBO));
+        arachLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_ARACHNOPHOBIA));
+        pauseFocusLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_PAUSE_FOCUS));
+        confirmQuitLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_CONFIRM_QUIT));
+        tooltipsLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_SHOW_TOOLTIPS));
+        
+        sizeLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_SCREEN_SIZE));
+        fsLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_FULLSCREEN));
+        visualFiltersLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_VISUAL_FILTERS));
+        
+        masterLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_MASTER_VOL));
+        musicLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_MUSIC_VOL));
+        sfxLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_SFX_VOL));
+        
         saveButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_SAVE_APPLY));
         backButton.setText(LanguageStrings.get(LanguageStrings.UI_BACK));
         
@@ -223,24 +372,6 @@ public class SettingsPanel extends JPanel {
     }
     
     private void setupNavigation(JComponent component) {
-        if (component instanceof JButton) {
-            component.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke("ENTER"), "pressed");
-            component.getActionMap().put("pressed", new AbstractAction() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    ((JButton)component).doClick();
-                }
-            });
-        } else if (component instanceof JCheckBox) {
-            component.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke("ENTER"), "pressed");
-            component.getActionMap().put("pressed", new AbstractAction() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    ((JCheckBox)component).doClick();
-                }
-            });
-        }
-
         Set<AWTKeyStroke> forwardKeys = new HashSet<>(component.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
         forwardKeys.add(KeyStroke.getKeyStroke("DOWN"));
         forwardKeys.add(KeyStroke.getKeyStroke("RIGHT"));
@@ -261,10 +392,6 @@ public class SettingsPanel extends JPanel {
             }
         }
         
-        turboCheck.setSelected(engine.isAllowTurboMode());
-        sizeCombo.setSelectedItem(engine.getScreenSize());
-        fullScreenCheck.setSelected(engine.isFullScreen());
-
         int freq = engine.getAutosaveFrequency();
         for (int i = 0; i < autosaveCombo.getItemCount(); i++) {
             if (autosaveCombo.getItemAt(i).value == freq) {
@@ -272,6 +399,20 @@ public class SettingsPanel extends JPanel {
                 break;
             }
         }
+        
+        turboCheck.setSelected(engine.isAllowTurboMode());
+        arachnophobiaCheck.setSelected(engine.isArachnophobiaMode());
+        pauseFocusCheck.setSelected(engine.isPauseOnFocusLoss());
+        confirmQuitCheck.setSelected(engine.isConfirmOnQuit());
+        showTooltipsCheck.setSelected(engine.isShowTooltips());
+        
+        sizeCombo.setSelectedItem(engine.getScreenSize());
+        fullScreenCheck.setSelected(engine.isFullScreen());
+        visualFiltersCheck.setSelected(engine.isVisualFiltersEnabled());
+        
+        masterVolSlider.setValue(engine.getMasterVolume());
+        musicVolSlider.setValue(engine.getMusicVolume());
+        sfxVolSlider.setValue(engine.getSfxVolume());
     }
 
     private void saveSettings() {
@@ -281,14 +422,24 @@ public class SettingsPanel extends JPanel {
             LanguageStrings.setLanguage(selectedLang.code); 
         }
         
-        engine.setAllowTurboMode(turboCheck.isSelected());
-        engine.setScreenSize((String) sizeCombo.getSelectedItem());
-        engine.setFullScreen(fullScreenCheck.isSelected());
-        
         AutosaveOption selectedFreq = (AutosaveOption) autosaveCombo.getSelectedItem();
         if (selectedFreq != null) {
             engine.setAutosaveFrequency(selectedFreq.value);
         }
+        
+        engine.setAllowTurboMode(turboCheck.isSelected());
+        engine.setArachnophobiaMode(arachnophobiaCheck.isSelected());
+        engine.setPauseOnFocusLoss(pauseFocusCheck.isSelected());
+        engine.setConfirmOnQuit(confirmQuitCheck.isSelected());
+        engine.setShowTooltips(showTooltipsCheck.isSelected());
+        
+        engine.setScreenSize((String) sizeCombo.getSelectedItem());
+        engine.setFullScreen(fullScreenCheck.isSelected());
+        engine.setVisualFiltersEnabled(visualFiltersCheck.isSelected());
+        
+        engine.setMasterVolume(masterVolSlider.getValue());
+        engine.setMusicVolume(musicVolSlider.getValue());
+        engine.setSfxVolume(sfxVolSlider.getValue());
 
         engine.saveGlobalSettings(); 
         frame.applyEngineSettings();

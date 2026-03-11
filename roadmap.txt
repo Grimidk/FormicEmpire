@@ -14,7 +14,6 @@ To Fix (By decreasing priority) :
 	(none right now)
 
 	Low:
-	disable weather filters option
 	breeders go out of the colony in nuptial
 	"view convoy" option using going and returning biomes for tiles, or underground or air
 	logistic physics use dimension 2
@@ -27,13 +26,12 @@ Needed for launch (v1.0) (Launch Version):
 	Priority:
 	genetic stagnation (obscured until below (80%)) every nuptial, assimilation gives base 5% after cloning (unlocked after empire rank), alliances can increase while allied, stagnation = success chance to spread and drones from assimilated
 	font
-	Spanish localization
 	promo video
 
 	Everything else :
 	ant speed and biome depletion and further located sources take more time and sustainability of biome 
 	auxiliary room sprites (storage (resources), farm (shroom), nurse (bedding), royal (nests and science))
-	more settings (choose default, fuzzed parasites, arachnophobia mode ?)
+	more settings (choose default, fuzzed parasites)
 	automate NPC to spread
 	diplomacy and diplomatic reputation (own and xeno colonies) and alliances (non-aggression pacts) and wars 
 	rebellions and rebel colonies (internal rebeliousness stat, too much causes a rebellious dynasty to appear, once capital defeated it gets reabsorbed)

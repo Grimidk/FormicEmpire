@@ -379,6 +379,9 @@ public class SpanishTranslation implements Translation {
         
         es.put("SETTINGS_VISUAL_FILTERS", "Filtros Visuales:");
         es.put("SETTINGS_ARACHNOPHOBIA", "Modo Aracnofobia:");
+        es.put("SETTINGS_PAUSE_FOCUS", "Pausar al Perder Foco:");
+        es.put("SETTINGS_CONFIRM_QUIT", "Confirmar al Salir:");
+        es.put("SETTINGS_SHOW_TOOLTIPS", "Mostrar Tooltips:");
         
         es.put("SETTINGS_MASTER_VOL", "Volumen Maestro:");
         es.put("SETTINGS_MUSIC_VOL", "Volumen de Música:");

@@ -442,6 +442,10 @@ public final class LanguageStrings {
     public static final String SETTINGS_VISUAL_FILTERS = "SETTINGS_VISUAL_FILTERS";
     public static final String SETTINGS_ARACHNOPHOBIA = "SETTINGS_ARACHNOPHOBIA";
     
+    public static final String SETTINGS_PAUSE_FOCUS = "SETTINGS_PAUSE_FOCUS";
+    public static final String SETTINGS_CONFIRM_QUIT = "SETTINGS_CONFIRM_QUIT";
+    public static final String SETTINGS_SHOW_TOOLTIPS = "SETTINGS_SHOW_TOOLTIPS";
+    
     public static final String SETTINGS_MASTER_VOL = "SETTINGS_MASTER_VOL";
     public static final String SETTINGS_MUSIC_VOL = "SETTINGS_MUSIC_VOL";
     public static final String SETTINGS_SFX_VOL = "SETTINGS_SFX_VOL";

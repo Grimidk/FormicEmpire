@@ -1097,18 +1097,17 @@ public class SaveManager {
                 sb.append("\"pmid\":").append(t.pendingMethodId).append(",");
                 
                 Map<String, Double> pLoadStrMap = new HashMap<>();
-                for (Map.Entry<Integer, Double> e : t.pendingLoad.entrySet()) pLoadStrMap.put(String.valueOf(e.getKey()), e.getValue());
+                for (Map.Entry<Integer, Double> entry : t.pendingLoad.entrySet()) pLoadStrMap.put(String.valueOf(entry.getKey()), entry.getValue());
                 sb.append("\"pload\":").append(serializeDoubleMapToJson(pLoadStrMap)).append(",");
 
                 Map<String, Double> pReturnLoadStrMap = new HashMap<>();
-                for (Map.Entry<Integer, Double> e : t.pendingReturnLoad.entrySet()) pReturnLoadStrMap.put(String.valueOf(e.getKey()), e.getValue());
+                for (Map.Entry<Integer, Double> entry : t.pendingReturnLoad.entrySet()) pReturnLoadStrMap.put(String.valueOf(entry.getKey()), entry.getValue());
                 sb.append("\"prload\":").append(serializeDoubleMapToJson(pReturnLoadStrMap)).append(",");
 
                 Map<String, Integer> pTransportStrMap = new HashMap<>();
-                for (Map.Entry<Integer, Integer> e : t.pendingTransport.entrySet()) pTransportStrMap.put(String.valueOf(e.getKey()), e.getValue());
+                for (Map.Entry<Integer, Integer> entry : t.pendingTransport.entrySet()) pTransportStrMap.put(String.valueOf(entry.getKey()), entry.getValue());
                 sb.append("\"ptrans\":").append(serializeMapToJson(pTransportStrMap));
             } else {
-                // remove trailing comma if no pending updates
                 sb.setLength(sb.length() - 1);
             }
             
@@ -1334,13 +1333,13 @@ public class SaveManager {
                         st.isReturning = Boolean.parseBoolean(m.getOrDefault("ret", "false"));
                         
                         Map<String, Double> loadMap = deserializeJsonToDoubleMap(m.get("load"));
-                        for (Map.Entry<String, Double> e : loadMap.entrySet()) st.load.put(Integer.parseInt(e.getKey()), e.getValue());
+                        for (Map.Entry<String, Double> entry : loadMap.entrySet()) st.load.put(Integer.parseInt(entry.getKey()), entry.getValue());
 
                         Map<String, Double> rLoadMap = deserializeJsonToDoubleMap(m.get("rload"));
-                        for (Map.Entry<String, Double> e : rLoadMap.entrySet()) st.returnLoad.put(Integer.parseInt(e.getKey()), e.getValue());
+                        for (Map.Entry<String, Double> entry : rLoadMap.entrySet()) st.returnLoad.put(Integer.parseInt(entry.getKey()), entry.getValue());
                         
                         Map<String, Integer> transMap = deserializeJsonToMap(m.get("trans"));
-                        for (Map.Entry<String, Integer> e : transMap.entrySet()) st.transport.put(Integer.parseInt(e.getKey()), e.getValue());
+                        for (Map.Entry<String, Integer> entry : transMap.entrySet()) st.transport.put(Integer.parseInt(entry.getKey()), entry.getValue());
 
                         // Pending
                         st.hasPendingUpdate = Boolean.parseBoolean(m.getOrDefault("hpu", "false"));
@@ -1350,13 +1349,13 @@ public class SaveManager {
                             st.pendingMethodId = Integer.parseInt(m.getOrDefault("pmid", "1"));
 
                             Map<String, Double> pLoadMap = deserializeJsonToDoubleMap(m.get("pload"));
-                            for (Map.Entry<String, Double> e : pLoadMap.entrySet()) st.pendingLoad.put(Integer.parseInt(e.getKey()), e.getValue());
+                            for (Map.Entry<String, Double> entry : pLoadMap.entrySet()) st.pendingLoad.put(Integer.parseInt(entry.getKey()), entry.getValue());
 
                             Map<String, Double> pReturnLoadMap = deserializeJsonToDoubleMap(m.get("prload"));
-                            for (Map.Entry<String, Double> e : pReturnLoadMap.entrySet()) st.pendingReturnLoad.put(Integer.parseInt(e.getKey()), e.getValue());
+                            for (Map.Entry<String, Double> entry : pReturnLoadMap.entrySet()) st.pendingReturnLoad.put(Integer.parseInt(entry.getKey()), entry.getValue());
 
                             Map<String, Integer> pTransMap = deserializeJsonToMap(m.get("ptrans"));
-                            for (Map.Entry<String, Integer> e : pTransMap.entrySet()) st.pendingTransport.put(Integer.parseInt(e.getKey()), e.getValue());
+                            for (Map.Entry<String, Integer> entry : pTransMap.entrySet()) st.pendingTransport.put(Integer.parseInt(entry.getKey()), entry.getValue());
                         }
                         
                         list.add(st);
@@ -1404,7 +1403,10 @@ public class SaveManager {
             writeJsonLine(w, "arachnophobiaMode", engine.isArachnophobiaMode(), false);
             writeJsonLine(w, "masterVolume", engine.getMasterVolume(), false);
             writeJsonLine(w, "musicVolume", engine.getMusicVolume(), false);
-            writeJsonLine(w, "sfxVolume", engine.getSfxVolume(), true);
+            writeJsonLine(w, "sfxVolume", engine.getSfxVolume(), false);
+            writeJsonLine(w, "pauseOnFocusLoss", engine.isPauseOnFocusLoss(), false);
+            writeJsonLine(w, "confirmOnQuit", engine.isConfirmOnQuit(), false);
+            writeJsonLine(w, "showTooltips", engine.isShowTooltips(), true);
             w.write("}");
             w.newLine();
             w.flush();
@@ -1478,6 +1480,10 @@ public class SaveManager {
             engine.setMasterVolume(Integer.parseInt(m.getOrDefault("masterVolume", String.valueOf(engine.getMasterVolume()))));
             engine.setMusicVolume(Integer.parseInt(m.getOrDefault("musicVolume", String.valueOf(engine.getMusicVolume()))));
             engine.setSfxVolume(Integer.parseInt(m.getOrDefault("sfxVolume", String.valueOf(engine.getSfxVolume()))));
+            
+            engine.setPauseOnFocusLoss(Boolean.parseBoolean(m.getOrDefault("pauseOnFocusLoss", String.valueOf(engine.isPauseOnFocusLoss()))));
+            engine.setConfirmOnQuit(Boolean.parseBoolean(m.getOrDefault("confirmOnQuit", String.valueOf(engine.isConfirmOnQuit()))));
+            engine.setShowTooltips(Boolean.parseBoolean(m.getOrDefault("showTooltips", String.valueOf(engine.isShowTooltips()))));
             
             System.out.println("[SaveManager] Global settings loaded.");
         } catch (Exception e) {
