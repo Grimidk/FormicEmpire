@@ -15,9 +15,13 @@ public abstract class ZeroDialog extends JDialog {
 
     protected final JPanel southPanel;
     private static final float[] SPEED_DELAYS = { 250f, 125f, 60f, 30f, 15f, 5f, 1f};
+    
+    private final String titleKey;
+    private final JButton closeButton;
 
-    public ZeroDialog(JFrame owner, String title, Dimension preferredSize) {
-        super(owner, title, true);
+    public ZeroDialog(JFrame owner, String titleKey, Dimension preferredSize) {
+        super(owner, LanguageStrings.get(titleKey), true);
+        this.titleKey = titleKey;
         
         getContentPane().setBackground(AssetStyles.UI_BG_PRIMARY);
         setLayout(new BorderLayout());
@@ -28,7 +32,7 @@ public abstract class ZeroDialog extends JDialog {
         southPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         southPanel.setBackground(AssetStyles.UI_BG_SECONDARY);
         
-        JButton closeButton = new JButton(LanguageStrings.UI_CLOSE);
+        closeButton = new JButton(LanguageStrings.get(LanguageStrings.UI_CLOSE));
         closeButton.setFont(AssetStyles.FONT_NORMAL);
         closeButton.setFocusable(false);
         closeButton.addActionListener(e -> dispose());
@@ -42,6 +46,12 @@ public abstract class ZeroDialog extends JDialog {
                 JComponent.WHEN_IN_FOCUSED_WINDOW);
         
         setFocusable(true);
+    }
+    
+    public void refreshTranslations() {
+        setTitle(LanguageStrings.get(titleKey));
+        closeButton.setText(LanguageStrings.get(LanguageStrings.UI_CLOSE));
+        refreshDialog();
     }
 
     protected void disableFocusTraversal(Container container) {

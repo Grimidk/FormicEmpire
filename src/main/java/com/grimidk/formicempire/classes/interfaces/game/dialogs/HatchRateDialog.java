@@ -19,7 +19,7 @@ public class HatchRateDialog extends ZeroDialog {
 
     private final Colony colony;
     private final Map<AntType, JSpinner> spinnerMap = new HashMap<>();
-    private final JLabel totalLabel = new JLabel(String.format(LanguageStrings.HATCH_TOTAL, 100.0f));
+    private final JLabel totalLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.HATCH_TOTAL), 100.0f));
     private final JPanel centerPanel;
     
     private boolean isAdjusting = false;
@@ -61,7 +61,7 @@ public class HatchRateDialog extends ZeroDialog {
         totalLabel.setFont(AssetStyles.FONT_BOLD);
         totalLabel.setForeground(AssetStyles.FONT_COLOR);
         
-        JLabel descLabel = new JLabel(LanguageStrings.HATCH_DESC);
+        JLabel descLabel = new JLabel(LanguageStrings.get(LanguageStrings.HATCH_DESC));
         descLabel.setForeground(AssetStyles.FONT_COLOR);
         
         centerPanel.add(descLabel);
@@ -181,14 +181,14 @@ public class HatchRateDialog extends ZeroDialog {
             totalAssigned += (Double) s.getValue();
         }
         
-        totalLabel.setText(String.format(LanguageStrings.HATCH_TOTAL, totalAssigned));
+        totalLabel.setText(String.format(LanguageStrings.get(LanguageStrings.HATCH_TOTAL), totalAssigned));
         
         if (Math.abs(100.0 - totalAssigned) > 0.1) { 
             totalLabel.setForeground(AssetStyles.FONT_COLOR_ERROR);
-            totalLabel.setToolTipText(LanguageStrings.HATCH_WARNING_TOTAL);
+            totalLabel.setToolTipText(LanguageStrings.get(LanguageStrings.HATCH_WARNING_TOTAL));
         } else {
             totalLabel.setForeground(AssetStyles.FONT_COLOR);
-            totalLabel.setToolTipText(LanguageStrings.HATCH_TOTAL_OK);
+            totalLabel.setToolTipText(LanguageStrings.get(LanguageStrings.HATCH_TOTAL_OK));
         }
     }
 }

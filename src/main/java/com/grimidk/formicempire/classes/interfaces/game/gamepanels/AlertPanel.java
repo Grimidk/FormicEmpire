@@ -7,11 +7,13 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.util.List;
+import java.util.ArrayList;
 
 public class AlertPanel extends ZeroGamePanel {
 
     private JPanel listPanel;
     private JScrollPane scrollPane;
+    private List<Alert> lastAlerts = new ArrayList<>();
 
     public AlertPanel() {
         super(new BorderLayout());        
@@ -39,12 +41,19 @@ public class AlertPanel extends ZeroGamePanel {
     protected void initLayout() {
         add(scrollPane, BorderLayout.CENTER);
     }
+    
+    @Override
+    public void refreshTranslations() {
+        super.refreshTranslations();
+        updateAlerts(lastAlerts);
+    }
 
     public void updateAlerts(List<Alert> alerts) {
+        this.lastAlerts = alerts;
         listPanel.removeAll();
         
         if (alerts.isEmpty()) {
-            JLabel emptyLabel = new JLabel(LanguageStrings.PANEL_NO_ALERTS);
+            JLabel emptyLabel = new JLabel(LanguageStrings.get(LanguageStrings.PANEL_NO_ALERTS));
             emptyLabel.setForeground(AssetStyles.BACKGROUND_SECONDARY);
             emptyLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             listPanel.add(Box.createVerticalGlue());

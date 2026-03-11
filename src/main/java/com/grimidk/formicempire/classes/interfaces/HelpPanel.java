@@ -16,6 +16,7 @@ import com.grimidk.formicempire.classes.constants.world.Weather;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 import com.grimidk.formicempire.classes.constants.Constant;
 
 import javax.swing.*;
@@ -36,24 +37,67 @@ import java.util.stream.Collectors;
 
 public class HelpPanel extends JPanel {
     private final MainFrame frame;
+    private final JTabbedPane mainTabs;
+    private final JButton backButton;
 
     public HelpPanel(MainFrame frame) {
         this.frame = frame;
         setLayout(new BorderLayout());
         setBackground(AssetStyles.BACKGROUND_COLOR);
 
-        JTabbedPane mainTabs = new JTabbedPane();
+        mainTabs = new JTabbedPane();
         mainTabs.setFont(AssetStyles.FONT_BOLD);
         mainTabs.setBackground(AssetStyles.BACKGROUND_SECONDARY);
         mainTabs.setForeground(AssetStyles.FONT_COLOR);
 
+        backButton = new JButton();
+        
+        initTabs();
+        
+        setupTabPaneNavigation(mainTabs);
+        add(mainTabs, BorderLayout.CENTER);
+
+        JPanel southPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        southPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        
+        backButton.setFont(AssetStyles.FONT_BOLD);
+        backButton.setBackground(AssetStyles.BACKGROUND_SECONDARY);
+        backButton.setForeground(AssetStyles.FONT_COLOR);
+        backButton.addActionListener(e -> this.frame.showCard(MainFrame.CARD_INIT));
+        
+        setupButtonNavigation(backButton);
+        
+        southPanel.add(backButton);
+        add(southPanel, BorderLayout.SOUTH);
+        
+        refreshTranslations();
+        
+        LanguageStrings.addListener(this::refreshTranslations);
+
+        addAncestorListener(new AncestorListener() {
+            @Override
+            public void ancestorAdded(AncestorEvent event) {
+                backButton.requestFocusInWindow();
+            }
+
+            @Override
+            public void ancestorRemoved(AncestorEvent event) {}
+
+            @Override
+            public void ancestorMoved(AncestorEvent event) {}
+        });
+    }
+    
+    private void initTabs() {
+        mainTabs.removeAll();
+        
         // Filter Role Upgrades vs Generic Upgrades
         List<Constant> roleConstants = GameUnlocks.getUpgrades().stream()
-                .filter(u -> u.getName().toLowerCase().contains("role"))
+                .filter(u -> u.getNameKey().toLowerCase().contains("role"))
                 .collect(Collectors.toList());
         
         List<Constant> genericUpgrades = GameUnlocks.getUpgrades().stream()
-                .filter(u -> !u.getName().toLowerCase().contains("role"))
+                .filter(u -> !u.getNameKey().toLowerCase().contains("role"))
                 .collect(Collectors.toList());
 
         // Add tabs
@@ -68,37 +112,36 @@ public class HelpPanel extends JPanel {
         mainTabs.addTab("Buildings", createDictionaryPanel(new ArrayList<>(GameUnlocks.getBuildings())));
         mainTabs.addTab("Assimilations", createDictionaryPanel(new ArrayList<>(GameUnlocks.getAssimilations())));
         mainTabs.addTab("World", createWorldPanel());
-
-        setupTabPaneNavigation(mainTabs);
-
-        add(mainTabs, BorderLayout.CENTER);
-
-        JPanel southPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        southPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
+    }
+    
+    public void refreshTranslations() {
+        backButton.setText(LanguageStrings.get(LanguageStrings.UI_BACK));
         
-        JButton back = new JButton("Back");
-        back.setFont(AssetStyles.FONT_BOLD);
-        back.setBackground(AssetStyles.BACKGROUND_SECONDARY);
-        back.setForeground(AssetStyles.FONT_COLOR);
-        back.addActionListener(e -> this.frame.showCard(MainFrame.CARD_INIT));
+        // Update tab titles
+        String[] titles = {
+            LanguageStrings.get("HELP_TAB_WELCOME"),
+            LanguageStrings.get("HELP_TAB_STARTED"),
+            LanguageStrings.get("HELP_TAB_DYNASTY"),
+            LanguageStrings.get("HELP_TAB_HOTKEYS"),
+            LanguageStrings.get("HELP_TAB_SPECIES"),
+            LanguageStrings.get("HELP_TAB_TYPES"),
+            LanguageStrings.get("HELP_TAB_ROLES"),
+            LanguageStrings.get("HELP_TAB_UPGRADES"),
+            LanguageStrings.get("HELP_TAB_BUILDINGS"),
+            LanguageStrings.get("HELP_TAB_ASSIMILATIONS"),
+            LanguageStrings.get("HELP_TAB_WORLD")
+        };
         
-        setupButtonNavigation(back);
+        for (int i = 0; i < titles.length && i < mainTabs.getTabCount(); i++) {
+            mainTabs.setTitleAt(i, titles[i]);
+        }
         
-        southPanel.add(back);
-        add(southPanel, BorderLayout.SOUTH);
-
-        addAncestorListener(new AncestorListener() {
-            @Override
-            public void ancestorAdded(AncestorEvent event) {
-                back.requestFocusInWindow();
-            }
-
-            @Override
-            public void ancestorRemoved(AncestorEvent event) {}
-
-            @Override
-            public void ancestorMoved(AncestorEvent event) {}
-        });
+        // Fully re-init tabs to refresh internal content
+        int selected = mainTabs.getSelectedIndex();
+        initTabs();
+        if (selected >= 0 && selected < mainTabs.getTabCount()) {
+            mainTabs.setSelectedIndex(selected);
+        }
     }
     
     private void setupButtonNavigation(JButton button) {
@@ -134,12 +177,7 @@ public class HelpPanel extends JPanel {
     private JComponent createWelcomePanel() {
         String story = "<html><div style='width: 450px; font-family: sans-serif;'>" +
                 "<p style='font-size: 14pt;'>" +
-                "Nearly all other ants are extinct. You are an ant queen and have within you " +
-                "all the genetic knowledge of every ant species. You must unlock it and " +
-                "take over the world as the dominant species. " +
-                "<br><br>" +
-                "Build up your colony and begin to spread while fighting other ant colonies, " +
-                "you will need to adapt to new environments by absorbing and researching their abilities." +
+                LanguageStrings.get("HELP_WELCOME_STORY") +
                 "</p></div></html>";
         
         JPanel panel = new JPanel(new GridBagLayout());
@@ -155,22 +193,7 @@ public class HelpPanel extends JPanel {
 
     private JComponent createGettingStartedPanel() {
         String gameInfo = "<html><div style='width: 450px; font-family: sans-serif; font-size: 11pt;'>" +
-                "<b>Basic Survival:</b><br>" +
-                "Your ants need <b>Fungi</b> (Mushrooms) to eat and <b>Water</b> to drink every day. Without them, your colony will starve or die of dehydration.<br>" +
-                "- <b>Foragers</b> gather Plants and Water.<br>" +
-                "- <b>Hunters</b> gather Protein (Meat).<br>" +
-                "- <b>Farmers</b> convert Plants and Protein into Fungi.<br>" +
-                "- <b>Nurses</b> care for your brood. Neglected brood will perish.<br><br>" +
-                "<b>Watching Your Colony:</b><br>" +
-                "Press <b>A</b> to toggle your view between the <b>Underworld</b> (inside the nest) and the <b>Overworld</b> (outside gathering).<br><br>" +
-                "<b>Colony Management:</b><br>" +
-                "Use <b>Hatch Rates (P)</b> to control ant births. " +
-                "<b>Researchers</b> generate Research Points (RP) for upgrades in the <b>Research Menu (Y)</b>. " +
-                "<b>Builders</b> use Minerals and Resin to construct facilities via the <b>Build Menu (U)</b>.<br><br>" +
-                "<b>Advanced Threats:</b><br>" +
-                "- <b>Contamination:</b> Dead ants must be cleared by <b>Gravers</b>.<br>" +
-                "- <b>Parasites:</b> Secretly drain food. Assign <b>Police</b> to eliminate them.<br>" +
-                "- <b>Depletion:</b> Resource nodes dry up; assign <b>Scouts</b> to find new ones." +
+                LanguageStrings.get("HELP_START_INFO") +
                 "</div></html>";
         
         JPanel panel = new JPanel(new GridBagLayout());
@@ -186,21 +209,7 @@ public class HelpPanel extends JPanel {
 
     private JComponent createEmpireManagementPanel() {
         String empireInfo = "<html><div style='width: 450px; font-family: sans-serif; font-size: 11pt;'>" +
-                "<b>Expanding Your Dynasty:</b><br>" +
-                "Once you unlock <b>Breeders</b>, perform Nuptial Flights to spread via the <b>World Map (I)</b>.<br>" +
-                "<i>Tip: Eclipses trigger spontaneous, free Nuptial Flights!</i><br><br>" +
-                "<b>Logistics & Trade:</b><br>" +
-                "Founding multiple colonies unlocks <b>Trade Routes</b>. Assign <b>Couriers</b> to transport resources.<br>" +
-                "- <b>Land:</b> Standard trade method.<br>" +
-                "- <b>Tunnel:</b> Secure and fast, requires <b>Tunnels</b> and <b>Borers</b>.<br>" +
-                "- <b>Air:</b> Fast but low capacity, requires <b>Sky Transports</b> (Princesses).<br>" +
-                "- <b>Bilateral:</b> Allows two-way resource transport.<br><br>" +
-                "<b>Dynasty Milestones:</b><br>" +
-                "- <b>Dynasty Menu (S):</b> View and manage all colonies.<br>" +
-                "- <b>Mass Colonization:</b> Removes satellite colony limits.<br>" +
-                "- <b>Automation:</b> Allows NPC colonies to manage themselves.<br><br>" +
-                "<b>Evolution:</b><br>" +
-                "Unlock <b>Synergies</b> to combine upgrades and <b>Assimilations</b> to absorb other ant species' traits." +
+                LanguageStrings.get("HELP_DYNASTY_INFO") +
                 "</div></html>";
         
         JPanel panel = new JPanel(new GridBagLayout());
@@ -233,8 +242,8 @@ public class HelpPanel extends JPanel {
             entry.add(icon, BorderLayout.WEST);
 
             String baseUpgrades = s.getBaseUpgrades().stream().map(Upgrade::getName).collect(Collectors.joining(", "));
-            String info = "<html><div style='width: 350px; font-family: sans-serif; font-size: 11pt;'><b>Scientific Name:</b> <i>" + s.getScientific() + "</i><br>" +
-                          "<b>Base Traits:</b> " + baseUpgrades + "</div></html>";
+            String info = "<html><div style='width: 350px; font-family: sans-serif; font-size: 11pt;'><b>" + LanguageStrings.get("HELP_SPECIES_SCIENTIFIC") + "</b> <i>" + s.getScientific() + "</i><br>" +
+                          "<b>" + LanguageStrings.get("HELP_SPECIES_TRAITS") + "</b> " + baseUpgrades + "</div></html>";
             
             JLabel infoLabel = new JLabel(info);
             infoLabel.setFont(AssetStyles.FONT_NORMAL);
@@ -290,19 +299,19 @@ public class HelpPanel extends JPanel {
         }
         
         HotkeyRow row = new HotkeyRow();
-        row.add("Spacebar", "Pause / Resume Game");
-        row.add("+ / -", "Increase / Decrease Game Speed");
-        row.add("A", "Toggle Overworld/Underworld View");
-        row.add("ESC", "Open Game Menu / Close Dialogs");
+        row.add("Spacebar", LanguageStrings.get("HOTKEY_PAUSE"));
+        row.add("+ / -", LanguageStrings.get("HOTKEY_SPEED"));
+        row.add("A", LanguageStrings.get("HOTKEY_VIEW"));
+        row.add("ESC", LanguageStrings.get("HOTKEY_ESC"));
         row.addSeparator();
-        row.add("Q / W / E / R / T", "Manage Roles (Press again to close)");
+        row.add("Q / W / E / R / T", LanguageStrings.get("HOTKEY_ROLES"));
         row.addSeparator();
-        row.add("P", "Hatch Rates Menu (Toggles)");
-        row.add("Y / U / I / O", "Upgrade Tabs (Research, Build, etc. Toggles)");
-        row.add("Z", "Colony Operations Menu (Toggles)");
-        row.add("S / A", "Dynasty Tabs (Overview, Trade. Toggles)");
-        row.add("M", "World Map (Toggles)");
-        row.add("X", "Statistics (Toggles)");
+        row.add("P", LanguageStrings.get("HOTKEY_P"));
+        row.add("Y / U / I / O", LanguageStrings.get("HOTKEY_UPGRADES"));
+        row.add("Z", LanguageStrings.get("HOTKEY_Z"));
+        row.add("S / A", LanguageStrings.get("HOTKEY_DYNASTY"));
+        row.add("M", LanguageStrings.get("HOTKEY_M"));
+        row.add("X", LanguageStrings.get("HOTKEY_X"));
 
         return hotkeyPanel;
     }
@@ -328,25 +337,15 @@ public class HelpPanel extends JPanel {
             entry.add(icon, BorderLayout.WEST);
 
             String desc = "";
-            if (type == GameConstants.TYPE_EGG) {
-                desc = "The first stage of ant life. Requires a Nurse to survive. Will hatch into a Larva.";
-            } else if (type == GameConstants.TYPE_LARVA) {
-                desc = "The second stage. Larvae must be fed by Nurses to grow. Will pupate into a Pupa.";
-            } else if (type == GameConstants.TYPE_PUPA) {
-                desc = "The final juvenile stage. Does not eat. Will hatch into an adult ant based on your Hatch Rates.";
-            } else if (type == GameConstants.TYPE_WORKER) {
-                desc = "The backbone of the colony. Can be assigned to roles like Forager, Farmer, Nurse, and Builder.";
-            } else if (type == GameConstants.TYPE_SOLDIER) {
-                desc = "A combat ant. Stronger than a Worker. Unlocks the Hunter role for gathering Protein.";
-            } else if (type == GameConstants.TYPE_MAJOR) {
-                desc = "A heavy combat ant, significantly stronger and tougher than a Soldier. Unlocks the Brute role.";
-            } else if (type == GameConstants.TYPE_PRINCESS) {
-                desc = "A winged reproductive. Can be assigned to the Breeder role to mate with a Drone and become a new Queen.";
-            } else if (type == GameConstants.TYPE_DRONE) {
-                desc = "A winged male reproductive. Its only purpose is to mate with a Princess, after which it dies.";
-            } else if (type == GameConstants.TYPE_QUEEN) {
-                desc = "The heart of the colony. Can be assigned to Lay Eggs or Research new technologies.";
-            }
+            if (type == GameConstants.TYPE_EGG) desc = LanguageStrings.get("HELP_TYPE_EGG_DESC");
+            else if (type == GameConstants.TYPE_LARVA) desc = LanguageStrings.get("HELP_TYPE_LARVA_DESC");
+            else if (type == GameConstants.TYPE_PUPA) desc = LanguageStrings.get("HELP_TYPE_PUPA_DESC");
+            else if (type == GameConstants.TYPE_WORKER) desc = LanguageStrings.get("HELP_TYPE_WORKER_DESC");
+            else if (type == GameConstants.TYPE_SOLDIER) desc = LanguageStrings.get("HELP_TYPE_SOLDIER_DESC");
+            else if (type == GameConstants.TYPE_MAJOR) desc = LanguageStrings.get("HELP_TYPE_MAJOR_DESC");
+            else if (type == GameConstants.TYPE_PRINCESS) desc = LanguageStrings.get("HELP_TYPE_PRINCESS_DESC");
+            else if (type == GameConstants.TYPE_DRONE) desc = LanguageStrings.get("HELP_TYPE_DRONE_DESC");
+            else if (type == GameConstants.TYPE_QUEEN) desc = LanguageStrings.get("HELP_TYPE_QUEEN_DESC");
             
             JTextArea descArea = new JTextArea(desc);
             descArea.setFont(AssetStyles.FONT_NORMAL);
@@ -491,7 +490,7 @@ public class HelpPanel extends JPanel {
         // Resources
         JPanel resourcesPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         resourcesPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
-        resourcesPanel.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER, "Resources", 
+        resourcesPanel.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER, LanguageStrings.get("PANEL_RESOURCES"), 
                 javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, 
                 javax.swing.border.TitledBorder.DEFAULT_POSITION, 
                 AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
@@ -507,18 +506,18 @@ public class HelpPanel extends JPanel {
         // Biomes
         JPanel biomesPanel = new JPanel(new GridLayout(0, 3, 10, 10));
         biomesPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
-        biomesPanel.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER, "Biomes", 
+        biomesPanel.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER, LanguageStrings.get("HELP_BIOMES_TITLE"), 
                 javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, 
                 javax.swing.border.TitledBorder.DEFAULT_POSITION, 
                 AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
         
         for (Biome b : GameConstants.getBiomes()) {
             String bInfo = "<html><div style='width: 120px; font-family: sans-serif;'><b>" + b.getName() + "</b><br>" +
-                           "Temp: " + b.getTemperature() + "°C<br>" +
-                           "Humid: " + b.isIsHumid() + "/5<br>" +
-                           "Plants: " + b.getPlantAbundance() + "x<br>" +
-                           "Meat: " + b.getAnimalAbundance() + "x<br>" +
-                           "Minerals: " + b.getMineralAbundance() + "x</div></html>";
+                           LanguageStrings.get("HELP_BIOME_TEMP") + b.getTemperature() + "°C<br>" +
+                           LanguageStrings.get("HELP_BIOME_HUMID") + b.isIsHumid() + "/5<br>" +
+                           LanguageStrings.get("RESOURCE_PLANT") + ": " + b.getPlantAbundance() + "x<br>" +
+                           LanguageStrings.get("RESOURCE_MEAT") + ": " + b.getAnimalAbundance() + "x<br>" +
+                           LanguageStrings.get("RESOURCE_ROCK") + ": " + b.getMineralAbundance() + "x</div></html>";
             JLabel bLabel = new JLabel(bInfo, b.getIcon(), SwingConstants.LEFT);
             bLabel.setFont(AssetStyles.FONT_SMALL);
             bLabel.setForeground(AssetStyles.FONT_COLOR);
@@ -529,17 +528,17 @@ public class HelpPanel extends JPanel {
         // World Info (Seasons, Weather, etc.)
         JPanel worldInfoPanel = new JPanel(new GridLayout(0, 3, 10, 10));
         worldInfoPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
-        worldInfoPanel.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER, "World Info", 
+        worldInfoPanel.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER, LanguageStrings.get("HELP_WORLD_INFO_TITLE"), 
                 javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, 
                 javax.swing.border.TitledBorder.DEFAULT_POSITION, 
                 AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
         
-        worldInfoPanel.add(createSeasonListPanel("Seasons", GameConstants.getSeasons()));
-        worldInfoPanel.add(createWeatherListPanel("Weather", GameConstants.getWeathers()));
-        worldInfoPanel.add(createTimeOfDayListPanel("Time of Day", GameConstants.getTimesOfDay()));
-        worldInfoPanel.add(createMoonPhaseListPanel("Moon Phases", GameConstants.getMoonPhases()));
-        worldInfoPanel.add(createTemperatureListPanel("Temperatures", GameConstants.getTemperature()));
-        worldInfoPanel.add(createHumidityListPanel("Humidity", GameConstants.getHumidity()));
+        worldInfoPanel.add(createSeasonListPanel(LanguageStrings.get("HELP_SEASONS"), GameConstants.getSeasons()));
+        worldInfoPanel.add(createWeatherListPanel(LanguageStrings.get("HELP_WEATHER"), GameConstants.getWeathers()));
+        worldInfoPanel.add(createTimeOfDayListPanel(LanguageStrings.get("HELP_TIME_DAY"), GameConstants.getTimesOfDay()));
+        worldInfoPanel.add(createMoonPhaseListPanel(LanguageStrings.get("HELP_MOON"), GameConstants.getMoonPhases()));
+        worldInfoPanel.add(createTemperatureListPanel(LanguageStrings.get("HELP_TEMP"), GameConstants.getTemperature()));
+        worldInfoPanel.add(createHumidityListPanel(LanguageStrings.get("HELP_HUMID"), GameConstants.getHumidity()));
 
         panel.add(worldInfoPanel);
         
@@ -608,7 +607,7 @@ public class HelpPanel extends JPanel {
                 if (!e.getValueIsAdjusting()) {
                     Constant selected = list.getSelectedValue();
                     if (selected == null) {
-                        descriptionArea.setText("<html><div style='font-family: sans-serif; font-size: 11pt; color: black;'>Select an item from the list to see its description.</div></html>");
+                        descriptionArea.setText("<html><div style='font-family: sans-serif; font-size: 11pt; color: black;'>" + LanguageStrings.get("HELP_SELECT_ITEM") + "</div></html>");
                         return;
                     }
                     
@@ -619,25 +618,25 @@ public class HelpPanel extends JPanel {
                         Upgrade u = (Upgrade) selected;
                         sb.append("<b>").append(u.getFlavorName()).append("</b><br><br>");
                         sb.append(u.getDescription()).append("<br><br>");
-                        sb.append("<b>Cost:</b> ").append(u.getCost()).append(" RP");
+                        sb.append("<b>").append(LanguageStrings.get("UI_COST")).append(":</b> ").append(u.getCost()).append(" RP");
                         if (u.getRequirement() != null) {
-                            sb.append("<br><b>Requires:</b> ").append(u.getRequirement().getFlavorName());
+                            sb.append("<br><b>").append(LanguageStrings.get("UI_REQUIREMENTS")).append(":</b> ").append(u.getRequirement().getFlavorName());
                         }
                     } else if (selected instanceof Building) {
                         Building b = (Building) selected;
                         sb.append("<b>").append(b.getName()).append("</b><br><br>");
                         sb.append(b.getDescription());
                         if (b.getBuildTime() > 0) {
-                             sb.append("<br><br><b>Base Cost:</b><br>");
-                             sb.append(b.getMineralCost()).append(" Minerals, ");
-                             sb.append(b.getResinCost()).append(" Resin, ");
+                             sb.append("<br><br><b>").append(LanguageStrings.get("HELP_BUILD_BASE_COST")).append(":</b><br>");
+                             sb.append(b.getMineralCost()).append(" ").append(LanguageStrings.get("RESOURCE_ROCK")).append(", ");
+                             sb.append(b.getResinCost()).append(" ").append(LanguageStrings.get("RESOURCE_RESIN")).append(", ");
                              sb.append(b.getBuildTime()).append(" Hours");
                         }
                     } else if (selected instanceof Assimilation) {
                         Assimilation a = (Assimilation) selected;
                         sb.append("<b>").append(a.getName()).append("</b><br><br>");
                         sb.append(a.getDescription()).append("<br><br>");
-                        sb.append("<b>Cost:</b> ").append(a.getCost()).append(" RP");
+                        sb.append("<b>").append(LanguageStrings.get("UI_COST")).append(":</b> ").append(a.getCost()).append(" RP");
                     }
                     
                     sb.append("</div></html>");
@@ -653,7 +652,7 @@ public class HelpPanel extends JPanel {
 
     public static void showTutorialDialog(Component parent) {
         Window window = SwingUtilities.getWindowAncestor(parent);
-        JDialog dialog = new JDialog(window, "Welcome to Formic Dynasty!", Dialog.ModalityType.APPLICATION_MODAL);
+        JDialog dialog = new JDialog(window, LanguageStrings.get("HELP_TUTORIAL_TITLE"), Dialog.ModalityType.APPLICATION_MODAL);
         dialog.setLayout(new BorderLayout());
 
         JPanel cardPanel = new JPanel(new CardLayout());
@@ -661,9 +660,7 @@ public class HelpPanel extends JPanel {
         
         // --- Page 1: Story ---
         String story = "<html><div style='width: 350px; font-family: sans-serif;'><p style='font-size: 12pt;'>" +
-                "Nearly all other ants are extinct. You are an ant queen and have within you " +
-                "all the genetic knowledge of every ant species. You must unlock it and " +
-                "take over the world as the dominant species." +
+                LanguageStrings.get("HELP_WELCOME_STORY") +
                 "</p></div></html>";
         JPanel page1 = new JPanel(new BorderLayout());
         page1.setBackground(AssetStyles.BACKGROUND_COLOR);
@@ -674,13 +671,7 @@ public class HelpPanel extends JPanel {
 
         // --- Page 2: Game Info ---
         String gameInfo = "<html><div style='width: 350px; font-family: sans-serif;'><p style='font-size: 11pt;'>" +
-                "<b>Basic Tips:</b><br><br>" +
-                "Your main food is <b>Fungi</b> (Mushrooms), which ants will eat daily.<br><br>" +
-                "Assign <b>Workers</b> (Q) to <b>Forager</b> roles to gather Plants and Water. Without them your ants will die of thirst!<br><br>" +
-                "Assign <b>Farmers</b> (Q) to convert gathered Plants into Fungi. One Farmer can generally handle 6 Foragers.<br><br>" +
-                "Assign <b>Nurses</b> (Q) to care for your <b>Eggs, Larvae, and Pupae</b>. Without enough nurses, your young will perish from neglect!<br><br>" +
-                "Press <b>A</b> to toggle your view between the <b>Underworld</b>  and the <b>Overworld</b> .<br><br>" +
-                "<i>QoL Tip: If you assign a new role but have no unassigned ants, the game automatically pulls from your default workforce (like Foragers).</i>" +
+                LanguageStrings.get("HELP_TUTORIAL_TIPS") +
                 "</p></div></html>";
         JPanel page2 = new JPanel(new BorderLayout());
         page2.setBackground(AssetStyles.BACKGROUND_COLOR);
@@ -691,10 +682,7 @@ public class HelpPanel extends JPanel {
         
         // --- Page 3: Threats & Mechanics ---
         String threatInfo = "<html><div style='width: 350px; font-family: sans-serif;'><p style='font-size: 11pt;'>" +
-                "<b>Colony Threats:</b><br><br>" +
-                "<b>Contamination:</b> Ants naturally die of old age. If bodies pile up, disease will spread and kill your colony. Assign <b>Gravers</b> to clear the dead.<br><br>" +
-                "<b>Parasites:</b> Unseen pests will leech your Fungi reserves. Assign <b>Police</b> to detect and eliminate them.<br><br>" +
-                "<b>Depletion:</b> Resource nodes don't last forever. If your foragers run out of plants or water, assign <b>Scouts</b> to find new resources nearby." +
+                LanguageStrings.get("HELP_TUTORIAL_THREATS") +
                 "</p></div></html>";
         JPanel page3 = new JPanel(new BorderLayout());
         page3.setBackground(AssetStyles.BACKGROUND_COLOR);
@@ -705,10 +693,7 @@ public class HelpPanel extends JPanel {
 
         // --- Page 4: Dynasty Management ---
         String empireInfo = "<html><div style='width: 350px; font-family: sans-serif;'><p style='font-size: 11pt;'>" +
-                "<b>Dynasty Management:</b><br><br>" +
-                "As your colony thrives, you will unlock <b>Breeder</b> Princesses. These allow you to establish satellite colonies via the <b>World Map (I)</b> .<br>" +
-                "<i>Tip: Keep an eye on the sky! Rare Solar or Lunar Eclipses will trigger spontaneous, free Nuptial Flights!</i><br><br>" +
-                "Founding multiple colonies unlocks the <b>Dynasty Menu (S)</b>. Reaching certain milestones will allow you to construct <b>Trade Routes</b>, remove spreading limits, and even <b>Automate</b> your expanding dynasty!" +
+                LanguageStrings.get("HELP_TUTORIAL_DYNASTY") +
                 "</p></div></html>";
         JPanel page4 = new JPanel(new BorderLayout());
         page4.setBackground(AssetStyles.BACKGROUND_COLOR);
@@ -720,30 +705,30 @@ public class HelpPanel extends JPanel {
         // --- Page 5: Hotkeys ---
         JPanel hotkeyPanel = new JPanel(new GridLayout(0, 2, 10, 5)); 
         hotkeyPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
-        hotkeyPanel.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER, "Hotkeys",
+        hotkeyPanel.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER, LanguageStrings.get("HELP_TAB_HOTKEYS"),
                 javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
                 javax.swing.border.TitledBorder.DEFAULT_POSITION,
                 AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
 
-        String[] keys = {
-            "Pause/Play:", "Spacebar",
-            "Game Menu:", "ESC",
-            "Toggle View:", "A",
-            "Roles (Q-T):", "Toggle Menus",
-            "Upgrades (Y-O):", "Toggle Menus",
-            "Hatch Rates:", "P (Toggle)",
-            "Dynasty (S/A):", "Toggle Menus",
-            "World Map:", "M (Toggle)",
-            "Stats:", "X (Toggle)"
+        Object[][] keysData = {
+            {LanguageStrings.get("HOTKEY_PAUSE_LABEL"), "Spacebar"},
+            {LanguageStrings.get("HOTKEY_ESC_LABEL"), "ESC"},
+            {LanguageStrings.get("HOTKEY_VIEW_LABEL"), "A"},
+            {LanguageStrings.get("HOTKEY_ROLES_LABEL"), "Q-T"},
+            {LanguageStrings.get("HOTKEY_UPGRADES_LABEL"), "Y-O"},
+            {LanguageStrings.get("HOTKEY_P_LABEL"), "P"},
+            {LanguageStrings.get("HOTKEY_DYNASTY_LABEL"), "S / A"},
+            {LanguageStrings.get("HOTKEY_M_LABEL"), "M"},
+            {LanguageStrings.get("HOTKEY_X_LABEL"), "X"}
         };
         
-        for (int i = 0; i < keys.length; i+=2) {
-            JLabel k = new JLabel(keys[i]);
+        for (Object[] row : keysData) {
+            JLabel k = new JLabel((String)row[0]);
             k.setFont(AssetStyles.FONT_BOLD);
             k.setForeground(AssetStyles.FONT_COLOR_HEADER);
             hotkeyPanel.add(k);
             
-            JLabel v = new JLabel(keys[i+1]);
+            JLabel v = new JLabel((String)row[1]);
             v.setFont(AssetStyles.FONT_NORMAL);
             v.setForeground(AssetStyles.FONT_COLOR);
             hotkeyPanel.add(v);
@@ -766,10 +751,10 @@ public class HelpPanel extends JPanel {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
         
-        JButton skipBtn = new JButton("Skip Tutorial");
-        JButton backBtn = new JButton("< Back");
-        JButton nextBtn = new JButton("Next >");
-        JButton finishBtn = new JButton("Finish");
+        JButton skipBtn = new JButton(LanguageStrings.get("HELP_SKIP_TUTORIAL"));
+        JButton backBtn = new JButton("< " + LanguageStrings.get("UI_BACK"));
+        JButton nextBtn = new JButton(LanguageStrings.get("UI_NEXT") + " >");
+        JButton finishBtn = new JButton(LanguageStrings.get("UI_FINISH"));
         
         for(JButton btn : new JButton[]{skipBtn, backBtn, nextBtn, finishBtn}) {
             btn.setFont(AssetStyles.FONT_BOLD);

@@ -89,7 +89,7 @@ public class UpgradeDialog extends ZeroDialog {
         if (colony.hasUpgrade(GameUnlocks.ABILITY_RESEARCH)) {
             if (researchPanel == null) researchPanel = new ResearchPanel(colony);
             researchPanel.updateData();
-            tabbedPane.addTab(LanguageStrings.TAB_RESEARCH, GameConstants.ROLE_RESEARCHER.getIcon(), researchPanel);
+            tabbedPane.addTab(LanguageStrings.get(LanguageStrings.TAB_RESEARCH), GameConstants.ROLE_RESEARCHER.getIcon(), researchPanel);
             tabIndexMap.put(TAB_RESEARCH, currentIndex++);
         }
 
@@ -97,7 +97,7 @@ public class UpgradeDialog extends ZeroDialog {
         if (colony.hasUpgrade(GameUnlocks.ROLE_BUILDER)) {
             if (buildPanel == null) buildPanel = new BuildPanel(colony);
             buildPanel.updateData();
-            tabbedPane.addTab(LanguageStrings.TAB_CONSTRUCTION, GameConstants.ROLE_BUILDER.getIcon(), buildPanel);
+            tabbedPane.addTab(LanguageStrings.get(LanguageStrings.TAB_CONSTRUCTION), GameConstants.ROLE_BUILDER.getIcon(), buildPanel);
             tabIndexMap.put(TAB_BUILD, currentIndex++);
         }
 
@@ -107,16 +107,16 @@ public class UpgradeDialog extends ZeroDialog {
                 assimilationPanel = new AssimilationPanel(colony);
             }
             ((AssimilationPanel) assimilationPanel).updateData();
-            tabbedPane.addTab(LanguageStrings.TAB_ASSIMILATIONS, null, assimilationPanel);
+            tabbedPane.addTab(LanguageStrings.get(LanguageStrings.TAB_ASSIMILATIONS), null, assimilationPanel);
             tabIndexMap.put(TAB_ASSIMILATION, currentIndex++);
         }
 
         // --- Synergies Tab ---
         if (colony.hasUpgrade(GameUnlocks.ABILITY_SYNERGY)) { 
             if (synergyPanel == null) {
-                synergyPanel = createPlaceholderPanel(LanguageStrings.SYNERGY_COMING_SOON);
+                synergyPanel = createPlaceholderPanel(LanguageStrings.get(LanguageStrings.SYNERGY_COMING_SOON));
             }
-            tabbedPane.addTab(LanguageStrings.TAB_SYNERGIES, null, synergyPanel);
+            tabbedPane.addTab(LanguageStrings.get(LanguageStrings.TAB_SYNERGIES), null, synergyPanel);
             tabIndexMap.put(TAB_SYNERGY, currentIndex++);
         }
         
@@ -256,7 +256,7 @@ public class UpgradeDialog extends ZeroDialog {
             availableUpgrades.sort((u1, u2) -> Integer.compare(u1.getCost(), u2.getCost()));
 
             if (availableUpgrades.isEmpty()) {
-                JLabel emptyLabel = new JLabel(LanguageStrings.UPGRADE_NO_RESEARCH);
+                JLabel emptyLabel = new JLabel(LanguageStrings.get(LanguageStrings.UPGRADE_NO_RESEARCH));
                 emptyLabel.setForeground(AssetStyles.FONT_COLOR);
                 listPanel.add(emptyLabel);
             } else {
@@ -273,7 +273,7 @@ public class UpgradeDialog extends ZeroDialog {
         }
 
         private void updateResearchPointsLabel() {
-            researchPointsLabel.setText(String.format(LanguageStrings.UPGRADE_RESEARCH_AVAILABLE, colony.getResearchPoints()));
+            researchPointsLabel.setText(String.format(LanguageStrings.get(LanguageStrings.UPGRADE_RESEARCH_AVAILABLE), colony.getResearchPoints()));
         }
 
         private JPanel createUpgradePanel(Upgrade upgrade, int currentRP) {
@@ -306,12 +306,12 @@ public class UpgradeDialog extends ZeroDialog {
             actionPanel.setLayout(new BoxLayout(actionPanel, BoxLayout.Y_AXIS));
             actionPanel.setBorder(new EmptyBorder(0, 0, 0, 5));
 
-            JButton purchaseButton = new JButton(LanguageStrings.UI_BUY);
+            JButton purchaseButton = new JButton(LanguageStrings.get(LanguageStrings.UI_BUY));
             purchaseButton.setFont(AssetStyles.FONT_BOLD);
             purchaseButton.setFocusable(false);
             if (currentRP < upgrade.getCost()) {
                 purchaseButton.setEnabled(false);
-                purchaseButton.setToolTipText(LanguageStrings.UPGRADE_NOT_ENOUGH_RP);
+                purchaseButton.setToolTipText(LanguageStrings.get(LanguageStrings.UPGRADE_NOT_ENOUGH_RP));
             }
 
             purchaseButton.addActionListener(e -> {
@@ -323,7 +323,7 @@ public class UpgradeDialog extends ZeroDialog {
                 }
             });
 
-            JLabel costLabel = new JLabel(String.format(LanguageStrings.UPGRADE_COST_RP, upgrade.getCost()));
+            JLabel costLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.UPGRADE_COST_RP), upgrade.getCost()));
             costLabel.setFont(AssetStyles.FONT_BOLD);
             costLabel.setForeground(AssetStyles.FONT_COLOR_VALUE);
             costLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -349,7 +349,7 @@ public class UpgradeDialog extends ZeroDialog {
 
                 if (currentRP < upgrade.getCost()) {
                     button.setEnabled(false);
-                    button.setToolTipText(LanguageStrings.UPGRADE_NOT_ENOUGH_RP);
+                    button.setToolTipText(LanguageStrings.get(LanguageStrings.UPGRADE_NOT_ENOUGH_RP));
                 } else {
                     button.setEnabled(true);
                     button.setToolTipText(null);
@@ -434,7 +434,7 @@ public class UpgradeDialog extends ZeroDialog {
                 availableBuildings.sort((b1, b2) -> Integer.compare(b1.getBuildTime(), b2.getBuildTime()));
 
                 if (availableBuildings.isEmpty()) {
-                    JLabel emptyLabel = new JLabel(LanguageStrings.BUILD_NO_CONSTRUCTIONS);
+                    JLabel emptyLabel = new JLabel(LanguageStrings.get(LanguageStrings.BUILD_NO_CONSTRUCTIONS));
                     emptyLabel.setForeground(AssetStyles.FONT_COLOR);
                     listPanel.add(emptyLabel);
                 } else {
@@ -454,11 +454,11 @@ public class UpgradeDialog extends ZeroDialog {
         private void updateResourceLabels() {
             mineralsLabel.setText(colony.getMinerals() + "/" + colony.getMineralsCapacity());
             resinLabel.setText(colony.getResins() + "/" + colony.getResinsCapacity());
-            buildersLabel.setText(String.format(LanguageStrings.BUILD_STATUS_BUILDERS, colony.getAssignedRoleCount(GameConstants.ROLE_BUILDER)));
+            buildersLabel.setText(String.format(LanguageStrings.get(LanguageStrings.BUILD_STATUS_BUILDERS), colony.getAssignedRoleCount(GameConstants.ROLE_BUILDER)));
             
             if (colony.hasUpgrade(GameUnlocks.ROLE_CRANE)) {
                 cranesLabel.setVisible(true);
-                cranesLabel.setText(String.format(LanguageStrings.BUILD_STATUS_CRANES, colony.getAssignedRoleCount(GameConstants.ROLE_CRANE)));
+                cranesLabel.setText(String.format(LanguageStrings.get(LanguageStrings.BUILD_STATUS_CRANES), colony.getAssignedRoleCount(GameConstants.ROLE_CRANE)));
             } else {
                 cranesLabel.setVisible(false);
             }
@@ -494,7 +494,7 @@ public class UpgradeDialog extends ZeroDialog {
             actionPanel.setLayout(new BoxLayout(actionPanel, BoxLayout.Y_AXIS));
             actionPanel.setBorder(new EmptyBorder(0, 0, 0, 5));
 
-            JButton purchaseButton = new JButton(LanguageStrings.UI_BUILD);
+            JButton purchaseButton = new JButton(LanguageStrings.get(LanguageStrings.UI_BUILD));
             purchaseButton.setFont(AssetStyles.FONT_BOLD);
             purchaseButton.setFocusable(false);
 
@@ -507,7 +507,7 @@ public class UpgradeDialog extends ZeroDialog {
                 }
             });
 
-            String costString = String.format(LanguageStrings.BUILD_COST_FORMAT, building.getMineralCost(), building.getResinCost(), building.getBuildTime());
+            String costString = String.format(LanguageStrings.get(LanguageStrings.BUILD_COST_FORMAT), building.getMineralCost(), building.getResinCost(), building.getBuildTime());
 
             JLabel costLabel = new JLabel(costString);
             costLabel.setFont(AssetStyles.FONT_BOLD);
@@ -527,7 +527,7 @@ public class UpgradeDialog extends ZeroDialog {
             JPanel panel = new JPanel(new BorderLayout(10, 10));
             panel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
             
-            TitledBorder border = new TitledBorder(AssetStyles.PANEL_BORDER, String.format(LanguageStrings.BUILD_UNDER_CONSTRUCTION, project.getName()));
+            TitledBorder border = new TitledBorder(AssetStyles.PANEL_BORDER, String.format(LanguageStrings.get(LanguageStrings.BUILD_UNDER_CONSTRUCTION), project.getName()));
             border.setTitleColor(AssetStyles.FONT_COLOR_HEADER);
             border.setTitleFont(AssetStyles.FONT_BOLD);
             panel.setBorder(border);
@@ -546,21 +546,21 @@ public class UpgradeDialog extends ZeroDialog {
             JProgressBar progressBar = new JProgressBar(0, 100);
             progressBar.setValue(progressPercent);
             progressBar.setStringPainted(true);
-            progressBar.setString(String.format(LanguageStrings.BUILD_PROGRESS_HOURS, progressHours, requiredHours));
+            progressBar.setString(String.format(LanguageStrings.get(LanguageStrings.BUILD_PROGRESS_HOURS), progressHours, requiredHours));
 
             panel.add(progressBar, BorderLayout.CENTER);
 
-            String buildersStr = String.format(LanguageStrings.BUILD_STATUS_BUILDERS, builderCount);
+            String buildersStr = String.format(LanguageStrings.get(LanguageStrings.BUILD_STATUS_BUILDERS), builderCount);
             if (colony.hasUpgrade(GameUnlocks.ROLE_CRANE)) {
-                buildersStr += " & " + String.format(LanguageStrings.BUILD_STATUS_CRANES, craneCount);
+                buildersStr += " & " + String.format(LanguageStrings.get(LanguageStrings.BUILD_STATUS_CRANES), craneCount);
             }
-            JLabel progressLabel = new JLabel(String.format(LanguageStrings.BUILD_STATUS_SPEED, buildersStr, efficiency * 100));
+            JLabel progressLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.BUILD_STATUS_SPEED), buildersStr, efficiency * 100));
             progressLabel.setForeground(AssetStyles.FONT_COLOR);
             progressLabel.setFont(AssetStyles.FONT_NORMAL);
             progressLabel.setHorizontalAlignment(SwingConstants.CENTER);
             panel.add(progressLabel, BorderLayout.SOUTH);
 
-            JButton cancelButton = new JButton(LanguageStrings.UI_CANCEL);
+            JButton cancelButton = new JButton(LanguageStrings.get(LanguageStrings.UI_CANCEL));
             cancelButton.setFont(AssetStyles.FONT_BOLD);
             cancelButton.setFocusable(false);
             cancelButton.addActionListener(e -> {
@@ -587,10 +587,10 @@ public class UpgradeDialog extends ZeroDialog {
 
             if (builders <= 0 && cranes <= 0) {
                 button.setEnabled(false);
-                button.setToolTipText(LanguageStrings.BUILD_REQUIREMENT_ERROR);
+                button.setToolTipText(LanguageStrings.get(LanguageStrings.BUILD_REQUIREMENT_ERROR));
             } else if (minerals < building.getMineralCost() || resin < building.getResinCost()) {
                 button.setEnabled(false);
-                button.setToolTipText(LanguageStrings.BUILD_RESOURCES_ERROR);
+                button.setToolTipText(LanguageStrings.get(LanguageStrings.BUILD_RESOURCES_ERROR));
             } else {
                 button.setEnabled(true);
                 button.setToolTipText(null);
@@ -625,13 +625,13 @@ public class UpgradeDialog extends ZeroDialog {
                         }
 
                         progressBar.setValue(progressPercent);
-                        progressBar.setString(String.format(LanguageStrings.BUILD_PROGRESS_HOURS, progressHours, requiredHours));
+                        progressBar.setString(String.format(LanguageStrings.get(LanguageStrings.BUILD_PROGRESS_HOURS), progressHours, requiredHours));
                         
-                        String buildersStr = String.format(LanguageStrings.BUILD_STATUS_BUILDERS, builderCount);
+                        String buildersStr = String.format(LanguageStrings.get(LanguageStrings.BUILD_STATUS_BUILDERS), builderCount);
                         if (colony.hasUpgrade(GameUnlocks.ROLE_CRANE)) {
-                            buildersStr += " & " + String.format(LanguageStrings.BUILD_STATUS_CRANES, craneCount);
+                            buildersStr += " & " + String.format(LanguageStrings.get(LanguageStrings.BUILD_STATUS_CRANES), craneCount);
                         }
-                        progressLabel.setText(String.format(LanguageStrings.BUILD_STATUS_SPEED, buildersStr, efficiency * 100));
+                        progressLabel.setText(String.format(LanguageStrings.get(LanguageStrings.BUILD_STATUS_SPEED), buildersStr, efficiency * 100));
                     } else {
                         updateData();
                     }
@@ -664,7 +664,7 @@ public class UpgradeDialog extends ZeroDialog {
 
             JPanel northPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
             northPanel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
-            statusLabel = new JLabel(String.format(LanguageStrings.ASSIMILATION_CURRENT, LanguageStrings.ASSIMILATION_NONE));
+            statusLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.ASSIMILATION_CURRENT), LanguageStrings.get(LanguageStrings.ASSIMILATION_NONE)));
             statusLabel.setFont(AssetStyles.FONT_BOLD);
             statusLabel.setForeground(AssetStyles.FONT_COLOR_HEADER);
             northPanel.add(statusLabel);
@@ -713,7 +713,7 @@ public class UpgradeDialog extends ZeroDialog {
                 }
 
                 if (available.isEmpty()) {
-                    JLabel emptyLabel = new JLabel(LanguageStrings.ASSIMILATION_NO_GENOMES);
+                    JLabel emptyLabel = new JLabel(LanguageStrings.get(LanguageStrings.ASSIMILATION_NO_GENOMES));
                     emptyLabel.setForeground(AssetStyles.FONT_COLOR);
                     listPanel.add(emptyLabel);
                 } else {
@@ -732,9 +732,9 @@ public class UpgradeDialog extends ZeroDialog {
             Dynasty d = colony.getDynasty();
             if (d == null) return;
             if (d.getCurrentAssimilation() != null) {
-                statusLabel.setText(String.format(LanguageStrings.ASSIMILATION_CURRENT, d.getCurrentAssimilation().getName()));
+                statusLabel.setText(String.format(LanguageStrings.get(LanguageStrings.ASSIMILATION_CURRENT), d.getCurrentAssimilation().getName()));
             } else {
-                statusLabel.setText(String.format(LanguageStrings.ASSIMILATION_CURRENT, LanguageStrings.ASSIMILATION_NONE));
+                statusLabel.setText(String.format(LanguageStrings.get(LanguageStrings.ASSIMILATION_CURRENT), LanguageStrings.get(LanguageStrings.ASSIMILATION_NONE)));
             }
         }
 
@@ -760,12 +760,12 @@ public class UpgradeDialog extends ZeroDialog {
             east.setOpaque(false);
             east.setLayout(new BoxLayout(east, BoxLayout.Y_AXIS));
             
-            JLabel cost = new JLabel(String.format(LanguageStrings.ASSIMILATION_TARGET, a.getCost()));
+            JLabel cost = new JLabel(String.format(LanguageStrings.get(LanguageStrings.ASSIMILATION_TARGET), a.getCost()));
             cost.setForeground(AssetStyles.FONT_COLOR_VALUE);
             cost.setFont(AssetStyles.FONT_BOLD);
             cost.setAlignmentX(Component.CENTER_ALIGNMENT);
             
-            JButton btn = new JButton(LanguageStrings.UI_BEGIN);
+            JButton btn = new JButton(LanguageStrings.get(LanguageStrings.UI_BEGIN));
             btn.setFont(AssetStyles.FONT_BOLD);
             btn.setAlignmentX(Component.CENTER_ALIGNMENT);
             btn.addActionListener(e -> {
@@ -786,7 +786,7 @@ public class UpgradeDialog extends ZeroDialog {
             JPanel panel = new JPanel(new BorderLayout(10, 10));
             panel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
             
-            TitledBorder border = new TitledBorder(AssetStyles.PANEL_BORDER, String.format(LanguageStrings.ASSIMILATION_ACTIVE, a.getName()));
+            TitledBorder border = new TitledBorder(AssetStyles.PANEL_BORDER, String.format(LanguageStrings.get(LanguageStrings.ASSIMILATION_ACTIVE), a.getName()));
             border.setTitleColor(AssetStyles.FONT_COLOR_HEADER);
             border.setTitleFont(AssetStyles.FONT_BOLD);
             panel.setBorder(border);
@@ -797,10 +797,10 @@ public class UpgradeDialog extends ZeroDialog {
             JProgressBar bar = new JProgressBar(0, 100);
             bar.setValue(percent);
             bar.setStringPainted(true);
-            bar.setString(String.format(LanguageStrings.ASSIMILATION_PROGRESS, prog, a.getCost(), percent));
+            bar.setString(String.format(LanguageStrings.get(LanguageStrings.ASSIMILATION_PROGRESS), prog, a.getCost(), percent));
             panel.add(bar, BorderLayout.CENTER);
 
-            JButton cancel = new JButton(LanguageStrings.UI_CANCEL);
+            JButton cancel = new JButton(LanguageStrings.get(LanguageStrings.UI_CANCEL));
             cancel.setFont(AssetStyles.FONT_BOLD);
             cancel.setFocusable(false);
             cancel.addActionListener(e -> {
@@ -814,7 +814,7 @@ public class UpgradeDialog extends ZeroDialog {
             eastPanel.add(cancel);
             panel.add(eastPanel, BorderLayout.EAST);
 
-            JLabel info = new JLabel(LanguageStrings.ASSIMILATION_INFO);
+            JLabel info = new JLabel(LanguageStrings.get(LanguageStrings.ASSIMILATION_INFO));
             info.setForeground(AssetStyles.FONT_COLOR);
             info.setFont(AssetStyles.FONT_NORMAL);
             info.setHorizontalAlignment(SwingConstants.CENTER);
@@ -844,7 +844,7 @@ public class UpgradeDialog extends ZeroDialog {
                     double prog = d.getAssimilationProgress();
                     int percent = (int)((prog / a.getCost()) * 100);
                     bar.setValue(percent);
-                    bar.setString(String.format(LanguageStrings.ASSIMILATION_PROGRESS, prog, a.getCost(), percent));
+                    bar.setString(String.format(LanguageStrings.get(LanguageStrings.ASSIMILATION_PROGRESS), prog, a.getCost(), percent));
                 }
             }
         }

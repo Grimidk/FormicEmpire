@@ -492,7 +492,7 @@ public final class GameConstants {
     static { species.add(SPECIES_LEAF); }
     
     public static final Species SPECIES_PHARAOH = new Species(3, LanguageStrings.SPECIES_PHARAOH, LanguageStrings.SPECIES_PHARAOH_SCIENTIFIC, "pharaoh/", GameUnlocks.ASSIMILATION_PHARAOH, 
-        Set.of(GameUnlocks.TYPE_EGG, GameUnlocks.TYPE_QUEEN, GameUnlocks.TYPE_WORKER, LanguageStrings.SPECIES_PHARAOH_SCIENTIFIC.length() > 0 ? GameUnlocks.ROLE_FORAGER : null, 
+        Set.of(GameUnlocks.TYPE_EGG, GameUnlocks.TYPE_QUEEN, GameUnlocks.TYPE_WORKER, LanguageStrings.get(LanguageStrings.SPECIES_PHARAOH_SCIENTIFIC).length() > 0 ? GameUnlocks.ROLE_FORAGER : null, 
             GameUnlocks.ROLE_FARMER, GameUnlocks.ROLE_NURSE, GameUnlocks.ROLE_LAYER, 
             GameUnlocks.STAT_SKELETON, GameUnlocks.STAT_ACID, GameUnlocks.STAT_LONGEVITY,
             GameUnlocks.ASSIMILATED_MULTIQUEEN) ,loadIcon("icons/species/pharaoh.png"));

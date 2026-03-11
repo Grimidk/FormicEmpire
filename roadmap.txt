@@ -14,6 +14,7 @@ To Fix (By decreasing priority) :
 	(none right now)
 
 	Low:
+	disable weather filters option
 	breeders go out of the colony in nuptial
 	"view convoy" option using going and returning biomes for tiles, or underground or air
 	logistic physics use dimension 2
@@ -27,6 +28,8 @@ Needed for launch (v1.0) (Launch Version):
 	genetic stagnation (obscured until below (80%)) every nuptial, assimilation gives base 5% after cloning (unlocked after empire rank), alliances can increase while allied, stagnation = success chance to spread and drones from assimilated
 	font
 	Spanish localization
+	promo video
+
 	Everything else :
 	ant speed and biome depletion and further located sources take more time and sustainability of biome 
 	auxiliary room sprites (storage (resources), farm (shroom), nurse (bedding), royal (nests and science))
@@ -48,9 +51,9 @@ Needed for launch (v1.0) (Launch Version):
 	more upgrades
 	more buildings
 	more roles (commander and captain roles, air force)
-	more enemies ( Rebel ant colonies, Bugs, Arachnids, Reptiles, Birds, Rodents, Zombie ant colonies, Parasitic ants)
+	more enemies ( Rebel ant colonies, Bugs, Arachnids, Reptiles, Birds, Rodents, Zombie ant colonies)
 	more stats (kills, historic productions, graphs?)
-	more bugs (constants and icons)
+	more bugs (constants and icons and scienctific name)
 	non-ant assimilation ( Winged workers (Bees), Spiked larvae, Chemical throwing (Bombardier beetle), Chirping (Grass hopper), Diving, Mineralized exoskeletons, Rock mining, Bioluminescence (Fireflies), Static electricity generation, Pollination (Flies) )
 	rework tutorial and obscure unlocks in menus
 	rework menus and key binds and how the ui looks
@@ -61,7 +64,7 @@ Needed for launch (v1.0) (Launch Version):
 	balance every upgrade
 	ant menus (detailed per ant)
 	music and sounds and settings for them and player panel
-	langs (ENG, SPA, POR, FRE, GER, RUS, CHN, JAP)
+	langs (ENG, POR, FRE, GER, RUS, CHN, JAP)
 	warning screen for arthropophobia 
 	start animation and general animations
 	register Grim Games or Grimidk in steam as dev team

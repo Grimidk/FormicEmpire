@@ -11,16 +11,25 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.List;
 
 public class SettingsPanel extends JPanel {
     private final MainFrame frame;
     private final Engine engine;
 
-    private JComboBox<String> languageCombo;
+    private JComboBox<LanguageOption> languageCombo;
     private JCheckBox turboCheck;
     private JComboBox<String> sizeCombo;
     private JCheckBox fullScreenCheck;
     private JComboBox<AutosaveOption> autosaveCombo;
+    
+    private JLabel langLabel;
+    private JLabel sizeLabel;
+    private JLabel fsLabel;
+    private JLabel autoLabel;
+    private JLabel turboLabel;
+    private JButton saveButton;
+    private JButton backButton;
 
     private static class AutosaveOption {
         String label;
@@ -32,6 +41,17 @@ public class SettingsPanel extends JPanel {
         @Override
         public String toString() { return label; }
     }
+    
+    private static class LanguageOption {
+        String code;
+        String name;
+        public LanguageOption(String code, String name) {
+            this.code = code;
+            this.name = name;
+        }
+        @Override
+        public String toString() { return name; }
+    }
 
     public SettingsPanel(MainFrame frame) {
         this.frame = frame;
@@ -39,6 +59,26 @@ public class SettingsPanel extends JPanel {
         setLayout(new GridBagLayout());
         setBackground(AssetStyles.BACKGROUND_COLOR);
         
+        initUI();
+        
+        LanguageStrings.addListener(this::refreshTranslations);
+
+        addAncestorListener(new AncestorListener() {
+            @Override
+            public void ancestorAdded(AncestorEvent event) {
+                backButton.requestFocusInWindow();
+            }
+
+            @Override
+            public void ancestorRemoved(AncestorEvent event) {}
+
+            @Override
+            public void ancestorMoved(AncestorEvent event) {}
+        });
+    }
+    
+    private void initUI() {
+        removeAll();
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
         c.insets = new Insets(8, 8, 8, 8);
@@ -46,18 +86,23 @@ public class SettingsPanel extends JPanel {
 
         // Language
         c.gridy = 0; c.gridx = 0; 
-        JLabel langLabel = new JLabel(LanguageStrings.SETTINGS_LANGUAGE);
+        langLabel = new JLabel(LanguageStrings.get(LanguageStrings.SETTINGS_LANGUAGE));
         langLabel.setFont(AssetStyles.FONT_NORMAL);
         langLabel.setForeground(AssetStyles.FONT_COLOR);
         add(langLabel, c);
         
-        languageCombo = new JComboBox<>(new String[]{"en", "es", "de"});
+        List<String> codes = LanguageStrings.getAvailableLanguageCodes();
+        LanguageOption[] options = new LanguageOption[codes.size()];
+        for (int i = 0; i < codes.size(); i++) {
+            options[i] = new LanguageOption(codes.get(i), LanguageStrings.getLanguageName(codes.get(i)));
+        }
+        languageCombo = new JComboBox<>(options);
         styleComboBox(languageCombo);
         c.gridx = 1; add(languageCombo, c);
 
         // Screen Size
         c.gridy = 1; c.gridx = 0; 
-        JLabel sizeLabel = new JLabel(LanguageStrings.SETTINGS_SCREEN_SIZE);
+        sizeLabel = new JLabel(LanguageStrings.get(LanguageStrings.SETTINGS_SCREEN_SIZE));
         sizeLabel.setFont(AssetStyles.FONT_NORMAL);
         sizeLabel.setForeground(AssetStyles.FONT_COLOR);
         add(sizeLabel, c);
@@ -69,7 +114,7 @@ public class SettingsPanel extends JPanel {
 
         // Full Screen
         c.gridy = 2; c.gridx = 0; 
-        JLabel fsLabel = new JLabel(LanguageStrings.SETTINGS_FULLSCREEN);
+        fsLabel = new JLabel(LanguageStrings.get(LanguageStrings.SETTINGS_FULLSCREEN));
         fsLabel.setFont(AssetStyles.FONT_NORMAL);
         fsLabel.setForeground(AssetStyles.FONT_COLOR);
         add(fsLabel, c);
@@ -81,24 +126,24 @@ public class SettingsPanel extends JPanel {
 
         // Autosave Frequency
         c.gridy = 3; c.gridx = 0; 
-        JLabel autoLabel = new JLabel(LanguageStrings.SETTINGS_AUTOSAVE);
+        autoLabel = new JLabel(LanguageStrings.get(LanguageStrings.SETTINGS_AUTOSAVE));
         autoLabel.setFont(AssetStyles.FONT_NORMAL);
         autoLabel.setForeground(AssetStyles.FONT_COLOR);
         add(autoLabel, c);
         
         autosaveCombo = new JComboBox<>(new AutosaveOption[]{
-                new AutosaveOption(LanguageStrings.SETTINGS_EVERY_MONTH, 1),
-                new AutosaveOption(LanguageStrings.SETTINGS_EVERY_3_MONTHS, 3),
-                new AutosaveOption(LanguageStrings.SETTINGS_EVERY_6_MONTHS, 6),
-                new AutosaveOption(LanguageStrings.SETTINGS_EVERY_YEAR, 12),
-                new AutosaveOption(LanguageStrings.UI_DISABLED, 0)
+                new AutosaveOption(LanguageStrings.get(LanguageStrings.SETTINGS_EVERY_MONTH), 1),
+                new AutosaveOption(LanguageStrings.get(LanguageStrings.SETTINGS_EVERY_3_MONTHS), 3),
+                new AutosaveOption(LanguageStrings.get(LanguageStrings.SETTINGS_EVERY_6_MONTHS), 6),
+                new AutosaveOption(LanguageStrings.get(LanguageStrings.SETTINGS_EVERY_YEAR), 12),
+                new AutosaveOption(LanguageStrings.get(LanguageStrings.UI_DISABLED), 0)
         });
         styleComboBox(autosaveCombo);
         c.gridx = 1; add(autosaveCombo, c);
         
         // Turbo Mode
         c.gridy = 4; c.gridx = 0; 
-        JLabel turboLabel = new JLabel(LanguageStrings.SETTINGS_TURBO);
+        turboLabel = new JLabel(LanguageStrings.get(LanguageStrings.SETTINGS_TURBO));
         turboLabel.setFont(AssetStyles.FONT_NORMAL);
         turboLabel.setForeground(AssetStyles.FONT_COLOR);
         add(turboLabel, c);
@@ -112,12 +157,12 @@ public class SettingsPanel extends JPanel {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
         
-        JButton saveButton = new JButton(LanguageStrings.SETTINGS_SAVE_APPLY);
+        saveButton = new JButton(LanguageStrings.get(LanguageStrings.SETTINGS_SAVE_APPLY));
         styleButton(saveButton);
         saveButton.addActionListener(e -> saveSettings());
         setupNavigation(saveButton);
 
-        JButton backButton = new JButton(LanguageStrings.UI_BACK);
+        backButton = new JButton(LanguageStrings.get(LanguageStrings.UI_BACK));
         styleButton(backButton);
         backButton.addActionListener(e -> this.frame.showCard(MainFrame.CARD_INIT));
         setupNavigation(backButton);
@@ -129,18 +174,34 @@ public class SettingsPanel extends JPanel {
         c.anchor = GridBagConstraints.CENTER;
         add(buttonPanel, c);
         
-        addAncestorListener(new AncestorListener() {
-            @Override
-            public void ancestorAdded(AncestorEvent event) {
-                backButton.requestFocusInWindow();
+        revalidate();
+        repaint();
+    }
+    
+    private void refreshTranslations() {
+        langLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_LANGUAGE));
+        sizeLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_SCREEN_SIZE));
+        fsLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_FULLSCREEN));
+        autoLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_AUTOSAVE));
+        turboLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_TURBO));
+        saveButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_SAVE_APPLY));
+        backButton.setText(LanguageStrings.get(LanguageStrings.UI_BACK));
+        
+        // Refresh autosave combo options
+        int currentFreq = (autosaveCombo.getSelectedItem() != null) ? ((AutosaveOption)autosaveCombo.getSelectedItem()).value : 0;
+        autosaveCombo.setModel(new DefaultComboBoxModel<>(new AutosaveOption[]{
+                new AutosaveOption(LanguageStrings.get(LanguageStrings.SETTINGS_EVERY_MONTH), 1),
+                new AutosaveOption(LanguageStrings.get(LanguageStrings.SETTINGS_EVERY_3_MONTHS), 3),
+                new AutosaveOption(LanguageStrings.get(LanguageStrings.SETTINGS_EVERY_6_MONTHS), 6),
+                new AutosaveOption(LanguageStrings.get(LanguageStrings.SETTINGS_EVERY_YEAR), 12),
+                new AutosaveOption(LanguageStrings.get(LanguageStrings.UI_DISABLED), 0)
+        }));
+        for (int i = 0; i < autosaveCombo.getItemCount(); i++) {
+            if (autosaveCombo.getItemAt(i).value == currentFreq) {
+                autosaveCombo.setSelectedIndex(i);
+                break;
             }
-
-            @Override
-            public void ancestorRemoved(AncestorEvent event) {}
-
-            @Override
-            public void ancestorMoved(AncestorEvent event) {}
-        });
+        }
     }
     
     private void styleComboBox(JComboBox<?> box) {
@@ -192,7 +253,14 @@ public class SettingsPanel extends JPanel {
     }
 
     public void loadSettings() {
-        languageCombo.setSelectedItem(engine.getLanguage());
+        String currentLang = engine.getLanguage();
+        for (int i = 0; i < languageCombo.getItemCount(); i++) {
+            if (languageCombo.getItemAt(i).code.equals(currentLang)) {
+                languageCombo.setSelectedIndex(i);
+                break;
+            }
+        }
+        
         turboCheck.setSelected(engine.isAllowTurboMode());
         sizeCombo.setSelectedItem(engine.getScreenSize());
         fullScreenCheck.setSelected(engine.isFullScreen());
@@ -207,7 +275,12 @@ public class SettingsPanel extends JPanel {
     }
 
     private void saveSettings() {
-        engine.setLanguage((String) languageCombo.getSelectedItem());
+        LanguageOption selectedLang = (LanguageOption) languageCombo.getSelectedItem();
+        if (selectedLang != null) {
+            engine.setLanguage(selectedLang.code);
+            LanguageStrings.setLanguage(selectedLang.code); 
+        }
+        
         engine.setAllowTurboMode(turboCheck.isSelected());
         engine.setScreenSize((String) sizeCombo.getSelectedItem());
         engine.setFullScreen(fullScreenCheck.isSelected());
@@ -221,7 +294,7 @@ public class SettingsPanel extends JPanel {
         frame.applyEngineSettings();
         
         SwingUtilities.invokeLater(() -> {
-            JOptionPane.showMessageDialog(this, LanguageStrings.SETTINGS_SAVED_MSG, LanguageStrings.UI_SETTINGS, JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.SETTINGS_SAVED_MSG), LanguageStrings.get(LanguageStrings.UI_SETTINGS), JOptionPane.INFORMATION_MESSAGE);
         });
     }
 }

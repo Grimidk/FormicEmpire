@@ -42,11 +42,11 @@ public class MapDialog extends ZeroDialog {
         this.legendPanel = new LegendPanel();
         
         // --- Buttons ---
-        homeButton = new JButton(LanguageStrings.MAP_HOME_BUTTON);
+        homeButton = new JButton(LanguageStrings.get(LanguageStrings.MAP_HOME_BUTTON));
         homeButton.setFocusable(false);
         homeButton.addActionListener(e -> travelToHomeHex());
 
-        closeButton = new JButton(LanguageStrings.UI_CLOSE);
+        closeButton = new JButton(LanguageStrings.get(LanguageStrings.UI_CLOSE));
         closeButton.setFocusable(false);
         closeButton.addActionListener(e -> dispose());
 
@@ -112,7 +112,7 @@ public class MapDialog extends ZeroDialog {
             setPreferredSize(new Dimension(220, 0));
             setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, AssetStyles.BORDER_COLOR));
 
-            JLabel title = new JLabel(LanguageStrings.MAP_LEGEND_TITLE, SwingConstants.CENTER);
+            JLabel title = new JLabel(LanguageStrings.get(LanguageStrings.MAP_LEGEND_TITLE), SwingConstants.CENTER);
             title.setFont(AssetStyles.FONT_BOLD);
             title.setForeground(AssetStyles.FONT_COLOR_HEADER);
             title.setBorder(new EmptyBorder(10, 5, 10, 5));
@@ -156,7 +156,7 @@ public class MapDialog extends ZeroDialog {
                 item.setOpaque(false);
                 item.setAlignmentX(Component.LEFT_ALIGNMENT);
                 item.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                item.setToolTipText(String.format(LanguageStrings.MAP_CLICK_VIEW_CAPITAL, d.getName()));
+                item.setToolTipText(String.format(LanguageStrings.get(LanguageStrings.MAP_CLICK_VIEW_CAPITAL), d.getName()));
 
                 item.addMouseListener(new MouseAdapter() {
                     @Override
@@ -198,7 +198,7 @@ public class MapDialog extends ZeroDialog {
                 // Name
                 String nameStr = d.getName();
                 if (d.isPlayer()) {
-                    nameStr += LanguageStrings.MAP_YOU_PLAYER;
+                    nameStr += LanguageStrings.get(LanguageStrings.MAP_YOU_PLAYER);
                 }
                 JLabel name = new JLabel(nameStr);
                 name.setFont(AssetStyles.FONT_SMALL);
@@ -208,7 +208,7 @@ public class MapDialog extends ZeroDialog {
                 }
                 
                 int pop = d.getStatService().getTotalPopulation(d);
-                name.setToolTipText(String.format(LanguageStrings.MAP_POPULATION_FORMAT, pop));
+                name.setToolTipText(String.format(LanguageStrings.get(LanguageStrings.MAP_POPULATION_FORMAT), pop));
                 
                 item.add(name);
 
@@ -274,21 +274,21 @@ public class MapDialog extends ZeroDialog {
                     StringBuilder sb = new StringBuilder("<html>");
                     
                     if (hex.getBiome() != null) {
-                        sb.append(LanguageStrings.MAP_TOOLTIP_BIOME).append(hex.getBiome().getName());
+                        sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_BIOME)).append(hex.getBiome().getName());
                     } else {
-                        sb.append(LanguageStrings.MAP_TOOLTIP_BIOME).append(LanguageStrings.STAT_UNKNOWN);
+                        sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_BIOME)).append(LanguageStrings.get(LanguageStrings.STAT_UNKNOWN));
                     }
                     
                     Colony c = hex.getColony();
                     if (c != null) {
                         if (c.getRank() != null) {
-                            sb.append(LanguageStrings.MAP_TOOLTIP_RANK).append(c.getRank().getName());
+                            sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_RANK)).append(c.getRank().getName());
                         }
                         
                         if (c.getSpecies() != null) {
-                            sb.append(LanguageStrings.MAP_TOOLTIP_SPECIES).append(c.getSpecies().getName());
+                            sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_SPECIES)).append(c.getSpecies().getName());
                         } else {
-                            sb.append(LanguageStrings.MAP_TOOLTIP_SPECIES).append(LanguageStrings.STAT_UNKNOWN);
+                            sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_SPECIES)).append(LanguageStrings.get(LanguageStrings.STAT_UNKNOWN));
                         }
                         
                         if (c.getName() != null) {
@@ -297,13 +297,13 @@ public class MapDialog extends ZeroDialog {
 
                         Dynasty dynasty = c.getDynasty();
                         if (dynasty != null) {
-                            sb.append(LanguageStrings.MAP_TOOLTIP_DYNASTY).append(dynasty.getName());
+                            sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_DYNASTY)).append(dynasty.getName());
                             if (dynasty.getRank() != null) {
-                                sb.append(LanguageStrings.MAP_TOOLTIP_DYNASTY_RANK).append(dynasty.getRank().getName());
+                                sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_DYNASTY_RANK)).append(dynasty.getRank().getName());
                             }
                         }
                     } else {
-                        sb.append(LanguageStrings.MAP_TOOLTIP_EMPTY);
+                        sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_EMPTY));
                     }
                     
                     sb.append("</html>");

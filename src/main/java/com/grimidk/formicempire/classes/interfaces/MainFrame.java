@@ -26,6 +26,8 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
     private final GamePanel gamePanel;
     private final SaveSelectPanel saveSelectPanel;
     private final SettingsPanel settingsPanel;
+    private final InitPanel initPanel;
+    private final HelpPanel helpPanel;
 
     private Cursor cursorNormal;
     private Cursor cursorClick;
@@ -51,7 +53,7 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
     }
 
     public MainFrame(Engine engine) {
-        super(LanguageStrings.UI_APP_TITLE);
+        super(LanguageStrings.get(LanguageStrings.UI_APP_TITLE));
         Image icon = AssetStyles.loadImage("/icon.ico");
         if (icon != null) {
             setIconImage(icon);
@@ -62,9 +64,9 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
 
         initCursors();
 
-        InitPanel initPanel = new InitPanel(this);
+        this.initPanel = new InitPanel(this);
         this.saveSelectPanel = new SaveSelectPanel(this);
-        HelpPanel helpPanel = new HelpPanel(this);
+        this.helpPanel = new HelpPanel(this);
         this.settingsPanel = new SettingsPanel(this);
         this.gamePanel = new GamePanel(this);
 
@@ -80,6 +82,14 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         applyEngineSettings();
+        
+        LanguageStrings.addListener(this::refreshTranslations);
+    }
+    
+    private void refreshTranslations() {
+        setTitle(LanguageStrings.get(LanguageStrings.UI_APP_TITLE));
+        // Panels that don't already have listeners
+        saveSelectPanel.refreshTranslations();
     }
 
     private void initCursors() {
@@ -176,9 +186,9 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         engine.pauseEngine();
         if (gamePanel != null) gamePanel.updateStatusIndicator(true);
 
-        String[] options = {LanguageStrings.DEATH_OPTIONS_RELOAD, LanguageStrings.DEATH_OPTIONS_MENU};
-        String title = LanguageStrings.DEATH_TITLE;
-        String message = LanguageStrings.DEATH_MESSAGE;
+        String[] options = {LanguageStrings.get(LanguageStrings.DEATH_OPTIONS_RELOAD), LanguageStrings.get(LanguageStrings.DEATH_OPTIONS_MENU)};
+        String title = LanguageStrings.get(LanguageStrings.DEATH_TITLE);
+        String message = LanguageStrings.get(LanguageStrings.DEATH_MESSAGE);
 
         int choice = JOptionPane.showOptionDialog(
                 this,
@@ -195,7 +205,7 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
             int slotId = (engine.getWorld() != null) ? engine.getWorld().getSaveSlotId() : 0;
             
             if (slotId == 0) {
-                JOptionPane.showMessageDialog(this, LanguageStrings.DEATH_LOAD_FAILED_NEW_GAME, LanguageStrings.DEATH_LOAD_FAILED_TITLE, JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.DEATH_LOAD_FAILED_NEW_GAME), LanguageStrings.get(LanguageStrings.DEATH_LOAD_FAILED_TITLE), JOptionPane.ERROR_MESSAGE);
                 handleQuitToMenu();
             } else {
                 SaveManager sm = new SaveManager();
@@ -204,7 +214,7 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
                 if (saveToLoad != null) {
                     openGameWithSave(saveToLoad);
                 } else {
-                    JOptionPane.showMessageDialog(this, LanguageStrings.DEATH_LOAD_FAILED_NO_AUTOSAVE, LanguageStrings.DEATH_LOAD_FAILED_TITLE, JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.DEATH_LOAD_FAILED_NO_AUTOSAVE), LanguageStrings.get(LanguageStrings.DEATH_LOAD_FAILED_TITLE), JOptionPane.ERROR_MESSAGE);
                     handleQuitToMenu();
                 }
             }

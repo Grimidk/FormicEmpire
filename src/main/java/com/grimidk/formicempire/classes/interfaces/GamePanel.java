@@ -61,11 +61,13 @@ public class GamePanel extends ZeroGamePanel {
         initControlPanelCallbacks();
         initLayout();        
         updateStatusIndicator(false);
+        
+        LanguageStrings.addListener(this::refreshTranslations);
     }
 
     @Override
     protected void initComponents() {
-        statusLabel = new JLabel(LanguageStrings.UI_NOT_STARTED);
+        statusLabel = new JLabel(LanguageStrings.get(LanguageStrings.UI_NOT_STARTED));
         statusIndicator = new JLabel();
         
         colonyPanel = new ColonyPanel();
@@ -89,6 +91,26 @@ public class GamePanel extends ZeroGamePanel {
                 updateGameAreaSize();
             }
         });
+    }
+    
+    @Override
+    public void refreshTranslations() {
+        updateStatusIndicator(frame.getEngine().isPaused());
+        
+        // Refresh subpanels
+        worldPanel.refreshTranslations();
+        colonyPanel.refreshTranslations();
+        alertPanel.refreshTranslations();
+        controlPanel.refreshTranslations();
+        
+        // Refresh open dialogs
+        if (hatchDialog != null && hatchDialog.isShowing()) hatchDialog.refreshTranslations();
+        if (roleDialog != null && roleDialog.isShowing()) roleDialog.refreshTranslations();
+        if (upgradeDialog != null && upgradeDialog.isShowing()) upgradeDialog.refreshTranslations();
+        if (abilitiesDialog != null && abilitiesDialog.isShowing()) abilitiesDialog.refreshTranslations();
+        if (mapDialog != null && mapDialog.isShowing()) mapDialog.refreshTranslations();
+        if (statsDialog != null && statsDialog.isShowing()) statsDialog.refreshTranslations();
+        if (dynastyDialog != null && dynastyDialog.isShowing()) dynastyDialog.refreshTranslations();
     }
     
     private void initControlPanelCallbacks() {
@@ -497,7 +519,7 @@ public class GamePanel extends ZeroGamePanel {
         
         this.triggerManager = null; 
         this.engineStarted = false;
-        statusLabel.setText(LanguageStrings.UI_NOT_STARTED);
+        statusLabel.setText(LanguageStrings.get(LanguageStrings.UI_NOT_STARTED));
     }
 
     private void handleBackButton() {
@@ -539,7 +561,7 @@ public class GamePanel extends ZeroGamePanel {
     }
 
     public void enterWithSavefile(Savefile savefile) {
-        statusLabel.setText(LanguageStrings.UI_STARTING);
+        statusLabel.setText(LanguageStrings.get(LanguageStrings.UI_STARTING));
         Engine engine = frame.getEngine();
         
         JDialog loadingDialog = new JDialog(frame, "Loading", true);
@@ -550,7 +572,7 @@ public class GamePanel extends ZeroGamePanel {
         panel.setBorder(BorderFactory.createLineBorder(AssetStyles.BORDER_COLOR, AssetStyles.BORDER_THICKNESS_EXTERNAL));
         panel.setBackground(AssetStyles.BACKGROUND_DARK);
 
-        JLabel label = new JLabel(LanguageStrings.UI_LOADING_WAIT, SwingConstants.CENTER);
+        JLabel label = new JLabel(LanguageStrings.get(LanguageStrings.UI_LOADING_WAIT), SwingConstants.CENTER);
         label.setForeground(AssetStyles.FONT_COLOR_BRIGHT);
         label.setBorder(BorderFactory.createEmptyBorder(30, 60, 30, 60));
 
@@ -571,7 +593,7 @@ public class GamePanel extends ZeroGamePanel {
                 loadingDialog.dispose();
                 try {
                     get();
-                    statusLabel.setText(LanguageStrings.UI_RUNNING);
+                    statusLabel.setText(LanguageStrings.get(LanguageStrings.UI_RUNNING));
                     registerTickListeners(); 
                     
                     World world = engine.getWorld();
@@ -605,7 +627,7 @@ public class GamePanel extends ZeroGamePanel {
                     
                 } catch (Exception e) {
                     e.printStackTrace();
-                    statusLabel.setText(LanguageStrings.UI_ERROR_LOADING);
+                    statusLabel.setText(LanguageStrings.get(LanguageStrings.UI_ERROR_LOADING));
                 }
             }
         };
@@ -649,15 +671,15 @@ public class GamePanel extends ZeroGamePanel {
     public void updateStatusIndicator(boolean paused) {
         if (!engineStarted) {
             statusIndicator.setBackground(AssetStyles.BACKGROUND_SECONDARY);
-            statusLabel.setText(LanguageStrings.UI_NOT_STARTED);
+            statusLabel.setText(LanguageStrings.get(LanguageStrings.UI_NOT_STARTED));
             return;
         }
         if (paused) {
             statusIndicator.setBackground(AssetStyles.FONT_COLOR_WARNING);
-            statusLabel.setText(LanguageStrings.UI_PAUSED_TICK);
+            statusLabel.setText(LanguageStrings.get(LanguageStrings.UI_PAUSED_TICK));
         } else {
             statusIndicator.setBackground(AssetStyles.FONT_COLOR_SUCCESS);
-            statusLabel.setText(LanguageStrings.UI_RUNNING);
+            statusLabel.setText(LanguageStrings.get(LanguageStrings.UI_RUNNING));
         }
     }
 

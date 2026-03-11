@@ -157,14 +157,14 @@ public class DynastyManagementDialog extends ZeroDialog {
             overviewPanel = new OverviewPanel(currentAutoBuild, currentAuto);
         }
         overviewPanel.updateData();
-        tabbedPane.addTab(LanguageStrings.TAB_OVERVIEW, overviewPanel);
+        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.TAB_OVERVIEW), overviewPanel);
         tabIndexMap.put(TAB_OVERVIEW, currentIndex++);
 
         if (dynasty.hasUpgrade(GameUnlocks.ABILITY_TRADE)) {
             if (tradePanel == null) {
                 tradePanel = new TradePanel();
             }
-            tabbedPane.addTab(LanguageStrings.TAB_LOGISTICS, tradePanel);
+            tabbedPane.addTab(LanguageStrings.get(LanguageStrings.TAB_LOGISTICS), tradePanel);
             tabIndexMap.put(TAB_TRADE, currentIndex++);
         }
 
@@ -223,9 +223,9 @@ public class DynastyManagementDialog extends ZeroDialog {
             removeAll();
             tunnelsVisible = dynasty.hasUpgrade(GameUnlocks.ABILITY_TUNNELS);
             
-            List<String> cols = new ArrayList<>(List.of(LanguageStrings.DYNASTY_DIRECTION, LanguageStrings.DYNASTY_NEIGHBOR));
-            if (tunnelsVisible) cols.add(LanguageStrings.DYNASTY_TUNNEL_STATUS);
-            cols.addAll(List.of(LanguageStrings.DYNASTY_OUTGOING, LanguageStrings.DYNASTY_INCOMING, LanguageStrings.DYNASTY_ACTIONS));
+            List<String> cols = new ArrayList<>(List.of(LanguageStrings.get(LanguageStrings.DYNASTY_DIRECTION), LanguageStrings.get(LanguageStrings.DYNASTY_NEIGHBOR)));
+            if (tunnelsVisible) cols.add(LanguageStrings.get(LanguageStrings.DYNASTY_TUNNEL_STATUS));
+            cols.addAll(List.of(LanguageStrings.get(LanguageStrings.DYNASTY_OUTGOING), LanguageStrings.get(LanguageStrings.DYNASTY_INCOMING), LanguageStrings.get(LanguageStrings.DYNASTY_ACTIONS)));
 
             model = new DefaultTableModel(cols.toArray(), 0) {
                 @Override
@@ -266,11 +266,11 @@ public class DynastyManagementDialog extends ZeroDialog {
             JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
             topPanel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
             
-            JLabel label = new JLabel(LanguageStrings.DYNASTY_MANAGE_LOGISTICS);
+            JLabel label = new JLabel(LanguageStrings.get(LanguageStrings.DYNASTY_MANAGE_LOGISTICS));
             label.setForeground(AssetStyles.FONT_COLOR);
             topPanel.add(label);
             
-            activeColonyLabel = new JLabel(LanguageStrings.ASSIMILATION_NONE);
+            activeColonyLabel = new JLabel(LanguageStrings.get(LanguageStrings.ASSIMILATION_NONE));
             activeColonyLabel.setForeground(AssetStyles.FONT_COLOR);
             activeColonyLabel.setFont(AssetStyles.FONT_BOLD);
             topPanel.add(activeColonyLabel);
@@ -300,7 +300,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 : null;
 
             if (activeColony == null) {
-                activeColonyLabel.setText(LanguageStrings.WORLD_NA);
+                activeColonyLabel.setText(LanguageStrings.get(LanguageStrings.WORLD_NA));
                 model.setRowCount(0);
                 return;
             }
@@ -334,10 +334,10 @@ public class DynastyManagementDialog extends ZeroDialog {
                 String inStatus = formatTradeStatus(incoming);
 
                 if (outgoing == null && incoming != null && (incoming.hasPendingUpdate() ? incoming.isPendingBilateral() : incoming.isBilateral())) {
-                    outStatus = LanguageStrings.UI_BILATERAL;
+                    outStatus = LanguageStrings.get(LanguageStrings.UI_BILATERAL);
                 }
                 if (incoming == null && outgoing != null && (outgoing.hasPendingUpdate() ? outgoing.isPendingBilateral() : outgoing.isBilateral())) {
-                    inStatus = LanguageStrings.UI_BILATERAL;
+                    inStatus = LanguageStrings.get(LanguageStrings.UI_BILATERAL);
                 }
 
                 TradeRowData rowData = new TradeRowData(neighborColony, neighborHex, outgoing, tunnel);
@@ -376,16 +376,16 @@ public class DynastyManagementDialog extends ZeroDialog {
         }
 
         private String formatTradeStatus(Trade trade) {
-            if (trade == null) return LanguageStrings.ASSIMILATION_NONE;
-            String transit = trade.isReturning() ? LanguageStrings.UI_RETURNING : LanguageStrings.UI_TRANSIT;
-            String pending = trade.hasPendingUpdate() ? LanguageStrings.UI_MODIFIED : "";
-            return String.format(LanguageStrings.DYNASTY_TRANSIT_FORMAT, transit, trade.getRemainingHours(), pending);
+            if (trade == null) return LanguageStrings.get(LanguageStrings.ASSIMILATION_NONE);
+            String transit = trade.isReturning() ? LanguageStrings.get(LanguageStrings.UI_RETURNING) : LanguageStrings.get(LanguageStrings.UI_TRANSIT);
+            String pending = trade.hasPendingUpdate() ? LanguageStrings.get(LanguageStrings.UI_MODIFIED) : "";
+            return String.format(LanguageStrings.get(LanguageStrings.DYNASTY_TRANSIT_FORMAT), transit, trade.getRemainingHours(), pending);
         }
 
         private class TunnelCellRenderer extends JPanel implements TableCellRenderer {
             private final JProgressBar progressBar = new JProgressBar(0, 100);
             private final JLabel label = new JLabel();
-            private final JButton buildBtn = new JButton(LanguageStrings.DYNASTY_BUILD_TUNNEL);
+            private final JButton buildBtn = new JButton(LanguageStrings.get(LanguageStrings.DYNASTY_BUILD_TUNNEL));
             public TunnelCellRenderer() {
                 setLayout(new BorderLayout(5, 5));
                 setOpaque(true);
@@ -404,27 +404,27 @@ public class DynastyManagementDialog extends ZeroDialog {
                         if (sameDynasty) {
                             boolean alreadyBuilding = activeColony.getCurrentTunnelProject() != null;
                             buildBtn.setEnabled(!alreadyBuilding);
-                            buildBtn.setToolTipText(alreadyBuilding ? LanguageStrings.DYNASTY_TUNNEL_Sponsoring : null);
+                            buildBtn.setToolTipText(alreadyBuilding ? LanguageStrings.get(LanguageStrings.DYNASTY_TUNNEL_Sponsoring) : null);
                             add(buildBtn, BorderLayout.CENTER);
                         } else {
-                            label.setText(LanguageStrings.WORLD_NA);
+                            label.setText(LanguageStrings.get(LanguageStrings.WORLD_NA));
                             label.setForeground(AssetStyles.BACKGROUND_SECONDARY);
                             add(label, BorderLayout.CENTER);
                         }
                     } else if (data.tunnel.isComplete()) {
-                        label.setText(LanguageStrings.DYNASTY_BUILT);
+                        label.setText(LanguageStrings.get(LanguageStrings.DYNASTY_BUILT));
                         label.setForeground(AssetStyles.FONT_COLOR_SUCCESS);
                         add(label, BorderLayout.CENTER);
                     } else {
                         double pct = (data.tunnel.getProgress() / data.tunnel.getTotalCost()) * 100;
                         progressBar.setValue((int) pct);
-                        progressBar.setString(String.format(LanguageStrings.DYNASTY_PROGRESS_PERCENT, pct));
+                        progressBar.setString(String.format(LanguageStrings.get(LanguageStrings.DYNASTY_PROGRESS_PERCENT), pct));
                         
                         int engineers = activeColony.getAssignedRoleCount(GameConstants.ROLE_ENGINEER);
                         int borers = activeColony.getAssignedRoleCount(GameConstants.ROLE_BORER);
                         if (engineers <= 0 && borers <= 0) {
                             progressBar.setForeground(AssetStyles.FONT_COLOR_ERROR);
-                            progressBar.setToolTipText(LanguageStrings.DYNASTY_ERROR_NO_ENGINEERS);
+                            progressBar.setToolTipText(LanguageStrings.get(LanguageStrings.DYNASTY_ERROR_NO_ENGINEERS));
                         } else {
                             progressBar.setForeground(UIManager.getColor("ProgressBar.foreground"));
                             progressBar.setToolTipText(null);
@@ -439,7 +439,7 @@ public class DynastyManagementDialog extends ZeroDialog {
 
         private class TunnelCellEditor extends AbstractCellEditor implements TableCellEditor {
             private final JPanel panel = new JPanel(new BorderLayout());
-            private final JButton buildBtn = new JButton(LanguageStrings.DYNASTY_BUILD_TUNNEL);
+            private final JButton buildBtn = new JButton(LanguageStrings.get(LanguageStrings.DYNASTY_BUILD_TUNNEL));
             private TradeRowData currentData;
             public TunnelCellEditor() {
                 buildBtn.setFocusable(false);
@@ -451,8 +451,8 @@ public class DynastyManagementDialog extends ZeroDialog {
                         
                         if (engineers <= 0 && borers <= 0) {
                             JOptionPane.showMessageDialog(panel, 
-                                LanguageStrings.DYNASTY_ERROR_ASSIGN_BORERS,
-                                LanguageStrings.DYNASTY_ERROR_LABOR_REQUIRED, JOptionPane.WARNING_MESSAGE);
+                                LanguageStrings.get(LanguageStrings.DYNASTY_ERROR_ASSIGN_BORERS),
+                                LanguageStrings.get(LanguageStrings.DYNASTY_ERROR_LABOR_REQUIRED), JOptionPane.WARNING_MESSAGE);
                         } else {
                             startTunnel(currentData.neighborHex);
                         }
@@ -494,10 +494,10 @@ public class DynastyManagementDialog extends ZeroDialog {
                 if (value instanceof TradeRowData) {
                     TradeRowData data = (TradeRowData) value;
                     if (data.neighbor == null) {
-                        actionBtn.setText(LanguageStrings.UI_ESTABLISH);
+                        actionBtn.setText(LanguageStrings.get(LanguageStrings.UI_ESTABLISH));
                         actionBtn.setEnabled(false);
                     } else {
-                        actionBtn.setText(data.outgoingTrade == null ? LanguageStrings.UI_ESTABLISH : LanguageStrings.UI_MANAGE);
+                        actionBtn.setText(data.outgoingTrade == null ? LanguageStrings.get(LanguageStrings.UI_ESTABLISH) : LanguageStrings.get(LanguageStrings.UI_MANAGE));
                         actionBtn.setEnabled(true);
                     }
                 }
@@ -527,7 +527,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
                 currentData = (TradeRowData) value;
                 if (currentData != null) {
-                    actionBtn.setText(currentData.outgoingTrade == null ? LanguageStrings.UI_ESTABLISH : LanguageStrings.UI_MANAGE);
+                    actionBtn.setText(currentData.outgoingTrade == null ? LanguageStrings.get(LanguageStrings.UI_ESTABLISH) : LanguageStrings.get(LanguageStrings.UI_MANAGE));
                 }
                 return panel;
             }
@@ -542,8 +542,8 @@ public class DynastyManagementDialog extends ZeroDialog {
         }
 
         private void manageTrade(Trade trade) {
-            String[] options = {LanguageStrings.DYNASTY_MODIFY, LanguageStrings.DYNASTY_CANCEL_ROUTE, LanguageStrings.UI_CLOSE};
-            int res = JOptionPane.showOptionDialog(this, String.format(LanguageStrings.DYNASTY_MANAGE_TRADE_MSG, trade.getDestination().getColony().getName()), LanguageStrings.DYNASTY_MANAGE_TRADE_TITLE, 
+            String[] options = {LanguageStrings.get(LanguageStrings.DYNASTY_MODIFY), LanguageStrings.get(LanguageStrings.DYNASTY_CANCEL_ROUTE), LanguageStrings.get(LanguageStrings.UI_CLOSE)};
+            int res = JOptionPane.showOptionDialog(this, String.format(LanguageStrings.get(LanguageStrings.DYNASTY_MANAGE_TRADE_MSG), trade.getDestination().getColony().getName()), LanguageStrings.get(LanguageStrings.DYNASTY_MANAGE_TRADE_TITLE), 
                 JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
             
             if (res == 0) {
@@ -579,15 +579,15 @@ public class DynastyManagementDialog extends ZeroDialog {
         private final JButton createBtn;
         private final JButton optimizeBtn;
         
-        private final JLabel capLabel = new JLabel(String.format(LanguageStrings.TRADE_CAPACITY_FORMAT, 0.0, 0.0));
-        private final JLabel speedLabel = new JLabel(String.format(LanguageStrings.TRADE_SPEED_FORMAT, 0.0));
-        private final JLabel timeLabel = new JLabel(String.format(LanguageStrings.TRADE_TIME_FORMAT, 0));
-        private final JLabel dangerLabel = new JLabel(String.format(LanguageStrings.TRADE_SECURITY_FORMAT, 0.0));
+        private final JLabel capLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.TRADE_CAPACITY_FORMAT), 0.0, 0.0));
+        private final JLabel speedLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.TRADE_SPEED_FORMAT), 0.0));
+        private final JLabel timeLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.TRADE_TIME_FORMAT), 0));
+        private final JLabel dangerLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.TRADE_SECURITY_FORMAT), 0.0));
 
         private double totalTransportCapacity = 0.0;
 
         public TradeCreationDialog(Window owner, Colony origin, Colony target, Engine engine, Trade existingTrade) {
-            super(owner, (existingTrade == null ? LanguageStrings.UI_ESTABLISH : LanguageStrings.DYNASTY_MODIFY) + " " + LanguageStrings.PANEL_TRADE, ModalityType.APPLICATION_MODAL); // generic trade key used
+            super(owner, (existingTrade == null ? LanguageStrings.get(LanguageStrings.UI_ESTABLISH) : LanguageStrings.get(LanguageStrings.DYNASTY_MODIFY)) + " " + LanguageStrings.get(LanguageStrings.PANEL_TRADE), ModalityType.APPLICATION_MODAL); // generic trade key used
             this.origin = origin;
             this.target = target;
             this.engine = engine;
@@ -620,14 +620,14 @@ public class DynastyManagementDialog extends ZeroDialog {
             mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
             mainPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
 
-            JLabel routeLabel = new JLabel(String.format(LanguageStrings.TRADE_ROUTE_PREFIX, origin.getName(), target.getName()));
+            JLabel routeLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.TRADE_ROUTE_PREFIX), origin.getName(), target.getName()));
             routeLabel.setFont(AssetStyles.FONT_BOLD);
             routeLabel.setForeground(AssetStyles.FONT_COLOR);
             mainPanel.add(routeLabel);
             mainPanel.add(Box.createVerticalStrut(15));
 
             JPanel resGrid = new JPanel(new GridLayout(0, 2, 15, 8));
-            resGrid.setBorder(BorderFactory.createTitledBorder(LanguageStrings.TRADE_CARGO_LOAD));
+            resGrid.setBorder(BorderFactory.createTitledBorder(LanguageStrings.get(LanguageStrings.TRADE_CARGO_LOAD)));
             resGrid.setBackground(AssetStyles.BACKGROUND_COLOR);
             for (ResourceType rt : GameConstants.getResources()) {
                 if (rt.isIsLiquid()) continue;
@@ -654,7 +654,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 resourceSpinners.put(rt, s);
                 p.add(s);
 
-                JButton maxBtn = new JButton(LanguageStrings.UI_MAX);
+                JButton maxBtn = new JButton(LanguageStrings.get(LanguageStrings.UI_MAX));
                 maxBtn.setFocusable(false);
                 maxBtn.setMargin(new Insets(2, 5, 2, 5));
                 maxBtn.addActionListener(e -> setMaxResource(rt));
@@ -666,7 +666,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             mainPanel.add(Box.createVerticalStrut(15));
 
             JPanel bilateralPanel = new JPanel(new GridLayout(0, 2, 15, 8));
-            bilateralPanel.setBorder(BorderFactory.createTitledBorder(LanguageStrings.TRADE_CARGO_RETURN));
+            bilateralPanel.setBorder(BorderFactory.createTitledBorder(LanguageStrings.get(LanguageStrings.TRADE_CARGO_RETURN)));
             bilateralPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
             for (ResourceType rt : GameConstants.getResources()) {
                 if (rt.isIsLiquid()) continue;
@@ -691,7 +691,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 returnResourceSpinners.put(rt, s);
                 p.add(s);
 
-                JButton maxBtn = new JButton(LanguageStrings.UI_MAX);
+                JButton maxBtn = new JButton(LanguageStrings.get(LanguageStrings.UI_MAX));
                 maxBtn.setFocusable(false);
                 maxBtn.setMargin(new Insets(2, 5, 2, 5));
                 maxBtn.addActionListener(e -> setMaxResource(rt, true));
@@ -705,7 +705,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             mainPanel.add(Box.createVerticalStrut(15));
 
             JPanel antGrid = new JPanel(new GridLayout(0, 2, 15, 8));
-            antGrid.setBorder(BorderFactory.createTitledBorder(LanguageStrings.TRADE_PERSONNEL));
+            antGrid.setBorder(BorderFactory.createTitledBorder(LanguageStrings.get(LanguageStrings.TRADE_PERSONNEL)));
             antGrid.setBackground(AssetStyles.BACKGROUND_COLOR);
             
             Map<AntType, Integer> availableRoles = new HashMap<>();
@@ -732,10 +732,10 @@ public class DynastyManagementDialog extends ZeroDialog {
                 JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 2));
                 p.setOpaque(false);
                 String labelName = at.getName();
-                if (at == GameConstants.TYPE_WORKER) labelName = LanguageStrings.TRADE_COURIERS;
-                else if (at == GameConstants.TYPE_MAJOR) labelName = LanguageStrings.TRADE_TRANSPORTS;
-                else if (at == GameConstants.TYPE_SOLDIER) labelName = LanguageStrings.TRADE_ESCORTS;
-                else if (at == GameConstants.TYPE_PRINCESS) labelName = LanguageStrings.TRADE_FLYERS;
+                if (at == GameConstants.TYPE_WORKER) labelName = LanguageStrings.get(LanguageStrings.TRADE_COURIERS);
+                else if (at == GameConstants.TYPE_MAJOR) labelName = LanguageStrings.get(LanguageStrings.TRADE_TRANSPORTS);
+                else if (at == GameConstants.TYPE_SOLDIER) labelName = LanguageStrings.get(LanguageStrings.TRADE_ESCORTS);
+                else if (at == GameConstants.TYPE_PRINCESS) labelName = LanguageStrings.get(LanguageStrings.TRADE_FLYERS);
                 
                 int available = availableRoles.getOrDefault(at, 0);
                 JLabel label = new JLabel(labelName + " (" + available + ")", at.getIcon(), JLabel.LEFT);
@@ -765,7 +765,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             mainPanel.add(Box.createVerticalStrut(15));
 
             JPanel configPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 10));
-            configPanel.setBorder(BorderFactory.createTitledBorder(LanguageStrings.TAB_LOGISTICS));
+            configPanel.setBorder(BorderFactory.createTitledBorder(LanguageStrings.get(LanguageStrings.TAB_LOGISTICS)));
             configPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
             
             methodCombo = new JComboBox<>();
@@ -785,13 +785,13 @@ public class DynastyManagementDialog extends ZeroDialog {
                 }
             });
             methodCombo.addActionListener(e -> updateStats());
-            JLabel mLabel = new JLabel(LanguageStrings.TRADE_METHOD);
+            JLabel mLabel = new JLabel(LanguageStrings.get(LanguageStrings.TRADE_METHOD));
             mLabel.setForeground(AssetStyles.FONT_COLOR);
             configPanel.add(mLabel);
             configPanel.add(methodCombo);
             
             boolean initialRecurrent = (existingTrade != null) ? (existingTrade.hasPendingUpdate() ? existingTrade.isPendingRecurrent() : existingTrade.isRecurrent()) : true;
-            recurrentCheck = new JCheckBox(LanguageStrings.TRADE_RECURRENT, initialRecurrent);
+            recurrentCheck = new JCheckBox(LanguageStrings.get(LanguageStrings.TRADE_RECURRENT), initialRecurrent);
             recurrentCheck.setFocusable(false);
             recurrentCheck.setForeground(AssetStyles.FONT_COLOR);
             recurrentCheck.setOpaque(false);
@@ -799,7 +799,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             configPanel.add(recurrentCheck);
             
             boolean initialBilateral = (existingTrade != null) ? (existingTrade.hasPendingUpdate() ? existingTrade.isPendingBilateral() : existingTrade.isBilateral()) : false;
-            bilateralCheck = new JCheckBox(LanguageStrings.TRADE_BILATERAL, initialBilateral);
+            bilateralCheck = new JCheckBox(LanguageStrings.get(LanguageStrings.TRADE_BILATERAL), initialBilateral);
             bilateralCheck.setFocusable(false);
             bilateralCheck.setForeground(AssetStyles.FONT_COLOR);
             bilateralCheck.setOpaque(false);
@@ -821,19 +821,19 @@ public class DynastyManagementDialog extends ZeroDialog {
             footerPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
             footerPanel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
 
-            createBtn = new JButton(existingTrade == null ? LanguageStrings.TRADE_CONFIRM : LanguageStrings.TRADE_UPDATE);
+            createBtn = new JButton(existingTrade == null ? LanguageStrings.get(LanguageStrings.TRADE_CONFIRM) : LanguageStrings.get(LanguageStrings.TRADE_UPDATE));
             createBtn.setFocusable(false);
             createBtn.setFont(AssetStyles.FONT_BOLD);
             createBtn.addActionListener(e -> attemptCreate());
             
-            optimizeBtn = new JButton(LanguageStrings.TRADE_OPTIMIZE);
+            optimizeBtn = new JButton(LanguageStrings.get(LanguageStrings.TRADE_OPTIMIZE));
             optimizeBtn.setFocusable(false);
             optimizeBtn.setFont(AssetStyles.FONT_BOLD);
             optimizeBtn.setForeground(AssetStyles.FONT_COLOR_SUCCESS);
             optimizeBtn.setVisible(false);
             optimizeBtn.addActionListener(e -> performOptimization());
             
-            JButton cancelBtn = new JButton(LanguageStrings.UI_CANCEL);
+            JButton cancelBtn = new JButton(LanguageStrings.get(LanguageStrings.UI_CANCEL));
             cancelBtn.setFocusable(false);
             cancelBtn.setFont(AssetStyles.FONT_BOLD);
             cancelBtn.addActionListener(e -> dispose());
@@ -986,18 +986,18 @@ public class DynastyManagementDialog extends ZeroDialog {
             boolean noLoad = totalLoad <= 0 && (!bilateralCheck.isSelected() || totalReturnLoad <= 0);
             boolean noAnts = totalAnts <= 0;
 
-            capLabel.setText(String.format(LanguageStrings.TRADE_CAPACITY_FORMAT, Math.max(totalLoad, bilateralCheck.isSelected() ? totalReturnLoad : 0), totalCap));
+            capLabel.setText(String.format(LanguageStrings.get(LanguageStrings.TRADE_CAPACITY_FORMAT), Math.max(totalLoad, bilateralCheck.isSelected() ? totalReturnLoad : 0), totalCap));
             capLabel.setForeground(overCap ? AssetStyles.FONT_COLOR_ERROR : AssetStyles.FONT_COLOR);
             
-            speedLabel.setText(String.format(LanguageStrings.TRADE_SPEED_FORMAT, speedFactor));
-            timeLabel.setText(String.format(LanguageStrings.TRADE_TIME_FORMAT, hours));
-            dangerLabel.setText(String.format(LanguageStrings.TRADE_SECURITY_FORMAT, mitigationPercent));
+            speedLabel.setText(String.format(LanguageStrings.get(LanguageStrings.TRADE_SPEED_FORMAT), speedFactor));
+            timeLabel.setText(String.format(LanguageStrings.get(LanguageStrings.TRADE_TIME_FORMAT), hours));
+            dangerLabel.setText(String.format(LanguageStrings.get(LanguageStrings.TRADE_SECURITY_FORMAT), mitigationPercent));
             dangerLabel.setForeground(mitigationPercent < 100 ? AssetStyles.FONT_COLOR_WARNING : AssetStyles.FONT_COLOR_SUCCESS);
 
             createBtn.setEnabled(!overCap && !noAnts && !noLoad);
-            if (overCap) createBtn.setToolTipText(LanguageStrings.TRADE_ERROR_OVER_CAP);
-            else if (noAnts) createBtn.setToolTipText(LanguageStrings.TRADE_ERROR_NO_ANTS);
-            else if (noLoad) createBtn.setToolTipText(LanguageStrings.TRADE_ERROR_NO_LOAD);
+            if (overCap) createBtn.setToolTipText(LanguageStrings.get(LanguageStrings.TRADE_ERROR_OVER_CAP));
+            else if (noAnts) createBtn.setToolTipText(LanguageStrings.get(LanguageStrings.TRADE_ERROR_NO_ANTS));
+            else if (noLoad) createBtn.setToolTipText(LanguageStrings.get(LanguageStrings.TRADE_ERROR_NO_LOAD));
             else createBtn.setToolTipText(null);
 
             if (origin.hasUpgrade(GameUnlocks.ABILITY_BILATERAL_TRADE) && !bilateralCheck.isSelected()) {
@@ -1032,8 +1032,8 @@ public class DynastyManagementDialog extends ZeroDialog {
             if (incoming == null) return;
 
             int res = JOptionPane.showConfirmDialog(this, 
-                String.format(LanguageStrings.TRADE_OPTIMIZE_MSG, target.getName()), 
-                LanguageStrings.TRADE_OPTIMIZE, JOptionPane.YES_NO_OPTION);
+                String.format(LanguageStrings.get(LanguageStrings.TRADE_OPTIMIZE_MSG), target.getName()), 
+                LanguageStrings.get(LanguageStrings.TRADE_OPTIMIZE), JOptionPane.YES_NO_OPTION);
             
             if (res == JOptionPane.YES_OPTION) {
                 bilateralCheck.setSelected(true);
@@ -1072,30 +1072,30 @@ public class DynastyManagementDialog extends ZeroDialog {
             }
 
             if (load.isEmpty() && returnLoad.isEmpty()) {
-                JOptionPane.showMessageDialog(this, LanguageStrings.TRADE_ERROR_EMPTY);
+                JOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.TRADE_ERROR_EMPTY));
                 return;
             }
             if (transport.isEmpty()) {
-                JOptionPane.showMessageDialog(this, LanguageStrings.TRADE_ERROR_NO_PERSONNEL);
+                JOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.TRADE_ERROR_NO_PERSONNEL));
                 return;
             }
 
             TradeMethod method = (TradeMethod) methodCombo.getSelectedItem();
             if (method == null) {
-                JOptionPane.showMessageDialog(this, LanguageStrings.TRADE_ERROR_NO_METHOD);
+                JOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.TRADE_ERROR_NO_METHOD));
                 return;
             }
 
             if (existingTrade != null) {
                 existingTrade.setPendingUpdate(load, returnLoad, transport, recurrentCheck.isSelected(), bilateralCheck.isSelected(), method);
-                JOptionPane.showMessageDialog(this, LanguageStrings.TRADE_QUEUED_MSG);
+                JOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.TRADE_QUEUED_MSG));
             } else {
                 World world = engine.getWorld();
                 Hex originHex = world.getHexOfColony(origin);
                 Hex targetHex = world.getHexOfColony(target);
                 
                 if (originHex == null || targetHex == null) {
-                    JOptionPane.showMessageDialog(this, LanguageStrings.DYNASTY_ERROR_LOCATE);
+                    JOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.DYNASTY_ERROR_LOCATE));
                     return;
                 }
 
@@ -1107,7 +1107,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                         engine.getTradeManager().addTrade(trade);
                     }
                 } else {
-                    JOptionPane.showMessageDialog(this, LanguageStrings.TRADE_ERROR_START);
+                    JOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.TRADE_ERROR_START));
                     return;
                 }
             }
@@ -1176,7 +1176,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             
             JPanel sortPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
             sortPanel.setOpaque(false);
-            JLabel sortLabel = new JLabel(LanguageStrings.DYNASTY_SORT_BY);
+            JLabel sortLabel = new JLabel(LanguageStrings.get(LanguageStrings.DYNASTY_SORT_BY));
             sortLabel.setForeground(AssetStyles.FONT_COLOR);
             sortPanel.add(sortLabel);
             sortPanel.add(sortCombo);
@@ -1185,22 +1185,22 @@ public class DynastyManagementDialog extends ZeroDialog {
             topPanel.add(Box.createHorizontalStrut(20));
 
             if (showAutoBuild) {
-                defaultAutoBuildCheck = new JCheckBox(LanguageStrings.DYNASTY_DEFAULT_AUTO_BUILD);
+                defaultAutoBuildCheck = new JCheckBox(LanguageStrings.get(LanguageStrings.DYNASTY_DEFAULT_AUTO_BUILD));
                 defaultAutoBuildCheck.setFocusable(false);
                 defaultAutoBuildCheck.setOpaque(false);
                 defaultAutoBuildCheck.setForeground(AssetStyles.FONT_COLOR);
-                defaultAutoBuildCheck.setToolTipText(LanguageStrings.DYNASTY_DEFAULT_AUTO_BUILD_TOOLTIP);
+                defaultAutoBuildCheck.setToolTipText(LanguageStrings.get(LanguageStrings.DYNASTY_DEFAULT_AUTO_BUILD_TOOLTIP));
                 defaultAutoBuildCheck.setSelected(dynasty.isDefaultAutoBuildEnabled());
                 defaultAutoBuildCheck.addActionListener(e -> dynasty.setDefaultAutoBuildEnabled(defaultAutoBuildCheck.isSelected()));
                 topPanel.add(defaultAutoBuildCheck);
             }
             
             if (showAutomation) {
-                defaultAutomationCheck = new JCheckBox(LanguageStrings.DYNASTY_DEFAULT_AUTOMATION);
+                defaultAutomationCheck = new JCheckBox(LanguageStrings.get(LanguageStrings.DYNASTY_DEFAULT_AUTOMATION));
                 defaultAutomationCheck.setFocusable(false);
                 defaultAutomationCheck.setOpaque(false);
                 defaultAutomationCheck.setForeground(AssetStyles.FONT_COLOR);
-                defaultAutomationCheck.setToolTipText(LanguageStrings.DYNASTY_DEFAULT_AUTOMATION_TOOLTIP);
+                defaultAutomationCheck.setToolTipText(LanguageStrings.get(LanguageStrings.DYNASTY_DEFAULT_AUTOMATION_TOOLTIP));
                 defaultAutomationCheck.setSelected(dynasty.isDefaultAutomationEnabled());
                 defaultAutomationCheck.addActionListener(e -> dynasty.setDefaultAutomationEnabled(defaultAutomationCheck.isSelected()));
                 topPanel.add(defaultAutomationCheck);
@@ -1208,19 +1208,19 @@ public class DynastyManagementDialog extends ZeroDialog {
             
             add(topPanel, BorderLayout.NORTH);
 
-            List<String> cols = new ArrayList<>(Arrays.asList("", LanguageStrings.COLONY_RANK, LanguageStrings.COL_TYPE, LanguageStrings.PANEL_COLONY, LanguageStrings.STATS_TAB_POPULATION, LanguageStrings.STAT_AGE, LanguageStrings.STATS_TAB_LOCAL_HEX));
+            List<String> cols = new ArrayList<>(Arrays.asList("", LanguageStrings.get(LanguageStrings.COLONY_RANK), LanguageStrings.get(LanguageStrings.COL_TYPE), LanguageStrings.get(LanguageStrings.PANEL_COLONY), LanguageStrings.get(LanguageStrings.STATS_TAB_POPULATION), LanguageStrings.get(LanguageStrings.STAT_AGE), LanguageStrings.get(LanguageStrings.STATS_TAB_LOCAL_HEX)));
             
             if (showAutoBuild) {
                 autoBuildCol = cols.size();
-                cols.add(LanguageStrings.STAT_AUTO_BUILD);
+                cols.add(LanguageStrings.get(LanguageStrings.STAT_AUTO_BUILD));
             }
             if (showAutomation) {
                 automationCol = cols.size();
-                cols.add(LanguageStrings.STAT_AUTOMATION);
+                cols.add(LanguageStrings.get(LanguageStrings.STAT_AUTOMATION));
             }
             
             actionCol = cols.size();
-            cols.add(LanguageStrings.DYNASTY_STATUS);
+            cols.add(LanguageStrings.get(LanguageStrings.DYNASTY_STATUS));
 
             model = new DefaultTableModel(cols.toArray(new String[0]), 0) {
                 @Override
@@ -1329,7 +1329,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 Object[] rowData = new Object[model.getColumnCount()];
                 rowData[0] = colony.getRank().getIcon();
                 rowData[1] = colony.getRank().getName();
-                rowData[2] = colony.isCapital() ? LanguageStrings.STAT_CAPITAL : LanguageStrings.DYNASTY_SATELLITE;
+                rowData[2] = colony.isCapital() ? LanguageStrings.get(LanguageStrings.STAT_CAPITAL) : LanguageStrings.get(LanguageStrings.DYNASTY_SATELLITE);
                 rowData[3] = (colony.isCapital() ? "★ " : "") + colony.getName();
                 rowData[4] = colony.getAntTotal();
                 rowData[5] = colony.getAge();
@@ -1353,7 +1353,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 setIcon(b.getIcon());
                 setIconTextGap(8);
             } else {
-                setText(LanguageStrings.STAT_UNKNOWN);
+                setText(LanguageStrings.get(LanguageStrings.STAT_UNKNOWN));
                 setIcon(null);
             }
             return this;
@@ -1361,10 +1361,10 @@ public class DynastyManagementDialog extends ZeroDialog {
     }
 
     private static class ActionPanelRenderer extends JPanel implements TableCellRenderer {
-        private final JButton editBtn = new JButton(LanguageStrings.UI_EDIT);
-        private final JButton viewBtn = new JButton(LanguageStrings.UI_VIEW);
+        private final JButton editBtn = new JButton(LanguageStrings.get(LanguageStrings.UI_EDIT));
+        private final JButton viewBtn = new JButton(LanguageStrings.get(LanguageStrings.UI_VIEW));
         private final JProgressBar progressBar = new JProgressBar(0, 7);
-        private final JLabel statusLabel = new JLabel(LanguageStrings.UI_MATURING, SwingConstants.CENTER);
+        private final JLabel statusLabel = new JLabel(LanguageStrings.get(LanguageStrings.UI_MATURING), SwingConstants.CENTER);
 
         public ActionPanelRenderer() {
             setLayout(new CardLayout());
@@ -1396,7 +1396,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 else {
                     cl.show(this, "PROGRESS");
                     progressBar.setValue(c.getAge());
-                    progressBar.setString(String.format(LanguageStrings.DYNASTY_7_DAYS, c.getAge()));
+                    progressBar.setString(String.format(LanguageStrings.get(LanguageStrings.DYNASTY_7_DAYS), c.getAge()));
                 }
             }
             return this;
@@ -1405,10 +1405,10 @@ public class DynastyManagementDialog extends ZeroDialog {
 
     private class ActionPanelEditor extends AbstractCellEditor implements TableCellEditor {
         private final JPanel container;
-        private final JButton editBtn = new JButton(LanguageStrings.UI_EDIT);
-        private final JButton viewBtn = new JButton(LanguageStrings.UI_VIEW);
+        private final JButton editBtn = new JButton(LanguageStrings.get(LanguageStrings.UI_EDIT));
+        private final JButton viewBtn = new JButton(LanguageStrings.get(LanguageStrings.UI_VIEW));
         private final JProgressBar progressBar = new JProgressBar(0, 7);
-        private final JLabel statusLabel = new JLabel(LanguageStrings.UI_MATURING, SwingConstants.CENTER);
+        private final JLabel statusLabel = new JLabel(LanguageStrings.get(LanguageStrings.UI_MATURING), SwingConstants.CENTER);
         private Colony currentColony;
         private final CardLayout cardLayout = new CardLayout();
 
@@ -1443,7 +1443,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 else {
                     cardLayout.show(container, "PROGRESS");
                     progressBar.setValue(currentColony.getAge());
-                    progressBar.setString(String.format(LanguageStrings.DYNASTY_7_DAYS, currentColony.getAge()));
+                    progressBar.setString(String.format(LanguageStrings.get(LanguageStrings.DYNASTY_7_DAYS), currentColony.getAge()));
                 }
             }
             return container;
@@ -1454,7 +1454,7 @@ public class DynastyManagementDialog extends ZeroDialog {
 
     private void performEdit(Colony colony) {
         if (colony == null) return;
-        String newName = JOptionPane.showInputDialog(this, String.format(LanguageStrings.DYNASTY_RENAME_TITLE, colony.getName()), colony.getName());
+        String newName = JOptionPane.showInputDialog(this, String.format(LanguageStrings.get(LanguageStrings.DYNASTY_RENAME_TITLE), colony.getName()), colony.getName());
         if (newName != null && !newName.trim().isEmpty()) {
             colony.setName(newName.trim());
             refreshDialog();

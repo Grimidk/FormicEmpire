@@ -30,9 +30,10 @@ public class WorldPanel extends ZeroGamePanel {
     private MoonPhase lastMoonPhase = null;
     private Season lastSeason = null;
     private Weather lastWeather = null;
-    private String lastBiome = "";
     private int lastTemperature = -999;
     private int lastHumidity = -1;
+    
+    private World lastWorldRef;
 
     public WorldPanel() {
         super(new GridBagLayout());
@@ -83,9 +84,9 @@ public class WorldPanel extends ZeroGamePanel {
         lastMoonPhase = null;
         lastSeason = null;
         lastWeather = null;
-        lastBiome = "";
         lastTemperature = -999;
         lastHumidity = -1;
+        lastWorldRef = null;
         
         dateTimeLabel.setText("00:00 01/01/0000");
         biomeLabel.setText("");
@@ -98,6 +99,24 @@ public class WorldPanel extends ZeroGamePanel {
         moonPhaseLabel.setIcon(null);
         seasonLabel.setIcon(null);
         weatherLabel.setIcon(null);
+    }
+    
+    @Override
+    public void refreshTranslations() {
+        super.refreshTranslations();
+        if (lastWorldRef != null) {
+            // Force refresh of localized tooltips
+            updateStaticData(lastWorldRef);
+            
+            // Re-apply tooltips for time/weather/etc
+            if (lastTimeOfDay != null) timeOfDayLabel.setToolTipText(lastTimeOfDay.getName());
+            if (lastWeather != null) weatherLabel.setToolTipText(lastWeather.getName());
+            if (lastMoonPhase != null) moonPhaseLabel.setToolTipText(lastMoonPhase.getName());
+            if (lastSeason != null) seasonLabel.setToolTipText(lastSeason.getName());
+            
+            temperatureLabel.setToolTipText(LanguageStrings.get(LanguageStrings.WORLD_TEMP_PREFIX) + lastTemperature + "°C" + " (" + lastWorldRef.getTemperatureIcon().getName() + ")");
+            humidityLabel.setToolTipText(LanguageStrings.get(LanguageStrings.WORLD_HUMIDITY_PREFIX) + lastWorldRef.getHumidityIcon().getName());
+        }
     }
     
     private JPanel createTimePanel() {
@@ -122,17 +141,15 @@ public class WorldPanel extends ZeroGamePanel {
     
     public void updateStaticData(World world) {
         if (world == null || world.getActiveHex() == null) return;
+        this.lastWorldRef = world;
         
-        String name = (world.getActiveHex().getBiome() != null) ? world.getActiveHex().getBiome().getName() : LanguageStrings.WORLD_NA;
-        String fullTooltip = LanguageStrings.WORLD_BIOME_PREFIX + name;
+        String name = (world.getActiveHex().getBiome() != null) ? world.getActiveHex().getBiome().getName() : LanguageStrings.get(LanguageStrings.WORLD_NA);
+        String fullTooltip = LanguageStrings.get(LanguageStrings.WORLD_BIOME_PREFIX) + name;
         
-        if (!fullTooltip.equals(lastBiome)) {
-            biomeLabel.setText(name); 
-            biomeLabel.setToolTipText(fullTooltip);
-            if (world.getActiveHex().getBiome() != null) {
-                biomeLabel.setIcon(world.getActiveHex().getBiome().getIcon());
-            }
-            lastBiome = fullTooltip;
+        biomeLabel.setText(name); 
+        biomeLabel.setToolTipText(fullTooltip);
+        if (world.getActiveHex().getBiome() != null) {
+            biomeLabel.setIcon(world.getActiveHex().getBiome().getIcon());
         }
     }
     
@@ -146,6 +163,7 @@ public class WorldPanel extends ZeroGamePanel {
     }
     
     public void updateHourData(World world) {
+        this.lastWorldRef = world;
         TimeOfDay currentTimeOfDay = world.getTimeOfDay();
         if (currentTimeOfDay != lastTimeOfDay) {
             timeOfDayLabel.setIcon(currentTimeOfDay.getIcon());
@@ -162,20 +180,21 @@ public class WorldPanel extends ZeroGamePanel {
         int temp = world.getTemperature();
         if (temp != lastTemperature) {
             temperatureLabel.setText("");
-            temperatureLabel.setToolTipText(LanguageStrings.WORLD_TEMP_PREFIX + temp + "°C" + " (" + world.getTemperatureIcon().getName() + ")");
+            temperatureLabel.setToolTipText(LanguageStrings.get(LanguageStrings.WORLD_TEMP_PREFIX) + temp + "°C" + " (" + world.getTemperatureIcon().getName() + ")");
             temperatureLabel.setIcon(world.getTemperatureIcon().getIcon());
             lastTemperature = temp;
         }
         int humidity = world.getHumidity();
         if (humidity != lastHumidity) {
             humidityLabel.setText("");
-            humidityLabel.setToolTipText(LanguageStrings.WORLD_HUMIDITY_PREFIX + world.getHumidityIcon().getName());
+            humidityLabel.setToolTipText(LanguageStrings.get(LanguageStrings.WORLD_HUMIDITY_PREFIX) + world.getHumidityIcon().getName());
             humidityLabel.setIcon(world.getHumidityIcon().getIcon());
             lastHumidity = humidity;
         }
     }
 
     public void updateDayData(World world) {
+        this.lastWorldRef = world;
         MoonPhase currentMoonPhase = world.getMoonPhase();
         if (currentMoonPhase != lastMoonPhase) {
             moonPhaseLabel.setIcon(currentMoonPhase.getIcon());
@@ -185,6 +204,7 @@ public class WorldPanel extends ZeroGamePanel {
     }
 
     public void updateMonthData(World world) {
+        this.lastWorldRef = world;
         Season currentSeason = world.getSeason();
         if (currentSeason != lastSeason) {
             seasonLabel.setIcon(currentSeason.getIcon());

@@ -7,6 +7,7 @@ import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 
 public class Engine extends Thread {
     private World world;
@@ -232,6 +233,7 @@ public class Engine extends Thread {
 
     public void setLanguage(String language) {
         this.language = (language != null) ? language : "en";
+        LanguageStrings.setLanguage(this.language);
     }
 
     public boolean isAllowTurboMode() {

@@ -1,34 +1,34 @@
 package com.grimidk.formicempire.classes.constants.unlocks;
 
 import javax.swing.ImageIcon;
-
 import com.grimidk.formicempire.classes.constants.Constant;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 
 public class Upgrade extends Constant {
-    private final String flavorName;
-    private final String description;
+    private final String flavorNameKey;
+    private final String descriptionKey;
     private final Upgrade requirement;
     private final int cost;
 
-    public Upgrade(int id, String name, String flavorName, String description, Upgrade requirement, int cost, ImageIcon icon) {
-        super(id, name, icon);
-        this.flavorName = flavorName;
-        this.description = description;
+    public Upgrade(int id, String nameKey, String flavorNameKey, String descriptionKey, Upgrade requirement, int cost, ImageIcon icon) {
+        super(id, nameKey, icon);
+        this.flavorNameKey = flavorNameKey;
+        this.descriptionKey = descriptionKey;
         this.requirement = requirement;
         this.cost = cost;
     }
 
     // (no icon)
-    public Upgrade(int id, String name, String flavorName, String description, Upgrade requirement, int cost) {
-        this(id, name, flavorName, description, requirement, cost, null);
+    public Upgrade(int id, String nameKey, String flavorNameKey, String descriptionKey, Upgrade requirement, int cost) {
+        this(id, nameKey, flavorNameKey, descriptionKey, requirement, cost, null);
     }
 
     public String getFlavorName() {
-        return flavorName;
+        return LanguageStrings.get(flavorNameKey);
     }
 
     public String getDescription() {
-        return description;
+        return LanguageStrings.get(descriptionKey);
     }
 
     public Upgrade getRequirement() {
