@@ -372,6 +372,17 @@ public class EnglishTranslation implements Translation {
         en.put("SETTINGS_EVERY_YEAR", "Every Year (12 Months)");
         en.put("SETTINGS_SAVE_APPLY", "Save & Apply");
         en.put("SETTINGS_SAVED_MSG", "Settings saved and applied.");
+        
+        en.put("SETTINGS_TAB_GENERAL", "General");
+        en.put("SETTINGS_TAB_VIDEO", "Video");
+        en.put("SETTINGS_TAB_AUDIO", "Audio");
+        
+        en.put("SETTINGS_VISUAL_FILTERS", "Visual Filters:");
+        en.put("SETTINGS_ARACHNOPHOBIA", "Arachnophobia Mode:");
+        
+        en.put("SETTINGS_MASTER_VOL", "Master Volume:");
+        en.put("SETTINGS_MUSIC_VOL", "Music Volume:");
+        en.put("SETTINGS_SFX_VOL", "Sound Effects:");
 
         en.put("WORLD_BIOME_PREFIX", "Biome: ");
         en.put("WORLD_TEMP_PREFIX", "Temp: ");

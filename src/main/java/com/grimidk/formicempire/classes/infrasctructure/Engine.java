@@ -27,12 +27,19 @@ public class Engine extends Thread {
     
     private final SaveManager settingsSaveManager;
 
-    // Settings
+    // --- Settings ---
     private String language = "en";
     private boolean allowTurboMode = false;
     private String screenSize = "1000x700";
     private boolean fullScreen = false;
     private int autosaveFrequency = 1; // 1 = every month
+    
+    private boolean visualFiltersEnabled = true;
+    private boolean arachnophobiaMode = false;
+    
+    private int masterVolume = 80;
+    private int musicVolume = 70;
+    private int sfxVolume = 100;
 
     public Engine() {
         this.delay = 250;
@@ -225,7 +232,7 @@ public class Engine extends Thread {
         }
     }
 
-    // -- Settings Getters and Setters --
+    // --- Settings Getters and Setters ---
 
     public String getLanguage() {
         return language;
@@ -265,6 +272,46 @@ public class Engine extends Thread {
     }
 
     public void setAutosaveFrequency(int autosaveFrequency) {
-        this.autosaveFrequency = (autosaveFrequency > 0) ? autosaveFrequency : 1;
+        this.autosaveFrequency = (autosaveFrequency >= 0) ? autosaveFrequency : 1;
+    }
+
+    public boolean isVisualFiltersEnabled() {
+        return visualFiltersEnabled;
+    }
+
+    public void setVisualFiltersEnabled(boolean visualFiltersEnabled) {
+        this.visualFiltersEnabled = visualFiltersEnabled;
+    }
+
+    public boolean isArachnophobiaMode() {
+        return arachnophobiaMode;
+    }
+
+    public void setArachnophobiaMode(boolean arachnophobiaMode) {
+        this.arachnophobiaMode = arachnophobiaMode;
+    }
+
+    public int getMasterVolume() {
+        return masterVolume;
+    }
+
+    public void setMasterVolume(int masterVolume) {
+        this.masterVolume = masterVolume;
+    }
+
+    public int getMusicVolume() {
+        return musicVolume;
+    }
+
+    public void setMusicVolume(int musicVolume) {
+        this.musicVolume = musicVolume;
+    }
+
+    public int getSfxVolume() {
+        return sfxVolume;
+    }
+
+    public void setSfxVolume(int sfxVolume) {
+        this.sfxVolume = sfxVolume;
     }
 }

@@ -372,6 +372,17 @@ public class SpanishTranslation implements Translation {
         es.put("SETTINGS_EVERY_YEAR", "Cada Año (12 Meses)");
         es.put("SETTINGS_SAVE_APPLY", "Guardar y Aplicar");
         es.put("SETTINGS_SAVED_MSG", "Ajustes guardados y aplicados.");
+        
+        es.put("SETTINGS_TAB_GENERAL", "General");
+        es.put("SETTINGS_TAB_VIDEO", "Vídeo");
+        es.put("SETTINGS_TAB_AUDIO", "Audio");
+        
+        es.put("SETTINGS_VISUAL_FILTERS", "Filtros Visuales:");
+        es.put("SETTINGS_ARACHNOPHOBIA", "Modo Aracnofobia:");
+        
+        es.put("SETTINGS_MASTER_VOL", "Volumen Maestro:");
+        es.put("SETTINGS_MUSIC_VOL", "Volumen de Música:");
+        es.put("SETTINGS_SFX_VOL", "Efectos de Sonido:");
 
         es.put("WORLD_BIOME_PREFIX", "Bioma: ");
         es.put("WORLD_TEMP_PREFIX", "Temp: ");

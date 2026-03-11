@@ -434,7 +434,18 @@ public final class LanguageStrings {
     public static final String SETTINGS_EVERY_YEAR = "SETTINGS_EVERY_YEAR";
     public static final String SETTINGS_SAVE_APPLY = "SETTINGS_SAVE_APPLY";
     public static final String SETTINGS_SAVED_MSG = "SETTINGS_SAVED_MSG";
-
+    
+    public static final String SETTINGS_TAB_GENERAL = "SETTINGS_TAB_GENERAL";
+    public static final String SETTINGS_TAB_VIDEO = "SETTINGS_TAB_VIDEO";
+    public static final String SETTINGS_TAB_AUDIO = "SETTINGS_TAB_AUDIO";
+    
+    public static final String SETTINGS_VISUAL_FILTERS = "SETTINGS_VISUAL_FILTERS";
+    public static final String SETTINGS_ARACHNOPHOBIA = "SETTINGS_ARACHNOPHOBIA";
+    
+    public static final String SETTINGS_MASTER_VOL = "SETTINGS_MASTER_VOL";
+    public static final String SETTINGS_MUSIC_VOL = "SETTINGS_MUSIC_VOL";
+    public static final String SETTINGS_SFX_VOL = "SETTINGS_SFX_VOL";
+    
     public static final String WORLD_BIOME_PREFIX = "WORLD_BIOME_PREFIX";
     public static final String WORLD_TEMP_PREFIX = "WORLD_TEMP_PREFIX";
     public static final String WORLD_HUMIDITY_PREFIX = "WORLD_HUMIDITY_PREFIX";

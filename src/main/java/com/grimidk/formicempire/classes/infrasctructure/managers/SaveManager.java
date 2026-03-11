@@ -1399,7 +1399,12 @@ public class SaveManager {
             writeJsonLine(w, "allowTurboMode", engine.isAllowTurboMode(), false);
             writeJsonLine(w, "screenSize", engine.getScreenSize(), false);
             writeJsonLine(w, "fullScreen", engine.isFullScreen(), false);
-            writeJsonLine(w, "autosaveFrequency", engine.getAutosaveFrequency(), true);
+            writeJsonLine(w, "autosaveFrequency", engine.getAutosaveFrequency(), false);
+            writeJsonLine(w, "visualFiltersEnabled", engine.isVisualFiltersEnabled(), false);
+            writeJsonLine(w, "arachnophobiaMode", engine.isArachnophobiaMode(), false);
+            writeJsonLine(w, "masterVolume", engine.getMasterVolume(), false);
+            writeJsonLine(w, "musicVolume", engine.getMusicVolume(), false);
+            writeJsonLine(w, "sfxVolume", engine.getSfxVolume(), true);
             w.write("}");
             w.newLine();
             w.flush();
@@ -1467,6 +1472,13 @@ public class SaveManager {
             engine.setScreenSize(m.getOrDefault("screenSize", engine.getScreenSize()));
             engine.setFullScreen(Boolean.parseBoolean(m.getOrDefault("fullScreen", String.valueOf(engine.isFullScreen()))));
             engine.setAutosaveFrequency(Integer.parseInt(m.getOrDefault("autosaveFrequency", String.valueOf(engine.getAutosaveFrequency()))));
+            
+            engine.setVisualFiltersEnabled(Boolean.parseBoolean(m.getOrDefault("visualFiltersEnabled", String.valueOf(engine.isVisualFiltersEnabled()))));
+            engine.setArachnophobiaMode(Boolean.parseBoolean(m.getOrDefault("arachnophobiaMode", String.valueOf(engine.isArachnophobiaMode()))));
+            engine.setMasterVolume(Integer.parseInt(m.getOrDefault("masterVolume", String.valueOf(engine.getMasterVolume()))));
+            engine.setMusicVolume(Integer.parseInt(m.getOrDefault("musicVolume", String.valueOf(engine.getMusicVolume()))));
+            engine.setSfxVolume(Integer.parseInt(m.getOrDefault("sfxVolume", String.valueOf(engine.getSfxVolume()))));
+            
             System.out.println("[SaveManager] Global settings loaded.");
         } catch (Exception e) {
             e.printStackTrace();
