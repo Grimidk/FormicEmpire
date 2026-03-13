@@ -3,6 +3,7 @@ package com.grimidk.formicempire.classes.interfaces;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
+import com.grimidk.formicempire.classes.interfaces.game.dialogs.ZeroDialog;
 
 import javax.swing.*;
 import javax.swing.event.AncestorEvent;
@@ -67,6 +68,10 @@ public class SettingsPanel extends JPanel {
     }
 
     public SettingsPanel(MainFrame frame) {
+        this(frame, false);
+    }
+
+    public SettingsPanel(MainFrame frame, boolean isInDialog) {
         this.frame = frame;
         this.engine = frame.getEngine();
         setLayout(new BorderLayout());
@@ -91,7 +96,16 @@ public class SettingsPanel extends JPanel {
 
         backButton = new JButton();
         styleButton(backButton);
-        backButton.addActionListener(e -> this.frame.showCard(MainFrame.CARD_INIT));
+        backButton.addActionListener(e -> {
+            if (isInDialog) {
+                Window window = SwingUtilities.getWindowAncestor(this);
+                if (window instanceof JDialog) {
+                    window.dispose();
+                }
+            } else {
+                this.frame.showCard(MainFrame.CARD_INIT);
+            }
+        });
         setupNavigation(backButton);
         
         southPanel.add(saveButton);
@@ -312,7 +326,7 @@ public class SettingsPanel extends JPanel {
         return slider;
     }
     
-    private void refreshTranslations() {
+    public void refreshTranslations() {
         tabbedPane.setTitleAt(0, LanguageStrings.get(LanguageStrings.SETTINGS_TAB_GENERAL));
         tabbedPane.setTitleAt(1, LanguageStrings.get(LanguageStrings.SETTINGS_TAB_VIDEO));
         tabbedPane.setTitleAt(2, LanguageStrings.get(LanguageStrings.SETTINGS_TAB_AUDIO));
@@ -447,5 +461,25 @@ public class SettingsPanel extends JPanel {
         SwingUtilities.invokeLater(() -> {
             JOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.SETTINGS_SAVED_MSG), LanguageStrings.get(LanguageStrings.UI_SETTINGS), JOptionPane.INFORMATION_MESSAGE);
         });
+    }
+
+    public static class SettingsDialog extends ZeroDialog {
+        private final SettingsPanel settingsPanel;
+
+        public SettingsDialog(MainFrame frame, Engine engine) {
+            super(frame, LanguageStrings.UI_SETTINGS, AssetStyles.DEFAULT_DIALOG_SIZE);
+            
+            setLayout(new BorderLayout());
+            
+            settingsPanel = new SettingsPanel(frame, true);
+            settingsPanel.loadSettings();
+            
+            add(settingsPanel, BorderLayout.CENTER);
+        }
+
+        @Override
+        protected void refreshDialog() {
+            settingsPanel.refreshTranslations();
+        }
     }
 }

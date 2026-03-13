@@ -95,7 +95,12 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         
         addWindowFocusListener(new WindowFocusListener() {
             @Override
-            public void windowGainedFocus(WindowEvent e) {}
+            public void windowGainedFocus(WindowEvent e) {
+                if (engine.isPauseOnFocusLoss() && gamePanel.isEngineStarted() && engine.isPaused()) {
+                    engine.resumeEngine();
+                    gamePanel.updateStatusIndicator(false);
+                }
+            }
 
             @Override
             public void windowLostFocus(WindowEvent e) {

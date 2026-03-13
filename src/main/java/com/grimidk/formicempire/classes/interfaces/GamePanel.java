@@ -42,6 +42,7 @@ public class GamePanel extends ZeroGamePanel {
     private MapDialog mapDialog;
     private StatsDialog statsDialog; 
     private DynastyManagementDialog dynastyDialog;
+    private SettingsPanel.SettingsDialog settingsDialog;
 
     private AlertManager alertManager;
     private TriggerManager triggerManager; 
@@ -111,6 +112,7 @@ public class GamePanel extends ZeroGamePanel {
         if (mapDialog != null && mapDialog.isShowing()) mapDialog.refreshTranslations();
         if (statsDialog != null && statsDialog.isShowing()) statsDialog.refreshTranslations();
         if (dynastyDialog != null && dynastyDialog.isShowing()) dynastyDialog.refreshTranslations();
+        if (settingsDialog != null && settingsDialog.isShowing()) settingsDialog.refreshDialog();
     }
     
     private void initControlPanelCallbacks() {
@@ -125,6 +127,7 @@ public class GamePanel extends ZeroGamePanel {
         Runnable showStatsDialogCallback = this::showStatsDialog;
         Runnable showDynastyDialogCallback = this::showDynastyDialog;
         Runnable showTradeDialogCallback = this::showTradeDialog;
+        Runnable showSettingsDialogCallback = this::showSettingsDialog;
         ControlPanel.RoleManagementCallback showRoleManagementDialogCallback = this::showRoleManagementDialog;
         
         Runnable toggleViewCallback = () -> {
@@ -152,7 +155,8 @@ public class GamePanel extends ZeroGamePanel {
             toggleViewCallback,
             showMapDialogCallback,
             showDynastyDialogCallback,
-            showTradeDialogCallback); 
+            showTradeDialogCallback,
+            showSettingsDialogCallback); 
     }
     
     private void updateGameAreaSize() {
@@ -456,6 +460,23 @@ public class GamePanel extends ZeroGamePanel {
         dynastyDialog.showDialog(DynastyManagementDialog.TAB_TRADE);
     }
 
+    private void showSettingsDialog() {
+        Engine engine = frame.getEngine();
+        if (engine == null) return;
+
+        if (settingsDialog != null && settingsDialog.isShowing()) {
+            settingsDialog.dispose();
+            return;
+        }
+
+        if (settingsDialog != null) {
+            settingsDialog.dispose();
+        }
+
+        settingsDialog = new SettingsPanel.SettingsDialog(frame, engine);
+        settingsDialog.showDialog();
+    }
+
     private void handleGoToColony(Colony target) {
         Engine engine = frame.getEngine();
         if (engine == null || engine.getWorld() == null) return;
@@ -497,6 +518,7 @@ public class GamePanel extends ZeroGamePanel {
         if (mapDialog != null) { mapDialog.dispose(); mapDialog = null; }
         if (statsDialog != null) { statsDialog.dispose(); statsDialog = null; }
         if (dynastyDialog != null) { dynastyDialog.dispose(); dynastyDialog = null; }
+        if (settingsDialog != null) { settingsDialog.dispose(); settingsDialog = null; }
     }
 
     private void cleanupSession() {

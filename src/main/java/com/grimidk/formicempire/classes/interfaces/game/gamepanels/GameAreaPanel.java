@@ -218,7 +218,10 @@ public class GameAreaPanel extends ZeroGamePanel {
     }
 
     private void drawEnvironmentalOverlays(Graphics2D g2d) {
+        if (engine == null || !engine.isVisualFiltersEnabled()) return;
+        
         World world = engine.getWorld();
+        if (world == null) return;
         
         if (world.getTimeOfDay() != null && world.getTimeOfDay().getOverlayColor() != null) {
             g2d.setColor(world.getTimeOfDay().getOverlayColor());

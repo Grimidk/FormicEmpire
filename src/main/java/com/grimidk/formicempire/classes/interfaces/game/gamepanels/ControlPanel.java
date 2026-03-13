@@ -1,7 +1,6 @@
 package com.grimidk.formicempire.classes.interfaces.game.gamepanels;
 
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
-import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 import com.grimidk.formicempire.classes.interfaces.HelpPanel;
 import com.grimidk.formicempire.classes.interfaces.MainFrame;
@@ -29,6 +28,7 @@ public class ControlPanel extends ZeroGamePanel {
     private final Runnable showMapDialogCallback;
     private final Runnable showDynastyDialogCallback;
     private final Runnable showTradeDialogCallback;
+    private final Runnable showSettingsDialogCallback;
 
     // --- UI Components ---
     private final JButton speedUpButton = new JButton(LanguageStrings.get(LanguageStrings.UI_SPEED_UP));
@@ -72,7 +72,8 @@ public class ControlPanel extends ZeroGamePanel {
                         Runnable toggleViewCallback,
                         Runnable showMapDialogCallback,
                         Runnable showDynastyDialogCallback,
-                        Runnable showTradeDialogCallback) {
+                        Runnable showTradeDialogCallback,
+                        Runnable showSettingsDialogCallback) {
         super(new FlowLayout(FlowLayout.RIGHT));
         
         this.frame = frame;
@@ -89,6 +90,7 @@ public class ControlPanel extends ZeroGamePanel {
         this.showMapDialogCallback = showMapDialogCallback;
         this.showDynastyDialogCallback = showDynastyDialogCallback;
         this.showTradeDialogCallback = showTradeDialogCallback;
+        this.showSettingsDialogCallback = showSettingsDialogCallback;
 
         initComponents();
         initLayout();        
@@ -251,28 +253,7 @@ public class ControlPanel extends ZeroGamePanel {
         manageTrade.setVisible(false);
         
         openSettings.addActionListener(e -> {
-            Engine engine = frame.getEngine();
-            if (engine != null) {
-                engine.pauseEngine();
-            }
-            if (frame.getGamePanel() != null) {
-                frame.getGamePanel().updateStatusIndicator(true);
-                setPlayPauseButtonText(true);
-            }
-
-            try {
-                SaveManager sm = new SaveManager();
-                if (engine != null && engine.getWorld() != null) {
-                    sm.saveAutosaveAsync(engine.getWorld(), engine, () -> {
-                        frame.showCard(MainFrame.CARD_SETTINGS);
-                    });
-                } else {
-                    frame.showCard(MainFrame.CARD_SETTINGS);
-                }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                frame.showCard(MainFrame.CARD_SETTINGS);
-            }
+            showSettingsDialogCallback.run();
         });
         
         showTutorial.addActionListener(e -> HelpPanel.showTutorialDialog(frame));

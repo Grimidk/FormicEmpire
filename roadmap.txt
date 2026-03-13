@@ -8,7 +8,6 @@ To Fix (By decreasing priority) :
 	(none right now)
 	
 	High:
-	settings without going to menu
 	visual filter toggle not working
 	if pause when unfocus, play back when focus
 
@@ -28,10 +27,10 @@ To Feature (to be done in order):
 Needed for launch (v1.0) (Launch Version):
 	Priority:
 	font
-
-	Everything else :
 	ant speed and biome depletion and further located sources take more time and sustainability of biome, source sprites by size
 	auxiliary room sprites (storage (resources), farm (shroom), nurse (bedding), royal (nests and science))
+
+	Everything else :
 	more settings (choose default, fuzzed parasites)
 	automate NPC to spread
 	diplomacy and diplomatic reputation (own and xeno colonies) and alliances (non-aggression pacts) and wars, alliances can increase while allied genetic integrity
