@@ -8,10 +8,13 @@ To Fix (By decreasing priority) :
 	(none right now)
 	
 	High:
-	(none right now)
+	settings without going to menu
+	visual filter toggle not working
+	if pause when unfocus, play back when focus
 
 	Mid:
-	(none right now)
+	check ant movement speed
+	higher contrast text
 
 	Low:
 	breeders go out of the colony in nuptial
@@ -24,16 +27,14 @@ To Fix (By decreasing priority) :
 To Feature (to be done in order):
 Needed for launch (v1.0) (Launch Version):
 	Priority:
-	genetic stagnation (obscured until below (80%)) every nuptial, assimilation gives base 5% after cloning (unlocked after empire rank), alliances can increase while allied, stagnation = success chance to spread and drones from assimilated
 	font
-	promo video
 
 	Everything else :
 	ant speed and biome depletion and further located sources take more time and sustainability of biome, source sprites by size
 	auxiliary room sprites (storage (resources), farm (shroom), nurse (bedding), royal (nests and science))
 	more settings (choose default, fuzzed parasites)
 	automate NPC to spread
-	diplomacy and diplomatic reputation (own and xeno colonies) and alliances (non-aggression pacts) and wars 
+	diplomacy and diplomatic reputation (own and xeno colonies) and alliances (non-aggression pacts) and wars, alliances can increase while allied genetic integrity
 	rebellions and rebel colonies (internal rebeliousness stat, too much causes a rebellious dynasty to appear, once capital defeated it gets reabsorbed)
 	diplo dialog with stance options (neutral, aggressive, peaceful)
 	battle system (mass battle in land and air, tick based loses based on active/passive military strenght from 1:1 = 50% chance and 1% loses up to 1:10 100% chance and 100% loses, 2 staged war until the queens are dead)
@@ -62,6 +63,7 @@ Needed for launch (v1.0) (Launch Version):
 	balance every upgrade
 	ant menus (detailed per ant)
 	music and sounds and settings for them and player panel
+	promo video
 	langs (ENG, POR, FRE, GER, RUS, CHN, JAP)
 	warning screen for arthropophobia 
 	start animation and general animations

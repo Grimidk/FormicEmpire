@@ -8,10 +8,11 @@ import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
+import com.grimidk.formicempire.classes.constants.misc.GameSpeed;
 
 public class Engine extends Thread {
     private World world;
-    private float delay;
+    private GameSpeed speed = GameSpeed.NORMAL;
     private final Semaphore semaphore;
     private boolean killSwitch;
     private volatile boolean paused;
@@ -46,7 +47,6 @@ public class Engine extends Thread {
     private boolean showTooltips = true;
 
     public Engine() {
-        this.delay = 250;
         this.semaphore = new Semaphore(1);
         this.killSwitch = false;
         this.paused = true;
@@ -80,11 +80,35 @@ public class Engine extends Thread {
     }
 
     public float getDelay() {
-        return delay;
+        return speed.getDelayMs();
     }
 
     public void setDelay(float delay) {
-        this.delay = delay;
+        // Find closest speed for backward compatibility
+        GameSpeed closest = GameSpeed.NORMAL;
+        int minDiff = Integer.MAX_VALUE;
+        for (GameSpeed s : GameSpeed.values()) {
+            int diff = Math.abs(s.getDelayMs() - (int)delay);
+            if (diff < minDiff) {
+                minDiff = diff;
+                closest = s;
+            }
+        }
+        this.speed = closest;
+    }
+    
+    public GameSpeed getSpeed() {
+        return speed;
+    }
+    
+    public void setSpeed(GameSpeed speed) {
+        if (speed != null) {
+            if (speed == GameSpeed.TURBO && !allowTurboMode) {
+                this.speed = GameSpeed.VERY_FAST;
+            } else {
+                this.speed = speed;
+            }
+        }
     }
 
     public Semaphore getSema() {
@@ -214,14 +238,10 @@ public class Engine extends Thread {
     @Override
     public void run() {
         while (!killSwitch) {
-            if (!allowTurboMode) {
-                try {
-                    Thread.sleep((long) delay);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                Thread.yield();
+            try {
+                Thread.sleep(speed.getDelayMs());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
 
             if (!paused) {
@@ -229,9 +249,9 @@ public class Engine extends Thread {
                     semaphore.acquire();
                     if (this.world != null) {
                         this.world.runMinute(); 
+                        notifyMinuteListeners(); 
                     }
-                    notifyMinuteListeners(); 
-                    
+
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } finally {
@@ -240,7 +260,6 @@ public class Engine extends Thread {
             }
         }
     }
-
     // --- Settings Getters and Setters ---
 
     public String getLanguage() {
@@ -258,6 +277,9 @@ public class Engine extends Thread {
 
     public void setAllowTurboMode(boolean allowTurboMode) {
         this.allowTurboMode = allowTurboMode;
+        if (!allowTurboMode && speed == GameSpeed.TURBO) {
+            speed = GameSpeed.VERY_FAST;
+        }
     }
 
     public String getScreenSize() {

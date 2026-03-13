@@ -84,6 +84,12 @@ public final class LanguageStrings {
     public static final String UI_PLAY = "UI_PLAY";
     public static final String UI_SPEED_UP = "UI_SPEED_UP";
     public static final String UI_SPEED_DOWN = "UI_SPEED_DOWN";
+    public static final String UI_SPEED_VERY_SLOW = "UI_SPEED_VERY_SLOW";
+    public static final String UI_SPEED_SLOW = "UI_SPEED_SLOW";
+    public static final String UI_SPEED_NORMAL = "UI_SPEED_NORMAL";
+    public static final String UI_SPEED_FAST = "UI_SPEED_FAST";
+    public static final String UI_SPEED_VERY_FAST = "UI_SPEED_VERY_FAST";
+    public static final String UI_SPEED_TURBO = "UI_SPEED_TURBO";
     public static final String UI_TICK_PREFIX = "UI_TICK_PREFIX";
     public static final String UI_MS_SUFFIX = "UI_MS_SUFFIX";
     public static final String UI_PAUSED_TICK = "UI_PAUSED_TICK";
@@ -307,6 +313,7 @@ public final class LanguageStrings {
     public static final String STAT_COLONY_TOTAL = "STAT_COLONY_TOTAL";
     public static final String STAT_DYNASTY_TOTAL = "STAT_DYNASTY_TOTAL";
     public static final String STAT_NO_DEATHS = "STAT_NO_DEATHS";
+    public static final String STAT_GENETIC_INTEGRITY = "STAT_GENETIC_INTEGRITY";
 
     public static final String UNIT_STAT_HEALTH = "UNIT_STAT_HEALTH";
     public static final String UNIT_STAT_HEALTH_DESC = "UNIT_STAT_HEALTH_DESC";
@@ -764,6 +771,8 @@ public final class LanguageStrings {
     public static final String ABILITY_MANAGEMENT_FLAVOR = "ABILITY_MANAGEMENT_FLAVOR";
     public static final String ABILITY_MANAGEMENT_DESC = "ABILITY_MANAGEMENT_DESC";
     public static final String ABILITY_MASS_FLIGHT_FLAVOR = "ABILITY_MASS_FLIGHT_FLAVOR";
+    public static final String ABILITY_CLONING_FLAVOR = "ABILITY_CLONING_FLAVOR";
+    public static final String ABILITY_CLONING_DESC = "ABILITY_CLONING_DESC";
     public static final String ABILITY_ABILITY_FLAVOR = "ABILITY_ABILITY_FLAVOR";
     public static final String ABILITY_ABILITY_DESC = "ABILITY_ABILITY_DESC";
 

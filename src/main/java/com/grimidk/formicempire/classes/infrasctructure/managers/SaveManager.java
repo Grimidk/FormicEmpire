@@ -357,6 +357,8 @@ public class SaveManager {
                 }
                 sc.currentAssimilationId = (dynasty.getCurrentAssimilation() != null) ? dynasty.getCurrentAssimilation().getId() : -1;
                 sc.assimilationProgress = dynasty.getAssimilationProgress();
+                sc.capitalColonyId = (dynasty.getCapital() != null) ? dynasty.getCapital().getId() : -1;
+                sc.geneticIntegrity = dynasty.getGeneticIntegrity();
                 
                 sc.unlockedUpgradeIds = new ArrayList<>();
                 if (dynasty.getUnlockedUpgrades() != null) {
@@ -633,6 +635,8 @@ public class SaveManager {
         writeJsonLine(w, "defaultAutoBuildEnabled", sc.defaultAutoBuildEnabled, false);
         writeJsonLine(w, "currentAssimilationId", sc.currentAssimilationId, false);
         writeJsonLine(w, "assimilationProgress", sc.assimilationProgress, false);
+        writeJsonLine(w, "capitalColonyId", sc.capitalColonyId, false);
+        writeJsonLine(w, "geneticIntegrity", sc.geneticIntegrity, false);
         w.write("      \"unlockedUpgradeIds\": " + serializeListToJson(sc.unlockedUpgradeIds) + ","); w.newLine();
         w.write("      \"absorbedDynastyIds\": " + serializeListToJson(sc.absorbedDynastyIds) + ","); w.newLine();
         w.write("      \"defeatedSpeciesIds\": " + serializeListToJson(sc.defeatedSpeciesIds) + ","); w.newLine();
@@ -846,6 +850,8 @@ public class SaveManager {
         sc.defaultAutoBuildEnabled = Boolean.parseBoolean(map.getOrDefault("defaultAutoBuildEnabled", "false"));
         sc.currentAssimilationId = Integer.parseInt(map.getOrDefault("currentAssimilationId", "-1"));
         sc.assimilationProgress = Double.parseDouble(map.getOrDefault("assimilationProgress", "0.0"));
+        sc.capitalColonyId = Integer.parseInt(map.getOrDefault("capitalColonyId", "-1"));
+        sc.geneticIntegrity = Double.parseDouble(map.getOrDefault("geneticIntegrity", "100.0"));
         sc.unlockedUpgradeIds = deserializeJsonToList(map.get("unlockedUpgradeIds"));
         sc.absorbedDynastyIds = deserializeJsonToList(map.get("absorbedDynastyIds"));
         sc.defeatedSpeciesIds = deserializeJsonToList(map.get("defeatedSpeciesIds"));

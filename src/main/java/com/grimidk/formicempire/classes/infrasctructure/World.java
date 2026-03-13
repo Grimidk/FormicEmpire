@@ -727,6 +727,20 @@ public class World {
         this.colonyIdCounter = maxColId + 1;
         this.dynastyIdCounter = maxDynastyId + 1;
         
+        if (savefile.getDynastys() != null) {
+            for (Savefile.SavedDynasty sd : savefile.getDynastys()) {
+                Dynasty d = loadedDynastys.get(sd.id);
+                if (d != null && sd.capitalColonyId != -1) {
+                    for (Colony c : d.getColonies()) {
+                        if (c.getId() == sd.capitalColonyId) {
+                            d.setCapital(c);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        
         changeActiveHex(getSpawnHex()); 
         updateEnvironmentalConditions();
     }
@@ -818,7 +832,7 @@ public class World {
                 hex.getColony().runMinutelyJobs();
             }
         }
-
+        
         if (this.minute > 59) {
             this.minute = 0;
             this.runHour();

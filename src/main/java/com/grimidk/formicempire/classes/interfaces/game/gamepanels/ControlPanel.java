@@ -5,6 +5,7 @@ import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 import com.grimidk.formicempire.classes.interfaces.HelpPanel;
 import com.grimidk.formicempire.classes.interfaces.MainFrame;
+import com.grimidk.formicempire.classes.constants.misc.GameSpeed;
 
 import javax.swing.*;
 import java.awt.*;
@@ -53,10 +54,6 @@ public class ControlPanel extends ZeroGamePanel {
     private JMenuItem openSettings;
     private JMenuItem showTutorial;
     private JMenuItem quitToMenu;
-    
-    // --- State ---
-    private int speedLevel = 1;
-    private static final float[] SPEED_DELAYS = { 250f, 125f, 60f, 30f, 15f, 5f, 1f}; 
     
     public interface RoleManagementCallback {
         void showDialog(int tabIndex);
@@ -171,55 +168,44 @@ public class ControlPanel extends ZeroGamePanel {
         }
     }
 
-    private int getMaxSpeedLevel() {
-        Engine engine = frame.getEngine();
-        if (engine == null) return 1;
-        
-        int maxLevel = SPEED_DELAYS.length - 1; 
-        if (!engine.isAllowTurboMode() && maxLevel > 6) {
-            maxLevel = 6;
-        }
-        return maxLevel;
-    }
-
     private void applySpeedLevel() {
         Engine eng = frame.getEngine();
         if (eng == null) return;
 
-        int maxLevel = getMaxSpeedLevel();
-        if (speedLevel > maxLevel) speedLevel = maxLevel;
-        if (speedLevel < 0) speedLevel = 0;
-
-        float delay = SPEED_DELAYS[speedLevel];
-
-        if (delay == -1f) {
-            eng.pauseEngine();
-            setPlayPauseButtonText(true);
-            tickLabel.setText(LanguageStrings.get(LanguageStrings.UI_TICK_PREFIX) + LanguageStrings.get(LanguageStrings.UI_PAUSED_TICK));
-            if (frame.getGamePanel() != null) frame.getGamePanel().updateStatusIndicator(true);
-        } else {
-            eng.setDelay(delay);
-            if (eng.isPaused()) {
-                eng.resumeEngine();
-            }
-            setPlayPauseButtonText(false);
-            updateTickLabel(eng);
-            if (frame.getGamePanel() != null) frame.getGamePanel().updateStatusIndicator(false);
+        if (eng.isPaused()) {
+            eng.resumeEngine();
         }
+        setPlayPauseButtonText(false);
+        updateTickLabel(eng);
+        if (frame.getGamePanel() != null) frame.getGamePanel().updateStatusIndicator(false);
     }
 
     private void initListeners() {
         speedDownButton.addActionListener(e -> {
-            if (speedLevel > 0) speedLevel--;
-            applySpeedLevel();
+            Engine eng = frame.getEngine();
+            if (eng == null) return;
+            
+            GameSpeed current = eng.getSpeed();
+            if (current != GameSpeed.VERY_SLOW) {
+                eng.setSpeed(GameSpeed.getPrevious(current));
+                applySpeedLevel();
+            }
         });
 
         speedUpButton.addActionListener(e -> {
-            int maxLevel = getMaxSpeedLevel();
-            if (speedLevel < maxLevel) {
-                speedLevel++;
+            Engine eng = frame.getEngine();
+            if (eng == null) return;
+            
+            GameSpeed current = eng.getSpeed();
+            GameSpeed next = GameSpeed.getNext(current);
+            
+            boolean canGoTurbo = eng.isAllowTurboMode();
+            if (current == GameSpeed.VERY_FAST && !canGoTurbo) {
+            } else if (current == GameSpeed.TURBO) {
+            } else {
+                eng.setSpeed(next);
+                applySpeedLevel();
             }
-            applySpeedLevel();
         });
 
         playPauseButton.addActionListener(e -> {
@@ -479,10 +465,10 @@ public class ControlPanel extends ZeroGamePanel {
 
     public void updateTickLabel(Engine eng) {
         if (eng == null) {
-            tickLabel.setText(LanguageStrings.get(LanguageStrings.UI_TICK_PREFIX) + "-");
+            tickLabel.setText("-");
             return;
         }
-        tickLabel.setText(LanguageStrings.get(LanguageStrings.UI_TICK_PREFIX) + (long) eng.getDelay() + LanguageStrings.get(LanguageStrings.UI_MS_SUFFIX));
+        tickLabel.setText(eng.getSpeed().getLabel());
     }
     
     public void setPlayPauseButtonText(boolean isPaused) {

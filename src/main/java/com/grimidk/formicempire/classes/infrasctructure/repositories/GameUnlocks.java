@@ -116,6 +116,8 @@ public final class GameUnlocks {
     static { upgrades.add(ABILITY_MANAGEMENT); }
     public static final Upgrade ABILITY_MASS_FLIGHT = new Upgrade(512, "ABILITY_MASS_FLIGHT", "ABILITY_MASS_FLIGHT_FLAVOR", "ABILITY_MASS_FLIGHT_DESC", ABILITY_FORCED_FLIGHT, 0);
     static { upgrades.add(ABILITY_MASS_FLIGHT); }
+    public static final Upgrade ABILITY_CLONING = new Upgrade(514, "ABILITY_CLONING", "ABILITY_CLONING_FLAVOR", "ABILITY_CLONING_DESC", ABILITY_RESEARCH, 0);
+    static { upgrades.add(ABILITY_CLONING); }
     public static final Upgrade ABILITY_ABILITY = new Upgrade(900, "ABILITY_ABILITY", "ABILITY_ABILITY_FLAVOR", "ABILITY_ABILITY_DESC", null, 0);
     static { upgrades.add(ABILITY_ABILITY); }
 

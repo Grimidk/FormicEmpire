@@ -72,13 +72,13 @@ public class AssetStyles {
     public static final Color BACKGROUND_LIGHT = COLOR_ABSOLUTE_WHITE;
     
     public static final Color FONT_COLOR = COLOR_ABSOLUTE_BLACK;
-    public static final Color FONT_COLOR_BRIGHT = COLOR_ABSOLUTE_WHITE;
-    public static final Color FONT_COLOR_HEADER = COLOR_DARK_BLUE;
-    public static final Color FONT_COLOR_SUCCESS = COLOR_MEDIUM_GREEN;
-    public static final Color FONT_COLOR_ERROR = COLOR_DARK_RED;
-    public static final Color FONT_COLOR_WARNING = COLOR_DARK_RED;
-    public static final Color FONT_COLOR_HIGHLIGHT = COLOR_MEDIUM_BLUE;
-    public static final Color FONT_COLOR_VALUE = COLOR_MEDIUM_PURPLE;
+    public static final Color FONT_COLOR_BRIGHT = COLOR_ABSOLUTE_BLACK;
+    public static final Color FONT_COLOR_HEADER = COLOR_ABSOLUTE_BLACK;
+    public static final Color FONT_COLOR_SUCCESS = COLOR_ABSOLUTE_BLACK;
+    public static final Color FONT_COLOR_ERROR = COLOR_ABSOLUTE_BLACK;
+    public static final Color FONT_COLOR_WARNING = COLOR_ABSOLUTE_BLACK;
+    public static final Color FONT_COLOR_HIGHLIGHT = COLOR_ABSOLUTE_BLACK;
+    public static final Color FONT_COLOR_VALUE = COLOR_ABSOLUTE_BLACK;
     
     public static final Color BORDER_COLOR = COLOR_ABSOLUTE_BLACK;
     public static final Color PLAYER_COLOR = COLOR_MEDIUM_BLUE;
@@ -88,11 +88,11 @@ public class AssetStyles {
     public static final Color UI_BG_HEADER = BACKGROUND_SECONDARY;
     public static final Color UI_BORDER_COLOR = BORDER_COLOR;
     
-    public static final Color TEXT_NORMAL = FONT_COLOR;
-    public static final Color TEXT_HEADER = FONT_COLOR_HEADER;
-    public static final Color TEXT_SUCCESS = FONT_COLOR_SUCCESS;
-    public static final Color TEXT_ERROR = FONT_COLOR_ERROR;
-    public static final Color TEXT_WARNING = FONT_COLOR_WARNING;
+    public static final Color TEXT_NORMAL = COLOR_ABSOLUTE_BLACK;
+    public static final Color TEXT_HEADER = COLOR_ABSOLUTE_BLACK;
+    public static final Color TEXT_SUCCESS = COLOR_ABSOLUTE_BLACK;
+    public static final Color TEXT_ERROR = COLOR_ABSOLUTE_BLACK;
+    public static final Color TEXT_WARNING = COLOR_ABSOLUTE_BLACK;
     
     public static final Color PLAYER_FACTION = PLAYER_COLOR;
 

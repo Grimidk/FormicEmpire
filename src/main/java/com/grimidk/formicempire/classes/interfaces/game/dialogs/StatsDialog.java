@@ -375,6 +375,7 @@ public class StatsDialog extends ZeroDialog {
         model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_TOTAL_COLONIES), dynastyStatsService.getTotalColonies(dynasty)});
         model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_GLOBAL_POP), dynastyStatsService.getTotalPopulation(dynasty)});
         model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_NUPTIAL_FLIGHTS), dynasty.getTotalNuptialFlights()});
+        model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_GENETIC_INTEGRITY), String.format("%.1f%%", dynasty.getGeneticIntegrity())});
 
         // Conquest & Expansion
         model.addRow(new Object[]{null, null, "------", "------"});

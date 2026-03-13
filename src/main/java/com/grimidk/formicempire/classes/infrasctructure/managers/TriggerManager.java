@@ -72,6 +72,7 @@ public class TriggerManager {
         checkColonyDeath();
         checkAllNPCTriggers();
         checkMassFlightUnlock();
+        checkCloningAbilityUnlock();
     }
 
     private void checkHourlyTriggers() {
@@ -102,6 +103,31 @@ public class TriggerManager {
             checkNPCPolice(npc);
             checkNPCUnitRoles(npc);
             checkNPCAbilities(npc);
+            checkNPCCloning(npc);
+        }
+    }
+    
+    private void checkCloningAbilityUnlock() {
+        if (playerColony.getDynasty() == null) return;
+        if (playerColony.hasUpgrade(GameUnlocks.ABILITY_CLONING)) return;
+
+        if (playerColony.getDynasty().getRank().getId() >= GameConstants.RANK_ULTRA.getId()) {
+            double bonus = playerColony.getDynasty().getCompletedAssimilations().size() * 5.0;
+            playerColony.getDynasty().setGeneticIntegrity(playerColony.getDynasty().getGeneticIntegrity() + bonus);
+             
+            fireTrigger(GameUnlocks.ABILITY_CLONING,
+                "Cloning Vats",
+                "Your colony has reached the Ultra rank! You have unlocked Cloning, securing your genetic future.");
+        }
+    }
+    
+    private void checkNPCCloning(Colony npc) {
+        if (npc.getDynasty() == null) return;
+        if (npc.hasUpgrade(GameUnlocks.ABILITY_CLONING)) return;
+        if (npc.getDynasty().getRank().getId() >= GameConstants.RANK_ULTRA.getId()) {
+            double bonus = npc.getDynasty().getCompletedAssimilations().size() * 5.0;
+            npc.getDynasty().setGeneticIntegrity(npc.getDynasty().getGeneticIntegrity() + bonus);
+            npc.unlockUpgrade(GameUnlocks.ABILITY_CLONING);
         }
     }
 
