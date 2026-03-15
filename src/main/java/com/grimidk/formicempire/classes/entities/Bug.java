@@ -146,14 +146,14 @@ public class Bug {
         return this.targetPosition != null;
     }
 
-    public void updatePosition() {
+    public void updatePosition(float speedMultiplier) {
         if (targetPosition == null || this.moveStatus == GameConstants.MOVE_STATIC) return;
 
         double dx = targetPosition.x - this.preciseX;
         double dy = targetPosition.y - this.preciseY;
         double distance = Math.sqrt(dx * dx + dy * dy);
         
-        double currentSpeed = this.speed * this.moveStatus.getSpeedMult();
+        double currentSpeed = this.speed * this.moveStatus.getSpeedMult() * speedMultiplier;
         if (currentSpeed <= 0.01) currentSpeed = 0.01;
 
         if (distance <= currentSpeed) {

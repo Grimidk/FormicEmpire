@@ -8,12 +8,10 @@ To Fix (By decreasing priority) :
 	(none right now)
 	
 	High:
-	visual filter toggle not working
-	if pause when unfocus, play back when focus
+	(none right now)
 
 	Mid:
-	check ant movement speed
-	higher contrast text
+	(none right now)
 
 	Low:
 	breeders go out of the colony in nuptial
@@ -76,6 +74,7 @@ Post launch (v1.1) (Improvements Update):
 	console and commands for debugging 
 	native universal modding support
 	custom key bind settings for all keys
+	theme modificaciont (colors, text scale, font)
 	roadmap screen in game (use this txt)
 	global stats from all players (needs api and consent)
 	socials screen with discord server and instagram

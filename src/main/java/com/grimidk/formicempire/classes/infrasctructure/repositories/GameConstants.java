@@ -85,6 +85,9 @@ public final class GameConstants {
     public static final ImageIcon ICON_RESEARCH = loadIcon("icons/misc/research.png");
     static { misc.add(ICON_RESEARCH); }
 
+    // --- Base Stats ---
+    public static final float BASE_SPRITE_SPEED = 2.5f;
+
     // --- Temperatures ---
     public static final Temperature TEMP_FREEZING = new Temperature(1, LanguageStrings.TEMP_FREEZING, 5,
         loadIcon("icons/temp/freezing.png"));

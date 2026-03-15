@@ -47,7 +47,7 @@ public class ColonyPhysicsService {
                         updateAntLogic(colony, ant);
                     }
                     
-                    ant.updatePosition();
+                    ant.updatePosition(GameConstants.BASE_SPRITE_SPEED);
                 }
             }
         }
@@ -60,7 +60,7 @@ public class ColonyPhysicsService {
                     if (!bug.isMoving()) {
                         updateBugLogic(colony, bug);
                     }
-                    bug.updatePosition();
+                    bug.updatePosition(GameConstants.BASE_SPRITE_SPEED);
                 }
             }
         }

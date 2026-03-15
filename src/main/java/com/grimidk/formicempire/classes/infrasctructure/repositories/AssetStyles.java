@@ -24,6 +24,9 @@ public class AssetStyles {
     public static final Color COLOR_DARK_GRAY = new Color(67, 67, 67);
     public static final Color COLOR_MEDIUM_GRAY = new Color(103, 103, 103);
     public static final Color COLOR_LIGHT_GRAY = new Color(157, 157, 157);
+    public static final Color COLOR_LIGHTER_GRAY = new Color(200, 200, 200);
+    public static final Color COLOR_VERY_LIGHT_GRAY = new Color(230, 230, 230);
+    public static final Color COLOR_LIGHTEST_GRAY = new Color(245, 245, 245);
     public static final Color COLOR_DARK_RED = new Color(117, 23, 23);
     public static final Color COLOR_MEDIUM_RED = new Color(190, 38, 51);
     public static final Color COLOR_LIGHT_RED = new Color(224, 111, 139);
@@ -66,9 +69,9 @@ public class AssetStyles {
     public static final Color OVERLAY_ACID_RAIN = new Color(163, 206, 39, OVERLAY_ALPHA + 20);
 
     // --- Global Style References ---
-    public static final Color BACKGROUND_COLOR = COLOR_LIGHT_GRAY;
-    public static final Color BACKGROUND_SECONDARY = COLOR_MEDIUM_GRAY;
-    public static final Color BACKGROUND_DARK = COLOR_DARK_GRAY;
+    public static final Color BACKGROUND_COLOR = COLOR_LIGHTEST_GRAY;
+    public static final Color BACKGROUND_SECONDARY = COLOR_VERY_LIGHT_GRAY;
+    public static final Color BACKGROUND_DARK = COLOR_LIGHTER_GRAY;
     public static final Color BACKGROUND_LIGHT = COLOR_ABSOLUTE_WHITE;
     
     public static final Color FONT_COLOR = COLOR_ABSOLUTE_BLACK;
@@ -160,8 +163,8 @@ public class AssetStyles {
         
         UIManager.put("ProgressBar.background", BACKGROUND_DARK);
         UIManager.put("ProgressBar.foreground", FONT_COLOR_SUCCESS);
-        UIManager.put("ProgressBar.selectionBackground", COLOR_ABSOLUTE_BLACK);
-        UIManager.put("ProgressBar.selectionForeground", COLOR_ABSOLUTE_WHITE);
+        UIManager.put("ProgressBar.selectionBackground", FONT_COLOR);
+        UIManager.put("ProgressBar.selectionForeground", FONT_COLOR);
         UIManager.put("ProgressBar.font", FONT_SMALL);
         
         UIManager.put("CheckBox.background", BACKGROUND_COLOR);
@@ -188,10 +191,10 @@ public class AssetStyles {
         UIManager.put("ScrollPane.background", BACKGROUND_COLOR);
         UIManager.put("Viewport.background", BACKGROUND_COLOR);
         
-        UIManager.put("Separator.foreground", COLOR_ABSOLUTE_BLACK);
-        UIManager.put("Separator.background", COLOR_ABSOLUTE_BLACK);
-        UIManager.put("JSeparator.foreground", COLOR_ABSOLUTE_BLACK);
-        UIManager.put("JSeparator.background", COLOR_ABSOLUTE_BLACK);
+        UIManager.put("Separator.foreground", FONT_COLOR);
+        UIManager.put("Separator.background", FONT_COLOR);
+        UIManager.put("JSeparator.foreground", FONT_COLOR);
+        UIManager.put("JSeparator.background", FONT_COLOR);
         
         UIManager.put("TitledBorder.titleColor", FONT_COLOR_HEADER);
         UIManager.put("TitledBorder.font", FONT_BOLD);
