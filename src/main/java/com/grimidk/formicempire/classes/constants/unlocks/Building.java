@@ -1,22 +1,22 @@
 package com.grimidk.formicempire.classes.constants.unlocks;
 
 import javax.swing.ImageIcon;
-
 import com.grimidk.formicempire.classes.constants.Constant;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 
 public class Building extends Constant {
     private final int level;
-    private final String description;
+    private final String descriptionKey;
     private final Building requirement;
     private final int resinCost;
     private final int mineralCost;
     private final int buildTime;
     private final ImageIcon sprite;
 
-    public Building(int id, String name,int level, String description, Building requirement, int resinCost, int mineralCost, int buildTime, ImageIcon icon, ImageIcon sprite) {
-        super(id, name, icon);
+    public Building(int id, String nameKey, int level, String descriptionKey, Building requirement, int resinCost, int mineralCost, int buildTime, ImageIcon icon, ImageIcon sprite) {
+        super(id, nameKey, icon);
         this.level = level;
-        this.description = description;
+        this.descriptionKey = descriptionKey;
         this.requirement = requirement;
         this.resinCost = resinCost;
         this.mineralCost = mineralCost;
@@ -25,8 +25,8 @@ public class Building extends Constant {
     }
 
     //(no icon/sprite)
-    public Building(int id, String name,int level, String description, Building requirement, int resinCost, int mineralCost, int buildTime) {
-        this(id, name, level, description, requirement, resinCost, mineralCost, buildTime, null, null);
+    public Building(int id, String nameKey, int level, String descriptionKey, Building requirement, int resinCost, int mineralCost, int buildTime) {
+        this(id, nameKey, level, descriptionKey, requirement, resinCost, mineralCost, buildTime, null, null);
     }
 
     public int getLevel() {
@@ -34,7 +34,7 @@ public class Building extends Constant {
     }
 
     public String getDescription() {
-        return description;
+        return LanguageStrings.get(descriptionKey);
     }
 
     public Building getRequirement() {

@@ -6,3 +6,7 @@ Pixelartist:
 
 Testers:
     Grimidk
+
+Translations:
+    English: Grimidk
+    Spanish: Grimidk

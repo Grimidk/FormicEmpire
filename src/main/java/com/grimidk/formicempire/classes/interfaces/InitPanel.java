@@ -1,5 +1,7 @@
 package com.grimidk.formicempire.classes.interfaces;
 
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
+
 import javax.swing.*;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
@@ -10,28 +12,19 @@ import java.util.Set;
 
 public class InitPanel extends JPanel {
     private final MainFrame frame;
+    
+    private JButton play;
+    private JButton help;
+    private JButton settings;
+    private JButton quit;
 
     public InitPanel(MainFrame frame) {
         this.frame = frame;
         setLayout(new GridBagLayout());
-        GridBagConstraints c = new GridBagConstraints();
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.insets = new Insets(8, 8, 8, 8);
-
-        JButton play = new JButton("Play");
-        JButton help = new JButton("Help");
-        JButton settings = new JButton("Settings");
-        JButton quit = new JButton("Quit");
-
-        play.addActionListener(e -> this.frame.showCard(MainFrame.CARD_SAVE));
-        help.addActionListener(e -> this.frame.showCard(MainFrame.CARD_HELP));
-        settings.addActionListener(e -> this.frame.showCard(MainFrame.CARD_SETTINGS));
-        quit.addActionListener(e -> System.exit(0));
-
-        setupNavigation(play);
-        setupNavigation(help);
-        setupNavigation(settings);
-        setupNavigation(quit);
+        
+        initComponents();
+        
+        LanguageStrings.addListener(this::refreshTranslations);
 
         addAncestorListener(new AncestorListener() {
             @Override
@@ -45,11 +38,43 @@ public class InitPanel extends JPanel {
             @Override
             public void ancestorMoved(AncestorEvent event) {}
         });
+    }
+    
+    private void initComponents() {
+        removeAll();
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.insets = new Insets(8, 8, 8, 8);
+
+        play = new JButton(LanguageStrings.get(LanguageStrings.UI_PLAY));
+        help = new JButton(LanguageStrings.get(LanguageStrings.UI_HELP));
+        settings = new JButton(LanguageStrings.get(LanguageStrings.UI_SETTINGS));
+        quit = new JButton(LanguageStrings.get(LanguageStrings.UI_QUIT));
+
+        play.addActionListener(e -> this.frame.showCard(MainFrame.CARD_SAVE));
+        help.addActionListener(e -> this.frame.showCard(MainFrame.CARD_HELP));
+        settings.addActionListener(e -> this.frame.showCard(MainFrame.CARD_SETTINGS));
+        quit.addActionListener(e -> System.exit(0));
+
+        setupNavigation(play);
+        setupNavigation(help);
+        setupNavigation(settings);
+        setupNavigation(quit);
 
         c.gridy = 0; add(play, c);
         c.gridy = 1; add(help, c);
         c.gridy = 2; add(settings, c);
         c.gridy = 3; add(quit, c);
+        
+        revalidate();
+        repaint();
+    }
+    
+    public void refreshTranslations() {
+        play.setText(LanguageStrings.get(LanguageStrings.UI_PLAY));
+        help.setText(LanguageStrings.get(LanguageStrings.UI_HELP));
+        settings.setText(LanguageStrings.get(LanguageStrings.UI_SETTINGS));
+        quit.setText(LanguageStrings.get(LanguageStrings.UI_QUIT));
     }
 
     private void setupNavigation(JButton button) {

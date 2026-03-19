@@ -7,6 +7,7 @@ import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 
 import javax.swing.*;
 import java.awt.*;
@@ -36,7 +37,7 @@ public class RoleManagementDialog extends ZeroDialog {
     private final Map<Integer, Integer> tabIndexMap = new HashMap<>();
 
     public RoleManagementDialog(JFrame owner, Colony colony) {
-        super(owner, "Manage Ant Roles", new Dimension(550, 500));
+        super(owner, LanguageStrings.get(LanguageStrings.DIALOG_ROLES_TITLE), AssetStyles.DEFAULT_DIALOG_SIZE);
         this.colony = colony;
 
         add(tabbedPane, BorderLayout.CENTER);
@@ -238,20 +239,20 @@ public class RoleManagementDialog extends ZeroDialog {
 
             int totalAnts = colony.getAntsByType(antType).size();
             
-            totalLabel = new JLabel("Total " + antType.getName() + "s: " + totalAnts);
+            totalLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.ROLE_TOTAL_PREFIX), antType.getName(), totalAnts));
             totalLabel.setFont(totalLabel.getFont().deriveFont(Font.BOLD));
             totalLabel.setForeground(AssetStyles.FONT_COLOR);
             
-            assignedLabel = new JLabel("Total Assigned: 0");
+            assignedLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.ROLE_ASSIGNED_PREFIX), 0));
             assignedLabel.setForeground(AssetStyles.FONT_COLOR);
             
-            unassignedLabel = new JLabel("Unassigned: " + totalAnts);
+            unassignedLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.ROLE_UNASSIGNED_PREFIX), totalAnts));
             unassignedLabel.setForeground(AssetStyles.FONT_COLOR);
             
             add(totalLabel);
             add(assignedLabel);
             add(unassignedLabel);
-            add(new JSeparator(SwingConstants.HORIZONTAL));
+            add(AssetStyles.createInternalSeparator());
 
             checkAndAddRoles();
             
@@ -270,8 +271,6 @@ public class RoleManagementDialog extends ZeroDialog {
                         addRoleRow(role);
                         displayedRoles.add(role);
                         addedAny = true;
-                    } else {
-                        // System.out.println("[RoleDialog] Colony missing upgrade for role: " + role.getName());
                     }
                 }
             }
@@ -371,7 +370,7 @@ public class RoleManagementDialog extends ZeroDialog {
                 }
                 
                 int totalAnts = colony.getAntsByType(antType).size();
-                totalLabel.setText("Total " + antType.getName() + "s: " + totalAnts);
+                totalLabel.setText(String.format(LanguageStrings.get(LanguageStrings.ROLE_TOTAL_PREFIX), antType.getName(), totalAnts));
 
                 int totalAssigned = 0;
                 for (JSpinner s : spinnerMap.values()) {
@@ -380,14 +379,14 @@ public class RoleManagementDialog extends ZeroDialog {
                 
                 int unassigned = totalAnts - totalAssigned;
                 
-                assignedLabel.setText("Total Assigned: " + totalAssigned);
-                unassignedLabel.setText("Unassigned: " + unassigned);
+                assignedLabel.setText(String.format(LanguageStrings.get(LanguageStrings.ROLE_ASSIGNED_PREFIX), totalAssigned));
+                unassignedLabel.setText(String.format(LanguageStrings.get(LanguageStrings.ROLE_UNASSIGNED_PREFIX), unassigned));
 
                 if (totalAssigned > totalAnts) {
                     assignedLabel.setForeground(AssetStyles.FONT_COLOR_ERROR);
-                    assignedLabel.setToolTipText("You have assigned more roles than you have ants.");
+                    assignedLabel.setToolTipText(LanguageStrings.get(LanguageStrings.ROLE_ERROR_OVER_ASSIGNED));
                     unassignedLabel.setForeground(AssetStyles.FONT_COLOR_ERROR);
-                    unassignedLabel.setToolTipText("You have assigned more roles than you have ants.");
+                    unassignedLabel.setToolTipText(LanguageStrings.get(LanguageStrings.ROLE_ERROR_OVER_ASSIGNED));
                 } else {
                     assignedLabel.setForeground(AssetStyles.FONT_COLOR);
                     assignedLabel.setToolTipText(null);

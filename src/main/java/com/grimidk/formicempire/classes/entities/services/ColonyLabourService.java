@@ -34,26 +34,26 @@ public class ColonyLabourService {
     // --- Actual Ant Objects ---
     private List<Ant> getWorkingAnts(Colony colony, AntRole role) {
         List<Ant> workers = new ArrayList<>();
-        List<Ant> allAdults = new ArrayList<>();
-        allAdults.addAll(colony.getWorkers());
-        allAdults.addAll(colony.getSoldiers());
-        allAdults.addAll(colony.getMajors());
-        allAdults.addAll(colony.getQueens());
-        allAdults.addAll(colony.getPrincesses()); 
-        allAdults.addAll(colony.getDrones());
-        
-        for (Ant ant : allAdults) {
-            if (!ant.isAlive()) continue;
-            if (ant.isOnTrade()) continue;
-            if (ant.getRole() == role) {
-                workers.add(ant);
+        for (List<Ant> group : colony.getAntGroups().values()) {
+            for (Ant ant : group) {
+                if (ant.isAlive() && !ant.isOnTrade() && ant.getRole() == role) {
+                    workers.add(ant);
+                }
             }
         }
         return workers;
     }
 
     private int countActiveAnts(Colony colony, AntRole role) {
-        return getWorkingAnts(colony, role).size();
+        int count = 0;
+        for (List<Ant> group : colony.getAntGroups().values()) {
+            for (Ant ant : group) {
+                if (ant.isAlive() && !ant.isOnTrade() && ant.getRole() == role) {
+                    count++;
+                }
+            }
+        }
+        return count;
     }
     
     private int processGathering(Colony colony, List<ResourceSource> sources, int powerAvailable, ResourceType type, List<Ant> workers) {
@@ -201,24 +201,26 @@ public class ColonyLabourService {
         
         if (farmerCount <= 0 || !resources.hasCapacity(colony, GameConstants.RESOURCE_FUNGI)) return;
         
-        if (Math.random() <= stats.getConversionRate(colony)) {
-            double consumedPlants = resources.consumeResource(colony, GameConstants.RESOURCE_PLANT, farmerCount);
+        double scale = 1.0;
+        double chance = stats.getConversionRate(colony);
+        
+        if (Math.random() <= chance * scale || chance * scale >= 1.0) {
+            double amount = farmerCount * (chance * scale >= 1.0 ? chance * scale : 1.0);
+            
+            double consumedPlants = resources.consumeResource(colony, GameConstants.RESOURCE_PLANT, amount);
             if (consumedPlants > 0) {
                 double yield = consumedPlants;
                 if (colony.hasUpgrade(GameUnlocks.ASSIMILATED_FARMING)) {
-                    yield += consumedPlants; // +1 extra per plant
+                    yield += consumedPlants;
                 }
                 resources.addResource(colony, GameConstants.RESOURCE_FUNGI, yield);
-                return;
             }
-        }
-        
-        if (Math.random() <= stats.getConversionRate(colony)) {
-            double consumedMeat = resources.consumeResource(colony, GameConstants.RESOURCE_MEAT, farmerCount);
+            
+            double consumedMeat = resources.consumeResource(colony, GameConstants.RESOURCE_MEAT, amount);
             if (consumedMeat > 0) {
                 double yield = consumedMeat * 2;
                 if (colony.hasUpgrade(GameUnlocks.ASSIMILATED_FARMING)) {
-                    yield += consumedMeat; // +1 extra per meat
+                    yield += consumedMeat;
                 }
                 resources.addResource(colony, GameConstants.RESOURCE_FUNGI, yield);
             }
@@ -374,6 +376,10 @@ public class ColonyLabourService {
         for (Hex neighbor : neighbors) {
             if (satellitesSpawned >= satellitesToSpawn) break; 
             
+            if (neighbor.getBiome() == GameConstants.BIOME_OCEAN || neighbor.getBiome() == GameConstants.BIOME_LAKE) {
+                continue;
+            }
+            
             Colony existingColony = neighbor.getColony();
             boolean isDead = existingColony != null && existingColony.getAntTotal() == 0 && existingColony.getAge() >= 7;
             
@@ -390,6 +396,19 @@ public class ColonyLabourService {
                         oldDynasty.removeColony(existingColony);
                     }
                     existingColony.setDynasty(null);
+                }
+
+                double integrity = dynasty.getGeneticIntegrity();
+                double failureChance = 0.0;
+                if (integrity <= 0) failureChance = 0.80;
+                else if (integrity <= 20) failureChance = 0.40;
+                else if (integrity <= 40) failureChance = 0.20;
+                else if (integrity <= 60) failureChance = 0.10;
+                else if (integrity <= 80) failureChance = 0.05;
+
+                if (random.nextDouble() < failureChance) {
+                    colony.logEvent("FAILURE: A satellite colony failed to mature due to genetic stagnation.");
+                    continue;
                 }
 
                 int newId = world.getNextColonyId();

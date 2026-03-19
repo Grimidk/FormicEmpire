@@ -7,10 +7,12 @@ import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
+import com.grimidk.formicempire.classes.constants.misc.GameSpeed;
 
 public class Engine extends Thread {
     private World world;
-    private float delay;
+    private GameSpeed speed = GameSpeed.NORMAL;
     private final Semaphore semaphore;
     private boolean killSwitch;
     private volatile boolean paused;
@@ -26,15 +28,25 @@ public class Engine extends Thread {
     
     private final SaveManager settingsSaveManager;
 
-    // Settings
+    // --- Settings ---
     private String language = "en";
     private boolean allowTurboMode = false;
     private String screenSize = "1000x700";
     private boolean fullScreen = false;
     private int autosaveFrequency = 1; // 1 = every month
+    
+    private boolean visualFiltersEnabled = true;
+    private boolean arachnophobiaMode = false;
+    
+    private int masterVolume = 80;
+    private int musicVolume = 70;
+    private int sfxVolume = 100;
+    
+    private boolean pauseOnFocusLoss = true;
+    private boolean confirmOnQuit = true;
+    private boolean showTooltips = true;
 
     public Engine() {
-        this.delay = 250;
         this.semaphore = new Semaphore(1);
         this.killSwitch = false;
         this.paused = true;
@@ -68,11 +80,35 @@ public class Engine extends Thread {
     }
 
     public float getDelay() {
-        return delay;
+        return speed.getDelayMs();
     }
 
     public void setDelay(float delay) {
-        this.delay = delay;
+        // Find closest speed for backward compatibility
+        GameSpeed closest = GameSpeed.NORMAL;
+        int minDiff = Integer.MAX_VALUE;
+        for (GameSpeed s : GameSpeed.values()) {
+            int diff = Math.abs(s.getDelayMs() - (int)delay);
+            if (diff < minDiff) {
+                minDiff = diff;
+                closest = s;
+            }
+        }
+        this.speed = closest;
+    }
+    
+    public GameSpeed getSpeed() {
+        return speed;
+    }
+    
+    public void setSpeed(GameSpeed speed) {
+        if (speed != null) {
+            if (speed == GameSpeed.TURBO && !allowTurboMode) {
+                this.speed = GameSpeed.VERY_FAST;
+            } else {
+                this.speed = speed;
+            }
+        }
     }
 
     public Semaphore getSema() {
@@ -203,18 +239,19 @@ public class Engine extends Thread {
     public void run() {
         while (!killSwitch) {
             try {
-                Thread.sleep((long) delay);
+                Thread.sleep(speed.getDelayMs());
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+
             if (!paused) {
                 try {
                     semaphore.acquire();
                     if (this.world != null) {
                         this.world.runMinute(); 
+                        notifyMinuteListeners(); 
                     }
-                    notifyMinuteListeners(); 
-                    
+
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } finally {
@@ -223,8 +260,7 @@ public class Engine extends Thread {
             }
         }
     }
-
-    // -- Settings Getters and Setters --
+    // --- Settings Getters and Setters ---
 
     public String getLanguage() {
         return language;
@@ -232,6 +268,7 @@ public class Engine extends Thread {
 
     public void setLanguage(String language) {
         this.language = (language != null) ? language : "en";
+        LanguageStrings.setLanguage(this.language);
     }
 
     public boolean isAllowTurboMode() {
@@ -240,6 +277,9 @@ public class Engine extends Thread {
 
     public void setAllowTurboMode(boolean allowTurboMode) {
         this.allowTurboMode = allowTurboMode;
+        if (!allowTurboMode && speed == GameSpeed.TURBO) {
+            speed = GameSpeed.VERY_FAST;
+        }
     }
 
     public String getScreenSize() {
@@ -263,6 +303,70 @@ public class Engine extends Thread {
     }
 
     public void setAutosaveFrequency(int autosaveFrequency) {
-        this.autosaveFrequency = (autosaveFrequency > 0) ? autosaveFrequency : 1;
+        this.autosaveFrequency = (autosaveFrequency >= 0) ? autosaveFrequency : 1;
+    }
+
+    public boolean isVisualFiltersEnabled() {
+        return visualFiltersEnabled;
+    }
+
+    public void setVisualFiltersEnabled(boolean visualFiltersEnabled) {
+        this.visualFiltersEnabled = visualFiltersEnabled;
+    }
+
+    public boolean isArachnophobiaMode() {
+        return arachnophobiaMode;
+    }
+
+    public void setArachnophobiaMode(boolean arachnophobiaMode) {
+        this.arachnophobiaMode = arachnophobiaMode;
+    }
+
+    public int getMasterVolume() {
+        return masterVolume;
+    }
+
+    public void setMasterVolume(int masterVolume) {
+        this.masterVolume = masterVolume;
+    }
+
+    public int getMusicVolume() {
+        return musicVolume;
+    }
+
+    public void setMusicVolume(int musicVolume) {
+        this.musicVolume = musicVolume;
+    }
+
+    public int getSfxVolume() {
+        return sfxVolume;
+    }
+
+    public void setSfxVolume(int sfxVolume) {
+        this.sfxVolume = sfxVolume;
+    }
+
+    public boolean isPauseOnFocusLoss() {
+        return pauseOnFocusLoss;
+    }
+
+    public void setPauseOnFocusLoss(boolean pauseOnFocusLoss) {
+        this.pauseOnFocusLoss = pauseOnFocusLoss;
+    }
+
+    public boolean isConfirmOnQuit() {
+        return confirmOnQuit;
+    }
+
+    public void setConfirmOnQuit(boolean confirmOnQuit) {
+        this.confirmOnQuit = confirmOnQuit;
+    }
+
+    public boolean isShowTooltips() {
+        return showTooltips;
+    }
+
+    public void setShowTooltips(boolean showTooltips) {
+        this.showTooltips = showTooltips;
     }
 }

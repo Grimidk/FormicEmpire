@@ -1,12 +1,18 @@
 package com.grimidk.formicempire.classes.interfaces.game.gamepanels;
 
 import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class ZeroGamePanel extends JPanel {
+
+    private String mainTitleKey;
+    private final Map<JPanel, String> titledPanels = new HashMap<>();
 
     public ZeroGamePanel(LayoutManager layout) {
         super(layout != null ? layout : new FlowLayout());
@@ -18,22 +24,32 @@ public abstract class ZeroGamePanel extends JPanel {
 
     protected abstract void initLayout();
 
-    protected void setTitledBorder(String title) {
-        TitledBorder border = BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER, title);
-        border.setTitleColor(AssetStyles.TEXT_HEADER);
-        border.setTitleFont(AssetStyles.FONT_BOLD);
-        setBorder(border);
+    public void refreshTranslations() {
+        if (mainTitleKey != null) {
+            updateTitledBorder(this, mainTitleKey);
+        }
+        for (Map.Entry<JPanel, String> entry : titledPanels.entrySet()) {
+            updateTitledBorder(entry.getKey(), entry.getValue());
+        }
+    }
+
+    protected void setTitledBorder(String key) {
+        this.mainTitleKey = key;
+        updateTitledBorder(this, key);
     }
     
-    protected JPanel createTitledPanel(String title, LayoutManager layout) {
-        JPanel panel = new JPanel(layout != null ? layout : new FlowLayout());
-        panel.setBackground(AssetStyles.UI_BG_PRIMARY);
-        
-        TitledBorder border = BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER, title);
+    private void updateTitledBorder(JPanel panel, String key) {
+        TitledBorder border = BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER, LanguageStrings.get(key));
         border.setTitleColor(AssetStyles.TEXT_HEADER);
         border.setTitleFont(AssetStyles.FONT_BOLD);
-        
         panel.setBorder(border);
+    }
+    
+    protected JPanel createTitledPanel(String key, LayoutManager layout) {
+        JPanel panel = new JPanel(layout != null ? layout : new FlowLayout());
+        panel.setBackground(AssetStyles.UI_BG_PRIMARY);
+        titledPanels.put(panel, key);
+        updateTitledBorder(panel, key);
         return panel;
     }
 }

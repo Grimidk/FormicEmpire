@@ -12,6 +12,8 @@ import java.io.InputStream;
 import java.net.URL;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
+import javax.swing.JSeparator;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 
@@ -22,6 +24,9 @@ public class AssetStyles {
     public static final Color COLOR_DARK_GRAY = new Color(67, 67, 67);
     public static final Color COLOR_MEDIUM_GRAY = new Color(103, 103, 103);
     public static final Color COLOR_LIGHT_GRAY = new Color(157, 157, 157);
+    public static final Color COLOR_LIGHTER_GRAY = new Color(200, 200, 200);
+    public static final Color COLOR_VERY_LIGHT_GRAY = new Color(230, 230, 230);
+    public static final Color COLOR_LIGHTEST_GRAY = new Color(245, 245, 245);
     public static final Color COLOR_DARK_RED = new Color(117, 23, 23);
     public static final Color COLOR_MEDIUM_RED = new Color(190, 38, 51);
     public static final Color COLOR_LIGHT_RED = new Color(224, 111, 139);
@@ -39,20 +44,44 @@ public class AssetStyles {
     public static final Color COLOR_MEDIUM_PURPLE = new Color(148, 39, 196);
     public static final Color COLOR_LIGHT_PURPLE = new Color(174, 126, 229);
 
+    // --- Overlay Colors ---
+    private static final int OVERLAY_ALPHA = 40;
+    public static final Color OVERLAY_DAWN = new Color(235, 137, 49, OVERLAY_ALPHA);
+    public static final Color OVERLAY_DAY = new Color(255, 255, 255, 0);
+    public static final Color OVERLAY_DUSK = new Color(148, 39, 196, OVERLAY_ALPHA);
+    public static final Color OVERLAY_NIGHT = new Color(27, 38, 50, OVERLAY_ALPHA + 40);
+    public static final Color OVERLAY_SOLAR_ECLIPSE = new Color(0, 0, 0, OVERLAY_ALPHA + 80);
+    public static final Color OVERLAY_LUNAR_ECLIPSE = new Color(117, 23, 23, OVERLAY_ALPHA + 40);
+    
+    public static final Color OVERLAY_CLEAR = new Color(255, 255, 255, 0);
+    public static final Color OVERLAY_RAIN = new Color(49, 162, 242, OVERLAY_ALPHA);
+    public static final Color OVERLAY_HEAVY_RAIN = new Color(0, 87, 132, OVERLAY_ALPHA + 20);
+    public static final Color OVERLAY_SNOW = new Color(255, 255, 255, OVERLAY_ALPHA);
+    public static final Color OVERLAY_HEAVY_SNOW = new Color(178, 220, 239, OVERLAY_ALPHA + 20); 
+    public static final Color OVERLAY_THUNDER = new Color(67, 67, 67, OVERLAY_ALPHA + 30);
+    public static final Color OVERLAY_WIND = new Color(157, 157, 157, OVERLAY_ALPHA);
+    public static final Color OVERLAY_HEAT = new Color(247, 226, 107, OVERLAY_ALPHA); 
+    public static final Color OVERLAY_FOG = new Color(157, 157, 157, OVERLAY_ALPHA + 40);
+    public static final Color OVERLAY_FROG = new Color(68, 137, 26, OVERLAY_ALPHA);
+    public static final Color OVERLAY_BLOOD = new Color(190, 38, 51, OVERLAY_ALPHA + 20);
+    public static final Color OVERLAY_SANDSTORM = new Color(164, 100, 34, OVERLAY_ALPHA + 30); 
+    public static final Color OVERLAY_PYROCLASTIC = new Color(67, 67, 67, OVERLAY_ALPHA + 50);
+    public static final Color OVERLAY_ACID_RAIN = new Color(163, 206, 39, OVERLAY_ALPHA + 20);
+
     // --- Global Style References ---
-    public static final Color BACKGROUND_COLOR = COLOR_LIGHT_GRAY;
-    public static final Color BACKGROUND_SECONDARY = COLOR_MEDIUM_GRAY;
-    public static final Color BACKGROUND_DARK = COLOR_DARK_GRAY;
+    public static final Color BACKGROUND_COLOR = COLOR_LIGHTEST_GRAY;
+    public static final Color BACKGROUND_SECONDARY = COLOR_VERY_LIGHT_GRAY;
+    public static final Color BACKGROUND_DARK = COLOR_LIGHTER_GRAY;
     public static final Color BACKGROUND_LIGHT = COLOR_ABSOLUTE_WHITE;
     
     public static final Color FONT_COLOR = COLOR_ABSOLUTE_BLACK;
-    public static final Color FONT_COLOR_BRIGHT = COLOR_ABSOLUTE_WHITE;
-    public static final Color FONT_COLOR_HEADER = COLOR_DARK_BLUE;
-    public static final Color FONT_COLOR_SUCCESS = COLOR_MEDIUM_GREEN;
-    public static final Color FONT_COLOR_ERROR = COLOR_DARK_RED;
-    public static final Color FONT_COLOR_WARNING = COLOR_DARK_RED;
-    public static final Color FONT_COLOR_HIGHLIGHT = COLOR_MEDIUM_BLUE;
-    public static final Color FONT_COLOR_VALUE = COLOR_MEDIUM_PURPLE;
+    public static final Color FONT_COLOR_BRIGHT = COLOR_ABSOLUTE_BLACK;
+    public static final Color FONT_COLOR_HEADER = COLOR_ABSOLUTE_BLACK;
+    public static final Color FONT_COLOR_SUCCESS = COLOR_ABSOLUTE_BLACK;
+    public static final Color FONT_COLOR_ERROR = COLOR_ABSOLUTE_BLACK;
+    public static final Color FONT_COLOR_WARNING = COLOR_ABSOLUTE_BLACK;
+    public static final Color FONT_COLOR_HIGHLIGHT = COLOR_ABSOLUTE_BLACK;
+    public static final Color FONT_COLOR_VALUE = COLOR_ABSOLUTE_BLACK;
     
     public static final Color BORDER_COLOR = COLOR_ABSOLUTE_BLACK;
     public static final Color PLAYER_COLOR = COLOR_MEDIUM_BLUE;
@@ -62,16 +91,29 @@ public class AssetStyles {
     public static final Color UI_BG_HEADER = BACKGROUND_SECONDARY;
     public static final Color UI_BORDER_COLOR = BORDER_COLOR;
     
-    public static final Color TEXT_NORMAL = FONT_COLOR;
-    public static final Color TEXT_HEADER = FONT_COLOR_HEADER;
-    public static final Color TEXT_SUCCESS = FONT_COLOR_SUCCESS;
-    public static final Color TEXT_ERROR = FONT_COLOR_ERROR;
-    public static final Color TEXT_WARNING = FONT_COLOR_WARNING;
+    public static final Color TEXT_NORMAL = COLOR_ABSOLUTE_BLACK;
+    public static final Color TEXT_HEADER = COLOR_ABSOLUTE_BLACK;
+    public static final Color TEXT_SUCCESS = COLOR_ABSOLUTE_BLACK;
+    public static final Color TEXT_ERROR = COLOR_ABSOLUTE_BLACK;
+    public static final Color TEXT_WARNING = COLOR_ABSOLUTE_BLACK;
     
     public static final Color PLAYER_FACTION = PLAYER_COLOR;
 
-    public static final Border PANEL_BORDER = BorderFactory.createLineBorder(UI_BORDER_COLOR, 2);
+    public static final java.awt.Dimension DEFAULT_DIALOG_SIZE = new java.awt.Dimension(1000, 650);
+
+    public static final int BORDER_THICKNESS_EXTERNAL = 2;
+    public static final int BORDER_THICKNESS_INTERNAL = 1;
+
+    public static final Border PANEL_BORDER = BorderFactory.createLineBorder(UI_BORDER_COLOR, BORDER_THICKNESS_EXTERNAL);
+    public static final Border INTERNAL_BORDER = BorderFactory.createLineBorder(UI_BORDER_COLOR, BORDER_THICKNESS_INTERNAL);
     
+    public static JSeparator createInternalSeparator() {
+        JSeparator sep = new JSeparator(SwingConstants.HORIZONTAL);
+        sep.setForeground(COLOR_ABSOLUTE_BLACK);
+        sep.setBackground(COLOR_ABSOLUTE_BLACK);
+        return sep;
+    }
+
     private static Font customFont;
 
     static {
@@ -121,8 +163,8 @@ public class AssetStyles {
         
         UIManager.put("ProgressBar.background", BACKGROUND_DARK);
         UIManager.put("ProgressBar.foreground", FONT_COLOR_SUCCESS);
-        UIManager.put("ProgressBar.selectionBackground", COLOR_ABSOLUTE_BLACK);
-        UIManager.put("ProgressBar.selectionForeground", COLOR_ABSOLUTE_WHITE);
+        UIManager.put("ProgressBar.selectionBackground", FONT_COLOR);
+        UIManager.put("ProgressBar.selectionForeground", FONT_COLOR);
         UIManager.put("ProgressBar.font", FONT_SMALL);
         
         UIManager.put("CheckBox.background", BACKGROUND_COLOR);
@@ -148,6 +190,11 @@ public class AssetStyles {
 
         UIManager.put("ScrollPane.background", BACKGROUND_COLOR);
         UIManager.put("Viewport.background", BACKGROUND_COLOR);
+        
+        UIManager.put("Separator.foreground", FONT_COLOR);
+        UIManager.put("Separator.background", FONT_COLOR);
+        UIManager.put("JSeparator.foreground", FONT_COLOR);
+        UIManager.put("JSeparator.background", FONT_COLOR);
         
         UIManager.put("TitledBorder.titleColor", FONT_COLOR_HEADER);
         UIManager.put("TitledBorder.font", FONT_BOLD);

@@ -1,9 +1,10 @@
 package com.grimidk.formicempire.classes.interfaces.game.gamepanels;
 
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
-import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 import com.grimidk.formicempire.classes.interfaces.HelpPanel;
 import com.grimidk.formicempire.classes.interfaces.MainFrame;
+import com.grimidk.formicempire.classes.constants.misc.GameSpeed;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,14 +28,22 @@ public class ControlPanel extends ZeroGamePanel {
     private final Runnable showMapDialogCallback;
     private final Runnable showDynastyDialogCallback;
     private final Runnable showTradeDialogCallback;
+    private final Runnable showSettingsDialogCallback;
 
     // --- UI Components ---
-    private final JButton speedUpButton = new JButton("Speed+");
-    private final JButton speedDownButton = new JButton("Speed-");
-    private final JLabel tickLabel = new JLabel("Tick: 250ms");
-    private final JButton playPauseButton = new JButton("Pause");
-    private final JButton menuButton = new JButton("Menu");
+    private final JButton speedUpButton = new JButton(LanguageStrings.get(LanguageStrings.UI_SPEED_UP));
+    private final JButton speedDownButton = new JButton(LanguageStrings.get(LanguageStrings.UI_SPEED_DOWN));
+    private final JLabel tickLabel = new JLabel();
+    private final JButton playPauseButton = new JButton();
+    private final JButton menuButton = new JButton(LanguageStrings.get(LanguageStrings.UI_MENU));
     private final JPopupMenu gameMenu = new JPopupMenu();
+    
+    private JMenuItem backToGame;
+    private JMenuItem toggleView;
+    private JMenuItem showMap;
+    private JMenuItem showStats;
+    private JMenuItem manageRoles;
+    private JMenuItem manageHatchRates;
     private JMenuItem manageResearch;
     private JMenuItem manageBuilding;
     private JMenuItem manageAssimilation;
@@ -42,10 +51,9 @@ public class ControlPanel extends ZeroGamePanel {
     private JMenuItem manageAbilities;
     private JMenuItem manageDynasty;
     private JMenuItem manageTrade;
-    
-    // --- State ---
-    private int speedLevel = 1;
-    private static final float[] SPEED_DELAYS = { 250f, 125f, 60f, 30f, 15f, 5f, 1f}; 
+    private JMenuItem openSettings;
+    private JMenuItem showTutorial;
+    private JMenuItem quitToMenu;
     
     public interface RoleManagementCallback {
         void showDialog(int tabIndex);
@@ -64,7 +72,8 @@ public class ControlPanel extends ZeroGamePanel {
                         Runnable toggleViewCallback,
                         Runnable showMapDialogCallback,
                         Runnable showDynastyDialogCallback,
-                        Runnable showTradeDialogCallback) {
+                        Runnable showTradeDialogCallback,
+                        Runnable showSettingsDialogCallback) {
         super(new FlowLayout(FlowLayout.RIGHT));
         
         this.frame = frame;
@@ -81,12 +90,14 @@ public class ControlPanel extends ZeroGamePanel {
         this.showMapDialogCallback = showMapDialogCallback;
         this.showDynastyDialogCallback = showDynastyDialogCallback;
         this.showTradeDialogCallback = showTradeDialogCallback;
+        this.showSettingsDialogCallback = showSettingsDialogCallback;
 
         initComponents();
         initLayout();        
         initListeners();
         initKeyBindings();
         updateTickLabel(frame.getEngine());
+        updatePlayPauseButton();
     }
 
     @Override
@@ -95,6 +106,26 @@ public class ControlPanel extends ZeroGamePanel {
         speedUpButton.setFocusable(false);
         playPauseButton.setFocusable(false);
         menuButton.setFocusable(false);
+        
+        // Init menu items
+        backToGame = new JMenuItem();
+        toggleView = new JMenuItem();
+        showMap = new JMenuItem(); 
+        showStats = new JMenuItem();
+        manageRoles = new JMenuItem();
+        manageHatchRates = new JMenuItem();
+        manageResearch = new JMenuItem();
+        manageBuilding = new JMenuItem();
+        manageAssimilation = new JMenuItem();
+        manageSynergy = new JMenuItem();
+        manageAbilities = new JMenuItem();
+        manageDynasty = new JMenuItem();
+        manageTrade = new JMenuItem();
+        openSettings = new JMenuItem();
+        showTutorial = new JMenuItem();
+        quitToMenu = new JMenuItem();
+        
+        refreshTranslations();
     }
 
     @Override
@@ -105,56 +136,78 @@ public class ControlPanel extends ZeroGamePanel {
         add(playPauseButton);
         add(menuButton);
     }
-
-    private int getMaxSpeedLevel() {
-        Engine engine = frame.getEngine();
-        if (engine == null) return 1;
+    
+    @Override
+    public void refreshTranslations() {
+        speedUpButton.setText(LanguageStrings.get(LanguageStrings.UI_SPEED_UP));
+        speedDownButton.setText(LanguageStrings.get(LanguageStrings.UI_SPEED_DOWN));
+        menuButton.setText(LanguageStrings.get(LanguageStrings.UI_MENU));
+        updateTickLabel(frame.getEngine());
+        updatePlayPauseButton();
         
-        int maxLevel = SPEED_DELAYS.length - 1; 
-        if (!engine.isAllowTurboMode() && maxLevel > 6) {
-            maxLevel = 6;
+        backToGame.setText(LanguageStrings.get(LanguageStrings.UI_BACK_TO_GAME));
+        toggleView.setText(LanguageStrings.get(LanguageStrings.MENU_TOGGLE_VIEW));
+        showMap.setText(LanguageStrings.get(LanguageStrings.MENU_WORLD_MAP));
+        showStats.setText(LanguageStrings.get(LanguageStrings.MENU_STATS));
+        manageRoles.setText(LanguageStrings.get(LanguageStrings.MENU_ROLES));
+        manageHatchRates.setText(LanguageStrings.get(LanguageStrings.MENU_HATCH_RATES));
+        manageResearch.setText(LanguageStrings.get(LanguageStrings.MENU_RESEARCH));
+        manageBuilding.setText(LanguageStrings.get(LanguageStrings.MENU_BUILD));
+        manageAssimilation.setText(LanguageStrings.get(LanguageStrings.MENU_ASSIMILATION));
+        manageSynergy.setText(LanguageStrings.get(LanguageStrings.MENU_SYNERGY));
+        manageAbilities.setText(LanguageStrings.get(LanguageStrings.MENU_ABILITIES));
+        manageDynasty.setText(LanguageStrings.get(LanguageStrings.MENU_DYNASTY));
+        manageTrade.setText(LanguageStrings.get(LanguageStrings.MENU_TRADE));
+        openSettings.setText(LanguageStrings.get(LanguageStrings.UI_SETTINGS));
+        showTutorial.setText(LanguageStrings.get(LanguageStrings.UI_TUTORIAL));
+        quitToMenu.setText(LanguageStrings.get(LanguageStrings.UI_BACK_TO_MENU));
+    }
+    
+    private void updatePlayPauseButton() {
+        Engine engine = frame.getEngine();
+        if (engine != null) {
+            setPlayPauseButtonText(engine.isPaused());
         }
-        return maxLevel;
     }
 
     private void applySpeedLevel() {
         Engine eng = frame.getEngine();
         if (eng == null) return;
 
-        int maxLevel = getMaxSpeedLevel();
-        if (speedLevel > maxLevel) speedLevel = maxLevel;
-        if (speedLevel < 0) speedLevel = 0;
-
-        float delay = SPEED_DELAYS[speedLevel];
-
-        if (delay == -1f) {
-            eng.pauseEngine();
-            playPauseButton.setText("Play");
-            tickLabel.setText("Tick: PAUSED");
-            if (frame.getGamePanel() != null) frame.getGamePanel().updateStatusIndicator(true);
-        } else {
-            eng.setDelay(delay);
-            if (eng.isPaused()) {
-                eng.resumeEngine();
-            }
-            playPauseButton.setText("Pause");
-            updateTickLabel(eng);
-            if (frame.getGamePanel() != null) frame.getGamePanel().updateStatusIndicator(false);
+        if (eng.isPaused()) {
+            eng.resumeEngine();
         }
+        setPlayPauseButtonText(false);
+        updateTickLabel(eng);
+        if (frame.getGamePanel() != null) frame.getGamePanel().updateStatusIndicator(false);
     }
 
     private void initListeners() {
         speedDownButton.addActionListener(e -> {
-            if (speedLevel > 0) speedLevel--;
-            applySpeedLevel();
+            Engine eng = frame.getEngine();
+            if (eng == null) return;
+            
+            GameSpeed current = eng.getSpeed();
+            if (current != GameSpeed.VERY_SLOW) {
+                eng.setSpeed(GameSpeed.getPrevious(current));
+                applySpeedLevel();
+            }
         });
 
         speedUpButton.addActionListener(e -> {
-            int maxLevel = getMaxSpeedLevel();
-            if (speedLevel < maxLevel) {
-                speedLevel++;
+            Engine eng = frame.getEngine();
+            if (eng == null) return;
+            
+            GameSpeed current = eng.getSpeed();
+            GameSpeed next = GameSpeed.getNext(current);
+            
+            boolean canGoTurbo = eng.isAllowTurboMode();
+            if (current == GameSpeed.VERY_FAST && !canGoTurbo) {
+            } else if (current == GameSpeed.TURBO) {
+            } else {
+                eng.setSpeed(next);
+                applySpeedLevel();
             }
-            applySpeedLevel();
         });
 
         playPauseButton.addActionListener(e -> {
@@ -162,33 +215,14 @@ public class ControlPanel extends ZeroGamePanel {
             if (engine == null || !frame.getGamePanel().isEngineStarted()) return;
             if (engine.isPaused()) {
                 engine.resumeEngine();
-                playPauseButton.setText("Pause");
+                setPlayPauseButtonText(false);
                 if (frame.getGamePanel() != null) frame.getGamePanel().updateStatusIndicator(false);
             } else {
                 engine.pauseEngine();
-                playPauseButton.setText("Play");
+                setPlayPauseButtonText(true);
                 if (frame.getGamePanel() != null) frame.getGamePanel().updateStatusIndicator(true);
             }
         });
-
-        // --- Game Menu Setup ---
-        JMenuItem backToGame = new JMenuItem("Back to Game");
-        JMenuItem toggleView = new JMenuItem("Toggle View (Z)");
-        JMenuItem showMap = new JMenuItem("World Map (M)"); 
-        JMenuItem showStats = new JMenuItem("Colony Statistics (X)");
-        JMenuItem manageRoles = new JMenuItem("Manage Roles (Q/W/E/R/T)");
-        JMenuItem manageHatchRates = new JMenuItem("Manage Hatch Rates (P)");
-        manageResearch = new JMenuItem("Research (Y)");
-        manageBuilding = new JMenuItem("Build (U)");
-        manageAssimilation = new JMenuItem("Assimilation (I)");
-        manageSynergy = new JMenuItem("Synergies (O)");
-        manageAbilities = new JMenuItem("Abilities (C)");
-        manageDynasty = new JMenuItem("Dynasty (A)");
-        manageTrade = new JMenuItem("Trade Routes (S)");
-
-        JMenuItem openSettings = new JMenuItem("Settings");
-        JMenuItem showTutorial = new JMenuItem("Show Tutorial");
-        JMenuItem quitToMenu = new JMenuItem("Quit to Main Menu");
 
         backToGame.addActionListener(e -> gameMenu.setVisible(false));
         toggleView.addActionListener(e -> toggleViewCallback.run());
@@ -219,28 +253,7 @@ public class ControlPanel extends ZeroGamePanel {
         manageTrade.setVisible(false);
         
         openSettings.addActionListener(e -> {
-            Engine engine = frame.getEngine();
-            if (engine != null) {
-                engine.pauseEngine();
-            }
-            if (frame.getGamePanel() != null) {
-                frame.getGamePanel().updateStatusIndicator(true);
-                playPauseButton.setText("Play");
-            }
-
-            try {
-                SaveManager sm = new SaveManager();
-                if (engine != null && engine.getWorld() != null) {
-                    sm.saveAutosaveAsync(engine.getWorld(), engine, () -> {
-                        frame.showCard(MainFrame.CARD_SETTINGS);
-                    });
-                } else {
-                    frame.showCard(MainFrame.CARD_SETTINGS);
-                }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                frame.showCard(MainFrame.CARD_SETTINGS);
-            }
+            showSettingsDialogCallback.run();
         });
         
         showTutorial.addActionListener(e -> HelpPanel.showTutorialDialog(frame));
@@ -433,14 +446,14 @@ public class ControlPanel extends ZeroGamePanel {
 
     public void updateTickLabel(Engine eng) {
         if (eng == null) {
-            tickLabel.setText("Tick: -");
+            tickLabel.setText("-");
             return;
         }
-        tickLabel.setText("Tick: " + (long) eng.getDelay() + "ms");
+        tickLabel.setText(eng.getSpeed().getLabel());
     }
     
     public void setPlayPauseButtonText(boolean isPaused) {
-        playPauseButton.setText(isPaused ? "Play" : "Pause");
+        playPauseButton.setText(isPaused ? LanguageStrings.get(LanguageStrings.UI_PLAY) : LanguageStrings.get(LanguageStrings.UI_PAUSE));
     }
 
     public void updateResearchMenu(boolean visible) {

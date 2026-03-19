@@ -2,6 +2,7 @@ package com.grimidk.formicempire.classes.interfaces;
 
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 
 import javax.swing.*;
 import javax.swing.event.AncestorEvent;
@@ -18,6 +19,7 @@ public class SaveSelectPanel extends JPanel {
     private final JButton[] slotButtons = new JButton[3];
     private final JButton[] deleteButtons = new JButton[3];
     private final JLabel[] slotLabels = new JLabel[3];
+    private final JButton backButton;
     
     private final Savefile[] cachedSaves = new Savefile[3];
 
@@ -31,9 +33,9 @@ public class SaveSelectPanel extends JPanel {
 
         for (int i = 0; i < 3; i++) {
             int slotId = i + 1;
-            slotLabels[i] = new JLabel("Empty slot");
-            slotButtons[i] = new JButton("Create");
-            deleteButtons[i] = new JButton("Delete");
+            slotLabels[i] = new JLabel(LanguageStrings.get(LanguageStrings.SAVE_EMPTY_SLOT));
+            slotButtons[i] = new JButton(LanguageStrings.get(LanguageStrings.UI_CREATE));
+            deleteButtons[i] = new JButton(LanguageStrings.get(LanguageStrings.UI_DELETE));
             deleteButtons[i].setVisible(false);
             
             setupNavigation(slotButtons[i]);
@@ -47,13 +49,13 @@ public class SaveSelectPanel extends JPanel {
             c.gridx = 2; add(deleteButtons[i], c);
         }
 
-        JButton back = new JButton("Back");
-        setupNavigation(back);
-        back.addActionListener(e -> {
+        backButton = new JButton(LanguageStrings.get(LanguageStrings.UI_BACK));
+        setupNavigation(backButton);
+        backButton.addActionListener(e -> {
             frame.showCard(MainFrame.CARD_INIT);
         });
 
-        c.gridx = 0; c.gridy = 4; c.gridwidth = 2; add(back, c);
+        c.gridx = 0; c.gridy = 4; c.gridwidth = 2; add(backButton, c);
 
         addAncestorListener(new AncestorListener() {
             @Override
@@ -69,6 +71,11 @@ public class SaveSelectPanel extends JPanel {
             @Override
             public void ancestorMoved(AncestorEvent event) {}
         });
+    }
+    
+    public void refreshTranslations() {
+        refreshSlots();
+        backButton.setText(LanguageStrings.get(LanguageStrings.UI_BACK));
     }
     
     private void setupNavigation(JButton button) {
@@ -97,13 +104,15 @@ public class SaveSelectPanel extends JPanel {
             cachedSaves[i] = s;
 
             if (s == null) {
-                slotLabels[i].setText("Empty slot");
-                slotButtons[i].setText("Create");
+                slotLabels[i].setText(LanguageStrings.get(LanguageStrings.SAVE_EMPTY_SLOT));
+                slotButtons[i].setText(LanguageStrings.get(LanguageStrings.UI_CREATE));
+                deleteButtons[i].setText(LanguageStrings.get(LanguageStrings.UI_DELETE));
                 deleteButtons[i].setVisible(false);
             } else {
                 int totalDays = (s.getDay() - 1) + ((s.getMonth() - 1) * 30) + (s.getYear() * 12 * 30);
-                slotLabels[i].setText(s.getName() + " — " + totalDays + " days");
-                slotButtons[i].setText("Load");
+                slotLabels[i].setText(String.format(LanguageStrings.get(LanguageStrings.SAVE_DAYS_FORMAT), s.getName(), totalDays));
+                slotButtons[i].setText(LanguageStrings.get(LanguageStrings.UI_LOAD));
+                deleteButtons[i].setText(LanguageStrings.get(LanguageStrings.UI_DELETE));
                 deleteButtons[i].setVisible(true);
             }
         }
@@ -113,7 +122,7 @@ public class SaveSelectPanel extends JPanel {
         Savefile existing = cachedSaves[idx];
         
         if (existing == null) {
-            String name = JOptionPane.showInputDialog(this, "Enter save name:", "Create Save", JOptionPane.PLAIN_MESSAGE);
+            String name = JOptionPane.showInputDialog(this, LanguageStrings.get(LanguageStrings.SAVE_ENTER_NAME), LanguageStrings.get(LanguageStrings.SAVE_CREATE_TITLE), JOptionPane.PLAIN_MESSAGE);
             if (name == null || name.trim().isEmpty()) return;
             
             Savefile save = new Savefile(slotId, name.trim());            
@@ -125,7 +134,7 @@ public class SaveSelectPanel extends JPanel {
                     HelpPanel.showTutorialDialog(frame);
                     frame.openGameWithSave(newSave); 
                 } else {
-                    JOptionPane.showMessageDialog(frame, "Failed to create new save file.", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(frame, LanguageStrings.get(LanguageStrings.SAVE_ERROR_CREATE), LanguageStrings.get(LanguageStrings.UI_ERROR), JOptionPane.ERROR_MESSAGE);
                 }
             });
         } else {
@@ -134,10 +143,10 @@ public class SaveSelectPanel extends JPanel {
     }
 
     private void onDelete(int slotId, int idx) {
-        int res = JOptionPane.showConfirmDialog(this, "Delete save in slot " + slotId + "?", "Delete Save", JOptionPane.YES_NO_OPTION);
+        int res = JOptionPane.showConfirmDialog(this, String.format(LanguageStrings.get(LanguageStrings.SAVE_DELETE_CONFIRM), slotId), LanguageStrings.get(LanguageStrings.SAVE_DELETE_TITLE), JOptionPane.YES_NO_OPTION);
         if (res != JOptionPane.YES_OPTION) return;
         boolean ok = saveManager.deleteSlot(slotId);
-        if (!ok) JOptionPane.showMessageDialog(this, "Failed to delete save (file may not exist).");
+        if (!ok) JOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.SAVE_DELETE_ERROR));
         refreshSlots();
     }
 }

@@ -11,6 +11,7 @@ import com.grimidk.formicempire.classes.infrasctructure.managers.TriggerManager;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 import com.grimidk.formicempire.classes.interfaces.game.dialogs.*;
 import com.grimidk.formicempire.classes.interfaces.game.gamepanels.*;
 
@@ -41,6 +42,7 @@ public class GamePanel extends ZeroGamePanel {
     private MapDialog mapDialog;
     private StatsDialog statsDialog; 
     private DynastyManagementDialog dynastyDialog;
+    private SettingsPanel.SettingsDialog settingsDialog;
 
     private AlertManager alertManager;
     private TriggerManager triggerManager; 
@@ -60,17 +62,20 @@ public class GamePanel extends ZeroGamePanel {
         initControlPanelCallbacks();
         initLayout();        
         updateStatusIndicator(false);
+        
+        LanguageStrings.addListener(this::refreshTranslations);
     }
 
     @Override
     protected void initComponents() {
-        statusLabel = new JLabel("Game not started");
+        statusLabel = new JLabel(LanguageStrings.get(LanguageStrings.UI_NOT_STARTED));
         statusIndicator = new JLabel();
         
         colonyPanel = new ColonyPanel();
         worldPanel = new WorldPanel();
         alertPanel = new AlertPanel();
         gameAreaPanel = new GameAreaPanel();
+        gameAreaPanel.setEngine(frame.getEngine());
         
         gameScrollPane = new JScrollPane(gameAreaPanel);
         gameScrollPane.setBorder(null);
@@ -89,6 +94,27 @@ public class GamePanel extends ZeroGamePanel {
         });
     }
     
+    @Override
+    public void refreshTranslations() {
+        updateStatusIndicator(frame.getEngine().isPaused());
+        
+        // Refresh subpanels
+        worldPanel.refreshTranslations();
+        colonyPanel.refreshTranslations();
+        alertPanel.refreshTranslations();
+        controlPanel.refreshTranslations();
+        
+        // Refresh open dialogs
+        if (hatchDialog != null && hatchDialog.isShowing()) hatchDialog.refreshTranslations();
+        if (roleDialog != null && roleDialog.isShowing()) roleDialog.refreshTranslations();
+        if (upgradeDialog != null && upgradeDialog.isShowing()) upgradeDialog.refreshTranslations();
+        if (abilitiesDialog != null && abilitiesDialog.isShowing()) abilitiesDialog.refreshTranslations();
+        if (mapDialog != null && mapDialog.isShowing()) mapDialog.refreshTranslations();
+        if (statsDialog != null && statsDialog.isShowing()) statsDialog.refreshTranslations();
+        if (dynastyDialog != null && dynastyDialog.isShowing()) dynastyDialog.refreshTranslations();
+        if (settingsDialog != null && settingsDialog.isShowing()) settingsDialog.refreshDialog();
+    }
+    
     private void initControlPanelCallbacks() {
         Runnable handleBackButtonCallback = this::handleBackButton;
         Runnable showHatchRateDialogCallback = this::showHatchRateDialog;        
@@ -101,6 +127,7 @@ public class GamePanel extends ZeroGamePanel {
         Runnable showStatsDialogCallback = this::showStatsDialog;
         Runnable showDynastyDialogCallback = this::showDynastyDialog;
         Runnable showTradeDialogCallback = this::showTradeDialog;
+        Runnable showSettingsDialogCallback = this::showSettingsDialog;
         ControlPanel.RoleManagementCallback showRoleManagementDialogCallback = this::showRoleManagementDialog;
         
         Runnable toggleViewCallback = () -> {
@@ -128,7 +155,8 @@ public class GamePanel extends ZeroGamePanel {
             toggleViewCallback,
             showMapDialogCallback,
             showDynastyDialogCallback,
-            showTradeDialogCallback); 
+            showTradeDialogCallback,
+            showSettingsDialogCallback); 
     }
     
     private void updateGameAreaSize() {
@@ -432,6 +460,23 @@ public class GamePanel extends ZeroGamePanel {
         dynastyDialog.showDialog(DynastyManagementDialog.TAB_TRADE);
     }
 
+    private void showSettingsDialog() {
+        Engine engine = frame.getEngine();
+        if (engine == null) return;
+
+        if (settingsDialog != null && settingsDialog.isShowing()) {
+            settingsDialog.dispose();
+            return;
+        }
+
+        if (settingsDialog != null) {
+            settingsDialog.dispose();
+        }
+
+        settingsDialog = new SettingsPanel.SettingsDialog(frame, engine);
+        settingsDialog.showDialog();
+    }
+
     private void handleGoToColony(Colony target) {
         Engine engine = frame.getEngine();
         if (engine == null || engine.getWorld() == null) return;
@@ -473,6 +518,7 @@ public class GamePanel extends ZeroGamePanel {
         if (mapDialog != null) { mapDialog.dispose(); mapDialog = null; }
         if (statsDialog != null) { statsDialog.dispose(); statsDialog = null; }
         if (dynastyDialog != null) { dynastyDialog.dispose(); dynastyDialog = null; }
+        if (settingsDialog != null) { settingsDialog.dispose(); settingsDialog = null; }
     }
 
     private void cleanupSession() {
@@ -495,7 +541,7 @@ public class GamePanel extends ZeroGamePanel {
         
         this.triggerManager = null; 
         this.engineStarted = false;
-        statusLabel.setText("Game not started");
+        statusLabel.setText(LanguageStrings.get(LanguageStrings.UI_NOT_STARTED));
     }
 
     private void handleBackButton() {
@@ -537,7 +583,7 @@ public class GamePanel extends ZeroGamePanel {
     }
 
     public void enterWithSavefile(Savefile savefile) {
-        statusLabel.setText("Starting game...");
+        statusLabel.setText(LanguageStrings.get(LanguageStrings.UI_STARTING));
         Engine engine = frame.getEngine();
         
         JDialog loadingDialog = new JDialog(frame, "Loading", true);
@@ -545,10 +591,10 @@ public class GamePanel extends ZeroGamePanel {
         loadingDialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBorder(BorderFactory.createLineBorder(AssetStyles.BACKGROUND_SECONDARY, 2));
+        panel.setBorder(BorderFactory.createLineBorder(AssetStyles.BORDER_COLOR, AssetStyles.BORDER_THICKNESS_EXTERNAL));
         panel.setBackground(AssetStyles.BACKGROUND_DARK);
 
-        JLabel label = new JLabel("Loading game, please wait...", SwingConstants.CENTER);
+        JLabel label = new JLabel(LanguageStrings.get(LanguageStrings.UI_LOADING_WAIT), SwingConstants.CENTER);
         label.setForeground(AssetStyles.FONT_COLOR_BRIGHT);
         label.setBorder(BorderFactory.createEmptyBorder(30, 60, 30, 60));
 
@@ -569,7 +615,7 @@ public class GamePanel extends ZeroGamePanel {
                 loadingDialog.dispose();
                 try {
                     get();
-                    statusLabel.setText("Game started");
+                    statusLabel.setText(LanguageStrings.get(LanguageStrings.UI_RUNNING));
                     registerTickListeners(); 
                     
                     World world = engine.getWorld();
@@ -603,7 +649,7 @@ public class GamePanel extends ZeroGamePanel {
                     
                 } catch (Exception e) {
                     e.printStackTrace();
-                    statusLabel.setText("Error loading game!");
+                    statusLabel.setText(LanguageStrings.get(LanguageStrings.UI_ERROR_LOADING));
                 }
             }
         };
@@ -647,15 +693,15 @@ public class GamePanel extends ZeroGamePanel {
     public void updateStatusIndicator(boolean paused) {
         if (!engineStarted) {
             statusIndicator.setBackground(AssetStyles.BACKGROUND_SECONDARY);
-            statusLabel.setText("Game not started");
+            statusLabel.setText(LanguageStrings.get(LanguageStrings.UI_NOT_STARTED));
             return;
         }
         if (paused) {
             statusIndicator.setBackground(AssetStyles.FONT_COLOR_WARNING);
-            statusLabel.setText("Paused");
+            statusLabel.setText(LanguageStrings.get(LanguageStrings.UI_PAUSED_TICK));
         } else {
             statusIndicator.setBackground(AssetStyles.FONT_COLOR_SUCCESS);
-            statusLabel.setText("Running");
+            statusLabel.setText(LanguageStrings.get(LanguageStrings.UI_RUNNING));
         }
     }
 

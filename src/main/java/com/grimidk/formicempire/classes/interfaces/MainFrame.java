@@ -8,9 +8,13 @@ import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TriggerManager;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
 
 public class MainFrame extends JFrame implements TriggerManager.TriggerListener {
     public static final String CARD_INIT = "INIT";
@@ -25,6 +29,8 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
     private final GamePanel gamePanel;
     private final SaveSelectPanel saveSelectPanel;
     private final SettingsPanel settingsPanel;
+    private final InitPanel initPanel;
+    private final HelpPanel helpPanel;
 
     private Cursor cursorNormal;
     private Cursor cursorClick;
@@ -50,20 +56,22 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
     }
 
     public MainFrame(Engine engine) {
-        super("Formic Empire");
+        super(LanguageStrings.get(LanguageStrings.UI_APP_TITLE));
+        this.engine = engine;
+        
         Image icon = AssetStyles.loadImage("/icon.ico");
         if (icon != null) {
             setIconImage(icon);
         }
-        this.engine = engine;
+        
         this.cardLayout = new CardLayout();
         this.cards = new JPanel(cardLayout);
 
         initCursors();
 
-        InitPanel initPanel = new InitPanel(this);
+        this.initPanel = new InitPanel(this);
         this.saveSelectPanel = new SaveSelectPanel(this);
-        HelpPanel helpPanel = new HelpPanel(this);
+        this.helpPanel = new HelpPanel(this);
         this.settingsPanel = new SettingsPanel(this);
         this.gamePanel = new GamePanel(this);
 
@@ -76,9 +84,57 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(cards, BorderLayout.CENTER);
 
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        // --- Window Listeners ---
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                handleExit();
+            }
+        });
         
+        addWindowFocusListener(new WindowFocusListener() {
+            @Override
+            public void windowGainedFocus(WindowEvent e) {
+                if (engine.isPauseOnFocusLoss() && gamePanel.isEngineStarted() && engine.isPaused()) {
+                    engine.resumeEngine();
+                    gamePanel.updateStatusIndicator(false);
+                }
+            }
+
+            @Override
+            public void windowLostFocus(WindowEvent e) {
+                if (engine.isPauseOnFocusLoss() && gamePanel.isEngineStarted() && !engine.isPaused()) {
+                    engine.pauseEngine();
+                    gamePanel.updateStatusIndicator(true);
+                }
+            }
+        });
+
         applyEngineSettings();
+        
+        LanguageStrings.addListener(this::refreshTranslations);
+    }
+    
+    private void handleExit() {
+        if (engine.isConfirmOnQuit()) {
+            int res = JOptionPane.showConfirmDialog(this, 
+                LanguageStrings.get("UI_CONFIRM_EXIT_MSG"), 
+                LanguageStrings.get("UI_CONFIRM_EXIT_TITLE"), 
+                JOptionPane.YES_NO_OPTION);
+            if (res == JOptionPane.YES_OPTION) {
+                System.exit(0);
+            }
+        } else {
+            System.exit(0);
+        }
+    }
+    
+    private void refreshTranslations() {
+        setTitle(LanguageStrings.get(LanguageStrings.UI_APP_TITLE));
+        saveSelectPanel.refreshTranslations();
+        initPanel.refreshTranslations();
+        helpPanel.refreshTranslations();
     }
 
     private void initCursors() {
@@ -128,6 +184,8 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
             setLocationRelativeTo(null);
             setVisible(true);
         }
+        
+        ToolTipManager.sharedInstance().setEnabled(engine.isShowTooltips());
     }
 
     public void showCard(String card) {
@@ -175,9 +233,9 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         engine.pauseEngine();
         if (gamePanel != null) gamePanel.updateStatusIndicator(true);
 
-        String[] options = {"Reload Last Save", "Go to Main Menu"};
-        String title = "Your Colony Has Perished";
-        String message = "Your last queen has died, and the colony cannot continue.\nWhat would you like to do?";
+        String[] options = {LanguageStrings.get(LanguageStrings.DEATH_OPTIONS_RELOAD), LanguageStrings.get(LanguageStrings.DEATH_OPTIONS_MENU)};
+        String title = LanguageStrings.get(LanguageStrings.DEATH_TITLE);
+        String message = LanguageStrings.get(LanguageStrings.DEATH_MESSAGE);
 
         int choice = JOptionPane.showOptionDialog(
                 this,
@@ -194,7 +252,7 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
             int slotId = (engine.getWorld() != null) ? engine.getWorld().getSaveSlotId() : 0;
             
             if (slotId == 0) {
-                JOptionPane.showMessageDialog(this, "This was a new game with no save file. Returning to main menu.", "Load Failed", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.DEATH_LOAD_FAILED_NEW_GAME), LanguageStrings.get(LanguageStrings.DEATH_LOAD_FAILED_TITLE), JOptionPane.ERROR_MESSAGE);
                 handleQuitToMenu();
             } else {
                 SaveManager sm = new SaveManager();
@@ -203,7 +261,7 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
                 if (saveToLoad != null) {
                     openGameWithSave(saveToLoad);
                 } else {
-                    JOptionPane.showMessageDialog(this, "No autosave found for this slot. Returning to main menu.", "Load Failed", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.DEATH_LOAD_FAILED_NO_AUTOSAVE), LanguageStrings.get(LanguageStrings.DEATH_LOAD_FAILED_TITLE), JOptionPane.ERROR_MESSAGE);
                     handleQuitToMenu();
                 }
             }

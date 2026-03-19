@@ -11,9 +11,7 @@ To Fix (By decreasing priority) :
 	(none right now)
 
 	Mid:
-	map legend
-	pause/play in dialogs
-	colnies in water biome
+	(none right now)
 
 	Low:
 	breeders go out of the colony in nuptial
@@ -26,34 +24,32 @@ To Fix (By decreasing priority) :
 To Feature (to be done in order):
 Needed for launch (v1.0) (Launch Version):
 	Priority:
-	genetic stagnation (obscured until below (80%)) every nuptial, assimilation gives base 5% after cloning (unlocked after empire rank), alliances can increase while allied, stagnation = success chance to spread and drones from assimilated
 	font
+	ant speed and biome depletion and further located sources take more time and sustainability of biome, source sprites by size
+	auxiliary room sprites (storage (resources), farm (shroom), nurse (bedding), royal (nests and science))
 
 	Everything else :
-	ant speed and biome depletion and further located sources take more time and sustainability of biome 
-	auxiliary room sprites (storage (resources), farm (shroom), nurse (bedding), royal (nests and science))
-	more settings (allow idle to forage, allow unassigned, choose default, fuzzed parasites, arachnophobia mode ?)
-	automate NPC to spread
-	diplomacy and diplomatic reputation (own and xeno colonies) and alliances (non-aggression pacts) and wars 
-	rebellions and rebel colonies
+	more settings (choose default, fuzzed parasites)
+	automate NPC to trade and tunnel
+	diplomacy and diplomatic reputation (own and xeno colonies) and alliances (non-aggression pacts) and wars, alliances can increase while allied genetic integrity
+	rebellions and rebel colonies (internal rebeliousness stat, too much causes a rebellious dynasty to appear, once capital defeated it gets reabsorbed)
 	diplo dialog with stance options (neutral, aggressive, peaceful)
-	battle system (mass battle in land and air)
+	battle system (mass battle in land and air, tick based loses based on active/passive military strenght from 1:1 = 50% chance and 1% loses up to 1:10 100% chance and 100% loses, 2 staged war until the queens are dead)
 	assimilations ( Trap-jaw (Trap jaw ants), Honey-pot (Honey pot ants), Door-head (Turtle ants), Wood burrowing (Carpenter ants), Silk weaving (Weaver ants), Rafting (Flood plains ants), Fire venom (Fire ants), Jumping (Jet ants), Gliding (Gliding ants), Stinging (Bullet ants), Swarming (Army ants), Stealth (Ghost ants), Fast bitting (Dracula ants), Heat resistance (Saharan silver ants), Deadly venom (Harvester ants), Self destruction (Exploding ants), Far sight (Bulldog ants), Hive building (Shining black ants), Location sensing (Desert ants))
 	ant subtypes (enable by role /  exclusion) checks with new sprites 
 	revamp story and lore and maybe intro screen
 	more socialism (?)
-	visual filters for weather, time of day, biome etc.
 	research tree
 	building tree
 	minerals
 	synergies ( Super majors + Chemical throwing = Artillery ants; Self destruction + Acid spitting = Corrosive bombs; Silk weaving + Hive building = Web building; Air-force ants + self destruction = Air-bomber ants)
-	icons for all constants and unlocks
+	icons for all constants and unlocks (roles, move and trade methods, upgrades, buildings, assimilations,  synergies)
 	more upgrades
 	more buildings
 	more roles (commander and captain roles, air force)
-	more enemies ( Rebel ant colonies, Bugs, Arachnids, Reptiles, Birds, Rodents, Zombie ant colonies, Parasitic ants)
+	more enemies ( Rebel ant colonies, Bugs, Arachnids, Reptiles, Birds, Rodents, Zombie ant colonies)
 	more stats (kills, historic productions, graphs?)
-	more bugs (constants and icons)
+	more bugs (constants and icons and scienctific name)
 	non-ant assimilation ( Winged workers (Bees), Spiked larvae, Chemical throwing (Bombardier beetle), Chirping (Grass hopper), Diving, Mineralized exoskeletons, Rock mining, Bioluminescence (Fireflies), Static electricity generation, Pollination (Flies) )
 	rework tutorial and obscure unlocks in menus
 	rework menus and key binds and how the ui looks
@@ -63,8 +59,9 @@ Needed for launch (v1.0) (Launch Version):
 	rework manager and aux files
 	balance every upgrade
 	ant menus (detailed per ant)
-	music and sounds and settings for them
-	langs (ENG, SPA, POR, FRE, GER, RUS, CHN, JAP)
+	music and sounds and settings for them and player panel
+	promo video
+	langs (POR, FRE, GER, RUS, CHN, JAP)
 	warning screen for arthropophobia 
 	start animation and general animations
 	register Grim Games or Grimidk in steam as dev team
@@ -77,6 +74,7 @@ Post launch (v1.1) (Improvements Update):
 	console and commands for debugging 
 	native universal modding support
 	custom key bind settings for all keys
+	theme modificaciont (colors, text scale, font)
 	roadmap screen in game (use this txt)
 	global stats from all players (needs api and consent)
 	socials screen with discord server and instagram

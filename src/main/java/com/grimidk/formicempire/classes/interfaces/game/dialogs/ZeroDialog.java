@@ -1,38 +1,149 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
+import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
+import com.grimidk.formicempire.classes.interfaces.MainFrame;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
 public abstract class ZeroDialog extends JDialog {
 
     protected final JPanel southPanel;
+    private static final float[] SPEED_DELAYS = { 250f, 125f, 60f, 30f, 15f, 5f, 1f};
+    
+    private final String titleKey;
+    private final JButton closeButton;
 
-    public ZeroDialog(JFrame owner, String title, Dimension preferredSize) {
-        super(owner, title, true);
+    public ZeroDialog(JFrame owner, String titleKey, Dimension preferredSize) {
+        super(owner, LanguageStrings.get(titleKey), true);
+        this.titleKey = titleKey;
         
         getContentPane().setBackground(AssetStyles.UI_BG_PRIMARY);
         setLayout(new BorderLayout());
-        if (preferredSize != null) {
-            setPreferredSize(preferredSize);
-        }
+        
+        Dimension size = (preferredSize != null) ? preferredSize : AssetStyles.DEFAULT_DIALOG_SIZE;
+        setPreferredSize(size);
 
         southPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         southPanel.setBackground(AssetStyles.UI_BG_SECONDARY);
         
-        JButton closeButton = new JButton("Close");
+        closeButton = new JButton(LanguageStrings.get(LanguageStrings.UI_CLOSE));
         closeButton.setFont(AssetStyles.FONT_NORMAL);
+        closeButton.setFocusable(false);
         closeButton.addActionListener(e -> dispose());
         southPanel.add(closeButton);
         add(southPanel, BorderLayout.SOUTH);
 
+        initGlobalKeyBindings();
+
         getRootPane().registerKeyboardAction(e -> dispose(),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_IN_FOCUSED_WINDOW);
+        
+        setFocusable(true);
+    }
+    
+    public void refreshTranslations() {
+        setTitle(LanguageStrings.get(titleKey));
+        closeButton.setText(LanguageStrings.get(LanguageStrings.UI_CLOSE));
+        refreshDialog();
     }
 
+    protected void disableFocusTraversal(Container container) {
+        for (Component comp : container.getComponents()) {
+            if (comp instanceof AbstractButton || comp instanceof JComboBox || comp instanceof JSpinner || comp instanceof JList || comp instanceof JTable || comp instanceof JTabbedPane) {
+                comp.setFocusable(false);
+            }
+            if (comp instanceof Container) {
+                disableFocusTraversal((Container) comp);
+            }
+        }
+    }
+
+    private void initGlobalKeyBindings() {
+        InputMap inputMap = getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        ActionMap actionMap = getRootPane().getActionMap();
+
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0), "togglePause");
+        actionMap.put("togglePause", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Engine engine = getEngine();
+                if (engine == null) return;
+                if (engine.isPaused()) {
+                    engine.resumeEngine();
+                } else {
+                    engine.pauseEngine();
+                }
+                syncWithMainControlPanel();
+            }
+        });
+
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ADD, 0), "speedUp");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, InputEvent.SHIFT_DOWN_MASK), "speedUp");
+        actionMap.put("speedUp", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                adjustSpeed(1);
+                syncWithMainControlPanel();
+            }
+        });
+
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_SUBTRACT, 0), "speedDown");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, 0), "speedDown");
+        actionMap.put("speedDown", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                adjustSpeed(-1);
+                syncWithMainControlPanel();
+            }
+        });
+    }
+
+    private void adjustSpeed(int delta) {
+        Engine engine = getEngine();
+        if (engine == null) return;
+
+        float currentDelay = engine.getDelay();
+        int currentIndex = 0;
+        for (int i = 0; i < SPEED_DELAYS.length; i++) {
+            if (Math.abs(SPEED_DELAYS[i] - currentDelay) < 0.1) {
+                currentIndex = i;
+                break;
+            }
+        }
+
+        int newIndex = currentIndex + delta;
+        if (newIndex >= 0 && newIndex < SPEED_DELAYS.length) {
+            engine.setDelay(SPEED_DELAYS[newIndex]);
+            if (engine.isPaused()) engine.resumeEngine();
+        }
+    }
+
+    private void syncWithMainControlPanel() {
+        if (getOwner() instanceof MainFrame frame) {
+            if (frame.getGamePanel() != null) {
+                frame.getGamePanel().refreshAllGUIData();
+                
+                Engine engine = frame.getEngine();
+                if (engine != null) {
+                    frame.getGamePanel().updateStatusIndicator(engine.isPaused());
+                }
+            }
+        }
+    }
+
+    private Engine getEngine() {
+        if (getOwner() instanceof MainFrame frame) {
+            return frame.getEngine();
+        }
+        return null;
+    }
 
     protected void registerCloseKey(int keyEvent) {
         getRootPane().registerKeyboardAction(e -> dispose(),
@@ -46,8 +157,26 @@ public abstract class ZeroDialog extends JDialog {
 
     public void showDialog() {
         refreshDialog();
-        pack();
-        setLocationRelativeTo(getOwner());
+
+        disableFocusTraversal(this);
+
+        Dimension size = getPreferredSize();
+        if (size == null || size.width < AssetStyles.DEFAULT_DIALOG_SIZE.width) {
+            size = AssetStyles.DEFAULT_DIALOG_SIZE;
+        }
+        setSize(size);
+
+        if (getOwner() != null && getOwner().isVisible()) {
+            Point ownerLoc = getOwner().getLocationOnScreen();
+            int x = ownerLoc.x + (getOwner().getWidth() - getWidth()) / 2;
+            int y = ownerLoc.y + 100;
+            setLocation(x, y);
+        } else {
+            setLocationRelativeTo(null);
+            Point loc = getLocation();
+            setLocation(loc.x, loc.y + 60);
+        }
+
         setVisible(true);
     }
 

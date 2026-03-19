@@ -79,6 +79,8 @@ public class Savefile implements Serializable {
         public List<Integer> completedAssimilationIds = new ArrayList<>();
         public int currentAssimilationId = -1;
         public double assimilationProgress = 0;
+        public int capitalColonyId = -1;
+        public double geneticIntegrity = 100.0;
         public Map<String, Integer> deathStatistics = new HashMap<>();
         public List<SavedTunnel> tunnels = new ArrayList<>();
     }

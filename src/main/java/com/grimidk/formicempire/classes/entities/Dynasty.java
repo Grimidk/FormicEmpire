@@ -48,6 +48,8 @@ public class Dynasty {
     private final Set<Assimilation> completedAssimilations;
     private Assimilation currentAssimilation;
     private double assimilationProgress;
+    private Colony capital;
+    private double geneticIntegrity;
 
     // Services
     private transient DynastyAutomationService automationService;
@@ -74,6 +76,7 @@ public class Dynasty {
         this.assimilationProgress = 0;
         this.defaultAutomationEnabled = false;
         this.defaultAutoBuildEnabled = false;
+        this.geneticIntegrity = 100.0;
         
         initializeColor();
         initializeServices();
@@ -89,6 +92,7 @@ public class Dynasty {
         this.assimilationProgress = savedDynasty.assimilationProgress;
         this.defaultAutomationEnabled = savedDynasty.defaultAutomationEnabled;
         this.defaultAutoBuildEnabled = savedDynasty.defaultAutoBuildEnabled;
+        this.geneticIntegrity = savedDynasty.geneticIntegrity;
         
         this.species = GameConstants.SPECIES_OMNI; 
         for(Species s : GameConstants.getSpecies()) {
@@ -200,6 +204,8 @@ public class Dynasty {
     private void rankUp() {
         int total = this.statService.getTotalPopulation(this);
         
+        ColonyRank oldRank = this.rank;
+        
         if (total >= GameConstants.RANK_GIGA.getPopulation()) this.rank = GameConstants.RANK_GIGA;
         else if (total >= GameConstants.RANK_SUPREME.getPopulation()) this.rank = GameConstants.RANK_SUPREME;
         else if (total >= GameConstants.RANK_ULTIMATE.getPopulation()) this.rank = GameConstants.RANK_ULTIMATE;
@@ -229,6 +235,9 @@ public class Dynasty {
 
     public void removeColony(Colony colony) {
         colonies.remove(colony);
+        if (capital == colony) {
+            capital = null;
+        }
         rankUp();
     }
     
@@ -246,6 +255,9 @@ public class Dynasty {
     
     public void incrementNuptialFlights() {
         this.totalNuptialFlights++;
+        
+        this.geneticIntegrity = Math.max(0.0, this.geneticIntegrity - 1.0);
+        
         if (this.totalNuptialFlights >= 10 && !hasUpgrade(GameUnlocks.ABILITY_MASS_FLIGHT)) {
             unlockUpgrade(GameUnlocks.ABILITY_MASS_FLIGHT);
         }
@@ -307,16 +319,14 @@ public class Dynasty {
     }
 
     public Colony getCapital() {
-        return colonies.stream()
-            .filter(Colony::isCapital)
-            .findFirst()
-            .orElse(null);
+        return capital;
     }
 
     public void setCapital(Colony colony) {
         if (colony != null && !colonies.contains(colony)) {
             addColony(colony);
         }
+        this.capital = colony;
         for (Colony c : colonies) {
             c.setCapital(c == colony);
         }
@@ -365,7 +375,15 @@ public class Dynasty {
 
     public Set<Assimilation> getCompletedAssimilations() { return completedAssimilations; }
     public boolean isAssimilationCompleted(Assimilation a) { return completedAssimilations.contains(a); }
-    public void completeAssimilation(Assimilation a) { completedAssimilations.add(a); }
+    
+    public void completeAssimilation(Assimilation a) { 
+        if (!completedAssimilations.contains(a)) {
+            completedAssimilations.add(a);
+            if (hasUpgrade(GameUnlocks.ABILITY_CLONING)) {
+                this.geneticIntegrity = Math.min(100.0, this.geneticIntegrity + 5.0);
+            }
+        }
+    }
 
     public Assimilation getCurrentAssimilation() { return currentAssimilation; }
     public void setCurrentAssimilation(Assimilation a) { this.currentAssimilation = a; }
@@ -377,5 +395,20 @@ public class Dynasty {
     
     public DynastyStarterService getStarterService() { return starterService; }
     public DynastyStatService getStatService() { return statService; }
+
+    public double getMinGeneticIntegrity() {
+        if (hasUpgrade(GameUnlocks.ABILITY_CLONING)) {
+            return Math.min(100.0, completedAssimilations.size() * 5.0);
+        }
+        return 0.0;
+    }
+
+    public double getGeneticIntegrity() { 
+        return Math.max(getMinGeneticIntegrity(), geneticIntegrity); 
+    }
+    
+    public void setGeneticIntegrity(double geneticIntegrity) { 
+        this.geneticIntegrity = Math.max(getMinGeneticIntegrity(), geneticIntegrity); 
+    }
 
 }

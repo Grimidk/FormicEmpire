@@ -5,6 +5,7 @@ import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,21 +19,28 @@ public class HatchRateDialog extends ZeroDialog {
 
     private final Colony colony;
     private final Map<AntType, JSpinner> spinnerMap = new HashMap<>();
-    private final JLabel totalLabel = new JLabel("Total: 100.0%");
+    private final JLabel totalLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.HATCH_TOTAL), 100.0f));
     private final JPanel centerPanel;
     
     private boolean isAdjusting = false;
 
     public HatchRateDialog(JFrame owner, Colony colony) {
-        super(owner, "Manage Pupa Hatch Rates", new Dimension(400, 350));
+        super(owner, LanguageStrings.DIALOG_HATCH_RATES_TITLE, AssetStyles.DEFAULT_DIALOG_SIZE);
         this.colony = colony;
         
+        JPanel outer = new JPanel(new GridBagLayout());
+        outer.setBackground(AssetStyles.BACKGROUND_COLOR);
+
         centerPanel = new JPanel();
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
-        centerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        centerPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        centerPanel.setBorder(BorderFactory.createCompoundBorder(
+            AssetStyles.PANEL_BORDER,
+            BorderFactory.createEmptyBorder(20, 20, 20, 20)
+        ));
+        centerPanel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
         
-        add(centerPanel, BorderLayout.CENTER);
+        outer.add(centerPanel);
+        add(outer, BorderLayout.CENTER);
         
         registerCloseKey(KeyEvent.VK_P);
     }
@@ -53,12 +61,12 @@ public class HatchRateDialog extends ZeroDialog {
         totalLabel.setFont(AssetStyles.FONT_BOLD);
         totalLabel.setForeground(AssetStyles.FONT_COLOR);
         
-        JLabel descLabel = new JLabel("Set hatch chance for new ants:");
+        JLabel descLabel = new JLabel(LanguageStrings.get(LanguageStrings.HATCH_DESC));
         descLabel.setForeground(AssetStyles.FONT_COLOR);
         
         centerPanel.add(descLabel);
         centerPanel.add(totalLabel);
-        centerPanel.add(new JSeparator(SwingConstants.HORIZONTAL));
+        centerPanel.add(AssetStyles.createInternalSeparator());
         
         List<AntType> typesToRate = new ArrayList<>();
         if (colony.hasUpgrade(GameUnlocks.TYPE_WORKER)) typesToRate.add(GameConstants.TYPE_WORKER);
@@ -173,14 +181,14 @@ public class HatchRateDialog extends ZeroDialog {
             totalAssigned += (Double) s.getValue();
         }
         
-        totalLabel.setText(String.format("Total: %.1f%%", totalAssigned));
+        totalLabel.setText(String.format(LanguageStrings.get(LanguageStrings.HATCH_TOTAL), totalAssigned));
         
         if (Math.abs(100.0 - totalAssigned) > 0.1) { 
             totalLabel.setForeground(AssetStyles.FONT_COLOR_ERROR);
-            totalLabel.setToolTipText(String.format("Warning: Total is not 100%%."));
+            totalLabel.setToolTipText(LanguageStrings.get(LanguageStrings.HATCH_WARNING_TOTAL));
         } else {
             totalLabel.setForeground(AssetStyles.FONT_COLOR);
-            totalLabel.setToolTipText("Total is 100%");
+            totalLabel.setToolTipText(LanguageStrings.get(LanguageStrings.HATCH_TOTAL_OK));
         }
     }
 }

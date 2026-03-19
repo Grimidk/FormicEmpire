@@ -7,38 +7,46 @@ import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MapDialog extends ZeroDialog {
 
     private final World world;
     private final HexMapPanel mapPanel;
+    private final LegendPanel legendPanel;
     private final JButton homeButton;
     private final JButton closeButton;
     private final Runnable onHexChange;
 
     public MapDialog(JFrame owner, World world, Runnable onHexChange) {
-        super(owner, "World Map", new Dimension(1000, 800));
+        super(owner, LanguageStrings.DIALOG_MAP_TITLE, AssetStyles.DEFAULT_DIALOG_SIZE);
         this.world = world;
         this.onHexChange = onHexChange;
 
         // --- Main Map Panel ---
         this.mapPanel = new HexMapPanel();
         
+        // --- Legend Panel ---
+        this.legendPanel = new LegendPanel();
+        
         // --- Buttons ---
-        homeButton = new JButton("Center on Home");
+        homeButton = new JButton(LanguageStrings.get(LanguageStrings.MAP_HOME_BUTTON));
         homeButton.setFocusable(false);
         homeButton.addActionListener(e -> travelToHomeHex());
 
-        closeButton = new JButton("Close");
+        closeButton = new JButton(LanguageStrings.get(LanguageStrings.UI_CLOSE));
         closeButton.setFocusable(false);
         closeButton.addActionListener(e -> dispose());
 
@@ -47,6 +55,7 @@ public class MapDialog extends ZeroDialog {
         bottomPanel.add(homeButton);
         bottomPanel.add(closeButton);
 
+        add(legendPanel, BorderLayout.WEST);
         add(mapPanel, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
 
@@ -58,6 +67,19 @@ public class MapDialog extends ZeroDialog {
         Hex homeHex = world.getSpawnHex();
         if (homeHex != null) {
             changeHex(homeHex);
+        }
+    }
+
+    private void selectHex(Hex newHex) {
+        if (newHex == null) return;
+        world.changeActiveHex(newHex);
+        
+        if (onHexChange != null) {
+            onHexChange.run();
+        }
+        
+        if (mapPanel != null) {
+            mapPanel.repaint();
         }
     }
 
@@ -76,6 +98,127 @@ public class MapDialog extends ZeroDialog {
         if (mapPanel != null) {
             mapPanel.repaint();
         }
+        if (legendPanel != null) {
+            legendPanel.updateLegend();
+        }
+    }
+
+    private class LegendPanel extends JPanel {
+        private final JPanel content;
+
+        public LegendPanel() {
+            setLayout(new BorderLayout());
+            setBackground(AssetStyles.BACKGROUND_COLOR);
+            setPreferredSize(new Dimension(220, 0));
+            setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, AssetStyles.BORDER_COLOR));
+
+            JLabel title = new JLabel(LanguageStrings.get(LanguageStrings.MAP_LEGEND_TITLE), SwingConstants.CENTER);
+            title.setFont(AssetStyles.FONT_BOLD);
+            title.setForeground(AssetStyles.FONT_COLOR_HEADER);
+            title.setBorder(new EmptyBorder(10, 5, 10, 5));
+            add(title, BorderLayout.NORTH);
+
+            content = new JPanel();
+            content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
+            content.setBackground(AssetStyles.BACKGROUND_COLOR);
+            content.setBorder(new EmptyBorder(5, 10, 5, 5));
+            
+            JScrollPane scroll = new JScrollPane(content);
+            scroll.setBorder(null);
+            scroll.setOpaque(false);
+            scroll.getViewport().setOpaque(false);
+            add(scroll, BorderLayout.CENTER);
+
+            updateLegend();
+        }
+
+        public void updateLegend() {
+            content.removeAll();
+            if (world == null || world.getHexes() == null) return;
+
+            Map<Integer, Dynasty> activeDynastiesMap = new HashMap<>();
+            for (Hex h : world.getHexes()) {
+                if (h.getColony() != null && h.getColony().getDynasty() != null) {
+                    Dynasty d = h.getColony().getDynasty();
+                    activeDynastiesMap.put(d.getId(), d);
+                }
+            }
+
+            List<Dynasty> sortedDynasties = new ArrayList<>(activeDynastiesMap.values());
+            sortedDynasties.sort((d1, d2) -> {
+                int p1 = d1.getStatService().getTotalPopulation(d1);
+                int p2 = d2.getStatService().getTotalPopulation(d2);
+                return Integer.compare(p2, p1);
+            });
+
+            for (Dynasty d : sortedDynasties) {
+                JPanel item = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 2));
+                item.setOpaque(false);
+                item.setAlignmentX(Component.LEFT_ALIGNMENT);
+                item.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                item.setToolTipText(String.format(LanguageStrings.get(LanguageStrings.MAP_CLICK_VIEW_CAPITAL), d.getName()));
+
+                item.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        Colony capital = d.getCapital();
+                        if (capital != null) {
+                            Hex capitalHex = world.getHexOfColony(capital);
+                            if (capitalHex != null) {
+                                selectHex(capitalHex);
+                            }
+                        }
+                    }
+                    @Override
+                    public void mouseEntered(MouseEvent e) {
+                        item.setOpaque(true);
+                        item.setBackground(AssetStyles.BACKGROUND_SECONDARY);
+                        item.repaint();
+                    }
+                    @Override
+                    public void mouseExited(MouseEvent e) {
+                        item.setOpaque(false);
+                        item.repaint();
+                    }
+                });
+
+                // Color box
+                JPanel colorBox = new JPanel();
+                colorBox.setPreferredSize(new Dimension(12, 12));
+                colorBox.setBackground(d.getColor());
+                colorBox.setBorder(BorderFactory.createLineBorder(AssetStyles.COLOR_ABSOLUTE_BLACK, 1));
+                item.add(colorBox);
+
+                // Species icon
+                if (d.getSpecies() != null && d.getSpecies().getIcon() != null) {
+                    JLabel icon = new JLabel(d.getSpecies().getIcon());
+                    item.add(icon);
+                }
+
+                // Name
+                String nameStr = d.getName();
+                if (d.isPlayer()) {
+                    nameStr += LanguageStrings.get(LanguageStrings.MAP_YOU_PLAYER);
+                }
+                JLabel name = new JLabel(nameStr);
+                name.setFont(AssetStyles.FONT_SMALL);
+                name.setForeground(AssetStyles.FONT_COLOR);
+                if (d.isPlayer()) {
+                    name.setFont(AssetStyles.FONT_BOLD.deriveFont(10f));
+                }
+                
+                int pop = d.getStatService().getTotalPopulation(d);
+                name.setToolTipText(String.format(LanguageStrings.get(LanguageStrings.MAP_POPULATION_FORMAT), pop));
+                
+                item.add(name);
+
+                content.add(item);
+                content.add(Box.createRigidArea(new Dimension(0, 2)));
+            }
+
+            content.revalidate();
+            content.repaint();
+        }
     }
 
     private class HexMapPanel extends JPanel {
@@ -88,7 +231,7 @@ public class MapDialog extends ZeroDialog {
         };
 
         public HexMapPanel() {
-            setBackground(AssetStyles.BACKGROUND_LIGHT);
+            setBackground(AssetStyles.BACKGROUND_COLOR);
             ToolTipManager.sharedInstance().registerComponent(this);
 
             addMouseListener(new MouseAdapter() {
@@ -131,21 +274,21 @@ public class MapDialog extends ZeroDialog {
                     StringBuilder sb = new StringBuilder("<html>");
                     
                     if (hex.getBiome() != null) {
-                        sb.append("<b>Biome:</b> ").append(hex.getBiome().getName());
+                        sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_BIOME)).append(hex.getBiome().getName());
                     } else {
-                        sb.append("<b>Biome:</b> Unknown");
+                        sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_BIOME)).append(LanguageStrings.get(LanguageStrings.STAT_UNKNOWN));
                     }
                     
                     Colony c = hex.getColony();
                     if (c != null) {
                         if (c.getRank() != null) {
-                            sb.append("<br><b>Rank:</b> ").append(c.getRank().getName());
+                            sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_RANK)).append(c.getRank().getName());
                         }
                         
                         if (c.getSpecies() != null) {
-                            sb.append("<br><b>Species:</b> ").append(c.getSpecies().getName());
+                            sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_SPECIES)).append(c.getSpecies().getName());
                         } else {
-                            sb.append("<br><b>Species:</b> Unknown");
+                            sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_SPECIES)).append(LanguageStrings.get(LanguageStrings.STAT_UNKNOWN));
                         }
                         
                         if (c.getName() != null) {
@@ -154,13 +297,13 @@ public class MapDialog extends ZeroDialog {
 
                         Dynasty dynasty = c.getDynasty();
                         if (dynasty != null) {
-                            sb.append("<br><b>Dynasty:</b> ").append(dynasty.getName());
+                            sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_DYNASTY)).append(dynasty.getName());
                             if (dynasty.getRank() != null) {
-                                sb.append("<br><b>Dynasty Rank:</b> ").append(dynasty.getRank().getName());
+                                sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_DYNASTY_RANK)).append(dynasty.getRank().getName());
                             }
                         }
                     } else {
-                        sb.append("<br><i>Empty</i>");
+                        sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_EMPTY));
                     }
                     
                     sb.append("</html>");
@@ -234,7 +377,7 @@ public class MapDialog extends ZeroDialog {
                 }
                 
                 if (hex != world.getActiveHex()) {
-                    fillColor = fadeToWhite(fillColor, 0.4f); 
+                    fillColor = fadeToBackground(fillColor, 0.4f); 
                 }
                 
                 g2d.setColor(fillColor);
@@ -402,7 +545,7 @@ public class MapDialog extends ZeroDialog {
                     }
                 }
 
-                if (count == 0) return AssetStyles.BACKGROUND_LIGHT;
+                if (count == 0) return AssetStyles.BACKGROUND_COLOR;
 
                 return new Color((int)(sumR/count), (int)(sumG/count), (int)(sumB/count));
                 
@@ -412,16 +555,18 @@ public class MapDialog extends ZeroDialog {
         }
         
         private Color lighten(Color c, float amount) {
-            int r = Math.min(255, (int)(c.getRed() + (255 - c.getRed()) * amount));
-            int g = Math.min(255, (int)(c.getGreen() + (255 - c.getGreen()) * amount));
-            int b = Math.min(255, (int)(c.getBlue() + (255 - c.getBlue()) * amount));
+            Color bg = AssetStyles.BACKGROUND_COLOR;
+            int r = Math.min(255, (int)(c.getRed() + (bg.getRed() - c.getRed()) * amount));
+            int g = Math.min(255, (int)(c.getGreen() + (bg.getGreen() - c.getGreen()) * amount));
+            int b = Math.min(255, (int)(c.getBlue() + (bg.getBlue() - c.getBlue()) * amount));
             return new Color(r, g, b, c.getAlpha());
         }
         
-        private Color fadeToWhite(Color c, float factor) {
-            int r = (int) (c.getRed() * (1 - factor) + 255 * factor);
-            int g = (int) (c.getGreen() * (1 - factor) + 255 * factor);
-            int b = (int) (c.getBlue() * (1 - factor) + 255 * factor);
+        private Color fadeToBackground(Color c, float factor) {
+            Color bg = AssetStyles.BACKGROUND_COLOR;
+            int r = (int) (c.getRed() * (1 - factor) + bg.getRed() * factor);
+            int g = (int) (c.getGreen() * (1 - factor) + bg.getGreen() * factor);
+            int b = (int) (c.getBlue() * (1 - factor) + bg.getBlue() * factor);
             return new Color(r, g, b);
         }
     }
