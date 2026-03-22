@@ -33,7 +33,8 @@ public class ColonyPhysicsService {
             List<Ant> antList = entry.getValue();
 
             synchronized (antList) {
-                for (Ant ant : antList) {
+                for (int i = antList.size() - 1; i >= 0; i--) {
+                    Ant ant = antList.get(i);
                     if (!ant.isAlive()) continue;
 
                     boolean isActiveDim = (ant.getDimension() == activeDimension);
@@ -133,6 +134,11 @@ public class ColonyPhysicsService {
 
     // --- AI Logic ---
     private void updateAntLogic(Colony colony, Ant ant) {
+        if (ant.isNuptial()) {
+            handleNuptialAnt(colony, ant);
+            return;
+        }
+
         if (isGatherer(ant)) {
             handleGathererLogic(colony, ant);
             return;
@@ -145,6 +151,39 @@ public class ColonyPhysicsService {
         }
     }
     
+    private void handleNuptialAnt(Colony colony, Ant ant) {
+        int gameWidth = Math.max(colony.getGameAreaWidth(), 1280);
+        int gameHeight = Math.max(colony.getGameAreaHeight(), 720);
+
+        if (ant.getDimension() == WorldSpaces.UNDERWORLD) {
+            Point exit = new Point(ANCHOR_CENTER_X, 0);
+            if (dist(ant.getX(), ant.getY(), exit.x, exit.y) < 20) {
+                ant.setDimension(WorldSpaces.OVERWORLD);
+                ant.setPosition(colony.getLocationService().getColonyEntrance(colony));
+            } else {
+                ant.moveTo(exit);
+            }
+        } else {
+            if (ant.getX() < -100 || ant.getX() > gameWidth + 100 || ant.getY() < -100 || ant.getY() > gameHeight + 100) {
+                colony.getAntsByType(ant.getAntType()).remove(ant);
+                return;
+            }
+
+            if (!ant.isMoving()) {
+                int side = (int)(Math.random() * 4);
+                int tx = 0, ty = 0;
+                int buffer = 200;
+                switch(side) {
+                    case 0: tx = (int)(Math.random() * gameWidth); ty = -buffer; break;
+                    case 1: tx = (int)(Math.random() * gameWidth); ty = gameHeight + buffer; break;
+                    case 2: tx = -buffer; ty = (int)(Math.random() * gameHeight); break;
+                    case 3: tx = gameWidth + buffer; ty = (int)(Math.random() * gameHeight); break;
+                }
+                ant.moveTo(new Point(tx, ty));
+            }
+        }
+    }
+
     private boolean isGatherer(Ant ant) {
         AntRole r = ant.getRole();
         return r == GameConstants.ROLE_FORAGER || r == GameConstants.ROLE_HUNTER || r == GameConstants.ROLE_MINER;
@@ -307,8 +346,19 @@ public class ColonyPhysicsService {
         }
 
         if (isPointInSafeBounds(colony, myRoom, ant.getX(), ant.getY())) {
-            if (Math.random() < 0.10) {
-                ant.moveTo(getRandomPointInRoom(colony, myRoom, virtualWidth));
+            boolean isBuilder = (ant.getRole() == GameConstants.ROLE_BUILDER || ant.getRole() == GameConstants.ROLE_CRANE) 
+                && colony.getCurrentBuildingProject() != null;
+
+            if (isBuilder && myRoom.equals(getRoomBounds(colony, WorldSpaces.CONSTRUCTION_SITE))) {
+                if (Math.random() < 0.10) {
+                    Point center = new Point((int)myRoom.getCenterX(), (int)myRoom.getCenterY());
+                    int radius = myRoom.width / 2;
+                    ant.moveTo(getCirclePoint(center, radius));
+                }
+            } else {
+                if (Math.random() < 0.10) {
+                    ant.moveTo(getRandomPointInRoom(colony, myRoom, virtualWidth));
+                }
             }
         } else {
             Room targetRoom = findRoomForAnt(colony, ant);
@@ -319,6 +369,14 @@ public class ColonyPhysicsService {
             Queue<NeoPoint> route = colony.getLocationService().calculateRoute(colony, current, targetRoom, ant);
             ant.setRoute(route);
         }
+    }
+    
+    private Point getCirclePoint(Point center, int radius) {
+        double angle = Math.random() * 2 * Math.PI;
+        double r = Math.sqrt(Math.random()) * radius;
+        int x = (int)(center.x + r * Math.cos(angle));
+        int y = (int)(center.y + r * Math.sin(angle));
+        return new Point(x, y);
     }
     
     private Room getRoomContainingAnt(Colony colony, Ant ant) {
@@ -446,10 +504,11 @@ public class ColonyPhysicsService {
         if (room == WorldSpaces.CONSTRUCTION_SITE) {
             int cx = ANCHOR_CENTER_X;
             int bottomY = 512; 
-            if (colony.hasUpgrade(GameUnlocks.ROLE_BREEDER)) {
-                bottomY = 768;
+            boolean hasTunnels = colony.getDynasty() != null && !colony.getDynasty().getTunnels().isEmpty();
+            if (colony.hasUpgrade(GameUnlocks.ROLE_BREEDER) || hasTunnels) {
+                bottomY += 512;
             }
-            int size = 100;
+            int size = 256;
             return new Rectangle(cx - (size/2), bottomY, size, size);
         }
 

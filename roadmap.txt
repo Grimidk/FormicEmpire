@@ -3,19 +3,18 @@ Here is the current roadmap of features and fixes:
 To Fix (By decreasing priority) : 
 	Important not Urgent:
 	late game performance (physics too taxing, may need to deload ants outside of area or update less when >50k ants) maybe look into LWJGL
+	need to revisit multithreading
 
 	Game Breaking:
 	(none right now)
 	
 	High:
-	W E R T keys not working if a tab ir already opened
+	(none right now)
 
 	Mid:
-	scienctific names dont need to be translated
+	(none right now)
 
 	Low:
-	breeders go out of the colony in nuptial
-	"view convoy" option using going and returning biomes for tiles, or underground or air
 	logistic physics use dimension 2
 	map line artifcacting, might need to make sprites
 
@@ -32,12 +31,13 @@ Needed for launch (v1.0) (Launch Version):
 	Everything else :
 	more settings (choose default, fuzzed parasites)
 	automate NPC to trade and tunnel
-	diplomacy and diplomatic reputation (own and xeno colonies) and alliances (non-aggression pacts) and wars, alliances can increase while allied genetic integrity
+	diplomacy and diplomatic reputation (own and xeno colonies) and alliances (non-aggression pacts), alliances can increase while allied genetic integrity
 	rebellions and rebel colonies (internal rebeliousness stat, too much causes a rebellious dynasty to appear, once capital defeated it gets reabsorbed)
 	diplo dialog with stance options (neutral, aggressive, peaceful)
 	battle system (mass battle in land and air, tick based loses based on active/passive military strenght from 1:1 = 50% chance and 1% loses up to 1:10 100% chance and 100% loses, 2 staged war until the queens are dead)
 	assimilations ( Trap-jaw (Trap jaw ants), Honey-pot (Honey pot ants), Door-head (Turtle ants), Wood burrowing (Carpenter ants), Silk weaving (Weaver ants), Rafting (Flood plains ants), Fire venom (Fire ants), Jumping (Jet ants), Gliding (Gliding ants), Stinging (Bullet ants), Swarming (Army ants), Stealth (Ghost ants), Fast bitting (Dracula ants), Heat resistance (Saharan silver ants), Deadly venom (Harvester ants), Self destruction (Exploding ants), Far sight (Bulldog ants), Hive building (Shining black ants), Location sensing (Desert ants))
 	ant subtypes (enable by role /  exclusion) checks with new sprites 
+	simulation screen to see battles, transports ("view convoy" option using going and returning biomes for tiles, or underground or air), maybe something else
 	revamp story and lore and maybe intro screen
 	more socialism (?)
 	research tree

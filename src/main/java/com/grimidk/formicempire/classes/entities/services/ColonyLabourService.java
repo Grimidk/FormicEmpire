@@ -611,8 +611,9 @@ public class ColonyLabourService {
             .collect(Collectors.toList());
 
         if (allDrones.isEmpty() || breederPrincesses.isEmpty()) return;
-        colony.getDrones().clear(); 
-        colony.getPrincesses().removeAll(breederPrincesses);
+        
+        allDrones.forEach(d -> d.setNuptial(true));
+        breederPrincesses.forEach(p -> p.setNuptial(true));
 
         int potentialQueens = Math.min(allDrones.size(), breederPrincesses.size());
         int currentQueens = colony.getQueens().size();
