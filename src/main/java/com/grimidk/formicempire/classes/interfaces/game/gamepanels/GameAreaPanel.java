@@ -2,6 +2,7 @@ package com.grimidk.formicempire.classes.interfaces.game.gamepanels;
 
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
+import com.grimidk.formicempire.classes.constants.misc.Species;
 import com.grimidk.formicempire.classes.constants.world.Weather;
 import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Bug;
@@ -17,6 +18,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -436,17 +438,40 @@ public class GameAreaPanel extends ZeroGamePanel {
             Image sprite = spriteIcon.getImage();
             int w = spriteIcon.getIconWidth();
             int h = spriteIcon.getIconHeight();
+            
+            List<Species> assimilatedSpecies = new ArrayList<>();
+            if (type == GameConstants.TYPE_DRONE && colony.getDynasty() != null) {
+                for (Species s : GameConstants.getSpecies()) {
+                    if (s == colony.getSpecies()) continue;
+                    if (s.getAssimilation() != null && colony.getDynasty().isAssimilationCompleted(s.getAssimilation())) {
+                        assimilatedSpecies.add(s);
+                    }
+                }
+            }
 
             List<Ant> ants = colony.getAntsByType(type);
             for (Ant ant : ants) {
                 if (ant.getDimension() != currentDimension) continue;
+                
+                Image currentSprite = sprite;
+                if (!assimilatedSpecies.isEmpty()) {
+                    int seed = System.identityHashCode(ant);
+                    if (Math.abs(seed) % 10 < 3) {
+                        int index = (Math.abs(seed) / 10) % assimilatedSpecies.size();
+                        Species as = assimilatedSpecies.get(index);
+                        ImageIcon asIcon = GameConstants.getAntSprite(type, as);
+                        if (asIcon != null) {
+                            currentSprite = asIcon.getImage();
+                        }
+                    }
+                }
                 
                 AffineTransform oldTransform = g2d.getTransform();
                 double centerX = ant.getX() + (w / 2.0);
                 double centerY = ant.getY() + (h / 2.0);
                 g2d.translate(centerX, centerY);       
                 g2d.rotate(Math.toRadians(ant.getR()));
-                g2d.drawImage(sprite, -w / 2, -h / 2, this);
+                g2d.drawImage(currentSprite, -w / 2, -h / 2, this);
                 
                 ResourceType carried = ant.getCarrying();
                 if (carried != null && carried.getIcon() != null) {

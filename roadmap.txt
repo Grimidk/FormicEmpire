@@ -8,15 +8,16 @@ To Fix (By decreasing priority) :
 	(none right now)
 	
 	High:
-	(none right now)
+	W E R T keys not working if a tab ir already opened
 
 	Mid:
-	(none right now)
+	scienctific names dont need to be translated
 
 	Low:
 	breeders go out of the colony in nuptial
 	"view convoy" option using going and returning biomes for tiles, or underground or air
 	logistic physics use dimension 2
+	map line artifcacting, might need to make sprites
 
 	Can't reproduce:
 	(none right now)

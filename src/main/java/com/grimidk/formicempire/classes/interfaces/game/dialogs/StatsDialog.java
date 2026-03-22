@@ -340,7 +340,7 @@ public class StatsDialog extends ZeroDialog {
             model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_WORLD), LanguageStrings.get(LanguageStrings.STAT_MOON_PHASE), world.getMoonPhase().getName()});
             
             Season season = world.getSeason();
-            model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_ENVIRONMENT), LanguageStrings.get(LanguageStrings.SEASON_SPRING), season.getName()}); // Season spring is just "Season" generic in key naming I used
+            model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_ENVIRONMENT), LanguageStrings.get(LanguageStrings.SEASON_SPRING), season.getName()});
             
             Weather weather = world.getWeather();
             model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_ENVIRONMENT), LanguageStrings.get(LanguageStrings.PANEL_WORLD), weather.getName()});
