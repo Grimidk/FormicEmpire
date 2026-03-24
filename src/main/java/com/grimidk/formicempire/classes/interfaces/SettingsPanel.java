@@ -27,6 +27,7 @@ public class SettingsPanel extends JPanel {
     private JCheckBox pauseFocusCheck;
     private JCheckBox confirmQuitCheck;
     private JCheckBox showTooltipsCheck;
+    private JCheckBox fuzzParasitesCheck;
     
     // --- Video Tab ---
     private JComboBox<String> sizeCombo;
@@ -38,7 +39,7 @@ public class SettingsPanel extends JPanel {
     private JSlider musicVolSlider;
     private JSlider sfxVolSlider;
     
-    private JLabel langLabel, autoLabel, turboLabel, arachLabel, pauseFocusLabel, confirmQuitLabel, tooltipsLabel;
+    private JLabel langLabel, autoLabel, turboLabel, arachLabel, pauseFocusLabel, confirmQuitLabel, tooltipsLabel, fuzzParasitesLabel;
     private JLabel sizeLabel, fsLabel, visualFiltersLabel;
     private JLabel masterLabel, musicLabel, sfxLabel;
     
@@ -226,6 +227,17 @@ public class SettingsPanel extends JPanel {
         styleCheckBox(showTooltipsCheck);
         c.gridx = 1; panel.add(showTooltipsCheck, c);
         
+        // Fuzz Parasites
+        c.gridy = 7; c.gridx = 0;
+        fuzzParasitesLabel = new JLabel();
+        fuzzParasitesLabel.setFont(AssetStyles.FONT_NORMAL);
+        fuzzParasitesLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(fuzzParasitesLabel, c);
+        
+        fuzzParasitesCheck = new JCheckBox();
+        styleCheckBox(fuzzParasitesCheck);
+        c.gridx = 1; panel.add(fuzzParasitesCheck, c);
+        
         return panel;
     }
     
@@ -338,6 +350,7 @@ public class SettingsPanel extends JPanel {
         pauseFocusLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_PAUSE_FOCUS));
         confirmQuitLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_CONFIRM_QUIT));
         tooltipsLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_SHOW_TOOLTIPS));
+        fuzzParasitesLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_FUZZ_PARASITES));
         
         sizeLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_SCREEN_SIZE));
         fsLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_FULLSCREEN));
@@ -419,6 +432,7 @@ public class SettingsPanel extends JPanel {
         pauseFocusCheck.setSelected(engine.isPauseOnFocusLoss());
         confirmQuitCheck.setSelected(engine.isConfirmOnQuit());
         showTooltipsCheck.setSelected(engine.isShowTooltips());
+        fuzzParasitesCheck.setSelected(engine.isFuzzParasites());
         
         sizeCombo.setSelectedItem(engine.getScreenSize());
         fullScreenCheck.setSelected(engine.isFullScreen());
@@ -446,6 +460,7 @@ public class SettingsPanel extends JPanel {
         engine.setPauseOnFocusLoss(pauseFocusCheck.isSelected());
         engine.setConfirmOnQuit(confirmQuitCheck.isSelected());
         engine.setShowTooltips(showTooltipsCheck.isSelected());
+        engine.setFuzzParasites(fuzzParasitesCheck.isSelected());
         
         engine.setScreenSize((String) sizeCombo.getSelectedItem());
         engine.setFullScreen(fullScreenCheck.isSelected());

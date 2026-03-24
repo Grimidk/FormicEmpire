@@ -45,6 +45,13 @@ public class Engine extends Thread {
     private boolean pauseOnFocusLoss = true;
     private boolean confirmOnQuit = true;
     private boolean showTooltips = true;
+    
+    private boolean fuzzParasites = true;
+    private int defaultRoleWorker = 1; // ROLE_FORAGER
+    private int defaultRoleSoldier = 16; // ROLE_HUNTER
+    private int defaultRoleMajor = 17; // ROLE_BRUTE
+    private int defaultRolePrincess = 23; // ROLE_BREEDER
+    private int defaultRoleQueen = 25; // ROLE_LAYER
 
     public Engine() {
         this.semaphore = new Semaphore(1);
@@ -368,5 +375,53 @@ public class Engine extends Thread {
 
     public void setShowTooltips(boolean showTooltips) {
         this.showTooltips = showTooltips;
+    }
+
+    public boolean isFuzzParasites() {
+        return fuzzParasites;
+    }
+
+    public void setFuzzParasites(boolean fuzzParasites) {
+        this.fuzzParasites = fuzzParasites;
+    }
+
+    public int getDefaultRoleWorker() {
+        return defaultRoleWorker;
+    }
+
+    public void setDefaultRoleWorker(int defaultRoleWorker) {
+        this.defaultRoleWorker = defaultRoleWorker;
+    }
+
+    public int getDefaultRoleSoldier() {
+        return defaultRoleSoldier;
+    }
+
+    public void setDefaultRoleSoldier(int defaultRoleSoldier) {
+        this.defaultRoleSoldier = defaultRoleSoldier;
+    }
+
+    public int getDefaultRoleMajor() {
+        return defaultRoleMajor;
+    }
+
+    public void setDefaultRoleMajor(int defaultRoleMajor) {
+        this.defaultRoleMajor = defaultRoleMajor;
+    }
+
+    public int getDefaultRolePrincess() {
+        return defaultRolePrincess;
+    }
+
+    public void setDefaultRolePrincess(int defaultRolePrincess) {
+        this.defaultRolePrincess = defaultRolePrincess;
+    }
+
+    public int getDefaultRoleQueen() {
+        return defaultRoleQueen;
+    }
+
+    public void setDefaultRoleQueen(int defaultRoleQueen) {
+        this.defaultRoleQueen = defaultRoleQueen;
     }
 }

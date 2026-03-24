@@ -72,6 +72,7 @@ public class GamePanel extends ZeroGamePanel {
         statusIndicator = new JLabel();
         
         colonyPanel = new ColonyPanel();
+        colonyPanel.setEngine(frame.getEngine());
         worldPanel = new WorldPanel();
         alertPanel = new AlertPanel();
         gameAreaPanel = new GameAreaPanel();

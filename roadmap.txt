@@ -4,6 +4,7 @@ To Fix (By decreasing priority) :
 	Important not Urgent:
 	late game performance (physics too taxing, may need to deload ants outside of area or update less when >50k ants) maybe look into LWJGL
 	need to revisit multithreading
+	not loading sprites of any kind out of visible bounds maybe allow overworld to see around
 
 	Game Breaking:
 	(none right now)
@@ -29,7 +30,8 @@ Needed for launch (v1.0) (Launch Version):
 	auxiliary room sprites (storage (resources), farm (shroom), nurse (bedding), royal (nests and science))
 
 	Everything else :
-	more settings (choose default, fuzzed parasites)
+	more settings (choose default)
+	parasitic mite (forania) that reduce work effiency and bull mites (Stratiolaelaps) maybe with catcher role or something like that
 	automate NPC to trade and tunnel
 	diplomacy and diplomatic reputation (own and xeno colonies) and alliances (non-aggression pacts), alliances can increase while allied genetic integrity
 	rebellions and rebel colonies (internal rebeliousness stat, too much causes a rebellious dynasty to appear, once capital defeated it gets reabsorbed)
@@ -81,6 +83,7 @@ Post launch (v1.1) (Improvements Update):
 	socials screen with discord server and instagram
 	more langs 
 	link to IRL documentation for ant facts
+	achievements
 
 Post launch (v1.2) (Civilization Update):
 	(Secret for now)

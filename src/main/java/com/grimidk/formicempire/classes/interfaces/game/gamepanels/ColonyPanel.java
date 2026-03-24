@@ -5,6 +5,7 @@ import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.services.ColonyLocationService;
+import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
@@ -63,6 +64,7 @@ public class ColonyPanel extends ZeroGamePanel {
     
     // --- Cached Values ---
     private Colony lastColonyRef;
+    private Engine engine;
     
     private int lastMushrooms = -1;
     private int lastPlants = -1;
@@ -85,6 +87,10 @@ public class ColonyPanel extends ZeroGamePanel {
         super(new CardLayout()); 
         initComponents();
         initLayout();
+    }
+    
+    public void setEngine(Engine engine) {
+        this.engine = engine;
     }
 
     @Override
@@ -529,7 +535,8 @@ public class ColonyPanel extends ZeroGamePanel {
         parasiteCountLabel.setVisible(hasPolice);
         policeStatsLabel.setVisible(hasPolice);
         if (hasPolice) {
-            parasiteCountLabel.setText(String.format(LanguageStrings.get(LanguageStrings.COLONY_PARASITES), colony.getParasiteCountDisplay()));
+            boolean fuzz = engine != null && engine.isFuzzParasites();
+            parasiteCountLabel.setText(String.format(LanguageStrings.get(LanguageStrings.COLONY_PARASITES), colony.getParasiteCountDisplay(fuzz)));
             float detection = colony.getStatsService().getParasiteDetection(colony);
             int policeCount = colony.getAssignedRoleCount(GameConstants.ROLE_POLICE);
             policeStatsLabel.setText(String.format(LanguageStrings.get(LanguageStrings.COLONY_DETECTION_RATE), Math.round(policeCount * detection)));

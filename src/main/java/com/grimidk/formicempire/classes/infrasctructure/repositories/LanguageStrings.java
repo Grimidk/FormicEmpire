@@ -1,12 +1,13 @@
 package com.grimidk.formicempire.classes.infrasctructure.repositories;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
-import java.util.ArrayList;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.translations.Translation;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.translations.EnglishTranslation;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.translations.SpanishTranslation;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.translations.Translation;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public final class LanguageStrings {
     private LanguageStrings() {}
@@ -448,6 +449,7 @@ public final class LanguageStrings {
     public static final String SETTINGS_TAB_GENERAL = "SETTINGS_TAB_GENERAL";
     public static final String SETTINGS_TAB_VIDEO = "SETTINGS_TAB_VIDEO";
     public static final String SETTINGS_TAB_AUDIO = "SETTINGS_TAB_AUDIO";
+    public static final String SETTINGS_TAB_ROLES = "SETTINGS_TAB_ROLES";
     
     public static final String SETTINGS_VISUAL_FILTERS = "SETTINGS_VISUAL_FILTERS";
     public static final String SETTINGS_ARACHNOPHOBIA = "SETTINGS_ARACHNOPHOBIA";
@@ -455,6 +457,13 @@ public final class LanguageStrings {
     public static final String SETTINGS_PAUSE_FOCUS = "SETTINGS_PAUSE_FOCUS";
     public static final String SETTINGS_CONFIRM_QUIT = "SETTINGS_CONFIRM_QUIT";
     public static final String SETTINGS_SHOW_TOOLTIPS = "SETTINGS_SHOW_TOOLTIPS";
+    
+    public static final String SETTINGS_FUZZ_PARASITES = "SETTINGS_FUZZ_PARASITES";
+    public static final String SETTINGS_DEFAULT_ROLE_WORKER = "SETTINGS_DEFAULT_ROLE_WORKER";
+    public static final String SETTINGS_DEFAULT_ROLE_SOLDIER = "SETTINGS_DEFAULT_ROLE_SOLDIER";
+    public static final String SETTINGS_DEFAULT_ROLE_MAJOR = "SETTINGS_DEFAULT_ROLE_MAJOR";
+    public static final String SETTINGS_DEFAULT_ROLE_PRINCESS = "SETTINGS_DEFAULT_ROLE_PRINCESS";
+    public static final String SETTINGS_DEFAULT_ROLE_QUEEN = "SETTINGS_DEFAULT_ROLE_QUEEN";
     
     public static final String SETTINGS_MASTER_VOL = "SETTINGS_MASTER_VOL";
     public static final String SETTINGS_MUSIC_VOL = "SETTINGS_MUSIC_VOL";

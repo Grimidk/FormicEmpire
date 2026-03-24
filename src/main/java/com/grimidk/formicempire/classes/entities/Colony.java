@@ -593,11 +593,16 @@ public class Colony {
         }
     }
 
-    public String getParasiteCountDisplay() {
+    public String getParasiteCountDisplay(boolean fuzzEnabled) {
         if (!hasUpgrade(GameUnlocks.ROLE_POLICE)) {
             return "???";
         }
         int actual = getParasites();
+        
+        if (!fuzzEnabled) {
+            return String.valueOf(actual);
+        }
+
         if (actual == 0) return "~0";
         
         double fuzz = Math.random() * 0.2; 

@@ -388,12 +388,18 @@ public class SpanishTranslation implements Translation {
         
         es.put("SETTINGS_VISUAL_FILTERS", "Filtros Visuales:");
         es.put("SETTINGS_ARACHNOPHOBIA", "Modo Aracnofobia:");
-        es.put("SETTINGS_PAUSE_FOCUS", "Pausar al Perder Foco:");
-        es.put("SETTINGS_CONFIRM_QUIT", "Confirmar al Salir:");
-        es.put("SETTINGS_SHOW_TOOLTIPS", "Mostrar Tooltips:");
-        
+        es.put("SETTINGS_PAUSE_FOCUS", "Pausar al perder foco");
+        es.put("SETTINGS_CONFIRM_QUIT", "Confirmar al salir");
+        es.put("SETTINGS_SHOW_TOOLTIPS", "Mostrar consejos");
+        es.put("SETTINGS_FUZZ_PARASITES", "Cifras de parásitos imprecisas");
+        es.put("SETTINGS_DEFAULT_ROLE_WORKER", "Rol de Obrera por defecto");
+        es.put("SETTINGS_DEFAULT_ROLE_SOLDIER", "Rol de Soldado por defecto");
+        es.put("SETTINGS_DEFAULT_ROLE_MAJOR", "Rol de Major por defecto");
+        es.put("SETTINGS_DEFAULT_ROLE_PRINCESS", "Rol de Princesa por defecto");
+        es.put("SETTINGS_DEFAULT_ROLE_QUEEN", "Rol de Reina por defecto");
+
         es.put("SETTINGS_MASTER_VOL", "Volumen Maestro:");
-        es.put("SETTINGS_MUSIC_VOL", "Volumen de Música:");
+        es.put("SETTINGS_MUSIC_VOL", "Volumen Música:");
         es.put("SETTINGS_SFX_VOL", "Efectos de Sonido:");
 
         es.put("WORLD_BIOME_PREFIX", "Bioma: ");
@@ -401,7 +407,7 @@ public class SpanishTranslation implements Translation {
         es.put("WORLD_HUMIDITY_PREFIX", "Humedad: ");
         es.put("WORLD_NA", "N/D");
 
-        es.put("BIOME_PLAINS", "Llanuras");
+        es.put("BIOME_PLAINS", "Llanura");
         es.put("BIOME_FOREST", "Bosque");
         es.put("BIOME_JUNGLE", "Selva");
         es.put("BIOME_SWAMP", "Pantano");
@@ -417,7 +423,7 @@ public class SpanishTranslation implements Translation {
         es.put("TEMP_FREEZING", "Gélido");
         es.put("TEMP_COLD", "Frío");
         es.put("TEMP_CHILLY", "Fresco");
-        es.put("TEMP_GOOD", "Bueno");
+        es.put("TEMP_GOOD", "Templado");
         es.put("TEMP_WARM", "Cálido");
         es.put("TEMP_HOT", "Caluroso");
         es.put("TEMP_BURNING", "Ardiente");
@@ -447,9 +453,9 @@ public class SpanishTranslation implements Translation {
         es.put("MOON_NEW", "Luna Nueva");
         es.put("MOON_WAXING_CRESCENT", "Luna Creciente");
         es.put("MOON_FIRST_QUARTER", "Cuarto Creciente");
-        es.put("MOON_WAXING_GIBBOUS", "Luna Gibosa Creciente");
+        es.put("MOON_WAXING_GIBBOUS", "Gibosa Creciente");
         es.put("MOON_FULL", "Luna Llena");
-        es.put("MOON_WANING_GIBBOUS", "Luna Gibosa Menguante");
+        es.put("MOON_WANING_GIBBOUS", "Gibosa Menguante");
         es.put("MOON_LAST_QUARTER", "Cuarto Menguante");
         es.put("MOON_WANING_CRESCENT", "Luna Menguante");
 
@@ -462,22 +468,22 @@ public class SpanishTranslation implements Translation {
         es.put("WEATHER_RAIN", "Lluvia");
         es.put("WEATHER_SNOW", "Nieve");
         es.put("WEATHER_HEAVY_RAIN", "Lluvia Fuerte");
-        es.put("WEATHER_THUNDER", "Tormenta Eléctrica");
-        es.put("WEATHER_HEAVY_SNOW", "Tormenta de Nieve");
+        es.put("WEATHER_THUNDER", "Tormenta");
+        es.put("WEATHER_HEAVY_SNOW", "Tormenta Nieve");
         es.put("WEATHER_WIND", "Viento Fuerte");
         es.put("WEATHER_HEAT", "Ola de Calor");
         es.put("WEATHER_FOG", "Niebla");
         es.put("WEATHER_FROG", "Lluvia de Ranas");
         es.put("WEATHER_BLOOD", "Lluvia de Sangre");
-        es.put("WEATHER_SAND_STORM", "Tormenta de Arena");
-        es.put("WEATHER_PYROCLASTIC_FOG", "Niebla Pyroclástica");
+        es.put("WEATHER_SAND_STORM", "Tormenta Arena");
+        es.put("WEATHER_PYROCLASTIC_FOG", "Niebla Piroclástica");
         es.put("WEATHER_ACID_RAIN", "Lluvia Ácida");
 
         es.put("STATUS_ALIVE", "Viva");
         es.put("STATUS_DEAD", "Muerta");
         es.put("STATUS_ZOMBIFIED", "Zombificada");
 
-        es.put("MOVE_STATIC", "Estática");
+        es.put("MOVE_STATIC", "Quieta");
         es.put("MOVE_WANDER", "Deambulando");
         es.put("MOVE_MARCH", "Marchando");
         es.put("MOVE_SPEED", "Marcha Rápida");
@@ -485,8 +491,8 @@ public class SpanishTranslation implements Translation {
         es.put("MOVE_PATROL", "Patrullando");
 
         es.put("BUG_ANT", "Hormiga");
-        es.put("BUG_APHID", "Áfido");
-        es.put("BUG_PARASITE", "Parásito de Hormigas");
+        es.put("BUG_APHID", "Pulgón");
+        es.put("BUG_PARASITE", "Parásito");
 
         es.put("TYPE_EGG", "Huevo");
         es.put("TYPE_LARVA", "Larva");
@@ -505,11 +511,11 @@ public class SpanishTranslation implements Translation {
         es.put("ROLE_BUILDER", "Constructora");
         es.put("ROLE_SCOUT", "Exploradora");
         es.put("ROLE_FARMER", "Granjera");
-        es.put("ROLE_RANCHER", "Rancho");
+        es.put("ROLE_RANCHER", "Pastora");
         es.put("ROLE_GRAVER", "Sepulturera");
         es.put("ROLE_MINER", "Minera");
         es.put("ROLE_COURIER", "Mensajera");
-        es.put("ROLE_POTTER", "Alimentadora");
+        es.put("ROLE_POTTER", "Hormiga-Copa");
         es.put("ROLE_GUARD", "Guardia");
         es.put("ROLE_WARRIOR", "Guerrera");
         es.put("ROLE_DEFENDER", "Defensora");
@@ -517,9 +523,9 @@ public class SpanishTranslation implements Translation {
         es.put("ROLE_BOMBER", "Bombardera");
         es.put("ROLE_HUNTER", "Cazadora");
         es.put("ROLE_BRUTE", "Bruto");
-        es.put("ROLE_CARRIER", "Transportadora");
+        es.put("ROLE_CARRIER", "Transporte Tropas");
         es.put("ROLE_ARTILLERY", "Artillería");
-        es.put("ROLE_SIEGE", "Motor de Asedio");
+        es.put("ROLE_SIEGE", "Máquina Sitio");
         es.put("ROLE_BORER", "Perforadora");
         es.put("ROLE_DRONE", "Zángano");
         es.put("ROLE_BREEDER", "Criadora");
@@ -528,22 +534,22 @@ public class SpanishTranslation implements Translation {
         es.put("ROLE_RESEARCHER", "Investigadora");
         es.put("ROLE_MILITIA", "Milicia Auxiliar");
         es.put("ROLE_CATCHER", "Capturadora");
-        es.put("ROLE_CRANE", "Grúa de Construcción");
-        es.put("ROLE_TRANSPORT", "Transporte de Recursos");
-        es.put("ROLE_ASSISTANT", "Asistente de Laboratorio");
-        es.put("ROLE_ESCORT", "Escolta de Convoy");
-        es.put("ROLE_ENGINEER", "Ingeniera de Túneles");
-        es.put("ROLE_SKYTRANS", "Transporte Aéreo");
+        es.put("ROLE_CRANE", "Grúa Constr.");
+        es.put("ROLE_TRANSPORT", "Transp. Recursos");
+        es.put("ROLE_ASSISTANT", "Asistente Lab.");
+        es.put("ROLE_ESCORT", "Escolta Convoy");
+        es.put("ROLE_ENGINEER", "Ingeniera Túnel");
+        es.put("ROLE_SKYTRANS", "Transp. Aéreo");
 
         es.put("RANK_ANT", "Hormiga");
-        es.put("RANK_COLONY", "Colonia de Hormigas");
-        es.put("RANK_COUNTY", "Condado de Hormigas");
-        es.put("RANK_DUCHY", "Ducado de Hormigas");
-        es.put("RANK_KINGDOM", "Reino de Hormigas");
-        es.put("RANK_EMPIRE", "Imperio de Hormigas");
+        es.put("RANK_COLONY", "Colonia");
+        es.put("RANK_COUNTY", "Condado");
+        es.put("RANK_DUCHY", "Ducado");
+        es.put("RANK_KINGDOM", "Reino");
+        es.put("RANK_EMPIRE", "Imperio");
         es.put("RANK_SUPER", "Súper Colonia");
         es.put("RANK_ULTRA", "Ultra Colonia");
-        es.put("RANK_HYPER", "Híper Colonia");
+        es.put("RANK_HYPER", "Hiper Colonia");
         es.put("RANK_MEGA", "Mega Colonia");
         es.put("RANK_ULTIMATE", "Colonia Definitiva");
         es.put("RANK_SUPREME", "Colonia Suprema");
@@ -551,7 +557,7 @@ public class SpanishTranslation implements Translation {
 
         es.put("SPECIES_OMNI", "Hormiga Omni");
         es.put("SPECIES_OMNI_SCIENTIFIC", "Omniformica Grimunknowni");
-        es.put("SPECIES_LEAF", "Hormiga Cortadora de Hojas");
+        es.put("SPECIES_LEAF", "Hormiga Cortadora");
         es.put("SPECIES_LEAF_SCIENTIFIC", "Atta Cephalotes");
         es.put("SPECIES_PHARAOH", "Hormiga Faraón");
         es.put("SPECIES_PHARAOH_SCIENTIFIC", "Monomorium Pharaonis");

@@ -385,12 +385,20 @@ public class EnglishTranslation implements Translation {
         en.put("SETTINGS_TAB_GENERAL", "General");
         en.put("SETTINGS_TAB_VIDEO", "Video");
         en.put("SETTINGS_TAB_AUDIO", "Audio");
+        en.put("SETTINGS_TAB_ROLES", "Roles");
         
         en.put("SETTINGS_VISUAL_FILTERS", "Visual Filters:");
         en.put("SETTINGS_ARACHNOPHOBIA", "Arachnophobia Mode:");
-        en.put("SETTINGS_PAUSE_FOCUS", "Pause on Focus Loss:");
-        en.put("SETTINGS_CONFIRM_QUIT", "Confirm on Quit:");
-        en.put("SETTINGS_SHOW_TOOLTIPS", "Show UI Tooltips:");
+        en.put("SETTINGS_PAUSE_FOCUS", "Pause on focus loss");
+        en.put("SETTINGS_CONFIRM_QUIT", "Confirm on quit");
+        en.put("SETTINGS_SHOW_TOOLTIPS", "Show tooltips");
+        en.put("SETTINGS_FUZZ_PARASITES", "Fuzz parasite numbers");
+        en.put("SETTINGS_DEFAULT_ROLE_WORKER", "Default Worker role");
+        en.put("SETTINGS_DEFAULT_ROLE_SOLDIER", "Default Soldier role");
+        en.put("SETTINGS_DEFAULT_ROLE_MAJOR", "Default Major role");
+        en.put("SETTINGS_DEFAULT_ROLE_PRINCESS", "Default Princess role");
+        en.put("SETTINGS_DEFAULT_ROLE_QUEEN", "Default Queen role");
+
         
         en.put("SETTINGS_MASTER_VOL", "Master Volume:");
         en.put("SETTINGS_MUSIC_VOL", "Music Volume:");
@@ -957,6 +965,13 @@ public class EnglishTranslation implements Translation {
 
         en.put("HELP_SKIP_TUTORIAL", "Skip Tutorial");
         en.put("HELP_FINISH", "Finish");
+
+        en.put("SETTINGS_TAB_ROLES", "Roles");
+        en.put("SETTINGS_DEFAULT_ROLE_WORKER", "Default Worker Role:");
+        en.put("SETTINGS_DEFAULT_ROLE_SOLDIER", "Default Soldier Role:");
+        en.put("SETTINGS_DEFAULT_ROLE_MAJOR", "Default Major Role:");
+        en.put("SETTINGS_DEFAULT_ROLE_PRINCESS", "Default Princess Role:");
+        en.put("SETTINGS_DEFAULT_ROLE_QUEEN", "Default Queen Role:");
 
         return en;
     }

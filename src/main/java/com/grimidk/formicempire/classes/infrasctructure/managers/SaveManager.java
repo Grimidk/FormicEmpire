@@ -1412,7 +1412,13 @@ public class SaveManager {
             writeJsonLine(w, "sfxVolume", engine.getSfxVolume(), false);
             writeJsonLine(w, "pauseOnFocusLoss", engine.isPauseOnFocusLoss(), false);
             writeJsonLine(w, "confirmOnQuit", engine.isConfirmOnQuit(), false);
-            writeJsonLine(w, "showTooltips", engine.isShowTooltips(), true);
+            writeJsonLine(w, "showTooltips", engine.isShowTooltips(), false);
+            writeJsonLine(w, "fuzzParasites", engine.isFuzzParasites(), false);
+            writeJsonLine(w, "defaultRoleWorker", engine.getDefaultRoleWorker(), false);
+            writeJsonLine(w, "defaultRoleSoldier", engine.getDefaultRoleSoldier(), false);
+            writeJsonLine(w, "defaultRoleMajor", engine.getDefaultRoleMajor(), false);
+            writeJsonLine(w, "defaultRolePrincess", engine.getDefaultRolePrincess(), false);
+            writeJsonLine(w, "defaultRoleQueen", engine.getDefaultRoleQueen(), true);
             w.write("}");
             w.newLine();
             w.flush();
@@ -1480,17 +1486,21 @@ public class SaveManager {
             engine.setScreenSize(m.getOrDefault("screenSize", engine.getScreenSize()));
             engine.setFullScreen(Boolean.parseBoolean(m.getOrDefault("fullScreen", String.valueOf(engine.isFullScreen()))));
             engine.setAutosaveFrequency(Integer.parseInt(m.getOrDefault("autosaveFrequency", String.valueOf(engine.getAutosaveFrequency()))));
-            
             engine.setVisualFiltersEnabled(Boolean.parseBoolean(m.getOrDefault("visualFiltersEnabled", String.valueOf(engine.isVisualFiltersEnabled()))));
             engine.setArachnophobiaMode(Boolean.parseBoolean(m.getOrDefault("arachnophobiaMode", String.valueOf(engine.isArachnophobiaMode()))));
             engine.setMasterVolume(Integer.parseInt(m.getOrDefault("masterVolume", String.valueOf(engine.getMasterVolume()))));
             engine.setMusicVolume(Integer.parseInt(m.getOrDefault("musicVolume", String.valueOf(engine.getMusicVolume()))));
             engine.setSfxVolume(Integer.parseInt(m.getOrDefault("sfxVolume", String.valueOf(engine.getSfxVolume()))));
-            
             engine.setPauseOnFocusLoss(Boolean.parseBoolean(m.getOrDefault("pauseOnFocusLoss", String.valueOf(engine.isPauseOnFocusLoss()))));
             engine.setConfirmOnQuit(Boolean.parseBoolean(m.getOrDefault("confirmOnQuit", String.valueOf(engine.isConfirmOnQuit()))));
             engine.setShowTooltips(Boolean.parseBoolean(m.getOrDefault("showTooltips", String.valueOf(engine.isShowTooltips()))));
-            
+            engine.setFuzzParasites(Boolean.parseBoolean(m.getOrDefault("fuzzParasites", String.valueOf(engine.isFuzzParasites()))));
+            engine.setDefaultRoleWorker(Integer.parseInt(m.getOrDefault("defaultRoleWorker", String.valueOf(engine.getDefaultRoleWorker()))));
+            engine.setDefaultRoleSoldier(Integer.parseInt(m.getOrDefault("defaultRoleSoldier", String.valueOf(engine.getDefaultRoleSoldier()))));
+            engine.setDefaultRoleMajor(Integer.parseInt(m.getOrDefault("defaultRoleMajor", String.valueOf(engine.getDefaultRoleMajor()))));
+            engine.setDefaultRolePrincess(Integer.parseInt(m.getOrDefault("defaultRolePrincess", String.valueOf(engine.getDefaultRolePrincess()))));
+            engine.setDefaultRoleQueen(Integer.parseInt(m.getOrDefault("defaultRoleQueen", String.valueOf(engine.getDefaultRoleQueen()))));
+
             System.out.println("[SaveManager] Global settings loaded.");
         } catch (Exception e) {
             e.printStackTrace();
