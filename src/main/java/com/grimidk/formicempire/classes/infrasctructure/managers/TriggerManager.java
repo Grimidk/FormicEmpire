@@ -22,6 +22,10 @@ public class TriggerManager {
     private final List<TriggerListener> listeners = new ArrayList<>();
     private boolean colonyDeathFired = false;
 
+    private final Runnable monthlyRunnable = this::checkMonthlyTriggers;
+    private final Runnable dailyRunnable = this::checkDailyTriggers;
+    private final Runnable hourlyRunnable = this::checkHourlyTriggers;
+
     public TriggerManager(World world, Colony colony, Engine engine) {
         this.world = world;
         this.playerColony = colony;
@@ -29,9 +33,16 @@ public class TriggerManager {
     }
 
     public void registerListeners() {
-        engine.addMonthTickListener(this::checkMonthlyTriggers);
-        engine.addDayTickListener(this::checkDailyTriggers);
-        engine.addHourTickListener(this::checkHourlyTriggers); 
+        unregisterListeners();
+        engine.addMonthTickListener(monthlyRunnable);
+        engine.addDayTickListener(dailyRunnable);
+        engine.addHourTickListener(hourlyRunnable);
+    }
+
+    public void unregisterListeners() {
+        engine.removeMonthTickListener(monthlyRunnable);
+        engine.removeDayTickListener(dailyRunnable);
+        engine.removeHourTickListener(hourlyRunnable);
     }
 
     public interface TriggerListener {

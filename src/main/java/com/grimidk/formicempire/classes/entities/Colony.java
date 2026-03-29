@@ -19,6 +19,7 @@ import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.infrasctructure.Dimension;
+import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
@@ -303,7 +304,6 @@ public class Colony {
             }
         }
 
-        runRoleAssignment();
         rankUp();
     }
         
@@ -747,7 +747,13 @@ public class Colony {
 
 
     // --- Simulation Logic Methods ---
-    public void runRoleAssignment() { populationService.runRoleAssignment(this); }
+    public void runRoleAssignment() {
+        runRoleAssignment(null);
+    }
+
+    public void runRoleAssignment(Engine engine) {
+        populationService.runRoleAssignment(this, engine);
+    }
     public void runHatching(){ populationService.runHatching(this); }
     public void rankUp() { populationService.rankUp(this); }
     public void runLaying() { labourService.runLaying(this); }
@@ -811,7 +817,7 @@ public class Colony {
         }
     }
 
-    public void runHourlyJobs(Biome biome) {
+    public void runHourlyJobs(Biome biome, Engine engine) {
         if (this.age < 7) {
             return;
         }
@@ -820,7 +826,7 @@ public class Colony {
             if (this.automationEnabled) {
                 this.automationService.runAutomation(this);
             }
-            this.runRoleAssignment();
+            this.runRoleAssignment(engine);
             this.runLaying();
             this.runResearch();
             this.runRanching();
@@ -831,7 +837,7 @@ public class Colony {
             if (this.automationEnabled) {
                 this.automationService.runAutomation(this);
             }
-            this.populationService.runRoleAssignment(this); 
+            this.populationService.runRoleAssignment(this, engine); 
             this.runResearch();
             this.labourService.runTunnelConstruction(this);
             this.sumarizationService.runHourlyLite(this, biome);

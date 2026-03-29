@@ -544,6 +544,15 @@ public final class GameConstants {
 
     public static List<AntRole> getAntRoles() { return Collections.unmodifiableList(antRoles); }
 
+    public static AntRole getAntRoleById(int id) {
+        for (AntRole r : antRoles) {
+            if (r.getId() == id) {
+                return r;
+            }
+        }
+        return null;
+    }
+
     public static List<ColonyRank> getColonyRanks() { return Collections.unmodifiableList(colonyRanks); }
 
     public static List<Species> getSpecies() { return Collections.unmodifiableList(species); }

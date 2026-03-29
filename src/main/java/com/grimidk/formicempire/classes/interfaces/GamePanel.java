@@ -525,7 +525,12 @@ public class GamePanel extends ZeroGamePanel {
     private void cleanupSession() {
         disposeAllDialogs();
         unregisterTickListeners();
-        
+        if (triggerManager != null) {
+            triggerManager.unregisterListeners();
+            triggerManager = null;
+        }
+        alertManager = null;
+
         if (gameAreaPanel != null) gameAreaPanel.resetView();
         if (colonyPanel != null) colonyPanel.reset();
         if (worldPanel != null) worldPanel.reset();
@@ -539,8 +544,7 @@ public class GamePanel extends ZeroGamePanel {
         if (controlPanel != null) {
             controlPanel.setPlayPauseButtonText(true);
         }
-        
-        this.triggerManager = null; 
+
         this.engineStarted = false;
         statusLabel.setText(LanguageStrings.get(LanguageStrings.UI_NOT_STARTED));
     }

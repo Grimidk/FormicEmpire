@@ -1,7 +1,10 @@
 package com.grimidk.formicempire.classes.interfaces;
 
+import com.grimidk.formicempire.classes.constants.ant.AntRole;
+import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 import com.grimidk.formicempire.classes.interfaces.game.dialogs.ZeroDialog;
 
@@ -42,9 +45,15 @@ public class SettingsPanel extends JPanel {
     private JLabel langLabel, autoLabel, turboLabel, arachLabel, pauseFocusLabel, confirmQuitLabel, tooltipsLabel, fuzzParasitesLabel;
     private JLabel sizeLabel, fsLabel, visualFiltersLabel;
     private JLabel masterLabel, musicLabel, sfxLabel;
+    private JLabel defaultRoleWorkerLabel, defaultRoleSoldierLabel, defaultRoleMajorLabel, defaultRolePrincessLabel, defaultRoleQueenLabel;
+    private JComboBox<AntRole> defaultRoleWorkerCombo, defaultRoleSoldierCombo, defaultRoleMajorCombo, defaultRolePrincessCombo, defaultRoleQueenCombo;
     
     private JButton saveButton;
     private JButton backButton;
+    private JButton resetGeneralButton;
+    private JButton resetVideoButton;
+    private JButton resetAudioButton;
+    private JButton resetRolesButton;
 
     private static class AutosaveOption {
         String label;
@@ -135,6 +144,7 @@ public class SettingsPanel extends JPanel {
         tabbedPane.addTab("General", createGeneralTab());
         tabbedPane.addTab("Video", createVideoTab());
         tabbedPane.addTab("Audio", createAudioTab());
+        tabbedPane.addTab("Roles", createRolesTab());
     }
     
     private JPanel createGeneralTab() {
@@ -237,8 +247,195 @@ public class SettingsPanel extends JPanel {
         fuzzParasitesCheck = new JCheckBox();
         styleCheckBox(fuzzParasitesCheck);
         c.gridx = 1; panel.add(fuzzParasitesCheck, c);
+
+        c.gridy = 8;
+        c.gridx = 0;
+        c.gridwidth = 2;
+        c.anchor = GridBagConstraints.EAST;
+        c.insets = new Insets(16, 15, 5, 15);
+        resetGeneralButton = new JButton();
+        styleButton(resetGeneralButton);
+        resetGeneralButton.addActionListener(e -> resetGeneralTabToDefaults());
+        setupNavigation(resetGeneralButton);
+        panel.add(resetGeneralButton, c);
         
         return panel;
+    }
+
+    private JPanel createRolesTab() {
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.insets = new Insets(5, 15, 5, 15);
+        c.anchor = GridBagConstraints.WEST;
+
+        defaultRoleWorkerLabel = new JLabel();
+        defaultRoleWorkerLabel.setFont(AssetStyles.FONT_NORMAL);
+        defaultRoleWorkerLabel.setForeground(AssetStyles.FONT_COLOR);
+        c.gridy = 0;
+        c.gridx = 0;
+        panel.add(defaultRoleWorkerLabel, c);
+        defaultRoleWorkerCombo = createAntRoleCombo(GameConstants.TYPE_WORKER);
+        c.gridx = 1;
+        panel.add(defaultRoleWorkerCombo, c);
+
+        defaultRoleSoldierLabel = new JLabel();
+        defaultRoleSoldierLabel.setFont(AssetStyles.FONT_NORMAL);
+        defaultRoleSoldierLabel.setForeground(AssetStyles.FONT_COLOR);
+        c.gridy = 1;
+        c.gridx = 0;
+        panel.add(defaultRoleSoldierLabel, c);
+        defaultRoleSoldierCombo = createAntRoleCombo(GameConstants.TYPE_SOLDIER);
+        c.gridx = 1;
+        panel.add(defaultRoleSoldierCombo, c);
+
+        defaultRoleMajorLabel = new JLabel();
+        defaultRoleMajorLabel.setFont(AssetStyles.FONT_NORMAL);
+        defaultRoleMajorLabel.setForeground(AssetStyles.FONT_COLOR);
+        c.gridy = 2;
+        c.gridx = 0;
+        panel.add(defaultRoleMajorLabel, c);
+        defaultRoleMajorCombo = createAntRoleCombo(GameConstants.TYPE_MAJOR);
+        c.gridx = 1;
+        panel.add(defaultRoleMajorCombo, c);
+
+        defaultRolePrincessLabel = new JLabel();
+        defaultRolePrincessLabel.setFont(AssetStyles.FONT_NORMAL);
+        defaultRolePrincessLabel.setForeground(AssetStyles.FONT_COLOR);
+        c.gridy = 3;
+        c.gridx = 0;
+        panel.add(defaultRolePrincessLabel, c);
+        defaultRolePrincessCombo = createAntRoleCombo(GameConstants.TYPE_PRINCESS);
+        c.gridx = 1;
+        panel.add(defaultRolePrincessCombo, c);
+
+        defaultRoleQueenLabel = new JLabel();
+        defaultRoleQueenLabel.setFont(AssetStyles.FONT_NORMAL);
+        defaultRoleQueenLabel.setForeground(AssetStyles.FONT_COLOR);
+        c.gridy = 4;
+        c.gridx = 0;
+        panel.add(defaultRoleQueenLabel, c);
+        defaultRoleQueenCombo = createAntRoleCombo(GameConstants.TYPE_QUEEN);
+        c.gridx = 1;
+        panel.add(defaultRoleQueenCombo, c);
+
+        c.gridy = 5;
+        c.gridx = 0;
+        c.gridwidth = 2;
+        c.anchor = GridBagConstraints.EAST;
+        c.insets = new Insets(16, 15, 5, 15);
+        resetRolesButton = new JButton();
+        styleButton(resetRolesButton);
+        resetRolesButton.addActionListener(e -> resetRolesTabToDefaults());
+        setupNavigation(resetRolesButton);
+        panel.add(resetRolesButton, c);
+
+        return panel;
+    }
+
+    private JComboBox<AntRole> createAntRoleCombo(AntType type) {
+        JComboBox<AntRole> combo = new JComboBox<>();
+        for (AntRole r : Engine.antRolesForAntType(type)) {
+            combo.addItem(r);
+        }
+        styleComboBox(combo);
+        return combo;
+    }
+
+    private void applyDefaultRoleFromCombo(JComboBox<AntRole> combo, AntType type, int legacyFallbackId) {
+        AntRole selected = (AntRole) combo.getSelectedItem();
+        if (selected == null) {
+            return;
+        }
+        int safe = Engine.sanitizeDefaultRoleId(type, selected.getId(), legacyFallbackId);
+        if (type == GameConstants.TYPE_WORKER) {
+            engine.setDefaultRoleWorker(safe);
+        } else if (type == GameConstants.TYPE_SOLDIER) {
+            engine.setDefaultRoleSoldier(safe);
+        } else if (type == GameConstants.TYPE_MAJOR) {
+            engine.setDefaultRoleMajor(safe);
+        } else if (type == GameConstants.TYPE_PRINCESS) {
+            engine.setDefaultRolePrincess(safe);
+        } else if (type == GameConstants.TYPE_QUEEN) {
+            engine.setDefaultRoleQueen(safe);
+        }
+    }
+
+    private void selectLanguageByCode(String code) {
+        if (code == null) {
+            return;
+        }
+        for (int i = 0; i < languageCombo.getItemCount(); i++) {
+            if (languageCombo.getItemAt(i).code.equals(code)) {
+                languageCombo.setSelectedIndex(i);
+                return;
+            }
+        }
+    }
+
+    private void selectAutosaveByValue(int value) {
+        for (int i = 0; i < autosaveCombo.getItemCount(); i++) {
+            if (autosaveCombo.getItemAt(i).value == value) {
+                autosaveCombo.setSelectedIndex(i);
+                return;
+            }
+        }
+    }
+
+    private void resetGeneralTabToDefaults() {
+        selectLanguageByCode("en");
+        selectAutosaveByValue(1);
+        turboCheck.setSelected(false);
+        arachnophobiaCheck.setSelected(false);
+        pauseFocusCheck.setSelected(true);
+        confirmQuitCheck.setSelected(true);
+        showTooltipsCheck.setSelected(true);
+        fuzzParasitesCheck.setSelected(true);
+    }
+
+    private void resetVideoTabToDefaults() {
+        sizeCombo.setSelectedItem("1000x700");
+        if (sizeCombo.getSelectedItem() == null) {
+            sizeCombo.setSelectedIndex(0);
+        }
+        fullScreenCheck.setSelected(false);
+        visualFiltersCheck.setSelected(true);
+    }
+
+    private void resetAudioTabToDefaults() {
+        masterVolSlider.setValue(80);
+        musicVolSlider.setValue(70);
+        sfxVolSlider.setValue(100);
+    }
+
+    private void resetRolesTabToDefaults() {
+        selectRoleCombo(defaultRoleWorkerCombo, GameConstants.TYPE_WORKER, GameConstants.ROLE_FORAGER.getId());
+        selectRoleCombo(defaultRoleSoldierCombo, GameConstants.TYPE_SOLDIER, GameConstants.ROLE_HUNTER.getId());
+        selectRoleCombo(defaultRoleMajorCombo, GameConstants.TYPE_MAJOR, GameConstants.ROLE_BRUTE.getId());
+        selectRoleCombo(defaultRolePrincessCombo, GameConstants.TYPE_PRINCESS, GameConstants.ROLE_BREEDER.getId());
+        selectRoleCombo(defaultRoleQueenCombo, GameConstants.TYPE_QUEEN, GameConstants.ROLE_LAYER.getId());
+    }
+
+    private void selectRoleCombo(JComboBox<AntRole> combo, AntType type, int id) {
+        for (int i = 0; i < combo.getItemCount(); i++) {
+            if (combo.getItemAt(i).getId() == id) {
+                combo.setSelectedIndex(i);
+                return;
+            }
+        }
+        AntRole fallback = Engine.resolveDefaultRoleForAntType(type, engine);
+        if (fallback != null) {
+            for (int i = 0; i < combo.getItemCount(); i++) {
+                if (combo.getItemAt(i).getId() == fallback.getId()) {
+                    combo.setSelectedIndex(i);
+                    return;
+                }
+            }
+        }
+        if (combo.getItemCount() > 0) {
+            combo.setSelectedIndex(0);
+        }
     }
     
     private JPanel createVideoTab() {
@@ -283,6 +480,17 @@ public class SettingsPanel extends JPanel {
         visualFiltersCheck = new JCheckBox();
         styleCheckBox(visualFiltersCheck);
         c.gridx = 1; panel.add(visualFiltersCheck, c);
+
+        c.gridy = 3;
+        c.gridx = 0;
+        c.gridwidth = 2;
+        c.anchor = GridBagConstraints.EAST;
+        c.insets = new Insets(16, 15, 5, 15);
+        resetVideoButton = new JButton();
+        styleButton(resetVideoButton);
+        resetVideoButton.addActionListener(e -> resetVideoTabToDefaults());
+        setupNavigation(resetVideoButton);
+        panel.add(resetVideoButton, c);
         
         return panel;
     }
@@ -325,6 +533,17 @@ public class SettingsPanel extends JPanel {
         
         sfxVolSlider = createVolumeSlider();
         c.gridx = 1; panel.add(sfxVolSlider, c);
+
+        c.gridy = 3;
+        c.gridx = 0;
+        c.gridwidth = 2;
+        c.anchor = GridBagConstraints.EAST;
+        c.insets = new Insets(16, 15, 5, 15);
+        resetAudioButton = new JButton();
+        styleButton(resetAudioButton);
+        resetAudioButton.addActionListener(e -> resetAudioTabToDefaults());
+        setupNavigation(resetAudioButton);
+        panel.add(resetAudioButton, c);
         
         return panel;
     }
@@ -342,6 +561,7 @@ public class SettingsPanel extends JPanel {
         tabbedPane.setTitleAt(0, LanguageStrings.get(LanguageStrings.SETTINGS_TAB_GENERAL));
         tabbedPane.setTitleAt(1, LanguageStrings.get(LanguageStrings.SETTINGS_TAB_VIDEO));
         tabbedPane.setTitleAt(2, LanguageStrings.get(LanguageStrings.SETTINGS_TAB_AUDIO));
+        tabbedPane.setTitleAt(3, LanguageStrings.get(LanguageStrings.SETTINGS_TAB_ROLES));
         
         langLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_LANGUAGE));
         autoLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_AUTOSAVE));
@@ -359,9 +579,19 @@ public class SettingsPanel extends JPanel {
         masterLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_MASTER_VOL));
         musicLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_MUSIC_VOL));
         sfxLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_SFX_VOL));
+
+        defaultRoleWorkerLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_DEFAULT_ROLE_WORKER));
+        defaultRoleSoldierLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_DEFAULT_ROLE_SOLDIER));
+        defaultRoleMajorLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_DEFAULT_ROLE_MAJOR));
+        defaultRolePrincessLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_DEFAULT_ROLE_PRINCESS));
+        defaultRoleQueenLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_DEFAULT_ROLE_QUEEN));
         
         saveButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_SAVE_APPLY));
         backButton.setText(LanguageStrings.get(LanguageStrings.UI_BACK));
+        resetGeneralButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_RESET_TAB));
+        resetVideoButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_RESET_TAB));
+        resetAudioButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_RESET_TAB));
+        resetRolesButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_RESET_TAB));
         
         // Refresh autosave combo options
         int currentFreq = (autosaveCombo.getSelectedItem() != null) ? ((AutosaveOption)autosaveCombo.getSelectedItem()).value : 0;
@@ -411,21 +641,8 @@ public class SettingsPanel extends JPanel {
     }
 
     public void loadSettings() {
-        String currentLang = engine.getLanguage();
-        for (int i = 0; i < languageCombo.getItemCount(); i++) {
-            if (languageCombo.getItemAt(i).code.equals(currentLang)) {
-                languageCombo.setSelectedIndex(i);
-                break;
-            }
-        }
-        
-        int freq = engine.getAutosaveFrequency();
-        for (int i = 0; i < autosaveCombo.getItemCount(); i++) {
-            if (autosaveCombo.getItemAt(i).value == freq) {
-                autosaveCombo.setSelectedIndex(i);
-                break;
-            }
-        }
+        selectLanguageByCode(engine.getLanguage());
+        selectAutosaveByValue(engine.getAutosaveFrequency());
         
         turboCheck.setSelected(engine.isAllowTurboMode());
         arachnophobiaCheck.setSelected(engine.isArachnophobiaMode());
@@ -441,6 +658,12 @@ public class SettingsPanel extends JPanel {
         masterVolSlider.setValue(engine.getMasterVolume());
         musicVolSlider.setValue(engine.getMusicVolume());
         sfxVolSlider.setValue(engine.getSfxVolume());
+
+        selectRoleCombo(defaultRoleWorkerCombo, GameConstants.TYPE_WORKER, engine.getDefaultRoleWorker());
+        selectRoleCombo(defaultRoleSoldierCombo, GameConstants.TYPE_SOLDIER, engine.getDefaultRoleSoldier());
+        selectRoleCombo(defaultRoleMajorCombo, GameConstants.TYPE_MAJOR, engine.getDefaultRoleMajor());
+        selectRoleCombo(defaultRolePrincessCombo, GameConstants.TYPE_PRINCESS, engine.getDefaultRolePrincess());
+        selectRoleCombo(defaultRoleQueenCombo, GameConstants.TYPE_QUEEN, engine.getDefaultRoleQueen());
     }
 
     private void saveSettings() {
@@ -469,6 +692,12 @@ public class SettingsPanel extends JPanel {
         engine.setMasterVolume(masterVolSlider.getValue());
         engine.setMusicVolume(musicVolSlider.getValue());
         engine.setSfxVolume(sfxVolSlider.getValue());
+
+        applyDefaultRoleFromCombo(defaultRoleWorkerCombo, GameConstants.TYPE_WORKER, GameConstants.ROLE_FORAGER.getId());
+        applyDefaultRoleFromCombo(defaultRoleSoldierCombo, GameConstants.TYPE_SOLDIER, GameConstants.ROLE_HUNTER.getId());
+        applyDefaultRoleFromCombo(defaultRoleMajorCombo, GameConstants.TYPE_MAJOR, GameConstants.ROLE_BRUTE.getId());
+        applyDefaultRoleFromCombo(defaultRolePrincessCombo, GameConstants.TYPE_PRINCESS, GameConstants.ROLE_BREEDER.getId());
+        applyDefaultRoleFromCombo(defaultRoleQueenCombo, GameConstants.TYPE_QUEEN, GameConstants.ROLE_LAYER.getId());
 
         engine.saveGlobalSettings(); 
         frame.applyEngineSettings();

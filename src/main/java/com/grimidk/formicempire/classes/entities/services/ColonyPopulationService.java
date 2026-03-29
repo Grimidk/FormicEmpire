@@ -2,6 +2,7 @@ package com.grimidk.formicempire.classes.entities.services;
 
 import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
@@ -72,19 +73,9 @@ public class ColonyPopulationService {
     }
 
     // --- Role Management ---
-    private AntRole getDefaultRoleForType(AntType type) {
-        if (type == GameConstants.TYPE_WORKER) return GameConstants.ROLE_FORAGER;
-        else if (type == GameConstants.TYPE_SOLDIER) return GameConstants.ROLE_HUNTER;
-        else if (type == GameConstants.TYPE_MAJOR) return GameConstants.ROLE_BRUTE; 
-        else if (type == GameConstants.TYPE_PRINCESS) return GameConstants.ROLE_BREEDER;
-        else if (type == GameConstants.TYPE_DRONE) return GameConstants.ROLE_DRONE;
-        else if (type == GameConstants.TYPE_QUEEN) return GameConstants.ROLE_LAYER;
-        return null; 
-    }
-
-    private void assignRolesForType(Colony colony, List<Ant> ants, AntType type) {
-        AntRole defaultRole = getDefaultRoleForType(type);
-        if (defaultRole == null) return; 
+    private void assignRolesForType(Colony colony, List<Ant> ants, AntType type, Engine engine) {
+        AntRole defaultRole = Engine.resolveDefaultRoleForAntType(type, engine);
+        if (defaultRole == null) return;
         
         List<Ant> tradeAnts = new ArrayList<>();
         List<Ant> availableAnts = new ArrayList<>();
@@ -127,12 +118,12 @@ public class ColonyPopulationService {
         }
     }
 
-    public void runRoleAssignment(Colony colony) {
-        assignRolesForType(colony, colony.getWorkers(), GameConstants.TYPE_WORKER);
-        assignRolesForType(colony, colony.getSoldiers(), GameConstants.TYPE_SOLDIER);
-        assignRolesForType(colony, colony.getMajors(), GameConstants.TYPE_MAJOR);
-        assignRolesForType(colony, colony.getPrincesses(), GameConstants.TYPE_PRINCESS);
-        assignRolesForType(colony, colony.getQueens(), GameConstants.TYPE_QUEEN);
+    public void runRoleAssignment(Colony colony, Engine engine) {
+        assignRolesForType(colony, colony.getWorkers(), GameConstants.TYPE_WORKER, engine);
+        assignRolesForType(colony, colony.getSoldiers(), GameConstants.TYPE_SOLDIER, engine);
+        assignRolesForType(colony, colony.getMajors(), GameConstants.TYPE_MAJOR, engine);
+        assignRolesForType(colony, colony.getPrincesses(), GameConstants.TYPE_PRINCESS, engine);
+        assignRolesForType(colony, colony.getQueens(), GameConstants.TYPE_QUEEN, engine);
     }
 
     // --- Hatching & Lifecycle ---

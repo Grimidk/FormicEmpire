@@ -4,6 +4,8 @@ import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.infrasctructure.Engine;
+import com.grimidk.formicempire.classes.interfaces.MainFrame;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
@@ -31,14 +33,20 @@ public class RoleManagementDialog extends ZeroDialog {
     public static final int TAB_QUEEN = 4;
 
     private final Colony colony;
+    private final Engine engine;
     private final JTabbedPane tabbedPane = new JTabbedPane();
     private final List<RolePanel> rolePanels = new ArrayList<>();
     private final Set<AntType> initializedTypes = new HashSet<>();
     private final Map<Integer, Integer> tabIndexMap = new HashMap<>();
 
     public RoleManagementDialog(JFrame owner, Colony colony) {
+        this(owner, colony, owner instanceof MainFrame ? ((MainFrame) owner).getEngine() : null);
+    }
+
+    public RoleManagementDialog(JFrame owner, Colony colony, Engine engine) {
         super(owner, LanguageStrings.get(LanguageStrings.DIALOG_ROLES_TITLE), AssetStyles.DEFAULT_DIALOG_SIZE);
         this.colony = colony;
+        this.engine = engine;
 
         add(tabbedPane, BorderLayout.CENTER);
         
@@ -122,7 +130,7 @@ public class RoleManagementDialog extends ZeroDialog {
             return true;
         }
 
-        RolePanel panel = new RolePanel(colony, type);
+        RolePanel panel = new RolePanel(colony, type, engine);
         rolePanels.add(panel);
         tabbedPane.insertTab(type.getName(), type.getIcon(), panel, null, expectedIndex);
         initializedTypes.add(type);
@@ -158,16 +166,6 @@ public class RoleManagementDialog extends ZeroDialog {
                 }
             }
         });
-    }
-
-    private static AntRole getDefaultRoleForType(AntType type) {
-        if (type == GameConstants.TYPE_WORKER) return GameConstants.ROLE_FORAGER;
-        else if (type == GameConstants.TYPE_SOLDIER) return GameConstants.ROLE_HUNTER;
-        else if (type == GameConstants.TYPE_MAJOR) return GameConstants.ROLE_BRUTE; 
-        else if (type == GameConstants.TYPE_PRINCESS) return GameConstants.ROLE_BREEDER;
-        else if (type == GameConstants.TYPE_DRONE) return GameConstants.ROLE_DRONE;
-        else if (type == GameConstants.TYPE_QUEEN) return GameConstants.ROLE_LAYER;
-        return null; 
     }
 
     private static Upgrade getUpgradeForRole(AntRole role) {
@@ -221,6 +219,7 @@ public class RoleManagementDialog extends ZeroDialog {
     private static class RolePanel extends JPanel {
         private final Colony colony;
         private final AntType antType;
+        private final Engine engine;
         private final JLabel totalLabel;
         private final JLabel assignedLabel;
         private final JLabel unassignedLabel;
@@ -229,9 +228,10 @@ public class RoleManagementDialog extends ZeroDialog {
         private final Set<AntRole> displayedRoles = new HashSet<>();
         private boolean isUpdating = false;
 
-        RolePanel(Colony colony, AntType antType) {
+        RolePanel(Colony colony, AntType antType, Engine engine) {
             this.colony = colony;
             this.antType = antType;
+            this.engine = engine;
 
             setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
             setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -308,7 +308,7 @@ public class RoleManagementDialog extends ZeroDialog {
 
                 if (newTotalAssigned > currentTotalAnts) {
 
-                    AntRole defaultRole = getDefaultRoleForType(antType);
+                    AntRole defaultRole = Engine.resolveDefaultRoleForAntType(antType, engine);
                     
                     if (defaultRole != null && !role.equals(defaultRole) && spinnerMap.containsKey(defaultRole)) {
                         

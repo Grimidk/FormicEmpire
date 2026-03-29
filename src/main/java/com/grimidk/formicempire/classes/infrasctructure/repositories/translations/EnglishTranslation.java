@@ -380,6 +380,7 @@ public class EnglishTranslation implements Translation {
         en.put("SETTINGS_EVERY_6_MONTHS", "Every 6 Months");
         en.put("SETTINGS_EVERY_YEAR", "Every Year (12 Months)");
         en.put("SETTINGS_SAVE_APPLY", "Save & Apply");
+        en.put("SETTINGS_RESET_TAB", "Reset this tab to defaults");
         en.put("SETTINGS_SAVED_MSG", "Settings saved and applied.");
         
         en.put("SETTINGS_TAB_GENERAL", "General");

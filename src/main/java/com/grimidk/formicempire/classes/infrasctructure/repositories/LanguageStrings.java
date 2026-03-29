@@ -444,6 +444,7 @@ public final class LanguageStrings {
     public static final String SETTINGS_EVERY_6_MONTHS = "SETTINGS_EVERY_6_MONTHS";
     public static final String SETTINGS_EVERY_YEAR = "SETTINGS_EVERY_YEAR";
     public static final String SETTINGS_SAVE_APPLY = "SETTINGS_SAVE_APPLY";
+    public static final String SETTINGS_RESET_TAB = "SETTINGS_RESET_TAB";
     public static final String SETTINGS_SAVED_MSG = "SETTINGS_SAVED_MSG";
     
     public static final String SETTINGS_TAB_GENERAL = "SETTINGS_TAB_GENERAL";

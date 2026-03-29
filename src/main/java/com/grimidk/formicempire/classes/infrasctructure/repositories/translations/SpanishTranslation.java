@@ -380,11 +380,13 @@ public class SpanishTranslation implements Translation {
         es.put("SETTINGS_EVERY_6_MONTHS", "Cada 6 Meses");
         es.put("SETTINGS_EVERY_YEAR", "Cada Año (12 Meses)");
         es.put("SETTINGS_SAVE_APPLY", "Guardar y Aplicar");
+        es.put("SETTINGS_RESET_TAB", "Restablecer esta pestaña");
         es.put("SETTINGS_SAVED_MSG", "Ajustes guardados y aplicados.");
         
         es.put("SETTINGS_TAB_GENERAL", "General");
         es.put("SETTINGS_TAB_VIDEO", "Vídeo");
         es.put("SETTINGS_TAB_AUDIO", "Audio");
+        es.put("SETTINGS_TAB_ROLES", "Roles");
         
         es.put("SETTINGS_VISUAL_FILTERS", "Filtros Visuales:");
         es.put("SETTINGS_ARACHNOPHOBIA", "Modo Aracnofobia:");

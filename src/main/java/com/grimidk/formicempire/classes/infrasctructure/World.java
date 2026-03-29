@@ -740,9 +740,22 @@ public class World {
                 }
             }
         }
+
+        reapplyRoleAssignmentsAfterLoad();
         
         changeActiveHex(getSpawnHex()); 
         updateEnvironmentalConditions();
+    }
+
+    private void reapplyRoleAssignmentsAfterLoad() {
+        if (this.engine == null) {
+            return;
+        }
+        for (Hex hex : this.hexes) {
+            if (hex.getColony() != null) {
+                hex.getColony().runRoleAssignment(this.engine);
+            }
+        }
     }
 
     public Hex getHexAt(int q, int r) {
@@ -844,7 +857,7 @@ public class World {
         
         for (Hex hex : this.hexes) {
             if (hex.getColony() != null) {
-                hex.getColony().runHourlyJobs(hex.getBiome());
+                hex.getColony().runHourlyJobs(hex.getBiome(), this.engine);
             }
         }
 

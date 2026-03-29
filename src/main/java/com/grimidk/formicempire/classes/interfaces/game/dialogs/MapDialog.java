@@ -377,7 +377,7 @@ public class MapDialog extends ZeroDialog {
                 }
                 
                 if (hex != world.getActiveHex()) {
-                    fillColor = fadeToBackground(fillColor, 0.4f); 
+                    fillColor = AssetStyles.fadeTowardBackground(fillColor, 0.4f); 
                 }
                 
                 g2d.setColor(fillColor);
@@ -507,7 +507,7 @@ public class MapDialog extends ZeroDialog {
             }
 
             Color avgColor = calculateAverageColor(biome.getIcon());
-            avgColor = lighten(avgColor, 0.5f); 
+            avgColor = AssetStyles.lightenTowardBackground(avgColor, 0.5f);
             
             biomeColorCache.put(biome.getId(), avgColor);
             return avgColor;
@@ -545,29 +545,11 @@ public class MapDialog extends ZeroDialog {
                     }
                 }
 
-                if (count == 0) return AssetStyles.BACKGROUND_COLOR;
+                return AssetStyles.colorFromAveragedRgb(sumR, sumG, sumB, count);
 
-                return new Color((int)(sumR/count), (int)(sumG/count), (int)(sumB/count));
-                
             } catch (Exception e) {
                 return AssetStyles.BACKGROUND_COLOR;
             }
-        }
-        
-        private Color lighten(Color c, float amount) {
-            Color bg = AssetStyles.BACKGROUND_COLOR;
-            int r = Math.min(255, (int)(c.getRed() + (bg.getRed() - c.getRed()) * amount));
-            int g = Math.min(255, (int)(c.getGreen() + (bg.getGreen() - c.getGreen()) * amount));
-            int b = Math.min(255, (int)(c.getBlue() + (bg.getBlue() - c.getBlue()) * amount));
-            return new Color(r, g, b, c.getAlpha());
-        }
-        
-        private Color fadeToBackground(Color c, float factor) {
-            Color bg = AssetStyles.BACKGROUND_COLOR;
-            int r = (int) (c.getRed() * (1 - factor) + bg.getRed() * factor);
-            int g = (int) (c.getGreen() * (1 - factor) + bg.getGreen() * factor);
-            int b = (int) (c.getBlue() * (1 - factor) + bg.getBlue() * factor);
-            return new Color(r, g, b);
         }
     }
 }
