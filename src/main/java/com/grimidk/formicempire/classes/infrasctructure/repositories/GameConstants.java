@@ -133,63 +133,63 @@ public final class GameConstants {
 
     // --- Biomes ---
     public static final Biome BIOME_PLAINS = new Biome(1, LanguageStrings.BIOME_PLAINS, 25, 2, 1f, 1f, 0f,
-        loadIcon("icons/biomes/plains.png"));
+        loadIcon("icons/biomes/plains.png"), null);
     static { biomes.add(BIOME_PLAINS); }
     public static final Biome BIOME_FOREST = new Biome(2, LanguageStrings.BIOME_FOREST, 22, 3, 2f, 2f, 0.1f,
-        loadIcon("icons/biomes/forest.png"));
+        loadIcon("icons/biomes/forest.png"), null);
     static { biomes.add(BIOME_FOREST); }
     public static final Biome BIOME_JUNGLE = new Biome(3, LanguageStrings.BIOME_JUNGLE, 30, 4, 2.5f, 2.5f, 0.2f,
-        loadIcon("icons/biomes/jungle.png"));
+        loadIcon("icons/biomes/jungle.png"), null);
     static { biomes.add(BIOME_JUNGLE); }
     public static final Biome BIOME_SWAMP = new Biome(4, LanguageStrings.BIOME_SWAMP, 26, 5, 1.5f, 1.5f, 0f,
-        loadIcon("icons/biomes/swamp.png"));
+        loadIcon("icons/biomes/swamp.png"), null);
     static { biomes.add(BIOME_SWAMP); }
     public static final Biome BIOME_URBAN = new Biome(5, LanguageStrings.BIOME_URBAN, 28, 1, 0.5f, 0.5f, 0.5f,
-        loadIcon("icons/biomes/urban.png"));
+        loadIcon("icons/biomes/urban.png"), null);
     static { biomes.add(BIOME_URBAN); }
     public static final Biome BIOME_TUNDRA = new Biome(6, LanguageStrings.BIOME_TUNDRA, 5, 2, 0.2f, 0.2f, 0.3f,
-        loadIcon("icons/biomes/tundra.png"));
+        loadIcon("icons/biomes/tundra.png"), null);
     static { biomes.add(BIOME_TUNDRA); }
     public static final Biome BIOME_TAIGA = new Biome(7, LanguageStrings.BIOME_TAIGA, 12, 1, 0.4f, 0.3f, 0.5f,
-        loadIcon("icons/biomes/taiga.png"));
+        loadIcon("icons/biomes/taiga.png"), null);
     static { biomes.add(BIOME_TAIGA); }
     public static final Biome BIOME_DESERT = new Biome(8, LanguageStrings.BIOME_DESERT, 45, 0, 0.05f, 0.02f, 1f,
-        loadIcon("icons/biomes/dessert.png"));
+        loadIcon("icons/biomes/dessert.png"), null);
     static { biomes.add(BIOME_DESERT); }
     public static final Biome BIOME_MOUNTAIN = new Biome(9, LanguageStrings.BIOME_MOUNTAIN, 12, 1, 0.1f, 0.3f, 2f,
-        loadIcon("icons/biomes/mountain.png"));
+        loadIcon("icons/biomes/mountain.png"), null);
     static { biomes.add(BIOME_MOUNTAIN); }
     public static final Biome BIOME_VOLCANIC = new Biome(10, LanguageStrings.BIOME_VOLCANIC, 60, 0, 0.01f, 0.01f, 5f,
-        loadIcon("icons/biomes/volcanic.png"));
+        loadIcon("icons/biomes/volcanic.png"), null);
     static { biomes.add(BIOME_VOLCANIC); }
     public static final Biome BIOME_LAKE = new Biome(11, LanguageStrings.BIOME_LAKE, 25, 5, 0.5f, 0.5f, 0f,
-        loadIcon("icons/biomes/lake.png"));
+        loadIcon("icons/biomes/lake.png"), null);
     static { biomes.add(BIOME_LAKE); }
     public static final Biome BIOME_OCEAN = new Biome(12, LanguageStrings.BIOME_OCEAN, 20, 5, 0.2f, 0.2f, 0f,
-        loadIcon("icons/biomes/ocean.png"));
+        loadIcon("icons/biomes/ocean.png"), null);
     static { biomes.add(BIOME_OCEAN); }
 
     // --- Resources ---
-    public static final ResourceType RESOURCE_PLANT = new ResourceType(1, LanguageStrings.RESOURCE_PLANT, true, false, 
-        loadIcon("icons/resources/plant.png"));
+    public static final ResourceType RESOURCE_PLANT = new ResourceType(1, LanguageStrings.RESOURCE_PLANT, true, false,
+        loadIcon("icons/resources/plant.png"), null, null, null, null);
     static { resources.add(RESOURCE_PLANT); }
-    public static final ResourceType RESOURCE_FUNGI = new ResourceType(2, LanguageStrings.RESOURCE_FUNGI, true, false, 
-        loadIcon("icons/resources/mushroom.png"));
+    public static final ResourceType RESOURCE_FUNGI = new ResourceType(2, LanguageStrings.RESOURCE_FUNGI, true, false,
+        loadIcon("icons/resources/mushroom.png"), null, null, null, null);
     static { resources.add(RESOURCE_FUNGI); }
-    public static final ResourceType RESOURCE_MEAT = new ResourceType(3, LanguageStrings.RESOURCE_MEAT, true, false, 
-        loadIcon("icons/resources/protein.png"));
+    public static final ResourceType RESOURCE_MEAT = new ResourceType(3, LanguageStrings.RESOURCE_MEAT, true, false,
+        loadIcon("icons/resources/protein.png"), null, null, null, null);
     static { resources.add(RESOURCE_MEAT); }
-    public static final ResourceType RESOURCE_WATER = new ResourceType(4, LanguageStrings.RESOURCE_WATER, true, true, 
-        loadIcon("icons/resources/water.png"));
+    public static final ResourceType RESOURCE_WATER = new ResourceType(4, LanguageStrings.RESOURCE_WATER, true, true,
+        loadIcon("icons/resources/water.png"), null, null, null, null);
     static { resources.add(RESOURCE_WATER); }
-    public static final ResourceType RESOURCE_SYRUP = new ResourceType(5, LanguageStrings.RESOURCE_SYRUP, true, true, 
-        loadIcon("icons/resources/syrup.png"));
+    public static final ResourceType RESOURCE_SYRUP = new ResourceType(5, LanguageStrings.RESOURCE_SYRUP, true, true,
+        loadIcon("icons/resources/syrup.png"), null, null, null, null);
     static { resources.add(RESOURCE_SYRUP); }
-    public static final ResourceType RESOURCE_RESIN = new ResourceType(6, LanguageStrings.RESOURCE_RESIN, false, true, 
-        loadIcon("icons/resources/resin.png"));
+    public static final ResourceType RESOURCE_RESIN = new ResourceType(6, LanguageStrings.RESOURCE_RESIN, false, true,
+        loadIcon("icons/resources/resin.png"), null, null, null, null);
     static { resources.add(RESOURCE_RESIN); }
-    public static final ResourceType RESOURCE_ROCK = new ResourceType(7, LanguageStrings.RESOURCE_ROCK, false, false, 
-        loadIcon("icons/resources/mineral.png"));
+    public static final ResourceType RESOURCE_ROCK = new ResourceType(7, LanguageStrings.RESOURCE_ROCK, false, false,
+        loadIcon("icons/resources/mineral.png"), null, null, null, null);
     static { resources.add(RESOURCE_ROCK); }
 
     // --- Times of Day ---
@@ -308,17 +308,17 @@ public final class GameConstants {
     static { antStatuses.add(STATUS_ZOMBIFIED); }
 
     // --- Move Status ---
-    public static final MoveStatus MOVE_STATIC = new MoveStatus(1, LanguageStrings.MOVE_STATIC, 0);
+    public static final MoveStatus MOVE_STATIC = new MoveStatus(1, LanguageStrings.MOVE_STATIC, 0, null);
     static { moveStatuses.add(MOVE_STATIC); }
-    public static final MoveStatus MOVE_WANDER = new MoveStatus(2, LanguageStrings.MOVE_WANDER, 1/2f);
+    public static final MoveStatus MOVE_WANDER = new MoveStatus(2, LanguageStrings.MOVE_WANDER, 1/2f, null);
     static { moveStatuses.add(MOVE_WANDER); }
-    public static final MoveStatus MOVE_MARCH = new MoveStatus(3, LanguageStrings.MOVE_MARCH, 1f);
+    public static final MoveStatus MOVE_MARCH = new MoveStatus(3, LanguageStrings.MOVE_MARCH, 1f, null);
     static { moveStatuses.add(MOVE_MARCH); }
-    public static final MoveStatus MOVE_SPEED = new MoveStatus(4, LanguageStrings.MOVE_SPEED, 3/2f);
+    public static final MoveStatus MOVE_SPEED = new MoveStatus(4, LanguageStrings.MOVE_SPEED, 3/2f, null);
     static { moveStatuses.add(MOVE_SPEED); }
-    public static final MoveStatus MOVE_FLY = new MoveStatus(5, LanguageStrings.MOVE_FLY, 3f);
+    public static final MoveStatus MOVE_FLY = new MoveStatus(5, LanguageStrings.MOVE_FLY, 3f, null);
     static { moveStatuses.add(MOVE_FLY); }
-    public static final MoveStatus MOVE_PATROL = new MoveStatus(6, LanguageStrings.MOVE_PATROL, 1f);
+    public static final MoveStatus MOVE_PATROL = new MoveStatus(6, LanguageStrings.MOVE_PATROL, 1f, null);
     static { moveStatuses.add(MOVE_PATROL); }
 
     // --- Bug Types ---
@@ -370,73 +370,73 @@ public final class GameConstants {
     // --- Ant Subtypes ---
 
     // --- Ant Roles ---
-    public static final AntRole ROLE_FORAGER = new AntRole(1, TYPE_WORKER, LanguageStrings.ROLE_FORAGER);
+    public static final AntRole ROLE_FORAGER = new AntRole(1, TYPE_WORKER, LanguageStrings.ROLE_FORAGER, null);
     static { antRoles.add(ROLE_FORAGER); }
-    public static final AntRole ROLE_NURSE = new AntRole(2, TYPE_WORKER, LanguageStrings.ROLE_NURSE);
+    public static final AntRole ROLE_NURSE = new AntRole(2, TYPE_WORKER, LanguageStrings.ROLE_NURSE, null);
     static { antRoles.add(ROLE_NURSE); }
-    public static final AntRole ROLE_BUILDER = new AntRole(3, TYPE_WORKER, LanguageStrings.ROLE_BUILDER);
+    public static final AntRole ROLE_BUILDER = new AntRole(3, TYPE_WORKER, LanguageStrings.ROLE_BUILDER, null);
     static { antRoles.add(ROLE_BUILDER); }
-    public static final AntRole ROLE_SCOUT = new AntRole(4, TYPE_WORKER, LanguageStrings.ROLE_SCOUT);
+    public static final AntRole ROLE_SCOUT = new AntRole(4, TYPE_WORKER, LanguageStrings.ROLE_SCOUT, null);
     static { antRoles.add(ROLE_SCOUT); }
-    public static final AntRole ROLE_FARMER = new AntRole(5, TYPE_WORKER, LanguageStrings.ROLE_FARMER);
+    public static final AntRole ROLE_FARMER = new AntRole(5, TYPE_WORKER, LanguageStrings.ROLE_FARMER, null);
     static { antRoles.add(ROLE_FARMER); }
-    public static final AntRole ROLE_RANCHER = new AntRole(6, TYPE_WORKER, LanguageStrings.ROLE_RANCHER);
+    public static final AntRole ROLE_RANCHER = new AntRole(6, TYPE_WORKER, LanguageStrings.ROLE_RANCHER, null);
     static { antRoles.add(ROLE_RANCHER); }
-    public static final AntRole ROLE_GRAVER = new AntRole(7, TYPE_WORKER, LanguageStrings.ROLE_GRAVER);
+    public static final AntRole ROLE_GRAVER = new AntRole(7, TYPE_WORKER, LanguageStrings.ROLE_GRAVER, null);
     static { antRoles.add(ROLE_GRAVER); }
-    public static final AntRole ROLE_MINER = new AntRole(8, TYPE_WORKER, LanguageStrings.ROLE_MINER);
+    public static final AntRole ROLE_MINER = new AntRole(8, TYPE_WORKER, LanguageStrings.ROLE_MINER, null);
     static { antRoles.add(ROLE_MINER); }
-    public static final AntRole ROLE_COURIER = new AntRole(9, TYPE_WORKER, LanguageStrings.ROLE_COURIER);
+    public static final AntRole ROLE_COURIER = new AntRole(9, TYPE_WORKER, LanguageStrings.ROLE_COURIER, null);
     static { antRoles.add(ROLE_COURIER); }
-    public static final AntRole ROLE_POTTER = new AntRole(10, TYPE_WORKER, LanguageStrings.ROLE_POTTER);
+    public static final AntRole ROLE_POTTER = new AntRole(10, TYPE_WORKER, LanguageStrings.ROLE_POTTER, null);
     static { antRoles.add(ROLE_POTTER); }
-    public static final AntRole ROLE_GUARD = new AntRole(11, TYPE_SOLDIER, LanguageStrings.ROLE_GUARD);
+    public static final AntRole ROLE_GUARD = new AntRole(11, TYPE_SOLDIER, LanguageStrings.ROLE_GUARD, null);
     static { antRoles.add(ROLE_GUARD); }
-    public static final AntRole ROLE_WARRIOR = new AntRole(12, TYPE_SOLDIER, LanguageStrings.ROLE_WARRIOR);
+    public static final AntRole ROLE_WARRIOR = new AntRole(12, TYPE_SOLDIER, LanguageStrings.ROLE_WARRIOR, null);
     static { antRoles.add(ROLE_WARRIOR); }
-    public static final AntRole ROLE_DEFENDER = new AntRole(13, TYPE_SOLDIER, LanguageStrings.ROLE_DEFENDER);
+    public static final AntRole ROLE_DEFENDER = new AntRole(13, TYPE_SOLDIER, LanguageStrings.ROLE_DEFENDER, null);
     static { antRoles.add(ROLE_DEFENDER); }
-    public static final AntRole ROLE_POLICE = new AntRole(14, TYPE_SOLDIER, LanguageStrings.ROLE_POLICE);
+    public static final AntRole ROLE_POLICE = new AntRole(14, TYPE_SOLDIER, LanguageStrings.ROLE_POLICE, null);
     static { antRoles.add(ROLE_POLICE); }
-    public static final AntRole ROLE_BOMBER = new AntRole(15, TYPE_SOLDIER, LanguageStrings.ROLE_BOMBER);
+    public static final AntRole ROLE_BOMBER = new AntRole(15, TYPE_SOLDIER, LanguageStrings.ROLE_BOMBER, null);
     static { antRoles.add(ROLE_BOMBER); }
-    public static final AntRole ROLE_HUNTER = new AntRole(16, TYPE_SOLDIER, LanguageStrings.ROLE_HUNTER);
+    public static final AntRole ROLE_HUNTER = new AntRole(16, TYPE_SOLDIER, LanguageStrings.ROLE_HUNTER, null);
     static { antRoles.add(ROLE_HUNTER); }
-    public static final AntRole ROLE_BRUTE = new AntRole(17, TYPE_MAJOR, LanguageStrings.ROLE_BRUTE);
+    public static final AntRole ROLE_BRUTE = new AntRole(17, TYPE_MAJOR, LanguageStrings.ROLE_BRUTE, null);
     static { antRoles.add(ROLE_BRUTE); }
-    public static final AntRole ROLE_CARRIER = new AntRole(18, TYPE_MAJOR, LanguageStrings.ROLE_CARRIER);
+    public static final AntRole ROLE_CARRIER = new AntRole(18, TYPE_MAJOR, LanguageStrings.ROLE_CARRIER, null);
     static { antRoles.add(ROLE_CARRIER); }
-    public static final AntRole ROLE_ARTILLERY = new AntRole(19, TYPE_MAJOR, LanguageStrings.ROLE_ARTILLERY);
+    public static final AntRole ROLE_ARTILLERY = new AntRole(19, TYPE_MAJOR, LanguageStrings.ROLE_ARTILLERY, null);
     static { antRoles.add(ROLE_ARTILLERY); }
-    public static final AntRole ROLE_SIEGE = new AntRole(20, TYPE_MAJOR, LanguageStrings.ROLE_SIEGE);
+    public static final AntRole ROLE_SIEGE = new AntRole(20, TYPE_MAJOR, LanguageStrings.ROLE_SIEGE, null);
     static { antRoles.add(ROLE_SIEGE); }
-    public static final AntRole ROLE_BORER = new AntRole(21, TYPE_MAJOR, LanguageStrings.ROLE_BORER);
+    public static final AntRole ROLE_BORER = new AntRole(21, TYPE_MAJOR, LanguageStrings.ROLE_BORER, null);
     static { antRoles.add(ROLE_BORER); }
-    public static final AntRole ROLE_DRONE = new AntRole(22, TYPE_DRONE, LanguageStrings.ROLE_DRONE);
+    public static final AntRole ROLE_DRONE = new AntRole(22, TYPE_DRONE, LanguageStrings.ROLE_DRONE, null);
     static { antRoles.add(ROLE_DRONE); }
-    public static final AntRole ROLE_BREEDER = new AntRole(23, TYPE_PRINCESS, LanguageStrings.ROLE_BREEDER);
+    public static final AntRole ROLE_BREEDER = new AntRole(23, TYPE_PRINCESS, LanguageStrings.ROLE_BREEDER, null);
     static { antRoles.add(ROLE_BREEDER); }
-    public static final AntRole ROLE_DIPLOMAT = new AntRole(24, TYPE_PRINCESS, LanguageStrings.ROLE_DIPLOMAT);
+    public static final AntRole ROLE_DIPLOMAT = new AntRole(24, TYPE_PRINCESS, LanguageStrings.ROLE_DIPLOMAT, null);
     static { antRoles.add(ROLE_DIPLOMAT); }
-    public static final AntRole ROLE_LAYER = new AntRole(25, TYPE_QUEEN, LanguageStrings.ROLE_LAYER);
+    public static final AntRole ROLE_LAYER = new AntRole(25, TYPE_QUEEN, LanguageStrings.ROLE_LAYER, null);
     static { antRoles.add(ROLE_LAYER); }
-    public static final AntRole ROLE_RESEARCHER = new AntRole(26, TYPE_QUEEN, LanguageStrings.ROLE_RESEARCHER);
+    public static final AntRole ROLE_RESEARCHER = new AntRole(26, TYPE_QUEEN, LanguageStrings.ROLE_RESEARCHER, null);
     static { antRoles.add(ROLE_RESEARCHER); }
-    public static final AntRole ROLE_MILITIA = new AntRole(27, TYPE_WORKER, LanguageStrings.ROLE_MILITIA);
+    public static final AntRole ROLE_MILITIA = new AntRole(27, TYPE_WORKER, LanguageStrings.ROLE_MILITIA, null);
     static { antRoles.add(ROLE_MILITIA); }
-    public static final AntRole ROLE_CATCHER = new AntRole(28, TYPE_SOLDIER, LanguageStrings.ROLE_CATCHER);
+    public static final AntRole ROLE_CATCHER = new AntRole(28, TYPE_SOLDIER, LanguageStrings.ROLE_CATCHER, null);
     static { antRoles.add(ROLE_CATCHER); }
-    public static final AntRole ROLE_CRANE = new AntRole(29, TYPE_MAJOR, LanguageStrings.ROLE_CRANE);
+    public static final AntRole ROLE_CRANE = new AntRole(29, TYPE_MAJOR, LanguageStrings.ROLE_CRANE, null);
     static { antRoles.add(ROLE_CRANE); }
-    public static final AntRole ROLE_TRANSPORT = new AntRole(30, TYPE_MAJOR, LanguageStrings.ROLE_TRANSPORT);
+    public static final AntRole ROLE_TRANSPORT = new AntRole(30, TYPE_MAJOR, LanguageStrings.ROLE_TRANSPORT, null);
     static { antRoles.add(ROLE_TRANSPORT); }
-    public static final AntRole ROLE_ASSISTANT = new AntRole(31, TYPE_PRINCESS, LanguageStrings.ROLE_ASSISTANT);
+    public static final AntRole ROLE_ASSISTANT = new AntRole(31, TYPE_PRINCESS, LanguageStrings.ROLE_ASSISTANT, null);
     static { antRoles.add(ROLE_ASSISTANT); }
-    public static final AntRole ROLE_ESCORT = new AntRole(32, TYPE_SOLDIER, LanguageStrings.ROLE_ESCORT);
+    public static final AntRole ROLE_ESCORT = new AntRole(32, TYPE_SOLDIER, LanguageStrings.ROLE_ESCORT, null);
     static { antRoles.add(ROLE_ESCORT); }
-    public static final AntRole ROLE_ENGINEER = new AntRole(33, TYPE_WORKER, LanguageStrings.ROLE_ENGINEER);
+    public static final AntRole ROLE_ENGINEER = new AntRole(33, TYPE_WORKER, LanguageStrings.ROLE_ENGINEER, null);
     static { antRoles.add(ROLE_ENGINEER); }
-    public static final AntRole ROLE_SKYTRANS = new AntRole(34, TYPE_PRINCESS, LanguageStrings.ROLE_SKYTRANS);
+    public static final AntRole ROLE_SKYTRANS = new AntRole(34, TYPE_PRINCESS, LanguageStrings.ROLE_SKYTRANS, null);
     static { antRoles.add(ROLE_SKYTRANS); }
 
     // --- Colony Ranks ---
