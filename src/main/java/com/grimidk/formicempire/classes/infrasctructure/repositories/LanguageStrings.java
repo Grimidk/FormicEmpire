@@ -1,6 +1,8 @@
 package com.grimidk.formicempire.classes.infrasctructure.repositories;
 
 import com.grimidk.formicempire.classes.infrasctructure.repositories.translations.EnglishTranslation;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.translations.FrenchTranslation;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.translations.PortugueseTranslation;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.translations.SpanishTranslation;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.translations.Translation;
 
@@ -21,6 +23,8 @@ public final class LanguageStrings {
     static {
         registerLanguage("en", new EnglishTranslation());
         registerLanguage("es", new SpanishTranslation());
+        registerLanguage("fr", new FrenchTranslation());
+        registerLanguage("pt", new PortugueseTranslation());
     }
 
     public static void registerLanguage(String code, Translation translation) {
