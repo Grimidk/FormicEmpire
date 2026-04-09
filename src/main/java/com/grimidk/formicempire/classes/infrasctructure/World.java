@@ -27,7 +27,9 @@ import com.grimidk.formicempire.classes.entities.services.ColonyStarterService;
 import com.grimidk.formicempire.classes.entities.services.DynastyDeathService;
 import com.grimidk.formicempire.classes.entities.services.DynastyNamingService;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 
 public class World {
 
@@ -919,7 +921,8 @@ public class World {
             for (Hex hex : this.hexes) {
                 if (hex.getColony() != null && !hex.getColony().getDynasty().isDefeated()) {
                     hex.getColony().getLabourService().runNuptial(hex.getColony(), this, hex);
-                    hex.getColony().logEvent("The Eclipse has triggered a spontaneous Nuptial Flight!");
+                    hex.getColony().logEvent(ColonyLogPrefixes.NUPTIAL + " "
+                        + LanguageStrings.get(LanguageStrings.EVENT_ECLIPSE_NUPTIAL));
                 }
             }
             

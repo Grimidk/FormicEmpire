@@ -24,7 +24,9 @@ import com.grimidk.formicempire.classes.entities.ResourceSource;
 import com.grimidk.formicempire.classes.entities.Tunnel;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
 
 public class ColonyLabourService {
@@ -347,7 +349,8 @@ public class ColonyLabourService {
         }
         
         if (deathCount > 0) {
-            colony.logEvent("DEATH: " + deathCount + " Juveniles died (Lack of Care)");
+            colony.logEvent(ColonyLogPrefixes.DEATH + " "
+                + String.format(LanguageStrings.get(LanguageStrings.LOG_DEATH_JUVENILES_LACK_CARE_FMT), deathCount));
         }
     }
     
@@ -391,7 +394,8 @@ public class ColonyLabourService {
                         if (!dynasty.getAbsorbedDynastyIds().contains(oldDynasty.getId())) {
                             dynasty.addAbsorbedDynasty(oldDynasty.getId());
                             dynasty.absorbSpecies(oldDynasty.getSpecies().getId());
-                            colony.logEvent("DYNASTY: Absorbed the remnants of " + oldDynasty.getName() + "!");
+                            colony.logEvent(ColonyLogPrefixes.DYNASTY + " "
+                                + String.format(LanguageStrings.get(LanguageStrings.LOG_DYNASTY_ABSORBED_FMT), oldDynasty.getName()));
                         }
                         oldDynasty.removeColony(existingColony);
                     }
@@ -407,7 +411,7 @@ public class ColonyLabourService {
                 else if (integrity <= 80) failureChance = 0.05;
 
                 if (random.nextDouble() < failureChance) {
-                    colony.logEvent("FAILURE: A satellite colony failed to mature due to genetic stagnation.");
+                    colony.logEvent(ColonyLogPrefixes.FAILURE + " " + LanguageStrings.get(LanguageStrings.LOG_FAILURE_SATELLITE));
                     continue;
                 }
 
@@ -447,14 +451,16 @@ public class ColonyLabourService {
                 neighbor.setColony(satellite);
                 
                 satellitesSpawned++;
-                colony.logEvent("Established new satellite colony at (" + neighbor.getQ() + ", " + neighbor.getR() + ")");
+                colony.logEvent(ColonyLogPrefixes.INFO + " "
+                    + String.format(LanguageStrings.get(LanguageStrings.LOG_SATELLITE_AT_FMT), neighbor.getQ(), neighbor.getR()));
             }
         }
         
         if (satellitesSpawned > 0) {
-            colony.logEvent(satellitesSpawned + " satellites established.");
+            colony.logEvent(ColonyLogPrefixes.INFO + " "
+                + String.format(LanguageStrings.get(LanguageStrings.LOG_SATELLITES_ESTABLISHED_FMT), satellitesSpawned));
         } else {
-            colony.logEvent("Spreading failed: No suitable adjacent lands found.");
+            colony.logEvent(ColonyLogPrefixes.INFO + " " + LanguageStrings.get(LanguageStrings.LOG_SPREADING_FAILED));
         }
     }
 
@@ -480,7 +486,8 @@ public class ColonyLabourService {
         }
         
         if (parasitesKilled > 0) {
-            colony.logEvent("Eliminated " + parasitesKilled + " parasites.");
+            colony.logEvent(ColonyLogPrefixes.INFO + " "
+                + String.format(LanguageStrings.get(LanguageStrings.LOG_PARASITES_ELIMINATED_FMT), parasitesKilled));
             colony.setParasites(Math.max(0, colony.getParasites() - parasitesKilled));
         }
     }
@@ -639,7 +646,8 @@ public class ColonyLabourService {
             colony.getQueens().add(newQueen);
         }
 
-        colony.logEvent("Nuptial Flight Occurred. " + queensToAdd + " new Queens joined.");
+        colony.logEvent(ColonyLogPrefixes.NUPTIAL + " "
+            + String.format(LanguageStrings.get(LanguageStrings.LOG_NUPTIAL_QUEENS_FMT), queensToAdd));
         
         if (colony.getDynasty() != null) {
             colony.getDynasty().incrementNuptialFlights();
@@ -705,7 +713,8 @@ public class ColonyLabourService {
         colony.getResourceService().addResource(colony, GameConstants.RESOURCE_FUNGI, mushroomGain);
         
         if (actualToCompost > 0) {
-            colony.logEvent("COMPOST: Recycled " + actualToCompost + " bodies into mushroom matter.");
+            colony.logEvent(ColonyLogPrefixes.COMPOST + " "
+                + String.format(LanguageStrings.get(LanguageStrings.LOG_COMPOST_RECYCLED_FMT), actualToCompost));
         }
     }
 
@@ -736,13 +745,16 @@ public class ColonyLabourService {
                     Assimilation a = dynasty.getCurrentAssimilation();
                     dynasty.unlockUpgrade(a.getReward());
                     dynasty.completeAssimilation(a);
-                    colony.logEvent("SUCCESS: " + a.getName() + " completed! Reward: " + a.getReward().getFlavorName());
+                    colony.logEvent(ColonyLogPrefixes.SUCCESS + " "
+                        + String.format(LanguageStrings.get(LanguageStrings.LOG_SUCCESS_ASSIMILATION_FMT),
+                            a.getName(), a.getReward().getFlavorName()));
                     
                     if (colony.isPlayer()) {
                         SwingUtilities.invokeLater(() -> {
-                            JOptionPane.showMessageDialog(null, 
-                                "Genetic Assimilation Complete!\n\n" + a.getName() + " finished.\nUnlocked: " + a.getReward().getFlavorName(),
-                                "Assimilation Success", JOptionPane.INFORMATION_MESSAGE);
+                            JOptionPane.showMessageDialog(null,
+                                String.format(LanguageStrings.get(LanguageStrings.ASSIMILATION_DIALOG_SUCCESS_BODY),
+                                    a.getName(), a.getReward().getFlavorName()),
+                                LanguageStrings.get(LanguageStrings.ASSIMILATION_DIALOG_SUCCESS_TITLE), JOptionPane.INFORMATION_MESSAGE);
                         });
                     }
                     
@@ -768,7 +780,7 @@ public class ColonyLabourService {
 
         if (colony.getBuildingProgressHours() >= requiredHours) {
             colony.unlockBuilding(colony.getCurrentBuildingProject());
-            colony.logEvent("SUCCESS: Built " + colony.getCurrentBuildingProject().getName());
+            colony.logEvent(ColonyLogPrefixes.SUCCESS + " " + colony.getCurrentBuildingProject().getName());
             colony.setCurrentBuildingProject(null);
             colony.setBuildingProgressHours(0.0);
         }
@@ -790,7 +802,7 @@ public class ColonyLabourService {
         tunnel.addProgress(hourlyProgress);
 
         if (tunnel.isComplete()) {
-            colony.logEvent("SUCCESS: Tunnel connection completed!");
+            colony.logEvent(ColonyLogPrefixes.SUCCESS + " " + LanguageStrings.get(LanguageStrings.LOG_SUCCESS_TUNNEL));
             colony.setCurrentTunnelProject(null);
         }
     }

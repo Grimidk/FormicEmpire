@@ -5,8 +5,10 @@ import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
 import java.util.List;
 import java.util.Random;
@@ -180,6 +182,6 @@ public class ColonyStarterService {
             colony.getPhysicsService().randomizeAllAntPositions(colony);
         }
 
-        colony.logEvent("Colony Maturation Complete: Workforce deployed.");
+        colony.logEvent(ColonyLogPrefixes.INFO + " " + LanguageStrings.get(LanguageStrings.LOG_MATURATION_COMPLETE));
     }
 }

@@ -302,7 +302,7 @@ public class EnglishTranslation implements Translation {
         en.put("DYNASTY_ACTIONS", "Actions");
         en.put("DYNASTY_TRANSIT_FORMAT", "%s (%dh)%s");
         en.put("DYNASTY_BUILD_TUNNEL", "Build Tunnel");
-        en.put("DYNASTY_TUNNEL_Sponsoring", "This colony is already sponsoring a tunnel project.");
+        en.put("DYNASTY_TUNNEL_SPONSORING", "This colony is already sponsoring a tunnel project.");
         en.put("DYNASTY_BUILT", "Built");
         en.put("DYNASTY_PROGRESS_PERCENT", "%.0f%%");
         en.put("DYNASTY_ERROR_NO_ENGINEERS", "No Engineers or Borers assigned to progress construction!");
@@ -394,13 +394,7 @@ public class EnglishTranslation implements Translation {
         en.put("SETTINGS_CONFIRM_QUIT", "Confirm on quit");
         en.put("SETTINGS_SHOW_TOOLTIPS", "Show tooltips");
         en.put("SETTINGS_FUZZ_PARASITES", "Fuzz parasite numbers");
-        en.put("SETTINGS_DEFAULT_ROLE_WORKER", "Default Worker role");
-        en.put("SETTINGS_DEFAULT_ROLE_SOLDIER", "Default Soldier role");
-        en.put("SETTINGS_DEFAULT_ROLE_MAJOR", "Default Major role");
-        en.put("SETTINGS_DEFAULT_ROLE_PRINCESS", "Default Princess role");
-        en.put("SETTINGS_DEFAULT_ROLE_QUEEN", "Default Queen role");
 
-        
         en.put("SETTINGS_MASTER_VOL", "Master Volume:");
         en.put("SETTINGS_MUSIC_VOL", "Music Volume:");
         en.put("SETTINGS_SFX_VOL", "Sound Effects:");
@@ -497,12 +491,8 @@ public class EnglishTranslation implements Translation {
         en.put("BUG_APHID", "Aphid");
         en.put("BUG_PARASITE", "Ant Parasite");
 
-        en.put("TYPE_EGG", "Egg");
         en.put("TYPE_LARVA", "Larva");
         en.put("TYPE_PUPA", "Pupa");
-        en.put("TYPE_WORKER", "Worker");
-        en.put("TYPE_SOLDIER", "Soldier");
-        en.put("TYPE_MAJOR", "Major");
         en.put("TYPE_DRONE", "Drone");
         en.put("TYPE_PRINCESS", "Princess");
         en.put("TYPE_QUEEN", "Queen");
@@ -706,7 +696,6 @@ public class EnglishTranslation implements Translation {
         en.put("ABILITY_ASSIMILATION_FLAVOR", "Genetic Assimilation");
         en.put("ABILITY_ASSIMILATION_DESC", "Allows the use of assimilations to change the genetic code of your species and gain new abilities from other species.");
         en.put("ABILITY_FORCED_FLIGHT_FLAVOR", "Royal Decree");
-        en.put("ABILITY_FORCED_FLIGHT_DESC", "Allows you to force a nuptial flight by spending research points.");
         en.put("ABILITY_DYNASTY_FLAVOR", "Ant Society");
         en.put("ABILITY_DYNASTY_DESC", "Allows the dynasty management screen to see all the colonies in your dynasty.");
         en.put("ABILITY_TRADE_FLAVOR", "Ant Trade");
@@ -722,7 +711,8 @@ public class EnglishTranslation implements Translation {
         en.put("ABILITY_MANAGEMENT_FLAVOR", "Decentralized Command");
         en.put("ABILITY_MANAGEMENT_DESC", "Allows you to let colonies to build by themselves without your direct input.");
         en.put("ABILITY_MASS_FLIGHT_FLAVOR", "Imperial Decree");
-        en.put("ABILITY_MASS_FLIGHT_DESC", "Triggers nuptial flights in all colonies capable of doing so. Costs 10x standard forced flight cost.");
+        en.put("ABILITY_CLONING_FLAVOR", "Genetic Echo");
+        en.put("ABILITY_CLONING_DESC", "Each completed genetic assimilation raises dynasty genetic integrity. Minimum genetic integrity scales with assimilations completed.");
         en.put("ABILITY_ABILITY_FLAVOR", "Abilities Unlocked");
         en.put("ABILITY_ABILITY_DESC", "Allows you to see the abilities menu and use active abilities.");
 
@@ -967,7 +957,99 @@ public class EnglishTranslation implements Translation {
         en.put("HELP_SKIP_TUTORIAL", "Skip Tutorial");
         en.put("HELP_FINISH", "Finish");
 
-        en.put("SETTINGS_TAB_ROLES", "Roles");
+        en.put("ALERT_STARVATION_RISK", "Starvation Risk!");
+        en.put("ALERT_NEW_RESEARCH", "New Research Available");
+        en.put("ALERT_CAN_BUILD_FMT", "Can Build: %s");
+        en.put("ALERT_BODY_PILE_FMT", "Body Pile High: %d");
+        en.put("ALERT_NUPTIAL_FLIGHT", "Nuptial Flight Occurred");
+        en.put("ALERT_BUILT_PREFIX", "Built: ");
+        en.put("ALERT_COMPOST_RECYCLED_PREFIX", "Recycled ");
+        en.put("ALERT_COMPOST_BODIES_SUFFIX", " Bodies");
+
+        en.put("ASSIMILATION_DIALOG_SUCCESS_TITLE", "Assimilation Success");
+        en.put("ASSIMILATION_DIALOG_SUCCESS_BODY", "Genetic Assimilation Complete!\n\n%s finished.\nUnlocked: %s");
+
+        en.put("UI_DIALOG_LOADING_TITLE", "Loading");
+        en.put("SAVE_DEFAULT_NAME_FMT", "Save %d");
+
+        en.put("STAT_NEIGHBOR_NORTH", "North");
+        en.put("STAT_NEIGHBOR_NORTH_WEST", "North-West");
+        en.put("STAT_NEIGHBOR_NORTH_EAST", "North-East");
+        en.put("STAT_NEIGHBOR_SOUTH", "South");
+        en.put("STAT_NEIGHBOR_SOUTH_WEST", "South-West");
+        en.put("STAT_NEIGHBOR_SOUTH_EAST", "South-East");
+        en.put("STAT_TABLE_SEPARATOR", "------");
+        en.put("STAT_HEX_COLONY_FMT", " (Colony: %s)");
+        en.put("STAT_LABEL_ID", "ID");
+        en.put("STAT_LABEL_ERROR", "Error");
+        en.put("STAT_LABEL_PROGRESS", "Progress");
+        en.put("STAT_GLOBAL_RESOURCE_FMT", "Global %s");
+        en.put("STAT_DEFEATED_UNKNOWN_FMT", "ID:%d");
+        en.put("STAT_JOB_FARMING", "Farming");
+        en.put("STAT_JOB_FARMERS_EFF_FMT", "%d Eff. Farmers");
+        en.put("STAT_RATE_CONVERT_DAY", "~%d convert/day");
+        en.put("STAT_RATE_PWR_DAY", "~%d pwr/day");
+        en.put("STAT_RATE_RES_DAY", "~%d res/day");
+        en.put("STAT_RATE_SCOUT_STATUS", "Finding resources");
+        en.put("STAT_RATE_RESEARCH_ASST_FMT", "%d Res / %d Asst");
+        en.put("STAT_RATE_PTS_DAY_FMT", "+%d pts/day");
+        en.put("STAT_JOB_EGG_LAYING", "Egg Laying");
+        en.put("STAT_RATE_LAYERS_FMT", "%d Layers");
+        en.put("STAT_RATE_EGGS_DAY", "+%d eggs/day");
+        en.put("STAT_RATE_NURSES_FMT", "%d Nurses");
+        en.put("STAT_RATE_CAP_SHORT", "%d Cap");
+        en.put("STAT_RATE_LOAD_FMT", "%s / %d Load");
+        en.put("STAT_RATE_GRAVERS_FMT", "%d Gravers");
+        en.put("STAT_RATE_RANCHERS_FMT", "%d Ranchers");
+        en.put("STAT_RATE_APHIDS_FMT", "%s / %d Aphids");
+        en.put("STAT_RATE_POLICE_FMT", "%d Police");
+        en.put("STAT_RATE_PARASITES_FMT", "%d Parasites");
+        en.put("STAT_RATE_DET_DAY", "~%d det./day");
+
+        en.put("LOG_DEATH_OLD_AGE_FMT", "%d ants died of old age");
+        en.put("LOG_DEATH_JUVENILES_LACK_CARE_FMT", "%d juveniles died (lack of care)");
+        en.put("LOG_DEATH_COUNT_CAUSE_FMT", "%d ants died of %s");
+        en.put("LOG_CAUSE_OLD_AGE", "old age");
+        en.put("LOG_CAUSE_LACK_OF_CARE", "lack of care");
+        en.put("LOG_CAUSE_DEHYDRATION", "dehydration");
+        en.put("LOG_CAUSE_STARVATION", "starvation");
+        en.put("LOG_CAUSE_CONTAMINATION", "contamination");
+        en.put("LOG_CONTAMINATION_LEVEL_FMT", "Contamination level: %s");
+        en.put("LOG_CONTAM_LEVEL_SMALL", "Small");
+        en.put("LOG_CONTAM_LEVEL_MEDIUM", "Medium");
+        en.put("LOG_CONTAM_LEVEL_MASSIVE", "Massive");
+        en.put("LOG_PARASITE_SPREAD_FMT", "A parasitic infestation has spread! %d new parasites detected.");
+        en.put("LOG_DYNASTY_ABSORBED_FMT", "Absorbed the remnants of %s!");
+        en.put("LOG_FAILURE_SATELLITE", "A satellite colony failed to mature due to genetic stagnation.");
+        en.put("LOG_SATELLITE_AT_FMT", "Established new satellite colony at (%d, %d)");
+        en.put("LOG_SATELLITES_ESTABLISHED_FMT", "%d satellites established.");
+        en.put("LOG_SPREADING_FAILED", "Spreading failed: no suitable adjacent lands found.");
+        en.put("LOG_PARASITES_ELIMINATED_FMT", "Eliminated %d parasites.");
+        en.put("LOG_NUPTIAL_QUEENS_FMT", "Nuptial flight occurred. %d new queens joined.");
+        en.put("LOG_SUCCESS_ASSIMILATION_FMT", "%s completed! Reward: %s");
+        en.put("LOG_SUCCESS_TUNNEL", "Tunnel connection completed!");
+        en.put("LOG_FOUND_NEW_SOURCE_FMT", "Found new %s source.");
+        en.put("LOG_FOUND_SOURCE_FULL_FMT", "Found %s but capacity is full.");
+        en.put("LOG_SOURCE_EXHAUSTED_FMT", "A %s source has been exhausted.");
+        en.put("LOG_FORCE_FLIGHT_BLOCKED", "Cannot force flight. Missing drones or breeder princesses.");
+        en.put("LOG_WARNING_NO_QUEEN_FMT", "Colony has no queen! Days without queen: %d/7");
+        en.put("LOG_MATURATION_COMPLETE", "Colony maturation complete: workforce deployed.");
+        en.put("LOG_TRADE_CANCELLED_FMT", "Cancelled. Not enough available %s.");
+        en.put("LOG_TRADE_ARRIVED_FMT", "Trade arrived at %s successfully.");
+        en.put("LOG_TRADE_CONVOY_RETURN_FMT", "Convoy from %s picked up return cargo.");
+        en.put("LOG_TRADE_BILATERAL_RETURN_FMT", "Bilateral convoy returned with %d resource types.");
+        en.put("LOG_TRADE_ROUTE_CANCELLED_FMT", "Route to %s cancelled. Resources refunded.");
+        en.put("LOG_AUTOMATION_BUILD_FMT", "Started construction of %s");
+        en.put("LOG_LAST_COLONY_FALLEN", "The last colony has fallen. This is now a dead remnant.");
+        en.put("LOG_PROMOTION_CAPITAL_FMT", "The old capital has fallen. This colony is now the capital of %s!");
+        en.put("LOG_DYNASTY_RESEARCHED_FMT", "Researched %s");
+        en.put("LOG_COMPOST_RECYCLED_FMT", "Recycled %d bodies into mushroom matter.");
+
+        en.put("DYNASTY_SORT_POP_HIGH", "Population (highest first)");
+        en.put("DYNASTY_SORT_POP_LOW", "Population (lowest first)");
+        en.put("DYNASTY_SORT_AGE_OLD", "Age (oldest first)");
+        en.put("DYNASTY_SORT_AGE_NEW", "Age (newest first)");
+
         en.put("SETTINGS_DEFAULT_ROLE_WORKER", "Default Worker Role:");
         en.put("SETTINGS_DEFAULT_ROLE_SOLDIER", "Default Soldier Role:");
         en.put("SETTINGS_DEFAULT_ROLE_MAJOR", "Default Major Role:");

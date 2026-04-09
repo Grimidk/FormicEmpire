@@ -22,8 +22,10 @@ import com.grimidk.formicempire.classes.infrasctructure.Dimension;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.World;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.Temperature;
@@ -796,7 +798,7 @@ public class Colony {
         boolean hasBreeders = getPrincesses().stream().anyMatch(p -> p.getRole() == GameConstants.ROLE_BREEDER);
         
         if (!hasDrones || !hasBreeders) {
-            logEvent("Cannot force flight. Missing Drones or Breeder Princesses.");
+            logEvent(ColonyLogPrefixes.INFO + " " + LanguageStrings.get(LanguageStrings.LOG_FORCE_FLIGHT_BLOCKED));
             return;
         }
 
@@ -856,7 +858,8 @@ public class Colony {
         if (this.getQueens().isEmpty()) {
             this.daysWithoutQueen++;
             if (this.daysWithoutQueen == 1 || this.daysWithoutQueen == 6) {
-                this.logEvent("WARNING: Colony has no Queen! Days without Queen: " + this.daysWithoutQueen + "/7");
+                this.logEvent(ColonyLogPrefixes.WARNING + " "
+                    + String.format(LanguageStrings.get(LanguageStrings.LOG_WARNING_NO_QUEEN_FMT), this.daysWithoutQueen));
             }
         } else {
             this.daysWithoutQueen = 0;

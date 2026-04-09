@@ -302,7 +302,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("DYNASTY_ACTIONS", "Ações");
         pt.put("DYNASTY_TRANSIT_FORMAT", "%s (%dh)%s");
         pt.put("DYNASTY_BUILD_TUNNEL", "Construir túnel");
-        pt.put("DYNASTY_TUNNEL_Sponsoring", "Esta colônia já patrocina um projeto de túnel.");
+        pt.put("DYNASTY_TUNNEL_SPONSORING", "Esta colônia já patrocina um projeto de túnel.");
         pt.put("DYNASTY_BUILT", "Construído");
         pt.put("DYNASTY_PROGRESS_PERCENT", "%.0f%%");
         pt.put("DYNASTY_ERROR_NO_ENGINEERS", "Nenhuma engenheira ou perfuradora atribuída para avançar a construção!");
@@ -394,11 +394,6 @@ public class PortugueseTranslation implements Translation {
         pt.put("SETTINGS_CONFIRM_QUIT", "Confirmar ao sair");
         pt.put("SETTINGS_SHOW_TOOLTIPS", "Mostrar dicas");
         pt.put("SETTINGS_FUZZ_PARASITES", "Aproximar números de parasitas");
-        pt.put("SETTINGS_DEFAULT_ROLE_WORKER", "Função padrão de operária");
-        pt.put("SETTINGS_DEFAULT_ROLE_SOLDIER", "Função padrão de soldada");
-        pt.put("SETTINGS_DEFAULT_ROLE_MAJOR", "Função padrão de major");
-        pt.put("SETTINGS_DEFAULT_ROLE_PRINCESS", "Função padrão de princesa");
-        pt.put("SETTINGS_DEFAULT_ROLE_QUEEN", "Função padrão de rainha");
 
         pt.put("SETTINGS_MASTER_VOL", "Volume principal:");
         pt.put("SETTINGS_MUSIC_VOL", "Volume da música:");
@@ -496,12 +491,8 @@ public class PortugueseTranslation implements Translation {
         pt.put("BUG_APHID", "Pulgão");
         pt.put("BUG_PARASITE", "Parasita");
 
-        pt.put("TYPE_EGG", "Ovo");
         pt.put("TYPE_LARVA", "Larva");
         pt.put("TYPE_PUPA", "Pupa");
-        pt.put("TYPE_WORKER", "Operária");
-        pt.put("TYPE_SOLDIER", "Soldada");
-        pt.put("TYPE_MAJOR", "Major");
         pt.put("TYPE_DRONE", "Zangão");
         pt.put("TYPE_PRINCESS", "Princesa");
         pt.put("TYPE_QUEEN", "Rainha");
@@ -704,7 +695,6 @@ public class PortugueseTranslation implements Translation {
         pt.put("ABILITY_ASSIMILATION_FLAVOR", "Assimilação genética");
         pt.put("ABILITY_ASSIMILATION_DESC", "Permite usar assimilações para mudar o código genético e ganhar habilidades de outras espécies.");
         pt.put("ABILITY_FORCED_FLIGHT_FLAVOR", "Decreto real");
-        pt.put("ABILITY_FORCED_FLIGHT_DESC", "Permite forçar um voo nupcial gastando pontos de pesquisa.");
         pt.put("ABILITY_DYNASTY_FLAVOR", "Sociedade formiga");
         pt.put("ABILITY_DYNASTY_DESC", "Permite ver todas as colônias da dinastia na tela de gestão.");
         pt.put("ABILITY_TRADE_FLAVOR", "Comércio formiga");
@@ -720,7 +710,8 @@ public class PortugueseTranslation implements Translation {
         pt.put("ABILITY_MANAGEMENT_FLAVOR", "Comando descentralizado");
         pt.put("ABILITY_MANAGEMENT_DESC", "Permite que colônias se construam sozinhas sem sua intervenção direta.");
         pt.put("ABILITY_MASS_FLIGHT_FLAVOR", "Decreto imperial");
-        pt.put("ABILITY_MASS_FLIGHT_DESC", "Ativa voos nupciais em todas as colônias capazes. Custa 10x um voo forçado padrão.");
+        pt.put("ABILITY_CLONING_FLAVOR", "Eco genético");
+        pt.put("ABILITY_CLONING_DESC", "Cada assimilação genética concluída aumenta a integridade genética da dinastia. A integridade mínima aumenta com as assimilações concluídas.");
         pt.put("ABILITY_ABILITY_FLAVOR", "Habilidades desbloqueadas");
         pt.put("ABILITY_ABILITY_DESC", "Permite ver o menu de habilidades e usar habilidades ativas.");
 
@@ -963,6 +954,105 @@ public class PortugueseTranslation implements Translation {
 
         pt.put("HELP_SKIP_TUTORIAL", "Pular tutorial");
         pt.put("HELP_FINISH", "Concluir");
+
+        pt.put("ALERT_STARVATION_RISK", "Risco de fome");
+        pt.put("ALERT_NEW_RESEARCH", "Nova pesquisa disponível");
+        pt.put("ALERT_CAN_BUILD_FMT", "Pode construir: %s");
+        pt.put("ALERT_BODY_PILE_FMT", "Muitos cadáveres: %d");
+        pt.put("ALERT_NUPTIAL_FLIGHT", "Voo nupcial");
+        pt.put("ALERT_BUILT_PREFIX", "Construído: ");
+        pt.put("ALERT_COMPOST_RECYCLED_PREFIX", "Reciclados ");
+        pt.put("ALERT_COMPOST_BODIES_SUFFIX", " corpos");
+
+        pt.put("ASSIMILATION_DIALOG_SUCCESS_TITLE", "Assimilação concluída");
+        pt.put("ASSIMILATION_DIALOG_SUCCESS_BODY", "Assimilação genética concluída!\n\n%s finalizada.\nDesbloqueado: %s");
+
+        pt.put("UI_DIALOG_LOADING_TITLE", "Carregando");
+        pt.put("SAVE_DEFAULT_NAME_FMT", "Salvamento %d");
+
+        pt.put("STAT_NEIGHBOR_NORTH", "Norte");
+        pt.put("STAT_NEIGHBOR_NORTH_WEST", "Noroeste");
+        pt.put("STAT_NEIGHBOR_NORTH_EAST", "Nordeste");
+        pt.put("STAT_NEIGHBOR_SOUTH", "Sul");
+        pt.put("STAT_NEIGHBOR_SOUTH_WEST", "Sudoeste");
+        pt.put("STAT_NEIGHBOR_SOUTH_EAST", "Sudeste");
+        pt.put("STAT_TABLE_SEPARATOR", "------");
+        pt.put("STAT_HEX_COLONY_FMT", " (Colônia: %s)");
+        pt.put("STAT_LABEL_ID", "ID");
+        pt.put("STAT_LABEL_ERROR", "Erro");
+        pt.put("STAT_LABEL_PROGRESS", "Progresso");
+        pt.put("STAT_GLOBAL_RESOURCE_FMT", "Global %s");
+        pt.put("STAT_DEFEATED_UNKNOWN_FMT", "ID:%d");
+        pt.put("STAT_JOB_FARMING", "Agricultura");
+        pt.put("STAT_JOB_FARMERS_EFF_FMT", "%d agr. efic.");
+        pt.put("STAT_RATE_CONVERT_DAY", "~%d conv./dia");
+        pt.put("STAT_RATE_PWR_DAY", "~%d pot./dia");
+        pt.put("STAT_RATE_RES_DAY", "~%d rec./dia");
+        pt.put("STAT_RATE_SCOUT_STATUS", "Procurando recursos");
+        pt.put("STAT_RATE_RESEARCH_ASST_FMT", "%d Pesq. / %d Ass.");
+        pt.put("STAT_RATE_PTS_DAY_FMT", "+%d pts/dia");
+        pt.put("STAT_JOB_EGG_LAYING", "Postura de ovos");
+        pt.put("STAT_RATE_LAYERS_FMT", "%d posturas");
+        pt.put("STAT_RATE_EGGS_DAY", "+%d ovos/dia");
+        pt.put("STAT_RATE_NURSES_FMT", "%d babás");
+        pt.put("STAT_RATE_CAP_SHORT", "%d cap.");
+        pt.put("STAT_RATE_LOAD_FMT", "%s / %d carga");
+        pt.put("STAT_RATE_GRAVERS_FMT", "%d coveiras");
+        pt.put("STAT_RATE_RANCHERS_FMT", "%d criadoras");
+        pt.put("STAT_RATE_APHIDS_FMT", "%s / %d pulgões");
+        pt.put("STAT_RATE_POLICE_FMT", "%d polícia");
+        pt.put("STAT_RATE_PARASITES_FMT", "%d parasitas");
+        pt.put("STAT_RATE_DET_DAY", "~%d det./dia");
+
+        pt.put("LOG_DEATH_OLD_AGE_FMT", "%d formigas morreram de velhice");
+        pt.put("LOG_DEATH_JUVENILES_LACK_CARE_FMT", "%d juvenis morreram (falta de cuidados)");
+        pt.put("LOG_DEATH_COUNT_CAUSE_FMT", "%d formigas morreram por %s");
+        pt.put("LOG_CAUSE_OLD_AGE", "velhice");
+        pt.put("LOG_CAUSE_LACK_OF_CARE", "falta de cuidados");
+        pt.put("LOG_CAUSE_DEHYDRATION", "desidratação");
+        pt.put("LOG_CAUSE_STARVATION", "inanição");
+        pt.put("LOG_CAUSE_CONTAMINATION", "contaminação");
+        pt.put("LOG_CONTAMINATION_LEVEL_FMT", "Nível de contaminação: %s");
+        pt.put("LOG_CONTAM_LEVEL_SMALL", "Baixo");
+        pt.put("LOG_CONTAM_LEVEL_MEDIUM", "Médio");
+        pt.put("LOG_CONTAM_LEVEL_MASSIVE", "Massivo");
+        pt.put("LOG_PARASITE_SPREAD_FMT", "Uma infestação parasitária se espalhou! %d novos parasitas detectados.");
+        pt.put("LOG_DYNASTY_ABSORBED_FMT", "Restos de %s absorvidos!");
+        pt.put("LOG_FAILURE_SATELLITE", "Uma colônia satélite não amadureceu por estagnação genética.");
+        pt.put("LOG_SATELLITE_AT_FMT", "Nova colônia satélite em (%d, %d)");
+        pt.put("LOG_SATELLITES_ESTABLISHED_FMT", "%d satélites estabelecidos.");
+        pt.put("LOG_SPREADING_FAILED", "Expansão falhou: não há terras adjacentes adequadas.");
+        pt.put("LOG_PARASITES_ELIMINATED_FMT", "Eliminados %d parasitas.");
+        pt.put("LOG_NUPTIAL_QUEENS_FMT", "Voo nupcial. %d novas rainhas se juntaram.");
+        pt.put("LOG_SUCCESS_ASSIMILATION_FMT", "%s concluída! Recompensa: %s");
+        pt.put("LOG_SUCCESS_TUNNEL", "Conexão de túnel concluída!");
+        pt.put("LOG_FOUND_NEW_SOURCE_FMT", "Nova fonte de %s encontrada.");
+        pt.put("LOG_FOUND_SOURCE_FULL_FMT", "%s encontrado, mas capacidade cheia.");
+        pt.put("LOG_SOURCE_EXHAUSTED_FMT", "Uma fonte de %s esgotou-se.");
+        pt.put("LOG_FORCE_FLIGHT_BLOCKED", "Não é possível forçar o voo. Faltam zangões ou princesas reprodutoras.");
+        pt.put("LOG_WARNING_NO_QUEEN_FMT", "A colônia não tem rainha! Dias sem rainha: %d/7");
+        pt.put("LOG_MATURATION_COMPLETE", "Amadurecimento da colônia concluído: força de trabalho implantada.");
+        pt.put("LOG_TRADE_CANCELLED_FMT", "Cancelado. Não há %s suficiente disponível.");
+        pt.put("LOG_TRADE_ARRIVED_FMT", "Comércio chegou a %s com sucesso.");
+        pt.put("LOG_TRADE_CONVOY_RETURN_FMT", "Comboio de %s recolheu carga de retorno.");
+        pt.put("LOG_TRADE_BILATERAL_RETURN_FMT", "Comboio bilateral voltou com %d tipos de recursos.");
+        pt.put("LOG_TRADE_ROUTE_CANCELLED_FMT", "Rota para %s cancelada. Recursos reembolsados.");
+        pt.put("LOG_AUTOMATION_BUILD_FMT", "Construção iniciada: %s");
+        pt.put("LOG_LAST_COLONY_FALLEN", "A última colônia caiu. Isto é agora um remanescente morto.");
+        pt.put("LOG_PROMOTION_CAPITAL_FMT", "A antiga capital caiu. Esta colônia é agora a capital de %s!");
+        pt.put("LOG_DYNASTY_RESEARCHED_FMT", "Pesquisado: %s");
+        pt.put("LOG_COMPOST_RECYCLED_FMT", "Reciclados %d corpos em matéria de cogumelos.");
+
+        pt.put("DYNASTY_SORT_POP_HIGH", "População (maior primeiro)");
+        pt.put("DYNASTY_SORT_POP_LOW", "População (menor primeiro)");
+        pt.put("DYNASTY_SORT_AGE_OLD", "Idade (mais antiga primeiro)");
+        pt.put("DYNASTY_SORT_AGE_NEW", "Idade (mais nova primeiro)");
+
+        pt.put("SETTINGS_DEFAULT_ROLE_WORKER", "Função padrão de operária:");
+        pt.put("SETTINGS_DEFAULT_ROLE_SOLDIER", "Função padrão de soldada:");
+        pt.put("SETTINGS_DEFAULT_ROLE_MAJOR", "Função padrão de major:");
+        pt.put("SETTINGS_DEFAULT_ROLE_PRINCESS", "Função padrão de princesa:");
+        pt.put("SETTINGS_DEFAULT_ROLE_QUEEN", "Função padrão de rainha:");
 
         return pt;
     }

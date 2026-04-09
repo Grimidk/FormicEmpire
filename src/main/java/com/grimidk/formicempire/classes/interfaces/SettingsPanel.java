@@ -141,10 +141,10 @@ public class SettingsPanel extends JPanel {
     private void initUI() {
         tabbedPane.removeAll();
         
-        tabbedPane.addTab("General", createGeneralTab());
-        tabbedPane.addTab("Video", createVideoTab());
-        tabbedPane.addTab("Audio", createAudioTab());
-        tabbedPane.addTab("Roles", createRolesTab());
+        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.SETTINGS_TAB_GENERAL), createGeneralTab());
+        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.SETTINGS_TAB_VIDEO), createVideoTab());
+        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.SETTINGS_TAB_AUDIO), createAudioTab());
+        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.SETTINGS_TAB_ROLES), createRolesTab());
     }
     
     private JPanel createGeneralTab() {

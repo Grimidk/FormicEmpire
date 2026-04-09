@@ -561,7 +561,7 @@ public class GamePanel extends ZeroGamePanel {
                 int slotIdLocal = w.getSaveSlotId();
                 if (slotIdLocal > 0) {
                     Savefile existing = sm.loadSlot(slotIdLocal);
-                    String nameToUse = (existing != null && existing.getName() != null && !existing.getName().trim().isEmpty()) ? existing.getName() : ("Save " + slotIdLocal);
+                    String nameToUse = (existing != null && existing.getName() != null && !existing.getName().trim().isEmpty()) ? existing.getName() : String.format(LanguageStrings.get(LanguageStrings.SAVE_DEFAULT_NAME_FMT), slotIdLocal);
                     sm.saveWorldToSlotUserAsync(engine.getWorld(), engine, slotIdLocal, nameToUse, () -> {
                         cleanupSession();
                         frame.showCard(MainFrame.CARD_SAVE);
@@ -591,7 +591,7 @@ public class GamePanel extends ZeroGamePanel {
         statusLabel.setText(LanguageStrings.get(LanguageStrings.UI_STARTING));
         Engine engine = frame.getEngine();
         
-        JDialog loadingDialog = new JDialog(frame, "Loading", true);
+        JDialog loadingDialog = new JDialog(frame, LanguageStrings.get(LanguageStrings.UI_DIALOG_LOADING_TITLE), true);
         loadingDialog.setUndecorated(true);
         loadingDialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 

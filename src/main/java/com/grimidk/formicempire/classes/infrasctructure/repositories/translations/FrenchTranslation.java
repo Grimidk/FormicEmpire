@@ -302,7 +302,7 @@ public class FrenchTranslation implements Translation {
         fr.put("DYNASTY_ACTIONS", "Actions");
         fr.put("DYNASTY_TRANSIT_FORMAT", "%s (%dh)%s");
         fr.put("DYNASTY_BUILD_TUNNEL", "Construire un tunnel");
-        fr.put("DYNASTY_TUNNEL_Sponsoring", "Cette colonie parraine déjà un projet de tunnel.");
+        fr.put("DYNASTY_TUNNEL_SPONSORING", "Cette colonie parraine déjà un projet de tunnel.");
         fr.put("DYNASTY_BUILT", "Construit");
         fr.put("DYNASTY_PROGRESS_PERCENT", "%.0f%%");
         fr.put("DYNASTY_ERROR_NO_ENGINEERS", "Aucune ingénieuse ou foreuse assignée pour faire progresser la construction !");
@@ -394,11 +394,6 @@ public class FrenchTranslation implements Translation {
         fr.put("SETTINGS_CONFIRM_QUIT", "Confirmer à la sortie");
         fr.put("SETTINGS_SHOW_TOOLTIPS", "Afficher les infobulles");
         fr.put("SETTINGS_FUZZ_PARASITES", "Chiffres de parasites approximatifs");
-        fr.put("SETTINGS_DEFAULT_ROLE_WORKER", "Rôle ouvrière par défaut");
-        fr.put("SETTINGS_DEFAULT_ROLE_SOLDIER", "Rôle soldate par défaut");
-        fr.put("SETTINGS_DEFAULT_ROLE_MAJOR", "Rôle majore par défaut");
-        fr.put("SETTINGS_DEFAULT_ROLE_PRINCESS", "Rôle princesse par défaut");
-        fr.put("SETTINGS_DEFAULT_ROLE_QUEEN", "Rôle reine par défaut");
 
         fr.put("SETTINGS_MASTER_VOL", "Volume principal :");
         fr.put("SETTINGS_MUSIC_VOL", "Volume musique :");
@@ -496,12 +491,8 @@ public class FrenchTranslation implements Translation {
         fr.put("BUG_APHID", "Puceron");
         fr.put("BUG_PARASITE", "Parasite");
 
-        fr.put("TYPE_EGG", "Œuf");
         fr.put("TYPE_LARVA", "Larve");
         fr.put("TYPE_PUPA", "Nymphe");
-        fr.put("TYPE_WORKER", "Ouvrière");
-        fr.put("TYPE_SOLDIER", "Soldate");
-        fr.put("TYPE_MAJOR", "Majore");
         fr.put("TYPE_DRONE", "Mâle");
         fr.put("TYPE_PRINCESS", "Princesse");
         fr.put("TYPE_QUEEN", "Reine");
@@ -705,7 +696,6 @@ public class FrenchTranslation implements Translation {
         fr.put("ABILITY_ASSIMILATION_FLAVOR", "Assimilation génétique");
         fr.put("ABILITY_ASSIMILATION_DESC", "Utilise les assimilations pour modifier le code génétique et gagner des capacités d'autres espèces.");
         fr.put("ABILITY_FORCED_FLIGHT_FLAVOR", "Décret royal");
-        fr.put("ABILITY_FORCED_FLIGHT_DESC", "Force un essaim nuptial en dépensant des points de recherche.");
         fr.put("ABILITY_DYNASTY_FLAVOR", "Société fourmi");
         fr.put("ABILITY_DYNASTY_DESC", "Voir toutes les colonies de votre dynastie dans l'écran de gestion.");
         fr.put("ABILITY_TRADE_FLAVOR", "Commerce fourmi");
@@ -721,7 +711,8 @@ public class FrenchTranslation implements Translation {
         fr.put("ABILITY_MANAGEMENT_FLAVOR", "Commandement décentralisé");
         fr.put("ABILITY_MANAGEMENT_DESC", "Les colonies se construisent sans votre intervention directe.");
         fr.put("ABILITY_MASS_FLIGHT_FLAVOR", "Décret impérial");
-        fr.put("ABILITY_MASS_FLIGHT_DESC", "Déclenche des essaims dans toutes les colonies capables. Coûte 10× un essaim forcé standard.");
+        fr.put("ABILITY_CLONING_FLAVOR", "Écho génétique");
+        fr.put("ABILITY_CLONING_DESC", "Chaque assimilation génétique terminée augmente l'intégrité génétique de la dynastie. L'intégrité minimale augmente avec les assimilations terminées.");
         fr.put("ABILITY_ABILITY_FLAVOR", "Capacités débloquées");
         fr.put("ABILITY_ABILITY_DESC", "Affiche le menu des capacités et les capacités actives.");
 
@@ -965,6 +956,105 @@ public class FrenchTranslation implements Translation {
 
         fr.put("HELP_SKIP_TUTORIAL", "Passer le tutoriel");
         fr.put("HELP_FINISH", "Terminer");
+
+        fr.put("ALERT_STARVATION_RISK", "Risque de famine");
+        fr.put("ALERT_NEW_RESEARCH", "Nouvelle recherche disponible");
+        fr.put("ALERT_CAN_BUILD_FMT", "Construction possible : %s");
+        fr.put("ALERT_BODY_PILE_FMT", "Tas de cadavres élevé : %d");
+        fr.put("ALERT_NUPTIAL_FLIGHT", "Essaim nuptial");
+        fr.put("ALERT_BUILT_PREFIX", "Construit : ");
+        fr.put("ALERT_COMPOST_RECYCLED_PREFIX", "Recyclés ");
+        fr.put("ALERT_COMPOST_BODIES_SUFFIX", " corps");
+
+        fr.put("ASSIMILATION_DIALOG_SUCCESS_TITLE", "Assimilation réussie");
+        fr.put("ASSIMILATION_DIALOG_SUCCESS_BODY", "Assimilation génétique terminée !\n\n%s terminée.\nDébloqué : %s");
+
+        fr.put("UI_DIALOG_LOADING_TITLE", "Chargement");
+        fr.put("SAVE_DEFAULT_NAME_FMT", "Sauvegarde %d");
+
+        fr.put("STAT_NEIGHBOR_NORTH", "Nord");
+        fr.put("STAT_NEIGHBOR_NORTH_WEST", "Nord-Ouest");
+        fr.put("STAT_NEIGHBOR_NORTH_EAST", "Nord-Est");
+        fr.put("STAT_NEIGHBOR_SOUTH", "Sud");
+        fr.put("STAT_NEIGHBOR_SOUTH_WEST", "Sud-Ouest");
+        fr.put("STAT_NEIGHBOR_SOUTH_EAST", "Sud-Est");
+        fr.put("STAT_TABLE_SEPARATOR", "------");
+        fr.put("STAT_HEX_COLONY_FMT", " (Colonie : %s)");
+        fr.put("STAT_LABEL_ID", "ID");
+        fr.put("STAT_LABEL_ERROR", "Erreur");
+        fr.put("STAT_LABEL_PROGRESS", "Progrès");
+        fr.put("STAT_GLOBAL_RESOURCE_FMT", "Global %s");
+        fr.put("STAT_DEFEATED_UNKNOWN_FMT", "ID:%d");
+        fr.put("STAT_JOB_FARMING", "Agriculture");
+        fr.put("STAT_JOB_FARMERS_EFF_FMT", "%d agricultrices eff.");
+        fr.put("STAT_RATE_CONVERT_DAY", "~%d conv./jour");
+        fr.put("STAT_RATE_PWR_DAY", "~%d p./jour");
+        fr.put("STAT_RATE_RES_DAY", "~%d res./jour");
+        fr.put("STAT_RATE_SCOUT_STATUS", "Recherche de ressources");
+        fr.put("STAT_RATE_RESEARCH_ASST_FMT", "%d Cher. / %d Ass.");
+        fr.put("STAT_RATE_PTS_DAY_FMT", "+%d pts/jour");
+        fr.put("STAT_JOB_EGG_LAYING", "Ponte");
+        fr.put("STAT_RATE_LAYERS_FMT", "%d pondeuses");
+        fr.put("STAT_RATE_EGGS_DAY", "+%d œufs/jour");
+        fr.put("STAT_RATE_NURSES_FMT", "%d nourrices");
+        fr.put("STAT_RATE_CAP_SHORT", "%d cap.");
+        fr.put("STAT_RATE_LOAD_FMT", "%s / %d charge");
+        fr.put("STAT_RATE_GRAVERS_FMT", "%d fossoyeuses");
+        fr.put("STAT_RATE_RANCHERS_FMT", "%d éleveuses");
+        fr.put("STAT_RATE_APHIDS_FMT", "%s / %d pucerons");
+        fr.put("STAT_RATE_POLICE_FMT", "%d police");
+        fr.put("STAT_RATE_PARASITES_FMT", "%d parasites");
+        fr.put("STAT_RATE_DET_DAY", "~%d dét./jour");
+
+        fr.put("LOG_DEATH_OLD_AGE_FMT", "%d fourmis mortes de vieillesse");
+        fr.put("LOG_DEATH_JUVENILES_LACK_CARE_FMT", "%d juvéniles morts (manque de soins)");
+        fr.put("LOG_DEATH_COUNT_CAUSE_FMT", "%d fourmis mortes de %s");
+        fr.put("LOG_CAUSE_OLD_AGE", "vieillesse");
+        fr.put("LOG_CAUSE_LACK_OF_CARE", "manque de soins");
+        fr.put("LOG_CAUSE_DEHYDRATION", "déshydratation");
+        fr.put("LOG_CAUSE_STARVATION", "famine");
+        fr.put("LOG_CAUSE_CONTAMINATION", "contamination");
+        fr.put("LOG_CONTAMINATION_LEVEL_FMT", "Niveau de contamination : %s");
+        fr.put("LOG_CONTAM_LEVEL_SMALL", "Faible");
+        fr.put("LOG_CONTAM_LEVEL_MEDIUM", "Moyen");
+        fr.put("LOG_CONTAM_LEVEL_MASSIVE", "Massif");
+        fr.put("LOG_PARASITE_SPREAD_FMT", "Une infestation parasitaire s'est propagée ! %d nouveaux parasites détectés.");
+        fr.put("LOG_DYNASTY_ABSORBED_FMT", "Vestiges de %s absorbés !");
+        fr.put("LOG_FAILURE_SATELLITE", "Une colonie satellite n'a pas mûri : stagnation génétique.");
+        fr.put("LOG_SATELLITE_AT_FMT", "Nouvelle colonie satellite en (%d, %d)");
+        fr.put("LOG_SATELLITES_ESTABLISHED_FMT", "%d satellites établis.");
+        fr.put("LOG_SPREADING_FAILED", "Expansion impossible : aucune terre adjacente adaptée.");
+        fr.put("LOG_PARASITES_ELIMINATED_FMT", "%d parasites éliminés.");
+        fr.put("LOG_NUPTIAL_QUEENS_FMT", "Essaim nuptial : %d nouvelles reines ont rejoint.");
+        fr.put("LOG_SUCCESS_ASSIMILATION_FMT", "%s terminée ! Récompense : %s");
+        fr.put("LOG_SUCCESS_TUNNEL", "Connexion de tunnel terminée !");
+        fr.put("LOG_FOUND_NEW_SOURCE_FMT", "Nouvelle source de %s trouvée.");
+        fr.put("LOG_FOUND_SOURCE_FULL_FMT", "%s trouvé mais capacité pleine.");
+        fr.put("LOG_SOURCE_EXHAUSTED_FMT", "Une source de %s est épuisée.");
+        fr.put("LOG_FORCE_FLIGHT_BLOCKED", "Impossible de forcer l'essaim : pas de mâles ou de princesses reproductrices.");
+        fr.put("LOG_WARNING_NO_QUEEN_FMT", "La colonie n'a pas de reine ! Jours sans reine : %d/7");
+        fr.put("LOG_MATURATION_COMPLETE", "Maturation de la colonie terminée : effectif déployé.");
+        fr.put("LOG_TRADE_CANCELLED_FMT", "Annulé. Pas assez de %s disponible.");
+        fr.put("LOG_TRADE_ARRIVED_FMT", "Commerce arrivé à %s avec succès.");
+        fr.put("LOG_TRADE_CONVOY_RETURN_FMT", "Convoi de %s : cargaison de retour récupérée.");
+        fr.put("LOG_TRADE_BILATERAL_RETURN_FMT", "Convoi bilateral revenu avec %d types de ressources.");
+        fr.put("LOG_TRADE_ROUTE_CANCELLED_FMT", "Route vers %s annulée. Ressources remboursées.");
+        fr.put("LOG_AUTOMATION_BUILD_FMT", "Construction démarrée : %s");
+        fr.put("LOG_LAST_COLONY_FALLEN", "La dernière colonie est tombée. Ce n'est plus qu'un vestige mort.");
+        fr.put("LOG_PROMOTION_CAPITAL_FMT", "L'ancienne capitale est tombée. Cette colonie est la capitale de %s !");
+        fr.put("LOG_DYNASTY_RESEARCHED_FMT", "Recherché : %s");
+        fr.put("LOG_COMPOST_RECYCLED_FMT", "%d corps recyclés en matière fongique.");
+
+        fr.put("DYNASTY_SORT_POP_HIGH", "Population (plus élevée d'abord)");
+        fr.put("DYNASTY_SORT_POP_LOW", "Population (plus faible d'abord)");
+        fr.put("DYNASTY_SORT_AGE_OLD", "Âge (plus ancienne d'abord)");
+        fr.put("DYNASTY_SORT_AGE_NEW", "Âge (plus récente d'abord)");
+
+        fr.put("SETTINGS_DEFAULT_ROLE_WORKER", "Rôle ouvrière par défaut :");
+        fr.put("SETTINGS_DEFAULT_ROLE_SOLDIER", "Rôle soldate par défaut :");
+        fr.put("SETTINGS_DEFAULT_ROLE_MAJOR", "Rôle majore par défaut :");
+        fr.put("SETTINGS_DEFAULT_ROLE_PRINCESS", "Rôle princesse par défaut :");
+        fr.put("SETTINGS_DEFAULT_ROLE_QUEEN", "Rôle reine par défaut :");
 
         return fr;
     }

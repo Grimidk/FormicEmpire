@@ -315,7 +315,14 @@ public class DynastyManagementDialog extends ZeroDialog {
                 currentHex.getNorth(), currentHex.getNorthEast(), currentHex.getSouthEast(),
                 currentHex.getSouth(), currentHex.getSouthWest(), currentHex.getNorthWest()
             };
-            String[] dirNames = {"North", "North-East", "South-East", "South", "South-West", "North-West"};
+            String[] dirNames = {
+                LanguageStrings.get(LanguageStrings.STAT_NEIGHBOR_NORTH),
+                LanguageStrings.get(LanguageStrings.STAT_NEIGHBOR_NORTH_EAST),
+                LanguageStrings.get(LanguageStrings.STAT_NEIGHBOR_SOUTH_EAST),
+                LanguageStrings.get(LanguageStrings.STAT_NEIGHBOR_SOUTH),
+                LanguageStrings.get(LanguageStrings.STAT_NEIGHBOR_SOUTH_WEST),
+                LanguageStrings.get(LanguageStrings.STAT_NEIGHBOR_NORTH_WEST)
+            };
 
             for (int i = 0; i < adjacent.length; i++) {
                 Hex neighborHex = adjacent[i];
@@ -404,7 +411,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                         if (sameDynasty) {
                             boolean alreadyBuilding = activeColony.getCurrentTunnelProject() != null;
                             buildBtn.setEnabled(!alreadyBuilding);
-                            buildBtn.setToolTipText(alreadyBuilding ? LanguageStrings.get(LanguageStrings.DYNASTY_TUNNEL_Sponsoring) : null);
+                            buildBtn.setToolTipText(alreadyBuilding ? LanguageStrings.get(LanguageStrings.DYNASTY_TUNNEL_SPONSORING) : null);
                             add(buildBtn, BorderLayout.CENTER);
                         } else {
                             label.setText(LanguageStrings.get(LanguageStrings.WORLD_NA));
@@ -1139,10 +1146,10 @@ public class DynastyManagementDialog extends ZeroDialog {
             
             this.currentSorter = Comparator.comparingInt(Colony::getAntTotal).reversed();
             this.sortCombo = new JComboBox<>(new String[]{
-                "Population (Highest First)", 
-                "Population (Lowest First)", 
-                "Age (Oldest First)", 
-                "Age (Newest First)"
+                LanguageStrings.get(LanguageStrings.DYNASTY_SORT_POP_HIGH),
+                LanguageStrings.get(LanguageStrings.DYNASTY_SORT_POP_LOW),
+                LanguageStrings.get(LanguageStrings.DYNASTY_SORT_AGE_OLD),
+                LanguageStrings.get(LanguageStrings.DYNASTY_SORT_AGE_NEW)
             });
             this.sortCombo.setFocusable(false);
             this.sortCombo.addActionListener(e -> updateSorter());

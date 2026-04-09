@@ -21,7 +21,9 @@ import com.grimidk.formicempire.classes.entities.ResourceSource;
 import com.grimidk.formicempire.classes.infrasctructure.Dimension;
 import com.grimidk.formicempire.classes.infrasctructure.NeoPoint;
 import com.grimidk.formicempire.classes.infrasctructure.Room;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
 
 public class ColonyLocationService {
@@ -87,16 +89,19 @@ public class ColonyLocationService {
         if (count < capacity) {
             this.discoveredSources.add(source);
             invalidateCache();
-            colony.logEvent("Found new " + source.getResourceType().getName() + " source.");
+            colony.logEvent(ColonyLogPrefixes.INFO + " "
+                + String.format(LanguageStrings.get(LanguageStrings.LOG_FOUND_NEW_SOURCE_FMT), source.getResourceType().getName()));
         } else {
-            colony.logEvent("Found " + source.getResourceType().getName() + " but capacity is full.");
+            colony.logEvent(ColonyLogPrefixes.INFO + " "
+                + String.format(LanguageStrings.get(LanguageStrings.LOG_FOUND_SOURCE_FULL_FMT), source.getResourceType().getName()));
         }
     }
 
     public void removeSource(Colony colony, ResourceSource source) {
         if (this.discoveredSources.remove(source)) {
             invalidateCache();
-            colony.logEvent("A " + source.getResourceType().getName() + " source has been exhausted.");
+            colony.logEvent(ColonyLogPrefixes.INFO + " "
+                + String.format(LanguageStrings.get(LanguageStrings.LOG_SOURCE_EXHAUSTED_FMT), source.getResourceType().getName()));
         }
     }
 

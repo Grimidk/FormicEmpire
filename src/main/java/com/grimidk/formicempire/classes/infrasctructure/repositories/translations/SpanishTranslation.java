@@ -302,7 +302,7 @@ public class SpanishTranslation implements Translation {
         es.put("DYNASTY_ACTIONS", "Acciones");
         es.put("DYNASTY_TRANSIT_FORMAT", "%s (%dh)%s");
         es.put("DYNASTY_BUILD_TUNNEL", "Construir Túnel");
-        es.put("DYNASTY_TUNNEL_Sponsoring", "Esta colonia ya está patrocinando un proyecto de túnel.");
+        es.put("DYNASTY_TUNNEL_SPONSORING", "Esta colonia ya está patrocinando un proyecto de túnel.");
         es.put("DYNASTY_BUILT", "Construido");
         es.put("DYNASTY_PROGRESS_PERCENT", "%.0f%%");
         es.put("DYNASTY_ERROR_NO_ENGINEERS", "¡No hay Ingenieras o Perforadoras asignadas para progresar en la construcción!");
@@ -394,11 +394,6 @@ public class SpanishTranslation implements Translation {
         es.put("SETTINGS_CONFIRM_QUIT", "Confirmar al salir");
         es.put("SETTINGS_SHOW_TOOLTIPS", "Mostrar consejos");
         es.put("SETTINGS_FUZZ_PARASITES", "Cifras de parásitos imprecisas");
-        es.put("SETTINGS_DEFAULT_ROLE_WORKER", "Rol de Obrera por defecto");
-        es.put("SETTINGS_DEFAULT_ROLE_SOLDIER", "Rol de Soldado por defecto");
-        es.put("SETTINGS_DEFAULT_ROLE_MAJOR", "Rol de Major por defecto");
-        es.put("SETTINGS_DEFAULT_ROLE_PRINCESS", "Rol de Princesa por defecto");
-        es.put("SETTINGS_DEFAULT_ROLE_QUEEN", "Rol de Reina por defecto");
 
         es.put("SETTINGS_MASTER_VOL", "Volumen Maestro:");
         es.put("SETTINGS_MUSIC_VOL", "Volumen Música:");
@@ -496,12 +491,8 @@ public class SpanishTranslation implements Translation {
         es.put("BUG_APHID", "Pulgón");
         es.put("BUG_PARASITE", "Parásito");
 
-        es.put("TYPE_EGG", "Huevo");
         es.put("TYPE_LARVA", "Larva");
         es.put("TYPE_PUPA", "Pupa");
-        es.put("TYPE_WORKER", "Obrera");
-        es.put("TYPE_SOLDIER", "Soldado");
-        es.put("TYPE_MAJOR", "Major");
         es.put("TYPE_DRONE", "Zángano");
         es.put("TYPE_PRINCESS", "Princesa");
         es.put("TYPE_QUEEN", "Reina");
@@ -705,7 +696,6 @@ public class SpanishTranslation implements Translation {
         es.put("ABILITY_ASSIMILATION_FLAVOR", "Asimilación Genética");
         es.put("ABILITY_ASSIMILATION_DESC", "Permite usar asimilaciones para cambiar el código genético y ganar habilidades de otras especies.");
         es.put("ABILITY_FORCED_FLIGHT_FLAVOR", "Decreto Real");
-        es.put("ABILITY_FORCED_FLIGHT_DESC", "Permite forzar un vuelo nupcial gastando puntos de investigación.");
         es.put("ABILITY_DYNASTY_FLAVOR", "Sociedad Hormiga");
         es.put("ABILITY_DYNASTY_DESC", "Permite ver todas las colonias de tu dinastía en la pantalla de gestión.");
         es.put("ABILITY_TRADE_FLAVOR", "Comercio Hormiga");
@@ -721,7 +711,8 @@ public class SpanishTranslation implements Translation {
         es.put("ABILITY_MANAGEMENT_FLAVOR", "Mando Descentralizado");
         es.put("ABILITY_MANAGEMENT_DESC", "Permite que las colonias se construyan solas sin tu intervención directa.");
         es.put("ABILITY_MASS_FLIGHT_FLAVOR", "Decreto Imperial");
-        es.put("ABILITY_MASS_FLIGHT_DESC", "Activa vuelos nupciales en todas las colonias capaces. Cuesta 10 veces más que un vuelo forzado estándar.");
+        es.put("ABILITY_CLONING_FLAVOR", "Eco genético");
+        es.put("ABILITY_CLONING_DESC", "Cada asimilación genética completada aumenta la integridad genética de la dinastía. La integridad mínima escala con las asimilaciones completadas.");
         es.put("ABILITY_ABILITY_FLAVOR", "Habilidades Desbloqueadas");
         es.put("ABILITY_ABILITY_DESC", "Permite ver el menú de habilidades y usar habilidades activas.");
 
@@ -965,6 +956,105 @@ public class SpanishTranslation implements Translation {
 
         es.put("HELP_SKIP_TUTORIAL", "Saltar Tutorial");
         es.put("HELP_FINISH", "Finalizar");
+
+        es.put("ALERT_STARVATION_RISK", "Riesgo de inanición");
+        es.put("ALERT_NEW_RESEARCH", "Nueva investigación disponible");
+        es.put("ALERT_CAN_BUILD_FMT", "Se puede construir: %s");
+        es.put("ALERT_BODY_PILE_FMT", "Muchos cadáveres: %d");
+        es.put("ALERT_NUPTIAL_FLIGHT", "Vuelo nupcial");
+        es.put("ALERT_BUILT_PREFIX", "Construido: ");
+        es.put("ALERT_COMPOST_RECYCLED_PREFIX", "Reciclados ");
+        es.put("ALERT_COMPOST_BODIES_SUFFIX", " cadáveres");
+
+        es.put("ASSIMILATION_DIALOG_SUCCESS_TITLE", "Asimilación completada");
+        es.put("ASSIMILATION_DIALOG_SUCCESS_BODY", "Asimilación genética completada\n\n%s finalizada.\nDesbloqueado: %s");
+
+        es.put("UI_DIALOG_LOADING_TITLE", "Cargando");
+        es.put("SAVE_DEFAULT_NAME_FMT", "Partida %d");
+
+        es.put("STAT_NEIGHBOR_NORTH", "Norte");
+        es.put("STAT_NEIGHBOR_NORTH_WEST", "Noroeste");
+        es.put("STAT_NEIGHBOR_NORTH_EAST", "Noreste");
+        es.put("STAT_NEIGHBOR_SOUTH", "Sur");
+        es.put("STAT_NEIGHBOR_SOUTH_WEST", "Suroeste");
+        es.put("STAT_NEIGHBOR_SOUTH_EAST", "Sureste");
+        es.put("STAT_TABLE_SEPARATOR", "------");
+        es.put("STAT_HEX_COLONY_FMT", " (Colonia: %s)");
+        es.put("STAT_LABEL_ID", "ID");
+        es.put("STAT_LABEL_ERROR", "Error");
+        es.put("STAT_LABEL_PROGRESS", "Progreso");
+        es.put("STAT_GLOBAL_RESOURCE_FMT", "Global %s");
+        es.put("STAT_DEFEATED_UNKNOWN_FMT", "ID:%d");
+        es.put("STAT_JOB_FARMING", "Agricultura");
+        es.put("STAT_JOB_FARMERS_EFF_FMT", "%d granjeras ef.");
+        es.put("STAT_RATE_CONVERT_DAY", "~%d conv./día");
+        es.put("STAT_RATE_PWR_DAY", "~%d pot./día");
+        es.put("STAT_RATE_RES_DAY", "~%d rec./día");
+        es.put("STAT_RATE_SCOUT_STATUS", "Buscando recursos");
+        es.put("STAT_RATE_RESEARCH_ASST_FMT", "%d Inv / %d Asist");
+        es.put("STAT_RATE_PTS_DAY_FMT", "+%d pts/día");
+        es.put("STAT_JOB_EGG_LAYING", "Puesta de huevos");
+        es.put("STAT_RATE_LAYERS_FMT", "%d ponedoras");
+        es.put("STAT_RATE_EGGS_DAY", "+%d huevos/día");
+        es.put("STAT_RATE_NURSES_FMT", "%d niñeras");
+        es.put("STAT_RATE_CAP_SHORT", "%d cap.");
+        es.put("STAT_RATE_LOAD_FMT", "%s / %d carga");
+        es.put("STAT_RATE_GRAVERS_FMT", "%d sepultureras");
+        es.put("STAT_RATE_RANCHERS_FMT", "%d pastoras");
+        es.put("STAT_RATE_APHIDS_FMT", "%s / %d pulgones");
+        es.put("STAT_RATE_POLICE_FMT", "%d policía");
+        es.put("STAT_RATE_PARASITES_FMT", "%d parásitos");
+        es.put("STAT_RATE_DET_DAY", "~%d det./día");
+
+        es.put("LOG_DEATH_OLD_AGE_FMT", "%d hormigas murieron por vejez");
+        es.put("LOG_DEATH_JUVENILES_LACK_CARE_FMT", "%d juveniles murieron (falta de cuidados)");
+        es.put("LOG_DEATH_COUNT_CAUSE_FMT", "%d hormigas murieron por %s");
+        es.put("LOG_CAUSE_OLD_AGE", "vejez");
+        es.put("LOG_CAUSE_LACK_OF_CARE", "falta de cuidados");
+        es.put("LOG_CAUSE_DEHYDRATION", "deshidratación");
+        es.put("LOG_CAUSE_STARVATION", "inanición");
+        es.put("LOG_CAUSE_CONTAMINATION", "contaminación");
+        es.put("LOG_CONTAMINATION_LEVEL_FMT", "Nivel de contaminación: %s");
+        es.put("LOG_CONTAM_LEVEL_SMALL", "Bajo");
+        es.put("LOG_CONTAM_LEVEL_MEDIUM", "Medio");
+        es.put("LOG_CONTAM_LEVEL_MASSIVE", "Masivo");
+        es.put("LOG_PARASITE_SPREAD_FMT", "¡Se ha extendido una infestación parasitaria! %d parásitos nuevos detectados.");
+        es.put("LOG_DYNASTY_ABSORBED_FMT", "¡Se absorbieron los restos de %s!");
+        es.put("LOG_FAILURE_SATELLITE", "Una colonia satélite no maduró por estancamiento genético.");
+        es.put("LOG_SATELLITE_AT_FMT", "Nueva colonia satélite en (%d, %d)");
+        es.put("LOG_SATELLITES_ESTABLISHED_FMT", "%d satélites establecidos.");
+        es.put("LOG_SPREADING_FAILED", "Expansión fallida: no hay tierras adyacentes adecuadas.");
+        es.put("LOG_PARASITES_ELIMINATED_FMT", "Eliminados %d parásitos.");
+        es.put("LOG_NUPTIAL_QUEENS_FMT", "Vuelo nupcial. Se unieron %d reinas nuevas.");
+        es.put("LOG_SUCCESS_ASSIMILATION_FMT", "¡%s completada! Recompensa: %s");
+        es.put("LOG_SUCCESS_TUNNEL", "¡Conexión de túnel completada!");
+        es.put("LOG_FOUND_NEW_SOURCE_FMT", "Nueva fuente de %s encontrada.");
+        es.put("LOG_FOUND_SOURCE_FULL_FMT", "Se encontró %s pero la capacidad está llena.");
+        es.put("LOG_SOURCE_EXHAUSTED_FMT", "Una fuente de %s se ha agotado.");
+        es.put("LOG_FORCE_FLIGHT_BLOCKED", "No se puede forzar el vuelo. Faltan zánganos o princesas criadoras.");
+        es.put("LOG_WARNING_NO_QUEEN_FMT", "¡La colonia no tiene reina! Días sin reina: %d/7");
+        es.put("LOG_MATURATION_COMPLETE", "Maduración de la colonia completa: fuerza laboral desplegada.");
+        es.put("LOG_TRADE_CANCELLED_FMT", "Cancelado. No hay suficiente %s disponible.");
+        es.put("LOG_TRADE_ARRIVED_FMT", "Comercio llegó a %s correctamente.");
+        es.put("LOG_TRADE_CONVOY_RETURN_FMT", "Convoy de %s recogió carga de vuelta.");
+        es.put("LOG_TRADE_BILATERAL_RETURN_FMT", "Convoy bilateral volvió con %d tipos de recursos.");
+        es.put("LOG_TRADE_ROUTE_CANCELLED_FMT", "Ruta a %s cancelada. Recursos reembolsados.");
+        es.put("LOG_AUTOMATION_BUILD_FMT", "Iniciada construcción de %s");
+        es.put("LOG_LAST_COLONY_FALLEN", "La última colonia ha caído. Esto es ahora un remanente muerto.");
+        es.put("LOG_PROMOTION_CAPITAL_FMT", "¡La antigua capital ha caído. Esta colonia es ahora la capital de %s!");
+        es.put("LOG_DYNASTY_RESEARCHED_FMT", "Investigado %s");
+        es.put("LOG_COMPOST_RECYCLED_FMT", "Reciclados %d cadáveres en materia de hongos.");
+
+        es.put("DYNASTY_SORT_POP_HIGH", "Población (mayor primero)");
+        es.put("DYNASTY_SORT_POP_LOW", "Población (menor primero)");
+        es.put("DYNASTY_SORT_AGE_OLD", "Edad (más antigua primero)");
+        es.put("DYNASTY_SORT_AGE_NEW", "Edad (más nueva primero)");
+
+        es.put("SETTINGS_DEFAULT_ROLE_WORKER", "Rol de obrera por defecto:");
+        es.put("SETTINGS_DEFAULT_ROLE_SOLDIER", "Rol de soldado por defecto:");
+        es.put("SETTINGS_DEFAULT_ROLE_MAJOR", "Rol de major por defecto:");
+        es.put("SETTINGS_DEFAULT_ROLE_PRINCESS", "Rol de princesa por defecto:");
+        es.put("SETTINGS_DEFAULT_ROLE_QUEEN", "Rol de reina por defecto:");
 
         return es;
     }

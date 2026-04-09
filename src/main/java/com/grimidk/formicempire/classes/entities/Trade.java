@@ -9,7 +9,9 @@ import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.misc.TradeMethod;
 import com.grimidk.formicempire.classes.entities.services.ColonyResourceService;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 
 public class Trade {
 
@@ -94,7 +96,9 @@ public class Trade {
                 List<Ant> colonyAnts = originColony.getAntsByType(entry.getKey());
                 long availableCount = colonyAnts.stream().filter(a -> !a.isOnTrade() && a.isAlive()).count();
                 if (availableCount < entry.getValue()) {
-                    originColony.logEvent("TRADE: Cancelled. Not enough available " + entry.getKey().getName() + "s.");
+                    originColony.logEvent(ColonyLogPrefixes.TRADE + " "
+                        + String.format(LanguageStrings.get(LanguageStrings.LOG_TRADE_CANCELLED_FMT),
+                            entry.getKey().getName() + "s"));
                     isActive = false;
                     return false;
                 }
@@ -166,7 +170,8 @@ public class Trade {
                 dest.getResourceService().addResource(dest, entry.getKey(), entry.getValue());
             }
             if (origin.getColony() != null) {
-                origin.getColony().logEvent("TRADE: Trade arrived at " + dest.getName() + " successfully.");
+                origin.getColony().logEvent(ColonyLogPrefixes.TRADE + " "
+                    + String.format(LanguageStrings.get(LanguageStrings.LOG_TRADE_ARRIVED_FMT), dest.getName()));
             }
         }
     }
@@ -178,7 +183,9 @@ public class Trade {
             for (Map.Entry<ResourceType, Double> entry : returnLoad.entrySet()) {
                 resService.consumeResource(destColony, entry.getKey(), entry.getValue());
             }
-            destColony.logEvent("TRADE: Convoy from " + origin.getColony().getName() + " picked up return cargo.");
+            destColony.logEvent(ColonyLogPrefixes.TRADE + " "
+                + String.format(LanguageStrings.get(LanguageStrings.LOG_TRADE_CONVOY_RETURN_FMT),
+                    origin.getColony().getName()));
         }
     }
 
@@ -189,7 +196,8 @@ public class Trade {
             for (Map.Entry<ResourceType, Double> entry : securedLoad.entrySet()) {
                 originColony.getResourceService().addResource(originColony, entry.getKey(), entry.getValue());
             }
-            originColony.logEvent("TRADE: Bilateral convoy returned with " + securedLoad.size() + " resource types.");
+            originColony.logEvent(ColonyLogPrefixes.TRADE + " "
+                + String.format(LanguageStrings.get(LanguageStrings.LOG_TRADE_BILATERAL_RETURN_FMT), securedLoad.size()));
         }
     }
 
@@ -247,7 +255,9 @@ public class Trade {
                     for (Map.Entry<ResourceType, Double> entry : load.entrySet()) {
                         originColony.getResourceService().addResource(originColony, entry.getKey(), entry.getValue());
                     }
-                    originColony.logEvent("TRADE: Route to " + destination.getColony().getName() + " cancelled. Resources refunded.");
+                    originColony.logEvent(ColonyLogPrefixes.TRADE + " "
+                        + String.format(LanguageStrings.get(LanguageStrings.LOG_TRADE_ROUTE_CANCELLED_FMT),
+                            destination.getColony().getName()));
                 }
             }
             releaseAnts();

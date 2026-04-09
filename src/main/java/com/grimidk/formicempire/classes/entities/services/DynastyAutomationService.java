@@ -2,7 +2,9 @@ package com.grimidk.formicempire.classes.entities.services;
 
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -38,7 +40,8 @@ public class DynastyAutomationService {
             dynasty.unlockUpgrade(target);
             
             if (!dynasty.getColonies().isEmpty()) {
-                dynasty.getColonies().get(0).logEvent("DYNASTY: Researched " + target.getName());
+                dynasty.getColonies().get(0).logEvent(ColonyLogPrefixes.DYNASTY + " "
+                    + String.format(LanguageStrings.get(LanguageStrings.LOG_DYNASTY_RESEARCHED_FMT), target.getName()));
             }
         }
     }

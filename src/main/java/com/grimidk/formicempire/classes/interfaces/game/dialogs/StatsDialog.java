@@ -276,20 +276,21 @@ public class StatsDialog extends ZeroDialog {
         }
 
         // Neighbors
-        model.addRow(new Object[]{null, null, "------", "------"});
-        model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_NEIGHBORS), "North", getHexSummary(hex.getNorth())});
-        model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_NEIGHBORS), "North-West", getHexSummary(hex.getNorthWest())});
-        model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_NEIGHBORS), "North-East", getHexSummary(hex.getNorthEast())});
-        model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_NEIGHBORS), "South", getHexSummary(hex.getSouth())});
-        model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_NEIGHBORS), "South-West", getHexSummary(hex.getSouthWest())});
-        model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_NEIGHBORS), "South-East", getHexSummary(hex.getSouthEast())});
+        String sep = LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR);
+        model.addRow(new Object[]{null, null, sep, sep});
+        model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_NEIGHBORS), LanguageStrings.get(LanguageStrings.STAT_NEIGHBOR_NORTH), getHexSummary(hex.getNorth())});
+        model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_NEIGHBORS), LanguageStrings.get(LanguageStrings.STAT_NEIGHBOR_NORTH_WEST), getHexSummary(hex.getNorthWest())});
+        model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_NEIGHBORS), LanguageStrings.get(LanguageStrings.STAT_NEIGHBOR_NORTH_EAST), getHexSummary(hex.getNorthEast())});
+        model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_NEIGHBORS), LanguageStrings.get(LanguageStrings.STAT_NEIGHBOR_SOUTH), getHexSummary(hex.getSouth())});
+        model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_NEIGHBORS), LanguageStrings.get(LanguageStrings.STAT_NEIGHBOR_SOUTH_WEST), getHexSummary(hex.getSouthWest())});
+        model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_NEIGHBORS), LanguageStrings.get(LanguageStrings.STAT_NEIGHBOR_SOUTH_EAST), getHexSummary(hex.getSouthEast())});
     }
 
     private String getHexSummary(Hex neighbor) {
         if (neighbor == null) return LanguageStrings.get(LanguageStrings.STAT_EDGE_WORLD);
         String summary = (neighbor.getBiome() != null ? neighbor.getBiome().getName() : LanguageStrings.get(LanguageStrings.STAT_UNKNOWN));
         if (neighbor.getColony() != null) {
-            summary += " (Colony: " + neighbor.getColony().getName() + ")";
+            summary += String.format(LanguageStrings.get(LanguageStrings.STAT_HEX_COLONY_FMT), neighbor.getColony().getName());
         }
         return summary;
     }
@@ -316,7 +317,7 @@ public class StatsDialog extends ZeroDialog {
             model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_COLONY), LanguageStrings.get(LanguageStrings.COL_VALUE), colony.getRank().getName()});
             model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_COLONY), LanguageStrings.get(LanguageStrings.COL_VALUE), colony.getSpecies() != null ? colony.getSpecies().getName() : LanguageStrings.get(LanguageStrings.STAT_UNKNOWN)});
             model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_COLONY), LanguageStrings.get(LanguageStrings.STAT_SPECIES_SCIENTIFIC), colony.getSpecies() != null ? colony.getSpecies().getScientific() : LanguageStrings.get(LanguageStrings.STAT_UNKNOWN)});
-            model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_COLONY), "ID", colony.getId()});
+            model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_COLONY), LanguageStrings.get(LanguageStrings.STAT_LABEL_ID), colony.getId()});
             model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_COLONY), LanguageStrings.get(LanguageStrings.STAT_AGE), colony.getAge() + LanguageStrings.get(LanguageStrings.STAT_DAYS_SUFFIX)});
             
             if (colony.getQueens().isEmpty()) {
@@ -360,7 +361,7 @@ public class StatsDialog extends ZeroDialog {
         
         Dynasty dynasty = colony.getDynasty();
         if (dynasty == null) {
-            model.addRow(new Object[]{null, "Error", LanguageStrings.get(LanguageStrings.COL_VALUE), LanguageStrings.get(LanguageStrings.STAT_NO_DYNASTY)});
+            model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_LABEL_ERROR), LanguageStrings.get(LanguageStrings.COL_VALUE), LanguageStrings.get(LanguageStrings.STAT_NO_DYNASTY)});
             return;
         }
 
@@ -378,47 +379,47 @@ public class StatsDialog extends ZeroDialog {
         model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_GENETIC_INTEGRITY), String.format("%.1f%%", dynasty.getGeneticIntegrity())});
 
         // Conquest & Expansion
-        model.addRow(new Object[]{null, null, "------", "------"});
+        model.addRow(new Object[]{null, null, LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR), LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR)});
         String defeated = dynasty.getDefeatedSpeciesIds().stream()
             .map(id -> {
                 for (Species s : GameConstants.getSpecies()) {
                     if (s.getId() == id) return s.getName();
                 }
-                return "ID:" + id;
+                return String.format(LanguageStrings.get(LanguageStrings.STAT_DEFEATED_UNKNOWN_FMT), id);
             })
             .collect(Collectors.joining(", "));
         model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_DEFEATED_SPECIES), defeated.isEmpty() ? LanguageStrings.get(LanguageStrings.ASSIMILATION_NONE) : defeated});
         
         // Unlocks
-        model.addRow(new Object[]{null, null, "------", "------"});
-        model.addRow(new Object[]{null, "Progress", LanguageStrings.get(LanguageStrings.STAT_UPGRADES_RES), dynasty.getUnlockedUpgrades().size()});
-        model.addRow(new Object[]{null, "Progress", LanguageStrings.get(LanguageStrings.STAT_ASSIM_COMP), dynasty.getCompletedAssimilations().size()});
+        model.addRow(new Object[]{null, null, LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR), LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR)});
+        model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_LABEL_PROGRESS), LanguageStrings.get(LanguageStrings.STAT_UPGRADES_RES), dynasty.getUnlockedUpgrades().size()});
+        model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_LABEL_PROGRESS), LanguageStrings.get(LanguageStrings.STAT_ASSIM_COMP), dynasty.getCompletedAssimilations().size()});
         
         int totalBuildings = 0;
         for (Colony c : dynasty.getColonies()) {
             totalBuildings += c.getUnlockedBuildings().size();
         }
-        model.addRow(new Object[]{null, "Progress", LanguageStrings.get(LanguageStrings.STAT_BUILDINGS_BUILT), totalBuildings});
+        model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_LABEL_PROGRESS), LanguageStrings.get(LanguageStrings.STAT_BUILDINGS_BUILT), totalBuildings});
 
         // Research
-        model.addRow(new Object[]{null, null, "------", "------"});
+        model.addRow(new Object[]{null, null, LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR), LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR)});
         model.addRow(new Object[]{GameConstants.ICON_RESEARCH, LanguageStrings.get(LanguageStrings.TAB_RESEARCH), LanguageStrings.get(LanguageStrings.STAT_STORED_POINTS), dynasty.getResearchPoints()});
         model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.TAB_RESEARCH), LanguageStrings.get(LanguageStrings.STAT_GLOBAL_RATE), String.format(LanguageStrings.get(LanguageStrings.STAT_PTS_DAY_FORMAT), dynastyStatsService.getGlobalResearchRateDaily(dynasty))});
 
         // Global Resources
-        model.addRow(new Object[]{null, null, "------", "------"});
+        model.addRow(new Object[]{null, null, LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR), LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR)});
         Map<ResourceType, Integer> resources = dynastyStatsService.getGlobalResources(dynasty);
         
-        model.addRow(new Object[]{GameConstants.RESOURCE_PLANT.getIcon(), LanguageStrings.get(LanguageStrings.PANEL_RESOURCES), "Global " + LanguageStrings.get(LanguageStrings.RESOURCE_PLANT), resources.get(GameConstants.RESOURCE_PLANT)});
-        model.addRow(new Object[]{GameConstants.RESOURCE_FUNGI.getIcon(), LanguageStrings.get(LanguageStrings.PANEL_RESOURCES), "Global " + LanguageStrings.get(LanguageStrings.RESOURCE_FUNGI), resources.get(GameConstants.RESOURCE_FUNGI)});
-        model.addRow(new Object[]{GameConstants.RESOURCE_MEAT.getIcon(), LanguageStrings.get(LanguageStrings.PANEL_RESOURCES), "Global " + LanguageStrings.get(LanguageStrings.RESOURCE_MEAT), resources.get(GameConstants.RESOURCE_MEAT)});
-        model.addRow(new Object[]{GameConstants.RESOURCE_WATER.getIcon(), LanguageStrings.get(LanguageStrings.PANEL_RESOURCES), "Global " + LanguageStrings.get(LanguageStrings.RESOURCE_WATER), resources.get(GameConstants.RESOURCE_WATER)});
-        model.addRow(new Object[]{GameConstants.RESOURCE_SYRUP.getIcon(), LanguageStrings.get(LanguageStrings.PANEL_RESOURCES), "Global " + LanguageStrings.get(LanguageStrings.RESOURCE_SYRUP), resources.getOrDefault(GameConstants.RESOURCE_SYRUP, 0)});
-        model.addRow(new Object[]{GameConstants.RESOURCE_RESIN.getIcon(), LanguageStrings.get(LanguageStrings.PANEL_RESOURCES), "Global " + LanguageStrings.get(LanguageStrings.RESOURCE_RESIN), resources.getOrDefault(GameConstants.RESOURCE_RESIN, 0)});
-        model.addRow(new Object[]{GameConstants.RESOURCE_ROCK.getIcon(), LanguageStrings.get(LanguageStrings.PANEL_RESOURCES), "Global " + LanguageStrings.get(LanguageStrings.RESOURCE_ROCK), resources.getOrDefault(GameConstants.RESOURCE_ROCK, 0)});
+        model.addRow(new Object[]{GameConstants.RESOURCE_PLANT.getIcon(), LanguageStrings.get(LanguageStrings.PANEL_RESOURCES), String.format(LanguageStrings.get(LanguageStrings.STAT_GLOBAL_RESOURCE_FMT), LanguageStrings.get(LanguageStrings.RESOURCE_PLANT)), resources.get(GameConstants.RESOURCE_PLANT)});
+        model.addRow(new Object[]{GameConstants.RESOURCE_FUNGI.getIcon(), LanguageStrings.get(LanguageStrings.PANEL_RESOURCES), String.format(LanguageStrings.get(LanguageStrings.STAT_GLOBAL_RESOURCE_FMT), LanguageStrings.get(LanguageStrings.RESOURCE_FUNGI)), resources.get(GameConstants.RESOURCE_FUNGI)});
+        model.addRow(new Object[]{GameConstants.RESOURCE_MEAT.getIcon(), LanguageStrings.get(LanguageStrings.PANEL_RESOURCES), String.format(LanguageStrings.get(LanguageStrings.STAT_GLOBAL_RESOURCE_FMT), LanguageStrings.get(LanguageStrings.RESOURCE_MEAT)), resources.get(GameConstants.RESOURCE_MEAT)});
+        model.addRow(new Object[]{GameConstants.RESOURCE_WATER.getIcon(), LanguageStrings.get(LanguageStrings.PANEL_RESOURCES), String.format(LanguageStrings.get(LanguageStrings.STAT_GLOBAL_RESOURCE_FMT), LanguageStrings.get(LanguageStrings.RESOURCE_WATER)), resources.get(GameConstants.RESOURCE_WATER)});
+        model.addRow(new Object[]{GameConstants.RESOURCE_SYRUP.getIcon(), LanguageStrings.get(LanguageStrings.PANEL_RESOURCES), String.format(LanguageStrings.get(LanguageStrings.STAT_GLOBAL_RESOURCE_FMT), LanguageStrings.get(LanguageStrings.RESOURCE_SYRUP)), resources.getOrDefault(GameConstants.RESOURCE_SYRUP, 0)});
+        model.addRow(new Object[]{GameConstants.RESOURCE_RESIN.getIcon(), LanguageStrings.get(LanguageStrings.PANEL_RESOURCES), String.format(LanguageStrings.get(LanguageStrings.STAT_GLOBAL_RESOURCE_FMT), LanguageStrings.get(LanguageStrings.RESOURCE_RESIN)), resources.getOrDefault(GameConstants.RESOURCE_RESIN, 0)});
+        model.addRow(new Object[]{GameConstants.RESOURCE_ROCK.getIcon(), LanguageStrings.get(LanguageStrings.PANEL_RESOURCES), String.format(LanguageStrings.get(LanguageStrings.STAT_GLOBAL_RESOURCE_FMT), LanguageStrings.get(LanguageStrings.RESOURCE_ROCK)), resources.getOrDefault(GameConstants.RESOURCE_ROCK, 0)});
         
         // Global Deaths
-        model.addRow(new Object[]{null, null, "------", "------"});
+        model.addRow(new Object[]{null, null, LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR), LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR)});
         int totalDeaths = 0;
         if (dynasty.getGlobalDeathStatistics() != null) {
             totalDeaths = dynasty.getGlobalDeathStatistics().values().stream().mapToInt(Integer::intValue).sum();
@@ -494,7 +495,7 @@ public class StatsDialog extends ZeroDialog {
         addResourceRow(model, GameConstants.RESOURCE_SYRUP.getIcon(), LanguageStrings.get(LanguageStrings.RESOURCE_SYRUP), (int)totalSyrups, capSyrups, 0, 0, prodSyrups, 0);
         addResourceRow(model, GameConstants.RESOURCE_RESIN.getIcon(), LanguageStrings.get(LanguageStrings.RESOURCE_RESIN), (int)totalResins, capResins, 0, 0, prodResins, 0);
 
-        model.addRow(new Object[]{null, "------", "---", "---", "---", "---", "---", "---"});
+        model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR), "---", "---", "---", "---", "---", "---"});
         int netFood = prodMushrooms - consMushrooms;
         model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_TOTAL_FOOD), "---", "---", "---", prodMushrooms, consMushrooms, (netFood >= 0 ? "+" : "") + netFood});
     }
@@ -571,7 +572,7 @@ public class StatsDialog extends ZeroDialog {
             }
         }
         
-        model.addRow(new Object[]{null, "------", "------", "------"});
+        model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR), LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR), LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR)});
         model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.UI_SUMMARY), LanguageStrings.get(LanguageStrings.STAT_ADULTS), totalAdult});
         model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.UI_SUMMARY), LanguageStrings.get(LanguageStrings.STAT_JUVENILES), totalJuvenile});
         model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.UI_SUMMARY), dynastyModeToggle.isSelected() ? LanguageStrings.get(LanguageStrings.STAT_DYNASTY_TOTAL) : LanguageStrings.get(LanguageStrings.STAT_COLONY_TOTAL), grandTotal});
@@ -643,17 +644,17 @@ public class StatsDialog extends ZeroDialog {
             dailyDetect += Math.round(c.getAssignedRoleCount(GameConstants.ROLE_POLICE) * cs.getParasiteDetection(c));
         }
 
-        if (foragers > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.ROLE_FORAGER), foragers + " " + LanguageStrings.get(LanguageStrings.ROLE_FORAGER) + "s", LanguageStrings.get(LanguageStrings.UI_COMBINED), "~" + dailyForage + " res/day"});
-        if (farmers > 0) model.addRow(new Object[]{"Farming", farmers + " Eff. Farmers", LanguageStrings.get(LanguageStrings.UI_COMBINED), "~" + dailyFarm + " convert/day"});
-        if (hunters > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.ROLE_HUNTER), hunters + " " + LanguageStrings.get(LanguageStrings.ROLE_HUNTER) + "s", LanguageStrings.get(LanguageStrings.UI_COMBINED), "~" + dailyHunt + " pwr/day"});
-        if (miners > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.ROLE_MINER), miners + " " + LanguageStrings.get(LanguageStrings.ROLE_MINER) + "s", LanguageStrings.get(LanguageStrings.UI_COMBINED), "~" + dailyMine + " pwr/day"});
-        if (scouts > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.ROLE_SCOUT), scouts + " " + LanguageStrings.get(LanguageStrings.ROLE_SCOUT) + "s", "---", "Finding resources"});
-        if (researchers + assistants > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.TAB_RESEARCH), researchers + " Res / " + assistants + " Asst", LanguageStrings.get(LanguageStrings.UI_COMBINED), "+" + dailyRP + " pts/day"});
-        if (layers > 0) model.addRow(new Object[]{"Egg Laying", layers + " Layers", LanguageStrings.get(LanguageStrings.UI_COMBINED), "+" + dailyEggs + " eggs/day"});
-        if (nurses > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.ROLE_NURSE), nurses + " Nurses", nurseCap + " Cap", babies + " / " + nurseCap + " Load"});
-        if (gravers > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.ROLE_GRAVER), gravers + " Gravers", graveCap + " Cap", deadAnts + " / " + graveCap + " Load"});
-        if (ranchers > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.ROLE_RANCHER), ranchers + " Ranchers", aphidCap + " Cap", aphids + " / " + aphidCap + " Aphids"});
-        if (police > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.ROLE_POLICE), police + " Police", parasites + " Parasites", "~" + dailyDetect + " det./day"});
+        if (foragers > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.ROLE_FORAGER), String.format("%d %s", foragers, LanguageStrings.get(LanguageStrings.ROLE_FORAGER)), LanguageStrings.get(LanguageStrings.UI_COMBINED), String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_RES_DAY), dailyForage)});
+        if (farmers > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_JOB_FARMING), String.format(LanguageStrings.get(LanguageStrings.STAT_JOB_FARMERS_EFF_FMT), farmers), LanguageStrings.get(LanguageStrings.UI_COMBINED), String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_CONVERT_DAY), dailyFarm)});
+        if (hunters > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.ROLE_HUNTER), String.format("%d %s", hunters, LanguageStrings.get(LanguageStrings.ROLE_HUNTER)), LanguageStrings.get(LanguageStrings.UI_COMBINED), String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_PWR_DAY), dailyHunt)});
+        if (miners > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.ROLE_MINER), String.format("%d %s", miners, LanguageStrings.get(LanguageStrings.ROLE_MINER)), LanguageStrings.get(LanguageStrings.UI_COMBINED), String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_PWR_DAY), dailyMine)});
+        if (scouts > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.ROLE_SCOUT), String.format("%d %s", scouts, LanguageStrings.get(LanguageStrings.ROLE_SCOUT)), "---", LanguageStrings.get(LanguageStrings.STAT_RATE_SCOUT_STATUS)});
+        if (researchers + assistants > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.TAB_RESEARCH), String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_RESEARCH_ASST_FMT), researchers, assistants), LanguageStrings.get(LanguageStrings.UI_COMBINED), String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_PTS_DAY_FMT), dailyRP)});
+        if (layers > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_JOB_EGG_LAYING), String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_LAYERS_FMT), layers), LanguageStrings.get(LanguageStrings.UI_COMBINED), String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_EGGS_DAY), dailyEggs)});
+        if (nurses > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.ROLE_NURSE), String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_NURSES_FMT), nurses), String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_CAP_SHORT), nurseCap), String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_LOAD_FMT), String.valueOf(babies), nurseCap)});
+        if (gravers > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.ROLE_GRAVER), String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_GRAVERS_FMT), gravers), String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_CAP_SHORT), graveCap), String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_LOAD_FMT), String.valueOf(deadAnts), graveCap)});
+        if (ranchers > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.ROLE_RANCHER), String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_RANCHERS_FMT), ranchers), String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_CAP_SHORT), aphidCap), String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_APHIDS_FMT), String.valueOf(aphids), aphidCap)});
+        if (police > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.ROLE_POLICE), String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_POLICE_FMT), police), String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_PARASITES_FMT), parasites), String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_DET_DAY), dailyDetect)});
     }
 
     private void updateUnitStatsData() {
@@ -721,7 +722,7 @@ public class StatsDialog extends ZeroDialog {
             }
         }
         
-        model.addRow(new Object[]{"------", "------"});
+        model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR), LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR)});
         model.addRow(new Object[]{dynastyModeToggle.isSelected() ? LanguageStrings.get(LanguageStrings.STAT_DYNASTY_TOTAL) : LanguageStrings.get(LanguageStrings.STAT_COLONY_TOTAL), totalDeaths});
     }
 }
