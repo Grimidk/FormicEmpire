@@ -12,6 +12,7 @@ import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
+import com.grimidk.formicempire.classes.entities.services.ViewportPhysicsLod;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
 
 import javax.swing.*;
@@ -42,6 +43,7 @@ public class GameAreaPanel extends ZeroGamePanel {
     private Engine engine;
     private Dimension currentDimension = WorldSpaces.OVERWORLD; 
     private String currentBiomeName = "Plains";
+    private Rectangle paintViewportRect;
 
     private final int ANCHOR_WIDTH = 550;
     private final int ANCHOR_HEIGHT = 500;
@@ -118,11 +120,19 @@ public class GameAreaPanel extends ZeroGamePanel {
     public void setEngine(Engine engine) {
         this.engine = engine;
     }
+
+    /**
+     * Scroll viewport in this panel's coordinates; used to cull sprites and match physics LOD.
+     */
+    public void setPaintViewportRect(Rectangle viewRect) {
+        this.paintViewportRect = viewRect != null ? new Rectangle(viewRect) : null;
+    }
     
     public void resetView() {
         this.currentDimension = WorldSpaces.OVERWORLD;
         this.currentBiomeName = "Plains";
         this.colony = null;
+        this.paintViewportRect = null;
         this.backgroundImage = biomeTextureCache.get("Plains");
         repaint();
     }
@@ -293,8 +303,14 @@ public class GameAreaPanel extends ZeroGamePanel {
                 int safeY = y + padTop;
                 int safeW = w - padBack - padHall;
                 int safeH = h - padTop - padBottom;
-                
-                drawStaticItemsLocal(g2d, deadBodyImg, safeX, safeY, safeW, safeH, colony.getDeadAnts().size());
+
+                Rectangle deadDrawArea = new Rectangle(safeX, safeY, Math.max(1, safeW), Math.max(1, safeH));
+                boolean drawDeadPile = !ViewportPhysicsLod.isLodActive(paintViewportRect)
+                    || ViewportPhysicsLod.expandViewport(paintViewportRect, ViewportPhysicsLod.MARGIN_PX).intersects(deadDrawArea);
+
+                if (drawDeadPile) {
+                    drawStaticItemsLocal(g2d, deadBodyImg, safeX, safeY, safeW, safeH, colony.getDeadAnts().size());
+                }
             }
 
             g2d.setTransform(old);
@@ -452,6 +468,10 @@ public class GameAreaPanel extends ZeroGamePanel {
             List<Ant> ants = colony.getAntsByType(type);
             for (Ant ant : ants) {
                 if (ant.getDimension() != currentDimension) continue;
+
+                if (!ViewportPhysicsLod.antIntersectsViewport(paintViewportRect, ant.getX(), ant.getY(), w, h)) {
+                    continue;
+                }
                 
                 Image currentSprite = sprite;
                 if (!assimilatedSpecies.isEmpty()) {
@@ -521,13 +541,17 @@ public class GameAreaPanel extends ZeroGamePanel {
         
         for (Bug bug : colony.getBugs()) {
             if (bug.getDimension() != currentDimension) continue;
-            
+
             ImageIcon spriteIcon = bug.getBugType().getSprite();
             if (spriteIcon == null) continue;
             
             Image sprite = spriteIcon.getImage();
             int w = spriteIcon.getIconWidth();
             int h = spriteIcon.getIconHeight();
+
+            if (!ViewportPhysicsLod.antIntersectsViewport(paintViewportRect, bug.getX(), bug.getY(), w, h)) {
+                continue;
+            }
             
             AffineTransform oldTransform = g2d.getTransform();
             

@@ -28,17 +28,45 @@ public class ColonyPhysicsService {
 
     // --- Main Physics Loop ---
     public void runPhysics(Colony colony, Dimension activeDimension) {
+        runPhysics(colony, activeDimension, null, 0L);
+    }
+
+    /**
+     * @param viewportBounds panel coordinates of the scroll viewport; {@code null} disables viewport LOD
+     * @param physicsStepIndex monotonic step counter for LOD hashing (unused when viewport is null)
+     */
+    public void runPhysics(Colony colony, Dimension activeDimension, Rectangle viewportBounds, long physicsStepIndex) {
         // -- Ants --
         for (Map.Entry<AntType, List<Ant>> entry : colony.getAntGroups().entrySet()) {
+            AntType type = entry.getKey();
+
+            ImageIcon spriteIcon = GameConstants.getAntSprite(type, colony.getSpecies());
+            int spriteW = spriteIcon != null ? spriteIcon.getIconWidth() : 16;
+            int spriteH = spriteIcon != null ? spriteIcon.getIconHeight() : 16;
+
             List<Ant> antList = entry.getValue();
 
             synchronized (antList) {
-                for (int i = antList.size() - 1; i >= 0; i--) {
-                    Ant ant = antList.get(i);
-                    if (!ant.isAlive()) continue;
+                // CopyOnWriteArrayList: indexed loops are unsafe because updateAntLogic may remove ants.
+                // Enhanced for uses a snapshot iterator; removals during this step cannot cause get(index) faults.
+                for (Ant ant : antList) {
+                    if (!ant.isAlive()) {
+                        continue;
+                    }
 
-                    boolean isActiveDim = (ant.getDimension() == activeDimension);
-                    boolean shouldRunAI = isActiveDim || (Math.random() < 0.05);
+                    boolean sameDim = ant.getDimension() == activeDimension;
+                    boolean lodSameDim = ViewportPhysicsLod.isLodActive(viewportBounds) && sameDim;
+                    boolean inView = ViewportPhysicsLod.antIntersectsViewport(
+                        viewportBounds, ant.getX(), ant.getY(), spriteW, spriteH);
+
+                    boolean shouldRunAI;
+                    if (!sameDim) {
+                        shouldRunAI = Math.random() < 0.05;
+                    } else if (lodSameDim && !inView) {
+                        shouldRunAI = ViewportPhysicsLod.shouldRunOffViewportAi(physicsStepIndex, ant);
+                    } else {
+                        shouldRunAI = true;
+                    }
 
                     if (!ant.isMoving() && ant.hasRoute()) {
                         processNextRoutePoint(ant);
@@ -47,22 +75,50 @@ public class ColonyPhysicsService {
                     if (!ant.isMoving() && !ant.hasRoute() && shouldRunAI) {
                         updateAntLogic(colony, ant);
                     }
-                    
-                    ant.updatePosition(GameConstants.BASE_SPRITE_SPEED);
+
+                    float moveSpeed = GameConstants.BASE_SPRITE_SPEED;
+                    if (lodSameDim && !inView) {
+                        if (!ViewportPhysicsLod.shouldRunOffViewportPosition(physicsStepIndex, ant)) {
+                            continue;
+                        }
+                        moveSpeed = ViewportPhysicsLod.compensatedMoveSpeed(GameConstants.BASE_SPRITE_SPEED);
+                    }
+                    ant.updatePosition(moveSpeed);
                 }
             }
         }
-        
+
         // -- Bugs --
         List<Bug> bugs = colony.getBugs();
         synchronized (bugs) {
             for (Bug bug : bugs) {
-                if (bug.isAlive() && bug.getDimension() == activeDimension) {
-                    if (!bug.isMoving()) {
-                        updateBugLogic(colony, bug);
-                    }
-                    bug.updatePosition(GameConstants.BASE_SPRITE_SPEED);
+                if (!bug.isAlive() || bug.getDimension() != activeDimension) {
+                    continue;
                 }
+
+                ImageIcon bugIcon = bug.getBugType().getSprite();
+                int bw = bugIcon != null ? bugIcon.getIconWidth() : 16;
+                int bh = bugIcon != null ? bugIcon.getIconHeight() : 16;
+
+                boolean lod = ViewportPhysicsLod.isLodActive(viewportBounds);
+                boolean bugInView = ViewportPhysicsLod.antIntersectsViewport(
+                    viewportBounds, bug.getX(), bug.getY(), bw, bh);
+                int bugHash = System.identityHashCode(bug);
+
+                boolean runBugAi = !lod || bugInView
+                    || ViewportPhysicsLod.shouldRunOffViewportBugAi(physicsStepIndex, bugHash);
+                if (!bug.isMoving() && runBugAi) {
+                    updateBugLogic(colony, bug);
+                }
+
+                float bugMove = GameConstants.BASE_SPRITE_SPEED;
+                if (lod && !bugInView) {
+                    if (!ViewportPhysicsLod.shouldRunOffViewportBugMove(physicsStepIndex, bugHash)) {
+                        continue;
+                    }
+                    bugMove = ViewportPhysicsLod.compensatedMoveSpeed(GameConstants.BASE_SPRITE_SPEED);
+                }
+                bug.updatePosition(bugMove);
             }
         }
     }

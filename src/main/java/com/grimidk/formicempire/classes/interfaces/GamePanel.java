@@ -21,6 +21,7 @@ import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class GamePanel extends ZeroGamePanel {
     private final MainFrame frame;
@@ -51,6 +52,9 @@ public class GamePanel extends ZeroGamePanel {
     private Runnable hourTickListener;
     private Runnable dayTickListener;
     private Runnable monthTickListener;
+
+    private final AtomicInteger pendingMinuteGuiSteps = new AtomicInteger(0);
+    private Timer minuteDrainTimer;
     
     private volatile boolean engineStarted = false;
     
@@ -92,6 +96,14 @@ public class GamePanel extends ZeroGamePanel {
             public void componentResized(ComponentEvent e) {
                 updateGameAreaSize();
             }
+        });
+        gameScrollPane.getViewport().addChangeListener(e -> {
+            if (!engineStarted || gameAreaPanel == null) {
+                return;
+            }
+            Rectangle vr = gameScrollPane.getViewport().getViewRect();
+            gameAreaPanel.setPaintViewportRect(vr);
+            gameAreaPanel.repaint();
         });
     }
     
@@ -666,17 +678,24 @@ public class GamePanel extends ZeroGamePanel {
         unregisterTickListeners();
         Engine engine = frame.getEngine();
         if (engine == null) return;
-        
-        minuteTickListener = () -> SwingUtilities.invokeLater(this::updateMinuteGUI);
+
+        pendingMinuteGuiSteps.set(0);
+        minuteTickListener = () -> pendingMinuteGuiSteps.incrementAndGet();
         hourTickListener = () -> SwingUtilities.invokeLater(this::updateHourGUI);
         dayTickListener = () -> SwingUtilities.invokeLater(this::updateDayGUI);
         monthTickListener = () -> SwingUtilities.invokeLater(this::updateMonthGUI);
-        
+
         engine.addTickListener(minuteTickListener);
         engine.addHourTickListener(hourTickListener);
         engine.addDayTickListener(dayTickListener);
         engine.addMonthTickListener(monthTickListener);
-        
+
+        if (minuteDrainTimer == null) {
+            minuteDrainTimer = new Timer(16, e -> drainPendingMinuteGuiSteps());
+            minuteDrainTimer.setRepeats(true);
+        }
+        minuteDrainTimer.start();
+
         controlPanel.updateTickLabel(engine);
         updateStatusIndicator(engine.isPaused());
     }
@@ -693,6 +712,30 @@ public class GamePanel extends ZeroGamePanel {
         hourTickListener = null;
         dayTickListener = null;
         monthTickListener = null;
+
+        if (minuteDrainTimer != null) {
+            minuteDrainTimer.stop();
+        }
+        pendingMinuteGuiSteps.set(0);
+    }
+
+    /**
+     * Coalesces engine minute notifications: applies all pending physics steps in one EDT burst,
+     * then updates side panels once and repaints the game area (decoupled from per-tick invokeLater spam).
+     */
+    private void drainPendingMinuteGuiSteps() {
+        if (!engineStarted) {
+            return;
+        }
+        Engine engine = frame.getEngine();
+        if (engine == null || engine.isPaused()) {
+            return;
+        }
+        int steps = pendingMinuteGuiSteps.getAndSet(0);
+        if (steps <= 0) {
+            return;
+        }
+        performMinuteGuiUpdate(steps);
     }
 
     public void updateStatusIndicator(boolean paused) {
@@ -728,14 +771,24 @@ public class GamePanel extends ZeroGamePanel {
     }
 
     private void updateMinuteGUI() {
+        pendingMinuteGuiSteps.set(0);
+        performMinuteGuiUpdate(1);
+    }
+
+    private void performMinuteGuiUpdate(int physicsSteps) {
         Engine engine = frame.getEngine();
         World world = engine != null ? engine.getWorld() : null;
         Colony colony = world != null && world.getActiveHex() != null ? world.getActiveHex().getColony() : null;
-        
-        gameAreaPanel.setColony(colony);        
-        updateStaticWorldInfo(); 
-        
-        if (world == null) return;
+
+        gameAreaPanel.setColony(colony);
+        updateStaticWorldInfo();
+
+        if (world == null) {
+            return;
+        }
+
+        Rectangle viewportRect = gameScrollPane.getViewport().getViewRect();
+        gameAreaPanel.setPaintViewportRect(viewportRect);
 
         if (colony != null) {
             int w = gameAreaPanel.getWidth();
@@ -743,12 +796,14 @@ public class GamePanel extends ZeroGamePanel {
             if (w > 1 && h > 1) {
                 colony.setGameAreaDimensions(w, h);
             }
-            colony.runPhysics(gameAreaPanel.getCurrentDimension()); 
+            for (int i = 0; i < physicsSteps; i++) {
+                colony.runPhysics(gameAreaPanel.getCurrentDimension(), viewportRect);
+            }
         }
 
         worldPanel.updateMinuteData(world);
         colonyPanel.updateMinuteData(colony);
-        gameAreaPanel.repaint(); 
+        gameAreaPanel.repaint();
     }
 
     private void updateHourGUI() {

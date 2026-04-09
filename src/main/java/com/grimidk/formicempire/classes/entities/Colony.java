@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.entities;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -76,6 +77,7 @@ public class Colony {
     private int totalDeaths;
     private int gameAreaWidth = 1;
     private int gameAreaHeight = 1;
+    private long physicsStepSequence;
     private Building currentBuildingProject = null;
     private Tunnel currentTunnelProject = null;
     private double buildingProgressHours = 0.0;
@@ -423,8 +425,22 @@ public class Colony {
     public boolean isAutoBuildEnabled() { return autoBuildEnabled; }
     public void setAutoBuildEnabled(boolean autoBuildEnabled) { this.autoBuildEnabled = autoBuildEnabled; }
 
-    public Map<AntType, List<Ant>> getAntGroups() { return antGroups; } 
-    public List<Ant> getAntsByType(AntType type) { return antGroups.getOrDefault(type, new CopyOnWriteArrayList<>()); }
+    public Map<AntType, List<Ant>> getAntGroups() { return antGroups; }
+
+    /**
+     * Live ants by type. {@link GameConstants#TYPE_DEAD} is stored in {@link #getDeadAnts()} (not in {@code antGroups}).
+     * Unknown types return an empty immutable list (never a fresh throwaway {@link CopyOnWriteArrayList}).
+     */
+    public List<Ant> getAntsByType(AntType type) {
+        if (type == GameConstants.TYPE_DEAD) {
+            return deadAnts;
+        }
+        List<Ant> list = antGroups.get(type);
+        if (list != null) {
+            return list;
+        }
+        return Collections.emptyList();
+    }
     public List<Ant> getEggs() { return antGroups.get(GameConstants.TYPE_EGG); }
     public void setEggs(List<Ant> eggs) { antGroups.put(GameConstants.TYPE_EGG, eggs); }
     public List<Ant> getLarvae() { return antGroups.get(GameConstants.TYPE_LARVA); }
@@ -806,10 +822,19 @@ public class Colony {
         this.labourService.runNuptial(this, world, currentHex);
     }
     
-    public void runPhysics(Dimension activeDimension) { 
-        if (this.isActive) {
-            physicsService.runPhysics(this, activeDimension); 
+    public void runPhysics(Dimension activeDimension) {
+        runPhysics(activeDimension, null);
+    }
+
+    /**
+     * @param viewportPanelBounds scroll viewport in panel coordinates; {@code null} runs full-panel physics (no viewport LOD)
+     */
+    public void runPhysics(Dimension activeDimension, Rectangle viewportPanelBounds) {
+        if (!this.isActive) {
+            return;
         }
+        physicsStepSequence++;
+        physicsService.runPhysics(this, activeDimension, viewportPanelBounds, physicsStepSequence);
     }
 
     // --- Job Schedulers ---
