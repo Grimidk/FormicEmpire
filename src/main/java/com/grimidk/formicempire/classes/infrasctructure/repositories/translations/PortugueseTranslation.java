@@ -779,6 +779,19 @@ public class PortugueseTranslation implements Translation {
         pt.put("STAT_POLICING_2_DESC", "Aumenta vigilância para 35% por dia.");
         pt.put("STAT_POLICING_3_FLAVOR", "Drones de vigilância");
         pt.put("STAT_POLICING_3_DESC", "Aumenta vigilância para 55% por dia.");
+        pt.put("STAT_HEX_SUSTAIN_FLAVOR", "Sustentabilidade ambiental");
+        pt.put("STAT_HEX_SUSTAIN_DESC", "Limita o esgotamento efetivo do hexágono a 80% para esta colônia.");
+        pt.put("STAT_WORKER_SPEED_2_FLAVOR", "Marcha forçada");
+        pt.put("STAT_WORKER_SPEED_2_DESC", "Dobra a velocidade de movimento das operárias na superfície e a contribuição ao raio de coleta em plena eficiência.");
+
+        pt.put("STAT_CAT_OVERWORLD", "Hexágono");
+        pt.put("STAT_HEX_DEPLETION", "Esgotamento");
+        pt.put("STAT_HEX_SOURCES_FOUND", "Fontes encontradas");
+        pt.put("STAT_HEX_MAX_EFFICIENCY_DISTANCE", "Distância máx. de plena eficiência");
+        pt.put("STAT_LOCAL_HEX_NOTE_CAT", "Nota");
+        pt.put("STAT_LOCAL_HEX_DYNASTY_HINT", "No modo dinastia, esta aba descreve a colônia da qual você abriu estatísticas, não todas de uma vez.");
+        pt.put("UNIT_STAT_WORKER_MARCH", "Marcha operária");
+        pt.put("UNIT_STAT_WORKER_MARCH_DESC", "Operárias movem-se ao dobro da velocidade na superfície (marcha forçada).");
 
         pt.put("ASSIMILATED_FARMING_FLAVOR", "Técnicas agrícolas ancestrais");
         pt.put("ASSIMILATED_FARMING_DESC", "Sua dinastia aprendeu a cultivar cogumelos com mais eficiência, +1 unidade extra por planta e proteína.");
@@ -897,6 +910,7 @@ public class PortugueseTranslation implements Translation {
 
         pt.put("HELP_WELCOME_STORY", "Quase todas as outras formigas se extinguiram. Você é uma rainha e carrega o conhecimento genético de cada espécie. Desbloqueie-o e domine o mundo. <br><br>Construa a colônia e expanda-se lutando contra outras colônias; adapte-se absorvendo e pesquisando habilidades.");
         pt.put("HELP_START_INFO", "<b>Sobrevivência básica:</b><br>Suas formigas precisam de <b>cogumelos</b> para comer e <b>água</b> para beber todos os dias. Sem isso, a colônia morre de fome ou sede.<br>- <b>Coletoras</b> recolhem plantas e água.<br>- <b>Caçadoras</b> recolhem proteína (carne).<br>- <b>Agricultoras</b> convertem planta e proteína em cogumelos.<br>- <b>Babás</b> cuidam da prole. Prole negligenciada morre.<br><br><b>Observando a colônia:</b><br>Pressione <b>A</b> para alternar entre <b>submundo</b> (formigueiro) e <b>supermundo</b> (coleta externa).<br><br><b>Gestão:</b><br>Use <b>taxas de eclosão (P)</b> para nascimentos. <b>Pesquisadoras</b> geram PP para melhorias no <b>menu de pesquisa (Y)</b>. <b>Construtoras</b> usam minerais e resina no <b>menu de construção (U)</b>.<br><br><b>Ameaças:</b><br>- <b>Contaminação:</b> mortas devem ser retiradas por <b>coveiras</b>.<br>- <b>Parasitas:</b> drenam comida. Atribua <b>vigilantes</b>.<br>- <b>Esgotamento:</b> fontes secam; use <b>batedoras</b> para achar novas.");
+        pt.put("HELP_OVERWORLD_GATHERING", "<b>Coleta no supermundo:</b><br>As <b>batedoras</b> descobrem novos nós de recursos. Cada hex do mapa acumula <b>esgotamento</b> por achados sem água; esgotamento maior tende a colocar nós novos mais longe do formigueiro (algumas melhorias limitam isso).<br><br><b>Distância:</b> o rendimento usa linha reta a partir da <b>entrada do ninho</b>. Dentro de um raio de <b>plena eficiência</b> (maior com operárias mais rápidas e certas melhorias), o rendimento é integral; além disso, cai até um mínimo pequeno.<br><br><b>Estatísticas (Hex local):</b> <b>Esgotamento</b> é a porcentagem efetiva usada para aparições; <b>Fontes encontradas</b> conta os nós que esta colônia descobriu; <b>Distância máx. de plena eficiência</b> estima o raio de rendimento pleno para uma operária típica.");
         pt.put("HELP_DYNASTY_INFO", "<b>Expandindo a dinastia:</b><br>Com <b>reprodutoras</b>, faça voos nupciais pelo <b>mapa mundial (I)</b>.<br><i>Dica: eclipses ativam voos nupciais espontâneos e gratuitos!</i><br><br><b>Logística e comércio:</b><br>Várias colônias desbloqueiam <b>rotas comerciais</b>. Atribua <b>mensageiras</b>.<br>- <b>Terra:</b> padrão.<br>- <b>Túnel:</b> seguro e rápido, requer <b>túneis</b> e <b>perfuradoras</b>.<br>- <b>Ar:</b> rápido, baixa capacidade, requer <b>transporte aéreo</b> (princesas).<br>- <b>Bilateral:</b> transporte nos dois sentidos.<br><br><b>Marcos:</b><br>- <b>Menu da dinastia (S):</b> gerir colônias.<br>- <b>Colonização em massa:</b> remove limite de satélites.<br>- <b>Automação:</b> colônias NPC se gerem.<br><br><b>Evolução:</b><br><b>Sinergias</b> combinam melhorias; <b>assimilações</b> absorvem traços.");
 
         pt.put("HELP_SPECIES_SCIENTIFIC", "Nome científico:");

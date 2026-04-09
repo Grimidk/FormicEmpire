@@ -139,6 +139,8 @@ public class Savefile implements Serializable {
         public boolean hasColony;
         public int timeOffset;
         public int weatherId;
+        /** Non-water overworld sources spawned on this hex (drives depletion). */
+        public int nonWaterResourceSourcesGenerated;
 
         public SavedHex(int q, int r, int biomeId, boolean hasColony, int timeOffset, int weatherId) {
             this.q = q;

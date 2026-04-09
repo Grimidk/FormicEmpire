@@ -604,6 +604,8 @@ public class World {
                 } else {
                     hex.setColony(null);
                 }
+
+                hex.setNonWaterResourceSourcesGenerated(sh.nonWaterResourceSourcesGenerated);
                 
                 hexMap.put(sh.q + "," + sh.r, hex);
                 this.hexes.add(hex);
@@ -901,7 +903,7 @@ public class World {
         
         for (Hex hex : this.hexes) {
             if (hex.getColony() != null) {
-                hex.getColony().runDailyJobs(this.getTemperatureIcon(), hex.getBiome());
+                hex.getColony().runDailyJobs(this.getTemperatureIcon(), hex.getBiome(), hex);
             }
         }
         

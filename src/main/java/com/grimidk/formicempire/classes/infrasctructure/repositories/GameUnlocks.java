@@ -200,6 +200,10 @@ public final class GameUnlocks {
     static { upgrades.add(STAT_POLICING_2); }
     public static final Upgrade STAT_POLICING_3 = new Upgrade(132, "STAT_POLICING_3", "STAT_POLICING_3_FLAVOR", "STAT_POLICING_3_DESC", STAT_POLICING_2, 42000, null);
     static { upgrades.add(STAT_POLICING_3); }
+    public static final Upgrade STAT_HEX_SUSTAIN = new Upgrade(133, "STAT_HEX_SUSTAIN", "STAT_HEX_SUSTAIN_FLAVOR", "STAT_HEX_SUSTAIN_DESC", STAT_FARMING_3, 175000, null);
+    static { upgrades.add(STAT_HEX_SUSTAIN); }
+    public static final Upgrade STAT_WORKER_SPEED_2 = new Upgrade(134, "STAT_WORKER_SPEED_2", "STAT_WORKER_SPEED_2_FLAVOR", "STAT_WORKER_SPEED_2_DESC", STAT_SCOUTING_3, 200000, null);
+    static { upgrades.add(STAT_WORKER_SPEED_2); }
     // -- Assimilated --
     public static final Upgrade ASSIMILATED_FARMING = new Upgrade(1001, "ASSIMILATED_FARMING", "ASSIMILATED_FARMING_FLAVOR", "ASSIMILATED_FARMING_DESC", ABILITY_ASSIMILATION, 0, null );
     static { upgrades.add(ASSIMILATED_FARMING); }

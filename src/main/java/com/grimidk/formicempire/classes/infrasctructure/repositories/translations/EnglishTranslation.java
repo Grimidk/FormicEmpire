@@ -780,6 +780,19 @@ public class EnglishTranslation implements Translation {
         en.put("STAT_POLICING_2_DESC", "Increases policing rate to 35% per day.");
         en.put("STAT_POLICING_3_FLAVOR", "Surveillance Drones");
         en.put("STAT_POLICING_3_DESC", "Increases policing rate to 55% per day.");
+        en.put("STAT_HEX_SUSTAIN_FLAVOR", "Environmental Sustainability");
+        en.put("STAT_HEX_SUSTAIN_DESC", "Caps effective hex resource depletion at 80% for overworld spawn distance (raw accumulation can still rise).");
+        en.put("STAT_WORKER_SPEED_2_FLAVOR", "Forced March");
+        en.put("STAT_WORKER_SPEED_2_DESC", "Doubles overworld movement speed for worker ants and doubles their contribution to gathering full-efficiency radius.");
+
+        en.put("STAT_CAT_OVERWORLD", "Hex");
+        en.put("STAT_HEX_DEPLETION", "Depletion");
+        en.put("STAT_HEX_SOURCES_FOUND", "Sources found");
+        en.put("STAT_HEX_MAX_EFFICIENCY_DISTANCE", "Max efficiency distance");
+        en.put("STAT_LOCAL_HEX_NOTE_CAT", "Note");
+        en.put("STAT_LOCAL_HEX_DYNASTY_HINT", "In dynasty mode, this tab describes the colony you opened statistics from, not every colony at once.");
+        en.put("UNIT_STAT_WORKER_MARCH", "Worker march");
+        en.put("UNIT_STAT_WORKER_MARCH_DESC", "Worker ants move at double speed on the surface (Forced March).");
 
         en.put("ASSIMILATED_FARMING_FLAVOR", "Ancestral Farming Techniques");
         en.put("ASSIMILATED_FARMING_DESC", "Your dynasty has learned how to farm fungi more efficiently. By getting 1 extra mushroom matter per plant and protein.");
@@ -899,6 +912,7 @@ public class EnglishTranslation implements Translation {
 
         en.put("HELP_WELCOME_STORY", "Nearly all other ants are extinct. You are an ant queen and have within you all the genetic knowledge of every ant species. You must unlock it and take over the world as the dominant species. <br><br>Build up your colony and begin to spread while fighting other ant colonies, you will need to adapt to new environments by absorbing and researching their abilities.");
         en.put("HELP_START_INFO", "<b>Basic Survival:</b><br>Your ants need <b>Fungi</b> (Mushrooms) to eat and <b>Water</b> to drink every day. Without them, your colony will starve or die of dehydration.<br>- <b>Foragers</b> gather Plants and Water.<br>- <b>Hunters</b> gather Protein (Meat).<br>- <b>Farmers</b> convert Plants and Protein into Fungi.<br>- <b>Nurses</b> care for your brood. Neglected brood will perish.<br><br><b>Watching Your Colony:</b><br>Press <b>A</b> to toggle your view between the <b>Underworld</b> (inside the nest) and the <b>Overworld</b> (outside gathering).<br><br><b>Colony Management:</b><br>Use <b>Hatch Rates (P)</b> to control ant births. <b>Researchers</b> generate Research Points (RP) for upgrades in the <b>Research Menu (Y)</b>. <b>Builders</b> use Minerals and Resin to construct facilities via the <b>Build Menu (U)</b>.<br><br><b>Advanced Threats:</b><br>- <b>Contamination:</b> Dead ants must be cleared by <b>Gravers</b>.<br>- <b>Parasites:</b> Secretly drain food. Assign <b>Police</b> to eliminate them.<br>- <b>Depletion:</b> Resource nodes dry up; assign <b>Scouts</b> to find new ones.");
+        en.put("HELP_OVERWORLD_GATHERING", "<b>Overworld (surface) gathering:</b><br><b>Scouts</b> discover new resource nodes. Each map hex tracks <b>depletion</b> from non-water finds; higher depletion tends to place new nodes farther from the nest (some upgrades cap how bad this gets).<br><br><b>Distance:</b> Gathered amounts use straight-line distance from the <b>nest entrance</b>. Inside a <b>full efficiency</b> radius (larger for faster workers and certain upgrades), yields are full; beyond that, yield falls toward a small minimum.<br><br><b>Statistics (Local hex):</b> <b>Depletion</b> is the effective percentage used for spawns; <b>Sources found</b> counts nodes this colony has discovered; <b>Max efficiency distance</b> estimates the full-yield radius for a typical worker.");
         en.put("HELP_DYNASTY_INFO", "<b>Expanding Your Dynasty:</b><br>Once you unlock <b>Breeders</b>, perform Nuptial Flights to spread via the <b>World Map (I)</b>.<br><i>Tip: Eclipses trigger spontaneous, free Nuptial Flights!</i><br><br><b>Logistics & Trade:</b><br>Founding multiple colonies unlocks <b>Trade Routes</b>. Assign <b>Couriers</b> to transport resources.<br>- <b>Land:</b> Standard trade method.<br>- <b>Tunnel:</b> Secure and fast, requires <b>Tunnels</b> and <b>Borers</b>.<br>- <b>Air:</b> Fast but low capacity, requires <b>Sky Transports</b> (Princesses).<br>- <b>Bilateral:</b> Allows two-way resource transport.<br><br><b>Dynasty Milestones:</b><br>- <b>Dynasty Menu (S):</b> View and manage all colonies.<br>- <b>Mass Colonization:</b> Removes satellite colony limits.<br>- <b>Automation:</b> Allows NPC colonies to manage themselves.<br><br><b>Evolution:</b><br>Unlock <b>Synergies</b> to combine upgrades and <b>Assimilations</b> to absorb other ant species' traits.");
         
         en.put("HELP_SPECIES_SCIENTIFIC", "Scientific Name:");

@@ -7,12 +7,13 @@ import com.grimidk.formicempire.classes.constants.world.Weather;
 import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Bug;
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.ResourceSource;
+import com.grimidk.formicempire.classes.entities.services.ViewportPhysicsLod;
 import com.grimidk.formicempire.classes.infrasctructure.Dimension;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
-import com.grimidk.formicempire.classes.entities.services.ViewportPhysicsLod;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
 
 import javax.swing.*;
@@ -216,6 +217,7 @@ public class GameAreaPanel extends ZeroGamePanel {
                 drawUnderworldStructure(g2d);
             } else {
                 drawOverworldStructure(g2d);
+                drawResourceSources(g2d);
             }
             
             colony.setRoomBounds(entranceBounds, room1Bounds, room2Bounds, room3Bounds, room4Bounds, rancherYardBounds, graverYardBounds, breederRoomBounds, transitRoomBounds);
@@ -226,6 +228,30 @@ public class GameAreaPanel extends ZeroGamePanel {
 
         if (currentDimension == WorldSpaces.OVERWORLD && engine != null && engine.getWorld() != null) {
             drawEnvironmentalOverlays(g2d);
+        }
+    }
+
+    private void drawResourceSources(Graphics2D g2d) {
+        if (colony == null || colony.getLocationService() == null) {
+            return;
+        }
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+        for (ResourceSource src : colony.getLocationService().getDiscoveredSources()) {
+            if (src.getQuantity() <= 0) {
+                continue;
+            }
+            ImageIcon icon = src.getIconForDisplay();
+            if (icon == null) {
+                continue;
+            }
+            int w = icon.getIconWidth();
+            int h = icon.getIconHeight();
+            int sx = src.getX();
+            int sy = src.getY();
+            if (!ViewportPhysicsLod.antIntersectsViewport(paintViewportRect, sx, sy, w, h)) {
+                continue;
+            }
+            g2d.drawImage(icon.getImage(), sx, sy, w, h, this);
         }
     }
 

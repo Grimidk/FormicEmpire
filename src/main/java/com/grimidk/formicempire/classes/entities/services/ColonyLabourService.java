@@ -88,7 +88,12 @@ public class ColonyLabourService {
             if (space <= 0) break; 
 
             int gatherAmount = Math.min(powerAvailable, (int) Math.ceil(space));
-            int actualGathered = locations.gatherFromSource(colony, source, gatherAmount);
+            double efficiency = locations.computeGatherEfficiency(colony, source, workers);
+            int cappedRequest = (int) Math.floor(gatherAmount * efficiency);
+            if (cappedRequest <= 0) {
+                continue;
+            }
+            int actualGathered = locations.gatherFromSource(colony, source, cappedRequest);
             
             if (actualGathered > 0) {
                 resources.addResource(colony, type, actualGathered);
@@ -492,7 +497,7 @@ public class ColonyLabourService {
         }
     }
 
-    public void runScoutting(Colony colony, Biome biome) {
+    public void runScoutting(Colony colony, Biome biome, Hex currentHex) {
         if (!colony.hasUpgrade(GameUnlocks.ROLE_SCOUT)) return;
 
         int scoutCount = countActiveAnts(colony, GameConstants.ROLE_SCOUT);
@@ -515,12 +520,12 @@ public class ColonyLabourService {
             }
 
             if (found) {
-                generateAndAddSource(colony, biome);
+                generateAndAddSource(colony, biome, currentHex);
             }
         }
     }
 
-    private void generateAndAddSource(Colony colony, Biome biome) {
+    private void generateAndAddSource(Colony colony, Biome biome, Hex currentHex) {
         ColonyLocationService locations = colony.getLocationService();
         List<ResourceType> possibleTypes = new ArrayList<>();
         
@@ -584,9 +589,16 @@ public class ColonyLabourService {
         if (gameW <= 100) gameW = 2560;
         if (gameH <= 100) gameH = 1440;
         
-        int bufferMin = 400; 
-        int bufferMax = 900;
-        int randomBuffer = bufferMin + random.nextInt(bufferMax - bufferMin);
+        int maxDepl = colony.hasUpgrade(GameUnlocks.STAT_HEX_SUSTAIN)
+                ? GameConstants.HEX_SUSTAIN_MAX_DEPLETION_PCT
+                : 100;
+        int depletionPct = currentHex != null ? currentHex.getResourceDepletionPercentCapped(maxDepl) : 0;
+        int extraBuffer = (int) Math.round(
+            (depletionPct / 100.0) * GameConstants.HEX_DEPLETION_SPAWN_BUFFER_EXTRA_MAX);
+
+        int bufferMin = 400 + extraBuffer;
+        int bufferMax = 900 + extraBuffer;
+        int randomBuffer = bufferMin + random.nextInt(Math.max(1, bufferMax - bufferMin));
         
         int sourceX, sourceY;
         int side = random.nextInt(4); // 0=Top, 1=Right, 2=Bottom, 3=Left
@@ -605,8 +617,10 @@ public class ColonyLabourService {
              sourceY = random.nextInt(Math.max(1, gameH));
         }
         
-        ResourceSource source = new ResourceSource(selectedType, quantity, sourceX, sourceY); 
-        colony.getLocationService().addSource(colony, source);
+        ResourceSource source = new ResourceSource(selectedType, quantity, sourceX, sourceY);
+        if (colony.getLocationService().addSource(colony, source) && currentHex != null) {
+            currentHex.recordGeneratedResourceSource(selectedType);
+        }
     }
 
     public void runNuptial(Colony colony, World world, Hex currentHex) {

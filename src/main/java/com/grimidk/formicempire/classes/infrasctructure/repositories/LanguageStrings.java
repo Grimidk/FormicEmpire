@@ -948,6 +948,19 @@ public final class LanguageStrings {
     public static final String STAT_POLICING_2_DESC = "STAT_POLICING_2_DESC";
     public static final String STAT_POLICING_3_FLAVOR = "STAT_POLICING_3_FLAVOR";
     public static final String STAT_POLICING_3_DESC = "STAT_POLICING_3_DESC";
+    public static final String STAT_HEX_SUSTAIN_FLAVOR = "STAT_HEX_SUSTAIN_FLAVOR";
+    public static final String STAT_HEX_SUSTAIN_DESC = "STAT_HEX_SUSTAIN_DESC";
+    public static final String STAT_WORKER_SPEED_2_FLAVOR = "STAT_WORKER_SPEED_2_FLAVOR";
+    public static final String STAT_WORKER_SPEED_2_DESC = "STAT_WORKER_SPEED_2_DESC";
+
+    public static final String STAT_CAT_OVERWORLD = "STAT_CAT_OVERWORLD";
+    public static final String STAT_HEX_DEPLETION = "STAT_HEX_DEPLETION";
+    public static final String STAT_HEX_SOURCES_FOUND = "STAT_HEX_SOURCES_FOUND";
+    public static final String STAT_HEX_MAX_EFFICIENCY_DISTANCE = "STAT_HEX_MAX_EFFICIENCY_DISTANCE";
+    public static final String STAT_LOCAL_HEX_NOTE_CAT = "STAT_LOCAL_HEX_NOTE_CAT";
+    public static final String STAT_LOCAL_HEX_DYNASTY_HINT = "STAT_LOCAL_HEX_DYNASTY_HINT";
+    public static final String UNIT_STAT_WORKER_MARCH = "UNIT_STAT_WORKER_MARCH";
+    public static final String UNIT_STAT_WORKER_MARCH_DESC = "UNIT_STAT_WORKER_MARCH_DESC";
 
     public static final String ASSIMILATED_FARMING_FLAVOR = "ASSIMILATED_FARMING_FLAVOR";
     public static final String ASSIMILATED_FARMING_DESC = "ASSIMILATED_FARMING_DESC";
@@ -1067,6 +1080,7 @@ public final class LanguageStrings {
 
     public static final String HELP_WELCOME_STORY = "HELP_WELCOME_STORY";
     public static final String HELP_START_INFO = "HELP_START_INFO";
+    public static final String HELP_OVERWORLD_GATHERING = "HELP_OVERWORLD_GATHERING";
     public static final String HELP_DYNASTY_INFO = "HELP_DYNASTY_INFO";
     
     public static final String HELP_SPECIES_SCIENTIFIC = "HELP_SPECIES_SCIENTIFIC";

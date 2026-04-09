@@ -780,6 +780,19 @@ public class FrenchTranslation implements Translation {
         fr.put("STAT_POLICING_2_DESC", "Taux de police à 35% par jour.");
         fr.put("STAT_POLICING_3_FLAVOR", "Drones de surveillance");
         fr.put("STAT_POLICING_3_DESC", "Taux de police à 55% par jour.");
+        fr.put("STAT_HEX_SUSTAIN_FLAVOR", "Durabilité environnementale");
+        fr.put("STAT_HEX_SUSTAIN_DESC", "Plafonne l'épuisement effectif de l'hexagone à 80% pour cette colonie.");
+        fr.put("STAT_WORKER_SPEED_2_FLAVOR", "Marche forcée");
+        fr.put("STAT_WORKER_SPEED_2_DESC", "Double la vitesse de déplacement des ouvrières en surface et leur contribution au rayon de pleine efficacité.");
+
+        fr.put("STAT_CAT_OVERWORLD", "Hexagone");
+        fr.put("STAT_HEX_DEPLETION", "Épuisement");
+        fr.put("STAT_HEX_SOURCES_FOUND", "Sources trouvées");
+        fr.put("STAT_HEX_MAX_EFFICIENCY_DISTANCE", "Distance max. pleine efficacité");
+        fr.put("STAT_LOCAL_HEX_NOTE_CAT", "Note");
+        fr.put("STAT_LOCAL_HEX_DYNASTY_HINT", "En mode dynastie, cet onglet concerne la colonie depuis laquelle vous avez ouvert les statistiques, pas toutes les colonies à la fois.");
+        fr.put("UNIT_STAT_WORKER_MARCH", "Marche ouvrière");
+        fr.put("UNIT_STAT_WORKER_MARCH_DESC", "Les ouvrières se déplacent deux fois plus vite en surface (marche forcée).");
 
         fr.put("ASSIMILATED_FARMING_FLAVOR", "Techniques agricoles ancestrales");
         fr.put("ASSIMILATED_FARMING_DESC", "Votre dynastie cultive les champignons plus efficacement : +1 unité champignon par matière végétale et animale.");
@@ -899,6 +912,7 @@ public class FrenchTranslation implements Translation {
 
         fr.put("HELP_WELCOME_STORY", "Presque toutes les autres fourmis ont disparu. Vous êtes une reine et portez tout le savoir génétique de chaque espèce. Débloquez-le et dominez le monde. <br><br>Développez votre colonie, combattez les autres colonies et adaptez-vous en absorbant et recherchant de nouvelles capacités.");
         fr.put("HELP_START_INFO", "<b>Survie de base :</b><br>Vos fourmis ont besoin de <b>champignons</b> pour manger et d'<b>eau</b> chaque jour. Sans cela, famine ou déshydratation.<br>- <b>Ramasseuses</b> : plantes et eau.<br>- <b>Chasseuses</b> : protéines (viande).<br>- <b>Agricultrices</b> : plantes et protéines en champignons.<br>- <b>Nourrices</b> : couvée. Une couvée négligée meurt.<br><br><b>Vue :</b><br><b>A</b> bascule entre <b>souterrain</b> (nid) et <b>surface</b> (collecte).<br><br><b>Gestion :</b><br><b>Taux d'éclosion (P)</b> pour les naissances. Les <b>chercheuses</b> génèrent des PR (menu <b>Y</b>). Les <b>constructrices</b> utilisent minéraux et résine (menu <b>U</b>).<br><br><b>Menaces :</b><br>- <b>Contamination :</b> les mortes doivent être enlevées par les <b>fossoyeuses</b>.<br>- <b>Parasites :</b> drainent la nourriture. Assignez la <b>police</b>.<br>- <b>Épuisement :</b> les nœuds de ressources s'épuisent ; les <b>éclaireuses</b> en trouvent de nouveaux.");
+        fr.put("HELP_OVERWORLD_GATHERING", "<b>Collecte en surface :</b><br>Les <b>éclaireuses</b> découvrent de nouveaux nœuds. Chaque hex de carte cumule de l'<b>épuisement</b> hors eau ; un épuisement plus éloigne en général les nouveaux nœuds du nid (certaines améliorations plafonnent l'effet).<br><br><b>Distance :</b> le rendement utilise la distance à vol d'oiseau depuis l'<b>entrée du nid</b>. Dans un rayon de <b>pleine efficacité</b> (plus grand avec des ouvrières plus rapides et certaines améliorations), le rendement est entier ; au-delà, il descend vers un petit minimum.<br><br><b>Statistiques (Hex local) :</b> <b>Épuisement</b> est le pourcentage effectif pour les apparitions ; <b>Sources trouvées</b> compte les nœuds découverts par cette colonie ; <b>Distance max. pleine efficacité</b> estime le rayon à plein rendement pour une ouvrière type.");
         fr.put("HELP_DYNASTY_INFO", "<b>Étendre la dynastie :</b><br>Avec les <b>reproductrices</b>, les essaims nuptiaux vous font progresser sur la <b>carte du monde (I)</b>.<br><i>Astuce : les éclipses déclenchent des essaims gratuits !</i><br><br><b>Logistique et commerce :</b><br>Plusieurs colonies débloquent les <b>routes commerciales</b>. Assignez des <b>messagères</b>.<br>- <b>Terre :</b> standard.<br>- <b>Tunnel :</b> sûr et rapide, tunnels et <b>foreuses</b>.<br>- <b>Air :</b> rapide, faible capacité, <b>transport aérien</b> (princesses).<br>- <b>Bilatéral :</b> transport dans les deux sens.<br><br><b>Étapes :</b><br>- <b>Menu dynastie (S) :</b> toutes les colonies.<br>- <b>Colonisation de masse :</b> plus de limite de satellites.<br>- <b>Automatisation :</b> colonies PNJ autonomes.<br><br><b>Évolution :</b><br><b>Synergies</b> pour combiner des améliorations, <b>assimilations</b> pour les traits d'autres espèces.");
 
         fr.put("HELP_SPECIES_SCIENTIFIC", "Nom scientifique :");

@@ -787,7 +787,7 @@ public class Colony {
     public void runConverting() { labourService.runConverting(this); }
     public void runRanching() { labourService.runRanching(this); }
     public void runHerding(Biome biome) { labourService.runHerding(this, biome); }
-    public void runScoutting(Biome biome) { labourService.runScoutting(this, biome); }
+    public void runScoutting(Biome biome, Hex currentHex) { labourService.runScoutting(this, biome, currentHex); }
     public void runComposting() { labourService.runComposting(this); }
     public void runParasitation() { populationService.runParasitation(this); }
     public void runPolicing() { labourService.runPolicing(this); }
@@ -871,7 +871,7 @@ public class Colony {
         }
     }
 
-    public void runDailyJobs(Temperature currentTemp, Biome biome) {
+    public void runDailyJobs(Temperature currentTemp, Biome biome, Hex currentHex) {
         if (this.age < 7) {
             this.age++;
             if (this.age >= 7) {
@@ -905,7 +905,7 @@ public class Colony {
             this.runComposting();
             this.runGraveKeeping();
             this.runHerding(biome); 
-            this.runScoutting(biome);
+            this.runScoutting(biome, currentHex);
             this.runContamination(); 
             this.runPolicing(); 
         } else {

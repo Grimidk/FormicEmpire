@@ -8,6 +8,7 @@ import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.Season;
 import com.grimidk.formicempire.classes.constants.world.Weather;
 import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.services.DynastyStatService;
@@ -17,6 +18,7 @@ import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 
 import javax.swing.*;
@@ -250,15 +252,30 @@ public class StatsDialog extends ZeroDialog {
     private void updateLocalHexData() {
         DefaultTableModel model = (DefaultTableModel) localHexTable.getModel();
         model.setRowCount(0);
+        String sep = LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR);
 
         World world = engine != null ? engine.getWorld() : null;
-        if (world == null || world.getActiveHex() == null) {
+        if (world == null) {
             model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_WORLD), LanguageStrings.get(LanguageStrings.COL_VALUE), LanguageStrings.get(LanguageStrings.STAT_STATUS_NO_HEX)});
             return;
         }
-
-        Hex hex = world.getActiveHex();
+        Hex hex = world.getHexOfColony(colony);
+        if (hex == null) {
+            hex = world.getActiveHex();
+        }
+        if (hex == null) {
+            model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_WORLD), LanguageStrings.get(LanguageStrings.COL_VALUE), LanguageStrings.get(LanguageStrings.STAT_STATUS_NO_HEX)});
+            return;
+        }
         Biome biome = hex.getBiome();
+
+        if (dynastyModeToggle.isSelected()) {
+            model.addRow(new Object[]{
+                LanguageStrings.get(LanguageStrings.STAT_LOCAL_HEX_NOTE_CAT),
+                "",
+                LanguageStrings.get(LanguageStrings.STAT_LOCAL_HEX_DYNASTY_HINT)
+            });
+        }
 
         // Hex Coordinates & Basic Info
         model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_WORLD), LanguageStrings.get(LanguageStrings.STAT_COORDS), hex.getQ() + ", " + hex.getR()});
@@ -275,8 +292,30 @@ public class StatsDialog extends ZeroDialog {
             model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_ABUNDANCES), LanguageStrings.get(LanguageStrings.RESOURCE_ROCK), String.format("%.2f", biome.getMineralAbundance())});
         }
 
+        model.addRow(new Object[]{null, null, sep, sep});
+        int maxDepl = colony.hasUpgrade(GameUnlocks.STAT_HEX_SUSTAIN)
+                ? GameConstants.HEX_SUSTAIN_MAX_DEPLETION_PCT
+                : 100;
+        int depletionPct = hex.getResourceDepletionPercentCapped(maxDepl);
+        ColonyLocationService locations = colony.getLocationService();
+        int sourcesFound = locations != null ? locations.getDiscoveredSources().size() : 0;
+        List<Ant> sampleWorker = new ArrayList<>();
+        if (colony.getWorkers() != null) {
+            for (Ant w : colony.getWorkers()) {
+                if (w.getAntType() == GameConstants.TYPE_WORKER) {
+                    sampleWorker.add(w);
+                    break;
+                }
+            }
+        }
+        float maxEffDistance = (locations == null || sampleWorker.isEmpty())
+                ? GameConstants.GATHER_FULL_EFFICIENCY_RADIUS_BASE
+                : locations.computeFullEfficiencyRadius(colony, sampleWorker);
+        model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_CAT_OVERWORLD), LanguageStrings.get(LanguageStrings.STAT_HEX_DEPLETION), depletionPct + "%"});
+        model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_CAT_OVERWORLD), LanguageStrings.get(LanguageStrings.STAT_HEX_SOURCES_FOUND), String.valueOf(sourcesFound)});
+        model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_CAT_OVERWORLD), LanguageStrings.get(LanguageStrings.STAT_HEX_MAX_EFFICIENCY_DISTANCE), String.format("%.0f", maxEffDistance)});
+
         // Neighbors
-        String sep = LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR);
         model.addRow(new Object[]{null, null, sep, sep});
         model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_NEIGHBORS), LanguageStrings.get(LanguageStrings.STAT_NEIGHBOR_NORTH), getHexSummary(hex.getNorth())});
         model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_NEIGHBORS), LanguageStrings.get(LanguageStrings.STAT_NEIGHBOR_NORTH_WEST), getHexSummary(hex.getNorthWest())});
@@ -685,6 +724,10 @@ public class StatsDialog extends ZeroDialog {
 
         float detect = stats.getParasiteDetection(colony);
         if (detect > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.UNIT_STAT_DETECTION), String.format("%.2f", detect), LanguageStrings.get(LanguageStrings.UNIT_STAT_DETECTION_DESC)});
+
+        if (colony.hasUpgrade(GameUnlocks.STAT_WORKER_SPEED_2)) {
+            model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.UNIT_STAT_WORKER_MARCH), LanguageStrings.get(LanguageStrings.UI_ENABLED), LanguageStrings.get(LanguageStrings.UNIT_STAT_WORKER_MARCH_DESC)});
+        }
         
         float contam = stats.getContaminationMitigation(colony);
         if (contam < 1.0f) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.UNIT_STAT_IMMUNITY), String.format("%.0f%%", (1.0f - contam) * 100), LanguageStrings.get(LanguageStrings.UNIT_STAT_IMMUNITY_DESC)});

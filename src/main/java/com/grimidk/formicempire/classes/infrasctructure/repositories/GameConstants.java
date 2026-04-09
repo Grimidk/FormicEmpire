@@ -88,6 +88,20 @@ public final class GameConstants {
     // --- Base Stats ---
     public static final float BASE_SPRITE_SPEED = 2.5f;
 
+    /** Overworld units: full gathering efficiency within this radius at reference travel speed. */
+    public static final float GATHER_FULL_EFFICIENCY_RADIUS_BASE = 500f;
+    /** Minimum gathering efficiency beyond the full-efficiency disk (never zero). */
+    public static final double GATHER_MIN_EFFICIENCY = 0.01;
+    /** Multiplier on effective travel speed for full-efficiency radius when the colony has a speed upgrade ({@code STAT_ACID}). */
+    public static final float GATHER_COLONY_SPEED_RADIUS_MULT = 1.25f;
+
+    /** Non-water sources generated per +1% hex resource depletion. */
+    public static final int HEX_RESOURCE_DEPLETION_SOURCES_PER_PERCENT = 20;
+    /** Max extra spawn buffer (pixels) added at 100% hex depletion. */
+    public static final int HEX_DEPLETION_SPAWN_BUFFER_EXTRA_MAX = 500;
+    /** Effective hex depletion cap (%) when the colony has the environmental sustainability upgrade. */
+    public static final int HEX_SUSTAIN_MAX_DEPLETION_PCT = 80;
+
     // --- Temperatures ---
     public static final Temperature TEMP_FREEZING = new Temperature(1, LanguageStrings.TEMP_FREEZING, 5,
         loadIcon("icons/temp/freezing.png"));
@@ -171,25 +185,53 @@ public final class GameConstants {
 
     // --- Resources ---
     public static final ResourceType RESOURCE_PLANT = new ResourceType(1, LanguageStrings.RESOURCE_PLANT, true, false,
-        loadIcon("icons/resources/plant.png"), null, null, null, null);
+        loadIcon("icons/resources/plant.png"),
+        loadIcon("sprites/sources/plant_small.png"),
+        loadIcon("sprites/sources/plant_medium.png"),
+        loadIcon("sprites/sources/plant_big.png"),
+        loadIcon("sprites/sources/plant_huge.png"));
     static { resources.add(RESOURCE_PLANT); }
     public static final ResourceType RESOURCE_FUNGI = new ResourceType(2, LanguageStrings.RESOURCE_FUNGI, true, false,
-        loadIcon("icons/resources/mushroom.png"), null, null, null, null);
+        loadIcon("icons/resources/mushroom.png"),
+        loadIcon("sprites/sources/mushroom_small.png"),
+        loadIcon("sprites/sources/mushroom_medium.png"),
+        loadIcon("sprites/sources/mushroom_big.png"),
+        loadIcon("sprites/sources/mushroom_huge.png"));
     static { resources.add(RESOURCE_FUNGI); }
     public static final ResourceType RESOURCE_MEAT = new ResourceType(3, LanguageStrings.RESOURCE_MEAT, true, false,
-        loadIcon("icons/resources/protein.png"), null, null, null, null);
+        loadIcon("icons/resources/protein.png"),
+        loadIcon("sprites/sources/protein_small.png"),
+        loadIcon("sprites/sources/protein_medium.png"),
+        loadIcon("sprites/sources/protein_big.png"),
+        loadIcon("sprites/sources/protein_huge.png"));
     static { resources.add(RESOURCE_MEAT); }
     public static final ResourceType RESOURCE_WATER = new ResourceType(4, LanguageStrings.RESOURCE_WATER, true, true,
-        loadIcon("icons/resources/water.png"), null, null, null, null);
+        loadIcon("icons/resources/water.png"),
+        loadIcon("sprites/sources/water_small.png"),
+        loadIcon("sprites/sources/water_medium.png"),
+        loadIcon("sprites/sources/water_big.png"),
+        loadIcon("sprites/sources/water_huge.png"));
     static { resources.add(RESOURCE_WATER); }
     public static final ResourceType RESOURCE_SYRUP = new ResourceType(5, LanguageStrings.RESOURCE_SYRUP, true, true,
-        loadIcon("icons/resources/syrup.png"), null, null, null, null);
+        loadIcon("icons/resources/syrup.png"),
+        loadIcon("sprites/sources/syrup_small.png"),
+        loadIcon("sprites/sources/syrup_medium.png"),
+        loadIcon("sprites/sources/syrup_big.png"),
+        loadIcon("sprites/sources/syrup_huge.png"));
     static { resources.add(RESOURCE_SYRUP); }
     public static final ResourceType RESOURCE_RESIN = new ResourceType(6, LanguageStrings.RESOURCE_RESIN, false, true,
-        loadIcon("icons/resources/resin.png"), null, null, null, null);
+        loadIcon("icons/resources/resin.png"),
+        loadIcon("sprites/sources/resin_small.png"),
+        loadIcon("sprites/sources/resin_medium.png"),
+        loadIcon("sprites/sources/resin_big.png"),
+        loadIcon("sprites/sources/resin_huge.png"));
     static { resources.add(RESOURCE_RESIN); }
     public static final ResourceType RESOURCE_ROCK = new ResourceType(7, LanguageStrings.RESOURCE_ROCK, false, false,
-        loadIcon("icons/resources/mineral.png"), null, null, null, null);
+        loadIcon("icons/resources/mineral.png"),
+        loadIcon("sprites/sources/mineral_small.png"),
+        loadIcon("sprites/sources/mineral_medium.png"),
+        loadIcon("sprites/sources/mineral_big.png"),
+        loadIcon("sprites/sources/mineral_huge.png"));
     static { resources.add(RESOURCE_ROCK); }
 
     // --- Times of Day ---

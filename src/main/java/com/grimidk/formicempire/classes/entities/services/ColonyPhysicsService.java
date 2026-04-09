@@ -83,6 +83,9 @@ public class ColonyPhysicsService {
                         }
                         moveSpeed = ViewportPhysicsLod.compensatedMoveSpeed(GameConstants.BASE_SPRITE_SPEED);
                     }
+                    if (type == GameConstants.TYPE_WORKER && colony.hasUpgrade(GameUnlocks.STAT_WORKER_SPEED_2)) {
+                        moveSpeed *= 2f;
+                    }
                     ant.updatePosition(moveSpeed);
                 }
             }

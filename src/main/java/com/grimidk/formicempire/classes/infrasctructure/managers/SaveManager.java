@@ -459,7 +459,9 @@ public class SaveManager {
                 boolean hasColony = (h.getColony() != null);
                 int biomeId = (h.getBiome() != null) ? h.getBiome().getId() : 1;
                 int weatherId = (h.getLocalWeather() != null) ? h.getLocalWeather().getId() : 1;
-                hexList.add(new Savefile.SavedHex(h.getQ(), h.getR(), biomeId, hasColony, h.getTimeOffset(), weatherId));
+                Savefile.SavedHex sh = new Savefile.SavedHex(h.getQ(), h.getR(), biomeId, hasColony, h.getTimeOffset(), weatherId);
+                sh.nonWaterResourceSourcesGenerated = h.getNonWaterResourceSourcesGenerated();
+                hexList.add(sh);
                 
                 if (hasColony) {
                     Colony c = h.getColony();
@@ -1033,7 +1035,8 @@ public class SaveManager {
             sb.append("\"b\":").append(h.biomeId).append(",");
             sb.append("\"c\":").append(h.hasColony).append(",");
             sb.append("\"t\":").append(h.timeOffset).append(","); 
-            sb.append("\"w\":").append(h.weatherId); 
+            sb.append("\"w\":").append(h.weatherId).append(",");
+            sb.append("\"nw\":").append(h.nonWaterResourceSourcesGenerated);
             sb.append("}");
             if (i < hexes.size() - 1) {
                 sb.append(",");
@@ -1242,7 +1245,8 @@ public class SaveManager {
             int b = 0;
             boolean c = false;
             int t = 0; 
-            int w = 1; 
+            int w = 1;
+            int nw = 0;
             
             try {
                 String clean = objStr.replace("{", "").replace("}", "");
@@ -1259,9 +1263,12 @@ public class SaveManager {
                         else if (k.equals("c")) c = Boolean.parseBoolean(v);
                         else if (k.equals("t")) t = Integer.parseInt(v);
                         else if (k.equals("w")) w = Integer.parseInt(v);
+                        else if (k.equals("nw")) nw = Integer.parseInt(v);
                     }
                 }
-                list.add(new Savefile.SavedHex(q, r, b, c, t, w));
+                Savefile.SavedHex saved = new Savefile.SavedHex(q, r, b, c, t, w);
+                saved.nonWaterResourceSourcesGenerated = nw;
+                list.add(saved);
             } catch (Exception e) {
                 e.printStackTrace();
             }

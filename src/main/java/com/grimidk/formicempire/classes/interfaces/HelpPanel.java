@@ -194,6 +194,8 @@ public class HelpPanel extends JPanel {
     private JComponent createGettingStartedPanel() {
         String gameInfo = "<html><div style='width: 450px; font-family: sans-serif; font-size: 11pt;'>" +
                 LanguageStrings.get("HELP_START_INFO") +
+                "<br><br>" +
+                LanguageStrings.get("HELP_OVERWORLD_GATHERING") +
                 "</div></html>";
         
         JPanel panel = new JPanel(new GridBagLayout());
