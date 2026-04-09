@@ -44,10 +44,22 @@ public class GameAreaPanel extends ZeroGamePanel {
     private Engine engine;
     private Dimension currentDimension = WorldSpaces.OVERWORLD; 
     private String currentBiomeName = "Plains";
+    /** Visible region in {@link JViewport} view coordinates (includes scroll x/y). */
     private Rectangle paintViewportRect;
+    /**
+     * Same visibility in overworld <em>simulation</em> coordinates (0..gameArea size); used for culling and physics LOD.
+     * For underworld, equals {@link #paintViewportRect}.
+     */
+    private Rectangle lodViewportRect;
 
     private final int ANCHOR_WIDTH = 550;
     private final int ANCHOR_HEIGHT = 500;
+
+    /** Extra pixels around the viewport size so the overworld can be panned in 2D; must exceed max off-edge resource spawn distance. */
+    private static final int OVERWORLD_PAN_OUTSET = 1400;
+
+    private int overworldLayoutOffsetX;
+    private int overworldLayoutOffsetY;
 
     // --- Bounds ---
     public Rectangle entranceBounds;
@@ -123,10 +135,40 @@ public class GameAreaPanel extends ZeroGamePanel {
     }
 
     /**
-     * Scroll viewport in this panel's coordinates; used to cull sprites and match physics LOD.
+     * Sets the visible rect from {@link javax.swing.JViewport#getViewRect()} (panel/scroll coordinates).
+     * Overworld ants/sources use simulation coordinates; {@link #getLodViewportRect()} converts for culling/physics.
      */
     public void setPaintViewportRect(Rectangle viewRect) {
         this.paintViewportRect = viewRect != null ? new Rectangle(viewRect) : null;
+        this.lodViewportRect = computeLodViewportRect();
+    }
+
+    /**
+     * Viewport bounds in simulation space for overworld (matches ant x/y); panel space for underworld.
+     */
+    public Rectangle getLodViewportRect() {
+        return lodViewportRect != null ? new Rectangle(lodViewportRect) : null;
+    }
+
+    private Rectangle computeLodViewportRect() {
+        if (paintViewportRect == null) {
+            return null;
+        }
+        if (currentDimension != WorldSpaces.OVERWORLD) {
+            return new Rectangle(paintViewportRect);
+        }
+        int pw = getWidth();
+        int ph = getHeight();
+        if (pw <= 0 || ph <= 0) {
+            return null;
+        }
+        int padX = Math.max(0, (pw - paintViewportRect.width) / 2);
+        int padY = Math.max(0, (ph - paintViewportRect.height) / 2);
+        return new Rectangle(
+                paintViewportRect.x - padX,
+                paintViewportRect.y - padY,
+                paintViewportRect.width,
+                paintViewportRect.height);
     }
     
     public void resetView() {
@@ -134,8 +176,19 @@ public class GameAreaPanel extends ZeroGamePanel {
         this.currentBiomeName = "Plains";
         this.colony = null;
         this.paintViewportRect = null;
+        this.lodViewportRect = null;
+        this.overworldLayoutOffsetX = 0;
+        this.overworldLayoutOffsetY = 0;
         this.backgroundImage = biomeTextureCache.get("Plains");
         repaint();
+    }
+
+    public int getOverworldLayoutOffsetX() {
+        return overworldLayoutOffsetX;
+    }
+
+    public int getOverworldLayoutOffsetY() {
+        return overworldLayoutOffsetY;
     }
     
     public void toggleDimension() {
@@ -163,8 +216,11 @@ public class GameAreaPanel extends ZeroGamePanel {
     
     public void refreshSize(int viewportWidth, int viewportHeight) {
         if (currentDimension == WorldSpaces.OVERWORLD) {
-            if (getWidth() != viewportWidth || getHeight() != viewportHeight) {
-                setPreferredSize(new java.awt.Dimension(viewportWidth, viewportHeight));
+            int pad = Math.max(OVERWORLD_PAN_OUTSET, Math.max(viewportWidth, viewportHeight) / 2);
+            int vw = viewportWidth + 2 * pad;
+            int vh = viewportHeight + 2 * pad;
+            if (getWidth() != vw || getHeight() != vh) {
+                setPreferredSize(new java.awt.Dimension(vw, vh));
                 revalidate();
             }
         } else {
@@ -212,19 +268,33 @@ public class GameAreaPanel extends ZeroGamePanel {
             }
         }
         
+        int contentPadX = 0;
+        int contentPadY = 0;
+        if (colony != null && currentDimension == WorldSpaces.OVERWORLD && paintViewportRect != null) {
+            int vpw = paintViewportRect.width;
+            int vph = paintViewportRect.height;
+            contentPadX = Math.max(0, (getWidth() - vpw) / 2);
+            contentPadY = Math.max(0, (getHeight() - vph) / 2);
+        }
+        overworldLayoutOffsetX = contentPadX;
+        overworldLayoutOffsetY = contentPadY;
+
         if (colony != null) {
             if (currentDimension == WorldSpaces.UNDERWORLD) {
                 drawUnderworldStructure(g2d);
+                drawAnts(g2d);
+                drawBugs(g2d);
             } else {
+                g2d.translate(contentPadX, contentPadY);
                 drawOverworldStructure(g2d);
                 drawResourceSources(g2d);
+                drawAnts(g2d);
+                drawBugs(g2d);
+                g2d.translate(-contentPadX, -contentPadY);
             }
-            
+
             colony.setRoomBounds(entranceBounds, room1Bounds, room2Bounds, room3Bounds, room4Bounds, rancherYardBounds, graverYardBounds, breederRoomBounds, transitRoomBounds);
         }
-        
-        drawAnts(g2d);
-        drawBugs(g2d);
 
         if (currentDimension == WorldSpaces.OVERWORLD && engine != null && engine.getWorld() != null) {
             drawEnvironmentalOverlays(g2d);
@@ -248,7 +318,7 @@ public class GameAreaPanel extends ZeroGamePanel {
             int h = icon.getIconHeight();
             int sx = src.getX();
             int sy = src.getY();
-            if (!ViewportPhysicsLod.antIntersectsViewport(paintViewportRect, sx, sy, w, h)) {
+            if (!ViewportPhysicsLod.antIntersectsViewport(lodViewportRect, sx, sy, w, h)) {
                 continue;
             }
             g2d.drawImage(icon.getImage(), sx, sy, w, h, this);
@@ -277,6 +347,9 @@ public class GameAreaPanel extends ZeroGamePanel {
         }
     }
     
+    /**
+     * Draws overworld structures in simulation space (0..anchor); {@link Colony#setRoomBounds} uses the same space as ant x/y.
+     */
     private void drawOverworldStructure(Graphics2D g2d) {
         // --- Entrance ---
         if (antHillImg != null) {
@@ -331,8 +404,8 @@ public class GameAreaPanel extends ZeroGamePanel {
                 int safeH = h - padTop - padBottom;
 
                 Rectangle deadDrawArea = new Rectangle(safeX, safeY, Math.max(1, safeW), Math.max(1, safeH));
-                boolean drawDeadPile = !ViewportPhysicsLod.isLodActive(paintViewportRect)
-                    || ViewportPhysicsLod.expandViewport(paintViewportRect, ViewportPhysicsLod.MARGIN_PX).intersects(deadDrawArea);
+                boolean drawDeadPile = !ViewportPhysicsLod.isLodActive(lodViewportRect)
+                    || ViewportPhysicsLod.expandViewport(lodViewportRect, ViewportPhysicsLod.MARGIN_PX).intersects(deadDrawArea);
 
                 if (drawDeadPile) {
                     drawStaticItemsLocal(g2d, deadBodyImg, safeX, safeY, safeW, safeH, colony.getDeadAnts().size());
@@ -495,7 +568,7 @@ public class GameAreaPanel extends ZeroGamePanel {
             for (Ant ant : ants) {
                 if (ant.getDimension() != currentDimension) continue;
 
-                if (!ViewportPhysicsLod.antIntersectsViewport(paintViewportRect, ant.getX(), ant.getY(), w, h)) {
+                if (!ViewportPhysicsLod.antIntersectsViewport(lodViewportRect, ant.getX(), ant.getY(), w, h)) {
                     continue;
                 }
                 
@@ -575,7 +648,7 @@ public class GameAreaPanel extends ZeroGamePanel {
             int w = spriteIcon.getIconWidth();
             int h = spriteIcon.getIconHeight();
 
-            if (!ViewportPhysicsLod.antIntersectsViewport(paintViewportRect, bug.getX(), bug.getY(), w, h)) {
+            if (!ViewportPhysicsLod.antIntersectsViewport(lodViewportRect, bug.getX(), bug.getY(), w, h)) {
                 continue;
             }
             

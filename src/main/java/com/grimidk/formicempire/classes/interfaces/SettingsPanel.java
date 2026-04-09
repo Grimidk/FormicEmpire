@@ -36,7 +36,7 @@ public class SettingsPanel extends JPanel {
     private JComboBox<String> sizeCombo;
     private JCheckBox fullScreenCheck;
     private JCheckBox visualFiltersCheck;
-    
+
     // --- Audio Tab ---
     private JSlider masterVolSlider;
     private JSlider musicVolSlider;
@@ -654,7 +654,7 @@ public class SettingsPanel extends JPanel {
         sizeCombo.setSelectedItem(engine.getScreenSize());
         fullScreenCheck.setSelected(engine.isFullScreen());
         visualFiltersCheck.setSelected(engine.isVisualFiltersEnabled());
-        
+
         masterVolSlider.setValue(engine.getMasterVolume());
         musicVolSlider.setValue(engine.getMusicVolume());
         sfxVolSlider.setValue(engine.getSfxVolume());
@@ -688,7 +688,7 @@ public class SettingsPanel extends JPanel {
         engine.setScreenSize((String) sizeCombo.getSelectedItem());
         engine.setFullScreen(fullScreenCheck.isSelected());
         engine.setVisualFiltersEnabled(visualFiltersCheck.isSelected());
-        
+
         engine.setMasterVolume(masterVolSlider.getValue());
         engine.setMusicVolume(musicVolSlider.getValue());
         engine.setSfxVolume(sfxVolSlider.getValue());
@@ -699,9 +699,9 @@ public class SettingsPanel extends JPanel {
         applyDefaultRoleFromCombo(defaultRolePrincessCombo, GameConstants.TYPE_PRINCESS, GameConstants.ROLE_BREEDER.getId());
         applyDefaultRoleFromCombo(defaultRoleQueenCombo, GameConstants.TYPE_QUEEN, GameConstants.ROLE_LAYER.getId());
 
-        engine.saveGlobalSettings(); 
+        engine.saveGlobalSettings();
         frame.applyEngineSettings();
-        
+
         SwingUtilities.invokeLater(() -> {
             JOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.SETTINGS_SAVED_MSG), LanguageStrings.get(LanguageStrings.UI_SETTINGS), JOptionPane.INFORMATION_MESSAGE);
         });

@@ -595,9 +595,10 @@ public class ColonyLabourService {
         int depletionPct = currentHex != null ? currentHex.getResourceDepletionPercentCapped(maxDepl) : 0;
         int extraBuffer = (int) Math.round(
             (depletionPct / 100.0) * GameConstants.HEX_DEPLETION_SPAWN_BUFFER_EXTRA_MAX);
+        extraBuffer = Math.min(extraBuffer, GameConstants.RESOURCE_SPAWN_BUFFER_EXTRA_CAP);
 
-        int bufferMin = 400 + extraBuffer;
-        int bufferMax = 900 + extraBuffer;
+        int bufferMin = GameConstants.RESOURCE_SPAWN_EDGE_BUFFER_MIN + extraBuffer;
+        int bufferMax = GameConstants.RESOURCE_SPAWN_EDGE_BUFFER_MAX + extraBuffer;
         int randomBuffer = bufferMin + random.nextInt(Math.max(1, bufferMax - bufferMin));
         
         int sourceX, sourceY;

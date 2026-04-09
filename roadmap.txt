@@ -29,6 +29,8 @@ To Fix (By decreasing priority) :
 	Low:
 	logistic physics use dimension 2
 	map line artifcacting, might need to make sprites
+	dark mode
+	move around in overworld
 
 	Can't reproduce:
 	(none right now)

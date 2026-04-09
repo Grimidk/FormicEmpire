@@ -32,7 +32,7 @@ public class ColonyPhysicsService {
     }
 
     /**
-     * @param viewportBounds panel coordinates of the scroll viewport; {@code null} disables viewport LOD
+     * @param viewportBounds LOD region: underworld in panel coords; overworld in simulation coords (ant x/y). {@code null} disables LOD
      * @param physicsStepIndex monotonic step counter for LOD hashing (unused when viewport is null)
      */
     public void runPhysics(Colony colony, Dimension activeDimension, Rectangle viewportBounds, long physicsStepIndex) {

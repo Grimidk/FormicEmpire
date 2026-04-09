@@ -20,6 +20,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
+import java.awt.event.AdjustmentListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -55,8 +61,23 @@ public class GamePanel extends ZeroGamePanel {
 
     private final AtomicInteger pendingMinuteGuiSteps = new AtomicInteger(0);
     private Timer minuteDrainTimer;
-    
+
+    private boolean overworldPanDragging;
+    private Point overworldPanLast;
+    private Timer overworldSpringTimer;
+    private Point overworldSpringStartPos;
+    private Point overworldSpringTargetPos;
+    private long overworldSpringStartMs;
+
     private volatile boolean engineStarted = false;
+
+    private static final int OVERWORLD_SPRING_DURATION_MS = 240;
+    private static final int OVERWORLD_IDLE_RECENTER_MS = 1000;
+    private static final int OVERWORLD_IDLE_RECENTER_POLL_MS = 200;
+    private static final double OVERWORLD_CENTERED_EPS_PX = 2.5;
+
+    private long overworldLastUserPanMs = System.currentTimeMillis();
+    private Timer overworldIdleRecenterTimer;
     
     public GamePanel(MainFrame frame) {
         super(new BorderLayout()); 
@@ -87,9 +108,11 @@ public class GamePanel extends ZeroGamePanel {
         gameScrollPane.getViewport().setOpaque(false);
         gameScrollPane.setOpaque(false);
         gameScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        gameScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        gameScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         gameScrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        gameScrollPane.getHorizontalScrollBar().setUnitIncrement(16);
         gameScrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
+        gameScrollPane.getHorizontalScrollBar().setPreferredSize(new Dimension(0, 0));
         
         gameScrollPane.getViewport().addComponentListener(new ComponentAdapter() {
             @Override
@@ -105,6 +128,205 @@ public class GamePanel extends ZeroGamePanel {
             gameAreaPanel.setPaintViewportRect(vr);
             gameAreaPanel.repaint();
         });
+
+        setupOverworldPanAndSpring();
+        setupOverworldShiftWheelHorizontalScroll();
+        setupOverworldScrollbarPanTracking();
+        setupOverworldIdleRecenter();
+    }
+
+    private void noteOverworldUserPan() {
+        overworldLastUserPanMs = System.currentTimeMillis();
+    }
+
+    private boolean isOverworldViewCentered() {
+        if (gameScrollPane == null) {
+            return true;
+        }
+        Point cur = gameScrollPane.getViewport().getViewPosition();
+        return cur.distance(computeOverworldCenterViewPosition()) < OVERWORLD_CENTERED_EPS_PX;
+    }
+
+    private void setupOverworldIdleRecenter() {
+        overworldIdleRecenterTimer = new Timer(OVERWORLD_IDLE_RECENTER_POLL_MS, e -> {
+            if (!engineStarted || gameScrollPane == null || gameAreaPanel == null) {
+                return;
+            }
+            if (gameAreaPanel.getCurrentDimension() != WorldSpaces.OVERWORLD) {
+                return;
+            }
+            if (overworldPanDragging) {
+                return;
+            }
+            if (overworldSpringTimer != null && overworldSpringTimer.isRunning()) {
+                return;
+            }
+            if (System.currentTimeMillis() - overworldLastUserPanMs < OVERWORLD_IDLE_RECENTER_MS) {
+                return;
+            }
+            if (isOverworldViewCentered()) {
+                return;
+            }
+            startOverworldSpringToCenter();
+        });
+        overworldIdleRecenterTimer.setRepeats(true);
+        overworldIdleRecenterTimer.start();
+    }
+
+    private void setupOverworldScrollbarPanTracking() {
+        AdjustmentListener al = e -> {
+            if (e.getValueIsAdjusting() && engineStarted && gameAreaPanel != null
+                    && gameAreaPanel.getCurrentDimension() == WorldSpaces.OVERWORLD) {
+                noteOverworldUserPan();
+            }
+        };
+        gameScrollPane.getVerticalScrollBar().addAdjustmentListener(al);
+        gameScrollPane.getHorizontalScrollBar().addAdjustmentListener(al);
+    }
+
+    private void setupOverworldShiftWheelHorizontalScroll() {
+        gameScrollPane.addMouseWheelListener(new MouseWheelListener() {
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                if (engineStarted && gameAreaPanel != null
+                        && gameAreaPanel.getCurrentDimension() == WorldSpaces.OVERWORLD) {
+                    noteOverworldUserPan();
+                }
+                if (!engineStarted || gameAreaPanel == null) {
+                    return;
+                }
+                if (gameAreaPanel.getCurrentDimension() != WorldSpaces.OVERWORLD || !e.isShiftDown()) {
+                    return;
+                }
+                JViewport vp = gameScrollPane.getViewport();
+                Point p = vp.getViewPosition();
+                int increment = gameScrollPane.getHorizontalScrollBar().getUnitIncrement();
+                p.x += e.getWheelRotation() * increment;
+                clampOverworldViewPosition(vp, p);
+                vp.setViewPosition(p);
+                e.consume();
+            }
+        });
+    }
+
+    private void setupOverworldPanAndSpring() {
+        gameAreaPanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (!engineStarted || gameAreaPanel.getCurrentDimension() != WorldSpaces.OVERWORLD) {
+                    return;
+                }
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    return;
+                }
+                stopOverworldSpring();
+                noteOverworldUserPan();
+                overworldPanDragging = true;
+                overworldPanLast = e.getPoint();
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (!overworldPanDragging) {
+                    return;
+                }
+                overworldPanDragging = false;
+                overworldPanLast = null;
+                noteOverworldUserPan();
+            }
+        });
+        gameAreaPanel.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                if (!overworldPanDragging || overworldPanLast == null
+                        || gameAreaPanel.getCurrentDimension() != WorldSpaces.OVERWORLD) {
+                    return;
+                }
+                noteOverworldUserPan();
+                int dx = e.getX() - overworldPanLast.x;
+                int dy = e.getY() - overworldPanLast.y;
+                overworldPanLast = e.getPoint();
+                JViewport vp = gameScrollPane.getViewport();
+                Point p = vp.getViewPosition();
+                p.x -= dx;
+                p.y -= dy;
+                clampOverworldViewPosition(vp, p);
+                vp.setViewPosition(p);
+            }
+        });
+    }
+
+    private void clampOverworldViewPosition(JViewport vp, Point p) {
+        Dimension ext = vp.getExtentSize();
+        Dimension vs = vp.getView().getSize();
+        int maxX = Math.max(0, vs.width - ext.width);
+        int maxY = Math.max(0, vs.height - ext.height);
+        p.x = Math.max(0, Math.min(maxX, p.x));
+        p.y = Math.max(0, Math.min(maxY, p.y));
+    }
+
+    private Point computeOverworldCenterViewPosition() {
+        JViewport vp = gameScrollPane.getViewport();
+        Dimension ext = vp.getExtentSize();
+        Dimension vs = vp.getView().getSize();
+        int maxX = Math.max(0, vs.width - ext.width);
+        int maxY = Math.max(0, vs.height - ext.height);
+        return new Point(maxX / 2, maxY / 2);
+    }
+
+    void centerOverworldScroll() {
+        if (gameScrollPane == null || gameAreaPanel == null) {
+            return;
+        }
+        if (gameAreaPanel.getCurrentDimension() != WorldSpaces.OVERWORLD) {
+            return;
+        }
+        stopOverworldSpring();
+        SwingUtilities.invokeLater(() -> {
+            JViewport vp = gameScrollPane.getViewport();
+            vp.setViewPosition(computeOverworldCenterViewPosition());
+            gameAreaPanel.repaint();
+        });
+    }
+
+    private void stopOverworldSpring() {
+        if (overworldSpringTimer != null && overworldSpringTimer.isRunning()) {
+            overworldSpringTimer.stop();
+        }
+        overworldSpringTimer = null;
+    }
+
+    private void startOverworldSpringToCenter() {
+        if (gameScrollPane == null || gameAreaPanel == null) {
+            return;
+        }
+        if (gameAreaPanel.getCurrentDimension() != WorldSpaces.OVERWORLD) {
+            return;
+        }
+        JViewport vp = gameScrollPane.getViewport();
+        Point target = computeOverworldCenterViewPosition();
+        Point start = vp.getViewPosition();
+        if (start.distance(target) < 1.5) {
+            vp.setViewPosition(target);
+            return;
+        }
+        stopOverworldSpring();
+        overworldSpringStartPos = start;
+        overworldSpringTargetPos = target;
+        overworldSpringStartMs = System.currentTimeMillis();
+        overworldSpringTimer = new Timer(16, e -> {
+            long elapsed = System.currentTimeMillis() - overworldSpringStartMs;
+            float t = Math.min(1f, elapsed / (float) OVERWORLD_SPRING_DURATION_MS);
+            float ease = 1f - (1f - t) * (1f - t);
+            int x = (int) (overworldSpringStartPos.x + (overworldSpringTargetPos.x - overworldSpringStartPos.x) * ease);
+            int y = (int) (overworldSpringStartPos.y + (overworldSpringTargetPos.y - overworldSpringStartPos.y) * ease);
+            vp.setViewPosition(new Point(x, y));
+            gameAreaPanel.repaint();
+            if (t >= 1f) {
+                stopOverworldSpring();
+            }
+        });
+        overworldSpringTimer.start();
     }
     
     @Override
@@ -148,9 +370,19 @@ public class GamePanel extends ZeroGamePanel {
                 gameAreaPanel.toggleDimension();
                 
                 updateGameAreaSize();
-                
+
                 if (gameAreaPanel.getCurrentDimension() == WorldSpaces.OVERWORLD) {
+                    centerOverworldScroll();
+                    noteOverworldUserPan();
+                    SwingUtilities.invokeLater(() -> {
+                        if (gameScrollPane != null && gameAreaPanel != null) {
+                            gameAreaPanel.setPaintViewportRect(gameScrollPane.getViewport().getViewRect());
+                            gameAreaPanel.repaint();
+                        }
+                    });
+                } else {
                     gameScrollPane.getVerticalScrollBar().setValue(0);
+                    gameAreaPanel.setPaintViewportRect(gameScrollPane.getViewport().getViewRect());
                 }
             }
         };
@@ -507,7 +739,8 @@ public class GamePanel extends ZeroGamePanel {
                     
                     refreshAllGUIData();
                     updateGameAreaSize();
-                    
+                    centerOverworldScroll();
+
                     if (triggerManager != null) {
                     }
                     break;
@@ -543,7 +776,12 @@ public class GamePanel extends ZeroGamePanel {
         }
         alertManager = null;
 
-        if (gameAreaPanel != null) gameAreaPanel.resetView();
+        if (gameAreaPanel != null) {
+            stopOverworldSpring();
+            overworldPanDragging = false;
+            overworldPanLast = null;
+            gameAreaPanel.resetView();
+        }
         if (colonyPanel != null) colonyPanel.reset();
         if (worldPanel != null) worldPanel.reset();
         if (alertPanel != null) alertPanel.updateAlerts(new ArrayList<>());
@@ -653,7 +891,9 @@ public class GamePanel extends ZeroGamePanel {
                     updateStaticWorldInfo();
                     refreshAllGUIData();
                     updateGameAreaSize();
-                    
+                    centerOverworldScroll();
+                    noteOverworldUserPan();
+
                     SwingUtilities.invokeLater(() -> {
                         if (!engineStarted) {
                             engineStarted = true;
@@ -794,10 +1034,15 @@ public class GamePanel extends ZeroGamePanel {
             int w = gameAreaPanel.getWidth();
             int h = gameAreaPanel.getHeight();
             if (w > 1 && h > 1) {
-                colony.setGameAreaDimensions(w, h);
+                if (gameAreaPanel.getCurrentDimension() == WorldSpaces.OVERWORLD) {
+                    colony.setGameAreaDimensions(viewportRect.width, viewportRect.height);
+                } else {
+                    colony.setGameAreaDimensions(w, h);
+                }
             }
+            Rectangle lodRect = gameAreaPanel.getLodViewportRect();
             for (int i = 0; i < physicsSteps; i++) {
-                colony.runPhysics(gameAreaPanel.getCurrentDimension(), viewportRect);
+                colony.runPhysics(gameAreaPanel.getCurrentDimension(), lodRect);
             }
         }
 
