@@ -129,9 +129,6 @@ public class ColonyLocationService {
         return gathered;
     }
 
-    /**
-     * Gathering efficiency in {@code [GATHER_MIN_EFFICIENCY, 1.0]} from nest entrance to source (Euclidean) and worker travel speed.
-     */
     public double computeGatherEfficiency(Colony colony, ResourceSource source, List<Ant> workers) {
         NeoPoint nest = getColonyEntrance(colony);
         float radius = GatheringMath.computeFullEfficiencyRadius(colony, workers);
@@ -139,9 +136,6 @@ public class ColonyLocationService {
             nest.getX(), nest.getY(), source.getX(), source.getY(), radius);
     }
 
-    /**
-     * Estimated full-efficiency radius for UI (same model as {@link #computeGatherEfficiency}).
-     */
     public float computeFullEfficiencyRadius(Colony colony, List<Ant> workers) {
         return GatheringMath.computeFullEfficiencyRadius(colony, workers);
     }
@@ -424,9 +418,6 @@ public class ColonyLocationService {
         return route;
     }
 
-    /**
-     * Overworld gathering: Euclidean distance from the nest and speed-scaled full-efficiency radius.
-     */
     public static final class GatheringMath {
 
         private GatheringMath() {

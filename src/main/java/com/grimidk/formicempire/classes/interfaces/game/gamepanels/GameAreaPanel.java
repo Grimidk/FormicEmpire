@@ -44,18 +44,12 @@ public class GameAreaPanel extends ZeroGamePanel {
     private Engine engine;
     private Dimension currentDimension = WorldSpaces.OVERWORLD; 
     private String currentBiomeName = "Plains";
-    /** Visible region in {@link JViewport} view coordinates (includes scroll x/y). */
     private Rectangle paintViewportRect;
-    /**
-     * Same visibility in overworld <em>simulation</em> coordinates (0..gameArea size); used for culling and physics LOD.
-     * For underworld, equals {@link #paintViewportRect}.
-     */
     private Rectangle lodViewportRect;
 
     private final int ANCHOR_WIDTH = 550;
     private final int ANCHOR_HEIGHT = 500;
 
-    /** Extra pixels around the viewport size so the overworld can be panned in 2D; must exceed max off-edge resource spawn distance. */
     private static final int OVERWORLD_PAN_OUTSET = 1400;
 
     private int overworldLayoutOffsetX;
@@ -134,18 +128,11 @@ public class GameAreaPanel extends ZeroGamePanel {
         this.engine = engine;
     }
 
-    /**
-     * Sets the visible rect from {@link javax.swing.JViewport#getViewRect()} (panel/scroll coordinates).
-     * Overworld ants/sources use simulation coordinates; {@link #getLodViewportRect()} converts for culling/physics.
-     */
     public void setPaintViewportRect(Rectangle viewRect) {
         this.paintViewportRect = viewRect != null ? new Rectangle(viewRect) : null;
         this.lodViewportRect = computeLodViewportRect();
     }
 
-    /**
-     * Viewport bounds in simulation space for overworld (matches ant x/y); panel space for underworld.
-     */
     public Rectangle getLodViewportRect() {
         return lodViewportRect != null ? new Rectangle(lodViewportRect) : null;
     }
@@ -347,9 +334,6 @@ public class GameAreaPanel extends ZeroGamePanel {
         }
     }
     
-    /**
-     * Draws overworld structures in simulation space (0..anchor); {@link Colony#setRoomBounds} uses the same space as ant x/y.
-     */
     private void drawOverworldStructure(Graphics2D g2d) {
         // --- Entrance ---
         if (antHillImg != null) {

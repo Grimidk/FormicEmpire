@@ -826,10 +826,6 @@ public class Colony {
         runPhysics(activeDimension, null);
     }
 
-    /**
-     * @param viewportPanelBounds viewport for LOD: underworld uses panel coordinates; overworld uses simulation coordinates
-     *        (aligned with ant x/y). {@code null} disables viewport LOD.
-     */
     public void runPhysics(Dimension activeDimension, Rectangle viewportPanelBounds) {
         if (!this.isActive) {
             return;

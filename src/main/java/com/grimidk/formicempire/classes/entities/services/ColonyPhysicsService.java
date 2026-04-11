@@ -31,10 +31,6 @@ public class ColonyPhysicsService {
         runPhysics(colony, activeDimension, null, 0L);
     }
 
-    /**
-     * @param viewportBounds LOD region: underworld in panel coords; overworld in simulation coords (ant x/y). {@code null} disables LOD
-     * @param physicsStepIndex monotonic step counter for LOD hashing (unused when viewport is null)
-     */
     public void runPhysics(Colony colony, Dimension activeDimension, Rectangle viewportBounds, long physicsStepIndex) {
         // -- Ants --
         for (Map.Entry<AntType, List<Ant>> entry : colony.getAntGroups().entrySet()) {
@@ -47,8 +43,6 @@ public class ColonyPhysicsService {
             List<Ant> antList = entry.getValue();
 
             synchronized (antList) {
-                // CopyOnWriteArrayList: indexed loops are unsafe because updateAntLogic may remove ants.
-                // Enhanced for uses a snapshot iterator; removals during this step cannot cause get(index) faults.
                 for (Ant ant : antList) {
                     if (!ant.isAlive()) {
                         continue;

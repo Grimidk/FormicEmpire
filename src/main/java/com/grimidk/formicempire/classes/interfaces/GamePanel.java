@@ -959,10 +959,6 @@ public class GamePanel extends ZeroGamePanel {
         pendingMinuteGuiSteps.set(0);
     }
 
-    /**
-     * Coalesces engine minute notifications: applies all pending physics steps in one EDT burst,
-     * then updates side panels once and repaints the game area (decoupled from per-tick invokeLater spam).
-     */
     private void drainPendingMinuteGuiSteps() {
         if (!engineStarted) {
             return;

@@ -88,23 +88,15 @@ public final class GameConstants {
     // --- Base Stats ---
     public static final float BASE_SPRITE_SPEED = 2.5f;
 
-    /** Overworld units: full gathering efficiency within this radius at reference travel speed. */
     public static final float GATHER_FULL_EFFICIENCY_RADIUS_BASE = 500f;
-    /** Minimum gathering efficiency beyond the full-efficiency disk (never zero). */
     public static final double GATHER_MIN_EFFICIENCY = 0.01;
-    /** Multiplier on effective travel speed for full-efficiency radius when the colony has a speed upgrade ({@code STAT_ACID}). */
     public static final float GATHER_COLONY_SPEED_RADIUS_MULT = 1.25f;
 
-    /** Non-water sources generated per +1% hex resource depletion. */
     public static final int HEX_RESOURCE_DEPLETION_SOURCES_PER_PERCENT = 20;
-    /** Max extra spawn buffer (pixels) added at 100% hex depletion. */
     public static final int HEX_DEPLETION_SPAWN_BUFFER_EXTRA_MAX = 500;
-    /** Base distance (sim px) beyond the game edge for new overworld resource nodes; kept small so nodes stay reachable by panning. */
     public static final int RESOURCE_SPAWN_EDGE_BUFFER_MIN = 72;
     public static final int RESOURCE_SPAWN_EDGE_BUFFER_MAX = 200;
-    /** Caps depletion-driven extra distance for spawns so nodes remain on the scrollable overworld canvas. */
     public static final int RESOURCE_SPAWN_BUFFER_EXTRA_CAP = 220;
-    /** Effective hex depletion cap (%) when the colony has the environmental sustainability upgrade. */
     public static final int HEX_SUSTAIN_MAX_DEPLETION_PCT = 80;
 
     // --- Temperatures ---

@@ -4,11 +4,6 @@ import java.awt.Rectangle;
 
 import com.grimidk.formicempire.classes.entities.Ant;
 
-/**
- * Viewport-based LOD for colony physics: off-screen ants on the active dimension
- * use cheaper AI and movement integration. Drawing uses the same visibility rules via
- * {@link #antIntersectsViewport(Rectangle, int, int, int, int)}.
- */
 public final class ViewportPhysicsLod {
 
     public static final int MARGIN_PX = 64;
@@ -31,10 +26,6 @@ public final class ViewportPhysicsLod {
         return v;
     }
 
-    /**
-     * When LOD is inactive ({@code null} or empty bounds), returns true so behavior matches legacy physics.
-     * Allocation-free for use on hot paths.
-     */
     public static boolean antIntersectsViewport(Rectangle viewportBounds, int antX, int antY, int spriteW, int spriteH) {
         if (!isLodActive(viewportBounds)) {
             return true;

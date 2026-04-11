@@ -17,10 +17,6 @@ import com.grimidk.formicempire.classes.infrasctructure.Dimension;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
 
-/**
- * Stress tests for viewport LOD: prints timings to stdout. Run with
- * {@code -Dformic.run100k=true} to include the 100k case (needs heap, e.g. {@code -Xmx1g}).
- */
 class ColonyPhysicsViewportPerformanceTest {
 
     private ColonyPhysicsService physicsService;
