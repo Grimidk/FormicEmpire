@@ -35,7 +35,8 @@ public class SettingsPanel extends JPanel {
     // --- Video Tab ---
     private JComboBox<String> sizeCombo;
     private JCheckBox fullScreenCheck;
-    private JCheckBox visualFiltersCheck;
+    private JCheckBox daylightColorOverlayCheck;
+    private JCheckBox weatherColorOverlayCheck;
 
     // --- Audio Tab ---
     private JSlider masterVolSlider;
@@ -43,7 +44,7 @@ public class SettingsPanel extends JPanel {
     private JSlider sfxVolSlider;
     
     private JLabel langLabel, autoLabel, turboLabel, arachLabel, pauseFocusLabel, confirmQuitLabel, tooltipsLabel, fuzzParasitesLabel;
-    private JLabel sizeLabel, fsLabel, visualFiltersLabel;
+    private JLabel sizeLabel, fsLabel, daylightColorOverlayLabel, weatherColorOverlayLabel;
     private JLabel masterLabel, musicLabel, sfxLabel;
     private JLabel defaultRoleWorkerLabel, defaultRoleSoldierLabel, defaultRoleMajorLabel, defaultRolePrincessLabel, defaultRoleQueenLabel;
     private JComboBox<AntRole> defaultRoleWorkerCombo, defaultRoleSoldierCombo, defaultRoleMajorCombo, defaultRolePrincessCombo, defaultRoleQueenCombo;
@@ -400,7 +401,8 @@ public class SettingsPanel extends JPanel {
             sizeCombo.setSelectedIndex(0);
         }
         fullScreenCheck.setSelected(false);
-        visualFiltersCheck.setSelected(true);
+        daylightColorOverlayCheck.setSelected(true);
+        weatherColorOverlayCheck.setSelected(true);
     }
 
     private void resetAudioTabToDefaults() {
@@ -470,18 +472,29 @@ public class SettingsPanel extends JPanel {
         styleCheckBox(fullScreenCheck);
         c.gridx = 1; panel.add(fullScreenCheck, c);
 
-        // Visual Filters
+        // Daylight color overlay
         c.gridy = 2; c.gridx = 0;
-        visualFiltersLabel = new JLabel();
-        visualFiltersLabel.setFont(AssetStyles.FONT_NORMAL);
-        visualFiltersLabel.setForeground(AssetStyles.FONT_COLOR);
-        panel.add(visualFiltersLabel, c);
-        
-        visualFiltersCheck = new JCheckBox();
-        styleCheckBox(visualFiltersCheck);
-        c.gridx = 1; panel.add(visualFiltersCheck, c);
+        daylightColorOverlayLabel = new JLabel();
+        daylightColorOverlayLabel.setFont(AssetStyles.FONT_NORMAL);
+        daylightColorOverlayLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(daylightColorOverlayLabel, c);
 
-        c.gridy = 3;
+        daylightColorOverlayCheck = new JCheckBox();
+        styleCheckBox(daylightColorOverlayCheck);
+        c.gridx = 1; panel.add(daylightColorOverlayCheck, c);
+
+        // Weather color overlay
+        c.gridy = 3; c.gridx = 0;
+        weatherColorOverlayLabel = new JLabel();
+        weatherColorOverlayLabel.setFont(AssetStyles.FONT_NORMAL);
+        weatherColorOverlayLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(weatherColorOverlayLabel, c);
+
+        weatherColorOverlayCheck = new JCheckBox();
+        styleCheckBox(weatherColorOverlayCheck);
+        c.gridx = 1; panel.add(weatherColorOverlayCheck, c);
+
+        c.gridy = 4;
         c.gridx = 0;
         c.gridwidth = 2;
         c.anchor = GridBagConstraints.EAST;
@@ -574,7 +587,8 @@ public class SettingsPanel extends JPanel {
         
         sizeLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_SCREEN_SIZE));
         fsLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_FULLSCREEN));
-        visualFiltersLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_VISUAL_FILTERS));
+        daylightColorOverlayLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_DAYLIGHT_COLOR_OVERLAY));
+        weatherColorOverlayLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_WEATHER_COLOR_OVERLAY));
         
         masterLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_MASTER_VOL));
         musicLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_MUSIC_VOL));
@@ -653,7 +667,8 @@ public class SettingsPanel extends JPanel {
         
         sizeCombo.setSelectedItem(engine.getScreenSize());
         fullScreenCheck.setSelected(engine.isFullScreen());
-        visualFiltersCheck.setSelected(engine.isVisualFiltersEnabled());
+        daylightColorOverlayCheck.setSelected(engine.isDaylightColorOverlayEnabled());
+        weatherColorOverlayCheck.setSelected(engine.isWeatherColorOverlayEnabled());
 
         masterVolSlider.setValue(engine.getMasterVolume());
         musicVolSlider.setValue(engine.getMusicVolume());
@@ -687,7 +702,8 @@ public class SettingsPanel extends JPanel {
         
         engine.setScreenSize((String) sizeCombo.getSelectedItem());
         engine.setFullScreen(fullScreenCheck.isSelected());
-        engine.setVisualFiltersEnabled(visualFiltersCheck.isSelected());
+        engine.setDaylightColorOverlayEnabled(daylightColorOverlayCheck.isSelected());
+        engine.setWeatherColorOverlayEnabled(weatherColorOverlayCheck.isSelected());
 
         engine.setMasterVolume(masterVolSlider.getValue());
         engine.setMusicVolume(musicVolSlider.getValue());

@@ -39,7 +39,8 @@ public class Engine extends Thread {
     private boolean fullScreen = false;
     private int autosaveFrequency = 1; // 1 = every month
     
-    private boolean visualFiltersEnabled = true;
+    private boolean daylightColorOverlayEnabled = true;
+    private boolean weatherColorOverlayEnabled = true;
     private boolean arachnophobiaMode = false;
     
     private int masterVolume = 80;
@@ -317,12 +318,20 @@ public class Engine extends Thread {
         this.autosaveFrequency = (autosaveFrequency >= 0) ? autosaveFrequency : 1;
     }
 
-    public boolean isVisualFiltersEnabled() {
-        return visualFiltersEnabled;
+    public boolean isDaylightColorOverlayEnabled() {
+        return daylightColorOverlayEnabled;
     }
 
-    public void setVisualFiltersEnabled(boolean visualFiltersEnabled) {
-        this.visualFiltersEnabled = visualFiltersEnabled;
+    public void setDaylightColorOverlayEnabled(boolean daylightColorOverlayEnabled) {
+        this.daylightColorOverlayEnabled = daylightColorOverlayEnabled;
+    }
+
+    public boolean isWeatherColorOverlayEnabled() {
+        return weatherColorOverlayEnabled;
+    }
+
+    public void setWeatherColorOverlayEnabled(boolean weatherColorOverlayEnabled) {
+        this.weatherColorOverlayEnabled = weatherColorOverlayEnabled;
     }
 
     public boolean isArachnophobiaMode() {

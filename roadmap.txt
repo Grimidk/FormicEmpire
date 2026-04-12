@@ -11,8 +11,8 @@ Missing assets:
 		Assimilation — missing icon: ASSIMILATION_LEAFCUTTER, ASSIMILATION_PHARAOH, ASSIMILATION_MARAUDER
 
 		Map hexes — if edges look bad, try tiles or harder pixel alignment
-		Font: ship /fonts/font.ttf (sources: formicFont.sfd, Font.png)
-		Optional later: pixel buttons/tabs (Swing is flat colors )
+		Font - self explanatory
+		Optional: buttons/tabs 
 
 To Fix (By decreasing priority) : 
 		
@@ -23,7 +23,8 @@ To Fix (By decreasing priority) :
 	(none right now)
 
 	Mid:
-	remove carrying icon, looks ugly
+	maybe turn passive graveyard into Dermestid beetles
+	scienctific name for all bugs
 
 	Low:
 	logistic physics use dimension 2
@@ -34,7 +35,6 @@ To Fix (By decreasing priority) :
 
 	Important not Urgent:
 	late game performance (physics too taxing, may need to deload ants outside of area or update less when >50k ants) maybe look into LWJGL
-	not loading sprites of any kind out of visible bounds maybe allow overworld to see around
 	
 To Feature (to be done in order):
 Needed for launch (v1.0) (Launch Version):
@@ -57,6 +57,7 @@ Needed for launch (v1.0) (Launch Version):
 	research tree
 	building tree
 	minerals
+	rework how carrying looks completely
 	main menu screen maybe simulation like factorio
 	synergies ( Super majors + Chemical throwing = Artillery ants; Self destruction + Acid spitting = Corrosive bombs; Silk weaving + Hive building = Web building; Air-force ants + self destruction = Air-bomber ants)
 	icons for all constants and unlocks (roles, move and trade methods, upgrades, buildings, assimilations,  synergies)

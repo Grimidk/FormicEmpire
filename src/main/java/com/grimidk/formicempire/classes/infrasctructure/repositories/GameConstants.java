@@ -361,13 +361,13 @@ public final class GameConstants {
     static { moveStatuses.add(MOVE_PATROL); }
 
     // --- Bug Types ---
-    public static final BugType TYPE_ANT = new BugType(1, LanguageStrings.BUG_ANT, 1, 1, 1, 1, 1, 1,
+    public static final BugType TYPE_ANT = new BugType(1, LanguageStrings.BUG_ANT, LanguageStrings.BUG_ANT_SCIENTIFIC, 1, 1, 1, 1, 1, 1,
         loadIcon("icons/ants/omni/worker.png"), loadIcon("sprites/ants/omni/worker.png"));
     static { bugTypes.add(TYPE_ANT); }
-    public static final BugType TYPE_APHID = new BugType(2, LanguageStrings.BUG_APHID, 1, 1, 0, 0, 5, 0.5f,
+    public static final BugType TYPE_APHID = new BugType(2, LanguageStrings.BUG_APHID, LanguageStrings.BUG_APHID_SCIENTIFIC, 1, 1, 0, 0, 5, 0.5f,
         loadIcon("icons/bugs/aphid.png") , loadIcon("sprites/bugs/aphid.png"));
     static { bugTypes.add(TYPE_APHID); }
-    public static final BugType TYPE_PARASITE = new BugType(3, LanguageStrings.BUG_PARASITE, 1, 1, 0, 0, 1, 1,
+    public static final BugType TYPE_PARASITE = new BugType(3, LanguageStrings.BUG_PARASITE, LanguageStrings.BUG_PARASITE_SCIENTIFIC, 1, 1, 0, 0, 1, 1,
         loadIcon("icons/bugs/parasite.png") , loadIcon("sprites/bugs/parasite.png"));
     static { bugTypes.add(TYPE_PARASITE); }
 

@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.interfaces;
 
 import com.grimidk.formicempire.classes.constants.ant.AntType;
+import com.grimidk.formicempire.classes.constants.misc.BugType;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.misc.Species;
 import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
@@ -107,6 +108,7 @@ public class HelpPanel extends JPanel {
         mainTabs.addTab("Hotkeys", createHotkeysPanel());
         mainTabs.addTab("Species", createSpeciesPanel());
         mainTabs.addTab("Ant Types", createAntTypesPanel());
+        mainTabs.addTab("Bugs", createBugsPanel());
         mainTabs.addTab("Roles", createDictionaryPanel(roleConstants));
         mainTabs.addTab("Upgrades", createDictionaryPanel(genericUpgrades));
         mainTabs.addTab("Buildings", createDictionaryPanel(new ArrayList<>(GameUnlocks.getBuildings())));
@@ -125,6 +127,7 @@ public class HelpPanel extends JPanel {
             LanguageStrings.get("HELP_TAB_HOTKEYS"),
             LanguageStrings.get("HELP_TAB_SPECIES"),
             LanguageStrings.get("HELP_TAB_TYPES"),
+            LanguageStrings.get("HELP_TAB_BUGS"),
             LanguageStrings.get("HELP_TAB_ROLES"),
             LanguageStrings.get("HELP_TAB_UPGRADES"),
             LanguageStrings.get("HELP_TAB_BUILDINGS"),
@@ -368,7 +371,55 @@ public class HelpPanel extends JPanel {
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         return scrollPane;
     }
-    
+
+    private JComponent createBugsPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        panel.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+        for (BugType type : GameConstants.getBugTypes()) {
+            JPanel entry = new JPanel(new BorderLayout(10, 0));
+            entry.setBackground(AssetStyles.BACKGROUND_COLOR);
+            entry.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER, type.getName(),
+                javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
+
+            ImageIcon sprite = type.getSprite();
+            JLabel spriteLabel = new JLabel(sprite != null ? sprite : type.getIcon());
+            spriteLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
+            entry.add(spriteLabel, BorderLayout.WEST);
+
+            String desc;
+            if (type == GameConstants.TYPE_ANT) {
+                desc = LanguageStrings.get(LanguageStrings.HELP_BUG_ANT_DESC);
+            } else if (type == GameConstants.TYPE_APHID) {
+                desc = LanguageStrings.get(LanguageStrings.HELP_BUG_APHID_DESC);
+            } else if (type == GameConstants.TYPE_PARASITE) {
+                desc = LanguageStrings.get(LanguageStrings.HELP_BUG_PARASITE_DESC);
+            } else {
+                desc = "";
+            }
+
+            String info = "<html><div style='width: 350px; font-family: sans-serif; font-size: 11pt;'><b>"
+                    + LanguageStrings.get(LanguageStrings.HELP_SPECIES_SCIENTIFIC) + "</b> <i>" + type.getScientificName()
+                    + "</i><br><br>" + desc + "</div></html>";
+
+            JLabel infoLabel = new JLabel(info);
+            infoLabel.setFont(AssetStyles.FONT_NORMAL);
+            infoLabel.setForeground(AssetStyles.FONT_COLOR);
+            entry.add(infoLabel, BorderLayout.CENTER);
+
+            panel.add(entry);
+            panel.add(Box.createRigidArea(new Dimension(0, 5)));
+        }
+
+        JScrollPane scrollPane = new JScrollPane(panel);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        return scrollPane;
+    }
+
     private JPanel createSeasonListPanel(String title, List<Season> constants) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -483,26 +534,91 @@ public class HelpPanel extends JPanel {
         return panel;
     }
 
+    private static ImageIcon sourceSpriteTier(ResourceType res, int tier) {
+        switch (tier) {
+            case 0:
+                return res.getSourceSpriteSmall();
+            case 1:
+                return res.getSourceSpriteMedium();
+            case 2:
+                return res.getSourceSpriteBig();
+            case 3:
+                return res.getSourceSpriteHuge();
+            default:
+                return null;
+        }
+    }
+
     private JComponent createWorldPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBackground(AssetStyles.BACKGROUND_COLOR);
         panel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        // Resources
-        JPanel resourcesPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        // Resources: one header row (icon + name per resource, like original), then rows of pile sizes (small..huge) aligned in columns
+        JPanel resourcesPanel = new JPanel();
+        resourcesPanel.setLayout(new BoxLayout(resourcesPanel, BoxLayout.Y_AXIS));
         resourcesPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
         resourcesPanel.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER, LanguageStrings.get("PANEL_RESOURCES"), 
                 javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, 
                 javax.swing.border.TitledBorder.DEFAULT_POSITION, 
                 AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
-        
-        for (ResourceType res : GameConstants.getResources()) {
-            JLabel resLabel = new JLabel(res.getName(), res.getIcon(), SwingConstants.LEFT);
-            resLabel.setFont(AssetStyles.FONT_NORMAL);
-            resLabel.setForeground(AssetStyles.FONT_COLOR);
-            resourcesPanel.add(resLabel);
+
+        List<ResourceType> resourceList = GameConstants.getResources();
+        int n = resourceList.size();
+
+        JPanel grid = new JPanel(new GridBagLayout());
+        grid.setBackground(AssetStyles.BACKGROUND_COLOR);
+        GridBagConstraints gc = new GridBagConstraints();
+        gc.insets = new Insets(4, 8, 4, 8);
+        gc.anchor = GridBagConstraints.CENTER;
+
+        gc.gridx = 0;
+        gc.gridy = 0;
+        gc.weightx = 0;
+        JPanel corner = new JPanel();
+        corner.setBackground(AssetStyles.BACKGROUND_COLOR);
+        grid.add(corner, gc);
+
+        for (int i = 0; i < n; i++) {
+            ResourceType res = resourceList.get(i);
+            gc.gridx = i + 1;
+            gc.gridy = 0;
+            gc.weightx = 1.0 / Math.max(1, n);
+            gc.anchor = GridBagConstraints.WEST;
+            JLabel hdr = new JLabel(res.getName(), res.getIcon(), SwingConstants.LEFT);
+            hdr.setFont(AssetStyles.FONT_NORMAL);
+            hdr.setForeground(AssetStyles.FONT_COLOR);
+            grid.add(hdr, gc);
         }
+        gc.anchor = GridBagConstraints.CENTER;
+
+        String[] sizeKeys = {
+                LanguageStrings.HELP_RESOURCE_SOURCE_SMALL,
+                LanguageStrings.HELP_RESOURCE_SOURCE_MEDIUM,
+                LanguageStrings.HELP_RESOURCE_SOURCE_BIG,
+                LanguageStrings.HELP_RESOURCE_SOURCE_HUGE
+        };
+        for (int r = 0; r < 4; r++) {
+            gc.gridx = 0;
+            gc.gridy = r + 1;
+            gc.weightx = 0;
+            gc.anchor = GridBagConstraints.EAST;
+            JLabel sizeLabel = new JLabel(LanguageStrings.get(sizeKeys[r]));
+            sizeLabel.setFont(AssetStyles.FONT_SMALL);
+            sizeLabel.setForeground(AssetStyles.FONT_COLOR);
+            grid.add(sizeLabel, gc);
+            gc.anchor = GridBagConstraints.CENTER;
+            for (int i = 0; i < n; i++) {
+                ResourceType res = resourceList.get(i);
+                gc.gridx = i + 1;
+                gc.weightx = 1.0 / Math.max(1, n);
+                ImageIcon sp = sourceSpriteTier(res, r);
+                grid.add(new JLabel(sp), gc);
+            }
+        }
+
+        resourcesPanel.add(grid);
         panel.add(resourcesPanel);
 
         // Biomes

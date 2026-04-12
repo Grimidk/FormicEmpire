@@ -388,7 +388,8 @@ public class SpanishTranslation implements Translation {
         es.put("SETTINGS_TAB_AUDIO", "Audio");
         es.put("SETTINGS_TAB_ROLES", "Roles");
         
-        es.put("SETTINGS_VISUAL_FILTERS", "Filtros Visuales:");
+        es.put("SETTINGS_DAYLIGHT_COLOR_OVERLAY", "Tono de luz diurna:");
+        es.put("SETTINGS_WEATHER_COLOR_OVERLAY", "Tono del clima:");
         es.put("SETTINGS_ARACHNOPHOBIA", "Modo Aracnofobia:");
         es.put("SETTINGS_PAUSE_FOCUS", "Pausar al perder foco");
         es.put("SETTINGS_CONFIRM_QUIT", "Confirmar al salir");
@@ -490,6 +491,9 @@ public class SpanishTranslation implements Translation {
         es.put("BUG_ANT", "Hormiga");
         es.put("BUG_APHID", "Pulgón");
         es.put("BUG_PARASITE", "Parásito");
+        es.put("BUG_ANT_SCIENTIFIC", "Formica");
+        es.put("BUG_APHID_SCIENTIFIC", "Aphididae");
+        es.put("BUG_PARASITE_SCIENTIFIC", "Anergates");
 
         es.put("TYPE_LARVA", "Larva");
         es.put("TYPE_PUPA", "Pupa");
@@ -904,6 +908,7 @@ public class SpanishTranslation implements Translation {
         es.put("HELP_TAB_HOTKEYS", "Teclas");
         es.put("HELP_TAB_SPECIES", "Especies");
         es.put("HELP_TAB_TYPES", "Tipos");
+        es.put("HELP_TAB_BUGS", "Otros insectos");
         es.put("HELP_TAB_ROLES", "Roles");
         es.put("HELP_TAB_UPGRADES", "Mejoras");
         es.put("HELP_TAB_BUILDINGS", "Edificios");
@@ -917,6 +922,11 @@ public class SpanishTranslation implements Translation {
         
         es.put("HELP_SPECIES_SCIENTIFIC", "Nombre Científico:");
         es.put("HELP_SPECIES_TRAITS", "Rasgos Base:");
+
+        es.put("HELP_RESOURCE_SOURCE_SMALL", "Pequeño");
+        es.put("HELP_RESOURCE_SOURCE_MEDIUM", "Mediano");
+        es.put("HELP_RESOURCE_SOURCE_BIG", "Grande");
+        es.put("HELP_RESOURCE_SOURCE_HUGE", "Enorme");
 
         es.put("HOTKEY_PAUSE", "Pausar / Reanudar Juego");
         es.put("HOTKEY_SPEED", "Aumentar / Disminuir Velocidad");
@@ -939,6 +949,10 @@ public class SpanishTranslation implements Translation {
         es.put("HELP_TYPE_PRINCESS_DESC", "Una reproductora alada. Se puede asignar al rol de Criadora para aparearse con un Zángano y convertirse en una nueva Reina.");
         es.put("HELP_TYPE_DRONE_DESC", "Un reproductor macho alado. Su único propósito es aparearse con una Princesa, tras lo cual muere.");
         es.put("HELP_TYPE_QUEEN_DESC", "El corazón de la colonia. Se puede asignar a Poner Huevos o Investigar nuevas tecnologías.");
+
+        es.put("HELP_BUG_ANT_DESC", "Hormigas salvajes o rivales que aparecen en el supramundo. Pueden luchar contra tus hormigas y competir por espacio.");
+        es.put("HELP_BUG_APHID_DESC", "Insectos de cuerpo blando que se alimentan de plantas. Con el rol Pastora, tu colonia puede cuidar pulgones para obtener un ingreso constante de jarabe (melaza).");
+        es.put("HELP_BUG_PARASITE_DESC", "Plagas que se esconden en el nido y drenan comida en secreto. Asigna Vigilantes para encontrarlas y eliminarlas antes de que se multipliquen.");
 
         es.put("HELP_BIOMES_TITLE", "Biomas");
         es.put("HELP_BIOME_TEMP", "Temp: ");

@@ -388,7 +388,8 @@ public class PortugueseTranslation implements Translation {
         pt.put("SETTINGS_TAB_AUDIO", "Áudio");
         pt.put("SETTINGS_TAB_ROLES", "Funções");
 
-        pt.put("SETTINGS_VISUAL_FILTERS", "Filtros visuais:");
+        pt.put("SETTINGS_DAYLIGHT_COLOR_OVERLAY", "Tonalidade dia/noite:");
+        pt.put("SETTINGS_WEATHER_COLOR_OVERLAY", "Tonalidade do clima:");
         pt.put("SETTINGS_ARACHNOPHOBIA", "Modo aracnofobia:");
         pt.put("SETTINGS_PAUSE_FOCUS", "Pausar ao perder o foco");
         pt.put("SETTINGS_CONFIRM_QUIT", "Confirmar ao sair");
@@ -490,6 +491,9 @@ public class PortugueseTranslation implements Translation {
         pt.put("BUG_ANT", "Formiga");
         pt.put("BUG_APHID", "Pulgão");
         pt.put("BUG_PARASITE", "Parasita");
+        pt.put("BUG_ANT_SCIENTIFIC", "Formica");
+        pt.put("BUG_APHID_SCIENTIFIC", "Aphididae");
+        pt.put("BUG_PARASITE_SCIENTIFIC", "Anergates");
 
         pt.put("TYPE_LARVA", "Larva");
         pt.put("TYPE_PUPA", "Pupa");
@@ -902,6 +906,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("HELP_TAB_HOTKEYS", "Teclas");
         pt.put("HELP_TAB_SPECIES", "Espécies");
         pt.put("HELP_TAB_TYPES", "Tipos");
+        pt.put("HELP_TAB_BUGS", "Outros insetos");
         pt.put("HELP_TAB_ROLES", "Funções");
         pt.put("HELP_TAB_UPGRADES", "Melhorias");
         pt.put("HELP_TAB_BUILDINGS", "Edifícios");
@@ -915,6 +920,11 @@ public class PortugueseTranslation implements Translation {
 
         pt.put("HELP_SPECIES_SCIENTIFIC", "Nome científico:");
         pt.put("HELP_SPECIES_TRAITS", "Traços base:");
+
+        pt.put("HELP_RESOURCE_SOURCE_SMALL", "Pequeno");
+        pt.put("HELP_RESOURCE_SOURCE_MEDIUM", "Médio");
+        pt.put("HELP_RESOURCE_SOURCE_BIG", "Grande");
+        pt.put("HELP_RESOURCE_SOURCE_HUGE", "Enorme");
 
         pt.put("HOTKEY_PAUSE", "Pausar / retomar jogo");
         pt.put("HOTKEY_SPEED", "Aumentar / diminuir velocidade");
@@ -937,6 +947,10 @@ public class PortugueseTranslation implements Translation {
         pt.put("HELP_TYPE_PRINCESS_DESC", "Reprodutora alada. Pode acasalar com zangão e virar rainha.");
         pt.put("HELP_TYPE_DRONE_DESC", "Macho alado. Apenas acasala com princesa e morre.");
         pt.put("HELP_TYPE_QUEEN_DESC", "Coração da colônia. Pode por ovos ou pesquisar.");
+
+        pt.put("HELP_BUG_ANT_DESC", "Formigas selvagens ou rivais que aparecem na superfície. Podem lutar com as suas formigas e competir por espaço.");
+        pt.put("HELP_BUG_APHID_DESC", "Insetos de corpo mole que se alimentam de plantas. Com o papel de Pastora, a sua colônia pode criar pulgões para uma renda constante de xarope (melada).");
+        pt.put("HELP_BUG_PARASITE_DESC", "Pragas que se escondem no formigueiro e drenam comida em segredo. Atribua Polícias para encontrá-las e eliminá-las antes que se multipliquem.");
 
         pt.put("HELP_BIOMES_TITLE", "Biomas");
         pt.put("HELP_BIOME_TEMP", "Temp.: ");

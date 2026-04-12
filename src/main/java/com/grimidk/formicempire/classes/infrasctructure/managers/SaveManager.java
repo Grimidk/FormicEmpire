@@ -1412,7 +1412,8 @@ public class SaveManager {
             writeJsonLine(w, "screenSize", engine.getScreenSize(), false);
             writeJsonLine(w, "fullScreen", engine.isFullScreen(), false);
             writeJsonLine(w, "autosaveFrequency", engine.getAutosaveFrequency(), false);
-            writeJsonLine(w, "visualFiltersEnabled", engine.isVisualFiltersEnabled(), false);
+            writeJsonLine(w, "daylightColorOverlayEnabled", engine.isDaylightColorOverlayEnabled(), false);
+            writeJsonLine(w, "weatherColorOverlayEnabled", engine.isWeatherColorOverlayEnabled(), false);
             writeJsonLine(w, "arachnophobiaMode", engine.isArachnophobiaMode(), false);
             writeJsonLine(w, "masterVolume", engine.getMasterVolume(), false);
             writeJsonLine(w, "musicVolume", engine.getMusicVolume(), false);
@@ -1493,7 +1494,18 @@ public class SaveManager {
             engine.setScreenSize(m.getOrDefault("screenSize", engine.getScreenSize()));
             engine.setFullScreen(Boolean.parseBoolean(m.getOrDefault("fullScreen", String.valueOf(engine.isFullScreen()))));
             engine.setAutosaveFrequency(Integer.parseInt(m.getOrDefault("autosaveFrequency", String.valueOf(engine.getAutosaveFrequency()))));
-            engine.setVisualFiltersEnabled(Boolean.parseBoolean(m.getOrDefault("visualFiltersEnabled", String.valueOf(engine.isVisualFiltersEnabled()))));
+            boolean legacyVisualFilters = m.containsKey("visualFiltersEnabled")
+                    && Boolean.parseBoolean(m.get("visualFiltersEnabled"));
+            if (m.containsKey("daylightColorOverlayEnabled")) {
+                engine.setDaylightColorOverlayEnabled(Boolean.parseBoolean(m.get("daylightColorOverlayEnabled")));
+            } else if (m.containsKey("visualFiltersEnabled")) {
+                engine.setDaylightColorOverlayEnabled(legacyVisualFilters);
+            }
+            if (m.containsKey("weatherColorOverlayEnabled")) {
+                engine.setWeatherColorOverlayEnabled(Boolean.parseBoolean(m.get("weatherColorOverlayEnabled")));
+            } else if (m.containsKey("visualFiltersEnabled")) {
+                engine.setWeatherColorOverlayEnabled(legacyVisualFilters);
+            }
             engine.setArachnophobiaMode(Boolean.parseBoolean(m.getOrDefault("arachnophobiaMode", String.valueOf(engine.isArachnophobiaMode()))));
             engine.setMasterVolume(Integer.parseInt(m.getOrDefault("masterVolume", String.valueOf(engine.getMasterVolume()))));
             engine.setMusicVolume(Integer.parseInt(m.getOrDefault("musicVolume", String.valueOf(engine.getMusicVolume()))));

@@ -1,7 +1,6 @@
 package com.grimidk.formicempire.classes.interfaces.game.gamepanels;
 
 import com.grimidk.formicempire.classes.constants.ant.AntType;
-import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.misc.Species;
 import com.grimidk.formicempire.classes.constants.world.Weather;
 import com.grimidk.formicempire.classes.entities.Ant;
@@ -24,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 
 public class GameAreaPanel extends ZeroGamePanel {
@@ -292,7 +292,7 @@ public class GameAreaPanel extends ZeroGamePanel {
         if (colony == null || colony.getLocationService() == null) {
             return;
         }
-        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
         for (ResourceSource src : colony.getLocationService().getDiscoveredSources()) {
             if (src.getQuantity() <= 0) {
                 continue;
@@ -305,32 +305,52 @@ public class GameAreaPanel extends ZeroGamePanel {
             int h = icon.getIconHeight();
             int sx = src.getX();
             int sy = src.getY();
-            if (!ViewportPhysicsLod.antIntersectsViewport(lodViewportRect, sx, sy, w, h)) {
+            int cx = sx + w / 2;
+            int cy = sy + h / 2;
+            int side = Math.max(1, (int) Math.ceil(Math.hypot(w, h)));
+            int bx = cx - (side + 1) / 2;
+            int by = cy - (side + 1) / 2;
+            if (!ViewportPhysicsLod.antIntersectsViewport(lodViewportRect, bx, by, side, side)) {
                 continue;
             }
-            g2d.drawImage(icon.getImage(), sx, sy, w, h, this);
+            AffineTransform oldTx = g2d.getTransform();
+            double deg = resourceSourceRotationDegrees(src);
+            g2d.translate(cx, cy);
+            g2d.rotate(Math.toRadians(deg));
+            g2d.drawImage(icon.getImage(), -w / 2, -h / 2, w, h, this);
+            g2d.setTransform(oldTx);
         }
     }
 
+    private static double resourceSourceRotationDegrees(ResourceSource src) {
+        int h = Objects.hash(src.getX(), src.getY(), src.getResourceType());
+        return Math.floorMod(h, 360);
+    }
+
     private void drawEnvironmentalOverlays(Graphics2D g2d) {
-        if (engine == null || !engine.isVisualFiltersEnabled()) return;
-        
+        if (engine == null) return;
+        boolean dayOn = engine.isDaylightColorOverlayEnabled();
+        boolean weatherOn = engine.isWeatherColorOverlayEnabled();
+        if (!dayOn && !weatherOn) return;
+
         World world = engine.getWorld();
         if (world == null) return;
-        
-        if (world.getTimeOfDay() != null && world.getTimeOfDay().getOverlayColor() != null) {
+
+        if (dayOn && world.getTimeOfDay() != null && world.getTimeOfDay().getOverlayColor() != null) {
             g2d.setColor(world.getTimeOfDay().getOverlayColor());
             g2d.fillRect(0, 0, getWidth(), getHeight());
         }
 
-        Weather w = world.getWeather();
-        if (world.getActiveHex() != null && world.getActiveHex().getLocalWeather() != null) {
-            w = world.getActiveHex().getLocalWeather();
-        }
+        if (weatherOn) {
+            Weather w = world.getWeather();
+            if (world.getActiveHex() != null && world.getActiveHex().getLocalWeather() != null) {
+                w = world.getActiveHex().getLocalWeather();
+            }
 
-        if (w != null && w.getOverlayColor() != null) {
-            g2d.setColor(w.getOverlayColor());
-            g2d.fillRect(0, 0, getWidth(), getHeight());
+            if (w != null && w.getOverlayColor() != null) {
+                g2d.setColor(w.getOverlayColor());
+                g2d.fillRect(0, 0, getWidth(), getHeight());
+            }
         }
     }
     
@@ -575,42 +595,7 @@ public class GameAreaPanel extends ZeroGamePanel {
                 g2d.translate(centerX, centerY);       
                 g2d.rotate(Math.toRadians(ant.getR()));
                 g2d.drawImage(currentSprite, -w / 2, -h / 2, this);
-                
-                ResourceType carried = ant.getCarrying();
-                if (carried != null && carried.getIcon() != null) {
-                    g2d.rotate(Math.toRadians(-ant.getR())); 
-                    Image resourceIcon = carried.getIcon().getImage();
-                    
-                    if (resourceIcon != null) {
-                        int iconW = 20; 
-                        int iconH = 20;
-                        
-                        g2d.drawImage(resourceIcon, -iconW/2, -h/2 - iconH, iconW, iconH, this);
-                        
-                        ResourceType carriedSec = ant.getCarryingSec();
-                        if (carriedSec != null && carriedSec.getIcon() != null) {
-                            Image secIcon = carriedSec.getIcon().getImage();
-                            if (secIcon != null) {
-                                g2d.drawImage(secIcon, -iconW/2 + 10, -h/2 - iconH + 5, iconW, iconH, this);
-                            }
-                        }
-                    }
-                } 
-                
-                if (ant.getCarryingAnt() != null) {
-                    if (ant.getCarrying() == null) {
-                        g2d.rotate(Math.toRadians(-ant.getR())); 
-                    }
-                    
-                    ImageIcon carriedSprite = GameConstants.getAntSprite(ant.getCarryingAnt(), colony.getSpecies());
-                    if (carriedSprite != null) {
-                        Image cSprite = carriedSprite.getImage();
-                        int cW = (int)(w * 0.7);
-                        int cH = (int)(h * 0.7);
-                        g2d.drawImage(cSprite, -cW/2, -h/2 - cH + 5, cW, cH, this);
-                    }
-                }
-                
+
                 g2d.setTransform(oldTransform);
             }
         }

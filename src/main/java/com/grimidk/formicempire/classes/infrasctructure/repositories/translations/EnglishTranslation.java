@@ -388,7 +388,8 @@ public class EnglishTranslation implements Translation {
         en.put("SETTINGS_TAB_AUDIO", "Audio");
         en.put("SETTINGS_TAB_ROLES", "Roles");
         
-        en.put("SETTINGS_VISUAL_FILTERS", "Visual Filters:");
+        en.put("SETTINGS_DAYLIGHT_COLOR_OVERLAY", "Daylight color overlay:");
+        en.put("SETTINGS_WEATHER_COLOR_OVERLAY", "Weather color overlay:");
         en.put("SETTINGS_ARACHNOPHOBIA", "Arachnophobia Mode:");
         en.put("SETTINGS_PAUSE_FOCUS", "Pause on focus loss");
         en.put("SETTINGS_CONFIRM_QUIT", "Confirm on quit");
@@ -490,6 +491,9 @@ public class EnglishTranslation implements Translation {
         en.put("BUG_ANT", "Ant");
         en.put("BUG_APHID", "Aphid");
         en.put("BUG_PARASITE", "Ant Parasite");
+        en.put("BUG_ANT_SCIENTIFIC", "Formica");
+        en.put("BUG_APHID_SCIENTIFIC", "Aphididae");
+        en.put("BUG_PARASITE_SCIENTIFIC", "Anergates");
 
         en.put("TYPE_LARVA", "Larva");
         en.put("TYPE_PUPA", "Pupa");
@@ -904,6 +908,7 @@ public class EnglishTranslation implements Translation {
         en.put("HELP_TAB_HOTKEYS", "Hotkeys");
         en.put("HELP_TAB_SPECIES", "Species");
         en.put("HELP_TAB_TYPES", "Ant Types");
+        en.put("HELP_TAB_BUGS", "Other insects");
         en.put("HELP_TAB_ROLES", "Roles");
         en.put("HELP_TAB_UPGRADES", "Upgrades");
         en.put("HELP_TAB_BUILDINGS", "Buildings");
@@ -917,6 +922,11 @@ public class EnglishTranslation implements Translation {
         
         en.put("HELP_SPECIES_SCIENTIFIC", "Scientific Name:");
         en.put("HELP_SPECIES_TRAITS", "Base Traits:");
+
+        en.put("HELP_RESOURCE_SOURCE_SMALL", "Small");
+        en.put("HELP_RESOURCE_SOURCE_MEDIUM", "Medium");
+        en.put("HELP_RESOURCE_SOURCE_BIG", "Big");
+        en.put("HELP_RESOURCE_SOURCE_HUGE", "Huge");
 
         en.put("HOTKEY_PAUSE", "Pause / Resume Game");
         en.put("HOTKEY_SPEED", "Increase / Decrease Game Speed");
@@ -939,6 +949,10 @@ public class EnglishTranslation implements Translation {
         en.put("HELP_TYPE_PRINCESS_DESC", "A winged reproductive. Can be assigned to the Breeder role to mate with a Drone and become a new Queen.");
         en.put("HELP_TYPE_DRONE_DESC", "A winged male reproductive. Its only purpose is to mate with a Princess, after which it dies.");
         en.put("HELP_TYPE_QUEEN_DESC", "The heart of the colony. Can be assigned to Lay Eggs or Research new technologies.");
+
+        en.put("HELP_BUG_ANT_DESC", "Wild or rival ants that appear on the overworld. They can fight your ants and compete for space.");
+        en.put("HELP_BUG_APHID_DESC", "Soft-bodied insects that feed on plants. With the Rancher role, your colony can tend aphids for a steady syrup (honeydew) income.");
+        en.put("HELP_BUG_PARASITE_DESC", "Pests that hide in the nest and secretly drain your food. Assign Police to find and eliminate them before they spread.");
 
         en.put("HELP_BIOMES_TITLE", "Biomes");
         en.put("HELP_BIOME_TEMP", "Temp: ");

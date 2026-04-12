@@ -549,7 +549,8 @@ public final class LanguageStrings {
     public static final String SETTINGS_TAB_AUDIO = "SETTINGS_TAB_AUDIO";
     public static final String SETTINGS_TAB_ROLES = "SETTINGS_TAB_ROLES";
     
-    public static final String SETTINGS_VISUAL_FILTERS = "SETTINGS_VISUAL_FILTERS";
+    public static final String SETTINGS_DAYLIGHT_COLOR_OVERLAY = "SETTINGS_DAYLIGHT_COLOR_OVERLAY";
+    public static final String SETTINGS_WEATHER_COLOR_OVERLAY = "SETTINGS_WEATHER_COLOR_OVERLAY";
     public static final String SETTINGS_ARACHNOPHOBIA = "SETTINGS_ARACHNOPHOBIA";
     
     public static final String SETTINGS_PAUSE_FOCUS = "SETTINGS_PAUSE_FOCUS";
@@ -658,6 +659,9 @@ public final class LanguageStrings {
     public static final String BUG_ANT = "BUG_ANT";
     public static final String BUG_APHID = "BUG_APHID";
     public static final String BUG_PARASITE = "BUG_PARASITE";
+    public static final String BUG_ANT_SCIENTIFIC = "BUG_ANT_SCIENTIFIC";
+    public static final String BUG_APHID_SCIENTIFIC = "BUG_APHID_SCIENTIFIC";
+    public static final String BUG_PARASITE_SCIENTIFIC = "BUG_PARASITE_SCIENTIFIC";
 
     public static final String TYPE_EGG = "TYPE_EGG";
     public static final String TYPE_LARVA = "TYPE_LARVA";
@@ -1072,6 +1076,7 @@ public final class LanguageStrings {
     public static final String HELP_TAB_HOTKEYS = "HELP_TAB_HOTKEYS";
     public static final String HELP_TAB_SPECIES = "HELP_TAB_SPECIES";
     public static final String HELP_TAB_TYPES = "HELP_TAB_TYPES";
+    public static final String HELP_TAB_BUGS = "HELP_TAB_BUGS";
     public static final String HELP_TAB_ROLES = "HELP_TAB_ROLES";
     public static final String HELP_TAB_UPGRADES = "HELP_TAB_UPGRADES";
     public static final String HELP_TAB_BUILDINGS = "HELP_TAB_BUILDINGS";
@@ -1085,6 +1090,11 @@ public final class LanguageStrings {
     
     public static final String HELP_SPECIES_SCIENTIFIC = "HELP_SPECIES_SCIENTIFIC";
     public static final String HELP_SPECIES_TRAITS = "HELP_SPECIES_TRAITS";
+
+    public static final String HELP_RESOURCE_SOURCE_SMALL = "HELP_RESOURCE_SOURCE_SMALL";
+    public static final String HELP_RESOURCE_SOURCE_MEDIUM = "HELP_RESOURCE_SOURCE_MEDIUM";
+    public static final String HELP_RESOURCE_SOURCE_BIG = "HELP_RESOURCE_SOURCE_BIG";
+    public static final String HELP_RESOURCE_SOURCE_HUGE = "HELP_RESOURCE_SOURCE_HUGE";
 
     public static final String HOTKEY_PAUSE = "HOTKEY_PAUSE";
     public static final String HOTKEY_SPEED = "HOTKEY_SPEED";
@@ -1107,6 +1117,10 @@ public final class LanguageStrings {
     public static final String HELP_TYPE_PRINCESS_DESC = "HELP_TYPE_PRINCESS_DESC";
     public static final String HELP_TYPE_DRONE_DESC = "HELP_TYPE_DRONE_DESC";
     public static final String HELP_TYPE_QUEEN_DESC = "HELP_TYPE_QUEEN_DESC";
+
+    public static final String HELP_BUG_ANT_DESC = "HELP_BUG_ANT_DESC";
+    public static final String HELP_BUG_APHID_DESC = "HELP_BUG_APHID_DESC";
+    public static final String HELP_BUG_PARASITE_DESC = "HELP_BUG_PARASITE_DESC";
 
     public static final String HELP_BIOMES_TITLE = "HELP_BIOMES_TITLE";
     public static final String HELP_BIOME_TEMP = "HELP_BIOME_TEMP";

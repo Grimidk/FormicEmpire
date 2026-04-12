@@ -388,7 +388,8 @@ public class FrenchTranslation implements Translation {
         fr.put("SETTINGS_TAB_AUDIO", "Audio");
         fr.put("SETTINGS_TAB_ROLES", "Rôles");
 
-        fr.put("SETTINGS_VISUAL_FILTERS", "Filtres visuels :");
+        fr.put("SETTINGS_DAYLIGHT_COLOR_OVERLAY", "Teinte jour/nuit :");
+        fr.put("SETTINGS_WEATHER_COLOR_OVERLAY", "Teinte météo :");
         fr.put("SETTINGS_ARACHNOPHOBIA", "Mode arachnophobie :");
         fr.put("SETTINGS_PAUSE_FOCUS", "Pause si perte de focus");
         fr.put("SETTINGS_CONFIRM_QUIT", "Confirmer à la sortie");
@@ -490,6 +491,9 @@ public class FrenchTranslation implements Translation {
         fr.put("BUG_ANT", "Fourmi");
         fr.put("BUG_APHID", "Puceron");
         fr.put("BUG_PARASITE", "Parasite");
+        fr.put("BUG_ANT_SCIENTIFIC", "Formica");
+        fr.put("BUG_APHID_SCIENTIFIC", "Aphididae");
+        fr.put("BUG_PARASITE_SCIENTIFIC", "Anergates");
 
         fr.put("TYPE_LARVA", "Larve");
         fr.put("TYPE_PUPA", "Nymphe");
@@ -904,6 +908,7 @@ public class FrenchTranslation implements Translation {
         fr.put("HELP_TAB_HOTKEYS", "Raccourcis");
         fr.put("HELP_TAB_SPECIES", "Espèces");
         fr.put("HELP_TAB_TYPES", "Types");
+        fr.put("HELP_TAB_BUGS", "Autres insectes");
         fr.put("HELP_TAB_ROLES", "Rôles");
         fr.put("HELP_TAB_UPGRADES", "Améliorations");
         fr.put("HELP_TAB_BUILDINGS", "Bâtiments");
@@ -917,6 +922,11 @@ public class FrenchTranslation implements Translation {
 
         fr.put("HELP_SPECIES_SCIENTIFIC", "Nom scientifique :");
         fr.put("HELP_SPECIES_TRAITS", "Traits de base :");
+
+        fr.put("HELP_RESOURCE_SOURCE_SMALL", "Petit");
+        fr.put("HELP_RESOURCE_SOURCE_MEDIUM", "Moyen");
+        fr.put("HELP_RESOURCE_SOURCE_BIG", "Grand");
+        fr.put("HELP_RESOURCE_SOURCE_HUGE", "Énorme");
 
         fr.put("HOTKEY_PAUSE", "Pause / Reprendre");
         fr.put("HOTKEY_SPEED", "Accélérer / Ralentir");
@@ -939,6 +949,10 @@ public class FrenchTranslation implements Translation {
         fr.put("HELP_TYPE_PRINCESS_DESC", "Reproductrice ailée. Rôle reproducteur avec un mâle pour devenir reine.");
         fr.put("HELP_TYPE_DRONE_DESC", "Mâle ailé. S'accouple avec une princesse puis meurt.");
         fr.put("HELP_TYPE_QUEEN_DESC", "Cœur de la colonie. Pondre ou rechercher.");
+
+        fr.put("HELP_BUG_ANT_DESC", "Fourmis sauvages ou rivales sur la surface. Elles peuvent combattre vos fourmis et rivaliser pour l'espace.");
+        fr.put("HELP_BUG_APHID_DESC", "Insectes à corps mou qui se nourrissent sur les plantes. Avec le rôle Berger, votre colonie peut élever des pucerons pour un revenu régulier de sirop (miellat).");
+        fr.put("HELP_BUG_PARASITE_DESC", "Ravageurs cachés dans le nid qui drainent secrètement vos réserves de nourriture. Assignez des Policiers pour les traquer et les éliminer avant qu'ils ne se propagent.");
 
         fr.put("HELP_BIOMES_TITLE", "Biomes");
         fr.put("HELP_BIOME_TEMP", "Temp : ");
