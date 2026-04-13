@@ -7,6 +7,7 @@ import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Bug;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
+import com.grimidk.formicempire.classes.entities.services.ColonyRoomDecorationService;
 import com.grimidk.formicempire.classes.entities.services.ViewportPhysicsLod;
 import com.grimidk.formicempire.classes.infrasctructure.Dimension;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
@@ -84,33 +85,36 @@ public class GameAreaPanel extends ZeroGamePanel {
     }
 
     private void loadImages() {
-        biomeTextureCache.put("Plains", loadImage("/backgrounds/biomes/PlainsTile.png"));
-        biomeTextureCache.put("Forest", loadImage("/backgrounds/biomes/ForestTile.png"));
-        biomeTextureCache.put("Jungle", loadImage("/backgrounds/biomes/JungleTile.png"));
-        biomeTextureCache.put("Swamp", loadImage("/backgrounds/biomes/SwampTile.png"));
-        biomeTextureCache.put("Tundra", loadImage("/backgrounds/biomes/TundraTile.png"));
-        biomeTextureCache.put("Taiga", loadImage("/backgrounds/biomes/TaigaTile.png"));
-        biomeTextureCache.put("Desert", loadImage("/backgrounds/biomes/DessertTile.png"));
-        biomeTextureCache.put("Urban", loadImage("/backgrounds/biomes/UrbanTile.png"));
-        biomeTextureCache.put("Mountain", loadImage("/backgrounds/biomes/MountainTile.png"));
-        biomeTextureCache.put("Volcanic", loadImage("/backgrounds/biomes/VolcanicTile.png"));
-        biomeTextureCache.put("Lake", loadImage("/backgrounds/biomes/LakeTile.png"));
-        biomeTextureCache.put("Ocean", loadImage("/backgrounds/biomes/OceanTile.png"));
+        // Tile PNGs are stored in git as e.g. PlainsTile.png; some checkouts/JARs end up as plainsTile.png.
+        // loadImage() tries both casings when the class loader is case-sensitive.
+        biomeTextureCache.put("Plains", loadImage("backgrounds/biomes/PlainsTile.png"));
+        biomeTextureCache.put("Forest", loadImage("backgrounds/biomes/ForestTile.png"));
+        biomeTextureCache.put("Jungle", loadImage("backgrounds/biomes/JungleTile.png"));
+        biomeTextureCache.put("Swamp", loadImage("backgrounds/biomes/SwampTile.png"));
+        biomeTextureCache.put("Tundra", loadImage("backgrounds/biomes/TundraTile.png"));
+        biomeTextureCache.put("Taiga", loadImage("backgrounds/biomes/TaigaTile.png"));
+        biomeTextureCache.put("Desert", loadImage("backgrounds/biomes/DessertTile.png"));
+        biomeTextureCache.put("Urban", loadImage("backgrounds/biomes/UrbanTile.png"));
+        biomeTextureCache.put("Mountain", loadImage("backgrounds/biomes/MountainTile.png"));
+        biomeTextureCache.put("Volcanic", loadImage("backgrounds/biomes/VolcanicTile.png"));
+        biomeTextureCache.put("Lake", loadImage("backgrounds/biomes/LakeTile.png"));
+        biomeTextureCache.put("Ocean", loadImage("backgrounds/biomes/OceanTile.png"));
 
-        biomeTextureCache.put("Underground", loadImage("/backgrounds/colony/UndergroundTile.png"));
+        biomeTextureCache.put("Underground", loadImage("backgrounds/colony/UndergroundTile.png"));
 
-        basicRoomImg = loadImage("/sprites/buildings/basicRoom.png");
-        doubleRoomImg = loadImage("/sprites/buildings/doubleRoom.png");
-        firstHallwayImg = loadImage("/sprites/buildings/firstHallway.png");
-        middleHallwayImg = loadImage("/sprites/buildings/middleHallway.png");
-        antHillImg = loadImage("/sprites/buildings/antHill.png");
-        basicYardImg = loadImage("/sprites/buildings/basicYard.png");
+        basicRoomImg = loadImage("sprites/buildings/basicRoom.png");
+        doubleRoomImg = loadImage("sprites/buildings/doubleRoom.png");
+        firstHallwayImg = loadImage("sprites/buildings/firstHallway.png");
+        middleHallwayImg = loadImage("sprites/buildings/middleHallway.png");
+        antHillImg = loadImage("sprites/buildings/antHill.png");
+        basicYardImg = loadImage("sprites/buildings/basicYard.png");
 
-        deadBodyImg = loadImage("/sprites/ants/dead.png");
+        deadBodyImg = loadImage("sprites/ants/dead.png");
     }
 
-    private Image loadImage(String path) {        try {
-            URL imgUrl = getClass().getResource(path);
+    private Image loadImage(String classpathRelativePath) {
+        try {
+            URL imgUrl = resolveResourceUrl(classpathRelativePath);
             if (imgUrl != null) {
                 return new ImageIcon(imgUrl).getImage();
             }
@@ -118,6 +122,47 @@ public class GameAreaPanel extends ZeroGamePanel {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private static URL resolveResourceUrl(String classpathRelativePath) {
+        URL u = tryResourceUrl(classpathRelativePath);
+        if (u != null) {
+            return u;
+        }
+        String alt = alternateFilenameFirstLetterCase(classpathRelativePath);
+        if (alt != null && !alt.equals(classpathRelativePath)) {
+            u = tryResourceUrl(alt);
+        }
+        return u;
+    }
+
+    private static URL tryResourceUrl(String classpathRelativePath) {
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        if (cl != null) {
+            URL u = cl.getResource(classpathRelativePath);
+            if (u != null) {
+                return u;
+            }
+        }
+        return GameAreaPanel.class.getResource("/" + classpathRelativePath);
+    }
+
+    /**
+     * Toggles the case of the first letter of the filename segment so {@code PlainsTile.png} and
+     * {@code plainsTile.png} both resolve when only one exists on the classpath.
+     */
+    private static String alternateFilenameFirstLetterCase(String path) {
+        int sep = path.lastIndexOf('/');
+        int nameStart = sep + 1;
+        if (nameStart >= path.length()) {
+            return null;
+        }
+        char c = path.charAt(nameStart);
+        if (!Character.isLetter(c)) {
+            return null;
+        }
+        char toggled = Character.isUpperCase(c) ? Character.toLowerCase(c) : Character.toUpperCase(c);
+        return path.substring(0, nameStart) + toggled + path.substring(nameStart + 1);
     }
     
     public void setColony(Colony colony) {
@@ -271,6 +316,7 @@ public class GameAreaPanel extends ZeroGamePanel {
                 drawUnderworldStructure(g2d);
                 drawAnts(g2d);
                 drawBugs(g2d);
+                drawUnderworldRoomDecorationsOverlay(g2d);
             } else {
                 g2d.translate(contentPadX, contentPadY);
                 drawOverworldStructure(g2d);
@@ -450,30 +496,93 @@ public class GameAreaPanel extends ZeroGamePanel {
         }
     }
 
-    private void drawUnderworldStructure(Graphics2D g2d) {
-        if (firstHallwayImg == null || basicRoomImg == null || middleHallwayImg == null || doubleRoomImg == null) return;
+    /**
+     * Shared layout for the first two underworld rows (hall + four basic rooms). Row 3 uses the same
+     * horizontal positions when present.
+     */
+    private record UnderworldRoomLayout(
+            int hallX,
+            int hallY,
+            int hallW,
+            int hallH,
+            int leftRoomX,
+            int rightRoomX,
+            int roomW,
+            int roomH,
+            int roomYRow1,
+            int roomYRow2) {
+    }
 
-        int topMargin = 0; 
-        
-        // --- ROW 1 (Floor 1) ---
+    private UnderworldRoomLayout resolveUnderworldRoomLayout() {
+        if (firstHallwayImg == null || basicRoomImg == null || middleHallwayImg == null || doubleRoomImg == null) {
+            return null;
+        }
+        int topMargin = 0;
         int hallW = firstHallwayImg.getWidth(this);
         int hallH = firstHallwayImg.getHeight(this);
         int centerX = ANCHOR_WIDTH / 2;
         int hallX = centerX - (hallW / 2);
         int hallY = topMargin;
+        int roomW = basicRoomImg.getWidth(this);
+        int roomH = basicRoomImg.getHeight(this);
+        int leftRoomX = hallX - roomW;
+        int rightRoomX = hallX + hallW;
+        int secondRowYOffset = 256;
+        int roomY2 = hallY + secondRowYOffset;
+        return new UnderworldRoomLayout(hallX, hallY, hallW, hallH, leftRoomX, rightRoomX, roomW, roomH, hallY, roomY2);
+    }
+
+    private void drawUnderworldRoomDecorationsOverlay(Graphics2D g2d) {
+        if (colony == null) {
+            return;
+        }
+        UnderworldRoomLayout L = resolveUnderworldRoomLayout();
+        if (L == null) {
+            return;
+        }
+
+        ColonyRoomDecorationService.drawStorageRoomDecorations(g2d, colony, L.leftRoomX, L.roomYRow1, L.roomW, L.roomH, this);
+
+        AffineTransform old = g2d.getTransform();
+        double rotateCenterX = L.rightRoomX + (L.roomW / 2.0);
+        double rotateCenterY = L.roomYRow1 + (L.roomH / 2.0);
+        g2d.rotate(Math.toRadians(180), rotateCenterX, rotateCenterY);
+        ColonyRoomDecorationService.drawFarmRoomDecorations(g2d, colony, L.rightRoomX, L.roomYRow1, L.roomW, L.roomH, this, true);
+        g2d.setTransform(old);
+
+        ColonyRoomDecorationService.drawNurseryRoomDecorations(g2d, colony, L.leftRoomX, L.roomYRow2, L.roomW, L.roomH, this);
+
+        AffineTransform old2 = g2d.getTransform();
+        double rotateCenter2X = L.rightRoomX + (L.roomW / 2.0);
+        double rotateCenter2Y = L.roomYRow2 + (L.roomH / 2.0);
+        g2d.rotate(Math.toRadians(180), rotateCenter2X, rotateCenter2Y);
+        ColonyRoomDecorationService.drawRoyalRoomDecorations(g2d, colony, L.rightRoomX, L.roomYRow2, L.roomW, L.roomH, this, true);
+        g2d.setTransform(old2);
+    }
+
+    private void drawUnderworldStructure(Graphics2D g2d) {
+        if (firstHallwayImg == null || basicRoomImg == null || middleHallwayImg == null || doubleRoomImg == null) return;
+
+        UnderworldRoomLayout L = resolveUnderworldRoomLayout();
+        if (L == null) {
+            return;
+        }
+
+        int hallX = L.hallX;
+        int hallY = L.hallY;
+        int hallW = L.hallW;
+        int hallH = L.hallH;
+        int roomW = L.roomW;
+        int roomH = L.roomH;
+        int leftRoomX = L.leftRoomX;
+        int rightRoomX = L.rightRoomX;
+        int roomY = L.roomYRow1;
         
         g2d.drawImage(firstHallwayImg, hallX, hallY, this);
         entranceBounds = new Rectangle(hallX, hallY, hallW, hallH);
         
-        int roomW = basicRoomImg.getWidth(this);
-        int roomH = basicRoomImg.getHeight(this);
-        int roomY = hallY;
-        
-        int leftRoomX = hallX - roomW;
         g2d.drawImage(basicRoomImg, leftRoomX, roomY, this);
         room1Bounds = new Rectangle(leftRoomX, roomY, roomW, roomH);
-        
-        int rightRoomX = hallX + hallW;
         
         AffineTransform old = g2d.getTransform();
         
@@ -487,8 +596,7 @@ public class GameAreaPanel extends ZeroGamePanel {
         g2d.setTransform(old);
 
         // --- ROW 2 (Floor 2) ---
-        int secondRowYOffset = 256; 
-        int roomY2 = hallY + secondRowYOffset;
+        int roomY2 = L.roomYRow2;
 
         g2d.drawImage(basicRoomImg, leftRoomX, roomY2, this);
         room3Bounds = new Rectangle(leftRoomX, roomY2, roomW, roomH);

@@ -210,100 +210,172 @@ public final class GameUnlocks {
     public static final Upgrade ASSIMILATED_MULTIQUEEN = new Upgrade(1002, "ASSIMILATED_MULTIQUEEN", "ASSIMILATED_MULTIQUEEN_FLAVOR", "ASSIMILATED_MULTIQUEEN_DESC", ABILITY_ASSIMILATION, 0, null );
     static { upgrades.add(ASSIMILATED_MULTIQUEEN); }
 
-    // --- Buildings ---
+    // --- Buildings (room/menu sprites: sprites/buildings/rooms/{chain}L{tier}.png, passive{Name}.png; refresh via scripts/sync_room_placeholders.sh) ---
     // -- Tier 0 --
-    public static final Building ROYAL_CHAMBER_0 = new Building(1, "ROYAL_CHAMBER_0", 0, "ROYAL_CHAMBER_0_DESC", null, 0, 0, 0, null, null);
+    public static final Building ROYAL_CHAMBER_0 = new Building(1, "ROYAL_CHAMBER_0", 0, "ROYAL_CHAMBER_0_DESC", null, 0, 0, 0,
+            BuildingSpriteResources.roomTier("royal", 0), BuildingSpriteResources.roomTier("royal", 0));
     static { buildings.add(ROYAL_CHAMBER_0); }
-    public static final Building EGG_CHAMBER_0 = new Building(2, "EGG_CHAMBER_0", 0, "EGG_CHAMBER_0_DESC", null, 0, 0, 0, null, null);
+    public static final Building EGG_CHAMBER_0 = new Building(2, "EGG_CHAMBER_0", 0, "EGG_CHAMBER_0_DESC", null, 0, 0, 0,
+            BuildingSpriteResources.roomTier("egg", 0), BuildingSpriteResources.roomTier("egg", 0));
     static { buildings.add(EGG_CHAMBER_0); }
-    public static final Building MUSHROOM_CHAMBER_0 = new Building(3, "MUSHROOM_CHAMBER_0", 0, "MUSHROOM_CHAMBER_0_DESC", null, 0, 0, 0, null, null);
+    public static final Building MUSHROOM_CHAMBER_0 = new Building(3, "MUSHROOM_CHAMBER_0", 0, "MUSHROOM_CHAMBER_0_DESC", null, 0, 0, 0,
+            BuildingSpriteResources.roomTier("mushroom", 0), BuildingSpriteResources.roomTier("mushroom", 0));
     static { buildings.add(MUSHROOM_CHAMBER_0); }
-    public static final Building PLANT_CHAMBER_0 = new Building(4, "PLANT_CHAMBER_0", 0, "PLANT_CHAMBER_0_DESC", null, 0, 0, 0, null, null);
+    public static final Building PLANT_CHAMBER_0 = new Building(4, "PLANT_CHAMBER_0", 0, "PLANT_CHAMBER_0_DESC", null, 0, 0, 0,
+            BuildingSpriteResources.roomTier("plant", 0), BuildingSpriteResources.roomTier("plant", 0));
     static { buildings.add(PLANT_CHAMBER_0); }
-    public static final Building WATER_RESERVOIR_0 = new Building(5, "WATER_RESERVOIR_0", 0, "WATER_RESERVOIR_0_DESC", null, 0, 0, 0, null, null);
+    public static final Building WATER_RESERVOIR_0 = new Building(5, "WATER_RESERVOIR_0", 0, "WATER_RESERVOIR_0_DESC", null, 0, 0, 0,
+            BuildingSpriteResources.roomTier("water", 0), BuildingSpriteResources.roomTier("water", 0));
     static { buildings.add(WATER_RESERVOIR_0); }
-    public static final Building MEAT_CHAMBER_0 = new Building(6, "MEAT_CHAMBER_0", 0, "MEAT_CHAMBER_0_DESC", null,0, 0, 12, null, null);
+    public static final Building MEAT_CHAMBER_0 = new Building(6, "MEAT_CHAMBER_0", 0, "MEAT_CHAMBER_0_DESC", null, 0, 0, 12,
+            BuildingSpriteResources.roomTier("meat", 0), BuildingSpriteResources.roomTier("meat", 0));
     static { buildings.add(MEAT_CHAMBER_0); }
-    public static final Building SYRUP_RESERVOIR_0 = new Building(7, "SYRUP_RESERVOIR_0", 0, "SYRUP_RESERVOIR_0_DESC", null, 0, 0, 24, null, null);
+    public static final Building SYRUP_RESERVOIR_0 = new Building(7, "SYRUP_RESERVOIR_0", 0, "SYRUP_RESERVOIR_0_DESC", null, 0, 0, 24,
+            BuildingSpriteResources.roomTier("syrup", 0), BuildingSpriteResources.roomTier("syrup", 0));
     static { buildings.add(SYRUP_RESERVOIR_0); }
-    public static final Building ROCK_WAREHOUSE_0 = new Building(8, "ROCK_WAREHOUSE_0", 0, "ROCK_WAREHOUSE_0_DESC", null, 0, 0, 50, null, null);
+    public static final Building ROCK_WAREHOUSE_0 = new Building(8, "ROCK_WAREHOUSE_0", 0, "ROCK_WAREHOUSE_0_DESC", null, 0, 0, 50,
+            BuildingSpriteResources.roomTier("rock", 0), BuildingSpriteResources.roomTier("rock", 0));
     static { buildings.add(ROCK_WAREHOUSE_0); }
-    public static final Building RESIN_RESERVOIR_0 = new Building(9, "RESIN_RESERVOIR_0", 0, "RESIN_RESERVOIR_0_DESC", null, 0, 0, 50, null, null);
+    public static final Building RESIN_RESERVOIR_0 = new Building(9, "RESIN_RESERVOIR_0", 0, "RESIN_RESERVOIR_0_DESC", null, 0, 0, 50,
+            BuildingSpriteResources.roomTier("resin", 0), BuildingSpriteResources.roomTier("resin", 0));
     static { buildings.add(RESIN_RESERVOIR_0); }
     // -- Tier 1 --
-    public static final Building ROYAL_CHAMBER_1 = new Building(10, "ROYAL_CHAMBER_1", 1, "ROYAL_CHAMBER_1_DESC", ROYAL_CHAMBER_0, 0, 0, 1000, null, null);
+    public static final Building ROYAL_CHAMBER_1 = new Building(10, "ROYAL_CHAMBER_1", 1, "ROYAL_CHAMBER_1_DESC", ROYAL_CHAMBER_0, 0, 0, 1000,
+            BuildingSpriteResources.roomTier("royal", 1), BuildingSpriteResources.roomTier("royal", 1));
     static { buildings.add(ROYAL_CHAMBER_1); }
-    public static final Building EGG_CHAMBER_1 = new Building(11, "EGG_CHAMBER_1", 1, "EGG_CHAMBER_1_DESC", EGG_CHAMBER_0, 0, 0, 100, null, null);
+    public static final Building EGG_CHAMBER_1 = new Building(11, "EGG_CHAMBER_1", 1, "EGG_CHAMBER_1_DESC", EGG_CHAMBER_0, 0, 0, 100,
+            BuildingSpriteResources.roomTier("egg", 1), BuildingSpriteResources.roomTier("egg", 1));
     static { buildings.add(EGG_CHAMBER_1); }
-    public static final Building MUSHROOM_CHAMBER_1 = new Building(12, "MUSHROOM_CHAMBER_1", 1, "MUSHROOM_CHAMBER_1_DESC", MUSHROOM_CHAMBER_0, 0, 0, 150, null, null);
+    public static final Building MUSHROOM_CHAMBER_1 = new Building(12, "MUSHROOM_CHAMBER_1", 1, "MUSHROOM_CHAMBER_1_DESC", MUSHROOM_CHAMBER_0, 0, 0, 150,
+            BuildingSpriteResources.roomTier("mushroom", 1), BuildingSpriteResources.roomTier("mushroom", 1));
     static { buildings.add(MUSHROOM_CHAMBER_1); }
-    public static final Building PLANT_CHAMBER_1 = new Building(13, "PLANT_CHAMBER_1", 1, "PLANT_CHAMBER_1_DESC", PLANT_CHAMBER_0, 0, 0, 180, null, null);
+    public static final Building PLANT_CHAMBER_1 = new Building(13, "PLANT_CHAMBER_1", 1, "PLANT_CHAMBER_1_DESC", PLANT_CHAMBER_0, 0, 0, 180,
+            BuildingSpriteResources.roomTier("plant", 1), BuildingSpriteResources.roomTier("plant", 1));
     static { buildings.add(PLANT_CHAMBER_1); }
-    public static final Building WATER_RESERVOIR_1 = new Building(14, "WATER_RESERVOIR_1", 1, "WATER_RESERVOIR_1_DESC", WATER_RESERVOIR_0, 0, 0, 250, null, null);
+    public static final Building WATER_RESERVOIR_1 = new Building(14, "WATER_RESERVOIR_1", 1, "WATER_RESERVOIR_1_DESC", WATER_RESERVOIR_0, 0, 0, 250,
+            BuildingSpriteResources.roomTier("water", 1), BuildingSpriteResources.roomTier("water", 1));
     static { buildings.add(WATER_RESERVOIR_1); }
-    public static final Building MEAT_CHAMBER_1 = new Building(15, "MEAT_CHAMBER_1", 1, "MEAT_CHAMBER_1_DESC", MEAT_CHAMBER_0, 0, 0, 200, null, null);
+    public static final Building MEAT_CHAMBER_1 = new Building(15, "MEAT_CHAMBER_1", 1, "MEAT_CHAMBER_1_DESC", MEAT_CHAMBER_0, 0, 0, 200,
+            BuildingSpriteResources.roomTier("meat", 1), BuildingSpriteResources.roomTier("meat", 1));
     static { buildings.add(MEAT_CHAMBER_1); }
-    public static final Building SYRUP_RESERVOIR_1 = new Building(16, "SYRUP_RESERVOIR_1", 1, "SYRUP_RESERVOIR_1_DESC", SYRUP_RESERVOIR_0, 0, 0, 250, null, null);
+    public static final Building SYRUP_RESERVOIR_1 = new Building(16, "SYRUP_RESERVOIR_1", 1, "SYRUP_RESERVOIR_1_DESC", SYRUP_RESERVOIR_0, 0, 0, 250,
+            BuildingSpriteResources.roomTier("syrup", 1), BuildingSpriteResources.roomTier("syrup", 1));
     static { buildings.add(SYRUP_RESERVOIR_1); }
-    public static final Building ROCK_WAREHOUSE_1 = new Building(17, "ROCK_WAREHOUSE_1", 1, "ROCK_WAREHOUSE_1_DESC", ROCK_WAREHOUSE_0, 0, 0, 500, null, null);
+    public static final Building ROCK_WAREHOUSE_1 = new Building(17, "ROCK_WAREHOUSE_1", 1, "ROCK_WAREHOUSE_1_DESC", ROCK_WAREHOUSE_0, 0, 0, 500,
+            BuildingSpriteResources.roomTier("rock", 1), BuildingSpriteResources.roomTier("rock", 1));
     static { buildings.add(ROCK_WAREHOUSE_1); }
-    public static final Building RESIN_RESERVOIR_1 = new Building(18, "RESIN_RESERVOIR_1", 1, "RESIN_RESERVOIR_1_DESC", RESIN_RESERVOIR_0, 0, 0, 400, null, null);
+    public static final Building RESIN_RESERVOIR_1 = new Building(18, "RESIN_RESERVOIR_1", 1, "RESIN_RESERVOIR_1_DESC", RESIN_RESERVOIR_0, 0, 0, 400,
+            BuildingSpriteResources.roomTier("resin", 1), BuildingSpriteResources.roomTier("resin", 1));
     static { buildings.add(RESIN_RESERVOIR_1); }
     // -- Tier 2 --
-    public static final Building ROYAL_CHAMBER_2 = new Building(19, "ROYAL_CHAMBER_2", 2, "ROYAL_CHAMBER_2_DESC", ROYAL_CHAMBER_1, 500, 0, 3000, null, null);
+    public static final Building ROYAL_CHAMBER_2 = new Building(19, "ROYAL_CHAMBER_2", 2, "ROYAL_CHAMBER_2_DESC", ROYAL_CHAMBER_1, 500, 0, 3000,
+            BuildingSpriteResources.roomTier("royal", 2), BuildingSpriteResources.roomTier("royal", 2));
     static { buildings.add(ROYAL_CHAMBER_2); }
-    public static final Building EGG_CHAMBER_2 = new Building(20, "EGG_CHAMBER_2", 2, "EGG_CHAMBER_2_DESC", EGG_CHAMBER_1, 200, 0, 1000, null, null);
+    public static final Building EGG_CHAMBER_2 = new Building(20, "EGG_CHAMBER_2", 2, "EGG_CHAMBER_2_DESC", EGG_CHAMBER_1, 200, 0, 1000,
+            BuildingSpriteResources.roomTier("egg", 2), BuildingSpriteResources.roomTier("egg", 2));
     static { buildings.add(EGG_CHAMBER_2); }
-    public static final Building MUSHROOM_CHAMBER_2 = new Building(21, "MUSHROOM_CHAMBER_2", 2, "MUSHROOM_CHAMBER_2_DESC", MUSHROOM_CHAMBER_1, 250, 0, 800, null, null);
+    public static final Building MUSHROOM_CHAMBER_2 = new Building(21, "MUSHROOM_CHAMBER_2", 2, "MUSHROOM_CHAMBER_2_DESC", MUSHROOM_CHAMBER_1, 250, 0, 800,
+            BuildingSpriteResources.roomTier("mushroom", 2), BuildingSpriteResources.roomTier("mushroom", 2));
     static { buildings.add(MUSHROOM_CHAMBER_2); }
-    public static final Building PLANT_CHAMBER_2 = new Building(22, "PLANT_CHAMBER_2", 2, "PLANT_CHAMBER_2_DESC", PLANT_CHAMBER_1, 200, 0, 1000, null, null);
+    public static final Building PLANT_CHAMBER_2 = new Building(22, "PLANT_CHAMBER_2", 2, "PLANT_CHAMBER_2_DESC", PLANT_CHAMBER_1, 200, 0, 1000,
+            BuildingSpriteResources.roomTier("plant", 2), BuildingSpriteResources.roomTier("plant", 2));
     static { buildings.add(PLANT_CHAMBER_2); }
-    public static final Building WATER_RESERVOIR_2 = new Building(23, "WATER_RESERVOIR_2", 2, "WATER_RESERVOIR_2_DESC", WATER_RESERVOIR_1, 300, 0, 1200, null, null);
+    public static final Building WATER_RESERVOIR_2 = new Building(23, "WATER_RESERVOIR_2", 2, "WATER_RESERVOIR_2_DESC", WATER_RESERVOIR_1, 300, 0, 1200,
+            BuildingSpriteResources.roomTier("water", 2), BuildingSpriteResources.roomTier("water", 2));
     static { buildings.add(WATER_RESERVOIR_2); }
-    public static final Building MEAT_CHAMBER_2 = new Building(24, "MEAT_CHAMBER_2", 2, "MEAT_CHAMBER_2_DESC", MEAT_CHAMBER_1, 350, 0, 1500, null, null);
+    public static final Building MEAT_CHAMBER_2 = new Building(24, "MEAT_CHAMBER_2", 2, "MEAT_CHAMBER_2_DESC", MEAT_CHAMBER_1, 350, 0, 1500,
+            BuildingSpriteResources.roomTier("meat", 2), BuildingSpriteResources.roomTier("meat", 2));
     static { buildings.add(MEAT_CHAMBER_2); }
-    public static final Building SYRUP_RESERVOIR_2 = new Building(25, "SYRUP_RESERVOIR_2", 2, "SYRUP_RESERVOIR_2_DESC", SYRUP_RESERVOIR_1, 350, 0, 1500, null, null);
+    public static final Building SYRUP_RESERVOIR_2 = new Building(25, "SYRUP_RESERVOIR_2", 2, "SYRUP_RESERVOIR_2_DESC", SYRUP_RESERVOIR_1, 350, 0, 1500,
+            BuildingSpriteResources.roomTier("syrup", 2), BuildingSpriteResources.roomTier("syrup", 2));
     static { buildings.add(SYRUP_RESERVOIR_2); }
-    public static final Building ROCK_WAREHOUSE_2 = new Building(26, "ROCK_WAREHOUSE_2", 2, "ROCK_WAREHOUSE_2_DESC", ROCK_WAREHOUSE_1, 450, 0, 2500, null, null);
+    public static final Building ROCK_WAREHOUSE_2 = new Building(26, "ROCK_WAREHOUSE_2", 2, "ROCK_WAREHOUSE_2_DESC", ROCK_WAREHOUSE_1, 450, 0, 2500,
+            BuildingSpriteResources.roomTier("rock", 2), BuildingSpriteResources.roomTier("rock", 2));
     static { buildings.add(ROCK_WAREHOUSE_2); }
-    public static final Building RESIN_RESERVOIR_2 = new Building(27, "RESIN_RESERVOIR_2", 2, "RESIN_RESERVOIR_2_DESC", RESIN_RESERVOIR_1, 400, 0, 2000, null, null);
+    public static final Building RESIN_RESERVOIR_2 = new Building(27, "RESIN_RESERVOIR_2", 2, "RESIN_RESERVOIR_2_DESC", RESIN_RESERVOIR_1, 400, 0, 2000,
+            BuildingSpriteResources.roomTier("resin", 2), BuildingSpriteResources.roomTier("resin", 2));
     static { buildings.add(RESIN_RESERVOIR_2); }
     // -- Tier 3 --
-    public static final Building ROYAL_CHAMBER_3 = new Building(28, "ROYAL_CHAMBER_3", 3, "ROYAL_CHAMBER_3_DESC", ROYAL_CHAMBER_2, 1000, 0, 15000, null, null);
+    public static final Building ROYAL_CHAMBER_3 = new Building(28, "ROYAL_CHAMBER_3", 3, "ROYAL_CHAMBER_3_DESC", ROYAL_CHAMBER_2, 1000, 0, 15000,
+            BuildingSpriteResources.roomTier("royal", 3), BuildingSpriteResources.roomTier("royal", 3));
     static { buildings.add(ROYAL_CHAMBER_3); }
-    public static final Building EGG_CHAMBER_3 = new Building(29, "EGG_CHAMBER_3", 3, "EGG_CHAMBER_3_DESC", EGG_CHAMBER_2, 500, 0, 5000, null, null);
+    public static final Building EGG_CHAMBER_3 = new Building(29, "EGG_CHAMBER_3", 3, "EGG_CHAMBER_3_DESC", EGG_CHAMBER_2, 500, 0, 5000,
+            BuildingSpriteResources.roomTier("egg", 3), BuildingSpriteResources.roomTier("egg", 3));
     static { buildings.add(EGG_CHAMBER_3); }
-    public static final Building MUSHROOM_CHAMBER_3 = new Building(30, "MUSHROOM_CHAMBER_3", 3, "MUSHROOM_CHAMBER_3_DESC", MUSHROOM_CHAMBER_2, 800, 0, 5000, null, null);
-    static { buildings.add(MUSHROOM_CHAMBER_3); }   
-    public static final Building PLANT_CHAMBER_3 = new Building(31, "PLANT_CHAMBER_3", 3, "PLANT_CHAMBER_3_DESC", PLANT_CHAMBER_2, 700, 0, 5000, null, null);
+    public static final Building MUSHROOM_CHAMBER_3 = new Building(30, "MUSHROOM_CHAMBER_3", 3, "MUSHROOM_CHAMBER_3_DESC", MUSHROOM_CHAMBER_2, 800, 0, 5000,
+            BuildingSpriteResources.roomTier("mushroom", 3), BuildingSpriteResources.roomTier("mushroom", 3));
+    static { buildings.add(MUSHROOM_CHAMBER_3); }
+    public static final Building PLANT_CHAMBER_3 = new Building(31, "PLANT_CHAMBER_3", 3, "PLANT_CHAMBER_3_DESC", PLANT_CHAMBER_2, 700, 0, 5000,
+            BuildingSpriteResources.roomTier("plant", 3), BuildingSpriteResources.roomTier("plant", 3));
     static { buildings.add(PLANT_CHAMBER_3); }
-    public static final Building WATER_RESERVOIR_3 = new Building(32, "WATER_RESERVOIR_3", 3, "WATER_RESERVOIR_3_DESC", WATER_RESERVOIR_2, 900, 0, 5000, null, null);
+    public static final Building WATER_RESERVOIR_3 = new Building(32, "WATER_RESERVOIR_3", 3, "WATER_RESERVOIR_3_DESC", WATER_RESERVOIR_2, 900, 0, 5000,
+            BuildingSpriteResources.roomTier("water", 3), BuildingSpriteResources.roomTier("water", 3));
     static { buildings.add(WATER_RESERVOIR_3); }
-    public static final Building MEAT_CHAMBER_3 = new Building(33, "MEAT_CHAMBER_3", 3, "MEAT_CHAMBER_3_DESC", MEAT_CHAMBER_2, 850, 0, 10000, null, null);
+    public static final Building MEAT_CHAMBER_3 = new Building(33, "MEAT_CHAMBER_3", 3, "MEAT_CHAMBER_3_DESC", MEAT_CHAMBER_2, 850, 0, 10000,
+            BuildingSpriteResources.roomTier("meat", 3), BuildingSpriteResources.roomTier("meat", 3));
     static { buildings.add(MEAT_CHAMBER_3); }
-    public static final Building SYRUP_RESERVOIR_3 = new Building(34, "SYRUP_RESERVOIR_3", 3, "SYRUP_RESERVOIR_3_DESC", SYRUP_RESERVOIR_2, 800, 0, 10000, null, null);
+    public static final Building SYRUP_RESERVOIR_3 = new Building(34, "SYRUP_RESERVOIR_3", 3, "SYRUP_RESERVOIR_3_DESC", SYRUP_RESERVOIR_2, 800, 0, 10000,
+            BuildingSpriteResources.roomTier("syrup", 3), BuildingSpriteResources.roomTier("syrup", 3));
     static { buildings.add(SYRUP_RESERVOIR_3); }
-    public static final Building ROCK_WAREHOUSE_3 = new Building(35, "ROCK_WAREHOUSE_3", 3, "ROCK_WAREHOUSE_3_DESC", ROCK_WAREHOUSE_2, 950, 0, 10000, null, null);
+    public static final Building ROCK_WAREHOUSE_3 = new Building(35, "ROCK_WAREHOUSE_3", 3, "ROCK_WAREHOUSE_3_DESC", ROCK_WAREHOUSE_2, 950, 0, 10000,
+            BuildingSpriteResources.roomTier("rock", 3), BuildingSpriteResources.roomTier("rock", 3));
     static { buildings.add(ROCK_WAREHOUSE_3); }
-    public static final Building RESIN_RESERVOIR_3 = new Building(36, "RESIN_RESERVOIR_3", 3, "RESIN_RESERVOIR_3_DESC", RESIN_RESERVOIR_2, 900, 0, 10000, null, null);
+    public static final Building RESIN_RESERVOIR_3 = new Building(36, "RESIN_RESERVOIR_3", 3, "RESIN_RESERVOIR_3_DESC", RESIN_RESERVOIR_2, 900, 0, 10000,
+            BuildingSpriteResources.roomTier("resin", 3), BuildingSpriteResources.roomTier("resin", 3));
     static { buildings.add(RESIN_RESERVOIR_3); }
     // -- Tier 4 --
     // -- Tier 5 --
-    // -- Tier Misc. --
-    public static final Building PASSIVE_LAB = new Building(101, "PASSIVE_LAB", 0, "PASSIVE_LAB_DESC", ROYAL_CHAMBER_1, 150, 0, 800, null, null);
+    // -- Tier Misc. (passive overlays) --
+    public static final Building PASSIVE_LAB = new Building(101, "PASSIVE_LAB", 0, "PASSIVE_LAB_DESC", ROYAL_CHAMBER_1, 150, 0, 800,
+            BuildingSpriteResources.passiveRoom("lab"), BuildingSpriteResources.passiveRoom("lab"));
     static { buildings.add(PASSIVE_LAB); }
-    public static final Building PASSIVE_WATER = new Building(102, "PASSIVE_WATER", 0, "PASSIVE_WATER_DESC", WATER_RESERVOIR_1, 100, 0, 500, null, null);
+    public static final Building PASSIVE_WATER = new Building(102, "PASSIVE_WATER", 0, "PASSIVE_WATER_DESC", WATER_RESERVOIR_1, 100, 0, 500,
+            BuildingSpriteResources.passiveRoom("water"), BuildingSpriteResources.passiveRoom("water"));
     static { buildings.add(PASSIVE_WATER); }
-    public static final Building PASSIVE_APHID = new Building(103, "PASSIVE_APHID", 0, "PASSIVE_APHID_DESC", SYRUP_RESERVOIR_1, 200, 0, 1000, null, null);
+    public static final Building PASSIVE_APHID = new Building(103, "PASSIVE_APHID", 0, "PASSIVE_APHID_DESC", SYRUP_RESERVOIR_1, 200, 0, 1000,
+            BuildingSpriteResources.passiveRoom("aphid"), BuildingSpriteResources.passiveRoom("aphid"));
     static { buildings.add(PASSIVE_APHID); }
-    public static final Building PASSIVE_NURSE = new Building(104, "PASSIVE_NURSE", 0, "PASSIVE_NURSE_DESC", EGG_CHAMBER_1, 150, 0, 700, null, null);
+    public static final Building PASSIVE_NURSE = new Building(104, "PASSIVE_NURSE", 0, "PASSIVE_NURSE_DESC", EGG_CHAMBER_1, 150, 0, 700,
+            BuildingSpriteResources.passiveRoom("nurse"), BuildingSpriteResources.passiveRoom("nurse"));
     static { buildings.add(PASSIVE_NURSE); }
-    public static final Building PASSIVE_FARM = new Building(105, "PASSIVE_FARM", 0, "PASSIVE_FARM_DESC", MUSHROOM_CHAMBER_1, 200, 0, 900, null, null);
+    public static final Building PASSIVE_FARM = new Building(105, "PASSIVE_FARM", 0, "PASSIVE_FARM_DESC", MUSHROOM_CHAMBER_1, 200, 0, 900,
+            BuildingSpriteResources.passiveRoom("farm"), BuildingSpriteResources.passiveRoom("farm"));
     static { buildings.add(PASSIVE_FARM); }
-    public static final Building PASSIVE_GRAVE = new Building(106, "PASSIVE_GRAVE", 0, "PASSIVE_GRAVE_DESC", MEAT_CHAMBER_1, 150, 0, 600, null, null);
+    public static final Building PASSIVE_GRAVE = new Building(106, "PASSIVE_GRAVE", 0, "PASSIVE_GRAVE_DESC", MEAT_CHAMBER_1, 150, 0, 600,
+            BuildingSpriteResources.passiveRoom("grave"), BuildingSpriteResources.passiveRoom("grave"));
     static { buildings.add(PASSIVE_GRAVE); }
-    public static final Building BUILDING_COMPOSTER = new Building(107, "BUILDING_COMPOSTER", 0, "BUILDING_COMPOSTER_DESC", PASSIVE_GRAVE, 500, 0, 1000, null, null);
+    public static final Building BUILDING_COMPOSTER = new Building(107, "BUILDING_COMPOSTER", 0, "BUILDING_COMPOSTER_DESC", PASSIVE_GRAVE, 500, 0, 1000,
+            BuildingSpriteResources.passiveRoom("composter"), BuildingSpriteResources.passiveRoom("composter"));
     static { buildings.add(BUILDING_COMPOSTER); }
+
+    /** Highest tier first for {@link com.grimidk.formicempire.classes.entities.services.ColonyRoomDecorationService}. */
+    public static final Building[] BUILDING_CHAIN_ROYAL = {
+            ROYAL_CHAMBER_3, ROYAL_CHAMBER_2, ROYAL_CHAMBER_1, ROYAL_CHAMBER_0
+    };
+    public static final Building[] BUILDING_CHAIN_EGG = {
+            EGG_CHAMBER_3, EGG_CHAMBER_2, EGG_CHAMBER_1, EGG_CHAMBER_0
+    };
+    public static final Building[] BUILDING_CHAIN_MUSHROOM = {
+            MUSHROOM_CHAMBER_3, MUSHROOM_CHAMBER_2, MUSHROOM_CHAMBER_1, MUSHROOM_CHAMBER_0
+    };
+    public static final Building[] BUILDING_CHAIN_PLANT = {
+            PLANT_CHAMBER_3, PLANT_CHAMBER_2, PLANT_CHAMBER_1, PLANT_CHAMBER_0
+    };
+    public static final Building[] BUILDING_CHAIN_WATER = {
+            WATER_RESERVOIR_3, WATER_RESERVOIR_2, WATER_RESERVOIR_1, WATER_RESERVOIR_0
+    };
+    public static final Building[] BUILDING_CHAIN_MEAT = {
+            MEAT_CHAMBER_3, MEAT_CHAMBER_2, MEAT_CHAMBER_1, MEAT_CHAMBER_0
+    };
+    public static final Building[] BUILDING_CHAIN_SYRUP = {
+            SYRUP_RESERVOIR_3, SYRUP_RESERVOIR_2, SYRUP_RESERVOIR_1, SYRUP_RESERVOIR_0
+    };
+    public static final Building[] BUILDING_CHAIN_ROCK = {
+            ROCK_WAREHOUSE_3, ROCK_WAREHOUSE_2, ROCK_WAREHOUSE_1, ROCK_WAREHOUSE_0
+    };
+    public static final Building[] BUILDING_CHAIN_RESIN = {
+            RESIN_RESERVOIR_3, RESIN_RESERVOIR_2, RESIN_RESERVOIR_1, RESIN_RESERVOIR_0
+    };
 
     // --- Assimilations ---
     public static final Assimilation ASSIMILATION_LEAFCUTTER = new Assimilation(1, "ASSIMILATION_LEAFCUTTER", "ASSIMILATION_LEAFCUTTER_DESC", ASSIMILATED_FARMING, 5000, null);

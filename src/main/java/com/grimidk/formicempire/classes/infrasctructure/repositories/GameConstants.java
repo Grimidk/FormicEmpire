@@ -45,6 +45,23 @@ public final class GameConstants {
         return icon;
     }
 
+    /** Expected pixel size of room PNGs under {@code sprites/buildings/rooms/}; keep in sync with {@link BuildingSpriteResources#ROOM_ICON_PX}. */
+    public static final int BUILDING_ROOM_ICON_SIZE_PX = BuildingSpriteResources.ROOM_ICON_PX;
+
+    /**
+     * Room / underground decoration sprite for a main building chain (classpath PNGs; see {@link BuildingSpriteResources}).
+     */
+    public static ImageIcon buildingRoomSprite(String chainKey, int level) {
+        return BuildingSpriteResources.roomTier(chainKey, level);
+    }
+
+    /**
+     * Passive colony building overlay (see {@link BuildingSpriteResources#passiveRoom(String)}).
+     */
+    public static ImageIcon passiveBuildingRoomSprite(String passiveKey) {
+        return BuildingSpriteResources.passiveRoom(passiveKey);
+    }
+
     public static ImageIcon getAntSprite(AntType type, Species species) {
         if (type == null) return null;
         
