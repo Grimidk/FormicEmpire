@@ -73,7 +73,7 @@ public class AssetStyles {
     public static final Color BACKGROUND_SECONDARY = COLOR_VERY_LIGHT_GRAY;
     public static final Color BACKGROUND_DARK = COLOR_LIGHTER_GRAY;
     public static final Color BACKGROUND_LIGHT = COLOR_ABSOLUTE_WHITE;
-    
+
     public static final Color FONT_COLOR = COLOR_ABSOLUTE_BLACK;
     public static final Color FONT_COLOR_BRIGHT = COLOR_ABSOLUTE_BLACK;
     public static final Color FONT_COLOR_HEADER = COLOR_ABSOLUTE_BLACK;
@@ -82,7 +82,7 @@ public class AssetStyles {
     public static final Color FONT_COLOR_WARNING = COLOR_ABSOLUTE_BLACK;
     public static final Color FONT_COLOR_HIGHLIGHT = COLOR_ABSOLUTE_BLACK;
     public static final Color FONT_COLOR_VALUE = COLOR_ABSOLUTE_BLACK;
-    
+
     public static final Color BORDER_COLOR = COLOR_ABSOLUTE_BLACK;
     public static final Color PLAYER_COLOR = COLOR_MEDIUM_BLUE;
 
@@ -90,13 +90,13 @@ public class AssetStyles {
     public static final Color UI_BG_SECONDARY = BACKGROUND_SECONDARY;
     public static final Color UI_BG_HEADER = BACKGROUND_SECONDARY;
     public static final Color UI_BORDER_COLOR = BORDER_COLOR;
-    
+
     public static final Color TEXT_NORMAL = COLOR_ABSOLUTE_BLACK;
     public static final Color TEXT_HEADER = COLOR_ABSOLUTE_BLACK;
     public static final Color TEXT_SUCCESS = COLOR_ABSOLUTE_BLACK;
     public static final Color TEXT_ERROR = COLOR_ABSOLUTE_BLACK;
     public static final Color TEXT_WARNING = COLOR_ABSOLUTE_BLACK;
-    
+
     public static final Color PLAYER_FACTION = PLAYER_COLOR;
 
     public static final java.awt.Dimension DEFAULT_DIALOG_SIZE = new java.awt.Dimension(1000, 650);
@@ -106,13 +106,6 @@ public class AssetStyles {
 
     public static final Border PANEL_BORDER = BorderFactory.createLineBorder(UI_BORDER_COLOR, BORDER_THICKNESS_EXTERNAL);
     public static final Border INTERNAL_BORDER = BorderFactory.createLineBorder(UI_BORDER_COLOR, BORDER_THICKNESS_INTERNAL);
-    
-    public static JSeparator createInternalSeparator() {
-        JSeparator sep = new JSeparator(SwingConstants.HORIZONTAL);
-        sep.setForeground(COLOR_ABSOLUTE_BLACK);
-        sep.setBackground(COLOR_ABSOLUTE_BLACK);
-        return sep;
-    }
 
     private static Font customFont;
 
@@ -133,14 +126,21 @@ public class AssetStyles {
     public static final Font FONT_TITLE = customFont.deriveFont(Font.BOLD, 18f);
     public static final Font FONT_SMALL = customFont.deriveFont(10f);
 
+    public static JSeparator createInternalSeparator() {
+        JSeparator sep = new JSeparator(SwingConstants.HORIZONTAL);
+        sep.setForeground(COLOR_ABSOLUTE_BLACK);
+        sep.setBackground(COLOR_ABSOLUTE_BLACK);
+        return sep;
+    }
+
     public static void applyGlobalStyles() {
         UIManager.put("Panel.background", BACKGROUND_COLOR);
         UIManager.put("Panel.foreground", FONT_COLOR);
-        
+
         UIManager.put("Label.background", BACKGROUND_COLOR);
         UIManager.put("Label.foreground", FONT_COLOR);
         UIManager.put("Label.font", FONT_NORMAL);
-        
+
         UIManager.put("Button.background", BACKGROUND_SECONDARY);
         UIManager.put("Button.foreground", COLOR_ABSOLUTE_BLACK);
         UIManager.put("Button.font", FONT_BOLD);
@@ -226,5 +226,40 @@ public class AssetStyles {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static Color colorFromRgb(int r, int g, int b) {
+        return new Color(clampByte(r), clampByte(g), clampByte(b));
+    }
+
+    public static Color colorFromRgba(int r, int g, int b, int a) {
+        return new Color(clampByte(r), clampByte(g), clampByte(b), clampByte(a));
+    }
+
+    public static Color colorFromAveragedRgb(long sumR, long sumG, long sumB, long count) {
+        if (count <= 0) {
+            return BACKGROUND_COLOR;
+        }
+        return colorFromRgb((int) (sumR / count), (int) (sumG / count), (int) (sumB / count));
+    }
+
+    public static Color lightenTowardBackground(Color c, float amount) {
+        Color bg = BACKGROUND_COLOR;
+        int r = Math.min(255, (int) (c.getRed() + (bg.getRed() - c.getRed()) * amount));
+        int g = Math.min(255, (int) (c.getGreen() + (bg.getGreen() - c.getGreen()) * amount));
+        int b = Math.min(255, (int) (c.getBlue() + (bg.getBlue() - c.getBlue()) * amount));
+        return colorFromRgba(r, g, b, c.getAlpha());
+    }
+
+    public static Color fadeTowardBackground(Color c, float factor) {
+        Color bg = BACKGROUND_COLOR;
+        int r = (int) (c.getRed() * (1 - factor) + bg.getRed() * factor);
+        int g = (int) (c.getGreen() * (1 - factor) + bg.getGreen() * factor);
+        int b = (int) (c.getBlue() * (1 - factor) + bg.getBlue() * factor);
+        return colorFromRgb(r, g, b);
+    }
+
+    private static int clampByte(int v) {
+        return Math.max(0, Math.min(255, v));
     }
 }

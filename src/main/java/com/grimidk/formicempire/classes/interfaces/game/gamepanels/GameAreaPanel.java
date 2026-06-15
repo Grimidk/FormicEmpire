@@ -1,11 +1,14 @@
 package com.grimidk.formicempire.classes.interfaces.game.gamepanels;
 
 import com.grimidk.formicempire.classes.constants.ant.AntType;
-import com.grimidk.formicempire.classes.constants.misc.ResourceType;
+import com.grimidk.formicempire.classes.constants.misc.Species;
 import com.grimidk.formicempire.classes.constants.world.Weather;
 import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Bug;
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.ResourceSource;
+import com.grimidk.formicempire.classes.entities.services.ColonyRoomDecorationService;
+import com.grimidk.formicempire.classes.entities.services.ViewportPhysicsLod;
 import com.grimidk.formicempire.classes.infrasctructure.Dimension;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
@@ -17,9 +20,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 
 public class GameAreaPanel extends ZeroGamePanel {
@@ -40,9 +45,16 @@ public class GameAreaPanel extends ZeroGamePanel {
     private Engine engine;
     private Dimension currentDimension = WorldSpaces.OVERWORLD; 
     private String currentBiomeName = "Plains";
+    private Rectangle paintViewportRect;
+    private Rectangle lodViewportRect;
 
     private final int ANCHOR_WIDTH = 550;
     private final int ANCHOR_HEIGHT = 500;
+
+    private static final int OVERWORLD_PAN_OUTSET = 1400;
+
+    private int overworldLayoutOffsetX;
+    private int overworldLayoutOffsetY;
 
     // --- Bounds ---
     public Rectangle entranceBounds;
@@ -54,6 +66,7 @@ public class GameAreaPanel extends ZeroGamePanel {
     public Rectangle graverYardBounds;
     public Rectangle breederRoomBounds;
     public Rectangle transitRoomBounds;
+    public Rectangle insectPenBounds;
 
     public GameAreaPanel() {
         super(null);
@@ -73,33 +86,36 @@ public class GameAreaPanel extends ZeroGamePanel {
     }
 
     private void loadImages() {
-        biomeTextureCache.put("Plains", loadImage("/backgrounds/biomes/PlainsTile.png"));
-        biomeTextureCache.put("Forest", loadImage("/backgrounds/biomes/ForestTile.png"));
-        biomeTextureCache.put("Jungle", loadImage("/backgrounds/biomes/JungleTile.png"));
-        biomeTextureCache.put("Swamp", loadImage("/backgrounds/biomes/SwampTile.png"));
-        biomeTextureCache.put("Tundra", loadImage("/backgrounds/biomes/TundraTile.png"));
-        biomeTextureCache.put("Taiga", loadImage("/backgrounds/biomes/TaigaTile.png"));
-        biomeTextureCache.put("Desert", loadImage("/backgrounds/biomes/DessertTile.png"));
-        biomeTextureCache.put("Urban", loadImage("/backgrounds/biomes/UrbanTile.png"));
-        biomeTextureCache.put("Mountain", loadImage("/backgrounds/biomes/MountainTile.png"));
-        biomeTextureCache.put("Volcanic", loadImage("/backgrounds/biomes/VolcanicTile.png"));
-        biomeTextureCache.put("Lake", loadImage("/backgrounds/biomes/LakeTile.png"));
-        biomeTextureCache.put("Ocean", loadImage("/backgrounds/biomes/OceanTile.png"));
+        // Tile PNGs are stored in git as e.g. PlainsTile.png; some checkouts/JARs end up as plainsTile.png.
+        // loadImage() tries both casings when the class loader is case-sensitive.
+        biomeTextureCache.put("Plains", loadImage("backgrounds/biomes/PlainsTile.png"));
+        biomeTextureCache.put("Forest", loadImage("backgrounds/biomes/ForestTile.png"));
+        biomeTextureCache.put("Jungle", loadImage("backgrounds/biomes/JungleTile.png"));
+        biomeTextureCache.put("Swamp", loadImage("backgrounds/biomes/SwampTile.png"));
+        biomeTextureCache.put("Tundra", loadImage("backgrounds/biomes/TundraTile.png"));
+        biomeTextureCache.put("Taiga", loadImage("backgrounds/biomes/TaigaTile.png"));
+        biomeTextureCache.put("Desert", loadImage("backgrounds/biomes/DessertTile.png"));
+        biomeTextureCache.put("Urban", loadImage("backgrounds/biomes/UrbanTile.png"));
+        biomeTextureCache.put("Mountain", loadImage("backgrounds/biomes/MountainTile.png"));
+        biomeTextureCache.put("Volcanic", loadImage("backgrounds/biomes/VolcanicTile.png"));
+        biomeTextureCache.put("Lake", loadImage("backgrounds/biomes/LakeTile.png"));
+        biomeTextureCache.put("Ocean", loadImage("backgrounds/biomes/OceanTile.png"));
 
-        biomeTextureCache.put("Underground", loadImage("/backgrounds/colony/UndergroundTile.png"));
+        biomeTextureCache.put("Underground", loadImage("backgrounds/colony/UndergroundTile.png"));
 
-        basicRoomImg = loadImage("/sprites/buildings/basicRoom.png");
-        doubleRoomImg = loadImage("/sprites/buildings/doubleRoom.png");
-        firstHallwayImg = loadImage("/sprites/buildings/firstHallway.png");
-        middleHallwayImg = loadImage("/sprites/buildings/middleHallway.png");
-        antHillImg = loadImage("/sprites/buildings/antHill.png");
-        basicYardImg = loadImage("/sprites/buildings/basicYard.png");
+        basicRoomImg = loadImage("sprites/buildings/basicRoom.png");
+        doubleRoomImg = loadImage("sprites/buildings/doubleRoom.png");
+        firstHallwayImg = loadImage("sprites/buildings/firstHallway.png");
+        middleHallwayImg = loadImage("sprites/buildings/middleHallway.png");
+        antHillImg = loadImage("sprites/buildings/antHill.png");
+        basicYardImg = loadImage("sprites/buildings/basicYard.png");
 
-        deadBodyImg = loadImage("/sprites/ants/dead.png");
+        deadBodyImg = loadImage("sprites/ants/dead.png");
     }
 
-    private Image loadImage(String path) {        try {
-            URL imgUrl = getClass().getResource(path);
+    private Image loadImage(String classpathRelativePath) {
+        try {
+            URL imgUrl = resolveResourceUrl(classpathRelativePath);
             if (imgUrl != null) {
                 return new ImageIcon(imgUrl).getImage();
             }
@@ -107,6 +123,47 @@ public class GameAreaPanel extends ZeroGamePanel {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private static URL resolveResourceUrl(String classpathRelativePath) {
+        URL u = tryResourceUrl(classpathRelativePath);
+        if (u != null) {
+            return u;
+        }
+        String alt = alternateFilenameFirstLetterCase(classpathRelativePath);
+        if (alt != null && !alt.equals(classpathRelativePath)) {
+            u = tryResourceUrl(alt);
+        }
+        return u;
+    }
+
+    private static URL tryResourceUrl(String classpathRelativePath) {
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        if (cl != null) {
+            URL u = cl.getResource(classpathRelativePath);
+            if (u != null) {
+                return u;
+            }
+        }
+        return GameAreaPanel.class.getResource("/" + classpathRelativePath);
+    }
+
+    /**
+     * Toggles the case of the first letter of the filename segment so {@code PlainsTile.png} and
+     * {@code plainsTile.png} both resolve when only one exists on the classpath.
+     */
+    private static String alternateFilenameFirstLetterCase(String path) {
+        int sep = path.lastIndexOf('/');
+        int nameStart = sep + 1;
+        if (nameStart >= path.length()) {
+            return null;
+        }
+        char c = path.charAt(nameStart);
+        if (!Character.isLetter(c)) {
+            return null;
+        }
+        char toggled = Character.isUpperCase(c) ? Character.toLowerCase(c) : Character.toUpperCase(c);
+        return path.substring(0, nameStart) + toggled + path.substring(nameStart + 1);
     }
     
     public void setColony(Colony colony) {
@@ -116,13 +173,55 @@ public class GameAreaPanel extends ZeroGamePanel {
     public void setEngine(Engine engine) {
         this.engine = engine;
     }
+
+    public void setPaintViewportRect(Rectangle viewRect) {
+        this.paintViewportRect = viewRect != null ? new Rectangle(viewRect) : null;
+        this.lodViewportRect = computeLodViewportRect();
+    }
+
+    public Rectangle getLodViewportRect() {
+        return lodViewportRect != null ? new Rectangle(lodViewportRect) : null;
+    }
+
+    private Rectangle computeLodViewportRect() {
+        if (paintViewportRect == null) {
+            return null;
+        }
+        if (currentDimension != WorldSpaces.OVERWORLD) {
+            return new Rectangle(paintViewportRect);
+        }
+        int pw = getWidth();
+        int ph = getHeight();
+        if (pw <= 0 || ph <= 0) {
+            return null;
+        }
+        int padX = Math.max(0, (pw - paintViewportRect.width) / 2);
+        int padY = Math.max(0, (ph - paintViewportRect.height) / 2);
+        return new Rectangle(
+                paintViewportRect.x - padX,
+                paintViewportRect.y - padY,
+                paintViewportRect.width,
+                paintViewportRect.height);
+    }
     
     public void resetView() {
         this.currentDimension = WorldSpaces.OVERWORLD;
         this.currentBiomeName = "Plains";
         this.colony = null;
+        this.paintViewportRect = null;
+        this.lodViewportRect = null;
+        this.overworldLayoutOffsetX = 0;
+        this.overworldLayoutOffsetY = 0;
         this.backgroundImage = biomeTextureCache.get("Plains");
         repaint();
+    }
+
+    public int getOverworldLayoutOffsetX() {
+        return overworldLayoutOffsetX;
+    }
+
+    public int getOverworldLayoutOffsetY() {
+        return overworldLayoutOffsetY;
     }
     
     public void toggleDimension() {
@@ -150,8 +249,11 @@ public class GameAreaPanel extends ZeroGamePanel {
     
     public void refreshSize(int viewportWidth, int viewportHeight) {
         if (currentDimension == WorldSpaces.OVERWORLD) {
-            if (getWidth() != viewportWidth || getHeight() != viewportHeight) {
-                setPreferredSize(new java.awt.Dimension(viewportWidth, viewportHeight));
+            int pad = Math.max(OVERWORLD_PAN_OUTSET, Math.max(viewportWidth, viewportHeight) / 2);
+            int vw = viewportWidth + 2 * pad;
+            int vh = viewportHeight + 2 * pad;
+            if (getWidth() != vw || getHeight() != vh) {
+                setPreferredSize(new java.awt.Dimension(vw, vh));
                 revalidate();
             }
         } else {
@@ -199,43 +301,101 @@ public class GameAreaPanel extends ZeroGamePanel {
             }
         }
         
+        int contentPadX = 0;
+        int contentPadY = 0;
+        if (colony != null && currentDimension == WorldSpaces.OVERWORLD && paintViewportRect != null) {
+            int vpw = paintViewportRect.width;
+            int vph = paintViewportRect.height;
+            contentPadX = Math.max(0, (getWidth() - vpw) / 2);
+            contentPadY = Math.max(0, (getHeight() - vph) / 2);
+        }
+        overworldLayoutOffsetX = contentPadX;
+        overworldLayoutOffsetY = contentPadY;
+
         if (colony != null) {
             if (currentDimension == WorldSpaces.UNDERWORLD) {
                 drawUnderworldStructure(g2d);
+                drawAnts(g2d);
+                drawBugs(g2d);
+                drawUnderworldRoomDecorationsOverlay(g2d);
             } else {
+                g2d.translate(contentPadX, contentPadY);
                 drawOverworldStructure(g2d);
+                drawResourceSources(g2d);
+                drawAnts(g2d);
+                drawBugs(g2d);
+                g2d.translate(-contentPadX, -contentPadY);
             }
-            
+
             colony.setRoomBounds(entranceBounds, room1Bounds, room2Bounds, room3Bounds, room4Bounds, rancherYardBounds, graverYardBounds, breederRoomBounds, transitRoomBounds);
+            colony.setInsectPenBounds(insectPenBounds);
         }
-        
-        drawAnts(g2d);
-        drawBugs(g2d);
 
         if (currentDimension == WorldSpaces.OVERWORLD && engine != null && engine.getWorld() != null) {
             drawEnvironmentalOverlays(g2d);
         }
     }
 
+    private void drawResourceSources(Graphics2D g2d) {
+        if (colony == null || colony.getLocationService() == null) {
+            return;
+        }
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        for (ResourceSource src : colony.getLocationService().getDiscoveredSources()) {
+            if (src.getQuantity() <= 0) {
+                continue;
+            }
+            ImageIcon icon = src.getIconForDisplay();
+            if (icon == null) {
+                continue;
+            }
+            int displayPx = src.getDisplaySizePx();
+            int cx = src.getCenterX();
+            int cy = src.getCenterY();
+            int side = Math.max(1, displayPx);
+            int bx = cx - (side + 1) / 2;
+            int by = cy - (side + 1) / 2;
+            if (!ViewportPhysicsLod.antIntersectsViewport(lodViewportRect, bx, by, side, side)) {
+                continue;
+            }
+            AffineTransform oldTx = g2d.getTransform();
+            double deg = resourceSourceRotationDegrees(src);
+            g2d.translate(cx, cy);
+            g2d.rotate(Math.toRadians(deg));
+            g2d.drawImage(icon.getImage(), -displayPx / 2, -displayPx / 2, displayPx, displayPx, this);
+            g2d.setTransform(oldTx);
+        }
+    }
+
+    private static double resourceSourceRotationDegrees(ResourceSource src) {
+        int h = Objects.hash(src.getX(), src.getY(), src.getResourceType());
+        return Math.floorMod(h, 360);
+    }
+
     private void drawEnvironmentalOverlays(Graphics2D g2d) {
-        if (engine == null || !engine.isVisualFiltersEnabled()) return;
-        
+        if (engine == null) return;
+        boolean dayOn = engine.isDaylightColorOverlayEnabled();
+        boolean weatherOn = engine.isWeatherColorOverlayEnabled();
+        if (!dayOn && !weatherOn) return;
+
         World world = engine.getWorld();
         if (world == null) return;
-        
-        if (world.getTimeOfDay() != null && world.getTimeOfDay().getOverlayColor() != null) {
+
+        if (dayOn && world.getTimeOfDay() != null && world.getTimeOfDay().getOverlayColor() != null) {
             g2d.setColor(world.getTimeOfDay().getOverlayColor());
             g2d.fillRect(0, 0, getWidth(), getHeight());
         }
 
-        Weather w = world.getWeather();
-        if (world.getActiveHex() != null && world.getActiveHex().getLocalWeather() != null) {
-            w = world.getActiveHex().getLocalWeather();
-        }
+        if (weatherOn) {
+            Weather w = world.getWeather();
+            if (world.getActiveHex() != null && world.getActiveHex().getLocalWeather() != null) {
+                w = world.getActiveHex().getLocalWeather();
+            }
 
-        if (w != null && w.getOverlayColor() != null) {
-            g2d.setColor(w.getOverlayColor());
-            g2d.fillRect(0, 0, getWidth(), getHeight());
+            if (w != null && w.getOverlayColor() != null) {
+                g2d.setColor(w.getOverlayColor());
+                g2d.fillRect(0, 0, getWidth(), getHeight());
+            }
         }
     }
     
@@ -291,14 +451,33 @@ public class GameAreaPanel extends ZeroGamePanel {
                 int safeY = y + padTop;
                 int safeW = w - padBack - padHall;
                 int safeH = h - padTop - padBottom;
-                
-                drawStaticItemsLocal(g2d, deadBodyImg, safeX, safeY, safeW, safeH, colony.getDeadAnts().size());
+
+                Rectangle deadDrawArea = new Rectangle(safeX, safeY, Math.max(1, safeW), Math.max(1, safeH));
+                boolean drawDeadPile = !ViewportPhysicsLod.isLodActive(lodViewportRect)
+                    || ViewportPhysicsLod.expandViewport(lodViewportRect, ViewportPhysicsLod.MARGIN_PX).intersects(deadDrawArea);
+
+                if (drawDeadPile) {
+                    drawStaticItemsLocal(g2d, deadBodyImg, safeX, safeY, safeW, safeH, colony.getDeadAnts().size());
+                }
             }
 
             g2d.setTransform(old);
             
         } else {
             graverYardBounds = null;
+        }
+
+        // --- Insect Pen ---
+        if (colony.hasUpgrade(GameUnlocks.ROLE_CATCHER) && basicYardImg != null) {
+            int w = basicYardImg.getWidth(this);
+            int h = basicYardImg.getHeight(this);
+            int x = 10;
+            int y = ANCHOR_HEIGHT - h - 10;
+
+            g2d.drawImage(basicYardImg, x, y, this);
+            insectPenBounds = new Rectangle(x, y, w, h);
+        } else {
+            insectPenBounds = null;
         }
     }
     
@@ -329,30 +508,93 @@ public class GameAreaPanel extends ZeroGamePanel {
         }
     }
 
-    private void drawUnderworldStructure(Graphics2D g2d) {
-        if (firstHallwayImg == null || basicRoomImg == null || middleHallwayImg == null || doubleRoomImg == null) return;
+    /**
+     * Shared layout for the first two underworld rows (hall + four basic rooms). Row 3 uses the same
+     * horizontal positions when present.
+     */
+    private record UnderworldRoomLayout(
+            int hallX,
+            int hallY,
+            int hallW,
+            int hallH,
+            int leftRoomX,
+            int rightRoomX,
+            int roomW,
+            int roomH,
+            int roomYRow1,
+            int roomYRow2) {
+    }
 
-        int topMargin = 0; 
-        
-        // --- ROW 1 (Floor 1) ---
+    private UnderworldRoomLayout resolveUnderworldRoomLayout() {
+        if (firstHallwayImg == null || basicRoomImg == null || middleHallwayImg == null || doubleRoomImg == null) {
+            return null;
+        }
+        int topMargin = 0;
         int hallW = firstHallwayImg.getWidth(this);
         int hallH = firstHallwayImg.getHeight(this);
         int centerX = ANCHOR_WIDTH / 2;
         int hallX = centerX - (hallW / 2);
         int hallY = topMargin;
+        int roomW = basicRoomImg.getWidth(this);
+        int roomH = basicRoomImg.getHeight(this);
+        int leftRoomX = hallX - roomW;
+        int rightRoomX = hallX + hallW;
+        int secondRowYOffset = 256;
+        int roomY2 = hallY + secondRowYOffset;
+        return new UnderworldRoomLayout(hallX, hallY, hallW, hallH, leftRoomX, rightRoomX, roomW, roomH, hallY, roomY2);
+    }
+
+    private void drawUnderworldRoomDecorationsOverlay(Graphics2D g2d) {
+        if (colony == null) {
+            return;
+        }
+        UnderworldRoomLayout L = resolveUnderworldRoomLayout();
+        if (L == null) {
+            return;
+        }
+
+        ColonyRoomDecorationService.drawStorageRoomDecorations(g2d, colony, L.leftRoomX, L.roomYRow1, L.roomW, L.roomH, this);
+
+        AffineTransform old = g2d.getTransform();
+        double rotateCenterX = L.rightRoomX + (L.roomW / 2.0);
+        double rotateCenterY = L.roomYRow1 + (L.roomH / 2.0);
+        g2d.rotate(Math.toRadians(180), rotateCenterX, rotateCenterY);
+        ColonyRoomDecorationService.drawFarmRoomDecorations(g2d, colony, L.rightRoomX, L.roomYRow1, L.roomW, L.roomH, this, true);
+        g2d.setTransform(old);
+
+        ColonyRoomDecorationService.drawNurseryRoomDecorations(g2d, colony, L.leftRoomX, L.roomYRow2, L.roomW, L.roomH, this);
+
+        AffineTransform old2 = g2d.getTransform();
+        double rotateCenter2X = L.rightRoomX + (L.roomW / 2.0);
+        double rotateCenter2Y = L.roomYRow2 + (L.roomH / 2.0);
+        g2d.rotate(Math.toRadians(180), rotateCenter2X, rotateCenter2Y);
+        ColonyRoomDecorationService.drawRoyalRoomDecorations(g2d, colony, L.rightRoomX, L.roomYRow2, L.roomW, L.roomH, this, true);
+        g2d.setTransform(old2);
+    }
+
+    private void drawUnderworldStructure(Graphics2D g2d) {
+        if (firstHallwayImg == null || basicRoomImg == null || middleHallwayImg == null || doubleRoomImg == null) return;
+
+        UnderworldRoomLayout L = resolveUnderworldRoomLayout();
+        if (L == null) {
+            return;
+        }
+
+        int hallX = L.hallX;
+        int hallY = L.hallY;
+        int hallW = L.hallW;
+        int hallH = L.hallH;
+        int roomW = L.roomW;
+        int roomH = L.roomH;
+        int leftRoomX = L.leftRoomX;
+        int rightRoomX = L.rightRoomX;
+        int roomY = L.roomYRow1;
         
         g2d.drawImage(firstHallwayImg, hallX, hallY, this);
         entranceBounds = new Rectangle(hallX, hallY, hallW, hallH);
         
-        int roomW = basicRoomImg.getWidth(this);
-        int roomH = basicRoomImg.getHeight(this);
-        int roomY = hallY;
-        
-        int leftRoomX = hallX - roomW;
         g2d.drawImage(basicRoomImg, leftRoomX, roomY, this);
         room1Bounds = new Rectangle(leftRoomX, roomY, roomW, roomH);
-        
-        int rightRoomX = hallX + hallW;
         
         AffineTransform old = g2d.getTransform();
         
@@ -366,8 +608,7 @@ public class GameAreaPanel extends ZeroGamePanel {
         g2d.setTransform(old);
 
         // --- ROW 2 (Floor 2) ---
-        int secondRowYOffset = 256; 
-        int roomY2 = hallY + secondRowYOffset;
+        int roomY2 = L.roomYRow2;
 
         g2d.drawImage(basicRoomImg, leftRoomX, roomY2, this);
         room3Bounds = new Rectangle(leftRoomX, roomY2, roomW, roomH);
@@ -436,55 +677,70 @@ public class GameAreaPanel extends ZeroGamePanel {
             Image sprite = spriteIcon.getImage();
             int w = spriteIcon.getIconWidth();
             int h = spriteIcon.getIconHeight();
+            
+            List<Species> assimilatedSpecies = new ArrayList<>();
+            if (type == GameConstants.TYPE_DRONE && colony.getDynasty() != null) {
+                for (Species s : GameConstants.getSpecies()) {
+                    if (s == colony.getSpecies()) continue;
+                    if (s.getAssimilation() != null && colony.getDynasty().isAssimilationCompleted(s.getAssimilation())) {
+                        assimilatedSpecies.add(s);
+                    }
+                }
+            }
 
             List<Ant> ants = colony.getAntsByType(type);
             for (Ant ant : ants) {
                 if (ant.getDimension() != currentDimension) continue;
+
+                if (!ViewportPhysicsLod.antIntersectsViewport(lodViewportRect, ant.getX(), ant.getY(), w, h)) {
+                    continue;
+                }
+                
+                Image currentSprite = sprite;
+                if (!assimilatedSpecies.isEmpty()) {
+                    int seed = System.identityHashCode(ant);
+                    if (Math.abs(seed) % 10 < 3) {
+                        int index = (Math.abs(seed) / 10) % assimilatedSpecies.size();
+                        Species as = assimilatedSpecies.get(index);
+                        ImageIcon asIcon = GameConstants.getAntSprite(type, as);
+                        if (asIcon != null) {
+                            currentSprite = asIcon.getImage();
+                        }
+                    }
+                }
                 
                 AffineTransform oldTransform = g2d.getTransform();
                 double centerX = ant.getX() + (w / 2.0);
                 double centerY = ant.getY() + (h / 2.0);
                 g2d.translate(centerX, centerY);       
                 g2d.rotate(Math.toRadians(ant.getR()));
-                g2d.drawImage(sprite, -w / 2, -h / 2, this);
-                
-                ResourceType carried = ant.getCarrying();
-                if (carried != null && carried.getIcon() != null) {
-                    g2d.rotate(Math.toRadians(-ant.getR())); 
-                    Image resourceIcon = carried.getIcon().getImage();
-                    
-                    if (resourceIcon != null) {
-                        int iconW = 20; 
-                        int iconH = 20;
-                        
-                        g2d.drawImage(resourceIcon, -iconW/2, -h/2 - iconH, iconW, iconH, this);
-                        
-                        ResourceType carriedSec = ant.getCarryingSec();
-                        if (carriedSec != null && carriedSec.getIcon() != null) {
-                            Image secIcon = carriedSec.getIcon().getImage();
-                            if (secIcon != null) {
-                                g2d.drawImage(secIcon, -iconW/2 + 10, -h/2 - iconH + 5, iconW, iconH, this);
-                            }
-                        }
-                    }
-                } 
-                
-                if (ant.getCarryingAnt() != null) {
-                    if (ant.getCarrying() == null) {
-                        g2d.rotate(Math.toRadians(-ant.getR())); 
-                    }
-                    
-                    ImageIcon carriedSprite = GameConstants.getAntSprite(ant.getCarryingAnt(), colony.getSpecies());
-                    if (carriedSprite != null) {
-                        Image cSprite = carriedSprite.getImage();
-                        int cW = (int)(w * 0.7);
-                        int cH = (int)(h * 0.7);
-                        g2d.drawImage(cSprite, -cW/2, -h/2 - cH + 5, cW, cH, this);
-                    }
+                g2d.drawImage(currentSprite, -w / 2, -h / 2, this);
+                if (ant.isParasiticMiteInfected()) {
+                    drawParasiticMiteOverlay(g2d);
                 }
-                
+
                 g2d.setTransform(oldTransform);
             }
+        }
+    }
+
+    private void drawParasiticMiteOverlay(Graphics2D g2d) {
+        ImageIcon miteIcon = GameConstants.TYPE_PARASITIC_MITE.getSprite();
+        if (miteIcon == null) {
+            miteIcon = GameConstants.ICON_PARASITIC_MITE;
+        }
+        if (miteIcon == null) {
+            return;
+        }
+        Image mite = miteIcon.getImage();
+        int miteW = miteIcon.getIconWidth();
+        int miteH = miteIcon.getIconHeight();
+        int halfW = miteW / 2;
+        int halfH = miteH / 2;
+        int[][] offsets = {{-8, -10}, {8, -8}, {-10, 4}, {10, 6}, {0, 10}};
+        int count = Math.min(GameConstants.PARASITIC_MITES_ON_ANT_SPRITE, offsets.length);
+        for (int i = 0; i < count; i++) {
+            g2d.drawImage(mite, offsets[i][0] - halfW, offsets[i][1] - halfH, this);
         }
     }
 
@@ -496,13 +752,17 @@ public class GameAreaPanel extends ZeroGamePanel {
         
         for (Bug bug : colony.getBugs()) {
             if (bug.getDimension() != currentDimension) continue;
-            
+
             ImageIcon spriteIcon = bug.getBugType().getSprite();
             if (spriteIcon == null) continue;
             
             Image sprite = spriteIcon.getImage();
             int w = spriteIcon.getIconWidth();
             int h = spriteIcon.getIconHeight();
+
+            if (!ViewportPhysicsLod.antIntersectsViewport(lodViewportRect, bug.getX(), bug.getY(), w, h)) {
+                continue;
+            }
             
             AffineTransform oldTransform = g2d.getTransform();
             

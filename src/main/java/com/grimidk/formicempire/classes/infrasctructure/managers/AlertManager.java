@@ -4,7 +4,9 @@ import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 import com.grimidk.formicempire.classes.interfaces.game.gamepanels.AlertPanel;
 import com.grimidk.formicempire.classes.interfaces.game.gamepanels.AlertPanel.Alert;
 
@@ -26,6 +28,17 @@ public class AlertManager {
         this.panel = panel;
     }
 
+    private static String stripPrefix(String msg, String prefix) {
+        if (!msg.startsWith(prefix)) {
+            return msg;
+        }
+        String rest = msg.substring(prefix.length());
+        if (rest.startsWith(" ")) {
+            return rest.substring(1);
+        }
+        return rest;
+    }
+
     public void checkStatus() {
         Iterator<Alert> it = activeAlerts.iterator();
         while (it.hasNext()) {
@@ -36,27 +49,39 @@ public class AlertManager {
 
         List<String> events = colony.consumeEvents();
         for (String msg : events) {
-            if (msg.startsWith("CRITICAL")) {
-                String shortMsg = msg.replace("CRITICAL: ", "").replace(" new Queens joined", " Queens In");
-                addAlert("CRIT", shortMsg, AssetStyles.FONT_COLOR_ERROR, durationDefault); 
+            if (msg.startsWith(ColonyLogPrefixes.DEATH)) {
+                addAlert("DEATH", stripPrefix(msg, ColonyLogPrefixes.DEATH), AssetStyles.FONT_COLOR_ERROR, durationDefault); 
             } 
-            else if (msg.startsWith("DEATH:")) {
-                String cleanMsg = msg.replace("DEATH: ", "");
-                addAlert("DEATH", cleanMsg, AssetStyles.FONT_COLOR_ERROR, durationDefault);
+            else if (msg.startsWith(ColonyLogPrefixes.WARNING)) {
+                addAlert("WARN", stripPrefix(msg, ColonyLogPrefixes.WARNING), AssetStyles.FONT_COLOR_WARNING, durationDefault);
+            } 
+            else if (msg.startsWith(ColonyLogPrefixes.SUCCESS)) {
+                String body = stripPrefix(msg, ColonyLogPrefixes.SUCCESS);
+                addAlert("SUCC", LanguageStrings.get(LanguageStrings.ALERT_BUILT_PREFIX) + body, AssetStyles.FONT_COLOR_SUCCESS, durationDefault);
+            } 
+            else if (msg.startsWith(ColonyLogPrefixes.COMPOST)) {
+                addAlert("COMP", stripPrefix(msg, ColonyLogPrefixes.COMPOST), AssetStyles.FONT_COLOR_HIGHLIGHT, durationDefault);
+            } 
+            else if (msg.startsWith(ColonyLogPrefixes.NUPTIAL)) {
+                addAlert("NUPTIAL", stripPrefix(msg, ColonyLogPrefixes.NUPTIAL), AssetStyles.FONT_COLOR_HEADER, durationDefault);
             }
-            else if (msg.startsWith("WARNING")) {
-                String shortWarn = msg.replace("WARNING: ", "").replace(" Juveniles Died (Nursing)", " Juveniles Lost");
-                addAlert("WARN", shortWarn, AssetStyles.FONT_COLOR_WARNING, durationDefault);
-            } 
-            else if (msg.startsWith("SUCCESS")) {
-                addAlert("SUCC", msg.replace("SUCCESS: ", "Built: "), AssetStyles.FONT_COLOR_SUCCESS, durationDefault);
-            } 
-            else if (msg.startsWith("COMPOST")) {
-                String display = msg.replace("COMPOST: Recycled ", "Recycled ").replace(" bodies into mushroom matter.", " Bodies");
-                addAlert("COMP", display, AssetStyles.FONT_COLOR_HIGHLIGHT, durationDefault);
-            } 
-            else if (msg.contains("Nuptial Flight")) {
-                addAlert("NUPTIAL", "Nuptial Flight Occurred", AssetStyles.FONT_COLOR_HEADER, durationDefault);
+            else if (msg.startsWith(ColonyLogPrefixes.TRADE)) {
+                addAlert("TRADE", stripPrefix(msg, ColonyLogPrefixes.TRADE), AssetStyles.FONT_COLOR, durationDefault);
+            }
+            else if (msg.startsWith(ColonyLogPrefixes.DYNASTY)) {
+                addAlert("DYN", stripPrefix(msg, ColonyLogPrefixes.DYNASTY), AssetStyles.FONT_COLOR, durationDefault);
+            }
+            else if (msg.startsWith(ColonyLogPrefixes.FAILURE)) {
+                addAlert("FAIL", stripPrefix(msg, ColonyLogPrefixes.FAILURE), AssetStyles.FONT_COLOR_ERROR, durationDefault);
+            }
+            else if (msg.startsWith(ColonyLogPrefixes.AUTOMATION)) {
+                addAlert("AUTO", stripPrefix(msg, ColonyLogPrefixes.AUTOMATION), AssetStyles.FONT_COLOR, durationDefault);
+            }
+            else if (msg.startsWith(ColonyLogPrefixes.PROMOTION)) {
+                addAlert("PROMO", stripPrefix(msg, ColonyLogPrefixes.PROMOTION), AssetStyles.FONT_COLOR_HIGHLIGHT, durationDefault);
+            }
+            else if (msg.startsWith(ColonyLogPrefixes.INFO)) {
+                addAlert("INFO", stripPrefix(msg, ColonyLogPrefixes.INFO), AssetStyles.FONT_COLOR, durationDefault);
             }
             else {
                 addAlert("INFO", msg, AssetStyles.FONT_COLOR, durationDefault);
@@ -80,7 +105,7 @@ public class AlertManager {
         int production = colony.getTotalProduction();
         int consumption = colony.getTotalConsumption();
         if (consumption > production && colony.getMushrooms() < consumption * 24) {
-            addAlert("STARVE", "Starvation Risk!", AssetStyles.FONT_COLOR_ERROR, durationDefault);
+            addAlert("STARVE", LanguageStrings.get(LanguageStrings.ALERT_STARVATION_RISK), AssetStyles.FONT_COLOR_ERROR, durationDefault);
         }
     }
 
@@ -90,7 +115,7 @@ public class AlertManager {
             if (!colony.hasUpgrade(u) && u.getCost() > 0 && 
                (u.getRequirement() == null || colony.hasUpgrade(u.getRequirement())) && 
                colony.getResearchPoints() >= u.getCost()) {
-                addAlert("RESEARCH", "New Research Available", AssetStyles.FONT_COLOR_HIGHLIGHT, durationDefault);
+                addAlert("RESEARCH", LanguageStrings.get(LanguageStrings.ALERT_NEW_RESEARCH), AssetStyles.FONT_COLOR_HIGHLIGHT, durationDefault);
                 return; 
             }
         }
@@ -103,7 +128,7 @@ public class AlertManager {
         for (Building b : GameUnlocks.getBuildings()) {
             if (!colony.hasBuilding(b) && colony.getMinerals() >= b.getMineralCost() && 
                 colony.getResins() >= b.getResinCost() && colony.hasBuilding(b.getRequirement())) {
-                addAlert("BUILD", "Can Build: " + b.getName(), AssetStyles.FONT_COLOR_VALUE, durationDefault);
+                addAlert("BUILD", String.format(LanguageStrings.get(LanguageStrings.ALERT_CAN_BUILD_FMT), b.getName()), AssetStyles.FONT_COLOR_VALUE, durationDefault);
                 return; 
             }
         }
@@ -112,7 +137,7 @@ public class AlertManager {
     private void checkBodyPile() {
         int deadCount = colony.getDeadAnts().size();
         if (deadCount >= 500) {
-            addAlert("DEAD", "Body Pile High: " + deadCount, AssetStyles.FONT_COLOR_ERROR, durationDefault);
+            addAlert("DEAD", String.format(LanguageStrings.get(LanguageStrings.ALERT_BODY_PILE_FMT), deadCount), AssetStyles.FONT_COLOR_ERROR, durationDefault);
         }
     }
 }

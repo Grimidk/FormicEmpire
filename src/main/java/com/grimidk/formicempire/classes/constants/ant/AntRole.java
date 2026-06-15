@@ -20,4 +20,9 @@ public class AntRole extends Constant {
     public AntType getAntType() {
         return antType;
     }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
 }

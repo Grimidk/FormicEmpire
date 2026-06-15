@@ -1,0 +1,67 @@
+package com.grimidk.formicempire.classes.infrasctructure;
+
+import com.grimidk.formicempire.classes.constants.ant.AntRole;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class EngineDefaultRolesTest {
+
+    @Test
+    void sanitizeAcceptsRoleMatchingType() {
+        int safe = Engine.sanitizeDefaultRoleId(
+                GameConstants.TYPE_WORKER,
+                GameConstants.ROLE_NURSE.getId(),
+                GameConstants.ROLE_FORAGER.getId());
+        assertEquals(GameConstants.ROLE_NURSE.getId(), safe);
+    }
+
+    @Test
+    void sanitizeRejectsWrongTypeAndUsesFallback() {
+        int safe = Engine.sanitizeDefaultRoleId(
+                GameConstants.TYPE_WORKER,
+                GameConstants.ROLE_HUNTER.getId(),
+                GameConstants.ROLE_FORAGER.getId());
+        assertEquals(GameConstants.ROLE_FORAGER.getId(), safe);
+    }
+
+    @Test
+    void sanitizeRejectsUnknownId() {
+        int safe = Engine.sanitizeDefaultRoleId(
+                GameConstants.TYPE_SOLDIER,
+                -1,
+                GameConstants.ROLE_HUNTER.getId());
+        assertEquals(GameConstants.ROLE_HUNTER.getId(), safe);
+    }
+
+    @Test
+    void resolveUsesLegacyWhenEngineNull() {
+        AntRole r = Engine.resolveDefaultRoleForAntType(GameConstants.TYPE_WORKER, null);
+        assertEquals(GameConstants.ROLE_FORAGER, r);
+    }
+
+    @Test
+    void resolveUsesEngineWhenValid() {
+        Engine engine = new Engine();
+        engine.setDefaultRoleWorker(GameConstants.ROLE_NURSE.getId());
+        AntRole r = Engine.resolveDefaultRoleForAntType(GameConstants.TYPE_WORKER, engine);
+        assertEquals(GameConstants.ROLE_NURSE, r);
+    }
+
+    @Test
+    void resolveFallsBackWhenEngineStoresInvalidRoleForType() {
+        Engine engine = new Engine();
+        engine.setDefaultRoleWorker(GameConstants.ROLE_HUNTER.getId());
+        AntRole r = Engine.resolveDefaultRoleForAntType(GameConstants.TYPE_WORKER, engine);
+        assertEquals(GameConstants.ROLE_FORAGER, r);
+    }
+
+    @Test
+    void defaultRoleIdForAntTypeMatchesResolve() {
+        Engine engine = new Engine();
+        engine.setDefaultRoleMajor(GameConstants.ROLE_CARRIER.getId());
+        int id = Engine.defaultRoleIdForAntType(GameConstants.TYPE_MAJOR, engine);
+        assertEquals(GameConstants.ROLE_CARRIER.getId(), id);
+    }
+}

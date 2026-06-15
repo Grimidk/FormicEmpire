@@ -77,4 +77,18 @@ public class ColonyResourceService {
         if (type == GameConstants.RESOURCE_RESIN) return colony.getResinsPrecise() < stats.getResinsCapacity(colony);
         return false;
     }
+
+    public long getStoredResourceTotal(Colony colony) {
+        if (colony == null) {
+            return 0;
+        }
+        return (long) Math.floor(
+                colony.getMushroomsPrecise()
+                        + colony.getPlantsPrecise()
+                        + colony.getProteinPrecise()
+                        + colony.getWaterPrecise()
+                        + colony.getSyrupsPrecise()
+                        + colony.getResinsPrecise()
+                        + colony.getMineralsPrecise());
+    }
 }

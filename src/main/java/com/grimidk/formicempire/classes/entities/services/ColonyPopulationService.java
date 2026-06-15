@@ -2,7 +2,11 @@ package com.grimidk.formicempire.classes.entities.services;
 
 import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.infrasctructure.Engine;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.ColonyLogPrefixes;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.ColonyLogTexts;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
@@ -72,19 +76,9 @@ public class ColonyPopulationService {
     }
 
     // --- Role Management ---
-    private AntRole getDefaultRoleForType(AntType type) {
-        if (type == GameConstants.TYPE_WORKER) return GameConstants.ROLE_FORAGER;
-        else if (type == GameConstants.TYPE_SOLDIER) return GameConstants.ROLE_HUNTER;
-        else if (type == GameConstants.TYPE_MAJOR) return GameConstants.ROLE_BRUTE; 
-        else if (type == GameConstants.TYPE_PRINCESS) return GameConstants.ROLE_BREEDER;
-        else if (type == GameConstants.TYPE_DRONE) return GameConstants.ROLE_DRONE;
-        else if (type == GameConstants.TYPE_QUEEN) return GameConstants.ROLE_LAYER;
-        return null; 
-    }
-
-    private void assignRolesForType(Colony colony, List<Ant> ants, AntType type) {
-        AntRole defaultRole = getDefaultRoleForType(type);
-        if (defaultRole == null) return; 
+    private void assignRolesForType(Colony colony, List<Ant> ants, AntType type, Engine engine) {
+        AntRole defaultRole = Engine.resolveDefaultRoleForAntType(type, engine);
+        if (defaultRole == null) return;
         
         List<Ant> tradeAnts = new ArrayList<>();
         List<Ant> availableAnts = new ArrayList<>();
@@ -127,12 +121,12 @@ public class ColonyPopulationService {
         }
     }
 
-    public void runRoleAssignment(Colony colony) {
-        assignRolesForType(colony, colony.getWorkers(), GameConstants.TYPE_WORKER);
-        assignRolesForType(colony, colony.getSoldiers(), GameConstants.TYPE_SOLDIER);
-        assignRolesForType(colony, colony.getMajors(), GameConstants.TYPE_MAJOR);
-        assignRolesForType(colony, colony.getPrincesses(), GameConstants.TYPE_PRINCESS);
-        assignRolesForType(colony, colony.getQueens(), GameConstants.TYPE_QUEEN);
+    public void runRoleAssignment(Colony colony, Engine engine) {
+        assignRolesForType(colony, colony.getWorkers(), GameConstants.TYPE_WORKER, engine);
+        assignRolesForType(colony, colony.getSoldiers(), GameConstants.TYPE_SOLDIER, engine);
+        assignRolesForType(colony, colony.getMajors(), GameConstants.TYPE_MAJOR, engine);
+        assignRolesForType(colony, colony.getPrincesses(), GameConstants.TYPE_PRINCESS, engine);
+        assignRolesForType(colony, colony.getQueens(), GameConstants.TYPE_QUEEN, engine);
     }
 
     // --- Hatching & Lifecycle ---
@@ -246,7 +240,8 @@ public class ColonyPopulationService {
         }
         
         if (agedDeaths > 0) {
-            colony.logEvent("DEATH: " + agedDeaths + " Ants died of Old Age");
+            colony.logEvent(ColonyLogPrefixes.DEATH + " "
+                + String.format(LanguageStrings.get(LanguageStrings.LOG_DEATH_OLD_AGE_FMT), agedDeaths));
         }
     }
     
@@ -351,7 +346,9 @@ public class ColonyPopulationService {
             }
         }
         if (count > 0) {
-            colony.logEvent("DEATH: " + count + " Ants died of " + cause);
+            colony.logEvent(ColonyLogPrefixes.DEATH + " "
+                + String.format(LanguageStrings.get(LanguageStrings.LOG_DEATH_COUNT_CAUSE_FMT),
+                    count, ColonyLogTexts.localizedDeathCause(cause)));
         }
     }
     
@@ -397,7 +394,14 @@ public class ColonyPopulationService {
 
         processDeaths(colony, victims, "Contamination");
         if (killed > 0) {
-            colony.logEvent("Contamination Level: " + contaminationLevel);
+            String levelLabel = switch (contaminationLevel) {
+                case "Small" -> LanguageStrings.get(LanguageStrings.LOG_CONTAM_LEVEL_SMALL);
+                case "Medium" -> LanguageStrings.get(LanguageStrings.LOG_CONTAM_LEVEL_MEDIUM);
+                case "Massive" -> LanguageStrings.get(LanguageStrings.LOG_CONTAM_LEVEL_MASSIVE);
+                default -> contaminationLevel;
+            };
+            colony.logEvent(ColonyLogPrefixes.INFO + " "
+                + String.format(LanguageStrings.get(LanguageStrings.LOG_CONTAMINATION_LEVEL_FMT), levelLabel));
         }
     }
 
@@ -414,7 +418,8 @@ public class ColonyPopulationService {
         if (spawnAmount <= 0) return;
         
         colony.setParasites(colony.getParasites() + spawnAmount);
-        colony.logEvent("A parasitic infestation has spread! " + spawnAmount + " new parasites detected.");
+        colony.logEvent(ColonyLogPrefixes.INFO + " "
+            + String.format(LanguageStrings.get(LanguageStrings.LOG_PARASITE_SPREAD_FMT), spawnAmount));
     }
 
     public void rankUp(Colony colony) {

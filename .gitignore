@@ -23,6 +23,7 @@ logs/
 dependency-reduced-pom.xml
 .DS_Store
 GEMINI.md
+AGENTS.md
 
 # Package
 FormicEmpire_Release/

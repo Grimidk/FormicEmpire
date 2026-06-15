@@ -106,7 +106,7 @@ public class Savefile implements Serializable {
         public int eggs, pupae, larvae, workers, soldiers, majors, drones, princesses, queens;        
         public int plants, mushrooms, protein, water, syrups, resins, minerals;        
         public float hatchRateWorker, hatchRateSoldier, hatchRateMajor, hatchRateDrone, hatchRatePrincess;
-        public int aphids, parasites;
+        public int aphids, soilMites, dermestids, parasites, parasiticMites;
         public int totalDeaths;
         public Map<String, Integer> assignedRoleCounts = new HashMap<>();
         public Map<String, Integer> localDeathStatistics = new HashMap<>();
@@ -139,6 +139,8 @@ public class Savefile implements Serializable {
         public boolean hasColony;
         public int timeOffset;
         public int weatherId;
+        /** Non-water overworld sources spawned on this hex (drives depletion). */
+        public int nonWaterResourceSourcesGenerated;
 
         public SavedHex(int q, int r, int biomeId, boolean hasColony, int timeOffset, int weatherId) {
             this.q = q;

@@ -1,14 +1,18 @@
 package com.grimidk.formicempire.classes.infrasctructure;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Semaphore;
 
+import com.grimidk.formicempire.classes.constants.ant.AntRole;
+import com.grimidk.formicempire.classes.constants.ant.AntType;
+import com.grimidk.formicempire.classes.constants.misc.GameSpeed;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
-import com.grimidk.formicempire.classes.constants.misc.GameSpeed;
 
 public class Engine extends Thread {
     private World world;
@@ -35,7 +39,8 @@ public class Engine extends Thread {
     private boolean fullScreen = false;
     private int autosaveFrequency = 1; // 1 = every month
     
-    private boolean visualFiltersEnabled = true;
+    private boolean daylightColorOverlayEnabled = true;
+    private boolean weatherColorOverlayEnabled = true;
     private boolean arachnophobiaMode = false;
     
     private int masterVolume = 80;
@@ -45,6 +50,13 @@ public class Engine extends Thread {
     private boolean pauseOnFocusLoss = true;
     private boolean confirmOnQuit = true;
     private boolean showTooltips = true;
+    
+    private boolean fuzzParasites = true;
+    private int defaultRoleWorker = 1; // ROLE_FORAGER
+    private int defaultRoleSoldier = 16; // ROLE_HUNTER
+    private int defaultRoleMajor = 17; // ROLE_BRUTE
+    private int defaultRolePrincess = 23; // ROLE_BREEDER
+    private int defaultRoleQueen = 25; // ROLE_LAYER
 
     public Engine() {
         this.semaphore = new Semaphore(1);
@@ -306,12 +318,20 @@ public class Engine extends Thread {
         this.autosaveFrequency = (autosaveFrequency >= 0) ? autosaveFrequency : 1;
     }
 
-    public boolean isVisualFiltersEnabled() {
-        return visualFiltersEnabled;
+    public boolean isDaylightColorOverlayEnabled() {
+        return daylightColorOverlayEnabled;
     }
 
-    public void setVisualFiltersEnabled(boolean visualFiltersEnabled) {
-        this.visualFiltersEnabled = visualFiltersEnabled;
+    public void setDaylightColorOverlayEnabled(boolean daylightColorOverlayEnabled) {
+        this.daylightColorOverlayEnabled = daylightColorOverlayEnabled;
+    }
+
+    public boolean isWeatherColorOverlayEnabled() {
+        return weatherColorOverlayEnabled;
+    }
+
+    public void setWeatherColorOverlayEnabled(boolean weatherColorOverlayEnabled) {
+        this.weatherColorOverlayEnabled = weatherColorOverlayEnabled;
     }
 
     public boolean isArachnophobiaMode() {
@@ -368,5 +388,122 @@ public class Engine extends Thread {
 
     public void setShowTooltips(boolean showTooltips) {
         this.showTooltips = showTooltips;
+    }
+
+    public boolean isFuzzParasites() {
+        return fuzzParasites;
+    }
+
+    public void setFuzzParasites(boolean fuzzParasites) {
+        this.fuzzParasites = fuzzParasites;
+    }
+
+    public int getDefaultRoleWorker() {
+        return defaultRoleWorker;
+    }
+
+    public void setDefaultRoleWorker(int defaultRoleWorker) {
+        this.defaultRoleWorker = defaultRoleWorker;
+    }
+
+    public int getDefaultRoleSoldier() {
+        return defaultRoleSoldier;
+    }
+
+    public void setDefaultRoleSoldier(int defaultRoleSoldier) {
+        this.defaultRoleSoldier = defaultRoleSoldier;
+    }
+
+    public int getDefaultRoleMajor() {
+        return defaultRoleMajor;
+    }
+
+    public void setDefaultRoleMajor(int defaultRoleMajor) {
+        this.defaultRoleMajor = defaultRoleMajor;
+    }
+
+    public int getDefaultRolePrincess() {
+        return defaultRolePrincess;
+    }
+
+    public void setDefaultRolePrincess(int defaultRolePrincess) {
+        this.defaultRolePrincess = defaultRolePrincess;
+    }
+
+    public int getDefaultRoleQueen() {
+        return defaultRoleQueen;
+    }
+
+    public void setDefaultRoleQueen(int defaultRoleQueen) {
+        this.defaultRoleQueen = defaultRoleQueen;
+    }
+
+    public static List<AntRole> antRolesForAntType(AntType type) {
+        List<AntRole> out = new ArrayList<>();
+        for (AntRole r : GameConstants.getAntRoles()) {
+            if (r.getAntType() == type) {
+                out.add(r);
+            }
+        }
+        return out;
+    }
+
+    public static AntRole resolveDefaultRoleForAntType(AntType type, Engine engine) {
+        if (engine != null) {
+            int roleId;
+            if (type == GameConstants.TYPE_WORKER) {
+                roleId = engine.getDefaultRoleWorker();
+            } else if (type == GameConstants.TYPE_SOLDIER) {
+                roleId = engine.getDefaultRoleSoldier();
+            } else if (type == GameConstants.TYPE_MAJOR) {
+                roleId = engine.getDefaultRoleMajor();
+            } else if (type == GameConstants.TYPE_PRINCESS) {
+                roleId = engine.getDefaultRolePrincess();
+            } else if (type == GameConstants.TYPE_QUEEN) {
+                roleId = engine.getDefaultRoleQueen();
+            } else {
+                return legacyDefaultRoleForAntType(type);
+            }
+            AntRole chosen = GameConstants.getAntRoleById(roleId);
+            if (chosen != null && chosen.getAntType() == type) {
+                return chosen;
+            }
+        }
+        return legacyDefaultRoleForAntType(type);
+    }
+
+    private static AntRole legacyDefaultRoleForAntType(AntType type) {
+        if (type == GameConstants.TYPE_WORKER) {
+            return GameConstants.ROLE_FORAGER;
+        }
+        if (type == GameConstants.TYPE_SOLDIER) {
+            return GameConstants.ROLE_HUNTER;
+        }
+        if (type == GameConstants.TYPE_MAJOR) {
+            return GameConstants.ROLE_BRUTE;
+        }
+        if (type == GameConstants.TYPE_PRINCESS) {
+            return GameConstants.ROLE_BREEDER;
+        }
+        if (type == GameConstants.TYPE_DRONE) {
+            return GameConstants.ROLE_DRONE;
+        }
+        if (type == GameConstants.TYPE_QUEEN) {
+            return GameConstants.ROLE_LAYER;
+        }
+        return null;
+    }
+
+    public static int sanitizeDefaultRoleId(AntType type, int desiredRoleId, int fallbackRoleId) {
+        AntRole r = GameConstants.getAntRoleById(desiredRoleId);
+        if (r != null && r.getAntType() == type) {
+            return desiredRoleId;
+        }
+        return fallbackRoleId;
+    }
+
+    public static int defaultRoleIdForAntType(AntType type, Engine engine) {
+        AntRole r = resolveDefaultRoleForAntType(type, engine);
+        return r != null ? r.getId() : -1;
     }
 }

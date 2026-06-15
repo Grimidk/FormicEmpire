@@ -459,7 +459,9 @@ public class SaveManager {
                 boolean hasColony = (h.getColony() != null);
                 int biomeId = (h.getBiome() != null) ? h.getBiome().getId() : 1;
                 int weatherId = (h.getLocalWeather() != null) ? h.getLocalWeather().getId() : 1;
-                hexList.add(new Savefile.SavedHex(h.getQ(), h.getR(), biomeId, hasColony, h.getTimeOffset(), weatherId));
+                Savefile.SavedHex sh = new Savefile.SavedHex(h.getQ(), h.getR(), biomeId, hasColony, h.getTimeOffset(), weatherId);
+                sh.nonWaterResourceSourcesGenerated = h.getNonWaterResourceSourcesGenerated();
+                hexList.add(sh);
                 
                 if (hasColony) {
                     Colony c = h.getColony();
@@ -510,7 +512,10 @@ public class SaveManager {
                     
                     // Stats
                     sc.aphids = c.getAphids();
+                    sc.soilMites = c.getSoilMites();
+                    sc.dermestids = c.getDermestids();
                     sc.parasites = c.getParasites();
+                    sc.parasiticMites = c.getParasiticMites();
                     sc.totalDeaths = c.getTotalDeaths();
                     
                     // Maps/Lists
@@ -694,7 +699,10 @@ public class SaveManager {
         writeJsonLine(w, "hatchRatePrincess", sc.hatchRatePrincess, false);
         
         writeJsonLine(w, "aphids", sc.aphids, false);
+        writeJsonLine(w, "soilMites", sc.soilMites, false);
+        writeJsonLine(w, "dermestids", sc.dermestids, false);
         writeJsonLine(w, "parasites", sc.parasites, false);
+        writeJsonLine(w, "parasiticMites", sc.parasiticMites, false);
         writeJsonLine(w, "totalDeaths", sc.totalDeaths, false);
 
         // Serialized Lists within Colony
@@ -933,7 +941,10 @@ public class SaveManager {
         sc.hatchRatePrincess = Float.parseFloat(map.getOrDefault("hatchRatePrincess", "0.0"));
         
         sc.aphids = Integer.parseInt(map.getOrDefault("aphids", "0"));
+        sc.soilMites = Integer.parseInt(map.getOrDefault("soilMites", map.getOrDefault("bullMites", "0")));
+        sc.dermestids = Integer.parseInt(map.getOrDefault("dermestids", "0"));
         sc.parasites = Integer.parseInt(map.getOrDefault("parasites", "0"));
+        sc.parasiticMites = Integer.parseInt(map.getOrDefault("parasiticMites", "0"));
         sc.totalDeaths = Integer.parseInt(map.getOrDefault("totalDeaths", "0"));
         
         // Nested structures
@@ -1033,7 +1044,8 @@ public class SaveManager {
             sb.append("\"b\":").append(h.biomeId).append(",");
             sb.append("\"c\":").append(h.hasColony).append(",");
             sb.append("\"t\":").append(h.timeOffset).append(","); 
-            sb.append("\"w\":").append(h.weatherId); 
+            sb.append("\"w\":").append(h.weatherId).append(",");
+            sb.append("\"nw\":").append(h.nonWaterResourceSourcesGenerated);
             sb.append("}");
             if (i < hexes.size() - 1) {
                 sb.append(",");
@@ -1242,7 +1254,8 @@ public class SaveManager {
             int b = 0;
             boolean c = false;
             int t = 0; 
-            int w = 1; 
+            int w = 1;
+            int nw = 0;
             
             try {
                 String clean = objStr.replace("{", "").replace("}", "");
@@ -1259,9 +1272,12 @@ public class SaveManager {
                         else if (k.equals("c")) c = Boolean.parseBoolean(v);
                         else if (k.equals("t")) t = Integer.parseInt(v);
                         else if (k.equals("w")) w = Integer.parseInt(v);
+                        else if (k.equals("nw")) nw = Integer.parseInt(v);
                     }
                 }
-                list.add(new Savefile.SavedHex(q, r, b, c, t, w));
+                Savefile.SavedHex saved = new Savefile.SavedHex(q, r, b, c, t, w);
+                saved.nonWaterResourceSourcesGenerated = nw;
+                list.add(saved);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -1405,14 +1421,21 @@ public class SaveManager {
             writeJsonLine(w, "screenSize", engine.getScreenSize(), false);
             writeJsonLine(w, "fullScreen", engine.isFullScreen(), false);
             writeJsonLine(w, "autosaveFrequency", engine.getAutosaveFrequency(), false);
-            writeJsonLine(w, "visualFiltersEnabled", engine.isVisualFiltersEnabled(), false);
+            writeJsonLine(w, "daylightColorOverlayEnabled", engine.isDaylightColorOverlayEnabled(), false);
+            writeJsonLine(w, "weatherColorOverlayEnabled", engine.isWeatherColorOverlayEnabled(), false);
             writeJsonLine(w, "arachnophobiaMode", engine.isArachnophobiaMode(), false);
             writeJsonLine(w, "masterVolume", engine.getMasterVolume(), false);
             writeJsonLine(w, "musicVolume", engine.getMusicVolume(), false);
             writeJsonLine(w, "sfxVolume", engine.getSfxVolume(), false);
             writeJsonLine(w, "pauseOnFocusLoss", engine.isPauseOnFocusLoss(), false);
             writeJsonLine(w, "confirmOnQuit", engine.isConfirmOnQuit(), false);
-            writeJsonLine(w, "showTooltips", engine.isShowTooltips(), true);
+            writeJsonLine(w, "showTooltips", engine.isShowTooltips(), false);
+            writeJsonLine(w, "fuzzParasites", engine.isFuzzParasites(), false);
+            writeJsonLine(w, "defaultRoleWorker", engine.getDefaultRoleWorker(), false);
+            writeJsonLine(w, "defaultRoleSoldier", engine.getDefaultRoleSoldier(), false);
+            writeJsonLine(w, "defaultRoleMajor", engine.getDefaultRoleMajor(), false);
+            writeJsonLine(w, "defaultRolePrincess", engine.getDefaultRolePrincess(), false);
+            writeJsonLine(w, "defaultRoleQueen", engine.getDefaultRoleQueen(), true);
             w.write("}");
             w.newLine();
             w.flush();
@@ -1480,17 +1503,32 @@ public class SaveManager {
             engine.setScreenSize(m.getOrDefault("screenSize", engine.getScreenSize()));
             engine.setFullScreen(Boolean.parseBoolean(m.getOrDefault("fullScreen", String.valueOf(engine.isFullScreen()))));
             engine.setAutosaveFrequency(Integer.parseInt(m.getOrDefault("autosaveFrequency", String.valueOf(engine.getAutosaveFrequency()))));
-            
-            engine.setVisualFiltersEnabled(Boolean.parseBoolean(m.getOrDefault("visualFiltersEnabled", String.valueOf(engine.isVisualFiltersEnabled()))));
+            boolean legacyVisualFilters = m.containsKey("visualFiltersEnabled")
+                    && Boolean.parseBoolean(m.get("visualFiltersEnabled"));
+            if (m.containsKey("daylightColorOverlayEnabled")) {
+                engine.setDaylightColorOverlayEnabled(Boolean.parseBoolean(m.get("daylightColorOverlayEnabled")));
+            } else if (m.containsKey("visualFiltersEnabled")) {
+                engine.setDaylightColorOverlayEnabled(legacyVisualFilters);
+            }
+            if (m.containsKey("weatherColorOverlayEnabled")) {
+                engine.setWeatherColorOverlayEnabled(Boolean.parseBoolean(m.get("weatherColorOverlayEnabled")));
+            } else if (m.containsKey("visualFiltersEnabled")) {
+                engine.setWeatherColorOverlayEnabled(legacyVisualFilters);
+            }
             engine.setArachnophobiaMode(Boolean.parseBoolean(m.getOrDefault("arachnophobiaMode", String.valueOf(engine.isArachnophobiaMode()))));
             engine.setMasterVolume(Integer.parseInt(m.getOrDefault("masterVolume", String.valueOf(engine.getMasterVolume()))));
             engine.setMusicVolume(Integer.parseInt(m.getOrDefault("musicVolume", String.valueOf(engine.getMusicVolume()))));
             engine.setSfxVolume(Integer.parseInt(m.getOrDefault("sfxVolume", String.valueOf(engine.getSfxVolume()))));
-            
             engine.setPauseOnFocusLoss(Boolean.parseBoolean(m.getOrDefault("pauseOnFocusLoss", String.valueOf(engine.isPauseOnFocusLoss()))));
             engine.setConfirmOnQuit(Boolean.parseBoolean(m.getOrDefault("confirmOnQuit", String.valueOf(engine.isConfirmOnQuit()))));
             engine.setShowTooltips(Boolean.parseBoolean(m.getOrDefault("showTooltips", String.valueOf(engine.isShowTooltips()))));
-            
+            engine.setFuzzParasites(Boolean.parseBoolean(m.getOrDefault("fuzzParasites", String.valueOf(engine.isFuzzParasites()))));
+            engine.setDefaultRoleWorker(Integer.parseInt(m.getOrDefault("defaultRoleWorker", String.valueOf(engine.getDefaultRoleWorker()))));
+            engine.setDefaultRoleSoldier(Integer.parseInt(m.getOrDefault("defaultRoleSoldier", String.valueOf(engine.getDefaultRoleSoldier()))));
+            engine.setDefaultRoleMajor(Integer.parseInt(m.getOrDefault("defaultRoleMajor", String.valueOf(engine.getDefaultRoleMajor()))));
+            engine.setDefaultRolePrincess(Integer.parseInt(m.getOrDefault("defaultRolePrincess", String.valueOf(engine.getDefaultRolePrincess()))));
+            engine.setDefaultRoleQueen(Integer.parseInt(m.getOrDefault("defaultRoleQueen", String.valueOf(engine.getDefaultRoleQueen()))));
+
             System.out.println("[SaveManager] Global settings loaded.");
         } catch (Exception e) {
             e.printStackTrace();

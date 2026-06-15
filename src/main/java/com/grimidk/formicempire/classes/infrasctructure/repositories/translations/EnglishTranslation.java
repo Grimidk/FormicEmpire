@@ -115,7 +115,8 @@ public class EnglishTranslation implements Translation {
         en.put("COLONY_LAYING_RATE", "Laying Rate: %d/day");
         en.put("COLONY_NURSE_COVERAGE", "Nurse Coverage: %d/%d");
         en.put("COLONY_GRAVE_CLEANING", "Grave Cleaning: %d/%d");
-        en.put("COLONY_APHIDS", "Aphids: %d/%d");
+        en.put("COLONY_PET_INSECTS", "Pet insects: %d/%d");
+        en.put("COLONY_PARASITIC_MITES", "Parasitic mites: %d (%d slowed ants)");
         en.put("COLONY_PARASITES", "Parasites: %s");
         en.put("COLONY_POLICING", "Policing: %d");
         en.put("COLONY_DETECTION_RATE", "Detection rate: ~%d/day");
@@ -124,7 +125,8 @@ public class EnglishTranslation implements Translation {
         en.put("COLONY_JUVENILE_ANTS", "Juvenile Ants: %d");
         en.put("COLONY_ADULT_ANTS", "Adult Ants: %d");
         
-        en.put("TOOLTIP_APHIDS", "Aphids");
+        en.put("TOOLTIP_PET_INSECTS", "Pet insects kept by ranchers and catchers. See the Insects tab in colony statistics (X) for a breakdown by species.");
+        en.put("TOOLTIP_PARASITIC_MITES", "Microscopic mites on your ants. Every 10 mites slow one ant to half speed. Spread monthly when stored resources are high.");
         en.put("TOOLTIP_PARASITES", "Parasites in Colony");
         en.put("TOOLTIP_POLICING", "Policing Efficiency");
         en.put("TOOLTIP_RESEARCH_POINTS", "Research Points");
@@ -182,6 +184,7 @@ public class EnglishTranslation implements Translation {
         en.put("STATS_TAB_POPULATION", "Population");
         en.put("STATS_TAB_LOCAL_HEX", "Local Hex");
         en.put("STATS_TAB_RATES", "Rates & Jobs");
+        en.put("STATS_TAB_INSECTS", "Insects");
         en.put("STATS_TAB_UNIT_STATS", "Unit Stats");
         en.put("STATS_TAB_MORTALITY", "Mortality");
         en.put("COL_CATEGORY", "Category");
@@ -208,6 +211,7 @@ public class EnglishTranslation implements Translation {
         en.put("COL_DESCRIPTION", "Description");
         en.put("COL_CAUSE", "Cause");
         en.put("COL_TOTAL", "Total");
+        en.put("COL_CARETAKERS", "Caretakers");
         en.put("STAT_STATUS_NO_HEX", "No Active Hex");
         en.put("STAT_COORDS", "Coordinates (Q, R)");
         en.put("STAT_LOCAL_WEATHER", "Local Weather");
@@ -302,7 +306,7 @@ public class EnglishTranslation implements Translation {
         en.put("DYNASTY_ACTIONS", "Actions");
         en.put("DYNASTY_TRANSIT_FORMAT", "%s (%dh)%s");
         en.put("DYNASTY_BUILD_TUNNEL", "Build Tunnel");
-        en.put("DYNASTY_TUNNEL_Sponsoring", "This colony is already sponsoring a tunnel project.");
+        en.put("DYNASTY_TUNNEL_SPONSORING", "This colony is already sponsoring a tunnel project.");
         en.put("DYNASTY_BUILT", "Built");
         en.put("DYNASTY_PROGRESS_PERCENT", "%.0f%%");
         en.put("DYNASTY_ERROR_NO_ENGINEERS", "No Engineers or Borers assigned to progress construction!");
@@ -380,18 +384,22 @@ public class EnglishTranslation implements Translation {
         en.put("SETTINGS_EVERY_6_MONTHS", "Every 6 Months");
         en.put("SETTINGS_EVERY_YEAR", "Every Year (12 Months)");
         en.put("SETTINGS_SAVE_APPLY", "Save & Apply");
+        en.put("SETTINGS_RESET_TAB", "Reset this tab to defaults");
         en.put("SETTINGS_SAVED_MSG", "Settings saved and applied.");
         
         en.put("SETTINGS_TAB_GENERAL", "General");
         en.put("SETTINGS_TAB_VIDEO", "Video");
         en.put("SETTINGS_TAB_AUDIO", "Audio");
+        en.put("SETTINGS_TAB_ROLES", "Roles");
         
-        en.put("SETTINGS_VISUAL_FILTERS", "Visual Filters:");
+        en.put("SETTINGS_DAYLIGHT_COLOR_OVERLAY", "Daylight color overlay:");
+        en.put("SETTINGS_WEATHER_COLOR_OVERLAY", "Weather color overlay:");
         en.put("SETTINGS_ARACHNOPHOBIA", "Arachnophobia Mode:");
-        en.put("SETTINGS_PAUSE_FOCUS", "Pause on Focus Loss:");
-        en.put("SETTINGS_CONFIRM_QUIT", "Confirm on Quit:");
-        en.put("SETTINGS_SHOW_TOOLTIPS", "Show UI Tooltips:");
-        
+        en.put("SETTINGS_PAUSE_FOCUS", "Pause on focus loss");
+        en.put("SETTINGS_CONFIRM_QUIT", "Confirm on quit");
+        en.put("SETTINGS_SHOW_TOOLTIPS", "Show tooltips");
+        en.put("SETTINGS_FUZZ_PARASITES", "Fuzz parasite numbers");
+
         en.put("SETTINGS_MASTER_VOL", "Master Volume:");
         en.put("SETTINGS_MUSIC_VOL", "Music Volume:");
         en.put("SETTINGS_SFX_VOL", "Sound Effects:");
@@ -486,14 +494,19 @@ public class EnglishTranslation implements Translation {
 
         en.put("BUG_ANT", "Ant");
         en.put("BUG_APHID", "Aphid");
+        en.put("BUG_SOIL_MITE", "Soil mite");
+        en.put("BUG_DERMESTID", "Dermestid beetle");
         en.put("BUG_PARASITE", "Ant Parasite");
+        en.put("BUG_ANT_SCIENTIFIC", "Formica");
+        en.put("BUG_APHID_SCIENTIFIC", "Aphididae");
+        en.put("BUG_SOIL_MITE_SCIENTIFIC", "Stratiolaelaps scimitus");
+        en.put("BUG_DERMESTID_SCIENTIFIC", "Dermestidae");
+        en.put("BUG_PARASITIC_MITE", "Parasitic mite");
+        en.put("BUG_PARASITIC_MITE_SCIENTIFIC", "Acaridae");
+        en.put("BUG_PARASITE_SCIENTIFIC", "Anergates");
 
-        en.put("TYPE_EGG", "Egg");
         en.put("TYPE_LARVA", "Larva");
         en.put("TYPE_PUPA", "Pupa");
-        en.put("TYPE_WORKER", "Worker");
-        en.put("TYPE_SOLDIER", "Soldier");
-        en.put("TYPE_MAJOR", "Major");
         en.put("TYPE_DRONE", "Drone");
         en.put("TYPE_PRINCESS", "Princess");
         en.put("TYPE_QUEEN", "Queen");
@@ -565,7 +578,6 @@ public class EnglishTranslation implements Translation {
 
         en.put("EVENT_ECLIPSE_NUPTIAL", "The Eclipse has triggered a spontaneous Nuptial Flight!");
 
-        // -- GameUnlocks Keys --
         en.put("TYPE_EGG", "Egg, Larva and Pupa Type");
         en.put("TYPE_EGG_FLAVOR", "Brand New Ants");
         en.put("TYPE_EGG_DESC", "Unlocks the juvenile ant types, allowing new ants to be born. Each stage takes 4 days to grow out of.");
@@ -604,7 +616,7 @@ public class EnglishTranslation implements Translation {
         en.put("ROLE_LAYER_DESC", "Allows queens to lay new eggs. 1 ant can lay 1 egg per hour.");
         en.put("ROLE_RANCHER_UPGRADE", "Rancher Role");
         en.put("ROLE_RANCHER_FLAVOR", "Aphid Rancher");
-        en.put("ROLE_RANCHER_DESC", "Allows workers to ranch aphids. 1 ant can handle 10 aphids and herd 1 additional aphid per day. Each aphid produces 1 hoenydew (syrup).");
+        en.put("ROLE_RANCHER_DESC", "Allows workers to tend aphids in the ranch pen. Each rancher supports up to 10 aphids. Each aphid produces 1 honeydew (syrup) per hour when fed plants. Catchers find wild aphids except in dry biomes.");
         en.put("ROLE_RESEARCHER_UPGRADE", "Research Role");
         en.put("ROLE_RESEARCHER_FLAVOR", "Ant Science");
         en.put("ROLE_RESEARCHER_DESC", "Allows queens to generate research points. 1 ant research 1 point per hour.");
@@ -658,7 +670,7 @@ public class EnglishTranslation implements Translation {
         en.put("ROLE_MILITIA_DESC", "Allows workers to perform basic defensive duties.");
         en.put("ROLE_CATCHER_UPGRADE", "Catcher Role");
         en.put("ROLE_CATCHER_FLAVOR", "Bug Catching");
-        en.put("ROLE_CATCHER_DESC", "Allows soldiers to capture enemy bugs.");
+        en.put("ROLE_CATCHER_DESC", "Allows soldiers to catch native insects on the overworld. Each catcher maintains up to 10 pet insects total. Ranchers tend aphids, gravers tend dermestids. Pairs breed daily when you have at least two.");
         en.put("ROLE_CRANE_UPGRADE", "Construction Crane Role");
         en.put("ROLE_CRANE_FLAVOR", "Heavy Duty");
         en.put("ROLE_CRANE_DESC", "Allows majors to help in the construction of buildings, each one is 25 times as strong.");
@@ -697,7 +709,6 @@ public class EnglishTranslation implements Translation {
         en.put("ABILITY_ASSIMILATION_FLAVOR", "Genetic Assimilation");
         en.put("ABILITY_ASSIMILATION_DESC", "Allows the use of assimilations to change the genetic code of your species and gain new abilities from other species.");
         en.put("ABILITY_FORCED_FLIGHT_FLAVOR", "Royal Decree");
-        en.put("ABILITY_FORCED_FLIGHT_DESC", "Allows you to force a nuptial flight by spending research points.");
         en.put("ABILITY_DYNASTY_FLAVOR", "Ant Society");
         en.put("ABILITY_DYNASTY_DESC", "Allows the dynasty management screen to see all the colonies in your dynasty.");
         en.put("ABILITY_TRADE_FLAVOR", "Ant Trade");
@@ -713,7 +724,10 @@ public class EnglishTranslation implements Translation {
         en.put("ABILITY_MANAGEMENT_FLAVOR", "Decentralized Command");
         en.put("ABILITY_MANAGEMENT_DESC", "Allows you to let colonies to build by themselves without your direct input.");
         en.put("ABILITY_MASS_FLIGHT_FLAVOR", "Imperial Decree");
-        en.put("ABILITY_MASS_FLIGHT_DESC", "Triggers nuptial flights in all colonies capable of doing so. Costs 10x standard forced flight cost.");
+        en.put("ABILITY_CLONING_FLAVOR", "Genetic Echo");
+        en.put("ABILITY_CLONING_DESC", "Each completed genetic assimilation raises dynasty genetic integrity. Minimum genetic integrity scales with assimilations completed.");
+        en.put("ABILITY_PARASITIC_MITE_ALERT_FLAVOR", "Parasitic Mites");
+        en.put("ABILITY_PARASITIC_MITE_ALERT_DESC", "Warns when parasitic mites infest the colony. Every 10 mites slow one ant to half speed.");
         en.put("ABILITY_ABILITY_FLAVOR", "Abilities Unlocked");
         en.put("ABILITY_ABILITY_DESC", "Allows you to see the abilities menu and use active abilities.");
 
@@ -769,6 +783,10 @@ public class EnglishTranslation implements Translation {
         en.put("STAT_CONTAMINATION_2_DESC", "Reduces contamination death rate by 40%.");
         en.put("STAT_CONTAMINATION_3_FLAVOR", "Isolation Protocols");
         en.put("STAT_CONTAMINATION_3_DESC", "Reduces contamination death rate by 60%.");
+        en.put("STAT_SOIL_MITE_1_FLAVOR", "Mite Training");
+        en.put("STAT_SOIL_MITE_1_DESC", "Increases each soil mite's parasitic mite elimination to 12 per day.");
+        en.put("STAT_DERMESTID_1_FLAVOR", "Grave Beetles");
+        en.put("STAT_DERMESTID_1_DESC", "Allows each dermestid in the graveyard to count as 1 graver for burial duty.");
         en.put("STAT_GRAVING_1_FLAVOR", "Shallow Graves");
         en.put("STAT_GRAVING_1_DESC", "Increases graving rate by 5 per day.");
         en.put("STAT_GRAVING_2_FLAVOR", "Mass Graves");
@@ -781,6 +799,19 @@ public class EnglishTranslation implements Translation {
         en.put("STAT_POLICING_2_DESC", "Increases policing rate to 35% per day.");
         en.put("STAT_POLICING_3_FLAVOR", "Surveillance Drones");
         en.put("STAT_POLICING_3_DESC", "Increases policing rate to 55% per day.");
+        en.put("STAT_HEX_SUSTAIN_FLAVOR", "Environmental Sustainability");
+        en.put("STAT_HEX_SUSTAIN_DESC", "Caps effective hex resource depletion at 80% for overworld spawn distance (raw accumulation can still rise).");
+        en.put("STAT_WORKER_SPEED_2_FLAVOR", "Forced March");
+        en.put("STAT_WORKER_SPEED_2_DESC", "Doubles overworld movement speed for worker ants and doubles their contribution to gathering full-efficiency radius.");
+
+        en.put("STAT_CAT_OVERWORLD", "Hex");
+        en.put("STAT_HEX_DEPLETION", "Depletion");
+        en.put("STAT_HEX_SOURCES_FOUND", "Sources found");
+        en.put("STAT_HEX_MAX_EFFICIENCY_DISTANCE", "Max efficiency distance");
+        en.put("STAT_LOCAL_HEX_NOTE_CAT", "Note");
+        en.put("STAT_LOCAL_HEX_DYNASTY_HINT", "In dynasty mode, this tab describes the colony you opened statistics from, not every colony at once.");
+        en.put("UNIT_STAT_WORKER_MARCH", "Worker march");
+        en.put("UNIT_STAT_WORKER_MARCH_DESC", "Worker ants move at double speed on the surface (Forced March).");
 
         en.put("ASSIMILATED_FARMING_FLAVOR", "Ancestral Farming Techniques");
         en.put("ASSIMILATED_FARMING_DESC", "Your dynasty has learned how to farm fungi more efficiently. By getting 1 extra mushroom matter per plant and protein.");
@@ -885,13 +916,13 @@ public class EnglishTranslation implements Translation {
         en.put("ASSIMILATION_MARAUDER", "Marauder Assimilation");
         en.put("ASSIMILATION_MARAUDER_DESC", "After assimilating the marauder ant genome: ");
 
-        // -- HelpPanel Keys --
         en.put("HELP_TAB_WELCOME", "Welcome");
         en.put("HELP_TAB_STARTED", "Getting Started");
         en.put("HELP_TAB_DYNASTY", "Dynasty");
         en.put("HELP_TAB_HOTKEYS", "Hotkeys");
         en.put("HELP_TAB_SPECIES", "Species");
         en.put("HELP_TAB_TYPES", "Ant Types");
+        en.put("HELP_TAB_BUGS", "Other insects");
         en.put("HELP_TAB_ROLES", "Roles");
         en.put("HELP_TAB_UPGRADES", "Upgrades");
         en.put("HELP_TAB_BUILDINGS", "Buildings");
@@ -900,10 +931,16 @@ public class EnglishTranslation implements Translation {
 
         en.put("HELP_WELCOME_STORY", "Nearly all other ants are extinct. You are an ant queen and have within you all the genetic knowledge of every ant species. You must unlock it and take over the world as the dominant species. <br><br>Build up your colony and begin to spread while fighting other ant colonies, you will need to adapt to new environments by absorbing and researching their abilities.");
         en.put("HELP_START_INFO", "<b>Basic Survival:</b><br>Your ants need <b>Fungi</b> (Mushrooms) to eat and <b>Water</b> to drink every day. Without them, your colony will starve or die of dehydration.<br>- <b>Foragers</b> gather Plants and Water.<br>- <b>Hunters</b> gather Protein (Meat).<br>- <b>Farmers</b> convert Plants and Protein into Fungi.<br>- <b>Nurses</b> care for your brood. Neglected brood will perish.<br><br><b>Watching Your Colony:</b><br>Press <b>A</b> to toggle your view between the <b>Underworld</b> (inside the nest) and the <b>Overworld</b> (outside gathering).<br><br><b>Colony Management:</b><br>Use <b>Hatch Rates (P)</b> to control ant births. <b>Researchers</b> generate Research Points (RP) for upgrades in the <b>Research Menu (Y)</b>. <b>Builders</b> use Minerals and Resin to construct facilities via the <b>Build Menu (U)</b>.<br><br><b>Advanced Threats:</b><br>- <b>Contamination:</b> Dead ants must be cleared by <b>Gravers</b>.<br>- <b>Parasites:</b> Secretly drain food. Assign <b>Police</b> to eliminate them.<br>- <b>Depletion:</b> Resource nodes dry up; assign <b>Scouts</b> to find new ones.");
+        en.put("HELP_OVERWORLD_GATHERING", "<b>Overworld (surface) gathering:</b><br><b>Scouts</b> discover new resource nodes. Each map hex tracks <b>depletion</b> from non-water finds; higher depletion tends to place new nodes farther from the nest (some upgrades cap how bad this gets).<br><br><b>Distance:</b> Gathered amounts use straight-line distance from the <b>nest entrance</b>. Inside a <b>full efficiency</b> radius (larger for faster workers and certain upgrades), yields are full; beyond that, yield falls toward a small minimum.<br><br><b>Statistics (Local hex):</b> <b>Depletion</b> is the effective percentage used for spawns; <b>Sources found</b> counts nodes this colony has discovered; <b>Max efficiency distance</b> estimates the full-yield radius for a typical worker.");
         en.put("HELP_DYNASTY_INFO", "<b>Expanding Your Dynasty:</b><br>Once you unlock <b>Breeders</b>, perform Nuptial Flights to spread via the <b>World Map (I)</b>.<br><i>Tip: Eclipses trigger spontaneous, free Nuptial Flights!</i><br><br><b>Logistics & Trade:</b><br>Founding multiple colonies unlocks <b>Trade Routes</b>. Assign <b>Couriers</b> to transport resources.<br>- <b>Land:</b> Standard trade method.<br>- <b>Tunnel:</b> Secure and fast, requires <b>Tunnels</b> and <b>Borers</b>.<br>- <b>Air:</b> Fast but low capacity, requires <b>Sky Transports</b> (Princesses).<br>- <b>Bilateral:</b> Allows two-way resource transport.<br><br><b>Dynasty Milestones:</b><br>- <b>Dynasty Menu (S):</b> View and manage all colonies.<br>- <b>Mass Colonization:</b> Removes satellite colony limits.<br>- <b>Automation:</b> Allows NPC colonies to manage themselves.<br><br><b>Evolution:</b><br>Unlock <b>Synergies</b> to combine upgrades and <b>Assimilations</b> to absorb other ant species' traits.");
         
         en.put("HELP_SPECIES_SCIENTIFIC", "Scientific Name:");
         en.put("HELP_SPECIES_TRAITS", "Base Traits:");
+
+        en.put("HELP_RESOURCE_SOURCE_SMALL", "Small");
+        en.put("HELP_RESOURCE_SOURCE_MEDIUM", "Medium");
+        en.put("HELP_RESOURCE_SOURCE_BIG", "Big");
+        en.put("HELP_RESOURCE_SOURCE_HUGE", "Huge");
 
         en.put("HOTKEY_PAUSE", "Pause / Resume Game");
         en.put("HOTKEY_SPEED", "Increase / Decrease Game Speed");
@@ -926,6 +963,13 @@ public class EnglishTranslation implements Translation {
         en.put("HELP_TYPE_PRINCESS_DESC", "A winged reproductive. Can be assigned to the Breeder role to mate with a Drone and become a new Queen.");
         en.put("HELP_TYPE_DRONE_DESC", "A winged male reproductive. Its only purpose is to mate with a Princess, after which it dies.");
         en.put("HELP_TYPE_QUEEN_DESC", "The heart of the colony. Can be assigned to Lay Eggs or Research new technologies.");
+
+        en.put("HELP_BUG_ANT_DESC", "Wild or rival ants that appear on the overworld. They can fight your ants and compete for space.");
+        en.put("HELP_BUG_APHID_DESC", "Soft-bodied insects that feed on plants. Native to most biomes except dry ones. Ranchers tend penned aphids (up to 10 per rancher) for syrup income. Pets without a dedicated yard use the insect pen.");
+        en.put("HELP_BUG_SOIL_MITE_DESC", "Small predatory mites used as biological control. Native to all biomes. Kept in the insect pen. Each soil mite eliminates up to 5 parasitic mites per day (12 with Mite Training). Pairs breed daily once you have at least two.");
+        en.put("HELP_BUG_DERMESTID_DESC", "Carrion beetles that clean dead tissue. Native to most biomes except cold ones. Gravers tend up to 10 each in the graveyard (or insect pen if no yard). With Grave Beetles research, each dermestid counts as one graver. Pairs breed daily once you have at least two.");
+        en.put("HELP_BUG_PARASITE_DESC", "Pests that hide in the nest and secretly drain your food. Assign Police to find and eliminate them before they spread.");
+        en.put("HELP_BUG_PARASITIC_MITE_DESC", "Tiny mites that infest adult ants when the colony hoards resources. Counts are in the thousands. Each 10 mites slow one ant to half speed. They spread monthly; soil mites are the main counter. Police do not affect them.");
 
         en.put("HELP_BIOMES_TITLE", "Biomes");
         en.put("HELP_BIOME_TEMP", "Temp: ");
@@ -957,6 +1001,115 @@ public class EnglishTranslation implements Translation {
 
         en.put("HELP_SKIP_TUTORIAL", "Skip Tutorial");
         en.put("HELP_FINISH", "Finish");
+
+        en.put("ALERT_STARVATION_RISK", "Starvation Risk!");
+        en.put("ALERT_NEW_RESEARCH", "New Research Available");
+        en.put("ALERT_CAN_BUILD_FMT", "Can Build: %s");
+        en.put("ALERT_BODY_PILE_FMT", "Body Pile High: %d");
+        en.put("ALERT_NUPTIAL_FLIGHT", "Nuptial Flight Occurred");
+        en.put("ALERT_BUILT_PREFIX", "Built: ");
+        en.put("ALERT_COMPOST_RECYCLED_PREFIX", "Recycled ");
+        en.put("ALERT_COMPOST_BODIES_SUFFIX", " Bodies");
+
+        en.put("ASSIMILATION_DIALOG_SUCCESS_TITLE", "Assimilation Success");
+        en.put("ASSIMILATION_DIALOG_SUCCESS_BODY", "Genetic Assimilation Complete!\n\n%s finished.\nUnlocked: %s");
+
+        en.put("UI_DIALOG_LOADING_TITLE", "Loading");
+        en.put("SAVE_DEFAULT_NAME_FMT", "Save %d");
+
+        en.put("STAT_NEIGHBOR_NORTH", "North");
+        en.put("STAT_NEIGHBOR_NORTH_WEST", "North-West");
+        en.put("STAT_NEIGHBOR_NORTH_EAST", "North-East");
+        en.put("STAT_NEIGHBOR_SOUTH", "South");
+        en.put("STAT_NEIGHBOR_SOUTH_WEST", "South-West");
+        en.put("STAT_NEIGHBOR_SOUTH_EAST", "South-East");
+        en.put("STAT_TABLE_SEPARATOR", "------");
+        en.put("STAT_HEX_COLONY_FMT", " (Colony: %s)");
+        en.put("STAT_LABEL_ID", "ID");
+        en.put("STAT_LABEL_ERROR", "Error");
+        en.put("STAT_LABEL_PROGRESS", "Progress");
+        en.put("STAT_GLOBAL_RESOURCE_FMT", "Global %s");
+        en.put("STAT_DEFEATED_UNKNOWN_FMT", "ID:%d");
+        en.put("STAT_JOB_FARMING", "Farming");
+        en.put("STAT_JOB_FARMERS_EFF_FMT", "%d Eff. Farmers");
+        en.put("STAT_RATE_CONVERT_DAY", "~%d convert/day");
+        en.put("STAT_RATE_PWR_DAY", "~%d pwr/day");
+        en.put("STAT_RATE_RES_DAY", "~%d res/day");
+        en.put("STAT_RATE_SCOUT_STATUS", "Finding resources");
+        en.put("STAT_RATE_RESEARCH_ASST_FMT", "%d Res / %d Asst");
+        en.put("STAT_RATE_PTS_DAY_FMT", "+%d pts/day");
+        en.put("STAT_JOB_EGG_LAYING", "Egg Laying");
+        en.put("STAT_RATE_LAYERS_FMT", "%d Layers");
+        en.put("STAT_RATE_EGGS_DAY", "+%d eggs/day");
+        en.put("STAT_RATE_NURSES_FMT", "%d Nurses");
+        en.put("STAT_RATE_CAP_SHORT", "%d Cap");
+        en.put("STAT_RATE_LOAD_FMT", "%s / %d Load");
+        en.put("STAT_RATE_GRAVERS_FMT", "%d Gravers");
+        en.put("STAT_RATE_RANCHERS_FMT", "%d Ranchers");
+        en.put("STAT_RATE_APHIDS_FMT", "%s / %d Aphids");
+        en.put("STAT_RATE_POLICE_FMT", "%d Police");
+        en.put("STAT_RATE_PARASITES_FMT", "%d Parasites");
+        en.put("STAT_RATE_DET_DAY", "~%d det./day");
+        en.put("STAT_NO_INSECTS", "No insects tracked");
+        en.put("STAT_INSECT_CATCHERS_FMT", "%d catchers");
+        en.put("STAT_INSECT_SLOWED_FMT", "%d slowed ants");
+        en.put("STAT_INSECT_POOL", "Catcher pool");
+        en.put("STAT_INSECT_PARASITIC_CAP_FMT", "%d mites per slowed ant");
+        en.put("STAT_INSECT_PARASITIC_KILL_FMT", "%d slowed, ~%d/day counter");
+
+        en.put("LOG_DEATH_OLD_AGE_FMT", "%d ants died of old age");
+        en.put("LOG_DEATH_JUVENILES_LACK_CARE_FMT", "%d juveniles died (lack of care)");
+        en.put("LOG_DEATH_COUNT_CAUSE_FMT", "%d ants died of %s");
+        en.put("LOG_CAUSE_OLD_AGE", "old age");
+        en.put("LOG_CAUSE_LACK_OF_CARE", "lack of care");
+        en.put("LOG_CAUSE_DEHYDRATION", "dehydration");
+        en.put("LOG_CAUSE_STARVATION", "starvation");
+        en.put("LOG_CAUSE_CONTAMINATION", "contamination");
+        en.put("LOG_CONTAMINATION_LEVEL_FMT", "Contamination level: %s");
+        en.put("LOG_CONTAM_LEVEL_SMALL", "Small");
+        en.put("LOG_CONTAM_LEVEL_MEDIUM", "Medium");
+        en.put("LOG_CONTAM_LEVEL_MASSIVE", "Massive");
+        en.put("LOG_PARASITE_SPREAD_FMT", "A parasitic infestation has spread! %d new parasites detected.");
+        en.put("LOG_PARASITIC_MITE_SPREAD_FMT", "Parasitic mites have spread! %d new mites detected on the colony.");
+        en.put("LOG_DYNASTY_ABSORBED_FMT", "Absorbed the remnants of %s!");
+        en.put("LOG_FAILURE_SATELLITE", "A satellite colony failed to mature due to genetic stagnation.");
+        en.put("LOG_SATELLITE_AT_FMT", "Established new satellite colony at (%d, %d)");
+        en.put("LOG_SATELLITES_ESTABLISHED_FMT", "%d satellites established.");
+        en.put("LOG_SPREADING_FAILED", "Spreading failed: no suitable adjacent lands found.");
+        en.put("LOG_PARASITES_ELIMINATED_FMT", "Eliminated %d parasites.");
+        en.put("LOG_CAUGHT_BUGS_SUMMARY_FMT", "Catchers brought in %d insect(s) from the wild.");
+        en.put("LOG_CAUGHT_BUG_BRED_FMT", "%d %s bred in captivity.");
+        en.put("LOG_SOIL_MITES_PREDATION_FMT", "Soil mites eliminated %d parasitic mite(s).");
+        en.put("LOG_NUPTIAL_QUEENS_FMT", "Nuptial flight occurred. %d new queens joined.");
+        en.put("LOG_SUCCESS_ASSIMILATION_FMT", "%s completed! Reward: %s");
+        en.put("LOG_SUCCESS_TUNNEL", "Tunnel connection completed!");
+        en.put("LOG_FOUND_NEW_SOURCE_FMT", "Found new %s source.");
+        en.put("LOG_FOUND_SOURCE_FULL_FMT", "Found %s but capacity is full.");
+        en.put("LOG_SOURCE_EXHAUSTED_FMT", "A %s source has been exhausted.");
+        en.put("LOG_FORCE_FLIGHT_BLOCKED", "Cannot force flight. Missing drones or breeder princesses.");
+        en.put("LOG_WARNING_NO_QUEEN_FMT", "Colony has no queen! Days without queen: %d/7");
+        en.put("LOG_MATURATION_COMPLETE", "Colony maturation complete: workforce deployed.");
+        en.put("LOG_TRADE_CANCELLED_FMT", "Cancelled. Not enough available %s.");
+        en.put("LOG_TRADE_ARRIVED_FMT", "Trade arrived at %s successfully.");
+        en.put("LOG_TRADE_CONVOY_RETURN_FMT", "Convoy from %s picked up return cargo.");
+        en.put("LOG_TRADE_BILATERAL_RETURN_FMT", "Bilateral convoy returned with %d resource types.");
+        en.put("LOG_TRADE_ROUTE_CANCELLED_FMT", "Route to %s cancelled. Resources refunded.");
+        en.put("LOG_AUTOMATION_BUILD_FMT", "Started construction of %s");
+        en.put("LOG_LAST_COLONY_FALLEN", "The last colony has fallen. This is now a dead remnant.");
+        en.put("LOG_PROMOTION_CAPITAL_FMT", "The old capital has fallen. This colony is now the capital of %s!");
+        en.put("LOG_DYNASTY_RESEARCHED_FMT", "Researched %s");
+        en.put("LOG_COMPOST_RECYCLED_FMT", "Recycled %d bodies into mushroom matter.");
+
+        en.put("DYNASTY_SORT_POP_HIGH", "Population (highest first)");
+        en.put("DYNASTY_SORT_POP_LOW", "Population (lowest first)");
+        en.put("DYNASTY_SORT_AGE_OLD", "Age (oldest first)");
+        en.put("DYNASTY_SORT_AGE_NEW", "Age (newest first)");
+
+        en.put("SETTINGS_DEFAULT_ROLE_WORKER", "Default Worker Role:");
+        en.put("SETTINGS_DEFAULT_ROLE_SOLDIER", "Default Soldier Role:");
+        en.put("SETTINGS_DEFAULT_ROLE_MAJOR", "Default Major Role:");
+        en.put("SETTINGS_DEFAULT_ROLE_PRINCESS", "Default Princess Role:");
+        en.put("SETTINGS_DEFAULT_ROLE_QUEEN", "Default Queen Role:");
 
         return en;
     }

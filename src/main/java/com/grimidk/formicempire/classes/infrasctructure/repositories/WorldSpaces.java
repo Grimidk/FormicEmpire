@@ -162,7 +162,23 @@ public final class WorldSpaces {
         new Point(2000, 1960),
         List.of(GameConstants.ROLE_GRAVER), 
         List.of(GameConstants.TYPE_DEAD),
-        List.of()
+        List.of(GameConstants.TYPE_DERMESTID)
+    );
+
+    public static final Room INSECT_PEN = new Room(
+        202,
+        "Insect Pen",
+        OVERWORLD,
+        ROOM_SIZE,
+        ROOM_SIZE,
+        true,
+        new Point(10, 2000),
+        new Point(10 + 128, 2000 + 128),
+        new Point(10, 2000),
+        new Point(10, 1960),
+        List.of(GameConstants.ROLE_CATCHER),
+        List.of(),
+        List.of(GameConstants.TYPE_APHID, GameConstants.TYPE_SOIL_MITE, GameConstants.TYPE_DERMESTID)
     );
 
     public static final Room CONSTRUCTION_SITE = new Room(

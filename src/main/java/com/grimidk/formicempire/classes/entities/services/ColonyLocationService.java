@@ -21,7 +21,10 @@ import com.grimidk.formicempire.classes.entities.ResourceSource;
 import com.grimidk.formicempire.classes.infrasctructure.Dimension;
 import com.grimidk.formicempire.classes.infrasctructure.NeoPoint;
 import com.grimidk.formicempire.classes.infrasctructure.Room;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
 
 public class ColonyLocationService {
@@ -77,7 +80,7 @@ public class ColonyLocationService {
         return count >= capacity;
     }
 
-    public void addSource(Colony colony, ResourceSource source) {
+    public boolean addSource(Colony colony, ResourceSource source) {
         int capacity = colony.getStatsService().getSourceCapacity(colony);
         
         long count = discoveredSources.stream()
@@ -87,16 +90,20 @@ public class ColonyLocationService {
         if (count < capacity) {
             this.discoveredSources.add(source);
             invalidateCache();
-            colony.logEvent("Found new " + source.getResourceType().getName() + " source.");
-        } else {
-            colony.logEvent("Found " + source.getResourceType().getName() + " but capacity is full.");
+            colony.logEvent(ColonyLogPrefixes.INFO + " "
+                + String.format(LanguageStrings.get(LanguageStrings.LOG_FOUND_NEW_SOURCE_FMT), source.getResourceType().getName()));
+            return true;
         }
+        colony.logEvent(ColonyLogPrefixes.INFO + " "
+            + String.format(LanguageStrings.get(LanguageStrings.LOG_FOUND_SOURCE_FULL_FMT), source.getResourceType().getName()));
+        return false;
     }
 
     public void removeSource(Colony colony, ResourceSource source) {
         if (this.discoveredSources.remove(source)) {
             invalidateCache();
-            colony.logEvent("A " + source.getResourceType().getName() + " source has been exhausted.");
+            colony.logEvent(ColonyLogPrefixes.INFO + " "
+                + String.format(LanguageStrings.get(LanguageStrings.LOG_SOURCE_EXHAUSTED_FMT), source.getResourceType().getName()));
         }
     }
 
@@ -122,20 +129,35 @@ public class ColonyLocationService {
         return gathered;
     }
 
+    public double computeGatherEfficiency(Colony colony, ResourceSource source, List<Ant> workers) {
+        NeoPoint nest = getColonyEntrance(colony);
+        float radius = GatheringMath.computeFullEfficiencyRadius(colony, workers);
+        return GatheringMath.gatheringEfficiency(
+            nest.getX(), nest.getY(), source.getCenterX(), source.getCenterY(), radius);
+    }
+
+    public float computeFullEfficiencyRadius(Colony colony, List<Ant> workers) {
+        return GatheringMath.computeFullEfficiencyRadius(colony, workers);
+    }
+
     private void updateRankedCache(Colony colony) {
         long now = System.currentTimeMillis();
         if (now - lastRankUpdate < RANK_UPDATE_INTERVAL_MS && !rankedSourcesCache.isEmpty()) return;
 
         synchronized (rankedSourcesCache) {
             rankedSourcesCache.clear();
-            int centerX = getHallwayCenterX(colony);
-            int centerY = ANCHOR_HEIGHT / 2;
+            NeoPoint nest = getColonyEntrance(colony);
+            final double nestX = nest.getX();
+            final double nestY = nest.getY();
 
             for (ResourceType type : GameConstants.getResources()) {
                 List<ResourceSource> sources = discoveredSources.stream()
                     .filter(s -> s.getResourceType() == type && s.getQuantity() > 0)
-                    .sorted(Comparator.comparingDouble(s -> 
-                        Math.pow(s.getX() - centerX, 2) + Math.pow(s.getY() - centerY, 2)))
+                    .sorted(Comparator.comparingDouble(s -> {
+                        double dx = s.getCenterX() - nestX;
+                        double dy = s.getCenterY() - nestY;
+                        return dx * dx + dy * dy;
+                    }))
                     .collect(Collectors.toList());
                 
                 if (!sources.isEmpty()) {
@@ -394,5 +416,64 @@ public class ColonyLocationService {
         }
 
         return route;
+    }
+
+    public static final class GatheringMath {
+
+        private GatheringMath() {
+        }
+
+        public static double gatheringEfficiency(
+                double nestX,
+                double nestY,
+                int sourceX,
+                int sourceY,
+                float fullEfficiencyRadius) {
+            if (fullEfficiencyRadius <= 0f) {
+                return GameConstants.GATHER_MIN_EFFICIENCY;
+            }
+            double dx = sourceX - nestX;
+            double dy = sourceY - nestY;
+            double dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist <= fullEfficiencyRadius) {
+                return 1.0;
+            }
+            return Math.max(GameConstants.GATHER_MIN_EFFICIENCY, fullEfficiencyRadius / dist);
+        }
+
+        public static float computeFullEfficiencyRadius(Colony colony, List<Ant> workers) {
+            float refTravel = GameConstants.BASE_SPRITE_SPEED * GameConstants.TYPE_WORKER.getSpeedMult();
+            if (refTravel <= 1e-6f) {
+                return GameConstants.GATHER_FULL_EFFICIENCY_RADIUS_BASE;
+            }
+            if (workers == null || workers.isEmpty()) {
+                return GameConstants.GATHER_FULL_EFFICIENCY_RADIUS_BASE;
+            }
+            float sum = 0f;
+            int n = 0;
+            for (Ant ant : workers) {
+                if (ant == null || !ant.isAlive()) {
+                    continue;
+                }
+                sum += effectiveTravelUnits(colony, ant);
+                n++;
+            }
+            if (n == 0) {
+                return GameConstants.GATHER_FULL_EFFICIENCY_RADIUS_BASE;
+            }
+            float avg = sum / n;
+            float colonyMult = colony.hasUpgrade(GameUnlocks.STAT_ACID)
+                    ? GameConstants.GATHER_COLONY_SPEED_RADIUS_MULT
+                    : 1f;
+            return GameConstants.GATHER_FULL_EFFICIENCY_RADIUS_BASE * (avg / refTravel) * colonyMult;
+        }
+
+        private static float effectiveTravelUnits(Colony colony, Ant ant) {
+            float u = GameConstants.BASE_SPRITE_SPEED * ant.getAntType().getSpeedMult();
+            if (ant.getAntType() == GameConstants.TYPE_WORKER && colony.hasUpgrade(GameUnlocks.STAT_WORKER_SPEED_2)) {
+                u *= 2f;
+            }
+            return u;
+        }
     }
 }

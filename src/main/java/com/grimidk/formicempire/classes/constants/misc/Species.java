@@ -6,6 +6,7 @@ import javax.swing.ImageIcon;
 import com.grimidk.formicempire.classes.constants.Constant;
 import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 
 public class Species extends Constant {
     private final String scientific;
@@ -27,7 +28,7 @@ public class Species extends Constant {
     }
 
     public String getScientific() {
-        return scientific;
+        return LanguageStrings.get(scientific);
     }
 
     public String getDirectory() {

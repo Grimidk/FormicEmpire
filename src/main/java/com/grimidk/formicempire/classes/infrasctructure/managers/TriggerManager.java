@@ -22,6 +22,10 @@ public class TriggerManager {
     private final List<TriggerListener> listeners = new ArrayList<>();
     private boolean colonyDeathFired = false;
 
+    private final Runnable monthlyRunnable = this::checkMonthlyTriggers;
+    private final Runnable dailyRunnable = this::checkDailyTriggers;
+    private final Runnable hourlyRunnable = this::checkHourlyTriggers;
+
     public TriggerManager(World world, Colony colony, Engine engine) {
         this.world = world;
         this.playerColony = colony;
@@ -29,9 +33,16 @@ public class TriggerManager {
     }
 
     public void registerListeners() {
-        engine.addMonthTickListener(this::checkMonthlyTriggers);
-        engine.addDayTickListener(this::checkDailyTriggers);
-        engine.addHourTickListener(this::checkHourlyTriggers); 
+        unregisterListeners();
+        engine.addMonthTickListener(monthlyRunnable);
+        engine.addDayTickListener(dailyRunnable);
+        engine.addHourTickListener(hourlyRunnable);
+    }
+
+    public void unregisterListeners() {
+        engine.removeMonthTickListener(monthlyRunnable);
+        engine.removeDayTickListener(dailyRunnable);
+        engine.removeHourTickListener(hourlyRunnable);
     }
 
     public interface TriggerListener {
@@ -65,6 +76,7 @@ public class TriggerManager {
     private void checkMonthlyTriggers() {
         checkResearchRoleUnlock();
         checkPoliceRoleUnlock();
+        checkParasiticMiteOutbreak();
     }
     
     private void checkDailyTriggers() {
@@ -292,6 +304,15 @@ public class TriggerManager {
                 "Parasitic Infestation", 
                 "The colony has become so prosperous that parasitic bugs may infiltrate it!");
         }
+    }
+
+    private void checkParasiticMiteOutbreak() {
+        if (playerColony.hasUpgrade(GameUnlocks.ABILITY_PARASITIC_MITE_ALERT)) return;
+        if (playerColony.getParasiticMites() <= 0) return;
+
+        fireTrigger(GameUnlocks.ABILITY_PARASITIC_MITE_ALERT,
+            "Parasitic Mites",
+            "Microscopic mites are infesting your workers and slowing them down! Research the Catcher role and assign soldiers to capture soil mites—they eliminate parasitic mites daily.");
     }
 
     private void checkMassFlightUnlock() {

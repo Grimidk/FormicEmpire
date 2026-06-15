@@ -27,7 +27,9 @@ import com.grimidk.formicempire.classes.entities.services.ColonyStarterService;
 import com.grimidk.formicempire.classes.entities.services.DynastyDeathService;
 import com.grimidk.formicempire.classes.entities.services.DynastyNamingService;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 
 public class World {
 
@@ -602,6 +604,8 @@ public class World {
                 } else {
                     hex.setColony(null);
                 }
+
+                hex.setNonWaterResourceSourcesGenerated(sh.nonWaterResourceSourcesGenerated);
                 
                 hexMap.put(sh.q + "," + sh.r, hex);
                 this.hexes.add(hex);
@@ -740,9 +744,22 @@ public class World {
                 }
             }
         }
+
+        reapplyRoleAssignmentsAfterLoad();
         
         changeActiveHex(getSpawnHex()); 
         updateEnvironmentalConditions();
+    }
+
+    private void reapplyRoleAssignmentsAfterLoad() {
+        if (this.engine == null) {
+            return;
+        }
+        for (Hex hex : this.hexes) {
+            if (hex.getColony() != null) {
+                hex.getColony().runRoleAssignment(this.engine);
+            }
+        }
     }
 
     public Hex getHexAt(int q, int r) {
@@ -844,7 +861,7 @@ public class World {
         
         for (Hex hex : this.hexes) {
             if (hex.getColony() != null) {
-                hex.getColony().runHourlyJobs(hex.getBiome());
+                hex.getColony().runHourlyJobs(hex.getBiome(), this.engine);
             }
         }
 
@@ -886,7 +903,7 @@ public class World {
         
         for (Hex hex : this.hexes) {
             if (hex.getColony() != null) {
-                hex.getColony().runDailyJobs(this.getTemperatureIcon(), hex.getBiome());
+                hex.getColony().runDailyJobs(this.getTemperatureIcon(), hex.getBiome(), hex);
             }
         }
         
@@ -906,7 +923,8 @@ public class World {
             for (Hex hex : this.hexes) {
                 if (hex.getColony() != null && !hex.getColony().getDynasty().isDefeated()) {
                     hex.getColony().getLabourService().runNuptial(hex.getColony(), this, hex);
-                    hex.getColony().logEvent("The Eclipse has triggered a spontaneous Nuptial Flight!");
+                    hex.getColony().logEvent(ColonyLogPrefixes.NUPTIAL + " "
+                        + LanguageStrings.get(LanguageStrings.EVENT_ECLIPSE_NUPTIAL));
                 }
             }
             

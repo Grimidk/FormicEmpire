@@ -22,9 +22,12 @@ import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
 import com.grimidk.formicempire.classes.entities.Tunnel;
+import com.grimidk.formicempire.classes.infrasctructure.NeoPoint;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
 
 public class ColonyLabourService {
@@ -86,7 +89,12 @@ public class ColonyLabourService {
             if (space <= 0) break; 
 
             int gatherAmount = Math.min(powerAvailable, (int) Math.ceil(space));
-            int actualGathered = locations.gatherFromSource(colony, source, gatherAmount);
+            double efficiency = locations.computeGatherEfficiency(colony, source, workers);
+            int cappedRequest = (int) Math.floor(gatherAmount * efficiency);
+            if (cappedRequest <= 0) {
+                continue;
+            }
+            int actualGathered = locations.gatherFromSource(colony, source, cappedRequest);
             
             if (actualGathered > 0) {
                 resources.addResource(colony, type, actualGathered);
@@ -242,27 +250,8 @@ public class ColonyLabourService {
         }
     }
 
-    public void runHerding(Colony colony, Biome biome) {
-        if (!colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) return;
-         
-        ColonyStatsService stats = colony.getStatsService();
-        int rancherCount = countActiveAnts(colony, GameConstants.ROLE_RANCHER);
-        
-        if (colony.hasBuilding(GameUnlocks.PASSIVE_APHID)) {
-            if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
-                rancherCount += 2;
-            } else { rancherCount += 1; } 
-        }
-        
-        int maxSustainableAphids = stats.getAphidCapacity(colony) * rancherCount;
-        
-        if (biome != null && biome.getPlantAbundance() >= 0.5f) {
-            if (colony.getAphids() < maxSustainableAphids) {
-                colony.setAphids(Math.min(colony.getAphids() + rancherCount, maxSustainableAphids));
-            } else if (colony.getAphids() > maxSustainableAphids) {
-                colony.setAphids(maxSustainableAphids);
-            }
-        }
+    public void runCaughtBugs(Colony colony, Biome biome) {
+        colony.getBugHandlingService().runDaily(colony, biome);
     }
 
     public void runLaying(Colony colony) {
@@ -347,7 +336,8 @@ public class ColonyLabourService {
         }
         
         if (deathCount > 0) {
-            colony.logEvent("DEATH: " + deathCount + " Juveniles died (Lack of Care)");
+            colony.logEvent(ColonyLogPrefixes.DEATH + " "
+                + String.format(LanguageStrings.get(LanguageStrings.LOG_DEATH_JUVENILES_LACK_CARE_FMT), deathCount));
         }
     }
     
@@ -391,7 +381,8 @@ public class ColonyLabourService {
                         if (!dynasty.getAbsorbedDynastyIds().contains(oldDynasty.getId())) {
                             dynasty.addAbsorbedDynasty(oldDynasty.getId());
                             dynasty.absorbSpecies(oldDynasty.getSpecies().getId());
-                            colony.logEvent("DYNASTY: Absorbed the remnants of " + oldDynasty.getName() + "!");
+                            colony.logEvent(ColonyLogPrefixes.DYNASTY + " "
+                                + String.format(LanguageStrings.get(LanguageStrings.LOG_DYNASTY_ABSORBED_FMT), oldDynasty.getName()));
                         }
                         oldDynasty.removeColony(existingColony);
                     }
@@ -407,7 +398,7 @@ public class ColonyLabourService {
                 else if (integrity <= 80) failureChance = 0.05;
 
                 if (random.nextDouble() < failureChance) {
-                    colony.logEvent("FAILURE: A satellite colony failed to mature due to genetic stagnation.");
+                    colony.logEvent(ColonyLogPrefixes.FAILURE + " " + LanguageStrings.get(LanguageStrings.LOG_FAILURE_SATELLITE));
                     continue;
                 }
 
@@ -447,14 +438,16 @@ public class ColonyLabourService {
                 neighbor.setColony(satellite);
                 
                 satellitesSpawned++;
-                colony.logEvent("Established new satellite colony at (" + neighbor.getQ() + ", " + neighbor.getR() + ")");
+                colony.logEvent(ColonyLogPrefixes.INFO + " "
+                    + String.format(LanguageStrings.get(LanguageStrings.LOG_SATELLITE_AT_FMT), neighbor.getQ(), neighbor.getR()));
             }
         }
         
         if (satellitesSpawned > 0) {
-            colony.logEvent(satellitesSpawned + " satellites established.");
+            colony.logEvent(ColonyLogPrefixes.INFO + " "
+                + String.format(LanguageStrings.get(LanguageStrings.LOG_SATELLITES_ESTABLISHED_FMT), satellitesSpawned));
         } else {
-            colony.logEvent("Spreading failed: No suitable adjacent lands found.");
+            colony.logEvent(ColonyLogPrefixes.INFO + " " + LanguageStrings.get(LanguageStrings.LOG_SPREADING_FAILED));
         }
     }
 
@@ -480,12 +473,13 @@ public class ColonyLabourService {
         }
         
         if (parasitesKilled > 0) {
-            colony.logEvent("Eliminated " + parasitesKilled + " parasites.");
+            colony.logEvent(ColonyLogPrefixes.INFO + " "
+                + String.format(LanguageStrings.get(LanguageStrings.LOG_PARASITES_ELIMINATED_FMT), parasitesKilled));
             colony.setParasites(Math.max(0, colony.getParasites() - parasitesKilled));
         }
     }
 
-    public void runScoutting(Colony colony, Biome biome) {
+    public void runScoutting(Colony colony, Biome biome, Hex currentHex) {
         if (!colony.hasUpgrade(GameUnlocks.ROLE_SCOUT)) return;
 
         int scoutCount = countActiveAnts(colony, GameConstants.ROLE_SCOUT);
@@ -508,12 +502,12 @@ public class ColonyLabourService {
             }
 
             if (found) {
-                generateAndAddSource(colony, biome);
+                generateAndAddSource(colony, biome, currentHex);
             }
         }
     }
 
-    private void generateAndAddSource(Colony colony, Biome biome) {
+    private void generateAndAddSource(Colony colony, Biome biome, Hex currentHex) {
         ColonyLocationService locations = colony.getLocationService();
         List<ResourceType> possibleTypes = new ArrayList<>();
         
@@ -577,29 +571,28 @@ public class ColonyLabourService {
         if (gameW <= 100) gameW = 2560;
         if (gameH <= 100) gameH = 1440;
         
-        int bufferMin = 400; 
-        int bufferMax = 900;
-        int randomBuffer = bufferMin + random.nextInt(bufferMax - bufferMin);
-        
-        int sourceX, sourceY;
-        int side = random.nextInt(4); // 0=Top, 1=Right, 2=Bottom, 3=Left
-        
-        if (side == 0) { // Top
-             sourceX = random.nextInt(Math.max(1, gameW));
-             sourceY = -randomBuffer;
-        } else if (side == 1) { // Right
-             sourceX = gameW + randomBuffer;
-             sourceY = random.nextInt(Math.max(1, gameH));
-        } else if (side == 2) { // Bottom
-             sourceX = random.nextInt(Math.max(1, gameW));
-             sourceY = gameH + randomBuffer;
-        } else { // Left
-             sourceX = -randomBuffer;
-             sourceY = random.nextInt(Math.max(1, gameH));
+        int maxDepl = colony.hasUpgrade(GameUnlocks.STAT_HEX_SUSTAIN)
+                ? GameConstants.HEX_SUSTAIN_MAX_DEPLETION_PCT
+                : 100;
+        int depletionPct = currentHex != null ? currentHex.getResourceDepletionPercentCapped(maxDepl) : 0;
+        int depletionExtra = (int) Math.round(
+            (depletionPct / 100.0) * GameConstants.HEX_DEPLETION_SPAWN_BUFFER_EXTRA_MAX);
+        depletionExtra = Math.min(depletionExtra, GameConstants.RESOURCE_SPAWN_BUFFER_EXTRA_CAP);
+
+        int extraMin = GameConstants.RESOURCE_SPAWN_EXTRA_DISTANCE_MIN + depletionExtra;
+        int extraMax = GameConstants.RESOURCE_SPAWN_EXTRA_DISTANCE_MAX + depletionExtra;
+        int extraDistance = extraMin + random.nextInt(Math.max(1, extraMax - extraMin));
+
+        int displayPx = selectedType.getDisplaySizeForSourceQuantity(quantity);
+        NeoPoint entrance = colony.getLocationService().getColonyEntrance(colony);
+        Point center = ResourceSourcePlacement.pickSpawnCenter(
+                entrance, gameW, gameH, displayPx, extraDistance, random);
+        Point topLeft = ResourceSourcePlacement.topLeftFromCenter(center.x, center.y, displayPx);
+
+        ResourceSource source = new ResourceSource(selectedType, quantity, topLeft.x, topLeft.y);
+        if (colony.getLocationService().addSource(colony, source) && currentHex != null) {
+            currentHex.recordGeneratedResourceSource(selectedType);
         }
-        
-        ResourceSource source = new ResourceSource(selectedType, quantity, sourceX, sourceY); 
-        colony.getLocationService().addSource(colony, source);
     }
 
     public void runNuptial(Colony colony, World world, Hex currentHex) {
@@ -611,8 +604,9 @@ public class ColonyLabourService {
             .collect(Collectors.toList());
 
         if (allDrones.isEmpty() || breederPrincesses.isEmpty()) return;
-        colony.getDrones().clear(); 
-        colony.getPrincesses().removeAll(breederPrincesses);
+        
+        allDrones.forEach(d -> d.setNuptial(true));
+        breederPrincesses.forEach(p -> p.setNuptial(true));
 
         int potentialQueens = Math.min(allDrones.size(), breederPrincesses.size());
         int currentQueens = colony.getQueens().size();
@@ -638,7 +632,8 @@ public class ColonyLabourService {
             colony.getQueens().add(newQueen);
         }
 
-        colony.logEvent("Nuptial Flight Occurred. " + queensToAdd + " new Queens joined.");
+        colony.logEvent(ColonyLogPrefixes.NUPTIAL + " "
+            + String.format(LanguageStrings.get(LanguageStrings.LOG_NUPTIAL_QUEENS_FMT), queensToAdd));
         
         if (colony.getDynasty() != null) {
             colony.getDynasty().incrementNuptialFlights();
@@ -660,6 +655,7 @@ public class ColonyLabourService {
                 graverCount += 1; 
             }
         }
+        graverCount += colony.getBugHandlingService().getDermestidGraveBonus(colony);
         
         boolean hasBodies = !colony.getDeadAnts().isEmpty();
         for (Ant graver : gravers) {
@@ -704,7 +700,8 @@ public class ColonyLabourService {
         colony.getResourceService().addResource(colony, GameConstants.RESOURCE_FUNGI, mushroomGain);
         
         if (actualToCompost > 0) {
-            colony.logEvent("COMPOST: Recycled " + actualToCompost + " bodies into mushroom matter.");
+            colony.logEvent(ColonyLogPrefixes.COMPOST + " "
+                + String.format(LanguageStrings.get(LanguageStrings.LOG_COMPOST_RECYCLED_FMT), actualToCompost));
         }
     }
 
@@ -735,13 +732,16 @@ public class ColonyLabourService {
                     Assimilation a = dynasty.getCurrentAssimilation();
                     dynasty.unlockUpgrade(a.getReward());
                     dynasty.completeAssimilation(a);
-                    colony.logEvent("SUCCESS: " + a.getName() + " completed! Reward: " + a.getReward().getFlavorName());
+                    colony.logEvent(ColonyLogPrefixes.SUCCESS + " "
+                        + String.format(LanguageStrings.get(LanguageStrings.LOG_SUCCESS_ASSIMILATION_FMT),
+                            a.getName(), a.getReward().getFlavorName()));
                     
                     if (colony.isPlayer()) {
                         SwingUtilities.invokeLater(() -> {
-                            JOptionPane.showMessageDialog(null, 
-                                "Genetic Assimilation Complete!\n\n" + a.getName() + " finished.\nUnlocked: " + a.getReward().getFlavorName(),
-                                "Assimilation Success", JOptionPane.INFORMATION_MESSAGE);
+                            JOptionPane.showMessageDialog(null,
+                                String.format(LanguageStrings.get(LanguageStrings.ASSIMILATION_DIALOG_SUCCESS_BODY),
+                                    a.getName(), a.getReward().getFlavorName()),
+                                LanguageStrings.get(LanguageStrings.ASSIMILATION_DIALOG_SUCCESS_TITLE), JOptionPane.INFORMATION_MESSAGE);
                         });
                     }
                     
@@ -767,7 +767,7 @@ public class ColonyLabourService {
 
         if (colony.getBuildingProgressHours() >= requiredHours) {
             colony.unlockBuilding(colony.getCurrentBuildingProject());
-            colony.logEvent("SUCCESS: Built " + colony.getCurrentBuildingProject().getName());
+            colony.logEvent(ColonyLogPrefixes.SUCCESS + " " + colony.getCurrentBuildingProject().getName());
             colony.setCurrentBuildingProject(null);
             colony.setBuildingProgressHours(0.0);
         }
@@ -789,7 +789,7 @@ public class ColonyLabourService {
         tunnel.addProgress(hourlyProgress);
 
         if (tunnel.isComplete()) {
-            colony.logEvent("SUCCESS: Tunnel connection completed!");
+            colony.logEvent(ColonyLogPrefixes.SUCCESS + " " + LanguageStrings.get(LanguageStrings.LOG_SUCCESS_TUNNEL));
             colony.setCurrentTunnelProject(null);
         }
     }

@@ -4,8 +4,10 @@ import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -55,7 +57,8 @@ public class ColonyAutomationService {
             Building target = candidates.get(0);
             
             colony.startBuildingProject(target);
-            colony.logEvent("AUTOMATION: Started construction of " + target.getName());
+            colony.logEvent(ColonyLogPrefixes.AUTOMATION + " "
+                + String.format(LanguageStrings.get(LanguageStrings.LOG_AUTOMATION_BUILD_FMT), target.getName()));
         }
     }
 

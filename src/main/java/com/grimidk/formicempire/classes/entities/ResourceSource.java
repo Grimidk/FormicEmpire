@@ -1,5 +1,7 @@
 package com.grimidk.formicempire.classes.entities;
 
+import javax.swing.ImageIcon;
+
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 
 public class ResourceSource {
@@ -27,6 +29,22 @@ public class ResourceSource {
 
     public ResourceType getResourceType() {
         return resourceType;
+    }
+
+    public ImageIcon getIconForDisplay() {
+        return resourceType.getIconForSourceQuantity(quantity);
+    }
+
+    public int getDisplaySizePx() {
+        return resourceType.getDisplaySizeForSourceQuantity(quantity);
+    }
+
+    public int getCenterX() {
+        return getX() + getDisplaySizePx() / 2;
+    }
+
+    public int getCenterY() {
+        return getY() + getDisplaySizePx() / 2;
     }
 
     public int getQuantity() {

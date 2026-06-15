@@ -1,12 +1,15 @@
 package com.grimidk.formicempire.classes.infrasctructure.repositories;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
-import java.util.ArrayList;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.translations.Translation;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.translations.EnglishTranslation;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.translations.FrenchTranslation;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.translations.PortugueseTranslation;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.translations.SpanishTranslation;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.translations.Translation;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public final class LanguageStrings {
     private LanguageStrings() {}
@@ -20,6 +23,8 @@ public final class LanguageStrings {
     static {
         registerLanguage("en", new EnglishTranslation());
         registerLanguage("es", new SpanishTranslation());
+        registerLanguage("fr", new FrenchTranslation());
+        registerLanguage("pt", new PortugueseTranslation());
     }
 
     public static void registerLanguage(String code, Translation translation) {
@@ -178,7 +183,8 @@ public final class LanguageStrings {
     public static final String COLONY_LAYING_RATE = "COLONY_LAYING_RATE";
     public static final String COLONY_NURSE_COVERAGE = "COLONY_NURSE_COVERAGE";
     public static final String COLONY_GRAVE_CLEANING = "COLONY_GRAVE_CLEANING";
-    public static final String COLONY_APHIDS = "COLONY_APHIDS";
+    public static final String COLONY_PET_INSECTS = "COLONY_PET_INSECTS";
+    public static final String COLONY_PARASITIC_MITES = "COLONY_PARASITIC_MITES";
     public static final String COLONY_PARASITES = "COLONY_PARASITES";
     public static final String COLONY_POLICING = "COLONY_POLICING";
     public static final String COLONY_DETECTION_RATE = "COLONY_DETECTION_RATE";
@@ -187,7 +193,8 @@ public final class LanguageStrings {
     public static final String COLONY_JUVENILE_ANTS = "COLONY_JUVENILE_ANTS";
     public static final String COLONY_ADULT_ANTS = "COLONY_ADULT_ANTS";
     
-    public static final String TOOLTIP_APHIDS = "TOOLTIP_APHIDS";
+    public static final String TOOLTIP_PET_INSECTS = "TOOLTIP_PET_INSECTS";
+    public static final String TOOLTIP_PARASITIC_MITES = "TOOLTIP_PARASITIC_MITES";
     public static final String TOOLTIP_PARASITES = "TOOLTIP_PARASITES";
     public static final String TOOLTIP_POLICING = "TOOLTIP_POLICING";
     public static final String TOOLTIP_RESEARCH_POINTS = "TOOLTIP_RESEARCH_POINTS";
@@ -245,6 +252,7 @@ public final class LanguageStrings {
     public static final String STATS_TAB_POPULATION = "STATS_TAB_POPULATION";
     public static final String STATS_TAB_LOCAL_HEX = "STATS_TAB_LOCAL_HEX";
     public static final String STATS_TAB_RATES = "STATS_TAB_RATES";
+    public static final String STATS_TAB_INSECTS = "STATS_TAB_INSECTS";
     public static final String STATS_TAB_UNIT_STATS = "STATS_TAB_UNIT_STATS";
     public static final String STATS_TAB_MORTALITY = "STATS_TAB_MORTALITY";
     public static final String COL_CATEGORY = "COL_CATEGORY";
@@ -271,6 +279,7 @@ public final class LanguageStrings {
     public static final String COL_DESCRIPTION = "COL_DESCRIPTION";
     public static final String COL_CAUSE = "COL_CAUSE";
     public static final String COL_TOTAL = "COL_TOTAL";
+    public static final String COL_CARETAKERS = "COL_CARETAKERS";
     public static final String STAT_STATUS_NO_HEX = "STAT_STATUS_NO_HEX";
     public static final String STAT_COORDS = "STAT_COORDS";
     public static final String STAT_LOCAL_WEATHER = "STAT_LOCAL_WEATHER";
@@ -365,7 +374,7 @@ public final class LanguageStrings {
     public static final String DYNASTY_ACTIONS = "DYNASTY_ACTIONS";
     public static final String DYNASTY_TRANSIT_FORMAT = "DYNASTY_TRANSIT_FORMAT";
     public static final String DYNASTY_BUILD_TUNNEL = "DYNASTY_BUILD_TUNNEL";
-    public static final String DYNASTY_TUNNEL_Sponsoring = "DYNASTY_TUNNEL_Sponsoring";
+    public static final String DYNASTY_TUNNEL_SPONSORING = "DYNASTY_TUNNEL_SPONSORING";
     public static final String DYNASTY_BUILT = "DYNASTY_BUILT";
     public static final String DYNASTY_PROGRESS_PERCENT = "DYNASTY_PROGRESS_PERCENT";
     public static final String DYNASTY_ERROR_NO_ENGINEERS = "DYNASTY_ERROR_NO_ENGINEERS";
@@ -416,6 +425,109 @@ public final class LanguageStrings {
     public static final String TRADE_QUEUED_MSG = "TRADE_QUEUED_MSG";
     public static final String TRADE_ERROR_START = "TRADE_ERROR_START";
 
+    public static final String ALERT_STARVATION_RISK = "ALERT_STARVATION_RISK";
+    public static final String ALERT_NEW_RESEARCH = "ALERT_NEW_RESEARCH";
+    public static final String ALERT_CAN_BUILD_FMT = "ALERT_CAN_BUILD_FMT";
+    public static final String ALERT_BODY_PILE_FMT = "ALERT_BODY_PILE_FMT";
+    public static final String ALERT_NUPTIAL_FLIGHT = "ALERT_NUPTIAL_FLIGHT";
+    public static final String ALERT_BUILT_PREFIX = "ALERT_BUILT_PREFIX";
+    public static final String ALERT_COMPOST_RECYCLED_PREFIX = "ALERT_COMPOST_RECYCLED_PREFIX";
+    public static final String ALERT_COMPOST_BODIES_SUFFIX = "ALERT_COMPOST_BODIES_SUFFIX";
+
+    public static final String ASSIMILATION_DIALOG_SUCCESS_TITLE = "ASSIMILATION_DIALOG_SUCCESS_TITLE";
+    public static final String ASSIMILATION_DIALOG_SUCCESS_BODY = "ASSIMILATION_DIALOG_SUCCESS_BODY";
+
+    public static final String UI_DIALOG_LOADING_TITLE = "UI_DIALOG_LOADING_TITLE";
+    public static final String SAVE_DEFAULT_NAME_FMT = "SAVE_DEFAULT_NAME_FMT";
+
+    public static final String STAT_NEIGHBOR_NORTH = "STAT_NEIGHBOR_NORTH";
+    public static final String STAT_NEIGHBOR_NORTH_WEST = "STAT_NEIGHBOR_NORTH_WEST";
+    public static final String STAT_NEIGHBOR_NORTH_EAST = "STAT_NEIGHBOR_NORTH_EAST";
+    public static final String STAT_NEIGHBOR_SOUTH = "STAT_NEIGHBOR_SOUTH";
+    public static final String STAT_NEIGHBOR_SOUTH_WEST = "STAT_NEIGHBOR_SOUTH_WEST";
+    public static final String STAT_NEIGHBOR_SOUTH_EAST = "STAT_NEIGHBOR_SOUTH_EAST";
+    public static final String STAT_TABLE_SEPARATOR = "STAT_TABLE_SEPARATOR";
+    public static final String STAT_HEX_COLONY_FMT = "STAT_HEX_COLONY_FMT";
+    public static final String STAT_LABEL_ID = "STAT_LABEL_ID";
+    public static final String STAT_LABEL_ERROR = "STAT_LABEL_ERROR";
+    public static final String STAT_LABEL_PROGRESS = "STAT_LABEL_PROGRESS";
+    public static final String STAT_GLOBAL_RESOURCE_FMT = "STAT_GLOBAL_RESOURCE_FMT";
+    public static final String STAT_DEFEATED_UNKNOWN_FMT = "STAT_DEFEATED_UNKNOWN_FMT";
+    public static final String STAT_JOB_FARMING = "STAT_JOB_FARMING";
+    public static final String STAT_JOB_FARMERS_EFF_FMT = "STAT_JOB_FARMERS_EFF_FMT";
+    public static final String STAT_RATE_CONVERT_DAY = "STAT_RATE_CONVERT_DAY";
+    public static final String STAT_RATE_PWR_DAY = "STAT_RATE_PWR_DAY";
+    public static final String STAT_RATE_RES_DAY = "STAT_RATE_RES_DAY";
+    public static final String STAT_RATE_SCOUT_STATUS = "STAT_RATE_SCOUT_STATUS";
+    public static final String STAT_RATE_RESEARCH_ASST_FMT = "STAT_RATE_RESEARCH_ASST_FMT";
+    public static final String STAT_RATE_PTS_DAY_FMT = "STAT_RATE_PTS_DAY_FMT";
+    public static final String STAT_JOB_EGG_LAYING = "STAT_JOB_EGG_LAYING";
+    public static final String STAT_RATE_LAYERS_FMT = "STAT_RATE_LAYERS_FMT";
+    public static final String STAT_RATE_EGGS_DAY = "STAT_RATE_EGGS_DAY";
+    public static final String STAT_RATE_NURSES_FMT = "STAT_RATE_NURSES_FMT";
+    public static final String STAT_RATE_CAP_SHORT = "STAT_RATE_CAP_SHORT";
+    public static final String STAT_RATE_LOAD_FMT = "STAT_RATE_LOAD_FMT";
+    public static final String STAT_RATE_GRAVERS_FMT = "STAT_RATE_GRAVERS_FMT";
+    public static final String STAT_RATE_RANCHERS_FMT = "STAT_RATE_RANCHERS_FMT";
+    public static final String STAT_RATE_APHIDS_FMT = "STAT_RATE_APHIDS_FMT";
+    public static final String STAT_RATE_POLICE_FMT = "STAT_RATE_POLICE_FMT";
+    public static final String STAT_RATE_PARASITES_FMT = "STAT_RATE_PARASITES_FMT";
+    public static final String STAT_RATE_DET_DAY = "STAT_RATE_DET_DAY";
+    public static final String STAT_NO_INSECTS = "STAT_NO_INSECTS";
+    public static final String STAT_INSECT_CATCHERS_FMT = "STAT_INSECT_CATCHERS_FMT";
+    public static final String STAT_INSECT_SLOWED_FMT = "STAT_INSECT_SLOWED_FMT";
+    public static final String STAT_INSECT_POOL = "STAT_INSECT_POOL";
+    public static final String STAT_INSECT_PARASITIC_CAP_FMT = "STAT_INSECT_PARASITIC_CAP_FMT";
+    public static final String STAT_INSECT_PARASITIC_KILL_FMT = "STAT_INSECT_PARASITIC_KILL_FMT";
+
+    public static final String LOG_DEATH_OLD_AGE_FMT = "LOG_DEATH_OLD_AGE_FMT";
+    public static final String LOG_DEATH_JUVENILES_LACK_CARE_FMT = "LOG_DEATH_JUVENILES_LACK_CARE_FMT";
+    public static final String LOG_DEATH_COUNT_CAUSE_FMT = "LOG_DEATH_COUNT_CAUSE_FMT";
+    public static final String LOG_CAUSE_OLD_AGE = "LOG_CAUSE_OLD_AGE";
+    public static final String LOG_CAUSE_LACK_OF_CARE = "LOG_CAUSE_LACK_OF_CARE";
+    public static final String LOG_CAUSE_DEHYDRATION = "LOG_CAUSE_DEHYDRATION";
+    public static final String LOG_CAUSE_STARVATION = "LOG_CAUSE_STARVATION";
+    public static final String LOG_CAUSE_CONTAMINATION = "LOG_CAUSE_CONTAMINATION";
+    public static final String LOG_CONTAMINATION_LEVEL_FMT = "LOG_CONTAMINATION_LEVEL_FMT";
+    public static final String LOG_CONTAM_LEVEL_SMALL = "LOG_CONTAM_LEVEL_SMALL";
+    public static final String LOG_CONTAM_LEVEL_MEDIUM = "LOG_CONTAM_LEVEL_MEDIUM";
+    public static final String LOG_CONTAM_LEVEL_MASSIVE = "LOG_CONTAM_LEVEL_MASSIVE";
+    public static final String LOG_PARASITE_SPREAD_FMT = "LOG_PARASITE_SPREAD_FMT";
+    public static final String LOG_PARASITIC_MITE_SPREAD_FMT = "LOG_PARASITIC_MITE_SPREAD_FMT";
+    public static final String LOG_DYNASTY_ABSORBED_FMT = "LOG_DYNASTY_ABSORBED_FMT";
+    public static final String LOG_FAILURE_SATELLITE = "LOG_FAILURE_SATELLITE";
+    public static final String LOG_SATELLITE_AT_FMT = "LOG_SATELLITE_AT_FMT";
+    public static final String LOG_SATELLITES_ESTABLISHED_FMT = "LOG_SATELLITES_ESTABLISHED_FMT";
+    public static final String LOG_SPREADING_FAILED = "LOG_SPREADING_FAILED";
+    public static final String LOG_PARASITES_ELIMINATED_FMT = "LOG_PARASITES_ELIMINATED_FMT";
+    public static final String LOG_CAUGHT_BUGS_SUMMARY_FMT = "LOG_CAUGHT_BUGS_SUMMARY_FMT";
+    public static final String LOG_CAUGHT_BUG_BRED_FMT = "LOG_CAUGHT_BUG_BRED_FMT";
+    public static final String LOG_SOIL_MITES_PREDATION_FMT = "LOG_SOIL_MITES_PREDATION_FMT";
+    public static final String LOG_NUPTIAL_QUEENS_FMT = "LOG_NUPTIAL_QUEENS_FMT";
+    public static final String LOG_SUCCESS_ASSIMILATION_FMT = "LOG_SUCCESS_ASSIMILATION_FMT";
+    public static final String LOG_SUCCESS_TUNNEL = "LOG_SUCCESS_TUNNEL";
+    public static final String LOG_FOUND_NEW_SOURCE_FMT = "LOG_FOUND_NEW_SOURCE_FMT";
+    public static final String LOG_FOUND_SOURCE_FULL_FMT = "LOG_FOUND_SOURCE_FULL_FMT";
+    public static final String LOG_SOURCE_EXHAUSTED_FMT = "LOG_SOURCE_EXHAUSTED_FMT";
+    public static final String LOG_FORCE_FLIGHT_BLOCKED = "LOG_FORCE_FLIGHT_BLOCKED";
+    public static final String LOG_WARNING_NO_QUEEN_FMT = "LOG_WARNING_NO_QUEEN_FMT";
+    public static final String LOG_MATURATION_COMPLETE = "LOG_MATURATION_COMPLETE";
+    public static final String LOG_TRADE_CANCELLED_FMT = "LOG_TRADE_CANCELLED_FMT";
+    public static final String LOG_TRADE_ARRIVED_FMT = "LOG_TRADE_ARRIVED_FMT";
+    public static final String LOG_TRADE_CONVOY_RETURN_FMT = "LOG_TRADE_CONVOY_RETURN_FMT";
+    public static final String LOG_TRADE_BILATERAL_RETURN_FMT = "LOG_TRADE_BILATERAL_RETURN_FMT";
+    public static final String LOG_TRADE_ROUTE_CANCELLED_FMT = "LOG_TRADE_ROUTE_CANCELLED_FMT";
+    public static final String LOG_AUTOMATION_BUILD_FMT = "LOG_AUTOMATION_BUILD_FMT";
+    public static final String LOG_LAST_COLONY_FALLEN = "LOG_LAST_COLONY_FALLEN";
+    public static final String LOG_PROMOTION_CAPITAL_FMT = "LOG_PROMOTION_CAPITAL_FMT";
+    public static final String LOG_DYNASTY_RESEARCHED_FMT = "LOG_DYNASTY_RESEARCHED_FMT";
+    public static final String LOG_COMPOST_RECYCLED_FMT = "LOG_COMPOST_RECYCLED_FMT";
+
+    public static final String DYNASTY_SORT_POP_HIGH = "DYNASTY_SORT_POP_HIGH";
+    public static final String DYNASTY_SORT_POP_LOW = "DYNASTY_SORT_POP_LOW";
+    public static final String DYNASTY_SORT_AGE_OLD = "DYNASTY_SORT_AGE_OLD";
+    public static final String DYNASTY_SORT_AGE_NEW = "DYNASTY_SORT_AGE_NEW";
+
     public static final String DEATH_OPTIONS_RELOAD = "DEATH_OPTIONS_RELOAD";
     public static final String DEATH_OPTIONS_MENU = "DEATH_OPTIONS_MENU";
     public static final String DEATH_TITLE = "DEATH_TITLE";
@@ -443,18 +555,28 @@ public final class LanguageStrings {
     public static final String SETTINGS_EVERY_6_MONTHS = "SETTINGS_EVERY_6_MONTHS";
     public static final String SETTINGS_EVERY_YEAR = "SETTINGS_EVERY_YEAR";
     public static final String SETTINGS_SAVE_APPLY = "SETTINGS_SAVE_APPLY";
+    public static final String SETTINGS_RESET_TAB = "SETTINGS_RESET_TAB";
     public static final String SETTINGS_SAVED_MSG = "SETTINGS_SAVED_MSG";
     
     public static final String SETTINGS_TAB_GENERAL = "SETTINGS_TAB_GENERAL";
     public static final String SETTINGS_TAB_VIDEO = "SETTINGS_TAB_VIDEO";
     public static final String SETTINGS_TAB_AUDIO = "SETTINGS_TAB_AUDIO";
+    public static final String SETTINGS_TAB_ROLES = "SETTINGS_TAB_ROLES";
     
-    public static final String SETTINGS_VISUAL_FILTERS = "SETTINGS_VISUAL_FILTERS";
+    public static final String SETTINGS_DAYLIGHT_COLOR_OVERLAY = "SETTINGS_DAYLIGHT_COLOR_OVERLAY";
+    public static final String SETTINGS_WEATHER_COLOR_OVERLAY = "SETTINGS_WEATHER_COLOR_OVERLAY";
     public static final String SETTINGS_ARACHNOPHOBIA = "SETTINGS_ARACHNOPHOBIA";
     
     public static final String SETTINGS_PAUSE_FOCUS = "SETTINGS_PAUSE_FOCUS";
     public static final String SETTINGS_CONFIRM_QUIT = "SETTINGS_CONFIRM_QUIT";
     public static final String SETTINGS_SHOW_TOOLTIPS = "SETTINGS_SHOW_TOOLTIPS";
+    
+    public static final String SETTINGS_FUZZ_PARASITES = "SETTINGS_FUZZ_PARASITES";
+    public static final String SETTINGS_DEFAULT_ROLE_WORKER = "SETTINGS_DEFAULT_ROLE_WORKER";
+    public static final String SETTINGS_DEFAULT_ROLE_SOLDIER = "SETTINGS_DEFAULT_ROLE_SOLDIER";
+    public static final String SETTINGS_DEFAULT_ROLE_MAJOR = "SETTINGS_DEFAULT_ROLE_MAJOR";
+    public static final String SETTINGS_DEFAULT_ROLE_PRINCESS = "SETTINGS_DEFAULT_ROLE_PRINCESS";
+    public static final String SETTINGS_DEFAULT_ROLE_QUEEN = "SETTINGS_DEFAULT_ROLE_QUEEN";
     
     public static final String SETTINGS_MASTER_VOL = "SETTINGS_MASTER_VOL";
     public static final String SETTINGS_MUSIC_VOL = "SETTINGS_MUSIC_VOL";
@@ -551,6 +673,15 @@ public final class LanguageStrings {
     public static final String BUG_ANT = "BUG_ANT";
     public static final String BUG_APHID = "BUG_APHID";
     public static final String BUG_PARASITE = "BUG_PARASITE";
+    public static final String BUG_SOIL_MITE = "BUG_SOIL_MITE";
+    public static final String BUG_DERMESTID = "BUG_DERMESTID";
+    public static final String BUG_ANT_SCIENTIFIC = "BUG_ANT_SCIENTIFIC";
+    public static final String BUG_APHID_SCIENTIFIC = "BUG_APHID_SCIENTIFIC";
+    public static final String BUG_PARASITE_SCIENTIFIC = "BUG_PARASITE_SCIENTIFIC";
+    public static final String BUG_SOIL_MITE_SCIENTIFIC = "BUG_SOIL_MITE_SCIENTIFIC";
+    public static final String BUG_DERMESTID_SCIENTIFIC = "BUG_DERMESTID_SCIENTIFIC";
+    public static final String BUG_PARASITIC_MITE = "BUG_PARASITIC_MITE";
+    public static final String BUG_PARASITIC_MITE_SCIENTIFIC = "BUG_PARASITIC_MITE_SCIENTIFIC";
 
     public static final String TYPE_EGG = "TYPE_EGG";
     public static final String TYPE_LARVA = "TYPE_LARVA";
@@ -757,6 +888,7 @@ public final class LanguageStrings {
     public static final String ABILITY_ASSIMILATION_FLAVOR = "ABILITY_ASSIMILATION_FLAVOR";
     public static final String ABILITY_ASSIMILATION_DESC = "ABILITY_ASSIMILATION_DESC";
     public static final String ABILITY_FORCED_FLIGHT_FLAVOR = "ABILITY_FORCED_FLIGHT_FLAVOR";
+    public static final String ABILITY_DYNASTY_FLAVOR = "ABILITY_DYNASTY_FLAVOR";
     public static final String ABILITY_DYNASTY_DESC = "ABILITY_DYNASTY_DESC";
     public static final String ABILITY_TRADE_FLAVOR = "ABILITY_TRADE_FLAVOR";
     public static final String ABILITY_TRADE_DESC = "ABILITY_TRADE_DESC";
@@ -773,6 +905,8 @@ public final class LanguageStrings {
     public static final String ABILITY_MASS_FLIGHT_FLAVOR = "ABILITY_MASS_FLIGHT_FLAVOR";
     public static final String ABILITY_CLONING_FLAVOR = "ABILITY_CLONING_FLAVOR";
     public static final String ABILITY_CLONING_DESC = "ABILITY_CLONING_DESC";
+    public static final String ABILITY_PARASITIC_MITE_ALERT_FLAVOR = "ABILITY_PARASITIC_MITE_ALERT_FLAVOR";
+    public static final String ABILITY_PARASITIC_MITE_ALERT_DESC = "ABILITY_PARASITIC_MITE_ALERT_DESC";
     public static final String ABILITY_ABILITY_FLAVOR = "ABILITY_ABILITY_FLAVOR";
     public static final String ABILITY_ABILITY_DESC = "ABILITY_ABILITY_DESC";
 
@@ -828,6 +962,10 @@ public final class LanguageStrings {
     public static final String STAT_CONTAMINATION_2_DESC = "STAT_CONTAMINATION_2_DESC";
     public static final String STAT_CONTAMINATION_3_FLAVOR = "STAT_CONTAMINATION_3_FLAVOR";
     public static final String STAT_CONTAMINATION_3_DESC = "STAT_CONTAMINATION_3_DESC";
+    public static final String STAT_SOIL_MITE_1_FLAVOR = "STAT_SOIL_MITE_1_FLAVOR";
+    public static final String STAT_SOIL_MITE_1_DESC = "STAT_SOIL_MITE_1_DESC";
+    public static final String STAT_DERMESTID_1_FLAVOR = "STAT_DERMESTID_1_FLAVOR";
+    public static final String STAT_DERMESTID_1_DESC = "STAT_DERMESTID_1_DESC";
     public static final String STAT_GRAVING_1_FLAVOR = "STAT_GRAVING_1_FLAVOR";
     public static final String STAT_GRAVING_1_DESC = "STAT_GRAVING_1_DESC";
     public static final String STAT_GRAVING_2_FLAVOR = "STAT_GRAVING_2_FLAVOR";
@@ -840,6 +978,19 @@ public final class LanguageStrings {
     public static final String STAT_POLICING_2_DESC = "STAT_POLICING_2_DESC";
     public static final String STAT_POLICING_3_FLAVOR = "STAT_POLICING_3_FLAVOR";
     public static final String STAT_POLICING_3_DESC = "STAT_POLICING_3_DESC";
+    public static final String STAT_HEX_SUSTAIN_FLAVOR = "STAT_HEX_SUSTAIN_FLAVOR";
+    public static final String STAT_HEX_SUSTAIN_DESC = "STAT_HEX_SUSTAIN_DESC";
+    public static final String STAT_WORKER_SPEED_2_FLAVOR = "STAT_WORKER_SPEED_2_FLAVOR";
+    public static final String STAT_WORKER_SPEED_2_DESC = "STAT_WORKER_SPEED_2_DESC";
+
+    public static final String STAT_CAT_OVERWORLD = "STAT_CAT_OVERWORLD";
+    public static final String STAT_HEX_DEPLETION = "STAT_HEX_DEPLETION";
+    public static final String STAT_HEX_SOURCES_FOUND = "STAT_HEX_SOURCES_FOUND";
+    public static final String STAT_HEX_MAX_EFFICIENCY_DISTANCE = "STAT_HEX_MAX_EFFICIENCY_DISTANCE";
+    public static final String STAT_LOCAL_HEX_NOTE_CAT = "STAT_LOCAL_HEX_NOTE_CAT";
+    public static final String STAT_LOCAL_HEX_DYNASTY_HINT = "STAT_LOCAL_HEX_DYNASTY_HINT";
+    public static final String UNIT_STAT_WORKER_MARCH = "UNIT_STAT_WORKER_MARCH";
+    public static final String UNIT_STAT_WORKER_MARCH_DESC = "UNIT_STAT_WORKER_MARCH_DESC";
 
     public static final String ASSIMILATED_FARMING_FLAVOR = "ASSIMILATED_FARMING_FLAVOR";
     public static final String ASSIMILATED_FARMING_DESC = "ASSIMILATED_FARMING_DESC";
@@ -951,6 +1102,7 @@ public final class LanguageStrings {
     public static final String HELP_TAB_HOTKEYS = "HELP_TAB_HOTKEYS";
     public static final String HELP_TAB_SPECIES = "HELP_TAB_SPECIES";
     public static final String HELP_TAB_TYPES = "HELP_TAB_TYPES";
+    public static final String HELP_TAB_BUGS = "HELP_TAB_BUGS";
     public static final String HELP_TAB_ROLES = "HELP_TAB_ROLES";
     public static final String HELP_TAB_UPGRADES = "HELP_TAB_UPGRADES";
     public static final String HELP_TAB_BUILDINGS = "HELP_TAB_BUILDINGS";
@@ -959,10 +1111,16 @@ public final class LanguageStrings {
 
     public static final String HELP_WELCOME_STORY = "HELP_WELCOME_STORY";
     public static final String HELP_START_INFO = "HELP_START_INFO";
+    public static final String HELP_OVERWORLD_GATHERING = "HELP_OVERWORLD_GATHERING";
     public static final String HELP_DYNASTY_INFO = "HELP_DYNASTY_INFO";
     
     public static final String HELP_SPECIES_SCIENTIFIC = "HELP_SPECIES_SCIENTIFIC";
     public static final String HELP_SPECIES_TRAITS = "HELP_SPECIES_TRAITS";
+
+    public static final String HELP_RESOURCE_SOURCE_SMALL = "HELP_RESOURCE_SOURCE_SMALL";
+    public static final String HELP_RESOURCE_SOURCE_MEDIUM = "HELP_RESOURCE_SOURCE_MEDIUM";
+    public static final String HELP_RESOURCE_SOURCE_BIG = "HELP_RESOURCE_SOURCE_BIG";
+    public static final String HELP_RESOURCE_SOURCE_HUGE = "HELP_RESOURCE_SOURCE_HUGE";
 
     public static final String HOTKEY_PAUSE = "HOTKEY_PAUSE";
     public static final String HOTKEY_SPEED = "HOTKEY_SPEED";
@@ -985,6 +1143,13 @@ public final class LanguageStrings {
     public static final String HELP_TYPE_PRINCESS_DESC = "HELP_TYPE_PRINCESS_DESC";
     public static final String HELP_TYPE_DRONE_DESC = "HELP_TYPE_DRONE_DESC";
     public static final String HELP_TYPE_QUEEN_DESC = "HELP_TYPE_QUEEN_DESC";
+
+    public static final String HELP_BUG_ANT_DESC = "HELP_BUG_ANT_DESC";
+    public static final String HELP_BUG_APHID_DESC = "HELP_BUG_APHID_DESC";
+    public static final String HELP_BUG_SOIL_MITE_DESC = "HELP_BUG_SOIL_MITE_DESC";
+    public static final String HELP_BUG_DERMESTID_DESC = "HELP_BUG_DERMESTID_DESC";
+    public static final String HELP_BUG_PARASITE_DESC = "HELP_BUG_PARASITE_DESC";
+    public static final String HELP_BUG_PARASITIC_MITE_DESC = "HELP_BUG_PARASITIC_MITE_DESC";
 
     public static final String HELP_BIOMES_TITLE = "HELP_BIOMES_TITLE";
     public static final String HELP_BIOME_TEMP = "HELP_BIOME_TEMP";

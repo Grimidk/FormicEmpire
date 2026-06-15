@@ -115,7 +115,8 @@ public class SpanishTranslation implements Translation {
         es.put("COLONY_LAYING_RATE", "Tasa de Puesta: %d/día");
         es.put("COLONY_NURSE_COVERAGE", "Cobertura de Niñeras: %d/%d");
         es.put("COLONY_GRAVE_CLEANING", "Limpieza de Tumbas: %d/%d");
-        es.put("COLONY_APHIDS", "Áfidos: %d/%d");
+        es.put("COLONY_PET_INSECTS", "Insectos mascota: %d/%d");
+        es.put("COLONY_PARASITIC_MITES", "Ácaros parásitos: %d (%d hormigas ralentizadas)");
         es.put("COLONY_PARASITES", "Parásitos: %s");
         es.put("COLONY_POLICING", "Vigilancia: %d");
         es.put("COLONY_DETECTION_RATE", "Tasa de detección: ~%d/día");
@@ -124,7 +125,8 @@ public class SpanishTranslation implements Translation {
         es.put("COLONY_JUVENILE_ANTS", "Hormigas Juveniles: %d");
         es.put("COLONY_ADULT_ANTS", "Hormigas Adultas: %d");
         
-        es.put("TOOLTIP_APHIDS", "Áfidos");
+        es.put("TOOLTIP_PET_INSECTS", "Insectos mascota cuidados por pastoras y capturadoras. Consulta la pestaña Insectos en estadísticas de colonia (X) para el desglose por especie.");
+        es.put("TOOLTIP_PARASITIC_MITES", "Ácaros microscópicos en tus hormigas. Cada 10 ácaros ralentizan una hormiga a la mitad. Se propagan mensualmente con muchos recursos almacenados.");
         es.put("TOOLTIP_PARASITES", "Parásitos en la Colonia");
         es.put("TOOLTIP_POLICING", "Eficiencia de Vigilancia");
         es.put("TOOLTIP_RESEARCH_POINTS", "Puntos de Investigación");
@@ -182,6 +184,7 @@ public class SpanishTranslation implements Translation {
         es.put("STATS_TAB_POPULATION", "Población");
         es.put("STATS_TAB_LOCAL_HEX", "Hexágono Local");
         es.put("STATS_TAB_RATES", "Tasas y Trabajos");
+        es.put("STATS_TAB_INSECTS", "Insectos");
         es.put("STATS_TAB_UNIT_STATS", "Estad. de Unidades");
         es.put("STATS_TAB_MORTALITY", "Mortalidad");
         es.put("COL_CATEGORY", "Categoría");
@@ -208,6 +211,7 @@ public class SpanishTranslation implements Translation {
         es.put("COL_DESCRIPTION", "Descripción");
         es.put("COL_CAUSE", "Causa");
         es.put("COL_TOTAL", "Total");
+        es.put("COL_CARETAKERS", "Cuidadores");
         es.put("STAT_STATUS_NO_HEX", "Sin Hexágono Activo");
         es.put("STAT_COORDS", "Coordenadas (Q, R)");
         es.put("STAT_LOCAL_WEATHER", "Clima Local");
@@ -302,7 +306,7 @@ public class SpanishTranslation implements Translation {
         es.put("DYNASTY_ACTIONS", "Acciones");
         es.put("DYNASTY_TRANSIT_FORMAT", "%s (%dh)%s");
         es.put("DYNASTY_BUILD_TUNNEL", "Construir Túnel");
-        es.put("DYNASTY_TUNNEL_Sponsoring", "Esta colonia ya está patrocinando un proyecto de túnel.");
+        es.put("DYNASTY_TUNNEL_SPONSORING", "Esta colonia ya está patrocinando un proyecto de túnel.");
         es.put("DYNASTY_BUILT", "Construido");
         es.put("DYNASTY_PROGRESS_PERCENT", "%.0f%%");
         es.put("DYNASTY_ERROR_NO_ENGINEERS", "¡No hay Ingenieras o Perforadoras asignadas para progresar en la construcción!");
@@ -380,20 +384,24 @@ public class SpanishTranslation implements Translation {
         es.put("SETTINGS_EVERY_6_MONTHS", "Cada 6 Meses");
         es.put("SETTINGS_EVERY_YEAR", "Cada Año (12 Meses)");
         es.put("SETTINGS_SAVE_APPLY", "Guardar y Aplicar");
+        es.put("SETTINGS_RESET_TAB", "Restablecer esta pestaña");
         es.put("SETTINGS_SAVED_MSG", "Ajustes guardados y aplicados.");
         
         es.put("SETTINGS_TAB_GENERAL", "General");
         es.put("SETTINGS_TAB_VIDEO", "Vídeo");
         es.put("SETTINGS_TAB_AUDIO", "Audio");
+        es.put("SETTINGS_TAB_ROLES", "Roles");
         
-        es.put("SETTINGS_VISUAL_FILTERS", "Filtros Visuales:");
+        es.put("SETTINGS_DAYLIGHT_COLOR_OVERLAY", "Tono de luz diurna:");
+        es.put("SETTINGS_WEATHER_COLOR_OVERLAY", "Tono del clima:");
         es.put("SETTINGS_ARACHNOPHOBIA", "Modo Aracnofobia:");
-        es.put("SETTINGS_PAUSE_FOCUS", "Pausar al Perder Foco:");
-        es.put("SETTINGS_CONFIRM_QUIT", "Confirmar al Salir:");
-        es.put("SETTINGS_SHOW_TOOLTIPS", "Mostrar Tooltips:");
-        
+        es.put("SETTINGS_PAUSE_FOCUS", "Pausar al perder foco");
+        es.put("SETTINGS_CONFIRM_QUIT", "Confirmar al salir");
+        es.put("SETTINGS_SHOW_TOOLTIPS", "Mostrar consejos");
+        es.put("SETTINGS_FUZZ_PARASITES", "Cifras de parásitos imprecisas");
+
         es.put("SETTINGS_MASTER_VOL", "Volumen Maestro:");
-        es.put("SETTINGS_MUSIC_VOL", "Volumen de Música:");
+        es.put("SETTINGS_MUSIC_VOL", "Volumen Música:");
         es.put("SETTINGS_SFX_VOL", "Efectos de Sonido:");
 
         es.put("WORLD_BIOME_PREFIX", "Bioma: ");
@@ -401,7 +409,7 @@ public class SpanishTranslation implements Translation {
         es.put("WORLD_HUMIDITY_PREFIX", "Humedad: ");
         es.put("WORLD_NA", "N/D");
 
-        es.put("BIOME_PLAINS", "Llanuras");
+        es.put("BIOME_PLAINS", "Llanura");
         es.put("BIOME_FOREST", "Bosque");
         es.put("BIOME_JUNGLE", "Selva");
         es.put("BIOME_SWAMP", "Pantano");
@@ -417,7 +425,7 @@ public class SpanishTranslation implements Translation {
         es.put("TEMP_FREEZING", "Gélido");
         es.put("TEMP_COLD", "Frío");
         es.put("TEMP_CHILLY", "Fresco");
-        es.put("TEMP_GOOD", "Bueno");
+        es.put("TEMP_GOOD", "Templado");
         es.put("TEMP_WARM", "Cálido");
         es.put("TEMP_HOT", "Caluroso");
         es.put("TEMP_BURNING", "Ardiente");
@@ -447,9 +455,9 @@ public class SpanishTranslation implements Translation {
         es.put("MOON_NEW", "Luna Nueva");
         es.put("MOON_WAXING_CRESCENT", "Luna Creciente");
         es.put("MOON_FIRST_QUARTER", "Cuarto Creciente");
-        es.put("MOON_WAXING_GIBBOUS", "Luna Gibosa Creciente");
+        es.put("MOON_WAXING_GIBBOUS", "Gibosa Creciente");
         es.put("MOON_FULL", "Luna Llena");
-        es.put("MOON_WANING_GIBBOUS", "Luna Gibosa Menguante");
+        es.put("MOON_WANING_GIBBOUS", "Gibosa Menguante");
         es.put("MOON_LAST_QUARTER", "Cuarto Menguante");
         es.put("MOON_WANING_CRESCENT", "Luna Menguante");
 
@@ -462,22 +470,22 @@ public class SpanishTranslation implements Translation {
         es.put("WEATHER_RAIN", "Lluvia");
         es.put("WEATHER_SNOW", "Nieve");
         es.put("WEATHER_HEAVY_RAIN", "Lluvia Fuerte");
-        es.put("WEATHER_THUNDER", "Tormenta Eléctrica");
-        es.put("WEATHER_HEAVY_SNOW", "Tormenta de Nieve");
+        es.put("WEATHER_THUNDER", "Tormenta");
+        es.put("WEATHER_HEAVY_SNOW", "Tormenta Nieve");
         es.put("WEATHER_WIND", "Viento Fuerte");
         es.put("WEATHER_HEAT", "Ola de Calor");
         es.put("WEATHER_FOG", "Niebla");
         es.put("WEATHER_FROG", "Lluvia de Ranas");
         es.put("WEATHER_BLOOD", "Lluvia de Sangre");
-        es.put("WEATHER_SAND_STORM", "Tormenta de Arena");
-        es.put("WEATHER_PYROCLASTIC_FOG", "Niebla Pyroclástica");
+        es.put("WEATHER_SAND_STORM", "Tormenta Arena");
+        es.put("WEATHER_PYROCLASTIC_FOG", "Niebla Piroclástica");
         es.put("WEATHER_ACID_RAIN", "Lluvia Ácida");
 
         es.put("STATUS_ALIVE", "Viva");
         es.put("STATUS_DEAD", "Muerta");
         es.put("STATUS_ZOMBIFIED", "Zombificada");
 
-        es.put("MOVE_STATIC", "Estática");
+        es.put("MOVE_STATIC", "Quieta");
         es.put("MOVE_WANDER", "Deambulando");
         es.put("MOVE_MARCH", "Marchando");
         es.put("MOVE_SPEED", "Marcha Rápida");
@@ -485,15 +493,20 @@ public class SpanishTranslation implements Translation {
         es.put("MOVE_PATROL", "Patrullando");
 
         es.put("BUG_ANT", "Hormiga");
-        es.put("BUG_APHID", "Áfido");
-        es.put("BUG_PARASITE", "Parásito de Hormigas");
+        es.put("BUG_APHID", "Pulgón");
+        es.put("BUG_SOIL_MITE", "Ácaro de suelo");
+        es.put("BUG_DERMESTID", "Escarabajo derméstido");
+        es.put("BUG_PARASITE", "Parásito");
+        es.put("BUG_ANT_SCIENTIFIC", "Formica");
+        es.put("BUG_APHID_SCIENTIFIC", "Aphididae");
+        es.put("BUG_SOIL_MITE_SCIENTIFIC", "Stratiolaelaps scimitus");
+        es.put("BUG_DERMESTID_SCIENTIFIC", "Dermestidae");
+        es.put("BUG_PARASITIC_MITE", "Ácaro parásito");
+        es.put("BUG_PARASITIC_MITE_SCIENTIFIC", "Acaridae");
+        es.put("BUG_PARASITE_SCIENTIFIC", "Anergates");
 
-        es.put("TYPE_EGG", "Huevo");
         es.put("TYPE_LARVA", "Larva");
         es.put("TYPE_PUPA", "Pupa");
-        es.put("TYPE_WORKER", "Obrera");
-        es.put("TYPE_SOLDIER", "Soldado");
-        es.put("TYPE_MAJOR", "Major");
         es.put("TYPE_DRONE", "Zángano");
         es.put("TYPE_PRINCESS", "Princesa");
         es.put("TYPE_QUEEN", "Reina");
@@ -505,11 +518,11 @@ public class SpanishTranslation implements Translation {
         es.put("ROLE_BUILDER", "Constructora");
         es.put("ROLE_SCOUT", "Exploradora");
         es.put("ROLE_FARMER", "Granjera");
-        es.put("ROLE_RANCHER", "Rancho");
+        es.put("ROLE_RANCHER", "Pastora");
         es.put("ROLE_GRAVER", "Sepulturera");
         es.put("ROLE_MINER", "Minera");
         es.put("ROLE_COURIER", "Mensajera");
-        es.put("ROLE_POTTER", "Alimentadora");
+        es.put("ROLE_POTTER", "Hormiga-Copa");
         es.put("ROLE_GUARD", "Guardia");
         es.put("ROLE_WARRIOR", "Guerrera");
         es.put("ROLE_DEFENDER", "Defensora");
@@ -517,9 +530,9 @@ public class SpanishTranslation implements Translation {
         es.put("ROLE_BOMBER", "Bombardera");
         es.put("ROLE_HUNTER", "Cazadora");
         es.put("ROLE_BRUTE", "Bruto");
-        es.put("ROLE_CARRIER", "Transportadora");
+        es.put("ROLE_CARRIER", "Transporte Tropas");
         es.put("ROLE_ARTILLERY", "Artillería");
-        es.put("ROLE_SIEGE", "Motor de Asedio");
+        es.put("ROLE_SIEGE", "Máquina Sitio");
         es.put("ROLE_BORER", "Perforadora");
         es.put("ROLE_DRONE", "Zángano");
         es.put("ROLE_BREEDER", "Criadora");
@@ -528,22 +541,22 @@ public class SpanishTranslation implements Translation {
         es.put("ROLE_RESEARCHER", "Investigadora");
         es.put("ROLE_MILITIA", "Milicia Auxiliar");
         es.put("ROLE_CATCHER", "Capturadora");
-        es.put("ROLE_CRANE", "Grúa de Construcción");
-        es.put("ROLE_TRANSPORT", "Transporte de Recursos");
-        es.put("ROLE_ASSISTANT", "Asistente de Laboratorio");
-        es.put("ROLE_ESCORT", "Escolta de Convoy");
-        es.put("ROLE_ENGINEER", "Ingeniera de Túneles");
-        es.put("ROLE_SKYTRANS", "Transporte Aéreo");
+        es.put("ROLE_CRANE", "Grúa Constr.");
+        es.put("ROLE_TRANSPORT", "Transp. Recursos");
+        es.put("ROLE_ASSISTANT", "Asistente Lab.");
+        es.put("ROLE_ESCORT", "Escolta Convoy");
+        es.put("ROLE_ENGINEER", "Ingeniera Túnel");
+        es.put("ROLE_SKYTRANS", "Transp. Aéreo");
 
         es.put("RANK_ANT", "Hormiga");
-        es.put("RANK_COLONY", "Colonia de Hormigas");
-        es.put("RANK_COUNTY", "Condado de Hormigas");
-        es.put("RANK_DUCHY", "Ducado de Hormigas");
-        es.put("RANK_KINGDOM", "Reino de Hormigas");
-        es.put("RANK_EMPIRE", "Imperio de Hormigas");
+        es.put("RANK_COLONY", "Colonia");
+        es.put("RANK_COUNTY", "Condado");
+        es.put("RANK_DUCHY", "Ducado");
+        es.put("RANK_KINGDOM", "Reino");
+        es.put("RANK_EMPIRE", "Imperio");
         es.put("RANK_SUPER", "Súper Colonia");
         es.put("RANK_ULTRA", "Ultra Colonia");
-        es.put("RANK_HYPER", "Híper Colonia");
+        es.put("RANK_HYPER", "Hiper Colonia");
         es.put("RANK_MEGA", "Mega Colonia");
         es.put("RANK_ULTIMATE", "Colonia Definitiva");
         es.put("RANK_SUPREME", "Colonia Suprema");
@@ -551,7 +564,7 @@ public class SpanishTranslation implements Translation {
 
         es.put("SPECIES_OMNI", "Hormiga Omni");
         es.put("SPECIES_OMNI_SCIENTIFIC", "Omniformica Grimunknowni");
-        es.put("SPECIES_LEAF", "Hormiga Cortadora de Hojas");
+        es.put("SPECIES_LEAF", "Hormiga Cortadora");
         es.put("SPECIES_LEAF_SCIENTIFIC", "Atta Cephalotes");
         es.put("SPECIES_PHARAOH", "Hormiga Faraón");
         es.put("SPECIES_PHARAOH_SCIENTIFIC", "Monomorium Pharaonis");
@@ -565,7 +578,6 @@ public class SpanishTranslation implements Translation {
 
         es.put("EVENT_ECLIPSE_NUPTIAL", "¡El Eclipse ha provocado un Vuelo Nupcial espontáneo!");
 
-        // -- GameUnlocks Keys --
         es.put("TYPE_EGG", "Tipo de Huevo, Larva y Pupa");
         es.put("TYPE_EGG_FLAVOR", "Hormigas Nuevas");
         es.put("TYPE_EGG_DESC", "Desbloquea los tipos de hormigas juveniles, permitiendo que nazcan nuevas hormigas. Cada etapa tarda 4 días en superarse.");
@@ -604,7 +616,7 @@ public class SpanishTranslation implements Translation {
         es.put("ROLE_LAYER_DESC", "Permite a las reinas poner huevos. 1 reina pone 1 huevo por hora.");
         es.put("ROLE_RANCHER_UPGRADE", "Rol Rancho");
         es.put("ROLE_RANCHER_FLAVOR", "Pastora de Áfidos");
-        es.put("ROLE_RANCHER_DESC", "Permite a las obreras criar áfidos. 1 hormiga maneja 10 y atrae 1 nuevo por día. Cada áfido produce 1 de jarabe.");
+        es.put("ROLE_RANCHER_DESC", "Permite a las obreras cuidar pulgones en el corral. Cada pastora sostiene hasta 10 áfidos. Cada áfido produce 1 jarabe por hora si hay plantas. Usa Capturadoras para encontrar áfidos salvajes en las Llanuras.");
         es.put("ROLE_RESEARCHER_UPGRADE", "Rol Investigadora");
         es.put("ROLE_RESEARCHER_FLAVOR", "Ciencia Hormiga");
         es.put("ROLE_RESEARCHER_DESC", "Permite a las reinas generar puntos de investigación. 1 reina genera 1 punto por hora.");
@@ -658,7 +670,7 @@ public class SpanishTranslation implements Translation {
         es.put("ROLE_MILITIA_DESC", "Permite a las obreras realizar tareas defensivas básicas.");
         es.put("ROLE_CATCHER_UPGRADE", "Rol Capturadora");
         es.put("ROLE_CATCHER_FLAVOR", "Captura de Bichos");
-        es.put("ROLE_CATCHER_DESC", "Permite a los soldados capturar insectos enemigos.");
+        es.put("ROLE_CATCHER_DESC", "Permite a las soldados capturar insectos nativos en el exterior. Cada capturadora mantiene hasta 10 insectos mascota en total. Las pastoras cuidan áfidos, las coveiras derméstidos. Las parejas se reproducen diariamente con al menos dos ejemplares.");
         es.put("ROLE_CRANE_UPGRADE", "Rol Grúa de Construcción");
         es.put("ROLE_CRANE_FLAVOR", "Trabajo Pesado");
         es.put("ROLE_CRANE_DESC", "Permite a los majors ayudar en la construcción; cada uno equivale a 25 obreras.");
@@ -697,7 +709,6 @@ public class SpanishTranslation implements Translation {
         es.put("ABILITY_ASSIMILATION_FLAVOR", "Asimilación Genética");
         es.put("ABILITY_ASSIMILATION_DESC", "Permite usar asimilaciones para cambiar el código genético y ganar habilidades de otras especies.");
         es.put("ABILITY_FORCED_FLIGHT_FLAVOR", "Decreto Real");
-        es.put("ABILITY_FORCED_FLIGHT_DESC", "Permite forzar un vuelo nupcial gastando puntos de investigación.");
         es.put("ABILITY_DYNASTY_FLAVOR", "Sociedad Hormiga");
         es.put("ABILITY_DYNASTY_DESC", "Permite ver todas las colonias de tu dinastía en la pantalla de gestión.");
         es.put("ABILITY_TRADE_FLAVOR", "Comercio Hormiga");
@@ -713,7 +724,10 @@ public class SpanishTranslation implements Translation {
         es.put("ABILITY_MANAGEMENT_FLAVOR", "Mando Descentralizado");
         es.put("ABILITY_MANAGEMENT_DESC", "Permite que las colonias se construyan solas sin tu intervención directa.");
         es.put("ABILITY_MASS_FLIGHT_FLAVOR", "Decreto Imperial");
-        es.put("ABILITY_MASS_FLIGHT_DESC", "Activa vuelos nupciales en todas las colonias capaces. Cuesta 10 veces más que un vuelo forzado estándar.");
+        es.put("ABILITY_CLONING_FLAVOR", "Eco genético");
+        es.put("ABILITY_CLONING_DESC", "Cada asimilación genética completada aumenta la integridad genética de la dinastía. La integridad mínima escala con las asimilaciones completadas.");
+        es.put("ABILITY_PARASITIC_MITE_ALERT_FLAVOR", "Ácaros parásitos");
+        es.put("ABILITY_PARASITIC_MITE_ALERT_DESC", "Avisa cuando los ácaros parásitos infestan la colonia. Cada 10 ácaros ralentizan una hormiga a la mitad de velocidad.");
         es.put("ABILITY_ABILITY_FLAVOR", "Habilidades Desbloqueadas");
         es.put("ABILITY_ABILITY_DESC", "Permite ver el menú de habilidades y usar habilidades activas.");
 
@@ -769,6 +783,10 @@ public class SpanishTranslation implements Translation {
         es.put("STAT_CONTAMINATION_2_DESC", "Reduce la tasa de mortalidad por contaminación en un 40%.");
         es.put("STAT_CONTAMINATION_3_FLAVOR", "Protocolos de Aislamiento");
         es.put("STAT_CONTAMINATION_3_DESC", "Reduce la tasa de mortalidad por contaminación en un 60%.");
+        es.put("STAT_SOIL_MITE_1_FLAVOR", "Entrenamiento de ácaros");
+        es.put("STAT_SOIL_MITE_1_DESC", "Aumenta la eliminación de ácaros parásitos de cada ácaro de suelo a 12 por día.");
+        es.put("STAT_DERMESTID_1_FLAVOR", "Escarabajos de fosa");
+        es.put("STAT_DERMESTID_1_DESC", "Permite que cada derméstido en la fosa cuente como 1 coveira para enterrar cadáveres.");
         es.put("STAT_GRAVING_1_FLAVOR", "Tumbas Poco Profundas");
         es.put("STAT_GRAVING_1_DESC", "Aumenta la tasa de sepultura en 5 por día.");
         es.put("STAT_GRAVING_2_FLAVOR", "Fosas Comunes");
@@ -781,6 +799,19 @@ public class SpanishTranslation implements Translation {
         es.put("STAT_POLICING_2_DESC", "Aumenta la tasa de vigilancia al 35% por día.");
         es.put("STAT_POLICING_3_FLAVOR", "Drones de Vigilancia");
         es.put("STAT_POLICING_3_DESC", "Aumenta la tasa de vigilancia al 55% por día.");
+        es.put("STAT_HEX_SUSTAIN_FLAVOR", "Sostenibilidad ambiental");
+        es.put("STAT_HEX_SUSTAIN_DESC", "Limita el agotamiento efectivo del hexágono al 80% para esta colonia.");
+        es.put("STAT_WORKER_SPEED_2_FLAVOR", "Marcha forzada");
+        es.put("STAT_WORKER_SPEED_2_DESC", "Duplica la velocidad de movimiento en superficie de las obreras y su radio de recolección a plena eficiencia.");
+
+        es.put("STAT_CAT_OVERWORLD", "Hexágono");
+        es.put("STAT_HEX_DEPLETION", "Agotamiento");
+        es.put("STAT_HEX_SOURCES_FOUND", "Fuentes encontradas");
+        es.put("STAT_HEX_MAX_EFFICIENCY_DISTANCE", "Distancia máx. a plena eficiencia");
+        es.put("STAT_LOCAL_HEX_NOTE_CAT", "Nota");
+        es.put("STAT_LOCAL_HEX_DYNASTY_HINT", "En modo dinastía, esta pestaña describe la colonia desde la que abriste estadísticas, no todas a la vez.");
+        es.put("UNIT_STAT_WORKER_MARCH", "Marcha obrera");
+        es.put("UNIT_STAT_WORKER_MARCH_DESC", "Las obreras se mueven al doble de velocidad en superficie (marcha forzada).");
 
         es.put("ASSIMILATED_FARMING_FLAVOR", "Técnicas Agrícolas Ancestrales");
         es.put("ASSIMILATED_FARMING_DESC", "Tu dinastía ha aprendido a cultivar hongos de manera más eficiente, obteniendo 1 unidad extra por cada planta y proteína.");
@@ -885,13 +916,13 @@ public class SpanishTranslation implements Translation {
         es.put("ASSIMILATION_MARAUDER", "Asimilación de Hormiga Merodeadora");
         es.put("ASSIMILATION_MARAUDER_DESC", "Tras asimilar el genoma de la hormiga merodeadora:");
 
-        // -- HelpPanel Keys --
         es.put("HELP_TAB_WELCOME", "Bienvenida");
         es.put("HELP_TAB_STARTED", "Primeros Pasos");
         es.put("HELP_TAB_DYNASTY", "Dinastía");
         es.put("HELP_TAB_HOTKEYS", "Teclas");
         es.put("HELP_TAB_SPECIES", "Especies");
         es.put("HELP_TAB_TYPES", "Tipos");
+        es.put("HELP_TAB_BUGS", "Otros insectos");
         es.put("HELP_TAB_ROLES", "Roles");
         es.put("HELP_TAB_UPGRADES", "Mejoras");
         es.put("HELP_TAB_BUILDINGS", "Edificios");
@@ -900,10 +931,16 @@ public class SpanishTranslation implements Translation {
 
         es.put("HELP_WELCOME_STORY", "Casi todas las demás hormigas se han extinguido. Eres una reina hormiga y tienes dentro de ti todo el conocimiento genético de cada especie de hormiga. Debes desbloquearlo y apoderarte del mundo como la especie dominante. <br><br>Construye tu colonia y comienza a expandirte mientras luchas contra otras colonias de hormigas; necesitarás adaptarte a nuevos entornos absorbiendo e investigando sus habilidades.");
         es.put("HELP_START_INFO", "<b>Supervivencia Básica:</b><br>Tus hormigas necesitan <b>Hongos</b> para comer y <b>Agua</b> para beber todos los días. Sin ellos, tu colonia morirá de hambre o deshidratación.<br>- <b>Recolectoras</b> recogen Plantas y Agua.<br>- <b>Cazadoras</b> recogen Proteína (Carne).<br>- <b>Granjeras</b> convierten Plantas y Proteína en Hongos.<br>- <b>Niñeras</b> cuidan de tu prole. La prole descuidada morirá.<br><br><b>Observando tu Colonia:</b><br>Presiona <b>A</b> para alternar tu vista entre el <b>Inframundo</b> (dentro del hormiguero) y el <b>Supramundo</b> (recolección exterior).<br><br><b>Gestión de la Colonia:</b><br>Usa <b>Tasas de Eclosión (P)</b> para controlar los nacimientos. Las <b>Investigadoras</b> generan Puntos de Investigación (PI) para mejoras en el <b>Menú de Investigación (Y)</b>. Las <b>Constructoras</b> usan Minerales y Resina para construir instalaciones mediante el <b>Menú de Construcción (U)</b>.<br><br><b>Amenazas Avanzadas:</b><br>- <b>Contaminación:</b> Las hormigas muertas deben ser retiradas por <b>Sepultureras</b>.<br>- <b>Parásitos:</b> Drenan secretamente la comida. Asigna <b>Vigilantes</b> para eliminarlos.<br>- <b>Agotamiento:</b> Los nodos de recursos se secan; asigna <b>Exploradoras</b> para encontrar nuevos.");
+        es.put("HELP_OVERWORLD_GATHERING", "<b>Recolección en superficie (supramundo):</b><br>Las <b>exploradoras</b> descubren nuevos nodos de recursos. Cada hexágono del mapa acumula <b>agotamiento</b> por hallazgos sin agua; un agotamiento mayor suele colocar nodos nuevos más lejos del nido (algunas mejoras limitan lo fuerte que es esto).<br><br><b>Distancia:</b> Lo recogido depende de la distancia en línea recta desde la <b>entrada del nido</b>. Dentro de un radio de <b>plena eficiencia</b> (mayor con obreras más rápidas y ciertas mejoras), el rendimiento es completo; más lejos, cae hacia un mínimo pequeño.<br><br><b>Estadísticas (Hex local):</b> <b>Agotamiento</b> es el porcentaje efectivo usado para apariciones; <b>Fuentes encontradas</b> cuenta los nodos que esta colonia ha descubierto; <b>Distancia máx. a plena eficiencia</b> estima el radio de rendimiento pleno para una obrera típica.");
         es.put("HELP_DYNASTY_INFO", "<b>Expandiendo tu Dinastía:</b><br>Una vez que desbloquees a las <b>Criadoras</b>, realiza Vuelos Nupciales para expandirte a través del <b>Mapa Mundial (I)</b>.<br><i>Consejo: ¡Vigila el cielo! ¡Los eclipses activan Vuelos Nupciales espontáneos y gratuitos!</i><br><br><b>Logística y Comercio:</b><br>Fundar múltiples colonias desbloquea las <b>Rutas Comerciales</b>. Asigna <b>Mensajeras</b> para transportar recursos.<br>- <b>Tierra:</b> Método comercial estándar.<br>- <b>Túnel:</b> Seguro y rápido, requiere <b>Túneles</b> y <b>Perforadoras</b>.<br>- <b>Aire:</b> Rápido pero de baja capacidad, requiere <b>Transporte Aéreo</b> (Princesas).<br>- <b>Bilateral:</b> Permite el transporte de recursos en ambos sentidos.<br><br><b>Hitos de la Dinastía:</b><br>- <b>Menú de Dinastía (S):</b> Mira y gestiona todas las colonias.<br>- <b>Colonización Masiva:</b> Elimina los límites de colonias satélite.<br>- <b>Automatización:</b> Permite que las colonias NPC se gestionen solas.<br><br><b>Evolución:</b><br>Desbloquea <b>Sinergias</b> para combinar mejoras y <b>Asimilaciones</b> para absorber rasgos de otras especies.");
         
         es.put("HELP_SPECIES_SCIENTIFIC", "Nombre Científico:");
         es.put("HELP_SPECIES_TRAITS", "Rasgos Base:");
+
+        es.put("HELP_RESOURCE_SOURCE_SMALL", "Pequeño");
+        es.put("HELP_RESOURCE_SOURCE_MEDIUM", "Mediano");
+        es.put("HELP_RESOURCE_SOURCE_BIG", "Grande");
+        es.put("HELP_RESOURCE_SOURCE_HUGE", "Enorme");
 
         es.put("HOTKEY_PAUSE", "Pausar / Reanudar Juego");
         es.put("HOTKEY_SPEED", "Aumentar / Disminuir Velocidad");
@@ -926,6 +963,13 @@ public class SpanishTranslation implements Translation {
         es.put("HELP_TYPE_PRINCESS_DESC", "Una reproductora alada. Se puede asignar al rol de Criadora para aparearse con un Zángano y convertirse en una nueva Reina.");
         es.put("HELP_TYPE_DRONE_DESC", "Un reproductor macho alado. Su único propósito es aparearse con una Princesa, tras lo cual muere.");
         es.put("HELP_TYPE_QUEEN_DESC", "El corazón de la colonia. Se puede asignar a Poner Huevos o Investigar nuevas tecnologías.");
+
+        es.put("HELP_BUG_ANT_DESC", "Hormigas salvajes o rivales que aparecen en el supramundo. Pueden luchar contra tus hormigas y competir por espacio.");
+        es.put("HELP_BUG_APHID_DESC", "Insectos que se alimentan de plantas. Las capturadoras los capturan en las Llanuras; las pastoras cuidan hasta 10 por pastora. Sin corral dedicado, van al corral de insectos.");
+        es.put("HELP_BUG_SOIL_MITE_DESC", "Ácaros depredadores de control biológico. En el corral de insectos. Cada ácaro de suelo elimina hasta 5 ácaros parásitos al día (12 con Entrenamiento de ácaros). Se reproducen con al menos dos.");
+        es.put("HELP_BUG_DERMESTID_DESC", "Escarabajos que limpian carroña. Las coveiras cuidan hasta 10 cada una. Con Escarabajos de fosa, cada uno cuenta como una coveira. Se reproducen con al menos dos.");
+        es.put("HELP_BUG_PARASITE_DESC", "Plagas que se esconden en el nido y drenan comida en secreto. Asigna Vigilantes para encontrarlas y eliminarlas antes de que se multipliquen.");
+        es.put("HELP_BUG_PARASITIC_MITE_DESC", "Ácaros diminutos que infestan hormigas adultas cuando la colonia acumula recursos. Los números van en miles. Cada 10 ácaros ralentizan una hormiga a la mitad. Se propagan mensualmente; los ácaros de suelo son el principal contramedio. La Policía no los afecta.");
 
         es.put("HELP_BIOMES_TITLE", "Biomas");
         es.put("HELP_BIOME_TEMP", "Temp: ");
@@ -957,6 +1001,115 @@ public class SpanishTranslation implements Translation {
 
         es.put("HELP_SKIP_TUTORIAL", "Saltar Tutorial");
         es.put("HELP_FINISH", "Finalizar");
+
+        es.put("ALERT_STARVATION_RISK", "Riesgo de inanición");
+        es.put("ALERT_NEW_RESEARCH", "Nueva investigación disponible");
+        es.put("ALERT_CAN_BUILD_FMT", "Se puede construir: %s");
+        es.put("ALERT_BODY_PILE_FMT", "Muchos cadáveres: %d");
+        es.put("ALERT_NUPTIAL_FLIGHT", "Vuelo nupcial");
+        es.put("ALERT_BUILT_PREFIX", "Construido: ");
+        es.put("ALERT_COMPOST_RECYCLED_PREFIX", "Reciclados ");
+        es.put("ALERT_COMPOST_BODIES_SUFFIX", " cadáveres");
+
+        es.put("ASSIMILATION_DIALOG_SUCCESS_TITLE", "Asimilación completada");
+        es.put("ASSIMILATION_DIALOG_SUCCESS_BODY", "Asimilación genética completada\n\n%s finalizada.\nDesbloqueado: %s");
+
+        es.put("UI_DIALOG_LOADING_TITLE", "Cargando");
+        es.put("SAVE_DEFAULT_NAME_FMT", "Partida %d");
+
+        es.put("STAT_NEIGHBOR_NORTH", "Norte");
+        es.put("STAT_NEIGHBOR_NORTH_WEST", "Noroeste");
+        es.put("STAT_NEIGHBOR_NORTH_EAST", "Noreste");
+        es.put("STAT_NEIGHBOR_SOUTH", "Sur");
+        es.put("STAT_NEIGHBOR_SOUTH_WEST", "Suroeste");
+        es.put("STAT_NEIGHBOR_SOUTH_EAST", "Sureste");
+        es.put("STAT_TABLE_SEPARATOR", "------");
+        es.put("STAT_HEX_COLONY_FMT", " (Colonia: %s)");
+        es.put("STAT_LABEL_ID", "ID");
+        es.put("STAT_LABEL_ERROR", "Error");
+        es.put("STAT_LABEL_PROGRESS", "Progreso");
+        es.put("STAT_GLOBAL_RESOURCE_FMT", "Global %s");
+        es.put("STAT_DEFEATED_UNKNOWN_FMT", "ID:%d");
+        es.put("STAT_JOB_FARMING", "Agricultura");
+        es.put("STAT_JOB_FARMERS_EFF_FMT", "%d granjeras ef.");
+        es.put("STAT_RATE_CONVERT_DAY", "~%d conv./día");
+        es.put("STAT_RATE_PWR_DAY", "~%d pot./día");
+        es.put("STAT_RATE_RES_DAY", "~%d rec./día");
+        es.put("STAT_RATE_SCOUT_STATUS", "Buscando recursos");
+        es.put("STAT_RATE_RESEARCH_ASST_FMT", "%d Inv / %d Asist");
+        es.put("STAT_RATE_PTS_DAY_FMT", "+%d pts/día");
+        es.put("STAT_JOB_EGG_LAYING", "Puesta de huevos");
+        es.put("STAT_RATE_LAYERS_FMT", "%d ponedoras");
+        es.put("STAT_RATE_EGGS_DAY", "+%d huevos/día");
+        es.put("STAT_RATE_NURSES_FMT", "%d niñeras");
+        es.put("STAT_RATE_CAP_SHORT", "%d cap.");
+        es.put("STAT_RATE_LOAD_FMT", "%s / %d carga");
+        es.put("STAT_RATE_GRAVERS_FMT", "%d sepultureras");
+        es.put("STAT_RATE_RANCHERS_FMT", "%d pastoras");
+        es.put("STAT_RATE_APHIDS_FMT", "%s / %d pulgones");
+        es.put("STAT_RATE_POLICE_FMT", "%d policía");
+        es.put("STAT_RATE_PARASITES_FMT", "%d parásitos");
+        es.put("STAT_RATE_DET_DAY", "~%d det./día");
+        es.put("STAT_NO_INSECTS", "Sin insectos registrados");
+        es.put("STAT_INSECT_CATCHERS_FMT", "%d capturadoras");
+        es.put("STAT_INSECT_SLOWED_FMT", "%d hormigas ralentizadas");
+        es.put("STAT_INSECT_POOL", "Cupo de capturadoras");
+        es.put("STAT_INSECT_PARASITIC_CAP_FMT", "%d ácaros por hormiga ralentizada");
+        es.put("STAT_INSECT_PARASITIC_KILL_FMT", "%d ralentizadas, ~%d/día de contramedida");
+
+        es.put("LOG_DEATH_OLD_AGE_FMT", "%d hormigas murieron por vejez");
+        es.put("LOG_DEATH_JUVENILES_LACK_CARE_FMT", "%d juveniles murieron (falta de cuidados)");
+        es.put("LOG_DEATH_COUNT_CAUSE_FMT", "%d hormigas murieron por %s");
+        es.put("LOG_CAUSE_OLD_AGE", "vejez");
+        es.put("LOG_CAUSE_LACK_OF_CARE", "falta de cuidados");
+        es.put("LOG_CAUSE_DEHYDRATION", "deshidratación");
+        es.put("LOG_CAUSE_STARVATION", "inanición");
+        es.put("LOG_CAUSE_CONTAMINATION", "contaminación");
+        es.put("LOG_CONTAMINATION_LEVEL_FMT", "Nivel de contaminación: %s");
+        es.put("LOG_CONTAM_LEVEL_SMALL", "Bajo");
+        es.put("LOG_CONTAM_LEVEL_MEDIUM", "Medio");
+        es.put("LOG_CONTAM_LEVEL_MASSIVE", "Masivo");
+        es.put("LOG_PARASITE_SPREAD_FMT", "¡Se ha extendido una infestación parasitaria! %d parásitos nuevos detectados.");
+        es.put("LOG_PARASITIC_MITE_SPREAD_FMT", "¡Los ácaros parásitos se han propagado! %d ácaros nuevos detectados en la colonia.");
+        es.put("LOG_DYNASTY_ABSORBED_FMT", "¡Se absorbieron los restos de %s!");
+        es.put("LOG_FAILURE_SATELLITE", "Una colonia satélite no maduró por estancamiento genético.");
+        es.put("LOG_SATELLITE_AT_FMT", "Nueva colonia satélite en (%d, %d)");
+        es.put("LOG_SATELLITES_ESTABLISHED_FMT", "%d satélites establecidos.");
+        es.put("LOG_SPREADING_FAILED", "Expansión fallida: no hay tierras adyacentes adecuadas.");
+        es.put("LOG_PARASITES_ELIMINATED_FMT", "Eliminados %d parásitos.");
+        es.put("LOG_CAUGHT_BUGS_SUMMARY_FMT", "Las capturadoras trajeron %d insecto(s) del exterior.");
+        es.put("LOG_CAUGHT_BUG_BRED_FMT", "%d %s se reprodujeron en cautiverio.");
+        es.put("LOG_SOIL_MITES_PREDATION_FMT", "Los ácaros de suelo eliminaron %d ácaro(s) parásito(s).");
+        es.put("LOG_NUPTIAL_QUEENS_FMT", "Vuelo nupcial. Se unieron %d reinas nuevas.");
+        es.put("LOG_SUCCESS_ASSIMILATION_FMT", "¡%s completada! Recompensa: %s");
+        es.put("LOG_SUCCESS_TUNNEL", "¡Conexión de túnel completada!");
+        es.put("LOG_FOUND_NEW_SOURCE_FMT", "Nueva fuente de %s encontrada.");
+        es.put("LOG_FOUND_SOURCE_FULL_FMT", "Se encontró %s pero la capacidad está llena.");
+        es.put("LOG_SOURCE_EXHAUSTED_FMT", "Una fuente de %s se ha agotado.");
+        es.put("LOG_FORCE_FLIGHT_BLOCKED", "No se puede forzar el vuelo. Faltan zánganos o princesas criadoras.");
+        es.put("LOG_WARNING_NO_QUEEN_FMT", "¡La colonia no tiene reina! Días sin reina: %d/7");
+        es.put("LOG_MATURATION_COMPLETE", "Maduración de la colonia completa: fuerza laboral desplegada.");
+        es.put("LOG_TRADE_CANCELLED_FMT", "Cancelado. No hay suficiente %s disponible.");
+        es.put("LOG_TRADE_ARRIVED_FMT", "Comercio llegó a %s correctamente.");
+        es.put("LOG_TRADE_CONVOY_RETURN_FMT", "Convoy de %s recogió carga de vuelta.");
+        es.put("LOG_TRADE_BILATERAL_RETURN_FMT", "Convoy bilateral volvió con %d tipos de recursos.");
+        es.put("LOG_TRADE_ROUTE_CANCELLED_FMT", "Ruta a %s cancelada. Recursos reembolsados.");
+        es.put("LOG_AUTOMATION_BUILD_FMT", "Iniciada construcción de %s");
+        es.put("LOG_LAST_COLONY_FALLEN", "La última colonia ha caído. Esto es ahora un remanente muerto.");
+        es.put("LOG_PROMOTION_CAPITAL_FMT", "¡La antigua capital ha caído. Esta colonia es ahora la capital de %s!");
+        es.put("LOG_DYNASTY_RESEARCHED_FMT", "Investigado %s");
+        es.put("LOG_COMPOST_RECYCLED_FMT", "Reciclados %d cadáveres en materia de hongos.");
+
+        es.put("DYNASTY_SORT_POP_HIGH", "Población (mayor primero)");
+        es.put("DYNASTY_SORT_POP_LOW", "Población (menor primero)");
+        es.put("DYNASTY_SORT_AGE_OLD", "Edad (más antigua primero)");
+        es.put("DYNASTY_SORT_AGE_NEW", "Edad (más nueva primero)");
+
+        es.put("SETTINGS_DEFAULT_ROLE_WORKER", "Rol de obrera por defecto:");
+        es.put("SETTINGS_DEFAULT_ROLE_SOLDIER", "Rol de soldado por defecto:");
+        es.put("SETTINGS_DEFAULT_ROLE_MAJOR", "Rol de major por defecto:");
+        es.put("SETTINGS_DEFAULT_ROLE_PRINCESS", "Rol de princesa por defecto:");
+        es.put("SETTINGS_DEFAULT_ROLE_QUEEN", "Rol de reina por defecto:");
 
         return es;
     }

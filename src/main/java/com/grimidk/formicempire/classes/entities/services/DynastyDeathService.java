@@ -7,6 +7,8 @@ import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.infrasctructure.World;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.ColonyLogPrefixes;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 
 public class DynastyDeathService {
 
@@ -43,7 +45,8 @@ public class DynastyDeathService {
                     if (dead == remnant) {
                         dead.setActive(false);
                         dead.setAutomationEnabled(false);
-                        dead.logEvent("The last colony has fallen. This is now a dead remnant.");
+                        dead.logEvent(ColonyLogPrefixes.INFO + " "
+                            + LanguageStrings.get(LanguageStrings.LOG_LAST_COLONY_FALLEN));
                     } else {
                         Hex hex = findHexForColony(world, dead);
                         if (hex != null) starter.dismantleColony(hex);
@@ -73,7 +76,9 @@ public class DynastyDeathService {
                     
                     if (newCapital != null) {
                         newCapital.setCapital(true);
-                        newCapital.logEvent("PROMOTION: The old capital has fallen. This colony is now the Capital of the " + dynasty.getName() + "!");
+                        newCapital.logEvent(ColonyLogPrefixes.PROMOTION + " "
+                            + String.format(LanguageStrings.get(LanguageStrings.LOG_PROMOTION_CAPITAL_FMT),
+                                dynasty.getName()));
                         System.out.println("[DynastyDeathService] New capital crowned for " + dynasty.getName() + ": " + newCapital.getName());
                     }
                 }

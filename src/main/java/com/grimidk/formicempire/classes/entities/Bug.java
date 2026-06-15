@@ -60,6 +60,10 @@ public class Bug {
     public BugType getBugType() { return type; } 
     public void setBugType(BugType type) { this.type = type; }
 
+    public String getScientificName() {
+        return type != null ? type.getScientificName() : "";
+    }
+
     public AntStatus getStatus() { return status; }
     public void setStatus(AntStatus status) { this.status = status; }
 
