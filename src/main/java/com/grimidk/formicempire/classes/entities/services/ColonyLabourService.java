@@ -22,6 +22,7 @@ import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
 import com.grimidk.formicempire.classes.entities.Tunnel;
+import com.grimidk.formicempire.classes.infrasctructure.NeoPoint;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.ColonyLogPrefixes;
@@ -593,32 +594,21 @@ public class ColonyLabourService {
                 ? GameConstants.HEX_SUSTAIN_MAX_DEPLETION_PCT
                 : 100;
         int depletionPct = currentHex != null ? currentHex.getResourceDepletionPercentCapped(maxDepl) : 0;
-        int extraBuffer = (int) Math.round(
+        int depletionExtra = (int) Math.round(
             (depletionPct / 100.0) * GameConstants.HEX_DEPLETION_SPAWN_BUFFER_EXTRA_MAX);
-        extraBuffer = Math.min(extraBuffer, GameConstants.RESOURCE_SPAWN_BUFFER_EXTRA_CAP);
+        depletionExtra = Math.min(depletionExtra, GameConstants.RESOURCE_SPAWN_BUFFER_EXTRA_CAP);
 
-        int bufferMin = GameConstants.RESOURCE_SPAWN_EDGE_BUFFER_MIN + extraBuffer;
-        int bufferMax = GameConstants.RESOURCE_SPAWN_EDGE_BUFFER_MAX + extraBuffer;
-        int randomBuffer = bufferMin + random.nextInt(Math.max(1, bufferMax - bufferMin));
-        
-        int sourceX, sourceY;
-        int side = random.nextInt(4); // 0=Top, 1=Right, 2=Bottom, 3=Left
-        
-        if (side == 0) { // Top
-             sourceX = random.nextInt(Math.max(1, gameW));
-             sourceY = -randomBuffer;
-        } else if (side == 1) { // Right
-             sourceX = gameW + randomBuffer;
-             sourceY = random.nextInt(Math.max(1, gameH));
-        } else if (side == 2) { // Bottom
-             sourceX = random.nextInt(Math.max(1, gameW));
-             sourceY = gameH + randomBuffer;
-        } else { // Left
-             sourceX = -randomBuffer;
-             sourceY = random.nextInt(Math.max(1, gameH));
-        }
-        
-        ResourceSource source = new ResourceSource(selectedType, quantity, sourceX, sourceY);
+        int extraMin = GameConstants.RESOURCE_SPAWN_EXTRA_DISTANCE_MIN + depletionExtra;
+        int extraMax = GameConstants.RESOURCE_SPAWN_EXTRA_DISTANCE_MAX + depletionExtra;
+        int extraDistance = extraMin + random.nextInt(Math.max(1, extraMax - extraMin));
+
+        int displayPx = selectedType.getDisplaySizeForSourceQuantity(quantity);
+        NeoPoint entrance = colony.getLocationService().getColonyEntrance(colony);
+        Point center = ResourceSourcePlacement.pickSpawnCenter(
+                entrance, gameW, gameH, displayPx, extraDistance, random);
+        Point topLeft = ResourceSourcePlacement.topLeftFromCenter(center.x, center.y, displayPx);
+
+        ResourceSource source = new ResourceSource(selectedType, quantity, topLeft.x, topLeft.y);
         if (colony.getLocationService().addSource(colony, source) && currentHex != null) {
             currentHex.recordGeneratedResourceSource(selectedType);
         }

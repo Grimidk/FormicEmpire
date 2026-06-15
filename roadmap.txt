@@ -17,13 +17,13 @@ Missing assets:
 To Fix (By decreasing priority) : 
 		
 	Game Breaking:
-	(none right now)-
+	(none right now)
 	
 	High:
 	(none right now)
 
 	Mid:
-	maybe turn passive graveyard into Dermestid beetles
+	(none right now)
 
 	Low:
 	logistic physics use dimension 2
@@ -38,11 +38,10 @@ To Fix (By decreasing priority) :
 To Feature (to be done in order):
 Needed for launch (v1.0) (Launch Version):
 	Priority:
-	font
-	auxiliary room sprites (storage (resources), farm (shroom), nurse (bedding), royal (nests and science))
+	parasitic mite (forania) that reduce work effiency and bull mites (Stratiolaelaps) maybe with catcher role or something like that
+	Dermestid beetles instead of passive graving
 
 	Everything else :
-	parasitic mite (forania) that reduce work effiency and bull mites (Stratiolaelaps) maybe with catcher role or something like that
 	automate NPC to trade and tunnel
 	diplomacy and diplomatic reputation (own and xeno colonies) and alliances (non-aggression pacts), alliances can increase while allied genetic integrity
 	rebellions and rebel colonies (internal rebeliousness stat, too much causes a rebellious dynasty to appear, once capital defeated it gets reabsorbed)

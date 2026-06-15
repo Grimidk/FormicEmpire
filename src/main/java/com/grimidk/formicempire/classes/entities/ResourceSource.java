@@ -32,7 +32,19 @@ public class ResourceSource {
     }
 
     public ImageIcon getIconForDisplay() {
-        return resourceType.getIconForSourceQuantity(initialQuantity);
+        return resourceType.getIconForSourceQuantity(quantity);
+    }
+
+    public int getDisplaySizePx() {
+        return resourceType.getDisplaySizeForSourceQuantity(quantity);
+    }
+
+    public int getCenterX() {
+        return getX() + getDisplaySizePx() / 2;
+    }
+
+    public int getCenterY() {
+        return getY() + getDisplaySizePx() / 2;
     }
 
     public int getQuantity() {

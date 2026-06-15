@@ -259,7 +259,7 @@ public class ColonyPhysicsService {
         ResourceSource target = colony.getLocationService().findNearestRelevantSource(colony, ant);
         
         if (target != null) {
-            double d = dist(ant.getX(), ant.getY(), target.getX(), target.getY());
+            double d = dist(ant.getX(), ant.getY(), target.getCenterX(), target.getCenterY());
             
             if (d < 50 && ant.getDimension() == WorldSpaces.OVERWORLD) {
                 ant.setCarrying(target.getResourceType());
@@ -268,7 +268,7 @@ public class ColonyPhysicsService {
                 
                 Room current = getRoomContainingAnt(colony, ant);
                 Room sourceRoom = colony.getLocationService().createTempRoomAtPoint(
-                    new Point(target.getX(), target.getY()), 
+                    new Point(target.getCenterX(), target.getCenterY()), 
                     WorldSpaces.OVERWORLD
                 );
                 

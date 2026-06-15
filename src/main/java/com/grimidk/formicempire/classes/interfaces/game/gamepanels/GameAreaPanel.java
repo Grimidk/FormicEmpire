@@ -347,13 +347,10 @@ public class GameAreaPanel extends ZeroGamePanel {
             if (icon == null) {
                 continue;
             }
-            int w = icon.getIconWidth();
-            int h = icon.getIconHeight();
-            int sx = src.getX();
-            int sy = src.getY();
-            int cx = sx + w / 2;
-            int cy = sy + h / 2;
-            int side = Math.max(1, (int) Math.ceil(Math.hypot(w, h)));
+            int displayPx = src.getDisplaySizePx();
+            int cx = src.getCenterX();
+            int cy = src.getCenterY();
+            int side = Math.max(1, displayPx);
             int bx = cx - (side + 1) / 2;
             int by = cy - (side + 1) / 2;
             if (!ViewportPhysicsLod.antIntersectsViewport(lodViewportRect, bx, by, side, side)) {
@@ -363,7 +360,7 @@ public class GameAreaPanel extends ZeroGamePanel {
             double deg = resourceSourceRotationDegrees(src);
             g2d.translate(cx, cy);
             g2d.rotate(Math.toRadians(deg));
-            g2d.drawImage(icon.getImage(), -w / 2, -h / 2, w, h, this);
+            g2d.drawImage(icon.getImage(), -displayPx / 2, -displayPx / 2, displayPx, displayPx, this);
             g2d.setTransform(oldTx);
         }
     }

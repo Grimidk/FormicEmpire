@@ -3,6 +3,7 @@ package com.grimidk.formicempire.classes.constants.misc;
 import javax.swing.ImageIcon;
 
 import com.grimidk.formicempire.classes.constants.Constant;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 
 public class ResourceType extends Constant {
     public static final int SOURCE_QTY_SMALL = 100;
@@ -66,5 +67,18 @@ public class ResourceType extends Constant {
             return sourceSpriteSmall;
         }
         return getIcon();
+    }
+
+    public int getDisplaySizeForSourceQuantity(int quantity) {
+        if (quantity >= SOURCE_QTY_HUGE) {
+            return GameConstants.SOURCE_DISPLAY_PX_HUGE;
+        }
+        if (quantity >= SOURCE_QTY_BIG) {
+            return GameConstants.SOURCE_DISPLAY_PX_BIG;
+        }
+        if (quantity >= SOURCE_QTY_MEDIUM) {
+            return GameConstants.SOURCE_DISPLAY_PX_MEDIUM;
+        }
+        return GameConstants.SOURCE_DISPLAY_PX_SMALL;
     }
 }

@@ -133,7 +133,7 @@ public class ColonyLocationService {
         NeoPoint nest = getColonyEntrance(colony);
         float radius = GatheringMath.computeFullEfficiencyRadius(colony, workers);
         return GatheringMath.gatheringEfficiency(
-            nest.getX(), nest.getY(), source.getX(), source.getY(), radius);
+            nest.getX(), nest.getY(), source.getCenterX(), source.getCenterY(), radius);
     }
 
     public float computeFullEfficiencyRadius(Colony colony, List<Ant> workers) {
@@ -154,8 +154,8 @@ public class ColonyLocationService {
                 List<ResourceSource> sources = discoveredSources.stream()
                     .filter(s -> s.getResourceType() == type && s.getQuantity() > 0)
                     .sorted(Comparator.comparingDouble(s -> {
-                        double dx = s.getX() - nestX;
-                        double dy = s.getY() - nestY;
+                        double dx = s.getCenterX() - nestX;
+                        double dy = s.getCenterY() - nestY;
                         return dx * dx + dy * dy;
                     }))
                     .collect(Collectors.toList());

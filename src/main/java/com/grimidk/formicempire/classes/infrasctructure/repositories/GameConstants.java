@@ -111,9 +111,15 @@ public final class GameConstants {
 
     public static final int HEX_RESOURCE_DEPLETION_SOURCES_PER_PERCENT = 20;
     public static final int HEX_DEPLETION_SPAWN_BUFFER_EXTRA_MAX = 500;
-    public static final int RESOURCE_SPAWN_EDGE_BUFFER_MIN = 72;
-    public static final int RESOURCE_SPAWN_EDGE_BUFFER_MAX = 200;
-    public static final int RESOURCE_SPAWN_BUFFER_EXTRA_CAP = 220;
+    /** Extra clearance beyond the viewport so scaled source sprites never peek in when centered on the nest. */
+    public static final int RESOURCE_SPAWN_VIEWPORT_MARGIN = 64;
+    public static final int RESOURCE_SPAWN_EXTRA_DISTANCE_MIN = 80;
+    public static final int RESOURCE_SPAWN_EXTRA_DISTANCE_MAX = 320;
+    public static final int RESOURCE_SPAWN_BUFFER_EXTRA_CAP = 400;
+    public static final int SOURCE_DISPLAY_PX_SMALL = 36;
+    public static final int SOURCE_DISPLAY_PX_MEDIUM = 52;
+    public static final int SOURCE_DISPLAY_PX_BIG = 72;
+    public static final int SOURCE_DISPLAY_PX_HUGE = 96;
     public static final int HEX_SUSTAIN_MAX_DEPLETION_PCT = 80;
 
     // --- Temperatures ---
