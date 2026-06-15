@@ -12,6 +12,7 @@ import java.awt.Rectangle;
 import java.awt.Point; 
 
 import com.grimidk.formicempire.classes.entities.services.*; 
+import com.grimidk.formicempire.classes.constants.misc.BugType;
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
@@ -64,7 +65,10 @@ public class Colony {
     private double minerals;
     
     private int aphids; 
+    private int soilMites;
+    private int dermestids;
     private int parasites;
+    private int parasiticMites;
 
     // --- Hatch Rate Data ---
     private float hatchRateWorker;
@@ -93,6 +97,7 @@ public class Colony {
     private Rectangle graverBounds;
     private Rectangle breederBounds; 
     private Rectangle transitBounds; 
+    private Rectangle insectPenBounds;
 
     // --- Service Dependencies ---
     private transient ColonyStatsService statsService;
@@ -104,6 +109,7 @@ public class Colony {
     private transient ColonyAutomationService automationService;
     private transient ColonyResourceService resourceService;
     private transient ColonyStarterService starterService;
+    private transient ColonyBugHandlingService bugHandlingService;
 
     // --- Service Initializer ---
     private void initializeServices() {
@@ -116,6 +122,7 @@ public class Colony {
         this.automationService = new ColonyAutomationService(); 
         this.resourceService = new ColonyResourceService();
         this.starterService = new ColonyStarterService();
+        this.bugHandlingService = new ColonyBugHandlingService();
     }
 
     // --- Initialization Methods ---
@@ -147,7 +154,10 @@ public class Colony {
         this.resins = 0;
         this.minerals = 0;
         this.aphids = 0;
+        this.soilMites = 0;
+        this.dermestids = 0;
         this.parasites = 0;
+        this.parasiticMites = 0;
         this.hatchRateWorker = 100.0f;
         this.hatchRateSoldier = 0.0f;
         this.hatchRateMajor = 0.0f;
@@ -269,13 +279,13 @@ public class Colony {
         this.resins = savedColony.resins;
         this.minerals = savedColony.minerals;
 
-        this.aphids = savedColony.aphids; 
-        for(int i=0; i<this.aphids; i++) {
-            this.bugs.add(new Bug(GameConstants.TYPE_APHID));
-        }
+        this.aphids = savedColony.aphids;
+        this.soilMites = savedColony.soilMites;
+        this.dermestids = savedColony.dermestids;
 
         this.parasites = savedColony.parasites;
-        for(int i=0; i<this.parasites; i++) {
+        this.parasiticMites = savedColony.parasiticMites;
+        for (int i = 0; i < this.parasites; i++) {
             Bug p = new Bug(GameConstants.TYPE_PARASITE);
             p.setDimension(WorldSpaces.UNDERWORLD);
             this.bugs.add(p);
@@ -307,6 +317,11 @@ public class Colony {
                 }
             }
         }
+
+        getBugHandlingService().syncPetBugEntities(this, GameConstants.TYPE_APHID, aphids);
+        getBugHandlingService().syncPetBugEntities(this, GameConstants.TYPE_SOIL_MITE, soilMites);
+        getBugHandlingService().syncPetBugEntities(this, GameConstants.TYPE_DERMESTID, dermestids);
+        getBugHandlingService().syncParasiticMiteInfections(this);
 
         rankUp();
     }
@@ -535,80 +550,58 @@ public class Colony {
     }
 
     public int getAphids() { return aphids; }
-    public void setAphids(int count) { 
-        int rancherCount = getAssignedRoleCount(GameConstants.ROLE_RANCHER);
-        
-        if (hasBuilding(GameUnlocks.PASSIVE_APHID)) {
-            if (hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
-                rancherCount += 2;
-            } else {
-                rancherCount += 1;
-            }
-        }
-        
-        int maxAphids = Integer.MAX_VALUE;
-        if (statsService != null) {
-            maxAphids = statsService.getAphidCapacity(this) * rancherCount;
-        }
-        
-        this.aphids = Math.max(0, Math.min(count, maxAphids)); 
-        
-        long currentAphids = this.bugs.stream().filter(b -> b.getBugType() == GameConstants.TYPE_APHID).count();
-        if (currentAphids < this.aphids) {
-             int diff = this.aphids - (int)currentAphids;
-             Rectangle yard = getRancherBounds();
-             if (yard == null) yard = new Rectangle(10, 10, 256, 256); 
-             for(int i=0; i<diff; i++) {
-                Bug newBug = new Bug(GameConstants.TYPE_APHID);
-                if (physicsService != null) {
-                    Point spawnPos = physicsService.getSpecificRoomPoint(this, yard);
-                    newBug.setPosition(spawnPos);
-                }
-                this.bugs.add(newBug);
-            }
-        } else if (currentAphids > this.aphids) {
-            int diff = (int)currentAphids - this.aphids;
-            List<Bug> toRemove = new ArrayList<>();
-            for (Bug b : this.bugs) {
-                if (b.getBugType() == GameConstants.TYPE_APHID) {
-                    toRemove.add(b);
-                    if (toRemove.size() == diff) break;
-                }
-            }
-            this.bugs.removeAll(toRemove);
+    public void setAphids(int count) {
+        getBugHandlingService().setCount(this, GameConstants.TYPE_APHID, count);
+    }
+
+    public int getSoilMites() { return soilMites; }
+    public void setSoilMites(int count) {
+        getBugHandlingService().setCount(this, GameConstants.TYPE_SOIL_MITE, count);
+    }
+
+    public int getDermestids() { return dermestids; }
+    public void setDermestids(int count) {
+        getBugHandlingService().setCount(this, GameConstants.TYPE_DERMESTID, count);
+    }
+
+    public void applyPetBugCount(BugType type, int count) {
+        if (type == GameConstants.TYPE_APHID) {
+            this.aphids = count;
+        } else if (type == GameConstants.TYPE_SOIL_MITE) {
+            this.soilMites = count;
+        } else if (type == GameConstants.TYPE_DERMESTID) {
+            this.dermestids = count;
         }
     }
 
-    public int getParasites() { return parasites; }
-    public void setParasites(int count) { 
-        this.parasites = Math.max(0, count);
-        
-        long currentParasites = this.bugs.stream().filter(b -> b.getBugType() == GameConstants.TYPE_PARASITE).count();
-        if (currentParasites < this.parasites) {
-             int diff = this.parasites - (int)currentParasites;
-             Rectangle spawnRoom = getStorageBounds();
-             if (spawnRoom == null) spawnRoom = new Rectangle(0, 0, 256, 256);
+    public void applyParasiteCount(int count) {
+        this.parasites = count;
+    }
 
-             for(int i=0; i<diff; i++) {
-                Bug newBug = new Bug(GameConstants.TYPE_PARASITE);
-                newBug.setDimension(WorldSpaces.UNDERWORLD);
-                if (physicsService != null) {
-                    Point spawnPos = physicsService.getSpecificRoomPoint(this, spawnRoom);
-                    newBug.setPosition(spawnPos);
-                }
-                this.bugs.add(newBug);
-            }
-        } else if (currentParasites > this.parasites) {
-            int diff = (int)currentParasites - this.parasites;
-            List<Bug> toRemove = new ArrayList<>();
-            for (Bug b : this.bugs) {
-                if (b.getBugType() == GameConstants.TYPE_PARASITE) {
-                    toRemove.add(b);
-                    if (toRemove.size() == diff) break;
-                }
-            }
-            this.bugs.removeAll(toRemove);
+    public ColonyBugHandlingService getBugHandlingService() {
+        if (bugHandlingService == null) {
+            bugHandlingService = new ColonyBugHandlingService();
         }
+        return bugHandlingService;
+    }
+
+    public int getParasites() { return parasites; }
+    public void setParasites(int count) {
+        getBugHandlingService().setParasiteCount(this, count);
+    }
+
+    public int getParasiticMites() { return parasiticMites; }
+
+    public void setParasiticMites(int count) {
+        getBugHandlingService().setParasiticMiteCount(this, count);
+    }
+
+    public void applyParasiticMiteCount(int count) {
+        this.parasiticMites = Math.max(0, count);
+    }
+
+    public int getParasiticMiteSlowedAntCount() {
+        return getBugHandlingService().getParasiticMiteSlowedAntCount(this);
     }
 
     public String getParasiteCountDisplay(boolean fuzzEnabled) {
@@ -704,6 +697,8 @@ public class Colony {
     public Rectangle getRoyalBounds() { return royalBounds; }
     public Rectangle getRancherBounds() { return rancherBounds; }
     public Rectangle getGraverBounds() { return graverBounds; }
+    public Rectangle getInsectPenBounds() { return insectPenBounds; }
+    public void setInsectPenBounds(Rectangle insectPenBounds) { this.insectPenBounds = insectPenBounds; }
     public Rectangle getBreederBounds() { return breederBounds; }
     public Rectangle getTransitBounds() { return transitBounds; }    
     public Rectangle getTargetRoomForAnt(Ant ant) {
@@ -717,8 +712,8 @@ public class Colony {
         if (role == GameConstants.ROLE_GRAVER && graverBounds != null) return graverBounds;
         if (role == GameConstants.ROLE_BREEDER && breederBounds != null) return breederBounds;
         if (role == GameConstants.ROLE_ASSISTANT && royalBounds != null) return royalBounds;
-        
-        return null; // Default - Outside
+        if (role == GameConstants.ROLE_CATCHER && insectPenBounds != null) return insectPenBounds;
+        return null;
     }
 
     // --- Public getters for services ---
@@ -786,7 +781,9 @@ public class Colony {
     public void runCollecting() { labourService.runCollecting(this); }
     public void runConverting() { labourService.runConverting(this); }
     public void runRanching() { labourService.runRanching(this); }
-    public void runHerding(Biome biome) { labourService.runHerding(this, biome); }
+    public void runHerding(Biome biome) {
+        labourService.runCaughtBugs(this, biome);
+    }
     public void runScoutting(Biome biome, Hex currentHex) { labourService.runScoutting(this, biome, currentHex); }
     public void runComposting() { labourService.runComposting(this); }
     public void runParasitation() { populationService.runParasitation(this); }
@@ -927,6 +924,7 @@ public class Colony {
     public void runMonthlyJobs() { 
         if (this.isActive || this.isPlayer) {
             this.runParasitation();
+            getBugHandlingService().runMonthlyParasiticMites(this);
         }
     }
 

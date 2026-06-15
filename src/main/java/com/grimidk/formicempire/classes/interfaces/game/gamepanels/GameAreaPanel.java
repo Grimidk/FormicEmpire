@@ -66,6 +66,7 @@ public class GameAreaPanel extends ZeroGamePanel {
     public Rectangle graverYardBounds;
     public Rectangle breederRoomBounds;
     public Rectangle transitRoomBounds;
+    public Rectangle insectPenBounds;
 
     public GameAreaPanel() {
         super(null);
@@ -327,6 +328,7 @@ public class GameAreaPanel extends ZeroGamePanel {
             }
 
             colony.setRoomBounds(entranceBounds, room1Bounds, room2Bounds, room3Bounds, room4Bounds, rancherYardBounds, graverYardBounds, breederRoomBounds, transitRoomBounds);
+            colony.setInsectPenBounds(insectPenBounds);
         }
 
         if (currentDimension == WorldSpaces.OVERWORLD && engine != null && engine.getWorld() != null) {
@@ -463,6 +465,19 @@ public class GameAreaPanel extends ZeroGamePanel {
             
         } else {
             graverYardBounds = null;
+        }
+
+        // --- Insect Pen ---
+        if (colony.hasUpgrade(GameUnlocks.ROLE_CATCHER) && basicYardImg != null) {
+            int w = basicYardImg.getWidth(this);
+            int h = basicYardImg.getHeight(this);
+            int x = 10;
+            int y = ANCHOR_HEIGHT - h - 10;
+
+            g2d.drawImage(basicYardImg, x, y, this);
+            insectPenBounds = new Rectangle(x, y, w, h);
+        } else {
+            insectPenBounds = null;
         }
     }
     
@@ -700,9 +715,32 @@ public class GameAreaPanel extends ZeroGamePanel {
                 g2d.translate(centerX, centerY);       
                 g2d.rotate(Math.toRadians(ant.getR()));
                 g2d.drawImage(currentSprite, -w / 2, -h / 2, this);
+                if (ant.isParasiticMiteInfected()) {
+                    drawParasiticMiteOverlay(g2d);
+                }
 
                 g2d.setTransform(oldTransform);
             }
+        }
+    }
+
+    private void drawParasiticMiteOverlay(Graphics2D g2d) {
+        ImageIcon miteIcon = GameConstants.TYPE_PARASITIC_MITE.getSprite();
+        if (miteIcon == null) {
+            miteIcon = GameConstants.ICON_PARASITIC_MITE;
+        }
+        if (miteIcon == null) {
+            return;
+        }
+        Image mite = miteIcon.getImage();
+        int miteW = miteIcon.getIconWidth();
+        int miteH = miteIcon.getIconHeight();
+        int halfW = miteW / 2;
+        int halfH = miteH / 2;
+        int[][] offsets = {{-8, -10}, {8, -8}, {-10, 4}, {10, 6}, {0, 10}};
+        int count = Math.min(GameConstants.PARASITIC_MITES_ON_ANT_SPRITE, offsets.length);
+        for (int i = 0; i < count; i++) {
+            g2d.drawImage(mite, offsets[i][0] - halfW, offsets[i][1] - halfH, this);
         }
     }
 

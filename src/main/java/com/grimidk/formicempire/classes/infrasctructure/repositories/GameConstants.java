@@ -99,11 +99,18 @@ public final class GameConstants {
     // --- Misc Icons ---
     public static final ImageIcon ICON_APHID = loadIcon("icons/bugs/aphid.png");
     static { misc.add(ICON_APHID); }
+    public static final ImageIcon ICON_SOIL_MITE = loadIcon("icons/bugs/soilMite.png");
+    static { misc.add(ICON_SOIL_MITE); }
+    public static final ImageIcon ICON_DERMESTID = loadIcon("icons/bugs/dermestid.png");
+    static { misc.add(ICON_DERMESTID); }
+    public static final ImageIcon ICON_PARASITIC_MITE = loadIcon("icons/bugs/parasiticMite.png");
+    static { misc.add(ICON_PARASITIC_MITE); }
     public static final ImageIcon ICON_RESEARCH = loadIcon("icons/misc/research.png");
     static { misc.add(ICON_RESEARCH); }
 
     // --- Base Stats ---
     public static final float BASE_SPRITE_SPEED = 2.5f;
+    public static final int PARASITIC_MITES_ON_ANT_SPRITE = 5;
 
     public static final float GATHER_FULL_EFFICIENCY_RADIUS_BASE = 500f;
     public static final double GATHER_MIN_EFFICIENCY = 0.01;
@@ -111,7 +118,7 @@ public final class GameConstants {
 
     public static final int HEX_RESOURCE_DEPLETION_SOURCES_PER_PERCENT = 20;
     public static final int HEX_DEPLETION_SPAWN_BUFFER_EXTRA_MAX = 500;
-    /** Extra clearance beyond the viewport so scaled source sprites never peek in when centered on the nest. */
+    
     public static final int RESOURCE_SPAWN_VIEWPORT_MARGIN = 64;
     public static final int RESOURCE_SPAWN_EXTRA_DISTANCE_MIN = 80;
     public static final int RESOURCE_SPAWN_EXTRA_DISTANCE_MAX = 320;
@@ -121,6 +128,24 @@ public final class GameConstants {
     public static final int SOURCE_DISPLAY_PX_BIG = 72;
     public static final int SOURCE_DISPLAY_PX_HUGE = 96;
     public static final int HEX_SUSTAIN_MAX_DEPLETION_PCT = 80;
+
+    public static final int BIOME_COLD_TEMP_MAX = 15;
+    public static final int BIOME_DRY_HUMIDITY_MAX = 1;
+
+    public static final int PET_POOL_PER_CATCHER = 10;
+    public static final int PET_CAPACITY_PER_TENDER = 10;
+    public static final int PET_BREED_MIN_COUNT = 2;
+    public static final float CATCH_BASE_CHANCE_PER_CATCHER = 0.12f;
+    public static final int SOIL_MITE_PARASITIC_MITE_KILL_PER_DAY = 5;
+    public static final int SOIL_MITE_PARASITIC_MITE_KILL_UPGRADED = 12;
+
+    public static final int PARASITIC_MITE_RESOURCE_THRESHOLD = 5_000;
+    public static final float PARASITIC_MITE_MONTHLY_SPAWN_CHANCE = 0.65f;
+    public static final int PARASITIC_MITE_MIN_MONTHLY_SPAWN = 1_000;
+    public static final int PARASITIC_MITE_PER_ANT = 50;
+    public static final float PARASITIC_MITE_SPREAD_FACTOR = 0.50f;
+    public static final int PARASITIC_MITES_PER_SLOWED_ANT = 10;
+    public static final float PARASITIC_MITE_SPEED_MULTIPLIER = 0.5f;
 
     // --- Temperatures ---
     public static final Temperature TEMP_FREEZING = new Temperature(1, LanguageStrings.TEMP_FREEZING, 5,
@@ -393,6 +418,34 @@ public final class GameConstants {
     public static final BugType TYPE_PARASITE = new BugType(3, LanguageStrings.BUG_PARASITE, LanguageStrings.BUG_PARASITE_SCIENTIFIC, 1, 1, 0, 0, 1, 1,
         loadIcon("icons/bugs/parasite.png") , loadIcon("sprites/bugs/parasite.png"));
     static { bugTypes.add(TYPE_PARASITE); }
+    public static final BugType TYPE_SOIL_MITE = new BugType(4, LanguageStrings.BUG_SOIL_MITE, LanguageStrings.BUG_SOIL_MITE_SCIENTIFIC,
+            1, 0, 0, 0, 2, 0.4f, loadIcon("icons/bugs/soilMite.png"), loadIcon("sprites/bugs/soilMite.png"));
+    static { bugTypes.add(TYPE_SOIL_MITE); }
+    public static final BugType TYPE_DERMESTID = new BugType(5, LanguageStrings.BUG_DERMESTID, LanguageStrings.BUG_DERMESTID_SCIENTIFIC,
+            1, 0, 0, 0, 3, 0.35f, loadIcon("icons/bugs/dermestid.png"), loadIcon("sprites/bugs/dermestid.png"));
+    static { bugTypes.add(TYPE_DERMESTID); }
+    public static final BugType TYPE_PARASITIC_MITE = new BugType(6, LanguageStrings.BUG_PARASITIC_MITE,
+            LanguageStrings.BUG_PARASITIC_MITE_SCIENTIFIC, 1, 0, 0, 0, 1, 0.25f,
+            loadIcon("icons/bugs/parasiticMite.png"), loadIcon("sprites/bugs/parasiticMite.png"));
+    static { bugTypes.add(TYPE_PARASITIC_MITE); }
+
+    static {
+        for (Biome biome : biomes) {
+            biome.setNativeBugs(buildNativeBugsForBiome(biome));
+        }
+    }
+
+    private static List<BugType> buildNativeBugsForBiome(Biome biome) {
+        List<BugType> natives = new ArrayList<>();
+        if (!biome.isDry()) {
+            natives.add(TYPE_APHID);
+        }
+        natives.add(TYPE_SOIL_MITE);
+        if (!biome.isCold()) {
+            natives.add(TYPE_DERMESTID);
+        }
+        return List.copyOf(natives);
+    }
 
     // --- Ant Types ---
     public static final AntType TYPE_EGG = new AntType(1, LanguageStrings.TYPE_EGG, 1f, 0f, 0f, 0f, 0f, 0f, 0f,

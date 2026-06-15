@@ -54,7 +54,8 @@ public class ColonyPanel extends ZeroGamePanel {
     private final JLabel layingRateLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.COLONY_LAYING_RATE), 0));
     private final JLabel nurseCoverageLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.COLONY_NURSE_COVERAGE), 0, 0));
     private final JLabel graveKeepingLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.COLONY_GRAVE_CLEANING), 0, 0));
-    private final JLabel aphidCountLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.COLONY_APHIDS), 0, 0));
+    private final JLabel petInsectsLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.COLONY_PET_INSECTS), 0, 0));
+    private final JLabel parasiticMiteCountLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.COLONY_PARASITIC_MITES), 0, 0));
     private final JLabel parasiteCountLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.COLONY_PARASITES), LanguageStrings.get(LanguageStrings.WORLD_NA))); 
     private final JLabel policeStatsLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.COLONY_POLICING), 0)); 
     private final JLabel researchPointsLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.COLONY_RESEARCH), 0));
@@ -106,7 +107,8 @@ public class ColonyPanel extends ZeroGamePanel {
         layingRateLabel.setVisible(false);
         nurseCoverageLabel.setVisible(false);
         graveKeepingLabel.setVisible(false);
-        aphidCountLabel.setVisible(false);
+        petInsectsLabel.setVisible(false);
+        parasiticMiteCountLabel.setVisible(false);
         parasiteCountLabel.setVisible(false);
         policeStatsLabel.setVisible(false);
         researchPointsLabel.setVisible(false);
@@ -134,7 +136,8 @@ public class ColonyPanel extends ZeroGamePanel {
         setupConstantLabel(deadAntsLabel, GameConstants.TYPE_DEAD);
 
         // Special Icons & Tooltips
-        aphidCountLabel.setIcon(GameConstants.ICON_APHID);
+        petInsectsLabel.setIcon(GameConstants.ICON_APHID);
+        parasiticMiteCountLabel.setIcon(GameConstants.ICON_PARASITIC_MITE);
         parasiteCountLabel.setIcon(GameConstants.TYPE_PARASITE.getIcon());
         policeStatsLabel.setIcon(GameConstants.TYPE_SOLDIER.getIcon());
         researchPointsLabel.setIcon(GameConstants.ICON_RESEARCH);
@@ -173,7 +176,8 @@ public class ColonyPanel extends ZeroGamePanel {
         eggsLabel.setToolTipText(GameConstants.TYPE_EGG.getName());
         deadAntsLabel.setToolTipText(GameConstants.TYPE_DEAD.getName());
         
-        aphidCountLabel.setToolTipText(LanguageStrings.get(LanguageStrings.TOOLTIP_APHIDS));
+        petInsectsLabel.setToolTipText(LanguageStrings.get(LanguageStrings.TOOLTIP_PET_INSECTS));
+        parasiticMiteCountLabel.setToolTipText(LanguageStrings.get(LanguageStrings.TOOLTIP_PARASITIC_MITES));
         parasiteCountLabel.setToolTipText(LanguageStrings.get(LanguageStrings.TOOLTIP_PARASITES));
         policeStatsLabel.setToolTipText(LanguageStrings.get(LanguageStrings.TOOLTIP_POLICING));
         researchPointsLabel.setToolTipText(LanguageStrings.get(LanguageStrings.TOOLTIP_RESEARCH_POINTS));
@@ -294,7 +298,8 @@ public class ColonyPanel extends ZeroGamePanel {
         layingRateLabel.setForeground(AssetStyles.FONT_COLOR);
         nurseCoverageLabel.setForeground(AssetStyles.FONT_COLOR);
         graveKeepingLabel.setForeground(AssetStyles.FONT_COLOR);
-        aphidCountLabel.setForeground(AssetStyles.FONT_COLOR);
+        petInsectsLabel.setForeground(AssetStyles.FONT_COLOR);
+        parasiticMiteCountLabel.setForeground(AssetStyles.FONT_COLOR);
         parasiteCountLabel.setForeground(AssetStyles.FONT_COLOR);
         policeStatsLabel.setForeground(AssetStyles.FONT_COLOR);
         researchPointsLabel.setForeground(AssetStyles.FONT_COLOR);
@@ -308,7 +313,8 @@ public class ColonyPanel extends ZeroGamePanel {
         panel.add(layingRateLabel);
         panel.add(nurseCoverageLabel);
         panel.add(graveKeepingLabel);
-        panel.add(aphidCountLabel);
+        panel.add(petInsectsLabel);
+        panel.add(parasiticMiteCountLabel);
         panel.add(parasiteCountLabel);
         panel.add(policeStatsLabel);
         panel.add(researchPointsLabel);
@@ -517,18 +523,24 @@ public class ColonyPanel extends ZeroGamePanel {
         }
 
         boolean hasRancher = colony.hasUpgrade(GameUnlocks.ROLE_RANCHER);
-        aphidCountLabel.setVisible(hasRancher);
-        if (hasRancher) {
-            int rancherCount = colony.getAssignedRoleCount(GameConstants.ROLE_RANCHER);
-            if (colony.hasBuilding(GameUnlocks.PASSIVE_APHID)) {
-                if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
-                    rancherCount += 2;
-                } else {
-                    rancherCount += 1;
-                }
-            }
-            int maxSustainableAphids = colony.getAphidCapacity() * rancherCount;
-            aphidCountLabel.setText(String.format(LanguageStrings.get(LanguageStrings.COLONY_APHIDS), colony.getAphids(), maxSustainableAphids));
+        boolean hasCatcher = colony.hasUpgrade(GameUnlocks.ROLE_CATCHER);
+        petInsectsLabel.setVisible(hasRancher || hasCatcher);
+        if (hasRancher || hasCatcher) {
+            var bugHandling = colony.getBugHandlingService();
+            int poolUsed = bugHandling.getTotalPetCount(colony);
+            int poolMax = hasCatcher
+                    ? bugHandling.getCatcherPoolCapacity(colony)
+                    : bugHandling.getMaxCapacity(colony, GameConstants.TYPE_APHID);
+            petInsectsLabel.setText(String.format(
+                    LanguageStrings.get(LanguageStrings.COLONY_PET_INSECTS), poolUsed, poolMax));
+        }
+
+        int parasiticMites = colony.getParasiticMites();
+        parasiticMiteCountLabel.setVisible(parasiticMites > 0);
+        if (parasiticMites > 0) {
+            int slowed = colony.getParasiticMiteSlowedAntCount();
+            parasiticMiteCountLabel.setText(String.format(
+                    LanguageStrings.get(LanguageStrings.COLONY_PARASITIC_MITES), parasiticMites, slowed));
         }
         
         boolean hasPolice = colony.hasUpgrade(GameUnlocks.ROLE_POLICE);

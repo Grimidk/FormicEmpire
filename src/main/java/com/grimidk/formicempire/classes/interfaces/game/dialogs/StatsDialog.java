@@ -11,6 +11,7 @@ import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.entities.services.ColonyBugHandlingService;
 import com.grimidk.formicempire.classes.entities.services.DynastyStatService;
 import com.grimidk.formicempire.classes.entities.services.ColonyLocationService;
 import com.grimidk.formicempire.classes.entities.services.ColonyStatsService;
@@ -49,6 +50,7 @@ public class StatsDialog extends ZeroDialog {
     private JTable populationTable;
     private JTable localHexTable;
     private JTable ratesTable;
+    private JTable insectsTable;
     private JTable unitStatsTable;
     private JTable deathTable;
     
@@ -86,6 +88,7 @@ public class StatsDialog extends ZeroDialog {
         initPopulationTab();
         initLocalHexTab();
         initRatesTab();
+        initInsectsTab();
         initUnitStatsTab();
         initDeathTab();
         
@@ -121,8 +124,9 @@ public class StatsDialog extends ZeroDialog {
         tabbedPane.setTitleAt(3, LanguageStrings.get(LanguageStrings.STATS_TAB_POPULATION));
         tabbedPane.setTitleAt(4, LanguageStrings.get(LanguageStrings.STATS_TAB_LOCAL_HEX));
         tabbedPane.setTitleAt(5, LanguageStrings.get(LanguageStrings.STATS_TAB_RATES));
-        tabbedPane.setTitleAt(6, LanguageStrings.get(LanguageStrings.STATS_TAB_UNIT_STATS));
-        tabbedPane.setTitleAt(7, LanguageStrings.get(LanguageStrings.STATS_TAB_MORTALITY));
+        tabbedPane.setTitleAt(6, LanguageStrings.get(LanguageStrings.STATS_TAB_INSECTS));
+        tabbedPane.setTitleAt(7, LanguageStrings.get(LanguageStrings.STATS_TAB_UNIT_STATS));
+        tabbedPane.setTitleAt(8, LanguageStrings.get(LanguageStrings.STATS_TAB_MORTALITY));
     }
 
     public void liveUpdate() {
@@ -223,6 +227,14 @@ public class StatsDialog extends ZeroDialog {
         tabbedPane.addTab(LanguageStrings.get(LanguageStrings.STATS_TAB_RATES), createTablePane(ratesTable));
     }
 
+    private void initInsectsTab() {
+        String[] columns = {"", LanguageStrings.get(LanguageStrings.COL_TYPE), LanguageStrings.get(LanguageStrings.COL_COUNT), LanguageStrings.get(LanguageStrings.COL_CAPACITY), LanguageStrings.get(LanguageStrings.COL_CARETAKERS)};
+        insectsTable = new JTable(createIconModel(columns));
+        insectsTable.getColumnModel().getColumn(0).setMaxWidth(40);
+        insectsTable.getColumnModel().getColumn(0).setPreferredWidth(40);
+        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.STATS_TAB_INSECTS), createTablePane(insectsTable));
+    }
+
     private void initUnitStatsTab() {
         String[] columns = {LanguageStrings.get(LanguageStrings.COL_STAT), LanguageStrings.get(LanguageStrings.COL_BASE_VAL), LanguageStrings.get(LanguageStrings.COL_DESCRIPTION)};
         unitStatsTable = new JTable(createIconModel(columns));
@@ -245,6 +257,7 @@ public class StatsDialog extends ZeroDialog {
         updatePopulationData();
         updateLocalHexData();
         updateRatesData();
+        updateInsectsData();
         updateUnitStatsData();
         updateDeathData();
     }
@@ -694,6 +707,130 @@ public class StatsDialog extends ZeroDialog {
         if (gravers > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.ROLE_GRAVER), String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_GRAVERS_FMT), gravers), String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_CAP_SHORT), graveCap), String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_LOAD_FMT), String.valueOf(deadAnts), graveCap)});
         if (ranchers > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.ROLE_RANCHER), String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_RANCHERS_FMT), ranchers), String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_CAP_SHORT), aphidCap), String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_APHIDS_FMT), String.valueOf(aphids), aphidCap)});
         if (police > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.ROLE_POLICE), String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_POLICE_FMT), police), String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_PARASITES_FMT), parasites), String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_DET_DAY), dailyDetect)});
+    }
+
+    private void updateInsectsData() {
+        DefaultTableModel model = (DefaultTableModel) insectsTable.getModel();
+        model.setRowCount(0);
+
+        List<Colony> coloniesToCount = new ArrayList<>();
+        if (dynastyModeToggle.isSelected() && colony.getDynasty() != null) {
+            coloniesToCount.addAll(colony.getDynasty().getColonies());
+        } else {
+            coloniesToCount.add(colony);
+        }
+
+        int aphids = 0, aphidCap = 0, ranchers = 0;
+        int soilMites = 0, soilMiteCap = 0, catchers = 0;
+        int dermestids = 0, dermestidCap = 0, gravers = 0;
+        int poolUsed = 0, poolMax = 0;
+        int parasiticMites = 0, slowedAnts = 0, parasiticKillPerDay = 0;
+        int antParasites = 0;
+        boolean showPets = false;
+        boolean showCatcherPets = false;
+        boolean showParasitic = false;
+        boolean showAntParasites = false;
+
+        for (Colony c : coloniesToCount) {
+            ColonyBugHandlingService bugs = c.getBugHandlingService();
+
+            if (c.hasUpgrade(GameUnlocks.ROLE_RANCHER) || c.hasUpgrade(GameUnlocks.ROLE_CATCHER)) {
+                showPets = true;
+                aphids += c.getAphids();
+                aphidCap += bugs.getMaxCapacity(c, GameConstants.TYPE_APHID);
+                ranchers += c.getAssignedRoleCount(GameConstants.ROLE_RANCHER);
+            }
+            if (c.hasUpgrade(GameUnlocks.ROLE_CATCHER)) {
+                showCatcherPets = true;
+                soilMites += c.getSoilMites();
+                soilMiteCap += bugs.getMaxCapacity(c, GameConstants.TYPE_SOIL_MITE);
+                dermestids += c.getDermestids();
+                dermestidCap += bugs.getMaxCapacity(c, GameConstants.TYPE_DERMESTID);
+                catchers += c.getAssignedRoleCount(GameConstants.ROLE_CATCHER);
+                poolUsed += bugs.getTotalPetCount(c);
+                poolMax += bugs.getCatcherPoolCapacity(c);
+            }
+            if (c.hasUpgrade(GameUnlocks.ROLE_GRAVER)) {
+                gravers += c.getAssignedRoleCount(GameConstants.ROLE_GRAVER);
+            }
+
+            if (c.hasUpgrade(GameUnlocks.ABILITY_PARASITIC_MITE_ALERT)
+                    || c.hasUpgrade(GameUnlocks.ROLE_CATCHER)
+                    || c.getParasiticMites() > 0) {
+                showParasitic = true;
+            }
+            int pm = c.getParasiticMites();
+            parasiticMites += pm;
+            slowedAnts += c.getParasiticMiteSlowedAntCount();
+            parasiticKillPerDay += c.getSoilMites() * bugs.getSoilMiteParasiticMiteKillPerDay(c);
+            if (c.hasUpgrade(GameUnlocks.ROLE_POLICE)) {
+                showAntParasites = true;
+                antParasites += c.getParasites();
+            }
+        }
+
+        if (!showPets && !showParasitic && !showAntParasites) {
+            model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_NO_INSECTS), "---", "---", "---"});
+            return;
+        }
+
+        if (showPets) {
+            model.addRow(new Object[]{
+                GameConstants.ICON_APHID,
+                LanguageStrings.get(LanguageStrings.BUG_APHID),
+                aphids,
+                aphidCap,
+                String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_RANCHERS_FMT), ranchers)
+            });
+            if (showCatcherPets) {
+                model.addRow(new Object[]{
+                    GameConstants.ICON_SOIL_MITE,
+                    LanguageStrings.get(LanguageStrings.BUG_SOIL_MITE),
+                    soilMites,
+                    soilMiteCap,
+                    String.format(LanguageStrings.get(LanguageStrings.STAT_INSECT_CATCHERS_FMT), catchers)
+                });
+                model.addRow(new Object[]{
+                    GameConstants.ICON_DERMESTID,
+                    LanguageStrings.get(LanguageStrings.BUG_DERMESTID),
+                    dermestids,
+                    dermestidCap,
+                    String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_GRAVERS_FMT), gravers)
+                });
+                model.addRow(new Object[]{
+                    null,
+                    LanguageStrings.get(LanguageStrings.STAT_INSECT_POOL),
+                    poolUsed,
+                    poolMax,
+                    String.format(LanguageStrings.get(LanguageStrings.STAT_INSECT_CATCHERS_FMT), catchers)
+                });
+            }
+        }
+
+        if (showParasitic || showAntParasites) {
+            if (showPets) {
+                model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR), LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR), LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR), LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR)});
+            }
+            if (showParasitic) {
+                model.addRow(new Object[]{
+                    GameConstants.ICON_PARASITIC_MITE,
+                    LanguageStrings.get(LanguageStrings.BUG_PARASITIC_MITE),
+                    parasiticMites,
+                    String.format(LanguageStrings.get(LanguageStrings.STAT_INSECT_PARASITIC_CAP_FMT),
+                            GameConstants.PARASITIC_MITES_PER_SLOWED_ANT),
+                    String.format(LanguageStrings.get(LanguageStrings.STAT_INSECT_PARASITIC_KILL_FMT), slowedAnts, parasiticKillPerDay)
+                });
+            }
+            if (showAntParasites) {
+                model.addRow(new Object[]{
+                    GameConstants.TYPE_PARASITE.getIcon(),
+                    LanguageStrings.get(LanguageStrings.BUG_PARASITE),
+                    antParasites,
+                    LanguageStrings.get(LanguageStrings.WORLD_NA),
+                    LanguageStrings.get(LanguageStrings.ROLE_POLICE)
+                });
+            }
+        }
     }
 
     private void updateUnitStatsData() {

@@ -22,9 +22,7 @@ public class Ant extends Bug {
     private String causeOfDeath;
     private boolean isOnTrade;
     private boolean isNuptial;
-    
-    // --- Navigation Queue ---
-    private Queue<NeoPoint> route = new LinkedList<>();
+    private boolean parasiticMiteInfected;
 
     public Ant(Colony colony, AntType type) {
         super(GameConstants.TYPE_ANT); 
@@ -85,7 +83,14 @@ public class Ant extends Bug {
     public boolean isNuptial() { return isNuptial; }
     public void setNuptial(boolean isNuptial) { this.isNuptial = isNuptial; }
 
-    // --- Route Management Methods ---
+    public boolean isParasiticMiteInfected() { return parasiticMiteInfected; }
+    public void setParasiticMiteInfected(boolean parasiticMiteInfected) {
+        this.parasiticMiteInfected = parasiticMiteInfected;
+    }
+
+    // --- Navigation Queue ---
+    private Queue<NeoPoint> route = new LinkedList<>();
+
     public void setRoute(Queue<NeoPoint> route) {
         this.route = route;
     }
@@ -128,6 +133,7 @@ public class Ant extends Bug {
         
         this.clearLoad();        
         this.clearRoute();
+        this.parasiticMiteInfected = false;
         super.goDie();
     }
 

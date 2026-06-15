@@ -115,7 +115,8 @@ public class PortugueseTranslation implements Translation {
         pt.put("COLONY_LAYING_RATE", "Taxa de postura: %d/dia");
         pt.put("COLONY_NURSE_COVERAGE", "Cobertura de babás: %d/%d");
         pt.put("COLONY_GRAVE_CLEANING", "Limpeza de túmulos: %d/%d");
-        pt.put("COLONY_APHIDS", "Pulgões: %d/%d");
+        pt.put("COLONY_PET_INSECTS", "Insetos de estimação: %d/%d");
+        pt.put("COLONY_PARASITIC_MITES", "Ácaros parasitas: %d (%d formigas lentas)");
         pt.put("COLONY_PARASITES", "Parasitas: %s");
         pt.put("COLONY_POLICING", "Vigilância: %d");
         pt.put("COLONY_DETECTION_RATE", "Taxa de detecção: ~%d/dia");
@@ -124,7 +125,8 @@ public class PortugueseTranslation implements Translation {
         pt.put("COLONY_JUVENILE_ANTS", "Formigas jovens: %d");
         pt.put("COLONY_ADULT_ANTS", "Formigas adultas: %d");
 
-        pt.put("TOOLTIP_APHIDS", "Pulgões");
+        pt.put("TOOLTIP_PET_INSECTS", "Insetos de estimação cuidados por pastoras e capturadoras. Veja a aba Insetos nas estatísticas da colônia (X) para o detalhe por espécie.");
+        pt.put("TOOLTIP_PARASITIC_MITES", "Ácaros microscópicos nas formigas. A cada 10 ácaros, uma formiga fica com metade da velocidade. Espalham-se mensalmente com muitos recursos armazenados.");
         pt.put("TOOLTIP_PARASITES", "Parasitas na colônia");
         pt.put("TOOLTIP_POLICING", "Eficiência de vigilância");
         pt.put("TOOLTIP_RESEARCH_POINTS", "Pontos de pesquisa");
@@ -182,6 +184,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("STATS_TAB_POPULATION", "População");
         pt.put("STATS_TAB_LOCAL_HEX", "Hexágono local");
         pt.put("STATS_TAB_RATES", "Taxas e trabalhos");
+        pt.put("STATS_TAB_INSECTS", "Insetos");
         pt.put("STATS_TAB_UNIT_STATS", "Estat. de unidades");
         pt.put("STATS_TAB_MORTALITY", "Mortalidade");
         pt.put("COL_CATEGORY", "Categoria");
@@ -208,6 +211,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("COL_DESCRIPTION", "Descrição");
         pt.put("COL_CAUSE", "Causa");
         pt.put("COL_TOTAL", "Total");
+        pt.put("COL_CARETAKERS", "Cuidadores");
         pt.put("STAT_STATUS_NO_HEX", "Sem hexágono ativo");
         pt.put("STAT_COORDS", "Coordenadas (Q, R)");
         pt.put("STAT_LOCAL_WEATHER", "Clima local");
@@ -490,9 +494,15 @@ public class PortugueseTranslation implements Translation {
 
         pt.put("BUG_ANT", "Formiga");
         pt.put("BUG_APHID", "Pulgão");
+        pt.put("BUG_SOIL_MITE", "Ácaro do solo");
+        pt.put("BUG_DERMESTID", "Besouro dermestídeo");
         pt.put("BUG_PARASITE", "Parasita");
         pt.put("BUG_ANT_SCIENTIFIC", "Formica");
         pt.put("BUG_APHID_SCIENTIFIC", "Aphididae");
+        pt.put("BUG_SOIL_MITE_SCIENTIFIC", "Stratiolaelaps scimitus");
+        pt.put("BUG_DERMESTID_SCIENTIFIC", "Dermestidae");
+        pt.put("BUG_PARASITIC_MITE", "Ácaro parasita");
+        pt.put("BUG_PARASITIC_MITE_SCIENTIFIC", "Acaridae");
         pt.put("BUG_PARASITE_SCIENTIFIC", "Anergates");
 
         pt.put("TYPE_LARVA", "Larva");
@@ -606,7 +616,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("ROLE_LAYER_DESC", "Permite que rainhas ponham ovos. 1 rainha põe 1 ovo por hora.");
         pt.put("ROLE_RANCHER_UPGRADE", "Função pastora");
         pt.put("ROLE_RANCHER_FLAVOR", "Pastora de pulgões");
-        pt.put("ROLE_RANCHER_DESC", "Permite criar pulgões. 1 formiga cuida de 10 e atrai 1 novo por dia. Cada pulgão produz 1 de xarope.");
+        pt.put("ROLE_RANCHER_DESC", "Permite que operárias cuidem de pulgões no curral. Cada pastora sustenta até 10 pulgões. Cada pulgão produz 1 xarope por hora se houver plantas. Use Capturadoras para encontrar pulgões selvagens nas Planícies.");
         pt.put("ROLE_RESEARCHER_UPGRADE", "Função pesquisadora");
         pt.put("ROLE_RESEARCHER_FLAVOR", "Ciência formiga");
         pt.put("ROLE_RESEARCHER_DESC", "Permite que rainhas gerem pontos de pesquisa. 1 rainha gera 1 ponto por hora.");
@@ -660,7 +670,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("ROLE_MILITIA_DESC", "Permite tarefas defensivas básicas às operárias.");
         pt.put("ROLE_CATCHER_UPGRADE", "Função capturadora");
         pt.put("ROLE_CATCHER_FLAVOR", "Captura de insetos");
-        pt.put("ROLE_CATCHER_DESC", "Permite que soldadas capturem insetos inimigos.");
+        pt.put("ROLE_CATCHER_DESC", "Permite que soldadas capturem insetos nativos no exterior. Cada capturadora mantém até 10 insetos de estimação no total. Pastoras cuidam de pulgões, coveiras de dermestídeos. Pares reproduzem-se diariamente com pelo menos dois exemplares.");
         pt.put("ROLE_CRANE_UPGRADE", "Função guindaste de construção");
         pt.put("ROLE_CRANE_FLAVOR", "Trabalho pesado");
         pt.put("ROLE_CRANE_DESC", "Permite que majors ajudem na construção; cada uma equivale a 25 operárias.");
@@ -716,6 +726,8 @@ public class PortugueseTranslation implements Translation {
         pt.put("ABILITY_MASS_FLIGHT_FLAVOR", "Decreto imperial");
         pt.put("ABILITY_CLONING_FLAVOR", "Eco genético");
         pt.put("ABILITY_CLONING_DESC", "Cada assimilação genética concluída aumenta a integridade genética da dinastia. A integridade mínima aumenta com as assimilações concluídas.");
+        pt.put("ABILITY_PARASITIC_MITE_ALERT_FLAVOR", "Ácaros parasitas");
+        pt.put("ABILITY_PARASITIC_MITE_ALERT_DESC", "Avisa quando ácaros parasitas infestam a colônia. A cada 10 ácaros, uma formiga fica com metade da velocidade.");
         pt.put("ABILITY_ABILITY_FLAVOR", "Habilidades desbloqueadas");
         pt.put("ABILITY_ABILITY_DESC", "Permite ver o menu de habilidades e usar habilidades ativas.");
 
@@ -771,6 +783,10 @@ public class PortugueseTranslation implements Translation {
         pt.put("STAT_CONTAMINATION_2_DESC", "Reduz mortes por contaminação em 40%.");
         pt.put("STAT_CONTAMINATION_3_FLAVOR", "Protocolos de isolamento");
         pt.put("STAT_CONTAMINATION_3_DESC", "Reduz mortes por contaminação em 60%.");
+        pt.put("STAT_SOIL_MITE_1_FLAVOR", "Treino de ácaros");
+        pt.put("STAT_SOIL_MITE_1_DESC", "Aumenta a eliminação de ácaros parasitas de cada ácaro do solo para 12 por dia.");
+        pt.put("STAT_DERMESTID_1_FLAVOR", "Besouros de cova");
+        pt.put("STAT_DERMESTID_1_DESC", "Permite que cada dermestídeo na cova conte como 1 coveira para enterros.");
         pt.put("STAT_GRAVING_1_FLAVOR", "Tumbas rasas");
         pt.put("STAT_GRAVING_1_DESC", "Aumenta sepultamento em 5 por dia.");
         pt.put("STAT_GRAVING_2_FLAVOR", "Valas comuns");
@@ -949,8 +965,11 @@ public class PortugueseTranslation implements Translation {
         pt.put("HELP_TYPE_QUEEN_DESC", "Coração da colônia. Pode por ovos ou pesquisar.");
 
         pt.put("HELP_BUG_ANT_DESC", "Formigas selvagens ou rivais que aparecem na superfície. Podem lutar com as suas formigas e competir por espaço.");
-        pt.put("HELP_BUG_APHID_DESC", "Insetos de corpo mole que se alimentam de plantas. Com o papel de Pastora, a sua colônia pode criar pulgões para uma renda constante de xarope (melada).");
+        pt.put("HELP_BUG_APHID_DESC", "Insetos que se alimentam de plantas. Capturados nas Planícies; pastoras cuidam de até 10 cada. Sem curral dedicado, vão ao curral de insetos.");
+        pt.put("HELP_BUG_SOIL_MITE_DESC", "Ácaros predadores de controlo biológico. No curral de insetos. Cada ácaro do solo elimina até 5 ácaros parasitas por dia (12 com Treino de ácaros). Reproduzem-se com pelo menos dois.");
+        pt.put("HELP_BUG_DERMESTID_DESC", "Besouros que limpam carcaças. Coveiras cuidam de até 10 cada. Com Besouros de cova, cada um conta como uma coveira. Reproduzem-se com pelo menos dois.");
         pt.put("HELP_BUG_PARASITE_DESC", "Pragas que se escondem no formigueiro e drenam comida em segredo. Atribua Polícias para encontrá-las e eliminá-las antes que se multipliquem.");
+        pt.put("HELP_BUG_PARASITIC_MITE_DESC", "Ácaros minúsculos que infestam formigas adultas quando a colônia acumula recursos. As contagens vão aos milhares. Cada 10 ácaros reduzem uma formiga à metade da velocidade. Espalham-se mensalmente; ácaros do solo são o principal contramedida. A Polícia não os afeta.");
 
         pt.put("HELP_BIOMES_TITLE", "Biomas");
         pt.put("HELP_BIOME_TEMP", "Temp.: ");
@@ -1031,6 +1050,12 @@ public class PortugueseTranslation implements Translation {
         pt.put("STAT_RATE_POLICE_FMT", "%d polícia");
         pt.put("STAT_RATE_PARASITES_FMT", "%d parasitas");
         pt.put("STAT_RATE_DET_DAY", "~%d det./dia");
+        pt.put("STAT_NO_INSECTS", "Nenhum inseto registado");
+        pt.put("STAT_INSECT_CATCHERS_FMT", "%d capturadoras");
+        pt.put("STAT_INSECT_SLOWED_FMT", "%d formigas lentas");
+        pt.put("STAT_INSECT_POOL", "Cota das capturadoras");
+        pt.put("STAT_INSECT_PARASITIC_CAP_FMT", "%d ácaros por formiga lenta");
+        pt.put("STAT_INSECT_PARASITIC_KILL_FMT", "%d lentas, ~%d/dia de contramedida");
 
         pt.put("LOG_DEATH_OLD_AGE_FMT", "%d formigas morreram de velhice");
         pt.put("LOG_DEATH_JUVENILES_LACK_CARE_FMT", "%d juvenis morreram (falta de cuidados)");
@@ -1045,12 +1070,16 @@ public class PortugueseTranslation implements Translation {
         pt.put("LOG_CONTAM_LEVEL_MEDIUM", "Médio");
         pt.put("LOG_CONTAM_LEVEL_MASSIVE", "Massivo");
         pt.put("LOG_PARASITE_SPREAD_FMT", "Uma infestação parasitária se espalhou! %d novos parasitas detectados.");
+        pt.put("LOG_PARASITIC_MITE_SPREAD_FMT", "Ácaros parasitas se espalharam! %d novos ácaros detectados na colônia.");
         pt.put("LOG_DYNASTY_ABSORBED_FMT", "Restos de %s absorvidos!");
         pt.put("LOG_FAILURE_SATELLITE", "Uma colônia satélite não amadureceu por estagnação genética.");
         pt.put("LOG_SATELLITE_AT_FMT", "Nova colônia satélite em (%d, %d)");
         pt.put("LOG_SATELLITES_ESTABLISHED_FMT", "%d satélites estabelecidos.");
         pt.put("LOG_SPREADING_FAILED", "Expansão falhou: não há terras adjacentes adequadas.");
         pt.put("LOG_PARASITES_ELIMINATED_FMT", "Eliminados %d parasitas.");
+        pt.put("LOG_CAUGHT_BUGS_SUMMARY_FMT", "Capturadoras trouxeram %d inseto(s) do exterior.");
+        pt.put("LOG_CAUGHT_BUG_BRED_FMT", "%d %s reproduziram-se em cativeiro.");
+        pt.put("LOG_SOIL_MITES_PREDATION_FMT", "Ácaros do solo eliminaram %d ácaro(s) parasita(s).");
         pt.put("LOG_NUPTIAL_QUEENS_FMT", "Voo nupcial. %d novas rainhas se juntaram.");
         pt.put("LOG_SUCCESS_ASSIMILATION_FMT", "%s concluída! Recompensa: %s");
         pt.put("LOG_SUCCESS_TUNNEL", "Conexão de túnel concluída!");

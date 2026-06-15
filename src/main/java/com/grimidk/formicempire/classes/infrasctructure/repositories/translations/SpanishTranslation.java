@@ -115,7 +115,8 @@ public class SpanishTranslation implements Translation {
         es.put("COLONY_LAYING_RATE", "Tasa de Puesta: %d/día");
         es.put("COLONY_NURSE_COVERAGE", "Cobertura de Niñeras: %d/%d");
         es.put("COLONY_GRAVE_CLEANING", "Limpieza de Tumbas: %d/%d");
-        es.put("COLONY_APHIDS", "Áfidos: %d/%d");
+        es.put("COLONY_PET_INSECTS", "Insectos mascota: %d/%d");
+        es.put("COLONY_PARASITIC_MITES", "Ácaros parásitos: %d (%d hormigas ralentizadas)");
         es.put("COLONY_PARASITES", "Parásitos: %s");
         es.put("COLONY_POLICING", "Vigilancia: %d");
         es.put("COLONY_DETECTION_RATE", "Tasa de detección: ~%d/día");
@@ -124,7 +125,8 @@ public class SpanishTranslation implements Translation {
         es.put("COLONY_JUVENILE_ANTS", "Hormigas Juveniles: %d");
         es.put("COLONY_ADULT_ANTS", "Hormigas Adultas: %d");
         
-        es.put("TOOLTIP_APHIDS", "Áfidos");
+        es.put("TOOLTIP_PET_INSECTS", "Insectos mascota cuidados por pastoras y capturadoras. Consulta la pestaña Insectos en estadísticas de colonia (X) para el desglose por especie.");
+        es.put("TOOLTIP_PARASITIC_MITES", "Ácaros microscópicos en tus hormigas. Cada 10 ácaros ralentizan una hormiga a la mitad. Se propagan mensualmente con muchos recursos almacenados.");
         es.put("TOOLTIP_PARASITES", "Parásitos en la Colonia");
         es.put("TOOLTIP_POLICING", "Eficiencia de Vigilancia");
         es.put("TOOLTIP_RESEARCH_POINTS", "Puntos de Investigación");
@@ -182,6 +184,7 @@ public class SpanishTranslation implements Translation {
         es.put("STATS_TAB_POPULATION", "Población");
         es.put("STATS_TAB_LOCAL_HEX", "Hexágono Local");
         es.put("STATS_TAB_RATES", "Tasas y Trabajos");
+        es.put("STATS_TAB_INSECTS", "Insectos");
         es.put("STATS_TAB_UNIT_STATS", "Estad. de Unidades");
         es.put("STATS_TAB_MORTALITY", "Mortalidad");
         es.put("COL_CATEGORY", "Categoría");
@@ -208,6 +211,7 @@ public class SpanishTranslation implements Translation {
         es.put("COL_DESCRIPTION", "Descripción");
         es.put("COL_CAUSE", "Causa");
         es.put("COL_TOTAL", "Total");
+        es.put("COL_CARETAKERS", "Cuidadores");
         es.put("STAT_STATUS_NO_HEX", "Sin Hexágono Activo");
         es.put("STAT_COORDS", "Coordenadas (Q, R)");
         es.put("STAT_LOCAL_WEATHER", "Clima Local");
@@ -490,9 +494,15 @@ public class SpanishTranslation implements Translation {
 
         es.put("BUG_ANT", "Hormiga");
         es.put("BUG_APHID", "Pulgón");
+        es.put("BUG_SOIL_MITE", "Ácaro de suelo");
+        es.put("BUG_DERMESTID", "Escarabajo derméstido");
         es.put("BUG_PARASITE", "Parásito");
         es.put("BUG_ANT_SCIENTIFIC", "Formica");
         es.put("BUG_APHID_SCIENTIFIC", "Aphididae");
+        es.put("BUG_SOIL_MITE_SCIENTIFIC", "Stratiolaelaps scimitus");
+        es.put("BUG_DERMESTID_SCIENTIFIC", "Dermestidae");
+        es.put("BUG_PARASITIC_MITE", "Ácaro parásito");
+        es.put("BUG_PARASITIC_MITE_SCIENTIFIC", "Acaridae");
         es.put("BUG_PARASITE_SCIENTIFIC", "Anergates");
 
         es.put("TYPE_LARVA", "Larva");
@@ -568,7 +578,6 @@ public class SpanishTranslation implements Translation {
 
         es.put("EVENT_ECLIPSE_NUPTIAL", "¡El Eclipse ha provocado un Vuelo Nupcial espontáneo!");
 
-        // -- GameUnlocks Keys --
         es.put("TYPE_EGG", "Tipo de Huevo, Larva y Pupa");
         es.put("TYPE_EGG_FLAVOR", "Hormigas Nuevas");
         es.put("TYPE_EGG_DESC", "Desbloquea los tipos de hormigas juveniles, permitiendo que nazcan nuevas hormigas. Cada etapa tarda 4 días en superarse.");
@@ -607,7 +616,7 @@ public class SpanishTranslation implements Translation {
         es.put("ROLE_LAYER_DESC", "Permite a las reinas poner huevos. 1 reina pone 1 huevo por hora.");
         es.put("ROLE_RANCHER_UPGRADE", "Rol Rancho");
         es.put("ROLE_RANCHER_FLAVOR", "Pastora de Áfidos");
-        es.put("ROLE_RANCHER_DESC", "Permite a las obreras criar áfidos. 1 hormiga maneja 10 y atrae 1 nuevo por día. Cada áfido produce 1 de jarabe.");
+        es.put("ROLE_RANCHER_DESC", "Permite a las obreras cuidar pulgones en el corral. Cada pastora sostiene hasta 10 áfidos. Cada áfido produce 1 jarabe por hora si hay plantas. Usa Capturadoras para encontrar áfidos salvajes en las Llanuras.");
         es.put("ROLE_RESEARCHER_UPGRADE", "Rol Investigadora");
         es.put("ROLE_RESEARCHER_FLAVOR", "Ciencia Hormiga");
         es.put("ROLE_RESEARCHER_DESC", "Permite a las reinas generar puntos de investigación. 1 reina genera 1 punto por hora.");
@@ -661,7 +670,7 @@ public class SpanishTranslation implements Translation {
         es.put("ROLE_MILITIA_DESC", "Permite a las obreras realizar tareas defensivas básicas.");
         es.put("ROLE_CATCHER_UPGRADE", "Rol Capturadora");
         es.put("ROLE_CATCHER_FLAVOR", "Captura de Bichos");
-        es.put("ROLE_CATCHER_DESC", "Permite a los soldados capturar insectos enemigos.");
+        es.put("ROLE_CATCHER_DESC", "Permite a las soldados capturar insectos nativos en el exterior. Cada capturadora mantiene hasta 10 insectos mascota en total. Las pastoras cuidan áfidos, las coveiras derméstidos. Las parejas se reproducen diariamente con al menos dos ejemplares.");
         es.put("ROLE_CRANE_UPGRADE", "Rol Grúa de Construcción");
         es.put("ROLE_CRANE_FLAVOR", "Trabajo Pesado");
         es.put("ROLE_CRANE_DESC", "Permite a los majors ayudar en la construcción; cada uno equivale a 25 obreras.");
@@ -717,6 +726,8 @@ public class SpanishTranslation implements Translation {
         es.put("ABILITY_MASS_FLIGHT_FLAVOR", "Decreto Imperial");
         es.put("ABILITY_CLONING_FLAVOR", "Eco genético");
         es.put("ABILITY_CLONING_DESC", "Cada asimilación genética completada aumenta la integridad genética de la dinastía. La integridad mínima escala con las asimilaciones completadas.");
+        es.put("ABILITY_PARASITIC_MITE_ALERT_FLAVOR", "Ácaros parásitos");
+        es.put("ABILITY_PARASITIC_MITE_ALERT_DESC", "Avisa cuando los ácaros parásitos infestan la colonia. Cada 10 ácaros ralentizan una hormiga a la mitad de velocidad.");
         es.put("ABILITY_ABILITY_FLAVOR", "Habilidades Desbloqueadas");
         es.put("ABILITY_ABILITY_DESC", "Permite ver el menú de habilidades y usar habilidades activas.");
 
@@ -772,6 +783,10 @@ public class SpanishTranslation implements Translation {
         es.put("STAT_CONTAMINATION_2_DESC", "Reduce la tasa de mortalidad por contaminación en un 40%.");
         es.put("STAT_CONTAMINATION_3_FLAVOR", "Protocolos de Aislamiento");
         es.put("STAT_CONTAMINATION_3_DESC", "Reduce la tasa de mortalidad por contaminación en un 60%.");
+        es.put("STAT_SOIL_MITE_1_FLAVOR", "Entrenamiento de ácaros");
+        es.put("STAT_SOIL_MITE_1_DESC", "Aumenta la eliminación de ácaros parásitos de cada ácaro de suelo a 12 por día.");
+        es.put("STAT_DERMESTID_1_FLAVOR", "Escarabajos de fosa");
+        es.put("STAT_DERMESTID_1_DESC", "Permite que cada derméstido en la fosa cuente como 1 coveira para enterrar cadáveres.");
         es.put("STAT_GRAVING_1_FLAVOR", "Tumbas Poco Profundas");
         es.put("STAT_GRAVING_1_DESC", "Aumenta la tasa de sepultura en 5 por día.");
         es.put("STAT_GRAVING_2_FLAVOR", "Fosas Comunes");
@@ -901,7 +916,6 @@ public class SpanishTranslation implements Translation {
         es.put("ASSIMILATION_MARAUDER", "Asimilación de Hormiga Merodeadora");
         es.put("ASSIMILATION_MARAUDER_DESC", "Tras asimilar el genoma de la hormiga merodeadora:");
 
-        // -- HelpPanel Keys --
         es.put("HELP_TAB_WELCOME", "Bienvenida");
         es.put("HELP_TAB_STARTED", "Primeros Pasos");
         es.put("HELP_TAB_DYNASTY", "Dinastía");
@@ -951,8 +965,11 @@ public class SpanishTranslation implements Translation {
         es.put("HELP_TYPE_QUEEN_DESC", "El corazón de la colonia. Se puede asignar a Poner Huevos o Investigar nuevas tecnologías.");
 
         es.put("HELP_BUG_ANT_DESC", "Hormigas salvajes o rivales que aparecen en el supramundo. Pueden luchar contra tus hormigas y competir por espacio.");
-        es.put("HELP_BUG_APHID_DESC", "Insectos de cuerpo blando que se alimentan de plantas. Con el rol Pastora, tu colonia puede cuidar pulgones para obtener un ingreso constante de jarabe (melaza).");
+        es.put("HELP_BUG_APHID_DESC", "Insectos que se alimentan de plantas. Las capturadoras los capturan en las Llanuras; las pastoras cuidan hasta 10 por pastora. Sin corral dedicado, van al corral de insectos.");
+        es.put("HELP_BUG_SOIL_MITE_DESC", "Ácaros depredadores de control biológico. En el corral de insectos. Cada ácaro de suelo elimina hasta 5 ácaros parásitos al día (12 con Entrenamiento de ácaros). Se reproducen con al menos dos.");
+        es.put("HELP_BUG_DERMESTID_DESC", "Escarabajos que limpian carroña. Las coveiras cuidan hasta 10 cada una. Con Escarabajos de fosa, cada uno cuenta como una coveira. Se reproducen con al menos dos.");
         es.put("HELP_BUG_PARASITE_DESC", "Plagas que se esconden en el nido y drenan comida en secreto. Asigna Vigilantes para encontrarlas y eliminarlas antes de que se multipliquen.");
+        es.put("HELP_BUG_PARASITIC_MITE_DESC", "Ácaros diminutos que infestan hormigas adultas cuando la colonia acumula recursos. Los números van en miles. Cada 10 ácaros ralentizan una hormiga a la mitad. Se propagan mensualmente; los ácaros de suelo son el principal contramedio. La Policía no los afecta.");
 
         es.put("HELP_BIOMES_TITLE", "Biomas");
         es.put("HELP_BIOME_TEMP", "Temp: ");
@@ -1033,6 +1050,12 @@ public class SpanishTranslation implements Translation {
         es.put("STAT_RATE_POLICE_FMT", "%d policía");
         es.put("STAT_RATE_PARASITES_FMT", "%d parásitos");
         es.put("STAT_RATE_DET_DAY", "~%d det./día");
+        es.put("STAT_NO_INSECTS", "Sin insectos registrados");
+        es.put("STAT_INSECT_CATCHERS_FMT", "%d capturadoras");
+        es.put("STAT_INSECT_SLOWED_FMT", "%d hormigas ralentizadas");
+        es.put("STAT_INSECT_POOL", "Cupo de capturadoras");
+        es.put("STAT_INSECT_PARASITIC_CAP_FMT", "%d ácaros por hormiga ralentizada");
+        es.put("STAT_INSECT_PARASITIC_KILL_FMT", "%d ralentizadas, ~%d/día de contramedida");
 
         es.put("LOG_DEATH_OLD_AGE_FMT", "%d hormigas murieron por vejez");
         es.put("LOG_DEATH_JUVENILES_LACK_CARE_FMT", "%d juveniles murieron (falta de cuidados)");
@@ -1047,12 +1070,16 @@ public class SpanishTranslation implements Translation {
         es.put("LOG_CONTAM_LEVEL_MEDIUM", "Medio");
         es.put("LOG_CONTAM_LEVEL_MASSIVE", "Masivo");
         es.put("LOG_PARASITE_SPREAD_FMT", "¡Se ha extendido una infestación parasitaria! %d parásitos nuevos detectados.");
+        es.put("LOG_PARASITIC_MITE_SPREAD_FMT", "¡Los ácaros parásitos se han propagado! %d ácaros nuevos detectados en la colonia.");
         es.put("LOG_DYNASTY_ABSORBED_FMT", "¡Se absorbieron los restos de %s!");
         es.put("LOG_FAILURE_SATELLITE", "Una colonia satélite no maduró por estancamiento genético.");
         es.put("LOG_SATELLITE_AT_FMT", "Nueva colonia satélite en (%d, %d)");
         es.put("LOG_SATELLITES_ESTABLISHED_FMT", "%d satélites establecidos.");
         es.put("LOG_SPREADING_FAILED", "Expansión fallida: no hay tierras adyacentes adecuadas.");
         es.put("LOG_PARASITES_ELIMINATED_FMT", "Eliminados %d parásitos.");
+        es.put("LOG_CAUGHT_BUGS_SUMMARY_FMT", "Las capturadoras trajeron %d insecto(s) del exterior.");
+        es.put("LOG_CAUGHT_BUG_BRED_FMT", "%d %s se reprodujeron en cautiverio.");
+        es.put("LOG_SOIL_MITES_PREDATION_FMT", "Los ácaros de suelo eliminaron %d ácaro(s) parásito(s).");
         es.put("LOG_NUPTIAL_QUEENS_FMT", "Vuelo nupcial. Se unieron %d reinas nuevas.");
         es.put("LOG_SUCCESS_ASSIMILATION_FMT", "¡%s completada! Recompensa: %s");
         es.put("LOG_SUCCESS_TUNNEL", "¡Conexión de túnel completada!");

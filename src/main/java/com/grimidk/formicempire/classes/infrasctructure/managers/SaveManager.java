@@ -512,7 +512,10 @@ public class SaveManager {
                     
                     // Stats
                     sc.aphids = c.getAphids();
+                    sc.soilMites = c.getSoilMites();
+                    sc.dermestids = c.getDermestids();
                     sc.parasites = c.getParasites();
+                    sc.parasiticMites = c.getParasiticMites();
                     sc.totalDeaths = c.getTotalDeaths();
                     
                     // Maps/Lists
@@ -696,7 +699,10 @@ public class SaveManager {
         writeJsonLine(w, "hatchRatePrincess", sc.hatchRatePrincess, false);
         
         writeJsonLine(w, "aphids", sc.aphids, false);
+        writeJsonLine(w, "soilMites", sc.soilMites, false);
+        writeJsonLine(w, "dermestids", sc.dermestids, false);
         writeJsonLine(w, "parasites", sc.parasites, false);
+        writeJsonLine(w, "parasiticMites", sc.parasiticMites, false);
         writeJsonLine(w, "totalDeaths", sc.totalDeaths, false);
 
         // Serialized Lists within Colony
@@ -935,7 +941,10 @@ public class SaveManager {
         sc.hatchRatePrincess = Float.parseFloat(map.getOrDefault("hatchRatePrincess", "0.0"));
         
         sc.aphids = Integer.parseInt(map.getOrDefault("aphids", "0"));
+        sc.soilMites = Integer.parseInt(map.getOrDefault("soilMites", map.getOrDefault("bullMites", "0")));
+        sc.dermestids = Integer.parseInt(map.getOrDefault("dermestids", "0"));
         sc.parasites = Integer.parseInt(map.getOrDefault("parasites", "0"));
+        sc.parasiticMites = Integer.parseInt(map.getOrDefault("parasiticMites", "0"));
         sc.totalDeaths = Integer.parseInt(map.getOrDefault("totalDeaths", "0"));
         
         // Nested structures

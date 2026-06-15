@@ -76,6 +76,7 @@ public class TriggerManager {
     private void checkMonthlyTriggers() {
         checkResearchRoleUnlock();
         checkPoliceRoleUnlock();
+        checkParasiticMiteOutbreak();
     }
     
     private void checkDailyTriggers() {
@@ -303,6 +304,15 @@ public class TriggerManager {
                 "Parasitic Infestation", 
                 "The colony has become so prosperous that parasitic bugs may infiltrate it!");
         }
+    }
+
+    private void checkParasiticMiteOutbreak() {
+        if (playerColony.hasUpgrade(GameUnlocks.ABILITY_PARASITIC_MITE_ALERT)) return;
+        if (playerColony.getParasiticMites() <= 0) return;
+
+        fireTrigger(GameUnlocks.ABILITY_PARASITIC_MITE_ALERT,
+            "Parasitic Mites",
+            "Microscopic mites are infesting your workers and slowing them down! Research the Catcher role and assign soldiers to capture soil mites—they eliminate parasitic mites daily.");
     }
 
     private void checkMassFlightUnlock() {

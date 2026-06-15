@@ -80,6 +80,9 @@ public class ColonyPhysicsService {
                     if (type == GameConstants.TYPE_WORKER && colony.hasUpgrade(GameUnlocks.STAT_WORKER_SPEED_2)) {
                         moveSpeed *= 2f;
                     }
+                    if (ant.isParasiticMiteInfected()) {
+                        moveSpeed *= GameConstants.PARASITIC_MITE_SPEED_MULTIPLIER;
+                    }
                     ant.updatePosition(moveSpeed);
                 }
             }
@@ -173,6 +176,20 @@ public class ColonyPhysicsService {
             for (Bug bug : bugs) {
                 if (bug.getBugType() == GameConstants.TYPE_APHID && colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) {
                     Rectangle yard = getRoomBounds(colony, WorldSpaces.RANCHER_YARD);
+                    bug.setPosition(getRandomPointInRoom(colony, yard, virtualWidth));
+                } else if (bug.getBugType() == GameConstants.TYPE_SOIL_MITE
+                        && colony.hasUpgrade(GameUnlocks.ROLE_CATCHER)) {
+                    Rectangle pen = colony.getInsectPenBounds();
+                    if (pen == null) {
+                        pen = getRoomBounds(colony, WorldSpaces.INSECT_PEN);
+                    }
+                    bug.setPosition(getRandomPointInRoom(colony, pen, virtualWidth));
+                } else if (bug.getBugType() == GameConstants.TYPE_DERMESTID
+                        && colony.hasUpgrade(GameUnlocks.ROLE_CATCHER)) {
+                    Rectangle yard = colony.getGraverBounds();
+                    if (yard == null) {
+                        yard = getRoomBounds(colony, WorldSpaces.GRAVEYARD);
+                    }
                     bug.setPosition(getRandomPointInRoom(colony, yard, virtualWidth));
                 } else if (bug.getBugType() == GameConstants.TYPE_PARASITE) {
                     bug.setDimension(WorldSpaces.UNDERWORLD);
@@ -278,7 +295,7 @@ public class ColonyPhysicsService {
         } else {
             if (ant.getDimension() == WorldSpaces.OVERWORLD) {
                  if (Math.random() < 0.01) {
-                    if (ant.getRole() == GameConstants.ROLE_SCOUT || isGatherer(ant)) {
+                    if (ant.getRole() == GameConstants.ROLE_SCOUT || ant.getRole() == GameConstants.ROLE_CATCHER) {
                          ant.moveTo(getRandomScoutPosition(colony));
                     } else {
                          ant.moveTo(getRandomOverworldPosition(colony, GameConstants.getAntSprite(ant.getAntType(), colony.getSpecies())));
@@ -298,6 +315,22 @@ public class ColonyPhysicsService {
             } else {
                 bug.setPosition(new Point(-1000, -1000));
             }
+        } else if (bug.getDimension() == WorldSpaces.OVERWORLD
+                && bug.getBugType() == GameConstants.TYPE_SOIL_MITE
+                && colony.hasUpgrade(GameUnlocks.ROLE_CATCHER)) {
+            Rectangle pen = colony.getInsectPenBounds();
+            if (pen == null) {
+                pen = getRoomBounds(colony, WorldSpaces.INSECT_PEN);
+            }
+            wanderInBoundaries(colony, bug, pen, 0.05);
+        } else if (bug.getDimension() == WorldSpaces.OVERWORLD
+                && bug.getBugType() == GameConstants.TYPE_DERMESTID
+                && colony.hasUpgrade(GameUnlocks.ROLE_CATCHER)) {
+            Rectangle yard = colony.getGraverBounds();
+            if (yard == null) {
+                yard = getRoomBounds(colony, WorldSpaces.GRAVEYARD);
+            }
+            wanderInBoundaries(colony, bug, yard, 0.05);
         }
         else if (bug.getBugType() == GameConstants.TYPE_PARASITE) {
             if (bug.getDimension() != WorldSpaces.UNDERWORLD) {
@@ -479,7 +512,10 @@ public class ColonyPhysicsService {
     private Rectangle getOverworldJobBounds(Colony colony, Ant ant) {
         if (ant.getRole() == GameConstants.ROLE_RANCHER) {
             return getRoomBounds(colony, WorldSpaces.RANCHER_YARD);
-        } 
+        }
+        if (ant.getRole() == GameConstants.ROLE_CATCHER) {
+            return null;
+        }
         if (ant.getRole() == GameConstants.ROLE_GRAVER) {
             return getRoomBounds(colony, WorldSpaces.GRAVEYARD);
         }

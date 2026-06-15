@@ -250,27 +250,8 @@ public class ColonyLabourService {
         }
     }
 
-    public void runHerding(Colony colony, Biome biome) {
-        if (!colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) return;
-         
-        ColonyStatsService stats = colony.getStatsService();
-        int rancherCount = countActiveAnts(colony, GameConstants.ROLE_RANCHER);
-        
-        if (colony.hasBuilding(GameUnlocks.PASSIVE_APHID)) {
-            if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
-                rancherCount += 2;
-            } else { rancherCount += 1; } 
-        }
-        
-        int maxSustainableAphids = stats.getAphidCapacity(colony) * rancherCount;
-        
-        if (biome != null && biome.getPlantAbundance() >= 0.5f) {
-            if (colony.getAphids() < maxSustainableAphids) {
-                colony.setAphids(Math.min(colony.getAphids() + rancherCount, maxSustainableAphids));
-            } else if (colony.getAphids() > maxSustainableAphids) {
-                colony.setAphids(maxSustainableAphids);
-            }
-        }
+    public void runCaughtBugs(Colony colony, Biome biome) {
+        colony.getBugHandlingService().runDaily(colony, biome);
     }
 
     public void runLaying(Colony colony) {
@@ -674,6 +655,7 @@ public class ColonyLabourService {
                 graverCount += 1; 
             }
         }
+        graverCount += colony.getBugHandlingService().getDermestidGraveBonus(colony);
         
         boolean hasBodies = !colony.getDeadAnts().isEmpty();
         for (Ant graver : gravers) {

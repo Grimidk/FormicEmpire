@@ -106,7 +106,7 @@ public class Savefile implements Serializable {
         public int eggs, pupae, larvae, workers, soldiers, majors, drones, princesses, queens;        
         public int plants, mushrooms, protein, water, syrups, resins, minerals;        
         public float hatchRateWorker, hatchRateSoldier, hatchRateMajor, hatchRateDrone, hatchRatePrincess;
-        public int aphids, parasites;
+        public int aphids, soilMites, dermestids, parasites, parasiticMites;
         public int totalDeaths;
         public Map<String, Integer> assignedRoleCounts = new HashMap<>();
         public Map<String, Integer> localDeathStatistics = new HashMap<>();
