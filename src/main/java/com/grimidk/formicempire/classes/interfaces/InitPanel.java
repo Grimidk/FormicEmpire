@@ -26,8 +26,6 @@ public class InitPanel extends JPanel {
         
         initComponents();
         
-        LanguageStrings.addListener(this::refreshTranslations);
-
         addAncestorListener(new AncestorListener() {
             @Override
             public void ancestorAdded(AncestorEvent event) {
@@ -60,7 +58,7 @@ public class InitPanel extends JPanel {
         roadmap.addActionListener(e -> HelpPanel.showRoadmapDialog(this));
         credits.addActionListener(e -> HelpPanel.showCreditsDialog(this));
         settings.addActionListener(e -> this.frame.showSettingsMenu(MainFrame.CARD_INIT));
-        quit.addActionListener(e -> System.exit(0));
+        quit.addActionListener(e -> frame.requestExit());
 
         setupNavigation(play);
         setupNavigation(help);

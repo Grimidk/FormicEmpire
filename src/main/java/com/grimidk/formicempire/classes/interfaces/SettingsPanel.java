@@ -124,8 +124,6 @@ public class SettingsPanel extends JPanel {
         add(southPanel, BorderLayout.SOUTH);
         
         refreshTranslations();
-        
-        LanguageStrings.addListener(this::refreshTranslations);
 
         addAncestorListener(new AncestorListener() {
             @Override

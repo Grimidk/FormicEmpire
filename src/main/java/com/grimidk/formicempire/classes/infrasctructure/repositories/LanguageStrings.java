@@ -63,6 +63,44 @@ public final class LanguageStrings {
         }
         return key;
     }
+
+    public static String formatPlayerDynastyName(String baseName) {
+        return String.format(get(DYNASTY_PLAYER_NAME_FMT), baseName);
+    }
+
+    public static String stripDynastyNameSuffix(String dynastyName) {
+        if (dynastyName == null) {
+            return null;
+        }
+        String localizedSuffix = String.format(get(DYNASTY_PLAYER_NAME_FMT), "");
+        if (dynastyName.endsWith(localizedSuffix)) {
+            return dynastyName.substring(0, dynastyName.length() - localizedSuffix.length());
+        }
+        String legacySuffix = " Dynasty";
+        if (dynastyName.endsWith(legacySuffix)) {
+            return dynastyName.substring(0, dynastyName.length() - legacySuffix.length());
+        }
+        return dynastyName;
+    }
+
+    public static boolean isAutosaveSaveName(String name) {
+        return "Autosave".equals(name) || get(SAVE_AUTOSAVE_NAME).equals(name);
+    }
+
+    /** True for default slot labels (not a user-chosen colony/world name). */
+    public static boolean isGenericSaveName(String name, int slotId) {
+        if (name == null || name.trim().isEmpty()) {
+            return true;
+        }
+        String trimmed = name.trim();
+        if (isAutosaveSaveName(trimmed)) {
+            return true;
+        }
+        if (("Save " + slotId).equals(trimmed)) {
+            return true;
+        }
+        return String.format(get(SAVE_DEFAULT_NAME_FMT), slotId).equals(trimmed);
+    }
     
     public static void addListener(Runnable listener) {
         listeners.add(listener);
@@ -446,6 +484,11 @@ public final class LanguageStrings {
 
     public static final String UI_DIALOG_LOADING_TITLE = "UI_DIALOG_LOADING_TITLE";
     public static final String SAVE_DEFAULT_NAME_FMT = "SAVE_DEFAULT_NAME_FMT";
+    public static final String SAVE_AUTOSAVE_NAME = "SAVE_AUTOSAVE_NAME";
+    public static final String SAVE_ERROR_WRITE = "SAVE_ERROR_WRITE";
+    public static final String SAVE_ERROR_WRITE_TITLE = "SAVE_ERROR_WRITE_TITLE";
+    public static final String DYNASTY_PLAYER_NAME_FMT = "DYNASTY_PLAYER_NAME_FMT";
+    public static final String DYNASTY_WILD_NAME = "DYNASTY_WILD_NAME";
 
     public static final String STAT_NEIGHBOR_NORTH = "STAT_NEIGHBOR_NORTH";
     public static final String STAT_NEIGHBOR_NORTH_WEST = "STAT_NEIGHBOR_NORTH_WEST";
@@ -1188,4 +1231,52 @@ public final class LanguageStrings {
 
     public static final String HELP_SKIP_TUTORIAL = "HELP_SKIP_TUTORIAL";
     public static final String HELP_FINISH = "HELP_FINISH";
+
+    // -- Trigger unlock dialogs --
+    public static final String TRIGGER_CLONING_TITLE = "TRIGGER_CLONING_TITLE";
+    public static final String TRIGGER_CLONING_MSG = "TRIGGER_CLONING_MSG";
+    public static final String TRIGGER_RESEARCHER_ROLE_TITLE = "TRIGGER_RESEARCHER_ROLE_TITLE";
+    public static final String TRIGGER_RESEARCHER_ROLE_MSG = "TRIGGER_RESEARCHER_ROLE_MSG";
+    public static final String TRIGGER_GRAVER_ROLE_TITLE = "TRIGGER_GRAVER_ROLE_TITLE";
+    public static final String TRIGGER_GRAVER_ROLE_MSG = "TRIGGER_GRAVER_ROLE_MSG";
+    public static final String TRIGGER_RESEARCH_ABILITY_TITLE = "TRIGGER_RESEARCH_ABILITY_TITLE";
+    public static final String TRIGGER_RESEARCH_ABILITY_MSG = "TRIGGER_RESEARCH_ABILITY_MSG";
+    public static final String TRIGGER_BUILD_ABILITY_TITLE = "TRIGGER_BUILD_ABILITY_TITLE";
+    public static final String TRIGGER_BUILD_ABILITY_MSG = "TRIGGER_BUILD_ABILITY_MSG";
+    public static final String TRIGGER_HUNTER_ROLE_TITLE = "TRIGGER_HUNTER_ROLE_TITLE";
+    public static final String TRIGGER_HUNTER_ROLE_MSG = "TRIGGER_HUNTER_ROLE_MSG";
+    public static final String TRIGGER_BREEDER_ROLE_TITLE = "TRIGGER_BREEDER_ROLE_TITLE";
+    public static final String TRIGGER_BREEDER_ROLE_MSG = "TRIGGER_BREEDER_ROLE_MSG";
+    public static final String TRIGGER_BRUTE_ROLE_TITLE = "TRIGGER_BRUTE_ROLE_TITLE";
+    public static final String TRIGGER_BRUTE_ROLE_MSG = "TRIGGER_BRUTE_ROLE_MSG";
+    public static final String TRIGGER_SPREAD_ABILITY_TITLE = "TRIGGER_SPREAD_ABILITY_TITLE";
+    public static final String TRIGGER_SPREAD_ABILITY_MSG = "TRIGGER_SPREAD_ABILITY_MSG";
+    public static final String TRIGGER_SCOUT_ROLE_TITLE = "TRIGGER_SCOUT_ROLE_TITLE";
+    public static final String TRIGGER_SCOUT_ROLE_MSG = "TRIGGER_SCOUT_ROLE_MSG";
+    public static final String TRIGGER_POLICE_ROLE_TITLE = "TRIGGER_POLICE_ROLE_TITLE";
+    public static final String TRIGGER_POLICE_ROLE_MSG = "TRIGGER_POLICE_ROLE_MSG";
+    public static final String TRIGGER_PARASITIC_MITE_TITLE = "TRIGGER_PARASITIC_MITE_TITLE";
+    public static final String TRIGGER_PARASITIC_MITE_MSG = "TRIGGER_PARASITIC_MITE_MSG";
+    public static final String TRIGGER_MASS_FLIGHT_TITLE = "TRIGGER_MASS_FLIGHT_TITLE";
+    public static final String TRIGGER_MASS_FLIGHT_MSG = "TRIGGER_MASS_FLIGHT_MSG";
+    public static final String TRIGGER_DYNASTY_ABILITY_TITLE = "TRIGGER_DYNASTY_ABILITY_TITLE";
+    public static final String TRIGGER_DYNASTY_ABILITY_MSG = "TRIGGER_DYNASTY_ABILITY_MSG";
+    public static final String TRIGGER_TRADE_ABILITY_TITLE = "TRIGGER_TRADE_ABILITY_TITLE";
+    public static final String TRIGGER_TRADE_ABILITY_MSG = "TRIGGER_TRADE_ABILITY_MSG";
+    public static final String TRIGGER_MANAGEMENT_ABILITY_TITLE = "TRIGGER_MANAGEMENT_ABILITY_TITLE";
+    public static final String TRIGGER_MANAGEMENT_ABILITY_MSG = "TRIGGER_MANAGEMENT_ABILITY_MSG";
+    public static final String TRIGGER_SPREAD_2_ABILITY_TITLE = "TRIGGER_SPREAD_2_ABILITY_TITLE";
+    public static final String TRIGGER_SPREAD_2_ABILITY_MSG = "TRIGGER_SPREAD_2_ABILITY_MSG";
+    public static final String TRIGGER_AUTOMATION_ABILITY_TITLE = "TRIGGER_AUTOMATION_ABILITY_TITLE";
+    public static final String TRIGGER_AUTOMATION_ABILITY_MSG = "TRIGGER_AUTOMATION_ABILITY_MSG";
+    public static final String TRIGGER_BILATERAL_TRADE_TITLE = "TRIGGER_BILATERAL_TRADE_TITLE";
+    public static final String TRIGGER_BILATERAL_TRADE_MSG = "TRIGGER_BILATERAL_TRADE_MSG";
+    public static final String TRIGGER_COURIER_ROLE_TITLE = "TRIGGER_COURIER_ROLE_TITLE";
+    public static final String TRIGGER_COURIER_ROLE_MSG = "TRIGGER_COURIER_ROLE_MSG";
+    public static final String TRIGGER_BORER_ROLE_TITLE = "TRIGGER_BORER_ROLE_TITLE";
+    public static final String TRIGGER_BORER_ROLE_MSG = "TRIGGER_BORER_ROLE_MSG";
+    public static final String TRIGGER_ASSIMILATION_ABILITY_TITLE = "TRIGGER_ASSIMILATION_ABILITY_TITLE";
+    public static final String TRIGGER_ASSIMILATION_ABILITY_MSG = "TRIGGER_ASSIMILATION_ABILITY_MSG";
+    public static final String TRIGGER_OPERATIONS_ABILITY_TITLE = "TRIGGER_OPERATIONS_ABILITY_TITLE";
+    public static final String TRIGGER_OPERATIONS_ABILITY_MSG = "TRIGGER_OPERATIONS_ABILITY_MSG";
 }

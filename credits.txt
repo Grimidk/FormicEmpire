@@ -4,12 +4,17 @@ Developer:
 Pixelartist:
     Grimidk
 
-Testers:
+Testers (request to be included):
+    
+
+Marketing:
     Grimidk
 
 Translations:
     English: Grimidk
     Spanish: Grimidk
+    Portuguese: Grimidk
+    French: Grimidk
 
 Special thanks to:
-    Svetlana Navas
+    Svetlana Valentina

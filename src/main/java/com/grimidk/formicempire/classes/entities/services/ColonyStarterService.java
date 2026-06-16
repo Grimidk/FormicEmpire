@@ -14,6 +14,12 @@ import java.util.List;
 import java.util.Random;
 
 public class ColonyStarterService {
+
+    private static final ColonyStarterService SHARED = new ColonyStarterService();
+
+    public static ColonyStarterService shared() {
+        return SHARED;
+    }
     
     private String formatName(String name) {
         if (name == null || name.trim().isEmpty()) return "Player";
@@ -27,11 +33,7 @@ public class ColonyStarterService {
         if (colony.getDynasty() != null) {
             Dynasty d = colony.getDynasty();
             
-            String baseName = d.getName();
-            if (baseName != null && baseName.endsWith(" Dynasty")) {
-                baseName = baseName.substring(0, baseName.length() - 8);
-            }
-            baseName = formatName(baseName);
+            String baseName = formatName(LanguageStrings.stripDynastyNameSuffix(d.getName()));
             
             int index = d.getColonies().indexOf(colony);
             if (index == -1) index = d.getColonies().size(); 

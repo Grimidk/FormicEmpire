@@ -23,6 +23,7 @@ import com.grimidk.formicempire.classes.infrasctructure.NeoPoint;
 import com.grimidk.formicempire.classes.infrasctructure.Room;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameRandom;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
@@ -203,10 +204,10 @@ public class ColonyLocationService {
                     .collect(Collectors.toList());
             if (active.isEmpty()) continue;
 
-            if (Math.random() < 0.70 || active.size() == 1) {
+            if (GameRandom.nextDouble() < 0.70 || active.size() == 1) {
                 return active.get(0);
             } else {
-                return active.get(1 + (int) (Math.random() * (active.size() - 1)));
+                return active.get(1 + GameRandom.nextInt(active.size() - 1));
             }
         }
         return null;

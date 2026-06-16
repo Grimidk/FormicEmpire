@@ -4,8 +4,8 @@ Developer:
 Pixelartist:
     Grimidk
 
-Testers:
-    Grimidk
+Testers (request to be included):
+    
 
 Marketing:
     Grimidk
@@ -17,4 +17,4 @@ Translations:
     French: Grimidk
 
 Special thanks to:
-    Svetlana Navas
+    Svetlana Valentina

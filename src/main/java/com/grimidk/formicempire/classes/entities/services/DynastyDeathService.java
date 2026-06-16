@@ -12,9 +12,9 @@ import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStr
 
 public class DynastyDeathService {
 
+    private static final ColonyStarterService STARTER = ColonyStarterService.shared();
+
     public void processDynastyDeaths(World world) {
-        ColonyStarterService starter = new ColonyStarterService();
-        
         for (Dynasty dynasty : world.getDynastys()) {
             if (dynasty.isDefeated()) continue;
             
@@ -49,7 +49,7 @@ public class DynastyDeathService {
                             + LanguageStrings.get(LanguageStrings.LOG_LAST_COLONY_FALLEN));
                     } else {
                         Hex hex = findHexForColony(world, dead);
-                        if (hex != null) starter.dismantleColony(hex);
+                        if (hex != null) STARTER.dismantleColony(hex);
                     }
                 }
                 
@@ -59,7 +59,7 @@ public class DynastyDeathService {
             } else {
                 for (Colony dead : deadColonies) {
                     Hex hex = findHexForColony(world, dead);
-                    if (hex != null) starter.dismantleColony(hex);
+                    if (hex != null) STARTER.dismantleColony(hex);
                     dynasty.removeColony(dead);
                 }
                 

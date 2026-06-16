@@ -26,6 +26,7 @@ import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameRandom;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
@@ -53,6 +54,7 @@ public class Colony {
     private final List<Bug> bugs; 
     
     private Map<AntRole, Integer> assignedRoleCounts;
+    private Map<AntRole, Integer> activeRoleCountCache;
     private final Set<Building> buildings;
 
     // --- Resource Data ---
@@ -121,7 +123,7 @@ public class Colony {
         this.sumarizationService = new ColonySumarizationService();
         this.automationService = new ColonyAutomationService(); 
         this.resourceService = new ColonyResourceService();
-        this.starterService = new ColonyStarterService();
+        this.starterService = ColonyStarterService.shared();
         this.bugHandlingService = new ColonyBugHandlingService();
     }
 
@@ -246,10 +248,10 @@ public class Colony {
         
         Map<String, Integer> savedRoles = savedColony.assignedRoleCounts;
         if (savedRoles != null && !savedRoles.isEmpty()) {
-            for (AntRole role : GameConstants.getAntRoles()) {
-                Integer count = savedRoles.get(role.getName());
-                if (count != null) {
-                    this.assignedRoleCounts.put(role, count);
+            for (Map.Entry<String, Integer> entry : savedRoles.entrySet()) {
+                AntRole role = GameConstants.getAntRoleByPersistenceKey(entry.getKey());
+                if (role != null && entry.getValue() != null) {
+                    this.assignedRoleCounts.put(role, entry.getValue());
                 }
             }
         }
@@ -615,8 +617,8 @@ public class Colony {
 
         if (actual == 0) return "~0";
         
-        double fuzz = Math.random() * 0.2; 
-        boolean up = Math.random() > 0.5;
+        double fuzz = GameRandom.nextDouble() * 0.2; 
+        boolean up = GameRandom.nextDouble() > 0.5;
         
         int display = actual;
         if (up) display += (int)(actual * fuzz);
@@ -641,6 +643,29 @@ public class Colony {
     public int getAssignedRoleCount(AntRole role) { return assignedRoleCounts.getOrDefault(role, 0); }
     public void setAssignedRoleCount(AntRole role, int count) { if (count >= 0) assignedRoleCounts.put(role, count); }
     public Map<AntRole, Integer> getAssignedRoleCounts() { return assignedRoleCounts; }
+
+    public void invalidateActiveRoleCountCache() {
+        activeRoleCountCache = null;
+    }
+
+    public int getActiveRoleCount(AntRole role) {
+        if (activeRoleCountCache == null) {
+            rebuildActiveRoleCountCache();
+        }
+        return activeRoleCountCache.getOrDefault(role, 0);
+    }
+
+    private void rebuildActiveRoleCountCache() {
+        Map<AntRole, Integer> counts = new HashMap<>();
+        for (List<Ant> group : antGroups.values()) {
+            for (Ant ant : group) {
+                if (ant.isAlive() && !ant.isOnTrade() && ant.getRole() != null) {
+                    counts.merge(ant.getRole(), 1, Integer::sum);
+                }
+            }
+        }
+        activeRoleCountCache = counts;
+    }
     
     public float getHatchRateWorker() { return hatchRateWorker; }
     public void setHatchRateWorker(float hatchRateWorker) { this.hatchRateWorker = hatchRateWorker; }
@@ -832,6 +857,7 @@ public class Colony {
 
     // --- Job Schedulers ---
     public void runMinutelyJobs() {
+        invalidateActiveRoleCountCache();
         if (this.isActive) {
             this.runConverting();
         }
@@ -847,6 +873,7 @@ public class Colony {
                 this.automationService.runAutomation(this);
             }
             this.runRoleAssignment(engine);
+            invalidateActiveRoleCountCache();
             this.runLaying();
             this.runResearch();
             this.runRanching();
@@ -857,7 +884,8 @@ public class Colony {
             if (this.automationEnabled) {
                 this.automationService.runAutomation(this);
             }
-            this.populationService.runRoleAssignment(this, engine); 
+            this.populationService.runRoleAssignment(this, engine);
+            invalidateActiveRoleCountCache();
             this.runResearch();
             this.labourService.runTunnelConstruction(this);
             this.sumarizationService.runHourlyLite(this, biome);

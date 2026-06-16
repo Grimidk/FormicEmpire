@@ -91,8 +91,6 @@ public class HelpPanel extends JPanel {
         add(southPanel, BorderLayout.SOUTH);
         
         refreshTranslations();
-        
-        LanguageStrings.addListener(this::refreshTranslations);
 
         addAncestorListener(new AncestorListener() {
             @Override
@@ -121,18 +119,18 @@ public class HelpPanel extends JPanel {
                 .collect(Collectors.toList());
 
         // Add tabs
-        mainTabs.addTab("Welcome", createWelcomePanel());
-        mainTabs.addTab("Getting Started", createGettingStartedPanel());
-        mainTabs.addTab("Dynasty", createEmpireManagementPanel());
-        mainTabs.addTab("Hotkeys", createHotkeysPanel());
-        mainTabs.addTab("Species", createSpeciesPanel());
-        mainTabs.addTab("Ant Types", createAntTypesPanel());
-        mainTabs.addTab("Bugs", createBugsPanel());
-        mainTabs.addTab("Roles", createDictionaryPanel(roleConstants));
-        mainTabs.addTab("Upgrades", createDictionaryPanel(genericUpgrades));
-        mainTabs.addTab("Buildings", createDictionaryPanel(new ArrayList<>(GameUnlocks.getBuildings())));
-        mainTabs.addTab("Assimilations", createDictionaryPanel(new ArrayList<>(GameUnlocks.getAssimilations())));
-        mainTabs.addTab("World", createWorldPanel());
+        mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_WELCOME), createWelcomePanel());
+        mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_STARTED), createGettingStartedPanel());
+        mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_DYNASTY), createEmpireManagementPanel());
+        mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_HOTKEYS), createHotkeysPanel());
+        mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_SPECIES), createSpeciesPanel());
+        mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_TYPES), createAntTypesPanel());
+        mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_BUGS), createBugsPanel());
+        mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_ROLES), createDictionaryPanel(roleConstants));
+        mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_UPGRADES), createDictionaryPanel(genericUpgrades));
+        mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_BUILDINGS), createDictionaryPanel(new ArrayList<>(GameUnlocks.getBuildings())));
+        mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_ASSIMILATIONS), createDictionaryPanel(new ArrayList<>(GameUnlocks.getAssimilations())));
+        mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_WORLD), createWorldPanel());
     }
     
     public void refreshTranslations() {
@@ -971,7 +969,7 @@ public class HelpPanel extends JPanel {
         JTextArea textArea = new JTextArea(text);
         textArea.setEditable(false);
         textArea.setLineWrap(false);
-        textArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+        textArea.setFont(AssetStyles.FONT_MONOSPACED);
         textArea.setBackground(AssetStyles.BACKGROUND_COLOR);
         textArea.setForeground(AssetStyles.FONT_COLOR);
         textArea.setBorder(new EmptyBorder(12, 12, 12, 12));

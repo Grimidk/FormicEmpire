@@ -2,6 +2,7 @@ package com.grimidk.formicempire.classes.interfaces.game.gamepanels;
 
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.Species;
+import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.Weather;
 import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Bug;
@@ -33,9 +34,8 @@ import java.util.Random;
 public class GameAreaPanel extends ZeroGamePanel {
 
     private Image backgroundImage;
-    private final Map<String, Image> biomeTextureCache = new HashMap<>();
-    
-    // --- Images ---
+    private final Map<Integer, Image> biomeTextureCache = new HashMap<>();
+    private Image undergroundTexture;
     private Image basicRoomImg;
     private Image doubleRoomImg;
     private Image firstHallwayImg;
@@ -46,8 +46,8 @@ public class GameAreaPanel extends ZeroGamePanel {
     
     private Colony colony;
     private Engine engine;
-    private Dimension currentDimension = WorldSpaces.OVERWORLD; 
-    private String currentBiomeName = "Plains";
+    private Dimension currentDimension = WorldSpaces.OVERWORLD;
+    private int currentBiomeId = GameConstants.BIOME_PLAINS.getId();
     private Rectangle paintViewportRect;
     private Rectangle lodViewportRect;
 
@@ -81,7 +81,7 @@ public class GameAreaPanel extends ZeroGamePanel {
     @Override
     protected void initComponents() {
         loadImages();
-        this.backgroundImage = biomeTextureCache.getOrDefault("Plains", null);
+        updateBackground();
     }
 
     @Override
@@ -89,22 +89,19 @@ public class GameAreaPanel extends ZeroGamePanel {
     }
 
     private void loadImages() {
-        // Tile PNGs are stored in git as e.g. PlainsTile.png; some checkouts/JARs end up as plainsTile.png.
-        // loadImage() tries both casings when the class loader is case-sensitive.
-        biomeTextureCache.put("Plains", loadImage("backgrounds/biomes/PlainsTile.png"));
-        biomeTextureCache.put("Forest", loadImage("backgrounds/biomes/ForestTile.png"));
-        biomeTextureCache.put("Jungle", loadImage("backgrounds/biomes/JungleTile.png"));
-        biomeTextureCache.put("Swamp", loadImage("backgrounds/biomes/SwampTile.png"));
-        biomeTextureCache.put("Tundra", loadImage("backgrounds/biomes/TundraTile.png"));
-        biomeTextureCache.put("Taiga", loadImage("backgrounds/biomes/TaigaTile.png"));
-        biomeTextureCache.put("Desert", loadImage("backgrounds/biomes/DessertTile.png"));
-        biomeTextureCache.put("Urban", loadImage("backgrounds/biomes/UrbanTile.png"));
-        biomeTextureCache.put("Mountain", loadImage("backgrounds/biomes/MountainTile.png"));
-        biomeTextureCache.put("Volcanic", loadImage("backgrounds/biomes/VolcanicTile.png"));
-        biomeTextureCache.put("Lake", loadImage("backgrounds/biomes/LakeTile.png"));
-        biomeTextureCache.put("Ocean", loadImage("backgrounds/biomes/OceanTile.png"));
-
-        biomeTextureCache.put("Underground", loadImage("backgrounds/colony/UndergroundTile.png"));
+        biomeTextureCache.put(GameConstants.BIOME_PLAINS.getId(), loadImage("backgrounds/biomes/PlainsTile.png"));
+        biomeTextureCache.put(GameConstants.BIOME_FOREST.getId(), loadImage("backgrounds/biomes/ForestTile.png"));
+        biomeTextureCache.put(GameConstants.BIOME_JUNGLE.getId(), loadImage("backgrounds/biomes/JungleTile.png"));
+        biomeTextureCache.put(GameConstants.BIOME_SWAMP.getId(), loadImage("backgrounds/biomes/SwampTile.png"));
+        biomeTextureCache.put(GameConstants.BIOME_TUNDRA.getId(), loadImage("backgrounds/biomes/TundraTile.png"));
+        biomeTextureCache.put(GameConstants.BIOME_TAIGA.getId(), loadImage("backgrounds/biomes/TaigaTile.png"));
+        biomeTextureCache.put(GameConstants.BIOME_DESERT.getId(), loadImage("backgrounds/biomes/DessertTile.png"));
+        biomeTextureCache.put(GameConstants.BIOME_URBAN.getId(), loadImage("backgrounds/biomes/UrbanTile.png"));
+        biomeTextureCache.put(GameConstants.BIOME_MOUNTAIN.getId(), loadImage("backgrounds/biomes/MountainTile.png"));
+        biomeTextureCache.put(GameConstants.BIOME_VOLCANIC.getId(), loadImage("backgrounds/biomes/VolcanicTile.png"));
+        biomeTextureCache.put(GameConstants.BIOME_LAKE.getId(), loadImage("backgrounds/biomes/LakeTile.png"));
+        biomeTextureCache.put(GameConstants.BIOME_OCEAN.getId(), loadImage("backgrounds/biomes/OceanTile.png"));
+        undergroundTexture = loadImage("backgrounds/colony/UndergroundTile.png");
 
         basicRoomImg = loadImage("sprites/buildings/basicRoom.png");
         doubleRoomImg = loadImage("sprites/buildings/doubleRoom.png");
@@ -211,13 +208,13 @@ public class GameAreaPanel extends ZeroGamePanel {
     
     public void resetView() {
         this.currentDimension = WorldSpaces.OVERWORLD;
-        this.currentBiomeName = "Plains";
+        this.currentBiomeId = GameConstants.BIOME_PLAINS.getId();
         this.colony = null;
         this.paintViewportRect = null;
         this.lodViewportRect = null;
         this.overworldLayoutOffsetX = 0;
         this.overworldLayoutOffsetY = 0;
-        this.backgroundImage = biomeTextureCache.get("Plains");
+        this.backgroundImage = resolveBackgroundImage();
         repaint();
     }
 
@@ -255,17 +252,27 @@ public class GameAreaPanel extends ZeroGamePanel {
         return currentDimension;
     }
 
-    public void setBackgroundByBiome(String biomeName) {
-        this.currentBiomeName = biomeName;
+    public void setBackgroundBiome(Biome biome) {
+        if (biome == null) {
+            return;
+        }
+        this.currentBiomeId = biome.getId();
         updateBackground();
+    }
+
+    private Image resolveBackgroundImage() {
+        if (currentDimension == WorldSpaces.UNDERWORLD) {
+            return undergroundTexture;
+        }
+        Image tile = biomeTextureCache.get(currentBiomeId);
+        if (tile == null) {
+            tile = biomeTextureCache.get(GameConstants.BIOME_PLAINS.getId());
+        }
+        return tile;
     }
     
     private void updateBackground() {
-        if (currentDimension == WorldSpaces.UNDERWORLD) {
-            this.backgroundImage = biomeTextureCache.get("Underground");
-        } else {
-            this.backgroundImage = biomeTextureCache.getOrDefault(currentBiomeName, biomeTextureCache.get("Plains"));
-        }
+        this.backgroundImage = resolveBackgroundImage();
     }
     
     public void refreshSize(int viewportWidth, int viewportHeight) {

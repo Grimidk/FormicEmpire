@@ -25,6 +25,7 @@ import com.grimidk.formicempire.classes.entities.Tunnel;
 import com.grimidk.formicempire.classes.infrasctructure.NeoPoint;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameRandom;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
@@ -45,18 +46,6 @@ public class ColonyLabourService {
             }
         }
         return workers;
-    }
-
-    private int countActiveAnts(Colony colony, AntRole role) {
-        int count = 0;
-        for (List<Ant> group : colony.getAntGroups().values()) {
-            for (Ant ant : group) {
-                if (ant.isAlive() && !ant.isOnTrade() && ant.getRole() == role) {
-                    count++;
-                }
-            }
-        }
-        return count;
     }
     
     private int processGathering(Colony colony, List<ResourceSource> sources, int powerAvailable, ResourceType type, List<Ant> workers) {
@@ -200,7 +189,7 @@ public class ColonyLabourService {
         ColonyStatsService stats = colony.getStatsService();
         ColonyResourceService resources = colony.getResourceService();
         
-        int farmerCount = countActiveAnts(colony, GameConstants.ROLE_FARMER);
+        int farmerCount = colony.getActiveRoleCount(GameConstants.ROLE_FARMER);
         if (colony.hasBuilding(GameUnlocks.PASSIVE_FARM)) {
             if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
                 farmerCount += 2;
@@ -212,7 +201,7 @@ public class ColonyLabourService {
         double scale = 1.0;
         double chance = stats.getConversionRate(colony);
         
-        if (Math.random() <= chance * scale || chance * scale >= 1.0) {
+        if (GameRandom.nextDouble() <= chance * scale || chance * scale >= 1.0) {
             double amount = farmerCount * (chance * scale >= 1.0 ? chance * scale : 1.0);
             
             double consumedPlants = resources.consumeResource(colony, GameConstants.RESOURCE_PLANT, amount);
@@ -255,7 +244,7 @@ public class ColonyLabourService {
     }
 
     public void runLaying(Colony colony) {
-        int layerCount = countActiveAnts(colony, GameConstants.ROLE_LAYER);
+        int layerCount = colony.getActiveRoleCount(GameConstants.ROLE_LAYER);
         
         List<Ant> eggList = colony.getEggs();
         
@@ -296,8 +285,8 @@ public class ColonyLabourService {
         
         for (Ant nurse : nurses) {
             nurse.clearLoad();
-            if (babyAntTotal > 0 && Math.random() < 0.30) {
-                double r = Math.random();
+            if (babyAntTotal > 0 && GameRandom.nextDouble() < 0.30) {
+                double r = GameRandom.nextDouble();
                 if (r < 0.33) nurse.setCarryingAnt(GameConstants.TYPE_EGG);
                 else if (r < 0.66) nurse.setCarryingAnt(GameConstants.TYPE_LARVA);
                 else nurse.setCarryingAnt(GameConstants.TYPE_PUPA);
@@ -361,7 +350,7 @@ public class ColonyLabourService {
         Collections.shuffle(neighbors);
         
         int satellitesSpawned = 0;
-        ColonyStarterService starter = new ColonyStarterService();
+        ColonyStarterService starter = ColonyStarterService.shared();
         
         for (Hex neighbor : neighbors) {
             if (satellitesSpawned >= satellitesToSpawn) break; 
@@ -482,7 +471,7 @@ public class ColonyLabourService {
     public void runScoutting(Colony colony, Biome biome, Hex currentHex) {
         if (!colony.hasUpgrade(GameUnlocks.ROLE_SCOUT)) return;
 
-        int scoutCount = countActiveAnts(colony, GameConstants.ROLE_SCOUT);
+        int scoutCount = colony.getActiveRoleCount(GameConstants.ROLE_SCOUT);
         if (scoutCount == 0) return;
 
         float chancePerScout = colony.getStatsService().getScoutingRate(colony); 
@@ -660,7 +649,7 @@ public class ColonyLabourService {
         boolean hasBodies = !colony.getDeadAnts().isEmpty();
         for (Ant graver : gravers) {
             graver.clearLoad();
-            if (hasBodies && Math.random() < 0.5) {
+            if (hasBodies && GameRandom.nextDouble() < 0.5) {
                 graver.setCarryingAnt(GameConstants.TYPE_DEAD);
             }
         }
@@ -711,7 +700,7 @@ public class ColonyLabourService {
         Dynasty dynasty = colony.getDynasty();
         if (dynasty == null) return;
 
-        int researcherCount = countActiveAnts(colony, GameConstants.ROLE_RESEARCHER);        
+        int researcherCount = colony.getActiveRoleCount(GameConstants.ROLE_RESEARCHER);        
         if (colony.hasBuilding(GameUnlocks.PASSIVE_LAB)) {
             if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
                 researcherCount += 2;
@@ -720,7 +709,7 @@ public class ColonyLabourService {
             }
         }
 
-        int assistantCount = countActiveAnts(colony, GameConstants.ROLE_ASSISTANT);        
+        int assistantCount = colony.getActiveRoleCount(GameConstants.ROLE_ASSISTANT);        
         if (researcherCount > 0 || assistantCount > 0) {
             int speed = colony.getStatsService().getResearchSpeed(colony);
             

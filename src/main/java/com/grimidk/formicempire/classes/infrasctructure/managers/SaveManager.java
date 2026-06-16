@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.lang.reflect.Field;
@@ -26,6 +27,7 @@ import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,8 +41,14 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 
 public class SaveManager {
+    private static final ExecutorService SHARED_EXECUTOR =
+            Executors.newSingleThreadExecutor(r -> new Thread(r, "save-worker"));
+
+    public static void shutdownSharedExecutor() {
+        SHARED_EXECUTOR.shutdown();
+    }
+
     private final File savesDir;
-    private final ExecutorService executor = Executors.newSingleThreadExecutor(r -> new Thread(r, "save-worker"));
 
     public SaveManager() {
         this.savesDir = new File("saves");
@@ -115,7 +123,7 @@ public class SaveManager {
     }
 
     public void saveUserSlotAsync(Savefile save, Runnable onComplete) {
-        executor.submit(() -> {
+        SHARED_EXECUTOR.submit(() -> {
             try {
                 writeManualSave(save);
                 if (onComplete != null) SwingUtilities.invokeLater(onComplete);
@@ -153,7 +161,7 @@ public class SaveManager {
             return;
         }
 
-        String nameToUse = "Autosave"; 
+        String nameToUse = LanguageStrings.get(LanguageStrings.SAVE_AUTOSAVE_NAME);
         File manualFile = getSlotFile(slotId, "manual");
         if (manualFile.exists() && manualFile.length() > 0) {
             try (BufferedReader r = Files.newBufferedReader(manualFile.toPath(), StandardCharsets.UTF_8)) {
@@ -277,24 +285,22 @@ public class SaveManager {
         writeManualSave(save);
     }
 
-    public void saveWorldToSlotUserAsync(World w, Engine e, int slotId, Runnable onComplete) {
-        executor.submit(() -> {
-            try {
-                saveWorldToSlotUser(w, slotId); 
-                if (onComplete != null) SwingUtilities.invokeLater(onComplete);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        });
+    public void saveWorldToSlotUserAsync(World w, Engine e, int slotId, Consumer<Boolean> onDone) {
+        saveWorldToSlotUserAsync(w, e, slotId, null, onDone);
     }
 
-    public void saveWorldToSlotUserAsync(World w, Engine e, int slotId, String name, Runnable onComplete) {
-        executor.submit(() -> {
+    public void saveWorldToSlotUserAsync(World w, Engine e, int slotId, String name, Consumer<Boolean> onDone) {
+        SHARED_EXECUTOR.submit(() -> {
+            boolean success = false;
             try {
-                saveWorldToSlotUser(w, slotId, name); 
-                if (onComplete != null) SwingUtilities.invokeLater(onComplete);
+                saveWorldToSlotUser(w, slotId, name);
+                success = true;
             } catch (Exception err) {
                 err.printStackTrace();
+            }
+            if (onDone != null) {
+                boolean ok = success;
+                SwingUtilities.invokeLater(() -> onDone.accept(ok));
             }
         });
     }
@@ -314,15 +320,8 @@ public class SaveManager {
         return computePlayTime(s.getMinute(), s.getHour(), s.getDay(), s.getMonth(), s.getYear());
     }
 
-    public void saveAutosaveAsync(World w, Engine e, Runnable onComplete) {
-        executor.submit(() -> {
-            saveAutosave(w, e); 
-            if (onComplete != null) SwingUtilities.invokeLater(onComplete);
-        });
-    }
-    
     private void populateSavefileFromGame(Savefile save, World w, Engine engine) {
-        save.setTimestamp(System.currentTimeMillis()); 
+        save.setTimestamp(System.currentTimeMillis());
         save.setMinute(w.getMinute());
         save.setHour(w.getHour());
         save.setDay(w.getDay());
@@ -343,7 +342,7 @@ public class SaveManager {
                 sc.name = dynasty.getName();
                 sc.isPlayer = dynasty.isPlayer();
                 sc.isDefeated = dynasty.isDefeated();
-                sc.rankName = dynasty.getRank() != null ? dynasty.getRank().getName() : "Ant";
+                sc.rankName = dynasty.getRank() != null ? dynasty.getRank().getNameKey() : LanguageStrings.RANK_ANT;
                 sc.researchPoints = dynasty.getResearchPoints();
                 sc.totalNuptialFlights = dynasty.getTotalNuptialFlights();
                 sc.speciesId = dynasty.getSpecies() != null ? dynasty.getSpecies().getId() : 1;
@@ -472,7 +471,7 @@ public class SaveManager {
                     sc.id = c.getId();
                     sc.dynastyId = (c.getDynasty() != null) ? c.getDynasty().getId() : 0;
                     sc.name = c.getName();
-                    sc.rankName = c.getRank() != null ? c.getRank().getName() : "Colony";
+                    sc.rankName = c.getRank() != null ? c.getRank().getNameKey() : LanguageStrings.RANK_COLONY;
                     sc.isPlayer = c.isPlayer();
                     sc.isCapital = c.isCapital();
                     sc.isAutomated = c.isAutomationEnabled();
@@ -521,7 +520,7 @@ public class SaveManager {
                     
                     // Maps/Lists
                     for (Map.Entry<AntRole, Integer> entry : c.getAssignedRoleCounts().entrySet()) {
-                        sc.assignedRoleCounts.put(entry.getKey().getName(), entry.getValue());
+                        sc.assignedRoleCounts.put(String.valueOf(entry.getKey().getId()), entry.getValue());
                     }
                     
                     if (c.getPopulationService() != null) {

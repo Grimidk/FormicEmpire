@@ -72,6 +72,10 @@ public class Engine extends Thread {
         return tradeManager;
     }
 
+    public SaveManager getSaveManager() {
+        return settingsSaveManager;
+    }
+
     public void loadGlobalSettings() {
         this.settingsSaveManager.loadSettings(this);
     }
@@ -234,6 +238,7 @@ public class Engine extends Thread {
 
     public void startUp(Savefile savefile) {
         System.out.println("[Engine] Starting up Engine...");
+        tradeManager.clearActiveTrades();
         World world = new World();
         this.setWorld(world);
 

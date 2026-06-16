@@ -669,6 +669,23 @@ public final class GameConstants {
         return null;
     }
 
+    public static AntRole getAntRoleByPersistenceKey(String key) {
+        if (key == null) {
+            return null;
+        }
+        for (AntRole role : antRoles) {
+            if (String.valueOf(role.getId()).equals(key) || role.getNameKey().equals(key)) {
+                return role;
+            }
+        }
+        for (AntRole role : antRoles) {
+            if (role.getName().equals(key)) {
+                return role;
+            }
+        }
+        return null;
+    }
+
     public static List<ColonyRank> getColonyRanks() { return Collections.unmodifiableList(colonyRanks); }
 
     public static List<Species> getSpecies() { return Collections.unmodifiableList(species); }

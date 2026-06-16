@@ -21,6 +21,7 @@ public class AssetStyles {
     // --- Palette ---
     public static final Color COLOR_ABSOLUTE_BLACK = new Color(0, 0, 0);
     public static final Color COLOR_ABSOLUTE_WHITE = new Color(255, 255, 255);
+    public static final String COLOR_ABSOLUTE_WHITE_HTML = "#FFFFFF";
     public static final Color COLOR_DARK_GRAY = new Color(67, 67, 67);
     public static final Color COLOR_MEDIUM_GRAY = new Color(103, 103, 103);
     public static final Color COLOR_LIGHT_GRAY = new Color(157, 157, 157);
@@ -125,6 +126,7 @@ public class AssetStyles {
     public static final Font FONT_BOLD = customFont.deriveFont(Font.BOLD, 12f);
     public static final Font FONT_TITLE = customFont.deriveFont(Font.BOLD, 18f);
     public static final Font FONT_SMALL = customFont.deriveFont(10f);
+    public static final Font FONT_MONOSPACED = new Font(Font.MONOSPACED, Font.PLAIN, 12);
 
     public static JSeparator createInternalSeparator() {
         JSeparator sep = new JSeparator(SwingConstants.HORIZONTAL);

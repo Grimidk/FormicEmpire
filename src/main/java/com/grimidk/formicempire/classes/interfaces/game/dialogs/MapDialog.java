@@ -371,15 +371,15 @@ public class MapDialog extends ZeroDialog {
                 
                 Biome biome = hex.getBiome();
                 Color fillColor = AssetStyles.BACKGROUND_COLOR;
-                
+
                 if (biome != null) {
                     fillColor = getBiomeColor(biome);
                 }
-                
+
                 if (hex != world.getActiveHex()) {
-                    fillColor = AssetStyles.fadeTowardBackground(fillColor, 0.4f); 
+                    fillColor = AssetStyles.fadeTowardBackground(fillColor, 0.4f);
                 }
-                
+
                 g2d.setColor(fillColor);
                 g2d.fillPolygon(poly);
 

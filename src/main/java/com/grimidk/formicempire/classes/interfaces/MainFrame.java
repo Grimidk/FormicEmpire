@@ -11,6 +11,7 @@ import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 
 import java.awt.*;
+import java.awt.event.AWTEventListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -37,6 +38,8 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
 
     private Cursor cursorNormal;
     private Cursor cursorClick;
+    private AWTEventListener cursorEventListener;
+    private final Runnable translationRefresh = this::refreshTranslations;
 
     public CardLayout getCardLayout() {
         return cardLayout;
@@ -151,21 +154,37 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
 
         applyEngineSettings();
         
-        LanguageStrings.addListener(this::refreshTranslations);
+        LanguageStrings.addListener(translationRefresh);
+    }
+
+    public void requestExit() {
+        handleExit();
     }
     
     private void handleExit() {
-        if (engine.isConfirmOnQuit()) {
+        if (gamePanel.isEngineStarted() && engine.isConfirmOnQuit()) {
             int res = JOptionPane.showConfirmDialog(this, 
-                LanguageStrings.get("UI_CONFIRM_EXIT_MSG"), 
-                LanguageStrings.get("UI_CONFIRM_EXIT_TITLE"), 
+                LanguageStrings.get(LanguageStrings.UI_CONFIRM_EXIT_MSG), 
+                LanguageStrings.get(LanguageStrings.UI_CONFIRM_EXIT_TITLE), 
                 JOptionPane.YES_NO_OPTION);
             if (res == JOptionPane.YES_OPTION) {
-                System.exit(0);
+                shutdownAndExit();
             }
         } else {
-            System.exit(0);
+            shutdownAndExit();
         }
+    }
+
+    private void shutdownAndExit() {
+        gamePanel.endSession();
+        LanguageStrings.removeListener(translationRefresh);
+        engine.pauseEngine();
+        SaveManager.shutdownSharedExecutor();
+        if (cursorEventListener != null) {
+            Toolkit.getDefaultToolkit().removeAWTEventListener(cursorEventListener);
+            cursorEventListener = null;
+        }
+        System.exit(0);
     }
     
     private void refreshTranslations() {
@@ -174,6 +193,8 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         introPanel.refreshTranslations();
         initPanel.refreshTranslations();
         helpPanel.refreshTranslations();
+        settingsPanel.refreshTranslations();
+        gamePanel.refreshTranslations();
     }
 
     public String getMenuReturnCard() {
@@ -191,7 +212,7 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         
         setCursor(cursorNormal);
 
-        Toolkit.getDefaultToolkit().addAWTEventListener(event -> {
+        Toolkit.getDefaultToolkit().addAWTEventListener(cursorEventListener = event -> {
             if (event instanceof MouseEvent me) {
                 if (me.getID() == MouseEvent.MOUSE_PRESSED || me.getID() == MouseEvent.MOUSE_RELEASED) {
                     applyGameCursorForMouseEvent(me);
@@ -300,7 +321,7 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
                 JOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.DEATH_LOAD_FAILED_NEW_GAME), LanguageStrings.get(LanguageStrings.DEATH_LOAD_FAILED_TITLE), JOptionPane.ERROR_MESSAGE);
                 handleQuitToMenu();
             } else {
-                SaveManager sm = new SaveManager();
+                SaveManager sm = engine.getSaveManager();
                 Savefile saveToLoad = sm.loadAutosaveForSlot(slotId);
                 
                 if (saveToLoad != null) {

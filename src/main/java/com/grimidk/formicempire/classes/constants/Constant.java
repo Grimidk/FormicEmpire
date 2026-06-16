@@ -18,10 +18,12 @@ public class Constant {
         return id;
     }
 
+    /** Localized label for UI only; do not use for saves, caches, or comparisons. */
     public String getName() {
         return LanguageStrings.get(nameKey);
     }
-    
+
+    /** Stable key for persistence and logic (not translated). */
     public String getNameKey() {
         return nameKey;
     }

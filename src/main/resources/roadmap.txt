@@ -26,6 +26,7 @@ To Fix (By decreasing priority) :
 	(none right now)
 
 	Low:
+	dead ant list memory cap (trim or count-only storage if body piles grow very large)
 	logistic physics use dimension 2
 	dark mode
 
@@ -76,10 +77,9 @@ Needed for launch (v1.0) (Launch Version):
 	music and sounds and settings for them and player panel
 	promo video
 	langs (GER, RUS, CHN, JAP)
-	start animation and general animations
+	proper start animation and general animations and roadmap and credits
 	register Grim Games or Grimidk in steam as dev team
 	versioning to go back to previous stable patches
-	credits screen
 	cleanup code (no placeholders) and refactor inefficiencies with inheritance and stuff, hexagonal architecture, async functions and clean comments 
 
 Post launch (v1.1) (Improvements Update):
@@ -88,7 +88,6 @@ Post launch (v1.1) (Improvements Update):
 	native universal modding support (to include in core)
 	custom key bind settings for all keys (to include in core)
 	theme modificaciont (colors, text scale, font) (to include in core)
-	roadmap screen in game (use this txt but pretty) 
 	global stats from all players (needs api and consent) (to include in core)
 	socials screen with discord server, bluesky, itch, steam and instagram (to include in core)
 	more langs 

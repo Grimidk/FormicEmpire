@@ -71,6 +71,7 @@ public class GamePanel extends ZeroGamePanel {
     private long overworldSpringStartMs;
 
     private volatile boolean engineStarted = false;
+    private SwingWorker<Void, Void> loadWorker;
 
     private static final int OVERWORLD_SPRING_DURATION_MS = 240;
     private static final int OVERWORLD_IDLE_RECENTER_MS = 1000;
@@ -79,6 +80,7 @@ public class GamePanel extends ZeroGamePanel {
 
     private long overworldLastUserPanMs = System.currentTimeMillis();
     private Timer overworldIdleRecenterTimer;
+    private AdjustmentListener overworldScrollbarPanListener;
     
     public GamePanel(MainFrame frame) {
         super(new BorderLayout()); 
@@ -88,8 +90,6 @@ public class GamePanel extends ZeroGamePanel {
         initControlPanelCallbacks();
         initLayout();        
         updateStatusIndicator(false);
-        
-        LanguageStrings.addListener(this::refreshTranslations);
     }
 
     @Override
@@ -135,7 +135,6 @@ public class GamePanel extends ZeroGamePanel {
 
         setupOverworldPanAndSpring();
         setupOverworldShiftWheelHorizontalScroll();
-        setupOverworldScrollbarPanTracking();
         setupOverworldIdleRecenter();
     }
 
@@ -174,18 +173,41 @@ public class GamePanel extends ZeroGamePanel {
             startOverworldSpringToCenter();
         });
         overworldIdleRecenterTimer.setRepeats(true);
+    }
+
+    private void startOverworldIdleRecenter() {
+        if (overworldIdleRecenterTimer == null) {
+            setupOverworldIdleRecenter();
+        }
         overworldIdleRecenterTimer.start();
     }
 
+    private void stopOverworldIdleRecenter() {
+        if (overworldIdleRecenterTimer != null) {
+            overworldIdleRecenterTimer.stop();
+        }
+    }
+
     private void setupOverworldScrollbarPanTracking() {
-        AdjustmentListener al = e -> {
+        if (overworldScrollbarPanListener != null) {
+            return;
+        }
+        overworldScrollbarPanListener = e -> {
             if (e.getValueIsAdjusting() && engineStarted && gameAreaPanel != null
                     && gameAreaPanel.getCurrentDimension() == WorldSpaces.OVERWORLD) {
                 noteOverworldUserPan();
             }
         };
-        gameScrollPane.getVerticalScrollBar().addAdjustmentListener(al);
-        gameScrollPane.getHorizontalScrollBar().addAdjustmentListener(al);
+        gameScrollPane.getVerticalScrollBar().addAdjustmentListener(overworldScrollbarPanListener);
+        gameScrollPane.getHorizontalScrollBar().addAdjustmentListener(overworldScrollbarPanListener);
+    }
+
+    private void removeOverworldScrollbarPanTracking() {
+        if (overworldScrollbarPanListener != null && gameScrollPane != null) {
+            gameScrollPane.getVerticalScrollBar().removeAdjustmentListener(overworldScrollbarPanListener);
+            gameScrollPane.getHorizontalScrollBar().removeAdjustmentListener(overworldScrollbarPanListener);
+            overworldScrollbarPanListener = null;
+        }
     }
 
     private void setupOverworldShiftWheelHorizontalScroll() {
@@ -782,7 +804,12 @@ public class GamePanel extends ZeroGamePanel {
         if (settingsDialog != null) { settingsDialog.dispose(); settingsDialog = null; }
     }
 
+    public void endSession() {
+        cleanupSession();
+    }
+
     private void cleanupSession() {
+        cancelLoadWorker();
         disposeAllDialogs();
         unregisterTickListeners();
         if (triggerManager != null) {
@@ -804,6 +831,7 @@ public class GamePanel extends ZeroGamePanel {
         Engine eng = frame.getEngine();
         if (eng != null) {
             eng.pauseEngine();
+            eng.setWorld(null);
         }
         updateStatusIndicator(true);
         if (controlPanel != null) {
@@ -819,7 +847,7 @@ public class GamePanel extends ZeroGamePanel {
         if (eng != null) eng.pauseEngine();
         
         try {
-            SaveManager sm = new SaveManager();
+            SaveManager sm = frame.getEngine().getSaveManager();
             Engine engine = frame.getEngine();
             if (engine != null && engine.getWorld() != null) {
                 World w = engine.getWorld();
@@ -827,7 +855,13 @@ public class GamePanel extends ZeroGamePanel {
                 if (slotIdLocal > 0) {
                     Savefile existing = sm.loadSlot(slotIdLocal);
                     String nameToUse = (existing != null && existing.getName() != null && !existing.getName().trim().isEmpty()) ? existing.getName() : String.format(LanguageStrings.get(LanguageStrings.SAVE_DEFAULT_NAME_FMT), slotIdLocal);
-                    sm.saveWorldToSlotUserAsync(engine.getWorld(), engine, slotIdLocal, nameToUse, () -> {
+                    sm.saveWorldToSlotUserAsync(engine.getWorld(), engine, slotIdLocal, nameToUse, success -> {
+                        if (!success) {
+                            JOptionPane.showMessageDialog(this,
+                                    LanguageStrings.get(LanguageStrings.SAVE_ERROR_WRITE),
+                                    LanguageStrings.get(LanguageStrings.SAVE_ERROR_WRITE_TITLE),
+                                    JOptionPane.ERROR_MESSAGE);
+                        }
                         cleanupSession();
                         frame.showCard(MainFrame.CARD_SAVE);
                     });
@@ -853,6 +887,8 @@ public class GamePanel extends ZeroGamePanel {
     }
 
     public void enterWithSavefile(Savefile savefile) {
+        cleanupSession();
+        cancelLoadWorker();
         statusLabel.setText(LanguageStrings.get(LanguageStrings.UI_STARTING));
         Engine engine = frame.getEngine();
         
@@ -873,10 +909,16 @@ public class GamePanel extends ZeroGamePanel {
         loadingDialog.pack();
         loadingDialog.setLocationRelativeTo(frame);
 
-        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+        loadWorker = new SwingWorker<Void, Void>() {
             @Override
             protected Void doInBackground() throws Exception {
+                if (isCancelled()) {
+                    return null;
+                }
                 engine.startUp(savefile);
+                if (isCancelled()) {
+                    return null;
+                }
                 Colony colony = null;
                 World world = engine.getWorld();
                 if (world != null && world.getActiveHex() != null) {
@@ -889,6 +931,9 @@ public class GamePanel extends ZeroGamePanel {
             @Override
             protected void done() {
                 loadingDialog.dispose();
+                if (isCancelled()) {
+                    return;
+                }
                 try {
                     get();
                     registerTickListeners();
@@ -929,8 +974,15 @@ public class GamePanel extends ZeroGamePanel {
                 }
             }
         };
-        worker.execute();
+        loadWorker.execute();
         loadingDialog.setVisible(true);
+    }
+
+    private void cancelLoadWorker() {
+        if (loadWorker != null) {
+            loadWorker.cancel(true);
+            loadWorker = null;
+        }
     }
 
     private void registerTickListeners() {
@@ -954,6 +1006,8 @@ public class GamePanel extends ZeroGamePanel {
             minuteDrainTimer.setRepeats(true);
         }
         minuteDrainTimer.start();
+        setupOverworldScrollbarPanTracking();
+        startOverworldIdleRecenter();
 
         controlPanel.updateTickLabel(engine);
         updateStatusIndicator(engine.isPaused());
@@ -975,6 +1029,8 @@ public class GamePanel extends ZeroGamePanel {
         if (minuteDrainTimer != null) {
             minuteDrainTimer.stop();
         }
+        stopOverworldIdleRecenter();
+        removeOverworldScrollbarPanTracking();
         pendingMinuteGuiSteps.set(0);
     }
 
@@ -1020,8 +1076,7 @@ public class GamePanel extends ZeroGamePanel {
         if (world == null) return;
         worldPanel.updateStaticData(world);
         if (world.getActiveHex() != null && world.getActiveHex().getBiome() != null) {
-            String biomeName = world.getActiveHex().getBiome().getName();
-            gameAreaPanel.setBackgroundByBiome(biomeName);
+            gameAreaPanel.setBackgroundBiome(world.getActiveHex().getBiome());
         }
     }
 

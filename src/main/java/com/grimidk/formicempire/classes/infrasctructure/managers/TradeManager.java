@@ -28,6 +28,10 @@ public class TradeManager implements Runnable {
         return new ArrayList<>(activeTrades);
     }
 
+    public void clearActiveTrades() {
+        activeTrades.clear();
+    }
+
     @Override
     public void run() {
         updateTrades();

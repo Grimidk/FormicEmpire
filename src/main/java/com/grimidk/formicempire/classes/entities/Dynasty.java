@@ -21,6 +21,7 @@ import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 
 public class Dynasty {
 
@@ -178,10 +179,8 @@ public class Dynasty {
     }
 
     public String generateNextColonyName() {
-        String baseName = this.name;
-        if (baseName != null && baseName.endsWith(" Dynasty")) {
-            baseName = baseName.substring(0, baseName.length() - 8);
-        } else if (baseName == null) {
+        String baseName = LanguageStrings.stripDynastyNameSuffix(this.name);
+        if (baseName == null || baseName.isEmpty()) {
             baseName = "Player";
         }
         

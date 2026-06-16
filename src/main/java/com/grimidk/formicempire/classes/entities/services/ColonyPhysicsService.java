@@ -10,6 +10,7 @@ import com.grimidk.formicempire.classes.infrasctructure.Dimension;
 import com.grimidk.formicempire.classes.infrasctructure.NeoPoint;
 import com.grimidk.formicempire.classes.infrasctructure.Room;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameRandom;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
 
@@ -55,7 +56,7 @@ public class ColonyPhysicsService {
 
                     boolean shouldRunAI;
                     if (!sameDim) {
-                        shouldRunAI = Math.random() < 0.05;
+                        shouldRunAI = GameRandom.nextDouble() < 0.05;
                     } else if (lodSameDim && !inView) {
                         shouldRunAI = ViewportPhysicsLod.shouldRunOffViewportAi(physicsStepIndex, ant);
                     } else {
@@ -240,14 +241,14 @@ public class ColonyPhysicsService {
             }
 
             if (!ant.isMoving()) {
-                int side = (int)(Math.random() * 4);
+                int side = (int)(GameRandom.nextDouble() * 4);
                 int tx = 0, ty = 0;
                 int buffer = 200;
                 switch(side) {
-                    case 0: tx = (int)(Math.random() * gameWidth); ty = -buffer; break;
-                    case 1: tx = (int)(Math.random() * gameWidth); ty = gameHeight + buffer; break;
-                    case 2: tx = -buffer; ty = (int)(Math.random() * gameHeight); break;
-                    case 3: tx = gameWidth + buffer; ty = (int)(Math.random() * gameHeight); break;
+                    case 0: tx = (int)(GameRandom.nextDouble() * gameWidth); ty = -buffer; break;
+                    case 1: tx = (int)(GameRandom.nextDouble() * gameWidth); ty = gameHeight + buffer; break;
+                    case 2: tx = -buffer; ty = (int)(GameRandom.nextDouble() * gameHeight); break;
+                    case 3: tx = gameWidth + buffer; ty = (int)(GameRandom.nextDouble() * gameHeight); break;
                 }
                 ant.moveTo(new Point(tx, ty));
             }
@@ -278,7 +279,7 @@ public class ColonyPhysicsService {
         if (target == null || !colony.getLocationService().isActiveSource(target)) {
             ant.clearRoute();
             if (ant.getDimension() == WorldSpaces.OVERWORLD) {
-                 if (Math.random() < 0.01) {
+                 if (GameRandom.nextDouble() < 0.01) {
                     if (ant.getRole() == GameConstants.ROLE_SCOUT || ant.getRole() == GameConstants.ROLE_CATCHER) {
                          ant.moveTo(getRandomScoutPosition(colony));
                     } else {
@@ -345,7 +346,7 @@ public class ColonyPhysicsService {
             }
 
             Rectangle currentRoom = getRoomBounds(colony, WorldSpaces.STORAGE);
-            if (Math.random() < 0.3) currentRoom = getRoomBounds(colony, WorldSpaces.FARM);
+            if (GameRandom.nextDouble() < 0.3) currentRoom = getRoomBounds(colony, WorldSpaces.FARM);
 
             if (currentRoom != null) {
                 wanderInBoundaries(colony, bug, currentRoom, 0.05);
@@ -374,7 +375,7 @@ public class ColonyPhysicsService {
 
             if (yard != null) {
                 if (isPointInSafeBounds(colony, yard, ant.getX(), ant.getY())) {
-                    if (Math.random() < 0.05) {
+                    if (GameRandom.nextDouble() < 0.05) {
                         ant.moveTo(getRandomPointInRoom(colony, yard, colony.getGameAreaWidth()));
                     }
                 } else {
@@ -384,7 +385,7 @@ public class ColonyPhysicsService {
                     ant.setRoute(route);
                 }
             } else {
-                if (Math.random() < 0.01) {
+                if (GameRandom.nextDouble() < 0.01) {
                     if (ant.getRole() == GameConstants.ROLE_SCOUT) {
                         ant.moveTo(getRandomScoutPosition(colony));
                     } else {
@@ -443,13 +444,13 @@ public class ColonyPhysicsService {
                 && colony.getCurrentBuildingProject() != null;
 
             if (isBuilder && myRoom.equals(getRoomBounds(colony, WorldSpaces.CONSTRUCTION_SITE))) {
-                if (Math.random() < 0.10) {
+                if (GameRandom.nextDouble() < 0.10) {
                     Point center = new Point((int)myRoom.getCenterX(), (int)myRoom.getCenterY());
                     int radius = myRoom.width / 2;
                     ant.moveTo(getCirclePoint(center, radius));
                 }
             } else {
-                if (Math.random() < 0.10) {
+                if (GameRandom.nextDouble() < 0.10) {
                     ant.moveTo(getRandomPointInRoom(colony, myRoom, virtualWidth));
                 }
             }
@@ -465,8 +466,8 @@ public class ColonyPhysicsService {
     }
     
     private Point getCirclePoint(Point center, int radius) {
-        double angle = Math.random() * 2 * Math.PI;
-        double r = Math.sqrt(Math.random()) * radius;
+        double angle = GameRandom.nextDouble() * 2 * Math.PI;
+        double r = Math.sqrt(GameRandom.nextDouble()) * radius;
         int x = (int)(center.x + r * Math.cos(angle));
         int y = (int)(center.y + r * Math.sin(angle));
         return new Point(x, y);
@@ -621,7 +622,7 @@ public class ColonyPhysicsService {
 
     private void wanderInBoundaries(Colony colony, Bug entity, Rectangle bounds, double chance) {
         if (isPointInSafeBounds(colony, bounds, entity.getX(), entity.getY())) {
-            if (Math.random() < chance) {
+            if (GameRandom.nextDouble() < chance) {
                 entity.moveTo(getRandomPointInRoom(colony, bounds, colony.getGameAreaWidth()));
             }
         } else {
@@ -631,8 +632,8 @@ public class ColonyPhysicsService {
 
     private Point getRandomPointInRoom(Colony colony, Rectangle r, int gameWidth) {
         Rectangle safe = getSafeWalkableBounds(colony, r, gameWidth);
-        int x = safe.x + (int)(Math.random() * safe.width);
-        int y = safe.y + (int)(Math.random() * safe.height);
+        int x = safe.x + (int)(GameRandom.nextDouble() * safe.width);
+        int y = safe.y + (int)(GameRandom.nextDouble() * safe.height);
         return new Point(x, y);
     }
 
@@ -671,7 +672,7 @@ public class ColonyPhysicsService {
         
         int maxX = Math.max(1, width - w);
         int maxY = Math.max(1, height - h);
-        return new Point((int)(Math.random() * maxX), (int)(Math.random() * maxY));
+        return new Point((int)(GameRandom.nextDouble() * maxX), (int)(GameRandom.nextDouble() * maxY));
     }
 
     private Point getRandomScoutPosition(Colony colony) {
@@ -683,8 +684,8 @@ public class ColonyPhysicsService {
         int minY = -500;
         int maxY = height + 500;
         
-        int x = minX + (int)(Math.random() * (maxX - minX));
-        int y = minY + (int)(Math.random() * (maxY - minY));
+        int x = minX + (int)(GameRandom.nextDouble() * (maxX - minX));
+        int y = minY + (int)(GameRandom.nextDouble() * (maxY - minY));
         return new Point(x, y);
     }
     

@@ -25,7 +25,7 @@ public class SaveSelectPanel extends JPanel {
 
     public SaveSelectPanel(MainFrame frame) {
         this.frame = frame;
-        this.saveManager = new SaveManager();
+        this.saveManager = frame.getEngine().getSaveManager();
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;

@@ -23,7 +23,7 @@ public class IntroPanel extends JPanel {
         setBackground(AssetStyles.COLOR_ABSOLUTE_BLACK);
 
         messageLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        messageLabel.setForeground(Color.WHITE);
+        messageLabel.setForeground(AssetStyles.COLOR_ABSOLUTE_WHITE);
         messageLabel.setFont(AssetStyles.FONT_NORMAL);
 
         GridBagConstraints c = new GridBagConstraints();
@@ -34,8 +34,6 @@ public class IntroPanel extends JPanel {
         c.fill = GridBagConstraints.BOTH;
         c.insets = new Insets(48, 48, 48, 48);
         add(messageLabel, c);
-
-        LanguageStrings.addListener(this::refreshTranslations);
 
         addAncestorListener(new AncestorListener() {
             @Override
@@ -67,13 +65,15 @@ public class IntroPanel extends JPanel {
     }
 
     private void showStudioSlide() {
-        messageLabel.setText("<html><body style='text-align: center; color: #FFFFFF; font-family: sans-serif; font-size: 20pt;'>"
+        messageLabel.setText("<html><body style='text-align: center; color: " + AssetStyles.COLOR_ABSOLUTE_WHITE_HTML
+                + "; font-family: sans-serif; font-size: 20pt;'>"
                 + STUDIO_NAME + "</body></html>");
     }
 
     private void showWarningSlide() {
         String text = LanguageStrings.get(LanguageStrings.INTRO_WARNING);
-        messageLabel.setText("<html><body style='width: 520px; text-align: center; color: #FFFFFF; font-family: sans-serif; font-size: 13pt;'>"
+        messageLabel.setText("<html><body style='width: 520px; text-align: center; color: " + AssetStyles.COLOR_ABSOLUTE_WHITE_HTML
+                + "; font-family: sans-serif; font-size: 13pt;'>"
                 + text + "</body></html>");
     }
 

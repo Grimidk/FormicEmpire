@@ -26,12 +26,13 @@ import com.grimidk.formicempire.classes.entities.Tunnel;
 import com.grimidk.formicempire.classes.entities.services.ColonyStarterService;
 import com.grimidk.formicempire.classes.entities.services.DynastyDeathService;
 import com.grimidk.formicempire.classes.entities.services.DynastyNamingService;
-import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 
 public class World {
+
+    private static final DynastyDeathService DYNASTY_DEATH_SERVICE = new DynastyDeathService();
 
     private int minute;
     private int hour;
@@ -284,17 +285,17 @@ public class World {
         name = name.trim();
         return name.substring(0, 1).toUpperCase() + name.substring(1);
     }
-    
+
     public void generateWorld(Biome startBiome, int size, Colony startColony, String baseName) {
         System.out.println("Generating World... Size: " + size + " rings.");
         this.worldRadius = size;
         this.hexes.clear();
         this.dynastys.clear();
         Map<String, Hex> hexMap = new HashMap<>();
-        ColonyStarterService starterService = new ColonyStarterService();
+        ColonyStarterService starterService = ColonyStarterService.shared();
         
         baseName = formatName(baseName);
-        String dynName = baseName + " Dynasty";
+        String dynName = LanguageStrings.formatPlayerDynastyName(baseName);
         namingService.registerUsedName(dynName);
         
         Dynasty playerDynasty = new Dynasty(this.dynastyIdCounter++, dynName, true, GameConstants.SPECIES_OMNI);
@@ -513,7 +514,7 @@ public class World {
         System.out.println("[World] startWorld called. Colony ants before init: " + colony.getAntTotal());
 
         if (colony.getAntTotal() == 0) {
-            ColonyStarterService starterService = new ColonyStarterService();
+            ColonyStarterService starterService = ColonyStarterService.shared();
             starterService.initializeNewColony(colony);
         }
         
@@ -536,7 +537,7 @@ public class World {
         String baseName = "Player";
         if (savefile.getName() != null && !savefile.getName().trim().isEmpty()) {
             String sName = savefile.getName().trim();
-            if (!sName.startsWith("Save ") && !sName.equals("Autosave")) {
+            if (!LanguageStrings.isGenericSaveName(sName, savefile.getId())) {
                 baseName = sName;
             }
         }
@@ -572,7 +573,9 @@ public class World {
                     loadedDynastys.get(sc.dynastyId).addColony(c);
                 } else {
                     int newDynastyId = ++maxDynastyId;
-                    String dynName = c.isPlayer() ? (baseName + " Dynasty") : "Wild Dynasty";
+                    String dynName = c.isPlayer()
+                            ? LanguageStrings.formatPlayerDynastyName(baseName)
+                            : LanguageStrings.get(LanguageStrings.DYNASTY_WILD_NAME);
                     namingService.registerUsedName(dynName);
                     Dynasty adHocDynasty = new Dynasty(newDynastyId, dynName, c.isPlayer(), GameConstants.SPECIES_OMNI);
                     adHocDynasty.getStarterService().initializeDynasty(adHocDynasty);
@@ -624,13 +627,13 @@ public class World {
             }
              
             if (colony == null) {
-                String playerDynName = baseName + " Dynasty";
+                String playerDynName = LanguageStrings.formatPlayerDynastyName(baseName);
                 String playerCapName = namingService.generateCapitalName(playerDynName);
                 colony = new Colony(1, playerCapName, true);
             }
              
             if (colony.getAntTotal() == 0) {
-                ColonyStarterService starter = new ColonyStarterService();
+                ColonyStarterService starter = ColonyStarterService.shared();
                 starter.initializeNewColony(colony);
             }
 
@@ -670,8 +673,9 @@ public class World {
             }
         }
 
-        if (savefile.getTrades() != null && engine != null && engine.getTradeManager() != null) {
-            engine.getTradeManager().getActiveTrades().forEach(t -> engine.getTradeManager().removeTrade(t));
+        if (engine != null && engine.getTradeManager() != null) {
+            engine.getTradeManager().clearActiveTrades();
+            if (savefile.getTrades() != null) {
             for (Savefile.SavedTrade st : savefile.getTrades()) {
                 Hex hO = getHexAt(st.qOrigin, st.rOrigin);
                 Hex hD = getHexAt(st.qDest, st.rDest);
@@ -725,6 +729,7 @@ public class World {
                     } catch (Exception e) { e.printStackTrace(); }
                     engine.getTradeManager().addTrade(trade);
                 }
+            }
             }
         }
 
@@ -908,8 +913,7 @@ public class World {
         }
         
         // --- Process Dynasty/Colony Deaths ---
-        DynastyDeathService deathService = new DynastyDeathService();
-        deathService.processDynastyDeaths(this);
+        DYNASTY_DEATH_SERVICE.processDynastyDeaths(this);
 
         randomizeWeather();
 
@@ -921,9 +925,10 @@ public class World {
             }
             
             for (Hex hex : this.hexes) {
-                if (hex.getColony() != null && !hex.getColony().getDynasty().isDefeated()) {
-                    hex.getColony().getLabourService().runNuptial(hex.getColony(), this, hex);
-                    hex.getColony().logEvent(ColonyLogPrefixes.NUPTIAL + " "
+                Colony colony = hex.getColony();
+                if (colonyHasActiveDynasty(colony)) {
+                    colony.getLabourService().runNuptial(colony, this, hex);
+                    colony.logEvent(ColonyLogPrefixes.NUPTIAL + " "
                         + LanguageStrings.get(LanguageStrings.EVENT_ECLIPSE_NUPTIAL));
                 }
             }
@@ -966,8 +971,9 @@ public class World {
         this.month++;
         
         for (Hex hex : this.hexes) {
-            if (hex.getColony() != null && !hex.getColony().getDynasty().isDefeated()) {
-                hex.getColony().runMonthlyJobs();
+            Colony colony = hex.getColony();
+            if (colonyHasActiveDynasty(colony)) {
+                colony.runMonthlyJobs();
             }
         }
 
@@ -987,8 +993,7 @@ public class World {
             if (this.engine != null) {
                 int freq = this.engine.getAutosaveFrequency();
                 if (freq > 0 && (this.month % freq == 0)) {
-                    SaveManager sm = new SaveManager();
-                    sm.saveAutosave(this, this.engine);
+                    this.engine.getSaveManager().saveAutosave(this, this.engine);
                 }
             }
         } catch (Exception ex) {
@@ -1009,9 +1014,14 @@ public class World {
         this.year++;
         
         for (Hex hex : this.hexes) {
-            if (hex.getColony() != null && !hex.getColony().getDynasty().isDefeated()) {
-                hex.getColony().runYearlyJobs(this, hex);
+            Colony colony = hex.getColony();
+            if (colonyHasActiveDynasty(colony)) {
+                colony.runYearlyJobs(this, hex);
             }
         }
+    }
+
+    private static boolean colonyHasActiveDynasty(Colony colony) {
+        return colony != null && colony.getDynasty() != null && !colony.getDynasty().isDefeated();
     }
 }

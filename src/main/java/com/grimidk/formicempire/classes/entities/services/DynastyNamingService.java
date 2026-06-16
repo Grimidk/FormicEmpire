@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.entities.services;
 
 import com.grimidk.formicempire.classes.constants.misc.Species;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 
 import java.util.*;
 
@@ -32,14 +33,14 @@ public class DynastyNamingService {
     public String generateDynastyName(Species species) {
         String theme = getRandomTheme(species);
         usedThemes.add(theme);
-        return theme + " Dynasty";
+        return LanguageStrings.formatPlayerDynastyName(theme);
     }
 
     public String generateCapitalName(String dynastyName) {
-        if (dynastyName == null || !dynastyName.endsWith(" Dynasty")) {
+        String theme = LanguageStrings.stripDynastyNameSuffix(dynastyName);
+        if (theme == null || theme.isEmpty()) {
             return "Colony Prime";
         }
-        String theme = dynastyName.replace(" Dynasty", "");
         return theme + " Prime";
     }
 
@@ -71,8 +72,9 @@ public class DynastyNamingService {
     }
     
     public void registerUsedName(String dynastyName) {
-        if (dynastyName != null && dynastyName.endsWith(" Dynasty")) {
-            usedThemes.add(dynastyName.replace(" Dynasty", ""));
+        String theme = LanguageStrings.stripDynastyNameSuffix(dynastyName);
+        if (theme != null && !theme.isEmpty()) {
+            usedThemes.add(theme);
         }
     }
 }
