@@ -105,6 +105,13 @@ class ColonyBugHandlingServiceTest {
     }
 
     @Test
+    void parasiticMitesDoNotSpawnAtFiveThousandResources() {
+        colony.setMushrooms(5_000);
+        service.runMonthlyParasiticMites(colony);
+        assertEquals(0, colony.getParasiticMites());
+    }
+
+    @Test
     void parasiticMitesCanSpawnMonthlyWithHighResources() {
         colony.setMushrooms(10_000);
         boolean spawned = false;

@@ -9,6 +9,7 @@ import com.grimidk.formicempire.classes.infrasctructure.managers.AlertManager;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TriggerManager;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameSpritePreloader;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
@@ -862,6 +863,12 @@ public class GamePanel extends ZeroGamePanel {
             @Override
             protected Void doInBackground() throws Exception {
                 engine.startUp(savefile);
+                Colony colony = null;
+                World world = engine.getWorld();
+                if (world != null && world.getActiveHex() != null) {
+                    colony = world.getActiveHex().getColony();
+                }
+                GameSpritePreloader.warmSession(colony);
                 return null;
             }
 
@@ -870,15 +877,14 @@ public class GamePanel extends ZeroGamePanel {
                 loadingDialog.dispose();
                 try {
                     get();
-                    statusLabel.setText(LanguageStrings.get(LanguageStrings.UI_RUNNING));
-                    registerTickListeners(); 
-                    
+                    registerTickListeners();
+
                     World world = engine.getWorld();
                     Colony colony = null;
                     if (world != null && world.getActiveHex() != null && world.getActiveHex().getColony() != null) {
                         colony = world.getActiveHex().getColony();
                         gameAreaPanel.setColony(colony);
-                        
+
                         alertManager = new AlertManager(colony, alertPanel);
 
                         triggerManager = new TriggerManager(world, colony, engine);
@@ -887,23 +893,22 @@ public class GamePanel extends ZeroGamePanel {
                         }
                         triggerManager.registerListeners();
                     }
-                    
+
                     updateStaticWorldInfo();
                     refreshAllGUIData();
                     updateGameAreaSize();
                     centerOverworldScroll();
                     noteOverworldUserPan();
 
-                    SwingUtilities.invokeLater(() -> {
-                        if (!engineStarted) {
-                            engineStarted = true;
-                            if (!engine.isAlive()) {
-                                engine.start();
-                            }
+                    if (!engineStarted) {
+                        engineStarted = true;
+                        if (!engine.isAlive()) {
+                            engine.start();
                         }
-                        controlPanel.setPlayPauseButtonText(engine.isPaused());
-                    });
-                    
+                    }
+                    controlPanel.setPlayPauseButtonText(engine.isPaused());
+                    updateStatusIndicator(engine.isPaused());
+                    paintGameAreaWhilePaused();
                 } catch (Exception e) {
                     e.printStackTrace();
                     statusLabel.setText(LanguageStrings.get(LanguageStrings.UI_ERROR_LOADING));
@@ -1003,6 +1008,19 @@ public class GamePanel extends ZeroGamePanel {
         if (world.getActiveHex() != null && world.getActiveHex().getBiome() != null) {
             String biomeName = world.getActiveHex().getBiome().getName();
             gameAreaPanel.setBackgroundByBiome(biomeName);
+        }
+    }
+
+    private void paintGameAreaWhilePaused() {
+        if (gameScrollPane == null || gameAreaPanel == null) {
+            return;
+        }
+        Rectangle viewportRect = gameScrollPane.getViewport().getViewRect();
+        gameAreaPanel.setPaintViewportRect(viewportRect);
+        gameAreaPanel.revalidate();
+        gameAreaPanel.repaint();
+        if (gameAreaPanel.getWidth() > 0 && gameAreaPanel.getHeight() > 0) {
+            gameAreaPanel.paintImmediately(gameAreaPanel.getVisibleRect());
         }
     }
 

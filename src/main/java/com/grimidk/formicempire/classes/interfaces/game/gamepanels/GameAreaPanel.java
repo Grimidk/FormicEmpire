@@ -13,6 +13,7 @@ import com.grimidk.formicempire.classes.infrasctructure.Dimension;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameSpritePreloader;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
 
@@ -117,7 +118,9 @@ public class GameAreaPanel extends ZeroGamePanel {
         try {
             URL imgUrl = resolveResourceUrl(classpathRelativePath);
             if (imgUrl != null) {
-                return new ImageIcon(imgUrl).getImage();
+                Image image = new ImageIcon(imgUrl).getImage();
+                GameSpritePreloader.ensureLoaded(image);
+                return image;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -737,7 +740,7 @@ public class GameAreaPanel extends ZeroGamePanel {
         int miteH = miteIcon.getIconHeight();
         int halfW = miteW / 2;
         int halfH = miteH / 2;
-        int[][] offsets = {{-8, -10}, {8, -8}, {-10, 4}, {10, 6}, {0, 10}};
+        int[][] offsets = {{-4, -5}, {4, -4}, {-5, 2}, {5, 3}, {0, 5}};
         int count = Math.min(GameConstants.PARASITIC_MITES_ON_ANT_SPRITE, offsets.length);
         for (int i = 0; i < count; i++) {
             g2d.drawImage(mite, offsets[i][0] - halfW, offsets[i][1] - halfH, this);

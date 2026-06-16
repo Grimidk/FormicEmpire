@@ -28,9 +28,14 @@ class ResourceSourceDisplayTest {
     }
 
     @Test
-    void centerUsesScaledDisplaySize() {
-        ResourceSource source = new ResourceSource(GameConstants.RESOURCE_WATER, 500, 40, 60);
-        int half = source.getDisplaySizePx() / 2;
+    void centerUsesInitialDisplaySize() {
+        ResourceSource source = new ResourceSource(
+                GameConstants.RESOURCE_WATER,
+                ResourceType.SOURCE_QTY_MEDIUM,
+                ResourceType.SOURCE_QTY_BIG,
+                40,
+                60);
+        int half = GameConstants.RESOURCE_WATER.getDisplaySizeForSourceQuantity(ResourceType.SOURCE_QTY_BIG) / 2;
         assertEquals(40 + half, source.getCenterX());
         assertEquals(60 + half, source.getCenterY());
     }

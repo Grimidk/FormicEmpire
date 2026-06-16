@@ -41,6 +41,7 @@ public final class GameConstants {
             return null; 
         }
         ImageIcon icon = new ImageIcon(resourceUrl);
+        GameSpritePreloader.ensureLoaded(icon);
         iconCache.put(path, icon);
         return icon;
     }
@@ -139,7 +140,7 @@ public final class GameConstants {
     public static final int SOIL_MITE_PARASITIC_MITE_KILL_PER_DAY = 5;
     public static final int SOIL_MITE_PARASITIC_MITE_KILL_UPGRADED = 12;
 
-    public static final int PARASITIC_MITE_RESOURCE_THRESHOLD = 5_000;
+    public static final int PARASITIC_MITE_RESOURCE_THRESHOLD = 10_000;
     public static final float PARASITIC_MITE_MONTHLY_SPAWN_CHANCE = 0.65f;
     public static final int PARASITIC_MITE_MIN_MONTHLY_SPAWN = 1_000;
     public static final int PARASITIC_MITE_PER_ANT = 50;
