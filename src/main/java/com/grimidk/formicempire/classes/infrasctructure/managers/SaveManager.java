@@ -511,9 +511,9 @@ public class SaveManager {
                     sc.hatchRatePrincess = c.getHatchRatePrincess();
                     
                     // Stats
-                    sc.aphids = c.getAphids();
-                    sc.soilMites = c.getSoilMites();
-                    sc.dermestids = c.getDermestids();
+                    sc.aphids = c.getBugHandlingService().resolvePetCountForSave(c, GameConstants.TYPE_APHID);
+                    sc.soilMites = c.getBugHandlingService().resolvePetCountForSave(c, GameConstants.TYPE_SOIL_MITE);
+                    sc.dermestids = c.getBugHandlingService().resolvePetCountForSave(c, GameConstants.TYPE_DERMESTID);
                     sc.parasites = c.getParasites();
                     sc.parasiticMites = c.getParasiticMites();
                     sc.totalDeaths = c.getTotalDeaths();

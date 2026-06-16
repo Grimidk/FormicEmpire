@@ -22,6 +22,10 @@ public abstract class ZeroDialog extends JDialog {
     public ZeroDialog(JFrame owner, String titleKey, Dimension preferredSize) {
         super(owner, LanguageStrings.get(titleKey), true);
         this.titleKey = titleKey;
+
+        if (owner instanceof MainFrame mainFrame) {
+            mainFrame.applyGameCursors(this);
+        }
         
         getContentPane().setBackground(AssetStyles.UI_BG_PRIMARY);
         setLayout(new BorderLayout());
@@ -175,6 +179,10 @@ public abstract class ZeroDialog extends JDialog {
             setLocationRelativeTo(null);
             Point loc = getLocation();
             setLocation(loc.x, loc.y + 60);
+        }
+
+        if (getOwner() instanceof MainFrame mainFrame) {
+            mainFrame.applyGameCursors(this);
         }
 
         setVisible(true);

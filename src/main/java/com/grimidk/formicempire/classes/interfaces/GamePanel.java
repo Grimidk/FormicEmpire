@@ -119,6 +119,9 @@ public class GamePanel extends ZeroGamePanel {
             @Override
             public void componentResized(ComponentEvent e) {
                 updateGameAreaSize();
+                if (engineStarted && gameAreaPanel.getCurrentDimension() == WorldSpaces.OVERWORLD) {
+                    centerOverworldScroll();
+                }
             }
         });
         gameScrollPane.getViewport().addChangeListener(e -> {
@@ -272,6 +275,17 @@ public class GamePanel extends ZeroGamePanel {
         Dimension vs = vp.getView().getSize();
         int maxX = Math.max(0, vs.width - ext.width);
         int maxY = Math.max(0, vs.height - ext.height);
+
+        Colony colony = getColonyFromEngine(frame.getEngine());
+        if (gameAreaPanel != null && colony != null) {
+            Point colonyCenter = gameAreaPanel.computeOverworldColonyCenterPanelPixels(
+                    colony, ext.width, ext.height);
+            Point centered = new Point(colonyCenter.x - ext.width / 2, colonyCenter.y - ext.height / 2);
+            centered.x = Math.max(0, Math.min(maxX, centered.x));
+            centered.y = Math.max(0, Math.min(maxY, centered.y));
+            return centered;
+        }
+
         return new Point(maxX / 2, maxY / 2);
     }
 

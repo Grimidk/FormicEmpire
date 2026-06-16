@@ -116,7 +116,7 @@ public class SpanishTranslation implements Translation {
         es.put("COLONY_NURSE_COVERAGE", "Cobertura de Niñeras: %d/%d");
         es.put("COLONY_GRAVE_CLEANING", "Limpieza de Tumbas: %d/%d");
         es.put("COLONY_PET_INSECTS", "Insectos mascota: %d/%d");
-        es.put("COLONY_PARASITIC_MITES", "Ácaros parásitos: %d (%d hormigas ralentizadas)");
+        es.put("COLONY_PARASITIC_MITES", "Ácaros: %d (%d hormigas ralentizadas)");
         es.put("COLONY_PARASITES", "Parásitos: %s");
         es.put("COLONY_POLICING", "Vigilancia: %d");
         es.put("COLONY_DETECTION_RATE", "Tasa de detección: ~%d/día");

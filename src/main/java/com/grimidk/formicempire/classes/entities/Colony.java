@@ -290,7 +290,11 @@ public class Colony {
             p.setDimension(WorldSpaces.UNDERWORLD);
             this.bugs.add(p);
         }
-        
+
+        getBugHandlingService().restorePetCountsFromSave(
+                this, savedColony.aphids, savedColony.soilMites, savedColony.dermestids);
+        getBugHandlingService().setParasiticMiteCount(this, savedColony.parasiticMites);
+
         this.totalDeaths = savedColony.totalDeaths;
         
         if (savedColony.savedResourceSources != null && this.locationService != null) {
@@ -317,11 +321,6 @@ public class Colony {
                 }
             }
         }
-
-        getBugHandlingService().syncPetBugEntities(this, GameConstants.TYPE_APHID, aphids);
-        getBugHandlingService().syncPetBugEntities(this, GameConstants.TYPE_SOIL_MITE, soilMites);
-        getBugHandlingService().syncPetBugEntities(this, GameConstants.TYPE_DERMESTID, dermestids);
-        getBugHandlingService().syncParasiticMiteInfections(this);
 
         rankUp();
     }

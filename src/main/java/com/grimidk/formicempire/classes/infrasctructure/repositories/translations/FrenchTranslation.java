@@ -116,7 +116,7 @@ public class FrenchTranslation implements Translation {
         fr.put("COLONY_NURSE_COVERAGE", "Couverture nourrices : %d/%d");
         fr.put("COLONY_GRAVE_CLEANING", "Nettoyage des tombes : %d/%d");
         fr.put("COLONY_PET_INSECTS", "Insectes de compagnie : %d/%d");
-        fr.put("COLONY_PARASITIC_MITES", "Acariens parasitaires : %d (%d fourmis ralenties)");
+        fr.put("COLONY_PARASITIC_MITES", "Acariens : %d (%d fourmis ralenties)");
         fr.put("COLONY_PARASITES", "Parasites : %s");
         fr.put("COLONY_POLICING", "Police : %d");
         fr.put("COLONY_DETECTION_RATE", "Taux de détection : ~%d/jour");

@@ -274,25 +274,9 @@ public class ColonyPhysicsService {
         }
 
         ResourceSource target = colony.getLocationService().findNearestRelevantSource(colony, ant);
-        
-        if (target != null) {
-            double d = dist(ant.getX(), ant.getY(), target.getCenterX(), target.getCenterY());
-            
-            if (d < 50 && ant.getDimension() == WorldSpaces.OVERWORLD) {
-                ant.setCarrying(target.getResourceType());
-            } else {
-                ant.clearLoad();
-                
-                Room current = getRoomContainingAnt(colony, ant);
-                Room sourceRoom = colony.getLocationService().createTempRoomAtPoint(
-                    new Point(target.getCenterX(), target.getCenterY()), 
-                    WorldSpaces.OVERWORLD
-                );
-                
-                Queue<NeoPoint> route = colony.getLocationService().calculateRoute(colony, current, sourceRoom, ant);
-                ant.setRoute(route);
-            }
-        } else {
+
+        if (target == null || !colony.getLocationService().isActiveSource(target)) {
+            ant.clearRoute();
             if (ant.getDimension() == WorldSpaces.OVERWORLD) {
                  if (Math.random() < 0.01) {
                     if (ant.getRole() == GameConstants.ROLE_SCOUT || ant.getRole() == GameConstants.ROLE_CATCHER) {
@@ -302,7 +286,30 @@ public class ColonyPhysicsService {
                     }
                 }
             } else {
-                 handleUnderworldAnt(colony, ant); 
+                 handleUnderworldAnt(colony, ant);
+            }
+            return;
+        }
+
+        double d = dist(ant.getX(), ant.getY(), target.getCenterX(), target.getCenterY());
+
+        if (d < 50 && ant.getDimension() == WorldSpaces.OVERWORLD) {
+            if (colony.getLocationService().isActiveSource(target)) {
+                ant.setCarrying(target.getResourceType());
+            }
+            ant.clearRoute();
+        } else {
+            ant.clearLoad();
+
+            if (!ant.hasRoute()) {
+                Room current = getRoomContainingAnt(colony, ant);
+                Room sourceRoom = colony.getLocationService().createTempRoomAtPoint(
+                    new Point(target.getCenterX(), target.getCenterY()),
+                    WorldSpaces.OVERWORLD
+                );
+
+                Queue<NeoPoint> route = colony.getLocationService().calculateRoute(colony, current, sourceRoom, ant);
+                ant.setRoute(route);
             }
         }
     }

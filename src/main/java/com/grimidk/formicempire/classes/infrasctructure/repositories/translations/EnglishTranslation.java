@@ -116,7 +116,7 @@ public class EnglishTranslation implements Translation {
         en.put("COLONY_NURSE_COVERAGE", "Nurse Coverage: %d/%d");
         en.put("COLONY_GRAVE_CLEANING", "Grave Cleaning: %d/%d");
         en.put("COLONY_PET_INSECTS", "Pet insects: %d/%d");
-        en.put("COLONY_PARASITIC_MITES", "Parasitic mites: %d (%d slowed ants)");
+        en.put("COLONY_PARASITIC_MITES", "Mites: %d (%d slowed ants)");
         en.put("COLONY_PARASITES", "Parasites: %s");
         en.put("COLONY_POLICING", "Policing: %d");
         en.put("COLONY_DETECTION_RATE", "Detection rate: ~%d/day");

@@ -115,7 +115,7 @@ public class ColonyLocationService {
     }
     
     public int gatherFromSource(Colony colony, ResourceSource source, int amountWanted) {
-        if (!discoveredSources.contains(source)) return 0;
+        if (!isActiveSource(source)) return 0;
 
         int available = source.getQuantity();
         int gathered = Math.min(available, amountWanted);
@@ -140,9 +140,20 @@ public class ColonyLocationService {
         return GatheringMath.computeFullEfficiencyRadius(colony, workers);
     }
 
+    public boolean isActiveSource(ResourceSource source) {
+        return source != null && source.getQuantity() > 0 && discoveredSources.contains(source);
+    }
+
     private void updateRankedCache(Colony colony) {
         long now = System.currentTimeMillis();
-        if (now - lastRankUpdate < RANK_UPDATE_INTERVAL_MS && !rankedSourcesCache.isEmpty()) return;
+        if (now - lastRankUpdate < RANK_UPDATE_INTERVAL_MS && !rankedSourcesCache.isEmpty()) {
+            boolean stale = rankedSourcesCache.values().stream()
+                    .flatMap(List::stream)
+                    .anyMatch(source -> !isActiveSource(source));
+            if (!stale) {
+                return;
+            }
+        }
 
         synchronized (rankedSourcesCache) {
             rankedSourcesCache.clear();
@@ -187,10 +198,15 @@ public class ColonyLocationService {
             List<ResourceSource> ranked = rankedSourcesCache.get(type);
             if (ranked == null || ranked.isEmpty()) continue;
 
-            if (Math.random() < 0.70 || ranked.size() == 1) {
-                return ranked.get(0);
+            List<ResourceSource> active = ranked.stream()
+                    .filter(this::isActiveSource)
+                    .collect(Collectors.toList());
+            if (active.isEmpty()) continue;
+
+            if (Math.random() < 0.70 || active.size() == 1) {
+                return active.get(0);
             } else {
-                return ranked.get(1 + (int)(Math.random() * (ranked.size() - 1)));
+                return active.get(1 + (int) (Math.random() * (active.size() - 1)));
             }
         }
         return null;

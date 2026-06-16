@@ -7,10 +7,12 @@ import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Bug;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
+import com.grimidk.formicempire.classes.entities.services.ColonyLocationService;
 import com.grimidk.formicempire.classes.entities.services.ColonyRoomDecorationService;
 import com.grimidk.formicempire.classes.entities.services.ViewportPhysicsLod;
 import com.grimidk.formicempire.classes.infrasctructure.Dimension;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
+import com.grimidk.formicempire.classes.infrasctructure.NeoPoint;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameSpritePreloader;
@@ -225,6 +227,22 @@ public class GameAreaPanel extends ZeroGamePanel {
 
     public int getOverworldLayoutOffsetY() {
         return overworldLayoutOffsetY;
+    }
+
+    /**
+     * Colony entrance in {@link #paintComponent} panel coordinates for the current overworld layout.
+     */
+    public Point computeOverworldColonyCenterPanelPixels(Colony sessionColony, int viewportWidth, int viewportHeight) {
+        int pad = Math.max(OVERWORLD_PAN_OUTSET, Math.max(viewportWidth, viewportHeight) / 2);
+        int contentPadX = pad;
+        int contentPadY = pad;
+        if (sessionColony != null && sessionColony.getLocationService() != null) {
+            NeoPoint entrance = sessionColony.getLocationService().getColonyEntrance(sessionColony);
+            return new Point(contentPadX + (int) entrance.getX(), contentPadY + (int) entrance.getY());
+        }
+        return new Point(
+                contentPadX + ColonyLocationService.ANCHOR_CENTER_X,
+                contentPadY + ColonyLocationService.ANCHOR_HEIGHT / 2);
     }
     
     public void toggleDimension() {

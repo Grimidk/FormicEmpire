@@ -205,6 +205,33 @@ public class ColonyBugHandlingService {
         syncParasiteEntities(colony, capped);
     }
 
+    public void restorePetCountsFromSave(Colony colony, int aphids, int soilMites, int dermestids) {
+        if (colony == null) {
+            return;
+        }
+        restorePetCountFromSave(colony, GameConstants.TYPE_APHID, aphids);
+        restorePetCountFromSave(colony, GameConstants.TYPE_SOIL_MITE, soilMites);
+        restorePetCountFromSave(colony, GameConstants.TYPE_DERMESTID, dermestids);
+    }
+
+    public void restorePetCountFromSave(Colony colony, BugType type, int count) {
+        if (colony == null || type == null || !isPetBug(type)) {
+            return;
+        }
+        int safe = Math.max(0, count);
+        colony.applyPetBugCount(type, safe);
+        syncPetBugEntities(colony, type, safe);
+    }
+
+    public int resolvePetCountForSave(Colony colony, BugType type) {
+        if (colony == null || type == null) {
+            return 0;
+        }
+        int stored = getCount(colony, type);
+        long entities = colony.getBugs().stream().filter(b -> b.getBugType() == type).count();
+        return (int) Math.max(stored, entities);
+    }
+
     public void syncPetBugEntities(Colony colony, BugType type, int targetCount) {
         if (colony == null || type == null) {
             return;

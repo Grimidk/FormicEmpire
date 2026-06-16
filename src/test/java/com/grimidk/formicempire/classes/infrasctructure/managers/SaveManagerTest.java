@@ -1,9 +1,13 @@
 package com.grimidk.formicempire.classes.infrasctructure.managers;
 
+import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 import org.junit.jupiter.api.Test;
 
+import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,5 +74,54 @@ public class SaveManagerTest {
         assertTrue(result.hasPendingUpdate);
         assertFalse(result.pendingIsBilateral);
         assertEquals(40.0, result.pendingReturnLoad.get(GameConstants.RESOURCE_FUNGI.getId()));
+    }
+
+    @Test
+    void colonySoilMitesRoundTripThroughJson() throws Exception {
+        Savefile.SavedColony sc = new Savefile.SavedColony();
+        sc.id = 1;
+        sc.name = "Test";
+        sc.soilMites = 7;
+        sc.aphids = 3;
+        sc.dermestids = 2;
+
+        SaveManager saveManager = new SaveManager();
+        StringWriter writer = new StringWriter();
+        try (java.io.BufferedWriter w = new java.io.BufferedWriter(writer)) {
+            Method writeColony = SaveManager.class.getDeclaredMethod(
+                    "writeSavedColony", java.io.BufferedWriter.class, Savefile.SavedColony.class, boolean.class);
+            writeColony.setAccessible(true);
+            writeColony.invoke(saveManager, w, sc, true);
+        }
+
+        String json = writer.toString();
+        assertTrue(json.contains("\"soilMites\": 7"));
+
+        Method parseColony = SaveManager.class.getDeclaredMethod("parseColonyObject", String.class);
+        parseColony.setAccessible(true);
+        Savefile.SavedColony loaded = (Savefile.SavedColony) parseColony.invoke(saveManager, json);
+        assertEquals(7, loaded.soilMites);
+
+        Dynasty dynasty = new Dynasty(1, "Test", true, GameConstants.SPECIES_OMNI);
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_CATCHER);
+        Colony colony = new Colony(loaded);
+        dynasty.addColony(colony);
+        assertEquals(7, colony.getSoilMites());
+    }
+
+    @Test
+    void colonySoilMitesLoadLegacyBullMitesKey() throws Exception {
+        String json = """
+                {
+                "id": 1,
+                "name": "Legacy",
+                "bullMites": 4
+                }
+                """;
+        SaveManager saveManager = new SaveManager();
+        Method parseColony = SaveManager.class.getDeclaredMethod("parseColonyObject", String.class);
+        parseColony.setAccessible(true);
+        Savefile.SavedColony loaded = (Savefile.SavedColony) parseColony.invoke(saveManager, json);
+        assertEquals(4, loaded.soilMites);
     }
 }

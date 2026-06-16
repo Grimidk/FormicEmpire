@@ -116,7 +116,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("COLONY_NURSE_COVERAGE", "Cobertura de babás: %d/%d");
         pt.put("COLONY_GRAVE_CLEANING", "Limpeza de túmulos: %d/%d");
         pt.put("COLONY_PET_INSECTS", "Insetos de estimação: %d/%d");
-        pt.put("COLONY_PARASITIC_MITES", "Ácaros parasitas: %d (%d formigas lentas)");
+        pt.put("COLONY_PARASITIC_MITES", "Ácaros: %d (%d formigas lentas)");
         pt.put("COLONY_PARASITES", "Parasitas: %s");
         pt.put("COLONY_POLICING", "Vigilância: %d");
         pt.put("COLONY_DETECTION_RATE", "Taxa de detecção: ~%d/dia");

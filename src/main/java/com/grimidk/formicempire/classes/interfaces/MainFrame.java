@@ -47,6 +47,39 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         return gamePanel;
     }
 
+    public Cursor getGameCursorNormal() {
+        return cursorNormal;
+    }
+
+    public Cursor getGameCursorClick() {
+        return cursorClick;
+    }
+
+    public void applyGameCursors(Window window) {
+        if (window != null && cursorNormal != null) {
+            window.setCursor(cursorNormal);
+        }
+    }
+
+    private void applyGameCursorForMouseEvent(MouseEvent me) {
+        if (cursorNormal == null || cursorClick == null) {
+            return;
+        }
+        Component component = me.getComponent();
+        if (component == null) {
+            return;
+        }
+        Window window = SwingUtilities.getWindowAncestor(component);
+        if (window == null) {
+            return;
+        }
+        if (me.getID() == MouseEvent.MOUSE_PRESSED) {
+            window.setCursor(cursorClick);
+        } else if (me.getID() == MouseEvent.MOUSE_RELEASED) {
+            window.setCursor(cursorNormal);
+        }
+    }
+
     public SaveSelectPanel getSaveSelectPanel() {
         return saveSelectPanel;
     }
@@ -144,12 +177,9 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         setCursor(cursorNormal);
 
         Toolkit.getDefaultToolkit().addAWTEventListener(event -> {
-            if (event instanceof MouseEvent) {
-                MouseEvent me = (MouseEvent) event;
-                if (me.getID() == MouseEvent.MOUSE_PRESSED) {
-                    setCursor(cursorClick);
-                } else if (me.getID() == MouseEvent.MOUSE_RELEASED) {
-                    setCursor(cursorNormal);
+            if (event instanceof MouseEvent me) {
+                if (me.getID() == MouseEvent.MOUSE_PRESSED || me.getID() == MouseEvent.MOUSE_RELEASED) {
+                    applyGameCursorForMouseEvent(me);
                 }
             }
         }, AWTEvent.MOUSE_EVENT_MASK);
