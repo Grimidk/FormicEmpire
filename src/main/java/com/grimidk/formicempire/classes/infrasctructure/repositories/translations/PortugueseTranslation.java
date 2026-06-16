@@ -72,7 +72,14 @@ public class PortugueseTranslation implements Translation {
         pt.put("UI_CREATE", "Criar");
         pt.put("UI_LOAD", "Carregar");
         pt.put("UI_HELP", "Ajuda");
+        pt.put("UI_ROADMAP", "Roteiro");
         pt.put("UI_QUIT", "Sair");
+        pt.put("INTRO_WARNING", "Formic Dynasty é uma simulação de colónia com formigas, insetos e outros artrópodes pixelados.<br><br>Se aranhas ou criaturas semelhantes te incomodam, ativa o Modo aracnofobia nas Definições antes de jogar.");
+        pt.put("ROADMAP_TITLE", "Roteiro de desenvolvimento");
+        pt.put("ROADMAP_UNAVAILABLE", "Não foi possível carregar o roteiro.");
+        pt.put("UI_CREDITS", "Créditos");
+        pt.put("CREDITS_TITLE", "Créditos");
+        pt.put("CREDITS_UNAVAILABLE", "Não foi possível carregar o ficheiro de créditos.");
         pt.put("UI_ERROR", "Erro");
         pt.put("UI_NEXT", "Próximo");
         pt.put("UI_FINISH", "Concluir");

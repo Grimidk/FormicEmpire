@@ -72,7 +72,14 @@ public class SpanishTranslation implements Translation {
         es.put("UI_CREATE", "Crear");
         es.put("UI_LOAD", "Cargar");
         es.put("UI_HELP", "Ayuda");
+        es.put("UI_ROADMAP", "Hoja de ruta");
         es.put("UI_QUIT", "Salir");
+        es.put("INTRO_WARNING", "Formic Dynasty es una simulación de colonias con hormigas, insectos y otros artrópodos en píxeles.<br><br>Si las arañas u otros arácnidos te molestan, activa el Modo aracnofobia en Ajustes antes de jugar.");
+        es.put("ROADMAP_TITLE", "Hoja de ruta de desarrollo");
+        es.put("ROADMAP_UNAVAILABLE", "No se pudo cargar la hoja de ruta.");
+        es.put("UI_CREDITS", "Créditos");
+        es.put("CREDITS_TITLE", "Créditos");
+        es.put("CREDITS_UNAVAILABLE", "No se pudo cargar el archivo de créditos.");
         es.put("UI_ERROR", "Error");
         es.put("UI_NEXT", "Siguiente");
         es.put("UI_FINISH", "Finalizar");

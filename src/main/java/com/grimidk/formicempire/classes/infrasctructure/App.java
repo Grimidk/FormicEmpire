@@ -12,6 +12,7 @@ public class App {
         SwingUtilities.invokeLater(() -> {
            MainFrame main = new MainFrame(engine);
             main.setVisible(true);
+            main.showCard(MainFrame.CARD_INTRO);
         });
     }
     

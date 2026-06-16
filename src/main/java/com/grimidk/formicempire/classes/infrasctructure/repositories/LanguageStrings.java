@@ -139,7 +139,14 @@ public final class LanguageStrings {
     public static final String UI_CREATE = "UI_CREATE";
     public static final String UI_LOAD = "UI_LOAD";
     public static final String UI_HELP = "UI_HELP";
+    public static final String UI_ROADMAP = "UI_ROADMAP";
     public static final String UI_QUIT = "UI_QUIT";
+    public static final String INTRO_WARNING = "INTRO_WARNING";
+    public static final String ROADMAP_TITLE = "ROADMAP_TITLE";
+    public static final String ROADMAP_UNAVAILABLE = "ROADMAP_UNAVAILABLE";
+    public static final String UI_CREDITS = "UI_CREDITS";
+    public static final String CREDITS_TITLE = "CREDITS_TITLE";
+    public static final String CREDITS_UNAVAILABLE = "CREDITS_UNAVAILABLE";
     public static final String UI_ERROR = "UI_ERROR";
     public static final String UI_NEXT = "UI_NEXT";
     public static final String UI_FINISH = "UI_FINISH";

@@ -15,6 +15,7 @@ import com.grimidk.formicempire.classes.constants.world.Temperature;
 import com.grimidk.formicempire.classes.constants.world.TimeOfDay;
 import com.grimidk.formicempire.classes.constants.world.Weather;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.ClasspathTextFiles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
@@ -39,6 +40,8 @@ import java.util.stream.Collectors;
 public class HelpPanel extends JPanel {
     private final MainFrame frame;
     private final JTabbedPane mainTabs;
+    private final JButton creditsButton;
+    private final JButton roadmapButton;
     private final JButton backButton;
 
     public HelpPanel(MainFrame frame) {
@@ -52,6 +55,8 @@ public class HelpPanel extends JPanel {
         mainTabs.setForeground(AssetStyles.FONT_COLOR);
 
         backButton = new JButton();
+        creditsButton = new JButton();
+        roadmapButton = new JButton();
         
         initTabs();
         
@@ -61,13 +66,27 @@ public class HelpPanel extends JPanel {
         JPanel southPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         southPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
         
+        creditsButton.setFont(AssetStyles.FONT_BOLD);
+        creditsButton.setBackground(AssetStyles.BACKGROUND_SECONDARY);
+        creditsButton.setForeground(AssetStyles.FONT_COLOR);
+        creditsButton.addActionListener(e -> showCreditsDialog(this));
+
+        roadmapButton.setFont(AssetStyles.FONT_BOLD);
+        roadmapButton.setBackground(AssetStyles.BACKGROUND_SECONDARY);
+        roadmapButton.setForeground(AssetStyles.FONT_COLOR);
+        roadmapButton.addActionListener(e -> showRoadmapDialog(this));
+
         backButton.setFont(AssetStyles.FONT_BOLD);
         backButton.setBackground(AssetStyles.BACKGROUND_SECONDARY);
         backButton.setForeground(AssetStyles.FONT_COLOR);
         backButton.addActionListener(e -> this.frame.showCard(MainFrame.CARD_INIT));
         
+        setupButtonNavigation(creditsButton);
+        setupButtonNavigation(roadmapButton);
         setupButtonNavigation(backButton);
         
+        southPanel.add(creditsButton);
+        southPanel.add(roadmapButton);
         southPanel.add(backButton);
         add(southPanel, BorderLayout.SOUTH);
         
@@ -118,6 +137,8 @@ public class HelpPanel extends JPanel {
     
     public void refreshTranslations() {
         backButton.setText(LanguageStrings.get(LanguageStrings.UI_BACK));
+        creditsButton.setText(LanguageStrings.get(LanguageStrings.UI_CREDITS));
+        roadmapButton.setText(LanguageStrings.get(LanguageStrings.UI_ROADMAP));
         
         // Update tab titles
         String[] titles = {
@@ -928,6 +949,49 @@ public class HelpPanel extends JPanel {
         updateButtons.run();
 
         dialog.add(cardPanel, BorderLayout.CENTER);
+        dialog.add(buttonPanel, BorderLayout.SOUTH);
+        dialog.pack();
+        dialog.setLocationRelativeTo(parent);
+        dialog.setVisible(true);
+    }
+
+    public static void showRoadmapDialog(Component parent) {
+        showTextFileDialog(parent, LanguageStrings.ROADMAP_TITLE, ClasspathTextFiles.loadRoadmapText());
+    }
+
+    public static void showCreditsDialog(Component parent) {
+        showTextFileDialog(parent, LanguageStrings.CREDITS_TITLE, ClasspathTextFiles.loadCreditsText());
+    }
+
+    private static void showTextFileDialog(Component parent, String titleKey, String text) {
+        Window window = SwingUtilities.getWindowAncestor(parent);
+        JDialog dialog = new JDialog(window, LanguageStrings.get(titleKey), Dialog.ModalityType.APPLICATION_MODAL);
+        dialog.setLayout(new BorderLayout());
+
+        JTextArea textArea = new JTextArea(text);
+        textArea.setEditable(false);
+        textArea.setLineWrap(false);
+        textArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+        textArea.setBackground(AssetStyles.BACKGROUND_COLOR);
+        textArea.setForeground(AssetStyles.FONT_COLOR);
+        textArea.setBorder(new EmptyBorder(12, 12, 12, 12));
+        textArea.setCaretPosition(0);
+
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        scrollPane.setPreferredSize(new Dimension(720, 520));
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        dialog.add(scrollPane, BorderLayout.CENTER);
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        buttonPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
+
+        JButton closeButton = new JButton(LanguageStrings.get(LanguageStrings.UI_CLOSE));
+        closeButton.setFont(AssetStyles.FONT_BOLD);
+        closeButton.setBackground(AssetStyles.BACKGROUND_SECONDARY);
+        closeButton.setForeground(AssetStyles.FONT_COLOR);
+        closeButton.addActionListener(e -> dialog.dispose());
+        buttonPanel.add(closeButton);
+
         dialog.add(buttonPanel, BorderLayout.SOUTH);
         dialog.pack();
         dialog.setLocationRelativeTo(parent);

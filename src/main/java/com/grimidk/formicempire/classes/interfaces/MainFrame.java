@@ -17,6 +17,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 
 public class MainFrame extends JFrame implements TriggerManager.TriggerListener {
+    public static final String CARD_INTRO = "INTRO";
     public static final String CARD_INIT = "INIT";
     public static final String CARD_SAVE = "SAVE";
     public static final String CARD_HELP = "HELP";
@@ -29,8 +30,10 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
     private final GamePanel gamePanel;
     private final SaveSelectPanel saveSelectPanel;
     private final SettingsPanel settingsPanel;
+    private final IntroPanel introPanel;
     private final InitPanel initPanel;
     private final HelpPanel helpPanel;
+    private String menuReturnCard = CARD_INIT;
 
     private Cursor cursorNormal;
     private Cursor cursorClick;
@@ -102,12 +105,14 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
 
         initCursors();
 
+        this.introPanel = new IntroPanel(this);
         this.initPanel = new InitPanel(this);
         this.saveSelectPanel = new SaveSelectPanel(this);
         this.helpPanel = new HelpPanel(this);
         this.settingsPanel = new SettingsPanel(this);
         this.gamePanel = new GamePanel(this);
 
+        cards.add(introPanel, CARD_INTRO);
         cards.add(initPanel, CARD_INIT);
         cards.add(saveSelectPanel, CARD_SAVE);
         cards.add(helpPanel, CARD_HELP);
@@ -166,8 +171,18 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
     private void refreshTranslations() {
         setTitle(LanguageStrings.get(LanguageStrings.UI_APP_TITLE));
         saveSelectPanel.refreshTranslations();
+        introPanel.refreshTranslations();
         initPanel.refreshTranslations();
         helpPanel.refreshTranslations();
+    }
+
+    public String getMenuReturnCard() {
+        return menuReturnCard;
+    }
+
+    public void showSettingsMenu(String returnTo) {
+        menuReturnCard = returnTo;
+        showCard(CARD_SETTINGS);
     }
 
     private void initCursors() {

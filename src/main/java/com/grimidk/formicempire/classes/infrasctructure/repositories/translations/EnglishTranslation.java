@@ -72,7 +72,14 @@ public class EnglishTranslation implements Translation {
         en.put("UI_CREATE", "Create");
         en.put("UI_LOAD", "Load");
         en.put("UI_HELP", "Help");
+        en.put("UI_ROADMAP", "Roadmap");
         en.put("UI_QUIT", "Quit");
+        en.put("INTRO_WARNING", "Formic Dynasty is a colony simulation about pixelated ants, bugs, and other arthropods.<br><br>If spiders or similar creatures bother you, enable Arachnophobia Mode in Settings before you play.");
+        en.put("ROADMAP_TITLE", "Development Roadmap");
+        en.put("ROADMAP_UNAVAILABLE", "Roadmap file could not be loaded.");
+        en.put("UI_CREDITS", "Credits");
+        en.put("CREDITS_TITLE", "Credits");
+        en.put("CREDITS_UNAVAILABLE", "Credits file could not be loaded.");
         en.put("UI_ERROR", "Error");
         en.put("UI_NEXT", "Next");
         en.put("UI_FINISH", "Finish");

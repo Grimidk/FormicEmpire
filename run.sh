@@ -17,6 +17,10 @@ else
     exit 1
 fi
 
+echo "[Build] Syncing roadmap.txt and credits.txt from the project root into src/main/resources/..."
+cp -f roadmap.txt src/main/resources/roadmap.txt
+cp -f credits.txt src/main/resources/credits.txt
+
 echo "[Build] Building Formic Empire..."
 $MVN_EXEC clean install
 

@@ -72,7 +72,14 @@ public class FrenchTranslation implements Translation {
         fr.put("UI_CREATE", "Créer");
         fr.put("UI_LOAD", "Charger");
         fr.put("UI_HELP", "Aide");
+        fr.put("UI_ROADMAP", "Feuille de route");
         fr.put("UI_QUIT", "Quitter");
+        fr.put("INTRO_WARNING", "Formic Dynasty est une simulation de colonie avec des fourmis, insectes et autres arthropodes en pixels.<br><br>Si les araignées ou créatures similaires vous gênent, activez le Mode arachnophobie dans les Paramètres avant de jouer.");
+        fr.put("ROADMAP_TITLE", "Feuille de route du développement");
+        fr.put("ROADMAP_UNAVAILABLE", "Impossible de charger la feuille de route.");
+        fr.put("UI_CREDITS", "Crédits");
+        fr.put("CREDITS_TITLE", "Crédits");
+        fr.put("CREDITS_UNAVAILABLE", "Impossible de charger le fichier des crédits.");
         fr.put("UI_ERROR", "Erreur");
         fr.put("UI_NEXT", "Suivant");
         fr.put("UI_FINISH", "Terminer");

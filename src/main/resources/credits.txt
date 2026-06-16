@@ -7,9 +7,14 @@ Pixelartist:
 Testers:
     Grimidk
 
+Marketing:
+    Grimidk
+
 Translations:
     English: Grimidk
     Spanish: Grimidk
+    Portuguese: Grimidk
+    French: Grimidk
 
 Special thanks to:
     Svetlana Navas

@@ -114,7 +114,7 @@ public class SettingsPanel extends JPanel {
                     window.dispose();
                 }
             } else {
-                this.frame.showCard(MainFrame.CARD_INIT);
+                this.frame.showCard(this.frame.getMenuReturnCard());
             }
         });
         setupNavigation(backButton);

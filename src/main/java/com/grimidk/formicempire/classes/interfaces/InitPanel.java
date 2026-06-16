@@ -15,6 +15,8 @@ public class InitPanel extends JPanel {
     
     private JButton play;
     private JButton help;
+    private JButton roadmap;
+    private JButton credits;
     private JButton settings;
     private JButton quit;
 
@@ -48,23 +50,31 @@ public class InitPanel extends JPanel {
 
         play = new JButton(LanguageStrings.get(LanguageStrings.UI_PLAY));
         help = new JButton(LanguageStrings.get(LanguageStrings.UI_HELP));
+        roadmap = new JButton(LanguageStrings.get(LanguageStrings.UI_ROADMAP));
+        credits = new JButton(LanguageStrings.get(LanguageStrings.UI_CREDITS));
         settings = new JButton(LanguageStrings.get(LanguageStrings.UI_SETTINGS));
         quit = new JButton(LanguageStrings.get(LanguageStrings.UI_QUIT));
 
         play.addActionListener(e -> this.frame.showCard(MainFrame.CARD_SAVE));
         help.addActionListener(e -> this.frame.showCard(MainFrame.CARD_HELP));
-        settings.addActionListener(e -> this.frame.showCard(MainFrame.CARD_SETTINGS));
+        roadmap.addActionListener(e -> HelpPanel.showRoadmapDialog(this));
+        credits.addActionListener(e -> HelpPanel.showCreditsDialog(this));
+        settings.addActionListener(e -> this.frame.showSettingsMenu(MainFrame.CARD_INIT));
         quit.addActionListener(e -> System.exit(0));
 
         setupNavigation(play);
         setupNavigation(help);
+        setupNavigation(roadmap);
+        setupNavigation(credits);
         setupNavigation(settings);
         setupNavigation(quit);
 
         c.gridy = 0; add(play, c);
         c.gridy = 1; add(help, c);
-        c.gridy = 2; add(settings, c);
-        c.gridy = 3; add(quit, c);
+        c.gridy = 2; add(roadmap, c);
+        c.gridy = 3; add(credits, c);
+        c.gridy = 4; add(settings, c);
+        c.gridy = 5; add(quit, c);
         
         revalidate();
         repaint();
@@ -73,6 +83,8 @@ public class InitPanel extends JPanel {
     public void refreshTranslations() {
         play.setText(LanguageStrings.get(LanguageStrings.UI_PLAY));
         help.setText(LanguageStrings.get(LanguageStrings.UI_HELP));
+        roadmap.setText(LanguageStrings.get(LanguageStrings.UI_ROADMAP));
+        credits.setText(LanguageStrings.get(LanguageStrings.UI_CREDITS));
         settings.setText(LanguageStrings.get(LanguageStrings.UI_SETTINGS));
         quit.setText(LanguageStrings.get(LanguageStrings.UI_QUIT));
     }

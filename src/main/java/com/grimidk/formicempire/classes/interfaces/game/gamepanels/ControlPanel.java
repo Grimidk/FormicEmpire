@@ -53,6 +53,8 @@ public class ControlPanel extends ZeroGamePanel {
     private JMenuItem manageTrade;
     private JMenuItem openSettings;
     private JMenuItem showTutorial;
+    private JMenuItem showRoadmap;
+    private JMenuItem showCredits;
     private JMenuItem quitToMenu;
     
     public interface RoleManagementCallback {
@@ -123,6 +125,8 @@ public class ControlPanel extends ZeroGamePanel {
         manageTrade = new JMenuItem();
         openSettings = new JMenuItem();
         showTutorial = new JMenuItem();
+        showRoadmap = new JMenuItem();
+        showCredits = new JMenuItem();
         quitToMenu = new JMenuItem();
         
         refreshTranslations();
@@ -160,6 +164,8 @@ public class ControlPanel extends ZeroGamePanel {
         manageTrade.setText(LanguageStrings.get(LanguageStrings.MENU_TRADE));
         openSettings.setText(LanguageStrings.get(LanguageStrings.UI_SETTINGS));
         showTutorial.setText(LanguageStrings.get(LanguageStrings.UI_TUTORIAL));
+        showRoadmap.setText(LanguageStrings.get(LanguageStrings.UI_ROADMAP));
+        showCredits.setText(LanguageStrings.get(LanguageStrings.UI_CREDITS));
         quitToMenu.setText(LanguageStrings.get(LanguageStrings.UI_BACK_TO_MENU));
     }
     
@@ -257,6 +263,8 @@ public class ControlPanel extends ZeroGamePanel {
         });
         
         showTutorial.addActionListener(e -> HelpPanel.showTutorialDialog(frame));
+        showRoadmap.addActionListener(e -> HelpPanel.showRoadmapDialog(frame));
+        showCredits.addActionListener(e -> HelpPanel.showCreditsDialog(frame));
         
         quitToMenu.addActionListener(e -> handleBackButtonCallback.run());
         
@@ -275,6 +283,8 @@ public class ControlPanel extends ZeroGamePanel {
         gameMenu.add(manageTrade);
         gameMenu.add(openSettings);
         gameMenu.add(showTutorial);
+        gameMenu.add(showRoadmap);
+        gameMenu.add(showCredits);
         gameMenu.add(new JSeparator());
         gameMenu.add(quitToMenu);
 
