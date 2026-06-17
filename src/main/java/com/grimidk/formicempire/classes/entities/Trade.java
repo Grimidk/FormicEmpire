@@ -293,6 +293,16 @@ public class Trade {
         return remainingHours;
     }
 
+    public int getTotalHours() {
+        return totalHours;
+    }
+
+    public void restoreTripState(int totalHours, int remainingHours, boolean isReturning) {
+        this.totalHours = totalHours;
+        this.remainingHours = remainingHours;
+        this.isReturning = isReturning;
+    }
+
     public boolean isReturning() {
         return isReturning;
     }

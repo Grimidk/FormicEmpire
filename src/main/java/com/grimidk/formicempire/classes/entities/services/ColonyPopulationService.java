@@ -5,7 +5,9 @@ import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.ColonyLogTexts;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.DeathCause;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameRandom;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
@@ -18,12 +20,9 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ColonyPopulationService {
-    
-    private final Random random = new Random();
 
     // --- Role Management ---
     private void assignRolesForType(Colony colony, List<Ant> ants, AntType type, Engine engine) {
@@ -81,7 +80,7 @@ public class ColonyPopulationService {
 
     // --- Hatching & Lifecycle ---
     private AntType determineHatchType(Colony colony) {
-        double rand = random.nextDouble() * 100.0;
+        double rand = GameRandom.nextDouble() * 100.0;
         double cumulative = 0.0;
         
         cumulative += colony.getHatchRateWorker();
@@ -180,8 +179,8 @@ public class ColonyPopulationService {
         for (Ant ant : antsToKill) {
              if (ant.isAlive()) { 
                 AntType originalType = ant.getAntType(); 
-                ant.goDie(colony, "Old Age");
-                colony.recordAntDeath(ant, "Old Age");
+                ant.goDie(colony, DeathCause.OLD_AGE);
+                colony.recordAntDeath(ant, DeathCause.OLD_AGE);
                 
                 List<Ant> antList = colony.getAntsByType(originalType);
                 if (antList != null) antList.remove(ant);
@@ -210,7 +209,7 @@ public class ColonyPopulationService {
         for (AntType type : adultDrinkOrder) {
             List<Ant> list = colony.getAntsByType(type);
             for (Ant ant : list) {
-                if (random.nextInt(100) >= resistanceChance) {
+                if (GameRandom.nextInt(100) >= resistanceChance) {
                     thirstyCandidates.add(ant);
                 }
             }
@@ -278,8 +277,8 @@ public class ColonyPopulationService {
             }
         }
 
-        processDeaths(colony, doomedThirsty, "Dehydration");
-        processDeaths(colony, doomedHungry, "Starvation");
+        processDeaths(colony, doomedThirsty, DeathCause.DEHYDRATION);
+        processDeaths(colony, doomedHungry, DeathCause.STARVATION);
     }
 
     private void processDeaths(Colony colony, List<Ant> ants, String cause) {
@@ -335,14 +334,14 @@ public class ColonyPopulationService {
             
             for (Ant ant : population) {
                 if (killed >= finalDeaths) break;
-                if (random.nextFloat() < 0.1) {
+                if (GameRandom.nextFloat() < 0.1) {
                     victims.add(ant);
                     killed++;
                 }
             }
         }
 
-        processDeaths(colony, victims, "Contamination");
+        processDeaths(colony, victims, DeathCause.CONTAMINATION);
         if (killed > 0) {
             String levelLabel = switch (contaminationLevel) {
                 case "Small" -> LanguageStrings.get(LanguageStrings.LOG_CONTAM_LEVEL_SMALL);

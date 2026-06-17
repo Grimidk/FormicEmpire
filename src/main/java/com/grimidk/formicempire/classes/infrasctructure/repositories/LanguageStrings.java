@@ -538,6 +538,9 @@ public final class LanguageStrings {
     public static final String LOG_CAUSE_DEHYDRATION = "LOG_CAUSE_DEHYDRATION";
     public static final String LOG_CAUSE_STARVATION = "LOG_CAUSE_STARVATION";
     public static final String LOG_CAUSE_CONTAMINATION = "LOG_CAUSE_CONTAMINATION";
+    public static final String LOG_CAUSE_CONFLICT = "LOG_CAUSE_CONFLICT";
+    public static final String LOG_CAUSE_ILLNESS = "LOG_CAUSE_ILLNESS";
+    public static final String LOG_CAUSE_OTHER = "LOG_CAUSE_OTHER";
     public static final String LOG_CONTAMINATION_LEVEL_FMT = "LOG_CONTAMINATION_LEVEL_FMT";
     public static final String LOG_CONTAM_LEVEL_SMALL = "LOG_CONTAM_LEVEL_SMALL";
     public static final String LOG_CONTAM_LEVEL_MEDIUM = "LOG_CONTAM_LEVEL_MEDIUM";

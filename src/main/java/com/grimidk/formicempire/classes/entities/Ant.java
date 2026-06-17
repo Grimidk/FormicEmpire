@@ -8,6 +8,7 @@ import com.grimidk.formicempire.classes.constants.ant.AntSubType;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.infrasctructure.NeoPoint;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.DeathCause;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
 
@@ -124,7 +125,7 @@ public class Ant extends Bug {
 
     @Override
     public void goDie() {
-        goDie(null, "Unknown");
+        goDie(null, DeathCause.OTHER);
     }
 
     public void goDie(Colony colony, String reason) {

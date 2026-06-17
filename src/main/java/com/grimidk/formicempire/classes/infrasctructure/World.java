@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
-import java.lang.reflect.Field;
 
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
@@ -29,6 +27,7 @@ import com.grimidk.formicempire.classes.entities.services.DynastyNamingService;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameRandom;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 
 public class World {
@@ -51,7 +50,6 @@ public class World {
     private Hex activeHex; 
     private int saveSlotId = 0; // 0 = no slot (ad-hoc)
     private Engine engine;
-    private Random random;    
     private int worldRadius = 8; 
     private int colonyIdCounter = 1;
     private int dynastyIdCounter = 1;
@@ -71,7 +69,6 @@ public class World {
         this.moonPhase = GameConstants.PHASE_NEW_MOON;
         this.season = GameConstants.SEASON_SPRING;
         this.weather = GameConstants.WEATHER_CLEAR;
-        this.random = new Random();
         this.namingService = new DynastyNamingService();
     }
     
@@ -340,7 +337,7 @@ public class World {
                     hex.setColony(startColony); 
                     startColony.setActive(true);
                 } else {
-                    if (dist > 1 && !isWaterBiome(ringBiome) && random.nextInt(100) < 30) {
+                    if (dist > 1 && !isWaterBiome(ringBiome) && GameRandom.nextInt(100) < 30) {
                         int dynastyId = this.dynastyIdCounter++;
                         
                         // Random non-omni species
@@ -349,7 +346,7 @@ public class World {
                         for (Species s : allSpecies) {
                             if (s.getId() != 1) nonOmni.add(s);
                         }
-                        Species randomSpecies = nonOmni.isEmpty() ? GameConstants.SPECIES_OMNI : nonOmni.get(random.nextInt(nonOmni.size()));
+                        Species randomSpecies = nonOmni.isEmpty() ? GameConstants.SPECIES_OMNI : nonOmni.get(GameRandom.nextInt(nonOmni.size()));
                         
                         String npcDynName = namingService.generateDynastyName(randomSpecies);
                         Dynasty npcDynasty = new Dynasty(dynastyId, npcDynName, false, randomSpecies);
@@ -397,8 +394,6 @@ public class World {
     }
     
     private Biome getBiomeForRing(int ring) {
-        if (this.random == null) this.random = new Random();
-        
         List<Biome> options = new ArrayList<>();
         
         switch (ring) {
@@ -449,7 +444,7 @@ public class World {
                 break;
         }
         
-        return options.get(random.nextInt(options.size()));
+        return options.get(GameRandom.nextInt(options.size()));
     }
     
     private Biome getBiomeById(int id) {
@@ -467,7 +462,6 @@ public class World {
     }
     
     private Weather getRandomWeather(Biome biome) {
-        if (random == null) random = new Random();
         List<Weather> weathers = new ArrayList<>(GameConstants.getWeathers());
         
         weathers.remove(GameConstants.WEATHER_SAND_STORM);
@@ -475,18 +469,18 @@ public class World {
         weathers.remove(GameConstants.WEATHER_ACID_RAIN);
         
         if (biome != null) {
-            if (biome == GameConstants.BIOME_DESERT && random.nextInt(100) < 20) {
+            if (biome == GameConstants.BIOME_DESERT && GameRandom.nextInt(100) < 20) {
                 return GameConstants.WEATHER_SAND_STORM;
             }
-            if (biome == GameConstants.BIOME_VOLCANIC && random.nextInt(100) < 30) {
+            if (biome == GameConstants.BIOME_VOLCANIC && GameRandom.nextInt(100) < 30) {
                 return GameConstants.WEATHER_PYROCLASTIC_FOG;
             }
-            if (biome == GameConstants.BIOME_URBAN && random.nextInt(100) < 15) {
+            if (biome == GameConstants.BIOME_URBAN && GameRandom.nextInt(100) < 15) {
                 return GameConstants.WEATHER_ACID_RAIN;
             }
         }
         
-        return weathers.get(random.nextInt(weathers.size()));
+        return weathers.get(GameRandom.nextInt(weathers.size()));
     }
 
     private void printWorldToConsole(int size, Map<String, Hex> hexMap) {
@@ -503,7 +497,10 @@ public class World {
             for (int q = q1; q <= q2; q++) {
                 Hex hex = hexMap.get(q + "," + r);
                 if (hex != null) {
-                    char c = (hex.getBiome().getName().length() > 0) ? hex.getBiome().getName().charAt(0) : '?';
+                    char c = '?';
+                    if (hex.getBiome() != null && hex.getBiome().getNameKey() != null && !hex.getBiome().getNameKey().isEmpty()) {
+                        c = hex.getBiome().getNameKey().charAt(0);
+                    }
                     
                     if (hex.getColony() != null) {
                         if (hex.getColony().isPlayer()) {
@@ -661,14 +658,7 @@ public class World {
                         Hex hB = getHexAt(st.qB, st.rB);
                         if (hA != null && hB != null) {
                             Tunnel tunnel = new Tunnel(hA, hB, st.totalCost);
-                            try {
-                                Field pf = Tunnel.class.getDeclaredField("progress");
-                                Field icf = Tunnel.class.getDeclaredField("isComplete");
-                                pf.setAccessible(true);
-                                icf.setAccessible(true);
-                                pf.set(tunnel, st.progress);
-                                icf.set(tunnel, st.isComplete);
-                            } catch (Exception e) { e.printStackTrace(); }
+                            tunnel.restoreState(st.progress, st.isComplete);
                             d.addTunnel(tunnel);
                             
                             if (!st.isComplete) {
@@ -693,52 +683,34 @@ public class World {
                 Hex hD = getHexAt(st.qDest, st.rDest);
                 if (hO != null && hD != null) {
                     Map<ResourceType, Double> load = new HashMap<>();
-                    for (Map.Entry<Integer, Double> e : st.load.entrySet()) {
-                        GameConstants.getResources().stream().filter(r -> r.getId() == e.getKey()).findFirst().ifPresent(r -> load.put(r, e.getValue()));
-                    }
+                    putResourceLoad(st.load, load);
                     Map<ResourceType, Double> returnLoad = new HashMap<>();
-                    if (st.returnLoad != null) {
-                        for (Map.Entry<Integer, Double> e : st.returnLoad.entrySet()) {
-                            GameConstants.getResources().stream().filter(r -> r.getId() == e.getKey()).findFirst().ifPresent(r -> returnLoad.put(r, e.getValue()));
-                        }
-                    }
+                    putResourceLoad(st.returnLoad, returnLoad);
                     Map<AntType, Integer> trans = new HashMap<>();
-                    for (Map.Entry<Integer, Integer> e : st.transport.entrySet()) {
-                        GameConstants.getAntTypes().stream().filter(at -> at.getId() == e.getKey()).findFirst().ifPresent(at -> trans.put(at, e.getValue()));
+                    putAntTransport(st.transport, trans);
+                    TradeMethod method = GameConstants.getTradeMethodById(st.methodId);
+                    if (method == null) {
+                        method = GameConstants.METHOD_LAND;
                     }
-                    TradeMethod method = GameConstants.getTradeMethods().stream().filter(m -> m.getId() == st.methodId).findFirst().orElse(GameConstants.METHOD_LAND);
-                    
+
                     Trade trade = new Trade(hO, hD, load, returnLoad, trans, st.isRecurrent, st.isBilateral, method);
                     trade.setActive(st.isActive);
 
                     if (st.hasPendingUpdate) {
                         Map<ResourceType, Double> pLoad = new HashMap<>();
-                        for (Map.Entry<Integer, Double> e : st.pendingLoad.entrySet()) {
-                            GameConstants.getResources().stream().filter(r -> r.getId() == e.getKey()).findFirst().ifPresent(r -> pLoad.put(r, e.getValue()));
-                        }
+                        putResourceLoad(st.pendingLoad, pLoad);
                         Map<ResourceType, Double> pReturnLoad = new HashMap<>();
-                        for (Map.Entry<Integer, Double> e : st.pendingReturnLoad.entrySet()) {
-                            GameConstants.getResources().stream().filter(r -> r.getId() == e.getKey()).findFirst().ifPresent(r -> pReturnLoad.put(r, e.getValue()));
-                        }
+                        putResourceLoad(st.pendingReturnLoad, pReturnLoad);
                         Map<AntType, Integer> pTrans = new HashMap<>();
-                        for (Map.Entry<Integer, Integer> e : st.pendingTransport.entrySet()) {
-                            GameConstants.getAntTypes().stream().filter(at -> at.getId() == e.getKey()).findFirst().ifPresent(at -> pTrans.put(at, e.getValue()));
+                        putAntTransport(st.pendingTransport, pTrans);
+                        TradeMethod pMethod = GameConstants.getTradeMethodById(st.pendingMethodId);
+                        if (pMethod == null) {
+                            pMethod = method;
                         }
-                        TradeMethod pMethod = GameConstants.getTradeMethods().stream().filter(m -> m.getId() == st.pendingMethodId).findFirst().orElse(method);
                         trade.setPendingUpdate(pLoad, pReturnLoad, pTrans, st.pendingRecurrent, st.pendingIsBilateral, pMethod);
                     }
 
-                    try {
-                        Field th = Trade.class.getDeclaredField("totalHours");
-                        Field rh = Trade.class.getDeclaredField("remainingHours");
-                        Field ret = Trade.class.getDeclaredField("isReturning");
-                        th.setAccessible(true);
-                        rh.setAccessible(true);
-                        ret.setAccessible(true);
-                        th.set(trade, st.totalHours);
-                        rh.set(trade, st.remainingHours);
-                        ret.set(trade, st.isReturning);
-                    } catch (Exception e) { e.printStackTrace(); }
+                    trade.restoreTripState(st.totalHours, st.remainingHours, st.isReturning);
                     engine.getTradeManager().addTrade(trade);
                 }
             }
@@ -823,8 +795,8 @@ public class World {
     }
 
     private void randomizeWeather() {
-        if (random.nextInt(1000) == 0) {
-            if (random.nextBoolean()) {
+        if (GameRandom.nextInt(1000) == 0) {
+            if (GameRandom.nextBoolean()) {
                 this.setWeather(GameConstants.WEATHER_FROG);
             } else {
                 this.setWeather(GameConstants.WEATHER_BLOOD);
@@ -846,14 +818,14 @@ public class World {
                 possibleWeathers.add(GameConstants.WEATHER_HEAVY_RAIN);
                 possibleWeathers.add(GameConstants.WEATHER_WIND);
             }
-            Weather newWeather = possibleWeathers.get(random.nextInt(possibleWeathers.size()));
+            Weather newWeather = possibleWeathers.get(GameRandom.nextInt(possibleWeathers.size()));
             if (this.weather != newWeather) {
                 this.setWeather(newWeather);
             }
         }
         
         for (Hex h : this.hexes) {
-             if (random.nextInt(100) < 5) { 
+             if (GameRandom.nextInt(100) < 5) { 
                  h.setLocalWeather(getRandomWeather(h.getBiome()));
              }
         }
@@ -930,8 +902,8 @@ public class World {
 
         randomizeWeather();
 
-        if (random.nextInt(1000) == 0) {
-            if (random.nextBoolean()) {
+        if (GameRandom.nextInt(1000) == 0) {
+            if (GameRandom.nextBoolean()) {
                 this.setTimeOfDay(GameConstants.TIME_SOLAR_ECLIPSE);
             } else {
                 this.setTimeOfDay(GameConstants.TIME_LUNAR_ECLIPSE);
@@ -1036,5 +1008,29 @@ public class World {
 
     private static boolean colonyHasActiveDynasty(Colony colony) {
         return colony != null && colony.getDynasty() != null && !colony.getDynasty().isDefeated();
+    }
+
+    private static void putResourceLoad(Map<Integer, Double> src, Map<ResourceType, Double> dest) {
+        if (src == null) {
+            return;
+        }
+        for (Map.Entry<Integer, Double> entry : src.entrySet()) {
+            ResourceType resource = GameConstants.getResourceById(entry.getKey());
+            if (resource != null) {
+                dest.put(resource, entry.getValue());
+            }
+        }
+    }
+
+    private static void putAntTransport(Map<Integer, Integer> src, Map<AntType, Integer> dest) {
+        if (src == null) {
+            return;
+        }
+        for (Map.Entry<Integer, Integer> entry : src.entrySet()) {
+            AntType antType = GameConstants.getAntTypeById(entry.getKey());
+            if (antType != null) {
+                dest.put(antType, entry.getValue());
+            }
+        }
     }
 }

@@ -21,6 +21,7 @@ import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.DeathCause;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
@@ -144,7 +145,10 @@ public class Dynasty {
         }
         
         if (savedDynasty.deathStatistics != null) {
-            this.globalDeathStatistics.putAll(savedDynasty.deathStatistics);
+            Map<String, Integer> migrated = DeathCause.migrateStatistics(savedDynasty.deathStatistics);
+            if (migrated != null) {
+                this.globalDeathStatistics.putAll(migrated);
+            }
         }
 
         if (savedDynasty.unlockedUpgradeIds != null) {
@@ -224,7 +228,7 @@ public class Dynasty {
     }
     
     public void recordDeath(String cause) {
-        this.globalDeathStatistics.merge(cause, 1, Integer::sum);
+        this.globalDeathStatistics.merge(DeathCause.normalize(cause), 1, Integer::sum);
     }
 
     public void addColony(Colony colony) {
@@ -398,6 +402,9 @@ public class Dynasty {
     public void bindTradeManager(TradeManager tradeManager) {
         if (tradeManager == null) {
             this.tradeService = null;
+            return;
+        }
+        if (this.tradeService != null && this.tradeService.getTradeManager() == tradeManager) {
             return;
         }
         this.tradeService = new DynastyTradeService(this, tradeManager);

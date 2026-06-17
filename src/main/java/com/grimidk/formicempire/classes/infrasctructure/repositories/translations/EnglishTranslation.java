@@ -1077,6 +1077,9 @@ public class EnglishTranslation implements Translation {
         en.put("LOG_CAUSE_DEHYDRATION", "dehydration");
         en.put("LOG_CAUSE_STARVATION", "starvation");
         en.put("LOG_CAUSE_CONTAMINATION", "contamination");
+        en.put("LOG_CAUSE_CONFLICT", "conflict");
+        en.put("LOG_CAUSE_ILLNESS", "illness");
+        en.put("LOG_CAUSE_OTHER", "other");
         en.put("LOG_CONTAMINATION_LEVEL_FMT", "Contamination level: %s");
         en.put("LOG_CONTAM_LEVEL_SMALL", "Small");
         en.put("LOG_CONTAM_LEVEL_MEDIUM", "Medium");

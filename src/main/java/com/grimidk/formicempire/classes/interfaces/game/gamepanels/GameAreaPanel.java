@@ -30,7 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Random;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameRandom;
 
 public class GameAreaPanel extends ZeroGamePanel {
 
@@ -51,9 +51,6 @@ public class GameAreaPanel extends ZeroGamePanel {
     private int currentBiomeId = GameConstants.BIOME_PLAINS.getId();
     private Rectangle paintViewportRect;
     private Rectangle lodViewportRect;
-
-    private final int ANCHOR_WIDTH = 550;
-    private final int ANCHOR_HEIGHT = 500;
 
     private static final int OVERWORLD_PAN_OUTSET = 1400;
 
@@ -429,8 +426,8 @@ public class GameAreaPanel extends ZeroGamePanel {
         if (antHillImg != null) {
             int w = antHillImg.getWidth(this);
             int h = antHillImg.getHeight(this);
-            int x = (ANCHOR_WIDTH / 2) - (w / 2);
-            int y = (ANCHOR_HEIGHT / 2) - (h / 2);
+            int x = (ColonySpatialLayout.ANCHOR_WIDTH / 2) - (w / 2);
+            int y = (ColonySpatialLayout.ANCHOR_HEIGHT / 2) - (h / 2);
             
             g2d.drawImage(antHillImg, x, y, this);            
             entranceBounds = new Rectangle(x, y, w, h);
@@ -454,8 +451,8 @@ public class GameAreaPanel extends ZeroGamePanel {
         if (colony.hasUpgrade(GameUnlocks.ROLE_GRAVER) && basicYardImg != null) {
             int w = basicYardImg.getWidth(this);
             int h = basicYardImg.getHeight(this);
-            int x = ANCHOR_WIDTH - w - 10;
-            int y = ANCHOR_HEIGHT - h - 10;
+            int x = ColonySpatialLayout.ANCHOR_WIDTH - w - 10;
+            int y = ColonySpatialLayout.ANCHOR_HEIGHT - h - 10;
             
             AffineTransform old = g2d.getTransform();
             double rotateCenterX = x + (w / 2.0);
@@ -497,7 +494,7 @@ public class GameAreaPanel extends ZeroGamePanel {
             int w = basicYardImg.getWidth(this);
             int h = basicYardImg.getHeight(this);
             int x = 10;
-            int y = ANCHOR_HEIGHT - h - 10;
+            int y = ColonySpatialLayout.ANCHOR_HEIGHT - h - 10;
 
             g2d.drawImage(basicYardImg, x, y, this);
             insectPenBounds = new Rectangle(x, y, w, h);
@@ -515,12 +512,10 @@ public class GameAreaPanel extends ZeroGamePanel {
 
         for (int i = 0; i < count; i++) {
             long seed = i * 999999L;
-            Random rng = new Random(seed);
-            
-            int dx = rng.nextInt(areaW);
-            int dy = rng.nextInt(areaH);
-            
-            float angle = rng.nextFloat() * 360.0f; 
+            int dx = GameRandom.seededNextInt(seed, areaW);
+            int dy = GameRandom.seededNextInt(seed + 1, areaH);
+
+            float angle = GameRandom.seededNextFloat(seed + 2) * 360.0f;
             AffineTransform old = g2d.getTransform();
             
             double centerX = rx + dx + (imgW / 2.0);
@@ -553,7 +548,7 @@ public class GameAreaPanel extends ZeroGamePanel {
         int topMargin = 0;
         int hallW = firstHallwayImg.getWidth(this);
         int hallH = firstHallwayImg.getHeight(this);
-        int centerX = ANCHOR_WIDTH / 2;
+        int centerX = ColonySpatialLayout.ANCHOR_WIDTH / 2;
         int hallX = centerX - (hallW / 2);
         int hallY = topMargin;
         int roomW = basicRoomImg.getWidth(this);

@@ -18,6 +18,7 @@ import com.grimidk.formicempire.classes.entities.services.ColonyStatsService;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.ColonyLogTexts;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
@@ -60,7 +61,9 @@ public class StatsDialog extends ZeroDialog {
         super(owner, LanguageStrings.DIALOG_STATS_TITLE, AssetStyles.DEFAULT_DIALOG_SIZE);
         this.colony = colony;
         this.engine = engine;
-        this.dynastyStatsService = new DynastyStatService(); 
+        this.dynastyStatsService = colony.getDynasty() != null
+                ? colony.getDynasty().getStatService()
+                : new DynastyStatService();
         
         setLayout(new BorderLayout());
         
@@ -102,19 +105,27 @@ public class StatsDialog extends ZeroDialog {
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
-                if (engine != null) {
-                    engine.removeHourTickListener(refreshTask);
-                }
+                detachTickListener();
             }
             @Override
             public void windowClosing(WindowEvent e) {
-                if (engine != null) {
-                    engine.removeHourTickListener(refreshTask);
-                }
+                detachTickListener();
             }
         });
 
         registerCloseKey(KeyEvent.VK_X);
+    }
+
+    private void detachTickListener() {
+        if (engine != null) {
+            engine.removeHourTickListener(refreshTask);
+        }
+    }
+
+    @Override
+    public void dispose() {
+        detachTickListener();
+        super.dispose();
     }
 
     private void updateTabTitles() {
@@ -898,7 +909,7 @@ public class StatsDialog extends ZeroDialog {
             model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_NO_DEATHS), 0});
         } else {
             for (Map.Entry<String, Integer> entry : aggregateDeaths.entrySet()) {
-                model.addRow(new Object[]{entry.getKey(), entry.getValue()});
+                model.addRow(new Object[]{ColonyLogTexts.localizedDeathCause(entry.getKey()), entry.getValue()});
             }
         }
         

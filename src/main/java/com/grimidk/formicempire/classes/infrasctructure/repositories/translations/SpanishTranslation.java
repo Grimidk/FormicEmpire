@@ -1077,6 +1077,9 @@ public class SpanishTranslation implements Translation {
         es.put("LOG_CAUSE_DEHYDRATION", "deshidratación");
         es.put("LOG_CAUSE_STARVATION", "inanición");
         es.put("LOG_CAUSE_CONTAMINATION", "contaminación");
+        es.put("LOG_CAUSE_CONFLICT", "conflicto");
+        es.put("LOG_CAUSE_ILLNESS", "enfermedad");
+        es.put("LOG_CAUSE_OTHER", "otro");
         es.put("LOG_CONTAMINATION_LEVEL_FMT", "Nivel de contaminación: %s");
         es.put("LOG_CONTAM_LEVEL_SMALL", "Bajo");
         es.put("LOG_CONTAM_LEVEL_MEDIUM", "Medio");

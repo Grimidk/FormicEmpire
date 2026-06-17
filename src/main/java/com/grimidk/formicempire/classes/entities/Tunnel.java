@@ -30,6 +30,11 @@ public class Tunnel {
         }
     }
 
+    public void restoreState(double progress, boolean isComplete) {
+        this.progress = progress;
+        this.isComplete = isComplete;
+    }
+
     public boolean connects(Hex a, Hex b) {
         return (hexA == a && hexB == b) || (hexA == b && hexB == a);
     }

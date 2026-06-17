@@ -72,7 +72,7 @@ public class DynastyManagementDialog extends ZeroDialog {
         initKeyBindings();
         
         if (this.engine != null) {
-            this.engine.addTickListener(refreshTask);
+            this.engine.addHourTickListener(refreshTask);
         }
 
         this.addWindowListener(new WindowAdapter() {
@@ -82,15 +82,11 @@ public class DynastyManagementDialog extends ZeroDialog {
             }
             @Override
             public void windowClosed(WindowEvent e) {
-                if (engine != null) {
-                    engine.removeTickListener(refreshTask);
-                }
+                detachTickListener();
             }
             @Override
             public void windowClosing(WindowEvent e) {
-                if (engine != null) {
-                    engine.removeTickListener(refreshTask);
-                }
+                detachTickListener();
             }
         });
         
@@ -112,6 +108,18 @@ public class DynastyManagementDialog extends ZeroDialog {
         if (tabIndexMap.containsKey(tabIndex)) {
             tabbedPane.setSelectedIndex(tabIndexMap.get(tabIndex));
         }
+    }
+
+    private void detachTickListener() {
+        if (engine != null) {
+            engine.removeHourTickListener(refreshTask);
+        }
+    }
+
+    @Override
+    public void dispose() {
+        detachTickListener();
+        super.dispose();
     }
 
     public void liveUpdate() {

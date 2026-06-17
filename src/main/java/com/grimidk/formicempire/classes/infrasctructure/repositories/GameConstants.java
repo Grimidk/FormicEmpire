@@ -643,6 +643,15 @@ public final class GameConstants {
 
     public static List<ResourceType> getResources() { return Collections.unmodifiableList(resources); }
 
+    public static ResourceType getResourceById(int id) {
+        for (ResourceType r : resources) {
+            if (r.getId() == id) {
+                return r;
+            }
+        }
+        return null;
+    }
+
     public static List<TimeOfDay> getTimesOfDay() { return Collections.unmodifiableList(timesOfDay); }  
 
     public static List<MoonPhase> getMoonPhases() { return Collections.unmodifiableList(moonPhases); }
@@ -656,6 +665,15 @@ public final class GameConstants {
     public static List<MoveStatus> getMoveStatuses() { return Collections.unmodifiableList(moveStatuses); }
 
     public static List<AntType> getAntTypes() { return Collections.unmodifiableList(antTypes); }
+
+    public static AntType getAntTypeById(int id) {
+        for (AntType t : antTypes) {
+            if (t.getId() == id) {
+                return t;
+            }
+        }
+        return null;
+    }
 
     public static List<AntSubType> getAntSubTypes() {  return Collections.unmodifiableList(antSubTypes); }
 
@@ -679,11 +697,6 @@ public final class GameConstants {
                 return role;
             }
         }
-        for (AntRole role : antRoles) {
-            if (role.getName().equals(key)) {
-                return role;
-            }
-        }
         return null;
     }
 
@@ -692,6 +705,15 @@ public final class GameConstants {
     public static List<Species> getSpecies() { return Collections.unmodifiableList(species); }
 
     public static List<TradeMethod> getTradeMethods() { return Collections.unmodifiableList(tradeMethods); }
+
+    public static TradeMethod getTradeMethodById(int id) {
+        for (TradeMethod m : tradeMethods) {
+            if (m.getId() == id) {
+                return m;
+            }
+        }
+        return null;
+    }
 
     public static List<Humidity> getHumidity() { return Collections.unmodifiableList(humidity); }
 

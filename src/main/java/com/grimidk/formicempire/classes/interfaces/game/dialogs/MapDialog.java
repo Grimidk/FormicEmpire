@@ -66,31 +66,27 @@ public class MapDialog extends ZeroDialog {
         if (world == null) return;
         Hex homeHex = world.getSpawnHex();
         if (homeHex != null) {
-            changeHex(homeHex);
+            changeHex(homeHex, true);
+        }
+    }
+
+    private void changeHex(Hex newHex, boolean closeDialog) {
+        if (newHex == null) return;
+        world.changeActiveHex(newHex);
+
+        if (onHexChange != null) {
+            onHexChange.run();
+        }
+        if (mapPanel != null) {
+            mapPanel.repaint();
+        }
+        if (closeDialog) {
+            dispose();
         }
     }
 
     private void selectHex(Hex newHex) {
-        if (newHex == null) return;
-        world.changeActiveHex(newHex);
-        
-        if (onHexChange != null) {
-            onHexChange.run();
-        }
-        
-        if (mapPanel != null) {
-            mapPanel.repaint();
-        }
-    }
-
-    private void changeHex(Hex newHex) {
-        if (newHex == null) return;
-        world.changeActiveHex(newHex);
-        
-        if (onHexChange != null) {
-            onHexChange.run();
-        }
-        dispose();
+        changeHex(newHex, false);
     }
 
     @Override
@@ -321,7 +317,7 @@ public class MapDialog extends ZeroDialog {
             for (Hex hex : world.getHexes()) {
                 Polygon poly = getHexPolygon(hex, centerOffset.x, centerOffset.y);
                 if (poly.contains(p)) {
-                    changeHex(hex);
+                    changeHex(hex, true);
                     return;
                 }
             }

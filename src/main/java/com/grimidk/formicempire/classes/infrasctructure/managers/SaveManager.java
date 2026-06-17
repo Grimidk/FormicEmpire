@@ -8,7 +8,6 @@ import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.lang.reflect.Field;
 import javax.swing.SwingUtilities;
 
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
@@ -264,7 +263,7 @@ public class SaveManager {
     public void saveWorldToSlotUser(World w, int slotId) throws IOException {
         if (w == null) return;
         
-        String slotName = "Save " + slotId;
+        String slotName = String.format(LanguageStrings.get(LanguageStrings.SAVE_DEFAULT_NAME_FMT), slotId);
         try {
             Savefile existing = loadSlot(slotId);
             if (existing != null && existing.getName() != null && !existing.getName().isEmpty()) {
@@ -279,7 +278,7 @@ public class SaveManager {
     public void saveWorldToSlotUser(World w, int slotId, String name) throws IOException {
         if (w == null) return;
         
-        String saveName = (name != null && !name.isEmpty()) ? name : ("Save " + slotId);
+        String saveName = (name != null && !name.isEmpty()) ? name : String.format(LanguageStrings.get(LanguageStrings.SAVE_DEFAULT_NAME_FMT), slotId);
         Savefile save = new Savefile(slotId, saveName);
         populateSavefileFromGame(save, w, w.getEngine());
         writeManualSave(save);
@@ -403,16 +402,8 @@ public class SaveManager {
                 st.isBilateral = t.isBilateral();
                 st.methodId = t.getMethod().getId();
                 st.isActive = t.isActive();
-                
-                try {
-                    Field th = Trade.class.getDeclaredField("totalHours");
-                    Field rh = Trade.class.getDeclaredField("remainingHours");
-                    th.setAccessible(true);
-                    rh.setAccessible(true);
-                    st.totalHours = (int) th.get(t);
-                    st.remainingHours = (int) rh.get(t);
-                } catch (Exception ignore) {}
-                
+                st.totalHours = t.getTotalHours();
+                st.remainingHours = t.getRemainingHours();
                 st.isReturning = t.isReturning();
                 
                 for (Map.Entry<ResourceType, Double> e : t.getLoad().entrySet()) {

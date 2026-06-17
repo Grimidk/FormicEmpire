@@ -1077,6 +1077,9 @@ public class FrenchTranslation implements Translation {
         fr.put("LOG_CAUSE_DEHYDRATION", "déshydratation");
         fr.put("LOG_CAUSE_STARVATION", "famine");
         fr.put("LOG_CAUSE_CONTAMINATION", "contamination");
+        fr.put("LOG_CAUSE_CONFLICT", "conflit");
+        fr.put("LOG_CAUSE_ILLNESS", "maladie");
+        fr.put("LOG_CAUSE_OTHER", "autre");
         fr.put("LOG_CONTAMINATION_LEVEL_FMT", "Niveau de contamination : %s");
         fr.put("LOG_CONTAM_LEVEL_SMALL", "Faible");
         fr.put("LOG_CONTAM_LEVEL_MEDIUM", "Moyen");

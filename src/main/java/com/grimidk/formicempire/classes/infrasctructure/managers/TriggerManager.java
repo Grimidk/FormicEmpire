@@ -44,6 +44,7 @@ public class TriggerManager {
         engine.removeMonthTickListener(monthlyRunnable);
         engine.removeDayTickListener(dailyRunnable);
         engine.removeHourTickListener(hourlyRunnable);
+        listeners.clear();
     }
 
     public interface TriggerListener {
@@ -408,9 +409,10 @@ public class TriggerManager {
 
     private void checkAbilityMenuHint() {
         if (playerColony.hasUpgrade(GameUnlocks.ABILITY_ABILITY)) return;
-        
-        boolean hasActionAbilities = playerColony.hasUpgrade(GameUnlocks.ABILITY_FORCED_FLIGHT);
-        
+
+        boolean hasActionAbilities = playerColony.hasUpgrade(GameUnlocks.ABILITY_FORCED_FLIGHT)
+                || playerColony.hasUpgrade(GameUnlocks.ABILITY_MASS_FLIGHT);
+
         if (hasActionAbilities) {
             fireLocalizedTrigger(GameUnlocks.ABILITY_ABILITY,
                 LanguageStrings.TRIGGER_OPERATIONS_ABILITY_TITLE,

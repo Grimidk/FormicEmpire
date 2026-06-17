@@ -40,27 +40,26 @@ To Feature (to be done in order):
 Needed for launch (v1.0) (Launch Version):
 	Priority:
 	automate NPC to trade and tunnel
-
-	Everything else :
-	automate NPC to trade and tunnel
 	diplomacy and diplomatic reputation (own and xeno colonies) and alliances (non-aggression pacts), alliances can increase while allied genetic integrity
 	rebellions and rebel colonies (internal rebeliousness stat, too much causes a rebellious dynasty to appear, once capital defeated it gets reabsorbed)
 	diplo dialog with stance options (neutral, aggressive, peaceful)
 	battle system (mass battle in land and air, tick based loses based on active/passive military strenght from 1:1 = 50% chance and 1% loses up to 1:10 100% chance and 100% loses, 2 staged war until the queens are dead)
 	assimilations ( Trap-jaw (Trap jaw ants), Honey-pot (Honey pot ants), Door-head (Turtle ants), Wood burrowing (Carpenter ants), Silk weaving (Weaver ants), Rafting (Flood plains ants), Fire venom (Fire ants), Jumping (Jet ants), Gliding (Gliding ants), Stinging (Bullet ants), Swarming (Army ants), Stealth (Ghost ants), Fast bitting (Dracula ants), Heat resistance (Saharan silver ants), Deadly venom (Harvester ants), Self destruction (Exploding ants), Far sight (Bulldog ants), Hive building (Shining black ants), Location sensing (Desert ants))
+
+	Everything else :
 	ant subtypes (enable by role /  exclusion) checks with new sprites 
 	simulation screen to see battles, transports ("view convoy" option using going and returning biomes for tiles, or underground or air), maybe something else
 	revamp story and lore and maybe intro screen
 	more socialism (?)
-	research tree
-	building tree
-	minerals
+	research tree and building tree
+	minerals 
 	rework how carrying looks completely
 	main menu screen maybe simulation like factorio
 	synergies ( Super majors + Chemical throwing = Artillery ants; Self destruction + Acid spitting = Corrosive bombs; Silk weaving + Hive building = Web building; Air-force ants + self destruction = Air-bomber ants)
 	icons for all constants and unlocks (roles, move and trade methods, upgrades, buildings, assimilations,  synergies)
 	more upgrades
 	more buildings
+	more abilities (boost speed with syrup, boost strenght with protein)
 	more roles (commander and captain roles, air force)
 	more enemies ( Rebel ant colonies, Bugs, Arachnids, Reptiles, Birds, Rodents, Zombie ant colonies)
 	more stats (kills, historic productions, graphs?)
@@ -71,7 +70,7 @@ Needed for launch (v1.0) (Launch Version):
 	rework start and choose difficulty / biome / species
 	rework abilities and alerts and triggers (new classes?)
 	rework saves to be cleaner
-	rework manager and aux files and services
+	rework manager and aux files
 	balance every upgrade
 	ant menus (detailed per ant)
 	music and sounds and settings for them and player panel

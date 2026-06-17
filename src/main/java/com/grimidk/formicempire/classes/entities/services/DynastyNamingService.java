@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.entities.services;
 
 import com.grimidk.formicempire.classes.constants.misc.Species;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameRandom;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 
 import java.util.*;
@@ -28,8 +29,6 @@ public class DynastyNamingService {
     }
 
     private final Set<String> usedThemes = new HashSet<>();
-    private final Random random = new Random();
-
     public String generateDynastyName(Species species) {
         String theme = getRandomTheme(species);
         usedThemes.add(theme);
@@ -65,10 +64,10 @@ public class DynastyNamingService {
         }
 
         if (pool.isEmpty()) {
-            return ALL_THEMES.get(random.nextInt(ALL_THEMES.size()));
+            return ALL_THEMES.get(GameRandom.nextInt(ALL_THEMES.size()));
         }
 
-        return pool.get(random.nextInt(pool.size()));
+        return pool.get(GameRandom.nextInt(pool.size()));
     }
     
     public void registerUsedName(String dynastyName) {

@@ -12,7 +12,7 @@ import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
 import java.util.List;
-import java.util.Random;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameRandom;
 
 public class ColonyStarterService {
 
@@ -134,7 +134,6 @@ public class ColonyStarterService {
 
     public void matureColony(Colony colony) {
         System.out.println("[ColonyStarterService] Maturation complete. Spawning workforce for " + colony.getName());
-        Random random = new Random();
 
         List<Ant> workerList = colony.getWorkers();
         for (int i = 0; i < 9; i++) {
@@ -164,14 +163,14 @@ public class ColonyStarterService {
                 int centerX = ColonySpatialLayout.ANCHOR_CENTER_X; 
                 int centerY = ColonySpatialLayout.ANCHOR_HEIGHT / 2;
                 
-                int pX = centerX + random.nextInt((range * 2) + 1) - range;
-                int pY = centerY + random.nextInt((range * 2) + 1) - range;
+                int pX = centerX + GameRandom.nextInt((range * 2) + 1) - range;
+                int pY = centerY + GameRandom.nextInt((range * 2) + 1) - range;
                 pX = Math.max(50, pX);
                 pY = Math.max(50, pY);
                 ResourceSource initialPlant = new ResourceSource(GameConstants.RESOURCE_PLANT, 10000, pX, pY);
                 
-                int wX = centerX + random.nextInt((range * 2) + 1) - range;
-                int wY = centerY + random.nextInt((range * 2) + 1) - range;
+                int wX = centerX + GameRandom.nextInt((range * 2) + 1) - range;
+                int wY = centerY + GameRandom.nextInt((range * 2) + 1) - range;
                 wX = Math.max(50, wX);
                 wY = Math.max(50, wY);
                 ResourceSource initialWater = new ResourceSource(GameConstants.RESOURCE_WATER, 10000, wX, wY);

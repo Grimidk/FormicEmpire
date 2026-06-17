@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.DeathCause;
 
 public class ColonyDeathService {
 
@@ -15,14 +16,14 @@ public class ColonyDeathService {
     }
 
     private void initializeDeathCauses() {
-        deathCauses.put("Old Age", 0);
-        deathCauses.put("Starvation", 0);
-        deathCauses.put("Dehydration", 0);
-        deathCauses.put("Contamination", 0);
-        deathCauses.put("Conflict", 0);
-        deathCauses.put("Illness", 0);
-        deathCauses.put("Lack of Care", 0);
-        deathCauses.put("Other", 0);
+        deathCauses.put(DeathCause.OLD_AGE, 0);
+        deathCauses.put(DeathCause.STARVATION, 0);
+        deathCauses.put(DeathCause.DEHYDRATION, 0);
+        deathCauses.put(DeathCause.CONTAMINATION, 0);
+        deathCauses.put(DeathCause.CONFLICT, 0);
+        deathCauses.put(DeathCause.ILLNESS, 0);
+        deathCauses.put(DeathCause.LACK_OF_CARE, 0);
+        deathCauses.put(DeathCause.OTHER, 0);
     }
 
     public void recordDeath(String cause) {
@@ -30,14 +31,7 @@ public class ColonyDeathService {
     }
 
     public void recordDeath(String cause, Colony colony) {
-        String key = "Other";
-        if (cause != null) {
-            if (deathCauses.containsKey(cause)) {
-                key = cause;
-            } else if (cause.equalsIgnoreCase("Combat")) {
-                key = "Conflict";
-            }
-        }
+        String key = DeathCause.normalize(cause);
         deathCauses.merge(key, 1, Integer::sum);
 
         if (colony != null && colony.getDynasty() != null) {
@@ -50,8 +44,12 @@ public class ColonyDeathService {
     }
 
     public void loadDeathStatistics(Map<String, Integer> savedStats) {
-        if (savedStats != null) {
-            this.deathCauses.putAll(savedStats);
+        resetDeathStatistics();
+        Map<String, Integer> migrated = DeathCause.migrateStatistics(savedStats);
+        if (migrated != null) {
+            for (Map.Entry<String, Integer> entry : migrated.entrySet()) {
+                deathCauses.merge(entry.getKey(), entry.getValue(), Integer::sum);
+            }
         }
     }
 

@@ -5,7 +5,6 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 
@@ -22,6 +21,7 @@ import com.grimidk.formicempire.classes.entities.ResourceSource;
 import com.grimidk.formicempire.classes.entities.Tunnel;
 import com.grimidk.formicempire.classes.infrasctructure.NeoPoint;
 import com.grimidk.formicempire.classes.infrasctructure.World;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.DeathCause;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameRandom;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.ColonyLogPrefixes;
@@ -30,8 +30,6 @@ import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStr
 import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
 
 public class ColonyLabourService {
-    
-    private final Random random = new Random();
 
     // --- Actual Ant Objects ---
     private List<Ant> getWorkingAnts(Colony colony, AntRole role) {
@@ -93,7 +91,7 @@ public class ColonyLabourService {
                         worker.setCarrying(type);
                         
                         if (colony.hasUpgrade(GameUnlocks.ABILITY_RESIN)) {
-                            if (random.nextInt(100) < 1) {
+                            if (GameRandom.nextInt(100) < 1) {
                                 double addedResin = resources.addResource(colony, GameConstants.RESOURCE_RESIN, 1);
                                 if (addedResin > 0) {
                                     worker.setCarryingSec(GameConstants.RESOURCE_RESIN);
@@ -312,8 +310,8 @@ public class ColonyLabourService {
             
             for (Ant antToCull : antsToCull) {
                 if (antToCull.isAlive()) {
-                    antToCull.goDie(colony, "Lack of Care");
-                    colony.recordAntDeath(antToCull, "Lack of Care");
+                    antToCull.goDie(colony, DeathCause.LACK_OF_CARE);
+                    colony.recordAntDeath(antToCull, DeathCause.LACK_OF_CARE);
                     
                     list.remove(antToCull);
                     deathCount++;
@@ -384,7 +382,7 @@ public class ColonyLabourService {
                 else if (integrity <= 60) failureChance = 0.10;
                 else if (integrity <= 80) failureChance = 0.05;
 
-                if (random.nextDouble() < failureChance) {
+                if (GameRandom.nextDouble() < failureChance) {
                     colony.logEvent(ColonyLogPrefixes.FAILURE + " " + LanguageStrings.get(LanguageStrings.LOG_FAILURE_SATELLITE));
                     continue;
                 }
@@ -453,7 +451,7 @@ public class ColonyLabourService {
         for (Ant officer : police) {
             if (parasitesKilled >= parasiteCount) break;
             
-            if (random.nextFloat() < detectionRate) {
+            if (GameRandom.nextFloat() < detectionRate) {
                 parasitesKilled++;
                 colony.getResourceService().addResource(colony, GameConstants.RESOURCE_MEAT, 4);
             }
@@ -482,7 +480,7 @@ public class ColonyLabourService {
                 found = true;
                 totalChance -= 1.0f;
             } else {
-                if (random.nextFloat() < totalChance) {
+                if (GameRandom.nextFloat() < totalChance) {
                     found = true;
                 }
                 totalChance = 0; 
@@ -512,7 +510,7 @@ public class ColonyLabourService {
         }
 
         if (possibleTypes.isEmpty()) return;
-        ResourceType selectedType = possibleTypes.get(random.nextInt(possibleTypes.size()));
+        ResourceType selectedType = possibleTypes.get(GameRandom.nextInt(possibleTypes.size()));
         
         float abundance = 0f;
         
@@ -537,12 +535,12 @@ public class ColonyLabourService {
         if (abundance <= 0) return; 
         
         int quantity = 100; // Small
-        float roll = random.nextFloat();
+        float roll = GameRandom.nextFloat();
         
         if (roll < abundance) {
             quantity = 100000; // Huge
         } else {
-            float subRoll = random.nextFloat();
+            float subRoll = GameRandom.nextFloat();
             if (subRoll < 0.33f) {
                 quantity = 10000; // Big
             } else if (subRoll < 0.66f) {
@@ -568,12 +566,12 @@ public class ColonyLabourService {
 
         int extraMin = GameConstants.RESOURCE_SPAWN_EXTRA_DISTANCE_MIN + depletionExtra;
         int extraMax = GameConstants.RESOURCE_SPAWN_EXTRA_DISTANCE_MAX + depletionExtra;
-        int extraDistance = extraMin + random.nextInt(Math.max(1, extraMax - extraMin));
+        int extraDistance = extraMin + GameRandom.nextInt(Math.max(1, extraMax - extraMin));
 
         int displayPx = selectedType.getDisplaySizeForSourceQuantity(quantity);
         NeoPoint entrance = colony.getLocationService().getColonyEntrance(colony);
         Point center = ResourceSourcePlacement.pickSpawnCenter(
-                entrance, gameW, gameH, displayPx, extraDistance, random);
+                entrance, gameW, gameH, displayPx, extraDistance);
         Point topLeft = ResourceSourcePlacement.topLeftFromCenter(center.x, center.y, displayPx);
 
         ResourceSource source = new ResourceSource(selectedType, quantity, topLeft.x, topLeft.y);

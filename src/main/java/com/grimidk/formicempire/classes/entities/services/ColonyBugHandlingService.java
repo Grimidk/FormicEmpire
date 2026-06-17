@@ -5,7 +5,8 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
+
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameRandom;
 
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.BugType;
@@ -25,8 +26,6 @@ public class ColonyBugHandlingService {
             GameConstants.TYPE_APHID,
             GameConstants.TYPE_SOIL_MITE,
             GameConstants.TYPE_DERMESTID);
-
-    private final Random random = new Random();
 
     public static List<BugType> getPetTypes() {
         return PET_TYPES;
@@ -126,7 +125,7 @@ public class ColonyBugHandlingService {
 
         int caughtTotal = 0;
         for (int i = 0; i < catcherCount; i++) {
-            if (random.nextFloat() > GameConstants.CATCH_BASE_CHANCE_PER_CATCHER) {
+            if (GameRandom.nextFloat() > GameConstants.CATCH_BASE_CHANCE_PER_CATCHER) {
                 continue;
             }
             BugType nativeType = pickRandomNative(biome);
@@ -335,7 +334,7 @@ public class ColonyBugHandlingService {
         if (natives.isEmpty()) {
             return null;
         }
-        return natives.get(random.nextInt(natives.size()));
+        return natives.get(GameRandom.nextInt(natives.size()));
     }
 
     private int effectiveRancherCount(Colony colony) {
@@ -358,7 +357,7 @@ public class ColonyBugHandlingService {
         if (stored < GameConstants.PARASITIC_MITE_RESOURCE_THRESHOLD) {
             return;
         }
-        if (random.nextFloat() > GameConstants.PARASITIC_MITE_MONTHLY_SPAWN_CHANCE) {
+        if (GameRandom.nextFloat() > GameConstants.PARASITIC_MITE_MONTHLY_SPAWN_CHANCE) {
             return;
         }
 
@@ -421,7 +420,7 @@ public class ColonyBugHandlingService {
         if (targetInfected <= 0 || candidates.isEmpty()) {
             return;
         }
-        Collections.shuffle(candidates, random);
+        Collections.shuffle(candidates, GameRandom.getShuffleRandom());
         int toInfect = Math.min(targetInfected, candidates.size());
         for (int i = 0; i < toInfect; i++) {
             candidates.get(i).setParasiticMiteInfected(true);

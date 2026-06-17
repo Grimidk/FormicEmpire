@@ -1077,6 +1077,9 @@ public class PortugueseTranslation implements Translation {
         pt.put("LOG_CAUSE_DEHYDRATION", "desidratação");
         pt.put("LOG_CAUSE_STARVATION", "inanição");
         pt.put("LOG_CAUSE_CONTAMINATION", "contaminação");
+        pt.put("LOG_CAUSE_CONFLICT", "conflito");
+        pt.put("LOG_CAUSE_ILLNESS", "doença");
+        pt.put("LOG_CAUSE_OTHER", "outro");
         pt.put("LOG_CONTAMINATION_LEVEL_FMT", "Nível de contaminação: %s");
         pt.put("LOG_CONTAM_LEVEL_SMALL", "Baixo");
         pt.put("LOG_CONTAM_LEVEL_MEDIUM", "Médio");

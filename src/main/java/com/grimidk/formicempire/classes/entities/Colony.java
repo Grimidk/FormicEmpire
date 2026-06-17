@@ -383,7 +383,7 @@ public class Colony {
         if (ant == null) return;
         this.totalDeaths++;
         this.deadAnts.add(ant);
-        if (populationService != null) {
+        if (deathService != null) {
             deathService.recordDeath(cause, this);
         }
     }
@@ -588,9 +588,6 @@ public class Colony {
     }
 
     public ColonyBugHandlingService getBugHandlingService() {
-        if (bugHandlingService == null) {
-            bugHandlingService = new ColonyBugHandlingService();
-        }
         return bugHandlingService;
     }
 

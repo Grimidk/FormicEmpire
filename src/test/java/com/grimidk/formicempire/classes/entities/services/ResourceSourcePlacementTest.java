@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.Point;
-import java.util.Random;
 
 import org.junit.jupiter.api.Test;
 
@@ -24,11 +23,10 @@ class ResourceSourcePlacementTest {
         int entranceY = 230;
         int displayPx = GameConstants.SOURCE_DISPLAY_PX_HUGE;
         NeoPoint entrance = new NeoPoint(entranceX, entranceY, WorldSpaces.OVERWORLD);
-        Random random = new Random(42);
 
         for (int i = 0; i < 40; i++) {
             Point center = ResourceSourcePlacement.pickSpawnCenter(
-                    entrance, viewportW, viewportH, displayPx, 120, random);
+                    entrance, viewportW, viewportH, displayPx, 120);
             Point topLeft = ResourceSourcePlacement.topLeftFromCenter(center.x, center.y, displayPx);
             assertTrue(
                     ResourceSourcePlacement.isFullyOutsideViewport(topLeft, displayPx, viewportW, viewportH),

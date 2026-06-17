@@ -21,6 +21,10 @@ public class DynastyTradeService {
         this.tradeManager = tradeManager;
     }
 
+    public TradeManager getTradeManager() {
+        return tradeManager;
+    }
+
     public List<Trade> getDynastyTrades() {
         return tradeManager.getActiveTrades().stream()
             .filter(this::isTradeInDynasty)

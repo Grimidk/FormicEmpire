@@ -2,7 +2,7 @@ package com.grimidk.formicempire.classes.entities.services;
 
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.util.Random;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameRandom;
 
 import com.grimidk.formicempire.classes.infrasctructure.NeoPoint;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
@@ -27,11 +27,11 @@ public final class ResourceSourcePlacement {
     }
 
     public static Point pickSpawnCenter(
-            NeoPoint entrance, int viewportW, int viewportH, int displaySizePx, int extraDistance, Random random) {
+            NeoPoint entrance, int viewportW, int viewportH, int displaySizePx, int extraDistance) {
         int minDist = minSpawnDistanceFromEntrance(
                 entrance.x, entrance.y, viewportW, viewportH, displaySizePx);
         int dist = minDist + Math.max(0, extraDistance);
-        double angle = random.nextDouble() * 2.0 * Math.PI;
+        double angle = GameRandom.nextDouble() * 2.0 * Math.PI;
         int cx = (int) Math.round(entrance.x + Math.cos(angle) * dist);
         int cy = (int) Math.round(entrance.y + Math.sin(angle) * dist);
         return new Point(cx, cy);
