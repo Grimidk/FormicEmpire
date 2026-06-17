@@ -5,6 +5,7 @@ import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
+import com.grimidk.formicempire.classes.entities.services.ColonySpatialLayout;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
@@ -160,8 +161,8 @@ public class ColonyStarterService {
             if (colony.getLocationService().getDiscoveredSources().isEmpty()) {
                 int range = 300;
                 
-                int centerX = ColonyLocationService.ANCHOR_CENTER_X; 
-                int centerY = ColonyLocationService.ANCHOR_HEIGHT / 2;
+                int centerX = ColonySpatialLayout.ANCHOR_CENTER_X; 
+                int centerY = ColonySpatialLayout.ANCHOR_HEIGHT / 2;
                 
                 int pX = centerX + random.nextInt((range * 2) + 1) - range;
                 int pY = centerY + random.nextInt((range * 2) + 1) - range;

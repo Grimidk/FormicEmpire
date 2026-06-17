@@ -1,6 +1,6 @@
 A game about ants developed solely on Java, autism, energy drinks, and cigarettes. 
 I refuse to use an engine or learn proper UI/UX. 
-Gemini is being used to help me debug, and all pixelart made using Aseprite with my own trackpad. 
+Cursor is being used to help me debug, and all pixelart made using Aseprite with my own trackpad. 
 I plan to make everything from scratch including the music, assets, fonts and more.
 
 Please enjoy it, and send feedback to: thegrimidk@gmail.com .

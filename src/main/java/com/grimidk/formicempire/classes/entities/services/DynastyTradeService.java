@@ -1,11 +1,14 @@
 package com.grimidk.formicempire.classes.entities.services;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.Trade;
+import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 
 public class DynastyTradeService {
@@ -20,7 +23,7 @@ public class DynastyTradeService {
 
     public List<Trade> getDynastyTrades() {
         return tradeManager.getActiveTrades().stream()
-            .filter(t -> isTradeInDynasty(t))
+            .filter(this::isTradeInDynasty)
             .collect(Collectors.toList());
     }
 
@@ -33,5 +36,60 @@ public class DynastyTradeService {
         return tradeManager.getActiveTrades().stream()
             .filter(t -> t.getOrigin().getColony() == colony || t.getDestination().getColony() == colony)
             .collect(Collectors.toList());
+    }
+
+    public Trade findTrade(Colony origin, Colony destination) {
+        if (origin == null || destination == null || tradeManager == null) {
+            return null;
+        }
+        for (Trade trade : tradeManager.getActiveTrades()) {
+            if (!trade.isActive()) {
+                continue;
+            }
+            Colony tradeOrigin = trade.getOrigin().getColony();
+            Colony tradeDest = trade.getDestination().getColony();
+            if (tradeOrigin == origin && tradeDest == destination) {
+                return trade;
+            }
+            if (tradeOrigin != null && tradeDest != null
+                    && tradeOrigin.getId() == origin.getId() && tradeDest.getId() == destination.getId()) {
+                return trade;
+            }
+        }
+        return null;
+    }
+
+    public List<Colony> getNeighborColonies(World world, Colony colony) {
+        List<Colony> neighbors = new ArrayList<>();
+        Hex center = world.getHexOfColony(colony);
+        if (center == null) {
+            return neighbors;
+        }
+        for (Hex hex : adjacentHexes(center)) {
+            if (hex != null && hex.getColony() != null && hex.getColony() != colony) {
+                neighbors.add(hex.getColony());
+            }
+        }
+        return neighbors;
+    }
+
+    public Hex getNeighborHex(World world, Colony colony, Colony neighbor) {
+        Hex center = world.getHexOfColony(colony);
+        if (center == null) {
+            return null;
+        }
+        for (Hex hex : adjacentHexes(center)) {
+            if (hex != null && hex.getColony() == neighbor) {
+                return hex;
+            }
+        }
+        return null;
+    }
+
+    private static Hex[] adjacentHexes(Hex center) {
+        return new Hex[] {
+            center.getNorth(), center.getNorthWest(), center.getNorthEast(),
+            center.getSouth(), center.getSouthWest(), center.getSouthEast()
+        };
     }
 }

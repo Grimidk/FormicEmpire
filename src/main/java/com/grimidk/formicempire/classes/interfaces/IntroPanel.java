@@ -9,7 +9,7 @@ import javax.swing.event.AncestorListener;
 import java.awt.*;
 
 public class IntroPanel extends JPanel {
-    private static final int SLIDE_MS = 5000;
+    private static final int SLIDE_MS = 2500;
     private static final String STUDIO_NAME = "Grimidk";
 
     private final MainFrame frame;

@@ -124,6 +124,18 @@ class ColonyBugHandlingServiceTest {
     }
 
     @Test
+    void parasiticMitesCapAtTenPerAnt() {
+        for (int i = 0; i < 100; i++) {
+            colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+        }
+        colony.setMushrooms(10_000);
+        for (int i = 0; i < 50; i++) {
+            service.runMonthlyParasiticMites(colony);
+        }
+        assertTrue(colony.getParasiticMites() <= 100 * GameConstants.PARASITIC_MITES_PER_SLOWED_ANT);
+    }
+
+    @Test
     void soilMitesEliminateParasiticMitesDaily() {
         service.setCount(colony, GameConstants.TYPE_SOIL_MITE, 1);
         service.setParasiticMiteCount(colony, 20);

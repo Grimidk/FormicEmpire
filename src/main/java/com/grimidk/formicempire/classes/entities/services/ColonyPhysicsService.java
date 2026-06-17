@@ -23,10 +23,6 @@ import javax.swing.ImageIcon;
 
 public class ColonyPhysicsService {
 
-    private static final int ANCHOR_WIDTH = 550;
-    private static final int ANCHOR_HEIGHT = 500;
-    private static final int ANCHOR_CENTER_X = ANCHOR_WIDTH / 2;
-
     // --- Main Physics Loop ---
     public void runPhysics(Colony colony, Dimension activeDimension) {
         runPhysics(colony, activeDimension, null, 0L);
@@ -227,7 +223,7 @@ public class ColonyPhysicsService {
         int gameHeight = Math.max(colony.getGameAreaHeight(), 720);
 
         if (ant.getDimension() == WorldSpaces.UNDERWORLD) {
-            Point exit = new Point(ANCHOR_CENTER_X, 0);
+            Point exit = new Point(ColonySpatialLayout.ANCHOR_CENTER_X, 0);
             if (dist(ant.getX(), ant.getY(), exit.x, exit.y) < 20) {
                 ant.setDimension(WorldSpaces.OVERWORLD);
                 ant.setPosition(colony.getLocationService().getColonyEntrance(colony));
@@ -361,7 +357,7 @@ public class ColonyPhysicsService {
             if (dist(ant.getX(), ant.getY(), entrance.x, entrance.y) < 30) {
                 ant.clearLoad();
                 ant.setDimension(WorldSpaces.UNDERWORLD);
-                ant.setPosition(new Point(ANCHOR_CENTER_X, 50));
+                ant.setPosition(new Point(ColonySpatialLayout.ANCHOR_CENTER_X, 50));
             } else {
                 Room target = findRoomForAnt(colony, ant);
                 if (target == null) target = WorldSpaces.STORAGE;
@@ -402,7 +398,7 @@ public class ColonyPhysicsService {
 
         if (myRoom == null) {
              if (ant.getX() == 0 && ant.getY() == 0) {
-                 ant.setPosition(new Point(ANCHOR_CENTER_X, 0));
+                 ant.setPosition(new Point(ColonySpatialLayout.ANCHOR_CENTER_X, 0));
              }
              
              Queue<NeoPoint> route = colony.getLocationService().calculateRoute(colony, getRoomContainingAnt(colony, ant), WorldSpaces.SURFACE, ant);
@@ -581,25 +577,25 @@ public class ColonyPhysicsService {
         
         if (room == WorldSpaces.GRAVEYARD) {
             if (colony.getGraverBounds() != null) return colony.getGraverBounds();
-            int x = Math.max(0, ANCHOR_WIDTH - room.getWidth() - 10);
-            int y = Math.max(0, ANCHOR_HEIGHT - room.getHeight() - 10);
+            int x = Math.max(0, ColonySpatialLayout.ANCHOR_WIDTH - room.getWidth() - 10);
+            int y = Math.max(0, ColonySpatialLayout.ANCHOR_HEIGHT - room.getHeight() - 10);
             return new Rectangle(x, y, room.getWidth(), room.getHeight());
         }
         
         if (room == WorldSpaces.BREEDER_CHAMBER) {
             if (colony.getBreederBounds() != null) return colony.getBreederBounds();
-            int cx = ANCHOR_CENTER_X;
+            int cx = ColonySpatialLayout.ANCHOR_CENTER_X;
             return new Rectangle(cx - 256, 512, 256, 256);
         }
 
         if (room == WorldSpaces.TRANSIT_CHAMBER) {
             if (colony.getTransitBounds() != null) return colony.getTransitBounds();
-            int cx = ANCHOR_CENTER_X;
+            int cx = ColonySpatialLayout.ANCHOR_CENTER_X;
             return new Rectangle(cx + 64, 512, 512, 256);
         }
 
         if (room == WorldSpaces.CONSTRUCTION_SITE) {
-            int cx = ANCHOR_CENTER_X;
+            int cx = ColonySpatialLayout.ANCHOR_CENTER_X;
             int bottomY = 512; 
             boolean hasTunnels = colony.getDynasty() != null && !colony.getDynasty().getTunnels().isEmpty();
             if (colony.hasUpgrade(GameUnlocks.ROLE_BREEDER) || hasTunnels) {
@@ -613,7 +609,7 @@ public class ColonyPhysicsService {
         int y = room.getFloorPoint().y;
         
         if (room.getDimension() == WorldSpaces.UNDERWORLD) {
-            int cx = ANCHOR_CENTER_X;
+            int cx = ColonySpatialLayout.ANCHOR_CENTER_X;
             x += cx;
         }
         
@@ -638,22 +634,22 @@ public class ColonyPhysicsService {
     }
 
     private Rectangle getSafeWalkableBounds(Colony colony, Rectangle r, int gameWidth) {
-        int hallCenterX = ANCHOR_CENTER_X;
+        int hallCenterX = ColonySpatialLayout.ANCHOR_CENTER_X;
         
         boolean isRightSide = r.getCenterX() > hallCenterX;
-        int pLeft = ColonyLocationService.PAD_WALL;
-        int pRight = ColonyLocationService.PAD_WALL;
+        int pLeft = ColonySpatialLayout.PAD_WALL;
+        int pRight = ColonySpatialLayout.PAD_WALL;
         
         if (Math.abs(r.getCenterX() - hallCenterX) < (r.getWidth() + 200)) {
-             if (isRightSide) pLeft = ColonyLocationService.PAD_DOOR; 
-             else pRight = ColonyLocationService.PAD_DOOR;        
+             if (isRightSide) pLeft = ColonySpatialLayout.PAD_DOOR; 
+             else pRight = ColonySpatialLayout.PAD_DOOR;        
         }
 
         int minX = r.x + pLeft;
-        int maxX = r.x + r.width - pRight - ColonyLocationService.ANT_SIZE;
+        int maxX = r.x + r.width - pRight - ColonySpatialLayout.ANT_SIZE;
         
-        int minY = r.y + ColonyLocationService.PAD_TOP;
-        int maxY = Math.max(minY, r.y + r.height - ColonyLocationService.PAD_BOTTOM - ColonyLocationService.ANT_SIZE);
+        int minY = r.y + ColonySpatialLayout.PAD_TOP;
+        int maxY = Math.max(minY, r.y + r.height - ColonySpatialLayout.PAD_BOTTOM - ColonySpatialLayout.ANT_SIZE);
         
         if (maxX < minX) maxX = minX; 
         return new Rectangle(minX, minY, maxX - minX, maxY - minY);

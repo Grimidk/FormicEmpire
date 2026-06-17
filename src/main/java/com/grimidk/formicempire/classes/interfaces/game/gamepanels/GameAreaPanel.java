@@ -9,7 +9,8 @@ import com.grimidk.formicempire.classes.entities.Bug;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
 import com.grimidk.formicempire.classes.entities.services.ColonyLocationService;
-import com.grimidk.formicempire.classes.entities.services.ColonyRoomDecorationService;
+import com.grimidk.formicempire.classes.entities.services.ColonySpatialLayout;
+import com.grimidk.formicempire.classes.interfaces.game.rendering.RoomDecorationRenderer;
 import com.grimidk.formicempire.classes.entities.services.ViewportPhysicsLod;
 import com.grimidk.formicempire.classes.infrasctructure.Dimension;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
@@ -150,10 +151,6 @@ public class GameAreaPanel extends ZeroGamePanel {
         return GameAreaPanel.class.getResource("/" + classpathRelativePath);
     }
 
-    /**
-     * Toggles the case of the first letter of the filename segment so {@code PlainsTile.png} and
-     * {@code plainsTile.png} both resolve when only one exists on the classpath.
-     */
     private static String alternateFilenameFirstLetterCase(String path) {
         int sep = path.lastIndexOf('/');
         int nameStart = sep + 1;
@@ -238,8 +235,8 @@ public class GameAreaPanel extends ZeroGamePanel {
             return new Point(contentPadX + (int) entrance.getX(), contentPadY + (int) entrance.getY());
         }
         return new Point(
-                contentPadX + ColonyLocationService.ANCHOR_CENTER_X,
-                contentPadY + ColonyLocationService.ANCHOR_HEIGHT / 2);
+                contentPadX + ColonySpatialLayout.ANCHOR_CENTER_X,
+                contentPadY + ColonySpatialLayout.ANCHOR_HEIGHT / 2);
     }
     
     public void toggleDimension() {
@@ -536,10 +533,6 @@ public class GameAreaPanel extends ZeroGamePanel {
         }
     }
 
-    /**
-     * Shared layout for the first two underworld rows (hall + four basic rooms). Row 3 uses the same
-     * horizontal positions when present.
-     */
     private record UnderworldRoomLayout(
             int hallX,
             int hallY,
@@ -581,22 +574,22 @@ public class GameAreaPanel extends ZeroGamePanel {
             return;
         }
 
-        ColonyRoomDecorationService.drawStorageRoomDecorations(g2d, colony, L.leftRoomX, L.roomYRow1, L.roomW, L.roomH, this);
+        RoomDecorationRenderer.drawStorageRoomDecorations(g2d, colony, L.leftRoomX, L.roomYRow1, L.roomW, L.roomH, this);
 
         AffineTransform old = g2d.getTransform();
         double rotateCenterX = L.rightRoomX + (L.roomW / 2.0);
         double rotateCenterY = L.roomYRow1 + (L.roomH / 2.0);
         g2d.rotate(Math.toRadians(180), rotateCenterX, rotateCenterY);
-        ColonyRoomDecorationService.drawFarmRoomDecorations(g2d, colony, L.rightRoomX, L.roomYRow1, L.roomW, L.roomH, this, true);
+        RoomDecorationRenderer.drawFarmRoomDecorations(g2d, colony, L.rightRoomX, L.roomYRow1, L.roomW, L.roomH, this, true);
         g2d.setTransform(old);
 
-        ColonyRoomDecorationService.drawNurseryRoomDecorations(g2d, colony, L.leftRoomX, L.roomYRow2, L.roomW, L.roomH, this);
+        RoomDecorationRenderer.drawNurseryRoomDecorations(g2d, colony, L.leftRoomX, L.roomYRow2, L.roomW, L.roomH, this);
 
         AffineTransform old2 = g2d.getTransform();
         double rotateCenter2X = L.rightRoomX + (L.roomW / 2.0);
         double rotateCenter2Y = L.roomYRow2 + (L.roomH / 2.0);
         g2d.rotate(Math.toRadians(180), rotateCenter2X, rotateCenter2Y);
-        ColonyRoomDecorationService.drawRoyalRoomDecorations(g2d, colony, L.rightRoomX, L.roomYRow2, L.roomW, L.roomH, this, true);
+        RoomDecorationRenderer.drawRoyalRoomDecorations(g2d, colony, L.rightRoomX, L.roomYRow2, L.roomW, L.roomH, this, true);
         g2d.setTransform(old2);
     }
 

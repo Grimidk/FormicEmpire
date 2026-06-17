@@ -216,7 +216,7 @@ public final class GameUnlocks {
     public static final Upgrade ASSIMILATED_MULTIQUEEN = new Upgrade(1002, "ASSIMILATED_MULTIQUEEN", "ASSIMILATED_MULTIQUEEN_FLAVOR", "ASSIMILATED_MULTIQUEEN_DESC", ABILITY_ASSIMILATION, 0, null );
     static { upgrades.add(ASSIMILATED_MULTIQUEEN); }
 
-    // --- Buildings (room/menu sprites: sprites/buildings/rooms/{chain}L{tier}.png, passive{Name}.png; refresh via scripts/sync_room_placeholders.sh) ---
+    // --- Buildings ---
     // -- Tier 0 --
     public static final Building ROYAL_CHAMBER_0 = new Building(1, "ROYAL_CHAMBER_0", 0, "ROYAL_CHAMBER_0_DESC", null, 0, 0, 0,
             BuildingSpriteResources.roomTier("royal", 0), BuildingSpriteResources.roomTier("royal", 0));
@@ -354,7 +354,7 @@ public final class GameUnlocks {
             BuildingSpriteResources.passiveRoom("composter"), BuildingSpriteResources.passiveRoom("composter"));
     static { buildings.add(BUILDING_COMPOSTER); }
 
-    /** Highest tier first for {@link com.grimidk.formicempire.classes.entities.services.ColonyRoomDecorationService}. */
+    /** Highest tier first for {@link com.grimidk.formicempire.classes.interfaces.game.rendering.RoomDecorationRenderer}. */
     public static final Building[] BUILDING_CHAIN_ROYAL = {
             ROYAL_CHAMBER_3, ROYAL_CHAMBER_2, ROYAL_CHAMBER_1, ROYAL_CHAMBER_0
     };

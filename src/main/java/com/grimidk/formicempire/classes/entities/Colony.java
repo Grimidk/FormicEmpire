@@ -103,11 +103,15 @@ public class Colony {
 
     // --- Service Dependencies ---
     private transient ColonyStatsService statsService;
+    private transient ColonySpatialService spatialService;
+    private transient ColonySourceService sourceService;
+    private transient ColonyPathfindingService pathfindingService;
     private transient ColonyLabourService labourService;
     private transient ColonyPopulationService populationService;
+    private transient ColonyDeathService deathService;
     private transient ColonyPhysicsService physicsService;
     private transient ColonyLocationService locationService;
-    private transient ColonySumarizationService sumarizationService;
+    private transient ColonySummarizationService summarizationService;
     private transient ColonyAutomationService automationService;
     private transient ColonyResourceService resourceService;
     private transient ColonyStarterService starterService;
@@ -116,11 +120,15 @@ public class Colony {
     // --- Service Initializer ---
     private void initializeServices() {
         this.statsService = new ColonyStatsService();
+        this.spatialService = new ColonySpatialService();
+        this.sourceService = new ColonySourceService(spatialService);
+        this.pathfindingService = new ColonyPathfindingService(spatialService);
+        this.locationService = new ColonyLocationService(spatialService, sourceService, pathfindingService);
         this.labourService = new ColonyLabourService();
         this.populationService = new ColonyPopulationService();
+        this.deathService = new ColonyDeathService();
         this.physicsService = new ColonyPhysicsService();
-        this.locationService = new ColonyLocationService();
-        this.sumarizationService = new ColonySumarizationService();
+        this.summarizationService = new ColonySummarizationService();
         this.automationService = new ColonyAutomationService(); 
         this.resourceService = new ColonyResourceService();
         this.starterService = ColonyStarterService.shared();
@@ -242,8 +250,8 @@ public class Colony {
         initializeAssignedRoles(); 
         initializeServices(); 
         
-        if (this.populationService != null && savedColony.localDeathStatistics != null) {
-            this.populationService.loadDeathStatistics(savedColony.localDeathStatistics);
+        if (this.deathService != null && savedColony.localDeathStatistics != null) {
+            this.deathService.loadDeathStatistics(savedColony.localDeathStatistics);
         }
         
         Map<String, Integer> savedRoles = savedColony.assignedRoleCounts;
@@ -376,7 +384,7 @@ public class Colony {
         this.totalDeaths++;
         this.deadAnts.add(ant);
         if (populationService != null) {
-            populationService.recordDeath(cause, this);
+            deathService.recordDeath(cause, this);
         }
     }
 
@@ -742,11 +750,15 @@ public class Colony {
 
     // --- Public getters for services ---
     public ColonyStatsService getStatsService() { return this.statsService; }
+    public ColonySpatialService getSpatialService() { return this.spatialService; }
+    public ColonySourceService getSourceService() { return this.sourceService; }
+    public ColonyPathfindingService getPathfindingService() { return this.pathfindingService; }
     public ColonyLabourService getLabourService() { return this.labourService; }
     public ColonyPopulationService getPopulationService() { return this.populationService; }
+    public ColonyDeathService getDeathService() { return this.deathService; }
     public ColonyPhysicsService getPhysicsService() { return this.physicsService; }
     public ColonyLocationService getLocationService() { return this.locationService; }
-    public ColonySumarizationService getSumarizationService() { return this.sumarizationService; }
+    public ColonySummarizationService getSummarizationService() { return this.summarizationService; }
     public ColonyAutomationService getAutomationService() { return this.automationService; }
     public ColonyResourceService getResourceService() { return this.resourceService; }
     public ColonyStarterService getStarterService() { return this.starterService; }
@@ -888,7 +900,7 @@ public class Colony {
             invalidateActiveRoleCountCache();
             this.runResearch();
             this.labourService.runTunnelConstruction(this);
-            this.sumarizationService.runHourlyLite(this, biome);
+            this.summarizationService.runHourlyLite(this, biome);
         }
     }
 
@@ -930,7 +942,7 @@ public class Colony {
             this.runContamination(); 
             this.runPolicing(); 
         } else {
-            this.sumarizationService.runDailyLite(this);
+            this.summarizationService.runDailyLite(this);
         }
 
         this.age++;

@@ -86,7 +86,10 @@ public class ColonyBugHandlingService {
         if (type == GameConstants.TYPE_DERMESTID) {
             return colony.getAssignedRoleCount(GameConstants.ROLE_GRAVER) * GameConstants.PET_CAPACITY_PER_TENDER;
         }
-        return Integer.MAX_VALUE;
+        if (type == GameConstants.TYPE_SOIL_MITE) {
+            return colony.getAssignedRoleCount(GameConstants.ROLE_CATCHER) * GameConstants.PET_CAPACITY_PER_TENDER;
+        }
+        return 0;
     }
 
     public int getMaxCapacity(Colony colony, BugType type) {
@@ -218,18 +221,24 @@ public class ColonyBugHandlingService {
         if (colony == null || type == null || !isPetBug(type)) {
             return;
         }
-        int safe = Math.max(0, count);
-        colony.applyPetBugCount(type, safe);
-        syncPetBugEntities(colony, type, safe);
+        int sane = Math.max(0, Math.min(count, petSaveLoadCap(colony, type)));
+        colony.applyPetBugCount(type, sane);
+        syncPetBugEntities(colony, type, sane);
+    }
+
+    private int petSaveLoadCap(Colony colony, BugType type) {
+        int fromRoles = getMaxCapacity(colony, type);
+        int fromScale = Math.max(
+                GameConstants.PARASITIC_MITE_MIN_MONTHLY_SPAWN,
+                colony.getAntTotal() * GameConstants.PET_CAPACITY_PER_TENDER);
+        return Math.max(fromRoles, Math.min(GameConstants.PET_COUNT_SAVE_ABS_MAX, fromScale));
     }
 
     public int resolvePetCountForSave(Colony colony, BugType type) {
         if (colony == null || type == null) {
             return 0;
         }
-        int stored = getCount(colony, type);
-        long entities = colony.getBugs().stream().filter(b -> b.getBugType() == type).count();
-        return (int) Math.max(stored, entities);
+        return getCount(colony, type);
     }
 
     public void syncPetBugEntities(Colony colony, BugType type, int targetCount) {
@@ -353,13 +362,22 @@ public class ColonyBugHandlingService {
             return;
         }
 
-        int spawnAmount = Math.max(
-                GameConstants.PARASITIC_MITE_MIN_MONTHLY_SPAWN,
-                colony.getAntTotal() * GameConstants.PARASITIC_MITE_PER_ANT);
         int existing = colony.getParasiticMites();
+        int cap = parasiticMiteCap(colony);
+        int room = cap - existing;
+        if (room <= 0) {
+            return;
+        }
+
+        int antTotal = colony.getAntTotal();
+        int spawnFromAnts = Math.max(
+                GameConstants.PARASITIC_MITE_MIN_MONTHLY_SPAWN,
+                antTotal * GameConstants.PARASITIC_MITE_PER_ANT);
+        int spawnAmount = spawnFromAnts;
         if (existing > 0) {
             spawnAmount += (int) (existing * GameConstants.PARASITIC_MITE_SPREAD_FACTOR);
         }
+        spawnAmount = Math.min(spawnAmount, room);
         if (spawnAmount <= 0) {
             return;
         }
@@ -369,11 +387,18 @@ public class ColonyBugHandlingService {
                 + String.format(LanguageStrings.get(LanguageStrings.LOG_PARASITIC_MITE_SPREAD_FMT), spawnAmount));
     }
 
+    private int parasiticMiteCap(Colony colony) {
+        int antTotal = colony.getAntTotal();
+        int fromPopulation = antTotal * GameConstants.PARASITIC_MITES_PER_SLOWED_ANT;
+        return Math.max(fromPopulation, GameConstants.PARASITIC_MITE_MIN_MONTHLY_SPAWN);
+    }
+
     public void setParasiticMiteCount(Colony colony, int count) {
         if (colony == null) {
             return;
         }
-        colony.applyParasiticMiteCount(count);
+        int capped = Math.min(Math.max(0, count), parasiticMiteCap(colony));
+        colony.applyParasiticMiteCount(capped);
         syncParasiticMiteInfections(colony);
     }
 

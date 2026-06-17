@@ -26,6 +26,7 @@ import com.grimidk.formicempire.classes.entities.Tunnel;
 import com.grimidk.formicempire.classes.entities.services.ColonyStarterService;
 import com.grimidk.formicempire.classes.entities.services.DynastyDeathService;
 import com.grimidk.formicempire.classes.entities.services.DynastyNamingService;
+import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
@@ -202,6 +203,16 @@ public class World {
     }
     
     public List<Dynasty> getDynastys() { return dynastys; }
+
+    public void bindDynastyTradeServices() {
+        if (engine == null || engine.getTradeManager() == null) {
+            return;
+        }
+        TradeManager tradeManager = engine.getTradeManager();
+        for (Dynasty dynasty : dynastys) {
+            dynasty.bindTradeManager(tradeManager);
+        }
+    }
     
     public int getWorldRadius() {
         return worldRadius;
@@ -364,6 +375,7 @@ public class World {
 
         linkNeighbors(hexMap);        
         printWorldToConsole(size, hexMap);
+        bindDynastyTradeServices();
     }
     
     private boolean isWaterBiome(Biome biome) {
@@ -751,7 +763,8 @@ public class World {
         }
 
         reapplyRoleAssignmentsAfterLoad();
-        
+        bindDynastyTradeServices();
+
         changeActiveHex(getSpawnHex()); 
         updateEnvironmentalConditions();
     }

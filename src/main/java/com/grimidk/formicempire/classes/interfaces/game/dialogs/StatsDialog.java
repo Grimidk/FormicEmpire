@@ -886,7 +886,7 @@ public class StatsDialog extends ZeroDialog {
 
         for (Colony c : coloniesToCount) {
             if (c.getPopulationService() != null) {
-                Map<String, Integer> stats = c.getPopulationService().getDeathStatistics();
+                Map<String, Integer> stats = c.getDeathService().getDeathStatistics();
                 for (Map.Entry<String, Integer> entry : stats.entrySet()) {
                     aggregateDeaths.merge(entry.getKey(), entry.getValue(), Integer::sum);
                 }

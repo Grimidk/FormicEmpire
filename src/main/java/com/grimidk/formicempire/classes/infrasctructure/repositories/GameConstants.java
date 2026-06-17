@@ -136,6 +136,7 @@ public final class GameConstants {
     public static final int PET_POOL_PER_CATCHER = 10;
     public static final int PET_CAPACITY_PER_TENDER = 10;
     public static final int PET_BREED_MIN_COUNT = 2;
+    public static final int PET_COUNT_SAVE_ABS_MAX = 10_000;
     public static final float CATCH_BASE_CHANCE_PER_CATCHER = 0.12f;
     public static final int SOIL_MITE_PARASITIC_MITE_KILL_PER_DAY = 5;
     public static final int SOIL_MITE_PARASITIC_MITE_KILL_UPGRADED = 12;
@@ -143,8 +144,8 @@ public final class GameConstants {
     public static final int PARASITIC_MITE_RESOURCE_THRESHOLD = 10_000;
     public static final float PARASITIC_MITE_MONTHLY_SPAWN_CHANCE = 0.65f;
     public static final int PARASITIC_MITE_MIN_MONTHLY_SPAWN = 1_000;
-    public static final int PARASITIC_MITE_PER_ANT = 50;
-    public static final float PARASITIC_MITE_SPREAD_FACTOR = 0.50f;
+    public static final int PARASITIC_MITE_PER_ANT = 1;
+    public static final float PARASITIC_MITE_SPREAD_FACTOR = 0.10f;
     public static final int PARASITIC_MITES_PER_SLOWED_ANT = 10;
     public static final float PARASITIC_MITE_SPEED_MULTIPLIER = 0.5f;
 

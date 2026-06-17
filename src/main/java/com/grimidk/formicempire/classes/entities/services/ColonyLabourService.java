@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
@@ -724,15 +722,6 @@ public class ColonyLabourService {
                     colony.logEvent(ColonyLogPrefixes.SUCCESS + " "
                         + String.format(LanguageStrings.get(LanguageStrings.LOG_SUCCESS_ASSIMILATION_FMT),
                             a.getName(), a.getReward().getFlavorName()));
-                    
-                    if (colony.isPlayer()) {
-                        SwingUtilities.invokeLater(() -> {
-                            JOptionPane.showMessageDialog(null,
-                                String.format(LanguageStrings.get(LanguageStrings.ASSIMILATION_DIALOG_SUCCESS_BODY),
-                                    a.getName(), a.getReward().getFlavorName()),
-                                LanguageStrings.get(LanguageStrings.ASSIMILATION_DIALOG_SUCCESS_TITLE), JOptionPane.INFORMATION_MESSAGE);
-                        });
-                    }
                     
                     dynasty.setCurrentAssimilation(null);
                     dynasty.setAssimilationProgress(0);

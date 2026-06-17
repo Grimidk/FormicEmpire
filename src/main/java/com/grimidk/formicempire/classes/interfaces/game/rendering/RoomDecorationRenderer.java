@@ -1,7 +1,8 @@
-package com.grimidk.formicempire.classes.entities.services;
+package com.grimidk.formicempire.classes.interfaces.game.rendering;
 
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.services.ColonySpatialLayout;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 
@@ -17,9 +18,9 @@ import java.util.List;
 
 import javax.swing.ImageIcon;
 
-public final class ColonyRoomDecorationService {
+public final class RoomDecorationRenderer {
 
-    private ColonyRoomDecorationService() {
+    private RoomDecorationRenderer() {
     }
 
     public static Building highestUnlocked(Colony colony, Building[] chainHighestFirst) {
@@ -52,22 +53,22 @@ public final class ColonyRoomDecorationService {
     }
 
     static Rectangle decorationInteriorRect(int rx, int ry, int rw, int rh) {
-        int hallCx = ColonyLocationService.ANCHOR_CENTER_X;
+        int hallCx = ColonySpatialLayout.ANCHOR_CENTER_X;
         double centerX = rx + rw / 2.0;
         boolean isRightSide = centerX > hallCx;
-        int pLeft = ColonyLocationService.PAD_WALL;
-        int pRight = ColonyLocationService.PAD_WALL;
+        int pLeft = ColonySpatialLayout.PAD_WALL;
+        int pRight = ColonySpatialLayout.PAD_WALL;
         if (Math.abs(centerX - hallCx) < rw + 200) {
             if (isRightSide) {
-                pLeft = ColonyLocationService.PAD_DOOR;
+                pLeft = ColonySpatialLayout.PAD_DOOR;
             } else {
-                pRight = ColonyLocationService.PAD_DOOR;
+                pRight = ColonySpatialLayout.PAD_DOOR;
             }
         }
         int ix = rx + pLeft;
-        int iy = ry + ColonyLocationService.PAD_TOP;
+        int iy = ry + ColonySpatialLayout.PAD_TOP;
         int iw = rw - pLeft - pRight;
-        int ih = rh - ColonyLocationService.PAD_TOP - ColonyLocationService.PAD_BOTTOM;
+        int ih = rh - ColonySpatialLayout.PAD_TOP - ColonySpatialLayout.PAD_BOTTOM;
         return new Rectangle(ix, iy, Math.max(1, iw), Math.max(1, ih));
     }
 

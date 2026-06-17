@@ -7,18 +7,11 @@ import java.util.Random;
 import com.grimidk.formicempire.classes.infrasctructure.NeoPoint;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 
-/**
- * Overworld resource-node placement: keeps nodes outside the default viewport and away from the nest entrance.
- */
 public final class ResourceSourcePlacement {
 
     private ResourceSourcePlacement() {
     }
 
-    /**
-     * Minimum center-to-entrance distance so a square sprite of {@code displaySizePx} does not intersect the
-     * viewport rectangle {@code [0, viewportW) x [0, viewportH)} when the scroll view is centered on the nest.
-     */
     public static int minSpawnDistanceFromEntrance(
             int entranceX, int entranceY, int viewportW, int viewportH, int displaySizePx) {
         int half = Math.max(1, displaySizePx / 2);
@@ -33,9 +26,6 @@ public final class ResourceSourcePlacement {
         return farthestCorner + half + margin;
     }
 
-    /**
-     * Picks a spawn center at least {@link #minSpawnDistanceFromEntrance} plus {@code extraDistance} from the entrance.
-     */
     public static Point pickSpawnCenter(
             NeoPoint entrance, int viewportW, int viewportH, int displaySizePx, int extraDistance, Random random) {
         int minDist = minSpawnDistanceFromEntrance(
@@ -47,16 +37,11 @@ public final class ResourceSourcePlacement {
         return new Point(cx, cy);
     }
 
-    /** Top-left of the drawn sprite given center and square display size. */
     public static Point topLeftFromCenter(int centerX, int centerY, int displaySizePx) {
         int half = displaySizePx / 2;
         return new Point(centerX - half, centerY - half);
     }
 
-    /**
-     * Returns true when the axis-aligned square of {@code displaySizePx} at {@code topLeft} is fully outside
-     * the viewport content rect.
-     */
     public static boolean isFullyOutsideViewport(Point topLeft, int displaySizePx, int viewportW, int viewportH) {
         Rectangle viewport = new Rectangle(0, 0, Math.max(1, viewportW), Math.max(1, viewportH));
         Rectangle sprite = new Rectangle(topLeft.x, topLeft.y, displaySizePx, displaySizePx);

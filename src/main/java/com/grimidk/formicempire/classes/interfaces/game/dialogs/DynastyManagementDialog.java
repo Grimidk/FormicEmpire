@@ -9,7 +9,6 @@ import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.Trade;
 import com.grimidk.formicempire.classes.entities.Tunnel;
-import com.grimidk.formicempire.classes.entities.services.DynastyTradeService;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
@@ -57,7 +56,7 @@ public class DynastyManagementDialog extends ZeroDialog {
         this.dynasty = dynasty;
         this.engine = engine;
         this.onGoToColony = onGoToColony;
-        new DynastyTradeService(dynasty, engine.getTradeManager());
+        dynasty.bindTradeManager(engine.getTradeManager());
 
         tabbedPane = new JTabbedPane();
         tabbedPane.setFocusable(false);
@@ -334,8 +333,8 @@ public class DynastyManagementDialog extends ZeroDialog {
                 String neighborName = neighborColony.getName();
                 Tunnel tunnel = dynasty.getTunnelBetween(currentHex, neighborHex);
                 
-                Trade outgoing = findTrade(activeColony, neighborColony);
-                Trade incoming = findTrade(neighborColony, activeColony);
+                Trade outgoing = dynasty.getTradeService().findTrade(activeColony, neighborColony);
+                Trade incoming = dynasty.getTradeService().findTrade(neighborColony, activeColony);
                 
                 String outStatus = formatTradeStatus(outgoing);
                 String inStatus = formatTradeStatus(incoming);
@@ -362,24 +361,10 @@ public class DynastyManagementDialog extends ZeroDialog {
         }
 
         private Trade findTrade(Colony origin, Colony destination) {
-            if (origin == null || destination == null) return null;
-            List<Trade> all = engine.getTradeManager().getActiveTrades();
-            
-            for (Trade t : all) {
-                if (!t.isActive()) continue;
-                Colony tOrigin = t.getOrigin().getColony();
-                Colony tDest = t.getDestination().getColony();
-                
-                if (tOrigin == origin && tDest == destination) {
-                    return t;
-                }
-                
-                if (tOrigin != null && tDest != null && 
-                    tOrigin.getId() == origin.getId() && tDest.getId() == destination.getId()) {
-                    return t;
-                }
+            if (dynasty.getTradeService() == null) {
+                return null;
             }
-            return null;
+            return dynasty.getTradeService().findTrade(origin, destination);
         }
 
         private String formatTradeStatus(Trade trade) {

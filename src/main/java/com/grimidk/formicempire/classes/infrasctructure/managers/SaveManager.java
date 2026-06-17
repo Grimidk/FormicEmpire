@@ -524,7 +524,7 @@ public class SaveManager {
                     }
                     
                     if (c.getPopulationService() != null) {
-                        sc.localDeathStatistics = new HashMap<>(c.getPopulationService().getDeathStatistics());
+                        sc.localDeathStatistics = new HashMap<>(c.getDeathService().getDeathStatistics());
                     }
 
                     for (Building b : c.getUnlockedBuildings()) sc.unlockedBuildingIds.add(b.getId());

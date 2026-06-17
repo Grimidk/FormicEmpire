@@ -16,8 +16,10 @@ import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
 import com.grimidk.formicempire.classes.entities.services.DynastyAutomationService;
 import com.grimidk.formicempire.classes.entities.services.DynastyStarterService;
 import com.grimidk.formicempire.classes.entities.services.DynastyStatService;
+import com.grimidk.formicempire.classes.entities.services.DynastyTradeService;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.World;
+import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
@@ -56,6 +58,7 @@ public class Dynasty {
     private transient DynastyAutomationService automationService;
     private transient DynastyStarterService starterService;
     private transient DynastyStatService statService;
+    private transient DynastyTradeService tradeService;
 
     public Dynasty(int id, String name, boolean isPlayer, Species species) {
         this.id = id;
@@ -392,8 +395,17 @@ public class Dynasty {
     
     public Map<String, Integer> getGlobalDeathStatistics() { return globalDeathStatistics; }
     
+    public void bindTradeManager(TradeManager tradeManager) {
+        if (tradeManager == null) {
+            this.tradeService = null;
+            return;
+        }
+        this.tradeService = new DynastyTradeService(this, tradeManager);
+    }
+
     public DynastyStarterService getStarterService() { return starterService; }
     public DynastyStatService getStatService() { return statService; }
+    public DynastyTradeService getTradeService() { return tradeService; }
 
     public double getMinGeneticIntegrity() {
         if (hasUpgrade(GameUnlocks.ABILITY_CLONING)) {

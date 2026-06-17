@@ -10,56 +10,61 @@ import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstan
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
 
-public class ColonySumarizationService {
+public final class ColonyJobRules {
 
-    private final Random random = new Random();
-
-    public void runHourlyLite(Colony colony, Biome biome) {
-        simulateProduction(colony);
-        simulateResearch(colony);
-        simulateBuilding(colony); 
-        simulateLaying(colony);
-        simulateRanching(colony, biome);
+    private ColonyJobRules() {
     }
 
-    public void runDailyLite(Colony colony) {
+    public static void runHourlyLite(Colony colony, Biome biome, Random random) {
+        applyHourlyProduction(colony, random);
+        applyHourlyResearch(colony);
+        applyHourlyBuilding(colony);
+        applyHourlyLaying(colony, random);
+        applyHourlyRanching(colony);
+    }
+
+    public static void runDailyLite(Colony colony, Random random) {
         colony.rankUp();
-        simulateNursing(colony);
-        simulateEating(colony);
+        applyDailyNursing(colony, random);
+        applyDailyEating(colony, random);
         colony.getPopulationService().runHatching(colony);
         colony.getPopulationService().runAging(colony);
-        
-        simulateComposting(colony);
-        simulateGraveKeeping(colony);
-        simulatePolicing(colony);
-        
+        applyDailyComposting(colony);
+        applyDailyGraveKeeping(colony);
+        applyDailyPolicing(colony, random);
         if (colony.isPlayer()) {
             colony.getPopulationService().runContamination(colony);
         }
     }
 
-    private void simulateProduction(Colony colony) {
+    public static void applyHourlyProduction(Colony colony, Random random) {
         ColonyStatsService stats = colony.getStatsService();
-        ColonyLocationService loc = colony.getLocationService();
+        ColonySourceService sources = colony.getSourceService();
         ColonyResourceService resources = colony.getResourceService();
-        
-        int plantGain = probabilisticRound(stats.getPlantProductionHourly(colony));
-        int waterGain = probabilisticRound(stats.getWaterProductionHourly(colony));
-        int meatGain = probabilisticRound(stats.getProteinProductionHourly(colony));
-        int rockGain = probabilisticRound(stats.getMineralProductionHourly(colony));
 
-        if (loc.getTotalQuantityAvailable(GameConstants.RESOURCE_PLANT) <= 0) plantGain = 0;
+        int plantGain = probabilisticRound(stats.getPlantProductionHourly(colony), random);
+        int waterGain = probabilisticRound(stats.getWaterProductionHourly(colony), random);
+        int meatGain = probabilisticRound(stats.getProteinProductionHourly(colony), random);
+        int rockGain = probabilisticRound(stats.getMineralProductionHourly(colony), random);
 
-        if (loc.getTotalQuantityAvailable(GameConstants.RESOURCE_WATER) <= 0) {
-            double passiveOnly = 0; 
-             if (colony.hasBuilding(GameUnlocks.PASSIVE_WATER)) {
+        if (sources.getTotalQuantityAvailable(GameConstants.RESOURCE_PLANT) <= 0) {
+            plantGain = 0;
+        }
+
+        if (sources.getTotalQuantityAvailable(GameConstants.RESOURCE_WATER) <= 0) {
+            double passiveOnly = 0;
+            if (colony.hasBuilding(GameUnlocks.PASSIVE_WATER)) {
                 double dailyPct = colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1) ? 0.20 : 0.10;
                 passiveOnly = (stats.getWaterCapacity(colony) * dailyPct) / 24.0;
             }
-            waterGain = probabilisticRound(passiveOnly);
+            waterGain = probabilisticRound(passiveOnly, random);
         }
-        if (loc.getTotalQuantityAvailable(GameConstants.RESOURCE_MEAT) <= 0) meatGain = 0;
-        if (loc.getTotalQuantityAvailable(GameConstants.RESOURCE_ROCK) <= 0) rockGain = 0;
+        if (sources.getTotalQuantityAvailable(GameConstants.RESOURCE_MEAT) <= 0) {
+            meatGain = 0;
+        }
+        if (sources.getTotalQuantityAvailable(GameConstants.RESOURCE_ROCK) <= 0) {
+            rockGain = 0;
+        }
 
         resources.addResource(colony, GameConstants.RESOURCE_PLANT, plantGain);
         resources.addResource(colony, GameConstants.RESOURCE_WATER, waterGain);
@@ -69,25 +74,25 @@ public class ColonySumarizationService {
         if (resources.hasCapacity(colony, GameConstants.RESOURCE_FUNGI)) {
             int farmerCount = stats.getEffectiveFarmerCount(colony);
             float convertRate = stats.getConversionRate(colony);
-            
-            int maxConvert = probabilisticRound(farmerCount * convertRate * 60);
-            
+
+            int maxConvert = probabilisticRound(farmerCount * convertRate * 60, random);
+
             if (maxConvert > 0) {
                 int actualConverted = 0;
 
                 double plantConvert = resources.consumeResource(colony, GameConstants.RESOURCE_PLANT, maxConvert);
                 if (plantConvert > 0) {
                     actualConverted += plantConvert;
-                    maxConvert -= plantConvert;
+                    maxConvert -= (int) plantConvert;
                 }
 
                 if (maxConvert > 0) {
                     double meatConvert = resources.consumeResource(colony, GameConstants.RESOURCE_MEAT, maxConvert);
                     if (meatConvert > 0) {
-                        actualConverted += (meatConvert * 2); 
+                        actualConverted += (meatConvert * 2);
                     }
                 }
-                
+
                 if (actualConverted > 0) {
                     resources.addResource(colony, GameConstants.RESOURCE_FUNGI, actualConverted);
                 }
@@ -95,36 +100,37 @@ public class ColonySumarizationService {
         }
     }
 
-    private void simulateRanching(Colony colony, Biome biome) {
-        if (!colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) return;
-        
+    public static void applyHourlyRanching(Colony colony) {
+        if (!colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) {
+            return;
+        }
+
         ColonyResourceService resources = colony.getResourceService();
-        int syrupGain = colony.getAphids(); 
-        double plantConsumption = syrupGain * 0.10; 
+        int syrupGain = colony.getAphids();
+        double plantConsumption = syrupGain * 0.10;
 
         double actualPlantsConsumed = resources.consumeResource(colony, GameConstants.RESOURCE_PLANT, plantConsumption);
-        
+
         if (actualPlantsConsumed > 0) {
             double ratio = actualPlantsConsumed / plantConsumption;
             resources.addResource(colony, GameConstants.RESOURCE_SYRUP, syrupGain * ratio);
         }
     }
 
-    private int probabilisticRound(double value) {
-        int floor = (int) value;
-        return (random.nextDouble() < (value - floor)) ? floor + 1 : floor;
-    }
-
-    private void simulateLaying(Colony colony) {
+    public static void applyHourlyLaying(Colony colony, Random random) {
         int layerCount = colony.getAssignedRoleCount(GameConstants.ROLE_LAYER);
-        if (layerCount <= 0) return;
+        if (layerCount <= 0) {
+            return;
+        }
 
         int spaceAvailable = colony.getStatsService().getEggsCapacity(colony) - colony.getEggs().size();
-        if (spaceAvailable <= 0) return;
+        if (spaceAvailable <= 0) {
+            return;
+        }
 
-        int toLay = probabilisticRound(layerCount * colony.getStatsService().getLayingRate(colony));
+        int toLay = probabilisticRound(layerCount * colony.getStatsService().getLayingRate(colony), random);
         toLay = Math.min(toLay, spaceAvailable);
-        
+
         List<Ant> eggs = colony.getEggs();
         for (int i = 0; i < toLay; i++) {
             Ant newEgg = new Ant(colony, GameConstants.TYPE_EGG);
@@ -134,195 +140,241 @@ public class ColonySumarizationService {
         }
     }
 
-    private void simulateEating(Colony colony) {
+    public static void applyDailyEating(Colony colony, Random random) {
         ColonyStatsService stats = colony.getStatsService();
         ColonyResourceService resources = colony.getResourceService();
-        
+
         int totalConsumption = stats.getTotalConsumption(colony);
         totalConsumption += colony.getParasites();
 
         double consumedFood = resources.consumeResource(colony, GameConstants.RESOURCE_FUNGI, totalConsumption);
         double foodDeficit = totalConsumption - consumedFood;
-        
+
         if (foodDeficit > 0) {
             double consumedSyrup = resources.consumeResource(colony, GameConstants.RESOURCE_SYRUP, foodDeficit);
             foodDeficit -= consumedSyrup;
-            
+
             if (foodDeficit > 0) {
-                handleStarvation(colony, (int) foodDeficit, "Starvation");
+                applyStarvation(colony, (int) foodDeficit, "Starvation", random);
             }
         }
-        
+
         int waterDemand = stats.getWaterConsumption(colony);
         double consumedWater = resources.consumeResource(colony, GameConstants.RESOURCE_WATER, waterDemand);
         double waterDeficit = waterDemand - consumedWater;
-        
+
         if (waterDeficit > 0) {
             double consumedSyrup = resources.consumeResource(colony, GameConstants.RESOURCE_SYRUP, waterDeficit);
             waterDeficit -= consumedSyrup;
-            
+
             if (waterDeficit > 0) {
-                handleStarvation(colony, (int) (waterDeficit / 2), "Dehydration");
+                applyStarvation(colony, (int) (waterDeficit / 2), "Dehydration", random);
             }
         }
     }
 
-    private void handleStarvation(Colony colony, int deficit, String cause) {
-        int deaths = deficit / 5; 
-        
-        if (deaths <= 0 && deficit > 0 && random.nextFloat() < 0.2) deaths = 1; 
-
-        if (deaths <= 0) return;
-
-        List<Ant> workers = colony.getWorkers();
-        int killed = 0;
-        
-        for (int i = workers.size() - 1; i >= 0; i--) {
-            if (killed >= deaths) break;
-            Ant victim = workers.remove(i);
-            colony.recordAntDeath(victim, cause);
-            killed++;
-        }
-    }
-
-    private void simulateNursing(Colony colony) {
+    public static void applyDailyNursing(Colony colony, Random random) {
         int nurseCount = colony.getAssignedRoleCount(GameConstants.ROLE_NURSE);
-        if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) nurseCount += 2;
-        else if (colony.hasBuilding(GameUnlocks.PASSIVE_LAB)) nurseCount += 1; 
+        if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
+            nurseCount += 2;
+        } else if (colony.hasBuilding(GameUnlocks.PASSIVE_LAB)) {
+            nurseCount += 1;
+        }
 
         float nursingRate = colony.getStatsService().getNursingRate(colony);
         int capacity = (int) (nurseCount * nursingRate);
-        
+
         int totalBrood = colony.getEggs().size() + colony.getLarvae().size() + colony.getPupae().size();
-        
+
         if (totalBrood > capacity) {
             int toCull = totalBrood - capacity;
-            
-            int killedEggs = performCulling(colony, colony.getEggs(), toCull);
+
+            int killedEggs = cullBrood(colony, colony.getEggs(), toCull);
             toCull -= killedEggs;
-            
+
             if (toCull > 0) {
-                int killedLarvae = performCulling(colony, colony.getLarvae(), toCull);
+                int killedLarvae = cullBrood(colony, colony.getLarvae(), toCull);
                 toCull -= killedLarvae;
             }
-            
+
             if (toCull > 0) {
-                performCulling(colony, colony.getPupae(), toCull);
+                cullBrood(colony, colony.getPupae(), toCull);
             }
         }
     }
 
-    private int performCulling(Colony colony, List<Ant> broodList, int amount) {
-        int removed = 0;
-        for (int i = broodList.size() - 1; i >= 0; i--) {
-            if (removed >= amount) break;
-            Ant victim = broodList.remove(i);
-            colony.recordAntDeath(victim, "Lack of Care");
-            removed++;
+    public static void applyDailyComposting(Colony colony) {
+        if (!colony.hasBuilding(GameUnlocks.BUILDING_COMPOSTER)) {
+            return;
         }
-        return removed;
-    }
 
-    private void simulateComposting(Colony colony) {
-        if (!colony.hasBuilding(GameUnlocks.BUILDING_COMPOSTER)) return;
-        
         List<Ant> deadAnts = colony.getDeadAnts();
         int graverCount = colony.getAssignedRoleCount(GameConstants.ROLE_GRAVER);
         int potentialCompost = (int) colony.getStatsService().getGravingRate(colony) * graverCount;
-        
-        if (potentialCompost == 0 || deadAnts.isEmpty()) return;
+
+        if (potentialCompost == 0 || deadAnts.isEmpty()) {
+            return;
+        }
 
         int actualToCompost = Math.min(potentialCompost, deadAnts.size());
-        
-        for(int i = 0; i < actualToCompost; i++) {
+
+        for (int i = 0; i < actualToCompost; i++) {
             deadAnts.remove(deadAnts.size() - 1);
         }
 
-        int mushroomGain = actualToCompost * 4; 
+        int mushroomGain = actualToCompost * 4;
         colony.getResourceService().addResource(colony, GameConstants.RESOURCE_FUNGI, mushroomGain);
     }
-    
-    private void simulateGraveKeeping(Colony colony) {
+
+    public static void applyDailyGraveKeeping(Colony colony) {
         int graverCount = colony.getAssignedRoleCount(GameConstants.ROLE_GRAVER);
-        
+
         if (colony.hasBuilding(GameUnlocks.PASSIVE_GRAVE)) {
-            if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) graverCount += 2;
-            else graverCount += 1;
+            if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
+                graverCount += 2;
+            } else {
+                graverCount += 1;
+            }
         }
 
-        if (graverCount <= 0) return;
-        
+        if (graverCount <= 0) {
+            return;
+        }
+
         float gravingRate = colony.getStatsService().getGravingRate(colony);
         int cleanCapacity = (int) (graverCount * gravingRate);
-        
-        if (cleanCapacity <= 0) return;
+
+        if (cleanCapacity <= 0) {
+            return;
+        }
 
         List<Ant> deadAnts = colony.getDeadAnts();
         int removed = 0;
-        
+
         for (int i = deadAnts.size() - 1; i >= 0; i--) {
-            if (removed >= cleanCapacity) break;
+            if (removed >= cleanCapacity) {
+                break;
+            }
             deadAnts.remove(i);
             removed++;
         }
     }
 
-    private void simulatePolicing(Colony colony) {
-        if (!colony.hasUpgrade(GameUnlocks.ROLE_POLICE)) return;
-        
+    public static void applyDailyPolicing(Colony colony, Random random) {
+        if (!colony.hasUpgrade(GameUnlocks.ROLE_POLICE)) {
+            return;
+        }
+
         int parasiteCount = colony.getParasites();
-        if (parasiteCount == 0) return;
-        
+        if (parasiteCount == 0) {
+            return;
+        }
+
         int policeCount = colony.getAssignedRoleCount(GameConstants.ROLE_POLICE);
-        if (policeCount == 0) return;
-        
+        if (policeCount == 0) {
+            return;
+        }
+
         float detectionRate = colony.getStatsService().getParasiteDetection(colony);
         int parasitesKilled = 0;
-        
+
         for (int i = 0; i < policeCount; i++) {
-            if (parasitesKilled >= parasiteCount) break;
+            if (parasitesKilled >= parasiteCount) {
+                break;
+            }
             if (random.nextFloat() < detectionRate) {
                 parasitesKilled++;
                 colony.getResourceService().addResource(colony, GameConstants.RESOURCE_MEAT, 4);
             }
         }
-        
+
         if (parasitesKilled > 0) {
             colony.setParasites(Math.max(0, colony.getParasites() - parasitesKilled));
         }
     }
 
-    private void simulateResearch(Colony colony) {
-        if (!colony.hasUpgrade(GameUnlocks.ROLE_RESEARCHER)) return;
+    public static void applyHourlyResearch(Colony colony) {
+        if (!colony.hasUpgrade(GameUnlocks.ROLE_RESEARCHER)) {
+            return;
+        }
         int researcherCount = colony.getAssignedRoleCount(GameConstants.ROLE_RESEARCHER);
-        
+
         if (colony.hasBuilding(GameUnlocks.PASSIVE_LAB)) {
-            if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) researcherCount += 2;
-            else researcherCount += 1;
+            if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
+                researcherCount += 2;
+            } else {
+                researcherCount += 1;
+            }
         }
 
         int assistantCount = colony.getAssignedRoleCount(GameConstants.ROLE_ASSISTANT);
         int speed = colony.getStatsService().getResearchSpeed(colony);
-        
+
         int queenGain = researcherCount * speed;
         int assistantGain = (int) (assistantCount * (speed / 5.0));
 
         colony.addResearchPoints(queenGain + assistantGain);
     }
 
-    private void simulateBuilding(Colony colony) {
-        if (colony.getCurrentBuildingProject() == null) return;
-        
+    public static void applyHourlyBuilding(Colony colony) {
+        if (colony.getCurrentBuildingProject() == null) {
+            return;
+        }
+
         double efficiency = colony.getConstructionEfficiency();
-        if (efficiency <= 0) return;
-        
+        if (efficiency <= 0) {
+            return;
+        }
+
         colony.setBuildingProgressHours(colony.getBuildingProgressHours() + 1.0);
-        
+
         double required = colony.getCurrentBuildingProject().getBuildTime() / efficiency;
         if (colony.getBuildingProgressHours() >= required) {
             colony.unlockBuilding(colony.getCurrentBuildingProject());
             colony.setCurrentBuildingProject(null);
             colony.setBuildingProgressHours(0.0);
         }
+    }
+
+    private static int probabilisticRound(double value, Random random) {
+        int floor = (int) value;
+        return (random.nextDouble() < (value - floor)) ? floor + 1 : floor;
+    }
+
+    private static void applyStarvation(Colony colony, int deficit, String cause, Random random) {
+        int deaths = deficit / 5;
+
+        if (deaths <= 0 && deficit > 0 && random.nextFloat() < 0.2) {
+            deaths = 1;
+        }
+
+        if (deaths <= 0) {
+            return;
+        }
+
+        List<Ant> workers = colony.getWorkers();
+        int killed = 0;
+
+        for (int i = workers.size() - 1; i >= 0; i--) {
+            if (killed >= deaths) {
+                break;
+            }
+            Ant victim = workers.remove(i);
+            colony.recordAntDeath(victim, cause);
+            killed++;
+        }
+    }
+
+    private static int cullBrood(Colony colony, List<Ant> broodList, int amount) {
+        int removed = 0;
+        for (int i = broodList.size() - 1; i >= 0; i--) {
+            if (removed >= amount) {
+                break;
+            }
+            Ant victim = broodList.remove(i);
+            colony.recordAntDeath(victim, "Lack of Care");
+            removed++;
+        }
+        return removed;
     }
 }
