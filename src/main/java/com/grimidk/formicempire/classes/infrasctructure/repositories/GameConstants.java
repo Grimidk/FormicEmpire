@@ -137,7 +137,13 @@ public final class GameConstants {
     public static final int PET_CAPACITY_PER_TENDER = 10;
     public static final int PET_BREED_MIN_COUNT = 2;
     public static final int PET_COUNT_SAVE_ABS_MAX = 10_000;
+    /** Max dead ants / pet bug sprites drawn or simulated as entities; gameplay counts may be higher. */
+    public static final int MAX_VISIBLE_SPRITE_COUNT = 1_000;
     public static final float CATCH_BASE_CHANCE_PER_CATCHER = 0.12f;
+
+    public static int capVisibleSprites(int count) {
+        return Math.min(Math.max(0, count), MAX_VISIBLE_SPRITE_COUNT);
+    }
     public static final int SOIL_MITE_PARASITIC_MITE_KILL_PER_DAY = 5;
     public static final int SOIL_MITE_PARASITIC_MITE_KILL_UPGRADED = 12;
 

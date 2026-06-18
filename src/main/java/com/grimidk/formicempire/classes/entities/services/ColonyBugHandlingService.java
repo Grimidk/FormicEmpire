@@ -244,10 +244,11 @@ public class ColonyBugHandlingService {
         if (colony == null || type == null) {
             return;
         }
+        int entityCount = GameConstants.capVisibleSprites(targetCount);
         List<Bug> bugs = colony.getBugs();
         long current = bugs.stream().filter(b -> b.getBugType() == type).count();
-        if (current < targetCount) {
-            int diff = targetCount - (int) current;
+        if (current < entityCount) {
+            int diff = entityCount - (int) current;
             Rectangle pen = resolvePenBounds(colony, type);
             if (pen == null) {
                 pen = new Rectangle(10, 10, 256, 256);
@@ -262,8 +263,8 @@ public class ColonyBugHandlingService {
                 }
                 bugs.add(newBug);
             }
-        } else if (current > targetCount) {
-            int diff = (int) current - targetCount;
+        } else if (current > entityCount) {
+            int diff = (int) current - entityCount;
             List<Bug> toRemove = new ArrayList<>();
             for (Bug b : bugs) {
                 if (b.getBugType() == type) {

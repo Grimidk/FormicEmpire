@@ -145,6 +145,23 @@ class ColonyBugHandlingServiceTest {
     }
 
     @Test
+    void petBugEntitiesCapAtVisibleSpriteLimitWhileCountsStayFull() {
+        for (int i = 0; i < 600; i++) {
+            colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+        }
+        service.restorePetCountsFromSave(colony, 5_000, 5_000, 5_000);
+        assertEquals(5_000, colony.getAphids());
+        assertEquals(5_000, colony.getSoilMites());
+        assertEquals(5_000, colony.getDermestids());
+        assertEquals(GameConstants.MAX_VISIBLE_SPRITE_COUNT,
+                colony.getBugs().stream().filter(b -> b.getBugType() == GameConstants.TYPE_APHID).count());
+        assertEquals(GameConstants.MAX_VISIBLE_SPRITE_COUNT,
+                colony.getBugs().stream().filter(b -> b.getBugType() == GameConstants.TYPE_SOIL_MITE).count());
+        assertEquals(GameConstants.MAX_VISIBLE_SPRITE_COUNT,
+                colony.getBugs().stream().filter(b -> b.getBugType() == GameConstants.TYPE_DERMESTID).count());
+    }
+
+    @Test
     void soilMiteUpgradeKillsMoreParasiticMites() {
         colony.getDynasty().unlockUpgrade(GameUnlocks.STAT_SOIL_MITE_1);
         service.setCount(colony, GameConstants.TYPE_SOIL_MITE, 1);
