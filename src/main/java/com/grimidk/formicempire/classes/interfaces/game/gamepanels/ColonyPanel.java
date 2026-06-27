@@ -3,9 +3,13 @@ package com.grimidk.formicempire.classes.interfaces.game.gamepanels;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
+import com.grimidk.formicempire.classes.constants.world.Biome;
+import com.grimidk.formicempire.classes.constants.world.Season;
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.services.ColonyLocationService;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
+import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
@@ -56,7 +60,7 @@ public class ColonyPanel extends ZeroGamePanel {
     private final JLabel graveKeepingLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.COLONY_GRAVE_CLEANING), 0, 0));
     private final JLabel petInsectsLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.COLONY_PET_INSECTS), 0, 0));
     private final JLabel parasiticMiteCountLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.COLONY_PARASITIC_MITES), 0, 0));
-    private final JLabel parasiteCountLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.COLONY_PARASITES), LanguageStrings.get(LanguageStrings.WORLD_NA))); 
+    private final JLabel parasiteAntCountLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.COLONY_PARASITE_ANTS), LanguageStrings.get(LanguageStrings.WORLD_NA))); 
     private final JLabel policeStatsLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.COLONY_POLICING), 0)); 
     private final JLabel researchPointsLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.COLONY_RESEARCH), 0));
     private final JLabel researchRateLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.COLONY_RESEARCH_RATE), 0));
@@ -109,7 +113,7 @@ public class ColonyPanel extends ZeroGamePanel {
         graveKeepingLabel.setVisible(false);
         petInsectsLabel.setVisible(false);
         parasiticMiteCountLabel.setVisible(false);
-        parasiteCountLabel.setVisible(false);
+        parasiteAntCountLabel.setVisible(false);
         policeStatsLabel.setVisible(false);
         researchPointsLabel.setVisible(false);
         researchRateLabel.setVisible(false);
@@ -138,7 +142,7 @@ public class ColonyPanel extends ZeroGamePanel {
         // Special Icons & Tooltips
         petInsectsLabel.setIcon(GameConstants.ICON_APHID);
         parasiticMiteCountLabel.setIcon(GameConstants.ICON_PARASITIC_MITE);
-        parasiteCountLabel.setIcon(GameConstants.TYPE_PARASITE.getIcon());
+        parasiteAntCountLabel.setIcon(GameConstants.TYPE_PARASITE_ANT.getIcon());
         policeStatsLabel.setIcon(GameConstants.TYPE_SOLDIER.getIcon());
         researchPointsLabel.setIcon(GameConstants.ICON_RESEARCH);
         
@@ -178,7 +182,7 @@ public class ColonyPanel extends ZeroGamePanel {
         
         petInsectsLabel.setToolTipText(LanguageStrings.get(LanguageStrings.TOOLTIP_PET_INSECTS));
         parasiticMiteCountLabel.setToolTipText(LanguageStrings.get(LanguageStrings.TOOLTIP_PARASITIC_MITES));
-        parasiteCountLabel.setToolTipText(LanguageStrings.get(LanguageStrings.TOOLTIP_PARASITES));
+        parasiteAntCountLabel.setToolTipText(LanguageStrings.get(LanguageStrings.TOOLTIP_PARASITE_ANTS));
         policeStatsLabel.setToolTipText(LanguageStrings.get(LanguageStrings.TOOLTIP_POLICING));
         researchPointsLabel.setToolTipText(LanguageStrings.get(LanguageStrings.TOOLTIP_RESEARCH_POINTS));
     }
@@ -300,7 +304,7 @@ public class ColonyPanel extends ZeroGamePanel {
         graveKeepingLabel.setForeground(AssetStyles.FONT_COLOR);
         petInsectsLabel.setForeground(AssetStyles.FONT_COLOR);
         parasiticMiteCountLabel.setForeground(AssetStyles.FONT_COLOR);
-        parasiteCountLabel.setForeground(AssetStyles.FONT_COLOR);
+        parasiteAntCountLabel.setForeground(AssetStyles.FONT_COLOR);
         policeStatsLabel.setForeground(AssetStyles.FONT_COLOR);
         researchPointsLabel.setForeground(AssetStyles.FONT_COLOR);
         researchRateLabel.setForeground(AssetStyles.FONT_COLOR);
@@ -315,7 +319,7 @@ public class ColonyPanel extends ZeroGamePanel {
         panel.add(graveKeepingLabel);
         panel.add(petInsectsLabel);
         panel.add(parasiticMiteCountLabel);
-        panel.add(parasiteCountLabel);
+        panel.add(parasiteAntCountLabel);
         panel.add(policeStatsLabel);
         panel.add(researchPointsLabel);
         panel.add(researchRateLabel);
@@ -548,14 +552,39 @@ public class ColonyPanel extends ZeroGamePanel {
         }
         
         boolean hasPolice = colony.hasUpgrade(GameUnlocks.ROLE_POLICE);
-        parasiteCountLabel.setVisible(hasPolice);
+        parasiteAntCountLabel.setVisible(hasPolice);
         policeStatsLabel.setVisible(hasPolice);
         if (hasPolice) {
-            boolean fuzz = engine != null && engine.isFuzzParasites();
-            parasiteCountLabel.setText(String.format(LanguageStrings.get(LanguageStrings.COLONY_PARASITES), colony.getParasiteCountDisplay(fuzz)));
+            boolean fuzz = engine != null && engine.isFuzzParasiteAnts();
+            parasiteAntCountLabel.setText(String.format(LanguageStrings.get(LanguageStrings.COLONY_PARASITE_ANTS), colony.getParasiteAntCountDisplay(fuzz)));
             float detection = colony.getStatsService().getParasiteDetection(colony);
             int policeCount = colony.getAssignedRoleCount(GameConstants.ROLE_POLICE);
             policeStatsLabel.setText(String.format(LanguageStrings.get(LanguageStrings.COLONY_DETECTION_RATE), Math.round(policeCount * detection)));
+
+            World world = engine != null ? engine.getWorld() : null;
+            if (world != null) {
+                Hex hex = world.getHexOfColony(colony);
+                Biome biome = hex != null ? hex.getBiome() : null;
+                Season season = world.getSeason();
+                if (biome != null && season != null) {
+                    int projected = colony.getPopulationService().projectParasiteAntMonthlySpawn(colony, biome, season);
+                    if (projected > 0) {
+                        int required = colony.getPopulationService().requiredPoliceToPreventParasiteAntOutbreak(colony, biome, season);
+                        String prevention = String.format(
+                                LanguageStrings.get(LanguageStrings.STAT_OUTBREAK_PREV_FMT),
+                                policeCount, required, projected);
+                        if (policeCount >= required) {
+                            prevention = LanguageStrings.get(LanguageStrings.STAT_OUTBREAK_PREV_BLOCKED) + " — " + prevention;
+                        }
+                        policeStatsLabel.setToolTipText(
+                                LanguageStrings.get(LanguageStrings.TOOLTIP_POLICING) + "<br>"
+                                + LanguageStrings.get(LanguageStrings.TOOLTIP_OUTBREAK_PREV_POLICE) + "<br>"
+                                + prevention);
+                    } else {
+                        policeStatsLabel.setToolTipText(LanguageStrings.get(LanguageStrings.TOOLTIP_POLICING));
+                    }
+                }
+            }
         }
         
         int eggs = colony.getEggs() != null ? colony.getEggs().size() : 0;

@@ -70,7 +70,7 @@ public class Colony {
     private int aphids; 
     private int symbioticMites;
     private int dermestids;
-    private int parasites;
+    private int parasiteAnts;
     private int parasiticMites;
 
     // --- Hatch Rate Data ---
@@ -167,7 +167,7 @@ public class Colony {
         this.aphids = 0;
         this.symbioticMites = 0;
         this.dermestids = 0;
-        this.parasites = 0;
+        this.parasiteAnts = 0;
         this.parasiticMites = 0;
         this.hatchRateWorker = 100.0f;
         this.hatchRateSoldier = 0.0f;
@@ -294,10 +294,10 @@ public class Colony {
         this.symbioticMites = savedColony.symbioticMites;
         this.dermestids = savedColony.dermestids;
 
-        this.parasites = savedColony.parasites;
+        this.parasiteAnts = savedColony.parasiteAnts;
         this.parasiticMites = savedColony.parasiticMites;
-        for (int i = 0; i < this.parasites; i++) {
-            Bug p = new Bug(GameConstants.TYPE_PARASITE);
+        for (int i = 0; i < this.parasiteAnts; i++) {
+            Bug p = new Bug(GameConstants.TYPE_PARASITE_ANT);
             p.setDimension(WorldSpaces.UNDERWORLD);
             this.bugs.add(p);
         }
@@ -584,17 +584,17 @@ public class Colony {
         }
     }
 
-    public void applyParasiteCount(int count) {
-        this.parasites = count;
+    public void applyParasiteAntCount(int count) {
+        this.parasiteAnts = count;
     }
 
     public ColonyBugHandlingService getBugHandlingService() {
         return bugHandlingService;
     }
 
-    public int getParasites() { return parasites; }
-    public void setParasites(int count) {
-        getBugHandlingService().setParasiteCount(this, count);
+    public int getParasiteAnts() { return parasiteAnts; }
+    public void setParasiteAnts(int count) {
+        getBugHandlingService().setParasiteAntCount(this, count);
     }
 
     public int getParasiticMites() { return parasiticMites; }
@@ -611,11 +611,11 @@ public class Colony {
         return getBugHandlingService().getParasiticMiteSlowedAntCount(this);
     }
 
-    public String getParasiteCountDisplay(boolean fuzzEnabled) {
+    public String getParasiteAntCountDisplay(boolean fuzzEnabled) {
         if (!hasUpgrade(GameUnlocks.ROLE_POLICE)) {
             return "???";
         }
-        int actual = getParasites();
+        int actual = getParasiteAnts();
         
         if (!fuzzEnabled) {
             return String.valueOf(actual);

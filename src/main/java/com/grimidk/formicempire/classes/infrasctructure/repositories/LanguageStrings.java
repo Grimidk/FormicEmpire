@@ -230,7 +230,7 @@ public final class LanguageStrings {
     public static final String COLONY_GRAVE_CLEANING = "COLONY_GRAVE_CLEANING";
     public static final String COLONY_PET_INSECTS = "COLONY_PET_INSECTS";
     public static final String COLONY_PARASITIC_MITES = "COLONY_PARASITIC_MITES";
-    public static final String COLONY_PARASITES = "COLONY_PARASITES";
+    public static final String COLONY_PARASITE_ANTS = "COLONY_PARASITE_ANTS";
     public static final String COLONY_POLICING = "COLONY_POLICING";
     public static final String COLONY_DETECTION_RATE = "COLONY_DETECTION_RATE";
     public static final String COLONY_RESEARCH = "COLONY_RESEARCH";
@@ -240,7 +240,7 @@ public final class LanguageStrings {
     
     public static final String TOOLTIP_PET_INSECTS = "TOOLTIP_PET_INSECTS";
     public static final String TOOLTIP_PARASITIC_MITES = "TOOLTIP_PARASITIC_MITES";
-    public static final String TOOLTIP_PARASITES = "TOOLTIP_PARASITES";
+    public static final String TOOLTIP_PARASITE_ANTS = "TOOLTIP_PARASITE_ANTS";
     public static final String TOOLTIP_POLICING = "TOOLTIP_POLICING";
     public static final String TOOLTIP_RESEARCH_POINTS = "TOOLTIP_RESEARCH_POINTS";
 
@@ -521,7 +521,7 @@ public final class LanguageStrings {
     public static final String STAT_RATE_RANCHERS_FMT = "STAT_RATE_RANCHERS_FMT";
     public static final String STAT_RATE_APHIDS_FMT = "STAT_RATE_APHIDS_FMT";
     public static final String STAT_RATE_POLICE_FMT = "STAT_RATE_POLICE_FMT";
-    public static final String STAT_RATE_PARASITES_FMT = "STAT_RATE_PARASITES_FMT";
+    public static final String STAT_RATE_PARASITE_ANTS_FMT = "STAT_RATE_PARASITE_ANTS_FMT";
     public static final String STAT_RATE_DET_DAY = "STAT_RATE_DET_DAY";
     public static final String STAT_NO_INSECTS = "STAT_NO_INSECTS";
     public static final String STAT_INSECT_CATCHERS_FMT = "STAT_INSECT_CATCHERS_FMT";
@@ -529,6 +529,11 @@ public final class LanguageStrings {
     public static final String STAT_INSECT_POOL = "STAT_INSECT_POOL";
     public static final String STAT_INSECT_PARASITIC_CAP_FMT = "STAT_INSECT_PARASITIC_CAP_FMT";
     public static final String STAT_INSECT_PARASITIC_KILL_FMT = "STAT_INSECT_PARASITIC_KILL_FMT";
+    public static final String STAT_OUTBREAK_PREV_FMT = "STAT_OUTBREAK_PREV_FMT";
+    public static final String STAT_OUTBREAK_PREV_BLOCKED = "STAT_OUTBREAK_PREV_BLOCKED";
+    public static final String STAT_OUTBREAK_PREV_PROJECTED_FMT = "STAT_OUTBREAK_PREV_PROJECTED_FMT";
+    public static final String TOOLTIP_OUTBREAK_PREV_POLICE = "TOOLTIP_OUTBREAK_PREV_POLICE";
+    public static final String TOOLTIP_OUTBREAK_PREV_SYMBIOTIC = "TOOLTIP_OUTBREAK_PREV_SYMBIOTIC";
 
     public static final String LOG_DEATH_OLD_AGE_FMT = "LOG_DEATH_OLD_AGE_FMT";
     public static final String LOG_DEATH_JUVENILES_LACK_CARE_FMT = "LOG_DEATH_JUVENILES_LACK_CARE_FMT";
@@ -545,14 +550,14 @@ public final class LanguageStrings {
     public static final String LOG_CONTAM_LEVEL_SMALL = "LOG_CONTAM_LEVEL_SMALL";
     public static final String LOG_CONTAM_LEVEL_MEDIUM = "LOG_CONTAM_LEVEL_MEDIUM";
     public static final String LOG_CONTAM_LEVEL_MASSIVE = "LOG_CONTAM_LEVEL_MASSIVE";
-    public static final String LOG_PARASITE_SPREAD_FMT = "LOG_PARASITE_SPREAD_FMT";
+    public static final String LOG_PARASITE_ANT_SPREAD_FMT = "LOG_PARASITE_ANT_SPREAD_FMT";
     public static final String LOG_PARASITIC_MITE_SPREAD_FMT = "LOG_PARASITIC_MITE_SPREAD_FMT";
     public static final String LOG_DYNASTY_ABSORBED_FMT = "LOG_DYNASTY_ABSORBED_FMT";
     public static final String LOG_FAILURE_SATELLITE = "LOG_FAILURE_SATELLITE";
     public static final String LOG_SATELLITE_AT_FMT = "LOG_SATELLITE_AT_FMT";
     public static final String LOG_SATELLITES_ESTABLISHED_FMT = "LOG_SATELLITES_ESTABLISHED_FMT";
     public static final String LOG_SPREADING_FAILED = "LOG_SPREADING_FAILED";
-    public static final String LOG_PARASITES_ELIMINATED_FMT = "LOG_PARASITES_ELIMINATED_FMT";
+    public static final String LOG_PARASITE_ANTS_ELIMINATED_FMT = "LOG_PARASITE_ANTS_ELIMINATED_FMT";
     public static final String LOG_CAUGHT_BUGS_SUMMARY_FMT = "LOG_CAUGHT_BUGS_SUMMARY_FMT";
     public static final String LOG_CAUGHT_BUG_BRED_FMT = "LOG_CAUGHT_BUG_BRED_FMT";
     public static final String LOG_SYMBIOTIC_MITES_PREDATION_FMT = "LOG_SYMBIOTIC_MITES_PREDATION_FMT";
@@ -624,7 +629,7 @@ public final class LanguageStrings {
     public static final String SETTINGS_CONFIRM_QUIT = "SETTINGS_CONFIRM_QUIT";
     public static final String SETTINGS_SHOW_TOOLTIPS = "SETTINGS_SHOW_TOOLTIPS";
     
-    public static final String SETTINGS_FUZZ_PARASITES = "SETTINGS_FUZZ_PARASITES";
+    public static final String SETTINGS_FUZZ_PARASITE_ANTS = "SETTINGS_FUZZ_PARASITE_ANTS";
     public static final String SETTINGS_DEFAULT_ROLE_WORKER = "SETTINGS_DEFAULT_ROLE_WORKER";
     public static final String SETTINGS_DEFAULT_ROLE_SOLDIER = "SETTINGS_DEFAULT_ROLE_SOLDIER";
     public static final String SETTINGS_DEFAULT_ROLE_MAJOR = "SETTINGS_DEFAULT_ROLE_MAJOR";
@@ -725,12 +730,12 @@ public final class LanguageStrings {
 
     public static final String BUG_ANT = "BUG_ANT";
     public static final String BUG_APHID = "BUG_APHID";
-    public static final String BUG_PARASITE = "BUG_PARASITE";
+    public static final String BUG_PARASITE_ANT = "BUG_PARASITE_ANT";
     public static final String BUG_SYMBIOTIC_MITE = "BUG_SYMBIOTIC_MITE";
     public static final String BUG_DERMESTID = "BUG_DERMESTID";
     public static final String BUG_ANT_SCIENTIFIC = "BUG_ANT_SCIENTIFIC";
     public static final String BUG_APHID_SCIENTIFIC = "BUG_APHID_SCIENTIFIC";
-    public static final String BUG_PARASITE_SCIENTIFIC = "BUG_PARASITE_SCIENTIFIC";
+    public static final String BUG_PARASITE_ANT_SCIENTIFIC = "BUG_PARASITE_ANT_SCIENTIFIC";
     public static final String BUG_SYMBIOTIC_MITE_SCIENTIFIC = "BUG_SYMBIOTIC_MITE_SCIENTIFIC";
     public static final String BUG_DERMESTID_SCIENTIFIC = "BUG_DERMESTID_SCIENTIFIC";
     public static final String BUG_PARASITIC_MITE = "BUG_PARASITIC_MITE";
@@ -1205,7 +1210,7 @@ public final class LanguageStrings {
     public static final String HELP_BUG_APHID_DESC = "HELP_BUG_APHID_DESC";
     public static final String HELP_BUG_SYMBIOTIC_MITE_DESC = "HELP_BUG_SYMBIOTIC_MITE_DESC";
     public static final String HELP_BUG_DERMESTID_DESC = "HELP_BUG_DERMESTID_DESC";
-    public static final String HELP_BUG_PARASITE_DESC = "HELP_BUG_PARASITE_DESC";
+    public static final String HELP_BUG_PARASITE_ANT_DESC = "HELP_BUG_PARASITE_ANT_DESC";
     public static final String HELP_BUG_PARASITIC_MITE_DESC = "HELP_BUG_PARASITIC_MITE_DESC";
 
     public static final String HELP_BIOMES_TITLE = "HELP_BIOMES_TITLE";

@@ -30,7 +30,7 @@ public class SettingsPanel extends JPanel {
     private JCheckBox pauseFocusCheck;
     private JCheckBox confirmQuitCheck;
     private JCheckBox showTooltipsCheck;
-    private JCheckBox fuzzParasitesCheck;
+    private JCheckBox fuzzParasiteAntsCheck;
     
     // --- Video Tab ---
     private JComboBox<String> sizeCombo;
@@ -43,7 +43,7 @@ public class SettingsPanel extends JPanel {
     private JSlider musicVolSlider;
     private JSlider sfxVolSlider;
     
-    private JLabel langLabel, autoLabel, turboLabel, arachLabel, pauseFocusLabel, confirmQuitLabel, tooltipsLabel, fuzzParasitesLabel;
+    private JLabel langLabel, autoLabel, turboLabel, arachLabel, pauseFocusLabel, confirmQuitLabel, tooltipsLabel, fuzzParasiteAntsLabel;
     private JLabel sizeLabel, fsLabel, daylightColorOverlayLabel, weatherColorOverlayLabel;
     private JLabel masterLabel, musicLabel, sfxLabel;
     private JLabel defaultRoleWorkerLabel, defaultRoleSoldierLabel, defaultRoleMajorLabel, defaultRolePrincessLabel, defaultRoleQueenLabel;
@@ -236,16 +236,16 @@ public class SettingsPanel extends JPanel {
         styleCheckBox(showTooltipsCheck);
         c.gridx = 1; panel.add(showTooltipsCheck, c);
         
-        // Fuzz Parasites
+        // Fuzz parasite ants
         c.gridy = 7; c.gridx = 0;
-        fuzzParasitesLabel = new JLabel();
-        fuzzParasitesLabel.setFont(AssetStyles.FONT_NORMAL);
-        fuzzParasitesLabel.setForeground(AssetStyles.FONT_COLOR);
-        panel.add(fuzzParasitesLabel, c);
+        fuzzParasiteAntsLabel = new JLabel();
+        fuzzParasiteAntsLabel.setFont(AssetStyles.FONT_NORMAL);
+        fuzzParasiteAntsLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(fuzzParasiteAntsLabel, c);
         
-        fuzzParasitesCheck = new JCheckBox();
-        styleCheckBox(fuzzParasitesCheck);
-        c.gridx = 1; panel.add(fuzzParasitesCheck, c);
+        fuzzParasiteAntsCheck = new JCheckBox();
+        styleCheckBox(fuzzParasiteAntsCheck);
+        c.gridx = 1; panel.add(fuzzParasiteAntsCheck, c);
 
         c.gridy = 8;
         c.gridx = 0;
@@ -390,7 +390,7 @@ public class SettingsPanel extends JPanel {
         pauseFocusCheck.setSelected(true);
         confirmQuitCheck.setSelected(true);
         showTooltipsCheck.setSelected(true);
-        fuzzParasitesCheck.setSelected(true);
+        fuzzParasiteAntsCheck.setSelected(true);
     }
 
     private void resetVideoTabToDefaults() {
@@ -581,7 +581,7 @@ public class SettingsPanel extends JPanel {
         pauseFocusLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_PAUSE_FOCUS));
         confirmQuitLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_CONFIRM_QUIT));
         tooltipsLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_SHOW_TOOLTIPS));
-        fuzzParasitesLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_FUZZ_PARASITES));
+        fuzzParasiteAntsLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_FUZZ_PARASITE_ANTS));
         
         sizeLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_SCREEN_SIZE));
         fsLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_FULLSCREEN));
@@ -661,7 +661,7 @@ public class SettingsPanel extends JPanel {
         pauseFocusCheck.setSelected(engine.isPauseOnFocusLoss());
         confirmQuitCheck.setSelected(engine.isConfirmOnQuit());
         showTooltipsCheck.setSelected(engine.isShowTooltips());
-        fuzzParasitesCheck.setSelected(engine.isFuzzParasites());
+        fuzzParasiteAntsCheck.setSelected(engine.isFuzzParasiteAnts());
         
         sizeCombo.setSelectedItem(engine.getScreenSize());
         fullScreenCheck.setSelected(engine.isFullScreen());
@@ -696,7 +696,7 @@ public class SettingsPanel extends JPanel {
         engine.setPauseOnFocusLoss(pauseFocusCheck.isSelected());
         engine.setConfirmOnQuit(confirmQuitCheck.isSelected());
         engine.setShowTooltips(showTooltipsCheck.isSelected());
-        engine.setFuzzParasites(fuzzParasitesCheck.isSelected());
+        engine.setFuzzParasiteAnts(fuzzParasiteAntsCheck.isSelected());
         
         engine.setScreenSize((String) sizeCombo.getSelectedItem());
         engine.setFullScreen(fullScreenCheck.isSelected());

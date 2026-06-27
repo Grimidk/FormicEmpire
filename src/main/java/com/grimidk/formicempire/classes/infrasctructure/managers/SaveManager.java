@@ -505,7 +505,7 @@ public class SaveManager {
                     sc.aphids = c.getBugHandlingService().resolvePetCountForSave(c, GameConstants.TYPE_APHID);
                     sc.symbioticMites = c.getBugHandlingService().resolvePetCountForSave(c, GameConstants.TYPE_SYMBIOTIC_MITE);
                     sc.dermestids = c.getBugHandlingService().resolvePetCountForSave(c, GameConstants.TYPE_DERMESTID);
-                    sc.parasites = c.getParasites();
+                    sc.parasiteAnts = c.getParasiteAnts();
                     sc.parasiticMites = c.getParasiticMites();
                     sc.totalDeaths = c.getTotalDeaths();
                     
@@ -692,7 +692,7 @@ public class SaveManager {
         writeJsonLine(w, "aphids", sc.aphids, false);
         writeJsonLine(w, "symbioticMites", sc.symbioticMites, false);
         writeJsonLine(w, "dermestids", sc.dermestids, false);
-        writeJsonLine(w, "parasites", sc.parasites, false);
+        writeJsonLine(w, "parasiteAnts", sc.parasiteAnts, false);
         writeJsonLine(w, "parasiticMites", sc.parasiticMites, false);
         writeJsonLine(w, "totalDeaths", sc.totalDeaths, false);
 
@@ -935,7 +935,7 @@ public class SaveManager {
         sc.symbioticMites = Integer.parseInt(map.getOrDefault("symbioticMites",
                 map.getOrDefault("soilMites", map.getOrDefault("bullMites", "0"))));
         sc.dermestids = Integer.parseInt(map.getOrDefault("dermestids", "0"));
-        sc.parasites = Integer.parseInt(map.getOrDefault("parasites", "0"));
+        sc.parasiteAnts = Integer.parseInt(map.getOrDefault("parasiteAnts", map.getOrDefault("parasites", "0")));
         sc.parasiticMites = Integer.parseInt(map.getOrDefault("parasiticMites", "0"));
         sc.totalDeaths = Integer.parseInt(map.getOrDefault("totalDeaths", "0"));
         
@@ -1422,7 +1422,7 @@ public class SaveManager {
             writeJsonLine(w, "pauseOnFocusLoss", engine.isPauseOnFocusLoss(), false);
             writeJsonLine(w, "confirmOnQuit", engine.isConfirmOnQuit(), false);
             writeJsonLine(w, "showTooltips", engine.isShowTooltips(), false);
-            writeJsonLine(w, "fuzzParasites", engine.isFuzzParasites(), false);
+            writeJsonLine(w, "fuzzParasiteAnts", engine.isFuzzParasiteAnts(), false);
             writeJsonLine(w, "defaultRoleWorker", engine.getDefaultRoleWorker(), false);
             writeJsonLine(w, "defaultRoleSoldier", engine.getDefaultRoleSoldier(), false);
             writeJsonLine(w, "defaultRoleMajor", engine.getDefaultRoleMajor(), false);
@@ -1514,7 +1514,8 @@ public class SaveManager {
             engine.setPauseOnFocusLoss(Boolean.parseBoolean(m.getOrDefault("pauseOnFocusLoss", String.valueOf(engine.isPauseOnFocusLoss()))));
             engine.setConfirmOnQuit(Boolean.parseBoolean(m.getOrDefault("confirmOnQuit", String.valueOf(engine.isConfirmOnQuit()))));
             engine.setShowTooltips(Boolean.parseBoolean(m.getOrDefault("showTooltips", String.valueOf(engine.isShowTooltips()))));
-            engine.setFuzzParasites(Boolean.parseBoolean(m.getOrDefault("fuzzParasites", String.valueOf(engine.isFuzzParasites()))));
+            engine.setFuzzParasiteAnts(Boolean.parseBoolean(m.getOrDefault("fuzzParasiteAnts",
+                    m.getOrDefault("fuzzParasites", String.valueOf(engine.isFuzzParasiteAnts())))));
             engine.setDefaultRoleWorker(Integer.parseInt(m.getOrDefault("defaultRoleWorker", String.valueOf(engine.getDefaultRoleWorker()))));
             engine.setDefaultRoleSoldier(Integer.parseInt(m.getOrDefault("defaultRoleSoldier", String.valueOf(engine.getDefaultRoleSoldier()))));
             engine.setDefaultRoleMajor(Integer.parseInt(m.getOrDefault("defaultRoleMajor", String.valueOf(engine.getDefaultRoleMajor()))));

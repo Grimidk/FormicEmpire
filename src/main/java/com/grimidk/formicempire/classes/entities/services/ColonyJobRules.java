@@ -146,7 +146,7 @@ public final class ColonyJobRules {
         ColonyResourceService resources = colony.getResourceService();
 
         int totalConsumption = stats.getTotalConsumption(colony);
-        totalConsumption += colony.getParasites();
+        totalConsumption += colony.getParasiteAnts();
 
         double consumedFood = resources.consumeResource(colony, GameConstants.RESOURCE_FUNGI, totalConsumption);
         double foodDeficit = totalConsumption - consumedFood;
@@ -266,7 +266,7 @@ public final class ColonyJobRules {
             return;
         }
 
-        int parasiteCount = colony.getParasites();
+        int parasiteCount = colony.getParasiteAnts();
         if (parasiteCount == 0) {
             return;
         }
@@ -277,20 +277,20 @@ public final class ColonyJobRules {
         }
 
         float detectionRate = colony.getStatsService().getParasiteDetection(colony);
-        int parasitesKilled = 0;
+        int parasiteAntsKilled = 0;
 
         for (int i = 0; i < policeCount; i++) {
-            if (parasitesKilled >= parasiteCount) {
+            if (parasiteAntsKilled >= parasiteCount) {
                 break;
             }
             if (GameRandom.nextFloat() < detectionRate) {
-                parasitesKilled++;
+                parasiteAntsKilled++;
                 colony.getResourceService().addResource(colony, GameConstants.RESOURCE_MEAT, 4);
             }
         }
 
-        if (parasitesKilled > 0) {
-            colony.setParasites(Math.max(0, colony.getParasites() - parasitesKilled));
+        if (parasiteAntsKilled > 0) {
+            colony.setParasiteAnts(Math.max(0, colony.getParasiteAnts() - parasiteAntsKilled));
         }
     }
 

@@ -194,14 +194,14 @@ class ColonyBugHandlingServiceTest {
 
     @Test
     void hotBiomesHostParasiticAntsNotMites() {
-        assertTrue(GameConstants.BIOME_DESERT.hasNativeParasite(GameConstants.TYPE_PARASITE));
+        assertTrue(GameConstants.BIOME_DESERT.hasNativeParasite(GameConstants.TYPE_PARASITE_ANT));
         assertFalse(GameConstants.BIOME_DESERT.hasNativeParasite(GameConstants.TYPE_PARASITIC_MITE));
     }
 
     @Test
     void coldBiomesHostParasiticMitesNotAnts() {
         assertTrue(GameConstants.BIOME_TUNDRA.hasNativeParasite(GameConstants.TYPE_PARASITIC_MITE));
-        assertFalse(GameConstants.BIOME_TUNDRA.hasNativeParasite(GameConstants.TYPE_PARASITE));
+        assertFalse(GameConstants.BIOME_TUNDRA.hasNativeParasite(GameConstants.TYPE_PARASITE_ANT));
     }
 
     @Test

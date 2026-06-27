@@ -419,8 +419,8 @@ public class HelpPanel extends JPanel {
                 desc = LanguageStrings.get(LanguageStrings.HELP_BUG_SYMBIOTIC_MITE_DESC);
             } else if (type == GameConstants.TYPE_DERMESTID) {
                 desc = LanguageStrings.get(LanguageStrings.HELP_BUG_DERMESTID_DESC);
-            } else if (type == GameConstants.TYPE_PARASITE) {
-                desc = LanguageStrings.get(LanguageStrings.HELP_BUG_PARASITE_DESC);
+            } else if (type == GameConstants.TYPE_PARASITE_ANT) {
+                desc = LanguageStrings.get(LanguageStrings.HELP_BUG_PARASITE_ANT_DESC);
             } else if (type == GameConstants.TYPE_PARASITIC_MITE) {
                 desc = LanguageStrings.get(LanguageStrings.HELP_BUG_PARASITIC_MITE_DESC);
             } else {

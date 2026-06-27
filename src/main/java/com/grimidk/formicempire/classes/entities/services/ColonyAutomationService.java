@@ -233,7 +233,7 @@ public class ColonyAutomationService {
         if (remainingSoldiers == 0) return;
 
         int assignedPolice = 0;
-        if (colony.getParasites() > 0 && colony.hasUpgrade(GameUnlocks.ROLE_POLICE)) {
+        if (colony.getParasiteAnts() > 0 && colony.hasUpgrade(GameUnlocks.ROLE_POLICE)) {
             int maxPolice = (int) (colony.getSoldiers().size() * 0.20);
             assignedPolice = Math.min(maxPolice, remainingSoldiers);
             

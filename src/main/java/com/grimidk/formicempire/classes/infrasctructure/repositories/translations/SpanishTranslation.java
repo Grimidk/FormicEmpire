@@ -124,7 +124,7 @@ public class SpanishTranslation implements Translation {
         es.put("COLONY_GRAVE_CLEANING", "Limpieza de Tumbas: %d/%d");
         es.put("COLONY_PET_INSECTS", "Insectos mascota: %d/%d");
         es.put("COLONY_PARASITIC_MITES", "Ácaros: %d (%d hormigas ralentizadas)");
-        es.put("COLONY_PARASITES", "Parásitos: %s");
+        es.put("COLONY_PARASITE_ANTS", "Hormigas parásitas: %s");
         es.put("COLONY_POLICING", "Vigilancia: %d");
         es.put("COLONY_DETECTION_RATE", "Tasa de detección: ~%d/día");
         es.put("COLONY_RESEARCH", "Investigación: %d");
@@ -134,7 +134,7 @@ public class SpanishTranslation implements Translation {
         
         es.put("TOOLTIP_PET_INSECTS", "Insectos mascota cuidados por pastoras y capturadoras. Consulta la pestaña Insectos en estadísticas de colonia (X) para el desglose por especie.");
         es.put("TOOLTIP_PARASITIC_MITES", "Ácaros microscópicos en tus hormigas. Cada 10 ácaros ralentizan una hormiga a la mitad. Se propagan mensualmente con muchos recursos almacenados.");
-        es.put("TOOLTIP_PARASITES", "Parásitos en la Colonia");
+        es.put("TOOLTIP_PARASITE_ANTS", "Hormigas parásitas en la colonia");
         es.put("TOOLTIP_POLICING", "Eficiencia de Vigilancia");
         es.put("TOOLTIP_RESEARCH_POINTS", "Puntos de Investigación");
 
@@ -277,8 +277,8 @@ public class SpanishTranslation implements Translation {
         es.put("UNIT_STAT_TEMP_RES_DESC", "Grados de tolerancia");
         es.put("UNIT_STAT_CONSUMPTION", "Consumo Base");
         es.put("UNIT_STAT_CONSUMPTION_DESC", "Unidades de alimento por día por hormiga");
-        es.put("UNIT_STAT_DETECTION", "Detección de Parásitos");
-        es.put("UNIT_STAT_DETECTION_DESC", "Probabilidad de encontrar parásitos");
+        es.put("UNIT_STAT_DETECTION", "Detección de hormigas parásitas");
+        es.put("UNIT_STAT_DETECTION_DESC", "Probabilidad de encontrar hormigas parásitas");
         es.put("UNIT_STAT_IMMUNITY", "Inmunidad");
         es.put("UNIT_STAT_IMMUNITY_DESC", "Mitigación de contaminación");
 
@@ -410,7 +410,7 @@ public class SpanishTranslation implements Translation {
         es.put("SETTINGS_PAUSE_FOCUS", "Pausar al perder foco");
         es.put("SETTINGS_CONFIRM_QUIT", "Confirmar al salir");
         es.put("SETTINGS_SHOW_TOOLTIPS", "Mostrar consejos");
-        es.put("SETTINGS_FUZZ_PARASITES", "Cifras de parásitos imprecisas");
+        es.put("SETTINGS_FUZZ_PARASITE_ANTS", "Cifras de hormigas parásitas imprecisas");
 
         es.put("SETTINGS_MASTER_VOL", "Volumen Maestro:");
         es.put("SETTINGS_MUSIC_VOL", "Volumen Música:");
@@ -508,14 +508,14 @@ public class SpanishTranslation implements Translation {
         es.put("BUG_APHID", "Pulgón");
         es.put("BUG_SYMBIOTIC_MITE", "Ácaro simbiótico");
         es.put("BUG_DERMESTID", "Escarabajo derméstido");
-        es.put("BUG_PARASITE", "Parásito");
+        es.put("BUG_PARASITE_ANT", "Hormiga parásita");
         es.put("BUG_ANT_SCIENTIFIC", "Formica");
         es.put("BUG_APHID_SCIENTIFIC", "Aphididae");
         es.put("BUG_SYMBIOTIC_MITE_SCIENTIFIC", "Stratiolaelaps scimitus");
         es.put("BUG_DERMESTID_SCIENTIFIC", "Dermestidae");
         es.put("BUG_PARASITIC_MITE", "Ácaro parásito");
         es.put("BUG_PARASITIC_MITE_SCIENTIFIC", "Acaridae");
-        es.put("BUG_PARASITE_SCIENTIFIC", "Anergates");
+        es.put("BUG_PARASITE_ANT_SCIENTIFIC", "Anergates");
 
         es.put("TYPE_LARVA", "Larva");
         es.put("TYPE_PUPA", "Pupa");
@@ -538,7 +538,7 @@ public class SpanishTranslation implements Translation {
         es.put("ROLE_GUARD", "Guardia");
         es.put("ROLE_WARRIOR", "Guerrera");
         es.put("ROLE_DEFENDER", "Defensora");
-        es.put("ROLE_POLICE", "Vigilante");
+        es.put("ROLE_POLICE", "Vigilante de hormigas parásitas");
         es.put("ROLE_BOMBER", "Bombardera");
         es.put("ROLE_HUNTER", "Cazadora");
         es.put("ROLE_BRUTE", "Bruto");
@@ -655,7 +655,7 @@ public class SpanishTranslation implements Translation {
         es.put("ROLE_DEFENDER_DESC", "Permite a los soldados proteger directamente a la reina.");
         es.put("ROLE_POLICE_UPGRADE", "Rol Vigilante");
         es.put("ROLE_POLICE_FLAVOR", "Brutalidad Policial");
-        es.put("ROLE_POLICE_DESC", "Permite a los soldados detectar parásitos disfrazados; cada uno tiene 10% de probabilidad diaria.");
+        es.put("ROLE_POLICE_DESC", "Permite a los soldados detectar hormigas parásitas disfrazadas; cada uno tiene 10% de probabilidad diaria.");
         es.put("ROLE_BOMBER_UPGRADE", "Rol Bombardera");
         es.put("ROLE_BOMBER_FLAVOR", "Final Explosivo");
         es.put("ROLE_BOMBER_DESC", "Permite que soldados especializados exploten al morir.");
@@ -946,7 +946,7 @@ public class SpanishTranslation implements Translation {
         es.put("HELP_TAB_WORLD", "Mundo");
 
         es.put("HELP_WELCOME_STORY", "Casi todas las demás hormigas se han extinguido. Eres una reina hormiga y tienes dentro de ti todo el conocimiento genético de cada especie de hormiga. Debes desbloquearlo y apoderarte del mundo como la especie dominante. <br><br>Construye tu colonia y comienza a expandirte mientras luchas contra otras colonias de hormigas; necesitarás adaptarte a nuevos entornos absorbiendo e investigando sus habilidades.");
-        es.put("HELP_START_INFO", "<b>Supervivencia Básica:</b><br>Tus hormigas necesitan <b>Hongos</b> para comer y <b>Agua</b> para beber todos los días. Sin ellos, tu colonia morirá de hambre o deshidratación.<br>- <b>Recolectoras</b> recogen Plantas y Agua.<br>- <b>Cazadoras</b> recogen Proteína (Carne).<br>- <b>Granjeras</b> convierten Plantas y Proteína en Hongos.<br>- <b>Niñeras</b> cuidan de tu prole. La prole descuidada morirá.<br><br><b>Observando tu Colonia:</b><br>Presiona <b>A</b> para alternar tu vista entre el <b>Inframundo</b> (dentro del hormiguero) y el <b>Supramundo</b> (recolección exterior).<br><br><b>Gestión de la Colonia:</b><br>Usa <b>Tasas de Eclosión (P)</b> para controlar los nacimientos. Las <b>Investigadoras</b> generan Puntos de Investigación (PI) para mejoras en el <b>Menú de Investigación (Y)</b>. Las <b>Constructoras</b> usan Minerales y Resina para construir instalaciones mediante el <b>Menú de Construcción (U)</b>.<br><br><b>Amenazas Avanzadas:</b><br>- <b>Contaminación:</b> Las hormigas muertas deben ser retiradas por <b>Sepultureras</b>.<br>- <b>Parásitos:</b> Drenan secretamente la comida. Asigna <b>Vigilantes</b> para eliminarlos.<br>- <b>Agotamiento:</b> Los nodos de recursos se secan; asigna <b>Exploradoras</b> para encontrar nuevos.");
+        es.put("HELP_START_INFO", "<b>Supervivencia Básica:</b><br>Tus hormigas necesitan <b>Hongos</b> para comer y <b>Agua</b> para beber todos los días. Sin ellos, tu colonia morirá de hambre o deshidratación.<br>- <b>Recolectoras</b> recogen Plantas y Agua.<br>- <b>Cazadoras</b> recogen Proteína (Carne).<br>- <b>Granjeras</b> convierten Plantas y Proteína en Hongos.<br>- <b>Niñeras</b> cuidan de tu prole. La prole descuidada morirá.<br><br><b>Observando tu Colonia:</b><br>Presiona <b>A</b> para alternar tu vista entre el <b>Inframundo</b> (dentro del hormiguero) y el <b>Supramundo</b> (recolección exterior).<br><br><b>Gestión de la Colonia:</b><br>Usa <b>Tasas de Eclosión (P)</b> para controlar los nacimientos. Las <b>Investigadoras</b> generan Puntos de Investigación (PI) para mejoras en el <b>Menú de Investigación (Y)</b>. Las <b>Constructoras</b> usan Minerales y Resina para construir instalaciones mediante el <b>Menú de Construcción (U)</b>.<br><br><b>Amenazas Avanzadas:</b><br>- <b>Contaminación:</b> Las hormigas muertas deben ser retiradas por <b>Sepultureras</b>.<br>- <b>Hormigas parásitas:</b> Drenan secretamente la comida. Asigna <b>Vigilantes</b> para eliminarlos.<br>- <b>Agotamiento:</b> Los nodos de recursos se secan; asigna <b>Exploradoras</b> para encontrar nuevos.");
         es.put("HELP_OVERWORLD_GATHERING", "<b>Recolección en superficie (supramundo):</b><br>Las <b>exploradoras</b> descubren nuevos nodos de recursos. Cada hexágono del mapa acumula <b>agotamiento</b> por hallazgos sin agua; un agotamiento mayor suele colocar nodos nuevos más lejos del nido (algunas mejoras limitan lo fuerte que es esto).<br><br><b>Distancia:</b> Lo recogido depende de la distancia en línea recta desde la <b>entrada del nido</b>. Dentro de un radio de <b>plena eficiencia</b> (mayor con obreras más rápidas y ciertas mejoras), el rendimiento es completo; más lejos, cae hacia un mínimo pequeño.<br><br><b>Estadísticas (Hex local):</b> <b>Agotamiento</b> es el porcentaje efectivo usado para apariciones; <b>Fuentes encontradas</b> cuenta los nodos que esta colonia ha descubierto; <b>Distancia máx. a plena eficiencia</b> estima el radio de rendimiento pleno para una obrera típica.");
         es.put("HELP_DYNASTY_INFO", "<b>Expandiendo tu Dinastía:</b><br>Una vez que desbloquees a las <b>Criadoras</b>, realiza Vuelos Nupciales para expandirte a través del <b>Mapa Mundial (I)</b>.<br><i>Consejo: ¡Vigila el cielo! ¡Los eclipses activan Vuelos Nupciales espontáneos y gratuitos!</i><br><br><b>Logística y Comercio:</b><br>Fundar múltiples colonias desbloquea las <b>Rutas Comerciales</b>. Asigna <b>Mensajeras</b> para transportar recursos.<br>- <b>Tierra:</b> Método comercial estándar.<br>- <b>Túnel:</b> Seguro y rápido, requiere <b>Túneles</b> y <b>Perforadoras</b>.<br>- <b>Aire:</b> Rápido pero de baja capacidad, requiere <b>Transporte Aéreo</b> (Princesas).<br>- <b>Bilateral:</b> Permite el transporte de recursos en ambos sentidos.<br><br><b>Hitos de la Dinastía:</b><br>- <b>Menú de Dinastía (S):</b> Mira y gestiona todas las colonias.<br>- <b>Colonización Masiva:</b> Elimina los límites de colonias satélite.<br>- <b>Automatización:</b> Permite que las colonias NPC se gestionen solas.<br><br><b>Evolución:</b><br>Desbloquea <b>Sinergias</b> para combinar mejoras y <b>Asimilaciones</b> para absorber rasgos de otras especies.");
         
@@ -984,7 +984,7 @@ public class SpanishTranslation implements Translation {
         es.put("HELP_BUG_APHID_DESC", "Insectos que se alimentan de plantas. Nativos de la mayoría de biomas excepto los secos. Requieren el rol Pastora antes de que las capturadoras puedan recogerlos. Las pastoras cuidan hasta 10 por pastora para obtener jarabe.");
         es.put("HELP_BUG_SYMBIOTIC_MITE_DESC", "Ácaros depredadores de control biológico. Nativos de todos los biomas. Se desbloquea la captura al aparecer los primeros ácaros parásitos. En el corral de insectos. Cada ácaro simbiótico elimina hasta 5 ácaros parásitos al día (12 con Entrenamiento de ácaros simbióticos).");
         es.put("HELP_BUG_DERMESTID_DESC", "Escarabajos que limpian carroña. Nativos de la mayoría de biomas excepto los fríos. Requieren la investigación Captura de escarabajos de fosa. Las coveiras cuidan hasta 10 cada una. Con Escarabajos de fosa, cada uno cuenta como una coveira.");
-        es.put("HELP_BUG_PARASITE_DESC", "Plagas que se esconden en el nido y drenan comida en secreto. Nativas de biomas cálidos. Brotes en primavera y verano con más de 1.000 hormigas (25% de probabilidad mensual). Asigna Vigilantes para eliminarlas.");
+        es.put("HELP_BUG_PARASITE_ANT_DESC", "Hormigas parásitas que se esconden en el nido y drenan comida en secreto. Nativas de biomas cálidos. Brotes en primavera y verano con más de 1.000 hormigas (25% de probabilidad mensual). Asigna Vigilantes para eliminarlas.");
         es.put("HELP_BUG_PARASITIC_MITE_DESC", "Ácaros diminutos que infestan hormigas adultas cuando la colonia acumula recursos. Nativos de biomas fríos. Brotes en otoño e invierno con más de 10.000 recursos almacenados (25% mensual). Cada 10 ácaros ralentizan una hormiga a la mitad. Los ácaros simbióticos son el principal contramedio.");
 
         es.put("HELP_BIOMES_TITLE", "Biomas");
@@ -1002,7 +1002,7 @@ public class SpanishTranslation implements Translation {
 
         es.put("HELP_TUTORIAL_TITLE", "¡Bienvenido a la Dinastía Fórmica!");
         es.put("HELP_TUTORIAL_TIPS", "<b>Consejos Básicos:</b><br><br>Tu principal alimento son los <b>Hongos</b>, que las hormigas comerán a diario.<br><br>Asigna <b>Obreras</b> (Q) a roles de <b>Recolectora</b> para recoger Plantas y Agua. ¡Sin ellas tus hormigas morirán de sed!<br><br>Asigna <b>Granjeras</b> (Q) para convertir las Plantas recogidas en Hongos. Una Granjera generalmente puede manejar a 6 Recolectoras.<br><br>Asigna <b>Niñeras</b> (Q) para cuidar de tus <b>Huevos, Larvas y Pupas</b>. ¡Sin suficientes niñeras, tus crías morirán por descuido!<br><br>Presiona <b>A</b> para alternar tu vista entre el <b>Inframundo</b> y el <b>Supramundo</b>.<br><br><i>Consejo de QoL: Si asignas un nuevo rol pero no tienes hormigas sin asignar, el juego las tomará automáticamente de tu fuerza de trabajo por defecto (como las Recolectoras).</i>");
-        es.put("HELP_TUTORIAL_THREATS", "<b>Amenazas a la Colonia:</b><br><br><b>Contaminación:</b> Las hormigas mueren naturalmente de vejez. Si los cuerpos se acumulan, la enfermedad se propagará y matará a tu colonia. Asigna <b>Sepultureras</b> para limpiar a los muertos.<br><br><b>Parásitos:</b> Plagas invisibles absorberán tus reservas de Hongos. Asigna <b>Vigilantes</b> para detectarlos y eliminarlos.<br><br><b>Agotamiento:</b> Los nodos de recursos no duran para siempre. Si tus recolectoras se quedan sin plantas o agua, asigna <b>Exploradoras</b> para encontrar nuevos recursos cerca.");
+        es.put("HELP_TUTORIAL_THREATS", "<b>Amenazas a la Colonia:</b><br><br><b>Contaminación:</b> Las hormigas mueren naturalmente de vejez. Si los cuerpos se acumulan, la enfermedad se propagará y matará a tu colonia. Asigna <b>Sepultureras</b> para limpiar a los muertos.<br><br><b>Hormigas parásitas:</b> Plagas invisibles absorberán tus reservas de Hongos. Asigna <b>Vigilantes</b> para detectarlos y eliminarlos.<br><br><b>Agotamiento:</b> Los nodos de recursos no duran para siempre. Si tus recolectoras se quedan sin plantas o agua, asigna <b>Exploradoras</b> para encontrar nuevos recursos cerca.");
         es.put("HELP_TUTORIAL_DYNASTY", "<b>Gestión de Dinastía:</b><br><br>A medida que tu colonia prospere, desbloquearás Princesas <b>Criadoras</b>. Estas te permiten establecer colonias satélite a través del <b>Mapa Mundial (I)</b>.<br><i>Consejo: ¡Vigila el cielo! ¡Los raros eclipses solares o lunares activarán Vuelos Nupciales espontáneos y gratuitos!</i><br><br>Fundar múltiples colonias desbloquea el <b>Menú de Dinastía (S)</b>. ¡Alcanzar ciertos hitos te permitirá construir <b>Rutas Comerciales</b>, eliminar límites de expansión e incluso <b>Automatizar</b> tu creciente dinastía!");
         
         es.put("HOTKEY_PAUSE_LABEL", "Pausa/Jugar:");
@@ -1064,7 +1064,7 @@ public class SpanishTranslation implements Translation {
         es.put("STAT_RATE_RANCHERS_FMT", "%d pastoras");
         es.put("STAT_RATE_APHIDS_FMT", "%s / %d pulgones");
         es.put("STAT_RATE_POLICE_FMT", "%d policía");
-        es.put("STAT_RATE_PARASITES_FMT", "%d parásitos");
+        es.put("STAT_RATE_PARASITE_ANTS_FMT", "%d hormigas parásitas");
         es.put("STAT_RATE_DET_DAY", "~%d det./día");
         es.put("STAT_NO_INSECTS", "Sin insectos registrados");
         es.put("STAT_INSECT_CATCHERS_FMT", "%d capturadoras");
@@ -1072,6 +1072,11 @@ public class SpanishTranslation implements Translation {
         es.put("STAT_INSECT_POOL", "Cupo de capturadoras");
         es.put("STAT_INSECT_PARASITIC_CAP_FMT", "%d ácaros por hormiga ralentizada");
         es.put("STAT_INSECT_PARASITIC_KILL_FMT", "%d ralentizadas, ~%d/día de contramedida");
+        es.put("STAT_OUTBREAK_PREV_FMT", "%d / %d (2× %d/mes de aparición)");
+        es.put("STAT_OUTBREAK_PREV_BLOCKED", "Brotes bloqueados");
+        es.put("STAT_OUTBREAK_PREV_PROJECTED_FMT", "Hasta %d/mes en brote");
+        es.put("TOOLTIP_OUTBREAK_PREV_POLICE", "Si el número de vigilantes es al menos el doble de la aparición mensual proyectada de hormigas parásitas, los nuevos brotes quedan bloqueados por completo (si no, sigue aplicándose el 25% mensual).");
+        es.put("TOOLTIP_OUTBREAK_PREV_SYMBIOTIC", "Si el número de ácaros simbióticos es al menos el doble de la aparición mensual proyectada de ácaros parásitos, los nuevos brotes quedan bloqueados por completo (si no, sigue aplicándose el 25% mensual).");
 
         es.put("LOG_DEATH_OLD_AGE_FMT", "%d hormigas murieron por vejez");
         es.put("LOG_DEATH_JUVENILES_LACK_CARE_FMT", "%d juveniles murieron (falta de cuidados)");
@@ -1088,14 +1093,14 @@ public class SpanishTranslation implements Translation {
         es.put("LOG_CONTAM_LEVEL_SMALL", "Bajo");
         es.put("LOG_CONTAM_LEVEL_MEDIUM", "Medio");
         es.put("LOG_CONTAM_LEVEL_MASSIVE", "Masivo");
-        es.put("LOG_PARASITE_SPREAD_FMT", "¡Se ha extendido una infestación parasitaria! %d parásitos nuevos detectados.");
+        es.put("LOG_PARASITE_ANT_SPREAD_FMT", "¡Se ha extendido una infestación de hormigas parásitas! %d nuevas detectadas.");
         es.put("LOG_PARASITIC_MITE_SPREAD_FMT", "¡Los ácaros parásitos se han propagado! %d ácaros nuevos detectados en la colonia.");
         es.put("LOG_DYNASTY_ABSORBED_FMT", "¡Se absorbieron los restos de %s!");
         es.put("LOG_FAILURE_SATELLITE", "Una colonia satélite no maduró por estancamiento genético.");
         es.put("LOG_SATELLITE_AT_FMT", "Nueva colonia satélite en (%d, %d)");
         es.put("LOG_SATELLITES_ESTABLISHED_FMT", "%d satélites establecidos.");
         es.put("LOG_SPREADING_FAILED", "Expansión fallida: no hay tierras adyacentes adecuadas.");
-        es.put("LOG_PARASITES_ELIMINATED_FMT", "Eliminados %d parásitos.");
+        es.put("LOG_PARASITE_ANTS_ELIMINATED_FMT", "Eliminadas %d hormigas parásitas.");
         es.put("LOG_CAUGHT_BUGS_SUMMARY_FMT", "Las capturadoras trajeron %d insecto(s) del exterior.");
         es.put("LOG_CAUGHT_BUG_BRED_FMT", "%d %s se reprodujeron en cautiverio.");
         es.put("LOG_SYMBIOTIC_MITES_PREDATION_FMT", "Los ácaros simbióticos eliminaron %d ácaro(s) parásito(s).");
@@ -1150,8 +1155,8 @@ public class SpanishTranslation implements Translation {
         es.put("TRIGGER_SPREAD_ABILITY_MSG", "Con la capacidad de criar nuevas reinas, tu colonia ahora sabe cómo expandirse. Puedes fundar nuevas colonias desde el mapa mundial (I).");
         es.put("TRIGGER_SCOUT_ROLE_TITLE", "Llamada de la aventura");
         es.put("TRIGGER_SCOUT_ROLE_MSG", "¡Hemos agotado más de la mitad de nuestra principal fuente de plantas! Las obreras sienten la necesidad de explorar nuevas tierras, desbloqueando el rol de Explorador.");
-        es.put("TRIGGER_POLICE_ROLE_TITLE", "Infestación parasitaria");
-        es.put("TRIGGER_POLICE_ROLE_MSG", "¡La colonia se ha vuelto tan próspera que los bichos parásitos pueden infiltrarse!");
+        es.put("TRIGGER_POLICE_ROLE_TITLE", "Infestación de hormigas parásitas");
+        es.put("TRIGGER_POLICE_ROLE_MSG", "¡La colonia se ha vuelto tan próspera que las hormigas parásitas pueden infiltrarse!");
         es.put("TRIGGER_PARASITIC_MITE_TITLE", "Ácaros parásitos");
         es.put("TRIGGER_PARASITIC_MITE_MSG", "¡Ácaros microscópicos infestan a tus obreras y las ralentizan! La captura de ácaros simbióticos ya está disponible. Investiga el rol de Capturador y asigna soldados para capturarlos: eliminan ácaros parásitos a diario.");
         es.put("TRIGGER_MASS_FLIGHT_TITLE", "Decreto imperial");

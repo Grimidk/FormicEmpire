@@ -124,7 +124,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("COLONY_GRAVE_CLEANING", "Limpeza de túmulos: %d/%d");
         pt.put("COLONY_PET_INSECTS", "Insetos de estimação: %d/%d");
         pt.put("COLONY_PARASITIC_MITES", "Ácaros: %d (%d formigas lentas)");
-        pt.put("COLONY_PARASITES", "Parasitas: %s");
+        pt.put("COLONY_PARASITE_ANTS", "Formigas parasitas: %s");
         pt.put("COLONY_POLICING", "Vigilância: %d");
         pt.put("COLONY_DETECTION_RATE", "Taxa de detecção: ~%d/dia");
         pt.put("COLONY_RESEARCH", "Pesquisa: %d");
@@ -134,7 +134,7 @@ public class PortugueseTranslation implements Translation {
 
         pt.put("TOOLTIP_PET_INSECTS", "Insetos de estimação cuidados por pastoras e capturadoras. Veja a aba Insetos nas estatísticas da colônia (X) para o detalhe por espécie.");
         pt.put("TOOLTIP_PARASITIC_MITES", "Ácaros microscópicos nas formigas. A cada 10 ácaros, uma formiga fica com metade da velocidade. Espalham-se mensalmente com muitos recursos armazenados.");
-        pt.put("TOOLTIP_PARASITES", "Parasitas na colônia");
+        pt.put("TOOLTIP_PARASITE_ANTS", "Formigas parasitas na colônia");
         pt.put("TOOLTIP_POLICING", "Eficiência de vigilância");
         pt.put("TOOLTIP_RESEARCH_POINTS", "Pontos de pesquisa");
 
@@ -277,8 +277,8 @@ public class PortugueseTranslation implements Translation {
         pt.put("UNIT_STAT_TEMP_RES_DESC", "Graus de tolerância");
         pt.put("UNIT_STAT_CONSUMPTION", "Consumo base");
         pt.put("UNIT_STAT_CONSUMPTION_DESC", "Unidades de alimento por dia por formiga");
-        pt.put("UNIT_STAT_DETECTION", "Detecção de parasitas");
-        pt.put("UNIT_STAT_DETECTION_DESC", "Chance de encontrar parasitas");
+        pt.put("UNIT_STAT_DETECTION", "Detecção de formigas parasitas");
+        pt.put("UNIT_STAT_DETECTION_DESC", "Chance de encontrar formigas parasitas");
         pt.put("UNIT_STAT_IMMUNITY", "Imunidade");
         pt.put("UNIT_STAT_IMMUNITY_DESC", "Mitigação de contaminação");
 
@@ -410,7 +410,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("SETTINGS_PAUSE_FOCUS", "Pausar ao perder o foco");
         pt.put("SETTINGS_CONFIRM_QUIT", "Confirmar ao sair");
         pt.put("SETTINGS_SHOW_TOOLTIPS", "Mostrar dicas");
-        pt.put("SETTINGS_FUZZ_PARASITES", "Aproximar números de parasitas");
+        pt.put("SETTINGS_FUZZ_PARASITE_ANTS", "Aproximar números de formigas parasitas");
 
         pt.put("SETTINGS_MASTER_VOL", "Volume principal:");
         pt.put("SETTINGS_MUSIC_VOL", "Volume da música:");
@@ -508,14 +508,14 @@ public class PortugueseTranslation implements Translation {
         pt.put("BUG_APHID", "Pulgão");
         pt.put("BUG_SYMBIOTIC_MITE", "Ácaro simbiótico");
         pt.put("BUG_DERMESTID", "Besouro dermestídeo");
-        pt.put("BUG_PARASITE", "Parasita");
+        pt.put("BUG_PARASITE_ANT", "Formiga parasita");
         pt.put("BUG_ANT_SCIENTIFIC", "Formica");
         pt.put("BUG_APHID_SCIENTIFIC", "Aphididae");
         pt.put("BUG_SYMBIOTIC_MITE_SCIENTIFIC", "Stratiolaelaps scimitus");
         pt.put("BUG_DERMESTID_SCIENTIFIC", "Dermestidae");
         pt.put("BUG_PARASITIC_MITE", "Ácaro parasita");
         pt.put("BUG_PARASITIC_MITE_SCIENTIFIC", "Acaridae");
-        pt.put("BUG_PARASITE_SCIENTIFIC", "Anergates");
+        pt.put("BUG_PARASITE_ANT_SCIENTIFIC", "Anergates");
 
         pt.put("TYPE_LARVA", "Larva");
         pt.put("TYPE_PUPA", "Pupa");
@@ -655,7 +655,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("ROLE_DEFENDER_DESC", "Permite que soldadas protejam diretamente a rainha.");
         pt.put("ROLE_POLICE_UPGRADE", "Função vigilante");
         pt.put("ROLE_POLICE_FLAVOR", "Brutalidade policial");
-        pt.put("ROLE_POLICE_DESC", "Permite detectar parasitas disfarçados; cada uma tem 10% de chance diária.");
+        pt.put("ROLE_POLICE_DESC", "Permite detectar formigas parasitas disfarçadas; cada uma tem 10% de chance diária.");
         pt.put("ROLE_BOMBER_UPGRADE", "Função bombardeira");
         pt.put("ROLE_BOMBER_FLAVOR", "Final explosivo");
         pt.put("ROLE_BOMBER_DESC", "Permite que soldadas especializadas explodam ao morrer.");
@@ -946,7 +946,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("HELP_TAB_WORLD", "Mundo");
 
         pt.put("HELP_WELCOME_STORY", "Quase todas as outras formigas se extinguiram. Você é uma rainha e carrega o conhecimento genético de cada espécie. Desbloqueie-o e domine o mundo. <br><br>Construa a colônia e expanda-se lutando contra outras colônias; adapte-se absorvendo e pesquisando habilidades.");
-        pt.put("HELP_START_INFO", "<b>Sobrevivência básica:</b><br>Suas formigas precisam de <b>cogumelos</b> para comer e <b>água</b> para beber todos os dias. Sem isso, a colônia morre de fome ou sede.<br>- <b>Coletoras</b> recolhem plantas e água.<br>- <b>Caçadoras</b> recolhem proteína (carne).<br>- <b>Agricultoras</b> convertem planta e proteína em cogumelos.<br>- <b>Babás</b> cuidam da prole. Prole negligenciada morre.<br><br><b>Observando a colônia:</b><br>Pressione <b>A</b> para alternar entre <b>submundo</b> (formigueiro) e <b>supermundo</b> (coleta externa).<br><br><b>Gestão:</b><br>Use <b>taxas de eclosão (P)</b> para nascimentos. <b>Pesquisadoras</b> geram PP para melhorias no <b>menu de pesquisa (Y)</b>. <b>Construtoras</b> usam minerais e resina no <b>menu de construção (U)</b>.<br><br><b>Ameaças:</b><br>- <b>Contaminação:</b> mortas devem ser retiradas por <b>coveiras</b>.<br>- <b>Parasitas:</b> drenam comida. Atribua <b>vigilantes</b>.<br>- <b>Esgotamento:</b> fontes secam; use <b>batedoras</b> para achar novas.");
+        pt.put("HELP_START_INFO", "<b>Sobrevivência básica:</b><br>Suas formigas precisam de <b>cogumelos</b> para comer e <b>água</b> para beber todos os dias. Sem isso, a colônia morre de fome ou sede.<br>- <b>Coletoras</b> recolhem plantas e água.<br>- <b>Caçadoras</b> recolhem proteína (carne).<br>- <b>Agricultoras</b> convertem planta e proteína em cogumelos.<br>- <b>Babás</b> cuidam da prole. Prole negligenciada morre.<br><br><b>Observando a colônia:</b><br>Pressione <b>A</b> para alternar entre <b>submundo</b> (formigueiro) e <b>supermundo</b> (coleta externa).<br><br><b>Gestão:</b><br>Use <b>taxas de eclosão (P)</b> para nascimentos. <b>Pesquisadoras</b> geram PP para melhorias no <b>menu de pesquisa (Y)</b>. <b>Construtoras</b> usam minerais e resina no <b>menu de construção (U)</b>.<br><br><b>Ameaças:</b><br>- <b>Contaminação:</b> mortas devem ser retiradas por <b>coveiras</b>.<br>- <b>Formigas parasitas:</b> drenam comida. Atribua <b>vigilantes</b>.<br>- <b>Esgotamento:</b> fontes secam; use <b>batedoras</b> para achar novas.");
         pt.put("HELP_OVERWORLD_GATHERING", "<b>Coleta no supermundo:</b><br>As <b>batedoras</b> descobrem novos nós de recursos. Cada hex do mapa acumula <b>esgotamento</b> por achados sem água; esgotamento maior tende a colocar nós novos mais longe do formigueiro (algumas melhorias limitam isso).<br><br><b>Distância:</b> o rendimento usa linha reta a partir da <b>entrada do ninho</b>. Dentro de um raio de <b>plena eficiência</b> (maior com operárias mais rápidas e certas melhorias), o rendimento é integral; além disso, cai até um mínimo pequeno.<br><br><b>Estatísticas (Hex local):</b> <b>Esgotamento</b> é a porcentagem efetiva usada para aparições; <b>Fontes encontradas</b> conta os nós que esta colônia descobriu; <b>Distância máx. de plena eficiência</b> estima o raio de rendimento pleno para uma operária típica.");
         pt.put("HELP_DYNASTY_INFO", "<b>Expandindo a dinastia:</b><br>Com <b>reprodutoras</b>, faça voos nupciais pelo <b>mapa mundial (I)</b>.<br><i>Dica: eclipses ativam voos nupciais espontâneos e gratuitos!</i><br><br><b>Logística e comércio:</b><br>Várias colônias desbloqueiam <b>rotas comerciais</b>. Atribua <b>mensageiras</b>.<br>- <b>Terra:</b> padrão.<br>- <b>Túnel:</b> seguro e rápido, requer <b>túneis</b> e <b>perfuradoras</b>.<br>- <b>Ar:</b> rápido, baixa capacidade, requer <b>transporte aéreo</b> (princesas).<br>- <b>Bilateral:</b> transporte nos dois sentidos.<br><br><b>Marcos:</b><br>- <b>Menu da dinastia (S):</b> gerir colônias.<br>- <b>Colonização em massa:</b> remove limite de satélites.<br>- <b>Automação:</b> colônias NPC se gerem.<br><br><b>Evolução:</b><br><b>Sinergias</b> combinam melhorias; <b>assimilações</b> absorvem traços.");
 
@@ -984,7 +984,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("HELP_BUG_APHID_DESC", "Insetos que se alimentam de plantas. Nativos da maioria dos biomas exceto secos. Exigem o papel Pastora antes de capturadoras os recolherem. Pastoras cuidam de até 10 cada para xarope.");
         pt.put("HELP_BUG_SYMBIOTIC_MITE_DESC", "Ácaros predadores de controlo biológico. Nativos de todos os biomas. A captura desbloqueia na primeira aparição de ácaros parasitas. No curral de insetos. Cada ácaro simbiótico elimina até 5 ácaros parasitas por dia (12 com Treino de ácaros simbióticos).");
         pt.put("HELP_BUG_DERMESTID_DESC", "Besouros que limpam carcaças. Nativos da maioria dos biomas exceto frios. Exigem a pesquisa Captura de besouros de cova. Coveiras cuidam de até 10 cada. Com Besouros de cova, cada um conta como uma coveira.");
-        pt.put("HELP_BUG_PARASITE_DESC", "Pragas que se escondem no formigueiro e drenam comida em segredo. Nativas de biomas quentes. Surto na primavera e verão com mais de 1.000 formigas (25% por mês). Atribua Polícias para eliminá-las.");
+        pt.put("HELP_BUG_PARASITE_ANT_DESC", "Formigas parasitas que se escondem no formigueiro e drenam comida em segredo. Nativas de biomas quentes. Surto na primavera e verão com mais de 1.000 formigas (25% por mês). Atribua Polícias para eliminá-las.");
         pt.put("HELP_BUG_PARASITIC_MITE_DESC", "Ácaros minúsculos que infestam formigas adultas quando a colônia acumula recursos. Nativos de biomas frios. Surto no outono e inverno acima de 10.000 recursos armazenados (25% por mês). Cada 10 ácaros reduzem uma formiga à metade da velocidade. Ácaros simbióticos são o principal contramedida.");
 
         pt.put("HELP_BIOMES_TITLE", "Biomas");
@@ -1002,7 +1002,7 @@ public class PortugueseTranslation implements Translation {
 
         pt.put("HELP_TUTORIAL_TITLE", "Bem-vindo à dinastia fôrmica!");
         pt.put("HELP_TUTORIAL_TIPS", "<b>Dicas:</b><br><br>O principal alimento são <b>cogumelos</b>, consumidos diariamente.<br><br>Atribua <b>operárias</b> (Q) como <b>coletoras</b> para plantas e água. Sem água, suas formigas morrem de sede!<br><br>Atribua <b>agricultoras</b> (Q) para converter plantas em cogumelos. Uma agricultora costuma atender ~6 coletoras.<br><br>Atribua <b>babás</b> (Q) para <b>ovos, larvas e pupas</b>. Sem babás, as crias morrem!<br><br>Pressione <b>A</b> para alternar submundo e supermundo.<br><br><i>Se não houver formigas livres ao mudar função, o jogo pode puxar da força padrão (ex.: coletoras).</i>");
-        pt.put("HELP_TUTORIAL_THREATS", "<b>Ameaças:</b><br><br><b>Contaminação:</b> formigas morrem de velhice. Corpos acumulam doença. Use <b>coveiras</b>.<br><br><b>Parasitas:</b> drenam cogumelos. Use <b>vigilantes</b>.<br><br><b>Esgotamento:</b> fontes acabam. Use <b>batedoras</b> para achar novas.");
+        pt.put("HELP_TUTORIAL_THREATS", "<b>Ameaças:</b><br><br><b>Contaminação:</b> formigas morrem de velhice. Corpos acumulam doença. Use <b>coveiras</b>.<br><br><b>Formigas parasitas:</b> drenam cogumelos. Use <b>vigilantes</b>.<br><br><b>Esgotamento:</b> fontes acabam. Use <b>batedoras</b> para achar novas.");
         pt.put("HELP_TUTORIAL_DYNASTY", "<b>Dinastia:</b><br><br>Com a colônia forte, desbloqueie princesas <b>reprodutoras</b> e colonias satélites pelo <b>mapa mundial (I)</b>.<br><i>Eclipses raros geram voos nupciais gratuitos!</i><br><br>Várias colônias desbloqueiam o <b>menu da dinastia (S)</b>. Marcos permitem <b>rotas comerciais</b>, remover limites e <b>automatizar</b>.");
 
         pt.put("HOTKEY_PAUSE_LABEL", "Pausa/jogar:");
@@ -1064,7 +1064,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("STAT_RATE_RANCHERS_FMT", "%d criadoras");
         pt.put("STAT_RATE_APHIDS_FMT", "%s / %d pulgões");
         pt.put("STAT_RATE_POLICE_FMT", "%d polícia");
-        pt.put("STAT_RATE_PARASITES_FMT", "%d parasitas");
+        pt.put("STAT_RATE_PARASITE_ANTS_FMT", "%d formigas parasitas");
         pt.put("STAT_RATE_DET_DAY", "~%d det./dia");
         pt.put("STAT_NO_INSECTS", "Nenhum inseto registado");
         pt.put("STAT_INSECT_CATCHERS_FMT", "%d capturadoras");
@@ -1072,6 +1072,11 @@ public class PortugueseTranslation implements Translation {
         pt.put("STAT_INSECT_POOL", "Cota das capturadoras");
         pt.put("STAT_INSECT_PARASITIC_CAP_FMT", "%d ácaros por formiga lenta");
         pt.put("STAT_INSECT_PARASITIC_KILL_FMT", "%d lentas, ~%d/dia de contramedida");
+        pt.put("STAT_OUTBREAK_PREV_FMT", "%d / %d (2× %d/mês de surto)");
+        pt.put("STAT_OUTBREAK_PREV_BLOCKED", "Surtos bloqueados");
+        pt.put("STAT_OUTBREAK_PREV_PROJECTED_FMT", "Até %d/mês em surto");
+        pt.put("TOOLTIP_OUTBREAK_PREV_POLICE", "Se a contagem de polícias for pelo menos o dobro do surto mensal projetado de formigas parasitas, novos surtos são bloqueados por completo (caso contrário, o sorteio mensal de 25% ainda se aplica).");
+        pt.put("TOOLTIP_OUTBREAK_PREV_SYMBIOTIC", "Se a contagem de ácaros simbióticos for pelo menos o dobro do surto mensal projetado de ácaros parasitas, novos surtos são bloqueados por completo (caso contrário, o sorteio mensal de 25% ainda se aplica).");
 
         pt.put("LOG_DEATH_OLD_AGE_FMT", "%d formigas morreram de velhice");
         pt.put("LOG_DEATH_JUVENILES_LACK_CARE_FMT", "%d juvenis morreram (falta de cuidados)");
@@ -1088,14 +1093,14 @@ public class PortugueseTranslation implements Translation {
         pt.put("LOG_CONTAM_LEVEL_SMALL", "Baixo");
         pt.put("LOG_CONTAM_LEVEL_MEDIUM", "Médio");
         pt.put("LOG_CONTAM_LEVEL_MASSIVE", "Massivo");
-        pt.put("LOG_PARASITE_SPREAD_FMT", "Uma infestação parasitária se espalhou! %d novos parasitas detectados.");
+        pt.put("LOG_PARASITE_ANT_SPREAD_FMT", "Uma infestação de formigas parasitas se espalhou! %d novas formigas parasitas detectadas.");
         pt.put("LOG_PARASITIC_MITE_SPREAD_FMT", "Ácaros parasitas se espalharam! %d novos ácaros detectados na colônia.");
         pt.put("LOG_DYNASTY_ABSORBED_FMT", "Restos de %s absorvidos!");
         pt.put("LOG_FAILURE_SATELLITE", "Uma colônia satélite não amadureceu por estagnação genética.");
         pt.put("LOG_SATELLITE_AT_FMT", "Nova colônia satélite em (%d, %d)");
         pt.put("LOG_SATELLITES_ESTABLISHED_FMT", "%d satélites estabelecidos.");
         pt.put("LOG_SPREADING_FAILED", "Expansão falhou: não há terras adjacentes adequadas.");
-        pt.put("LOG_PARASITES_ELIMINATED_FMT", "Eliminados %d parasitas.");
+        pt.put("LOG_PARASITE_ANTS_ELIMINATED_FMT", "Eliminadas %d formigas parasitas.");
         pt.put("LOG_CAUGHT_BUGS_SUMMARY_FMT", "Capturadoras trouxeram %d inseto(s) do exterior.");
         pt.put("LOG_CAUGHT_BUG_BRED_FMT", "%d %s reproduziram-se em cativeiro.");
         pt.put("LOG_SYMBIOTIC_MITES_PREDATION_FMT", "Ácaros simbióticos eliminaram %d ácaro(s) parasita(s).");
@@ -1150,8 +1155,8 @@ public class PortugueseTranslation implements Translation {
         pt.put("TRIGGER_SPREAD_ABILITY_MSG", "Com a capacidade de criar novas rainhas, a tua colónia agora sabe como se expandir. Podes fundar novas colónias no mapa mundial (I).");
         pt.put("TRIGGER_SCOUT_ROLE_TITLE", "Chamada da aventura");
         pt.put("TRIGGER_SCOUT_ROLE_MSG", "Esgotámos mais de metade da nossa principal fonte de plantas! As operárias sentem a necessidade de explorar novas terras, desbloqueando a função de Exploradora.");
-        pt.put("TRIGGER_POLICE_ROLE_TITLE", "Infestação parasitária");
-        pt.put("TRIGGER_POLICE_ROLE_MSG", "A colónia tornou-se tão próspera que insetos parasitas podem infiltrar-se!");
+        pt.put("TRIGGER_POLICE_ROLE_TITLE", "Infestação de formigas parasitas");
+        pt.put("TRIGGER_POLICE_ROLE_MSG", "A colónia tornou-se tão próspera que formigas parasitas podem infiltrar-se!");
         pt.put("TRIGGER_PARASITIC_MITE_TITLE", "Ácaros parasitas");
         pt.put("TRIGGER_PARASITIC_MITE_MSG", "Ácaros microscópicos infestam as tuas operárias e abrandam-nas! A captura de ácaros simbióticos já está disponível. Investiga o papel Captor e atribui soldadas para os capturar — eliminam ácaros parasitas diariamente.");
         pt.put("TRIGGER_MASS_FLIGHT_TITLE", "Decreto imperial");

@@ -188,7 +188,7 @@ public class ColonyPhysicsService {
                         yard = getRoomBounds(colony, WorldSpaces.GRAVEYARD);
                     }
                     bug.setPosition(getRandomPointInRoom(colony, yard, virtualWidth));
-                } else if (bug.getBugType() == GameConstants.TYPE_PARASITE) {
+                } else if (bug.getBugType() == GameConstants.TYPE_PARASITE_ANT) {
                     bug.setDimension(WorldSpaces.UNDERWORLD);
                     Rectangle hideout = getRoomBounds(colony, WorldSpaces.STORAGE);
                     bug.setPosition(getRandomPointInRoom(colony, hideout, virtualWidth));
@@ -336,7 +336,7 @@ public class ColonyPhysicsService {
             }
             wanderInBoundaries(colony, bug, yard, 0.05);
         }
-        else if (bug.getBugType() == GameConstants.TYPE_PARASITE) {
+        else if (bug.getBugType() == GameConstants.TYPE_PARASITE_ANT) {
             if (bug.getDimension() != WorldSpaces.UNDERWORLD) {
                 bug.setDimension(WorldSpaces.UNDERWORLD);
             }

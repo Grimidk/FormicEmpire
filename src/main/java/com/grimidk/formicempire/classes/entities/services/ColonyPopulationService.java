@@ -254,7 +254,7 @@ public class ColonyPopulationService {
             }
         }
 
-        int parasiteCount = colony.getParasites();
+        int parasiteCount = colony.getParasiteAnts();
         if (parasiteCount > 0) {
             foodNeeded += parasiteCount; 
         }
@@ -356,35 +356,73 @@ public class ColonyPopulationService {
         }
     }
 
-    public void runParasitation(Colony colony, Biome biome, Season season) {
+    public boolean isParasiteAntOutbreakEligible(Colony colony, Biome biome, Season season) {
         if (colony == null || biome == null || season == null) {
-            return;
+            return false;
         }
         if (!GameConstants.isParasiticAntSeason(season)) {
+            return false;
+        }
+        if (!biome.hasNativeParasite(GameConstants.TYPE_PARASITE_ANT)) {
+            return false;
+        }
+        return colony.getAntTotal() >= 1000;
+    }
+
+    public int calculateParasiteAntSpawnAmount(Colony colony) {
+        if (colony == null) {
+            return 0;
+        }
+        int spawnAmount = Math.max(10, (int) (colony.getAntTotal() * 0.01));
+        int existingParasiteAnts = colony.getParasiteAnts();
+        if (existingParasiteAnts > 0) {
+            spawnAmount += (int) (existingParasiteAnts * 0.50);
+        }
+        return Math.max(0, spawnAmount);
+    }
+
+    public int projectParasiteAntMonthlySpawn(Colony colony, Biome biome, Season season) {
+        if (!isParasiteAntOutbreakEligible(colony, biome, season)) {
+            return 0;
+        }
+        return calculateParasiteAntSpawnAmount(colony);
+    }
+
+    public int requiredPoliceToPreventParasiteAntOutbreak(Colony colony, Biome biome, Season season) {
+        int spawn = projectParasiteAntMonthlySpawn(colony, biome, season);
+        if (spawn <= 0) {
+            return 0;
+        }
+        return spawn * GameConstants.PARASITE_OUTBREAK_PREVENTION_MULTIPLIER;
+    }
+
+    public boolean isParasiteAntOutbreakPrevented(Colony colony, Biome biome, Season season) {
+        int required = requiredPoliceToPreventParasiteAntOutbreak(colony, biome, season);
+        if (required <= 0) {
+            return false;
+        }
+        return colony.getAssignedRoleCount(GameConstants.ROLE_POLICE) >= required;
+    }
+
+    public void runParasitation(Colony colony, Biome biome, Season season) {
+        if (!isParasiteAntOutbreakEligible(colony, biome, season)) {
             return;
         }
-        if (!biome.hasNativeParasite(GameConstants.TYPE_PARASITE)) {
+
+        int spawnAmount = calculateParasiteAntSpawnAmount(colony);
+        if (spawnAmount <= 0) {
             return;
         }
-        if (colony.getAntTotal() < 1000) {
+        if (isParasiteAntOutbreakPrevented(colony, biome, season)) {
             return;
         }
         if (GameRandom.nextFloat() > GameConstants.PARASITE_OUTBREAK_CHANCE) {
             return;
         }
 
-        int spawnAmount = Math.max(10, (int) (colony.getAntTotal() * 0.01));
-        int existingParasites = colony.getParasites();
-
-        if (existingParasites > 0) {
-            spawnAmount += (int)(existingParasites * 0.50);
-        }
-        
-        if (spawnAmount <= 0) return;
-        
-        colony.setParasites(colony.getParasites() + spawnAmount);
+        colony.setParasiteAnts(colony.getParasiteAnts() + spawnAmount);
         colony.logEvent(ColonyLogPrefixes.INFO + " "
-            + String.format(LanguageStrings.get(LanguageStrings.LOG_PARASITE_SPREAD_FMT), spawnAmount));
+            + String.format(LanguageStrings.get(LanguageStrings.LOG_PARASITE_ANT_SPREAD_FMT), spawnAmount));
     }
 
     public void rankUp(Colony colony) {

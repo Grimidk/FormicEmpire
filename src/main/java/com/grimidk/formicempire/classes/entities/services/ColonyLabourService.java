@@ -439,28 +439,28 @@ public class ColonyLabourService {
     public void runPolicing(Colony colony) {
         if (!colony.hasUpgrade(GameUnlocks.ROLE_POLICE)) return;
         
-        int parasiteCount = colony.getParasites();
+        int parasiteCount = colony.getParasiteAnts();
         if (parasiteCount == 0) return;
         
         List<Ant> police = getWorkingAnts(colony, GameConstants.ROLE_POLICE);
         if (police.isEmpty()) return;
         
         float detectionRate = colony.getStatsService().getParasiteDetection(colony);
-        int parasitesKilled = 0;
+        int parasiteAntsKilled = 0;
         
         for (Ant officer : police) {
-            if (parasitesKilled >= parasiteCount) break;
+            if (parasiteAntsKilled >= parasiteCount) break;
             
             if (GameRandom.nextFloat() < detectionRate) {
-                parasitesKilled++;
+                parasiteAntsKilled++;
                 colony.getResourceService().addResource(colony, GameConstants.RESOURCE_MEAT, 4);
             }
         }
         
-        if (parasitesKilled > 0) {
+        if (parasiteAntsKilled > 0) {
             colony.logEvent(ColonyLogPrefixes.INFO + " "
-                + String.format(LanguageStrings.get(LanguageStrings.LOG_PARASITES_ELIMINATED_FMT), parasitesKilled));
-            colony.setParasites(Math.max(0, colony.getParasites() - parasitesKilled));
+                + String.format(LanguageStrings.get(LanguageStrings.LOG_PARASITE_ANTS_ELIMINATED_FMT), parasiteAntsKilled));
+            colony.setParasiteAnts(Math.max(0, colony.getParasiteAnts() - parasiteAntsKilled));
         }
     }
 

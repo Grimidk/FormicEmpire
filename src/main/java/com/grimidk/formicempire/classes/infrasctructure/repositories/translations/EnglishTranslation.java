@@ -124,7 +124,7 @@ public class EnglishTranslation implements Translation {
         en.put("COLONY_GRAVE_CLEANING", "Grave Cleaning: %d/%d");
         en.put("COLONY_PET_INSECTS", "Pet insects: %d/%d");
         en.put("COLONY_PARASITIC_MITES", "Mites: %d (%d slowed ants)");
-        en.put("COLONY_PARASITES", "Parasites: %s");
+        en.put("COLONY_PARASITE_ANTS", "Parasite ants: %s");
         en.put("COLONY_POLICING", "Policing: %d");
         en.put("COLONY_DETECTION_RATE", "Detection rate: ~%d/day");
         en.put("COLONY_RESEARCH", "Research: %d");
@@ -134,7 +134,7 @@ public class EnglishTranslation implements Translation {
         
         en.put("TOOLTIP_PET_INSECTS", "Pet insects kept by ranchers and catchers. See the Insects tab in colony statistics (X) for a breakdown by species.");
         en.put("TOOLTIP_PARASITIC_MITES", "Microscopic mites on your ants. Every 10 mites slow one ant to half speed. Spread monthly when stored resources are high.");
-        en.put("TOOLTIP_PARASITES", "Parasites in Colony");
+        en.put("TOOLTIP_PARASITE_ANTS", "Parasite ants in colony");
         en.put("TOOLTIP_POLICING", "Policing Efficiency");
         en.put("TOOLTIP_RESEARCH_POINTS", "Research Points");
 
@@ -277,8 +277,8 @@ public class EnglishTranslation implements Translation {
         en.put("UNIT_STAT_TEMP_RES_DESC", "Degrees tolerance");
         en.put("UNIT_STAT_CONSUMPTION", "Base Consumption");
         en.put("UNIT_STAT_CONSUMPTION_DESC", "Food units per day per ant");
-        en.put("UNIT_STAT_DETECTION", "Parasite Detection");
-        en.put("UNIT_STAT_DETECTION_DESC", "Chance to find parasites");
+        en.put("UNIT_STAT_DETECTION", "Parasite Ant Detection");
+        en.put("UNIT_STAT_DETECTION_DESC", "Chance to find parasite ants");
         en.put("UNIT_STAT_IMMUNITY", "Immunity");
         en.put("UNIT_STAT_IMMUNITY_DESC", "Contamination mitigation");
 
@@ -410,7 +410,7 @@ public class EnglishTranslation implements Translation {
         en.put("SETTINGS_PAUSE_FOCUS", "Pause on focus loss");
         en.put("SETTINGS_CONFIRM_QUIT", "Confirm on quit");
         en.put("SETTINGS_SHOW_TOOLTIPS", "Show tooltips");
-        en.put("SETTINGS_FUZZ_PARASITES", "Fuzz parasite numbers");
+        en.put("SETTINGS_FUZZ_PARASITE_ANTS", "Fuzz parasite ant numbers");
 
         en.put("SETTINGS_MASTER_VOL", "Master Volume:");
         en.put("SETTINGS_MUSIC_VOL", "Music Volume:");
@@ -508,14 +508,14 @@ public class EnglishTranslation implements Translation {
         en.put("BUG_APHID", "Aphid");
         en.put("BUG_SYMBIOTIC_MITE", "Symbiotic mite");
         en.put("BUG_DERMESTID", "Dermestid beetle");
-        en.put("BUG_PARASITE", "Ant Parasite");
+        en.put("BUG_PARASITE_ANT", "Parasite ant");
         en.put("BUG_ANT_SCIENTIFIC", "Formica");
         en.put("BUG_APHID_SCIENTIFIC", "Aphididae");
         en.put("BUG_SYMBIOTIC_MITE_SCIENTIFIC", "Stratiolaelaps scimitus");
         en.put("BUG_DERMESTID_SCIENTIFIC", "Dermestidae");
         en.put("BUG_PARASITIC_MITE", "Parasitic mite");
         en.put("BUG_PARASITIC_MITE_SCIENTIFIC", "Acaridae");
-        en.put("BUG_PARASITE_SCIENTIFIC", "Anergates");
+        en.put("BUG_PARASITE_ANT_SCIENTIFIC", "Anergates");
 
         en.put("TYPE_LARVA", "Larva");
         en.put("TYPE_PUPA", "Pupa");
@@ -538,7 +538,7 @@ public class EnglishTranslation implements Translation {
         en.put("ROLE_GUARD", "Guard");
         en.put("ROLE_WARRIOR", "Warrior");
         en.put("ROLE_DEFENDER", "Defender");
-        en.put("ROLE_POLICE", "Parasite-Police");
+        en.put("ROLE_POLICE", "Parasite-Ant Police");
         en.put("ROLE_BOMBER", "Bomber");
         en.put("ROLE_HUNTER", "Hunter");
         en.put("ROLE_BRUTE", "Brute");
@@ -653,9 +653,9 @@ public class EnglishTranslation implements Translation {
         en.put("ROLE_DEFENDER_UPGRADE", "Defender Role");
         en.put("ROLE_DEFENDER_FLAVOR", "Royal Shield");
         en.put("ROLE_DEFENDER_DESC", "Allows soldiers to protect the queen directly.");
-        en.put("ROLE_POLICE_UPGRADE", "Parasite-Police Role");
+        en.put("ROLE_POLICE_UPGRADE", "Parasite-Ant Police Role");
         en.put("ROLE_POLICE_FLAVOR", "Police Brutality");
-        en.put("ROLE_POLICE_DESC", "Allows soldiers to detect parasitic bugs disguising as your ants, each one has a 10% chance to detect parasites per day.");
+        en.put("ROLE_POLICE_DESC", "Allows soldiers to detect parasite ants disguising as your ants; each one has a 10% chance to detect parasite ants per day.");
         en.put("ROLE_BOMBER_UPGRADE", "Bomber Role");
         en.put("ROLE_BOMBER_FLAVOR", "Explosive Finish");
         en.put("ROLE_BOMBER_DESC", "Allows specialized soldiers to explode on death.");
@@ -946,7 +946,7 @@ public class EnglishTranslation implements Translation {
         en.put("HELP_TAB_WORLD", "World");
 
         en.put("HELP_WELCOME_STORY", "Nearly all other ants are extinct. You are an ant queen and have within you all the genetic knowledge of every ant species. You must unlock it and take over the world as the dominant species. <br><br>Build up your colony and begin to spread while fighting other ant colonies, you will need to adapt to new environments by absorbing and researching their abilities.");
-        en.put("HELP_START_INFO", "<b>Basic Survival:</b><br>Your ants need <b>Fungi</b> (Mushrooms) to eat and <b>Water</b> to drink every day. Without them, your colony will starve or die of dehydration.<br>- <b>Foragers</b> gather Plants and Water.<br>- <b>Hunters</b> gather Protein (Meat).<br>- <b>Farmers</b> convert Plants and Protein into Fungi.<br>- <b>Nurses</b> care for your brood. Neglected brood will perish.<br><br><b>Watching Your Colony:</b><br>Press <b>A</b> to toggle your view between the <b>Underworld</b> (inside the nest) and the <b>Overworld</b> (outside gathering).<br><br><b>Colony Management:</b><br>Use <b>Hatch Rates (P)</b> to control ant births. <b>Researchers</b> generate Research Points (RP) for upgrades in the <b>Research Menu (Y)</b>. <b>Builders</b> use Minerals and Resin to construct facilities via the <b>Build Menu (U)</b>.<br><br><b>Advanced Threats:</b><br>- <b>Contamination:</b> Dead ants must be cleared by <b>Gravers</b>.<br>- <b>Parasites:</b> Secretly drain food. Assign <b>Police</b> to eliminate them.<br>- <b>Depletion:</b> Resource nodes dry up; assign <b>Scouts</b> to find new ones.");
+        en.put("HELP_START_INFO", "<b>Basic Survival:</b><br>Your ants need <b>Fungi</b> (Mushrooms) to eat and <b>Water</b> to drink every day. Without them, your colony will starve or die of dehydration.<br>- <b>Foragers</b> gather Plants and Water.<br>- <b>Hunters</b> gather Protein (Meat).<br>- <b>Farmers</b> convert Plants and Protein into Fungi.<br>- <b>Nurses</b> care for your brood. Neglected brood will perish.<br><br><b>Watching Your Colony:</b><br>Press <b>A</b> to toggle your view between the <b>Underworld</b> (inside the nest) and the <b>Overworld</b> (outside gathering).<br><br><b>Colony Management:</b><br>Use <b>Hatch Rates (P)</b> to control ant births. <b>Researchers</b> generate Research Points (RP) for upgrades in the <b>Research Menu (Y)</b>. <b>Builders</b> use Minerals and Resin to construct facilities via the <b>Build Menu (U)</b>.<br><br><b>Advanced Threats:</b><br>- <b>Contamination:</b> Dead ants must be cleared by <b>Gravers</b>.<br>- <b>Parasite ants:</b> Secretly drain food. Assign <b>Police</b> to eliminate them.<br>- <b>Depletion:</b> Resource nodes dry up; assign <b>Scouts</b> to find new ones.");
         en.put("HELP_OVERWORLD_GATHERING", "<b>Overworld (surface) gathering:</b><br><b>Scouts</b> discover new resource nodes. Each map hex tracks <b>depletion</b> from non-water finds; higher depletion tends to place new nodes farther from the nest (some upgrades cap how bad this gets).<br><br><b>Distance:</b> Gathered amounts use straight-line distance from the <b>nest entrance</b>. Inside a <b>full efficiency</b> radius (larger for faster workers and certain upgrades), yields are full; beyond that, yield falls toward a small minimum.<br><br><b>Statistics (Local hex):</b> <b>Depletion</b> is the effective percentage used for spawns; <b>Sources found</b> counts nodes this colony has discovered; <b>Max efficiency distance</b> estimates the full-yield radius for a typical worker.");
         en.put("HELP_DYNASTY_INFO", "<b>Expanding Your Dynasty:</b><br>Once you unlock <b>Breeders</b>, perform Nuptial Flights to spread via the <b>World Map (I)</b>.<br><i>Tip: Eclipses trigger spontaneous, free Nuptial Flights!</i><br><br><b>Logistics & Trade:</b><br>Founding multiple colonies unlocks <b>Trade Routes</b>. Assign <b>Couriers</b> to transport resources.<br>- <b>Land:</b> Standard trade method.<br>- <b>Tunnel:</b> Secure and fast, requires <b>Tunnels</b> and <b>Borers</b>.<br>- <b>Air:</b> Fast but low capacity, requires <b>Sky Transports</b> (Princesses).<br>- <b>Bilateral:</b> Allows two-way resource transport.<br><br><b>Dynasty Milestones:</b><br>- <b>Dynasty Menu (S):</b> View and manage all colonies.<br>- <b>Mass Colonization:</b> Removes satellite colony limits.<br>- <b>Automation:</b> Allows NPC colonies to manage themselves.<br><br><b>Evolution:</b><br>Unlock <b>Synergies</b> to combine upgrades and <b>Assimilations</b> to absorb other ant species' traits.");
         
@@ -984,7 +984,7 @@ public class EnglishTranslation implements Translation {
         en.put("HELP_BUG_APHID_DESC", "Soft-bodied insects that feed on plants. Native to most biomes except dry ones. Requires the Rancher role before catchers can collect them. Ranchers tend penned aphids (up to 10 per rancher) for syrup income.");
         en.put("HELP_BUG_SYMBIOTIC_MITE_DESC", "Small predatory mites used as biological control. Native to all biomes. Unlocks for catching when parasitic mites first appear. Kept in the insect pen. Each symbiotic mite eliminates up to 5 parasitic mites per day (12 with Symbiotic Mite Training).");
         en.put("HELP_BUG_DERMESTID_DESC", "Carrion beetles that clean dead tissue. Native to most biomes except cold ones. Requires Grave Beetle Catching research before catchers can collect them. Gravers tend up to 10 each in the graveyard. With Grave Beetles research, each dermestid counts as one graver.");
-        en.put("HELP_BUG_PARASITE_DESC", "Pests that hide in the nest and secretly drain your food. Native to hot biomes. Outbreaks can occur in spring and summer when the colony exceeds 1,000 ants (25% chance per month). Assign Police to find and eliminate them before they spread.");
+        en.put("HELP_BUG_PARASITE_ANT_DESC", "Parasite ants that hide in the nest and secretly drain your food. Native to hot biomes. Outbreaks can occur in spring and summer when the colony exceeds 1,000 ants (25% chance per month). Assign Police to find and eliminate them before they spread.");
         en.put("HELP_BUG_PARASITIC_MITE_DESC", "Tiny mites that infest adult ants when the colony hoards resources. Native to cold biomes. Outbreaks can occur in autumn and winter above 10,000 stored resources (25% chance per month). Each 10 mites slow one ant to half speed. Symbiotic mites are the main counter. Police do not affect them.");
 
         en.put("HELP_BIOMES_TITLE", "Biomes");
@@ -1002,7 +1002,7 @@ public class EnglishTranslation implements Translation {
 
         en.put("HELP_TUTORIAL_TITLE", "Welcome to Formic Dynasty!");
         en.put("HELP_TUTORIAL_TIPS", "<b>Basic Tips:</b><br><br>Your main food is <b>Fungi</b> (Mushrooms), which ants will eat daily.<br><br>Assign <b>Workers</b> (Q) to <b>Forager</b> roles to gather Plants and Water. Without them your ants will die of thirst!<br><br>Assign <b>Farmers</b> (Q) to convert gathered Plants into Fungi. One Farmer can generally handle 6 Foragers.<br><br>Assign <b>Nurses</b> (Q) to care for your <b>Eggs, Larvae, and Pupae</b>. Without enough nurses, your young will perish from neglect!<br><br>Press <b>A</b> to toggle your view between the <b>Underworld</b>  and the <b>Overworld</b> .<br><br><i>QoL Tip: If you assign a new role but have no unassigned ants, the game automatically pulls from your default workforce (like Foragers).</i>");
-        en.put("HELP_TUTORIAL_THREATS", "<b>Colony Threats:</b><br><br><b>Contamination:</b> Ants naturally die of old age. If bodies pile up, disease will spread and kill your colony. Assign <b>Gravers</b> to clear the dead.<br><br><b>Parasites:</b> Unseen pests will leech your Fungi reserves. Assign <b>Police</b> to detect and eliminate them.<br><br><b>Depletion:</b> Resource nodes don't last forever. If your foragers run out of plants or water, assign <b>Scouts</b> to find new resources nearby.");
+        en.put("HELP_TUTORIAL_THREATS", "<b>Colony Threats:</b><br><br><b>Contamination:</b> Ants naturally die of old age. If bodies pile up, disease will spread and kill your colony. Assign <b>Gravers</b> to clear the dead.<br><br><b>Parasite ants:</b> Unseen pests will leech your Fungi reserves. Assign <b>Police</b> to detect and eliminate them.<br><br><b>Depletion:</b> Resource nodes don't last forever. If your foragers run out of plants or water, assign <b>Scouts</b> to find new resources nearby.");
         en.put("HELP_TUTORIAL_DYNASTY", "<b>Dynasty Management:</b><br><br>As your colony thrives, you will unlock <b>Breeder</b> Princesses. These allow you to establish satellite colonies via the <b>World Map (I)</b> .<br><i>Tip: Keep an eye on the sky! Rare Solar or Lunar Eclipses will trigger spontaneous, free Nuptial Flights!</i><br><br>Founding multiple colonies unlocks the <b>Dynasty Menu (S)</b>. Reaching certain milestones will allow you to construct <b>Trade Routes</b>, remove spreading limits, and even <b>Automate</b> your expanding dynasty!");
         
         en.put("HOTKEY_PAUSE_LABEL", "Pause/Play:");
@@ -1064,7 +1064,7 @@ public class EnglishTranslation implements Translation {
         en.put("STAT_RATE_RANCHERS_FMT", "%d Ranchers");
         en.put("STAT_RATE_APHIDS_FMT", "%s / %d Aphids");
         en.put("STAT_RATE_POLICE_FMT", "%d Police");
-        en.put("STAT_RATE_PARASITES_FMT", "%d Parasites");
+        en.put("STAT_RATE_PARASITE_ANTS_FMT", "%d parasite ants");
         en.put("STAT_RATE_DET_DAY", "~%d det./day");
         en.put("STAT_NO_INSECTS", "No insects tracked");
         en.put("STAT_INSECT_CATCHERS_FMT", "%d catchers");
@@ -1072,6 +1072,11 @@ public class EnglishTranslation implements Translation {
         en.put("STAT_INSECT_POOL", "Catcher pool");
         en.put("STAT_INSECT_PARASITIC_CAP_FMT", "%d mites per slowed ant");
         en.put("STAT_INSECT_PARASITIC_KILL_FMT", "%d slowed, ~%d/day counter");
+        en.put("STAT_OUTBREAK_PREV_FMT", "%d / %d (2× %d/mo spawn)");
+        en.put("STAT_OUTBREAK_PREV_BLOCKED", "Outbreak prevented");
+        en.put("STAT_OUTBREAK_PREV_PROJECTED_FMT", "Up to %d/mo on outbreak");
+        en.put("TOOLTIP_OUTBREAK_PREV_POLICE", "If police count is at least twice the projected monthly parasite-ant spawn, new outbreaks are blocked entirely (25% monthly roll still applies otherwise).");
+        en.put("TOOLTIP_OUTBREAK_PREV_SYMBIOTIC", "If symbiotic mite count is at least twice the projected monthly parasitic-mite spawn, new outbreaks are blocked entirely (25% monthly roll still applies otherwise).");
 
         en.put("LOG_DEATH_OLD_AGE_FMT", "%d ants died of old age");
         en.put("LOG_DEATH_JUVENILES_LACK_CARE_FMT", "%d juveniles died (lack of care)");
@@ -1088,14 +1093,14 @@ public class EnglishTranslation implements Translation {
         en.put("LOG_CONTAM_LEVEL_SMALL", "Small");
         en.put("LOG_CONTAM_LEVEL_MEDIUM", "Medium");
         en.put("LOG_CONTAM_LEVEL_MASSIVE", "Massive");
-        en.put("LOG_PARASITE_SPREAD_FMT", "A parasitic infestation has spread! %d new parasites detected.");
+        en.put("LOG_PARASITE_ANT_SPREAD_FMT", "A parasite ant infestation has spread! %d new parasite ants detected.");
         en.put("LOG_PARASITIC_MITE_SPREAD_FMT", "Parasitic mites have spread! %d new mites detected on the colony.");
         en.put("LOG_DYNASTY_ABSORBED_FMT", "Absorbed the remnants of %s!");
         en.put("LOG_FAILURE_SATELLITE", "A satellite colony failed to mature due to genetic stagnation.");
         en.put("LOG_SATELLITE_AT_FMT", "Established new satellite colony at (%d, %d)");
         en.put("LOG_SATELLITES_ESTABLISHED_FMT", "%d satellites established.");
         en.put("LOG_SPREADING_FAILED", "Spreading failed: no suitable adjacent lands found.");
-        en.put("LOG_PARASITES_ELIMINATED_FMT", "Eliminated %d parasites.");
+        en.put("LOG_PARASITE_ANTS_ELIMINATED_FMT", "Eliminated %d parasite ants.");
         en.put("LOG_CAUGHT_BUGS_SUMMARY_FMT", "Catchers brought in %d insect(s) from the wild.");
         en.put("LOG_CAUGHT_BUG_BRED_FMT", "%d %s bred in captivity.");
         en.put("LOG_SYMBIOTIC_MITES_PREDATION_FMT", "Symbiotic mites eliminated %d parasitic mite(s).");
@@ -1150,8 +1155,8 @@ public class EnglishTranslation implements Translation {
         en.put("TRIGGER_SPREAD_ABILITY_MSG", "With the ability to breed new queens, your colony now understands how to spread. You can found new colonies from the world map (I).");
         en.put("TRIGGER_SCOUT_ROLE_TITLE", "Adventure's Call");
         en.put("TRIGGER_SCOUT_ROLE_MSG", "We have depleted more than half of our main plant source! Our workers feel the need to explore for new lands, unlocking the Scout role!");
-        en.put("TRIGGER_POLICE_ROLE_TITLE", "Parasitic Infestation");
-        en.put("TRIGGER_POLICE_ROLE_MSG", "The colony has become so prosperous that parasitic bugs may infiltrate it!");
+        en.put("TRIGGER_POLICE_ROLE_TITLE", "Parasite Ant Infestation");
+        en.put("TRIGGER_POLICE_ROLE_MSG", "The colony has become so prosperous that parasite ants may infiltrate it!");
         en.put("TRIGGER_PARASITIC_MITE_TITLE", "Parasitic Mites");
         en.put("TRIGGER_PARASITIC_MITE_MSG", "Microscopic mites are infesting your workers and slowing them down! Symbiotic mite catching is now available. Research the Catcher role and assign soldiers to capture symbiotic mites—they eliminate parasitic mites daily.");
         en.put("TRIGGER_MASS_FLIGHT_TITLE", "Imperial Decree");

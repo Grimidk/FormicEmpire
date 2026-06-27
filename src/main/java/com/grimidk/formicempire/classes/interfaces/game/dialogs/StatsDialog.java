@@ -663,10 +663,16 @@ public class StatsDialog extends ZeroDialog {
         int nurses = 0, babies = 0, nurseCap = 0;
         int gravers = 0, deadAnts = 0, graveCap = 0;
         int ranchers = 0, aphidCap = 0, aphids = 0;
-        int police = 0, parasites = 0, dailyDetect = 0;
+        int police = 0, parasiteAnts = 0, dailyDetect = 0;
+        int projectedParasiteAntSpawn = 0;
+        int requiredPoliceForPrevention = 0;
+
+        World world = engine != null ? engine.getWorld() : null;
+        Season season = world != null ? world.getSeason() : null;
 
         for (Colony c : coloniesToCount) {
             ColonyStatsService cs = c.getStatsService();
+            Biome biome = resolveColonyBiome(c, world);
             
             foragers += c.getAssignedRoleCount(GameConstants.ROLE_FORAGER);
             dailyForage += cs.getPlantProduction(c) + cs.getWaterProduction(c);
@@ -703,8 +709,12 @@ public class StatsDialog extends ZeroDialog {
             aphidCap += c.getAssignedRoleCount(GameConstants.ROLE_RANCHER) * cs.getAphidCapacity(c);
 
             police += c.getAssignedRoleCount(GameConstants.ROLE_POLICE);
-            parasites += c.getParasites();
+            parasiteAnts += c.getParasiteAnts();
             dailyDetect += Math.round(c.getAssignedRoleCount(GameConstants.ROLE_POLICE) * cs.getParasiteDetection(c));
+            if (biome != null && season != null) {
+                projectedParasiteAntSpawn += c.getPopulationService().projectParasiteAntMonthlySpawn(c, biome, season);
+                requiredPoliceForPrevention += c.getPopulationService().requiredPoliceToPreventParasiteAntOutbreak(c, biome, season);
+            }
         }
 
         if (foragers > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.ROLE_FORAGER), String.format("%d %s", foragers, LanguageStrings.get(LanguageStrings.ROLE_FORAGER)), LanguageStrings.get(LanguageStrings.UI_COMBINED), String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_RES_DAY), dailyForage)});
@@ -717,7 +727,27 @@ public class StatsDialog extends ZeroDialog {
         if (nurses > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.ROLE_NURSE), String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_NURSES_FMT), nurses), String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_CAP_SHORT), nurseCap), String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_LOAD_FMT), String.valueOf(babies), nurseCap)});
         if (gravers > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.ROLE_GRAVER), String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_GRAVERS_FMT), gravers), String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_CAP_SHORT), graveCap), String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_LOAD_FMT), String.valueOf(deadAnts), graveCap)});
         if (ranchers > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.ROLE_RANCHER), String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_RANCHERS_FMT), ranchers), String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_CAP_SHORT), aphidCap), String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_APHIDS_FMT), String.valueOf(aphids), aphidCap)});
-        if (police > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.ROLE_POLICE), String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_POLICE_FMT), police), String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_PARASITES_FMT), parasites), String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_DET_DAY), dailyDetect)});
+        if (police > 0 || projectedParasiteAntSpawn > 0 || parasiteAnts > 0) {
+            String loadCol = projectedParasiteAntSpawn > 0
+                    ? String.format(LanguageStrings.get(LanguageStrings.STAT_OUTBREAK_PREV_PROJECTED_FMT), projectedParasiteAntSpawn)
+                    : String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_PARASITE_ANTS_FMT), parasiteAnts);
+            String rateCol = String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_DET_DAY), dailyDetect);
+            if (projectedParasiteAntSpawn > 0) {
+                String prevention = String.format(
+                        LanguageStrings.get(LanguageStrings.STAT_OUTBREAK_PREV_FMT),
+                        police, requiredPoliceForPrevention, projectedParasiteAntSpawn);
+                if (police >= requiredPoliceForPrevention) {
+                    prevention = LanguageStrings.get(LanguageStrings.STAT_OUTBREAK_PREV_BLOCKED) + " — " + prevention;
+                }
+                rateCol = prevention + " | " + rateCol;
+            }
+            model.addRow(new Object[]{
+                    LanguageStrings.get(LanguageStrings.ROLE_POLICE),
+                    String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_POLICE_FMT), police),
+                    loadCol,
+                    rateCol
+            });
+        }
     }
 
     private void updateInsectsData() {
@@ -736,16 +766,23 @@ public class StatsDialog extends ZeroDialog {
         int dermestids = 0, dermestidCap = 0, gravers = 0;
         int poolUsed = 0, poolMax = 0;
         int parasiticMites = 0, slowedAnts = 0, parasiticKillPerDay = 0;
-        int antParasites = 0;
+        int projectedParasiticMiteSpawn = 0;
+        int requiredSymbioticMites = 0;
+        int symbioticMitesForPrevention = 0;
+        int parasiteAnts = 0;
         boolean showAphids = false;
         boolean showSymbioticMites = false;
         boolean showDermestids = false;
         boolean showPool = false;
         boolean showParasitic = false;
-        boolean showAntParasites = false;
+        boolean showParasiteAnts = false;
+
+        World world = engine != null ? engine.getWorld() : null;
+        Season season = world != null ? world.getSeason() : null;
 
         for (Colony c : coloniesToCount) {
             ColonyBugHandlingService bugs = c.getBugHandlingService();
+            Biome biome = resolveColonyBiome(c, world);
 
             if (c.hasUpgrade(GameUnlocks.ROLE_RANCHER) || c.getAphids() > 0) {
                 showAphids = true;
@@ -783,15 +820,20 @@ public class StatsDialog extends ZeroDialog {
             slowedAnts += c.getParasiticMiteSlowedAntCount();
             if (c.hasUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE) || c.getSymbioticMites() > 0) {
                 parasiticKillPerDay += c.getSymbioticMites() * bugs.getSymbioticMiteParasiticMiteKillPerDay(c);
+                symbioticMitesForPrevention += c.getSymbioticMites();
+            }
+            if (biome != null && season != null) {
+                projectedParasiticMiteSpawn += bugs.projectParasiticMiteMonthlySpawn(c, biome, season);
+                requiredSymbioticMites += bugs.requiredSymbioticMitesToPreventOutbreak(c, biome, season);
             }
             if (c.hasUpgrade(GameUnlocks.ROLE_POLICE)) {
-                showAntParasites = true;
-                antParasites += c.getParasites();
+                showParasiteAnts = true;
+                parasiteAnts += c.getParasiteAnts();
             }
         }
 
         if (!showAphids && !showSymbioticMites && !showDermestids && !showPool
-                && !showParasitic && !showAntParasites) {
+                && !showParasitic && !showParasiteAnts) {
             model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_NO_INSECTS), "---", "---", "---"});
             return;
         }
@@ -833,30 +875,52 @@ public class StatsDialog extends ZeroDialog {
             });
         }
 
-        if (showParasitic || showAntParasites) {
+        if (showParasitic || showParasiteAnts) {
             if (showAphids || showSymbioticMites || showDermestids || showPool) {
                 model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR), LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR), LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR), LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR)});
             }
             if (showParasitic) {
+                String rateCol = String.format(
+                        LanguageStrings.get(LanguageStrings.STAT_INSECT_PARASITIC_KILL_FMT),
+                        slowedAnts, parasiticKillPerDay);
+                if (projectedParasiticMiteSpawn > 0) {
+                    String prevention = String.format(
+                            LanguageStrings.get(LanguageStrings.STAT_OUTBREAK_PREV_FMT),
+                            symbioticMitesForPrevention, requiredSymbioticMites, projectedParasiticMiteSpawn);
+                    if (symbioticMitesForPrevention >= requiredSymbioticMites) {
+                        prevention = LanguageStrings.get(LanguageStrings.STAT_OUTBREAK_PREV_BLOCKED) + " — " + prevention;
+                    }
+                    rateCol = rateCol + " | " + prevention;
+                }
                 model.addRow(new Object[]{
                     GameConstants.ICON_PARASITIC_MITE,
                     LanguageStrings.get(LanguageStrings.BUG_PARASITIC_MITE),
                     parasiticMites,
-                    String.format(LanguageStrings.get(LanguageStrings.STAT_INSECT_PARASITIC_CAP_FMT),
-                            GameConstants.PARASITIC_MITES_PER_SLOWED_ANT),
-                    String.format(LanguageStrings.get(LanguageStrings.STAT_INSECT_PARASITIC_KILL_FMT), slowedAnts, parasiticKillPerDay)
+                    projectedParasiticMiteSpawn > 0
+                            ? String.format(LanguageStrings.get(LanguageStrings.STAT_OUTBREAK_PREV_PROJECTED_FMT), projectedParasiticMiteSpawn)
+                            : String.format(LanguageStrings.get(LanguageStrings.STAT_INSECT_PARASITIC_CAP_FMT),
+                                    GameConstants.PARASITIC_MITES_PER_SLOWED_ANT),
+                    rateCol
                 });
             }
-            if (showAntParasites) {
+            if (showParasiteAnts) {
                 model.addRow(new Object[]{
-                    GameConstants.TYPE_PARASITE.getIcon(),
-                    LanguageStrings.get(LanguageStrings.BUG_PARASITE),
-                    antParasites,
+                    GameConstants.TYPE_PARASITE_ANT.getIcon(),
+                    LanguageStrings.get(LanguageStrings.BUG_PARASITE_ANT),
+                    parasiteAnts,
                     LanguageStrings.get(LanguageStrings.WORLD_NA),
                     LanguageStrings.get(LanguageStrings.ROLE_POLICE)
                 });
             }
         }
+    }
+
+    private Biome resolveColonyBiome(Colony c, World world) {
+        if (c == null || world == null) {
+            return null;
+        }
+        Hex hex = world.getHexOfColony(c);
+        return hex != null ? hex.getBiome() : null;
     }
 
     private void updateUnitStatsData() {

@@ -66,7 +66,7 @@ public final class WorldSpaces {
         new Point(REL_X_LEFT + 256, ROOM_SIZE + 88),
         List.of(GameConstants.ROLE_NURSE), 
         List.of(GameConstants.TYPE_EGG, GameConstants.TYPE_LARVA, GameConstants.TYPE_PUPA),
-        List.of(GameConstants.TYPE_PARASITE)
+        List.of(GameConstants.TYPE_PARASITE_ANT)
     );
 
     public static final Room FARM = new Room(
@@ -82,7 +82,7 @@ public final class WorldSpaces {
         new Point(REL_X_RIGHT, 88),
         List.of(GameConstants.ROLE_FARMER), 
         List.of(),
-       List.of(GameConstants.TYPE_PARASITE)
+       List.of(GameConstants.TYPE_PARASITE_ANT)
     );
 
     public static final Room ROYAL_CHAMBER = new Room(

@@ -149,6 +149,7 @@ public final class GameConstants {
 
     public static final int PARASITIC_MITE_RESOURCE_THRESHOLD = 10_000;
     public static final float PARASITE_OUTBREAK_CHANCE = 0.25f;
+    public static final int PARASITE_OUTBREAK_PREVENTION_MULTIPLIER = 2;
     public static final int PARASITIC_MITE_MIN_MONTHLY_SPAWN = 1_000;
     public static final int PARASITIC_MITE_PER_ANT = 1;
     public static final float PARASITIC_MITE_SPREAD_FACTOR = 0.10f;
@@ -423,9 +424,9 @@ public final class GameConstants {
     public static final BugType TYPE_APHID = new BugType(2, LanguageStrings.BUG_APHID, LanguageStrings.BUG_APHID_SCIENTIFIC, 1, 1, 0, 0, 5, 0.5f,
         loadIcon("icons/bugs/aphid.png") , loadIcon("sprites/bugs/aphid.png"));
     static { bugTypes.add(TYPE_APHID); }
-    public static final BugType TYPE_PARASITE = new BugType(3, LanguageStrings.BUG_PARASITE, LanguageStrings.BUG_PARASITE_SCIENTIFIC, 1, 1, 0, 0, 1, 1,
+    public static final BugType TYPE_PARASITE_ANT = new BugType(3, LanguageStrings.BUG_PARASITE_ANT, LanguageStrings.BUG_PARASITE_ANT_SCIENTIFIC, 1, 1, 0, 0, 1, 1,
         loadIcon("icons/bugs/parasite.png") , loadIcon("sprites/bugs/parasite.png"));
-    static { bugTypes.add(TYPE_PARASITE); }
+    static { bugTypes.add(TYPE_PARASITE_ANT); }
     public static final BugType TYPE_SYMBIOTIC_MITE = new BugType(4, LanguageStrings.BUG_SYMBIOTIC_MITE, LanguageStrings.BUG_SYMBIOTIC_MITE_SCIENTIFIC, 1, 0, 0, 0, 2, 0.4f, 
         loadIcon("icons/bugs/soilMite.png"), loadIcon("sprites/bugs/soilMite.png"));
     static { bugTypes.add(TYPE_SYMBIOTIC_MITE); }
@@ -458,7 +459,7 @@ public final class GameConstants {
     private static List<BugType> buildNativeParasitesForBiome(Biome biome) {
         List<BugType> natives = new ArrayList<>();
         if (biome.isHot()) {
-            natives.add(TYPE_PARASITE);
+            natives.add(TYPE_PARASITE_ANT);
         }
         if (biome.isCold()) {
             natives.add(TYPE_PARASITIC_MITE);

@@ -220,13 +220,13 @@ public class ColonyBugHandlingService {
         return getCount(colony, GameConstants.TYPE_DERMESTID);
     }
 
-    public void setParasiteCount(Colony colony, int count) {
+    public void setParasiteAntCount(Colony colony, int count) {
         if (colony == null) {
             return;
         }
         int capped = Math.max(0, count);
-        colony.applyParasiteCount(capped);
-        syncParasiteEntities(colony, capped);
+        colony.applyParasiteAntCount(capped);
+        syncParasiteAntEntities(colony, capped);
     }
 
     public void restorePetCountsFromSave(Colony colony, int aphids, int symbioticMites, int dermestids) {
@@ -301,12 +301,12 @@ public class ColonyBugHandlingService {
         }
     }
 
-    public void syncParasiteEntities(Colony colony, int targetCount) {
+    public void syncParasiteAntEntities(Colony colony, int targetCount) {
         if (colony == null) {
             return;
         }
         List<Bug> bugs = colony.getBugs();
-        long current = bugs.stream().filter(b -> b.getBugType() == GameConstants.TYPE_PARASITE).count();
+        long current = bugs.stream().filter(b -> b.getBugType() == GameConstants.TYPE_PARASITE_ANT).count();
         if (current < targetCount) {
             int diff = targetCount - (int) current;
             Rectangle spawnRoom = colony.getStorageBounds();
@@ -315,7 +315,7 @@ public class ColonyBugHandlingService {
             }
             ColonyPhysicsService physics = colony.getPhysicsService();
             for (int i = 0; i < diff; i++) {
-                Bug newBug = new Bug(GameConstants.TYPE_PARASITE);
+                Bug newBug = new Bug(GameConstants.TYPE_PARASITE_ANT);
                 newBug.setDimension(WorldSpaces.UNDERWORLD);
                 if (physics != null) {
                     Point spawnPos = physics.getSpecificRoomPoint(colony, spawnRoom);
@@ -327,7 +327,7 @@ public class ColonyBugHandlingService {
             int diff = (int) current - targetCount;
             List<Bug> toRemove = new ArrayList<>();
             for (Bug b : bugs) {
-                if (b.getBugType() == GameConstants.TYPE_PARASITE) {
+                if (b.getBugType() == GameConstants.TYPE_PARASITE_ANT) {
                     toRemove.add(b);
                     if (toRemove.size() == diff) {
                         break;
@@ -394,29 +394,29 @@ public class ColonyBugHandlingService {
         return rancherCount;
     }
 
-    public void runMonthlyParasiticMites(Colony colony, Biome biome, Season season) {
+    public boolean isParasiticMiteOutbreakEligible(Colony colony, Biome biome, Season season) {
         if (colony == null || biome == null || season == null) {
-            return;
+            return false;
         }
         if (!GameConstants.isParasiticMiteSeason(season)) {
-            return;
+            return false;
         }
         if (!biome.hasNativeParasite(GameConstants.TYPE_PARASITIC_MITE)) {
-            return;
+            return false;
         }
         long stored = colony.getResourceService().getStoredResourceTotal(colony);
-        if (stored < GameConstants.PARASITIC_MITE_RESOURCE_THRESHOLD) {
-            return;
-        }
-        if (GameRandom.nextFloat() > GameConstants.PARASITE_OUTBREAK_CHANCE) {
-            return;
-        }
+        return stored >= GameConstants.PARASITIC_MITE_RESOURCE_THRESHOLD;
+    }
 
+    public int calculateParasiticMiteSpawnAmount(Colony colony) {
+        if (colony == null) {
+            return 0;
+        }
         int existing = colony.getParasiticMites();
         int cap = parasiticMiteCap(colony);
         int room = cap - existing;
         if (room <= 0) {
-            return;
+            return 0;
         }
 
         int antTotal = colony.getAntTotal();
@@ -427,12 +427,49 @@ public class ColonyBugHandlingService {
         if (existing > 0) {
             spawnAmount += (int) (existing * GameConstants.PARASITIC_MITE_SPREAD_FACTOR);
         }
-        spawnAmount = Math.min(spawnAmount, room);
-        if (spawnAmount <= 0) {
+        return Math.min(spawnAmount, room);
+    }
+
+    public int projectParasiticMiteMonthlySpawn(Colony colony, Biome biome, Season season) {
+        if (!isParasiticMiteOutbreakEligible(colony, biome, season)) {
+            return 0;
+        }
+        return calculateParasiticMiteSpawnAmount(colony);
+    }
+
+    public int requiredSymbioticMitesToPreventOutbreak(Colony colony, Biome biome, Season season) {
+        int spawn = projectParasiticMiteMonthlySpawn(colony, biome, season);
+        if (spawn <= 0) {
+            return 0;
+        }
+        return spawn * GameConstants.PARASITE_OUTBREAK_PREVENTION_MULTIPLIER;
+    }
+
+    public boolean isParasiticMiteOutbreakPrevented(Colony colony, Biome biome, Season season) {
+        int required = requiredSymbioticMitesToPreventOutbreak(colony, biome, season);
+        if (required <= 0) {
+            return false;
+        }
+        return colony.getSymbioticMites() >= required;
+    }
+
+    public void runMonthlyParasiticMites(Colony colony, Biome biome, Season season) {
+        if (!isParasiticMiteOutbreakEligible(colony, biome, season)) {
             return;
         }
 
-        setParasiticMiteCount(colony, existing + spawnAmount);
+        int spawnAmount = calculateParasiticMiteSpawnAmount(colony);
+        if (spawnAmount <= 0) {
+            return;
+        }
+        if (isParasiticMiteOutbreakPrevented(colony, biome, season)) {
+            return;
+        }
+        if (GameRandom.nextFloat() > GameConstants.PARASITE_OUTBREAK_CHANCE) {
+            return;
+        }
+
+        setParasiticMiteCount(colony, colony.getParasiticMites() + spawnAmount);
         colony.logEvent(ColonyLogPrefixes.INFO + " "
                 + String.format(LanguageStrings.get(LanguageStrings.LOG_PARASITIC_MITE_SPREAD_FMT), spawnAmount));
     }

@@ -51,7 +51,7 @@ public class Engine extends Thread {
     private boolean confirmOnQuit = true;
     private boolean showTooltips = true;
     
-    private boolean fuzzParasites = true;
+    private boolean fuzzParasiteAnts = true;
     private int defaultRoleWorker = 1; // ROLE_FORAGER
     private int defaultRoleSoldier = 16; // ROLE_HUNTER
     private int defaultRoleMajor = 17; // ROLE_BRUTE
@@ -395,12 +395,12 @@ public class Engine extends Thread {
         this.showTooltips = showTooltips;
     }
 
-    public boolean isFuzzParasites() {
-        return fuzzParasites;
+    public boolean isFuzzParasiteAnts() {
+        return fuzzParasiteAnts;
     }
 
-    public void setFuzzParasites(boolean fuzzParasites) {
-        this.fuzzParasites = fuzzParasites;
+    public void setFuzzParasiteAnts(boolean fuzzParasiteAnts) {
+        this.fuzzParasiteAnts = fuzzParasiteAnts;
     }
 
     public int getDefaultRoleWorker() {

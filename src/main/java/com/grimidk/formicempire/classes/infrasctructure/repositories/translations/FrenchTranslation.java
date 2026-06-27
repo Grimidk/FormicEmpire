@@ -124,7 +124,7 @@ public class FrenchTranslation implements Translation {
         fr.put("COLONY_GRAVE_CLEANING", "Nettoyage des tombes : %d/%d");
         fr.put("COLONY_PET_INSECTS", "Insectes de compagnie : %d/%d");
         fr.put("COLONY_PARASITIC_MITES", "Acariens : %d (%d fourmis ralenties)");
-        fr.put("COLONY_PARASITES", "Parasites : %s");
+        fr.put("COLONY_PARASITE_ANTS", "Fourmis parasites : %s");
         fr.put("COLONY_POLICING", "Police : %d");
         fr.put("COLONY_DETECTION_RATE", "Taux de détection : ~%d/jour");
         fr.put("COLONY_RESEARCH", "Recherche : %d");
@@ -134,7 +134,7 @@ public class FrenchTranslation implements Translation {
 
         fr.put("TOOLTIP_PET_INSECTS", "Insectes de compagnie gardés par les éleveuses et capturantes. Voir l'onglet Insectes dans les statistiques de colonie (X) pour le détail par espèce.");
         fr.put("TOOLTIP_PARASITIC_MITES", "Acariens microscopiques sur vos fourmis. Tous les 10 acariens ralentissent une fourmi de moitié. Propagation mensuelle quand les réserves sont élevées.");
-        fr.put("TOOLTIP_PARASITES", "Parasites dans la colonie");
+        fr.put("TOOLTIP_PARASITE_ANTS", "Fourmis parasites dans la colonie");
         fr.put("TOOLTIP_POLICING", "Efficacité de la police");
         fr.put("TOOLTIP_RESEARCH_POINTS", "Points de recherche");
 
@@ -277,8 +277,8 @@ public class FrenchTranslation implements Translation {
         fr.put("UNIT_STAT_TEMP_RES_DESC", "Degrés de tolérance");
         fr.put("UNIT_STAT_CONSUMPTION", "Consommation de base");
         fr.put("UNIT_STAT_CONSUMPTION_DESC", "Unités de nourriture par jour et par fourmi");
-        fr.put("UNIT_STAT_DETECTION", "Détection des parasites");
-        fr.put("UNIT_STAT_DETECTION_DESC", "Chance de trouver des parasites");
+        fr.put("UNIT_STAT_DETECTION", "Détection des fourmis parasites");
+        fr.put("UNIT_STAT_DETECTION_DESC", "Chance de trouver des fourmis parasites");
         fr.put("UNIT_STAT_IMMUNITY", "Immunité");
         fr.put("UNIT_STAT_IMMUNITY_DESC", "Atténuation de la contamination");
 
@@ -410,7 +410,7 @@ public class FrenchTranslation implements Translation {
         fr.put("SETTINGS_PAUSE_FOCUS", "Pause si perte de focus");
         fr.put("SETTINGS_CONFIRM_QUIT", "Confirmer à la sortie");
         fr.put("SETTINGS_SHOW_TOOLTIPS", "Afficher les infobulles");
-        fr.put("SETTINGS_FUZZ_PARASITES", "Chiffres de parasites approximatifs");
+        fr.put("SETTINGS_FUZZ_PARASITE_ANTS", "Chiffres de fourmis parasites approximatifs");
 
         fr.put("SETTINGS_MASTER_VOL", "Volume principal :");
         fr.put("SETTINGS_MUSIC_VOL", "Volume musique :");
@@ -508,14 +508,14 @@ public class FrenchTranslation implements Translation {
         fr.put("BUG_APHID", "Puceron");
         fr.put("BUG_SYMBIOTIC_MITE", "Acarien symbiotique");
         fr.put("BUG_DERMESTID", "Dermeste");
-        fr.put("BUG_PARASITE", "Parasite");
+        fr.put("BUG_PARASITE_ANT", "Fourmi parasite");
         fr.put("BUG_ANT_SCIENTIFIC", "Formica");
         fr.put("BUG_APHID_SCIENTIFIC", "Aphididae");
         fr.put("BUG_SYMBIOTIC_MITE_SCIENTIFIC", "Stratiolaelaps scimitus");
         fr.put("BUG_DERMESTID_SCIENTIFIC", "Dermestidae");
         fr.put("BUG_PARASITIC_MITE", "Acarien parasitaire");
         fr.put("BUG_PARASITIC_MITE_SCIENTIFIC", "Acaridae");
-        fr.put("BUG_PARASITE_SCIENTIFIC", "Anergates");
+        fr.put("BUG_PARASITE_ANT_SCIENTIFIC", "Anergates");
 
         fr.put("TYPE_LARVA", "Larve");
         fr.put("TYPE_PUPA", "Nymphe");
@@ -538,7 +538,7 @@ public class FrenchTranslation implements Translation {
         fr.put("ROLE_GUARD", "Garde");
         fr.put("ROLE_WARRIOR", "Guerrière");
         fr.put("ROLE_DEFENDER", "Défenseuse");
-        fr.put("ROLE_POLICE", "Police anti-parasites");
+        fr.put("ROLE_POLICE", "Police anti-fourmis parasites");
         fr.put("ROLE_BOMBER", "Bombardière");
         fr.put("ROLE_HUNTER", "Chasseuse");
         fr.put("ROLE_BRUTE", "Brute");
@@ -653,9 +653,9 @@ public class FrenchTranslation implements Translation {
         fr.put("ROLE_DEFENDER_UPGRADE", "Rôle défenseuse");
         fr.put("ROLE_DEFENDER_FLAVOR", "Bouclier royal");
         fr.put("ROLE_DEFENDER_DESC", "Permet aux soldates de protéger directement la reine.");
-        fr.put("ROLE_POLICE_UPGRADE", "Rôle police anti-parasites");
+        fr.put("ROLE_POLICE_UPGRADE", "Rôle police anti-fourmis parasites");
         fr.put("ROLE_POLICE_FLAVOR", "Brutalité policière");
-        fr.put("ROLE_POLICE_DESC", "Permet de détecter les parasites déguisés ; 10% de chance par jour chacune.");
+        fr.put("ROLE_POLICE_DESC", "Permet de détecter les fourmis parasites déguisées ; 10% de chance par jour chacune.");
         fr.put("ROLE_BOMBER_UPGRADE", "Rôle bombardière");
         fr.put("ROLE_BOMBER_FLAVOR", "Fin explosive");
         fr.put("ROLE_BOMBER_DESC", "Permet à certaines soldates d'exploser à la mort.");
@@ -682,7 +682,7 @@ public class FrenchTranslation implements Translation {
         fr.put("ROLE_MILITIA_DESC", "Permet aux ouvrières des tâches défensives simples.");
         fr.put("ROLE_CATCHER_UPGRADE", "Rôle capturatrice");
         fr.put("ROLE_CATCHER_FLAVOR", "Chasse aux insectes");
-        fr.put("ROLE_CATCHER_DESC", "Permet aux soldates de capturer des insectes natifs à la surface. Chaque capturante maintient jusqu'à 10 insectes de compagnie au total. Les pucerons exigent le rôle Éleveuse ; les acariens symbiotiques se débloquent à l'apparition des acariens parasites ; les dermestes exigent la recherche Capture de coléoptères de fosse. Les couples se reproduisent chaque jour à partir de deux spécimens.");
+        fr.put("ROLE_CATCHER_DESC", "Permet aux soldates de capturer des insectes natifs à la surface. Chaque capturante maintient jusqu'à 10 insectes de compagnie au total. Les pucerons exigent le rôle Éleveuse ; les acariens symbiotiques se débloquent à l'apparition des acariens parasitaires ; les dermestes exigent la recherche Capture de coléoptères de fosse. Les couples se reproduisent chaque jour à partir de deux spécimens.");
         fr.put("ROLE_CRANE_UPGRADE", "Rôle grue de chantier");
         fr.put("ROLE_CRANE_FLAVOR", "Travail lourd");
         fr.put("ROLE_CRANE_DESC", "Permet aux majores d'aider à la construction ; chacune vaut 25 ouvrières.");
@@ -738,10 +738,10 @@ public class FrenchTranslation implements Translation {
         fr.put("ABILITY_MASS_FLIGHT_FLAVOR", "Décret impérial");
         fr.put("ABILITY_CLONING_FLAVOR", "Écho génétique");
         fr.put("ABILITY_CLONING_DESC", "Chaque assimilation génétique terminée augmente l'intégrité génétique de la dynastie. L'intégrité minimale augmente avec les assimilations terminées.");
-        fr.put("ABILITY_PARASITIC_MITE_ALERT_FLAVOR", "Acariens parasites");
-        fr.put("ABILITY_PARASITIC_MITE_ALERT_DESC", "Avertit lorsque des acariens parasites infestent la colonie. Tous les 10 acariens ralentissent une fourmi de moitié.");
+        fr.put("ABILITY_PARASITIC_MITE_ALERT_FLAVOR", "Alerte acariens parasitaires");
+        fr.put("ABILITY_PARASITIC_MITE_ALERT_DESC", "Avertit lorsque des acariens parasitaires infestent la colonie. Tous les 10 acariens ralentissent une fourmi de moitié.");
         fr.put("ABILITY_CATCH_SYMBIOTIC_MITE_FLAVOR", "Capture d'acariens symbiotiques");
-        fr.put("ABILITY_CATCH_SYMBIOTIC_MITE_DESC", "Permet aux capturantes de collecter des acariens symbiotiques à la surface. Se débloque à la première apparition d'acariens parasites. Chaque acarien symbiotique élimine jusqu'à 5 acariens parasites par jour.");
+        fr.put("ABILITY_CATCH_SYMBIOTIC_MITE_DESC", "Permet aux capturantes de collecter des acariens symbiotiques à la surface. Se débloque à la première apparition d'acariens parasitaires. Chaque acarien symbiotique élimine jusqu'à 5 acariens parasitaires par jour.");
         fr.put("ABILITY_CATCH_DERMESTID_FLAVOR", "Capture de coléoptères de fosse");
         fr.put("ABILITY_CATCH_DERMESTID_DESC", "Permet aux capturantes de collecter des dermestes à la surface. Les fossoyeuses en gardent jusqu'à 10 chacune dans la fosse.");
         fr.put("ABILITY_ABILITY_FLAVOR", "Capacités débloquées");
@@ -800,7 +800,7 @@ public class FrenchTranslation implements Translation {
         fr.put("STAT_CONTAMINATION_3_FLAVOR", "Protocoles d'isolement");
         fr.put("STAT_CONTAMINATION_3_DESC", "Réduit la mortalité par contamination de 60%.");
         fr.put("STAT_SYMBIOTIC_MITE_1_FLAVOR", "Dressage d'acariens symbiotiques");
-        fr.put("STAT_SYMBIOTIC_MITE_1_DESC", "Augmente l'élimination d'acariens parasites de chaque acarien symbiotique à 12 par jour.");
+        fr.put("STAT_SYMBIOTIC_MITE_1_DESC", "Augmente l'élimination d'acariens parasitaires de chaque acarien symbiotique à 12 par jour.");
         fr.put("STAT_DERMESTID_1_FLAVOR", "Coléoptères de fosse");
         fr.put("STAT_DERMESTID_1_DESC", "Permet à chaque dermeste dans la fosse de compter comme 1 fossoyeuse pour l'enterrement.");
         fr.put("STAT_GRAVING_1_FLAVOR", "Tombes peu profondes");
@@ -946,7 +946,7 @@ public class FrenchTranslation implements Translation {
         fr.put("HELP_TAB_WORLD", "Monde");
 
         fr.put("HELP_WELCOME_STORY", "Presque toutes les autres fourmis ont disparu. Vous êtes une reine et portez tout le savoir génétique de chaque espèce. Débloquez-le et dominez le monde. <br><br>Développez votre colonie, combattez les autres colonies et adaptez-vous en absorbant et recherchant de nouvelles capacités.");
-        fr.put("HELP_START_INFO", "<b>Survie de base :</b><br>Vos fourmis ont besoin de <b>champignons</b> pour manger et d'<b>eau</b> chaque jour. Sans cela, famine ou déshydratation.<br>- <b>Ramasseuses</b> : plantes et eau.<br>- <b>Chasseuses</b> : protéines (viande).<br>- <b>Agricultrices</b> : plantes et protéines en champignons.<br>- <b>Nourrices</b> : couvée. Une couvée négligée meurt.<br><br><b>Vue :</b><br><b>A</b> bascule entre <b>souterrain</b> (nid) et <b>surface</b> (collecte).<br><br><b>Gestion :</b><br><b>Taux d'éclosion (P)</b> pour les naissances. Les <b>chercheuses</b> génèrent des PR (menu <b>Y</b>). Les <b>constructrices</b> utilisent minéraux et résine (menu <b>U</b>).<br><br><b>Menaces :</b><br>- <b>Contamination :</b> les mortes doivent être enlevées par les <b>fossoyeuses</b>.<br>- <b>Parasites :</b> drainent la nourriture. Assignez la <b>police</b>.<br>- <b>Épuisement :</b> les nœuds de ressources s'épuisent ; les <b>éclaireuses</b> en trouvent de nouveaux.");
+        fr.put("HELP_START_INFO", "<b>Survie de base :</b><br>Vos fourmis ont besoin de <b>champignons</b> pour manger et d'<b>eau</b> chaque jour. Sans cela, famine ou déshydratation.<br>- <b>Ramasseuses</b> : plantes et eau.<br>- <b>Chasseuses</b> : protéines (viande).<br>- <b>Agricultrices</b> : plantes et protéines en champignons.<br>- <b>Nourrices</b> : couvée. Une couvée négligée meurt.<br><br><b>Vue :</b><br><b>A</b> bascule entre <b>souterrain</b> (nid) et <b>surface</b> (collecte).<br><br><b>Gestion :</b><br><b>Taux d'éclosion (P)</b> pour les naissances. Les <b>chercheuses</b> génèrent des PR (menu <b>Y</b>). Les <b>constructrices</b> utilisent minéraux et résine (menu <b>U</b>).<br><br><b>Menaces :</b><br>- <b>Contamination :</b> les mortes doivent être enlevées par les <b>fossoyeuses</b>.<br>- <b>Fourmis parasites :</b> drainent la nourriture. Assignez la <b>police</b>.<br>- <b>Épuisement :</b> les nœuds de ressources s'épuisent ; les <b>éclaireuses</b> en trouvent de nouveaux.");
         fr.put("HELP_OVERWORLD_GATHERING", "<b>Collecte en surface :</b><br>Les <b>éclaireuses</b> découvrent de nouveaux nœuds. Chaque hex de carte cumule de l'<b>épuisement</b> hors eau ; un épuisement plus éloigne en général les nouveaux nœuds du nid (certaines améliorations plafonnent l'effet).<br><br><b>Distance :</b> le rendement utilise la distance à vol d'oiseau depuis l'<b>entrée du nid</b>. Dans un rayon de <b>pleine efficacité</b> (plus grand avec des ouvrières plus rapides et certaines améliorations), le rendement est entier ; au-delà, il descend vers un petit minimum.<br><br><b>Statistiques (Hex local) :</b> <b>Épuisement</b> est le pourcentage effectif pour les apparitions ; <b>Sources trouvées</b> compte les nœuds découverts par cette colonie ; <b>Distance max. pleine efficacité</b> estime le rayon à plein rendement pour une ouvrière type.");
         fr.put("HELP_DYNASTY_INFO", "<b>Étendre la dynastie :</b><br>Avec les <b>reproductrices</b>, les essaims nuptiaux vous font progresser sur la <b>carte du monde (I)</b>.<br><i>Astuce : les éclipses déclenchent des essaims gratuits !</i><br><br><b>Logistique et commerce :</b><br>Plusieurs colonies débloquent les <b>routes commerciales</b>. Assignez des <b>messagères</b>.<br>- <b>Terre :</b> standard.<br>- <b>Tunnel :</b> sûr et rapide, tunnels et <b>foreuses</b>.<br>- <b>Air :</b> rapide, faible capacité, <b>transport aérien</b> (princesses).<br>- <b>Bilatéral :</b> transport dans les deux sens.<br><br><b>Étapes :</b><br>- <b>Menu dynastie (S) :</b> toutes les colonies.<br>- <b>Colonisation de masse :</b> plus de limite de satellites.<br>- <b>Automatisation :</b> colonies PNJ autonomes.<br><br><b>Évolution :</b><br><b>Synergies</b> pour combiner des améliorations, <b>assimilations</b> pour les traits d'autres espèces.");
 
@@ -982,9 +982,9 @@ public class FrenchTranslation implements Translation {
 
         fr.put("HELP_BUG_ANT_DESC", "Fourmis sauvages ou rivales sur la surface. Elles peuvent combattre vos fourmis et rivaliser pour l'espace.");
         fr.put("HELP_BUG_APHID_DESC", "Insectes qui se nourrissent de plantes. Natifs de la plupart des biomes sauf les secs. Exigent le rôle Éleveuse avant que les capturantes puissent les collecter. Les éleveuses en gardent jusqu'à 10 chacune pour le miellat.");
-        fr.put("HELP_BUG_SYMBIOTIC_MITE_DESC", "Acariens prédateurs de lutte biologique. Natifs de tous les biomes. La capture se débloque à la première apparition d'acariens parasites. Dans l'enclos à insectes. Chaque acarien symbiotique élimine jusqu'à 5 acariens parasitaires par jour (12 avec Dressage d'acariens symbiotiques).");
+        fr.put("HELP_BUG_SYMBIOTIC_MITE_DESC", "Acariens prédateurs de lutte biologique. Natifs de tous les biomes. La capture se débloque à la première apparition d'acariens parasitaires. Dans l'enclos à insectes. Chaque acarien symbiotique élimine jusqu'à 5 acariens parasitaires par jour (12 avec Dressage d'acariens symbiotiques).");
         fr.put("HELP_BUG_DERMESTID_DESC", "Coléoptères qui nettoient les carcasses. Natifs de la plupart des biomes sauf les froids. Exigent la recherche Capture de coléoptères de fosse. Les fossoyeuses en gardent jusqu'à 10 chacune. Avec Coléoptères de fosse, chacun compte comme une fossoyeuse.");
-        fr.put("HELP_BUG_PARASITE_DESC", "Ravageurs cachés dans le nid qui drainent secrètement vos réserves. Natifs des biomes chauds. Flambées au printemps et en été au-delà de 1 000 fourmis (25% par mois). Assignez des Policiers pour les éliminer.");
+        fr.put("HELP_BUG_PARASITE_ANT_DESC", "Fourmis parasites cachées dans le nid qui drainent secrètement vos réserves. Natifs des biomes chauds. Flambées au printemps et en été au-delà de 1 000 fourmis (25% par mois). Assignez des Policiers pour les éliminer.");
         fr.put("HELP_BUG_PARASITIC_MITE_DESC", "Minuscules acariens qui infestent les fourmis adultes quand la colonie accumule des ressources. Natifs des biomes froids. Flambées en automne et hiver au-delà de 10 000 ressources stockées (25% par mois). Tous les 10 acariens ralentissent une fourmi de moitié. Les acariens symbiotiques sont le principal contre.");
 
         fr.put("HELP_BIOMES_TITLE", "Biomes");
@@ -1002,7 +1002,7 @@ public class FrenchTranslation implements Translation {
 
         fr.put("HELP_TUTORIAL_TITLE", "Bienvenue dans la dynastie formique !");
         fr.put("HELP_TUTORIAL_TIPS", "<b>Conseils :</b><br><br>Aliment principal : <b>champignons</b>, consommés chaque jour.<br><br>Assignez des <b>ouvrières</b> (Q) en <b>ramasseuses</b> pour plantes et eau. Sans eau, soif !<br><br>Les <b>agricultrices</b> (Q) transforment les plantes en champignons. En général 1 agricultrice pour ~6 ramasseuses.<br><br>Les <b>nourrices</b> (Q) s'occupent des <b>œufs, larves et nymphes</b>. Sans assez de nourrices, la couvée meurt !<br><br><b>A</b> bascule <b>souterrain</b> / <b>surface</b>.<br><br><i>QoL : si vous assignez un rôle sans fourmis libres, le jeu les prend sur votre effectif par défaut (ex. ramasseuses).</i>");
-        fr.put("HELP_TUTORIAL_THREATS", "<b>Menaces :</b><br><br><b>Contamination :</b> les morts naturels s'accumulent et propagent la maladie. <b>Fossoyeuses</b> pour nettoyer.<br><br><b>Parasites :</b> drainent les champignons. <b>Police</b> pour les détecter et éliminer.<br><br><b>Épuisement :</b> les ressources s'épuisent. <b>Éclaireuses</b> pour en trouver d'autres.");
+        fr.put("HELP_TUTORIAL_THREATS", "<b>Menaces :</b><br><br><b>Contamination :</b> les morts naturels s'accumulent et propagent la maladie. <b>Fossoyeuses</b> pour nettoyer.<br><br><b>Fourmis parasites :</b> drainent les champignons. <b>Police</b> pour les détecter et éliminer.<br><br><b>Épuisement :</b> les ressources s'épuisent. <b>Éclaireuses</b> pour en trouver d'autres.");
         fr.put("HELP_TUTORIAL_DYNASTY", "<b>Dynastie :</b><br><br>En prospérant, vous débloquez des princesses <b>reproductrices</b> et des colonies satellites via la <b>carte (I)</b>.<br><i>Les éclipses solaires ou lunaires rares déclenchent des essaims gratuits !</i><br><br>Plusieurs colonies débloquent le <b>menu dynastie (S)</b>. Des jalons permettent <b>routes commerciales</b>, lever les limites de satellites et <b>automatiser</b> la dynastie.");
 
         fr.put("HOTKEY_PAUSE_LABEL", "Pause/Jouer :");
@@ -1064,7 +1064,7 @@ public class FrenchTranslation implements Translation {
         fr.put("STAT_RATE_RANCHERS_FMT", "%d éleveuses");
         fr.put("STAT_RATE_APHIDS_FMT", "%s / %d pucerons");
         fr.put("STAT_RATE_POLICE_FMT", "%d police");
-        fr.put("STAT_RATE_PARASITES_FMT", "%d parasites");
+        fr.put("STAT_RATE_PARASITE_ANTS_FMT", "%d fourmis parasites");
         fr.put("STAT_RATE_DET_DAY", "~%d dét./jour");
         fr.put("STAT_NO_INSECTS", "Aucun insecte suivi");
         fr.put("STAT_INSECT_CATCHERS_FMT", "%d capturantes");
@@ -1072,6 +1072,11 @@ public class FrenchTranslation implements Translation {
         fr.put("STAT_INSECT_POOL", "Réserve des capturantes");
         fr.put("STAT_INSECT_PARASITIC_CAP_FMT", "%d acariens par fourmi ralentie");
         fr.put("STAT_INSECT_PARASITIC_KILL_FMT", "%d ralenties, ~%d/jour de contre");
+        fr.put("STAT_OUTBREAK_PREV_FMT", "%d / %d (2× %d/mois d'apparition)");
+        fr.put("STAT_OUTBREAK_PREV_BLOCKED", "Flambées bloquées");
+        fr.put("STAT_OUTBREAK_PREV_PROJECTED_FMT", "Jusqu'à %d/mois en flambée");
+        fr.put("TOOLTIP_OUTBREAK_PREV_POLICE", "Si le nombre de policiers atteint au moins le double de l'apparition mensuelle projetée de fourmis parasites, les nouvelles flambées sont entièrement bloquées (sinon, le tirage mensuel à 25 % s'applique toujours).");
+        fr.put("TOOLTIP_OUTBREAK_PREV_SYMBIOTIC", "Si le nombre d'acariens symbiotiques atteint au moins le double de l'apparition mensuelle projetée d'acariens parasitaires, les nouvelles flambées sont entièrement bloquées (sinon, le tirage mensuel à 25 % s'applique toujours).");
 
         fr.put("LOG_DEATH_OLD_AGE_FMT", "%d fourmis mortes de vieillesse");
         fr.put("LOG_DEATH_JUVENILES_LACK_CARE_FMT", "%d juvéniles morts (manque de soins)");
@@ -1088,14 +1093,14 @@ public class FrenchTranslation implements Translation {
         fr.put("LOG_CONTAM_LEVEL_SMALL", "Faible");
         fr.put("LOG_CONTAM_LEVEL_MEDIUM", "Moyen");
         fr.put("LOG_CONTAM_LEVEL_MASSIVE", "Massif");
-        fr.put("LOG_PARASITE_SPREAD_FMT", "Une infestation parasitaire s'est propagée ! %d nouveaux parasites détectés.");
+        fr.put("LOG_PARASITE_ANT_SPREAD_FMT", "Une infestation de fourmis parasites s'est propagée ! %d nouvelles fourmis parasites détectées.");
         fr.put("LOG_PARASITIC_MITE_SPREAD_FMT", "Les acariens parasitaires se sont propagés ! %d nouveaux acariens détectés dans la colonie.");
         fr.put("LOG_DYNASTY_ABSORBED_FMT", "Vestiges de %s absorbés !");
         fr.put("LOG_FAILURE_SATELLITE", "Une colonie satellite n'a pas mûri : stagnation génétique.");
         fr.put("LOG_SATELLITE_AT_FMT", "Nouvelle colonie satellite en (%d, %d)");
         fr.put("LOG_SATELLITES_ESTABLISHED_FMT", "%d satellites établis.");
         fr.put("LOG_SPREADING_FAILED", "Expansion impossible : aucune terre adjacente adaptée.");
-        fr.put("LOG_PARASITES_ELIMINATED_FMT", "%d parasites éliminés.");
+        fr.put("LOG_PARASITE_ANTS_ELIMINATED_FMT", "%d fourmis parasites éliminées.");
         fr.put("LOG_CAUGHT_BUGS_SUMMARY_FMT", "Les capturantes ont rapporté %d insecte(s) de la surface.");
         fr.put("LOG_CAUGHT_BUG_BRED_FMT", "%d %s se sont reproduits en captivité.");
         fr.put("LOG_SYMBIOTIC_MITES_PREDATION_FMT", "Les acariens symbiotiques ont éliminé %d acarien(s) parasitaire(s).");
@@ -1150,10 +1155,10 @@ public class FrenchTranslation implements Translation {
         fr.put("TRIGGER_SPREAD_ABILITY_MSG", "Avec la capacité d'élever de nouvelles reines, votre colonie sait maintenant se propager. Vous pouvez fonder de nouvelles colonies depuis la carte du monde (I).");
         fr.put("TRIGGER_SCOUT_ROLE_TITLE", "Appel de l'aventure");
         fr.put("TRIGGER_SCOUT_ROLE_MSG", "Nous avons épuisé plus de la moitié de notre principale source de plantes ! Les ouvrières ressentent le besoin d'explorer de nouvelles terres, débloquant le rôle Éclaireur.");
-        fr.put("TRIGGER_POLICE_ROLE_TITLE", "Infestation parasitaire");
-        fr.put("TRIGGER_POLICE_ROLE_MSG", "La colonie est devenue si prospère que des insectes parasites peuvent s'y infiltrer !");
-        fr.put("TRIGGER_PARASITIC_MITE_TITLE", "Acariens parasites");
-        fr.put("TRIGGER_PARASITIC_MITE_MSG", "Des acariens microscopiques infestent vos ouvrières et les ralentissent ! La capture d'acariens symbiotiques est maintenant disponible. Recherchez le rôle Capteur et assignez des soldates pour les capturer — ils éliminent les acariens parasites chaque jour.");
+        fr.put("TRIGGER_POLICE_ROLE_TITLE", "Infestation de fourmis parasites");
+        fr.put("TRIGGER_POLICE_ROLE_MSG", "La colonie est devenue si prospère que des fourmis parasites peuvent s'y infiltrer !");
+        fr.put("TRIGGER_PARASITIC_MITE_TITLE", "Acariens parasitaires");
+        fr.put("TRIGGER_PARASITIC_MITE_MSG", "Des acariens microscopiques infestent vos ouvrières et les ralentissent ! La capture d'acariens symbiotiques est maintenant disponible. Recherchez le rôle Capteur et assignez des soldates pour les capturer — ils éliminent les acariens parasitaires chaque jour.");
         fr.put("TRIGGER_MASS_FLIGHT_TITLE", "Décret impérial");
         fr.put("TRIGGER_MASS_FLIGHT_MSG", "Votre dynastie a effectué 10 vols nuptiaux ! Vous avez débloqué la capacité « Vols nuptiaux de masse » dans le menu Opérations de colonie (Z).");
         fr.put("TRIGGER_DYNASTY_ABILITY_TITLE", "Dynastie de fourmis");
