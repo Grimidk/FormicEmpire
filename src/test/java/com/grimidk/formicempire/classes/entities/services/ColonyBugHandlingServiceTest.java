@@ -121,6 +121,42 @@ class ColonyBugHandlingServiceTest {
     }
 
     @Test
+    void unlockedPetCapacityMaxSumsOnlyUnlockedSpecies() {
+        Dynasty dynasty = new Dynasty(11, "Cap", true, GameConstants.SPECIES_OMNI);
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_CATCHER);
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_RANCHER);
+        Colony gated = new Colony(11, "Cap", true);
+        dynasty.addColony(gated);
+        gated.setAssignedRoleCount(GameConstants.ROLE_CATCHER, 5);
+        gated.setAssignedRoleCount(GameConstants.ROLE_RANCHER, 2);
+        ColonyBugHandlingService capService = gated.getBugHandlingService();
+
+        assertEquals(50, capService.getCatcherPoolCapacity(gated));
+        assertEquals(20, capService.getUnlockedPetCapacityMax(gated));
+
+        dynasty.unlockUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE);
+        assertEquals(50, capService.getUnlockedPetCapacityMax(gated));
+
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_GRAVER);
+        dynasty.unlockUpgrade(GameUnlocks.ABILITY_CATCH_DERMESTID);
+        gated.setAssignedRoleCount(GameConstants.ROLE_GRAVER, 1);
+        assertEquals(50, capService.getUnlockedPetCapacityMax(gated));
+    }
+
+    @Test
+    void unlockedPetCapacityMaxIgnoresLockedSpeciesWhenOnlyMitesUnlocked() {
+        Dynasty dynasty = new Dynasty(10, "Mites", true, GameConstants.SPECIES_OMNI);
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_CATCHER);
+        dynasty.unlockUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE);
+        Colony gated = new Colony(10, "Mites", true);
+        dynasty.addColony(gated);
+        gated.setAssignedRoleCount(GameConstants.ROLE_CATCHER, 3);
+
+        assertEquals(30, service.getCatcherPoolCapacity(gated));
+        assertEquals(30, gated.getBugHandlingService().getUnlockedPetCapacityMax(gated));
+    }
+
+    @Test
     void sharedCatcherPoolLimitsTotalPets() {
         colony.setAssignedRoleCount(GameConstants.ROLE_CATCHER, 1);
         service.setCount(colony, GameConstants.TYPE_APHID, 8);

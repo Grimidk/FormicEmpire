@@ -411,6 +411,7 @@ public class SpanishTranslation implements Translation {
         es.put("SETTINGS_CONFIRM_QUIT", "Confirmar al salir");
         es.put("SETTINGS_SHOW_TOOLTIPS", "Mostrar consejos");
         es.put("SETTINGS_FUZZ_PARASITE_ANTS", "Cifras de hormigas parásitas imprecisas");
+        es.put("SETTINGS_OVERWORLD_AUTO_RECENTER", "Recentrar automáticamente el exterior en la entrada de la colonia");
 
         es.put("SETTINGS_MASTER_VOL", "Volumen Maestro:");
         es.put("SETTINGS_MUSIC_VOL", "Volumen Música:");

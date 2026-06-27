@@ -803,8 +803,8 @@ public class StatsDialog extends ZeroDialog {
             if (c.hasUpgrade(GameUnlocks.ROLE_CATCHER)) {
                 showPool = true;
                 catchers += c.getAssignedRoleCount(GameConstants.ROLE_CATCHER);
-                poolUsed += bugs.getTotalPetCount(c);
-                poolMax += bugs.getCatcherPoolCapacity(c);
+                poolUsed += bugs.getUnlockedPetCount(c);
+                poolMax += bugs.getUnlockedPetCapacityMax(c);
             }
             if (c.hasUpgrade(GameUnlocks.ROLE_GRAVER)) {
                 gravers += c.getAssignedRoleCount(GameConstants.ROLE_GRAVER);

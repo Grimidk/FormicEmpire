@@ -52,6 +52,7 @@ public class Engine extends Thread {
     private boolean showTooltips = true;
     
     private boolean fuzzParasiteAnts = true;
+    private boolean overworldAutoRecenter = true;
     private int defaultRoleWorker = 1; // ROLE_FORAGER
     private int defaultRoleSoldier = 16; // ROLE_HUNTER
     private int defaultRoleMajor = 17; // ROLE_BRUTE
@@ -401,6 +402,14 @@ public class Engine extends Thread {
 
     public void setFuzzParasiteAnts(boolean fuzzParasiteAnts) {
         this.fuzzParasiteAnts = fuzzParasiteAnts;
+    }
+
+    public boolean isOverworldAutoRecenter() {
+        return overworldAutoRecenter;
+    }
+
+    public void setOverworldAutoRecenter(boolean overworldAutoRecenter) {
+        this.overworldAutoRecenter = overworldAutoRecenter;
     }
 
     public int getDefaultRoleWorker() {

@@ -76,6 +76,40 @@ public class ColonyBugHandlingService {
         return total;
     }
 
+    public int getUnlockedPetCount(Colony colony) {
+        if (colony == null) {
+            return 0;
+        }
+        int total = 0;
+        for (BugType type : PET_TYPES) {
+            if (canCatchPetBug(colony, type)) {
+                total += getCount(colony, type);
+            }
+        }
+        return total;
+    }
+
+    /** Display cap: sum of tender capacity for unlocked pet species, limited by the shared catcher pool when present. */
+    public int getUnlockedPetCapacityMax(Colony colony) {
+        if (colony == null) {
+            return 0;
+        }
+        int speciesTotal = 0;
+        for (BugType type : PET_TYPES) {
+            if (canCatchPetBug(colony, type)) {
+                speciesTotal += getSpeciesTenderCapacity(colony, type);
+            }
+        }
+        if (speciesTotal <= 0) {
+            return 0;
+        }
+        int pool = getCatcherPoolCapacity(colony);
+        if (pool > 0) {
+            return Math.min(speciesTotal, pool);
+        }
+        return speciesTotal;
+    }
+
     public void setCount(Colony colony, BugType type, int count) {
         if (colony == null || type == null || !isPetBug(type)) {
             return;

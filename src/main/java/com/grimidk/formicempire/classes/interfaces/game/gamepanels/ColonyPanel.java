@@ -535,10 +535,8 @@ public class ColonyPanel extends ZeroGamePanel {
         petInsectsLabel.setVisible(showPetInsects);
         if (showPetInsects) {
             var bugHandling = colony.getBugHandlingService();
-            int poolUsed = bugHandling.getTotalPetCount(colony);
-            int poolMax = hasCatcher
-                    ? bugHandling.getCatcherPoolCapacity(colony)
-                    : bugHandling.getMaxCapacity(colony, GameConstants.TYPE_APHID);
+            int poolUsed = bugHandling.getUnlockedPetCount(colony);
+            int poolMax = bugHandling.getUnlockedPetCapacityMax(colony);
             petInsectsLabel.setText(String.format(
                     LanguageStrings.get(LanguageStrings.COLONY_PET_INSECTS), poolUsed, poolMax));
         }

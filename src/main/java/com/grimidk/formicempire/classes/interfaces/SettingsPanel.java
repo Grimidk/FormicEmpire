@@ -31,6 +31,7 @@ public class SettingsPanel extends JPanel {
     private JCheckBox confirmQuitCheck;
     private JCheckBox showTooltipsCheck;
     private JCheckBox fuzzParasiteAntsCheck;
+    private JCheckBox overworldAutoRecenterCheck;
     
     // --- Video Tab ---
     private JComboBox<String> sizeCombo;
@@ -43,7 +44,7 @@ public class SettingsPanel extends JPanel {
     private JSlider musicVolSlider;
     private JSlider sfxVolSlider;
     
-    private JLabel langLabel, autoLabel, turboLabel, arachLabel, pauseFocusLabel, confirmQuitLabel, tooltipsLabel, fuzzParasiteAntsLabel;
+    private JLabel langLabel, autoLabel, turboLabel, arachLabel, pauseFocusLabel, confirmQuitLabel, tooltipsLabel, overworldAutoRecenterLabel, fuzzParasiteAntsLabel;
     private JLabel sizeLabel, fsLabel, daylightColorOverlayLabel, weatherColorOverlayLabel;
     private JLabel masterLabel, musicLabel, sfxLabel;
     private JLabel defaultRoleWorkerLabel, defaultRoleSoldierLabel, defaultRoleMajorLabel, defaultRolePrincessLabel, defaultRoleQueenLabel;
@@ -236,8 +237,19 @@ public class SettingsPanel extends JPanel {
         styleCheckBox(showTooltipsCheck);
         c.gridx = 1; panel.add(showTooltipsCheck, c);
         
-        // Fuzz parasite ants
+        // Overworld auto-recenter
         c.gridy = 7; c.gridx = 0;
+        overworldAutoRecenterLabel = new JLabel();
+        overworldAutoRecenterLabel.setFont(AssetStyles.FONT_NORMAL);
+        overworldAutoRecenterLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(overworldAutoRecenterLabel, c);
+
+        overworldAutoRecenterCheck = new JCheckBox();
+        styleCheckBox(overworldAutoRecenterCheck);
+        c.gridx = 1; panel.add(overworldAutoRecenterCheck, c);
+
+        // Fuzz parasite ants
+        c.gridy = 8; c.gridx = 0;
         fuzzParasiteAntsLabel = new JLabel();
         fuzzParasiteAntsLabel.setFont(AssetStyles.FONT_NORMAL);
         fuzzParasiteAntsLabel.setForeground(AssetStyles.FONT_COLOR);
@@ -247,7 +259,7 @@ public class SettingsPanel extends JPanel {
         styleCheckBox(fuzzParasiteAntsCheck);
         c.gridx = 1; panel.add(fuzzParasiteAntsCheck, c);
 
-        c.gridy = 8;
+        c.gridy = 9;
         c.gridx = 0;
         c.gridwidth = 2;
         c.anchor = GridBagConstraints.EAST;
@@ -390,6 +402,7 @@ public class SettingsPanel extends JPanel {
         pauseFocusCheck.setSelected(true);
         confirmQuitCheck.setSelected(true);
         showTooltipsCheck.setSelected(true);
+        overworldAutoRecenterCheck.setSelected(true);
         fuzzParasiteAntsCheck.setSelected(true);
     }
 
@@ -581,6 +594,7 @@ public class SettingsPanel extends JPanel {
         pauseFocusLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_PAUSE_FOCUS));
         confirmQuitLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_CONFIRM_QUIT));
         tooltipsLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_SHOW_TOOLTIPS));
+        overworldAutoRecenterLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_OVERWORLD_AUTO_RECENTER));
         fuzzParasiteAntsLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_FUZZ_PARASITE_ANTS));
         
         sizeLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_SCREEN_SIZE));
@@ -661,6 +675,7 @@ public class SettingsPanel extends JPanel {
         pauseFocusCheck.setSelected(engine.isPauseOnFocusLoss());
         confirmQuitCheck.setSelected(engine.isConfirmOnQuit());
         showTooltipsCheck.setSelected(engine.isShowTooltips());
+        overworldAutoRecenterCheck.setSelected(engine.isOverworldAutoRecenter());
         fuzzParasiteAntsCheck.setSelected(engine.isFuzzParasiteAnts());
         
         sizeCombo.setSelectedItem(engine.getScreenSize());
@@ -696,6 +711,7 @@ public class SettingsPanel extends JPanel {
         engine.setPauseOnFocusLoss(pauseFocusCheck.isSelected());
         engine.setConfirmOnQuit(confirmQuitCheck.isSelected());
         engine.setShowTooltips(showTooltipsCheck.isSelected());
+        engine.setOverworldAutoRecenter(overworldAutoRecenterCheck.isSelected());
         engine.setFuzzParasiteAnts(fuzzParasiteAntsCheck.isSelected());
         
         engine.setScreenSize((String) sizeCombo.getSelectedItem());
@@ -715,6 +731,7 @@ public class SettingsPanel extends JPanel {
 
         engine.saveGlobalSettings();
         frame.applyEngineSettings();
+        frame.getGamePanel().applyOverworldRecenterSetting();
 
         SwingUtilities.invokeLater(() -> {
             JOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.SETTINGS_SAVED_MSG), LanguageStrings.get(LanguageStrings.UI_SETTINGS), JOptionPane.INFORMATION_MESSAGE);

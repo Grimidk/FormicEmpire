@@ -411,6 +411,7 @@ public class EnglishTranslation implements Translation {
         en.put("SETTINGS_CONFIRM_QUIT", "Confirm on quit");
         en.put("SETTINGS_SHOW_TOOLTIPS", "Show tooltips");
         en.put("SETTINGS_FUZZ_PARASITE_ANTS", "Fuzz parasite ant numbers");
+        en.put("SETTINGS_OVERWORLD_AUTO_RECENTER", "Auto-recenter overworld on colony entrance");
 
         en.put("SETTINGS_MASTER_VOL", "Master Volume:");
         en.put("SETTINGS_MUSIC_VOL", "Music Volume:");

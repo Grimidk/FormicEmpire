@@ -411,6 +411,7 @@ public class FrenchTranslation implements Translation {
         fr.put("SETTINGS_CONFIRM_QUIT", "Confirmer à la sortie");
         fr.put("SETTINGS_SHOW_TOOLTIPS", "Afficher les infobulles");
         fr.put("SETTINGS_FUZZ_PARASITE_ANTS", "Chiffres de fourmis parasites approximatifs");
+        fr.put("SETTINGS_OVERWORLD_AUTO_RECENTER", "Recentrer automatiquement la surface sur l'entrée de la colonie");
 
         fr.put("SETTINGS_MASTER_VOL", "Volume principal :");
         fr.put("SETTINGS_MUSIC_VOL", "Volume musique :");

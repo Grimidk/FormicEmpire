@@ -64,7 +64,7 @@ public class GamePanel extends ZeroGamePanel {
     private Timer minuteDrainTimer;
 
     private boolean overworldPanDragging;
-    private Point overworldPanLast;
+    private Point overworldPanLastScreen;
     private Timer overworldSpringTimer;
     private Point overworldSpringStartPos;
     private Point overworldSpringTargetPos;
@@ -142,6 +142,22 @@ public class GamePanel extends ZeroGamePanel {
         overworldLastUserPanMs = System.currentTimeMillis();
     }
 
+    private boolean isOverworldAutoRecenterEnabled() {
+        Engine engine = frame.getEngine();
+        return engine == null || engine.isOverworldAutoRecenter();
+    }
+
+    public void applyOverworldRecenterSetting() {
+        if (!isOverworldAutoRecenterEnabled()) {
+            stopOverworldSpring();
+            stopOverworldIdleRecenter();
+            return;
+        }
+        if (engineStarted) {
+            startOverworldIdleRecenter();
+        }
+    }
+
     private boolean isOverworldViewCentered() {
         if (gameScrollPane == null) {
             return true;
@@ -152,6 +168,9 @@ public class GamePanel extends ZeroGamePanel {
 
     private void setupOverworldIdleRecenter() {
         overworldIdleRecenterTimer = new Timer(OVERWORLD_IDLE_RECENTER_POLL_MS, e -> {
+            if (!isOverworldAutoRecenterEnabled()) {
+                return;
+            }
             if (!engineStarted || gameScrollPane == null || gameAreaPanel == null) {
                 return;
             }
@@ -176,6 +195,10 @@ public class GamePanel extends ZeroGamePanel {
     }
 
     private void startOverworldIdleRecenter() {
+        if (!isOverworldAutoRecenterEnabled()) {
+            stopOverworldIdleRecenter();
+            return;
+        }
         if (overworldIdleRecenterTimer == null) {
             setupOverworldIdleRecenter();
         }
@@ -248,7 +271,7 @@ public class GamePanel extends ZeroGamePanel {
                 stopOverworldSpring();
                 noteOverworldUserPan();
                 overworldPanDragging = true;
-                overworldPanLast = e.getPoint();
+                overworldPanLastScreen = e.getLocationOnScreen();
             }
 
             @Override
@@ -257,21 +280,22 @@ public class GamePanel extends ZeroGamePanel {
                     return;
                 }
                 overworldPanDragging = false;
-                overworldPanLast = null;
+                overworldPanLastScreen = null;
                 noteOverworldUserPan();
             }
         });
         gameAreaPanel.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
-                if (!overworldPanDragging || overworldPanLast == null
+                if (!overworldPanDragging || overworldPanLastScreen == null
                         || gameAreaPanel.getCurrentDimension() != WorldSpaces.OVERWORLD) {
                     return;
                 }
                 noteOverworldUserPan();
-                int dx = e.getX() - overworldPanLast.x;
-                int dy = e.getY() - overworldPanLast.y;
-                overworldPanLast = e.getPoint();
+                Point screen = e.getLocationOnScreen();
+                int dx = screen.x - overworldPanLastScreen.x;
+                int dy = screen.y - overworldPanLastScreen.y;
+                overworldPanLastScreen = screen;
                 JViewport vp = gameScrollPane.getViewport();
                 Point p = vp.getViewPosition();
                 p.x -= dx;
@@ -348,8 +372,8 @@ public class GamePanel extends ZeroGamePanel {
             return;
         }
         stopOverworldSpring();
-        overworldSpringStartPos = start;
-        overworldSpringTargetPos = target;
+        overworldSpringStartPos = new Point(start);
+        overworldSpringTargetPos = new Point(target);
         overworldSpringStartMs = System.currentTimeMillis();
         overworldSpringTimer = new Timer(16, e -> {
             long elapsed = System.currentTimeMillis() - overworldSpringStartMs;
@@ -357,11 +381,13 @@ public class GamePanel extends ZeroGamePanel {
             float ease = 1f - (1f - t) * (1f - t);
             int x = (int) (overworldSpringStartPos.x + (overworldSpringTargetPos.x - overworldSpringStartPos.x) * ease);
             int y = (int) (overworldSpringStartPos.y + (overworldSpringTargetPos.y - overworldSpringStartPos.y) * ease);
+            if (t >= 1f) {
+                vp.setViewPosition(overworldSpringTargetPos);
+                stopOverworldSpring();
+                return;
+            }
             vp.setViewPosition(new Point(x, y));
             gameAreaPanel.repaint();
-            if (t >= 1f) {
-                stopOverworldSpring();
-            }
         });
         overworldSpringTimer.start();
     }
@@ -821,7 +847,7 @@ public class GamePanel extends ZeroGamePanel {
         if (gameAreaPanel != null) {
             stopOverworldSpring();
             overworldPanDragging = false;
-            overworldPanLast = null;
+            overworldPanLastScreen = null;
             gameAreaPanel.resetView();
         }
         if (colonyPanel != null) colonyPanel.reset();
