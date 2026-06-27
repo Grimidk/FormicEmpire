@@ -506,12 +506,12 @@ public class PortugueseTranslation implements Translation {
 
         pt.put("BUG_ANT", "Formiga");
         pt.put("BUG_APHID", "Pulgão");
-        pt.put("BUG_SOIL_MITE", "Ácaro do solo");
+        pt.put("BUG_SYMBIOTIC_MITE", "Ácaro simbiótico");
         pt.put("BUG_DERMESTID", "Besouro dermestídeo");
         pt.put("BUG_PARASITE", "Parasita");
         pt.put("BUG_ANT_SCIENTIFIC", "Formica");
         pt.put("BUG_APHID_SCIENTIFIC", "Aphididae");
-        pt.put("BUG_SOIL_MITE_SCIENTIFIC", "Stratiolaelaps scimitus");
+        pt.put("BUG_SYMBIOTIC_MITE_SCIENTIFIC", "Stratiolaelaps scimitus");
         pt.put("BUG_DERMESTID_SCIENTIFIC", "Dermestidae");
         pt.put("BUG_PARASITIC_MITE", "Ácaro parasita");
         pt.put("BUG_PARASITIC_MITE_SCIENTIFIC", "Acaridae");
@@ -628,7 +628,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("ROLE_LAYER_DESC", "Permite que rainhas ponham ovos. 1 rainha põe 1 ovo por hora.");
         pt.put("ROLE_RANCHER_UPGRADE", "Função pastora");
         pt.put("ROLE_RANCHER_FLAVOR", "Pastora de pulgões");
-        pt.put("ROLE_RANCHER_DESC", "Permite que operárias cuidem de pulgões no curral. Cada pastora sustenta até 10 pulgões. Cada pulgão produz 1 xarope por hora se houver plantas. Use Capturadoras para encontrar pulgões selvagens nas Planícies.");
+        pt.put("ROLE_RANCHER_DESC", "Permite que operárias cuidem de pulgões no curral. Cada pastora sustenta até 10 pulgões. Cada pulgão produz 1 xarope por hora se houver plantas. Capturadoras só podem recolher pulgões selvagens após desbloquear este papel (exceto em biomas secos).");
         pt.put("ROLE_RESEARCHER_UPGRADE", "Função pesquisadora");
         pt.put("ROLE_RESEARCHER_FLAVOR", "Ciência formiga");
         pt.put("ROLE_RESEARCHER_DESC", "Permite que rainhas gerem pontos de pesquisa. 1 rainha gera 1 ponto por hora.");
@@ -682,7 +682,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("ROLE_MILITIA_DESC", "Permite tarefas defensivas básicas às operárias.");
         pt.put("ROLE_CATCHER_UPGRADE", "Função capturadora");
         pt.put("ROLE_CATCHER_FLAVOR", "Captura de insetos");
-        pt.put("ROLE_CATCHER_DESC", "Permite que soldadas capturem insetos nativos no exterior. Cada capturadora mantém até 10 insetos de estimação no total. Pastoras cuidam de pulgões, coveiras de dermestídeos. Pares reproduzem-se diariamente com pelo menos dois exemplares.");
+        pt.put("ROLE_CATCHER_DESC", "Permite que soldadas capturem insetos nativos no exterior. Cada capturadora mantém até 10 insetos de estimação no total. Pulgões exigem o papel Pastora; ácaros simbióticos desbloqueiam quando aparecem ácaros parasitas; dermestídeos exigem a pesquisa Captura de besouros de cova. Pares reproduzem-se diariamente com pelo menos dois exemplares.");
         pt.put("ROLE_CRANE_UPGRADE", "Função guindaste de construção");
         pt.put("ROLE_CRANE_FLAVOR", "Trabalho pesado");
         pt.put("ROLE_CRANE_DESC", "Permite que majors ajudem na construção; cada uma equivale a 25 operárias.");
@@ -740,6 +740,10 @@ public class PortugueseTranslation implements Translation {
         pt.put("ABILITY_CLONING_DESC", "Cada assimilação genética concluída aumenta a integridade genética da dinastia. A integridade mínima aumenta com as assimilações concluídas.");
         pt.put("ABILITY_PARASITIC_MITE_ALERT_FLAVOR", "Ácaros parasitas");
         pt.put("ABILITY_PARASITIC_MITE_ALERT_DESC", "Avisa quando ácaros parasitas infestam a colônia. A cada 10 ácaros, uma formiga fica com metade da velocidade.");
+        pt.put("ABILITY_CATCH_SYMBIOTIC_MITE_FLAVOR", "Captura de ácaros simbióticos");
+        pt.put("ABILITY_CATCH_SYMBIOTIC_MITE_DESC", "Permite que capturadoras recolham ácaros simbióticos no exterior. Desbloqueia quando aparecem os primeiros ácaros parasitas. Cada ácaro simbiótico elimina até 5 ácaros parasitas por dia.");
+        pt.put("ABILITY_CATCH_DERMESTID_FLAVOR", "Captura de besouros de cova");
+        pt.put("ABILITY_CATCH_DERMESTID_DESC", "Permite que capturadoras recolham dermestídeos no exterior. Coveiras cuidam de até 10 cada uma na cova.");
         pt.put("ABILITY_ABILITY_FLAVOR", "Habilidades desbloqueadas");
         pt.put("ABILITY_ABILITY_DESC", "Permite ver o menu de habilidades e usar habilidades ativas.");
 
@@ -795,8 +799,8 @@ public class PortugueseTranslation implements Translation {
         pt.put("STAT_CONTAMINATION_2_DESC", "Reduz mortes por contaminação em 40%.");
         pt.put("STAT_CONTAMINATION_3_FLAVOR", "Protocolos de isolamento");
         pt.put("STAT_CONTAMINATION_3_DESC", "Reduz mortes por contaminação em 60%.");
-        pt.put("STAT_SOIL_MITE_1_FLAVOR", "Treino de ácaros");
-        pt.put("STAT_SOIL_MITE_1_DESC", "Aumenta a eliminação de ácaros parasitas de cada ácaro do solo para 12 por dia.");
+        pt.put("STAT_SYMBIOTIC_MITE_1_FLAVOR", "Treino de ácaros simbióticos");
+        pt.put("STAT_SYMBIOTIC_MITE_1_DESC", "Aumenta a eliminação de ácaros parasitas de cada ácaro simbiótico para 12 por dia.");
         pt.put("STAT_DERMESTID_1_FLAVOR", "Besouros de cova");
         pt.put("STAT_DERMESTID_1_DESC", "Permite que cada dermestídeo na cova conte como 1 coveira para enterros.");
         pt.put("STAT_GRAVING_1_FLAVOR", "Tumbas rasas");
@@ -977,11 +981,11 @@ public class PortugueseTranslation implements Translation {
         pt.put("HELP_TYPE_QUEEN_DESC", "Coração da colônia. Pode por ovos ou pesquisar.");
 
         pt.put("HELP_BUG_ANT_DESC", "Formigas selvagens ou rivais que aparecem na superfície. Podem lutar com as suas formigas e competir por espaço.");
-        pt.put("HELP_BUG_APHID_DESC", "Insetos que se alimentam de plantas. Capturados nas Planícies; pastoras cuidam de até 10 cada. Sem curral dedicado, vão ao curral de insetos.");
-        pt.put("HELP_BUG_SOIL_MITE_DESC", "Ácaros predadores de controlo biológico. No curral de insetos. Cada ácaro do solo elimina até 5 ácaros parasitas por dia (12 com Treino de ácaros). Reproduzem-se com pelo menos dois.");
-        pt.put("HELP_BUG_DERMESTID_DESC", "Besouros que limpam carcaças. Coveiras cuidam de até 10 cada. Com Besouros de cova, cada um conta como uma coveira. Reproduzem-se com pelo menos dois.");
-        pt.put("HELP_BUG_PARASITE_DESC", "Pragas que se escondem no formigueiro e drenam comida em segredo. Atribua Polícias para encontrá-las e eliminá-las antes que se multipliquem.");
-        pt.put("HELP_BUG_PARASITIC_MITE_DESC", "Ácaros minúsculos que infestam formigas adultas quando a colônia acumula recursos. As contagens vão aos milhares. Cada 10 ácaros reduzem uma formiga à metade da velocidade. Espalham-se mensalmente; ácaros do solo são o principal contramedida. A Polícia não os afeta.");
+        pt.put("HELP_BUG_APHID_DESC", "Insetos que se alimentam de plantas. Nativos da maioria dos biomas exceto secos. Exigem o papel Pastora antes de capturadoras os recolherem. Pastoras cuidam de até 10 cada para xarope.");
+        pt.put("HELP_BUG_SYMBIOTIC_MITE_DESC", "Ácaros predadores de controlo biológico. Nativos de todos os biomas. A captura desbloqueia na primeira aparição de ácaros parasitas. No curral de insetos. Cada ácaro simbiótico elimina até 5 ácaros parasitas por dia (12 com Treino de ácaros simbióticos).");
+        pt.put("HELP_BUG_DERMESTID_DESC", "Besouros que limpam carcaças. Nativos da maioria dos biomas exceto frios. Exigem a pesquisa Captura de besouros de cova. Coveiras cuidam de até 10 cada. Com Besouros de cova, cada um conta como uma coveira.");
+        pt.put("HELP_BUG_PARASITE_DESC", "Pragas que se escondem no formigueiro e drenam comida em segredo. Nativas de biomas quentes. Surto na primavera e verão com mais de 1.000 formigas (25% por mês). Atribua Polícias para eliminá-las.");
+        pt.put("HELP_BUG_PARASITIC_MITE_DESC", "Ácaros minúsculos que infestam formigas adultas quando a colônia acumula recursos. Nativos de biomas frios. Surto no outono e inverno acima de 10.000 recursos armazenados (25% por mês). Cada 10 ácaros reduzem uma formiga à metade da velocidade. Ácaros simbióticos são o principal contramedida.");
 
         pt.put("HELP_BIOMES_TITLE", "Biomas");
         pt.put("HELP_BIOME_TEMP", "Temp.: ");
@@ -1094,7 +1098,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("LOG_PARASITES_ELIMINATED_FMT", "Eliminados %d parasitas.");
         pt.put("LOG_CAUGHT_BUGS_SUMMARY_FMT", "Capturadoras trouxeram %d inseto(s) do exterior.");
         pt.put("LOG_CAUGHT_BUG_BRED_FMT", "%d %s reproduziram-se em cativeiro.");
-        pt.put("LOG_SOIL_MITES_PREDATION_FMT", "Ácaros do solo eliminaram %d ácaro(s) parasita(s).");
+        pt.put("LOG_SYMBIOTIC_MITES_PREDATION_FMT", "Ácaros simbióticos eliminaram %d ácaro(s) parasita(s).");
         pt.put("LOG_NUPTIAL_QUEENS_FMT", "Voo nupcial. %d novas rainhas se juntaram.");
         pt.put("LOG_SUCCESS_ASSIMILATION_FMT", "%s concluída! Recompensa: %s");
         pt.put("LOG_SUCCESS_TUNNEL", "Conexão de túnel concluída!");
@@ -1149,7 +1153,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("TRIGGER_POLICE_ROLE_TITLE", "Infestação parasitária");
         pt.put("TRIGGER_POLICE_ROLE_MSG", "A colónia tornou-se tão próspera que insetos parasitas podem infiltrar-se!");
         pt.put("TRIGGER_PARASITIC_MITE_TITLE", "Ácaros parasitas");
-        pt.put("TRIGGER_PARASITIC_MITE_MSG", "Ácaros microscópicos infestam as tuas operárias e abrandam-nas! Investiga a função de Captor e atribui soldadas para capturar ácaros do solo — eliminam ácaros parasitas diariamente.");
+        pt.put("TRIGGER_PARASITIC_MITE_MSG", "Ácaros microscópicos infestam as tuas operárias e abrandam-nas! A captura de ácaros simbióticos já está disponível. Investiga o papel Captor e atribui soldadas para os capturar — eliminam ácaros parasitas diariamente.");
         pt.put("TRIGGER_MASS_FLIGHT_TITLE", "Decreto imperial");
         pt.put("TRIGGER_MASS_FLIGHT_MSG", "A tua dinastia realizou 10 voos nupciais! Desbloqueaste a habilidade 'Voos nupciais em massa' no menu de Operações da colónia (Z).");
         pt.put("TRIGGER_DYNASTY_ABILITY_TITLE", "Dinastia de formigas");

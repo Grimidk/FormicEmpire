@@ -506,12 +506,12 @@ public class FrenchTranslation implements Translation {
 
         fr.put("BUG_ANT", "Fourmi");
         fr.put("BUG_APHID", "Puceron");
-        fr.put("BUG_SOIL_MITE", "Acarien du sol");
+        fr.put("BUG_SYMBIOTIC_MITE", "Acarien symbiotique");
         fr.put("BUG_DERMESTID", "Dermeste");
         fr.put("BUG_PARASITE", "Parasite");
         fr.put("BUG_ANT_SCIENTIFIC", "Formica");
         fr.put("BUG_APHID_SCIENTIFIC", "Aphididae");
-        fr.put("BUG_SOIL_MITE_SCIENTIFIC", "Stratiolaelaps scimitus");
+        fr.put("BUG_SYMBIOTIC_MITE_SCIENTIFIC", "Stratiolaelaps scimitus");
         fr.put("BUG_DERMESTID_SCIENTIFIC", "Dermestidae");
         fr.put("BUG_PARASITIC_MITE", "Acarien parasitaire");
         fr.put("BUG_PARASITIC_MITE_SCIENTIFIC", "Acaridae");
@@ -628,7 +628,7 @@ public class FrenchTranslation implements Translation {
         fr.put("ROLE_LAYER_DESC", "Permet aux reines de pondre. 1 reine = 1 œuf par heure.");
         fr.put("ROLE_RANCHER_UPGRADE", "Rôle éleveuse");
         fr.put("ROLE_RANCHER_FLAVOR", "Éleveuse de pucerons");
-        fr.put("ROLE_RANCHER_DESC", "Permet aux ouvrières de garder des pucerons dans l'enclos. Chaque éleveuse soutient jusqu'à 10 pucerons. Chaque puceron produit 1 miellat par heure s'il y a des plantes. Les Capturantes trouvent des pucerons sauvages dans les Plaines.");
+        fr.put("ROLE_RANCHER_DESC", "Permet aux ouvrières de garder des pucerons dans l'enclos. Chaque éleveuse soutient jusqu'à 10 pucerons. Chaque puceron produit 1 miellat par heure s'il y a des plantes. Les capturantes ne peuvent collecter des pucerons sauvages qu'après ce rôle (sauf biomes secs).");
         fr.put("ROLE_RESEARCHER_UPGRADE", "Rôle chercheuse");
         fr.put("ROLE_RESEARCHER_FLAVOR", "Science fourmi");
         fr.put("ROLE_RESEARCHER_DESC", "Permet aux reines de générer des points de recherche. 1 reine = 1 point par heure.");
@@ -682,7 +682,7 @@ public class FrenchTranslation implements Translation {
         fr.put("ROLE_MILITIA_DESC", "Permet aux ouvrières des tâches défensives simples.");
         fr.put("ROLE_CATCHER_UPGRADE", "Rôle capturatrice");
         fr.put("ROLE_CATCHER_FLAVOR", "Chasse aux insectes");
-        fr.put("ROLE_CATCHER_DESC", "Permet aux soldates de capturer des insectes natifs à la surface. Chaque capturante maintient jusqu'à 10 insectes de compagnie au total. Les éleveuses gardent les pucerons, les fossoyeuses les dermestes. Les couples se reproduisent chaque jour à partir de deux spécimens.");
+        fr.put("ROLE_CATCHER_DESC", "Permet aux soldates de capturer des insectes natifs à la surface. Chaque capturante maintient jusqu'à 10 insectes de compagnie au total. Les pucerons exigent le rôle Éleveuse ; les acariens symbiotiques se débloquent à l'apparition des acariens parasites ; les dermestes exigent la recherche Capture de coléoptères de fosse. Les couples se reproduisent chaque jour à partir de deux spécimens.");
         fr.put("ROLE_CRANE_UPGRADE", "Rôle grue de chantier");
         fr.put("ROLE_CRANE_FLAVOR", "Travail lourd");
         fr.put("ROLE_CRANE_DESC", "Permet aux majores d'aider à la construction ; chacune vaut 25 ouvrières.");
@@ -740,6 +740,10 @@ public class FrenchTranslation implements Translation {
         fr.put("ABILITY_CLONING_DESC", "Chaque assimilation génétique terminée augmente l'intégrité génétique de la dynastie. L'intégrité minimale augmente avec les assimilations terminées.");
         fr.put("ABILITY_PARASITIC_MITE_ALERT_FLAVOR", "Acariens parasites");
         fr.put("ABILITY_PARASITIC_MITE_ALERT_DESC", "Avertit lorsque des acariens parasites infestent la colonie. Tous les 10 acariens ralentissent une fourmi de moitié.");
+        fr.put("ABILITY_CATCH_SYMBIOTIC_MITE_FLAVOR", "Capture d'acariens symbiotiques");
+        fr.put("ABILITY_CATCH_SYMBIOTIC_MITE_DESC", "Permet aux capturantes de collecter des acariens symbiotiques à la surface. Se débloque à la première apparition d'acariens parasites. Chaque acarien symbiotique élimine jusqu'à 5 acariens parasites par jour.");
+        fr.put("ABILITY_CATCH_DERMESTID_FLAVOR", "Capture de coléoptères de fosse");
+        fr.put("ABILITY_CATCH_DERMESTID_DESC", "Permet aux capturantes de collecter des dermestes à la surface. Les fossoyeuses en gardent jusqu'à 10 chacune dans la fosse.");
         fr.put("ABILITY_ABILITY_FLAVOR", "Capacités débloquées");
         fr.put("ABILITY_ABILITY_DESC", "Affiche le menu des capacités et les capacités actives.");
 
@@ -795,8 +799,8 @@ public class FrenchTranslation implements Translation {
         fr.put("STAT_CONTAMINATION_2_DESC", "Réduit la mortalité par contamination de 40%.");
         fr.put("STAT_CONTAMINATION_3_FLAVOR", "Protocoles d'isolement");
         fr.put("STAT_CONTAMINATION_3_DESC", "Réduit la mortalité par contamination de 60%.");
-        fr.put("STAT_SOIL_MITE_1_FLAVOR", "Dressage d'acariens");
-        fr.put("STAT_SOIL_MITE_1_DESC", "Augmente l'élimination d'acariens parasites de chaque acarien du sol à 12 par jour.");
+        fr.put("STAT_SYMBIOTIC_MITE_1_FLAVOR", "Dressage d'acariens symbiotiques");
+        fr.put("STAT_SYMBIOTIC_MITE_1_DESC", "Augmente l'élimination d'acariens parasites de chaque acarien symbiotique à 12 par jour.");
         fr.put("STAT_DERMESTID_1_FLAVOR", "Coléoptères de fosse");
         fr.put("STAT_DERMESTID_1_DESC", "Permet à chaque dermeste dans la fosse de compter comme 1 fossoyeuse pour l'enterrement.");
         fr.put("STAT_GRAVING_1_FLAVOR", "Tombes peu profondes");
@@ -977,11 +981,11 @@ public class FrenchTranslation implements Translation {
         fr.put("HELP_TYPE_QUEEN_DESC", "Cœur de la colonie. Pondre ou rechercher.");
 
         fr.put("HELP_BUG_ANT_DESC", "Fourmis sauvages ou rivales sur la surface. Elles peuvent combattre vos fourmis et rivaliser pour l'espace.");
-        fr.put("HELP_BUG_APHID_DESC", "Insectes qui se nourrissent de plantes. Capturés dans les Plaines ; les éleveuses en gardent jusqu'à 10 chacune. Sans enclos dédié, ils vont à l'enclos à insectes.");
-        fr.put("HELP_BUG_SOIL_MITE_DESC", "Acariens prédateurs de lutte biologique. Dans l'enclos à insectes. Chaque acarien du sol élimine jusqu'à 5 acariens parasitaires par jour (12 avec Dressage d'acariens). Reproduction à partir de deux.");
-        fr.put("HELP_BUG_DERMESTID_DESC", "Coléoptères qui nettoient les carcasses. Les fossoyeuses en gardent jusqu'à 10 chacune. Avec Coléoptères de fosse, chacun compte comme une fossoyeuse. Reproduction à partir de deux.");
-        fr.put("HELP_BUG_PARASITE_DESC", "Ravageurs cachés dans le nid qui drainent secrètement vos réserves de nourriture. Assignez des Policiers pour les traquer et les éliminer avant qu'ils ne se propagent.");
-        fr.put("HELP_BUG_PARASITIC_MITE_DESC", "Minuscules acariens qui infestent les fourmis adultes quand la colonie accumule des ressources. Les effectifs se comptent en milliers. Tous les 10 acariens ralentissent une fourmi de moitié. Propagation mensuelle ; les acariens du sol sont le principal contre. La Police ne les affecte pas.");
+        fr.put("HELP_BUG_APHID_DESC", "Insectes qui se nourrissent de plantes. Natifs de la plupart des biomes sauf les secs. Exigent le rôle Éleveuse avant que les capturantes puissent les collecter. Les éleveuses en gardent jusqu'à 10 chacune pour le miellat.");
+        fr.put("HELP_BUG_SYMBIOTIC_MITE_DESC", "Acariens prédateurs de lutte biologique. Natifs de tous les biomes. La capture se débloque à la première apparition d'acariens parasites. Dans l'enclos à insectes. Chaque acarien symbiotique élimine jusqu'à 5 acariens parasitaires par jour (12 avec Dressage d'acariens symbiotiques).");
+        fr.put("HELP_BUG_DERMESTID_DESC", "Coléoptères qui nettoient les carcasses. Natifs de la plupart des biomes sauf les froids. Exigent la recherche Capture de coléoptères de fosse. Les fossoyeuses en gardent jusqu'à 10 chacune. Avec Coléoptères de fosse, chacun compte comme une fossoyeuse.");
+        fr.put("HELP_BUG_PARASITE_DESC", "Ravageurs cachés dans le nid qui drainent secrètement vos réserves. Natifs des biomes chauds. Flambées au printemps et en été au-delà de 1 000 fourmis (25% par mois). Assignez des Policiers pour les éliminer.");
+        fr.put("HELP_BUG_PARASITIC_MITE_DESC", "Minuscules acariens qui infestent les fourmis adultes quand la colonie accumule des ressources. Natifs des biomes froids. Flambées en automne et hiver au-delà de 10 000 ressources stockées (25% par mois). Tous les 10 acariens ralentissent une fourmi de moitié. Les acariens symbiotiques sont le principal contre.");
 
         fr.put("HELP_BIOMES_TITLE", "Biomes");
         fr.put("HELP_BIOME_TEMP", "Temp : ");
@@ -1094,7 +1098,7 @@ public class FrenchTranslation implements Translation {
         fr.put("LOG_PARASITES_ELIMINATED_FMT", "%d parasites éliminés.");
         fr.put("LOG_CAUGHT_BUGS_SUMMARY_FMT", "Les capturantes ont rapporté %d insecte(s) de la surface.");
         fr.put("LOG_CAUGHT_BUG_BRED_FMT", "%d %s se sont reproduits en captivité.");
-        fr.put("LOG_SOIL_MITES_PREDATION_FMT", "Les acariens du sol ont éliminé %d acarien(s) parasitaire(s).");
+        fr.put("LOG_SYMBIOTIC_MITES_PREDATION_FMT", "Les acariens symbiotiques ont éliminé %d acarien(s) parasitaire(s).");
         fr.put("LOG_NUPTIAL_QUEENS_FMT", "Essaim nuptial : %d nouvelles reines ont rejoint.");
         fr.put("LOG_SUCCESS_ASSIMILATION_FMT", "%s terminée ! Récompense : %s");
         fr.put("LOG_SUCCESS_TUNNEL", "Connexion de tunnel terminée !");
@@ -1149,7 +1153,7 @@ public class FrenchTranslation implements Translation {
         fr.put("TRIGGER_POLICE_ROLE_TITLE", "Infestation parasitaire");
         fr.put("TRIGGER_POLICE_ROLE_MSG", "La colonie est devenue si prospère que des insectes parasites peuvent s'y infiltrer !");
         fr.put("TRIGGER_PARASITIC_MITE_TITLE", "Acariens parasites");
-        fr.put("TRIGGER_PARASITIC_MITE_MSG", "Des acariens microscopiques infestent vos ouvrières et les ralentissent ! Recherchez le rôle Capteur et assignez des soldates pour capturer les acariens du sol — ils éliminent les acariens parasites chaque jour.");
+        fr.put("TRIGGER_PARASITIC_MITE_MSG", "Des acariens microscopiques infestent vos ouvrières et les ralentissent ! La capture d'acariens symbiotiques est maintenant disponible. Recherchez le rôle Capteur et assignez des soldates pour les capturer — ils éliminent les acariens parasites chaque jour.");
         fr.put("TRIGGER_MASS_FLIGHT_TITLE", "Décret impérial");
         fr.put("TRIGGER_MASS_FLIGHT_MSG", "Votre dynastie a effectué 10 vols nuptiaux ! Vous avez débloqué la capacité « Vols nuptiaux de masse » dans le menu Opérations de colonie (Z).");
         fr.put("TRIGGER_DYNASTY_ABILITY_TITLE", "Dynastie de fourmis");

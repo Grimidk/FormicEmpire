@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.infrasctructure.managers;
 
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
+import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
@@ -313,8 +314,27 @@ public class TriggerManager {
     }
 
     private void checkParasiticMiteOutbreak() {
-        if (playerColony.hasUpgrade(GameUnlocks.ABILITY_PARASITIC_MITE_ALERT)) return;
-        if (playerColony.getParasiticMites() <= 0) return;
+        if (playerColony.getParasiticMites() <= 0) {
+            return;
+        }
+        Hex hex = world.getHexOfColony(playerColony);
+        Biome biome = hex != null ? hex.getBiome() : null;
+        if (biome == null || !biome.hasNativeParasite(GameConstants.TYPE_PARASITIC_MITE)) {
+            return;
+        }
+
+        boolean needsAlert = !playerColony.hasUpgrade(GameUnlocks.ABILITY_PARASITIC_MITE_ALERT);
+        boolean needsSymbioticMiteCatch = !playerColony.hasUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE);
+        if (!needsAlert && !needsSymbioticMiteCatch) {
+            return;
+        }
+
+        if (needsAlert) {
+            playerColony.unlockUpgrade(GameUnlocks.ABILITY_PARASITIC_MITE_ALERT);
+        }
+        if (needsSymbioticMiteCatch) {
+            playerColony.unlockUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE);
+        }
 
         fireLocalizedTrigger(GameUnlocks.ABILITY_PARASITIC_MITE_ALERT,
             LanguageStrings.TRIGGER_PARASITIC_MITE_TITLE,

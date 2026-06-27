@@ -506,12 +506,12 @@ public class SpanishTranslation implements Translation {
 
         es.put("BUG_ANT", "Hormiga");
         es.put("BUG_APHID", "Pulgón");
-        es.put("BUG_SOIL_MITE", "Ácaro de suelo");
+        es.put("BUG_SYMBIOTIC_MITE", "Ácaro simbiótico");
         es.put("BUG_DERMESTID", "Escarabajo derméstido");
         es.put("BUG_PARASITE", "Parásito");
         es.put("BUG_ANT_SCIENTIFIC", "Formica");
         es.put("BUG_APHID_SCIENTIFIC", "Aphididae");
-        es.put("BUG_SOIL_MITE_SCIENTIFIC", "Stratiolaelaps scimitus");
+        es.put("BUG_SYMBIOTIC_MITE_SCIENTIFIC", "Stratiolaelaps scimitus");
         es.put("BUG_DERMESTID_SCIENTIFIC", "Dermestidae");
         es.put("BUG_PARASITIC_MITE", "Ácaro parásito");
         es.put("BUG_PARASITIC_MITE_SCIENTIFIC", "Acaridae");
@@ -628,7 +628,7 @@ public class SpanishTranslation implements Translation {
         es.put("ROLE_LAYER_DESC", "Permite a las reinas poner huevos. 1 reina pone 1 huevo por hora.");
         es.put("ROLE_RANCHER_UPGRADE", "Rol Rancho");
         es.put("ROLE_RANCHER_FLAVOR", "Pastora de Áfidos");
-        es.put("ROLE_RANCHER_DESC", "Permite a las obreras cuidar pulgones en el corral. Cada pastora sostiene hasta 10 áfidos. Cada áfido produce 1 jarabe por hora si hay plantas. Usa Capturadoras para encontrar áfidos salvajes en las Llanuras.");
+        es.put("ROLE_RANCHER_DESC", "Permite a las obreras cuidar pulgones en el corral. Cada pastora sostiene hasta 10 áfidos. Cada áfido produce 1 jarabe por hora si hay plantas. Las capturadoras solo pueden recoger áfidos salvajes tras desbloquear este rol (excepto en biomas secos).");
         es.put("ROLE_RESEARCHER_UPGRADE", "Rol Investigadora");
         es.put("ROLE_RESEARCHER_FLAVOR", "Ciencia Hormiga");
         es.put("ROLE_RESEARCHER_DESC", "Permite a las reinas generar puntos de investigación. 1 reina genera 1 punto por hora.");
@@ -682,7 +682,7 @@ public class SpanishTranslation implements Translation {
         es.put("ROLE_MILITIA_DESC", "Permite a las obreras realizar tareas defensivas básicas.");
         es.put("ROLE_CATCHER_UPGRADE", "Rol Capturadora");
         es.put("ROLE_CATCHER_FLAVOR", "Captura de Bichos");
-        es.put("ROLE_CATCHER_DESC", "Permite a las soldados capturar insectos nativos en el exterior. Cada capturadora mantiene hasta 10 insectos mascota en total. Las pastoras cuidan áfidos, las coveiras derméstidos. Las parejas se reproducen diariamente con al menos dos ejemplares.");
+        es.put("ROLE_CATCHER_DESC", "Permite a las soldados capturar insectos nativos en el exterior. Cada capturadora mantiene hasta 10 insectos mascota en total. Los áfidos requieren el rol Pastora; los ácaros simbióticos se desbloquean al aparecer ácaros parásitos; los derméstidos requieren la investigación Captura de escarabajos de fosa. Las parejas se reproducen diariamente con al menos dos ejemplares.");
         es.put("ROLE_CRANE_UPGRADE", "Rol Grúa de Construcción");
         es.put("ROLE_CRANE_FLAVOR", "Trabajo Pesado");
         es.put("ROLE_CRANE_DESC", "Permite a los majors ayudar en la construcción; cada uno equivale a 25 obreras.");
@@ -740,6 +740,10 @@ public class SpanishTranslation implements Translation {
         es.put("ABILITY_CLONING_DESC", "Cada asimilación genética completada aumenta la integridad genética de la dinastía. La integridad mínima escala con las asimilaciones completadas.");
         es.put("ABILITY_PARASITIC_MITE_ALERT_FLAVOR", "Ácaros parásitos");
         es.put("ABILITY_PARASITIC_MITE_ALERT_DESC", "Avisa cuando los ácaros parásitos infestan la colonia. Cada 10 ácaros ralentizan una hormiga a la mitad de velocidad.");
+        es.put("ABILITY_CATCH_SYMBIOTIC_MITE_FLAVOR", "Captura de ácaros simbióticos");
+        es.put("ABILITY_CATCH_SYMBIOTIC_MITE_DESC", "Permite a las capturadoras recoger ácaros simbióticos del exterior. Se desbloquea al aparecer los primeros ácaros parásitos. Cada ácaro simbiótico elimina hasta 5 ácaros parásitos al día.");
+        es.put("ABILITY_CATCH_DERMESTID_FLAVOR", "Captura de escarabajos de fosa");
+        es.put("ABILITY_CATCH_DERMESTID_DESC", "Permite a las capturadoras recoger derméstidos del exterior. Las coveiras cuidan hasta 10 cada una en la fosa.");
         es.put("ABILITY_ABILITY_FLAVOR", "Habilidades Desbloqueadas");
         es.put("ABILITY_ABILITY_DESC", "Permite ver el menú de habilidades y usar habilidades activas.");
 
@@ -795,8 +799,8 @@ public class SpanishTranslation implements Translation {
         es.put("STAT_CONTAMINATION_2_DESC", "Reduce la tasa de mortalidad por contaminación en un 40%.");
         es.put("STAT_CONTAMINATION_3_FLAVOR", "Protocolos de Aislamiento");
         es.put("STAT_CONTAMINATION_3_DESC", "Reduce la tasa de mortalidad por contaminación en un 60%.");
-        es.put("STAT_SOIL_MITE_1_FLAVOR", "Entrenamiento de ácaros");
-        es.put("STAT_SOIL_MITE_1_DESC", "Aumenta la eliminación de ácaros parásitos de cada ácaro de suelo a 12 por día.");
+        es.put("STAT_SYMBIOTIC_MITE_1_FLAVOR", "Entrenamiento de ácaros simbióticos");
+        es.put("STAT_SYMBIOTIC_MITE_1_DESC", "Aumenta la eliminación de ácaros parásitos de cada ácaro simbiótico a 12 por día.");
         es.put("STAT_DERMESTID_1_FLAVOR", "Escarabajos de fosa");
         es.put("STAT_DERMESTID_1_DESC", "Permite que cada derméstido en la fosa cuente como 1 coveira para enterrar cadáveres.");
         es.put("STAT_GRAVING_1_FLAVOR", "Tumbas Poco Profundas");
@@ -977,11 +981,11 @@ public class SpanishTranslation implements Translation {
         es.put("HELP_TYPE_QUEEN_DESC", "El corazón de la colonia. Se puede asignar a Poner Huevos o Investigar nuevas tecnologías.");
 
         es.put("HELP_BUG_ANT_DESC", "Hormigas salvajes o rivales que aparecen en el supramundo. Pueden luchar contra tus hormigas y competir por espacio.");
-        es.put("HELP_BUG_APHID_DESC", "Insectos que se alimentan de plantas. Las capturadoras los capturan en las Llanuras; las pastoras cuidan hasta 10 por pastora. Sin corral dedicado, van al corral de insectos.");
-        es.put("HELP_BUG_SOIL_MITE_DESC", "Ácaros depredadores de control biológico. En el corral de insectos. Cada ácaro de suelo elimina hasta 5 ácaros parásitos al día (12 con Entrenamiento de ácaros). Se reproducen con al menos dos.");
-        es.put("HELP_BUG_DERMESTID_DESC", "Escarabajos que limpian carroña. Las coveiras cuidan hasta 10 cada una. Con Escarabajos de fosa, cada uno cuenta como una coveira. Se reproducen con al menos dos.");
-        es.put("HELP_BUG_PARASITE_DESC", "Plagas que se esconden en el nido y drenan comida en secreto. Asigna Vigilantes para encontrarlas y eliminarlas antes de que se multipliquen.");
-        es.put("HELP_BUG_PARASITIC_MITE_DESC", "Ácaros diminutos que infestan hormigas adultas cuando la colonia acumula recursos. Los números van en miles. Cada 10 ácaros ralentizan una hormiga a la mitad. Se propagan mensualmente; los ácaros de suelo son el principal contramedio. La Policía no los afecta.");
+        es.put("HELP_BUG_APHID_DESC", "Insectos que se alimentan de plantas. Nativos de la mayoría de biomas excepto los secos. Requieren el rol Pastora antes de que las capturadoras puedan recogerlos. Las pastoras cuidan hasta 10 por pastora para obtener jarabe.");
+        es.put("HELP_BUG_SYMBIOTIC_MITE_DESC", "Ácaros depredadores de control biológico. Nativos de todos los biomas. Se desbloquea la captura al aparecer los primeros ácaros parásitos. En el corral de insectos. Cada ácaro simbiótico elimina hasta 5 ácaros parásitos al día (12 con Entrenamiento de ácaros simbióticos).");
+        es.put("HELP_BUG_DERMESTID_DESC", "Escarabajos que limpian carroña. Nativos de la mayoría de biomas excepto los fríos. Requieren la investigación Captura de escarabajos de fosa. Las coveiras cuidan hasta 10 cada una. Con Escarabajos de fosa, cada uno cuenta como una coveira.");
+        es.put("HELP_BUG_PARASITE_DESC", "Plagas que se esconden en el nido y drenan comida en secreto. Nativas de biomas cálidos. Brotes en primavera y verano con más de 1.000 hormigas (25% de probabilidad mensual). Asigna Vigilantes para eliminarlas.");
+        es.put("HELP_BUG_PARASITIC_MITE_DESC", "Ácaros diminutos que infestan hormigas adultas cuando la colonia acumula recursos. Nativos de biomas fríos. Brotes en otoño e invierno con más de 10.000 recursos almacenados (25% mensual). Cada 10 ácaros ralentizan una hormiga a la mitad. Los ácaros simbióticos son el principal contramedio.");
 
         es.put("HELP_BIOMES_TITLE", "Biomas");
         es.put("HELP_BIOME_TEMP", "Temp: ");
@@ -1094,7 +1098,7 @@ public class SpanishTranslation implements Translation {
         es.put("LOG_PARASITES_ELIMINATED_FMT", "Eliminados %d parásitos.");
         es.put("LOG_CAUGHT_BUGS_SUMMARY_FMT", "Las capturadoras trajeron %d insecto(s) del exterior.");
         es.put("LOG_CAUGHT_BUG_BRED_FMT", "%d %s se reprodujeron en cautiverio.");
-        es.put("LOG_SOIL_MITES_PREDATION_FMT", "Los ácaros de suelo eliminaron %d ácaro(s) parásito(s).");
+        es.put("LOG_SYMBIOTIC_MITES_PREDATION_FMT", "Los ácaros simbióticos eliminaron %d ácaro(s) parásito(s).");
         es.put("LOG_NUPTIAL_QUEENS_FMT", "Vuelo nupcial. Se unieron %d reinas nuevas.");
         es.put("LOG_SUCCESS_ASSIMILATION_FMT", "¡%s completada! Recompensa: %s");
         es.put("LOG_SUCCESS_TUNNEL", "¡Conexión de túnel completada!");
@@ -1149,7 +1153,7 @@ public class SpanishTranslation implements Translation {
         es.put("TRIGGER_POLICE_ROLE_TITLE", "Infestación parasitaria");
         es.put("TRIGGER_POLICE_ROLE_MSG", "¡La colonia se ha vuelto tan próspera que los bichos parásitos pueden infiltrarse!");
         es.put("TRIGGER_PARASITIC_MITE_TITLE", "Ácaros parásitos");
-        es.put("TRIGGER_PARASITIC_MITE_MSG", "¡Ácaros microscópicos infestan a tus obreras y las ralentizan! Investiga el rol de Capturador y asigna soldados para capturar ácaros del suelo: eliminan ácaros parásitos a diario.");
+        es.put("TRIGGER_PARASITIC_MITE_MSG", "¡Ácaros microscópicos infestan a tus obreras y las ralentizan! La captura de ácaros simbióticos ya está disponible. Investiga el rol de Capturador y asigna soldados para capturarlos: eliminan ácaros parásitos a diario.");
         es.put("TRIGGER_MASS_FLIGHT_TITLE", "Decreto imperial");
         es.put("TRIGGER_MASS_FLIGHT_MSG", "¡Tu dinastía ha realizado 10 vuelos nupciales! Has desbloqueado la habilidad 'Vuelos nupciales masivos' en el menú de Operaciones de colonia (Z).");
         es.put("TRIGGER_DYNASTY_ABILITY_TITLE", "Dinastía de hormigas");

@@ -503,7 +503,7 @@ public class SaveManager {
                     
                     // Stats
                     sc.aphids = c.getBugHandlingService().resolvePetCountForSave(c, GameConstants.TYPE_APHID);
-                    sc.soilMites = c.getBugHandlingService().resolvePetCountForSave(c, GameConstants.TYPE_SOIL_MITE);
+                    sc.symbioticMites = c.getBugHandlingService().resolvePetCountForSave(c, GameConstants.TYPE_SYMBIOTIC_MITE);
                     sc.dermestids = c.getBugHandlingService().resolvePetCountForSave(c, GameConstants.TYPE_DERMESTID);
                     sc.parasites = c.getParasites();
                     sc.parasiticMites = c.getParasiticMites();
@@ -690,7 +690,7 @@ public class SaveManager {
         writeJsonLine(w, "hatchRatePrincess", sc.hatchRatePrincess, false);
         
         writeJsonLine(w, "aphids", sc.aphids, false);
-        writeJsonLine(w, "soilMites", sc.soilMites, false);
+        writeJsonLine(w, "symbioticMites", sc.symbioticMites, false);
         writeJsonLine(w, "dermestids", sc.dermestids, false);
         writeJsonLine(w, "parasites", sc.parasites, false);
         writeJsonLine(w, "parasiticMites", sc.parasiticMites, false);
@@ -932,7 +932,8 @@ public class SaveManager {
         sc.hatchRatePrincess = Float.parseFloat(map.getOrDefault("hatchRatePrincess", "0.0"));
         
         sc.aphids = Integer.parseInt(map.getOrDefault("aphids", "0"));
-        sc.soilMites = Integer.parseInt(map.getOrDefault("soilMites", map.getOrDefault("bullMites", "0")));
+        sc.symbioticMites = Integer.parseInt(map.getOrDefault("symbioticMites",
+                map.getOrDefault("soilMites", map.getOrDefault("bullMites", "0"))));
         sc.dermestids = Integer.parseInt(map.getOrDefault("dermestids", "0"));
         sc.parasites = Integer.parseInt(map.getOrDefault("parasites", "0"));
         sc.parasiticMites = Integer.parseInt(map.getOrDefault("parasiticMites", "0"));

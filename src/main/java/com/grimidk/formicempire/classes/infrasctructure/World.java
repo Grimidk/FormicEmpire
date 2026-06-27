@@ -444,7 +444,23 @@ public class World {
                 break;
         }
         
-        return options.get(GameRandom.nextInt(options.size()));
+        return pickBiomeForRing(ring, options);
+    }
+
+    private Biome pickBiomeForRing(int ring, List<Biome> options) {
+        if (options.isEmpty()) {
+            return GameConstants.BIOME_PLAINS;
+        }
+        int targetDifficulty = Math.min(5, Math.max(1, ring / 2 + 1));
+        List<Biome> weighted = new ArrayList<>();
+        for (Biome biome : options) {
+            int distance = Math.abs(biome.getDifficulty() - targetDifficulty);
+            int weight = Math.max(1, 4 - distance);
+            for (int i = 0; i < weight; i++) {
+                weighted.add(biome);
+            }
+        }
+        return weighted.get(GameRandom.nextInt(weighted.size()));
     }
     
     private Biome getBiomeById(int id) {
@@ -954,25 +970,16 @@ public class World {
 
     public void runMonth() {
         this.month++;
-        
+        Season monthSeason = GameConstants.seasonForMonth(this.month);
+
         for (Hex hex : this.hexes) {
             Colony colony = hex.getColony();
             if (colonyHasActiveDynasty(colony)) {
-                colony.runMonthlyJobs();
+                colony.runMonthlyJobs(monthSeason, hex.getBiome());
             }
         }
 
-        if (this.month >= 1 && this.month < 4) {
-            this.setSeason(GameConstants.SEASON_SPRING);
-        } else if (this.month >= 4 && this.month < 7) {
-            this.setSeason(GameConstants.SEASON_SUMMER);
-        } else if (this.month >= 7 && this.month < 10) {
-            this.setSeason(GameConstants.SEASON_AUTUMN);
-        } else if (this.month >= 10 && this.month < 12) {
-            this.setSeason(GameConstants.SEASON_WINTER);
-        } else {
-            this.setSeason(GameConstants.SEASON_SPRING);
-        }
+        this.setSeason(monthSeason);
 
         try {
             if (this.engine != null) {

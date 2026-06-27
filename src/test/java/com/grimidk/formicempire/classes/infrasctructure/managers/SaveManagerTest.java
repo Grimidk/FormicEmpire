@@ -77,11 +77,11 @@ public class SaveManagerTest {
     }
 
     @Test
-    void colonySoilMitesRoundTripThroughJson() throws Exception {
+    void colonySymbioticMitesRoundTripThroughJson() throws Exception {
         Savefile.SavedColony sc = new Savefile.SavedColony();
         sc.id = 1;
         sc.name = "Test";
-        sc.soilMites = 7;
+        sc.symbioticMites = 7;
         sc.aphids = 3;
         sc.dermestids = 2;
 
@@ -95,22 +95,38 @@ public class SaveManagerTest {
         }
 
         String json = writer.toString();
-        assertTrue(json.contains("\"soilMites\": 7"));
+        assertTrue(json.contains("\"symbioticMites\": 7"));
 
         Method parseColony = SaveManager.class.getDeclaredMethod("parseColonyObject", String.class);
         parseColony.setAccessible(true);
         Savefile.SavedColony loaded = (Savefile.SavedColony) parseColony.invoke(saveManager, json);
-        assertEquals(7, loaded.soilMites);
+        assertEquals(7, loaded.symbioticMites);
 
         Dynasty dynasty = new Dynasty(1, "Test", true, GameConstants.SPECIES_OMNI);
         dynasty.unlockUpgrade(GameUnlocks.ROLE_CATCHER);
         Colony colony = new Colony(loaded);
         dynasty.addColony(colony);
-        assertEquals(7, colony.getSoilMites());
+        assertEquals(7, colony.getSymbioticMites());
     }
 
     @Test
-    void colonySoilMitesLoadLegacyBullMitesKey() throws Exception {
+    void colonySymbioticMitesLoadLegacySoilMitesKey() throws Exception {
+        String json = """
+                {
+                "id": 1,
+                "name": "Legacy",
+                "soilMites": 4
+                }
+                """;
+        SaveManager saveManager = new SaveManager();
+        Method parseColony = SaveManager.class.getDeclaredMethod("parseColonyObject", String.class);
+        parseColony.setAccessible(true);
+        Savefile.SavedColony loaded = (Savefile.SavedColony) parseColony.invoke(saveManager, json);
+        assertEquals(4, loaded.symbioticMites);
+    }
+
+    @Test
+    void colonySymbioticMitesLoadLegacyBullMitesKey() throws Exception {
         String json = """
                 {
                 "id": 1,
@@ -122,6 +138,6 @@ public class SaveManagerTest {
         Method parseColony = SaveManager.class.getDeclaredMethod("parseColonyObject", String.class);
         parseColony.setAccessible(true);
         Savefile.SavedColony loaded = (Savefile.SavedColony) parseColony.invoke(saveManager, json);
-        assertEquals(4, loaded.soilMites);
+        assertEquals(4, loaded.symbioticMites);
     }
 }

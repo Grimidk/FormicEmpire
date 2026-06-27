@@ -771,7 +771,7 @@ public class GameAreaPanel extends ZeroGamePanel {
         g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
         int aphidSprites = 0;
-        int soilMiteSprites = 0;
+        int symbioticMiteSprites = 0;
         int dermestidSprites = 0;
         int penSprites = 0;
         final int spriteCap = GameConstants.MAX_VISIBLE_SPRITE_COUNT;
@@ -799,7 +799,7 @@ public class GameAreaPanel extends ZeroGamePanel {
             if (type == GameConstants.TYPE_APHID && aphidSprites >= spriteCap) {
                 continue;
             }
-            if (type == GameConstants.TYPE_SOIL_MITE && soilMiteSprites >= spriteCap) {
+            if (type == GameConstants.TYPE_SYMBIOTIC_MITE && symbioticMiteSprites >= spriteCap) {
                 continue;
             }
             if (type == GameConstants.TYPE_DERMESTID && dermestidSprites >= spriteCap) {
@@ -822,8 +822,8 @@ public class GameAreaPanel extends ZeroGamePanel {
 
             if (type == GameConstants.TYPE_APHID) {
                 aphidSprites++;
-            } else if (type == GameConstants.TYPE_SOIL_MITE) {
-                soilMiteSprites++;
+            } else if (type == GameConstants.TYPE_SYMBIOTIC_MITE) {
+                symbioticMiteSprites++;
             } else if (type == GameConstants.TYPE_DERMESTID) {
                 dermestidSprites++;
             }

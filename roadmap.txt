@@ -23,7 +23,9 @@ To Fix (By decreasing priority) :
 	(none right now)
 
 	Mid:
-	(none right now)
+	parasite prevention with enough coverage
+	panning is too jitery   
+	option to disable auto fcous
 
 	Low:
 	dead ant list memory cap (trim or count-only storage if body piles grow very large)
@@ -72,20 +74,23 @@ Needed for launch (v1.0) (Launch Version):
 	rework saves to be cleaner
 	rework manager and aux files
 	balance every upgrade
-	ant menus (detailed per ant)
-	music and sounds and settings for them and player panel
+	music and sounds and settings for them and player panel (to include in core engine)
 	promo video
 	langs (GER, RUS, CHN, JAP)
 	proper start animation and general animations and roadmap and credits
 	register Grim Games or Grimidk in steam as dev team
+	stean upload and demo version
 	versioning to go back to previous stable patches
 	cleanup code (no placeholders) and refactor inefficiencies with inheritance and stuff, hexagonal architecture, async functions and clean comments 
 
 Post launch (v1.1) (Improvements Update):
     engine clean up for reusability (Core Engine Package)
+	world editing (size, difficulty, islands)
+	choosing starting specie 
 	console and commands for debugging (to include in core)
 	native universal modding support (to include in core)
 	custom key bind settings for all keys (to include in core)
+	ant menus (detailed per ant)
 	theme modificaciont (colors, text scale, font) (to include in core)
 	global stats from all players (needs api and consent) (to include in core)
 	socials screen with discord server, bluesky, itch, steam and instagram (to include in core)

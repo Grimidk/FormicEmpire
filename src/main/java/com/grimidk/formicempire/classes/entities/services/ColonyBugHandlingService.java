@@ -11,6 +11,7 @@ import com.grimidk.formicempire.classes.infrasctructure.repositories.GameRandom;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.BugType;
 import com.grimidk.formicempire.classes.constants.world.Biome;
+import com.grimidk.formicempire.classes.constants.world.Season;
 import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Bug;
 import com.grimidk.formicempire.classes.entities.Colony;
@@ -24,7 +25,7 @@ public class ColonyBugHandlingService {
 
     private static final List<BugType> PET_TYPES = List.of(
             GameConstants.TYPE_APHID,
-            GameConstants.TYPE_SOIL_MITE,
+            GameConstants.TYPE_SYMBIOTIC_MITE,
             GameConstants.TYPE_DERMESTID);
 
     public static List<BugType> getPetTypes() {
@@ -35,6 +36,22 @@ public class ColonyBugHandlingService {
         return type != null && PET_TYPES.contains(type);
     }
 
+    public boolean canCatchPetBug(Colony colony, BugType type) {
+        if (colony == null || type == null || !isPetBug(type)) {
+            return false;
+        }
+        if (type == GameConstants.TYPE_APHID) {
+            return colony.hasUpgrade(GameUnlocks.ROLE_RANCHER);
+        }
+        if (type == GameConstants.TYPE_DERMESTID) {
+            return colony.hasUpgrade(GameUnlocks.ABILITY_CATCH_DERMESTID);
+        }
+        if (type == GameConstants.TYPE_SYMBIOTIC_MITE) {
+            return colony.hasUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE);
+        }
+        return false;
+    }
+
     public int getCount(Colony colony, BugType type) {
         if (colony == null || type == null) {
             return 0;
@@ -42,8 +59,8 @@ public class ColonyBugHandlingService {
         if (type == GameConstants.TYPE_APHID) {
             return colony.getAphids();
         }
-        if (type == GameConstants.TYPE_SOIL_MITE) {
-            return colony.getSoilMites();
+        if (type == GameConstants.TYPE_SYMBIOTIC_MITE) {
+            return colony.getSymbioticMites();
         }
         if (type == GameConstants.TYPE_DERMESTID) {
             return colony.getDermestids();
@@ -76,7 +93,7 @@ public class ColonyBugHandlingService {
     }
 
     public int getSpeciesTenderCapacity(Colony colony, BugType type) {
-        if (colony == null || type == null) {
+        if (colony == null || type == null || !canCatchPetBug(colony, type)) {
             return 0;
         }
         if (type == GameConstants.TYPE_APHID) {
@@ -85,7 +102,7 @@ public class ColonyBugHandlingService {
         if (type == GameConstants.TYPE_DERMESTID) {
             return colony.getAssignedRoleCount(GameConstants.ROLE_GRAVER) * GameConstants.PET_CAPACITY_PER_TENDER;
         }
-        if (type == GameConstants.TYPE_SOIL_MITE) {
+        if (type == GameConstants.TYPE_SYMBIOTIC_MITE) {
             return colony.getAssignedRoleCount(GameConstants.ROLE_CATCHER) * GameConstants.PET_CAPACITY_PER_TENDER;
         }
         return 0;
@@ -106,12 +123,14 @@ public class ColonyBugHandlingService {
     }
 
     public void runDaily(Colony colony, Biome biome) {
-        if (colony == null || !colony.hasUpgrade(GameUnlocks.ROLE_CATCHER)) {
+        if (colony == null) {
             return;
         }
-        runCatching(colony, biome);
+        if (colony.hasUpgrade(GameUnlocks.ROLE_CATCHER)) {
+            runCatching(colony, biome);
+        }
         runBreeding(colony);
-        runSoilMitePredation(colony);
+        runSymbioticMitePredation(colony);
     }
 
     private void runCatching(Colony colony, Biome biome) {
@@ -128,7 +147,7 @@ public class ColonyBugHandlingService {
             if (GameRandom.nextFloat() > GameConstants.CATCH_BASE_CHANCE_PER_CATCHER) {
                 continue;
             }
-            BugType nativeType = pickRandomNative(biome);
+            BugType nativeType = pickRandomNative(colony, biome);
             if (nativeType == null) {
                 continue;
             }
@@ -149,6 +168,9 @@ public class ColonyBugHandlingService {
 
     private void runBreeding(Colony colony) {
         for (BugType type : PET_TYPES) {
+            if (!canCatchPetBug(colony, type)) {
+                continue;
+            }
             int count = getCount(colony, type);
             if (count < GameConstants.PET_BREED_MIN_COUNT) {
                 continue;
@@ -169,26 +191,26 @@ public class ColonyBugHandlingService {
         }
     }
 
-    private void runSoilMitePredation(Colony colony) {
-        int soilMites = getCount(colony, GameConstants.TYPE_SOIL_MITE);
+    private void runSymbioticMitePredation(Colony colony) {
+        int symbioticMites = getCount(colony, GameConstants.TYPE_SYMBIOTIC_MITE);
         int parasiticMites = colony.getParasiticMites();
-        if (soilMites <= 0 || parasiticMites <= 0) {
+        if (symbioticMites <= 0 || parasiticMites <= 0) {
             return;
         }
-        int killPerSoilMite = getSoilMiteParasiticMiteKillPerDay(colony);
-        int eliminated = Math.min(parasiticMites, soilMites * killPerSoilMite);
+        int killPerSymbioticMite = getSymbioticMiteParasiticMiteKillPerDay(colony);
+        int eliminated = Math.min(parasiticMites, symbioticMites * killPerSymbioticMite);
         if (eliminated > 0) {
             setParasiticMiteCount(colony, parasiticMites - eliminated);
             colony.logEvent(ColonyLogPrefixes.INFO + " "
-                    + String.format(LanguageStrings.get(LanguageStrings.LOG_SOIL_MITES_PREDATION_FMT), eliminated));
+                    + String.format(LanguageStrings.get(LanguageStrings.LOG_SYMBIOTIC_MITES_PREDATION_FMT), eliminated));
         }
     }
 
-    public int getSoilMiteParasiticMiteKillPerDay(Colony colony) {
-        if (colony != null && colony.hasUpgrade(GameUnlocks.STAT_SOIL_MITE_1)) {
-            return GameConstants.SOIL_MITE_PARASITIC_MITE_KILL_UPGRADED;
+    public int getSymbioticMiteParasiticMiteKillPerDay(Colony colony) {
+        if (colony != null && colony.hasUpgrade(GameUnlocks.STAT_SYMBIOTIC_MITE_1)) {
+            return GameConstants.SYMBIOTIC_MITE_PARASITIC_MITE_KILL_UPGRADED;
         }
-        return GameConstants.SOIL_MITE_PARASITIC_MITE_KILL_PER_DAY;
+        return GameConstants.SYMBIOTIC_MITE_PARASITIC_MITE_KILL_PER_DAY;
     }
 
     public int getDermestidGraveBonus(Colony colony) {
@@ -207,12 +229,13 @@ public class ColonyBugHandlingService {
         syncParasiteEntities(colony, capped);
     }
 
-    public void restorePetCountsFromSave(Colony colony, int aphids, int soilMites, int dermestids) {
+    public void restorePetCountsFromSave(Colony colony, int aphids, int symbioticMites, int dermestids) {
         if (colony == null) {
             return;
         }
+        grantLegacyPetCatchUnlocks(colony, symbioticMites, dermestids);
         restorePetCountFromSave(colony, GameConstants.TYPE_APHID, aphids);
-        restorePetCountFromSave(colony, GameConstants.TYPE_SOIL_MITE, soilMites);
+        restorePetCountFromSave(colony, GameConstants.TYPE_SYMBIOTIC_MITE, symbioticMites);
         restorePetCountFromSave(colony, GameConstants.TYPE_DERMESTID, dermestids);
     }
 
@@ -324,18 +347,39 @@ public class ColonyBugHandlingService {
             Rectangle grave = colony.getGraverBounds();
             return grave != null ? grave : colony.getInsectPenBounds();
         }
-        if (type == GameConstants.TYPE_SOIL_MITE) {
+        if (type == GameConstants.TYPE_SYMBIOTIC_MITE) {
             return colony.getInsectPenBounds();
         }
         return colony.getInsectPenBounds();
     }
 
-    private BugType pickRandomNative(Biome biome) {
+    private void grantLegacyPetCatchUnlocks(Colony colony, int symbioticMites, int dermestids) {
+        if (colony.getDynasty() == null) {
+            return;
+        }
+        if (symbioticMites > 0 && !colony.hasUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE)) {
+            colony.getDynasty().unlockUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE);
+        }
+        if (dermestids > 0 && !colony.hasUpgrade(GameUnlocks.ABILITY_CATCH_DERMESTID)) {
+            colony.getDynasty().unlockUpgrade(GameUnlocks.ABILITY_CATCH_DERMESTID);
+        }
+    }
+
+    private BugType pickRandomNative(Colony colony, Biome biome) {
         List<BugType> natives = biome.getNativeBugs();
         if (natives.isEmpty()) {
             return null;
         }
-        return natives.get(GameRandom.nextInt(natives.size()));
+        List<BugType> catchable = new ArrayList<>();
+        for (BugType type : natives) {
+            if (canCatchPetBug(colony, type)) {
+                catchable.add(type);
+            }
+        }
+        if (catchable.isEmpty()) {
+            return null;
+        }
+        return catchable.get(GameRandom.nextInt(catchable.size()));
     }
 
     private int effectiveRancherCount(Colony colony) {
@@ -350,15 +394,21 @@ public class ColonyBugHandlingService {
         return rancherCount;
     }
 
-    public void runMonthlyParasiticMites(Colony colony) {
-        if (colony == null) {
+    public void runMonthlyParasiticMites(Colony colony, Biome biome, Season season) {
+        if (colony == null || biome == null || season == null) {
+            return;
+        }
+        if (!GameConstants.isParasiticMiteSeason(season)) {
+            return;
+        }
+        if (!biome.hasNativeParasite(GameConstants.TYPE_PARASITIC_MITE)) {
             return;
         }
         long stored = colony.getResourceService().getStoredResourceTotal(colony);
         if (stored < GameConstants.PARASITIC_MITE_RESOURCE_THRESHOLD) {
             return;
         }
-        if (GameRandom.nextFloat() > GameConstants.PARASITIC_MITE_MONTHLY_SPAWN_CHANCE) {
+        if (GameRandom.nextFloat() > GameConstants.PARASITE_OUTBREAK_CHANCE) {
             return;
         }
 

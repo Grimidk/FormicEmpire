@@ -120,6 +120,10 @@ public final class GameUnlocks {
     static { upgrades.add(ABILITY_CLONING); }
     public static final Upgrade ABILITY_PARASITIC_MITE_ALERT = new Upgrade(515, "ABILITY_PARASITIC_MITE_ALERT", "ABILITY_PARASITIC_MITE_ALERT_FLAVOR", "ABILITY_PARASITIC_MITE_ALERT_DESC", null, 0, null);
     static { upgrades.add(ABILITY_PARASITIC_MITE_ALERT); }
+    public static final Upgrade ABILITY_CATCH_SYMBIOTIC_MITE = new Upgrade(516, "ABILITY_CATCH_SYMBIOTIC_MITE", "ABILITY_CATCH_SYMBIOTIC_MITE_FLAVOR", "ABILITY_CATCH_SYMBIOTIC_MITE_DESC", null, 0, null);
+    static { upgrades.add(ABILITY_CATCH_SYMBIOTIC_MITE); }
+    public static final Upgrade ABILITY_CATCH_DERMESTID = new Upgrade(517, "ABILITY_CATCH_DERMESTID", "ABILITY_CATCH_DERMESTID_FLAVOR", "ABILITY_CATCH_DERMESTID_DESC", ROLE_GRAVER, 2000, null);
+    static { upgrades.add(ABILITY_CATCH_DERMESTID); }
     public static final Upgrade ABILITY_ABILITY = new Upgrade(900, "ABILITY_ABILITY", "ABILITY_ABILITY_FLAVOR", "ABILITY_ABILITY_DESC", null, 0, null);
     static { upgrades.add(ABILITY_ABILITY); }
 
@@ -190,9 +194,9 @@ public final class GameUnlocks {
     static { upgrades.add(STAT_CONTAMINATION_2); }
     public static final Upgrade STAT_CONTAMINATION_3 = new Upgrade(126, "STAT_CONTAMINATION_3", "STAT_CONTAMINATION_3_FLAVOR", "STAT_CONTAMINATION_3_DESC", STAT_CONTAMINATION_2, 25000, null);
     static { upgrades.add(STAT_CONTAMINATION_3); }
-    public static final Upgrade STAT_SOIL_MITE_1 = new Upgrade(135, "STAT_SOIL_MITE_1", "STAT_SOIL_MITE_1_FLAVOR", "STAT_SOIL_MITE_1_DESC", ROLE_CATCHER, 2000, null);
-    static { upgrades.add(STAT_SOIL_MITE_1); }
-    public static final Upgrade STAT_DERMESTID_1 = new Upgrade(136, "STAT_DERMESTID_1", "STAT_DERMESTID_1_FLAVOR", "STAT_DERMESTID_1_DESC", ROLE_CATCHER, 2000, null);
+    public static final Upgrade STAT_SYMBIOTIC_MITE_1 = new Upgrade(135, "STAT_SYMBIOTIC_MITE_1", "STAT_SYMBIOTIC_MITE_1_FLAVOR", "STAT_SYMBIOTIC_MITE_1_DESC", ABILITY_CATCH_SYMBIOTIC_MITE, 2000, null);
+    static { upgrades.add(STAT_SYMBIOTIC_MITE_1); }
+    public static final Upgrade STAT_DERMESTID_1 = new Upgrade(136, "STAT_DERMESTID_1", "STAT_DERMESTID_1_FLAVOR", "STAT_DERMESTID_1_DESC", ABILITY_CATCH_DERMESTID, 2000, null);
     static { upgrades.add(STAT_DERMESTID_1); }
     public static final Upgrade STAT_GRAVING_1 = new Upgrade(127, "STAT_GRAVING_1", "STAT_GRAVING_1_FLAVOR", "STAT_GRAVING_1_DESC", ROLE_GRAVER, 1500, null);
     static { upgrades.add(STAT_GRAVING_1); }

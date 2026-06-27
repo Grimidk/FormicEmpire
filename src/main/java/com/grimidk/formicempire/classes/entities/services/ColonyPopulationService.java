@@ -6,6 +6,8 @@ import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.ColonyLogTexts;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.DeathCause;
+import com.grimidk.formicempire.classes.constants.world.Biome;
+import com.grimidk.formicempire.classes.constants.world.Season;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameRandom;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
@@ -354,10 +356,24 @@ public class ColonyPopulationService {
         }
     }
 
-    public void runParasitation(Colony colony) {
-        if (colony.getAntTotal() < 1000) return;
-        
-        int spawnAmount = Math.max(10, (int)(colony.getAntTotal() * 0.01));
+    public void runParasitation(Colony colony, Biome biome, Season season) {
+        if (colony == null || biome == null || season == null) {
+            return;
+        }
+        if (!GameConstants.isParasiticAntSeason(season)) {
+            return;
+        }
+        if (!biome.hasNativeParasite(GameConstants.TYPE_PARASITE)) {
+            return;
+        }
+        if (colony.getAntTotal() < 1000) {
+            return;
+        }
+        if (GameRandom.nextFloat() > GameConstants.PARASITE_OUTBREAK_CHANCE) {
+            return;
+        }
+
+        int spawnAmount = Math.max(10, (int) (colony.getAntTotal() * 0.01));
         int existingParasites = colony.getParasites();
 
         if (existingParasites > 0) {

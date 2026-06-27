@@ -178,7 +178,7 @@ public final class WorldSpaces {
         new Point(10, 1960),
         List.of(GameConstants.ROLE_CATCHER),
         List.of(),
-        List.of(GameConstants.TYPE_APHID, GameConstants.TYPE_SOIL_MITE, GameConstants.TYPE_DERMESTID)
+        List.of(GameConstants.TYPE_APHID, GameConstants.TYPE_SYMBIOTIC_MITE, GameConstants.TYPE_DERMESTID)
     );
 
     public static final Room CONSTRUCTION_SITE = new Room(

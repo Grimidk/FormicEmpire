@@ -100,8 +100,8 @@ public final class GameConstants {
     // --- Misc Icons ---
     public static final ImageIcon ICON_APHID = loadIcon("icons/bugs/aphid.png");
     static { misc.add(ICON_APHID); }
-    public static final ImageIcon ICON_SOIL_MITE = loadIcon("icons/bugs/soilMite.png");
-    static { misc.add(ICON_SOIL_MITE); }
+    public static final ImageIcon ICON_SYMBIOTIC_MITE = loadIcon("icons/bugs/soilMite.png");
+    static { misc.add(ICON_SYMBIOTIC_MITE); }
     public static final ImageIcon ICON_DERMESTID = loadIcon("icons/bugs/dermestid.png");
     static { misc.add(ICON_DERMESTID); }
     public static final ImageIcon ICON_PARASITIC_MITE = loadIcon("icons/bugs/parasiticMite.png");
@@ -144,11 +144,11 @@ public final class GameConstants {
     public static int capVisibleSprites(int count) {
         return Math.min(Math.max(0, count), MAX_VISIBLE_SPRITE_COUNT);
     }
-    public static final int SOIL_MITE_PARASITIC_MITE_KILL_PER_DAY = 5;
-    public static final int SOIL_MITE_PARASITIC_MITE_KILL_UPGRADED = 12;
+    public static final int SYMBIOTIC_MITE_PARASITIC_MITE_KILL_PER_DAY = 5;
+    public static final int SYMBIOTIC_MITE_PARASITIC_MITE_KILL_UPGRADED = 12;
 
     public static final int PARASITIC_MITE_RESOURCE_THRESHOLD = 10_000;
-    public static final float PARASITIC_MITE_MONTHLY_SPAWN_CHANCE = 0.65f;
+    public static final float PARASITE_OUTBREAK_CHANCE = 0.25f;
     public static final int PARASITIC_MITE_MIN_MONTHLY_SPAWN = 1_000;
     public static final int PARASITIC_MITE_PER_ANT = 1;
     public static final float PARASITIC_MITE_SPREAD_FACTOR = 0.10f;
@@ -199,40 +199,40 @@ public final class GameConstants {
     static { humidity.add(HUMID_5); }
 
     // --- Biomes ---
-    public static final Biome BIOME_PLAINS = new Biome(1, LanguageStrings.BIOME_PLAINS, 25, 2, 1f, 1f, 0f,
+    public static final Biome BIOME_PLAINS = new Biome(1, LanguageStrings.BIOME_PLAINS, 25, 2, 1f, 1f, 0f, 1,
         loadIcon("icons/biomes/plains.png"), null);
     static { biomes.add(BIOME_PLAINS); }
-    public static final Biome BIOME_FOREST = new Biome(2, LanguageStrings.BIOME_FOREST, 22, 3, 2f, 2f, 0.1f,
+    public static final Biome BIOME_FOREST = new Biome(2, LanguageStrings.BIOME_FOREST, 22, 3, 2f, 2f, 0.1f, 1,
         loadIcon("icons/biomes/forest.png"), null);
     static { biomes.add(BIOME_FOREST); }
-    public static final Biome BIOME_JUNGLE = new Biome(3, LanguageStrings.BIOME_JUNGLE, 30, 4, 2.5f, 2.5f, 0.2f,
+    public static final Biome BIOME_JUNGLE = new Biome(3, LanguageStrings.BIOME_JUNGLE, 30, 4, 2.5f, 2.5f, 0.2f, 3,
         loadIcon("icons/biomes/jungle.png"), null);
     static { biomes.add(BIOME_JUNGLE); }
-    public static final Biome BIOME_SWAMP = new Biome(4, LanguageStrings.BIOME_SWAMP, 26, 5, 1.5f, 1.5f, 0f,
+    public static final Biome BIOME_SWAMP = new Biome(4, LanguageStrings.BIOME_SWAMP, 26, 5, 1.5f, 1.5f, 0f, 2,
         loadIcon("icons/biomes/swamp.png"), null);
     static { biomes.add(BIOME_SWAMP); }
-    public static final Biome BIOME_URBAN = new Biome(5, LanguageStrings.BIOME_URBAN, 28, 1, 0.5f, 0.5f, 0.5f,
+    public static final Biome BIOME_URBAN = new Biome(5, LanguageStrings.BIOME_URBAN, 28, 1, 0.5f, 0.5f, 0.5f, 2,
         loadIcon("icons/biomes/urban.png"), null);
     static { biomes.add(BIOME_URBAN); }
-    public static final Biome BIOME_TUNDRA = new Biome(6, LanguageStrings.BIOME_TUNDRA, 5, 2, 0.2f, 0.2f, 0.3f,
+    public static final Biome BIOME_TUNDRA = new Biome(6, LanguageStrings.BIOME_TUNDRA, 5, 2, 0.2f, 0.2f, 0.3f, 4,
         loadIcon("icons/biomes/tundra.png"), null);
     static { biomes.add(BIOME_TUNDRA); }
-    public static final Biome BIOME_TAIGA = new Biome(7, LanguageStrings.BIOME_TAIGA, 12, 1, 0.4f, 0.3f, 0.5f,
+    public static final Biome BIOME_TAIGA = new Biome(7, LanguageStrings.BIOME_TAIGA, 12, 1, 0.4f, 0.3f, 0.5f, 3,
         loadIcon("icons/biomes/taiga.png"), null);
     static { biomes.add(BIOME_TAIGA); }
-    public static final Biome BIOME_DESERT = new Biome(8, LanguageStrings.BIOME_DESERT, 45, 0, 0.05f, 0.02f, 1f,
+    public static final Biome BIOME_DESERT = new Biome(8, LanguageStrings.BIOME_DESERT, 45, 0, 0.05f, 0.02f, 1f, 4,
         loadIcon("icons/biomes/dessert.png"), null);
     static { biomes.add(BIOME_DESERT); }
-    public static final Biome BIOME_MOUNTAIN = new Biome(9, LanguageStrings.BIOME_MOUNTAIN, 12, 1, 0.1f, 0.3f, 2f,
+    public static final Biome BIOME_MOUNTAIN = new Biome(9, LanguageStrings.BIOME_MOUNTAIN, 12, 1, 0.1f, 0.3f, 2f, 3,
         loadIcon("icons/biomes/mountain.png"), null);
     static { biomes.add(BIOME_MOUNTAIN); }
-    public static final Biome BIOME_VOLCANIC = new Biome(10, LanguageStrings.BIOME_VOLCANIC, 60, 0, 0.01f, 0.01f, 5f,
+    public static final Biome BIOME_VOLCANIC = new Biome(10, LanguageStrings.BIOME_VOLCANIC, 60, 0, 0.01f, 0.01f, 5f, 5,
         loadIcon("icons/biomes/volcanic.png"), null);
     static { biomes.add(BIOME_VOLCANIC); }
-    public static final Biome BIOME_LAKE = new Biome(11, LanguageStrings.BIOME_LAKE, 25, 5, 0.5f, 0.5f, 0f,
+    public static final Biome BIOME_LAKE = new Biome(11, LanguageStrings.BIOME_LAKE, 25, 5, 0.5f, 0.5f, 0f, 1,
         loadIcon("icons/biomes/lake.png"), null);
     static { biomes.add(BIOME_LAKE); }
-    public static final Biome BIOME_OCEAN = new Biome(12, LanguageStrings.BIOME_OCEAN, 20, 5, 0.2f, 0.2f, 0f,
+    public static final Biome BIOME_OCEAN = new Biome(12, LanguageStrings.BIOME_OCEAN, 20, 5, 0.2f, 0.2f, 0f, 2,
         loadIcon("icons/biomes/ocean.png"), null);
     static { biomes.add(BIOME_OCEAN); }
 
@@ -426,20 +426,20 @@ public final class GameConstants {
     public static final BugType TYPE_PARASITE = new BugType(3, LanguageStrings.BUG_PARASITE, LanguageStrings.BUG_PARASITE_SCIENTIFIC, 1, 1, 0, 0, 1, 1,
         loadIcon("icons/bugs/parasite.png") , loadIcon("sprites/bugs/parasite.png"));
     static { bugTypes.add(TYPE_PARASITE); }
-    public static final BugType TYPE_SOIL_MITE = new BugType(4, LanguageStrings.BUG_SOIL_MITE, LanguageStrings.BUG_SOIL_MITE_SCIENTIFIC,
-            1, 0, 0, 0, 2, 0.4f, loadIcon("icons/bugs/soilMite.png"), loadIcon("sprites/bugs/soilMite.png"));
-    static { bugTypes.add(TYPE_SOIL_MITE); }
-    public static final BugType TYPE_DERMESTID = new BugType(5, LanguageStrings.BUG_DERMESTID, LanguageStrings.BUG_DERMESTID_SCIENTIFIC,
-            1, 0, 0, 0, 3, 0.35f, loadIcon("icons/bugs/dermestid.png"), loadIcon("sprites/bugs/dermestid.png"));
+    public static final BugType TYPE_SYMBIOTIC_MITE = new BugType(4, LanguageStrings.BUG_SYMBIOTIC_MITE, LanguageStrings.BUG_SYMBIOTIC_MITE_SCIENTIFIC, 1, 0, 0, 0, 2, 0.4f, 
+        loadIcon("icons/bugs/soilMite.png"), loadIcon("sprites/bugs/soilMite.png"));
+    static { bugTypes.add(TYPE_SYMBIOTIC_MITE); }
+    public static final BugType TYPE_DERMESTID = new BugType(5, LanguageStrings.BUG_DERMESTID, LanguageStrings.BUG_DERMESTID_SCIENTIFIC, 1, 0, 0, 0, 3, 0.35f,
+            loadIcon("icons/bugs/dermestid.png"), loadIcon("sprites/bugs/dermestid.png"));
     static { bugTypes.add(TYPE_DERMESTID); }
-    public static final BugType TYPE_PARASITIC_MITE = new BugType(6, LanguageStrings.BUG_PARASITIC_MITE,
-            LanguageStrings.BUG_PARASITIC_MITE_SCIENTIFIC, 1, 0, 0, 0, 1, 0.25f,
+    public static final BugType TYPE_PARASITIC_MITE = new BugType(6, LanguageStrings.BUG_PARASITIC_MITE, LanguageStrings.BUG_PARASITIC_MITE_SCIENTIFIC, 1, 0, 0, 0, 1, 0.25f,
             loadIcon("icons/bugs/parasiticMite.png"), loadIcon("sprites/bugs/parasiticMite.png"));
     static { bugTypes.add(TYPE_PARASITIC_MITE); }
 
     static {
         for (Biome biome : biomes) {
             biome.setNativeBugs(buildNativeBugsForBiome(biome));
+            biome.setNativeParasites(buildNativeParasitesForBiome(biome));
         }
     }
 
@@ -448,11 +448,46 @@ public final class GameConstants {
         if (!biome.isDry()) {
             natives.add(TYPE_APHID);
         }
-        natives.add(TYPE_SOIL_MITE);
+        natives.add(TYPE_SYMBIOTIC_MITE);
         if (!biome.isCold()) {
             natives.add(TYPE_DERMESTID);
         }
         return List.copyOf(natives);
+    }
+
+    private static List<BugType> buildNativeParasitesForBiome(Biome biome) {
+        List<BugType> natives = new ArrayList<>();
+        if (biome.isHot()) {
+            natives.add(TYPE_PARASITE);
+        }
+        if (biome.isCold()) {
+            natives.add(TYPE_PARASITIC_MITE);
+        }
+        return List.copyOf(natives);
+    }
+
+    public static Season seasonForMonth(int month) {
+        if (month >= 1 && month < 4) {
+            return SEASON_SPRING;
+        }
+        if (month >= 4 && month < 7) {
+            return SEASON_SUMMER;
+        }
+        if (month >= 7 && month < 10) {
+            return SEASON_AUTUMN;
+        }
+        if (month >= 10 && month < 13) {
+            return SEASON_WINTER;
+        }
+        return SEASON_SPRING;
+    }
+
+    public static boolean isParasiticAntSeason(Season season) {
+        return season == SEASON_SPRING || season == SEASON_SUMMER;
+    }
+
+    public static boolean isParasiticMiteSeason(Season season) {
+        return season == SEASON_AUTUMN || season == SEASON_WINTER;
     }
 
     // --- Ant Types ---

@@ -174,15 +174,15 @@ public class ColonyPhysicsService {
                 if (bug.getBugType() == GameConstants.TYPE_APHID && colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) {
                     Rectangle yard = getRoomBounds(colony, WorldSpaces.RANCHER_YARD);
                     bug.setPosition(getRandomPointInRoom(colony, yard, virtualWidth));
-                } else if (bug.getBugType() == GameConstants.TYPE_SOIL_MITE
-                        && colony.hasUpgrade(GameUnlocks.ROLE_CATCHER)) {
+                } else if (bug.getBugType() == GameConstants.TYPE_SYMBIOTIC_MITE
+                        && colony.hasUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE)) {
                     Rectangle pen = colony.getInsectPenBounds();
                     if (pen == null) {
                         pen = getRoomBounds(colony, WorldSpaces.INSECT_PEN);
                     }
                     bug.setPosition(getRandomPointInRoom(colony, pen, virtualWidth));
                 } else if (bug.getBugType() == GameConstants.TYPE_DERMESTID
-                        && colony.hasUpgrade(GameUnlocks.ROLE_CATCHER)) {
+                        && colony.hasUpgrade(GameUnlocks.ABILITY_CATCH_DERMESTID)) {
                     Rectangle yard = colony.getGraverBounds();
                     if (yard == null) {
                         yard = getRoomBounds(colony, WorldSpaces.GRAVEYARD);
@@ -320,8 +320,8 @@ public class ColonyPhysicsService {
                 bug.setPosition(new Point(-1000, -1000));
             }
         } else if (bug.getDimension() == WorldSpaces.OVERWORLD
-                && bug.getBugType() == GameConstants.TYPE_SOIL_MITE
-                && colony.hasUpgrade(GameUnlocks.ROLE_CATCHER)) {
+                && bug.getBugType() == GameConstants.TYPE_SYMBIOTIC_MITE
+                && colony.hasUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE)) {
             Rectangle pen = colony.getInsectPenBounds();
             if (pen == null) {
                 pen = getRoomBounds(colony, WorldSpaces.INSECT_PEN);
@@ -329,7 +329,7 @@ public class ColonyPhysicsService {
             wanderInBoundaries(colony, bug, pen, 0.05);
         } else if (bug.getDimension() == WorldSpaces.OVERWORLD
                 && bug.getBugType() == GameConstants.TYPE_DERMESTID
-                && colony.hasUpgrade(GameUnlocks.ROLE_CATCHER)) {
+                && colony.hasUpgrade(GameUnlocks.ABILITY_CATCH_DERMESTID)) {
             Rectangle yard = colony.getGraverBounds();
             if (yard == null) {
                 yard = getRoomBounds(colony, WorldSpaces.GRAVEYARD);

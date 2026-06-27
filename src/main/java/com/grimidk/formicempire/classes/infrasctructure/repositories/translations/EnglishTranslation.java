@@ -506,12 +506,12 @@ public class EnglishTranslation implements Translation {
 
         en.put("BUG_ANT", "Ant");
         en.put("BUG_APHID", "Aphid");
-        en.put("BUG_SOIL_MITE", "Soil mite");
+        en.put("BUG_SYMBIOTIC_MITE", "Symbiotic mite");
         en.put("BUG_DERMESTID", "Dermestid beetle");
         en.put("BUG_PARASITE", "Ant Parasite");
         en.put("BUG_ANT_SCIENTIFIC", "Formica");
         en.put("BUG_APHID_SCIENTIFIC", "Aphididae");
-        en.put("BUG_SOIL_MITE_SCIENTIFIC", "Stratiolaelaps scimitus");
+        en.put("BUG_SYMBIOTIC_MITE_SCIENTIFIC", "Stratiolaelaps scimitus");
         en.put("BUG_DERMESTID_SCIENTIFIC", "Dermestidae");
         en.put("BUG_PARASITIC_MITE", "Parasitic mite");
         en.put("BUG_PARASITIC_MITE_SCIENTIFIC", "Acaridae");
@@ -628,7 +628,7 @@ public class EnglishTranslation implements Translation {
         en.put("ROLE_LAYER_DESC", "Allows queens to lay new eggs. 1 ant can lay 1 egg per hour.");
         en.put("ROLE_RANCHER_UPGRADE", "Rancher Role");
         en.put("ROLE_RANCHER_FLAVOR", "Aphid Rancher");
-        en.put("ROLE_RANCHER_DESC", "Allows workers to tend aphids in the ranch pen. Each rancher supports up to 10 aphids. Each aphid produces 1 honeydew (syrup) per hour when fed plants. Catchers find wild aphids except in dry biomes.");
+        en.put("ROLE_RANCHER_DESC", "Allows workers to tend aphids in the ranch pen. Each rancher supports up to 10 aphids. Each aphid produces 1 honeydew (syrup) per hour when fed plants. Catchers can only collect wild aphids after this role is unlocked (except in dry biomes).");
         en.put("ROLE_RESEARCHER_UPGRADE", "Research Role");
         en.put("ROLE_RESEARCHER_FLAVOR", "Ant Science");
         en.put("ROLE_RESEARCHER_DESC", "Allows queens to generate research points. 1 ant research 1 point per hour.");
@@ -682,7 +682,7 @@ public class EnglishTranslation implements Translation {
         en.put("ROLE_MILITIA_DESC", "Allows workers to perform basic defensive duties.");
         en.put("ROLE_CATCHER_UPGRADE", "Catcher Role");
         en.put("ROLE_CATCHER_FLAVOR", "Bug Catching");
-        en.put("ROLE_CATCHER_DESC", "Allows soldiers to catch native insects on the overworld. Each catcher maintains up to 10 pet insects total. Ranchers tend aphids, gravers tend dermestids. Pairs breed daily when you have at least two.");
+        en.put("ROLE_CATCHER_DESC", "Allows soldiers to catch native insects on the overworld. Each catcher maintains up to 10 pet insects total. Aphids need the Rancher role; symbiotic mites unlock when parasitic mites appear; dermestids need Grave Beetle Catching research. Pairs breed daily when you have at least two.");
         en.put("ROLE_CRANE_UPGRADE", "Construction Crane Role");
         en.put("ROLE_CRANE_FLAVOR", "Heavy Duty");
         en.put("ROLE_CRANE_DESC", "Allows majors to help in the construction of buildings, each one is 25 times as strong.");
@@ -740,6 +740,10 @@ public class EnglishTranslation implements Translation {
         en.put("ABILITY_CLONING_DESC", "Each completed genetic assimilation raises dynasty genetic integrity. Minimum genetic integrity scales with assimilations completed.");
         en.put("ABILITY_PARASITIC_MITE_ALERT_FLAVOR", "Parasitic Mites");
         en.put("ABILITY_PARASITIC_MITE_ALERT_DESC", "Warns when parasitic mites infest the colony. Every 10 mites slow one ant to half speed.");
+        en.put("ABILITY_CATCH_SYMBIOTIC_MITE_FLAVOR", "Symbiotic Mite Catching");
+        en.put("ABILITY_CATCH_SYMBIOTIC_MITE_DESC", "Allows catchers to collect symbiotic mites from the overworld. Unlocks when parasitic mites first appear. Each symbiotic mite eliminates up to 5 parasitic mites per day.");
+        en.put("ABILITY_CATCH_DERMESTID_FLAVOR", "Grave Beetle Catching");
+        en.put("ABILITY_CATCH_DERMESTID_DESC", "Allows catchers to collect dermestid beetles from the overworld. Gravers tend up to 10 each in the graveyard.");
         en.put("ABILITY_ABILITY_FLAVOR", "Abilities Unlocked");
         en.put("ABILITY_ABILITY_DESC", "Allows you to see the abilities menu and use active abilities.");
 
@@ -795,8 +799,8 @@ public class EnglishTranslation implements Translation {
         en.put("STAT_CONTAMINATION_2_DESC", "Reduces contamination death rate by 40%.");
         en.put("STAT_CONTAMINATION_3_FLAVOR", "Isolation Protocols");
         en.put("STAT_CONTAMINATION_3_DESC", "Reduces contamination death rate by 60%.");
-        en.put("STAT_SOIL_MITE_1_FLAVOR", "Mite Training");
-        en.put("STAT_SOIL_MITE_1_DESC", "Increases each soil mite's parasitic mite elimination to 12 per day.");
+        en.put("STAT_SYMBIOTIC_MITE_1_FLAVOR", "Symbiotic Mite Training");
+        en.put("STAT_SYMBIOTIC_MITE_1_DESC", "Increases each symbiotic mite's parasitic mite elimination to 12 per day.");
         en.put("STAT_DERMESTID_1_FLAVOR", "Grave Beetles");
         en.put("STAT_DERMESTID_1_DESC", "Allows each dermestid in the graveyard to count as 1 graver for burial duty.");
         en.put("STAT_GRAVING_1_FLAVOR", "Shallow Graves");
@@ -977,11 +981,11 @@ public class EnglishTranslation implements Translation {
         en.put("HELP_TYPE_QUEEN_DESC", "The heart of the colony. Can be assigned to Lay Eggs or Research new technologies.");
 
         en.put("HELP_BUG_ANT_DESC", "Wild or rival ants that appear on the overworld. They can fight your ants and compete for space.");
-        en.put("HELP_BUG_APHID_DESC", "Soft-bodied insects that feed on plants. Native to most biomes except dry ones. Ranchers tend penned aphids (up to 10 per rancher) for syrup income. Pets without a dedicated yard use the insect pen.");
-        en.put("HELP_BUG_SOIL_MITE_DESC", "Small predatory mites used as biological control. Native to all biomes. Kept in the insect pen. Each soil mite eliminates up to 5 parasitic mites per day (12 with Mite Training). Pairs breed daily once you have at least two.");
-        en.put("HELP_BUG_DERMESTID_DESC", "Carrion beetles that clean dead tissue. Native to most biomes except cold ones. Gravers tend up to 10 each in the graveyard (or insect pen if no yard). With Grave Beetles research, each dermestid counts as one graver. Pairs breed daily once you have at least two.");
-        en.put("HELP_BUG_PARASITE_DESC", "Pests that hide in the nest and secretly drain your food. Assign Police to find and eliminate them before they spread.");
-        en.put("HELP_BUG_PARASITIC_MITE_DESC", "Tiny mites that infest adult ants when the colony hoards resources. Counts are in the thousands. Each 10 mites slow one ant to half speed. They spread monthly; soil mites are the main counter. Police do not affect them.");
+        en.put("HELP_BUG_APHID_DESC", "Soft-bodied insects that feed on plants. Native to most biomes except dry ones. Requires the Rancher role before catchers can collect them. Ranchers tend penned aphids (up to 10 per rancher) for syrup income.");
+        en.put("HELP_BUG_SYMBIOTIC_MITE_DESC", "Small predatory mites used as biological control. Native to all biomes. Unlocks for catching when parasitic mites first appear. Kept in the insect pen. Each symbiotic mite eliminates up to 5 parasitic mites per day (12 with Symbiotic Mite Training).");
+        en.put("HELP_BUG_DERMESTID_DESC", "Carrion beetles that clean dead tissue. Native to most biomes except cold ones. Requires Grave Beetle Catching research before catchers can collect them. Gravers tend up to 10 each in the graveyard. With Grave Beetles research, each dermestid counts as one graver.");
+        en.put("HELP_BUG_PARASITE_DESC", "Pests that hide in the nest and secretly drain your food. Native to hot biomes. Outbreaks can occur in spring and summer when the colony exceeds 1,000 ants (25% chance per month). Assign Police to find and eliminate them before they spread.");
+        en.put("HELP_BUG_PARASITIC_MITE_DESC", "Tiny mites that infest adult ants when the colony hoards resources. Native to cold biomes. Outbreaks can occur in autumn and winter above 10,000 stored resources (25% chance per month). Each 10 mites slow one ant to half speed. Symbiotic mites are the main counter. Police do not affect them.");
 
         en.put("HELP_BIOMES_TITLE", "Biomes");
         en.put("HELP_BIOME_TEMP", "Temp: ");
@@ -1094,7 +1098,7 @@ public class EnglishTranslation implements Translation {
         en.put("LOG_PARASITES_ELIMINATED_FMT", "Eliminated %d parasites.");
         en.put("LOG_CAUGHT_BUGS_SUMMARY_FMT", "Catchers brought in %d insect(s) from the wild.");
         en.put("LOG_CAUGHT_BUG_BRED_FMT", "%d %s bred in captivity.");
-        en.put("LOG_SOIL_MITES_PREDATION_FMT", "Soil mites eliminated %d parasitic mite(s).");
+        en.put("LOG_SYMBIOTIC_MITES_PREDATION_FMT", "Symbiotic mites eliminated %d parasitic mite(s).");
         en.put("LOG_NUPTIAL_QUEENS_FMT", "Nuptial flight occurred. %d new queens joined.");
         en.put("LOG_SUCCESS_ASSIMILATION_FMT", "%s completed! Reward: %s");
         en.put("LOG_SUCCESS_TUNNEL", "Tunnel connection completed!");
@@ -1149,7 +1153,7 @@ public class EnglishTranslation implements Translation {
         en.put("TRIGGER_POLICE_ROLE_TITLE", "Parasitic Infestation");
         en.put("TRIGGER_POLICE_ROLE_MSG", "The colony has become so prosperous that parasitic bugs may infiltrate it!");
         en.put("TRIGGER_PARASITIC_MITE_TITLE", "Parasitic Mites");
-        en.put("TRIGGER_PARASITIC_MITE_MSG", "Microscopic mites are infesting your workers and slowing them down! Research the Catcher role and assign soldiers to capture soil mites—they eliminate parasitic mites daily.");
+        en.put("TRIGGER_PARASITIC_MITE_MSG", "Microscopic mites are infesting your workers and slowing them down! Symbiotic mite catching is now available. Research the Catcher role and assign soldiers to capture symbiotic mites—they eliminate parasitic mites daily.");
         en.put("TRIGGER_MASS_FLIGHT_TITLE", "Imperial Decree");
         en.put("TRIGGER_MASS_FLIGHT_MSG", "Your dynasty has performed 10 nuptial flights! You have unlocked the 'Mass Nuptial Flights' ability in the Colony Operations menu (Z).");
         en.put("TRIGGER_DYNASTY_ABILITY_TITLE", "Ant Dynasty");

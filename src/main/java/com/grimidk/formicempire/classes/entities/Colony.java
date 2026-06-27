@@ -31,6 +31,7 @@ import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
 import com.grimidk.formicempire.classes.constants.world.Biome;
+import com.grimidk.formicempire.classes.constants.world.Season;
 import com.grimidk.formicempire.classes.constants.world.Temperature;
 
 public class Colony {
@@ -67,7 +68,7 @@ public class Colony {
     private double minerals;
     
     private int aphids; 
-    private int soilMites;
+    private int symbioticMites;
     private int dermestids;
     private int parasites;
     private int parasiticMites;
@@ -164,7 +165,7 @@ public class Colony {
         this.resins = 0;
         this.minerals = 0;
         this.aphids = 0;
-        this.soilMites = 0;
+        this.symbioticMites = 0;
         this.dermestids = 0;
         this.parasites = 0;
         this.parasiticMites = 0;
@@ -290,7 +291,7 @@ public class Colony {
         this.minerals = savedColony.minerals;
 
         this.aphids = savedColony.aphids;
-        this.soilMites = savedColony.soilMites;
+        this.symbioticMites = savedColony.symbioticMites;
         this.dermestids = savedColony.dermestids;
 
         this.parasites = savedColony.parasites;
@@ -302,7 +303,7 @@ public class Colony {
         }
 
         getBugHandlingService().restorePetCountsFromSave(
-                this, savedColony.aphids, savedColony.soilMites, savedColony.dermestids);
+                this, savedColony.aphids, savedColony.symbioticMites, savedColony.dermestids);
         getBugHandlingService().setParasiticMiteCount(this, savedColony.parasiticMites);
 
         this.totalDeaths = savedColony.totalDeaths;
@@ -563,9 +564,9 @@ public class Colony {
         getBugHandlingService().setCount(this, GameConstants.TYPE_APHID, count);
     }
 
-    public int getSoilMites() { return soilMites; }
-    public void setSoilMites(int count) {
-        getBugHandlingService().setCount(this, GameConstants.TYPE_SOIL_MITE, count);
+    public int getSymbioticMites() { return symbioticMites; }
+    public void setSymbioticMites(int count) {
+        getBugHandlingService().setCount(this, GameConstants.TYPE_SYMBIOTIC_MITE, count);
     }
 
     public int getDermestids() { return dermestids; }
@@ -576,8 +577,8 @@ public class Colony {
     public void applyPetBugCount(BugType type, int count) {
         if (type == GameConstants.TYPE_APHID) {
             this.aphids = count;
-        } else if (type == GameConstants.TYPE_SOIL_MITE) {
-            this.soilMites = count;
+        } else if (type == GameConstants.TYPE_SYMBIOTIC_MITE) {
+            this.symbioticMites = count;
         } else if (type == GameConstants.TYPE_DERMESTID) {
             this.dermestids = count;
         }
@@ -819,7 +820,9 @@ public class Colony {
     }
     public void runScoutting(Biome biome, Hex currentHex) { labourService.runScoutting(this, biome, currentHex); }
     public void runComposting() { labourService.runComposting(this); }
-    public void runParasitation() { populationService.runParasitation(this); }
+    public void runParasitation(Biome biome, Season season) {
+        populationService.runParasitation(this, biome, season);
+    }
     public void runPolicing() { labourService.runPolicing(this); }
     
     public int getNuptialFlightCost() {
@@ -957,10 +960,10 @@ public class Colony {
         }
     }
 
-    public void runMonthlyJobs() { 
+    public void runMonthlyJobs(Season season, Biome biome) {
         if (this.isActive || this.isPlayer) {
-            this.runParasitation();
-            getBugHandlingService().runMonthlyParasiticMites(this);
+            this.runParasitation(biome, season);
+            getBugHandlingService().runMonthlyParasiticMites(this, biome, season);
         }
     }
 

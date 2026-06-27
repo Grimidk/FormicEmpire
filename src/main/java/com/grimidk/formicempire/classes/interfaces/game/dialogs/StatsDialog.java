@@ -732,31 +732,39 @@ public class StatsDialog extends ZeroDialog {
         }
 
         int aphids = 0, aphidCap = 0, ranchers = 0;
-        int soilMites = 0, soilMiteCap = 0, catchers = 0;
+        int symbioticMites = 0, symbioticMiteCap = 0, catchers = 0;
         int dermestids = 0, dermestidCap = 0, gravers = 0;
         int poolUsed = 0, poolMax = 0;
         int parasiticMites = 0, slowedAnts = 0, parasiticKillPerDay = 0;
         int antParasites = 0;
-        boolean showPets = false;
-        boolean showCatcherPets = false;
+        boolean showAphids = false;
+        boolean showSymbioticMites = false;
+        boolean showDermestids = false;
+        boolean showPool = false;
         boolean showParasitic = false;
         boolean showAntParasites = false;
 
         for (Colony c : coloniesToCount) {
             ColonyBugHandlingService bugs = c.getBugHandlingService();
 
-            if (c.hasUpgrade(GameUnlocks.ROLE_RANCHER) || c.hasUpgrade(GameUnlocks.ROLE_CATCHER)) {
-                showPets = true;
+            if (c.hasUpgrade(GameUnlocks.ROLE_RANCHER) || c.getAphids() > 0) {
+                showAphids = true;
                 aphids += c.getAphids();
                 aphidCap += bugs.getMaxCapacity(c, GameConstants.TYPE_APHID);
                 ranchers += c.getAssignedRoleCount(GameConstants.ROLE_RANCHER);
             }
-            if (c.hasUpgrade(GameUnlocks.ROLE_CATCHER)) {
-                showCatcherPets = true;
-                soilMites += c.getSoilMites();
-                soilMiteCap += bugs.getMaxCapacity(c, GameConstants.TYPE_SOIL_MITE);
+            if (c.hasUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE) || c.getSymbioticMites() > 0) {
+                showSymbioticMites = true;
+                symbioticMites += c.getSymbioticMites();
+                symbioticMiteCap += bugs.getMaxCapacity(c, GameConstants.TYPE_SYMBIOTIC_MITE);
+            }
+            if (c.hasUpgrade(GameUnlocks.ABILITY_CATCH_DERMESTID) || c.getDermestids() > 0) {
+                showDermestids = true;
                 dermestids += c.getDermestids();
                 dermestidCap += bugs.getMaxCapacity(c, GameConstants.TYPE_DERMESTID);
+            }
+            if (c.hasUpgrade(GameUnlocks.ROLE_CATCHER)) {
+                showPool = true;
                 catchers += c.getAssignedRoleCount(GameConstants.ROLE_CATCHER);
                 poolUsed += bugs.getTotalPetCount(c);
                 poolMax += bugs.getCatcherPoolCapacity(c);
@@ -766,26 +774,29 @@ public class StatsDialog extends ZeroDialog {
             }
 
             if (c.hasUpgrade(GameUnlocks.ABILITY_PARASITIC_MITE_ALERT)
-                    || c.hasUpgrade(GameUnlocks.ROLE_CATCHER)
+                    || c.hasUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE)
                     || c.getParasiticMites() > 0) {
                 showParasitic = true;
             }
             int pm = c.getParasiticMites();
             parasiticMites += pm;
             slowedAnts += c.getParasiticMiteSlowedAntCount();
-            parasiticKillPerDay += c.getSoilMites() * bugs.getSoilMiteParasiticMiteKillPerDay(c);
+            if (c.hasUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE) || c.getSymbioticMites() > 0) {
+                parasiticKillPerDay += c.getSymbioticMites() * bugs.getSymbioticMiteParasiticMiteKillPerDay(c);
+            }
             if (c.hasUpgrade(GameUnlocks.ROLE_POLICE)) {
                 showAntParasites = true;
                 antParasites += c.getParasites();
             }
         }
 
-        if (!showPets && !showParasitic && !showAntParasites) {
+        if (!showAphids && !showSymbioticMites && !showDermestids && !showPool
+                && !showParasitic && !showAntParasites) {
             model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_NO_INSECTS), "---", "---", "---"});
             return;
         }
 
-        if (showPets) {
+        if (showAphids) {
             model.addRow(new Object[]{
                 GameConstants.ICON_APHID,
                 LanguageStrings.get(LanguageStrings.BUG_APHID),
@@ -793,33 +804,37 @@ public class StatsDialog extends ZeroDialog {
                 aphidCap,
                 String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_RANCHERS_FMT), ranchers)
             });
-            if (showCatcherPets) {
-                model.addRow(new Object[]{
-                    GameConstants.ICON_SOIL_MITE,
-                    LanguageStrings.get(LanguageStrings.BUG_SOIL_MITE),
-                    soilMites,
-                    soilMiteCap,
-                    String.format(LanguageStrings.get(LanguageStrings.STAT_INSECT_CATCHERS_FMT), catchers)
-                });
-                model.addRow(new Object[]{
-                    GameConstants.ICON_DERMESTID,
-                    LanguageStrings.get(LanguageStrings.BUG_DERMESTID),
-                    dermestids,
-                    dermestidCap,
-                    String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_GRAVERS_FMT), gravers)
-                });
-                model.addRow(new Object[]{
-                    null,
-                    LanguageStrings.get(LanguageStrings.STAT_INSECT_POOL),
-                    poolUsed,
-                    poolMax,
-                    String.format(LanguageStrings.get(LanguageStrings.STAT_INSECT_CATCHERS_FMT), catchers)
-                });
-            }
+        }
+        if (showSymbioticMites) {
+            model.addRow(new Object[]{
+                GameConstants.ICON_SYMBIOTIC_MITE,
+                LanguageStrings.get(LanguageStrings.BUG_SYMBIOTIC_MITE),
+                symbioticMites,
+                symbioticMiteCap,
+                String.format(LanguageStrings.get(LanguageStrings.STAT_INSECT_CATCHERS_FMT), catchers)
+            });
+        }
+        if (showDermestids) {
+            model.addRow(new Object[]{
+                GameConstants.ICON_DERMESTID,
+                LanguageStrings.get(LanguageStrings.BUG_DERMESTID),
+                dermestids,
+                dermestidCap,
+                String.format(LanguageStrings.get(LanguageStrings.STAT_RATE_GRAVERS_FMT), gravers)
+            });
+        }
+        if (showPool) {
+            model.addRow(new Object[]{
+                null,
+                LanguageStrings.get(LanguageStrings.STAT_INSECT_POOL),
+                poolUsed,
+                poolMax,
+                String.format(LanguageStrings.get(LanguageStrings.STAT_INSECT_CATCHERS_FMT), catchers)
+            });
         }
 
         if (showParasitic || showAntParasites) {
-            if (showPets) {
+            if (showAphids || showSymbioticMites || showDermestids || showPool) {
                 model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR), LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR), LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR), LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR)});
             }
             if (showParasitic) {

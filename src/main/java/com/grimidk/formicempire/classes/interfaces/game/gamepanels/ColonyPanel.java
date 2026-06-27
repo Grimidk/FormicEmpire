@@ -524,8 +524,12 @@ public class ColonyPanel extends ZeroGamePanel {
 
         boolean hasRancher = colony.hasUpgrade(GameUnlocks.ROLE_RANCHER);
         boolean hasCatcher = colony.hasUpgrade(GameUnlocks.ROLE_CATCHER);
-        petInsectsLabel.setVisible(hasRancher || hasCatcher);
-        if (hasRancher || hasCatcher) {
+        boolean hasSymbioticMiteCatch = colony.hasUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE);
+        boolean hasDermestidCatch = colony.hasUpgrade(GameUnlocks.ABILITY_CATCH_DERMESTID);
+        boolean showPetInsects = hasRancher || hasCatcher || hasSymbioticMiteCatch || hasDermestidCatch
+                || colony.getAphids() > 0 || colony.getSymbioticMites() > 0 || colony.getDermestids() > 0;
+        petInsectsLabel.setVisible(showPetInsects);
+        if (showPetInsects) {
             var bugHandling = colony.getBugHandlingService();
             int poolUsed = bugHandling.getTotalPetCount(colony);
             int poolMax = hasCatcher
