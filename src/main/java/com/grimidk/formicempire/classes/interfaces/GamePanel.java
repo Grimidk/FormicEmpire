@@ -8,13 +8,14 @@ import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.managers.AlertManager;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TriggerManager;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameSpritePreloader;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 import com.grimidk.formicempire.classes.interfaces.game.dialogs.*;
 import com.grimidk.formicempire.classes.interfaces.game.gamepanels.*;
+import com.grimidk.formicempire.classes.interfaces.ui.styles.UiScrollBarStyles;
 
 
 import javax.swing.*;
@@ -108,12 +109,8 @@ public class GamePanel extends ZeroGamePanel {
         gameScrollPane.setBorder(null);
         gameScrollPane.getViewport().setOpaque(false);
         gameScrollPane.setOpaque(false);
-        gameScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        gameScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        UiScrollBarStyles.hide(gameScrollPane);
         gameScrollPane.getVerticalScrollBar().setUnitIncrement(16);
-        gameScrollPane.getHorizontalScrollBar().setUnitIncrement(16);
-        gameScrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
-        gameScrollPane.getHorizontalScrollBar().setPreferredSize(new Dimension(0, 0));
         
         gameScrollPane.getViewport().addComponentListener(new ComponentAdapter() {
             @Override
@@ -411,6 +408,28 @@ public class GamePanel extends ZeroGamePanel {
         if (statsDialog != null && statsDialog.isShowing()) statsDialog.refreshTranslations();
         if (dynastyDialog != null && dynastyDialog.isShowing()) dynastyDialog.refreshTranslations();
         if (settingsDialog != null && settingsDialog.isShowing()) settingsDialog.refreshDialog();
+    }
+
+    @Override
+    public void refreshTheme() {
+        super.refreshTheme();
+        updateStatusIndicator(frame.getEngine().isPaused());
+        worldPanel.refreshTheme();
+        colonyPanel.refreshTheme();
+        alertPanel.refreshTheme();
+        controlPanel.refreshTheme();
+        refreshOpenDialogThemes();
+    }
+
+    private void refreshOpenDialogThemes() {
+        if (hatchDialog != null && hatchDialog.isShowing()) hatchDialog.refreshTheme();
+        if (roleDialog != null && roleDialog.isShowing()) roleDialog.refreshTheme();
+        if (upgradeDialog != null && upgradeDialog.isShowing()) upgradeDialog.refreshTheme();
+        if (abilitiesDialog != null && abilitiesDialog.isShowing()) abilitiesDialog.refreshTheme();
+        if (mapDialog != null && mapDialog.isShowing()) mapDialog.refreshTheme();
+        if (statsDialog != null && statsDialog.isShowing()) statsDialog.refreshTheme();
+        if (dynastyDialog != null && dynastyDialog.isShowing()) dynastyDialog.refreshTheme();
+        if (settingsDialog != null && settingsDialog.isShowing()) settingsDialog.refreshTheme();
     }
     
     private void initControlPanelCallbacks() {

@@ -74,7 +74,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("UI_HELP", "Ajuda");
         pt.put("UI_ROADMAP", "Roteiro");
         pt.put("UI_QUIT", "Sair");
-        pt.put("INTRO_WARNING", "Formic Dynasty é uma simulação de colónia com formigas, insetos e outros artrópodes pixelados.<br><br>Se aranhas ou criaturas semelhantes te incomodam, ativa o Modo aracnofobia nas Definições antes de jogar.");
+        pt.put("INTRO_WARNING", "Império Fôrmico é uma simulação de colónia com formigas, insetos e outros artrópodes pixelados.<br><br>Se aranhas ou criaturas semelhantes te incomodam, ativa o Modo aracnofobia nas Definições antes de jogar.");
         pt.put("ROADMAP_TITLE", "Roteiro de desenvolvimento");
         pt.put("ROADMAP_UNAVAILABLE", "Não foi possível carregar o roteiro.");
         pt.put("UI_CREDITS", "Créditos");
@@ -412,6 +412,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("SETTINGS_SHOW_TOOLTIPS", "Mostrar dicas");
         pt.put("SETTINGS_FUZZ_PARASITE_ANTS", "Aproximar números de formigas parasitas");
         pt.put("SETTINGS_OVERWORLD_AUTO_RECENTER", "Recentrar automaticamente o exterior na entrada da colônia");
+        pt.put("SETTINGS_DARK_MODE", "Modo escuro");
 
         pt.put("SETTINGS_MASTER_VOL", "Volume principal:");
         pt.put("SETTINGS_MUSIC_VOL", "Volume da música:");
@@ -937,6 +938,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("HELP_TAB_STARTED", "Primeiros passos");
         pt.put("HELP_TAB_DYNASTY", "Dinastia");
         pt.put("HELP_TAB_HOTKEYS", "Teclas");
+        pt.put("HELP_TAB_TUTORIALS", "Tutoriais");
         pt.put("HELP_TAB_SPECIES", "Espécies");
         pt.put("HELP_TAB_TYPES", "Tipos");
         pt.put("HELP_TAB_BUGS", "Outros insetos");
@@ -1001,7 +1003,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("HELP_SELECT_ITEM", "Selecione um item da lista para ver a descrição.");
         pt.put("HELP_BUILD_BASE_COST", "Custo base");
 
-        pt.put("HELP_TUTORIAL_TITLE", "Bem-vindo à dinastia fôrmica!");
+        pt.put("HELP_TUTORIAL_TITLE", "Bem-vindo ao Império Fôrmico!");
         pt.put("HELP_TUTORIAL_TIPS", "<b>Dicas:</b><br><br>O principal alimento são <b>cogumelos</b>, consumidos diariamente.<br><br>Atribua <b>operárias</b> (Q) como <b>coletoras</b> para plantas e água. Sem água, suas formigas morrem de sede!<br><br>Atribua <b>agricultoras</b> (Q) para converter plantas em cogumelos. Uma agricultora costuma atender ~6 coletoras.<br><br>Atribua <b>babás</b> (Q) para <b>ovos, larvas e pupas</b>. Sem babás, as crias morrem!<br><br>Pressione <b>A</b> para alternar submundo e supermundo.<br><br><i>Se não houver formigas livres ao mudar função, o jogo pode puxar da força padrão (ex.: coletoras).</i>");
         pt.put("HELP_TUTORIAL_THREATS", "<b>Ameaças:</b><br><br><b>Contaminação:</b> formigas morrem de velhice. Corpos acumulam doença. Use <b>coveiras</b>.<br><br><b>Formigas parasitas:</b> drenam cogumelos. Use <b>vigilantes</b>.<br><br><b>Esgotamento:</b> fontes acabam. Use <b>batedoras</b> para achar novas.");
         pt.put("HELP_TUTORIAL_DYNASTY", "<b>Dinastia:</b><br><br>Com a colônia forte, desbloqueie princesas <b>reprodutoras</b> e colonias satélites pelo <b>mapa mundial (I)</b>.<br><i>Eclipses raros geram voos nupciais gratuitos!</i><br><br>Várias colônias desbloqueiam o <b>menu da dinastia (S)</b>. Marcos permitem <b>rotas comerciais</b>, remover limites e <b>automatizar</b>.");

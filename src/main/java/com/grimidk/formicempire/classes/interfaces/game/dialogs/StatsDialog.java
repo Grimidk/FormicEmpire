@@ -17,7 +17,7 @@ import com.grimidk.formicempire.classes.entities.services.ColonyLocationService;
 import com.grimidk.formicempire.classes.entities.services.ColonyStatsService;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.ColonyLogTexts;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
@@ -71,6 +71,7 @@ public class StatsDialog extends ZeroDialog {
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         topPanel.setBackground(AssetStyles.UI_BG_SECONDARY);
         dynastyModeToggle = new JCheckBox(LanguageStrings.get(LanguageStrings.STATS_DYNASTY_MODE));
+        AssetStyles.styleCheckBox(dynastyModeToggle);
         dynastyModeToggle.setOpaque(false);
         dynastyModeToggle.setFont(AssetStyles.FONT_BOLD);
         dynastyModeToggle.setForeground(AssetStyles.TEXT_HEADER);
@@ -83,6 +84,7 @@ public class StatsDialog extends ZeroDialog {
         add(topPanel, BorderLayout.NORTH);
 
         tabbedPane = new JTabbedPane();
+        AssetStyles.styleTabbedPane(tabbedPane);
         add(tabbedPane, BorderLayout.CENTER);
         
         initGeneralTab();

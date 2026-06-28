@@ -6,7 +6,7 @@ import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.infrasctructure.World;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 
 import javax.swing.*;
@@ -44,10 +44,12 @@ public class MapDialog extends ZeroDialog {
         // --- Buttons ---
         homeButton = new JButton(LanguageStrings.get(LanguageStrings.MAP_HOME_BUTTON));
         homeButton.setFocusable(false);
+        AssetStyles.styleButton(homeButton);
         homeButton.addActionListener(e -> travelToHomeHex());
 
         closeButton = new JButton(LanguageStrings.get(LanguageStrings.UI_CLOSE));
         closeButton.setFocusable(false);
+        AssetStyles.styleButton(closeButton);
         closeButton.addActionListener(e -> dispose());
 
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));

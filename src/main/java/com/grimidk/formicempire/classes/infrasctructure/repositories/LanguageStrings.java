@@ -631,6 +631,7 @@ public final class LanguageStrings {
     
     public static final String SETTINGS_FUZZ_PARASITE_ANTS = "SETTINGS_FUZZ_PARASITE_ANTS";
     public static final String SETTINGS_OVERWORLD_AUTO_RECENTER = "SETTINGS_OVERWORLD_AUTO_RECENTER";
+    public static final String SETTINGS_DARK_MODE = "SETTINGS_DARK_MODE";
     public static final String SETTINGS_DEFAULT_ROLE_WORKER = "SETTINGS_DEFAULT_ROLE_WORKER";
     public static final String SETTINGS_DEFAULT_ROLE_SOLDIER = "SETTINGS_DEFAULT_ROLE_SOLDIER";
     public static final String SETTINGS_DEFAULT_ROLE_MAJOR = "SETTINGS_DEFAULT_ROLE_MAJOR";
@@ -1163,6 +1164,7 @@ public final class LanguageStrings {
     public static final String HELP_TAB_STARTED = "HELP_TAB_STARTED";
     public static final String HELP_TAB_DYNASTY = "HELP_TAB_DYNASTY";
     public static final String HELP_TAB_HOTKEYS = "HELP_TAB_HOTKEYS";
+    public static final String HELP_TAB_TUTORIALS = "HELP_TAB_TUTORIALS";
     public static final String HELP_TAB_SPECIES = "HELP_TAB_SPECIES";
     public static final String HELP_TAB_TYPES = "HELP_TAB_TYPES";
     public static final String HELP_TAB_BUGS = "HELP_TAB_BUGS";

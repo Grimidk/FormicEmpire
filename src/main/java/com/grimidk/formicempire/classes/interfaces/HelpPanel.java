@@ -14,7 +14,7 @@ import com.grimidk.formicempire.classes.constants.world.Season;
 import com.grimidk.formicempire.classes.constants.world.Temperature;
 import com.grimidk.formicempire.classes.constants.world.TimeOfDay;
 import com.grimidk.formicempire.classes.constants.world.Weather;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.ClasspathTextFiles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
@@ -50,9 +50,7 @@ public class HelpPanel extends JPanel {
         setBackground(AssetStyles.BACKGROUND_COLOR);
 
         mainTabs = new JTabbedPane();
-        mainTabs.setFont(AssetStyles.FONT_BOLD);
-        mainTabs.setBackground(AssetStyles.BACKGROUND_SECONDARY);
-        mainTabs.setForeground(AssetStyles.FONT_COLOR);
+        AssetStyles.styleTabbedPane(mainTabs);
 
         backButton = new JButton();
         creditsButton = new JButton();
@@ -66,19 +64,13 @@ public class HelpPanel extends JPanel {
         JPanel southPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         southPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
         
-        creditsButton.setFont(AssetStyles.FONT_BOLD);
-        creditsButton.setBackground(AssetStyles.BACKGROUND_SECONDARY);
-        creditsButton.setForeground(AssetStyles.FONT_COLOR);
+        AssetStyles.styleButton(creditsButton);
         creditsButton.addActionListener(e -> showCreditsDialog(this));
 
-        roadmapButton.setFont(AssetStyles.FONT_BOLD);
-        roadmapButton.setBackground(AssetStyles.BACKGROUND_SECONDARY);
-        roadmapButton.setForeground(AssetStyles.FONT_COLOR);
+        AssetStyles.styleButton(roadmapButton);
         roadmapButton.addActionListener(e -> showRoadmapDialog(this));
 
-        backButton.setFont(AssetStyles.FONT_BOLD);
-        backButton.setBackground(AssetStyles.BACKGROUND_SECONDARY);
-        backButton.setForeground(AssetStyles.FONT_COLOR);
+        AssetStyles.styleButton(backButton);
         backButton.addActionListener(e -> this.frame.showCard(MainFrame.CARD_INIT));
         
         setupButtonNavigation(creditsButton);
@@ -119,16 +111,14 @@ public class HelpPanel extends JPanel {
                 .collect(Collectors.toList());
 
         // Add tabs
-        mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_WELCOME), createWelcomePanel());
-        mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_STARTED), createGettingStartedPanel());
-        mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_DYNASTY), createEmpireManagementPanel());
-        mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_HOTKEYS), createHotkeysPanel());
+        mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_TUTORIALS), createTutorialsPanel());
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_SPECIES), createSpeciesPanel());
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_TYPES), createAntTypesPanel());
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_BUGS), createBugsPanel());
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_ROLES), createDictionaryPanel(roleConstants));
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_UPGRADES), createDictionaryPanel(genericUpgrades));
-        mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_BUILDINGS), createDictionaryPanel(new ArrayList<>(GameUnlocks.getBuildings())));
+        mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_BUILDINGS),
+                createDictionaryPanel(new ArrayList<>(GameUnlocks.getBuildings()), false));
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_ASSIMILATIONS), createDictionaryPanel(new ArrayList<>(GameUnlocks.getAssimilations())));
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_WORLD), createWorldPanel());
     }
@@ -140,18 +130,15 @@ public class HelpPanel extends JPanel {
         
         // Update tab titles
         String[] titles = {
-            LanguageStrings.get("HELP_TAB_WELCOME"),
-            LanguageStrings.get("HELP_TAB_STARTED"),
-            LanguageStrings.get("HELP_TAB_DYNASTY"),
-            LanguageStrings.get("HELP_TAB_HOTKEYS"),
-            LanguageStrings.get("HELP_TAB_SPECIES"),
-            LanguageStrings.get("HELP_TAB_TYPES"),
-            LanguageStrings.get("HELP_TAB_BUGS"),
-            LanguageStrings.get("HELP_TAB_ROLES"),
-            LanguageStrings.get("HELP_TAB_UPGRADES"),
-            LanguageStrings.get("HELP_TAB_BUILDINGS"),
-            LanguageStrings.get("HELP_TAB_ASSIMILATIONS"),
-            LanguageStrings.get("HELP_TAB_WORLD")
+            LanguageStrings.get(LanguageStrings.HELP_TAB_TUTORIALS),
+            LanguageStrings.get(LanguageStrings.HELP_TAB_SPECIES),
+            LanguageStrings.get(LanguageStrings.HELP_TAB_TYPES),
+            LanguageStrings.get(LanguageStrings.HELP_TAB_BUGS),
+            LanguageStrings.get(LanguageStrings.HELP_TAB_ROLES),
+            LanguageStrings.get(LanguageStrings.HELP_TAB_UPGRADES),
+            LanguageStrings.get(LanguageStrings.HELP_TAB_BUILDINGS),
+            LanguageStrings.get(LanguageStrings.HELP_TAB_ASSIMILATIONS),
+            LanguageStrings.get(LanguageStrings.HELP_TAB_WORLD)
         };
         
         for (int i = 0; i < titles.length && i < mainTabs.getTabCount(); i++) {
@@ -164,6 +151,20 @@ public class HelpPanel extends JPanel {
         if (selected >= 0 && selected < mainTabs.getTabCount()) {
             mainTabs.setSelectedIndex(selected);
         }
+    }
+
+    public void refreshTheme() {
+        setBackground(AssetStyles.BACKGROUND_COLOR);
+        AssetStyles.styleTabbedPane(mainTabs);
+        AssetStyles.styleButton(creditsButton);
+        AssetStyles.styleButton(roadmapButton);
+        AssetStyles.styleButton(backButton);
+        int selected = mainTabs.getSelectedIndex();
+        initTabs();
+        if (selected >= 0 && selected < mainTabs.getTabCount()) {
+            mainTabs.setSelectedIndex(selected);
+        }
+        AssetStyles.applyThemeToContainer(this);
     }
     
     private void setupButtonNavigation(JButton button) {
@@ -196,53 +197,82 @@ public class HelpPanel extends JPanel {
         tabs.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, backwardKeys);
     }
 
+    private JComponent createTutorialsPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        panel.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+        panel.add(wrapTutorialSection(LanguageStrings.HELP_TAB_WELCOME, createWelcomePanel()));
+        panel.add(Box.createRigidArea(new Dimension(0, 12)));
+        panel.add(wrapTutorialSection(LanguageStrings.HELP_TAB_STARTED, createGettingStartedPanel()));
+        panel.add(Box.createRigidArea(new Dimension(0, 12)));
+        panel.add(wrapTutorialSection(LanguageStrings.HELP_TAB_DYNASTY, createEmpireManagementPanel()));
+        panel.add(Box.createRigidArea(new Dimension(0, 12)));
+        panel.add(wrapTutorialSection(LanguageStrings.HELP_TAB_HOTKEYS, buildHotkeysGrid()));
+
+        JScrollPane scrollPane = new JScrollPane(panel);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        return scrollPane;
+    }
+
+    private JPanel wrapTutorialSection(String titleKey, JComponent content) {
+        JPanel section = new JPanel(new BorderLayout());
+        section.setBackground(AssetStyles.BACKGROUND_COLOR);
+        section.setBorder(BorderFactory.createTitledBorder(
+                AssetStyles.PANEL_BORDER,
+                LanguageStrings.get(titleKey),
+                javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                AssetStyles.FONT_BOLD,
+                AssetStyles.FONT_COLOR_HEADER));
+        section.add(content, BorderLayout.CENTER);
+        return section;
+    }
+
+    private String tutorialHtml(String body) {
+        return "<html><div style='width:450px;font-family:sans-serif;font-size:12pt;color:"
+                + AssetStyles.themeTextColorHtml() + ";'>" + body + "</div></html>";
+    }
+
+    private void styleTutorialLabel(JLabel label) {
+        label.setFont(AssetStyles.FONT_NORMAL);
+        label.setForeground(AssetStyles.FONT_COLOR);
+    }
+
     private JComponent createWelcomePanel() {
-        String story = "<html><div style='width: 450px; font-family: sans-serif;'>" +
-                "<p style='font-size: 14pt;'>" +
-                LanguageStrings.get("HELP_WELCOME_STORY") +
-                "</p></div></html>";
-        
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(AssetStyles.BACKGROUND_COLOR);
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
-        
-        JLabel label = new JLabel(story);
-        label.setFont(AssetStyles.FONT_NORMAL);
-        label.setForeground(AssetStyles.FONT_COLOR);
+
+        JLabel label = new JLabel(tutorialHtml(LanguageStrings.get("HELP_WELCOME_STORY")));
+        styleTutorialLabel(label);
         panel.add(label);
         return panel;
     }
 
     private JComponent createGettingStartedPanel() {
-        String gameInfo = "<html><div style='width: 450px; font-family: sans-serif; font-size: 11pt;'>" +
-                LanguageStrings.get("HELP_START_INFO") +
-                "<br><br>" +
-                LanguageStrings.get("HELP_OVERWORLD_GATHERING") +
-                "</div></html>";
-        
+        String body = LanguageStrings.get("HELP_START_INFO")
+                + "<br><br>"
+                + LanguageStrings.get("HELP_OVERWORLD_GATHERING");
+
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(AssetStyles.BACKGROUND_COLOR);
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
-        
-        JLabel label = new JLabel(gameInfo);
-        label.setFont(AssetStyles.FONT_NORMAL);
-        label.setForeground(AssetStyles.FONT_COLOR);
+
+        JLabel label = new JLabel(tutorialHtml(body));
+        styleTutorialLabel(label);
         panel.add(label);
         return panel;
     }
 
     private JComponent createEmpireManagementPanel() {
-        String empireInfo = "<html><div style='width: 450px; font-family: sans-serif; font-size: 11pt;'>" +
-                LanguageStrings.get("HELP_DYNASTY_INFO") +
-                "</div></html>";
-        
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(AssetStyles.BACKGROUND_COLOR);
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
-        
-        JLabel label = new JLabel(empireInfo);
-        label.setFont(AssetStyles.FONT_NORMAL);
-        label.setForeground(AssetStyles.FONT_COLOR);
+
+        JLabel label = new JLabel(tutorialHtml(LanguageStrings.get("HELP_DYNASTY_INFO")));
+        styleTutorialLabel(label);
         panel.add(label);
         return panel;
     }
@@ -284,10 +314,10 @@ public class HelpPanel extends JPanel {
         return scrollPane;
     }
 
-    private JComponent createHotkeysPanel() {
+    private JPanel buildHotkeysGrid() {
         JPanel hotkeyPanel = new JPanel(new GridBagLayout());
         hotkeyPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
-        hotkeyPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
+        hotkeyPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
         GridBagConstraints c = new GridBagConstraints();
         c.insets = new Insets(5, 10, 5, 10);
         c.anchor = GridBagConstraints.WEST;
@@ -301,7 +331,7 @@ public class HelpPanel extends JPanel {
                 keyLabel.setFont(AssetStyles.FONT_BOLD);
                 keyLabel.setForeground(AssetStyles.FONT_COLOR_HEADER);
                 hotkeyPanel.add(keyLabel, c);
-                
+
                 c.gridx = 1;
                 JLabel descLabel = new JLabel(desc);
                 descLabel.setFont(AssetStyles.FONT_NORMAL);
@@ -691,6 +721,10 @@ public class HelpPanel extends JPanel {
     }
 
     private JComponent createDictionaryPanel(List<Constant> items) {
+        return createDictionaryPanel(items, true);
+    }
+
+    private JComponent createDictionaryPanel(List<Constant> items, boolean showIcons) {
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setBackground(AssetStyles.BACKGROUND_COLOR);
         
@@ -723,7 +757,7 @@ public class HelpPanel extends JPanel {
                 if (value instanceof Constant) {
                     Constant c = (Constant) value;
                     setText((c instanceof Upgrade) ? ((Upgrade) c).getFlavorName() : c.getName());
-                    setIcon(c.getIcon());
+                    setIcon(showIcons ? c.getIcon() : null);
                 }
                 return this;
             }
@@ -899,10 +933,8 @@ public class HelpPanel extends JPanel {
         JButton nextBtn = new JButton(LanguageStrings.get("UI_NEXT") + " >");
         JButton finishBtn = new JButton(LanguageStrings.get("UI_FINISH"));
         
-        for(JButton btn : new JButton[]{skipBtn, backBtn, nextBtn, finishBtn}) {
-            btn.setFont(AssetStyles.FONT_BOLD);
-            btn.setBackground(AssetStyles.BACKGROUND_SECONDARY);
-            btn.setForeground(AssetStyles.FONT_COLOR);
+        for (JButton btn : new JButton[]{skipBtn, backBtn, nextBtn, finishBtn}) {
+            AssetStyles.styleButton(btn);
         }
 
         skipBtn.addActionListener(e -> dialog.dispose());
@@ -984,9 +1016,7 @@ public class HelpPanel extends JPanel {
         buttonPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
 
         JButton closeButton = new JButton(LanguageStrings.get(LanguageStrings.UI_CLOSE));
-        closeButton.setFont(AssetStyles.FONT_BOLD);
-        closeButton.setBackground(AssetStyles.BACKGROUND_SECONDARY);
-        closeButton.setForeground(AssetStyles.FONT_COLOR);
+        AssetStyles.styleButton(closeButton);
         closeButton.addActionListener(e -> dialog.dispose());
         buttonPanel.add(closeButton);
 

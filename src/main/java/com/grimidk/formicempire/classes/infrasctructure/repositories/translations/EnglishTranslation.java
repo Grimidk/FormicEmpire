@@ -74,7 +74,7 @@ public class EnglishTranslation implements Translation {
         en.put("UI_HELP", "Help");
         en.put("UI_ROADMAP", "Roadmap");
         en.put("UI_QUIT", "Quit");
-        en.put("INTRO_WARNING", "Formic Dynasty is a colony simulation about pixelated ants, bugs, and other arthropods.<br><br>If spiders or similar creatures bother you, enable Arachnophobia Mode in Settings before you play.");
+        en.put("INTRO_WARNING", "Formic Empire is a colony simulation about pixelated ants, bugs, and other arthropods.<br><br>If spiders or similar creatures bother you, enable Arachnophobia Mode in Settings before you play.");
         en.put("ROADMAP_TITLE", "Development Roadmap");
         en.put("ROADMAP_UNAVAILABLE", "Roadmap file could not be loaded.");
         en.put("UI_CREDITS", "Credits");
@@ -412,6 +412,7 @@ public class EnglishTranslation implements Translation {
         en.put("SETTINGS_SHOW_TOOLTIPS", "Show tooltips");
         en.put("SETTINGS_FUZZ_PARASITE_ANTS", "Fuzz parasite ant numbers");
         en.put("SETTINGS_OVERWORLD_AUTO_RECENTER", "Auto-recenter overworld on colony entrance");
+        en.put("SETTINGS_DARK_MODE", "Dark mode");
 
         en.put("SETTINGS_MASTER_VOL", "Master Volume:");
         en.put("SETTINGS_MUSIC_VOL", "Music Volume:");
@@ -937,6 +938,7 @@ public class EnglishTranslation implements Translation {
         en.put("HELP_TAB_STARTED", "Getting Started");
         en.put("HELP_TAB_DYNASTY", "Dynasty");
         en.put("HELP_TAB_HOTKEYS", "Hotkeys");
+        en.put("HELP_TAB_TUTORIALS", "Tutorials");
         en.put("HELP_TAB_SPECIES", "Species");
         en.put("HELP_TAB_TYPES", "Ant Types");
         en.put("HELP_TAB_BUGS", "Other insects");
@@ -1001,7 +1003,7 @@ public class EnglishTranslation implements Translation {
         en.put("HELP_SELECT_ITEM", "Select an item from the list to see its description.");
         en.put("HELP_BUILD_BASE_COST", "Base Cost");
 
-        en.put("HELP_TUTORIAL_TITLE", "Welcome to Formic Dynasty!");
+        en.put("HELP_TUTORIAL_TITLE", "Welcome to Formic Empire!");
         en.put("HELP_TUTORIAL_TIPS", "<b>Basic Tips:</b><br><br>Your main food is <b>Fungi</b> (Mushrooms), which ants will eat daily.<br><br>Assign <b>Workers</b> (Q) to <b>Forager</b> roles to gather Plants and Water. Without them your ants will die of thirst!<br><br>Assign <b>Farmers</b> (Q) to convert gathered Plants into Fungi. One Farmer can generally handle 6 Foragers.<br><br>Assign <b>Nurses</b> (Q) to care for your <b>Eggs, Larvae, and Pupae</b>. Without enough nurses, your young will perish from neglect!<br><br>Press <b>A</b> to toggle your view between the <b>Underworld</b>  and the <b>Overworld</b> .<br><br><i>QoL Tip: If you assign a new role but have no unassigned ants, the game automatically pulls from your default workforce (like Foragers).</i>");
         en.put("HELP_TUTORIAL_THREATS", "<b>Colony Threats:</b><br><br><b>Contamination:</b> Ants naturally die of old age. If bodies pile up, disease will spread and kill your colony. Assign <b>Gravers</b> to clear the dead.<br><br><b>Parasite ants:</b> Unseen pests will leech your Fungi reserves. Assign <b>Police</b> to detect and eliminate them.<br><br><b>Depletion:</b> Resource nodes don't last forever. If your foragers run out of plants or water, assign <b>Scouts</b> to find new resources nearby.");
         en.put("HELP_TUTORIAL_DYNASTY", "<b>Dynasty Management:</b><br><br>As your colony thrives, you will unlock <b>Breeder</b> Princesses. These allow you to establish satellite colonies via the <b>World Map (I)</b> .<br><i>Tip: Keep an eye on the sky! Rare Solar or Lunar Eclipses will trigger spontaneous, free Nuptial Flights!</i><br><br>Founding multiple colonies unlocks the <b>Dynasty Menu (S)</b>. Reaching certain milestones will allow you to construct <b>Trade Routes</b>, remove spreading limits, and even <b>Automate</b> your expanding dynasty!");

@@ -3,7 +3,7 @@ package com.grimidk.formicempire.classes.interfaces;
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 import com.grimidk.formicempire.classes.interfaces.game.dialogs.ZeroDialog;
@@ -17,10 +17,22 @@ import java.util.Set;
 import java.util.List;
 
 public class SettingsPanel extends JPanel {
+    private static final String SECTION_GENERAL = "general";
+    private static final String SECTION_VIDEO = "video";
+    private static final String SECTION_AUDIO = "audio";
+    private static final String SECTION_ROLES = "roles";
+
     private final MainFrame frame;
     private final Engine engine;
 
-    private JTabbedPane tabbedPane;
+    private final CardLayout sectionLayout = new CardLayout();
+    private final JPanel sectionCards = new JPanel(sectionLayout);
+    private final JPanel sectionTabs = new JPanel();
+    private JButton generalTabButton;
+    private JButton videoTabButton;
+    private JButton audioTabButton;
+    private JButton rolesTabButton;
+    private String selectedSection = SECTION_GENERAL;
     
     // --- General Tab ---
     private JComboBox<LanguageOption> languageCombo;
@@ -38,6 +50,7 @@ public class SettingsPanel extends JPanel {
     private JCheckBox fullScreenCheck;
     private JCheckBox daylightColorOverlayCheck;
     private JCheckBox weatherColorOverlayCheck;
+    private JCheckBox darkModeCheck;
 
     // --- Audio Tab ---
     private JSlider masterVolSlider;
@@ -45,7 +58,7 @@ public class SettingsPanel extends JPanel {
     private JSlider sfxVolSlider;
     
     private JLabel langLabel, autoLabel, turboLabel, arachLabel, pauseFocusLabel, confirmQuitLabel, tooltipsLabel, overworldAutoRecenterLabel, fuzzParasiteAntsLabel;
-    private JLabel sizeLabel, fsLabel, daylightColorOverlayLabel, weatherColorOverlayLabel;
+    private JLabel sizeLabel, fsLabel, daylightColorOverlayLabel, weatherColorOverlayLabel, darkModeLabel;
     private JLabel masterLabel, musicLabel, sfxLabel;
     private JLabel defaultRoleWorkerLabel, defaultRoleSoldierLabel, defaultRoleMajorLabel, defaultRolePrincessLabel, defaultRoleQueenLabel;
     private JComboBox<AntRole> defaultRoleWorkerCombo, defaultRoleSoldierCombo, defaultRoleMajorCombo, defaultRolePrincessCombo, defaultRoleQueenCombo;
@@ -88,15 +101,29 @@ public class SettingsPanel extends JPanel {
         this.engine = frame.getEngine();
         setLayout(new BorderLayout());
         setBackground(AssetStyles.BACKGROUND_COLOR);
-        
-        tabbedPane = new JTabbedPane();
-        tabbedPane.setFont(AssetStyles.FONT_BOLD);
-        tabbedPane.setBackground(AssetStyles.BACKGROUND_SECONDARY);
-        tabbedPane.setForeground(AssetStyles.FONT_COLOR);
-        
+
+        sectionTabs.setLayout(new BoxLayout(sectionTabs, BoxLayout.X_AXIS));
+        sectionTabs.setBackground(AssetStyles.BACKGROUND_DARK);
+        sectionCards.setBackground(AssetStyles.BACKGROUND_COLOR);
+
         initUI();
-        
-        add(tabbedPane, BorderLayout.CENTER);
+
+        generalTabButton = createSectionTab(SECTION_GENERAL);
+        videoTabButton = createSectionTab(SECTION_VIDEO);
+        audioTabButton = createSectionTab(SECTION_AUDIO);
+        rolesTabButton = createSectionTab(SECTION_ROLES);
+        sectionTabs.add(generalTabButton);
+        sectionTabs.add(videoTabButton);
+        sectionTabs.add(audioTabButton);
+        sectionTabs.add(rolesTabButton);
+
+        JPanel body = new JPanel(new BorderLayout());
+        body.setBackground(AssetStyles.BACKGROUND_COLOR);
+        body.add(sectionTabs, BorderLayout.NORTH);
+        body.add(sectionCards, BorderLayout.CENTER);
+        add(body, BorderLayout.CENTER);
+
+        showSection(SECTION_GENERAL);
         
         JPanel southPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         southPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
@@ -139,12 +166,42 @@ public class SettingsPanel extends JPanel {
     }
     
     private void initUI() {
-        tabbedPane.removeAll();
-        
-        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.SETTINGS_TAB_GENERAL), createGeneralTab());
-        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.SETTINGS_TAB_VIDEO), createVideoTab());
-        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.SETTINGS_TAB_AUDIO), createAudioTab());
-        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.SETTINGS_TAB_ROLES), createRolesTab());
+        sectionCards.removeAll();
+
+        sectionCards.add(createGeneralTab(), SECTION_GENERAL);
+        sectionCards.add(createVideoTab(), SECTION_VIDEO);
+        sectionCards.add(createAudioTab(), SECTION_AUDIO);
+        sectionCards.add(createRolesTab(), SECTION_ROLES);
+    }
+
+    private JButton createSectionTab(String sectionId) {
+        JButton button = new JButton();
+        AssetStyles.styleSectionTabButton(button);
+        button.addActionListener(e -> showSection(sectionId));
+        setupNavigation(button);
+        return button;
+    }
+
+    private void showSection(String sectionId) {
+        selectedSection = sectionId;
+        sectionLayout.show(sectionCards, sectionId);
+        styleSectionTab(generalTabButton, SECTION_GENERAL.equals(sectionId));
+        styleSectionTab(videoTabButton, SECTION_VIDEO.equals(sectionId));
+        styleSectionTab(audioTabButton, SECTION_AUDIO.equals(sectionId));
+        styleSectionTab(rolesTabButton, SECTION_ROLES.equals(sectionId));
+    }
+
+    private void styleSectionTab(JButton button, boolean selected) {
+        if (button == null) {
+            return;
+        }
+        if (selected) {
+            button.setBackground(AssetStyles.BACKGROUND_COLOR);
+            button.setForeground(AssetStyles.FONT_COLOR_HEADER);
+        } else {
+            button.setBackground(AssetStyles.BACKGROUND_LIGHT);
+            button.setForeground(AssetStyles.FONT_COLOR);
+        }
     }
     
     private JPanel createGeneralTab() {
@@ -414,6 +471,7 @@ public class SettingsPanel extends JPanel {
         fullScreenCheck.setSelected(false);
         daylightColorOverlayCheck.setSelected(true);
         weatherColorOverlayCheck.setSelected(true);
+        darkModeCheck.setSelected(false);
     }
 
     private void resetAudioTabToDefaults() {
@@ -505,7 +563,21 @@ public class SettingsPanel extends JPanel {
         styleCheckBox(weatherColorOverlayCheck);
         c.gridx = 1; panel.add(weatherColorOverlayCheck, c);
 
-        c.gridy = 4;
+        // Dark mode
+        c.gridy = 4; c.gridx = 0;
+        c.gridwidth = 1;
+        c.anchor = GridBagConstraints.WEST;
+        c.insets = new Insets(10, 15, 10, 15);
+        darkModeLabel = new JLabel();
+        darkModeLabel.setFont(AssetStyles.FONT_NORMAL);
+        darkModeLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(darkModeLabel, c);
+
+        darkModeCheck = new JCheckBox();
+        styleCheckBox(darkModeCheck);
+        c.gridx = 1; panel.add(darkModeCheck, c);
+
+        c.gridy = 5;
         c.gridx = 0;
         c.gridwidth = 2;
         c.anchor = GridBagConstraints.EAST;
@@ -528,35 +600,38 @@ public class SettingsPanel extends JPanel {
         c.anchor = GridBagConstraints.WEST;
         c.weightx = 1.0;
 
-        // Master Volume
-        c.gridy = 0; c.gridx = 0; 
+        c.gridy = 0;
+        c.gridx = 0;
         masterLabel = new JLabel();
         masterLabel.setFont(AssetStyles.FONT_NORMAL);
         masterLabel.setForeground(AssetStyles.FONT_COLOR);
         panel.add(masterLabel, c);
-        
-        masterVolSlider = createVolumeSlider();
-        c.gridx = 1; panel.add(masterVolSlider, c);
 
-        // Music Volume
-        c.gridy = 1; c.gridx = 0; 
+        masterVolSlider = createVolumeSlider();
+        c.gridx = 1;
+        panel.add(masterVolSlider, c);
+
+        c.gridy = 1;
+        c.gridx = 0;
         musicLabel = new JLabel();
         musicLabel.setFont(AssetStyles.FONT_NORMAL);
         musicLabel.setForeground(AssetStyles.FONT_COLOR);
         panel.add(musicLabel, c);
-        
-        musicVolSlider = createVolumeSlider();
-        c.gridx = 1; panel.add(musicVolSlider, c);
 
-        // SFX Volume
-        c.gridy = 2; c.gridx = 0; 
+        musicVolSlider = createVolumeSlider();
+        c.gridx = 1;
+        panel.add(musicVolSlider, c);
+
+        c.gridy = 2;
+        c.gridx = 0;
         sfxLabel = new JLabel();
         sfxLabel.setFont(AssetStyles.FONT_NORMAL);
         sfxLabel.setForeground(AssetStyles.FONT_COLOR);
         panel.add(sfxLabel, c);
-        
+
         sfxVolSlider = createVolumeSlider();
-        c.gridx = 1; panel.add(sfxVolSlider, c);
+        c.gridx = 1;
+        panel.add(sfxVolSlider, c);
 
         c.gridy = 3;
         c.gridx = 0;
@@ -568,24 +643,27 @@ public class SettingsPanel extends JPanel {
         resetAudioButton.addActionListener(e -> resetAudioTabToDefaults());
         setupNavigation(resetAudioButton);
         panel.add(resetAudioButton, c);
-        
+
         return panel;
     }
-    
+
     private JSlider createVolumeSlider() {
         JSlider slider = new JSlider(0, 100);
-        slider.setBackground(AssetStyles.BACKGROUND_COLOR);
-        slider.setForeground(AssetStyles.FONT_COLOR_HEADER);
-        slider.setMajorTickSpacing(20);
+        slider.setMajorTickSpacing(10);
         slider.setPaintTicks(true);
+        slider.setSnapToTicks(true);
+        AssetStyles.styleSlider(slider);
         return slider;
     }
     
     public void refreshTranslations() {
-        tabbedPane.setTitleAt(0, LanguageStrings.get(LanguageStrings.SETTINGS_TAB_GENERAL));
-        tabbedPane.setTitleAt(1, LanguageStrings.get(LanguageStrings.SETTINGS_TAB_VIDEO));
-        tabbedPane.setTitleAt(2, LanguageStrings.get(LanguageStrings.SETTINGS_TAB_AUDIO));
-        tabbedPane.setTitleAt(3, LanguageStrings.get(LanguageStrings.SETTINGS_TAB_ROLES));
+        if (generalTabButton != null) {
+            generalTabButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_TAB_GENERAL));
+            videoTabButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_TAB_VIDEO));
+            audioTabButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_TAB_AUDIO));
+            rolesTabButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_TAB_ROLES));
+            showSection(selectedSection);
+        }
         
         langLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_LANGUAGE));
         autoLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_AUTOSAVE));
@@ -601,6 +679,7 @@ public class SettingsPanel extends JPanel {
         fsLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_FULLSCREEN));
         daylightColorOverlayLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_DAYLIGHT_COLOR_OVERLAY));
         weatherColorOverlayLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_WEATHER_COLOR_OVERLAY));
+        darkModeLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_DARK_MODE));
         
         masterLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_MASTER_VOL));
         musicLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_MUSIC_VOL));
@@ -637,21 +716,15 @@ public class SettingsPanel extends JPanel {
     }
     
     private void styleComboBox(JComboBox<?> box) {
-        box.setFont(AssetStyles.FONT_NORMAL);
-        box.setBackground(AssetStyles.BACKGROUND_SECONDARY);
-        box.setForeground(AssetStyles.FONT_COLOR);
+        AssetStyles.styleComboBox(box);
     }
     
     private void styleCheckBox(JCheckBox box) {
-        box.setBackground(AssetStyles.BACKGROUND_COLOR);
-        box.setForeground(AssetStyles.FONT_COLOR);
-        box.setFont(AssetStyles.FONT_NORMAL);
+        AssetStyles.styleCheckBox(box);
     }
     
     private void styleButton(JButton btn) {
-        btn.setFont(AssetStyles.FONT_BOLD);
-        btn.setBackground(AssetStyles.BACKGROUND_SECONDARY);
-        btn.setForeground(AssetStyles.FONT_COLOR);
+        AssetStyles.styleButton(btn);
     }
     
     private void setupNavigation(JComponent component) {
@@ -682,6 +755,7 @@ public class SettingsPanel extends JPanel {
         fullScreenCheck.setSelected(engine.isFullScreen());
         daylightColorOverlayCheck.setSelected(engine.isDaylightColorOverlayEnabled());
         weatherColorOverlayCheck.setSelected(engine.isWeatherColorOverlayEnabled());
+        darkModeCheck.setSelected(engine.isDarkMode());
 
         masterVolSlider.setValue(engine.getMasterVolume());
         musicVolSlider.setValue(engine.getMusicVolume());
@@ -718,6 +792,7 @@ public class SettingsPanel extends JPanel {
         engine.setFullScreen(fullScreenCheck.isSelected());
         engine.setDaylightColorOverlayEnabled(daylightColorOverlayCheck.isSelected());
         engine.setWeatherColorOverlayEnabled(weatherColorOverlayCheck.isSelected());
+        engine.setDarkMode(darkModeCheck.isSelected());
 
         engine.setMasterVolume(masterVolSlider.getValue());
         engine.setMusicVolume(musicVolSlider.getValue());
@@ -738,6 +813,20 @@ public class SettingsPanel extends JPanel {
         });
     }
 
+    public void refreshTheme() {
+        setBackground(AssetStyles.BACKGROUND_COLOR);
+        sectionTabs.setBackground(AssetStyles.BACKGROUND_DARK);
+        sectionCards.setBackground(AssetStyles.BACKGROUND_COLOR);
+        showSection(selectedSection);
+        styleButton(saveButton);
+        styleButton(backButton);
+        styleButton(resetGeneralButton);
+        styleButton(resetVideoButton);
+        styleButton(resetAudioButton);
+        styleButton(resetRolesButton);
+        AssetStyles.applyThemeToContainer(this);
+    }
+
     public static class SettingsDialog extends ZeroDialog {
         private final SettingsPanel settingsPanel;
 
@@ -755,6 +844,12 @@ public class SettingsPanel extends JPanel {
         @Override
         protected void refreshDialog() {
             settingsPanel.refreshTranslations();
+        }
+
+        @Override
+        public void refreshTheme() {
+            super.refreshTheme();
+            settingsPanel.refreshTheme();
         }
     }
 }

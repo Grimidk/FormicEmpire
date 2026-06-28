@@ -6,7 +6,7 @@ import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Dynasty;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
@@ -49,6 +49,7 @@ public class UpgradeDialog extends ZeroDialog {
         this.colony = colony;
 
         tabbedPane = new JTabbedPane();
+        AssetStyles.styleTabbedPane(tabbedPane);
         add(tabbedPane, BorderLayout.CENTER);
 
         initKeyBindings();
@@ -307,8 +308,8 @@ public class UpgradeDialog extends ZeroDialog {
             actionPanel.setBorder(new EmptyBorder(0, 0, 0, 5));
 
             JButton purchaseButton = new JButton(LanguageStrings.get(LanguageStrings.UI_BUY));
-            purchaseButton.setFont(AssetStyles.FONT_BOLD);
             purchaseButton.setFocusable(false);
+            AssetStyles.styleButton(purchaseButton);
             if (currentRP < upgrade.getCost()) {
                 purchaseButton.setEnabled(false);
                 purchaseButton.setToolTipText(LanguageStrings.get(LanguageStrings.UPGRADE_NOT_ENOUGH_RP));
@@ -495,8 +496,8 @@ public class UpgradeDialog extends ZeroDialog {
             actionPanel.setBorder(new EmptyBorder(0, 0, 0, 5));
 
             JButton purchaseButton = new JButton(LanguageStrings.get(LanguageStrings.UI_BUILD));
-            purchaseButton.setFont(AssetStyles.FONT_BOLD);
             purchaseButton.setFocusable(false);
+            AssetStyles.styleButton(purchaseButton);
 
             buttonBuildingMap.put(purchaseButton, building);
             updateBuildButtonState(purchaseButton, building);
@@ -544,6 +545,7 @@ public class UpgradeDialog extends ZeroDialog {
             }
 
             JProgressBar progressBar = new JProgressBar(0, 100);
+            AssetStyles.styleProgressBar(progressBar);
             progressBar.setValue(progressPercent);
             progressBar.setStringPainted(true);
             progressBar.setString(String.format(LanguageStrings.get(LanguageStrings.BUILD_PROGRESS_HOURS), progressHours, requiredHours));
@@ -561,8 +563,8 @@ public class UpgradeDialog extends ZeroDialog {
             panel.add(progressLabel, BorderLayout.SOUTH);
 
             JButton cancelButton = new JButton(LanguageStrings.get(LanguageStrings.UI_CANCEL));
-            cancelButton.setFont(AssetStyles.FONT_BOLD);
             cancelButton.setFocusable(false);
+            AssetStyles.styleButton(cancelButton);
             cancelButton.addActionListener(e -> {
                 colony.setMinerals(colony.getMinerals() + project.getMineralCost());
                 colony.setResins(colony.getResins() + project.getResinCost());
@@ -766,8 +768,9 @@ public class UpgradeDialog extends ZeroDialog {
             cost.setAlignmentX(Component.CENTER_ALIGNMENT);
             
             JButton btn = new JButton(LanguageStrings.get(LanguageStrings.UI_BEGIN));
-            btn.setFont(AssetStyles.FONT_BOLD);
+            btn.setFocusable(false);
             btn.setAlignmentX(Component.CENTER_ALIGNMENT);
+            AssetStyles.styleButton(btn);
             btn.addActionListener(e -> {
                 colony.getDynasty().setCurrentAssimilation(a);
                 colony.getDynasty().setAssimilationProgress(0);
@@ -795,14 +798,15 @@ public class UpgradeDialog extends ZeroDialog {
             int percent = (int)((prog / a.getCost()) * 100);
 
             JProgressBar bar = new JProgressBar(0, 100);
+            AssetStyles.styleProgressBar(bar);
             bar.setValue(percent);
             bar.setStringPainted(true);
             bar.setString(String.format(LanguageStrings.get(LanguageStrings.ASSIMILATION_PROGRESS), prog, a.getCost(), percent));
             panel.add(bar, BorderLayout.CENTER);
 
             JButton cancel = new JButton(LanguageStrings.get(LanguageStrings.UI_CANCEL));
-            cancel.setFont(AssetStyles.FONT_BOLD);
             cancel.setFocusable(false);
+            AssetStyles.styleButton(cancel);
             cancel.addActionListener(e -> {
                 colony.getDynasty().setCurrentAssimilation(null);
                 colony.getDynasty().setAssimilationProgress(0);

@@ -7,7 +7,7 @@ import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TriggerManager;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 
 import java.awt.*;
@@ -39,7 +39,63 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
     private Cursor cursorNormal;
     private Cursor cursorClick;
     private AWTEventListener cursorEventListener;
+    private boolean cursorPressed;
     private final Runnable translationRefresh = this::refreshTranslations;
+
+    private boolean isGameWindow(Window window) {
+        if (window == null) {
+            return false;
+        }
+        if (window == this) {
+            return true;
+        }
+        return window instanceof Dialog dialog && dialog.getOwner() == this;
+    }
+
+    public void applyGameCursors(Window window) {
+        if (window == null || cursorNormal == null) {
+            return;
+        }
+        cursorPressed = false;
+        window.setCursor(cursorNormal);
+        clearInheritedCursors(window);
+    }
+
+    private void clearInheritedCursors(Container container) {
+        for (Component child : container.getComponents()) {
+            Cursor childCursor = child.getCursor();
+            if (childCursor != null && childCursor.getType() == Cursor.HAND_CURSOR) {
+                continue;
+            }
+            child.setCursor(null);
+            if (child instanceof Container nested) {
+                clearInheritedCursors(nested);
+            }
+        }
+    }
+
+    private void applyGameCursorForMouseEvent(MouseEvent me) {
+        if (cursorNormal == null || cursorClick == null) {
+            return;
+        }
+        Component source = me.getComponent();
+        if (source == null) {
+            return;
+        }
+        Window window = SwingUtilities.getWindowAncestor(source);
+        if (!isGameWindow(window)) {
+            return;
+        }
+        if (me.getID() == MouseEvent.MOUSE_PRESSED) {
+            cursorPressed = true;
+            window.setCursor(cursorClick);
+        } else if (me.getID() == MouseEvent.MOUSE_RELEASED) {
+            cursorPressed = false;
+            window.setCursor(cursorNormal);
+        } else if (me.getID() == MouseEvent.MOUSE_DRAGGED && !cursorPressed) {
+            window.setCursor(cursorNormal);
+        }
+    }
 
     public CardLayout getCardLayout() {
         return cardLayout;
@@ -59,31 +115,6 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
 
     public Cursor getGameCursorClick() {
         return cursorClick;
-    }
-
-    public void applyGameCursors(Window window) {
-        if (window != null && cursorNormal != null) {
-            window.setCursor(cursorNormal);
-        }
-    }
-
-    private void applyGameCursorForMouseEvent(MouseEvent me) {
-        if (cursorNormal == null || cursorClick == null) {
-            return;
-        }
-        Component component = me.getComponent();
-        if (component == null) {
-            return;
-        }
-        Window window = SwingUtilities.getWindowAncestor(component);
-        if (window == null) {
-            return;
-        }
-        if (me.getID() == MouseEvent.MOUSE_PRESSED) {
-            window.setCursor(cursorClick);
-        } else if (me.getID() == MouseEvent.MOUSE_RELEASED) {
-            window.setCursor(cursorNormal);
-        }
     }
 
     public SaveSelectPanel getSaveSelectPanel() {
@@ -157,6 +188,21 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         LanguageStrings.addListener(translationRefresh);
     }
 
+    public void applyTheme() {
+        AssetStyles.applyTheme(engine.isDarkMode());
+        AssetStyles.applyGlobalStyles();
+        SwingUtilities.updateComponentTreeUI(this);
+        getContentPane().setBackground(AssetStyles.BACKGROUND_COLOR);
+        cards.setBackground(AssetStyles.BACKGROUND_COLOR);
+        AssetStyles.applyThemeToContainer(cards);
+        applyGameCursors(this);
+        settingsPanel.refreshTheme();
+        helpPanel.refreshTheme();
+        saveSelectPanel.refreshTheme();
+        initPanel.refreshTheme();
+        gamePanel.refreshTheme();
+    }
+
     public void requestExit() {
         handleExit();
     }
@@ -214,7 +260,8 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
 
         Toolkit.getDefaultToolkit().addAWTEventListener(cursorEventListener = event -> {
             if (event instanceof MouseEvent me) {
-                if (me.getID() == MouseEvent.MOUSE_PRESSED || me.getID() == MouseEvent.MOUSE_RELEASED) {
+                int id = me.getID();
+                if (id == MouseEvent.MOUSE_PRESSED || id == MouseEvent.MOUSE_RELEASED || id == MouseEvent.MOUSE_DRAGGED) {
                     applyGameCursorForMouseEvent(me);
                 }
             }
@@ -252,6 +299,7 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         }
         
         ToolTipManager.sharedInstance().setEnabled(engine.isShowTooltips());
+        applyTheme();
     }
 
     public void showCard(String card) {
@@ -266,6 +314,7 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
             } catch (Exception ignore) {}
         }
         cardLayout.show(cards, card);
+        applyGameCursors(this);
     }
 
     public void openGameWithSave(Savefile savefile) {

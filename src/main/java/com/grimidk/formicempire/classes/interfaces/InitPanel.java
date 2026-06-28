@@ -1,5 +1,6 @@
 package com.grimidk.formicempire.classes.interfaces;
 
+import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 
 import javax.swing.*;
@@ -66,6 +67,12 @@ public class InitPanel extends JPanel {
         setupNavigation(credits);
         setupNavigation(settings);
         setupNavigation(quit);
+        AssetStyles.styleButton(play);
+        AssetStyles.styleButton(help);
+        AssetStyles.styleButton(roadmap);
+        AssetStyles.styleButton(credits);
+        AssetStyles.styleButton(settings);
+        AssetStyles.styleButton(quit);
 
         c.gridy = 0; add(play, c);
         c.gridy = 1; add(help, c);
@@ -85,6 +92,10 @@ public class InitPanel extends JPanel {
         credits.setText(LanguageStrings.get(LanguageStrings.UI_CREDITS));
         settings.setText(LanguageStrings.get(LanguageStrings.UI_SETTINGS));
         quit.setText(LanguageStrings.get(LanguageStrings.UI_QUIT));
+    }
+
+    public void refreshTheme() {
+        AssetStyles.applyThemeToContainer(this);
     }
 
     private void setupNavigation(JButton button) {

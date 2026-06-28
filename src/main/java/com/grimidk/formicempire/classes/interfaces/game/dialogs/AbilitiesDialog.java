@@ -5,7 +5,7 @@ import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
@@ -175,8 +175,8 @@ public class AbilitiesDialog extends ZeroDialog {
         actionPanel.setLayout(new BoxLayout(actionPanel, BoxLayout.Y_AXIS));
         
         JButton btn = new JButton(LanguageStrings.get(LanguageStrings.UI_TRIGGER));
-        btn.setFont(AssetStyles.FONT_BOLD);
         btn.setEnabled(enabled);
+        AssetStyles.styleButton(btn);
         btn.setFocusable(false);
         btn.addActionListener(action);
         

@@ -12,7 +12,6 @@ Missing assets:
 
 		Map hexes — look yank
 		Font - self explanatory
-		Optional: buttons/tabs 
 
 To Fix (By decreasing priority) : 
 		
@@ -23,14 +22,11 @@ To Fix (By decreasing priority) :
 	(none right now)
 
 	Mid:
-	parasite prevention with enough coverage
-	panning is too jitery   
-	option to disable auto fcous
+	(none right now)
 
 	Low:
 	dead ant list memory cap (trim or count-only storage if body piles grow very large)
 	logistic physics use dimension 2
-	dark mode
 
 	Can't reproduce:
 	(none right now)
@@ -68,7 +64,6 @@ Needed for launch (v1.0) (Launch Version):
 	more bugs (constants and icons and scienctific name)
 	non-ant assimilation ( Winged workers (Bees), Spiked larvae, Chemical throwing (Bombardier beetle), Chirping (Grass hopper), Diving, Mineralized exoskeletons, Rock mining, Bioluminescence (Fireflies), Static electricity generation, Pollination (Flies) )
 	rework tutorial and obscure unlocks in menus
-	rework menus and key binds and how the ui looks
 	rework start and choose difficulty / biome / species
 	rework abilities and alerts and triggers (new classes?)
 	rework saves to be cleaner
@@ -85,6 +80,7 @@ Needed for launch (v1.0) (Launch Version):
 
 Post launch (v1.1) (Improvements Update):
     engine clean up for reusability (Core Engine Package)
+	editable stat panel 
 	world editing (size, difficulty, islands)
 	choosing starting specie 
 	console and commands for debugging (to include in core)

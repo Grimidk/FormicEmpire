@@ -6,7 +6,7 @@ import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.interfaces.MainFrame;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
@@ -48,6 +48,7 @@ public class RoleManagementDialog extends ZeroDialog {
         this.colony = colony;
         this.engine = engine;
 
+        AssetStyles.styleTabbedPane(tabbedPane);
         add(tabbedPane, BorderLayout.CENTER);
         
         initTabs(); 
@@ -290,6 +291,7 @@ public class RoleManagementDialog extends ZeroDialog {
             int currentAssigned = colony.getAssignedRoleCount(role);
             SpinnerModel model = new SpinnerNumberModel(currentAssigned, 0, Integer.MAX_VALUE, 1); 
             JSpinner spinner = new JSpinner(model);
+            AssetStyles.styleSpinner(spinner);
             spinner.setPreferredSize(new Dimension(80, 25));
 
             spinner.addChangeListener(e -> {

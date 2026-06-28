@@ -1424,6 +1424,7 @@ public class SaveManager {
             writeJsonLine(w, "showTooltips", engine.isShowTooltips(), false);
             writeJsonLine(w, "fuzzParasiteAnts", engine.isFuzzParasiteAnts(), false);
             writeJsonLine(w, "overworldAutoRecenter", engine.isOverworldAutoRecenter(), false);
+            writeJsonLine(w, "darkMode", engine.isDarkMode(), false);
             writeJsonLine(w, "defaultRoleWorker", engine.getDefaultRoleWorker(), false);
             writeJsonLine(w, "defaultRoleSoldier", engine.getDefaultRoleSoldier(), false);
             writeJsonLine(w, "defaultRoleMajor", engine.getDefaultRoleMajor(), false);
@@ -1519,6 +1520,7 @@ public class SaveManager {
                     m.getOrDefault("fuzzParasites", String.valueOf(engine.isFuzzParasiteAnts())))));
             engine.setOverworldAutoRecenter(Boolean.parseBoolean(m.getOrDefault("overworldAutoRecenter",
                     String.valueOf(engine.isOverworldAutoRecenter()))));
+            engine.setDarkMode(Boolean.parseBoolean(m.getOrDefault("darkMode", String.valueOf(engine.isDarkMode()))));
             engine.setDefaultRoleWorker(Integer.parseInt(m.getOrDefault("defaultRoleWorker", String.valueOf(engine.getDefaultRoleWorker()))));
             engine.setDefaultRoleSoldier(Integer.parseInt(m.getOrDefault("defaultRoleSoldier", String.valueOf(engine.getDefaultRoleSoldier()))));
             engine.setDefaultRoleMajor(Integer.parseInt(m.getOrDefault("defaultRoleMajor", String.valueOf(engine.getDefaultRoleMajor()))));

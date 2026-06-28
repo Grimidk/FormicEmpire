@@ -74,7 +74,7 @@ public class FrenchTranslation implements Translation {
         fr.put("UI_HELP", "Aide");
         fr.put("UI_ROADMAP", "Feuille de route");
         fr.put("UI_QUIT", "Quitter");
-        fr.put("INTRO_WARNING", "Formic Dynasty est une simulation de colonie avec des fourmis, insectes et autres arthropodes en pixels.<br><br>Si les araignées ou créatures similaires vous gênent, activez le Mode arachnophobie dans les Paramètres avant de jouer.");
+        fr.put("INTRO_WARNING", "Empire Formique est une simulation de colonie avec des fourmis, insectes et autres arthropodes en pixels.<br><br>Si les araignées ou créatures similaires vous gênent, activez le Mode arachnophobie dans les Paramètres avant de jouer.");
         fr.put("ROADMAP_TITLE", "Feuille de route du développement");
         fr.put("ROADMAP_UNAVAILABLE", "Impossible de charger la feuille de route.");
         fr.put("UI_CREDITS", "Crédits");
@@ -412,6 +412,7 @@ public class FrenchTranslation implements Translation {
         fr.put("SETTINGS_SHOW_TOOLTIPS", "Afficher les infobulles");
         fr.put("SETTINGS_FUZZ_PARASITE_ANTS", "Chiffres de fourmis parasites approximatifs");
         fr.put("SETTINGS_OVERWORLD_AUTO_RECENTER", "Recentrer automatiquement la surface sur l'entrée de la colonie");
+        fr.put("SETTINGS_DARK_MODE", "Mode sombre");
 
         fr.put("SETTINGS_MASTER_VOL", "Volume principal :");
         fr.put("SETTINGS_MUSIC_VOL", "Volume musique :");
@@ -937,6 +938,7 @@ public class FrenchTranslation implements Translation {
         fr.put("HELP_TAB_STARTED", "Prise en main");
         fr.put("HELP_TAB_DYNASTY", "Dynastie");
         fr.put("HELP_TAB_HOTKEYS", "Raccourcis");
+        fr.put("HELP_TAB_TUTORIALS", "Tutoriels");
         fr.put("HELP_TAB_SPECIES", "Espèces");
         fr.put("HELP_TAB_TYPES", "Types");
         fr.put("HELP_TAB_BUGS", "Autres insectes");
@@ -1001,7 +1003,7 @@ public class FrenchTranslation implements Translation {
         fr.put("HELP_SELECT_ITEM", "Sélectionnez un élément pour sa description.");
         fr.put("HELP_BUILD_BASE_COST", "Coût de base");
 
-        fr.put("HELP_TUTORIAL_TITLE", "Bienvenue dans la dynastie formique !");
+        fr.put("HELP_TUTORIAL_TITLE", "Bienvenue dans Empire Formique !");
         fr.put("HELP_TUTORIAL_TIPS", "<b>Conseils :</b><br><br>Aliment principal : <b>champignons</b>, consommés chaque jour.<br><br>Assignez des <b>ouvrières</b> (Q) en <b>ramasseuses</b> pour plantes et eau. Sans eau, soif !<br><br>Les <b>agricultrices</b> (Q) transforment les plantes en champignons. En général 1 agricultrice pour ~6 ramasseuses.<br><br>Les <b>nourrices</b> (Q) s'occupent des <b>œufs, larves et nymphes</b>. Sans assez de nourrices, la couvée meurt !<br><br><b>A</b> bascule <b>souterrain</b> / <b>surface</b>.<br><br><i>QoL : si vous assignez un rôle sans fourmis libres, le jeu les prend sur votre effectif par défaut (ex. ramasseuses).</i>");
         fr.put("HELP_TUTORIAL_THREATS", "<b>Menaces :</b><br><br><b>Contamination :</b> les morts naturels s'accumulent et propagent la maladie. <b>Fossoyeuses</b> pour nettoyer.<br><br><b>Fourmis parasites :</b> drainent les champignons. <b>Police</b> pour les détecter et éliminer.<br><br><b>Épuisement :</b> les ressources s'épuisent. <b>Éclaireuses</b> pour en trouver d'autres.");
         fr.put("HELP_TUTORIAL_DYNASTY", "<b>Dynastie :</b><br><br>En prospérant, vous débloquez des princesses <b>reproductrices</b> et des colonies satellites via la <b>carte (I)</b>.<br><i>Les éclipses solaires ou lunaires rares déclenchent des essaims gratuits !</i><br><br>Plusieurs colonies débloquent le <b>menu dynastie (S)</b>. Des jalons permettent <b>routes commerciales</b>, lever les limites de satellites et <b>automatiser</b> la dynastie.");

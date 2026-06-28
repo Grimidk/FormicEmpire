@@ -1,6 +1,6 @@
 package com.grimidk.formicempire.classes.interfaces;
 
-import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 
 import javax.swing.*;
@@ -10,7 +10,7 @@ import java.awt.*;
 
 public class IntroPanel extends JPanel {
     private static final int SLIDE_MS = 2500;
-    private static final String STUDIO_NAME = "Grimidk";
+    private static final String STUDIO_NAME = "GrimIDK";
 
     private final MainFrame frame;
     private final JLabel messageLabel = new JLabel();
@@ -60,6 +60,8 @@ public class IntroPanel extends JPanel {
     private void beginIntro() {
         cancelAdvance();
         slideIndex = 0;
+        setCursor(null);
+        frame.applyGameCursors(frame);
         showStudioSlide();
         scheduleNextSlide();
     }

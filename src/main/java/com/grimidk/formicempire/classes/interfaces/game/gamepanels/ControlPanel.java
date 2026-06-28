@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.interfaces.game.gamepanels;
 
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
+import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 import com.grimidk.formicempire.classes.interfaces.HelpPanel;
 import com.grimidk.formicempire.classes.interfaces.MainFrame;
@@ -108,6 +109,10 @@ public class ControlPanel extends ZeroGamePanel {
         speedUpButton.setFocusable(false);
         playPauseButton.setFocusable(false);
         menuButton.setFocusable(false);
+        AssetStyles.styleButton(speedUpButton);
+        AssetStyles.styleButton(speedDownButton);
+        AssetStyles.styleButton(playPauseButton);
+        AssetStyles.styleButton(menuButton);
         
         // Init menu items
         backToGame = new JMenuItem();
@@ -167,6 +172,18 @@ public class ControlPanel extends ZeroGamePanel {
         showRoadmap.setText(LanguageStrings.get(LanguageStrings.UI_ROADMAP));
         showCredits.setText(LanguageStrings.get(LanguageStrings.UI_CREDITS));
         quitToMenu.setText(LanguageStrings.get(LanguageStrings.UI_BACK_TO_MENU));
+    }
+
+    @Override
+    public void refreshTheme() {
+        super.refreshTheme();
+        gameMenu.setBackground(AssetStyles.BACKGROUND_COLOR);
+        gameMenu.setForeground(AssetStyles.FONT_COLOR);
+        for (Component component : gameMenu.getComponents()) {
+            if (component instanceof JMenuItem menuItem) {
+                AssetStyles.styleMenuItem(menuItem);
+            }
+        }
     }
     
     private void updatePlayPauseButton() {
@@ -285,8 +302,15 @@ public class ControlPanel extends ZeroGamePanel {
         gameMenu.add(showTutorial);
         gameMenu.add(showRoadmap);
         gameMenu.add(showCredits);
-        gameMenu.add(new JSeparator());
+        gameMenu.add(AssetStyles.createInternalSeparator());
         gameMenu.add(quitToMenu);
+        gameMenu.setBackground(AssetStyles.BACKGROUND_COLOR);
+        gameMenu.setForeground(AssetStyles.FONT_COLOR);
+        for (Component component : gameMenu.getComponents()) {
+            if (component instanceof JMenuItem menuItem) {
+                AssetStyles.styleMenuItem(menuItem);
+            }
+        }
 
         menuButton.addActionListener(e -> {
             gameMenu.show(menuButton, 0, -gameMenu.getPreferredSize().height);

@@ -74,7 +74,7 @@ public class SpanishTranslation implements Translation {
         es.put("UI_HELP", "Ayuda");
         es.put("UI_ROADMAP", "Hoja de ruta");
         es.put("UI_QUIT", "Salir");
-        es.put("INTRO_WARNING", "Formic Dynasty es una simulación de colonias con hormigas, insectos y otros artrópodos en píxeles.<br><br>Si las arañas u otros arácnidos te molestan, activa el Modo aracnofobia en Ajustes antes de jugar.");
+        es.put("INTRO_WARNING", "Imperio Fórmico es una simulación de colonias con hormigas, insectos y otros artrópodos en píxeles.<br><br>Si las arañas u otros arácnidos te molestan, activa el Modo aracnofobia en Ajustes antes de jugar.");
         es.put("ROADMAP_TITLE", "Hoja de ruta de desarrollo");
         es.put("ROADMAP_UNAVAILABLE", "No se pudo cargar la hoja de ruta.");
         es.put("UI_CREDITS", "Créditos");
@@ -412,6 +412,7 @@ public class SpanishTranslation implements Translation {
         es.put("SETTINGS_SHOW_TOOLTIPS", "Mostrar consejos");
         es.put("SETTINGS_FUZZ_PARASITE_ANTS", "Cifras de hormigas parásitas imprecisas");
         es.put("SETTINGS_OVERWORLD_AUTO_RECENTER", "Recentrar automáticamente el exterior en la entrada de la colonia");
+        es.put("SETTINGS_DARK_MODE", "Modo oscuro");
 
         es.put("SETTINGS_MASTER_VOL", "Volumen Maestro:");
         es.put("SETTINGS_MUSIC_VOL", "Volumen Música:");
@@ -937,6 +938,7 @@ public class SpanishTranslation implements Translation {
         es.put("HELP_TAB_STARTED", "Primeros Pasos");
         es.put("HELP_TAB_DYNASTY", "Dinastía");
         es.put("HELP_TAB_HOTKEYS", "Teclas");
+        es.put("HELP_TAB_TUTORIALS", "Tutoriales");
         es.put("HELP_TAB_SPECIES", "Especies");
         es.put("HELP_TAB_TYPES", "Tipos");
         es.put("HELP_TAB_BUGS", "Otros insectos");
@@ -1001,7 +1003,7 @@ public class SpanishTranslation implements Translation {
         es.put("HELP_SELECT_ITEM", "Selecciona un elemento de la lista para ver su descripción.");
         es.put("HELP_BUILD_BASE_COST", "Coste Base");
 
-        es.put("HELP_TUTORIAL_TITLE", "¡Bienvenido a la Dinastía Fórmica!");
+        es.put("HELP_TUTORIAL_TITLE", "¡Bienvenido a Imperio Fórmico!");
         es.put("HELP_TUTORIAL_TIPS", "<b>Consejos Básicos:</b><br><br>Tu principal alimento son los <b>Hongos</b>, que las hormigas comerán a diario.<br><br>Asigna <b>Obreras</b> (Q) a roles de <b>Recolectora</b> para recoger Plantas y Agua. ¡Sin ellas tus hormigas morirán de sed!<br><br>Asigna <b>Granjeras</b> (Q) para convertir las Plantas recogidas en Hongos. Una Granjera generalmente puede manejar a 6 Recolectoras.<br><br>Asigna <b>Niñeras</b> (Q) para cuidar de tus <b>Huevos, Larvas y Pupas</b>. ¡Sin suficientes niñeras, tus crías morirán por descuido!<br><br>Presiona <b>A</b> para alternar tu vista entre el <b>Inframundo</b> y el <b>Supramundo</b>.<br><br><i>Consejo de QoL: Si asignas un nuevo rol pero no tienes hormigas sin asignar, el juego las tomará automáticamente de tu fuerza de trabajo por defecto (como las Recolectoras).</i>");
         es.put("HELP_TUTORIAL_THREATS", "<b>Amenazas a la Colonia:</b><br><br><b>Contaminación:</b> Las hormigas mueren naturalmente de vejez. Si los cuerpos se acumulan, la enfermedad se propagará y matará a tu colonia. Asigna <b>Sepultureras</b> para limpiar a los muertos.<br><br><b>Hormigas parásitas:</b> Plagas invisibles absorberán tus reservas de Hongos. Asigna <b>Vigilantes</b> para detectarlos y eliminarlos.<br><br><b>Agotamiento:</b> Los nodos de recursos no duran para siempre. Si tus recolectoras se quedan sin plantas o agua, asigna <b>Exploradoras</b> para encontrar nuevos recursos cerca.");
         es.put("HELP_TUTORIAL_DYNASTY", "<b>Gestión de Dinastía:</b><br><br>A medida que tu colonia prospere, desbloquearás Princesas <b>Criadoras</b>. Estas te permiten establecer colonias satélite a través del <b>Mapa Mundial (I)</b>.<br><i>Consejo: ¡Vigila el cielo! ¡Los raros eclipses solares o lunares activarán Vuelos Nupciales espontáneos y gratuitos!</i><br><br>Fundar múltiples colonias desbloquea el <b>Menú de Dinastía (S)</b>. ¡Alcanzar ciertos hitos te permitirá construir <b>Rutas Comerciales</b>, eliminar límites de expansión e incluso <b>Automatizar</b> tu creciente dinastía!");

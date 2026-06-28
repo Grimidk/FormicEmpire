@@ -2,7 +2,7 @@ package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
@@ -88,6 +88,7 @@ public class HatchRateDialog extends ZeroDialog {
             float currentRate = colony.getHatchRate(type);
             SpinnerModel model = new SpinnerNumberModel((double)currentRate, 0.0, 100.0, 0.1);
             JSpinner spinner = new JSpinner(model);
+            AssetStyles.styleSpinner(spinner);
             spinner.setPreferredSize(new Dimension(80, 25));
 
             spinner.addChangeListener(e -> handleSpinnerChange(type, spinner));

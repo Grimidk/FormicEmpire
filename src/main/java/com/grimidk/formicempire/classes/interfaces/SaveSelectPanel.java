@@ -2,6 +2,7 @@ package com.grimidk.formicempire.classes.interfaces;
 
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
+import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 
 import javax.swing.*;
@@ -36,6 +37,8 @@ public class SaveSelectPanel extends JPanel {
             slotLabels[i] = new JLabel(LanguageStrings.get(LanguageStrings.SAVE_EMPTY_SLOT));
             slotButtons[i] = new JButton(LanguageStrings.get(LanguageStrings.UI_CREATE));
             deleteButtons[i] = new JButton(LanguageStrings.get(LanguageStrings.UI_DELETE));
+            AssetStyles.styleButton(slotButtons[i]);
+            AssetStyles.styleButton(deleteButtons[i]);
             deleteButtons[i].setVisible(false);
             
             setupNavigation(slotButtons[i]);
@@ -50,6 +53,7 @@ public class SaveSelectPanel extends JPanel {
         }
 
         backButton = new JButton(LanguageStrings.get(LanguageStrings.UI_BACK));
+        AssetStyles.styleButton(backButton);
         setupNavigation(backButton);
         backButton.addActionListener(e -> {
             frame.showCard(MainFrame.CARD_INIT);
@@ -76,6 +80,10 @@ public class SaveSelectPanel extends JPanel {
     public void refreshTranslations() {
         refreshSlots();
         backButton.setText(LanguageStrings.get(LanguageStrings.UI_BACK));
+    }
+
+    public void refreshTheme() {
+        AssetStyles.applyThemeToContainer(this);
     }
     
     private void setupNavigation(JButton button) {

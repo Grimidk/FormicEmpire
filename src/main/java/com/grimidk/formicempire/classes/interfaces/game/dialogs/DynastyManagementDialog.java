@@ -11,7 +11,7 @@ import com.grimidk.formicempire.classes.entities.Trade;
 import com.grimidk.formicempire.classes.entities.Tunnel;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
@@ -59,6 +59,7 @@ public class DynastyManagementDialog extends ZeroDialog {
         dynasty.bindTradeManager(engine.getTradeManager());
 
         tabbedPane = new JTabbedPane();
+        AssetStyles.styleTabbedPane(tabbedPane);
         tabbedPane.setFocusable(false);
         tabbedPane.addChangeListener(e -> {
             Component selected = tabbedPane.getSelectedComponent();
@@ -392,6 +393,8 @@ public class DynastyManagementDialog extends ZeroDialog {
                 progressBar.setStringPainted(true);
                 label.setHorizontalAlignment(JLabel.CENTER);
                 buildBtn.setFocusable(false);
+                AssetStyles.styleButton(buildBtn);
+                AssetStyles.styleProgressBar(progressBar);
             }
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -443,6 +446,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             private TradeRowData currentData;
             public TunnelCellEditor() {
                 buildBtn.setFocusable(false);
+                AssetStyles.styleButton(buildBtn);
                 panel.add(buildBtn, BorderLayout.CENTER);
                 buildBtn.addActionListener(e -> {
                     if (currentData != null && currentData.tunnel == null) {
@@ -487,6 +491,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             public TradeActionRenderer() {
                 setLayout(new FlowLayout(FlowLayout.CENTER, 5, 2));
                 actionBtn.setFocusable(false);
+                AssetStyles.styleCompactButton(actionBtn);
                 add(actionBtn);
             }
             @Override
@@ -512,6 +517,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             private TradeRowData currentData;
             public TradeActionEditor() {
                 actionBtn.setFocusable(false);
+                AssetStyles.styleCompactButton(actionBtn);
                 panel.add(actionBtn);
                 actionBtn.addActionListener(e -> {
                     fireEditingStopped();
@@ -578,6 +584,7 @@ public class DynastyManagementDialog extends ZeroDialog {
         private final JCheckBox bilateralCheck;
         private final JButton createBtn;
         private final JButton optimizeBtn;
+        private final List<JButton> compactButtons = new ArrayList<>();
         
         private final JLabel capLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.TRADE_CAPACITY_FORMAT), 0.0, 0.0));
         private final JLabel speedLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.TRADE_SPEED_FORMAT), 0.0));
@@ -650,13 +657,14 @@ public class DynastyManagementDialog extends ZeroDialog {
                 }
                 JSpinner s = new JSpinner(new SpinnerNumberModel(initialVal, 0.0, available, 10.0));
                 s.setFocusable(false);
+                AssetStyles.styleSpinner(s);
                 s.addChangeListener(e -> updateStats());
                 resourceSpinners.put(rt, s);
                 p.add(s);
 
                 JButton maxBtn = new JButton(LanguageStrings.get(LanguageStrings.UI_MAX));
                 maxBtn.setFocusable(false);
-                maxBtn.setMargin(new Insets(2, 5, 2, 5));
+                compactButtons.add(maxBtn);
                 maxBtn.addActionListener(e -> setMaxResource(rt));
                 p.add(maxBtn);
 
@@ -687,13 +695,14 @@ public class DynastyManagementDialog extends ZeroDialog {
                 }
                 JSpinner s = new JSpinner(new SpinnerNumberModel(initialVal, 0.0, 1000000.0, 10.0));
                 s.setFocusable(false);
+                AssetStyles.styleSpinner(s);
                 s.addChangeListener(e -> updateStats());
                 returnResourceSpinners.put(rt, s);
                 p.add(s);
 
                 JButton maxBtn = new JButton(LanguageStrings.get(LanguageStrings.UI_MAX));
                 maxBtn.setFocusable(false);
-                maxBtn.setMargin(new Insets(2, 5, 2, 5));
+                compactButtons.add(maxBtn);
                 maxBtn.addActionListener(e -> setMaxResource(rt, true));
                 p.add(maxBtn);
 
@@ -753,6 +762,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 }
                 JSpinner s = new JSpinner(new SpinnerNumberModel(initialVal, 0, available, 1));
                 s.setFocusable(false);
+                AssetStyles.styleSpinner(s);
                 s.addChangeListener(e -> {
                     updateAvailableMethods();
                     updateStats();
@@ -770,6 +780,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             
             methodCombo = new JComboBox<>();
             methodCombo.setFocusable(false);
+            AssetStyles.styleComboBox(methodCombo);
             updateAvailableMethods();
 
             if (existingTrade != null) {
@@ -792,16 +803,16 @@ public class DynastyManagementDialog extends ZeroDialog {
             
             boolean initialRecurrent = (existingTrade != null) ? (existingTrade.hasPendingUpdate() ? existingTrade.isPendingRecurrent() : existingTrade.isRecurrent()) : true;
             recurrentCheck = new JCheckBox(LanguageStrings.get(LanguageStrings.TRADE_RECURRENT), initialRecurrent);
+            AssetStyles.styleCheckBox(recurrentCheck);
             recurrentCheck.setFocusable(false);
-            recurrentCheck.setForeground(AssetStyles.FONT_COLOR);
             recurrentCheck.setOpaque(false);
             configPanel.add(Box.createHorizontalStrut(20));
             configPanel.add(recurrentCheck);
             
             boolean initialBilateral = (existingTrade != null) ? (existingTrade.hasPendingUpdate() ? existingTrade.isPendingBilateral() : existingTrade.isBilateral()) : false;
             bilateralCheck = new JCheckBox(LanguageStrings.get(LanguageStrings.TRADE_BILATERAL), initialBilateral);
+            AssetStyles.styleCheckBox(bilateralCheck);
             bilateralCheck.setFocusable(false);
-            bilateralCheck.setForeground(AssetStyles.FONT_COLOR);
             bilateralCheck.setOpaque(false);
             bilateralCheck.setVisible(origin.hasUpgrade(GameUnlocks.ABILITY_BILATERAL_TRADE));
             bilateralCheck.addActionListener(e -> {
@@ -823,25 +834,30 @@ public class DynastyManagementDialog extends ZeroDialog {
 
             createBtn = new JButton(existingTrade == null ? LanguageStrings.get(LanguageStrings.TRADE_CONFIRM) : LanguageStrings.get(LanguageStrings.TRADE_UPDATE));
             createBtn.setFocusable(false);
-            createBtn.setFont(AssetStyles.FONT_BOLD);
             createBtn.addActionListener(e -> attemptCreate());
             
             optimizeBtn = new JButton(LanguageStrings.get(LanguageStrings.TRADE_OPTIMIZE));
             optimizeBtn.setFocusable(false);
-            optimizeBtn.setFont(AssetStyles.FONT_BOLD);
             optimizeBtn.setForeground(AssetStyles.FONT_COLOR_SUCCESS);
             optimizeBtn.setVisible(false);
             optimizeBtn.addActionListener(e -> performOptimization());
             
             JButton cancelBtn = new JButton(LanguageStrings.get(LanguageStrings.UI_CANCEL));
             cancelBtn.setFocusable(false);
-            cancelBtn.setFont(AssetStyles.FONT_BOLD);
             cancelBtn.addActionListener(e -> dispose());
             
             footerPanel.add(createBtn);
             footerPanel.add(optimizeBtn);
             footerPanel.add(cancelBtn);
             add(footerPanel, BorderLayout.SOUTH);
+            
+            AssetStyles.applyThemeToContainer(getContentPane());
+            AssetStyles.styleButton(createBtn);
+            AssetStyles.styleButton(optimizeBtn);
+            AssetStyles.styleButton(cancelBtn);
+            for (JButton compact : compactButtons) {
+                AssetStyles.styleCompactButton(compact);
+            }
             
             updateStats();
         }
@@ -1145,6 +1161,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 LanguageStrings.get(LanguageStrings.DYNASTY_SORT_AGE_NEW)
             });
             this.sortCombo.setFocusable(false);
+            AssetStyles.styleComboBox(this.sortCombo);
             this.sortCombo.addActionListener(e -> updateSorter());
             
             initUI();
@@ -1186,9 +1203,9 @@ public class DynastyManagementDialog extends ZeroDialog {
 
             if (showAutoBuild) {
                 defaultAutoBuildCheck = new JCheckBox(LanguageStrings.get(LanguageStrings.DYNASTY_DEFAULT_AUTO_BUILD));
+                AssetStyles.styleCheckBox(defaultAutoBuildCheck);
                 defaultAutoBuildCheck.setFocusable(false);
                 defaultAutoBuildCheck.setOpaque(false);
-                defaultAutoBuildCheck.setForeground(AssetStyles.FONT_COLOR);
                 defaultAutoBuildCheck.setToolTipText(LanguageStrings.get(LanguageStrings.DYNASTY_DEFAULT_AUTO_BUILD_TOOLTIP));
                 defaultAutoBuildCheck.setSelected(dynasty.isDefaultAutoBuildEnabled());
                 defaultAutoBuildCheck.addActionListener(e -> dynasty.setDefaultAutoBuildEnabled(defaultAutoBuildCheck.isSelected()));
@@ -1197,9 +1214,9 @@ public class DynastyManagementDialog extends ZeroDialog {
             
             if (showAutomation) {
                 defaultAutomationCheck = new JCheckBox(LanguageStrings.get(LanguageStrings.DYNASTY_DEFAULT_AUTOMATION));
+                AssetStyles.styleCheckBox(defaultAutomationCheck);
                 defaultAutomationCheck.setFocusable(false);
                 defaultAutomationCheck.setOpaque(false);
-                defaultAutomationCheck.setForeground(AssetStyles.FONT_COLOR);
                 defaultAutomationCheck.setToolTipText(LanguageStrings.get(LanguageStrings.DYNASTY_DEFAULT_AUTOMATION_TOOLTIP));
                 defaultAutomationCheck.setSelected(dynasty.isDefaultAutomationEnabled());
                 defaultAutomationCheck.addActionListener(e -> dynasty.setDefaultAutomationEnabled(defaultAutomationCheck.isSelected()));
@@ -1373,11 +1390,14 @@ public class DynastyManagementDialog extends ZeroDialog {
             btnPanel.setOpaque(false);
             editBtn.setFocusable(false);
             viewBtn.setFocusable(false);
+            AssetStyles.styleCompactButton(editBtn);
+            AssetStyles.styleCompactButton(viewBtn);
             btnPanel.add(editBtn);
             btnPanel.add(viewBtn);
             JPanel progressPanel = new JPanel(new BorderLayout());
             progressPanel.setOpaque(false);
             progressBar.setStringPainted(true);
+            AssetStyles.styleProgressBar(progressBar);
             statusLabel.setFont(AssetStyles.FONT_SMALL);
             statusLabel.setForeground(AssetStyles.FONT_COLOR);
             progressPanel.add(statusLabel, BorderLayout.NORTH);
@@ -1419,6 +1439,8 @@ public class DynastyManagementDialog extends ZeroDialog {
             btnPanel.setOpaque(false);
             editBtn.setFocusable(false);
             viewBtn.setFocusable(false);
+            AssetStyles.styleCompactButton(editBtn);
+            AssetStyles.styleCompactButton(viewBtn);
             editBtn.addActionListener(e -> { fireEditingStopped(); performEdit(currentColony); });
             viewBtn.addActionListener(e -> { fireEditingStopped(); performView(currentColony); });
             btnPanel.add(editBtn);
@@ -1426,6 +1448,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             JPanel progressPanel = new JPanel(new BorderLayout());
             progressPanel.setOpaque(false);
             progressBar.setStringPainted(true);
+            AssetStyles.styleProgressBar(progressBar);
             statusLabel.setFont(AssetStyles.FONT_SMALL);
             statusLabel.setForeground(AssetStyles.FONT_COLOR);
             progressPanel.add(statusLabel, BorderLayout.NORTH);

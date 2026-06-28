@@ -1,7 +1,7 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 import com.grimidk.formicempire.classes.interfaces.MainFrame;
 
@@ -37,8 +37,8 @@ public abstract class ZeroDialog extends JDialog {
         southPanel.setBackground(AssetStyles.UI_BG_SECONDARY);
         
         closeButton = new JButton(LanguageStrings.get(LanguageStrings.UI_CLOSE));
-        closeButton.setFont(AssetStyles.FONT_NORMAL);
         closeButton.setFocusable(false);
+        AssetStyles.styleButton(closeButton);
         closeButton.addActionListener(e -> dispose());
         southPanel.add(closeButton);
         add(southPanel, BorderLayout.SOUTH);
@@ -55,6 +55,14 @@ public abstract class ZeroDialog extends JDialog {
     public void refreshTranslations() {
         setTitle(LanguageStrings.get(titleKey));
         closeButton.setText(LanguageStrings.get(LanguageStrings.UI_CLOSE));
+        refreshDialog();
+    }
+
+    public void refreshTheme() {
+        getContentPane().setBackground(AssetStyles.UI_BG_PRIMARY);
+        southPanel.setBackground(AssetStyles.UI_BG_SECONDARY);
+        AssetStyles.styleButton(closeButton);
+        AssetStyles.applyThemeToContainer(getContentPane());
         refreshDialog();
     }
 
