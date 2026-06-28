@@ -301,7 +301,7 @@ public class ColonyBugHandlingService {
         if (colony == null || type == null) {
             return;
         }
-        int entityCount = GameConstants.capVisibleSprites(targetCount);
+        int entityCount = GameConstants.capPenNonAntSprites(targetCount);
         List<Bug> bugs = colony.getBugs();
         long current = bugs.stream().filter(b -> b.getBugType() == type).count();
         if (current < entityCount) {

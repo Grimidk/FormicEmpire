@@ -70,6 +70,9 @@ public class GameAreaPanel extends ZeroGamePanel {
     public Rectangle transitRoomBounds;
     public Rectangle insectPenBounds;
 
+    /** Shared overworld draw budget for corpses and pet bugs in yards (reset each frame). */
+    private int overworldPenNonAntSpritesRemaining;
+
     public GameAreaPanel() {
         super(null);
         setOpaque(true);
@@ -343,6 +346,7 @@ public class GameAreaPanel extends ZeroGamePanel {
                 drawUnderworldRoomDecorationsOverlay(g2d);
             } else {
                 g2d.translate(contentPadX, contentPadY);
+                overworldPenNonAntSpritesRemaining = GameConstants.MAX_PEN_NON_ANT_SPRITES;
                 drawOverworldStructure(g2d);
                 drawResourceSources(g2d);
                 drawAnts(g2d);
@@ -479,9 +483,12 @@ public class GameAreaPanel extends ZeroGamePanel {
                 boolean drawDeadPile = !ViewportPhysicsLod.isLodActive(lodViewportRect)
                     || ViewportPhysicsLod.expandViewport(lodViewportRect, ViewportPhysicsLod.MARGIN_PX).intersects(deadDrawArea);
 
-                if (drawDeadPile) {
-                    int deadSprites = GameConstants.capVisibleSprites(colony.getDeadAnts().size());
+                if (drawDeadPile && overworldPenNonAntSpritesRemaining > 0) {
+                    int deadSprites = Math.min(
+                            GameConstants.capPenNonAntSprites(colony.getDeadAnts().size()),
+                            overworldPenNonAntSpritesRemaining);
                     drawStaticItemsLocal(g2d, deadBodyImg, safeX, safeY, safeW, safeH, deadSprites);
+                    overworldPenNonAntSpritesRemaining -= deadSprites;
                 }
             }
 
@@ -770,12 +777,11 @@ public class GameAreaPanel extends ZeroGamePanel {
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
+        boolean overworld = currentDimension == WorldSpaces.OVERWORLD;
         int aphidSprites = 0;
         int symbioticMiteSprites = 0;
         int dermestidSprites = 0;
-        int penSprites = 0;
-        final int spriteCap = GameConstants.MAX_VISIBLE_SPRITE_COUNT;
-        Rectangle pen = currentDimension == WorldSpaces.OVERWORLD ? insectPenBounds : null;
+        final int typeSpriteCap = GameConstants.MAX_PEN_NON_ANT_SPRITES;
 
         for (Bug bug : colony.getBugs()) {
             if (bug.getDimension() != currentDimension) {
@@ -796,19 +802,20 @@ public class GameAreaPanel extends ZeroGamePanel {
             }
 
             BugType type = bug.getBugType();
-            if (type == GameConstants.TYPE_APHID && aphidSprites >= spriteCap) {
+            boolean inOverworldPen = overworld && isBugInOverworldPen(bug, w, h);
+            if (inOverworldPen && overworldPenNonAntSpritesRemaining <= 0) {
                 continue;
             }
-            if (type == GameConstants.TYPE_SYMBIOTIC_MITE && symbioticMiteSprites >= spriteCap) {
-                continue;
-            }
-            if (type == GameConstants.TYPE_DERMESTID && dermestidSprites >= spriteCap) {
-                continue;
-            }
-
-            boolean inPen = pen != null && isBugCenterInRect(bug, w, h, pen);
-            if (inPen && penSprites >= spriteCap) {
-                continue;
+            if (!overworld) {
+                if (type == GameConstants.TYPE_APHID && aphidSprites >= typeSpriteCap) {
+                    continue;
+                }
+                if (type == GameConstants.TYPE_SYMBIOTIC_MITE && symbioticMiteSprites >= typeSpriteCap) {
+                    continue;
+                }
+                if (type == GameConstants.TYPE_DERMESTID && dermestidSprites >= typeSpriteCap) {
+                    continue;
+                }
             }
 
             AffineTransform oldTransform = g2d.getTransform();
@@ -820,20 +827,30 @@ public class GameAreaPanel extends ZeroGamePanel {
             g2d.drawImage(sprite, -w / 2, -h / 2, this);
             g2d.setTransform(oldTransform);
 
-            if (type == GameConstants.TYPE_APHID) {
-                aphidSprites++;
-            } else if (type == GameConstants.TYPE_SYMBIOTIC_MITE) {
-                symbioticMiteSprites++;
-            } else if (type == GameConstants.TYPE_DERMESTID) {
-                dermestidSprites++;
-            }
-            if (inPen) {
-                penSprites++;
+            if (inOverworldPen) {
+                overworldPenNonAntSpritesRemaining--;
+            } else if (!overworld) {
+                if (type == GameConstants.TYPE_APHID) {
+                    aphidSprites++;
+                } else if (type == GameConstants.TYPE_SYMBIOTIC_MITE) {
+                    symbioticMiteSprites++;
+                } else if (type == GameConstants.TYPE_DERMESTID) {
+                    dermestidSprites++;
+                }
             }
         }
     }
 
+    private boolean isBugInOverworldPen(Bug bug, int w, int h) {
+        return isBugCenterInRect(bug, w, h, rancherYardBounds)
+                || isBugCenterInRect(bug, w, h, graverYardBounds)
+                || isBugCenterInRect(bug, w, h, insectPenBounds);
+    }
+
     private static boolean isBugCenterInRect(Bug bug, int w, int h, Rectangle rect) {
+        if (rect == null) {
+            return false;
+        }
         int cx = bug.getX() + w / 2;
         int cy = bug.getY() + h / 2;
         return rect.contains(cx, cy);

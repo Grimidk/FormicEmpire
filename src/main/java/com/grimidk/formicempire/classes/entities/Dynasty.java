@@ -209,9 +209,7 @@ public class Dynasty {
     
     private void rankUp() {
         int total = this.statService.getTotalPopulation(this);
-        
-        ColonyRank oldRank = this.rank;
-        
+                
         if (total >= GameConstants.RANK_GIGA.getPopulation()) this.rank = GameConstants.RANK_GIGA;
         else if (total >= GameConstants.RANK_SUPREME.getPopulation()) this.rank = GameConstants.RANK_SUPREME;
         else if (total >= GameConstants.RANK_ULTIMATE.getPopulation()) this.rank = GameConstants.RANK_ULTIMATE;

@@ -1,7 +1,6 @@
 package com.grimidk.formicempire.classes.infrasctructure.repositories;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Random;
 
 public final class GameRandom {

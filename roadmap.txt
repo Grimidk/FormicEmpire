@@ -25,8 +25,7 @@ To Fix (By decreasing priority) :
 	(none right now)
 
 	Low:
-	dead ant list memory cap (trim or count-only storage if body piles grow very large)
-	logistic physics use dimension 2
+	logistic physics use dimension 2 and tunnel sprite
 
 	Can't reproduce:
 	(none right now)
@@ -81,6 +80,7 @@ Needed for launch (v1.0) (Launch Version):
 Post launch (v1.1) (Improvements Update):
     engine clean up for reusability (Core Engine Package)
 	editable stat panel 
+	logistic lines in map with tunnels and progress and method
 	world editing (size, difficulty, islands)
 	choosing starting specie 
 	console and commands for debugging (to include in core)

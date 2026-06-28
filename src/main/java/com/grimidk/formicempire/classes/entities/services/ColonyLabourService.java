@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
@@ -668,7 +667,6 @@ public class ColonyLabourService {
         
         List<Ant> deadAnts = colony.getDeadAnts();
         List<Ant> gravers = getWorkingAnts(colony, GameConstants.ROLE_GRAVER);
-        int graverCount = gravers.size();
         int potentialCompost = (int) colony.getStatsService().getGravingRate(colony) * gravers.size();
         
         if (potentialCompost == 0 || deadAnts.isEmpty()) return;

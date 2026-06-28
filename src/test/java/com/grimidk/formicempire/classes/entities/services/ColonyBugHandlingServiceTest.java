@@ -258,11 +258,11 @@ class ColonyBugHandlingServiceTest {
         assertEquals(5_000, colony.getAphids());
         assertEquals(5_000, colony.getSymbioticMites());
         assertEquals(5_000, colony.getDermestids());
-        assertEquals(GameConstants.MAX_VISIBLE_SPRITE_COUNT,
+        assertEquals(GameConstants.MAX_PEN_NON_ANT_SPRITES,
                 colony.getBugs().stream().filter(b -> b.getBugType() == GameConstants.TYPE_APHID).count());
-        assertEquals(GameConstants.MAX_VISIBLE_SPRITE_COUNT,
+        assertEquals(GameConstants.MAX_PEN_NON_ANT_SPRITES,
                 colony.getBugs().stream().filter(b -> b.getBugType() == GameConstants.TYPE_SYMBIOTIC_MITE).count());
-        assertEquals(GameConstants.MAX_VISIBLE_SPRITE_COUNT,
+        assertEquals(GameConstants.MAX_PEN_NON_ANT_SPRITES,
                 colony.getBugs().stream().filter(b -> b.getBugType() == GameConstants.TYPE_DERMESTID).count());
     }
 
