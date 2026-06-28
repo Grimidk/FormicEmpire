@@ -131,7 +131,7 @@ public class GamePanel extends ZeroGamePanel {
         });
 
         setupOverworldPanAndSpring();
-        setupOverworldShiftWheelHorizontalScroll();
+        setupGameAreaWheelScroll();
         setupOverworldIdleRecenter();
     }
 
@@ -230,20 +230,19 @@ public class GamePanel extends ZeroGamePanel {
         }
     }
 
-    private void setupOverworldShiftWheelHorizontalScroll() {
-        gameScrollPane.addMouseWheelListener(new MouseWheelListener() {
-            @Override
-            public void mouseWheelMoved(MouseWheelEvent e) {
-                if (engineStarted && gameAreaPanel != null
-                        && gameAreaPanel.getCurrentDimension() == WorldSpaces.OVERWORLD) {
-                    noteOverworldUserPan();
-                }
-                if (!engineStarted || gameAreaPanel == null) {
-                    return;
-                }
-                if (gameAreaPanel.getCurrentDimension() != WorldSpaces.OVERWORLD || !e.isShiftDown()) {
-                    return;
-                }
+    private void setupGameAreaWheelScroll() {
+        gameScrollPane.setWheelScrollingEnabled(false);
+        MouseWheelListener wheelListener = this::handleGameAreaWheel;
+        gameAreaPanel.addMouseWheelListener(wheelListener);
+    }
+
+    private void handleGameAreaWheel(MouseWheelEvent e) {
+        if (!engineStarted || gameAreaPanel == null || gameScrollPane == null) {
+            return;
+        }
+        if (gameAreaPanel.getCurrentDimension() == WorldSpaces.OVERWORLD) {
+            noteOverworldUserPan();
+            if (e.isShiftDown()) {
                 JViewport vp = gameScrollPane.getViewport();
                 Point p = vp.getViewPosition();
                 int increment = gameScrollPane.getHorizontalScrollBar().getUnitIncrement();
@@ -251,8 +250,15 @@ public class GamePanel extends ZeroGamePanel {
                 clampOverworldViewPosition(vp, p);
                 vp.setViewPosition(p);
                 e.consume();
+                return;
             }
-        });
+        }
+        JScrollBar verticalBar = gameScrollPane.getVerticalScrollBar();
+        int next = verticalBar.getValue() + e.getUnitsToScroll() * verticalBar.getUnitIncrement();
+        int max = Math.max(verticalBar.getMinimum(),
+                verticalBar.getMaximum() - verticalBar.getVisibleAmount() + 1);
+        verticalBar.setValue(Math.max(verticalBar.getMinimum(), Math.min(max, next)));
+        e.consume();
     }
 
     private void setupOverworldPanAndSpring() {
@@ -463,8 +469,14 @@ public class GamePanel extends ZeroGamePanel {
                         }
                     });
                 } else {
-                    gameScrollPane.getVerticalScrollBar().setValue(0);
-                    gameAreaPanel.setPaintViewportRect(gameScrollPane.getViewport().getViewRect());
+                    SwingUtilities.invokeLater(() -> {
+                        updateGameAreaSize();
+                        if (gameScrollPane != null && gameAreaPanel != null) {
+                            gameScrollPane.getVerticalScrollBar().setValue(0);
+                            gameAreaPanel.setPaintViewportRect(gameScrollPane.getViewport().getViewRect());
+                            gameAreaPanel.repaint();
+                        }
+                    });
                 }
             }
         };
@@ -1149,6 +1161,9 @@ public class GamePanel extends ZeroGamePanel {
         Colony colony = world != null && world.getActiveHex() != null ? world.getActiveHex().getColony() : null;
 
         gameAreaPanel.setColony(colony);
+        if (colony != null && gameAreaPanel.getCurrentDimension() == WorldSpaces.UNDERWORLD) {
+            updateGameAreaSize();
+        }
         updateStaticWorldInfo();
 
         if (world == null) {

@@ -51,6 +51,30 @@ public class ColonySpatialService {
         return new NeoPoint(x, y, WorldSpaces.OVERWORLD);
     }
 
+    /** Off-map portal to the right of the logistics / transit chamber (underworld). */
+    public NeoPoint getTransitPortal(Colony colony) {
+        java.awt.Rectangle transit = colony.getTransitBounds();
+        if (transit != null) {
+            return new NeoPoint(transit.x + transit.width + 64, (int) transit.getCenterY(), WorldSpaces.UNDERWORLD);
+        }
+        int hallX = getHallwayCenterX(colony) + (ColonySpatialLayout.HALL_WIDTH / 2);
+        int rowY = 512;
+        return new NeoPoint(
+                hallX + ColonySpatialLayout.ROOM_SIZE + 64,
+                rowY + (ColonySpatialLayout.ROOM_SIZE / 2),
+                WorldSpaces.UNDERWORLD);
+    }
+
+    /** Interior staging point inside the logistics / transit chamber. */
+    public NeoPoint getTransitStagingPoint(Colony colony) {
+        java.awt.Rectangle transit = colony.getTransitBounds();
+        if (transit != null) {
+            return new NeoPoint((int) transit.getCenterX(), (int) transit.getCenterY(), WorldSpaces.UNDERWORLD);
+        }
+        NeoPoint portal = getTransitPortal(colony);
+        return new NeoPoint(portal.x - 96, portal.y, WorldSpaces.UNDERWORLD);
+    }
+
     public NeoPoint getResolvedPoint(Colony colony, Room room, String pointType) {
         if (room == null) {
             return null;
@@ -67,6 +91,8 @@ public class ColonySpatialService {
             dynamicBounds = colony.getRancherBounds();
         } else if (room.getId() == 104) {
             dynamicBounds = colony.getBreederBounds();
+        } else if (room.getId() == 105) {
+            dynamicBounds = colony.getTransitBounds();
         } else if (room.getId() == 999) {
             dynamicBounds = colony.getPhysicsService().getRoomBounds(colony, WorldSpaces.CONSTRUCTION_SITE);
         }

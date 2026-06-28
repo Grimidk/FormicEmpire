@@ -8,6 +8,7 @@ import java.util.List;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.misc.TradeMethod;
+import com.grimidk.formicempire.classes.entities.services.ColonyConvoyTransitService;
 import com.grimidk.formicempire.classes.entities.services.ColonyResourceService;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
@@ -29,6 +30,8 @@ public class Trade {
     private int totalHours;
     private int remainingHours;
     private boolean isReturning;
+
+    private double tunnelBearingRadians;
 
     private Map<ResourceType, Double> pendingLoad;
     private Map<ResourceType, Double> pendingReturnLoad;
@@ -123,6 +126,8 @@ public class Trade {
         for (Map.Entry<ResourceType, Double> entry : load.entrySet()) {
             resService.consumeResource(originColony, entry.getKey(), entry.getValue());
         }
+
+        originColony.getConvoyTransitService().beginConvoyTransit(originColony, this);
         
         this.isReturning = false;
         this.remainingHours = this.totalHours;
@@ -141,6 +146,10 @@ public class Trade {
                 }
                 isReturning = true;
                 remainingHours = totalHours;
+                Colony originColony = origin.getColony();
+                if (originColony != null) {
+                    originColony.getConvoyTransitService().onReturnLegStarted(originColony, this);
+                }
             } else {
                 if (isBilateral) {
                     deliverReturnLoad();
@@ -241,6 +250,10 @@ public class Trade {
     }
 
     private void releaseAnts() {
+        Colony originColony = origin.getColony();
+        if (originColony != null) {
+            originColony.getConvoyTransitService().restoreConvoyAnts(originColony, this);
+        }
         for (Ant ant : antsOnTrip) {
             ant.setOnTrade(false);
         }
@@ -341,6 +354,22 @@ public class Trade {
 
     public boolean isActive() {
         return isActive;
+    }
+
+    public List<Ant> getAntsOnTrip() {
+        return antsOnTrip;
+    }
+
+    public boolean containsAnt(Ant ant) {
+        return ant != null && antsOnTrip.contains(ant);
+    }
+
+    public double getTunnelBearingRadians() {
+        return tunnelBearingRadians;
+    }
+
+    public void initializeTunnelBearing(boolean returning) {
+        this.tunnelBearingRadians = ColonyConvoyTransitService.bearingFromHexes(origin, destination, returning);
     }
 
     public void setActive(boolean isActive) {

@@ -116,6 +116,7 @@ public class Colony {
     private transient ColonyResourceService resourceService;
     private transient ColonyStarterService starterService;
     private transient ColonyBugHandlingService bugHandlingService;
+    private transient ColonyConvoyTransitService convoyTransitService;
 
     // --- Service Initializer ---
     private void initializeServices() {
@@ -133,6 +134,7 @@ public class Colony {
         this.resourceService = new ColonyResourceService();
         this.starterService = ColonyStarterService.shared();
         this.bugHandlingService = new ColonyBugHandlingService();
+        this.convoyTransitService = new ColonyConvoyTransitService();
     }
 
     // --- Initialization Methods ---
@@ -591,6 +593,10 @@ public class Colony {
         return bugHandlingService;
     }
 
+    public ColonyConvoyTransitService getConvoyTransitService() {
+        return convoyTransitService;
+    }
+
     public int getParasiteAnts() { return parasiteAnts; }
     public void setParasiteAnts(int count) {
         getBugHandlingService().setParasiteAntCount(this, count);
@@ -863,6 +869,7 @@ public class Colony {
             return;
         }
         physicsStepSequence++;
+        convoyTransitService.runConvoyPhysics(this);
         physicsService.runPhysics(this, activeDimension, viewportPanelBounds, physicsStepSequence);
     }
 

@@ -12,7 +12,8 @@ public final class WorldSpaces {
     // --- Dimensions ---
     public static final Dimension OVERWORLD = new Dimension(0, "Overworld", true);
     public static final Dimension UNDERWORLD = new Dimension(1, "Underworld", true);
-    public static final Dimension MAINWORLD = new Dimension(2, "Mainworld", false);
+    /** Convoy transit space; not player-viewable ({@code isActiveAble = false}). */
+    public static final Dimension TUNNEL_WORLD = new Dimension(2, "Tunnel World", false);
 
     private static final int ROOM_SIZE = 256;
     private static final int HALL_WIDTH = 128;

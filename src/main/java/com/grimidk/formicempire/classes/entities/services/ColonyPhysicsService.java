@@ -44,6 +44,9 @@ public class ColonyPhysicsService {
                     if (!ant.isAlive()) {
                         continue;
                     }
+                    if (ant.isOnTrade()) {
+                        continue;
+                    }
 
                     boolean sameDim = ant.getDimension() == activeDimension;
                     boolean lodSameDim = ViewportPhysicsLod.isLodActive(viewportBounds) && sameDim;

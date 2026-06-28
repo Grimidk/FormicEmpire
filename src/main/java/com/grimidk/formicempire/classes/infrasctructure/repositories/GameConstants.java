@@ -145,6 +145,10 @@ public final class GameConstants {
     public static int capPenNonAntSprites(int count) {
         return Math.min(Math.max(0, count), MAX_PEN_NON_ANT_SPRITES);
     }
+
+    /** Cosmetic tunnel-travel distance per convoy leg (not tied to {@code Trade} hours yet). */
+    public static final int CONVOY_TUNNEL_LEG_DISTANCE = 10_000;
+    public static final int CONVOY_PORTAL_APPROACH_PX = 36;
     public static final int SYMBIOTIC_MITE_PARASITIC_MITE_KILL_PER_DAY = 5;
     public static final int SYMBIOTIC_MITE_PARASITIC_MITE_KILL_UPGRADED = 12;
 

@@ -285,27 +285,37 @@ public class GameAreaPanel extends ZeroGamePanel {
         } else {
             int requiredHeight = calculateUnderworldHeight();
             int finalHeight = Math.max(requiredHeight, viewportHeight);
-            
-            if (getWidth() != viewportWidth || getHeight() != finalHeight) {
-                setPreferredSize(new java.awt.Dimension(viewportWidth, finalHeight));
+            java.awt.Dimension next = new java.awt.Dimension(viewportWidth, finalHeight);
+            if (!next.equals(getPreferredSize())) {
+                setPreferredSize(next);
                 revalidate();
             }
         }
     }
 
     private int calculateUnderworldHeight() {
-        int maxY = 512; 
-        
-        int roomHeight = (basicRoomImg != null) ? basicRoomImg.getHeight(this) : 200;
-        
-        boolean hasBreeder = colony != null && colony.hasUpgrade(GameUnlocks.ROLE_BREEDER);
-        boolean hasTunnels = colony != null && colony.getDynasty() != null && !colony.getDynasty().getTunnels().isEmpty();
-
-        if (hasBreeder || hasTunnels) {
-            maxY = 512 + 256;
+        UnderworldRoomLayout layout = resolveUnderworldRoomLayout();
+        if (layout == null) {
+            return ColonySpatialLayout.ANCHOR_HEIGHT;
         }
-        
-        return maxY + roomHeight + 50;
+
+        int bottom = layout.roomYRow2 + layout.roomH;
+        if (colony != null) {
+            boolean hasBreeder = colony.hasUpgrade(GameUnlocks.ROLE_BREEDER);
+            boolean showLogisticsChamber = true;
+            if (hasBreeder || showLogisticsChamber) {
+                int row3Y = layout.hallY + 512;
+                int row3H = layout.roomH;
+                if (middleHallwayImg != null) {
+                    row3H = Math.max(row3H, middleHallwayImg.getHeight(this));
+                }
+                if (showLogisticsChamber && doubleRoomImg != null) {
+                    row3H = Math.max(row3H, doubleRoomImg.getHeight(this));
+                }
+                bottom = row3Y + row3H;
+            }
+        }
+        return bottom + 50;
     }
 
     @Override
@@ -551,7 +561,7 @@ public class GameAreaPanel extends ZeroGamePanel {
     }
 
     private UnderworldRoomLayout resolveUnderworldRoomLayout() {
-        if (firstHallwayImg == null || basicRoomImg == null || middleHallwayImg == null || doubleRoomImg == null) {
+        if (firstHallwayImg == null || basicRoomImg == null || middleHallwayImg == null) {
             return null;
         }
         int topMargin = 0;
@@ -598,7 +608,9 @@ public class GameAreaPanel extends ZeroGamePanel {
     }
 
     private void drawUnderworldStructure(Graphics2D g2d) {
-        if (firstHallwayImg == null || basicRoomImg == null || middleHallwayImg == null || doubleRoomImg == null) return;
+        if (firstHallwayImg == null || basicRoomImg == null || middleHallwayImg == null) {
+            return;
+        }
 
         UnderworldRoomLayout L = resolveUnderworldRoomLayout();
         if (L == null) {
@@ -649,11 +661,11 @@ public class GameAreaPanel extends ZeroGamePanel {
         
         g2d.setTransform(old2);
         
-        // --- ROW 3 (Floor 3) ---
+        // --- ROW 3 (Floor 3) — logistics portal row; doubleRoom is logistics only ---
         boolean hasBreeder = colony.hasUpgrade(GameUnlocks.ROLE_BREEDER);
-        boolean hasTunnels = colony.getDynasty() != null && !colony.getDynasty().getTunnels().isEmpty();
+        boolean showLogisticsChamber = true;
 
-        if (hasBreeder || hasTunnels) {
+        if (hasBreeder || showLogisticsChamber) {
             int thirdRowYOffset = 512;
             int roomY3 = hallY + thirdRowYOffset;
             
@@ -666,7 +678,7 @@ public class GameAreaPanel extends ZeroGamePanel {
                 breederRoomBounds = null;
             }
 
-            if (hasTunnels) {
+            if (showLogisticsChamber && doubleRoomImg != null) {
                 int dRoomW = doubleRoomImg.getWidth(this);
                 int dRoomH = doubleRoomImg.getHeight(this);
                 
@@ -716,6 +728,7 @@ public class GameAreaPanel extends ZeroGamePanel {
             List<Ant> ants = colony.getAntsByType(type);
             for (Ant ant : ants) {
                 if (ant.getDimension() != currentDimension) continue;
+                if (ant.getDimension() == WorldSpaces.TUNNEL_WORLD) continue;
 
                 if (!ViewportPhysicsLod.antIntersectsViewport(lodViewportRect, ant.getX(), ant.getY(), w, h)) {
                     continue;
