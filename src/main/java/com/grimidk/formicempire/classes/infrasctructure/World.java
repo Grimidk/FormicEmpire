@@ -692,7 +692,6 @@ public class World {
         }
 
         if (engine != null && engine.getTradeManager() != null) {
-            engine.getTradeManager().clearActiveTrades();
             if (savefile.getTrades() != null) {
             for (Savefile.SavedTrade st : savefile.getTrades()) {
                 Hex hO = getHexAt(st.qOrigin, st.rOrigin);

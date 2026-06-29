@@ -331,14 +331,15 @@ public class TriggerManager {
 
         if (needsAlert) {
             playerColony.unlockUpgrade(GameUnlocks.ABILITY_PARASITIC_MITE_ALERT);
-        }
-        if (needsSymbioticMiteCatch) {
+            if (needsSymbioticMiteCatch) {
+                playerColony.unlockUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE);
+            }
+            fireLocalizedTrigger(GameUnlocks.ABILITY_PARASITIC_MITE_ALERT,
+                LanguageStrings.TRIGGER_PARASITIC_MITE_TITLE,
+                LanguageStrings.TRIGGER_PARASITIC_MITE_MSG);
+        } else {
             playerColony.unlockUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE);
         }
-
-        fireLocalizedTrigger(GameUnlocks.ABILITY_PARASITIC_MITE_ALERT,
-            LanguageStrings.TRIGGER_PARASITIC_MITE_TITLE,
-            LanguageStrings.TRIGGER_PARASITIC_MITE_MSG);
     }
 
     private void checkMassFlightUnlock() {

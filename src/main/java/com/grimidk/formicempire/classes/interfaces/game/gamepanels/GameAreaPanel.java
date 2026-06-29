@@ -97,7 +97,7 @@ public class GameAreaPanel extends ZeroGamePanel {
         biomeTextureCache.put(GameConstants.BIOME_SWAMP.getId(), loadImage("backgrounds/biomes/SwampTile.png"));
         biomeTextureCache.put(GameConstants.BIOME_TUNDRA.getId(), loadImage("backgrounds/biomes/TundraTile.png"));
         biomeTextureCache.put(GameConstants.BIOME_TAIGA.getId(), loadImage("backgrounds/biomes/TaigaTile.png"));
-        biomeTextureCache.put(GameConstants.BIOME_DESERT.getId(), loadImage("backgrounds/biomes/DessertTile.png"));
+        biomeTextureCache.put(GameConstants.BIOME_DESERT.getId(), loadImage("backgrounds/biomes/desertTile.png"));
         biomeTextureCache.put(GameConstants.BIOME_URBAN.getId(), loadImage("backgrounds/biomes/UrbanTile.png"));
         biomeTextureCache.put(GameConstants.BIOME_MOUNTAIN.getId(), loadImage("backgrounds/biomes/MountainTile.png"));
         biomeTextureCache.put(GameConstants.BIOME_VOLCANIC.getId(), loadImage("backgrounds/biomes/VolcanicTile.png"));

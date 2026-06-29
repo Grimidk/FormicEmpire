@@ -736,7 +736,7 @@ public class GamePanel extends ZeroGamePanel {
     private void showStatsDialog() {
         Engine engine = frame.getEngine();
         Colony colony = getColonyFromEngine(engine);
-        if (colony == null) return;
+        if (colony == null || colony.getDynasty() == null) return;
 
         if (statsDialog != null && statsDialog.isShowing()) {
             statsDialog.dispose();
@@ -1028,6 +1028,7 @@ public class GamePanel extends ZeroGamePanel {
                 } catch (Exception e) {
                     e.printStackTrace();
                     statusLabel.setText(LanguageStrings.get(LanguageStrings.UI_ERROR_LOADING));
+                    cleanupSession();
                 }
             }
         };

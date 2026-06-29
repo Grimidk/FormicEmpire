@@ -19,6 +19,7 @@ import javax.swing.JSeparator;
 import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
+import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import com.grimidk.formicempire.classes.interfaces.ui.theme.UiColorUtils;
 import com.grimidk.formicempire.classes.interfaces.ui.theme.UiFonts;
@@ -35,6 +36,7 @@ import com.grimidk.formicempire.classes.interfaces.ui.styles.UiScrollBarStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.styles.UiSliderStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.styles.UiSpinnerStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.styles.UiTabbedPaneStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.styles.UiTableBooleanStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiResourceLoader;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
@@ -247,6 +249,10 @@ public class AssetStyles {
 
     public static void styleTabbedPane(JTabbedPane tabbedPane) {
         UiTabbedPaneStyles.style(tabbedPane);
+    }
+
+    public static void styleTableBooleanColumn(JTable table, int columnIndex) {
+        UiTableBooleanStyles.applyBooleanColumn(table, columnIndex);
     }
 
     public static void applyGlobalStyles() {

@@ -366,8 +366,15 @@ public class Dynasty {
     public void setRank(ColonyRank rank) { this.rank = rank; }
 
     public int getResearchPoints() { return researchPoints; }
-    public void setResearchPoints(int researchPoints) { this.researchPoints = researchPoints; }
-    public void addResearchPoints(int amount) { this.researchPoints += amount; }
+    public void setResearchPoints(int researchPoints) {
+        this.researchPoints = researchPoints;
+        invalidateAffordableAlertCaches();
+    }
+
+    public void addResearchPoints(int amount) {
+        this.researchPoints += amount;
+        invalidateAffordableAlertCaches();
+    }
     
     public int getTotalNuptialFlights() { return totalNuptialFlights; }
 
@@ -382,7 +389,16 @@ public class Dynasty {
 
     public Set<Upgrade> getUnlockedUpgrades() { return unlockedUpgrades; }
     public boolean hasUpgrade(Upgrade upgrade) { return unlockedUpgrades.contains(upgrade); }
-    public void unlockUpgrade(Upgrade upgrade) { unlockedUpgrades.add(upgrade); }
+    public void unlockUpgrade(Upgrade upgrade) {
+        unlockedUpgrades.add(upgrade);
+        invalidateAffordableAlertCaches();
+    }
+
+    private void invalidateAffordableAlertCaches() {
+        for (Colony colony : colonies) {
+            colony.invalidateAffordableAlertCache();
+        }
+    }
 
     public List<Colony> getColonies() { return colonies; }
     public List<Integer> getAbsorbedDynastyIds() { return absorbedDynastyIds; }

@@ -387,9 +387,8 @@ public class ColonyLabourService {
                 }
 
                 int newId = world.getNextColonyId();
-                String newName = colony.getName() + " " + newId;
-                
-                Colony satellite = new Colony(newId, newName, colony.isPlayer());
+
+                Colony satellite = new Colony(newId, "", colony.isPlayer());
                 satellite.setDynasty(dynasty); 
                 satellite.setActive(false); 
                 satellite.setAutomationEnabled(!colony.isPlayer()); 

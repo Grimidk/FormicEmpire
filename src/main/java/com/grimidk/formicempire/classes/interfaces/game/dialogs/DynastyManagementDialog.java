@@ -1302,8 +1302,14 @@ public class DynastyManagementDialog extends ZeroDialog {
             table.getColumnModel().getColumn(5).setCellRenderer(paddedRenderer);
             table.getColumnModel().getColumn(6).setCellRenderer(new BiomeRenderer());
 
-            if (showAutoBuild) table.getColumnModel().getColumn(autoBuildCol).setMaxWidth(100);
-            if (showAutomation) table.getColumnModel().getColumn(automationCol).setMaxWidth(100);
+            if (showAutoBuild) {
+                table.getColumnModel().getColumn(autoBuildCol).setMaxWidth(100);
+                AssetStyles.styleTableBooleanColumn(table, autoBuildCol);
+            }
+            if (showAutomation) {
+                table.getColumnModel().getColumn(automationCol).setMaxWidth(100);
+                AssetStyles.styleTableBooleanColumn(table, automationCol);
+            }
 
             table.getColumnModel().getColumn(actionCol).setMinWidth(220);
             table.getColumnModel().getColumn(actionCol).setPreferredWidth(220);
@@ -1320,6 +1326,9 @@ public class DynastyManagementDialog extends ZeroDialog {
 
         @Override
         public void updateData() {
+            if (table.isEditing()) {
+                return;
+            }
             int selectedRow = table.getSelectedRow();
             model.setRowCount(0);
             displayedColonies.clear();

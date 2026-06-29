@@ -55,6 +55,9 @@ public class Colony {
     
     private Map<AntRole, Integer> assignedRoleCounts;
     private Map<AntRole, Integer> activeRoleCountCache;
+    private Boolean affordableResearchCached;
+    private Building affordableBuildingCached;
+    private boolean affordableBuildingCacheValid;
     private final Set<Building> buildings;
 
     // --- Resource Data ---
@@ -434,7 +437,9 @@ public class Colony {
         return dynasty != null && dynasty.hasUpgrade(upgrade);
     }
     public void unlockUpgrade(Upgrade upgrade) {
-        if (dynasty != null) dynasty.unlockUpgrade(upgrade);
+        if (dynasty != null) {
+            dynasty.unlockUpgrade(upgrade);
+        }
     }
     public Set<Upgrade> getUnlockedUpgrades() {
         return dynasty != null ? dynasty.getUnlockedUpgrades() : new HashSet<>();
@@ -498,10 +503,16 @@ public class Colony {
     }
 
     public boolean hasBuilding(Building building) { return this.buildings.contains(building); }
-    public void unlockBuilding(Building building) { this.buildings.add(building); }
+    public void unlockBuilding(Building building) {
+        this.buildings.add(building);
+        invalidateAffordableAlertCache();
+    }
     public Set<Building> getUnlockedBuildings() { return this.buildings; }
     public Building getCurrentBuildingProject() { return currentBuildingProject; }
-    public void setCurrentBuildingProject(Building b) { this.currentBuildingProject = b; }
+    public void setCurrentBuildingProject(Building b) {
+        this.currentBuildingProject = b;
+        invalidateAffordableAlertCache();
+    }
     public Tunnel getCurrentTunnelProject() { return currentTunnelProject; }
     public void setCurrentTunnelProject(Tunnel t) { this.currentTunnelProject = t; }
     public double getBuildingProgressHours() { return buildingProgressHours; }
@@ -515,8 +526,8 @@ public class Colony {
         
         resourceService.consumeResource(this, GameConstants.RESOURCE_ROCK, building.getMineralCost());
         resourceService.consumeResource(this, GameConstants.RESOURCE_RESIN, building.getResinCost());
-        
-        this.currentBuildingProject = building;
+
+        setCurrentBuildingProject(building);
         this.buildingProgressHours = 0.0;
         return true;
     }
@@ -553,11 +564,13 @@ public class Colony {
     public void setSyrups(double syrups) { 
         this.syrups = Math.max(0, syrups); 
     }
-    public void setResins(double resins) { 
-        this.resins = Math.max(0, resins); 
+    public void setResins(double resins) {
+        this.resins = Math.max(0, resins);
+        invalidateAffordableAlertCache();
     }
-    public void setMinerals(double minerals) { 
-        this.minerals = Math.max(0, minerals); 
+    public void setMinerals(double minerals) {
+        this.minerals = Math.max(0, minerals);
+        invalidateAffordableAlertCache();
     }
 
     public int getAphids() { return aphids; }
@@ -657,6 +670,57 @@ public class Colony {
 
     public void invalidateActiveRoleCountCache() {
         activeRoleCountCache = null;
+    }
+
+    public void invalidateAffordableAlertCache() {
+        affordableResearchCached = null;
+        affordableBuildingCacheValid = false;
+        affordableBuildingCached = null;
+    }
+
+    public boolean hasAffordableResearch() {
+        if (affordableResearchCached == null) {
+            affordableResearchCached = computeHasAffordableResearch();
+        }
+        return affordableResearchCached;
+    }
+
+    public Building getAffordableBuildingForAlert() {
+        if (!affordableBuildingCacheValid) {
+            affordableBuildingCached = computeAffordableBuildingForAlert();
+            affordableBuildingCacheValid = true;
+        }
+        return affordableBuildingCached;
+    }
+
+    private boolean computeHasAffordableResearch() {
+        if (!hasUpgrade(GameUnlocks.ABILITY_RESEARCH)) {
+            return false;
+        }
+        int researchPoints = getResearchPoints();
+        for (Upgrade upgrade : GameUnlocks.getUpgrades()) {
+            if (!hasUpgrade(upgrade) && upgrade.getCost() > 0
+                    && (upgrade.getRequirement() == null || hasUpgrade(upgrade.getRequirement()))
+                    && researchPoints >= upgrade.getCost()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private Building computeAffordableBuildingForAlert() {
+        if (!hasUpgrade(GameUnlocks.ABILITY_BUILD) || currentBuildingProject != null) {
+            return null;
+        }
+        int minerals = getMinerals();
+        int resins = getResins();
+        for (Building building : GameUnlocks.getBuildings()) {
+            if (!hasBuilding(building) && minerals >= building.getMineralCost()
+                    && resins >= building.getResinCost() && hasBuilding(building.getRequirement())) {
+                return building;
+            }
+        }
+        return null;
     }
 
     public int getActiveRoleCount(AntRole role) {

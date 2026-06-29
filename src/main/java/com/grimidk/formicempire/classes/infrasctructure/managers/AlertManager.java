@@ -1,11 +1,9 @@
 package com.grimidk.formicempire.classes.infrasctructure.managers;
 
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
-import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.ColonyLogPrefixes;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 import com.grimidk.formicempire.classes.interfaces.game.gamepanels.AlertPanel;
 import com.grimidk.formicempire.classes.interfaces.game.gamepanels.AlertPanel.Alert;
@@ -110,27 +108,15 @@ public class AlertManager {
     }
 
     private void checkAvailableResearch() {
-        if (!colony.hasUpgrade(GameUnlocks.ABILITY_RESEARCH)) return;
-        for (Upgrade u : GameUnlocks.getUpgrades()) {
-            if (!colony.hasUpgrade(u) && u.getCost() > 0 && 
-               (u.getRequirement() == null || colony.hasUpgrade(u.getRequirement())) && 
-               colony.getResearchPoints() >= u.getCost()) {
-                addAlert("RESEARCH", LanguageStrings.get(LanguageStrings.ALERT_NEW_RESEARCH), AssetStyles.FONT_COLOR_HIGHLIGHT, durationDefault);
-                return; 
-            }
+        if (colony.hasAffordableResearch()) {
+            addAlert("RESEARCH", LanguageStrings.get(LanguageStrings.ALERT_NEW_RESEARCH), AssetStyles.FONT_COLOR_HIGHLIGHT, durationDefault);
         }
     }
-    
-    private void checkAvailableBuildings() {
-        if (!colony.hasUpgrade(GameUnlocks.ABILITY_BUILD)) return;
-        if (colony.getCurrentBuildingProject() != null) return; 
 
-        for (Building b : GameUnlocks.getBuildings()) {
-            if (!colony.hasBuilding(b) && colony.getMinerals() >= b.getMineralCost() && 
-                colony.getResins() >= b.getResinCost() && colony.hasBuilding(b.getRequirement())) {
-                addAlert("BUILD", String.format(LanguageStrings.get(LanguageStrings.ALERT_CAN_BUILD_FMT), b.getName()), AssetStyles.FONT_COLOR_VALUE, durationDefault);
-                return; 
-            }
+    private void checkAvailableBuildings() {
+        Building building = colony.getAffordableBuildingForAlert();
+        if (building != null) {
+            addAlert("BUILD", String.format(LanguageStrings.get(LanguageStrings.ALERT_CAN_BUILD_FMT), building.getName()), AssetStyles.FONT_COLOR_VALUE, durationDefault);
         }
     }
 

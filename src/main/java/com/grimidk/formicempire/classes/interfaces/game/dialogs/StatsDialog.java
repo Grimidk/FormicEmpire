@@ -61,9 +61,7 @@ public class StatsDialog extends ZeroDialog {
         super(owner, LanguageStrings.DIALOG_STATS_TITLE, AssetStyles.DEFAULT_DIALOG_SIZE);
         this.colony = colony;
         this.engine = engine;
-        this.dynastyStatsService = colony.getDynasty() != null
-                ? colony.getDynasty().getStatService()
-                : new DynastyStatService();
+        this.dynastyStatsService = colony.getDynasty().getStatService();
         
         setLayout(new BorderLayout());
         
