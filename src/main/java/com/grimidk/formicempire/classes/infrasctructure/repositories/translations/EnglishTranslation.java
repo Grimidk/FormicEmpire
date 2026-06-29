@@ -1122,6 +1122,8 @@ public class EnglishTranslation implements Translation {
         en.put("LOG_TRADE_BILATERAL_RETURN_FMT", "Bilateral convoy returned with %d resource types.");
         en.put("LOG_TRADE_ROUTE_CANCELLED_FMT", "Route to %s cancelled. Resources refunded.");
         en.put("LOG_AUTOMATION_BUILD_FMT", "Started construction of %s");
+        en.put("LOG_AUTOMATION_TUNNEL_FMT", "Started tunnel toward %s");
+        en.put("LOG_AUTOMATION_TRADE_FMT", "Opened trade route to %s");
         en.put("LOG_LAST_COLONY_FALLEN", "The last colony has fallen. This is now a dead remnant.");
         en.put("LOG_PROMOTION_CAPITAL_FMT", "The old capital has fallen. This colony is now the capital of %s!");
         en.put("LOG_DYNASTY_RESEARCHED_FMT", "Researched %s");

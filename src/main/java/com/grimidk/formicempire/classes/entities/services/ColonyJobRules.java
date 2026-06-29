@@ -3,6 +3,7 @@ package com.grimidk.formicempire.classes.entities.services;
 import java.util.List;
 
 import com.grimidk.formicempire.classes.constants.world.Biome;
+import com.grimidk.formicempire.classes.constants.world.Season;
 import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.DeathCause;
@@ -33,9 +34,13 @@ public final class ColonyJobRules {
         applyDailyComposting(colony);
         applyDailyGraveKeeping(colony);
         applyDailyPolicing(colony);
-        if (colony.isPlayer()) {
-            colony.getPopulationService().runContamination(colony);
-        }
+        colony.getBugHandlingService().runSymbioticMitePredationLite(colony);
+        colony.getPopulationService().runContamination(colony);
+    }
+
+    public static void runMonthlyLite(Colony colony, Biome biome, Season season) {
+        colony.getPopulationService().runParasitation(colony, biome, season);
+        colony.getBugHandlingService().runMonthlyParasiticMitesLite(colony, biome, season);
     }
 
     public static void applyHourlyProduction(Colony colony) {
@@ -43,10 +48,10 @@ public final class ColonyJobRules {
         ColonySourceService sources = colony.getSourceService();
         ColonyResourceService resources = colony.getResourceService();
 
-        int plantGain = probabilisticRound(stats.getPlantProductionHourly(colony));
-        int waterGain = probabilisticRound(stats.getWaterProductionHourly(colony));
-        int meatGain = probabilisticRound(stats.getProteinProductionHourly(colony));
-        int rockGain = probabilisticRound(stats.getMineralProductionHourly(colony));
+        int plantGain = probabilisticRound(stats.getPlantProductionHourly(colony) * parasiticMiteWorkEfficiency(colony));
+        int waterGain = probabilisticRound(stats.getWaterProductionHourly(colony) * parasiticMiteWorkEfficiency(colony));
+        int meatGain = probabilisticRound(stats.getProteinProductionHourly(colony) * parasiticMiteWorkEfficiency(colony));
+        int rockGain = probabilisticRound(stats.getMineralProductionHourly(colony) * parasiticMiteWorkEfficiency(colony));
 
         if (sources.getTotalQuantityAvailable(GameConstants.RESOURCE_PLANT) <= 0) {
             plantGain = 0;
@@ -76,7 +81,7 @@ public final class ColonyJobRules {
             int farmerCount = stats.getEffectiveFarmerCount(colony);
             float convertRate = stats.getConversionRate(colony);
 
-            int maxConvert = probabilisticRound(farmerCount * convertRate * 60);
+            int maxConvert = probabilisticRound(farmerCount * convertRate * 60 * parasiticMiteWorkEfficiency(colony));
 
             if (maxConvert > 0) {
                 int actualConverted = 0;
@@ -377,5 +382,15 @@ public final class ColonyJobRules {
             removed++;
         }
         return removed;
+    }
+
+    /** Inactive colonies: each slowed ant counts as half a worker without per-ant infection sync. */
+    private static double parasiticMiteWorkEfficiency(Colony colony) {
+        int antTotal = colony.getAntTotal();
+        if (antTotal <= 0 || colony.getParasiticMites() <= 0) {
+            return 1.0;
+        }
+        int slowed = colony.getParasiticMiteSlowedAntCount();
+        return Math.max(0.0, 1.0 - (slowed * 0.5 / antTotal));
     }
 }

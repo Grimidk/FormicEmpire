@@ -930,7 +930,7 @@ public class Colony {
         }
 
         if (this.automationEnabled) {
-            this.automationService.runDailyAutomation(this);
+            this.automationService.runDailyAutomation(this, currentHex);
         } else if (this.autoBuildEnabled) {
             this.automationService.runAutoBuild(this);
         }
@@ -967,9 +967,11 @@ public class Colony {
     }
 
     public void runMonthlyJobs(Season season, Biome biome) {
-        if (this.isActive || this.isPlayer) {
+        if (this.isActive) {
             this.runParasitation(biome, season);
             getBugHandlingService().runMonthlyParasiticMites(this, biome, season);
+        } else {
+            this.summarizationService.runMonthlyLite(this, biome, season);
         }
     }
 

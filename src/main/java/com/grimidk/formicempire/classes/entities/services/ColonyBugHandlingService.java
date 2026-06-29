@@ -508,6 +508,53 @@ public class ColonyBugHandlingService {
                 + String.format(LanguageStrings.get(LanguageStrings.LOG_PARASITIC_MITE_SPREAD_FMT), spawnAmount));
     }
 
+    public void runMonthlyParasiticMitesLite(Colony colony, Biome biome, Season season) {
+        if (!isParasiticMiteOutbreakEligible(colony, biome, season)) {
+            return;
+        }
+
+        int spawnAmount = calculateParasiticMiteSpawnAmount(colony);
+        if (spawnAmount <= 0) {
+            return;
+        }
+        if (isParasiticMiteOutbreakPrevented(colony, biome, season)) {
+            return;
+        }
+        if (GameRandom.nextFloat() > GameConstants.PARASITE_OUTBREAK_CHANCE) {
+            return;
+        }
+
+        applyParasiticMiteCountLite(colony, colony.getParasiticMites() + spawnAmount);
+        colony.logEvent(ColonyLogPrefixes.INFO + " "
+                + String.format(LanguageStrings.get(LanguageStrings.LOG_PARASITIC_MITE_SPREAD_FMT), spawnAmount));
+    }
+
+    public void runSymbioticMitePredationLite(Colony colony) {
+        if (colony == null) {
+            return;
+        }
+        int symbioticMites = getCount(colony, GameConstants.TYPE_SYMBIOTIC_MITE);
+        int parasiticMites = colony.getParasiticMites();
+        if (symbioticMites <= 0 || parasiticMites <= 0) {
+            return;
+        }
+        int killPerSymbioticMite = getSymbioticMiteParasiticMiteKillPerDay(colony);
+        int eliminated = Math.min(parasiticMites, symbioticMites * killPerSymbioticMite);
+        if (eliminated > 0) {
+            applyParasiticMiteCountLite(colony, parasiticMites - eliminated);
+            colony.logEvent(ColonyLogPrefixes.INFO + " "
+                    + String.format(LanguageStrings.get(LanguageStrings.LOG_SYMBIOTIC_MITES_PREDATION_FMT), eliminated));
+        }
+    }
+
+    public void applyParasiticMiteCountLite(Colony colony, int count) {
+        if (colony == null) {
+            return;
+        }
+        int capped = Math.min(Math.max(0, count), parasiticMiteCap(colony));
+        colony.applyParasiticMiteCount(capped);
+    }
+
     private int parasiticMiteCap(Colony colony) {
         int antTotal = colony.getAntTotal();
         int fromPopulation = antTotal * GameConstants.PARASITIC_MITES_PER_SLOWED_ANT;

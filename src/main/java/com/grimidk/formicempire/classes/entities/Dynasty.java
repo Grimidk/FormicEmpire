@@ -14,6 +14,7 @@ import com.grimidk.formicempire.classes.constants.misc.Species;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
 import com.grimidk.formicempire.classes.entities.services.DynastyAutomationService;
+import com.grimidk.formicempire.classes.entities.services.DynastyLogisticsAutomationService;
 import com.grimidk.formicempire.classes.entities.services.DynastyStarterService;
 import com.grimidk.formicempire.classes.entities.services.DynastyStatService;
 import com.grimidk.formicempire.classes.entities.services.DynastyTradeService;
@@ -57,6 +58,7 @@ public class Dynasty {
 
     // Services
     private transient DynastyAutomationService automationService;
+    private transient DynastyLogisticsAutomationService logisticsAutomationService;
     private transient DynastyStarterService starterService;
     private transient DynastyStatService statService;
     private transient DynastyTradeService tradeService;
@@ -172,6 +174,7 @@ public class Dynasty {
 
     private void initializeServices() {
         this.automationService = new DynastyAutomationService();
+        this.logisticsAutomationService = new DynastyLogisticsAutomationService();
         this.starterService = new DynastyStarterService();
         this.statService = new DynastyStatService();
     }
@@ -202,8 +205,16 @@ public class Dynasty {
 
     // --- Logic ---
     public void runDailyJobs() {
+        runDailyJobs(null, null);
+    }
+
+    public void runDailyJobs(World world, TradeManager tradeManager) {
         if (this.isDefeated) return;
         this.automationService.runDailyAutomation(this);
+        if (world != null && tradeManager != null) {
+            bindTradeManager(tradeManager);
+            this.logisticsAutomationService.runDailyLogistics(this, world, tradeManager);
+        }
         this.rankUp();
     }
     

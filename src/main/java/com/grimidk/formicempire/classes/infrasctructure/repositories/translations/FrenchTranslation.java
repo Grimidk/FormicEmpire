@@ -1122,6 +1122,8 @@ public class FrenchTranslation implements Translation {
         fr.put("LOG_TRADE_BILATERAL_RETURN_FMT", "Convoi bilateral revenu avec %d types de ressources.");
         fr.put("LOG_TRADE_ROUTE_CANCELLED_FMT", "Route vers %s annulée. Ressources remboursées.");
         fr.put("LOG_AUTOMATION_BUILD_FMT", "Construction démarrée : %s");
+        fr.put("LOG_AUTOMATION_TUNNEL_FMT", "Tunnel démarré vers %s");
+        fr.put("LOG_AUTOMATION_TRADE_FMT", "Route commerciale ouverte vers %s");
         fr.put("LOG_LAST_COLONY_FALLEN", "La dernière colonie est tombée. Ce n'est plus qu'un vestige mort.");
         fr.put("LOG_PROMOTION_CAPITAL_FMT", "L'ancienne capitale est tombée. Cette colonie est la capitale de %s !");
         fr.put("LOG_DYNASTY_RESEARCHED_FMT", "Recherché : %s");

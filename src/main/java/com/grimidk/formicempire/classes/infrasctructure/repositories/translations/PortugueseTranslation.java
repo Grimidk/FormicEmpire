@@ -1122,6 +1122,8 @@ public class PortugueseTranslation implements Translation {
         pt.put("LOG_TRADE_BILATERAL_RETURN_FMT", "Comboio bilateral voltou com %d tipos de recursos.");
         pt.put("LOG_TRADE_ROUTE_CANCELLED_FMT", "Rota para %s cancelada. Recursos reembolsados.");
         pt.put("LOG_AUTOMATION_BUILD_FMT", "Construção iniciada: %s");
+        pt.put("LOG_AUTOMATION_TUNNEL_FMT", "Túnel iniciado em direção a %s");
+        pt.put("LOG_AUTOMATION_TRADE_FMT", "Rota comercial aberta para %s");
         pt.put("LOG_LAST_COLONY_FALLEN", "A última colônia caiu. Isto é agora um remanescente morto.");
         pt.put("LOG_PROMOTION_CAPITAL_FMT", "A antiga capital caiu. Esta colônia é agora a capital de %s!");
         pt.put("LOG_DYNASTY_RESEARCHED_FMT", "Pesquisado: %s");

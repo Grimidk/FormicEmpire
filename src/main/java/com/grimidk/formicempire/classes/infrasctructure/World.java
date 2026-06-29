@@ -904,7 +904,7 @@ public class World {
         this.day++;
         
         for (Dynasty dynasty : this.dynastys) {
-            dynasty.runDailyJobs();
+            dynasty.runDailyJobs(this, engine != null ? engine.getTradeManager() : null);
         }
         
         for (Hex hex : this.hexes) {

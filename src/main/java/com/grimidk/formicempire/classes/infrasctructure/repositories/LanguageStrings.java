@@ -576,6 +576,8 @@ public final class LanguageStrings {
     public static final String LOG_TRADE_BILATERAL_RETURN_FMT = "LOG_TRADE_BILATERAL_RETURN_FMT";
     public static final String LOG_TRADE_ROUTE_CANCELLED_FMT = "LOG_TRADE_ROUTE_CANCELLED_FMT";
     public static final String LOG_AUTOMATION_BUILD_FMT = "LOG_AUTOMATION_BUILD_FMT";
+    public static final String LOG_AUTOMATION_TUNNEL_FMT = "LOG_AUTOMATION_TUNNEL_FMT";
+    public static final String LOG_AUTOMATION_TRADE_FMT = "LOG_AUTOMATION_TRADE_FMT";
     public static final String LOG_LAST_COLONY_FALLEN = "LOG_LAST_COLONY_FALLEN";
     public static final String LOG_PROMOTION_CAPITAL_FMT = "LOG_PROMOTION_CAPITAL_FMT";
     public static final String LOG_DYNASTY_RESEARCHED_FMT = "LOG_DYNASTY_RESEARCHED_FMT";

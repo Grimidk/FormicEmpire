@@ -4,6 +4,9 @@ import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.entities.Tunnel;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
@@ -20,6 +23,8 @@ public class ColonyAutomationService {
     private static final int MIN_NURSES = 4;
     private static final int MIN_FORAGERS = 4;
     private static final int MIN_FARMERS = 1;
+    private static final int WORKER_SURPLUS_FOR_TUNNEL = 5;
+    private static final int MIN_COURIERS_FOR_LOGISTICS = 1;
 
     public void runAutomation(Colony colony) {
         if (!colony.isAutomationEnabled()) return;
@@ -29,11 +34,16 @@ public class ColonyAutomationService {
     }
 
     public void runDailyAutomation(Colony colony) {
+        runDailyAutomation(colony, null);
+    }
+
+    public void runDailyAutomation(Colony colony, Hex currentHex) {
         if (!colony.isAutomationEnabled()) return;
 
         checkAndConstructBuildings(colony);
+        checkAndStartTunnel(colony, currentHex);
     }
-    
+
     public void runAutoBuild(Colony colony) {
         checkAndConstructBuildings(colony);
     }
@@ -55,11 +65,62 @@ public class ColonyAutomationService {
         if (!candidates.isEmpty()) {
             candidates.sort(Comparator.comparingInt(b -> b.getMineralCost() + b.getResinCost()));
             Building target = candidates.get(0);
-            
+
             colony.startBuildingProject(target);
             colony.logEvent(ColonyLogPrefixes.AUTOMATION + " "
                 + String.format(LanguageStrings.get(LanguageStrings.LOG_AUTOMATION_BUILD_FMT), target.getName()));
         }
+    }
+
+    public void checkAndStartTunnel(Colony colony, Hex currentHex) {
+        if (colony.getCurrentTunnelProject() != null) return;
+        if (!colony.isAutomationEnabled()) return;
+        if (!colony.hasUpgrade(GameUnlocks.ABILITY_TUNNELS)) return;
+        if (!colony.hasUpgrade(GameUnlocks.ROLE_BORER) && !colony.hasUpgrade(GameUnlocks.ROLE_ENGINEER)) return;
+
+        int diggers = colony.getAssignedRoleCount(GameConstants.ROLE_BORER)
+                + colony.getAssignedRoleCount(GameConstants.ROLE_ENGINEER);
+        if (diggers <= 0) return;
+
+        Dynasty dynasty = colony.getDynasty();
+        if (dynasty == null || currentHex == null) return;
+
+        Hex targetHex = findTunnelTarget(colony, dynasty, currentHex);
+        if (targetHex == null) return;
+
+        Tunnel tunnel = new Tunnel(currentHex, targetHex, GameConstants.TUNNEL_WORK_REQUIRED);
+        dynasty.addTunnel(tunnel);
+        colony.setCurrentTunnelProject(tunnel);
+        colony.logEvent(ColonyLogPrefixes.AUTOMATION + " "
+            + String.format(LanguageStrings.get(LanguageStrings.LOG_AUTOMATION_TUNNEL_FMT),
+                targetHex.getColony() != null ? targetHex.getColony().getName() : "?"));
+    }
+
+    private Hex findTunnelTarget(Colony colony, Dynasty dynasty, Hex currentHex) {
+        Hex sameDynastyTarget = null;
+        Hex anyTarget = null;
+
+        for (Hex neighbor : adjacentHexes(currentHex)) {
+            if (neighbor == null) continue;
+
+            Tunnel existing = dynasty.getTunnelBetween(currentHex, neighbor);
+            if (existing != null) continue;
+
+            if (neighbor.getColony() != null && neighbor.getColony().getDynasty() == dynasty) {
+                sameDynastyTarget = neighbor;
+            } else if (anyTarget == null) {
+                anyTarget = neighbor;
+            }
+        }
+
+        return sameDynastyTarget != null ? sameDynastyTarget : anyTarget;
+    }
+
+    private static Hex[] adjacentHexes(Hex center) {
+        return new Hex[] {
+            center.getNorth(), center.getNorthWest(), center.getNorthEast(),
+            center.getSouth(), center.getSouthWest(), center.getSouthEast()
+        };
     }
 
     private Map<AntRole, Integer> calculateNeedsBasedQuotas(Colony colony) {
@@ -85,12 +146,12 @@ public class ColonyAutomationService {
         int farmerTarget = Math.max(MIN_FARMERS, (int) (totalWorkers * 0.05));
         int farmers = assignMinimum(remaining, farmerTarget);
         remaining -= farmers;
-        
+
         int foragers = assignMinimum(remaining, MIN_FORAGERS);
         remaining -= foragers;
 
         float nursingRate = stats.getNursingRate(colony);
-        int maxBrood = stats.getEggsCapacity(colony) * 3; 
+        int maxBrood = stats.getEggsCapacity(colony) * 3;
         int nurseTarget = MIN_NURSES;
         if (nursingRate > 0) {
             nurseTarget = Math.max(MIN_NURSES, (int) Math.ceil(maxBrood / nursingRate));
@@ -137,11 +198,11 @@ public class ColonyAutomationService {
         if (remaining > 0 && colony.hasUpgrade(GameUnlocks.ROLE_MINER)) {
             int minerTarget = (int) (totalWorkers * 0.15);
             int toAdd = Math.min(remaining, minerTarget);
-            
+
             if (colony.getMinerals() >= colony.getMineralsCapacity()) {
-                toAdd = Math.min(remaining, Math.max(1, (int) (minerTarget * 0.10))); 
+                toAdd = Math.min(remaining, Math.max(1, (int) (minerTarget * 0.10)));
             }
-            
+
             targets.put(GameConstants.ROLE_MINER, toAdd);
             remaining -= toAdd;
         }
@@ -154,6 +215,9 @@ public class ColonyAutomationService {
                 remaining -= toAdd;
             }
         }
+
+        remaining = allocateTunnelEngineers(colony, targets, remaining);
+        remaining = allocateCourierWorkers(colony, targets, remaining);
 
         if (remaining > 0 && colony.hasUpgrade(GameUnlocks.ROLE_BUILDER)) {
             if (colony.getCurrentBuildingProject() != null) {
@@ -168,7 +232,52 @@ public class ColonyAutomationService {
             targets.put(GameConstants.ROLE_FORAGER, foragers + remaining);
         }
     }
-    
+
+    private int allocateTunnelEngineers(Colony colony, Map<AntRole, Integer> targets, int remaining) {
+        if (remaining < WORKER_SURPLUS_FOR_TUNNEL) return remaining;
+        if (!colony.hasUpgrade(GameUnlocks.ABILITY_TUNNELS)) return remaining;
+        if (!colony.hasUpgrade(GameUnlocks.ROLE_ENGINEER)) return remaining;
+
+        boolean digging = colony.getCurrentTunnelProject() != null;
+        boolean preparing = !digging && needsTunnelDigging(colony);
+        if (!digging && !preparing) return remaining;
+
+        int engineerTarget = Math.min(remaining, digging ? Math.max(1, remaining / 5) : 1);
+        targets.put(GameConstants.ROLE_ENGINEER, engineerTarget);
+        return remaining - engineerTarget;
+    }
+
+    private boolean needsTunnelDigging(Colony colony) {
+        if (!colony.hasUpgrade(GameUnlocks.ROLE_BORER) && !colony.hasUpgrade(GameUnlocks.ROLE_ENGINEER)) {
+            return false;
+        }
+        Dynasty dynasty = colony.getDynasty();
+        if (dynasty == null || dynasty.getColonies().size() < 2) {
+            return dynasty != null && dynasty.getTunnels().stream().anyMatch(t -> !t.isComplete());
+        }
+        return true;
+    }
+
+    private int allocateCourierWorkers(Colony colony, Map<AntRole, Integer> targets, int remaining) {
+        if (remaining <= 0 || !colony.hasUpgrade(GameUnlocks.ROLE_COURIER)) return remaining;
+        if (!needsLogisticsStaff(colony)) return remaining;
+
+        int courierTarget = Math.min(remaining, Math.max(MIN_COURIERS_FOR_LOGISTICS, remaining / 10));
+        targets.put(GameConstants.ROLE_COURIER, courierTarget);
+        return remaining - courierTarget;
+    }
+
+    private boolean needsLogisticsStaff(Colony colony) {
+        Dynasty dynasty = colony.getDynasty();
+        if (dynasty == null) return false;
+        if (!dynasty.hasUpgrade(GameUnlocks.ABILITY_TRADE)) return false;
+        if (dynasty.getColonies().size() >= 2) return true;
+        if (dynasty.getTradeService() != null) {
+            return !dynasty.getTradeService().getDynastyTrades().isEmpty();
+        }
+        return false;
+    }
+
     private int assignMinimum(int available, int min) {
         return Math.min(min, available);
     }
@@ -182,12 +291,12 @@ public class ColonyAutomationService {
         if (dailyCleaningRate <= 0) return 0;
 
         float daysToClear = 5.0f;
-        if (deadBodies >= 400) daysToClear = 1.0f; 
+        if (deadBodies >= 400) daysToClear = 1.0f;
         if (deadBodies >= 1400) daysToClear = 0.5f;
 
-        int needed = (int) Math.ceil(deadBodies / (dailyCleaningRate * daysToClear));                    
+        int needed = (int) Math.ceil(deadBodies / (dailyCleaningRate * daysToClear));
         int doubleNeeded = needed * 2;
-        
+
         return Math.min(doubleNeeded, available);
     }
 
@@ -211,17 +320,17 @@ public class ColonyAutomationService {
         int totalConsumption = stats.getTotalConsumption(colony);
         float conversionRate = stats.getConversionRate(colony);
         double productionPerFarmer = conversionRate * 1440.0;
-        
+
         if (productionPerFarmer <= 0) return 0;
 
         int currentProduction = (int) (currentFarmers * productionPerFarmer);
         boolean needsFood = currentProduction < totalConsumption || colony.getMushrooms() < stats.getMushroomsCapacity(colony) * 0.2;
-        
+
         if (needsFood) {
             int deficit = totalConsumption - currentProduction;
             int baseNeeded = (int) Math.ceil(deficit / productionPerFarmer);
-            if (colony.getMushrooms() < stats.getMushroomsCapacity(colony) * 0.1) baseNeeded++; 
-            
+            if (colony.getMushrooms() < stats.getMushroomsCapacity(colony) * 0.1) baseNeeded++;
+
             int extraNeeded = baseNeeded * 3;
             return Math.min(extraNeeded, available);
         }
@@ -236,11 +345,28 @@ public class ColonyAutomationService {
         if (colony.getParasiteAnts() > 0 && colony.hasUpgrade(GameUnlocks.ROLE_POLICE)) {
             int maxPolice = (int) (colony.getSoldiers().size() * 0.20);
             assignedPolice = Math.min(maxPolice, remainingSoldiers);
-            
+
             if (assignedPolice == 0 && maxPolice > 0 && remainingSoldiers > 0) assignedPolice = 1;
         }
         targets.put(GameConstants.ROLE_POLICE, assignedPolice);
         remainingSoldiers -= assignedPolice;
+
+        int assignedCatchers = 0;
+        if (colony.getParasiticMites() > 0 && colony.hasUpgrade(GameUnlocks.ROLE_CATCHER)) {
+            assignedCatchers = Math.min(remainingSoldiers, Math.max(1, colony.getParasiticMites() / 10));
+            targets.put(GameConstants.ROLE_CATCHER, assignedCatchers);
+            remainingSoldiers -= assignedCatchers;
+        }
+
+        int assignedEscorts = 0;
+        if (remainingSoldiers > 0 && colony.hasUpgrade(GameUnlocks.ROLE_ESCORT)) {
+            int couriers = targets.getOrDefault(GameConstants.ROLE_COURIER, 0);
+            if (couriers > 0) {
+                assignedEscorts = Math.min(remainingSoldiers, Math.max(1, couriers / 2));
+                targets.put(GameConstants.ROLE_ESCORT, assignedEscorts);
+                remainingSoldiers -= assignedEscorts;
+            }
+        }
 
         if (remainingSoldiers > 0 && colony.hasUpgrade(GameUnlocks.ROLE_HUNTER)) {
             targets.put(GameConstants.ROLE_HUNTER, remainingSoldiers);
@@ -250,24 +376,59 @@ public class ColonyAutomationService {
     private void calculateMajorQuotas(Colony colony, Map<AntRole, Integer> targets) {
         int totalMajors = colony.getMajors().size();
         if (totalMajors == 0) return;
-        
+
+        int assignedBorers = 0;
+        if (colony.hasUpgrade(GameUnlocks.ROLE_BORER) && colony.hasUpgrade(GameUnlocks.ABILITY_TUNNELS)) {
+            boolean digging = colony.getCurrentTunnelProject() != null;
+            boolean preparing = !digging && needsTunnelDigging(colony);
+            if (digging || preparing) {
+                assignedBorers = Math.min(totalMajors, digging ? Math.max(1, totalMajors / 3) : 1);
+                targets.put(GameConstants.ROLE_BORER, assignedBorers);
+            }
+        }
+
+        int remainingMajors = totalMajors - assignedBorers;
+
+        int assignedTransport = 0;
+        if (remainingMajors > 0 && colony.hasUpgrade(GameUnlocks.ROLE_TRANSPORT)) {
+            int couriers = targets.getOrDefault(GameConstants.ROLE_COURIER, 0);
+            if (couriers > 0) {
+                assignedTransport = Math.min(remainingMajors, Math.max(1, couriers / 3));
+            }
+        }
+
         if (colony.getCurrentBuildingProject() != null && colony.hasUpgrade(GameUnlocks.ROLE_CRANE)) {
-            targets.put(GameConstants.ROLE_CRANE, totalMajors);
+            targets.put(GameConstants.ROLE_CRANE, remainingMajors - assignedTransport);
+            targets.put(GameConstants.ROLE_TRANSPORT, assignedTransport);
             targets.put(GameConstants.ROLE_BRUTE, 0);
+        } else if (assignedTransport > 0) {
+            targets.put(GameConstants.ROLE_TRANSPORT, assignedTransport);
+            targets.put(GameConstants.ROLE_CRANE, 0);
+            targets.put(GameConstants.ROLE_BRUTE, remainingMajors - assignedTransport);
         } else {
             targets.put(GameConstants.ROLE_CRANE, 0);
-            targets.put(GameConstants.ROLE_BRUTE, totalMajors);
+            targets.put(GameConstants.ROLE_TRANSPORT, 0);
+            targets.put(GameConstants.ROLE_BRUTE, remainingMajors);
         }
     }
 
     private void calculatePrincessQuotas(Colony colony, Map<AntRole, Integer> targets) {
         int totalPrincesses = colony.getPrincesses().size();
         if (totalPrincesses == 0) return;
-        
-        int assistantCount = (int) (totalPrincesses * 0.80);
+
+        int skyTrans = 0;
+        if (colony.hasUpgrade(GameUnlocks.ROLE_SKYTRANS)) {
+            int couriers = targets.getOrDefault(GameConstants.ROLE_COURIER, 0);
+            if (couriers >= 3) {
+                skyTrans = Math.min(totalPrincesses, 1);
+            }
+        }
+
+        int assistantCount = (int) ((totalPrincesses - skyTrans) * 0.80);
         targets.put(GameConstants.ROLE_ASSISTANT, assistantCount);
-        
-        int breederCount = totalPrincesses - assistantCount;
+        targets.put(GameConstants.ROLE_SKYTRANS, skyTrans);
+
+        int breederCount = totalPrincesses - assistantCount - skyTrans;
         targets.put(GameConstants.ROLE_BREEDER, breederCount);
     }
 
