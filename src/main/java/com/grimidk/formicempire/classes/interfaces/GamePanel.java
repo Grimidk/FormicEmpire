@@ -9,6 +9,8 @@ import com.grimidk.formicempire.classes.infrasctructure.managers.AlertManager;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TriggerManager;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.util.UiDialogUtils;
+import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameSpritePreloader;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
@@ -914,7 +916,7 @@ public class GamePanel extends ZeroGamePanel {
                     String nameToUse = (existing != null && existing.getName() != null && !existing.getName().trim().isEmpty()) ? existing.getName() : String.format(LanguageStrings.get(LanguageStrings.SAVE_DEFAULT_NAME_FMT), slotIdLocal);
                     sm.saveWorldToSlotUserAsync(engine.getWorld(), engine, slotIdLocal, nameToUse, success -> {
                         if (!success) {
-                            JOptionPane.showMessageDialog(this,
+                            UiOptionPane.showMessageDialog(this,
                                     LanguageStrings.get(LanguageStrings.SAVE_ERROR_WRITE),
                                     LanguageStrings.get(LanguageStrings.SAVE_ERROR_WRITE_TITLE),
                                     JOptionPane.ERROR_MESSAGE);
@@ -963,6 +965,7 @@ public class GamePanel extends ZeroGamePanel {
 
         panel.add(label, BorderLayout.CENTER);
         loadingDialog.add(panel);
+        UiDialogUtils.prepareDialog(loadingDialog, frame);
         loadingDialog.pack();
         loadingDialog.setLocationRelativeTo(frame);
 

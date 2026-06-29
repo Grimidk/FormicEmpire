@@ -40,7 +40,6 @@ To Fix (By decreasing priority) :
 To Feature (to be done in order):
 Needed for launch (v1.0) (Launch Version):
 	Priority:
-	automate NPC to trade and tunnel
 	diplomacy and diplomatic reputation (own and xeno colonies) and alliances (non-aggression pacts), alliances can increase while allied genetic integrity
 	rebellions and rebel colonies (internal rebeliousness stat, too much causes a rebellious dynasty to appear, once capital defeated it gets reabsorbed)
 	diplo dialog with stance options (neutral, aggressive, peaceful)

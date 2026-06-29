@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Writes camelCase PNG placeholders under src/main/resources/sprites/buildings/rooms/
+# Writes PascalCase PNG placeholders under src/main/resources/sprites/buildings/rooms/
 # by scaling source icons (48x48). Re-run after changing icon sources or when refreshing placeholders.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -22,28 +22,29 @@ scale_to() {
 emit_chain() {
   local chain="$1"
   local src="$RES/$2"
+  local head="${chain^}"
   for l in 0 1 2 3; do
-    scale_to "$src" "$OUT/${chain}L${l}.png"
+    scale_to "$src" "$OUT/${head}L${l}.png"
   done
 }
 
-emit_chain royal   icons/ants/omni/queen.png
-emit_chain egg     icons/ants/egg.png
-emit_chain mushroom icons/resources/mushroom.png
-emit_chain plant   icons/resources/plant.png
-emit_chain water   icons/resources/water.png
-emit_chain meat    icons/resources/protein.png
-emit_chain syrup   icons/resources/syrup.png
-emit_chain rock    icons/resources/mineral.png
-emit_chain resin   icons/resources/resin.png
+emit_chain royal   icons/ants/omni/Queen.png
+emit_chain egg     icons/ants/Egg.png
+emit_chain mushroom icons/resources/Mushroom.png
+emit_chain plant   icons/resources/Plant.png
+emit_chain water   icons/resources/Water.png
+emit_chain meat    icons/resources/Protein.png
+emit_chain syrup   icons/resources/Syrup.png
+emit_chain rock    icons/resources/Mineral.png
+emit_chain resin   icons/resources/Resin.png
 
 # Passives (single file each)
-scale_to "$RES/icons/misc/research.png"       "$OUT/passiveLab.png"
-scale_to "$RES/icons/resources/water.png"      "$OUT/passiveWater.png"
-scale_to "$RES/icons/bugs/aphid.png"          "$OUT/passiveAphid.png"
-scale_to "$RES/icons/ants/larva.png"          "$OUT/passiveNurse.png"
-scale_to "$RES/icons/resources/mushroom.png"  "$OUT/passiveFarm.png"
-scale_to "$RES/icons/status/dead.png"         "$OUT/passiveGrave.png"
-scale_to "$RES/icons/biomes/swamp.png"        "$OUT/passiveComposter.png"
+scale_to "$RES/icons/misc/Research.png"       "$OUT/PassiveLab.png"
+scale_to "$RES/icons/resources/Water.png"      "$OUT/PassiveWater.png"
+scale_to "$RES/icons/bugs/Aphid.png"          "$OUT/PassiveAphid.png"
+scale_to "$RES/icons/ants/Larva.png"          "$OUT/PassiveNurse.png"
+scale_to "$RES/icons/resources/Mushroom.png"  "$OUT/PassiveFarm.png"
+scale_to "$RES/icons/status/Dead.png"         "$OUT/PassiveGrave.png"
+scale_to "$RES/icons/biomes/Swamp.png"        "$OUT/PassiveComposter.png"
 
 echo "Wrote $(find "$OUT" -name '*.png' | wc -l | tr -d ' ') PNGs to $OUT"

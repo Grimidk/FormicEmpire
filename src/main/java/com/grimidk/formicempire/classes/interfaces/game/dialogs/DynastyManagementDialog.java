@@ -12,6 +12,8 @@ import com.grimidk.formicempire.classes.entities.Tunnel;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.util.UiDialogUtils;
+import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
@@ -454,7 +456,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                         int borers = activeColony.getAssignedRoleCount(GameConstants.ROLE_BORER);
                         
                         if (engineers <= 0 && borers <= 0) {
-                            JOptionPane.showMessageDialog(panel, 
+                            UiOptionPane.showMessageDialog(panel, 
                                 LanguageStrings.get(LanguageStrings.DYNASTY_ERROR_ASSIGN_BORERS),
                                 LanguageStrings.get(LanguageStrings.DYNASTY_ERROR_LABOR_REQUIRED), JOptionPane.WARNING_MESSAGE);
                         } else {
@@ -549,7 +551,7 @@ public class DynastyManagementDialog extends ZeroDialog {
 
         private void manageTrade(Trade trade) {
             String[] options = {LanguageStrings.get(LanguageStrings.DYNASTY_MODIFY), LanguageStrings.get(LanguageStrings.DYNASTY_CANCEL_ROUTE), LanguageStrings.get(LanguageStrings.UI_CLOSE)};
-            int res = JOptionPane.showOptionDialog(this, String.format(LanguageStrings.get(LanguageStrings.DYNASTY_MANAGE_TRADE_MSG), trade.getDestination().getColony().getName()), LanguageStrings.get(LanguageStrings.DYNASTY_MANAGE_TRADE_TITLE), 
+            int res = UiOptionPane.showOptionDialog(this, String.format(LanguageStrings.get(LanguageStrings.DYNASTY_MANAGE_TRADE_MSG), trade.getDestination().getColony().getName()), LanguageStrings.get(LanguageStrings.DYNASTY_MANAGE_TRADE_TITLE), 
                 JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
             
             if (res == 0) {
@@ -851,15 +853,13 @@ public class DynastyManagementDialog extends ZeroDialog {
             footerPanel.add(cancelBtn);
             add(footerPanel, BorderLayout.SOUTH);
             
-            AssetStyles.applyThemeToContainer(getContentPane());
-            AssetStyles.styleButton(createBtn);
-            AssetStyles.styleButton(optimizeBtn);
-            AssetStyles.styleButton(cancelBtn);
-            for (JButton compact : compactButtons) {
-                AssetStyles.styleCompactButton(compact);
-            }
-            
+            UiDialogUtils.prepareDialog(this, owner);
             updateStats();
+        }
+
+        void refreshTheme() {
+            getContentPane().setBackground(AssetStyles.UI_BG_PRIMARY);
+            UiDialogUtils.prepareDialog(this, getOwner());
         }
 
         private double getColonyResource(ResourceType rt) {
@@ -1047,7 +1047,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             Trade incoming = findIncomingTrade();
             if (incoming == null) return;
 
-            int res = JOptionPane.showConfirmDialog(this, 
+            int res = UiOptionPane.showConfirmDialog(this, 
                 String.format(LanguageStrings.get(LanguageStrings.TRADE_OPTIMIZE_MSG), target.getName()), 
                 LanguageStrings.get(LanguageStrings.TRADE_OPTIMIZE), JOptionPane.YES_NO_OPTION);
             
@@ -1088,30 +1088,30 @@ public class DynastyManagementDialog extends ZeroDialog {
             }
 
             if (load.isEmpty() && returnLoad.isEmpty()) {
-                JOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.TRADE_ERROR_EMPTY));
+                UiOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.TRADE_ERROR_EMPTY));
                 return;
             }
             if (transport.isEmpty()) {
-                JOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.TRADE_ERROR_NO_PERSONNEL));
+                UiOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.TRADE_ERROR_NO_PERSONNEL));
                 return;
             }
 
             TradeMethod method = (TradeMethod) methodCombo.getSelectedItem();
             if (method == null) {
-                JOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.TRADE_ERROR_NO_METHOD));
+                UiOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.TRADE_ERROR_NO_METHOD));
                 return;
             }
 
             if (existingTrade != null) {
                 existingTrade.setPendingUpdate(load, returnLoad, transport, recurrentCheck.isSelected(), bilateralCheck.isSelected(), method);
-                JOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.TRADE_QUEUED_MSG));
+                UiOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.TRADE_QUEUED_MSG));
             } else {
                 World world = engine.getWorld();
                 Hex originHex = world.getHexOfColony(origin);
                 Hex targetHex = world.getHexOfColony(target);
                 
                 if (originHex == null || targetHex == null) {
-                    JOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.DYNASTY_ERROR_LOCATE));
+                    UiOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.DYNASTY_ERROR_LOCATE));
                     return;
                 }
 
@@ -1123,7 +1123,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                         engine.getTradeManager().addTrade(trade);
                     }
                 } else {
-                    JOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.TRADE_ERROR_START));
+                    UiOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.TRADE_ERROR_START));
                     return;
                 }
             }
@@ -1486,7 +1486,7 @@ public class DynastyManagementDialog extends ZeroDialog {
 
     private void performEdit(Colony colony) {
         if (colony == null) return;
-        String newName = JOptionPane.showInputDialog(this, String.format(LanguageStrings.get(LanguageStrings.DYNASTY_RENAME_TITLE), colony.getName()), colony.getName());
+        String newName = UiOptionPane.showInputDialog(this, String.format(LanguageStrings.get(LanguageStrings.DYNASTY_RENAME_TITLE), colony.getName()), colony.getName());
         if (newName != null && !newName.trim().isEmpty()) {
             colony.setName(newName.trim());
             refreshDialog();

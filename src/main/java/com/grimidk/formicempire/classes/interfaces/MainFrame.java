@@ -8,6 +8,7 @@ import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TriggerManager;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 
 import java.awt.*;
@@ -209,7 +210,7 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
     
     private void handleExit() {
         if (gamePanel.isEngineStarted() && engine.isConfirmOnQuit()) {
-            int res = JOptionPane.showConfirmDialog(this, 
+            int res = UiOptionPane.showConfirmDialog(this, 
                 LanguageStrings.get(LanguageStrings.UI_CONFIRM_EXIT_MSG), 
                 LanguageStrings.get(LanguageStrings.UI_CONFIRM_EXIT_TITLE), 
                 JOptionPane.YES_NO_OPTION);
@@ -253,8 +254,8 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
     }
 
     private void initCursors() {
-        cursorNormal = AssetStyles.loadCustomCursor("/icons/ui/cursor_normal.png", "AntCursorNormal");
-        cursorClick = AssetStyles.loadCustomCursor("/icons/ui/cursor_click.png", "AntCursorClick");
+        cursorNormal = AssetStyles.loadCustomCursor("/icons/ui/CursorNormal.png", "AntCursorNormal");
+        cursorClick = AssetStyles.loadCustomCursor("/icons/ui/CursorClick.png", "AntCursorClick");
         
         setCursor(cursorNormal);
 
@@ -331,7 +332,7 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
             if (gamePanel != null) gamePanel.updateStatusIndicator(true);
         }
         
-        JOptionPane.showMessageDialog(this, message, title, JOptionPane.INFORMATION_MESSAGE);
+        UiOptionPane.showMessageDialog(this, message, title, JOptionPane.INFORMATION_MESSAGE);
         
         if (!wasPaused) {
             engine.resumeEngine();
@@ -352,7 +353,7 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         String title = LanguageStrings.get(LanguageStrings.DEATH_TITLE);
         String message = LanguageStrings.get(LanguageStrings.DEATH_MESSAGE);
 
-        int choice = JOptionPane.showOptionDialog(
+        int choice = UiOptionPane.showOptionDialog(
                 this,
                 message,
                 title,
@@ -367,7 +368,7 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
             int slotId = (engine.getWorld() != null) ? engine.getWorld().getSaveSlotId() : 0;
             
             if (slotId == 0) {
-                JOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.DEATH_LOAD_FAILED_NEW_GAME), LanguageStrings.get(LanguageStrings.DEATH_LOAD_FAILED_TITLE), JOptionPane.ERROR_MESSAGE);
+                UiOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.DEATH_LOAD_FAILED_NEW_GAME), LanguageStrings.get(LanguageStrings.DEATH_LOAD_FAILED_TITLE), JOptionPane.ERROR_MESSAGE);
                 handleQuitToMenu();
             } else {
                 SaveManager sm = engine.getSaveManager();
@@ -376,7 +377,7 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
                 if (saveToLoad != null) {
                     openGameWithSave(saveToLoad);
                 } else {
-                    JOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.DEATH_LOAD_FAILED_NO_AUTOSAVE), LanguageStrings.get(LanguageStrings.DEATH_LOAD_FAILED_TITLE), JOptionPane.ERROR_MESSAGE);
+                    UiOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.DEATH_LOAD_FAILED_NO_AUTOSAVE), LanguageStrings.get(LanguageStrings.DEATH_LOAD_FAILED_TITLE), JOptionPane.ERROR_MESSAGE);
                     handleQuitToMenu();
                 }
             }

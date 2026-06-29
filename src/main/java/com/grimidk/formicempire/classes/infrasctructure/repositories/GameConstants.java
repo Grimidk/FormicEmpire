@@ -99,15 +99,15 @@ public final class GameConstants {
     private static final List<ImageIcon> misc = new ArrayList<>();
 
     // --- Misc Icons ---
-    public static final ImageIcon ICON_APHID = loadIcon("icons/bugs/aphid.png");
+    public static final ImageIcon ICON_APHID = loadIcon("icons/bugs/Aphid.png");
     static { misc.add(ICON_APHID); }
-    public static final ImageIcon ICON_SYMBIOTIC_MITE = loadIcon("icons/bugs/soilMite.png");
+    public static final ImageIcon ICON_SYMBIOTIC_MITE = loadIcon("icons/bugs/SoilMite.png");
     static { misc.add(ICON_SYMBIOTIC_MITE); }
-    public static final ImageIcon ICON_DERMESTID = loadIcon("icons/bugs/dermestid.png");
+    public static final ImageIcon ICON_DERMESTID = loadIcon("icons/bugs/Dermestid.png");
     static { misc.add(ICON_DERMESTID); }
-    public static final ImageIcon ICON_PARASITIC_MITE = loadIcon("icons/bugs/parasiticMite.png");
+    public static final ImageIcon ICON_PARASITIC_MITE = loadIcon("icons/bugs/ParasiticMite.png");
     static { misc.add(ICON_PARASITIC_MITE); }
-    public static final ImageIcon ICON_RESEARCH = loadIcon("icons/misc/research.png");
+    public static final ImageIcon ICON_RESEARCH = loadIcon("icons/misc/Research.png");
     static { misc.add(ICON_RESEARCH); }
 
     // --- Base Stats ---
@@ -163,249 +163,249 @@ public final class GameConstants {
 
     // --- Temperatures ---
     public static final Temperature TEMP_FREEZING = new Temperature(1, LanguageStrings.TEMP_FREEZING, 5,
-        loadIcon("icons/temp/freezing.png"));
+        loadIcon("icons/temp/Freezing.png"));
     static { temperature.add(TEMP_FREEZING); }
     public static final Temperature TEMP_COLD = new Temperature(2, LanguageStrings.TEMP_COLD, 15,
-        loadIcon("icons/temp/cold.png"));
+        loadIcon("icons/temp/Cold.png"));
     static { temperature.add(TEMP_COLD); }
     public static final Temperature TEMP_CHILLY = new Temperature(3, LanguageStrings.TEMP_CHILLY, 20,
-        loadIcon("icons/temp/chilly.png"));
+        loadIcon("icons/temp/Chilly.png"));
     static { temperature.add(TEMP_CHILLY); }
     public static final Temperature TEMP_GOOD = new Temperature(4, LanguageStrings.TEMP_GOOD, 28,
-        loadIcon("icons/temp/good.png"));
+        loadIcon("icons/temp/Good.png"));
     static { temperature.add(TEMP_GOOD); }
     public static final Temperature TEMP_WARM = new Temperature(5, LanguageStrings.TEMP_WARM, 35,
-        loadIcon("icons/temp/warm.png"));
+        loadIcon("icons/temp/Warm.png"));
     static { temperature.add(TEMP_WARM); }
     public static final Temperature TEMP_HOT = new Temperature(6, LanguageStrings.TEMP_HOT, 45,
-        loadIcon("icons/temp/hot.png"));
+        loadIcon("icons/temp/Hot.png"));
     static { temperature.add(TEMP_HOT); }    
     public static final Temperature TEMP_BURNING = new Temperature(7, LanguageStrings.TEMP_BURNING, 100,
-        loadIcon("icons/temp/burning.png"));
+        loadIcon("icons/temp/Burning.png"));
     static { temperature.add(TEMP_BURNING); }    
 
     // --- Humidity
     public static final Humidity HUMID_0 = new Humidity(1, LanguageStrings.HUMID_ARID, 0,
-        loadIcon("icons/humid/humid0.png"));
+        loadIcon("icons/humid/Humid0.png"));
     static { humidity.add(HUMID_0); }    
     public static final Humidity HUMID_1 = new Humidity(2, LanguageStrings.HUMID_DRY, 1, 
-        loadIcon("icons/humid/humid1.png"));
+        loadIcon("icons/humid/Humid1.png"));
     static { humidity.add(HUMID_1); }
     public static final Humidity HUMID_2 = new Humidity(3, LanguageStrings.HUMID_NORMAL, 2, 
-        loadIcon("icons/humid/humid2.png"));
+        loadIcon("icons/humid/Humid2.png"));
     static { humidity.add(HUMID_2); }
     public static final Humidity HUMID_3 = new Humidity(4, LanguageStrings.HUMID_HUMID, 3, 
-        loadIcon("icons/humid/humid3.png"));
+        loadIcon("icons/humid/Humid3.png"));
     static { humidity.add(HUMID_3); }
     public static final Humidity HUMID_4 = new Humidity(5, LanguageStrings.HUMID_MOIST, 4, 
-        loadIcon("icons/humid/humid4.png"));
+        loadIcon("icons/humid/Humid4.png"));
     static { humidity.add(HUMID_4); }
     public static final Humidity HUMID_5 = new Humidity(6, LanguageStrings.HUMID_SATURATED, 5, 
-        loadIcon("icons/humid/humid5.png"));
+        loadIcon("icons/humid/Humid5.png"));
     static { humidity.add(HUMID_5); }
 
     // --- Biomes ---
     public static final Biome BIOME_PLAINS = new Biome(1, LanguageStrings.BIOME_PLAINS, 25, 2, 1f, 1f, 0f, 1,
-        loadIcon("icons/biomes/plains.png"), null);
+        loadIcon("icons/biomes/Plains.png"), null);
     static { biomes.add(BIOME_PLAINS); }
     public static final Biome BIOME_FOREST = new Biome(2, LanguageStrings.BIOME_FOREST, 22, 3, 2f, 2f, 0.1f, 1,
-        loadIcon("icons/biomes/forest.png"), null);
+        loadIcon("icons/biomes/Forest.png"), null);
     static { biomes.add(BIOME_FOREST); }
     public static final Biome BIOME_JUNGLE = new Biome(3, LanguageStrings.BIOME_JUNGLE, 30, 4, 2.5f, 2.5f, 0.2f, 3,
-        loadIcon("icons/biomes/jungle.png"), null);
+        loadIcon("icons/biomes/Jungle.png"), null);
     static { biomes.add(BIOME_JUNGLE); }
     public static final Biome BIOME_SWAMP = new Biome(4, LanguageStrings.BIOME_SWAMP, 26, 5, 1.5f, 1.5f, 0f, 2,
-        loadIcon("icons/biomes/swamp.png"), null);
+        loadIcon("icons/biomes/Swamp.png"), null);
     static { biomes.add(BIOME_SWAMP); }
     public static final Biome BIOME_URBAN = new Biome(5, LanguageStrings.BIOME_URBAN, 28, 1, 0.5f, 0.5f, 0.5f, 2,
-        loadIcon("icons/biomes/urban.png"), null);
+        loadIcon("icons/biomes/Urban.png"), null);
     static { biomes.add(BIOME_URBAN); }
     public static final Biome BIOME_TUNDRA = new Biome(6, LanguageStrings.BIOME_TUNDRA, 5, 2, 0.2f, 0.2f, 0.3f, 4,
-        loadIcon("icons/biomes/tundra.png"), null);
+        loadIcon("icons/biomes/Tundra.png"), null);
     static { biomes.add(BIOME_TUNDRA); }
     public static final Biome BIOME_TAIGA = new Biome(7, LanguageStrings.BIOME_TAIGA, 12, 1, 0.4f, 0.3f, 0.5f, 3,
-        loadIcon("icons/biomes/taiga.png"), null);
+        loadIcon("icons/biomes/Taiga.png"), null);
     static { biomes.add(BIOME_TAIGA); }
     public static final Biome BIOME_DESERT = new Biome(8, LanguageStrings.BIOME_DESERT, 45, 0, 0.05f, 0.02f, 1f, 4,
-        loadIcon("icons/biomes/dessert.png"), null);
+        loadIcon("icons/biomes/Dessert.png"), null);
     static { biomes.add(BIOME_DESERT); }
     public static final Biome BIOME_MOUNTAIN = new Biome(9, LanguageStrings.BIOME_MOUNTAIN, 12, 1, 0.1f, 0.3f, 2f, 3,
-        loadIcon("icons/biomes/mountain.png"), null);
+        loadIcon("icons/biomes/Mountain.png"), null);
     static { biomes.add(BIOME_MOUNTAIN); }
     public static final Biome BIOME_VOLCANIC = new Biome(10, LanguageStrings.BIOME_VOLCANIC, 60, 0, 0.01f, 0.01f, 5f, 5,
-        loadIcon("icons/biomes/volcanic.png"), null);
+        loadIcon("icons/biomes/Volcanic.png"), null);
     static { biomes.add(BIOME_VOLCANIC); }
     public static final Biome BIOME_LAKE = new Biome(11, LanguageStrings.BIOME_LAKE, 25, 5, 0.5f, 0.5f, 0f, 1,
-        loadIcon("icons/biomes/lake.png"), null);
+        loadIcon("icons/biomes/Lake.png"), null);
     static { biomes.add(BIOME_LAKE); }
     public static final Biome BIOME_OCEAN = new Biome(12, LanguageStrings.BIOME_OCEAN, 20, 5, 0.2f, 0.2f, 0f, 2,
-        loadIcon("icons/biomes/ocean.png"), null);
+        loadIcon("icons/biomes/Ocean.png"), null);
     static { biomes.add(BIOME_OCEAN); }
 
     // --- Resources ---
     public static final ResourceType RESOURCE_PLANT = new ResourceType(1, LanguageStrings.RESOURCE_PLANT, true, false,
-        loadIcon("icons/resources/plant.png"),
-        loadIcon("sprites/sources/plant_small.png"),
-        loadIcon("sprites/sources/plant_medium.png"),
-        loadIcon("sprites/sources/plant_big.png"),
-        loadIcon("sprites/sources/plant_huge.png"));
+        loadIcon("icons/resources/Plant.png"),
+        loadIcon("sprites/sources/PlantSmall.png"),
+        loadIcon("sprites/sources/PlantMedium.png"),
+        loadIcon("sprites/sources/PlantBig.png"),
+        loadIcon("sprites/sources/PlantHuge.png"));
     static { resources.add(RESOURCE_PLANT); }
     public static final ResourceType RESOURCE_FUNGI = new ResourceType(2, LanguageStrings.RESOURCE_FUNGI, true, false,
-        loadIcon("icons/resources/mushroom.png"),
-        loadIcon("sprites/sources/mushroom_small.png"),
-        loadIcon("sprites/sources/mushroom_medium.png"),
-        loadIcon("sprites/sources/mushroom_big.png"),
-        loadIcon("sprites/sources/mushroom_huge.png"));
+        loadIcon("icons/resources/Mushroom.png"),
+        loadIcon("sprites/sources/MushroomSmall.png"),
+        loadIcon("sprites/sources/MushroomMedium.png"),
+        loadIcon("sprites/sources/MushroomBig.png"),
+        loadIcon("sprites/sources/MushroomHuge.png"));
     static { resources.add(RESOURCE_FUNGI); }
     public static final ResourceType RESOURCE_MEAT = new ResourceType(3, LanguageStrings.RESOURCE_MEAT, true, false,
-        loadIcon("icons/resources/protein.png"),
-        loadIcon("sprites/sources/protein_small.png"),
-        loadIcon("sprites/sources/protein_medium.png"),
-        loadIcon("sprites/sources/protein_big.png"),
-        loadIcon("sprites/sources/protein_huge.png"));
+        loadIcon("icons/resources/Protein.png"),
+        loadIcon("sprites/sources/ProteinSmall.png"),
+        loadIcon("sprites/sources/ProteinMedium.png"),
+        loadIcon("sprites/sources/ProteinBig.png"),
+        loadIcon("sprites/sources/ProteinHuge.png"));
     static { resources.add(RESOURCE_MEAT); }
     public static final ResourceType RESOURCE_WATER = new ResourceType(4, LanguageStrings.RESOURCE_WATER, true, true,
-        loadIcon("icons/resources/water.png"),
-        loadIcon("sprites/sources/water_small.png"),
-        loadIcon("sprites/sources/water_medium.png"),
-        loadIcon("sprites/sources/water_big.png"),
-        loadIcon("sprites/sources/water_huge.png"));
+        loadIcon("icons/resources/Water.png"),
+        loadIcon("sprites/sources/WaterSmall.png"),
+        loadIcon("sprites/sources/WaterMedium.png"),
+        loadIcon("sprites/sources/WaterBig.png"),
+        loadIcon("sprites/sources/WaterHuge.png"));
     static { resources.add(RESOURCE_WATER); }
     public static final ResourceType RESOURCE_SYRUP = new ResourceType(5, LanguageStrings.RESOURCE_SYRUP, true, true,
-        loadIcon("icons/resources/syrup.png"),
-        loadIcon("sprites/sources/syrup_small.png"),
-        loadIcon("sprites/sources/syrup_medium.png"),
-        loadIcon("sprites/sources/syrup_big.png"),
-        loadIcon("sprites/sources/syrup_huge.png"));
+        loadIcon("icons/resources/Syrup.png"),
+        loadIcon("sprites/sources/SyrupSmall.png"),
+        loadIcon("sprites/sources/SyrupMedium.png"),
+        loadIcon("sprites/sources/SyrupBig.png"),
+        loadIcon("sprites/sources/SyrupHuge.png"));
     static { resources.add(RESOURCE_SYRUP); }
     public static final ResourceType RESOURCE_RESIN = new ResourceType(6, LanguageStrings.RESOURCE_RESIN, false, true,
-        loadIcon("icons/resources/resin.png"),
-        loadIcon("sprites/sources/resin_small.png"),
-        loadIcon("sprites/sources/resin_medium.png"),
-        loadIcon("sprites/sources/resin_big.png"),
-        loadIcon("sprites/sources/resin_huge.png"));
+        loadIcon("icons/resources/Resin.png"),
+        loadIcon("sprites/sources/ResinSmall.png"),
+        loadIcon("sprites/sources/ResinMedium.png"),
+        loadIcon("sprites/sources/ResinBig.png"),
+        loadIcon("sprites/sources/ResinHuge.png"));
     static { resources.add(RESOURCE_RESIN); }
     public static final ResourceType RESOURCE_ROCK = new ResourceType(7, LanguageStrings.RESOURCE_ROCK, false, false,
-        loadIcon("icons/resources/mineral.png"),
-        loadIcon("sprites/sources/mineral_small.png"),
-        loadIcon("sprites/sources/mineral_medium.png"),
-        loadIcon("sprites/sources/mineral_big.png"),
-        loadIcon("sprites/sources/mineral_huge.png"));
+        loadIcon("icons/resources/Mineral.png"),
+        loadIcon("sprites/sources/MineralSmall.png"),
+        loadIcon("sprites/sources/MineralMedium.png"),
+        loadIcon("sprites/sources/MineralBig.png"),
+        loadIcon("sprites/sources/MineralHuge.png"));
     static { resources.add(RESOURCE_ROCK); }
 
     // --- Times of Day ---
     public static final TimeOfDay TIME_DAY = new TimeOfDay(1, LanguageStrings.TIME_DAY, 1.05f, AssetStyles.OVERLAY_DAY,
-        loadIcon("icons/times/day.png"));
+        loadIcon("icons/times/Day.png"));
     static { timesOfDay.add(TIME_DAY); }
     public static final TimeOfDay TIME_DUSK = new TimeOfDay(2, LanguageStrings.TIME_DUSK, 0.95f, AssetStyles.OVERLAY_DUSK,
-        loadIcon("icons/times/dusk.png"));
+        loadIcon("icons/times/Dusk.png"));
     static { timesOfDay.add(TIME_DUSK); }
     public static final TimeOfDay TIME_NIGHT = new TimeOfDay(3, LanguageStrings.TIME_NIGHT, 0.85f, AssetStyles.OVERLAY_NIGHT,
-        loadIcon("icons/times/night.png"));
+        loadIcon("icons/times/Night.png"));
     static { timesOfDay.add(TIME_NIGHT); }
     public static final TimeOfDay TIME_DAWN = new TimeOfDay(4, LanguageStrings.TIME_DAWN, 0.90f, AssetStyles.OVERLAY_DAWN,
-        loadIcon("icons/times/dawn.png"));
+        loadIcon("icons/times/Dawn.png"));
     static { timesOfDay.add(TIME_DAWN); }
     public static final TimeOfDay TIME_SOLAR_ECLIPSE = new TimeOfDay(5, LanguageStrings.TIME_SOLAR_ECLIPSE, 0.7f, AssetStyles.OVERLAY_SOLAR_ECLIPSE,
-        loadIcon("icons/times/solar-eclipse.png"));
+        loadIcon("icons/times/SolarEclipse.png"));
     static { timesOfDay.add(TIME_SOLAR_ECLIPSE); }
     public static final TimeOfDay TIME_LUNAR_ECLIPSE = new TimeOfDay(6, LanguageStrings.TIME_LUNAR_ECLIPSE, 0.85f, AssetStyles.OVERLAY_LUNAR_ECLIPSE,
-        loadIcon("icons/times/lunar-eclipse.png"));
+        loadIcon("icons/times/LunarEclipse.png"));
     static { timesOfDay.add(TIME_LUNAR_ECLIPSE); }
 
     // --- Moon Phases ---
     public static final MoonPhase PHASE_NEW_MOON = new MoonPhase(1, LanguageStrings.MOON_NEW, 1f, 
-        loadIcon("icons/moon/new-moon.png"));
+        loadIcon("icons/moon/NewMoon.png"));
     static { moonPhases.add(PHASE_NEW_MOON); }
     public static final MoonPhase PHASE_WAXING_CRESCENT = new MoonPhase(2, LanguageStrings.MOON_WAXING_CRESCENT, 3/4f,
-        loadIcon("icons/moon/waxing-crescent.png"));
+        loadIcon("icons/moon/WaxingCrescent.png"));
     static { moonPhases.add(PHASE_WAXING_CRESCENT); }
     public static final MoonPhase PHASE_FIRST_QUARTER = new MoonPhase(3, LanguageStrings.MOON_FIRST_QUARTER, 1/2f, 
-        loadIcon("icons/moon/first-quarter.png"));
+        loadIcon("icons/moon/FirstQuarter.png"));
     static { moonPhases.add(PHASE_FIRST_QUARTER); }
     public static final MoonPhase PHASE_WAXING_GIBBOUS = new MoonPhase(4, LanguageStrings.MOON_WAXING_GIBBOUS, 1/4f, 
-        loadIcon("icons/moon/waxing-gibbous.png"));
+        loadIcon("icons/moon/WaxingGibbous.png"));
     static { moonPhases.add(PHASE_WAXING_GIBBOUS); }
     public static final MoonPhase PHASE_FULL_MOON = new MoonPhase(5, LanguageStrings.MOON_FULL, 0f, 
-        loadIcon("icons/moon/full-moon.png"));
+        loadIcon("icons/moon/FullMoon.png"));
     static { moonPhases.add(PHASE_FULL_MOON); }
     public static final MoonPhase PHASE_WANING_GIBBOUS = new MoonPhase(6, LanguageStrings.MOON_WANING_GIBBOUS, 1/4f, 
-        loadIcon("icons/moon/waning-gibbous.png"));
+        loadIcon("icons/moon/WaningGibbous.png"));
     static { moonPhases.add(PHASE_WANING_GIBBOUS); }
     public static final MoonPhase PHASE_LAST_QUARTER = new MoonPhase(7, LanguageStrings.MOON_LAST_QUARTER, 1/2f, 
-        loadIcon("icons/moon/third-quarter.png"));
+        loadIcon("icons/moon/ThirdQuarter.png"));
     static { moonPhases.add(PHASE_LAST_QUARTER); }
     public static final MoonPhase PHASE_WANING_CRESCENT = new MoonPhase(8, LanguageStrings.MOON_WANING_CRESCENT, 3/4f, 
-        loadIcon("icons/moon/waning-crescent.png"));
+        loadIcon("icons/moon/WaningCrescent.png"));
     static { moonPhases.add(PHASE_WANING_CRESCENT); }
 
     // --- Seasons ---
     public static final Season SEASON_SPRING = new Season(1, LanguageStrings.SEASON_SPRING, 1.0f, 1.0f, 
-        loadIcon("icons/seasons/spring.png"));
+        loadIcon("icons/seasons/Spring.png"));
     static { seasons.add(SEASON_SPRING); }
     public static final Season SEASON_SUMMER = new Season(2, LanguageStrings.SEASON_SUMMER, 1.15f, 0.8f, 
-        loadIcon("icons/seasons/summer.png"));
+        loadIcon("icons/seasons/Summer.png"));
     static { seasons.add(SEASON_SUMMER); }
     public static final Season SEASON_AUTUMN = new Season(3, LanguageStrings.SEASON_AUTUMN, 0.95f, 1.1f, 
-        loadIcon("icons/seasons/autumn.png"));
+        loadIcon("icons/seasons/Autumn.png"));
     static { seasons.add(SEASON_AUTUMN); }
     public static final Season SEASON_WINTER = new Season(4, LanguageStrings.SEASON_WINTER, 0.7f, 1.2f, 
-        loadIcon("icons/seasons/winter.png"));
+        loadIcon("icons/seasons/Winter.png"));
     static { seasons.add(SEASON_WINTER); }
 
     // --- Weather ---
     public static final Weather WEATHER_CLEAR = new Weather(1, LanguageStrings.WEATHER_CLEAR, 0, 1.0f, AssetStyles.OVERLAY_CLEAR,
-        loadIcon("icons/weather/clear.png"));
+        loadIcon("icons/weather/Clear.png"));
     static { weathers.add(WEATHER_CLEAR); }
     public static final Weather WEATHER_RAIN = new Weather(2, LanguageStrings.WEATHER_RAIN, 1, 0.95f, AssetStyles.OVERLAY_RAIN,
-        loadIcon("icons/weather/rain.png"));
+        loadIcon("icons/weather/Rain.png"));
     static { weathers.add(WEATHER_RAIN); }
     public static final Weather WEATHER_SNOW = new Weather(3, LanguageStrings.WEATHER_SNOW, 1, 0.8f, AssetStyles.OVERLAY_SNOW,
-        loadIcon("icons/weather/snow.png"));
+        loadIcon("icons/weather/Snow.png"));
     static { weathers.add(WEATHER_SNOW); }
     public static final Weather WEATHER_HEAVY_RAIN = new Weather(4, LanguageStrings.WEATHER_HEAVY_RAIN, 2, 0.9f, AssetStyles.OVERLAY_HEAVY_RAIN,
-        loadIcon("icons/weather/heavy-rain.png"));
+        loadIcon("icons/weather/HeavyRain.png"));
     static { weathers.add(WEATHER_HEAVY_RAIN); }
     public static final Weather WEATHER_THUNDER = new Weather(5, LanguageStrings.WEATHER_THUNDER, 2, 0.9f, AssetStyles.OVERLAY_THUNDER,
-        loadIcon("icons/weather/thunder.png"));
+        loadIcon("icons/weather/Thunder.png"));
     static { weathers.add(WEATHER_THUNDER); }
     public static final Weather WEATHER_HEAVY_SNOW = new Weather(6, LanguageStrings.WEATHER_HEAVY_SNOW, 2, 0.7f, AssetStyles.OVERLAY_HEAVY_SNOW,
-        loadIcon("icons/weather/heavy-snow.png"));
+        loadIcon("icons/weather/HeavySnow.png"));
     static { weathers.add(WEATHER_HEAVY_SNOW); }
     public static final Weather WEATHER_WIND = new Weather(7, LanguageStrings.WEATHER_WIND, -1, 0.95f, AssetStyles.OVERLAY_WIND,
-        loadIcon("icons/weather/heavy-wind.png"));
+        loadIcon("icons/weather/HeavyWind.png"));
         static { weathers.add(WEATHER_WIND); }
     public static final Weather WEATHER_HEAT = new Weather(8, LanguageStrings.WEATHER_HEAT, -2, 1.2f, AssetStyles.OVERLAY_HEAT,
-        loadIcon("icons/weather/heat-wave.png"));
+        loadIcon("icons/weather/HeatWave.png"));
     static { weathers.add(WEATHER_HEAT); }
     public static final Weather WEATHER_FOG = new Weather(9, LanguageStrings.WEATHER_FOG, 0, 0.9f, AssetStyles.OVERLAY_FOG,
-        loadIcon("icons/weather/fog.png"));
+        loadIcon("icons/weather/Fog.png"));
     static { weathers.add(WEATHER_FOG); }
     public static final Weather WEATHER_FROG = new Weather(10, LanguageStrings.WEATHER_FROG, 3, 1.0f, AssetStyles.OVERLAY_FROG,
-        loadIcon("icons/weather/frog-rain.png"));
+        loadIcon("icons/weather/FrogRain.png"));
     static { weathers.add(WEATHER_FROG); }
     public static final Weather WEATHER_BLOOD = new Weather(11, LanguageStrings.WEATHER_BLOOD, 2, 0.85f, AssetStyles.OVERLAY_BLOOD,
-        loadIcon("icons/weather/blood-rain.png"));
+        loadIcon("icons/weather/BloodRain.png"));
     static { weathers.add(WEATHER_BLOOD); }
     public static final Weather WEATHER_SAND_STORM = new Weather(12, LanguageStrings.WEATHER_SAND_STORM, -1, 0.8f, AssetStyles.OVERLAY_SANDSTORM,
-        loadIcon("icons/weather/sand-storm.png"));
+        loadIcon("icons/weather/SandStorm.png"));
     static { weathers.add(WEATHER_SAND_STORM); }
     public static final Weather WEATHER_PYROCLASTIC_FOG = new Weather(13, LanguageStrings.WEATHER_PYROCLASTIC_FOG, 0, 0.5f, AssetStyles.OVERLAY_PYROCLASTIC,
-        loadIcon("icons/weather/pyro-fog.png"));
+        loadIcon("icons/weather/PyroFog.png"));
     static { weathers.add(WEATHER_PYROCLASTIC_FOG); }
     public static final Weather WEATHER_ACID_RAIN = new Weather(14, LanguageStrings.WEATHER_ACID_RAIN, 1, 0.75f, AssetStyles.OVERLAY_ACID_RAIN,
-        loadIcon("icons/weather/acid-rain.png"));
+        loadIcon("icons/weather/AcidRain.png"));
     static { weathers.add(WEATHER_ACID_RAIN); }
 
     // --- Ant Status ---
     public static final AntStatus STATUS_ALIVE = new AntStatus(1, LanguageStrings.STATUS_ALIVE, 
-        loadIcon("icons/status/alive.png"));
+        loadIcon("icons/status/Alive.png"));
     static { antStatuses.add(STATUS_ALIVE); }
     public static final AntStatus STATUS_DEAD = new AntStatus(2, LanguageStrings.STATUS_DEAD, 
-        loadIcon("icons/status/dead.png"));
+        loadIcon("icons/status/Dead.png"));
     static { antStatuses.add(STATUS_DEAD); }
     public static final AntStatus STATUS_ZOMBIFIED = new AntStatus(3, LanguageStrings.STATUS_ZOMBIFIED, 
-        loadIcon("icons/status/zombified.png"));
+        loadIcon("icons/status/Zombified.png"));
     static { antStatuses.add(STATUS_ZOMBIFIED); }
 
     // --- Move Status ---
@@ -424,22 +424,22 @@ public final class GameConstants {
 
     // --- Bug Types ---
     public static final BugType TYPE_ANT = new BugType(1, LanguageStrings.BUG_ANT, LanguageStrings.BUG_ANT_SCIENTIFIC, 1, 1, 1, 1, 1, 1,
-        loadIcon("icons/ants/omni/worker.png"), loadIcon("sprites/ants/omni/worker.png"));
+        loadIcon("icons/ants/omni/Worker.png"), loadIcon("sprites/ants/omni/Worker.png"));
     static { bugTypes.add(TYPE_ANT); }
     public static final BugType TYPE_APHID = new BugType(2, LanguageStrings.BUG_APHID, LanguageStrings.BUG_APHID_SCIENTIFIC, 1, 1, 0, 0, 5, 0.5f,
-        loadIcon("icons/bugs/aphid.png") , loadIcon("sprites/bugs/aphid.png"));
+        loadIcon("icons/bugs/Aphid.png") , loadIcon("sprites/bugs/Aphid.png"));
     static { bugTypes.add(TYPE_APHID); }
     public static final BugType TYPE_PARASITE_ANT = new BugType(3, LanguageStrings.BUG_PARASITE_ANT, LanguageStrings.BUG_PARASITE_ANT_SCIENTIFIC, 1, 1, 0, 0, 1, 1,
-        loadIcon("icons/bugs/parasite.png") , loadIcon("sprites/bugs/parasite.png"));
+        loadIcon("icons/bugs/Parasite.png") , loadIcon("sprites/bugs/Parasite.png"));
     static { bugTypes.add(TYPE_PARASITE_ANT); }
     public static final BugType TYPE_SYMBIOTIC_MITE = new BugType(4, LanguageStrings.BUG_SYMBIOTIC_MITE, LanguageStrings.BUG_SYMBIOTIC_MITE_SCIENTIFIC, 1, 0, 0, 0, 2, 0.4f, 
-        loadIcon("icons/bugs/soilMite.png"), loadIcon("sprites/bugs/soilMite.png"));
+        loadIcon("icons/bugs/SoilMite.png"), loadIcon("sprites/bugs/SoilMite.png"));
     static { bugTypes.add(TYPE_SYMBIOTIC_MITE); }
     public static final BugType TYPE_DERMESTID = new BugType(5, LanguageStrings.BUG_DERMESTID, LanguageStrings.BUG_DERMESTID_SCIENTIFIC, 1, 0, 0, 0, 3, 0.35f,
-            loadIcon("icons/bugs/dermestid.png"), loadIcon("sprites/bugs/dermestid.png"));
+            loadIcon("icons/bugs/Dermestid.png"), loadIcon("sprites/bugs/Dermestid.png"));
     static { bugTypes.add(TYPE_DERMESTID); }
     public static final BugType TYPE_PARASITIC_MITE = new BugType(6, LanguageStrings.BUG_PARASITIC_MITE, LanguageStrings.BUG_PARASITIC_MITE_SCIENTIFIC, 1, 0, 0, 0, 1, 0.25f,
-            loadIcon("icons/bugs/parasiticMite.png"), loadIcon("sprites/bugs/parasiticMite.png"));
+            loadIcon("icons/bugs/ParasiticMite.png"), loadIcon("sprites/bugs/ParasiticMite.png"));
     static { bugTypes.add(TYPE_PARASITIC_MITE); }
 
     static {
@@ -498,37 +498,37 @@ public final class GameConstants {
 
     // --- Ant Types ---
     public static final AntType TYPE_EGG = new AntType(1, LanguageStrings.TYPE_EGG, 1f, 0f, 0f, 0f, 0f, 0f, 0f,
-        loadIcon("icons/ants/egg.png"), "egg.png");
+        loadIcon("icons/ants/Egg.png"), "Egg.png");
     static { antTypes.add(TYPE_EGG); }    
     public static final AntType TYPE_LARVA = new AntType(2, LanguageStrings.TYPE_LARVA, 1f, 1/2f, 1/2f, 1f, 1f, 1/2f, 1/2f,
-        loadIcon("icons/ants/larva.png"), "larva.png");
+        loadIcon("icons/ants/Larva.png"), "Larva.png");
     static { antTypes.add(TYPE_LARVA); }
     public static final AntType TYPE_PUPA = new AntType(3, LanguageStrings.TYPE_PUPA, 1f, 0f, 1f, 0f, 0f, 1/2f, 0f,
-        loadIcon("icons/ants/pupa.png"), "pupa.png");
+        loadIcon("icons/ants/Pupa.png"), "Pupa.png");
     static { antTypes.add(TYPE_PUPA); }
     public static final AntType TYPE_WORKER = new AntType(4, LanguageStrings.TYPE_WORKER, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 
-        loadIcon("icons/ants/omni/worker.png"), "worker.png");
+        loadIcon("icons/ants/omni/Worker.png"), "Worker.png");
     static { antTypes.add(TYPE_WORKER); }
     public static final AntType TYPE_SOLDIER = new AntType(5, LanguageStrings.TYPE_SOLDIER, 3f, 3f, 3f, 2f, 3f, 5f, 3f, 
-        loadIcon("icons/ants/omni/soldier.png"), "soldier.png");
+        loadIcon("icons/ants/omni/Soldier.png"), "Soldier.png");
     static { antTypes.add(TYPE_SOLDIER); }
     public static final AntType TYPE_MAJOR = new AntType(6, LanguageStrings.TYPE_MAJOR, 10f, 15f, 20f, 5f, 2f, 50f, 2f, 
-        loadIcon("icons/ants/omni/major.png"), "major.png");
+        loadIcon("icons/ants/omni/Major.png"), "Major.png");
     static { antTypes.add(TYPE_MAJOR); }
     public static final AntType TYPE_DRONE = new AntType(7, LanguageStrings.TYPE_DRONE, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 
-        loadIcon("icons/ants/omni/drone.png"), "drone.png");
+        loadIcon("icons/ants/omni/Drone.png"), "Drone.png");
     static { antTypes.add(TYPE_DRONE); }
     public static final AntType TYPE_PRINCESS = new AntType(8, LanguageStrings.TYPE_PRINCESS, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 
-        loadIcon("icons/ants/omni/princess.png"), "princess.png");
+        loadIcon("icons/ants/omni/Princess.png"), "Princess.png");
     static { antTypes.add(TYPE_PRINCESS); }
     public static final AntType TYPE_QUEEN = new AntType(9, LanguageStrings.TYPE_QUEEN, 50f, 2f, 50f, 10f, 1/2f, 50f, 1/4f, 
-        loadIcon("icons/ants/omni/queen.png"), "queen.png");
+        loadIcon("icons/ants/omni/Queen.png"), "Queen.png");
     static { antTypes.add(TYPE_QUEEN); }
     public static final AntType TYPE_DEAD = new AntType(10, LanguageStrings.TYPE_DEAD, 0, 0, 0, 0, 0, 0, 0,
-        loadIcon("icons/ants/dead.png"), "dead.png");
+        loadIcon("icons/ants/Dead.png"), "Dead.png");
     static { antTypes.add(TYPE_DEAD); }
     public static final AntType TYPE_ZOMBIE = new AntType(11, LanguageStrings.TYPE_ZOMBIE,  1f, 1f, 1f, 1f, 1f, 1f, 1f, 
-        loadIcon("icons/ants/zombie.png"), "zombie.png");
+        loadIcon("icons/ants/Zombie.png"), "Zombie.png");
     static { antTypes.add(TYPE_ZOMBIE); }
 
     // --- Ant Subtypes ---
@@ -605,71 +605,71 @@ public final class GameConstants {
 
     // --- Colony Ranks ---
     public static final ColonyRank RANK_ANT = new ColonyRank(1, LanguageStrings.RANK_ANT, 1l, 
-        loadIcon("icons/ranks/ant.png"));
+        loadIcon("icons/ranks/Ant.png"));
     static { colonyRanks.add(RANK_ANT); }
     public static final ColonyRank RANK_COLONY = new ColonyRank(2, LanguageStrings.RANK_COLONY, 10l, 
-        loadIcon("icons/ranks/colony.png"));
+        loadIcon("icons/ranks/Colony.png"));
     static { colonyRanks.add(RANK_COLONY); }
     public static final ColonyRank RANK_COUNTY = new ColonyRank(3, LanguageStrings.RANK_COUNTY, 100l, 
-        loadIcon("icons/ranks/county.png"));
+        loadIcon("icons/ranks/County.png"));
     static { colonyRanks.add(RANK_COUNTY); }
     public static final ColonyRank RANK_DUCHY = new ColonyRank(4, LanguageStrings.RANK_DUCHY, 1000l, 
-        loadIcon("icons/ranks/duchy.png"));
+        loadIcon("icons/ranks/Duchy.png"));
     static { colonyRanks.add(RANK_DUCHY); }
     public static final ColonyRank RANK_KINGDOM = new ColonyRank(5, LanguageStrings.RANK_KINGDOM, 10000l, 
-        loadIcon("icons/ranks/kingdom.png"));
+        loadIcon("icons/ranks/Kingdom.png"));
     static { colonyRanks.add(RANK_KINGDOM); }
     public static final ColonyRank RANK_EMPIRE = new ColonyRank(6, LanguageStrings.RANK_EMPIRE, 100000l, 
-        loadIcon("icons/ranks/empire.png"));
+        loadIcon("icons/ranks/Empire.png"));
     static { colonyRanks.add(RANK_EMPIRE); }
     public static final ColonyRank RANK_SUPER = new ColonyRank(7, LanguageStrings.RANK_SUPER, 1000000l, 
-        loadIcon("icons/ranks/super.png"));
+        loadIcon("icons/ranks/Super.png"));
     static { colonyRanks.add(RANK_SUPER); }
     public static final ColonyRank RANK_ULTRA = new ColonyRank(8, LanguageStrings.RANK_ULTRA, 10000000l, 
-        loadIcon("icons/ranks/ultra.png"));
+        loadIcon("icons/ranks/Ultra.png"));
     static { colonyRanks.add(RANK_ULTRA); }
     public static final ColonyRank RANK_HYPER = new ColonyRank(9, LanguageStrings.RANK_HYPER, 100000000l, 
-        loadIcon("icons/ranks/hyper.png"));
+        loadIcon("icons/ranks/Hyper.png"));
     static { colonyRanks.add(RANK_HYPER); }
     public static final ColonyRank RANK_MEGA = new ColonyRank(10, LanguageStrings.RANK_MEGA, 1000000000l, 
-        loadIcon("icons/ranks/mega.png"));
+        loadIcon("icons/ranks/Mega.png"));
     static { colonyRanks.add(RANK_MEGA); }
     public static final ColonyRank RANK_ULTIMATE = new ColonyRank(11, LanguageStrings.RANK_ULTIMATE, 10000000000l, 
-        loadIcon("icons/ranks/ultimate.png"));
+        loadIcon("icons/ranks/Ultimate.png"));
     static { colonyRanks.add(RANK_ULTIMATE); }
     public static final ColonyRank RANK_SUPREME = new ColonyRank(12, LanguageStrings.RANK_SUPREME, 100000000000l, 
-        loadIcon("icons/ranks/supreme.png"));
+        loadIcon("icons/ranks/Supreme.png"));
     static { colonyRanks.add(RANK_SUPREME); }
     public static final ColonyRank RANK_GIGA = new ColonyRank(13, LanguageStrings.RANK_GIGA, 1000000000000l, 
-        loadIcon("icons/ranks/giga.png"));
+        loadIcon("icons/ranks/Giga.png"));
     static { colonyRanks.add(RANK_GIGA); }
     
     // --- Species ---
     public static final Species SPECIES_OMNI = new Species(1, LanguageStrings.SPECIES_OMNI, LanguageStrings.SPECIES_OMNI_SCIENTIFIC,  "omni/", null, 
         Set.of(GameUnlocks.TYPE_EGG, GameUnlocks.TYPE_QUEEN, GameUnlocks.TYPE_WORKER, GameUnlocks.ROLE_FORAGER, 
             GameUnlocks.ROLE_FARMER, GameUnlocks.ROLE_NURSE, GameUnlocks.ROLE_LAYER, 
-            GameUnlocks.STAT_SKELETON, GameUnlocks.STAT_ACID, GameUnlocks.STAT_LONGEVITY), loadIcon("icons/species/omni.png"));
+            GameUnlocks.STAT_SKELETON, GameUnlocks.STAT_ACID, GameUnlocks.STAT_LONGEVITY), loadIcon("icons/species/Omni.png"));
     static { species.add(SPECIES_OMNI); }
     
     public static final Species SPECIES_LEAF = new Species(2, LanguageStrings.SPECIES_LEAF, LanguageStrings.SPECIES_LEAF_SCIENTIFIC, "leaf/", GameUnlocks.ASSIMILATION_LEAFCUTTER, 
         Set.of(GameUnlocks.TYPE_EGG, GameUnlocks.TYPE_QUEEN, GameUnlocks.TYPE_WORKER, GameUnlocks.ROLE_FORAGER, 
             GameUnlocks.ROLE_FARMER, GameUnlocks.ROLE_NURSE, GameUnlocks.ROLE_LAYER, 
             GameUnlocks.STAT_SKELETON, GameUnlocks.STAT_ACID, GameUnlocks.STAT_LONGEVITY,
-            GameUnlocks.ASSIMILATED_FARMING), loadIcon("icons/species/leaf.png"));
+            GameUnlocks.ASSIMILATED_FARMING), loadIcon("icons/species/Leaf.png"));
     static { species.add(SPECIES_LEAF); }
     
     public static final Species SPECIES_PHARAOH = new Species(3, LanguageStrings.SPECIES_PHARAOH, LanguageStrings.SPECIES_PHARAOH_SCIENTIFIC, "pharaoh/", GameUnlocks.ASSIMILATION_PHARAOH, 
         Set.of(GameUnlocks.TYPE_EGG, GameUnlocks.TYPE_QUEEN, GameUnlocks.TYPE_WORKER, LanguageStrings.get(LanguageStrings.SPECIES_PHARAOH_SCIENTIFIC).length() > 0 ? GameUnlocks.ROLE_FORAGER : null, 
             GameUnlocks.ROLE_FARMER, GameUnlocks.ROLE_NURSE, GameUnlocks.ROLE_LAYER, 
             GameUnlocks.STAT_SKELETON, GameUnlocks.STAT_ACID, GameUnlocks.STAT_LONGEVITY,
-            GameUnlocks.ASSIMILATED_MULTIQUEEN) ,loadIcon("icons/species/pharaoh.png"));
+            GameUnlocks.ASSIMILATED_MULTIQUEEN) ,loadIcon("icons/species/Pharaoh.png"));
     static { species.add(SPECIES_PHARAOH); }
     
     public static final Species SPECIES_MARAUDER = new Species(4, LanguageStrings.SPECIES_MARAUDER, LanguageStrings.SPECIES_MARAUDER_SCIENTIFIC, "marauder/", GameUnlocks.ASSIMILATION_MARAUDER, 
         Set.of(GameUnlocks.TYPE_EGG, GameUnlocks.TYPE_QUEEN, GameUnlocks.TYPE_WORKER, GameUnlocks.ROLE_FORAGER, 
             GameUnlocks.ROLE_FARMER, GameUnlocks.ROLE_NURSE, GameUnlocks.ROLE_LAYER, 
             GameUnlocks.STAT_SKELETON, GameUnlocks.STAT_ACID, GameUnlocks.STAT_LONGEVITY,
-            GameUnlocks.TYPE_MAJOR) ,loadIcon("icons/species/marauder.png"));
+            GameUnlocks.TYPE_MAJOR) ,loadIcon("icons/species/Marauder.png"));
     static { species.add(SPECIES_MARAUDER); }
 
     // --- Trade Methods ---

@@ -6,6 +6,7 @@ import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
@@ -87,7 +88,7 @@ public class AbilitiesDialog extends ZeroDialog {
                                     colony.forceNuptialFlight(world, targetHex);
                                     refreshDialog(); 
                                 } else {
-                                    JOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.ABILITY_ERROR_LOCATE_COLONY));
+                                    UiOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.ABILITY_ERROR_LOCATE_COLONY));
                                 }
                             }
                         }

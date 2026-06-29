@@ -97,7 +97,7 @@ public class GameAreaPanel extends ZeroGamePanel {
         biomeTextureCache.put(GameConstants.BIOME_SWAMP.getId(), loadImage("backgrounds/biomes/SwampTile.png"));
         biomeTextureCache.put(GameConstants.BIOME_TUNDRA.getId(), loadImage("backgrounds/biomes/TundraTile.png"));
         biomeTextureCache.put(GameConstants.BIOME_TAIGA.getId(), loadImage("backgrounds/biomes/TaigaTile.png"));
-        biomeTextureCache.put(GameConstants.BIOME_DESERT.getId(), loadImage("backgrounds/biomes/desertTile.png"));
+        biomeTextureCache.put(GameConstants.BIOME_DESERT.getId(), loadImage("backgrounds/biomes/DesertTile.png"));
         biomeTextureCache.put(GameConstants.BIOME_URBAN.getId(), loadImage("backgrounds/biomes/UrbanTile.png"));
         biomeTextureCache.put(GameConstants.BIOME_MOUNTAIN.getId(), loadImage("backgrounds/biomes/MountainTile.png"));
         biomeTextureCache.put(GameConstants.BIOME_VOLCANIC.getId(), loadImage("backgrounds/biomes/VolcanicTile.png"));
@@ -105,14 +105,14 @@ public class GameAreaPanel extends ZeroGamePanel {
         biomeTextureCache.put(GameConstants.BIOME_OCEAN.getId(), loadImage("backgrounds/biomes/OceanTile.png"));
         undergroundTexture = loadImage("backgrounds/colony/UndergroundTile.png");
 
-        basicRoomImg = loadImage("sprites/buildings/basicRoom.png");
-        doubleRoomImg = loadImage("sprites/buildings/doubleRoom.png");
-        firstHallwayImg = loadImage("sprites/buildings/firstHallway.png");
-        middleHallwayImg = loadImage("sprites/buildings/middleHallway.png");
-        antHillImg = loadImage("sprites/buildings/antHill.png");
-        basicYardImg = loadImage("sprites/buildings/basicYard.png");
+        basicRoomImg = loadImage("sprites/buildings/BasicRoom.png");
+        doubleRoomImg = loadImage("sprites/buildings/DoubleRoom.png");
+        firstHallwayImg = loadImage("sprites/buildings/FirstHallway.png");
+        middleHallwayImg = loadImage("sprites/buildings/MiddleHallway.png");
+        antHillImg = loadImage("sprites/buildings/AntHill.png");
+        basicYardImg = loadImage("sprites/buildings/BasicYard.png");
 
-        deadBodyImg = loadImage("sprites/ants/dead.png");
+        deadBodyImg = loadImage("sprites/ants/Dead.png");
     }
 
     private Image loadImage(String classpathRelativePath) {

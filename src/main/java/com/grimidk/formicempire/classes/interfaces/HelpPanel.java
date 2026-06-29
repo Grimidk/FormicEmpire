@@ -15,6 +15,7 @@ import com.grimidk.formicempire.classes.constants.world.Temperature;
 import com.grimidk.formicempire.classes.constants.world.TimeOfDay;
 import com.grimidk.formicempire.classes.constants.world.Weather;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.util.UiDialogUtils;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.ClasspathTextFiles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
@@ -231,8 +232,12 @@ public class HelpPanel extends JPanel {
     }
 
     private String tutorialHtml(String body) {
-        return "<html><div style='width:450px;font-family:sans-serif;font-size:12pt;color:"
-                + AssetStyles.themeTextColorHtml() + ";'>" + body + "</div></html>";
+        return helpHtml("width:450px;font-size:12pt;", body);
+    }
+
+    private static String helpHtml(String extraStyle, String body) {
+        return "<html><div style='" + extraStyle + "font-family:" + AssetStyles.themeFontFamilyCss()
+                + ";color:" + AssetStyles.themeTextColorHtml() + ";'>" + body + "</div></html>";
     }
 
     private void styleTutorialLabel(JLabel label) {
@@ -296,8 +301,9 @@ public class HelpPanel extends JPanel {
             entry.add(icon, BorderLayout.WEST);
 
             String baseUpgrades = s.getBaseUpgrades().stream().map(Upgrade::getName).collect(Collectors.joining(", "));
-            String info = "<html><div style='width: 350px; font-family: sans-serif; font-size: 11pt;'><b>" + LanguageStrings.get("HELP_SPECIES_SCIENTIFIC") + "</b> <i>" + s.getScientific() + "</i><br>" +
-                          "<b>" + LanguageStrings.get("HELP_SPECIES_TRAITS") + "</b> " + baseUpgrades + "</div></html>";
+            String info = helpHtml("width:350px;font-size:11pt;",
+                    "<b>" + LanguageStrings.get("HELP_SPECIES_SCIENTIFIC") + "</b> <i>" + s.getScientific() + "</i><br>"
+                            + "<b>" + LanguageStrings.get("HELP_SPECIES_TRAITS") + "</b> " + baseUpgrades);
             
             JLabel infoLabel = new JLabel(info);
             infoLabel.setFont(AssetStyles.FONT_NORMAL);
@@ -457,9 +463,9 @@ public class HelpPanel extends JPanel {
                 desc = "";
             }
 
-            String info = "<html><div style='width: 350px; font-family: sans-serif; font-size: 11pt;'><b>"
-                    + LanguageStrings.get(LanguageStrings.HELP_SPECIES_SCIENTIFIC) + "</b> <i>" + type.getScientificName()
-                    + "</i><br><br>" + desc + "</div></html>";
+            String info = helpHtml("width:350px;font-size:11pt;",
+                    "<b>" + LanguageStrings.get(LanguageStrings.HELP_SPECIES_SCIENTIFIC) + "</b> <i>" + type.getScientificName()
+                            + "</i><br><br>" + desc);
 
             JLabel infoLabel = new JLabel(info);
             infoLabel.setFont(AssetStyles.FONT_NORMAL);
@@ -685,12 +691,13 @@ public class HelpPanel extends JPanel {
                 AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
         
         for (Biome b : GameConstants.getBiomes()) {
-            String bInfo = "<html><div style='width: 120px; font-family: sans-serif;'><b>" + b.getName() + "</b><br>" +
-                           LanguageStrings.get("HELP_BIOME_TEMP") + b.getTemperature() + "°C<br>" +
-                           LanguageStrings.get("HELP_BIOME_HUMID") + b.isIsHumid() + "/5<br>" +
-                           LanguageStrings.get("RESOURCE_PLANT") + ": " + b.getPlantAbundance() + "x<br>" +
-                           LanguageStrings.get("RESOURCE_MEAT") + ": " + b.getAnimalAbundance() + "x<br>" +
-                           LanguageStrings.get("RESOURCE_ROCK") + ": " + b.getMineralAbundance() + "x</div></html>";
+            String bInfo = helpHtml("width:120px;",
+                    "<b>" + b.getName() + "</b><br>"
+                            + LanguageStrings.get("HELP_BIOME_TEMP") + b.getTemperature() + "°C<br>"
+                            + LanguageStrings.get("HELP_BIOME_HUMID") + b.isIsHumid() + "/5<br>"
+                            + LanguageStrings.get("RESOURCE_PLANT") + ": " + b.getPlantAbundance() + "x<br>"
+                            + LanguageStrings.get("RESOURCE_MEAT") + ": " + b.getAnimalAbundance() + "x<br>"
+                            + LanguageStrings.get("RESOURCE_ROCK") + ": " + b.getMineralAbundance() + "x");
             JLabel bLabel = new JLabel(bInfo, b.getIcon(), SwingConstants.LEFT);
             bLabel.setFont(AssetStyles.FONT_SMALL);
             bLabel.setForeground(AssetStyles.FONT_COLOR);
@@ -784,40 +791,38 @@ public class HelpPanel extends JPanel {
                 if (!e.getValueIsAdjusting()) {
                     Constant selected = list.getSelectedValue();
                     if (selected == null) {
-                        descriptionArea.setText("<html><div style='font-family: sans-serif; font-size: 11pt; color: black;'>" + LanguageStrings.get("HELP_SELECT_ITEM") + "</div></html>");
+                        descriptionArea.setText(helpHtml("font-size:11pt;", LanguageStrings.get("HELP_SELECT_ITEM")));
                         return;
                     }
                     
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("<html><div style='font-family: sans-serif; font-size: 11pt; color: black; width: 250px;'>");
+                    StringBuilder body = new StringBuilder();
                     
                     if (selected instanceof Upgrade) {
                         Upgrade u = (Upgrade) selected;
-                        sb.append("<b>").append(u.getFlavorName()).append("</b><br><br>");
-                        sb.append(u.getDescription()).append("<br><br>");
-                        sb.append("<b>").append(LanguageStrings.get("UI_COST")).append(":</b> ").append(u.getCost()).append(" RP");
+                        body.append("<b>").append(u.getFlavorName()).append("</b><br><br>");
+                        body.append(u.getDescription()).append("<br><br>");
+                        body.append("<b>").append(LanguageStrings.get("UI_COST")).append(":</b> ").append(u.getCost()).append(" RP");
                         if (u.getRequirement() != null) {
-                            sb.append("<br><b>").append(LanguageStrings.get("UI_REQUIREMENTS")).append(":</b> ").append(u.getRequirement().getFlavorName());
+                            body.append("<br><b>").append(LanguageStrings.get("UI_REQUIREMENTS")).append(":</b> ").append(u.getRequirement().getFlavorName());
                         }
                     } else if (selected instanceof Building) {
                         Building b = (Building) selected;
-                        sb.append("<b>").append(b.getName()).append("</b><br><br>");
-                        sb.append(b.getDescription());
+                        body.append("<b>").append(b.getName()).append("</b><br><br>");
+                        body.append(b.getDescription());
                         if (b.getBuildTime() > 0) {
-                             sb.append("<br><br><b>").append(LanguageStrings.get("HELP_BUILD_BASE_COST")).append(":</b><br>");
-                             sb.append(b.getMineralCost()).append(" ").append(LanguageStrings.get("RESOURCE_ROCK")).append(", ");
-                             sb.append(b.getResinCost()).append(" ").append(LanguageStrings.get("RESOURCE_RESIN")).append(", ");
-                             sb.append(b.getBuildTime()).append(" Hours");
+                             body.append("<br><br><b>").append(LanguageStrings.get("HELP_BUILD_BASE_COST")).append(":</b><br>");
+                             body.append(b.getMineralCost()).append(" ").append(LanguageStrings.get("RESOURCE_ROCK")).append(", ");
+                             body.append(b.getResinCost()).append(" ").append(LanguageStrings.get("RESOURCE_RESIN")).append(", ");
+                             body.append(b.getBuildTime()).append(" Hours");
                         }
                     } else if (selected instanceof Assimilation) {
                         Assimilation a = (Assimilation) selected;
-                        sb.append("<b>").append(a.getName()).append("</b><br><br>");
-                        sb.append(a.getDescription()).append("<br><br>");
-                        sb.append("<b>").append(LanguageStrings.get("UI_COST")).append(":</b> ").append(a.getCost()).append(" RP");
+                        body.append("<b>").append(a.getName()).append("</b><br><br>");
+                        body.append(a.getDescription()).append("<br><br>");
+                        body.append("<b>").append(LanguageStrings.get("UI_COST")).append(":</b> ").append(a.getCost()).append(" RP");
                     }
                     
-                    sb.append("</div></html>");
-                    descriptionArea.setText(sb.toString());
+                    descriptionArea.setText(helpHtml("font-size:11pt;width:250px;", body.toString()));
                     descriptionArea.setCaretPosition(0);
                 }
             }
@@ -836,9 +841,7 @@ public class HelpPanel extends JPanel {
         cardPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
         
         // --- Page 1: Story ---
-        String story = "<html><div style='width: 350px; font-family: sans-serif;'><p style='font-size: 12pt;'>" +
-                LanguageStrings.get("HELP_WELCOME_STORY") +
-                "</p></div></html>";
+        String story = helpHtml("width:350px;font-size:12pt;", "<p>" + LanguageStrings.get("HELP_WELCOME_STORY") + "</p>");
         JPanel page1 = new JPanel(new BorderLayout());
         page1.setBackground(AssetStyles.BACKGROUND_COLOR);
         page1.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -847,9 +850,7 @@ public class HelpPanel extends JPanel {
         page1.add(storyLabel, BorderLayout.CENTER);
 
         // --- Page 2: Game Info ---
-        String gameInfo = "<html><div style='width: 350px; font-family: sans-serif;'><p style='font-size: 11pt;'>" +
-                LanguageStrings.get("HELP_TUTORIAL_TIPS") +
-                "</p></div></html>";
+        String gameInfo = helpHtml("width:350px;font-size:11pt;", "<p>" + LanguageStrings.get("HELP_TUTORIAL_TIPS") + "</p>");
         JPanel page2 = new JPanel(new BorderLayout());
         page2.setBackground(AssetStyles.BACKGROUND_COLOR);
         page2.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -858,9 +859,7 @@ public class HelpPanel extends JPanel {
         page2.add(infoLabel, BorderLayout.CENTER);
         
         // --- Page 3: Threats & Mechanics ---
-        String threatInfo = "<html><div style='width: 350px; font-family: sans-serif;'><p style='font-size: 11pt;'>" +
-                LanguageStrings.get("HELP_TUTORIAL_THREATS") +
-                "</p></div></html>";
+        String threatInfo = helpHtml("width:350px;font-size:11pt;", "<p>" + LanguageStrings.get("HELP_TUTORIAL_THREATS") + "</p>");
         JPanel page3 = new JPanel(new BorderLayout());
         page3.setBackground(AssetStyles.BACKGROUND_COLOR);
         page3.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -869,9 +868,7 @@ public class HelpPanel extends JPanel {
         page3.add(threatLabel, BorderLayout.CENTER);
 
         // --- Page 4: Dynasty Management ---
-        String empireInfo = "<html><div style='width: 350px; font-family: sans-serif;'><p style='font-size: 11pt;'>" +
-                LanguageStrings.get("HELP_TUTORIAL_DYNASTY") +
-                "</p></div></html>";
+        String empireInfo = helpHtml("width:350px;font-size:11pt;", "<p>" + LanguageStrings.get("HELP_TUTORIAL_DYNASTY") + "</p>");
         JPanel page4 = new JPanel(new BorderLayout());
         page4.setBackground(AssetStyles.BACKGROUND_COLOR);
         page4.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -980,9 +977,7 @@ public class HelpPanel extends JPanel {
 
         dialog.add(cardPanel, BorderLayout.CENTER);
         dialog.add(buttonPanel, BorderLayout.SOUTH);
-        dialog.pack();
-        dialog.setLocationRelativeTo(parent);
-        dialog.setVisible(true);
+        UiDialogUtils.show(dialog, parent);
     }
 
     public static void showRoadmapDialog(Component parent) {
@@ -1021,8 +1016,6 @@ public class HelpPanel extends JPanel {
         buttonPanel.add(closeButton);
 
         dialog.add(buttonPanel, BorderLayout.SOUTH);
-        dialog.pack();
-        dialog.setLocationRelativeTo(parent);
-        dialog.setVisible(true);
+        UiDialogUtils.show(dialog, parent);
     }
 }

@@ -68,14 +68,14 @@ public class IntroPanel extends JPanel {
 
     private void showStudioSlide() {
         messageLabel.setText("<html><body style='text-align: center; color: " + AssetStyles.COLOR_ABSOLUTE_WHITE_HTML
-                + "; font-family: sans-serif; font-size: 20pt;'>"
+                + "; font-family: " + AssetStyles.themeFontFamilyCss() + "; font-size: 20pt;'>"
                 + STUDIO_NAME + "</body></html>");
     }
 
     private void showWarningSlide() {
         String text = LanguageStrings.get(LanguageStrings.INTRO_WARNING);
         messageLabel.setText("<html><body style='width: 520px; text-align: center; color: " + AssetStyles.COLOR_ABSOLUTE_WHITE_HTML
-                + "; font-family: sans-serif; font-size: 13pt;'>"
+                + "; font-family: " + AssetStyles.themeFontFamilyCss() + "; font-size: 13pt;'>"
                 + text + "</body></html>");
     }
 

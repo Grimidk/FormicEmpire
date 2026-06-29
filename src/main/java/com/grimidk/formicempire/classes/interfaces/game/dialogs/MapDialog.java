@@ -153,7 +153,7 @@ public class MapDialog extends ZeroDialog {
                 JPanel item = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 2));
                 item.setOpaque(false);
                 item.setAlignmentX(Component.LEFT_ALIGNMENT);
-                item.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                item.setCursor(null);
                 item.setToolTipText(String.format(LanguageStrings.get(LanguageStrings.MAP_CLICK_VIEW_CAPITAL), d.getName()));
 
                 item.addMouseListener(new MouseAdapter() {

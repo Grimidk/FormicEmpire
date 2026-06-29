@@ -162,6 +162,11 @@ public class AssetStyles {
         return colorToHtml(FONT_COLOR);
     }
 
+    /** CSS font-family for the current UI font (for HTML labels). */
+    public static String themeFontFamilyCss() {
+        return FONT_NORMAL.getFamily();
+    }
+
     public static String colorToHtml(Color color) {
         return String.format("#%06X", color.getRGB() & 0xFFFFFF);
     }

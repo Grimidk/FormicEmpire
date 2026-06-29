@@ -3,6 +3,7 @@ package com.grimidk.formicempire.classes.interfaces;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 
 import javax.swing.*;
@@ -130,7 +131,7 @@ public class SaveSelectPanel extends JPanel {
         Savefile existing = cachedSaves[idx];
         
         if (existing == null) {
-            String name = JOptionPane.showInputDialog(this, LanguageStrings.get(LanguageStrings.SAVE_ENTER_NAME), LanguageStrings.get(LanguageStrings.SAVE_CREATE_TITLE), JOptionPane.PLAIN_MESSAGE);
+            String name = UiOptionPane.showInputDialog(this, LanguageStrings.get(LanguageStrings.SAVE_ENTER_NAME), LanguageStrings.get(LanguageStrings.SAVE_CREATE_TITLE), JOptionPane.PLAIN_MESSAGE);
             if (name == null || name.trim().isEmpty()) return;
             
             Savefile save = new Savefile(slotId, name.trim());            
@@ -142,7 +143,7 @@ public class SaveSelectPanel extends JPanel {
                     HelpPanel.showTutorialDialog(frame);
                     frame.openGameWithSave(newSave); 
                 } else {
-                    JOptionPane.showMessageDialog(frame, LanguageStrings.get(LanguageStrings.SAVE_ERROR_CREATE), LanguageStrings.get(LanguageStrings.UI_ERROR), JOptionPane.ERROR_MESSAGE);
+                    UiOptionPane.showMessageDialog(frame, LanguageStrings.get(LanguageStrings.SAVE_ERROR_CREATE), LanguageStrings.get(LanguageStrings.UI_ERROR), JOptionPane.ERROR_MESSAGE);
                 }
             });
         } else {
@@ -151,10 +152,10 @@ public class SaveSelectPanel extends JPanel {
     }
 
     private void onDelete(int slotId, int idx) {
-        int res = JOptionPane.showConfirmDialog(this, String.format(LanguageStrings.get(LanguageStrings.SAVE_DELETE_CONFIRM), slotId), LanguageStrings.get(LanguageStrings.SAVE_DELETE_TITLE), JOptionPane.YES_NO_OPTION);
+        int res = UiOptionPane.showConfirmDialog(this, String.format(LanguageStrings.get(LanguageStrings.SAVE_DELETE_CONFIRM), slotId), LanguageStrings.get(LanguageStrings.SAVE_DELETE_TITLE), JOptionPane.YES_NO_OPTION);
         if (res != JOptionPane.YES_OPTION) return;
         boolean ok = saveManager.deleteSlot(slotId);
-        if (!ok) JOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.SAVE_DELETE_ERROR));
+        if (!ok) UiOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.SAVE_DELETE_ERROR));
         refreshSlots();
     }
 }

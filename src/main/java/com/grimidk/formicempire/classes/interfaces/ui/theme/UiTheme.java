@@ -182,6 +182,12 @@ public final class UiTheme {
             separator.setBackground(AssetStyles.BACKGROUND_COLOR);
         } else if (component instanceof javax.swing.JSplitPane splitPane) {
             splitPane.setBackground(AssetStyles.BACKGROUND_COLOR);
+        } else if (component instanceof javax.swing.JPopupMenu popupMenu) {
+            popupMenu.setBackground(AssetStyles.BACKGROUND_COLOR);
+            popupMenu.setForeground(AssetStyles.FONT_COLOR);
+            for (Component child : popupMenu.getComponents()) {
+                applyThemeToComponent(child);
+            }
         } else if (component instanceof javax.swing.JToolBar toolBar) {
             toolBar.setBackground(AssetStyles.BACKGROUND_SECONDARY);
             toolBar.setForeground(AssetStyles.FONT_COLOR);
