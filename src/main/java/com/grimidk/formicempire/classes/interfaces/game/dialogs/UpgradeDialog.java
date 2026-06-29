@@ -80,6 +80,13 @@ public class UpgradeDialog extends ZeroDialog {
     }
 
     @Override
+    public void refreshTheme() {
+        super.refreshTheme();
+        AssetStyles.styleTabbedPane(tabbedPane);
+        tabbedPane.updateUI();
+    }
+
+    @Override
     protected void refreshDialog() {
         tabbedPane.removeAll();
         tabIndexMap.clear();

@@ -124,6 +124,7 @@ public final class UiLookAndFeel {
         UIManager.put("CheckBox.selectedIcon", SquareCheckIcons.CHECKED);
         UIManager.put("CheckBox.disabledIcon", SquareCheckIcons.UNCHECKED_DISABLED);
         UIManager.put("CheckBox.disabledSelectedIcon", SquareCheckIcons.CHECKED_DISABLED);
+        UIManager.put("CheckBox.disabledText", COLOR_LIGHT_GRAY);
 
         UIManager.put("ComboBox.background", AssetStyles.BACKGROUND_SECONDARY);
         UIManager.put("ComboBox.foreground", AssetStyles.FONT_COLOR);

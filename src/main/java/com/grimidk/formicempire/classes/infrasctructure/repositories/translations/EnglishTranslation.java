@@ -300,9 +300,15 @@ public class EnglishTranslation implements Translation {
         en.put("MAP_TOOLTIP_DYNASTY", "<br><b>Dynasty:</b> ");
         en.put("MAP_TOOLTIP_DYNASTY_RANK", "<br><b>Dynasty Rank:</b> ");
         en.put("MAP_TOOLTIP_EMPTY", "<br><i>Empty</i>");
+        en.put("MAP_DYNASTY_DIPLO_FORMAT", "%s · %s");
+        en.put("MAP_SORT_BY_POPULATION", "Sort: Population");
+        en.put("MAP_SORT_BY_DIPLOMACY", "Sort: Diplomacy (hostile → friendly)");
+        en.put("MAP_LEGEND_SHOW", "Show legend");
+        en.put("MAP_LEGEND_HIDE", "Hide legend");
 
         en.put("DIALOG_DYNASTY_TITLE", "Dynasty Management");
         en.put("TAB_OVERVIEW", "Overview");
+        en.put("TAB_DIPLOMACY", "Diplomacy");
         en.put("TAB_LOGISTICS", "Logistics");
         en.put("DYNASTY_MANAGE_LOGISTICS", "Managing Logistics for: ");
         en.put("DYNASTY_DIRECTION", "Direction");
@@ -330,6 +336,10 @@ public class EnglishTranslation implements Translation {
         en.put("DYNASTY_DEFAULT_AUTOMATION", "Default Automation");
         en.put("DYNASTY_DEFAULT_AUTOMATION_TOOLTIP", "Automatically enable Automation for all new colonies established by this dynasty.");
         en.put("DYNASTY_SATELLITE", "Satellite");
+        en.put("STAT_LOYALTY", "Loyalty");
+        en.put("DYNASTY_REPUTATION", "Reputation");
+        en.put("DYNASTY_REPUTATION_STANCE", "Stance");
+        en.put("SCORE_TIER_FORMAT", "%d · %s");
         en.put("DYNASTY_STATUS", "Actions/Status");
         en.put("DYNASTY_7_DAYS", "%d / 7 Days");
         en.put("DYNASTY_RENAME_TITLE", "Enter new name for %s");
@@ -354,6 +364,7 @@ public class EnglishTranslation implements Translation {
         en.put("TRADE_CONFIRM", "Confirm Trade Route");
         en.put("TRADE_UPDATE", "Update Trade Route");
         en.put("TRADE_OPTIMIZE", "Bilateral Optimization");
+        en.put("TRADE_MAKE_TWO_WAY", "Make Two-Way Trade");
         en.put("TRADE_ERROR_OVER_CAP", "Cargo exceeds transport capacity!");
         en.put("TRADE_ERROR_NO_ANTS", "No ants assigned to transport!");
         en.put("TRADE_ERROR_NO_LOAD", "No resources selected for trade!");
@@ -575,6 +586,46 @@ public class EnglishTranslation implements Translation {
         en.put("RANK_ULTIMATE", "Ant Ultimate Colony");
         en.put("RANK_SUPREME", "Ant Supreme Colony");
         en.put("RANK_GIGA", "Ant Giga Colony");
+
+        en.put("REPUTATION_AGGRESSIVE", "Aggressive");
+        en.put("REPUTATION_WARY", "Wary");
+        en.put("REPUTATION_NEUTRAL", "Neutral");
+        en.put("REPUTATION_CORDIAL", "Cordial");
+        en.put("REPUTATION_FRIENDLY", "Friendly");
+
+        en.put("LOYALTY_REBELLIOUS", "Rebellious");
+        en.put("LOYALTY_DISLOYAL", "Disloyal");
+        en.put("LOYALTY_COMPLACENT", "Complacent");
+        en.put("LOYALTY_LOYAL", "Loyal");
+        en.put("LOYALTY_MILITANT", "Militant");
+
+        en.put("DIPLO_MODIFIER_PACT", "Pact");
+        en.put("DIPLO_MODIFIER_BROKEN_PACT", "Broken Pact");
+        en.put("DIPLO_MODIFIER_WAR", "War");
+        en.put("DIPLO_MODIFIER_TRADE", "Trade Route");
+        en.put("DIPLO_MODIFIER_TRADE_REQUEST", "Trade Request");
+        en.put("DIPLO_MODIFIER_BORDER_FRICTION", "Border Friction");
+        en.put("GI_MODIFIER_PACT", "Pact Alliance");
+        en.put("LOYALTY_MODIFIER_TRADE", "Active Trade");
+        en.put("LOYALTY_MODIFIER_TUNNEL", "Tunnel Link");
+        en.put("LOYALTY_MODIFIER_CAPITAL", "Capital");
+        en.put("DIPLO_ACTION_FORM_PACT", "Form Pact");
+        en.put("DIPLO_ACTION_BREAK_PACT", "Break Pact");
+        en.put("DIPLO_ACTION_TRADE", "Trade");
+        en.put("DIPLO_ACTION_REQUEST_TRADE", "Request Trade");
+        en.put("DIPLO_ERROR_CORDIAL_REQUIRED", "Cordial reputation or better is required to form a pact.");
+        en.put("DIPLO_ERROR_CORDIAL_REQUIRED_REQUEST", "Cordial reputation or better is required to request trade.");
+        en.put("DIPLO_ERROR_NEUTRAL_REQUIRED", "Neutral reputation or better is required to send a trade route.");
+        en.put("DIPLO_ERROR_LOYALTY_REQUIRED", "Colony loyalty must be at least Disloyal to trade.");
+        en.put("DIPLO_ERROR_NO_BORDER", "Select a player colony bordering this dynasty.");
+        en.put("DIPLO_ERROR_ACTIVE_COLONY", "Select one of your colonies on the map first.");
+        en.put("DIPLO_TRADE_REQUEST_SENT", "Trade request sent. Reputation decreased slightly.");
+        en.put("DIPLO_TOOLTIP_BASE", "Base");
+        en.put("DIPLO_TOOLTIP_EFFECTIVE", "Effective");
+        en.put("DIPLO_MODIFIER_LINE", "%s: %+d");
+        en.put("LOYALTY_TOOLTIP_BASE", "Base");
+        en.put("LOYALTY_TOOLTIP_EFFECTIVE", "Effective");
+        en.put("LOYALTY_MODIFIER_LINE", "%s: %+d");
 
         en.put("SPECIES_OMNI", "Omni Ant");
         en.put("SPECIES_OMNI_SCIENTIFIC", "Omniformica Grimunknowni");

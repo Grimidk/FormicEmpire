@@ -1,12 +1,16 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
 import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
+import com.grimidk.formicempire.classes.constants.misc.DiplomaticReputation;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.plaf.FlatChevronButton;
+import com.grimidk.formicempire.classes.interfaces.ui.styles.UiScrollBarStyles;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 
 import javax.swing.*;
@@ -15,8 +19,11 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,17 +38,13 @@ public class MapDialog extends ZeroDialog {
     private final Runnable onHexChange;
 
     public MapDialog(JFrame owner, World world, Runnable onHexChange) {
-        super(owner, LanguageStrings.DIALOG_MAP_TITLE, AssetStyles.DEFAULT_DIALOG_SIZE);
+        super(owner, LanguageStrings.DIALOG_MAP_TITLE, AssetStyles.MAP_DIALOG_SIZE);
         this.world = world;
         this.onHexChange = onHexChange;
 
-        // --- Main Map Panel ---
         this.mapPanel = new HexMapPanel();
-        
-        // --- Legend Panel ---
         this.legendPanel = new LegendPanel();
-        
-        // --- Buttons ---
+
         homeButton = new JButton(LanguageStrings.get(LanguageStrings.MAP_HOME_BUTTON));
         homeButton.setFocusable(false);
         AssetStyles.styleButton(homeButton);
@@ -52,7 +55,7 @@ public class MapDialog extends ZeroDialog {
         AssetStyles.styleButton(closeButton);
         closeButton.addActionListener(e -> dispose());
 
-        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         bottomPanel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
         bottomPanel.add(homeButton);
         bottomPanel.add(closeButton);
@@ -91,6 +94,18 @@ public class MapDialog extends ZeroDialog {
         changeHex(newHex, false);
     }
 
+    private Dynasty findPlayerDynasty() {
+        if (world == null || world.getDynastys() == null) {
+            return null;
+        }
+        for (Dynasty dynasty : world.getDynastys()) {
+            if (dynasty.isPlayer()) {
+                return dynasty;
+            }
+        }
+        return null;
+    }
+
     @Override
     protected void refreshDialog() {
         if (mapPanel != null) {
@@ -101,33 +116,200 @@ public class MapDialog extends ZeroDialog {
         }
     }
 
+    @Override
+    public void refreshTheme() {
+        super.refreshTheme();
+        AssetStyles.styleButton(homeButton);
+        AssetStyles.styleButton(closeButton);
+        bottomPanel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
+        if (mapPanel != null) {
+            mapPanel.onThemeChanged();
+        }
+        if (legendPanel != null) {
+            legendPanel.onThemeChanged();
+        }
+    }
+
+    private final JPanel bottomPanel;
+
     private class LegendPanel extends JPanel {
+        private static final int LEGEND_EXPANDED_WIDTH = 380;
+        private static final int LEGEND_COLLAPSED_WIDTH = 32;
+        private static final int POP_VALUE_WIDTH = 52;
+
+        private final JPanel legendBody;
         private final JPanel content;
+        private final JScrollPane legendScroll;
+        private final JButton sortButton;
+        private final FlatChevronButton collapseControl;
+        private int popColumnWidth = POP_VALUE_WIDTH;
+        private boolean sortByDiplomacy;
+        private boolean expanded = true;
 
         public LegendPanel() {
             setLayout(new BorderLayout());
             setBackground(AssetStyles.BACKGROUND_COLOR);
-            setPreferredSize(new Dimension(220, 0));
+            setPreferredSize(new Dimension(LEGEND_EXPANDED_WIDTH, 0));
             setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, AssetStyles.BORDER_COLOR));
+
+            collapseControl = new FlatChevronButton();
+            collapseControl.setPointsLeft(true);
+            collapseControl.setOpaque(true);
+            collapseControl.setToolTipText(LanguageStrings.get(LanguageStrings.MAP_LEGEND_HIDE));
+            collapseControl.addActionListener(e -> setExpanded(!expanded));
+            collapseControl.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    collapseControl.setBackground(AssetStyles.BACKGROUND_SECONDARY);
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    collapseControl.setBackground(AssetStyles.BACKGROUND_COLOR);
+                }
+            });
+
+            JPanel collapseWrap = new JPanel(new BorderLayout());
+            collapseWrap.setBackground(AssetStyles.BACKGROUND_COLOR);
+            collapseWrap.setPreferredSize(new Dimension(LEGEND_COLLAPSED_WIDTH, 0));
+            collapseWrap.add(collapseControl, BorderLayout.NORTH);
+            add(collapseWrap, BorderLayout.EAST);
+
+            legendBody = new JPanel(new BorderLayout());
+            legendBody.setBackground(AssetStyles.BACKGROUND_COLOR);
+
+            JPanel header = new JPanel(new BorderLayout());
+            header.setOpaque(false);
+            header.setBorder(new EmptyBorder(10, 5, 5, 5));
 
             JLabel title = new JLabel(LanguageStrings.get(LanguageStrings.MAP_LEGEND_TITLE), SwingConstants.CENTER);
             title.setFont(AssetStyles.FONT_BOLD);
             title.setForeground(AssetStyles.FONT_COLOR_HEADER);
-            title.setBorder(new EmptyBorder(10, 5, 10, 5));
-            add(title, BorderLayout.NORTH);
+            header.add(title, BorderLayout.NORTH);
 
-            content = new JPanel();
+            sortButton = new JButton(LanguageStrings.get(LanguageStrings.MAP_SORT_BY_POPULATION));
+            sortButton.setFocusable(false);
+            AssetStyles.styleCompactButton(sortButton);
+            sortButton.addActionListener(e -> {
+                sortByDiplomacy = !sortByDiplomacy;
+                updateSortButtonLabel();
+                updateLegend();
+            });
+            JPanel sortWrap = new JPanel(new BorderLayout());
+            sortWrap.setOpaque(false);
+            sortWrap.setBorder(new EmptyBorder(0, 4, 0, 4));
+            sortWrap.add(sortButton, BorderLayout.CENTER);
+            header.add(sortWrap, BorderLayout.SOUTH);
+            legendBody.add(header, BorderLayout.NORTH);
+
+            JPanel columnHeader = new JPanel(new BorderLayout(4, 0));
+            columnHeader.setOpaque(false);
+            columnHeader.setBorder(new EmptyBorder(0, 10, 4, 8));
+            JLabel dynastyHeader = new JLabel(LanguageStrings.get(LanguageStrings.STAT_DYNASTY));
+            dynastyHeader.setFont(AssetStyles.FONT_BOLD.deriveFont(10f));
+            dynastyHeader.setForeground(AssetStyles.FONT_COLOR);
+            JLabel popHeader = new JLabel(LanguageStrings.get(LanguageStrings.PANEL_POPULATION), SwingConstants.RIGHT);
+            popHeader.setFont(AssetStyles.FONT_BOLD.deriveFont(10f));
+            popHeader.setForeground(AssetStyles.FONT_COLOR);
+            int popHeaderWidth = Math.max(POP_VALUE_WIDTH, popHeader.getPreferredSize().width + 4);
+            popColumnWidth = popHeaderWidth;
+            popHeader.setPreferredSize(new Dimension(popHeaderWidth, popHeader.getPreferredSize().height));
+            columnHeader.add(dynastyHeader, BorderLayout.CENTER);
+            columnHeader.add(popHeader, BorderLayout.EAST);
+
+            content = new LegendScrollContent();
             content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
             content.setBackground(AssetStyles.BACKGROUND_COLOR);
-            content.setBorder(new EmptyBorder(5, 10, 5, 5));
-            
+            content.setBorder(new EmptyBorder(0, 5, 5, 8));
+
+            JPanel listPanel = new JPanel(new BorderLayout());
+            listPanel.setOpaque(false);
+            listPanel.add(columnHeader, BorderLayout.NORTH);
+
             JScrollPane scroll = new JScrollPane(content);
             scroll.setBorder(null);
             scroll.setOpaque(false);
             scroll.getViewport().setOpaque(false);
-            add(scroll, BorderLayout.CENTER);
+            scroll.getVerticalScrollBar().setUnitIncrement(16);
+            UiScrollBarStyles.hide(scroll);
+            legendScroll = scroll;
+            attachLegendWheelScroll(scroll, this, legendBody, listPanel, content, header, columnHeader);
+            listPanel.add(scroll, BorderLayout.CENTER);
+            legendBody.add(listPanel, BorderLayout.CENTER);
 
+            add(legendBody, BorderLayout.CENTER);
             updateLegend();
+        }
+
+        private void attachLegendWheelScroll(JScrollPane scroll, JComponent... targets) {
+            MouseWheelListener wheelListener = this::handleLegendWheel;
+            scroll.setWheelScrollingEnabled(true);
+            scroll.addMouseWheelListener(wheelListener);
+            scroll.getViewport().addMouseWheelListener(wheelListener);
+            for (JComponent target : targets) {
+                target.addMouseWheelListener(wheelListener);
+            }
+        }
+
+        private void handleLegendWheel(MouseWheelEvent e) {
+            if (!expanded || legendScroll == null) {
+                return;
+            }
+            JScrollBar bar = legendScroll.getVerticalScrollBar();
+            int next = bar.getValue() + e.getUnitsToScroll() * bar.getUnitIncrement();
+            int max = Math.max(bar.getMinimum(), bar.getMaximum() - bar.getVisibleAmount() + 1);
+            bar.setValue(Math.max(bar.getMinimum(), Math.min(max, next)));
+            e.consume();
+        }
+
+        private void setExpanded(boolean expanded) {
+            this.expanded = expanded;
+            legendBody.setVisible(expanded);
+            collapseControl.setPointsLeft(expanded);
+            collapseControl.setToolTipText(LanguageStrings.get(
+                    expanded ? LanguageStrings.MAP_LEGEND_HIDE : LanguageStrings.MAP_LEGEND_SHOW));
+            int width = expanded ? LEGEND_EXPANDED_WIDTH : LEGEND_COLLAPSED_WIDTH;
+            setPreferredSize(new Dimension(width, 0));
+            setMinimumSize(new Dimension(width, 0));
+            setMaximumSize(new Dimension(width, Integer.MAX_VALUE));
+            revalidate();
+            Container parent = getParent();
+            if (parent != null) {
+                parent.revalidate();
+                parent.repaint();
+            }
+            if (mapPanel != null) {
+                mapPanel.revalidate();
+                mapPanel.repaint();
+            }
+        }
+
+        private void updateSortButtonLabel() {
+            String label = LanguageStrings.get(
+                    sortByDiplomacy ? LanguageStrings.MAP_SORT_BY_DIPLOMACY : LanguageStrings.MAP_SORT_BY_POPULATION);
+            sortButton.setText(label);
+            sortButton.setToolTipText(label);
+            AssetStyles.styleCompactButton(sortButton);
+            var fm = sortButton.getFontMetrics(sortButton.getFont());
+            var insets = AssetStyles.BUTTON_COMPACT_MARGIN_INSETS;
+            int width = insets.left + insets.right + fm.stringWidth(label) + 4;
+            int height = insets.top + insets.bottom + fm.getHeight();
+            sortButton.setPreferredSize(new Dimension(width, height));
+            sortButton.revalidate();
+        }
+
+        private void onThemeChanged() {
+            setBackground(AssetStyles.BACKGROUND_COLOR);
+            legendBody.setBackground(AssetStyles.BACKGROUND_COLOR);
+            content.setBackground(AssetStyles.BACKGROUND_COLOR);
+            collapseControl.setBackground(AssetStyles.BACKGROUND_COLOR);
+            collapseControl.setForeground(AssetStyles.FONT_COLOR);
+            collapseControl.repaint();
+            AssetStyles.styleCompactButton(sortButton);
+            updateSortButtonLabel();
+            updateLegend();
+            revalidate();
+            repaint();
         }
 
         public void updateLegend() {
@@ -142,18 +324,26 @@ public class MapDialog extends ZeroDialog {
                 }
             }
 
+            Dynasty playerDynasty = findPlayerDynasty();
             List<Dynasty> sortedDynasties = new ArrayList<>(activeDynastiesMap.values());
-            sortedDynasties.sort((d1, d2) -> {
-                int p1 = d1.getStatService().getTotalPopulation(d1);
-                int p2 = d2.getStatService().getTotalPopulation(d2);
-                return Integer.compare(p2, p1);
-            });
+            if (sortByDiplomacy && playerDynasty != null && playerDynasty.getDiplomacyService() != null) {
+                sortedDynasties.sort(Comparator
+                        .comparingInt((Dynasty d) -> d.isPlayer() ? Integer.MIN_VALUE
+                                : playerDynasty.getDiplomacyService().getEffectiveDiplomaticReputation(d, world))
+                        .thenComparing(Dynasty::getName, String.CASE_INSENSITIVE_ORDER));
+            } else {
+                sortedDynasties.sort((d1, d2) -> {
+                    int p1 = d1.getStatService().getTotalPopulation(d1);
+                    int p2 = d2.getStatService().getTotalPopulation(d2);
+                    return Integer.compare(p2, p1);
+                });
+            }
 
             for (Dynasty d : sortedDynasties) {
-                JPanel item = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 2));
+                JPanel item = new JPanel(new BorderLayout(4, 0));
                 item.setOpaque(false);
                 item.setAlignmentX(Component.LEFT_ALIGNMENT);
-                item.setCursor(null);
+                item.setMaximumSize(new Dimension(Integer.MAX_VALUE, 28));
                 item.setToolTipText(String.format(LanguageStrings.get(LanguageStrings.MAP_CLICK_VIEW_CAPITAL), d.getName()));
 
                 item.addMouseListener(new MouseAdapter() {
@@ -180,35 +370,52 @@ public class MapDialog extends ZeroDialog {
                     }
                 });
 
-                // Color box
+                JPanel badges = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 2));
+                badges.setOpaque(false);
+
                 JPanel colorBox = new JPanel();
                 colorBox.setPreferredSize(new Dimension(12, 12));
                 colorBox.setBackground(d.getColor());
                 colorBox.setBorder(BorderFactory.createLineBorder(AssetStyles.COLOR_ABSOLUTE_BLACK, 1));
-                item.add(colorBox);
+                badges.add(colorBox);
 
-                // Species icon
                 if (d.getSpecies() != null && d.getSpecies().getIcon() != null) {
-                    JLabel icon = new JLabel(d.getSpecies().getIcon());
-                    item.add(icon);
+                    badges.add(new JLabel(d.getSpecies().getIcon()));
                 }
 
-                // Name
+                DiplomaticReputation stance = null;
+                if (!d.isPlayer() && playerDynasty != null && playerDynasty.getDiplomacyService() != null) {
+                    int rep = playerDynasty.getDiplomacyService().getEffectiveDiplomaticReputation(d, world);
+                    stance = GameConstants.getDiplomaticReputationLevel(rep);
+                    if (stance.getIcon() != null) {
+                        badges.add(new JLabel(stance.getIcon()));
+                    }
+                    item.setToolTipText(playerDynasty.getDiplomacyService().buildReputationModifierTooltip(d, world));
+                }
+
                 String nameStr = d.getName();
                 if (d.isPlayer()) {
                     nameStr += LanguageStrings.get(LanguageStrings.MAP_YOU_PLAYER);
+                } else if (stance != null) {
+                    nameStr = String.format(
+                            LanguageStrings.get(LanguageStrings.MAP_DYNASTY_DIPLO_FORMAT),
+                            nameStr,
+                            stance.getName());
                 }
+
                 JLabel name = new JLabel(nameStr);
-                name.setFont(AssetStyles.FONT_SMALL);
+                name.setFont(d.isPlayer() ? AssetStyles.FONT_BOLD.deriveFont(10f) : AssetStyles.FONT_SMALL);
                 name.setForeground(AssetStyles.FONT_COLOR);
-                if (d.isPlayer()) {
-                    name.setFont(AssetStyles.FONT_BOLD.deriveFont(10f));
-                }
-                
+
                 int pop = d.getStatService().getTotalPopulation(d);
-                name.setToolTipText(String.format(LanguageStrings.get(LanguageStrings.MAP_POPULATION_FORMAT), pop));
-                
-                item.add(name);
+                JLabel popLabel = new JLabel(String.valueOf(pop), SwingConstants.RIGHT);
+                popLabel.setFont(AssetStyles.FONT_SMALL);
+                popLabel.setForeground(AssetStyles.FONT_COLOR);
+                popLabel.setPreferredSize(new Dimension(popColumnWidth, popLabel.getPreferredSize().height));
+
+                item.add(badges, BorderLayout.WEST);
+                item.add(name, BorderLayout.CENTER);
+                item.add(popLabel, BorderLayout.EAST);
 
                 content.add(item);
                 content.add(Box.createRigidArea(new Dimension(0, 2)));
@@ -217,10 +424,42 @@ public class MapDialog extends ZeroDialog {
             content.revalidate();
             content.repaint();
         }
+
+        /** Scrollable legend list — tracks viewport width so rows are not clipped on the right. */
+        private final class LegendScrollContent extends JPanel implements Scrollable {
+            LegendScrollContent() {
+                setOpaque(true);
+            }
+
+            @Override
+            public Dimension getPreferredScrollableViewportSize() {
+                return getPreferredSize();
+            }
+
+            @Override
+            public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
+                return 16;
+            }
+
+            @Override
+            public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
+                return Math.max(visibleRect.height - 16, 16);
+            }
+
+            @Override
+            public boolean getScrollableTracksViewportWidth() {
+                return true;
+            }
+
+            @Override
+            public boolean getScrollableTracksViewportHeight() {
+                return false;
+            }
+        }
     }
 
     private class HexMapPanel extends JPanel {
-        private int hexRadius = 26;  
+        private int hexRadius = 26;
         private final Map<Integer, Color> biomeColorCache = new HashMap<>();
         private final Map<Point, Hex> hexLookup = new HashMap<>();
 
@@ -240,23 +479,29 @@ public class MapDialog extends ZeroDialog {
             });
         }
 
+        void onThemeChanged() {
+            biomeColorCache.clear();
+            setBackground(AssetStyles.BACKGROUND_COLOR);
+            repaint();
+        }
+
         private void calculateHexSize() {
             if (world == null) return;
-            
+
             int worldR = world.getWorldRadius();
-            
+
             int panelW = getWidth();
             int panelH = getHeight();
-            
-            if (panelW <= 0 || panelH <= 0) return; 
 
-            double hexesAcross = (worldR * 2 + 1) + 1.5; 
-            double hexesHigh = (worldR * 2 + 1) + 1.5; 
+            if (panelW <= 0 || panelH <= 0) return;
+
+            double hexesAcross = (worldR * 2 + 1) + 1.5;
+            double hexesHigh = (worldR * 2 + 1) + 1.5;
             double maxRadiusW = panelW / (hexesAcross * Math.sqrt(3));
             double maxRadiusH = panelH / (hexesHigh * 1.5);
-            
+
             this.hexRadius = (int) Math.min(Math.min(maxRadiusW, maxRadiusH), 55);
-            if (this.hexRadius < 10) this.hexRadius = 10; 
+            if (this.hexRadius < 10) this.hexRadius = 10;
         }
 
         @Override
@@ -270,25 +515,25 @@ public class MapDialog extends ZeroDialog {
                 Polygon poly = getHexPolygon(hex, centerOffset.x, centerOffset.y);
                 if (poly.contains(p)) {
                     StringBuilder sb = new StringBuilder("<html>");
-                    
+
                     if (hex.getBiome() != null) {
                         sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_BIOME)).append(hex.getBiome().getName());
                     } else {
                         sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_BIOME)).append(LanguageStrings.get(LanguageStrings.STAT_UNKNOWN));
                     }
-                    
+
                     Colony c = hex.getColony();
                     if (c != null) {
                         if (c.getRank() != null) {
                             sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_RANK)).append(c.getRank().getName());
                         }
-                        
+
                         if (c.getSpecies() != null) {
                             sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_SPECIES)).append(c.getSpecies().getName());
                         } else {
                             sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_SPECIES)).append(LanguageStrings.get(LanguageStrings.STAT_UNKNOWN));
                         }
-                        
+
                         if (c.getName() != null) {
                             sb.append("<br><i>").append(c.getName()).append("</i>");
                         }
@@ -299,11 +544,23 @@ public class MapDialog extends ZeroDialog {
                             if (dynasty.getRank() != null) {
                                 sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_DYNASTY_RANK)).append(dynasty.getRank().getName());
                             }
+                            Dynasty playerDynasty = findPlayerDynasty();
+                            if (playerDynasty != null && !dynasty.isPlayer() && playerDynasty.getDiplomacyService() != null) {
+                                int rep = playerDynasty.getDiplomacyService().getEffectiveDiplomaticReputation(dynasty, world);
+                                DiplomaticReputation stance = GameConstants.getDiplomaticReputationLevel(rep);
+                                sb.append("<br><b>")
+                                        .append(LanguageStrings.get(LanguageStrings.DYNASTY_REPUTATION))
+                                        .append(":</b> ")
+                                        .append(stance.getName())
+                                        .append(" (")
+                                        .append(rep)
+                                        .append(")");
+                            }
                         }
                     } else {
                         sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_EMPTY));
                     }
-                    
+
                     sb.append("</html>");
                     return sb.toString();
                 }
@@ -329,7 +586,7 @@ public class MapDialog extends ZeroDialog {
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
             if (world == null || world.getHexes() == null) return;
-            
+
             calculateHexSize();
 
             hexLookup.clear();
@@ -353,20 +610,19 @@ public class MapDialog extends ZeroDialog {
                 drawHex(g2d, activeHex, centerOffset.x, centerOffset.y, true);
             }
         }
-        
+
         private Point getCenterOffset() {
             return new Point(getWidth() / 2, getHeight() / 2);
         }
 
         private void drawHex(Graphics2D g2d, Hex hex, int centerX, int centerY, boolean isSelectionPass) {
             Polygon poly = getHexPolygon(hex, centerX, centerY);
-            
+
             if (!isSelectionPass) {
-                // --- 1. Fill Background ---
                 Rectangle bounds = poly.getBounds();
                 int cx = (int)bounds.getCenterX();
                 int cy = (int)bounds.getCenterY();
-                
+
                 Biome biome = hex.getBiome();
                 Color fillColor = AssetStyles.BACKGROUND_COLOR;
 
@@ -375,16 +631,16 @@ public class MapDialog extends ZeroDialog {
                 }
 
                 if (hex != world.getActiveHex()) {
-                    fillColor = AssetStyles.fadeTowardBackground(fillColor, 0.4f);
+                    float fade = AssetStyles.isDarkMode() ? 0.25f : 0.4f;
+                    fillColor = AssetStyles.fadeTowardBackground(fillColor, fade);
                 }
 
                 g2d.setColor(fillColor);
                 g2d.fillPolygon(poly);
 
-                // --- 2. Draw Icons ---
                 float scale = 0.85f;
-                int iconSize = (int)(hexRadius * scale); 
-                
+                int iconSize = (int)(hexRadius * scale);
+
                 if (biome != null && biome.getIcon() != null) {
                     Image icon = biome.getIcon().getImage();
                     int iconX = cx - (iconSize / 2);
@@ -395,17 +651,16 @@ public class MapDialog extends ZeroDialog {
                 if (hex.getColony() != null) {
                     Colony c = hex.getColony();
                     ColonyRank rank = c.getRank();
-                    
+
                     if (rank != null && rank.getIcon() != null) {
                         Image rankImg = rank.getIcon().getImage();
-                        int rankSize = (int)(hexRadius * scale);                    
+                        int rankSize = (int)(hexRadius * scale);
                         int rankX = cx - (rankSize / 2);
-                        int rankY = cy - (rankSize / 2) - (int)(hexRadius * scale); 
+                        int rankY = cy - (rankSize / 2) - (int)(hexRadius * scale);
                         g2d.drawImage(rankImg, rankX, rankY, rankSize, rankSize, null);
                     }
                 }
 
-                // --- 3. Draw Smart Borders ---
                 drawMergedBorders(g2d, hex, poly);
 
             } else {
@@ -431,9 +686,9 @@ public class MapDialog extends ZeroDialog {
                 Rectangle bounds = poly.getBounds();
                 double cx = bounds.getCenterX();
                 double cy = bounds.getCenterY();
-                double inset = 1.2; 
+                double inset = 1.2;
                 double scale = (hexRadius - inset) / (double)hexRadius;
-                
+
                 for(int i=0; i<6; i++) {
                     double dx = poly.xpoints[i] - cx;
                     double dy = poly.ypoints[i] - cy;
@@ -455,7 +710,7 @@ public class MapDialog extends ZeroDialog {
                     int[] offset = NEIGHBOR_OFFSETS[i];
                     int nQ = currentHex.getQ() + offset[0];
                     int nR = currentHex.getR() + offset[1];
-                    
+
                     Hex neighbor = hexLookup.get(new Point(nQ, nR));
 
                     if (neighbor != null && neighbor.getColony() != null && neighbor.getColony().getDynasty() != null) {
@@ -464,7 +719,7 @@ public class MapDialog extends ZeroDialog {
                             shouldDrawEdge = false;
                         }
                     }
-                    
+
                     g2d.setStroke(new BasicStroke(2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
                     g2d.setColor(dynastyColor);
                 } else {
@@ -506,7 +761,7 @@ public class MapDialog extends ZeroDialog {
 
             Color avgColor = calculateAverageColor(biome.getIcon());
             avgColor = AssetStyles.lightenTowardBackground(avgColor, 0.5f);
-            
+
             biomeColorCache.put(biome.getId(), avgColor);
             return avgColor;
         }
@@ -515,11 +770,11 @@ public class MapDialog extends ZeroDialog {
             try {
                 Image img = icon.getImage();
                 BufferedImage bi = new BufferedImage(
-                    img.getWidth(null), 
-                    img.getHeight(null), 
+                    img.getWidth(null),
+                    img.getHeight(null),
                     BufferedImage.TYPE_INT_ARGB
                 );
-                
+
                 Graphics g = bi.createGraphics();
                 g.drawImage(img, 0, 0, null);
                 g.dispose();
@@ -531,10 +786,10 @@ public class MapDialog extends ZeroDialog {
                     for (int y = 0; y < bi.getHeight(); y++) {
                         int pixel = bi.getRGB(x, y);
                         int alpha = (pixel >> 24) & 0xff;
-                        
-                        if (alpha < 20) continue; 
-                        
-                        if ((x % 3 == 0) && (y % 3 == 0)) { 
+
+                        if (alpha < 20) continue;
+
+                        if ((x % 3 == 0) && (y % 3 == 0)) {
                             sumR += (pixel >> 16) & 0xff;
                             sumG += (pixel >> 8) & 0xff;
                             sumB += (pixel) & 0xff;

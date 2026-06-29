@@ -273,15 +273,25 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         return engine;
     }
 
+    public void applyRuntimeSettings() {
+        ToolTipManager.sharedInstance().setEnabled(engine.isShowTooltips());
+        applyTheme();
+    }
+
     public void applyEngineSettings() {
+        reapplyWindowChrome();
+        applyRuntimeSettings();
+    }
+
+    private void reapplyWindowChrome() {
         if (engine.isFullScreen()) {
             dispose();
             setUndecorated(true);
-            
+
             Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
             setSize(screenSize);
             setVisible(true);
-            
+
             setExtendedState(JFrame.MAXIMIZED_BOTH);
         } else {
             dispose();
@@ -298,9 +308,6 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
             setLocationRelativeTo(null);
             setVisible(true);
         }
-        
-        ToolTipManager.sharedInstance().setEnabled(engine.isShowTooltips());
-        applyTheme();
     }
 
     public void showCard(String card) {
@@ -321,7 +328,7 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
     public void openGameWithSave(Savefile savefile) {
         showCard(CARD_GAME);
         gamePanel.enterWithSavefile(savefile);
-        applyEngineSettings();
+        applyRuntimeSettings();
     }
     
     @Override

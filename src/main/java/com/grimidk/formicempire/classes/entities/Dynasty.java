@@ -11,9 +11,11 @@ import java.awt.Color;
 
 import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
 import com.grimidk.formicempire.classes.constants.misc.Species;
+import com.grimidk.formicempire.classes.constants.misc.GeneticIntegrityModifier;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
 import com.grimidk.formicempire.classes.entities.services.DynastyAutomationService;
+import com.grimidk.formicempire.classes.entities.services.DynastyDiplomacyService;
 import com.grimidk.formicempire.classes.entities.services.DynastyLogisticsAutomationService;
 import com.grimidk.formicempire.classes.entities.services.DynastyStarterService;
 import com.grimidk.formicempire.classes.entities.services.DynastyStatService;
@@ -55,6 +57,9 @@ public class Dynasty {
     private double assimilationProgress;
     private Colony capital;
     private double geneticIntegrity;
+    private final Map<Integer, Integer> diplomaticReputations;
+    private final Map<Integer, String> diplomaticModifierKeys;
+    private final List<Integer> crossDynastyTradeRepGrantedIds;
 
     // Services
     private transient DynastyAutomationService automationService;
@@ -62,6 +67,7 @@ public class Dynasty {
     private transient DynastyStarterService starterService;
     private transient DynastyStatService statService;
     private transient DynastyTradeService tradeService;
+    private transient DynastyDiplomacyService diplomacyService;
 
     public Dynasty(int id, String name, boolean isPlayer, Species species) {
         this.id = id;
@@ -84,6 +90,9 @@ public class Dynasty {
         this.defaultAutomationEnabled = false;
         this.defaultAutoBuildEnabled = false;
         this.geneticIntegrity = 100.0;
+        this.diplomaticReputations = new HashMap<>();
+        this.diplomaticModifierKeys = new HashMap<>();
+        this.crossDynastyTradeRepGrantedIds = new ArrayList<>();
         
         initializeColor();
         initializeServices();
@@ -114,6 +123,9 @@ public class Dynasty {
         this.tunnels = new ArrayList<>();
         this.globalDeathStatistics = new ConcurrentHashMap<>();
         this.completedAssimilations = new HashSet<>();
+        this.diplomaticReputations = new HashMap<>();
+        this.diplomaticModifierKeys = new HashMap<>();
+        this.crossDynastyTradeRepGrantedIds = new ArrayList<>();
         
         this.absorbedDynastyIds = new ArrayList<>();
         if (savedDynasty.absorbedDynastyIds != null) {
@@ -153,6 +165,36 @@ public class Dynasty {
             }
         }
 
+        if (savedDynasty.diplomaticReputations != null) {
+            for (Map.Entry<String, Integer> entry : savedDynasty.diplomaticReputations.entrySet()) {
+                try {
+                    int otherDynastyId = Integer.parseInt(entry.getKey());
+                    if (otherDynastyId != this.id && entry.getValue() != null) {
+                        diplomaticReputations.put(otherDynastyId,
+                                GameConstants.clampDiplomaticReputation(entry.getValue()));
+                    }
+                } catch (NumberFormatException ignored) {
+                }
+            }
+        }
+
+        if (savedDynasty.diplomaticModifierKeys != null) {
+            for (Map.Entry<String, String> entry : savedDynasty.diplomaticModifierKeys.entrySet()) {
+                try {
+                    int otherDynastyId = Integer.parseInt(entry.getKey());
+                    if (otherDynastyId != this.id && entry.getValue() != null
+                            && GameConstants.getDiplomaticReputationModifierByKey(entry.getValue()) != null) {
+                        diplomaticModifierKeys.put(otherDynastyId, entry.getValue());
+                    }
+                } catch (NumberFormatException ignored) {
+                }
+            }
+        }
+
+        if (savedDynasty.crossDynastyTradeRepGrantedIds != null) {
+            this.crossDynastyTradeRepGrantedIds.addAll(savedDynasty.crossDynastyTradeRepGrantedIds);
+        }
+
         if (savedDynasty.unlockedUpgradeIds != null) {
             Map<Integer, Upgrade> allUpgrades = new HashMap<>();
             for (Upgrade u : GameUnlocks.getUpgrades()) {
@@ -177,6 +219,7 @@ public class Dynasty {
         this.logisticsAutomationService = new DynastyLogisticsAutomationService();
         this.starterService = new DynastyStarterService();
         this.statService = new DynastyStatService();
+        this.diplomacyService = new DynastyDiplomacyService(this);
     }
     
     private void initializeColor() {
@@ -347,6 +390,73 @@ public class Dynasty {
         }
     }
 
+    public int getDiplomaticReputation(int otherDynastyId) {
+        if (otherDynastyId == id) {
+            return GameConstants.DEFAULT_DIPLOMATIC_REPUTATION;
+        }
+        return GameConstants.clampDiplomaticReputation(
+                diplomaticReputations.getOrDefault(otherDynastyId, GameConstants.DEFAULT_DIPLOMATIC_REPUTATION));
+    }
+
+    public void setDiplomaticReputation(int otherDynastyId, int score) {
+        if (otherDynastyId == id) {
+            return;
+        }
+        diplomaticReputations.put(otherDynastyId, GameConstants.clampDiplomaticReputation(score));
+    }
+
+    public void adjustDiplomaticReputation(int otherDynastyId, int delta) {
+        setDiplomaticReputation(otherDynastyId, getDiplomaticReputation(otherDynastyId) + delta);
+    }
+
+    public Map<Integer, Integer> copyDiplomaticReputations() {
+        return new HashMap<>(diplomaticReputations);
+    }
+
+    public String getDiplomaticModifierKey(int otherDynastyId) {
+        if (otherDynastyId == id) {
+            return null;
+        }
+        return diplomaticModifierKeys.get(otherDynastyId);
+    }
+
+    public void setDiplomaticModifierKey(int otherDynastyId, String modifierKey) {
+        if (otherDynastyId == id) {
+            return;
+        }
+        if (modifierKey == null) {
+            diplomaticModifierKeys.remove(otherDynastyId);
+        } else {
+            diplomaticModifierKeys.put(otherDynastyId, modifierKey);
+        }
+    }
+
+    public void clearDiplomaticModifierKey(int otherDynastyId) {
+        setDiplomaticModifierKey(otherDynastyId, null);
+    }
+
+    public Map<String, String> copyDiplomaticModifierKeys() {
+        Map<String, String> copy = new HashMap<>();
+        for (Map.Entry<Integer, String> entry : diplomaticModifierKeys.entrySet()) {
+            copy.put(String.valueOf(entry.getKey()), entry.getValue());
+        }
+        return copy;
+    }
+
+    public boolean hasCrossDynastyTradeRepBonus(int otherDynastyId) {
+        return crossDynastyTradeRepGrantedIds.contains(otherDynastyId);
+    }
+
+    public void markCrossDynastyTradeRepBonus(int otherDynastyId) {
+        if (otherDynastyId != id && !crossDynastyTradeRepGrantedIds.contains(otherDynastyId)) {
+            crossDynastyTradeRepGrantedIds.add(otherDynastyId);
+        }
+    }
+
+    public List<Integer> copyCrossDynastyTradeRepGrantedIds() {
+        return new ArrayList<>(crossDynastyTradeRepGrantedIds);
+    }
+
     // --- Getters & Setters ---
     public int getId() { return id; }
     public String getName() { return name; }
@@ -438,6 +548,22 @@ public class Dynasty {
     public DynastyStarterService getStarterService() { return starterService; }
     public DynastyStatService getStatService() { return statService; }
     public DynastyTradeService getTradeService() { return tradeService; }
+    public DynastyDiplomacyService getDiplomacyService() { return diplomacyService; }
+
+    public double getDiplomaticGeneticIntegrityBonus() {
+        double bonus = 0.0;
+        for (String modifierKey : diplomaticModifierKeys.values()) {
+            GeneticIntegrityModifier modifier = GameConstants.getGeneticIntegrityModifierForDiplomaticKey(modifierKey);
+            if (modifier != null) {
+                bonus += modifier.getIntegrityDelta();
+            }
+        }
+        return bonus;
+    }
+
+    public double getBaseGeneticIntegrity() {
+        return geneticIntegrity;
+    }
 
     public double getMinGeneticIntegrity() {
         if (hasUpgrade(GameUnlocks.ABILITY_CLONING)) {
@@ -446,8 +572,9 @@ public class Dynasty {
         return 0.0;
     }
 
-    public double getGeneticIntegrity() { 
-        return Math.max(getMinGeneticIntegrity(), geneticIntegrity); 
+    public double getGeneticIntegrity() {
+        double effective = geneticIntegrity + getDiplomaticGeneticIntegrityBonus();
+        return Math.min(100.0, Math.max(getMinGeneticIntegrity(), effective));
     }
     
     public void setGeneticIntegrity(double geneticIntegrity) { 

@@ -364,7 +364,6 @@ public class ColonyLabourService {
                     if (oldDynasty != null) {
                         if (!dynasty.getAbsorbedDynastyIds().contains(oldDynasty.getId())) {
                             dynasty.addAbsorbedDynasty(oldDynasty.getId());
-                            dynasty.absorbSpecies(oldDynasty.getSpecies().getId());
                             colony.logEvent(ColonyLogPrefixes.DYNASTY + " "
                                 + String.format(LanguageStrings.get(LanguageStrings.LOG_DYNASTY_ABSORBED_FMT), oldDynasty.getName()));
                         }

@@ -300,9 +300,15 @@ public class PortugueseTranslation implements Translation {
         pt.put("MAP_TOOLTIP_DYNASTY", "<br><b>Dinastia:</b> ");
         pt.put("MAP_TOOLTIP_DYNASTY_RANK", "<br><b>Rank da dinastia:</b> ");
         pt.put("MAP_TOOLTIP_EMPTY", "<br><i>Vazio</i>");
+        pt.put("MAP_DYNASTY_DIPLO_FORMAT", "%s · %s");
+        pt.put("MAP_SORT_BY_POPULATION", "Ordenar: População");
+        pt.put("MAP_SORT_BY_DIPLOMACY", "Ordenar: Diplomacia (hostil → amigável)");
+        pt.put("MAP_LEGEND_SHOW", "Mostrar legenda");
+        pt.put("MAP_LEGEND_HIDE", "Ocultar legenda");
 
         pt.put("DIALOG_DYNASTY_TITLE", "Gestão da dinastia");
         pt.put("TAB_OVERVIEW", "Visão geral");
+        pt.put("TAB_DIPLOMACY", "Diplomacia");
         pt.put("TAB_LOGISTICS", "Logística");
         pt.put("DYNASTY_MANAGE_LOGISTICS", "Gerenciando logística para: ");
         pt.put("DYNASTY_DIRECTION", "Direção");
@@ -330,6 +336,10 @@ public class PortugueseTranslation implements Translation {
         pt.put("DYNASTY_DEFAULT_AUTOMATION", "Automação padrão");
         pt.put("DYNASTY_DEFAULT_AUTOMATION_TOOLTIP", "Ativar automaticamente a automação para todas as novas colônias desta dinastia.");
         pt.put("DYNASTY_SATELLITE", "Satélite");
+        pt.put("STAT_LOYALTY", "Lealdade");
+        pt.put("DYNASTY_REPUTATION", "Reputação");
+        pt.put("DYNASTY_REPUTATION_STANCE", "Postura");
+        pt.put("SCORE_TIER_FORMAT", "%d · %s");
         pt.put("DYNASTY_STATUS", "Ações/estado");
         pt.put("DYNASTY_7_DAYS", "%d / 7 dias");
         pt.put("DYNASTY_RENAME_TITLE", "Digite o novo nome para %s");
@@ -354,6 +364,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("TRADE_CONFIRM", "Confirmar rota comercial");
         pt.put("TRADE_UPDATE", "Atualizar rota comercial");
         pt.put("TRADE_OPTIMIZE", "Otimização bilateral");
+        pt.put("TRADE_MAKE_TWO_WAY", "Comércio de mão dupla");
         pt.put("TRADE_ERROR_OVER_CAP", "A carga excede a capacidade de transporte!");
         pt.put("TRADE_ERROR_NO_ANTS", "Nenhuma formiga atribuída ao transporte!");
         pt.put("TRADE_ERROR_NO_LOAD", "Nenhum recurso selecionado para trocar!");
@@ -575,6 +586,46 @@ public class PortugueseTranslation implements Translation {
         pt.put("RANK_ULTIMATE", "Colônia definitiva");
         pt.put("RANK_SUPREME", "Colônia suprema");
         pt.put("RANK_GIGA", "Gigacolônia");
+
+        pt.put("REPUTATION_AGGRESSIVE", "Agressivo");
+        pt.put("REPUTATION_WARY", "Desconfiado");
+        pt.put("REPUTATION_NEUTRAL", "Neutro");
+        pt.put("REPUTATION_CORDIAL", "Cordial");
+        pt.put("REPUTATION_FRIENDLY", "Amigável");
+
+        pt.put("LOYALTY_REBELLIOUS", "Rebelde");
+        pt.put("LOYALTY_DISLOYAL", "Desleal");
+        pt.put("LOYALTY_COMPLACENT", "Complacente");
+        pt.put("LOYALTY_LOYAL", "Leal");
+        pt.put("LOYALTY_MILITANT", "Militante");
+
+        pt.put("DIPLO_MODIFIER_PACT", "Pacto");
+        pt.put("DIPLO_MODIFIER_BROKEN_PACT", "Pacto quebrado");
+        pt.put("DIPLO_MODIFIER_WAR", "Guerra");
+        pt.put("DIPLO_MODIFIER_TRADE", "Rota comercial");
+        pt.put("DIPLO_MODIFIER_TRADE_REQUEST", "Pedido comercial");
+        pt.put("DIPLO_MODIFIER_BORDER_FRICTION", "Fricção fronteiriça");
+        pt.put("GI_MODIFIER_PACT", "Aliança de pacto");
+        pt.put("LOYALTY_MODIFIER_TRADE", "Comércio ativo");
+        pt.put("LOYALTY_MODIFIER_TUNNEL", "Ligação de túnel");
+        pt.put("LOYALTY_MODIFIER_CAPITAL", "Capital");
+        pt.put("DIPLO_ACTION_FORM_PACT", "Formar pacto");
+        pt.put("DIPLO_ACTION_BREAK_PACT", "Quebrar pacto");
+        pt.put("DIPLO_ACTION_TRADE", "Comerciar");
+        pt.put("DIPLO_ACTION_REQUEST_TRADE", "Solicitar comércio");
+        pt.put("DIPLO_ERROR_CORDIAL_REQUIRED", "Reputação cordial ou melhor é necessária para formar um pacto.");
+        pt.put("DIPLO_ERROR_CORDIAL_REQUIRED_REQUEST", "Reputação cordial ou melhor é necessária para solicitar comércio.");
+        pt.put("DIPLO_ERROR_NEUTRAL_REQUIRED", "Reputação neutra ou melhor é necessária para enviar uma rota comercial.");
+        pt.put("DIPLO_ERROR_LOYALTY_REQUIRED", "A lealdade da colónia deve ser pelo menos Desleal para comerciar.");
+        pt.put("DIPLO_ERROR_NO_BORDER", "Selecione uma colónia sua que faça fronteira com esta dinastia.");
+        pt.put("DIPLO_ERROR_ACTIVE_COLONY", "Selecione primeiro uma das suas colónias no mapa.");
+        pt.put("DIPLO_TRADE_REQUEST_SENT", "Pedido comercial enviado. A reputação diminuiu ligeiramente.");
+        pt.put("DIPLO_TOOLTIP_BASE", "Base");
+        pt.put("DIPLO_TOOLTIP_EFFECTIVE", "Efetiva");
+        pt.put("DIPLO_MODIFIER_LINE", "%s: %+d");
+        pt.put("LOYALTY_TOOLTIP_BASE", "Base");
+        pt.put("LOYALTY_TOOLTIP_EFFECTIVE", "Efetiva");
+        pt.put("LOYALTY_MODIFIER_LINE", "%s: %+d");
 
         pt.put("SPECIES_OMNI", "Formiga omni");
         pt.put("SPECIES_OMNI_SCIENTIFIC", "Omniformica Grimunknowni");

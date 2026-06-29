@@ -25,6 +25,7 @@ public class SettingsPanel extends JPanel {
 
     private final MainFrame frame;
     private final Engine engine;
+    private final boolean inDialog;
 
     private final CardLayout sectionLayout = new CardLayout();
     private final JPanel sectionCards = new JPanel(sectionLayout);
@@ -100,10 +101,11 @@ public class SettingsPanel extends JPanel {
     public SettingsPanel(MainFrame frame, boolean isInDialog) {
         this.frame = frame;
         this.engine = frame.getEngine();
+        this.inDialog = isInDialog;
         setLayout(new BorderLayout());
         setBackground(AssetStyles.BACKGROUND_COLOR);
 
-        sectionTabs.setLayout(new BoxLayout(sectionTabs, BoxLayout.X_AXIS));
+        sectionTabs.setLayout(new java.awt.GridLayout(1, 4, -1, 0));
         sectionTabs.setBackground(AssetStyles.BACKGROUND_DARK);
         sectionCards.setBackground(AssetStyles.BACKGROUND_COLOR);
 
@@ -193,16 +195,7 @@ public class SettingsPanel extends JPanel {
     }
 
     private void styleSectionTab(JButton button, boolean selected) {
-        if (button == null) {
-            return;
-        }
-        if (selected) {
-            button.setBackground(AssetStyles.BACKGROUND_COLOR);
-            button.setForeground(AssetStyles.FONT_COLOR_HEADER);
-        } else {
-            button.setBackground(AssetStyles.BACKGROUND_LIGHT);
-            button.setForeground(AssetStyles.FONT_COLOR);
-        }
+        AssetStyles.applyTabSelection(button, selected);
     }
     
     private JPanel createGeneralTab() {
@@ -806,8 +799,14 @@ public class SettingsPanel extends JPanel {
         applyDefaultRoleFromCombo(defaultRoleQueenCombo, GameConstants.TYPE_QUEEN, GameConstants.ROLE_LAYER.getId());
 
         engine.saveGlobalSettings();
-        frame.applyEngineSettings();
-        frame.getGamePanel().applyOverworldRecenterSetting();
+        if (inDialog) {
+            frame.applyRuntimeSettings();
+        } else {
+            frame.applyEngineSettings();
+        }
+        if (frame.getGamePanel() != null) {
+            frame.getGamePanel().applyOverworldRecenterSetting();
+        }
 
         SwingUtilities.invokeLater(() -> {
             UiOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.SETTINGS_SAVED_MSG), LanguageStrings.get(LanguageStrings.UI_SETTINGS), JOptionPane.INFORMATION_MESSAGE);

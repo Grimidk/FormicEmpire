@@ -1,0 +1,48 @@
+package com.grimidk.formicempire.classes.constants.misc;
+
+import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
+
+public class DiplomaticReputationModifier {
+    private final int id;
+    private final String nameKey;
+    private final int reputationDelta;
+    private final int minReputationRequired;
+    private final String exclusiveGroupKey;
+
+    public DiplomaticReputationModifier(int id, String nameKey, int reputationDelta,
+            int minReputationRequired, String exclusiveGroupKey) {
+        this.id = id;
+        this.nameKey = nameKey;
+        this.reputationDelta = reputationDelta;
+        this.minReputationRequired = minReputationRequired;
+        this.exclusiveGroupKey = exclusiveGroupKey;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getNameKey() {
+        return nameKey;
+    }
+
+    public String getName() {
+        return LanguageStrings.get(nameKey);
+    }
+
+    public int getReputationDelta() {
+        return reputationDelta;
+    }
+
+    public int getMinReputationRequired() {
+        return minReputationRequired;
+    }
+
+    public String getExclusiveGroupKey() {
+        return exclusiveGroupKey;
+    }
+
+    public boolean meetsReputationRequirement(int reputationScore) {
+        return reputationScore >= minReputationRequired;
+    }
+}

@@ -43,6 +43,7 @@ public class StatsDialog extends ZeroDialog {
     private final DynastyStatService dynastyStatsService; 
     
     private final JTabbedPane tabbedPane;
+    private final JPanel topPanel;
     private JCheckBox dynastyModeToggle;
     
     private JTable generalTable;
@@ -66,7 +67,7 @@ public class StatsDialog extends ZeroDialog {
         setLayout(new BorderLayout());
         
         // --- Top Toggle Panel ---
-        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         topPanel.setBackground(AssetStyles.UI_BG_SECONDARY);
         dynastyModeToggle = new JCheckBox(LanguageStrings.get(LanguageStrings.STATS_DYNASTY_MODE));
         AssetStyles.styleCheckBox(dynastyModeToggle);
@@ -126,6 +127,15 @@ public class StatsDialog extends ZeroDialog {
     public void dispose() {
         detachTickListener();
         super.dispose();
+    }
+
+    @Override
+    public void refreshTheme() {
+        super.refreshTheme();
+        topPanel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
+        dynastyModeToggle.setForeground(AssetStyles.FONT_COLOR_HEADER);
+        AssetStyles.styleTabbedPane(tabbedPane);
+        tabbedPane.updateUI();
     }
 
     private void updateTabTitles() {
@@ -439,7 +449,7 @@ public class StatsDialog extends ZeroDialog {
         model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_TOTAL_COLONIES), dynastyStatsService.getTotalColonies(dynasty)});
         model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_GLOBAL_POP), dynastyStatsService.getTotalPopulation(dynasty)});
         model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_NUPTIAL_FLIGHTS), dynasty.getTotalNuptialFlights()});
-        model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_GENETIC_INTEGRITY), String.format("%.1f%%", dynasty.getGeneticIntegrity())});
+        model.addRow(new Object[]{GameConstants.ICON_STAT_GENETIC_INTEGRITY, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_GENETIC_INTEGRITY), String.format("%.1f%%", dynasty.getGeneticIntegrity())});
 
         // Conquest & Expansion
         model.addRow(new Object[]{null, null, LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR), LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR)});

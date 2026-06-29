@@ -1,5 +1,7 @@
 package com.grimidk.formicempire.classes.infrasctructure;
 
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -82,6 +84,9 @@ public class Savefile implements Serializable {
         public int capitalColonyId = -1;
         public double geneticIntegrity = 100.0;
         public Map<String, Integer> deathStatistics = new HashMap<>();
+        public Map<String, Integer> diplomaticReputations = new HashMap<>();
+        public Map<String, String> diplomaticModifierKeys = new HashMap<>();
+        public List<Integer> crossDynastyTradeRepGrantedIds = new ArrayList<>();
         public List<SavedTunnel> tunnels = new ArrayList<>();
     }
 
@@ -108,6 +113,7 @@ public class Savefile implements Serializable {
         public float hatchRateWorker, hatchRateSoldier, hatchRateMajor, hatchRateDrone, hatchRatePrincess;
         public int aphids, symbioticMites, dermestids, parasiteAnts, parasiticMites;
         public int totalDeaths;
+        public int loyalty = GameConstants.DEFAULT_COLONY_LOYALTY;
         public Map<String, Integer> assignedRoleCounts = new HashMap<>();
         public Map<String, Integer> localDeathStatistics = new HashMap<>();
         public List<Integer> unlockedBuildingIds = new ArrayList<>();

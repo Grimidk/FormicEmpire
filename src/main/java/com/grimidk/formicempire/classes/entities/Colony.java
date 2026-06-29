@@ -14,6 +14,7 @@ import com.grimidk.formicempire.classes.entities.services.*;
 import com.grimidk.formicempire.classes.constants.misc.BugType;
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
+import com.grimidk.formicempire.classes.constants.misc.ColonyLoyaltyModifier;
 import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
 import com.grimidk.formicempire.classes.constants.misc.Species;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
@@ -22,7 +23,10 @@ import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.infrasctructure.Dimension;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
+import com.grimidk.formicempire.classes.entities.Trade;
+import com.grimidk.formicempire.classes.entities.Tunnel;
 import com.grimidk.formicempire.classes.infrasctructure.World;
+import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameRandom;
@@ -47,6 +51,7 @@ public class Colony {
     private boolean isCapital = false;
     private int age;
     private int daysWithoutQueen;
+    private int loyalty = GameConstants.DEFAULT_COLONY_LOYALTY;
     
     // --- Population Data ---
     private final Map<AntType, List<Ant>> antGroups;
@@ -180,6 +185,7 @@ public class Colony {
         this.hatchRatePrincess = 0.0f;
         this.isActive = false;
         this.autoBuildEnabled = false;
+        this.loyalty = GameConstants.DEFAULT_COLONY_LOYALTY;
     }
 
     private void initializeBuildings() {
@@ -249,6 +255,7 @@ public class Colony {
         this.autoBuildEnabled = savedColony.autoBuildEnabled;
         this.age = savedColony.age;
         this.daysWithoutQueen = savedColony.daysWithoutQueen;
+        this.loyalty = GameConstants.clampColonyLoyalty(savedColony.loyalty);
         this.totalDeaths = savedColony.totalDeaths;
 
         loadBuildings(savedColony);
@@ -403,6 +410,98 @@ public class Colony {
     public void setAge(int age) { this.age = age; }
     public int getDaysWithoutQueen() { return daysWithoutQueen; }
     public void setDaysWithoutQueen(int days) { this.daysWithoutQueen = days; }
+
+    public int getLoyalty() { return loyalty; }
+
+    public void setLoyalty(int loyalty) {
+        this.loyalty = GameConstants.clampColonyLoyalty(loyalty);
+    }
+
+    public int getLoyaltyModifierBonus(TradeManager tradeManager, World world) {
+        int bonus = 0;
+        if (tradeManager != null && world != null && participatesInActiveTrade(tradeManager, world)) {
+            bonus += GameConstants.LOYALTY_MODIFIER_TRADE.getLoyaltyDelta();
+        }
+        if (world != null && dynasty != null && hasCompleteTunnel(world)) {
+            bonus += GameConstants.LOYALTY_MODIFIER_TUNNEL.getLoyaltyDelta();
+        }
+        if (isCapital) {
+            bonus += GameConstants.LOYALTY_MODIFIER_CAPITAL.getLoyaltyDelta();
+        }
+        return bonus;
+    }
+
+    public int getEffectiveLoyalty(TradeManager tradeManager, World world) {
+        return GameConstants.clampColonyLoyalty(loyalty + getLoyaltyModifierBonus(tradeManager, world));
+    }
+
+    public String buildLoyaltyModifierTooltip(TradeManager tradeManager, World world) {
+        StringBuilder sb = new StringBuilder("<html>");
+        sb.append(LanguageStrings.get(LanguageStrings.LOYALTY_TOOLTIP_BASE))
+                .append(": ")
+                .append(loyalty)
+                .append("<br>");
+
+        if (isCapital) {
+            appendLoyaltyModifierLine(sb, GameConstants.LOYALTY_MODIFIER_CAPITAL);
+        }
+        if (tradeManager != null && world != null && participatesInActiveTrade(tradeManager, world)) {
+            appendLoyaltyModifierLine(sb, GameConstants.LOYALTY_MODIFIER_TRADE);
+        }
+        if (world != null && dynasty != null && hasCompleteTunnel(world)) {
+            appendLoyaltyModifierLine(sb, GameConstants.LOYALTY_MODIFIER_TUNNEL);
+        }
+
+        sb.append(LanguageStrings.get(LanguageStrings.LOYALTY_TOOLTIP_EFFECTIVE))
+                .append(": ")
+                .append(getEffectiveLoyalty(tradeManager, world));
+        sb.append("</html>");
+        return sb.toString();
+    }
+
+    private static void appendLoyaltyModifierLine(StringBuilder sb, ColonyLoyaltyModifier modifier) {
+        sb.append(String.format(
+                LanguageStrings.get(LanguageStrings.LOYALTY_MODIFIER_LINE),
+                modifier.getName(),
+                modifier.getLoyaltyDelta())).append("<br>");
+    }
+
+    public boolean participatesInActiveTrade(TradeManager tradeManager, World world) {
+        if (tradeManager == null || world == null) {
+            return false;
+        }
+        Hex colonyHex = world.getHexOfColony(this);
+        if (colonyHex == null) {
+            return false;
+        }
+        for (Trade trade : tradeManager.getActiveTrades()) {
+            if (!trade.isActive()) {
+                continue;
+            }
+            Hex originHex = trade.getOrigin();
+            Hex destinationHex = trade.getDestination();
+            if (originHex == colonyHex || destinationHex == colonyHex) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean hasCompleteTunnel(World world) {
+        if (dynasty == null || world == null) {
+            return false;
+        }
+        Hex colonyHex = world.getHexOfColony(this);
+        if (colonyHex == null) {
+            return false;
+        }
+        for (Tunnel tunnel : dynasty.getTunnels()) {
+            if (tunnel.isComplete() && (tunnel.getHexA() == colonyHex || tunnel.getHexB() == colonyHex)) {
+                return true;
+            }
+        }
+        return false;
+    }
     
     public Dynasty getDynasty() { return dynasty; }
     public void setDynasty(Dynasty dynasty) { 

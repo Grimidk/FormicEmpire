@@ -5,6 +5,7 @@ import com.grimidk.formicempire.classes.interfaces.ui.plaf.FlatTabbedPaneUI;
 import com.grimidk.formicempire.classes.interfaces.ui.plaf.PanelBorderButtonUI;
 
 import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.awt.Insets;
 import javax.swing.AbstractButton;
 import javax.swing.SwingConstants;
@@ -49,7 +50,7 @@ public final class UiButtonStyles {
         }
         button.setFont(AssetStyles.FONT_BOLD);
         button.setForeground(AssetStyles.FONT_COLOR);
-        button.setBackground(AssetStyles.BACKGROUND_COLOR);
+        button.setBackground(AssetStyles.TAB_UNSELECTED_BG);
         button.setCursor(null);
         button.setHorizontalAlignment(SwingConstants.CENTER);
         button.setVerticalAlignment(SwingConstants.CENTER);
@@ -57,11 +58,38 @@ public final class UiButtonStyles {
         button.setContentAreaFilled(true);
         button.setFocusPainted(false);
         button.setBorderPainted(false);
-        button.setMargin(NO_MARGIN);
-        button.setBorder(new EmptyBorder(AssetStyles.TAB_MARGIN_INSETS));
-        Dimension size = AssetStyles.tabStripSize();
+        button.setMargin(new Insets(0, 0, 0, 0));
+        Insets insets = AssetStyles.TAB_MARGIN_INSETS;
+        button.setBorder(new EmptyBorder(insets.top, insets.left, insets.bottom, Math.max(0, insets.right - 1)));
+        button.setMaximumSize(new Dimension(Integer.MAX_VALUE, AssetStyles.TAB_STRIP_HEIGHT));
+        button.setMinimumSize(new Dimension(AssetStyles.TAB_STRIP_WIDTH, AssetStyles.TAB_STRIP_HEIGHT));
+    }
+
+    public static void applyTabSelection(AbstractButton button, boolean selected) {
+        if (button == null) {
+            return;
+        }
+        if (selected) {
+            button.setBackground(AssetStyles.TAB_SELECTED_BG);
+            button.setForeground(AssetStyles.FONT_COLOR_HEADER);
+        } else {
+            button.setBackground(AssetStyles.TAB_UNSELECTED_BG);
+            button.setForeground(AssetStyles.FONT_COLOR);
+        }
+        resizeSectionTab(button);
+    }
+
+    public static void resizeSectionTab(AbstractButton button) {
+        if (button == null) {
+            return;
+        }
+        FontMetrics metrics = button.getFontMetrics(button.getFont());
+        Insets insets = AssetStyles.TAB_MARGIN_INSETS;
+        int width = Math.max(
+                AssetStyles.TAB_STRIP_WIDTH,
+                insets.left + insets.right + metrics.stringWidth(button.getText()));
+        Dimension size = new Dimension(width, AssetStyles.TAB_STRIP_HEIGHT);
         button.setPreferredSize(size);
-        button.setMinimumSize(size);
-        button.setMaximumSize(size);
+        button.setMinimumSize(new Dimension(Math.min(width, AssetStyles.TAB_STRIP_WIDTH), AssetStyles.TAB_STRIP_HEIGHT));
     }
 }

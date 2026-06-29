@@ -2,6 +2,7 @@ package com.grimidk.formicempire.classes.interfaces.ui.plaf;
 
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 
+import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Insets;
@@ -59,6 +60,27 @@ public final class PanelBorderButtonUI extends BasicButtonUI {
                 b.getText() == null ? 0 : b.getIconTextGap());
 
         paintIcon(g, b, iconRect);
-        paintText(g, b, textRect, text);
+        paintText(g, b, textRect, b.getText());
+    }
+
+    @Override
+    protected void paintText(Graphics g, AbstractButton b, Rectangle textRect, String text) {
+        if (text == null || text.isEmpty()) {
+            return;
+        }
+        FontMetrics fm = g.getFontMetrics(b.getFont());
+        g.setFont(b.getFont());
+        g.setColor(buttonTextColor(b));
+        int textX = textRect.x + (textRect.width - fm.stringWidth(text)) / 2;
+        int textY = textRect.y + fm.getAscent() + (textRect.height - fm.getHeight()) / 2;
+        g.drawString(text, textX, textY);
+    }
+
+    private static Color buttonTextColor(AbstractButton b) {
+        // Model flag only — isEnabled() also walks parents; table cell renderers disable the row panel.
+        if (!b.getModel().isEnabled()) {
+            return AssetStyles.COLOR_LIGHT_GRAY;
+        }
+        return AssetStyles.FONT_COLOR;
     }
 }

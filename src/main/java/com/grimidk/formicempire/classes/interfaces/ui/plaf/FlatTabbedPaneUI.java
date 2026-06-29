@@ -2,7 +2,6 @@ package com.grimidk.formicempire.classes.interfaces.ui.plaf;
 
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 
-import java.awt.FontMetrics;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -12,20 +11,28 @@ import javax.swing.JComponent;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicTabbedPaneUI;
 
-/** Flat tab chrome only — uses default Swing tab layout and hit-testing. */
+/** Flat tab chrome — selected tab is elevated with a brighter/darker fill. */
 public final class FlatTabbedPaneUI extends BasicTabbedPaneUI {
+    private static final int SELECTED_LIFT_PX = 2;
+
     public static ComponentUI createUI(JComponent c) {
         return new FlatTabbedPaneUI();
     }
 
     @Override
     protected int calculateTabWidth(int tabPlacement, int tabIndex, FontMetrics metrics) {
-        return AssetStyles.TAB_STRIP_WIDTH;
+        String title = tabPane.getTitleAt(tabIndex);
+        if (title == null) {
+            title = "";
+        }
+        Insets insets = tabInsets != null ? tabInsets : new Insets(0, 0, 0, 0);
+        int textWidth = metrics.stringWidth(title);
+        return Math.max(AssetStyles.TAB_STRIP_WIDTH, insets.left + insets.right + textWidth);
     }
 
     @Override
     protected int calculateTabHeight(int tabPlacement, int tabIndex, int fontHeight) {
-        return AssetStyles.TAB_STRIP_HEIGHT;
+        return AssetStyles.TAB_STRIP_HEIGHT + SELECTED_LIFT_PX;
     }
 
     @Override
@@ -33,13 +40,14 @@ public final class FlatTabbedPaneUI extends BasicTabbedPaneUI {
         super.installDefaults();
         tabInsets = AssetStyles.TAB_MARGIN_INSETS;
         tabAreaInsets = new Insets(0, 0, 0, 0);
-        selectedTabPadInsets = new Insets(0, 0, 0, 0);
-        tabRunOverlay = 0;
+        contentBorderInsets = new Insets(0, 0, 0, 0);
+        selectedTabPadInsets = new Insets(0, 0, SELECTED_LIFT_PX, 0);
+        tabRunOverlay = -1;
     }
 
     @Override
     protected int getTabRunOverlay(int tabPlacement) {
-        return 0;
+        return -1;
     }
 
     @Override
@@ -50,18 +58,24 @@ public final class FlatTabbedPaneUI extends BasicTabbedPaneUI {
     @Override
     protected void paintTabBackground(Graphics g, int tabPlacement, int tabIndex,
             int x, int y, int w, int h, boolean isSelected) {
-        g.setColor(isSelected ? AssetStyles.BACKGROUND_COLOR : AssetStyles.BACKGROUND_LIGHT);
-        g.fillRect(x, y, w, h);
+        int paintY = isSelected ? y - SELECTED_LIFT_PX : y;
+        int paintH = isSelected ? h + SELECTED_LIFT_PX : h;
+        g.setColor(isSelected ? AssetStyles.TAB_SELECTED_BG : AssetStyles.TAB_UNSELECTED_BG);
+        g.fillRect(x, paintY, w, paintH);
     }
 
     @Override
     protected void paintTabBorder(Graphics g, int tabPlacement, int tabIndex,
             int x, int y, int w, int h, boolean isSelected) {
+        int paintY = isSelected ? y - SELECTED_LIFT_PX : y;
+        int paintH = isSelected ? h + SELECTED_LIFT_PX : h;
         g.setColor(AssetStyles.UI_BORDER_COLOR);
-        g.drawLine(x, y, x, y + h - 1);
-        g.drawLine(x, y, x + w - 1, y);
-        g.drawLine(x + w - 1, y, x + w - 1, y + h - 1);
-        g.drawLine(x, y + h - 1, x + w - 1, y + h - 1);
+        g.drawLine(x, paintY, x, paintY + paintH - 1);
+        g.drawLine(x, paintY, x + w - 1, paintY);
+        g.drawLine(x + w - 1, paintY, x + w - 1, paintY + paintH - 1);
+        if (!isSelected) {
+            g.drawLine(x, paintY + paintH - 1, x + w - 1, paintY + paintH - 1);
+        }
     }
 
     @Override
@@ -86,7 +100,7 @@ public final class FlatTabbedPaneUI extends BasicTabbedPaneUI {
     protected void paintText(Graphics g, int tabPlacement, Font font, FontMetrics metrics,
             int tabIndex, String title, Rectangle textRect, boolean isSelected) {
         g.setFont(font);
-        g.setColor(AssetStyles.FONT_COLOR);
+        g.setColor(isSelected ? AssetStyles.FONT_COLOR_HEADER : AssetStyles.FONT_COLOR);
         super.paintText(g, tabPlacement, font, metrics, tabIndex, title, textRect, isSelected);
     }
 }

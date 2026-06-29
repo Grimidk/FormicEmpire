@@ -357,7 +357,14 @@ public class SaveManager {
                 sc.currentAssimilationId = (dynasty.getCurrentAssimilation() != null) ? dynasty.getCurrentAssimilation().getId() : -1;
                 sc.assimilationProgress = dynasty.getAssimilationProgress();
                 sc.capitalColonyId = (dynasty.getCapital() != null) ? dynasty.getCapital().getId() : -1;
-                sc.geneticIntegrity = dynasty.getGeneticIntegrity();
+                sc.geneticIntegrity = dynasty.getBaseGeneticIntegrity();
+                
+                sc.diplomaticReputations = new HashMap<>();
+                for (Map.Entry<Integer, Integer> entry : dynasty.copyDiplomaticReputations().entrySet()) {
+                    sc.diplomaticReputations.put(String.valueOf(entry.getKey()), entry.getValue());
+                }
+                sc.diplomaticModifierKeys = dynasty.copyDiplomaticModifierKeys();
+                sc.crossDynastyTradeRepGrantedIds = dynasty.copyCrossDynastyTradeRepGrantedIds();
                 
                 sc.unlockedUpgradeIds = new ArrayList<>();
                 if (dynasty.getUnlockedUpgrades() != null) {
@@ -469,6 +476,7 @@ public class SaveManager {
                     sc.autoBuildEnabled = c.isAutoBuildEnabled();
                     sc.age = c.getAge();
                     sc.daysWithoutQueen = c.getDaysWithoutQueen();
+                    sc.loyalty = c.getLoyalty();
                     sc.q = h.getQ();
                     sc.r = h.getR();
                     
@@ -633,6 +641,9 @@ public class SaveManager {
         writeJsonLine(w, "assimilationProgress", sc.assimilationProgress, false);
         writeJsonLine(w, "capitalColonyId", sc.capitalColonyId, false);
         writeJsonLine(w, "geneticIntegrity", sc.geneticIntegrity, false);
+        w.write("      \"diplomaticReputations\": " + serializeMapToJson(sc.diplomaticReputations) + ","); w.newLine();
+        w.write("      \"diplomaticModifierKeys\": " + serializeStringMapToJson(sc.diplomaticModifierKeys) + ","); w.newLine();
+        w.write("      \"crossDynastyTradeRepGrantedIds\": " + serializeListToJson(sc.crossDynastyTradeRepGrantedIds) + ","); w.newLine();
         w.write("      \"unlockedUpgradeIds\": " + serializeListToJson(sc.unlockedUpgradeIds) + ","); w.newLine();
         w.write("      \"absorbedDynastyIds\": " + serializeListToJson(sc.absorbedDynastyIds) + ","); w.newLine();
         w.write("      \"defeatedSpeciesIds\": " + serializeListToJson(sc.defeatedSpeciesIds) + ","); w.newLine();
@@ -658,6 +669,7 @@ public class SaveManager {
         writeJsonLine(w, "autoBuildEnabled", sc.autoBuildEnabled, false);
         writeJsonLine(w, "age", sc.age, false);
         writeJsonLine(w, "daysWithoutQueen", sc.daysWithoutQueen, false);
+        writeJsonLine(w, "loyalty", sc.loyalty, false);
         writeJsonLine(w, "q", sc.q, false);
         writeJsonLine(w, "r", sc.r, false);
         
@@ -851,6 +863,9 @@ public class SaveManager {
         sc.assimilationProgress = Double.parseDouble(map.getOrDefault("assimilationProgress", "0.0"));
         sc.capitalColonyId = Integer.parseInt(map.getOrDefault("capitalColonyId", "-1"));
         sc.geneticIntegrity = Double.parseDouble(map.getOrDefault("geneticIntegrity", "100.0"));
+        sc.diplomaticReputations = deserializeJsonToMap(map.get("diplomaticReputations"));
+        sc.diplomaticModifierKeys = deserializeJsonToStringMap(map.get("diplomaticModifierKeys"));
+        sc.crossDynastyTradeRepGrantedIds = deserializeJsonToList(map.get("crossDynastyTradeRepGrantedIds"));
         sc.unlockedUpgradeIds = deserializeJsonToList(map.get("unlockedUpgradeIds"));
         sc.absorbedDynastyIds = deserializeJsonToList(map.get("absorbedDynastyIds"));
         sc.defeatedSpeciesIds = deserializeJsonToList(map.get("defeatedSpeciesIds"));
@@ -902,6 +917,7 @@ public class SaveManager {
         sc.autoBuildEnabled = Boolean.parseBoolean(map.getOrDefault("autoBuildEnabled", "false"));
         sc.age = Integer.parseInt(map.getOrDefault("age", "0"));
         sc.daysWithoutQueen = Integer.parseInt(map.getOrDefault("daysWithoutQueen", "0"));
+        sc.loyalty = Integer.parseInt(map.getOrDefault("loyalty", String.valueOf(GameConstants.DEFAULT_COLONY_LOYALTY)));
         sc.q = Integer.parseInt(map.getOrDefault("q", "0"));
         sc.r = Integer.parseInt(map.getOrDefault("r", "0"));
         sc.totalAnts = Integer.parseInt(map.getOrDefault("totalAnts", "0"));
@@ -976,6 +992,28 @@ public class SaveManager {
             sb.append(escapeJsonString(entry.getKey()));
             sb.append("\":");
             sb.append(entry.getValue());
+            if (i < map.size() - 1) {
+                sb.append(",");
+            }
+            i++;
+        }
+        sb.append("}");
+        return sb.toString();
+    }
+
+    private String serializeStringMapToJson(Map<String, String> map) {
+        if (map == null || map.isEmpty()) {
+            return "{}";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("{");
+        int i = 0;
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            sb.append("\"");
+            sb.append(escapeJsonString(entry.getKey()));
+            sb.append("\":\"");
+            sb.append(escapeJsonString(entry.getValue()));
+            sb.append("\"");
             if (i < map.size() - 1) {
                 sb.append(",");
             }
@@ -1144,6 +1182,20 @@ public class SaveManager {
             } catch (Exception e) {
                 System.err.println("Error parsing map pair: " + m.group(0));
             }
+        }
+        return map;
+    }
+
+    private static final Pattern JSON_STRING_PAIR_PATTERN = Pattern.compile("\"([^\"]*)\":\"([^\"]*)\"");
+
+    private Map<String, String> deserializeJsonToStringMap(String json) {
+        Map<String, String> map = new HashMap<>();
+        if (json == null || json.length() <= 2) {
+            return map;
+        }
+        Matcher m = JSON_STRING_PAIR_PATTERN.matcher(json);
+        while (m.find()) {
+            map.put(unescapeJsonString(m.group(1)), unescapeJsonString(m.group(2)));
         }
         return map;
     }

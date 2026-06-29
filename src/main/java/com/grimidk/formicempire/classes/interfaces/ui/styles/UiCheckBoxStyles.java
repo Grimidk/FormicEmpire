@@ -21,5 +21,6 @@ public final class UiCheckBoxStyles {
         box.setDisabledIcon(SquareCheckIcons.UNCHECKED_DISABLED);
         box.setDisabledSelectedIcon(SquareCheckIcons.CHECKED_DISABLED);
         box.setIconTextGap(ICON_TEXT_GAP);
+        box.repaint();
     }
 }

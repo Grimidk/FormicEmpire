@@ -6,7 +6,12 @@ import com.grimidk.formicempire.classes.constants.ant.AntSubType;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.ant.MoveStatus;
 import com.grimidk.formicempire.classes.constants.misc.BugType;
+import com.grimidk.formicempire.classes.constants.misc.ColonyLoyalty;
+import com.grimidk.formicempire.classes.constants.misc.ColonyLoyaltyModifier;
 import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
+import com.grimidk.formicempire.classes.constants.misc.DiplomaticReputation;
+import com.grimidk.formicempire.classes.constants.misc.DiplomaticReputationModifier;
+import com.grimidk.formicempire.classes.constants.misc.GeneticIntegrityModifier;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.misc.Species;
 import com.grimidk.formicempire.classes.constants.misc.TradeMethod;
@@ -78,7 +83,7 @@ public final class GameConstants {
         return loadIcon(path);
     }
 
-    // --- Lists ---
+    // TODO asset: complete missing icons/sprites for all Constant registry entries (grep "TODO asset" in this file and constant classes).
     private static final List<Biome> biomes = new ArrayList<>();
     private static final List<ResourceType> resources = new ArrayList<>();
     private static final List<TimeOfDay> timesOfDay = new ArrayList<>();
@@ -92,6 +97,11 @@ public final class GameConstants {
     private static final List<AntSubType> antSubTypes = new ArrayList<>();
     private static final List<AntRole> antRoles = new ArrayList<>();
     private static final List<ColonyRank> colonyRanks = new ArrayList<>();
+    private static final List<DiplomaticReputation> diplomaticReputations = new ArrayList<>();
+    private static final List<DiplomaticReputationModifier> diplomaticReputationModifiers = new ArrayList<>();
+    private static final List<GeneticIntegrityModifier> geneticIntegrityModifiers = new ArrayList<>();
+    private static final List<ColonyLoyalty> colonyLoyalties = new ArrayList<>();
+    private static final List<ColonyLoyaltyModifier> colonyLoyaltyModifiers = new ArrayList<>();
     private static final List<Species> species = new ArrayList<>();
     private static final List<TradeMethod> tradeMethods = new ArrayList<>();
     private static final List<Humidity> humidity = new ArrayList<>();
@@ -109,6 +119,14 @@ public final class GameConstants {
     static { misc.add(ICON_PARASITIC_MITE); }
     public static final ImageIcon ICON_RESEARCH = loadIcon("icons/misc/Research.png");
     static { misc.add(ICON_RESEARCH); }
+    /** Category icon for loyalty stat labels (tiers use {@link ColonyLoyalty} icons). */
+    public static final ImageIcon ICON_STAT_LOYALTY = loadIcon("icons/temp/Warm.png");
+    static { misc.add(ICON_STAT_LOYALTY); }
+    /** Category icon for reputation stat labels (stance tiers use {@link DiplomaticReputation} icons). */
+    public static final ImageIcon ICON_STAT_REPUTATION = loadIcon("icons/temp/Good.png");
+    static { misc.add(ICON_STAT_REPUTATION); }
+    /** Category icon for genetic integrity stat labels. */
+    public static final ImageIcon ICON_STAT_GENETIC_INTEGRITY = ICON_RESEARCH;
 
     // --- Base Stats ---
     public static final float BASE_SPRITE_SPEED = 2.5f;
@@ -643,6 +661,98 @@ public final class GameConstants {
     public static final ColonyRank RANK_GIGA = new ColonyRank(13, LanguageStrings.RANK_GIGA, 1000000000000l, 
         loadIcon("icons/ranks/Giga.png"));
     static { colonyRanks.add(RANK_GIGA); }
+
+    public static final int DIPLOMATIC_REPUTATION_MIN = 0;
+    public static final int DIPLOMATIC_REPUTATION_MAX = 100;
+    public static final int DIPLOMATIC_REPUTATION_TIER_STEP = 20;
+    public static final int DEFAULT_DIPLOMATIC_REPUTATION = 50;
+
+    // --- Diplomatic reputation (dynasty-to-dynasty; 0 = aggressive, 100 = friendly) ---
+    // TODO asset: icons/diplomacy/Aggressive.png
+    public static final DiplomaticReputation REPUTATION_AGGRESSIVE = new DiplomaticReputation(
+        1, LanguageStrings.REPUTATION_AGGRESSIVE, 0, loadIcon("icons/temp/Burning.png"));
+    static { diplomaticReputations.add(REPUTATION_AGGRESSIVE); }
+    // TODO asset: icons/diplomacy/Wary.png
+    public static final DiplomaticReputation REPUTATION_WARY = new DiplomaticReputation(
+        2, LanguageStrings.REPUTATION_WARY, 20, loadIcon("icons/temp/Cold.png"));
+    static { diplomaticReputations.add(REPUTATION_WARY); }
+    // TODO asset: icons/diplomacy/Neutral.png
+    public static final DiplomaticReputation REPUTATION_NEUTRAL = new DiplomaticReputation(
+        3, LanguageStrings.REPUTATION_NEUTRAL, 40, loadIcon("icons/temp/Warm.png"));
+    static { diplomaticReputations.add(REPUTATION_NEUTRAL); }
+    // TODO asset: icons/diplomacy/Cordial.png
+    public static final DiplomaticReputation REPUTATION_CORDIAL = new DiplomaticReputation(
+        4, LanguageStrings.REPUTATION_CORDIAL, 60, loadIcon("icons/temp/Good.png"));
+    static { diplomaticReputations.add(REPUTATION_CORDIAL); }
+    // TODO asset: icons/diplomacy/Friendly.png
+    public static final DiplomaticReputation REPUTATION_FRIENDLY = new DiplomaticReputation(
+        5, LanguageStrings.REPUTATION_FRIENDLY, 80, loadIcon("icons/temp/Hot.png"));
+    static { diplomaticReputations.add(REPUTATION_FRIENDLY); }
+
+    public static final String DIPLO_EXCLUSIVE_PACT = "pact";
+
+    // --- Diplomatic reputation modifiers (mutually exclusive within exclusiveGroupKey) ---
+    public static final DiplomaticReputationModifier DIPLO_MODIFIER_PACT = new DiplomaticReputationModifier(
+        1, LanguageStrings.DIPLO_MODIFIER_PACT, 20, REPUTATION_CORDIAL.getMinScore(), DIPLO_EXCLUSIVE_PACT);
+    static { diplomaticReputationModifiers.add(DIPLO_MODIFIER_PACT); }
+    public static final DiplomaticReputationModifier DIPLO_MODIFIER_BROKEN_PACT = new DiplomaticReputationModifier(
+        2, LanguageStrings.DIPLO_MODIFIER_BROKEN_PACT, -30, 0, DIPLO_EXCLUSIVE_PACT);
+    static { diplomaticReputationModifiers.add(DIPLO_MODIFIER_BROKEN_PACT); }
+    public static final DiplomaticReputationModifier DIPLO_MODIFIER_WAR = new DiplomaticReputationModifier(
+        3, LanguageStrings.DIPLO_MODIFIER_WAR, -100, 0, DIPLO_EXCLUSIVE_PACT);
+    static { diplomaticReputationModifiers.add(DIPLO_MODIFIER_WAR); }
+    public static final DiplomaticReputationModifier DIPLO_MODIFIER_TRADE = new DiplomaticReputationModifier(
+        4, LanguageStrings.DIPLO_MODIFIER_TRADE, 20, REPUTATION_NEUTRAL.getMinScore(), null);
+    static { diplomaticReputationModifiers.add(DIPLO_MODIFIER_TRADE); }
+    public static final DiplomaticReputationModifier DIPLO_MODIFIER_TRADE_REQUEST = new DiplomaticReputationModifier(
+        5, LanguageStrings.DIPLO_MODIFIER_TRADE_REQUEST, -5, REPUTATION_CORDIAL.getMinScore(), null);
+    static { diplomaticReputationModifiers.add(DIPLO_MODIFIER_TRADE_REQUEST); }
+    public static final DiplomaticReputationModifier DIPLO_MODIFIER_BORDER_FRICTION = new DiplomaticReputationModifier(
+        6, LanguageStrings.DIPLO_MODIFIER_BORDER_FRICTION, -10, 0, null);
+    static { diplomaticReputationModifiers.add(DIPLO_MODIFIER_BORDER_FRICTION); }
+
+    // --- Genetic integrity modifiers (active while linked diplomatic modifier is active) ---
+    public static final GeneticIntegrityModifier GI_MODIFIER_PACT = new GeneticIntegrityModifier(
+        1, LanguageStrings.GI_MODIFIER_PACT, 10.0, DIPLO_MODIFIER_PACT.getNameKey());
+    static { geneticIntegrityModifiers.add(GI_MODIFIER_PACT); }
+
+    public static final int COLONY_LOYALTY_MIN = 0;
+    public static final int COLONY_LOYALTY_MAX = 100;
+    public static final int COLONY_LOYALTY_TIER_STEP = 20;
+    public static final int DEFAULT_COLONY_LOYALTY = 50;
+
+    // --- Colony loyalty (colony-to-own-dynasty; 0 = rebellious, 100 = militant) ---
+    // TODO asset: icons/loyalty/Rebellious.png
+    public static final ColonyLoyalty LOYALTY_REBELLIOUS = new ColonyLoyalty(
+        1, LanguageStrings.LOYALTY_REBELLIOUS, 0, loadIcon("icons/temp/Burning.png"));
+    static { colonyLoyalties.add(LOYALTY_REBELLIOUS); }
+    // TODO asset: icons/loyalty/Disloyal.png
+    public static final ColonyLoyalty LOYALTY_DISLOYAL = new ColonyLoyalty(
+        2, LanguageStrings.LOYALTY_DISLOYAL, 20, loadIcon("icons/temp/Cold.png"));
+    static { colonyLoyalties.add(LOYALTY_DISLOYAL); }
+    // TODO asset: icons/loyalty/Complacent.png
+    public static final ColonyLoyalty LOYALTY_COMPLACENT = new ColonyLoyalty(
+        3, LanguageStrings.LOYALTY_COMPLACENT, 40, loadIcon("icons/temp/Warm.png"));
+    static { colonyLoyalties.add(LOYALTY_COMPLACENT); }
+    // TODO asset: icons/loyalty/Loyal.png
+    public static final ColonyLoyalty LOYALTY_LOYAL = new ColonyLoyalty(
+        4, LanguageStrings.LOYALTY_LOYAL, 60, loadIcon("icons/temp/Good.png"));
+    static { colonyLoyalties.add(LOYALTY_LOYAL); }
+    // TODO asset: icons/loyalty/Militant.png
+    public static final ColonyLoyalty LOYALTY_MILITANT = new ColonyLoyalty(
+        5, LanguageStrings.LOYALTY_MILITANT, 80, loadIcon("icons/temp/Hot.png"));
+    static { colonyLoyalties.add(LOYALTY_MILITANT); }
+
+    // --- Colony loyalty modifiers (applied while condition is active) ---
+    public static final ColonyLoyaltyModifier LOYALTY_MODIFIER_TRADE = new ColonyLoyaltyModifier(
+        1, LanguageStrings.LOYALTY_MODIFIER_TRADE, 10, 0, null);
+    static { colonyLoyaltyModifiers.add(LOYALTY_MODIFIER_TRADE); }
+    public static final ColonyLoyaltyModifier LOYALTY_MODIFIER_TUNNEL = new ColonyLoyaltyModifier(
+        2, LanguageStrings.LOYALTY_MODIFIER_TUNNEL, 10, 0, null);
+    static { colonyLoyaltyModifiers.add(LOYALTY_MODIFIER_TUNNEL); }
+    public static final ColonyLoyaltyModifier LOYALTY_MODIFIER_CAPITAL = new ColonyLoyaltyModifier(
+        3, LanguageStrings.LOYALTY_MODIFIER_CAPITAL, 200, 0, null);
+    static { colonyLoyaltyModifiers.add(LOYALTY_MODIFIER_CAPITAL); }
     
     // --- Species ---
     public static final Species SPECIES_OMNI = new Species(1, LanguageStrings.SPECIES_OMNI, LanguageStrings.SPECIES_OMNI_SCIENTIFIC,  "omni/", null, 
@@ -748,6 +858,128 @@ public final class GameConstants {
     }
 
     public static List<ColonyRank> getColonyRanks() { return Collections.unmodifiableList(colonyRanks); }
+
+    public static int clampDiplomaticReputation(int score) {
+        return Math.max(DIPLOMATIC_REPUTATION_MIN, Math.min(DIPLOMATIC_REPUTATION_MAX, score));
+    }
+
+    public static DiplomaticReputation getDiplomaticReputationLevel(int score) {
+        score = clampDiplomaticReputation(score);
+        DiplomaticReputation level = REPUTATION_AGGRESSIVE;
+        for (DiplomaticReputation candidate : diplomaticReputations) {
+            if (score >= candidate.getMinScore()) {
+                level = candidate;
+            }
+        }
+        return level;
+    }
+
+    public static DiplomaticReputation getDiplomaticReputationById(int id) {
+        for (DiplomaticReputation level : diplomaticReputations) {
+            if (level.getId() == id) {
+                return level;
+            }
+        }
+        return null;
+    }
+
+    public static List<DiplomaticReputation> getDiplomaticReputations() {
+        return Collections.unmodifiableList(diplomaticReputations);
+    }
+
+    public static DiplomaticReputationModifier getDiplomaticReputationModifierById(int id) {
+        for (DiplomaticReputationModifier modifier : diplomaticReputationModifiers) {
+            if (modifier.getId() == id) {
+                return modifier;
+            }
+        }
+        return null;
+    }
+
+    public static DiplomaticReputationModifier getDiplomaticReputationModifierByKey(String key) {
+        if (key == null) {
+            return null;
+        }
+        for (DiplomaticReputationModifier modifier : diplomaticReputationModifiers) {
+            if (modifier.getNameKey().equals(key)) {
+                return modifier;
+            }
+        }
+        return null;
+    }
+
+    public static List<DiplomaticReputationModifier> getDiplomaticReputationModifiers() {
+        return Collections.unmodifiableList(diplomaticReputationModifiers);
+    }
+
+    public static GeneticIntegrityModifier getGeneticIntegrityModifierForDiplomaticKey(String diplomaticModifierKey) {
+        if (diplomaticModifierKey == null) {
+            return null;
+        }
+        for (GeneticIntegrityModifier modifier : geneticIntegrityModifiers) {
+            if (diplomaticModifierKey.equals(modifier.getLinkedDiplomaticModifierKey())) {
+                return modifier;
+            }
+        }
+        return null;
+    }
+
+    public static List<GeneticIntegrityModifier> getGeneticIntegrityModifiers() {
+        return Collections.unmodifiableList(geneticIntegrityModifiers);
+    }
+
+    public static ColonyLoyaltyModifier getColonyLoyaltyModifierById(int id) {
+        for (ColonyLoyaltyModifier modifier : colonyLoyaltyModifiers) {
+            if (modifier.getId() == id) {
+                return modifier;
+            }
+        }
+        return null;
+    }
+
+    public static ColonyLoyaltyModifier getColonyLoyaltyModifierByKey(String key) {
+        if (key == null) {
+            return null;
+        }
+        for (ColonyLoyaltyModifier modifier : colonyLoyaltyModifiers) {
+            if (modifier.getNameKey().equals(key)) {
+                return modifier;
+            }
+        }
+        return null;
+    }
+
+    public static List<ColonyLoyaltyModifier> getColonyLoyaltyModifiers() {
+        return Collections.unmodifiableList(colonyLoyaltyModifiers);
+    }
+
+    public static int clampColonyLoyalty(int score) {
+        return Math.max(COLONY_LOYALTY_MIN, Math.min(COLONY_LOYALTY_MAX, score));
+    }
+
+    public static ColonyLoyalty getColonyLoyaltyLevel(int score) {
+        score = clampColonyLoyalty(score);
+        ColonyLoyalty level = LOYALTY_REBELLIOUS;
+        for (ColonyLoyalty candidate : colonyLoyalties) {
+            if (score >= candidate.getMinScore()) {
+                level = candidate;
+            }
+        }
+        return level;
+    }
+
+    public static ColonyLoyalty getColonyLoyaltyById(int id) {
+        for (ColonyLoyalty level : colonyLoyalties) {
+            if (level.getId() == id) {
+                return level;
+            }
+        }
+        return null;
+    }
+
+    public static List<ColonyLoyalty> getColonyLoyalties() {
+        return Collections.unmodifiableList(colonyLoyalties);
+    }
 
     public static List<Species> getSpecies() { return Collections.unmodifiableList(species); }
 

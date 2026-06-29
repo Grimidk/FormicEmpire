@@ -1,21 +1,13 @@
 Here is the current roadmap of features and fixes:
 
 Missing assets:
-	Pixel art pass
-		ResourceSources — sprite: mineral,mushroom,syrup,resin for small,medium,big,huge
-		MoveStatus — missing icon: MOVE_STATIC, MOVE_WANDER, MOVE_MARCH, MOVE_SPEED, MOVE_FLY, MOVE_PATROL
-		AntRole — missing icon (34): ROLE_FORAGER, ROLE_NURSE, ROLE_BUILDER, ROLE_SCOUT, ROLE_FARMER, ROLE_RANCHER, ROLE_GRAVER, ROLE_MINER, ROLE_COURIER, ROLE_POTTER, ROLE_GUARD, ROLE_WARRIOR, ROLE_DEFENDER, ROLE_POLICE, ROLE_BOMBER, ROLE_HUNTER, ROLE_BRUTE, ROLE_CARRIER, ROLE_ARTILLERY, ROLE_SIEGE, ROLE_BORER, ROLE_DRONE, ROLE_BREEDER, ROLE_DIPLOMAT, ROLE_LAYER, ROLE_RESEARCHER, ROLE_MILITIA, ROLE_CATCHER, ROLE_CRANE, ROLE_TRANSPORT, ROLE_ASSISTANT, ROLE_ESCORT, ROLE_ENGINEER, ROLE_SKYTRANS
-		TradeMethod — missing icon: METHOD_LAND, METHOD_AIR, METHOD_SEA, METHOD_TUNNEL
-		Upgrade — missing icon: TYPE_EGG, TYPE_WORKER, TYPE_SOLDIER, TYPE_MAJOR, TYPE_PRINCESS, TYPE_QUEEN, ROLE_FORAGER, ROLE_NURSE, ROLE_FARMER, ROLE_GRAVER, ROLE_HUNTER, ROLE_LAYER, ROLE_RANCHER, ROLE_RESEARCHER, ROLE_BUILDER, ROLE_SCOUT, ROLE_MINER, ROLE_POTTER, ROLE_GUARD, ROLE_WARRIOR, ROLE_DEFENDER, ROLE_POLICE, ROLE_BOMBER, ROLE_BRUTE, ROLE_CARRIER, ROLE_ARTILLERY, ROLE_SIEGE, ROLE_BREEDER, ROLE_DIPLOMAT, ROLE_MILITIA, ROLE_CATCHER, ROLE_CRANE, ROLE_ASSISTANT, ABILITY_RESEARCH, ABILITY_BUILD, ABILITY_SPREAD, ABILITY_RESIN, ABILITY_SYNERGY, ABILITY_ASSIMILATION, ABILITY_FORCED_FLIGHT, ABILITY_DYNASTY, ABILITY_TRADE, ABILITY_SPREAD_2, ABILITY_AUTOMATION, ABILITY_TUNNELS, ABILITY_BILATERAL_TRADE, ABILITY_MANAGEMENT, ABILITY_MASS_FLIGHT, ABILITY_CLONING, ABILITY_ABILITY, ROLE_COURIER, ROLE_BORER, ROLE_TRANSPORT, ROLE_ESCORT, ROLE_ENGINEER, ROLE_SKYTRANS, STAT_SKELETON, STAT_ACID, STAT_LONGEVITY, STAT_RESEARCH_1, STAT_RESEARCH_2, STAT_RESEARCH_3, STAT_GROWTH_1, STAT_GROWTH_2, STAT_GROWTH_3, STAT_THIRST_1, STAT_THIRST_2, STAT_THIRST_3, STAT_LOGISTICS_1, STAT_PASSIVE_1, STAT_LAYING_1, STAT_LAYING_2, STAT_LAYING_3, STAT_SCOUTING_1, STAT_SCOUTING_2, STAT_SCOUTING_3, STAT_FARMING_1, STAT_FARMING_2, STAT_FARMING_3, STAT_CONTAMINATION_1, STAT_CONTAMINATION_2, STAT_CONTAMINATION_3, STAT_GRAVING_1, STAT_GRAVING_2, STAT_GRAVING_3, STAT_POLICING_1, STAT_POLICING_2, STAT_POLICING_3, ASSIMILATED_FARMING, ASSIMILATED_MULTIQUEEN
-		Building — missing menu icon and room sprite (both null): ROYAL_CHAMBER_0 - 5, EGG_CHAMBER_0 - 5, MUSHROOM_CHAMBER_0 - 5, PLANT_CHAMBER_0 - 5, WATER_RESERVOIR_0 - 5, MEAT_CHAMBER_0 - 5, SYRUP_RESERVOIR_0 - 5, ROCK_WAREHOUSE_0 - 5, RESIN_RESERVOIR_0 - 5, PASSIVE_LAB, PASSIVE_WATER, PASSIVE_APHID, PASSIVE_NURSE, PASSIVE_FARM, PASSIVE_GRAVE, BUILDING_COMPOSTER
-		Assimilation — missing icon: ASSIMILATION_LEAFCUTTER, ASSIMILATION_PHARAOH, ASSIMILATION_MARAUDER
-		Convoy / tunnel logistics — missing sprite:
-			sprites/buildings/rooms/transitPortal.png — underworld portal mouth, off-map right of logistics / transit chamber (nest-entrance style)
-			sprites/tunnel/tunnelTile.png — repeating tunnel dimension background (future convoy view / simulation screen)
-			sprites/tunnel/tunnelPortal.png — portal frame visible inside tunnel dimension (future)
-
-		Map hexes — look yank
-		Font - self explanatory
+	Pixel art pass (general)
+	Convoy / tunnel logistics — missing sprite:
+		sprites/buildings/rooms/transitPortal.png — underworld portal mouth, off-map right of logistics / transit chamber (nest-entrance style)
+		sprites/tunnel/tunnelTile.png — repeating tunnel dimension background (future convoy view / simulation screen)
+		sprites/tunnel/tunnelPortal.png — portal frame visible inside tunnel dimension (future)
+	Map hexes — look yank
+	Font - self explanatory
 
 To Fix (By decreasing priority) : 
 		
@@ -23,7 +15,7 @@ To Fix (By decreasing priority) :
 	(none right now)
 	
 	High:
-	(none right now)
+	TODO: icons/sprites for all Constant types still missing assets (grep "TODO asset" in GameConstants and constant classes — roles, moves, trade methods, upgrades, buildings, assimilations, loyalty/reputation tiers, diplomacy modifiers, resource source sprites)
 
 	Mid:
 	(none right now)
@@ -40,10 +32,12 @@ To Fix (By decreasing priority) :
 To Feature (to be done in order):
 Needed for launch (v1.0) (Launch Version):
 	Priority:
-	diplomacy and diplomatic reputation (own and xeno colonies) and alliances (non-aggression pacts), alliances can increase while allied genetic integrity
-	rebellions and rebel colonies (internal rebeliousness stat, too much causes a rebellious dynasty to appear, once capital defeated it gets reabsorbed)
+	TODO: automate diplomatic actions (AI dynasties proposing/breaking pacts and other rep modifiers)
+	TODO: NPC AI calculates and responds to cross-dynasty trade requests
+	TODO: show colony loyalty on overworld map for player dynasty colonies
+	rebellions and rebel colonies ( too much causes a rebellious dynasty to appear, once capital defeated it gets reabsorbed)
 	diplo dialog with stance options (neutral, aggressive, peaceful)
-	battle system (mass battle in land and air, tick based loses based on active/passive military strenght from 1:1 = 50% chance and 1% loses up to 1:10 100% chance and 100% loses, 2 staged war until the queens are dead)
+	battle system (mass battle in land and air, tick based loses based on active/passive military strenght from 1:1 = 50% chance and 1% loses up to 1:10 100% chance and 100% loses, 2 staged war until the queens are dead; war cancels active cross-dynasty trades)
 	assimilations ( Trap-jaw (Trap jaw ants), Honey-pot (Honey pot ants), Door-head (Turtle ants), Wood burrowing (Carpenter ants), Silk weaving (Weaver ants), Rafting (Flood plains ants), Fire venom (Fire ants), Jumping (Jet ants), Gliding (Gliding ants), Stinging (Bullet ants), Swarming (Army ants), Stealth (Ghost ants), Fast bitting (Dracula ants), Heat resistance (Saharan silver ants), Deadly venom (Harvester ants), Self destruction (Exploding ants), Far sight (Bulldog ants), Hive building (Shining black ants), Location sensing (Desert ants))
 
 	Everything else :

@@ -68,6 +68,13 @@ public class RoleManagementDialog extends ZeroDialog {
     }
 
     @Override
+    public void refreshTheme() {
+        super.refreshTheme();
+        AssetStyles.styleTabbedPane(tabbedPane);
+        tabbedPane.updateUI();
+    }
+
+    @Override
     protected void refreshDialog() {
         initTabs();
         for (RolePanel panel : rolePanels) {

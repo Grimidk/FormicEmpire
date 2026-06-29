@@ -57,6 +57,7 @@ public final class UiTableBooleanStyles {
         public Component getTableCellRendererComponent(
                 JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             applyRowColors(checkBox, table, isSelected);
+            AssetStyles.styleCheckBox(checkBox);
             checkBox.setSelected(value instanceof Boolean selected && selected);
             return checkBox;
         }
@@ -76,6 +77,7 @@ public final class UiTableBooleanStyles {
         public Component getTableCellEditorComponent(
                 JTable table, Object value, boolean isSelected, int row, int column) {
             applyRowColors(checkBox, table, isSelected);
+            AssetStyles.styleCheckBox(checkBox);
             checkBox.setSelected(value instanceof Boolean selected && selected);
             return checkBox;
         }

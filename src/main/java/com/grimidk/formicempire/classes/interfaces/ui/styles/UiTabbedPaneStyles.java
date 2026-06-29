@@ -10,7 +10,7 @@ public final class UiTabbedPaneStyles {
 
     public static void style(JTabbedPane tabbedPane) {
         tabbedPane.setFont(AssetStyles.FONT_BOLD);
-        tabbedPane.setBackground(AssetStyles.BACKGROUND_DARK);
+        tabbedPane.setBackground(AssetStyles.TAB_UNSELECTED_BG);
         tabbedPane.setForeground(AssetStyles.FONT_COLOR);
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
         tabbedPane.updateUI();

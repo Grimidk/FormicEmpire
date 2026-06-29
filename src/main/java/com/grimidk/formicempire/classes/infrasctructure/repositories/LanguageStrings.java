@@ -406,9 +406,15 @@ public final class LanguageStrings {
     public static final String MAP_TOOLTIP_DYNASTY = "MAP_TOOLTIP_DYNASTY";
     public static final String MAP_TOOLTIP_DYNASTY_RANK = "MAP_TOOLTIP_DYNASTY_RANK";
     public static final String MAP_TOOLTIP_EMPTY = "MAP_TOOLTIP_EMPTY";
+    public static final String MAP_DYNASTY_DIPLO_FORMAT = "MAP_DYNASTY_DIPLO_FORMAT";
+    public static final String MAP_SORT_BY_POPULATION = "MAP_SORT_BY_POPULATION";
+    public static final String MAP_SORT_BY_DIPLOMACY = "MAP_SORT_BY_DIPLOMACY";
+    public static final String MAP_LEGEND_SHOW = "MAP_LEGEND_SHOW";
+    public static final String MAP_LEGEND_HIDE = "MAP_LEGEND_HIDE";
 
     public static final String DIALOG_DYNASTY_TITLE = "DIALOG_DYNASTY_TITLE";
     public static final String TAB_OVERVIEW = "TAB_OVERVIEW";
+    public static final String TAB_DIPLOMACY = "TAB_DIPLOMACY";
     public static final String TAB_LOGISTICS = "TAB_LOGISTICS";
     public static final String DYNASTY_MANAGE_LOGISTICS = "DYNASTY_MANAGE_LOGISTICS";
     public static final String DYNASTY_DIRECTION = "DYNASTY_DIRECTION";
@@ -436,6 +442,10 @@ public final class LanguageStrings {
     public static final String DYNASTY_DEFAULT_AUTOMATION = "DYNASTY_DEFAULT_AUTOMATION";
     public static final String DYNASTY_DEFAULT_AUTOMATION_TOOLTIP = "DYNASTY_DEFAULT_AUTOMATION_TOOLTIP";
     public static final String DYNASTY_SATELLITE = "DYNASTY_SATELLITE";
+    public static final String STAT_LOYALTY = "STAT_LOYALTY";
+    public static final String DYNASTY_REPUTATION = "DYNASTY_REPUTATION";
+    public static final String DYNASTY_REPUTATION_STANCE = "DYNASTY_REPUTATION_STANCE";
+    public static final String SCORE_TIER_FORMAT = "SCORE_TIER_FORMAT";
     public static final String DYNASTY_STATUS = "DYNASTY_STATUS";
     public static final String DYNASTY_7_DAYS = "DYNASTY_7_DAYS";
     public static final String DYNASTY_RENAME_TITLE = "DYNASTY_RENAME_TITLE";
@@ -460,6 +470,7 @@ public final class LanguageStrings {
     public static final String TRADE_CONFIRM = "TRADE_CONFIRM";
     public static final String TRADE_UPDATE = "TRADE_UPDATE";
     public static final String TRADE_OPTIMIZE = "TRADE_OPTIMIZE";
+    public static final String TRADE_MAKE_TWO_WAY = "TRADE_MAKE_TWO_WAY";
     public static final String TRADE_ERROR_OVER_CAP = "TRADE_ERROR_OVER_CAP";
     public static final String TRADE_ERROR_NO_ANTS = "TRADE_ERROR_NO_ANTS";
     public static final String TRADE_ERROR_NO_LOAD = "TRADE_ERROR_NO_LOAD";
@@ -805,6 +816,46 @@ public final class LanguageStrings {
     public static final String RANK_ULTIMATE = "RANK_ULTIMATE";
     public static final String RANK_SUPREME = "RANK_SUPREME";
     public static final String RANK_GIGA = "RANK_GIGA";
+
+    public static final String REPUTATION_AGGRESSIVE = "REPUTATION_AGGRESSIVE";
+    public static final String REPUTATION_WARY = "REPUTATION_WARY";
+    public static final String REPUTATION_NEUTRAL = "REPUTATION_NEUTRAL";
+    public static final String REPUTATION_CORDIAL = "REPUTATION_CORDIAL";
+    public static final String REPUTATION_FRIENDLY = "REPUTATION_FRIENDLY";
+
+    public static final String LOYALTY_REBELLIOUS = "LOYALTY_REBELLIOUS";
+    public static final String LOYALTY_DISLOYAL = "LOYALTY_DISLOYAL";
+    public static final String LOYALTY_COMPLACENT = "LOYALTY_COMPLACENT";
+    public static final String LOYALTY_LOYAL = "LOYALTY_LOYAL";
+    public static final String LOYALTY_MILITANT = "LOYALTY_MILITANT";
+
+    public static final String DIPLO_MODIFIER_PACT = "DIPLO_MODIFIER_PACT";
+    public static final String DIPLO_MODIFIER_BROKEN_PACT = "DIPLO_MODIFIER_BROKEN_PACT";
+    public static final String DIPLO_MODIFIER_WAR = "DIPLO_MODIFIER_WAR";
+    public static final String DIPLO_MODIFIER_TRADE = "DIPLO_MODIFIER_TRADE";
+    public static final String DIPLO_MODIFIER_TRADE_REQUEST = "DIPLO_MODIFIER_TRADE_REQUEST";
+    public static final String DIPLO_MODIFIER_BORDER_FRICTION = "DIPLO_MODIFIER_BORDER_FRICTION";
+    public static final String GI_MODIFIER_PACT = "GI_MODIFIER_PACT";
+    public static final String LOYALTY_MODIFIER_TRADE = "LOYALTY_MODIFIER_TRADE";
+    public static final String LOYALTY_MODIFIER_TUNNEL = "LOYALTY_MODIFIER_TUNNEL";
+    public static final String LOYALTY_MODIFIER_CAPITAL = "LOYALTY_MODIFIER_CAPITAL";
+    public static final String DIPLO_ACTION_FORM_PACT = "DIPLO_ACTION_FORM_PACT";
+    public static final String DIPLO_ACTION_BREAK_PACT = "DIPLO_ACTION_BREAK_PACT";
+    public static final String DIPLO_ACTION_TRADE = "DIPLO_ACTION_TRADE";
+    public static final String DIPLO_ACTION_REQUEST_TRADE = "DIPLO_ACTION_REQUEST_TRADE";
+    public static final String DIPLO_ERROR_CORDIAL_REQUIRED = "DIPLO_ERROR_CORDIAL_REQUIRED";
+    public static final String DIPLO_ERROR_CORDIAL_REQUIRED_REQUEST = "DIPLO_ERROR_CORDIAL_REQUIRED_REQUEST";
+    public static final String DIPLO_ERROR_NEUTRAL_REQUIRED = "DIPLO_ERROR_NEUTRAL_REQUIRED";
+    public static final String DIPLO_ERROR_LOYALTY_REQUIRED = "DIPLO_ERROR_LOYALTY_REQUIRED";
+    public static final String DIPLO_ERROR_NO_BORDER = "DIPLO_ERROR_NO_BORDER";
+    public static final String DIPLO_ERROR_ACTIVE_COLONY = "DIPLO_ERROR_ACTIVE_COLONY";
+    public static final String DIPLO_TRADE_REQUEST_SENT = "DIPLO_TRADE_REQUEST_SENT";
+    public static final String DIPLO_TOOLTIP_BASE = "DIPLO_TOOLTIP_BASE";
+    public static final String DIPLO_TOOLTIP_EFFECTIVE = "DIPLO_TOOLTIP_EFFECTIVE";
+    public static final String DIPLO_MODIFIER_LINE = "DIPLO_MODIFIER_LINE";
+    public static final String LOYALTY_TOOLTIP_BASE = "LOYALTY_TOOLTIP_BASE";
+    public static final String LOYALTY_TOOLTIP_EFFECTIVE = "LOYALTY_TOOLTIP_EFFECTIVE";
+    public static final String LOYALTY_MODIFIER_LINE = "LOYALTY_MODIFIER_LINE";
 
     public static final String SPECIES_OMNI = "SPECIES_OMNI";
     public static final String SPECIES_OMNI_SCIENTIFIC = "SPECIES_OMNI_SCIENTIFIC";

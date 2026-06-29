@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.swing.ImageIcon;
+
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameRandom;
 
 import com.grimidk.formicempire.classes.constants.ant.AntType;
@@ -294,7 +296,12 @@ public class ColonyBugHandlingService {
         if (colony == null || type == null) {
             return 0;
         }
-        return getCount(colony, type);
+        int count = getCount(colony, type);
+        int cap = getMaxCapacity(colony, type);
+        if (cap > 0) {
+            return Math.min(count, cap);
+        }
+        return count;
     }
 
     public void syncPetBugEntities(Colony colony, BugType type, int targetCount) {
@@ -332,6 +339,49 @@ public class ColonyBugHandlingService {
                 }
             }
             bugs.removeAll(toRemove);
+        }
+    }
+
+    /** Keeps pet sprite entities in their overworld pens once colony bounds are known. */
+    public void syncPetPenPositionsFromBounds(Colony colony) {
+        if (colony == null) {
+            return;
+        }
+        for (BugType type : PET_TYPES) {
+            int count = getCount(colony, type);
+            if (count <= 0) {
+                continue;
+            }
+            Rectangle pen = resolvePenBounds(colony, type);
+            if (pen == null || pen.width <= 0 || pen.height <= 0) {
+                continue;
+            }
+
+            long entityCount = colony.getBugs().stream()
+                    .filter(b -> b.getBugType() == type && b.getDimension() == WorldSpaces.OVERWORLD)
+                    .count();
+            int targetEntities = GameConstants.capPenNonAntSprites(count);
+            if (entityCount != targetEntities) {
+                syncPetBugEntities(colony, type, count);
+            }
+
+            ColonyPhysicsService physics = colony.getPhysicsService();
+            ImageIcon sprite = type.getSprite();
+            int halfW = sprite != null ? Math.max(1, sprite.getIconWidth()) / 2 : 1;
+            int halfH = sprite != null ? Math.max(1, sprite.getIconHeight()) / 2 : 1;
+            for (Bug bug : colony.getBugs()) {
+                if (bug.getBugType() != type || bug.getDimension() != WorldSpaces.OVERWORLD) {
+                    continue;
+                }
+                int cx = bug.getX() + halfW;
+                int cy = bug.getY() + halfH;
+                if (pen.contains(cx, cy)) {
+                    continue;
+                }
+                if (physics != null) {
+                    bug.setPosition(physics.getSpecificRoomPoint(colony, pen));
+                }
+            }
         }
     }
 

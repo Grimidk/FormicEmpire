@@ -9,6 +9,7 @@ import java.awt.FontMetrics;
 import java.awt.Insets;
 import java.awt.Toolkit;
 import javax.swing.AbstractButton;
+import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -36,6 +37,8 @@ import com.grimidk.formicempire.classes.interfaces.ui.styles.UiScrollBarStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.styles.UiSliderStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.styles.UiSpinnerStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.styles.UiTabbedPaneStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.styles.UiTextFieldStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.styles.UiTableStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.styles.UiTableBooleanStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiResourceLoader;
 import javax.swing.border.Border;
@@ -119,6 +122,11 @@ public class AssetStyles {
     public static Color UI_BG_HEADER = BACKGROUND_SECONDARY;
     public static Color UI_BORDER_COLOR = BORDER_COLOR;
 
+    /** Selected tab strip (JTabbedPane + section buttons). */
+    public static Color TAB_SELECTED_BG = BACKGROUND_LIGHT;
+    /** Unselected tab strip. */
+    public static Color TAB_UNSELECTED_BG = BACKGROUND_DARK;
+
     public static Color TEXT_NORMAL = COLOR_ABSOLUTE_BLACK;
     public static Color TEXT_HEADER = COLOR_ABSOLUTE_BLACK;
     public static Color TEXT_SUCCESS = COLOR_ABSOLUTE_BLACK;
@@ -127,7 +135,8 @@ public class AssetStyles {
 
     public static Color SELECTION_BACKGROUND = COLOR_LIGHTER_GRAY;
 
-    public static final Dimension DEFAULT_DIALOG_SIZE = new Dimension(1000, 650);
+    public static final Dimension DEFAULT_DIALOG_SIZE = new Dimension(1150, 720);
+    public static final Dimension MAP_DIALOG_SIZE = new Dimension(1280, 820);
 
     public static final int BORDER_THICKNESS_EXTERNAL = 2;
     public static final int BORDER_THICKNESS_INTERNAL = 1;
@@ -240,6 +249,10 @@ public class AssetStyles {
         UiSpinnerStyles.style(spinner);
     }
 
+    public static void styleTextField(javax.swing.text.JTextComponent field) {
+        UiTextFieldStyles.style(field);
+    }
+
     public static void styleProgressBar(JProgressBar bar) {
         UiProgressBarStyles.style(bar);
     }
@@ -254,6 +267,26 @@ public class AssetStyles {
 
     public static void styleTabbedPane(JTabbedPane tabbedPane) {
         UiTabbedPaneStyles.style(tabbedPane);
+        if (tabbedPane == null) {
+            return;
+        }
+        tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+    }
+
+    public static void applyTabSelection(AbstractButton button, boolean selected) {
+        UiButtonStyles.applyTabSelection(button, selected);
+    }
+
+    public static void styleDialogTable(JTable table) {
+        UiTableStyles.applyDialogTable(table);
+    }
+
+    public static void fitTableColumns(JTable table) {
+        UiTableStyles.fitColumns(table);
+    }
+
+    public static void fitTableColumn(JTable table, int columnIndex, int minWidth, int maxWidth) {
+        UiTableStyles.fitColumn(table, columnIndex, minWidth, maxWidth, 16);
     }
 
     public static void styleTableBooleanColumn(JTable table, int columnIndex) {
