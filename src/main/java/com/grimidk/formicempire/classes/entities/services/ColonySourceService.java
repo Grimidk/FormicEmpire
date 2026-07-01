@@ -256,6 +256,9 @@ public class ColonySourceService {
 
         private static float effectiveTravelUnits(Colony colony, Ant ant) {
             float u = GameConstants.BASE_SPRITE_SPEED * ant.getAntType().getSpeedMult();
+            if (colony.isCreatineDietActive()) {
+                u *= GameConstants.CREATINE_DIET_SPEED_MULTIPLIER;
+            }
             if (ant.getAntType() == GameConstants.TYPE_WORKER && colony.hasUpgrade(GameUnlocks.STAT_WORKER_SPEED_2)) {
                 u *= 2f;
             }

@@ -43,9 +43,9 @@ public class Engine extends Thread {
     private boolean weatherColorOverlayEnabled = true;
     private boolean arachnophobiaMode = false;
     
-    private int masterVolume = 80;
-    private int musicVolume = 70;
-    private int sfxVolume = 100;
+    private int masterVolume = 50;
+    private int musicVolume = 50;
+    private int sfxVolume = 50;
     
     private boolean pauseOnFocusLoss = true;
     private boolean confirmOnQuit = true;
@@ -102,7 +102,6 @@ public class Engine extends Thread {
     }
 
     public void setDelay(float delay) {
-        // Find closest speed for backward compatibility
         GameSpeed closest = GameSpeed.NORMAL;
         int minDiff = Integer.MAX_VALUE;
         for (GameSpeed s : GameSpeed.values()) {
@@ -120,12 +119,16 @@ public class Engine extends Thread {
     }
     
     public void setSpeed(GameSpeed speed) {
-        if (speed != null) {
-            if (speed == GameSpeed.TURBO && !allowTurboMode) {
-                this.speed = GameSpeed.VERY_FAST;
-            } else {
-                this.speed = speed;
-            }
+        if (speed == null) {
+            return;
+        }
+        GameSpeed resolved = speed;
+        if (speed == GameSpeed.TURBO && !allowTurboMode) {
+            resolved = GameSpeed.VERY_FAST;
+        }
+        if (this.speed != resolved) {
+            this.speed = resolved;
+            interrupt();
         }
     }
 
@@ -260,7 +263,6 @@ public class Engine extends Thread {
             try {
                 Thread.sleep(speed.getDelayMs());
             } catch (InterruptedException e) {
-                e.printStackTrace();
             }
 
             if (!paused) {

@@ -10,11 +10,11 @@ public final class ClasspathTextFiles {
     private ClasspathTextFiles() {}
 
     public static String loadRoadmapText() {
-        return load("/roadmap.txt", LanguageStrings.ROADMAP_UNAVAILABLE);
+        return load("/meta/roadmap.txt", LanguageStrings.ROADMAP_UNAVAILABLE);
     }
 
     public static String loadCreditsText() {
-        return load("/credits.txt", LanguageStrings.CREDITS_UNAVAILABLE);
+        return load("/meta/credits.txt", LanguageStrings.CREDITS_UNAVAILABLE);
     }
 
     private static String load(String resourcePath, String unavailableKey) {

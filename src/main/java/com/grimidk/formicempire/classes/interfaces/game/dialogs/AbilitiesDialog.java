@@ -126,6 +126,64 @@ public class AbilitiesDialog extends ZeroDialog {
             hasAnyAbility = true;
         }
 
+        if (colony.hasUpgrade(GameUnlocks.ABILITY_PHEROMONE_STORM)) {
+            int syrupCost = GameConstants.PHEROMONE_STORM_SYRUP_COST;
+            boolean hasSyrup = colony.getSyrups() >= syrupCost;
+            boolean alreadyActive = colony.isPheromoneStormActive();
+            String fail = alreadyActive
+                    ? LanguageStrings.get(LanguageStrings.ABILITY_ERROR_ALREADY_ACTIVE)
+                    : (hasSyrup ? null : String.format(
+                            LanguageStrings.get(LanguageStrings.ABILITY_ERROR_NOT_ENOUGH_RESOURCE),
+                            syrupCost,
+                            GameConstants.RESOURCE_SYRUP.getName()));
+
+            JPanel p = createResourceAbilityPanel(
+                    GameUnlocks.ABILITY_PHEROMONE_STORM.getName(),
+                    GameUnlocks.ABILITY_PHEROMONE_STORM.getDescription(),
+                    syrupCost,
+                    GameConstants.RESOURCE_SYRUP.getName(),
+                    e -> {
+                        if (colony.activatePheromoneStorm()) {
+                            refreshDialog();
+                        }
+                    },
+                    hasSyrup && !alreadyActive,
+                    fail
+            );
+            listPanel.add(p);
+            listPanel.add(Box.createVerticalStrut(10));
+            hasAnyAbility = true;
+        }
+
+        if (colony.hasUpgrade(GameUnlocks.ABILITY_CREATINE_DIET)) {
+            int proteinCost = GameConstants.CREATINE_DIET_PROTEIN_COST;
+            boolean hasProtein = colony.getProtein() >= proteinCost;
+            boolean alreadyActive = colony.isCreatineDietActive();
+            String fail = alreadyActive
+                    ? LanguageStrings.get(LanguageStrings.ABILITY_ERROR_ALREADY_ACTIVE)
+                    : (hasProtein ? null : String.format(
+                            LanguageStrings.get(LanguageStrings.ABILITY_ERROR_NOT_ENOUGH_RESOURCE),
+                            proteinCost,
+                            GameConstants.RESOURCE_MEAT.getName()));
+
+            JPanel p = createResourceAbilityPanel(
+                    GameUnlocks.ABILITY_CREATINE_DIET.getName(),
+                    GameUnlocks.ABILITY_CREATINE_DIET.getDescription(),
+                    proteinCost,
+                    GameConstants.RESOURCE_MEAT.getName(),
+                    e -> {
+                        if (colony.activateCreatineDiet()) {
+                            refreshDialog();
+                        }
+                    },
+                    hasProtein && !alreadyActive,
+                    fail
+            );
+            listPanel.add(p);
+            listPanel.add(Box.createVerticalStrut(10));
+            hasAnyAbility = true;
+        }
+
         if (!hasAnyAbility) {
             JLabel empty = new JLabel(LanguageStrings.get(LanguageStrings.ABILITY_NO_ABILITIES));
             empty.setForeground(AssetStyles.TEXT_NORMAL);
@@ -197,6 +255,57 @@ public class AbilitiesDialog extends ZeroDialog {
         actionPanel.add(Box.createVerticalStrut(5));
         actionPanel.add(btn);
         
+        panel.add(actionPanel, BorderLayout.EAST);
+        return panel;
+    }
+
+    private JPanel createResourceAbilityPanel(String title, String desc, int resourceCost, String resourceName,
+            java.awt.event.ActionListener action, boolean enabled, String tooltip) {
+        JPanel panel = new JPanel(new BorderLayout(10, 10));
+        panel.setBackground(AssetStyles.UI_BG_SECONDARY);
+
+        TitledBorder border = new TitledBorder(AssetStyles.PANEL_BORDER, title);
+        border.setTitleColor(AssetStyles.TEXT_HEADER);
+        border.setTitleFont(AssetStyles.FONT_BOLD);
+        panel.setBorder(border);
+
+        JTextArea descriptionArea = new JTextArea(desc);
+        descriptionArea.setWrapStyleWord(true);
+        descriptionArea.setLineWrap(true);
+        descriptionArea.setEditable(false);
+        descriptionArea.setFocusable(false);
+        descriptionArea.setBackground(panel.getBackground());
+        descriptionArea.setForeground(AssetStyles.TEXT_NORMAL);
+        descriptionArea.setFont(AssetStyles.FONT_NORMAL);
+        panel.add(descriptionArea, BorderLayout.CENTER);
+
+        JPanel actionPanel = new JPanel();
+        actionPanel.setOpaque(false);
+        actionPanel.setLayout(new BoxLayout(actionPanel, BoxLayout.Y_AXIS));
+
+        JButton btn = new JButton(LanguageStrings.get(LanguageStrings.UI_TRIGGER));
+        btn.setEnabled(enabled);
+        AssetStyles.styleButton(btn);
+        btn.setFocusable(false);
+        btn.addActionListener(action);
+
+        if (!enabled && tooltip != null) {
+            btn.setToolTipText(tooltip);
+        } else {
+            btn.setToolTipText(null);
+        }
+
+        JLabel costLabel = new JLabel(String.format(
+                LanguageStrings.get(LanguageStrings.ABILITY_COST_RESOURCE_FMT), resourceCost, resourceName));
+        costLabel.setForeground(AssetStyles.TEXT_NORMAL);
+        costLabel.setFont(AssetStyles.FONT_BOLD);
+        costLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btn.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        actionPanel.add(costLabel);
+        actionPanel.add(Box.createVerticalStrut(5));
+        actionPanel.add(btn);
+
         panel.add(actionPanel, BorderLayout.EAST);
         return panel;
     }

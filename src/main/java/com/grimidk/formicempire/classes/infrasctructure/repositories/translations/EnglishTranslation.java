@@ -182,6 +182,15 @@ public class EnglishTranslation implements Translation {
         en.put("ABILITY_ERROR_NO_DRONES", "No Drones available in the colony.");
         en.put("ABILITY_ERROR_NO_BREEDERS", "No Breeder Princesses available.");
         en.put("ABILITY_ERROR_LOCATE_COLONY", "Error: Could not locate colony on the world map.");
+        en.put("ABILITY_ERROR_ALREADY_ACTIVE", "This ability is already active.");
+        en.put("ABILITY_ERROR_NOT_ENOUGH_RESOURCE", "Not enough %2$s (%1$d needed).");
+        en.put("ABILITY_COST_RESOURCE_FMT", "Cost: %d %s");
+        en.put("ABILITY_PHEROMONE_STORM", "Pheromone Storm");
+        en.put("ABILITY_PHEROMONE_STORM_FLAVOR", "Scented Unity");
+        en.put("ABILITY_PHEROMONE_STORM_DESC", "Spend 500 syrups to boost colony loyalty by 10 for one year (12 months).");
+        en.put("ABILITY_CREATINE_DIET", "Creatine Diet");
+        en.put("ABILITY_CREATINE_DIET_FLAVOR", "Muscle Fuel");
+        en.put("ABILITY_CREATINE_DIET_DESC", "Spend 300 protein to double ant movement speed for half a year (6 months).");
 
         en.put("DIALOG_STATS_TITLE", "Statistics");
         en.put("STATS_DYNASTY_MODE", "Dynasty Mode");
@@ -516,6 +525,12 @@ public class EnglishTranslation implements Translation {
         en.put("MOVE_SPEED", "Speed Marching");
         en.put("MOVE_FLY", "Flying");
         en.put("MOVE_PATROL", "Patrolling");
+        en.put("MOVE_STATIC_DESC", "Does not move (used by stationary pet insects).");
+        en.put("MOVE_WANDER_DESC", "Slow idle wandering.");
+        en.put("MOVE_MARCH_DESC", "Normal marching speed.");
+        en.put("MOVE_SPEED_DESC", "Faster marching pace.");
+        en.put("MOVE_FLY_DESC", "Flying movement.");
+        en.put("MOVE_PATROL_DESC", "Patrol movement around a pen or post.");
 
         en.put("BUG_ANT", "Ant");
         en.put("BUG_APHID", "Aphid");
@@ -609,10 +624,20 @@ public class EnglishTranslation implements Translation {
         en.put("LOYALTY_MODIFIER_TRADE", "Active Trade");
         en.put("LOYALTY_MODIFIER_TUNNEL", "Tunnel Link");
         en.put("LOYALTY_MODIFIER_CAPITAL", "Capital");
+        en.put("LOYALTY_MODIFIER_PHEROMONE_STORM", "Pheromone Storm");
         en.put("DIPLO_ACTION_FORM_PACT", "Form Pact");
         en.put("DIPLO_ACTION_BREAK_PACT", "Break Pact");
         en.put("DIPLO_ACTION_TRADE", "Trade");
         en.put("DIPLO_ACTION_REQUEST_TRADE", "Request Trade");
+        en.put("DIPLO_ACTION_SEND_DIPLOMATS", "Send Diplomats");
+        en.put("DIPLO_SEND_DIPLOMATS_TITLE", "Send Diplomats");
+        en.put("DIPLO_SEND_DIPLOMATS_PROMPT", "Send up to %d diplomat(s) (%d assigned). Each improves stability by %d.");
+        en.put("DIPLO_SEND_DIPLOMATS_SUCCESS_DYNASTY", "Sent %d diplomat(s). Reputation with %s increased by %d.");
+        en.put("DIPLO_SEND_DIPLOMATS_SUCCESS_COLONY", "Sent %d diplomat(s). %s loyalty increased by %d.");
+        en.put("DIPLO_ERROR_NO_DIPLOMATS", "No princesses are assigned to the Diplomat role in this colony.");
+        en.put("DIPLO_ERROR_NO_DIPLOMAT_ROLE", "Unlock the Diplomat role before sending diplomats.");
+        en.put("DIPLO_ERROR_REPUTATION_STABLE", "Diplomats cannot be sent to dynasties with Aggressive reputation.");
+        en.put("DIPLO_ERROR_LOYALTY_STABLE", "Diplomats cannot be sent to colonies with Rebellious loyalty.");
         en.put("DIPLO_ERROR_CORDIAL_REQUIRED", "Cordial reputation or better is required to form a pact.");
         en.put("DIPLO_ERROR_CORDIAL_REQUIRED_REQUEST", "Cordial reputation or better is required to request trade.");
         en.put("DIPLO_ERROR_NEUTRAL_REQUIRED", "Neutral reputation or better is required to send a trade route.");
@@ -640,6 +665,10 @@ public class EnglishTranslation implements Translation {
         en.put("METHOD_AIR", "Air");
         en.put("METHOD_SEA", "Sea");
         en.put("METHOD_TUNNEL", "Tunnel");
+        en.put("METHOD_LAND_DESC", "Balanced speed and capacity overland convoys.");
+        en.put("METHOD_AIR_DESC", "Fast aerial convoys; low cargo capacity. Requires Sky Transport princesses.");
+        en.put("METHOD_SEA_DESC", "High-capacity convoys between coastal colonies.");
+        en.put("METHOD_TUNNEL_DESC", "Low danger through completed tunnels. Requires tunnel engineers or borers to dig.");
 
         en.put("EVENT_ECLIPSE_NUPTIAL", "The Eclipse has triggered a spontaneous Nuptial Flight!");
 
@@ -729,7 +758,7 @@ public class EnglishTranslation implements Translation {
         en.put("ROLE_BREEDER_DESC", "Allows Princesses and Drones to go to nuptial flights and get more queens or spread to new places.");
         en.put("ROLE_DIPLOMAT_UPGRADE", "Diplomat Role");
         en.put("ROLE_DIPLOMAT_FLAVOR", "Mightier Than The Sword");
-        en.put("ROLE_DIPLOMAT_DESC", "Allows princesses to negotiate with other colonies.");
+        en.put("ROLE_DIPLOMAT_DESC", "Allows princesses to improve colony loyalty or dynasty reputation via diplomatic missions.");
         en.put("ROLE_MILITIA_UPGRADE", "Militia Role");
         en.put("ROLE_MILITIA_FLAVOR", "Worker Militia Auxiliary");
         en.put("ROLE_MILITIA_DESC", "Allows workers to perform basic defensive duties.");
@@ -797,6 +826,12 @@ public class EnglishTranslation implements Translation {
         en.put("ABILITY_CATCH_SYMBIOTIC_MITE_DESC", "Allows catchers to collect symbiotic mites from the overworld. Unlocks when parasitic mites first appear. Each symbiotic mite eliminates up to 5 parasitic mites per day.");
         en.put("ABILITY_CATCH_DERMESTID_FLAVOR", "Grave Beetle Catching");
         en.put("ABILITY_CATCH_DERMESTID_DESC", "Allows catchers to collect dermestid beetles from the overworld. Gravers tend up to 10 each in the graveyard.");
+        en.put("ABILITY_DIPLOMAT_PRESSURE_2", "Diplomatic Pressure II");
+        en.put("ABILITY_DIPLOMAT_PRESSURE_2_FLAVOR", "Silver Tongues");
+        en.put("ABILITY_DIPLOMAT_PRESSURE_2_DESC", "Each diplomat sent on a mission improves stability by 3 instead of 1.");
+        en.put("ABILITY_DIPLOMAT_PRESSURE_3", "Diplomatic Pressure III");
+        en.put("ABILITY_DIPLOMAT_PRESSURE_3_FLAVOR", "Iron Mandibles");
+        en.put("ABILITY_DIPLOMAT_PRESSURE_3_DESC", "Each diplomat sent on a mission improves stability by 5 instead of 1.");
         en.put("ABILITY_ABILITY_FLAVOR", "Abilities Unlocked");
         en.put("ABILITY_ABILITY_DESC", "Allows you to see the abilities menu and use active abilities.");
 
@@ -993,7 +1028,9 @@ public class EnglishTranslation implements Translation {
         en.put("HELP_TAB_SPECIES", "Species");
         en.put("HELP_TAB_TYPES", "Ant Types");
         en.put("HELP_TAB_BUGS", "Other insects");
-        en.put("HELP_TAB_ROLES", "Roles");
+        en.put("HELP_TAB_ROLES", "Role Upgrades");
+        en.put("HELP_TAB_ANT_ROLES", "Ant Roles");
+        en.put("HELP_TAB_EMPIRE", "Empire");
         en.put("HELP_TAB_UPGRADES", "Upgrades");
         en.put("HELP_TAB_BUILDINGS", "Buildings");
         en.put("HELP_TAB_ASSIMILATIONS", "Assimilations");
@@ -1002,7 +1039,7 @@ public class EnglishTranslation implements Translation {
         en.put("HELP_WELCOME_STORY", "Nearly all other ants are extinct. You are an ant queen and have within you all the genetic knowledge of every ant species. You must unlock it and take over the world as the dominant species. <br><br>Build up your colony and begin to spread while fighting other ant colonies, you will need to adapt to new environments by absorbing and researching their abilities.");
         en.put("HELP_START_INFO", "<b>Basic Survival:</b><br>Your ants need <b>Fungi</b> (Mushrooms) to eat and <b>Water</b> to drink every day. Without them, your colony will starve or die of dehydration.<br>- <b>Foragers</b> gather Plants and Water.<br>- <b>Hunters</b> gather Protein (Meat).<br>- <b>Farmers</b> convert Plants and Protein into Fungi.<br>- <b>Nurses</b> care for your brood. Neglected brood will perish.<br><br><b>Watching Your Colony:</b><br>Press <b>A</b> to toggle your view between the <b>Underworld</b> (inside the nest) and the <b>Overworld</b> (outside gathering).<br><br><b>Colony Management:</b><br>Use <b>Hatch Rates (P)</b> to control ant births. <b>Researchers</b> generate Research Points (RP) for upgrades in the <b>Research Menu (Y)</b>. <b>Builders</b> use Minerals and Resin to construct facilities via the <b>Build Menu (U)</b>.<br><br><b>Advanced Threats:</b><br>- <b>Contamination:</b> Dead ants must be cleared by <b>Gravers</b>.<br>- <b>Parasite ants:</b> Secretly drain food. Assign <b>Police</b> to eliminate them.<br>- <b>Depletion:</b> Resource nodes dry up; assign <b>Scouts</b> to find new ones.");
         en.put("HELP_OVERWORLD_GATHERING", "<b>Overworld (surface) gathering:</b><br><b>Scouts</b> discover new resource nodes. Each map hex tracks <b>depletion</b> from non-water finds; higher depletion tends to place new nodes farther from the nest (some upgrades cap how bad this gets).<br><br><b>Distance:</b> Gathered amounts use straight-line distance from the <b>nest entrance</b>. Inside a <b>full efficiency</b> radius (larger for faster workers and certain upgrades), yields are full; beyond that, yield falls toward a small minimum.<br><br><b>Statistics (Local hex):</b> <b>Depletion</b> is the effective percentage used for spawns; <b>Sources found</b> counts nodes this colony has discovered; <b>Max efficiency distance</b> estimates the full-yield radius for a typical worker.");
-        en.put("HELP_DYNASTY_INFO", "<b>Expanding Your Dynasty:</b><br>Once you unlock <b>Breeders</b>, perform Nuptial Flights to spread via the <b>World Map (I)</b>.<br><i>Tip: Eclipses trigger spontaneous, free Nuptial Flights!</i><br><br><b>Logistics & Trade:</b><br>Founding multiple colonies unlocks <b>Trade Routes</b>. Assign <b>Couriers</b> to transport resources.<br>- <b>Land:</b> Standard trade method.<br>- <b>Tunnel:</b> Secure and fast, requires <b>Tunnels</b> and <b>Borers</b>.<br>- <b>Air:</b> Fast but low capacity, requires <b>Sky Transports</b> (Princesses).<br>- <b>Bilateral:</b> Allows two-way resource transport.<br><br><b>Dynasty Milestones:</b><br>- <b>Dynasty Menu (S):</b> View and manage all colonies.<br>- <b>Mass Colonization:</b> Removes satellite colony limits.<br>- <b>Automation:</b> Allows NPC colonies to manage themselves.<br><br><b>Evolution:</b><br>Unlock <b>Synergies</b> to combine upgrades and <b>Assimilations</b> to absorb other ant species' traits.");
+        en.put("HELP_DYNASTY_INFO", "<b>Expanding Your Dynasty:</b><br>Once you unlock <b>Breeders</b>, perform Nuptial Flights to spread via the <b>World Map (I)</b>.<br><i>Tip: Eclipses trigger spontaneous, free Nuptial Flights!</i><br><br><b>Logistics & Trade:</b><br>Founding multiple colonies unlocks <b>Trade Routes</b>. Assign transport ants and pick a convoy method (icons shown in the Dynasty logistics tab):<br>- <b>Land:</b> Standard overland convoys.<br>- <b>Sea:</b> High capacity between coastal colonies.<br>- <b>Tunnel:</b> Secure and fast; requires a completed tunnel and tunnel-capable roles.<br>- <b>Air:</b> Fast but low capacity; requires <b>Sky Transports</b> (Princesses).<br>- <b>Bilateral:</b> Merges outgoing and incoming routes into one two-way convoy.<br><br><b>Loyalty & Diplomacy:</b><br>Each colony has <b>Loyalty</b> to your dynasty (tier icons in the Dynasty overview). Low loyalty blocks trade. Other dynasties have a <b>Reputation</b> score and stance tier that affects diplomacy and trade.<br><br><b>Dynasty Milestones:</b><br>- <b>Dynasty Menu (S):</b> View and manage all colonies.<br>- <b>Mass Colonization:</b> Removes satellite colony limits.<br>- <b>Automation:</b> Allows NPC colonies to manage themselves.<br><br><b>Evolution:</b><br>Unlock <b>Synergies</b> to combine upgrades and <b>Assimilations</b> to absorb other ant species' traits.");
         
         en.put("HELP_SPECIES_SCIENTIFIC", "Scientific Name:");
         en.put("HELP_SPECIES_TRAITS", "Base Traits:");
@@ -1057,8 +1094,14 @@ public class EnglishTranslation implements Translation {
         en.put("HELP_TUTORIAL_TITLE", "Welcome to Formic Empire!");
         en.put("HELP_TUTORIAL_TIPS", "<b>Basic Tips:</b><br><br>Your main food is <b>Fungi</b> (Mushrooms), which ants will eat daily.<br><br>Assign <b>Workers</b> (Q) to <b>Forager</b> roles to gather Plants and Water. Without them your ants will die of thirst!<br><br>Assign <b>Farmers</b> (Q) to convert gathered Plants into Fungi. One Farmer can generally handle 6 Foragers.<br><br>Assign <b>Nurses</b> (Q) to care for your <b>Eggs, Larvae, and Pupae</b>. Without enough nurses, your young will perish from neglect!<br><br>Press <b>A</b> to toggle your view between the <b>Underworld</b>  and the <b>Overworld</b> .<br><br><i>QoL Tip: If you assign a new role but have no unassigned ants, the game automatically pulls from your default workforce (like Foragers).</i>");
         en.put("HELP_TUTORIAL_THREATS", "<b>Colony Threats:</b><br><br><b>Contamination:</b> Ants naturally die of old age. If bodies pile up, disease will spread and kill your colony. Assign <b>Gravers</b> to clear the dead.<br><br><b>Parasite ants:</b> Unseen pests will leech your Fungi reserves. Assign <b>Police</b> to detect and eliminate them.<br><br><b>Depletion:</b> Resource nodes don't last forever. If your foragers run out of plants or water, assign <b>Scouts</b> to find new resources nearby.");
-        en.put("HELP_TUTORIAL_DYNASTY", "<b>Dynasty Management:</b><br><br>As your colony thrives, you will unlock <b>Breeder</b> Princesses. These allow you to establish satellite colonies via the <b>World Map (I)</b> .<br><i>Tip: Keep an eye on the sky! Rare Solar or Lunar Eclipses will trigger spontaneous, free Nuptial Flights!</i><br><br>Founding multiple colonies unlocks the <b>Dynasty Menu (S)</b>. Reaching certain milestones will allow you to construct <b>Trade Routes</b>, remove spreading limits, and even <b>Automate</b> your expanding dynasty!");
+        en.put("HELP_TUTORIAL_DYNASTY", "<b>Dynasty Management:</b><br><br>As your colony thrives, you will unlock <b>Breeder</b> Princesses. These allow you to establish satellite colonies via the <b>World Map (I)</b>.<br><i>Tip: Keep an eye on the sky! Rare Solar or Lunar Eclipses will trigger spontaneous, free Nuptial Flights!</i><br><br>Founding multiple colonies unlocks the <b>Dynasty Menu (S)</b> for logistics, loyalty, and diplomacy. Trade routes use convoy method icons (Land, Sea, Tunnel, Air). Colony <b>Loyalty</b> and diplomatic <b>Reputation</b> tiers are shown with their own icons in the Dynasty and Stats panels.");
         
+        en.put("HELP_EMPIRE_TRADE", "Trade Methods");
+        en.put("HELP_EMPIRE_LOYALTY", "Colony Loyalty Tiers");
+        en.put("HELP_EMPIRE_REPUTATION", "Diplomatic Reputation Stances");
+        en.put("HELP_EMPIRE_MOVEMENT", "Pet Insect Movement");
+        en.put("HELP_TIER_MIN_SCORE", " (min %d)");
+        en.put("HELP_ROLE_ANT_TYPE", "Ant type: %s");
         en.put("HOTKEY_PAUSE_LABEL", "Pause/Play:");
         en.put("HOTKEY_ESC_LABEL", "Game Menu:");
         en.put("HOTKEY_VIEW_LABEL", "Toggle View:");
@@ -1165,6 +1208,10 @@ public class EnglishTranslation implements Translation {
         en.put("LOG_FOUND_SOURCE_FULL_FMT", "Found %s but capacity is full.");
         en.put("LOG_SOURCE_EXHAUSTED_FMT", "A %s source has been exhausted.");
         en.put("LOG_FORCE_FLIGHT_BLOCKED", "Cannot force flight. Missing drones or breeder princesses.");
+        en.put("LOG_PHEROMONE_STORM_STARTED_FMT", "Pheromone Storm activated: +%d loyalty for %d months.");
+        en.put("LOG_PHEROMONE_STORM_ENDED", "Pheromone Storm effect has ended.");
+        en.put("LOG_CREATINE_DIET_STARTED_FMT", "Creatine Diet activated: doubled speed for %d months.");
+        en.put("LOG_CREATINE_DIET_ENDED", "Creatine Diet effect has ended.");
         en.put("LOG_WARNING_NO_QUEEN_FMT", "Colony has no queen! Days without queen: %d/7");
         en.put("LOG_MATURATION_COMPLETE", "Colony maturation complete: workforce deployed.");
         en.put("LOG_TRADE_CANCELLED_FMT", "Cancelled. Not enough available %s.");
@@ -1184,6 +1231,8 @@ public class EnglishTranslation implements Translation {
         en.put("DYNASTY_SORT_POP_LOW", "Population (lowest first)");
         en.put("DYNASTY_SORT_AGE_OLD", "Age (oldest first)");
         en.put("DYNASTY_SORT_AGE_NEW", "Age (newest first)");
+        en.put("DYNASTY_SORT_LOYALTY_HIGH", "Loyalty (highest first)");
+        en.put("DYNASTY_SORT_LOYALTY_LOW", "Loyalty (lowest first)");
 
         en.put("SETTINGS_DEFAULT_ROLE_WORKER", "Default Worker Role:");
         en.put("SETTINGS_DEFAULT_ROLE_SOLDIER", "Default Soldier Role:");

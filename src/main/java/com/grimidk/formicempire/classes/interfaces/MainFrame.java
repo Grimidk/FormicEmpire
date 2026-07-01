@@ -130,7 +130,7 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         super(LanguageStrings.get(LanguageStrings.UI_APP_TITLE));
         this.engine = engine;
         
-        Image icon = AssetStyles.loadImage("/icon.ico");
+        Image icon = AssetStyles.loadImage(AssetStyles.META_APP_ICON);
         if (icon != null) {
             setIconImage(icon);
         }
@@ -254,8 +254,8 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
     }
 
     private void initCursors() {
-        cursorNormal = AssetStyles.loadCustomCursor("/icons/ui/CursorNormal.png", "AntCursorNormal");
-        cursorClick = AssetStyles.loadCustomCursor("/icons/ui/CursorClick.png", "AntCursorClick");
+        cursorNormal = AssetStyles.loadCustomCursor(AssetStyles.META_CURSOR_NORMAL, "AntCursorNormal");
+        cursorClick = AssetStyles.loadCustomCursor(AssetStyles.META_CURSOR_CLICK, "AntCursorClick");
         
         setCursor(cursorNormal);
 

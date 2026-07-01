@@ -74,7 +74,7 @@ public final class GameUnlocks {
     static { upgrades.add(ROLE_SIEGE); }
     public static final Upgrade ROLE_BREEDER = new Upgrade(30,"ROLE_BREEDER_UPGRADE", "ROLE_BREEDER_FLAVOR", "ROLE_BREEDER_DESC", TYPE_PRINCESS, 0, null );
     static { upgrades.add(ROLE_BREEDER); }
-    public static final Upgrade ROLE_DIPLOMAT = new Upgrade(31, "ROLE_DIPLOMAT_UPGRADE", "ROLE_DIPLOMAT_FLAVOR", "ROLE_DIPLOMAT_DESC", TYPE_PRINCESS, 0, null );
+    public static final Upgrade ROLE_DIPLOMAT = new Upgrade(31, "ROLE_DIPLOMAT_UPGRADE", "ROLE_DIPLOMAT_FLAVOR", "ROLE_DIPLOMAT_DESC", TYPE_PRINCESS, 1500, null );
     static { upgrades.add(ROLE_DIPLOMAT); }
     public static final Upgrade ROLE_MILITIA = new Upgrade(32, "ROLE_MILITIA_UPGRADE", "ROLE_MILITIA_FLAVOR", "ROLE_MILITIA_DESC", TYPE_WORKER, 0, null );
     static { upgrades.add(ROLE_MILITIA); }
@@ -124,8 +124,16 @@ public final class GameUnlocks {
     static { upgrades.add(ABILITY_CATCH_SYMBIOTIC_MITE); }
     public static final Upgrade ABILITY_CATCH_DERMESTID = new Upgrade(517, "ABILITY_CATCH_DERMESTID", "ABILITY_CATCH_DERMESTID_FLAVOR", "ABILITY_CATCH_DERMESTID_DESC", ROLE_GRAVER, 2000, null);
     static { upgrades.add(ABILITY_CATCH_DERMESTID); }
+    public static final Upgrade ABILITY_DIPLOMAT_PRESSURE_2 = new Upgrade(518, "ABILITY_DIPLOMAT_PRESSURE_2", "ABILITY_DIPLOMAT_PRESSURE_2_FLAVOR", "ABILITY_DIPLOMAT_PRESSURE_2_DESC", ROLE_DIPLOMAT, 2500, null);
+    static { upgrades.add(ABILITY_DIPLOMAT_PRESSURE_2); }
+    public static final Upgrade ABILITY_DIPLOMAT_PRESSURE_3 = new Upgrade(519, "ABILITY_DIPLOMAT_PRESSURE_3", "ABILITY_DIPLOMAT_PRESSURE_3_FLAVOR", "ABILITY_DIPLOMAT_PRESSURE_3_DESC", ABILITY_DIPLOMAT_PRESSURE_2, 10000, null);
+    static { upgrades.add(ABILITY_DIPLOMAT_PRESSURE_3); }
     public static final Upgrade ABILITY_ABILITY = new Upgrade(900, "ABILITY_ABILITY", "ABILITY_ABILITY_FLAVOR", "ABILITY_ABILITY_DESC", null, 0, null);
     static { upgrades.add(ABILITY_ABILITY); }
+    public static final Upgrade ABILITY_PHEROMONE_STORM = new Upgrade(520, "ABILITY_PHEROMONE_STORM", "ABILITY_PHEROMONE_STORM_FLAVOR", "ABILITY_PHEROMONE_STORM_DESC", ABILITY_ABILITY, 4000, null);
+    static { upgrades.add(ABILITY_PHEROMONE_STORM); }
+    public static final Upgrade ABILITY_CREATINE_DIET = new Upgrade(521, "ABILITY_CREATINE_DIET", "ABILITY_CREATINE_DIET_FLAVOR", "ABILITY_CREATINE_DIET_DESC", ABILITY_ABILITY, 4000, null);
+    static { upgrades.add(ABILITY_CREATINE_DIET); }
 
     // -- Advanced Roles --
     public static final Upgrade ROLE_COURIER = new Upgrade(18, "ROLE_COURIER_UPGRADE", "ROLE_COURIER_FLAVOR", "ROLE_COURIER_DESC", ABILITY_TRADE, 0, null );

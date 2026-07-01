@@ -182,6 +182,15 @@ public class SpanishTranslation implements Translation {
         es.put("ABILITY_ERROR_NO_DRONES", "No hay Zánganos disponibles en la colonia.");
         es.put("ABILITY_ERROR_NO_BREEDERS", "No hay Princesas Criadoras disponibles.");
         es.put("ABILITY_ERROR_LOCATE_COLONY", "Error: No se pudo localizar la colonia en el mapa mundial.");
+        es.put("ABILITY_ERROR_ALREADY_ACTIVE", "Esta habilidad ya está activa.");
+        es.put("ABILITY_ERROR_NOT_ENOUGH_RESOURCE", "No hay suficiente %2$s (se necesitan %1$d).");
+        es.put("ABILITY_COST_RESOURCE_FMT", "Costo: %d %s");
+        es.put("ABILITY_PHEROMONE_STORM", "Tormenta de Feromonas");
+        es.put("ABILITY_PHEROMONE_STORM_FLAVOR", "Unidad Aromática");
+        es.put("ABILITY_PHEROMONE_STORM_DESC", "Gasta 500 jarabes para aumentar la lealtad de la colonia en 10 durante un año (12 meses).");
+        es.put("ABILITY_CREATINE_DIET", "Dieta de Creatina");
+        es.put("ABILITY_CREATINE_DIET_FLAVOR", "Combustible Muscular");
+        es.put("ABILITY_CREATINE_DIET_DESC", "Gasta 300 proteína para duplicar la velocidad de movimiento de las hormigas durante medio año (6 meses).");
 
         es.put("DIALOG_STATS_TITLE", "Estadísticas");
         es.put("STATS_DYNASTY_MODE", "Modo Dinastía");
@@ -516,6 +525,12 @@ public class SpanishTranslation implements Translation {
         es.put("MOVE_SPEED", "Marcha Rápida");
         es.put("MOVE_FLY", "Volando");
         es.put("MOVE_PATROL", "Patrullando");
+        es.put("MOVE_STATIC_DESC", "No se mueve (insectos mascota estacionarios).");
+        es.put("MOVE_WANDER_DESC", "Deambulación lenta.");
+        es.put("MOVE_MARCH_DESC", "Marcha a velocidad normal.");
+        es.put("MOVE_SPEED_DESC", "Marcha rápida.");
+        es.put("MOVE_FLY_DESC", "Movimiento volador.");
+        es.put("MOVE_PATROL_DESC", "Patrulla alrededor de un corral o puesto.");
 
         es.put("BUG_ANT", "Hormiga");
         es.put("BUG_APHID", "Pulgón");
@@ -609,10 +624,20 @@ public class SpanishTranslation implements Translation {
         es.put("LOYALTY_MODIFIER_TRADE", "Comercio activo");
         es.put("LOYALTY_MODIFIER_TUNNEL", "Enlace de túnel");
         es.put("LOYALTY_MODIFIER_CAPITAL", "Capital");
+        es.put("LOYALTY_MODIFIER_PHEROMONE_STORM", "Tormenta de Feromonas");
         es.put("DIPLO_ACTION_FORM_PACT", "Formar pacto");
         es.put("DIPLO_ACTION_BREAK_PACT", "Romper pacto");
         es.put("DIPLO_ACTION_TRADE", "Comerciar");
         es.put("DIPLO_ACTION_REQUEST_TRADE", "Solicitar comercio");
+        es.put("DIPLO_ACTION_SEND_DIPLOMATS", "Enviar diplomáticas");
+        es.put("DIPLO_SEND_DIPLOMATS_TITLE", "Enviar diplomáticas");
+        es.put("DIPLO_SEND_DIPLOMATS_PROMPT", "Envía hasta %d diplomática(s) (%d asignadas). Cada una mejora la estabilidad en %d.");
+        es.put("DIPLO_SEND_DIPLOMATS_SUCCESS_DYNASTY", "Enviadas %d diplomática(s). Reputación con %s aumentó en %d.");
+        es.put("DIPLO_SEND_DIPLOMATS_SUCCESS_COLONY", "Enviadas %d diplomática(s). Lealtad de %s aumentó en %d.");
+        es.put("DIPLO_ERROR_NO_DIPLOMATS", "No hay princesas con rol Diplomática asignado en esta colonia.");
+        es.put("DIPLO_ERROR_NO_DIPLOMAT_ROLE", "Desbloquea el rol Diplomática antes de enviar diplomáticas.");
+        es.put("DIPLO_ERROR_REPUTATION_STABLE", "No puedes enviar diplomáticas a dinastías con reputación Agresiva.");
+        es.put("DIPLO_ERROR_LOYALTY_STABLE", "No puedes enviar diplomáticas a colonias con lealtad Rebelde.");
         es.put("DIPLO_ERROR_CORDIAL_REQUIRED", "Se requiere reputación cordial o mejor para formar un pacto.");
         es.put("DIPLO_ERROR_CORDIAL_REQUIRED_REQUEST", "Se requiere reputación cordial o mejor para solicitar comercio.");
         es.put("DIPLO_ERROR_NEUTRAL_REQUIRED", "Se requiere reputación neutral o mejor para enviar una ruta comercial.");
@@ -640,6 +665,10 @@ public class SpanishTranslation implements Translation {
         es.put("METHOD_AIR", "Aire");
         es.put("METHOD_SEA", "Mar");
         es.put("METHOD_TUNNEL", "Túnel");
+        es.put("METHOD_LAND_DESC", "Convoyes terrestres equilibrados en velocidad y capacidad.");
+        es.put("METHOD_AIR_DESC", "Convoyes aéreos rápidos; baja capacidad. Requiere princesas de Transporte Aéreo.");
+        es.put("METHOD_SEA_DESC", "Convoyes de alta capacidad entre colonias costeras.");
+        es.put("METHOD_TUNNEL_DESC", "Bajo peligro por túneles completados. Requiere ingenieros o perforadoras de túnel.");
 
         es.put("EVENT_ECLIPSE_NUPTIAL", "¡El Eclipse ha provocado un Vuelo Nupcial espontáneo!");
 
@@ -729,7 +758,7 @@ public class SpanishTranslation implements Translation {
         es.put("ROLE_BREEDER_DESC", "Permite a princesas y zánganos realizar vuelos nupciales para crear colonias u obtener reinas.");
         es.put("ROLE_DIPLOMAT_UPGRADE", "Rol Diplomática");
         es.put("ROLE_DIPLOMAT_FLAVOR", "Más fuerte que la espada");
-        es.put("ROLE_DIPLOMAT_DESC", "Permite a las princesas negociar con otras colonias.");
+        es.put("ROLE_DIPLOMAT_DESC", "Permite a las princesas mejorar la lealtad de la colonia o la reputación dinástica mediante misiones diplomáticas.");
         es.put("ROLE_MILITIA_UPGRADE", "Rol Milicia");
         es.put("ROLE_MILITIA_FLAVOR", "Milicia Auxiliar de Obreras");
         es.put("ROLE_MILITIA_DESC", "Permite a las obreras realizar tareas defensivas básicas.");
@@ -797,6 +826,12 @@ public class SpanishTranslation implements Translation {
         es.put("ABILITY_CATCH_SYMBIOTIC_MITE_DESC", "Permite a las capturadoras recoger ácaros simbióticos del exterior. Se desbloquea al aparecer los primeros ácaros parásitos. Cada ácaro simbiótico elimina hasta 5 ácaros parásitos al día.");
         es.put("ABILITY_CATCH_DERMESTID_FLAVOR", "Captura de escarabajos de fosa");
         es.put("ABILITY_CATCH_DERMESTID_DESC", "Permite a las capturadoras recoger derméstidos del exterior. Las coveiras cuidan hasta 10 cada una en la fosa.");
+        es.put("ABILITY_DIPLOMAT_PRESSURE_2", "Presión diplomática II");
+        es.put("ABILITY_DIPLOMAT_PRESSURE_2_FLAVOR", "Lengua de plata");
+        es.put("ABILITY_DIPLOMAT_PRESSURE_2_DESC", "Cada diplomática enviada mejora la estabilidad en 3 en lugar de 1.");
+        es.put("ABILITY_DIPLOMAT_PRESSURE_3", "Presión diplomática III");
+        es.put("ABILITY_DIPLOMAT_PRESSURE_3_FLAVOR", "Mandíbulas de hierro");
+        es.put("ABILITY_DIPLOMAT_PRESSURE_3_DESC", "Cada diplomática enviada mejora la estabilidad en 5 en lugar de 1.");
         es.put("ABILITY_ABILITY_FLAVOR", "Habilidades Desbloqueadas");
         es.put("ABILITY_ABILITY_DESC", "Permite ver el menú de habilidades y usar habilidades activas.");
 
@@ -993,7 +1028,9 @@ public class SpanishTranslation implements Translation {
         es.put("HELP_TAB_SPECIES", "Especies");
         es.put("HELP_TAB_TYPES", "Tipos");
         es.put("HELP_TAB_BUGS", "Otros insectos");
-        es.put("HELP_TAB_ROLES", "Roles");
+        es.put("HELP_TAB_ROLES", "Mejoras de Rol");
+        es.put("HELP_TAB_ANT_ROLES", "Roles de Hormiga");
+        es.put("HELP_TAB_EMPIRE", "Imperio");
         es.put("HELP_TAB_UPGRADES", "Mejoras");
         es.put("HELP_TAB_BUILDINGS", "Edificios");
         es.put("HELP_TAB_ASSIMILATIONS", "Asimilaciones");
@@ -1002,7 +1039,7 @@ public class SpanishTranslation implements Translation {
         es.put("HELP_WELCOME_STORY", "Casi todas las demás hormigas se han extinguido. Eres una reina hormiga y tienes dentro de ti todo el conocimiento genético de cada especie de hormiga. Debes desbloquearlo y apoderarte del mundo como la especie dominante. <br><br>Construye tu colonia y comienza a expandirte mientras luchas contra otras colonias de hormigas; necesitarás adaptarte a nuevos entornos absorbiendo e investigando sus habilidades.");
         es.put("HELP_START_INFO", "<b>Supervivencia Básica:</b><br>Tus hormigas necesitan <b>Hongos</b> para comer y <b>Agua</b> para beber todos los días. Sin ellos, tu colonia morirá de hambre o deshidratación.<br>- <b>Recolectoras</b> recogen Plantas y Agua.<br>- <b>Cazadoras</b> recogen Proteína (Carne).<br>- <b>Granjeras</b> convierten Plantas y Proteína en Hongos.<br>- <b>Niñeras</b> cuidan de tu prole. La prole descuidada morirá.<br><br><b>Observando tu Colonia:</b><br>Presiona <b>A</b> para alternar tu vista entre el <b>Inframundo</b> (dentro del hormiguero) y el <b>Supramundo</b> (recolección exterior).<br><br><b>Gestión de la Colonia:</b><br>Usa <b>Tasas de Eclosión (P)</b> para controlar los nacimientos. Las <b>Investigadoras</b> generan Puntos de Investigación (PI) para mejoras en el <b>Menú de Investigación (Y)</b>. Las <b>Constructoras</b> usan Minerales y Resina para construir instalaciones mediante el <b>Menú de Construcción (U)</b>.<br><br><b>Amenazas Avanzadas:</b><br>- <b>Contaminación:</b> Las hormigas muertas deben ser retiradas por <b>Sepultureras</b>.<br>- <b>Hormigas parásitas:</b> Drenan secretamente la comida. Asigna <b>Vigilantes</b> para eliminarlos.<br>- <b>Agotamiento:</b> Los nodos de recursos se secan; asigna <b>Exploradoras</b> para encontrar nuevos.");
         es.put("HELP_OVERWORLD_GATHERING", "<b>Recolección en superficie (supramundo):</b><br>Las <b>exploradoras</b> descubren nuevos nodos de recursos. Cada hexágono del mapa acumula <b>agotamiento</b> por hallazgos sin agua; un agotamiento mayor suele colocar nodos nuevos más lejos del nido (algunas mejoras limitan lo fuerte que es esto).<br><br><b>Distancia:</b> Lo recogido depende de la distancia en línea recta desde la <b>entrada del nido</b>. Dentro de un radio de <b>plena eficiencia</b> (mayor con obreras más rápidas y ciertas mejoras), el rendimiento es completo; más lejos, cae hacia un mínimo pequeño.<br><br><b>Estadísticas (Hex local):</b> <b>Agotamiento</b> es el porcentaje efectivo usado para apariciones; <b>Fuentes encontradas</b> cuenta los nodos que esta colonia ha descubierto; <b>Distancia máx. a plena eficiencia</b> estima el radio de rendimiento pleno para una obrera típica.");
-        es.put("HELP_DYNASTY_INFO", "<b>Expandiendo tu Dinastía:</b><br>Una vez que desbloquees a las <b>Criadoras</b>, realiza Vuelos Nupciales para expandirte a través del <b>Mapa Mundial (I)</b>.<br><i>Consejo: ¡Vigila el cielo! ¡Los eclipses activan Vuelos Nupciales espontáneos y gratuitos!</i><br><br><b>Logística y Comercio:</b><br>Fundar múltiples colonias desbloquea las <b>Rutas Comerciales</b>. Asigna <b>Mensajeras</b> para transportar recursos.<br>- <b>Tierra:</b> Método comercial estándar.<br>- <b>Túnel:</b> Seguro y rápido, requiere <b>Túneles</b> y <b>Perforadoras</b>.<br>- <b>Aire:</b> Rápido pero de baja capacidad, requiere <b>Transporte Aéreo</b> (Princesas).<br>- <b>Bilateral:</b> Permite el transporte de recursos en ambos sentidos.<br><br><b>Hitos de la Dinastía:</b><br>- <b>Menú de Dinastía (S):</b> Mira y gestiona todas las colonias.<br>- <b>Colonización Masiva:</b> Elimina los límites de colonias satélite.<br>- <b>Automatización:</b> Permite que las colonias NPC se gestionen solas.<br><br><b>Evolución:</b><br>Desbloquea <b>Sinergias</b> para combinar mejoras y <b>Asimilaciones</b> para absorber rasgos de otras especies.");
+        es.put("HELP_DYNASTY_INFO", "<b>Expandiendo tu Dinastía:</b><br>Una vez que desbloquees a las <b>Criadoras</b>, realiza Vuelos Nupciales para expandirte a través del <b>Mapa Mundial (I)</b>.<br><i>Consejo: ¡Vigila el cielo! ¡Los eclipses activan Vuelos Nupciales espontáneos y gratuitos!</i><br><br><b>Logística y Comercio:</b><br>Fundar múltiples colonias desbloquea las <b>Rutas Comerciales</b>. Asigna hormigas de transporte y elige un método de convoy (iconos en la pestaña de logística):<br>- <b>Tierra:</b> Convoyes terrestres estándar.<br>- <b>Mar:</b> Alta capacidad entre colonias costeras.<br>- <b>Túnel:</b> Seguro y rápido; requiere túnel completado y roles de túnel.<br>- <b>Aire:</b> Rápido pero de baja capacidad; requiere <b>Transporte Aéreo</b> (Princesas).<br>- <b>Bilateral:</b> Fusiona rutas de ida y vuelta en un convoy bidireccional.<br><br><b>Lealtad y Diplomacia:</b><br>Cada colonia tiene <b>Lealtad</b> a tu dinastía (iconos de nivel en la vista general). La baja lealtad bloquea el comercio. Otras dinastías tienen <b>Reputación</b> y postura diplomática que afectan el comercio.<br><br><b>Hitos de la Dinastía:</b><br>- <b>Menú de Dinastía (S):</b> Mira y gestiona todas las colonias.<br>- <b>Colonización Masiva:</b> Elimina los límites de colonias satélite.<br>- <b>Automatización:</b> Permite que las colonias NPC se gestionen solas.<br><br><b>Evolución:</b><br>Desbloquea <b>Sinergias</b> para combinar mejoras y <b>Asimilaciones</b> para absorber rasgos de otras especies.");
         
         es.put("HELP_SPECIES_SCIENTIFIC", "Nombre Científico:");
         es.put("HELP_SPECIES_TRAITS", "Rasgos Base:");
@@ -1057,8 +1094,14 @@ public class SpanishTranslation implements Translation {
         es.put("HELP_TUTORIAL_TITLE", "¡Bienvenido a Imperio Fórmico!");
         es.put("HELP_TUTORIAL_TIPS", "<b>Consejos Básicos:</b><br><br>Tu principal alimento son los <b>Hongos</b>, que las hormigas comerán a diario.<br><br>Asigna <b>Obreras</b> (Q) a roles de <b>Recolectora</b> para recoger Plantas y Agua. ¡Sin ellas tus hormigas morirán de sed!<br><br>Asigna <b>Granjeras</b> (Q) para convertir las Plantas recogidas en Hongos. Una Granjera generalmente puede manejar a 6 Recolectoras.<br><br>Asigna <b>Niñeras</b> (Q) para cuidar de tus <b>Huevos, Larvas y Pupas</b>. ¡Sin suficientes niñeras, tus crías morirán por descuido!<br><br>Presiona <b>A</b> para alternar tu vista entre el <b>Inframundo</b> y el <b>Supramundo</b>.<br><br><i>Consejo de QoL: Si asignas un nuevo rol pero no tienes hormigas sin asignar, el juego las tomará automáticamente de tu fuerza de trabajo por defecto (como las Recolectoras).</i>");
         es.put("HELP_TUTORIAL_THREATS", "<b>Amenazas a la Colonia:</b><br><br><b>Contaminación:</b> Las hormigas mueren naturalmente de vejez. Si los cuerpos se acumulan, la enfermedad se propagará y matará a tu colonia. Asigna <b>Sepultureras</b> para limpiar a los muertos.<br><br><b>Hormigas parásitas:</b> Plagas invisibles absorberán tus reservas de Hongos. Asigna <b>Vigilantes</b> para detectarlos y eliminarlos.<br><br><b>Agotamiento:</b> Los nodos de recursos no duran para siempre. Si tus recolectoras se quedan sin plantas o agua, asigna <b>Exploradoras</b> para encontrar nuevos recursos cerca.");
-        es.put("HELP_TUTORIAL_DYNASTY", "<b>Gestión de Dinastía:</b><br><br>A medida que tu colonia prospere, desbloquearás Princesas <b>Criadoras</b>. Estas te permiten establecer colonias satélite a través del <b>Mapa Mundial (I)</b>.<br><i>Consejo: ¡Vigila el cielo! ¡Los raros eclipses solares o lunares activarán Vuelos Nupciales espontáneos y gratuitos!</i><br><br>Fundar múltiples colonias desbloquea el <b>Menú de Dinastía (S)</b>. ¡Alcanzar ciertos hitos te permitirá construir <b>Rutas Comerciales</b>, eliminar límites de expansión e incluso <b>Automatizar</b> tu creciente dinastía!");
+        es.put("HELP_TUTORIAL_DYNASTY", "<b>Gestión de Dinastía:</b><br><br>A medida que tu colonia prospere, desbloquearás Princesas <b>Criadoras</b>. Estas te permiten establecer colonias satélite a través del <b>Mapa Mundial (I)</b>.<br><i>Consejo: ¡Vigila el cielo! ¡Los raros eclipses solares o lunares activarán Vuelos Nupciales espontáneos y gratuitos!</i><br><br>Fundar múltiples colonias desbloquea el <b>Menú de Dinastía (S)</b> para logística, lealtad y diplomacia. Las rutas comerciales usan iconos de convoy (Tierra, Mar, Túnel, Aire). La <b>Lealtad</b> de colonia y la <b>Reputación</b> diplomática se muestran con sus propios iconos en Dinastía y Estadísticas.");
         
+        es.put("HELP_EMPIRE_TRADE", "Métodos de Comercio");
+        es.put("HELP_EMPIRE_LOYALTY", "Niveles de Lealtad de Colonia");
+        es.put("HELP_EMPIRE_REPUTATION", "Posturas de Reputación Diplomática");
+        es.put("HELP_EMPIRE_MOVEMENT", "Movimiento de Insectos Mascota");
+        es.put("HELP_TIER_MIN_SCORE", " (mín. %d)");
+        es.put("HELP_ROLE_ANT_TYPE", "Tipo de hormiga: %s");
         es.put("HOTKEY_PAUSE_LABEL", "Pausa/Jugar:");
         es.put("HOTKEY_ESC_LABEL", "Menú de Juego:");
         es.put("HOTKEY_VIEW_LABEL", "Alternar Vista:");
@@ -1165,6 +1208,10 @@ public class SpanishTranslation implements Translation {
         es.put("LOG_FOUND_SOURCE_FULL_FMT", "Se encontró %s pero la capacidad está llena.");
         es.put("LOG_SOURCE_EXHAUSTED_FMT", "Una fuente de %s se ha agotado.");
         es.put("LOG_FORCE_FLIGHT_BLOCKED", "No se puede forzar el vuelo. Faltan zánganos o princesas criadoras.");
+        es.put("LOG_PHEROMONE_STORM_STARTED_FMT", "Tormenta de Feromonas activada: +%d lealtad durante %d meses.");
+        es.put("LOG_PHEROMONE_STORM_ENDED", "El efecto de Tormenta de Feromonas ha terminado.");
+        es.put("LOG_CREATINE_DIET_STARTED_FMT", "Dieta de Creatina activada: velocidad duplicada durante %d meses.");
+        es.put("LOG_CREATINE_DIET_ENDED", "El efecto de Dieta de Creatina ha terminado.");
         es.put("LOG_WARNING_NO_QUEEN_FMT", "¡La colonia no tiene reina! Días sin reina: %d/7");
         es.put("LOG_MATURATION_COMPLETE", "Maduración de la colonia completa: fuerza laboral desplegada.");
         es.put("LOG_TRADE_CANCELLED_FMT", "Cancelado. No hay suficiente %s disponible.");
@@ -1184,6 +1231,8 @@ public class SpanishTranslation implements Translation {
         es.put("DYNASTY_SORT_POP_LOW", "Población (menor primero)");
         es.put("DYNASTY_SORT_AGE_OLD", "Edad (más antigua primero)");
         es.put("DYNASTY_SORT_AGE_NEW", "Edad (más nueva primero)");
+        es.put("DYNASTY_SORT_LOYALTY_HIGH", "Lealtad (mayor primero)");
+        es.put("DYNASTY_SORT_LOYALTY_LOW", "Lealtad (menor primero)");
 
         es.put("SETTINGS_DEFAULT_ROLE_WORKER", "Rol de obrera por defecto:");
         es.put("SETTINGS_DEFAULT_ROLE_SOLDIER", "Rol de soldado por defecto:");

@@ -291,7 +291,8 @@ public class RoleManagementDialog extends ZeroDialog {
         private void addRoleRow(AntRole role) {
             JPanel roleRow = new JPanel(new FlowLayout(FlowLayout.LEFT));
             roleRow.setOpaque(false);
-            JLabel label = new JLabel(role.getName() + ":");
+            JLabel label = new JLabel(role.getName() + ":", role.getIcon(), SwingConstants.LEFT);
+            label.setIconTextGap(6);
             label.setForeground(AssetStyles.FONT_COLOR);
             roleRow.add(label);
             

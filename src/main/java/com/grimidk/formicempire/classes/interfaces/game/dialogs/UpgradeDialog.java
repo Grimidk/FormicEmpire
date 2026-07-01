@@ -664,6 +664,7 @@ public class UpgradeDialog extends ZeroDialog {
         private final JPanel listPanel;
         private final JScrollPane scrollPane;
         private final JLabel statusLabel;
+        private final JLabel geneticIntegrityLabel;
         private final Map<JButton, Assimilation> buttonMap = new HashMap<>();
 
         public AssimilationPanel(Colony colony) {
@@ -671,12 +672,19 @@ public class UpgradeDialog extends ZeroDialog {
             this.colony = colony;
             setBackground(AssetStyles.BACKGROUND_COLOR);
 
-            JPanel northPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            JPanel northPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 5));
             northPanel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
             statusLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.ASSIMILATION_CURRENT), LanguageStrings.get(LanguageStrings.ASSIMILATION_NONE)));
             statusLabel.setFont(AssetStyles.FONT_BOLD);
             statusLabel.setForeground(AssetStyles.FONT_COLOR_HEADER);
             northPanel.add(statusLabel);
+
+            geneticIntegrityLabel = new JLabel();
+            geneticIntegrityLabel.setFont(AssetStyles.FONT_BOLD);
+            geneticIntegrityLabel.setForeground(AssetStyles.FONT_COLOR_VALUE);
+            geneticIntegrityLabel.setIcon(GameConstants.ICON_STAT_GENETIC_INTEGRITY);
+            geneticIntegrityLabel.setIconTextGap(8);
+            northPanel.add(geneticIntegrityLabel);
             add(northPanel, BorderLayout.NORTH);
 
             listPanel = new JPanel();
@@ -745,6 +753,9 @@ public class UpgradeDialog extends ZeroDialog {
             } else {
                 statusLabel.setText(String.format(LanguageStrings.get(LanguageStrings.ASSIMILATION_CURRENT), LanguageStrings.get(LanguageStrings.ASSIMILATION_NONE)));
             }
+            geneticIntegrityLabel.setText(String.format("%s: %.1f%%",
+                    LanguageStrings.get(LanguageStrings.STAT_GENETIC_INTEGRITY),
+                    d.getGeneticIntegrity()));
         }
 
         private JPanel createAssimilationCard(Assimilation a) {
@@ -837,7 +848,13 @@ public class UpgradeDialog extends ZeroDialog {
         @Override
         public void liveUpdate() {
             Dynasty d = colony.getDynasty();
-            if (d == null || d.getCurrentAssimilation() == null) {
+            if (d == null) {
+                return;
+            }
+            geneticIntegrityLabel.setText(String.format("%s: %.1f%%",
+                    LanguageStrings.get(LanguageStrings.STAT_GENETIC_INTEGRITY),
+                    d.getGeneticIntegrity()));
+            if (d.getCurrentAssimilation() == null) {
                 if (listPanel.getComponentCount() > 0 && listPanel.getComponent(0) instanceof JPanel) {
                     JPanel p = (JPanel) listPanel.getComponent(0);
                     if (p.getBorder() instanceof TitledBorder && ((TitledBorder)p.getBorder()).getTitle().contains("Assimilating:")) {

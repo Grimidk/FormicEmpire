@@ -515,6 +515,8 @@ public class SaveManager {
                     sc.dermestids = c.getBugHandlingService().resolvePetCountForSave(c, GameConstants.TYPE_DERMESTID);
                     sc.parasiteAnts = c.getParasiteAnts();
                     sc.parasiticMites = c.getParasiticMites();
+                    sc.pheromoneStormMonthsRemaining = c.getPheromoneStormMonthsRemaining();
+                    sc.creatineDietMonthsRemaining = c.getCreatineDietMonthsRemaining();
                     sc.totalDeaths = c.getTotalDeaths();
                     
                     // Maps/Lists
@@ -706,6 +708,8 @@ public class SaveManager {
         writeJsonLine(w, "dermestids", sc.dermestids, false);
         writeJsonLine(w, "parasiteAnts", sc.parasiteAnts, false);
         writeJsonLine(w, "parasiticMites", sc.parasiticMites, false);
+        writeJsonLine(w, "pheromoneStormMonthsRemaining", sc.pheromoneStormMonthsRemaining, false);
+        writeJsonLine(w, "creatineDietMonthsRemaining", sc.creatineDietMonthsRemaining, false);
         writeJsonLine(w, "totalDeaths", sc.totalDeaths, false);
 
         // Serialized Lists within Colony
@@ -953,6 +957,8 @@ public class SaveManager {
         sc.dermestids = Integer.parseInt(map.getOrDefault("dermestids", "0"));
         sc.parasiteAnts = Integer.parseInt(map.getOrDefault("parasiteAnts", map.getOrDefault("parasites", "0")));
         sc.parasiticMites = Integer.parseInt(map.getOrDefault("parasiticMites", "0"));
+        sc.pheromoneStormMonthsRemaining = Integer.parseInt(map.getOrDefault("pheromoneStormMonthsRemaining", "0"));
+        sc.creatineDietMonthsRemaining = Integer.parseInt(map.getOrDefault("creatineDietMonthsRemaining", "0"));
         sc.totalDeaths = Integer.parseInt(map.getOrDefault("totalDeaths", "0"));
         
         // Nested structures

@@ -94,7 +94,7 @@
                             <headerType>gui</headerType>
                             <jar>${project.build.directory}/${project.artifactId}-${project.version}.jar</jar>
                             <outfile>${project.build.directory}/FormicEmpire.exe</outfile>
-                            <icon>src/main/resources/icon.ico</icon>
+                            <icon>src/main/resources/meta/icon.ico</icon>
                             <downloadUrl>http://java.com/download</downloadUrl>
                             <classPath>
                                 <mainClass>com.grimidk.formicempire.FormicEmpire</mainClass>

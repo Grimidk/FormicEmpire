@@ -71,6 +71,9 @@ public class ColonyPhysicsService {
                     }
 
                     float moveSpeed = GameConstants.BASE_SPRITE_SPEED;
+                    if (colony.isCreatineDietActive()) {
+                        moveSpeed *= GameConstants.CREATINE_DIET_SPEED_MULTIPLIER;
+                    }
                     if (lodSameDim && !inView) {
                         if (!ViewportPhysicsLod.shouldRunOffViewportPosition(physicsStepIndex, ant)) {
                             continue;
@@ -112,6 +115,9 @@ public class ColonyPhysicsService {
                 }
 
                 float bugMove = GameConstants.BASE_SPRITE_SPEED;
+                if (colony.isCreatineDietActive()) {
+                    bugMove *= GameConstants.CREATINE_DIET_SPEED_MULTIPLIER;
+                }
                 if (lod && !bugInView) {
                     if (!ViewportPhysicsLod.shouldRunOffViewportBugMove(physicsStepIndex, bugHash)) {
                         continue;
@@ -317,14 +323,17 @@ public class ColonyPhysicsService {
     private void updateBugLogic(Colony colony, Bug bug) {
         if (bug.getDimension() == WorldSpaces.OVERWORLD && bug.getBugType() == GameConstants.TYPE_APHID) {
             if (colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) {
-                Rectangle yard = getRoomBounds(colony, WorldSpaces.RANCHER_YARD);
+                Rectangle yard = colony.getRancherBounds();
+                if (yard == null) {
+                    yard = getRoomBounds(colony, WorldSpaces.RANCHER_YARD);
+                }
                 wanderInBoundaries(colony, bug, yard, 0.05);
             } else {
                 bug.setPosition(new Point(-1000, -1000));
             }
         } else if (bug.getDimension() == WorldSpaces.OVERWORLD
                 && bug.getBugType() == GameConstants.TYPE_SYMBIOTIC_MITE
-                && colony.hasUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE)) {
+                && (colony.hasUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE) || colony.getSymbioticMites() > 0)) {
             Rectangle pen = colony.getInsectPenBounds();
             if (pen == null) {
                 pen = getRoomBounds(colony, WorldSpaces.INSECT_PEN);
@@ -620,13 +629,49 @@ public class ColonyPhysicsService {
     }
 
     private void wanderInBoundaries(Colony colony, Bug entity, Rectangle bounds, double chance) {
-        if (isPointInSafeBounds(colony, bounds, entity.getX(), entity.getY())) {
+        if (bounds == null) {
+            return;
+        }
+        Rectangle walk = getBugWalkBounds(colony, bounds, entity);
+        if (isPointInWalkBounds(walk, entity.getX(), entity.getY())) {
             if (GameRandom.nextDouble() < chance) {
-                entity.moveTo(getRandomPointInRoom(colony, bounds, colony.getGameAreaWidth()));
+                entity.moveTo(getRandomPointInWalkBounds(walk));
             }
         } else {
-            entity.moveTo(new Point((int)bounds.getCenterX(), (int)bounds.getCenterY()));
+            entity.moveTo(getRandomPointInWalkBounds(walk));
         }
+    }
+
+    private Rectangle getBugWalkBounds(Colony colony, Rectangle bounds, Bug entity) {
+        if (bounds.width <= 200 || bounds.height <= 200) {
+            ImageIcon icon = entity.getBugType().getSprite();
+            int spriteW = icon != null ? Math.max(1, icon.getIconWidth()) : ColonySpatialLayout.ANT_SIZE;
+            int spriteH = icon != null ? Math.max(1, icon.getIconHeight()) : ColonySpatialLayout.ANT_SIZE;
+            return getCompactPenWalkBounds(bounds, spriteW, spriteH);
+        }
+        return getSafeWalkableBounds(colony, bounds, colony.getGameAreaWidth());
+    }
+
+    private Rectangle getCompactPenWalkBounds(Rectangle pen, int spriteW, int spriteH) {
+        int pad = 4;
+        int minX = pen.x + pad;
+        int minY = pen.y + pad;
+        int maxX = Math.max(minX, pen.x + pen.width - pad - spriteW);
+        int maxY = Math.max(minY, pen.y + pen.height - pad - spriteH);
+        return new Rectangle(minX, minY, maxX - minX + 1, maxY - minY + 1);
+    }
+
+    private boolean isPointInWalkBounds(Rectangle walk, int x, int y) {
+        return walk != null && walk.width > 0 && walk.height > 0 && walk.contains(x, y);
+    }
+
+    private Point getRandomPointInWalkBounds(Rectangle walk) {
+        if (walk == null || walk.width <= 0 || walk.height <= 0) {
+            return new Point(0, 0);
+        }
+        int x = walk.x + (walk.width <= 1 ? 0 : GameRandom.nextInt(walk.width));
+        int y = walk.y + (walk.height <= 1 ? 0 : GameRandom.nextInt(walk.height));
+        return new Point(x, y);
     }
 
     private Point getRandomPointInRoom(Colony colony, Rectangle r, int gameWidth) {

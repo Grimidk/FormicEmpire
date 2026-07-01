@@ -112,6 +112,8 @@ public class Savefile implements Serializable {
         public int plants, mushrooms, protein, water, syrups, resins, minerals;        
         public float hatchRateWorker, hatchRateSoldier, hatchRateMajor, hatchRateDrone, hatchRatePrincess;
         public int aphids, symbioticMites, dermestids, parasiteAnts, parasiticMites;
+        public int pheromoneStormMonthsRemaining;
+        public int creatineDietMonthsRemaining;
         public int totalDeaths;
         public int loyalty = GameConstants.DEFAULT_COLONY_LOYALTY;
         public Map<String, Integer> assignedRoleCounts = new HashMap<>();

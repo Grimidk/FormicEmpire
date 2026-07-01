@@ -2,6 +2,7 @@ package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
+import com.grimidk.formicempire.classes.constants.misc.ColonyLoyalty;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.misc.Species;
 import com.grimidk.formicempire.classes.constants.world.Biome;
@@ -167,13 +168,74 @@ public class StatsDialog extends ZeroDialog {
             public Class<?> getColumnClass(int columnIndex) {
                 for (int row = 0; row < getRowCount(); row++) {
                     Object val = getValueAt(row, columnIndex);
-                    if (val != null) {
-                        return val.getClass();
+                    if (val instanceof Icon) {
+                        return Icon.class;
+                    }
+                    if (val instanceof Integer) {
+                        return Integer.class;
+                    }
+                    if (val instanceof Boolean) {
+                        return Boolean.class;
+                    }
+                    if (val instanceof String) {
+                        return String.class;
                     }
                 }
                 return Object.class;
             }
         };
+    }
+
+    private static void applyIconColumnRenderer(JTable table, int columnIndex) {
+        if (table == null || columnIndex < 0 || columnIndex >= table.getColumnCount()) {
+            return;
+        }
+        table.getColumnModel().getColumn(columnIndex).setCellRenderer(new IconOrTextCellRenderer());
+    }
+
+    private static void applyGeneralValueRenderer(JTable table) {
+        if (table == null || table.getColumnCount() < 3) {
+            return;
+        }
+        table.getColumnModel().getColumn(2).setCellRenderer(new GeneralValueCellRenderer());
+    }
+
+    private static final class GeneralValueCellRenderer extends DefaultTableCellRenderer {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                boolean hasFocus, int row, int column) {
+            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            Object property = table.getModel().getValueAt(row, 1);
+            if (LanguageStrings.get(LanguageStrings.STAT_LOYALTY).equals(property) && value instanceof Integer score) {
+                ColonyLoyalty tier = GameConstants.getColonyLoyaltyLevel(score);
+                setText(String.format(
+                        LanguageStrings.get(LanguageStrings.SCORE_TIER_FORMAT),
+                        score,
+                        tier.getName()));
+                setIcon(tier.getIcon());
+                setIconTextGap(6);
+            } else {
+                setIcon(null);
+                setText(value != null ? value.toString() : "");
+            }
+            return this;
+        }
+    }
+
+    private static final class IconOrTextCellRenderer extends DefaultTableCellRenderer {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                boolean hasFocus, int row, int column) {
+            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            if (value instanceof Icon icon) {
+                setIcon(icon);
+                setText("");
+            } else {
+                setIcon(null);
+                setText(value != null ? value.toString() : "");
+            }
+            return this;
+        }
     }
 
     private JScrollPane createTablePane(JTable table) {
@@ -203,6 +265,7 @@ public class StatsDialog extends ZeroDialog {
     private void initGeneralTab() {
         String[] columns = {LanguageStrings.get(LanguageStrings.COL_CATEGORY), LanguageStrings.get(LanguageStrings.COL_PROPERTY), LanguageStrings.get(LanguageStrings.COL_VALUE)};
         generalTable = new JTable(createIconModel(columns));
+        applyGeneralValueRenderer(generalTable);
         tabbedPane.addTab(LanguageStrings.get(LanguageStrings.STATS_TAB_GENERAL), createTablePane(generalTable));
     }
     
@@ -212,6 +275,7 @@ public class StatsDialog extends ZeroDialog {
         
         dynastyTable.getColumnModel().getColumn(0).setMaxWidth(40);
         dynastyTable.getColumnModel().getColumn(0).setPreferredWidth(40);
+        applyIconColumnRenderer(dynastyTable, 0);
         
         tabbedPane.addTab(LanguageStrings.get(LanguageStrings.STATS_TAB_DYNASTY), createTablePane(dynastyTable));
     }
@@ -222,6 +286,7 @@ public class StatsDialog extends ZeroDialog {
         
         resourcesTable.getColumnModel().getColumn(0).setMaxWidth(40);
         resourcesTable.getColumnModel().getColumn(0).setPreferredWidth(40);
+        applyIconColumnRenderer(resourcesTable, 0);
         
         tabbedPane.addTab(LanguageStrings.get(LanguageStrings.STATS_TAB_ECONOMY), createTablePane(resourcesTable));
     }
@@ -232,6 +297,7 @@ public class StatsDialog extends ZeroDialog {
         
         populationTable.getColumnModel().getColumn(0).setMaxWidth(40);
         populationTable.getColumnModel().getColumn(0).setPreferredWidth(40);
+        applyIconColumnRenderer(populationTable, 0);
 
         tabbedPane.addTab(LanguageStrings.get(LanguageStrings.STATS_TAB_POPULATION), createTablePane(populationTable));
     }
@@ -253,6 +319,7 @@ public class StatsDialog extends ZeroDialog {
         insectsTable = new JTable(createIconModel(columns));
         insectsTable.getColumnModel().getColumn(0).setMaxWidth(40);
         insectsTable.getColumnModel().getColumn(0).setPreferredWidth(40);
+        applyIconColumnRenderer(insectsTable, 0);
         tabbedPane.addTab(LanguageStrings.get(LanguageStrings.STATS_TAB_INSECTS), createTablePane(insectsTable));
     }
 
@@ -392,6 +459,13 @@ public class StatsDialog extends ZeroDialog {
             model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_COLONY), LanguageStrings.get(LanguageStrings.STAT_SPECIES_SCIENTIFIC), colony.getSpecies() != null ? colony.getSpecies().getScientific() : LanguageStrings.get(LanguageStrings.STAT_UNKNOWN)});
             model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_COLONY), LanguageStrings.get(LanguageStrings.STAT_LABEL_ID), colony.getId()});
             model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_COLONY), LanguageStrings.get(LanguageStrings.STAT_AGE), colony.getAge() + LanguageStrings.get(LanguageStrings.STAT_DAYS_SUFFIX)});
+
+            int effectiveLoyalty = colony.getEffectiveLoyalty(engine.getTradeManager(), engine.getWorld());
+            model.addRow(new Object[]{
+                    LanguageStrings.get(LanguageStrings.PANEL_COLONY),
+                    LanguageStrings.get(LanguageStrings.STAT_LOYALTY),
+                    effectiveLoyalty
+            });
             
             if (colony.getQueens().isEmpty()) {
                 model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_COLONY), LanguageStrings.get(LanguageStrings.STAT_QUEEN_STATUS), LanguageStrings.get(LanguageStrings.UI_MISSING) + " (" + colony.getDaysWithoutQueen() + LanguageStrings.get(LanguageStrings.STAT_DAYS_SUFFIX) + ")"});

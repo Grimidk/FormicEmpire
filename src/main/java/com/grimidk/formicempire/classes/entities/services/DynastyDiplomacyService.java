@@ -328,4 +328,92 @@ public class DynastyDiplomacyService {
             center.getSouth(), center.getSouthWest(), center.getNorthWest()
         };
     }
+
+    public int getMaxDiplomatsForDynastyMission() {
+        return GameConstants.DIPLOMAT_MAX_PER_DYNASTY_MISSION;
+    }
+
+    public int getMaxDiplomatsForColonyMission() {
+        return GameConstants.DIPLOMAT_MAX_PER_COLONY_MISSION;
+    }
+
+    public int getDiplomatStabilityGainPerAnt() {
+        if (dynasty.hasUpgrade(GameUnlocks.ABILITY_DIPLOMAT_PRESSURE_3)) {
+            return GameConstants.DIPLOMAT_STABILITY_GAIN_PRESSURE_3;
+        }
+        if (dynasty.hasUpgrade(GameUnlocks.ABILITY_DIPLOMAT_PRESSURE_2)) {
+            return GameConstants.DIPLOMAT_STABILITY_GAIN_PRESSURE_2;
+        }
+        return GameConstants.DIPLOMAT_STABILITY_GAIN_BASE;
+    }
+
+    public int countAvailableDiplomats(Colony colony) {
+        if (colony == null || !colonyHasDiplomatRole(colony)) {
+            return 0;
+        }
+        return colony.getAssignedRoleCount(GameConstants.ROLE_DIPLOMAT);
+    }
+
+    private boolean colonyHasDiplomatRole(Colony colony) {
+        return colony != null && colony.hasUpgrade(GameUnlocks.ROLE_DIPLOMAT);
+    }
+
+    public boolean needsDiplomatMissionToDynasty(Dynasty other, World world) {
+        if (other == null || other == dynasty) {
+            return false;
+        }
+        return GameConstants.allowsDiplomatMissionToDynasty(getEffectiveDiplomaticReputation(other, world));
+    }
+
+    public boolean needsDiplomatMissionToColony(Colony target, TradeManager tradeManager, World world) {
+        if (target == null) {
+            return false;
+        }
+        return GameConstants.allowsDiplomatMissionToColony(target.getEffectiveLoyalty(tradeManager, world));
+    }
+
+    public boolean canSendDiplomatsToColony(Colony target, TradeManager tradeManager, World world) {
+        return target != null && target.getDynasty() == dynasty
+                && countAvailableDiplomats(target) > 0
+                && needsDiplomatMissionToColony(target, tradeManager, world);
+    }
+
+    public int sendDiplomatsToColony(Colony target, int requestedCount, TradeManager tradeManager, World world) {
+        if (!canSendDiplomatsToColony(target, tradeManager, world) || requestedCount <= 0) {
+            return 0;
+        }
+        int toSend = Math.min(requestedCount, Math.min(
+                countAvailableDiplomats(target), getMaxDiplomatsForColonyMission()));
+        if (toSend <= 0) {
+            return 0;
+        }
+        int gain = toSend * getDiplomatStabilityGainPerAnt();
+        target.setLoyalty(target.getLoyalty() + gain);
+        return toSend;
+    }
+
+    public boolean canSendDiplomatsToDynasty(Colony from, Dynasty other, World world) {
+        if (other == null || other == dynasty || from == null || world == null) {
+            return false;
+        }
+        if (from.getDynasty() != dynasty || isAtWarWith(other)) {
+            return false;
+        }
+        return countAvailableDiplomats(from) > 0 && needsDiplomatMissionToDynasty(other, world);
+    }
+
+    public int sendDiplomatsToDynasty(Colony from, Dynasty other, int requestedCount, World world) {
+        if (!canSendDiplomatsToDynasty(from, other, world) || requestedCount <= 0) {
+            return 0;
+        }
+        int toSend = Math.min(requestedCount, Math.min(
+                countAvailableDiplomats(from), getMaxDiplomatsForDynastyMission()));
+        if (toSend <= 0) {
+            return 0;
+        }
+        int gain = toSend * getDiplomatStabilityGainPerAnt();
+        dynasty.adjustDiplomaticReputation(other.getId(), gain);
+        other.adjustDiplomaticReputation(dynasty.getId(), gain);
+        return toSend;
+    }
 }

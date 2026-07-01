@@ -5,13 +5,14 @@ import java.awt.FontFormatException;
 import java.io.IOException;
 import java.io.InputStream;
 
-/** Loads and exposes UI fonts from classpath `/fonts/font.ttf`. */
+/** Loads and exposes UI fonts from classpath {@code /meta/fonts/font.ttf}. */
 public final class UiFonts {
+    private static final String FONT_RESOURCE = "/meta/fonts/font.ttf";
     private static final Font customFont;
 
     static {
         Font loaded = null;
-        try (InputStream is = UiFonts.class.getResourceAsStream("/fonts/font.ttf")) {
+        try (InputStream is = UiFonts.class.getResourceAsStream(FONT_RESOURCE)) {
             if (is != null) {
                 loaded = Font.createFont(Font.TRUETYPE_FONT, is);
             }

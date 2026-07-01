@@ -73,6 +73,9 @@ public class ColonyConvoyTransitService {
                     }
                     updateConvoyAnt(colony, ant, trade);
                     float moveSpeed = GameConstants.BASE_SPRITE_SPEED;
+                    if (colony.isCreatineDietActive()) {
+                        moveSpeed *= GameConstants.CREATINE_DIET_SPEED_MULTIPLIER;
+                    }
                     if (entry.getKey() == GameConstants.TYPE_WORKER
                             && colony.hasUpgrade(GameUnlocks.STAT_WORKER_SPEED_2)) {
                         moveSpeed *= 2f;

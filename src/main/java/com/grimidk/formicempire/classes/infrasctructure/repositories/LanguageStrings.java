@@ -288,6 +288,15 @@ public final class LanguageStrings {
     public static final String ABILITY_ERROR_NO_DRONES = "ABILITY_ERROR_NO_DRONES";
     public static final String ABILITY_ERROR_NO_BREEDERS = "ABILITY_ERROR_NO_BREEDERS";
     public static final String ABILITY_ERROR_LOCATE_COLONY = "ABILITY_ERROR_LOCATE_COLONY";
+    public static final String ABILITY_ERROR_ALREADY_ACTIVE = "ABILITY_ERROR_ALREADY_ACTIVE";
+    public static final String ABILITY_ERROR_NOT_ENOUGH_RESOURCE = "ABILITY_ERROR_NOT_ENOUGH_RESOURCE";
+    public static final String ABILITY_COST_RESOURCE_FMT = "ABILITY_COST_RESOURCE_FMT";
+    public static final String ABILITY_PHEROMONE_STORM = "ABILITY_PHEROMONE_STORM";
+    public static final String ABILITY_PHEROMONE_STORM_FLAVOR = "ABILITY_PHEROMONE_STORM_FLAVOR";
+    public static final String ABILITY_PHEROMONE_STORM_DESC = "ABILITY_PHEROMONE_STORM_DESC";
+    public static final String ABILITY_CREATINE_DIET = "ABILITY_CREATINE_DIET";
+    public static final String ABILITY_CREATINE_DIET_FLAVOR = "ABILITY_CREATINE_DIET_FLAVOR";
+    public static final String ABILITY_CREATINE_DIET_DESC = "ABILITY_CREATINE_DIET_DESC";
 
     public static final String DIALOG_STATS_TITLE = "DIALOG_STATS_TITLE";
     public static final String STATS_DYNASTY_MODE = "STATS_DYNASTY_MODE";
@@ -579,6 +588,10 @@ public final class LanguageStrings {
     public static final String LOG_FOUND_SOURCE_FULL_FMT = "LOG_FOUND_SOURCE_FULL_FMT";
     public static final String LOG_SOURCE_EXHAUSTED_FMT = "LOG_SOURCE_EXHAUSTED_FMT";
     public static final String LOG_FORCE_FLIGHT_BLOCKED = "LOG_FORCE_FLIGHT_BLOCKED";
+    public static final String LOG_PHEROMONE_STORM_STARTED_FMT = "LOG_PHEROMONE_STORM_STARTED_FMT";
+    public static final String LOG_PHEROMONE_STORM_ENDED = "LOG_PHEROMONE_STORM_ENDED";
+    public static final String LOG_CREATINE_DIET_STARTED_FMT = "LOG_CREATINE_DIET_STARTED_FMT";
+    public static final String LOG_CREATINE_DIET_ENDED = "LOG_CREATINE_DIET_ENDED";
     public static final String LOG_WARNING_NO_QUEEN_FMT = "LOG_WARNING_NO_QUEEN_FMT";
     public static final String LOG_MATURATION_COMPLETE = "LOG_MATURATION_COMPLETE";
     public static final String LOG_TRADE_CANCELLED_FMT = "LOG_TRADE_CANCELLED_FMT";
@@ -598,6 +611,8 @@ public final class LanguageStrings {
     public static final String DYNASTY_SORT_POP_LOW = "DYNASTY_SORT_POP_LOW";
     public static final String DYNASTY_SORT_AGE_OLD = "DYNASTY_SORT_AGE_OLD";
     public static final String DYNASTY_SORT_AGE_NEW = "DYNASTY_SORT_AGE_NEW";
+    public static final String DYNASTY_SORT_LOYALTY_HIGH = "DYNASTY_SORT_LOYALTY_HIGH";
+    public static final String DYNASTY_SORT_LOYALTY_LOW = "DYNASTY_SORT_LOYALTY_LOW";
 
     public static final String DEATH_OPTIONS_RELOAD = "DEATH_OPTIONS_RELOAD";
     public static final String DEATH_OPTIONS_MENU = "DEATH_OPTIONS_MENU";
@@ -839,10 +854,20 @@ public final class LanguageStrings {
     public static final String LOYALTY_MODIFIER_TRADE = "LOYALTY_MODIFIER_TRADE";
     public static final String LOYALTY_MODIFIER_TUNNEL = "LOYALTY_MODIFIER_TUNNEL";
     public static final String LOYALTY_MODIFIER_CAPITAL = "LOYALTY_MODIFIER_CAPITAL";
+    public static final String LOYALTY_MODIFIER_PHEROMONE_STORM = "LOYALTY_MODIFIER_PHEROMONE_STORM";
     public static final String DIPLO_ACTION_FORM_PACT = "DIPLO_ACTION_FORM_PACT";
     public static final String DIPLO_ACTION_BREAK_PACT = "DIPLO_ACTION_BREAK_PACT";
     public static final String DIPLO_ACTION_TRADE = "DIPLO_ACTION_TRADE";
     public static final String DIPLO_ACTION_REQUEST_TRADE = "DIPLO_ACTION_REQUEST_TRADE";
+    public static final String DIPLO_ACTION_SEND_DIPLOMATS = "DIPLO_ACTION_SEND_DIPLOMATS";
+    public static final String DIPLO_SEND_DIPLOMATS_TITLE = "DIPLO_SEND_DIPLOMATS_TITLE";
+    public static final String DIPLO_SEND_DIPLOMATS_PROMPT = "DIPLO_SEND_DIPLOMATS_PROMPT";
+    public static final String DIPLO_SEND_DIPLOMATS_SUCCESS_DYNASTY = "DIPLO_SEND_DIPLOMATS_SUCCESS_DYNASTY";
+    public static final String DIPLO_SEND_DIPLOMATS_SUCCESS_COLONY = "DIPLO_SEND_DIPLOMATS_SUCCESS_COLONY";
+    public static final String DIPLO_ERROR_NO_DIPLOMATS = "DIPLO_ERROR_NO_DIPLOMATS";
+    public static final String DIPLO_ERROR_NO_DIPLOMAT_ROLE = "DIPLO_ERROR_NO_DIPLOMAT_ROLE";
+    public static final String DIPLO_ERROR_REPUTATION_STABLE = "DIPLO_ERROR_REPUTATION_STABLE";
+    public static final String DIPLO_ERROR_LOYALTY_STABLE = "DIPLO_ERROR_LOYALTY_STABLE";
     public static final String DIPLO_ERROR_CORDIAL_REQUIRED = "DIPLO_ERROR_CORDIAL_REQUIRED";
     public static final String DIPLO_ERROR_CORDIAL_REQUIRED_REQUEST = "DIPLO_ERROR_CORDIAL_REQUIRED_REQUEST";
     public static final String DIPLO_ERROR_NEUTRAL_REQUIRED = "DIPLO_ERROR_NEUTRAL_REQUIRED";
@@ -1024,6 +1049,12 @@ public final class LanguageStrings {
     public static final String ABILITY_CATCH_SYMBIOTIC_MITE_DESC = "ABILITY_CATCH_SYMBIOTIC_MITE_DESC";
     public static final String ABILITY_CATCH_DERMESTID_FLAVOR = "ABILITY_CATCH_DERMESTID_FLAVOR";
     public static final String ABILITY_CATCH_DERMESTID_DESC = "ABILITY_CATCH_DERMESTID_DESC";
+    public static final String ABILITY_DIPLOMAT_PRESSURE_2 = "ABILITY_DIPLOMAT_PRESSURE_2";
+    public static final String ABILITY_DIPLOMAT_PRESSURE_2_FLAVOR = "ABILITY_DIPLOMAT_PRESSURE_2_FLAVOR";
+    public static final String ABILITY_DIPLOMAT_PRESSURE_2_DESC = "ABILITY_DIPLOMAT_PRESSURE_2_DESC";
+    public static final String ABILITY_DIPLOMAT_PRESSURE_3 = "ABILITY_DIPLOMAT_PRESSURE_3";
+    public static final String ABILITY_DIPLOMAT_PRESSURE_3_FLAVOR = "ABILITY_DIPLOMAT_PRESSURE_3_FLAVOR";
+    public static final String ABILITY_DIPLOMAT_PRESSURE_3_DESC = "ABILITY_DIPLOMAT_PRESSURE_3_DESC";
     public static final String ABILITY_ABILITY_FLAVOR = "ABILITY_ABILITY_FLAVOR";
     public static final String ABILITY_ABILITY_DESC = "ABILITY_ABILITY_DESC";
 
@@ -1222,6 +1253,8 @@ public final class LanguageStrings {
     public static final String HELP_TAB_TYPES = "HELP_TAB_TYPES";
     public static final String HELP_TAB_BUGS = "HELP_TAB_BUGS";
     public static final String HELP_TAB_ROLES = "HELP_TAB_ROLES";
+    public static final String HELP_TAB_ANT_ROLES = "HELP_TAB_ANT_ROLES";
+    public static final String HELP_TAB_EMPIRE = "HELP_TAB_EMPIRE";
     public static final String HELP_TAB_UPGRADES = "HELP_TAB_UPGRADES";
     public static final String HELP_TAB_BUILDINGS = "HELP_TAB_BUILDINGS";
     public static final String HELP_TAB_ASSIMILATIONS = "HELP_TAB_ASSIMILATIONS";
@@ -1231,7 +1264,25 @@ public final class LanguageStrings {
     public static final String HELP_START_INFO = "HELP_START_INFO";
     public static final String HELP_OVERWORLD_GATHERING = "HELP_OVERWORLD_GATHERING";
     public static final String HELP_DYNASTY_INFO = "HELP_DYNASTY_INFO";
-    
+    public static final String HELP_EMPIRE_TRADE = "HELP_EMPIRE_TRADE";
+    public static final String HELP_EMPIRE_LOYALTY = "HELP_EMPIRE_LOYALTY";
+    public static final String HELP_EMPIRE_REPUTATION = "HELP_EMPIRE_REPUTATION";
+    public static final String HELP_EMPIRE_MOVEMENT = "HELP_EMPIRE_MOVEMENT";
+    public static final String HELP_TIER_MIN_SCORE = "HELP_TIER_MIN_SCORE";
+    public static final String HELP_ROLE_ANT_TYPE = "HELP_ROLE_ANT_TYPE";
+
+    public static final String METHOD_LAND_DESC = "METHOD_LAND_DESC";
+    public static final String METHOD_AIR_DESC = "METHOD_AIR_DESC";
+    public static final String METHOD_SEA_DESC = "METHOD_SEA_DESC";
+    public static final String METHOD_TUNNEL_DESC = "METHOD_TUNNEL_DESC";
+
+    public static final String MOVE_STATIC_DESC = "MOVE_STATIC_DESC";
+    public static final String MOVE_WANDER_DESC = "MOVE_WANDER_DESC";
+    public static final String MOVE_MARCH_DESC = "MOVE_MARCH_DESC";
+    public static final String MOVE_SPEED_DESC = "MOVE_SPEED_DESC";
+    public static final String MOVE_FLY_DESC = "MOVE_FLY_DESC";
+    public static final String MOVE_PATROL_DESC = "MOVE_PATROL_DESC";
+
     public static final String HELP_SPECIES_SCIENTIFIC = "HELP_SPECIES_SCIENTIFIC";
     public static final String HELP_SPECIES_TRAITS = "HELP_SPECIES_TRAITS";
 

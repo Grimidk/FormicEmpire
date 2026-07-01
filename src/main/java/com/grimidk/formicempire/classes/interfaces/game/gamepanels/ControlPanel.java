@@ -220,14 +220,10 @@ public class ControlPanel extends ZeroGamePanel {
         speedUpButton.addActionListener(e -> {
             Engine eng = frame.getEngine();
             if (eng == null) return;
-            
+
             GameSpeed current = eng.getSpeed();
-            GameSpeed next = GameSpeed.getNext(current);
-            
-            boolean canGoTurbo = eng.isAllowTurboMode();
-            if (current == GameSpeed.VERY_FAST && !canGoTurbo) {
-            } else if (current == GameSpeed.TURBO) {
-            } else {
+            GameSpeed next = GameSpeed.getNext(current, eng.isAllowTurboMode());
+            if (current != next) {
                 eng.setSpeed(next);
                 applySpeedLevel();
             }

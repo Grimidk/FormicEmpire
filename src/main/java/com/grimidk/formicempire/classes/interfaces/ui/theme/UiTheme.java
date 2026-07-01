@@ -29,9 +29,9 @@ public final class UiTheme {
     public static void applyTheme(boolean dark) {
         AssetStyles.setDarkMode(dark);
         if (dark) {
-            AssetStyles.BACKGROUND_COLOR = COLOR_ABSOLUTE_BLACK;
+            AssetStyles.BACKGROUND_COLOR = COLOR_NEAR_BLACK;
             AssetStyles.BACKGROUND_SECONDARY = COLOR_NEAR_BLACK;
-            AssetStyles.BACKGROUND_DARK = COLOR_ABSOLUTE_BLACK;
+            AssetStyles.BACKGROUND_DARK = COLOR_NEAR_BLACK;
             AssetStyles.BACKGROUND_LIGHT = COLOR_DARK_GRAY;
             AssetStyles.FONT_COLOR = COLOR_ABSOLUTE_WHITE;
             AssetStyles.FONT_COLOR_BRIGHT = COLOR_ABSOLUTE_WHITE;
@@ -80,7 +80,7 @@ public final class UiTheme {
         AssetStyles.BUTTON_BORDER = BorderFactory.createLineBorder(
                 AssetStyles.UI_BORDER_COLOR, AssetStyles.BORDER_THICKNESS_BUTTON);
         AssetStyles.TAB_SELECTED_BG = dark ? COLOR_DARK_GRAY : COLOR_ABSOLUTE_WHITE;
-        AssetStyles.TAB_UNSELECTED_BG = dark ? COLOR_ABSOLUTE_BLACK : COLOR_VERY_LIGHT_GRAY;
+        AssetStyles.TAB_UNSELECTED_BG = dark ? COLOR_NEAR_BLACK : COLOR_VERY_LIGHT_GRAY;
     }
 
     public static JSeparator createInternalSeparator() {

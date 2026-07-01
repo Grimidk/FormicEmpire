@@ -26,6 +26,15 @@ public enum GameSpeed {
         if (nextOrdinal >= values().length) return values()[0];
         return values()[nextOrdinal];
     }
+
+    /** Skips turbo when disabled; wraps VERY_FAST to VERY_SLOW instead of stalling on turbo. */
+    public static GameSpeed getNext(GameSpeed current, boolean allowTurbo) {
+        GameSpeed next = getNext(current);
+        if (next == TURBO && !allowTurbo) {
+            return VERY_SLOW;
+        }
+        return next;
+    }
     
     public static GameSpeed getPrevious(GameSpeed current) {
         int prevOrdinal = current.ordinal() - 1;

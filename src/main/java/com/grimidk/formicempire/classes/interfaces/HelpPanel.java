@@ -1,6 +1,10 @@
 package com.grimidk.formicempire.classes.interfaces;
 
+import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
+import com.grimidk.formicempire.classes.constants.misc.ColonyLoyalty;
+import com.grimidk.formicempire.classes.constants.misc.DiplomaticReputation;
+import com.grimidk.formicempire.classes.constants.misc.TradeMethod;
 import com.grimidk.formicempire.classes.constants.misc.BugType;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.misc.Species;
@@ -117,6 +121,8 @@ public class HelpPanel extends JPanel {
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_TYPES), createAntTypesPanel());
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_BUGS), createBugsPanel());
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_ROLES), createDictionaryPanel(roleConstants));
+        mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_ANT_ROLES), createAntRolesPanel());
+        mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_EMPIRE), createEmpirePanel());
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_UPGRADES), createDictionaryPanel(genericUpgrades));
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_BUILDINGS),
                 createDictionaryPanel(new ArrayList<>(GameUnlocks.getBuildings()), false));
@@ -136,6 +142,8 @@ public class HelpPanel extends JPanel {
             LanguageStrings.get(LanguageStrings.HELP_TAB_TYPES),
             LanguageStrings.get(LanguageStrings.HELP_TAB_BUGS),
             LanguageStrings.get(LanguageStrings.HELP_TAB_ROLES),
+            LanguageStrings.get(LanguageStrings.HELP_TAB_ANT_ROLES),
+            LanguageStrings.get(LanguageStrings.HELP_TAB_EMPIRE),
             LanguageStrings.get(LanguageStrings.HELP_TAB_UPGRADES),
             LanguageStrings.get(LanguageStrings.HELP_TAB_BUILDINGS),
             LanguageStrings.get(LanguageStrings.HELP_TAB_ASSIMILATIONS),
@@ -296,9 +304,10 @@ public class HelpPanel extends JPanel {
                 javax.swing.border.TitledBorder.DEFAULT_POSITION, 
                 AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
 
-            JLabel icon = new JLabel(s.getIcon());
-            icon.setBorder(new EmptyBorder(5, 5, 5, 5));
-            entry.add(icon, BorderLayout.WEST);
+            ImageIcon sprite = GameConstants.getAntSprite(GameConstants.TYPE_WORKER, s);
+            JLabel spriteLabel = new JLabel(sprite != null ? sprite : s.getIcon());
+            spriteLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
+            entry.add(spriteLabel, BorderLayout.WEST);
 
             String baseUpgrades = s.getBaseUpgrades().stream().map(Upgrade::getName).collect(Collectors.joining(", "));
             String info = helpHtml("width:350px;font-size:11pt;",
@@ -479,6 +488,139 @@ public class HelpPanel extends JPanel {
         JScrollPane scrollPane = new JScrollPane(panel);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         return scrollPane;
+    }
+
+    private static String roleDescriptionKey(AntRole role) {
+        return role.getNameKey() + "_DESC";
+    }
+
+    private JComponent createAntRolesPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        panel.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+        List<AntRole> roles = new ArrayList<>(GameConstants.getAntRoles());
+        Collections.sort(roles, (a, b) -> a.getName().compareToIgnoreCase(b.getName()));
+
+        for (AntRole role : roles) {
+            JPanel entry = new JPanel(new BorderLayout(10, 0));
+            entry.setBackground(AssetStyles.BACKGROUND_COLOR);
+            entry.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER, role.getName(),
+                javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
+
+            JLabel icon = new JLabel(role.getIcon());
+            icon.setBorder(new EmptyBorder(5, 5, 5, 5));
+            entry.add(icon, BorderLayout.WEST);
+
+            AntType antType = role.getAntType();
+            String typeLine = antType != null
+                    ? String.format(LanguageStrings.get(LanguageStrings.HELP_ROLE_ANT_TYPE), antType.getName())
+                    : "";
+            String desc = LanguageStrings.get(roleDescriptionKey(role));
+            String body = helpHtml("width:350px;font-size:11pt;",
+                    (typeLine.isEmpty() ? "" : "<b>" + typeLine + "</b><br><br>") + desc);
+
+            JLabel infoLabel = new JLabel(body);
+            infoLabel.setFont(AssetStyles.FONT_NORMAL);
+            infoLabel.setForeground(AssetStyles.FONT_COLOR);
+            infoLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
+            entry.add(infoLabel, BorderLayout.CENTER);
+
+            panel.add(entry);
+            panel.add(Box.createRigidArea(new Dimension(0, 5)));
+        }
+
+        JScrollPane scrollPane = new JScrollPane(panel);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        return scrollPane;
+    }
+
+    private JComponent createEmpirePanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        panel.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+        panel.add(wrapEmpireSection(LanguageStrings.HELP_EMPIRE_TRADE, createTradeMethodSection()));
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(wrapEmpireSection(LanguageStrings.HELP_EMPIRE_LOYALTY, createLoyaltySection()));
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(wrapEmpireSection(LanguageStrings.HELP_EMPIRE_REPUTATION, createReputationSection()));
+
+        JScrollPane scrollPane = new JScrollPane(panel);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        return scrollPane;
+    }
+
+    private JPanel wrapEmpireSection(String titleKey, JComponent content) {
+        JPanel section = new JPanel(new BorderLayout());
+        section.setBackground(AssetStyles.BACKGROUND_COLOR);
+        section.setBorder(BorderFactory.createTitledBorder(
+                AssetStyles.PANEL_BORDER,
+                LanguageStrings.get(titleKey),
+                javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                AssetStyles.FONT_BOLD,
+                AssetStyles.FONT_COLOR_HEADER));
+        section.add(content, BorderLayout.CENTER);
+        return section;
+    }
+
+    private JPanel createTradeMethodSection() {
+        JPanel grid = new JPanel(new GridLayout(0, 1, 0, 8));
+        grid.setBackground(AssetStyles.BACKGROUND_COLOR);
+        grid.setBorder(new EmptyBorder(8, 8, 8, 8));
+
+        for (TradeMethod method : GameConstants.getTradeMethods()) {
+            String descKey = method.getNameKey() + "_DESC";
+            String info = helpHtml("width:420px;font-size:11pt;",
+                    "<b>" + method.getName() + "</b><br>" + LanguageStrings.get(descKey));
+            JLabel row = new JLabel(info, method.getIcon(), SwingConstants.LEFT);
+            row.setFont(AssetStyles.FONT_NORMAL);
+            row.setForeground(AssetStyles.FONT_COLOR);
+            row.setIconTextGap(10);
+            grid.add(row);
+        }
+        return grid;
+    }
+
+    private JPanel createLoyaltySection() {
+        JPanel list = new JPanel();
+        list.setLayout(new BoxLayout(list, BoxLayout.Y_AXIS));
+        list.setBackground(AssetStyles.BACKGROUND_COLOR);
+        list.setBorder(new EmptyBorder(8, 8, 8, 8));
+
+        for (ColonyLoyalty loyalty : GameConstants.getColonyLoyalties()) {
+            String label = loyalty.getName() + String.format(
+                    LanguageStrings.get(LanguageStrings.HELP_TIER_MIN_SCORE), loyalty.getMinScore());
+            JLabel item = new JLabel(label, loyalty.getIcon(), SwingConstants.LEFT);
+            item.setFont(AssetStyles.FONT_NORMAL);
+            item.setForeground(AssetStyles.FONT_COLOR);
+            item.setIconTextGap(8);
+            list.add(item);
+        }
+        return list;
+    }
+
+    private JPanel createReputationSection() {
+        JPanel list = new JPanel();
+        list.setLayout(new BoxLayout(list, BoxLayout.Y_AXIS));
+        list.setBackground(AssetStyles.BACKGROUND_COLOR);
+        list.setBorder(new EmptyBorder(8, 8, 8, 8));
+
+        for (DiplomaticReputation reputation : GameConstants.getDiplomaticReputations()) {
+            String label = reputation.getName() + String.format(
+                    LanguageStrings.get(LanguageStrings.HELP_TIER_MIN_SCORE), reputation.getMinScore());
+            JLabel item = new JLabel(label, reputation.getIcon(), SwingConstants.LEFT);
+            item.setFont(AssetStyles.FONT_NORMAL);
+            item.setForeground(AssetStyles.FONT_COLOR);
+            item.setIconTextGap(8);
+            list.add(item);
+        }
+        return list;
     }
 
     private JPanel createSeasonListPanel(String title, List<Season> constants) {

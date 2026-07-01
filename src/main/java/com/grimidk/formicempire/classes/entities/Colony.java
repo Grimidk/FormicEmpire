@@ -80,6 +80,9 @@ public class Colony {
     private int parasiteAnts;
     private int parasiticMites;
 
+    private int pheromoneStormMonthsRemaining;
+    private int creatineDietMonthsRemaining;
+
     // --- Hatch Rate Data ---
     private float hatchRateWorker;
     private float hatchRateSoldier;
@@ -307,6 +310,8 @@ public class Colony {
 
         this.parasiteAnts = savedColony.parasiteAnts;
         this.parasiticMites = savedColony.parasiticMites;
+        this.pheromoneStormMonthsRemaining = savedColony.pheromoneStormMonthsRemaining;
+        this.creatineDietMonthsRemaining = savedColony.creatineDietMonthsRemaining;
         for (int i = 0; i < this.parasiteAnts; i++) {
             Bug p = new Bug(GameConstants.TYPE_PARASITE_ANT);
             p.setDimension(WorldSpaces.UNDERWORLD);
@@ -428,6 +433,9 @@ public class Colony {
         if (isCapital) {
             bonus += GameConstants.LOYALTY_MODIFIER_CAPITAL.getLoyaltyDelta();
         }
+        if (pheromoneStormMonthsRemaining > 0) {
+            bonus += GameConstants.LOYALTY_MODIFIER_PHEROMONE_STORM.getLoyaltyDelta();
+        }
         return bonus;
     }
 
@@ -450,6 +458,9 @@ public class Colony {
         }
         if (world != null && dynasty != null && hasCompleteTunnel(world)) {
             appendLoyaltyModifierLine(sb, GameConstants.LOYALTY_MODIFIER_TUNNEL);
+        }
+        if (pheromoneStormMonthsRemaining > 0) {
+            appendLoyaltyModifierLine(sb, GameConstants.LOYALTY_MODIFIER_PHEROMONE_STORM);
         }
 
         sb.append(LanguageStrings.get(LanguageStrings.LOYALTY_TOOLTIP_EFFECTIVE))
@@ -1022,6 +1033,70 @@ public class Colony {
         addResearchPoints(-cost);
         this.labourService.runNuptial(this, world, currentHex);
     }
+
+    public boolean isPheromoneStormActive() {
+        return pheromoneStormMonthsRemaining > 0;
+    }
+
+    public int getPheromoneStormMonthsRemaining() {
+        return pheromoneStormMonthsRemaining;
+    }
+
+    public boolean isCreatineDietActive() {
+        return creatineDietMonthsRemaining > 0;
+    }
+
+    public int getCreatineDietMonthsRemaining() {
+        return creatineDietMonthsRemaining;
+    }
+
+    public boolean activatePheromoneStorm() {
+        if (!hasUpgrade(GameUnlocks.ABILITY_PHEROMONE_STORM) || isPheromoneStormActive()) {
+            return false;
+        }
+        int cost = GameConstants.PHEROMONE_STORM_SYRUP_COST;
+        if (getSyrups() < cost) {
+            return false;
+        }
+        setSyrups(getSyrupsPrecise() - cost);
+        pheromoneStormMonthsRemaining = GameConstants.PHEROMONE_STORM_DURATION_MONTHS;
+        logEvent(ColonyLogPrefixes.INFO + " "
+                + String.format(LanguageStrings.get(LanguageStrings.LOG_PHEROMONE_STORM_STARTED_FMT),
+                        GameConstants.LOYALTY_MODIFIER_PHEROMONE_STORM.getLoyaltyDelta(),
+                        GameConstants.PHEROMONE_STORM_DURATION_MONTHS));
+        return true;
+    }
+
+    public boolean activateCreatineDiet() {
+        if (!hasUpgrade(GameUnlocks.ABILITY_CREATINE_DIET) || isCreatineDietActive()) {
+            return false;
+        }
+        int cost = GameConstants.CREATINE_DIET_PROTEIN_COST;
+        if (getProtein() < cost) {
+            return false;
+        }
+        setProtein(getProteinPrecise() - cost);
+        creatineDietMonthsRemaining = GameConstants.CREATINE_DIET_DURATION_MONTHS;
+        logEvent(ColonyLogPrefixes.INFO + " "
+                + String.format(LanguageStrings.get(LanguageStrings.LOG_CREATINE_DIET_STARTED_FMT),
+                        GameConstants.CREATINE_DIET_DURATION_MONTHS));
+        return true;
+    }
+
+    private void tickAbilityDurations() {
+        if (pheromoneStormMonthsRemaining > 0) {
+            pheromoneStormMonthsRemaining--;
+            if (pheromoneStormMonthsRemaining == 0) {
+                logEvent(ColonyLogPrefixes.INFO + " " + LanguageStrings.get(LanguageStrings.LOG_PHEROMONE_STORM_ENDED));
+            }
+        }
+        if (creatineDietMonthsRemaining > 0) {
+            creatineDietMonthsRemaining--;
+            if (creatineDietMonthsRemaining == 0) {
+                logEvent(ColonyLogPrefixes.INFO + " " + LanguageStrings.get(LanguageStrings.LOG_CREATINE_DIET_ENDED));
+            }
+        }
+    }
     
     public void runPhysics(Dimension activeDimension) {
         runPhysics(activeDimension, null);
@@ -1130,6 +1205,7 @@ public class Colony {
     }
 
     public void runMonthlyJobs(Season season, Biome biome) {
+        tickAbilityDurations();
         if (this.isActive) {
             this.runParasitation(biome, season);
             getBugHandlingService().runMonthlyParasiticMites(this, biome, season);

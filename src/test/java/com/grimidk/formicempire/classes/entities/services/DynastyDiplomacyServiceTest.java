@@ -7,6 +7,7 @@ import com.grimidk.formicempire.classes.entities.Trade;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -121,6 +122,15 @@ class DynastyDiplomacyServiceTest {
                 player.getDiplomaticModifierKey(neighbor.getId()));
         assertEquals(0, player.getDiplomaticReputation(neighbor.getId()));
         assertEquals(85.0, player.getGeneticIntegrity(), 0.001);
+    }
+
+    @Test
+    void diplomatPressureUpgradesIncreaseStabilityGain() {
+        assertEquals(1, player.getDiplomacyService().getDiplomatStabilityGainPerAnt());
+        player.unlockUpgrade(GameUnlocks.ABILITY_DIPLOMAT_PRESSURE_2);
+        assertEquals(3, player.getDiplomacyService().getDiplomatStabilityGainPerAnt());
+        player.unlockUpgrade(GameUnlocks.ABILITY_DIPLOMAT_PRESSURE_3);
+        assertEquals(5, player.getDiplomacyService().getDiplomatStabilityGainPerAnt());
     }
 
     @Test

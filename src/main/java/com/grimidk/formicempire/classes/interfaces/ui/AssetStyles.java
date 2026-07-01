@@ -49,6 +49,14 @@ import javax.swing.border.EmptyBorder;
  * Swing PLAF under {@code ui/plaf}. Edit those packages or call methods here to restyle the app.
  */
 public class AssetStyles {
+    /** Classpath paths under {@code meta/} (UI chrome, not in-game menu icons). */
+    public static final String META_CURSOR_NORMAL = "/meta/ui/CursorNormal.png";
+    public static final String META_CURSOR_CLICK = "/meta/ui/CursorClick.png";
+    public static final String META_APP_ICON = "/meta/icon.ico";
+    public static final String META_FONT = "/meta/fonts/font.ttf";
+    public static final String META_ROADMAP = "/meta/roadmap.txt";
+    public static final String META_CREDITS = "/meta/credits.txt";
+
     // --- Palette (fixed) ---
     public static final Color COLOR_ABSOLUTE_BLACK = UiPalette.COLOR_ABSOLUTE_BLACK;
     public static final Color COLOR_ABSOLUTE_WHITE = UiPalette.COLOR_ABSOLUTE_WHITE;

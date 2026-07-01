@@ -402,6 +402,18 @@ public class SettingsPanel extends JPanel {
             combo.addItem(r);
         }
         styleComboBox(combo);
+        combo.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof AntRole role) {
+                    setText(role.getName());
+                    setIcon(role.getIcon());
+                    setIconTextGap(8);
+                }
+                return this;
+            }
+        });
         return combo;
     }
 

@@ -1,5 +1,6 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
+import com.grimidk.formicempire.classes.constants.misc.GameSpeed;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
@@ -14,7 +15,6 @@ import java.awt.event.KeyEvent;
 public abstract class ZeroDialog extends JDialog {
 
     protected final JPanel southPanel;
-    private static final float[] SPEED_DELAYS = { 250f, 125f, 60f, 30f, 15f, 5f, 1f};
     
     private final String titleKey;
     private final JButton closeButton;
@@ -121,19 +121,15 @@ public abstract class ZeroDialog extends JDialog {
         Engine engine = getEngine();
         if (engine == null) return;
 
-        float currentDelay = engine.getDelay();
-        int currentIndex = 0;
-        for (int i = 0; i < SPEED_DELAYS.length; i++) {
-            if (Math.abs(SPEED_DELAYS[i] - currentDelay) < 0.1) {
-                currentIndex = i;
-                break;
+        GameSpeed current = engine.getSpeed();
+        GameSpeed next = delta > 0
+                ? GameSpeed.getNext(current, engine.isAllowTurboMode())
+                : GameSpeed.getPrevious(current);
+        if (current != next) {
+            engine.setSpeed(next);
+            if (engine.isPaused()) {
+                engine.resumeEngine();
             }
-        }
-
-        int newIndex = currentIndex + delta;
-        if (newIndex >= 0 && newIndex < SPEED_DELAYS.length) {
-            engine.setDelay(SPEED_DELAYS[newIndex]);
-            if (engine.isPaused()) engine.resumeEngine();
         }
     }
 

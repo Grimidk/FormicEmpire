@@ -182,6 +182,15 @@ public class FrenchTranslation implements Translation {
         fr.put("ABILITY_ERROR_NO_DRONES", "Aucun mâle disponible dans la colonie.");
         fr.put("ABILITY_ERROR_NO_BREEDERS", "Aucune princesse reproductrice disponible.");
         fr.put("ABILITY_ERROR_LOCATE_COLONY", "Erreur : impossible de localiser la colonie sur la carte du monde.");
+        fr.put("ABILITY_ERROR_ALREADY_ACTIVE", "Cette capacité est déjà active.");
+        fr.put("ABILITY_ERROR_NOT_ENOUGH_RESOURCE", "Pas assez de %2$s (%1$d requis).");
+        fr.put("ABILITY_COST_RESOURCE_FMT", "Coût : %d %s");
+        fr.put("ABILITY_PHEROMONE_STORM", "Tempête de Phéromones");
+        fr.put("ABILITY_PHEROMONE_STORM_FLAVOR", "Unité Parfumée");
+        fr.put("ABILITY_PHEROMONE_STORM_DESC", "Dépensez 500 sirops pour augmenter la loyauté de la colonie de 10 pendant un an (12 mois).");
+        fr.put("ABILITY_CREATINE_DIET", "Régime Créatine");
+        fr.put("ABILITY_CREATINE_DIET_FLAVOR", "Carburant Musculaire");
+        fr.put("ABILITY_CREATINE_DIET_DESC", "Dépensez 300 protéines pour doubler la vitesse de déplacement des fourmis pendant six mois (6 mois).");
 
         fr.put("DIALOG_STATS_TITLE", "Statistiques");
         fr.put("STATS_DYNASTY_MODE", "Mode dynastie");
@@ -516,6 +525,12 @@ public class FrenchTranslation implements Translation {
         fr.put("MOVE_SPEED", "Marche rapide");
         fr.put("MOVE_FLY", "Vol");
         fr.put("MOVE_PATROL", "Patrouille");
+        fr.put("MOVE_STATIC_DESC", "Immobile (insectes de compagnie stationnaires).");
+        fr.put("MOVE_WANDER_DESC", "Errance lente.");
+        fr.put("MOVE_MARCH_DESC", "Marche normale.");
+        fr.put("MOVE_SPEED_DESC", "Marche rapide.");
+        fr.put("MOVE_FLY_DESC", "Déplacement volant.");
+        fr.put("MOVE_PATROL_DESC", "Patrouille autour d'un enclos ou d'un poste.");
 
         fr.put("BUG_ANT", "Fourmi");
         fr.put("BUG_APHID", "Puceron");
@@ -609,10 +624,20 @@ public class FrenchTranslation implements Translation {
         fr.put("LOYALTY_MODIFIER_TRADE", "Commerce actif");
         fr.put("LOYALTY_MODIFIER_TUNNEL", "Liaison de tunnel");
         fr.put("LOYALTY_MODIFIER_CAPITAL", "Capitale");
+        fr.put("LOYALTY_MODIFIER_PHEROMONE_STORM", "Tempête de Phéromones");
         fr.put("DIPLO_ACTION_FORM_PACT", "Former un pacte");
         fr.put("DIPLO_ACTION_BREAK_PACT", "Rompre le pacte");
         fr.put("DIPLO_ACTION_TRADE", "Commerce");
         fr.put("DIPLO_ACTION_REQUEST_TRADE", "Demander un commerce");
+        fr.put("DIPLO_ACTION_SEND_DIPLOMATS", "Envoyer des diplomates");
+        fr.put("DIPLO_SEND_DIPLOMATS_TITLE", "Envoyer des diplomates");
+        fr.put("DIPLO_SEND_DIPLOMATS_PROMPT", "Envoyez jusqu'à %d diplomate(s) (%d assignées). Chacune améliore la stabilité de %d.");
+        fr.put("DIPLO_SEND_DIPLOMATS_SUCCESS_DYNASTY", "%d diplomate(s) envoyées. Réputation avec %s augmentée de %d.");
+        fr.put("DIPLO_SEND_DIPLOMATS_SUCCESS_COLONY", "%d diplomate(s) envoyées. Loyauté de %s augmentée de %d.");
+        fr.put("DIPLO_ERROR_NO_DIPLOMATS", "Aucune princesse n'a le rôle Diplomate dans cette colonie.");
+        fr.put("DIPLO_ERROR_NO_DIPLOMAT_ROLE", "Débloquez le rôle Diplomate avant d'envoyer des diplomates.");
+        fr.put("DIPLO_ERROR_REPUTATION_STABLE", "Les diplomates ne peuvent pas être envoyés aux dynasties avec une réputation Agressive.");
+        fr.put("DIPLO_ERROR_LOYALTY_STABLE", "Les diplomates ne peuvent pas être envoyés aux colonies avec une loyauté Rebelle.");
         fr.put("DIPLO_ERROR_CORDIAL_REQUIRED", "Une réputation cordiale ou meilleure est requise pour former un pacte.");
         fr.put("DIPLO_ERROR_CORDIAL_REQUIRED_REQUEST", "Une réputation cordiale ou meilleure est requise pour demander un commerce.");
         fr.put("DIPLO_ERROR_NEUTRAL_REQUIRED", "Une réputation neutre ou meilleure est requise pour envoyer une route commerciale.");
@@ -640,6 +665,10 @@ public class FrenchTranslation implements Translation {
         fr.put("METHOD_AIR", "Air");
         fr.put("METHOD_SEA", "Mer");
         fr.put("METHOD_TUNNEL", "Tunnel");
+        fr.put("METHOD_LAND_DESC", "Convoi terrestre équilibré en vitesse et capacité.");
+        fr.put("METHOD_AIR_DESC", "Convoi aérien rapide ; faible capacité. Nécessite des princesses Transport Aérien.");
+        fr.put("METHOD_SEA_DESC", "Convoi haute capacité entre colonies côtières.");
+        fr.put("METHOD_TUNNEL_DESC", "Faible danger via tunnels terminés. Nécessite ingénieurs ou foreuses de tunnel.");
 
         fr.put("EVENT_ECLIPSE_NUPTIAL", "L'éclipse a déclenché un essaim nuptial spontané !");
 
@@ -729,7 +758,7 @@ public class FrenchTranslation implements Translation {
         fr.put("ROLE_BREEDER_DESC", "Permet aux princesses et mâles d'essaimer pour de nouvelles colonies ou reines.");
         fr.put("ROLE_DIPLOMAT_UPGRADE", "Rôle diplomate");
         fr.put("ROLE_DIPLOMAT_FLAVOR", "Plus fort que l'épée");
-        fr.put("ROLE_DIPLOMAT_DESC", "Permet aux princesses de négocier avec d'autres colonies.");
+        fr.put("ROLE_DIPLOMAT_DESC", "Permet aux princesses d'améliorer la loyauté d'une colonie ou la réputation dynastique via des missions diplomatiques.");
         fr.put("ROLE_MILITIA_UPGRADE", "Rôle milice");
         fr.put("ROLE_MILITIA_FLAVOR", "Milice auxiliaire d'ouvrières");
         fr.put("ROLE_MILITIA_DESC", "Permet aux ouvrières des tâches défensives simples.");
@@ -797,6 +826,12 @@ public class FrenchTranslation implements Translation {
         fr.put("ABILITY_CATCH_SYMBIOTIC_MITE_DESC", "Permet aux capturantes de collecter des acariens symbiotiques à la surface. Se débloque à la première apparition d'acariens parasitaires. Chaque acarien symbiotique élimine jusqu'à 5 acariens parasitaires par jour.");
         fr.put("ABILITY_CATCH_DERMESTID_FLAVOR", "Capture de coléoptères de fosse");
         fr.put("ABILITY_CATCH_DERMESTID_DESC", "Permet aux capturantes de collecter des dermestes à la surface. Les fossoyeuses en gardent jusqu'à 10 chacune dans la fosse.");
+        fr.put("ABILITY_DIPLOMAT_PRESSURE_2", "Pression diplomatique II");
+        fr.put("ABILITY_DIPLOMAT_PRESSURE_2_FLAVOR", "Langue d'argent");
+        fr.put("ABILITY_DIPLOMAT_PRESSURE_2_DESC", "Chaque diplomate envoyée améliore la stabilité de 3 au lieu de 1.");
+        fr.put("ABILITY_DIPLOMAT_PRESSURE_3", "Pression diplomatique III");
+        fr.put("ABILITY_DIPLOMAT_PRESSURE_3_FLAVOR", "Mandibules de fer");
+        fr.put("ABILITY_DIPLOMAT_PRESSURE_3_DESC", "Chaque diplomate envoyée améliore la stabilité de 5 au lieu de 1.");
         fr.put("ABILITY_ABILITY_FLAVOR", "Capacités débloquées");
         fr.put("ABILITY_ABILITY_DESC", "Affiche le menu des capacités et les capacités actives.");
 
@@ -993,7 +1028,9 @@ public class FrenchTranslation implements Translation {
         fr.put("HELP_TAB_SPECIES", "Espèces");
         fr.put("HELP_TAB_TYPES", "Types");
         fr.put("HELP_TAB_BUGS", "Autres insectes");
-        fr.put("HELP_TAB_ROLES", "Rôles");
+        fr.put("HELP_TAB_ROLES", "Améliorations de Rôle");
+        fr.put("HELP_TAB_ANT_ROLES", "Rôles de Fourmi");
+        fr.put("HELP_TAB_EMPIRE", "Empire");
         fr.put("HELP_TAB_UPGRADES", "Améliorations");
         fr.put("HELP_TAB_BUILDINGS", "Bâtiments");
         fr.put("HELP_TAB_ASSIMILATIONS", "Assimilations");
@@ -1002,7 +1039,7 @@ public class FrenchTranslation implements Translation {
         fr.put("HELP_WELCOME_STORY", "Presque toutes les autres fourmis ont disparu. Vous êtes une reine et portez tout le savoir génétique de chaque espèce. Débloquez-le et dominez le monde. <br><br>Développez votre colonie, combattez les autres colonies et adaptez-vous en absorbant et recherchant de nouvelles capacités.");
         fr.put("HELP_START_INFO", "<b>Survie de base :</b><br>Vos fourmis ont besoin de <b>champignons</b> pour manger et d'<b>eau</b> chaque jour. Sans cela, famine ou déshydratation.<br>- <b>Ramasseuses</b> : plantes et eau.<br>- <b>Chasseuses</b> : protéines (viande).<br>- <b>Agricultrices</b> : plantes et protéines en champignons.<br>- <b>Nourrices</b> : couvée. Une couvée négligée meurt.<br><br><b>Vue :</b><br><b>A</b> bascule entre <b>souterrain</b> (nid) et <b>surface</b> (collecte).<br><br><b>Gestion :</b><br><b>Taux d'éclosion (P)</b> pour les naissances. Les <b>chercheuses</b> génèrent des PR (menu <b>Y</b>). Les <b>constructrices</b> utilisent minéraux et résine (menu <b>U</b>).<br><br><b>Menaces :</b><br>- <b>Contamination :</b> les mortes doivent être enlevées par les <b>fossoyeuses</b>.<br>- <b>Fourmis parasites :</b> drainent la nourriture. Assignez la <b>police</b>.<br>- <b>Épuisement :</b> les nœuds de ressources s'épuisent ; les <b>éclaireuses</b> en trouvent de nouveaux.");
         fr.put("HELP_OVERWORLD_GATHERING", "<b>Collecte en surface :</b><br>Les <b>éclaireuses</b> découvrent de nouveaux nœuds. Chaque hex de carte cumule de l'<b>épuisement</b> hors eau ; un épuisement plus éloigne en général les nouveaux nœuds du nid (certaines améliorations plafonnent l'effet).<br><br><b>Distance :</b> le rendement utilise la distance à vol d'oiseau depuis l'<b>entrée du nid</b>. Dans un rayon de <b>pleine efficacité</b> (plus grand avec des ouvrières plus rapides et certaines améliorations), le rendement est entier ; au-delà, il descend vers un petit minimum.<br><br><b>Statistiques (Hex local) :</b> <b>Épuisement</b> est le pourcentage effectif pour les apparitions ; <b>Sources trouvées</b> compte les nœuds découverts par cette colonie ; <b>Distance max. pleine efficacité</b> estime le rayon à plein rendement pour une ouvrière type.");
-        fr.put("HELP_DYNASTY_INFO", "<b>Étendre la dynastie :</b><br>Avec les <b>reproductrices</b>, les essaims nuptiaux vous font progresser sur la <b>carte du monde (I)</b>.<br><i>Astuce : les éclipses déclenchent des essaims gratuits !</i><br><br><b>Logistique et commerce :</b><br>Plusieurs colonies débloquent les <b>routes commerciales</b>. Assignez des <b>messagères</b>.<br>- <b>Terre :</b> standard.<br>- <b>Tunnel :</b> sûr et rapide, tunnels et <b>foreuses</b>.<br>- <b>Air :</b> rapide, faible capacité, <b>transport aérien</b> (princesses).<br>- <b>Bilatéral :</b> transport dans les deux sens.<br><br><b>Étapes :</b><br>- <b>Menu dynastie (S) :</b> toutes les colonies.<br>- <b>Colonisation de masse :</b> plus de limite de satellites.<br>- <b>Automatisation :</b> colonies PNJ autonomes.<br><br><b>Évolution :</b><br><b>Synergies</b> pour combiner des améliorations, <b>assimilations</b> pour les traits d'autres espèces.");
+        fr.put("HELP_DYNASTY_INFO", "<b>Étendre la dynastie :</b><br>Avec les <b>reproductrices</b>, les essaims nuptiaux vous font progresser sur la <b>carte du monde (I)</b>.<br><i>Astuce : les éclipses déclenchent des essaims gratuits !</i><br><br><b>Logistique et commerce :</b><br>Plusieurs colonies débloquent les <b>routes commerciales</b>. Assignez des transporteuses et choisissez une méthode de convoi (icônes dans l'onglet logistique) :<br>- <b>Terre :</b> convois terrestres standard.<br>- <b>Mer :</b> haute capacité entre colonies côtières.<br>- <b>Tunnel :</b> sûr et rapide ; tunnel terminé et rôles de tunnel requis.<br>- <b>Air :</b> rapide, faible capacité ; <b>transport aérien</b> (princesses).<br>- <b>Bilatéral :</b> fusionne les routes aller et retour.<br><br><b>Loyauté et diplomatie :</b><br>Chaque colonie a une <b>loyauté</b> envers votre dynastie (icônes de palier dans l'aperçu). Une faible loyauté bloque le commerce. Les autres dynasties ont une <b>réputation</b> et une posture diplomatique.<br><br><b>Étapes :</b><br>- <b>Menu dynastie (S) :</b> toutes les colonies.<br>- <b>Colonisation de masse :</b> plus de limite de satellites.<br>- <b>Automatisation :</b> colonies PNJ autonomes.<br><br><b>Évolution :</b><br><b>Synergies</b> pour combiner des améliorations, <b>assimilations</b> pour les traits d'autres espèces.");
 
         fr.put("HELP_SPECIES_SCIENTIFIC", "Nom scientifique :");
         fr.put("HELP_SPECIES_TRAITS", "Traits de base :");
@@ -1057,8 +1094,14 @@ public class FrenchTranslation implements Translation {
         fr.put("HELP_TUTORIAL_TITLE", "Bienvenue dans Empire Formique !");
         fr.put("HELP_TUTORIAL_TIPS", "<b>Conseils :</b><br><br>Aliment principal : <b>champignons</b>, consommés chaque jour.<br><br>Assignez des <b>ouvrières</b> (Q) en <b>ramasseuses</b> pour plantes et eau. Sans eau, soif !<br><br>Les <b>agricultrices</b> (Q) transforment les plantes en champignons. En général 1 agricultrice pour ~6 ramasseuses.<br><br>Les <b>nourrices</b> (Q) s'occupent des <b>œufs, larves et nymphes</b>. Sans assez de nourrices, la couvée meurt !<br><br><b>A</b> bascule <b>souterrain</b> / <b>surface</b>.<br><br><i>QoL : si vous assignez un rôle sans fourmis libres, le jeu les prend sur votre effectif par défaut (ex. ramasseuses).</i>");
         fr.put("HELP_TUTORIAL_THREATS", "<b>Menaces :</b><br><br><b>Contamination :</b> les morts naturels s'accumulent et propagent la maladie. <b>Fossoyeuses</b> pour nettoyer.<br><br><b>Fourmis parasites :</b> drainent les champignons. <b>Police</b> pour les détecter et éliminer.<br><br><b>Épuisement :</b> les ressources s'épuisent. <b>Éclaireuses</b> pour en trouver d'autres.");
-        fr.put("HELP_TUTORIAL_DYNASTY", "<b>Dynastie :</b><br><br>En prospérant, vous débloquez des princesses <b>reproductrices</b> et des colonies satellites via la <b>carte (I)</b>.<br><i>Les éclipses solaires ou lunaires rares déclenchent des essaims gratuits !</i><br><br>Plusieurs colonies débloquent le <b>menu dynastie (S)</b>. Des jalons permettent <b>routes commerciales</b>, lever les limites de satellites et <b>automatiser</b> la dynastie.");
-
+        fr.put("HELP_TUTORIAL_DYNASTY", "<b>Dynastie :</b><br><br>En prospérant, vous débloquez des princesses <b>reproductrices</b> et des colonies satellites via la <b>carte (I)</b>.<br><i>Les éclipses solaires ou lunaires rares déclenchent des essaims gratuits !</i><br><br>Plusieurs colonies débloquent le <b>menu dynastie (S)</b> pour logistique, loyauté et diplomatie. Les routes utilisent des icônes de convoi (Terre, Mer, Tunnel, Air). La <b>loyauté</b> des colonies et la <b>réputation</b> diplomatique ont leurs propres icônes dans Dynastie et Statistiques.");
+        
+        fr.put("HELP_EMPIRE_TRADE", "Méthodes de commerce");
+        fr.put("HELP_EMPIRE_LOYALTY", "Paliers de loyauté des colonies");
+        fr.put("HELP_EMPIRE_REPUTATION", "Postures de réputation diplomatique");
+        fr.put("HELP_EMPIRE_MOVEMENT", "Mouvement des insectes de compagnie");
+        fr.put("HELP_TIER_MIN_SCORE", " (min. %d)");
+        fr.put("HELP_ROLE_ANT_TYPE", "Type de fourmi : %s");
         fr.put("HOTKEY_PAUSE_LABEL", "Pause/Jouer :");
         fr.put("HOTKEY_ESC_LABEL", "Menu jeu :");
         fr.put("HOTKEY_VIEW_LABEL", "Basculer vue :");
@@ -1165,6 +1208,10 @@ public class FrenchTranslation implements Translation {
         fr.put("LOG_FOUND_SOURCE_FULL_FMT", "%s trouvé mais capacité pleine.");
         fr.put("LOG_SOURCE_EXHAUSTED_FMT", "Une source de %s est épuisée.");
         fr.put("LOG_FORCE_FLIGHT_BLOCKED", "Impossible de forcer l'essaim : pas de mâles ou de princesses reproductrices.");
+        fr.put("LOG_PHEROMONE_STORM_STARTED_FMT", "Tempête de Phéromones activée : +%d loyauté pendant %d mois.");
+        fr.put("LOG_PHEROMONE_STORM_ENDED", "L'effet Tempête de Phéromones est terminé.");
+        fr.put("LOG_CREATINE_DIET_STARTED_FMT", "Régime Créatine activé : vitesse doublée pendant %d mois.");
+        fr.put("LOG_CREATINE_DIET_ENDED", "L'effet Régime Créatine est terminé.");
         fr.put("LOG_WARNING_NO_QUEEN_FMT", "La colonie n'a pas de reine ! Jours sans reine : %d/7");
         fr.put("LOG_MATURATION_COMPLETE", "Maturation de la colonie terminée : effectif déployé.");
         fr.put("LOG_TRADE_CANCELLED_FMT", "Annulé. Pas assez de %s disponible.");
@@ -1184,6 +1231,8 @@ public class FrenchTranslation implements Translation {
         fr.put("DYNASTY_SORT_POP_LOW", "Population (plus faible d'abord)");
         fr.put("DYNASTY_SORT_AGE_OLD", "Âge (plus ancienne d'abord)");
         fr.put("DYNASTY_SORT_AGE_NEW", "Âge (plus récente d'abord)");
+        fr.put("DYNASTY_SORT_LOYALTY_HIGH", "Loyauté (plus élevée d'abord)");
+        fr.put("DYNASTY_SORT_LOYALTY_LOW", "Loyauté (plus faible d'abord)");
 
         fr.put("SETTINGS_DEFAULT_ROLE_WORKER", "Rôle ouvrière par défaut :");
         fr.put("SETTINGS_DEFAULT_ROLE_SOLDIER", "Rôle soldate par défaut :");

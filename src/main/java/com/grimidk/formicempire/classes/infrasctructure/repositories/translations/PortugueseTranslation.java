@@ -182,6 +182,15 @@ public class PortugueseTranslation implements Translation {
         pt.put("ABILITY_ERROR_NO_DRONES", "Não há zangões disponíveis na colônia.");
         pt.put("ABILITY_ERROR_NO_BREEDERS", "Não há princesas reprodutoras disponíveis.");
         pt.put("ABILITY_ERROR_LOCATE_COLONY", "Erro: não foi possível localizar a colônia no mapa mundial.");
+        pt.put("ABILITY_ERROR_ALREADY_ACTIVE", "Esta habilidade já está ativa.");
+        pt.put("ABILITY_ERROR_NOT_ENOUGH_RESOURCE", "Não há %2$s suficiente (%1$d necessário).");
+        pt.put("ABILITY_COST_RESOURCE_FMT", "Custo: %d %s");
+        pt.put("ABILITY_PHEROMONE_STORM", "Tempestade de Feromônios");
+        pt.put("ABILITY_PHEROMONE_STORM_FLAVOR", "Unidade Aromática");
+        pt.put("ABILITY_PHEROMONE_STORM_DESC", "Gaste 500 xaropes para aumentar a lealdade da colônia em 10 por um ano (12 meses).");
+        pt.put("ABILITY_CREATINE_DIET", "Dieta de Creatina");
+        pt.put("ABILITY_CREATINE_DIET_FLAVOR", "Combustível Muscular");
+        pt.put("ABILITY_CREATINE_DIET_DESC", "Gaste 300 proteína para dobrar a velocidade de movimento das formigas por meio ano (6 meses).");
 
         pt.put("DIALOG_STATS_TITLE", "Estatísticas");
         pt.put("STATS_DYNASTY_MODE", "Modo dinastia");
@@ -516,6 +525,12 @@ public class PortugueseTranslation implements Translation {
         pt.put("MOVE_SPEED", "Marcha rápida");
         pt.put("MOVE_FLY", "Voando");
         pt.put("MOVE_PATROL", "Patrulhando");
+        pt.put("MOVE_STATIC_DESC", "Imóvel (insetos de estimação parados).");
+        pt.put("MOVE_WANDER_DESC", "Vagar lento.");
+        pt.put("MOVE_MARCH_DESC", "Marcha normal.");
+        pt.put("MOVE_SPEED_DESC", "Marcha rápida.");
+        pt.put("MOVE_FLY_DESC", "Movimento voador.");
+        pt.put("MOVE_PATROL_DESC", "Patrulha em torno de um curral ou posto.");
 
         pt.put("BUG_ANT", "Formiga");
         pt.put("BUG_APHID", "Pulgão");
@@ -609,10 +624,20 @@ public class PortugueseTranslation implements Translation {
         pt.put("LOYALTY_MODIFIER_TRADE", "Comércio ativo");
         pt.put("LOYALTY_MODIFIER_TUNNEL", "Ligação de túnel");
         pt.put("LOYALTY_MODIFIER_CAPITAL", "Capital");
+        pt.put("LOYALTY_MODIFIER_PHEROMONE_STORM", "Tempestade de Feromônios");
         pt.put("DIPLO_ACTION_FORM_PACT", "Formar pacto");
         pt.put("DIPLO_ACTION_BREAK_PACT", "Quebrar pacto");
         pt.put("DIPLO_ACTION_TRADE", "Comerciar");
         pt.put("DIPLO_ACTION_REQUEST_TRADE", "Solicitar comércio");
+        pt.put("DIPLO_ACTION_SEND_DIPLOMATS", "Enviar diplomatas");
+        pt.put("DIPLO_SEND_DIPLOMATS_TITLE", "Enviar diplomatas");
+        pt.put("DIPLO_SEND_DIPLOMATS_PROMPT", "Envie até %d diplomata(s) (%d atribuídas). Cada uma melhora a estabilidade em %d.");
+        pt.put("DIPLO_SEND_DIPLOMATS_SUCCESS_DYNASTY", "Enviadas %d diplomata(s). Reputação com %s aumentou em %d.");
+        pt.put("DIPLO_SEND_DIPLOMATS_SUCCESS_COLONY", "Enviadas %d diplomata(s). Lealdade de %s aumentou em %d.");
+        pt.put("DIPLO_ERROR_NO_DIPLOMATS", "Nenhuma princesa está atribuída ao papel Diplomata nesta colônia.");
+        pt.put("DIPLO_ERROR_NO_DIPLOMAT_ROLE", "Desbloqueie o papel Diplomata antes de enviar diplomatas.");
+        pt.put("DIPLO_ERROR_REPUTATION_STABLE", "Diplomatas não podem ser enviados a dinastias com reputação Agressiva.");
+        pt.put("DIPLO_ERROR_LOYALTY_STABLE", "Diplomatas não podem ser enviados a colônias com lealdade Rebelde.");
         pt.put("DIPLO_ERROR_CORDIAL_REQUIRED", "Reputação cordial ou melhor é necessária para formar um pacto.");
         pt.put("DIPLO_ERROR_CORDIAL_REQUIRED_REQUEST", "Reputação cordial ou melhor é necessária para solicitar comércio.");
         pt.put("DIPLO_ERROR_NEUTRAL_REQUIRED", "Reputação neutra ou melhor é necessária para enviar uma rota comercial.");
@@ -640,6 +665,10 @@ public class PortugueseTranslation implements Translation {
         pt.put("METHOD_AIR", "Ar");
         pt.put("METHOD_SEA", "Mar");
         pt.put("METHOD_TUNNEL", "Túnel");
+        pt.put("METHOD_LAND_DESC", "Comboios terrestres equilibrados em velocidade e capacidade.");
+        pt.put("METHOD_AIR_DESC", "Comboios aéreos rápidos; baixa capacidade. Requer princesas de Transporte Aéreo.");
+        pt.put("METHOD_SEA_DESC", "Comboios de alta capacidade entre colônias costeiras.");
+        pt.put("METHOD_TUNNEL_DESC", "Baixo perigo por túneis concluídos. Requer engenheiros ou perfuradores de túnel.");
 
         pt.put("EVENT_ECLIPSE_NUPTIAL", "O eclipse provocou um voo nupcial espontâneo!");
 
@@ -729,7 +758,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("ROLE_BREEDER_DESC", "Permite que princesas e zangões façam voos nupciais para criar colônias ou obter rainhas.");
         pt.put("ROLE_DIPLOMAT_UPGRADE", "Função diplomata");
         pt.put("ROLE_DIPLOMAT_FLAVOR", "Mais forte que a espada");
-        pt.put("ROLE_DIPLOMAT_DESC", "Permite que princesas negociem com outras colônias.");
+        pt.put("ROLE_DIPLOMAT_DESC", "Permite que princesas melhorem a lealdade da colônia ou a reputação dinástica via missões diplomáticas.");
         pt.put("ROLE_MILITIA_UPGRADE", "Função milícia");
         pt.put("ROLE_MILITIA_FLAVOR", "Milícia auxiliar de operárias");
         pt.put("ROLE_MILITIA_DESC", "Permite tarefas defensivas básicas às operárias.");
@@ -797,6 +826,12 @@ public class PortugueseTranslation implements Translation {
         pt.put("ABILITY_CATCH_SYMBIOTIC_MITE_DESC", "Permite que capturadoras recolham ácaros simbióticos no exterior. Desbloqueia quando aparecem os primeiros ácaros parasitas. Cada ácaro simbiótico elimina até 5 ácaros parasitas por dia.");
         pt.put("ABILITY_CATCH_DERMESTID_FLAVOR", "Captura de besouros de cova");
         pt.put("ABILITY_CATCH_DERMESTID_DESC", "Permite que capturadoras recolham dermestídeos no exterior. Coveiras cuidam de até 10 cada uma na cova.");
+        pt.put("ABILITY_DIPLOMAT_PRESSURE_2", "Pressão diplomática II");
+        pt.put("ABILITY_DIPLOMAT_PRESSURE_2_FLAVOR", "Língua de prata");
+        pt.put("ABILITY_DIPLOMAT_PRESSURE_2_DESC", "Cada diplomata enviada melhora a estabilidade em 3 em vez de 1.");
+        pt.put("ABILITY_DIPLOMAT_PRESSURE_3", "Pressão diplomática III");
+        pt.put("ABILITY_DIPLOMAT_PRESSURE_3_FLAVOR", "Mandíbulas de ferro");
+        pt.put("ABILITY_DIPLOMAT_PRESSURE_3_DESC", "Cada diplomata enviada melhora a estabilidade em 5 em vez de 1.");
         pt.put("ABILITY_ABILITY_FLAVOR", "Habilidades desbloqueadas");
         pt.put("ABILITY_ABILITY_DESC", "Permite ver o menu de habilidades e usar habilidades ativas.");
 
@@ -993,7 +1028,9 @@ public class PortugueseTranslation implements Translation {
         pt.put("HELP_TAB_SPECIES", "Espécies");
         pt.put("HELP_TAB_TYPES", "Tipos");
         pt.put("HELP_TAB_BUGS", "Outros insetos");
-        pt.put("HELP_TAB_ROLES", "Funções");
+        pt.put("HELP_TAB_ROLES", "Melhorias de Função");
+        pt.put("HELP_TAB_ANT_ROLES", "Funções de Formiga");
+        pt.put("HELP_TAB_EMPIRE", "Império");
         pt.put("HELP_TAB_UPGRADES", "Melhorias");
         pt.put("HELP_TAB_BUILDINGS", "Edifícios");
         pt.put("HELP_TAB_ASSIMILATIONS", "Assimilações");
@@ -1002,7 +1039,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("HELP_WELCOME_STORY", "Quase todas as outras formigas se extinguiram. Você é uma rainha e carrega o conhecimento genético de cada espécie. Desbloqueie-o e domine o mundo. <br><br>Construa a colônia e expanda-se lutando contra outras colônias; adapte-se absorvendo e pesquisando habilidades.");
         pt.put("HELP_START_INFO", "<b>Sobrevivência básica:</b><br>Suas formigas precisam de <b>cogumelos</b> para comer e <b>água</b> para beber todos os dias. Sem isso, a colônia morre de fome ou sede.<br>- <b>Coletoras</b> recolhem plantas e água.<br>- <b>Caçadoras</b> recolhem proteína (carne).<br>- <b>Agricultoras</b> convertem planta e proteína em cogumelos.<br>- <b>Babás</b> cuidam da prole. Prole negligenciada morre.<br><br><b>Observando a colônia:</b><br>Pressione <b>A</b> para alternar entre <b>submundo</b> (formigueiro) e <b>supermundo</b> (coleta externa).<br><br><b>Gestão:</b><br>Use <b>taxas de eclosão (P)</b> para nascimentos. <b>Pesquisadoras</b> geram PP para melhorias no <b>menu de pesquisa (Y)</b>. <b>Construtoras</b> usam minerais e resina no <b>menu de construção (U)</b>.<br><br><b>Ameaças:</b><br>- <b>Contaminação:</b> mortas devem ser retiradas por <b>coveiras</b>.<br>- <b>Formigas parasitas:</b> drenam comida. Atribua <b>vigilantes</b>.<br>- <b>Esgotamento:</b> fontes secam; use <b>batedoras</b> para achar novas.");
         pt.put("HELP_OVERWORLD_GATHERING", "<b>Coleta no supermundo:</b><br>As <b>batedoras</b> descobrem novos nós de recursos. Cada hex do mapa acumula <b>esgotamento</b> por achados sem água; esgotamento maior tende a colocar nós novos mais longe do formigueiro (algumas melhorias limitam isso).<br><br><b>Distância:</b> o rendimento usa linha reta a partir da <b>entrada do ninho</b>. Dentro de um raio de <b>plena eficiência</b> (maior com operárias mais rápidas e certas melhorias), o rendimento é integral; além disso, cai até um mínimo pequeno.<br><br><b>Estatísticas (Hex local):</b> <b>Esgotamento</b> é a porcentagem efetiva usada para aparições; <b>Fontes encontradas</b> conta os nós que esta colônia descobriu; <b>Distância máx. de plena eficiência</b> estima o raio de rendimento pleno para uma operária típica.");
-        pt.put("HELP_DYNASTY_INFO", "<b>Expandindo a dinastia:</b><br>Com <b>reprodutoras</b>, faça voos nupciais pelo <b>mapa mundial (I)</b>.<br><i>Dica: eclipses ativam voos nupciais espontâneos e gratuitos!</i><br><br><b>Logística e comércio:</b><br>Várias colônias desbloqueiam <b>rotas comerciais</b>. Atribua <b>mensageiras</b>.<br>- <b>Terra:</b> padrão.<br>- <b>Túnel:</b> seguro e rápido, requer <b>túneis</b> e <b>perfuradoras</b>.<br>- <b>Ar:</b> rápido, baixa capacidade, requer <b>transporte aéreo</b> (princesas).<br>- <b>Bilateral:</b> transporte nos dois sentidos.<br><br><b>Marcos:</b><br>- <b>Menu da dinastia (S):</b> gerir colônias.<br>- <b>Colonização em massa:</b> remove limite de satélites.<br>- <b>Automação:</b> colônias NPC se gerem.<br><br><b>Evolução:</b><br><b>Sinergias</b> combinam melhorias; <b>assimilações</b> absorvem traços.");
+        pt.put("HELP_DYNASTY_INFO", "<b>Expandindo a dinastia:</b><br>Com <b>reprodutoras</b>, faça voos nupciais pelo <b>mapa mundial (I)</b>.<br><i>Dica: eclipses ativam voos nupciais espontâneos e gratuitos!</i><br><br><b>Logística e comércio:</b><br>Várias colônias desbloqueiam <b>rotas comerciais</b>. Atribua formigas de transporte e escolha um método de comboio (ícones na aba de logística):<br>- <b>Terra:</b> comboios terrestres padrão.<br>- <b>Mar:</b> alta capacidade entre colônias costeiras.<br>- <b>Túnel:</b> seguro e rápido; túnel concluído e funções de túnel necessárias.<br>- <b>Ar:</b> rápido, baixa capacidade; requer <b>transporte aéreo</b> (princesas).<br>- <b>Bilateral:</b> funde rotas de ida e volta num comboio bidirecional.<br><br><b>Lealdade e diplomacia:</b><br>Cada colônia tem <b>lealdade</b> à sua dinastia (ícones de nível na visão geral). Baixa lealdade bloqueia comércio. Outras dinastias têm <b>reputação</b> e postura diplomática.<br><br><b>Marcos:</b><br>- <b>Menu da dinastia (S):</b> gerir colônias.<br>- <b>Colonização em massa:</b> remove limite de satélites.<br>- <b>Automação:</b> colônias NPC se gerem.<br><br><b>Evolução:</b><br><b>Sinergias</b> combinam melhorias; <b>assimilações</b> absorvem traços.");
 
         pt.put("HELP_SPECIES_SCIENTIFIC", "Nome científico:");
         pt.put("HELP_SPECIES_TRAITS", "Traços base:");
@@ -1057,8 +1094,14 @@ public class PortugueseTranslation implements Translation {
         pt.put("HELP_TUTORIAL_TITLE", "Bem-vindo ao Império Fôrmico!");
         pt.put("HELP_TUTORIAL_TIPS", "<b>Dicas:</b><br><br>O principal alimento são <b>cogumelos</b>, consumidos diariamente.<br><br>Atribua <b>operárias</b> (Q) como <b>coletoras</b> para plantas e água. Sem água, suas formigas morrem de sede!<br><br>Atribua <b>agricultoras</b> (Q) para converter plantas em cogumelos. Uma agricultora costuma atender ~6 coletoras.<br><br>Atribua <b>babás</b> (Q) para <b>ovos, larvas e pupas</b>. Sem babás, as crias morrem!<br><br>Pressione <b>A</b> para alternar submundo e supermundo.<br><br><i>Se não houver formigas livres ao mudar função, o jogo pode puxar da força padrão (ex.: coletoras).</i>");
         pt.put("HELP_TUTORIAL_THREATS", "<b>Ameaças:</b><br><br><b>Contaminação:</b> formigas morrem de velhice. Corpos acumulam doença. Use <b>coveiras</b>.<br><br><b>Formigas parasitas:</b> drenam cogumelos. Use <b>vigilantes</b>.<br><br><b>Esgotamento:</b> fontes acabam. Use <b>batedoras</b> para achar novas.");
-        pt.put("HELP_TUTORIAL_DYNASTY", "<b>Dinastia:</b><br><br>Com a colônia forte, desbloqueie princesas <b>reprodutoras</b> e colonias satélites pelo <b>mapa mundial (I)</b>.<br><i>Eclipses raros geram voos nupciais gratuitos!</i><br><br>Várias colônias desbloqueiam o <b>menu da dinastia (S)</b>. Marcos permitem <b>rotas comerciais</b>, remover limites e <b>automatizar</b>.");
-
+        pt.put("HELP_TUTORIAL_DYNASTY", "<b>Dinastia:</b><br><br>Com a colônia forte, desbloqueie princesas <b>reprodutoras</b> e colônias satélites pelo <b>mapa mundial (I)</b>.<br><i>Eclipses raros geram voos nupciais gratuitos!</i><br><br>Várias colônias desbloqueiam o <b>menu da dinastia (S)</b> para logística, lealdade e diplomacia. Rotas comerciais usam ícones de comboio (Terra, Mar, Túnel, Ar). <b>Lealdade</b> de colônia e <b>reputação</b> diplomática aparecem com ícones próprios em Dinastia e Estatísticas.");
+        
+        pt.put("HELP_EMPIRE_TRADE", "Métodos de Comércio");
+        pt.put("HELP_EMPIRE_LOYALTY", "Níveis de Lealdade da Colônia");
+        pt.put("HELP_EMPIRE_REPUTATION", "Posturas de Reputação Diplomática");
+        pt.put("HELP_EMPIRE_MOVEMENT", "Movimento de Insetos de Estimação");
+        pt.put("HELP_TIER_MIN_SCORE", " (mín. %d)");
+        pt.put("HELP_ROLE_ANT_TYPE", "Tipo de formiga: %s");
         pt.put("HOTKEY_PAUSE_LABEL", "Pausa/jogar:");
         pt.put("HOTKEY_ESC_LABEL", "Menu:");
         pt.put("HOTKEY_VIEW_LABEL", "Alternar vista:");
@@ -1165,6 +1208,10 @@ public class PortugueseTranslation implements Translation {
         pt.put("LOG_FOUND_SOURCE_FULL_FMT", "%s encontrado, mas capacidade cheia.");
         pt.put("LOG_SOURCE_EXHAUSTED_FMT", "Uma fonte de %s esgotou-se.");
         pt.put("LOG_FORCE_FLIGHT_BLOCKED", "Não é possível forçar o voo. Faltam zangões ou princesas reprodutoras.");
+        pt.put("LOG_PHEROMONE_STORM_STARTED_FMT", "Tempestade de Feromônios ativada: +%d lealdade por %d meses.");
+        pt.put("LOG_PHEROMONE_STORM_ENDED", "O efeito Tempestade de Feromônios terminou.");
+        pt.put("LOG_CREATINE_DIET_STARTED_FMT", "Dieta de Creatina ativada: velocidade dobrada por %d meses.");
+        pt.put("LOG_CREATINE_DIET_ENDED", "O efeito Dieta de Creatina terminou.");
         pt.put("LOG_WARNING_NO_QUEEN_FMT", "A colônia não tem rainha! Dias sem rainha: %d/7");
         pt.put("LOG_MATURATION_COMPLETE", "Amadurecimento da colônia concluído: força de trabalho implantada.");
         pt.put("LOG_TRADE_CANCELLED_FMT", "Cancelado. Não há %s suficiente disponível.");
@@ -1184,6 +1231,8 @@ public class PortugueseTranslation implements Translation {
         pt.put("DYNASTY_SORT_POP_LOW", "População (menor primeiro)");
         pt.put("DYNASTY_SORT_AGE_OLD", "Idade (mais antiga primeiro)");
         pt.put("DYNASTY_SORT_AGE_NEW", "Idade (mais nova primeiro)");
+        pt.put("DYNASTY_SORT_LOYALTY_HIGH", "Lealdade (maior primeiro)");
+        pt.put("DYNASTY_SORT_LOYALTY_LOW", "Lealdade (menor primeiro)");
 
         pt.put("SETTINGS_DEFAULT_ROLE_WORKER", "Função padrão de operária:");
         pt.put("SETTINGS_DEFAULT_ROLE_SOLDIER", "Função padrão de soldada:");
