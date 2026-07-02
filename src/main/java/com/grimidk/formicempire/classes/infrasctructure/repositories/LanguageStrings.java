@@ -5,6 +5,7 @@ import com.grimidk.formicempire.classes.infrasctructure.repositories.translation
 import com.grimidk.formicempire.classes.infrasctructure.repositories.translations.PortugueseTranslation;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.translations.SpanishTranslation;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.translations.Translation;
+import com.grimidk.formicempire.classes.interfaces.ui.util.UiNumberFormat;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,6 +63,23 @@ public final class LanguageStrings {
             return langMap.get(key);
         }
         return key;
+    }
+
+    /** Like {@link String#format(String, Object...)} but compact-formats numeric arguments for display. */
+    public static String format(String key, Object... args) {
+        return String.format(get(key), UiNumberFormat.formatDisplayArgs(args));
+    }
+
+    public static String formatSigned(int value) {
+        return UiNumberFormat.formatSigned(value);
+    }
+
+    public static String formatNumber(int value) {
+        return UiNumberFormat.format(value);
+    }
+
+    public static String formatNumber(long value) {
+        return UiNumberFormat.format(value);
     }
 
     public static String formatPlayerDynastyName(String baseName) {

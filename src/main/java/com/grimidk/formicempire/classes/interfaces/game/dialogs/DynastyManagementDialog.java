@@ -286,8 +286,7 @@ public class DynastyManagementDialog extends ZeroDialog {
         options.add(LanguageStrings.get(LanguageStrings.UI_CLOSE));
 
         int res = UiOptionPane.showOptionDialog(parent,
-                String.format(LanguageStrings.get(LanguageStrings.DYNASTY_MANAGE_TRADE_MSG),
-                        trade.getDestination().getColony().getName()),
+                LanguageStrings.format(LanguageStrings.DYNASTY_MANAGE_TRADE_MSG,                         trade.getDestination().getColony().getName()),
                 LanguageStrings.get(LanguageStrings.DYNASTY_MANAGE_TRADE_TITLE),
                 JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null,
                 options.toArray(), options.get(0));
@@ -296,7 +295,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             openTradeDialog(activeColony, trade.getDestination().getColony(), trade);
         } else if (canTwoWay && res == 1) {
             int confirm = UiOptionPane.showConfirmDialog(parent,
-                    String.format(LanguageStrings.get(LanguageStrings.TRADE_OPTIMIZE_MSG), neighbor.getName()),
+                    LanguageStrings.format(LanguageStrings.TRADE_OPTIMIZE_MSG, neighbor.getName()),
                     LanguageStrings.get(LanguageStrings.TRADE_MAKE_TWO_WAY),
                     JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
@@ -552,7 +551,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 return;
             }
             int res = UiOptionPane.showConfirmDialog(this,
-                    String.format(LanguageStrings.get(LanguageStrings.TRADE_OPTIMIZE_MSG), data.neighbor.getName()),
+                    LanguageStrings.format(LanguageStrings.TRADE_OPTIMIZE_MSG, data.neighbor.getName()),
                     LanguageStrings.get(LanguageStrings.TRADE_MAKE_TWO_WAY),
                     JOptionPane.YES_NO_OPTION);
             if (res == JOptionPane.YES_OPTION && mergeTradesIntoBilateral(data.outgoingTrade, incoming)) {
@@ -571,7 +570,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             if (trade == null) return LanguageStrings.get(LanguageStrings.ASSIMILATION_NONE);
             String transit = trade.isReturning() ? LanguageStrings.get(LanguageStrings.UI_RETURNING) : LanguageStrings.get(LanguageStrings.UI_TRANSIT);
             String pending = trade.hasPendingUpdate() ? LanguageStrings.get(LanguageStrings.UI_MODIFIED) : "";
-            return String.format(LanguageStrings.get(LanguageStrings.DYNASTY_TRANSIT_FORMAT), transit, trade.getRemainingHours(), pending);
+            return LanguageStrings.format(LanguageStrings.DYNASTY_TRANSIT_FORMAT, transit, trade.getRemainingHours(), pending);
         }
 
         private TradeRouteStatus tradeRouteStatus(Trade trade, String textOverride) {
@@ -660,7 +659,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                     } else if (shouldShowTunnelProgress(tunnel)) {
                         double pct = (tunnel.getProgress() / tunnel.getTotalCost()) * 100;
                         progressBar.setValue((int) pct);
-                        progressBar.setString(String.format(LanguageStrings.get(LanguageStrings.DYNASTY_PROGRESS_PERCENT), pct));
+                        progressBar.setString(LanguageStrings.format(LanguageStrings.DYNASTY_PROGRESS_PERCENT, pct));
 
                         int engineers = activeColony.getAssignedRoleCount(GameConstants.ROLE_ENGINEER);
                         int borers = activeColony.getAssignedRoleCount(GameConstants.ROLE_BORER);
@@ -860,10 +859,10 @@ public class DynastyManagementDialog extends ZeroDialog {
         private final JButton optimizeBtn;
         private final List<JButton> compactButtons = new ArrayList<>();
         
-        private final JLabel capLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.TRADE_CAPACITY_FORMAT), 0.0, 0.0));
-        private final JLabel speedLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.TRADE_SPEED_FORMAT), 0.0));
-        private final JLabel timeLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.TRADE_TIME_FORMAT), 0));
-        private final JLabel dangerLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.TRADE_SECURITY_FORMAT), 0.0));
+        private final JLabel capLabel = new JLabel(LanguageStrings.format(LanguageStrings.TRADE_CAPACITY_FORMAT, 0.0, 0.0));
+        private final JLabel speedLabel = new JLabel(LanguageStrings.format(LanguageStrings.TRADE_SPEED_FORMAT, 0.0));
+        private final JLabel timeLabel = new JLabel(LanguageStrings.format(LanguageStrings.TRADE_TIME_FORMAT, 0));
+        private final JLabel dangerLabel = new JLabel(LanguageStrings.format(LanguageStrings.TRADE_SECURITY_FORMAT, 0.0));
 
         private double totalTransportCapacity = 0.0;
 
@@ -902,7 +901,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
             mainPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
 
-            JLabel routeLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.TRADE_ROUTE_PREFIX), origin.getName(), target.getName()));
+            JLabel routeLabel = new JLabel(LanguageStrings.format(LanguageStrings.TRADE_ROUTE_PREFIX, origin.getName(), target.getName()));
             routeLabel.setFont(AssetStyles.FONT_BOLD);
             routeLabel.setForeground(AssetStyles.FONT_COLOR);
             mainPanel.add(routeLabel);
@@ -1285,12 +1284,12 @@ public class DynastyManagementDialog extends ZeroDialog {
             boolean noLoad = totalLoad <= 0 && (!bilateralCheck.isSelected() || totalReturnLoad <= 0);
             boolean noAnts = totalAnts <= 0;
 
-            capLabel.setText(String.format(LanguageStrings.get(LanguageStrings.TRADE_CAPACITY_FORMAT), Math.max(totalLoad, bilateralCheck.isSelected() ? totalReturnLoad : 0), totalCap));
+            capLabel.setText(LanguageStrings.format(LanguageStrings.TRADE_CAPACITY_FORMAT, Math.max(totalLoad, bilateralCheck.isSelected() ? totalReturnLoad : 0), totalCap));
             capLabel.setForeground(overCap ? AssetStyles.FONT_COLOR_ERROR : AssetStyles.FONT_COLOR);
             
-            speedLabel.setText(String.format(LanguageStrings.get(LanguageStrings.TRADE_SPEED_FORMAT), speedFactor));
-            timeLabel.setText(String.format(LanguageStrings.get(LanguageStrings.TRADE_TIME_FORMAT), hours));
-            dangerLabel.setText(String.format(LanguageStrings.get(LanguageStrings.TRADE_SECURITY_FORMAT), mitigationPercent));
+            speedLabel.setText(LanguageStrings.format(LanguageStrings.TRADE_SPEED_FORMAT, speedFactor));
+            timeLabel.setText(LanguageStrings.format(LanguageStrings.TRADE_TIME_FORMAT, hours));
+            dangerLabel.setText(LanguageStrings.format(LanguageStrings.TRADE_SECURITY_FORMAT, mitigationPercent));
             dangerLabel.setForeground(mitigationPercent < 100 ? AssetStyles.FONT_COLOR_WARNING : AssetStyles.FONT_COLOR_SUCCESS);
 
             createBtn.setEnabled(!overCap && !noAnts && !noLoad);
@@ -1322,7 +1321,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             if (incoming == null) return;
 
             int res = UiOptionPane.showConfirmDialog(this, 
-                String.format(LanguageStrings.get(LanguageStrings.TRADE_OPTIMIZE_MSG), target.getName()), 
+                LanguageStrings.format(LanguageStrings.TRADE_OPTIMIZE_MSG, target.getName()), 
                 LanguageStrings.get(LanguageStrings.TRADE_OPTIMIZE), JOptionPane.YES_NO_OPTION);
             
             if (res == JOptionPane.YES_OPTION) {
@@ -1505,7 +1504,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 setHorizontalAlignment(JLabel.CENTER);
                 int power = value instanceof Number number ? number.intValue() : 0;
-                setText(String.format("%,d", power));
+                setText(AssetStyles.formatNumber(power));
                 setIcon(GameConstants.ICON_STAT_MILITARY_POWER);
                 setIconTextGap(6);
                 return this;
@@ -2148,7 +2147,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 setHorizontalAlignment(JLabel.CENTER);
                 int power = value instanceof Number number ? number.intValue() : 0;
-                setText(String.format("%,d", power));
+                setText(AssetStyles.formatNumber(power));
                 setIcon(GameConstants.ICON_STAT_MILITARY_POWER);
                 setIconTextGap(6);
                 return this;
@@ -2236,7 +2235,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 else {
                     cl.show(this, "PROGRESS");
                     progressBar.setValue(c.getAge());
-                    progressBar.setString(String.format(LanguageStrings.get(LanguageStrings.DYNASTY_7_DAYS), c.getAge()));
+                    progressBar.setString(LanguageStrings.format(LanguageStrings.DYNASTY_7_DAYS, c.getAge()));
                 }
             }
             return this;
@@ -2294,7 +2293,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 else {
                     cardLayout.show(container, "PROGRESS");
                     progressBar.setValue(currentColony.getAge());
-                    progressBar.setString(String.format(LanguageStrings.get(LanguageStrings.DYNASTY_7_DAYS), currentColony.getAge()));
+                    progressBar.setString(LanguageStrings.format(LanguageStrings.DYNASTY_7_DAYS, currentColony.getAge()));
                 }
             }
             return container;
@@ -2386,8 +2385,7 @@ public class DynastyManagementDialog extends ZeroDialog {
         if (sent > 0) {
             int totalGain = sent * gainPer;
             UiOptionPane.showMessageDialog(parent,
-                    String.format(LanguageStrings.get(LanguageStrings.DIPLO_SEND_DIPLOMATS_SUCCESS_COLONY),
-                            sent, colony.getName(), totalGain),
+                    LanguageStrings.format(LanguageStrings.DIPLO_SEND_DIPLOMATS_SUCCESS_COLONY,                             sent, colony.getName(), totalGain),
                     LanguageStrings.get(LanguageStrings.DIPLO_SEND_DIPLOMATS_TITLE),
                     JOptionPane.INFORMATION_MESSAGE);
             refreshDialog();
@@ -2435,8 +2433,7 @@ public class DynastyManagementDialog extends ZeroDialog {
         if (sent > 0) {
             int totalGain = sent * gainPer;
             UiOptionPane.showMessageDialog(parent,
-                    String.format(LanguageStrings.get(LanguageStrings.DIPLO_SEND_DIPLOMATS_SUCCESS_DYNASTY),
-                            sent, other.getName(), totalGain),
+                    LanguageStrings.format(LanguageStrings.DIPLO_SEND_DIPLOMATS_SUCCESS_DYNASTY,                             sent, other.getName(), totalGain),
                     LanguageStrings.get(LanguageStrings.DIPLO_SEND_DIPLOMATS_TITLE),
                     JOptionPane.INFORMATION_MESSAGE);
             refreshDialog();
@@ -2469,7 +2466,7 @@ public class DynastyManagementDialog extends ZeroDialog {
 
     private void performEdit(Colony colony) {
         if (colony == null) return;
-        String newName = UiOptionPane.showInputDialog(this, String.format(LanguageStrings.get(LanguageStrings.DYNASTY_RENAME_TITLE), colony.getName()), colony.getName());
+        String newName = UiOptionPane.showInputDialog(this, LanguageStrings.format(LanguageStrings.DYNASTY_RENAME_TITLE, colony.getName()), colony.getName());
         if (newName != null && !newName.trim().isEmpty()) {
             colony.setName(newName.trim());
             refreshDialog();

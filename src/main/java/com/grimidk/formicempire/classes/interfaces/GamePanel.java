@@ -973,7 +973,7 @@ public class GamePanel extends ZeroGamePanel {
                 int slotIdLocal = w.getSaveSlotId();
                 if (slotIdLocal > 0) {
                     Savefile existing = sm.loadSlot(slotIdLocal);
-                    String nameToUse = (existing != null && existing.getName() != null && !existing.getName().trim().isEmpty()) ? existing.getName() : String.format(LanguageStrings.get(LanguageStrings.SAVE_DEFAULT_NAME_FMT), slotIdLocal);
+                    String nameToUse = (existing != null && existing.getName() != null && !existing.getName().trim().isEmpty()) ? existing.getName() : LanguageStrings.format(LanguageStrings.SAVE_DEFAULT_NAME_FMT, slotIdLocal);
                     sm.saveWorldToSlotUserAsync(engine.getWorld(), engine, slotIdLocal, nameToUse, success -> {
                         if (!success) {
                             UiOptionPane.showMessageDialog(this,

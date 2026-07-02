@@ -510,33 +510,33 @@ public class Colony {
         }
         int militaryAdj = getMilitaryLoyaltyAdjustment();
         if (militaryAdj != 0) {
-            sb.append(String.format(
-                    LanguageStrings.get(LanguageStrings.LOYALTY_MODIFIER_LINE),
+            sb.append(LanguageStrings.format(
+                    LanguageStrings.LOYALTY_MODIFIER_LINE,
                     LanguageStrings.get(LanguageStrings.LOYALTY_MODIFIER_MILITARY_VS_CAPITAL),
-                    militaryAdj)).append("<br>");
+                    LanguageStrings.formatSigned(militaryAdj))).append("<br>");
         }
         int distanceAdj = getDistanceFromCapitalLoyaltyAdjustment(world);
         if (distanceAdj != 0) {
             int tiles = getCapitalHexDistance(world);
-            sb.append(String.format(
-                    LanguageStrings.get(LanguageStrings.LOYALTY_MODIFIER_DISTANCE_LINE),
+            sb.append(LanguageStrings.format(
+                    LanguageStrings.LOYALTY_MODIFIER_DISTANCE_LINE,
                     LanguageStrings.get(LanguageStrings.LOYALTY_MODIFIER_DISTANCE_FROM_CAPITAL),
                     tiles,
-                    distanceAdj)).append("<br>");
+                    LanguageStrings.formatSigned(distanceAdj))).append("<br>");
         }
 
         sb.append(LanguageStrings.get(LanguageStrings.LOYALTY_TOOLTIP_EFFECTIVE))
                 .append(": ")
-                .append(getEffectiveLoyalty(tradeManager, world));
+                .append(LanguageStrings.formatNumber(getEffectiveLoyalty(tradeManager, world)));
         sb.append("</html>");
         return sb.toString();
     }
 
     private static void appendLoyaltyModifierLine(StringBuilder sb, ColonyLoyaltyModifier modifier) {
-        sb.append(String.format(
-                LanguageStrings.get(LanguageStrings.LOYALTY_MODIFIER_LINE),
+        sb.append(LanguageStrings.format(
+                LanguageStrings.LOYALTY_MODIFIER_LINE,
                 modifier.getName(),
-                modifier.getLoyaltyDelta())).append("<br>");
+                LanguageStrings.formatSigned(modifier.getLoyaltyDelta()))).append("<br>");
     }
 
     public boolean participatesInActiveTrade(TradeManager tradeManager, World world) {
@@ -1123,7 +1123,7 @@ public class Colony {
         setSyrups(getSyrupsPrecise() - cost);
         pheromoneStormMonthsRemaining = GameConstants.PHEROMONE_STORM_DURATION_MONTHS;
         logEvent(ColonyLogPrefixes.INFO + " "
-                + String.format(LanguageStrings.get(LanguageStrings.LOG_PHEROMONE_STORM_STARTED_FMT),
+                + LanguageStrings.format(LanguageStrings.LOG_PHEROMONE_STORM_STARTED_FMT,
                         GameConstants.LOYALTY_MODIFIER_PHEROMONE_STORM.getLoyaltyDelta(),
                         GameConstants.PHEROMONE_STORM_DURATION_MONTHS));
         return true;
@@ -1140,7 +1140,7 @@ public class Colony {
         setProtein(getProteinPrecise() - cost);
         creatineDietMonthsRemaining = GameConstants.CREATINE_DIET_DURATION_MONTHS;
         logEvent(ColonyLogPrefixes.INFO + " "
-                + String.format(LanguageStrings.get(LanguageStrings.LOG_CREATINE_DIET_STARTED_FMT),
+                + LanguageStrings.format(LanguageStrings.LOG_CREATINE_DIET_STARTED_FMT,
                         GameConstants.CREATINE_DIET_DURATION_MONTHS));
         return true;
     }
@@ -1224,7 +1224,7 @@ public class Colony {
             this.daysWithoutQueen++;
             if (this.daysWithoutQueen == 1 || this.daysWithoutQueen == 6) {
                 this.logEvent(ColonyLogPrefixes.WARNING + " "
-                    + String.format(LanguageStrings.get(LanguageStrings.LOG_WARNING_NO_QUEEN_FMT), this.daysWithoutQueen));
+                    + LanguageStrings.format(LanguageStrings.LOG_WARNING_NO_QUEEN_FMT, this.daysWithoutQueen));
             }
         } else {
             this.daysWithoutQueen = 0;

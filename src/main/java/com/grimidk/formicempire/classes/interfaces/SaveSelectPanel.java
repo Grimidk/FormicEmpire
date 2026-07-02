@@ -119,7 +119,7 @@ public class SaveSelectPanel extends JPanel {
                 deleteButtons[i].setVisible(false);
             } else {
                 int totalDays = (s.getDay() - 1) + ((s.getMonth() - 1) * 30) + (s.getYear() * 12 * 30);
-                slotLabels[i].setText(String.format(LanguageStrings.get(LanguageStrings.SAVE_DAYS_FORMAT), s.getName(), totalDays));
+                slotLabels[i].setText(LanguageStrings.format(LanguageStrings.SAVE_DAYS_FORMAT, s.getName(), totalDays));
                 slotButtons[i].setText(LanguageStrings.get(LanguageStrings.UI_LOAD));
                 deleteButtons[i].setText(LanguageStrings.get(LanguageStrings.UI_DELETE));
                 deleteButtons[i].setVisible(true);
@@ -152,7 +152,7 @@ public class SaveSelectPanel extends JPanel {
     }
 
     private void onDelete(int slotId, int idx) {
-        int res = UiOptionPane.showConfirmDialog(this, String.format(LanguageStrings.get(LanguageStrings.SAVE_DELETE_CONFIRM), slotId), LanguageStrings.get(LanguageStrings.SAVE_DELETE_TITLE), JOptionPane.YES_NO_OPTION);
+        int res = UiOptionPane.showConfirmDialog(this, LanguageStrings.format(LanguageStrings.SAVE_DELETE_CONFIRM, slotId), LanguageStrings.get(LanguageStrings.SAVE_DELETE_TITLE), JOptionPane.YES_NO_OPTION);
         if (res != JOptionPane.YES_OPTION) return;
         boolean ok = saveManager.deleteSlot(slotId);
         if (!ok) UiOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.SAVE_DELETE_ERROR));

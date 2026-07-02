@@ -247,14 +247,14 @@ public class RoleManagementDialog extends ZeroDialog {
 
             int totalAnts = colony.getAntsByType(antType).size();
             
-            totalLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.ROLE_TOTAL_PREFIX), antType.getName(), totalAnts));
+            totalLabel = new JLabel(LanguageStrings.format(LanguageStrings.ROLE_TOTAL_PREFIX, antType.getName(), totalAnts));
             totalLabel.setFont(totalLabel.getFont().deriveFont(Font.BOLD));
             totalLabel.setForeground(AssetStyles.FONT_COLOR);
             
-            assignedLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.ROLE_ASSIGNED_PREFIX), 0));
+            assignedLabel = new JLabel(LanguageStrings.format(LanguageStrings.ROLE_ASSIGNED_PREFIX, 0));
             assignedLabel.setForeground(AssetStyles.FONT_COLOR);
             
-            unassignedLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.ROLE_UNASSIGNED_PREFIX), totalAnts));
+            unassignedLabel = new JLabel(LanguageStrings.format(LanguageStrings.ROLE_UNASSIGNED_PREFIX, totalAnts));
             unassignedLabel.setForeground(AssetStyles.FONT_COLOR);
             
             add(totalLabel);
@@ -380,7 +380,7 @@ public class RoleManagementDialog extends ZeroDialog {
                 }
                 
                 int totalAnts = colony.getAntsByType(antType).size();
-                totalLabel.setText(String.format(LanguageStrings.get(LanguageStrings.ROLE_TOTAL_PREFIX), antType.getName(), totalAnts));
+                totalLabel.setText(LanguageStrings.format(LanguageStrings.ROLE_TOTAL_PREFIX, antType.getName(), totalAnts));
 
                 int totalAssigned = 0;
                 for (JSpinner s : spinnerMap.values()) {
@@ -389,8 +389,8 @@ public class RoleManagementDialog extends ZeroDialog {
                 
                 int unassigned = totalAnts - totalAssigned;
                 
-                assignedLabel.setText(String.format(LanguageStrings.get(LanguageStrings.ROLE_ASSIGNED_PREFIX), totalAssigned));
-                unassignedLabel.setText(String.format(LanguageStrings.get(LanguageStrings.ROLE_UNASSIGNED_PREFIX), unassigned));
+                assignedLabel.setText(LanguageStrings.format(LanguageStrings.ROLE_ASSIGNED_PREFIX, totalAssigned));
+                unassignedLabel.setText(LanguageStrings.format(LanguageStrings.ROLE_UNASSIGNED_PREFIX, unassigned));
 
                 if (totalAssigned > totalAnts) {
                     assignedLabel.setForeground(AssetStyles.FONT_COLOR_ERROR);

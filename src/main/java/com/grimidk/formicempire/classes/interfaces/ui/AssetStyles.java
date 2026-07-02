@@ -40,6 +40,7 @@ import com.grimidk.formicempire.classes.interfaces.ui.styles.UiTabbedPaneStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.styles.UiTextFieldStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.styles.UiTableStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.styles.UiTableBooleanStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.util.UiNumberFormat;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiResourceLoader;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
@@ -287,6 +288,38 @@ public class AssetStyles {
 
     public static void styleDialogTable(JTable table) {
         UiTableStyles.applyDialogTable(table);
+    }
+
+    public static String formatNumber(int value) {
+        return UiNumberFormat.format(value);
+    }
+
+    public static String formatNumber(long value) {
+        return UiNumberFormat.format(value);
+    }
+
+    public static String formatNumber(float value) {
+        return UiNumberFormat.format(value);
+    }
+
+    public static String formatNumber(double value) {
+        return UiNumberFormat.format(value);
+    }
+
+    public static String formatNumber(Number value) {
+        return UiNumberFormat.format(value);
+    }
+
+    public static String formatSignedNumber(int value) {
+        return UiNumberFormat.formatSigned(value);
+    }
+
+    public static String formatRatio(long current, long max) {
+        return UiNumberFormat.formatRatio(current, max);
+    }
+
+    public static String formatRatio(int current, int max) {
+        return UiNumberFormat.formatRatio(current, max);
     }
 
     public static void fitTableColumns(JTable table) {

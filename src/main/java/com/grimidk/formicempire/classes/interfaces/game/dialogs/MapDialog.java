@@ -370,7 +370,7 @@ public class MapDialog extends ZeroDialog {
                 item.setOpaque(false);
                 item.setAlignmentX(Component.LEFT_ALIGNMENT);
                 item.setMaximumSize(new Dimension(Integer.MAX_VALUE, 28));
-                item.setToolTipText(String.format(LanguageStrings.get(LanguageStrings.MAP_CLICK_VIEW_CAPITAL), d.getName()));
+                item.setToolTipText(LanguageStrings.format(LanguageStrings.MAP_CLICK_VIEW_CAPITAL, d.getName()));
 
                 item.addMouseListener(new MouseAdapter() {
                     @Override
@@ -438,11 +438,11 @@ public class MapDialog extends ZeroDialog {
 
                 JPanel metricsPanel = new JPanel(new GridLayout(1, 2, 6, 0));
                 metricsPanel.setOpaque(false);
-                JLabel popLabel = new JLabel(String.format("%,d", pop), SwingConstants.RIGHT);
+                JLabel popLabel = new JLabel(AssetStyles.formatNumber(pop), SwingConstants.RIGHT);
                 popLabel.setFont(AssetStyles.FONT_SMALL);
                 popLabel.setForeground(AssetStyles.FONT_COLOR);
                 popLabel.setPreferredSize(new Dimension(metricsColumnWidth, popLabel.getPreferredSize().height));
-                JLabel militaryLabel = new JLabel(String.format("%,d", military), SwingConstants.RIGHT);
+                JLabel militaryLabel = new JLabel(AssetStyles.formatNumber(military), SwingConstants.RIGHT);
                 militaryLabel.setFont(AssetStyles.FONT_SMALL);
                 militaryLabel.setForeground(AssetStyles.FONT_COLOR);
                 militaryLabel.setPreferredSize(new Dimension(metricsColumnWidth, militaryLabel.getPreferredSize().height));
@@ -575,7 +575,7 @@ public class MapDialog extends ZeroDialog {
                             sb.append("<br><i>").append(c.getName()).append("</i>");
                         }
                         sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_MILITARY_POWER))
-                                .append(String.format("%,d", c.getMilitaryPower()));
+                                .append(AssetStyles.formatNumber(c.getMilitaryPower()));
 
                         Dynasty dynasty = c.getDynasty();
                         if (dynasty != null) {
@@ -584,7 +584,7 @@ public class MapDialog extends ZeroDialog {
                                 sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_DYNASTY_RANK)).append(dynasty.getRank().getName());
                             }
                             sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_DYNASTY_MILITARY_POWER))
-                                    .append(String.format("%,d", dynasty.getMilitaryPower()));
+                                    .append(AssetStyles.formatNumber(dynasty.getMilitaryPower()));
                             Dynasty playerDynasty = findPlayerDynasty();
                             if (playerDynasty != null && !dynasty.isPlayer() && playerDynasty.getDiplomacyService() != null) {
                                 int rep = playerDynasty.getDiplomacyService().getEffectiveDiplomaticReputation(dynasty, world);

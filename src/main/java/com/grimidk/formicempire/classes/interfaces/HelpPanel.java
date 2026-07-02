@@ -518,7 +518,7 @@ public class HelpPanel extends JPanel {
 
             AntType antType = role.getAntType();
             String typeLine = antType != null
-                    ? String.format(LanguageStrings.get(LanguageStrings.HELP_ROLE_ANT_TYPE), antType.getName())
+                    ? LanguageStrings.format(LanguageStrings.HELP_ROLE_ANT_TYPE, antType.getName())
                     : "";
             String desc = LanguageStrings.get(roleDescriptionKey(role));
             String body = helpHtml("width:350px;font-size:11pt;",
@@ -999,7 +999,7 @@ public class HelpPanel extends JPanel {
                         Upgrade u = (Upgrade) selected;
                         body.append("<b>").append(u.getFlavorName()).append("</b><br><br>");
                         body.append(u.getDescription()).append("<br><br>");
-                        body.append("<b>").append(LanguageStrings.get("UI_COST")).append(":</b> ").append(u.getCost()).append(" RP");
+                        body.append("<b>").append(LanguageStrings.get("UI_COST")).append(":</b> ").append(AssetStyles.formatNumber(u.getCost())).append(" RP");
                         if (u.getRequirement() != null) {
                             body.append("<br><b>").append(LanguageStrings.get("UI_REQUIREMENTS")).append(":</b> ").append(u.getRequirement().getFlavorName());
                         }
@@ -1009,15 +1009,15 @@ public class HelpPanel extends JPanel {
                         body.append(b.getDescription());
                         if (b.getBuildTime() > 0) {
                              body.append("<br><br><b>").append(LanguageStrings.get("HELP_BUILD_BASE_COST")).append(":</b><br>");
-                             body.append(b.getMineralCost()).append(" ").append(LanguageStrings.get("RESOURCE_ROCK")).append(", ");
-                             body.append(b.getResinCost()).append(" ").append(LanguageStrings.get("RESOURCE_RESIN")).append(", ");
-                             body.append(b.getBuildTime()).append(" Hours");
+                             body.append(AssetStyles.formatNumber(b.getMineralCost())).append(" ").append(LanguageStrings.get("RESOURCE_ROCK")).append(", ");
+                             body.append(AssetStyles.formatNumber(b.getResinCost())).append(" ").append(LanguageStrings.get("RESOURCE_RESIN")).append(", ");
+                             body.append(AssetStyles.formatNumber(b.getBuildTime())).append(" Hours");
                         }
                     } else if (selected instanceof Assimilation) {
                         Assimilation a = (Assimilation) selected;
                         body.append("<b>").append(a.getName()).append("</b><br><br>");
                         body.append(a.getDescription()).append("<br><br>");
-                        body.append("<b>").append(LanguageStrings.get("UI_COST")).append(":</b> ").append(a.getCost()).append(" RP");
+                        body.append("<b>").append(LanguageStrings.get("UI_COST")).append(":</b> ").append(AssetStyles.formatNumber(a.getCost())).append(" RP");
                     }
                     
                     descriptionArea.setText(helpHtml("font-size:11pt;width:250px;", body.toString()));

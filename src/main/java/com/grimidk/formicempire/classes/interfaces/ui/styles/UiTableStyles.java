@@ -5,8 +5,12 @@ import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import java.awt.Component;
 import java.awt.Dimension;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
+
+import com.grimidk.formicempire.classes.interfaces.ui.util.UiNumberFormat;
 
 /** Shared JTable layout helpers — column sizing and dialog defaults. */
 public final class UiTableStyles {
@@ -31,6 +35,28 @@ public final class UiTableStyles {
         table.setSelectionBackground(AssetStyles.SELECTION_BACKGROUND);
         table.setSelectionForeground(AssetStyles.FONT_COLOR);
         styleHeader(table);
+        applyDefaultNumberRenderers(table);
+    }
+
+    private static void applyDefaultNumberRenderers(JTable table) {
+        DefaultTableCellRenderer renderer = new DefaultTableCellRenderer() {
+            @Override
+            public void setValue(Object value) {
+                if (value instanceof Number number) {
+                    setText(UiNumberFormat.format(number));
+                } else {
+                    super.setValue(value);
+                }
+            }
+        };
+        renderer.setHorizontalAlignment(SwingConstants.RIGHT);
+        table.setDefaultRenderer(Number.class, renderer);
+        table.setDefaultRenderer(Integer.class, renderer);
+        table.setDefaultRenderer(Long.class, renderer);
+        table.setDefaultRenderer(Float.class, renderer);
+        table.setDefaultRenderer(Double.class, renderer);
+        table.setDefaultRenderer(Short.class, renderer);
+        table.setDefaultRenderer(Byte.class, renderer);
     }
 
     public static void styleHeader(JTable table) {
