@@ -52,6 +52,7 @@ public class Colony {
     private int age;
     private int daysWithoutQueen;
     private int loyalty = GameConstants.DEFAULT_COLONY_LOYALTY;
+    private int militaryPower;
     
     // --- Population Data ---
     private final Map<AntType, List<Ant>> antGroups;
@@ -259,6 +260,7 @@ public class Colony {
         this.age = savedColony.age;
         this.daysWithoutQueen = savedColony.daysWithoutQueen;
         this.loyalty = GameConstants.clampColonyLoyalty(savedColony.loyalty);
+        this.militaryPower = savedColony.militaryPower;
         this.totalDeaths = savedColony.totalDeaths;
 
         loadBuildings(savedColony);
@@ -418,6 +420,12 @@ public class Colony {
 
     public int getLoyalty() { return loyalty; }
 
+    public int getMilitaryPower() { return militaryPower; }
+
+    public void setMilitaryPower(int militaryPower) {
+        this.militaryPower = Math.max(0, militaryPower);
+    }
+
     public void setLoyalty(int loyalty) {
         this.loyalty = GameConstants.clampColonyLoyalty(loyalty);
     }
@@ -436,7 +444,45 @@ public class Colony {
         if (pheromoneStormMonthsRemaining > 0) {
             bonus += GameConstants.LOYALTY_MODIFIER_PHEROMONE_STORM.getLoyaltyDelta();
         }
+        bonus += getMilitaryLoyaltyAdjustment();
+        bonus += getDistanceFromCapitalLoyaltyAdjustment(world);
         return bonus;
+    }
+
+    private int getDistanceFromCapitalLoyaltyAdjustment(World world) {
+        if (isCapital || dynasty == null || world == null) {
+            return 0;
+        }
+        Colony capital = dynasty.getCapital();
+        if (capital == null || capital == this) {
+            return 0;
+        }
+        int tiles = world.colonyHexDistance(this, capital);
+        return GameConstants.getCapitalDistanceLoyaltyPenalty(tiles);
+    }
+
+    /** Hex tile distance to dynasty capital, or -1 if unknown. */
+    public int getCapitalHexDistance(World world) {
+        if (isCapital || dynasty == null || world == null) {
+            return 0;
+        }
+        Colony capital = dynasty.getCapital();
+        if (capital == null || capital == this) {
+            return -1;
+        }
+        return world.colonyHexDistance(this, capital);
+    }
+
+    private int getMilitaryLoyaltyAdjustment() {
+        if (isCapital || dynasty == null) {
+            return 0;
+        }
+        Colony capital = dynasty.getCapital();
+        if (capital == null || capital == this) {
+            return 0;
+        }
+        return ColonyMilitaryService.getMilitaryLoyaltyAdjustment(
+                getMilitaryPower(), capital.getMilitaryPower(), isCapital);
     }
 
     public int getEffectiveLoyalty(TradeManager tradeManager, World world) {
@@ -461,6 +507,22 @@ public class Colony {
         }
         if (pheromoneStormMonthsRemaining > 0) {
             appendLoyaltyModifierLine(sb, GameConstants.LOYALTY_MODIFIER_PHEROMONE_STORM);
+        }
+        int militaryAdj = getMilitaryLoyaltyAdjustment();
+        if (militaryAdj != 0) {
+            sb.append(String.format(
+                    LanguageStrings.get(LanguageStrings.LOYALTY_MODIFIER_LINE),
+                    LanguageStrings.get(LanguageStrings.LOYALTY_MODIFIER_MILITARY_VS_CAPITAL),
+                    militaryAdj)).append("<br>");
+        }
+        int distanceAdj = getDistanceFromCapitalLoyaltyAdjustment(world);
+        if (distanceAdj != 0) {
+            int tiles = getCapitalHexDistance(world);
+            sb.append(String.format(
+                    LanguageStrings.get(LanguageStrings.LOYALTY_MODIFIER_DISTANCE_LINE),
+                    LanguageStrings.get(LanguageStrings.LOYALTY_MODIFIER_DISTANCE_FROM_CAPITAL),
+                    tiles,
+                    distanceAdj)).append("<br>");
         }
 
         sb.append(LanguageStrings.get(LanguageStrings.LOYALTY_TOOLTIP_EFFECTIVE))
@@ -1154,6 +1216,7 @@ public class Colony {
             if (this.age >= 7) {
                 matureColony();
             }
+            ColonyMilitaryService.refreshColonyMilitaryPower(this);
             return;
         }
 
@@ -1190,6 +1253,7 @@ public class Colony {
         }
 
         this.age++;
+        ColonyMilitaryService.refreshColonyMilitaryPower(this);
     }
 
     public void matureColony() {

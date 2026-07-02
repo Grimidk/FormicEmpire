@@ -131,6 +131,7 @@ public class FrenchTranslation implements Translation {
         fr.put("COLONY_RESEARCH_RATE", "Taux de recherche : %d/jour");
         fr.put("COLONY_JUVENILE_ANTS", "Fourmis juvéniles : %d");
         fr.put("COLONY_ADULT_ANTS", "Fourmis adultes : %d");
+        fr.put("COLONY_MILITARY_POWER", "Puissance militaire : %,d");
 
         fr.put("TOOLTIP_PET_INSECTS", "Insectes de compagnie gardés par les éleveuses et capturantes. Voir l'onglet Insectes dans les statistiques de colonie (X) pour le détail par espèce.");
         fr.put("TOOLTIP_PARASITIC_MITES", "Acariens microscopiques sur vos fourmis. Tous les 10 acariens ralentissent une fourmi de moitié. Propagation mensuelle quand les réserves sont élevées.");
@@ -308,10 +309,14 @@ public class FrenchTranslation implements Translation {
         fr.put("MAP_TOOLTIP_SPECIES", "<br><b>Espèce :</b> ");
         fr.put("MAP_TOOLTIP_DYNASTY", "<br><b>Dynastie :</b> ");
         fr.put("MAP_TOOLTIP_DYNASTY_RANK", "<br><b>Rang dynastie :</b> ");
+        fr.put("MAP_TOOLTIP_MILITARY_POWER", "<br><b>Puissance militaire de colonie :</b> ");
+        fr.put("MAP_TOOLTIP_DYNASTY_MILITARY_POWER", "<br><b>Puissance militaire de dynastie :</b> ");
+        fr.put("MAP_LEGEND_MILITARY", "Puiss.");
         fr.put("MAP_TOOLTIP_EMPTY", "<br><i>Vide</i>");
         fr.put("MAP_DYNASTY_DIPLO_FORMAT", "%s · %s");
         fr.put("MAP_SORT_BY_POPULATION", "Tri : Population");
         fr.put("MAP_SORT_BY_DIPLOMACY", "Tri : Diplomatie (hostile → amicale)");
+        fr.put("MAP_SORT_BY_MILITARY", "Tri : Puissance militaire");
         fr.put("MAP_LEGEND_SHOW", "Afficher la légende");
         fr.put("MAP_LEGEND_HIDE", "Masquer la légende");
 
@@ -346,6 +351,8 @@ public class FrenchTranslation implements Translation {
         fr.put("DYNASTY_DEFAULT_AUTOMATION_TOOLTIP", "Activer automatiquement l'automatisation pour toutes les nouvelles colonies de cette dynastie.");
         fr.put("DYNASTY_SATELLITE", "Satellite");
         fr.put("STAT_LOYALTY", "Loyauté");
+        fr.put("STAT_MILITARY_POWER", "Puissance militaire");
+        fr.put("STAT_MILITARY_POWER_DESC", "Effectifs par type adulte (rôles ignorés) pondérés par les stats de combat de base. Mis à jour une fois par jour.");
         fr.put("DYNASTY_REPUTATION", "Réputation");
         fr.put("DYNASTY_REPUTATION_STANCE", "Position");
         fr.put("SCORE_TIER_FORMAT", "%d · %s");
@@ -620,11 +627,15 @@ public class FrenchTranslation implements Translation {
         fr.put("DIPLO_MODIFIER_TRADE", "Route commerciale");
         fr.put("DIPLO_MODIFIER_TRADE_REQUEST", "Demande commerciale");
         fr.put("DIPLO_MODIFIER_BORDER_FRICTION", "Friction frontalière");
+        fr.put("DIPLO_MILITARY_STRENGTH", "Force militaire");
         fr.put("GI_MODIFIER_PACT", "Alliance de pacte");
         fr.put("LOYALTY_MODIFIER_TRADE", "Commerce actif");
         fr.put("LOYALTY_MODIFIER_TUNNEL", "Liaison de tunnel");
         fr.put("LOYALTY_MODIFIER_CAPITAL", "Capitale");
         fr.put("LOYALTY_MODIFIER_PHEROMONE_STORM", "Tempête de Phéromones");
+        fr.put("LOYALTY_MODIFIER_MILITARY_VS_CAPITAL", "Militaire vs capitale");
+        fr.put("LOYALTY_MODIFIER_DISTANCE_FROM_CAPITAL", "Distance à la capitale");
+        fr.put("LOYALTY_MODIFIER_DISTANCE_LINE", "%s (%d cases): %+d");
         fr.put("DIPLO_ACTION_FORM_PACT", "Former un pacte");
         fr.put("DIPLO_ACTION_BREAK_PACT", "Rompre le pacte");
         fr.put("DIPLO_ACTION_TRADE", "Commerce");
@@ -1098,9 +1109,14 @@ public class FrenchTranslation implements Translation {
         
         fr.put("HELP_EMPIRE_TRADE", "Méthodes de commerce");
         fr.put("HELP_EMPIRE_LOYALTY", "Paliers de loyauté des colonies");
+        fr.put("HELP_EMPIRE_MILITARY_POWER", "Puissance militaire");
+        fr.put("HELP_MILITARY_POWER_BODY", "<b>Puissance militaire</b> estime la force de combat selon les types adultes (rôles ignorés) : Ouvrières x1, Soldats x5, Majors x15, Princesses x10, Reines x50, modulée par les stats de combat de base (Squelette + Acide = multiplicateur complet). Recalculée une fois par jour du monde.");
         fr.put("HELP_EMPIRE_REPUTATION", "Postures de réputation diplomatique");
         fr.put("HELP_EMPIRE_MOVEMENT", "Mouvement des insectes de compagnie");
         fr.put("HELP_TIER_MIN_SCORE", " (min. %d)");
+        fr.put("HELP_LOYALTY_MODIFIERS_TITLE", "Modificateurs actifs");
+        fr.put("HELP_LOYALTY_MODIFIER_MILITARY", "Militaire vs capitale : +/-1 à +/-10 selon le ratio de puissance avec la capitale (colonies plus faibles gagnent ; satellites plus forts perdent).");
+        fr.put("HELP_LOYALTY_MODIFIER_DISTANCE", "Distance à la capitale : 0 à 1 case, jusqu'à -10 à 10+ cases (linéaire entre les deux).");
         fr.put("HELP_ROLE_ANT_TYPE", "Type de fourmi : %s");
         fr.put("HOTKEY_PAUSE_LABEL", "Pause/Jouer :");
         fr.put("HOTKEY_ESC_LABEL", "Menu jeu :");
@@ -1233,6 +1249,8 @@ public class FrenchTranslation implements Translation {
         fr.put("DYNASTY_SORT_AGE_NEW", "Âge (plus récente d'abord)");
         fr.put("DYNASTY_SORT_LOYALTY_HIGH", "Loyauté (plus élevée d'abord)");
         fr.put("DYNASTY_SORT_LOYALTY_LOW", "Loyauté (plus faible d'abord)");
+        fr.put("DYNASTY_SORT_MILITARY_HIGH", "Puissance militaire (plus élevée d'abord)");
+        fr.put("DYNASTY_SORT_MILITARY_LOW", "Puissance militaire (plus faible d'abord)");
 
         fr.put("SETTINGS_DEFAULT_ROLE_WORKER", "Rôle ouvrière par défaut :");
         fr.put("SETTINGS_DEFAULT_ROLE_SOLDIER", "Rôle soldate par défaut :");

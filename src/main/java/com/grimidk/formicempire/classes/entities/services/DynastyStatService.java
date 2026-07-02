@@ -77,4 +77,8 @@ public class DynastyStatService {
     public int getTotalColonies(Dynasty dynasty) {
         return dynasty != null ? dynasty.getColonies().size() : 0;
     }
+
+    public int getMilitaryPower(Dynasty dynasty) {
+        return dynasty != null ? dynasty.getMilitaryPower() : 0;
+    }
 }

@@ -29,6 +29,8 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
@@ -214,9 +216,15 @@ public class StatsDialog extends ZeroDialog {
                         tier.getName()));
                 setIcon(tier.getIcon());
                 setIconTextGap(6);
+            } else if (LanguageStrings.get(LanguageStrings.STAT_MILITARY_POWER).equals(property) && value instanceof Integer power) {
+                setText(String.format("%,d", power));
+                setIcon(GameConstants.ICON_STAT_MILITARY_POWER);
+                setIconTextGap(6);
+                setToolTipText(LanguageStrings.get(LanguageStrings.STAT_MILITARY_POWER_DESC));
             } else {
                 setIcon(null);
                 setText(value != null ? value.toString() : "");
+                setToolTipText(null);
             }
             return this;
         }
@@ -266,6 +274,23 @@ public class StatsDialog extends ZeroDialog {
         String[] columns = {LanguageStrings.get(LanguageStrings.COL_CATEGORY), LanguageStrings.get(LanguageStrings.COL_PROPERTY), LanguageStrings.get(LanguageStrings.COL_VALUE)};
         generalTable = new JTable(createIconModel(columns));
         applyGeneralValueRenderer(generalTable);
+        generalTable.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                int row = generalTable.rowAtPoint(e.getPoint());
+                int col = generalTable.columnAtPoint(e.getPoint());
+                if (row >= 0 && col >= 0
+                        && LanguageStrings.get(LanguageStrings.STAT_LOYALTY)
+                                .equals(generalTable.getModel().getValueAt(row, 1))
+                        && !dynastyModeToggle.isSelected()) {
+                    generalTable.setToolTipText(colony.buildLoyaltyModifierTooltip(
+                            engine != null ? engine.getTradeManager() : null,
+                            engine != null ? engine.getWorld() : null));
+                    return;
+                }
+                generalTable.setToolTipText(null);
+            }
+        });
         tabbedPane.addTab(LanguageStrings.get(LanguageStrings.STATS_TAB_GENERAL), createTablePane(generalTable));
     }
     
@@ -450,6 +475,7 @@ public class StatsDialog extends ZeroDialog {
                 
                 int totalQueens = dynasty.getColonies().stream().mapToInt(c -> c.getQueens().size()).sum();
                 model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_GLOBAL_QUEENS), totalQueens});
+                model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_MILITARY_POWER), dynasty.getMilitaryPower()});
             }
         } else {
             // Colony Info
@@ -465,6 +491,11 @@ public class StatsDialog extends ZeroDialog {
                     LanguageStrings.get(LanguageStrings.PANEL_COLONY),
                     LanguageStrings.get(LanguageStrings.STAT_LOYALTY),
                     effectiveLoyalty
+            });
+            model.addRow(new Object[]{
+                    LanguageStrings.get(LanguageStrings.PANEL_COLONY),
+                    LanguageStrings.get(LanguageStrings.STAT_MILITARY_POWER),
+                    colony.getMilitaryPower()
             });
             
             if (colony.getQueens().isEmpty()) {
@@ -522,6 +553,7 @@ public class StatsDialog extends ZeroDialog {
         
         model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_TOTAL_COLONIES), dynastyStatsService.getTotalColonies(dynasty)});
         model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_GLOBAL_POP), dynastyStatsService.getTotalPopulation(dynasty)});
+        model.addRow(new Object[]{GameConstants.ICON_STAT_MILITARY_POWER, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_MILITARY_POWER), String.format("%,d", dynasty.getMilitaryPower())});
         model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_NUPTIAL_FLIGHTS), dynasty.getTotalNuptialFlights()});
         model.addRow(new Object[]{GameConstants.ICON_STAT_GENETIC_INTEGRITY, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_GENETIC_INTEGRITY), String.format("%.1f%%", dynasty.getGeneticIntegrity())});
 
@@ -723,6 +755,17 @@ public class StatsDialog extends ZeroDialog {
         model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.UI_SUMMARY), LanguageStrings.get(LanguageStrings.STAT_ADULTS), totalAdult});
         model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.UI_SUMMARY), LanguageStrings.get(LanguageStrings.STAT_JUVENILES), totalJuvenile});
         model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.UI_SUMMARY), dynastyModeToggle.isSelected() ? LanguageStrings.get(LanguageStrings.STAT_DYNASTY_TOTAL) : LanguageStrings.get(LanguageStrings.STAT_COLONY_TOTAL), grandTotal});
+
+        int militaryTotal = 0;
+        for (Colony c : coloniesToCount) {
+            militaryTotal += c.getMilitaryPower();
+        }
+        model.addRow(new Object[]{
+                GameConstants.ICON_STAT_MILITARY_POWER,
+                LanguageStrings.get(LanguageStrings.UI_SUMMARY),
+                LanguageStrings.get(LanguageStrings.STAT_MILITARY_POWER),
+                militaryTotal
+        });
     }
 
     private void updateRatesData() {

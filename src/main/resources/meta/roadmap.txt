@@ -1,11 +1,7 @@
 Here is the current roadmap of features and fixes:
 
 Missing assets:
-	Pixel art pass (general)
-	Convoy / tunnel logistics — missing sprite:
-		sprites/buildings/rooms/transitPortal.png — underworld portal mouth, off-map right of logistics / transit chamber (nest-entrance style)
-		sprites/tunnel/tunnelTile.png — repeating tunnel dimension background (future convoy view / simulation screen)
-		sprites/tunnel/tunnelPortal.png — portal frame visible inside tunnel dimension (future)
+	Convoy / tunnel logistics — missing sprite: tunel sprite, and convoy backgrounds (land and sky)
 	Map hexes — look yank
 	Font - self explanatory
 
@@ -15,17 +11,17 @@ To Fix (By decreasing priority) :
 	(none right now)
 	
 	High:
-	TODO: icons/sprites for all Constant types still missing assets (grep "TODO asset" in GameConstants and constant classes — roles, moves, upgrades, buildings, assimilations)
-	automate diplomatic actions and diplomat missions
-	ai accept/decline trades and offer trades
+	TODO: icons/sprites for all Constants (roles, moves) and unlocks (all)
+	automate diplomatic actions and diplomat missions and accept/decline trades and offer trades
+	speed up button still not working
 
 	Mid:
-	show loyalty icon in map 
 	mac executable
+	metric number sumarization
 
 	Low:
-	convoy tunnel dimension rendering (tile + portal art; movement sim exists, sync to Trade hours later)
-
+	(none right now)
+  
 	Can't reproduce:
 	(none right now)
 
@@ -38,27 +34,25 @@ Needed for launch (v1.0) (Launch Version):
 	rebellions and rebel colonies ( too much causes a rebellious dynasty to appear, once capital defeated it gets reabsorbed)
 	grant independence and modifier for it
 	battle system (mass battle in land and air, tick based loses based on active/passive military strenght from 1:1 = 50% chance and 1% loses up to 1:10 100% chance and 100% loses, 2 staged war until the queens are dead; war cancels active cross-dynasty trades)
+	war economy check (takes a day to transition)
 	assimilations ( Trap-jaw (Trap jaw ants), Honey-pot (Honey pot ants), Door-head (Turtle ants), Wood burrowing (Carpenter ants), Silk weaving (Weaver ants), Rafting (Flood plains ants), Fire venom (Fire ants), Jumping (Jet ants), Gliding (Gliding ants), Stinging (Bullet ants), Swarming (Army ants), Stealth (Ghost ants), Fast bitting (Dracula ants), Heat resistance (Saharan silver ants), Deadly venom (Harvester ants), Self destruction (Exploding ants), Far sight (Bulldog ants), Hive building (Shining black ants), Location sensing (Desert ants))
 
 	Everything else :
-	ant subtypes (enable by role / exclusion) checks with new sprites 
-	simulation screen to see battles, transports ("view convoy" option using going and returning biomes for tiles, or underground or air), maybe something else
-	revamp story and lore and maybe intro screen
-	more socialism (?)
+	ant subtypes (enable by role / exclusion) checks with new sprites, manage by hatch rate since they cant be changed
+	simulation screen to see battles, transports ("view convoy" option using going and returning biomes for tiles, or underground or air)
 	minerals
-	research tree and building tree (after)
+	research tree and building tree (after icons)
 	rework how carrying looks completely
 	main menu screen maybe simulation like factorio
 	synergies ( Super majors + Chemical throwing = Artillery ants; Self destruction + Acid spitting = Corrosive bombs; Silk weaving + Hive building = Web building; Air-force ants + self destruction = Air-bomber ants)
-	more upgrades
-	more buildings
-	more abilities 
+	more upgrades and more buildings
 	more roles (commander and captain roles, air force)
 	more enemies ( Rebel ant colonies, Bugs, Arachnids, Reptiles, Birds, Rodents, Zombie ant colonies)
 	more stats (kills, historic productions, graphs?)
 	more bugs (constants and icons and scienctific name)
 	non-ant assimilation ( Winged workers (Bees), Spiked larvae, Chemical throwing (Bombardier beetle), Chirping (Grass hopper), Diving, Mineralized exoskeletons, Rock mining, Bioluminescence (Fireflies), Static electricity generation, Pollination (Flies) )
-	rework tutorial and obscure unlocks in menus
+	revamp story and lore and maybe intro screen
+	rework tutorial to clearer and obscure unlocks in menus, disable tutorial option and konami code to unboscure all
 	rework start and choose difficulty / biome / species
 	rework abilities and alerts and triggers (new classes?)
 	rework saves to be cleaner
@@ -67,9 +61,9 @@ Needed for launch (v1.0) (Launch Version):
 	music and sounds and settings for them and player panel (to include in core engine)
 	promo video 
 	langs (GER, RUS, CHN, JAP) and translate credits and roadmap
-	proper start animation and general animations and roadmap and credits
+	proper start animation and general animations and roadmap and credits, epilepsy warning
 	register Grim Games or Grimidk in steam as dev team
-	stean upload and demo version
+	steam upload and demo version
 	versioning to go back to previous stable patches
 	cleanup code (no placeholders) and refactor inefficiencies with inheritance and stuff, hexagonal architecture, async functions and clean comments 
 
@@ -90,4 +84,7 @@ Post launch (v1.1) (Improvements Update):
 	achievements (to include in core)
 
 Post launch (v1.2) (Civilization Update):
+	(Secret for now)
+
+Post launch (v1.3) (Globalization Update):
 	(Secret for now)

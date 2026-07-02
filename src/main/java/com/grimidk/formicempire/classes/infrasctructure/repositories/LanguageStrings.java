@@ -237,6 +237,7 @@ public final class LanguageStrings {
     public static final String COLONY_RESEARCH_RATE = "COLONY_RESEARCH_RATE";
     public static final String COLONY_JUVENILE_ANTS = "COLONY_JUVENILE_ANTS";
     public static final String COLONY_ADULT_ANTS = "COLONY_ADULT_ANTS";
+    public static final String COLONY_MILITARY_POWER = "COLONY_MILITARY_POWER";
     
     public static final String TOOLTIP_PET_INSECTS = "TOOLTIP_PET_INSECTS";
     public static final String TOOLTIP_PARASITIC_MITES = "TOOLTIP_PARASITIC_MITES";
@@ -418,6 +419,7 @@ public final class LanguageStrings {
     public static final String MAP_DYNASTY_DIPLO_FORMAT = "MAP_DYNASTY_DIPLO_FORMAT";
     public static final String MAP_SORT_BY_POPULATION = "MAP_SORT_BY_POPULATION";
     public static final String MAP_SORT_BY_DIPLOMACY = "MAP_SORT_BY_DIPLOMACY";
+    public static final String MAP_SORT_BY_MILITARY = "MAP_SORT_BY_MILITARY";
     public static final String MAP_LEGEND_SHOW = "MAP_LEGEND_SHOW";
     public static final String MAP_LEGEND_HIDE = "MAP_LEGEND_HIDE";
 
@@ -452,6 +454,15 @@ public final class LanguageStrings {
     public static final String DYNASTY_DEFAULT_AUTOMATION_TOOLTIP = "DYNASTY_DEFAULT_AUTOMATION_TOOLTIP";
     public static final String DYNASTY_SATELLITE = "DYNASTY_SATELLITE";
     public static final String STAT_LOYALTY = "STAT_LOYALTY";
+    public static final String STAT_MILITARY_POWER = "STAT_MILITARY_POWER";
+    public static final String STAT_MILITARY_POWER_DESC = "STAT_MILITARY_POWER_DESC";
+    public static final String DYNASTY_SORT_MILITARY_HIGH = "DYNASTY_SORT_MILITARY_HIGH";
+    public static final String DYNASTY_SORT_MILITARY_LOW = "DYNASTY_SORT_MILITARY_LOW";
+    public static final String MAP_LEGEND_MILITARY = "MAP_LEGEND_MILITARY";
+    public static final String MAP_TOOLTIP_MILITARY_POWER = "MAP_TOOLTIP_MILITARY_POWER";
+    public static final String MAP_TOOLTIP_DYNASTY_MILITARY_POWER = "MAP_TOOLTIP_DYNASTY_MILITARY_POWER";
+    public static final String HELP_EMPIRE_MILITARY_POWER = "HELP_EMPIRE_MILITARY_POWER";
+    public static final String HELP_MILITARY_POWER_BODY = "HELP_MILITARY_POWER_BODY";
     public static final String DYNASTY_REPUTATION = "DYNASTY_REPUTATION";
     public static final String DYNASTY_REPUTATION_STANCE = "DYNASTY_REPUTATION_STANCE";
     public static final String SCORE_TIER_FORMAT = "SCORE_TIER_FORMAT";
@@ -878,9 +889,13 @@ public final class LanguageStrings {
     public static final String DIPLO_TOOLTIP_BASE = "DIPLO_TOOLTIP_BASE";
     public static final String DIPLO_TOOLTIP_EFFECTIVE = "DIPLO_TOOLTIP_EFFECTIVE";
     public static final String DIPLO_MODIFIER_LINE = "DIPLO_MODIFIER_LINE";
+    public static final String DIPLO_MILITARY_STRENGTH = "DIPLO_MILITARY_STRENGTH";
     public static final String LOYALTY_TOOLTIP_BASE = "LOYALTY_TOOLTIP_BASE";
     public static final String LOYALTY_TOOLTIP_EFFECTIVE = "LOYALTY_TOOLTIP_EFFECTIVE";
     public static final String LOYALTY_MODIFIER_LINE = "LOYALTY_MODIFIER_LINE";
+    public static final String LOYALTY_MODIFIER_MILITARY_VS_CAPITAL = "LOYALTY_MODIFIER_MILITARY_VS_CAPITAL";
+    public static final String LOYALTY_MODIFIER_DISTANCE_FROM_CAPITAL = "LOYALTY_MODIFIER_DISTANCE_FROM_CAPITAL";
+    public static final String LOYALTY_MODIFIER_DISTANCE_LINE = "LOYALTY_MODIFIER_DISTANCE_LINE";
 
     public static final String SPECIES_OMNI = "SPECIES_OMNI";
     public static final String SPECIES_OMNI_SCIENTIFIC = "SPECIES_OMNI_SCIENTIFIC";
@@ -1269,6 +1284,9 @@ public final class LanguageStrings {
     public static final String HELP_EMPIRE_REPUTATION = "HELP_EMPIRE_REPUTATION";
     public static final String HELP_EMPIRE_MOVEMENT = "HELP_EMPIRE_MOVEMENT";
     public static final String HELP_TIER_MIN_SCORE = "HELP_TIER_MIN_SCORE";
+    public static final String HELP_LOYALTY_MODIFIERS_TITLE = "HELP_LOYALTY_MODIFIERS_TITLE";
+    public static final String HELP_LOYALTY_MODIFIER_MILITARY = "HELP_LOYALTY_MODIFIER_MILITARY";
+    public static final String HELP_LOYALTY_MODIFIER_DISTANCE = "HELP_LOYALTY_MODIFIER_DISTANCE";
     public static final String HELP_ROLE_ANT_TYPE = "HELP_ROLE_ANT_TYPE";
 
     public static final String METHOD_LAND_DESC = "METHOD_LAND_DESC";

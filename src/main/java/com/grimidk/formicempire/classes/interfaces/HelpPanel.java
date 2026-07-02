@@ -3,6 +3,7 @@ package com.grimidk.formicempire.classes.interfaces;
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ColonyLoyalty;
+import com.grimidk.formicempire.classes.constants.misc.ColonyLoyaltyModifier;
 import com.grimidk.formicempire.classes.constants.misc.DiplomaticReputation;
 import com.grimidk.formicempire.classes.constants.misc.TradeMethod;
 import com.grimidk.formicempire.classes.constants.misc.BugType;
@@ -548,6 +549,8 @@ public class HelpPanel extends JPanel {
         panel.add(Box.createRigidArea(new Dimension(0, 10)));
         panel.add(wrapEmpireSection(LanguageStrings.HELP_EMPIRE_LOYALTY, createLoyaltySection()));
         panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(wrapEmpireSection(LanguageStrings.HELP_EMPIRE_MILITARY_POWER, createMilitaryPowerSection()));
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
         panel.add(wrapEmpireSection(LanguageStrings.HELP_EMPIRE_REPUTATION, createReputationSection()));
 
         JScrollPane scrollPane = new JScrollPane(panel);
@@ -602,7 +605,60 @@ public class HelpPanel extends JPanel {
             item.setIconTextGap(8);
             list.add(item);
         }
+
+        list.add(Box.createRigidArea(new Dimension(0, 8)));
+        JLabel modifiersTitle = new JLabel(LanguageStrings.get(LanguageStrings.HELP_LOYALTY_MODIFIERS_TITLE));
+        modifiersTitle.setFont(AssetStyles.FONT_BOLD);
+        modifiersTitle.setForeground(AssetStyles.FONT_COLOR_HEADER);
+        modifiersTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
+        list.add(modifiersTitle);
+        list.add(Box.createRigidArea(new Dimension(0, 4)));
+
+        for (ColonyLoyaltyModifier modifier : GameConstants.getColonyLoyaltyModifiers()) {
+            String line = String.format(
+                    LanguageStrings.get(LanguageStrings.LOYALTY_MODIFIER_LINE),
+                    modifier.getName(),
+                    modifier.getLoyaltyDelta());
+            JLabel item = new JLabel(line, GameConstants.ICON_STAT_LOYALTY, SwingConstants.LEFT);
+            item.setFont(AssetStyles.FONT_NORMAL);
+            item.setForeground(AssetStyles.FONT_COLOR);
+            item.setIconTextGap(8);
+            item.setAlignmentX(Component.LEFT_ALIGNMENT);
+            list.add(item);
+        }
+        JLabel militaryLine = new JLabel(
+                LanguageStrings.get(LanguageStrings.HELP_LOYALTY_MODIFIER_MILITARY),
+                GameConstants.ICON_STAT_MILITARY_POWER,
+                SwingConstants.LEFT);
+        militaryLine.setFont(AssetStyles.FONT_NORMAL);
+        militaryLine.setForeground(AssetStyles.FONT_COLOR);
+        militaryLine.setIconTextGap(8);
+        militaryLine.setAlignmentX(Component.LEFT_ALIGNMENT);
+        list.add(militaryLine);
+        JLabel distanceLine = new JLabel(
+                LanguageStrings.get(LanguageStrings.HELP_LOYALTY_MODIFIER_DISTANCE),
+                GameConstants.ICON_STAT_LOYALTY,
+                SwingConstants.LEFT);
+        distanceLine.setFont(AssetStyles.FONT_NORMAL);
+        distanceLine.setForeground(AssetStyles.FONT_COLOR);
+        distanceLine.setIconTextGap(8);
+        distanceLine.setAlignmentX(Component.LEFT_ALIGNMENT);
+        list.add(distanceLine);
         return list;
+    }
+
+    private JPanel createMilitaryPowerSection() {
+        JPanel panel = new JPanel(new BorderLayout(8, 0));
+        panel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        panel.setBorder(new EmptyBorder(8, 8, 8, 8));
+        JLabel iconLabel = new JLabel(GameConstants.ICON_STAT_MILITARY_POWER);
+        iconLabel.setVerticalAlignment(SwingConstants.TOP);
+        panel.add(iconLabel, BorderLayout.WEST);
+        JLabel body = new JLabel("<html>" + LanguageStrings.get(LanguageStrings.HELP_MILITARY_POWER_BODY) + "</html>");
+        body.setFont(AssetStyles.FONT_NORMAL);
+        body.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(body, BorderLayout.CENTER);
+        return panel;
     }
 
     private JPanel createReputationSection() {

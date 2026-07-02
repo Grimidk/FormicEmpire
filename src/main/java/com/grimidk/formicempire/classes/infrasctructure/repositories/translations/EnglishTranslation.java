@@ -131,6 +131,7 @@ public class EnglishTranslation implements Translation {
         en.put("COLONY_RESEARCH_RATE", "Research Rate: %d/day");
         en.put("COLONY_JUVENILE_ANTS", "Juvenile Ants: %d");
         en.put("COLONY_ADULT_ANTS", "Adult Ants: %d");
+        en.put("COLONY_MILITARY_POWER", "Military Power: %,d");
         
         en.put("TOOLTIP_PET_INSECTS", "Pet insects kept by ranchers and catchers. See the Insects tab in colony statistics (X) for a breakdown by species.");
         en.put("TOOLTIP_PARASITIC_MITES", "Microscopic mites on your ants. Every 10 mites slow one ant to half speed. Spread monthly when stored resources are high.");
@@ -308,10 +309,14 @@ public class EnglishTranslation implements Translation {
         en.put("MAP_TOOLTIP_SPECIES", "<br><b>Species:</b> ");
         en.put("MAP_TOOLTIP_DYNASTY", "<br><b>Dynasty:</b> ");
         en.put("MAP_TOOLTIP_DYNASTY_RANK", "<br><b>Dynasty Rank:</b> ");
+        en.put("MAP_TOOLTIP_MILITARY_POWER", "<br><b>Colony Military Power:</b> ");
+        en.put("MAP_TOOLTIP_DYNASTY_MILITARY_POWER", "<br><b>Dynasty Military Power:</b> ");
+        en.put("MAP_LEGEND_MILITARY", "Power");
         en.put("MAP_TOOLTIP_EMPTY", "<br><i>Empty</i>");
         en.put("MAP_DYNASTY_DIPLO_FORMAT", "%s · %s");
         en.put("MAP_SORT_BY_POPULATION", "Sort: Population");
         en.put("MAP_SORT_BY_DIPLOMACY", "Sort: Diplomacy (hostile → friendly)");
+        en.put("MAP_SORT_BY_MILITARY", "Sort: Military Power");
         en.put("MAP_LEGEND_SHOW", "Show legend");
         en.put("MAP_LEGEND_HIDE", "Hide legend");
 
@@ -346,6 +351,8 @@ public class EnglishTranslation implements Translation {
         en.put("DYNASTY_DEFAULT_AUTOMATION_TOOLTIP", "Automatically enable Automation for all new colonies established by this dynasty.");
         en.put("DYNASTY_SATELLITE", "Satellite");
         en.put("STAT_LOYALTY", "Loyalty");
+        en.put("STAT_MILITARY_POWER", "Military Power");
+        en.put("STAT_MILITARY_POWER_DESC", "Adult type counts (roles ignored) weighted by combat base stats. Updated once per world day.");
         en.put("DYNASTY_REPUTATION", "Reputation");
         en.put("DYNASTY_REPUTATION_STANCE", "Stance");
         en.put("SCORE_TIER_FORMAT", "%d · %s");
@@ -620,11 +627,15 @@ public class EnglishTranslation implements Translation {
         en.put("DIPLO_MODIFIER_TRADE", "Trade Route");
         en.put("DIPLO_MODIFIER_TRADE_REQUEST", "Trade Request");
         en.put("DIPLO_MODIFIER_BORDER_FRICTION", "Border Friction");
+        en.put("DIPLO_MILITARY_STRENGTH", "Military Strength");
         en.put("GI_MODIFIER_PACT", "Pact Alliance");
         en.put("LOYALTY_MODIFIER_TRADE", "Active Trade");
         en.put("LOYALTY_MODIFIER_TUNNEL", "Tunnel Link");
         en.put("LOYALTY_MODIFIER_CAPITAL", "Capital");
         en.put("LOYALTY_MODIFIER_PHEROMONE_STORM", "Pheromone Storm");
+        en.put("LOYALTY_MODIFIER_MILITARY_VS_CAPITAL", "Military vs Capital");
+        en.put("LOYALTY_MODIFIER_DISTANCE_FROM_CAPITAL", "Distance from Capital");
+        en.put("LOYALTY_MODIFIER_DISTANCE_LINE", "%s (%d tiles): %+d");
         en.put("DIPLO_ACTION_FORM_PACT", "Form Pact");
         en.put("DIPLO_ACTION_BREAK_PACT", "Break Pact");
         en.put("DIPLO_ACTION_TRADE", "Trade");
@@ -1098,9 +1109,14 @@ public class EnglishTranslation implements Translation {
         
         en.put("HELP_EMPIRE_TRADE", "Trade Methods");
         en.put("HELP_EMPIRE_LOYALTY", "Colony Loyalty Tiers");
+        en.put("HELP_EMPIRE_MILITARY_POWER", "Military Power");
+        en.put("HELP_MILITARY_POWER_BODY", "<b>Military Power</b> estimates fighting strength from adult ant types (roles ignored): Workers x1, Soldiers x5, Majors x15, Princesses x10, Queens x50, scaled by combat base stats (Skeleton + Acid = full multiplier). Recalculated once per world day.<br><br>A power gap of up to 11:1 adjusts diplomacy (+/-1 to +/-10, asymmetric) and colony loyalty vs the capital the same way: weaker parties gain loyalty/reputation toward the stronger; stronger parties lose it toward the weaker.");
         en.put("HELP_EMPIRE_REPUTATION", "Diplomatic Reputation Stances");
         en.put("HELP_EMPIRE_MOVEMENT", "Pet Insect Movement");
         en.put("HELP_TIER_MIN_SCORE", " (min %d)");
+        en.put("HELP_LOYALTY_MODIFIERS_TITLE", "Active modifiers");
+        en.put("HELP_LOYALTY_MODIFIER_MILITARY", "Military vs Capital: +/-1 to +/-10 from power ratio vs capital (weaker colonies gain loyalty; stronger satellites lose it).");
+        en.put("HELP_LOYALTY_MODIFIER_DISTANCE", "Distance from Capital: 0 at 1 tile away, up to -10 at 10+ tiles (linear in between).");
         en.put("HELP_ROLE_ANT_TYPE", "Ant type: %s");
         en.put("HOTKEY_PAUSE_LABEL", "Pause/Play:");
         en.put("HOTKEY_ESC_LABEL", "Game Menu:");
@@ -1233,6 +1249,8 @@ public class EnglishTranslation implements Translation {
         en.put("DYNASTY_SORT_AGE_NEW", "Age (newest first)");
         en.put("DYNASTY_SORT_LOYALTY_HIGH", "Loyalty (highest first)");
         en.put("DYNASTY_SORT_LOYALTY_LOW", "Loyalty (lowest first)");
+        en.put("DYNASTY_SORT_MILITARY_HIGH", "Military Power (highest first)");
+        en.put("DYNASTY_SORT_MILITARY_LOW", "Military Power (lowest first)");
 
         en.put("SETTINGS_DEFAULT_ROLE_WORKER", "Default Worker Role:");
         en.put("SETTINGS_DEFAULT_ROLE_SOLDIER", "Default Soldier Role:");

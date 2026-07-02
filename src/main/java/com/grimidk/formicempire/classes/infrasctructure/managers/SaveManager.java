@@ -358,6 +358,7 @@ public class SaveManager {
                 sc.assimilationProgress = dynasty.getAssimilationProgress();
                 sc.capitalColonyId = (dynasty.getCapital() != null) ? dynasty.getCapital().getId() : -1;
                 sc.geneticIntegrity = dynasty.getBaseGeneticIntegrity();
+                sc.militaryPower = dynasty.getMilitaryPower();
                 
                 sc.diplomaticReputations = new HashMap<>();
                 for (Map.Entry<Integer, Integer> entry : dynasty.copyDiplomaticReputations().entrySet()) {
@@ -518,6 +519,7 @@ public class SaveManager {
                     sc.pheromoneStormMonthsRemaining = c.getPheromoneStormMonthsRemaining();
                     sc.creatineDietMonthsRemaining = c.getCreatineDietMonthsRemaining();
                     sc.totalDeaths = c.getTotalDeaths();
+                    sc.militaryPower = c.getMilitaryPower();
                     
                     // Maps/Lists
                     for (Map.Entry<AntRole, Integer> entry : c.getAssignedRoleCounts().entrySet()) {
@@ -643,6 +645,7 @@ public class SaveManager {
         writeJsonLine(w, "assimilationProgress", sc.assimilationProgress, false);
         writeJsonLine(w, "capitalColonyId", sc.capitalColonyId, false);
         writeJsonLine(w, "geneticIntegrity", sc.geneticIntegrity, false);
+        writeJsonLine(w, "militaryPower", sc.militaryPower, false);
         w.write("      \"diplomaticReputations\": " + serializeMapToJson(sc.diplomaticReputations) + ","); w.newLine();
         w.write("      \"diplomaticModifierKeys\": " + serializeStringMapToJson(sc.diplomaticModifierKeys) + ","); w.newLine();
         w.write("      \"crossDynastyTradeRepGrantedIds\": " + serializeListToJson(sc.crossDynastyTradeRepGrantedIds) + ","); w.newLine();
@@ -672,6 +675,7 @@ public class SaveManager {
         writeJsonLine(w, "age", sc.age, false);
         writeJsonLine(w, "daysWithoutQueen", sc.daysWithoutQueen, false);
         writeJsonLine(w, "loyalty", sc.loyalty, false);
+        writeJsonLine(w, "militaryPower", sc.militaryPower, false);
         writeJsonLine(w, "q", sc.q, false);
         writeJsonLine(w, "r", sc.r, false);
         
@@ -867,6 +871,7 @@ public class SaveManager {
         sc.assimilationProgress = Double.parseDouble(map.getOrDefault("assimilationProgress", "0.0"));
         sc.capitalColonyId = Integer.parseInt(map.getOrDefault("capitalColonyId", "-1"));
         sc.geneticIntegrity = Double.parseDouble(map.getOrDefault("geneticIntegrity", "100.0"));
+        sc.militaryPower = Integer.parseInt(map.getOrDefault("militaryPower", "0"));
         sc.diplomaticReputations = deserializeJsonToMap(map.get("diplomaticReputations"));
         sc.diplomaticModifierKeys = deserializeJsonToStringMap(map.get("diplomaticModifierKeys"));
         sc.crossDynastyTradeRepGrantedIds = deserializeJsonToList(map.get("crossDynastyTradeRepGrantedIds"));
@@ -922,6 +927,7 @@ public class SaveManager {
         sc.age = Integer.parseInt(map.getOrDefault("age", "0"));
         sc.daysWithoutQueen = Integer.parseInt(map.getOrDefault("daysWithoutQueen", "0"));
         sc.loyalty = Integer.parseInt(map.getOrDefault("loyalty", String.valueOf(GameConstants.DEFAULT_COLONY_LOYALTY)));
+        sc.militaryPower = Integer.parseInt(map.getOrDefault("militaryPower", "0"));
         sc.q = Integer.parseInt(map.getOrDefault("q", "0"));
         sc.r = Integer.parseInt(map.getOrDefault("r", "0"));
         sc.totalAnts = Integer.parseInt(map.getOrDefault("totalAnts", "0"));

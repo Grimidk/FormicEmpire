@@ -83,6 +83,7 @@ public class Savefile implements Serializable {
         public double assimilationProgress = 0;
         public int capitalColonyId = -1;
         public double geneticIntegrity = 100.0;
+        public int militaryPower;
         public Map<String, Integer> deathStatistics = new HashMap<>();
         public Map<String, Integer> diplomaticReputations = new HashMap<>();
         public Map<String, String> diplomaticModifierKeys = new HashMap<>();
@@ -116,6 +117,7 @@ public class Savefile implements Serializable {
         public int creatineDietMonthsRemaining;
         public int totalDeaths;
         public int loyalty = GameConstants.DEFAULT_COLONY_LOYALTY;
+        public int militaryPower;
         public Map<String, Integer> assignedRoleCounts = new HashMap<>();
         public Map<String, Integer> localDeathStatistics = new HashMap<>();
         public List<Integer> unlockedBuildingIds = new ArrayList<>();

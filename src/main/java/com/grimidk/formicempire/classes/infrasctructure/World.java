@@ -21,6 +21,7 @@ import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.Trade;
 import com.grimidk.formicempire.classes.entities.Tunnel;
+import com.grimidk.formicempire.classes.entities.services.ColonyMilitaryService;
 import com.grimidk.formicempire.classes.entities.services.ColonyStarterService;
 import com.grimidk.formicempire.classes.entities.services.DynastyDeathService;
 import com.grimidk.formicempire.classes.entities.services.DynastyNamingService;
@@ -197,6 +198,15 @@ public class World {
             if (h.getColony() == colony) return h;
         }
         return null;
+    }
+
+    public int colonyHexDistance(Colony from, Colony to) {
+        Hex fromHex = getHexOfColony(from);
+        Hex toHex = getHexOfColony(to);
+        if (fromHex == null || toHex == null) {
+            return 0;
+        }
+        return GameConstants.axialHexDistance(fromHex.getQ(), fromHex.getR(), toHex.getQ(), toHex.getR());
     }
     
     public List<Dynasty> getDynastys() { return dynastys; }
@@ -746,11 +756,15 @@ public class World {
                         }
                     }
                 }
+                if (d != null && d.getCapital() == null) {
+                    d.resolveCapitalFromColonies();
+                }
             }
         }
 
         reapplyRoleAssignmentsAfterLoad();
         bindDynastyTradeServices();
+        ColonyMilitaryService.refreshAllMilitaryPower(this.dynastys);
 
         changeActiveHex(getSpawnHex()); 
         updateEnvironmentalConditions();
@@ -910,6 +924,10 @@ public class World {
             if (hex.getColony() != null) {
                 hex.getColony().runDailyJobs(this.getTemperatureIcon(), hex.getBiome(), hex);
             }
+        }
+
+        for (Dynasty dynasty : this.dynastys) {
+            ColonyMilitaryService.refreshDynastyMilitaryPower(dynasty);
         }
         
         // --- Process Dynasty/Colony Deaths ---

@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.interfaces.game.gamepanels;
 
 import com.grimidk.formicempire.classes.constants.ant.AntType;
+import com.grimidk.formicempire.classes.constants.misc.ColonyLoyalty;
 import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.world.Biome;
@@ -66,6 +67,8 @@ public class ColonyPanel extends ZeroGamePanel {
     private final JLabel researchRateLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.COLONY_RESEARCH_RATE), 0));
     private final JLabel babyAntsLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.COLONY_JUVENILE_ANTS), 0));
     private final JLabel adultAntsLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.COLONY_ADULT_ANTS), 0));
+    private final JLabel militaryPowerLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.COLONY_MILITARY_POWER), 0));
+    private final JLabel loyaltyLabel = new JLabel();
     
     // --- Cached Values ---
     private Colony lastColonyRef;
@@ -86,6 +89,8 @@ public class ColonyPanel extends ZeroGamePanel {
     
     private int lastTotalConsumption = -1;
     private int lastEggs = -1;
+    private int lastMilitaryPower = -1;
+    private int lastEffectiveLoyalty = -1;
     private ColonyRank lastRank = null;
 
     public ColonyPanel() {
@@ -145,6 +150,10 @@ public class ColonyPanel extends ZeroGamePanel {
         parasiteAntCountLabel.setIcon(GameConstants.TYPE_PARASITE_ANT.getIcon());
         policeStatsLabel.setIcon(GameConstants.TYPE_SOLDIER.getIcon());
         researchPointsLabel.setIcon(GameConstants.ICON_RESEARCH);
+        militaryPowerLabel.setIcon(GameConstants.ICON_STAT_MILITARY_POWER);
+        militaryPowerLabel.setToolTipText(LanguageStrings.get(LanguageStrings.STAT_MILITARY_POWER_DESC));
+        loyaltyLabel.setIcon(GameConstants.ICON_STAT_LOYALTY);
+        loyaltyLabel.setIconTextGap(6);
         
         updateTooltips();
         
@@ -233,6 +242,8 @@ public class ColonyPanel extends ZeroGamePanel {
         lastMineralsAvailable = -1;
         lastTotalConsumption = -1;
         lastEggs = -1;
+        lastMilitaryPower = -1;
+        lastEffectiveLoyalty = -1;
         lastRank = null;
         
         setView(false);
@@ -246,6 +257,8 @@ public class ColonyPanel extends ZeroGamePanel {
             // Force refresh text fields
             lastMushrooms = -1;
             lastTotalConsumption = -1;
+            lastMilitaryPower = -1;
+            lastEffectiveLoyalty = -1;
             lastRank = null;
             updateMinuteData(lastColonyRef);
             updateHourData(lastColonyRef);
@@ -310,6 +323,8 @@ public class ColonyPanel extends ZeroGamePanel {
         researchRateLabel.setForeground(AssetStyles.FONT_COLOR);
         babyAntsLabel.setForeground(AssetStyles.FONT_COLOR);
         adultAntsLabel.setForeground(AssetStyles.FONT_COLOR);
+        militaryPowerLabel.setForeground(AssetStyles.FONT_COLOR);
+        loyaltyLabel.setForeground(AssetStyles.FONT_COLOR);
 
         panel.add(totalConsumptionLabel);
         panel.add(totalProductionLabel);
@@ -325,6 +340,8 @@ public class ColonyPanel extends ZeroGamePanel {
         panel.add(researchRateLabel);
         panel.add(babyAntsLabel);
         panel.add(adultAntsLabel);
+        panel.add(militaryPowerLabel);
+        panel.add(loyaltyLabel);
         return panel;
     }
 
@@ -593,6 +610,29 @@ public class ColonyPanel extends ZeroGamePanel {
 
         int adultTotal = (colony.getQueens().size() + colony.getPrincesses().size() + colony.getDrones().size() + colony.getMajors().size() + colony.getSoldiers().size() + colony.getWorkers().size());
         adultAntsLabel.setText(String.format(LanguageStrings.get(LanguageStrings.COLONY_ADULT_ANTS), adultTotal));
+
+        int militaryPower = colony.getMilitaryPower();
+        if (militaryPower != lastMilitaryPower) {
+            militaryPowerLabel.setText(String.format(
+                    LanguageStrings.get(LanguageStrings.COLONY_MILITARY_POWER), militaryPower));
+            lastMilitaryPower = militaryPower;
+        }
+
+        int effectiveLoyalty = colony.getEffectiveLoyalty(
+                engine != null ? engine.getTradeManager() : null,
+                engine != null ? engine.getWorld() : null);
+        if (effectiveLoyalty != lastEffectiveLoyalty) {
+            ColonyLoyalty tier = GameConstants.getColonyLoyaltyLevel(effectiveLoyalty);
+            loyaltyLabel.setText(String.format(
+                    LanguageStrings.get(LanguageStrings.SCORE_TIER_FORMAT),
+                    effectiveLoyalty,
+                    tier.getName()));
+            loyaltyLabel.setIcon(tier.getIcon());
+            loyaltyLabel.setToolTipText(colony.buildLoyaltyModifierTooltip(
+                    engine != null ? engine.getTradeManager() : null,
+                    engine != null ? engine.getWorld() : null));
+            lastEffectiveLoyalty = effectiveLoyalty;
+        }
 
         lastMushrooms = colony.getMushrooms(); 
     }

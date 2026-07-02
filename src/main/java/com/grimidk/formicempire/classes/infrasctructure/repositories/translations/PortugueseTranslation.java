@@ -131,6 +131,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("COLONY_RESEARCH_RATE", "Taxa de pesquisa: %d/dia");
         pt.put("COLONY_JUVENILE_ANTS", "Formigas jovens: %d");
         pt.put("COLONY_ADULT_ANTS", "Formigas adultas: %d");
+        pt.put("COLONY_MILITARY_POWER", "Poder militar: %,d");
 
         pt.put("TOOLTIP_PET_INSECTS", "Insetos de estimação cuidados por pastoras e capturadoras. Veja a aba Insetos nas estatísticas da colônia (X) para o detalhe por espécie.");
         pt.put("TOOLTIP_PARASITIC_MITES", "Ácaros microscópicos nas formigas. A cada 10 ácaros, uma formiga fica com metade da velocidade. Espalham-se mensalmente com muitos recursos armazenados.");
@@ -308,10 +309,14 @@ public class PortugueseTranslation implements Translation {
         pt.put("MAP_TOOLTIP_SPECIES", "<br><b>Espécie:</b> ");
         pt.put("MAP_TOOLTIP_DYNASTY", "<br><b>Dinastia:</b> ");
         pt.put("MAP_TOOLTIP_DYNASTY_RANK", "<br><b>Rank da dinastia:</b> ");
+        pt.put("MAP_TOOLTIP_MILITARY_POWER", "<br><b>Poder militar da colónia:</b> ");
+        pt.put("MAP_TOOLTIP_DYNASTY_MILITARY_POWER", "<br><b>Poder militar da dinastia:</b> ");
+        pt.put("MAP_LEGEND_MILITARY", "Poder");
         pt.put("MAP_TOOLTIP_EMPTY", "<br><i>Vazio</i>");
         pt.put("MAP_DYNASTY_DIPLO_FORMAT", "%s · %s");
         pt.put("MAP_SORT_BY_POPULATION", "Ordenar: População");
         pt.put("MAP_SORT_BY_DIPLOMACY", "Ordenar: Diplomacia (hostil → amigável)");
+        pt.put("MAP_SORT_BY_MILITARY", "Ordenar: Poder militar");
         pt.put("MAP_LEGEND_SHOW", "Mostrar legenda");
         pt.put("MAP_LEGEND_HIDE", "Ocultar legenda");
 
@@ -346,6 +351,8 @@ public class PortugueseTranslation implements Translation {
         pt.put("DYNASTY_DEFAULT_AUTOMATION_TOOLTIP", "Ativar automaticamente a automação para todas as novas colônias desta dinastia.");
         pt.put("DYNASTY_SATELLITE", "Satélite");
         pt.put("STAT_LOYALTY", "Lealdade");
+        pt.put("STAT_MILITARY_POWER", "Poder militar");
+        pt.put("STAT_MILITARY_POWER_DESC", "Contagem de tipos adultos (papéis ignorados) ponderada pelas estatísticas de combate base. Atualizado uma vez por dia.");
         pt.put("DYNASTY_REPUTATION", "Reputação");
         pt.put("DYNASTY_REPUTATION_STANCE", "Postura");
         pt.put("SCORE_TIER_FORMAT", "%d · %s");
@@ -620,11 +627,15 @@ public class PortugueseTranslation implements Translation {
         pt.put("DIPLO_MODIFIER_TRADE", "Rota comercial");
         pt.put("DIPLO_MODIFIER_TRADE_REQUEST", "Pedido comercial");
         pt.put("DIPLO_MODIFIER_BORDER_FRICTION", "Fricção fronteiriça");
+        pt.put("DIPLO_MILITARY_STRENGTH", "Força militar");
         pt.put("GI_MODIFIER_PACT", "Aliança de pacto");
         pt.put("LOYALTY_MODIFIER_TRADE", "Comércio ativo");
         pt.put("LOYALTY_MODIFIER_TUNNEL", "Ligação de túnel");
         pt.put("LOYALTY_MODIFIER_CAPITAL", "Capital");
         pt.put("LOYALTY_MODIFIER_PHEROMONE_STORM", "Tempestade de Feromônios");
+        pt.put("LOYALTY_MODIFIER_MILITARY_VS_CAPITAL", "Militar vs capital");
+        pt.put("LOYALTY_MODIFIER_DISTANCE_FROM_CAPITAL", "Distância da capital");
+        pt.put("LOYALTY_MODIFIER_DISTANCE_LINE", "%s (%d casas): %+d");
         pt.put("DIPLO_ACTION_FORM_PACT", "Formar pacto");
         pt.put("DIPLO_ACTION_BREAK_PACT", "Quebrar pacto");
         pt.put("DIPLO_ACTION_TRADE", "Comerciar");
@@ -1098,9 +1109,14 @@ public class PortugueseTranslation implements Translation {
         
         pt.put("HELP_EMPIRE_TRADE", "Métodos de Comércio");
         pt.put("HELP_EMPIRE_LOYALTY", "Níveis de Lealdade da Colônia");
+        pt.put("HELP_EMPIRE_MILITARY_POWER", "Poder militar");
+        pt.put("HELP_MILITARY_POWER_BODY", "<b>Poder militar</b> estima a força de combate pelos tipos adultos (papéis ignorados): Operárias x1, Soldados x5, Majores x15, Princesas x10, Rainhas x50, escalado pelas estatísticas de combate base (Esqueleto + Ácido = multiplicador completo). Recalculado uma vez por dia do mundo.");
         pt.put("HELP_EMPIRE_REPUTATION", "Posturas de Reputação Diplomática");
         pt.put("HELP_EMPIRE_MOVEMENT", "Movimento de Insetos de Estimação");
         pt.put("HELP_TIER_MIN_SCORE", " (mín. %d)");
+        pt.put("HELP_LOYALTY_MODIFIERS_TITLE", "Modificadores ativos");
+        pt.put("HELP_LOYALTY_MODIFIER_MILITARY", "Militar vs capital: +/-1 a +/-10 pela razão de poder com a capital (colônias mais fracas ganham lealdade; satélites mais fortes perdem).");
+        pt.put("HELP_LOYALTY_MODIFIER_DISTANCE", "Distância da capital: 0 a 1 casa, até -10 a 10+ casas (linear entre elas).");
         pt.put("HELP_ROLE_ANT_TYPE", "Tipo de formiga: %s");
         pt.put("HOTKEY_PAUSE_LABEL", "Pausa/jogar:");
         pt.put("HOTKEY_ESC_LABEL", "Menu:");
@@ -1233,6 +1249,8 @@ public class PortugueseTranslation implements Translation {
         pt.put("DYNASTY_SORT_AGE_NEW", "Idade (mais nova primeiro)");
         pt.put("DYNASTY_SORT_LOYALTY_HIGH", "Lealdade (maior primeiro)");
         pt.put("DYNASTY_SORT_LOYALTY_LOW", "Lealdade (menor primeiro)");
+        pt.put("DYNASTY_SORT_MILITARY_HIGH", "Poder militar (maior primeiro)");
+        pt.put("DYNASTY_SORT_MILITARY_LOW", "Poder militar (menor primeiro)");
 
         pt.put("SETTINGS_DEFAULT_ROLE_WORKER", "Função padrão de operária:");
         pt.put("SETTINGS_DEFAULT_ROLE_SOLDIER", "Função padrão de soldada:");

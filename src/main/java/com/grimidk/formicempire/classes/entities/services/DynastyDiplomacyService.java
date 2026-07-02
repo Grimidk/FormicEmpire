@@ -128,6 +128,14 @@ public class DynastyDiplomacyService {
                     friction)).append("<br>");
         }
 
+        int militaryAdj = getMilitaryReputationAdjustment(other);
+        if (militaryAdj != 0) {
+            sb.append(String.format(
+                    LanguageStrings.get(LanguageStrings.DIPLO_MODIFIER_LINE),
+                    LanguageStrings.get(LanguageStrings.DIPLO_MILITARY_STRENGTH),
+                    militaryAdj)).append("<br>");
+        }
+
         sb.append(LanguageStrings.get(LanguageStrings.DIPLO_TOOLTIP_EFFECTIVE))
                 .append(": ")
                 .append(getEffectiveDiplomaticReputation(other, world));
@@ -168,8 +176,18 @@ public class DynastyDiplomacyService {
         if (other == null || other == dynasty) {
             return GameConstants.DEFAULT_DIPLOMATIC_REPUTATION;
         }
-        int score = dynasty.getDiplomaticReputation(other.getId()) + getBorderFrictionAdjustment(other, world);
+        int score = dynasty.getDiplomaticReputation(other.getId())
+                + getBorderFrictionAdjustment(other, world)
+                + getMilitaryReputationAdjustment(other);
         return GameConstants.clampDiplomaticReputation(score);
+    }
+
+    public int getMilitaryReputationAdjustment(Dynasty other) {
+        if (other == null || other == dynasty) {
+            return 0;
+        }
+        return ColonyMilitaryService.getMilitaryReputationAdjustment(
+                dynasty.getMilitaryPower(), other.getMilitaryPower());
     }
 
     public boolean meetsTradeReputationRequirement(Dynasty other, World world) {

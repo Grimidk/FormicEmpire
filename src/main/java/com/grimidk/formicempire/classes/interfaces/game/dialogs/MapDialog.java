@@ -133,17 +133,20 @@ public class MapDialog extends ZeroDialog {
     private final JPanel bottomPanel;
 
     private class LegendPanel extends JPanel {
-        private static final int LEGEND_EXPANDED_WIDTH = 380;
+        private static final int LEGEND_EXPANDED_WIDTH = 420;
         private static final int LEGEND_COLLAPSED_WIDTH = 32;
-        private static final int POP_VALUE_WIDTH = 52;
+        private static final int METRICS_COLUMN_WIDTH = 52;
+        private static final int SORT_POPULATION = 0;
+        private static final int SORT_DIPLOMACY = 1;
+        private static final int SORT_MILITARY = 2;
 
         private final JPanel legendBody;
         private final JPanel content;
         private final JScrollPane legendScroll;
         private final JButton sortButton;
         private final FlatChevronButton collapseControl;
-        private int popColumnWidth = POP_VALUE_WIDTH;
-        private boolean sortByDiplomacy;
+        private int metricsColumnWidth = METRICS_COLUMN_WIDTH;
+        private int sortMode = SORT_POPULATION;
         private boolean expanded = true;
 
         public LegendPanel() {
@@ -191,7 +194,7 @@ public class MapDialog extends ZeroDialog {
             sortButton.setFocusable(false);
             AssetStyles.styleCompactButton(sortButton);
             sortButton.addActionListener(e -> {
-                sortByDiplomacy = !sortByDiplomacy;
+                sortMode = (sortMode + 1) % 3;
                 updateSortButtonLabel();
                 updateLegend();
             });
@@ -208,14 +211,28 @@ public class MapDialog extends ZeroDialog {
             JLabel dynastyHeader = new JLabel(LanguageStrings.get(LanguageStrings.STAT_DYNASTY));
             dynastyHeader.setFont(AssetStyles.FONT_BOLD.deriveFont(10f));
             dynastyHeader.setForeground(AssetStyles.FONT_COLOR);
+
+            JPanel metricsHeader = new JPanel(new GridLayout(1, 2, 6, 0));
+            metricsHeader.setOpaque(false);
             JLabel popHeader = new JLabel(LanguageStrings.get(LanguageStrings.PANEL_POPULATION), SwingConstants.RIGHT);
             popHeader.setFont(AssetStyles.FONT_BOLD.deriveFont(10f));
             popHeader.setForeground(AssetStyles.FONT_COLOR);
-            int popHeaderWidth = Math.max(POP_VALUE_WIDTH, popHeader.getPreferredSize().width + 4);
-            popColumnWidth = popHeaderWidth;
-            popHeader.setPreferredSize(new Dimension(popHeaderWidth, popHeader.getPreferredSize().height));
+            JLabel militaryHeader = new JLabel(LanguageStrings.get(LanguageStrings.MAP_LEGEND_MILITARY), SwingConstants.RIGHT);
+            militaryHeader.setFont(AssetStyles.FONT_BOLD.deriveFont(10f));
+            militaryHeader.setForeground(AssetStyles.FONT_COLOR);
+            militaryHeader.setIcon(GameConstants.ICON_STAT_MILITARY_POWER);
+            militaryHeader.setHorizontalTextPosition(SwingConstants.LEFT);
+            militaryHeader.setIconTextGap(2);
+            metricsColumnWidth = Math.max(METRICS_COLUMN_WIDTH,
+                    Math.max(popHeader.getPreferredSize().width, militaryHeader.getPreferredSize().width) + 4);
+            popHeader.setPreferredSize(new Dimension(metricsColumnWidth, popHeader.getPreferredSize().height));
+            militaryHeader.setPreferredSize(new Dimension(metricsColumnWidth, militaryHeader.getPreferredSize().height));
+            metricsHeader.add(popHeader);
+            metricsHeader.add(militaryHeader);
+            metricsHeader.setPreferredSize(new Dimension(metricsColumnWidth * 2 + 6, metricsHeader.getPreferredSize().height));
+
             columnHeader.add(dynastyHeader, BorderLayout.CENTER);
-            columnHeader.add(popHeader, BorderLayout.EAST);
+            columnHeader.add(metricsHeader, BorderLayout.EAST);
 
             content = new LegendScrollContent();
             content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
@@ -285,8 +302,12 @@ public class MapDialog extends ZeroDialog {
         }
 
         private void updateSortButtonLabel() {
-            String label = LanguageStrings.get(
-                    sortByDiplomacy ? LanguageStrings.MAP_SORT_BY_DIPLOMACY : LanguageStrings.MAP_SORT_BY_POPULATION);
+            String labelKey = switch (sortMode) {
+                case SORT_DIPLOMACY -> LanguageStrings.MAP_SORT_BY_DIPLOMACY;
+                case SORT_MILITARY -> LanguageStrings.MAP_SORT_BY_MILITARY;
+                default -> LanguageStrings.MAP_SORT_BY_POPULATION;
+            };
+            String label = LanguageStrings.get(labelKey);
             sortButton.setText(label);
             sortButton.setToolTipText(label);
             AssetStyles.styleCompactButton(sortButton);
@@ -326,10 +347,15 @@ public class MapDialog extends ZeroDialog {
 
             Dynasty playerDynasty = findPlayerDynasty();
             List<Dynasty> sortedDynasties = new ArrayList<>(activeDynastiesMap.values());
-            if (sortByDiplomacy && playerDynasty != null && playerDynasty.getDiplomacyService() != null) {
+            if (sortMode == SORT_DIPLOMACY && playerDynasty != null && playerDynasty.getDiplomacyService() != null) {
                 sortedDynasties.sort(Comparator
                         .comparingInt((Dynasty d) -> d.isPlayer() ? Integer.MIN_VALUE
                                 : playerDynasty.getDiplomacyService().getEffectiveDiplomaticReputation(d, world))
+                        .thenComparing(Dynasty::getName, String.CASE_INSENSITIVE_ORDER));
+            } else if (sortMode == SORT_MILITARY) {
+                sortedDynasties.sort(Comparator
+                        .comparingInt((Dynasty d) -> d.isPlayer() ? Integer.MAX_VALUE : d.getMilitaryPower())
+                        .reversed()
                         .thenComparing(Dynasty::getName, String.CASE_INSENSITIVE_ORDER));
             } else {
                 sortedDynasties.sort((d1, d2) -> {
@@ -408,14 +434,25 @@ public class MapDialog extends ZeroDialog {
                 name.setForeground(AssetStyles.FONT_COLOR);
 
                 int pop = d.getStatService().getTotalPopulation(d);
-                JLabel popLabel = new JLabel(String.valueOf(pop), SwingConstants.RIGHT);
+                int military = d.getMilitaryPower();
+
+                JPanel metricsPanel = new JPanel(new GridLayout(1, 2, 6, 0));
+                metricsPanel.setOpaque(false);
+                JLabel popLabel = new JLabel(String.format("%,d", pop), SwingConstants.RIGHT);
                 popLabel.setFont(AssetStyles.FONT_SMALL);
                 popLabel.setForeground(AssetStyles.FONT_COLOR);
-                popLabel.setPreferredSize(new Dimension(popColumnWidth, popLabel.getPreferredSize().height));
+                popLabel.setPreferredSize(new Dimension(metricsColumnWidth, popLabel.getPreferredSize().height));
+                JLabel militaryLabel = new JLabel(String.format("%,d", military), SwingConstants.RIGHT);
+                militaryLabel.setFont(AssetStyles.FONT_SMALL);
+                militaryLabel.setForeground(AssetStyles.FONT_COLOR);
+                militaryLabel.setPreferredSize(new Dimension(metricsColumnWidth, militaryLabel.getPreferredSize().height));
+                metricsPanel.add(popLabel);
+                metricsPanel.add(militaryLabel);
+                metricsPanel.setPreferredSize(new Dimension(metricsColumnWidth * 2 + 6, metricsPanel.getPreferredSize().height));
 
                 item.add(badges, BorderLayout.WEST);
                 item.add(name, BorderLayout.CENTER);
-                item.add(popLabel, BorderLayout.EAST);
+                item.add(metricsPanel, BorderLayout.EAST);
 
                 content.add(item);
                 content.add(Box.createRigidArea(new Dimension(0, 2)));
@@ -537,6 +574,8 @@ public class MapDialog extends ZeroDialog {
                         if (c.getName() != null) {
                             sb.append("<br><i>").append(c.getName()).append("</i>");
                         }
+                        sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_MILITARY_POWER))
+                                .append(String.format("%,d", c.getMilitaryPower()));
 
                         Dynasty dynasty = c.getDynasty();
                         if (dynasty != null) {
@@ -544,6 +583,8 @@ public class MapDialog extends ZeroDialog {
                             if (dynasty.getRank() != null) {
                                 sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_DYNASTY_RANK)).append(dynasty.getRank().getName());
                             }
+                            sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_DYNASTY_MILITARY_POWER))
+                                    .append(String.format("%,d", dynasty.getMilitaryPower()));
                             Dynasty playerDynasty = findPlayerDynasty();
                             if (playerDynasty != null && !dynasty.isPlayer() && playerDynasty.getDiplomacyService() != null) {
                                 int rep = playerDynasty.getDiplomacyService().getEffectiveDiplomaticReputation(dynasty, world);

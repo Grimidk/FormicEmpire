@@ -117,6 +117,8 @@ public final class GameConstants {
     static { misc.add(ICON_STAT_REPUTATION); }
     public static final ImageIcon ICON_STAT_GENETIC_INTEGRITY = loadIcon("icons/misc/GeneticIntegrity.png");
     static { misc.add(ICON_STAT_GENETIC_INTEGRITY); }
+    public static final ImageIcon ICON_STAT_MILITARY_POWER = loadIcon("icons/misc/MilitaryPower.png");
+    static { misc.add(ICON_STAT_MILITARY_POWER); }
 
     // --- Base Stats ---
     public static final float BASE_SPRITE_SPEED = 2.5f;
@@ -743,6 +745,45 @@ public final class GameConstants {
     public static final int COLONY_LOYALTY_MAX = 100;
     public static final int COLONY_LOYALTY_TIER_STEP = 20;
     public static final int DEFAULT_COLONY_LOYALTY = 50;
+
+    public static final int MILITARY_WEIGHT_WORKER = 1;
+    public static final int MILITARY_WEIGHT_SOLDIER = 5;
+    public static final int MILITARY_WEIGHT_MAJOR = 15;
+    public static final int MILITARY_WEIGHT_PRINCESS = 10;
+    public static final int MILITARY_WEIGHT_QUEEN = 50;
+
+    public static final int MILITARY_BASELINE_HEALTH = 100;
+    public static final int MILITARY_BASELINE_ATTACK = 10;
+    public static final int MILITARY_BASELINE_DEFENSE = 5;
+    public static final int MILITARY_BASELINE_ATTACK_SPEED = 1;
+    /** At this power ratio (stronger:weaker), military reputation/loyalty delta reaches max. */
+    public static final float MILITARY_STRENGTH_RATIO_MAX = 11f;
+    /** Max +/- reputation or loyalty adjustment from military strength gap. */
+    public static final int MILITARY_STRENGTH_DELTA_MAX = 10;
+    /** Hex tiles from capital with no distance loyalty penalty (neighbors). */
+    public static final int LOYALTY_CAPITAL_DISTANCE_NEUTRAL = 1;
+    /** Hex tiles from capital at which distance loyalty penalty reaches max. */
+    public static final int LOYALTY_CAPITAL_DISTANCE_MAX = 10;
+    /** Max loyalty penalty from distance to capital (negative). */
+    public static final int LOYALTY_CAPITAL_DISTANCE_PENALTY_MAX = 10;
+
+    public static int getCapitalDistanceLoyaltyPenalty(int hexDistance) {
+        if (hexDistance <= LOYALTY_CAPITAL_DISTANCE_NEUTRAL) {
+            return 0;
+        }
+        if (hexDistance >= LOYALTY_CAPITAL_DISTANCE_MAX) {
+            return -LOYALTY_CAPITAL_DISTANCE_PENALTY_MAX;
+        }
+        float normalized = (hexDistance - LOYALTY_CAPITAL_DISTANCE_NEUTRAL)
+                / (float) (LOYALTY_CAPITAL_DISTANCE_MAX - LOYALTY_CAPITAL_DISTANCE_NEUTRAL);
+        return -Math.round(normalized * LOYALTY_CAPITAL_DISTANCE_PENALTY_MAX);
+    }
+
+    public static int axialHexDistance(int q1, int r1, int q2, int r2) {
+        int dq = q1 - q2;
+        int dr = r1 - r2;
+        return (Math.abs(dq) + Math.abs(dr) + Math.abs(dq + dr)) / 2;
+    }
 
     // --- Colony Loyalty ---
     public static final ColonyLoyalty LOYALTY_REBELLIOUS = new ColonyLoyalty(

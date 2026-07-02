@@ -1416,7 +1416,8 @@ public class DynastyManagementDialog extends ZeroDialog {
         private static final int COL_SPECIES = 1;
         private static final int COL_REPUTATION = 2;
         private static final int COL_STANCE = 3;
-        private static final int COL_ACTIONS = 4;
+        private static final int COL_MILITARY = 4;
+        private static final int COL_ACTIONS = 5;
 
         public DiplomacyPanel() {
             super(new BorderLayout());
@@ -1429,6 +1430,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                     LanguageStrings.get(LanguageStrings.HELP_TAB_SPECIES),
                     LanguageStrings.get(LanguageStrings.DYNASTY_REPUTATION),
                     LanguageStrings.get(LanguageStrings.DYNASTY_REPUTATION_STANCE),
+                    LanguageStrings.get(LanguageStrings.STAT_MILITARY_POWER),
                     LanguageStrings.get(LanguageStrings.DYNASTY_ACTIONS)
             }, 0) {
                 @Override
@@ -1443,6 +1445,9 @@ public class DynastyManagementDialog extends ZeroDialog {
                     }
                     if (columnIndex == COL_STANCE) {
                         return DiplomaticReputation.class;
+                    }
+                    if (columnIndex == COL_MILITARY) {
+                        return Integer.class;
                     }
                     if (columnIndex == COL_ACTIONS) {
                         return DiplomacyRowData.class;
@@ -1460,6 +1465,8 @@ public class DynastyManagementDialog extends ZeroDialog {
             table.getColumnModel().getColumn(COL_REPUTATION).setPreferredWidth(110);
             table.getColumnModel().getColumn(COL_REPUTATION).setCellRenderer(new ReputationScoreRenderer());
             table.getColumnModel().getColumn(COL_STANCE).setCellRenderer(new ReputationStanceRenderer());
+            table.getColumnModel().getColumn(COL_MILITARY).setPreferredWidth(110);
+            table.getColumnModel().getColumn(COL_MILITARY).setCellRenderer(new MilitaryPowerScoreRenderer());
             table.getColumnModel().getColumn(COL_ACTIONS).setMinWidth(280);
             table.getColumnModel().getColumn(COL_ACTIONS).setPreferredWidth(280);
             table.getColumnModel().getColumn(COL_ACTIONS).setCellRenderer(new DiplomacyActionRenderer());
@@ -1480,11 +1487,29 @@ public class DynastyManagementDialog extends ZeroDialog {
                             return;
                         }
                     }
+                    if (row >= 0 && row < displayedDynasties.size() && col == COL_MILITARY) {
+                        table.setToolTipText(LanguageStrings.get(LanguageStrings.STAT_MILITARY_POWER_DESC));
+                        return;
+                    }
                     table.setToolTipText(null);
                 }
             });
 
             add(new JScrollPane(table), BorderLayout.CENTER);
+        }
+
+        private class MilitaryPowerScoreRenderer extends DefaultTableCellRenderer {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                    boolean hasFocus, int row, int column) {
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                setHorizontalAlignment(JLabel.CENTER);
+                int power = value instanceof Number number ? number.intValue() : 0;
+                setText(String.format("%,d", power));
+                setIcon(GameConstants.ICON_STAT_MILITARY_POWER);
+                setIconTextGap(6);
+                return this;
+            }
         }
 
         private class ReputationScoreRenderer extends DefaultTableCellRenderer {
@@ -1550,6 +1575,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                         other.getSpecies(),
                         String.valueOf(score),
                         stance,
+                        other.getMilitaryPower(),
                         new DiplomacyRowData(other)
                 });
             }
@@ -1560,6 +1586,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             AssetStyles.fitTableColumn(table, COL_DYNASTY, 120, 260);
             AssetStyles.fitTableColumn(table, COL_REPUTATION, 72, 130);
             AssetStyles.fitTableColumn(table, COL_STANCE, 100, 200);
+            AssetStyles.fitTableColumn(table, COL_MILITARY, 80, 140);
             AssetStyles.fitTableColumn(table, COL_ACTIONS, 300, 540);
         }
 
@@ -1836,6 +1863,7 @@ public class DynastyManagementDialog extends ZeroDialog {
         private int autoBuildCol = -1;
         private int automationCol = -1;
         private int loyaltyCol = -1;
+        private int militaryCol = -1;
         private int actionCol = -1;
         
         private final JComboBox<String> sortCombo;
@@ -1857,7 +1885,9 @@ public class DynastyManagementDialog extends ZeroDialog {
                 LanguageStrings.get(LanguageStrings.DYNASTY_SORT_AGE_OLD),
                 LanguageStrings.get(LanguageStrings.DYNASTY_SORT_AGE_NEW),
                 LanguageStrings.get(LanguageStrings.DYNASTY_SORT_LOYALTY_HIGH),
-                LanguageStrings.get(LanguageStrings.DYNASTY_SORT_LOYALTY_LOW)
+                LanguageStrings.get(LanguageStrings.DYNASTY_SORT_LOYALTY_LOW),
+                LanguageStrings.get(LanguageStrings.DYNASTY_SORT_MILITARY_HIGH),
+                LanguageStrings.get(LanguageStrings.DYNASTY_SORT_MILITARY_LOW)
             });
             this.sortCombo.setFocusable(false);
             AssetStyles.styleComboBox(this.sortCombo);
@@ -1883,6 +1913,8 @@ public class DynastyManagementDialog extends ZeroDialog {
                 case 3: currentSorter = Comparator.comparingInt(Colony::getAge); break;
                 case 4: currentSorter = Comparator.comparingInt(this::effectiveLoyaltyScore).reversed(); break;
                 case 5: currentSorter = Comparator.comparingInt(this::effectiveLoyaltyScore); break;
+                case 6: currentSorter = Comparator.comparingInt(Colony::getMilitaryPower).reversed(); break;
+                case 7: currentSorter = Comparator.comparingInt(Colony::getMilitaryPower); break;
                 default: currentSorter = Comparator.comparingInt(Colony::getAntTotal).reversed(); break;
             }
             updateData();
@@ -1934,6 +1966,8 @@ public class DynastyManagementDialog extends ZeroDialog {
             List<String> cols = new ArrayList<>(Arrays.asList("", LanguageStrings.get(LanguageStrings.COLONY_RANK), LanguageStrings.get(LanguageStrings.COL_TYPE), LanguageStrings.get(LanguageStrings.PANEL_COLONY), LanguageStrings.get(LanguageStrings.STATS_TAB_POPULATION), LanguageStrings.get(LanguageStrings.STAT_AGE), LanguageStrings.get(LanguageStrings.STATS_TAB_LOCAL_HEX)));
             loyaltyCol = cols.size();
             cols.add(LanguageStrings.get(LanguageStrings.STAT_LOYALTY));
+            militaryCol = cols.size();
+            cols.add(LanguageStrings.get(LanguageStrings.STAT_MILITARY_POWER));
             
             if (showAutoBuild) {
                 autoBuildCol = cols.size();
@@ -2007,6 +2041,8 @@ public class DynastyManagementDialog extends ZeroDialog {
             table.getColumnModel().getColumn(6).setCellRenderer(new OverviewBiomeRenderer());
             table.getColumnModel().getColumn(loyaltyCol).setPreferredWidth(140);
             table.getColumnModel().getColumn(loyaltyCol).setCellRenderer(new LoyaltyCellRenderer());
+            table.getColumnModel().getColumn(militaryCol).setPreferredWidth(110);
+            table.getColumnModel().getColumn(militaryCol).setCellRenderer(new MilitaryPowerCellRenderer());
 
             table.addMouseMotionListener(new MouseMotionAdapter() {
                 @Override
@@ -2017,6 +2053,10 @@ public class DynastyManagementDialog extends ZeroDialog {
                         Colony colony = displayedColonies.get(row);
                         table.setToolTipText(colony.buildLoyaltyModifierTooltip(
                                 engine.getTradeManager(), engine.getWorld()));
+                        return;
+                    }
+                    if (row >= 0 && row < displayedColonies.size() && col == militaryCol) {
+                        table.setToolTipText(LanguageStrings.get(LanguageStrings.STAT_MILITARY_POWER_DESC));
                         return;
                     }
                     table.setToolTipText(null);
@@ -2087,6 +2127,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                         LanguageStrings.get(LanguageStrings.SCORE_TIER_FORMAT),
                         effectiveLoyalty,
                         loyaltyTier.getName());
+                rowData[militaryCol] = colony.getMilitaryPower();
                 if (showAutoBuild) rowData[autoBuildCol] = colony.isAutoBuildEnabled();
                 if (showAutomation) rowData[automationCol] = colony.isAutomationEnabled();
                 rowData[actionCol] = colony;
@@ -2096,7 +2137,22 @@ public class DynastyManagementDialog extends ZeroDialog {
             AssetStyles.fitTableColumn(table, 0, 40, 52);
             AssetStyles.fitTableColumn(table, 3, 120, 280);
             AssetStyles.fitTableColumn(table, loyaltyCol, 100, 220);
+            AssetStyles.fitTableColumn(table, militaryCol, 80, 140);
             AssetStyles.fitTableColumn(table, actionCol, 120, 180);
+        }
+
+        private class MilitaryPowerCellRenderer extends DefaultTableCellRenderer {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                    boolean hasFocus, int row, int column) {
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                setHorizontalAlignment(JLabel.CENTER);
+                int power = value instanceof Number number ? number.intValue() : 0;
+                setText(String.format("%,d", power));
+                setIcon(GameConstants.ICON_STAT_MILITARY_POWER);
+                setIconTextGap(6);
+                return this;
+            }
         }
 
         private class LoyaltyCellRenderer extends DefaultTableCellRenderer {

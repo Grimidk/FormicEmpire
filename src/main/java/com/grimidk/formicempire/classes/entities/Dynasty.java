@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.entities;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -57,6 +58,7 @@ public class Dynasty {
     private double assimilationProgress;
     private Colony capital;
     private double geneticIntegrity;
+    private int militaryPower;
     private final Map<Integer, Integer> diplomaticReputations;
     private final Map<Integer, String> diplomaticModifierKeys;
     private final List<Integer> crossDynastyTradeRepGrantedIds;
@@ -109,6 +111,7 @@ public class Dynasty {
         this.defaultAutomationEnabled = savedDynasty.defaultAutomationEnabled;
         this.defaultAutoBuildEnabled = savedDynasty.defaultAutoBuildEnabled;
         this.geneticIntegrity = savedDynasty.geneticIntegrity;
+        this.militaryPower = savedDynasty.militaryPower;
         
         this.species = GameConstants.SPECIES_OMNI; 
         for(Species s : GameConstants.getSpecies()) {
@@ -377,7 +380,37 @@ public class Dynasty {
     }
 
     public Colony getCapital() {
+        if (capital == null) {
+            resolveCapitalFromColonies();
+        }
         return capital;
+    }
+
+    /** Infer capital when save has no capitalColonyId or it was not wired on load. */
+    public void resolveCapitalFromColonies() {
+        if (colonies == null || colonies.isEmpty()) {
+            return;
+        }
+        List<Colony> flagged = new ArrayList<>();
+        for (Colony c : colonies) {
+            if (c.isCapital()) {
+                flagged.add(c);
+            }
+        }
+        if (flagged.size() == 1) {
+            setCapital(flagged.get(0));
+            return;
+        }
+        if (flagged.size() > 1) {
+            flagged.stream()
+                    .max(Comparator.comparingInt(Colony::getMilitaryPower)
+                            .thenComparingInt(Colony::getId))
+                    .ifPresent(this::setCapital);
+            return;
+        }
+        colonies.stream()
+                .min(Comparator.comparingInt(Colony::getId))
+                .ifPresent(this::setCapital);
     }
 
     public void setCapital(Colony colony) {
@@ -579,6 +612,14 @@ public class Dynasty {
     
     public void setGeneticIntegrity(double geneticIntegrity) { 
         this.geneticIntegrity = Math.max(getMinGeneticIntegrity(), geneticIntegrity); 
+    }
+
+    public int getMilitaryPower() {
+        return militaryPower;
+    }
+
+    public void setMilitaryPower(int militaryPower) {
+        this.militaryPower = Math.max(0, militaryPower);
     }
 
 }
