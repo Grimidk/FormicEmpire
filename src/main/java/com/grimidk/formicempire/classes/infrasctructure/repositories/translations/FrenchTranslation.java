@@ -436,6 +436,7 @@ public class FrenchTranslation implements Translation {
         fr.put("SETTINGS_ARACHNOPHOBIA", "Mode arachnophobie :");
         fr.put("SETTINGS_PAUSE_FOCUS", "Pause si perte de focus");
         fr.put("SETTINGS_CONFIRM_QUIT", "Confirmer à la sortie");
+        fr.put("SETTINGS_ESCAPE_KEY_GAME_ACTIONS", "Échap ferme les dialogues / ouvre le menu");
         fr.put("SETTINGS_SHOW_TOOLTIPS", "Afficher les infobulles");
         fr.put("SETTINGS_FUZZ_PARASITE_ANTS", "Chiffres de fourmis parasites approximatifs");
         fr.put("SETTINGS_OVERWORLD_AUTO_RECENTER", "Recentrer automatiquement la surface sur l'entrée de la colonie");

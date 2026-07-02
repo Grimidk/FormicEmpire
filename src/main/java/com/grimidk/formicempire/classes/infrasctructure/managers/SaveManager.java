@@ -1485,6 +1485,7 @@ public class SaveManager {
             writeJsonLine(w, "sfxVolume", engine.getSfxVolume(), false);
             writeJsonLine(w, "pauseOnFocusLoss", engine.isPauseOnFocusLoss(), false);
             writeJsonLine(w, "confirmOnQuit", engine.isConfirmOnQuit(), false);
+            writeJsonLine(w, "escapeKeyGameActions", engine.isEscapeKeyGameActions(), false);
             writeJsonLine(w, "showTooltips", engine.isShowTooltips(), false);
             writeJsonLine(w, "fuzzParasiteAnts", engine.isFuzzParasiteAnts(), false);
             writeJsonLine(w, "overworldAutoRecenter", engine.isOverworldAutoRecenter(), false);
@@ -1579,6 +1580,8 @@ public class SaveManager {
             engine.setSfxVolume(Integer.parseInt(m.getOrDefault("sfxVolume", String.valueOf(engine.getSfxVolume()))));
             engine.setPauseOnFocusLoss(Boolean.parseBoolean(m.getOrDefault("pauseOnFocusLoss", String.valueOf(engine.isPauseOnFocusLoss()))));
             engine.setConfirmOnQuit(Boolean.parseBoolean(m.getOrDefault("confirmOnQuit", String.valueOf(engine.isConfirmOnQuit()))));
+            engine.setEscapeKeyGameActions(Boolean.parseBoolean(m.getOrDefault("escapeKeyGameActions",
+                    String.valueOf(engine.isEscapeKeyGameActions()))));
             engine.setShowTooltips(Boolean.parseBoolean(m.getOrDefault("showTooltips", String.valueOf(engine.isShowTooltips()))));
             engine.setFuzzParasiteAnts(Boolean.parseBoolean(m.getOrDefault("fuzzParasiteAnts",
                     m.getOrDefault("fuzzParasites", String.valueOf(engine.isFuzzParasiteAnts())))));

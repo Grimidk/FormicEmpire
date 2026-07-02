@@ -436,6 +436,7 @@ public class EnglishTranslation implements Translation {
         en.put("SETTINGS_ARACHNOPHOBIA", "Arachnophobia Mode:");
         en.put("SETTINGS_PAUSE_FOCUS", "Pause on focus loss");
         en.put("SETTINGS_CONFIRM_QUIT", "Confirm on quit");
+        en.put("SETTINGS_ESCAPE_KEY_GAME_ACTIONS", "Escape closes dialogs / opens menu");
         en.put("SETTINGS_SHOW_TOOLTIPS", "Show tooltips");
         en.put("SETTINGS_FUZZ_PARASITE_ANTS", "Fuzz parasite ant numbers");
         en.put("SETTINGS_OVERWORLD_AUTO_RECENTER", "Auto-recenter overworld on colony entrance");

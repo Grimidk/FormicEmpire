@@ -335,6 +335,7 @@ public class ControlPanel extends ZeroGamePanel {
 
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ADD, 0), "speedUp");
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, InputEvent.SHIFT_DOWN_MASK), "speedUp");
+        inputMap.put(KeyStroke.getKeyStroke('+'), "speedUp");
         actionMap.put("speedUp", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -344,6 +345,7 @@ public class ControlPanel extends ZeroGamePanel {
 
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_SUBTRACT, 0), "speedDown");
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, 0), "speedDown");
+        inputMap.put(KeyStroke.getKeyStroke('-'), "speedDown");
         actionMap.put("speedDown", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -355,10 +357,12 @@ public class ControlPanel extends ZeroGamePanel {
         actionMap.put("openMenu", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (gameMenu.isVisible()) {
-                    gameMenu.setVisible(false);
-                } else {
-                    menuButton.doClick();
+                if (frame.getGamePanel() != null && frame.getGamePanel().handleEscapeKey()) {
+                    return;
+                }
+                Engine engine = frame.getEngine();
+                if (engine != null && engine.isEscapeKeyGameActions()) {
+                    toggleGameMenu();
                 }
             }
         });
@@ -472,6 +476,14 @@ public class ControlPanel extends ZeroGamePanel {
                 showRoleManagementDialogCallback.showDialog(tab);
             }
         });
+    }
+
+    public void toggleGameMenu() {
+        if (gameMenu.isVisible()) {
+            gameMenu.setVisible(false);
+        } else {
+            menuButton.doClick();
+        }
     }
 
     public void updateTickLabel(Engine eng) {

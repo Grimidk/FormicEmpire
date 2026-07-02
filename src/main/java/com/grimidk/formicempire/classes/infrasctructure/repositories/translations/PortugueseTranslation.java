@@ -436,6 +436,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("SETTINGS_ARACHNOPHOBIA", "Modo aracnofobia:");
         pt.put("SETTINGS_PAUSE_FOCUS", "Pausar ao perder o foco");
         pt.put("SETTINGS_CONFIRM_QUIT", "Confirmar ao sair");
+        pt.put("SETTINGS_ESCAPE_KEY_GAME_ACTIONS", "Escape fecha diálogos / abre menu");
         pt.put("SETTINGS_SHOW_TOOLTIPS", "Mostrar dicas");
         pt.put("SETTINGS_FUZZ_PARASITE_ANTS", "Aproximar números de formigas parasitas");
         pt.put("SETTINGS_OVERWORLD_AUTO_RECENTER", "Recentrar automaticamente o exterior na entrada da colônia");

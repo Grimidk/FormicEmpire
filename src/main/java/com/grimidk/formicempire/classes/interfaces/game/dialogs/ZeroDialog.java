@@ -45,7 +45,7 @@ public abstract class ZeroDialog extends JDialog {
 
         initGlobalKeyBindings();
 
-        getRootPane().registerKeyboardAction(e -> dispose(),
+        getRootPane().registerKeyboardAction(e -> handleEscapeKey(),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_IN_FOCUSED_WINDOW);
         
@@ -98,6 +98,7 @@ public abstract class ZeroDialog extends JDialog {
 
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ADD, 0), "speedUp");
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, InputEvent.SHIFT_DOWN_MASK), "speedUp");
+        inputMap.put(KeyStroke.getKeyStroke('+'), "speedUp");
         actionMap.put("speedUp", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -108,6 +109,7 @@ public abstract class ZeroDialog extends JDialog {
 
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_SUBTRACT, 0), "speedDown");
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, 0), "speedDown");
+        inputMap.put(KeyStroke.getKeyStroke('-'), "speedDown");
         actionMap.put("speedDown", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -115,6 +117,14 @@ public abstract class ZeroDialog extends JDialog {
                 syncWithMainControlPanel();
             }
         });
+    }
+
+    private void handleEscapeKey() {
+        if (getOwner() instanceof MainFrame frame && frame.getGamePanel() != null
+                && frame.getGamePanel().handleEscapeKey()) {
+            return;
+        }
+        dispose();
     }
 
     private void adjustSpeed(int delta) {

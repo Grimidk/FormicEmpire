@@ -49,6 +49,7 @@ public class Engine extends Thread {
     
     private boolean pauseOnFocusLoss = true;
     private boolean confirmOnQuit = true;
+    private boolean escapeKeyGameActions = true;
     private boolean showTooltips = true;
     
     private boolean fuzzParasiteAnts = true;
@@ -389,6 +390,14 @@ public class Engine extends Thread {
 
     public void setConfirmOnQuit(boolean confirmOnQuit) {
         this.confirmOnQuit = confirmOnQuit;
+    }
+
+    public boolean isEscapeKeyGameActions() {
+        return escapeKeyGameActions;
+    }
+
+    public void setEscapeKeyGameActions(boolean escapeKeyGameActions) {
+        this.escapeKeyGameActions = escapeKeyGameActions;
     }
 
     public boolean isShowTooltips() {

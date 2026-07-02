@@ -852,6 +852,66 @@ public class GamePanel extends ZeroGamePanel {
     public boolean isEngineStarted() { return engineStarted; }
 
     // --- Cleanup Methods ---
+    public boolean handleEscapeKey() {
+        Engine engine = frame.getEngine();
+        if (engine == null || !engine.isEscapeKeyGameActions() || !engineStarted) {
+            return false;
+        }
+        if (closeVisibleDialogs()) {
+            return true;
+        }
+        if (controlPanel != null) {
+            controlPanel.toggleGameMenu();
+            return true;
+        }
+        return false;
+    }
+
+    private boolean closeVisibleDialogs() {
+        boolean closed = false;
+        if (hatchDialog != null && hatchDialog.isShowing()) {
+            hatchDialog.dispose();
+            hatchDialog = null;
+            closed = true;
+        }
+        if (roleDialog != null && roleDialog.isShowing()) {
+            roleDialog.dispose();
+            roleDialog = null;
+            closed = true;
+        }
+        if (upgradeDialog != null && upgradeDialog.isShowing()) {
+            upgradeDialog.dispose();
+            upgradeDialog = null;
+            closed = true;
+        }
+        if (abilitiesDialog != null && abilitiesDialog.isShowing()) {
+            abilitiesDialog.dispose();
+            abilitiesDialog = null;
+            closed = true;
+        }
+        if (mapDialog != null && mapDialog.isShowing()) {
+            mapDialog.dispose();
+            mapDialog = null;
+            closed = true;
+        }
+        if (statsDialog != null && statsDialog.isShowing()) {
+            statsDialog.dispose();
+            statsDialog = null;
+            closed = true;
+        }
+        if (dynastyDialog != null && dynastyDialog.isShowing()) {
+            dynastyDialog.dispose();
+            dynastyDialog = null;
+            closed = true;
+        }
+        if (settingsDialog != null && settingsDialog.isShowing()) {
+            settingsDialog.dispose();
+            settingsDialog = null;
+            closed = true;
+        }
+        return closed;
+    }
+
     private void disposeAllDialogs() {
         if (hatchDialog != null) { hatchDialog.dispose(); hatchDialog = null; }
         if (roleDialog != null) { roleDialog.dispose(); roleDialog = null; }

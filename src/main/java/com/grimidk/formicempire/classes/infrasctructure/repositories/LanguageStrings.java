@@ -666,6 +666,7 @@ public final class LanguageStrings {
     
     public static final String SETTINGS_PAUSE_FOCUS = "SETTINGS_PAUSE_FOCUS";
     public static final String SETTINGS_CONFIRM_QUIT = "SETTINGS_CONFIRM_QUIT";
+    public static final String SETTINGS_ESCAPE_KEY_GAME_ACTIONS = "SETTINGS_ESCAPE_KEY_GAME_ACTIONS";
     public static final String SETTINGS_SHOW_TOOLTIPS = "SETTINGS_SHOW_TOOLTIPS";
     
     public static final String SETTINGS_FUZZ_PARASITE_ANTS = "SETTINGS_FUZZ_PARASITE_ANTS";
