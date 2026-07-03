@@ -15,8 +15,8 @@ To Fix (By decreasing priority) :
 	TODO: icons/sprites for all Constants (roles, moves) and unlocks (all)
 
 	Mid:
-	refactor dead priority logic
-
+	(none right now)
+	
 	Low:
 	(none right now)
   

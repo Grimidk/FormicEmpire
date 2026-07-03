@@ -4,14 +4,16 @@ import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import javax.swing.Icon;
 
-/** Flat checkbox glyphs: hollow square (off) or filled square with X (on). */
+/** Flat checkbox glyphs: hollow square (off) or filled square with Unicode X (on). */
 public final class SquareCheckIcons {
     public static final int ICON_SIZE = 12;
+    private static final String CHECK_MARK = "\u2716";
 
     public static final Icon UNCHECKED = new SquareIcon(false);
     public static final Icon CHECKED = new SquareIcon(true);
@@ -42,15 +44,13 @@ public final class SquareCheckIcons {
         return AssetStyles.isDarkMode() ? AssetStyles.COLOR_ABSOLUTE_WHITE : AssetStyles.COLOR_ABSOLUTE_BLACK;
     }
 
-    private static void paintX(Graphics2D g2, int x, int y, int size, Color color) {
+    private static void paintMark(Graphics2D g2, int x, int y, int size, Color color) {
         g2.setColor(color);
-        int pad = 2;
-        int span = size - pad * 2;
-        for (int i = 0; i < span; i++) {
-            int px = x + pad + i;
-            g2.fillRect(px, y + pad + i, 2, 2);
-            g2.fillRect(px, y + size - pad - i - 2, 2, 2);
-        }
+        g2.setFont(AssetStyles.FONT_BOLD.deriveFont(10f));
+        FontMetrics fm = g2.getFontMetrics();
+        int textX = x + (size - fm.stringWidth(CHECK_MARK)) / 2;
+        int textY = y + ((size - fm.getHeight()) / 2) + fm.getAscent();
+        g2.drawString(CHECK_MARK, textX, textY);
     }
 
     private static final class SquareIcon implements Icon {
@@ -80,13 +80,14 @@ public final class SquareCheckIcons {
         public void paintIcon(Component c, Graphics g, int x, int y) {
             Graphics2D g2 = (Graphics2D) g.create();
             try {
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
                 int size = ICON_SIZE;
                 Color border = borderColor(disabled);
                 if (selected) {
                     g2.setColor(fillColor(disabled));
                     g2.fillRect(x + 1, y + 1, size - 2, size - 2);
-                    paintX(g2, x, y, size, markColor(disabled));
+                    paintMark(g2, x, y, size, markColor(disabled));
                 }
                 g2.setColor(border);
                 g2.drawRect(x, y, size - 1, size - 1);

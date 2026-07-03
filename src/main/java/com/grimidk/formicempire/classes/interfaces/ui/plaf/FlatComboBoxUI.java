@@ -2,7 +2,9 @@ package com.grimidk.formicempire.classes.interfaces.ui.plaf;
 
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 
+import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import javax.swing.JButton;
@@ -15,6 +17,8 @@ import javax.swing.plaf.basic.ComboPopup;
 
 /** Flat combo field with a bordered arrow button. */
 public final class FlatComboBoxUI extends BasicComboBoxUI {
+    private static final String ARROW_GLYPH = "\u25BC";
+
     public static ComponentUI createUI(JComponent c) {
         return new FlatComboBoxUI();
     }
@@ -30,14 +34,21 @@ public final class FlatComboBoxUI extends BasicComboBoxUI {
                 }
                 g.setColor(AssetStyles.UI_BORDER_COLOR);
                 g.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
-                int cx = getWidth() / 2;
-                int cy = getHeight() / 2;
-                g.setColor(AssetStyles.FONT_COLOR);
-                g.fillRect(cx - 3, cy - 1, 7, 2);
-                g.fillRect(cx - 2, cy, 5, 2);
-                g.fillRect(cx - 1, cy + 1, 3, 2);
+
+                Graphics2D g2 = (Graphics2D) g.create();
+                try {
+                    g2.setFont(getFont());
+                    g2.setColor(isEnabled() ? AssetStyles.FONT_COLOR : AssetStyles.COLOR_LIGHT_GRAY);
+                    FontMetrics fm = g2.getFontMetrics();
+                    int textX = (getWidth() - fm.stringWidth(ARROW_GLYPH)) / 2;
+                    int textY = (getHeight() + fm.getAscent()) / 2 - fm.getDescent();
+                    g2.drawString(ARROW_GLYPH, textX, textY);
+                } finally {
+                    g2.dispose();
+                }
             }
         };
+        button.setFont(AssetStyles.FONT_BOLD.deriveFont(9f));
         button.setFocusable(false);
         button.setRequestFocusEnabled(false);
         button.setBorderPainted(false);
