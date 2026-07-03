@@ -7,9 +7,9 @@ import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
+import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -127,26 +127,27 @@ public class TriggerManager {
     }
     
     private void checkCloningAbilityUnlock() {
-        if (playerColony.getDynasty() == null) return;
-        if (playerColony.hasUpgrade(GameUnlocks.ABILITY_CLONING)) return;
-
-        if (playerColony.getDynasty().getRank().getId() >= GameConstants.RANK_ULTRA.getId()) {
-            double bonus = playerColony.getDynasty().getCompletedAssimilations().size() * 5.0;
-            playerColony.getDynasty().setGeneticIntegrity(playerColony.getDynasty().getGeneticIntegrity() + bonus);
-             
-            fireLocalizedTrigger(GameUnlocks.ABILITY_CLONING,
-                LanguageStrings.TRIGGER_CLONING_TITLE,
-                LanguageStrings.TRIGGER_CLONING_MSG);
-        }
+        applyCloningUnlockIfEligible(playerColony, true);
     }
     
     private void checkNPCCloning(Colony npc) {
-        if (npc.getDynasty() == null) return;
-        if (npc.hasUpgrade(GameUnlocks.ABILITY_CLONING)) return;
-        if (npc.getDynasty().getRank().getId() >= GameConstants.RANK_ULTRA.getId()) {
-            double bonus = npc.getDynasty().getCompletedAssimilations().size() * 5.0;
-            npc.getDynasty().setGeneticIntegrity(npc.getDynasty().getGeneticIntegrity() + bonus);
-            npc.unlockUpgrade(GameUnlocks.ABILITY_CLONING);
+        applyCloningUnlockIfEligible(npc, false);
+    }
+
+    private void applyCloningUnlockIfEligible(Colony colony, boolean notifyPlayer) {
+        if (colony.getDynasty() == null || colony.hasUpgrade(GameUnlocks.ABILITY_CLONING)) {
+            return;
+        }
+        if (colony.getDynasty().getRank().getId() >= GameConstants.RANK_ULTRA.getId()) {
+            double bonus = colony.getDynasty().getCompletedAssimilations().size() * 5.0;
+            colony.getDynasty().setGeneticIntegrity(colony.getDynasty().getGeneticIntegrity() + bonus);
+            if (notifyPlayer) {
+                fireLocalizedTrigger(GameUnlocks.ABILITY_CLONING,
+                        LanguageStrings.TRIGGER_CLONING_TITLE,
+                        LanguageStrings.TRIGGER_CLONING_MSG);
+            } else {
+                colony.unlockUpgrade(GameUnlocks.ABILITY_CLONING);
+            }
         }
     }
 

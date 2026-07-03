@@ -4,17 +4,15 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
-import com.grimidk.formicempire.classes.constants.ant.AntSubType;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
-import com.grimidk.formicempire.classes.infrasctructure.NeoPoint;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.DeathCause;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
+import com.grimidk.formicempire.classes.entities.spatial.NeoPoint;
+import com.grimidk.formicempire.classes.infrasctructure.registries.DeathCause;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.WorldSpaces;
 
 public class Ant extends Bug {
     private AntType type;
-    private AntSubType subType;
     private AntRole role;
     private float tempRes;    
     private ResourceType carrying;
@@ -29,7 +27,6 @@ public class Ant extends Bug {
         super(GameConstants.TYPE_ANT); 
         
         this.type = type;
-        this.subType = null;
         this.role = null;
         this.carrying = null;
         this.carryingSec = null;
@@ -57,9 +54,6 @@ public class Ant extends Bug {
     
     public AntType getAntType() { return type; }
     public void setAntType(AntType type) { this.type = type; }
-
-    public AntSubType getSubType() { return subType; }
-    public void setSubType(AntSubType subType) { this.subType = subType; }
 
     public AntRole getRole() { return role; }
     public void setRole(AntRole role) { this.role = role; }

@@ -8,11 +8,11 @@ import java.util.List;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.misc.TradeMethod;
-import com.grimidk.formicempire.classes.entities.services.ColonyConvoyTransitService;
-import com.grimidk.formicempire.classes.entities.services.ColonyResourceService;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.ColonyLogPrefixes;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
+import com.grimidk.formicempire.classes.entities.services.colony.ColonyConvoyTransitService;
+import com.grimidk.formicempire.classes.entities.services.colony.ColonyResourceService;
+import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
 public class Trade {
 

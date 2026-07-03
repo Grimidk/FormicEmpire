@@ -1,7 +1,7 @@
 package com.grimidk.formicempire.classes.constants;
 
 import javax.swing.ImageIcon;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
+import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
 public class Constant {
     private final int id;

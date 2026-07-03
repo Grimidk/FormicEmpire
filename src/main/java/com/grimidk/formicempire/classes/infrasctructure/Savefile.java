@@ -1,6 +1,6 @@
 package com.grimidk.formicempire.classes.infrasctructure;
 
-import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 
 import java.io.Serializable;
 import java.util.ArrayList;

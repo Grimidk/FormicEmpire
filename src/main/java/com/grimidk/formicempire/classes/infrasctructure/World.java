@@ -21,15 +21,15 @@ import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.Trade;
 import com.grimidk.formicempire.classes.entities.Tunnel;
-import com.grimidk.formicempire.classes.entities.services.ColonyMilitaryService;
-import com.grimidk.formicempire.classes.entities.services.ColonyStarterService;
-import com.grimidk.formicempire.classes.entities.services.DynastyDeathService;
-import com.grimidk.formicempire.classes.entities.services.DynastyNamingService;
+import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
+import com.grimidk.formicempire.classes.entities.services.colony.ColonyStarterService;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDeathService;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyNamingService;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.ColonyLogPrefixes;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.GameRandom;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
+import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
+import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
 public class World {
 

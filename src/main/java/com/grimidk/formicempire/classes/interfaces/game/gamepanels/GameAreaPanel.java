@@ -9,18 +9,18 @@ import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Bug;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
-import com.grimidk.formicempire.classes.entities.services.ColonyLocationService;
-import com.grimidk.formicempire.classes.entities.services.ColonySpatialLayout;
+import com.grimidk.formicempire.classes.entities.services.colony.ColonyLocationService;
+import com.grimidk.formicempire.classes.entities.services.colony.ColonySpatialLayout;
 import com.grimidk.formicempire.classes.interfaces.game.rendering.RoomDecorationRenderer;
-import com.grimidk.formicempire.classes.entities.services.ViewportPhysicsLod;
-import com.grimidk.formicempire.classes.infrasctructure.Dimension;
+import com.grimidk.formicempire.classes.entities.services.shared.ViewportPhysicsLod;
+import com.grimidk.formicempire.classes.entities.spatial.Dimension;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
-import com.grimidk.formicempire.classes.infrasctructure.NeoPoint;
+import com.grimidk.formicempire.classes.entities.spatial.NeoPoint;
 import com.grimidk.formicempire.classes.infrasctructure.World;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.GameSpritePreloader;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.assets.GameSpritePreloader;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
+import com.grimidk.formicempire.classes.infrasctructure.registries.WorldSpaces;
 
 import javax.swing.*;
 import java.awt.*;
@@ -31,7 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.GameRandom;
+import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 
 public class GameAreaPanel extends ZeroGamePanel {
 

@@ -16,21 +16,21 @@ import com.grimidk.formicempire.classes.constants.misc.Species;
 import com.grimidk.formicempire.classes.constants.misc.GeneticIntegrityModifier;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
-import com.grimidk.formicempire.classes.entities.services.DynastyAiService;
-import com.grimidk.formicempire.classes.entities.services.DynastyAutomationService;
-import com.grimidk.formicempire.classes.entities.services.DynastyDiplomacyService;
-import com.grimidk.formicempire.classes.entities.services.DynastyLogisticsAutomationService;
-import com.grimidk.formicempire.classes.entities.services.DynastyStarterService;
-import com.grimidk.formicempire.classes.entities.services.DynastyStatService;
-import com.grimidk.formicempire.classes.entities.services.DynastyTradeService;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyAiService;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyAutomationService;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDiplomacyService;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyLogisticsAutomationService;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyStarterService;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyStatService;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyTradeService;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.DeathCause;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
+import com.grimidk.formicempire.classes.infrasctructure.registries.DeathCause;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
+import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
 public class Dynasty {
 

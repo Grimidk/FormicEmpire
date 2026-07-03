@@ -3,10 +3,10 @@ package com.grimidk.formicempire.classes.entities;
 import com.grimidk.formicempire.classes.constants.ant.AntStatus;
 import com.grimidk.formicempire.classes.constants.ant.MoveStatus;
 import com.grimidk.formicempire.classes.constants.misc.BugType;
-import com.grimidk.formicempire.classes.infrasctructure.Dimension;
-import com.grimidk.formicempire.classes.infrasctructure.Room;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
+import com.grimidk.formicempire.classes.entities.spatial.Dimension;
+import com.grimidk.formicempire.classes.entities.spatial.Room;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.WorldSpaces;
 
 import java.awt.Point;
 

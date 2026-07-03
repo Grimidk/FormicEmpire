@@ -3,7 +3,7 @@ package com.grimidk.formicempire.classes.constants.misc;
 import javax.swing.ImageIcon;
 
 import com.grimidk.formicempire.classes.constants.Constant;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 
 public class ResourceType extends Constant {
     public static final int SOURCE_QTY_SMALL = 100;

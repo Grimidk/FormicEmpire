@@ -3,7 +3,7 @@ package com.grimidk.formicempire.classes.entities;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.Weather;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 
 public class Hex {
     private Biome biome;
@@ -72,6 +72,13 @@ public class Hex {
     public Hex getSouthEast() { return southEast; }
 
     public void setSouthEast(Hex southEast) { this.southEast = southEast; }
+
+    /** Six hex-grid neighbors (may contain nulls at map edges). */
+    public Hex[] getAdjacentNeighbors() {
+        return new Hex[] {
+            north, northWest, northEast, south, southWest, southEast
+        };
+    }
 
     public int getQ() { return q; }
 

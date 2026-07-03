@@ -1,6 +1,6 @@
 package com.grimidk.formicempire.classes.constants.misc;
 
-import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
+import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
 public class GeneticIntegrityModifier {
     private final int id;

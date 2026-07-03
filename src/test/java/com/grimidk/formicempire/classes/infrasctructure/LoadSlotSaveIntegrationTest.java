@@ -2,7 +2,7 @@ package com.grimidk.formicempire.classes.infrasctructure;
 
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.GameSpritePreloader;
+import com.grimidk.formicempire.classes.infrasctructure.assets.GameSpritePreloader;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
