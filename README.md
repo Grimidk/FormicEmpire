@@ -35,14 +35,17 @@ Produces **`outputs/`** with separate bundles per platform:
 |------|----------|
 | `outputs/FormicEmpire.jar.zip` | JAR + `FormicEmpire.sh` + `saves/` — **JAR download** (needs Java 17+ installed) |
 | `outputs/FormicEmpire.windows.zip` | `FormicEmpire.exe` (game embedded) + `jre/` — **Windows download** |
+| `outputs/FormicEmpire.linux.zip` | jpackage app-image (`FormicEmpire/bin/FormicEmpire` + embedded runtime) — **Linux download** |
 | `outputs/FormicEmpire.app` | macOS app bundle (built on macOS via `jpackage`) |
 
 ### Bundled runtimes (not committed to git)
 
 | Folder | Platform | Required? |
 |--------|----------|-----------|
-| `jre/` | **Windows x64** Temurin 17 JRE | Yes, for `./package.sh` Windows output |
+| `jre/` | **Windows x64** Temurin 17 JRE | Yes on macOS, for Windows zip |
+| `jre-linux/` or `jdk-*-jre/` | **Linux x64** Temurin 17 JRE | Yes on Linux, for Linux zip |
 | System JDK 17 | **macOS** dev + `.app` build via `jpackage` | Yes on Mac (already installed) |
+| System JDK 17 | **Linux** dev + `.linux.zip` build via `jpackage` | Yes on Linux |
 | `jre-mac/` | Optional custom macOS runtime for `.app` | No — only if you want a specific embedded JRE |
 
 **Windows JRE setup (once):**
@@ -51,6 +54,12 @@ Produces **`outputs/`** with separate bundles per platform:
 2. Extract into the project root as **`jre/`** (must contain `jre/bin/java.exe`)
 3. Run `./package.sh` (validates `jre/` automatically)
 
+**Linux JRE setup (once, on the Linux build machine):**
+
+1. Download [Temurin 17 JRE — Linux x64](https://adoptium.net/temurin/releases/?version=17&os=linux&arch=x64&package=jre)
+2. Extract into the project root as **`jre-linux/`** (or leave as `jdk-*-jre/` — `setup_jre_linux.sh` detects both)
+3. Run `./package.sh` on **Linux** (requires `jpackage` from JDK 17+)
+
 **macOS:** No separate JRE download is required. `./run.sh` and the `.app` use your installed JDK 17. `jpackage` embeds a runtime when building `outputs/FormicEmpire.app`.
 
 **App icons:** `src/main/resources/meta/icon.ico` (Windows) and `icon.icns` (macOS) are committed assets. To refresh `icon.icns` after editing PNGs in `icon.iconset/` on macOS:
@@ -58,5 +67,6 @@ Produces **`outputs/`** with separate bundles per platform:
     iconutil -c icns src/main/resources/meta/icon.iconset -o src/main/resources/meta/icon.icns
 
 Run on macOS: `open outputs/FormicEmpire.app`  
+Run on Linux: ship `outputs/FormicEmpire.linux.zip` (unzip, then run `FormicEmpire/bin/FormicEmpire`). Saves are created beside the app folder at first run.  
 Run on Windows: ship `outputs/FormicEmpire.windows.zip` (unzip, then run `FormicEmpire.exe`). Saves are created beside the exe at first run.  
 Run anywhere with Java 17+: unzip `outputs/FormicEmpire.jar.zip` and run `./FormicEmpire.sh`

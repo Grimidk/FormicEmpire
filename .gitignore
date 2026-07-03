@@ -30,3 +30,5 @@ outputs/
 FormicEmpire_Release/
 FormicEmpire_Release.zip
 jre/
+jre-linux/
+jdk-*-jre/

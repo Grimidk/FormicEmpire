@@ -27,9 +27,23 @@ public final class GamePaths {
             if (devProjectRoot != null) {
                 return devProjectRoot;
             }
-            return fromCodeSource;
+            return normalizePackagedAppDirectory(fromCodeSource);
         }
         return new File(System.getProperty("user.dir", "."));
+    }
+
+    /** jpackage app-image puts the game jar under {@code lib/}; saves belong at the image root. */
+    private static File normalizePackagedAppDirectory(File appDir) {
+        if (appDir == null) {
+            return null;
+        }
+        if ("lib".equals(appDir.getName())) {
+            File imageRoot = appDir.getParentFile();
+            if (imageRoot != null && new File(imageRoot, "bin").isDirectory()) {
+                return imageRoot;
+            }
+        }
+        return appDir;
     }
 
     /** When running the shaded jar from Maven {@code target/}, keep saves at the repo root. */
