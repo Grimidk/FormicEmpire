@@ -11,6 +11,7 @@ import com.grimidk.formicempire.classes.interfaces.ui.plaf.FlatSpinnerUI;
 import com.grimidk.formicempire.classes.interfaces.ui.plaf.FlatTabbedPaneUI;
 import com.grimidk.formicempire.classes.interfaces.ui.plaf.PanelBorderButtonUI;
 import java.awt.Insets;
+import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 
 import static com.grimidk.formicempire.classes.interfaces.ui.theme.UiFonts.*;
@@ -72,6 +73,7 @@ public final class UiLookAndFeel {
         UIManager.put("PasswordField.foreground", AssetStyles.FONT_COLOR);
         UIManager.put("ToolTip.background", AssetStyles.BACKGROUND_SECONDARY);
         UIManager.put("ToolTip.foreground", AssetStyles.FONT_COLOR);
+        ToolTipManager.sharedInstance().setDismissDelay(Integer.MAX_VALUE);
         UIManager.put("OptionPane.background", AssetStyles.BACKGROUND_COLOR);
         UIManager.put("OptionPane.foreground", AssetStyles.FONT_COLOR);
         UIManager.put("OptionPane.messageForeground", AssetStyles.FONT_COLOR);

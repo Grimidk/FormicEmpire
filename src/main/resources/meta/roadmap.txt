@@ -1,7 +1,8 @@
 Here is the current roadmap of features and fixes:
 
 Missing assets:
-	Convoy / tunnel logistics — missing sprite: tunel sprite, and convoy backgrounds (land and sky)
+	Convoy view tiles — SkyConvoyTile.png, OverlandConvoyTile.png (see TODO asset in GameConstants); sea/underground tiles seeded
+	Room sprites still look ugly af (see TODO asset on buildingRoomSprite / BuildingSpriteResources)
 	Map hexes — look yank
 	Font - self explanatory
 

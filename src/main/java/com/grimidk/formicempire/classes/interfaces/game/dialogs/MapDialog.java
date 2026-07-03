@@ -90,10 +90,6 @@ public class MapDialog extends ZeroDialog {
         }
     }
 
-    private void selectHex(Hex newHex) {
-        changeHex(newHex, false);
-    }
-
     private Dynasty findPlayerDynasty() {
         if (world == null || world.getDynastys() == null) {
             return null;
@@ -217,6 +213,9 @@ public class MapDialog extends ZeroDialog {
             JLabel popHeader = new JLabel(LanguageStrings.get(LanguageStrings.PANEL_POPULATION), SwingConstants.RIGHT);
             popHeader.setFont(AssetStyles.FONT_BOLD.deriveFont(10f));
             popHeader.setForeground(AssetStyles.FONT_COLOR);
+            popHeader.setIcon(GameConstants.ICON_STAT_POPULATION);
+            popHeader.setHorizontalTextPosition(SwingConstants.LEFT);
+            popHeader.setIconTextGap(2);
             JLabel militaryHeader = new JLabel(LanguageStrings.get(LanguageStrings.MAP_LEGEND_MILITARY), SwingConstants.RIGHT);
             militaryHeader.setFont(AssetStyles.FONT_BOLD.deriveFont(10f));
             militaryHeader.setForeground(AssetStyles.FONT_COLOR);
@@ -379,7 +378,7 @@ public class MapDialog extends ZeroDialog {
                         if (capital != null) {
                             Hex capitalHex = world.getHexOfColony(capital);
                             if (capitalHex != null) {
-                                selectHex(capitalHex);
+                                changeHex(capitalHex, true);
                             }
                         }
                     }

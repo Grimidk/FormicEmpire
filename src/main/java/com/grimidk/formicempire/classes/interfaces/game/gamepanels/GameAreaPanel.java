@@ -45,6 +45,7 @@ public class GameAreaPanel extends ZeroGamePanel {
     private Image antHillImg;
     private Image basicYardImg;    
     private Image deadBodyImg;
+    private Image tunnelSpriteImg;
     
     private Colony colony;
     private Engine engine;
@@ -112,6 +113,7 @@ public class GameAreaPanel extends ZeroGamePanel {
         middleHallwayImg = loadImage("sprites/buildings/MiddleHallway.png");
         antHillImg = loadImage("sprites/buildings/AntHill.png");
         basicYardImg = loadImage("sprites/buildings/BasicYard.png");
+        tunnelSpriteImg = loadImage("sprites/buildings/TunnelSprite.png");
 
         deadBodyImg = loadImage("sprites/ants/Dead.png");
     }
@@ -701,6 +703,7 @@ public class GameAreaPanel extends ZeroGamePanel {
                 g2d.drawImage(doubleRoomImg, rightRoomX, roomY3, this);
                 transitRoomBounds = new Rectangle(rightRoomX, roomY3, dRoomW, dRoomH);
                 g2d.setTransform(old3);
+                drawTunnelBesideLogisticsRoom(g2d, transitRoomBounds);
             } else {
                 transitRoomBounds = null;
             }
@@ -708,6 +711,25 @@ public class GameAreaPanel extends ZeroGamePanel {
             breederRoomBounds = null;
             transitRoomBounds = null;
         }
+    }
+
+    private void drawTunnelBesideLogisticsRoom(Graphics2D g2d, Rectangle logisticsBounds) {
+        if (tunnelSpriteImg == null || logisticsBounds == null || colony == null) {
+            return;
+        }
+        World world = engine != null ? engine.getWorld() : null;
+        if (world == null || !colony.hasCompleteTunnel(world)) {
+            return;
+        }
+        int tunnelW = tunnelSpriteImg.getWidth(this);
+        int tunnelH = tunnelSpriteImg.getHeight(this);
+        if (tunnelW <= 0 || tunnelH <= 0) {
+            return;
+        }
+        int gap = 8;
+        int tunnelX = logisticsBounds.x + logisticsBounds.width + gap - 56;
+        int tunnelY = logisticsBounds.y + (logisticsBounds.height - tunnelH) / 2;
+        g2d.drawImage(tunnelSpriteImg, tunnelX, tunnelY, this);
     }
 
     private void drawAnts(Graphics2D g2d) {

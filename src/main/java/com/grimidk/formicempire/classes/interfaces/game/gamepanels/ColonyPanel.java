@@ -1,5 +1,6 @@
 package com.grimidk.formicempire.classes.interfaces.game.gamepanels;
 
+import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ColonyLoyalty;
 import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
@@ -145,6 +146,15 @@ public class ColonyPanel extends ZeroGamePanel {
         setupConstantLabel(deadAntsLabel, GameConstants.TYPE_DEAD);
 
         // Special Icons & Tooltips
+        setupStatLabel(totalAntLabel, GameConstants.ICON_STAT_POPULATION);
+        setupStatLabel(totalConsumptionLabel, GameConstants.ICON_STAT_FOOD_CONSUMPTION);
+        setupStatLabel(totalProductionLabel, GameConstants.ICON_STAT_FOOD_PRODUCTION);
+        setupStatLabel(netMushroomsLabel, GameConstants.ICON_STAT_NET_FOOD);
+        setupConstantLabel(layingRateLabel, GameConstants.ROLE_LAYER);
+        setupConstantLabel(nurseCoverageLabel, GameConstants.ROLE_NURSE);
+        setupConstantLabel(graveKeepingLabel, GameConstants.ROLE_GRAVER);
+        setupConstantLabel(babyAntsLabel, GameConstants.TYPE_EGG);
+        setupConstantLabel(adultAntsLabel, GameConstants.TYPE_WORKER);
         petInsectsLabel.setIcon(GameConstants.ICON_APHID);
         parasiticMiteCountLabel.setIcon(GameConstants.ICON_PARASITIC_MITE);
         parasiteAntCountLabel.setIcon(GameConstants.TYPE_PARASITE_ANT.getIcon());
@@ -201,8 +211,19 @@ public class ColonyPanel extends ZeroGamePanel {
         label.setForeground(AssetStyles.FONT_COLOR);
     }
 
+    private void setupConstantLabel(JLabel label, AntRole role) {
+        label.setIcon(role.getIcon());
+        label.setForeground(AssetStyles.FONT_COLOR);
+    }
+
     private void setupConstantLabel(JLabel label, ResourceType resource) { 
         label.setIcon(resource.getIcon());
+        label.setForeground(AssetStyles.FONT_COLOR);
+    }
+
+    private void setupStatLabel(JLabel label, ImageIcon icon) {
+        label.setIcon(icon);
+        label.setIconTextGap(6);
         label.setForeground(AssetStyles.FONT_COLOR);
     }
 

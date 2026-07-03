@@ -28,14 +28,16 @@ public final class BuildingSpriteResources {
         }
         int tier = Math.max(0, Math.min(3, level));
         String chain = pascalSegment(chainKey);
-        return icon("sprites/buildings/rooms/" + chain + "L" + tier + ".png");
+        String path = "sprites/buildings/rooms/" + chain + "L" + tier + ".png";
+        return icon(path);
     }
 
     public static ImageIcon passiveRoom(String passiveKey) {
         if (passiveKey == null || passiveKey.isEmpty()) {
             return null;
         }
-        return icon("sprites/buildings/rooms/Passive" + pascalSegment(passiveKey) + ".png");
+        String path = "sprites/buildings/rooms/Passive" + pascalSegment(passiveKey) + ".png";
+        return icon(path);
     }
 
     private static String pascalSegment(String key) {

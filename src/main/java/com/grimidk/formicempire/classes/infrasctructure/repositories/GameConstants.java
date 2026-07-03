@@ -55,12 +55,24 @@ public final class GameConstants {
     public static final int BUILDING_ROOM_ICON_SIZE_PX = BuildingSpriteResources.ROOM_ICON_PX;
 
     public static ImageIcon buildingRoomSprite(String chainKey, int level) {
+        // TODO asset: sprites/buildings/rooms/{Chain}L{tier}.png (placeholder in-room overlay; replace final art)
         return BuildingSpriteResources.roomTier(chainKey, level);
     }
 
     public static ImageIcon passiveBuildingRoomSprite(String passiveKey) {
+        // TODO asset: sprites/buildings/rooms/Passive{Name}.png (placeholder in-room overlay; replace final art)
         return BuildingSpriteResources.passiveRoom(passiveKey);
     }
+
+    // --- Convoy view tiles (simulation / view-convoy screen backgrounds) ---
+    // TODO asset: backgrounds/convoy/SeaConvoyTile.png
+    public static final ImageIcon CONVOY_TILE_SEA = loadIcon("backgrounds/convoy/SeaConvoyTile.png");
+    // TODO asset: backgrounds/convoy/UndergroundConvoyTile.png
+    public static final ImageIcon CONVOY_TILE_UNDERGROUND = loadIcon("backgrounds/convoy/UndergroundConvoyTile.png");
+    // TODO asset: backgrounds/convoy/SkyConvoyTile.png
+    // TODO asset: backgrounds/convoy/OverlandConvoyTile.png (deferred — pick origin/destination biome tiles at runtime)
+
+    public static final ImageIcon TUNNEL_SPRITE = loadIcon("sprites/buildings/TunnelSprite.png");
 
     public static ImageIcon getAntSprite(AntType type, Species species) {
         if (type == null) return null;
@@ -119,6 +131,14 @@ public final class GameConstants {
     static { misc.add(ICON_STAT_GENETIC_INTEGRITY); }
     public static final ImageIcon ICON_STAT_MILITARY_POWER = loadIcon("icons/misc/MilitaryPower.png");
     static { misc.add(ICON_STAT_MILITARY_POWER); }
+    public static final ImageIcon ICON_STAT_POPULATION = loadIcon("icons/misc/Population.png");
+    static { misc.add(ICON_STAT_POPULATION); }
+    public static final ImageIcon ICON_STAT_FOOD_CONSUMPTION = loadIcon("icons/misc/FoodConsumption.png");
+    static { misc.add(ICON_STAT_FOOD_CONSUMPTION); }
+    public static final ImageIcon ICON_STAT_FOOD_PRODUCTION = loadIcon("icons/misc/FoodProduction.png");
+    static { misc.add(ICON_STAT_FOOD_PRODUCTION); }
+    public static final ImageIcon ICON_STAT_NET_FOOD = loadIcon("icons/misc/NetFood.png");
+    static { misc.add(ICON_STAT_NET_FOOD); }
 
     // --- Base Stats ---
     public static final float BASE_SPRITE_SPEED = 2.5f;
