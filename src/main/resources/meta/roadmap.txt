@@ -13,7 +13,7 @@ To Fix (By decreasing priority) :
 	
 	High:
 	TODO: icons/sprites for all Constants (roles, moves) and unlocks (all)
-	automate diplomatic actions and diplomat missions and accept/decline trades and offer trades
+	automate accept/decline trades and offer trades
 
 	Mid:
 	(none right now)
