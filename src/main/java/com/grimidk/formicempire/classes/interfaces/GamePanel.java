@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.interfaces;
 
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.CrossDynastyTradeProposal;
 import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
@@ -8,6 +9,7 @@ import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.interfaces.game.managers.AlertManager;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
+import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TriggerManager;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiDialogUtils;
@@ -1322,6 +1324,7 @@ public class GamePanel extends ZeroGamePanel {
         }
 
         processPendingPactRequests(world);
+        processPendingTradeProposals(world);
 
         if (roleDialog != null && roleDialog.isShowing()) {
             roleDialog.liveUpdate();
@@ -1379,5 +1382,77 @@ public class GamePanel extends ZeroGamePanel {
         } else {
             playerDynasty.getDiplomacyService().declineNonAggressionPact(requester, world);
         }
+    }
+
+    private void processPendingTradeProposals(World world) {
+        if (world == null || !engineStarted) {
+            return;
+        }
+        Dynasty playerDynasty = null;
+        for (Dynasty dynasty : world.getDynastys()) {
+            if (dynasty.isPlayer() && !dynasty.isDefeated()) {
+                playerDynasty = dynasty;
+                break;
+            }
+        }
+        if (playerDynasty == null || playerDynasty.getDiplomacyService() == null) {
+            return;
+        }
+
+        List<CrossDynastyTradeProposal> pending = playerDynasty.copyPendingTradeProposals();
+        if (pending.isEmpty()) {
+            return;
+        }
+
+        CrossDynastyTradeProposal proposal = pending.get(0);
+        Dynasty requester = world.findDynastyById(proposal.getFromDynastyId());
+        if (requester == null || requester.isDefeated()) {
+            playerDynasty.removePendingTradeProposal(proposal);
+            return;
+        }
+
+        Colony origin = findColonyById(world, proposal.getOriginColonyId());
+        Colony destination = findColonyById(world, proposal.getDestinationColonyId());
+        if (origin == null || destination == null) {
+            playerDynasty.removePendingTradeProposal(proposal);
+            return;
+        }
+
+        String loadSummary = playerDynasty.getDiplomacyService().formatProposalLoadSummary(proposal);
+        String messageKey = proposal.getKind() == CrossDynastyTradeProposal.Kind.OFFER
+                ? LanguageStrings.DIPLO_TRADE_OFFER_MSG_FMT
+                : LanguageStrings.DIPLO_TRADE_REQUEST_MSG_FMT;
+        String message = LanguageStrings.format(messageKey,
+                requester.getName(),
+                origin.getName(),
+                destination.getName(),
+                loadSummary);
+        String[] options = {
+                LanguageStrings.get(LanguageStrings.DIPLO_TRADE_PROPOSAL_ACCEPT),
+                LanguageStrings.get(LanguageStrings.DIPLO_TRADE_PROPOSAL_DECLINE)
+        };
+        int choice = UiOptionPane.showOptionDialog(this, message,
+                LanguageStrings.get(LanguageStrings.DIPLO_TRADE_PROPOSAL_TITLE),
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                null, options, options[0]);
+
+        if (choice == JOptionPane.YES_OPTION || choice == 0) {
+            Engine engine = frame.getEngine();
+            TradeManager tradeManager = engine != null ? engine.getTradeManager() : null;
+            playerDynasty.getDiplomacyService().acceptTradeProposal(requester, proposal, world, tradeManager);
+        } else {
+            playerDynasty.getDiplomacyService().declineTradeProposal(requester, proposal, world);
+        }
+    }
+
+    private Colony findColonyById(World world, int colonyId) {
+        for (Dynasty dynasty : world.getDynastys()) {
+            for (Colony colony : dynasty.getColonies()) {
+                if (colony.getId() == colonyId) {
+                    return colony;
+                }
+            }
+        }
+        return null;
     }
 }

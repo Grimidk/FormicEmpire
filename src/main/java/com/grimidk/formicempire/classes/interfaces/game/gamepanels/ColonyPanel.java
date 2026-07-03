@@ -160,6 +160,7 @@ public class ColonyPanel extends ZeroGamePanel {
         parasiteAntCountLabel.setIcon(GameConstants.TYPE_PARASITE_ANT.getIcon());
         policeStatsLabel.setIcon(GameConstants.TYPE_SOLDIER.getIcon());
         researchPointsLabel.setIcon(GameConstants.ICON_RESEARCH);
+        researchRateLabel.setIcon(GameConstants.ROLE_RESEARCHER.getIcon());
         militaryPowerLabel.setIcon(GameConstants.ICON_STAT_MILITARY_POWER);
         militaryPowerLabel.setToolTipText(LanguageStrings.get(LanguageStrings.STAT_MILITARY_POWER_DESC));
         loyaltyLabel.setIcon(GameConstants.ICON_STAT_LOYALTY);

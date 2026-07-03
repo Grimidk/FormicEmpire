@@ -89,8 +89,19 @@ public class Savefile implements Serializable {
         public Map<String, String> diplomaticModifierKeys = new HashMap<>();
         public List<Integer> crossDynastyTradeRepGrantedIds = new ArrayList<>();
         public List<Integer> pendingPactRequestFromIds = new ArrayList<>();
+        public List<SavedCrossDynastyTradeProposal> pendingTradeProposals = new ArrayList<>();
         public int forcedFlightCooldownDays;
         public List<SavedTunnel> tunnels = new ArrayList<>();
+    }
+
+    public static class SavedCrossDynastyTradeProposal implements Serializable {
+        private static final long serialVersionUID = 1L;
+
+        public int fromDynastyId;
+        public int originColonyId;
+        public int destinationColonyId;
+        public boolean request;
+        public Map<String, Double> loadByResourceId = new HashMap<>();
     }
 
     public static class SavedColony implements Serializable {

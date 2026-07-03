@@ -1,5 +1,6 @@
 package com.grimidk.formicempire.classes.entities.services.colony;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.grimidk.formicempire.classes.constants.world.Biome;
@@ -358,16 +359,18 @@ public final class ColonyJobRules {
             return;
         }
 
-        List<Ant> workers = colony.getWorkers();
-        int killed = 0;
+        List<Ant> candidates = new ArrayList<>();
+        for (List<Ant> group : colony.getAntGroups().values()) {
+            candidates.addAll(group);
+        }
 
-        for (int i = workers.size() - 1; i >= 0; i--) {
-            if (killed >= deaths) {
-                break;
+        List<Ant> victims = ColonyResourceDeathSelection.selectVictims(candidates, deaths, null);
+        for (Ant victim : victims) {
+            List<Ant> typeList = colony.getAntsByType(victim.getAntType());
+            if (typeList != null) {
+                typeList.remove(victim);
             }
-            Ant victim = workers.remove(i);
             colony.recordAntDeath(victim, cause);
-            killed++;
         }
     }
 

@@ -18,6 +18,7 @@ import com.grimidk.formicempire.classes.constants.world.Temperature;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -224,14 +225,10 @@ public class ColonyPopulationService {
             waterDeficit -= syrupConsumed;
         }
 
-        List<Ant> doomedThirsty = new ArrayList<>();
-        for (int i = 0; i < (int) waterDeficit; i++) {
-            if (i < thirstyCandidates.size()) {
-                doomedThirsty.add(thirstyCandidates.get(i));
-            }
-        }
+        List<Ant> doomedThirsty = ColonyResourceDeathSelection.selectVictims(
+            thirstyCandidates, (int) waterDeficit, null);
 
-        List<AntType> eatOrder = Arrays.asList(
+        List<AntType> eatTypes = Arrays.asList(
             GameConstants.TYPE_DRONE, GameConstants.TYPE_PRINCESS, GameConstants.TYPE_MAJOR,
             GameConstants.TYPE_SOLDIER, GameConstants.TYPE_LARVA, GameConstants.TYPE_WORKER, GameConstants.TYPE_QUEEN
         );
@@ -240,7 +237,7 @@ public class ColonyPopulationService {
         int foodNeeded = 0;
         int baseConsumption = stats.getBaseConsumption(colony);
 
-        for (AntType type : eatOrder) {
+        for (AntType type : eatTypes) {
             int consumptionPerAnt = (int) (type.getConsumptionMult() * baseConsumption);
             if (consumptionPerAnt <= 0) consumptionPerAnt = 1; 
             if (type == GameConstants.TYPE_EGG || type == GameConstants.TYPE_PUPA) continue;
@@ -265,17 +262,9 @@ public class ColonyPopulationService {
             foodDeficit -= syrupConsumed;
         }
 
-        List<Ant> doomedHungry = new ArrayList<>();
         int approxAntsToKill = (int) (foodDeficit / (baseConsumption <= 0 ? 1 : baseConsumption));
-        
-        int added = 0;
-        for (int i = 0; i < hungryCandidates.size() && added < approxAntsToKill; i++) {
-            Ant potentialVictim = hungryCandidates.get(i);
-            if (!doomedThirsty.contains(potentialVictim)) {
-                doomedHungry.add(potentialVictim);
-                added++;
-            }
-        }
+        List<Ant> doomedHungry = ColonyResourceDeathSelection.selectVictims(
+            hungryCandidates, approxAntsToKill, new HashSet<>(doomedThirsty));
 
         processDeaths(colony, doomedThirsty, DeathCause.DEHYDRATION);
         processDeaths(colony, doomedHungry, DeathCause.STARVATION);

@@ -16,6 +16,7 @@ import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
+import com.grimidk.formicempire.classes.entities.CrossDynastyTradeProposal;
 import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
@@ -366,6 +367,18 @@ public class SaveManager {
                 sc.diplomaticModifierKeys = dynasty.copyDiplomaticModifierKeys();
                 sc.crossDynastyTradeRepGrantedIds = dynasty.copyCrossDynastyTradeRepGrantedIds();
                 sc.pendingPactRequestFromIds = dynasty.copyPendingPactRequestFromIds();
+                sc.pendingTradeProposals = new ArrayList<>();
+                for (CrossDynastyTradeProposal proposal : dynasty.copyPendingTradeProposals()) {
+                    Savefile.SavedCrossDynastyTradeProposal saved = new Savefile.SavedCrossDynastyTradeProposal();
+                    saved.fromDynastyId = proposal.getFromDynastyId();
+                    saved.originColonyId = proposal.getOriginColonyId();
+                    saved.destinationColonyId = proposal.getDestinationColonyId();
+                    saved.request = proposal.getKind() == CrossDynastyTradeProposal.Kind.REQUEST;
+                    for (Map.Entry<Integer, Double> entry : proposal.copyLoadByResourceId().entrySet()) {
+                        saved.loadByResourceId.put(String.valueOf(entry.getKey()), entry.getValue());
+                    }
+                    sc.pendingTradeProposals.add(saved);
+                }
                 sc.forcedFlightCooldownDays = dynasty.getForcedFlightCooldownDays();
                 
                 sc.unlockedUpgradeIds = new ArrayList<>();
@@ -651,6 +664,7 @@ public class SaveManager {
         w.write("      \"diplomaticModifierKeys\": " + serializeStringMapToJson(sc.diplomaticModifierKeys) + ","); w.newLine();
         w.write("      \"crossDynastyTradeRepGrantedIds\": " + serializeListToJson(sc.crossDynastyTradeRepGrantedIds) + ","); w.newLine();
         w.write("      \"pendingPactRequestFromIds\": " + serializeListToJson(sc.pendingPactRequestFromIds) + ","); w.newLine();
+        w.write("      \"pendingTradeProposals\": " + serializeTradeProposalsToJson(sc.pendingTradeProposals) + ","); w.newLine();
         w.write("      \"forcedFlightCooldownDays\": " + sc.forcedFlightCooldownDays + ","); w.newLine();
         w.write("      \"unlockedUpgradeIds\": " + serializeListToJson(sc.unlockedUpgradeIds) + ","); w.newLine();
         w.write("      \"absorbedDynastyIds\": " + serializeListToJson(sc.absorbedDynastyIds) + ","); w.newLine();
@@ -879,6 +893,7 @@ public class SaveManager {
         sc.diplomaticModifierKeys = deserializeJsonToStringMap(map.get("diplomaticModifierKeys"));
         sc.crossDynastyTradeRepGrantedIds = deserializeJsonToList(map.get("crossDynastyTradeRepGrantedIds"));
         sc.pendingPactRequestFromIds = deserializeJsonToList(map.get("pendingPactRequestFromIds"));
+        sc.pendingTradeProposals = deserializeJsonToTradeProposals(map.get("pendingTradeProposals"));
         sc.forcedFlightCooldownDays = Integer.parseInt(map.getOrDefault("forcedFlightCooldownDays", "0"));
         sc.unlockedUpgradeIds = deserializeJsonToList(map.get("unlockedUpgradeIds"));
         sc.absorbedDynastyIds = deserializeJsonToList(map.get("absorbedDynastyIds"));
@@ -1118,6 +1133,29 @@ public class SaveManager {
             sb.append("\"ic\":").append(t.isComplete);
             sb.append("}");
             if (i < tunnels.size() - 1) sb.append(",");
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
+    private String serializeTradeProposalsToJson(List<Savefile.SavedCrossDynastyTradeProposal> proposals) {
+        if (proposals == null || proposals.isEmpty()) {
+            return "[]";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (int i = 0; i < proposals.size(); i++) {
+            Savefile.SavedCrossDynastyTradeProposal p = proposals.get(i);
+            sb.append("{");
+            sb.append("\"fromDynastyId\":").append(p.fromDynastyId).append(",");
+            sb.append("\"originColonyId\":").append(p.originColonyId).append(",");
+            sb.append("\"destinationColonyId\":").append(p.destinationColonyId).append(",");
+            sb.append("\"request\":").append(p.request).append(",");
+            sb.append("\"load\":").append(serializeDoubleMapToJson(p.loadByResourceId));
+            sb.append("}");
+            if (i < proposals.size() - 1) {
+                sb.append(",");
+            }
         }
         sb.append("]");
         return sb.toString();
@@ -1377,6 +1415,50 @@ public class SaveManager {
                     }
                     while(i+1 < content.length() && (content.charAt(i+1) == ',' || Character.isWhitespace(content.charAt(i+1)))) i++;
                     start = i+1;
+                }
+            }
+        }
+        return list;
+    }
+
+    private List<Savefile.SavedCrossDynastyTradeProposal> deserializeJsonToTradeProposals(String jsonArray) {
+        List<Savefile.SavedCrossDynastyTradeProposal> list = new ArrayList<>();
+        if (jsonArray == null || !jsonArray.startsWith("[")) {
+            return list;
+        }
+
+        int lastIdx = jsonArray.lastIndexOf("]");
+        if (lastIdx <= 1) {
+            return list;
+        }
+
+        String content = jsonArray.substring(1, lastIdx);
+        int braceDepth = 0;
+        int start = 0;
+        for (int i = 0; i < content.length(); i++) {
+            char c = content.charAt(i);
+            if (c == '{') {
+                braceDepth++;
+            }
+            if (c == '}') {
+                braceDepth--;
+                if (braceDepth == 0) {
+                    String proposalJson = content.substring(start, i + 1);
+                    if (!proposalJson.trim().isEmpty()) {
+                        Savefile.SavedCrossDynastyTradeProposal saved = new Savefile.SavedCrossDynastyTradeProposal();
+                        Map<String, String> map = parseTopLevelJson(proposalJson);
+                        saved.fromDynastyId = Integer.parseInt(map.getOrDefault("fromDynastyId", "0"));
+                        saved.originColonyId = Integer.parseInt(map.getOrDefault("originColonyId", "0"));
+                        saved.destinationColonyId = Integer.parseInt(map.getOrDefault("destinationColonyId", "0"));
+                        saved.request = Boolean.parseBoolean(map.getOrDefault("request", "false"));
+                        saved.loadByResourceId = deserializeJsonToDoubleMap(map.get("load"));
+                        list.add(saved);
+                    }
+                    while (i + 1 < content.length()
+                            && (content.charAt(i + 1) == ',' || Character.isWhitespace(content.charAt(i + 1)))) {
+                        i++;
+                    }
+                    start = i + 1;
                 }
             }
         }

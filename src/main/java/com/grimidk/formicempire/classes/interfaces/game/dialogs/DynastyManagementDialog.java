@@ -12,6 +12,8 @@ import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.Trade;
 import com.grimidk.formicempire.classes.entities.Tunnel;
+import com.grimidk.formicempire.classes.entities.CrossDynastyTradeProposal;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyTradeAutomation;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDiplomacyService;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
@@ -1396,7 +1398,8 @@ public class DynastyManagementDialog extends ZeroDialog {
                         engine.getTradeManager().addTrade(trade);
                     }
                     if (crossDynasty && origin.getDynasty() != null && target.getDynasty() != null) {
-                        origin.getDynasty().getDiplomacyService().onCrossDynastyTradeEstablished(target.getDynasty());
+                        origin.getDynasty().getDiplomacyService().onCrossDynastyTradeEstablished(
+                                origin.getDynasty(), target.getDynasty(), CrossDynastyTradeProposal.Kind.OFFER);
                     }
                 } else {
                     UiOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.TRADE_ERROR_START));
@@ -1645,19 +1648,40 @@ public class DynastyManagementDialog extends ZeroDialog {
                 return;
             }
             Trade outgoing = dynasty.getTradeService().findTrade(activeColony, neighbor);
+            Trade incoming = dynasty.getTradeService().findTrade(neighbor, activeColony);
             if (outgoing != null) {
                 promptManageTradeRoute(this, activeColony, outgoing);
-            } else if (dynasty.getDiplomacyService().canEstablishCrossDynastyTrade(
-                    other, activeColony, world, engine.getTradeManager())) {
-                openTradeDialog(activeColony, neighbor, null);
-            } else {
-                String message = LanguageStrings.get(LanguageStrings.DIPLO_ERROR_NEUTRAL_REQUIRED);
-                if (!DynastyDiplomacyService.meetsTradeLoyaltyRequirement(activeColony)) {
-                    message = LanguageStrings.get(LanguageStrings.DIPLO_ERROR_LOYALTY_REQUIRED);
-                } else if (!dynasty.getDiplomacyService().meetsTradeReputationRequirement(other, world)) {
+            } else if (incoming != null) {
+                promptManageTradeRoute(this, neighbor, incoming);
+            } else if (!dynasty.getDiplomacyService().canParticipateInCrossDynastyTrade(other, activeColony, world)) {
+                String message = LanguageStrings.get(LanguageStrings.DIPLO_ERROR_LOYALTY_REQUIRED);
+                if (!dynasty.hasUpgrade(GameUnlocks.ABILITY_TRADE)) {
                     message = LanguageStrings.get(LanguageStrings.DIPLO_ERROR_NEUTRAL_REQUIRED);
                 }
                 UiOptionPane.showMessageDialog(this, message,
+                        LanguageStrings.get(LanguageStrings.DIPLO_ACTION_TRADE),
+                        JOptionPane.WARNING_MESSAGE);
+            } else if (!DynastyTradeAutomation.computeOutboundLoad(activeColony, neighbor).isEmpty()
+                    && dynasty.getDiplomacyService().canOfferTrade(other, world)) {
+                showTradeProposalResult(other,
+                        dynasty.getDiplomacyService().offerTrade(
+                                other, activeColony, world, engine.getTradeManager()),
+                        CrossDynastyTradeProposal.Kind.OFFER);
+            } else if (!DynastyTradeAutomation.computeOutboundLoad(neighbor, activeColony).isEmpty()
+                    && dynasty.getDiplomacyService().canRequestTrade(other, world)) {
+                showTradeProposalResult(other,
+                        dynasty.getDiplomacyService().requestTrade(
+                                other, activeColony, world, engine.getTradeManager()),
+                        CrossDynastyTradeProposal.Kind.REQUEST);
+            } else if (!dynasty.getDiplomacyService().canOfferTrade(other, world)
+                    && !dynasty.getDiplomacyService().canRequestTrade(other, world)) {
+                UiOptionPane.showMessageDialog(this,
+                        LanguageStrings.get(LanguageStrings.DIPLO_ERROR_NEUTRAL_REQUIRED),
+                        LanguageStrings.get(LanguageStrings.DIPLO_ACTION_TRADE),
+                        JOptionPane.WARNING_MESSAGE);
+            } else {
+                UiOptionPane.showMessageDialog(this,
+                        LanguageStrings.get(LanguageStrings.DIPLO_ERROR_NO_TRADE_CARGO),
                         LanguageStrings.get(LanguageStrings.DIPLO_ACTION_TRADE),
                         JOptionPane.WARNING_MESSAGE);
             }
@@ -1669,6 +1693,14 @@ public class DynastyManagementDialog extends ZeroDialog {
                 return;
             }
             World world = engine.getWorld();
+            Colony activeColony = getActivePlayerColony();
+            if (activeColony == null) {
+                UiOptionPane.showMessageDialog(this,
+                        LanguageStrings.get(LanguageStrings.DIPLO_ERROR_ACTIVE_COLONY),
+                        LanguageStrings.get(LanguageStrings.DIPLO_ACTION_REQUEST_TRADE),
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
             if (!dynasty.getDiplomacyService().canRequestTrade(other, world)) {
                 UiOptionPane.showMessageDialog(this,
                         LanguageStrings.get(LanguageStrings.DIPLO_ERROR_CORDIAL_REQUIRED_REQUEST),
@@ -1676,12 +1708,40 @@ public class DynastyManagementDialog extends ZeroDialog {
                         JOptionPane.WARNING_MESSAGE);
                 return;
             }
-            dynasty.getDiplomacyService().requestTrade(other, world);
-            UiOptionPane.showMessageDialog(this,
-                    LanguageStrings.get(LanguageStrings.DIPLO_TRADE_REQUEST_SENT),
-                    LanguageStrings.get(LanguageStrings.DIPLO_ACTION_REQUEST_TRADE),
-                    JOptionPane.INFORMATION_MESSAGE);
+            showTradeProposalResult(other,
+                    dynasty.getDiplomacyService().requestTrade(
+                            other, activeColony, world, engine.getTradeManager()),
+                    CrossDynastyTradeProposal.Kind.REQUEST);
             updateData();
+        }
+
+        private void showTradeProposalResult(
+                Dynasty other,
+                DynastyDiplomacyService.TradeProposalResult result,
+                CrossDynastyTradeProposal.Kind kind) {
+            String title = kind == CrossDynastyTradeProposal.Kind.OFFER
+                    ? LanguageStrings.get(LanguageStrings.DIPLO_ACTION_TRADE)
+                    : LanguageStrings.get(LanguageStrings.DIPLO_ACTION_REQUEST_TRADE);
+            switch (result) {
+                case QUEUED -> UiOptionPane.showMessageDialog(this,
+                        kind == CrossDynastyTradeProposal.Kind.OFFER
+                                ? LanguageStrings.format(LanguageStrings.DIPLO_TRADE_OFFER_SENT_FMT, other.getName())
+                                : LanguageStrings.get(LanguageStrings.DIPLO_TRADE_REQUEST_SENT),
+                        title,
+                        JOptionPane.INFORMATION_MESSAGE);
+                case ACCEPTED -> UiOptionPane.showMessageDialog(this,
+                        LanguageStrings.format(LanguageStrings.DIPLO_TRADE_ACCEPTED_FMT, other.getName()),
+                        title,
+                        JOptionPane.INFORMATION_MESSAGE);
+                case DECLINED -> UiOptionPane.showMessageDialog(this,
+                        LanguageStrings.format(LanguageStrings.DIPLO_TRADE_DECLINED_FMT, other.getName()),
+                        title,
+                        JOptionPane.WARNING_MESSAGE);
+                default -> UiOptionPane.showMessageDialog(this,
+                        LanguageStrings.get(LanguageStrings.DIPLO_ERROR_NO_TRADE_CARGO),
+                        title,
+                        JOptionPane.WARNING_MESSAGE);
+            }
         }
 
         private class DiplomacyRowData {
@@ -1796,18 +1856,21 @@ public class DynastyManagementDialog extends ZeroDialog {
                         tradeItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_NO_BORDER));
                     } else {
                         Trade outgoing = dynasty.getTradeService().findTrade(activeColony, neighbor);
-                        if (outgoing != null) {
+                        Trade incoming = dynasty.getTradeService().findTrade(neighbor, activeColony);
+                        if (outgoing != null || incoming != null) {
                             tradeItem.setText(LanguageStrings.get(LanguageStrings.UI_MANAGE));
                             tradeItem.addActionListener(e -> performTradeAction(other));
-                        } else if (diplo.canEstablishCrossDynastyTrade(
-                                other, activeColony, world, engine.getTradeManager())) {
+                        } else if (diplo.canParticipateInCrossDynastyTrade(other, activeColony, world)
+                                && (diplo.canOfferTrade(other, world) || diplo.canRequestTrade(other, world))) {
                             tradeItem.addActionListener(e -> performTradeAction(other));
                         } else {
                             tradeItem.setEnabled(false);
                             if (!DynastyDiplomacyService.meetsTradeLoyaltyRequirement(activeColony)) {
                                 tradeItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_LOYALTY_REQUIRED));
+                            } else if (!diplo.canOfferTrade(other, world) && !diplo.canRequestTrade(other, world)) {
+                                tradeItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_WARY_REQUIRED_OFFER));
                             } else {
-                                tradeItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_NEUTRAL_REQUIRED));
+                                tradeItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_NO_TRADE_CARGO));
                             }
                         }
                     }

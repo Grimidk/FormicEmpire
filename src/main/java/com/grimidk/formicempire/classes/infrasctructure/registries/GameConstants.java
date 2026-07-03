@@ -114,6 +114,8 @@ public final class GameConstants {
     private static final List<ImageIcon> misc = new ArrayList<>();
 
     // --- Misc Icons ---
+    public static final ImageIcon ICON_SOCIALISM = loadIcon("icons/misc/Socialism.png");
+    static { misc.add(ICON_SOCIALISM); }
     public static final ImageIcon ICON_APHID = loadIcon("icons/bugs/Aphid.png");
     static { misc.add(ICON_APHID); }
     public static final ImageIcon ICON_SYMBIOTIC_MITE = loadIcon("icons/bugs/SoilMite.png");
@@ -569,31 +571,22 @@ public final class GameConstants {
     // --- Ant Subtypes ---
 
     // --- Ant Roles ---
-    // TODO asset: icons/roles/Forager.png
     public static final AntRole ROLE_FORAGER = new AntRole(1, TYPE_WORKER, LanguageStrings.ROLE_FORAGER, loadIcon("icons/roles/Forager.png"));
     static { antRoles.add(ROLE_FORAGER); }
-    // TODO asset: icons/roles/Nurse.png
     public static final AntRole ROLE_NURSE = new AntRole(2, TYPE_WORKER, LanguageStrings.ROLE_NURSE, loadIcon("icons/roles/Nurse.png"));
     static { antRoles.add(ROLE_NURSE); }
-    // TODO asset: icons/roles/Builder.png
     public static final AntRole ROLE_BUILDER = new AntRole(3, TYPE_WORKER, LanguageStrings.ROLE_BUILDER, loadIcon("icons/roles/Builder.png"));
     static { antRoles.add(ROLE_BUILDER); }
-    // TODO asset: icons/roles/Scout.png
     public static final AntRole ROLE_SCOUT = new AntRole(4, TYPE_WORKER, LanguageStrings.ROLE_SCOUT, loadIcon("icons/roles/Scout.png"));
     static { antRoles.add(ROLE_SCOUT); }
-    // TODO asset: icons/roles/Farmer.png
     public static final AntRole ROLE_FARMER = new AntRole(5, TYPE_WORKER, LanguageStrings.ROLE_FARMER, loadIcon("icons/roles/Farmer.png"));
     static { antRoles.add(ROLE_FARMER); }
-    // TODO asset: icons/roles/Rancher.png
     public static final AntRole ROLE_RANCHER = new AntRole(6, TYPE_WORKER, LanguageStrings.ROLE_RANCHER, loadIcon("icons/roles/Rancher.png"));
     static { antRoles.add(ROLE_RANCHER); }
-    // TODO asset: icons/roles/Graver.png
     public static final AntRole ROLE_GRAVER = new AntRole(7, TYPE_WORKER, LanguageStrings.ROLE_GRAVER, loadIcon("icons/roles/Graver.png"));
     static { antRoles.add(ROLE_GRAVER); }
-    // TODO asset: icons/roles/Miner.png
     public static final AntRole ROLE_MINER = new AntRole(8, TYPE_WORKER, LanguageStrings.ROLE_MINER, loadIcon("icons/roles/Miner.png"));
     static { antRoles.add(ROLE_MINER); }
-    // TODO asset: icons/roles/Courier.png
     public static final AntRole ROLE_COURIER = new AntRole(9, TYPE_WORKER, LanguageStrings.ROLE_COURIER, loadIcon("icons/roles/Courier.png"));
     static { antRoles.add(ROLE_COURIER); }
     // TODO asset: icons/roles/Potter.png
@@ -608,13 +601,10 @@ public final class GameConstants {
     // TODO asset: icons/roles/Defender.png
     public static final AntRole ROLE_DEFENDER = new AntRole(13, TYPE_SOLDIER, LanguageStrings.ROLE_DEFENDER, loadIcon("icons/roles/Defender.png"));
     static { antRoles.add(ROLE_DEFENDER); }
-    // TODO asset: icons/roles/Police.png
     public static final AntRole ROLE_POLICE = new AntRole(14, TYPE_SOLDIER, LanguageStrings.ROLE_POLICE, loadIcon("icons/roles/Police.png"));
     static { antRoles.add(ROLE_POLICE); }
-    // TODO asset: icons/roles/Bomber.png
     public static final AntRole ROLE_BOMBER = new AntRole(15, TYPE_SOLDIER, LanguageStrings.ROLE_BOMBER, loadIcon("icons/roles/Bomber.png"));
     static { antRoles.add(ROLE_BOMBER); }
-    // TODO asset: icons/roles/Hunter.png
     public static final AntRole ROLE_HUNTER = new AntRole(16, TYPE_SOLDIER, LanguageStrings.ROLE_HUNTER, loadIcon("icons/roles/Hunter.png"));
     static { antRoles.add(ROLE_HUNTER); }
     // TODO asset: icons/roles/Brute.png
@@ -629,22 +619,16 @@ public final class GameConstants {
     // TODO asset: icons/roles/Siege.png
     public static final AntRole ROLE_SIEGE = new AntRole(20, TYPE_MAJOR, LanguageStrings.ROLE_SIEGE, loadIcon("icons/roles/Siege.png"));
     static { antRoles.add(ROLE_SIEGE); }
-    // TODO asset: icons/roles/Borer.png
     public static final AntRole ROLE_BORER = new AntRole(21, TYPE_MAJOR, LanguageStrings.ROLE_BORER, loadIcon("icons/roles/Borer.png"));
     static { antRoles.add(ROLE_BORER); }
-    // TODO asset: icons/roles/Drone.png
     public static final AntRole ROLE_DRONE = new AntRole(22, TYPE_DRONE, LanguageStrings.ROLE_DRONE, loadIcon("icons/roles/Drone.png"));
     static { antRoles.add(ROLE_DRONE); }
-    // TODO asset: icons/roles/Breeder.png
     public static final AntRole ROLE_BREEDER = new AntRole(23, TYPE_PRINCESS, LanguageStrings.ROLE_BREEDER, loadIcon("icons/roles/Breeder.png"));
     static { antRoles.add(ROLE_BREEDER); }
-    // TODO asset: icons/roles/Diplomat.png
     public static final AntRole ROLE_DIPLOMAT = new AntRole(24, TYPE_PRINCESS, LanguageStrings.ROLE_DIPLOMAT, loadIcon("icons/roles/Diplomat.png"));
     static { antRoles.add(ROLE_DIPLOMAT); }
-    // TODO asset: icons/roles/Layer.png
     public static final AntRole ROLE_LAYER = new AntRole(25, TYPE_QUEEN, LanguageStrings.ROLE_LAYER, loadIcon("icons/roles/Layer.png"));
     static { antRoles.add(ROLE_LAYER); }
-    // TODO asset: icons/roles/Researcher.png
     public static final AntRole ROLE_RESEARCHER = new AntRole(26, TYPE_QUEEN, LanguageStrings.ROLE_RESEARCHER, loadIcon("icons/roles/Researcher.png"));
     static { antRoles.add(ROLE_RESEARCHER); }
     // TODO asset: icons/roles/Militia.png
@@ -653,19 +637,16 @@ public final class GameConstants {
     // TODO asset: icons/roles/Catcher.png
     public static final AntRole ROLE_CATCHER = new AntRole(28, TYPE_SOLDIER, LanguageStrings.ROLE_CATCHER, loadIcon("icons/roles/Catcher.png"));
     static { antRoles.add(ROLE_CATCHER); }
-    // TODO asset: icons/roles/Crane.png
     public static final AntRole ROLE_CRANE = new AntRole(29, TYPE_MAJOR, LanguageStrings.ROLE_CRANE, loadIcon("icons/roles/Crane.png"));
     static { antRoles.add(ROLE_CRANE); }
     // TODO asset: icons/roles/Transport.png
     public static final AntRole ROLE_TRANSPORT = new AntRole(30, TYPE_MAJOR, LanguageStrings.ROLE_TRANSPORT, loadIcon("icons/roles/Transport.png"));
     static { antRoles.add(ROLE_TRANSPORT); }
-    // TODO asset: icons/roles/Assistant.png
     public static final AntRole ROLE_ASSISTANT = new AntRole(31, TYPE_PRINCESS, LanguageStrings.ROLE_ASSISTANT, loadIcon("icons/roles/Assistant.png"));
     static { antRoles.add(ROLE_ASSISTANT); }
     // TODO asset: icons/roles/Escort.png
     public static final AntRole ROLE_ESCORT = new AntRole(32, TYPE_SOLDIER, LanguageStrings.ROLE_ESCORT, loadIcon("icons/roles/Escort.png"));
     static { antRoles.add(ROLE_ESCORT); }
-    // TODO asset: icons/roles/Engineer.png
     public static final AntRole ROLE_ENGINEER = new AntRole(33, TYPE_WORKER, LanguageStrings.ROLE_ENGINEER, loadIcon("icons/roles/Engineer.png"));
     static { antRoles.add(ROLE_ENGINEER); }
     // TODO asset: icons/roles/Skytrans.png
@@ -754,8 +735,10 @@ public final class GameConstants {
         4, LanguageStrings.DIPLO_MODIFIER_TRADE, 20, REPUTATION_NEUTRAL.getMinScore(), null);
     static { diplomaticReputationModifiers.add(DIPLO_MODIFIER_TRADE); }
     public static final DiplomaticReputationModifier DIPLO_MODIFIER_TRADE_REQUEST = new DiplomaticReputationModifier(
-        5, LanguageStrings.DIPLO_MODIFIER_TRADE_REQUEST, -5, REPUTATION_CORDIAL.getMinScore(), null);
+        5, LanguageStrings.DIPLO_MODIFIER_TRADE_REQUEST, -5, REPUTATION_NEUTRAL.getMinScore(), null);
     static { diplomaticReputationModifiers.add(DIPLO_MODIFIER_TRADE_REQUEST); }
+    public static final int CROSS_DYNASTY_TRADE_RECEIVER_REP = 20;
+    public static final int CROSS_DYNASTY_TRADE_OFFER_SENDER_REP = 5;
     public static final DiplomaticReputationModifier DIPLO_MODIFIER_BORDER_FRICTION = new DiplomaticReputationModifier(
         6, LanguageStrings.DIPLO_MODIFIER_BORDER_FRICTION, -10, 0, null);
     static { diplomaticReputationModifiers.add(DIPLO_MODIFIER_BORDER_FRICTION); }

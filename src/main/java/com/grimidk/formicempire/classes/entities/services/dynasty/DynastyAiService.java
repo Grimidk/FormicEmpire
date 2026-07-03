@@ -1,13 +1,11 @@
 package com.grimidk.formicempire.classes.entities.services.dynasty;
 
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyStatsService;
-import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
-import com.grimidk.formicempire.classes.constants.misc.TradeMethod;
+import com.grimidk.formicempire.classes.entities.CrossDynastyTradeProposal;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
-import com.grimidk.formicempire.classes.entities.Trade;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
@@ -136,51 +134,47 @@ public class DynastyAiService {
             return;
         }
 
-        for (Colony origin : dynasty.getColonies()) {
-            if (origin.getAge() < 7 || !origin.isAutomationEnabled()) {
+        diplo.processIncomingTradeProposals(world, tradeManager);
+
+        for (Colony localColony : dynasty.getColonies()) {
+            if (localColony.getAge() < 7 || !localColony.isAutomationEnabled()) {
                 continue;
             }
-            Hex originHex = world.getHexOfColony(origin);
-            if (originHex == null) {
+            Hex localHex = world.getHexOfColony(localColony);
+            if (localHex == null) {
                 continue;
             }
 
-            for (Colony neighbor : tradeService.getNeighborColonies(world, origin)) {
+            for (Colony neighbor : tradeService.getNeighborColonies(world, localColony)) {
                 Dynasty otherDynasty = neighbor.getDynasty();
                 if (otherDynasty == null || otherDynasty == dynasty || otherDynasty.isDefeated()) {
                     continue;
                 }
-                if (tradeService.findTrade(origin, neighbor) != null) {
+                if (tradeService.findTrade(localColony, neighbor) != null
+                        || tradeService.findTrade(neighbor, localColony) != null) {
                     continue;
                 }
-                if (!diplo.canEstablishCrossDynastyTrade(otherDynasty, origin, world, tradeManager)) {
-                    continue;
-                }
-
-                Map<ResourceType, Double> load = DynastyTradeAutomation.computeOutboundLoad(origin, neighbor);
-                if (load.isEmpty()) {
+                if (!diplo.canParticipateInCrossDynastyTrade(otherDynasty, localColony, world)) {
                     continue;
                 }
 
-                Map<AntType, Integer> transport = DynastyTradeAutomation.buildTransport(origin);
-                if (transport.isEmpty()) {
-                    continue;
+                Map<ResourceType, Double> offerLoad = DynastyTradeAutomation.computeOutboundLoad(localColony, neighbor);
+                if (!offerLoad.isEmpty()
+                        && diplo.canNpcProposeTradeOffer(otherDynasty, world)
+                        && diplo.proposeCrossDynastyTrade(
+                                localColony, neighbor, CrossDynastyTradeProposal.Kind.OFFER, world, tradeManager)
+                                != DynastyDiplomacyService.TradeProposalResult.FAILED) {
+                    return;
                 }
 
-                Hex targetHex = tradeService.getNeighborHex(world, origin, neighbor);
-                if (targetHex == null) {
-                    continue;
+                Map<ResourceType, Double> requestLoad = DynastyTradeAutomation.computeOutboundLoad(neighbor, localColony);
+                if (!requestLoad.isEmpty()
+                        && diplo.canNpcProposeTradeRequest(otherDynasty, world)
+                        && diplo.proposeCrossDynastyTrade(
+                                localColony, neighbor, CrossDynastyTradeProposal.Kind.REQUEST, world, tradeManager)
+                                != DynastyDiplomacyService.TradeProposalResult.FAILED) {
+                    return;
                 }
-
-                TradeMethod method = DynastyTradeAutomation.pickTradeMethod(dynasty, originHex, targetHex);
-                Trade trade = new Trade(originHex, targetHex, load, null, transport, true, false, method);
-                if (trade.startTrip()) {
-                    tradeManager.addTrade(trade);
-                    diplo.onCrossDynastyTradeEstablished(otherDynasty);
-                    origin.logEvent(ColonyLogPrefixes.AUTOMATION + " "
-                            + LanguageStrings.format(LanguageStrings.LOG_AUTOMATION_TRADE_FMT, neighbor.getName()));
-                }
-                return;
             }
         }
     }

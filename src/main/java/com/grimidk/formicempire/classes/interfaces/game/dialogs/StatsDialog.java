@@ -587,7 +587,7 @@ public class StatsDialog extends ZeroDialog {
         // Research
         model.addRow(new Object[]{null, null, LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR), LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR)});
         model.addRow(new Object[]{GameConstants.ICON_RESEARCH, LanguageStrings.get(LanguageStrings.TAB_RESEARCH), LanguageStrings.get(LanguageStrings.STAT_STORED_POINTS), dynasty.getResearchPoints()});
-        model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.TAB_RESEARCH), LanguageStrings.get(LanguageStrings.STAT_GLOBAL_RATE), LanguageStrings.format(LanguageStrings.STAT_PTS_DAY_FORMAT, dynastyStatsService.getGlobalResearchRateDaily(dynasty))});
+        model.addRow(new Object[]{GameConstants.ROLE_RESEARCHER.getIcon(), LanguageStrings.get(LanguageStrings.TAB_RESEARCH), LanguageStrings.get(LanguageStrings.STAT_GLOBAL_RATE), LanguageStrings.format(LanguageStrings.STAT_PTS_DAY_FORMAT, dynastyStatsService.getGlobalResearchRateDaily(dynasty))});
 
         // Global Resources
         model.addRow(new Object[]{null, null, LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR), LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR)});

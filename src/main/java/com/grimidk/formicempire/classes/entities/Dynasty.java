@@ -65,6 +65,7 @@ public class Dynasty {
     private final Map<Integer, String> diplomaticModifierKeys;
     private final List<Integer> crossDynastyTradeRepGrantedIds;
     private final Set<Integer> pendingPactRequestFromIds;
+    private final List<CrossDynastyTradeProposal> pendingTradeProposals;
     private int forcedFlightCooldownDays;
 
     // Services
@@ -101,6 +102,7 @@ public class Dynasty {
         this.diplomaticModifierKeys = new HashMap<>();
         this.crossDynastyTradeRepGrantedIds = new ArrayList<>();
         this.pendingPactRequestFromIds = new LinkedHashSet<>();
+        this.pendingTradeProposals = new ArrayList<>();
         this.forcedFlightCooldownDays = 0;
         
         initializeColor();
@@ -137,6 +139,7 @@ public class Dynasty {
         this.diplomaticModifierKeys = new HashMap<>();
         this.crossDynastyTradeRepGrantedIds = new ArrayList<>();
         this.pendingPactRequestFromIds = new LinkedHashSet<>();
+        this.pendingTradeProposals = new ArrayList<>();
         this.forcedFlightCooldownDays = 0;
         
         this.absorbedDynastyIds = new ArrayList<>();
@@ -209,6 +212,29 @@ public class Dynasty {
 
         if (savedDynasty.pendingPactRequestFromIds != null) {
             this.pendingPactRequestFromIds.addAll(savedDynasty.pendingPactRequestFromIds);
+        }
+        if (savedDynasty.pendingTradeProposals != null) {
+            for (Savefile.SavedCrossDynastyTradeProposal saved : savedDynasty.pendingTradeProposals) {
+                CrossDynastyTradeProposal.Kind kind = saved.request
+                        ? CrossDynastyTradeProposal.Kind.REQUEST
+                        : CrossDynastyTradeProposal.Kind.OFFER;
+                Map<Integer, Double> load = new HashMap<>();
+                if (saved.loadByResourceId != null) {
+                    for (Map.Entry<String, Double> entry : saved.loadByResourceId.entrySet()) {
+                        try {
+                            load.put(Integer.parseInt(entry.getKey()), entry.getValue());
+                        } catch (NumberFormatException ignored) {
+                        }
+                    }
+                }
+                this.pendingTradeProposals.add(new CrossDynastyTradeProposal(
+                        saved.fromDynastyId,
+                        saved.originColonyId,
+                        saved.destinationColonyId,
+                        kind,
+                        load,
+                        true));
+            }
         }
         this.forcedFlightCooldownDays = savedDynasty.forcedFlightCooldownDays;
 
@@ -527,6 +553,38 @@ public class Dynasty {
 
     public List<Integer> copyPendingPactRequestFromIds() {
         return new ArrayList<>(pendingPactRequestFromIds);
+    }
+
+    public void addPendingTradeProposal(CrossDynastyTradeProposal proposal) {
+        if (proposal == null || proposal.isEmpty()) {
+            return;
+        }
+        pendingTradeProposals.removeIf(existing -> existing.getFromDynastyId() == proposal.getFromDynastyId()
+                && existing.getOriginColonyId() == proposal.getOriginColonyId()
+                && existing.getDestinationColonyId() == proposal.getDestinationColonyId());
+        pendingTradeProposals.add(proposal);
+    }
+
+    public void removePendingTradeProposal(CrossDynastyTradeProposal proposal) {
+        if (proposal == null) {
+            return;
+        }
+        pendingTradeProposals.removeIf(existing -> existing.getFromDynastyId() == proposal.getFromDynastyId()
+                && existing.getOriginColonyId() == proposal.getOriginColonyId()
+                && existing.getDestinationColonyId() == proposal.getDestinationColonyId());
+    }
+
+    public boolean hasPendingTradeProposalFrom(int fromDynastyId) {
+        for (CrossDynastyTradeProposal proposal : pendingTradeProposals) {
+            if (proposal.getFromDynastyId() == fromDynastyId) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public List<CrossDynastyTradeProposal> copyPendingTradeProposals() {
+        return new ArrayList<>(pendingTradeProposals);
     }
 
     public int getForcedFlightCooldownDays() {

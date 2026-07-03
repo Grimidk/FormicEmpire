@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.entities.services.dynasty;
 
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.CrossDynastyTradeProposal;
 import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.Trade;
@@ -134,38 +135,66 @@ class DynastyDiplomacyServiceTest {
     }
 
     @Test
-    void requestTradeRequiresCordialReputation() {
-        player.setDiplomaticReputation(neighbor.getId(), 59);
-        neighbor.setDiplomaticReputation(player.getId(), 59);
+    void requestTradeRequiresNeutralReputation() {
+        player.unlockUpgrade(GameUnlocks.ABILITY_TRADE);
+        player.setDiplomaticReputation(neighbor.getId(), 39);
+        neighbor.setDiplomaticReputation(player.getId(), 39);
+        assertFalse(player.getDiplomacyService().canRequestTrade(neighbor, null));
 
-        player.getDiplomacyService().requestTrade(neighbor, null);
-
-        assertEquals(59, player.getDiplomaticReputation(neighbor.getId()));
-        assertEquals(59, neighbor.getDiplomaticReputation(player.getId()));
+        player.setDiplomaticReputation(neighbor.getId(), 40);
+        assertTrue(player.getDiplomacyService().canRequestTrade(neighbor, null));
     }
 
     @Test
-    void requestTradeAppliesReputationPenaltyBothWays() {
+    void offerTradeRequiresWaryReputation() {
+        player.unlockUpgrade(GameUnlocks.ABILITY_TRADE);
+        player.setDiplomaticReputation(neighbor.getId(), 19);
+        assertFalse(player.getDiplomacyService().canOfferTrade(neighbor, null));
+
+        player.setDiplomaticReputation(neighbor.getId(), 20);
+        assertTrue(player.getDiplomacyService().canOfferTrade(neighbor, null));
+    }
+
+    @Test
+    void declineTradeProposalAppliesPenaltyBothWays() {
         player.setDiplomaticReputation(neighbor.getId(), 60);
         neighbor.setDiplomaticReputation(player.getId(), 60);
-
-        player.getDiplomacyService().requestTrade(neighbor, null);
-
+        CrossDynastyTradeProposal proposal = new CrossDynastyTradeProposal(
+                neighbor.getId(), 1, 2, CrossDynastyTradeProposal.Kind.REQUEST, Map.of());
+        player.getDiplomacyService().declineTradeProposal(neighbor, proposal, null);
         assertEquals(55, player.getDiplomaticReputation(neighbor.getId()));
         assertEquals(55, neighbor.getDiplomaticReputation(player.getId()));
     }
 
     @Test
-    void crossDynastyTradeBonusAppliesOncePerPair() {
+    void tradeOfferAcceptedAppliesSeparateReceiverAndSenderModifiers() {
         player.setDiplomaticReputation(neighbor.getId(), 50);
         neighbor.setDiplomaticReputation(player.getId(), 50);
 
-        player.getDiplomacyService().onCrossDynastyTradeEstablished(neighbor);
-        player.getDiplomacyService().onCrossDynastyTradeEstablished(neighbor);
+        player.getDiplomacyService().applyCrossDynastyTradeReputation(
+                player, neighbor, CrossDynastyTradeProposal.Kind.OFFER);
+
+        assertEquals(55, player.getDiplomaticReputation(neighbor.getId()));
+        assertEquals(70, neighbor.getDiplomaticReputation(player.getId()));
+    }
+
+    @Test
+    void tradeRequestAcceptedAppliesSeparateReceiverAndSenderModifiers() {
+        player.setDiplomaticReputation(neighbor.getId(), 50);
+        neighbor.setDiplomaticReputation(player.getId(), 50);
+
+        neighbor.getDiplomacyService().applyCrossDynastyTradeReputation(
+                neighbor, player, CrossDynastyTradeProposal.Kind.REQUEST);
 
         assertEquals(70, player.getDiplomaticReputation(neighbor.getId()));
-        assertEquals(70, neighbor.getDiplomaticReputation(player.getId()));
-        assertTrue(player.hasCrossDynastyTradeRepBonus(neighbor.getId()));
+        assertEquals(45, neighbor.getDiplomaticReputation(player.getId()));
+    }
+
+    @Test
+    void tradeAcceptanceChanceScalesFromNeutral() {
+        assertEquals(0.0, DynastyDiplomacyService.computeTradeAcceptanceChance(39), 0.001);
+        assertEquals(0.5, DynastyDiplomacyService.computeTradeAcceptanceChance(40), 0.001);
+        assertEquals(1.0, DynastyDiplomacyService.computeTradeAcceptanceChance(100), 0.001);
     }
 
     @Test
