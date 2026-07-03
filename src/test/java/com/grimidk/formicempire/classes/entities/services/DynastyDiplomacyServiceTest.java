@@ -169,6 +169,52 @@ class DynastyDiplomacyServiceTest {
     }
 
     @Test
+    void pactAcceptanceChanceScalesFromFiftyFiftyToGuaranteed() {
+        assertEquals(0.0, DynastyDiplomacyService.computePactAcceptanceChance(59), 0.001);
+        assertEquals(0.5, DynastyDiplomacyService.computePactAcceptanceChance(60), 0.001);
+        assertEquals(0.75, DynastyDiplomacyService.computePactAcceptanceChance(80), 0.001);
+        assertEquals(1.0, DynastyDiplomacyService.computePactAcceptanceChance(100), 0.001);
+    }
+
+    @Test
+    void decliningPactAppliesSmallerPenaltyThanBreaking() {
+        player.setDiplomaticReputation(neighbor.getId(), 60);
+        neighbor.setDiplomaticReputation(player.getId(), 60);
+
+        neighbor.getDiplomacyService().declineNonAggressionPact(player, null);
+
+        assertEquals(GameConstants.DIPLO_MODIFIER_DECLINED_PACT.getNameKey(),
+                player.getDiplomaticModifierKey(neighbor.getId()));
+        assertEquals(50, player.getDiplomaticReputation(neighbor.getId()));
+        assertEquals(50, neighbor.getDiplomaticReputation(player.getId()));
+        assertTrue(Math.abs(GameConstants.DIPLO_MODIFIER_DECLINED_PACT.getReputationDelta())
+                < Math.abs(GameConstants.DIPLO_MODIFIER_BROKEN_PACT.getReputationDelta()));
+    }
+
+    @Test
+    void requestToPlayerQueuesPendingPact() {
+        player.setDiplomaticReputation(neighbor.getId(), 60);
+        neighbor.setDiplomaticReputation(player.getId(), 60);
+
+        neighbor.getDiplomacyService().requestNonAggressionPact(player, null);
+
+        assertTrue(player.hasPendingPactRequestFrom(neighbor.getId()));
+        assertFalse(neighbor.getDiplomacyService().hasNonAggressionPact(player));
+    }
+
+    @Test
+    void acceptPendingPactFormsPact() {
+        player.setDiplomaticReputation(neighbor.getId(), 60);
+        neighbor.setDiplomaticReputation(player.getId(), 60);
+        player.addPendingPactRequest(neighbor.getId());
+
+        player.getDiplomacyService().acceptNonAggressionPact(neighbor);
+
+        assertTrue(player.getDiplomacyService().hasNonAggressionPact(neighbor));
+        assertFalse(player.hasPendingPactRequestFrom(neighbor.getId()));
+    }
+
+    @Test
     void meetsTradeLoyaltyRequirementUsesDisloyalThreshold() {
         Colony colony = new Colony(1, "Test", true);
         colony.setLoyalty(19);

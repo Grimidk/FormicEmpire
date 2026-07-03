@@ -365,6 +365,8 @@ public class SaveManager {
                 }
                 sc.diplomaticModifierKeys = dynasty.copyDiplomaticModifierKeys();
                 sc.crossDynastyTradeRepGrantedIds = dynasty.copyCrossDynastyTradeRepGrantedIds();
+                sc.pendingPactRequestFromIds = dynasty.copyPendingPactRequestFromIds();
+                sc.forcedFlightCooldownDays = dynasty.getForcedFlightCooldownDays();
                 
                 sc.unlockedUpgradeIds = new ArrayList<>();
                 if (dynasty.getUnlockedUpgrades() != null) {
@@ -648,6 +650,8 @@ public class SaveManager {
         w.write("      \"diplomaticReputations\": " + serializeMapToJson(sc.diplomaticReputations) + ","); w.newLine();
         w.write("      \"diplomaticModifierKeys\": " + serializeStringMapToJson(sc.diplomaticModifierKeys) + ","); w.newLine();
         w.write("      \"crossDynastyTradeRepGrantedIds\": " + serializeListToJson(sc.crossDynastyTradeRepGrantedIds) + ","); w.newLine();
+        w.write("      \"pendingPactRequestFromIds\": " + serializeListToJson(sc.pendingPactRequestFromIds) + ","); w.newLine();
+        w.write("      \"forcedFlightCooldownDays\": " + sc.forcedFlightCooldownDays + ","); w.newLine();
         w.write("      \"unlockedUpgradeIds\": " + serializeListToJson(sc.unlockedUpgradeIds) + ","); w.newLine();
         w.write("      \"absorbedDynastyIds\": " + serializeListToJson(sc.absorbedDynastyIds) + ","); w.newLine();
         w.write("      \"defeatedSpeciesIds\": " + serializeListToJson(sc.defeatedSpeciesIds) + ","); w.newLine();
@@ -874,6 +878,8 @@ public class SaveManager {
         sc.diplomaticReputations = deserializeJsonToMap(map.get("diplomaticReputations"));
         sc.diplomaticModifierKeys = deserializeJsonToStringMap(map.get("diplomaticModifierKeys"));
         sc.crossDynastyTradeRepGrantedIds = deserializeJsonToList(map.get("crossDynastyTradeRepGrantedIds"));
+        sc.pendingPactRequestFromIds = deserializeJsonToList(map.get("pendingPactRequestFromIds"));
+        sc.forcedFlightCooldownDays = Integer.parseInt(map.getOrDefault("forcedFlightCooldownDays", "0"));
         sc.unlockedUpgradeIds = deserializeJsonToList(map.get("unlockedUpgradeIds"));
         sc.absorbedDynastyIds = deserializeJsonToList(map.get("absorbedDynastyIds"));
         sc.defeatedSpeciesIds = deserializeJsonToList(map.get("defeatedSpeciesIds"));

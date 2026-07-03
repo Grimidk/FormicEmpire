@@ -211,6 +211,15 @@ public class World {
     
     public List<Dynasty> getDynastys() { return dynastys; }
 
+    public Dynasty findDynastyById(int dynastyId) {
+        for (Dynasty dynasty : dynastys) {
+            if (dynasty.getId() == dynastyId) {
+                return dynasty;
+            }
+        }
+        return null;
+    }
+
     public void bindDynastyTradeServices() {
         if (engine == null || engine.getTradeManager() == null) {
             return;

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,6 +16,7 @@ import com.grimidk.formicempire.classes.constants.misc.Species;
 import com.grimidk.formicempire.classes.constants.misc.GeneticIntegrityModifier;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
+import com.grimidk.formicempire.classes.entities.services.DynastyAiService;
 import com.grimidk.formicempire.classes.entities.services.DynastyAutomationService;
 import com.grimidk.formicempire.classes.entities.services.DynastyDiplomacyService;
 import com.grimidk.formicempire.classes.entities.services.DynastyLogisticsAutomationService;
@@ -62,9 +64,12 @@ public class Dynasty {
     private final Map<Integer, Integer> diplomaticReputations;
     private final Map<Integer, String> diplomaticModifierKeys;
     private final List<Integer> crossDynastyTradeRepGrantedIds;
+    private final Set<Integer> pendingPactRequestFromIds;
+    private int forcedFlightCooldownDays;
 
     // Services
     private transient DynastyAutomationService automationService;
+    private transient DynastyAiService aiService;
     private transient DynastyLogisticsAutomationService logisticsAutomationService;
     private transient DynastyStarterService starterService;
     private transient DynastyStatService statService;
@@ -95,6 +100,8 @@ public class Dynasty {
         this.diplomaticReputations = new HashMap<>();
         this.diplomaticModifierKeys = new HashMap<>();
         this.crossDynastyTradeRepGrantedIds = new ArrayList<>();
+        this.pendingPactRequestFromIds = new LinkedHashSet<>();
+        this.forcedFlightCooldownDays = 0;
         
         initializeColor();
         initializeServices();
@@ -129,6 +136,8 @@ public class Dynasty {
         this.diplomaticReputations = new HashMap<>();
         this.diplomaticModifierKeys = new HashMap<>();
         this.crossDynastyTradeRepGrantedIds = new ArrayList<>();
+        this.pendingPactRequestFromIds = new LinkedHashSet<>();
+        this.forcedFlightCooldownDays = 0;
         
         this.absorbedDynastyIds = new ArrayList<>();
         if (savedDynasty.absorbedDynastyIds != null) {
@@ -198,6 +207,11 @@ public class Dynasty {
             this.crossDynastyTradeRepGrantedIds.addAll(savedDynasty.crossDynastyTradeRepGrantedIds);
         }
 
+        if (savedDynasty.pendingPactRequestFromIds != null) {
+            this.pendingPactRequestFromIds.addAll(savedDynasty.pendingPactRequestFromIds);
+        }
+        this.forcedFlightCooldownDays = savedDynasty.forcedFlightCooldownDays;
+
         if (savedDynasty.unlockedUpgradeIds != null) {
             Map<Integer, Upgrade> allUpgrades = new HashMap<>();
             for (Upgrade u : GameUnlocks.getUpgrades()) {
@@ -219,6 +233,7 @@ public class Dynasty {
 
     private void initializeServices() {
         this.automationService = new DynastyAutomationService();
+        this.aiService = new DynastyAiService();
         this.logisticsAutomationService = new DynastyLogisticsAutomationService();
         this.starterService = new DynastyStarterService();
         this.statService = new DynastyStatService();
@@ -256,7 +271,13 @@ public class Dynasty {
 
     public void runDailyJobs(World world, TradeManager tradeManager) {
         if (this.isDefeated) return;
+        if (forcedFlightCooldownDays > 0) {
+            forcedFlightCooldownDays--;
+        }
         this.automationService.runDailyAutomation(this);
+        if (world != null) {
+            this.aiService.runDailyAi(this, world, tradeManager);
+        }
         if (world != null && tradeManager != null) {
             bindTradeManager(tradeManager);
             this.logisticsAutomationService.runDailyLogistics(this, world, tradeManager);
@@ -488,6 +509,32 @@ public class Dynasty {
 
     public List<Integer> copyCrossDynastyTradeRepGrantedIds() {
         return new ArrayList<>(crossDynastyTradeRepGrantedIds);
+    }
+
+    public boolean hasPendingPactRequestFrom(int fromDynastyId) {
+        return pendingPactRequestFromIds.contains(fromDynastyId);
+    }
+
+    public void addPendingPactRequest(int fromDynastyId) {
+        if (fromDynastyId != id) {
+            pendingPactRequestFromIds.add(fromDynastyId);
+        }
+    }
+
+    public void removePendingPactRequest(int fromDynastyId) {
+        pendingPactRequestFromIds.remove(fromDynastyId);
+    }
+
+    public List<Integer> copyPendingPactRequestFromIds() {
+        return new ArrayList<>(pendingPactRequestFromIds);
+    }
+
+    public int getForcedFlightCooldownDays() {
+        return forcedFlightCooldownDays;
+    }
+
+    public void setForcedFlightCooldownDays(int days) {
+        this.forcedFlightCooldownDays = Math.max(0, days);
     }
 
     // --- Getters & Setters ---

@@ -11,6 +11,7 @@ import com.grimidk.formicempire.classes.entities.Trade;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.repositories.GameRandom;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
 
@@ -50,6 +51,67 @@ public class DynastyDiplomacyService {
             return;
         }
         applyModifierBothWays(other, GameConstants.DIPLO_MODIFIER_PACT);
+    }
+
+    public boolean canRequestNonAggressionPact(Dynasty other, World world) {
+        return canFormNonAggressionPact(other);
+    }
+
+    public static double computePactAcceptanceChance(int effectiveReputation) {
+        int minRep = GameConstants.REPUTATION_CORDIAL.getMinScore();
+        int maxRep = GameConstants.DIPLOMATIC_REPUTATION_MAX;
+        if (effectiveReputation < minRep) {
+            return 0.0;
+        }
+        if (effectiveReputation >= maxRep) {
+            return 1.0;
+        }
+        return 0.5 + 0.5 * (effectiveReputation - minRep) / (double) (maxRep - minRep);
+    }
+
+    public void requestNonAggressionPact(Dynasty other, World world) {
+        if (!canRequestNonAggressionPact(other, world)) {
+            return;
+        }
+        if (other.hasPendingPactRequestFrom(dynasty.getId())) {
+            return;
+        }
+
+        if (other.isPlayer()) {
+            other.addPendingPactRequest(dynasty.getId());
+            return;
+        }
+
+        int effectiveRep = other.getDiplomacyService().getEffectiveDiplomaticReputation(dynasty, world);
+        if (GameRandom.nextDouble() < computePactAcceptanceChance(effectiveRep)) {
+            formNonAggressionPact(other);
+        } else {
+            other.getDiplomacyService().declineNonAggressionPact(dynasty, world);
+        }
+    }
+
+    public void acceptNonAggressionPact(Dynasty requester) {
+        if (requester == null || requester == dynasty) {
+            return;
+        }
+        removePendingPactRequestIfAny(requester);
+        requester.getDiplomacyService().formNonAggressionPact(dynasty);
+    }
+
+    public void declineNonAggressionPact(Dynasty requester, World world) {
+        if (requester == null || requester == dynasty) {
+            return;
+        }
+        dynasty.removePendingPactRequest(requester.getId());
+        if (hasNonAggressionPact(requester)) {
+            return;
+        }
+        applyModifierBothWays(requester, GameConstants.DIPLO_MODIFIER_DECLINED_PACT);
+    }
+
+    private void removePendingPactRequestIfAny(Dynasty requester) {
+        dynasty.removePendingPactRequest(requester.getId());
+        requester.removePendingPactRequest(dynasty.getId());
     }
 
     public void breakNonAggressionPact(Dynasty other) {

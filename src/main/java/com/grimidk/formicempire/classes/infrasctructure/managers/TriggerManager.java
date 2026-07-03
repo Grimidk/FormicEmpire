@@ -202,6 +202,18 @@ public class TriggerManager {
         if (!npc.hasUpgrade(GameUnlocks.ABILITY_SPREAD) && npc.hasUpgrade(GameUnlocks.ROLE_BREEDER)) {
             npc.unlockUpgrade(GameUnlocks.ABILITY_SPREAD);
         }
+        if (npc.getDynasty() != null) {
+            int colonies = npc.getDynasty().getColonies().size();
+            if (!npc.hasUpgrade(GameUnlocks.ABILITY_DYNASTY) && colonies >= 2) {
+                npc.unlockUpgrade(GameUnlocks.ABILITY_DYNASTY);
+            }
+            if (!npc.hasUpgrade(GameUnlocks.ABILITY_TRADE) && colonies >= 3) {
+                npc.unlockUpgrade(GameUnlocks.ABILITY_TRADE);
+            }
+            if (!npc.hasUpgrade(GameUnlocks.ABILITY_ABILITY) && npc.getResearchPoints() >= 4000) {
+                npc.unlockUpgrade(GameUnlocks.ABILITY_ABILITY);
+            }
+        }
     }
 
     private void checkResearchRoleUnlock() {

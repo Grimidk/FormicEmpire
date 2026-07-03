@@ -88,6 +88,8 @@ public class Savefile implements Serializable {
         public Map<String, Integer> diplomaticReputations = new HashMap<>();
         public Map<String, String> diplomaticModifierKeys = new HashMap<>();
         public List<Integer> crossDynastyTradeRepGrantedIds = new ArrayList<>();
+        public List<Integer> pendingPactRequestFromIds = new ArrayList<>();
+        public int forcedFlightCooldownDays;
         public List<SavedTunnel> tunnels = new ArrayList<>();
     }
 

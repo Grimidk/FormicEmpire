@@ -624,6 +624,7 @@ public class PortugueseTranslation implements Translation {
 
         pt.put("DIPLO_MODIFIER_PACT", "Pacto");
         pt.put("DIPLO_MODIFIER_BROKEN_PACT", "Pacto quebrado");
+        pt.put("DIPLO_MODIFIER_DECLINED_PACT", "Pacto recusado");
         pt.put("DIPLO_MODIFIER_WAR", "Guerra");
         pt.put("DIPLO_MODIFIER_TRADE", "Rota comercial");
         pt.put("DIPLO_MODIFIER_TRADE_REQUEST", "Pedido comercial");
@@ -638,6 +639,15 @@ public class PortugueseTranslation implements Translation {
         pt.put("LOYALTY_MODIFIER_DISTANCE_FROM_CAPITAL", "Distância da capital");
         pt.put("LOYALTY_MODIFIER_DISTANCE_LINE", "%s (%s casas): %s");
         pt.put("DIPLO_ACTION_FORM_PACT", "Formar pacto");
+        pt.put("DIPLO_ACTION_REQUEST_PACT", "Solicitar pacto");
+        pt.put("DIPLO_PACT_REQUEST_TITLE", "Pedido de pacto de não agressão");
+        pt.put("DIPLO_PACT_REQUEST_MSG_FMT", "%s solicita um pacto de não agressão. Aceitar?");
+        pt.put("DIPLO_PACT_REQUEST_ACCEPT", "Aceitar");
+        pt.put("DIPLO_PACT_REQUEST_DECLINE", "Recusar");
+        pt.put("DIPLO_PACT_REQUEST_SENT_FMT", "Pedido de pacto enviado a %s.");
+        pt.put("DIPLO_PACT_ACCEPTED_FMT", "%s aceitou o pacto de não agressão.");
+        pt.put("DIPLO_PACT_DECLINED_FMT", "%s recusou o pacto de não agressão.");
+        pt.put("LOG_PACT_DECLINED_FMT", "O pedido de pacto de não agressão de %s foi recusado.");
         pt.put("DIPLO_ACTION_BREAK_PACT", "Quebrar pacto");
         pt.put("DIPLO_ACTION_TRADE", "Comerciar");
         pt.put("DIPLO_ACTION_REQUEST_TRADE", "Solicitar comércio");
@@ -1239,6 +1249,9 @@ public class PortugueseTranslation implements Translation {
         pt.put("LOG_AUTOMATION_BUILD_FMT", "Construção iniciada: %s");
         pt.put("LOG_AUTOMATION_TUNNEL_FMT", "Túnel iniciado em direção a %s");
         pt.put("LOG_AUTOMATION_TRADE_FMT", "Rota comercial aberta para %s");
+        pt.put("LOG_AI_DIPLOMAT_COLONY_FMT", "IA enviou %s diplomatas para estabilizar %s (+%s lealdade)");
+        pt.put("LOG_AI_DIPLOMAT_DYNASTY_FMT", "IA enviou %s diplomatas para melhorar relações com %s (+%s reputação)");
+        pt.put("LOG_AI_PACT_FMT", "IA formou um pacto de não agressão com %s");
         pt.put("LOG_LAST_COLONY_FALLEN", "A última colônia caiu. Isto é agora um remanescente morto.");
         pt.put("LOG_PROMOTION_CAPITAL_FMT", "A antiga capital caiu. Esta colônia é agora a capital de %s!");
         pt.put("LOG_DYNASTY_RESEARCHED_FMT", "Pesquisado: %s");

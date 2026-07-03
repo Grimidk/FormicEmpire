@@ -1593,10 +1593,27 @@ public class DynastyManagementDialog extends ZeroDialog {
             if (other == null || dynasty.getDiplomacyService() == null) {
                 return;
             }
+            World world = engine.getWorld();
             if (dynasty.getDiplomacyService().hasNonAggressionPact(other)) {
                 dynasty.getDiplomacyService().breakNonAggressionPact(other);
-            } else if (dynasty.getDiplomacyService().canFormNonAggressionPact(other)) {
-                dynasty.getDiplomacyService().formNonAggressionPact(other);
+            } else if (dynasty.getDiplomacyService().canRequestNonAggressionPact(other, world)) {
+                dynasty.getDiplomacyService().requestNonAggressionPact(other, world);
+                if (dynasty.getDiplomacyService().hasNonAggressionPact(other)) {
+                    UiOptionPane.showMessageDialog(this,
+                            LanguageStrings.format(LanguageStrings.DIPLO_PACT_ACCEPTED_FMT, other.getName()),
+                            LanguageStrings.get(LanguageStrings.DIPLO_ACTION_FORM_PACT),
+                            JOptionPane.INFORMATION_MESSAGE);
+                } else if (other.isPlayer()) {
+                    UiOptionPane.showMessageDialog(this,
+                            LanguageStrings.format(LanguageStrings.DIPLO_PACT_REQUEST_SENT_FMT, other.getName()),
+                            LanguageStrings.get(LanguageStrings.DIPLO_ACTION_REQUEST_PACT),
+                            JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    UiOptionPane.showMessageDialog(this,
+                            LanguageStrings.format(LanguageStrings.DIPLO_PACT_DECLINED_FMT, other.getName()),
+                            LanguageStrings.get(LanguageStrings.DIPLO_ACTION_REQUEST_PACT),
+                            JOptionPane.WARNING_MESSAGE);
+                }
             } else {
                 UiOptionPane.showMessageDialog(this,
                         LanguageStrings.get(LanguageStrings.DIPLO_ERROR_CORDIAL_REQUIRED),
@@ -1742,11 +1759,11 @@ public class DynastyManagementDialog extends ZeroDialog {
             Colony activeColony = getActivePlayerColony();
             DynastyDiplomacyService diplo = dynasty.getDiplomacyService();
 
-            JMenuItem pactItem = new JMenuItem(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_FORM_PACT));
+            JMenuItem pactItem = new JMenuItem(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_REQUEST_PACT));
             if (diplo.hasNonAggressionPact(other)) {
                 pactItem.setText(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_BREAK_PACT));
                 pactItem.addActionListener(e -> performPactAction(other));
-            } else if (diplo.canFormNonAggressionPact(other)) {
+            } else if (diplo.canRequestNonAggressionPact(other, world)) {
                 pactItem.addActionListener(e -> performPactAction(other));
             } else {
                 pactItem.setEnabled(false);

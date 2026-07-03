@@ -633,6 +633,9 @@ public final class LanguageStrings {
     public static final String LOG_AUTOMATION_BUILD_FMT = "LOG_AUTOMATION_BUILD_FMT";
     public static final String LOG_AUTOMATION_TUNNEL_FMT = "LOG_AUTOMATION_TUNNEL_FMT";
     public static final String LOG_AUTOMATION_TRADE_FMT = "LOG_AUTOMATION_TRADE_FMT";
+    public static final String LOG_AI_DIPLOMAT_COLONY_FMT = "LOG_AI_DIPLOMAT_COLONY_FMT";
+    public static final String LOG_AI_DIPLOMAT_DYNASTY_FMT = "LOG_AI_DIPLOMAT_DYNASTY_FMT";
+    public static final String LOG_AI_PACT_FMT = "LOG_AI_PACT_FMT";
     public static final String LOG_LAST_COLONY_FALLEN = "LOG_LAST_COLONY_FALLEN";
     public static final String LOG_PROMOTION_CAPITAL_FMT = "LOG_PROMOTION_CAPITAL_FMT";
     public static final String LOG_DYNASTY_RESEARCHED_FMT = "LOG_DYNASTY_RESEARCHED_FMT";
@@ -878,6 +881,7 @@ public final class LanguageStrings {
 
     public static final String DIPLO_MODIFIER_PACT = "DIPLO_MODIFIER_PACT";
     public static final String DIPLO_MODIFIER_BROKEN_PACT = "DIPLO_MODIFIER_BROKEN_PACT";
+    public static final String DIPLO_MODIFIER_DECLINED_PACT = "DIPLO_MODIFIER_DECLINED_PACT";
     public static final String DIPLO_MODIFIER_WAR = "DIPLO_MODIFIER_WAR";
     public static final String DIPLO_MODIFIER_TRADE = "DIPLO_MODIFIER_TRADE";
     public static final String DIPLO_MODIFIER_TRADE_REQUEST = "DIPLO_MODIFIER_TRADE_REQUEST";
@@ -888,6 +892,15 @@ public final class LanguageStrings {
     public static final String LOYALTY_MODIFIER_CAPITAL = "LOYALTY_MODIFIER_CAPITAL";
     public static final String LOYALTY_MODIFIER_PHEROMONE_STORM = "LOYALTY_MODIFIER_PHEROMONE_STORM";
     public static final String DIPLO_ACTION_FORM_PACT = "DIPLO_ACTION_FORM_PACT";
+    public static final String DIPLO_ACTION_REQUEST_PACT = "DIPLO_ACTION_REQUEST_PACT";
+    public static final String DIPLO_PACT_REQUEST_TITLE = "DIPLO_PACT_REQUEST_TITLE";
+    public static final String DIPLO_PACT_REQUEST_MSG_FMT = "DIPLO_PACT_REQUEST_MSG_FMT";
+    public static final String DIPLO_PACT_REQUEST_ACCEPT = "DIPLO_PACT_REQUEST_ACCEPT";
+    public static final String DIPLO_PACT_REQUEST_DECLINE = "DIPLO_PACT_REQUEST_DECLINE";
+    public static final String DIPLO_PACT_REQUEST_SENT_FMT = "DIPLO_PACT_REQUEST_SENT_FMT";
+    public static final String DIPLO_PACT_ACCEPTED_FMT = "DIPLO_PACT_ACCEPTED_FMT";
+    public static final String DIPLO_PACT_DECLINED_FMT = "DIPLO_PACT_DECLINED_FMT";
+    public static final String LOG_PACT_DECLINED_FMT = "LOG_PACT_DECLINED_FMT";
     public static final String DIPLO_ACTION_BREAK_PACT = "DIPLO_ACTION_BREAK_PACT";
     public static final String DIPLO_ACTION_TRADE = "DIPLO_ACTION_TRADE";
     public static final String DIPLO_ACTION_REQUEST_TRADE = "DIPLO_ACTION_REQUEST_TRADE";

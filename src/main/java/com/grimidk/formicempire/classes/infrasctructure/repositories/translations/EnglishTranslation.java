@@ -624,6 +624,7 @@ public class EnglishTranslation implements Translation {
 
         en.put("DIPLO_MODIFIER_PACT", "Pact");
         en.put("DIPLO_MODIFIER_BROKEN_PACT", "Broken Pact");
+        en.put("DIPLO_MODIFIER_DECLINED_PACT", "Declined Pact");
         en.put("DIPLO_MODIFIER_WAR", "War");
         en.put("DIPLO_MODIFIER_TRADE", "Trade Route");
         en.put("DIPLO_MODIFIER_TRADE_REQUEST", "Trade Request");
@@ -638,6 +639,15 @@ public class EnglishTranslation implements Translation {
         en.put("LOYALTY_MODIFIER_DISTANCE_FROM_CAPITAL", "Distance from Capital");
         en.put("LOYALTY_MODIFIER_DISTANCE_LINE", "%s (%s tiles): %s");
         en.put("DIPLO_ACTION_FORM_PACT", "Form Pact");
+        en.put("DIPLO_ACTION_REQUEST_PACT", "Request Pact");
+        en.put("DIPLO_PACT_REQUEST_TITLE", "Non-Aggression Pact Request");
+        en.put("DIPLO_PACT_REQUEST_MSG_FMT", "%s requests a non-aggression pact. Accept?");
+        en.put("DIPLO_PACT_REQUEST_ACCEPT", "Accept");
+        en.put("DIPLO_PACT_REQUEST_DECLINE", "Decline");
+        en.put("DIPLO_PACT_REQUEST_SENT_FMT", "Pact request sent to %s.");
+        en.put("DIPLO_PACT_ACCEPTED_FMT", "%s accepted the non-aggression pact.");
+        en.put("DIPLO_PACT_DECLINED_FMT", "%s declined the non-aggression pact.");
+        en.put("LOG_PACT_DECLINED_FMT", "Non-aggression pact request from %s was declined.");
         en.put("DIPLO_ACTION_BREAK_PACT", "Break Pact");
         en.put("DIPLO_ACTION_TRADE", "Trade");
         en.put("DIPLO_ACTION_REQUEST_TRADE", "Request Trade");
@@ -1239,6 +1249,9 @@ public class EnglishTranslation implements Translation {
         en.put("LOG_AUTOMATION_BUILD_FMT", "Started construction of %s");
         en.put("LOG_AUTOMATION_TUNNEL_FMT", "Started tunnel toward %s");
         en.put("LOG_AUTOMATION_TRADE_FMT", "Opened trade route to %s");
+        en.put("LOG_AI_DIPLOMAT_COLONY_FMT", "AI sent %s diplomats to stabilize %s (+%s loyalty)");
+        en.put("LOG_AI_DIPLOMAT_DYNASTY_FMT", "AI sent %s diplomats to improve relations with %s (+%s reputation)");
+        en.put("LOG_AI_PACT_FMT", "AI formed a non-aggression pact with %s");
         en.put("LOG_LAST_COLONY_FALLEN", "The last colony has fallen. This is now a dead remnant.");
         en.put("LOG_PROMOTION_CAPITAL_FMT", "The old capital has fallen. This colony is now the capital of %s!");
         en.put("LOG_DYNASTY_RESEARCHED_FMT", "Researched %s");

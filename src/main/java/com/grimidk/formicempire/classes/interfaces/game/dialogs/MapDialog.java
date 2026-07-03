@@ -343,6 +343,13 @@ public class MapDialog extends ZeroDialog {
                     activeDynastiesMap.put(d.getId(), d);
                 }
             }
+            if (world.getDynastys() != null) {
+                for (Dynasty d : world.getDynastys()) {
+                    if (d.isDefeated()) {
+                        activeDynastiesMap.putIfAbsent(d.getId(), d);
+                    }
+                }
+            }
 
             Dynasty playerDynasty = findPlayerDynasty();
             List<Dynasty> sortedDynasties = new ArrayList<>(activeDynastiesMap.values());
@@ -408,8 +415,13 @@ public class MapDialog extends ZeroDialog {
                     badges.add(new JLabel(d.getSpecies().getIcon()));
                 }
 
+                boolean defeated = d.isDefeated();
+                if (defeated && GameConstants.TYPE_DEAD.getIcon() != null) {
+                    badges.add(new JLabel(GameConstants.TYPE_DEAD.getIcon()));
+                }
+
                 DiplomaticReputation stance = null;
-                if (!d.isPlayer() && playerDynasty != null && playerDynasty.getDiplomacyService() != null) {
+                if (!defeated && !d.isPlayer() && playerDynasty != null && playerDynasty.getDiplomacyService() != null) {
                     int rep = playerDynasty.getDiplomacyService().getEffectiveDiplomaticReputation(d, world);
                     stance = GameConstants.getDiplomaticReputationLevel(rep);
                     if (stance.getIcon() != null) {
@@ -419,7 +431,11 @@ public class MapDialog extends ZeroDialog {
                 }
 
                 String nameStr = d.getName();
-                if (d.isPlayer()) {
+                if (defeated) {
+                    nameStr += " (" + GameConstants.TYPE_DEAD.getName() + ")";
+                    item.setToolTipText(LanguageStrings.format(LanguageStrings.MAP_CLICK_VIEW_CAPITAL, d.getName())
+                            + " — " + GameConstants.TYPE_DEAD.getName());
+                } else if (d.isPlayer()) {
                     nameStr += LanguageStrings.get(LanguageStrings.MAP_YOU_PLAYER);
                 } else if (stance != null) {
                     nameStr = String.format(
@@ -430,7 +446,7 @@ public class MapDialog extends ZeroDialog {
 
                 JLabel name = new JLabel(nameStr);
                 name.setFont(d.isPlayer() ? AssetStyles.FONT_BOLD.deriveFont(10f) : AssetStyles.FONT_SMALL);
-                name.setForeground(AssetStyles.FONT_COLOR);
+                name.setForeground(defeated ? AssetStyles.FONT_COLOR_ERROR : AssetStyles.FONT_COLOR);
 
                 int pop = d.getStatService().getTotalPopulation(d);
                 int military = d.getMilitaryPower();
@@ -579,13 +595,17 @@ public class MapDialog extends ZeroDialog {
                         Dynasty dynasty = c.getDynasty();
                         if (dynasty != null) {
                             sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_DYNASTY)).append(dynasty.getName());
+                            if (dynasty.isDefeated()) {
+                                sb.append(" (").append(GameConstants.TYPE_DEAD.getName()).append(")");
+                            }
                             if (dynasty.getRank() != null) {
                                 sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_DYNASTY_RANK)).append(dynasty.getRank().getName());
                             }
                             sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_DYNASTY_MILITARY_POWER))
                                     .append(AssetStyles.formatNumber(dynasty.getMilitaryPower()));
                             Dynasty playerDynasty = findPlayerDynasty();
-                            if (playerDynasty != null && !dynasty.isPlayer() && playerDynasty.getDiplomacyService() != null) {
+                            if (!dynasty.isDefeated() && playerDynasty != null && !dynasty.isPlayer()
+                                    && playerDynasty.getDiplomacyService() != null) {
                                 int rep = playerDynasty.getDiplomacyService().getEffectiveDiplomaticReputation(dynasty, world);
                                 DiplomaticReputation stance = GameConstants.getDiplomaticReputationLevel(rep);
                                 sb.append("<br><b>")

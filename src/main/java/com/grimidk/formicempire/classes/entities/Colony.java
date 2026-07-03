@@ -623,6 +623,12 @@ public class Colony {
     public void setRank(ColonyRank rank) { this.rank = rank; }
     public boolean isActive() { return isActive; }
     public void setActive(boolean isActive) { this.isActive = isActive; }
+
+    /** Full per-ant labour/eating sim runs only on the player's viewed colony; NPC hexes stay on lite sim even when focused. */
+    public boolean runsFullSimulation() {
+        return isActive && isPlayer;
+    }
+
     public boolean isAutomationEnabled() { return automationEnabled; }
     public void setAutomationEnabled(boolean automationEnabled) { this.automationEnabled = automationEnabled; }
     public boolean isAutoBuildEnabled() { return autoBuildEnabled; }
@@ -1176,7 +1182,7 @@ public class Colony {
     // --- Job Schedulers ---
     public void runMinutelyJobs() {
         invalidateActiveRoleCountCache();
-        if (this.isActive) {
+        if (this.runsFullSimulation()) {
             this.runConverting();
         }
     }
@@ -1186,7 +1192,7 @@ public class Colony {
             return;
         }
 
-        if (this.isActive) {
+        if (this.runsFullSimulation()) {
             if (this.automationEnabled) {
                 this.automationService.runAutomation(this);
             }
@@ -1236,7 +1242,7 @@ public class Colony {
             this.automationService.runAutoBuild(this);
         }
 
-        if (this.isActive) {
+        if (this.runsFullSimulation()) {
             this.rankUp();
             this.runEating(currentTemp); 
             this.runHatching();
@@ -1270,7 +1276,7 @@ public class Colony {
 
     public void runMonthlyJobs(Season season, Biome biome) {
         tickAbilityDurations();
-        if (this.isActive) {
+        if (this.runsFullSimulation()) {
             this.runParasitation(biome, season);
             getBugHandlingService().runMonthlyParasiticMites(this, biome, season);
         } else {

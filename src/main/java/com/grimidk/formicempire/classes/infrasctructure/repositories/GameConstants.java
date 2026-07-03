@@ -743,6 +743,9 @@ public final class GameConstants {
     public static final DiplomaticReputationModifier DIPLO_MODIFIER_BROKEN_PACT = new DiplomaticReputationModifier(
         2, LanguageStrings.DIPLO_MODIFIER_BROKEN_PACT, -30, 0, DIPLO_EXCLUSIVE_PACT);
     static { diplomaticReputationModifiers.add(DIPLO_MODIFIER_BROKEN_PACT); }
+    public static final DiplomaticReputationModifier DIPLO_MODIFIER_DECLINED_PACT = new DiplomaticReputationModifier(
+        7, LanguageStrings.DIPLO_MODIFIER_DECLINED_PACT, -10, 0, DIPLO_EXCLUSIVE_PACT);
+    static { diplomaticReputationModifiers.add(DIPLO_MODIFIER_DECLINED_PACT); }
     public static final DiplomaticReputationModifier DIPLO_MODIFIER_WAR = new DiplomaticReputationModifier(
         3, LanguageStrings.DIPLO_MODIFIER_WAR, -100, 0, DIPLO_EXCLUSIVE_PACT);
     static { diplomaticReputationModifiers.add(DIPLO_MODIFIER_WAR); }
@@ -838,6 +841,9 @@ public final class GameConstants {
 
     public static final int PHEROMONE_STORM_SYRUP_COST = 500;
     public static final int PHEROMONE_STORM_DURATION_MONTHS = 12;
+    public static final int AI_FORCED_FLIGHT_COOLDOWN_DAYS = 30;
+    public static final int AI_EXPANSION_COLONY_TARGET = 6;
+    public static final double AI_CREATINE_FOOD_STRESS_RATIO = 0.35;
     public static final int CREATINE_DIET_PROTEIN_COST = 300;
     public static final int CREATINE_DIET_DURATION_MONTHS = 6;
     public static final float CREATINE_DIET_SPEED_MULTIPLIER = 2f;

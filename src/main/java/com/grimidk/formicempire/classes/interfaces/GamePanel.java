@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.interfaces;
 
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
@@ -23,6 +24,7 @@ import com.grimidk.formicempire.classes.interfaces.ui.styles.UiScrollBarStyles;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
+import java.util.List;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -1319,6 +1321,8 @@ public class GamePanel extends ZeroGamePanel {
             alertManager.checkStatus();
         }
 
+        processPendingPactRequests(world);
+
         if (roleDialog != null && roleDialog.isShowing()) {
             roleDialog.liveUpdate();
         }
@@ -1329,5 +1333,51 @@ public class GamePanel extends ZeroGamePanel {
         World world = engine != null ? engine.getWorld() : null;
         if (world == null) return;
         worldPanel.updateMonthData(world);
+    }
+
+    private void processPendingPactRequests(World world) {
+        if (world == null || !engineStarted) {
+            return;
+        }
+        Dynasty playerDynasty = null;
+        for (Dynasty dynasty : world.getDynastys()) {
+            if (dynasty.isPlayer() && !dynasty.isDefeated()) {
+                playerDynasty = dynasty;
+                break;
+            }
+        }
+        if (playerDynasty == null || playerDynasty.getDiplomacyService() == null) {
+            return;
+        }
+
+        List<Integer> pending = playerDynasty.copyPendingPactRequestFromIds();
+        if (pending.isEmpty()) {
+            return;
+        }
+
+        int fromId = pending.get(0);
+        Dynasty requester = world.findDynastyById(fromId);
+        if (requester == null || requester.isDefeated()) {
+            playerDynasty.removePendingPactRequest(fromId);
+            return;
+        }
+
+        String message = LanguageStrings.format(
+                LanguageStrings.DIPLO_PACT_REQUEST_MSG_FMT, requester.getName());
+        String[] options = {
+                LanguageStrings.get(LanguageStrings.DIPLO_PACT_REQUEST_ACCEPT),
+                LanguageStrings.get(LanguageStrings.DIPLO_PACT_REQUEST_DECLINE)
+        };
+        int choice = UiOptionPane.showOptionDialog(this, message,
+                LanguageStrings.get(LanguageStrings.DIPLO_PACT_REQUEST_TITLE),
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                null, options, options[0]);
+
+        playerDynasty.removePendingPactRequest(fromId);
+        if (choice == JOptionPane.YES_OPTION || choice == 0) {
+            playerDynasty.getDiplomacyService().acceptNonAggressionPact(requester);
+        } else {
+            playerDynasty.getDiplomacyService().declineNonAggressionPact(requester, world);
+        }
     }
 }
