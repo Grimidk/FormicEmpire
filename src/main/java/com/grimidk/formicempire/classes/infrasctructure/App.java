@@ -7,6 +7,8 @@ import javax.swing.SwingUtilities;
 
 public class App {
     public static void start(){
+        System.setProperty("awt.useSystemAAFontSettings", "on");
+        System.setProperty("swing.aatext", "true");
         Engine engine = new Engine();
         AssetStyles.applyTheme(engine.isDarkMode());
         AssetStyles.applyGlobalStyles();

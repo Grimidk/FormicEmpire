@@ -127,7 +127,7 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
     }
 
     public MainFrame(Engine engine) {
-        super(LanguageStrings.get(LanguageStrings.UI_APP_TITLE));
+        super(LanguageStrings.APP_DISPLAY_NAME);
         this.engine = engine;
         
         Image icon = AssetStyles.loadImage(AssetStyles.META_APP_ICON);
@@ -235,7 +235,7 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
     }
     
     private void refreshTranslations() {
-        setTitle(LanguageStrings.get(LanguageStrings.UI_APP_TITLE));
+        setTitle(LanguageStrings.APP_DISPLAY_NAME);
         saveSelectPanel.refreshTranslations();
         introPanel.refreshTranslations();
         initPanel.refreshTranslations();

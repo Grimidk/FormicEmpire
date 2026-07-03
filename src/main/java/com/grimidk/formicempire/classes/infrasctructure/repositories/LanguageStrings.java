@@ -135,6 +135,8 @@ public final class LanguageStrings {
     }
 
     // --- Keys ---
+    /** Product window title — never localized. */
+    public static final String APP_DISPLAY_NAME = "Formic Empire";
     public static final String UI_APP_TITLE = "UI_APP_TITLE";
     public static final String UI_BACK_TO_GAME = "UI_BACK_TO_GAME";
     public static final String UI_BACK_TO_MENU = "UI_BACK_TO_MENU";

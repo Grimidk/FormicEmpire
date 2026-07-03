@@ -2,6 +2,7 @@ package com.grimidk.formicempire.classes.interfaces.ui.theme;
 
 import java.awt.Font;
 import java.awt.FontFormatException;
+import java.awt.GraphicsEnvironment;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -15,6 +16,7 @@ public final class UiFonts {
         try (InputStream is = UiFonts.class.getResourceAsStream(FONT_RESOURCE)) {
             if (is != null) {
                 loaded = Font.createFont(Font.TRUETYPE_FONT, is);
+                GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(loaded);
             }
         } catch (FontFormatException | IOException ignored) {
         }

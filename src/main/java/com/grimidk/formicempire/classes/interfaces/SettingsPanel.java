@@ -487,7 +487,7 @@ public class SettingsPanel extends JPanel {
         if (sizeCombo.getSelectedItem() == null) {
             sizeCombo.setSelectedIndex(0);
         }
-        fullScreenCheck.setSelected(false);
+        fullScreenCheck.setSelected(true);
         daylightColorOverlayCheck.setSelected(true);
         weatherColorOverlayCheck.setSelected(true);
         darkModeCheck.setSelected(false);

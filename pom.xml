@@ -92,17 +92,21 @@
                         </goals>
                         <configuration>
                             <headerType>gui</headerType>
+                            <chdir>.</chdir>
                             <jar>${project.build.directory}/${project.artifactId}-${project.version}.jar</jar>
                             <outfile>${project.build.directory}/FormicEmpire.exe</outfile>
-                            <icon>src/main/resources/meta/icon.ico</icon>
+                            <icon>${project.basedir}/src/main/resources/meta/icon.ico</icon>
                             <downloadUrl>http://java.com/download</downloadUrl>
+                            <jvmArgs>-XX:+UseG1GC -Dsun.java2d.d3d=false -Dsun.java2d.opengl=false -Dawt.useSystemAAFontSettings=on -Dswing.aatext=true</jvmArgs>
+                            <initialHeapSize>256</initialHeapSize>
+                            <maxHeapSize>1536</maxHeapSize>
                             <classPath>
                                 <mainClass>com.grimidk.formicempire.FormicEmpire</mainClass>
                                 <preCp>anything</preCp>
                             </classPath>
                             <jre>
                                 <path>./jre</path>
-                                <requires64Bit>false</requires64Bit>
+                                <requires64Bit>true</requires64Bit>
                                 <minVersion>17</minVersion>
                                 <requiresJdk>false</requiresJdk>
                             </jre>

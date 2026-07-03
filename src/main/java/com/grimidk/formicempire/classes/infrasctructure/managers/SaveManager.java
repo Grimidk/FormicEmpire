@@ -23,6 +23,7 @@ import com.grimidk.formicempire.classes.entities.ResourceSource;
 import com.grimidk.formicempire.classes.entities.Trade;
 import com.grimidk.formicempire.classes.entities.Tunnel;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
+import com.grimidk.formicempire.classes.infrasctructure.GamePaths;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
@@ -50,10 +51,8 @@ public class SaveManager {
     private final File savesDir;
 
     public SaveManager() {
-        this.savesDir = new File("saves");
-        if (!savesDir.exists()) {
-            savesDir.mkdirs();
-        }
+        this.savesDir = GamePaths.resolveSavesDirectory();
+        System.out.println("[SaveManager] Saves directory: " + savesDir.getAbsolutePath());
     }
 
     public File getSlotFile(int slotId, String type) {

@@ -13,11 +13,9 @@ To Fix (By decreasing priority) :
 	High:
 	TODO: icons/sprites for all Constants (roles, moves) and unlocks (all)
 	automate diplomatic actions and diplomat missions and accept/decline trades and offer trades
-	speed up button still not working
 
 	Mid:
-	mac executable
-	metric number sumarization
+	(none right now)
 
 	Low:
 	(none right now)
@@ -40,7 +38,7 @@ Needed for launch (v1.0) (Launch Version):
 	Everything else :
 	ant subtypes (enable by role / exclusion) checks with new sprites, manage by hatch rate since they cant be changed
 	simulation screen to see battles, transports ("view convoy" option using going and returning biomes for tiles, or underground or air)
-	minerals
+	minerals with uprades to find it and increase miner efficency, also mushroom detection 
 	research tree and building tree (after icons)
 	rework how carrying looks completely
 	main menu screen maybe simulation like factorio

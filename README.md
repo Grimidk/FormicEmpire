@@ -13,13 +13,50 @@ After that expect regular but sparse updates including a Core Engine.
 Use 'production' branch for a stable version and 'development' branch for unstable beta features.
 
 Requirements:
-    Java 17 
-    and Electricity (Optional)
+    Java 17 (for development on macOS/Linux)
+    64-bit system for the Windows release bundle
+    Electricity (optional)
 
-    Note: Java no longer a requirement
+Running the game with Java installed (bash):
 
-Running the game with java installed (bash):
     ./run.sh
 
-Generating .exe (needs JRE) (bash):
+Uses your system JDK and saves in `./saves/`.
+
+Generating a release bundle (bash):
+
     ./package.sh
+
+`package.sh` calls `./scripts/setup_jre.sh` first to verify `jre/` is present.
+
+Produces **`outputs/`** with separate bundles per platform:
+
+| Path | Contents |
+|------|----------|
+| `outputs/FormicEmpire.jar.zip` | JAR + `FormicEmpire.sh` + `saves/` — **JAR download** (needs Java 17+ installed) |
+| `outputs/FormicEmpire.windows.zip` | `FormicEmpire.exe` (game embedded) + `jre/` — **Windows download** |
+| `outputs/FormicEmpire.app` | macOS app bundle (built on macOS via `jpackage`) |
+
+### Bundled runtimes (not committed to git)
+
+| Folder | Platform | Required? |
+|--------|----------|-----------|
+| `jre/` | **Windows x64** Temurin 17 JRE | Yes, for `./package.sh` Windows output |
+| System JDK 17 | **macOS** dev + `.app` build via `jpackage` | Yes on Mac (already installed) |
+| `jre-mac/` | Optional custom macOS runtime for `.app` | No — only if you want a specific embedded JRE |
+
+**Windows JRE setup (once):**
+
+1. Download [Temurin 17 JRE — Windows x64](https://adoptium.net/temurin/releases/?version=17&os=windows&arch=x64&package=jre)
+2. Extract into the project root as **`jre/`** (must contain `jre/bin/java.exe`)
+3. Run `./package.sh` (validates `jre/` automatically)
+
+**macOS:** No separate JRE download is required. `./run.sh` and the `.app` use your installed JDK 17. `jpackage` embeds a runtime when building `outputs/FormicEmpire.app`.
+
+**App icons:** `src/main/resources/meta/icon.ico` (Windows) and `icon.icns` (macOS) are committed assets. To refresh `icon.icns` after editing PNGs in `icon.iconset/` on macOS:
+
+    iconutil -c icns src/main/resources/meta/icon.iconset -o src/main/resources/meta/icon.icns
+
+Run on macOS: `open outputs/FormicEmpire.app`  
+Run on Windows: ship `outputs/FormicEmpire.windows.zip` (unzip, then run `FormicEmpire.exe`). Saves are created beside the exe at first run.  
+Run anywhere with Java 17+: unzip `outputs/FormicEmpire.jar.zip` and run `./FormicEmpire.sh`

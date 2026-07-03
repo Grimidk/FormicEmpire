@@ -36,7 +36,7 @@ public class Engine extends Thread {
     private String language = "en";
     private boolean allowTurboMode = false;
     private String screenSize = "1000x700";
-    private boolean fullScreen = false;
+    private boolean fullScreen = true;
     private int autosaveFrequency = 1; // 1 = every month
     
     private boolean daylightColorOverlayEnabled = true;

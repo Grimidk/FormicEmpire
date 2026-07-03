@@ -24,5 +24,20 @@ cp -f credits.txt src/main/resources/meta/credits.txt
 echo "[Build] Building Formic Empire..."
 $MVN_EXEC clean install
 
+SAVES_DIR="saves"
+TARGET_SAVES="target/saves"
+mkdir -p "$SAVES_DIR"
+if [ -d "$TARGET_SAVES" ]; then
+    for f in "$TARGET_SAVES"/*; do
+        [ -e "$f" ] || continue
+        base=$(basename "$f")
+        if [ ! -e "$SAVES_DIR/$base" ]; then
+            echo "[Run] Moving $f -> $SAVES_DIR/$base"
+            mv "$f" "$SAVES_DIR/$base"
+        fi
+    done
+    rmdir "$TARGET_SAVES" 2>/dev/null || true
+fi
+
 echo "[Run] Starting the Game..."
 java -jar target/FormicEmpire-1.0-SNAPSHOT.jar
