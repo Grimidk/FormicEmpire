@@ -40,9 +40,14 @@ public final class FlatChevronButtonUI extends BasicButtonUI {
             FontMetrics fm = g2d.getFontMetrics();
             int textW = fm.stringWidth(ARROW_GLYPH);
             int textH = fm.getAscent();
-            double rotation = (c instanceof FlatChevronButton chevronButton && chevronButton.isPointsLeft())
-                    ? -Math.PI / 2.0
-                    : Math.PI / 2.0;
+            double rotation = switch (c instanceof FlatChevronButton chevronButton
+                    ? chevronButton.getChevronDirection()
+                    : FlatChevronButton.ChevronDirection.LEFT) {
+                case LEFT -> -Math.PI / 2.0;
+                case RIGHT -> Math.PI / 2.0;
+                case DOWN -> Math.PI;
+                case UP -> 0.0;
+            };
             AffineTransform old = g2d.getTransform();
             g2d.rotate(rotation, b.getWidth() / 2.0, b.getHeight() / 2.0);
             int textX = (b.getWidth() - textW) / 2;

@@ -453,6 +453,7 @@ public final class LanguageStrings {
     public static final String MAP_YOU_PLAYER = "MAP_YOU_PLAYER";
     public static final String MAP_POPULATION_FORMAT = "MAP_POPULATION_FORMAT";
     public static final String MAP_TOOLTIP_BIOME = "MAP_TOOLTIP_BIOME";
+    public static final String MAP_TOOLTIP_COLONY_NAME = "MAP_TOOLTIP_COLONY_NAME";
     public static final String MAP_TOOLTIP_RANK = "MAP_TOOLTIP_RANK";
     public static final String MAP_TOOLTIP_SPECIES = "MAP_TOOLTIP_SPECIES";
     public static final String MAP_TOOLTIP_DYNASTY = "MAP_TOOLTIP_DYNASTY";

@@ -1,6 +1,8 @@
 package com.grimidk.formicempire.classes.interfaces.game.gamepanels;
 
+import com.grimidk.formicempire.classes.constants.misc.GameSpeed;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.interfaces.HelpPanel;
@@ -119,6 +121,11 @@ public class ControlPanel extends ZeroGamePanel {
         AssetStyles.styleButton(speedDownButton);
         AssetStyles.styleButton(playPauseButton);
         AssetStyles.styleButton(menuButton);
+
+        tickLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        tickLabel.setVerticalAlignment(SwingConstants.CENTER);
+        tickLabel.setIconTextGap(0);
+        tickLabel.setText("");
         
         // Init menu items
         backToGame = new JMenuItem();
@@ -509,10 +516,23 @@ public class ControlPanel extends ZeroGamePanel {
 
     public void updateTickLabel(Engine eng) {
         if (eng == null) {
-            tickLabel.setText("-");
+            tickLabel.setIcon(null);
+            tickLabel.setToolTipText(null);
             return;
         }
-        tickLabel.setText(eng.getSpeedLabel());
+        if (eng.isPaused()) {
+            tickLabel.setIcon(GameConstants.ICON_SPEED_PAUSE);
+            tickLabel.setToolTipText(LanguageStrings.get(LanguageStrings.UI_PAUSED_TICK));
+            return;
+        }
+        GameSpeed speed = eng.getSpeed();
+        if (speed != null && speed.getIcon() != null) {
+            tickLabel.setIcon(speed.getIcon());
+            tickLabel.setToolTipText(speed.getName());
+        } else {
+            tickLabel.setIcon(null);
+            tickLabel.setToolTipText(eng.getSpeedLabel());
+        }
     }
     
     public void setPlayPauseButtonText(boolean isPaused) {

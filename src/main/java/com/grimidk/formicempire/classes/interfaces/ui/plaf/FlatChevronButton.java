@@ -6,9 +6,17 @@ import java.awt.Dimension;
 import java.awt.Insets;
 import javax.swing.JButton;
 
-/** Small flat button that paints a left or right chevron (no text label). */
+/** Small flat button that paints a chevron glyph (no text label). */
 public final class FlatChevronButton extends JButton {
-    private boolean pointsLeft = true;
+
+    public enum ChevronDirection {
+        LEFT,
+        RIGHT,
+        UP,
+        DOWN
+    }
+
+    private ChevronDirection direction = ChevronDirection.LEFT;
 
     public FlatChevronButton() {
         setUI(FlatChevronButtonUI.createUI(this));
@@ -27,11 +35,19 @@ public final class FlatChevronButton extends JButton {
     }
 
     public boolean isPointsLeft() {
-        return pointsLeft;
+        return direction == ChevronDirection.LEFT;
+    }
+
+    public ChevronDirection getChevronDirection() {
+        return direction;
+    }
+
+    public void setChevronDirection(ChevronDirection direction) {
+        this.direction = direction != null ? direction : ChevronDirection.LEFT;
+        repaint();
     }
 
     public void setPointsLeft(boolean pointsLeft) {
-        this.pointsLeft = pointsLeft;
-        repaint();
+        setChevronDirection(pointsLeft ? ChevronDirection.LEFT : ChevronDirection.RIGHT);
     }
 }

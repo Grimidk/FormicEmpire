@@ -312,6 +312,7 @@ public class EnglishTranslation implements Translation {
         en.put("MAP_YOU_PLAYER", " (You)");
         en.put("MAP_POPULATION_FORMAT", "Population: %s");
         en.put("MAP_TOOLTIP_BIOME", "<b>Biome:</b> ");
+        en.put("MAP_TOOLTIP_COLONY_NAME", "<b>Colony:</b> ");
         en.put("MAP_TOOLTIP_RANK", "<br><b>Rank:</b> ");
         en.put("MAP_TOOLTIP_SPECIES", "<br><b>Species:</b> ");
         en.put("MAP_TOOLTIP_DYNASTY", "<br><b>Dynasty:</b> ");

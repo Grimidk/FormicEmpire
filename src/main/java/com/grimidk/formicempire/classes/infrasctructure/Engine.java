@@ -16,7 +16,7 @@ import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
 public class Engine extends Thread {
     private World world;
-    private GameSpeed speed = GameSpeed.NORMAL;
+    private GameSpeed speed = GameConstants.SPEED_NORMAL;
     private final Semaphore semaphore;
     private boolean killSwitch;
     private volatile boolean paused;

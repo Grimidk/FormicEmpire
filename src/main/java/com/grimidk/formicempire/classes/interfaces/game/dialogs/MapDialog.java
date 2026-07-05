@@ -216,7 +216,7 @@ public class MapDialog extends ZeroDialog {
             activeWarsContent.setBorder(new EmptyBorder(0, 12, 4, 8));
 
             activeWarsToggle = new FlatChevronButton();
-            activeWarsToggle.setPointsLeft(false);
+            activeWarsToggle.setChevronDirection(FlatChevronButton.ChevronDirection.UP);
             activeWarsToggle.setOpaque(false);
             activeWarsToggle.addActionListener(e -> setActiveWarsExpanded(!activeWarsExpanded));
 
@@ -311,7 +311,9 @@ public class MapDialog extends ZeroDialog {
         private void setActiveWarsExpanded(boolean expanded) {
             activeWarsExpanded = expanded;
             activeWarsContent.setVisible(expanded);
-            activeWarsToggle.setPointsLeft(!expanded);
+            activeWarsToggle.setChevronDirection(expanded
+                    ? FlatChevronButton.ChevronDirection.UP
+                    : FlatChevronButton.ChevronDirection.DOWN);
             activeWarsToggle.setToolTipText(LanguageStrings.get(
                     expanded ? LanguageStrings.MAP_ACTIVE_WARS_HIDE : LanguageStrings.MAP_ACTIVE_WARS_SHOW));
             activeWarsSection.revalidate();
@@ -352,7 +354,9 @@ public class MapDialog extends ZeroDialog {
                 activeWarsContent.add(warLabel);
             }
             activeWarsContent.setVisible(activeWarsExpanded && !wars.isEmpty());
-            activeWarsToggle.setPointsLeft(!activeWarsExpanded);
+            activeWarsToggle.setChevronDirection(activeWarsExpanded
+                    ? FlatChevronButton.ChevronDirection.UP
+                    : FlatChevronButton.ChevronDirection.DOWN);
             activeWarsToggle.setToolTipText(LanguageStrings.get(
                     activeWarsExpanded ? LanguageStrings.MAP_ACTIVE_WARS_HIDE : LanguageStrings.MAP_ACTIVE_WARS_SHOW));
             activeWarsSection.revalidate();
@@ -695,13 +699,27 @@ public class MapDialog extends ZeroDialog {
                 if (poly.contains(p)) {
                     StringBuilder sb = new StringBuilder("<html>");
 
-                    if (hex.getBiome() != null) {
-                        sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_BIOME)).append(hex.getBiome().getName());
-                    } else {
-                        sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_BIOME)).append(LanguageStrings.get(LanguageStrings.STAT_UNKNOWN));
+                    Colony c = hex.getColony();
+                    boolean hasColonyName = c != null && c.getName() != null;
+                    if (hasColonyName) {
+                        sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_COLONY_NAME))
+                                .append(c.getName());
                     }
 
-                    Colony c = hex.getColony();
+                    if (hex.getBiome() != null) {
+                        if (hasColonyName) {
+                            sb.append("<br>");
+                        }
+                        sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_BIOME))
+                                .append(hex.getBiome().getName());
+                    } else if (hasColonyName) {
+                        sb.append("<br>").append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_BIOME))
+                                .append(LanguageStrings.get(LanguageStrings.STAT_UNKNOWN));
+                    } else {
+                        sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_BIOME))
+                                .append(LanguageStrings.get(LanguageStrings.STAT_UNKNOWN));
+                    }
+
                     if (c != null) {
                         if (c.getRank() != null) {
                             sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_RANK)).append(c.getRank().getName());
@@ -713,9 +731,6 @@ public class MapDialog extends ZeroDialog {
                             sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_SPECIES)).append(LanguageStrings.get(LanguageStrings.STAT_UNKNOWN));
                         }
 
-                        if (c.getName() != null) {
-                            sb.append("<br><i>").append(c.getName()).append("</i>");
-                        }
                         sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_MILITARY_POWER))
                                 .append(AssetStyles.formatNumber(c.getMilitaryPower()));
 

@@ -312,6 +312,7 @@ public class FrenchTranslation implements Translation {
         fr.put("MAP_YOU_PLAYER", " (Vous)");
         fr.put("MAP_POPULATION_FORMAT", "Population : %s");
         fr.put("MAP_TOOLTIP_BIOME", "<b>Biome :</b> ");
+        fr.put("MAP_TOOLTIP_COLONY_NAME", "<b>Colonie :</b> ");
         fr.put("MAP_TOOLTIP_RANK", "<br><b>Rang :</b> ");
         fr.put("MAP_TOOLTIP_SPECIES", "<br><b>Espèce :</b> ");
         fr.put("MAP_TOOLTIP_DYNASTY", "<br><b>Dynastie :</b> ");

@@ -13,6 +13,7 @@ import com.grimidk.formicempire.classes.constants.misc.ColonyLoyaltyModifier;
 import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
 import com.grimidk.formicempire.classes.constants.misc.DiplomaticReputation;
 import com.grimidk.formicempire.classes.constants.misc.DiplomaticReputationModifier;
+import com.grimidk.formicempire.classes.constants.misc.GameSpeed;
 import com.grimidk.formicempire.classes.constants.misc.GeneticIntegrityModifier;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.misc.Species;
@@ -102,6 +103,7 @@ public final class GameConstants {
     private static final List<AntType> antTypes = new ArrayList<>();
     private static final List<AntRole> antRoles = new ArrayList<>();
     private static final List<ColonyRank> colonyRanks = new ArrayList<>();
+    private static final List<GameSpeed> gameSpeeds = new ArrayList<>();
     private static final List<DiplomaticReputation> diplomaticReputations = new ArrayList<>();
     private static final List<DiplomaticReputationModifier> diplomaticReputationModifiers = new ArrayList<>();
     private static final List<GeneticIntegrityModifier> geneticIntegrityModifiers = new ArrayList<>();
@@ -595,10 +597,8 @@ public final class GameConstants {
     // TODO asset: icons/roles/Guard.png
     public static final AntRole ROLE_GUARD = new AntRole(11, TYPE_SOLDIER, LanguageStrings.ROLE_GUARD, loadIcon("icons/roles/Guard.png"));
     static { antRoles.add(ROLE_GUARD); }
-    // TODO asset: icons/roles/Warrior.png
     public static final AntRole ROLE_WARRIOR = new AntRole(12, TYPE_SOLDIER, LanguageStrings.ROLE_WARRIOR, loadIcon("icons/roles/Warrior.png"));
     static { antRoles.add(ROLE_WARRIOR); }
-    // TODO asset: icons/roles/Defender.png
     public static final AntRole ROLE_DEFENDER = new AntRole(13, TYPE_SOLDIER, LanguageStrings.ROLE_DEFENDER, loadIcon("icons/roles/Defender.png"));
     static { antRoles.add(ROLE_DEFENDER); }
     public static final AntRole ROLE_POLICE = new AntRole(14, TYPE_SOLDIER, LanguageStrings.ROLE_POLICE, loadIcon("icons/roles/Police.png"));
@@ -607,7 +607,6 @@ public final class GameConstants {
     static { antRoles.add(ROLE_BOMBER); }
     public static final AntRole ROLE_HUNTER = new AntRole(16, TYPE_SOLDIER, LanguageStrings.ROLE_HUNTER, loadIcon("icons/roles/Hunter.png"));
     static { antRoles.add(ROLE_HUNTER); }
-    // TODO asset: icons/roles/Brute.png
     public static final AntRole ROLE_BRUTE = new AntRole(17, TYPE_MAJOR, LanguageStrings.ROLE_BRUTE, loadIcon("icons/roles/Brute.png"));
     static { antRoles.add(ROLE_BRUTE); }
     // TODO asset: icons/roles/Carrier.png
@@ -631,7 +630,6 @@ public final class GameConstants {
     static { antRoles.add(ROLE_LAYER); }
     public static final AntRole ROLE_RESEARCHER = new AntRole(26, TYPE_QUEEN, LanguageStrings.ROLE_RESEARCHER, loadIcon("icons/roles/Researcher.png"));
     static { antRoles.add(ROLE_RESEARCHER); }
-    // TODO asset: icons/roles/Militia.png
     public static final AntRole ROLE_MILITIA = new AntRole(27, TYPE_WORKER, LanguageStrings.ROLE_MILITIA, loadIcon("icons/roles/Militia.png"));
     static { antRoles.add(ROLE_MILITIA); }
     // TODO asset: icons/roles/Catcher.png
@@ -693,6 +691,33 @@ public final class GameConstants {
     public static final ColonyRank RANK_GIGA = new ColonyRank(13, LanguageStrings.RANK_GIGA, 1000000000000l, 
         loadIcon("icons/ranks/Giga.png"));
     static { colonyRanks.add(RANK_GIGA); }
+
+    // --- Game speeds (tick delay ms; icons under icons/speed/) ---
+    public static final GameSpeed SPEED_VERY_SLOW = new GameSpeed(
+            GameSpeed.ID_VERY_SLOW, LanguageStrings.UI_SPEED_VERY_SLOW, 1000,
+            loadIcon("icons/speed/VerySlow.png"));
+    static { gameSpeeds.add(SPEED_VERY_SLOW); }
+    public static final GameSpeed SPEED_SLOW = new GameSpeed(
+            GameSpeed.ID_SLOW, LanguageStrings.UI_SPEED_SLOW, 500,
+            loadIcon("icons/speed/Slow.png"));
+    static { gameSpeeds.add(SPEED_SLOW); }
+    public static final GameSpeed SPEED_NORMAL = new GameSpeed(
+            GameSpeed.ID_NORMAL, LanguageStrings.UI_SPEED_NORMAL, 250,
+            loadIcon("icons/speed/Normal.png"));
+    static { gameSpeeds.add(SPEED_NORMAL); }
+    public static final GameSpeed SPEED_FAST = new GameSpeed(
+            GameSpeed.ID_FAST, LanguageStrings.UI_SPEED_FAST, 100,
+            loadIcon("icons/speed/Fast.png"));
+    static { gameSpeeds.add(SPEED_FAST); }
+    public static final GameSpeed SPEED_VERY_FAST = new GameSpeed(
+            GameSpeed.ID_VERY_FAST, LanguageStrings.UI_SPEED_VERY_FAST, 50,
+            loadIcon("icons/speed/VeryFast.png"));
+    static { gameSpeeds.add(SPEED_VERY_FAST); }
+    public static final GameSpeed SPEED_TURBO = new GameSpeed(
+            GameSpeed.ID_TURBO, LanguageStrings.UI_SPEED_TURBO, 1,
+            loadIcon("icons/speed/Turbo.png"));
+    static { gameSpeeds.add(SPEED_TURBO); }
+    public static final ImageIcon ICON_SPEED_PAUSE = loadIcon("icons/speed/Pause.png");
 
     public static final int DIPLOMATIC_REPUTATION_MIN = 0;
     public static final int DIPLOMATIC_REPUTATION_MAX = 100;
@@ -1048,6 +1073,16 @@ public final class GameConstants {
     }
 
     public static List<ColonyRank> getColonyRanks() { return Collections.unmodifiableList(colonyRanks); }
+    public static List<GameSpeed> getGameSpeeds() { return Collections.unmodifiableList(gameSpeeds); }
+
+    public static GameSpeed getGameSpeedById(int id) {
+        for (GameSpeed speed : gameSpeeds) {
+            if (speed.getId() == id) {
+                return speed;
+            }
+        }
+        return null;
+    }
 
     public static int clampDiplomaticReputation(int score) {
         return Math.max(DIPLOMATIC_REPUTATION_MIN, Math.min(DIPLOMATIC_REPUTATION_MAX, score));

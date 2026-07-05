@@ -20,7 +20,7 @@ To Fix (By decreasing priority) :
 	  
 	Low:
 	(none right now)
-  
+
 	Can't reproduce:
 	(none right now)
 
@@ -32,10 +32,11 @@ Needed for launch (v1.0) (Launch Version):
 	Priority:
 	rebellions and rebel colonies ( too much causes a rebellious dynasty to appear, once capital defeated it gets reabsorbed)
 	grant independence and modifier for it
+	barrack room before royal chamber
 	assimilations ( Trap-jaw (Trap jaw ants), Honey-pot (Honey pot ants), Door-head (Turtle ants), Wood burrowing (Carpenter ants), Silk weaving (Weaver ants), Rafting (Flood plains ants), Fire venom (Fire ants), Jumping (Jet ants), Gliding (Gliding ants), Stinging (Bullet ants), Swarming (Army ants), Stealth (Ghost ants), Fast bitting (Dracula ants), Heat resistance (Saharan silver ants), Deadly venom (Harvester ants), Self destruction (Exploding ants), Far sight (Bulldog ants), Hive building (Shining black ants), Location sensing (Desert ants))
+	ant subtypes (enable by role / exclusion) checks with new sprites, manage by hatch rate since they cant be changed
 
 	Everything else :
-	ant subtypes (enable by role / exclusion) checks with new sprites, manage by hatch rate since they cant be changed
 	simulation screen to see battles, transports ("view convoy" option using going and returning biomes for tiles, or underground or air)
 	minerals with uprades to find it and increase miner efficency, also mushroom detection 
 	air warfare

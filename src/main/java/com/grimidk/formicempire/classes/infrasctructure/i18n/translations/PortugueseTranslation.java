@@ -312,6 +312,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("MAP_YOU_PLAYER", " (Você)");
         pt.put("MAP_POPULATION_FORMAT", "População: %s");
         pt.put("MAP_TOOLTIP_BIOME", "<b>Bioma:</b> ");
+        pt.put("MAP_TOOLTIP_COLONY_NAME", "<b>Colónia:</b> ");
         pt.put("MAP_TOOLTIP_RANK", "<br><b>Rank:</b> ");
         pt.put("MAP_TOOLTIP_SPECIES", "<br><b>Espécie:</b> ");
         pt.put("MAP_TOOLTIP_DYNASTY", "<br><b>Dinastia:</b> ");

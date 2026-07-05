@@ -14,14 +14,13 @@ To Fix (By decreasing priority) :
 	TODO: icons/sprites for all Constants (roles, moves) and unlocks (all)
 	Room sprites still look ugly af (see TODO asset on buildingRoomSprite / BuildingSpriteResources)
 	battle screen
-	make game speed a constant with symbols
 
 	Mid:
 	(none right now)
 	  
 	Low:
 	(none right now)
-  
+
 	Can't reproduce:
 	(none right now)
 
