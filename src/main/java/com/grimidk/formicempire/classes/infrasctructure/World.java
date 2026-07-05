@@ -25,6 +25,7 @@ import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryS
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyStarterService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDeathService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyNamingService;
+import com.grimidk.formicempire.classes.entities.services.world.WarService;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
@@ -55,6 +56,7 @@ public class World {
     private int colonyIdCounter = 1;
     private int dynastyIdCounter = 1;
     private final DynastyNamingService namingService;
+    private final WarService warService;
 
     public World() {
         this.minute = 0;
@@ -71,6 +73,11 @@ public class World {
         this.season = GameConstants.SEASON_SPRING;
         this.weather = GameConstants.WEATHER_CLEAR;
         this.namingService = new DynastyNamingService();
+        this.warService = new WarService(this);
+    }
+    
+    public WarService getWarService() {
+        return warService;
     }
     
     public Engine getEngine() {
@@ -774,8 +781,14 @@ public class World {
         reapplyRoleAssignmentsAfterLoad();
         bindDynastyTradeServices();
         ColonyMilitaryService.refreshAllMilitaryPower(this.dynastys);
+        if (savefile.getWars() != null && !savefile.getWars().isEmpty()) {
+            warService.loadFromSave(savefile.getWars());
+        } else {
+            warService.syncFromDynasties();
+        }
+        warService.pruneInvalidWars();
 
-        changeActiveHex(getSpawnHex()); 
+        changeActiveHex(getSpawnHex());
         updateEnvironmentalConditions();
     }
 
@@ -916,6 +929,8 @@ public class World {
             engine.notifyHourListeners();
         }
 
+        warService.tickWarProgressHourly();
+
         if (this.hour > 23) {
             this.hour = 0;
             this.runDay();
@@ -938,6 +953,8 @@ public class World {
         for (Dynasty dynasty : this.dynastys) {
             ColonyMilitaryService.refreshDynastyMilitaryPower(dynasty);
         }
+
+        warService.tickWarProgressDaily();
         
         // --- Process Dynasty/Colony Deaths ---
         DYNASTY_DEATH_SERVICE.processDynastyDeaths(this);

@@ -1,10 +1,12 @@
 package com.grimidk.formicempire.classes.entities.services.dynasty;
 
+import com.grimidk.formicempire.classes.entities.services.colony.ColonyAutomationService;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.DiplomaticReputationModifier;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
@@ -23,6 +25,61 @@ import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
 public class DynastyDiplomacyService {
+
+    public static boolean meetsWarDeclarationPopulationRequirement(Dynasty dynasty) {
+        if (dynasty == null || dynasty.isDefeated()) {
+            return false;
+        }
+        return dynasty.getStatService().getTotalPopulation(dynasty)
+                >= GameConstants.WAR_DECLARATION_MIN_POPULATION;
+    }
+
+    public static boolean meetsWarActiveMilitaryRequirement(Dynasty dynasty) {
+        return countPreparedActiveMilitaryRoles(dynasty) > 0;
+    }
+
+    public static int countPreparedActiveMilitaryRoles(Dynasty dynasty) {
+        if (dynasty == null || dynasty.isDefeated()) {
+            return 0;
+        }
+        ensureSoldierWarRoleUpgrades(dynasty);
+        int existing = 0;
+        for (Colony colony : dynasty.getColonies()) {
+            existing += sumActiveMilitaryRoleCounts(colony.getWarAssignedRoleCounts());
+        }
+        if (existing > 0) {
+            return existing;
+        }
+        ColonyAutomationService automation = new ColonyAutomationService();
+        int preview = 0;
+        for (Colony colony : dynasty.getColonies()) {
+            preview += sumActiveMilitaryRoleCounts(automation.calculateWarEconomyQuotas(colony));
+        }
+        return preview;
+    }
+
+    private static int sumActiveMilitaryRoleCounts(Map<AntRole, Integer> roleCounts) {
+        if (roleCounts == null) {
+            return 0;
+        }
+        int total = 0;
+        for (AntRole role : GameConstants.getActiveMilitaryRoles()) {
+            total += roleCounts.getOrDefault(role, 0);
+        }
+        return total;
+    }
+
+    private static void ensureSoldierWarRoleUpgrades(Dynasty dynasty) {
+        if (dynasty == null || !dynasty.hasUpgrade(GameUnlocks.TYPE_SOLDIER)) {
+            return;
+        }
+        if (!dynasty.hasUpgrade(GameUnlocks.ROLE_HUNTER)) {
+            dynasty.unlockUpgrade(GameUnlocks.ROLE_HUNTER);
+        }
+        if (!dynasty.hasUpgrade(GameUnlocks.ROLE_WARRIOR)) {
+            dynasty.unlockUpgrade(GameUnlocks.ROLE_WARRIOR);
+        }
+    }
 
     public enum TradeProposalResult {
         FAILED,
@@ -68,6 +125,10 @@ public class DynastyDiplomacyService {
     }
 
     public boolean canRequestNonAggressionPact(Dynasty other, World world) {
+        maybeRecoverDeclinedPactRequest(other, world);
+        if (getPactRequestDeclineCooldownMonthsRemaining(other, world) > 0) {
+            return false;
+        }
         return canFormNonAggressionPact(other);
     }
 
@@ -121,6 +182,7 @@ public class DynastyDiplomacyService {
             return;
         }
         applyModifierBothWays(requester, GameConstants.DIPLO_MODIFIER_DECLINED_PACT);
+        recordPactRequestDeclined(requester, world);
     }
 
     private void removePendingPactRequestIfAny(Dynasty requester) {
@@ -129,9 +191,14 @@ public class DynastyDiplomacyService {
     }
 
     public void breakNonAggressionPact(Dynasty other) {
+        breakNonAggressionPact(other, null);
+    }
+
+    public void breakNonAggressionPact(Dynasty other, World world) {
         if (!canBreakNonAggressionPact(other)) {
             return;
         }
+        recordPactBroken(other, world);
         applyModifierBothWays(other, GameConstants.DIPLO_MODIFIER_BROKEN_PACT);
     }
 
@@ -147,10 +214,14 @@ public class DynastyDiplomacyService {
         TradeManager tradeManager = dynasty.getTradeService() != null
                 ? dynasty.getTradeService().getTradeManager()
                 : null;
-        applyWar(other, tradeManager);
+        applyWar(other, tradeManager, null);
     }
 
     public void applyWar(Dynasty other, TradeManager tradeManager) {
+        applyWar(other, tradeManager, null);
+    }
+
+    public void applyWar(Dynasty other, TradeManager tradeManager, World world) {
         if (other == null || other == dynasty || dynasty.isDefeated() || other.isDefeated()) {
             return;
         }
@@ -159,6 +230,221 @@ public class DynastyDiplomacyService {
         }
         cancelCrossDynastyTradesWith(other, tradeManager);
         applyModifierBothWays(other, GameConstants.DIPLO_MODIFIER_WAR);
+        applyWarEconomyToDynasty(dynasty);
+        applyWarEconomyToDynasty(other);
+        if (other.isPlayer()) {
+            other.addPendingWarDeclarationFrom(dynasty.getId());
+        }
+        if (world != null) {
+            world.getWarService().beginWar(dynasty, other);
+        }
+    }
+
+    public void clearWarWith(Dynasty other, TradeManager tradeManager) {
+        if (other == null || !isAtWarWith(other)) {
+            return;
+        }
+        clearExclusiveGroupBothWays(other, GameConstants.DIPLO_EXCLUSIVE_PACT);
+        applyWarEconomyToDynasty(dynasty);
+        applyWarEconomyToDynasty(other);
+    }
+
+    public boolean canDeclareWar(Dynasty other, World world) {
+        if (other == null || other == dynasty || dynasty.isDefeated() || other.isDefeated()) {
+            return false;
+        }
+        if (!meetsWarDeclarationPopulationRequirement(dynasty)) {
+            return false;
+        }
+        if (!meetsWarActiveMilitaryRequirement(dynasty)) {
+            return false;
+        }
+        if (!meetsWarActiveMilitaryRequirement(other)) {
+            return false;
+        }
+        if (!sharesBorderWith(other, world)) {
+            return false;
+        }
+        if (isAtWarWith(other)) {
+            return false;
+        }
+        if (hasNonAggressionPact(other)) {
+            return false;
+        }
+        return getMonthsSincePactBroken(other, world) >= GameConstants.WAR_PACT_BREAK_COOLDOWN_MONTHS;
+    }
+
+    public int getMonthsSincePactBroken(Dynasty other, World world) {
+        if (other == null || world == null) {
+            return Integer.MAX_VALUE;
+        }
+        Integer brokenAt = dynasty.getPactBrokenAtWorldMonth(other.getId());
+        if (brokenAt == null) {
+            return Integer.MAX_VALUE;
+        }
+        return worldMonthIndex(world) - brokenAt;
+    }
+
+    public int getWarDeclarationCooldownMonthsRemaining(Dynasty other, World world) {
+        int since = getMonthsSincePactBroken(other, world);
+        if (since >= GameConstants.WAR_PACT_BREAK_COOLDOWN_MONTHS) {
+            return 0;
+        }
+        return GameConstants.WAR_PACT_BREAK_COOLDOWN_MONTHS - since;
+    }
+
+    public int getPactRequestDeclineCooldownMonthsRemaining(Dynasty other, World world) {
+        Integer declinedAt = dynasty.getPactRequestDeclinedAtWorldMonth(other.getId());
+        if (declinedAt == null || world == null) {
+            return 0;
+        }
+        int since = worldMonthIndex(world) - declinedAt;
+        if (since >= GameConstants.DIPLO_DECLINED_REQUEST_COOLDOWN_MONTHS) {
+            return 0;
+        }
+        return GameConstants.DIPLO_DECLINED_REQUEST_COOLDOWN_MONTHS - since;
+    }
+
+    public int getTradeRequestDeclineCooldownMonthsRemaining(Dynasty other, World world) {
+        Integer declinedAt = dynasty.getTradeRequestDeclinedAtWorldMonth(other.getId());
+        if (declinedAt == null || world == null) {
+            return 0;
+        }
+        int since = worldMonthIndex(world) - declinedAt;
+        if (since >= GameConstants.DIPLO_DECLINED_REQUEST_COOLDOWN_MONTHS) {
+            return 0;
+        }
+        return GameConstants.DIPLO_DECLINED_REQUEST_COOLDOWN_MONTHS - since;
+    }
+
+    public void declareWar(Dynasty other, World world, TradeManager tradeManager) {
+        if (!canDeclareWar(other, world)) {
+            return;
+        }
+        applyWar(other, tradeManager, world);
+        if (world != null && !dynasty.isPlayer() && !other.isPlayer()) {
+            queueNpcWarAlertForPlayer(world, dynasty.getId(), other.getId());
+        }
+    }
+
+    private static void queueNpcWarAlertForPlayer(World world, int attackerId, int defenderId) {
+        for (Dynasty dynasty : world.getDynastys()) {
+            if (dynasty.isPlayer() && !dynasty.isDefeated()) {
+                dynasty.addPendingNpcWarAlert(attackerId, defenderId);
+                return;
+            }
+        }
+    }
+
+    public static int worldMonthIndex(World world) {
+        if (world == null) {
+            return 0;
+        }
+        return world.getYear() * 12 + world.getMonth();
+    }
+
+    private void recordPactBroken(Dynasty other, World world) {
+        if (other == null || world == null) {
+            return;
+        }
+        int monthIndex = worldMonthIndex(world);
+        dynasty.setPactBrokenAtWorldMonth(other.getId(), monthIndex);
+        other.setPactBrokenAtWorldMonth(dynasty.getId(), monthIndex);
+    }
+
+    private void recordPactRequestDeclined(Dynasty other, World world) {
+        if (other == null) {
+            return;
+        }
+        int monthIndex = worldMonthIndex(world);
+        dynasty.setPactRequestDeclinedAtWorldMonth(other.getId(), monthIndex);
+        other.setPactRequestDeclinedAtWorldMonth(dynasty.getId(), monthIndex);
+    }
+
+    private void recordTradeRequestDeclined(Dynasty other, World world) {
+        if (other == null) {
+            return;
+        }
+        int monthIndex = worldMonthIndex(world);
+        dynasty.setTradeRequestDeclinedAtWorldMonth(other.getId(), monthIndex);
+        other.setTradeRequestDeclinedAtWorldMonth(dynasty.getId(), monthIndex);
+    }
+
+    private void maybeRecoverDeclinedPactRequest(Dynasty other, World world) {
+        if (other == null || world == null) {
+            return;
+        }
+        Integer declinedAt = dynasty.getPactRequestDeclinedAtWorldMonth(other.getId());
+        if (declinedAt == null) {
+            return;
+        }
+        if (worldMonthIndex(world) - declinedAt >= GameConstants.DIPLO_DECLINED_REQUEST_COOLDOWN_MONTHS) {
+            recoverFromDeclinedPactRequest(other);
+        }
+    }
+
+    private void maybeRecoverDeclinedTradeRequest(Dynasty other, World world) {
+        if (other == null || world == null) {
+            return;
+        }
+        Integer declinedAt = dynasty.getTradeRequestDeclinedAtWorldMonth(other.getId());
+        if (declinedAt == null) {
+            return;
+        }
+        if (worldMonthIndex(world) - declinedAt >= GameConstants.DIPLO_DECLINED_REQUEST_COOLDOWN_MONTHS) {
+            recoverFromDeclinedTradeRequest(other);
+        }
+    }
+
+    private void recoverFromDeclinedPactRequest(Dynasty other) {
+        if (other == null) {
+            return;
+        }
+        dynasty.removePactRequestDeclinedAtWorldMonth(other.getId());
+        other.removePactRequestDeclinedAtWorldMonth(dynasty.getId());
+
+        String selfKey = dynasty.getDiplomaticModifierKey(other.getId());
+        String otherKey = other.getDiplomaticModifierKey(dynasty.getId());
+        if (GameConstants.DIPLO_MODIFIER_DECLINED_PACT.getNameKey().equals(selfKey)
+                || GameConstants.DIPLO_MODIFIER_DECLINED_PACT.getNameKey().equals(otherKey)) {
+            dynasty.clearDiplomaticModifierKey(other.getId());
+            other.clearDiplomaticModifierKey(dynasty.getId());
+            int reverse = -GameConstants.DIPLO_MODIFIER_DECLINED_PACT.getReputationDelta();
+            dynasty.adjustDiplomaticReputation(other.getId(), reverse);
+            other.adjustDiplomaticReputation(dynasty.getId(), reverse);
+        }
+    }
+
+    private void recoverFromDeclinedTradeRequest(Dynasty other) {
+        if (other == null) {
+            return;
+        }
+        dynasty.removeTradeRequestDeclinedAtWorldMonth(other.getId());
+        other.removeTradeRequestDeclinedAtWorldMonth(dynasty.getId());
+
+        int reverse = -GameConstants.DIPLO_MODIFIER_TRADE_REQUEST.getReputationDelta();
+        dynasty.adjustDiplomaticReputation(other.getId(), reverse);
+        other.adjustDiplomaticReputation(dynasty.getId(), reverse);
+    }
+
+    private void applyWarEconomyToDynasty(Dynasty target) {
+        if (target == null) {
+            return;
+        }
+        ensureSoldierWarRoleUpgrades(target);
+        for (Colony colony : target.getColonies()) {
+            if (!hasConfiguredWarEconomyAssignments(colony)) {
+                colony.copyPeaceRolesToWar();
+            }
+            if (!target.isPlayer() || colony.isAutomationEnabled()) {
+                colony.getAutomationService().applyWarEconomyQuotas(colony);
+            }
+            colony.refreshRoleAssignmentForWarState(null);
+        }
+    }
+
+    private static boolean hasConfiguredWarEconomyAssignments(Colony colony) {
+        return sumActiveMilitaryRoleCounts(colony.getWarAssignedRoleCounts()) > 0;
     }
 
     public void cancelCrossDynastyTradesWith(Dynasty other, TradeManager tradeManager) {
@@ -340,6 +626,10 @@ public class DynastyDiplomacyService {
 
     public boolean canProposeCrossDynastyTrade(Dynasty other, World world, CrossDynastyTradeProposal.Kind kind) {
         if (other == null || other == dynasty || dynasty.isDefeated() || other.isDefeated()) {
+            return false;
+        }
+        maybeRecoverDeclinedTradeRequest(other, world);
+        if (getTradeRequestDeclineCooldownMonthsRemaining(other, world) > 0) {
             return false;
         }
         if (isAtWarWith(other)) {
@@ -558,6 +848,7 @@ public class DynastyDiplomacyService {
         dynasty.removePendingTradeProposal(proposal);
         proposer.removePendingTradeProposal(proposal);
         applyTradeDeclinePenalty(proposer);
+        recordTradeRequestDeclined(proposer, world);
         Colony logColony = proposer.getCapital();
         if (logColony == null && !proposer.getColonies().isEmpty()) {
             logColony = proposer.getColonies().get(0);

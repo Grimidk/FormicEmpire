@@ -6,12 +6,13 @@ import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.entities.War;
 import com.grimidk.formicempire.classes.infrasctructure.World;
+import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.plaf.FlatChevronButton;
 import com.grimidk.formicempire.classes.interfaces.ui.styles.UiScrollBarStyles;
-import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
-import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -36,11 +37,13 @@ public class MapDialog extends ZeroDialog {
     private final JButton homeButton;
     private final JButton closeButton;
     private final Runnable onHexChange;
+    private final Runnable onOpenWarDialog;
 
-    public MapDialog(JFrame owner, World world, Runnable onHexChange) {
+    public MapDialog(JFrame owner, World world, Runnable onHexChange, Runnable onOpenWarDialog) {
         super(owner, LanguageStrings.DIALOG_MAP_TITLE, AssetStyles.MAP_DIALOG_SIZE);
         this.world = world;
         this.onHexChange = onHexChange;
+        this.onOpenWarDialog = onOpenWarDialog;
 
         this.mapPanel = new HexMapPanel();
         this.legendPanel = new LegendPanel();
@@ -145,6 +148,12 @@ public class MapDialog extends ZeroDialog {
         private int sortMode = SORT_POPULATION;
         private boolean expanded = true;
 
+        private final JPanel activeWarsSection;
+        private final JPanel activeWarsContent;
+        private final FlatChevronButton activeWarsToggle;
+        private final JLabel activeWarsTitle;
+        private boolean activeWarsExpanded = true;
+
         public LegendPanel() {
             setLayout(new BorderLayout());
             setBackground(AssetStyles.BACKGROUND_COLOR);
@@ -201,6 +210,42 @@ public class MapDialog extends ZeroDialog {
             header.add(sortWrap, BorderLayout.SOUTH);
             legendBody.add(header, BorderLayout.NORTH);
 
+            activeWarsContent = new JPanel();
+            activeWarsContent.setLayout(new BoxLayout(activeWarsContent, BoxLayout.Y_AXIS));
+            activeWarsContent.setOpaque(false);
+            activeWarsContent.setBorder(new EmptyBorder(0, 12, 4, 8));
+
+            activeWarsToggle = new FlatChevronButton();
+            activeWarsToggle.setPointsLeft(false);
+            activeWarsToggle.setOpaque(false);
+            activeWarsToggle.addActionListener(e -> setActiveWarsExpanded(!activeWarsExpanded));
+
+            activeWarsTitle = new JLabel();
+            activeWarsTitle.setFont(AssetStyles.FONT_BOLD.deriveFont(10f));
+            activeWarsTitle.setForeground(AssetStyles.FONT_COLOR_HEADER);
+            activeWarsTitle.setIcon(GameConstants.ICON_STAT_MILITARY_POWER);
+            activeWarsTitle.setIconTextGap(4);
+
+            JPanel activeWarsHeader = new JPanel(new BorderLayout(4, 0));
+            activeWarsHeader.setOpaque(false);
+            activeWarsHeader.setBorder(new EmptyBorder(0, 4, 4, 4));
+            activeWarsHeader.add(activeWarsToggle, BorderLayout.WEST);
+            activeWarsHeader.add(activeWarsTitle, BorderLayout.CENTER);
+            activeWarsHeader.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            activeWarsHeader.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    setActiveWarsExpanded(!activeWarsExpanded);
+                }
+            });
+
+            activeWarsSection = new JPanel();
+            activeWarsSection.setLayout(new BoxLayout(activeWarsSection, BoxLayout.Y_AXIS));
+            activeWarsSection.setOpaque(false);
+            activeWarsSection.setVisible(false);
+            activeWarsSection.add(activeWarsHeader);
+            activeWarsSection.add(activeWarsContent);
+
             JPanel columnHeader = new JPanel(new BorderLayout(4, 0));
             columnHeader.setOpaque(false);
             columnHeader.setBorder(new EmptyBorder(0, 10, 4, 8));
@@ -249,12 +294,93 @@ public class MapDialog extends ZeroDialog {
             scroll.getVerticalScrollBar().setUnitIncrement(16);
             UiScrollBarStyles.hide(scroll);
             legendScroll = scroll;
-            attachLegendWheelScroll(scroll, this, legendBody, listPanel, content, header, columnHeader);
+            attachLegendWheelScroll(scroll, this, legendBody, listPanel, content, header, columnHeader, activeWarsSection);
             listPanel.add(scroll, BorderLayout.CENTER);
-            legendBody.add(listPanel, BorderLayout.CENTER);
+
+            JPanel centerStack = new JPanel();
+            centerStack.setLayout(new BoxLayout(centerStack, BoxLayout.Y_AXIS));
+            centerStack.setOpaque(false);
+            centerStack.add(activeWarsSection);
+            centerStack.add(listPanel);
+            legendBody.add(centerStack, BorderLayout.CENTER);
 
             add(legendBody, BorderLayout.CENTER);
             updateLegend();
+        }
+
+        private void setActiveWarsExpanded(boolean expanded) {
+            activeWarsExpanded = expanded;
+            activeWarsContent.setVisible(expanded);
+            activeWarsToggle.setPointsLeft(!expanded);
+            activeWarsToggle.setToolTipText(LanguageStrings.get(
+                    expanded ? LanguageStrings.MAP_ACTIVE_WARS_HIDE : LanguageStrings.MAP_ACTIVE_WARS_SHOW));
+            activeWarsSection.revalidate();
+            activeWarsSection.repaint();
+        }
+
+        private void updateActiveWarsSection() {
+            List<War> wars = world != null ? world.getWarService().getActiveWars() : List.of();
+            activeWarsSection.setVisible(!wars.isEmpty());
+            activeWarsTitle.setText(LanguageStrings.format(
+                    LanguageStrings.MAP_ACTIVE_WARS_TITLE_FMT, wars.size()));
+            activeWarsContent.removeAll();
+            boolean playerCanManageWars = canPlayerManageWars();
+            for (War war : wars) {
+                Dynasty dynastyA = world.findDynastyById(war.getDynastyIdA());
+                Dynasty dynastyB = world.findDynastyById(war.getDynastyIdB());
+                String label = war.getDisplayName();
+                if (label == null || label.isEmpty()) {
+                    String nameA = dynastyA != null ? dynastyA.getName() : "?";
+                    String nameB = dynastyB != null ? dynastyB.getName() : "?";
+                    label = LanguageStrings.format(LanguageStrings.MAP_ACTIVE_WAR_PAIR_FMT, nameA, nameB);
+                }
+                JLabel warLabel = new JLabel(label);
+                warLabel.setFont(AssetStyles.FONT_SMALL);
+                warLabel.setForeground(AssetStyles.FONT_COLOR_WARNING);
+                warLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+                warLabel.setBorder(new EmptyBorder(0, 8, 2, 0));
+                if (playerCanManageWars && onOpenWarDialog != null) {
+                    warLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    warLabel.setToolTipText(LanguageStrings.get(LanguageStrings.MAP_ACTIVE_WAR_OPEN));
+                    warLabel.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            onOpenWarDialog.run();
+                        }
+                    });
+                }
+                activeWarsContent.add(warLabel);
+            }
+            activeWarsContent.setVisible(activeWarsExpanded && !wars.isEmpty());
+            activeWarsToggle.setPointsLeft(!activeWarsExpanded);
+            activeWarsToggle.setToolTipText(LanguageStrings.get(
+                    activeWarsExpanded ? LanguageStrings.MAP_ACTIVE_WARS_HIDE : LanguageStrings.MAP_ACTIVE_WARS_SHOW));
+            activeWarsSection.revalidate();
+            activeWarsSection.repaint();
+        }
+
+        private boolean canPlayerManageWars() {
+            if (world == null || world.getDynastys() == null) {
+                return false;
+            }
+            for (Dynasty dynasty : world.getDynastys()) {
+                if (dynasty.isPlayer() && !dynasty.isDefeated()) {
+                    return dynasty.isAtWar() || world.getWarService().hasWarHistoryForDynasty(dynasty.getId());
+                }
+            }
+            return false;
+        }
+
+        private boolean isPlayerDynastyAtWar() {
+            if (world == null || world.getDynastys() == null) {
+                return false;
+            }
+            for (Dynasty dynasty : world.getDynastys()) {
+                if (dynasty.isPlayer() && !dynasty.isDefeated() && dynasty.isAtWar()) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         private void attachLegendWheelScroll(JScrollPane scroll, JComponent... targets) {
@@ -333,6 +459,7 @@ public class MapDialog extends ZeroDialog {
         }
 
         public void updateLegend() {
+            updateActiveWarsSection();
             content.removeAll();
             if (world == null || world.getHexes() == null) return;
 

@@ -627,6 +627,55 @@ public class ColonyLabourService {
         }
     }
 
+    /**
+     * Sends one breeder princess and one drone from the capital to establish a queen in a captured colony.
+     */
+    public static boolean establishQueenFromBreederPair(Colony capital, Colony target) {
+        if (capital == null || target == null || capital == target) {
+            return false;
+        }
+        if (!capital.hasUpgrade(GameUnlocks.TYPE_PRINCESS) || !capital.hasUpgrade(GameUnlocks.ROLE_BREEDER)) {
+            return false;
+        }
+
+        Ant drone = null;
+        for (Ant candidate : capital.getDrones()) {
+            if (!candidate.isOnTrade() && !candidate.isNuptial()) {
+                drone = candidate;
+                break;
+            }
+        }
+        Ant breeder = null;
+        for (Ant candidate : capital.getPrincesses()) {
+            if (candidate.getRole() == GameConstants.ROLE_BREEDER
+                    && !candidate.isOnTrade() && !candidate.isNuptial()) {
+                breeder = candidate;
+                break;
+            }
+        }
+        if (drone == null || breeder == null) {
+            return false;
+        }
+
+        capital.getDrones().remove(drone);
+        capital.getPrincesses().remove(breeder);
+
+        Ant queen = new Ant(target, GameConstants.TYPE_QUEEN);
+        queen.setDimension(WorldSpaces.UNDERWORLD);
+        queen.setRole(GameConstants.ROLE_LAYER);
+        Rectangle royal = target.getPhysicsService().getRoomBounds(target, WorldSpaces.ROYAL_CHAMBER);
+        if (royal != null) {
+            queen.setPosition(target.getPhysicsService().getSpecificRoomPoint(target, royal));
+        }
+        target.getQueens().add(queen);
+        target.setDaysWithoutQueen(0);
+        target.setPeaceAssignedRoleCount(GameConstants.ROLE_LAYER,
+                target.getPeaceAssignedRoleCount(GameConstants.ROLE_LAYER) + 1);
+        ColonyStarterService.shared().reestablishCapturedColony(capital, target);
+        ColonyMilitaryService.refreshColonyMilitaryPower(capital);
+        return true;
+    }
+
     public void runGraveKeeping(Colony colony) {
         List<Ant> gravers = getWorkingAnts(colony, GameConstants.ROLE_GRAVER);
         int graverCount = gravers.size();

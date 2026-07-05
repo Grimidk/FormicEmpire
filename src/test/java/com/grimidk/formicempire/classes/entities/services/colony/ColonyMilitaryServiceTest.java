@@ -8,6 +8,7 @@ import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ColonyMilitaryServiceTest {
 
@@ -81,5 +82,29 @@ class ColonyMilitaryServiceTest {
         assertEquals(10, ColonyMilitaryService.getMilitaryLoyaltyAdjustment(10, 110, false));
         assertEquals(-10, ColonyMilitaryService.getMilitaryLoyaltyAdjustment(110, 10, false));
         assertEquals(0, ColonyMilitaryService.getMilitaryLoyaltyAdjustment(100, 50, true));
+    }
+
+    @Test
+    void aiWarDeclarationChanceBlocksMuchStrongerTargets() {
+        assertEquals(0, ColonyMilitaryService.computeAiWarDeclarationChance(100, 201, 0));
+        assertTrue(ColonyMilitaryService.computeAiWarDeclarationChance(100, 200, 0) > 0);
+    }
+
+    @Test
+    void aiWarDeclarationChanceRisesWithRelativeWeaknessEvenAtNeutralReputation() {
+        double equalNeutral = ColonyMilitaryService.computeAiWarDeclarationChance(
+                100, 100, GameConstants.REPUTATION_NEUTRAL.getMinScore());
+        double weakNeutral = ColonyMilitaryService.computeAiWarDeclarationChance(
+                100, 200, GameConstants.REPUTATION_NEUTRAL.getMinScore());
+        assertEquals(0, equalNeutral, 0.0001);
+        assertTrue(weakNeutral > 0);
+    }
+
+    @Test
+    void aiWarDeclarationChanceRisesWithHostilityWhenStrengthIsSimilar() {
+        double hostile = ColonyMilitaryService.computeAiWarDeclarationChance(100, 100, 0);
+        double neutral = ColonyMilitaryService.computeAiWarDeclarationChance(
+                100, 100, GameConstants.REPUTATION_NEUTRAL.getMinScore());
+        assertTrue(hostile > neutral);
     }
 }

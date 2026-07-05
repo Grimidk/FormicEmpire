@@ -1,5 +1,6 @@
 package com.grimidk.formicempire.classes.entities.services.dynasty;
 
+import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.CrossDynastyTradeProposal;
 import com.grimidk.formicempire.classes.entities.Dynasty;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -123,6 +125,157 @@ class DynastyDiplomacyServiceTest {
                 player.getDiplomaticModifierKey(neighbor.getId()));
         assertEquals(0, player.getDiplomaticReputation(neighbor.getId()));
         assertEquals(85.0, player.getGeneticIntegrity(), 0.001);
+    }
+
+    @Test
+    void declareWarBlockedByActivePact() {
+        player.setDiplomaticReputation(neighbor.getId(), 60);
+        neighbor.setDiplomaticReputation(player.getId(), 60);
+        player.getDiplomacyService().formNonAggressionPact(neighbor);
+
+        assertFalse(player.getDiplomacyService().canDeclareWar(neighbor, null));
+    }
+
+    @Test
+    void declareWarRequiresMinimumPopulation() {
+        Colony smallColony = new Colony(30, "Small", true);
+        player.addColony(smallColony);
+        player.setCapital(smallColony);
+        assertFalse(DynastyDiplomacyService.meetsWarDeclarationPopulationRequirement(player));
+        assertFalse(player.getDiplomacyService().canDeclareWar(neighbor, null));
+
+        for (int i = 0; i < GameConstants.WAR_DECLARATION_MIN_POPULATION; i++) {
+            smallColony.getWorkers().add(
+                    new com.grimidk.formicempire.classes.entities.Ant(smallColony, GameConstants.TYPE_WORKER));
+        }
+        assertTrue(DynastyDiplomacyService.meetsWarDeclarationPopulationRequirement(player));
+    }
+
+    @Test
+    void warServiceListsEachActiveWarOnce() {
+        World world = buildBorderWorld();
+        player.getDiplomacyService().applyWar(neighbor, null, world);
+
+        List<com.grimidk.formicempire.classes.entities.War> wars = world.getWarService().getActiveWars();
+        assertEquals(1, wars.size());
+        assertTrue(wars.get(0).involves(player.getId()));
+    }
+
+    @Test
+    void declareWarBlockedUntilPactBreakCooldownExpires() {
+        World world = buildBorderWorld();
+        world.setYear(1);
+        world.setMonth(6);
+        player.setDiplomaticReputation(neighbor.getId(), 60);
+        neighbor.setDiplomaticReputation(player.getId(), 60);
+        player.getDiplomacyService().formNonAggressionPact(neighbor);
+        player.getDiplomacyService().breakNonAggressionPact(neighbor, world);
+
+        assertFalse(player.getDiplomacyService().canDeclareWar(neighbor, world));
+        assertEquals(6, player.getDiplomacyService().getWarDeclarationCooldownMonthsRemaining(neighbor, world));
+
+        world.setMonth(12);
+        assertTrue(player.getDiplomacyService().canDeclareWar(neighbor, world));
+    }
+
+    @Test
+    void declareWarNotifiesPlayerDynasty() {
+        World world = buildBorderWorld();
+        player.setDiplomaticReputation(neighbor.getId(), 30);
+        neighbor.setDiplomaticReputation(player.getId(), 30);
+
+        neighbor.getDiplomacyService().declareWar(player, world, null);
+
+        assertTrue(neighbor.getDiplomacyService().isAtWarWith(player));
+        assertTrue(player.hasPendingWarDeclarationFrom(neighbor.getId()));
+    }
+
+    @Test
+    void npcWarQueuesAlertOnPlayerDynasty() {
+        World world = new World();
+        Dynasty aggressor = new Dynasty(3, "Aggressor", false, GameConstants.SPECIES_OMNI);
+        Dynasty rival = new Dynasty(4, "Rival", false, GameConstants.SPECIES_OMNI);
+        world.getDynastys().add(aggressor);
+        world.getDynastys().add(rival);
+        world.getDynastys().add(player);
+
+        Hex aggressorHex = new Hex();
+        Hex rivalHex = new Hex();
+        aggressorHex.setQ(2);
+        aggressorHex.setR(0);
+        rivalHex.setQ(3);
+        rivalHex.setR(0);
+        aggressorHex.setNorthEast(rivalHex);
+        rivalHex.setSouthWest(aggressorHex);
+
+        Colony aggressorColony = new Colony(20, "Aggressor Capital", false);
+        Colony rivalColony = new Colony(21, "Rival Capital", false);
+        aggressor.addColony(aggressorColony);
+        rival.addColony(rivalColony);
+        aggressorColony.setDynasty(aggressor);
+        rivalColony.setDynasty(rival);
+        aggressorHex.setColony(aggressorColony);
+        rivalHex.setColony(rivalColony);
+
+        ArrayList<Hex> hexes = new ArrayList<>();
+        hexes.add(aggressorHex);
+        hexes.add(rivalHex);
+        world.setHexes(hexes);
+
+        ensureWarPopulation(aggressor, aggressorColony);
+        ensureWarPopulation(rival, rivalColony);
+
+        Colony playerColony = new Colony(22, "Player Capital", true);
+        player.addColony(playerColony);
+        player.setCapital(playerColony);
+
+        aggressor.getDiplomacyService().declareWar(rival, world, null);
+
+        assertTrue(aggressor.getDiplomacyService().isAtWarWith(rival));
+        assertEquals(1, player.copyPendingNpcWarAlerts().size());
+        assertEquals(aggressor.getId(), player.copyPendingNpcWarAlerts().get(0).attackerId);
+        assertEquals(rival.getId(), player.copyPendingNpcWarAlerts().get(0).defenderId);
+    }
+
+    private World buildBorderWorld() {
+        World world = new World();
+        Hex playerHex = new Hex();
+        Hex neighborHex = new Hex();
+        playerHex.setQ(0);
+        playerHex.setR(0);
+        neighborHex.setQ(1);
+        neighborHex.setR(0);
+        playerHex.setNorthEast(neighborHex);
+        neighborHex.setSouthWest(playerHex);
+
+        Colony playerColony = new Colony(10, "Capital", true);
+        Colony neighborColony = new Colony(11, "Border", false);
+        player.addColony(playerColony);
+        neighbor.addColony(neighborColony);
+        playerColony.setDynasty(player);
+        neighborColony.setDynasty(neighbor);
+        playerHex.setColony(playerColony);
+        neighborHex.setColony(neighborColony);
+        ensureWarPopulation(player, playerColony);
+        ensureWarPopulation(neighbor, neighborColony);
+
+        ArrayList<Hex> hexes = new ArrayList<>();
+        hexes.add(playerHex);
+        hexes.add(neighborHex);
+        world.setHexes(hexes);
+        world.getDynastys().add(player);
+        world.getDynastys().add(neighbor);
+        return world;
+    }
+
+    private static void ensureWarPopulation(Dynasty dynasty, Colony colony) {
+        dynasty.unlockUpgrade(GameUnlocks.TYPE_SOLDIER);
+        int needed = GameConstants.WAR_DECLARATION_MIN_POPULATION
+                - dynasty.getStatService().getTotalPopulation(dynasty);
+        for (int i = 0; i < needed; i++) {
+            colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+        }
+        colony.getSoldiers().add(new Ant(colony, GameConstants.TYPE_SOLDIER));
     }
 
     @Test
@@ -325,5 +478,46 @@ class DynastyDiplomacyServiceTest {
 
         assertTrue(player.getDiplomacyService().isAtWarWith(neighbor));
         assertEquals(0, tradeManager.getActiveTrades().size());
+    }
+
+    @Test
+    void declinedPactBlocksRetryUntilNextMonth() {
+        World world = new World();
+        world.setYear(1);
+        world.setMonth(3);
+
+        player.setDiplomaticReputation(neighbor.getId(), 60);
+        neighbor.setDiplomaticReputation(player.getId(), 60);
+        player.getDiplomacyService().declineNonAggressionPact(neighbor, world);
+
+        assertFalse(neighbor.getDiplomacyService().canRequestNonAggressionPact(player, world));
+        assertEquals(1, neighbor.getDiplomacyService().getPactRequestDeclineCooldownMonthsRemaining(player, world));
+
+        world.setMonth(4);
+        assertTrue(neighbor.getDiplomacyService().canRequestNonAggressionPact(player, world));
+        assertEquals(60, neighbor.getDiplomaticReputation(player.getId()));
+    }
+
+    @Test
+    void declinedTradeBlocksRetryUntilNextMonth() {
+        World world = new World();
+        world.setYear(0);
+        world.setMonth(5);
+
+        player.unlockUpgrade(GameUnlocks.ABILITY_TRADE);
+        neighbor.unlockUpgrade(GameUnlocks.ABILITY_TRADE);
+        player.setDiplomaticReputation(neighbor.getId(), 60);
+        neighbor.setDiplomaticReputation(player.getId(), 60);
+        CrossDynastyTradeProposal proposal = new CrossDynastyTradeProposal(
+                neighbor.getId(), 1, 2, CrossDynastyTradeProposal.Kind.REQUEST, Map.of());
+
+        player.getDiplomacyService().declineTradeProposal(neighbor, proposal, world);
+
+        assertFalse(neighbor.getDiplomacyService().canRequestTrade(player, world));
+        assertEquals(1, neighbor.getDiplomacyService().getTradeRequestDeclineCooldownMonthsRemaining(player, world));
+
+        world.setMonth(6);
+        assertTrue(neighbor.getDiplomacyService().canRequestTrade(player, world));
+        assertEquals(60, neighbor.getDiplomaticReputation(player.getId()));
     }
 }

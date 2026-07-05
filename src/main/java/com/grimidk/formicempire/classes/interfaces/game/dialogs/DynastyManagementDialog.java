@@ -49,10 +49,12 @@ public class DynastyManagementDialog extends ZeroDialog {
     public static final int TAB_OVERVIEW = 0;
     public static final int TAB_TRADE = 1;
     public static final int TAB_DIPLOMACY = 2;
+    public static final int TAB_WARS = 3;
 
     private final Dynasty dynasty;
     private final Engine engine;
     private final Consumer<Colony> onGoToColony;
+    private final Runnable onOpenWarRoles;
 
     private final JTabbedPane tabbedPane;
     private final Map<Integer, Integer> tabIndexMap = new HashMap<>();
@@ -60,14 +62,17 @@ public class DynastyManagementDialog extends ZeroDialog {
     private OverviewPanel overviewPanel;
     private TradePanel tradePanel;
     private DiplomacyPanel diplomacyPanel;
+    private WarManagementPanel warsPanel;
 
     private final Runnable refreshTask = this::liveUpdate;
 
-    public DynastyManagementDialog(JFrame owner, Dynasty dynasty, Engine engine, Consumer<Colony> onGoToColony) {
+    public DynastyManagementDialog(JFrame owner, Dynasty dynasty, Engine engine, Consumer<Colony> onGoToColony,
+            Runnable onOpenWarRoles) {
         super(owner, LanguageStrings.DIALOG_DYNASTY_TITLE, AssetStyles.DEFAULT_DIALOG_SIZE);
         this.dynasty = dynasty;
         this.engine = engine;
         this.onGoToColony = onGoToColony;
+        this.onOpenWarRoles = onOpenWarRoles;
         dynasty.bindTradeManager(engine.getTradeManager());
 
         tabbedPane = new JTabbedPane();
@@ -144,7 +149,7 @@ public class DynastyManagementDialog extends ZeroDialog {
         if (!isShowing()) return;
 
         boolean hasTrade = dynasty.hasUpgrade(GameUnlocks.ABILITY_TRADE);
-        int expectedTabs = 2 + (hasTrade ? 1 : 0);        
+        int expectedTabs = 3 + (hasTrade ? 1 : 0);
         boolean currentAuto = dynasty.hasUpgrade(GameUnlocks.ABILITY_AUTOMATION);
         boolean currentAutoBuild = dynasty.hasUpgrade(GameUnlocks.ABILITY_MANAGEMENT);
         
@@ -202,6 +207,13 @@ public class DynastyManagementDialog extends ZeroDialog {
         tabbedPane.addTab(LanguageStrings.get(LanguageStrings.TAB_DIPLOMACY), diplomacyPanel);
         tabIndexMap.put(TAB_DIPLOMACY, currentIndex++);
 
+        if (warsPanel == null) {
+            warsPanel = new WarManagementPanel(dynasty, engine, createWarCallbacks());
+        }
+        warsPanel.updateData();
+        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.TAB_WARS), warsPanel);
+        tabIndexMap.put(TAB_WARS, currentIndex++);
+
         if (selectedIndex < tabbedPane.getTabCount()) {
             tabbedPane.setSelectedIndex(selectedIndex);
         }
@@ -246,6 +258,46 @@ public class DynastyManagementDialog extends ZeroDialog {
                 }
             }
         });
+
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0), "toggleWars");
+        actionMap.put("toggleWars", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (isTabOpen(TAB_WARS)) {
+                    dispose();
+                } else if (tabIndexMap.containsKey(TAB_WARS)) {
+                    tabbedPane.setSelectedIndex(tabIndexMap.get(TAB_WARS));
+                }
+            }
+        });
+    }
+
+    private WarManagementPanel.Callbacks createWarCallbacks() {
+        return new WarManagementPanel.Callbacks() {
+            @Override
+            public void goToOpponentCapital(Dynasty opponent) {
+                if (opponent != null && opponent.getCapital() != null) {
+                    onGoToColony.accept(opponent.getCapital());
+                }
+            }
+
+            @Override
+            public void openDiplomacy(Dynasty opponent) {
+                setTab(TAB_DIPLOMACY);
+            }
+
+            @Override
+            public void openWarRoles() {
+                if (onOpenWarRoles != null) {
+                    onOpenWarRoles.run();
+                }
+            }
+
+            @Override
+            public void onWarsChanged() {
+                liveUpdate();
+            }
+        };
     }
 
     interface LiveUpdatePanel {
@@ -1560,7 +1612,7 @@ public class DynastyManagementDialog extends ZeroDialog {
 
             List<Dynasty> others = new ArrayList<>();
             for (Dynasty other : world.getDynastys()) {
-                if (other != dynasty) {
+                if (other != dynasty && !other.isDefeated()) {
                     others.add(other);
                 }
             }
@@ -1598,7 +1650,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             }
             World world = engine.getWorld();
             if (dynasty.getDiplomacyService().hasNonAggressionPact(other)) {
-                dynasty.getDiplomacyService().breakNonAggressionPact(other);
+                dynasty.getDiplomacyService().breakNonAggressionPact(other, world);
             } else if (dynasty.getDiplomacyService().canRequestNonAggressionPact(other, world)) {
                 dynasty.getDiplomacyService().requestNonAggressionPact(other, world);
                 if (dynasty.getDiplomacyService().hasNonAggressionPact(other)) {
@@ -1618,11 +1670,61 @@ public class DynastyManagementDialog extends ZeroDialog {
                             JOptionPane.WARNING_MESSAGE);
                 }
             } else {
-                UiOptionPane.showMessageDialog(this,
-                        LanguageStrings.get(LanguageStrings.DIPLO_ERROR_CORDIAL_REQUIRED),
+                String message;
+                int pactCooldown = dynasty.getDiplomacyService().getPactRequestDeclineCooldownMonthsRemaining(other, world);
+                if (pactCooldown > 0) {
+                    message = LanguageStrings.format(LanguageStrings.DIPLO_ERROR_PACT_DECLINE_COOLDOWN_FMT, pactCooldown);
+                } else {
+                    message = LanguageStrings.get(LanguageStrings.DIPLO_ERROR_CORDIAL_REQUIRED);
+                }
+                UiOptionPane.showMessageDialog(this, message,
                         LanguageStrings.get(LanguageStrings.DIPLO_ACTION_FORM_PACT),
                         JOptionPane.WARNING_MESSAGE);
             }
+            updateData();
+        }
+
+        private void performDeclareWarAction(Dynasty other) {
+            World world = engine.getWorld();
+            if (other == null || dynasty.getDiplomacyService() == null || world == null) {
+                return;
+            }
+            DynastyDiplomacyService diplo = dynasty.getDiplomacyService();
+            if (!diplo.canDeclareWar(other, world)) {
+                String message;
+                if (!DynastyDiplomacyService.meetsWarDeclarationPopulationRequirement(dynasty)) {
+                    message = LanguageStrings.format(
+                            LanguageStrings.DIPLO_ERROR_WAR_POPULATION_FMT,
+                            GameConstants.WAR_DECLARATION_MIN_POPULATION);
+                } else if (!DynastyDiplomacyService.meetsWarActiveMilitaryRequirement(dynasty)) {
+                    message = LanguageStrings.get(LanguageStrings.DIPLO_ERROR_WAR_ACTIVE_MILITARY);
+                } else if (!DynastyDiplomacyService.meetsWarActiveMilitaryRequirement(other)) {
+                    message = LanguageStrings.format(
+                            LanguageStrings.DIPLO_ERROR_WAR_TARGET_ACTIVE_MILITARY_FMT,
+                            other.getName());
+                } else if (diplo.hasNonAggressionPact(other)) {
+                    message = LanguageStrings.get(LanguageStrings.DIPLO_ERROR_PACT_BLOCKS_WAR);
+                } else {
+                    int remaining = diplo.getWarDeclarationCooldownMonthsRemaining(other, world);
+                    if (remaining > 0) {
+                        message = LanguageStrings.format(LanguageStrings.DIPLO_ERROR_WAR_COOLDOWN_FMT, remaining);
+                    } else {
+                        message = LanguageStrings.get(LanguageStrings.DIPLO_ERROR_NO_BORDER);
+                    }
+                }
+                UiOptionPane.showMessageDialog(this, message,
+                        LanguageStrings.get(LanguageStrings.DIPLO_ACTION_DECLARE_WAR),
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            int confirm = UiOptionPane.showConfirmDialog(this,
+                    LanguageStrings.format(LanguageStrings.DIPLO_WAR_DECLARE_CONFIRM_FMT, other.getName()),
+                    LanguageStrings.get(LanguageStrings.DIPLO_ACTION_DECLARE_WAR),
+                    JOptionPane.YES_NO_OPTION);
+            if (confirm != JOptionPane.YES_OPTION) {
+                return;
+            }
+            diplo.declareWar(other, world, engine.getTradeManager());
             updateData();
         }
 
@@ -1827,10 +1929,48 @@ public class DynastyManagementDialog extends ZeroDialog {
                 pactItem.addActionListener(e -> performPactAction(other));
             } else {
                 pactItem.setEnabled(false);
-                pactItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_CORDIAL_REQUIRED));
+                int pactCooldown = diplo.getPactRequestDeclineCooldownMonthsRemaining(other, world);
+                if (pactCooldown > 0) {
+                    pactItem.setToolTipText(LanguageStrings.format(
+                            LanguageStrings.DIPLO_ERROR_PACT_DECLINE_COOLDOWN_FMT, pactCooldown));
+                } else {
+                    pactItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_CORDIAL_REQUIRED));
+                }
             }
             AssetStyles.styleMenuItem(pactItem);
             menu.add(pactItem);
+
+            if (!diplo.isAtWarWith(other)) {
+                JMenuItem warItem = new JMenuItem(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_DECLARE_WAR));
+                if (diplo.canDeclareWar(other, world)) {
+                    warItem.addActionListener(e -> performDeclareWarAction(other));
+                } else {
+                    warItem.setEnabled(false);
+                    if (!DynastyDiplomacyService.meetsWarDeclarationPopulationRequirement(dynasty)) {
+                        warItem.setToolTipText(LanguageStrings.format(
+                                LanguageStrings.DIPLO_ERROR_WAR_POPULATION_FMT,
+                                GameConstants.WAR_DECLARATION_MIN_POPULATION));
+                    } else if (!DynastyDiplomacyService.meetsWarActiveMilitaryRequirement(dynasty)) {
+                        warItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_WAR_ACTIVE_MILITARY));
+                    } else if (!DynastyDiplomacyService.meetsWarActiveMilitaryRequirement(other)) {
+                        warItem.setToolTipText(LanguageStrings.format(
+                                LanguageStrings.DIPLO_ERROR_WAR_TARGET_ACTIVE_MILITARY_FMT,
+                                other.getName()));
+                    } else if (diplo.hasNonAggressionPact(other)) {
+                        warItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_PACT_BLOCKS_WAR));
+                    } else {
+                        int remaining = diplo.getWarDeclarationCooldownMonthsRemaining(other, world);
+                        if (remaining > 0) {
+                            warItem.setToolTipText(LanguageStrings.format(
+                                    LanguageStrings.DIPLO_ERROR_WAR_COOLDOWN_FMT, remaining));
+                        } else {
+                            warItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_NO_BORDER));
+                        }
+                    }
+                }
+                AssetStyles.styleMenuItem(warItem);
+                menu.add(warItem);
+            }
 
             if (!diplo.isAtWarWith(other)) {
                 JMenuItem requestItem = new JMenuItem(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_REQUEST_TRADE));
@@ -1838,7 +1978,13 @@ public class DynastyManagementDialog extends ZeroDialog {
                     requestItem.addActionListener(e -> performRequestTradeAction(other));
                 } else {
                     requestItem.setEnabled(false);
-                    requestItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_CORDIAL_REQUIRED_REQUEST));
+                    int tradeCooldown = diplo.getTradeRequestDeclineCooldownMonthsRemaining(other, world);
+                    if (tradeCooldown > 0) {
+                        requestItem.setToolTipText(LanguageStrings.format(
+                                LanguageStrings.DIPLO_ERROR_TRADE_DECLINE_COOLDOWN_FMT, tradeCooldown));
+                    } else {
+                        requestItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_CORDIAL_REQUIRED_REQUEST));
+                    }
                 }
                 AssetStyles.styleMenuItem(requestItem);
                 menu.add(requestItem);

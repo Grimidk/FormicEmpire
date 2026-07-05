@@ -103,33 +103,47 @@ public class Engine extends Thread {
     }
 
     public void setDelay(float delay) {
-        GameSpeed closest = GameSpeed.NORMAL;
-        int minDiff = Integer.MAX_VALUE;
-        for (GameSpeed s : GameSpeed.values()) {
-            int diff = Math.abs(s.getDelayMs() - (int)delay);
-            if (diff < minDiff) {
-                minDiff = diff;
-                closest = s;
-            }
-        }
-        this.speed = closest;
+        this.speed = GameSpeed.closestToDelayMs((int) delay);
     }
-    
+
     public GameSpeed getSpeed() {
         return speed;
     }
-    
+
+    public String getSpeedLabel() {
+        if (paused) {
+            return LanguageStrings.get(LanguageStrings.UI_PAUSED_TICK);
+        }
+        return speed.getLabel();
+    }
+
     public void setSpeed(GameSpeed speed) {
         if (speed == null) {
             return;
         }
         GameSpeed resolved = speed;
-        if (speed == GameSpeed.TURBO && !allowTurboMode) {
-            resolved = GameSpeed.VERY_FAST;
+        if (speed.getId() > GameSpeed.maxPlayableId(allowTurboMode)) {
+            resolved = GameSpeed.fromId(GameSpeed.maxPlayableId(allowTurboMode));
         }
         if (this.speed != resolved) {
             this.speed = resolved;
             interrupt();
+        }
+    }
+
+    public void stepSpeedUp() {
+        setSpeed(GameSpeed.step(speed, 1, allowTurboMode));
+    }
+
+    public void stepSpeedDown() {
+        setSpeed(GameSpeed.step(speed, -1, allowTurboMode));
+    }
+
+    public void togglePause() {
+        if (paused) {
+            resumeEngine();
+        } else {
+            pauseEngine();
         }
     }
 
@@ -299,8 +313,8 @@ public class Engine extends Thread {
 
     public void setAllowTurboMode(boolean allowTurboMode) {
         this.allowTurboMode = allowTurboMode;
-        if (!allowTurboMode && speed == GameSpeed.TURBO) {
-            speed = GameSpeed.VERY_FAST;
+        if (!allowTurboMode && speed.getId() > GameSpeed.maxPlayableId(false)) {
+            speed = GameSpeed.fromId(GameSpeed.maxPlayableId(false));
         }
     }
 

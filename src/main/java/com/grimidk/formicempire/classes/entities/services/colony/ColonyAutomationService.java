@@ -29,8 +29,30 @@ public class ColonyAutomationService {
     public void runAutomation(Colony colony) {
         if (!colony.isAutomationEnabled()) return;
 
-        Map<AntRole, Integer> roleQuotas = calculateNeedsBasedQuotas(colony);
+        Map<AntRole, Integer> roleQuotas = usesWarEconomy(colony)
+                ? calculateWarEconomyQuotas(colony)
+                : calculateNeedsBasedQuotas(colony);
         applyQuotas(colony, roleQuotas);
+    }
+
+    public void applyWarEconomyQuotas(Colony colony) {
+        Map<AntRole, Integer> roleQuotas = calculateWarEconomyQuotas(colony);
+        for (Map.Entry<AntRole, Integer> entry : roleQuotas.entrySet()) {
+            colony.setWarAssignedRoleCount(entry.getKey(), entry.getValue());
+        }
+    }
+
+    public Map<AntRole, Integer> calculateWarEconomyQuotas(Colony colony) {
+        Map<AntRole, Integer> targets = new HashMap<>();
+        for (AntRole role : GameConstants.getAntRoles()) {
+            targets.put(role, 0);
+        }
+        calculateWarWorkerQuotas(colony, targets);
+        calculateWarSoldierQuotas(colony, targets);
+        calculateWarMajorQuotas(colony, targets);
+        calculateMinimalPrincessQuotas(colony, targets);
+        calculateMinimalQueenQuotas(colony, targets);
+        return targets;
     }
 
     public void runDailyAutomation(Colony colony) {
@@ -130,6 +152,10 @@ public class ColonyAutomationService {
     }
 
     private void calculateWorkerQuotas(Colony colony, Map<AntRole, Integer> targets) {
+        if (usesWarEconomy(colony)) {
+            calculateWarWorkerQuotas(colony, targets);
+            return;
+        }
         int totalWorkers = colony.getWorkers().size();
         int remaining = totalWorkers;
         if (remaining == 0) return;
@@ -331,6 +357,10 @@ public class ColonyAutomationService {
     }
 
     private void calculateSoldierQuotas(Colony colony, Map<AntRole, Integer> targets) {
+        if (usesWarEconomy(colony)) {
+            calculateWarSoldierQuotas(colony, targets);
+            return;
+        }
         int remainingSoldiers = colony.getSoldiers().size();
         if (remainingSoldiers == 0) return;
 
@@ -367,6 +397,10 @@ public class ColonyAutomationService {
     }
 
     private void calculateMajorQuotas(Colony colony, Map<AntRole, Integer> targets) {
+        if (usesWarEconomy(colony)) {
+            calculateWarMajorQuotas(colony, targets);
+            return;
+        }
         int totalMajors = colony.getMajors().size();
         if (totalMajors == 0) return;
 
@@ -397,12 +431,129 @@ public class ColonyAutomationService {
         } else if (assignedTransport > 0) {
             targets.put(GameConstants.ROLE_TRANSPORT, assignedTransport);
             targets.put(GameConstants.ROLE_CRANE, 0);
-            targets.put(GameConstants.ROLE_BRUTE, remainingMajors - assignedTransport);
+            if (isAtWar(colony)) {
+                targets.put(GameConstants.ROLE_BRUTE, remainingMajors - assignedTransport);
+            } else {
+                targets.put(GameConstants.ROLE_BRUTE, 0);
+            }
         } else {
             targets.put(GameConstants.ROLE_CRANE, 0);
             targets.put(GameConstants.ROLE_TRANSPORT, 0);
-            targets.put(GameConstants.ROLE_BRUTE, remainingMajors);
+            if (isAtWar(colony)) {
+                targets.put(GameConstants.ROLE_BRUTE, remainingMajors);
+            } else {
+                targets.put(GameConstants.ROLE_BRUTE, 0);
+            }
         }
+    }
+
+    private boolean isAtWar(Colony colony) {
+        return usesWarEconomy(colony);
+    }
+
+    private boolean usesWarEconomy(Colony colony) {
+        Dynasty dynasty = colony.getDynasty();
+        return dynasty != null && dynasty.isAtWar();
+    }
+
+    private void calculateWarWorkerQuotas(Colony colony, Map<AntRole, Integer> targets) {
+        int totalWorkers = colony.getWorkers().size();
+        int remaining = totalWorkers;
+        if (remaining == 0) {
+            return;
+        }
+
+        ColonyStatsService stats = colony.getStatsService();
+
+        int farmers = assignMinimum(remaining, MIN_FARMERS);
+        remaining -= farmers;
+        targets.put(GameConstants.ROLE_FARMER, farmers);
+
+        int foragers = assignMinimum(remaining, MIN_FORAGERS);
+        remaining -= foragers;
+        targets.put(GameConstants.ROLE_FORAGER, foragers);
+
+        float nursingRate = stats.getNursingRate(colony);
+        int maxBrood = stats.getEggsCapacity(colony) * 3;
+        int nurseTarget = MIN_NURSES;
+        if (nursingRate > 0) {
+            nurseTarget = Math.max(MIN_NURSES, (int) Math.ceil(maxBrood / nursingRate));
+        }
+        int nurses = assignMinimum(remaining, nurseTarget);
+        remaining -= nurses;
+        targets.put(GameConstants.ROLE_NURSE, nurses);
+
+        int extraNurses = calculateExtraNurseNeeds(colony, remaining, nurses, stats);
+        nurses += extraNurses;
+        remaining -= extraNurses;
+        targets.put(GameConstants.ROLE_NURSE, nurses);
+
+        int extraFarmers = calculateExtraFarmerNeeds(colony, remaining, farmers, stats);
+        farmers += extraFarmers;
+        remaining -= extraFarmers;
+        targets.put(GameConstants.ROLE_FARMER, farmers);
+
+        if (remaining > 0 && colony.hasUpgrade(GameUnlocks.ROLE_MILITIA)) {
+            targets.put(GameConstants.ROLE_MILITIA, remaining);
+        }
+    }
+
+    private void calculateWarSoldierQuotas(Colony colony, Map<AntRole, Integer> targets) {
+        int remainingSoldiers = colony.getSoldiers().size();
+        if (remainingSoldiers == 0) {
+            return;
+        }
+
+        int assignedPolice = 0;
+        if (colony.getParasiteAnts() > 0 && colony.hasUpgrade(GameUnlocks.ROLE_POLICE)) {
+            int maxPolice = Math.max(1, (int) (colony.getSoldiers().size() * 0.10));
+            assignedPolice = Math.min(maxPolice, remainingSoldiers);
+            targets.put(GameConstants.ROLE_POLICE, assignedPolice);
+            remainingSoldiers -= assignedPolice;
+        }
+
+        if (remainingSoldiers <= 0) {
+            return;
+        }
+
+        if (colony.hasUpgrade(GameUnlocks.ROLE_WARRIOR)) {
+            int defenders = 0;
+            if (colony.hasUpgrade(GameUnlocks.ROLE_DEFENDER)) {
+                defenders = Math.max(1, remainingSoldiers / 4);
+                defenders = Math.min(defenders, remainingSoldiers);
+                targets.put(GameConstants.ROLE_DEFENDER, defenders);
+            }
+            targets.put(GameConstants.ROLE_WARRIOR, remainingSoldiers - defenders);
+        } else if (colony.hasUpgrade(GameUnlocks.ROLE_HUNTER)) {
+            targets.put(GameConstants.ROLE_HUNTER, remainingSoldiers);
+        }
+    }
+
+    private void calculateWarMajorQuotas(Colony colony, Map<AntRole, Integer> targets) {
+        int totalMajors = colony.getMajors().size();
+        if (totalMajors == 0) {
+            return;
+        }
+
+        if (colony.hasUpgrade(GameUnlocks.ROLE_BRUTE)) {
+            targets.put(GameConstants.ROLE_BRUTE, totalMajors);
+        }
+    }
+
+    private void calculateMinimalPrincessQuotas(Colony colony, Map<AntRole, Integer> targets) {
+        int totalPrincesses = colony.getPrincesses().size();
+        if (totalPrincesses == 0) {
+            return;
+        }
+        targets.put(GameConstants.ROLE_BREEDER, totalPrincesses);
+    }
+
+    private void calculateMinimalQueenQuotas(Colony colony, Map<AntRole, Integer> targets) {
+        int totalQueens = colony.getQueens().size();
+        if (totalQueens == 0) {
+            return;
+        }
+        targets.put(GameConstants.ROLE_LAYER, totalQueens);
     }
 
     private void calculatePrincessQuotas(Colony colony, Map<AntRole, Integer> targets) {

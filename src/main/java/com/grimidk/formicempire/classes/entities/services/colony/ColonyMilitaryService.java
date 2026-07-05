@@ -1,13 +1,18 @@
 package com.grimidk.formicempire.classes.entities.services.colony;
 
+import com.grimidk.formicempire.classes.constants.ant.AntRole;
+import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 
+import java.util.Map;
+
 /**
- * Colony military power from adult ant type counts (roles ignored) scaled by combat base stats.
+ * Colony military power from adult ant type counts scaled by combat base stats.
+ * During war, war-role assignments split power into active (front-line roles) and reserve (remaining adults).
  * Refreshed at most once per colony per world day ({@link Colony#runDailyJobs}).
  */
 public final class ColonyMilitaryService {
@@ -93,9 +98,48 @@ public final class ColonyMilitaryService {
         return 0;
     }
 
+    /**
+     * Daily AI war probability toward a bordering target. Returns 0 when the target exceeds
+     * {@link GameConstants#AI_DECLARE_WAR_MAX_TARGET_STRENGTH_RATIO} times the AI's military power.
+     * Chance rises as effective reputation falls and as the AI becomes relatively weaker (up to that cap).
+     */
+    public static double computeAiWarDeclarationChance(int aiPower, int otherPower, int effectiveReputation) {
+        if (otherPower <= 0 || aiPower <= 0) {
+            return 0;
+        }
+        float maxRatio = GameConstants.AI_DECLARE_WAR_MAX_TARGET_STRENGTH_RATIO;
+        if (otherPower > aiPower * maxRatio) {
+            return 0;
+        }
+
+        double strengthRatio = Math.min(maxRatio, otherPower / (double) aiPower);
+        double weaknessUrgency = strengthRatio <= 1.0
+                ? 0.0
+                : (strengthRatio - 1.0) / (maxRatio - 1.0);
+
+        int neutralMin = GameConstants.REPUTATION_NEUTRAL.getMinScore();
+        double repPressure;
+        if (effectiveReputation >= neutralMin) {
+            repPressure = 0.35 * weaknessUrgency;
+        } else {
+            repPressure = 0.35 + 0.65 * ((neutralMin - effectiveReputation) / (double) neutralMin);
+        }
+        if (repPressure <= 0) {
+            return 0;
+        }
+
+        return GameConstants.AI_DECLARE_WAR_CHANCE
+                * repPressure
+                * (0.40 + 0.60 * weaknessUrgency);
+    }
+
     public static int computeMilitaryPower(Colony colony) {
         if (colony == null) {
             return 0;
+        }
+        Dynasty dynasty = colony.getDynasty();
+        if (dynasty != null && dynasty.isAtWar()) {
+            return computeActiveMilitaryPower(colony) + computeReserveMilitaryPower(colony);
         }
         int typePoints = computeTypePoints(
                 sizeOf(colony.getWorkers()),
@@ -104,6 +148,59 @@ public final class ColonyMilitaryService {
                 sizeOf(colony.getPrincesses()),
                 sizeOf(colony.getQueens()));
         return Math.round(typePoints * computeStatMultiplier(colony));
+    }
+
+    public static int computeActiveMilitaryPower(Colony colony) {
+        if (colony == null) {
+            return 0;
+        }
+        Dynasty dynasty = colony.getDynasty();
+        if (dynasty != null && dynasty.isAtWar()) {
+            return computeActiveMilitaryPowerFromWarCounts(colony, colony.getWarAssignedRoleCounts());
+        }
+        return 0;
+    }
+
+    public static int computeActiveMilitaryPowerFromWarCounts(Colony colony, Map<AntRole, Integer> warCounts) {
+        if (colony == null || warCounts == null) {
+            return 0;
+        }
+        int points = 0;
+        for (AntRole role : GameConstants.getActiveMilitaryRoles()) {
+            int count = warCounts.getOrDefault(role, 0);
+            if (count > 0) {
+                points += count * GameConstants.getActiveMilitaryRoleWeight(role);
+            }
+        }
+        return Math.round(points * computeStatMultiplier(colony));
+    }
+
+    public static int computeReserveMilitaryPower(Colony colony) {
+        if (colony == null) {
+            return 0;
+        }
+        Dynasty dynasty = colony.getDynasty();
+        if (dynasty == null || !dynasty.isAtWar()) {
+            return computeMilitaryPower(colony);
+        }
+
+        int workers = sizeOf(colony.getWorkers());
+        int soldiers = sizeOf(colony.getSoldiers());
+        int majors = sizeOf(colony.getMajors());
+        int princesses = sizeOf(colony.getPrincesses());
+        int queens = sizeOf(colony.getQueens());
+
+        Map<AntRole, Integer> warCounts = colony.getWarAssignedRoleCounts();
+        int militia = warCounts.getOrDefault(GameConstants.ROLE_MILITIA, 0);
+        int activeSoldiers = sumActiveRoleCountsForType(warCounts, GameConstants.TYPE_SOLDIER);
+        int activeMajors = sumActiveRoleCountsForType(warCounts, GameConstants.TYPE_MAJOR);
+
+        int reserveWorkers = Math.max(0, workers - militia);
+        int reserveSoldiers = Math.max(0, soldiers - activeSoldiers);
+        int reserveMajors = Math.max(0, majors - activeMajors);
+
+        int points = computeTypePoints(reserveWorkers, reserveSoldiers, reserveMajors, princesses, queens);
+        return Math.round(points * computeStatMultiplier(colony));
     }
 
     /** Recompute from persisted colony counts and dynasty combat upgrades (for saves / inactive colonies). */
@@ -126,7 +223,11 @@ public final class ColonyMilitaryService {
         if (colony == null) {
             return;
         }
-        colony.setMilitaryPower(computeMilitaryPower(colony));
+        int active = computeActiveMilitaryPower(colony);
+        int reserve = computeReserveMilitaryPower(colony);
+        colony.setActiveMilitaryPower(active);
+        colony.setReserveMilitaryPower(reserve);
+        colony.setMilitaryPower(active + reserve);
     }
 
     public static void refreshDynastyMilitaryPower(Dynasty dynasty) {
@@ -134,10 +235,16 @@ public final class ColonyMilitaryService {
             return;
         }
         int total = 0;
+        int activeTotal = 0;
+        int reserveTotal = 0;
         for (Colony colony : dynasty.getColonies()) {
             total += colony.getMilitaryPower();
+            activeTotal += colony.getActiveMilitaryPower();
+            reserveTotal += colony.getReserveMilitaryPower();
         }
         dynasty.setMilitaryPower(total);
+        dynasty.setActiveMilitaryPower(activeTotal);
+        dynasty.setReserveMilitaryPower(reserveTotal);
     }
 
     public static void refreshAllMilitaryPower(Iterable<Dynasty> dynasties) {
@@ -150,6 +257,23 @@ public final class ColonyMilitaryService {
             }
             refreshDynastyMilitaryPower(dynasty);
         }
+    }
+
+    public static int powerForWarStanding(Dynasty dynasty) {
+        if (dynasty == null) {
+            return 0;
+        }
+        return dynasty.isAtWar() ? dynasty.getActiveMilitaryPower() : dynasty.getMilitaryPower();
+    }
+
+    private static int sumActiveRoleCountsForType(Map<AntRole, Integer> warCounts, AntType type) {
+        int sum = 0;
+        for (AntRole role : GameConstants.getActiveMilitaryRoles()) {
+            if (role.getAntType() == type) {
+                sum += warCounts.getOrDefault(role, 0);
+            }
+        }
+        return sum;
     }
 
     private static int sizeOf(java.util.List<?> list) {

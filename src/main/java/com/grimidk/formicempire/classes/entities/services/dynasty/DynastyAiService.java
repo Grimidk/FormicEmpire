@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.entities.services.dynasty;
 
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyStatsService;
+import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.entities.CrossDynastyTradeProposal;
 import com.grimidk.formicempire.classes.entities.Colony;
@@ -12,6 +13,7 @@ import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
+import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -33,6 +35,7 @@ public class DynastyAiService {
 
         ensureDiplomatStaff(dynasty);
         runDiplomaticMissions(dynasty, world, tradeManager);
+        runWarConsideration(dynasty, world, tradeManager);
         runCrossDynastyTrade(dynasty, world, tradeManager);
         runAbilities(dynasty, world);
     }
@@ -117,6 +120,78 @@ public class DynastyAiService {
                         sent, other.getName(), gain));
             }
         }
+    }
+
+    private void runWarConsideration(Dynasty dynasty, World world, TradeManager tradeManager) {
+        if (dynasty.isAtWar()) {
+            return;
+        }
+        DynastyDiplomacyService diplo = dynasty.getDiplomacyService();
+        if (diplo == null || hasColonizableExpansionSpace(dynasty, world)) {
+            return;
+        }
+
+        List<Dynasty> candidates = new ArrayList<>();
+        for (Dynasty other : world.getDynastys()) {
+            if (other == dynasty || other.isDefeated()) {
+                continue;
+            }
+            if (!diplo.sharesBorderWith(other, world)) {
+                continue;
+            }
+            if (!diplo.canDeclareWar(other, world)) {
+                continue;
+            }
+            candidates.add(other);
+        }
+        if (candidates.isEmpty()) {
+            return;
+        }
+
+        Dynasty target = null;
+        double bestChance = 0;
+        for (Dynasty other : candidates) {
+            double chance = ColonyMilitaryService.computeAiWarDeclarationChance(
+                    dynasty.getMilitaryPower(),
+                    other.getMilitaryPower(),
+                    diplo.getEffectiveDiplomaticReputation(other, world));
+            if (chance > bestChance) {
+                bestChance = chance;
+                target = other;
+            }
+        }
+        if (target == null || bestChance <= 0 || GameRandom.nextDouble() >= bestChance) {
+            return;
+        }
+
+        diplo.declareWar(target, world, tradeManager);
+        logDynastyEvent(dynasty, LanguageStrings.format(LanguageStrings.LOG_AI_DECLARE_WAR_FMT, target.getName()));
+    }
+
+    private boolean hasColonizableExpansionSpace(Dynasty dynasty, World world) {
+        for (Colony colony : dynasty.getColonies()) {
+            Hex hex = world.getHexOfColony(colony);
+            if (hex == null) {
+                continue;
+            }
+            for (Hex neighbor : hex.getAdjacentNeighbors()) {
+                if (neighbor == null) {
+                    continue;
+                }
+                if (neighbor.getBiome() == GameConstants.BIOME_OCEAN
+                        || neighbor.getBiome() == GameConstants.BIOME_LAKE) {
+                    continue;
+                }
+                Colony existing = neighbor.getColony();
+                if (existing == null) {
+                    return true;
+                }
+                if (existing.getAntTotal() == 0 && existing.getAge() >= 7) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private void runCrossDynastyTrade(Dynasty dynasty, World world, TradeManager tradeManager) {

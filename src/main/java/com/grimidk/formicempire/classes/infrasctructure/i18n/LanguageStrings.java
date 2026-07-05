@@ -102,6 +102,20 @@ public final class LanguageStrings {
         return dynastyName;
     }
 
+    public static String getWarOrdinal(int ordinal) {
+        if (ordinal <= 0) {
+            ordinal = 1;
+        }
+        return switch (ordinal) {
+            case 1 -> get(WAR_ORDINAL_1);
+            case 2 -> get(WAR_ORDINAL_2);
+            case 3 -> get(WAR_ORDINAL_3);
+            case 4 -> get(WAR_ORDINAL_4);
+            case 5 -> get(WAR_ORDINAL_5);
+            default -> format(WAR_ORDINAL_N_FMT, ordinal);
+        };
+    }
+
     public static boolean isAutosaveSaveName(String name) {
         return "Autosave".equals(name) || get(SAVE_AUTOSAVE_NAME).equals(name);
     }
@@ -237,6 +251,7 @@ public final class LanguageStrings {
     public static final String MENU_ABILITIES = "MENU_ABILITIES";
     public static final String MENU_DYNASTY = "MENU_DYNASTY";
     public static final String MENU_TRADE = "MENU_TRADE";
+    public static final String MENU_WARS = "MENU_WARS";
     public static final String MENU_TOGGLE_VIEW = "MENU_TOGGLE_VIEW";
 
     public static final String COLONY_RANK = "COLONY_RANK";
@@ -259,6 +274,7 @@ public final class LanguageStrings {
     public static final String COLONY_JUVENILE_ANTS = "COLONY_JUVENILE_ANTS";
     public static final String COLONY_ADULT_ANTS = "COLONY_ADULT_ANTS";
     public static final String COLONY_MILITARY_POWER = "COLONY_MILITARY_POWER";
+    public static final String COLONY_MILITARY_POWER_AT_WAR = "COLONY_MILITARY_POWER_AT_WAR";
     
     public static final String TOOLTIP_PET_INSECTS = "TOOLTIP_PET_INSECTS";
     public static final String TOOLTIP_PARASITIC_MITES = "TOOLTIP_PARASITIC_MITES";
@@ -424,6 +440,11 @@ public final class LanguageStrings {
     public static final String ROLE_ASSIGNED_PREFIX = "ROLE_ASSIGNED_PREFIX";
     public static final String ROLE_UNASSIGNED_PREFIX = "ROLE_UNASSIGNED_PREFIX";
     public static final String ROLE_ERROR_OVER_ASSIGNED = "ROLE_ERROR_OVER_ASSIGNED";
+    public static final String ROLE_WAR_ECONOMY_TOGGLE = "ROLE_WAR_ECONOMY_TOGGLE";
+    public static final String ROLE_WAR_ECONOMY_TOGGLE_TIP = "ROLE_WAR_ECONOMY_TOGGLE_TIP";
+    public static final String ROLE_COPY_PEACE_TO_WAR = "ROLE_COPY_PEACE_TO_WAR";
+    public static final String COLONY_AT_PEACE = "COLONY_AT_PEACE";
+    public static final String COLONY_AT_WAR = "COLONY_AT_WAR";
 
     public static final String DIALOG_MAP_TITLE = "DIALOG_MAP_TITLE";
     public static final String MAP_HOME_BUTTON = "MAP_HOME_BUTTON";
@@ -443,6 +464,75 @@ public final class LanguageStrings {
     public static final String MAP_SORT_BY_MILITARY = "MAP_SORT_BY_MILITARY";
     public static final String MAP_LEGEND_SHOW = "MAP_LEGEND_SHOW";
     public static final String MAP_LEGEND_HIDE = "MAP_LEGEND_HIDE";
+    public static final String MAP_ACTIVE_WARS_TITLE_FMT = "MAP_ACTIVE_WARS_TITLE_FMT";
+    public static final String MAP_ACTIVE_WAR_PAIR_FMT = "MAP_ACTIVE_WAR_PAIR_FMT";
+    public static final String MAP_ACTIVE_WARS_SHOW = "MAP_ACTIVE_WARS_SHOW";
+    public static final String MAP_ACTIVE_WARS_HIDE = "MAP_ACTIVE_WARS_HIDE";
+    public static final String MAP_ACTIVE_WAR_OPEN = "MAP_ACTIVE_WAR_OPEN";
+
+    public static final String DIALOG_WAR_TITLE = "DIALOG_WAR_TITLE";
+    public static final String TAB_WARS = "TAB_WARS";
+    public static final String TAB_WAR_ACTIVE = "TAB_WAR_ACTIVE";
+    public static final String TAB_WAR_HISTORY = "TAB_WAR_HISTORY";
+    public static final String WAR_NAME_FMT = "WAR_NAME_FMT";
+    public static final String WAR_ORDINAL_1 = "WAR_ORDINAL_1";
+    public static final String WAR_ORDINAL_2 = "WAR_ORDINAL_2";
+    public static final String WAR_ORDINAL_3 = "WAR_ORDINAL_3";
+    public static final String WAR_ORDINAL_4 = "WAR_ORDINAL_4";
+    public static final String WAR_ORDINAL_5 = "WAR_ORDINAL_5";
+    public static final String WAR_ORDINAL_N_FMT = "WAR_ORDINAL_N_FMT";
+    public static final String WAR_WORLD_MONTH_FMT = "WAR_WORLD_MONTH_FMT";
+    public static final String WAR_COL_NAME = "WAR_COL_NAME";
+    public static final String WAR_COL_OPPONENT = "WAR_COL_OPPONENT";
+    public static final String WAR_COL_DECLARED_BY = "WAR_COL_DECLARED_BY";
+    public static final String WAR_COL_STARTED = "WAR_COL_STARTED";
+    public static final String WAR_COL_ENDED = "WAR_COL_ENDED";
+    public static final String WAR_COL_DURATION = "WAR_COL_DURATION";
+    public static final String WAR_COL_STANDING = "WAR_COL_STANDING";
+    public static final String WAR_COL_CONCLUSION = "WAR_COL_CONCLUSION";
+    public static final String WAR_COL_WINNER = "WAR_COL_WINNER";
+    public static final String WAR_EMPTY = "WAR_EMPTY";
+    public static final String WAR_ALL_EMPTY = "WAR_ALL_EMPTY";
+    public static final String WAR_SHOW_ALL_ACTIVE = "WAR_SHOW_ALL_ACTIVE";
+    public static final String WAR_SHOW_ALL_ACTIVE_TIP = "WAR_SHOW_ALL_ACTIVE_TIP";
+    public static final String WAR_HISTORY_EMPTY = "WAR_HISTORY_EMPTY";
+    public static final String WAR_ONGOING = "WAR_ONGOING";
+    public static final String WAR_DECLARED_BY_YOU = "WAR_DECLARED_BY_YOU";
+    public static final String WAR_STANDING_WINNING = "WAR_STANDING_WINNING";
+    public static final String WAR_STANDING_LOSING = "WAR_STANDING_LOSING";
+    public static final String WAR_STANDING_EVEN = "WAR_STANDING_EVEN";
+    public static final String WAR_STANDING_LEADER_FMT = "WAR_STANDING_LEADER_FMT";
+    public static final String WAR_WINNER_YOU = "WAR_WINNER_YOU";
+    public static final String WAR_WINNER_NONE = "WAR_WINNER_NONE";
+    public static final String WAR_CONCLUSION_UNKNOWN = "WAR_CONCLUSION_UNKNOWN";
+    public static final String WAR_CONCLUSION_PEACE_TREATY = "WAR_CONCLUSION_PEACE_TREATY";
+    public static final String WAR_CONCLUSION_DEFEAT = "WAR_CONCLUSION_DEFEAT";
+    public static final String WAR_CONCLUSION_ABSOLUTE_VICTORY = "WAR_CONCLUSION_ABSOLUTE_VICTORY";
+    public static final String WAR_INHERITED_ASSIMILATIONS_FMT = "WAR_INHERITED_ASSIMILATIONS_FMT";
+    public static final String WAR_COL_PROGRESS = "WAR_COL_PROGRESS";
+    public static final String WAR_PROGRESS_FMT = "WAR_PROGRESS_FMT";
+    public static final String WAR_ACTION_FALLBACK = "WAR_ACTION_FALLBACK";
+    public static final String WAR_FALLBACK_CONFIRM_FMT = "WAR_FALLBACK_CONFIRM_FMT";
+    public static final String WAR_STAGE_CAPTURED_FMT = "WAR_STAGE_CAPTURED_FMT";
+    public static final String WAR_STAGE_DEFENDER_HELD_FMT = "WAR_STAGE_DEFENDER_HELD_FMT";
+    public static final String WAR_STAGE_FORFEITED_FMT = "WAR_STAGE_FORFEITED_FMT";
+    public static final String WAR_STAGE_REDEPLOY_FMT = "WAR_STAGE_REDEPLOY_FMT";
+    public static final String WAR_STAGE_CLASH_FMT = "WAR_STAGE_CLASH_FMT";
+    public static final String WAR_CAPITAL_COLONIZED_CAPTURES_FMT = "WAR_CAPITAL_COLONIZED_CAPTURES_FMT";
+    public static final String WAR_QUEEN_FROM_CAPITAL_FMT = "WAR_QUEEN_FROM_CAPITAL_FMT";
+    public static final String WAR_ACTION_GO_TO_CAPITAL = "WAR_ACTION_GO_TO_CAPITAL";
+    public static final String WAR_ACTION_DIPLOMACY = "WAR_ACTION_DIPLOMACY";
+    public static final String WAR_ACTION_WAR_ROLES = "WAR_ACTION_WAR_ROLES";
+    public static final String WAR_ACTION_OFFER_PEACE = "WAR_ACTION_OFFER_PEACE";
+    public static final String WAR_ACTION_ACCEPT_PEACE = "WAR_ACTION_ACCEPT_PEACE";
+    public static final String WAR_ACTION_DECLINE_PEACE = "WAR_ACTION_DECLINE_PEACE";
+    public static final String WAR_OFFER_PEACE_CONFIRM_FMT = "WAR_OFFER_PEACE_CONFIRM_FMT";
+    public static final String WAR_ACCEPT_PEACE_CONFIRM_FMT = "WAR_ACCEPT_PEACE_CONFIRM_FMT";
+    public static final String WAR_PEACE_OFFERED_TITLE = "WAR_PEACE_OFFERED_TITLE";
+    public static final String WAR_PEACE_OFFERED_MSG_FMT = "WAR_PEACE_OFFERED_MSG_FMT";
+    public static final String WAR_PEACE_ACCEPTED_TITLE = "WAR_PEACE_ACCEPTED_TITLE";
+    public static final String WAR_PEACE_ACCEPTED_MSG_FMT = "WAR_PEACE_ACCEPTED_MSG_FMT";
+    public static final String WAR_ERROR_CANNOT_OFFER_PEACE = "WAR_ERROR_CANNOT_OFFER_PEACE";
 
     public static final String DIALOG_DYNASTY_TITLE = "DIALOG_DYNASTY_TITLE";
     public static final String TAB_OVERVIEW = "TAB_OVERVIEW";
@@ -477,6 +567,8 @@ public final class LanguageStrings {
     public static final String STAT_LOYALTY = "STAT_LOYALTY";
     public static final String STAT_MILITARY_POWER = "STAT_MILITARY_POWER";
     public static final String STAT_MILITARY_POWER_DESC = "STAT_MILITARY_POWER_DESC";
+    public static final String STAT_ACTIVE_MILITARY_POWER = "STAT_ACTIVE_MILITARY_POWER";
+    public static final String STAT_RESERVE_MILITARY_POWER = "STAT_RESERVE_MILITARY_POWER";
     public static final String DYNASTY_SORT_MILITARY_HIGH = "DYNASTY_SORT_MILITARY_HIGH";
     public static final String DYNASTY_SORT_MILITARY_LOW = "DYNASTY_SORT_MILITARY_LOW";
     public static final String MAP_LEGEND_MILITARY = "MAP_LEGEND_MILITARY";
@@ -637,6 +729,7 @@ public final class LanguageStrings {
     public static final String LOG_AI_DIPLOMAT_COLONY_FMT = "LOG_AI_DIPLOMAT_COLONY_FMT";
     public static final String LOG_AI_DIPLOMAT_DYNASTY_FMT = "LOG_AI_DIPLOMAT_DYNASTY_FMT";
     public static final String LOG_AI_PACT_FMT = "LOG_AI_PACT_FMT";
+    public static final String LOG_AI_DECLARE_WAR_FMT = "LOG_AI_DECLARE_WAR_FMT";
     public static final String LOG_LAST_COLONY_FALLEN = "LOG_LAST_COLONY_FALLEN";
     public static final String LOG_PROMOTION_CAPITAL_FMT = "LOG_PROMOTION_CAPITAL_FMT";
     public static final String LOG_DYNASTY_RESEARCHED_FMT = "LOG_DYNASTY_RESEARCHED_FMT";
@@ -903,6 +996,18 @@ public final class LanguageStrings {
     public static final String DIPLO_PACT_DECLINED_FMT = "DIPLO_PACT_DECLINED_FMT";
     public static final String LOG_PACT_DECLINED_FMT = "LOG_PACT_DECLINED_FMT";
     public static final String DIPLO_ACTION_BREAK_PACT = "DIPLO_ACTION_BREAK_PACT";
+    public static final String DIPLO_ACTION_DECLARE_WAR = "DIPLO_ACTION_DECLARE_WAR";
+    public static final String DIPLO_WAR_DECLARE_CONFIRM_FMT = "DIPLO_WAR_DECLARE_CONFIRM_FMT";
+    public static final String DIPLO_WAR_DECLARED_TITLE = "DIPLO_WAR_DECLARED_TITLE";
+    public static final String DIPLO_WAR_DECLARED_MSG_FMT = "DIPLO_WAR_DECLARED_MSG_FMT";
+    public static final String DIPLO_NPC_WAR_ALERT_FMT = "DIPLO_NPC_WAR_ALERT_FMT";
+    public static final String DIPLO_ERROR_PACT_BLOCKS_WAR = "DIPLO_ERROR_PACT_BLOCKS_WAR";
+    public static final String DIPLO_ERROR_WAR_COOLDOWN_FMT = "DIPLO_ERROR_WAR_COOLDOWN_FMT";
+    public static final String DIPLO_ERROR_PACT_DECLINE_COOLDOWN_FMT = "DIPLO_ERROR_PACT_DECLINE_COOLDOWN_FMT";
+    public static final String DIPLO_ERROR_TRADE_DECLINE_COOLDOWN_FMT = "DIPLO_ERROR_TRADE_DECLINE_COOLDOWN_FMT";
+    public static final String DIPLO_ERROR_WAR_POPULATION_FMT = "DIPLO_ERROR_WAR_POPULATION_FMT";
+    public static final String DIPLO_ERROR_WAR_ACTIVE_MILITARY = "DIPLO_ERROR_WAR_ACTIVE_MILITARY";
+    public static final String DIPLO_ERROR_WAR_TARGET_ACTIVE_MILITARY_FMT = "DIPLO_ERROR_WAR_TARGET_ACTIVE_MILITARY_FMT";
     public static final String DIPLO_ACTION_TRADE = "DIPLO_ACTION_TRADE";
     public static final String DIPLO_ACTION_REQUEST_TRADE = "DIPLO_ACTION_REQUEST_TRADE";
     public static final String DIPLO_ACTION_SEND_DIPLOMATS = "DIPLO_ACTION_SEND_DIPLOMATS";

@@ -15,6 +15,8 @@ import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 
 public class ColonyStarterService {
 
+    private static final int MIN_SUSTAIN_WORKERS = 9;
+
     private static final ColonyStarterService SHARED = new ColonyStarterService();
 
     public static ColonyStarterService shared() {
@@ -150,10 +152,10 @@ public class ColonyStarterService {
         colony.configureWorker(7, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
         colony.configureWorker(8, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
 
-        colony.setAssignedRoleCount(GameConstants.ROLE_LAYER, 1);
-        colony.setAssignedRoleCount(GameConstants.ROLE_NURSE, 3);
-        colony.setAssignedRoleCount(GameConstants.ROLE_FARMER, 1);
-        colony.setAssignedRoleCount(GameConstants.ROLE_FORAGER, 5);
+        colony.setPeaceAssignedRoleCount(GameConstants.ROLE_LAYER, 1);
+        colony.setPeaceAssignedRoleCount(GameConstants.ROLE_NURSE, 3);
+        colony.setPeaceAssignedRoleCount(GameConstants.ROLE_FARMER, 1);
+        colony.setPeaceAssignedRoleCount(GameConstants.ROLE_FORAGER, 5);
 
         if (colony.getLocationService() != null) {
             if (colony.getLocationService().getDiscoveredSources().isEmpty()) {
@@ -184,5 +186,108 @@ public class ColonyStarterService {
         }
 
         colony.logEvent(ColonyLogPrefixes.INFO + " " + LanguageStrings.get(LanguageStrings.LOG_MATURATION_COMPLETE));
+    }
+
+    /**
+     * Seeds workforce, peace roles, resources, and food so a queenless captured colony can sustain after war.
+     */
+    public void reestablishCapturedColony(Colony capital, Colony target) {
+        if (capital == null || target == null || target.getQueens().isEmpty()) {
+            return;
+        }
+
+        target.setDaysWithoutQueen(0);
+        if (target.getAge() < 7) {
+            target.setAge(7);
+        }
+
+        target.setHatchRateWorker(capital.getHatchRateWorker());
+        target.setHatchRateSoldier(capital.getHatchRateSoldier());
+        target.setHatchRateMajor(capital.getHatchRateMajor());
+        target.setHatchRateDrone(capital.getHatchRateDrone());
+        target.setHatchRatePrincess(capital.getHatchRatePrincess());
+
+        Dynasty dynasty = target.getDynasty();
+        if (dynasty != null) {
+            if (dynasty.isDefaultAutomationEnabled() && dynasty.hasUpgrade(GameUnlocks.ABILITY_AUTOMATION)) {
+                target.setAutomationEnabled(true);
+            }
+            if (dynasty.isDefaultAutoBuildEnabled() && dynasty.hasUpgrade(GameUnlocks.ABILITY_MANAGEMENT)) {
+                target.setAutoBuildEnabled(true);
+            }
+        }
+
+        int workerDeficit = MIN_SUSTAIN_WORKERS - target.getWorkers().size();
+        for (int i = 0; i < workerDeficit; i++) {
+            target.getWorkers().add(new Ant(target, GameConstants.TYPE_WORKER));
+        }
+
+        ensurePeaceEconomyRoles(target);
+        ensureStarterResourceSources(target);
+
+        int consumption = Math.max(1, target.getTotalConsumption());
+        if (target.getMushrooms() < consumption * 48) {
+            target.getResourceService().addResource(target, GameConstants.RESOURCE_FUNGI, consumption * 48);
+        }
+
+        if (target.getPhysicsService() != null) {
+            target.getPhysicsService().randomizeAllAntPositions(target);
+        }
+        target.invalidateActiveRoleCountCache();
+        target.runRoleAssignment(null);
+        ColonyMilitaryService.refreshColonyMilitaryPower(target);
+    }
+
+    private void ensurePeaceEconomyRoles(Colony colony) {
+        colony.setPeaceAssignedRoleCount(GameConstants.ROLE_LAYER,
+                Math.max(colony.getQueens().size(), colony.getPeaceAssignedRoleCount(GameConstants.ROLE_LAYER)));
+        if (colony.getPeaceAssignedRoleCount(GameConstants.ROLE_NURSE) < 3) {
+            colony.setPeaceAssignedRoleCount(GameConstants.ROLE_NURSE, 3);
+        }
+        if (colony.getPeaceAssignedRoleCount(GameConstants.ROLE_FARMER) < 1) {
+            colony.setPeaceAssignedRoleCount(GameConstants.ROLE_FARMER, 1);
+        }
+        if (colony.getPeaceAssignedRoleCount(GameConstants.ROLE_FORAGER) < 5) {
+            colony.setPeaceAssignedRoleCount(GameConstants.ROLE_FORAGER, 5);
+        }
+
+        List<Ant> workers = colony.getWorkers();
+        if (workers.size() < MIN_SUSTAIN_WORKERS) {
+            return;
+        }
+        colony.configureWorker(0, GameConstants.ROLE_NURSE, WorldSpaces.UNDERWORLD);
+        colony.configureWorker(1, GameConstants.ROLE_NURSE, WorldSpaces.UNDERWORLD);
+        colony.configureWorker(2, GameConstants.ROLE_FARMER, WorldSpaces.UNDERWORLD);
+        colony.configureWorker(3, GameConstants.ROLE_NURSE, WorldSpaces.UNDERWORLD);
+        colony.configureWorker(4, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
+        colony.configureWorker(5, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
+        colony.configureWorker(6, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
+        colony.configureWorker(7, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
+        colony.configureWorker(8, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
+    }
+
+    private void ensureStarterResourceSources(Colony colony) {
+        if (colony.getLocationService() == null
+                || !colony.getLocationService().getDiscoveredSources().isEmpty()) {
+            return;
+        }
+        int range = 300;
+        int centerX = ColonySpatialLayout.ANCHOR_CENTER_X;
+        int centerY = ColonySpatialLayout.ANCHOR_HEIGHT / 2;
+
+        int pX = centerX + GameRandom.nextInt((range * 2) + 1) - range;
+        int pY = centerY + GameRandom.nextInt((range * 2) + 1) - range;
+        pX = Math.max(50, pX);
+        pY = Math.max(50, pY);
+        ResourceSource initialPlant = new ResourceSource(GameConstants.RESOURCE_PLANT, 10000, pX, pY);
+
+        int wX = centerX + GameRandom.nextInt((range * 2) + 1) - range;
+        int wY = centerY + GameRandom.nextInt((range * 2) + 1) - range;
+        wX = Math.max(50, wX);
+        wY = Math.max(50, wY);
+        ResourceSource initialWater = new ResourceSource(GameConstants.RESOURCE_WATER, 10000, wX, wY);
+
+        colony.getLocationService().addSource(colony, initialPlant);
+        colony.getLocationService().addSource(colony, initialWater);
     }
 }

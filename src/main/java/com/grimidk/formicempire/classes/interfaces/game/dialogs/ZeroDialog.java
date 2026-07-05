@@ -1,6 +1,5 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
-import com.grimidk.formicempire.classes.constants.misc.GameSpeed;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
@@ -87,18 +86,13 @@ public abstract class ZeroDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 Engine engine = getEngine();
                 if (engine == null) return;
-                if (engine.isPaused()) {
-                    engine.resumeEngine();
-                } else {
-                    engine.pauseEngine();
-                }
+                engine.togglePause();
                 syncWithMainControlPanel();
             }
         });
 
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ADD, 0), "speedUp");
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, InputEvent.SHIFT_DOWN_MASK), "speedUp");
-        inputMap.put(KeyStroke.getKeyStroke('+'), "speedUp");
         actionMap.put("speedUp", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -109,7 +103,6 @@ public abstract class ZeroDialog extends JDialog {
 
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_SUBTRACT, 0), "speedDown");
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, 0), "speedDown");
-        inputMap.put(KeyStroke.getKeyStroke('-'), "speedDown");
         actionMap.put("speedDown", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -131,15 +124,10 @@ public abstract class ZeroDialog extends JDialog {
         Engine engine = getEngine();
         if (engine == null) return;
 
-        GameSpeed current = engine.getSpeed();
-        GameSpeed next = delta > 0
-                ? GameSpeed.getNext(current, engine.isAllowTurboMode())
-                : GameSpeed.getPrevious(current);
-        if (current != next) {
-            engine.setSpeed(next);
-            if (engine.isPaused()) {
-                engine.resumeEngine();
-            }
+        if (delta > 0) {
+            engine.stepSpeedUp();
+        } else {
+            engine.stepSpeedDown();
         }
     }
 
@@ -147,10 +135,11 @@ public abstract class ZeroDialog extends JDialog {
         if (getOwner() instanceof MainFrame frame) {
             if (frame.getGamePanel() != null) {
                 frame.getGamePanel().refreshAllGUIData();
-                
+
                 Engine engine = frame.getEngine();
                 if (engine != null) {
                     frame.getGamePanel().updateStatusIndicator(engine.isPaused());
+                    frame.getGamePanel().updateSpeedLabel();
                 }
             }
         }

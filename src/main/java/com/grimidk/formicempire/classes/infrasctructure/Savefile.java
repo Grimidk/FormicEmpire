@@ -1,5 +1,7 @@
 package com.grimidk.formicempire.classes.infrasctructure;
 
+import com.grimidk.formicempire.classes.entities.War;
+import com.grimidk.formicempire.classes.entities.services.world.WarStagePhase;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 
 import java.io.Serializable;
@@ -46,6 +48,7 @@ public class Savefile implements Serializable {
     private List<SavedColony> colonies;
     private List<SavedDynasty> dynastys;
     private List<SavedTrade> trades;
+    private List<SavedWar> wars;
 
     public Savefile(int id, String name) {
         this.id = id;
@@ -55,6 +58,7 @@ public class Savefile implements Serializable {
         this.colonies = new ArrayList<>();
         this.dynastys = new ArrayList<>();
         this.trades = new ArrayList<>();
+        this.wars = new ArrayList<>();
         this.minute = 0;
         this.hour = 0;
         this.day = 1;
@@ -89,6 +93,11 @@ public class Savefile implements Serializable {
         public Map<String, String> diplomaticModifierKeys = new HashMap<>();
         public List<Integer> crossDynastyTradeRepGrantedIds = new ArrayList<>();
         public List<Integer> pendingPactRequestFromIds = new ArrayList<>();
+        public List<Integer> pendingWarDeclarationFromIds = new ArrayList<>();
+        public List<Integer> activeWarDynastyIds = new ArrayList<>();
+        public Map<String, Integer> pactBrokenAtWorldMonth = new HashMap<>();
+        public Map<String, Integer> pactRequestDeclinedAtWorldMonth = new HashMap<>();
+        public Map<String, Integer> tradeRequestDeclinedAtWorldMonth = new HashMap<>();
         public List<SavedCrossDynastyTradeProposal> pendingTradeProposals = new ArrayList<>();
         public int forcedFlightCooldownDays;
         public List<SavedTunnel> tunnels = new ArrayList<>();
@@ -132,6 +141,7 @@ public class Savefile implements Serializable {
         public int loyalty = GameConstants.DEFAULT_COLONY_LOYALTY;
         public int militaryPower;
         public Map<String, Integer> assignedRoleCounts = new HashMap<>();
+        public Map<String, Integer> warAssignedRoleCounts = new HashMap<>();
         public Map<String, Integer> localDeathStatistics = new HashMap<>();
         public List<Integer> unlockedBuildingIds = new ArrayList<>();
         public List<SavedResourceSource> savedResourceSources = new ArrayList<>();
@@ -182,6 +192,40 @@ public class Savefile implements Serializable {
         public double progress;
         public double totalCost;
         public boolean isComplete;
+    }
+
+    public static class SavedWar implements Serializable {
+        private static final long serialVersionUID = 1L;
+        public int id;
+        public int dynastyIdA;
+        public int dynastyIdB;
+        public int startedWorldMonth;
+        public int declaredByDynastyId;
+        public String displayName;
+        public int militaryPowerAtStartA;
+        public int militaryPowerAtStartB;
+        public int endedWorldMonth = War.ACTIVE_END_MONTH;
+        public int winnerDynastyId;
+        public String conclusionKey;
+        public int pendingPeaceOfferFromDynastyId;
+        public float progressPercent = 50f;
+        public int totalStages;
+        public int aggressorStagesCaptured;
+        public int defenderStagesCaptured;
+        public float stageProgress;
+        public String stagePhaseKey = WarStagePhase.ACTIVE_CLASH.name();
+        public int contestedColonyId;
+        public int stageAttackerDynastyId;
+        public int deployedActiveAttacker;
+        public int deployedActiveDefender;
+        public int deployedReserveDefender;
+        public int aggressorCapitalColonyId;
+        public int defenderCapitalColonyId;
+        public int redeployHoursRemaining;
+        public int stageStartActiveAggressor;
+        public int stageStartActiveDefender;
+        public String capturedColonyIds = "";
+        public String capturedByDynastyIds = "";
     }
 
     public static class SavedTrade implements Serializable {
@@ -288,4 +332,7 @@ public class Savefile implements Serializable {
 
     public List<SavedTrade> getTrades() { return trades; }
     public void setTrades(List<SavedTrade> trades) { this.trades = trades; }
+
+    public List<SavedWar> getWars() { return wars; }
+    public void setWars(List<SavedWar> wars) { this.wars = wars; }
 }

@@ -28,6 +28,8 @@ public class ColonyPanel extends ZeroGamePanel {
     private boolean isShowingContent = true;
 
     // --- Rank Components ---
+    private final JLabel colonyNameLabel = new JLabel("");
+    private final JLabel warStatusLabel = new JLabel();
     private final JLabel rankLabel = new JLabel(LanguageStrings.get(LanguageStrings.COLONY_RANK));
     
     // --- Resources Components ---
@@ -93,6 +95,8 @@ public class ColonyPanel extends ZeroGamePanel {
     private int lastMilitaryPower = -1;
     private int lastEffectiveLoyalty = -1;
     private ColonyRank lastRank = null;
+    private String lastColonyName = "";
+    private boolean lastAtWar = false;
 
     public ColonyPanel() {
         super(new CardLayout()); 
@@ -267,6 +271,8 @@ public class ColonyPanel extends ZeroGamePanel {
         lastMilitaryPower = -1;
         lastEffectiveLoyalty = -1;
         lastRank = null;
+        lastColonyName = "";
+        lastAtWar = false;
         
         setView(false);
     }
@@ -326,8 +332,17 @@ public class ColonyPanel extends ZeroGamePanel {
     private JPanel createColonyStatsPanel() {
         JPanel panel = createTitledPanel(LanguageStrings.PANEL_COLONY_STATS, new BoxLayout(null, BoxLayout.Y_AXIS));
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        colonyNameLabel.setForeground(AssetStyles.FONT_COLOR);
+        colonyNameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        warStatusLabel.setForeground(AssetStyles.FONT_COLOR);
+        warStatusLabel.setIconTextGap(6);
+        warStatusLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        warStatusLabel.setText(LanguageStrings.get(LanguageStrings.COLONY_AT_PEACE));
+        setupStatLabel(warStatusLabel, GameConstants.ROLE_DIPLOMAT.getIcon());
         rankLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         rankLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(colonyNameLabel);
+        panel.add(warStatusLabel);
         panel.add(rankLabel);
         panel.add(AssetStyles.createInternalSeparator());
         
@@ -510,6 +525,24 @@ public class ColonyPanel extends ZeroGamePanel {
         
         int totalAnts = colony.getAntTotal();
         totalAntLabel.setText(LanguageStrings.format(LanguageStrings.COLONY_TOTAL_ANTS, totalAnts));
+
+        String colonyName = colony.getName();
+        if (!colonyName.equals(lastColonyName)) {
+            colonyNameLabel.setText(colonyName);
+            lastColonyName = colonyName;
+        }
+
+        boolean atWar = colony.getDynasty() != null && colony.getDynasty().isAtWar();
+        if (atWar != lastAtWar) {
+            if (atWar) {
+                warStatusLabel.setText(LanguageStrings.get(LanguageStrings.COLONY_AT_WAR));
+                setupStatLabel(warStatusLabel, GameConstants.ICON_STAT_MILITARY_POWER);
+            } else {
+                warStatusLabel.setText(LanguageStrings.get(LanguageStrings.COLONY_AT_PEACE));
+                setupStatLabel(warStatusLabel, GameConstants.ROLE_DIPLOMAT.getIcon());
+            }
+            lastAtWar = atWar;
+        }
         
         ColonyRank currentRank = colony.getRank();
         if (currentRank != lastRank) {

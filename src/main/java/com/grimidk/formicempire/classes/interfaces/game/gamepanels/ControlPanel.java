@@ -5,7 +5,6 @@ import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.interfaces.HelpPanel;
 import com.grimidk.formicempire.classes.interfaces.MainFrame;
-import com.grimidk.formicempire.classes.constants.misc.GameSpeed;
 
 import javax.swing.*;
 import java.awt.*;
@@ -29,6 +28,8 @@ public class ControlPanel extends ZeroGamePanel {
     private final Runnable showMapDialogCallback;
     private final Runnable showDynastyDialogCallback;
     private final Runnable showTradeDialogCallback;
+    private final Runnable showDiplomacyDialogCallback;
+    private final Runnable showWarDialogCallback;
     private final Runnable showSettingsDialogCallback;
 
     // --- UI Components ---
@@ -52,6 +53,7 @@ public class ControlPanel extends ZeroGamePanel {
     private JMenuItem manageAbilities;
     private JMenuItem manageDynasty;
     private JMenuItem manageTrade;
+    private JMenuItem manageWars;
     private JMenuItem openSettings;
     private JMenuItem showTutorial;
     private JMenuItem showRoadmap;
@@ -76,6 +78,8 @@ public class ControlPanel extends ZeroGamePanel {
                         Runnable showMapDialogCallback,
                         Runnable showDynastyDialogCallback,
                         Runnable showTradeDialogCallback,
+                        Runnable showDiplomacyDialogCallback,
+                        Runnable showWarDialogCallback,
                         Runnable showSettingsDialogCallback) {
         super(new FlowLayout(FlowLayout.RIGHT));
         
@@ -93,6 +97,8 @@ public class ControlPanel extends ZeroGamePanel {
         this.showMapDialogCallback = showMapDialogCallback;
         this.showDynastyDialogCallback = showDynastyDialogCallback;
         this.showTradeDialogCallback = showTradeDialogCallback;
+        this.showDiplomacyDialogCallback = showDiplomacyDialogCallback;
+        this.showWarDialogCallback = showWarDialogCallback;
         this.showSettingsDialogCallback = showSettingsDialogCallback;
 
         initComponents();
@@ -128,6 +134,7 @@ public class ControlPanel extends ZeroGamePanel {
         manageAbilities = new JMenuItem();
         manageDynasty = new JMenuItem();
         manageTrade = new JMenuItem();
+        manageWars = new JMenuItem();
         openSettings = new JMenuItem();
         showTutorial = new JMenuItem();
         showRoadmap = new JMenuItem();
@@ -167,6 +174,7 @@ public class ControlPanel extends ZeroGamePanel {
         manageAbilities.setText(LanguageStrings.get(LanguageStrings.MENU_ABILITIES));
         manageDynasty.setText(LanguageStrings.get(LanguageStrings.MENU_DYNASTY));
         manageTrade.setText(LanguageStrings.get(LanguageStrings.MENU_TRADE));
+        manageWars.setText(LanguageStrings.get(LanguageStrings.MENU_WARS));
         openSettings.setText(LanguageStrings.get(LanguageStrings.UI_SETTINGS));
         showTutorial.setText(LanguageStrings.get(LanguageStrings.UI_TUTORIAL));
         showRoadmap.setText(LanguageStrings.get(LanguageStrings.UI_ROADMAP));
@@ -197,49 +205,34 @@ public class ControlPanel extends ZeroGamePanel {
         Engine eng = frame.getEngine();
         if (eng == null) return;
 
-        if (eng.isPaused()) {
-            eng.resumeEngine();
-        }
-        setPlayPauseButtonText(false);
+        setPlayPauseButtonText(eng.isPaused());
         updateTickLabel(eng);
-        if (frame.getGamePanel() != null) frame.getGamePanel().updateStatusIndicator(false);
+        if (frame.getGamePanel() != null) frame.getGamePanel().updateStatusIndicator(eng.isPaused());
     }
 
     private void initListeners() {
         speedDownButton.addActionListener(e -> {
             Engine eng = frame.getEngine();
             if (eng == null) return;
-            
-            GameSpeed current = eng.getSpeed();
-            if (current != GameSpeed.VERY_SLOW) {
-                eng.setSpeed(GameSpeed.getPrevious(current));
-                applySpeedLevel();
-            }
+            eng.stepSpeedDown();
+            applySpeedLevel();
         });
 
         speedUpButton.addActionListener(e -> {
             Engine eng = frame.getEngine();
             if (eng == null) return;
-
-            GameSpeed current = eng.getSpeed();
-            GameSpeed next = GameSpeed.getNext(current, eng.isAllowTurboMode());
-            if (current != next) {
-                eng.setSpeed(next);
-                applySpeedLevel();
-            }
+            eng.stepSpeedUp();
+            applySpeedLevel();
         });
 
         playPauseButton.addActionListener(e -> {
             Engine engine = frame.getEngine();
             if (engine == null || !frame.getGamePanel().isEngineStarted()) return;
-            if (engine.isPaused()) {
-                engine.resumeEngine();
-                setPlayPauseButtonText(false);
-                if (frame.getGamePanel() != null) frame.getGamePanel().updateStatusIndicator(false);
-            } else {
-                engine.pauseEngine();
-                setPlayPauseButtonText(true);
-                if (frame.getGamePanel() != null) frame.getGamePanel().updateStatusIndicator(true);
+            engine.togglePause();
+            setPlayPauseButtonText(engine.isPaused());
+            updateTickLabel(engine);
+            if (frame.getGamePanel() != null) {
+                frame.getGamePanel().updateStatusIndicator(engine.isPaused());
             }
         });
 
@@ -270,6 +263,9 @@ public class ControlPanel extends ZeroGamePanel {
 
         manageTrade.addActionListener(e -> showTradeDialogCallback.run());
         manageTrade.setVisible(false);
+
+        manageWars.addActionListener(e -> showWarDialogCallback.run());
+        manageWars.setVisible(false);
         
         openSettings.addActionListener(e -> {
             showSettingsDialogCallback.run();
@@ -294,6 +290,7 @@ public class ControlPanel extends ZeroGamePanel {
         gameMenu.add(manageAbilities);
         gameMenu.add(manageDynasty);
         gameMenu.add(manageTrade);
+        gameMenu.add(manageWars);
         gameMenu.add(openSettings);
         gameMenu.add(showTutorial);
         gameMenu.add(showRoadmap);
@@ -335,7 +332,6 @@ public class ControlPanel extends ZeroGamePanel {
 
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ADD, 0), "speedUp");
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, InputEvent.SHIFT_DOWN_MASK), "speedUp");
-        inputMap.put(KeyStroke.getKeyStroke('+'), "speedUp");
         actionMap.put("speedUp", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -345,7 +341,6 @@ public class ControlPanel extends ZeroGamePanel {
 
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_SUBTRACT, 0), "speedDown");
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, 0), "speedDown");
-        inputMap.put(KeyStroke.getKeyStroke('-'), "speedDown");
         actionMap.put("speedDown", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -368,7 +363,13 @@ public class ControlPanel extends ZeroGamePanel {
         });
 
         addRoleKeyBinding(inputMap, actionMap, "openRoles1", KeyEvent.VK_Q, 0);
-        addRoleKeyBinding(inputMap, actionMap, "openRoles2", KeyEvent.VK_W, 1);
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0), "handleWKey");
+        actionMap.put("handleWKey", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showRoleManagementDialogCallback.showDialog(1);
+            }
+        });
         addRoleKeyBinding(inputMap, actionMap, "openRoles3", KeyEvent.VK_E, 2);
         addRoleKeyBinding(inputMap, actionMap, "openRoles4", KeyEvent.VK_R, 3);
         addRoleKeyBinding(inputMap, actionMap, "openRoles5", KeyEvent.VK_T, 4);
@@ -466,6 +467,26 @@ public class ControlPanel extends ZeroGamePanel {
                 }
             }
         });
+
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0), "openDiplomacy");
+        actionMap.put("openDiplomacy", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (manageDynasty.isVisible()) {
+                    showDiplomacyDialogCallback.run();
+                }
+            }
+        });
+
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0), "openWars");
+        actionMap.put("openWars", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (manageWars.isVisible()) {
+                    showWarDialogCallback.run();
+                }
+            }
+        });
     }
     
     private void addRoleKeyBinding(InputMap im, ActionMap am, String name, int key, int tab) {
@@ -491,7 +512,7 @@ public class ControlPanel extends ZeroGamePanel {
             tickLabel.setText("-");
             return;
         }
-        tickLabel.setText(eng.getSpeed().getLabel());
+        tickLabel.setText(eng.getSpeedLabel());
     }
     
     public void setPlayPauseButtonText(boolean isPaused) {
@@ -537,6 +558,12 @@ public class ControlPanel extends ZeroGamePanel {
     public void updateTradeMenu(boolean visible) {
         if (manageTrade != null) {
             manageTrade.setVisible(visible);
+        }
+    }
+
+    public void updateWarsMenu(boolean visible) {
+        if (manageWars != null) {
+            manageWars.setVisible(visible);
         }
     }
 }

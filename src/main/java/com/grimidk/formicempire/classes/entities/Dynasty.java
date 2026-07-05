@@ -61,10 +61,17 @@ public class Dynasty {
     private Colony capital;
     private double geneticIntegrity;
     private int militaryPower;
+    private int activeMilitaryPower;
+    private int reserveMilitaryPower;
     private final Map<Integer, Integer> diplomaticReputations;
     private final Map<Integer, String> diplomaticModifierKeys;
     private final List<Integer> crossDynastyTradeRepGrantedIds;
     private final Set<Integer> pendingPactRequestFromIds;
+    private final Set<Integer> pendingWarDeclarationFromIds;
+    private final List<PendingNpcWarAlert> pendingNpcWarAlerts;
+    private final Map<Integer, Integer> pactBrokenAtWorldMonth;
+    private final Map<Integer, Integer> pactRequestDeclinedAtWorldMonth;
+    private final Map<Integer, Integer> tradeRequestDeclinedAtWorldMonth;
     private final List<CrossDynastyTradeProposal> pendingTradeProposals;
     private int forcedFlightCooldownDays;
 
@@ -102,6 +109,11 @@ public class Dynasty {
         this.diplomaticModifierKeys = new HashMap<>();
         this.crossDynastyTradeRepGrantedIds = new ArrayList<>();
         this.pendingPactRequestFromIds = new LinkedHashSet<>();
+        this.pendingWarDeclarationFromIds = new LinkedHashSet<>();
+        this.pendingNpcWarAlerts = new ArrayList<>();
+        this.pactBrokenAtWorldMonth = new HashMap<>();
+        this.pactRequestDeclinedAtWorldMonth = new HashMap<>();
+        this.tradeRequestDeclinedAtWorldMonth = new HashMap<>();
         this.pendingTradeProposals = new ArrayList<>();
         this.forcedFlightCooldownDays = 0;
         
@@ -139,6 +151,11 @@ public class Dynasty {
         this.diplomaticModifierKeys = new HashMap<>();
         this.crossDynastyTradeRepGrantedIds = new ArrayList<>();
         this.pendingPactRequestFromIds = new LinkedHashSet<>();
+        this.pendingWarDeclarationFromIds = new LinkedHashSet<>();
+        this.pendingNpcWarAlerts = new ArrayList<>();
+        this.pactBrokenAtWorldMonth = new HashMap<>();
+        this.pactRequestDeclinedAtWorldMonth = new HashMap<>();
+        this.tradeRequestDeclinedAtWorldMonth = new HashMap<>();
         this.pendingTradeProposals = new ArrayList<>();
         this.forcedFlightCooldownDays = 0;
         
@@ -212,6 +229,51 @@ public class Dynasty {
 
         if (savedDynasty.pendingPactRequestFromIds != null) {
             this.pendingPactRequestFromIds.addAll(savedDynasty.pendingPactRequestFromIds);
+        }
+        if (savedDynasty.pendingWarDeclarationFromIds != null) {
+            this.pendingWarDeclarationFromIds.addAll(savedDynasty.pendingWarDeclarationFromIds);
+        }
+        if (savedDynasty.pactBrokenAtWorldMonth != null) {
+            for (Map.Entry<String, Integer> entry : savedDynasty.pactBrokenAtWorldMonth.entrySet()) {
+                try {
+                    int otherDynastyId = Integer.parseInt(entry.getKey());
+                    if (otherDynastyId != this.id && entry.getValue() != null) {
+                        pactBrokenAtWorldMonth.put(otherDynastyId, entry.getValue());
+                    }
+                } catch (NumberFormatException ignored) {
+                }
+            }
+        }
+        if (savedDynasty.pactRequestDeclinedAtWorldMonth != null) {
+            for (Map.Entry<String, Integer> entry : savedDynasty.pactRequestDeclinedAtWorldMonth.entrySet()) {
+                try {
+                    int otherDynastyId = Integer.parseInt(entry.getKey());
+                    if (otherDynastyId != this.id && entry.getValue() != null) {
+                        pactRequestDeclinedAtWorldMonth.put(otherDynastyId, entry.getValue());
+                    }
+                } catch (NumberFormatException ignored) {
+                }
+            }
+        }
+        if (savedDynasty.tradeRequestDeclinedAtWorldMonth != null) {
+            for (Map.Entry<String, Integer> entry : savedDynasty.tradeRequestDeclinedAtWorldMonth.entrySet()) {
+                try {
+                    int otherDynastyId = Integer.parseInt(entry.getKey());
+                    if (otherDynastyId != this.id && entry.getValue() != null) {
+                        tradeRequestDeclinedAtWorldMonth.put(otherDynastyId, entry.getValue());
+                    }
+                } catch (NumberFormatException ignored) {
+                }
+            }
+        }
+        if (savedDynasty.activeWarDynastyIds != null) {
+            for (Integer otherId : savedDynasty.activeWarDynastyIds) {
+                if (otherId != null && otherId != this.id
+                        && !GameConstants.DIPLO_MODIFIER_WAR.getNameKey()
+                                .equals(getDiplomaticModifierKey(otherId))) {
+                    setDiplomaticModifierKey(otherId, GameConstants.DIPLO_MODIFIER_WAR.getNameKey());
+                }
+            }
         }
         if (savedDynasty.pendingTradeProposals != null) {
             for (Savefile.SavedCrossDynastyTradeProposal saved : savedDynasty.pendingTradeProposals) {
@@ -359,6 +421,54 @@ public class Dynasty {
         if (!defeatedSpeciesIds.contains(speciesId)) {
             defeatedSpeciesIds.add(speciesId);
         }
+    }
+
+    /**
+     * Transfers the loser's species genome unlocks and completed assimilations to this dynasty.
+     * Skips species and assimilations already held by the winner.
+     *
+     * @return count of newly inherited entries (species genomes + completed assimilations)
+     */
+    public int inheritAssimilationsFrom(Dynasty defeated) {
+        if (defeated == null || defeated == this) {
+            return 0;
+        }
+        int inherited = 0;
+
+        Species species = defeated.getSpecies();
+        if (species != null) {
+            int before = defeatedSpeciesIds.size();
+            absorbSpecies(species.getId());
+            if (defeatedSpeciesIds.size() > before) {
+                inherited++;
+            }
+        }
+
+        for (int speciesId : new ArrayList<>(defeated.getDefeatedSpeciesIds())) {
+            int before = defeatedSpeciesIds.size();
+            absorbSpecies(speciesId);
+            if (defeatedSpeciesIds.size() > before) {
+                inherited++;
+            }
+        }
+
+        for (Assimilation assimilation : new ArrayList<>(defeated.getCompletedAssimilations())) {
+            if (isAssimilationCompleted(assimilation)) {
+                continue;
+            }
+            if (assimilation.getReward() != null) {
+                unlockUpgrade(assimilation.getReward());
+            }
+            completeAssimilation(assimilation);
+            if (currentAssimilation == assimilation) {
+                currentAssimilation = null;
+                assimilationProgress = 0;
+            }
+            inherited++;
+        }
+
+        addAbsorbedDynasty(defeated.getId());
+        return inherited;
     }
     
     public void incrementNuptialFlights() {
@@ -555,6 +665,136 @@ public class Dynasty {
         return new ArrayList<>(pendingPactRequestFromIds);
     }
 
+    public boolean isAtWar() {
+        for (String modifierKey : diplomaticModifierKeys.values()) {
+            if (GameConstants.DIPLO_MODIFIER_WAR.getNameKey().equals(modifierKey)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isAtWarWith(int otherDynastyId) {
+        if (otherDynastyId == id) {
+            return false;
+        }
+        return GameConstants.DIPLO_MODIFIER_WAR.getNameKey().equals(getDiplomaticModifierKey(otherDynastyId));
+    }
+
+    public List<Integer> copyActiveWarDynastyIds() {
+        List<Integer> ids = new ArrayList<>();
+        for (Map.Entry<Integer, String> entry : diplomaticModifierKeys.entrySet()) {
+            if (GameConstants.DIPLO_MODIFIER_WAR.getNameKey().equals(entry.getValue())) {
+                ids.add(entry.getKey());
+            }
+        }
+        return ids;
+    }
+
+    public Map<String, Integer> copyPactBrokenAtWorldMonth() {
+        Map<String, Integer> copy = new HashMap<>();
+        for (Map.Entry<Integer, Integer> entry : pactBrokenAtWorldMonth.entrySet()) {
+            copy.put(String.valueOf(entry.getKey()), entry.getValue());
+        }
+        return copy;
+    }
+
+    public Integer getPactBrokenAtWorldMonth(int otherDynastyId) {
+        return pactBrokenAtWorldMonth.get(otherDynastyId);
+    }
+
+    public void setPactBrokenAtWorldMonth(int otherDynastyId, int worldMonthIndex) {
+        if (otherDynastyId != id) {
+            pactBrokenAtWorldMonth.put(otherDynastyId, worldMonthIndex);
+        }
+    }
+
+    public Map<String, Integer> copyPactRequestDeclinedAtWorldMonth() {
+        Map<String, Integer> copy = new HashMap<>();
+        for (Map.Entry<Integer, Integer> entry : pactRequestDeclinedAtWorldMonth.entrySet()) {
+            copy.put(String.valueOf(entry.getKey()), entry.getValue());
+        }
+        return copy;
+    }
+
+    public Integer getPactRequestDeclinedAtWorldMonth(int otherDynastyId) {
+        return pactRequestDeclinedAtWorldMonth.get(otherDynastyId);
+    }
+
+    public void setPactRequestDeclinedAtWorldMonth(int otherDynastyId, int worldMonthIndex) {
+        if (otherDynastyId != id) {
+            pactRequestDeclinedAtWorldMonth.put(otherDynastyId, worldMonthIndex);
+        }
+    }
+
+    public void removePactRequestDeclinedAtWorldMonth(int otherDynastyId) {
+        pactRequestDeclinedAtWorldMonth.remove(otherDynastyId);
+    }
+
+    public Map<String, Integer> copyTradeRequestDeclinedAtWorldMonth() {
+        Map<String, Integer> copy = new HashMap<>();
+        for (Map.Entry<Integer, Integer> entry : tradeRequestDeclinedAtWorldMonth.entrySet()) {
+            copy.put(String.valueOf(entry.getKey()), entry.getValue());
+        }
+        return copy;
+    }
+
+    public Integer getTradeRequestDeclinedAtWorldMonth(int otherDynastyId) {
+        return tradeRequestDeclinedAtWorldMonth.get(otherDynastyId);
+    }
+
+    public void setTradeRequestDeclinedAtWorldMonth(int otherDynastyId, int worldMonthIndex) {
+        if (otherDynastyId != id) {
+            tradeRequestDeclinedAtWorldMonth.put(otherDynastyId, worldMonthIndex);
+        }
+    }
+
+    public void removeTradeRequestDeclinedAtWorldMonth(int otherDynastyId) {
+        tradeRequestDeclinedAtWorldMonth.remove(otherDynastyId);
+    }
+
+    public boolean hasPendingWarDeclarationFrom(int fromDynastyId) {
+        return pendingWarDeclarationFromIds.contains(fromDynastyId);
+    }
+
+    public void addPendingWarDeclarationFrom(int fromDynastyId) {
+        if (fromDynastyId != id) {
+            pendingWarDeclarationFromIds.add(fromDynastyId);
+        }
+    }
+
+    public void removePendingWarDeclarationFrom(int fromDynastyId) {
+        pendingWarDeclarationFromIds.remove(fromDynastyId);
+    }
+
+    public List<Integer> copyPendingWarDeclarationFromIds() {
+        return new ArrayList<>(pendingWarDeclarationFromIds);
+    }
+
+    public static final class PendingNpcWarAlert {
+        public final int attackerId;
+        public final int defenderId;
+
+        public PendingNpcWarAlert(int attackerId, int defenderId) {
+            this.attackerId = attackerId;
+            this.defenderId = defenderId;
+        }
+    }
+
+    public void addPendingNpcWarAlert(int attackerId, int defenderId) {
+        if (attackerId != id && defenderId != id && attackerId != defenderId) {
+            pendingNpcWarAlerts.add(new PendingNpcWarAlert(attackerId, defenderId));
+        }
+    }
+
+    public void removePendingNpcWarAlert(int attackerId, int defenderId) {
+        pendingNpcWarAlerts.removeIf(alert -> alert.attackerId == attackerId && alert.defenderId == defenderId);
+    }
+
+    public List<PendingNpcWarAlert> copyPendingNpcWarAlerts() {
+        return new ArrayList<>(pendingNpcWarAlerts);
+    }
+
     public void addPendingTradeProposal(CrossDynastyTradeProposal proposal) {
         if (proposal == null || proposal.isEmpty()) {
             return;
@@ -638,7 +878,18 @@ public class Dynasty {
     public Set<Upgrade> getUnlockedUpgrades() { return unlockedUpgrades; }
     public boolean hasUpgrade(Upgrade upgrade) { return unlockedUpgrades.contains(upgrade); }
     public void unlockUpgrade(Upgrade upgrade) {
+        if (upgrade == null || unlockedUpgrades.contains(upgrade)) {
+            return;
+        }
         unlockedUpgrades.add(upgrade);
+        if (upgrade == GameUnlocks.TYPE_SOLDIER) {
+            if (!hasUpgrade(GameUnlocks.ROLE_HUNTER)) {
+                unlockedUpgrades.add(GameUnlocks.ROLE_HUNTER);
+            }
+            if (!hasUpgrade(GameUnlocks.ROLE_WARRIOR)) {
+                unlockedUpgrades.add(GameUnlocks.ROLE_WARRIOR);
+            }
+        }
         invalidateAffordableAlertCaches();
     }
 
@@ -725,6 +976,22 @@ public class Dynasty {
 
     public void setMilitaryPower(int militaryPower) {
         this.militaryPower = Math.max(0, militaryPower);
+    }
+
+    public int getActiveMilitaryPower() {
+        return activeMilitaryPower;
+    }
+
+    public void setActiveMilitaryPower(int activeMilitaryPower) {
+        this.activeMilitaryPower = Math.max(0, activeMilitaryPower);
+    }
+
+    public int getReserveMilitaryPower() {
+        return reserveMilitaryPower;
+    }
+
+    public void setReserveMilitaryPower(int reserveMilitaryPower) {
+        this.reserveMilitaryPower = Math.max(0, reserveMilitaryPower);
     }
 
 }

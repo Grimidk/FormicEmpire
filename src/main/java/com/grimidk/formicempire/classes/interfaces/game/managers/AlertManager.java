@@ -15,7 +15,7 @@ import java.util.List;
 import javax.swing.SwingUtilities;
 
 public class AlertManager {
-    private final Colony colony;
+    private Colony colony;
     private final AlertPanel panel;
     private final List<Alert> activeAlerts = new ArrayList<>();
     
@@ -24,6 +24,10 @@ public class AlertManager {
     public AlertManager(Colony colony, AlertPanel panel) {
         this.colony = colony;
         this.panel = panel;
+    }
+
+    public void setColony(Colony colony) {
+        this.colony = colony;
     }
 
     private static String stripPrefix(String msg, String prefix) {
@@ -38,6 +42,9 @@ public class AlertManager {
     }
 
     public void checkStatus() {
+        if (colony == null) {
+            return;
+        }
         Iterator<Alert> it = activeAlerts.iterator();
         while (it.hasNext()) {
             if (it.next().isExpired()) {
@@ -47,43 +54,7 @@ public class AlertManager {
 
         List<String> events = colony.consumeEvents();
         for (String msg : events) {
-            if (msg.startsWith(ColonyLogPrefixes.DEATH)) {
-                addAlert("DEATH", stripPrefix(msg, ColonyLogPrefixes.DEATH), AssetStyles.FONT_COLOR_ERROR, durationDefault); 
-            } 
-            else if (msg.startsWith(ColonyLogPrefixes.WARNING)) {
-                addAlert("WARN", stripPrefix(msg, ColonyLogPrefixes.WARNING), AssetStyles.FONT_COLOR_WARNING, durationDefault);
-            } 
-            else if (msg.startsWith(ColonyLogPrefixes.SUCCESS)) {
-                String body = stripPrefix(msg, ColonyLogPrefixes.SUCCESS);
-                addAlert("SUCC", LanguageStrings.get(LanguageStrings.ALERT_BUILT_PREFIX) + body, AssetStyles.FONT_COLOR_SUCCESS, durationDefault);
-            } 
-            else if (msg.startsWith(ColonyLogPrefixes.COMPOST)) {
-                addAlert("COMP", stripPrefix(msg, ColonyLogPrefixes.COMPOST), AssetStyles.FONT_COLOR_HIGHLIGHT, durationDefault);
-            } 
-            else if (msg.startsWith(ColonyLogPrefixes.NUPTIAL)) {
-                addAlert("NUPTIAL", stripPrefix(msg, ColonyLogPrefixes.NUPTIAL), AssetStyles.FONT_COLOR_HEADER, durationDefault);
-            }
-            else if (msg.startsWith(ColonyLogPrefixes.TRADE)) {
-                addAlert("TRADE", stripPrefix(msg, ColonyLogPrefixes.TRADE), AssetStyles.FONT_COLOR, durationDefault);
-            }
-            else if (msg.startsWith(ColonyLogPrefixes.DYNASTY)) {
-                addAlert("DYN", stripPrefix(msg, ColonyLogPrefixes.DYNASTY), AssetStyles.FONT_COLOR, durationDefault);
-            }
-            else if (msg.startsWith(ColonyLogPrefixes.FAILURE)) {
-                addAlert("FAIL", stripPrefix(msg, ColonyLogPrefixes.FAILURE), AssetStyles.FONT_COLOR_ERROR, durationDefault);
-            }
-            else if (msg.startsWith(ColonyLogPrefixes.AUTOMATION)) {
-                addAlert("AUTO", stripPrefix(msg, ColonyLogPrefixes.AUTOMATION), AssetStyles.FONT_COLOR, durationDefault);
-            }
-            else if (msg.startsWith(ColonyLogPrefixes.PROMOTION)) {
-                addAlert("PROMO", stripPrefix(msg, ColonyLogPrefixes.PROMOTION), AssetStyles.FONT_COLOR_HIGHLIGHT, durationDefault);
-            }
-            else if (msg.startsWith(ColonyLogPrefixes.INFO)) {
-                addAlert("INFO", stripPrefix(msg, ColonyLogPrefixes.INFO), AssetStyles.FONT_COLOR, durationDefault);
-            }
-            else {
-                addAlert("INFO", msg, AssetStyles.FONT_COLOR, durationDefault);
-            }
+            ingestLogEvent(msg);
         }
 
         checkResourceWarning();
@@ -92,6 +63,40 @@ public class AlertManager {
         checkBodyPile();
 
         SwingUtilities.invokeLater(() -> panel.updateAlerts(new ArrayList<>(activeAlerts)));
+    }
+
+    public void ingestLogEvent(String msg) {
+        if (msg == null || msg.isEmpty()) {
+            return;
+        }
+        if (msg.startsWith(ColonyLogPrefixes.DEATH)) {
+            addAlert("DEATH", stripPrefix(msg, ColonyLogPrefixes.DEATH), AssetStyles.FONT_COLOR_ERROR, durationDefault);
+        } else if (msg.startsWith(ColonyLogPrefixes.WARNING)) {
+            addAlert("WARN", stripPrefix(msg, ColonyLogPrefixes.WARNING), AssetStyles.FONT_COLOR_WARNING, durationDefault);
+        } else if (msg.startsWith(ColonyLogPrefixes.SUCCESS)) {
+            String body = stripPrefix(msg, ColonyLogPrefixes.SUCCESS);
+            addAlert("SUCC", LanguageStrings.get(LanguageStrings.ALERT_BUILT_PREFIX) + body, AssetStyles.FONT_COLOR_SUCCESS, durationDefault);
+        } else if (msg.startsWith(ColonyLogPrefixes.COMPOST)) {
+            addAlert("COMP", stripPrefix(msg, ColonyLogPrefixes.COMPOST), AssetStyles.FONT_COLOR_HIGHLIGHT, durationDefault);
+        } else if (msg.startsWith(ColonyLogPrefixes.NUPTIAL)) {
+            addAlert("NUPTIAL", stripPrefix(msg, ColonyLogPrefixes.NUPTIAL), AssetStyles.FONT_COLOR_HEADER, durationDefault);
+        } else if (msg.startsWith(ColonyLogPrefixes.TRADE)) {
+            addAlert("TRADE", stripPrefix(msg, ColonyLogPrefixes.TRADE), AssetStyles.FONT_COLOR, durationDefault);
+        } else if (msg.startsWith(ColonyLogPrefixes.DYNASTY)) {
+            addAlert("DYN", stripPrefix(msg, ColonyLogPrefixes.DYNASTY), AssetStyles.FONT_COLOR, durationDefault);
+        } else if (msg.startsWith(ColonyLogPrefixes.WAR)) {
+            addAlert("WAR", stripPrefix(msg, ColonyLogPrefixes.WAR), AssetStyles.FONT_COLOR_WARNING, durationDefault);
+        } else if (msg.startsWith(ColonyLogPrefixes.FAILURE)) {
+            addAlert("FAIL", stripPrefix(msg, ColonyLogPrefixes.FAILURE), AssetStyles.FONT_COLOR_ERROR, durationDefault);
+        } else if (msg.startsWith(ColonyLogPrefixes.AUTOMATION)) {
+            addAlert("AUTO", stripPrefix(msg, ColonyLogPrefixes.AUTOMATION), AssetStyles.FONT_COLOR, durationDefault);
+        } else if (msg.startsWith(ColonyLogPrefixes.PROMOTION)) {
+            addAlert("PROMO", stripPrefix(msg, ColonyLogPrefixes.PROMOTION), AssetStyles.FONT_COLOR_HIGHLIGHT, durationDefault);
+        } else if (msg.startsWith(ColonyLogPrefixes.INFO)) {
+            addAlert("INFO", stripPrefix(msg, ColonyLogPrefixes.INFO), AssetStyles.FONT_COLOR, durationDefault);
+        } else {
+            addAlert("INFO", msg, AssetStyles.FONT_COLOR, durationDefault);
+        }
     }
 
     private void addAlert(String key, String msg, Color color, long duration) {

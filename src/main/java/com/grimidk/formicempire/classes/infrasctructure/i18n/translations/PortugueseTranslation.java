@@ -110,6 +110,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("MENU_ABILITIES", "Habilidades (C)");
         pt.put("MENU_DYNASTY", "Dinastia (A)");
         pt.put("MENU_TRADE", "Rotas Comerciais (S)");
+        pt.put("MENU_WARS", "Guerras (F)");
         pt.put("MENU_TOGGLE_VIEW", "Alternar Vista (Z)");
 
         pt.put("COLONY_RANK", "Rank da Colônia");
@@ -132,6 +133,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("COLONY_JUVENILE_ANTS", "Formigas jovens: %s");
         pt.put("COLONY_ADULT_ANTS", "Formigas adultas: %s");
         pt.put("COLONY_MILITARY_POWER", "Poder militar: %s");
+        pt.put("COLONY_MILITARY_POWER_AT_WAR", "Poder militar: %1$s (Ativo: %2$s, Reserva: %3$s)");
 
         pt.put("TOOLTIP_PET_INSECTS", "Insetos de estimação cuidados por pastoras e capturadoras. Veja a aba Insetos nas estatísticas da colônia (X) para o detalhe por espécie.");
         pt.put("TOOLTIP_PARASITIC_MITES", "Ácaros microscópicos nas formigas. A cada 10 ácaros, uma formiga fica com metade da velocidade. Espalham-se mensalmente com muitos recursos armazenados.");
@@ -153,7 +155,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("BUILD_PROGRESS_HOURS", "%s / %s horas");
         pt.put("BUILD_STATUS_BUILDERS", "%s construtoras");
         pt.put("BUILD_STATUS_CRANES", "%s guindastes");
-        pt.put("BUILD_STATUS_SPEED", "%s (%.0f%% velocidade)");
+        pt.put("BUILD_STATUS_SPEED", "%s (%s%% velocidade)");
         pt.put("BUILD_REQUIREMENT_ERROR", "É necessário pelo menos 1 construtora ou guindaste atribuído.");
         pt.put("BUILD_RESOURCES_ERROR", "Recursos insuficientes.");
         pt.put("BUILD_COST_FORMAT", "<html>%s minerais<br>%s resina<br>%s horas (base)</html>");
@@ -162,13 +164,13 @@ public class PortugueseTranslation implements Translation {
         pt.put("ASSIMILATION_NO_GENOMES", "Nenhum genoma disponível para assimilação. Derrote outras espécies para desbloquear.");
         pt.put("ASSIMILATION_TARGET", "Alvo: %s");
         pt.put("ASSIMILATION_ACTIVE", "Assimilando: %s");
-        pt.put("ASSIMILATION_PROGRESS", "%.1f / %s ( %s%% )");
+        pt.put("ASSIMILATION_PROGRESS", "%s / %s ( %s%% )");
         pt.put("ASSIMILATION_INFO", "Atribua pesquisadoras para contribuir com a assimilação genética.");
         pt.put("SYNERGY_COMING_SOON", "Sinergias - em breve");
 
         pt.put("DIALOG_HATCH_RATES_TITLE", "Taxas de eclosão");
         pt.put("HATCH_DESC", "Definir probabilidade de eclosão:");
-        pt.put("HATCH_TOTAL", "Total: %.1f%%");
+        pt.put("HATCH_TOTAL", "Total: %s%%");
         pt.put("HATCH_WARNING_TOTAL", "Aviso: o total não é 100%%.");
         pt.put("HATCH_TOTAL_OK", "O total é 100%");
 
@@ -297,6 +299,11 @@ public class PortugueseTranslation implements Translation {
         pt.put("ROLE_ASSIGNED_PREFIX", "Total atribuídas: %s");
         pt.put("ROLE_UNASSIGNED_PREFIX", "Sem atribuir: %s");
         pt.put("ROLE_ERROR_OVER_ASSIGNED", "Você atribuiu mais funções do que tem formigas.");
+        pt.put("ROLE_WAR_ECONOMY_TOGGLE", "Funções de economia de guerra");
+        pt.put("ROLE_WAR_ECONOMY_TOGGLE_TIP", "Ver e editar a distribuição de funções de guerra. Ativa apenas enquanto a dinastia estiver em guerra.");
+        pt.put("ROLE_COPY_PEACE_TO_WAR", "Copiar da paz");
+        pt.put("COLONY_AT_PEACE", "Em paz");
+        pt.put("COLONY_AT_WAR", "Em guerra");
 
         pt.put("DIALOG_MAP_TITLE", "Mapa mundial");
         pt.put("MAP_HOME_BUTTON", "Centralizar no lar");
@@ -319,6 +326,75 @@ public class PortugueseTranslation implements Translation {
         pt.put("MAP_SORT_BY_MILITARY", "Ordenar: Poder militar");
         pt.put("MAP_LEGEND_SHOW", "Mostrar legenda");
         pt.put("MAP_LEGEND_HIDE", "Ocultar legenda");
+        pt.put("MAP_ACTIVE_WARS_TITLE_FMT", "Guerras ativas (%s)");
+        pt.put("MAP_ACTIVE_WAR_PAIR_FMT", "%s vs %s");
+        pt.put("MAP_ACTIVE_WARS_SHOW", "Mostrar guerras ativas");
+        pt.put("MAP_ACTIVE_WARS_HIDE", "Ocultar guerras ativas");
+        pt.put("MAP_ACTIVE_WAR_OPEN", "Clique para gerir as suas guerras");
+
+        pt.put("DIALOG_WAR_TITLE", "Guerras");
+        pt.put("TAB_WARS", "Guerras");
+        pt.put("TAB_WAR_ACTIVE", "Ativas");
+        pt.put("TAB_WAR_HISTORY", "Histórico");
+        pt.put("WAR_NAME_FMT", "Guerra %s %s - %s");
+        pt.put("WAR_ORDINAL_1", "Primeira");
+        pt.put("WAR_ORDINAL_2", "Segunda");
+        pt.put("WAR_ORDINAL_3", "Terceira");
+        pt.put("WAR_ORDINAL_4", "Quarta");
+        pt.put("WAR_ORDINAL_5", "Quinta");
+        pt.put("WAR_ORDINAL_N_FMT", "%sª");
+        pt.put("WAR_WORLD_MONTH_FMT", "Ano %s, Mês %s");
+        pt.put("WAR_COL_NAME", "Guerra");
+        pt.put("WAR_COL_OPPONENT", "Oponente");
+        pt.put("WAR_COL_DECLARED_BY", "Declarada por");
+        pt.put("WAR_COL_STARTED", "Início");
+        pt.put("WAR_COL_ENDED", "Fim");
+        pt.put("WAR_COL_DURATION", "Duração (meses)");
+        pt.put("WAR_COL_STANDING", "Situação");
+        pt.put("WAR_COL_CONCLUSION", "Conclusão");
+        pt.put("WAR_COL_WINNER", "Vencedor");
+        pt.put("WAR_EMPTY", "A sua dinastia não tem guerras ativas.");
+        pt.put("WAR_ALL_EMPTY", "Não há guerras ativas no mundo.");
+        pt.put("WAR_SHOW_ALL_ACTIVE", "Mostrar todas as guerras ativas");
+        pt.put("WAR_SHOW_ALL_ACTIVE_TIP", "Lista todas as guerras do mundo. Desmarcado, só aparecem as guerras da sua dinastia.");
+        pt.put("WAR_HISTORY_EMPTY", "Não há guerras passadas registadas.");
+        pt.put("WAR_ONGOING", "Em curso");
+        pt.put("WAR_DECLARED_BY_YOU", "Você");
+        pt.put("WAR_STANDING_WINNING", "A ganhar");
+        pt.put("WAR_STANDING_LOSING", "A perder");
+        pt.put("WAR_STANDING_EVEN", "Empate");
+        pt.put("WAR_STANDING_LEADER_FMT", "%s (%s)");
+        pt.put("WAR_WINNER_YOU", "Você");
+        pt.put("WAR_WINNER_NONE", "Nenhum");
+        pt.put("WAR_CONCLUSION_UNKNOWN", "Desconhecida");
+        pt.put("WAR_CONCLUSION_PEACE_TREATY", "Tratado de paz");
+        pt.put("WAR_CONCLUSION_DEFEAT", "Dinastia derrotada");
+        pt.put("WAR_CONCLUSION_ABSOLUTE_VICTORY", "Vitória absoluta");
+        pt.put("WAR_INHERITED_ASSIMILATIONS_FMT", "Herdados %2$s desbloqueios genéticos de %1$s.");
+        pt.put("WAR_COL_PROGRESS", "Progresso");
+        pt.put("WAR_PROGRESS_FMT", "%s%%");
+        pt.put("WAR_ACTION_FALLBACK", "Recuar (ceder etapa)");
+        pt.put("WAR_FALLBACK_CONFIRM_FMT", "Ceder a etapa atual em %s? Suas forças recuarão sem perdas.");
+        pt.put("WAR_STAGE_CAPTURED_FMT", "%1$s capturou %2$s. Progresso da guerra: %3$s%%.");
+        pt.put("WAR_STAGE_DEFENDER_HELD_FMT", "%1$s manteve %2$s. Progresso da guerra: %3$s%%.");
+        pt.put("WAR_STAGE_FORFEITED_FMT", "%1$s venceu a etapa em %2$s após uma retirada. Progresso da guerra: %3$s%%.");
+        pt.put("WAR_STAGE_REDEPLOY_FMT", "Forças a redeployar para a próxima etapa (%1$s horas). Próximo alvo: %2$s.");
+        pt.put("WAR_STAGE_CLASH_FMT", "A batalha retomou em %1$s.");
+        pt.put("WAR_CAPITAL_COLONIZED_CAPTURES_FMT", "Enviadas %s par(es) reprodutora(s) da capital para estabelecer rainhas nas colónias capturadas.");
+        pt.put("WAR_QUEEN_FROM_CAPITAL_FMT", "Uma rainha de %s foi estabelecida aqui após a guerra.");
+        pt.put("WAR_ACTION_GO_TO_CAPITAL", "Ir para a capital");
+        pt.put("WAR_ACTION_DIPLOMACY", "Abrir diplomacia");
+        pt.put("WAR_ACTION_WAR_ROLES", "Funções de economia de guerra");
+        pt.put("WAR_ACTION_OFFER_PEACE", "Oferecer paz");
+        pt.put("WAR_ACTION_ACCEPT_PEACE", "Aceitar paz");
+        pt.put("WAR_ACTION_DECLINE_PEACE", "Recusar paz");
+        pt.put("WAR_OFFER_PEACE_CONFIRM_FMT", "Oferecer paz a %s? Eles devem aceitar enquanto tiver vantagem.");
+        pt.put("WAR_ACCEPT_PEACE_CONFIRM_FMT", "Aceitar a oferta de paz de %s?");
+        pt.put("WAR_PEACE_OFFERED_TITLE", "Paz oferecida");
+        pt.put("WAR_PEACE_OFFERED_MSG_FMT", "%s ofereceu paz em %s.");
+        pt.put("WAR_PEACE_ACCEPTED_TITLE", "Paz aceite");
+        pt.put("WAR_PEACE_ACCEPTED_MSG_FMT", "%s aceitou a sua oferta de paz.");
+        pt.put("WAR_ERROR_CANNOT_OFFER_PEACE", "Tem de estar claramente a ganhar para oferecer paz.");
 
         pt.put("DIALOG_DYNASTY_TITLE", "Gestão da dinastia");
         pt.put("TAB_OVERVIEW", "Visão geral");
@@ -335,7 +411,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("DYNASTY_BUILD_TUNNEL", "Construir túnel");
         pt.put("DYNASTY_TUNNEL_SPONSORING", "Esta colônia já patrocina um projeto de túnel.");
         pt.put("DYNASTY_BUILT", "Construído");
-        pt.put("DYNASTY_PROGRESS_PERCENT", "%.0f%%");
+        pt.put("DYNASTY_PROGRESS_PERCENT", "%s%%");
         pt.put("DYNASTY_ERROR_NO_ENGINEERS", "Nenhuma engenheira ou perfuradora atribuída para avançar a construção!");
         pt.put("DYNASTY_ERROR_LABOR_REQUIRED", "Trabalho necessário");
         pt.put("DYNASTY_ERROR_ASSIGN_BORERS", "Atribua pelo menos uma engenheira ou perfuradora a esta colônia para iniciar o túnel.");
@@ -352,7 +428,9 @@ public class PortugueseTranslation implements Translation {
         pt.put("DYNASTY_SATELLITE", "Satélite");
         pt.put("STAT_LOYALTY", "Lealdade");
         pt.put("STAT_MILITARY_POWER", "Poder militar");
-        pt.put("STAT_MILITARY_POWER_DESC", "Contagem de tipos adultos (papéis ignorados) ponderada pelas estatísticas de combate base. Atualizado uma vez por dia.");
+        pt.put("STAT_MILITARY_POWER_DESC", "Contagem de tipos adultos ponderada pelas estatísticas de combate base. Em guerra, as atribuições de papéis de guerra separam a força ativa (linha de frente) e de reserva. Atualizado uma vez por dia.");
+        pt.put("STAT_ACTIVE_MILITARY_POWER", "Poder militar ativo");
+        pt.put("STAT_RESERVE_MILITARY_POWER", "Poder militar de reserva");
         pt.put("DYNASTY_REPUTATION", "Reputação");
         pt.put("DYNASTY_REPUTATION_STANCE", "Postura");
         pt.put("SCORE_TIER_FORMAT", "%s · %s");
@@ -363,9 +441,9 @@ public class PortugueseTranslation implements Translation {
         pt.put("TRADE_ESTABLISH_TITLE", "Estabelecer rota comercial");
         pt.put("TRADE_MODIFY_TITLE", "Modificar rota comercial");
         pt.put("TRADE_CAPACITY_FORMAT", "Capacidade: %s / %s");
-        pt.put("TRADE_SPEED_FORMAT", "Velocidade de trânsito: %.2fx");
+        pt.put("TRADE_SPEED_FORMAT", "Velocidade de trânsito: %sx");
         pt.put("TRADE_TIME_FORMAT", "Tempo de viagem: %sh");
-        pt.put("TRADE_SECURITY_FORMAT", "Segurança: %.1f%%");
+        pt.put("TRADE_SECURITY_FORMAT", "Segurança: %s%%");
         pt.put("TRADE_ROUTE_PREFIX", "Rota: %s -> %s");
         pt.put("TRADE_CARGO_LOAD", "Carga (saída)");
         pt.put("TRADE_CARGO_RETURN", "Carga (retorno)");
@@ -649,6 +727,18 @@ public class PortugueseTranslation implements Translation {
         pt.put("DIPLO_PACT_DECLINED_FMT", "%s recusou o pacto de não agressão.");
         pt.put("LOG_PACT_DECLINED_FMT", "O pedido de pacto de não agressão de %s foi recusado.");
         pt.put("DIPLO_ACTION_BREAK_PACT", "Quebrar pacto");
+        pt.put("DIPLO_ACTION_DECLARE_WAR", "Declarar guerra");
+        pt.put("DIPLO_WAR_DECLARE_CONFIRM_FMT", "Declarar guerra a %s? Comércios entre dinastias serão cancelados e ambas usarão funções de economia de guerra.");
+        pt.put("DIPLO_WAR_DECLARED_TITLE", "Guerra declarada");
+        pt.put("DIPLO_WAR_DECLARED_MSG_FMT", "%s declarou guerra contra a sua dinastia.");
+        pt.put("DIPLO_NPC_WAR_ALERT_FMT", "%s declarou guerra contra %s.");
+        pt.put("DIPLO_ERROR_PACT_BLOCKS_WAR", "Quebre o pacto de não agressão antes de declarar guerra.");
+        pt.put("DIPLO_ERROR_WAR_COOLDOWN_FMT", "Aguarde mais %s mês(es) após quebrar um pacto antes de declarar guerra.");
+        pt.put("DIPLO_ERROR_PACT_DECLINE_COOLDOWN_FMT", "Aguarde mais %s mês(es) após um pacto recusado antes de solicitar novamente.");
+        pt.put("DIPLO_ERROR_TRADE_DECLINE_COOLDOWN_FMT", "Aguarde mais %s mês(es) após uma proposta comercial recusada antes de propor novamente.");
+        pt.put("DIPLO_ERROR_WAR_POPULATION_FMT", "A sua dinastia precisa de pelo menos %s formigas antes de declarar guerra ou configurar funções de economia de guerra.");
+        pt.put("DIPLO_ERROR_WAR_ACTIVE_MILITARY", "Atribua funções militares activas na economia de guerra (Guerreira, Defensora, Milícia ou Bruto) antes de declarar guerra.");
+        pt.put("DIPLO_ERROR_WAR_TARGET_ACTIVE_MILITARY_FMT", "%s ainda não pode ser atacada — não tem funções militares activas.");
         pt.put("DIPLO_ACTION_TRADE", "Comerciar");
         pt.put("DIPLO_ACTION_REQUEST_TRADE", "Solicitar comércio");
         pt.put("DIPLO_ACTION_SEND_DIPLOMATS", "Enviar diplomatas");
@@ -1265,6 +1355,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("LOG_AI_DIPLOMAT_COLONY_FMT", "IA enviou %s diplomatas para estabilizar %s (+%s lealdade)");
         pt.put("LOG_AI_DIPLOMAT_DYNASTY_FMT", "IA enviou %s diplomatas para melhorar relações com %s (+%s reputação)");
         pt.put("LOG_AI_PACT_FMT", "IA formou um pacto de não agressão com %s");
+        pt.put("LOG_AI_DECLARE_WAR_FMT", "IA declarou guerra contra %s");
         pt.put("LOG_LAST_COLONY_FALLEN", "A última colônia caiu. Isto é agora um remanescente morto.");
         pt.put("LOG_PROMOTION_CAPITAL_FMT", "A antiga capital caiu. Esta colônia é agora a capital de %s!");
         pt.put("LOG_DYNASTY_RESEARCHED_FMT", "Pesquisado: %s");

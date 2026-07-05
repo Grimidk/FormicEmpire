@@ -4,6 +4,9 @@ import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.CrossDynastyTradeProposal;
 import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.entities.War;
+import com.grimidk.formicempire.classes.entities.services.world.WarService;
+import com.grimidk.formicempire.classes.entities.services.world.WarStanding;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.World;
@@ -18,6 +21,7 @@ import com.grimidk.formicempire.classes.infrasctructure.assets.GameSpritePreload
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.registries.WorldSpaces;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
+import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.interfaces.game.dialogs.*;
 import com.grimidk.formicempire.classes.interfaces.game.gamepanels.*;
 import com.grimidk.formicempire.classes.interfaces.ui.styles.UiScrollBarStyles;
@@ -57,6 +61,7 @@ public class GamePanel extends ZeroGamePanel {
     private MapDialog mapDialog;
     private StatsDialog statsDialog; 
     private DynastyManagementDialog dynastyDialog;
+    private WarDialog warDialog;
     private SettingsPanel.SettingsDialog settingsDialog;
 
     private AlertManager alertManager;
@@ -79,6 +84,7 @@ public class GamePanel extends ZeroGamePanel {
 
     private volatile boolean engineStarted = false;
     private SwingWorker<Void, Void> loadWorker;
+    private int lastPeaceOfferPromptWarId = -1;
 
     private static final int OVERWORLD_SPRING_DURATION_MS = 240;
     private static final int OVERWORLD_IDLE_RECENTER_MS = 1000;
@@ -419,6 +425,7 @@ public class GamePanel extends ZeroGamePanel {
         if (mapDialog != null && mapDialog.isShowing()) mapDialog.refreshTranslations();
         if (statsDialog != null && statsDialog.isShowing()) statsDialog.refreshTranslations();
         if (dynastyDialog != null && dynastyDialog.isShowing()) dynastyDialog.refreshTranslations();
+        if (warDialog != null && warDialog.isShowing()) warDialog.refreshTranslations();
         if (settingsDialog != null && settingsDialog.isShowing()) settingsDialog.refreshDialog();
     }
 
@@ -441,6 +448,7 @@ public class GamePanel extends ZeroGamePanel {
         if (mapDialog != null && mapDialog.isShowing()) mapDialog.refreshTheme();
         if (statsDialog != null && statsDialog.isShowing()) statsDialog.refreshTheme();
         if (dynastyDialog != null && dynastyDialog.isShowing()) dynastyDialog.refreshTheme();
+        if (warDialog != null && warDialog.isShowing()) warDialog.refreshTheme();
         if (settingsDialog != null && settingsDialog.isShowing()) settingsDialog.refreshTheme();
     }
     
@@ -456,6 +464,8 @@ public class GamePanel extends ZeroGamePanel {
         Runnable showStatsDialogCallback = this::showStatsDialog;
         Runnable showDynastyDialogCallback = this::showDynastyDialog;
         Runnable showTradeDialogCallback = this::showTradeDialog;
+        Runnable showDiplomacyDialogCallback = this::showDiplomacyDialog;
+        Runnable showWarDialogCallback = this::showWarDialog;
         Runnable showSettingsDialogCallback = this::showSettingsDialog;
         ControlPanel.RoleManagementCallback showRoleManagementDialogCallback = this::showRoleManagementDialog;
         
@@ -501,7 +511,9 @@ public class GamePanel extends ZeroGamePanel {
             showMapDialogCallback,
             showDynastyDialogCallback,
             showTradeDialogCallback,
-            showSettingsDialogCallback); 
+            showDiplomacyDialogCallback,
+            showWarDialogCallback,
+            showSettingsDialogCallback);
     }
     
     private void updateGameAreaSize() {
@@ -734,7 +746,7 @@ public class GamePanel extends ZeroGamePanel {
         
         if (mapDialog == null || mapDialog.getOwner() != frame) {
             if (mapDialog != null) mapDialog.dispose();
-            mapDialog = new MapDialog(frame, world, this::refreshAllGUIData);
+            mapDialog = new MapDialog(frame, world, this::refreshAllGUIData, this::showWarDialog);
         }
         mapDialog.showDialog();
     }
@@ -777,8 +789,85 @@ public class GamePanel extends ZeroGamePanel {
             dynastyDialog.dispose();
         }
 
-        dynastyDialog = new DynastyManagementDialog(frame, colony.getDynasty(), engine, this::handleGoToColony);
+        dynastyDialog = new DynastyManagementDialog(frame, colony.getDynasty(), engine, this::handleGoToColony,
+                this::showWarRolesFromManagement);
         dynastyDialog.showDialog(DynastyManagementDialog.TAB_OVERVIEW);
+    }
+
+    private void showWarDialog() {
+        Engine engine = frame.getEngine();
+        Colony colony = getColonyFromEngine(engine);
+        if (colony == null || colony.getDynasty() == null
+                || !colony.hasUpgrade(GameUnlocks.ABILITY_DYNASTY)) {
+            return;
+        }
+
+        if (warDialog != null && warDialog.isShowing()) {
+            warDialog.dispose();
+            return;
+        }
+
+        if (warDialog != null) {
+            warDialog.dispose();
+        }
+
+        warDialog = new WarDialog(frame, colony.getDynasty(), engine, createWarDialogCallbacks());
+        warDialog.showDialog();
+    }
+
+    private void showWarRolesFromManagement() {
+        showRoleManagementDialog(RoleManagementDialog.TAB_WORKER);
+    }
+
+    private WarManagementPanel.Callbacks createWarDialogCallbacks() {
+        return new WarManagementPanel.Callbacks() {
+            @Override
+            public void goToOpponentCapital(Dynasty opponent) {
+                if (opponent != null && opponent.getCapital() != null) {
+                    handleGoToColony(opponent.getCapital());
+                }
+            }
+
+            @Override
+            public void openDiplomacy(Dynasty opponent) {
+                showDynastyDialogTab(DynastyManagementDialog.TAB_DIPLOMACY);
+            }
+
+            @Override
+            public void openWarRoles() {
+                showWarRolesFromManagement();
+            }
+
+            @Override
+            public void onWarsChanged() {
+                refreshAllGUIData();
+            }
+        };
+    }
+
+    private void showDynastyDialogTab(int tabIndex) {
+        Engine engine = frame.getEngine();
+        Colony colony = getColonyFromEngine(engine);
+        if (colony == null || colony.getDynasty() == null) return;
+
+        if (dynastyDialog != null && dynastyDialog.isTabOpen(tabIndex)) {
+            dynastyDialog.requestFocus();
+            return;
+        }
+
+        if (dynastyDialog != null && dynastyDialog.isShowing()) {
+            dynastyDialog.setTab(tabIndex);
+            dynastyDialog.requestFocus();
+            return;
+        }
+
+        if (dynastyDialog != null) {
+            dynastyDialog.dispose();
+        }
+
+        dynastyDialog = new DynastyManagementDialog(frame, colony.getDynasty(), engine, this::handleGoToColony,
+                this::showWarRolesFromManagement);
+        dynastyDialog.showDialog(tabIndex);
     }
 
     private void showTradeDialog() {
@@ -801,8 +890,36 @@ public class GamePanel extends ZeroGamePanel {
             dynastyDialog.dispose();
         }
 
-        dynastyDialog = new DynastyManagementDialog(frame, colony.getDynasty(), engine, this::handleGoToColony);
+        dynastyDialog = new DynastyManagementDialog(frame, colony.getDynasty(), engine, this::handleGoToColony,
+                this::showWarRolesFromManagement);
         dynastyDialog.showDialog(DynastyManagementDialog.TAB_TRADE);
+    }
+
+    private void showDiplomacyDialog() {
+        Engine engine = frame.getEngine();
+        Colony colony = getColonyFromEngine(engine);
+        if (colony == null || colony.getDynasty() == null) {
+            return;
+        }
+
+        if (dynastyDialog != null && dynastyDialog.isTabOpen(DynastyManagementDialog.TAB_DIPLOMACY)) {
+            dynastyDialog.dispose();
+            return;
+        }
+
+        if (dynastyDialog != null && dynastyDialog.isShowing()) {
+            dynastyDialog.setTab(DynastyManagementDialog.TAB_DIPLOMACY);
+            dynastyDialog.requestFocus();
+            return;
+        }
+
+        if (dynastyDialog != null) {
+            dynastyDialog.dispose();
+        }
+
+        dynastyDialog = new DynastyManagementDialog(frame, colony.getDynasty(), engine, this::handleGoToColony,
+                this::showWarRolesFromManagement);
+        dynastyDialog.showDialog(DynastyManagementDialog.TAB_DIPLOMACY);
     }
 
     private void showSettingsDialog() {
@@ -908,6 +1025,11 @@ public class GamePanel extends ZeroGamePanel {
             dynastyDialog = null;
             closed = true;
         }
+        if (warDialog != null && warDialog.isShowing()) {
+            warDialog.dispose();
+            warDialog = null;
+            closed = true;
+        }
         if (settingsDialog != null && settingsDialog.isShowing()) {
             settingsDialog.dispose();
             settingsDialog = null;
@@ -924,6 +1046,7 @@ public class GamePanel extends ZeroGamePanel {
         if (mapDialog != null) { mapDialog.dispose(); mapDialog = null; }
         if (statsDialog != null) { statsDialog.dispose(); statsDialog = null; }
         if (dynastyDialog != null) { dynastyDialog.dispose(); dynastyDialog = null; }
+        if (warDialog != null) { warDialog.dispose(); warDialog = null; }
         if (settingsDialog != null) { settingsDialog.dispose(); settingsDialog = null; }
     }
 
@@ -940,6 +1063,7 @@ public class GamePanel extends ZeroGamePanel {
             triggerManager = null;
         }
         alertManager = null;
+        lastPeaceOfferPromptWarId = -1;
 
         if (gameAreaPanel != null) {
             stopOverworldSpring();
@@ -1078,17 +1202,17 @@ public class GamePanel extends ZeroGamePanel {
                     }
 
                     updateStaticWorldInfo();
-                    refreshAllGUIData();
-                    updateGameAreaSize();
-                    centerOverworldScroll();
-                    noteOverworldUserPan();
-
                     if (!engineStarted) {
                         engineStarted = true;
                         if (!engine.isAlive()) {
                             engine.start();
                         }
                     }
+                    refreshAllGUIData();
+                    updateGameAreaSize();
+                    centerOverworldScroll();
+                    noteOverworldUserPan();
+
                     controlPanel.setPlayPauseButtonText(engine.isPaused());
                     updateStatusIndicator(engine.isPaused());
                     paintGameAreaWhilePaused();
@@ -1189,6 +1313,12 @@ public class GamePanel extends ZeroGamePanel {
         }
     }
 
+    public void updateSpeedLabel() {
+        if (controlPanel != null) {
+            controlPanel.updateTickLabel(frame.getEngine());
+        }
+    }
+
     public void refreshAllGUIData() {
         updateMinuteGUI();
         updateHourGUI();
@@ -1229,6 +1359,9 @@ public class GamePanel extends ZeroGamePanel {
         Colony colony = world != null && world.getActiveHex() != null ? world.getActiveHex().getColony() : null;
 
         gameAreaPanel.setColony(colony);
+        if (alertManager != null && colony != null) {
+            alertManager.setColony(colony);
+        }
         if (colony != null && gameAreaPanel.getCurrentDimension() == WorldSpaces.UNDERWORLD) {
             updateGameAreaSize();
         }
@@ -1288,6 +1421,9 @@ public class GamePanel extends ZeroGamePanel {
             if (dynastyDialog != null && dynastyDialog.isShowing()) {
                 dynastyDialog.liveUpdate();
             }
+            if (warDialog != null && warDialog.isShowing()) {
+                warDialog.liveUpdate();
+            }
             if (controlPanel != null) {
                 controlPanel.updateResearchMenu(colony.hasUpgrade(GameUnlocks.ABILITY_RESEARCH));
                 controlPanel.updateBuildMenu(colony.hasUpgrade(GameUnlocks.ABILITY_BUILD));
@@ -1296,6 +1432,7 @@ public class GamePanel extends ZeroGamePanel {
                 controlPanel.updateAbilitiesMenu(colony.hasUpgrade(GameUnlocks.ABILITY_FORCED_FLIGHT));
                 controlPanel.updateDynastyMenu(colony.hasUpgrade(GameUnlocks.ABILITY_DYNASTY));
                 controlPanel.updateTradeMenu(colony.hasUpgrade(GameUnlocks.ABILITY_TRADE));
+                controlPanel.updateWarsMenu(colony.hasUpgrade(GameUnlocks.ABILITY_DYNASTY));
             }
         } else {
              if (controlPanel != null) {
@@ -1306,8 +1443,33 @@ public class GamePanel extends ZeroGamePanel {
                 controlPanel.updateAbilitiesMenu(false);
                 controlPanel.updateDynastyMenu(false);
                 controlPanel.updateTradeMenu(false);
+                controlPanel.updateWarsMenu(false);
             }
         }
+
+        flushPlayerWarAlerts(world);
+    }
+
+    private void flushPlayerWarAlerts(World world) {
+        if (world == null || alertManager == null || !engineStarted) {
+            return;
+        }
+        Dynasty playerDynasty = null;
+        for (Dynasty dynasty : world.getDynastys()) {
+            if (dynasty.isPlayer() && !dynasty.isDefeated()) {
+                playerDynasty = dynasty;
+                break;
+            }
+        }
+        if (playerDynasty == null) {
+            return;
+        }
+        for (Colony playerColony : playerDynasty.getColonies()) {
+            for (String msg : playerColony.consumeEventsWithPrefix(ColonyLogPrefixes.WAR)) {
+                alertManager.ingestLogEvent(msg);
+            }
+        }
+        alertManager.checkStatus();
     }
 
     private void updateDayGUI() {
@@ -1318,16 +1480,59 @@ public class GamePanel extends ZeroGamePanel {
 
         worldPanel.updateDayData(world);
         colonyPanel.updateDayData(colony);
-        
+
+        processPendingDiplomacyNotifications(world);
+        processPendingNpcWarAlerts(world);
+
         if (alertManager != null) {
             alertManager.checkStatus();
         }
 
-        processPendingPactRequests(world);
-        processPendingTradeProposals(world);
-
         if (roleDialog != null && roleDialog.isShowing()) {
             roleDialog.liveUpdate();
+        }
+    }
+
+    private void processPendingDiplomacyNotifications(World world) {
+        processPendingPactRequests(world);
+        processPendingWarDeclarations(world);
+        processPendingPeaceOffers(world);
+        processPendingTradeProposals(world);
+    }
+
+    private void processPendingNpcWarAlerts(World world) {
+        if (world == null || !engineStarted) {
+            return;
+        }
+        Dynasty playerDynasty = null;
+        for (Dynasty dynasty : world.getDynastys()) {
+            if (dynasty.isPlayer() && !dynasty.isDefeated()) {
+                playerDynasty = dynasty;
+                break;
+            }
+        }
+        if (playerDynasty == null) {
+            return;
+        }
+
+        Colony alertColony = playerDynasty.getCapital();
+        if (alertColony == null && !playerDynasty.getColonies().isEmpty()) {
+            alertColony = playerDynasty.getColonies().get(0);
+        }
+        if (alertColony == null) {
+            return;
+        }
+
+        for (Dynasty.PendingNpcWarAlert pending : playerDynasty.copyPendingNpcWarAlerts()) {
+            playerDynasty.removePendingNpcWarAlert(pending.attackerId, pending.defenderId);
+            Dynasty attacker = world.findDynastyById(pending.attackerId);
+            Dynasty defender = world.findDynastyById(pending.defenderId);
+            if (attacker == null || defender == null || attacker.isDefeated() || defender.isDefeated()) {
+                continue;
+            }
+            alertColony.logEvent(ColonyLogPrefixes.WAR + " "
+                    + LanguageStrings.format(
+                            LanguageStrings.DIPLO_NPC_WAR_ALERT_FMT, attacker.getName(), defender.getName()));
         }
     }
 
@@ -1381,6 +1586,84 @@ public class GamePanel extends ZeroGamePanel {
             playerDynasty.getDiplomacyService().acceptNonAggressionPact(requester);
         } else {
             playerDynasty.getDiplomacyService().declineNonAggressionPact(requester, world);
+        }
+    }
+
+    private void processPendingPeaceOffers(World world) {
+        if (world == null || !engineStarted) {
+            return;
+        }
+        Dynasty playerDynasty = null;
+        for (Dynasty dynasty : world.getDynastys()) {
+            if (dynasty.isPlayer() && !dynasty.isDefeated()) {
+                playerDynasty = dynasty;
+                break;
+            }
+        }
+        if (playerDynasty == null) {
+            return;
+        }
+
+        WarService warService = world.getWarService();
+        for (War war : warService.getWarsForDynasty(playerDynasty.getId())) {
+            int offererId = war.getPendingPeaceOfferFromDynastyId();
+            if (offererId <= 0) {
+                continue;
+            }
+            if (warService.getStandingForDynasty(war, playerDynasty) != WarStanding.LOSING) {
+                continue;
+            }
+            if (lastPeaceOfferPromptWarId == war.getId()) {
+                continue;
+            }
+            Dynasty offerer = world.findDynastyById(offererId);
+            if (offerer == null || offerer.isDefeated()) {
+                war.clearPendingPeaceOffer();
+                continue;
+            }
+            UiOptionPane.showMessageDialog(this,
+                    LanguageStrings.format(LanguageStrings.WAR_PEACE_OFFERED_MSG_FMT,
+                            offerer.getName(), warService.formatWarNameForDisplay(war, playerDynasty)),
+                    LanguageStrings.get(LanguageStrings.WAR_PEACE_OFFERED_TITLE),
+                    JOptionPane.QUESTION_MESSAGE);
+            lastPeaceOfferPromptWarId = war.getId();
+            showWarDialog();
+            return;
+        }
+    }
+
+    private void processPendingWarDeclarations(World world) {
+        if (world == null || !engineStarted) {
+            return;
+        }
+        Dynasty playerDynasty = null;
+        for (Dynasty dynasty : world.getDynastys()) {
+            if (dynasty.isPlayer() && !dynasty.isDefeated()) {
+                playerDynasty = dynasty;
+                break;
+            }
+        }
+        if (playerDynasty == null) {
+            return;
+        }
+
+        while (true) {
+            List<Integer> pending = playerDynasty.copyPendingWarDeclarationFromIds();
+            if (pending.isEmpty()) {
+                return;
+            }
+
+            int fromId = pending.get(0);
+            Dynasty attacker = world.findDynastyById(fromId);
+            playerDynasty.removePendingWarDeclarationFrom(fromId);
+            if (attacker == null || attacker.isDefeated()) {
+                continue;
+            }
+
+            UiOptionPane.showMessageDialog(this,
+                    LanguageStrings.format(LanguageStrings.DIPLO_WAR_DECLARED_MSG_FMT, attacker.getName()),
+                    LanguageStrings.get(LanguageStrings.DIPLO_WAR_DECLARED_TITLE),
+                    JOptionPane.WARNING_MESSAGE);
         }
     }
 

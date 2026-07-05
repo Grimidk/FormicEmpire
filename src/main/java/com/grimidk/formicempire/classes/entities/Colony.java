@@ -4,6 +4,7 @@ import com.grimidk.formicempire.classes.entities.spatial.Room;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.HashSet;
@@ -54,13 +55,16 @@ public class Colony {
     private int daysWithoutQueen;
     private int loyalty = GameConstants.DEFAULT_COLONY_LOYALTY;
     private int militaryPower;
+    private int activeMilitaryPower;
+    private int reserveMilitaryPower;
     
     // --- Population Data ---
     private final Map<AntType, List<Ant>> antGroups;
     private final List<Ant> deadAnts;
     private final List<Bug> bugs; 
     
-    private Map<AntRole, Integer> assignedRoleCounts;
+    private Map<AntRole, Integer> peaceAssignedRoleCounts;
+    private Map<AntRole, Integer> warAssignedRoleCounts;
     private Map<AntRole, Integer> activeRoleCountCache;
     private Boolean affordableResearchCached;
     private Building affordableBuildingCached;
@@ -163,10 +167,61 @@ public class Colony {
         this.antGroups.put(GameConstants.TYPE_QUEEN, new CopyOnWriteArrayList<>());
     }
 
-    private void initializeAssignedRoles() {
-        this.assignedRoleCounts = new HashMap<>();
+    private static Map<AntRole, Integer> createEmptyRoleCountMap() {
+        Map<AntRole, Integer> map = new HashMap<>();
         for (AntRole role : GameConstants.getAntRoles()) {
-            this.assignedRoleCounts.put(role, 0);
+            map.put(role, 0);
+        }
+        return map;
+    }
+
+    private void initializeAssignedRoles() {
+        this.peaceAssignedRoleCounts = createEmptyRoleCountMap();
+        this.warAssignedRoleCounts = createEmptyRoleCountMap();
+    }
+
+    private boolean usesWarEconomyRoles() {
+        Dynasty owner = getDynasty();
+        return owner != null && owner.isAtWar();
+    }
+
+    private Map<AntRole, Integer> activeAssignedRoleCounts() {
+        return usesWarEconomyRoles() ? warAssignedRoleCounts : peaceAssignedRoleCounts;
+    }
+
+    private static void applySavedRoleCounts(Map<AntRole, Integer> target, Map<String, Integer> saved) {
+        if (saved == null || saved.isEmpty()) {
+            return;
+        }
+        for (Map.Entry<String, Integer> entry : saved.entrySet()) {
+            AntRole role = GameConstants.getAntRoleByPersistenceKey(entry.getKey());
+            if (role != null && entry.getValue() != null) {
+                target.put(role, entry.getValue());
+            }
+        }
+    }
+
+    private static void copyRoleCounts(Map<AntRole, Integer> source, Map<AntRole, Integer> destination) {
+        for (AntRole role : GameConstants.getAntRoles()) {
+            destination.put(role, source.getOrDefault(role, 0));
+        }
+    }
+
+    private void loadAssignedRoleCountsFromSave(Savefile.SavedColony savedColony) {
+        applySavedRoleCounts(peaceAssignedRoleCounts, savedColony.assignedRoleCounts);
+        stripWarEconomyExclusiveFromPeace();
+        if (savedColony.warAssignedRoleCounts != null && !savedColony.warAssignedRoleCounts.isEmpty()) {
+            applySavedRoleCounts(warAssignedRoleCounts, savedColony.warAssignedRoleCounts);
+        } else if (savedColony.assignedRoleCounts != null && !savedColony.assignedRoleCounts.isEmpty()) {
+            copyPeaceRolesToWar();
+        }
+    }
+
+    private void stripWarEconomyExclusiveFromPeace() {
+        for (AntRole role : GameConstants.getAntRoles()) {
+            if (GameConstants.isWarEconomyExclusiveRole(role)) {
+                peaceAssignedRoleCounts.put(role, 0);
+            }
         }
     }
     
@@ -272,15 +327,7 @@ public class Colony {
             this.deathService.loadDeathStatistics(savedColony.localDeathStatistics);
         }
         
-        Map<String, Integer> savedRoles = savedColony.assignedRoleCounts;
-        if (savedRoles != null && !savedRoles.isEmpty()) {
-            for (Map.Entry<String, Integer> entry : savedRoles.entrySet()) {
-                AntRole role = GameConstants.getAntRoleByPersistenceKey(entry.getKey());
-                if (role != null && entry.getValue() != null) {
-                    this.assignedRoleCounts.put(role, entry.getValue());
-                }
-            }
-        }
+        loadAssignedRoleCountsFromSave(savedColony);
         
         this.hatchRateWorker = savedColony.hatchRateWorker;
         this.hatchRateSoldier = savedColony.hatchRateSoldier;
@@ -398,6 +445,24 @@ public class Colony {
         return consumed;
     }
 
+    public List<String> consumeEventsWithPrefix(String prefix) {
+        if (prefix == null || prefix.isEmpty()) {
+            return List.of();
+        }
+        List<String> consumed = new ArrayList<>();
+        synchronized (eventLog) {
+            Iterator<String> it = eventLog.iterator();
+            while (it.hasNext()) {
+                String msg = it.next();
+                if (msg.startsWith(prefix)) {
+                    consumed.add(msg);
+                    it.remove();
+                }
+            }
+        }
+        return consumed;
+    }
+
     // --- Death Tracking Wrapper ---
     public void recordAntDeath(Ant ant, String cause) {
         if (ant == null) return;
@@ -425,6 +490,22 @@ public class Colony {
 
     public void setMilitaryPower(int militaryPower) {
         this.militaryPower = Math.max(0, militaryPower);
+    }
+
+    public int getActiveMilitaryPower() {
+        return activeMilitaryPower;
+    }
+
+    public void setActiveMilitaryPower(int activeMilitaryPower) {
+        this.activeMilitaryPower = Math.max(0, activeMilitaryPower);
+    }
+
+    public int getReserveMilitaryPower() {
+        return reserveMilitaryPower;
+    }
+
+    public void setReserveMilitaryPower(int reserveMilitaryPower) {
+        this.reserveMilitaryPower = Math.max(0, reserveMilitaryPower);
     }
 
     public void setLoyalty(int loyalty) {
@@ -843,9 +924,69 @@ public class Colony {
     public int getGameAreaWidth() { return this.gameAreaWidth; }
     public int getGameAreaHeight() { return this.gameAreaHeight; }
 
-    public int getAssignedRoleCount(AntRole role) { return assignedRoleCounts.getOrDefault(role, 0); }
-    public void setAssignedRoleCount(AntRole role, int count) { if (count >= 0) assignedRoleCounts.put(role, count); }
-    public Map<AntRole, Integer> getAssignedRoleCounts() { return assignedRoleCounts; }
+    public int getAssignedRoleCount(AntRole role) {
+        return activeAssignedRoleCounts().getOrDefault(role, 0);
+    }
+
+    public void setAssignedRoleCount(AntRole role, int count) {
+        if (count >= 0) {
+            activeAssignedRoleCounts().put(role, count);
+        }
+    }
+
+    public Map<AntRole, Integer> getAssignedRoleCounts() {
+        return activeAssignedRoleCounts();
+    }
+
+    public int getPeaceAssignedRoleCount(AntRole role) {
+        return peaceAssignedRoleCounts.getOrDefault(role, 0);
+    }
+
+    public void setPeaceAssignedRoleCount(AntRole role, int count) {
+        if (GameConstants.isWarEconomyExclusiveRole(role)) {
+            count = 0;
+        }
+        if (count >= 0) {
+            peaceAssignedRoleCounts.put(role, count);
+        }
+    }
+
+    public Map<AntRole, Integer> getPeaceAssignedRoleCounts() {
+        return peaceAssignedRoleCounts;
+    }
+
+    public int getWarAssignedRoleCount(AntRole role) {
+        return warAssignedRoleCounts.getOrDefault(role, 0);
+    }
+
+    public void setWarAssignedRoleCount(AntRole role, int count) {
+        if (count >= 0) {
+            warAssignedRoleCounts.put(role, count);
+        }
+    }
+
+    public Map<AntRole, Integer> getWarAssignedRoleCounts() {
+        return warAssignedRoleCounts;
+    }
+
+    public void copyPeaceRolesToWar() {
+        for (AntRole role : GameConstants.getAntRoles()) {
+            if (GameConstants.isWarEconomyExclusiveRole(role)) {
+                continue;
+            }
+            warAssignedRoleCounts.put(role, peaceAssignedRoleCounts.getOrDefault(role, 0));
+        }
+    }
+
+    public void refreshRoleAssignmentForWarState(Engine engine) {
+        invalidateActiveRoleCountCache();
+        runRoleAssignment(engine);
+        ColonyMilitaryService.refreshColonyMilitaryPower(this);
+        Dynasty owner = getDynasty();
+        if (owner != null) {
+            ColonyMilitaryService.refreshDynastyMilitaryPower(owner);
+        }
+    }
 
     public void invalidateActiveRoleCountCache() {
         activeRoleCountCache = null;

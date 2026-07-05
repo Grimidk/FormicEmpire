@@ -23,6 +23,8 @@ import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
 import com.grimidk.formicempire.classes.entities.Trade;
 import com.grimidk.formicempire.classes.entities.Tunnel;
+import com.grimidk.formicempire.classes.entities.War;
+import com.grimidk.formicempire.classes.entities.services.world.WarStagePhase;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.util.GamePaths;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
@@ -367,6 +369,11 @@ public class SaveManager {
                 sc.diplomaticModifierKeys = dynasty.copyDiplomaticModifierKeys();
                 sc.crossDynastyTradeRepGrantedIds = dynasty.copyCrossDynastyTradeRepGrantedIds();
                 sc.pendingPactRequestFromIds = dynasty.copyPendingPactRequestFromIds();
+                sc.pendingWarDeclarationFromIds = dynasty.copyPendingWarDeclarationFromIds();
+                sc.activeWarDynastyIds = dynasty.copyActiveWarDynastyIds();
+                sc.pactBrokenAtWorldMonth = dynasty.copyPactBrokenAtWorldMonth();
+                sc.pactRequestDeclinedAtWorldMonth = dynasty.copyPactRequestDeclinedAtWorldMonth();
+                sc.tradeRequestDeclinedAtWorldMonth = dynasty.copyTradeRequestDeclinedAtWorldMonth();
                 sc.pendingTradeProposals = new ArrayList<>();
                 for (CrossDynastyTradeProposal proposal : dynasty.copyPendingTradeProposals()) {
                     Savefile.SavedCrossDynastyTradeProposal saved = new Savefile.SavedCrossDynastyTradeProposal();
@@ -465,6 +472,7 @@ public class SaveManager {
             }
         }
         save.setTrades(savedTrades);
+        save.setWars(w.getWarService().toSavedWars());
 
         // Save Hexes & Colonies
         if (w.getHexes() != null) {
@@ -536,8 +544,11 @@ public class SaveManager {
                     sc.militaryPower = c.getMilitaryPower();
                     
                     // Maps/Lists
-                    for (Map.Entry<AntRole, Integer> entry : c.getAssignedRoleCounts().entrySet()) {
+                    for (Map.Entry<AntRole, Integer> entry : c.getPeaceAssignedRoleCounts().entrySet()) {
                         sc.assignedRoleCounts.put(String.valueOf(entry.getKey().getId()), entry.getValue());
+                    }
+                    for (Map.Entry<AntRole, Integer> entry : c.getWarAssignedRoleCounts().entrySet()) {
+                        sc.warAssignedRoleCounts.put(String.valueOf(entry.getKey().getId()), entry.getValue());
                     }
                     
                     if (c.getPopulationService() != null) {
@@ -624,6 +635,8 @@ public class SaveManager {
         // - Trades -
         w.write("  \"trades\": " + serializeTradesToJson(s.getTrades()) + ",");
         w.newLine();
+        w.write("  \"wars\": " + serializeWarsToJson(s.getWars()) + ",");
+        w.newLine();
 
         // - Colonies -
         w.write("  \"colonies\": [");
@@ -664,6 +677,11 @@ public class SaveManager {
         w.write("      \"diplomaticModifierKeys\": " + serializeStringMapToJson(sc.diplomaticModifierKeys) + ","); w.newLine();
         w.write("      \"crossDynastyTradeRepGrantedIds\": " + serializeListToJson(sc.crossDynastyTradeRepGrantedIds) + ","); w.newLine();
         w.write("      \"pendingPactRequestFromIds\": " + serializeListToJson(sc.pendingPactRequestFromIds) + ","); w.newLine();
+        w.write("      \"pendingWarDeclarationFromIds\": " + serializeListToJson(sc.pendingWarDeclarationFromIds) + ","); w.newLine();
+        w.write("      \"activeWarDynastyIds\": " + serializeListToJson(sc.activeWarDynastyIds) + ","); w.newLine();
+        w.write("      \"pactBrokenAtWorldMonth\": " + serializeMapToJson(sc.pactBrokenAtWorldMonth) + ","); w.newLine();
+        w.write("      \"pactRequestDeclinedAtWorldMonth\": " + serializeMapToJson(sc.pactRequestDeclinedAtWorldMonth) + ","); w.newLine();
+        w.write("      \"tradeRequestDeclinedAtWorldMonth\": " + serializeMapToJson(sc.tradeRequestDeclinedAtWorldMonth) + ","); w.newLine();
         w.write("      \"pendingTradeProposals\": " + serializeTradeProposalsToJson(sc.pendingTradeProposals) + ","); w.newLine();
         w.write("      \"forcedFlightCooldownDays\": " + sc.forcedFlightCooldownDays + ","); w.newLine();
         w.write("      \"unlockedUpgradeIds\": " + serializeListToJson(sc.unlockedUpgradeIds) + ","); w.newLine();
@@ -735,6 +753,7 @@ public class SaveManager {
 
         // Serialized Lists within Colony
         w.write("      \"assignedRoleCounts\": " + serializeMapToJson(sc.assignedRoleCounts) + ","); w.newLine();
+        w.write("      \"warAssignedRoleCounts\": " + serializeMapToJson(sc.warAssignedRoleCounts) + ","); w.newLine();
         w.write("      \"localDeathStatistics\": " + serializeMapToJson(sc.localDeathStatistics) + ","); w.newLine();
         w.write("      \"unlockedBuildingIds\": " + serializeListToJson(sc.unlockedBuildingIds) + ","); w.newLine();
         w.write("      \"savedResourceSources\": " + serializeSourcesToJson(sc.savedResourceSources)); w.newLine(); 
@@ -795,6 +814,7 @@ public class SaveManager {
         s.setColonies(colonies);
 
         s.setTrades(deserializeJsonToTrades(rootMap.get("trades")));
+        s.setWars(deserializeJsonToWars(rootMap.get("wars")));
         
         return s;
     }
@@ -893,6 +913,11 @@ public class SaveManager {
         sc.diplomaticModifierKeys = deserializeJsonToStringMap(map.get("diplomaticModifierKeys"));
         sc.crossDynastyTradeRepGrantedIds = deserializeJsonToList(map.get("crossDynastyTradeRepGrantedIds"));
         sc.pendingPactRequestFromIds = deserializeJsonToList(map.get("pendingPactRequestFromIds"));
+        sc.pendingWarDeclarationFromIds = deserializeJsonToList(map.get("pendingWarDeclarationFromIds"));
+        sc.activeWarDynastyIds = deserializeJsonToList(map.get("activeWarDynastyIds"));
+        sc.pactBrokenAtWorldMonth = deserializeJsonToMap(map.get("pactBrokenAtWorldMonth"));
+        sc.pactRequestDeclinedAtWorldMonth = deserializeJsonToMap(map.get("pactRequestDeclinedAtWorldMonth"));
+        sc.tradeRequestDeclinedAtWorldMonth = deserializeJsonToMap(map.get("tradeRequestDeclinedAtWorldMonth"));
         sc.pendingTradeProposals = deserializeJsonToTradeProposals(map.get("pendingTradeProposals"));
         sc.forcedFlightCooldownDays = Integer.parseInt(map.getOrDefault("forcedFlightCooldownDays", "0"));
         sc.unlockedUpgradeIds = deserializeJsonToList(map.get("unlockedUpgradeIds"));
@@ -989,6 +1014,7 @@ public class SaveManager {
         
         // Nested structures
         sc.assignedRoleCounts = deserializeJsonToMap(map.get("assignedRoleCounts"));
+        sc.warAssignedRoleCounts = deserializeJsonToMap(map.get("warAssignedRoleCounts"));
         sc.localDeathStatistics = deserializeJsonToMap(map.get("localDeathStatistics"));
         sc.unlockedBuildingIds = deserializeJsonToList(map.get("unlockedBuildingIds"));
         sc.savedResourceSources = deserializeJsonToSources(map.get("savedResourceSources"));
@@ -1685,6 +1711,135 @@ public class SaveManager {
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("[SaveManager] Error parsing settings.json, using defaults.");
+        }
+    }
+
+    private String serializeWarsToJson(List<Savefile.SavedWar> wars) {
+        if (wars == null || wars.isEmpty()) {
+            return "[]";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (int i = 0; i < wars.size(); i++) {
+            Savefile.SavedWar war = wars.get(i);
+            sb.append("{");
+            sb.append("\"id\":").append(war.id).append(",");
+            sb.append("\"dynastyIdA\":").append(war.dynastyIdA).append(",");
+            sb.append("\"dynastyIdB\":").append(war.dynastyIdB).append(",");
+            sb.append("\"startedWorldMonth\":").append(war.startedWorldMonth).append(",");
+            sb.append("\"declaredByDynastyId\":").append(war.declaredByDynastyId).append(",");
+            sb.append("\"displayName\":\"").append(escapeJsonString(war.displayName != null ? war.displayName : "")).append("\",");
+            sb.append("\"militaryPowerAtStartA\":").append(war.militaryPowerAtStartA).append(",");
+            sb.append("\"militaryPowerAtStartB\":").append(war.militaryPowerAtStartB).append(",");
+            sb.append("\"endedWorldMonth\":").append(war.endedWorldMonth).append(",");
+            sb.append("\"winnerDynastyId\":").append(war.winnerDynastyId).append(",");
+            sb.append("\"conclusionKey\":\"").append(escapeJsonString(war.conclusionKey != null ? war.conclusionKey : "")).append("\",");
+            sb.append("\"pendingPeaceOfferFromDynastyId\":").append(war.pendingPeaceOfferFromDynastyId).append(",");
+            sb.append("\"progressPercent\":").append(war.progressPercent).append(",");
+            sb.append("\"totalStages\":").append(war.totalStages).append(",");
+            sb.append("\"aggressorStagesCaptured\":").append(war.aggressorStagesCaptured).append(",");
+            sb.append("\"defenderStagesCaptured\":").append(war.defenderStagesCaptured).append(",");
+            sb.append("\"stageProgress\":").append(war.stageProgress).append(",");
+            sb.append("\"stagePhaseKey\":\"").append(escapeJsonString(
+                    war.stagePhaseKey != null ? war.stagePhaseKey : WarStagePhase.ACTIVE_CLASH.name())).append("\",");
+            sb.append("\"contestedColonyId\":").append(war.contestedColonyId).append(",");
+            sb.append("\"stageAttackerDynastyId\":").append(war.stageAttackerDynastyId).append(",");
+            sb.append("\"deployedActiveAttacker\":").append(war.deployedActiveAttacker).append(",");
+            sb.append("\"deployedActiveDefender\":").append(war.deployedActiveDefender).append(",");
+            sb.append("\"deployedReserveDefender\":").append(war.deployedReserveDefender).append(",");
+            sb.append("\"aggressorCapitalColonyId\":").append(war.aggressorCapitalColonyId).append(",");
+            sb.append("\"defenderCapitalColonyId\":").append(war.defenderCapitalColonyId).append(",");
+            sb.append("\"redeployHoursRemaining\":").append(war.redeployHoursRemaining).append(",");
+            sb.append("\"stageStartActiveAggressor\":").append(war.stageStartActiveAggressor).append(",");
+            sb.append("\"stageStartActiveDefender\":").append(war.stageStartActiveDefender).append(",");
+            sb.append("\"capturedColonyIds\":\"").append(escapeJsonString(
+                    war.capturedColonyIds != null ? war.capturedColonyIds : "")).append("\",");
+            sb.append("\"capturedByDynastyIds\":\"").append(escapeJsonString(
+                    war.capturedByDynastyIds != null ? war.capturedByDynastyIds : "")).append("\"");
+            sb.append("}");
+            if (i < wars.size() - 1) {
+                sb.append(",");
+            }
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
+    private List<Savefile.SavedWar> deserializeJsonToWars(String jsonArray) {
+        List<Savefile.SavedWar> list = new ArrayList<>();
+        if (jsonArray == null || !jsonArray.startsWith("[")) {
+            return list;
+        }
+        int lastIdx = jsonArray.lastIndexOf("]");
+        if (lastIdx <= 1) {
+            return list;
+        }
+        String content = jsonArray.substring(1, lastIdx);
+        int braceDepth = 0;
+        int start = 0;
+        for (int i = 0; i < content.length(); i++) {
+            char c = content.charAt(i);
+            if (c == '{') {
+                braceDepth++;
+            }
+            if (c == '}') {
+                braceDepth--;
+                if (braceDepth == 0) {
+                    String warJson = content.substring(start, i + 1);
+                    if (!warJson.trim().isEmpty()) {
+                        Map<String, String> map = parseTopLevelJson(warJson);
+                        Savefile.SavedWar war = new Savefile.SavedWar();
+                        war.id = Integer.parseInt(map.getOrDefault("id", "0"));
+                        war.dynastyIdA = Integer.parseInt(map.getOrDefault("dynastyIdA", "0"));
+                        war.dynastyIdB = Integer.parseInt(map.getOrDefault("dynastyIdB", "0"));
+                        war.startedWorldMonth = Integer.parseInt(map.getOrDefault("startedWorldMonth", "0"));
+                        war.declaredByDynastyId = Integer.parseInt(map.getOrDefault("declaredByDynastyId", "0"));
+                        war.displayName = map.getOrDefault("displayName", "");
+                        war.militaryPowerAtStartA = Integer.parseInt(map.getOrDefault("militaryPowerAtStartA", "0"));
+                        war.militaryPowerAtStartB = Integer.parseInt(map.getOrDefault("militaryPowerAtStartB", "0"));
+                        war.endedWorldMonth = Integer.parseInt(map.getOrDefault("endedWorldMonth", String.valueOf(War.ACTIVE_END_MONTH)));
+                        war.winnerDynastyId = Integer.parseInt(map.getOrDefault("winnerDynastyId", "0"));
+                        war.conclusionKey = map.getOrDefault("conclusionKey", null);
+                        if (war.conclusionKey != null && war.conclusionKey.isEmpty()) {
+                            war.conclusionKey = null;
+                        }
+                        war.pendingPeaceOfferFromDynastyId = Integer.parseInt(map.getOrDefault("pendingPeaceOfferFromDynastyId", "0"));
+                        war.progressPercent = parseFloat(map.get("progressPercent"), 50f);
+                        war.totalStages = Integer.parseInt(map.getOrDefault("totalStages", "0"));
+                        war.aggressorStagesCaptured = Integer.parseInt(map.getOrDefault("aggressorStagesCaptured", "0"));
+                        war.defenderStagesCaptured = Integer.parseInt(map.getOrDefault("defenderStagesCaptured", "0"));
+                        war.stageProgress = parseFloat(map.get("stageProgress"), 0f);
+                        war.stagePhaseKey = map.getOrDefault("stagePhaseKey", WarStagePhase.ACTIVE_CLASH.name());
+                        war.contestedColonyId = Integer.parseInt(map.getOrDefault("contestedColonyId", "0"));
+                        war.stageAttackerDynastyId = Integer.parseInt(map.getOrDefault("stageAttackerDynastyId", "0"));
+                        war.deployedActiveAttacker = Integer.parseInt(map.getOrDefault("deployedActiveAttacker", "0"));
+                        war.deployedActiveDefender = Integer.parseInt(map.getOrDefault("deployedActiveDefender", "0"));
+                        war.deployedReserveDefender = Integer.parseInt(map.getOrDefault("deployedReserveDefender", "0"));
+                        war.aggressorCapitalColonyId = Integer.parseInt(map.getOrDefault("aggressorCapitalColonyId", "0"));
+                        war.defenderCapitalColonyId = Integer.parseInt(map.getOrDefault("defenderCapitalColonyId", "0"));
+                        war.redeployHoursRemaining = Integer.parseInt(map.getOrDefault("redeployHoursRemaining",
+                                map.getOrDefault("redeployDaysRemaining", "0")));
+                        war.stageStartActiveAggressor = Integer.parseInt(map.getOrDefault("stageStartActiveAggressor", "0"));
+                        war.stageStartActiveDefender = Integer.parseInt(map.getOrDefault("stageStartActiveDefender", "0"));
+                        war.capturedColonyIds = map.getOrDefault("capturedColonyIds", "");
+                        war.capturedByDynastyIds = map.getOrDefault("capturedByDynastyIds", "");
+                        list.add(war);
+                    }
+                    start = i + 1;
+                }
+            }
+        }
+        return list;
+    }
+
+    private static float parseFloat(String value, float defaultValue) {
+        if (value == null || value.isEmpty()) {
+            return defaultValue;
+        }
+        try {
+            return Float.parseFloat(value);
+        } catch (NumberFormatException ex) {
+            return defaultValue;
         }
     }
 }

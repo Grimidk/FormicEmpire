@@ -55,6 +55,7 @@ public class DynastyDeathService {
                 }
                 
                 dynasty.setDefeated(true);
+                world.getWarService().endWarsInvolving(dynasty);
                 System.out.println("[DynastyDeathService] Dynasty Defeated: " + dynasty.getName());
                 
             } else {

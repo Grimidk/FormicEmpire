@@ -4,12 +4,14 @@ import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.interfaces.MainFrame;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDiplomacyService;
 
 import javax.swing.*;
 import java.awt.*;
@@ -35,6 +37,9 @@ public class RoleManagementDialog extends ZeroDialog {
     private final Colony colony;
     private final Engine engine;
     private final JTabbedPane tabbedPane = new JTabbedPane();
+    private final JCheckBox warEconomyCheck;
+    private final JButton copyPeaceToWarButton;
+    private boolean editingWarRoles;
     private final List<RolePanel> rolePanels = new ArrayList<>();
     private final Set<AntType> initializedTypes = new HashSet<>();
     private final Map<Integer, Integer> tabIndexMap = new HashMap<>();
@@ -48,12 +53,35 @@ public class RoleManagementDialog extends ZeroDialog {
         this.colony = colony;
         this.engine = engine;
 
+        warEconomyCheck = new JCheckBox(
+                LanguageStrings.get(LanguageStrings.ROLE_WAR_ECONOMY_TOGGLE),
+                false);
+        warEconomyCheck.setToolTipText(LanguageStrings.get(LanguageStrings.ROLE_WAR_ECONOMY_TOGGLE_TIP));
+        AssetStyles.styleCheckBox(warEconomyCheck);
+        warEconomyCheck.addActionListener(e -> onWarEconomyViewToggle());
+
+        copyPeaceToWarButton = new JButton(LanguageStrings.get(LanguageStrings.ROLE_COPY_PEACE_TO_WAR));
+        AssetStyles.styleButton(copyPeaceToWarButton);
+        copyPeaceToWarButton.setVisible(false);
+        copyPeaceToWarButton.addActionListener(e -> onCopyPeaceToWar());
+
+        JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        headerPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        headerPanel.add(warEconomyCheck);
+        headerPanel.add(copyPeaceToWarButton);
+
+        JPanel contentPanel = new JPanel(new BorderLayout());
+        contentPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        contentPanel.add(headerPanel, BorderLayout.NORTH);
+
         AssetStyles.styleTabbedPane(tabbedPane);
-        add(tabbedPane, BorderLayout.CENTER);
+        contentPanel.add(tabbedPane, BorderLayout.CENTER);
+        add(contentPanel, BorderLayout.CENTER);
         
         initTabs(); 
         initKeyBindings();
-        initListeners(); 
+        initListeners();
+        updateWarEconomyControlsVisibility();
         
         addWindowListener(new WindowAdapter() {
             @Override
@@ -70,13 +98,54 @@ public class RoleManagementDialog extends ZeroDialog {
     @Override
     public void refreshTheme() {
         super.refreshTheme();
+        AssetStyles.styleCheckBox(warEconomyCheck);
+        AssetStyles.styleButton(copyPeaceToWarButton);
         AssetStyles.styleTabbedPane(tabbedPane);
         tabbedPane.updateUI();
+    }
+
+    private void onWarEconomyViewToggle() {
+        editingWarRoles = warEconomyCheck.isSelected();
+        copyPeaceToWarButton.setVisible(editingWarRoles && isWarEconomyUnlocked());
+        for (RolePanel panel : rolePanels) {
+            panel.updateData();
+        }
+    }
+
+    private boolean isWarEconomyUnlocked() {
+        Dynasty dynasty = colony.getDynasty();
+        return DynastyDiplomacyService.meetsWarDeclarationPopulationRequirement(dynasty);
+    }
+
+    private void updateWarEconomyControlsVisibility() {
+        boolean unlocked = isWarEconomyUnlocked();
+        warEconomyCheck.setVisible(unlocked);
+        if (!unlocked) {
+            if (warEconomyCheck.isSelected()) {
+                warEconomyCheck.setSelected(false);
+            }
+            editingWarRoles = false;
+            copyPeaceToWarButton.setVisible(false);
+            return;
+        }
+        copyPeaceToWarButton.setVisible(editingWarRoles);
+    }
+
+    private void onCopyPeaceToWar() {
+        colony.copyPeaceRolesToWar();
+        for (RolePanel panel : rolePanels) {
+            panel.updateData();
+        }
+    }
+
+    boolean isEditingWarRoles() {
+        return editingWarRoles;
     }
 
     @Override
     protected void refreshDialog() {
         initTabs();
+        updateWarEconomyControlsVisibility();
         for (RolePanel panel : rolePanels) {
             panel.updateData();
         }
@@ -138,7 +207,7 @@ public class RoleManagementDialog extends ZeroDialog {
             return true;
         }
 
-        RolePanel panel = new RolePanel(colony, type, engine);
+        RolePanel panel = new RolePanel(colony, type, engine, this);
         rolePanels.add(panel);
         tabbedPane.insertTab(type.getName(), type.getIcon(), panel, null, expectedIndex);
         initializedTypes.add(type);
@@ -219,6 +288,7 @@ public class RoleManagementDialog extends ZeroDialog {
         if (!isShowing()) {
             return;
         }
+        updateWarEconomyControlsVisibility();
         for (RolePanel panel : rolePanels) {
             panel.updateData();
         }
@@ -228,6 +298,7 @@ public class RoleManagementDialog extends ZeroDialog {
         private final Colony colony;
         private final AntType antType;
         private final Engine engine;
+        private final RoleManagementDialog owner;
         private final JLabel totalLabel;
         private final JLabel assignedLabel;
         private final JLabel unassignedLabel;
@@ -236,10 +307,11 @@ public class RoleManagementDialog extends ZeroDialog {
         private final Set<AntRole> displayedRoles = new HashSet<>();
         private boolean isUpdating = false;
 
-        RolePanel(Colony colony, AntType antType, Engine engine) {
+        RolePanel(Colony colony, AntType antType, Engine engine, RoleManagementDialog owner) {
             this.colony = colony;
             this.antType = antType;
             this.engine = engine;
+            this.owner = owner;
 
             setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
             setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -270,22 +342,53 @@ public class RoleManagementDialog extends ZeroDialog {
         private void checkAndAddRoles() {
             boolean addedAny = false;
             for (AntRole role : GameConstants.getAntRoles()) {
-                if (role.getAntType() == antType) {
-                    if (displayedRoles.contains(role)) continue;
-
-                    Upgrade roleUpgrade = getUpgradeForRole(role);
-                    
-                    if (roleUpgrade != null && colony.hasUpgrade(roleUpgrade)) {
+                if (role.getAntType() != antType) {
+                    continue;
+                }
+                if (GameConstants.isWarEconomyExclusiveRole(role)) {
+                    if (!owner.isEditingWarRoles() || !owner.isWarEconomyUnlocked()) {
+                        removeRoleRow(role);
+                        continue;
+                    }
+                    if (!displayedRoles.contains(role)) {
                         addRoleRow(role);
                         displayedRoles.add(role);
                         addedAny = true;
                     }
+                    continue;
+                }
+                if (displayedRoles.contains(role)) {
+                    continue;
+                }
+
+                Upgrade roleUpgrade = getUpgradeForRole(role);
+
+                if (roleUpgrade != null && colony.hasUpgrade(roleUpgrade)) {
+                    addRoleRow(role);
+                    displayedRoles.add(role);
+                    addedAny = true;
                 }
             }
             if (addedAny) {
                 revalidate();
                 repaint();
             }
+        }
+
+        private void removeRoleRow(AntRole role) {
+            if (!displayedRoles.contains(role)) {
+                return;
+            }
+            JSpinner spinner = spinnerMap.remove(role);
+            if (spinner != null) {
+                Container parent = spinner.getParent();
+                if (parent != null) {
+                    remove(parent);
+                }
+            }
+            displayedRoles.remove(role);
+            revalidate();
+            repaint();
         }
 
         private void addRoleRow(AntRole role) {
@@ -296,7 +399,7 @@ public class RoleManagementDialog extends ZeroDialog {
             label.setForeground(AssetStyles.FONT_COLOR);
             roleRow.add(label);
             
-            int currentAssigned = colony.getAssignedRoleCount(role);
+            int currentAssigned = getRoleCount(role);
             SpinnerModel model = new SpinnerNumberModel(currentAssigned, 0, Integer.MAX_VALUE, 1); 
             JSpinner spinner = new JSpinner(model);
             AssetStyles.styleSpinner(spinner);
@@ -334,9 +437,9 @@ public class RoleManagementDialog extends ZeroDialog {
                             } finally {
                                 isUpdating = false;
                             }
-                            colony.setAssignedRoleCount(defaultRole, newDefaultCount);
+                            setRoleCount(defaultRole, newDefaultCount);
                             
-                            colony.setAssignedRoleCount(role, newValue);
+                            setRoleCount(role, newValue);
                             updateData();
                             return; 
                         }
@@ -355,7 +458,7 @@ public class RoleManagementDialog extends ZeroDialog {
                     newValue = finalAllowed;
                 }
                 
-                colony.setAssignedRoleCount(role, newValue);
+                setRoleCount(role, newValue);
                 updateData();
             });
             
@@ -365,6 +468,20 @@ public class RoleManagementDialog extends ZeroDialog {
             spinnerMap.put(role, spinner);
             add(roleRow);
         }
+
+        private int getRoleCount(AntRole role) {
+            return owner.isEditingWarRoles()
+                    ? colony.getWarAssignedRoleCount(role)
+                    : colony.getPeaceAssignedRoleCount(role);
+        }
+
+        private void setRoleCount(AntRole role, int count) {
+            if (owner.isEditingWarRoles()) {
+                colony.setWarAssignedRoleCount(role, count);
+            } else {
+                colony.setPeaceAssignedRoleCount(role, count);
+            }
+        }
         
         void updateData() {
             if (isUpdating) return;
@@ -373,7 +490,7 @@ public class RoleManagementDialog extends ZeroDialog {
                 checkAndAddRoles();
                 
                 for (Map.Entry<AntRole, JSpinner> entry : spinnerMap.entrySet()) {
-                    int colonyValue = colony.getAssignedRoleCount(entry.getKey());
+                    int colonyValue = getRoleCount(entry.getKey());
                     if ((Integer)entry.getValue().getValue() != colonyValue) {
                         entry.getValue().setValue(colonyValue);
                     }

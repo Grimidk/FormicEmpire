@@ -729,7 +729,7 @@ public final class GameConstants {
         7, LanguageStrings.DIPLO_MODIFIER_DECLINED_PACT, -10, 0, DIPLO_EXCLUSIVE_PACT);
     static { diplomaticReputationModifiers.add(DIPLO_MODIFIER_DECLINED_PACT); }
     public static final DiplomaticReputationModifier DIPLO_MODIFIER_WAR = new DiplomaticReputationModifier(
-        3, LanguageStrings.DIPLO_MODIFIER_WAR, -100, 0, DIPLO_EXCLUSIVE_PACT);
+        3, LanguageStrings.DIPLO_MODIFIER_WAR, -200, 0, DIPLO_EXCLUSIVE_PACT);
     static { diplomaticReputationModifiers.add(DIPLO_MODIFIER_WAR); }
     public static final DiplomaticReputationModifier DIPLO_MODIFIER_TRADE = new DiplomaticReputationModifier(
         4, LanguageStrings.DIPLO_MODIFIER_TRADE, 20, REPUTATION_NEUTRAL.getMinScore(), null);
@@ -758,6 +758,58 @@ public final class GameConstants {
     public static final int MILITARY_WEIGHT_MAJOR = 15;
     public static final int MILITARY_WEIGHT_PRINCESS = 10;
     public static final int MILITARY_WEIGHT_QUEEN = 50;
+
+    private static final java.util.Set<AntRole> WAR_ECONOMY_EXCLUSIVE_ROLES =
+            java.util.Set.of(ROLE_MILITIA, ROLE_BRUTE);
+
+    private static final AntRole[] ACTIVE_MILITARY_ROLES = {
+            ROLE_WARRIOR, ROLE_DEFENDER,
+            ROLE_MILITIA,
+            ROLE_BRUTE, ROLE_ARTILLERY, ROLE_SIEGE
+    };
+
+    public static boolean isWarEconomyExclusiveRole(AntRole role) {
+        return role != null && WAR_ECONOMY_EXCLUSIVE_ROLES.contains(role);
+    }
+
+    public static boolean isActiveMilitaryRole(AntRole role) {
+        if (role == null) {
+            return false;
+        }
+        for (AntRole activeRole : ACTIVE_MILITARY_ROLES) {
+            if (activeRole == role) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static AntRole[] getActiveMilitaryRoles() {
+        return ACTIVE_MILITARY_ROLES.clone();
+    }
+
+    public static int getMilitaryWeightForAntType(AntType type) {
+        if (type == TYPE_WORKER) {
+            return MILITARY_WEIGHT_WORKER;
+        }
+        if (type == TYPE_SOLDIER) {
+            return MILITARY_WEIGHT_SOLDIER;
+        }
+        if (type == TYPE_MAJOR) {
+            return MILITARY_WEIGHT_MAJOR;
+        }
+        if (type == TYPE_PRINCESS) {
+            return MILITARY_WEIGHT_PRINCESS;
+        }
+        if (type == TYPE_QUEEN) {
+            return MILITARY_WEIGHT_QUEEN;
+        }
+        return 0;
+    }
+
+    public static int getActiveMilitaryRoleWeight(AntRole role) {
+        return role != null ? getMilitaryWeightForAntType(role.getAntType()) : 0;
+    }
 
     public static final int MILITARY_BASELINE_HEALTH = 100;
     public static final int MILITARY_BASELINE_ATTACK = 10;
@@ -826,6 +878,55 @@ public final class GameConstants {
     public static final int PHEROMONE_STORM_SYRUP_COST = 500;
     public static final int PHEROMONE_STORM_DURATION_MONTHS = 12;
     public static final int AI_FORCED_FLIGHT_COOLDOWN_DAYS = 30;
+    public static final int WAR_PACT_BREAK_COOLDOWN_MONTHS = 6;
+    public static final int DIPLO_DECLINED_REQUEST_COOLDOWN_MONTHS = 1;
+    public static final int WAR_DECLARATION_MIN_POPULATION = 1000;
+    /** Military power ratio required to count as winning or losing a war. */
+    public static final float WAR_STANDING_MILITARY_RATIO = 1.15f;
+    public static final double AI_ACCEPT_PEACE_CHANCE = 0.85;
+    public static final double AI_DECLARE_WAR_CHANCE = 0.12;
+    /** AI will not declare war on a dynasty more than this many times stronger. */
+    public static final float AI_DECLARE_WAR_MAX_TARGET_STRENGTH_RATIO = 2f;
+    /** Stronger:weaker power ratio treated as guaranteed victory in a war battle tick. */
+    public static final float WAR_BATTLE_RATIO_MAX = 10f;
+    /** Win chance at equal power; rises to 1 at {@link #WAR_BATTLE_RATIO_MAX}. */
+    public static final float WAR_BATTLE_WIN_CHANCE_AT_PARITY = 0.5f;
+    /** Fraction of the loser's pool lost per battle tick at equal power. */
+    public static final float WAR_BATTLE_LOSS_FRACTION_AT_PARITY = 0.01f;
+    /** Fraction of the winner's pool lost per battle tick at max ratio. */
+    public static final float WAR_BATTLE_WINNER_LOSS_FRACTION_MAX = 0.05f;
+    /** Daily increment to within-stage progress when battles continue. */
+    public static final float WAR_STAGE_PROGRESS_PER_DAY = 0.05f;
+    public static final float WAR_STAGE_PROGRESS_PER_HOUR = WAR_STAGE_PROGRESS_PER_DAY / 24f;
+    /** Full in-game hours between war stages for redeployment (one day). */
+    public static final int WAR_REDEPLOY_HOURS = 24;
+    /** AI only considers fallback below this active:opponent ratio (never when ahead). */
+    public static final float WAR_AI_FALLBACK_MAX_POWER_RATIO = 1f;
+    /** AI must retain at least this fraction of stage-start active power to consider fallback. */
+    public static final float WAR_AI_FALLBACK_RECOVERY_RATIO = 0.75f;
+    /** Minimum recovered active military before AI may forfeit a spare hex. */
+    public static final int WAR_AI_FALLBACK_MIN_ACTIVE = 500;
+    /** Minimum non-capital colonies required before AI treats a hex as expendable. */
+    public static final int WAR_AI_FALLBACK_MIN_SPARE_COLONIES = 3;
+    public static final double AI_WAR_FALLBACK_CHANCE = 0.06;
+
+    public static float warBattleWinChance(float strongerOverWeakerRatio) {
+        float ratio = Math.max(1f, Math.min(WAR_BATTLE_RATIO_MAX, strongerOverWeakerRatio));
+        return WAR_BATTLE_WIN_CHANCE_AT_PARITY
+                + (1f - WAR_BATTLE_WIN_CHANCE_AT_PARITY) * (ratio - 1f) / (WAR_BATTLE_RATIO_MAX - 1f);
+    }
+
+    public static float warBattleLoserLossFraction(float strongerOverWeakerRatio) {
+        float ratio = Math.max(1f, Math.min(WAR_BATTLE_RATIO_MAX, strongerOverWeakerRatio));
+        return WAR_BATTLE_LOSS_FRACTION_AT_PARITY
+                + (1f - WAR_BATTLE_LOSS_FRACTION_AT_PARITY) * (ratio - 1f) / (WAR_BATTLE_RATIO_MAX - 1f);
+    }
+
+    public static float warBattleWinnerLossFraction(float strongerOverWeakerRatio) {
+        float loserFraction = warBattleLoserLossFraction(strongerOverWeakerRatio);
+        return Math.min(WAR_BATTLE_WINNER_LOSS_FRACTION_MAX, loserFraction * 0.1f);
+    }
+
     public static final int AI_EXPANSION_COLONY_TARGET = 6;
     public static final double AI_CREATINE_FOOD_STRESS_RATIO = 0.35;
     public static final double TRADE_AUTOMATION_SURPLUS_RATIO = 0.50;

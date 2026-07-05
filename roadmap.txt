@@ -2,7 +2,6 @@ Here is the current roadmap of features and fixes:
 
 Missing assets:
 	Convoy view tiles — SkyConvoyTile.png, OverlandConvoyTile.png (see TODO asset in GameConstants); sea/underground tiles seeded
-	Room sprites still look ugly af (see TODO asset on buildingRoomSprite / BuildingSpriteResources)
 	Map hexes — look yank
 	Font - self explanatory
 
@@ -13,10 +12,13 @@ To Fix (By decreasing priority) :
 	
 	High:
 	TODO: icons/sprites for all Constants (roles, moves) and unlocks (all)
+	Room sprites still look ugly af (see TODO asset on buildingRoomSprite / BuildingSpriteResources)
+	battle screen
+	make game speed a constant with symbols
 
 	Mid:
 	(none right now)
-	
+	  
 	Low:
 	(none right now)
   
@@ -29,16 +31,16 @@ To Fix (By decreasing priority) :
 To Feature (to be done in order):
 Needed for launch (v1.0) (Launch Version):
 	Priority:
-	battle system (mass battle in land and air, tick based loses based on active/passive military strenght from 1:1 = 50% chance and 1% loses up to 1:10 100% chance and 100% loses, 2 staged war until the queens are dead; war cancels active cross-dynasty trades)
-	war economy check (takes a day to transition)
 	rebellions and rebel colonies ( too much causes a rebellious dynasty to appear, once capital defeated it gets reabsorbed)
 	grant independence and modifier for it
+	barrack room before royal chamber
 	assimilations ( Trap-jaw (Trap jaw ants), Honey-pot (Honey pot ants), Door-head (Turtle ants), Wood burrowing (Carpenter ants), Silk weaving (Weaver ants), Rafting (Flood plains ants), Fire venom (Fire ants), Jumping (Jet ants), Gliding (Gliding ants), Stinging (Bullet ants), Swarming (Army ants), Stealth (Ghost ants), Fast bitting (Dracula ants), Heat resistance (Saharan silver ants), Deadly venom (Harvester ants), Self destruction (Exploding ants), Far sight (Bulldog ants), Hive building (Shining black ants), Location sensing (Desert ants))
+	ant subtypes (enable by role / exclusion) checks with new sprites, manage by hatch rate since they cant be changed
 
 	Everything else :
-	ant subtypes (enable by role / exclusion) checks with new sprites, manage by hatch rate since they cant be changed
 	simulation screen to see battles, transports ("view convoy" option using going and returning biomes for tiles, or underground or air)
 	minerals with uprades to find it and increase miner efficency, also mushroom detection 
+	air warfare
 	research tree and building tree (after icons)
 	rework how carrying looks completely
 	main menu screen maybe simulation like factorio
