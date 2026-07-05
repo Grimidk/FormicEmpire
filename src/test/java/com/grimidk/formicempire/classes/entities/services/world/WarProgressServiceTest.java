@@ -5,6 +5,7 @@ import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.War;
+import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
@@ -216,5 +217,12 @@ class WarProgressServiceTest {
         for (int i = 0; i < needed; i++) {
             colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
         }
+        for (int i = 0; i < 20; i++) {
+            colony.getSoldiers().add(new Ant(colony, GameConstants.TYPE_SOLDIER));
+        }
+        colony.getWarAssignedRoleCounts().put(GameConstants.ROLE_WARRIOR, 10);
+        colony.getWarAssignedRoleCounts().put(GameConstants.ROLE_DEFENDER, 10);
+        ColonyMilitaryService.refreshColonyMilitaryPower(colony);
+        ColonyMilitaryService.refreshDynastyMilitaryPower(dynasty);
     }
 }

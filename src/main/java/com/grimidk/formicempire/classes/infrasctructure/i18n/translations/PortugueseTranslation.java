@@ -108,8 +108,11 @@ public class PortugueseTranslation implements Translation {
         pt.put("MENU_ASSIMILATION", "Assimilação (I)");
         pt.put("MENU_SYNERGY", "Sinergias (O)");
         pt.put("MENU_ABILITIES", "Habilidades (C)");
-        pt.put("MENU_DYNASTY", "Dinastia (A)");
+        pt.put("MENU_GROUP_COLONY", "Colónia");
+        pt.put("MENU_GROUP_DYNASTY", "Dinastia");
+        pt.put("MENU_DYNASTY", "Visão geral (A)");
         pt.put("MENU_TRADE", "Rotas Comerciais (S)");
+        pt.put("MENU_DIPLOMACY", "Diplomacia (D)");
         pt.put("MENU_WARS", "Guerras (F)");
         pt.put("MENU_TOGGLE_VIEW", "Alternar Vista (Z)");
 
@@ -334,6 +337,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("MAP_ACTIVE_WAR_OPEN", "Clique para gerir as suas guerras");
 
         pt.put("DIALOG_WAR_TITLE", "Guerras");
+        pt.put("DIALOG_BATTLE_TITLE", "Batalha");
         pt.put("TAB_WARS", "Guerras");
         pt.put("TAB_WAR_ACTIVE", "Ativas");
         pt.put("TAB_WAR_HISTORY", "Histórico");
@@ -358,7 +362,10 @@ public class PortugueseTranslation implements Translation {
         pt.put("WAR_ALL_EMPTY", "Não há guerras ativas no mundo.");
         pt.put("WAR_SHOW_ALL_ACTIVE", "Mostrar todas as guerras ativas");
         pt.put("WAR_SHOW_ALL_ACTIVE_TIP", "Lista todas as guerras do mundo. Desmarcado, só aparecem as guerras da sua dinastia.");
-        pt.put("WAR_HISTORY_EMPTY", "Não há guerras passadas registadas.");
+        pt.put("WAR_SHOW_ALL_HISTORIC", "Mostrar todas as guerras passadas");
+        pt.put("WAR_SHOW_ALL_HISTORIC_TIP", "Lista todas as guerras concluídas do mundo. Desmarcado, só aparecem as guerras da sua dinastia.");
+        pt.put("WAR_HISTORY_EMPTY", "Não há guerras passadas registadas para a sua dinastia.");
+        pt.put("WAR_ALL_HISTORY_EMPTY", "Não há guerras passadas registadas no mundo.");
         pt.put("WAR_ONGOING", "Em curso");
         pt.put("WAR_DECLARED_BY_YOU", "Você");
         pt.put("WAR_STANDING_WINNING", "A ganhar");
@@ -389,6 +396,15 @@ public class PortugueseTranslation implements Translation {
         pt.put("WAR_ACTION_OFFER_PEACE", "Oferecer paz");
         pt.put("WAR_ACTION_ACCEPT_PEACE", "Aceitar paz");
         pt.put("WAR_ACTION_DECLINE_PEACE", "Recusar paz");
+        pt.put("WAR_ACTION_VIEW_BATTLE", "Ver batalha");
+        pt.put("BATTLE_NOT_AVAILABLE", "Esta guerra não tem uma fase de batalha ativa para mostrar.");
+        pt.put("BATTLE_LOCATION_FMT", "Em %s");
+        pt.put("BATTLE_POWER_FMT", "%s: %s");
+        pt.put("BATTLE_FORCES_FMT", "Forças: %s vs %s formigas");
+        pt.put("BATTLE_PHASE_CLASH", "Choque frontal");
+        pt.put("BATTLE_PHASE_RESERVE", "Assalto às reservas");
+        pt.put("BATTLE_PHASE_REDEPLOY", "Redeploy");
+        pt.put("BATTLE_REDEPLOY_FMT", "Redeploy (%s h restantes)");
         pt.put("WAR_OFFER_PEACE_CONFIRM_FMT", "Oferecer paz a %s? Eles devem aceitar enquanto tiver vantagem.");
         pt.put("WAR_ACCEPT_PEACE_CONFIRM_FMT", "Aceitar a oferta de paz de %s?");
         pt.put("WAR_PEACE_OFFERED_TITLE", "Paz oferecida");
@@ -1183,7 +1199,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("HOTKEY_P", "Taxas de eclosão (alternar)");
         pt.put("HOTKEY_UPGRADES", "Abas de melhoria (alternar)");
         pt.put("HOTKEY_Z", "Operações da colônia (alternar)");
-        pt.put("HOTKEY_DYNASTY", "Abas da dinastia (alternar)");
+        pt.put("HOTKEY_DYNASTY", "Abas da dinastia: Visão geral (A), Comércio (S), Diplomacia (D), Guerras (F)");
         pt.put("HOTKEY_M", "Mapa mundial (alternar)");
         pt.put("HOTKEY_X", "Estatísticas (alternar)");
 
@@ -1239,7 +1255,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("HOTKEY_ROLES_LABEL", "Funções (Q-T):");
         pt.put("HOTKEY_UPGRADES_LABEL", "Melhorias (Y-O):");
         pt.put("HOTKEY_P_LABEL", "Eclosão:");
-        pt.put("HOTKEY_DYNASTY_LABEL", "Dinastia (S/A):");
+        pt.put("HOTKEY_DYNASTY_LABEL", "Dinastia (A/S/D/F):");
         pt.put("HOTKEY_M_LABEL", "Mapa mundial:");
         pt.put("HOTKEY_X_LABEL", "Estatísticas:");
 

@@ -101,15 +101,18 @@ public class EnglishTranslation implements Translation {
 
         en.put("MENU_WORLD_MAP", "World Map (M)");
         en.put("MENU_STATS", "Colony Statistics (X)");
-        en.put("MENU_ROLES", "Manage Roles (Q/W/E/R/T)");
-        en.put("MENU_HATCH_RATES", "Manage Hatch Rates (P)");
+        en.put("MENU_ROLES", "Roles (Q-T)");
+        en.put("MENU_HATCH_RATES", "Hatch Rates (P)");
         en.put("MENU_RESEARCH", "Research (Y)");
         en.put("MENU_BUILD", "Build (U)");
         en.put("MENU_ASSIMILATION", "Assimilation (I)");
         en.put("MENU_SYNERGY", "Synergies (O)");
         en.put("MENU_ABILITIES", "Abilities (C)");
-        en.put("MENU_DYNASTY", "Dynasty (A)");
+        en.put("MENU_GROUP_COLONY", "Colony");
+        en.put("MENU_GROUP_DYNASTY", "Dynasty");
+        en.put("MENU_DYNASTY", "Overview (A)");
         en.put("MENU_TRADE", "Trade Routes (S)");
+        en.put("MENU_DIPLOMACY", "Diplomacy (D)");
         en.put("MENU_WARS", "Wars (F)");
         en.put("MENU_TOGGLE_VIEW", "Toggle View (Z)");
 
@@ -334,6 +337,7 @@ public class EnglishTranslation implements Translation {
         en.put("MAP_ACTIVE_WAR_OPEN", "Click to manage your wars");
 
         en.put("DIALOG_WAR_TITLE", "Wars");
+        en.put("DIALOG_BATTLE_TITLE", "Battle");
         en.put("TAB_WARS", "Wars");
         en.put("TAB_WAR_ACTIVE", "Active");
         en.put("TAB_WAR_HISTORY", "History");
@@ -358,7 +362,10 @@ public class EnglishTranslation implements Translation {
         en.put("WAR_ALL_EMPTY", "There are no active wars in the world.");
         en.put("WAR_SHOW_ALL_ACTIVE", "Show all active wars");
         en.put("WAR_SHOW_ALL_ACTIVE_TIP", "List every war in the world. When unchecked, only wars your dynasty is fighting are shown.");
+        en.put("WAR_SHOW_ALL_HISTORIC", "Show all past wars");
+        en.put("WAR_SHOW_ALL_HISTORIC_TIP", "List every concluded war in the world. When unchecked, only wars your dynasty fought are shown.");
         en.put("WAR_HISTORY_EMPTY", "No past wars recorded for your dynasty.");
+        en.put("WAR_ALL_HISTORY_EMPTY", "There are no past wars recorded in the world.");
         en.put("WAR_ONGOING", "Ongoing");
         en.put("WAR_DECLARED_BY_YOU", "You");
         en.put("WAR_STANDING_WINNING", "Winning");
@@ -389,6 +396,15 @@ public class EnglishTranslation implements Translation {
         en.put("WAR_ACTION_OFFER_PEACE", "Offer peace");
         en.put("WAR_ACTION_ACCEPT_PEACE", "Accept peace");
         en.put("WAR_ACTION_DECLINE_PEACE", "Decline peace");
+        en.put("WAR_ACTION_VIEW_BATTLE", "View battle");
+        en.put("BATTLE_NOT_AVAILABLE", "This war has no active battle stage to display.");
+        en.put("BATTLE_LOCATION_FMT", "At %s");
+        en.put("BATTLE_POWER_FMT", "%s: %s");
+        en.put("BATTLE_FORCES_FMT", "Forces: %s vs %s ants");
+        en.put("BATTLE_PHASE_CLASH", "Front clash");
+        en.put("BATTLE_PHASE_RESERVE", "Hex defense");
+        en.put("BATTLE_PHASE_REDEPLOY", "Redeploying");
+        en.put("BATTLE_REDEPLOY_FMT", "Redeploying (%s h remaining)");
         en.put("WAR_OFFER_PEACE_CONFIRM_FMT", "Offer peace to %s? They must accept while you hold the advantage.");
         en.put("WAR_ACCEPT_PEACE_CONFIRM_FMT", "Accept the peace offer from %s?");
         en.put("WAR_PEACE_OFFERED_TITLE", "Peace Offered");
@@ -1183,7 +1199,7 @@ public class EnglishTranslation implements Translation {
         en.put("HOTKEY_P", "Hatch Rates Menu (Toggles)");
         en.put("HOTKEY_UPGRADES", "Upgrade Tabs (Research, Build, etc. Toggles)");
         en.put("HOTKEY_Z", "Colony Operations Menu (Toggles)");
-        en.put("HOTKEY_DYNASTY", "Dynasty Tabs (Overview, Trade. Toggles)");
+        en.put("HOTKEY_DYNASTY", "Dynasty tabs: Overview (A), Trade (S), Diplomacy (D), Wars (F)");
         en.put("HOTKEY_M", "World Map (Toggles)");
         en.put("HOTKEY_X", "Statistics (Toggles)");
 
@@ -1239,7 +1255,7 @@ public class EnglishTranslation implements Translation {
         en.put("HOTKEY_ROLES_LABEL", "Roles (Q-T):");
         en.put("HOTKEY_UPGRADES_LABEL", "Upgrades (Y-O):");
         en.put("HOTKEY_P_LABEL", "Hatch Rates:");
-        en.put("HOTKEY_DYNASTY_LABEL", "Dynasty (S/A):");
+        en.put("HOTKEY_DYNASTY_LABEL", "Dynasty (A/S/D/F):");
         en.put("HOTKEY_M_LABEL", "World Map:");
         en.put("HOTKEY_X_LABEL", "Stats:");
 

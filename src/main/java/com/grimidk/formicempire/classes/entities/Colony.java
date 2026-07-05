@@ -1231,11 +1231,8 @@ public class Colony {
         
         int cost = getNuptialFlightCost();
         if (getResearchPoints() < cost) return;
-        
-        boolean hasDrones = !getDrones().isEmpty();
-        boolean hasBreeders = getPrincesses().stream().anyMatch(p -> p.getRole() == GameConstants.ROLE_BREEDER);
-        
-        if (!hasDrones || !hasBreeders) {
+
+        if (!ColonyLabourService.meetsNuptialRequirements(this)) {
             logEvent(ColonyLogPrefixes.INFO + " " + LanguageStrings.get(LanguageStrings.LOG_FORCE_FLIGHT_BLOCKED));
             return;
         }

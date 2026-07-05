@@ -558,7 +558,14 @@ public class ColonyAutomationService {
 
     private void calculatePrincessQuotas(Colony colony, Map<AntRole, Integer> targets) {
         int totalPrincesses = colony.getPrincesses().size();
-        if (totalPrincesses == 0) return;
+        if (totalPrincesses == 0) {
+            return;
+        }
+
+        if (colony.getQueens().isEmpty() && colony.hasUpgrade(GameUnlocks.ROLE_BREEDER)) {
+            targets.put(GameConstants.ROLE_BREEDER, totalPrincesses);
+            return;
+        }
 
         int skyTrans = 0;
         if (colony.hasUpgrade(GameUnlocks.ROLE_SKYTRANS)) {

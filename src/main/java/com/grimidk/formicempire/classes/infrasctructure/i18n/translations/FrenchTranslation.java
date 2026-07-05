@@ -108,8 +108,11 @@ public class FrenchTranslation implements Translation {
         fr.put("MENU_ASSIMILATION", "Assimilation (I)");
         fr.put("MENU_SYNERGY", "Synergies (O)");
         fr.put("MENU_ABILITIES", "Capacités (C)");
-        fr.put("MENU_DYNASTY", "Dynastie (A)");
+        fr.put("MENU_GROUP_COLONY", "Colonie");
+        fr.put("MENU_GROUP_DYNASTY", "Dynastie");
+        fr.put("MENU_DYNASTY", "Aperçu (A)");
         fr.put("MENU_TRADE", "Routes commerciales (S)");
+        fr.put("MENU_DIPLOMACY", "Diplomatie (D)");
         fr.put("MENU_WARS", "Guerres (F)");
         fr.put("MENU_TOGGLE_VIEW", "Basculer la vue (Z)");
 
@@ -334,6 +337,7 @@ public class FrenchTranslation implements Translation {
         fr.put("MAP_ACTIVE_WAR_OPEN", "Cliquer pour gérer vos guerres");
 
         fr.put("DIALOG_WAR_TITLE", "Guerres");
+        fr.put("DIALOG_BATTLE_TITLE", "Bataille");
         fr.put("TAB_WARS", "Guerres");
         fr.put("TAB_WAR_ACTIVE", "Actives");
         fr.put("TAB_WAR_HISTORY", "Historique");
@@ -358,7 +362,10 @@ public class FrenchTranslation implements Translation {
         fr.put("WAR_ALL_EMPTY", "Il n'y a aucune guerre active dans le monde.");
         fr.put("WAR_SHOW_ALL_ACTIVE", "Afficher toutes les guerres actives");
         fr.put("WAR_SHOW_ALL_ACTIVE_TIP", "Liste toutes les guerres du monde. Décoché, seules les guerres de votre dynastie sont affichées.");
-        fr.put("WAR_HISTORY_EMPTY", "Aucune guerre passée enregistrée.");
+        fr.put("WAR_SHOW_ALL_HISTORIC", "Afficher toutes les guerres passées");
+        fr.put("WAR_SHOW_ALL_HISTORIC_TIP", "Liste toutes les guerres terminées du monde. Décoché, seules les guerres de votre dynastie sont affichées.");
+        fr.put("WAR_HISTORY_EMPTY", "Aucune guerre passée enregistrée pour votre dynastie.");
+        fr.put("WAR_ALL_HISTORY_EMPTY", "Aucune guerre passée enregistrée dans le monde.");
         fr.put("WAR_ONGOING", "En cours");
         fr.put("WAR_DECLARED_BY_YOU", "Vous");
         fr.put("WAR_STANDING_WINNING", "Gagne");
@@ -389,6 +396,15 @@ public class FrenchTranslation implements Translation {
         fr.put("WAR_ACTION_OFFER_PEACE", "Offrir la paix");
         fr.put("WAR_ACTION_ACCEPT_PEACE", "Accepter la paix");
         fr.put("WAR_ACTION_DECLINE_PEACE", "Refuser la paix");
+        fr.put("WAR_ACTION_VIEW_BATTLE", "Voir la bataille");
+        fr.put("BATTLE_NOT_AVAILABLE", "Cette guerre n'a pas d'étape de bataille active à afficher.");
+        fr.put("BATTLE_LOCATION_FMT", "À %s");
+        fr.put("BATTLE_POWER_FMT", "%s : %s");
+        fr.put("BATTLE_FORCES_FMT", "Forces : %s vs %s fourmis");
+        fr.put("BATTLE_PHASE_CLASH", "Affrontement");
+        fr.put("BATTLE_PHASE_RESERVE", "Assaut des réserves");
+        fr.put("BATTLE_PHASE_REDEPLOY", "Redéploiement");
+        fr.put("BATTLE_REDEPLOY_FMT", "Redéploiement (%s h restantes)");
         fr.put("WAR_OFFER_PEACE_CONFIRM_FMT", "Offrir la paix à %s ? Ils doivent accepter tant que vous avez l'avantage.");
         fr.put("WAR_ACCEPT_PEACE_CONFIRM_FMT", "Accepter l'offre de paix de %s ?");
         fr.put("WAR_PEACE_OFFERED_TITLE", "Paix proposée");
@@ -1183,7 +1199,7 @@ public class FrenchTranslation implements Translation {
         fr.put("HOTKEY_P", "Taux d'éclosion (basculer)");
         fr.put("HOTKEY_UPGRADES", "Onglets d'amélioration (basculer)");
         fr.put("HOTKEY_Z", "Opérations de colonie (basculer)");
-        fr.put("HOTKEY_DYNASTY", "Onglets dynastie (basculer)");
+        fr.put("HOTKEY_DYNASTY", "Onglets dynastie : Aperçu (A), Commerce (S), Diplomatie (D), Guerres (F)");
         fr.put("HOTKEY_M", "Carte du monde (basculer)");
         fr.put("HOTKEY_X", "Statistiques (basculer)");
 
@@ -1239,7 +1255,7 @@ public class FrenchTranslation implements Translation {
         fr.put("HOTKEY_ROLES_LABEL", "Rôles (Q-T) :");
         fr.put("HOTKEY_UPGRADES_LABEL", "Améliorations (Y-O) :");
         fr.put("HOTKEY_P_LABEL", "Éclosion :");
-        fr.put("HOTKEY_DYNASTY_LABEL", "Dynastie (S/A) :");
+        fr.put("HOTKEY_DYNASTY_LABEL", "Dynastie (A/S/D/F) :");
         fr.put("HOTKEY_M_LABEL", "Carte :");
         fr.put("HOTKEY_X_LABEL", "Stats :");
 

@@ -137,6 +137,24 @@ class DynastyDiplomacyServiceTest {
     }
 
     @Test
+    void declareWarRequiresActiveMilitaryRoles() {
+        World world = buildBorderWorld();
+        player.getCapital().getWarAssignedRoleCounts().clear();
+        neighbor.getCapital().getWarAssignedRoleCounts().clear();
+        player.getCapital().getSoldiers().clear();
+        neighbor.getCapital().getSoldiers().clear();
+
+        assertFalse(DynastyDiplomacyService.meetsWarActiveMilitaryRequirement(player));
+        assertFalse(player.getDiplomacyService().canDeclareWar(neighbor, world));
+
+        player.getCapital().getWarAssignedRoleCounts().put(GameConstants.ROLE_WARRIOR, 5);
+        assertFalse(player.getDiplomacyService().canDeclareWar(neighbor, world));
+
+        neighbor.getCapital().getWarAssignedRoleCounts().put(GameConstants.ROLE_WARRIOR, 5);
+        assertTrue(player.getDiplomacyService().canDeclareWar(neighbor, world));
+    }
+
+    @Test
     void declareWarRequiresMinimumPopulation() {
         Colony smallColony = new Colony(30, "Small", true);
         player.addColony(smallColony);
@@ -276,6 +294,8 @@ class DynastyDiplomacyServiceTest {
             colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
         }
         colony.getSoldiers().add(new Ant(colony, GameConstants.TYPE_SOLDIER));
+        colony.getWarAssignedRoleCounts().put(GameConstants.ROLE_WARRIOR, 5);
+        colony.getWarAssignedRoleCounts().put(GameConstants.ROLE_DEFENDER, 5);
     }
 
     @Test

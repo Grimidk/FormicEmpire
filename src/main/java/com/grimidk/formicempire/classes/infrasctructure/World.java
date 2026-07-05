@@ -21,6 +21,7 @@ import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.Trade;
 import com.grimidk.formicempire.classes.entities.Tunnel;
+import com.grimidk.formicempire.classes.entities.services.colony.ColonyLabourService;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyStarterService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDeathService;
@@ -29,6 +30,7 @@ import com.grimidk.formicempire.classes.entities.services.world.WarService;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
@@ -781,7 +783,7 @@ public class World {
         reapplyRoleAssignmentsAfterLoad();
         bindDynastyTradeServices();
         ColonyMilitaryService.refreshAllMilitaryPower(this.dynastys);
-        if (savefile.getWars() != null && !savefile.getWars().isEmpty()) {
+        if (savefile.getWars() != null) {
             warService.loadFromSave(savefile.getWars());
         } else {
             warService.syncFromDynasties();
@@ -946,7 +948,9 @@ public class World {
         
         for (Hex hex : this.hexes) {
             if (hex.getColony() != null) {
-                hex.getColony().runDailyJobs(this.getTemperatureIcon(), hex.getBiome(), hex);
+                Colony colony = hex.getColony();
+                colony.runDailyJobs(this.getTemperatureIcon(), hex.getBiome(), hex);
+                tryQueenRecoveryNuptial(this, colony, hex);
             }
         }
 
@@ -1054,6 +1058,22 @@ public class World {
                 colony.runYearlyJobs(this, hex);
             }
         }
+    }
+
+    private void tryQueenRecoveryNuptial(World world, Colony colony, Hex hex) {
+        if (!colonyHasActiveDynasty(colony) || hex == null || world == null) {
+            return;
+        }
+        if (!colony.getQueens().isEmpty() || colony.getDaysWithoutQueen() <= 0) {
+            return;
+        }
+        if (!colony.hasUpgrade(GameUnlocks.TYPE_PRINCESS)) {
+            return;
+        }
+        if (!ColonyLabourService.meetsNuptialRequirements(colony)) {
+            return;
+        }
+        colony.getLabourService().runNuptial(colony, world, hex);
     }
 
     private static boolean colonyHasActiveDynasty(Colony colony) {

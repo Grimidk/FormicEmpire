@@ -12,6 +12,7 @@ import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.Trade;
 import com.grimidk.formicempire.classes.entities.Tunnel;
+import com.grimidk.formicempire.classes.entities.War;
 import com.grimidk.formicempire.classes.entities.CrossDynastyTradeProposal;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyTradeAutomation;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDiplomacyService;
@@ -55,6 +56,7 @@ public class DynastyManagementDialog extends ZeroDialog {
     private final Engine engine;
     private final Consumer<Colony> onGoToColony;
     private final Runnable onOpenWarRoles;
+    private final Consumer<War> onViewBattle;
 
     private final JTabbedPane tabbedPane;
     private final Map<Integer, Integer> tabIndexMap = new HashMap<>();
@@ -67,12 +69,13 @@ public class DynastyManagementDialog extends ZeroDialog {
     private final Runnable refreshTask = this::liveUpdate;
 
     public DynastyManagementDialog(JFrame owner, Dynasty dynasty, Engine engine, Consumer<Colony> onGoToColony,
-            Runnable onOpenWarRoles) {
+            Runnable onOpenWarRoles, Consumer<War> onViewBattle) {
         super(owner, LanguageStrings.DIALOG_DYNASTY_TITLE, AssetStyles.DEFAULT_DIALOG_SIZE);
         this.dynasty = dynasty;
         this.engine = engine;
         this.onGoToColony = onGoToColony;
         this.onOpenWarRoles = onOpenWarRoles;
+        this.onViewBattle = onViewBattle;
         dynasty.bindTradeManager(engine.getTradeManager());
 
         tabbedPane = new JTabbedPane();
@@ -220,56 +223,35 @@ public class DynastyManagementDialog extends ZeroDialog {
     }
 
     private void initKeyBindings() {
-        InputMap inputMap = getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         ActionMap actionMap = getRootPane().getActionMap();
+        InputMap windowMap = getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        InputMap tabMap = tabbedPane.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0), "toggleOverview");
-        actionMap.put("toggleOverview", new AbstractAction() {
+        registerTabKeyBinding(windowMap, tabMap, actionMap, KeyEvent.VK_A, TAB_OVERVIEW, "toggleOverview");
+        registerTabKeyBinding(windowMap, tabMap, actionMap, KeyEvent.VK_S, TAB_TRADE, "toggleTrade");
+        registerTabKeyBinding(windowMap, tabMap, actionMap, KeyEvent.VK_D, TAB_DIPLOMACY, "toggleDiplomacy");
+        registerTabKeyBinding(windowMap, tabMap, actionMap, KeyEvent.VK_F, TAB_WARS, "toggleWars");
+    }
+
+    private void registerTabKeyBinding(InputMap windowMap, InputMap tabMap, ActionMap actionMap,
+            int keyCode, int tabIndex, String actionId) {
+        KeyStroke stroke = KeyStroke.getKeyStroke(keyCode, 0);
+        windowMap.put(stroke, actionId);
+        tabMap.put(stroke, actionId);
+        actionMap.put(actionId, new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (isTabOpen(TAB_OVERVIEW)) {
-                    dispose();
-                } else if (tabIndexMap.containsKey(TAB_OVERVIEW)) {
-                    tabbedPane.setSelectedIndex(tabIndexMap.get(TAB_OVERVIEW));
-                }
+                switchTabOrClose(tabIndex);
             }
         });
+    }
 
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0), "toggleTrade");
-        actionMap.put("toggleTrade", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (isTabOpen(TAB_TRADE)) {
-                    dispose();
-                } else if (tabIndexMap.containsKey(TAB_TRADE)) {
-                    tabbedPane.setSelectedIndex(tabIndexMap.get(TAB_TRADE));
-                }
-            }
-        });
-
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0), "toggleDiplomacy");
-        actionMap.put("toggleDiplomacy", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (isTabOpen(TAB_DIPLOMACY)) {
-                    dispose();
-                } else if (tabIndexMap.containsKey(TAB_DIPLOMACY)) {
-                    tabbedPane.setSelectedIndex(tabIndexMap.get(TAB_DIPLOMACY));
-                }
-            }
-        });
-
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0), "toggleWars");
-        actionMap.put("toggleWars", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (isTabOpen(TAB_WARS)) {
-                    dispose();
-                } else if (tabIndexMap.containsKey(TAB_WARS)) {
-                    tabbedPane.setSelectedIndex(tabIndexMap.get(TAB_WARS));
-                }
-            }
-        });
+    private void switchTabOrClose(int tabIndex) {
+        if (isTabOpen(tabIndex)) {
+            dispose();
+        } else if (tabIndexMap.containsKey(tabIndex)) {
+            tabbedPane.setSelectedIndex(tabIndexMap.get(tabIndex));
+        }
     }
 
     private WarManagementPanel.Callbacks createWarCallbacks() {
@@ -290,6 +272,13 @@ public class DynastyManagementDialog extends ZeroDialog {
             public void openWarRoles() {
                 if (onOpenWarRoles != null) {
                     onOpenWarRoles.run();
+                }
+            }
+
+            @Override
+            public void viewBattle(War war) {
+                if (onViewBattle != null && war != null) {
+                    onViewBattle.accept(war);
                 }
             }
 

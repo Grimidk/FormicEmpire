@@ -606,12 +606,23 @@ public final class WarProgressService {
         float winnerLossFraction = GameConstants.warBattleWinnerLossFraction(ratio);
         if (sideOneWins) {
             return new BattleTickResult(
-                    Math.max(1, Math.round(sideOnePower * winnerLossFraction)),
-                    Math.max(1, Math.round(sideTwoPower * lossFraction)));
+                    computeBattleLoss(sideOnePower, winnerLossFraction),
+                    computeBattleLoss(sideTwoPower, lossFraction));
         }
         return new BattleTickResult(
-                Math.max(1, Math.round(sideOnePower * lossFraction)),
-                Math.max(1, Math.round(sideTwoPower * winnerLossFraction)));
+                computeBattleLoss(sideOnePower, lossFraction),
+                computeBattleLoss(sideTwoPower, winnerLossFraction));
+    }
+
+    private static int computeBattleLoss(int power, float fraction) {
+        if (power <= 0) {
+            return 0;
+        }
+        int loss = Math.round(power * fraction);
+        if (loss < 1 && power >= 30) {
+            loss = 1;
+        }
+        return Math.min(power, Math.max(0, loss));
     }
 
     private static void applyActivePoolLoss(Dynasty dynasty, int powerLoss) {

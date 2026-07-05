@@ -23,7 +23,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WarManagementPanel extends JPanel {
+public class WarManagementPanel extends JPanel implements DynastyManagementDialog.LiveUpdatePanel {
 
     public interface Callbacks {
         void goToOpponentCapital(Dynasty opponent);
@@ -31,6 +31,8 @@ public class WarManagementPanel extends JPanel {
         void openDiplomacy(Dynasty opponent);
 
         void openWarRoles();
+
+        void viewBattle(War war);
 
         void onWarsChanged();
     }
@@ -64,6 +66,7 @@ public class WarManagementPanel extends JPanel {
     private final JTable historyTable;
     private final DefaultTableModel historyModel;
     private final JCheckBox showAllActiveWarsCheck;
+    private final JCheckBox showAllHistoricWarsCheck;
     private final List<ActiveWarRowData> displayedActiveWars = new ArrayList<>();
 
     public WarManagementPanel(Dynasty dynasty, Engine engine, Callbacks callbacks) {
@@ -79,6 +82,11 @@ public class WarManagementPanel extends JPanel {
         showAllActiveWarsCheck.setToolTipText(LanguageStrings.get(LanguageStrings.WAR_SHOW_ALL_ACTIVE_TIP));
         AssetStyles.styleCheckBox(showAllActiveWarsCheck);
         showAllActiveWarsCheck.addActionListener(e -> updateActiveWars());
+
+        showAllHistoricWarsCheck = new JCheckBox(LanguageStrings.get(LanguageStrings.WAR_SHOW_ALL_HISTORIC), false);
+        showAllHistoricWarsCheck.setToolTipText(LanguageStrings.get(LanguageStrings.WAR_SHOW_ALL_HISTORIC_TIP));
+        AssetStyles.styleCheckBox(showAllHistoricWarsCheck);
+        showAllHistoricWarsCheck.addActionListener(e -> updateHistoricWars());
 
         activeModel = createActiveModel();
         activeTable = createActiveTable(activeModel);
@@ -99,9 +107,18 @@ public class WarManagementPanel extends JPanel {
         activePanel.add(activeNorth, BorderLayout.NORTH);
         activePanel.add(new JScrollPane(activeTable), BorderLayout.CENTER);
 
+        JPanel historyHeader = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 4));
+        historyHeader.setOpaque(false);
+        historyHeader.add(showAllHistoricWarsCheck);
+
+        JPanel historyNorth = new JPanel(new BorderLayout());
+        historyNorth.setOpaque(false);
+        historyNorth.add(historyHeader, BorderLayout.NORTH);
+        historyNorth.add(historyEmptyLabel, BorderLayout.CENTER);
+
         JPanel historyPanel = new JPanel(new BorderLayout());
         historyPanel.setOpaque(false);
-        historyPanel.add(historyEmptyLabel, BorderLayout.NORTH);
+        historyPanel.add(historyNorth, BorderLayout.NORTH);
         historyPanel.add(new JScrollPane(historyTable), BorderLayout.CENTER);
 
         tabbedPane = new JTabbedPane();
@@ -109,6 +126,11 @@ public class WarManagementPanel extends JPanel {
         tabbedPane.addTab(LanguageStrings.get(LanguageStrings.TAB_WAR_ACTIVE), activePanel);
         tabbedPane.addTab(LanguageStrings.get(LanguageStrings.TAB_WAR_HISTORY), historyPanel);
         add(tabbedPane, BorderLayout.CENTER);
+        updateData();
+    }
+
+    @Override
+    public void liveUpdate() {
         updateData();
     }
 
@@ -242,36 +264,56 @@ public class WarManagementPanel extends JPanel {
 
         World world = engine != null ? engine.getWorld() : null;
         WarService warService = world != null ? world.getWarService() : null;
-        List<War> wars = warService != null ? warService.getHistoricWarsForDynasty(dynasty.getId()) : List.of();
+        boolean showAll = showAllHistoricWarsCheck.isSelected();
+        List<War> wars = List.of();
+        if (warService != null) {
+            wars = showAll ? warService.getHistoricWars() : warService.getHistoricWarsForDynasty(dynasty.getId());
+        }
 
         historyModel.setRowCount(0);
-        boolean showTable = !wars.isEmpty();
-        historyTable.setVisible(showTable);
-        historyEmptyLabel.setVisible(!showTable);
-        if (!showTable) {
+        historyEmptyLabel.setText(LanguageStrings.get(
+                showAll ? LanguageStrings.WAR_ALL_HISTORY_EMPTY : LanguageStrings.WAR_HISTORY_EMPTY));
+
+        if (warService == null || world == null) {
+            historyTable.setVisible(false);
+            historyEmptyLabel.setVisible(true);
             return;
         }
 
+        int worldMonth = DynastyDiplomacyService.worldMonthIndex(world);
         for (War war : wars) {
-            Dynasty winner = warService.resolveWinner(war);
-            String winnerLabel;
-            if (winner == null) {
-                winnerLabel = LanguageStrings.get(LanguageStrings.WAR_WINNER_NONE);
-            } else if (winner.getId() == dynasty.getId()) {
-                winnerLabel = LanguageStrings.get(LanguageStrings.WAR_WINNER_YOU);
-            } else {
-                winnerLabel = winner.getName();
+            if (!showAll && !war.involves(dynasty.getId())) {
+                continue;
             }
-            historyModel.addRow(new Object[]{
-                    warService.formatWarNameForDisplay(war, dynasty),
-                    war.formatStartedDate(),
-                    war.formatEndedDate(),
-                    war.getDurationMonths(DynastyDiplomacyService.worldMonthIndex(world)),
-                    war.formatConclusion(),
-                    winnerLabel
-            });
+            historyModel.addRow(buildHistoricWarRow(warService, world, war, worldMonth));
         }
-        fitHistoryColumns();
+
+        boolean showTable = historyModel.getRowCount() > 0;
+        historyTable.setVisible(showTable);
+        historyEmptyLabel.setVisible(!showTable);
+        if (showTable) {
+            fitHistoryColumns();
+        }
+    }
+
+    private Object[] buildHistoricWarRow(WarService warService, World world, War war, int worldMonth) {
+        Dynasty winner = warService.resolveWinner(war);
+        String winnerLabel;
+        if (winner == null) {
+            winnerLabel = LanguageStrings.get(LanguageStrings.WAR_WINNER_NONE);
+        } else if (winner.getId() == dynasty.getId()) {
+            winnerLabel = LanguageStrings.get(LanguageStrings.WAR_WINNER_YOU);
+        } else {
+            winnerLabel = winner.getName();
+        }
+        return new Object[]{
+                warService.formatWarNameForDisplay(war, dynasty),
+                war.formatStartedDate(),
+                war.formatEndedDate(),
+                war.getDurationMonths(worldMonth),
+                war.formatConclusion(),
+                winnerLabel
+        };
     }
 
     private void performOfferPeace(ActiveWarRowData rowData) {
@@ -356,13 +398,27 @@ public class WarManagementPanel extends JPanel {
     }
 
     private void showWarActionsMenu(ActiveWarRowData rowData, JTable tableRef, int row, int column) {
-        if (rowData == null || !rowData.playerInvolved || rowData.opponent == null) {
+        if (rowData == null || !rowData.war.isActive() || !rowData.war.isCampaignInitialized()) {
             return;
         }
         World world = engine != null ? engine.getWorld() : null;
         WarService warService = world != null ? world.getWarService() : null;
         Dynasty opponent = rowData.opponent;
         JPopupMenu menu = new JPopupMenu();
+
+        JMenuItem battleItem = new JMenuItem(LanguageStrings.get(LanguageStrings.WAR_ACTION_VIEW_BATTLE));
+        battleItem.addActionListener(e -> {
+            if (callbacks != null) {
+                callbacks.viewBattle(rowData.war);
+            }
+        });
+        AssetStyles.styleMenuItem(battleItem);
+        menu.add(battleItem);
+
+        if (!rowData.playerInvolved || rowData.opponent == null) {
+            showTableCellPopup(menu, tableRef, row, column);
+            return;
+        }
 
         if (warService != null && warService.canAcceptPeaceOffer(rowData.war, dynasty)) {
             JMenuItem acceptItem = new JMenuItem(LanguageStrings.get(LanguageStrings.WAR_ACTION_ACCEPT_PEACE));
@@ -433,7 +489,9 @@ public class WarManagementPanel extends JPanel {
                     return false;
                 }
                 Object value = getValueAt(row, COL_ACTIONS);
-                return value instanceof ActiveWarRowData rowData && rowData.playerInvolved;
+                return value instanceof ActiveWarRowData rowData
+                        && rowData.war.isActive()
+                        && rowData.war.isCampaignInitialized();
             }
 
             @Override
@@ -612,7 +670,9 @@ public class WarManagementPanel extends JPanel {
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
                 boolean hasFocus, int row, int column) {
             setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
-            boolean enabled = value instanceof ActiveWarRowData rowData && rowData.playerInvolved;
+            boolean enabled = value instanceof ActiveWarRowData rowData
+                    && rowData.war.isActive()
+                    && rowData.war.isCampaignInitialized();
             actionsBtn.setEnabled(enabled);
             actionsBtn.setVisible(enabled);
             return this;
@@ -649,7 +709,9 @@ public class WarManagementPanel extends JPanel {
             editingRow = row;
             editingCol = column;
             panel.setBackground(table.getSelectionBackground());
-            boolean enabled = currentData != null && currentData.playerInvolved;
+            boolean enabled = currentData != null
+                    && currentData.war.isActive()
+                    && currentData.war.isCampaignInitialized();
             actionsBtn.setEnabled(enabled);
             actionsBtn.setVisible(enabled);
             return panel;

@@ -3,6 +3,7 @@ package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.entities.services.colony.ColonyLabourService;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
@@ -200,8 +201,12 @@ public class AbilitiesDialog extends ZeroDialog {
     
     private String getNuptialFailureReason(int cost) {
         if (colony.getResearchPoints() < cost) return LanguageStrings.format(LanguageStrings.ABILITY_ERROR_NOT_ENOUGH_RP, cost);
-        if (colony.getDrones().isEmpty()) return LanguageStrings.get(LanguageStrings.ABILITY_ERROR_NO_DRONES);
-        if (colony.getPrincesses().stream().noneMatch(p -> p.getRole() == GameConstants.ROLE_BREEDER)) return LanguageStrings.get(LanguageStrings.ABILITY_ERROR_NO_BREEDERS);
+        if (!ColonyLabourService.meetsNuptialRequirements(colony)) {
+            if (colony.getDrones().isEmpty()) {
+                return LanguageStrings.get(LanguageStrings.ABILITY_ERROR_NO_DRONES);
+            }
+            return LanguageStrings.get(LanguageStrings.ABILITY_ERROR_NO_BREEDERS);
+        }
         return null;
     }
 

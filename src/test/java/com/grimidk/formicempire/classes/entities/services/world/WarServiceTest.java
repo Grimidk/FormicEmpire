@@ -6,6 +6,7 @@ import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.War;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
+import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
@@ -105,6 +106,37 @@ class WarServiceTest {
         assertEquals(war.getId(), loaded.getId());
         assertEquals(war.getDisplayName(), loaded.getDisplayName());
         assertEquals(war.getStartedWorldMonth(), loaded.getStartedWorldMonth());
+    }
+
+    @Test
+    void saveRoundTripPreservesHistoricWarRecords() {
+        War war = world.getWarService().beginWar(player, neighbor);
+        world.getWarService().concludeWar(war, player.getId(), LanguageStrings.WAR_CONCLUSION_PEACE_TREATY);
+
+        List<Savefile.SavedWar> saved = world.getWarService().toSavedWars();
+        assertEquals(1, saved.size());
+        assertTrue(saved.get(0).endedWorldMonth >= 0);
+
+        World reloaded = new World();
+        reloaded.getDynastys().add(player);
+        reloaded.getDynastys().add(neighbor);
+        reloaded.getWarService().loadFromSave(saved);
+
+        assertTrue(reloaded.getWarService().getActiveWars().isEmpty());
+        assertEquals(1, reloaded.getWarService().getHistoricWarsForDynasty(player.getId()).size());
+        assertFalse(reloaded.getWarService().getHistoricWarsForDynasty(player.getId()).get(0).isActive());
+    }
+
+    @Test
+    void pruneInvalidWarsArchivesOrphanedActiveRecords() {
+        War war = world.getWarService().beginWar(player, neighbor);
+        player.getDiplomacyService().clearWarWith(neighbor, null);
+
+        world.getWarService().pruneInvalidWars();
+
+        assertTrue(world.getWarService().getActiveWars().isEmpty());
+        assertEquals(1, world.getWarService().getHistoricWarsForDynasty(player.getId()).size());
+        assertFalse(world.getWarService().getHistoricWarsForDynasty(player.getId()).get(0).isActive());
     }
 
     @Test
@@ -229,10 +261,18 @@ class WarServiceTest {
     }
 
     private static void ensureWarPopulation(Dynasty dynasty, Colony colony) {
+        dynasty.unlockUpgrade(GameUnlocks.TYPE_SOLDIER);
         int needed = GameConstants.WAR_DECLARATION_MIN_POPULATION
                 - dynasty.getStatService().getTotalPopulation(dynasty);
         for (int i = 0; i < needed; i++) {
             colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
         }
+        for (int i = 0; i < 20; i++) {
+            colony.getSoldiers().add(new Ant(colony, GameConstants.TYPE_SOLDIER));
+        }
+        colony.getWarAssignedRoleCounts().put(GameConstants.ROLE_WARRIOR, 10);
+        colony.getWarAssignedRoleCounts().put(GameConstants.ROLE_DEFENDER, 10);
+        ColonyMilitaryService.refreshColonyMilitaryPower(colony);
+        ColonyMilitaryService.refreshDynastyMilitaryPower(dynasty);
     }
 }

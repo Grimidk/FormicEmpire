@@ -13,7 +13,7 @@ To Fix (By decreasing priority) :
 	High:
 	TODO: icons/sprites for all Constants (roles, moves) and unlocks (all)
 	Room sprites still look ugly af (see TODO asset on buildingRoomSprite / BuildingSpriteResources)
-	battle screen
+	wars can be opened from diplomacy
 
 	Mid:
 	(none right now)
@@ -26,6 +26,9 @@ To Fix (By decreasing priority) :
 
 	Important not Urgent:
 	late game performance (physics too taxing, may need to deload ants outside of area or update less when >50k ants) maybe look into LWJGL
+	mechanics audit and breakdown
+	hexagonal architecture
+	simplify deplyable menu
 	
 To Feature (to be done in order):
 Needed for launch (v1.0) (Launch Version):

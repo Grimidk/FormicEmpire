@@ -251,6 +251,9 @@ public final class LanguageStrings {
     public static final String MENU_ABILITIES = "MENU_ABILITIES";
     public static final String MENU_DYNASTY = "MENU_DYNASTY";
     public static final String MENU_TRADE = "MENU_TRADE";
+    public static final String MENU_DIPLOMACY = "MENU_DIPLOMACY";
+    public static final String MENU_GROUP_COLONY = "MENU_GROUP_COLONY";
+    public static final String MENU_GROUP_DYNASTY = "MENU_GROUP_DYNASTY";
     public static final String MENU_WARS = "MENU_WARS";
     public static final String MENU_TOGGLE_VIEW = "MENU_TOGGLE_VIEW";
 
@@ -472,6 +475,7 @@ public final class LanguageStrings {
     public static final String MAP_ACTIVE_WAR_OPEN = "MAP_ACTIVE_WAR_OPEN";
 
     public static final String DIALOG_WAR_TITLE = "DIALOG_WAR_TITLE";
+    public static final String DIALOG_BATTLE_TITLE = "DIALOG_BATTLE_TITLE";
     public static final String TAB_WARS = "TAB_WARS";
     public static final String TAB_WAR_ACTIVE = "TAB_WAR_ACTIVE";
     public static final String TAB_WAR_HISTORY = "TAB_WAR_HISTORY";
@@ -496,7 +500,10 @@ public final class LanguageStrings {
     public static final String WAR_ALL_EMPTY = "WAR_ALL_EMPTY";
     public static final String WAR_SHOW_ALL_ACTIVE = "WAR_SHOW_ALL_ACTIVE";
     public static final String WAR_SHOW_ALL_ACTIVE_TIP = "WAR_SHOW_ALL_ACTIVE_TIP";
+    public static final String WAR_SHOW_ALL_HISTORIC = "WAR_SHOW_ALL_HISTORIC";
+    public static final String WAR_SHOW_ALL_HISTORIC_TIP = "WAR_SHOW_ALL_HISTORIC_TIP";
     public static final String WAR_HISTORY_EMPTY = "WAR_HISTORY_EMPTY";
+    public static final String WAR_ALL_HISTORY_EMPTY = "WAR_ALL_HISTORY_EMPTY";
     public static final String WAR_ONGOING = "WAR_ONGOING";
     public static final String WAR_DECLARED_BY_YOU = "WAR_DECLARED_BY_YOU";
     public static final String WAR_STANDING_WINNING = "WAR_STANDING_WINNING";
@@ -527,6 +534,15 @@ public final class LanguageStrings {
     public static final String WAR_ACTION_OFFER_PEACE = "WAR_ACTION_OFFER_PEACE";
     public static final String WAR_ACTION_ACCEPT_PEACE = "WAR_ACTION_ACCEPT_PEACE";
     public static final String WAR_ACTION_DECLINE_PEACE = "WAR_ACTION_DECLINE_PEACE";
+    public static final String WAR_ACTION_VIEW_BATTLE = "WAR_ACTION_VIEW_BATTLE";
+    public static final String BATTLE_NOT_AVAILABLE = "BATTLE_NOT_AVAILABLE";
+    public static final String BATTLE_LOCATION_FMT = "BATTLE_LOCATION_FMT";
+    public static final String BATTLE_POWER_FMT = "BATTLE_POWER_FMT";
+    public static final String BATTLE_FORCES_FMT = "BATTLE_FORCES_FMT";
+    public static final String BATTLE_PHASE_CLASH = "BATTLE_PHASE_CLASH";
+    public static final String BATTLE_PHASE_RESERVE = "BATTLE_PHASE_RESERVE";
+    public static final String BATTLE_PHASE_REDEPLOY = "BATTLE_PHASE_REDEPLOY";
+    public static final String BATTLE_REDEPLOY_FMT = "BATTLE_REDEPLOY_FMT";
     public static final String WAR_OFFER_PEACE_CONFIRM_FMT = "WAR_OFFER_PEACE_CONFIRM_FMT";
     public static final String WAR_ACCEPT_PEACE_CONFIRM_FMT = "WAR_ACCEPT_PEACE_CONFIRM_FMT";
     public static final String WAR_PEACE_OFFERED_TITLE = "WAR_PEACE_OFFERED_TITLE";

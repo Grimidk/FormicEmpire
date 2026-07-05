@@ -68,9 +68,7 @@ public final class GameConstants {
     }
 
     // --- Convoy view tiles (simulation / view-convoy screen backgrounds) ---
-    // TODO asset: backgrounds/convoy/SeaConvoyTile.png
     public static final ImageIcon CONVOY_TILE_SEA = loadIcon("backgrounds/convoy/SeaConvoyTile.png");
-    // TODO asset: backgrounds/convoy/UndergroundConvoyTile.png
     public static final ImageIcon CONVOY_TILE_UNDERGROUND = loadIcon("backgrounds/convoy/UndergroundConvoyTile.png");
     // TODO asset: backgrounds/convoy/SkyConvoyTile.png
     // TODO asset: backgrounds/convoy/OverlandConvoyTile.png (deferred — pick origin/destination biome tiles at runtime)
@@ -840,15 +838,10 @@ public final class GameConstants {
     public static final int MILITARY_BASELINE_ATTACK = 10;
     public static final int MILITARY_BASELINE_DEFENSE = 5;
     public static final int MILITARY_BASELINE_ATTACK_SPEED = 1;
-    /** At this power ratio (stronger:weaker), military reputation/loyalty delta reaches max. */
     public static final float MILITARY_STRENGTH_RATIO_MAX = 11f;
-    /** Max +/- reputation or loyalty adjustment from military strength gap. */
     public static final int MILITARY_STRENGTH_DELTA_MAX = 10;
-    /** Hex tiles from capital with no distance loyalty penalty (neighbors). */
     public static final int LOYALTY_CAPITAL_DISTANCE_NEUTRAL = 1;
-    /** Hex tiles from capital at which distance loyalty penalty reaches max. */
     public static final int LOYALTY_CAPITAL_DISTANCE_MAX = 10;
-    /** Max loyalty penalty from distance to capital (negative). */
     public static final int LOYALTY_CAPITAL_DISTANCE_PENALTY_MAX = 10;
 
     public static int getCapitalDistanceLoyaltyPenalty(int hexDistance) {
@@ -886,7 +879,7 @@ public final class GameConstants {
         5, LanguageStrings.LOYALTY_MILITANT, 80, loadIcon("icons/loyalty/Militant.png"));
     static { colonyLoyalties.add(LOYALTY_MILITANT); }
 
-    // --- Colony loyalty modifiers (applied while condition is active) ---
+    // --- Colony loyalty modifiers ---
     public static final ColonyLoyaltyModifier LOYALTY_MODIFIER_TRADE = new ColonyLoyaltyModifier(
         1, LanguageStrings.LOYALTY_MODIFIER_TRADE, 10, 0, null);
     static { colonyLoyaltyModifiers.add(LOYALTY_MODIFIER_TRADE); }
@@ -906,32 +899,20 @@ public final class GameConstants {
     public static final int WAR_PACT_BREAK_COOLDOWN_MONTHS = 6;
     public static final int DIPLO_DECLINED_REQUEST_COOLDOWN_MONTHS = 1;
     public static final int WAR_DECLARATION_MIN_POPULATION = 1000;
-    /** Military power ratio required to count as winning or losing a war. */
     public static final float WAR_STANDING_MILITARY_RATIO = 1.15f;
     public static final double AI_ACCEPT_PEACE_CHANCE = 0.85;
     public static final double AI_DECLARE_WAR_CHANCE = 0.12;
-    /** AI will not declare war on a dynasty more than this many times stronger. */
     public static final float AI_DECLARE_WAR_MAX_TARGET_STRENGTH_RATIO = 2f;
-    /** Stronger:weaker power ratio treated as guaranteed victory in a war battle tick. */
     public static final float WAR_BATTLE_RATIO_MAX = 10f;
-    /** Win chance at equal power; rises to 1 at {@link #WAR_BATTLE_RATIO_MAX}. */
     public static final float WAR_BATTLE_WIN_CHANCE_AT_PARITY = 0.5f;
-    /** Fraction of the loser's pool lost per battle tick at equal power. */
-    public static final float WAR_BATTLE_LOSS_FRACTION_AT_PARITY = 0.01f;
-    /** Fraction of the winner's pool lost per battle tick at max ratio. */
-    public static final float WAR_BATTLE_WINNER_LOSS_FRACTION_MAX = 0.05f;
-    /** Daily increment to within-stage progress when battles continue. */
-    public static final float WAR_STAGE_PROGRESS_PER_DAY = 0.05f;
+    public static final float WAR_BATTLE_LOSS_FRACTION_AT_PARITY = 0.006f;
+    public static final float WAR_BATTLE_WINNER_LOSS_FRACTION_MAX = 0.035f;
+    public static final float WAR_STAGE_PROGRESS_PER_DAY = 0.035f;
     public static final float WAR_STAGE_PROGRESS_PER_HOUR = WAR_STAGE_PROGRESS_PER_DAY / 24f;
-    /** Full in-game hours between war stages for redeployment (one day). */
     public static final int WAR_REDEPLOY_HOURS = 24;
-    /** AI only considers fallback below this active:opponent ratio (never when ahead). */
     public static final float WAR_AI_FALLBACK_MAX_POWER_RATIO = 1f;
-    /** AI must retain at least this fraction of stage-start active power to consider fallback. */
     public static final float WAR_AI_FALLBACK_RECOVERY_RATIO = 0.75f;
-    /** Minimum recovered active military before AI may forfeit a spare hex. */
     public static final int WAR_AI_FALLBACK_MIN_ACTIVE = 500;
-    /** Minimum non-capital colonies required before AI treats a hex as expendable. */
     public static final int WAR_AI_FALLBACK_MIN_SPARE_COLONIES = 3;
     public static final double AI_WAR_FALLBACK_CHANCE = 0.06;
 
@@ -960,9 +941,7 @@ public final class GameConstants {
     public static final int CREATINE_DIET_DURATION_MONTHS = 6;
     public static final float CREATINE_DIET_SPEED_MULTIPLIER = 2f;
     public static final int DIPLOMAT_MAX_PER_DYNASTY_MISSION = 5;
-    /** Max princess diplomats assignable to one colony loyalty mission. */
     public static final int DIPLOMAT_MAX_PER_COLONY_MISSION = 3;
-    /** Base stability gain per diplomat per mission. */
     public static final int DIPLOMAT_STABILITY_GAIN_BASE = 1;
     public static final int DIPLOMAT_STABILITY_GAIN_PRESSURE_2 = 3;
     public static final int DIPLOMAT_STABILITY_GAIN_PRESSURE_3 = 5;
@@ -1198,7 +1177,6 @@ public final class GameConstants {
         return level;
     }
 
-    /** True when effective loyalty is Disloyal or better (not Rebellious). */
     public static boolean allowsDiplomatMissionToColony(int effectiveLoyalty) {
         return getColonyLoyaltyLevel(effectiveLoyalty) != LOYALTY_REBELLIOUS;
     }

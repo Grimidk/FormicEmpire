@@ -6,7 +6,6 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
@@ -579,34 +578,49 @@ public class ColonyLabourService {
     }
 
     public void runNuptial(Colony colony, World world, Hex currentHex) {
-        if (!colony.hasUpgrade(GameUnlocks.TYPE_PRINCESS)) return;
+        if (!colony.hasUpgrade(GameUnlocks.TYPE_PRINCESS)) {
+            return;
+        }
 
-        List<Ant> allDrones = new ArrayList<>(colony.getDrones());
-        List<Ant> breederPrincesses = colony.getPrincesses().stream()
-            .filter(p -> p.getRole() == GameConstants.ROLE_BREEDER)
-            .collect(Collectors.toList());
+        colony.runRoleAssignment(null);
 
-        if (allDrones.isEmpty() || breederPrincesses.isEmpty()) return;
-        
-        allDrones.forEach(d -> d.setNuptial(true));
-        breederPrincesses.forEach(p -> p.setNuptial(true));
+        List<Ant> allDrones = collectAvailableDrones(colony);
+        List<Ant> breederPrincesses = collectBreederPrincesses(colony);
+        if (allDrones.isEmpty() || breederPrincesses.isEmpty()) {
+            return;
+        }
 
         int potentialQueens = Math.min(allDrones.size(), breederPrincesses.size());
         int currentQueens = colony.getQueens().size();
         int maxQueens = colony.getStatsService().getQueensCapacity(colony);
         int spaceAvailable = maxQueens - currentQueens;
         int queensToAdd = 0;
-        int queensLeaving = potentialQueens;
+        int queensLeaving = 0;
+        boolean queenless = currentQueens == 0;
 
         if (spaceAvailable > 0) {
             queensToAdd = Math.min(spaceAvailable, potentialQueens);
-            queensLeaving = potentialQueens - queensToAdd;
+            if (!queenless) {
+                queensLeaving = potentialQueens - queensToAdd;
+            }
+        } else if (!queenless) {
+            queensLeaving = potentialQueens;
+        }
+
+        if (queenless && queensToAdd <= 0) {
+            return;
+        }
+
+        int pairsToFly = queenless ? queensToAdd : potentialQueens;
+        for (int i = 0; i < pairsToFly; i++) {
+            allDrones.get(i).setNuptial(true);
+            breederPrincesses.get(i).setNuptial(true);
         }
 
         for (int i = 0; i < queensToAdd; i++) {
             Ant newQueen = new Ant(colony, GameConstants.TYPE_QUEEN);
-            newQueen.setDimension(WorldSpaces.UNDERWORLD); 
-            
+            newQueen.setDimension(WorldSpaces.UNDERWORLD);
+
             Rectangle royal = colony.getPhysicsService().getRoomBounds(colony, WorldSpaces.ROYAL_CHAMBER);
             if (royal != null) {
                 newQueen.setPosition(colony.getPhysicsService().getSpecificRoomPoint(colony, royal));
@@ -615,16 +629,69 @@ public class ColonyLabourService {
             colony.getQueens().add(newQueen);
         }
 
+        if (queensToAdd > 0) {
+            colony.setDaysWithoutQueen(0);
+        }
+
         colony.logEvent(ColonyLogPrefixes.NUPTIAL + " "
             + String.format(LanguageStrings.get(LanguageStrings.LOG_NUPTIAL_QUEENS_FMT), queensToAdd));
-        
+
         if (colony.getDynasty() != null) {
             colony.getDynasty().incrementNuptialFlights();
         }
-        
+
         if (queensLeaving > 0) {
             runSpreading(colony, queensLeaving, world, currentHex);
         }
+    }
+
+    public static boolean meetsNuptialRequirements(Colony colony) {
+        if (colony == null || !colony.hasUpgrade(GameUnlocks.TYPE_PRINCESS)) {
+            return false;
+        }
+        colony.runRoleAssignment(null);
+        return !collectAvailableDrones(colony).isEmpty()
+                && !collectBreederPrincesses(colony).isEmpty();
+    }
+
+    private static List<Ant> collectAvailableDrones(Colony colony) {
+        List<Ant> drones = new ArrayList<>();
+        for (Ant drone : colony.getDrones()) {
+            if (!drone.isOnTrade() && !drone.isNuptial()) {
+                drones.add(drone);
+            }
+        }
+        return drones;
+    }
+
+    private static List<Ant> collectBreederPrincesses(Colony colony) {
+        List<Ant> breeders = new ArrayList<>();
+        for (Ant princess : colony.getPrincesses()) {
+            if (princess.getRole() == GameConstants.ROLE_BREEDER
+                    && !princess.isOnTrade() && !princess.isNuptial()) {
+                breeders.add(princess);
+            }
+        }
+        if (!breeders.isEmpty()) {
+            return breeders;
+        }
+
+        int quota = colony.getAssignedRoleCount(GameConstants.ROLE_BREEDER);
+        if (quota <= 0 || !colony.hasUpgrade(GameUnlocks.ROLE_BREEDER)) {
+            return breeders;
+        }
+
+        for (Ant princess : colony.getPrincesses()) {
+            if (princess.isOnTrade() || princess.isNuptial()) {
+                continue;
+            }
+            princess.setRole(GameConstants.ROLE_BREEDER);
+            breeders.add(princess);
+            if (breeders.size() >= quota) {
+                break;
+            }
+        }
+        return breeders;
     }
 
     /**

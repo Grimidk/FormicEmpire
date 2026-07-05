@@ -8,11 +8,12 @@ import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.interfaces.HelpPanel;
 import com.grimidk.formicempire.classes.interfaces.MainFrame;
 
-import javax.swing.*;
+import java.util.function.BooleanSupplier;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import javax.swing.*;
 
 public class ControlPanel extends ZeroGamePanel {
 
@@ -33,6 +34,7 @@ public class ControlPanel extends ZeroGamePanel {
     private final Runnable showDiplomacyDialogCallback;
     private final Runnable showWarDialogCallback;
     private final Runnable showSettingsDialogCallback;
+    private final BooleanSupplier dynastyDialogOpenCheck;
 
     // --- UI Components ---
     private final JButton speedUpButton = new JButton(LanguageStrings.get(LanguageStrings.UI_SPEED_UP));
@@ -41,6 +43,8 @@ public class ControlPanel extends ZeroGamePanel {
     private final JButton playPauseButton = new JButton();
     private final JButton menuButton = new JButton(LanguageStrings.get(LanguageStrings.UI_MENU));
     private final JPopupMenu gameMenu = new JPopupMenu();
+    private JMenu colonyMenu;
+    private JMenu dynastyMenu;
     
     private JMenuItem backToGame;
     private JMenuItem toggleView;
@@ -55,6 +59,7 @@ public class ControlPanel extends ZeroGamePanel {
     private JMenuItem manageAbilities;
     private JMenuItem manageDynasty;
     private JMenuItem manageTrade;
+    private JMenuItem manageDiplomacy;
     private JMenuItem manageWars;
     private JMenuItem openSettings;
     private JMenuItem showTutorial;
@@ -82,7 +87,8 @@ public class ControlPanel extends ZeroGamePanel {
                         Runnable showTradeDialogCallback,
                         Runnable showDiplomacyDialogCallback,
                         Runnable showWarDialogCallback,
-                        Runnable showSettingsDialogCallback) {
+                        Runnable showSettingsDialogCallback,
+                        BooleanSupplier dynastyDialogOpenCheck) {
         super(new FlowLayout(FlowLayout.RIGHT));
         
         this.frame = frame;
@@ -102,6 +108,7 @@ public class ControlPanel extends ZeroGamePanel {
         this.showDiplomacyDialogCallback = showDiplomacyDialogCallback;
         this.showWarDialogCallback = showWarDialogCallback;
         this.showSettingsDialogCallback = showSettingsDialogCallback;
+        this.dynastyDialogOpenCheck = dynastyDialogOpenCheck;
 
         initComponents();
         initLayout();        
@@ -141,6 +148,7 @@ public class ControlPanel extends ZeroGamePanel {
         manageAbilities = new JMenuItem();
         manageDynasty = new JMenuItem();
         manageTrade = new JMenuItem();
+        manageDiplomacy = new JMenuItem();
         manageWars = new JMenuItem();
         openSettings = new JMenuItem();
         showTutorial = new JMenuItem();
@@ -181,6 +189,7 @@ public class ControlPanel extends ZeroGamePanel {
         manageAbilities.setText(LanguageStrings.get(LanguageStrings.MENU_ABILITIES));
         manageDynasty.setText(LanguageStrings.get(LanguageStrings.MENU_DYNASTY));
         manageTrade.setText(LanguageStrings.get(LanguageStrings.MENU_TRADE));
+        manageDiplomacy.setText(LanguageStrings.get(LanguageStrings.MENU_DIPLOMACY));
         manageWars.setText(LanguageStrings.get(LanguageStrings.MENU_WARS));
         openSettings.setText(LanguageStrings.get(LanguageStrings.UI_SETTINGS));
         showTutorial.setText(LanguageStrings.get(LanguageStrings.UI_TUTORIAL));
@@ -195,10 +204,41 @@ public class ControlPanel extends ZeroGamePanel {
         gameMenu.setBackground(AssetStyles.BACKGROUND_COLOR);
         gameMenu.setForeground(AssetStyles.FONT_COLOR);
         for (Component component : gameMenu.getComponents()) {
-            if (component instanceof JMenuItem menuItem) {
-                AssetStyles.styleMenuItem(menuItem);
+            styleMenuComponent(component);
+        }
+    }
+
+    private void styleMenuComponent(Component component) {
+        if (component instanceof JMenu menu) {
+            menu.setBackground(AssetStyles.BACKGROUND_COLOR);
+            menu.setForeground(AssetStyles.FONT_COLOR);
+            for (Component child : menu.getMenuComponents()) {
+                styleMenuComponent(child);
+            }
+        } else if (component instanceof JMenuItem menuItem) {
+            AssetStyles.styleMenuItem(menuItem);
+        }
+    }
+
+    private JMenu createSubmenu(String titleKey) {
+        JMenu menu = new JMenu(LanguageStrings.get(titleKey));
+        menu.setBackground(AssetStyles.BACKGROUND_COLOR);
+        menu.setForeground(AssetStyles.FONT_COLOR);
+        return menu;
+    }
+
+    private void refreshSubmenuVisibility(JMenu submenu) {
+        if (submenu == null) {
+            return;
+        }
+        boolean anyVisible = false;
+        for (Component child : submenu.getMenuComponents()) {
+            if (child.isVisible()) {
+                anyVisible = true;
+                break;
             }
         }
+        submenu.setVisible(anyVisible);
     }
     
     private void updatePlayPauseButton() {
@@ -271,6 +311,9 @@ public class ControlPanel extends ZeroGamePanel {
         manageTrade.addActionListener(e -> showTradeDialogCallback.run());
         manageTrade.setVisible(false);
 
+        manageDiplomacy.addActionListener(e -> showDiplomacyDialogCallback.run());
+        manageDiplomacy.setVisible(false);
+
         manageWars.addActionListener(e -> showWarDialogCallback.run());
         manageWars.setVisible(false);
         
@@ -288,16 +331,24 @@ public class ControlPanel extends ZeroGamePanel {
         gameMenu.add(toggleView);
         gameMenu.add(showMap);
         gameMenu.add(showStats);
-        gameMenu.add(manageRoles);
-        gameMenu.add(manageHatchRates);
-        gameMenu.add(manageResearch);
-        gameMenu.add(manageBuilding);
-        gameMenu.add(manageAssimilation);
-        gameMenu.add(manageSynergy);
-        gameMenu.add(manageAbilities);
-        gameMenu.add(manageDynasty);
-        gameMenu.add(manageTrade);
-        gameMenu.add(manageWars);
+
+        colonyMenu = createSubmenu(LanguageStrings.MENU_GROUP_COLONY);
+        colonyMenu.add(manageRoles);
+        colonyMenu.add(manageHatchRates);
+        colonyMenu.add(manageResearch);
+        colonyMenu.add(manageBuilding);
+        colonyMenu.add(manageAssimilation);
+        colonyMenu.add(manageSynergy);
+        colonyMenu.add(manageAbilities);
+        gameMenu.add(colonyMenu);
+
+        dynastyMenu = createSubmenu(LanguageStrings.MENU_GROUP_DYNASTY);
+        dynastyMenu.add(manageDynasty);
+        dynastyMenu.add(manageTrade);
+        dynastyMenu.add(manageDiplomacy);
+        dynastyMenu.add(manageWars);
+        gameMenu.add(dynastyMenu);
+
         gameMenu.add(openSettings);
         gameMenu.add(showTutorial);
         gameMenu.add(showRoadmap);
@@ -307,9 +358,7 @@ public class ControlPanel extends ZeroGamePanel {
         gameMenu.setBackground(AssetStyles.BACKGROUND_COLOR);
         gameMenu.setForeground(AssetStyles.FONT_COLOR);
         for (Component component : gameMenu.getComponents()) {
-            if (component instanceof JMenuItem menuItem) {
-                AssetStyles.styleMenuItem(menuItem);
-            }
+            styleMenuComponent(component);
         }
 
         menuButton.addActionListener(e -> {
@@ -489,7 +538,8 @@ public class ControlPanel extends ZeroGamePanel {
         actionMap.put("openWars", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (manageWars.isVisible()) {
+                if ((dynastyDialogOpenCheck != null && dynastyDialogOpenCheck.getAsBoolean())
+                        || manageWars.isVisible()) {
                     showWarDialogCallback.run();
                 }
             }
@@ -543,47 +593,58 @@ public class ControlPanel extends ZeroGamePanel {
         if (manageResearch != null) {
             manageResearch.setVisible(visible);
         }
+        refreshSubmenuVisibility(colonyMenu);
     }
     
     public void updateBuildMenu(boolean visible) {
         if (manageBuilding != null) {
             manageBuilding.setVisible(visible);
         }
+        refreshSubmenuVisibility(colonyMenu);
     }
 
     public void updateAssimilationMenu(boolean visible) {
         if (manageAssimilation != null) {
             manageAssimilation.setVisible(visible);
         }
+        refreshSubmenuVisibility(colonyMenu);
     }
 
     public void updateSynergyMenu(boolean visible) {
         if (manageSynergy != null) {
             manageSynergy.setVisible(visible);
         }
+        refreshSubmenuVisibility(colonyMenu);
     }
     
     public void updateAbilitiesMenu(boolean visible) {
         if (manageAbilities != null) {
             manageAbilities.setVisible(visible);
         }
+        refreshSubmenuVisibility(colonyMenu);
     }
 
     public void updateDynastyMenu(boolean visible) {
         if (manageDynasty != null) {
             manageDynasty.setVisible(visible);
         }
+        if (manageDiplomacy != null) {
+            manageDiplomacy.setVisible(visible);
+        }
+        refreshSubmenuVisibility(dynastyMenu);
     }
 
     public void updateTradeMenu(boolean visible) {
         if (manageTrade != null) {
             manageTrade.setVisible(visible);
         }
+        refreshSubmenuVisibility(dynastyMenu);
     }
 
     public void updateWarsMenu(boolean visible) {
         if (manageWars != null) {
             manageWars.setVisible(visible);
         }
+        refreshSubmenuVisibility(dynastyMenu);
     }
 }

@@ -56,6 +56,16 @@ public final class ColonyMilitaryService {
         return (hpFactor + atkFactor + defFactor + spdFactor) / 4f;
     }
 
+    /** Floor for battle view scaling when combat upgrades are missing. */
+    public static float effectiveStatMultiplier(Colony colony) {
+        return Math.max(0.01f, computeStatMultiplier(colony));
+    }
+
+    /** War campaign power uses a higher floor so stages are not resolved in a single hour. */
+    public static float warStandingStatMultiplier(Colony colony) {
+        return Math.max(0.35f, computeStatMultiplier(colony));
+    }
+
     /**
      * Maps stronger:weaker military power ratio to a delta in {@code [0, MILITARY_STRENGTH_DELTA_MAX]}.
      * Ratio {@code <= 1} yields 0; ratio {@code >= MILITARY_STRENGTH_RATIO_MAX} yields max delta.
@@ -172,7 +182,7 @@ public final class ColonyMilitaryService {
                 points += count * GameConstants.getActiveMilitaryRoleWeight(role);
             }
         }
-        return Math.round(points * computeStatMultiplier(colony));
+        return Math.round(points * warStandingStatMultiplier(colony));
     }
 
     public static int computeReserveMilitaryPower(Colony colony) {
@@ -200,7 +210,7 @@ public final class ColonyMilitaryService {
         int reserveMajors = Math.max(0, majors - activeMajors);
 
         int points = computeTypePoints(reserveWorkers, reserveSoldiers, reserveMajors, princesses, queens);
-        return Math.round(points * computeStatMultiplier(colony));
+        return Math.round(points * warStandingStatMultiplier(colony));
     }
 
     /** Recompute from persisted colony counts and dynasty combat upgrades (for saves / inactive colonies). */

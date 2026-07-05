@@ -379,7 +379,7 @@ public class HelpPanel extends JPanel {
         row.add("P", LanguageStrings.get("HOTKEY_P"));
         row.add("Y / U / I / O", LanguageStrings.get("HOTKEY_UPGRADES"));
         row.add("Z", LanguageStrings.get("HOTKEY_Z"));
-        row.add("S / A", LanguageStrings.get("HOTKEY_DYNASTY"));
+        row.add("S / A / D / F", LanguageStrings.get("HOTKEY_DYNASTY"));
         row.add("M", LanguageStrings.get("HOTKEY_M"));
         row.add("X", LanguageStrings.get("HOTKEY_X"));
 
@@ -1089,7 +1089,7 @@ public class HelpPanel extends JPanel {
             {LanguageStrings.get("HOTKEY_ROLES_LABEL"), "Q-T"},
             {LanguageStrings.get("HOTKEY_UPGRADES_LABEL"), "Y-O"},
             {LanguageStrings.get("HOTKEY_P_LABEL"), "P"},
-            {LanguageStrings.get("HOTKEY_DYNASTY_LABEL"), "S / A"},
+            {LanguageStrings.get("HOTKEY_DYNASTY_LABEL"), "A / S / D / F"},
             {LanguageStrings.get("HOTKEY_M_LABEL"), "M"},
             {LanguageStrings.get("HOTKEY_X_LABEL"), "X"}
         };

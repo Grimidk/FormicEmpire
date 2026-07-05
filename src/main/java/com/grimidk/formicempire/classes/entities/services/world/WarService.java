@@ -179,21 +179,43 @@ public class WarService {
     }
 
     public void pruneInvalidWars() {
-        List<War> toRemove = new ArrayList<>();
+        List<War> toArchive = new ArrayList<>();
         for (War war : activeWars) {
             Dynasty dynastyA = world.findDynastyById(war.getDynastyIdA());
             Dynasty dynastyB = world.findDynastyById(war.getDynastyIdB());
             if (dynastyA == null || dynastyB == null || dynastyA.isDefeated() || dynastyB.isDefeated()) {
-                toRemove.add(war);
+                toArchive.add(war);
                 continue;
             }
             if (!dynastyA.getDiplomacyService().isAtWarWith(dynastyB)) {
-                toRemove.add(war);
+                toArchive.add(war);
             }
         }
-        for (War war : toRemove) {
-            activeWars.remove(war);
+        for (War war : toArchive) {
+            if (!activeWars.remove(war) || !war.isActive()) {
+                continue;
+            }
+            int winnerId = resolveArchiveWinnerId(war);
+            String conclusion = winnerId > 0
+                    ? LanguageStrings.WAR_CONCLUSION_DEFEAT
+                    : LanguageStrings.WAR_CONCLUSION_UNKNOWN;
+            war.conclude(DynastyDiplomacyService.worldMonthIndex(world), winnerId, conclusion);
+            historicWars.add(war);
         }
+    }
+
+    private int resolveArchiveWinnerId(War war) {
+        Dynasty dynastyA = world.findDynastyById(war.getDynastyIdA());
+        Dynasty dynastyB = world.findDynastyById(war.getDynastyIdB());
+        if (dynastyA != null && !dynastyA.isDefeated()
+                && (dynastyB == null || dynastyB.isDefeated())) {
+            return dynastyA.getId();
+        }
+        if (dynastyB != null && !dynastyB.isDefeated()
+                && (dynastyA == null || dynastyA.isDefeated())) {
+            return dynastyB.getId();
+        }
+        return 0;
     }
 
     public void syncFromDynasties() {
@@ -285,7 +307,9 @@ public class WarService {
     }
 
     public List<War> getHistoricWars() {
-        return new ArrayList<>(historicWars);
+        List<War> wars = new ArrayList<>(historicWars);
+        wars.sort(Comparator.comparingInt(War::getEndedWorldMonth).reversed());
+        return wars;
     }
 
     public List<War> getWarsForDynasty(int dynastyId) {
