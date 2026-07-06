@@ -1,0 +1,58 @@
+package com.grimidk.formicempire.classes.entities.services.dynasty;
+
+import com.grimidk.formicempire.classes.constants.unlocks.Synergy;
+import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
+import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
+
+public final class DynastySynergyService {
+
+    private DynastySynergyService() {
+    }
+
+    public static boolean isUnlocked(Dynasty dynasty, Synergy synergy) {
+        return dynasty != null && synergy != null && dynasty.hasUpgrade(synergy.getReward());
+    }
+
+    public static boolean hasAnyUnlocked(Dynasty dynasty) {
+        if (dynasty == null) {
+            return false;
+        }
+        for (Synergy synergy : GameUnlocks.getSynergies()) {
+            if (isUnlocked(dynasty, synergy)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Grants synergy reward upgrades when both requirements are owned and {@link GameUnlocks#ABILITY_SYNERGY} is researched. */
+    public static void refreshUnlocked(Dynasty dynasty) {
+        if (dynasty == null || !dynasty.hasUpgrade(GameUnlocks.ABILITY_SYNERGY)) {
+            return;
+        }
+        for (Synergy synergy : GameUnlocks.getSynergies()) {
+            if (isUnlocked(dynasty, synergy)) {
+                continue;
+            }
+            Upgrade first = synergy.getRequirement1();
+            Upgrade second = synergy.getRequirement2();
+            Upgrade reward = synergy.getReward();
+            if (first == null || second == null || reward == null) {
+                continue;
+            }
+            if (dynasty.hasUpgrade(first) && dynasty.hasUpgrade(second)) {
+                dynasty.unlockUpgrade(reward);
+            }
+        }
+    }
+
+    public static void refreshAll(Iterable<Dynasty> dynasties) {
+        if (dynasties == null) {
+            return;
+        }
+        for (Dynasty dynasty : dynasties) {
+            refreshUnlocked(dynasty);
+        }
+    }
+}

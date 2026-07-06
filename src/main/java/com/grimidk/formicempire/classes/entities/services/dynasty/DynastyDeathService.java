@@ -66,18 +66,9 @@ public class DynastyDeathService {
                 }
                 
                 if (capitalDied) {
-                    Colony newCapital = null;
-                    int maxAnts = -1;
-                    
-                    for (Colony c : dynasty.getColonies()) {
-                        if (c.getAntTotal() > maxAnts) {
-                            maxAnts = c.getAntTotal();
-                            newCapital = c;
-                        }
-                    }
-                    
+                    dynasty.promoteNewCapital();
+                    Colony newCapital = dynasty.getCapital();
                     if (newCapital != null) {
-                        newCapital.setCapital(true);
                         newCapital.logEvent(ColonyLogPrefixes.PROMOTION + " "
                             + String.format(LanguageStrings.get(LanguageStrings.LOG_PROMOTION_CAPITAL_FMT),
                                 dynasty.getName()));

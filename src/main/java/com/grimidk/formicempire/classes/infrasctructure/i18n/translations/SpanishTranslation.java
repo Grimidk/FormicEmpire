@@ -170,6 +170,10 @@ public class SpanishTranslation implements Translation {
         es.put("ASSIMILATION_PROGRESS", "%s / %s ( %s%% )");
         es.put("ASSIMILATION_INFO", "Asigna Investigadoras para contribuir a la asimilación genética.");
         es.put("SYNERGY_COMING_SOON", "Sinergias - Próximamente");
+        es.put("SYNERGY_REQUIREMENTS_FMT", "Combina: %s + %s");
+        es.put("SYNERGY_SUPER_VENOM", "Súper Veneno");
+        es.put("SYNERGY_SUPER_VENOM_FLAVOR", "Súper Veneno");
+        es.put("SYNERGY_SUPER_VENOM_DESC", "El multiplicador de daño de la colonia pasa a 16x en lugar de 4+4 cuando el veneno de fuego y el de cosechador están asimilados. El veneno punzante sigue sumando +4 (20x con los tres).");
 
         es.put("DIALOG_HATCH_RATES_TITLE", "Gestionar Tasas de Eclosión");
         es.put("HATCH_DESC", "Establecer probabilidad de eclosión:");

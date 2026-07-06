@@ -170,6 +170,10 @@ public class FrenchTranslation implements Translation {
         fr.put("ASSIMILATION_PROGRESS", "%s / %s ( %s%% )");
         fr.put("ASSIMILATION_INFO", "Assignez des chercheuses pour contribuer à l'assimilation génétique.");
         fr.put("SYNERGY_COMING_SOON", "Synergies - Bientôt");
+        fr.put("SYNERGY_REQUIREMENTS_FMT", "Combine : %s + %s");
+        fr.put("SYNERGY_SUPER_VENOM", "Super Venin");
+        fr.put("SYNERGY_SUPER_VENOM_FLAVOR", "Super Venin");
+        fr.put("SYNERGY_SUPER_VENOM_DESC", "Le multiplicateur de dégâts de la colonie passe à 16x au lieu de 4+4 lorsque le venin de feu et le venin moissonneur sont assimilés. Le venin piquant ajoute encore +4 (20x avec les trois).");
 
         fr.put("DIALOG_HATCH_RATES_TITLE", "Taux d'éclosion des nymphes");
         fr.put("HATCH_DESC", "Probabilité d'éclosion pour les nouvelles fourmis :");

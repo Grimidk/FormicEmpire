@@ -311,6 +311,10 @@ public final class LanguageStrings {
     public static final String ASSIMILATION_PROGRESS = "ASSIMILATION_PROGRESS";
     public static final String ASSIMILATION_INFO = "ASSIMILATION_INFO";
     public static final String SYNERGY_COMING_SOON = "SYNERGY_COMING_SOON";
+    public static final String SYNERGY_REQUIREMENTS_FMT = "SYNERGY_REQUIREMENTS_FMT";
+    public static final String SYNERGY_SUPER_VENOM = "SYNERGY_SUPER_VENOM";
+    public static final String SYNERGY_SUPER_VENOM_FLAVOR = "SYNERGY_SUPER_VENOM_FLAVOR";
+    public static final String SYNERGY_SUPER_VENOM_DESC = "SYNERGY_SUPER_VENOM_DESC";
 
     public static final String DIALOG_HATCH_RATES_TITLE = "DIALOG_HATCH_RATES_TITLE";
     public static final String HATCH_DESC = "HATCH_DESC";

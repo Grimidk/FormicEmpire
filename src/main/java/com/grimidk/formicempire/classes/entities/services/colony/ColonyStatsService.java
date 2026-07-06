@@ -207,9 +207,10 @@ public class ColonyStatsService {
         boolean fire = dynasty.hasUpgrade(GameUnlocks.ASSIMILATED_FIREVENOM);
         boolean stinging = dynasty.hasUpgrade(GameUnlocks.ASSIMILATED_STINGING);
         boolean deadly = dynasty.hasUpgrade(GameUnlocks.ASSIMILATED_DEADLYVENOM);
+        boolean superVenom = dynasty.hasUpgrade(GameUnlocks.SYNERGY_SUPER_VENOM);
 
         float mult;
-        if (fire && deadly) {
+        if (superVenom || (fire && deadly)) {
             mult = GameConstants.ASSIMILATED_DAMAGE_SYNERGY_FIRE_DEADLY;
         } else {
             mult = 1f;

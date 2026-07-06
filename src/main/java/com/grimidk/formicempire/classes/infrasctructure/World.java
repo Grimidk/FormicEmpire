@@ -26,6 +26,7 @@ import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryS
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyStarterService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDeathService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyNamingService;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastySynergyService;
 import com.grimidk.formicempire.classes.entities.services.world.WarService;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
@@ -777,8 +778,13 @@ public class World {
                 if (d != null && d.getCapital() == null) {
                     d.resolveCapitalFromColonies();
                 }
+                if (d != null) {
+                    d.reconcileCapital();
+                }
             }
         }
+
+        DynastySynergyService.refreshAll(this.dynastys);
 
         reapplyRoleAssignmentsAfterLoad();
         bindDynastyTradeServices();

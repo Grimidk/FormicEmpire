@@ -23,7 +23,6 @@ public class ControlPanel extends ZeroGamePanel {
     private final Runnable showResearchDialogCallback;
     private final Runnable showBuildDialogCallback;
     private final Runnable showAssimilationDialogCallback;
-    private final Runnable showSynergyDialogCallback;
     private final RoleManagementCallback showRoleManagementDialogCallback;
     private final Runnable showAbilitiesDialogCallback;
     private final Runnable showStatsDialogCallback; 
@@ -55,7 +54,6 @@ public class ControlPanel extends ZeroGamePanel {
     private JMenuItem manageResearch;
     private JMenuItem manageBuilding;
     private JMenuItem manageAssimilation;
-    private JMenuItem manageSynergy;
     private JMenuItem manageAbilities;
     private JMenuItem manageDynasty;
     private JMenuItem manageTrade;
@@ -77,7 +75,6 @@ public class ControlPanel extends ZeroGamePanel {
                         Runnable showResearchDialogCallback, 
                         Runnable showBuildDialogCallback,
                         Runnable showAssimilationDialogCallback,
-                        Runnable showSynergyDialogCallback,
                         RoleManagementCallback showRoleManagementDialogCallback,
                         Runnable showAbilitiesDialogCallback,
                         Runnable showStatsDialogCallback,
@@ -97,7 +94,6 @@ public class ControlPanel extends ZeroGamePanel {
         this.showResearchDialogCallback = showResearchDialogCallback;
         this.showBuildDialogCallback = showBuildDialogCallback;
         this.showAssimilationDialogCallback = showAssimilationDialogCallback;
-        this.showSynergyDialogCallback = showSynergyDialogCallback;
         this.showRoleManagementDialogCallback = showRoleManagementDialogCallback;
         this.showAbilitiesDialogCallback = showAbilitiesDialogCallback;
         this.showStatsDialogCallback = showStatsDialogCallback;
@@ -144,7 +140,6 @@ public class ControlPanel extends ZeroGamePanel {
         manageResearch = new JMenuItem();
         manageBuilding = new JMenuItem();
         manageAssimilation = new JMenuItem();
-        manageSynergy = new JMenuItem();
         manageAbilities = new JMenuItem();
         manageDynasty = new JMenuItem();
         manageTrade = new JMenuItem();
@@ -185,7 +180,6 @@ public class ControlPanel extends ZeroGamePanel {
         manageResearch.setText(LanguageStrings.get(LanguageStrings.MENU_RESEARCH));
         manageBuilding.setText(LanguageStrings.get(LanguageStrings.MENU_BUILD));
         manageAssimilation.setText(LanguageStrings.get(LanguageStrings.MENU_ASSIMILATION));
-        manageSynergy.setText(LanguageStrings.get(LanguageStrings.MENU_SYNERGY));
         manageAbilities.setText(LanguageStrings.get(LanguageStrings.MENU_ABILITIES));
         manageDynasty.setText(LanguageStrings.get(LanguageStrings.MENU_DYNASTY));
         manageTrade.setText(LanguageStrings.get(LanguageStrings.MENU_TRADE));
@@ -299,9 +293,6 @@ public class ControlPanel extends ZeroGamePanel {
         manageAssimilation.addActionListener(e -> showAssimilationDialogCallback.run());
         manageAssimilation.setVisible(false);
 
-        manageSynergy.addActionListener(e -> showSynergyDialogCallback.run());
-        manageSynergy.setVisible(false);
-        
         manageAbilities.addActionListener(e -> showAbilitiesDialogCallback.run());
         manageAbilities.setVisible(false);
 
@@ -338,7 +329,6 @@ public class ControlPanel extends ZeroGamePanel {
         colonyMenu.add(manageResearch);
         colonyMenu.add(manageBuilding);
         colonyMenu.add(manageAssimilation);
-        colonyMenu.add(manageSynergy);
         colonyMenu.add(manageAbilities);
         gameMenu.add(colonyMenu);
 
@@ -464,16 +454,6 @@ public class ControlPanel extends ZeroGamePanel {
             public void actionPerformed(ActionEvent e) {
                 if (manageAssimilation.isVisible()) {
                     showAssimilationDialogCallback.run();
-                }
-            }
-        });
-
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_O, 0), "openSynergy");
-        actionMap.put("openSynergy", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (manageSynergy.isVisible()) {
-                    showSynergyDialogCallback.run();
                 }
             }
         });
@@ -606,13 +586,6 @@ public class ControlPanel extends ZeroGamePanel {
     public void updateAssimilationMenu(boolean visible) {
         if (manageAssimilation != null) {
             manageAssimilation.setVisible(visible);
-        }
-        refreshSubmenuVisibility(colonyMenu);
-    }
-
-    public void updateSynergyMenu(boolean visible) {
-        if (manageSynergy != null) {
-            manageSynergy.setVisible(visible);
         }
         refreshSubmenuVisibility(colonyMenu);
     }

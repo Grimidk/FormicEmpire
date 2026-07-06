@@ -170,6 +170,10 @@ public class EnglishTranslation implements Translation {
         en.put("ASSIMILATION_PROGRESS", "%s / %s ( %s%% )");
         en.put("ASSIMILATION_INFO", "Assign Researchers to contribute to genetic assimilation.");
         en.put("SYNERGY_COMING_SOON", "Synergies - Coming Soon");
+        en.put("SYNERGY_REQUIREMENTS_FMT", "Combines: %s + %s");
+        en.put("SYNERGY_SUPER_VENOM", "Super Venom");
+        en.put("SYNERGY_SUPER_VENOM_FLAVOR", "Super Venom");
+        en.put("SYNERGY_SUPER_VENOM_DESC", "Colony damage multiplier becomes 16x instead of 4+4 when Fire venom and Harvester venom are both assimilated. Stinging venom still adds +4 on top (20x with all three).");
 
         en.put("DIALOG_HATCH_RATES_TITLE", "Manage Pupa Hatch Rates");
         en.put("HATCH_DESC", "Set hatch chance for new ants:");

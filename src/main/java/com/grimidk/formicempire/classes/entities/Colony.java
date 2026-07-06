@@ -479,6 +479,14 @@ public class Colony {
     public void setName(String name) { this.name = name; }
     public boolean isCapital() { return isCapital; }
     public void setCapital(boolean isCapital) { this.isCapital = isCapital; }
+
+    private boolean isDynastyCapital() {
+        if (dynasty != null) {
+            Colony capitalColony = dynasty.getCapital();
+            return capitalColony != null && capitalColony == this;
+        }
+        return isCapital;
+    }
     public int getAge() { return age; }
     public void setAge(int age) { this.age = age; }
     public int getDaysWithoutQueen() { return daysWithoutQueen; }
@@ -520,7 +528,7 @@ public class Colony {
         if (world != null && dynasty != null && hasCompleteTunnel(world)) {
             bonus += GameConstants.LOYALTY_MODIFIER_TUNNEL.getLoyaltyDelta();
         }
-        if (isCapital) {
+        if (isDynastyCapital()) {
             bonus += GameConstants.LOYALTY_MODIFIER_CAPITAL.getLoyaltyDelta();
         }
         if (pheromoneStormMonthsRemaining > 0) {
@@ -532,7 +540,7 @@ public class Colony {
     }
 
     private int getDistanceFromCapitalLoyaltyAdjustment(World world) {
-        if (isCapital || dynasty == null || world == null) {
+        if (isDynastyCapital() || dynasty == null || world == null) {
             return 0;
         }
         Colony capital = dynasty.getCapital();
@@ -545,7 +553,7 @@ public class Colony {
 
     /** Hex tile distance to dynasty capital, or -1 if unknown. */
     public int getCapitalHexDistance(World world) {
-        if (isCapital || dynasty == null || world == null) {
+        if (isDynastyCapital() || dynasty == null || world == null) {
             return 0;
         }
         Colony capital = dynasty.getCapital();
@@ -556,7 +564,7 @@ public class Colony {
     }
 
     private int getMilitaryLoyaltyAdjustment() {
-        if (isCapital || dynasty == null) {
+        if (isDynastyCapital() || dynasty == null) {
             return 0;
         }
         Colony capital = dynasty.getCapital();
@@ -564,7 +572,7 @@ public class Colony {
             return 0;
         }
         return ColonyMilitaryService.getMilitaryLoyaltyAdjustment(
-                getMilitaryPower(), capital.getMilitaryPower(), isCapital);
+                getMilitaryPower(), capital.getMilitaryPower(), isDynastyCapital());
     }
 
     public int getEffectiveLoyalty(TradeManager tradeManager, World world) {
@@ -578,7 +586,7 @@ public class Colony {
                 .append(loyalty)
                 .append("<br>");
 
-        if (isCapital) {
+        if (isDynastyCapital()) {
             appendLoyaltyModifierLine(sb, GameConstants.LOYALTY_MODIFIER_CAPITAL);
         }
         if (tradeManager != null && world != null && participatesInActiveTrade(tradeManager, world)) {

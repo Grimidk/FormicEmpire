@@ -22,6 +22,7 @@ import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDiploma
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyLogisticsAutomationService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyStarterService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyStatService;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastySynergyService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyTradeService;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.World;
@@ -580,6 +581,66 @@ public class Dynasty {
         }
     }
 
+    /** Crown the strongest remaining colony after the capital is lost (death or war capture). */
+    public void promoteNewCapital() {
+        if (colonies == null || colonies.isEmpty()) {
+            capital = null;
+            return;
+        }
+        Colony newCapital = null;
+        int maxAnts = -1;
+        for (Colony c : colonies) {
+            if (c.getAntTotal() > maxAnts) {
+                maxAnts = c.getAntTotal();
+                newCapital = c;
+            }
+        }
+        if (newCapital != null) {
+            setCapital(newCapital);
+        }
+    }
+
+    /**
+     * Repairs capital when a foreign captured prime was incorrectly crowned (legacy war-capture bug).
+     * Syncs {@code isCapital} flags with the dynasty's capital reference.
+     */
+    public void reconcileCapital() {
+        Colony current = capital;
+        if (current != null && colonies.contains(current) && isDynastyPrimeName(current.getName())) {
+            setCapital(current);
+            return;
+        }
+        String expectedPrime = formatDynastyBaseName() + " Prime";
+        for (Colony c : colonies) {
+            if (expectedPrime.equals(c.getName())) {
+                setCapital(c);
+                return;
+            }
+        }
+        if (current != null && colonies.contains(current)) {
+            setCapital(current);
+            return;
+        }
+        resolveCapitalFromColonies();
+    }
+
+    private boolean isDynastyPrimeName(String colonyName) {
+        if (colonyName == null || !colonyName.endsWith(" Prime")) {
+            return false;
+        }
+        String prefix = colonyName.substring(0, colonyName.length() - " Prime".length());
+        return prefix.equalsIgnoreCase(formatDynastyBaseName());
+    }
+
+    private String formatDynastyBaseName() {
+        String base = LanguageStrings.stripDynastyNameSuffix(name);
+        if (base == null || base.isEmpty()) {
+            return "";
+        }
+        base = base.trim();
+        return base.substring(0, 1).toUpperCase() + base.substring(1);
+    }
+
     public int getDiplomaticReputation(int otherDynastyId) {
         if (otherDynastyId == id) {
             return GameConstants.DEFAULT_DIPLOMATIC_REPUTATION;
@@ -890,6 +951,7 @@ public class Dynasty {
                 unlockedUpgrades.add(GameUnlocks.ROLE_WARRIOR);
             }
         }
+        DynastySynergyService.refreshUnlocked(this);
         invalidateAffordableAlertCaches();
     }
 

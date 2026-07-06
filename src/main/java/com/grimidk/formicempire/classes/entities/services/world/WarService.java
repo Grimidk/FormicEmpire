@@ -71,9 +71,36 @@ public class WarService {
         }
         war.conclude(DynastyDiplomacyService.worldMonthIndex(world), winnerDynastyId, conclusionKey);
         historicWars.add(war);
+        transferRemainingLoserColonies(war, winnerDynastyId, conclusionKey);
         transferVictoryAssimilations(war, winnerDynastyId, conclusionKey);
         clearDiplomaticWarState(war);
         colonizeCapturedColoniesFromCapital(war, winnerDynastyId, conclusionKey);
+    }
+
+    private void transferRemainingLoserColonies(War war, int winnerDynastyId, String conclusionKey) {
+        if (!LanguageStrings.WAR_CONCLUSION_ABSOLUTE_VICTORY.equals(conclusionKey)
+                || winnerDynastyId <= 0 || war == null) {
+            return;
+        }
+        Dynasty winner = world.findDynastyById(winnerDynastyId);
+        int loserId = war.getOtherDynastyId(winnerDynastyId);
+        Dynasty loser = loserId >= 0 ? world.findDynastyById(loserId) : null;
+        if (winner == null || loser == null || loser == winner) {
+            return;
+        }
+
+        List<Colony> remaining = new ArrayList<>(loser.getColonies());
+        for (Colony colony : remaining) {
+            if (colony.getDynasty() == loser) {
+                WarProgressService.captureColony(world, this, war, colony, winner, loser, false);
+            }
+        }
+
+        if (!loser.getColonies().isEmpty()) {
+            return;
+        }
+        loser.setDefeated(true);
+        endWarsInvolving(loser);
     }
 
     private void colonizeCapturedColoniesFromCapital(War war, int winnerDynastyId, String conclusionKey) {

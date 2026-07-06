@@ -370,6 +370,7 @@ public final class WarProgressService {
         Dynasty hexOwner = contested.getDynasty();
         boolean captured = !attackerRetreat && victor.getId() == stageAttacker.getId()
                 && hexOwner != null && hexOwner != victor;
+        boolean contestedWasCapital = captured && contested.isCapital();
 
         if (captured) {
             captureColony(world, warService, war, contested, victor, hexOwner);
@@ -386,12 +387,12 @@ public final class WarProgressService {
 
         notifyPlayerWarStageComplete(world, war, victor, contested, attackerRetreat, captured);
 
-        if (contested.isCapital() && victor.getId() == aggressor.getId()) {
+        if (contestedWasCapital && victor.getId() == aggressor.getId()) {
             war.setProgressPercent(100f);
             warService.concludeWar(war, aggressor.getId(), LanguageStrings.WAR_CONCLUSION_ABSOLUTE_VICTORY);
             return;
         }
-        if (contested.isCapital() && victor.getId() == defender.getId()) {
+        if (contestedWasCapital && victor.getId() == defender.getId()) {
             war.setProgressPercent(0f);
             warService.concludeWar(war, defender.getId(), LanguageStrings.WAR_CONCLUSION_ABSOLUTE_VICTORY);
             return;
@@ -514,18 +515,25 @@ public final class WarProgressService {
         return best;
     }
 
-    private static void captureColony(World world, WarService warService, War war,
+    static void captureColony(World world, WarService warService, War war,
             Colony colony, Dynasty victor, Dynasty loser) {
+        captureColony(world, warService, war, colony, victor, loser, true);
+    }
+
+    static void captureColony(World world, WarService warService, War war,
+            Colony colony, Dynasty victor, Dynasty loser, boolean promoteLoserCapital) {
         if (colony == null || victor == null || loser == null || colony.getDynasty() == victor) {
             return;
         }
+        boolean wasLoserCapital = colony.isCapital();
         loser.removeColony(colony);
         colony.setDynasty(victor);
+        colony.setCapital(false);
         if (war != null) {
             war.recordCapture(victor.getId(), colony.getId());
         }
-        if (colony.isCapital()) {
-            victor.setCapital(colony);
+        if (wasLoserCapital && promoteLoserCapital) {
+            loser.promoteNewCapital();
         }
         ColonyMilitaryService.refreshColonyMilitaryPower(colony);
         ColonyMilitaryService.refreshDynastyMilitaryPower(victor);

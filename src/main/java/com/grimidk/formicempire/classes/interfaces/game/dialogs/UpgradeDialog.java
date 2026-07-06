@@ -3,9 +3,11 @@ package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 import com.grimidk.formicempire.classes.constants.misc.Species;
 import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
+import com.grimidk.formicempire.classes.constants.unlocks.Synergy;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastySynergyService;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
@@ -38,7 +40,7 @@ public class UpgradeDialog extends ZeroDialog {
     private ResearchPanel researchPanel;
     private BuildPanel buildPanel;
     private JPanel assimilationPanel;
-    private JPanel synergyPanel;
+    private SynergyPanel synergyPanel;
 
     private final Map<Integer, Integer> tabIndexMap = new HashMap<>();
     
@@ -120,10 +122,11 @@ public class UpgradeDialog extends ZeroDialog {
         }
 
         // --- Synergies Tab ---
-        if (colony.hasUpgrade(GameUnlocks.ABILITY_SYNERGY)) { 
+        if (colony.getDynasty() != null && DynastySynergyService.hasAnyUnlocked(colony.getDynasty())) {
             if (synergyPanel == null) {
-                synergyPanel = createPlaceholderPanel(LanguageStrings.get(LanguageStrings.SYNERGY_COMING_SOON));
+                synergyPanel = new SynergyPanel(colony);
             }
+            synergyPanel.updateData();
             tabbedPane.addTab(LanguageStrings.get(LanguageStrings.TAB_SYNERGIES), null, synergyPanel);
             tabIndexMap.put(TAB_SYNERGY, currentIndex++);
         }
@@ -193,17 +196,6 @@ public class UpgradeDialog extends ZeroDialog {
             }
         });
 
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_O, 0), "toggleSynergy");
-        actionMap.put("toggleSynergy", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (isTabOpen(TAB_SYNERGY)) {
-                    dispose();
-                } else if (tabIndexMap.containsKey(TAB_SYNERGY)) {
-                    tabbedPane.setSelectedIndex(tabIndexMap.get(TAB_SYNERGY));
-                }
-            }
-        });
     }
 
     interface LiveUpdatePanel {
@@ -875,6 +867,95 @@ public class UpgradeDialog extends ZeroDialog {
                     bar.setString(LanguageStrings.format(LanguageStrings.ASSIMILATION_PROGRESS, prog, a.getCost(), percent));
                 }
             }
+        }
+    }
+
+    private class SynergyPanel extends JPanel implements LiveUpdatePanel {
+        private final Colony colony;
+        private final JPanel listPanel;
+        private final JScrollPane scrollPane;
+
+        public SynergyPanel(Colony colony) {
+            super(new BorderLayout());
+            this.colony = colony;
+            setBackground(AssetStyles.BACKGROUND_COLOR);
+
+            listPanel = new JPanel();
+            listPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
+            listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
+            scrollPane = new JScrollPane(listPanel);
+            scrollPane.getViewport().setBackground(AssetStyles.BACKGROUND_COLOR);
+            scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+            add(scrollPane, BorderLayout.CENTER);
+        }
+
+        @Override
+        public void updateData() {
+            listPanel.removeAll();
+            Dynasty dynasty = colony.getDynasty();
+            if (dynasty == null) {
+                listPanel.revalidate();
+                listPanel.repaint();
+                return;
+            }
+
+            List<Synergy> unlocked = new ArrayList<>();
+            for (Synergy synergy : GameUnlocks.getSynergies()) {
+                if (DynastySynergyService.isUnlocked(dynasty, synergy)) {
+                    unlocked.add(synergy);
+                }
+            }
+
+            for (Synergy synergy : unlocked) {
+                listPanel.add(createSynergyCard(synergy));
+                listPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+            }
+
+            listPanel.revalidate();
+            listPanel.repaint();
+            SwingUtilities.invokeLater(() -> scrollPane.getViewport().setViewPosition(new Point(0, 0)));
+        }
+
+        private JPanel createSynergyCard(Synergy synergy) {
+            JPanel panel = new JPanel(new BorderLayout(10, 10));
+            panel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
+
+            TitledBorder border = new TitledBorder(AssetStyles.PANEL_BORDER, synergy.getName());
+            border.setTitleColor(AssetStyles.FONT_COLOR_HEADER);
+            border.setTitleFont(AssetStyles.FONT_BOLD);
+            panel.setBorder(border);
+
+            JPanel infoPanel = new JPanel();
+            infoPanel.setOpaque(false);
+            infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+
+            JLabel requirements = new JLabel(LanguageStrings.format(
+                    LanguageStrings.SYNERGY_REQUIREMENTS_FMT,
+                    synergy.getRequirement1().getFlavorName(),
+                    synergy.getRequirement2().getFlavorName()));
+            requirements.setForeground(AssetStyles.FONT_COLOR_VALUE);
+            requirements.setFont(AssetStyles.FONT_NORMAL);
+            requirements.setAlignmentX(Component.LEFT_ALIGNMENT);
+            infoPanel.add(requirements);
+            infoPanel.add(Box.createRigidArea(new Dimension(0, 6)));
+
+            JTextArea descriptionArea = new JTextArea(synergy.getDescription());
+            descriptionArea.setWrapStyleWord(true);
+            descriptionArea.setLineWrap(true);
+            descriptionArea.setEditable(false);
+            descriptionArea.setFocusable(false);
+            descriptionArea.setBackground(panel.getBackground());
+            descriptionArea.setForeground(AssetStyles.FONT_COLOR);
+            descriptionArea.setFont(AssetStyles.FONT_NORMAL);
+            descriptionArea.setBorder(null);
+            infoPanel.add(descriptionArea);
+            panel.add(infoPanel, BorderLayout.CENTER);
+
+            return panel;
+        }
+
+        @Override
+        public void liveUpdate() {
         }
     }
 }
