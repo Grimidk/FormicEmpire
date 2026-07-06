@@ -1080,16 +1080,16 @@ public final class GameConstants {
 
     // --- Trade Methods ---
     public static final TradeMethod METHOD_LAND = new TradeMethod(1, LanguageStrings.METHOD_LAND, 1.0f, 1.0f, 0.35f,
-        loadIcon("icons/convoy/landConvoy.png"));
+        loadIcon("icons/convoy/LandConvoy.png"));
     static { tradeMethods.add(METHOD_LAND); }
     public static final TradeMethod METHOD_AIR = new TradeMethod(2, LanguageStrings.METHOD_AIR, 5.0f, 0.5f, 0.25f,
-        loadIcon("icons/convoy/skyConvoy.png"));
+        loadIcon("icons/convoy/SkyConvoy.png"));
     static { tradeMethods.add(METHOD_AIR); }
     public static final TradeMethod METHOD_SEA = new TradeMethod(3, LanguageStrings.METHOD_SEA, 3.0f, 5.0f, 0.15f,
-        loadIcon("icons/convoy/seaConvoy.png"));
+        loadIcon("icons/convoy/SeaConvoy.png"));
     static { tradeMethods.add(METHOD_SEA); }
     public static final TradeMethod METHOD_TUNNEL = new TradeMethod(4, LanguageStrings.METHOD_TUNNEL, 2.0f, 2.0f, 0.05f,
-        loadIcon("icons/convoy/tunnelConvoy.png"));
+        loadIcon("icons/convoy/TunnelConvoy.png"));
     static { tradeMethods.add(METHOD_TUNNEL); }
     
     // --- Construction Costs ---
