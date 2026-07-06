@@ -63,7 +63,7 @@ class WarCapitalCaptureTest {
         War war = world.getWarService().beginWar(aggressor, defender);
 
         WarProgressService.captureColony(world, world.getWarService(), war,
-                defenderCapital, aggressor, defender);
+                defenderCapital, aggressor, defender, true);
 
         assertEquals(aggressor, defenderCapital.getDynasty());
         assertFalse(defenderCapital.isCapital(), "Captured colony must not remain capital");
@@ -73,7 +73,7 @@ class WarCapitalCaptureTest {
     }
 
     @Test
-    void reconcileCapitalRepairsForeignCapturedPrime() {
+    void resolveCapitalFromColoniesRepairsForeignCapturedPrime() {
         Dynasty dynasty = new Dynasty(1, "Grim Dynasty", true, GameConstants.SPECIES_OMNI);
         Colony founding = new Colony(1, "Grim Prime", true);
         Colony captured = new Colony(39, "Wind Prime", false);
@@ -81,7 +81,7 @@ class WarCapitalCaptureTest {
         dynasty.addColony(captured);
         dynasty.setCapital(captured);
 
-        dynasty.reconcileCapital();
+        dynasty.resolveCapitalFromColonies();
 
         assertEquals(founding, dynasty.getCapital());
         assertTrue(founding.isCapital());

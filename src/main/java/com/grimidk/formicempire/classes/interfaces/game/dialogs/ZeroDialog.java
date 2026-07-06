@@ -1,14 +1,11 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
-import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.interfaces.MainFrame;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
 public abstract class ZeroDialog extends JDialog {
@@ -42,8 +39,6 @@ public abstract class ZeroDialog extends JDialog {
         southPanel.add(closeButton);
         add(southPanel, BorderLayout.SOUTH);
 
-        initGlobalKeyBindings();
-
         getRootPane().registerKeyboardAction(e -> handleEscapeKey(),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_IN_FOCUSED_WINDOW);
@@ -76,80 +71,12 @@ public abstract class ZeroDialog extends JDialog {
         }
     }
 
-    private void initGlobalKeyBindings() {
-        InputMap inputMap = getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        ActionMap actionMap = getRootPane().getActionMap();
-
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0), "togglePause");
-        actionMap.put("togglePause", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Engine engine = getEngine();
-                if (engine == null) return;
-                engine.togglePause();
-                syncWithMainControlPanel();
-            }
-        });
-
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ADD, 0), "speedUp");
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, InputEvent.SHIFT_DOWN_MASK), "speedUp");
-        actionMap.put("speedUp", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                adjustSpeed(1);
-                syncWithMainControlPanel();
-            }
-        });
-
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_SUBTRACT, 0), "speedDown");
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, 0), "speedDown");
-        actionMap.put("speedDown", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                adjustSpeed(-1);
-                syncWithMainControlPanel();
-            }
-        });
-    }
-
     private void handleEscapeKey() {
         if (getOwner() instanceof MainFrame frame && frame.getGamePanel() != null
                 && frame.getGamePanel().handleEscapeKey()) {
             return;
         }
         dispose();
-    }
-
-    private void adjustSpeed(int delta) {
-        Engine engine = getEngine();
-        if (engine == null) return;
-
-        if (delta > 0) {
-            engine.stepSpeedUp();
-        } else {
-            engine.stepSpeedDown();
-        }
-    }
-
-    private void syncWithMainControlPanel() {
-        if (getOwner() instanceof MainFrame frame) {
-            if (frame.getGamePanel() != null) {
-                frame.getGamePanel().refreshAllGUIData();
-
-                Engine engine = frame.getEngine();
-                if (engine != null) {
-                    frame.getGamePanel().updateStatusIndicator(engine.isPaused());
-                    frame.getGamePanel().updateSpeedLabel();
-                }
-            }
-        }
-    }
-
-    private Engine getEngine() {
-        if (getOwner() instanceof MainFrame frame) {
-            return frame.getEngine();
-        }
-        return null;
     }
 
     protected void registerCloseKey(int keyEvent) {

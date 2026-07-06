@@ -339,8 +339,8 @@ public class Dynasty {
     }
 
     public String generateNextColonyName() {
-        String baseName = LanguageStrings.stripDynastyNameSuffix(this.name);
-        if (baseName == null || baseName.isEmpty()) {
+        String baseName = LanguageStrings.dynastyThemeBase(this.name);
+        if (baseName.isEmpty()) {
             baseName = "Player";
         }
         
@@ -544,9 +544,26 @@ public class Dynasty {
         return capital;
     }
 
-    /** Infer capital when save has no capitalColonyId or it was not wired on load. */
+    /** Infer or repair capital after load, flag drift, or legacy war-capture corruption. */
     public void resolveCapitalFromColonies() {
         if (colonies == null || colonies.isEmpty()) {
+            capital = null;
+            return;
+        }
+        Colony current = capital;
+        if (current != null && colonies.contains(current) && isDynastyPrimeName(current.getName())) {
+            setCapital(current);
+            return;
+        }
+        String expectedPrime = LanguageStrings.expectedCapitalColonyName(name);
+        for (Colony c : colonies) {
+            if (expectedPrime.equals(c.getName())) {
+                setCapital(c);
+                return;
+            }
+        }
+        if (current != null && colonies.contains(current)) {
+            setCapital(current);
             return;
         }
         List<Colony> flagged = new ArrayList<>();
@@ -600,45 +617,12 @@ public class Dynasty {
         }
     }
 
-    /**
-     * Repairs capital when a foreign captured prime was incorrectly crowned (legacy war-capture bug).
-     * Syncs {@code isCapital} flags with the dynasty's capital reference.
-     */
-    public void reconcileCapital() {
-        Colony current = capital;
-        if (current != null && colonies.contains(current) && isDynastyPrimeName(current.getName())) {
-            setCapital(current);
-            return;
-        }
-        String expectedPrime = formatDynastyBaseName() + " Prime";
-        for (Colony c : colonies) {
-            if (expectedPrime.equals(c.getName())) {
-                setCapital(c);
-                return;
-            }
-        }
-        if (current != null && colonies.contains(current)) {
-            setCapital(current);
-            return;
-        }
-        resolveCapitalFromColonies();
-    }
-
     private boolean isDynastyPrimeName(String colonyName) {
         if (colonyName == null || !colonyName.endsWith(" Prime")) {
             return false;
         }
         String prefix = colonyName.substring(0, colonyName.length() - " Prime".length());
-        return prefix.equalsIgnoreCase(formatDynastyBaseName());
-    }
-
-    private String formatDynastyBaseName() {
-        String base = LanguageStrings.stripDynastyNameSuffix(name);
-        if (base == null || base.isEmpty()) {
-            return "";
-        }
-        base = base.trim();
-        return base.substring(0, 1).toUpperCase() + base.substring(1);
+        return prefix.equalsIgnoreCase(LanguageStrings.dynastyThemeBase(name));
     }
 
     public int getDiplomaticReputation(int otherDynastyId) {

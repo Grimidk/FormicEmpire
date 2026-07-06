@@ -23,10 +23,9 @@ public class ColonyStarterService {
         return SHARED;
     }
     
-    private String formatName(String name) {
-        if (name == null || name.trim().isEmpty()) return "Player";
-        name = name.trim();
-        return name.substring(0, 1).toUpperCase() + name.substring(1);
+    private String colonyStarterBaseName(String dynastyName) {
+        String base = LanguageStrings.dynastyThemeBase(dynastyName);
+        return base.isEmpty() ? "Player" : base;
     }
 
     public void initializeNewColony(Colony colony) {
@@ -35,7 +34,7 @@ public class ColonyStarterService {
         if (colony.getDynasty() != null) {
             Dynasty d = colony.getDynasty();
             
-            String baseName = formatName(LanguageStrings.stripDynastyNameSuffix(d.getName()));
+            String baseName = colonyStarterBaseName(d.getName());
             
             int index = d.getColonies().indexOf(colony);
             if (index == -1) index = d.getColonies().size(); 

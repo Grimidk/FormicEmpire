@@ -15,6 +15,7 @@ import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TriggerManager;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.util.GameControlKeyBindings;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiDialogUtils;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
 import com.grimidk.formicempire.classes.infrasctructure.assets.GameSpritePreloader;
@@ -32,6 +33,7 @@ import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.util.List;
 import java.awt.event.ComponentEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
@@ -85,6 +87,7 @@ public class GamePanel extends ZeroGamePanel {
 
     private volatile boolean engineStarted = false;
     private SwingWorker<Void, Void> loadWorker;
+    private KeyEventDispatcher plusSpeedKeyDispatcher;
     private int lastPeaceOfferPromptWarId = -1;
 
     private static final int OVERWORLD_SPRING_DURATION_MS = 240;
@@ -102,6 +105,7 @@ public class GamePanel extends ZeroGamePanel {
         
         initComponents();
         initControlPanelCallbacks();
+        initGameControlKeyBindings();
         initLayout();        
         updateStatusIndicator(false);
     }
@@ -516,6 +520,66 @@ public class GamePanel extends ZeroGamePanel {
             showWarDialogCallback,
             showSettingsDialogCallback,
             () -> dynastyDialog != null && dynastyDialog.isShowing());
+    }
+
+    private void initGameControlKeyBindings() {
+        JRootPane root = frame.getRootPane();
+        InputMap inputMap = root.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        ActionMap actionMap = root.getActionMap();
+        GameControlKeyBindings.register(
+                inputMap,
+                actionMap,
+                () -> {
+                    if (!engineStarted || controlPanel == null) {
+                        return;
+                    }
+                    controlPanel.togglePauseFromInput();
+                },
+                () -> {
+                    if (!engineStarted || controlPanel == null) {
+                        return;
+                    }
+                    controlPanel.stepSpeedFromInput(1);
+                },
+                () -> {
+                    if (!engineStarted || controlPanel == null) {
+                        return;
+                    }
+                    controlPanel.stepSpeedFromInput(-1);
+                });
+    }
+
+    /** Catches typed {@code +} on non-US layouts where InputMap shift+= does not match. */
+    private void installPlusSpeedKeyDispatcher() {
+        if (plusSpeedKeyDispatcher != null) {
+            return;
+        }
+        plusSpeedKeyDispatcher = e -> {
+            if (!engineStarted || controlPanel == null || e.getID() != KeyEvent.KEY_TYPED) {
+                return false;
+            }
+            Component source = e.getComponent();
+            if (source == null) {
+                return false;
+            }
+            Window sourceWindow = SwingUtilities.getWindowAncestor(source);
+            if (sourceWindow != frame) {
+                return false;
+            }
+            if (e.getKeyChar() == '+') {
+                controlPanel.stepSpeedFromInput(1);
+                return true;
+            }
+            return false;
+        };
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(plusSpeedKeyDispatcher);
+    }
+
+    private void uninstallPlusSpeedKeyDispatcher() {
+        if (plusSpeedKeyDispatcher != null) {
+            KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(plusSpeedKeyDispatcher);
+            plusSpeedKeyDispatcher = null;
+        }
     }
     
     private void updateGameAreaSize() {
@@ -1070,6 +1134,7 @@ public class GamePanel extends ZeroGamePanel {
 
     private void cleanupSession() {
         cancelLoadWorker();
+        uninstallPlusSpeedKeyDispatcher();
         disposeAllDialogs();
         unregisterTickListeners();
         if (triggerManager != null) {
@@ -1221,6 +1286,7 @@ public class GamePanel extends ZeroGamePanel {
                         if (!engine.isAlive()) {
                             engine.start();
                         }
+                        installPlusSpeedKeyDispatcher();
                     }
                     refreshAllGUIData();
                     updateGameAreaSize();
@@ -1329,7 +1395,11 @@ public class GamePanel extends ZeroGamePanel {
 
     public void updateSpeedLabel() {
         if (controlPanel != null) {
-            controlPanel.updateTickLabel(frame.getEngine());
+            Engine eng = frame.getEngine();
+            controlPanel.updateTickLabel(eng);
+            if (eng != null) {
+                controlPanel.setPlayPauseButtonText(eng.isPaused());
+            }
         }
     }
 

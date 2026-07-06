@@ -2,6 +2,7 @@ package com.grimidk.formicempire.classes.interfaces.ui.styles;
 
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.plaf.FlatTabbedPaneUI;
+import com.grimidk.formicempire.classes.interfaces.ui.plaf.IconButtonUI;
 import com.grimidk.formicempire.classes.interfaces.ui.plaf.PanelBorderButtonUI;
 
 import java.awt.Dimension;
@@ -41,6 +42,26 @@ public final class UiButtonStyles {
         style(button);
         button.setFont(AssetStyles.FONT_NORMAL);
         button.setBorder(AssetStyles.buttonCompactPaddingBorder());
+    }
+
+    /** Borderless icon-only control (e.g. speed / play toolbar buttons). */
+    public static void styleIcon(AbstractButton button) {
+        if (!(button.getUI() instanceof IconButtonUI)) {
+            button.setUI(IconButtonUI.INSTANCE);
+        }
+        button.setFont(AssetStyles.FONT_NORMAL);
+        button.setForeground(AssetStyles.FONT_COLOR);
+        button.setBackground(AssetStyles.BACKGROUND_COLOR);
+        button.setCursor(null);
+        button.setHorizontalAlignment(SwingConstants.CENTER);
+        button.setVerticalAlignment(SwingConstants.CENTER);
+        button.setOpaque(false);
+        button.setContentAreaFilled(false);
+        button.setFocusPainted(false);
+        button.setBorderPainted(false);
+        button.setMargin(NO_MARGIN);
+        button.setBorder(new EmptyBorder(0, 0, 0, 0));
+        button.putClientProperty(AssetStyles.ICON_BUTTON_CLIENT_KEY, Boolean.TRUE);
     }
 
     /** Fixed-size tab strip button — matches {@link FlatTabbedPaneUI} tab dimensions. */

@@ -607,7 +607,7 @@ public class GameAreaPanel extends ZeroGamePanel {
         double rotateCenterX = L.rightRoomX + (L.roomW / 2.0);
         double rotateCenterY = L.roomYRow1 + (L.roomH / 2.0);
         g2d.rotate(Math.toRadians(180), rotateCenterX, rotateCenterY);
-        RoomDecorationRenderer.drawFarmRoomDecorations(g2d, colony, L.rightRoomX, L.roomYRow1, L.roomW, L.roomH, this, true);
+        RoomDecorationRenderer.drawFarmRoomDecorations(g2d, colony, L.rightRoomX, L.roomYRow1, L.roomW, L.roomH, this);
         g2d.setTransform(old);
 
         RoomDecorationRenderer.drawNurseryRoomDecorations(g2d, colony, L.leftRoomX, L.roomYRow2, L.roomW, L.roomH, this);
@@ -616,7 +616,7 @@ public class GameAreaPanel extends ZeroGamePanel {
         double rotateCenter2X = L.rightRoomX + (L.roomW / 2.0);
         double rotateCenter2Y = L.roomYRow2 + (L.roomH / 2.0);
         g2d.rotate(Math.toRadians(180), rotateCenter2X, rotateCenter2Y);
-        RoomDecorationRenderer.drawRoyalRoomDecorations(g2d, colony, L.rightRoomX, L.roomYRow2, L.roomW, L.roomH, this, true);
+        RoomDecorationRenderer.drawRoyalRoomDecorations(g2d, colony, L.rightRoomX, L.roomYRow2, L.roomW, L.roomH, this);
         g2d.setTransform(old2);
     }
 

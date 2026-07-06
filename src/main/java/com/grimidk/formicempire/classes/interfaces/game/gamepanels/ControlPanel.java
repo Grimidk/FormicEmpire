@@ -11,11 +11,12 @@ import com.grimidk.formicempire.classes.interfaces.MainFrame;
 import java.util.function.BooleanSupplier;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.*;
 
 public class ControlPanel extends ZeroGamePanel {
+
+    private static final Dimension SPEED_ICON_SLOT_SIZE = new Dimension(32, 32);
 
     private final MainFrame frame;
     private final Runnable handleBackButtonCallback;
@@ -36,8 +37,8 @@ public class ControlPanel extends ZeroGamePanel {
     private final BooleanSupplier dynastyDialogOpenCheck;
 
     // --- UI Components ---
-    private final JButton speedUpButton = new JButton(LanguageStrings.get(LanguageStrings.UI_SPEED_UP));
-    private final JButton speedDownButton = new JButton(LanguageStrings.get(LanguageStrings.UI_SPEED_DOWN));
+    private final JButton speedUpButton = new JButton();
+    private final JButton speedDownButton = new JButton();
     private final JLabel tickLabel = new JLabel();
     private final JButton playPauseButton = new JButton();
     private final JButton menuButton = new JButton(LanguageStrings.get(LanguageStrings.UI_MENU));
@@ -120,15 +121,18 @@ public class ControlPanel extends ZeroGamePanel {
         speedUpButton.setFocusable(false);
         playPauseButton.setFocusable(false);
         menuButton.setFocusable(false);
-        AssetStyles.styleButton(speedUpButton);
-        AssetStyles.styleButton(speedDownButton);
-        AssetStyles.styleButton(playPauseButton);
         AssetStyles.styleButton(menuButton);
+        configureIconControlButton(speedUpButton, GameConstants.ICON_SPEED_UP);
+        configureIconControlButton(speedDownButton, GameConstants.ICON_SPEED_DOWN);
+        configureIconControlButton(playPauseButton, GameConstants.ICON_SPEED_PAUSE);
 
         tickLabel.setHorizontalAlignment(SwingConstants.CENTER);
         tickLabel.setVerticalAlignment(SwingConstants.CENTER);
         tickLabel.setIconTextGap(0);
         tickLabel.setText("");
+        tickLabel.setPreferredSize(SPEED_ICON_SLOT_SIZE);
+        tickLabel.setMinimumSize(SPEED_ICON_SLOT_SIZE);
+        tickLabel.setMaximumSize(SPEED_ICON_SLOT_SIZE);
         
         // Init menu items
         backToGame = new JMenuItem();
@@ -165,8 +169,8 @@ public class ControlPanel extends ZeroGamePanel {
     
     @Override
     public void refreshTranslations() {
-        speedUpButton.setText(LanguageStrings.get(LanguageStrings.UI_SPEED_UP));
-        speedDownButton.setText(LanguageStrings.get(LanguageStrings.UI_SPEED_DOWN));
+        speedUpButton.setToolTipText(LanguageStrings.get(LanguageStrings.UI_SPEED_UP));
+        speedDownButton.setToolTipText(LanguageStrings.get(LanguageStrings.UI_SPEED_DOWN));
         menuButton.setText(LanguageStrings.get(LanguageStrings.UI_MENU));
         updateTickLabel(frame.getEngine());
         updatePlayPauseButton();
@@ -251,31 +255,36 @@ public class ControlPanel extends ZeroGamePanel {
         if (frame.getGamePanel() != null) frame.getGamePanel().updateStatusIndicator(eng.isPaused());
     }
 
+    public void stepSpeedFromInput(int direction) {
+        changeSpeed(direction);
+    }
+
+    public void togglePauseFromInput() {
+        Engine engine = frame.getEngine();
+        if (engine == null || frame.getGamePanel() == null || !frame.getGamePanel().isEngineStarted()) {
+            return;
+        }
+        engine.togglePause();
+        setPlayPauseButtonText(engine.isPaused());
+        updateTickLabel(engine);
+        frame.getGamePanel().updateStatusIndicator(engine.isPaused());
+    }
+
+    private void changeSpeed(int direction) {
+        Engine eng = frame.getEngine();
+        if (eng == null || frame.getGamePanel() == null || !frame.getGamePanel().isEngineStarted()) {
+            return;
+        }
+        eng.adjustSpeedStep(direction);
+        applySpeedLevel();
+    }
+
     private void initListeners() {
-        speedDownButton.addActionListener(e -> {
-            Engine eng = frame.getEngine();
-            if (eng == null) return;
-            eng.stepSpeedDown();
-            applySpeedLevel();
-        });
+        speedDownButton.addActionListener(e -> changeSpeed(-1));
 
-        speedUpButton.addActionListener(e -> {
-            Engine eng = frame.getEngine();
-            if (eng == null) return;
-            eng.stepSpeedUp();
-            applySpeedLevel();
-        });
+        speedUpButton.addActionListener(e -> changeSpeed(1));
 
-        playPauseButton.addActionListener(e -> {
-            Engine engine = frame.getEngine();
-            if (engine == null || !frame.getGamePanel().isEngineStarted()) return;
-            engine.togglePause();
-            setPlayPauseButtonText(engine.isPaused());
-            updateTickLabel(engine);
-            if (frame.getGamePanel() != null) {
-                frame.getGamePanel().updateStatusIndicator(engine.isPaused());
-            }
-        });
+        playPauseButton.addActionListener(e -> togglePauseFromInput());
 
         backToGame.addActionListener(e -> gameMenu.setVisible(false));
         toggleView.addActionListener(e -> toggleViewCallback.run());
@@ -360,37 +369,11 @@ public class ControlPanel extends ZeroGamePanel {
         InputMap inputMap = this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         ActionMap actionMap = this.getActionMap();
 
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0), "togglePause");
-        actionMap.put("togglePause", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                playPauseButton.doClick();
-            }
-        });
-
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, 0), "toggleView");
         actionMap.put("toggleView", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 toggleViewCallback.run();
-            }
-        });
-
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ADD, 0), "speedUp");
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, InputEvent.SHIFT_DOWN_MASK), "speedUp");
-        actionMap.put("speedUp", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                speedUpButton.doClick();
-            }
-        });
-
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_SUBTRACT, 0), "speedDown");
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, 0), "speedDown");
-        actionMap.put("speedDown", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                speedDownButton.doClick();
             }
         });
 
@@ -551,7 +534,7 @@ public class ControlPanel extends ZeroGamePanel {
             return;
         }
         if (eng.isPaused()) {
-            tickLabel.setIcon(GameConstants.ICON_SPEED_PAUSE);
+            tickLabel.setIcon(GameConstants.ICON_SPEED_ZERO);
             tickLabel.setToolTipText(LanguageStrings.get(LanguageStrings.UI_PAUSED_TICK));
             return;
         }
@@ -566,7 +549,23 @@ public class ControlPanel extends ZeroGamePanel {
     }
     
     public void setPlayPauseButtonText(boolean isPaused) {
-        playPauseButton.setText(isPaused ? LanguageStrings.get(LanguageStrings.UI_PLAY) : LanguageStrings.get(LanguageStrings.UI_PAUSE));
+        playPauseButton.setIcon(isPaused ? GameConstants.ICON_SPEED_PLAY : GameConstants.ICON_SPEED_PAUSE);
+        playPauseButton.setText("");
+        playPauseButton.setToolTipText(LanguageStrings.get(
+                isPaused ? LanguageStrings.UI_PLAY : LanguageStrings.UI_PAUSE));
+    }
+
+    private static void configureIconControlButton(JButton button, ImageIcon icon) {
+        AssetStyles.styleIconButton(button);
+        button.setIcon(icon);
+        button.setText("");
+        button.setHorizontalAlignment(SwingConstants.CENTER);
+        button.setVerticalAlignment(SwingConstants.CENTER);
+        button.setHorizontalTextPosition(SwingConstants.CENTER);
+        button.setVerticalTextPosition(SwingConstants.CENTER);
+        button.setPreferredSize(SPEED_ICON_SLOT_SIZE);
+        button.setMinimumSize(SPEED_ICON_SLOT_SIZE);
+        button.setMaximumSize(SPEED_ICON_SLOT_SIZE);
     }
 
     public void updateResearchMenu(boolean visible) {

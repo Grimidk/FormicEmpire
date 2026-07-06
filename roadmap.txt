@@ -12,7 +12,7 @@ To Fix (By decreasing priority) :
 	
 	High:
 	TODO: icons/sprites for all Constants (roles, moves) and unlocks (all)
-	Room sprites still look ugly af (see TODO asset on buildingRoomSprite / BuildingSpriteResources)
+	Room overlay art still placeholder quality (sprites/buildings/rooms/*.png)
 
 	Mid:
 	(none right now)
@@ -45,7 +45,7 @@ Needed for launch (v1.0) (Launch Version):
 	random events (meteor, earthquake, tornado, tsunami, )
 	main menu screen maybe simulation like factorio
 	synergies ( Super majors + Chemical throwing = Artillery ants; Self destruction + Acid spitting = Corrosive bombs; Silk weaving + Hive building = Web building; Air-force ants + self destruction = Air-bomber ants)
-	more upgrades and more buildings
+	more upgrades and more buildings and assimilations and synergies
 	more roles (commander and captain roles, air force)
 	more enemies ( Rebel ant colonies, Bugs, Arachnids, Reptiles, Birds, Rodents, Zombie ant colonies)
 	more stats (kills, historic productions, graphs?)

@@ -58,6 +58,9 @@ public class AssetStyles {
     public static final String META_ROADMAP = "/meta/roadmap.txt";
     public static final String META_CREDITS = "/meta/credits.txt";
 
+    /** Client property on borderless icon-only toolbar buttons (see {@link #styleIconButton}). */
+    public static final String ICON_BUTTON_CLIENT_KEY = "formicempire.iconButton";
+
     // --- Palette (fixed) ---
     public static final Color COLOR_ABSOLUTE_BLACK = UiPalette.COLOR_ABSOLUTE_BLACK;
     public static final Color COLOR_ABSOLUTE_WHITE = UiPalette.COLOR_ABSOLUTE_WHITE;
@@ -236,6 +239,10 @@ public class AssetStyles {
 
     public static void styleCompactButton(AbstractButton button) {
         UiButtonStyles.styleCompact(button);
+    }
+
+    public static void styleIconButton(AbstractButton button) {
+        UiButtonStyles.styleIcon(button);
     }
 
     public static void styleSectionTabButton(AbstractButton button) {

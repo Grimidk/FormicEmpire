@@ -24,6 +24,10 @@ public class Building extends Constant {
         this.sprite = sprite;
     }
 
+    public Building(int id, String nameKey, int level, String descriptionKey, Building requirement, int resinCost, int mineralCost, int buildTime, ImageIcon roomArt) {
+        this(id, nameKey, level, descriptionKey, requirement, resinCost, mineralCost, buildTime, roomArt, roomArt);
+    }
+
     //(no icon/sprite)
     public Building(int id, String nameKey, int level, String descriptionKey, Building requirement, int resinCost, int mineralCost, int buildTime) {
         this(id, nameKey, level, descriptionKey, requirement, resinCost, mineralCost, buildTime, null, null);

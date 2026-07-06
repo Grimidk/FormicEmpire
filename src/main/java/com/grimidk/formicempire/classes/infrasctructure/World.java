@@ -775,11 +775,8 @@ public class World {
                         }
                     }
                 }
-                if (d != null && d.getCapital() == null) {
-                    d.resolveCapitalFromColonies();
-                }
                 if (d != null) {
-                    d.reconcileCapital();
+                    d.resolveCapitalFromColonies();
                 }
             }
         }

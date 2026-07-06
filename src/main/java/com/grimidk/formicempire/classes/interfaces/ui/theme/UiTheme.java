@@ -124,7 +124,11 @@ public final class UiTheme {
             chevronButton.setBackground(AssetStyles.BACKGROUND_COLOR);
             chevronButton.repaint();
         } else if (component instanceof javax.swing.JButton button) {
-            UiButtonStyles.style(button);
+            if (Boolean.TRUE.equals(button.getClientProperty(AssetStyles.ICON_BUTTON_CLIENT_KEY))) {
+                UiButtonStyles.styleIcon(button);
+            } else {
+                UiButtonStyles.style(button);
+            }
             button.repaint();
         } else if (component instanceof javax.swing.JToggleButton toggleButton) {
             UiButtonStyles.style(toggleButton);

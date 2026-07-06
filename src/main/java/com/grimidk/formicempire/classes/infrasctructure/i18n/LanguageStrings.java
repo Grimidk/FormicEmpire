@@ -102,6 +102,26 @@ public final class LanguageStrings {
         return dynastyName;
     }
 
+    public static String capitalizeTheme(String theme) {
+        if (theme == null || theme.isEmpty()) {
+            return "";
+        }
+        theme = theme.trim();
+        if (theme.isEmpty()) {
+            return "";
+        }
+        return Character.toUpperCase(theme.charAt(0)) + theme.substring(1);
+    }
+
+    public static String dynastyThemeBase(String dynastyName) {
+        return capitalizeTheme(stripDynastyNameSuffix(dynastyName));
+    }
+
+    public static String expectedCapitalColonyName(String dynastyName) {
+        String base = dynastyThemeBase(dynastyName);
+        return base.isEmpty() ? "Colony Prime" : base + " Prime";
+    }
+
     public static String getWarOrdinal(int ordinal) {
         if (ordinal <= 0) {
             ordinal = 1;

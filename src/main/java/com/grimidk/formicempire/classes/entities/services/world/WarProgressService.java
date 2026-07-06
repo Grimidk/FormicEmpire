@@ -373,7 +373,7 @@ public final class WarProgressService {
         boolean contestedWasCapital = captured && contested.isCapital();
 
         if (captured) {
-            captureColony(world, warService, war, contested, victor, hexOwner);
+            captureColony(world, warService, war, contested, victor, hexOwner, true);
         }
 
         if (victor.getId() == aggressor.getId()) {
@@ -513,11 +513,6 @@ public final class WarProgressService {
             }
         }
         return best;
-    }
-
-    static void captureColony(World world, WarService warService, War war,
-            Colony colony, Dynasty victor, Dynasty loser) {
-        captureColony(world, warService, war, colony, victor, loser, true);
     }
 
     static void captureColony(World world, WarService warService, War war,

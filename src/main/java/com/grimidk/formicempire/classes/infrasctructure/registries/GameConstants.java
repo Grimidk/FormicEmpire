@@ -1,6 +1,5 @@
 package com.grimidk.formicempire.classes.infrasctructure.registries;
 
-import com.grimidk.formicempire.classes.infrasctructure.assets.BuildingSpriteResources;
 import com.grimidk.formicempire.classes.infrasctructure.assets.GameSpritePreloader;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
@@ -56,17 +55,50 @@ public final class GameConstants {
         return icon;
     }
 
-    public static final int BUILDING_ROOM_ICON_SIZE_PX = BuildingSpriteResources.ROOM_ICON_PX;
-
-    public static ImageIcon buildingRoomSprite(String chainKey, int level) {
-        // TODO asset: sprites/buildings/rooms/{Chain}L{tier}.png (placeholder in-room overlay; replace final art)
-        return BuildingSpriteResources.roomTier(chainKey, level);
-    }
-
-    public static ImageIcon passiveBuildingRoomSprite(String passiveKey) {
-        // TODO asset: sprites/buildings/rooms/Passive{Name}.png (placeholder in-room overlay; replace final art)
-        return BuildingSpriteResources.passiveRoom(passiveKey);
-    }
+    // --- Building room overlay sprites (native size; no runtime scaling) ---
+    public static final ImageIcon ROOM_ROYAL_L0 = loadIcon("sprites/buildings/rooms/RoyalL0.png");
+    public static final ImageIcon ROOM_ROYAL_L1 = loadIcon("sprites/buildings/rooms/RoyalL1.png");
+    public static final ImageIcon ROOM_ROYAL_L2 = loadIcon("sprites/buildings/rooms/RoyalL2.png");
+    public static final ImageIcon ROOM_ROYAL_L3 = loadIcon("sprites/buildings/rooms/RoyalL3.png");
+    public static final ImageIcon ROOM_EGG_L0 = loadIcon("sprites/buildings/rooms/EggL0.png");
+    public static final ImageIcon ROOM_EGG_L1 = loadIcon("sprites/buildings/rooms/EggL1.png");
+    public static final ImageIcon ROOM_EGG_L2 = loadIcon("sprites/buildings/rooms/EggL2.png");
+    public static final ImageIcon ROOM_EGG_L3 = loadIcon("sprites/buildings/rooms/EggL3.png");
+    public static final ImageIcon ROOM_MUSHROOM_L0 = loadIcon("sprites/buildings/rooms/MushroomL0.png");
+    public static final ImageIcon ROOM_MUSHROOM_L1 = loadIcon("sprites/buildings/rooms/MushroomL1.png");
+    public static final ImageIcon ROOM_MUSHROOM_L2 = loadIcon("sprites/buildings/rooms/MushroomL2.png");
+    public static final ImageIcon ROOM_MUSHROOM_L3 = loadIcon("sprites/buildings/rooms/MushroomL3.png");
+    public static final ImageIcon ROOM_PLANT_L0 = loadIcon("sprites/buildings/rooms/PlantL0.png");
+    public static final ImageIcon ROOM_PLANT_L1 = loadIcon("sprites/buildings/rooms/PlantL1.png");
+    public static final ImageIcon ROOM_PLANT_L2 = loadIcon("sprites/buildings/rooms/PlantL2.png");
+    public static final ImageIcon ROOM_PLANT_L3 = loadIcon("sprites/buildings/rooms/PlantL3.png");
+    public static final ImageIcon ROOM_WATER_L0 = loadIcon("sprites/buildings/rooms/WaterL0.png");
+    public static final ImageIcon ROOM_WATER_L1 = loadIcon("sprites/buildings/rooms/WaterL1.png");
+    public static final ImageIcon ROOM_WATER_L2 = loadIcon("sprites/buildings/rooms/WaterL2.png");
+    public static final ImageIcon ROOM_WATER_L3 = loadIcon("sprites/buildings/rooms/WaterL3.png");
+    public static final ImageIcon ROOM_MEAT_L0 = loadIcon("sprites/buildings/rooms/MeatL0.png");
+    public static final ImageIcon ROOM_MEAT_L1 = loadIcon("sprites/buildings/rooms/MeatL1.png");
+    public static final ImageIcon ROOM_MEAT_L2 = loadIcon("sprites/buildings/rooms/MeatL2.png");
+    public static final ImageIcon ROOM_MEAT_L3 = loadIcon("sprites/buildings/rooms/MeatL3.png");
+    public static final ImageIcon ROOM_SYRUP_L0 = loadIcon("sprites/buildings/rooms/SyrupL0.png");
+    public static final ImageIcon ROOM_SYRUP_L1 = loadIcon("sprites/buildings/rooms/SyrupL1.png");
+    public static final ImageIcon ROOM_SYRUP_L2 = loadIcon("sprites/buildings/rooms/SyrupL2.png");
+    public static final ImageIcon ROOM_SYRUP_L3 = loadIcon("sprites/buildings/rooms/SyrupL3.png");
+    public static final ImageIcon ROOM_ROCK_L0 = loadIcon("sprites/buildings/rooms/RockL0.png");
+    public static final ImageIcon ROOM_ROCK_L1 = loadIcon("sprites/buildings/rooms/RockL1.png");
+    public static final ImageIcon ROOM_ROCK_L2 = loadIcon("sprites/buildings/rooms/RockL2.png");
+    public static final ImageIcon ROOM_ROCK_L3 = loadIcon("sprites/buildings/rooms/RockL3.png");
+    public static final ImageIcon ROOM_RESIN_L0 = loadIcon("sprites/buildings/rooms/ResinL0.png");
+    public static final ImageIcon ROOM_RESIN_L1 = loadIcon("sprites/buildings/rooms/ResinL1.png");
+    public static final ImageIcon ROOM_RESIN_L2 = loadIcon("sprites/buildings/rooms/ResinL2.png");
+    public static final ImageIcon ROOM_RESIN_L3 = loadIcon("sprites/buildings/rooms/ResinL3.png");
+    public static final ImageIcon ROOM_PASSIVE_LAB = loadIcon("sprites/buildings/rooms/PassiveLab.png");
+    public static final ImageIcon ROOM_PASSIVE_WATER = loadIcon("sprites/buildings/rooms/PassiveWater.png");
+    public static final ImageIcon ROOM_PASSIVE_APHID = loadIcon("sprites/buildings/rooms/PassiveAphid.png");
+    public static final ImageIcon ROOM_PASSIVE_NURSE = loadIcon("sprites/buildings/rooms/PassiveNurse.png");
+    public static final ImageIcon ROOM_PASSIVE_FARM = loadIcon("sprites/buildings/rooms/PassiveFarm.png");
+    public static final ImageIcon ROOM_PASSIVE_GRAVE = loadIcon("sprites/buildings/rooms/PassiveGrave.png");
+    public static final ImageIcon ROOM_PASSIVE_COMPOSTER = loadIcon("sprites/buildings/rooms/PassiveComposter.png");
 
     // --- Convoy view tiles (simulation / view-convoy screen backgrounds) ---
     public static final ImageIcon CONVOY_TILE_SEA = loadIcon("backgrounds/convoy/SeaConvoyTile.png");
@@ -724,6 +756,10 @@ public final class GameConstants {
             GameSpeed.ID_TURBO, LanguageStrings.UI_SPEED_TURBO, 1,
             loadIcon("icons/speed/Turbo.png"));
     static { gameSpeeds.add(SPEED_TURBO); }
+    public static final ImageIcon ICON_SPEED_ZERO = loadIcon("icons/speed/Zero.png");
+    public static final ImageIcon ICON_SPEED_UP = loadIcon("icons/speed/SpeedUp.png");
+    public static final ImageIcon ICON_SPEED_DOWN = loadIcon("icons/speed/SpeedDown.png");
+    public static final ImageIcon ICON_SPEED_PLAY = loadIcon("icons/speed/Play.png");
     public static final ImageIcon ICON_SPEED_PAUSE = loadIcon("icons/speed/Pause.png");
 
     public static final int DIPLOMATIC_REPUTATION_MIN = 0;

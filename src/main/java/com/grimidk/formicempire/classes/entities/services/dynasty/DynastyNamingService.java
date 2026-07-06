@@ -36,11 +36,7 @@ public class DynastyNamingService {
     }
 
     public String generateCapitalName(String dynastyName) {
-        String theme = LanguageStrings.stripDynastyNameSuffix(dynastyName);
-        if (theme == null || theme.isEmpty()) {
-            return "Colony Prime";
-        }
-        return theme + " Prime";
+        return LanguageStrings.expectedCapitalColonyName(dynastyName);
     }
 
     private String getRandomTheme(Species species) {

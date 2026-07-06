@@ -61,6 +61,11 @@ public class Engine extends Thread {
     private int defaultRolePrincess = 23; // ROLE_BREEDER
     private int defaultRoleQueen = 25; // ROLE_LAYER
 
+    /** Ignores duplicate speed input within one Swing key sequence (VK + typed char). */
+    private long lastSpeedDownStepMs;
+    private long lastSpeedUpStepMs;
+    private static final long SPEED_STEP_COALESCE_MS = 120;
+
     public Engine() {
         this.semaphore = new Semaphore(1);
         this.killSwitch = false;
@@ -132,11 +137,46 @@ public class Engine extends Thread {
     }
 
     public void stepSpeedUp() {
-        setSpeed(GameSpeed.step(speed, 1, allowTurboMode));
+        adjustSpeedStep(1);
     }
 
     public void stepSpeedDown() {
-        setSpeed(GameSpeed.step(speed, -1, allowTurboMode));
+        adjustSpeedStep(-1);
+    }
+
+    /** Unpauses if needed, then steps speed up or down (one tier per call). */
+    public void adjustSpeedStep(int direction) {
+        if (direction == 0) {
+            return;
+        }
+        long now = System.currentTimeMillis();
+        if (direction < 0) {
+            if (now - lastSpeedDownStepMs < SPEED_STEP_COALESCE_MS) {
+                return;
+            }
+            lastSpeedDownStepMs = now;
+        } else {
+            if (now - lastSpeedUpStepMs < SPEED_STEP_COALESCE_MS) {
+                return;
+            }
+            lastSpeedUpStepMs = now;
+        }
+        if (direction < 0) {
+            if (paused) {
+                return;
+            }
+            if (speed.getId() == GameSpeed.ID_VERY_SLOW) {
+                pauseEngine();
+                return;
+            }
+            setSpeed(GameSpeed.step(speed, -1, allowTurboMode));
+            return;
+        }
+        if (paused) {
+            resumeEngine();
+            return;
+        }
+        setSpeed(GameSpeed.step(speed, 1, allowTurboMode));
     }
 
     public void togglePause() {
@@ -278,18 +318,17 @@ public class Engine extends Thread {
             try {
                 Thread.sleep(speed.getDelayMs());
             } catch (InterruptedException e) {
+                Thread.interrupted();
+                continue;
             }
 
             if (!paused) {
+                semaphore.acquireUninterruptibly();
                 try {
-                    semaphore.acquire();
                     if (this.world != null) {
-                        this.world.runMinute(); 
-                        notifyMinuteListeners(); 
+                        this.world.runMinute();
+                        notifyMinuteListeners();
                     }
-
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
                 } finally {
                     semaphore.release();
                 }
