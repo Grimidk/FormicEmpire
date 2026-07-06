@@ -25,9 +25,7 @@ To Fix (By decreasing priority) :
 
 	Important not Urgent:
 	late game performance (physics too taxing, may need to deload ants outside of area or update less when >50k ants) maybe look into LWJGL
-	mechanics audit and breakdown
 	hexagonal architecture
-	simplify deplyable menu
 	
 To Feature (to be done in order):
 Needed for launch (v1.0) (Launch Version):
@@ -35,7 +33,7 @@ Needed for launch (v1.0) (Launch Version):
 	rebellions and rebel colonies ( too much causes a rebellious dynasty to appear, once capital defeated it gets reabsorbed)
 	grant independence and modifier for it
 	barrack room before royal chamber
-	assimilations ( Trap-jaw (Trap jaw ants), Honey-pot (Honey pot ants), Door-head (Turtle ants), Wood burrowing (Carpenter ants), Silk weaving (Weaver ants), Rafting (Flood plains ants), Fire venom (Fire ants), Jumping (Jet ants), Gliding (Gliding ants), Stinging (Bullet ants), Swarming (Army ants), Stealth (Ghost ants), Fast bitting (Dracula ants), Heat resistance (Saharan silver ants), Deadly venom (Harvester ants), Self destruction (Exploding ants), Far sight (Bulldog ants), Hive building (Shining black ants), Location sensing (Desert ants))
+	assimilations ( Trap-jaw (Trap jaw ants), Honey-pot (Honey pot ants), Door-head (Turtle ants), Wood burrowing (Carpenter ants), Silk weaving (Weaver ants), Rafting (Flood plains ants), Jumping (Jet ants), Gliding (Gliding ants), Swarming (Army ants), Stealth (Ghost ants), Heat resistance (Saharan silver ants), Self destruction (Exploding ants), Far sight (Bulldog ants), Hive building (Shining black ants), Location sensing (Desert ants))
 	ant subtypes (enable by role / exclusion) checks with new sprites, manage by hatch rate since they cant be changed
 
 	Everything else :
@@ -44,6 +42,7 @@ Needed for launch (v1.0) (Launch Version):
 	air warfare
 	research tree and building tree (after icons)
 	rework how carrying looks completely
+	random events (meteor, earthquake, tornado, tsunami, )
 	main menu screen maybe simulation like factorio
 	synergies ( Super majors + Chemical throwing = Artillery ants; Self destruction + Acid spitting = Corrosive bombs; Silk weaving + Hive building = Web building; Air-force ants + self destruction = Air-bomber ants)
 	more upgrades and more buildings

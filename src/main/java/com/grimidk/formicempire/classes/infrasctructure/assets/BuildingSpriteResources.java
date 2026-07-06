@@ -24,6 +24,7 @@ public final class BuildingSpriteResources {
     private BuildingSpriteResources() {
     }
 
+    // TODO asset: sprites/buildings/rooms/{Chain}L{tier}.png (placeholder in-room overlay; replace final art)
     public static ImageIcon roomTier(String chainKey, int level) {
         if (chainKey == null) {
             return null;
@@ -34,6 +35,7 @@ public final class BuildingSpriteResources {
         return icon(path);
     }
 
+    // TODO asset: sprites/buildings/rooms/Passive{Name}.png (placeholder in-room overlay; replace final art)
     public static ImageIcon passiveRoom(String passiveKey) {
         if (passiveKey == null || passiveKey.isEmpty()) {
             return null;

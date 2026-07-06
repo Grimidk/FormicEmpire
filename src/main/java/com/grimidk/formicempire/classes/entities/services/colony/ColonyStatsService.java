@@ -4,6 +4,7 @@ import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.world.Temperature;
 import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 
@@ -193,8 +194,61 @@ public class ColonyStatsService {
     public int getBaseTempRes(Colony colony) { return colony.hasUpgrade(GameUnlocks.STAT_LONGEVITY) ? 25 : 0; }
     public int getBaseRegen(Colony colony) { return colony.hasUpgrade(GameUnlocks.STAT_SKELETON) ? 1 : 0; }
     public int getBaseConsumption(Colony colony) { return colony.hasUpgrade(GameUnlocks.STAT_LONGEVITY) ? 1 : 0; }
-    public int getBaseAttack(Colony colony) { return colony.hasUpgrade(GameUnlocks.STAT_ACID) ? 10 : 0; }
-    public int getBaseAttackSpeed(Colony colony) { return colony.hasUpgrade(GameUnlocks.STAT_ACID) ? 1 : 0; }
+
+    /**
+     * Assimilated damage multiplier for colony base attack.
+     * Fire venom sets 4x; bullet and harvester venom add +4 each (additive).
+     * Fire + harvester together use {@link GameConstants#ASSIMILATED_DAMAGE_SYNERGY_FIRE_DEADLY} (16x) instead of 4+4.
+     */
+    public static float getAssimilatedDamageMultiplier(Dynasty dynasty) {
+        if (dynasty == null) {
+            return 1f;
+        }
+        boolean fire = dynasty.hasUpgrade(GameUnlocks.ASSIMILATED_FIREVENOM);
+        boolean stinging = dynasty.hasUpgrade(GameUnlocks.ASSIMILATED_STINGING);
+        boolean deadly = dynasty.hasUpgrade(GameUnlocks.ASSIMILATED_DEADLYVENOM);
+
+        float mult;
+        if (fire && deadly) {
+            mult = GameConstants.ASSIMILATED_DAMAGE_SYNERGY_FIRE_DEADLY;
+        } else {
+            mult = 1f;
+            if (fire) {
+                mult = GameConstants.ASSIMILATED_DAMAGE_MULT_FIRE;
+            }
+            if (deadly) {
+                mult += GameConstants.ASSIMILATED_DAMAGE_ADD_DEADLY;
+            }
+        }
+        if (stinging) {
+            mult += GameConstants.ASSIMILATED_DAMAGE_ADD_STING;
+        }
+        return mult;
+    }
+
+    public static float getAssimilatedAttackSpeedMultiplier(Dynasty dynasty) {
+        if (dynasty != null && dynasty.hasUpgrade(GameUnlocks.ASSIMILATED_FASTBITE)) {
+            return GameConstants.ASSIMILATED_ATTACK_SPEED_MULT_FASTBITE;
+        }
+        return 1f;
+    }
+
+    public int getBaseAttack(Colony colony) {
+        if (!colony.hasUpgrade(GameUnlocks.STAT_ACID)) {
+            return 0;
+        }
+        float mult = getAssimilatedDamageMultiplier(colony.getDynasty());
+        return Math.round(GameConstants.MILITARY_BASELINE_ATTACK * mult);
+    }
+
+    public int getBaseAttackSpeed(Colony colony) {
+        if (!colony.hasUpgrade(GameUnlocks.STAT_ACID)) {
+            return 0;
+        }
+        float mult = getAssimilatedAttackSpeedMultiplier(colony.getDynasty());
+        return Math.round(GameConstants.MILITARY_BASELINE_ATTACK_SPEED * mult);
+    }
+
     public int getBaseDefense(Colony colony) { return colony.hasUpgrade(GameUnlocks.STAT_SKELETON) ? 5 : 0; }
     public int getBaseSpeed(Colony colony) { return colony.hasUpgrade(GameUnlocks.STAT_ACID) ? 1 : 0; }
     public int getBaseSize(Colony colony){ return colony.hasUpgrade(GameUnlocks.STAT_LONGEVITY) ? 1 : 0; }

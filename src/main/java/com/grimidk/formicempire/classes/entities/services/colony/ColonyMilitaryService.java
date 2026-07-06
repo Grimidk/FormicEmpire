@@ -220,13 +220,22 @@ public final class ColonyMilitaryService {
         }
         boolean hasSkeleton = dynasty != null && dynasty.hasUpgrade(GameUnlocks.STAT_SKELETON);
         boolean hasAcid = dynasty != null && dynasty.hasUpgrade(GameUnlocks.STAT_ACID);
+        int baseHealth = hasSkeleton ? GameConstants.MILITARY_BASELINE_HEALTH : 0;
+        int baseDefense = hasSkeleton ? GameConstants.MILITARY_BASELINE_DEFENSE : 0;
+        int baseAttack = hasAcid
+                ? Math.round(GameConstants.MILITARY_BASELINE_ATTACK * ColonyStatsService.getAssimilatedDamageMultiplier(dynasty))
+                : 0;
+        int baseAttackSpeed = hasAcid
+                ? Math.round(GameConstants.MILITARY_BASELINE_ATTACK_SPEED
+                        * ColonyStatsService.getAssimilatedAttackSpeedMultiplier(dynasty))
+                : 0;
         int typePoints = computeTypePoints(
                 savedColony.workers,
                 savedColony.soldiers,
                 savedColony.majors,
                 savedColony.princesses,
                 savedColony.queens);
-        return Math.round(typePoints * computeStatMultiplier(hasSkeleton, hasAcid));
+        return Math.round(typePoints * computeStatMultiplierFromBases(baseHealth, baseAttack, baseDefense, baseAttackSpeed));
     }
 
     public static void refreshColonyMilitaryPower(Colony colony) {

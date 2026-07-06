@@ -106,25 +106,16 @@ public class HelpPanel extends JPanel {
     
     private void initTabs() {
         mainTabs.removeAll();
-        
-        // Filter Role Upgrades vs Generic Upgrades
-        List<Constant> roleConstants = GameUnlocks.getUpgrades().stream()
-                .filter(u -> u.getNameKey().toLowerCase().contains("role"))
-                .collect(Collectors.toList());
-        
-        List<Constant> genericUpgrades = GameUnlocks.getUpgrades().stream()
-                .filter(u -> !u.getNameKey().toLowerCase().contains("role"))
-                .collect(Collectors.toList());
 
         // Add tabs
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_TUTORIALS), createTutorialsPanel());
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_SPECIES), createSpeciesPanel());
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_TYPES), createAntTypesPanel());
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_BUGS), createBugsPanel());
-        mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_ROLES), createDictionaryPanel(roleConstants));
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_ANT_ROLES), createAntRolesPanel());
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_EMPIRE), createEmpirePanel());
-        mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_UPGRADES), createDictionaryPanel(genericUpgrades));
+        mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_UPGRADES),
+                createDictionaryPanel(new ArrayList<>(GameUnlocks.getUpgrades())));
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_BUILDINGS),
                 createDictionaryPanel(new ArrayList<>(GameUnlocks.getBuildings()), false));
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_ASSIMILATIONS), createDictionaryPanel(new ArrayList<>(GameUnlocks.getAssimilations())));
@@ -142,7 +133,6 @@ public class HelpPanel extends JPanel {
             LanguageStrings.get(LanguageStrings.HELP_TAB_SPECIES),
             LanguageStrings.get(LanguageStrings.HELP_TAB_TYPES),
             LanguageStrings.get(LanguageStrings.HELP_TAB_BUGS),
-            LanguageStrings.get(LanguageStrings.HELP_TAB_ROLES),
             LanguageStrings.get(LanguageStrings.HELP_TAB_ANT_ROLES),
             LanguageStrings.get(LanguageStrings.HELP_TAB_EMPIRE),
             LanguageStrings.get(LanguageStrings.HELP_TAB_UPGRADES),
@@ -371,15 +361,15 @@ public class HelpPanel extends JPanel {
         HotkeyRow row = new HotkeyRow();
         row.add("Spacebar", LanguageStrings.get("HOTKEY_PAUSE"));
         row.add("+ / -", LanguageStrings.get("HOTKEY_SPEED"));
-        row.add("A", LanguageStrings.get("HOTKEY_VIEW"));
+        row.add("Z", LanguageStrings.get("HOTKEY_VIEW"));
         row.add("ESC", LanguageStrings.get("HOTKEY_ESC"));
         row.addSeparator();
         row.add("Q / W / E / R / T", LanguageStrings.get("HOTKEY_ROLES"));
         row.addSeparator();
         row.add("P", LanguageStrings.get("HOTKEY_P"));
         row.add("Y / U / I / O", LanguageStrings.get("HOTKEY_UPGRADES"));
-        row.add("Z", LanguageStrings.get("HOTKEY_Z"));
-        row.add("S / A / D / F", LanguageStrings.get("HOTKEY_DYNASTY"));
+        row.add("C", LanguageStrings.get("HOTKEY_ABILITIES"));
+        row.add("A / S / D / F", LanguageStrings.get("HOTKEY_DYNASTY"));
         row.add("M", LanguageStrings.get("HOTKEY_M"));
         row.add("X", LanguageStrings.get("HOTKEY_X"));
 
@@ -1085,10 +1075,11 @@ public class HelpPanel extends JPanel {
         Object[][] keysData = {
             {LanguageStrings.get("HOTKEY_PAUSE_LABEL"), "Spacebar"},
             {LanguageStrings.get("HOTKEY_ESC_LABEL"), "ESC"},
-            {LanguageStrings.get("HOTKEY_VIEW_LABEL"), "A"},
+            {LanguageStrings.get("HOTKEY_VIEW_LABEL"), "Z"},
             {LanguageStrings.get("HOTKEY_ROLES_LABEL"), "Q-T"},
             {LanguageStrings.get("HOTKEY_UPGRADES_LABEL"), "Y-O"},
             {LanguageStrings.get("HOTKEY_P_LABEL"), "P"},
+            {LanguageStrings.get("HOTKEY_ABILITIES_LABEL"), "C"},
             {LanguageStrings.get("HOTKEY_DYNASTY_LABEL"), "A / S / D / F"},
             {LanguageStrings.get("HOTKEY_M_LABEL"), "M"},
             {LanguageStrings.get("HOTKEY_X_LABEL"), "X"}

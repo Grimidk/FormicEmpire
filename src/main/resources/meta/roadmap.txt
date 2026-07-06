@@ -13,7 +13,6 @@ To Fix (By decreasing priority) :
 	High:
 	TODO: icons/sprites for all Constants (roles, moves) and unlocks (all)
 	Room sprites still look ugly af (see TODO asset on buildingRoomSprite / BuildingSpriteResources)
-	wars can be opened from diplomacy
 
 	Mid:
 	(none right now)
