@@ -1,14 +1,30 @@
 package com.grimidk.formicempire.classes.infrasctructure.util;
 
+import java.util.ArrayDeque;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.Random;
 
 public final class GameRandom {
     private static final Random RNG = new Random();
+    private static final Deque<Double> TEST_DOUBLE_QUEUE = new ArrayDeque<>();
 
     private GameRandom() {}
 
+    public static void enqueueTestDoubles(double... values) {
+        for (double value : values) {
+            TEST_DOUBLE_QUEUE.addLast(value);
+        }
+    }
+
+    public static void clearTestDoubles() {
+        TEST_DOUBLE_QUEUE.clear();
+    }
+
     public static double nextDouble() {
+        if (!TEST_DOUBLE_QUEUE.isEmpty()) {
+            return TEST_DOUBLE_QUEUE.removeFirst();
+        }
         return RNG.nextDouble();
     }
 

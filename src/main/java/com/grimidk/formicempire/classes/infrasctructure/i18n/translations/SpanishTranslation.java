@@ -756,6 +756,17 @@ public class SpanishTranslation implements Translation {
         es.put("DIPLO_MODIFIER_TRADE", "Ruta comercial");
         es.put("DIPLO_MODIFIER_TRADE_REQUEST", "Solicitud comercial");
         es.put("DIPLO_MODIFIER_BORDER_FRICTION", "Fricción fronteriza");
+        es.put("DIPLO_MODIFIER_GRANTED_INDEPENDENCE", "Independencia concedida");
+        es.put("DYNASTY_REBELLION_NAME_FMT", "%s Rebelión");
+        es.put("REBELLION_WAR_NAME_FMT", "%s Rebelión %s");
+        es.put("ALERT_REBELLION_RISK_FMT", "¡Riesgo de rebelión en %s!");
+        es.put("REBELLION_RESPONSE_TITLE", "Rebelión");
+        es.put("REBELLION_RESPONSE_MSG_FMT", "%s se ha separado con %s colonias. ¿Luchar para recuperarlas o conceder independencia pacífica?");
+        es.put("REBELLION_ACTION_FIGHT", "Luchar");
+        es.put("REBELLION_ACTION_INDEPENDENCE", "Conceder independencia");
+        es.put("LOG_REBELLION_FORMED_FMT", "%s ha declarado la independencia de tu dinastía.");
+        es.put("LOG_REBELLION_COLONY_JOINED_FMT", "%s se unió a la rebelión.");
+        es.put("LOG_REBELLION_INDEPENDENCE_FMT", "Independencia pacífica concedida a %s.");
         es.put("DIPLO_MILITARY_STRENGTH", "Fuerza militar");
         es.put("GI_MODIFIER_PACT", "Alianza de pacto");
         es.put("GI_TOOLTIP_START", "Inicial");

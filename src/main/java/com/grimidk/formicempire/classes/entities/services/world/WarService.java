@@ -7,6 +7,7 @@ import com.grimidk.formicempire.classes.entities.War;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyLabourService;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDiplomacyService;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyRebellionService;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
@@ -61,6 +62,36 @@ public class WarService {
         return war;
     }
 
+    public War beginRebellionWar(Dynasty parent, Dynasty rebellion) {
+        if (parent == null || rebellion == null || parent == rebellion
+                || parent.isDefeated() || rebellion.isDefeated()) {
+            return null;
+        }
+        int[] pair = War.canonicalPair(parent.getId(), rebellion.getId());
+        War existing = findActiveWar(pair[0], pair[1]);
+        if (existing != null) {
+            return existing;
+        }
+        Dynasty dynastyA = world.findDynastyById(pair[0]);
+        Dynasty dynastyB = world.findDynastyById(pair[1]);
+        if (dynastyA == null || dynastyB == null) {
+            return null;
+        }
+        War war = new War(
+                nextWarId++,
+                pair[0],
+                pair[1],
+                DynastyDiplomacyService.worldMonthIndex(world),
+                parent.getId(),
+                DynastyRebellionService.generateRebellionWarName(world, parent),
+                dynastyA.getMilitaryPower(),
+                dynastyB.getMilitaryPower());
+        war.setRebellionWar(true);
+        activeWars.add(war);
+        WarProgressService.initializeCampaign(world, war, parent, rebellion);
+        return war;
+    }
+
     public void endWar(War war) {
         concludeWar(war, 0, LanguageStrings.WAR_CONCLUSION_UNKNOWN);
     }
@@ -72,6 +103,9 @@ public class WarService {
         war.conclude(DynastyDiplomacyService.worldMonthIndex(world), winnerDynastyId, conclusionKey);
         snapshotHistoricDynastyNames(war);
         historicWars.add(war);
+        if (war.isRebellionWar()) {
+            DynastyRebellionService.onRebellionWarConcluded(world, war, winnerDynastyId);
+        }
         transferRemainingLoserColonies(war, winnerDynastyId, conclusionKey);
         transferVictoryAssimilations(war, winnerDynastyId, conclusionKey);
         clearDiplomaticWarState(war);
@@ -519,6 +553,9 @@ public class WarService {
         if (war == null || offerer == null || !war.isActive() || !war.involves(offerer.getId())) {
             return false;
         }
+        if (war.isRebellionWar()) {
+            return false;
+        }
         if (war.getPendingPeaceOfferFromDynastyId() != 0) {
             return false;
         }
@@ -543,6 +580,9 @@ public class WarService {
 
     public boolean canAcceptPeaceOffer(War war, Dynasty accepter) {
         if (war == null || accepter == null || !war.isActive() || !war.involves(accepter.getId())) {
+            return false;
+        }
+        if (war.isRebellionWar()) {
             return false;
         }
         int offererId = war.getPendingPeaceOfferFromDynastyId();

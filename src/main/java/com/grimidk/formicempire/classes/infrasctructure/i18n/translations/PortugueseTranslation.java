@@ -756,6 +756,17 @@ public class PortugueseTranslation implements Translation {
         pt.put("DIPLO_MODIFIER_TRADE", "Rota comercial");
         pt.put("DIPLO_MODIFIER_TRADE_REQUEST", "Pedido comercial");
         pt.put("DIPLO_MODIFIER_BORDER_FRICTION", "Fricção fronteiriça");
+        pt.put("DIPLO_MODIFIER_GRANTED_INDEPENDENCE", "Independência concedida");
+        pt.put("DYNASTY_REBELLION_NAME_FMT", "%s Rebelião");
+        pt.put("REBELLION_WAR_NAME_FMT", "%s %s Rebelião");
+        pt.put("ALERT_REBELLION_RISK_FMT", "Risco de rebelião em %s!");
+        pt.put("REBELLION_RESPONSE_TITLE", "Rebelião");
+        pt.put("REBELLION_RESPONSE_MSG_FMT", "%s separou-se com %s colónias. Lutar para recuperá-las ou conceder independência pacífica?");
+        pt.put("REBELLION_ACTION_FIGHT", "Lutar");
+        pt.put("REBELLION_ACTION_INDEPENDENCE", "Conceder independência");
+        pt.put("LOG_REBELLION_FORMED_FMT", "%s declarou independência da sua dinastia.");
+        pt.put("LOG_REBELLION_COLONY_JOINED_FMT", "%s juntou-se à rebelião.");
+        pt.put("LOG_REBELLION_INDEPENDENCE_FMT", "Independência pacífica concedida a %s.");
         pt.put("DIPLO_MILITARY_STRENGTH", "Força militar");
         pt.put("GI_MODIFIER_PACT", "Aliança de pacto");
         pt.put("GI_TOOLTIP_START", "Inicial");

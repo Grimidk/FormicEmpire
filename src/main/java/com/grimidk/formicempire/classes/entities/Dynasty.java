@@ -80,6 +80,9 @@ public class Dynasty {
     private final List<CrossDynastyTradeProposal> pendingTradeProposals;
     private int forcedFlightCooldownDays;
     private final Map<Integer, Integer> diplomatSupportToDynasty = new HashMap<>();
+    private int originDynastyId;
+    private int activeRebellionDynastyId;
+    private int pendingRebellionResponseFromId;
 
     // Services
     private transient DynastyAutomationService automationService;
@@ -129,6 +132,9 @@ public class Dynasty {
         this.tradeRequestDeclinedAtWorldMonth = new HashMap<>();
         this.pendingTradeProposals = new ArrayList<>();
         this.forcedFlightCooldownDays = 0;
+        this.originDynastyId = 0;
+        this.activeRebellionDynastyId = 0;
+        this.pendingRebellionResponseFromId = 0;
         
         initializeColor();
         initializeServices();
@@ -176,6 +182,9 @@ public class Dynasty {
         this.tradeRequestDeclinedAtWorldMonth = new HashMap<>();
         this.pendingTradeProposals = new ArrayList<>();
         this.forcedFlightCooldownDays = 0;
+        this.originDynastyId = 0;
+        this.activeRebellionDynastyId = 0;
+        this.pendingRebellionResponseFromId = 0;
         
         this.absorbedDynastyIds = new ArrayList<>();
         if (savedDynasty.absorbedDynastyIds != null) {
@@ -317,6 +326,9 @@ public class Dynasty {
             }
         }
         this.forcedFlightCooldownDays = savedDynasty.forcedFlightCooldownDays;
+        this.originDynastyId = savedDynasty.originDynastyId;
+        this.activeRebellionDynastyId = savedDynasty.activeRebellionDynastyId;
+        this.pendingRebellionResponseFromId = savedDynasty.pendingRebellionResponseFromId;
         if (savedDynasty.diplomatSupportToDynasty != null) {
             for (Map.Entry<String, Integer> entry : savedDynasty.diplomatSupportToDynasty.entrySet()) {
                 diplomatSupportToDynasty.put(Integer.parseInt(entry.getKey()), entry.getValue());
@@ -496,6 +508,30 @@ public class Dynasty {
 
         addAbsorbedDynasty(defeated.getId());
         return inherited;
+    }
+
+    public void inheritProgressFrom(Dynasty parent) {
+        if (parent == null || parent == this) {
+            return;
+        }
+        for (Upgrade upgrade : new ArrayList<>(parent.getUnlockedUpgrades())) {
+            unlockUpgrade(upgrade);
+        }
+        for (Assimilation assimilation : new ArrayList<>(parent.getCompletedAssimilations())) {
+            if (!isAssimilationCompleted(assimilation)) {
+                if (assimilation.getReward() != null) {
+                    unlockUpgrade(assimilation.getReward());
+                }
+                completeAssimilation(assimilation);
+            }
+        }
+        for (int speciesId : new ArrayList<>(parent.getDefeatedSpeciesIds())) {
+            absorbSpecies(speciesId);
+        }
+        setDefaultAutomationEnabled(parent.isDefaultAutomationEnabled());
+        setDefaultAutoBuildEnabled(parent.isDefaultAutoBuildEnabled());
+        setAutoDiplomacyEnabled(parent.isAutoDiplomacyEnabled());
+        setDefaultAutoTunnelsEnabled(parent.isDefaultAutoTunnelsEnabled());
     }
     
     public void incrementNuptialFlights() {
@@ -894,6 +930,38 @@ public class Dynasty {
 
     public List<CrossDynastyTradeProposal> copyPendingTradeProposals() {
         return new ArrayList<>(pendingTradeProposals);
+    }
+
+    public void removePendingTradeProposalsFrom(int fromDynastyId) {
+        pendingTradeProposals.removeIf(proposal -> proposal.getFromDynastyId() == fromDynastyId);
+    }
+
+    public int getOriginDynastyId() {
+        return originDynastyId;
+    }
+
+    public void setOriginDynastyId(int originDynastyId) {
+        this.originDynastyId = Math.max(0, originDynastyId);
+    }
+
+    public int getActiveRebellionDynastyId() {
+        return activeRebellionDynastyId;
+    }
+
+    public void setActiveRebellionDynastyId(int activeRebellionDynastyId) {
+        this.activeRebellionDynastyId = Math.max(0, activeRebellionDynastyId);
+    }
+
+    public int getPendingRebellionResponseFromId() {
+        return pendingRebellionResponseFromId;
+    }
+
+    public void setPendingRebellionResponseFromId(int rebellionDynastyId) {
+        this.pendingRebellionResponseFromId = Math.max(0, rebellionDynastyId);
+    }
+
+    public void clearPendingRebellionResponse() {
+        this.pendingRebellionResponseFromId = 0;
     }
 
     public int getForcedFlightCooldownDays() {

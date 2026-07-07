@@ -756,6 +756,17 @@ public class EnglishTranslation implements Translation {
         en.put("DIPLO_MODIFIER_TRADE", "Trade Route");
         en.put("DIPLO_MODIFIER_TRADE_REQUEST", "Trade Request");
         en.put("DIPLO_MODIFIER_BORDER_FRICTION", "Border Friction");
+        en.put("DIPLO_MODIFIER_GRANTED_INDEPENDENCE", "Granted Independence");
+        en.put("DYNASTY_REBELLION_NAME_FMT", "%s Rebellion");
+        en.put("REBELLION_WAR_NAME_FMT", "%s %s Rebellion");
+        en.put("ALERT_REBELLION_RISK_FMT", "Rebellion risk at %s!");
+        en.put("REBELLION_RESPONSE_TITLE", "Rebellion");
+        en.put("REBELLION_RESPONSE_MSG_FMT", "%s has broken away with %s colonies. Fight to reclaim them or grant peaceful independence?");
+        en.put("REBELLION_ACTION_FIGHT", "Fight");
+        en.put("REBELLION_ACTION_INDEPENDENCE", "Grant Independence");
+        en.put("LOG_REBELLION_FORMED_FMT", "%s has declared independence from your dynasty.");
+        en.put("LOG_REBELLION_COLONY_JOINED_FMT", "%s joined the rebellion.");
+        en.put("LOG_REBELLION_INDEPENDENCE_FMT", "Peaceful independence granted to %s.");
         en.put("DIPLO_MILITARY_STRENGTH", "Military Strength");
         en.put("GI_MODIFIER_PACT", "Pact Alliance");
         en.put("GI_TOOLTIP_START", "Starting");

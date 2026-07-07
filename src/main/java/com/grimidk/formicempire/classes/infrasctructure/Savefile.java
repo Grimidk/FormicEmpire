@@ -109,6 +109,9 @@ public class Savefile implements Serializable {
         public List<SavedCrossDynastyTradeProposal> pendingTradeProposals = new ArrayList<>();
         public int forcedFlightCooldownDays;
         public List<SavedTunnel> tunnels = new ArrayList<>();
+        public int originDynastyId;
+        public int activeRebellionDynastyId;
+        public int pendingRebellionResponseFromId;
     }
 
     public static class SavedCrossDynastyTradeProposal implements Serializable {
@@ -242,6 +245,7 @@ public class Savefile implements Serializable {
         public String dynastyNameA;
         public String dynastyNameB;
         public String winnerDynastyName;
+        public boolean rebellionWar;
     }
 
     public static class SavedTrade implements Serializable {

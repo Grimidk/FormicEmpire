@@ -2,9 +2,13 @@ package com.grimidk.formicempire.classes.interfaces.game.managers;
 
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyRebellionService;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
+import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
+import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.interfaces.game.gamepanels.AlertPanel;
 import com.grimidk.formicempire.classes.interfaces.game.gamepanels.AlertPanel.Alert;
 
@@ -61,8 +65,38 @@ public class AlertManager {
         checkAvailableResearch();
         checkAvailableBuildings();
         checkBodyPile();
+        checkRebellionRisk(null, null);
 
         SwingUtilities.invokeLater(() -> panel.updateAlerts(new ArrayList<>(activeAlerts)));
+    }
+
+    public void checkRebellionRisk(World world, TradeManager tradeManager) {
+        if (colony == null) {
+            return;
+        }
+        Dynasty dynasty = colony.getDynasty();
+        if (dynasty == null || !dynasty.isPlayer()) {
+            return;
+        }
+        if (world != null) {
+            for (Colony candidate : dynasty.getColonies()) {
+                if (candidate.isCapital()) {
+                    continue;
+                }
+                if (DynastyRebellionService.isRebellionRisk(candidate, tradeManager, world)) {
+                    addAlert("REBEL",
+                            LanguageStrings.format(LanguageStrings.ALERT_REBELLION_RISK_FMT, candidate.getName()),
+                            AssetStyles.FONT_COLOR_WARNING, durationDefault);
+                    return;
+                }
+            }
+            return;
+        }
+        if (!colony.isCapital() && DynastyRebellionService.isRebellionRisk(colony, tradeManager, world)) {
+            addAlert("REBEL",
+                    LanguageStrings.format(LanguageStrings.ALERT_REBELLION_RISK_FMT, colony.getName()),
+                    AssetStyles.FONT_COLOR_WARNING, durationDefault);
+        }
     }
 
     public void ingestLogEvent(String msg) {
@@ -102,6 +136,15 @@ public class AlertManager {
     private void addAlert(String key, String msg, Color color, long duration) {
         activeAlerts.removeIf(a -> a.key.equals(key));
         activeAlerts.add(0, new Alert(key, msg, color, duration));
+    }
+
+    public boolean hasActiveAlert(String key) {
+        for (Alert alert : activeAlerts) {
+            if (alert.key.equals(key)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void checkResourceWarning() {

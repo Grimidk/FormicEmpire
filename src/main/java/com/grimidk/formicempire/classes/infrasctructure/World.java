@@ -27,6 +27,7 @@ import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryS
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyStarterService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDeathService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyNamingService;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyRebellionService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastySynergyService;
 import com.grimidk.formicempire.classes.entities.services.world.WarService;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
@@ -90,6 +91,10 @@ public class World {
 
     public synchronized int getNextColonyId() {
         return colonyIdCounter++;
+    }
+
+    public synchronized int allocateDynastyId() {
+        return dynastyIdCounter++;
     }
 
     public void setEngine(Engine engine) {
@@ -1053,6 +1058,9 @@ public class World {
                 colony.runMonthlyJobs(monthSeason, hex.getBiome());
             }
         }
+
+        TradeManager tradeManager = engine != null ? engine.getTradeManager() : null;
+        DynastyRebellionService.runMonthlyChecks(this, tradeManager);
 
         this.setSeason(monthSeason);
 

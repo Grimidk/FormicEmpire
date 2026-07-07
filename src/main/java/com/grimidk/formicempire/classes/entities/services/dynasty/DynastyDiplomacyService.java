@@ -129,6 +129,13 @@ public class DynastyDiplomacyService {
         applyModifierBothWays(other, GameConstants.DIPLO_MODIFIER_PACT);
     }
 
+    public void applyNonAggressionPact(Dynasty other) {
+        if (other == null || other == dynasty || hasNonAggressionPact(other)) {
+            return;
+        }
+        applyModifierBothWays(other, GameConstants.DIPLO_MODIFIER_PACT);
+    }
+
     public boolean canRequestNonAggressionPact(Dynasty other, World world) {
         maybeRecoverDeclinedPactRequest(other, world);
         if (getPactRequestDeclineCooldownMonthsRemaining(other, world) > 0) {

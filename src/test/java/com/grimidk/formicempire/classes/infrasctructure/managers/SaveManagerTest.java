@@ -187,4 +187,57 @@ public class SaveManagerTest {
         assertEquals(15, loaded.get(1).dynastyIdB);
         assertEquals("Grim Dynasty", loaded.get(1).winnerDynastyName);
     }
+
+    @Test
+    void rebellionWarFlagSurvivesWarJsonRoundTrip() throws Exception {
+        Savefile.SavedWar war = new Savefile.SavedWar();
+        war.id = 9;
+        war.dynastyIdA = 1;
+        war.dynastyIdB = 2;
+        war.startedWorldMonth = 3;
+        war.declaredByDynastyId = 1;
+        war.displayName = "First Crystal Rebellion";
+        war.militaryPowerAtStartA = 100;
+        war.militaryPowerAtStartB = 80;
+        war.rebellionWar = true;
+
+        SaveManager saveManager = new SaveManager();
+        Method serializeMethod = SaveManager.class.getDeclaredMethod("serializeWarsToJson", List.class);
+        serializeMethod.setAccessible(true);
+        String json = (String) serializeMethod.invoke(saveManager, List.of(war));
+
+        Method deserializeMethod = SaveManager.class.getDeclaredMethod("deserializeJsonToWars", String.class);
+        deserializeMethod.setAccessible(true);
+        @SuppressWarnings("unchecked")
+        List<Savefile.SavedWar> loaded = (List<Savefile.SavedWar>) deserializeMethod.invoke(saveManager, json);
+
+        assertEquals(1, loaded.size());
+        assertTrue(loaded.get(0).rebellionWar);
+        assertEquals("First Crystal Rebellion", loaded.get(0).displayName);
+    }
+
+    @Test
+    void rebellionDynastyFieldsSurviveDynastyJsonRoundTrip() throws Exception {
+        String json = "{"
+                + "\"id\":5,"
+                + "\"name\":\"Crystal Dynasty\","
+                + "\"titleKey\":\"DYNASTY_TITLE_DYNASTY\","
+                + "\"isPlayer\":true,"
+                + "\"isDefeated\":false,"
+                + "\"rank\":\"Ant\","
+                + "\"speciesId\":1,"
+                + "\"originDynastyId\":0,"
+                + "\"activeRebellionDynastyId\":12,"
+                + "\"pendingRebellionResponseFromId\":12"
+                + "}";
+
+        SaveManager saveManager = new SaveManager();
+        Method parseMethod = SaveManager.class.getDeclaredMethod("parseDynastyObject", String.class);
+        parseMethod.setAccessible(true);
+        Savefile.SavedDynasty loaded = (Savefile.SavedDynasty) parseMethod.invoke(saveManager, json);
+
+        assertEquals(12, loaded.activeRebellionDynastyId);
+        assertEquals(12, loaded.pendingRebellionResponseFromId);
+        assertEquals(0, loaded.originDynastyId);
+    }
 }

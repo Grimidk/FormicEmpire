@@ -404,6 +404,9 @@ public class SaveManager {
                     sc.pendingTradeProposals.add(saved);
                 }
                 sc.forcedFlightCooldownDays = dynasty.getForcedFlightCooldownDays();
+                sc.originDynastyId = dynasty.getOriginDynastyId();
+                sc.activeRebellionDynastyId = dynasty.getActiveRebellionDynastyId();
+                sc.pendingRebellionResponseFromId = dynasty.getPendingRebellionResponseFromId();
                 
                 sc.unlockedUpgradeIds = new ArrayList<>();
                 if (dynasty.getUnlockedUpgrades() != null) {
@@ -718,6 +721,9 @@ public class SaveManager {
         w.write("      \"tradeRequestDeclinedAtWorldMonth\": " + serializeMapToJson(sc.tradeRequestDeclinedAtWorldMonth) + ","); w.newLine();
         w.write("      \"pendingTradeProposals\": " + serializeTradeProposalsToJson(sc.pendingTradeProposals) + ","); w.newLine();
         w.write("      \"forcedFlightCooldownDays\": " + sc.forcedFlightCooldownDays + ","); w.newLine();
+        w.write("      \"originDynastyId\": " + sc.originDynastyId + ","); w.newLine();
+        w.write("      \"activeRebellionDynastyId\": " + sc.activeRebellionDynastyId + ","); w.newLine();
+        w.write("      \"pendingRebellionResponseFromId\": " + sc.pendingRebellionResponseFromId + ","); w.newLine();
         w.write("      \"unlockedUpgradeIds\": " + serializeListToJson(sc.unlockedUpgradeIds) + ","); w.newLine();
         w.write("      \"absorbedDynastyIds\": " + serializeListToJson(sc.absorbedDynastyIds) + ","); w.newLine();
         w.write("      \"defeatedSpeciesIds\": " + serializeListToJson(sc.defeatedSpeciesIds) + ","); w.newLine();
@@ -965,6 +971,9 @@ public class SaveManager {
         sc.tradeRequestDeclinedAtWorldMonth = deserializeJsonToMap(map.get("tradeRequestDeclinedAtWorldMonth"));
         sc.pendingTradeProposals = deserializeJsonToTradeProposals(map.get("pendingTradeProposals"));
         sc.forcedFlightCooldownDays = Integer.parseInt(map.getOrDefault("forcedFlightCooldownDays", "0"));
+        sc.originDynastyId = Integer.parseInt(map.getOrDefault("originDynastyId", "0"));
+        sc.activeRebellionDynastyId = Integer.parseInt(map.getOrDefault("activeRebellionDynastyId", "0"));
+        sc.pendingRebellionResponseFromId = Integer.parseInt(map.getOrDefault("pendingRebellionResponseFromId", "0"));
         sc.unlockedUpgradeIds = deserializeJsonToList(map.get("unlockedUpgradeIds"));
         sc.absorbedDynastyIds = deserializeJsonToList(map.get("absorbedDynastyIds"));
         sc.defeatedSpeciesIds = deserializeJsonToList(map.get("defeatedSpeciesIds"));
@@ -1827,7 +1836,8 @@ public class SaveManager {
             sb.append("\"dynastyNameB\":\"").append(escapeJsonString(
                     war.dynastyNameB != null ? war.dynastyNameB : "")).append("\",");
             sb.append("\"winnerDynastyName\":\"").append(escapeJsonString(
-                    war.winnerDynastyName != null ? war.winnerDynastyName : "")).append("\"");
+                    war.winnerDynastyName != null ? war.winnerDynastyName : "")).append("\",");
+            sb.append("\"rebellionWar\":").append(war.rebellionWar);
             sb.append("}");
             if (i < wars.size() - 1) {
                 sb.append(",");
@@ -1901,6 +1911,7 @@ public class SaveManager {
                         war.dynastyNameA = map.getOrDefault("dynastyNameA", null);
                         war.dynastyNameB = map.getOrDefault("dynastyNameB", null);
                         war.winnerDynastyName = map.getOrDefault("winnerDynastyName", null);
+                        war.rebellionWar = Boolean.parseBoolean(map.getOrDefault("rebellionWar", "false"));
                         if (War.isValidRecord(war.dynastyIdA, war.dynastyIdB)) {
                             list.add(war);
                         }

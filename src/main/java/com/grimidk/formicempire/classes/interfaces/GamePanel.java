@@ -5,6 +5,7 @@ import com.grimidk.formicempire.classes.entities.CrossDynastyTradeProposal;
 import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.War;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyRebellionService;
 import com.grimidk.formicempire.classes.entities.services.world.WarService;
 import com.grimidk.formicempire.classes.entities.services.world.WarStanding;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
@@ -1570,6 +1571,8 @@ public class GamePanel extends ZeroGamePanel {
         processPendingNpcWarAlerts(world);
 
         if (alertManager != null) {
+            TradeManager tradeManager = engine != null ? engine.getTradeManager() : null;
+            alertManager.checkRebellionRisk(world, tradeManager);
             alertManager.checkStatus();
         }
 
@@ -1579,6 +1582,7 @@ public class GamePanel extends ZeroGamePanel {
     }
 
     private void processPendingDiplomacyNotifications(World world) {
+        processPendingRebellionResponse(world);
         processPendingPactRequests(world);
         processPendingWarDeclarations(world);
         processPendingPeaceOffers(world);
@@ -1626,6 +1630,48 @@ public class GamePanel extends ZeroGamePanel {
         World world = engine != null ? engine.getWorld() : null;
         if (world == null) return;
         worldPanel.updateMonthData(world);
+    }
+
+    private void processPendingRebellionResponse(World world) {
+        if (world == null || !engineStarted) {
+            return;
+        }
+        Dynasty playerDynasty = null;
+        for (Dynasty dynasty : world.getDynastys()) {
+            if (dynasty.isPlayer() && !dynasty.isDefeated()) {
+                playerDynasty = dynasty;
+                break;
+            }
+        }
+        if (playerDynasty == null) {
+            return;
+        }
+        int rebellionId = playerDynasty.getPendingRebellionResponseFromId();
+        if (rebellionId <= 0) {
+            return;
+        }
+        Dynasty rebellion = world.findDynastyById(rebellionId);
+        if (rebellion == null || rebellion.isDefeated()) {
+            playerDynasty.clearPendingRebellionResponse();
+            return;
+        }
+
+        String message = LanguageStrings.format(
+                LanguageStrings.REBELLION_RESPONSE_MSG_FMT,
+                rebellion.getName(),
+                AssetStyles.formatNumber(rebellion.getColonies().size()));
+        String[] options = {
+                LanguageStrings.get(LanguageStrings.REBELLION_ACTION_FIGHT),
+                LanguageStrings.get(LanguageStrings.REBELLION_ACTION_INDEPENDENCE)
+        };
+        int choice = UiOptionPane.showOptionDialog(this, message,
+                LanguageStrings.get(LanguageStrings.REBELLION_RESPONSE_TITLE),
+                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE,
+                null, options, options[1]);
+
+        TradeManager tradeManager = frame.getEngine() != null ? frame.getEngine().getTradeManager() : null;
+        boolean fight = choice == JOptionPane.YES_OPTION || choice == 0;
+        DynastyRebellionService.respondToRebellion(world, tradeManager, playerDynasty, rebellion, fight);
     }
 
     private void processPendingPactRequests(World world) {

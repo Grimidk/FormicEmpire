@@ -804,6 +804,19 @@ public final class GameConstants {
     public static final DiplomaticReputationModifier DIPLO_MODIFIER_BORDER_FRICTION = new DiplomaticReputationModifier(
         6, LanguageStrings.DIPLO_MODIFIER_BORDER_FRICTION, -10, 0, null);
     static { diplomaticReputationModifiers.add(DIPLO_MODIFIER_BORDER_FRICTION); }
+    public static final DiplomaticReputationModifier DIPLO_MODIFIER_GRANTED_INDEPENDENCE = new DiplomaticReputationModifier(
+        8, LanguageStrings.DIPLO_MODIFIER_GRANTED_INDEPENDENCE, 25, 0, null);
+    static { diplomaticReputationModifiers.add(DIPLO_MODIFIER_GRANTED_INDEPENDENCE); }
+
+    public static final double REBELLION_MONTHLY_CHANCE_MIN = 0.05;
+    public static final double REBELLION_MONTHLY_CHANCE_MAX = 0.30;
+    public static final double REBELLION_JOIN_BASE_CHANCE = 0.15;
+    public static final double REBELLION_JOIN_DISTANCE_WEIGHT = 0.40;
+    public static final double REBELLION_JOIN_LOYALTY_WEIGHT = 0.35;
+    public static final double REBELLION_NPC_FIGHT_CHANCE_MIN = 0.20;
+    public static final double REBELLION_NPC_FIGHT_CHANCE_MAX = 0.80;
+    public static final double REBELLION_NPC_FIGHT_RATIO_LOW = 0.85;
+    public static final double REBELLION_NPC_FIGHT_RATIO_HIGH = 1.15;
 
     // --- Genetic integrity modifiers ---
     public static final double GENETIC_INTEGRITY_START = 100.0;

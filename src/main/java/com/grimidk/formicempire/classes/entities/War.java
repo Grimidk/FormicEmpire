@@ -55,6 +55,7 @@ public class War {
     private int redeployHoursRemaining;
     private int stageStartActiveAggressor;
     private int stageStartActiveDefender;
+    private boolean rebellionWar;
 
     private final List<Integer> capturedColonyIds = new ArrayList<>();
     private final List<Integer> capturedByDynastyIds = new ArrayList<>();
@@ -100,6 +101,7 @@ public class War {
         this.dynastyNameA = saved.dynastyNameA;
         this.dynastyNameB = saved.dynastyNameB;
         this.winnerDynastyName = saved.winnerDynastyName;
+        this.rebellionWar = saved.rebellionWar;
     }
 
     public static int[] canonicalPair(int dynastyIdOne, int dynastyIdTwo) {
@@ -169,6 +171,14 @@ public class War {
 
     public int getMilitaryPowerAtStartB() {
         return militaryPowerAtStartB;
+    }
+
+    public boolean isRebellionWar() {
+        return rebellionWar;
+    }
+
+    public void setRebellionWar(boolean rebellionWar) {
+        this.rebellionWar = rebellionWar;
     }
 
     public int getMilitaryPowerAtStart(int dynastyId) {
@@ -491,6 +501,7 @@ public class War {
         saved.dynastyNameA = dynastyNameA;
         saved.dynastyNameB = dynastyNameB;
         saved.winnerDynastyName = winnerDynastyName;
+        saved.rebellionWar = rebellionWar;
         return saved;
     }
 
