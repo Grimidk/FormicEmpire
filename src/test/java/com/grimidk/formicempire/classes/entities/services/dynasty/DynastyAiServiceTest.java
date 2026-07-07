@@ -54,18 +54,18 @@ class DynastyAiServiceTest {
         Colony capital = new Colony(10, "Capital", false);
         capital.setAge(10);
         capital.setLoyalty(80);
+        capital.setAssignedRoleCount(GameConstants.ROLE_DIPLOMAT, 2);
         npc.addColony(capital);
         npc.setCapital(capital);
 
         Colony frontier = new Colony(11, "Frontier", false);
         frontier.setAge(10);
         frontier.setLoyalty(50);
-        frontier.setAssignedRoleCount(GameConstants.ROLE_DIPLOMAT, 2);
         npc.addColony(frontier);
 
         aiService.runDailyAi(npc, world, tradeManager);
 
-        assertTrue(frontier.getLoyalty() > 50);
+        assertTrue(frontier.getEffectiveLoyalty(null, null) > 50);
     }
 
     @Test
@@ -102,7 +102,7 @@ class DynastyAiServiceTest {
 
         aiService.runDailyAi(npc, world, tradeManager);
 
-        assertTrue(npc.getDiplomaticReputation(neighbor.getId()) > 50);
+        assertTrue(npc.getDiplomacyService().getEffectiveDiplomaticReputation(neighbor, world) > 50);
         assertFalse(npc.getDiplomacyService().hasNonAggressionPact(neighbor));
     }
 

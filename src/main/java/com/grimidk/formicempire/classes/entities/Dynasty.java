@@ -41,6 +41,7 @@ public class Dynasty {
     private Species species;
     private int researchPoints;
     private int totalNuptialFlights;
+    private int diplomatsSentTotal;
     private ColonyRank rank;
     private Color color;
     
@@ -50,6 +51,8 @@ public class Dynasty {
     // Global Data
     private boolean defaultAutomationEnabled;
     private boolean defaultAutoBuildEnabled;
+    private boolean autoDiplomacyEnabled;
+    private boolean defaultAutoTunnelsEnabled;
     private final Set<Upgrade> unlockedUpgrades;
     private final List<Colony> colonies;
     private final List<Tunnel> tunnels;
@@ -75,6 +78,7 @@ public class Dynasty {
     private final Map<Integer, Integer> tradeRequestDeclinedAtWorldMonth;
     private final List<CrossDynastyTradeProposal> pendingTradeProposals;
     private int forcedFlightCooldownDays;
+    private final Map<Integer, Integer> diplomatSupportToDynasty = new HashMap<>();
 
     // Services
     private transient DynastyAutomationService automationService;
@@ -99,12 +103,15 @@ public class Dynasty {
         this.completedAssimilations = new HashSet<>();
         this.researchPoints = 0;
         this.totalNuptialFlights = 0;
+        this.diplomatsSentTotal = 0;
         this.rank = GameConstants.RANK_ANT;
         this.isDefeated = false;
         this.currentAssimilation = null;
         this.assimilationProgress = 0;
         this.defaultAutomationEnabled = false;
         this.defaultAutoBuildEnabled = false;
+        this.autoDiplomacyEnabled = false;
+        this.defaultAutoTunnelsEnabled = false;
         this.geneticIntegrity = 100.0;
         this.diplomaticReputations = new HashMap<>();
         this.diplomaticModifierKeys = new HashMap<>();
@@ -128,10 +135,13 @@ public class Dynasty {
         this.isPlayer = savedDynasty.isPlayer;
         this.researchPoints = savedDynasty.researchPoints;
         this.totalNuptialFlights = savedDynasty.totalNuptialFlights;
+        this.diplomatsSentTotal = savedDynasty.diplomatsSentTotal;
         this.isDefeated = savedDynasty.isDefeated;
         this.assimilationProgress = savedDynasty.assimilationProgress;
         this.defaultAutomationEnabled = savedDynasty.defaultAutomationEnabled;
         this.defaultAutoBuildEnabled = savedDynasty.defaultAutoBuildEnabled;
+        this.autoDiplomacyEnabled = savedDynasty.autoDiplomacyEnabled;
+        this.defaultAutoTunnelsEnabled = savedDynasty.defaultAutoTunnelsEnabled;
         this.geneticIntegrity = savedDynasty.geneticIntegrity;
         this.militaryPower = savedDynasty.militaryPower;
         
@@ -300,6 +310,11 @@ public class Dynasty {
             }
         }
         this.forcedFlightCooldownDays = savedDynasty.forcedFlightCooldownDays;
+        if (savedDynasty.diplomatSupportToDynasty != null) {
+            for (Map.Entry<String, Integer> entry : savedDynasty.diplomatSupportToDynasty.entrySet()) {
+                diplomatSupportToDynasty.put(Integer.parseInt(entry.getKey()), entry.getValue());
+            }
+        }
 
         if (savedDynasty.unlockedUpgradeIds != null) {
             Map<Integer, Upgrade> allUpgrades = new HashMap<>();
@@ -370,6 +385,9 @@ public class Dynasty {
         if (world != null && tradeManager != null) {
             bindTradeManager(tradeManager);
             this.logisticsAutomationService.runDailyLogistics(this, world, tradeManager);
+            if (hasUpgrade(GameUnlocks.ABILITY_AUTO_DIPLOMACY) && isAutoDiplomacyEnabled()) {
+                this.diplomacyService.runAutomatedColonyLoyalty(this, world, tradeManager);
+            }
         }
         this.rankUp();
     }
@@ -911,6 +929,29 @@ public class Dynasty {
     
     public int getTotalNuptialFlights() { return totalNuptialFlights; }
 
+    public int getDiplomatsSentTotal() { return diplomatsSentTotal; }
+
+    public void recordDiplomatsSent(int count) {
+        if (count > 0) {
+            diplomatsSentTotal += count;
+        }
+    }
+
+    public int countCompleteTunnels() {
+        int count = 0;
+        for (Tunnel tunnel : tunnels) {
+            if (tunnel.isComplete()) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public boolean meetsAdvancedAutomationPrerequisites() {
+        return countCompleteTunnels() >= GameConstants.AUTO_UPGRADE_MIN_COMPLETE_TUNNELS
+                && diplomatsSentTotal >= GameConstants.AUTO_UPGRADE_MIN_DIPLOMATS_SENT;
+    }
+
     public boolean isDefeated() { return isDefeated; }
     public void setDefeated(boolean isDefeated) { this.isDefeated = isDefeated; }
 
@@ -928,6 +969,47 @@ public class Dynasty {
 
     public boolean isDefaultAutoBuildEnabled() { return defaultAutoBuildEnabled; }
     public void setDefaultAutoBuildEnabled(boolean enabled) { this.defaultAutoBuildEnabled = enabled; }
+
+    public boolean isAutoDiplomacyEnabled() { return autoDiplomacyEnabled; }
+    public void setAutoDiplomacyEnabled(boolean enabled) { this.autoDiplomacyEnabled = enabled; }
+
+    public boolean isDefaultAutoTunnelsEnabled() { return defaultAutoTunnelsEnabled; }
+    public void setDefaultAutoTunnelsEnabled(boolean enabled) { this.defaultAutoTunnelsEnabled = enabled; }
+
+    public int getDiplomatSupportTo(int otherDynastyId) {
+        return diplomatSupportToDynasty.getOrDefault(otherDynastyId, 0);
+    }
+
+    public void addDiplomatSupportTo(int otherDynastyId, int count) {
+        if (count <= 0) {
+            return;
+        }
+        diplomatSupportToDynasty.merge(otherDynastyId, count, Integer::sum);
+    }
+
+    public void removeDiplomatSupportTo(int otherDynastyId, int count) {
+        if (count <= 0) {
+            return;
+        }
+        int current = diplomatSupportToDynasty.getOrDefault(otherDynastyId, 0);
+        int next = Math.max(0, current - count);
+        if (next == 0) {
+            diplomatSupportToDynasty.remove(otherDynastyId);
+        } else {
+            diplomatSupportToDynasty.put(otherDynastyId, next);
+        }
+    }
+
+    public Map<Integer, Integer> copyDiplomatSupportToDynasty() {
+        return new HashMap<>(diplomatSupportToDynasty);
+    }
+
+    public void restoreDiplomatSupportToDynasty(Map<Integer, Integer> support) {
+        diplomatSupportToDynasty.clear();
+        if (support != null) {
+            diplomatSupportToDynasty.putAll(support);
+        }
+    }
 
     public Set<Upgrade> getUnlockedUpgrades() { return unlockedUpgrades; }
     public boolean hasUpgrade(Upgrade upgrade) { return unlockedUpgrades.contains(upgrade); }

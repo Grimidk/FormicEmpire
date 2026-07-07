@@ -346,9 +346,16 @@ public class SaveManager {
                 sc.rankName = dynasty.getRank() != null ? dynasty.getRank().getNameKey() : LanguageStrings.RANK_ANT;
                 sc.researchPoints = dynasty.getResearchPoints();
                 sc.totalNuptialFlights = dynasty.getTotalNuptialFlights();
+                sc.diplomatsSentTotal = dynasty.getDiplomatsSentTotal();
                 sc.speciesId = dynasty.getSpecies() != null ? dynasty.getSpecies().getId() : 1;
                 sc.defaultAutomationEnabled = dynasty.isDefaultAutomationEnabled();
                 sc.defaultAutoBuildEnabled = dynasty.isDefaultAutoBuildEnabled();
+                sc.autoDiplomacyEnabled = dynasty.isAutoDiplomacyEnabled();
+                sc.defaultAutoTunnelsEnabled = dynasty.isDefaultAutoTunnelsEnabled();
+                sc.diplomatSupportToDynasty = new HashMap<>();
+                for (Map.Entry<Integer, Integer> entry : dynasty.copyDiplomatSupportToDynasty().entrySet()) {
+                    sc.diplomatSupportToDynasty.put(String.valueOf(entry.getKey()), entry.getValue());
+                }
                 sc.defeatedSpeciesIds = (dynasty.getDefeatedSpeciesIds() != null) ? new ArrayList<>(dynasty.getDefeatedSpeciesIds()) : new ArrayList<>();
                 sc.completedAssimilationIds = new ArrayList<>();
                 if (dynasty.getCompletedAssimilations() != null) {
@@ -497,6 +504,7 @@ public class SaveManager {
                     sc.isCapital = c.isCapital();
                     sc.isAutomated = c.isAutomationEnabled();
                     sc.autoBuildEnabled = c.isAutoBuildEnabled();
+                    sc.autoTunnelsEnabled = c.isAutoTunnelsEnabled();
                     sc.age = c.getAge();
                     sc.daysWithoutQueen = c.getDaysWithoutQueen();
                     sc.loyalty = c.getLoyalty();
@@ -550,6 +558,15 @@ public class SaveManager {
                     }
                     for (Map.Entry<AntRole, Integer> entry : c.getWarAssignedRoleCounts().entrySet()) {
                         sc.warAssignedRoleCounts.put(String.valueOf(entry.getKey().getId()), entry.getValue());
+                    }
+                    for (Map.Entry<Integer, Integer> entry : c.getOutgoingColonyDiplomatMissions().entrySet()) {
+                        sc.outgoingColonyDiplomatMissions.put(String.valueOf(entry.getKey()), entry.getValue());
+                    }
+                    for (Map.Entry<Integer, Integer> entry : c.getIncomingColonyDiplomatSupport().entrySet()) {
+                        sc.incomingColonyDiplomatSupport.put(String.valueOf(entry.getKey()), entry.getValue());
+                    }
+                    for (Map.Entry<Integer, Integer> entry : c.getOutgoingDynastyDiplomatMissions().entrySet()) {
+                        sc.outgoingDynastyDiplomatMissions.put(String.valueOf(entry.getKey()), entry.getValue());
                     }
                     
                     if (c.getPopulationService() != null) {
@@ -667,13 +684,17 @@ public class SaveManager {
         writeJsonLine(w, "speciesId", sc.speciesId, false);
         writeJsonLine(w, "researchPoints", sc.researchPoints, false);
         writeJsonLine(w, "totalNuptialFlights", sc.totalNuptialFlights, false);
+        writeJsonLine(w, "diplomatsSentTotal", sc.diplomatsSentTotal, false);
         writeJsonLine(w, "defaultAutomationEnabled", sc.defaultAutomationEnabled, false);
         writeJsonLine(w, "defaultAutoBuildEnabled", sc.defaultAutoBuildEnabled, false);
+        writeJsonLine(w, "autoDiplomacyEnabled", sc.autoDiplomacyEnabled, false);
+        writeJsonLine(w, "defaultAutoTunnelsEnabled", sc.defaultAutoTunnelsEnabled, false);
         writeJsonLine(w, "currentAssimilationId", sc.currentAssimilationId, false);
         writeJsonLine(w, "assimilationProgress", sc.assimilationProgress, false);
         writeJsonLine(w, "capitalColonyId", sc.capitalColonyId, false);
         writeJsonLine(w, "geneticIntegrity", sc.geneticIntegrity, false);
         writeJsonLine(w, "militaryPower", sc.militaryPower, false);
+        w.write("      \"diplomatSupportToDynasty\": " + serializeMapToJson(sc.diplomatSupportToDynasty) + ","); w.newLine();
         w.write("      \"diplomaticReputations\": " + serializeMapToJson(sc.diplomaticReputations) + ","); w.newLine();
         w.write("      \"diplomaticModifierKeys\": " + serializeStringMapToJson(sc.diplomaticModifierKeys) + ","); w.newLine();
         w.write("      \"crossDynastyTradeRepGrantedIds\": " + serializeListToJson(sc.crossDynastyTradeRepGrantedIds) + ","); w.newLine();
@@ -708,6 +729,7 @@ public class SaveManager {
         writeJsonLine(w, "isCapital", sc.isCapital, false);
         writeJsonLine(w, "isAutomated", sc.isAutomated, false);
         writeJsonLine(w, "autoBuildEnabled", sc.autoBuildEnabled, false);
+        writeJsonLine(w, "autoTunnelsEnabled", sc.autoTunnelsEnabled, false);
         writeJsonLine(w, "age", sc.age, false);
         writeJsonLine(w, "daysWithoutQueen", sc.daysWithoutQueen, false);
         writeJsonLine(w, "loyalty", sc.loyalty, false);
@@ -756,6 +778,9 @@ public class SaveManager {
         // Serialized Lists within Colony
         w.write("      \"assignedRoleCounts\": " + serializeMapToJson(sc.assignedRoleCounts) + ","); w.newLine();
         w.write("      \"warAssignedRoleCounts\": " + serializeMapToJson(sc.warAssignedRoleCounts) + ","); w.newLine();
+        w.write("      \"outgoingColonyDiplomatMissions\": " + serializeMapToJson(sc.outgoingColonyDiplomatMissions) + ","); w.newLine();
+        w.write("      \"incomingColonyDiplomatSupport\": " + serializeMapToJson(sc.incomingColonyDiplomatSupport) + ","); w.newLine();
+        w.write("      \"outgoingDynastyDiplomatMissions\": " + serializeMapToJson(sc.outgoingDynastyDiplomatMissions) + ","); w.newLine();
         w.write("      \"localDeathStatistics\": " + serializeMapToJson(sc.localDeathStatistics) + ","); w.newLine();
         w.write("      \"unlockedBuildingIds\": " + serializeListToJson(sc.unlockedBuildingIds) + ","); w.newLine();
         w.write("      \"savedResourceSources\": " + serializeSourcesToJson(sc.savedResourceSources)); w.newLine(); 
@@ -904,13 +929,17 @@ public class SaveManager {
         sc.speciesId = Integer.parseInt(map.getOrDefault("speciesId", "1"));
         sc.researchPoints = Integer.parseInt(map.getOrDefault("researchPoints", "0"));
         sc.totalNuptialFlights = Integer.parseInt(map.getOrDefault("totalNuptialFlights", "0"));
+        sc.diplomatsSentTotal = Integer.parseInt(map.getOrDefault("diplomatsSentTotal", "0"));
         sc.defaultAutomationEnabled = Boolean.parseBoolean(map.getOrDefault("defaultAutomationEnabled", "false"));
         sc.defaultAutoBuildEnabled = Boolean.parseBoolean(map.getOrDefault("defaultAutoBuildEnabled", "false"));
+        sc.autoDiplomacyEnabled = Boolean.parseBoolean(map.getOrDefault("autoDiplomacyEnabled", "false"));
+        sc.defaultAutoTunnelsEnabled = Boolean.parseBoolean(map.getOrDefault("defaultAutoTunnelsEnabled", "false"));
         sc.currentAssimilationId = Integer.parseInt(map.getOrDefault("currentAssimilationId", "-1"));
         sc.assimilationProgress = Double.parseDouble(map.getOrDefault("assimilationProgress", "0.0"));
         sc.capitalColonyId = Integer.parseInt(map.getOrDefault("capitalColonyId", "-1"));
         sc.geneticIntegrity = Double.parseDouble(map.getOrDefault("geneticIntegrity", "100.0"));
         sc.militaryPower = Integer.parseInt(map.getOrDefault("militaryPower", "0"));
+        sc.diplomatSupportToDynasty = deserializeJsonToMap(map.get("diplomatSupportToDynasty"));
         sc.diplomaticReputations = deserializeJsonToMap(map.get("diplomaticReputations"));
         sc.diplomaticModifierKeys = deserializeJsonToStringMap(map.get("diplomaticModifierKeys"));
         sc.crossDynastyTradeRepGrantedIds = deserializeJsonToList(map.get("crossDynastyTradeRepGrantedIds"));
@@ -971,6 +1000,7 @@ public class SaveManager {
         sc.isCapital = Boolean.parseBoolean(map.getOrDefault("isCapital", "false"));
         sc.isAutomated = Boolean.parseBoolean(map.getOrDefault("isAutomated", "false"));
         sc.autoBuildEnabled = Boolean.parseBoolean(map.getOrDefault("autoBuildEnabled", "false"));
+        sc.autoTunnelsEnabled = Boolean.parseBoolean(map.getOrDefault("autoTunnelsEnabled", "false"));
         sc.age = Integer.parseInt(map.getOrDefault("age", "0"));
         sc.daysWithoutQueen = Integer.parseInt(map.getOrDefault("daysWithoutQueen", "0"));
         sc.loyalty = Integer.parseInt(map.getOrDefault("loyalty", String.valueOf(GameConstants.DEFAULT_COLONY_LOYALTY)));
@@ -1019,6 +1049,9 @@ public class SaveManager {
         // Nested structures
         sc.assignedRoleCounts = deserializeJsonToMap(map.get("assignedRoleCounts"));
         sc.warAssignedRoleCounts = deserializeJsonToMap(map.get("warAssignedRoleCounts"));
+        sc.outgoingColonyDiplomatMissions = deserializeJsonToMap(map.get("outgoingColonyDiplomatMissions"));
+        sc.incomingColonyDiplomatSupport = deserializeJsonToMap(map.get("incomingColonyDiplomatSupport"));
+        sc.outgoingDynastyDiplomatMissions = deserializeJsonToMap(map.get("outgoingDynastyDiplomatMissions"));
         sc.localDeathStatistics = deserializeJsonToMap(map.get("localDeathStatistics"));
         sc.unlockedBuildingIds = deserializeJsonToList(map.get("unlockedBuildingIds"));
         sc.savedResourceSources = deserializeJsonToSources(map.get("savedResourceSources"));

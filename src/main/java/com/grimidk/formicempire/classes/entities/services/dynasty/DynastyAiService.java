@@ -70,13 +70,14 @@ public class DynastyAiService {
             if (loyalty >= LOYALTY_MISSION_THRESHOLD) {
                 continue;
             }
-            if (!diplo.canSendDiplomatsToColony(colony, tradeManager, world)) {
+            Colony from = diplo.pickDiplomatSourceColony(colony);
+            if (from == null || !diplo.canSendDiplomatsToColony(from, colony, tradeManager, world)) {
                 continue;
             }
             int max = Math.min(
-                    diplo.countAvailableDiplomats(colony),
+                    diplo.countAvailableDiplomats(from),
                     diplo.getMaxDiplomatsForColonyMission());
-            int sent = diplo.sendDiplomatsToColony(colony, max, tradeManager, world);
+            int sent = diplo.sendDiplomatsToColony(from, colony, max, tradeManager, world);
             if (sent > 0) {
                 int gain = sent * diplo.getDiplomatStabilityGainPerAnt();
                 colony.logEvent(ColonyLogPrefixes.DYNASTY + " "
@@ -106,7 +107,7 @@ public class DynastyAiService {
             if (effectiveRep >= REPUTATION_MISSION_TARGET) {
                 continue;
             }
-            Colony from = pickDiplomatSourceColony(dynasty, diplo);
+            Colony from = diplo.pickDiplomatSourceColony();
             if (from == null || !diplo.canSendDiplomatsToDynasty(from, other, world)) {
                 continue;
             }
@@ -252,17 +253,6 @@ public class DynastyAiService {
                 }
             }
         }
-    }
-
-    private Colony pickDiplomatSourceColony(Dynasty dynasty, DynastyDiplomacyService diplo) {
-        Colony capital = dynasty.getCapital();
-        if (capital != null && diplo.countAvailableDiplomats(capital) > 0) {
-            return capital;
-        }
-        return dynasty.getColonies().stream()
-                .filter(c -> diplo.countAvailableDiplomats(c) > 0)
-                .max(Comparator.comparingInt(c -> diplo.countAvailableDiplomats(c)))
-                .orElse(null);
     }
 
     private void runAbilities(Dynasty dynasty, World world) {

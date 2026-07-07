@@ -988,6 +988,8 @@ public final class GameConstants {
     public static final float CREATINE_DIET_SPEED_MULTIPLIER = 2f;
     public static final int DIPLOMAT_MAX_PER_DYNASTY_MISSION = 5;
     public static final int DIPLOMAT_MAX_PER_COLONY_MISSION = 3;
+    public static final int AUTO_UPGRADE_MIN_COMPLETE_TUNNELS = 5;
+    public static final int AUTO_UPGRADE_MIN_DIPLOMATS_SENT = 10;
     public static final int DIPLOMAT_STABILITY_GAIN_BASE = 1;
     public static final int DIPLOMAT_STABILITY_GAIN_PRESSURE_2 = 3;
     public static final int DIPLOMAT_STABILITY_GAIN_PRESSURE_3 = 5;

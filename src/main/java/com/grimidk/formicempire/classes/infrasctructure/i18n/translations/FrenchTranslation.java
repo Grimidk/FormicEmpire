@@ -257,6 +257,13 @@ public class FrenchTranslation implements Translation {
         fr.put("STAT_QUEEN_STATUS", "État de la reine");
         fr.put("STAT_AUTOMATION", "Automatisation");
         fr.put("STAT_AUTO_BUILD", "Auto-construction");
+        fr.put("STAT_AUTO_TUNNELS", "Auto-tunnels");
+        fr.put("DYNASTY_DEFAULT_AUTO_TUNNELS", "Auto-tunnels par défaut");
+        fr.put("DYNASTY_DEFAULT_AUTO_TUNNELS_TOOLTIP", "Active le creusement automatique de tunnels sur les nouvelles colonies.");
+        fr.put("DYNASTY_AUTO_DIPLOMACY", "Auto-diplomatie");
+        fr.put("DYNASTY_AUTO_DIPLOMACY_TOOLTIP", "La capitale et les colonies militantes envoient automatiquement des diplomates pour relever la loyauté des satellites.");
+        fr.put("LOYALTY_MODIFIER_DIPLOMAT_MISSION", "Mission diplomatique");
+        fr.put("DIPLO_MODIFIER_DIPLOMAT_MISSION", "Mission diplomatique");
         fr.put("STAT_DATE_TIME", "Date et heure");
         fr.put("STAT_TIME_DAY", "Moment de la journée");
         fr.put("STAT_MOON_PHASE", "Phase lunaire");
@@ -1107,6 +1114,10 @@ public class FrenchTranslation implements Translation {
         fr.put("ABILITY_SPREAD_2_DESC", "Permet plusieurs colonies satellites à la fois, sans limite.");
         fr.put("ABILITY_AUTOMATION_FLAVOR", "Automatisation fourmi");
         fr.put("ABILITY_AUTOMATION_DESC", "Automatisez vos colonies depuis l'écran de dynastie.");
+        fr.put("ABILITY_AUTO_TUNNELS_FLAVOR", "Automatisation des tunnels");
+        fr.put("ABILITY_AUTO_TUNNELS_DESC", "Les colonies automatisées assignent des foreuses et ingénieures pour creuser chaque liaison de tunnel possible.");
+        fr.put("ABILITY_AUTO_DIPLOMACY_FLAVOR", "Stabilisation de loyauté");
+        fr.put("ABILITY_AUTO_DIPLOMACY_DESC", "La capitale et les colonies militantes envoient automatiquement des diplomates pour relever la loyauté des satellites.");
         fr.put("ABILITY_TUNNELS_FLAVOR", "Autoroutes souterraines");
         fr.put("ABILITY_TUNNELS_DESC", "Permet des réseaux de tunnels entre colonies pour un transport plus rapide et sûr.");
         fr.put("ABILITY_BILATERAL_TRADE_FLAVOR", "Logistique deux sens");
@@ -1603,6 +1614,7 @@ public class FrenchTranslation implements Translation {
         fr.put("LOG_AUTOMATION_TRADE_FMT", "Route commerciale ouverte vers %s");
         fr.put("LOG_AI_DIPLOMAT_COLONY_FMT", "IA a envoyé %s diplomates pour stabiliser %s (+%s loyauté)");
         fr.put("LOG_AI_DIPLOMAT_DYNASTY_FMT", "IA a envoyé %s diplomates pour améliorer les relations avec %s (+%s réputation)");
+        fr.put("LOG_AUTO_DIPLOMAT_COLONY_FMT", "Automatisation a envoyé %s diplomates pour stabiliser %s (+%s loyauté)");
         fr.put("LOG_AI_PACT_FMT", "IA a formé un pacte de non-agression avec %s");
         fr.put("LOG_AI_DECLARE_WAR_FMT", "IA a déclaré la guerre à %s");
         fr.put("LOG_LAST_COLONY_FALLEN", "La dernière colonie est tombée. Ce n'est plus qu'un vestige mort.");
@@ -1661,6 +1673,10 @@ public class FrenchTranslation implements Translation {
         fr.put("TRIGGER_SPREAD_2_ABILITY_MSG", "Votre dynastie s'étend rapidement ! La limite de nouvelles colonies a été supprimée.");
         fr.put("TRIGGER_AUTOMATION_ABILITY_TITLE", "Ère de l'automatisation");
         fr.put("TRIGGER_AUTOMATION_ABILITY_MSG", "Votre dynastie est vaste. Vous pouvez maintenant automatiser entièrement la gestion des colonies.");
+        fr.put("TRIGGER_AUTO_TUNNELS_TITLE", "Automatisation du réseau de tunnels");
+        fr.put("TRIGGER_AUTO_TUNNELS_MSG", "Votre dynastie a achevé %s tunnels et envoyé %s missions diplomatiques ! Les colonies automatisées peuvent creuser chaque liaison restante. Activez Auto-tunnels par colonie dans l'Aperçu de la dynastie (A).");
+        fr.put("TRIGGER_AUTO_DIPLOMACY_TITLE", "Stabilisation de loyauté");
+        fr.put("TRIGGER_AUTO_DIPLOMACY_MSG", "Votre dynastie a achevé %s tunnels et envoyé %s missions diplomatiques ! La capitale et les colonies militantes peuvent stabiliser la loyauté automatiquement. Activez Auto-diplomatie dans l'Aperçu de la dynastie (A).");
         fr.put("TRIGGER_BILATERAL_TRADE_TITLE", "Logistique bidirectionnelle");
         fr.put("TRIGGER_BILATERAL_TRADE_MSG", "Votre réseau commercial est si actif que vos fourmis ont appris à ramener des ressources lors du retour ! Commerce bilatéral débloqué.");
         fr.put("TRIGGER_COURIER_ROLE_TITLE", "Réseau logistique");

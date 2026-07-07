@@ -13,6 +13,7 @@ To Fix (By decreasing priority) :
 	High:
 	TODO: icons/sprites for moves and all unlocks
 	Room overlay art still placeholder quality (sprites/buildings/rooms/*.png)
+	change mentions of rp and resources in the ability cost
 
 	Mid:
 	(none right now)
@@ -24,7 +25,6 @@ To Fix (By decreasing priority) :
 	(none right now)
 
 	Important not Urgent:
-	late game performance (physics too taxing, may need to deload ants outside of area or update less when >50k ants) maybe look into LWJGL
 	hexagonal architecture
 	more icon borderless buttons
 	logistic map overlay

@@ -253,15 +253,20 @@ public class ColonyAutomationService {
     }
 
     private int allocateTunnelEngineers(Colony colony, Map<AntRole, Integer> targets, int remaining) {
-        if (remaining < WORKER_SURPLUS_FOR_TUNNEL) return remaining;
         if (!colony.hasUpgrade(GameUnlocks.ABILITY_TUNNELS)) return remaining;
         if (!colony.hasUpgrade(GameUnlocks.ROLE_ENGINEER)) return remaining;
+        if (remaining <= 0) return remaining;
+
+        boolean aggressive = usesAggressiveTunnelAutomation(colony);
+        if (!aggressive && remaining < WORKER_SURPLUS_FOR_TUNNEL) return remaining;
 
         boolean digging = colony.getCurrentTunnelProject() != null;
         boolean preparing = !digging && needsTunnelDigging(colony);
         if (!digging && !preparing) return remaining;
 
-        int engineerTarget = Math.min(remaining, digging ? Math.max(1, remaining / 5) : 1);
+        int engineerTarget = aggressive
+                ? Math.min(remaining, Math.max(1, remaining / 3))
+                : Math.min(remaining, digging ? Math.max(1, remaining / 5) : 1);
         targets.put(GameConstants.ROLE_ENGINEER, engineerTarget);
         return remaining - engineerTarget;
     }
@@ -409,7 +414,11 @@ public class ColonyAutomationService {
             boolean digging = colony.getCurrentTunnelProject() != null;
             boolean preparing = !digging && needsTunnelDigging(colony);
             if (digging || preparing) {
-                assignedBorers = Math.min(totalMajors, digging ? Math.max(1, totalMajors / 3) : 1);
+                boolean aggressive = usesAggressiveTunnelAutomation(colony);
+                int borerShare = aggressive ? 2 : 3;
+                assignedBorers = Math.min(totalMajors, digging
+                        ? Math.max(1, totalMajors / borerShare)
+                        : (aggressive ? Math.max(1, totalMajors / 4) : 1));
                 targets.put(GameConstants.ROLE_BORER, assignedBorers);
             }
         }
@@ -581,6 +590,36 @@ public class ColonyAutomationService {
 
         int breederCount = totalPrincesses - assistantCount - skyTrans;
         targets.put(GameConstants.ROLE_BREEDER, breederCount);
+        assignAutomatedDiplomatQuotas(colony, targets);
+    }
+
+    private void assignAutomatedDiplomatQuotas(Colony colony, Map<AntRole, Integer> targets) {
+        Dynasty dynasty = colony.getDynasty();
+        if (dynasty == null || !dynasty.hasUpgrade(GameUnlocks.ABILITY_AUTO_DIPLOMACY)) {
+            return;
+        }
+        if (!colony.hasUpgrade(GameUnlocks.ROLE_DIPLOMAT) || colony.getPrincesses().isEmpty()) {
+            return;
+        }
+        boolean isSource = colony.isCapital()
+                || colony.getLoyalty() >= GameConstants.LOYALTY_MILITANT.getMinScore();
+        if (!isSource) {
+            return;
+        }
+        int princesses = colony.getPrincesses().size();
+        int assignedElsewhere = targets.values().stream().mapToInt(Integer::intValue).sum();
+        int available = Math.max(0, princesses - assignedElsewhere);
+        if (available <= 0) {
+            return;
+        }
+        int diplomatTarget = colony.isCapital() ? Math.min(2, available) : Math.min(1, available);
+        targets.put(GameConstants.ROLE_DIPLOMAT,
+                targets.getOrDefault(GameConstants.ROLE_DIPLOMAT, 0) + diplomatTarget);
+    }
+
+    private boolean usesAggressiveTunnelAutomation(Colony colony) {
+        Dynasty dynasty = colony.getDynasty();
+        return dynasty != null && dynasty.hasUpgrade(GameUnlocks.ABILITY_AUTO_TUNNELS) && colony.isAutoTunnelsEnabled();
     }
 
     private void calculateQueenQuotas(Colony colony, Map<AntRole, Integer> targets) {

@@ -71,7 +71,7 @@ public class DynastyManagementDialog extends ZeroDialog {
 
     public DynastyManagementDialog(JFrame owner, Dynasty dynasty, Engine engine, Consumer<Colony> onGoToColony,
             Runnable onOpenWarRoles, Consumer<War> onViewBattle) {
-        super(owner, LanguageStrings.DIALOG_DYNASTY_TITLE, AssetStyles.DEFAULT_DIALOG_SIZE);
+        super(owner, LanguageStrings.DIALOG_DYNASTY_TITLE, AssetStyles.DYNASTY_DIALOG_SIZE);
         this.dynasty = dynasty;
         this.engine = engine;
         this.onGoToColony = onGoToColony;
@@ -156,11 +156,16 @@ public class DynastyManagementDialog extends ZeroDialog {
         int expectedTabs = 3 + (hasTrade ? 1 : 0);
         boolean currentAuto = dynasty.hasUpgrade(GameUnlocks.ABILITY_AUTOMATION);
         boolean currentAutoBuild = dynasty.hasUpgrade(GameUnlocks.ABILITY_MANAGEMENT);
+        boolean currentAutoTunnels = dynasty.hasUpgrade(GameUnlocks.ABILITY_AUTO_TUNNELS);
+        boolean currentAutoDiplomacy = dynasty.hasUpgrade(GameUnlocks.ABILITY_AUTO_DIPLOMACY);
         
         boolean panelAuto = (overviewPanel != null) && overviewPanel.isShowAutomation();
         boolean panelAutoBuild = (overviewPanel != null) && overviewPanel.isShowAutoBuild();
+        boolean panelAutoTunnels = (overviewPanel != null) && overviewPanel.isShowAutoTunnels();
+        boolean panelAutoDiplomacy = (overviewPanel != null) && overviewPanel.isShowAutoDiplomacy();
 
-        if (tabbedPane.getTabCount() != expectedTabs || currentAuto != panelAuto || currentAutoBuild != panelAutoBuild) {
+        if (tabbedPane.getTabCount() != expectedTabs || currentAuto != panelAuto || currentAutoBuild != panelAutoBuild
+                || currentAutoTunnels != panelAutoTunnels || currentAutoDiplomacy != panelAutoDiplomacy) {
             refreshDialog();
         } else {
             Component selected = tabbedPane.getSelectedComponent();
@@ -188,9 +193,14 @@ public class DynastyManagementDialog extends ZeroDialog {
 
         boolean currentAuto = dynasty.hasUpgrade(GameUnlocks.ABILITY_AUTOMATION);
         boolean currentAutoBuild = dynasty.hasUpgrade(GameUnlocks.ABILITY_MANAGEMENT);
+        boolean currentAutoTunnels = dynasty.hasUpgrade(GameUnlocks.ABILITY_AUTO_TUNNELS);
+        boolean currentAutoDiplomacy = dynasty.hasUpgrade(GameUnlocks.ABILITY_AUTO_DIPLOMACY);
         
-        if (overviewPanel == null || overviewPanel.isShowAutomation() != currentAuto || overviewPanel.isShowAutoBuild() != currentAutoBuild) {
-            overviewPanel = new OverviewPanel(currentAutoBuild, currentAuto);
+        if (overviewPanel == null || overviewPanel.isShowAutomation() != currentAuto
+                || overviewPanel.isShowAutoBuild() != currentAutoBuild
+                || overviewPanel.isShowAutoTunnels() != currentAutoTunnels
+                || overviewPanel.isShowAutoDiplomacy() != currentAutoDiplomacy) {
+            overviewPanel = new OverviewPanel(currentAutoBuild, currentAuto, currentAutoTunnels, currentAutoDiplomacy);
         }
         overviewPanel.updateData();
         tabbedPane.addTab(LanguageStrings.get(LanguageStrings.TAB_OVERVIEW), overviewPanel);
@@ -2085,8 +2095,11 @@ public class DynastyManagementDialog extends ZeroDialog {
         private List<Colony> displayedColonies;
         private final boolean showAutoBuild;
         private final boolean showAutomation;
+        private final boolean showAutoTunnels;
+        private final boolean showAutoDiplomacy;
         private int autoBuildCol = -1;
         private int automationCol = -1;
+        private int autoTunnelsCol = -1;
         private int loyaltyCol = -1;
         private int militaryCol = -1;
         private int actionCol = -1;
@@ -2096,11 +2109,15 @@ public class DynastyManagementDialog extends ZeroDialog {
 
         private JCheckBox defaultAutoBuildCheck;
         private JCheckBox defaultAutomationCheck;
+        private JCheckBox defaultAutoTunnelsCheck;
+        private JCheckBox autoDiplomacyCheck;
 
-        public OverviewPanel(boolean showAutoBuild, boolean showAutomation) {
+        public OverviewPanel(boolean showAutoBuild, boolean showAutomation, boolean showAutoTunnels, boolean showAutoDiplomacy) {
             super(new BorderLayout());
             this.showAutoBuild = showAutoBuild;
             this.showAutomation = showAutomation;
+            this.showAutoTunnels = showAutoTunnels;
+            this.showAutoDiplomacy = showAutoDiplomacy;
             this.displayedColonies = new ArrayList<>();
             
             this.currentSorter = Comparator.comparingInt(Colony::getAntTotal).reversed();
@@ -2127,6 +2144,14 @@ public class DynastyManagementDialog extends ZeroDialog {
 
         public boolean isShowAutoBuild() {
             return showAutoBuild;
+        }
+
+        public boolean isShowAutoTunnels() {
+            return showAutoTunnels;
+        }
+
+        public boolean isShowAutoDiplomacy() {
+            return showAutoDiplomacy;
         }
         
         private void updateSorter() {
@@ -2185,6 +2210,28 @@ public class DynastyManagementDialog extends ZeroDialog {
                 defaultAutomationCheck.addActionListener(e -> dynasty.setDefaultAutomationEnabled(defaultAutomationCheck.isSelected()));
                 topPanel.add(defaultAutomationCheck);
             }
+
+            if (showAutoTunnels) {
+                defaultAutoTunnelsCheck = new JCheckBox(LanguageStrings.get(LanguageStrings.DYNASTY_DEFAULT_AUTO_TUNNELS));
+                AssetStyles.styleCheckBox(defaultAutoTunnelsCheck);
+                defaultAutoTunnelsCheck.setFocusable(false);
+                defaultAutoTunnelsCheck.setOpaque(false);
+                defaultAutoTunnelsCheck.setToolTipText(LanguageStrings.get(LanguageStrings.DYNASTY_DEFAULT_AUTO_TUNNELS_TOOLTIP));
+                defaultAutoTunnelsCheck.setSelected(dynasty.isDefaultAutoTunnelsEnabled());
+                defaultAutoTunnelsCheck.addActionListener(e -> dynasty.setDefaultAutoTunnelsEnabled(defaultAutoTunnelsCheck.isSelected()));
+                topPanel.add(defaultAutoTunnelsCheck);
+            }
+
+            if (showAutoDiplomacy) {
+                autoDiplomacyCheck = new JCheckBox(LanguageStrings.get(LanguageStrings.DYNASTY_AUTO_DIPLOMACY));
+                AssetStyles.styleCheckBox(autoDiplomacyCheck);
+                autoDiplomacyCheck.setFocusable(false);
+                autoDiplomacyCheck.setOpaque(false);
+                autoDiplomacyCheck.setToolTipText(LanguageStrings.get(LanguageStrings.DYNASTY_AUTO_DIPLOMACY_TOOLTIP));
+                autoDiplomacyCheck.setSelected(dynasty.isAutoDiplomacyEnabled());
+                autoDiplomacyCheck.addActionListener(e -> dynasty.setAutoDiplomacyEnabled(autoDiplomacyCheck.isSelected()));
+                topPanel.add(autoDiplomacyCheck);
+            }
             
             add(topPanel, BorderLayout.NORTH);
 
@@ -2202,6 +2249,10 @@ public class DynastyManagementDialog extends ZeroDialog {
                 automationCol = cols.size();
                 cols.add(LanguageStrings.get(LanguageStrings.STAT_AUTOMATION));
             }
+            if (showAutoTunnels) {
+                autoTunnelsCol = cols.size();
+                cols.add(LanguageStrings.get(LanguageStrings.STAT_AUTO_TUNNELS));
+            }
             
             actionCol = cols.size();
             cols.add(LanguageStrings.get(LanguageStrings.DYNASTY_ACTIONS));
@@ -2214,12 +2265,13 @@ public class DynastyManagementDialog extends ZeroDialog {
                     if (columnIndex == 6) return String.class;
                     if (autoBuildCol != -1 && columnIndex == autoBuildCol) return Boolean.class;
                     if (automationCol != -1 && columnIndex == automationCol) return Boolean.class;
+                    if (autoTunnelsCol != -1 && columnIndex == autoTunnelsCol) return Boolean.class;
                     return Object.class;
                 }
 
                 @Override
                 public boolean isCellEditable(int row, int column) {
-                    return column == autoBuildCol || column == automationCol || column == actionCol;
+                    return column == autoBuildCol || column == automationCol || column == autoTunnelsCol || column == actionCol;
                 }
             };
 
@@ -2232,6 +2284,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                     if (c != null) {
                         if (col == autoBuildCol) c.setAutoBuildEnabled((Boolean) model.getValueAt(row, col));
                         else if (col == automationCol) c.setAutomationEnabled((Boolean) model.getValueAt(row, col));
+                        else if (col == autoTunnelsCol) c.setAutoTunnelsEnabled((Boolean) model.getValueAt(row, col));
                     }
                 }
             });
@@ -2297,6 +2350,10 @@ public class DynastyManagementDialog extends ZeroDialog {
                 table.getColumnModel().getColumn(automationCol).setMaxWidth(100);
                 AssetStyles.styleTableBooleanColumn(table, automationCol);
             }
+            if (showAutoTunnels) {
+                table.getColumnModel().getColumn(autoTunnelsCol).setMaxWidth(100);
+                AssetStyles.styleTableBooleanColumn(table, autoTunnelsCol);
+            }
 
             table.getColumnModel().getColumn(actionCol).setCellRenderer(new ActionPanelRenderer());
             table.getColumnModel().getColumn(actionCol).setCellEditor(new ActionPanelEditor());
@@ -2356,6 +2413,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 rowData[militaryCol] = colony.getMilitaryPower();
                 if (showAutoBuild) rowData[autoBuildCol] = colony.isAutoBuildEnabled();
                 if (showAutomation) rowData[automationCol] = colony.isAutomationEnabled();
+                if (showAutoTunnels) rowData[autoTunnelsCol] = colony.isAutoTunnelsEnabled();
                 rowData[actionCol] = colony;
                 model.addRow(rowData);
             }
@@ -2556,13 +2614,14 @@ public class DynastyManagementDialog extends ZeroDialog {
         DynastyDiplomacyService diplo = dynasty.getDiplomacyService();
         if (diplo != null) {
             JMenuItem diplomatItem = new JMenuItem(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_SEND_DIPLOMATS));
-            if (diplo.canSendDiplomatsToColony(colony, engine.getTradeManager(), engine.getWorld())) {
+            Colony diplomatSource = diplo.pickDiplomatSourceColony(colony);
+            if (diplo.canSendDiplomatsToColony(diplomatSource, colony, engine.getTradeManager(), engine.getWorld())) {
                 diplomatItem.addActionListener(e -> promptSendDiplomatsToColony(this, colony));
             } else {
                 diplomatItem.setEnabled(false);
-                if (!colony.hasUpgrade(GameUnlocks.ROLE_DIPLOMAT)) {
+                if (!dynasty.hasUpgrade(GameUnlocks.ROLE_DIPLOMAT)) {
                     diplomatItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_NO_DIPLOMAT_ROLE));
-                } else if (diplo.countAvailableDiplomats(colony) <= 0) {
+                } else if (diplomatSource == null || diplo.countAvailableDiplomats(diplomatSource) <= 0) {
                     diplomatItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_NO_DIPLOMATS));
                 } else if (!diplo.needsDiplomatMissionToColony(colony, engine.getTradeManager(), engine.getWorld())) {
                     diplomatItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_LOYALTY_STABLE));
@@ -2580,7 +2639,7 @@ public class DynastyManagementDialog extends ZeroDialog {
         if (diplo == null || colony == null) {
             return;
         }
-        if (!colony.hasUpgrade(GameUnlocks.ROLE_DIPLOMAT)) {
+        if (!dynasty.hasUpgrade(GameUnlocks.ROLE_DIPLOMAT)) {
             UiOptionPane.showMessageDialog(parent,
                     LanguageStrings.get(LanguageStrings.DIPLO_ERROR_NO_DIPLOMAT_ROLE),
                     LanguageStrings.get(LanguageStrings.DIPLO_SEND_DIPLOMATS_TITLE),
@@ -2594,21 +2653,22 @@ public class DynastyManagementDialog extends ZeroDialog {
                     JOptionPane.WARNING_MESSAGE);
             return;
         }
-        int available = diplo.countAvailableDiplomats(colony);
-        if (available <= 0) {
+        Colony from = diplo.pickDiplomatSourceColony(colony);
+        if (from == null || diplo.countAvailableDiplomats(from) <= 0) {
             UiOptionPane.showMessageDialog(parent,
                     LanguageStrings.get(LanguageStrings.DIPLO_ERROR_NO_DIPLOMATS),
                     LanguageStrings.get(LanguageStrings.DIPLO_SEND_DIPLOMATS_TITLE),
                     JOptionPane.WARNING_MESSAGE);
             return;
         }
+        int available = diplo.countAvailableDiplomats(from);
         int max = Math.min(available, diplo.getMaxDiplomatsForColonyMission());
         int gainPer = diplo.getDiplomatStabilityGainPerAnt();
         int count = promptDiplomatCount(parent, available, max, gainPer);
         if (count <= 0) {
             return;
         }
-        int sent = diplo.sendDiplomatsToColony(colony, count, engine.getTradeManager(), engine.getWorld());
+        int sent = diplo.sendDiplomatsToColony(from, colony, count, engine.getTradeManager(), engine.getWorld());
         if (sent > 0) {
             int totalGain = sent * gainPer;
             UiOptionPane.showMessageDialog(parent,

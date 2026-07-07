@@ -246,7 +246,8 @@ public class UpgradeDialog extends ZeroDialog {
 
             for (Upgrade upgrade : allUpgrades) {
                 boolean owned = colony.hasUpgrade(upgrade);
-                boolean reqMet = (upgrade.getRequirement() == null || colony.hasUpgrade(upgrade.getRequirement()));
+                boolean reqMet = (upgrade.getRequirement() == null || colony.hasUpgrade(upgrade.getRequirement()))
+                        && GameUnlocks.meetsExtraAutomationPrerequisites(colony.getDynasty(), upgrade);
 
                 if (!owned && reqMet && upgrade.getCost() > 0) {
                     availableUpgrades.add(upgrade);

@@ -99,6 +99,9 @@ public final class UiOptionPane {
         dialog.setVisible(true);
         dialog.dispose();
         Object value = pane.getInputValue();
-        return value != null ? value.toString() : null;
+        if (value == null || value == JOptionPane.UNINITIALIZED_VALUE) {
+            return null;
+        }
+        return value.toString();
     }
 }

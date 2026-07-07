@@ -257,6 +257,13 @@ public class PortugueseTranslation implements Translation {
         pt.put("STAT_QUEEN_STATUS", "Estado da rainha");
         pt.put("STAT_AUTOMATION", "Automação");
         pt.put("STAT_AUTO_BUILD", "Auto-construção");
+        pt.put("STAT_AUTO_TUNNELS", "Auto-túneis");
+        pt.put("DYNASTY_DEFAULT_AUTO_TUNNELS", "Auto-túneis padrão");
+        pt.put("DYNASTY_DEFAULT_AUTO_TUNNELS_TOOLTIP", "Ativa a escavação automática de túneis em colónias novas.");
+        pt.put("DYNASTY_AUTO_DIPLOMACY", "Auto-diplomacia");
+        pt.put("DYNASTY_AUTO_DIPLOMACY_TOOLTIP", "A capital e colónias militantes enviam diplomatas automaticamente para elevar a lealdade dos satélites.");
+        pt.put("LOYALTY_MODIFIER_DIPLOMAT_MISSION", "Missão diplomática");
+        pt.put("DIPLO_MODIFIER_DIPLOMAT_MISSION", "Missão diplomática");
         pt.put("STAT_DATE_TIME", "Data e hora");
         pt.put("STAT_TIME_DAY", "Momento do dia");
         pt.put("STAT_MOON_PHASE", "Fase lunar");
@@ -1107,6 +1114,10 @@ public class PortugueseTranslation implements Translation {
         pt.put("ABILITY_SPREAD_2_DESC", "Permite fundar várias colônias satélite ao mesmo tempo, removendo o limite.");
         pt.put("ABILITY_AUTOMATION_FLAVOR", "Automação formiga");
         pt.put("ABILITY_AUTOMATION_DESC", "Permite automatizar colônias pela tela da dinastia.");
+        pt.put("ABILITY_AUTO_TUNNELS_FLAVOR", "Automação de túneis");
+        pt.put("ABILITY_AUTO_TUNNELS_DESC", "Colônias automatizadas atribuem broqueadoras e engenheiras para cavar todos os túneis possíveis.");
+        pt.put("ABILITY_AUTO_DIPLOMACY_FLAVOR", "Estabilização de lealdade");
+        pt.put("ABILITY_AUTO_DIPLOMACY_DESC", "A capital e colônias militantes enviam diplomatas automaticamente para elevar a lealdade dos satélites.");
         pt.put("ABILITY_TUNNELS_FLAVOR", "Rodovias subterrâneas");
         pt.put("ABILITY_TUNNELS_DESC", "Permite redes de túneis entre colônias para transporte mais rápido e seguro.");
         pt.put("ABILITY_BILATERAL_TRADE_FLAVOR", "Logística de mão dupla");
@@ -1603,6 +1614,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("LOG_AUTOMATION_TRADE_FMT", "Rota comercial aberta para %s");
         pt.put("LOG_AI_DIPLOMAT_COLONY_FMT", "IA enviou %s diplomatas para estabilizar %s (+%s lealdade)");
         pt.put("LOG_AI_DIPLOMAT_DYNASTY_FMT", "IA enviou %s diplomatas para melhorar relações com %s (+%s reputação)");
+        pt.put("LOG_AUTO_DIPLOMAT_COLONY_FMT", "Automação enviou %s diplomatas para estabilizar %s (+%s lealdade)");
         pt.put("LOG_AI_PACT_FMT", "IA formou um pacto de não agressão com %s");
         pt.put("LOG_AI_DECLARE_WAR_FMT", "IA declarou guerra contra %s");
         pt.put("LOG_LAST_COLONY_FALLEN", "A última colônia caiu. Isto é agora um remanescente morto.");
@@ -1661,6 +1673,10 @@ public class PortugueseTranslation implements Translation {
         pt.put("TRIGGER_SPREAD_2_ABILITY_MSG", "A tua dinastia está a expandir-se rapidamente! O limite de novas colónias foi removido.");
         pt.put("TRIGGER_AUTOMATION_ABILITY_TITLE", "Era da automação");
         pt.put("TRIGGER_AUTOMATION_ABILITY_MSG", "A tua dinastia é vasta. Agora podes automatizar completamente a gestão das colónias.");
+        pt.put("TRIGGER_AUTO_TUNNELS_TITLE", "Automação da rede de túneis");
+        pt.put("TRIGGER_AUTO_TUNNELS_MSG", "A tua dinastia completou %s túneis e enviou %s missões diplomáticas! Colónias automatizadas podem cavar cada ligação restante. Ativa Auto-Túneis por colónia na Visão geral da Dinastia (A).");
+        pt.put("TRIGGER_AUTO_DIPLOMACY_TITLE", "Estabilização de lealdade");
+        pt.put("TRIGGER_AUTO_DIPLOMACY_MSG", "A tua dinastia completou %s túneis e enviou %s missões diplomáticas! A capital e colónias militantes podem estabilizar a lealdade automaticamente. Ativa Auto-diplomacia na Visão geral da Dinastia (A).");
         pt.put("TRIGGER_BILATERAL_TRADE_TITLE", "Logística de dois sentidos");
         pt.put("TRIGGER_BILATERAL_TRADE_MSG", "A tua rede comercial está tão ocupada que as tuas formigas aprenderam a trazer recursos de volta nas viagens de regresso! Comércio bilateral desbloqueado.");
         pt.put("TRIGGER_COURIER_ROLE_TITLE", "Rede logística");

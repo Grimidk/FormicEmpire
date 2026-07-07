@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.grimidk.formicempire.classes.constants.unlocks.*;
+import com.grimidk.formicempire.classes.entities.Dynasty;
 
 public final class GameUnlocks {
         private GameUnlocks() {}
@@ -189,6 +190,19 @@ public final class GameUnlocks {
         // TODO asset: icons/upgrades/AbilityCreatineDiet.png
         public static final Upgrade ABILITY_CREATINE_DIET = new Upgrade(521, "ABILITY_CREATINE_DIET", "ABILITY_CREATINE_DIET_FLAVOR", "ABILITY_CREATINE_DIET_DESC", ABILITY_ABILITY, 4000, null);
         static { upgrades.add(ABILITY_CREATINE_DIET); }
+        // TODO asset: icons/upgrades/AbilityAutoTunnels.png
+        public static final Upgrade ABILITY_AUTO_TUNNELS = new Upgrade(522, "ABILITY_AUTO_TUNNELS", "ABILITY_AUTO_TUNNELS_FLAVOR", "ABILITY_AUTO_TUNNELS_DESC", ABILITY_AUTOMATION, 0, null);
+        static { upgrades.add(ABILITY_AUTO_TUNNELS); }
+        // TODO asset: icons/upgrades/AbilityAutoDiplomacy.png
+        public static final Upgrade ABILITY_AUTO_DIPLOMACY = new Upgrade(523, "ABILITY_AUTO_DIPLOMACY", "ABILITY_AUTO_DIPLOMACY_FLAVOR", "ABILITY_AUTO_DIPLOMACY_DESC", ABILITY_AUTOMATION, 0, null);
+        static { upgrades.add(ABILITY_AUTO_DIPLOMACY); }
+
+        public static boolean meetsExtraAutomationPrerequisites(Dynasty dynasty, Upgrade upgrade) {
+            if (upgrade != ABILITY_AUTO_TUNNELS && upgrade != ABILITY_AUTO_DIPLOMACY) {
+                return true;
+            }
+            return dynasty != null && dynasty.meetsAdvancedAutomationPrerequisites();
+        }
 
         // -- Advanced Roles --
         // TODO asset: icons/roles/Courier.png (upgrade tree icon; may diverge from role icon)

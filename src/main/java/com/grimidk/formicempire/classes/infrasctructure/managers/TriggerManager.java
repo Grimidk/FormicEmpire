@@ -3,6 +3,7 @@ package com.grimidk.formicempire.classes.infrasctructure.managers;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
@@ -70,6 +71,11 @@ public class TriggerManager {
     private void fireLocalizedTrigger(Upgrade upgrade, String titleKey, String messageKey) {
         fireTrigger(upgrade, LanguageStrings.get(titleKey), LanguageStrings.get(messageKey));
     }
+
+    private void fireLocalizedTrigger(Upgrade upgrade, String titleKey, String messageKey,
+            Object... messageArgs) {
+        fireTrigger(upgrade, LanguageStrings.get(titleKey), LanguageStrings.format(messageKey, messageArgs));
+    }
     
     private void fireColonyDeath() {
         for (TriggerListener listener : listeners) {
@@ -92,6 +98,8 @@ public class TriggerManager {
         checkAllNPCTriggers();
         checkMassFlightUnlock();
         checkCloningAbilityUnlock();
+        checkAutoTunnelsUnlock();
+        checkAutoDiplomacyUnlock();
     }
 
     private void checkHourlyTriggers() {
@@ -364,6 +372,38 @@ public class TriggerManager {
                 LanguageStrings.TRIGGER_MASS_FLIGHT_TITLE,
                 LanguageStrings.TRIGGER_MASS_FLIGHT_MSG);
         }
+    }
+
+    private void checkAutoTunnelsUnlock() {
+        if (playerColony.getDynasty() == null) return;
+        if (!playerColony.hasUpgrade(GameUnlocks.ABILITY_AUTOMATION)) return;
+        if (playerColony.hasUpgrade(GameUnlocks.ABILITY_AUTO_TUNNELS)) return;
+
+        Dynasty dynasty = playerColony.getDynasty();
+        if (dynasty.countCompleteTunnels() < GameConstants.AUTO_UPGRADE_MIN_COMPLETE_TUNNELS) return;
+        if (dynasty.getDiplomatsSentTotal() < GameConstants.AUTO_UPGRADE_MIN_DIPLOMATS_SENT) return;
+
+        fireLocalizedTrigger(GameUnlocks.ABILITY_AUTO_TUNNELS,
+                LanguageStrings.TRIGGER_AUTO_TUNNELS_TITLE,
+                LanguageStrings.TRIGGER_AUTO_TUNNELS_MSG,
+                GameConstants.AUTO_UPGRADE_MIN_COMPLETE_TUNNELS,
+                GameConstants.AUTO_UPGRADE_MIN_DIPLOMATS_SENT);
+    }
+
+    private void checkAutoDiplomacyUnlock() {
+        if (playerColony.getDynasty() == null) return;
+        if (!playerColony.hasUpgrade(GameUnlocks.ABILITY_AUTOMATION)) return;
+        if (playerColony.hasUpgrade(GameUnlocks.ABILITY_AUTO_DIPLOMACY)) return;
+
+        Dynasty dynasty = playerColony.getDynasty();
+        if (dynasty.countCompleteTunnels() < GameConstants.AUTO_UPGRADE_MIN_COMPLETE_TUNNELS) return;
+        if (dynasty.getDiplomatsSentTotal() < GameConstants.AUTO_UPGRADE_MIN_DIPLOMATS_SENT) return;
+
+        fireLocalizedTrigger(GameUnlocks.ABILITY_AUTO_DIPLOMACY,
+                LanguageStrings.TRIGGER_AUTO_DIPLOMACY_TITLE,
+                LanguageStrings.TRIGGER_AUTO_DIPLOMACY_MSG,
+                GameConstants.AUTO_UPGRADE_MIN_COMPLETE_TUNNELS,
+                GameConstants.AUTO_UPGRADE_MIN_DIPLOMATS_SENT);
     }
     
     private void checkDynastyTriggers() {

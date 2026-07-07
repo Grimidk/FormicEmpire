@@ -77,8 +77,12 @@ public class Savefile implements Serializable {
         public int speciesId;
         public int researchPoints;
         public int totalNuptialFlights;
+        public int diplomatsSentTotal;
         public boolean defaultAutomationEnabled;
         public boolean defaultAutoBuildEnabled;
+        public boolean autoDiplomacyEnabled;
+        public boolean defaultAutoTunnelsEnabled;
+        public Map<String, Integer> diplomatSupportToDynasty = new HashMap<>();
         public List<Integer> unlockedUpgradeIds = new ArrayList<>();
         public List<Integer> absorbedDynastyIds = new ArrayList<>();
         public List<Integer> defeatedSpeciesIds = new ArrayList<>();
@@ -124,6 +128,10 @@ public class Savefile implements Serializable {
         public boolean isCapital;
         public boolean isAutomated;
         public boolean autoBuildEnabled;
+        public boolean autoTunnelsEnabled;
+        public Map<String, Integer> outgoingColonyDiplomatMissions = new HashMap<>();
+        public Map<String, Integer> incomingColonyDiplomatSupport = new HashMap<>();
+        public Map<String, Integer> outgoingDynastyDiplomatMissions = new HashMap<>();
         public int age;
         public int daysWithoutQueen;
         public int q; 

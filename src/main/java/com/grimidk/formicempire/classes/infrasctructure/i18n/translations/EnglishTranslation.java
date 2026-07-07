@@ -257,6 +257,13 @@ public class EnglishTranslation implements Translation {
         en.put("STAT_QUEEN_STATUS", "Queen Status");
         en.put("STAT_AUTOMATION", "Automation");
         en.put("STAT_AUTO_BUILD", "Auto-Build");
+        en.put("STAT_AUTO_TUNNELS", "Auto-Tunnels");
+        en.put("DYNASTY_DEFAULT_AUTO_TUNNELS", "Default auto-tunnels");
+        en.put("DYNASTY_DEFAULT_AUTO_TUNNELS_TOOLTIP", "Enable auto-tunnel digging on newly founded colonies.");
+        en.put("DYNASTY_AUTO_DIPLOMACY", "Auto-diplomacy");
+        en.put("DYNASTY_AUTO_DIPLOMACY_TOOLTIP", "Capital and militant colonies automatically send diplomats to raise satellite loyalty.");
+        en.put("LOYALTY_MODIFIER_DIPLOMAT_MISSION", "Diplomatic mission");
+        en.put("DIPLO_MODIFIER_DIPLOMAT_MISSION", "Diplomatic mission");
         en.put("STAT_DATE_TIME", "Date & Time");
         en.put("STAT_TIME_DAY", "Time of Day");
         en.put("STAT_MOON_PHASE", "Moon Phase");
@@ -1067,6 +1074,10 @@ public class EnglishTranslation implements Translation {
         en.put("ABILITY_SPREAD_2_DESC", "Allows you to build more satellite colonies at the time, taking away the limit.");
         en.put("ABILITY_AUTOMATION_FLAVOR", "Ant Automation");
         en.put("ABILITY_AUTOMATION_DESC", "Allows your colonies to be automated in the dynasty management screen.");
+        en.put("ABILITY_AUTO_TUNNELS_FLAVOR", "Tunnel Grid Automation");
+        en.put("ABILITY_AUTO_TUNNELS_DESC", "Automated colonies assign borers and engineers to dig every possible tunnel link.");
+        en.put("ABILITY_AUTO_DIPLOMACY_FLAVOR", "Loyalty Stabilization");
+        en.put("ABILITY_AUTO_DIPLOMACY_DESC", "The capital and militant colonies automatically send diplomats to raise satellite loyalty.");
         en.put("ABILITY_TUNNELS_FLAVOR", "Subterranean Highways");
         en.put("ABILITY_TUNNELS_DESC", "Allows your colonies to build tunnel networks between each other for faster and safer resource transport.");
         en.put("ABILITY_BILATERAL_TRADE_FLAVOR", "Two-Way Logistics");
@@ -1524,6 +1535,7 @@ public class EnglishTranslation implements Translation {
         en.put("LOG_AUTOMATION_TRADE_FMT", "Opened trade route to %s");
         en.put("LOG_AI_DIPLOMAT_COLONY_FMT", "AI sent %s diplomats to stabilize %s (+%s loyalty)");
         en.put("LOG_AI_DIPLOMAT_DYNASTY_FMT", "AI sent %s diplomats to improve relations with %s (+%s reputation)");
+        en.put("LOG_AUTO_DIPLOMAT_COLONY_FMT", "Automation sent %s diplomats to stabilize %s (+%s loyalty)");
         en.put("LOG_AI_PACT_FMT", "AI formed a non-aggression pact with %s");
         en.put("LOG_AI_DECLARE_WAR_FMT", "AI declared war on %s");
         en.put("LOG_LAST_COLONY_FALLEN", "The last colony has fallen. This is now a dead remnant.");
@@ -1582,6 +1594,10 @@ public class EnglishTranslation implements Translation {
         en.put("TRIGGER_SPREAD_2_ABILITY_MSG", "Your dynasty is expanding rapidly! The limit on new colonies has been removed.");
         en.put("TRIGGER_AUTOMATION_ABILITY_TITLE", "Automation Era");
         en.put("TRIGGER_AUTOMATION_ABILITY_MSG", "Your dynasty is vast. You can now completely automate colony management.");
+        en.put("TRIGGER_AUTO_TUNNELS_TITLE", "Tunnel Grid Automation");
+        en.put("TRIGGER_AUTO_TUNNELS_MSG", "Your dynasty has completed %s tunnels and sent %s diplomatic missions! Automated colonies can now dig every remaining link. Toggle Auto-Tunnels per colony in the Dynasty Overview (A).");
+        en.put("TRIGGER_AUTO_DIPLOMACY_TITLE", "Loyalty Stabilization");
+        en.put("TRIGGER_AUTO_DIPLOMACY_MSG", "Your dynasty has completed %s tunnels and sent %s diplomatic missions! The capital and militant colonies can now stabilize loyalty automatically. Toggle Auto-Diplomacy in the Dynasty Overview (A).");
         en.put("TRIGGER_BILATERAL_TRADE_TITLE", "Two-Way Logistics");
         en.put("TRIGGER_BILATERAL_TRADE_MSG", "Your trade network is so busy that your ants have learned to bring resources back on their return trips! Bilateral Trade unlocked.");
         en.put("TRIGGER_COURIER_ROLE_TITLE", "Logistic Network");

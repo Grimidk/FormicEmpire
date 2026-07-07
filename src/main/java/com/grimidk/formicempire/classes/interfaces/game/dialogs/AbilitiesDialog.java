@@ -1,5 +1,6 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
+import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
@@ -42,6 +43,9 @@ public class AbilitiesDialog extends ZeroDialog {
         researchPointsLabel = new JLabel();
         researchPointsLabel.setFont(AssetStyles.FONT_BOLD);
         researchPointsLabel.setForeground(AssetStyles.TEXT_HEADER);
+        researchPointsLabel.setIcon(GameConstants.ICON_RESEARCH);
+        researchPointsLabel.setIconTextGap(6);
+        researchPointsLabel.setToolTipText(LanguageStrings.get(LanguageStrings.TOOLTIP_RESEARCH_POINTS));
         northPanel.add(researchPointsLabel);
         add(northPanel, BorderLayout.NORTH);
 
@@ -144,7 +148,7 @@ public class AbilitiesDialog extends ZeroDialog {
                     GameUnlocks.ABILITY_PHEROMONE_STORM.getName(),
                     GameUnlocks.ABILITY_PHEROMONE_STORM.getDescription(),
                     syrupCost,
-                    GameConstants.RESOURCE_SYRUP.getName(),
+                    GameConstants.RESOURCE_SYRUP,
                     e -> {
                         if (colony.activatePheromoneStorm()) {
                             refreshDialog();
@@ -173,7 +177,7 @@ public class AbilitiesDialog extends ZeroDialog {
                     GameUnlocks.ABILITY_CREATINE_DIET.getName(),
                     GameUnlocks.ABILITY_CREATINE_DIET.getDescription(),
                     proteinCost,
-                    GameConstants.RESOURCE_MEAT.getName(),
+                    GameConstants.RESOURCE_MEAT,
                     e -> {
                         if (colony.activateCreatineDiet()) {
                             refreshDialog();
@@ -213,23 +217,28 @@ public class AbilitiesDialog extends ZeroDialog {
     }
 
     private void updateResearchPointsLabel() {
-        researchPointsLabel.setText(LanguageStrings.format(LanguageStrings.ABILITY_RP_LABEL, colony.getResearchPoints()));
+        researchPointsLabel.setText(AssetStyles.formatNumber(colony.getResearchPoints()));
+    }
+
+    private JLabel createCostLabel(Icon icon, int amount) {
+        JLabel label = new JLabel(AssetStyles.formatNumber(amount), icon, SwingConstants.CENTER);
+        label.setForeground(AssetStyles.TEXT_NORMAL);
+        label.setFont(AssetStyles.FONT_BOLD);
+        label.setIconTextGap(6);
+        label.setHorizontalAlignment(SwingConstants.CENTER);
+        return label;
     }
 
     private JPanel createAbilityPanel(String title, String desc, int rpCost, java.awt.event.ActionListener action, boolean enabled, String tooltip) {
-        return createAbilityPanel(title, desc,
-                LanguageStrings.format(LanguageStrings.UPGRADE_COST_RP, rpCost),
-                action, enabled, tooltip);
+        return createAbilityPanel(title, desc, createCostLabel(GameConstants.ICON_RESEARCH, rpCost), action, enabled, tooltip);
     }
 
-    private JPanel createResourceAbilityPanel(String title, String desc, int resourceCost, String resourceName,
+    private JPanel createResourceAbilityPanel(String title, String desc, int resourceCost, ResourceType resourceType,
             java.awt.event.ActionListener action, boolean enabled, String tooltip) {
-        return createAbilityPanel(title, desc,
-                String.format(LanguageStrings.get(LanguageStrings.ABILITY_COST_RESOURCE_FMT), resourceCost, resourceName),
-                action, enabled, tooltip);
+        return createAbilityPanel(title, desc, createCostLabel(resourceType.getIcon(), resourceCost), action, enabled, tooltip);
     }
 
-    private JPanel createAbilityPanel(String title, String desc, String costText,
+    private JPanel createAbilityPanel(String title, String desc, JLabel costLabel,
             java.awt.event.ActionListener action, boolean enabled, String tooltip) {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBackground(AssetStyles.UI_BG_SECONDARY);
@@ -248,11 +257,11 @@ public class AbilitiesDialog extends ZeroDialog {
         descriptionArea.setForeground(AssetStyles.TEXT_NORMAL);
         descriptionArea.setFont(AssetStyles.FONT_NORMAL);
         panel.add(descriptionArea, BorderLayout.CENTER);
-        panel.add(createActionPanel(costText, action, enabled, tooltip), BorderLayout.EAST);
+        panel.add(createActionPanel(costLabel, action, enabled, tooltip), BorderLayout.EAST);
         return panel;
     }
 
-    private JPanel createActionPanel(String costText, java.awt.event.ActionListener action,
+    private JPanel createActionPanel(JLabel costLabel, java.awt.event.ActionListener action,
             boolean enabled, String tooltip) {
         JPanel actionPanel = new JPanel();
         actionPanel.setOpaque(false);
@@ -261,11 +270,7 @@ public class AbilitiesDialog extends ZeroDialog {
         actionPanel.setPreferredSize(new Dimension(ACTION_PANEL_WIDTH, 0));
         actionPanel.setMinimumSize(new Dimension(ACTION_PANEL_WIDTH, 0));
 
-        JLabel costLabel = new JLabel(costText);
-        costLabel.setForeground(AssetStyles.TEXT_NORMAL);
-        costLabel.setFont(AssetStyles.FONT_BOLD);
         costLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        costLabel.setHorizontalAlignment(SwingConstants.CENTER);
         costLabel.setMaximumSize(new Dimension(ACTION_PANEL_WIDTH, Integer.MAX_VALUE));
 
         JButton btn = new JButton(LanguageStrings.get(LanguageStrings.UI_TRIGGER));

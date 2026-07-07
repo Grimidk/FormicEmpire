@@ -13,6 +13,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.awt.Rectangle;
 
 import com.grimidk.formicempire.classes.entities.services.colony.*;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDiplomacyService;
 import com.grimidk.formicempire.classes.constants.misc.BugType;
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
@@ -50,6 +51,7 @@ public class Colony {
     private boolean isActive;
     private boolean automationEnabled = false; 
     private boolean autoBuildEnabled = false;
+    private boolean autoTunnelsEnabled = false;
     private boolean isCapital = false;
     private int age;
     private int daysWithoutQueen;
@@ -63,9 +65,12 @@ public class Colony {
     private final List<Ant> deadAnts;
     private final List<Bug> bugs; 
     
-    private Map<AntRole, Integer> peaceAssignedRoleCounts;
-    private Map<AntRole, Integer> warAssignedRoleCounts;
+    private final Map<AntRole, Integer> peaceAssignedRoleCounts = createEmptyRoleCountMap();
+    private final Map<AntRole, Integer> warAssignedRoleCounts = createEmptyRoleCountMap();
     private Map<AntRole, Integer> activeRoleCountCache;
+    private final Map<Integer, Integer> outgoingColonyDiplomatMissions = new HashMap<>();
+    private final Map<Integer, Integer> incomingColonyDiplomatSupport = new HashMap<>();
+    private final Map<Integer, Integer> outgoingDynastyDiplomatMissions = new HashMap<>();
     private Boolean affordableResearchCached;
     private Building affordableBuildingCached;
     private boolean affordableBuildingCacheValid;
@@ -177,8 +182,10 @@ public class Colony {
     }
 
     private void initializeAssignedRoles() {
-        this.peaceAssignedRoleCounts = createEmptyRoleCountMap();
-        this.warAssignedRoleCounts = createEmptyRoleCountMap();
+        for (AntRole role : GameConstants.getAntRoles()) {
+            peaceAssignedRoleCounts.put(role, 0);
+            warAssignedRoleCounts.put(role, 0);
+        }
     }
 
     private boolean usesWarEconomyRoles() {
@@ -206,6 +213,19 @@ public class Colony {
         for (AntRole role : GameConstants.getAntRoles()) {
             destination.put(role, source.getOrDefault(role, 0));
         }
+    }
+
+    private static Map<Integer, Integer> parseIntKeyMap(Map<String, Integer> saved) {
+        Map<Integer, Integer> parsed = new HashMap<>();
+        if (saved == null) {
+            return parsed;
+        }
+        for (Map.Entry<String, Integer> entry : saved.entrySet()) {
+            if (entry.getKey() != null && entry.getValue() != null) {
+                parsed.put(Integer.parseInt(entry.getKey()), entry.getValue());
+            }
+        }
+        return parsed;
     }
 
     private void loadAssignedRoleCountsFromSave(Savefile.SavedColony savedColony) {
@@ -246,6 +266,7 @@ public class Colony {
         this.hatchRatePrincess = 0.0f;
         this.isActive = false;
         this.autoBuildEnabled = false;
+        this.autoTunnelsEnabled = false;
         this.loyalty = GameConstants.DEFAULT_COLONY_LOYALTY;
     }
 
@@ -314,6 +335,7 @@ public class Colony {
         this.isCapital = savedColony.isCapital;
         this.automationEnabled = savedColony.isAutomated;
         this.autoBuildEnabled = savedColony.autoBuildEnabled;
+        this.autoTunnelsEnabled = savedColony.autoTunnelsEnabled;
         this.age = savedColony.age;
         this.daysWithoutQueen = savedColony.daysWithoutQueen;
         this.loyalty = GameConstants.clampColonyLoyalty(savedColony.loyalty);
@@ -329,6 +351,10 @@ public class Colony {
         }
         
         loadAssignedRoleCountsFromSave(savedColony);
+        copyDiplomatMissionMaps(
+                parseIntKeyMap(savedColony.outgoingColonyDiplomatMissions),
+                parseIntKeyMap(savedColony.incomingColonyDiplomatSupport),
+                parseIntKeyMap(savedColony.outgoingDynastyDiplomatMissions));
         
         this.hatchRateWorker = savedColony.hatchRateWorker;
         this.hatchRateSoldier = savedColony.hatchRateSoldier;
@@ -581,7 +607,21 @@ public class Colony {
     }
 
     public int getEffectiveLoyalty(TradeManager tradeManager, World world) {
-        return GameConstants.clampColonyLoyalty(loyalty + getLoyaltyModifierBonus(tradeManager, world));
+        return GameConstants.clampColonyLoyalty(
+                loyalty + getLoyaltyModifierBonus(tradeManager, world) + getDiplomatLoyaltyBonus());
+    }
+
+    public int getDiplomatLoyaltyBonus() {
+        if (dynasty == null || incomingColonyDiplomatSupport.isEmpty()) {
+            return 0;
+        }
+        DynastyDiplomacyService diplo = dynasty.getDiplomacyService();
+        if (diplo == null) {
+            return 0;
+        }
+        int gainPer = diplo.getDiplomatStabilityGainPerAnt();
+        int diplomats = incomingColonyDiplomatSupport.values().stream().mapToInt(Integer::intValue).sum();
+        return diplomats * gainPer;
     }
 
     public String buildLoyaltyModifierTooltip(TradeManager tradeManager, World world) {
@@ -621,6 +661,13 @@ public class Colony {
                     LanguageStrings.get(LanguageStrings.LOYALTY_MODIFIER_DISTANCE_FROM_CAPITAL),
                     tiles,
                     LanguageStrings.formatSigned(distanceAdj))).append("<br>");
+        }
+        int diplomatAdj = getDiplomatLoyaltyBonus();
+        if (diplomatAdj != 0) {
+            sb.append(LanguageStrings.format(
+                    LanguageStrings.LOYALTY_MODIFIER_LINE,
+                    LanguageStrings.get(LanguageStrings.LOYALTY_MODIFIER_DIPLOMAT_MISSION),
+                    LanguageStrings.formatSigned(diplomatAdj))).append("<br>");
         }
 
         sb.append(LanguageStrings.get(LanguageStrings.LOYALTY_TOOLTIP_EFFECTIVE))
@@ -731,6 +778,49 @@ public class Colony {
     public void setAutomationEnabled(boolean automationEnabled) { this.automationEnabled = automationEnabled; }
     public boolean isAutoBuildEnabled() { return autoBuildEnabled; }
     public void setAutoBuildEnabled(boolean autoBuildEnabled) { this.autoBuildEnabled = autoBuildEnabled; }
+    public boolean isAutoTunnelsEnabled() { return autoTunnelsEnabled; }
+    public void setAutoTunnelsEnabled(boolean autoTunnelsEnabled) { this.autoTunnelsEnabled = autoTunnelsEnabled; }
+
+    public int getDeployedDiplomatCount() {
+        int total = 0;
+        for (int count : outgoingColonyDiplomatMissions.values()) {
+            total += count;
+        }
+        for (int count : outgoingDynastyDiplomatMissions.values()) {
+            total += count;
+        }
+        return total;
+    }
+
+    public Map<Integer, Integer> getOutgoingColonyDiplomatMissions() {
+        return outgoingColonyDiplomatMissions;
+    }
+
+    public Map<Integer, Integer> getIncomingColonyDiplomatSupport() {
+        return incomingColonyDiplomatSupport;
+    }
+
+    public Map<Integer, Integer> getOutgoingDynastyDiplomatMissions() {
+        return outgoingDynastyDiplomatMissions;
+    }
+
+    public void copyDiplomatMissionMaps(
+            Map<Integer, Integer> outgoingColony,
+            Map<Integer, Integer> incomingColony,
+            Map<Integer, Integer> outgoingDynasty) {
+        outgoingColonyDiplomatMissions.clear();
+        incomingColonyDiplomatSupport.clear();
+        outgoingDynastyDiplomatMissions.clear();
+        if (outgoingColony != null) {
+            outgoingColonyDiplomatMissions.putAll(outgoingColony);
+        }
+        if (incomingColony != null) {
+            incomingColonyDiplomatSupport.putAll(incomingColony);
+        }
+        if (outgoingDynasty != null) {
+            outgoingDynastyDiplomatMissions.putAll(outgoingDynasty);
+        }
+    }
 
     public Map<AntType, List<Ant>> getAntGroups() { return antGroups; }
 
@@ -946,7 +1036,19 @@ public class Colony {
 
     public void setAssignedRoleCount(AntRole role, int count) {
         if (count >= 0) {
+            int previous = activeAssignedRoleCounts().getOrDefault(role, 0);
             activeAssignedRoleCounts().put(role, count);
+            reconcileDiplomatDeploymentsIfNeeded(role, previous, count, true);
+        }
+    }
+
+    private void reconcileDiplomatDeploymentsIfNeeded(AntRole role, int previous, int next, boolean activeEconomy) {
+        if (!activeEconomy || role != GameConstants.ROLE_DIPLOMAT || next >= previous || dynasty == null) {
+            return;
+        }
+        DynastyDiplomacyService diplo = dynasty.getDiplomacyService();
+        if (diplo != null) {
+            diplo.reconcileDiplomatDeployments(this, next);
         }
     }
 
@@ -963,7 +1065,9 @@ public class Colony {
             count = 0;
         }
         if (count >= 0) {
+            int previous = peaceAssignedRoleCounts.getOrDefault(role, 0);
             peaceAssignedRoleCounts.put(role, count);
+            reconcileDiplomatDeploymentsIfNeeded(role, previous, count, !usesWarEconomyRoles());
         }
     }
 
@@ -977,7 +1081,9 @@ public class Colony {
 
     public void setWarAssignedRoleCount(AntRole role, int count) {
         if (count >= 0) {
+            int previous = warAssignedRoleCounts.getOrDefault(role, 0);
             warAssignedRoleCounts.put(role, count);
+            reconcileDiplomatDeploymentsIfNeeded(role, previous, count, usesWarEconomyRoles());
         }
     }
 

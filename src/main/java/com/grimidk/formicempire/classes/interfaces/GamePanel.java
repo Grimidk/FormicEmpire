@@ -1153,7 +1153,7 @@ public class GamePanel extends ZeroGamePanel {
         if (colonyPanel != null) colonyPanel.reset();
         if (worldPanel != null) worldPanel.reset();
         if (alertPanel != null) alertPanel.updateAlerts(new ArrayList<>());
-        
+
         Engine eng = frame.getEngine();
         if (eng != null) {
             eng.pauseEngine();

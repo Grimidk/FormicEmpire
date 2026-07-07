@@ -418,6 +418,13 @@ public final class LanguageStrings {
     public static final String STAT_QUEEN_STATUS = "STAT_QUEEN_STATUS";
     public static final String STAT_AUTOMATION = "STAT_AUTOMATION";
     public static final String STAT_AUTO_BUILD = "STAT_AUTO_BUILD";
+    public static final String STAT_AUTO_TUNNELS = "STAT_AUTO_TUNNELS";
+    public static final String DYNASTY_DEFAULT_AUTO_TUNNELS = "DYNASTY_DEFAULT_AUTO_TUNNELS";
+    public static final String DYNASTY_DEFAULT_AUTO_TUNNELS_TOOLTIP = "DYNASTY_DEFAULT_AUTO_TUNNELS_TOOLTIP";
+    public static final String DYNASTY_AUTO_DIPLOMACY = "DYNASTY_AUTO_DIPLOMACY";
+    public static final String DYNASTY_AUTO_DIPLOMACY_TOOLTIP = "DYNASTY_AUTO_DIPLOMACY_TOOLTIP";
+    public static final String LOYALTY_MODIFIER_DIPLOMAT_MISSION = "LOYALTY_MODIFIER_DIPLOMAT_MISSION";
+    public static final String DIPLO_MODIFIER_DIPLOMAT_MISSION = "DIPLO_MODIFIER_DIPLOMAT_MISSION";
     public static final String STAT_DATE_TIME = "STAT_DATE_TIME";
     public static final String STAT_TIME_DAY = "STAT_TIME_DAY";
     public static final String STAT_MOON_PHASE = "STAT_MOON_PHASE";
@@ -769,6 +776,7 @@ public final class LanguageStrings {
     public static final String LOG_AUTOMATION_TRADE_FMT = "LOG_AUTOMATION_TRADE_FMT";
     public static final String LOG_AI_DIPLOMAT_COLONY_FMT = "LOG_AI_DIPLOMAT_COLONY_FMT";
     public static final String LOG_AI_DIPLOMAT_DYNASTY_FMT = "LOG_AI_DIPLOMAT_DYNASTY_FMT";
+    public static final String LOG_AUTO_DIPLOMAT_COLONY_FMT = "LOG_AUTO_DIPLOMAT_COLONY_FMT";
     public static final String LOG_AI_PACT_FMT = "LOG_AI_PACT_FMT";
     public static final String LOG_AI_DECLARE_WAR_FMT = "LOG_AI_DECLARE_WAR_FMT";
     public static final String LOG_LAST_COLONY_FALLEN = "LOG_LAST_COLONY_FALLEN";
@@ -1354,6 +1362,10 @@ public final class LanguageStrings {
     public static final String ABILITY_SPREAD_2_DESC = "ABILITY_SPREAD_2_DESC";
     public static final String ABILITY_AUTOMATION_FLAVOR = "ABILITY_AUTOMATION_FLAVOR";
     public static final String ABILITY_AUTOMATION_DESC = "ABILITY_AUTOMATION_DESC";
+    public static final String ABILITY_AUTO_TUNNELS_FLAVOR = "ABILITY_AUTO_TUNNELS_FLAVOR";
+    public static final String ABILITY_AUTO_TUNNELS_DESC = "ABILITY_AUTO_TUNNELS_DESC";
+    public static final String ABILITY_AUTO_DIPLOMACY_FLAVOR = "ABILITY_AUTO_DIPLOMACY_FLAVOR";
+    public static final String ABILITY_AUTO_DIPLOMACY_DESC = "ABILITY_AUTO_DIPLOMACY_DESC";
     public static final String ABILITY_TUNNELS_FLAVOR = "ABILITY_TUNNELS_FLAVOR";
     public static final String ABILITY_TUNNELS_DESC = "ABILITY_TUNNELS_DESC";
     public static final String ABILITY_BILATERAL_TRADE_FLAVOR = "ABILITY_BILATERAL_TRADE_FLAVOR";
@@ -1711,6 +1723,10 @@ public final class LanguageStrings {
     public static final String TRIGGER_SPREAD_2_ABILITY_MSG = "TRIGGER_SPREAD_2_ABILITY_MSG";
     public static final String TRIGGER_AUTOMATION_ABILITY_TITLE = "TRIGGER_AUTOMATION_ABILITY_TITLE";
     public static final String TRIGGER_AUTOMATION_ABILITY_MSG = "TRIGGER_AUTOMATION_ABILITY_MSG";
+    public static final String TRIGGER_AUTO_TUNNELS_TITLE = "TRIGGER_AUTO_TUNNELS_TITLE";
+    public static final String TRIGGER_AUTO_TUNNELS_MSG = "TRIGGER_AUTO_TUNNELS_MSG";
+    public static final String TRIGGER_AUTO_DIPLOMACY_TITLE = "TRIGGER_AUTO_DIPLOMACY_TITLE";
+    public static final String TRIGGER_AUTO_DIPLOMACY_MSG = "TRIGGER_AUTO_DIPLOMACY_MSG";
     public static final String TRIGGER_BILATERAL_TRADE_TITLE = "TRIGGER_BILATERAL_TRADE_TITLE";
     public static final String TRIGGER_BILATERAL_TRADE_MSG = "TRIGGER_BILATERAL_TRADE_MSG";
     public static final String TRIGGER_COURIER_ROLE_TITLE = "TRIGGER_COURIER_ROLE_TITLE";

@@ -74,6 +74,9 @@ public class ColonyStarterService {
                 if (d.isDefaultAutoBuildEnabled() && d.hasUpgrade(GameUnlocks.ABILITY_MANAGEMENT)) {
                     colony.setAutoBuildEnabled(true);
                 }
+                if (d.isDefaultAutoTunnelsEnabled() && d.hasUpgrade(GameUnlocks.ABILITY_AUTO_TUNNELS)) {
+                    colony.setAutoTunnelsEnabled(true);
+                }
             }
         } else {
             colony.setCapital(true);
@@ -255,6 +258,9 @@ public class ColonyStarterService {
             }
             if (dynasty.isDefaultAutoBuildEnabled() && dynasty.hasUpgrade(GameUnlocks.ABILITY_MANAGEMENT)) {
                 target.setAutoBuildEnabled(true);
+            }
+            if (dynasty.isDefaultAutoTunnelsEnabled() && dynasty.hasUpgrade(GameUnlocks.ABILITY_AUTO_TUNNELS)) {
+                target.setAutoTunnelsEnabled(true);
             }
         }
 

@@ -257,6 +257,13 @@ public class SpanishTranslation implements Translation {
         es.put("STAT_QUEEN_STATUS", "Estado de la Reina");
         es.put("STAT_AUTOMATION", "Automatización");
         es.put("STAT_AUTO_BUILD", "Auto-Construcción");
+        es.put("STAT_AUTO_TUNNELS", "Auto-Túneles");
+        es.put("DYNASTY_DEFAULT_AUTO_TUNNELS", "Auto-túneles por defecto");
+        es.put("DYNASTY_DEFAULT_AUTO_TUNNELS_TOOLTIP", "Activa la excavación automática de túneles en colonias nuevas.");
+        es.put("DYNASTY_AUTO_DIPLOMACY", "Auto-diplomacia");
+        es.put("DYNASTY_AUTO_DIPLOMACY_TOOLTIP", "La capital y las colonias militantes envían diplomáticas automáticamente para subir la lealtad de los satélites.");
+        es.put("LOYALTY_MODIFIER_DIPLOMAT_MISSION", "Misión diplomática");
+        es.put("DIPLO_MODIFIER_DIPLOMAT_MISSION", "Misión diplomática");
         es.put("STAT_DATE_TIME", "Fecha y Hora");
         es.put("STAT_TIME_DAY", "Momento del Día");
         es.put("STAT_MOON_PHASE", "Fase Lunar");
@@ -1107,6 +1114,10 @@ public class SpanishTranslation implements Translation {
         es.put("ABILITY_SPREAD_2_DESC", "Permite fundar múltiples colonias satélite simultáneamente, eliminando el límite.");
         es.put("ABILITY_AUTOMATION_FLAVOR", "Automatización Hormiga");
         es.put("ABILITY_AUTOMATION_DESC", "Permite automatizar tus colonias desde la pantalla de dinastía.");
+        es.put("ABILITY_AUTO_TUNNELS_FLAVOR", "Automatización de túneles");
+        es.put("ABILITY_AUTO_TUNNELS_DESC", "Las colonias automatizadas asignan perforadoras e ingenieras para excavar todos los túneles posibles.");
+        es.put("ABILITY_AUTO_DIPLOMACY_FLAVOR", "Estabilización de lealtad");
+        es.put("ABILITY_AUTO_DIPLOMACY_DESC", "La capital y las colonias militantes envían diplomáticas automáticamente para subir la lealtad de los satélites.");
         es.put("ABILITY_TUNNELS_FLAVOR", "Autopistas Subterráneas");
         es.put("ABILITY_TUNNELS_DESC", "Permite construir redes de túneles entre colonias para un transporte más rápido y seguro.");
         es.put("ABILITY_BILATERAL_TRADE_FLAVOR", "Logística de Doble Sentido");
@@ -1603,6 +1614,7 @@ public class SpanishTranslation implements Translation {
         es.put("LOG_AUTOMATION_TRADE_FMT", "Ruta comercial abierta hacia %s");
         es.put("LOG_AI_DIPLOMAT_COLONY_FMT", "IA envió %s diplomáticos para estabilizar %s (+%s lealtad)");
         es.put("LOG_AI_DIPLOMAT_DYNASTY_FMT", "IA envió %s diplomáticos para mejorar relaciones con %s (+%s reputación)");
+        es.put("LOG_AUTO_DIPLOMAT_COLONY_FMT", "Automatización envió %s diplomáticos para estabilizar %s (+%s lealtad)");
         es.put("LOG_AI_PACT_FMT", "IA formó un pacto de no agresión con %s");
         es.put("LOG_AI_DECLARE_WAR_FMT", "IA declaró la guerra contra %s");
         es.put("LOG_LAST_COLONY_FALLEN", "La última colonia ha caído. Esto es ahora un remanente muerto.");
@@ -1661,6 +1673,10 @@ public class SpanishTranslation implements Translation {
         es.put("TRIGGER_SPREAD_2_ABILITY_MSG", "¡Tu dinastía se expande rápidamente! Se ha eliminado el límite de nuevas colonias.");
         es.put("TRIGGER_AUTOMATION_ABILITY_TITLE", "Era de la automatización");
         es.put("TRIGGER_AUTOMATION_ABILITY_MSG", "Tu dinastía es vasta. Ahora puedes automatizar completamente la gestión de colonias.");
+        es.put("TRIGGER_AUTO_TUNNELS_TITLE", "Automatización de red de túneles");
+        es.put("TRIGGER_AUTO_TUNNELS_MSG", "¡Tu dinastía ha completado %s túneles y enviado %s misiones diplomáticas! Las colonias automatizadas pueden excavar cada enlace restante. Activa Auto-Túneles por colonia en la Vista general de la Dinastía (A).");
+        es.put("TRIGGER_AUTO_DIPLOMACY_TITLE", "Estabilización de lealtad");
+        es.put("TRIGGER_AUTO_DIPLOMACY_MSG", "¡Tu dinastía ha completado %s túneles y enviado %s misiones diplomáticas! La capital y las colonias militantes pueden estabilizar la lealtad automáticamente. Activa Auto-diplomacia en la Vista general de la Dinastía (A).");
         es.put("TRIGGER_BILATERAL_TRADE_TITLE", "Logística de doble sentido");
         es.put("TRIGGER_BILATERAL_TRADE_MSG", "¡Tu red comercial está tan ocupada que tus hormigas han aprendido a traer recursos de vuelta en sus viajes de retorno! Comercio bilateral desbloqueado.");
         es.put("TRIGGER_COURIER_ROLE_TITLE", "Red logística");
