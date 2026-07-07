@@ -344,6 +344,9 @@ public class Engine extends Thread {
     public void setLanguage(String language) {
         this.language = (language != null) ? language : "en";
         LanguageStrings.setLanguage(this.language);
+        if (this.world != null) {
+            this.world.relocalizeDynastyNames();
+        }
     }
 
     public boolean isAllowTurboMode() {

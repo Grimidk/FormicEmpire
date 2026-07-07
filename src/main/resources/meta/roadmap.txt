@@ -12,8 +12,7 @@ To Fix (By decreasing priority) :
 	
 	High:
 	TODO: icons/sprites for moves and all unlocks
-	Room overlay art still placeholder quality (sprites/buildings/rooms/*.png)
-	change mentions of rp and resources in the ability cost
+	Room overlay art still placeholder quality (sprites/buildings/rooms/*.png)	
 
 	Mid:
 	(none right now)

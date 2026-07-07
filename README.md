@@ -19,15 +19,15 @@ Requirements:
 
 Running the game with Java installed (bash):
 
-    ./run.sh
+    ./scripts/run.sh
 
 Uses your system JDK and saves in `./saves/`.
 
 Generating a release bundle (bash):
 
-    ./package.sh
+    ./scripts/package.sh
 
-`package.sh` calls `./scripts/setup_jre.sh` first to verify `jre/` is present.
+`scripts/package.sh` calls `./scripts/setup_jre.sh` first to verify `jre/` is present.
 
 Produces **`outputs/`** with separate bundles per platform:
 
@@ -52,15 +52,15 @@ Produces **`outputs/`** with separate bundles per platform:
 
 1. Download [Temurin 17 JRE — Windows x64](https://adoptium.net/temurin/releases/?version=17&os=windows&arch=x64&package=jre)
 2. Extract into the project root as **`jre/`** (must contain `jre/bin/java.exe`)
-3. Run `./package.sh` (validates `jre/` automatically)
+3. Run `./scripts/package.sh` (validates `jre/` automatically)
 
 **Linux JRE setup (once, on the Linux build machine):**
 
 1. Download [Temurin 17 JRE — Linux x64](https://adoptium.net/temurin/releases/?version=17&os=linux&arch=x64&package=jre)
 2. Extract into the project root as **`jre-linux/`** (or leave as `jdk-*-jre/` — `setup_jre_linux.sh` detects both)
-3. Run `./package.sh` on **Linux** (requires `jpackage` from JDK 17+)
+3. Run `./scripts/package.sh` on **Linux** (requires `jpackage` from JDK 17+)
 
-**macOS:** No separate JRE download is required. `./run.sh` and the `.app` use your installed JDK 17. `jpackage` embeds a runtime when building `outputs/FormicEmpire.app`.
+**macOS:** No separate JRE download is required. `./scripts/run.sh` and the `.app` use your installed JDK 17. `jpackage` embeds a runtime when building `outputs/FormicEmpire.app`.
 
 **App icons:** `src/main/resources/meta/icon.ico` (Windows) and `icon.icns` (macOS) are committed assets. To refresh `icon.icns` after editing PNGs in `icon.iconset/` on macOS:
 

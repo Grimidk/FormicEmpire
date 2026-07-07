@@ -147,8 +147,6 @@ public class TriggerManager {
             return;
         }
         if (colony.getDynasty().getRank().getId() >= GameConstants.RANK_ULTRA.getId()) {
-            double bonus = colony.getDynasty().getCompletedAssimilations().size() * 5.0;
-            colony.getDynasty().setGeneticIntegrity(colony.getDynasty().getGeneticIntegrity() + bonus);
             if (notifyPlayer) {
                 fireLocalizedTrigger(GameUnlocks.ABILITY_CLONING,
                         LanguageStrings.TRIGGER_CLONING_TITLE,

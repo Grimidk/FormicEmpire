@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$ROOT"
+
 case "$(uname -s)" in
     CYGWIN*|MINGW*|MSYS*)
         MVN_EXEC="./mvnw.cmd"
@@ -157,7 +160,7 @@ pack_windows_zip() {
 
 pack_macos_app() {
     if [ "$HOST_OS" != "Darwin" ]; then
-        echo "[Pack] Skipping macOS app (run package.sh on macOS to build $MAC_APP)."
+        echo "[Pack] Skipping macOS app (run scripts/package.sh on macOS to build $MAC_APP)."
         return 0
     fi
 
@@ -205,7 +208,7 @@ pack_macos_app() {
 
 pack_linux_app() {
     if [ "$HOST_OS" != "Linux" ]; then
-        echo "[Pack] Skipping Linux app-image (run package.sh on Linux to build $LINUX_ZIP)."
+        echo "[Pack] Skipping Linux app-image (run scripts/package.sh on Linux to build $LINUX_ZIP)."
         return 0
     fi
 
@@ -304,12 +307,12 @@ fi
 
 if [ "$HAS_APP" -ne 1 ] && [ "$HOST_OS" != "Darwin" ]; then
     echo ""
-    echo "Note: Run ./package.sh on macOS to also produce $MAC_APP."
+    echo "Note: Run ./scripts/package.sh on macOS to also produce $MAC_APP."
 fi
 
 if [ "$HAS_LINUX_ZIP" -ne 1 ] && [ "$HOST_OS" != "Linux" ]; then
     echo ""
-    echo "Note: Run ./package.sh on Linux to also produce $LINUX_ZIP."
+    echo "Note: Run ./scripts/package.sh on Linux to also produce $LINUX_ZIP."
 fi
 
 echo ""

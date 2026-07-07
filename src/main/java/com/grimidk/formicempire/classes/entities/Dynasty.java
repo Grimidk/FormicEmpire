@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.awt.Color;
 
 import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
+import com.grimidk.formicempire.classes.constants.misc.DynastyTitle;
 import com.grimidk.formicempire.classes.constants.misc.Species;
 import com.grimidk.formicempire.classes.constants.misc.GeneticIntegrityModifier;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
@@ -37,6 +38,7 @@ public class Dynasty {
 
     private final int id;
     private String name;
+    private String titleKey;
     private boolean isPlayer;
     private Species species;
     private int researchPoints;
@@ -63,7 +65,6 @@ public class Dynasty {
     private Assimilation currentAssimilation;
     private double assimilationProgress;
     private Colony capital;
-    private double geneticIntegrity;
     private int militaryPower;
     private int activeMilitaryPower;
     private int reserveMilitaryPower;
@@ -90,8 +91,13 @@ public class Dynasty {
     private transient DynastyDiplomacyService diplomacyService;
 
     public Dynasty(int id, String name, boolean isPlayer, Species species) {
+        this(id, name, LanguageStrings.DYNASTY_TITLE_DYNASTY, isPlayer, species);
+    }
+
+    public Dynasty(int id, String name, String titleKey, boolean isPlayer, Species species) {
         this.id = id;
         this.name = name;
+        this.titleKey = titleKey != null ? titleKey : LanguageStrings.DYNASTY_TITLE_DYNASTY;
         this.isPlayer = isPlayer;
         this.species = species;
         this.colonies = new ArrayList<>();
@@ -112,7 +118,6 @@ public class Dynasty {
         this.defaultAutoBuildEnabled = false;
         this.autoDiplomacyEnabled = false;
         this.defaultAutoTunnelsEnabled = false;
-        this.geneticIntegrity = 100.0;
         this.diplomaticReputations = new HashMap<>();
         this.diplomaticModifierKeys = new HashMap<>();
         this.crossDynastyTradeRepGrantedIds = new ArrayList<>();
@@ -132,6 +137,9 @@ public class Dynasty {
     public Dynasty(Savefile.SavedDynasty savedDynasty) {
         this.id = savedDynasty.id;
         this.name = savedDynasty.name;
+        this.titleKey = savedDynasty.titleKey != null && !savedDynasty.titleKey.isEmpty()
+                ? savedDynasty.titleKey
+                : LanguageStrings.DYNASTY_TITLE_DYNASTY;
         this.isPlayer = savedDynasty.isPlayer;
         this.researchPoints = savedDynasty.researchPoints;
         this.totalNuptialFlights = savedDynasty.totalNuptialFlights;
@@ -142,7 +150,6 @@ public class Dynasty {
         this.defaultAutoBuildEnabled = savedDynasty.defaultAutoBuildEnabled;
         this.autoDiplomacyEnabled = savedDynasty.autoDiplomacyEnabled;
         this.defaultAutoTunnelsEnabled = savedDynasty.defaultAutoTunnelsEnabled;
-        this.geneticIntegrity = savedDynasty.geneticIntegrity;
         this.militaryPower = savedDynasty.militaryPower;
         
         this.species = GameConstants.SPECIES_OMNI; 
@@ -331,7 +338,8 @@ public class Dynasty {
         
         initializeColor();
         initializeServices();
-        
+
+        applyLocalizedName();
         rankUp();
     }
 
@@ -354,7 +362,7 @@ public class Dynasty {
     }
 
     public String generateNextColonyName() {
-        String baseName = LanguageStrings.dynastyThemeBase(this.name);
+        String baseName = LanguageStrings.dynastyThemeBase(this.name, this.titleKey);
         if (baseName.isEmpty()) {
             baseName = "Player";
         }
@@ -492,9 +500,7 @@ public class Dynasty {
     
     public void incrementNuptialFlights() {
         this.totalNuptialFlights++;
-        
-        this.geneticIntegrity = Math.max(0.0, this.geneticIntegrity - 1.0);
-        
+
         if (this.totalNuptialFlights >= 10 && !hasUpgrade(GameUnlocks.ABILITY_MASS_FLIGHT)) {
             unlockUpgrade(GameUnlocks.ABILITY_MASS_FLIGHT);
         }
@@ -901,6 +907,39 @@ public class Dynasty {
     // --- Getters & Setters ---
     public int getId() { return id; }
     public String getName() { return name; }
+    public String getTitleKey() { return titleKey; }
+    public DynastyTitle getTitle() { return GameConstants.getDynastyTitleByKey(titleKey); }
+
+    public void setTitleKey(String titleKey) {
+        this.titleKey = titleKey != null ? titleKey : LanguageStrings.DYNASTY_TITLE_DYNASTY;
+    }
+
+    public void applyLocalizedName() {
+        if (isWildDynastyName()) {
+            this.name = LanguageStrings.formatWildDynastyName(this.titleKey);
+            return;
+        }
+        String theme = LanguageStrings.stripDynastyNameSuffix(this.name, this.titleKey);
+        if (theme == null || theme.isEmpty()) {
+            theme = LanguageStrings.stripDynastyNameSuffix(this.name);
+        }
+        if (theme != null && !theme.isEmpty()) {
+            this.name = LanguageStrings.formatDynastyName(theme, this.titleKey);
+        }
+    }
+
+    private boolean isWildDynastyName() {
+        if (this.name != null && this.name.equals(LanguageStrings.get(LanguageStrings.DYNASTY_WILD_NAME))) {
+            return true;
+        }
+        for (DynastyTitle title : GameConstants.getDynastyTitles()) {
+            if (this.name != null && this.name.equals(LanguageStrings.formatWildDynastyName(title))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void setName(String name) { this.name = name; }
     public boolean isPlayer() { return isPlayer; }
     public void setPlayer(boolean player) { 
@@ -1055,9 +1094,6 @@ public class Dynasty {
     public void completeAssimilation(Assimilation a) { 
         if (!completedAssimilations.contains(a)) {
             completedAssimilations.add(a);
-            if (hasUpgrade(GameUnlocks.ABILITY_CLONING)) {
-                this.geneticIntegrity = Math.min(100.0, this.geneticIntegrity + 5.0);
-            }
         }
     }
 
@@ -1096,24 +1132,83 @@ public class Dynasty {
         return bonus;
     }
 
+    public int countSatelliteColonies() {
+        if (colonies.size() <= 1) {
+            return 0;
+        }
+        int satellites = 0;
+        for (Colony colony : colonies) {
+            if (!colony.isCapital()) {
+                satellites++;
+            }
+        }
+        return satellites;
+    }
+
+    public double getSatelliteColonyIntegrityPenalty() {
+        return countSatelliteColonies() * GameConstants.GENETIC_INTEGRITY_SATELLITE_PENALTY;
+    }
+
+    /** Integrity after the starting value and satellite spread penalty, before diplomatic bonuses. */
     public double getBaseGeneticIntegrity() {
-        return geneticIntegrity;
+        return GameConstants.GENETIC_INTEGRITY_START - getSatelliteColonyIntegrityPenalty();
     }
 
     public double getMinGeneticIntegrity() {
-        if (hasUpgrade(GameUnlocks.ABILITY_CLONING)) {
-            return Math.min(100.0, completedAssimilations.size() * 5.0);
-        }
-        return 0.0;
+        return Math.min(100.0, completedAssimilations.size() * GameConstants.GENETIC_INTEGRITY_ASSIMILATION_FLOOR_STEP);
     }
 
     public double getGeneticIntegrity() {
-        double effective = geneticIntegrity + getDiplomaticGeneticIntegrityBonus();
-        return Math.min(100.0, Math.max(getMinGeneticIntegrity(), effective));
+        double raw = getBaseGeneticIntegrity() + getDiplomaticGeneticIntegrityBonus();
+        return Math.min(100.0, Math.max(getMinGeneticIntegrity(), raw));
     }
-    
-    public void setGeneticIntegrity(double geneticIntegrity) { 
-        this.geneticIntegrity = Math.max(getMinGeneticIntegrity(), geneticIntegrity); 
+
+    public String buildGeneticIntegrityTooltip() {
+        StringBuilder sb = new StringBuilder("<html>");
+        sb.append(LanguageStrings.get(LanguageStrings.GI_TOOLTIP_START))
+                .append(": ")
+                .append(String.format("%.1f%%", GameConstants.GENETIC_INTEGRITY_START))
+                .append("<br>");
+
+        int satelliteCount = countSatelliteColonies();
+        if (satelliteCount > 0) {
+            double penalty = getSatelliteColonyIntegrityPenalty();
+            sb.append(LanguageStrings.format(
+                    LanguageStrings.GI_MODIFIER_SATELLITE_COLONIES,
+                    LanguageStrings.formatNumber(satelliteCount),
+                    formatGeneticIntegrityDelta(-penalty))).append("<br>");
+        }
+
+        for (String modifierKey : diplomaticModifierKeys.values()) {
+            GeneticIntegrityModifier modifier = GameConstants.getGeneticIntegrityModifierForDiplomaticKey(modifierKey);
+            if (modifier != null) {
+                sb.append(LanguageStrings.format(
+                        LanguageStrings.LOYALTY_MODIFIER_LINE,
+                        modifier.getName(),
+                        formatGeneticIntegrityDelta(modifier.getIntegrityDelta()))).append("<br>");
+            }
+        }
+
+        double minIntegrity = getMinGeneticIntegrity();
+        if (minIntegrity > 0.0) {
+            sb.append(LanguageStrings.format(
+                    LanguageStrings.GI_TOOLTIP_ASSIMILATION_FLOOR,
+                    LanguageStrings.formatNumber(completedAssimilations.size()),
+                    String.format("%.1f", minIntegrity))).append("<br>");
+        }
+
+        sb.append(LanguageStrings.get(LanguageStrings.LOYALTY_TOOLTIP_EFFECTIVE))
+                .append(": ")
+                .append(String.format("%.1f%%", getGeneticIntegrity()));
+        sb.append("</html>");
+        return sb.toString();
+    }
+
+    private static String formatGeneticIntegrityDelta(double delta) {
+        if (Math.rint(delta) == delta) {
+            return LanguageStrings.formatSigned((int) delta) + "%";
+        }
+        return String.format("%+.1f%%", delta);
     }
 
     public int getMilitaryPower() {

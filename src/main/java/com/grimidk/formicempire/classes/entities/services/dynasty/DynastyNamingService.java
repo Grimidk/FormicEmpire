@@ -1,6 +1,8 @@
 package com.grimidk.formicempire.classes.entities.services.dynasty;
 
+import com.grimidk.formicempire.classes.constants.misc.DynastyTitle;
 import com.grimidk.formicempire.classes.constants.misc.Species;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
@@ -29,10 +31,20 @@ public class DynastyNamingService {
     }
 
     private final Set<String> usedThemes = new HashSet<>();
+
+    public DynastyTitle pickRandomTitle() {
+        List<DynastyTitle> titles = GameConstants.getDynastyTitles();
+        return titles.get(GameRandom.nextInt(titles.size()));
+    }
+
     public String generateDynastyName(Species species) {
+        return generateDynastyName(species, pickRandomTitle());
+    }
+
+    public String generateDynastyName(Species species, DynastyTitle title) {
         String theme = getRandomTheme(species);
         usedThemes.add(theme);
-        return LanguageStrings.formatPlayerDynastyName(theme);
+        return LanguageStrings.formatDynastyName(theme, title);
     }
 
     public String generateCapitalName(String dynastyName) {
@@ -42,7 +54,6 @@ public class DynastyNamingService {
     private String getRandomTheme(Species species) {
         List<String> pool = new ArrayList<>();
         
-        // Try to use species preferences first
         if (species != null && SPECIES_PREFERENCES.containsKey(species.getId())) {
             for (String pref : SPECIES_PREFERENCES.get(species.getId())) {
                 if (!usedThemes.contains(pref)) {

@@ -10,6 +10,7 @@ import com.grimidk.formicempire.classes.constants.misc.BugType;
 import com.grimidk.formicempire.classes.constants.misc.ColonyLoyalty;
 import com.grimidk.formicempire.classes.constants.misc.ColonyLoyaltyModifier;
 import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
+import com.grimidk.formicempire.classes.constants.misc.DynastyTitle;
 import com.grimidk.formicempire.classes.constants.misc.DiplomaticReputation;
 import com.grimidk.formicempire.classes.constants.misc.DiplomaticReputationModifier;
 import com.grimidk.formicempire.classes.constants.misc.GameSpeed;
@@ -148,6 +149,7 @@ public final class GameConstants {
     private static final List<GeneticIntegrityModifier> geneticIntegrityModifiers = new ArrayList<>();
     private static final List<ColonyLoyalty> colonyLoyalties = new ArrayList<>();
     private static final List<ColonyLoyaltyModifier> colonyLoyaltyModifiers = new ArrayList<>();
+    private static final List<DynastyTitle> dynastyTitles = new ArrayList<>();
     private static final List<Species> species = new ArrayList<>();
     private static final List<TradeMethod> tradeMethods = new ArrayList<>();
     private static final List<Humidity> humidity = new ArrayList<>();
@@ -804,6 +806,9 @@ public final class GameConstants {
     static { diplomaticReputationModifiers.add(DIPLO_MODIFIER_BORDER_FRICTION); }
 
     // --- Genetic integrity modifiers ---
+    public static final double GENETIC_INTEGRITY_START = 100.0;
+    public static final double GENETIC_INTEGRITY_SATELLITE_PENALTY = 1.0;
+    public static final double GENETIC_INTEGRITY_ASSIMILATION_FLOOR_STEP = 5.0;
     public static final GeneticIntegrityModifier GI_MODIFIER_PACT = new GeneticIntegrityModifier(
         1, LanguageStrings.GI_MODIFIER_PACT, 10.0, DIPLO_MODIFIER_PACT.getNameKey());
     static { geneticIntegrityModifiers.add(GI_MODIFIER_PACT); }
@@ -994,6 +999,47 @@ public final class GameConstants {
     public static final int DIPLOMAT_STABILITY_GAIN_PRESSURE_2 = 3;
     public static final int DIPLOMAT_STABILITY_GAIN_PRESSURE_3 = 5;
     
+    // --- Dynasty titles (display suffix for organization names) ---
+    public static final DynastyTitle DYNASTY_TITLE_DYNASTY = new DynastyTitle(
+            1, LanguageStrings.DYNASTY_TITLE_DYNASTY, LanguageStrings.DYNASTY_TITLE_FMT_DYNASTY);
+    static { dynastyTitles.add(DYNASTY_TITLE_DYNASTY); }
+
+    public static final DynastyTitle DYNASTY_TITLE_CONGLOMERATE = new DynastyTitle(
+            2, LanguageStrings.DYNASTY_TITLE_CONGLOMERATE, LanguageStrings.DYNASTY_TITLE_FMT_CONGLOMERATE);
+    static { dynastyTitles.add(DYNASTY_TITLE_CONGLOMERATE); }
+
+    public static final DynastyTitle DYNASTY_TITLE_UNION = new DynastyTitle(
+            3, LanguageStrings.DYNASTY_TITLE_UNION, LanguageStrings.DYNASTY_TITLE_FMT_UNION);
+    static { dynastyTitles.add(DYNASTY_TITLE_UNION); }
+
+    public static final DynastyTitle DYNASTY_TITLE_SYNDICATE = new DynastyTitle(
+            4, LanguageStrings.DYNASTY_TITLE_SYNDICATE, LanguageStrings.DYNASTY_TITLE_FMT_SYNDICATE);
+    static { dynastyTitles.add(DYNASTY_TITLE_SYNDICATE); }
+
+    public static final DynastyTitle DYNASTY_TITLE_TECHNOCRACY = new DynastyTitle(
+            5, LanguageStrings.DYNASTY_TITLE_TECHNOCRACY, LanguageStrings.DYNASTY_TITLE_FMT_TECHNOCRACY);
+    static { dynastyTitles.add(DYNASTY_TITLE_TECHNOCRACY); }
+
+    public static final DynastyTitle DYNASTY_TITLE_EMPIRE = new DynastyTitle(
+            6, LanguageStrings.DYNASTY_TITLE_EMPIRE, LanguageStrings.DYNASTY_TITLE_FMT_EMPIRE);
+    static { dynastyTitles.add(DYNASTY_TITLE_EMPIRE); }
+
+    public static final DynastyTitle DYNASTY_TITLE_DOMINION = new DynastyTitle(
+            7, LanguageStrings.DYNASTY_TITLE_DOMINION, LanguageStrings.DYNASTY_TITLE_FMT_DOMINION);
+    static { dynastyTitles.add(DYNASTY_TITLE_DOMINION); }
+
+    public static final DynastyTitle DYNASTY_TITLE_CITY = new DynastyTitle(
+            8, LanguageStrings.DYNASTY_TITLE_CITY, LanguageStrings.DYNASTY_TITLE_FMT_CITY);
+    static { dynastyTitles.add(DYNASTY_TITLE_CITY); }
+
+    public static final DynastyTitle DYNASTY_TITLE_BERG = new DynastyTitle(
+            9, LanguageStrings.DYNASTY_TITLE_BERG, LanguageStrings.DYNASTY_TITLE_FMT_BERG);
+    static { dynastyTitles.add(DYNASTY_TITLE_BERG); }
+
+    public static final DynastyTitle DYNASTY_TITLE_GRAD = new DynastyTitle(
+            10, LanguageStrings.DYNASTY_TITLE_GRAD, LanguageStrings.DYNASTY_TITLE_FMT_GRAD);
+    static { dynastyTitles.add(DYNASTY_TITLE_GRAD); }
+
     // --- Species ---
     public static final Species SPECIES_OMNI = new Species(1, LanguageStrings.SPECIES_OMNI, LanguageStrings.SPECIES_OMNI_SCIENTIFIC,  "omni/", null, 
         Set.of(GameUnlocks.TYPE_EGG, GameUnlocks.TYPE_QUEEN, GameUnlocks.TYPE_WORKER, GameUnlocks.ROLE_FORAGER, 
@@ -1189,6 +1235,19 @@ public final class GameConstants {
     }
 
     public static List<ColonyRank> getColonyRanks() { return Collections.unmodifiableList(colonyRanks); }
+    public static List<DynastyTitle> getDynastyTitles() { return Collections.unmodifiableList(dynastyTitles); }
+
+    public static DynastyTitle getDynastyTitleByKey(String key) {
+        if (key != null) {
+            for (DynastyTitle title : dynastyTitles) {
+                if (title.getNameKey().equals(key)) {
+                    return title;
+                }
+            }
+        }
+        return DYNASTY_TITLE_DYNASTY;
+    }
+
     public static List<GameSpeed> getGameSpeeds() { return Collections.unmodifiableList(gameSpeeds); }
 
     public static GameSpeed getGameSpeedById(int id) {

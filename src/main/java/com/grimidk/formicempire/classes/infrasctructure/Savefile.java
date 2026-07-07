@@ -3,6 +3,7 @@ package com.grimidk.formicempire.classes.infrasctructure;
 import com.grimidk.formicempire.classes.entities.War;
 import com.grimidk.formicempire.classes.entities.services.world.WarStagePhase;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ public class Savefile implements Serializable {
     private int month;
     private int year;
     private int worldRadius;
+    private String playerDynastyTitleKey;
     
     // --- Root Summary Data ---
     private int colonyId;
@@ -65,12 +67,14 @@ public class Savefile implements Serializable {
         this.month = 1;
         this.year = 0; 
         this.worldRadius = 8;
+        this.playerDynastyTitleKey = LanguageStrings.DYNASTY_TITLE_DYNASTY;
     }
 
     public static class SavedDynasty implements Serializable {
         private static final long serialVersionUID = 1L;
         public int id;
         public String name;
+        public String titleKey;
         public boolean isPlayer;
         public boolean isDefeated;
         public String rankName;
@@ -293,6 +297,11 @@ public class Savefile implements Serializable {
 
     public int getWorldRadius() { return worldRadius; }
     public void setWorldRadius(int worldRadius) { this.worldRadius = worldRadius; }
+
+    public String getPlayerDynastyTitleKey() { return playerDynastyTitleKey; }
+    public void setPlayerDynastyTitleKey(String playerDynastyTitleKey) {
+        this.playerDynastyTitleKey = playerDynastyTitleKey;
+    }
     
     public int getColonyId() { return colonyId; }
     public void setColonyId(int colonyId) { this.colonyId = colonyId; }

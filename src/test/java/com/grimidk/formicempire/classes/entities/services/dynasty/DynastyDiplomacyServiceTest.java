@@ -36,8 +36,36 @@ class DynastyDiplomacyServiceTest {
 
     private static void seedDiplomaticPopulation(Dynasty dynasty) {
         Colony colony = new Colony(dynasty.getId() * 100, "Capital", dynasty.isPlayer());
+        colony.setCapital(true);
         colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
         dynasty.addColony(colony);
+    }
+
+    private static void addSatelliteColonies(Dynasty dynasty, int count) {
+        for (int i = 0; i < count; i++) {
+            Colony satellite = new Colony(dynasty.getId() * 1000 + i, "Satellite " + i, dynasty.isPlayer());
+            satellite.getWorkers().add(new Ant(satellite, GameConstants.TYPE_WORKER));
+            dynasty.addColony(satellite);
+        }
+    }
+
+    @Test
+    void geneticIntegrityStartsAtFullAndScalesWithSatellitesAndAssimilations() {
+        assertEquals(100.0, player.getGeneticIntegrity(), 0.001);
+
+        addSatelliteColonies(player, 5);
+        assertEquals(95.0, player.getGeneticIntegrity(), 0.001);
+
+        player.completeAssimilation(GameUnlocks.ASSIMILATION_LEAFCUTTER);
+        assertEquals(5.0, player.getMinGeneticIntegrity(), 0.001);
+        assertEquals(95.0, player.getGeneticIntegrity(), 0.001);
+
+        addSatelliteColonies(player, 86);
+        assertEquals(9.0, player.getGeneticIntegrity(), 0.001);
+
+        player.completeAssimilation(GameUnlocks.ASSIMILATION_MARAUDER);
+        assertEquals(10.0, player.getMinGeneticIntegrity(), 0.001);
+        assertEquals(10.0, player.getGeneticIntegrity(), 0.001);
     }
 
     @Test
@@ -97,30 +125,30 @@ class DynastyDiplomacyServiceTest {
 
     @Test
     void pactAddsGeneticIntegrityBonusWhileActive() {
-        player.setGeneticIntegrity(85.0);
-        neighbor.setGeneticIntegrity(85.0);
+        addSatelliteColonies(player, 10);
+        addSatelliteColonies(neighbor, 10);
         player.setDiplomaticReputation(neighbor.getId(), 60);
         neighbor.setDiplomaticReputation(player.getId(), 60);
 
-        assertEquals(85.0, player.getBaseGeneticIntegrity(), 0.001);
-        assertEquals(85.0, player.getGeneticIntegrity(), 0.001);
+        assertEquals(90.0, player.getBaseGeneticIntegrity(), 0.001);
+        assertEquals(90.0, player.getGeneticIntegrity(), 0.001);
         assertEquals(0.0, player.getDiplomaticGeneticIntegrityBonus(), 0.001);
 
         player.getDiplomacyService().formNonAggressionPact(neighbor);
 
         assertEquals(10.0, player.getDiplomaticGeneticIntegrityBonus(), 0.001);
-        assertEquals(95.0, player.getGeneticIntegrity(), 0.001);
-        assertEquals(95.0, neighbor.getGeneticIntegrity(), 0.001);
+        assertEquals(100.0, player.getGeneticIntegrity(), 0.001);
+        assertEquals(100.0, neighbor.getGeneticIntegrity(), 0.001);
 
         player.getDiplomacyService().breakNonAggressionPact(neighbor);
 
         assertEquals(0.0, player.getDiplomaticGeneticIntegrityBonus(), 0.001);
-        assertEquals(85.0, player.getGeneticIntegrity(), 0.001);
+        assertEquals(90.0, player.getGeneticIntegrity(), 0.001);
     }
 
     @Test
     void warModifierReplacesPactAndAppliesReputationPenalty() {
-        player.setGeneticIntegrity(85.0);
+        addSatelliteColonies(player, 10);
         player.setDiplomaticReputation(neighbor.getId(), 60);
         neighbor.setDiplomaticReputation(player.getId(), 60);
         player.getDiplomacyService().formNonAggressionPact(neighbor);
@@ -132,7 +160,7 @@ class DynastyDiplomacyServiceTest {
         assertEquals(GameConstants.DIPLO_MODIFIER_WAR.getNameKey(),
                 player.getDiplomaticModifierKey(neighbor.getId()));
         assertEquals(0, player.getDiplomaticReputation(neighbor.getId()));
-        assertEquals(85.0, player.getGeneticIntegrity(), 0.001);
+        assertEquals(90.0, player.getGeneticIntegrity(), 0.001);
     }
 
     @Test
@@ -147,18 +175,29 @@ class DynastyDiplomacyServiceTest {
     @Test
     void declareWarRequiresActiveMilitaryRoles() {
         World world = buildBorderWorld();
-        player.getCapital().getWarAssignedRoleCounts().clear();
-        neighbor.getCapital().getWarAssignedRoleCounts().clear();
-        player.getCapital().getSoldiers().clear();
-        neighbor.getCapital().getSoldiers().clear();
+        Colony playerBorderColony = world.getHexes().get(0).getColony();
+        Colony neighborBorderColony = world.getHexes().get(1).getColony();
+        for (Colony colony : player.getColonies()) {
+            colony.getWarAssignedRoleCounts().clear();
+            colony.getWorkers().clear();
+            colony.getSoldiers().clear();
+        }
+        for (Colony colony : neighbor.getColonies()) {
+            colony.getWarAssignedRoleCounts().clear();
+            colony.getWorkers().clear();
+            colony.getSoldiers().clear();
+        }
 
         assertFalse(DynastyDiplomacyService.meetsWarActiveMilitaryRequirement(player));
         assertFalse(player.getDiplomacyService().canDeclareWar(neighbor, world));
 
-        player.getCapital().getWarAssignedRoleCounts().put(GameConstants.ROLE_WARRIOR, 5);
+        playerBorderColony.getWarAssignedRoleCounts().put(GameConstants.ROLE_WARRIOR, 5);
         assertFalse(player.getDiplomacyService().canDeclareWar(neighbor, world));
 
-        neighbor.getCapital().getWarAssignedRoleCounts().put(GameConstants.ROLE_WARRIOR, 5);
+        ensureWarPopulation(player, playerBorderColony);
+        ensureWarPopulation(neighbor, neighborBorderColony);
+        playerBorderColony.getWarAssignedRoleCounts().put(GameConstants.ROLE_WARRIOR, 5);
+        neighborBorderColony.getWarAssignedRoleCounts().put(GameConstants.ROLE_WARRIOR, 5);
         assertTrue(player.getDiplomacyService().canDeclareWar(neighbor, world));
     }
 

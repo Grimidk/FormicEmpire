@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.infrasctructure.i18n;
 
-import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
+import com.grimidk.formicempire.classes.constants.misc.DynastyTitle;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.translations.EnglishTranslation;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.translations.FrenchTranslation;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.translations.PortugueseTranslation;
@@ -83,17 +84,51 @@ public final class LanguageStrings {
         return UiNumberFormat.format(value);
     }
 
+    public static String formatDynastyName(String baseName, DynastyTitle title) {
+        if (title == null) {
+            title = GameConstants.DYNASTY_TITLE_DYNASTY;
+        }
+        return title.formatName(baseName);
+    }
+
+    public static String formatDynastyName(String baseName, String titleKey) {
+        return formatDynastyName(baseName, GameConstants.getDynastyTitleByKey(titleKey));
+    }
+
     public static String formatPlayerDynastyName(String baseName) {
-        return String.format(get(DYNASTY_PLAYER_NAME_FMT), baseName);
+        return formatDynastyName(baseName, GameConstants.DYNASTY_TITLE_DYNASTY);
+    }
+
+    public static String formatWildDynastyName(DynastyTitle title) {
+        if (title == null) {
+            title = GameConstants.DYNASTY_TITLE_DYNASTY;
+        }
+        return String.format(get(DYNASTY_WILD_NAME_FMT), title.getName());
+    }
+
+    public static String formatWildDynastyName(String titleKey) {
+        return formatWildDynastyName(GameConstants.getDynastyTitleByKey(titleKey));
     }
 
     public static String stripDynastyNameSuffix(String dynastyName) {
+        return stripDynastyNameSuffix(dynastyName, null);
+    }
+
+    public static String stripDynastyNameSuffix(String dynastyName, String titleKey) {
         if (dynastyName == null) {
             return null;
         }
-        String localizedSuffix = String.format(get(DYNASTY_PLAYER_NAME_FMT), "");
-        if (dynastyName.endsWith(localizedSuffix)) {
-            return dynastyName.substring(0, dynastyName.length() - localizedSuffix.length());
+        if (titleKey != null) {
+            String localizedSuffix = String.format(get(GameConstants.getDynastyTitleByKey(titleKey).getFormatKey()), "");
+            if (dynastyName.endsWith(localizedSuffix)) {
+                return dynastyName.substring(0, dynastyName.length() - localizedSuffix.length());
+            }
+        }
+        for (DynastyTitle title : GameConstants.getDynastyTitles()) {
+            String localizedSuffix = String.format(get(title.getFormatKey()), "");
+            if (dynastyName.endsWith(localizedSuffix)) {
+                return dynastyName.substring(0, dynastyName.length() - localizedSuffix.length());
+            }
         }
         String legacySuffix = " Dynasty";
         if (dynastyName.endsWith(legacySuffix)) {
@@ -115,6 +150,10 @@ public final class LanguageStrings {
 
     public static String dynastyThemeBase(String dynastyName) {
         return capitalizeTheme(stripDynastyNameSuffix(dynastyName));
+    }
+
+    public static String dynastyThemeBase(String dynastyName, String titleKey) {
+        return capitalizeTheme(stripDynastyNameSuffix(dynastyName, titleKey));
     }
 
     public static String expectedCapitalColonyName(String dynastyName) {
@@ -681,6 +720,28 @@ public final class LanguageStrings {
     public static final String SAVE_ERROR_WRITE_TITLE = "SAVE_ERROR_WRITE_TITLE";
     public static final String DYNASTY_PLAYER_NAME_FMT = "DYNASTY_PLAYER_NAME_FMT";
     public static final String DYNASTY_WILD_NAME = "DYNASTY_WILD_NAME";
+    public static final String DYNASTY_WILD_NAME_FMT = "DYNASTY_WILD_NAME_FMT";
+    public static final String DYNASTY_TITLE_DYNASTY = "DYNASTY_TITLE_DYNASTY";
+    public static final String DYNASTY_TITLE_CONGLOMERATE = "DYNASTY_TITLE_CONGLOMERATE";
+    public static final String DYNASTY_TITLE_UNION = "DYNASTY_TITLE_UNION";
+    public static final String DYNASTY_TITLE_SYNDICATE = "DYNASTY_TITLE_SYNDICATE";
+    public static final String DYNASTY_TITLE_TECHNOCRACY = "DYNASTY_TITLE_TECHNOCRACY";
+    public static final String DYNASTY_TITLE_EMPIRE = "DYNASTY_TITLE_EMPIRE";
+    public static final String DYNASTY_TITLE_DOMINION = "DYNASTY_TITLE_DOMINION";
+    public static final String DYNASTY_TITLE_CITY = "DYNASTY_TITLE_CITY";
+    public static final String DYNASTY_TITLE_BERG = "DYNASTY_TITLE_BERG";
+    public static final String DYNASTY_TITLE_GRAD = "DYNASTY_TITLE_GRAD";
+    public static final String DYNASTY_TITLE_FMT_DYNASTY = "DYNASTY_TITLE_FMT_DYNASTY";
+    public static final String DYNASTY_TITLE_FMT_CONGLOMERATE = "DYNASTY_TITLE_FMT_CONGLOMERATE";
+    public static final String DYNASTY_TITLE_FMT_UNION = "DYNASTY_TITLE_FMT_UNION";
+    public static final String DYNASTY_TITLE_FMT_SYNDICATE = "DYNASTY_TITLE_FMT_SYNDICATE";
+    public static final String DYNASTY_TITLE_FMT_TECHNOCRACY = "DYNASTY_TITLE_FMT_TECHNOCRACY";
+    public static final String DYNASTY_TITLE_FMT_EMPIRE = "DYNASTY_TITLE_FMT_EMPIRE";
+    public static final String DYNASTY_TITLE_FMT_DOMINION = "DYNASTY_TITLE_FMT_DOMINION";
+    public static final String DYNASTY_TITLE_FMT_CITY = "DYNASTY_TITLE_FMT_CITY";
+    public static final String DYNASTY_TITLE_FMT_BERG = "DYNASTY_TITLE_FMT_BERG";
+    public static final String DYNASTY_TITLE_FMT_GRAD = "DYNASTY_TITLE_FMT_GRAD";
+    public static final String SAVE_ENTER_DYNASTY_TITLE = "SAVE_ENTER_DYNASTY_TITLE";
 
     public static final String STAT_NEIGHBOR_NORTH = "STAT_NEIGHBOR_NORTH";
     public static final String STAT_NEIGHBOR_NORTH_WEST = "STAT_NEIGHBOR_NORTH_WEST";
@@ -1029,6 +1090,9 @@ public final class LanguageStrings {
     public static final String DIPLO_MODIFIER_TRADE_REQUEST = "DIPLO_MODIFIER_TRADE_REQUEST";
     public static final String DIPLO_MODIFIER_BORDER_FRICTION = "DIPLO_MODIFIER_BORDER_FRICTION";
     public static final String GI_MODIFIER_PACT = "GI_MODIFIER_PACT";
+    public static final String GI_TOOLTIP_START = "GI_TOOLTIP_START";
+    public static final String GI_MODIFIER_SATELLITE_COLONIES = "GI_MODIFIER_SATELLITE_COLONIES";
+    public static final String GI_TOOLTIP_ASSIMILATION_FLOOR = "GI_TOOLTIP_ASSIMILATION_FLOOR";
     public static final String LOYALTY_MODIFIER_TRADE = "LOYALTY_MODIFIER_TRADE";
     public static final String LOYALTY_MODIFIER_TUNNEL = "LOYALTY_MODIFIER_TUNNEL";
     public static final String LOYALTY_MODIFIER_CAPITAL = "LOYALTY_MODIFIER_CAPITAL";

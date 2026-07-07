@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.grimidk.formicempire.classes.constants.ant.AntType;
+import com.grimidk.formicempire.classes.constants.misc.DynastyTitle;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.misc.Species;
 import com.grimidk.formicempire.classes.constants.misc.TradeMethod;
@@ -323,7 +324,7 @@ public class World {
         return name.substring(0, 1).toUpperCase() + name.substring(1);
     }
 
-    public void generateWorld(Biome startBiome, int size, Colony startColony, String baseName) {
+    public void generateWorld(Biome startBiome, int size, Colony startColony, String baseName, String playerTitleKey) {
         System.out.println("Generating World... Size: " + size + " rings.");
         this.worldRadius = size;
         this.hexes.clear();
@@ -332,10 +333,11 @@ public class World {
         ColonyStarterService starterService = ColonyStarterService.shared();
         
         baseName = formatName(baseName);
-        String dynName = LanguageStrings.formatPlayerDynastyName(baseName);
+        DynastyTitle playerTitle = GameConstants.getDynastyTitleByKey(playerTitleKey);
+        String dynName = LanguageStrings.formatDynastyName(baseName, playerTitle);
         namingService.registerUsedName(dynName);
         
-        Dynasty playerDynasty = new Dynasty(this.dynastyIdCounter++, dynName, true, GameConstants.SPECIES_OMNI);
+        Dynasty playerDynasty = new Dynasty(this.dynastyIdCounter++, dynName, playerTitle.getNameKey(), true, GameConstants.SPECIES_OMNI);
         playerDynasty.getStarterService().initializeDynasty(playerDynasty);
         
         String capName = namingService.generateCapitalName(dynName);
@@ -377,8 +379,9 @@ public class World {
                         }
                         Species randomSpecies = nonOmni.isEmpty() ? GameConstants.SPECIES_OMNI : nonOmni.get(GameRandom.nextInt(nonOmni.size()));
                         
-                        String npcDynName = namingService.generateDynastyName(randomSpecies);
-                        Dynasty npcDynasty = new Dynasty(dynastyId, npcDynName, false, randomSpecies);
+                        DynastyTitle npcTitle = namingService.pickRandomTitle();
+                        String npcDynName = namingService.generateDynastyName(randomSpecies, npcTitle);
+                        Dynasty npcDynasty = new Dynasty(dynastyId, npcDynName, npcTitle.getNameKey(), false, randomSpecies);
                         npcDynasty.getStarterService().initializeDynasty(npcDynasty);
                         this.dynastys.add(npcDynasty);
                         
@@ -565,6 +568,10 @@ public class World {
     }
 
     public void startWorld(Biome biome, Colony colony, String baseName) {
+        startWorld(biome, colony, baseName, LanguageStrings.DYNASTY_TITLE_DYNASTY);
+    }
+
+    public void startWorld(Biome biome, Colony colony, String baseName, String playerTitleKey) {
         System.out.println("[World] startWorld called. Colony ants before init: " + colony.getAntTotal());
 
         if (colony.getAntTotal() == 0) {
@@ -575,9 +582,18 @@ public class World {
         System.out.println("[World] Colony ants after init: " + colony.getAntTotal());
 
         baseName = formatName(baseName);
-        generateWorld(biome, 8, colony, baseName);
+        generateWorld(biome, 8, colony, baseName, playerTitleKey);
         changeActiveHex(getSpawnHex()); 
         updateEnvironmentalConditions();
+    }
+
+    public void relocalizeDynastyNames() {
+        if (dynastys == null) {
+            return;
+        }
+        for (Dynasty dynasty : dynastys) {
+            dynasty.applyLocalizedName();
+        }
     }
 
     public void loadWorld(Savefile savefile) {
@@ -596,6 +612,9 @@ public class World {
             }
         }
         baseName = formatName(baseName);
+        String playerTitleKey = savefile.getPlayerDynastyTitleKey() != null
+                ? savefile.getPlayerDynastyTitleKey()
+                : LanguageStrings.DYNASTY_TITLE_DYNASTY;
 
         this.hexes.clear();
         this.dynastys.clear();
@@ -627,11 +646,17 @@ public class World {
                     loadedDynastys.get(sc.dynastyId).addColony(c);
                 } else {
                     int newDynastyId = ++maxDynastyId;
+                    DynastyTitle adHocTitle = namingService.pickRandomTitle();
                     String dynName = c.isPlayer()
-                            ? LanguageStrings.formatPlayerDynastyName(baseName)
-                            : LanguageStrings.get(LanguageStrings.DYNASTY_WILD_NAME);
+                            ? LanguageStrings.formatDynastyName(baseName, playerTitleKey)
+                            : LanguageStrings.formatWildDynastyName(adHocTitle);
                     namingService.registerUsedName(dynName);
-                    Dynasty adHocDynasty = new Dynasty(newDynastyId, dynName, c.isPlayer(), GameConstants.SPECIES_OMNI);
+                    Dynasty adHocDynasty = new Dynasty(
+                            newDynastyId,
+                            dynName,
+                            c.isPlayer() ? playerTitleKey : adHocTitle.getNameKey(),
+                            c.isPlayer(),
+                            GameConstants.SPECIES_OMNI);
                     adHocDynasty.getStarterService().initializeDynasty(adHocDynasty);
                     adHocDynasty.addColony(c);
                     this.dynastys.add(adHocDynasty);
@@ -681,7 +706,7 @@ public class World {
             }
              
             if (colony == null) {
-                String playerDynName = LanguageStrings.formatPlayerDynastyName(baseName);
+                String playerDynName = LanguageStrings.formatDynastyName(baseName, playerTitleKey);
                 String playerCapName = namingService.generateCapitalName(playerDynName);
                 colony = new Colony(1, playerCapName, true);
             }
@@ -691,7 +716,7 @@ public class World {
                 starter.initializeNewColony(colony);
             }
 
-            generateWorld(GameConstants.BIOME_PLAINS, this.worldRadius, colony, baseName);
+            generateWorld(GameConstants.BIOME_PLAINS, this.worldRadius, colony, baseName, playerTitleKey);
         }
 
         if (savefile.getDynastys() != null) {

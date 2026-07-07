@@ -1,7 +1,9 @@
 package com.grimidk.formicempire.classes.interfaces;
 
+import com.grimidk.formicempire.classes.constants.misc.DynastyTitle;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
@@ -131,10 +133,11 @@ public class SaveSelectPanel extends JPanel {
         Savefile existing = cachedSaves[idx];
         
         if (existing == null) {
-            String name = UiOptionPane.showInputDialog(this, LanguageStrings.get(LanguageStrings.SAVE_ENTER_NAME), LanguageStrings.get(LanguageStrings.SAVE_CREATE_TITLE), JOptionPane.PLAIN_MESSAGE);
-            if (name == null || name.trim().isEmpty()) return;
+            NewSaveRequest request = promptNewSave();
+            if (request == null) return;
             
-            Savefile save = new Savefile(slotId, name.trim());            
+            Savefile save = new Savefile(slotId, request.name());
+            save.setPlayerDynastyTitleKey(request.titleKey());
             saveManager.saveUserSlotAsync(save, () -> {
                 refreshSlots(); 
 
@@ -151,6 +154,50 @@ public class SaveSelectPanel extends JPanel {
         }
     }
 
+    private NewSaveRequest promptNewSave() {
+        JPanel panel = new JPanel(new GridLayout(2, 2, 8, 8));
+        panel.add(new JLabel(LanguageStrings.get(LanguageStrings.SAVE_ENTER_NAME)));
+        JTextField nameField = new JTextField();
+        panel.add(nameField);
+
+        panel.add(new JLabel(LanguageStrings.get(LanguageStrings.SAVE_ENTER_DYNASTY_TITLE)));
+        JComboBox<DynastyTitle> titleCombo = new JComboBox<>(
+                GameConstants.getDynastyTitles().toArray(new DynastyTitle[0]));
+        titleCombo.setSelectedItem(GameConstants.DYNASTY_TITLE_DYNASTY);
+        titleCombo.setRenderer((list, value, index, isSelected, cellHasFocus) -> {
+            JLabel label = new JLabel(value != null ? value.getName() : "");
+            if (isSelected) {
+                label.setOpaque(true);
+                label.setBackground(list.getSelectionBackground());
+                label.setForeground(list.getSelectionForeground());
+            }
+            return label;
+        });
+        AssetStyles.styleComboBox(titleCombo);
+        panel.add(titleCombo);
+
+        int result = UiOptionPane.showConfirmDialog(
+                this,
+                panel,
+                LanguageStrings.get(LanguageStrings.SAVE_CREATE_TITLE),
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.PLAIN_MESSAGE);
+        if (result != JOptionPane.OK_OPTION) {
+            return null;
+        }
+
+        String name = nameField.getText();
+        if (name == null || name.trim().isEmpty()) {
+            return null;
+        }
+
+        DynastyTitle selectedTitle = (DynastyTitle) titleCombo.getSelectedItem();
+        String titleKey = selectedTitle != null
+                ? selectedTitle.getNameKey()
+                : LanguageStrings.DYNASTY_TITLE_DYNASTY;
+        return new NewSaveRequest(name.trim(), titleKey);
+    }
+
     private void onDelete(int slotId, int idx) {
         int res = UiOptionPane.showConfirmDialog(this, LanguageStrings.format(LanguageStrings.SAVE_DELETE_CONFIRM, slotId), LanguageStrings.get(LanguageStrings.SAVE_DELETE_TITLE), JOptionPane.YES_NO_OPTION);
         if (res != JOptionPane.YES_OPTION) return;
@@ -158,4 +205,6 @@ public class SaveSelectPanel extends JPanel {
         if (!ok) UiOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.SAVE_DELETE_ERROR));
         refreshSlots();
     }
+
+    private record NewSaveRequest(String name, String titleKey) {}
 }

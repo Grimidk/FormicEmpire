@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$ROOT"
+
 case "$(uname -s)" in
     CYGWIN*|MINGW*|MSYS*)
         MVN_EXEC="./mvnw.cmd"
