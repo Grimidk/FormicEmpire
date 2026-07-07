@@ -173,7 +173,7 @@ public class FrenchTranslation implements Translation {
         fr.put("SYNERGY_REQUIREMENTS_FMT", "Combine : %s + %s");
         fr.put("SYNERGY_SUPER_VENOM", "Super Venin");
         fr.put("SYNERGY_SUPER_VENOM_FLAVOR", "Super Venin");
-        fr.put("SYNERGY_SUPER_VENOM_DESC", "Le multiplicateur de dégâts de la colonie passe à 16x au lieu de 4+4 lorsque le venin de feu et le venin moissonneur sont assimilés. Le venin piquant ajoute encore +4 (20x avec les trois).");
+        fr.put("SYNERGY_SUPER_VENOM_DESC", "Remplace l'empilement venin de feu + maricopa (4+4) par un multiplicateur de dégâts de 16x lorsque les deux venins sont assimilés et que les Synergies sont recherchées. Le venin piquant ajoute encore +4 (20x avec les trois).");
 
         fr.put("DIALOG_HATCH_RATES_TITLE", "Taux d'éclosion des nymphes");
         fr.put("HATCH_DESC", "Probabilité d'éclosion pour les nouvelles fourmis :");
@@ -670,7 +670,6 @@ public class FrenchTranslation implements Translation {
         fr.put("ROLE_MINER", "Mineuse");
         fr.put("ROLE_COURIER", "Messagère");
         fr.put("ROLE_POTTER", "Porteuse nourriture");
-        fr.put("ROLE_GUARD", "Garde");
         fr.put("ROLE_WARRIOR", "Guerrière");
         fr.put("ROLE_DEFENDER", "Défenseuse");
         fr.put("ROLE_POLICE", "Police anti-fourmis parasites");
@@ -734,6 +733,7 @@ public class FrenchTranslation implements Translation {
         fr.put("LOYALTY_MODIFIER_TUNNEL", "Liaison de tunnel");
         fr.put("LOYALTY_MODIFIER_CAPITAL", "Capitale");
         fr.put("LOYALTY_MODIFIER_PHEROMONE_STORM", "Tempête de Phéromones");
+        fr.put("LOYALTY_MODIFIER_RECENTLY_CONQUERED", "Récemment conquise");
         fr.put("LOYALTY_MODIFIER_MILITARY_VS_CAPITAL", "Militaire vs capitale");
         fr.put("LOYALTY_MODIFIER_DISTANCE_FROM_CAPITAL", "Distance à la capitale");
         fr.put("LOYALTY_MODIFIER_DISTANCE_LINE", "%s (%s cases): %s");
@@ -835,8 +835,8 @@ public class FrenchTranslation implements Translation {
         fr.put("SPECIES_FASTBITE_SCIENTIFIC", "Mystrium Sp.");
         fr.put("SPECIES_HEATRESIST", "Fourmi Argentée du Sahara");
         fr.put("SPECIES_HEATRESIST_SCIENTIFIC", "Cataglyphis Sp.");
-        fr.put("SPECIES_DEADLYVENOM", "Fourmi Moissonneuse");
-        fr.put("SPECIES_DEADLYVENOM_SCIENTIFIC", "Pogonomyrmex Sp.");
+        fr.put("SPECIES_DEADLYVENOM", "Fourmi Maricopa");
+        fr.put("SPECIES_DEADLYVENOM_SCIENTIFIC", "Pogonomyrmex Maricopa");
         fr.put("SPECIES_SELFDESTRUCT", "Fourmi Explosive");
         fr.put("SPECIES_SELFDESTRUCT_SCIENTIFIC", "Camponotus Saundersi");
         fr.put("SPECIES_FARSIGHT", "Fourmi Bulldog");
@@ -929,12 +929,12 @@ public class FrenchTranslation implements Translation {
         fr.put("ASSIMILATED_HEATRESIST_DESC", "Votre dynastie peut butiner sous une chaleur extrême du désert. (Mécanique en développement.)");
         fr.put("ASSIMILATION_HEATRESIST", "Assimilation fourmi argentée du sahara");
         fr.put("ASSIMILATION_HEATRESIST_DESC", "Après assimilation du génome de la fourmi argentée du sahara :");
-        fr.put("SPECIES_DEADLYVENOM", "Fourmi Moissonneuse");
-        fr.put("SPECIES_DEADLYVENOM_SCIENTIFIC", "Pogonomyrmex Sp.");
+        fr.put("SPECIES_DEADLYVENOM", "Fourmi Maricopa");
+        fr.put("SPECIES_DEADLYVENOM_SCIENTIFIC", "Pogonomyrmex Maricopa");
         fr.put("ASSIMILATED_DEADLYVENOM_FLAVOR", "Venin Mortel");
         fr.put("ASSIMILATED_DEADLYVENOM_DESC", "Votre dynastie peut injecter un venin létal contre les petites proies. (Mécanique en développement.)");
-        fr.put("ASSIMILATION_DEADLYVENOM", "Assimilation fourmi moissonneuse");
-        fr.put("ASSIMILATION_DEADLYVENOM_DESC", "Après assimilation du génome de la fourmi moissonneuse :");
+        fr.put("ASSIMILATION_DEADLYVENOM", "Assimilation fourmi maricopa");
+        fr.put("ASSIMILATION_DEADLYVENOM_DESC", "Après assimilation du génome de la fourmi maricopa :");
         fr.put("SPECIES_SELFDESTRUCT", "Fourmi Explosive");
         fr.put("SPECIES_SELFDESTRUCT_SCIENTIFIC", "Camponotus Saundersi");
         fr.put("ASSIMILATED_SELFDESTRUCT_FLAVOR", "Défense Suicidaire");
@@ -1025,9 +1025,6 @@ public class FrenchTranslation implements Translation {
         fr.put("ROLE_POTTER_UPGRADE", "Rôle porteuse nourriture");
         fr.put("ROLE_POTTER_FLAVOR", "Coup de main");
         fr.put("ROLE_POTTER_DESC", "Permet de stocker et transporter de la nourriture aux autres fourmis.");
-        fr.put("ROLE_GUARD_UPGRADE", "Rôle garde");
-        fr.put("ROLE_GUARD_FLAVOR", "Vigiles du nid");
-        fr.put("ROLE_GUARD_DESC", "Permet aux soldates de garder l'entrée de la colonie.");
         fr.put("ROLE_WARRIOR_UPGRADE", "Rôle guerrière");
         fr.put("ROLE_WARRIOR_FLAVOR", "Formation phalange");
         fr.put("ROLE_WARRIOR_DESC", "Permet aux soldates de combattre en groupe.");
@@ -1386,8 +1383,8 @@ public class FrenchTranslation implements Translation {
         fr.put("ASSIMILATION_FASTBITE_DESC", "Après assimilation du génome de la fourmi dracula :");
         fr.put("ASSIMILATION_HEATRESIST", "Assimilation fourmi argentée du sahara");
         fr.put("ASSIMILATION_HEATRESIST_DESC", "Après assimilation du génome de la fourmi argentée du sahara :");
-        fr.put("ASSIMILATION_DEADLYVENOM", "Assimilation fourmi moissonneuse");
-        fr.put("ASSIMILATION_DEADLYVENOM_DESC", "Après assimilation du génome de la fourmi moissonneuse :");
+        fr.put("ASSIMILATION_DEADLYVENOM", "Assimilation fourmi maricopa");
+        fr.put("ASSIMILATION_DEADLYVENOM_DESC", "Après assimilation du génome de la fourmi maricopa :");
         fr.put("ASSIMILATION_SELFDESTRUCT", "Assimilation fourmi explosive");
         fr.put("ASSIMILATION_SELFDESTRUCT_DESC", "Après assimilation du génome de la fourmi explosive :");
         fr.put("ASSIMILATION_FARSIGHT", "Assimilation fourmi bulldog");

@@ -173,7 +173,7 @@ public class SpanishTranslation implements Translation {
         es.put("SYNERGY_REQUIREMENTS_FMT", "Combina: %s + %s");
         es.put("SYNERGY_SUPER_VENOM", "Súper Veneno");
         es.put("SYNERGY_SUPER_VENOM_FLAVOR", "Súper Veneno");
-        es.put("SYNERGY_SUPER_VENOM_DESC", "El multiplicador de daño de la colonia pasa a 16x en lugar de 4+4 cuando el veneno de fuego y el de cosechador están asimilados. El veneno punzante sigue sumando +4 (20x con los tres).");
+        es.put("SYNERGY_SUPER_VENOM_DESC", "Reemplaza la acumulación de veneno de fuego + maricopa (4+4) por un multiplicador de daño de 16x cuando ambos venenos están asimilados y las Sinergias están investigadas. El veneno punzante sigue sumando +4 (20x con los tres).");
 
         es.put("DIALOG_HATCH_RATES_TITLE", "Gestionar Tasas de Eclosión");
         es.put("HATCH_DESC", "Establecer probabilidad de eclosión:");
@@ -670,7 +670,6 @@ public class SpanishTranslation implements Translation {
         es.put("ROLE_MINER", "Minera");
         es.put("ROLE_COURIER", "Mensajera");
         es.put("ROLE_POTTER", "Hormiga-Copa");
-        es.put("ROLE_GUARD", "Guardia");
         es.put("ROLE_WARRIOR", "Guerrera");
         es.put("ROLE_DEFENDER", "Defensora");
         es.put("ROLE_POLICE", "Vigilante de hormigas parásitas");
@@ -734,6 +733,7 @@ public class SpanishTranslation implements Translation {
         es.put("LOYALTY_MODIFIER_TUNNEL", "Enlace de túnel");
         es.put("LOYALTY_MODIFIER_CAPITAL", "Capital");
         es.put("LOYALTY_MODIFIER_PHEROMONE_STORM", "Tormenta de Feromonas");
+        es.put("LOYALTY_MODIFIER_RECENTLY_CONQUERED", "Recién conquistada");
         es.put("LOYALTY_MODIFIER_MILITARY_VS_CAPITAL", "Militar vs capital");
         es.put("LOYALTY_MODIFIER_DISTANCE_FROM_CAPITAL", "Distancia a la capital");
         es.put("LOYALTY_MODIFIER_DISTANCE_LINE", "%s (%s casillas): %s");
@@ -835,8 +835,8 @@ public class SpanishTranslation implements Translation {
         es.put("SPECIES_FASTBITE_SCIENTIFIC", "Mystrium Sp.");
         es.put("SPECIES_HEATRESIST", "Hormiga Plateada del Sahara");
         es.put("SPECIES_HEATRESIST_SCIENTIFIC", "Cataglyphis Sp.");
-        es.put("SPECIES_DEADLYVENOM", "Hormiga Cosechadora");
-        es.put("SPECIES_DEADLYVENOM_SCIENTIFIC", "Pogonomyrmex Sp.");
+        es.put("SPECIES_DEADLYVENOM", "Hormiga Maricopa");
+        es.put("SPECIES_DEADLYVENOM_SCIENTIFIC", "Pogonomyrmex Maricopa");
         es.put("SPECIES_SELFDESTRUCT", "Hormiga Explosiva");
         es.put("SPECIES_SELFDESTRUCT_SCIENTIFIC", "Camponotus Saundersi");
         es.put("SPECIES_FARSIGHT", "Hormiga Bulldog");
@@ -929,12 +929,12 @@ public class SpanishTranslation implements Translation {
         es.put("ASSIMILATED_HEATRESIST_DESC", "Tu dinastía puede recolectar bajo calor extremo del desierto. (Mecánica en desarrollo.)");
         es.put("ASSIMILATION_HEATRESIST", "Asimilación de Hormiga Plateada del Sahara");
         es.put("ASSIMILATION_HEATRESIST_DESC", "Tras asimilar el genoma de la hormiga plateada del sahara:");
-        es.put("SPECIES_DEADLYVENOM", "Hormiga Cosechadora");
-        es.put("SPECIES_DEADLYVENOM_SCIENTIFIC", "Pogonomyrmex Sp.");
+        es.put("SPECIES_DEADLYVENOM", "Hormiga Maricopa");
+        es.put("SPECIES_DEADLYVENOM_SCIENTIFIC", "Pogonomyrmex Maricopa");
         es.put("ASSIMILATED_DEADLYVENOM_FLAVOR", "Veneno Letal");
         es.put("ASSIMILATED_DEADLYVENOM_DESC", "Tu dinastía puede inyectar veneno capaz de matar presas pequeñas rápidamente. (Mecánica en desarrollo.)");
-        es.put("ASSIMILATION_DEADLYVENOM", "Asimilación de Hormiga Cosechadora");
-        es.put("ASSIMILATION_DEADLYVENOM_DESC", "Tras asimilar el genoma de la hormiga cosechadora:");
+        es.put("ASSIMILATION_DEADLYVENOM", "Asimilación de Hormiga Maricopa");
+        es.put("ASSIMILATION_DEADLYVENOM_DESC", "Tras asimilar el genoma de la hormiga maricopa:");
         es.put("SPECIES_SELFDESTRUCT", "Hormiga Explosiva");
         es.put("SPECIES_SELFDESTRUCT_SCIENTIFIC", "Camponotus Saundersi");
         es.put("ASSIMILATED_SELFDESTRUCT_FLAVOR", "Defensa Suicida");
@@ -1025,9 +1025,6 @@ public class SpanishTranslation implements Translation {
         es.put("ROLE_POTTER_UPGRADE", "Rol Alimentadora");
         es.put("ROLE_POTTER_FLAVOR", "Una Mano Amiga");
         es.put("ROLE_POTTER_DESC", "Permite a las obreras almacenar y transportar comida a otras hormigas.");
-        es.put("ROLE_GUARD_UPGRADE", "Rol Guardia");
-        es.put("ROLE_GUARD_FLAVOR", "Seguridad de la Hormiga");
-        es.put("ROLE_GUARD_DESC", "Permite a los soldados vigilar la entrada de la colonia.");
         es.put("ROLE_WARRIOR_UPGRADE", "Rol Guerrera");
         es.put("ROLE_WARRIOR_FLAVOR", "Formación de Falange");
         es.put("ROLE_WARRIOR_DESC", "Permite a los soldados luchar en grupos organizados.");
@@ -1386,8 +1383,8 @@ public class SpanishTranslation implements Translation {
         es.put("ASSIMILATION_FASTBITE_DESC", "Tras asimilar el genoma de la hormiga drácula:");
         es.put("ASSIMILATION_HEATRESIST", "Asimilación de Hormiga Plateada del Sahara");
         es.put("ASSIMILATION_HEATRESIST_DESC", "Tras asimilar el genoma de la hormiga plateada del sahara:");
-        es.put("ASSIMILATION_DEADLYVENOM", "Asimilación de Hormiga Cosechadora");
-        es.put("ASSIMILATION_DEADLYVENOM_DESC", "Tras asimilar el genoma de la hormiga cosechadora:");
+        es.put("ASSIMILATION_DEADLYVENOM", "Asimilación de Hormiga Maricopa");
+        es.put("ASSIMILATION_DEADLYVENOM_DESC", "Tras asimilar el genoma de la hormiga maricopa:");
         es.put("ASSIMILATION_SELFDESTRUCT", "Asimilación de Hormiga Explosiva");
         es.put("ASSIMILATION_SELFDESTRUCT_DESC", "Tras asimilar el genoma de la hormiga explosiva:");
         es.put("ASSIMILATION_FARSIGHT", "Asimilación de Hormiga Bulldog");

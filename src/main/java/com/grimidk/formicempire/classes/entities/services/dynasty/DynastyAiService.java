@@ -92,7 +92,7 @@ public class DynastyAiService {
                 .thenComparingInt(other -> diplo.getEffectiveDiplomaticReputation(other, world)));
 
         for (Dynasty other : others) {
-            if (other.isDefeated()) {
+            if (!other.isActiveForDiplomacy()) {
                 continue;
             }
             if (diplo.canRequestNonAggressionPact(other, world)) {
@@ -133,7 +133,7 @@ public class DynastyAiService {
 
         List<Dynasty> candidates = new ArrayList<>();
         for (Dynasty other : world.getDynastys()) {
-            if (other == dynasty || other.isDefeated()) {
+            if (other == dynasty || !other.isActiveForDiplomacy()) {
                 continue;
             }
             if (!diplo.sharesBorderWith(other, world)) {
@@ -222,7 +222,7 @@ public class DynastyAiService {
 
             for (Colony neighbor : tradeService.getNeighborColonies(world, localColony)) {
                 Dynasty otherDynasty = neighbor.getDynasty();
-                if (otherDynasty == null || otherDynasty == dynasty || otherDynasty.isDefeated()) {
+                if (otherDynasty == null || otherDynasty == dynasty || !DynastyDiplomacyService.isDiplomaticallyContactable(otherDynasty)) {
                     continue;
                 }
                 if (tradeService.findTrade(localColony, neighbor) != null

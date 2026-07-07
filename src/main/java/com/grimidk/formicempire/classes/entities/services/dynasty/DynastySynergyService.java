@@ -26,23 +26,26 @@ public final class DynastySynergyService {
         return false;
     }
 
-    /** Grants synergy reward upgrades when both requirements are owned and {@link GameUnlocks#ABILITY_SYNERGY} is researched. */
+    /** Grants or revokes synergy reward upgrades when requirements change. */
     public static void refreshUnlocked(Dynasty dynasty) {
-        if (dynasty == null || !dynasty.hasUpgrade(GameUnlocks.ABILITY_SYNERGY)) {
+        if (dynasty == null) {
             return;
         }
+        boolean synergyEnabled = dynasty.hasUpgrade(GameUnlocks.ABILITY_SYNERGY);
         for (Synergy synergy : GameUnlocks.getSynergies()) {
-            if (isUnlocked(dynasty, synergy)) {
-                continue;
-            }
             Upgrade first = synergy.getRequirement1();
             Upgrade second = synergy.getRequirement2();
             Upgrade reward = synergy.getReward();
             if (first == null || second == null || reward == null) {
                 continue;
             }
-            if (dynasty.hasUpgrade(first) && dynasty.hasUpgrade(second)) {
+            boolean shouldHave = synergyEnabled
+                    && dynasty.hasUpgrade(first)
+                    && dynasty.hasUpgrade(second);
+            if (shouldHave) {
                 dynasty.unlockUpgrade(reward);
+            } else {
+                dynasty.revokeUpgrade(reward);
             }
         }
     }

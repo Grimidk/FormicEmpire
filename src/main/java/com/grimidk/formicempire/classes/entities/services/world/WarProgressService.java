@@ -6,6 +6,7 @@ import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.War;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
+import com.grimidk.formicempire.classes.entities.services.colony.ColonyStarterService;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
@@ -533,6 +534,7 @@ public final class WarProgressService {
         ColonyMilitaryService.refreshColonyMilitaryPower(colony);
         ColonyMilitaryService.refreshDynastyMilitaryPower(victor);
         ColonyMilitaryService.refreshDynastyMilitaryPower(loser);
+        ColonyStarterService.shared().stabilizeConqueredColony(victor, colony);
     }
 
     private static Colony findBorderColonyFacing(World world, Dynasty owner, Dynasty facing) {

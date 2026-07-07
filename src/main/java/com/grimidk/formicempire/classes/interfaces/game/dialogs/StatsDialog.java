@@ -39,6 +39,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.grimidk.formicempire.classes.interfaces.ui.styles.UiTableStyles;
+
 public class StatsDialog extends ZeroDialog {
 
     private final Colony colony;
@@ -58,6 +60,16 @@ public class StatsDialog extends ZeroDialog {
     private JTable insectsTable;
     private JTable unitStatsTable;
     private JTable deathTable;
+
+    private JScrollPane generalScrollPane;
+    private JScrollPane dynastyScrollPane;
+    private JScrollPane resourcesScrollPane;
+    private JScrollPane populationScrollPane;
+    private JScrollPane localHexScrollPane;
+    private JScrollPane ratesScrollPane;
+    private JScrollPane insectsScrollPane;
+    private JScrollPane unitStatsScrollPane;
+    private JScrollPane deathScrollPane;
     
     private final Runnable refreshTask = this::liveUpdate;
 
@@ -101,6 +113,14 @@ public class StatsDialog extends ZeroDialog {
         
         updateTabTitles();
         refreshDialog();
+
+        tabbedPane.addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
+            public void componentResized(java.awt.event.ComponentEvent e) {
+                layoutAllTables();
+            }
+        });
+        SwingUtilities.invokeLater(this::layoutAllTables);
 
         if (this.engine != null) {
             this.engine.addHourTickListener(refreshTask);
@@ -193,6 +213,23 @@ public class StatsDialog extends ZeroDialog {
             return;
         }
         table.getColumnModel().getColumn(columnIndex).setCellRenderer(new IconOrTextCellRenderer());
+        AssetStyles.applyTableColumnAlignment(table, columnIndex, SwingConstants.CENTER);
+    }
+
+    private static void applyTextColumnRenderer(JTable table, int columnIndex, int alignment) {
+        if (table == null || columnIndex < 0 || columnIndex >= table.getColumnCount()) {
+            return;
+        }
+        table.getColumnModel().getColumn(columnIndex).setCellRenderer(UiTableStyles.createTextCellRenderer(alignment));
+        AssetStyles.applyTableColumnAlignment(table, columnIndex, alignment);
+    }
+
+    private static void applyNumericColumnRenderer(JTable table, int columnIndex) {
+        if (table == null || columnIndex < 0 || columnIndex >= table.getColumnCount()) {
+            return;
+        }
+        table.getColumnModel().getColumn(columnIndex).setCellRenderer(UiTableStyles.createNumericCellRenderer());
+        AssetStyles.applyTableColumnAlignment(table, columnIndex, SwingConstants.RIGHT);
     }
 
     private static void applyGeneralValueRenderer(JTable table) {
@@ -200,9 +237,12 @@ public class StatsDialog extends ZeroDialog {
             return;
         }
         table.getColumnModel().getColumn(2).setCellRenderer(new GeneralValueCellRenderer());
+        AssetStyles.applyTableColumnAlignment(table, 0, SwingConstants.LEFT);
+        AssetStyles.applyTableColumnAlignment(table, 1, SwingConstants.LEFT);
+        AssetStyles.applyTableColumnAlignment(table, 2, SwingConstants.LEFT);
     }
 
-    private static final class GeneralValueCellRenderer extends DefaultTableCellRenderer {
+    private static final class GeneralValueCellRenderer extends UiTableStyles.TooltipCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
                 boolean hasFocus, int row, int column) {
@@ -230,11 +270,12 @@ public class StatsDialog extends ZeroDialog {
                 setText(value != null ? value.toString() : "");
                 setToolTipText(null);
             }
+            updateTruncationTooltip(table, column);
             return this;
         }
     }
 
-    private static final class IconOrTextCellRenderer extends DefaultTableCellRenderer {
+    private static final class IconOrTextCellRenderer extends UiTableStyles.TooltipCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
                 boolean hasFocus, int row, int column) {
@@ -242,9 +283,13 @@ public class StatsDialog extends ZeroDialog {
             if (value instanceof Icon icon) {
                 setIcon(icon);
                 setText("");
+                setHorizontalAlignment(SwingConstants.CENTER);
+                setToolTipText(null);
             } else {
                 setIcon(null);
                 setText(value != null ? value.toString() : "");
+                setHorizontalAlignment(SwingConstants.LEFT);
+                updateTruncationTooltip(table, column);
             }
             return this;
         }
@@ -252,24 +297,37 @@ public class StatsDialog extends ZeroDialog {
 
     private JScrollPane createTablePane(JTable table) {
         table.setRowHeight(24);
-        table.setShowVerticalLines(false);
-        table.setIntercellSpacing(new Dimension(0, 1));
-        table.setBackground(AssetStyles.UI_BG_PRIMARY);
-        table.setForeground(AssetStyles.TEXT_NORMAL);
-        table.setSelectionBackground(AssetStyles.UI_BG_SECONDARY);
         table.setSelectionForeground(AssetStyles.TEXT_HEADER);
-        table.setFont(AssetStyles.FONT_NORMAL);
-        
-        DefaultTableCellRenderer headerRenderer = new DefaultTableCellRenderer();
-        headerRenderer.setBackground(AssetStyles.UI_BG_SECONDARY);
-        headerRenderer.setForeground(AssetStyles.TEXT_HEADER);
-        headerRenderer.setFont(AssetStyles.FONT_BOLD);
-        table.getTableHeader().setDefaultRenderer(headerRenderer);
-        
-        JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.getViewport().setBackground(AssetStyles.UI_BG_PRIMARY);
-        scrollPane.setBorder(null);
+        JScrollPane scrollPane = AssetStyles.wrapScrollableTable(table);
         return scrollPane;
+    }
+
+    private int viewportWidth(JScrollPane scrollPane) {
+        if (scrollPane != null && scrollPane.getViewport().getWidth() > 0) {
+            return scrollPane.getViewport().getWidth();
+        }
+        return AssetStyles.DEFAULT_DIALOG_SIZE.width - 56;
+    }
+
+    private void layoutAllTables() {
+        AssetStyles.layoutTableColumnsForViewport(generalTable, viewportWidth(generalScrollPane),
+                new boolean[]{false, true, true});
+        AssetStyles.layoutTableColumnsForViewport(dynastyTable, viewportWidth(dynastyScrollPane),
+                new boolean[]{false, false, true, true});
+        AssetStyles.layoutTableColumnsForViewport(resourcesTable, viewportWidth(resourcesScrollPane),
+                new boolean[]{false, true, true, true, true, true, true, true});
+        AssetStyles.layoutTableColumnsForViewport(populationTable, viewportWidth(populationScrollPane),
+                new boolean[]{false, true, true, false});
+        AssetStyles.layoutTableColumnsForViewport(localHexTable, viewportWidth(localHexScrollPane),
+                new boolean[]{false, true, true});
+        AssetStyles.layoutTableColumnsForViewport(ratesTable, viewportWidth(ratesScrollPane),
+                new boolean[]{true, false, false, false});
+        AssetStyles.layoutTableColumnsForViewport(insectsTable, viewportWidth(insectsScrollPane),
+                new boolean[]{false, true, false, false, false});
+        AssetStyles.layoutTableColumnsForViewport(unitStatsTable, viewportWidth(unitStatsScrollPane),
+                new boolean[]{false, false, true});
+        AssetStyles.layoutTableColumnsForViewport(deathTable, viewportWidth(deathScrollPane),
+                new boolean[]{true, false});
     }
 
     // --- Tab Initialization ---
@@ -295,73 +353,100 @@ public class StatsDialog extends ZeroDialog {
                 generalTable.setToolTipText(null);
             }
         });
-        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.STATS_TAB_GENERAL), createTablePane(generalTable));
+        generalScrollPane = createTablePane(generalTable);
+        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.STATS_TAB_GENERAL), generalScrollPane);
     }
     
     private void initDynastyTab() {
         String[] columns = {"", LanguageStrings.get(LanguageStrings.COL_SCOPE), LanguageStrings.get(LanguageStrings.COL_METRIC), LanguageStrings.get(LanguageStrings.COL_VALUE)};
         dynastyTable = new JTable(createIconModel(columns));
         
-        dynastyTable.getColumnModel().getColumn(0).setMaxWidth(40);
-        dynastyTable.getColumnModel().getColumn(0).setPreferredWidth(40);
         applyIconColumnRenderer(dynastyTable, 0);
+        applyTextColumnRenderer(dynastyTable, 1, SwingConstants.LEFT);
+        applyTextColumnRenderer(dynastyTable, 2, SwingConstants.LEFT);
+        applyTextColumnRenderer(dynastyTable, 3, SwingConstants.LEFT);
         
-        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.STATS_TAB_DYNASTY), createTablePane(dynastyTable));
+        dynastyScrollPane = createTablePane(dynastyTable);
+        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.STATS_TAB_DYNASTY), dynastyScrollPane);
     }
 
     private void initResourceTab() {
         String[] columns = {"", LanguageStrings.get(LanguageStrings.COL_RESOURCE), LanguageStrings.get(LanguageStrings.COL_CURRENT), LanguageStrings.get(LanguageStrings.COL_CAPACITY), LanguageStrings.get(LanguageStrings.COL_SOURCES), LanguageStrings.get(LanguageStrings.COL_PROD_DAY), LanguageStrings.get(LanguageStrings.COL_CONS_DAY), LanguageStrings.get(LanguageStrings.COL_NET)};
         resourcesTable = new JTable(createIconModel(columns));
         
-        resourcesTable.getColumnModel().getColumn(0).setMaxWidth(40);
-        resourcesTable.getColumnModel().getColumn(0).setPreferredWidth(40);
         applyIconColumnRenderer(resourcesTable, 0);
+        applyTextColumnRenderer(resourcesTable, 1, SwingConstants.LEFT);
+        for (int col = 2; col <= 7; col++) {
+            applyNumericColumnRenderer(resourcesTable, col);
+        }
         
-        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.STATS_TAB_ECONOMY), createTablePane(resourcesTable));
+        resourcesScrollPane = createTablePane(resourcesTable);
+        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.STATS_TAB_ECONOMY), resourcesScrollPane);
     }
 
     private void initPopulationTab() {
         String[] columns = {"", LanguageStrings.get(LanguageStrings.COL_TYPE), LanguageStrings.get(LanguageStrings.COL_ROLE), LanguageStrings.get(LanguageStrings.COL_COUNT)};
         populationTable = new JTable(createIconModel(columns));
         
-        populationTable.getColumnModel().getColumn(0).setMaxWidth(40);
-        populationTable.getColumnModel().getColumn(0).setPreferredWidth(40);
         applyIconColumnRenderer(populationTable, 0);
+        applyTextColumnRenderer(populationTable, 1, SwingConstants.LEFT);
+        applyTextColumnRenderer(populationTable, 2, SwingConstants.LEFT);
+        applyNumericColumnRenderer(populationTable, 3);
 
-        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.STATS_TAB_POPULATION), createTablePane(populationTable));
+        populationScrollPane = createTablePane(populationTable);
+        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.STATS_TAB_POPULATION), populationScrollPane);
     }
 
     private void initLocalHexTab() {
         String[] columns = {LanguageStrings.get(LanguageStrings.COL_CATEGORY), LanguageStrings.get(LanguageStrings.COL_PROPERTY), LanguageStrings.get(LanguageStrings.COL_VALUE)};
         localHexTable = new JTable(createIconModel(columns));
-        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.STATS_TAB_LOCAL_HEX), createTablePane(localHexTable));
+        applyTextColumnRenderer(localHexTable, 0, SwingConstants.LEFT);
+        applyTextColumnRenderer(localHexTable, 1, SwingConstants.LEFT);
+        applyTextColumnRenderer(localHexTable, 2, SwingConstants.LEFT);
+        localHexScrollPane = createTablePane(localHexTable);
+        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.STATS_TAB_LOCAL_HEX), localHexScrollPane);
     }
 
     private void initRatesTab() {
         String[] columns = {LanguageStrings.get(LanguageStrings.COL_ACTIVITY), LanguageStrings.get(LanguageStrings.COL_ASSIGNED), LanguageStrings.get(LanguageStrings.COL_RATE_CAP), LanguageStrings.get(LanguageStrings.COL_COV_OUT)};
         ratesTable = new JTable(createIconModel(columns));
-        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.STATS_TAB_RATES), createTablePane(ratesTable));
+        applyTextColumnRenderer(ratesTable, 0, SwingConstants.LEFT);
+        for (int col = 1; col <= 3; col++) {
+            applyNumericColumnRenderer(ratesTable, col);
+        }
+        ratesScrollPane = createTablePane(ratesTable);
+        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.STATS_TAB_RATES), ratesScrollPane);
     }
 
     private void initInsectsTab() {
         String[] columns = {"", LanguageStrings.get(LanguageStrings.COL_TYPE), LanguageStrings.get(LanguageStrings.COL_COUNT), LanguageStrings.get(LanguageStrings.COL_CAPACITY), LanguageStrings.get(LanguageStrings.COL_CARETAKERS)};
         insectsTable = new JTable(createIconModel(columns));
-        insectsTable.getColumnModel().getColumn(0).setMaxWidth(40);
-        insectsTable.getColumnModel().getColumn(0).setPreferredWidth(40);
         applyIconColumnRenderer(insectsTable, 0);
-        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.STATS_TAB_INSECTS), createTablePane(insectsTable));
+        applyTextColumnRenderer(insectsTable, 1, SwingConstants.LEFT);
+        for (int col = 2; col <= 4; col++) {
+            applyNumericColumnRenderer(insectsTable, col);
+        }
+        insectsScrollPane = createTablePane(insectsTable);
+        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.STATS_TAB_INSECTS), insectsScrollPane);
     }
 
     private void initUnitStatsTab() {
         String[] columns = {LanguageStrings.get(LanguageStrings.COL_STAT), LanguageStrings.get(LanguageStrings.COL_BASE_VAL), LanguageStrings.get(LanguageStrings.COL_DESCRIPTION)};
         unitStatsTable = new JTable(createIconModel(columns));
-        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.STATS_TAB_UNIT_STATS), createTablePane(unitStatsTable));
+        applyTextColumnRenderer(unitStatsTable, 0, SwingConstants.LEFT);
+        applyTextColumnRenderer(unitStatsTable, 1, SwingConstants.LEFT);
+        applyTextColumnRenderer(unitStatsTable, 2, SwingConstants.LEFT);
+        unitStatsScrollPane = createTablePane(unitStatsTable);
+        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.STATS_TAB_UNIT_STATS), unitStatsScrollPane);
     }
 
     private void initDeathTab() {
         String[] columns = {LanguageStrings.get(LanguageStrings.COL_CAUSE), LanguageStrings.get(LanguageStrings.COL_TOTAL)};
         deathTable = new JTable(createIconModel(columns));
-        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.STATS_TAB_MORTALITY), createTablePane(deathTable));
+        applyTextColumnRenderer(deathTable, 0, SwingConstants.LEFT);
+        applyNumericColumnRenderer(deathTable, 1);
+        deathScrollPane = createTablePane(deathTable);
+        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.STATS_TAB_MORTALITY), deathScrollPane);
     }
 
     // --- Data Updates ---
@@ -377,6 +462,7 @@ public class StatsDialog extends ZeroDialog {
         updateInsectsData();
         updateUnitStatsData();
         updateDeathData();
+        layoutAllTables();
     }
 
     private void updateLocalHexData() {

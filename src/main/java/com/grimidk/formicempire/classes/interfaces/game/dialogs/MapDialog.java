@@ -471,12 +471,14 @@ public class MapDialog extends ZeroDialog {
             for (Hex h : world.getHexes()) {
                 if (h.getColony() != null && h.getColony().getDynasty() != null) {
                     Dynasty d = h.getColony().getDynasty();
-                    activeDynastiesMap.put(d.getId(), d);
+                    if (d.isPlayer() || d.isDefeated() || d.isActiveForDiplomacy()) {
+                        activeDynastiesMap.put(d.getId(), d);
+                    }
                 }
             }
             if (world.getDynastys() != null) {
                 for (Dynasty d : world.getDynastys()) {
-                    if (d.isDefeated()) {
+                    if (d.isDefeated() || world.getWarService().hasWarHistoryForDynasty(d.getId())) {
                         activeDynastiesMap.putIfAbsent(d.getId(), d);
                     }
                 }

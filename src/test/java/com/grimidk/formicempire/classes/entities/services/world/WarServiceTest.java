@@ -109,6 +109,61 @@ class WarServiceTest {
     }
 
     @Test
+    void concludeWarSnapshotsDynastyNames() {
+        War war = world.getWarService().beginWar(player, neighbor);
+        world.getWarService().concludeWar(war, player.getId(), LanguageStrings.WAR_CONCLUSION_PEACE_TREATY);
+
+        War historic = world.getWarService().getHistoricWarsForDynasty(player.getId()).get(0);
+        assertEquals("Meat Dynasty", historic.getDynastyNameA());
+        assertEquals("Crystal Dynasty", historic.getDynastyNameB());
+        assertEquals("Meat Dynasty", historic.getWinnerDynastyName());
+    }
+
+    @Test
+    void resolveWinnerDisplayNameFallsBackToSnapshot() {
+        War war = world.getWarService().beginWar(player, neighbor);
+        world.getWarService().concludeWar(war, neighbor.getId(), LanguageStrings.WAR_CONCLUSION_DEFEAT);
+
+        War historic = world.getWarService().getHistoricWarsForDynasty(player.getId()).get(0);
+        world.getDynastys().remove(neighbor);
+
+        assertEquals("Crystal Dynasty", world.getWarService().resolveWinnerDisplayName(historic, player));
+    }
+
+    @Test
+    void resolveWinnerDisplayNameUsesDynastyNameForPlayerWinner() {
+        War war = world.getWarService().beginWar(player, neighbor);
+        world.getWarService().concludeWar(war, player.getId(), LanguageStrings.WAR_CONCLUSION_PEACE_TREATY);
+
+        War historic = world.getWarService().getHistoricWarsForDynasty(player.getId()).get(0);
+
+        assertEquals("Meat Dynasty", world.getWarService().resolveWinnerDisplayName(historic, player));
+    }
+
+    @Test
+    void loadFromSaveIgnoresInvalidWarRecords() {
+        Savefile.SavedWar invalid = new Savefile.SavedWar();
+        invalid.endedWorldMonth = 12;
+        invalid.conclusionKey = LanguageStrings.WAR_CONCLUSION_UNKNOWN;
+
+        War war = world.getWarService().beginWar(player, neighbor);
+        world.getWarService().concludeWar(war, player.getId(), LanguageStrings.WAR_CONCLUSION_PEACE_TREATY);
+
+        List<Savefile.SavedWar> saved = new ArrayList<>();
+        saved.add(invalid);
+        saved.addAll(world.getWarService().toSavedWars());
+
+        World reloaded = new World();
+        reloaded.getDynastys().add(player);
+        reloaded.getDynastys().add(neighbor);
+        reloaded.getWarService().loadFromSave(saved);
+        reloaded.getWarService().pruneInvalidWars();
+
+        assertEquals(1, reloaded.getWarService().getHistoricWarsForDynasty(player.getId()).size());
+        assertEquals(1, reloaded.getWarService().toSavedWars().size());
+    }
+
+    @Test
     void saveRoundTripPreservesHistoricWarRecords() {
         War war = world.getWarService().beginWar(player, neighbor);
         world.getWarService().concludeWar(war, player.getId(), LanguageStrings.WAR_CONCLUSION_PEACE_TREATY);

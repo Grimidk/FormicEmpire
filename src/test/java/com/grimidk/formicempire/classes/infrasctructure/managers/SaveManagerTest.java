@@ -2,6 +2,7 @@ package com.grimidk.formicempire.classes.infrasctructure.managers;
 
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.entities.War;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
@@ -139,5 +140,51 @@ public class SaveManagerTest {
         parseColony.setAccessible(true);
         Savefile.SavedColony loaded = (Savefile.SavedColony) parseColony.invoke(saveManager, json);
         assertEquals(4, loaded.symbioticMites);
+    }
+
+    @Test
+    void warArrayDeserializationPreservesSecondRecord() throws Exception {
+        Savefile.SavedWar first = new Savefile.SavedWar();
+        first.id = 1;
+        first.dynastyIdA = 1;
+        first.dynastyIdB = 2;
+        first.startedWorldMonth = 10;
+        first.declaredByDynastyId = 1;
+        first.displayName = "First War";
+        first.endedWorldMonth = 12;
+        first.winnerDynastyId = 1;
+        first.conclusionKey = "WAR_CONCLUSION_PEACE_TREATY";
+        first.dynastyNameA = "Alpha Dynasty";
+        first.dynastyNameB = "Beta Dynasty";
+        first.winnerDynastyName = "Alpha Dynasty";
+
+        Savefile.SavedWar second = new Savefile.SavedWar();
+        second.id = 2;
+        second.dynastyIdA = 1;
+        second.dynastyIdB = 15;
+        second.startedWorldMonth = 47;
+        second.declaredByDynastyId = 1;
+        second.displayName = "First Grim - Vine War";
+        second.endedWorldMonth = 47;
+        second.winnerDynastyId = 1;
+        second.conclusionKey = "WAR_CONCLUSION_ABSOLUTE_VICTORY";
+        second.dynastyNameA = "Grim Dynasty";
+        second.dynastyNameB = "Vine Dynasty";
+        second.winnerDynastyName = "Grim Dynasty";
+
+        SaveManager saveManager = new SaveManager();
+        Method serializeMethod = SaveManager.class.getDeclaredMethod("serializeWarsToJson", List.class);
+        serializeMethod.setAccessible(true);
+        String json = (String) serializeMethod.invoke(saveManager, List.of(first, second));
+
+        Method deserializeMethod = SaveManager.class.getDeclaredMethod("deserializeJsonToWars", String.class);
+        deserializeMethod.setAccessible(true);
+        @SuppressWarnings("unchecked")
+        List<Savefile.SavedWar> loaded = (List<Savefile.SavedWar>) deserializeMethod.invoke(saveManager, json);
+
+        assertEquals(2, loaded.size());
+        assertEquals("First Grim - Vine War", loaded.get(1).displayName);
+        assertEquals(15, loaded.get(1).dynastyIdB);
+        assertEquals("Grim Dynasty", loaded.get(1).winnerDynastyName);
     }
 }

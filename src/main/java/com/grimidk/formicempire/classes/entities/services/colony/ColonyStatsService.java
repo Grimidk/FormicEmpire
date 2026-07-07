@@ -197,8 +197,9 @@ public class ColonyStatsService {
 
     /**
      * Assimilated damage multiplier for colony base attack.
-     * Fire venom sets 4x; bullet and harvester venom add +4 each (additive).
-     * Fire + harvester together use {@link GameConstants#ASSIMILATED_DAMAGE_SYNERGY_FIRE_DEADLY} (16x) instead of 4+4.
+     * Fire venom sets 4x; bullet and Maricopa venom add +4 each (additive).
+     * {@link GameUnlocks#SYNERGY_SUPER_VENOM} replaces Fire + Maricopa stacking with
+     * {@link GameConstants#ASSIMILATED_DAMAGE_SYNERGY_FIRE_DEADLY} (16x).
      */
     public static float getAssimilatedDamageMultiplier(Dynasty dynasty) {
         if (dynasty == null) {
@@ -210,7 +211,7 @@ public class ColonyStatsService {
         boolean superVenom = dynasty.hasUpgrade(GameUnlocks.SYNERGY_SUPER_VENOM);
 
         float mult;
-        if (superVenom || (fire && deadly)) {
+        if (superVenom) {
             mult = GameConstants.ASSIMILATED_DAMAGE_SYNERGY_FIRE_DEADLY;
         } else {
             mult = 1f;

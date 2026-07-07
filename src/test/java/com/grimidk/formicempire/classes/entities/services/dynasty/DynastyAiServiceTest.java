@@ -74,7 +74,11 @@ class DynastyAiServiceTest {
         neighbor.setDiplomaticReputation(npc.getId(), 100);
         Colony colony = new Colony(10, "Capital", false);
         colony.setAge(10);
+        colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
         npc.addColony(colony);
+        Colony neighborColony = new Colony(20, "Neighbor Capital", false);
+        neighborColony.getWorkers().add(new Ant(neighborColony, GameConstants.TYPE_WORKER));
+        neighbor.addColony(neighborColony);
 
         aiService.runDailyAi(npc, world, tradeManager);
 
@@ -90,7 +94,11 @@ class DynastyAiServiceTest {
         Colony capital = new Colony(10, "Capital", false);
         capital.setAge(10);
         capital.setAssignedRoleCount(GameConstants.ROLE_DIPLOMAT, 3);
+        capital.getWorkers().add(new Ant(capital, GameConstants.TYPE_WORKER));
         npc.addColony(capital);
+        Colony neighborColony = new Colony(20, "Neighbor Capital", false);
+        neighborColony.getWorkers().add(new Ant(neighborColony, GameConstants.TYPE_WORKER));
+        neighbor.addColony(neighborColony);
 
         aiService.runDailyAi(npc, world, tradeManager);
 

@@ -173,7 +173,7 @@ public class EnglishTranslation implements Translation {
         en.put("SYNERGY_REQUIREMENTS_FMT", "Combines: %s + %s");
         en.put("SYNERGY_SUPER_VENOM", "Super Venom");
         en.put("SYNERGY_SUPER_VENOM_FLAVOR", "Super Venom");
-        en.put("SYNERGY_SUPER_VENOM_DESC", "Colony damage multiplier becomes 16x instead of 4+4 when Fire venom and Harvester venom are both assimilated. Stinging venom still adds +4 on top (20x with all three).");
+        en.put("SYNERGY_SUPER_VENOM_DESC", "Replaces Fire + Maricopa venom stacking (4+4) with a 16x colony damage multiplier when both venoms are assimilated and Synergies are researched. Stinging venom still adds +4 on top (20x with all three).");
 
         en.put("DIALOG_HATCH_RATES_TITLE", "Manage Pupa Hatch Rates");
         en.put("HATCH_DESC", "Set hatch chance for new ants:");
@@ -670,7 +670,6 @@ public class EnglishTranslation implements Translation {
         en.put("ROLE_MINER", "Miner");
         en.put("ROLE_COURIER", "Courier");
         en.put("ROLE_POTTER", "Portable-Feeder");
-        en.put("ROLE_GUARD", "Guard");
         en.put("ROLE_WARRIOR", "Warrior");
         en.put("ROLE_DEFENDER", "Defender");
         en.put("ROLE_POLICE", "Parasite-Ant Police");
@@ -734,6 +733,7 @@ public class EnglishTranslation implements Translation {
         en.put("LOYALTY_MODIFIER_TUNNEL", "Tunnel Link");
         en.put("LOYALTY_MODIFIER_CAPITAL", "Capital");
         en.put("LOYALTY_MODIFIER_PHEROMONE_STORM", "Pheromone Storm");
+        en.put("LOYALTY_MODIFIER_RECENTLY_CONQUERED", "Recently Conquered");
         en.put("LOYALTY_MODIFIER_MILITARY_VS_CAPITAL", "Military vs Capital");
         en.put("LOYALTY_MODIFIER_DISTANCE_FROM_CAPITAL", "Distance from Capital");
         en.put("LOYALTY_MODIFIER_DISTANCE_LINE", "%s (%s tiles): %s");
@@ -834,8 +834,8 @@ public class EnglishTranslation implements Translation {
         en.put("SPECIES_FASTBITE_SCIENTIFIC", "Mystrium Sp.");
         en.put("SPECIES_HEATRESIST", "Saharan Silver Ant");
         en.put("SPECIES_HEATRESIST_SCIENTIFIC", "Cataglyphis Sp.");
-        en.put("SPECIES_DEADLYVENOM", "Harvester Ant");
-        en.put("SPECIES_DEADLYVENOM_SCIENTIFIC", "Pogonomyrmex Sp.");
+        en.put("SPECIES_DEADLYVENOM", "Maricopa Ant");
+        en.put("SPECIES_DEADLYVENOM_SCIENTIFIC", "Pogonomyrmex Maricopa");
         en.put("SPECIES_SELFDESTRUCT", "Exploding Ant");
         en.put("SPECIES_SELFDESTRUCT_SCIENTIFIC", "Camponotus Saundersi");
         en.put("SPECIES_FARSIGHT", "Bulldog Ant");
@@ -869,7 +869,7 @@ public class EnglishTranslation implements Translation {
         en.put("ASSIMILATION_RAFTING", "Floodplain Ant Assimilation");
         en.put("ASSIMILATION_RAFTING_DESC", "After assimilating the floodplain ant genome:");
         en.put("ASSIMILATED_FIREVENOM_FLAVOR", "Burning Venom");
-        en.put("ASSIMILATED_FIREVENOM_DESC", "Multiplies colony base attack damage by 4. Synergizes with Harvester venom.");
+        en.put("ASSIMILATED_FIREVENOM_DESC", "Multiplies colony base attack damage by 4. Super Venom synergy with Maricopa venom replaces this stacking with 16x.");
         en.put("ASSIMILATION_FIREVENOM", "Fire Ant Assimilation");
         en.put("ASSIMILATION_FIREVENOM_DESC", "After assimilating the fire ant genome:");
         en.put("ASSIMILATED_JUMPING_FLAVOR", "Leap Strikes");
@@ -881,7 +881,7 @@ public class EnglishTranslation implements Translation {
         en.put("ASSIMILATION_GLIDING", "Gliding Ant Assimilation");
         en.put("ASSIMILATION_GLIDING_DESC", "After assimilating the gliding ant genome:");
         en.put("ASSIMILATED_STINGING_FLAVOR", "Excruciating Sting");
-        en.put("ASSIMILATED_STINGING_DESC", "Adds +4 to the colony damage multiplier (additive with Fire venom: 8x total, not 16x).");
+        en.put("ASSIMILATED_STINGING_DESC", "Unlocks the Bullet ant subtype (assigned via hatch rates once subtypes are available). Adds +4 to the colony damage multiplier.");
         en.put("ASSIMILATION_STINGING", "Bullet Ant Assimilation");
         en.put("ASSIMILATION_STINGING_DESC", "After assimilating the bullet ant genome:");
         en.put("ASSIMILATED_SWARMING_FLAVOR", "Raid Swarms");
@@ -901,9 +901,9 @@ public class EnglishTranslation implements Translation {
         en.put("ASSIMILATION_HEATRESIST", "Saharan Silver Ant Assimilation");
         en.put("ASSIMILATION_HEATRESIST_DESC", "After assimilating the saharan silver ant genome:");
         en.put("ASSIMILATED_DEADLYVENOM_FLAVOR", "Lethal Venom");
-        en.put("ASSIMILATED_DEADLYVENOM_DESC", "Adds +4 to the colony damage multiplier. With Fire venom, the pair becomes 16x instead of 4+4.");
-        en.put("ASSIMILATION_DEADLYVENOM", "Harvester Ant Assimilation");
-        en.put("ASSIMILATION_DEADLYVENOM_DESC", "After assimilating the harvester ant genome:");
+        en.put("ASSIMILATED_DEADLYVENOM_DESC", "Adds +4 to the colony damage multiplier. Super Venom synergy with Fire venom replaces this stacking with 16x.");
+        en.put("ASSIMILATION_DEADLYVENOM", "Maricopa Ant Assimilation");
+        en.put("ASSIMILATION_DEADLYVENOM_DESC", "After assimilating the Maricopa ant genome:");
         en.put("ASSIMILATED_SELFDESTRUCT_FLAVOR", "Suicidal Defense");
         en.put("ASSIMILATED_SELFDESTRUCT_DESC", "Your dynasty can rupture specialized workers to spray sticky toxins. (Mechanic in development.)");
         en.put("ASSIMILATION_SELFDESTRUCT", "Exploding Ant Assimilation");
@@ -985,9 +985,6 @@ public class EnglishTranslation implements Translation {
         en.put("ROLE_POTTER_UPGRADE", "Portable-Feeder Role");
         en.put("ROLE_POTTER_FLAVOR", "A Helping Hand");
         en.put("ROLE_POTTER_DESC", "Allows workers to store and transport food to other ants.");
-        en.put("ROLE_GUARD_UPGRADE", "Guard Role");
-        en.put("ROLE_GUARD_FLAVOR", "Ant Bouncers");
-        en.put("ROLE_GUARD_DESC", "Allows soldiers to guard the colony entrance.");
         en.put("ROLE_WARRIOR_UPGRADE", "Warrior Role");
         en.put("ROLE_WARRIOR_FLAVOR", "Phalanx Formation");
         en.put("ROLE_WARRIOR_DESC", "Allows soldiers to fight in organized groups.");
@@ -1307,8 +1304,8 @@ public class EnglishTranslation implements Translation {
         en.put("ASSIMILATION_FASTBITE_DESC", "After assimilating the dracula ant genome:");
         en.put("ASSIMILATION_HEATRESIST", "Saharan Silver Ant Assimilation");
         en.put("ASSIMILATION_HEATRESIST_DESC", "After assimilating the saharan silver ant genome:");
-        en.put("ASSIMILATION_DEADLYVENOM", "Harvester Ant Assimilation");
-        en.put("ASSIMILATION_DEADLYVENOM_DESC", "After assimilating the harvester ant genome:");
+        en.put("ASSIMILATION_DEADLYVENOM", "Maricopa Ant Assimilation");
+        en.put("ASSIMILATION_DEADLYVENOM_DESC", "After assimilating the Maricopa ant genome:");
         en.put("ASSIMILATION_SELFDESTRUCT", "Exploding Ant Assimilation");
         en.put("ASSIMILATION_SELFDESTRUCT_DESC", "After assimilating the exploding ant genome:");
         en.put("ASSIMILATION_FARSIGHT", "Bulldog Ant Assimilation");
@@ -1481,14 +1478,14 @@ public class EnglishTranslation implements Translation {
         en.put("LOG_DEATH_OLD_AGE_FMT", "%s ants died of old age");
         en.put("LOG_DEATH_JUVENILES_LACK_CARE_FMT", "%s juveniles died (lack of care)");
         en.put("LOG_DEATH_COUNT_CAUSE_FMT", "%s ants died of %s");
-        en.put("LOG_CAUSE_OLD_AGE", "old age");
-        en.put("LOG_CAUSE_LACK_OF_CARE", "lack of care");
-        en.put("LOG_CAUSE_DEHYDRATION", "dehydration");
-        en.put("LOG_CAUSE_STARVATION", "starvation");
-        en.put("LOG_CAUSE_CONTAMINATION", "contamination");
-        en.put("LOG_CAUSE_CONFLICT", "conflict");
-        en.put("LOG_CAUSE_ILLNESS", "illness");
-        en.put("LOG_CAUSE_OTHER", "other");
+        en.put("LOG_CAUSE_OLD_AGE", "Old Age");
+        en.put("LOG_CAUSE_LACK_OF_CARE", "Lack of Care");
+        en.put("LOG_CAUSE_DEHYDRATION", "Dehydration");
+        en.put("LOG_CAUSE_STARVATION", "Starvation");
+        en.put("LOG_CAUSE_CONTAMINATION", "Contamination");
+        en.put("LOG_CAUSE_CONFLICT", "Conflict");
+        en.put("LOG_CAUSE_ILLNESS", "Illness");
+        en.put("LOG_CAUSE_OTHER", "Other");
         en.put("LOG_CONTAMINATION_LEVEL_FMT", "Contamination level: %s");
         en.put("LOG_CONTAM_LEVEL_SMALL", "Small");
         en.put("LOG_CONTAM_LEVEL_MEDIUM", "Medium");

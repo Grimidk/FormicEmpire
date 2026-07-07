@@ -963,7 +963,6 @@ public final class LanguageStrings {
     public static final String ROLE_MINER = "ROLE_MINER";
     public static final String ROLE_COURIER = "ROLE_COURIER";
     public static final String ROLE_POTTER = "ROLE_POTTER";
-    public static final String ROLE_GUARD = "ROLE_GUARD";
     public static final String ROLE_WARRIOR = "ROLE_WARRIOR";
     public static final String ROLE_DEFENDER = "ROLE_DEFENDER";
     public static final String ROLE_POLICE = "ROLE_POLICE";
@@ -1026,6 +1025,7 @@ public final class LanguageStrings {
     public static final String LOYALTY_MODIFIER_TUNNEL = "LOYALTY_MODIFIER_TUNNEL";
     public static final String LOYALTY_MODIFIER_CAPITAL = "LOYALTY_MODIFIER_CAPITAL";
     public static final String LOYALTY_MODIFIER_PHEROMONE_STORM = "LOYALTY_MODIFIER_PHEROMONE_STORM";
+    public static final String LOYALTY_MODIFIER_RECENTLY_CONQUERED = "LOYALTY_MODIFIER_RECENTLY_CONQUERED";
     public static final String DIPLO_ACTION_FORM_PACT = "DIPLO_ACTION_FORM_PACT";
     public static final String DIPLO_ACTION_REQUEST_PACT = "DIPLO_ACTION_REQUEST_PACT";
     public static final String DIPLO_PACT_REQUEST_TITLE = "DIPLO_PACT_REQUEST_TITLE";
@@ -1272,9 +1272,6 @@ public final class LanguageStrings {
     public static final String ROLE_POTTER_UPGRADE = "ROLE_POTTER_UPGRADE";
     public static final String ROLE_POTTER_FLAVOR = "ROLE_POTTER_FLAVOR";
     public static final String ROLE_POTTER_DESC = "ROLE_POTTER_DESC";
-    public static final String ROLE_GUARD_UPGRADE = "ROLE_GUARD_UPGRADE";
-    public static final String ROLE_GUARD_FLAVOR = "ROLE_GUARD_FLAVOR";
-    public static final String ROLE_GUARD_DESC = "ROLE_GUARD_DESC";
     public static final String ROLE_WARRIOR_UPGRADE = "ROLE_WARRIOR_UPGRADE";
     public static final String ROLE_WARRIOR_FLAVOR = "ROLE_WARRIOR_FLAVOR";
     public static final String ROLE_WARRIOR_DESC = "ROLE_WARRIOR_DESC";

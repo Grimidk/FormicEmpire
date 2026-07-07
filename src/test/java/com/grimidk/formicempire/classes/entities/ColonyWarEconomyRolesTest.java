@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.entities.Ant;
 
 class ColonyWarEconomyRolesTest {
 
@@ -30,6 +31,7 @@ class ColonyWarEconomyRolesTest {
         Colony colony = new Colony(2, "Test", true);
         dynasty.addColony(colony);
         colony.setDynasty(dynasty);
+        colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
 
         colony.setPeaceAssignedRoleCount(GameConstants.ROLE_HUNTER, 5);
         colony.setWarAssignedRoleCount(GameConstants.ROLE_WARRIOR, 7);
@@ -38,7 +40,11 @@ class ColonyWarEconomyRolesTest {
         assertEquals(5, colony.getAssignedRoleCount(GameConstants.ROLE_HUNTER));
         assertEquals(0, colony.getAssignedRoleCount(GameConstants.ROLE_WARRIOR));
 
-        dynasty.getDiplomacyService().applyWar(new Dynasty(3, "Enemy", false, GameConstants.SPECIES_OMNI));
+        Dynasty enemy = new Dynasty(3, "Enemy", false, GameConstants.SPECIES_OMNI);
+        Colony enemyColony = new Colony(3, "Enemy Capital", false);
+        enemyColony.getWorkers().add(new Ant(enemyColony, GameConstants.TYPE_WORKER));
+        enemy.addColony(enemyColony);
+        dynasty.getDiplomacyService().applyWar(enemy);
 
         assertTrue(dynasty.isAtWar());
         assertEquals(0, colony.getAssignedRoleCount(GameConstants.ROLE_HUNTER));
@@ -64,10 +70,18 @@ class ColonyWarEconomyRolesTest {
     void warEconomyExclusiveRolesCannotBeStoredInPeaceDistribution() {
         Colony colony = new Colony(6, "Test", true);
 
+        colony.setPeaceAssignedRoleCount(GameConstants.ROLE_WARRIOR, 5);
+        colony.setPeaceAssignedRoleCount(GameConstants.ROLE_DEFENDER, 3);
         colony.setPeaceAssignedRoleCount(GameConstants.ROLE_BRUTE, 4);
+        colony.setPeaceAssignedRoleCount(GameConstants.ROLE_ARTILLERY, 2);
+        colony.setPeaceAssignedRoleCount(GameConstants.ROLE_SIEGE, 1);
         colony.setPeaceAssignedRoleCount(GameConstants.ROLE_MILITIA, 6);
 
+        assertEquals(0, colony.getPeaceAssignedRoleCount(GameConstants.ROLE_WARRIOR));
+        assertEquals(0, colony.getPeaceAssignedRoleCount(GameConstants.ROLE_DEFENDER));
         assertEquals(0, colony.getPeaceAssignedRoleCount(GameConstants.ROLE_BRUTE));
+        assertEquals(0, colony.getPeaceAssignedRoleCount(GameConstants.ROLE_ARTILLERY));
+        assertEquals(0, colony.getPeaceAssignedRoleCount(GameConstants.ROLE_SIEGE));
         assertEquals(0, colony.getPeaceAssignedRoleCount(GameConstants.ROLE_MILITIA));
     }
 

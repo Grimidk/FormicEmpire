@@ -57,7 +57,7 @@ public class Engine extends Thread {
     private boolean darkMode = false;
     private int defaultRoleWorker = 1; // ROLE_FORAGER
     private int defaultRoleSoldier = 16; // ROLE_HUNTER
-    private int defaultRoleMajor = 17; // ROLE_BRUTE
+    private int defaultRoleMajor = 18; // ROLE_CARRIER
     private int defaultRolePrincess = 23; // ROLE_BREEDER
     private int defaultRoleQueen = 25; // ROLE_LAYER
 
@@ -552,7 +552,8 @@ public class Engine extends Thread {
                 return legacyDefaultRoleForAntType(type);
             }
             AntRole chosen = GameConstants.getAntRoleById(roleId);
-            if (chosen != null && chosen.getAntType() == type) {
+            if (chosen != null && chosen.getAntType() == type
+                    && !GameConstants.isWarEconomyExclusiveRole(chosen)) {
                 return chosen;
             }
         }
@@ -567,7 +568,7 @@ public class Engine extends Thread {
             return GameConstants.ROLE_HUNTER;
         }
         if (type == GameConstants.TYPE_MAJOR) {
-            return GameConstants.ROLE_BRUTE;
+            return GameConstants.ROLE_CARRIER;
         }
         if (type == GameConstants.TYPE_PRINCESS) {
             return GameConstants.ROLE_BREEDER;
@@ -583,10 +584,16 @@ public class Engine extends Thread {
 
     public static int sanitizeDefaultRoleId(AntType type, int desiredRoleId, int fallbackRoleId) {
         AntRole r = GameConstants.getAntRoleById(desiredRoleId);
-        if (r != null && r.getAntType() == type) {
+        if (r != null && r.getAntType() == type && !GameConstants.isWarEconomyExclusiveRole(r)) {
             return desiredRoleId;
         }
-        return fallbackRoleId;
+        AntRole fallback = GameConstants.getAntRoleById(fallbackRoleId);
+        if (fallback != null && fallback.getAntType() == type
+                && !GameConstants.isWarEconomyExclusiveRole(fallback)) {
+            return fallbackRoleId;
+        }
+        AntRole legacy = legacyDefaultRoleForAntType(type);
+        return legacy != null ? legacy.getId() : fallbackRoleId;
     }
 
     public static int defaultRoleIdForAntType(AntType type, Engine engine) {

@@ -5,6 +5,7 @@ import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastySynergyService;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,17 +37,39 @@ class ColonyStatsServiceAssimilationTest {
     }
 
     @Test
-    void fireAndDeadlySynergyReplacesFourPlusFourWithSixteen() {
+    void fireAndDeadlyStackAdditivelyToEightWithoutSuperVenom() {
         Dynasty dynasty = dynastyWith(GameUnlocks.ASSIMILATED_FIREVENOM, GameUnlocks.ASSIMILATED_DEADLYVENOM);
+        assertEquals(8f, ColonyStatsService.getAssimilatedDamageMultiplier(dynasty), 0.0001f);
+    }
+
+    @Test
+    void superVenomReplacesFireAndDeadlyStackingWithSixteen() {
+        Dynasty dynasty = dynastyWith(
+                GameUnlocks.ABILITY_SYNERGY,
+                GameUnlocks.ASSIMILATED_FIREVENOM,
+                GameUnlocks.ASSIMILATED_DEADLYVENOM);
+        DynastySynergyService.refreshUnlocked(dynasty);
+        assertEquals(16f, ColonyStatsService.getAssimilatedDamageMultiplier(dynasty), 0.0001f);
+    }
+
+    @Test
+    void fireAndDeadlySynergyReplacesFourPlusFourWithSixteen() {
+        Dynasty dynasty = dynastyWith(
+                GameUnlocks.ABILITY_SYNERGY,
+                GameUnlocks.ASSIMILATED_FIREVENOM,
+                GameUnlocks.ASSIMILATED_DEADLYVENOM,
+                GameUnlocks.SYNERGY_SUPER_VENOM);
         assertEquals(16f, ColonyStatsService.getAssimilatedDamageMultiplier(dynasty), 0.0001f);
     }
 
     @Test
     void fireDeadlySynergyPlusStingingIsTwenty() {
         Dynasty dynasty = dynastyWith(
+                GameUnlocks.ABILITY_SYNERGY,
                 GameUnlocks.ASSIMILATED_FIREVENOM,
                 GameUnlocks.ASSIMILATED_DEADLYVENOM,
-                GameUnlocks.ASSIMILATED_STINGING);
+                GameUnlocks.ASSIMILATED_STINGING,
+                GameUnlocks.SYNERGY_SUPER_VENOM);
         assertEquals(20f, ColonyStatsService.getAssimilatedDamageMultiplier(dynasty), 0.0001f);
     }
 

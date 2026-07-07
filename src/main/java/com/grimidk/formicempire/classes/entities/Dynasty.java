@@ -914,6 +914,15 @@ public class Dynasty {
     public boolean isDefeated() { return isDefeated; }
     public void setDefeated(boolean isDefeated) { this.isDefeated = isDefeated; }
 
+    public boolean hasLivingPopulation() {
+        return statService.getTotalPopulation(this) > 0;
+    }
+
+    /** Living dynasties the player can still treat as diplomatic partners. */
+    public boolean isActiveForDiplomacy() {
+        return !isDefeated && hasLivingPopulation();
+    }
+
     public boolean isDefaultAutomationEnabled() { return defaultAutomationEnabled; }
     public void setDefaultAutomationEnabled(boolean enabled) { this.defaultAutomationEnabled = enabled; }
 
@@ -937,6 +946,15 @@ public class Dynasty {
         }
         DynastySynergyService.refreshUnlocked(this);
         invalidateAffordableAlertCaches();
+    }
+
+    public void revokeUpgrade(Upgrade upgrade) {
+        if (upgrade == null) {
+            return;
+        }
+        if (unlockedUpgrades.remove(upgrade)) {
+            invalidateAffordableAlertCaches();
+        }
     }
 
     private void invalidateAffordableAlertCaches() {

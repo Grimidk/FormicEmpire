@@ -87,6 +87,7 @@ public class Colony {
     private int parasiticMites;
 
     private int pheromoneStormMonthsRemaining;
+    private int recentlyConqueredMonthsRemaining;
     private int creatineDietMonthsRemaining;
 
     // --- Hatch Rate Data ---
@@ -361,6 +362,7 @@ public class Colony {
         this.parasiteAnts = savedColony.parasiteAnts;
         this.parasiticMites = savedColony.parasiticMites;
         this.pheromoneStormMonthsRemaining = savedColony.pheromoneStormMonthsRemaining;
+        this.recentlyConqueredMonthsRemaining = savedColony.recentlyConqueredMonthsRemaining;
         this.creatineDietMonthsRemaining = savedColony.creatineDietMonthsRemaining;
         for (int i = 0; i < this.parasiteAnts; i++) {
             Bug p = new Bug(GameConstants.TYPE_PARASITE_ANT);
@@ -534,6 +536,9 @@ public class Colony {
         if (pheromoneStormMonthsRemaining > 0) {
             bonus += GameConstants.LOYALTY_MODIFIER_PHEROMONE_STORM.getLoyaltyDelta();
         }
+        if (recentlyConqueredMonthsRemaining > 0) {
+            bonus += GameConstants.LOYALTY_MODIFIER_RECENTLY_CONQUERED.getLoyaltyDelta();
+        }
         bonus += getMilitaryLoyaltyAdjustment();
         bonus += getDistanceFromCapitalLoyaltyAdjustment(world);
         return bonus;
@@ -597,6 +602,9 @@ public class Colony {
         }
         if (pheromoneStormMonthsRemaining > 0) {
             appendLoyaltyModifierLine(sb, GameConstants.LOYALTY_MODIFIER_PHEROMONE_STORM);
+        }
+        if (recentlyConqueredMonthsRemaining > 0) {
+            appendLoyaltyModifierLine(sb, GameConstants.LOYALTY_MODIFIER_RECENTLY_CONQUERED);
         }
         int militaryAdj = getMilitaryLoyaltyAdjustment();
         if (militaryAdj != 0) {
@@ -1257,6 +1265,18 @@ public class Colony {
         return pheromoneStormMonthsRemaining;
     }
 
+    public boolean isRecentlyConquered() {
+        return recentlyConqueredMonthsRemaining > 0;
+    }
+
+    public int getRecentlyConqueredMonthsRemaining() {
+        return recentlyConqueredMonthsRemaining;
+    }
+
+    public void setRecentlyConqueredMonthsRemaining(int months) {
+        this.recentlyConqueredMonthsRemaining = Math.max(0, months);
+    }
+
     public boolean isCreatineDietActive() {
         return creatineDietMonthsRemaining > 0;
     }
@@ -1304,6 +1324,9 @@ public class Colony {
             if (pheromoneStormMonthsRemaining == 0) {
                 logEvent(ColonyLogPrefixes.INFO + " " + LanguageStrings.get(LanguageStrings.LOG_PHEROMONE_STORM_ENDED));
             }
+        }
+        if (recentlyConqueredMonthsRemaining > 0) {
+            recentlyConqueredMonthsRemaining--;
         }
         if (creatineDietMonthsRemaining > 0) {
             creatineDietMonthsRemaining--;

@@ -44,4 +44,19 @@ class DynastySynergyServiceTest {
 
         assertFalse(DynastySynergyService.isUnlocked(dynasty, GameUnlocks.SUPER_VENOM_SYNERGY));
     }
+
+    @Test
+    void superVenomRevokedWhenRequirementLost() {
+        Dynasty dynasty = new Dynasty(4, "Test", true, GameConstants.SPECIES_OMNI);
+        dynasty.unlockUpgrade(GameUnlocks.ABILITY_SYNERGY);
+        dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_FIREVENOM);
+        dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_DEADLYVENOM);
+        assertTrue(dynasty.hasUpgrade(GameUnlocks.SYNERGY_SUPER_VENOM));
+
+        dynasty.revokeUpgrade(GameUnlocks.ASSIMILATED_FIREVENOM);
+        DynastySynergyService.refreshUnlocked(dynasty);
+
+        assertFalse(dynasty.hasUpgrade(GameUnlocks.SYNERGY_SUPER_VENOM));
+        assertFalse(DynastySynergyService.isUnlocked(dynasty, GameUnlocks.SUPER_VENOM_SYNERGY));
+    }
 }

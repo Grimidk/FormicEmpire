@@ -32,6 +32,12 @@ public class WarBattleViewPanel extends JPanel {
     /** How close marching ants sit to the contact line (0 = rear edge, 1 = line). */
     private static final float CONTACT_DEPTH_BASE = 0.97f;
     private static final float CONTACT_DEPTH_SPREAD = 0.025f;
+    /** Wall-clock animation; independent of sim speed and pause. */
+    private static final int ANIMATION_FRAME_MS = 50;
+    private static final float WOBBLE_SPEED = 5.5f;
+    private static final float MARCH_SPEED = 2.8f;
+    private static final float WOBBLE_AMPLITUDE_PX = 2f;
+    private static final float MARCH_DEPTH_AMPLITUDE = 0.018f;
 
     private final War war;
     private final Engine engine;
@@ -41,6 +47,8 @@ public class WarBattleViewPanel extends JPanel {
     private List<BattleAnt> attackerAnts = List.of();
     private List<BattleAnt> defenderAnts = List.of();
     private float contactLineRatio = 0.5f;
+    private Timer animationTimer;
+    private float animationSeconds;
 
     public WarBattleViewPanel(War war, Engine engine) {
         super(new BorderLayout());
@@ -56,6 +64,7 @@ public class WarBattleViewPanel extends JPanel {
 
         loadBiomeTiles();
         refreshScene();
+        startAnimation();
     }
 
     public void refreshScene() {
@@ -75,8 +84,32 @@ public class WarBattleViewPanel extends JPanel {
         repaint();
     }
 
+    public void startAnimation() {
+        if (animationTimer != null) {
+            return;
+        }
+        animationTimer = new Timer(ANIMATION_FRAME_MS, e -> {
+            animationSeconds += ANIMATION_FRAME_MS / 1000f;
+            if (animationSeconds > 10_000f) {
+                animationSeconds = 0f;
+            }
+            repaint();
+        });
+        animationTimer.setCoalesce(true);
+        animationTimer.start();
+    }
+
     public void stopAnimation() {
-        // Battle view is driven by war hour ticks via refreshScene(), not real-time animation.
+        if (animationTimer != null) {
+            animationTimer.stop();
+            animationTimer = null;
+        }
+    }
+
+    @Override
+    public void removeNotify() {
+        stopAnimation();
+        super.removeNotify();
     }
 
     @Override
@@ -209,8 +242,9 @@ public class WarBattleViewPanel extends JPanel {
             int w = Math.max(8, icon.getIconWidth() / ANT_SPRITE_SCALE);
             int h = Math.max(8, icon.getIconHeight() / ANT_SPRITE_SCALE);
 
-            float depth = ant.contactDepth();
-            float wobble = (float) Math.sin(ant.wobblePhase) * 2f;
+            float depth = ant.animatedContactDepth(animationSeconds);
+            float wobble = (float) Math.sin(ant.wobblePhase + animationSeconds * WOBBLE_SPEED * ant.motionRate)
+                    * WOBBLE_AMPLITUDE_PX;
             int drawY = field.y + edgePad + Math.round(ant.laneY * (field.height - h - edgePad * 2)) + Math.round(wobble);
 
             int drawX;
@@ -257,7 +291,8 @@ public class WarBattleViewPanel extends JPanel {
                 float depthSpread = random.nextFloat() * CONTACT_DEPTH_SPREAD;
                 ants.add(new BattleAnt(type, side.species(), laneY,
                         CONTACT_DEPTH_BASE + depthSpread,
-                        random.nextFloat() * (float) (Math.PI * 2)));
+                        random.nextFloat() * (float) (Math.PI * 2),
+                        0.85f + random.nextFloat() * 0.3f));
             }
         }
         return ants;
@@ -388,17 +423,21 @@ public class WarBattleViewPanel extends JPanel {
         private final float laneY;
         private final float contactDepth;
         private final float wobblePhase;
+        private final float motionRate;
 
-        private BattleAnt(AntType type, Species species, float laneY, float contactDepth, float wobblePhase) {
+        private BattleAnt(AntType type, Species species, float laneY, float contactDepth, float wobblePhase,
+                float motionRate) {
             this.type = type;
             this.species = species;
             this.laneY = laneY;
             this.contactDepth = Math.min(0.995f, contactDepth);
             this.wobblePhase = wobblePhase;
+            this.motionRate = motionRate;
         }
 
-        private float contactDepth() {
-            return contactDepth;
+        private float animatedContactDepth(float seconds) {
+            float march = (float) Math.sin(wobblePhase + seconds * MARCH_SPEED * motionRate) * MARCH_DEPTH_AMPLITUDE;
+            return Math.max(0.05f, Math.min(0.995f, contactDepth + march));
         }
     }
 }

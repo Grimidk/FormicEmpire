@@ -44,8 +44,7 @@ public class WarManagementPanel extends JPanel implements DynastyManagementDialo
     private static final int COL_STANDING = 4;
     private static final int COL_PROGRESS = 5;
     private static final int COL_MILITARY = 6;
-    private static final int COL_REPUTATION = 7;
-    private static final int COL_ACTIONS = 8;
+    private static final int COL_ACTIONS = 7;
 
     private static final int HIST_COL_NAME = 0;
     private static final int HIST_COL_STARTED = 1;
@@ -63,8 +62,10 @@ public class WarManagementPanel extends JPanel implements DynastyManagementDialo
     private final JLabel historyEmptyLabel = new JLabel();
     private final JTable activeTable;
     private final DefaultTableModel activeModel;
+    private final JScrollPane activeScrollPane;
     private final JTable historyTable;
     private final DefaultTableModel historyModel;
+    private final JScrollPane historyScrollPane;
     private final JCheckBox showAllActiveWarsCheck;
     private final JCheckBox showAllHistoricWarsCheck;
     private final List<ActiveWarRowData> displayedActiveWars = new ArrayList<>();
@@ -90,8 +91,10 @@ public class WarManagementPanel extends JPanel implements DynastyManagementDialo
 
         activeModel = createActiveModel();
         activeTable = createActiveTable(activeModel);
+        activeScrollPane = AssetStyles.wrapScrollableTable(activeTable);
         historyModel = createHistoryModel();
         historyTable = createHistoryTable(historyModel);
+        historyScrollPane = AssetStyles.wrapScrollableTable(historyTable);
 
         JPanel activeHeader = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 4));
         activeHeader.setOpaque(false);
@@ -105,7 +108,7 @@ public class WarManagementPanel extends JPanel implements DynastyManagementDialo
         JPanel activePanel = new JPanel(new BorderLayout());
         activePanel.setOpaque(false);
         activePanel.add(activeNorth, BorderLayout.NORTH);
-        activePanel.add(new JScrollPane(activeTable), BorderLayout.CENTER);
+        activePanel.add(activeScrollPane, BorderLayout.CENTER);
 
         JPanel historyHeader = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 4));
         historyHeader.setOpaque(false);
@@ -119,13 +122,20 @@ public class WarManagementPanel extends JPanel implements DynastyManagementDialo
         JPanel historyPanel = new JPanel(new BorderLayout());
         historyPanel.setOpaque(false);
         historyPanel.add(historyNorth, BorderLayout.NORTH);
-        historyPanel.add(new JScrollPane(historyTable), BorderLayout.CENTER);
+        historyPanel.add(historyScrollPane, BorderLayout.CENTER);
 
         tabbedPane = new JTabbedPane();
         AssetStyles.styleTabbedPane(tabbedPane);
         tabbedPane.addTab(LanguageStrings.get(LanguageStrings.TAB_WAR_ACTIVE), activePanel);
         tabbedPane.addTab(LanguageStrings.get(LanguageStrings.TAB_WAR_HISTORY), historyPanel);
         add(tabbedPane, BorderLayout.CENTER);
+        tabbedPane.addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
+            public void componentResized(java.awt.event.ComponentEvent e) {
+                fitActiveColumns();
+                fitHistoryColumns();
+            }
+        });
         updateData();
     }
 
@@ -166,12 +176,11 @@ public class WarManagementPanel extends JPanel implements DynastyManagementDialo
         }
 
         int worldMonth = DynastyDiplomacyService.worldMonthIndex(world);
-        DynastyDiplomacyService diplo = dynasty.getDiplomacyService();
         String notApplicable = LanguageStrings.get(LanguageStrings.WORLD_NA);
 
         for (War war : wars) {
             if (war.involves(dynasty.getId())) {
-                addInvolvedActiveWarRow(warService, diplo, world, worldMonth, war);
+                addInvolvedActiveWarRow(warService, world, worldMonth, war);
             } else if (showAll) {
                 addSpectatorActiveWarRow(warService, world, worldMonth, war, notApplicable);
             }
@@ -189,8 +198,7 @@ public class WarManagementPanel extends JPanel implements DynastyManagementDialo
         }
     }
 
-    private void addInvolvedActiveWarRow(WarService warService, DynastyDiplomacyService diplo,
-            World world, int worldMonth, War war) {
+    private void addInvolvedActiveWarRow(WarService warService, World world, int worldMonth, War war) {
         Dynasty opponent = warService.resolveOpponent(war, dynasty);
         if (opponent == null || opponent.isDefeated()) {
             return;
@@ -199,7 +207,6 @@ public class WarManagementPanel extends JPanel implements DynastyManagementDialo
         String declaredBy = declarer != null && declarer.getId() == dynasty.getId()
                 ? LanguageStrings.get(LanguageStrings.WAR_DECLARED_BY_YOU)
                 : (declarer != null ? declarer.getName() : "-");
-        int reputation = diplo != null ? diplo.getEffectiveDiplomaticReputation(opponent, world) : 0;
         WarStanding standing = warService.getStandingForDynasty(war, dynasty);
         ActiveWarRowData rowData = new ActiveWarRowData(war, opponent, true);
         displayedActiveWars.add(rowData);
@@ -211,7 +218,6 @@ public class WarManagementPanel extends JPanel implements DynastyManagementDialo
                 warService.formatStanding(standing),
                 warService.formatProgress(war),
                 opponent.getMilitaryPower(),
-                String.valueOf(reputation),
                 rowData
         });
     }
@@ -240,7 +246,6 @@ public class WarManagementPanel extends JPanel implements DynastyManagementDialo
                 war.getDurationMonths(worldMonth),
                 formatNeutralStanding(warService, war),
                 warService.formatProgress(war),
-                notApplicable,
                 notApplicable,
                 rowData
         });
@@ -297,22 +302,13 @@ public class WarManagementPanel extends JPanel implements DynastyManagementDialo
     }
 
     private Object[] buildHistoricWarRow(WarService warService, World world, War war, int worldMonth) {
-        Dynasty winner = warService.resolveWinner(war);
-        String winnerLabel;
-        if (winner == null) {
-            winnerLabel = LanguageStrings.get(LanguageStrings.WAR_WINNER_NONE);
-        } else if (winner.getId() == dynasty.getId()) {
-            winnerLabel = LanguageStrings.get(LanguageStrings.WAR_WINNER_YOU);
-        } else {
-            winnerLabel = winner.getName();
-        }
         return new Object[]{
                 warService.formatWarNameForDisplay(war, dynasty),
                 war.formatStartedDate(),
                 war.formatEndedDate(),
                 war.getDurationMonths(worldMonth),
                 war.formatConclusion(),
-                winnerLabel
+                warService.resolveWinnerDisplayName(war, dynasty)
         };
     }
 
@@ -480,7 +476,6 @@ public class WarManagementPanel extends JPanel implements DynastyManagementDialo
                 LanguageStrings.get(LanguageStrings.WAR_COL_STANDING),
                 LanguageStrings.get(LanguageStrings.WAR_COL_PROGRESS),
                 LanguageStrings.get(LanguageStrings.STAT_MILITARY_POWER),
-                LanguageStrings.get(LanguageStrings.DYNASTY_REPUTATION),
                 LanguageStrings.get(LanguageStrings.DYNASTY_ACTIONS)
         }, 0) {
             @Override
@@ -511,9 +506,16 @@ public class WarManagementPanel extends JPanel implements DynastyManagementDialo
         JTable table = new JTable(model);
         table.setRowHeight(45);
         table.setFocusable(false);
-        AssetStyles.styleDialogTable(table);
+        AssetStyles.applyScrollableDialogTable(table);
+        AssetStyles.applyTableColumnAlignment(table, COL_NAME, SwingConstants.LEFT);
+        AssetStyles.applyTableColumnAlignment(table, COL_DECLARED_BY, SwingConstants.LEFT);
+        AssetStyles.applyTableHeaderAlignment(table, COL_STARTED, SwingConstants.CENTER);
+        AssetStyles.applyTableHeaderAlignment(table, COL_DURATION, SwingConstants.RIGHT);
+        AssetStyles.applyTableHeaderAlignment(table, COL_STANDING, SwingConstants.CENTER);
+        AssetStyles.applyTableHeaderAlignment(table, COL_PROGRESS, SwingConstants.CENTER);
+        AssetStyles.applyTableHeaderAlignment(table, COL_MILITARY, SwingConstants.CENTER);
+        AssetStyles.applyTableHeaderAlignment(table, COL_ACTIONS, SwingConstants.CENTER);
         table.getColumnModel().getColumn(COL_MILITARY).setCellRenderer(new MilitaryPowerRenderer());
-        table.getColumnModel().getColumn(COL_REPUTATION).setCellRenderer(new ReputationRenderer());
         table.getColumnModel().getColumn(COL_STANDING).setCellRenderer(new StandingRenderer());
         table.getColumnModel().getColumn(COL_ACTIONS).setCellRenderer(new WarActionRenderer());
         table.getColumnModel().getColumn(COL_ACTIONS).setCellEditor(new WarActionEditor());
@@ -548,29 +550,24 @@ public class WarManagementPanel extends JPanel implements DynastyManagementDialo
         JTable table = new JTable(model);
         table.setRowHeight(40);
         table.setFocusable(false);
-        AssetStyles.styleDialogTable(table);
+        AssetStyles.applyScrollableDialogTable(table);
+        AssetStyles.applyTableColumnAlignment(table, HIST_COL_NAME, SwingConstants.LEFT);
+        AssetStyles.applyTableColumnAlignment(table, HIST_COL_STARTED, SwingConstants.CENTER);
+        AssetStyles.applyTableColumnAlignment(table, HIST_COL_ENDED, SwingConstants.CENTER);
+        AssetStyles.applyTableColumnAlignment(table, HIST_COL_DURATION, SwingConstants.RIGHT);
+        AssetStyles.applyTableColumnAlignment(table, HIST_COL_CONCLUSION, SwingConstants.LEFT);
+        AssetStyles.applyTableColumnAlignment(table, HIST_COL_WINNER, SwingConstants.LEFT);
         return table;
     }
 
     private void fitActiveColumns() {
-        AssetStyles.fitTableColumn(activeTable, COL_NAME, 180, 320);
-        AssetStyles.fitTableColumn(activeTable, COL_DECLARED_BY, 90, 160);
-        AssetStyles.fitTableColumn(activeTable, COL_STARTED, 90, 150);
-        AssetStyles.fitTableColumn(activeTable, COL_DURATION, 70, 110);
-        AssetStyles.fitTableColumn(activeTable, COL_STANDING, 90, 140);
-        AssetStyles.fitTableColumn(activeTable, COL_PROGRESS, 70, 100);
-        AssetStyles.fitTableColumn(activeTable, COL_MILITARY, 80, 130);
-        AssetStyles.fitTableColumn(activeTable, COL_REPUTATION, 70, 110);
-        AssetStyles.fitTableColumn(activeTable, COL_ACTIONS, 220, 320);
+        AssetStyles.relayoutTableInScrollPane(activeScrollPane,
+                new boolean[]{true, true, false, false, false, false, false, false});
     }
 
     private void fitHistoryColumns() {
-        AssetStyles.fitTableColumn(historyTable, HIST_COL_NAME, 180, 320);
-        AssetStyles.fitTableColumn(historyTable, HIST_COL_STARTED, 90, 150);
-        AssetStyles.fitTableColumn(historyTable, HIST_COL_ENDED, 90, 150);
-        AssetStyles.fitTableColumn(historyTable, HIST_COL_DURATION, 70, 110);
-        AssetStyles.fitTableColumn(historyTable, HIST_COL_CONCLUSION, 120, 220);
-        AssetStyles.fitTableColumn(historyTable, HIST_COL_WINNER, 90, 180);
+        AssetStyles.relayoutTableInScrollPane(historyScrollPane,
+                new boolean[]{true, false, false, false, true, true});
     }
 
     private static void styleEmptyLabel(JLabel label, String textKey) {
@@ -631,24 +628,6 @@ public class WarManagementPanel extends JPanel implements DynastyManagementDialo
             } else {
                 setText(value != null ? value.toString() : "");
                 setIcon(null);
-            }
-            setIconTextGap(6);
-            return this;
-        }
-    }
-
-    private class ReputationRenderer extends DefaultTableCellRenderer {
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                boolean hasFocus, int row, int column) {
-            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            setHorizontalAlignment(SwingConstants.CENTER);
-            String text = value != null ? value.toString() : "";
-            setText(text);
-            if (text.isEmpty() || LanguageStrings.get(LanguageStrings.WORLD_NA).equals(text)) {
-                setIcon(null);
-            } else {
-                setIcon(GameConstants.ICON_STAT_REPUTATION);
             }
             setIconTextGap(6);
             return this;

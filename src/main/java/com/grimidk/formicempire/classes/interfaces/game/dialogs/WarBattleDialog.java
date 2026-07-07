@@ -49,6 +49,7 @@ public class WarBattleDialog extends ZeroDialog {
     }
 
     public void showDialog() {
+        battlePanel.startAnimation();
         battlePanel.refreshScene();
         pack();
         setVisible(true);

@@ -17,6 +17,7 @@ public class DynastyDeathService {
 
     public void processDynastyDeaths(World world) {
         for (Dynasty dynasty : world.getDynastys()) {
+            markExtinctIfDepopulated(world, dynasty);
             if (dynasty.isDefeated()) continue;
             
             List<Colony> deadColonies = new ArrayList<>();
@@ -77,6 +78,18 @@ public class DynastyDeathService {
                 }
             }
         }
+    }
+
+    private void markExtinctIfDepopulated(World world, Dynasty dynasty) {
+        if (dynasty == null || dynasty.isDefeated()) {
+            return;
+        }
+        if (dynasty.hasLivingPopulation()) {
+            return;
+        }
+        dynasty.setDefeated(true);
+        world.getWarService().endWarsInvolving(dynasty);
+        System.out.println("[DynastyDeathService] Dynasty marked extinct (no ants): " + dynasty.getName());
     }
     
     private Hex findHexForColony(World world, Colony colony) {

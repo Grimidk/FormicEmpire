@@ -19,6 +19,7 @@ import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDiploma
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.styles.UiTableStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiDialogUtils;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
@@ -366,6 +367,7 @@ public class DynastyManagementDialog extends ZeroDialog {
     private class TradePanel extends JPanel implements LiveUpdatePanel {
         private JTable table;
         private DefaultTableModel model;
+        private JScrollPane tableScrollPane;
         private Colony activeColony;
         private JLabel activeColonyLabel;
         private boolean tunnelsVisible = true;
@@ -410,25 +412,33 @@ public class DynastyManagementDialog extends ZeroDialog {
             table = new JTable(model);
             table.setRowHeight(45);
             table.setFocusable(false);
-            AssetStyles.styleDialogTable(table);
+            AssetStyles.applyScrollableDialogTable(table);
+            AssetStyles.applyTableColumnAlignment(table, 0, SwingConstants.LEFT);
+            AssetStyles.applyTableColumnAlignment(table, 1, SwingConstants.LEFT);
 
             TradeRouteStatusRenderer routeStatusRenderer = new TradeRouteStatusRenderer();
             int outCol = tunnelsVisible ? 3 : 2;
             int inCol = tunnelsVisible ? 4 : 3;
+            AssetStyles.applyTableHeaderAlignment(table, outCol, SwingConstants.CENTER);
+            AssetStyles.applyTableHeaderAlignment(table, inCol, SwingConstants.CENTER);
             table.getColumnModel().getColumn(outCol).setCellRenderer(routeStatusRenderer);
             table.getColumnModel().getColumn(inCol).setCellRenderer(routeStatusRenderer);
             
             if (tunnelsVisible) {
+                AssetStyles.applyTableHeaderAlignment(table, 2, SwingConstants.CENTER);
                 table.getColumnModel().getColumn(2).setCellRenderer(new TunnelCellRenderer());
                 table.getColumnModel().getColumn(2).setCellEditor(new TunnelCellEditor());
                 table.getColumnModel().getColumn(5).setCellRenderer(new TradeActionRenderer());
                 table.getColumnModel().getColumn(5).setCellEditor(new TradeActionEditor());
+                AssetStyles.applyTableHeaderAlignment(table, 5, SwingConstants.CENTER);
             } else {
                 table.getColumnModel().getColumn(4).setCellRenderer(new TradeActionRenderer());
                 table.getColumnModel().getColumn(4).setCellEditor(new TradeActionEditor());
+                AssetStyles.applyTableHeaderAlignment(table, 4, SwingConstants.CENTER);
             }
 
-            add(new JScrollPane(table), BorderLayout.CENTER);
+            tableScrollPane = AssetStyles.wrapScrollableTable(table);
+            add(tableScrollPane, BorderLayout.CENTER);
             
             JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
             topPanel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
@@ -529,13 +539,13 @@ public class DynastyManagementDialog extends ZeroDialog {
             if (selectedRow >= 0 && selectedRow < table.getRowCount()) {
                 table.setRowSelectionInterval(selectedRow, selectedRow);
             }
-            int actionCol = table.getColumnCount() - 1;
-            AssetStyles.fitTableColumn(table, 0, 72, 140);
-            AssetStyles.fitTableColumn(table, 1, 96, 220);
             if (tunnelsVisible) {
-                AssetStyles.fitTableColumn(table, 2, 120, 200);
+                AssetStyles.relayoutTableInScrollPane(tableScrollPane,
+                        new boolean[]{false, true, false, false, false, false});
+            } else {
+                AssetStyles.relayoutTableInScrollPane(tableScrollPane,
+                        new boolean[]{false, true, false, false, false});
             }
-            AssetStyles.fitTableColumn(table, actionCol, 100, 140);
         }
 
         private Trade findIncomingTrade(Colony origin, Colony neighbor) {
@@ -1454,6 +1464,7 @@ public class DynastyManagementDialog extends ZeroDialog {
     private class DiplomacyPanel extends JPanel implements LiveUpdatePanel {
         private JTable table;
         private DefaultTableModel model;
+        private JScrollPane tableScrollPane;
         private final List<Dynasty> displayedDynasties = new ArrayList<>();
         private static final int COL_DYNASTY = 0;
         private static final int COL_SPECIES = 1;
@@ -1502,16 +1513,17 @@ public class DynastyManagementDialog extends ZeroDialog {
             table = new JTable(model);
             table.setRowHeight(45);
             table.setFocusable(false);
-            AssetStyles.styleDialogTable(table);
-            table.getColumnModel().getColumn(COL_DYNASTY).setPreferredWidth(200);
+            AssetStyles.applyScrollableDialogTable(table);
+            AssetStyles.applyTableColumnAlignment(table, COL_DYNASTY, SwingConstants.LEFT);
+            AssetStyles.applyTableHeaderAlignment(table, COL_SPECIES, SwingConstants.LEFT);
+            AssetStyles.applyTableHeaderAlignment(table, COL_REPUTATION, SwingConstants.CENTER);
+            AssetStyles.applyTableHeaderAlignment(table, COL_STANCE, SwingConstants.CENTER);
+            AssetStyles.applyTableHeaderAlignment(table, COL_MILITARY, SwingConstants.CENTER);
+            AssetStyles.applyTableHeaderAlignment(table, COL_ACTIONS, SwingConstants.CENTER);
             table.getColumnModel().getColumn(COL_SPECIES).setCellRenderer(new SpeciesRenderer());
-            table.getColumnModel().getColumn(COL_REPUTATION).setPreferredWidth(110);
             table.getColumnModel().getColumn(COL_REPUTATION).setCellRenderer(new ReputationScoreRenderer());
             table.getColumnModel().getColumn(COL_STANCE).setCellRenderer(new ReputationStanceRenderer());
-            table.getColumnModel().getColumn(COL_MILITARY).setPreferredWidth(110);
             table.getColumnModel().getColumn(COL_MILITARY).setCellRenderer(new MilitaryPowerScoreRenderer());
-            table.getColumnModel().getColumn(COL_ACTIONS).setMinWidth(280);
-            table.getColumnModel().getColumn(COL_ACTIONS).setPreferredWidth(280);
             table.getColumnModel().getColumn(COL_ACTIONS).setCellRenderer(new DiplomacyActionRenderer());
             table.getColumnModel().getColumn(COL_ACTIONS).setCellEditor(new DiplomacyActionEditor());
 
@@ -1538,7 +1550,8 @@ public class DynastyManagementDialog extends ZeroDialog {
                 }
             });
 
-            add(new JScrollPane(table), BorderLayout.CENTER);
+            tableScrollPane = AssetStyles.wrapScrollableTable(table);
+            add(tableScrollPane, BorderLayout.CENTER);
         }
 
         private class MilitaryPowerScoreRenderer extends DefaultTableCellRenderer {
@@ -1601,7 +1614,7 @@ public class DynastyManagementDialog extends ZeroDialog {
 
             List<Dynasty> others = new ArrayList<>();
             for (Dynasty other : world.getDynastys()) {
-                if (other != dynasty && !other.isDefeated()) {
+                if (other != dynasty && other.isActiveForDiplomacy()) {
                     others.add(other);
                 }
             }
@@ -1626,11 +1639,8 @@ public class DynastyManagementDialog extends ZeroDialog {
             if (selectedRow >= 0 && selectedRow < table.getRowCount()) {
                 table.setRowSelectionInterval(selectedRow, selectedRow);
             }
-            AssetStyles.fitTableColumn(table, COL_DYNASTY, 120, 260);
-            AssetStyles.fitTableColumn(table, COL_REPUTATION, 72, 130);
-            AssetStyles.fitTableColumn(table, COL_STANCE, 100, 200);
-            AssetStyles.fitTableColumn(table, COL_MILITARY, 80, 140);
-            AssetStyles.fitTableColumn(table, COL_ACTIONS, 300, 540);
+            AssetStyles.relayoutTableInScrollPane(tableScrollPane,
+                    new boolean[]{true, false, false, false, false, true});
         }
 
         private void performPactAction(Dynasty other) {
@@ -2071,6 +2081,7 @@ public class DynastyManagementDialog extends ZeroDialog {
     private class OverviewPanel extends JPanel implements LiveUpdatePanel {
         private JTable table;
         private DefaultTableModel model;
+        private JScrollPane tableScrollPane;
         private List<Colony> displayedColonies;
         private final boolean showAutoBuild;
         private final boolean showAutomation;
@@ -2227,13 +2238,16 @@ public class DynastyManagementDialog extends ZeroDialog {
 
             table = new JTable(model);
             table.setRowHeight(45);
-            AssetStyles.styleDialogTable(table);
+            AssetStyles.applyScrollableDialogTable(table);
             table.setFocusable(false);
             
-            table.getColumnModel().getColumn(0).setMaxWidth(50);
-            table.getColumnModel().getColumn(0).setPreferredWidth(50);
-            table.getColumnModel().getColumn(1).setPreferredWidth(100);
-            table.getColumnModel().getColumn(2).setPreferredWidth(80);
+            AssetStyles.applyTableHeaderAlignment(table, 0, SwingConstants.CENTER);
+            AssetStyles.applyTableColumnAlignment(table, 1, SwingConstants.LEFT);
+            AssetStyles.applyTableHeaderAlignment(table, 2, SwingConstants.CENTER);
+            AssetStyles.applyTableColumnAlignment(table, 3, SwingConstants.LEFT);
+            AssetStyles.applyTableHeaderAlignment(table, 4, SwingConstants.RIGHT);
+            AssetStyles.applyTableHeaderAlignment(table, 5, SwingConstants.CENTER);
+            AssetStyles.applyTableColumnAlignment(table, 6, SwingConstants.LEFT);
             
             DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
             centerRenderer.setHorizontalAlignment(JLabel.CENTER);
@@ -2248,15 +2262,13 @@ public class DynastyManagementDialog extends ZeroDialog {
             };
             
             table.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
-            table.getColumnModel().getColumn(3).setPreferredWidth(200); 
-            table.getColumnModel().getColumn(4).setPreferredWidth(100);
-            table.getColumnModel().getColumn(5).setPreferredWidth(80);
+            table.getColumnModel().getColumn(4).setCellRenderer(UiTableStyles.createNumericCellRenderer());
             table.getColumnModel().getColumn(5).setCellRenderer(paddedRenderer);
             table.getColumnModel().getColumn(6).setCellRenderer(new OverviewBiomeRenderer());
-            table.getColumnModel().getColumn(loyaltyCol).setPreferredWidth(140);
             table.getColumnModel().getColumn(loyaltyCol).setCellRenderer(new LoyaltyCellRenderer());
-            table.getColumnModel().getColumn(militaryCol).setPreferredWidth(110);
+            AssetStyles.applyTableHeaderAlignment(table, loyaltyCol, SwingConstants.CENTER);
             table.getColumnModel().getColumn(militaryCol).setCellRenderer(new MilitaryPowerCellRenderer());
+            AssetStyles.applyTableHeaderAlignment(table, militaryCol, SwingConstants.CENTER);
 
             table.addMouseMotionListener(new MouseMotionAdapter() {
                 @Override
@@ -2286,12 +2298,12 @@ public class DynastyManagementDialog extends ZeroDialog {
                 AssetStyles.styleTableBooleanColumn(table, automationCol);
             }
 
-            table.getColumnModel().getColumn(actionCol).setMinWidth(120);
-            table.getColumnModel().getColumn(actionCol).setPreferredWidth(120);
             table.getColumnModel().getColumn(actionCol).setCellRenderer(new ActionPanelRenderer());
             table.getColumnModel().getColumn(actionCol).setCellEditor(new ActionPanelEditor());
+            AssetStyles.applyTableHeaderAlignment(table, actionCol, SwingConstants.CENTER);
 
-            add(new JScrollPane(table), BorderLayout.CENTER);
+            tableScrollPane = AssetStyles.wrapScrollableTable(table);
+            add(tableScrollPane, BorderLayout.CENTER);
         }
 
         @Override
@@ -2348,11 +2360,11 @@ public class DynastyManagementDialog extends ZeroDialog {
                 model.addRow(rowData);
             }
             if (selectedRow >= 0 && selectedRow < table.getRowCount()) table.setRowSelectionInterval(selectedRow, selectedRow);
-            AssetStyles.fitTableColumn(table, 0, 40, 52);
-            AssetStyles.fitTableColumn(table, 3, 120, 280);
-            AssetStyles.fitTableColumn(table, loyaltyCol, 100, 220);
-            AssetStyles.fitTableColumn(table, militaryCol, 80, 140);
-            AssetStyles.fitTableColumn(table, actionCol, 120, 180);
+            boolean[] growable = new boolean[model.getColumnCount()];
+            growable[3] = true;
+            growable[loyaltyCol] = true;
+            growable[actionCol] = true;
+            AssetStyles.relayoutTableInScrollPane(tableScrollPane, growable);
         }
 
         private class MilitaryPowerCellRenderer extends DefaultTableCellRenderer {

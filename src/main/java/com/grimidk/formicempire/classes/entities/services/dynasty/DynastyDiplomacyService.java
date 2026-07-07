@@ -26,6 +26,10 @@ import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
 public class DynastyDiplomacyService {
 
+    public static boolean isDiplomaticallyContactable(Dynasty dynasty) {
+        return dynasty != null && dynasty.isActiveForDiplomacy();
+    }
+
     public static boolean meetsWarDeclarationPopulationRequirement(Dynasty dynasty) {
         if (dynasty == null || dynasty.isDefeated()) {
             return false;
@@ -103,7 +107,7 @@ public class DynastyDiplomacyService {
     }
 
     public boolean canFormNonAggressionPact(Dynasty other) {
-        if (other == null || other == dynasty || dynasty.isDefeated() || other.isDefeated()) {
+        if (other == null || other == dynasty || !isDiplomaticallyContactable(dynasty) || !isDiplomaticallyContactable(other)) {
             return false;
         }
         if (hasNonAggressionPact(other)) {
@@ -222,7 +226,7 @@ public class DynastyDiplomacyService {
     }
 
     public void applyWar(Dynasty other, TradeManager tradeManager, World world) {
-        if (other == null || other == dynasty || dynasty.isDefeated() || other.isDefeated()) {
+        if (other == null || other == dynasty || !isDiplomaticallyContactable(dynasty) || !isDiplomaticallyContactable(other)) {
             return;
         }
         if (isAtWarWith(other)) {
@@ -250,7 +254,7 @@ public class DynastyDiplomacyService {
     }
 
     public boolean canDeclareWar(Dynasty other, World world) {
-        if (other == null || other == dynasty || dynasty.isDefeated() || other.isDefeated()) {
+        if (other == null || other == dynasty || !isDiplomaticallyContactable(dynasty) || !isDiplomaticallyContactable(other)) {
             return false;
         }
         if (!meetsWarDeclarationPopulationRequirement(dynasty)) {
@@ -601,7 +605,7 @@ public class DynastyDiplomacyService {
     }
 
     public boolean canParticipateInCrossDynastyTrade(Dynasty other, Colony localColony, World world) {
-        if (other == null || other == dynasty || dynasty.isDefeated() || other.isDefeated()) {
+        if (other == null || other == dynasty || !isDiplomaticallyContactable(dynasty) || !isDiplomaticallyContactable(other)) {
             return false;
         }
         if (isAtWarWith(other)) {
@@ -625,7 +629,7 @@ public class DynastyDiplomacyService {
     }
 
     public boolean canProposeCrossDynastyTrade(Dynasty other, World world, CrossDynastyTradeProposal.Kind kind) {
-        if (other == null || other == dynasty || dynasty.isDefeated() || other.isDefeated()) {
+        if (other == null || other == dynasty || !isDiplomaticallyContactable(dynasty) || !isDiplomaticallyContactable(other)) {
             return false;
         }
         maybeRecoverDeclinedTradeRequest(other, world);
@@ -770,7 +774,7 @@ public class DynastyDiplomacyService {
 
         CrossDynastyTradeProposal proposal = pending.get(0);
         Dynasty proposer = world.findDynastyById(proposal.getFromDynastyId());
-        if (proposer == null || proposer.isDefeated()) {
+        if (proposer == null || !isDiplomaticallyContactable(proposer)) {
             dynasty.removePendingTradeProposal(proposal);
             return;
         }
@@ -952,7 +956,7 @@ public class DynastyDiplomacyService {
         if (originDynasty == null || destinationDynasty == null) {
             return false;
         }
-        if (originDynasty.isDefeated() || destinationDynasty.isDefeated()) {
+        if (!isDiplomaticallyContactable(originDynasty) || !isDiplomaticallyContactable(destinationDynasty)) {
             return false;
         }
         if (!meetsTradeLoyaltyRequirement(origin)) {

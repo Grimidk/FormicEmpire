@@ -23,6 +23,8 @@ import java.util.Map;
 
 public class AbilitiesDialog extends ZeroDialog {
 
+    private static final int ACTION_PANEL_WIDTH = 130;
+
     private final Colony colony;
     private final JPanel listPanel;
     private final JLabel researchPointsLabel;
@@ -215,56 +217,19 @@ public class AbilitiesDialog extends ZeroDialog {
     }
 
     private JPanel createAbilityPanel(String title, String desc, int rpCost, java.awt.event.ActionListener action, boolean enabled, String tooltip) {
-        JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBackground(AssetStyles.UI_BG_SECONDARY);
-        
-        TitledBorder border = new TitledBorder(AssetStyles.PANEL_BORDER, title);
-        border.setTitleColor(AssetStyles.TEXT_HEADER);
-        border.setTitleFont(AssetStyles.FONT_BOLD);
-        panel.setBorder(border);
-
-        JTextArea descriptionArea = new JTextArea(desc);
-        descriptionArea.setWrapStyleWord(true);
-        descriptionArea.setLineWrap(true);
-        descriptionArea.setEditable(false);
-        descriptionArea.setFocusable(false);
-        descriptionArea.setBackground(panel.getBackground());
-        descriptionArea.setForeground(AssetStyles.TEXT_NORMAL);
-        descriptionArea.setFont(AssetStyles.FONT_NORMAL);
-        
-        panel.add(descriptionArea, BorderLayout.CENTER);
-
-        JPanel actionPanel = new JPanel();
-        actionPanel.setOpaque(false);
-        actionPanel.setLayout(new BoxLayout(actionPanel, BoxLayout.Y_AXIS));
-        
-        JButton btn = new JButton(LanguageStrings.get(LanguageStrings.UI_TRIGGER));
-        btn.setEnabled(enabled);
-        AssetStyles.styleButton(btn);
-        btn.setFocusable(false);
-        btn.addActionListener(action);
-        
-        if (!enabled && tooltip != null) {
-            btn.setToolTipText(tooltip);
-        } else {
-            btn.setToolTipText(null);
-        }
-        
-        JLabel costLabel = new JLabel(LanguageStrings.format(LanguageStrings.UPGRADE_COST_RP, rpCost));
-        costLabel.setForeground(AssetStyles.TEXT_NORMAL);
-        costLabel.setFont(AssetStyles.FONT_BOLD);
-        costLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        btn.setAlignmentX(Component.CENTER_ALIGNMENT);
-        
-        actionPanel.add(costLabel);
-        actionPanel.add(Box.createVerticalStrut(5));
-        actionPanel.add(btn);
-        
-        panel.add(actionPanel, BorderLayout.EAST);
-        return panel;
+        return createAbilityPanel(title, desc,
+                LanguageStrings.format(LanguageStrings.UPGRADE_COST_RP, rpCost),
+                action, enabled, tooltip);
     }
 
     private JPanel createResourceAbilityPanel(String title, String desc, int resourceCost, String resourceName,
+            java.awt.event.ActionListener action, boolean enabled, String tooltip) {
+        return createAbilityPanel(title, desc,
+                String.format(LanguageStrings.get(LanguageStrings.ABILITY_COST_RESOURCE_FMT), resourceCost, resourceName),
+                action, enabled, tooltip);
+    }
+
+    private JPanel createAbilityPanel(String title, String desc, String costText,
             java.awt.event.ActionListener action, boolean enabled, String tooltip) {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBackground(AssetStyles.UI_BG_SECONDARY);
@@ -283,16 +248,33 @@ public class AbilitiesDialog extends ZeroDialog {
         descriptionArea.setForeground(AssetStyles.TEXT_NORMAL);
         descriptionArea.setFont(AssetStyles.FONT_NORMAL);
         panel.add(descriptionArea, BorderLayout.CENTER);
+        panel.add(createActionPanel(costText, action, enabled, tooltip), BorderLayout.EAST);
+        return panel;
+    }
 
+    private JPanel createActionPanel(String costText, java.awt.event.ActionListener action,
+            boolean enabled, String tooltip) {
         JPanel actionPanel = new JPanel();
         actionPanel.setOpaque(false);
         actionPanel.setLayout(new BoxLayout(actionPanel, BoxLayout.Y_AXIS));
+        actionPanel.setBorder(new EmptyBorder(0, 0, 0, 5));
+        actionPanel.setPreferredSize(new Dimension(ACTION_PANEL_WIDTH, 0));
+        actionPanel.setMinimumSize(new Dimension(ACTION_PANEL_WIDTH, 0));
+
+        JLabel costLabel = new JLabel(costText);
+        costLabel.setForeground(AssetStyles.TEXT_NORMAL);
+        costLabel.setFont(AssetStyles.FONT_BOLD);
+        costLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        costLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        costLabel.setMaximumSize(new Dimension(ACTION_PANEL_WIDTH, Integer.MAX_VALUE));
 
         JButton btn = new JButton(LanguageStrings.get(LanguageStrings.UI_TRIGGER));
         btn.setEnabled(enabled);
         AssetStyles.styleButton(btn);
         btn.setFocusable(false);
         btn.addActionListener(action);
+        btn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btn.setMaximumSize(new Dimension(ACTION_PANEL_WIDTH, btn.getPreferredSize().height));
 
         if (!enabled && tooltip != null) {
             btn.setToolTipText(tooltip);
@@ -300,19 +282,10 @@ public class AbilitiesDialog extends ZeroDialog {
             btn.setToolTipText(null);
         }
 
-        JLabel costLabel = new JLabel(String.format(
-                LanguageStrings.get(LanguageStrings.ABILITY_COST_RESOURCE_FMT), resourceCost, resourceName));
-        costLabel.setForeground(AssetStyles.TEXT_NORMAL);
-        costLabel.setFont(AssetStyles.FONT_BOLD);
-        costLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        btn.setAlignmentX(Component.CENTER_ALIGNMENT);
-
         actionPanel.add(costLabel);
-        actionPanel.add(Box.createVerticalStrut(5));
+        actionPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         actionPanel.add(btn);
-
-        panel.add(actionPanel, BorderLayout.EAST);
-        return panel;
+        return actionPanel;
     }
     
     @Override

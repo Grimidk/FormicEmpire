@@ -539,6 +539,7 @@ public class SaveManager {
                     sc.parasiteAnts = c.getParasiteAnts();
                     sc.parasiticMites = c.getParasiticMites();
                     sc.pheromoneStormMonthsRemaining = c.getPheromoneStormMonthsRemaining();
+                    sc.recentlyConqueredMonthsRemaining = c.getRecentlyConqueredMonthsRemaining();
                     sc.creatineDietMonthsRemaining = c.getCreatineDietMonthsRemaining();
                     sc.totalDeaths = c.getTotalDeaths();
                     sc.militaryPower = c.getMilitaryPower();
@@ -748,6 +749,7 @@ public class SaveManager {
         writeJsonLine(w, "parasiteAnts", sc.parasiteAnts, false);
         writeJsonLine(w, "parasiticMites", sc.parasiticMites, false);
         writeJsonLine(w, "pheromoneStormMonthsRemaining", sc.pheromoneStormMonthsRemaining, false);
+        writeJsonLine(w, "recentlyConqueredMonthsRemaining", sc.recentlyConqueredMonthsRemaining, false);
         writeJsonLine(w, "creatineDietMonthsRemaining", sc.creatineDietMonthsRemaining, false);
         writeJsonLine(w, "totalDeaths", sc.totalDeaths, false);
 
@@ -1009,6 +1011,8 @@ public class SaveManager {
         sc.parasiteAnts = Integer.parseInt(map.getOrDefault("parasiteAnts", map.getOrDefault("parasites", "0")));
         sc.parasiticMites = Integer.parseInt(map.getOrDefault("parasiticMites", "0"));
         sc.pheromoneStormMonthsRemaining = Integer.parseInt(map.getOrDefault("pheromoneStormMonthsRemaining", "0"));
+        sc.recentlyConqueredMonthsRemaining = Integer.parseInt(
+                map.getOrDefault("recentlyConqueredMonthsRemaining", "0"));
         sc.creatineDietMonthsRemaining = Integer.parseInt(map.getOrDefault("creatineDietMonthsRemaining", "0"));
         sc.totalDeaths = Integer.parseInt(map.getOrDefault("totalDeaths", "0"));
         
@@ -1701,11 +1705,26 @@ public class SaveManager {
             engine.setOverworldAutoRecenter(Boolean.parseBoolean(m.getOrDefault("overworldAutoRecenter",
                     String.valueOf(engine.isOverworldAutoRecenter()))));
             engine.setDarkMode(Boolean.parseBoolean(m.getOrDefault("darkMode", String.valueOf(engine.isDarkMode()))));
-            engine.setDefaultRoleWorker(Integer.parseInt(m.getOrDefault("defaultRoleWorker", String.valueOf(engine.getDefaultRoleWorker()))));
-            engine.setDefaultRoleSoldier(Integer.parseInt(m.getOrDefault("defaultRoleSoldier", String.valueOf(engine.getDefaultRoleSoldier()))));
-            engine.setDefaultRoleMajor(Integer.parseInt(m.getOrDefault("defaultRoleMajor", String.valueOf(engine.getDefaultRoleMajor()))));
-            engine.setDefaultRolePrincess(Integer.parseInt(m.getOrDefault("defaultRolePrincess", String.valueOf(engine.getDefaultRolePrincess()))));
-            engine.setDefaultRoleQueen(Integer.parseInt(m.getOrDefault("defaultRoleQueen", String.valueOf(engine.getDefaultRoleQueen()))));
+            engine.setDefaultRoleWorker(Engine.sanitizeDefaultRoleId(
+                    GameConstants.TYPE_WORKER,
+                    Integer.parseInt(m.getOrDefault("defaultRoleWorker", String.valueOf(engine.getDefaultRoleWorker()))),
+                    GameConstants.ROLE_FORAGER.getId()));
+            engine.setDefaultRoleSoldier(Engine.sanitizeDefaultRoleId(
+                    GameConstants.TYPE_SOLDIER,
+                    Integer.parseInt(m.getOrDefault("defaultRoleSoldier", String.valueOf(engine.getDefaultRoleSoldier()))),
+                    GameConstants.ROLE_HUNTER.getId()));
+            engine.setDefaultRoleMajor(Engine.sanitizeDefaultRoleId(
+                    GameConstants.TYPE_MAJOR,
+                    Integer.parseInt(m.getOrDefault("defaultRoleMajor", String.valueOf(engine.getDefaultRoleMajor()))),
+                    GameConstants.ROLE_CARRIER.getId()));
+            engine.setDefaultRolePrincess(Engine.sanitizeDefaultRoleId(
+                    GameConstants.TYPE_PRINCESS,
+                    Integer.parseInt(m.getOrDefault("defaultRolePrincess", String.valueOf(engine.getDefaultRolePrincess()))),
+                    GameConstants.ROLE_BREEDER.getId()));
+            engine.setDefaultRoleQueen(Engine.sanitizeDefaultRoleId(
+                    GameConstants.TYPE_QUEEN,
+                    Integer.parseInt(m.getOrDefault("defaultRoleQueen", String.valueOf(engine.getDefaultRoleQueen()))),
+                    GameConstants.ROLE_LAYER.getId()));
 
             System.out.println("[SaveManager] Global settings loaded.");
         } catch (Exception e) {
@@ -1755,7 +1774,13 @@ public class SaveManager {
             sb.append("\"capturedColonyIds\":\"").append(escapeJsonString(
                     war.capturedColonyIds != null ? war.capturedColonyIds : "")).append("\",");
             sb.append("\"capturedByDynastyIds\":\"").append(escapeJsonString(
-                    war.capturedByDynastyIds != null ? war.capturedByDynastyIds : "")).append("\"");
+                    war.capturedByDynastyIds != null ? war.capturedByDynastyIds : "")).append("\",");
+            sb.append("\"dynastyNameA\":\"").append(escapeJsonString(
+                    war.dynastyNameA != null ? war.dynastyNameA : "")).append("\",");
+            sb.append("\"dynastyNameB\":\"").append(escapeJsonString(
+                    war.dynastyNameB != null ? war.dynastyNameB : "")).append("\",");
+            sb.append("\"winnerDynastyName\":\"").append(escapeJsonString(
+                    war.winnerDynastyName != null ? war.winnerDynastyName : "")).append("\"");
             sb.append("}");
             if (i < wars.size() - 1) {
                 sb.append(",");
@@ -1785,8 +1810,11 @@ public class SaveManager {
             if (c == '}') {
                 braceDepth--;
                 if (braceDepth == 0) {
-                    String warJson = content.substring(start, i + 1);
-                    if (!warJson.trim().isEmpty()) {
+                    String warJson = content.substring(start, i + 1).trim();
+                    if (warJson.startsWith(",")) {
+                        warJson = warJson.substring(1).trim();
+                    }
+                    if (!warJson.isEmpty() && warJson.startsWith("{")) {
                         Map<String, String> map = parseTopLevelJson(warJson);
                         Savefile.SavedWar war = new Savefile.SavedWar();
                         war.id = Integer.parseInt(map.getOrDefault("id", "0"));
@@ -1823,7 +1851,12 @@ public class SaveManager {
                         war.stageStartActiveDefender = Integer.parseInt(map.getOrDefault("stageStartActiveDefender", "0"));
                         war.capturedColonyIds = map.getOrDefault("capturedColonyIds", "");
                         war.capturedByDynastyIds = map.getOrDefault("capturedByDynastyIds", "");
-                        list.add(war);
+                        war.dynastyNameA = map.getOrDefault("dynastyNameA", null);
+                        war.dynastyNameB = map.getOrDefault("dynastyNameB", null);
+                        war.winnerDynastyName = map.getOrDefault("winnerDynastyName", null);
+                        if (War.isValidRecord(war.dynastyIdA, war.dynastyIdB)) {
+                            list.add(war);
+                        }
                     }
                     start = i + 1;
                 }

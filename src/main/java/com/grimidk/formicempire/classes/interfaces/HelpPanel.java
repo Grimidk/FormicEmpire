@@ -46,8 +46,6 @@ import java.util.stream.Collectors;
 public class HelpPanel extends JPanel {
     private final MainFrame frame;
     private final JTabbedPane mainTabs;
-    private final JButton creditsButton;
-    private final JButton roadmapButton;
     private final JButton backButton;
 
     public HelpPanel(MainFrame frame) {
@@ -59,8 +57,6 @@ public class HelpPanel extends JPanel {
         AssetStyles.styleTabbedPane(mainTabs);
 
         backButton = new JButton();
-        creditsButton = new JButton();
-        roadmapButton = new JButton();
         
         initTabs();
         
@@ -69,22 +65,12 @@ public class HelpPanel extends JPanel {
 
         JPanel southPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         southPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
-        
-        AssetStyles.styleButton(creditsButton);
-        creditsButton.addActionListener(e -> showCreditsDialog(this));
-
-        AssetStyles.styleButton(roadmapButton);
-        roadmapButton.addActionListener(e -> showRoadmapDialog(this));
 
         AssetStyles.styleButton(backButton);
         backButton.addActionListener(e -> this.frame.showCard(MainFrame.CARD_INIT));
         
-        setupButtonNavigation(creditsButton);
-        setupButtonNavigation(roadmapButton);
         setupButtonNavigation(backButton);
         
-        southPanel.add(creditsButton);
-        southPanel.add(roadmapButton);
         southPanel.add(backButton);
         add(southPanel, BorderLayout.SOUTH);
         
@@ -124,8 +110,6 @@ public class HelpPanel extends JPanel {
     
     public void refreshTranslations() {
         backButton.setText(LanguageStrings.get(LanguageStrings.UI_BACK));
-        creditsButton.setText(LanguageStrings.get(LanguageStrings.UI_CREDITS));
-        roadmapButton.setText(LanguageStrings.get(LanguageStrings.UI_ROADMAP));
         
         // Update tab titles
         String[] titles = {
@@ -156,8 +140,6 @@ public class HelpPanel extends JPanel {
     public void refreshTheme() {
         setBackground(AssetStyles.BACKGROUND_COLOR);
         AssetStyles.styleTabbedPane(mainTabs);
-        AssetStyles.styleButton(creditsButton);
-        AssetStyles.styleButton(roadmapButton);
         AssetStyles.styleButton(backButton);
         int selected = mainTabs.getSelectedIndex();
         initTabs();

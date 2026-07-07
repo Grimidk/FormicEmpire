@@ -30,6 +30,14 @@ class DynastyDiplomacyServiceTest {
     void setUp() {
         player = new Dynasty(1, "Player Dynasty", true, GameConstants.SPECIES_OMNI);
         neighbor = new Dynasty(2, "Wild Dynasty", false, GameConstants.SPECIES_OMNI);
+        seedDiplomaticPopulation(player);
+        seedDiplomaticPopulation(neighbor);
+    }
+
+    private static void seedDiplomaticPopulation(Dynasty dynasty) {
+        Colony colony = new Colony(dynasty.getId() * 100, "Capital", dynasty.isPlayer());
+        colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+        dynasty.addColony(colony);
     }
 
     @Test

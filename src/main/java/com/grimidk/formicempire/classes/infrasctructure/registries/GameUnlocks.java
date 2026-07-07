@@ -73,9 +73,6 @@ public final class GameUnlocks {
         // TODO asset: icons/roles/Potter.png (upgrade tree icon; may diverge from role icon)
         public static final Upgrade ROLE_POTTER = new Upgrade(19, "ROLE_POTTER_UPGRADE", "ROLE_POTTER_FLAVOR", "ROLE_POTTER_DESC", TYPE_WORKER, 0, null );
         static { upgrades.add(ROLE_POTTER); }
-        // TODO asset: icons/roles/Guard.png (upgrade tree icon; may diverge from role icon)
-        public static final Upgrade ROLE_GUARD = new Upgrade(20, "ROLE_GUARD_UPGRADE", "ROLE_GUARD_FLAVOR", "ROLE_GUARD_DESC", TYPE_SOLDIER, 0, null );
-        static { upgrades.add(ROLE_GUARD); }
         // TODO asset: icons/roles/Warrior.png (upgrade tree icon; may diverge from role icon)
         public static final Upgrade ROLE_WARRIOR = new Upgrade(21, "ROLE_WARRIOR_UPGRADE", "ROLE_WARRIOR_FLAVOR", "ROLE_WARRIOR_DESC", TYPE_SOLDIER, 0, null );
         static { upgrades.add(ROLE_WARRIOR); }
@@ -330,12 +327,15 @@ public final class GameUnlocks {
         public static final Upgrade ASSIMILATED_MULTIQUEEN = new Upgrade(1002, "ASSIMILATED_MULTIQUEEN", "ASSIMILATED_MULTIQUEEN_FLAVOR", "ASSIMILATED_MULTIQUEEN_DESC", ABILITY_ASSIMILATION, 0, null );
         static { upgrades.add(ASSIMILATED_MULTIQUEEN); }
         // TODO asset: icons/upgrades/AssimilatedTrapjaw.png; icons/species/Trapjaw.png (placeholder — replace final art)
+        // TODO subtype: Trap-jaw ant variant (hatch-rate assignment + per-role sprites)
         public static final Upgrade ASSIMILATED_TRAPJAW = new Upgrade(1003, "ASSIMILATED_TRAPJAW", "ASSIMILATED_TRAPJAW_FLAVOR", "ASSIMILATED_TRAPJAW_DESC", ABILITY_ASSIMILATION, 0, null );
         static { upgrades.add(ASSIMILATED_TRAPJAW); }
         // TODO asset: icons/upgrades/AssimilatedHoneypot.png; icons/species/Honeypot.png (placeholder — replace final art)
+        // TODO subtype: Honey-pot ant variant (hatch-rate assignment + per-role sprites)
         public static final Upgrade ASSIMILATED_HONEYPOT = new Upgrade(1004, "ASSIMILATED_HONEYPOT", "ASSIMILATED_HONEYPOT_FLAVOR", "ASSIMILATED_HONEYPOT_DESC", ABILITY_ASSIMILATION, 0, null );
         static { upgrades.add(ASSIMILATED_HONEYPOT); }
         // TODO asset: icons/upgrades/AssimilatedDoorhead.png; icons/species/Turtle.png (placeholder — replace final art)
+        // TODO subtype: Door-head / Turtle ant variant (hatch-rate assignment + per-role sprites)
         public static final Upgrade ASSIMILATED_DOORHEAD = new Upgrade(1005, "ASSIMILATED_DOORHEAD", "ASSIMILATED_DOORHEAD_FLAVOR", "ASSIMILATED_DOORHEAD_DESC", ABILITY_ASSIMILATION, 0, null );
         static { upgrades.add(ASSIMILATED_DOORHEAD); }
         // TODO asset: icons/upgrades/AssimilatedWoodburrow.png; icons/species/Carpenter.png (placeholder — replace final art)
@@ -357,6 +357,7 @@ public final class GameUnlocks {
         public static final Upgrade ASSIMILATED_GLIDING = new Upgrade(1011, "ASSIMILATED_GLIDING", "ASSIMILATED_GLIDING_FLAVOR", "ASSIMILATED_GLIDING_DESC", ABILITY_ASSIMILATION, 0, null );
         static { upgrades.add(ASSIMILATED_GLIDING); }
         // TODO asset: icons/upgrades/AssimilatedStinging.png; icons/species/Bullet.png (placeholder — replace final art)
+        // TODO subtype: Bullet ant variant (hatch-rate assignment + per-role sprites)
         public static final Upgrade ASSIMILATED_STINGING = new Upgrade(1012, "ASSIMILATED_STINGING", "ASSIMILATED_STINGING_FLAVOR", "ASSIMILATED_STINGING_DESC", ABILITY_ASSIMILATION, 0, null );
         static { upgrades.add(ASSIMILATED_STINGING); }
         // TODO asset: icons/upgrades/AssimilatedSwarming.png; icons/species/Army.png (placeholder — replace final art)
@@ -371,7 +372,7 @@ public final class GameUnlocks {
         // TODO asset: icons/upgrades/AssimilatedHeatresist.png; icons/species/Silver.png (placeholder — replace final art)
         public static final Upgrade ASSIMILATED_HEATRESIST = new Upgrade(1016, "ASSIMILATED_HEATRESIST", "ASSIMILATED_HEATRESIST_FLAVOR", "ASSIMILATED_HEATRESIST_DESC", ABILITY_ASSIMILATION, 0, null );
         static { upgrades.add(ASSIMILATED_HEATRESIST); }
-        // TODO asset: icons/upgrades/AssimilatedDeadlyvenom.png; icons/species/Harvester.png (placeholder — replace final art)
+        // TODO asset: icons/upgrades/AssimilatedDeadlyvenom.png; icons/species/Maricopa.png (placeholder — replace final art)
         public static final Upgrade ASSIMILATED_DEADLYVENOM = new Upgrade(1017, "ASSIMILATED_DEADLYVENOM", "ASSIMILATED_DEADLYVENOM_FLAVOR", "ASSIMILATED_DEADLYVENOM_DESC", ABILITY_ASSIMILATION, 0, null );
         static { upgrades.add(ASSIMILATED_DEADLYVENOM); }
         // TODO asset: icons/upgrades/AssimilatedSelfdestruct.png; icons/species/Exploding.png (placeholder — replace final art)
@@ -612,7 +613,7 @@ public final class GameUnlocks {
         // TODO asset: icons/assimilations/Silver.png; icons/species/Silver.png (placeholder — replace final art)
         public static final Assimilation ASSIMILATION_HEATRESIST = new Assimilation(17, "ASSIMILATION_HEATRESIST", "ASSIMILATION_HEATRESIST_DESC", ASSIMILATED_HEATRESIST, ASSIMILATION_COST, null);
         static { assimilations.add(ASSIMILATION_HEATRESIST); }
-        // TODO asset: icons/assimilations/Harvester.png; icons/species/Harvester.png (placeholder — replace final art)
+        // TODO asset: icons/assimilations/Maricopa.png; icons/species/Maricopa.png (placeholder — replace final art)
         public static final Assimilation ASSIMILATION_DEADLYVENOM = new Assimilation(18, "ASSIMILATION_DEADLYVENOM", "ASSIMILATION_DEADLYVENOM_DESC", ASSIMILATED_DEADLYVENOM, ASSIMILATION_COST, null);
         static { assimilations.add(ASSIMILATION_DEADLYVENOM); }
         // TODO asset: icons/assimilations/Exploding.png; icons/species/Exploding.png (placeholder — replace final art)

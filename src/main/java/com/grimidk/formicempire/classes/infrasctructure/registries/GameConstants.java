@@ -630,12 +630,8 @@ public final class GameConstants {
     static { antRoles.add(ROLE_MINER); }
     public static final AntRole ROLE_COURIER = new AntRole(9, TYPE_WORKER, LanguageStrings.ROLE_COURIER, loadIcon("icons/roles/Courier.png"));
     static { antRoles.add(ROLE_COURIER); }
-    // TODO asset: icons/roles/Potter.png
     public static final AntRole ROLE_POTTER = new AntRole(10, TYPE_WORKER, LanguageStrings.ROLE_POTTER, loadIcon("icons/roles/Potter.png"));
     static { antRoles.add(ROLE_POTTER); }
-    // TODO asset: icons/roles/Guard.png
-    public static final AntRole ROLE_GUARD = new AntRole(11, TYPE_SOLDIER, LanguageStrings.ROLE_GUARD, loadIcon("icons/roles/Guard.png"));
-    static { antRoles.add(ROLE_GUARD); }
     public static final AntRole ROLE_WARRIOR = new AntRole(12, TYPE_SOLDIER, LanguageStrings.ROLE_WARRIOR, loadIcon("icons/roles/Warrior.png"));
     static { antRoles.add(ROLE_WARRIOR); }
     public static final AntRole ROLE_DEFENDER = new AntRole(13, TYPE_SOLDIER, LanguageStrings.ROLE_DEFENDER, loadIcon("icons/roles/Defender.png"));
@@ -651,7 +647,6 @@ public final class GameConstants {
     // TODO asset: icons/roles/Carrier.png
     public static final AntRole ROLE_CARRIER = new AntRole(18, TYPE_MAJOR, LanguageStrings.ROLE_CARRIER, loadIcon("icons/roles/Carrier.png"));
     static { antRoles.add(ROLE_CARRIER); }
-    // TODO asset: icons/roles/Artillery.png
     public static final AntRole ROLE_ARTILLERY = new AntRole(19, TYPE_MAJOR, LanguageStrings.ROLE_ARTILLERY, loadIcon("icons/roles/Artillery.png"));
     static { antRoles.add(ROLE_ARTILLERY); }
     // TODO asset: icons/roles/Siege.png
@@ -671,12 +666,10 @@ public final class GameConstants {
     static { antRoles.add(ROLE_RESEARCHER); }
     public static final AntRole ROLE_MILITIA = new AntRole(27, TYPE_WORKER, LanguageStrings.ROLE_MILITIA, loadIcon("icons/roles/Militia.png"));
     static { antRoles.add(ROLE_MILITIA); }
-    // TODO asset: icons/roles/Catcher.png
     public static final AntRole ROLE_CATCHER = new AntRole(28, TYPE_SOLDIER, LanguageStrings.ROLE_CATCHER, loadIcon("icons/roles/Catcher.png"));
     static { antRoles.add(ROLE_CATCHER); }
     public static final AntRole ROLE_CRANE = new AntRole(29, TYPE_MAJOR, LanguageStrings.ROLE_CRANE, loadIcon("icons/roles/Crane.png"));
     static { antRoles.add(ROLE_CRANE); }
-    // TODO asset: icons/roles/Transport.png
     public static final AntRole ROLE_TRANSPORT = new AntRole(30, TYPE_MAJOR, LanguageStrings.ROLE_TRANSPORT, loadIcon("icons/roles/Transport.png"));
     static { antRoles.add(ROLE_TRANSPORT); }
     public static final AntRole ROLE_ASSISTANT = new AntRole(31, TYPE_PRINCESS, LanguageStrings.ROLE_ASSISTANT, loadIcon("icons/roles/Assistant.png"));
@@ -686,7 +679,6 @@ public final class GameConstants {
     static { antRoles.add(ROLE_ESCORT); }
     public static final AntRole ROLE_ENGINEER = new AntRole(33, TYPE_WORKER, LanguageStrings.ROLE_ENGINEER, loadIcon("icons/roles/Engineer.png"));
     static { antRoles.add(ROLE_ENGINEER); }
-    // TODO asset: icons/roles/Skytrans.png
     public static final AntRole ROLE_SKYTRANS = new AntRole(34, TYPE_PRINCESS, LanguageStrings.ROLE_SKYTRANS, loadIcon("icons/roles/Skytrans.png"));
     static { antRoles.add(ROLE_SKYTRANS); }
 
@@ -827,14 +819,14 @@ public final class GameConstants {
     public static final int MILITARY_WEIGHT_PRINCESS = 10;
     public static final int MILITARY_WEIGHT_QUEEN = 50;
 
-    private static final java.util.Set<AntRole> WAR_ECONOMY_EXCLUSIVE_ROLES =
-            java.util.Set.of(ROLE_MILITIA, ROLE_BRUTE);
-
     private static final AntRole[] ACTIVE_MILITARY_ROLES = {
             ROLE_WARRIOR, ROLE_DEFENDER,
             ROLE_MILITIA,
             ROLE_BRUTE, ROLE_ARTILLERY, ROLE_SIEGE
     };
+
+    private static final java.util.Set<AntRole> WAR_ECONOMY_EXCLUSIVE_ROLES =
+            java.util.Set.copyOf(java.util.Arrays.asList(ACTIVE_MILITARY_ROLES));
 
     public static boolean isWarEconomyExclusiveRole(AntRole role) {
         return role != null && WAR_ECONOMY_EXCLUSIVE_ROLES.contains(role);
@@ -883,14 +875,10 @@ public final class GameConstants {
     public static final int MILITARY_BASELINE_ATTACK = 10;
     public static final int MILITARY_BASELINE_DEFENSE = 5;
     public static final int MILITARY_BASELINE_ATTACK_SPEED = 1;
-    /** Fire ant assimilation: multiplies colony base attack damage. */
     public static final float ASSIMILATED_DAMAGE_MULT_FIRE = 4f;
-    /** Bullet / harvester assimilations: additive damage multipliers (not multiplicative with each other). */
     public static final float ASSIMILATED_DAMAGE_ADD_STING = 4f;
     public static final float ASSIMILATED_DAMAGE_ADD_DEADLY = 4f;
-    /** When both fire and harvester venom are assimilated, their 4+4 stack becomes 16 instead. */
     public static final float ASSIMILATED_DAMAGE_SYNERGY_FIRE_DEADLY = 16f;
-    /** Dracula ant assimilation: multiplies colony base attack speed. */
     public static final float ASSIMILATED_ATTACK_SPEED_MULT_FASTBITE = 3f;
     public static final float MILITARY_STRENGTH_RATIO_MAX = 11f;
     public static final int MILITARY_STRENGTH_DELTA_MAX = 10;
@@ -946,9 +934,13 @@ public final class GameConstants {
     public static final ColonyLoyaltyModifier LOYALTY_MODIFIER_PHEROMONE_STORM = new ColonyLoyaltyModifier(
         4, LanguageStrings.LOYALTY_MODIFIER_PHEROMONE_STORM, 10, 0, null);
     static { colonyLoyaltyModifiers.add(LOYALTY_MODIFIER_PHEROMONE_STORM); }
+    public static final ColonyLoyaltyModifier LOYALTY_MODIFIER_RECENTLY_CONQUERED = new ColonyLoyaltyModifier(
+        5, LanguageStrings.LOYALTY_MODIFIER_RECENTLY_CONQUERED, -5, 0, null);
+    static { colonyLoyaltyModifiers.add(LOYALTY_MODIFIER_RECENTLY_CONQUERED); }
 
     public static final int PHEROMONE_STORM_SYRUP_COST = 500;
     public static final int PHEROMONE_STORM_DURATION_MONTHS = 12;
+    public static final int RECENTLY_CONQUERED_LOYALTY_MONTHS = 6;
     public static final int AI_FORCED_FLIGHT_COOLDOWN_DAYS = 30;
     public static final int WAR_PACT_BREAK_COOLDOWN_MONTHS = 6;
     public static final int DIPLO_DECLINED_REQUEST_COOLDOWN_MONTHS = 1;
@@ -1019,20 +1011,22 @@ public final class GameConstants {
         defaultSpeciesUpgrades(GameUnlocks.TYPE_MAJOR), loadIcon("icons/species/Marauder.png"));
     static { species.add(SPECIES_MARAUDER); }
 
-    // TODO asset: icons/species/Trapjaw.png; sprites/ants/trapjaw/*.png (placeholder — replace final art)
     public static final Species SPECIES_TRAPJAW = new Species(5, LanguageStrings.SPECIES_TRAPJAW, LanguageStrings.SPECIES_TRAPJAW_SCIENTIFIC, "trapjaw/", GameUnlocks.ASSIMILATION_TRAPJAW,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_TRAPJAW), loadIcon("icons/species/Trapjaw.png"));
     static { species.add(SPECIES_TRAPJAW); }
+    // TODO subtype: Trap-jaw ant variant (hatch-rate assignment + per-role sprites)
 
     // TODO asset: icons/species/Honeypot.png; sprites/ants/honeypot/*.png (placeholder — replace final art)
     public static final Species SPECIES_HONEYPOT = new Species(6, LanguageStrings.SPECIES_HONEYPOT, LanguageStrings.SPECIES_HONEYPOT_SCIENTIFIC, "honeypot/", GameUnlocks.ASSIMILATION_HONEYPOT,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_HONEYPOT), loadIcon("icons/species/Honeypot.png"));
     static { species.add(SPECIES_HONEYPOT); }
+    // TODO subtype: Honey-pot ant variant (hatch-rate assignment + per-role sprites)
 
     // TODO asset: icons/species/Turtle.png; sprites/ants/turtle/*.png (placeholder — replace final art)
     public static final Species SPECIES_DOORHEAD = new Species(7, LanguageStrings.SPECIES_DOORHEAD, LanguageStrings.SPECIES_DOORHEAD_SCIENTIFIC, "turtle/", GameUnlocks.ASSIMILATION_DOORHEAD,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_DOORHEAD), loadIcon("icons/species/Turtle.png"));
     static { species.add(SPECIES_DOORHEAD); }
+    // TODO subtype: Door-head / Turtle ant variant (hatch-rate assignment + per-role sprites)
 
     // TODO asset: icons/species/Carpenter.png; sprites/ants/carpenter/*.png (placeholder — replace final art)
     public static final Species SPECIES_WOODBURROW = new Species(8, LanguageStrings.SPECIES_WOODBURROW, LanguageStrings.SPECIES_WOODBURROW_SCIENTIFIC, "carpenter/", GameUnlocks.ASSIMILATION_WOODBURROW,
@@ -1068,6 +1062,7 @@ public final class GameConstants {
     public static final Species SPECIES_STINGING = new Species(14, LanguageStrings.SPECIES_STINGING, LanguageStrings.SPECIES_STINGING_SCIENTIFIC, "bullet/", GameUnlocks.ASSIMILATION_STINGING,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_STINGING), loadIcon("icons/species/Bullet.png"));
     static { species.add(SPECIES_STINGING); }
+    // TODO subtype: Bullet ant variant (hatch-rate assignment + per-role sprites)
 
     // TODO asset: icons/species/Army.png; sprites/ants/army/*.png (placeholder — replace final art)
     public static final Species SPECIES_SWARMING = new Species(15, LanguageStrings.SPECIES_SWARMING, LanguageStrings.SPECIES_SWARMING_SCIENTIFIC, "army/", GameUnlocks.ASSIMILATION_SWARMING,
@@ -1089,9 +1084,9 @@ public final class GameConstants {
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_HEATRESIST), loadIcon("icons/species/Silver.png"));
     static { species.add(SPECIES_HEATRESIST); }
 
-    // TODO asset: icons/species/Harvester.png; sprites/ants/harvester/*.png (placeholder — replace final art)
-    public static final Species SPECIES_DEADLYVENOM = new Species(19, LanguageStrings.SPECIES_DEADLYVENOM, LanguageStrings.SPECIES_DEADLYVENOM_SCIENTIFIC, "harvester/", GameUnlocks.ASSIMILATION_DEADLYVENOM,
-        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_DEADLYVENOM), loadIcon("icons/species/Harvester.png"));
+    // TODO asset: icons/species/Maricopa.png; sprites/ants/maricopa/*.png (placeholder — replace final art)
+    public static final Species SPECIES_DEADLYVENOM = new Species(19, LanguageStrings.SPECIES_DEADLYVENOM, LanguageStrings.SPECIES_DEADLYVENOM_SCIENTIFIC, "maricopa/", GameUnlocks.ASSIMILATION_DEADLYVENOM,
+        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_DEADLYVENOM), loadIcon("icons/species/Maricopa.png"));
     static { species.add(SPECIES_DEADLYVENOM); }
 
     // TODO asset: icons/species/Exploding.png; sprites/ants/exploding/*.png (placeholder — replace final art)

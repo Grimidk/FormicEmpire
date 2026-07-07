@@ -173,7 +173,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("SYNERGY_REQUIREMENTS_FMT", "Combina: %s + %s");
         pt.put("SYNERGY_SUPER_VENOM", "Super Veneno");
         pt.put("SYNERGY_SUPER_VENOM_FLAVOR", "Super Veneno");
-        pt.put("SYNERGY_SUPER_VENOM_DESC", "O multiplicador de dano da colônia passa a 16x em vez de 4+4 quando o veneno de fogo e o de colheitadeira estão assimilados. O veneno picante ainda soma +4 (20x com os três).");
+        pt.put("SYNERGY_SUPER_VENOM_DESC", "Substitui o empilhamento de veneno de fogo + maricopa (4+4) por um multiplicador de dano de 16x quando ambos os venenos estão assimilados e Sinergias foram pesquisadas. O veneno picante ainda soma +4 (20x com os três).");
 
         pt.put("DIALOG_HATCH_RATES_TITLE", "Taxas de eclosão");
         pt.put("HATCH_DESC", "Definir probabilidade de eclosão:");
@@ -670,7 +670,6 @@ public class PortugueseTranslation implements Translation {
         pt.put("ROLE_MINER", "Mineradora");
         pt.put("ROLE_COURIER", "Mensageira");
         pt.put("ROLE_POTTER", "Alimentadora portátil");
-        pt.put("ROLE_GUARD", "Guarda");
         pt.put("ROLE_WARRIOR", "Guerreira");
         pt.put("ROLE_DEFENDER", "Defensora");
         pt.put("ROLE_POLICE", "Vigilante");
@@ -734,6 +733,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("LOYALTY_MODIFIER_TUNNEL", "Ligação de túnel");
         pt.put("LOYALTY_MODIFIER_CAPITAL", "Capital");
         pt.put("LOYALTY_MODIFIER_PHEROMONE_STORM", "Tempestade de Feromônios");
+        pt.put("LOYALTY_MODIFIER_RECENTLY_CONQUERED", "Recém-conquistada");
         pt.put("LOYALTY_MODIFIER_MILITARY_VS_CAPITAL", "Militar vs capital");
         pt.put("LOYALTY_MODIFIER_DISTANCE_FROM_CAPITAL", "Distância da capital");
         pt.put("LOYALTY_MODIFIER_DISTANCE_LINE", "%s (%s casas): %s");
@@ -835,8 +835,8 @@ public class PortugueseTranslation implements Translation {
         pt.put("SPECIES_FASTBITE_SCIENTIFIC", "Mystrium Sp.");
         pt.put("SPECIES_HEATRESIST", "Formiga Prateada do Saara");
         pt.put("SPECIES_HEATRESIST_SCIENTIFIC", "Cataglyphis Sp.");
-        pt.put("SPECIES_DEADLYVENOM", "Formiga Ceifeira");
-        pt.put("SPECIES_DEADLYVENOM_SCIENTIFIC", "Pogonomyrmex Sp.");
+        pt.put("SPECIES_DEADLYVENOM", "Formiga Maricopa");
+        pt.put("SPECIES_DEADLYVENOM_SCIENTIFIC", "Pogonomyrmex Maricopa");
         pt.put("SPECIES_SELFDESTRUCT", "Formiga Explosiva");
         pt.put("SPECIES_SELFDESTRUCT_SCIENTIFIC", "Camponotus Saundersi");
         pt.put("SPECIES_FARSIGHT", "Formiga Bulldog");
@@ -929,12 +929,12 @@ public class PortugueseTranslation implements Translation {
         pt.put("ASSIMILATED_HEATRESIST_DESC", "Sua dinastia pode forragear sob calor extremo do deserto. (Mecânica em desenvolvimento.)");
         pt.put("ASSIMILATION_HEATRESIST", "Assimilação Formiga Prateada do Saara");
         pt.put("ASSIMILATION_HEATRESIST_DESC", "Após assimilar o genoma da formiga prateada do saara:");
-        pt.put("SPECIES_DEADLYVENOM", "Formiga Ceifeira");
-        pt.put("SPECIES_DEADLYVENOM_SCIENTIFIC", "Pogonomyrmex Sp.");
+        pt.put("SPECIES_DEADLYVENOM", "Formiga Maricopa");
+        pt.put("SPECIES_DEADLYVENOM_SCIENTIFIC", "Pogonomyrmex Maricopa");
         pt.put("ASSIMILATED_DEADLYVENOM_FLAVOR", "Veneno Letal");
         pt.put("ASSIMILATED_DEADLYVENOM_DESC", "Sua dinastia pode injetar veneno capaz de matar presas pequenas rapidamente. (Mecânica em desenvolvimento.)");
-        pt.put("ASSIMILATION_DEADLYVENOM", "Assimilação Formiga Ceifeira");
-        pt.put("ASSIMILATION_DEADLYVENOM_DESC", "Após assimilar o genoma da formiga ceifeira:");
+        pt.put("ASSIMILATION_DEADLYVENOM", "Assimilação Formiga Maricopa");
+        pt.put("ASSIMILATION_DEADLYVENOM_DESC", "Após assimilar o genoma da formiga maricopa:");
         pt.put("SPECIES_SELFDESTRUCT", "Formiga Explosiva");
         pt.put("SPECIES_SELFDESTRUCT_SCIENTIFIC", "Camponotus Saundersi");
         pt.put("ASSIMILATED_SELFDESTRUCT_FLAVOR", "Defesa Suicida");
@@ -1025,9 +1025,6 @@ public class PortugueseTranslation implements Translation {
         pt.put("ROLE_POTTER_UPGRADE", "Função alimentadora");
         pt.put("ROLE_POTTER_FLAVOR", "Mão amiga");
         pt.put("ROLE_POTTER_DESC", "Permite armazenar e transportar comida para outras formigas.");
-        pt.put("ROLE_GUARD_UPGRADE", "Função guarda");
-        pt.put("ROLE_GUARD_FLAVOR", "Segurança da formiga");
-        pt.put("ROLE_GUARD_DESC", "Permite que soldadas vigiem a entrada da colônia.");
         pt.put("ROLE_WARRIOR_UPGRADE", "Função guerreira");
         pt.put("ROLE_WARRIOR_FLAVOR", "Formação em falange");
         pt.put("ROLE_WARRIOR_DESC", "Permite que soldadas lutem em grupos organizados.");
@@ -1386,8 +1383,8 @@ public class PortugueseTranslation implements Translation {
         pt.put("ASSIMILATION_FASTBITE_DESC", "Após assimilar o genoma da formiga drácula:");
         pt.put("ASSIMILATION_HEATRESIST", "Assimilação Formiga Prateada do Saara");
         pt.put("ASSIMILATION_HEATRESIST_DESC", "Após assimilar o genoma da formiga prateada do saara:");
-        pt.put("ASSIMILATION_DEADLYVENOM", "Assimilação Formiga Ceifeira");
-        pt.put("ASSIMILATION_DEADLYVENOM_DESC", "Após assimilar o genoma da formiga ceifeira:");
+        pt.put("ASSIMILATION_DEADLYVENOM", "Assimilação Formiga Maricopa");
+        pt.put("ASSIMILATION_DEADLYVENOM_DESC", "Após assimilar o genoma da formiga maricopa:");
         pt.put("ASSIMILATION_SELFDESTRUCT", "Assimilação Formiga Explosiva");
         pt.put("ASSIMILATION_SELFDESTRUCT_DESC", "Após assimilar o genoma da formiga explosiva:");
         pt.put("ASSIMILATION_FARSIGHT", "Assimilação Formiga Bulldog");

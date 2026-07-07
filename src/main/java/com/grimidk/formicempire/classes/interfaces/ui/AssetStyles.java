@@ -16,6 +16,7 @@ import javax.swing.JComboBox;
 import javax.swing.JMenuItem;
 import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSlider;
 import javax.swing.JSpinner;
@@ -335,6 +336,30 @@ public class AssetStyles {
 
     public static void fitTableColumn(JTable table, int columnIndex, int minWidth, int maxWidth) {
         UiTableStyles.fitColumn(table, columnIndex, minWidth, maxWidth, 16);
+    }
+
+    public static void applyScrollableDialogTable(JTable table) {
+        UiTableStyles.applyScrollableDialogTable(table);
+    }
+
+    public static void layoutTableColumnsForViewport(JTable table, int viewportWidth, boolean[] growableColumns) {
+        UiTableStyles.layoutColumnsForViewport(table, viewportWidth, growableColumns);
+    }
+
+    public static void applyTableColumnAlignment(JTable table, int columnIndex, int alignment) {
+        UiTableStyles.applyColumnAlignment(table, columnIndex, alignment);
+    }
+
+    public static void applyTableHeaderAlignment(JTable table, int columnIndex, int alignment) {
+        UiTableStyles.applyHeaderAlignment(table, columnIndex, alignment);
+    }
+
+    public static JScrollPane wrapScrollableTable(JTable table) {
+        return UiTableStyles.wrapScrollableTable(table);
+    }
+
+    public static void relayoutTableInScrollPane(JScrollPane scrollPane, boolean[] growableColumns) {
+        UiTableStyles.relayoutTableInScrollPane(scrollPane, growableColumns);
     }
 
     public static void styleTableBooleanColumn(JTable table, int columnIndex) {

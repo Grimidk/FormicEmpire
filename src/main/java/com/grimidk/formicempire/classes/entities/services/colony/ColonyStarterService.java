@@ -10,8 +10,10 @@ import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.WorldSpaces;
-import java.util.List;
 import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
+
+import java.awt.Rectangle;
+import java.util.List;
 
 public class ColonyStarterService {
 
@@ -185,6 +187,46 @@ public class ColonyStarterService {
         }
 
         colony.logEvent(ColonyLogPrefixes.INFO + " " + LanguageStrings.get(LanguageStrings.LOG_MATURATION_COMPLETE));
+    }
+
+    /**
+     * Rebuilds a colony immediately after conquest so battle losses do not leave it queenless or depopulated.
+     */
+    public void stabilizeConqueredColony(Dynasty victor, Colony colony) {
+        if (victor == null || colony == null) {
+            return;
+        }
+
+        colony.setRecentlyConqueredMonthsRemaining(GameConstants.RECENTLY_CONQUERED_LOYALTY_MONTHS);
+        Colony capital = victor.getCapital();
+
+        if (colony.getQueens().isEmpty()) {
+            boolean established = capital != null
+                    && ColonyLabourService.establishQueenFromBreederPair(capital, colony);
+            if (!established) {
+                spawnOccupationQueen(colony);
+                reestablishCapturedColony(capital != null ? capital : colony, colony);
+            }
+        } else {
+            colony.setDaysWithoutQueen(0);
+            reestablishCapturedColony(capital != null ? capital : colony, colony);
+        }
+    }
+
+    private void spawnOccupationQueen(Colony colony) {
+        Ant queen = new Ant(colony, GameConstants.TYPE_QUEEN);
+        queen.setDimension(WorldSpaces.UNDERWORLD);
+        queen.setRole(GameConstants.ROLE_LAYER);
+        if (colony.getPhysicsService() != null) {
+            Rectangle royal = colony.getPhysicsService().getRoomBounds(colony, WorldSpaces.ROYAL_CHAMBER);
+            if (royal != null) {
+                queen.setPosition(colony.getPhysicsService().getSpecificRoomPoint(colony, royal));
+            }
+        }
+        colony.getQueens().add(queen);
+        colony.setDaysWithoutQueen(0);
+        colony.setPeaceAssignedRoleCount(GameConstants.ROLE_LAYER,
+                colony.getPeaceAssignedRoleCount(GameConstants.ROLE_LAYER) + 1);
     }
 
     /**

@@ -136,6 +136,7 @@ public class Savefile implements Serializable {
         public float hatchRateWorker, hatchRateSoldier, hatchRateMajor, hatchRateDrone, hatchRatePrincess;
         public int aphids, symbioticMites, dermestids, parasiteAnts, parasiticMites;
         public int pheromoneStormMonthsRemaining;
+        public int recentlyConqueredMonthsRemaining;
         public int creatineDietMonthsRemaining;
         public int totalDeaths;
         public int loyalty = GameConstants.DEFAULT_COLONY_LOYALTY;
@@ -226,6 +227,9 @@ public class Savefile implements Serializable {
         public int stageStartActiveDefender;
         public String capturedColonyIds = "";
         public String capturedByDynastyIds = "";
+        public String dynastyNameA;
+        public String dynastyNameB;
+        public String winnerDynastyName;
     }
 
     public static class SavedTrade implements Serializable {

@@ -25,6 +25,10 @@ public class War {
     private final int militaryPowerAtStartA;
     private final int militaryPowerAtStartB;
 
+    private String dynastyNameA;
+    private String dynastyNameB;
+    private String winnerDynastyName;
+
     private int endedWorldMonth = ACTIVE_END_MONTH;
     private int winnerDynastyId;
     private String conclusionKey;
@@ -93,6 +97,9 @@ public class War {
         this.stageStartActiveDefender = saved.stageStartActiveDefender;
         this.capturedColonyIds.addAll(parseIdList(saved.capturedColonyIds));
         this.capturedByDynastyIds.addAll(parseIdList(saved.capturedByDynastyIds));
+        this.dynastyNameA = saved.dynastyNameA;
+        this.dynastyNameB = saved.dynastyNameB;
+        this.winnerDynastyName = saved.winnerDynastyName;
     }
 
     public static int[] canonicalPair(int dynastyIdOne, int dynastyIdTwo) {
@@ -124,6 +131,36 @@ public class War {
 
     public String getDisplayName() {
         return displayName;
+    }
+
+    public String getDynastyNameA() {
+        return dynastyNameA;
+    }
+
+    public String getDynastyNameB() {
+        return dynastyNameB;
+    }
+
+    public String getWinnerDynastyName() {
+        return winnerDynastyName;
+    }
+
+    public void setDynastyNameA(String dynastyNameA) {
+        if (dynastyNameA != null && !dynastyNameA.isEmpty()) {
+            this.dynastyNameA = dynastyNameA;
+        }
+    }
+
+    public void setDynastyNameB(String dynastyNameB) {
+        if (dynastyNameB != null && !dynastyNameB.isEmpty()) {
+            this.dynastyNameB = dynastyNameB;
+        }
+    }
+
+    public void setWinnerDynastyName(String winnerDynastyName) {
+        if (winnerDynastyName != null && !winnerDynastyName.isEmpty()) {
+            this.winnerDynastyName = winnerDynastyName;
+        }
     }
 
     public int getMilitaryPowerAtStartA() {
@@ -336,6 +373,14 @@ public class War {
         return endedWorldMonth < 0;
     }
 
+    public static boolean isValidRecord(int dynastyIdA, int dynastyIdB) {
+        return dynastyIdA > 0 && dynastyIdB > 0 && dynastyIdA != dynastyIdB;
+    }
+
+    public boolean isValidRecord() {
+        return isValidRecord(dynastyIdA, dynastyIdB);
+    }
+
     public boolean involves(int dynastyId) {
         return dynastyId == dynastyIdA || dynastyId == dynastyIdB;
     }
@@ -443,6 +488,9 @@ public class War {
         saved.stageStartActiveDefender = stageStartActiveDefender;
         saved.capturedColonyIds = joinIdList(capturedColonyIds);
         saved.capturedByDynastyIds = joinIdList(capturedByDynastyIds);
+        saved.dynastyNameA = dynastyNameA;
+        saved.dynastyNameB = dynastyNameB;
+        saved.winnerDynastyName = winnerDynastyName;
         return saved;
     }
 
