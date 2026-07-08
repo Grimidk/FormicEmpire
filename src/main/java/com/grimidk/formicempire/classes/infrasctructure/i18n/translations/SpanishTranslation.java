@@ -80,6 +80,9 @@ public class SpanishTranslation implements Translation {
         es.put("UI_CREDITS", "Créditos");
         es.put("CREDITS_TITLE", "Créditos");
         es.put("CREDITS_UNAVAILABLE", "No se pudo cargar el archivo de créditos.");
+        es.put("UI_AUDIT", "Auditoría de mecánicas");
+        es.put("AUDIT_TITLE", "Auditoría de mecánicas");
+        es.put("AUDIT_UNAVAILABLE", "No se pudo cargar el archivo de auditoría de mecánicas.");
         es.put("UI_ERROR", "Error");
         es.put("UI_NEXT", "Siguiente");
         es.put("UI_FINISH", "Finalizar");
@@ -567,6 +570,7 @@ public class SpanishTranslation implements Translation {
         es.put("SETTINGS_ESCAPE_KEY_GAME_ACTIONS", "Escape cierra diálogos / abre menú");
         es.put("SETTINGS_SHOW_TOOLTIPS", "Mostrar consejos");
         es.put("SETTINGS_FUZZ_PARASITE_ANTS", "Cifras de hormigas parásitas imprecisas");
+        es.put("SETTINGS_SHOW_AUDIT_MENU", "Mostrar auditoría de mecánicas en el menú principal");
         es.put("SETTINGS_OVERWORLD_AUTO_RECENTER", "Recentrar automáticamente el exterior en la entrada de la colonia");
         es.put("SETTINGS_DARK_MODE", "Modo oscuro");
 

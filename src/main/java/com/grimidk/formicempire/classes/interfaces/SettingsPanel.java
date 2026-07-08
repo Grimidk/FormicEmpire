@@ -46,6 +46,7 @@ public class SettingsPanel extends JPanel {
     private JCheckBox escapeKeyGameActionsCheck;
     private JCheckBox showTooltipsCheck;
     private JCheckBox fuzzParasiteAntsCheck;
+    private JCheckBox showAuditMenuCheck;
     private JCheckBox overworldAutoRecenterCheck;
     
     // --- Video Tab ---
@@ -60,7 +61,7 @@ public class SettingsPanel extends JPanel {
     private JSlider musicVolSlider;
     private JSlider sfxVolSlider;
     
-    private JLabel langLabel, autoLabel, turboLabel, arachLabel, pauseFocusLabel, confirmQuitLabel, escapeKeyGameActionsLabel, tooltipsLabel, overworldAutoRecenterLabel, fuzzParasiteAntsLabel;
+    private JLabel langLabel, autoLabel, turboLabel, arachLabel, pauseFocusLabel, confirmQuitLabel, escapeKeyGameActionsLabel, tooltipsLabel, overworldAutoRecenterLabel, fuzzParasiteAntsLabel, showAuditMenuLabel;
     private JLabel sizeLabel, fsLabel, daylightColorOverlayLabel, weatherColorOverlayLabel, darkModeLabel;
     private JLabel masterLabel, musicLabel, sfxLabel;
     private JLabel defaultRoleWorkerLabel, defaultRoleSoldierLabel, defaultRoleMajorLabel, defaultRolePrincessLabel, defaultRoleQueenLabel;
@@ -322,7 +323,17 @@ public class SettingsPanel extends JPanel {
         styleCheckBox(fuzzParasiteAntsCheck);
         c.gridx = 1; panel.add(fuzzParasiteAntsCheck, c);
 
-        c.gridy = 10;
+        c.gridy = 10; c.gridx = 0;
+        showAuditMenuLabel = new JLabel();
+        showAuditMenuLabel.setFont(AssetStyles.FONT_NORMAL);
+        showAuditMenuLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(showAuditMenuLabel, c);
+
+        showAuditMenuCheck = new JCheckBox();
+        styleCheckBox(showAuditMenuCheck);
+        c.gridx = 1; panel.add(showAuditMenuCheck, c);
+
+        c.gridy = 11;
         c.gridx = 0;
         c.gridwidth = 2;
         c.anchor = GridBagConstraints.EAST;
@@ -482,6 +493,7 @@ public class SettingsPanel extends JPanel {
         showTooltipsCheck.setSelected(true);
         overworldAutoRecenterCheck.setSelected(true);
         fuzzParasiteAntsCheck.setSelected(true);
+        showAuditMenuCheck.setSelected(false);
     }
 
     private void resetVideoTabToDefaults() {
@@ -696,6 +708,7 @@ public class SettingsPanel extends JPanel {
         tooltipsLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_SHOW_TOOLTIPS));
         overworldAutoRecenterLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_OVERWORLD_AUTO_RECENTER));
         fuzzParasiteAntsLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_FUZZ_PARASITE_ANTS));
+        showAuditMenuLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_SHOW_AUDIT_MENU));
         
         sizeLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_SCREEN_SIZE));
         fsLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_FULLSCREEN));
@@ -773,6 +786,7 @@ public class SettingsPanel extends JPanel {
         showTooltipsCheck.setSelected(engine.isShowTooltips());
         overworldAutoRecenterCheck.setSelected(engine.isOverworldAutoRecenter());
         fuzzParasiteAntsCheck.setSelected(engine.isFuzzParasiteAnts());
+        showAuditMenuCheck.setSelected(engine.isShowAuditMenu());
         
         sizeCombo.setSelectedItem(engine.getScreenSize());
         fullScreenCheck.setSelected(engine.isFullScreen());
@@ -811,6 +825,7 @@ public class SettingsPanel extends JPanel {
         engine.setShowTooltips(showTooltipsCheck.isSelected());
         engine.setOverworldAutoRecenter(overworldAutoRecenterCheck.isSelected());
         engine.setFuzzParasiteAnts(fuzzParasiteAntsCheck.isSelected());
+        engine.setShowAuditMenu(showAuditMenuCheck.isSelected());
         
         engine.setScreenSize((String) sizeCombo.getSelectedItem());
         engine.setFullScreen(fullScreenCheck.isSelected());

@@ -9,6 +9,7 @@ import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import java.awt.*;
@@ -17,6 +18,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class SaveSelectPanel extends JPanel {
+    private static final Dimension CREATE_SAVE_FIELD_SIZE = new Dimension(360, 32);
+    private static final Dimension CREATE_SAVE_PANEL_SIZE = new Dimension(520, 168);
+
     private final MainFrame frame;
     private final SaveManager saveManager;
 
@@ -155,15 +159,41 @@ public class SaveSelectPanel extends JPanel {
     }
 
     private NewSaveRequest promptNewSave() {
-        JPanel panel = new JPanel(new GridLayout(2, 2, 8, 8));
-        panel.add(new JLabel(LanguageStrings.get(LanguageStrings.SAVE_ENTER_NAME)));
-        JTextField nameField = new JTextField();
-        panel.add(nameField);
+        JPanel form = new JPanel(new GridBagLayout());
+        form.setBackground(AssetStyles.BACKGROUND_COLOR);
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.insets = new Insets(6, 0, 6, 12);
+        c.anchor = GridBagConstraints.WEST;
 
-        panel.add(new JLabel(LanguageStrings.get(LanguageStrings.SAVE_ENTER_DYNASTY_TITLE)));
+        JLabel nameLabel = new JLabel(LanguageStrings.get(LanguageStrings.SAVE_ENTER_NAME));
+        nameLabel.setFont(AssetStyles.FONT_NORMAL);
+        nameLabel.setForeground(AssetStyles.FONT_COLOR);
+        c.gridx = 0;
+        c.gridy = 0;
+        c.weightx = 0;
+        form.add(nameLabel, c);
+
+        JTextField nameField = new JTextField();
+        nameField.setPreferredSize(CREATE_SAVE_FIELD_SIZE);
+        nameField.setMinimumSize(CREATE_SAVE_FIELD_SIZE);
+        c.gridx = 1;
+        c.weightx = 1.0;
+        form.add(nameField, c);
+
+        JLabel titleLabel = new JLabel(LanguageStrings.get(LanguageStrings.SAVE_ENTER_DYNASTY_TITLE));
+        titleLabel.setFont(AssetStyles.FONT_NORMAL);
+        titleLabel.setForeground(AssetStyles.FONT_COLOR);
+        c.gridx = 0;
+        c.gridy = 1;
+        c.weightx = 0;
+        form.add(titleLabel, c);
+
         JComboBox<DynastyTitle> titleCombo = new JComboBox<>(
                 GameConstants.getDynastyTitles().toArray(new DynastyTitle[0]));
         titleCombo.setSelectedItem(GameConstants.DYNASTY_TITLE_DYNASTY);
+        titleCombo.setPreferredSize(CREATE_SAVE_FIELD_SIZE);
+        titleCombo.setMinimumSize(CREATE_SAVE_FIELD_SIZE);
         titleCombo.setRenderer((list, value, index, isSelected, cellHasFocus) -> {
             JLabel label = new JLabel(value != null ? value.getName() : "");
             if (isSelected) {
@@ -174,7 +204,16 @@ public class SaveSelectPanel extends JPanel {
             return label;
         });
         AssetStyles.styleComboBox(titleCombo);
-        panel.add(titleCombo);
+        c.gridx = 1;
+        c.weightx = 1.0;
+        form.add(titleCombo, c);
+
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        panel.setBorder(new EmptyBorder(16, 20, 8, 20));
+        panel.setPreferredSize(CREATE_SAVE_PANEL_SIZE);
+        panel.setMinimumSize(CREATE_SAVE_PANEL_SIZE);
+        panel.add(form, BorderLayout.CENTER);
 
         int result = UiOptionPane.showConfirmDialog(
                 this,

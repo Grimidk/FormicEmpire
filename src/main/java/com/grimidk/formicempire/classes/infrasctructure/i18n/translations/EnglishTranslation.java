@@ -80,6 +80,9 @@ public class EnglishTranslation implements Translation {
         en.put("UI_CREDITS", "Credits");
         en.put("CREDITS_TITLE", "Credits");
         en.put("CREDITS_UNAVAILABLE", "Credits file could not be loaded.");
+        en.put("UI_AUDIT", "Mechanics Audit");
+        en.put("AUDIT_TITLE", "Mechanics Audit");
+        en.put("AUDIT_UNAVAILABLE", "Mechanics audit file could not be loaded.");
         en.put("UI_ERROR", "Error");
         en.put("UI_NEXT", "Next");
         en.put("UI_FINISH", "Finish");
@@ -567,6 +570,7 @@ public class EnglishTranslation implements Translation {
         en.put("SETTINGS_ESCAPE_KEY_GAME_ACTIONS", "Escape closes dialogs / opens menu");
         en.put("SETTINGS_SHOW_TOOLTIPS", "Show tooltips");
         en.put("SETTINGS_FUZZ_PARASITE_ANTS", "Fuzz parasite ant numbers");
+        en.put("SETTINGS_SHOW_AUDIT_MENU", "Show mechanics audit on main menu");
         en.put("SETTINGS_OVERWORLD_AUTO_RECENTER", "Auto-recenter overworld on colony entrance");
         en.put("SETTINGS_DARK_MODE", "Dark mode");
 

@@ -62,6 +62,7 @@ public class ControlPanel extends ZeroGamePanel {
     private JMenuItem manageWars;
     private JMenuItem openSettings;
     private JMenuItem showTutorial;
+    private JMenuItem showAudit;
     private JMenuItem quitToMenu;
     
     public interface RoleManagementCallback {
@@ -149,6 +150,7 @@ public class ControlPanel extends ZeroGamePanel {
         manageWars = new JMenuItem();
         openSettings = new JMenuItem();
         showTutorial = new JMenuItem();
+        showAudit = new JMenuItem();
         quitToMenu = new JMenuItem();
         
         refreshTranslations();
@@ -187,6 +189,7 @@ public class ControlPanel extends ZeroGamePanel {
         manageWars.setText(LanguageStrings.get(LanguageStrings.MENU_WARS));
         openSettings.setText(LanguageStrings.get(LanguageStrings.UI_SETTINGS));
         showTutorial.setText(LanguageStrings.get(LanguageStrings.UI_TUTORIAL));
+        showAudit.setText(LanguageStrings.get(LanguageStrings.UI_AUDIT));
         quitToMenu.setText(LanguageStrings.get(LanguageStrings.UI_BACK_TO_MENU));
     }
 
@@ -316,7 +319,10 @@ public class ControlPanel extends ZeroGamePanel {
         });
         
         showTutorial.addActionListener(e -> HelpPanel.showTutorialDialog(frame));
-        
+
+        showAudit.addActionListener(e -> HelpPanel.showAuditDialog(frame));
+        showAudit.setVisible(false);
+
         quitToMenu.addActionListener(e -> handleBackButtonCallback.run());
         
         gameMenu.add(backToGame);
@@ -342,6 +348,7 @@ public class ControlPanel extends ZeroGamePanel {
 
         gameMenu.add(openSettings);
         gameMenu.add(showTutorial);
+        gameMenu.add(showAudit);
         gameMenu.add(AssetStyles.createInternalSeparator());
         gameMenu.add(quitToMenu);
         gameMenu.setBackground(AssetStyles.BACKGROUND_COLOR);
@@ -608,5 +615,11 @@ public class ControlPanel extends ZeroGamePanel {
             manageWars.setVisible(visible);
         }
         refreshSubmenuVisibility(dynastyMenu);
+    }
+
+    public void updateAuditMenu(boolean visible) {
+        if (showAudit != null) {
+            showAudit.setVisible(visible);
+        }
     }
 }

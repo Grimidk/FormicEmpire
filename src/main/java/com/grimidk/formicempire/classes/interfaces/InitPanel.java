@@ -16,6 +16,7 @@ public class InitPanel extends JPanel {
     
     private JButton play;
     private JButton help;
+    private JButton audit;
     private JButton roadmap;
     private JButton credits;
     private JButton settings;
@@ -30,6 +31,7 @@ public class InitPanel extends JPanel {
         addAncestorListener(new AncestorListener() {
             @Override
             public void ancestorAdded(AncestorEvent event) {
+                refreshMenuOptions();
                 play.requestFocusInWindow();
             }
 
@@ -42,45 +44,48 @@ public class InitPanel extends JPanel {
     }
     
     private void initComponents() {
+        play = createMenuButton(LanguageStrings.UI_PLAY, e -> frame.showCard(MainFrame.CARD_SAVE));
+        help = createMenuButton(LanguageStrings.UI_HELP, e -> frame.showCard(MainFrame.CARD_HELP));
+        audit = createMenuButton(LanguageStrings.UI_AUDIT, e -> HelpPanel.showAuditDialog(this));
+        roadmap = createMenuButton(LanguageStrings.UI_ROADMAP, e -> HelpPanel.showRoadmapDialog(this));
+        credits = createMenuButton(LanguageStrings.UI_CREDITS, e -> HelpPanel.showCreditsDialog(this));
+        settings = createMenuButton(LanguageStrings.UI_SETTINGS, e -> frame.showSettingsMenu(MainFrame.CARD_INIT));
+        quit = createMenuButton(LanguageStrings.UI_QUIT, e -> frame.requestExit());
+
+        refreshMenuOptions();
+    }
+
+    private JButton createMenuButton(String labelKey, java.awt.event.ActionListener action) {
+        JButton button = new JButton(LanguageStrings.get(labelKey));
+        button.addActionListener(action);
+        setupNavigation(button);
+        AssetStyles.styleButton(button);
+        return button;
+    }
+
+    public void refreshMenuOptions() {
+        boolean showAudit = frame.getEngine().isShowAuditMenu();
+        audit.setVisible(showAudit);
+        layoutMenuButtons();
+    }
+
+    private void layoutMenuButtons() {
         removeAll();
+
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
         c.insets = new Insets(8, 8, 8, 8);
+        c.gridx = 0;
 
-        play = new JButton(LanguageStrings.get(LanguageStrings.UI_PLAY));
-        help = new JButton(LanguageStrings.get(LanguageStrings.UI_HELP));
-        roadmap = new JButton(LanguageStrings.get(LanguageStrings.UI_ROADMAP));
-        credits = new JButton(LanguageStrings.get(LanguageStrings.UI_CREDITS));
-        settings = new JButton(LanguageStrings.get(LanguageStrings.UI_SETTINGS));
-        quit = new JButton(LanguageStrings.get(LanguageStrings.UI_QUIT));
+        JButton[] buttons = audit.isVisible()
+                ? new JButton[] { play, help, audit, roadmap, credits, settings, quit }
+                : new JButton[] { play, help, roadmap, credits, settings, quit };
 
-        play.addActionListener(e -> this.frame.showCard(MainFrame.CARD_SAVE));
-        help.addActionListener(e -> this.frame.showCard(MainFrame.CARD_HELP));
-        roadmap.addActionListener(e -> HelpPanel.showRoadmapDialog(this));
-        credits.addActionListener(e -> HelpPanel.showCreditsDialog(this));
-        settings.addActionListener(e -> this.frame.showSettingsMenu(MainFrame.CARD_INIT));
-        quit.addActionListener(e -> frame.requestExit());
+        for (int i = 0; i < buttons.length; i++) {
+            c.gridy = i;
+            add(buttons[i], c);
+        }
 
-        setupNavigation(play);
-        setupNavigation(help);
-        setupNavigation(roadmap);
-        setupNavigation(credits);
-        setupNavigation(settings);
-        setupNavigation(quit);
-        AssetStyles.styleButton(play);
-        AssetStyles.styleButton(help);
-        AssetStyles.styleButton(roadmap);
-        AssetStyles.styleButton(credits);
-        AssetStyles.styleButton(settings);
-        AssetStyles.styleButton(quit);
-
-        c.gridy = 0; add(play, c);
-        c.gridy = 1; add(help, c);
-        c.gridy = 2; add(roadmap, c);
-        c.gridy = 3; add(credits, c);
-        c.gridy = 4; add(settings, c);
-        c.gridy = 5; add(quit, c);
-        
         revalidate();
         repaint();
     }
@@ -88,6 +93,7 @@ public class InitPanel extends JPanel {
     public void refreshTranslations() {
         play.setText(LanguageStrings.get(LanguageStrings.UI_PLAY));
         help.setText(LanguageStrings.get(LanguageStrings.UI_HELP));
+        audit.setText(LanguageStrings.get(LanguageStrings.UI_AUDIT));
         roadmap.setText(LanguageStrings.get(LanguageStrings.UI_ROADMAP));
         credits.setText(LanguageStrings.get(LanguageStrings.UI_CREDITS));
         settings.setText(LanguageStrings.get(LanguageStrings.UI_SETTINGS));

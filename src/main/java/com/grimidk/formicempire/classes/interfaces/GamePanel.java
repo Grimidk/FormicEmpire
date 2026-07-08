@@ -173,6 +173,12 @@ public class GamePanel extends ZeroGamePanel {
         }
     }
 
+    public void refreshAuditMenuOption() {
+        if (controlPanel != null) {
+            controlPanel.updateAuditMenu(frame.getEngine().isShowAuditMenu());
+        }
+    }
+
     private boolean isOverworldViewCentered() {
         if (gameScrollPane == null) {
             return true;
@@ -1520,6 +1526,7 @@ public class GamePanel extends ZeroGamePanel {
                 controlPanel.updateDynastyMenu(colony.hasUpgrade(GameUnlocks.ABILITY_DYNASTY));
                 controlPanel.updateTradeMenu(colony.hasUpgrade(GameUnlocks.ABILITY_TRADE));
                 controlPanel.updateWarsMenu(colony.hasUpgrade(GameUnlocks.ABILITY_DYNASTY));
+                controlPanel.updateAuditMenu(frame.getEngine().isShowAuditMenu());
             }
         } else {
              if (controlPanel != null) {
@@ -1530,6 +1537,7 @@ public class GamePanel extends ZeroGamePanel {
                 controlPanel.updateDynastyMenu(false);
                 controlPanel.updateTradeMenu(false);
                 controlPanel.updateWarsMenu(false);
+                controlPanel.updateAuditMenu(frame.getEngine().isShowAuditMenu());
             }
         }
 

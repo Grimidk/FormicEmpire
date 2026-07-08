@@ -1661,6 +1661,7 @@ public class SaveManager {
             writeJsonLine(w, "escapeKeyGameActions", engine.isEscapeKeyGameActions(), false);
             writeJsonLine(w, "showTooltips", engine.isShowTooltips(), false);
             writeJsonLine(w, "fuzzParasiteAnts", engine.isFuzzParasiteAnts(), false);
+            writeJsonLine(w, "showAuditMenu", engine.isShowAuditMenu(), false);
             writeJsonLine(w, "overworldAutoRecenter", engine.isOverworldAutoRecenter(), false);
             writeJsonLine(w, "darkMode", engine.isDarkMode(), false);
             writeJsonLine(w, "defaultRoleWorker", engine.getDefaultRoleWorker(), false);
@@ -1758,6 +1759,8 @@ public class SaveManager {
             engine.setShowTooltips(Boolean.parseBoolean(m.getOrDefault("showTooltips", String.valueOf(engine.isShowTooltips()))));
             engine.setFuzzParasiteAnts(Boolean.parseBoolean(m.getOrDefault("fuzzParasiteAnts",
                     m.getOrDefault("fuzzParasites", String.valueOf(engine.isFuzzParasiteAnts())))));
+            engine.setShowAuditMenu(Boolean.parseBoolean(m.getOrDefault("showAuditMenu",
+                    String.valueOf(engine.isShowAuditMenu()))));
             engine.setOverworldAutoRecenter(Boolean.parseBoolean(m.getOrDefault("overworldAutoRecenter",
                     String.valueOf(engine.isOverworldAutoRecenter()))));
             engine.setDarkMode(Boolean.parseBoolean(m.getOrDefault("darkMode", String.valueOf(engine.isDarkMode()))));

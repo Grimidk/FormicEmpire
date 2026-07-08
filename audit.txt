@@ -1,0 +1,421 @@
+FORMIC EMPIRE — MANUAL MECHANICS AUDIT
+========================================
+Completion: 46% (115/251 checked)
+Use this checklist to exercise every player-facing interaction.
+Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
+
+Legend: [ ] = not tested yet   [x] = tested (reset to [ ] if the mechanic changes)
+
+================================================================================
+1. LAUNCHER / MAIN MENU
+================================================================================
+[x] Intro splash (studio name, then content warning) auto-advances to main menu
+[x] Play — opens save slot screen
+[x] Help — encyclopedia (all tabs; see section 18)
+[x] Roadmap — development roadmap text dialog
+[x] Credits — credits text dialog
+[x] Mechanics Audit — this file (only when enabled in Settings > General)
+[ ] Settings — full settings panel (see section 2)
+[x] Quit — exit app (respects confirm-on-quit when a game session is active)
+
+================================================================================
+2. SETTINGS (menu or in-game ESC > Settings)
+================================================================================
+General:
+[X] Language (en / es / fr / pt)
+[ ] Autosave frequency (monthly, 3/6/12 months, off)
+[ ] Allow turbo speed mode
+[ ] Arachnophobia mode (replaces spider-like visuals)
+[ ] Pause on focus loss
+[ ] Confirm on quit (active session)
+[ ] Escape key closes dialogs / opens game menu
+[X] Show tooltips
+[ ] Overworld auto-recenter on idle
+[ ] Fuzz parasite ant numbers
+[X] Show mechanics audit (main-menu and in-game ESC menu button for this file)
+[ ] Reset tab to defaults
+
+Video:
+[ ] Window size preset
+[ ] Full screen toggle
+[ ] Daylight color overlay
+[ ] Weather color overlay
+[X] Dark mode
+[ ] Reset tab to defaults
+
+Audio:
+[X] Master / music / SFX volume sliders
+[ ] Reset tab to defaults
+
+Roles (default hatch roles for new ants):
+[ ] Default worker role combo
+[ ] Default soldier role combo
+[ ] Default major role combo
+[ ] Default princess role combo
+[ ] Default queen role combo
+[ ] Reset tab to defaults
+
+[X] Save & Apply persists to settings.json and applies live
+
+================================================================================
+3. SAVE / LOAD FLOW
+================================================================================
+[X] Three save slots — empty slot shows Create
+[X] Create new save — name + dynasty title prompt
+[X] Tutorial dialog auto-opens on first create
+[X] Load existing save — resumes session
+[X] Delete save — removes slot data
+[ ] Back to main menu
+[X] Autosave runs per settings frequency during play
+[ ] Back to menu from game (ESC > Back to Menu) — saves progress
+[ ] Colony death — Reload or Main Menu options
+
+================================================================================
+4. IN-GAME HUD (bottom control bar)
+================================================================================
+[X] Speed down button (also - key)
+[X] Speed up button (also + key)
+[X] Tick speed icon / label updates with speed tier
+[X] Play / Pause button (also Space)
+[X] Turbo speeds only when allowed in settings
+[X] Menu button — opens ESC dropdown
+
+Side panels (live updates while playing):
+[X] Time panel (date, speed)
+[X] World panel
+[X] Colony panel (name, rank)
+[X] Resources panel
+[X] Ant population panel
+[X] Alerts panel (mite outbreaks, shortages, etc.)
+
+================================================================================
+5. HOTKEYS (also in Help > Tutorials > Hotkeys)
+================================================================================
+[X] Space — pause / resume
+[X] + / - — increase / decrease speed
+[X] Z — toggle Overworld / Underworld view
+[X] ESC — game menu (Colony & Dynasty submenus) or close top dialog
+[X] Q — Workers role dialog (toggle)
+[X] W — Soldiers role dialog (toggle)
+[X] E — Majors role dialog (toggle)
+[X] R — Princesses role dialog (toggle)
+[X] T — Queens role dialog (toggle)
+[X] P — Hatch rates dialog (toggle)
+[X] Y — Research upgrades (when unlocked)
+[X] U — Construction (when unlocked)
+[X] I — Assimilation (when unlocked)
+[X] O — Synergies (when unlocked)
+[X] C — Colony Operations / abilities (when unlocked)
+[X] A — Dynasty Overview tab (toggle)
+[X] S — Dynasty Trade / Logistics tab (toggle)
+[X] D — Dynasty Diplomacy tab (toggle)
+[X] F — Dynasty Wars tab (toggle)
+[X] M — World map (toggle)
+[X] X — Statistics (toggle)
+[X] Repeat same hotkey closes the bound dialog/tab
+
+================================================================================
+6. ESC GAME MENU
+================================================================================
+[X] Back to game
+[X] Toggle Overworld / Underworld (Z)
+[X] World map (M)
+[X] Statistics (X)
+
+Colony submenu (items appear when unlocked):
+[X] Manage roles
+[X] Hatch rates
+[X] Research (Y)
+[X] Construction (U)
+[X] Assimilation (I)
+[X] Colony Operations (C)
+
+Dynasty submenu (when dynasty unlocked):
+[X] Dynasty management (overview)
+[X] Trade / logistics (S)
+[X] Diplomacy (D)
+[X] Wars (F)
+
+[X] Settings
+[X] Tutorial (in-game)
+[X] Mechanics Audit (when enabled in Settings > General)
+[X] Back to main menu
+
+================================================================================
+7. VIEW & CAMERA
+================================================================================
+[X] Z — switch between overworld surface and underworld nest
+[X] Overworld — drag to pan (left mouse)
+[X] Overworld — mouse wheel scrolls view
+[ ] Overworld auto-recenter after idle (when enabled)
+[X] Underworld — scroll panes for large colonies
+[ ] Mouse wheel zoom / scroll in game area
+[X] Daylight overlay tints overworld by time of day
+[X] Weather overlay tints overworld by weather
+
+================================================================================
+8. ROLE MANAGEMENT (Q/W/E/R/T or ESC > Colony > Roles)
+================================================================================
+Per ant type tab (Worker, Soldier, Major, Princess, Queen):
+[ ] Adjust role counts (spinner / input per unlocked role)
+[ ] Counts respect available ants and unlock state
+[ ] War economy view toggle (when at war)
+[ ] Copy peace economy to war economy
+[ ] Default role assignment for newly hatched ants (from settings)
+
+================================================================================
+9. HATCH RATES (P or ESC > Hatch Rates)
+================================================================================
+[ ] Per-type hatch rate spinners (Egg, Worker, Soldier, Major, Princess, Queen)
+[ ] Rates sum to 100% (auto-adjust worker remainder)
+[ ] Subtype / assimilated variant rates when unlocked
+
+================================================================================
+10. RESEARCH (Y) — UpgradeDialog Research tab
+================================================================================
+Purchase with research points (RP). Test buy on each category:
+
+Ant types:
+[ ] Egg, Worker, Soldier, Major, Princess, Queen
+
+Worker roles:
+[ ] Forager, Nurse, Farmer, Graver, Scout, Miner, Potter, Builder, Rancher, Militia
+
+Soldier roles:
+[ ] Hunter, Warrior, Defender, Police, Bomber, Catcher
+
+Major roles:
+[ ] Brute, Carrier, Artillery, Siege, Crane
+
+Princess roles:
+[ ] Breeder, Diplomat, Assistant
+
+Queen roles:
+[ ] Layer, Researcher
+
+Advanced logistics roles (late tree):
+[ ] Courier, Borer, Transport, Escort, Engineer, Skytrans
+
+Colony abilities (unlock tree):
+[ ] Research, Build, Spread, Resin, Synergy, Assimilation
+[ ] Forced Flight, Dynasty, Trade, Spread 2, Automation, Tunnels
+[ ] Bilateral Trade, Management, Mass Flight, Cloning
+[ ] Parasitic Mite Alert, Catch Symbiotic Mite, Catch Dermestid
+[ ] Diplomat Pressure 2 & 3
+[ ] Ability slot, Pheromone Storm, Creatine Diet
+[ ] Auto Tunnels, Auto Diplomacy
+
+Stat upgrades (RP tiers):
+[ ] Skeleton, Acid, Longevity
+[ ] Research 1–3, Growth 1–3, Thirst 1–3
+[ ] Logistics 1, Passive 1, Laying 1–3
+[ ] Scouting 1–3, Farming 1–3, Contamination 1–3
+[ ] Symbiotic Mite 1, Dermestid 1, Graving 1–3
+[ ] Policing 1–3, Hex Sustain, Worker Speed 2
+
+Assimilated species passives (research tree):
+[ ] Farming, Multiqueen, Trapjaw, Honeypot, Doorhead, Woodburrow
+[ ] Silkweave, Rafting, Firevenom, Jumping, Gliding, Stinging
+[ ] Swarming, Stealth, Fastbite, Heatresist, Deadlyvenom, Selfdestruct
+[ ] Farsight, Hivebuild, Locsense
+
+[ ] Insufficient RP blocks purchase with message
+[ ] Prerequisites hide or disable locked nodes
+
+================================================================================
+11. CONSTRUCTION (U) — UpgradeDialog Build tab
+================================================================================
+Room upgrade chains (each tier L0→L3 where applicable):
+[ ] Royal Chamber
+[ ] Egg Chamber
+[ ] Mushroom Chamber
+[ ] Plant Chamber
+[ ] Water Reservoir
+[ ] Meat Chamber
+[ ] Syrup Reservoir
+[ ] Rock Warehouse
+[ ] Resin Reservoir
+
+Passive / special rooms:
+[ ] Passive Lab, Passive Water, Passive Aphid, Passive Nurse
+[ ] Passive Farm, Passive Grave, Composter
+
+[ ] Build queues with rock + RP costs
+[ ] Under-construction progress displays
+[ ] Completed rooms appear in underworld layout
+
+================================================================================
+12. ASSIMILATION (I) — UpgradeDialog Assimilation tab
+================================================================================
+Start / progress assimilations (RP + time). Each species:
+[ ] Leafcutter, Pharaoh, Marauder, Trapjaw, Honeypot, Doorhead
+[ ] Woodburrow, Silkweave, Rafting, Firevenom, Jumping, Gliding
+[ ] Stinging, Swarming, Stealth, Fastbite, Heatresist, Deadlyvenom
+[ ] Selfdestruct, Farsight, Hivebuild, Locsense
+
+[ ] Completed assimilation unlocks hatch subtypes and passives
+
+================================================================================
+13. SYNERGIES (O) — UpgradeDialog Synergy tab
+================================================================================
+[ ] Super Venom synergy — activate when requirements met
+[ ] Synergy effects apply to colony / dynasty
+
+================================================================================
+14. COLONY OPERATIONS (C) — AbilitiesDialog
+================================================================================
+[X] Forced Nuptial Flight — spend RP, requires breeders + drones
+[X] Mass Nuptial Flight — dynasty-wide spread (when unlocked)
+[X] Pheromone Storm — spend syrup buff (when unlocked)
+[X] Creatine Diet — spend protein buff (when unlocked)
+[X] Trigger buttons disabled with tooltip when requirements fail
+[X] Active buff state prevents re-trigger
+
+================================================================================
+15. DYNASTY — OVERVIEW (A)
+================================================================================
+[X] Colony list with sort options
+[ ] Per-colony Actions menu:
+    [ ] Rename / edit colony
+    [ ] View colony (switch active colony / camera)
+    [ ] Send diplomats to colony (when unlocked)
+[ ] Dynasty-wide automation toggles (when unlocked):
+    [ ] Default auto-build
+    [ ] Default automation
+    [ ] Default auto-tunnels
+    [ ] Auto-diplomacy
+[ ] Title progression as empire grows
+
+================================================================================
+16. DYNASTY — TRADE / LOGISTICS (S)
+================================================================================
+Neighbor trade rows (per adjacent hex):
+[ ] View incoming / outgoing trade amounts
+[ ] Tunnel status column (when Tunnels unlocked)
+[ ] Build tunnel to neighbor
+[ ] Create trade route — pick resources, amounts, direction
+[ ] One-way vs two-way trade
+[ ] Bilateral trade mode (when unlocked)
+[ ] Trade method combo (land / tunnel / etc. per unlocks)
+[ ] Max resource buttons on trade creator
+[ ] Optimize trade route button
+[ ] Confirm / update trade
+[ ] Cancel trade dialog
+[ ] Active trade edit from table actions
+[ ] Make two-way from one-way
+
+================================================================================
+17. DYNASTY — DIPLOMACY (D)
+================================================================================
+Per foreign dynasty Actions menu:
+[ ] Non-aggression pact — propose / accept / break
+[ ] Declare war (confirm dialog; population & military checks)
+[ ] Request trade agreement
+[ ] Open trade negotiation
+[ ] Send diplomats to dynasty
+[ ] Reputation / stance icons and tooltips
+[ ] Cooldowns after pact break block war
+
+================================================================================
+18. DYNASTY — WARS (F)
+================================================================================
+[X] Active wars list on map sidebar — click to focus war
+[X] War entries in dynasty table
+[ ] View battle — opens WarBattleDialog (hour-tick battle animation)
+[ ] Battle view updates each hour while open
+[ ] War standing / stage progression over time
+[ ] Redeploy delay between battles (24h)
+[ ] War role economy in role dialogs
+
+================================================================================
+19. WORLD MAP (M)
+================================================================================
+[X] Hex grid navigation — click hex to select / travel
+[X] Collapse / expand dynasty list panel
+[X] Click dynasty in list — jump to capital hex
+[X] Active wars header expand / collapse
+[X] Click war in sidebar — focus war target
+[X] Dynasty badges: color, species icon, stance, defeated marker
+[X] Mouse wheel zoom on map
+[X] Legend / overlay toggles if present
+
+================================================================================
+20. STATISTICS (X)
+================================================================================
+[X] General stats table — hover tooltips on rows
+[X] Colony stats when colony selected
+[X] Dynasty-wide aggregates
+[X] Live refresh while dialog open
+
+================================================================================
+21. TUTORIAL & HELP
+================================================================================
+In-game tutorial dialog (on new game + ESC > Tutorial):
+[X] Multi-page walkthrough — Back, Next, Skip, Finish
+
+Help encyclopedia (main menu Help):
+[x] Tutorials — Welcome, Getting Started, Dynasty, Hotkeys
+[x] Species reference
+[x] Ant types
+[x] Bugs / threats
+[x] Ant roles
+[x] Empire / dynasty concepts
+[x] Upgrades list (all GameUnlocks upgrades)
+[x] Buildings list
+[x] Assimilations list
+[x] World / biomes / hexes
+
+================================================================================
+22. AUTOMATIC TRIGGERS (play until fired — popup unlocks)
+================================================================================
+Monthly:
+[ ] Researcher role unlock
+[ ] Police role unlock
+[ ] Parasitic mite outbreak event
+
+Daily:
+[ ] Graver role unlock
+[ ] Colony death detection
+[ ] NPC dynasty triggers
+[ ] Mass flight unlock
+[ ] Cloning unlock
+[ ] (and other TriggerManager daily checks)
+
+Hourly:
+[ ] Hourly trigger checks
+
+[ ] Trigger popup pauses game, shows title + message, grants upgrade
+
+================================================================================
+23. SIMULATION MECHANICS (indirect player interaction — observe while playing)
+================================================================================
+Colony labour & resources:
+[ ] Foraging, farming, nursing, laying, research generation
+[ ] Water / food / protein / syrup / rock / resin economy
+[ ] Grave cleaning, policing, mite / parasite ant handling
+[ ] Building construction jobs
+[ ] Room passive effects (lab, farm, nurse, etc.)
+
+World:
+[X] Day / month / year / hour ticks
+[X] Weather changes
+[ ] Biome differences on hexes
+[X] Resource sources on map (plants, mushrooms, water, prey)
+[X] Nuptial flight colony founding on new hexes
+[ ] AI dynasties trade, tunnel, diplomacy, war
+
+Combat:
+[ ] Colony military power calculation
+[ ] War stages: clash, hex defense, etc.
+[ ] Battle view stat multipliers vs standing multipliers
+
+================================================================================
+24. EDGE CASES & LIFECYCLE
+================================================================================
+[X] Switch language mid-game — UI refreshes, logic keys unchanged
+[X] Toggle dark mode — theme refreshes on all open panels
+[ ] Open multiple dialogs — ESC closes topmost; dynasty keys defer when dynasty dialog open
+[ ] cleanupSession on back-to-menu — no leaked tick listeners
+[ ] Load second save while first loaded — prior session torn down
+[ ] Confirm exit with unsaved active session
+[ ] Arachnophobia mode — spider substitutes in gameplay & UI

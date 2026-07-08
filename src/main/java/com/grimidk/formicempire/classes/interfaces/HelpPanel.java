@@ -1161,6 +1161,11 @@ public class HelpPanel extends JPanel {
                 ClasspathTextFiles.load("/meta/credits.txt", LanguageStrings.CREDITS_UNAVAILABLE));
     }
 
+    public static void showAuditDialog(Component parent) {
+        showTextFileDialog(parent, LanguageStrings.AUDIT_TITLE,
+                ClasspathTextFiles.load(AssetStyles.META_AUDIT, LanguageStrings.AUDIT_UNAVAILABLE));
+    }
+
     private static void showTextFileDialog(Component parent, String titleKey, String text) {
         Window window = SwingUtilities.getWindowAncestor(parent);
         JDialog dialog = new JDialog(window, LanguageStrings.get(titleKey), Dialog.ModalityType.APPLICATION_MODAL);

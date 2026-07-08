@@ -53,6 +53,7 @@ public class Engine extends Thread {
     private boolean showTooltips = true;
     
     private boolean fuzzParasiteAnts = true;
+    private boolean showAuditMenu = false;
     private boolean overworldAutoRecenter = true;
     private boolean darkMode = false;
     private int defaultRoleWorker = 1; // ROLE_FORAGER
@@ -470,6 +471,14 @@ public class Engine extends Thread {
 
     public void setFuzzParasiteAnts(boolean fuzzParasiteAnts) {
         this.fuzzParasiteAnts = fuzzParasiteAnts;
+    }
+
+    public boolean isShowAuditMenu() {
+        return showAuditMenu;
+    }
+
+    public void setShowAuditMenu(boolean showAuditMenu) {
+        this.showAuditMenu = showAuditMenu;
     }
 
     public boolean isOverworldAutoRecenter() {

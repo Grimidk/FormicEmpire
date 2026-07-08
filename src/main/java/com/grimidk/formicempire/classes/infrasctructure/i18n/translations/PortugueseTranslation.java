@@ -80,6 +80,9 @@ public class PortugueseTranslation implements Translation {
         pt.put("UI_CREDITS", "Créditos");
         pt.put("CREDITS_TITLE", "Créditos");
         pt.put("CREDITS_UNAVAILABLE", "Não foi possível carregar o ficheiro de créditos.");
+        pt.put("UI_AUDIT", "Auditoria de mecânicas");
+        pt.put("AUDIT_TITLE", "Auditoria de mecânicas");
+        pt.put("AUDIT_UNAVAILABLE", "Não foi possível carregar o ficheiro de auditoria de mecânicas.");
         pt.put("UI_ERROR", "Erro");
         pt.put("UI_NEXT", "Próximo");
         pt.put("UI_FINISH", "Concluir");
@@ -567,6 +570,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("SETTINGS_ESCAPE_KEY_GAME_ACTIONS", "Escape fecha diálogos / abre menu");
         pt.put("SETTINGS_SHOW_TOOLTIPS", "Mostrar dicas");
         pt.put("SETTINGS_FUZZ_PARASITE_ANTS", "Aproximar números de formigas parasitas");
+        pt.put("SETTINGS_SHOW_AUDIT_MENU", "Mostrar auditoria de mecânicas no menu principal");
         pt.put("SETTINGS_OVERWORLD_AUTO_RECENTER", "Recentrar automaticamente o exterior na entrada da colônia");
         pt.put("SETTINGS_DARK_MODE", "Modo escuro");
 

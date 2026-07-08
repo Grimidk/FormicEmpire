@@ -279,6 +279,9 @@ public final class LanguageStrings {
     public static final String UI_CREDITS = "UI_CREDITS";
     public static final String CREDITS_TITLE = "CREDITS_TITLE";
     public static final String CREDITS_UNAVAILABLE = "CREDITS_UNAVAILABLE";
+    public static final String UI_AUDIT = "UI_AUDIT";
+    public static final String AUDIT_TITLE = "AUDIT_TITLE";
+    public static final String AUDIT_UNAVAILABLE = "AUDIT_UNAVAILABLE";
     public static final String UI_ERROR = "UI_ERROR";
     public static final String UI_NEXT = "UI_NEXT";
     public static final String UI_FINISH = "UI_FINISH";
@@ -897,6 +900,7 @@ public final class LanguageStrings {
     public static final String SETTINGS_SHOW_TOOLTIPS = "SETTINGS_SHOW_TOOLTIPS";
     
     public static final String SETTINGS_FUZZ_PARASITE_ANTS = "SETTINGS_FUZZ_PARASITE_ANTS";
+    public static final String SETTINGS_SHOW_AUDIT_MENU = "SETTINGS_SHOW_AUDIT_MENU";
     public static final String SETTINGS_OVERWORLD_AUTO_RECENTER = "SETTINGS_OVERWORLD_AUTO_RECENTER";
     public static final String SETTINGS_DARK_MODE = "SETTINGS_DARK_MODE";
     public static final String SETTINGS_DEFAULT_ROLE_WORKER = "SETTINGS_DEFAULT_ROLE_WORKER";

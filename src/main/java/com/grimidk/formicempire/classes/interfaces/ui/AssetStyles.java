@@ -58,6 +58,7 @@ public class AssetStyles {
     public static final String META_FONT = "/meta/fonts/font.ttf";
     public static final String META_ROADMAP = "/meta/roadmap.txt";
     public static final String META_CREDITS = "/meta/credits.txt";
+    public static final String META_AUDIT = "/meta/audit.txt";
 
     /** Client property on borderless icon-only toolbar buttons (see {@link #styleIconButton}). */
     public static final String ICON_BUTTON_CLIENT_KEY = "formicempire.iconButton";

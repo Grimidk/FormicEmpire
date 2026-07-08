@@ -275,6 +275,10 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
 
     public void applyRuntimeSettings() {
         ToolTipManager.sharedInstance().setEnabled(engine.isShowTooltips());
+        initPanel.refreshMenuOptions();
+        if (gamePanel != null) {
+            gamePanel.refreshAuditMenuOption();
+        }
         applyTheme();
     }
 

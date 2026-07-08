@@ -80,6 +80,9 @@ public class FrenchTranslation implements Translation {
         fr.put("UI_CREDITS", "Crédits");
         fr.put("CREDITS_TITLE", "Crédits");
         fr.put("CREDITS_UNAVAILABLE", "Impossible de charger le fichier des crédits.");
+        fr.put("UI_AUDIT", "Audit des mécaniques");
+        fr.put("AUDIT_TITLE", "Audit des mécaniques");
+        fr.put("AUDIT_UNAVAILABLE", "Impossible de charger le fichier d'audit des mécaniques.");
         fr.put("UI_ERROR", "Erreur");
         fr.put("UI_NEXT", "Suivant");
         fr.put("UI_FINISH", "Terminer");
@@ -567,6 +570,7 @@ public class FrenchTranslation implements Translation {
         fr.put("SETTINGS_ESCAPE_KEY_GAME_ACTIONS", "Échap ferme les dialogues / ouvre le menu");
         fr.put("SETTINGS_SHOW_TOOLTIPS", "Afficher les infobulles");
         fr.put("SETTINGS_FUZZ_PARASITE_ANTS", "Chiffres de fourmis parasites approximatifs");
+        fr.put("SETTINGS_SHOW_AUDIT_MENU", "Afficher l'audit des mécaniques dans le menu principal");
         fr.put("SETTINGS_OVERWORLD_AUTO_RECENTER", "Recentrer automatiquement la surface sur l'entrée de la colonie");
         fr.put("SETTINGS_DARK_MODE", "Mode sombre");
 
