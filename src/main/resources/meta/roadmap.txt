@@ -1,7 +1,6 @@
 Here is the current roadmap of features and fixes:
 
 Missing assets:
-	Convoy view tiles — SkyConvoyTile.png, OverlandConvoyTile.png (see TODO asset in GameConstants); sea/underground tiles seeded
 	Map hexes — look yank
 	Font - self explanatory
 
@@ -11,8 +10,8 @@ To Fix (By decreasing priority) :
 	(none right now)
 	
 	High:
-	TODO: icons/sprites for moves and all unlocks
-	Room overlay art still placeholder quality (sprites/buildings/rooms/*.png)	
+	TODO: icons all unlocks
+	TODO: sprites/buildings/rooms/*.png
 
 	Mid:
 	(none right now)
@@ -34,7 +33,7 @@ Needed for launch (v1.0) (Launch Version):
 	Priority:
 	barrack room before royal chamber
 	assimilations ( Trap-jaw (Trap jaw ants), Honey-pot (Honey pot ants), Door-head (Turtle ants), Wood burrowing (Carpenter ants), Silk weaving (Weaver ants), Rafting (Flood plains ants), Jumping (Jet ants), Gliding (Gliding ants), Swarming (Army ants), Stealth (Ghost ants), Heat resistance (Saharan silver ants), Self destruction (Exploding ants), Far sight (Bulldog ants), Hive building (Shining black ants), Location sensing (Desert ants))
-	ant subtypes (enable by role / exclusion) checks with new sprites, manage by hatch rate since they cant be changed
+	ant subtypes (enable by role / exclusion) checks with new sprites, manage by hatch rate since they cant be changed (trapjaw, doorhead, honeypot, bullet)
 	simluation for transports ("view convoy" option using going and returning biomes for tiles, or underground or air)
 
 	Everything else :

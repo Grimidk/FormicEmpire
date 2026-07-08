@@ -104,8 +104,7 @@ public final class GameConstants {
     // --- Convoy view tiles (simulation / view-convoy screen backgrounds) ---
     public static final ImageIcon CONVOY_TILE_SEA = loadIcon("backgrounds/convoy/SeaConvoyTile.png");
     public static final ImageIcon CONVOY_TILE_UNDERGROUND = loadIcon("backgrounds/convoy/UndergroundConvoyTile.png");
-    // TODO asset: backgrounds/convoy/SkyConvoyTile.png
-    // TODO asset: backgrounds/convoy/OverlandConvoyTile.png (deferred — pick origin/destination biome tiles at runtime)
+    public static final ImageIcon CONVOY_TILE_SKY = loadIcon("backgrounds/convoy/SkyConvoyTile.png");
 
     public static final ImageIcon TUNNEL_SPRITE = loadIcon("sprites/buildings/TunnelSprite.png");
 
@@ -483,22 +482,16 @@ public final class GameConstants {
     static { antStatuses.add(STATUS_ZOMBIFIED); }
 
     // --- Move Status ---
-    // TODO asset: icons/moves/Static.png
     public static final MoveStatus MOVE_STATIC = new MoveStatus(1, LanguageStrings.MOVE_STATIC, 0, loadIcon("icons/moves/Static.png"));
     static { moveStatuses.add(MOVE_STATIC); }
-    // TODO asset: icons/moves/Wander.png
     public static final MoveStatus MOVE_WANDER = new MoveStatus(2, LanguageStrings.MOVE_WANDER, 1/2f, loadIcon("icons/moves/Wander.png"));
     static { moveStatuses.add(MOVE_WANDER); }
-    // TODO asset: icons/moves/March.png
     public static final MoveStatus MOVE_MARCH = new MoveStatus(3, LanguageStrings.MOVE_MARCH, 1f, loadIcon("icons/moves/March.png"));
     static { moveStatuses.add(MOVE_MARCH); }
-    // TODO asset: icons/moves/Speed.png
     public static final MoveStatus MOVE_SPEED = new MoveStatus(4, LanguageStrings.MOVE_SPEED, 3/2f, loadIcon("icons/moves/Speed.png"));
     static { moveStatuses.add(MOVE_SPEED); }
-    // TODO asset: icons/moves/Fly.png
     public static final MoveStatus MOVE_FLY = new MoveStatus(5, LanguageStrings.MOVE_FLY, 3f, loadIcon("icons/moves/Fly.png"));
     static { moveStatuses.add(MOVE_FLY); }
-    // TODO asset: icons/moves/Patrol.png
     public static final MoveStatus MOVE_PATROL = new MoveStatus(6, LanguageStrings.MOVE_PATROL, 1f, loadIcon("icons/moves/Patrol.png"));
     static { moveStatuses.add(MOVE_PATROL); }
 
@@ -646,12 +639,10 @@ public final class GameConstants {
     static { antRoles.add(ROLE_HUNTER); }
     public static final AntRole ROLE_BRUTE = new AntRole(17, TYPE_MAJOR, LanguageStrings.ROLE_BRUTE, loadIcon("icons/roles/Brute.png"));
     static { antRoles.add(ROLE_BRUTE); }
-    // TODO asset: icons/roles/Carrier.png
     public static final AntRole ROLE_CARRIER = new AntRole(18, TYPE_MAJOR, LanguageStrings.ROLE_CARRIER, loadIcon("icons/roles/Carrier.png"));
     static { antRoles.add(ROLE_CARRIER); }
     public static final AntRole ROLE_ARTILLERY = new AntRole(19, TYPE_MAJOR, LanguageStrings.ROLE_ARTILLERY, loadIcon("icons/roles/Artillery.png"));
     static { antRoles.add(ROLE_ARTILLERY); }
-    // TODO asset: icons/roles/Siege.png
     public static final AntRole ROLE_SIEGE = new AntRole(20, TYPE_MAJOR, LanguageStrings.ROLE_SIEGE, loadIcon("icons/roles/Siege.png"));
     static { antRoles.add(ROLE_SIEGE); }
     public static final AntRole ROLE_BORER = new AntRole(21, TYPE_MAJOR, LanguageStrings.ROLE_BORER, loadIcon("icons/roles/Borer.png"));
@@ -676,7 +667,6 @@ public final class GameConstants {
     static { antRoles.add(ROLE_TRANSPORT); }
     public static final AntRole ROLE_ASSISTANT = new AntRole(31, TYPE_PRINCESS, LanguageStrings.ROLE_ASSISTANT, loadIcon("icons/roles/Assistant.png"));
     static { antRoles.add(ROLE_ASSISTANT); }
-    // TODO asset: icons/roles/Escort.png
     public static final AntRole ROLE_ESCORT = new AntRole(32, TYPE_SOLDIER, LanguageStrings.ROLE_ESCORT, loadIcon("icons/roles/Escort.png"));
     static { antRoles.add(ROLE_ESCORT); }
     public static final AntRole ROLE_ENGINEER = new AntRole(33, TYPE_WORKER, LanguageStrings.ROLE_ENGINEER, loadIcon("icons/roles/Engineer.png"));
@@ -1075,100 +1065,95 @@ public final class GameConstants {
     public static final Species SPECIES_TRAPJAW = new Species(5, LanguageStrings.SPECIES_TRAPJAW, LanguageStrings.SPECIES_TRAPJAW_SCIENTIFIC, "trapjaw/", GameUnlocks.ASSIMILATION_TRAPJAW,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_TRAPJAW), loadIcon("icons/species/Trapjaw.png"));
     static { species.add(SPECIES_TRAPJAW); }
-    // TODO subtype: Trap-jaw ant variant (hatch-rate assignment + per-role sprites)
 
     // TODO asset: icons/species/Honeypot.png; sprites/ants/honeypot/*.png (placeholder — replace final art)
     public static final Species SPECIES_HONEYPOT = new Species(6, LanguageStrings.SPECIES_HONEYPOT, LanguageStrings.SPECIES_HONEYPOT_SCIENTIFIC, "honeypot/", GameUnlocks.ASSIMILATION_HONEYPOT,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_HONEYPOT), loadIcon("icons/species/Honeypot.png"));
     static { species.add(SPECIES_HONEYPOT); }
-    // TODO subtype: Honey-pot ant variant (hatch-rate assignment + per-role sprites)
 
     // TODO asset: icons/species/Turtle.png; sprites/ants/turtle/*.png (placeholder — replace final art)
-    public static final Species SPECIES_DOORHEAD = new Species(7, LanguageStrings.SPECIES_DOORHEAD, LanguageStrings.SPECIES_DOORHEAD_SCIENTIFIC, "turtle/", GameUnlocks.ASSIMILATION_DOORHEAD,
+    public static final Species SPECIES_TURTLE = new Species(7, LanguageStrings.SPECIES_TURTLE, LanguageStrings.SPECIES_TURTLE_SCIENTIFIC, "turtle/", GameUnlocks.ASSIMILATION_DOORHEAD,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_DOORHEAD), loadIcon("icons/species/Turtle.png"));
-    static { species.add(SPECIES_DOORHEAD); }
-    // TODO subtype: Door-head / Turtle ant variant (hatch-rate assignment + per-role sprites)
+    static { species.add(SPECIES_TURTLE); }
 
     // TODO asset: icons/species/Carpenter.png; sprites/ants/carpenter/*.png (placeholder — replace final art)
-    public static final Species SPECIES_WOODBURROW = new Species(8, LanguageStrings.SPECIES_WOODBURROW, LanguageStrings.SPECIES_WOODBURROW_SCIENTIFIC, "carpenter/", GameUnlocks.ASSIMILATION_WOODBURROW,
+    public static final Species SPECIES_CARPENTER = new Species(8, LanguageStrings.SPECIES_CARPENTER, LanguageStrings.SPECIES_CARPENTER_SCIENTIFIC, "carpenter/", GameUnlocks.ASSIMILATION_WOODBURROW,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_WOODBURROW), loadIcon("icons/species/Carpenter.png"));
-    static { species.add(SPECIES_WOODBURROW); }
+    static { species.add(SPECIES_CARPENTER); }
 
     // TODO asset: icons/species/Weaver.png; sprites/ants/weaver/*.png (placeholder — replace final art)
-    public static final Species SPECIES_SILKWEAVE = new Species(9, LanguageStrings.SPECIES_SILKWEAVE, LanguageStrings.SPECIES_SILKWEAVE_SCIENTIFIC, "weaver/", GameUnlocks.ASSIMILATION_SILKWEAVE,
+    public static final Species SPECIES_WEAVER = new Species(9, LanguageStrings.SPECIES_WEAVER, LanguageStrings.SPECIES_WEAVER_SCIENTIFIC, "weaver/", GameUnlocks.ASSIMILATION_SILKWEAVE,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_SILKWEAVE), loadIcon("icons/species/Weaver.png"));
-    static { species.add(SPECIES_SILKWEAVE); }
+    static { species.add(SPECIES_WEAVER); }
 
     // TODO asset: icons/species/Floodplain.png; sprites/ants/floodplain/*.png (placeholder — replace final art)
-    public static final Species SPECIES_RAFTING = new Species(10, LanguageStrings.SPECIES_RAFTING, LanguageStrings.SPECIES_RAFTING_SCIENTIFIC, "floodplain/", GameUnlocks.ASSIMILATION_RAFTING,
+    public static final Species SPECIES_FLOODPLAIN = new Species(10, LanguageStrings.SPECIES_FLOODPLAIN, LanguageStrings.SPECIES_FLOODPLAIN_SCIENTIFIC, "floodplain/", GameUnlocks.ASSIMILATION_RAFTING,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_RAFTING), loadIcon("icons/species/Floodplain.png"));
-    static { species.add(SPECIES_RAFTING); }
+    static { species.add(SPECIES_FLOODPLAIN); }
 
     // TODO asset: icons/species/Fire.png; sprites/ants/fire/*.png (placeholder — replace final art)
-    public static final Species SPECIES_FIREVENOM = new Species(11, LanguageStrings.SPECIES_FIREVENOM, LanguageStrings.SPECIES_FIREVENOM_SCIENTIFIC, "fire/", GameUnlocks.ASSIMILATION_FIREVENOM,
+    public static final Species SPECIES_FIRE = new Species(11, LanguageStrings.SPECIES_FIRE, LanguageStrings.SPECIES_FIRE_SCIENTIFIC, "fire/", GameUnlocks.ASSIMILATION_FIREVENOM,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_FIREVENOM), loadIcon("icons/species/Fire.png"));
-    static { species.add(SPECIES_FIREVENOM); }
+    static { species.add(SPECIES_FIRE); }
 
     // TODO asset: icons/species/Jet.png; sprites/ants/jet/*.png (placeholder — replace final art)
-    public static final Species SPECIES_JUMPING = new Species(12, LanguageStrings.SPECIES_JUMPING, LanguageStrings.SPECIES_JUMPING_SCIENTIFIC, "jet/", GameUnlocks.ASSIMILATION_JUMPING,
+    public static final Species SPECIES_JET = new Species(12, LanguageStrings.SPECIES_JET, LanguageStrings.SPECIES_JET_SCIENTIFIC, "jet/", GameUnlocks.ASSIMILATION_JUMPING,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_JUMPING), loadIcon("icons/species/Jet.png"));
-    static { species.add(SPECIES_JUMPING); }
+    static { species.add(SPECIES_JET); }
 
     // TODO asset: icons/species/Gliding.png; sprites/ants/gliding/*.png (placeholder — replace final art)
     public static final Species SPECIES_GLIDING = new Species(13, LanguageStrings.SPECIES_GLIDING, LanguageStrings.SPECIES_GLIDING_SCIENTIFIC, "gliding/", GameUnlocks.ASSIMILATION_GLIDING,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_GLIDING), loadIcon("icons/species/Gliding.png"));
     static { species.add(SPECIES_GLIDING); }
 
-    // TODO asset: icons/species/Bullet.png; sprites/ants/bullet/*.png (placeholder — replace final art)
-    public static final Species SPECIES_STINGING = new Species(14, LanguageStrings.SPECIES_STINGING, LanguageStrings.SPECIES_STINGING_SCIENTIFIC, "bullet/", GameUnlocks.ASSIMILATION_STINGING,
+    public static final Species SPECIES_BULLET = new Species(14, LanguageStrings.SPECIES_BULLET, LanguageStrings.SPECIES_BULLET_SCIENTIFIC, "bullet/", GameUnlocks.ASSIMILATION_STINGING,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_STINGING), loadIcon("icons/species/Bullet.png"));
-    static { species.add(SPECIES_STINGING); }
-    // TODO subtype: Bullet ant variant (hatch-rate assignment + per-role sprites)
+    static { species.add(SPECIES_BULLET); }
 
     // TODO asset: icons/species/Army.png; sprites/ants/army/*.png (placeholder — replace final art)
-    public static final Species SPECIES_SWARMING = new Species(15, LanguageStrings.SPECIES_SWARMING, LanguageStrings.SPECIES_SWARMING_SCIENTIFIC, "army/", GameUnlocks.ASSIMILATION_SWARMING,
+    public static final Species SPECIES_ARMY = new Species(15, LanguageStrings.SPECIES_ARMY, LanguageStrings.SPECIES_ARMY_SCIENTIFIC, "army/", GameUnlocks.ASSIMILATION_SWARMING,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_SWARMING), loadIcon("icons/species/Army.png"));
-    static { species.add(SPECIES_SWARMING); }
+    static { species.add(SPECIES_ARMY); }
 
     // TODO asset: icons/species/Ghost.png; sprites/ants/ghost/*.png (placeholder — replace final art)
-    public static final Species SPECIES_STEALTH = new Species(16, LanguageStrings.SPECIES_STEALTH, LanguageStrings.SPECIES_STEALTH_SCIENTIFIC, "ghost/", GameUnlocks.ASSIMILATION_STEALTH,
+    public static final Species SPECIES_GHOST = new Species(16, LanguageStrings.SPECIES_GHOST, LanguageStrings.SPECIES_GHOST_SCIENTIFIC, "ghost/", GameUnlocks.ASSIMILATION_STEALTH,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_STEALTH), loadIcon("icons/species/Ghost.png"));
-    static { species.add(SPECIES_STEALTH); }
+    static { species.add(SPECIES_GHOST); }
 
     // TODO asset: icons/species/Dracula.png; sprites/ants/dracula/*.png (placeholder — replace final art)
-    public static final Species SPECIES_FASTBITE = new Species(17, LanguageStrings.SPECIES_FASTBITE, LanguageStrings.SPECIES_FASTBITE_SCIENTIFIC, "dracula/", GameUnlocks.ASSIMILATION_FASTBITE,
+    public static final Species SPECIES_DRACULA = new Species(17, LanguageStrings.SPECIES_DRACULA, LanguageStrings.SPECIES_DRACULA_SCIENTIFIC, "dracula/", GameUnlocks.ASSIMILATION_FASTBITE,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_FASTBITE), loadIcon("icons/species/Dracula.png"));
-    static { species.add(SPECIES_FASTBITE); }
+    static { species.add(SPECIES_DRACULA); }
 
     // TODO asset: icons/species/Silver.png; sprites/ants/silver/*.png (placeholder — replace final art)
-    public static final Species SPECIES_HEATRESIST = new Species(18, LanguageStrings.SPECIES_HEATRESIST, LanguageStrings.SPECIES_HEATRESIST_SCIENTIFIC, "silver/", GameUnlocks.ASSIMILATION_HEATRESIST,
+    public static final Species SPECIES_SILVER = new Species(18, LanguageStrings.SPECIES_SILVER, LanguageStrings.SPECIES_SILVER_SCIENTIFIC, "silver/", GameUnlocks.ASSIMILATION_HEATRESIST,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_HEATRESIST), loadIcon("icons/species/Silver.png"));
-    static { species.add(SPECIES_HEATRESIST); }
+    static { species.add(SPECIES_SILVER); }
 
     // TODO asset: icons/species/Maricopa.png; sprites/ants/maricopa/*.png (placeholder — replace final art)
-    public static final Species SPECIES_DEADLYVENOM = new Species(19, LanguageStrings.SPECIES_DEADLYVENOM, LanguageStrings.SPECIES_DEADLYVENOM_SCIENTIFIC, "maricopa/", GameUnlocks.ASSIMILATION_DEADLYVENOM,
+    public static final Species SPECIES_MARICOPA = new Species(19, LanguageStrings.SPECIES_MARICOPA, LanguageStrings.SPECIES_MARICOPA_SCIENTIFIC, "maricopa/", GameUnlocks.ASSIMILATION_DEADLYVENOM,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_DEADLYVENOM), loadIcon("icons/species/Maricopa.png"));
-    static { species.add(SPECIES_DEADLYVENOM); }
+    static { species.add(SPECIES_MARICOPA); }
 
     // TODO asset: icons/species/Exploding.png; sprites/ants/exploding/*.png (placeholder — replace final art)
-    public static final Species SPECIES_SELFDESTRUCT = new Species(20, LanguageStrings.SPECIES_SELFDESTRUCT, LanguageStrings.SPECIES_SELFDESTRUCT_SCIENTIFIC, "exploding/", GameUnlocks.ASSIMILATION_SELFDESTRUCT,
+    public static final Species SPECIES_EXPLODING = new Species(20, LanguageStrings.SPECIES_EXPLODING, LanguageStrings.SPECIES_EXPLODING_SCIENTIFIC, "exploding/", GameUnlocks.ASSIMILATION_SELFDESTRUCT,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_SELFDESTRUCT), loadIcon("icons/species/Exploding.png"));
-    static { species.add(SPECIES_SELFDESTRUCT); }
+    static { species.add(SPECIES_EXPLODING); }
 
     // TODO asset: icons/species/Bulldog.png; sprites/ants/bulldog/*.png (placeholder — replace final art)
-    public static final Species SPECIES_FARSIGHT = new Species(21, LanguageStrings.SPECIES_FARSIGHT, LanguageStrings.SPECIES_FARSIGHT_SCIENTIFIC, "bulldog/", GameUnlocks.ASSIMILATION_FARSIGHT,
+    public static final Species SPECIES_BULLDOG = new Species(21, LanguageStrings.SPECIES_BULLDOG, LanguageStrings.SPECIES_BULLDOG_SCIENTIFIC, "bulldog/", GameUnlocks.ASSIMILATION_FARSIGHT,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_FARSIGHT), loadIcon("icons/species/Bulldog.png"));
-    static { species.add(SPECIES_FARSIGHT); }
+    static { species.add(SPECIES_BULLDOG); }
 
     // TODO asset: icons/species/ShiningBlack.png; sprites/ants/shiningblack/*.png (placeholder — replace final art)
-    public static final Species SPECIES_HIVEBUILD = new Species(22, LanguageStrings.SPECIES_HIVEBUILD, LanguageStrings.SPECIES_HIVEBUILD_SCIENTIFIC, "shiningblack/", GameUnlocks.ASSIMILATION_HIVEBUILD,
+    public static final Species SPECIES_SHININGBLACK = new Species(22, LanguageStrings.SPECIES_SHININGBLACK, LanguageStrings.SPECIES_SHININGBLACK_SCIENTIFIC, "shiningblack/", GameUnlocks.ASSIMILATION_HIVEBUILD,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_HIVEBUILD), loadIcon("icons/species/ShiningBlack.png"));
-    static { species.add(SPECIES_HIVEBUILD); }
+    static { species.add(SPECIES_SHININGBLACK); }
 
     // TODO asset: icons/species/Desert.png; sprites/ants/desert/*.png (placeholder — replace final art)
-    public static final Species SPECIES_LOCSENSE = new Species(23, LanguageStrings.SPECIES_LOCSENSE, LanguageStrings.SPECIES_LOCSENSE_SCIENTIFIC, "desert/", GameUnlocks.ASSIMILATION_LOCSENSE,
+    public static final Species SPECIES_DESERT = new Species(23, LanguageStrings.SPECIES_DESERT, LanguageStrings.SPECIES_DESERT_SCIENTIFIC, "desert/", GameUnlocks.ASSIMILATION_LOCSENSE,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_LOCSENSE), loadIcon("icons/species/Desert.png"));
-    static { species.add(SPECIES_LOCSENSE); }
+    static { species.add(SPECIES_DESERT); }
 
     // --- Trade Methods ---
     public static final TradeMethod METHOD_LAND = new TradeMethod(1, LanguageStrings.METHOD_LAND, 1.0f, 1.0f, 0.35f,
