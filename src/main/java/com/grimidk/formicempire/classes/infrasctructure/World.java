@@ -424,7 +424,7 @@ public class World {
             }
         }
 
-        int required = GameConstants.getNonOmniSpecies().size();
+        int required = GameConstants.getWorldSpawnableNpcSpecies().size();
         Collections.shuffle(remaining, GameRandom.getShuffleRandom());
         for (Hex hex : remaining) {
             if (selected.size() >= required) {
@@ -436,7 +436,7 @@ public class World {
     }
 
     private List<Species> assignNpcSpecies(int colonyCount) {
-        List<Species> nonOmni = new ArrayList<>(GameConstants.getNonOmniSpecies());
+        List<Species> nonOmni = new ArrayList<>(GameConstants.getWorldSpawnableNpcSpecies());
         if (colonyCount == 0 || nonOmni.isEmpty()) {
             return List.of();
         }

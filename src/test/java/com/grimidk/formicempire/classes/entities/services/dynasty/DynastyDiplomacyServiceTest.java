@@ -589,6 +589,19 @@ class DynastyDiplomacyServiceTest {
     }
 
     @Test
+    void applyWasAtWarModifierAdjustsReputation() {
+        player.setDiplomaticReputation(neighbor.getId(), 50);
+        neighbor.setDiplomaticReputation(player.getId(), 50);
+
+        player.getDiplomacyService().applyWasAtWarModifier(neighbor, null);
+
+        assertEquals(30, player.getDiplomaticReputation(neighbor.getId()));
+        assertEquals(30, neighbor.getDiplomaticReputation(player.getId()));
+        assertEquals(GameConstants.DIPLO_MODIFIER_WAS_AT_WAR.getNameKey(),
+                player.getDiplomaticModifierKey(neighbor.getId()));
+    }
+
+    @Test
     void reputationModifierTooltipUsesSignedDeltasSortedPositiveFirst() {
         player.setDiplomaticModifierKey(neighbor.getId(), GameConstants.DIPLO_MODIFIER_PACT.getNameKey());
 

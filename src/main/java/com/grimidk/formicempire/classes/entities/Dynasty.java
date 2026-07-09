@@ -78,6 +78,7 @@ public class Dynasty {
     private final Map<Integer, Integer> pactBrokenAtWorldMonth;
     private final Map<Integer, Integer> pactRequestDeclinedAtWorldMonth;
     private final Map<Integer, Integer> tradeRequestDeclinedAtWorldMonth;
+    private final Map<Integer, Integer> wasAtWarPeacedAtWorldMonth;
     private final List<CrossDynastyTradeProposal> pendingTradeProposals;
     private int forcedFlightCooldownDays;
     private final Map<Integer, Integer> diplomatSupportToDynasty = new HashMap<>();
@@ -131,6 +132,7 @@ public class Dynasty {
         this.pactBrokenAtWorldMonth = new HashMap<>();
         this.pactRequestDeclinedAtWorldMonth = new HashMap<>();
         this.tradeRequestDeclinedAtWorldMonth = new HashMap<>();
+        this.wasAtWarPeacedAtWorldMonth = new HashMap<>();
         this.pendingTradeProposals = new ArrayList<>();
         this.forcedFlightCooldownDays = 0;
         this.originDynastyId = 0;
@@ -193,6 +195,7 @@ public class Dynasty {
         this.pactBrokenAtWorldMonth = new HashMap<>();
         this.pactRequestDeclinedAtWorldMonth = new HashMap<>();
         this.tradeRequestDeclinedAtWorldMonth = new HashMap<>();
+        this.wasAtWarPeacedAtWorldMonth = new HashMap<>();
         this.pendingTradeProposals = new ArrayList<>();
         this.forcedFlightCooldownDays = 0;
         this.originDynastyId = 0;
@@ -301,6 +304,17 @@ public class Dynasty {
                     int otherDynastyId = Integer.parseInt(entry.getKey());
                     if (otherDynastyId != this.id && entry.getValue() != null) {
                         tradeRequestDeclinedAtWorldMonth.put(otherDynastyId, entry.getValue());
+                    }
+                } catch (NumberFormatException ignored) {
+                }
+            }
+        }
+        if (savedDynasty.wasAtWarPeacedAtWorldMonth != null) {
+            for (Map.Entry<String, Integer> entry : savedDynasty.wasAtWarPeacedAtWorldMonth.entrySet()) {
+                try {
+                    int otherDynastyId = Integer.parseInt(entry.getKey());
+                    if (otherDynastyId != this.id && entry.getValue() != null) {
+                        wasAtWarPeacedAtWorldMonth.put(otherDynastyId, entry.getValue());
                     }
                 } catch (NumberFormatException ignored) {
                 }
@@ -871,6 +885,28 @@ public class Dynasty {
 
     public void removeTradeRequestDeclinedAtWorldMonth(int otherDynastyId) {
         tradeRequestDeclinedAtWorldMonth.remove(otherDynastyId);
+    }
+
+    public Map<String, Integer> copyWasAtWarPeacedAtWorldMonth() {
+        Map<String, Integer> copy = new HashMap<>();
+        for (Map.Entry<Integer, Integer> entry : wasAtWarPeacedAtWorldMonth.entrySet()) {
+            copy.put(String.valueOf(entry.getKey()), entry.getValue());
+        }
+        return copy;
+    }
+
+    public Integer getWasAtWarPeacedAtWorldMonth(int otherDynastyId) {
+        return wasAtWarPeacedAtWorldMonth.get(otherDynastyId);
+    }
+
+    public void setWasAtWarPeacedAtWorldMonth(int otherDynastyId, int worldMonthIndex) {
+        if (otherDynastyId != id) {
+            wasAtWarPeacedAtWorldMonth.put(otherDynastyId, worldMonthIndex);
+        }
+    }
+
+    public void removeWasAtWarPeacedAtWorldMonth(int otherDynastyId) {
+        wasAtWarPeacedAtWorldMonth.remove(otherDynastyId);
     }
 
     public boolean hasPendingWarDeclarationFrom(int fromDynastyId) {

@@ -1214,6 +1214,7 @@ public final class LanguageStrings {
     public static final String DIPLO_MODIFIER_TRADE_REQUEST = "DIPLO_MODIFIER_TRADE_REQUEST";
     public static final String DIPLO_MODIFIER_BORDER_FRICTION = "DIPLO_MODIFIER_BORDER_FRICTION";
     public static final String DIPLO_MODIFIER_GRANTED_INDEPENDENCE = "DIPLO_MODIFIER_GRANTED_INDEPENDENCE";
+    public static final String DIPLO_MODIFIER_WAS_AT_WAR = "DIPLO_MODIFIER_WAS_AT_WAR";
     public static final String DYNASTY_REBELLION_NAME_FMT = "DYNASTY_REBELLION_NAME_FMT";
     public static final String REBELLION_WAR_NAME_FMT = "REBELLION_WAR_NAME_FMT";
     public static final String ALERT_REBELLION_RISK_FMT = "ALERT_REBELLION_RISK_FMT";
@@ -1300,8 +1301,8 @@ public final class LanguageStrings {
 
     public static final String SPECIES_OMNI = "SPECIES_OMNI";
     public static final String SPECIES_OMNI_SCIENTIFIC = "SPECIES_OMNI_SCIENTIFIC";
-    public static final String SPECIES_LEAF = "SPECIES_LEAF";
-    public static final String SPECIES_LEAF_SCIENTIFIC = "SPECIES_LEAF_SCIENTIFIC";
+    public static final String SPECIES_LEAFCUTTER = "SPECIES_LEAFCUTTER";
+    public static final String SPECIES_LEAFCUTTER_SCIENTIFIC = "SPECIES_LEAFCUTTER_SCIENTIFIC";
     public static final String SPECIES_PHARAOH = "SPECIES_PHARAOH";
     public static final String SPECIES_PHARAOH_SCIENTIFIC = "SPECIES_PHARAOH_SCIENTIFIC";
     public static final String SPECIES_MARAUDER = "SPECIES_MARAUDER";

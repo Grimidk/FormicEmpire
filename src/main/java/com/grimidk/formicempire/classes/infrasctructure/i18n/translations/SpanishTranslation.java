@@ -803,6 +803,7 @@ public class SpanishTranslation implements Translation {
         es.put("DIPLO_MODIFIER_TRADE_REQUEST", "Solicitud comercial");
         es.put("DIPLO_MODIFIER_BORDER_FRICTION", "Fricción fronteriza");
         es.put("DIPLO_MODIFIER_GRANTED_INDEPENDENCE", "Independencia concedida");
+        es.put("DIPLO_MODIFIER_WAS_AT_WAR", "Estuvieron en guerra");
         es.put("DYNASTY_REBELLION_NAME_FMT", "%s Rebelión");
         es.put("REBELLION_WAR_NAME_FMT", "%s Rebelión %s");
         es.put("ALERT_REBELLION_RISK_FMT", "¡Riesgo de rebelión en %s!");
@@ -889,8 +890,8 @@ public class SpanishTranslation implements Translation {
 
         es.put("SPECIES_OMNI", "Hormiga Omni");
         es.put("SPECIES_OMNI_SCIENTIFIC", "Omniformica Grimunknowni");
-        es.put("SPECIES_LEAF", "Hormiga Cortadora");
-        es.put("SPECIES_LEAF_SCIENTIFIC", "Atta Cephalotes");
+        es.put("SPECIES_LEAFCUTTER", "Hormiga Leafcutter");
+        es.put("SPECIES_LEAFCUTTER_SCIENTIFIC", "Atta Cephalotes");
         es.put("SPECIES_PHARAOH", "Hormiga Faraón");
         es.put("SPECIES_PHARAOH_SCIENTIFIC", "Monomorium Pharaonis");
         es.put("SPECIES_MARAUDER", "Hormiga Merodeadora");

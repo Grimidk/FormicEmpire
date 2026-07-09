@@ -122,6 +122,13 @@ public final class GameConstants {
         return loadIcon(path);
     }
 
+    public static ImageIcon getAssimilatedDroneSprite(Species species) {
+        if (species == null) {
+            return null;
+        }
+        return loadIcon("sprites/ants/zero-drones/" + species.getZeroDroneSpriteFileName());
+    }
+
     private static Set<Upgrade> defaultSpeciesUpgrades(Upgrade speciesTrait) {
         return Set.of(
                 GameUnlocks.TYPE_EGG, GameUnlocks.TYPE_QUEEN, GameUnlocks.TYPE_WORKER,
@@ -798,6 +805,9 @@ public final class GameConstants {
     public static final DiplomaticReputationModifier DIPLO_MODIFIER_GRANTED_INDEPENDENCE = new DiplomaticReputationModifier(
         8, LanguageStrings.DIPLO_MODIFIER_GRANTED_INDEPENDENCE, 25, 0, null);
     static { diplomaticReputationModifiers.add(DIPLO_MODIFIER_GRANTED_INDEPENDENCE); }
+    public static final DiplomaticReputationModifier DIPLO_MODIFIER_WAS_AT_WAR = new DiplomaticReputationModifier(
+        9, LanguageStrings.DIPLO_MODIFIER_WAS_AT_WAR, -20, 0, null);
+    static { diplomaticReputationModifiers.add(DIPLO_MODIFIER_WAS_AT_WAR); }
 
     public static final double REBELLION_MONTHLY_CHANCE_MIN = 0.05;
     public static final double REBELLION_MONTHLY_CHANCE_MAX = 0.30;
@@ -953,6 +963,7 @@ public final class GameConstants {
     public static final int AI_FORCED_FLIGHT_COOLDOWN_DAYS = 30;
     public static final int WAR_PACT_BREAK_COOLDOWN_MONTHS = 6;
     public static final int DIPLO_DECLINED_REQUEST_COOLDOWN_MONTHS = 1;
+    public static final int WAS_AT_WAR_MODIFIER_MONTHS = 12;
     public static final int WAR_DECLARATION_MIN_POPULATION = 1000;
     public static final float WAR_STANDING_MILITARY_RATIO = 1.15f;
     public static final double AI_ACCEPT_PEACE_CHANCE = 0.85;
@@ -1059,9 +1070,9 @@ public final class GameConstants {
             GameUnlocks.STAT_SKELETON, GameUnlocks.STAT_ACID, GameUnlocks.STAT_LONGEVITY), loadIcon("icons/species/Omni.png"));
     static { species.add(SPECIES_OMNI); }
     
-    public static final Species SPECIES_LEAF = new Species(2, LanguageStrings.SPECIES_LEAF, LanguageStrings.SPECIES_LEAF_SCIENTIFIC, "leaf/", GameUnlocks.ASSIMILATION_LEAFCUTTER, 
-        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_FARMING), loadIcon("icons/species/Leaf.png"));
-    static { species.add(SPECIES_LEAF); }
+    public static final Species SPECIES_LEAFCUTTER = new Species(2, LanguageStrings.SPECIES_LEAFCUTTER, LanguageStrings.SPECIES_LEAFCUTTER_SCIENTIFIC, "leafcutter/", GameUnlocks.ASSIMILATION_LEAFCUTTER, 
+        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_FARMING), loadIcon("icons/species/Leafcutter.png"));
+    static { species.add(SPECIES_LEAFCUTTER); }
     
     public static final Species SPECIES_PHARAOH = new Species(3, LanguageStrings.SPECIES_PHARAOH, LanguageStrings.SPECIES_PHARAOH_SCIENTIFIC, "pharaoh/", GameUnlocks.ASSIMILATION_PHARAOH, 
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_MULTIQUEEN), loadIcon("icons/species/Pharaoh.png"));
@@ -1075,12 +1086,10 @@ public final class GameConstants {
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_TRAPJAW), loadIcon("icons/species/Trapjaw.png"));
     static { species.add(SPECIES_TRAPJAW); }
 
-    // TODO asset: icons/species/Honeypot.png; sprites/ants/honeypot/*.png (placeholder — replace final art)
     public static final Species SPECIES_HONEYPOT = new Species(6, LanguageStrings.SPECIES_HONEYPOT, LanguageStrings.SPECIES_HONEYPOT_SCIENTIFIC, "honeypot/", GameUnlocks.ASSIMILATION_HONEYPOT,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_HONEYPOT), loadIcon("icons/species/Honeypot.png"));
     static { species.add(SPECIES_HONEYPOT); }
 
-    // TODO asset: icons/species/Turtle.png; sprites/ants/turtle/*.png (placeholder — replace final art)
     public static final Species SPECIES_TURTLE = new Species(7, LanguageStrings.SPECIES_TURTLE, LanguageStrings.SPECIES_TURTLE_SCIENTIFIC, "turtle/", GameUnlocks.ASSIMILATION_DOORHEAD,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_DOORHEAD), loadIcon("icons/species/Turtle.png"));
     static { species.add(SPECIES_TURTLE); }
@@ -1433,6 +1442,26 @@ public final class GameConstants {
         List<Species> result = new ArrayList<>();
         for (Species s : species) {
             if (s.getId() != SPECIES_OMNI.getId()) {
+                result.add(s);
+            }
+        }
+        return Collections.unmodifiableList(result);
+    }
+
+    /** NPC dynasties at world gen — only species with art in {@code sprites/ants/zero-drones/}. */
+    private static final Set<Integer> WORLD_SPAWNABLE_NPC_SPECIES_IDS = Set.of(
+            SPECIES_LEAFCUTTER.getId(),
+            SPECIES_PHARAOH.getId(),
+            SPECIES_MARAUDER.getId(),
+            SPECIES_TRAPJAW.getId(),
+            SPECIES_HONEYPOT.getId(),
+            SPECIES_TURTLE.getId(),
+            SPECIES_BULLET.getId());
+
+    public static List<Species> getWorldSpawnableNpcSpecies() {
+        List<Species> result = new ArrayList<>();
+        for (Species s : species) {
+            if (WORLD_SPAWNABLE_NPC_SPECIES_IDS.contains(s.getId())) {
                 result.add(s);
             }
         }

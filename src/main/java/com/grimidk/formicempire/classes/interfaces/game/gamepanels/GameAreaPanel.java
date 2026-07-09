@@ -772,7 +772,7 @@ public class GameAreaPanel extends ZeroGamePanel {
                     if (Math.abs(seed) % 10 < 3) {
                         int index = (Math.abs(seed) / 10) % assimilatedSpecies.size();
                         Species as = assimilatedSpecies.get(index);
-                        ImageIcon asIcon = GameConstants.getAntSprite(type, as);
+                        ImageIcon asIcon = GameConstants.getAssimilatedDroneSprite(as);
                         if (asIcon != null) {
                             currentSprite = asIcon.getImage();
                         }

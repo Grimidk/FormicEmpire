@@ -8,13 +8,13 @@ To Fix (By decreasing priority) :
 	High:
 	TODO: icons all unlocks
 	TODO: sprites/buildings/rooms/*.png
-	TODO: species sprites and icon: honeypot, turtle, carpenter, weaver, floodplain, fire, jet, gliding, army, ghost, dracula, silver, maricopa, exploding, bulldog, shining black and desert
+	TODO: species sprites and icon: turtle, carpenter, weaver, floodplain, fire, jet, gliding, army, ghost, dracula, silver, maricopa, exploding, bulldog, shining black and desert
 
 	Mid:
 	(none right now)
 	  
 	Low:
-	was a war modifier -20 for 1 year
+	(none right now)
 
 	Can't reproduce:
 	(none right now)
@@ -39,14 +39,13 @@ Needed for launch (v1.0) (Launch Version):
 
 	Everything else :
 	minerals with uprades to find it and increase miner efficency, also mushroom detection 
-	air warfare
-	research tree and building tree (after icons)
+	research tree and building tree (after icons) with available, purchasable, locked and list trigger based upgrades 
 	rework how carrying looks completely
 	random events (meteor, earthquake, tornado, tsunami, )
 	main menu screen maybe simulation like factorio
 	synergies ( Super majors + Chemical throwing = Artillery ants; Self destruction + Acid spitting = Corrosive bombs; Silk weaving + Hive building = Web building; Air-force ants + self destruction = Air-bomber ants)
 	more upgrades and more buildings and assimilations and synergies
-	more roles (commander and captain roles, air force and paratroopers to skip a stage)
+	more roles (commander and captain roles, air force and paratroopers to skip a stage) and air warfare
 	more enemies ( Rebel ant colonies, Bugs, Arachnids, Reptiles, Birds, Rodents, Zombie ant colonies)
 	more stats (kills, historic productions, graphs?)
 	more bugs (constants and icons and scienctific name)

@@ -7,6 +7,7 @@ import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.War;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDiplomacyService;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
@@ -20,6 +21,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class WarServiceTest {
@@ -221,15 +223,15 @@ class WarServiceTest {
 
     @Test
     void absoluteVictoryInheritsLoserAssimilationsWithoutDuplicates() {
-        Dynasty leafDynasty = new Dynasty(2, "Leaf Dynasty", false, GameConstants.SPECIES_LEAF);
-        World leafWorld = buildBorderWorld(leafDynasty);
-        leafDynasty.absorbSpecies(GameConstants.SPECIES_PHARAOH.getId());
-        leafDynasty.completeAssimilation(GameUnlocks.ASSIMILATION_LEAFCUTTER);
+        Dynasty leafcutterDynasty = new Dynasty(2, "Leafcutter Dynasty", false, GameConstants.SPECIES_LEAFCUTTER);
+        World leafWorld = buildBorderWorld(leafcutterDynasty);
+        leafcutterDynasty.absorbSpecies(GameConstants.SPECIES_PHARAOH.getId());
+        leafcutterDynasty.completeAssimilation(GameUnlocks.ASSIMILATION_LEAFCUTTER);
 
-        War war = leafWorld.getWarService().beginWar(player, leafDynasty);
+        War war = leafWorld.getWarService().beginWar(player, leafcutterDynasty);
         leafWorld.getWarService().concludeWar(war, player.getId(), LanguageStrings.WAR_CONCLUSION_ABSOLUTE_VICTORY);
 
-        assertTrue(player.getDefeatedSpeciesIds().contains(GameConstants.SPECIES_LEAF.getId()));
+        assertTrue(player.getDefeatedSpeciesIds().contains(GameConstants.SPECIES_LEAFCUTTER.getId()));
         assertTrue(player.getDefeatedSpeciesIds().contains(GameConstants.SPECIES_PHARAOH.getId()));
         assertTrue(player.isAssimilationCompleted(GameUnlocks.ASSIMILATION_LEAFCUTTER));
         assertEquals(2, player.getDefeatedSpeciesIds().size());
@@ -245,6 +247,54 @@ class WarServiceTest {
 
         assertFalse(player.getDefeatedSpeciesIds().contains(GameConstants.SPECIES_MARAUDER.getId()));
         assertFalse(player.isAssimilationCompleted(GameUnlocks.ASSIMILATION_MARAUDER));
+    }
+
+    @Test
+    void peaceTreatyAppliesWasAtWarModifier() {
+        player.setDiplomaticReputation(neighbor.getId(), 50);
+        neighbor.setDiplomaticReputation(player.getId(), 50);
+        player.getDiplomacyService().applyWar(neighbor, null, world);
+
+        War war = world.getWarService().findActiveWar(player.getId(), neighbor.getId());
+        world.getWarService().concludeWar(war, player.getId(), LanguageStrings.WAR_CONCLUSION_PEACE_TREATY);
+
+        assertEquals(GameConstants.DIPLO_MODIFIER_WAS_AT_WAR.getNameKey(),
+                player.getDiplomaticModifierKey(neighbor.getId()));
+        assertEquals(12, player.getDiplomacyService().getWasAtWarModifierMonthsRemaining(neighbor, world));
+        assertEquals(DynastyDiplomacyService.worldMonthIndex(world),
+                player.getWasAtWarPeacedAtWorldMonth(neighbor.getId()));
+    }
+
+    @Test
+    void defeatConclusionDoesNotApplyWasAtWarModifier() {
+        player.getDiplomacyService().applyWar(neighbor, null, world);
+        War war = world.getWarService().findActiveWar(player.getId(), neighbor.getId());
+        world.getWarService().concludeWar(war, player.getId(), LanguageStrings.WAR_CONCLUSION_DEFEAT);
+
+        assertNull(player.getDiplomaticModifierKey(neighbor.getId()));
+    }
+
+    @Test
+    void wasAtWarModifierExpiresAfterOneYear() {
+        world.setYear(0);
+        world.setMonth(0);
+        player.setDiplomaticReputation(neighbor.getId(), 50);
+        neighbor.setDiplomaticReputation(player.getId(), 50);
+        player.getDiplomacyService().applyWar(neighbor, null, world);
+        War war = world.getWarService().findActiveWar(player.getId(), neighbor.getId());
+        world.getWarService().concludeWar(war, player.getId(), LanguageStrings.WAR_CONCLUSION_PEACE_TREATY);
+
+        assertEquals(GameConstants.DIPLO_MODIFIER_WAS_AT_WAR.getNameKey(),
+                player.getDiplomaticModifierKey(neighbor.getId()));
+        player.setDiplomaticReputation(neighbor.getId(), 40);
+        neighbor.setDiplomaticReputation(player.getId(), 40);
+
+        world.setYear(1);
+        world.setMonth(0);
+        player.getDiplomacyService().getEffectiveDiplomaticReputation(neighbor, world);
+
+        assertNull(player.getDiplomaticModifierKey(neighbor.getId()));
+        assertEquals(60, player.getDiplomaticReputation(neighbor.getId()));
     }
 
     @Test

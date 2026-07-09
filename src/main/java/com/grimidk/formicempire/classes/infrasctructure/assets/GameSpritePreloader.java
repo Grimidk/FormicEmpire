@@ -75,7 +75,7 @@ public final class GameSpritePreloader {
                 }
                 if (species.getAssimilation() != null
                         && colony.getDynasty().isAssimilationCompleted(species.getAssimilation())) {
-                    collectIcon(images, GameConstants.getAntSprite(GameConstants.TYPE_DRONE, species));
+                    collectIcon(images, GameConstants.getAssimilatedDroneSprite(species));
                 }
             }
         }

@@ -119,7 +119,7 @@ public class WorldTest {
             }
         }
 
-        for (var species : GameConstants.getNonOmniSpecies()) {
+        for (var species : GameConstants.getWorldSpawnableNpcSpecies()) {
             assertTrue(npcSpeciesIds.contains(species.getId()),
                     "Missing NPC dynasty for species id " + species.getId());
         }

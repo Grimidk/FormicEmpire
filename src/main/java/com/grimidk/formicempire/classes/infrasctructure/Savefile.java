@@ -109,6 +109,7 @@ public class Savefile implements Serializable {
         public Map<String, Integer> pactBrokenAtWorldMonth = new HashMap<>();
         public Map<String, Integer> pactRequestDeclinedAtWorldMonth = new HashMap<>();
         public Map<String, Integer> tradeRequestDeclinedAtWorldMonth = new HashMap<>();
+        public Map<String, Integer> wasAtWarPeacedAtWorldMonth = new HashMap<>();
         public List<SavedCrossDynastyTradeProposal> pendingTradeProposals = new ArrayList<>();
         public int forcedFlightCooldownDays;
         public List<SavedTunnel> tunnels = new ArrayList<>();

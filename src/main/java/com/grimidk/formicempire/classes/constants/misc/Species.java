@@ -35,6 +35,17 @@ public class Species extends Constant {
         return directory;
     }
 
+    public String getZeroDroneSpriteFileName() {
+        if (directory == null || directory.isEmpty()) {
+            return "Omni.png";
+        }
+        String base = directory.endsWith("/") ? directory.substring(0, directory.length() - 1) : directory;
+        if ("shiningblack".equals(base)) {
+            return "ShiningBlack.png";
+        }
+        return Character.toUpperCase(base.charAt(0)) + base.substring(1) + ".png";
+    }
+
     public Assimilation getAssimilation() {
         return assimilation;
     }

@@ -803,6 +803,7 @@ public class EnglishTranslation implements Translation {
         en.put("DIPLO_MODIFIER_TRADE_REQUEST", "Trade Request");
         en.put("DIPLO_MODIFIER_BORDER_FRICTION", "Border Friction");
         en.put("DIPLO_MODIFIER_GRANTED_INDEPENDENCE", "Granted Independence");
+        en.put("DIPLO_MODIFIER_WAS_AT_WAR", "Was at War");
         en.put("DYNASTY_REBELLION_NAME_FMT", "%s Rebellion");
         en.put("REBELLION_WAR_NAME_FMT", "%s %s Rebellion");
         en.put("ALERT_REBELLION_RISK_FMT", "Rebellion risk at %s!");
@@ -889,8 +890,8 @@ public class EnglishTranslation implements Translation {
 
         en.put("SPECIES_OMNI", "Omni Ant");
         en.put("SPECIES_OMNI_SCIENTIFIC", "Omniformica Grimunknowni");
-        en.put("SPECIES_LEAF", "Leaf-Cutter Ant");
-        en.put("SPECIES_LEAF_SCIENTIFIC", "Atta Cephalotes");
+        en.put("SPECIES_LEAFCUTTER", "Leafcutter Ant");
+        en.put("SPECIES_LEAFCUTTER_SCIENTIFIC", "Atta Cephalotes");
         en.put("SPECIES_PHARAOH", "Pharaoh Ant");
         en.put("SPECIES_PHARAOH_SCIENTIFIC", "Monomorium Pharaonis");
         en.put("SPECIES_MARAUDER", "Marauder Ant");

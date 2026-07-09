@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 69% (174/252 checked)
+Completion: 69% (174/253 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -314,6 +314,7 @@ Per foreign dynasty Actions menu:
 [ ] Open trade negotiation
 [X] Send diplomats to dynasty
 [x] Reputation / stance icons and tooltips
+[ ] Was at War reputation modifier after peace treaty (lasts 1 year)
 [ ] Cooldowns after pact break block war
 
 ================================================================================

@@ -803,6 +803,7 @@ public class FrenchTranslation implements Translation {
         fr.put("DIPLO_MODIFIER_TRADE_REQUEST", "Demande commerciale");
         fr.put("DIPLO_MODIFIER_BORDER_FRICTION", "Friction frontalière");
         fr.put("DIPLO_MODIFIER_GRANTED_INDEPENDENCE", "Indépendance accordée");
+        fr.put("DIPLO_MODIFIER_WAS_AT_WAR", "Étaient en guerre");
         fr.put("DYNASTY_REBELLION_NAME_FMT", "%s Rébellion");
         fr.put("REBELLION_WAR_NAME_FMT", "%s %s Rébellion");
         fr.put("ALERT_REBELLION_RISK_FMT", "Risque de rébellion à %s !");
@@ -889,8 +890,8 @@ public class FrenchTranslation implements Translation {
 
         fr.put("SPECIES_OMNI", "Fourmi omni");
         fr.put("SPECIES_OMNI_SCIENTIFIC", "Omniformica Grimunknowni");
-        fr.put("SPECIES_LEAF", "Fourmi coupe-feuille");
-        fr.put("SPECIES_LEAF_SCIENTIFIC", "Atta Cephalotes");
+        fr.put("SPECIES_LEAFCUTTER", "Fourmi Leafcutter");
+        fr.put("SPECIES_LEAFCUTTER_SCIENTIFIC", "Atta Cephalotes");
         fr.put("SPECIES_PHARAOH", "Fourmi pharaon");
         fr.put("SPECIES_PHARAOH_SCIENTIFIC", "Monomorium Pharaonis");
         fr.put("SPECIES_MARAUDER", "Fourmi maraudeuse");

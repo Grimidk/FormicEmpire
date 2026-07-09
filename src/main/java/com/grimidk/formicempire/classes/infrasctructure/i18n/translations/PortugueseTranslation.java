@@ -803,6 +803,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("DIPLO_MODIFIER_TRADE_REQUEST", "Pedido comercial");
         pt.put("DIPLO_MODIFIER_BORDER_FRICTION", "Fricção fronteiriça");
         pt.put("DIPLO_MODIFIER_GRANTED_INDEPENDENCE", "Independência concedida");
+        pt.put("DIPLO_MODIFIER_WAS_AT_WAR", "Estiveram em guerra");
         pt.put("DYNASTY_REBELLION_NAME_FMT", "%s Rebelião");
         pt.put("REBELLION_WAR_NAME_FMT", "%s %s Rebelião");
         pt.put("ALERT_REBELLION_RISK_FMT", "Risco de rebelião em %s!");
@@ -889,8 +890,8 @@ public class PortugueseTranslation implements Translation {
 
         pt.put("SPECIES_OMNI", "Formiga omni");
         pt.put("SPECIES_OMNI_SCIENTIFIC", "Omniformica Grimunknowni");
-        pt.put("SPECIES_LEAF", "Cortadeira de folhas");
-        pt.put("SPECIES_LEAF_SCIENTIFIC", "Atta Cephalotes");
+        pt.put("SPECIES_LEAFCUTTER", "Formiga Leafcutter");
+        pt.put("SPECIES_LEAFCUTTER_SCIENTIFIC", "Atta Cephalotes");
         pt.put("SPECIES_PHARAOH", "Faraó");
         pt.put("SPECIES_PHARAOH_SCIENTIFIC", "Monomorium Pharaonis");
         pt.put("SPECIES_MARAUDER", "Saqueadora");

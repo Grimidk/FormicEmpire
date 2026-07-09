@@ -16,10 +16,10 @@ public class LocalizationTest {
         assertNotEquals("SPECIES_OMNI_SCIENTIFIC", scientificName, "Scientific name should be localized, not return the key");
         assertEquals("Omniformica Grimunknowni", scientificName);
 
-        // Test Leaf Species
-        Species leaf = GameConstants.SPECIES_LEAF;
-        assertNotNull(leaf);
-        assertEquals("Atta Cephalotes", leaf.getScientific());
+        // Test Leafcutter Species
+        Species leafcutter = GameConstants.SPECIES_LEAFCUTTER;
+        assertNotNull(leafcutter);
+        assertEquals("Atta Cephalotes", leafcutter.getScientific());
 
         // Test Pharaoh Species
         Species pharaoh = GameConstants.SPECIES_PHARAOH;

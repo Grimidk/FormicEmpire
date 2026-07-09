@@ -29,18 +29,18 @@ public class DynastyStarterServiceTest {
     }
 
     @Test
-    public void testInitializeDynastyWithLeafSpecies() {
+    public void testInitializeDynastyWithLeafcutterSpecies() {
         // Setup
         DynastyStarterService starterService = new DynastyStarterService();
-        Species leaf = GameConstants.SPECIES_LEAF;
-        Dynasty dynasty = new Dynasty(2, "Leafy Dynasty", false, leaf);
+        Species leafcutter = GameConstants.SPECIES_LEAFCUTTER;
+        Dynasty dynasty = new Dynasty(2, "Leafcutter Dynasty", false, leafcutter);
 
         // Action
         starterService.initializeDynasty(dynasty);
 
         // Verification
-        assertNotNull(leaf.getBaseUpgrades(), "Leaf species should have base upgrades");
-        for (Upgrade expected : leaf.getBaseUpgrades()) {
+        assertNotNull(leafcutter.getBaseUpgrades(), "Leafcutter species should have base upgrades");
+        for (Upgrade expected : leafcutter.getBaseUpgrades()) {
             assertTrue(dynasty.hasUpgrade(expected), 
                 "Dynasty should have unlocked upgrade: " + expected.getName());
         }

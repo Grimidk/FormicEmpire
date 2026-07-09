@@ -398,6 +398,7 @@ public class SaveManager {
                 sc.pactBrokenAtWorldMonth = dynasty.copyPactBrokenAtWorldMonth();
                 sc.pactRequestDeclinedAtWorldMonth = dynasty.copyPactRequestDeclinedAtWorldMonth();
                 sc.tradeRequestDeclinedAtWorldMonth = dynasty.copyTradeRequestDeclinedAtWorldMonth();
+                sc.wasAtWarPeacedAtWorldMonth = dynasty.copyWasAtWarPeacedAtWorldMonth();
                 sc.pendingTradeProposals = new ArrayList<>();
                 for (CrossDynastyTradeProposal proposal : dynasty.copyPendingTradeProposals()) {
                     Savefile.SavedCrossDynastyTradeProposal saved = new Savefile.SavedCrossDynastyTradeProposal();
@@ -729,6 +730,7 @@ public class SaveManager {
         w.write("      \"pactBrokenAtWorldMonth\": " + serializeMapToJson(sc.pactBrokenAtWorldMonth) + ","); w.newLine();
         w.write("      \"pactRequestDeclinedAtWorldMonth\": " + serializeMapToJson(sc.pactRequestDeclinedAtWorldMonth) + ","); w.newLine();
         w.write("      \"tradeRequestDeclinedAtWorldMonth\": " + serializeMapToJson(sc.tradeRequestDeclinedAtWorldMonth) + ","); w.newLine();
+        w.write("      \"wasAtWarPeacedAtWorldMonth\": " + serializeMapToJson(sc.wasAtWarPeacedAtWorldMonth) + ","); w.newLine();
         w.write("      \"pendingTradeProposals\": " + serializeTradeProposalsToJson(sc.pendingTradeProposals) + ","); w.newLine();
         w.write("      \"forcedFlightCooldownDays\": " + sc.forcedFlightCooldownDays + ","); w.newLine();
         w.write("      \"originDynastyId\": " + sc.originDynastyId + ","); w.newLine();
@@ -985,6 +987,7 @@ public class SaveManager {
         sc.pactBrokenAtWorldMonth = deserializeJsonToMap(map.get("pactBrokenAtWorldMonth"));
         sc.pactRequestDeclinedAtWorldMonth = deserializeJsonToMap(map.get("pactRequestDeclinedAtWorldMonth"));
         sc.tradeRequestDeclinedAtWorldMonth = deserializeJsonToMap(map.get("tradeRequestDeclinedAtWorldMonth"));
+        sc.wasAtWarPeacedAtWorldMonth = deserializeJsonToMap(map.get("wasAtWarPeacedAtWorldMonth"));
         sc.pendingTradeProposals = deserializeJsonToTradeProposals(map.get("pendingTradeProposals"));
         sc.forcedFlightCooldownDays = Integer.parseInt(map.getOrDefault("forcedFlightCooldownDays", "0"));
         sc.originDynastyId = Integer.parseInt(map.getOrDefault("originDynastyId", "0"));

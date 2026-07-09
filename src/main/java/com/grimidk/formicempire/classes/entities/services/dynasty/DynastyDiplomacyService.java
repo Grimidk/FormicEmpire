@@ -262,6 +262,26 @@ public class DynastyDiplomacyService {
         applyWarEconomyToDynasty(other);
     }
 
+    public void applyWasAtWarModifier(Dynasty other, World world) {
+        if (other == null || other == dynasty) {
+            return;
+        }
+        applyModifierBothWays(other, GameConstants.DIPLO_MODIFIER_WAS_AT_WAR);
+        recordWasAtWarPeaced(other, world);
+    }
+
+    public int getWasAtWarModifierMonthsRemaining(Dynasty other, World world) {
+        Integer peacedAt = dynasty.getWasAtWarPeacedAtWorldMonth(other.getId());
+        if (peacedAt == null || world == null) {
+            return 0;
+        }
+        int since = worldMonthIndex(world) - peacedAt;
+        if (since >= GameConstants.WAS_AT_WAR_MODIFIER_MONTHS) {
+            return 0;
+        }
+        return GameConstants.WAS_AT_WAR_MODIFIER_MONTHS - since;
+    }
+
     public boolean canDeclareWar(Dynasty other, World world) {
         if (other == null || other == dynasty || !isDiplomaticallyContactable(dynasty) || !isDiplomaticallyContactable(other)) {
             return false;
@@ -383,6 +403,15 @@ public class DynastyDiplomacyService {
         other.setTradeRequestDeclinedAtWorldMonth(dynasty.getId(), monthIndex);
     }
 
+    private void recordWasAtWarPeaced(Dynasty other, World world) {
+        if (other == null) {
+            return;
+        }
+        int monthIndex = worldMonthIndex(world);
+        dynasty.setWasAtWarPeacedAtWorldMonth(other.getId(), monthIndex);
+        other.setWasAtWarPeacedAtWorldMonth(dynasty.getId(), monthIndex);
+    }
+
     private void maybeRecoverDeclinedPactRequest(Dynasty other, World world) {
         if (other == null || world == null) {
             return;
@@ -406,6 +435,19 @@ public class DynastyDiplomacyService {
         }
         if (worldMonthIndex(world) - declinedAt >= GameConstants.DIPLO_DECLINED_REQUEST_COOLDOWN_MONTHS) {
             recoverFromDeclinedTradeRequest(other);
+        }
+    }
+
+    private void maybeRecoverWasAtWarModifier(Dynasty other, World world) {
+        if (other == null || world == null) {
+            return;
+        }
+        Integer peacedAt = dynasty.getWasAtWarPeacedAtWorldMonth(other.getId());
+        if (peacedAt == null) {
+            return;
+        }
+        if (worldMonthIndex(world) - peacedAt >= GameConstants.WAS_AT_WAR_MODIFIER_MONTHS) {
+            recoverFromWasAtWarModifier(other);
         }
     }
 
@@ -438,6 +480,25 @@ public class DynastyDiplomacyService {
         int reverse = -GameConstants.DIPLO_MODIFIER_TRADE_REQUEST.getReputationDelta();
         dynasty.adjustDiplomaticReputation(other.getId(), reverse);
         other.adjustDiplomaticReputation(dynasty.getId(), reverse);
+    }
+
+    private void recoverFromWasAtWarModifier(Dynasty other) {
+        if (other == null) {
+            return;
+        }
+        dynasty.removeWasAtWarPeacedAtWorldMonth(other.getId());
+        other.removeWasAtWarPeacedAtWorldMonth(dynasty.getId());
+
+        String selfKey = dynasty.getDiplomaticModifierKey(other.getId());
+        String otherKey = other.getDiplomaticModifierKey(dynasty.getId());
+        if (GameConstants.DIPLO_MODIFIER_WAS_AT_WAR.getNameKey().equals(selfKey)
+                || GameConstants.DIPLO_MODIFIER_WAS_AT_WAR.getNameKey().equals(otherKey)) {
+            dynasty.clearDiplomaticModifierKey(other.getId());
+            other.clearDiplomaticModifierKey(dynasty.getId());
+            int reverse = -GameConstants.DIPLO_MODIFIER_WAS_AT_WAR.getReputationDelta();
+            dynasty.adjustDiplomaticReputation(other.getId(), reverse);
+            other.adjustDiplomaticReputation(dynasty.getId(), reverse);
+        }
     }
 
     private void applyWarEconomyToDynasty(Dynasty target) {
@@ -595,6 +656,7 @@ public class DynastyDiplomacyService {
         if (other == null || other == dynasty) {
             return GameConstants.DEFAULT_DIPLOMATIC_REPUTATION;
         }
+        maybeRecoverWasAtWarModifier(other, world);
         int score = dynasty.getDiplomaticReputation(other.getId())
                 + getBorderFrictionAdjustment(other, world)
                 + getMilitaryReputationAdjustment(other)

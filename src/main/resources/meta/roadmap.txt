@@ -14,7 +14,7 @@ To Fix (By decreasing priority) :
 	(none right now)
 	  
 	Low:
-	was a war modifier -20 for 1 year
+	(none right now)
 
 	Can't reproduce:
 	(none right now)

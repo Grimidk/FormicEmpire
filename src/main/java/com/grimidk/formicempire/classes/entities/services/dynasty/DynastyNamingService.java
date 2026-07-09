@@ -10,7 +10,7 @@ import java.util.*;
 
 public class DynastyNamingService {
     private static final List<String> ALL_THEMES = Arrays.asList(
-        "Leaf", "Sand", "Rock", "Iron", "Mushroom", "Meat", "Water", "Fire", "Wind", "Dirt", 
+        "Leafcutter", "Sand", "Rock", "Iron", "Mushroom", "Meat", "Water", "Fire", "Wind", "Dirt", 
         "Wood", "Gold", "Bug", "Stone", "Clay", "Steel", "Ice", "Flame", "Storm", "Dust",
         "Vine", "Root", "Seed", "Pollen", "Honey", "Silk", "Web", "Shadow", "Night", "Day",
         "Silver", "Copper", "Bronze", "Emerald", "Ruby", "Sapphire", "Quartz", "Granite",
@@ -22,8 +22,8 @@ public class DynastyNamingService {
     static {
         // Omni
         SPECIES_PREFERENCES.put(1, Arrays.asList("Iron", "Gold", "Stone", "Bug", "Silver", "Copper", "Bronze", "Steel"));
-        // Leaf-Cutter
-        SPECIES_PREFERENCES.put(2, Arrays.asList("Leaf", "Wood", "Vine", "Root", "Seed", "Forest", "Jungle", "Mushroom"));
+        // Leafcutter
+        SPECIES_PREFERENCES.put(2, Arrays.asList("Leafcutter", "Wood", "Vine", "Root", "Seed", "Forest", "Jungle", "Mushroom"));
         // Pharaoh
         SPECIES_PREFERENCES.put(3, Arrays.asList("Sand", "Dust", "Emerald", "Ruby", "Sapphire", "Gold", "Silver", "Silk"));
         // Marauder

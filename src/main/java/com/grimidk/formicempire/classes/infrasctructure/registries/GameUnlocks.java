@@ -1,6 +1,5 @@
 package com.grimidk.formicempire.classes.infrasctructure.registries;
 
-import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -334,7 +333,7 @@ public final class GameUnlocks {
         public static final Upgrade STAT_WORKER_SPEED_2 = new Upgrade(134, "STAT_WORKER_SPEED_2", "STAT_WORKER_SPEED_2_FLAVOR", "STAT_WORKER_SPEED_2_DESC", STAT_SCOUTING_3, 200000, null);
         static { upgrades.add(STAT_WORKER_SPEED_2); }
         // -- Assimilated --
-        // TODO asset: icons/upgrades/AssimilatedFarming.png; icons/species/Leaf.png (placeholder — replace final art)
+        // TODO asset: icons/upgrades/AssimilatedFarming.png; icons/species/Leafcutter.png (placeholder — replace final art)
         public static final Upgrade ASSIMILATED_FARMING = new Upgrade(1001, "ASSIMILATED_FARMING", "ASSIMILATED_FARMING_FLAVOR", "ASSIMILATED_FARMING_DESC", ABILITY_ASSIMILATION, 0, null );
         static { upgrades.add(ASSIMILATED_FARMING); }
         // TODO asset: icons/upgrades/AssimilatedMultiqueen.png; icons/species/Pharaoh.png (placeholder — replace final art)
@@ -576,7 +575,7 @@ public final class GameUnlocks {
         // --- Assimilations ---
         public static final int ASSIMILATION_COST = 10000;
 
-        // TODO asset: icons/assimilations/Leaf.png; icons/species/Leaf.png (placeholder — replace final art)
+        // TODO asset: icons/assimilations/Leafcutter.png; icons/species/Leafcutter.png (placeholder — replace final art)
         public static final Assimilation ASSIMILATION_LEAFCUTTER = new Assimilation(1, "ASSIMILATION_LEAFCUTTER", "ASSIMILATION_LEAFCUTTER_DESC", ASSIMILATED_FARMING, ASSIMILATION_COST, null);
         static { assimilations.add(ASSIMILATION_LEAFCUTTER); }
         // TODO asset: icons/assimilations/Pharaoh.png; icons/species/Pharaoh.png (placeholder — replace final art)

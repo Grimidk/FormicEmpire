@@ -109,6 +109,9 @@ public class WarService {
         transferRemainingLoserColonies(war, winnerDynastyId, conclusionKey);
         transferVictoryAssimilations(war, winnerDynastyId, conclusionKey);
         clearDiplomaticWarState(war);
+        if (LanguageStrings.WAR_CONCLUSION_PEACE_TREATY.equals(conclusionKey)) {
+            applyPeaceTreatyWasAtWarModifier(war);
+        }
         colonizeCapturedColoniesFromCapital(war, winnerDynastyId, conclusionKey);
     }
 
@@ -681,6 +684,14 @@ public class WarService {
         TradeManager tradeManager = world.getEngine() != null ? world.getEngine().getTradeManager() : null;
         if (dynastyA != null && dynastyB != null) {
             dynastyA.getDiplomacyService().clearWarWith(dynastyB, tradeManager);
+        }
+    }
+
+    private void applyPeaceTreatyWasAtWarModifier(War war) {
+        Dynasty dynastyA = world.findDynastyById(war.getDynastyIdA());
+        Dynasty dynastyB = world.findDynastyById(war.getDynastyIdB());
+        if (dynastyA != null && dynastyB != null) {
+            dynastyA.getDiplomacyService().applyWasAtWarModifier(dynastyB, world);
         }
     }
 
