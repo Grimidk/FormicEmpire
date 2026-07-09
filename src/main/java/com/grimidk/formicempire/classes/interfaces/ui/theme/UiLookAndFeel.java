@@ -131,6 +131,8 @@ public final class UiLookAndFeel {
 
         UIManager.put("ComboBox.background", AssetStyles.BACKGROUND_SECONDARY);
         UIManager.put("ComboBox.foreground", AssetStyles.FONT_COLOR);
+        UIManager.put("ComboBox.disabledBackground", AssetStyles.BACKGROUND_DARK);
+        UIManager.put("ComboBox.disabledForeground", COLOR_LIGHT_GRAY);
         UIManager.put("ComboBox.font", FONT_NORMAL);
         UIManager.put("ComboBox.selectionBackground", AssetStyles.SELECTION_BACKGROUND);
         UIManager.put("ComboBox.selectionForeground", AssetStyles.FONT_COLOR);

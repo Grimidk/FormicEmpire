@@ -10,8 +10,18 @@ public final class UiComboBoxStyles {
 
     public static void style(JComboBox<?> box) {
         box.setFont(AssetStyles.FONT_NORMAL);
-        box.setBackground(AssetStyles.BACKGROUND_SECONDARY);
-        box.setForeground(AssetStyles.FONT_COLOR);
+        box.setOpaque(true);
+        applyComboColors(box);
         box.setBorder(AssetStyles.INTERNAL_BORDER);
+    }
+
+    public static void applyComboColors(JComboBox<?> box) {
+        if (box.isEnabled()) {
+            box.setBackground(AssetStyles.BACKGROUND_SECONDARY);
+            box.setForeground(AssetStyles.FONT_COLOR);
+        } else {
+            box.setBackground(AssetStyles.BACKGROUND_DARK);
+            box.setForeground(AssetStyles.COLOR_LIGHT_GRAY);
+        }
     }
 }

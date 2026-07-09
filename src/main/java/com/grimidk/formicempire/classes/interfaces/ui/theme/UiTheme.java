@@ -140,6 +140,7 @@ public final class UiTheme {
         } else if (component instanceof javax.swing.JRadioButton radioButton) {
             UiRadioButtonStyles.style(radioButton);
         } else if (component instanceof javax.swing.JComboBox<?> comboBox) {
+            UiComboBoxStyles.applyComboColors(comboBox);
             UiComboBoxStyles.style(comboBox);
             comboBox.updateUI();
         } else if (component instanceof javax.swing.JSpinner spinner) {

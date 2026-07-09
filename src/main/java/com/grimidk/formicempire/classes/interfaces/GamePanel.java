@@ -596,6 +596,16 @@ public class GamePanel extends ZeroGamePanel {
         }
     }
 
+    public void onWindowGeometryChanged() {
+        SwingUtilities.invokeLater(() -> {
+            revalidate();
+            repaint();
+            if (engineStarted) {
+                updateGameAreaSize();
+            }
+        });
+    }
+
     @Override
     protected void initLayout() {
         add(createNorthPanel(), BorderLayout.NORTH);

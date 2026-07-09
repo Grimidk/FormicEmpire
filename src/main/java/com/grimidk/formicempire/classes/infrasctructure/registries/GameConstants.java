@@ -1429,6 +1429,16 @@ public final class GameConstants {
 
     public static List<Species> getSpecies() { return Collections.unmodifiableList(species); }
 
+    public static List<Species> getNonOmniSpecies() {
+        List<Species> result = new ArrayList<>();
+        for (Species s : species) {
+            if (s.getId() != SPECIES_OMNI.getId()) {
+                result.add(s);
+            }
+        }
+        return Collections.unmodifiableList(result);
+    }
+
     public static List<TradeMethod> getTradeMethods() { return Collections.unmodifiableList(tradeMethods); }
 
     public static TradeMethod getTradeMethodById(int id) {

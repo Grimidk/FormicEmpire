@@ -1,13 +1,17 @@
 package com.grimidk.formicempire.classes.infrasctructure;
 
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.Tunnel;
+import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -95,5 +99,29 @@ public class WorldTest {
         assertSame(tA, tB, "Both colonies should be working on the SAME tunnel instance");
         assertEquals(50.0, tA.getProgress(), 0.001);
         assertFalse(tA.isComplete());
+    }
+
+    @Test
+    void generateWorldIncludesEachNonOmniSpecies() {
+        World world = new World();
+        Colony colony = new Colony(1, "Test Prime", true);
+        world.generateWorld(
+                GameConstants.BIOME_PLAINS,
+                8,
+                colony,
+                "Test",
+                LanguageStrings.DYNASTY_TITLE_DYNASTY);
+
+        Set<Integer> npcSpeciesIds = new HashSet<>();
+        for (Dynasty dynasty : world.getDynastys()) {
+            if (!dynasty.isPlayer() && dynasty.getSpecies() != null) {
+                npcSpeciesIds.add(dynasty.getSpecies().getId());
+            }
+        }
+
+        for (var species : GameConstants.getNonOmniSpecies()) {
+            assertTrue(npcSpeciesIds.contains(species.getId()),
+                    "Missing NPC dynasty for species id " + species.getId());
+        }
     }
 }

@@ -17,7 +17,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
-
 public class MainFrame extends JFrame implements TriggerManager.TriggerListener {
     public static final String CARD_INTRO = "INTRO";
     public static final String CARD_INIT = "INIT";
@@ -288,29 +287,59 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
     }
 
     private void reapplyWindowChrome() {
-        if (engine.isFullScreen()) {
-            dispose();
-            setUndecorated(true);
+        Runnable apply = () -> {
+            boolean wantFullscreen = engine.isFullScreen();
 
-            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-            setSize(screenSize);
-            setVisible(true);
-
-            setExtendedState(JFrame.MAXIMIZED_BOTH);
-        } else {
-            dispose();
-            setUndecorated(false);
-            setExtendedState(JFrame.NORMAL);
-            String[] size = engine.getScreenSize().split("x");
-            try {
-                int width = Integer.parseInt(size[0]);
-                int height = Integer.parseInt(size[1]);
-                setSize(width, height);
-            } catch (Exception e) {
-                setSize(1000, 700);
+            if (wantFullscreen) {
+                setVisible(false);
+                dispose();
+                setUndecorated(true);
+                setExtendedState(JFrame.NORMAL);
+                Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+                setSize(screenSize);
+                setVisible(true);
+                setExtendedState(JFrame.MAXIMIZED_BOTH);
+            } else {
+                if (isUndecorated()) {
+                    setVisible(false);
+                    dispose();
+                    setUndecorated(false);
+                }
+                setExtendedState(JFrame.NORMAL);
+                applyWindowedSizeFromEngine();
+                setLocationRelativeTo(null);
+                setVisible(true);
             }
-            setLocationRelativeTo(null);
-            setVisible(true);
+
+            validate();
+            repaint();
+            applyGameCursors(this);
+            requestFocus();
+            if (gamePanel != null) {
+                gamePanel.onWindowGeometryChanged();
+            }
+        };
+
+        if (SwingUtilities.isEventDispatchThread()) {
+            apply.run();
+        } else {
+            SwingUtilities.invokeLater(apply);
+        }
+    }
+
+    private void applyWindowedSizeFromEngine() {
+        String screenSize = engine.getScreenSize();
+        if (screenSize == null || !screenSize.contains("x")) {
+            setSize(1000, 700);
+            return;
+        }
+        String[] parts = screenSize.split("x");
+        try {
+            int width = Integer.parseInt(parts[0].trim());
+            int height = Integer.parseInt(parts[1].trim());
+            setSize(Math.max(width, 640), Math.max(height, 480));
+        } catch (NumberFormatException e) {
+            setSize(1000, 700);
         }
     }
 

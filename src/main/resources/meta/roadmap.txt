@@ -12,10 +12,8 @@ To Fix (By decreasing priority) :
 	Map hexes — look yank
 
 	Mid:
-	better contextualize name of the dynasty, make that the savefile name
 	unclear control buttons and settings, need tooltips
 	trigger upgrades to help menu
-	balance species spawning
 	  
 	Low:
 	(none right now)
@@ -29,6 +27,7 @@ To Fix (By decreasing priority) :
 	logistic map overlay and wars overlay with toggles
 	feedback button
 	Font - self explanatory
+	clickable ant cursor
 	
 To Feature (to be done in order):
 Needed for launch (v1.0) (Launch Version):

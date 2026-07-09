@@ -23,37 +23,37 @@ Legend: [ ] = not tested yet   [x] = tested (reset to [ ] if the mechanic change
 ================================================================================
 General:
 [X] Language (en / es / fr / pt)
-[ ] Autosave frequency (monthly, 3/6/12 months, off)
+[X] Autosave frequency (monthly, 3/6/12 months, off)
 [X] Allow turbo speed mode
 [ ] Arachnophobia mode (replaces spider-like visuals)
-[ ] Pause on focus loss
-[ ] Confirm on quit (active session)
-[ ] Escape key closes dialogs / opens game menu
+[X] Pause on focus loss
+[X] Confirm on quit (active session)
+[X] Escape key closes dialogs / opens game menu
 [X] Show tooltips
-[ ] Overworld auto-recenter on idle
-[ ] Fuzz parasite ant numbers
+[X] Overworld auto-recenter on idle
+[X] Fuzz parasite ant numbers
 [X] Show mechanics audit (main-menu and in-game ESC menu button for this file)
-[ ] Reset tab to defaults
+[X] Reset tab to defaults
 
 Video:
-[ ] Window size preset
-[ ] Full screen toggle
-[ ] Daylight color overlay
-[ ] Weather color overlay
+[X] Window size preset
+[X] Full screen toggle (borderless maximized window)
+[X] Daylight color overlay
+[X] Weather color overlay
 [X] Dark mode
-[ ] Reset tab to defaults
+[X] Reset tab to defaults
 
 Audio:
 [X] Master / music / SFX volume sliders
-[ ] Reset tab to defaults
+[X] Reset tab to defaults
 
 Roles (default hatch roles for new ants):
-[ ] Default worker role combo
-[ ] Default soldier role combo
-[ ] Default major role combo
-[ ] Default princess role combo
-[ ] Default queen role combo
-[ ] Reset tab to defaults
+[X] Default worker role combo
+[X] Default soldier role combo
+[X] Default major role combo
+[X] Default princess role combo
+[X] Default queen role combo
+[X] Reset tab to defaults
 
 [X] Save & Apply persists to settings.json and applies live
 

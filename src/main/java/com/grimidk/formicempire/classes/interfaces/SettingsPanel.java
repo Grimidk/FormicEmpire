@@ -73,6 +73,8 @@ public class SettingsPanel extends JPanel {
     private JButton resetVideoButton;
     private JButton resetAudioButton;
     private JButton resetRolesButton;
+    private boolean loadedFullScreen;
+    private String loadedScreenSize;
 
     private static class AutosaveOption {
         String label;
@@ -789,6 +791,10 @@ public class SettingsPanel extends JPanel {
         showAuditMenuCheck.setSelected(engine.isShowAuditMenu());
         
         sizeCombo.setSelectedItem(engine.getScreenSize());
+        if (sizeCombo.getSelectedItem() == null) {
+            ensureScreenSizeInCombo(engine.getScreenSize());
+            sizeCombo.setSelectedItem(engine.getScreenSize());
+        }
         fullScreenCheck.setSelected(engine.isFullScreen());
         daylightColorOverlayCheck.setSelected(engine.isDaylightColorOverlayEnabled());
         weatherColorOverlayCheck.setSelected(engine.isWeatherColorOverlayEnabled());
@@ -803,6 +809,47 @@ public class SettingsPanel extends JPanel {
         selectRoleCombo(defaultRoleMajorCombo, GameConstants.TYPE_MAJOR, engine.getDefaultRoleMajor());
         selectRoleCombo(defaultRolePrincessCombo, GameConstants.TYPE_PRINCESS, engine.getDefaultRolePrincess());
         selectRoleCombo(defaultRoleQueenCombo, GameConstants.TYPE_QUEEN, engine.getDefaultRoleQueen());
+
+        loadedFullScreen = engine.isFullScreen();
+        loadedScreenSize = engine.getScreenSize();
+    }
+
+    private void ensureScreenSizeInCombo(String size) {
+        if (size == null || size.isBlank()) {
+            return;
+        }
+        for (int i = 0; i < sizeCombo.getItemCount(); i++) {
+            if (size.equals(sizeCombo.getItemAt(i))) {
+                return;
+            }
+        }
+        sizeCombo.addItem(size);
+    }
+
+    private boolean windowChromeChanged() {
+        if (fullScreenCheck.isSelected() != loadedFullScreen) {
+            return true;
+        }
+        if (!fullScreenCheck.isSelected()) {
+            return !resolveSelectedScreenSize().equals(loadedScreenSize);
+        }
+        return false;
+    }
+
+    private String resolveSelectedScreenSize() {
+        Object selectedSize = sizeCombo.getSelectedItem();
+        if (selectedSize instanceof String size && !size.isBlank()) {
+            return size;
+        }
+        return engine.getScreenSize() != null ? engine.getScreenSize() : "1000x700";
+    }
+
+    private void showSavedMessage() {
+        Component parent = inDialog ? frame : this;
+        SwingUtilities.invokeLater(() -> UiOptionPane.showMessageDialog(parent,
+                LanguageStrings.get(LanguageStrings.SETTINGS_SAVED_MSG),
+                LanguageStrings.get(LanguageStrings.UI_SETTINGS),
+                JOptionPane.INFORMATION_MESSAGE));
     }
 
     private void saveSettings() {
@@ -827,7 +874,7 @@ public class SettingsPanel extends JPanel {
         engine.setFuzzParasiteAnts(fuzzParasiteAntsCheck.isSelected());
         engine.setShowAuditMenu(showAuditMenuCheck.isSelected());
         
-        engine.setScreenSize((String) sizeCombo.getSelectedItem());
+        engine.setScreenSize(resolveSelectedScreenSize());
         engine.setFullScreen(fullScreenCheck.isSelected());
         engine.setDaylightColorOverlayEnabled(daylightColorOverlayCheck.isSelected());
         engine.setWeatherColorOverlayEnabled(weatherColorOverlayCheck.isSelected());
@@ -844,8 +891,26 @@ public class SettingsPanel extends JPanel {
         applyDefaultRoleFromCombo(defaultRoleQueenCombo, GameConstants.TYPE_QUEEN, GameConstants.ROLE_LAYER.getId());
 
         engine.saveGlobalSettings();
+        boolean chromeChanged = windowChromeChanged();
+
         if (inDialog) {
             frame.applyRuntimeSettings();
+            if (chromeChanged) {
+                Window window = SwingUtilities.getWindowAncestor(this);
+                if (window != null) {
+                    window.dispose();
+                }
+                SwingUtilities.invokeLater(() -> {
+                    frame.applyEngineSettings();
+                    if (frame.getGamePanel() != null) {
+                        frame.getGamePanel().applyOverworldRecenterSetting();
+                    }
+                    loadedFullScreen = engine.isFullScreen();
+                    loadedScreenSize = engine.getScreenSize();
+                    showSavedMessage();
+                });
+                return;
+            }
         } else {
             frame.applyEngineSettings();
         }
@@ -853,9 +918,9 @@ public class SettingsPanel extends JPanel {
             frame.getGamePanel().applyOverworldRecenterSetting();
         }
 
-        SwingUtilities.invokeLater(() -> {
-            UiOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.SETTINGS_SAVED_MSG), LanguageStrings.get(LanguageStrings.UI_SETTINGS), JOptionPane.INFORMATION_MESSAGE);
-        });
+        loadedFullScreen = engine.isFullScreen();
+        loadedScreenSize = engine.getScreenSize();
+        showSavedMessage();
     }
 
     public void refreshTheme() {

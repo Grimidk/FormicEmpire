@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.interfaces.ui.plaf;
 
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.styles.UiComboBoxStyles;
 
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -27,10 +28,8 @@ public final class FlatComboBoxUI extends BasicComboBoxUI {
         JButton button = new JButton() {
             @Override
             protected void paintComponent(Graphics g) {
-                if (isEnabled()) {
-                    g.setColor(getBackground());
-                    g.fillRect(0, 0, getWidth(), getHeight());
-                }
+                g.setColor(isEnabled() ? getBackground() : AssetStyles.BACKGROUND_DARK);
+                g.fillRect(0, 0, getWidth(), getHeight());
                 g.setColor(AssetStyles.UI_BORDER_COLOR);
                 g.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
 
@@ -52,6 +51,7 @@ public final class FlatComboBoxUI extends BasicComboBoxUI {
         button.setRequestFocusEnabled(false);
         button.setBorderPainted(false);
         button.setContentAreaFilled(false);
+        button.setOpaque(false);
         button.setBackground(AssetStyles.BACKGROUND_SECONDARY);
         button.setForeground(AssetStyles.FONT_COLOR);
         return button;
@@ -59,7 +59,7 @@ public final class FlatComboBoxUI extends BasicComboBoxUI {
 
     @Override
     public void paintCurrentValueBackground(Graphics g, Rectangle bounds, boolean hasFocus) {
-        g.setColor(comboBox.getBackground());
+        g.setColor(comboBox.isEnabled() ? comboBox.getBackground() : AssetStyles.BACKGROUND_DARK);
         g.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
         g.setColor(AssetStyles.UI_BORDER_COLOR);
         g.drawRect(bounds.x, bounds.y, bounds.width - 1, bounds.height - 1);
@@ -90,8 +90,7 @@ public final class FlatComboBoxUI extends BasicComboBoxUI {
     protected void installListeners() {
         super.installListeners();
         if (comboBox != null) {
-            comboBox.setBackground(AssetStyles.BACKGROUND_SECONDARY);
-            comboBox.setForeground(AssetStyles.FONT_COLOR);
+            UiComboBoxStyles.applyComboColors(comboBox);
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.infrasctructure;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -354,6 +355,8 @@ public class World {
         
         this.colonyIdCounter = startColony.getId() + 1;
 
+        List<Hex> eligibleNpcHexes = new ArrayList<>();
+
         for (int q = -size; q <= size; q++) {
             int r1 = Math.max(-size, -q - size);
             int r2 = Math.min(size, -q + size);
@@ -373,34 +376,10 @@ public class World {
                 if (dist == 0) {
                     hex.setColony(startColony); 
                     startColony.setActive(true);
+                } else if (dist > 1 && !isWaterBiome(ringBiome)) {
+                    eligibleNpcHexes.add(hex);
                 } else {
-                    if (dist > 1 && !isWaterBiome(ringBiome) && GameRandom.nextInt(100) < 30) {
-                        int dynastyId = this.dynastyIdCounter++;
-                        
-                        // Random non-omni species
-                        List<Species> allSpecies = GameConstants.getSpecies();
-                        List<Species> nonOmni = new ArrayList<>();
-                        for (Species s : allSpecies) {
-                            if (s.getId() != 1) nonOmni.add(s);
-                        }
-                        Species randomSpecies = nonOmni.isEmpty() ? GameConstants.SPECIES_OMNI : nonOmni.get(GameRandom.nextInt(nonOmni.size()));
-                        
-                        DynastyTitle npcTitle = namingService.pickRandomTitle();
-                        String npcDynName = namingService.generateDynastyName(randomSpecies, npcTitle);
-                        Dynasty npcDynasty = new Dynasty(dynastyId, npcDynName, npcTitle.getNameKey(), false, randomSpecies);
-                        npcDynasty.getStarterService().initializeDynasty(npcDynasty);
-                        this.dynastys.add(npcDynasty);
-                        
-                        int colId = this.colonyIdCounter++;
-                        String npcCapName = namingService.generateCapitalName(npcDynName);
-                        Colony aiColony = new Colony(colId, npcCapName, false);
-                        npcDynasty.addColony(aiColony);
-                        
-                        starterService.initializeNewColony(aiColony);
-                        hex.setColony(aiColony);
-                    } else {
-                        hex.setColony(null);
-                    }
+                    hex.setColony(null);
                 }
                 
                 hexMap.put(q + "," + r, hex);
@@ -408,9 +387,69 @@ public class World {
             }
         }
 
-        linkNeighbors(hexMap);        
-        printWorldToConsole(size, hexMap);
+        List<Hex> npcColonyHexes = selectNpcColonyHexes(eligibleNpcHexes);
+        List<Species> npcSpeciesAssignments = assignNpcSpecies(npcColonyHexes.size());
+        for (int i = 0; i < npcColonyHexes.size(); i++) {
+            Hex hex = npcColonyHexes.get(i);
+            Species npcSpecies = npcSpeciesAssignments.get(i);
+
+            int dynastyId = this.dynastyIdCounter++;
+            DynastyTitle npcTitle = namingService.pickRandomTitle();
+            String npcDynName = namingService.generateDynastyName(npcSpecies, npcTitle);
+            Dynasty npcDynasty = new Dynasty(dynastyId, npcDynName, npcTitle.getNameKey(), false, npcSpecies);
+            npcDynasty.getStarterService().initializeDynasty(npcDynasty);
+            this.dynastys.add(npcDynasty);
+
+            int colId = this.colonyIdCounter++;
+            String npcCapName = namingService.generateCapitalName(npcDynName);
+            Colony aiColony = new Colony(colId, npcCapName, false);
+            npcDynasty.addColony(aiColony);
+
+            starterService.initializeNewColony(aiColony);
+            hex.setColony(aiColony);
+        }
+
+        linkNeighbors(hexMap);
         bindDynastyTradeServices();
+    }
+
+    private List<Hex> selectNpcColonyHexes(List<Hex> eligible) {
+        List<Hex> selected = new ArrayList<>();
+        List<Hex> remaining = new ArrayList<>();
+        for (Hex hex : eligible) {
+            if (GameRandom.nextInt(100) < 30) {
+                selected.add(hex);
+            } else {
+                remaining.add(hex);
+            }
+        }
+
+        int required = GameConstants.getNonOmniSpecies().size();
+        Collections.shuffle(remaining, GameRandom.getShuffleRandom());
+        for (Hex hex : remaining) {
+            if (selected.size() >= required) {
+                break;
+            }
+            selected.add(hex);
+        }
+        return selected;
+    }
+
+    private List<Species> assignNpcSpecies(int colonyCount) {
+        List<Species> nonOmni = new ArrayList<>(GameConstants.getNonOmniSpecies());
+        if (colonyCount == 0 || nonOmni.isEmpty()) {
+            return List.of();
+        }
+        Collections.shuffle(nonOmni, GameRandom.getShuffleRandom());
+        List<Species> assignment = new ArrayList<>(colonyCount);
+        for (int i = 0; i < colonyCount; i++) {
+            if (i < nonOmni.size()) {
+                assignment.add(nonOmni.get(i));
+            } else {
+                assignment.add(nonOmni.get(GameRandom.nextInt(nonOmni.size())));
+            }
+        }
+        return assignment;
     }
     
     private boolean isWaterBiome(Biome biome) {
@@ -535,42 +574,6 @@ public class World {
         }
         
         return weathers.get(GameRandom.nextInt(weathers.size()));
-    }
-
-    private void printWorldToConsole(int size, Map<String, Hex> hexMap) {
-        System.out.println("\n--- Generated World Map ---\n");
-        for (int r = -size; r <= size; r++) {
-            StringBuilder line = new StringBuilder();
-            
-            int indent = Math.abs(r);
-            for (int s = 0; s < indent; s++) line.append(" ");
-            
-            int q1 = Math.max(-size, -r - size);
-            int q2 = Math.min(size, -r + size);
-
-            for (int q = q1; q <= q2; q++) {
-                Hex hex = hexMap.get(q + "," + r);
-                if (hex != null) {
-                    char c = '?';
-                    if (hex.getBiome() != null && hex.getBiome().getNameKey() != null && !hex.getBiome().getNameKey().isEmpty()) {
-                        c = hex.getBiome().getNameKey().charAt(0);
-                    }
-                    
-                    if (hex.getColony() != null) {
-                        if (hex.getColony().isPlayer()) {
-                            line.append("P ");
-                        } else {
-                            line.append("E ");
-                        }
-                    } else {
-                        line.append(c).append(" ");
-                    }
-                } else {
-                    line.append("  ");
-                }
-            }
-            System.out.println(line.toString());
-        }
     }
 
     public void startWorld(Biome biome, Colony colony, String baseName) {
