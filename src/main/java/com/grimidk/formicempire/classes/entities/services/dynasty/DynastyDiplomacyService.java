@@ -9,6 +9,7 @@ import java.util.Map;
 
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
+import com.grimidk.formicempire.classes.constants.misc.DiplomaticReputation;
 import com.grimidk.formicempire.classes.constants.misc.DiplomaticReputationModifier;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.misc.TradeMethod;
@@ -475,54 +476,90 @@ public class DynastyDiplomacyService {
         }
     }
 
+    record ReputationModifierLine(String label, int delta) {}
+
     public String buildReputationModifierTooltip(Dynasty other, World world) {
         if (other == null || other == dynasty) {
             return null;
         }
         StringBuilder sb = new StringBuilder("<html>");
-        int base = dynasty.getDiplomaticReputation(other.getId());
-        sb.append(LanguageStrings.get(LanguageStrings.DIPLO_TOOLTIP_BASE))
-                .append(": ")
-                .append(base)
-                .append("<br>");
+        appendReputationModifierDetails(sb, other, world);
+        sb.append("</html>");
+        return sb.toString();
+    }
+
+    public String buildStanceIconTooltip(Dynasty other, World world) {
+        if (other == null || other == dynasty) {
+            return null;
+        }
+        int rep = getEffectiveDiplomaticReputation(other, world);
+        DiplomaticReputation stance = GameConstants.getDiplomaticReputationLevel(rep);
+        StringBuilder sb = new StringBuilder("<html><b>");
+        sb.append(LanguageStrings.get(LanguageStrings.DIPLOMATIC_REPUTATION))
+                .append(":</b> ")
+                .append(stance.getName())
+                .append(" (")
+                .append(rep)
+                .append(")<br>");
+        appendReputationModifierDetails(sb, other, world);
+        sb.append("</html>");
+        return sb.toString();
+    }
+
+    List<ReputationModifierLine> collectVisibleReputationModifiers(Dynasty other, World world) {
+        List<ReputationModifierLine> lines = new ArrayList<>();
 
         String modifierKey = dynasty.getDiplomaticModifierKey(other.getId());
         if (modifierKey != null) {
             DiplomaticReputationModifier modifier = GameConstants.getDiplomaticReputationModifierByKey(modifierKey);
             if (modifier != null) {
-                sb.append(modifier.getName()).append("<br>");
+                lines.add(new ReputationModifierLine(modifier.getName(), modifier.getReputationDelta()));
             }
         }
 
         int friction = getBorderFrictionAdjustment(other, world);
         if (friction != 0) {
-            sb.append(String.format(
-                    LanguageStrings.get(LanguageStrings.DIPLO_MODIFIER_LINE),
-                    GameConstants.DIPLO_MODIFIER_BORDER_FRICTION.getName(),
-                    friction)).append("<br>");
+            lines.add(new ReputationModifierLine(GameConstants.DIPLO_MODIFIER_BORDER_FRICTION.getName(), friction));
         }
 
         int militaryAdj = getMilitaryReputationAdjustment(other);
         if (militaryAdj != 0) {
-            sb.append(String.format(
-                    LanguageStrings.get(LanguageStrings.DIPLO_MODIFIER_LINE),
-                    LanguageStrings.get(LanguageStrings.DIPLO_MILITARY_STRENGTH),
-                    militaryAdj)).append("<br>");
+            lines.add(new ReputationModifierLine(
+                    LanguageStrings.get(LanguageStrings.DIPLO_MILITARY_STRENGTH), militaryAdj));
         }
 
         int diplomatAdj = getDiplomatReputationAdjustment(other);
         if (diplomatAdj != 0) {
-            sb.append(String.format(
-                    LanguageStrings.get(LanguageStrings.DIPLO_MODIFIER_LINE),
-                    LanguageStrings.get(LanguageStrings.DIPLO_MODIFIER_DIPLOMAT_MISSION),
-                    diplomatAdj)).append("<br>");
+            lines.add(new ReputationModifierLine(
+                    LanguageStrings.get(LanguageStrings.DIPLO_MODIFIER_DIPLOMAT_MISSION), diplomatAdj));
+        }
+
+        lines.sort(Comparator.comparingInt(ReputationModifierLine::delta).reversed());
+        return lines;
+    }
+
+    private void appendReputationModifierLine(StringBuilder sb, String label, int delta) {
+        sb.append(LanguageStrings.format(
+                LanguageStrings.DIPLO_MODIFIER_LINE,
+                label,
+                LanguageStrings.formatSigned(delta))).append("<br>");
+    }
+
+    private void appendReputationModifierDetails(StringBuilder sb, Dynasty other, World world) {
+        int stored = dynasty.getDiplomaticReputation(other.getId());
+        sb.append(LanguageStrings.get(LanguageStrings.DIPLO_TOOLTIP_BASE))
+                .append(": ")
+                .append(stored)
+                .append("<br>");
+
+        List<ReputationModifierLine> modifiers = collectVisibleReputationModifiers(other, world);
+        for (ReputationModifierLine line : modifiers) {
+            appendReputationModifierLine(sb, line.label(), line.delta());
         }
 
         sb.append(LanguageStrings.get(LanguageStrings.DIPLO_TOOLTIP_EFFECTIVE))
                 .append(": ")
                 .append(getEffectiveDiplomaticReputation(other, world));
-        sb.append("</html>");
-        return sb.toString();
     }
 
     public boolean sharesBorderWith(Dynasty other, World world) {

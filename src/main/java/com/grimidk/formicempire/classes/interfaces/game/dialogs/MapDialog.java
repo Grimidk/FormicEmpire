@@ -509,31 +509,6 @@ public class MapDialog extends ZeroDialog {
                 item.setOpaque(false);
                 item.setAlignmentX(Component.LEFT_ALIGNMENT);
                 item.setMaximumSize(new Dimension(Integer.MAX_VALUE, 28));
-                item.setToolTipText(LanguageStrings.format(LanguageStrings.MAP_CLICK_VIEW_CAPITAL, d.getName()));
-
-                item.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                        Colony capital = d.getCapital();
-                        if (capital != null) {
-                            Hex capitalHex = world.getHexOfColony(capital);
-                            if (capitalHex != null) {
-                                changeHex(capitalHex, true);
-                            }
-                        }
-                    }
-                    @Override
-                    public void mouseEntered(MouseEvent e) {
-                        item.setOpaque(true);
-                        item.setBackground(AssetStyles.BACKGROUND_SECONDARY);
-                        item.repaint();
-                    }
-                    @Override
-                    public void mouseExited(MouseEvent e) {
-                        item.setOpaque(false);
-                        item.repaint();
-                    }
-                });
 
                 JPanel badges = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 2));
                 badges.setOpaque(false);
@@ -553,33 +528,53 @@ public class MapDialog extends ZeroDialog {
                     badges.add(new JLabel(GameConstants.TYPE_DEAD.getIcon()));
                 }
 
-                DiplomaticReputation stance = null;
+                JLabel stanceIcon = null;
                 if (!defeated && !d.isPlayer() && playerDynasty != null && playerDynasty.getDiplomacyService() != null) {
                     int rep = playerDynasty.getDiplomacyService().getEffectiveDiplomaticReputation(d, world);
-                    stance = GameConstants.getDiplomaticReputationLevel(rep);
+                    DiplomaticReputation stance = GameConstants.getDiplomaticReputationLevel(rep);
                     if (stance.getIcon() != null) {
-                        badges.add(new JLabel(stance.getIcon()));
+                        stanceIcon = new JLabel(stance.getIcon());
+                        stanceIcon.setToolTipText(playerDynasty.getDiplomacyService().buildStanceIconTooltip(d, world));
+                        badges.add(stanceIcon);
                     }
-                    item.setToolTipText(playerDynasty.getDiplomacyService().buildReputationModifierTooltip(d, world));
                 }
 
                 String nameStr = d.getName();
+                String clickTooltip = LanguageStrings.format(LanguageStrings.MAP_CLICK_VIEW_CAPITAL, d.getName());
                 if (defeated) {
                     nameStr += " (" + GameConstants.TYPE_DEAD.getName() + ")";
-                    item.setToolTipText(LanguageStrings.format(LanguageStrings.MAP_CLICK_VIEW_CAPITAL, d.getName())
-                            + " — " + GameConstants.TYPE_DEAD.getName());
+                    clickTooltip = clickTooltip + " — " + GameConstants.TYPE_DEAD.getName();
                 } else if (d.isPlayer()) {
                     nameStr += LanguageStrings.get(LanguageStrings.MAP_YOU_PLAYER);
-                } else if (stance != null) {
-                    nameStr = String.format(
-                            LanguageStrings.get(LanguageStrings.MAP_DYNASTY_DIPLO_FORMAT),
-                            nameStr,
-                            stance.getName());
+                }
+
+                Colony capital = d.getCapital();
+                Hex capitalHex = capital != null ? world.getHexOfColony(capital) : null;
+                if (capitalHex != null) {
+                    colorBox.setToolTipText(clickTooltip);
+                    colorBox.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    colorBox.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            changeHex(capitalHex, true);
+                        }
+
+                        @Override
+                        public void mouseEntered(MouseEvent e) {
+                            colorBox.setBorder(BorderFactory.createLineBorder(AssetStyles.SELECTION_BACKGROUND, 2));
+                        }
+
+                        @Override
+                        public void mouseExited(MouseEvent e) {
+                            colorBox.setBorder(BorderFactory.createLineBorder(AssetStyles.COLOR_ABSOLUTE_BLACK, 1));
+                        }
+                    });
                 }
 
                 JLabel name = new JLabel(nameStr);
                 name.setFont(d.isPlayer() ? AssetStyles.FONT_BOLD.deriveFont(10f) : AssetStyles.FONT_SMALL);
                 name.setForeground(defeated ? AssetStyles.FONT_COLOR_ERROR : AssetStyles.FONT_COLOR);
+                name.setToolTipText(buildDynastyLegendInfoTooltip(d, playerDynasty));
 
                 int pop = d.getStatService().getTotalPopulation(d);
                 int military = d.getMilitaryPower();
@@ -608,6 +603,42 @@ public class MapDialog extends ZeroDialog {
 
             content.revalidate();
             content.repaint();
+        }
+
+        private String buildDynastyLegendInfoTooltip(Dynasty dynasty, Dynasty playerDynasty) {
+            StringBuilder sb = new StringBuilder("<html>");
+            sb.append("<b>").append(dynasty.getName()).append("</b>");
+            if (dynasty.isDefeated()) {
+                sb.append(" (").append(GameConstants.TYPE_DEAD.getName()).append(")");
+            }
+            if (dynasty.getSpecies() != null) {
+                sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_SPECIES)).append(dynasty.getSpecies().getName());
+            }
+            if (dynasty.getRank() != null) {
+                sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_DYNASTY_RANK)).append(dynasty.getRank().getName());
+            }
+            sb.append(LanguageStrings.format(LanguageStrings.MAP_POPULATION_FORMAT,
+                    AssetStyles.formatNumber(dynasty.getStatService().getTotalPopulation(dynasty))));
+            sb.append(LanguageStrings.get(LanguageStrings.MAP_TOOLTIP_DYNASTY_MILITARY_POWER))
+                    .append(AssetStyles.formatNumber(dynasty.getMilitaryPower()));
+            Colony capital = dynasty.getCapital();
+            if (capital != null && capital.getName() != null) {
+                sb.append(LanguageStrings.format(LanguageStrings.MAP_TOOLTIP_DYNASTY_CAPITAL, capital.getName()));
+            }
+            if (!dynasty.isDefeated() && !dynasty.isPlayer() && playerDynasty != null
+                    && playerDynasty.getDiplomacyService() != null) {
+                int rep = playerDynasty.getDiplomacyService().getEffectiveDiplomaticReputation(dynasty, world);
+                DiplomaticReputation stance = GameConstants.getDiplomaticReputationLevel(rep);
+                sb.append("<br><b>")
+                        .append(LanguageStrings.get(LanguageStrings.DIPLOMATIC_REPUTATION))
+                        .append(":</b> ")
+                        .append(stance.getName())
+                        .append(" (")
+                        .append(rep)
+                        .append(")");
+            }
+            sb.append("</html>");
+            return sb.toString();
         }
 
         /** Scrollable legend list — tracks viewport width so rows are not clipped on the right. */

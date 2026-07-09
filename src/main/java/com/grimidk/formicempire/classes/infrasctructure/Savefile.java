@@ -27,6 +27,7 @@ public class Savefile implements Serializable {
     private int year;
     private int worldRadius;
     private String playerDynastyTitleKey;
+    private int playerDynastyTitleId;
     
     // --- Root Summary Data ---
     private int colonyId;
@@ -74,6 +75,8 @@ public class Savefile implements Serializable {
         private static final long serialVersionUID = 1L;
         public int id;
         public String name;
+        public String themeBase;
+        public int titleId;
         public String titleKey;
         public boolean isPlayer;
         public boolean isDefeated;
@@ -305,6 +308,21 @@ public class Savefile implements Serializable {
     public String getPlayerDynastyTitleKey() { return playerDynastyTitleKey; }
     public void setPlayerDynastyTitleKey(String playerDynastyTitleKey) {
         this.playerDynastyTitleKey = playerDynastyTitleKey;
+    }
+
+    public int getPlayerDynastyTitleId() { return playerDynastyTitleId; }
+    public void setPlayerDynastyTitleId(int playerDynastyTitleId) {
+        this.playerDynastyTitleId = playerDynastyTitleId;
+    }
+
+    /** Persisted title id when present; otherwise derived from legacy titleKey. */
+    public int resolvePlayerDynastyTitleId() {
+        if (playerDynastyTitleId > 0) {
+            return playerDynastyTitleId;
+        }
+        return GameConstants.getDynastyTitleByKey(
+                playerDynastyTitleKey != null ? playerDynastyTitleKey : LanguageStrings.DYNASTY_TITLE_DYNASTY
+        ).getId();
     }
     
     public int getColonyId() { return colonyId; }

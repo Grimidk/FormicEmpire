@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 55% (139/251 checked)
+Completion: 54% (137/252 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -9,7 +9,7 @@ Legend: [ ] = not tested yet   [x] = tested (reset to [ ] if the mechanic change
 ================================================================================
 1. LAUNCHER / MAIN MENU
 ================================================================================
-[ ] Intro splash (studio name, arthropod/arachnophobia warning, photosensitivity warning; click or timer to advance) auto-advances to main menu
+[X] Intro splash (studio name, arthropod/arachnophobia warning, photosensitivity warning; click or timer to advance) auto-advances to main menu
 [x] Play — opens save slot screen
 [x] Help — encyclopedia (all tabs; see section 18)
 [x] Roadmap — development roadmap text dialog
@@ -61,7 +61,7 @@ Roles (default hatch roles for new ants):
 3. SAVE / LOAD FLOW
 ================================================================================
 [X] Three save slots — empty slot shows Create
-[X] Create new save — name + dynasty title prompt
+[X] Create new save — name + title, live dynasty preview, confirm prompt; full dynasty name shown in slot list
 [X] Tutorial dialog auto-opens on first create
 [X] Load existing save — resumes session
 [X] Delete save — removes slot data
@@ -332,7 +332,8 @@ Per foreign dynasty Actions menu:
 ================================================================================
 [X] Hex grid navigation — click hex to select / travel
 [X] Collapse / expand dynasty list panel
-[X] Click dynasty in list — jump to capital hex
+[ ] Click dynasty color square in legend — jump to capital hex
+[ ] Hover dynasty name in legend — dynasty info tooltip
 [X] Active wars header expand / collapse
 [X] Click war in sidebar — focus war target
 [X] Dynasty badges: color, species icon, stance, defeated marker

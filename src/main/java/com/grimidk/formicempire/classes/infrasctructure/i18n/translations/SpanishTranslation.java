@@ -326,9 +326,10 @@ public class SpanishTranslation implements Translation {
         es.put("DIALOG_MAP_TITLE", "Mapa Mundial");
         es.put("MAP_HOME_BUTTON", "Centrar en el Hogar");
         es.put("MAP_LEGEND_TITLE", "Leyenda de Dinastía");
-        es.put("MAP_CLICK_VIEW_CAPITAL", "Clic para ver Capital de %s");
+        es.put("MAP_CLICK_VIEW_CAPITAL", "Clic para viajar a la capital de %s");
         es.put("MAP_YOU_PLAYER", " (Tú)");
-        es.put("MAP_POPULATION_FORMAT", "Población: %s");
+        es.put("MAP_POPULATION_FORMAT", "<br><b>Población:</b> %s");
+        es.put("MAP_TOOLTIP_DYNASTY_CAPITAL", "<br><b>Capital:</b> %s");
         es.put("MAP_TOOLTIP_BIOME", "<b>Bioma:</b> ");
         es.put("MAP_TOOLTIP_COLONY_NAME", "<b>Colonia:</b> ");
         es.put("MAP_TOOLTIP_RANK", "<br><b>Rango:</b> ");
@@ -464,6 +465,7 @@ public class SpanishTranslation implements Translation {
         es.put("STAT_ACTIVE_MILITARY_POWER", "Poder militar activo");
         es.put("STAT_RESERVE_MILITARY_POWER", "Poder militar de reserva");
         es.put("DYNASTY_REPUTATION", "Reputación");
+        es.put("DIPLOMATIC_REPUTATION", "Reputación diplomática");
         es.put("DYNASTY_REPUTATION_STANCE", "Postura");
         es.put("SCORE_TIER_FORMAT", "%s · %s");
         es.put("DYNASTY_STATUS", "Acciones/Estado");
@@ -513,9 +515,11 @@ public class SpanishTranslation implements Translation {
 
         es.put("SAVE_EMPTY_SLOT", "Espacio vacío");
         es.put("SAVE_DAYS_FORMAT", "%s — %s días");
-        es.put("SAVE_ENTER_NAME", "Ingrese nombre de la partida:");
-        es.put("SAVE_ENTER_DYNASTY_TITLE", "Título de la organización:");
-        es.put("SAVE_CREATE_TITLE", "Crear Guardado");
+        es.put("SAVE_ENTER_NAME", "Nombre");
+        es.put("SAVE_ENTER_DYNASTY_TITLE", "Título");
+        es.put("SAVE_DYNASTY_PREVIEW", "%s");
+        es.put("SAVE_DYNASTY_CONFIRM", "¿Seguro que quieres que tu dinastía se llame %s?");
+        es.put("SAVE_CREATE_TITLE", "Nombra tu Dinastía de Hormigas");
         es.put("SAVE_ERROR_CREATE", "Error al crear nuevo archivo de guardado.");
         es.put("SAVE_ERROR_WRITE", "No se pudo guardar la partida. Volviendo al menú.");
         es.put("SAVE_ERROR_WRITE_TITLE", "Error al guardar");
@@ -530,6 +534,8 @@ public class SpanishTranslation implements Translation {
         es.put("DYNASTY_TITLE_TECHNOCRACY", "Tecnocracia");
         es.put("DYNASTY_TITLE_EMPIRE", "Imperio");
         es.put("DYNASTY_TITLE_DOMINION", "Dominio");
+        es.put("DYNASTY_TITLE_NATION", "Nación");
+        es.put("DYNASTY_TITLE_REPUBLIC", "República");
         es.put("DYNASTY_TITLE_CITY", "Ciudad");
         es.put("DYNASTY_TITLE_BERG", "Berg");
         es.put("DYNASTY_TITLE_GRAD", "Grad");
@@ -540,6 +546,8 @@ public class SpanishTranslation implements Translation {
         es.put("DYNASTY_TITLE_FMT_TECHNOCRACY", "%s Tecnocracia");
         es.put("DYNASTY_TITLE_FMT_EMPIRE", "%s Imperio");
         es.put("DYNASTY_TITLE_FMT_DOMINION", "%s Dominio");
+        es.put("DYNASTY_TITLE_FMT_NATION", "%s Nación");
+        es.put("DYNASTY_TITLE_FMT_REPUBLIC", "%s República");
         es.put("DYNASTY_TITLE_FMT_CITY", "%s Ciudad");
         es.put("DYNASTY_TITLE_FMT_BERG", "%s Berg");
         es.put("DYNASTY_TITLE_FMT_GRAD", "%s Grad");

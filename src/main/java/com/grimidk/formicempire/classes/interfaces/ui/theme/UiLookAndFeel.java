@@ -77,6 +77,7 @@ public final class UiLookAndFeel {
         UIManager.put("OptionPane.background", AssetStyles.BACKGROUND_COLOR);
         UIManager.put("OptionPane.foreground", AssetStyles.FONT_COLOR);
         UIManager.put("OptionPane.messageForeground", AssetStyles.FONT_COLOR);
+        UIManager.put("OptionPane.isYesLast", Boolean.TRUE);
         UIManager.put("ScrollBar.width", FlatScrollBarUI.VERTICAL_BAR_WIDTH);
         UIManager.put("ScrollBar.background", AssetStyles.BACKGROUND_DARK);
         UIManager.put("ScrollBar.thumb", AssetStyles.BACKGROUND_SECONDARY);

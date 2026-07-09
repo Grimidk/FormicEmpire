@@ -37,6 +37,11 @@ public class DynastyNamingService {
         return titles.get(GameRandom.nextInt(titles.size()));
     }
 
+    public DynastyTitle pickRandomCityTitle() {
+        List<DynastyTitle> titles = GameConstants.getCityTitles();
+        return titles.get(GameRandom.nextInt(titles.size()));
+    }
+
     public String generateDynastyName(Species species) {
         return generateDynastyName(species, pickRandomTitle());
     }

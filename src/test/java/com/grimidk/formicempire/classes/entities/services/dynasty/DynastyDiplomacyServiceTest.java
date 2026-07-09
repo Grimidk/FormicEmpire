@@ -587,4 +587,17 @@ class DynastyDiplomacyServiceTest {
         assertTrue(neighbor.getDiplomacyService().canRequestTrade(player, world));
         assertEquals(60, neighbor.getDiplomaticReputation(player.getId()));
     }
+
+    @Test
+    void reputationModifierTooltipUsesSignedDeltasSortedPositiveFirst() {
+        player.setDiplomaticModifierKey(neighbor.getId(), GameConstants.DIPLO_MODIFIER_PACT.getNameKey());
+
+        var lines = player.getDiplomacyService().collectVisibleReputationModifiers(neighbor, null);
+        assertEquals(1, lines.size());
+        assertEquals(20, lines.get(0).delta());
+
+        String tooltip = player.getDiplomacyService().buildStanceIconTooltip(neighbor, null);
+        assertTrue(tooltip.contains("Pact: +20"));
+        assertTrue(tooltip.contains("Effective:"));
+    }
 }

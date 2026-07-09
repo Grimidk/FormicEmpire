@@ -149,6 +149,7 @@ public final class GameConstants {
     private static final List<ColonyLoyalty> colonyLoyalties = new ArrayList<>();
     private static final List<ColonyLoyaltyModifier> colonyLoyaltyModifiers = new ArrayList<>();
     private static final List<DynastyTitle> dynastyTitles = new ArrayList<>();
+    private static final List<DynastyTitle> cityTitles = new ArrayList<>();
     private static final List<Species> species = new ArrayList<>();
     private static final List<TradeMethod> tradeMethods = new ArrayList<>();
     private static final List<Humidity> humidity = new ArrayList<>();
@@ -1031,17 +1032,25 @@ public final class GameConstants {
             7, LanguageStrings.DYNASTY_TITLE_DOMINION, LanguageStrings.DYNASTY_TITLE_FMT_DOMINION);
     static { dynastyTitles.add(DYNASTY_TITLE_DOMINION); }
 
-    public static final DynastyTitle DYNASTY_TITLE_CITY = new DynastyTitle(
+    public static final DynastyTitle DYNASTY_TITLE_NATION = new DynastyTitle(
+            11, LanguageStrings.DYNASTY_TITLE_NATION, LanguageStrings.DYNASTY_TITLE_FMT_NATION);
+    static { dynastyTitles.add(DYNASTY_TITLE_NATION); }
+
+    public static final DynastyTitle DYNASTY_TITLE_REPUBLIC = new DynastyTitle(
+            12, LanguageStrings.DYNASTY_TITLE_REPUBLIC, LanguageStrings.DYNASTY_TITLE_FMT_REPUBLIC);
+    static { dynastyTitles.add(DYNASTY_TITLE_REPUBLIC); }
+
+    public static final DynastyTitle CITY_TITLE_CITY = new DynastyTitle(
             8, LanguageStrings.DYNASTY_TITLE_CITY, LanguageStrings.DYNASTY_TITLE_FMT_CITY);
-    static { dynastyTitles.add(DYNASTY_TITLE_CITY); }
+    static { cityTitles.add(CITY_TITLE_CITY); }
 
-    public static final DynastyTitle DYNASTY_TITLE_BERG = new DynastyTitle(
+    public static final DynastyTitle CITY_TITLE_BERG = new DynastyTitle(
             9, LanguageStrings.DYNASTY_TITLE_BERG, LanguageStrings.DYNASTY_TITLE_FMT_BERG);
-    static { dynastyTitles.add(DYNASTY_TITLE_BERG); }
+    static { cityTitles.add(CITY_TITLE_BERG); }
 
-    public static final DynastyTitle DYNASTY_TITLE_GRAD = new DynastyTitle(
+    public static final DynastyTitle CITY_TITLE_GRAD = new DynastyTitle(
             10, LanguageStrings.DYNASTY_TITLE_GRAD, LanguageStrings.DYNASTY_TITLE_FMT_GRAD);
-    static { dynastyTitles.add(DYNASTY_TITLE_GRAD); }
+    static { cityTitles.add(CITY_TITLE_GRAD); }
 
     // --- Species ---
     public static final Species SPECIES_OMNI = new Species(1, LanguageStrings.SPECIES_OMNI, LanguageStrings.SPECIES_OMNI_SCIENTIFIC,  "omni/", null, 
@@ -1234,16 +1243,46 @@ public final class GameConstants {
 
     public static List<ColonyRank> getColonyRanks() { return Collections.unmodifiableList(colonyRanks); }
     public static List<DynastyTitle> getDynastyTitles() { return Collections.unmodifiableList(dynastyTitles); }
+    public static List<DynastyTitle> getCityTitles() { return Collections.unmodifiableList(cityTitles); }
 
     public static DynastyTitle getDynastyTitleByKey(String key) {
-        if (key != null) {
-            for (DynastyTitle title : dynastyTitles) {
-                if (title.getNameKey().equals(key)) {
-                    return title;
-                }
+        DynastyTitle title = findTitleByKey(dynastyTitles, key);
+        if (title != null) {
+            return title;
+        }
+        title = findTitleByKey(cityTitles, key);
+        return title != null ? title : DYNASTY_TITLE_DYNASTY;
+    }
+
+    public static DynastyTitle getDynastyTitleById(int id) {
+        for (DynastyTitle title : dynastyTitles) {
+            if (title.getId() == id) {
+                return title;
+            }
+        }
+        for (DynastyTitle title : cityTitles) {
+            if (title.getId() == id) {
+                return title;
             }
         }
         return DYNASTY_TITLE_DYNASTY;
+    }
+
+    public static DynastyTitle getCityTitleByKey(String key) {
+        DynastyTitle title = findTitleByKey(cityTitles, key);
+        return title != null ? title : CITY_TITLE_CITY;
+    }
+
+    private static DynastyTitle findTitleByKey(List<DynastyTitle> titles, String key) {
+        if (key == null) {
+            return null;
+        }
+        for (DynastyTitle title : titles) {
+            if (title.getNameKey().equals(key)) {
+                return title;
+            }
+        }
+        return null;
     }
 
     public static List<GameSpeed> getGameSpeeds() { return Collections.unmodifiableList(gameSpeeds); }

@@ -343,6 +343,7 @@ public class World {
         namingService.registerUsedName(dynName);
         
         Dynasty playerDynasty = new Dynasty(this.dynastyIdCounter++, dynName, playerTitle.getNameKey(), true, GameConstants.SPECIES_OMNI);
+        playerDynasty.setThemeBase(baseName);
         playerDynasty.getStarterService().initializeDynasty(playerDynasty);
         
         String capName = namingService.generateCapitalName(dynName);
@@ -609,17 +610,16 @@ public class World {
         this.year = savefile.getYear();  
         this.worldRadius = (savefile.getWorldRadius() > 0) ? savefile.getWorldRadius() : 8;
         
+        String playerTitleKey = GameConstants.getDynastyTitleById(savefile.resolvePlayerDynastyTitleId()).getNameKey();
+
         String baseName = "Player";
         if (savefile.getName() != null && !savefile.getName().trim().isEmpty()) {
             String sName = savefile.getName().trim();
             if (!LanguageStrings.isGenericSaveName(sName, savefile.getId())) {
-                baseName = sName;
+                baseName = LanguageStrings.resolvePlayerThemeName(sName, savefile.resolvePlayerDynastyTitleId());
             }
         }
         baseName = formatName(baseName);
-        String playerTitleKey = savefile.getPlayerDynastyTitleKey() != null
-                ? savefile.getPlayerDynastyTitleKey()
-                : LanguageStrings.DYNASTY_TITLE_DYNASTY;
 
         this.hexes.clear();
         this.dynastys.clear();
@@ -823,6 +823,7 @@ public class World {
         }
         warService.pruneInvalidWars();
 
+        relocalizeDynastyNames();
         changeActiveHex(getSpawnHex());
         updateEnvironmentalConditions();
     }

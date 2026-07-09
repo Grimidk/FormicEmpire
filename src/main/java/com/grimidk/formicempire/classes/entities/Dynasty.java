@@ -38,6 +38,7 @@ public class Dynasty {
 
     private final int id;
     private String name;
+    private String themeBase;
     private String titleKey;
     private boolean isPlayer;
     private Species species;
@@ -142,10 +143,22 @@ public class Dynasty {
     
     public Dynasty(Savefile.SavedDynasty savedDynasty) {
         this.id = savedDynasty.id;
-        this.name = savedDynasty.name;
-        this.titleKey = savedDynasty.titleKey != null && !savedDynasty.titleKey.isEmpty()
-                ? savedDynasty.titleKey
-                : LanguageStrings.DYNASTY_TITLE_DYNASTY;
+        if (savedDynasty.titleId > 0) {
+            this.titleKey = GameConstants.getDynastyTitleById(savedDynasty.titleId).getNameKey();
+        } else {
+            this.titleKey = savedDynasty.titleKey != null && !savedDynasty.titleKey.isEmpty()
+                    ? savedDynasty.titleKey
+                    : LanguageStrings.DYNASTY_TITLE_DYNASTY;
+        }
+        if (savedDynasty.themeBase != null && !savedDynasty.themeBase.isEmpty()) {
+            this.themeBase = savedDynasty.themeBase;
+            this.name = savedDynasty.themeBase;
+        } else {
+            this.name = savedDynasty.name;
+            if (savedDynasty.isPlayer) {
+                this.themeBase = LanguageStrings.dynastyThemeBase(savedDynasty.name, this.titleKey);
+            }
+        }
         this.isPlayer = savedDynasty.isPlayer;
         this.researchPoints = savedDynasty.researchPoints;
         this.totalNuptialFlights = savedDynasty.totalNuptialFlights;
@@ -374,7 +387,9 @@ public class Dynasty {
     }
 
     public String generateNextColonyName() {
-        String baseName = LanguageStrings.dynastyThemeBase(this.name, this.titleKey);
+        String baseName = themeBase != null && !themeBase.isEmpty()
+                ? themeBase
+                : LanguageStrings.dynastyThemeBase(this.name, this.titleKey);
         if (baseName.isEmpty()) {
             baseName = "Player";
         }
@@ -975,8 +990,11 @@ public class Dynasty {
     // --- Getters & Setters ---
     public int getId() { return id; }
     public String getName() { return name; }
+    public String getThemeBase() { return themeBase; }
+    public void setThemeBase(String themeBase) { this.themeBase = themeBase; }
     public String getTitleKey() { return titleKey; }
     public DynastyTitle getTitle() { return GameConstants.getDynastyTitleByKey(titleKey); }
+    public int getTitleId() { return getTitle().getId(); }
 
     public void setTitleKey(String titleKey) {
         this.titleKey = titleKey != null ? titleKey : LanguageStrings.DYNASTY_TITLE_DYNASTY;
@@ -987,12 +1005,18 @@ public class Dynasty {
             this.name = LanguageStrings.formatWildDynastyName(this.titleKey);
             return;
         }
-        String theme = LanguageStrings.stripDynastyNameSuffix(this.name, this.titleKey);
+        String theme = this.themeBase;
         if (theme == null || theme.isEmpty()) {
-            theme = LanguageStrings.stripDynastyNameSuffix(this.name);
+            theme = LanguageStrings.stripDynastyNameSuffix(this.name, this.titleKey);
+            if (theme == null || theme.isEmpty()) {
+                theme = LanguageStrings.stripDynastyNameSuffix(this.name);
+            }
         }
         if (theme != null && !theme.isEmpty()) {
             this.name = LanguageStrings.formatDynastyName(theme, this.titleKey);
+            if (this.themeBase == null || this.themeBase.isEmpty()) {
+                this.themeBase = theme;
+            }
         }
     }
 

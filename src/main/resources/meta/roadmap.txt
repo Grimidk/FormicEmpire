@@ -10,12 +10,12 @@ To Fix (By decreasing priority) :
 	TODO: sprites/buildings/rooms/*.png
 	TODO: species sprites and icon: honeypot, turtle, carpenter, weaver, floodplain, fire, jet, gliding, army, ghost, dracula, silver, maricopa, exploding, bulldog, shining black and desert
 	Map hexes — look yank
-	slower warning screen but skip with clicking 
 
 	Mid:
 	better contextualize name of the dynasty, make that the savefile name
 	unclear control buttons and settings, need tooltips
 	trigger upgrades to help menu
+	balance species spawning
 	  
 	Low:
 	(none right now)
@@ -63,7 +63,7 @@ Needed for launch (v1.0) (Launch Version):
 	music and sounds and settings for them and player panel (to include in core engine)
 	promo video 
 	langs (GER, RUS, CHN, JAP) and translate credits and roadmap
-	proper start animation and general animations and roadmap and credits, epilepsy warning
+	proper start animation and general animations and roadmap and credits design
 	register Grim Games or Grimidk in steam as dev team
 	steam upload and demo version
 	versioning to go back to previous stable patches

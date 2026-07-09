@@ -326,9 +326,10 @@ public class PortugueseTranslation implements Translation {
         pt.put("DIALOG_MAP_TITLE", "Mapa mundial");
         pt.put("MAP_HOME_BUTTON", "Centralizar no lar");
         pt.put("MAP_LEGEND_TITLE", "Legenda da dinastia");
-        pt.put("MAP_CLICK_VIEW_CAPITAL", "Clique para ver a capital de %s");
+        pt.put("MAP_CLICK_VIEW_CAPITAL", "Clique para viajar até a capital de %s");
         pt.put("MAP_YOU_PLAYER", " (Você)");
-        pt.put("MAP_POPULATION_FORMAT", "População: %s");
+        pt.put("MAP_POPULATION_FORMAT", "<br><b>População:</b> %s");
+        pt.put("MAP_TOOLTIP_DYNASTY_CAPITAL", "<br><b>Capital:</b> %s");
         pt.put("MAP_TOOLTIP_BIOME", "<b>Bioma:</b> ");
         pt.put("MAP_TOOLTIP_COLONY_NAME", "<b>Colónia:</b> ");
         pt.put("MAP_TOOLTIP_RANK", "<br><b>Rank:</b> ");
@@ -464,6 +465,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("STAT_ACTIVE_MILITARY_POWER", "Poder militar ativo");
         pt.put("STAT_RESERVE_MILITARY_POWER", "Poder militar de reserva");
         pt.put("DYNASTY_REPUTATION", "Reputação");
+        pt.put("DIPLOMATIC_REPUTATION", "Reputação diplomática");
         pt.put("DYNASTY_REPUTATION_STANCE", "Postura");
         pt.put("SCORE_TIER_FORMAT", "%s · %s");
         pt.put("DYNASTY_STATUS", "Ações/estado");
@@ -513,9 +515,11 @@ public class PortugueseTranslation implements Translation {
 
         pt.put("SAVE_EMPTY_SLOT", "Slot vazio");
         pt.put("SAVE_DAYS_FORMAT", "%s — %s dias");
-        pt.put("SAVE_ENTER_NAME", "Digite o nome do save:");
-        pt.put("SAVE_ENTER_DYNASTY_TITLE", "Título da organização:");
-        pt.put("SAVE_CREATE_TITLE", "Criar save");
+        pt.put("SAVE_ENTER_NAME", "Nome");
+        pt.put("SAVE_ENTER_DYNASTY_TITLE", "Título");
+        pt.put("SAVE_DYNASTY_PREVIEW", "%s");
+        pt.put("SAVE_DYNASTY_CONFIRM", "Tens a certeza de que queres chamar à tua dinastia %s?");
+        pt.put("SAVE_CREATE_TITLE", "Nomeia a tua Dinastia de Formigas");
         pt.put("SAVE_ERROR_CREATE", "Erro ao criar novo arquivo de save.");
         pt.put("SAVE_ERROR_WRITE", "Falha ao salvar o jogo. Voltando ao menu.");
         pt.put("SAVE_ERROR_WRITE_TITLE", "Falha ao salvar");
@@ -530,6 +534,8 @@ public class PortugueseTranslation implements Translation {
         pt.put("DYNASTY_TITLE_TECHNOCRACY", "Tecnocracia");
         pt.put("DYNASTY_TITLE_EMPIRE", "Império");
         pt.put("DYNASTY_TITLE_DOMINION", "Domínio");
+        pt.put("DYNASTY_TITLE_NATION", "Nação");
+        pt.put("DYNASTY_TITLE_REPUBLIC", "República");
         pt.put("DYNASTY_TITLE_CITY", "Cidade");
         pt.put("DYNASTY_TITLE_BERG", "Berg");
         pt.put("DYNASTY_TITLE_GRAD", "Grad");
@@ -540,6 +546,8 @@ public class PortugueseTranslation implements Translation {
         pt.put("DYNASTY_TITLE_FMT_TECHNOCRACY", "%s Tecnocracia");
         pt.put("DYNASTY_TITLE_FMT_EMPIRE", "%s Império");
         pt.put("DYNASTY_TITLE_FMT_DOMINION", "%s Domínio");
+        pt.put("DYNASTY_TITLE_FMT_NATION", "%s Nação");
+        pt.put("DYNASTY_TITLE_FMT_REPUBLIC", "%s República");
         pt.put("DYNASTY_TITLE_FMT_CITY", "%s Cidade");
         pt.put("DYNASTY_TITLE_FMT_BERG", "%s Berg");
         pt.put("DYNASTY_TITLE_FMT_GRAD", "%s Grad");

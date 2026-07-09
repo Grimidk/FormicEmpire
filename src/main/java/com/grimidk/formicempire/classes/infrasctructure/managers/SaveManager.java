@@ -334,6 +334,7 @@ public class SaveManager {
         if (w.getDynastys() != null) {
             for (Dynasty dynasty : w.getDynastys()) {
                 if (dynasty.isPlayer()) {
+                    save.setPlayerDynastyTitleId(dynasty.getTitleId());
                     save.setPlayerDynastyTitleKey(dynasty.getTitleKey());
                     break;
                 }
@@ -349,8 +350,14 @@ public class SaveManager {
             for (Dynasty dynasty : w.getDynastys()) {
                 Savefile.SavedDynasty sc = new Savefile.SavedDynasty();
                 sc.id = dynasty.getId();
-                sc.name = dynasty.getName();
+                sc.titleId = dynasty.getTitleId();
                 sc.titleKey = dynasty.getTitleKey();
+                if (dynasty.getThemeBase() != null && !dynasty.getThemeBase().isEmpty()) {
+                    sc.themeBase = dynasty.getThemeBase();
+                    sc.name = sc.themeBase;
+                } else {
+                    sc.name = dynasty.getName();
+                }
                 sc.isPlayer = dynasty.isPlayer();
                 sc.isDefeated = dynasty.isDefeated();
                 sc.rankName = dynasty.getRank() != null ? dynasty.getRank().getNameKey() : LanguageStrings.RANK_ANT;
@@ -636,6 +643,7 @@ public class SaveManager {
         writeJsonLine(w, "month", s.getMonth(), false);
         writeJsonLine(w, "year", s.getYear(), false);
         writeJsonLine(w, "worldRadius", s.getWorldRadius(), false);
+        writeJsonLine(w, "playerDynastyTitleId", s.resolvePlayerDynastyTitleId(), false);
         writeJsonLine(w, "playerDynastyTitleKey", s.getPlayerDynastyTitleKey() != null ? s.getPlayerDynastyTitleKey() : LanguageStrings.DYNASTY_TITLE_DYNASTY, false);
         
         // - Root Summary Data - 
@@ -691,7 +699,9 @@ public class SaveManager {
         w.write("    {");
         w.newLine();
         writeJsonLine(w, "id", sc.id, false);
-        writeJsonLine(w, "name", sc.name, false);
+        writeJsonLine(w, "themeBase", sc.themeBase != null ? sc.themeBase : "", false);
+        writeJsonLine(w, "titleId", sc.titleId, false);
+        writeJsonLine(w, "name", sc.name != null ? sc.name : "", false);
         writeJsonLine(w, "titleKey", sc.titleKey != null ? sc.titleKey : LanguageStrings.DYNASTY_TITLE_DYNASTY, false);
         writeJsonLine(w, "isPlayer", sc.isPlayer, false);
         writeJsonLine(w, "isDefeated", sc.isDefeated, false);
@@ -841,6 +851,7 @@ public class SaveManager {
         s.setMonth(Integer.parseInt(rootMap.getOrDefault("month", "1")));
         s.setYear(Integer.parseInt(rootMap.getOrDefault("year", "0")));
         s.setWorldRadius(Integer.parseInt(rootMap.getOrDefault("worldRadius", "8")));
+        s.setPlayerDynastyTitleId(Integer.parseInt(rootMap.getOrDefault("playerDynastyTitleId", "0")));
         s.setPlayerDynastyTitleKey(rootMap.getOrDefault("playerDynastyTitleKey", LanguageStrings.DYNASTY_TITLE_DYNASTY));
         
         // --- Populate Root Summary Data ---
@@ -941,8 +952,13 @@ public class SaveManager {
         Savefile.SavedDynasty sc = new Savefile.SavedDynasty();
         Map<String, String> map = parseTopLevelJson(json);
         sc.id = Integer.parseInt(map.getOrDefault("id", "0"));
+        sc.themeBase = map.getOrDefault("themeBase", "");
+        sc.titleId = Integer.parseInt(map.getOrDefault("titleId", "0"));
         sc.name = map.getOrDefault("name", "Dynasty");
         sc.titleKey = map.getOrDefault("titleKey", LanguageStrings.DYNASTY_TITLE_DYNASTY);
+        if (sc.titleId <= 0) {
+            sc.titleId = GameConstants.getDynastyTitleByKey(sc.titleKey).getId();
+        }
         sc.isPlayer = Boolean.parseBoolean(map.getOrDefault("isPlayer", "false"));
         sc.isDefeated = Boolean.parseBoolean(map.getOrDefault("isDefeated", "false"));
         sc.rankName = map.getOrDefault("rank", "Ant");

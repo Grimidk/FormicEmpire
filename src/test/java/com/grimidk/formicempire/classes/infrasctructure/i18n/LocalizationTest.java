@@ -33,12 +33,11 @@ public class LocalizationTest {
     }
 
     @Test
-    public void testSpanishLocalization() {
-        LanguageStrings.setLanguage("es");
-        Species omni = GameConstants.SPECIES_OMNI;
-        assertEquals("Omniformica Grimunknowni", omni.getScientific());
-        
-        // Reset to English
+    void stripDynastyNameSuffixStripsAnyLocale() {
         LanguageStrings.setLanguage("en");
+        assertEquals("Crystal", LanguageStrings.stripDynastyNameSuffix("Crystal Dinastía", LanguageStrings.DYNASTY_TITLE_DYNASTY));
+        assertEquals("Crystal", LanguageStrings.stripDynastyNameSuffix("Crystal Dynasty", LanguageStrings.DYNASTY_TITLE_DYNASTY));
+        assertEquals("Crystal Dynasty", LanguageStrings.formatSaveSlotDisplayName("Crystal", GameConstants.DYNASTY_TITLE_DYNASTY.getId(), 1));
+        assertEquals("Crystal Dynasty", LanguageStrings.formatSaveSlotDisplayName("Crystal Dinastía", GameConstants.DYNASTY_TITLE_DYNASTY.getId(), 1));
     }
 }

@@ -91,8 +91,23 @@ public final class LanguageStrings {
         return title.formatName(baseName);
     }
 
+    public static String formatDynastyName(String baseName, int titleId) {
+        return formatDynastyName(baseName, GameConstants.getDynastyTitleById(titleId));
+    }
+
     public static String formatDynastyName(String baseName, String titleKey) {
         return formatDynastyName(baseName, GameConstants.getDynastyTitleByKey(titleKey));
+    }
+
+    public static String formatCityName(String baseName, DynastyTitle cityTitle) {
+        if (cityTitle == null) {
+            cityTitle = GameConstants.CITY_TITLE_CITY;
+        }
+        return cityTitle.formatName(baseName);
+    }
+
+    public static String formatCityName(String baseName, String cityTitleKey) {
+        return formatCityName(baseName, GameConstants.getCityTitleByKey(cityTitleKey));
     }
 
     public static String formatPlayerDynastyName(String baseName) {
@@ -118,23 +133,85 @@ public final class LanguageStrings {
         if (dynastyName == null) {
             return null;
         }
+        String trimmed = dynastyName.trim();
+        int longestSuffix = 0;
+        String result = trimmed;
+
+        List<DynastyTitle> titles = new ArrayList<>();
         if (titleKey != null) {
-            String localizedSuffix = String.format(get(GameConstants.getDynastyTitleByKey(titleKey).getFormatKey()), "");
-            if (dynastyName.endsWith(localizedSuffix)) {
-                return dynastyName.substring(0, dynastyName.length() - localizedSuffix.length());
-            }
+            titles.add(GameConstants.getDynastyTitleByKey(titleKey));
         }
         for (DynastyTitle title : GameConstants.getDynastyTitles()) {
-            String localizedSuffix = String.format(get(title.getFormatKey()), "");
-            if (dynastyName.endsWith(localizedSuffix)) {
-                return dynastyName.substring(0, dynastyName.length() - localizedSuffix.length());
+            if (!titles.contains(title)) {
+                titles.add(title);
             }
         }
-        String legacySuffix = " Dynasty";
-        if (dynastyName.endsWith(legacySuffix)) {
-            return dynastyName.substring(0, dynastyName.length() - legacySuffix.length());
+        for (DynastyTitle title : GameConstants.getCityTitles()) {
+            if (!titles.contains(title)) {
+                titles.add(title);
+            }
         }
-        return dynastyName;
+
+        for (DynastyTitle title : titles) {
+            if (title == null) {
+                continue;
+            }
+            for (Map<String, String> langMap : translations.values()) {
+                String format = langMap.get(title.getFormatKey());
+                if (format == null) {
+                    continue;
+                }
+                String suffix = String.format(format, "");
+                if (suffix.isEmpty() || !trimmed.endsWith(suffix)) {
+                    continue;
+                }
+                if (suffix.length() > longestSuffix) {
+                    longestSuffix = suffix.length();
+                    result = trimmed.substring(0, trimmed.length() - suffix.length());
+                }
+            }
+        }
+
+        String legacySuffix = " Dynasty";
+        if (legacySuffix.length() > longestSuffix && trimmed.endsWith(legacySuffix)) {
+            result = trimmed.substring(0, trimmed.length() - legacySuffix.length());
+        }
+        return result;
+    }
+
+    /** Localized dynasty label for a save slot (theme base + title id, never a frozen locale string). */
+    public static String formatSaveSlotDisplayName(String saveName, int titleId, int slotId) {
+        if (saveName == null || saveName.trim().isEmpty()) {
+            return saveName;
+        }
+        String trimmed = saveName.trim();
+        if (isGenericSaveName(trimmed, slotId)) {
+            return trimmed;
+        }
+        String base = resolvePlayerThemeName(trimmed, titleId);
+        return formatDynastyName(base, titleId);
+    }
+
+    public static String formatSaveSlotDisplayName(String saveName, String titleKey, int slotId) {
+        return formatSaveSlotDisplayName(saveName, GameConstants.getDynastyTitleByKey(titleKey).getId(), slotId);
+    }
+
+    /** Theme base from save root name (plain base or legacy localized full name). */
+    public static String resolvePlayerThemeName(String saveName, int titleId) {
+        if (saveName == null || saveName.isEmpty()) {
+            return "";
+        }
+        String trimmed = saveName.trim();
+        DynastyTitle title = GameConstants.getDynastyTitleById(titleId);
+        String stripped = stripDynastyNameSuffix(trimmed, title.getNameKey());
+        if (!stripped.equals(trimmed)) {
+            return capitalizeTheme(stripped);
+        }
+        stripped = stripDynastyNameSuffix(trimmed);
+        if (!stripped.equals(trimmed)) {
+            return capitalizeTheme(stripped);
+        }
+        return capitalizeTheme(trimmed);
     }
 
     public static String capitalizeTheme(String theme) {
@@ -529,6 +606,7 @@ public final class LanguageStrings {
     public static final String MAP_CLICK_VIEW_CAPITAL = "MAP_CLICK_VIEW_CAPITAL";
     public static final String MAP_YOU_PLAYER = "MAP_YOU_PLAYER";
     public static final String MAP_POPULATION_FORMAT = "MAP_POPULATION_FORMAT";
+    public static final String MAP_TOOLTIP_DYNASTY_CAPITAL = "MAP_TOOLTIP_DYNASTY_CAPITAL";
     public static final String MAP_TOOLTIP_BIOME = "MAP_TOOLTIP_BIOME";
     public static final String MAP_TOOLTIP_COLONY_NAME = "MAP_TOOLTIP_COLONY_NAME";
     public static final String MAP_TOOLTIP_RANK = "MAP_TOOLTIP_RANK";
@@ -668,6 +746,7 @@ public final class LanguageStrings {
     public static final String HELP_EMPIRE_MILITARY_POWER = "HELP_EMPIRE_MILITARY_POWER";
     public static final String HELP_MILITARY_POWER_BODY = "HELP_MILITARY_POWER_BODY";
     public static final String DYNASTY_REPUTATION = "DYNASTY_REPUTATION";
+    public static final String DIPLOMATIC_REPUTATION = "DIPLOMATIC_REPUTATION";
     public static final String DYNASTY_REPUTATION_STANCE = "DYNASTY_REPUTATION_STANCE";
     public static final String SCORE_TIER_FORMAT = "SCORE_TIER_FORMAT";
     public static final String DYNASTY_STATUS = "DYNASTY_STATUS";
@@ -737,6 +816,8 @@ public final class LanguageStrings {
     public static final String DYNASTY_TITLE_CITY = "DYNASTY_TITLE_CITY";
     public static final String DYNASTY_TITLE_BERG = "DYNASTY_TITLE_BERG";
     public static final String DYNASTY_TITLE_GRAD = "DYNASTY_TITLE_GRAD";
+    public static final String DYNASTY_TITLE_NATION = "DYNASTY_TITLE_NATION";
+    public static final String DYNASTY_TITLE_REPUBLIC = "DYNASTY_TITLE_REPUBLIC";
     public static final String DYNASTY_TITLE_FMT_DYNASTY = "DYNASTY_TITLE_FMT_DYNASTY";
     public static final String DYNASTY_TITLE_FMT_CONGLOMERATE = "DYNASTY_TITLE_FMT_CONGLOMERATE";
     public static final String DYNASTY_TITLE_FMT_UNION = "DYNASTY_TITLE_FMT_UNION";
@@ -747,7 +828,11 @@ public final class LanguageStrings {
     public static final String DYNASTY_TITLE_FMT_CITY = "DYNASTY_TITLE_FMT_CITY";
     public static final String DYNASTY_TITLE_FMT_BERG = "DYNASTY_TITLE_FMT_BERG";
     public static final String DYNASTY_TITLE_FMT_GRAD = "DYNASTY_TITLE_FMT_GRAD";
+    public static final String DYNASTY_TITLE_FMT_NATION = "DYNASTY_TITLE_FMT_NATION";
+    public static final String DYNASTY_TITLE_FMT_REPUBLIC = "DYNASTY_TITLE_FMT_REPUBLIC";
     public static final String SAVE_ENTER_DYNASTY_TITLE = "SAVE_ENTER_DYNASTY_TITLE";
+    public static final String SAVE_DYNASTY_PREVIEW = "SAVE_DYNASTY_PREVIEW";
+    public static final String SAVE_DYNASTY_CONFIRM = "SAVE_DYNASTY_CONFIRM";
 
     public static final String STAT_NEIGHBOR_NORTH = "STAT_NEIGHBOR_NORTH";
     public static final String STAT_NEIGHBOR_NORTH_WEST = "STAT_NEIGHBOR_NORTH_WEST";

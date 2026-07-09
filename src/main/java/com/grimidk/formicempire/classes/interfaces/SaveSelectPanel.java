@@ -12,14 +12,16 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.HashSet;
 import java.util.Set;
 
 public class SaveSelectPanel extends JPanel {
-    private static final Dimension CREATE_SAVE_FIELD_SIZE = new Dimension(360, 32);
-    private static final Dimension CREATE_SAVE_PANEL_SIZE = new Dimension(520, 168);
+    private static final Dimension CREATE_SAVE_FIELD_SIZE = new Dimension(460, 32);
+    private static final Dimension CREATE_SAVE_PANEL_SIZE = new Dimension(640, 220);
 
     private final MainFrame frame;
     private final SaveManager saveManager;
@@ -115,7 +117,8 @@ public class SaveSelectPanel extends JPanel {
 
     public void refreshSlots() {
         for (int i = 0; i < 3; i++) {
-            Savefile s = saveManager.loadSlot(i + 1);
+            int slotId = i + 1;
+            Savefile s = saveManager.loadSlot(slotId);
             cachedSaves[i] = s;
 
             if (s == null) {
@@ -125,7 +128,9 @@ public class SaveSelectPanel extends JPanel {
                 deleteButtons[i].setVisible(false);
             } else {
                 int totalDays = (s.getDay() - 1) + ((s.getMonth() - 1) * 30) + (s.getYear() * 12 * 30);
-                slotLabels[i].setText(LanguageStrings.format(LanguageStrings.SAVE_DAYS_FORMAT, s.getName(), totalDays));
+                String displayName = LanguageStrings.formatSaveSlotDisplayName(
+                        s.getName(), s.resolvePlayerDynastyTitleId(), slotId);
+                slotLabels[i].setText(LanguageStrings.format(LanguageStrings.SAVE_DAYS_FORMAT, displayName, totalDays));
                 slotButtons[i].setText(LanguageStrings.get(LanguageStrings.UI_LOAD));
                 deleteButtons[i].setText(LanguageStrings.get(LanguageStrings.UI_DELETE));
                 deleteButtons[i].setVisible(true);
@@ -139,9 +144,9 @@ public class SaveSelectPanel extends JPanel {
         if (existing == null) {
             NewSaveRequest request = promptNewSave();
             if (request == null) return;
-            
-            Savefile save = new Savefile(slotId, request.name());
-            save.setPlayerDynastyTitleKey(request.titleKey());
+
+            Savefile save = new Savefile(slotId, request.baseName());
+            save.setPlayerDynastyTitleId(request.titleId());
             saveManager.saveUserSlotAsync(save, () -> {
                 refreshSlots(); 
 
@@ -208,9 +213,39 @@ public class SaveSelectPanel extends JPanel {
         c.weightx = 1.0;
         form.add(titleCombo, c);
 
+        JLabel previewLabel = new JLabel();
+        previewLabel.setFont(AssetStyles.FONT_BOLD);
+        previewLabel.setForeground(AssetStyles.FONT_COLOR_BRIGHT);
+        previewLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        c.gridx = 0;
+        c.gridy = 2;
+        c.gridwidth = 2;
+        c.insets = new Insets(14, 0, 0, 0);
+        form.add(previewLabel, c);
+
+        Runnable refreshPreview = () -> updateDynastyPreview(previewLabel, nameField, titleCombo);
+        nameField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                refreshPreview.run();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                refreshPreview.run();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                refreshPreview.run();
+            }
+        });
+        titleCombo.addActionListener(e -> refreshPreview.run());
+        refreshPreview.run();
+
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(AssetStyles.BACKGROUND_COLOR);
-        panel.setBorder(new EmptyBorder(16, 20, 8, 20));
+        panel.setBorder(new EmptyBorder(16, 24, 8, 24));
         panel.setPreferredSize(CREATE_SAVE_PANEL_SIZE);
         panel.setMinimumSize(CREATE_SAVE_PANEL_SIZE);
         panel.add(form, BorderLayout.CENTER);
@@ -225,16 +260,50 @@ public class SaveSelectPanel extends JPanel {
             return null;
         }
 
-        String name = nameField.getText();
-        if (name == null || name.trim().isEmpty()) {
+        String rawName = nameField.getText();
+        if (rawName == null || rawName.trim().isEmpty()) {
             return null;
         }
 
         DynastyTitle selectedTitle = (DynastyTitle) titleCombo.getSelectedItem();
-        String titleKey = selectedTitle != null
-                ? selectedTitle.getNameKey()
-                : LanguageStrings.DYNASTY_TITLE_DYNASTY;
-        return new NewSaveRequest(name.trim(), titleKey);
+        int titleId = selectedTitle != null
+                ? selectedTitle.getId()
+                : GameConstants.DYNASTY_TITLE_DYNASTY.getId();
+        String baseName = formatBaseName(rawName);
+        String fullName = LanguageStrings.formatDynastyName(baseName, titleId);
+
+        int confirm = UiOptionPane.showConfirmDialog(
+                this,
+                LanguageStrings.format(LanguageStrings.SAVE_DYNASTY_CONFIRM, fullName),
+                LanguageStrings.get(LanguageStrings.SAVE_CREATE_TITLE),
+                JOptionPane.YES_NO_OPTION);
+        if (confirm != JOptionPane.YES_OPTION) {
+            return null;
+        }
+
+        return new NewSaveRequest(baseName, titleId);
+    }
+
+    private static void updateDynastyPreview(JLabel previewLabel, JTextField nameField, JComboBox<DynastyTitle> titleCombo) {
+        String baseName = formatBaseName(nameField.getText());
+        DynastyTitle title = (DynastyTitle) titleCombo.getSelectedItem();
+        if (title == null) {
+            title = GameConstants.DYNASTY_TITLE_DYNASTY;
+        }
+        if (baseName.isEmpty()) {
+            previewLabel.setText(LanguageStrings.format(LanguageStrings.SAVE_DYNASTY_PREVIEW, title.getName()));
+        } else {
+            previewLabel.setText(LanguageStrings.format(LanguageStrings.SAVE_DYNASTY_PREVIEW,
+                    LanguageStrings.formatDynastyName(baseName, title)));
+        }
+    }
+
+    private static String formatBaseName(String name) {
+        if (name == null || name.trim().isEmpty()) {
+            return "";
+        }
+        String trimmed = name.trim();
+        return trimmed.substring(0, 1).toUpperCase() + trimmed.substring(1);
     }
 
     private void onDelete(int slotId, int idx) {
@@ -245,5 +314,5 @@ public class SaveSelectPanel extends JPanel {
         refreshSlots();
     }
 
-    private record NewSaveRequest(String name, String titleKey) {}
+    private record NewSaveRequest(String baseName, int titleId) {}
 }
