@@ -75,6 +75,7 @@ public class FrenchTranslation implements Translation {
         fr.put("UI_ROADMAP", "Feuille de route");
         fr.put("UI_QUIT", "Quitter");
         fr.put("INTRO_WARNING", "Empire Formique est une simulation de colonie avec des fourmis, insectes et autres arthropodes en pixels.<br><br>Si les araignées ou créatures similaires vous gênent, activez le Mode arachnophobie dans les Paramètres avant de jouer.");
+        fr.put("INTRO_PHOTOSENSITIVITY_WARNING", "Avertissement photosensibilité : ce jeu contient des lumières clignotantes et des effets visuels susceptibles de provoquer des crises chez les personnes atteintes d'épilepsie photosensible.<br><br>Si vous ou un membre de votre foyer a des antécédents de crises ou d'épilepsie, consultez un médecin avant de jouer.");
         fr.put("ROADMAP_TITLE", "Feuille de route du développement");
         fr.put("ROADMAP_UNAVAILABLE", "Impossible de charger la feuille de route.");
         fr.put("UI_CREDITS", "Crédits");
@@ -490,6 +491,8 @@ public class FrenchTranslation implements Translation {
         fr.put("TRADE_UPDATE", "Mettre à jour la route");
         fr.put("TRADE_OPTIMIZE", "Optimisation bilatérale");
         fr.put("TRADE_MAKE_TWO_WAY", "Commerce bidirectionnel");
+        fr.put("TRADE_TWO_WAY_REQUIRES_INCOMING", "Nécessite une route entrante à sens unique depuis ce voisin.");
+        fr.put("TRADE_OPTIMIZE_REQUIRES_INCOMING", "Nécessite une route entrante à sens unique depuis ce voisin, mode bilatéral désactivé.");
         fr.put("TRADE_ERROR_OVER_CAP", "La cargaison dépasse la capacité de transport !");
         fr.put("TRADE_ERROR_NO_ANTS", "Aucune fourmi assignée au transport !");
         fr.put("TRADE_ERROR_NO_LOAD", "Aucune ressource sélectionnée pour le commerce !");
@@ -940,7 +943,7 @@ public class FrenchTranslation implements Translation {
         fr.put("ASSIMILATION_STEALTH", "Assimilation fourmi fantôme");
         fr.put("ASSIMILATION_STEALTH_DESC", "Après assimilation du génome de la fourmi fantôme :");
         fr.put("ASSIMILATED_FASTBITE_FLAVOR", "Mandibules Vampire");
-        fr.put("ASSIMILATED_FASTBITE_DESC", "Votre dynastie peut percer d'épais exosquelettes. (Mécanique en développement.)");
+        fr.put("ASSIMILATED_FASTBITE_DESC", "Multiplie la vitesse d'attaque de base de la colonie par 3.");
         fr.put("ASSIMILATION_FASTBITE", "Assimilation fourmi dracula");
         fr.put("ASSIMILATION_FASTBITE_DESC", "Après assimilation du génome de la fourmi dracula :");
         fr.put("ASSIMILATED_HEATRESIST_FLAVOR", "Tolérance à la Chaleur");
@@ -1255,7 +1258,7 @@ public class FrenchTranslation implements Translation {
         fr.put("ASSIMILATED_STEALTH_FLAVOR", "Infiltration Fantôme");
         fr.put("ASSIMILATED_STEALTH_DESC", "Votre dynastie peut se déplacer invisible et nicher dans des structures hostiles. (Mécanique en développement.)");
         fr.put("ASSIMILATED_FASTBITE_FLAVOR", "Mandibules Vampire");
-        fr.put("ASSIMILATED_FASTBITE_DESC", "Votre dynastie peut percer d'épais exosquelettes. (Mécanique en développement.)");
+        fr.put("ASSIMILATED_FASTBITE_DESC", "Multiplie la vitesse d'attaque de base de la colonie par 3.");
         fr.put("ASSIMILATED_HEATRESIST_FLAVOR", "Tolérance à la Chaleur");
         fr.put("ASSIMILATED_HEATRESIST_DESC", "Votre dynastie peut butiner sous une chaleur extrême du désert. (Mécanique en développement.)");
         fr.put("ASSIMILATED_DEADLYVENOM_FLAVOR", "Venin Mortel");

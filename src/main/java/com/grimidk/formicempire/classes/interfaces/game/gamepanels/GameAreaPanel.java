@@ -9,7 +9,6 @@ import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Bug;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
-import com.grimidk.formicempire.classes.entities.services.colony.ColonyLocationService;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonySpatialLayout;
 import com.grimidk.formicempire.classes.interfaces.game.rendering.RoomDecorationRenderer;
 import com.grimidk.formicempire.classes.entities.services.shared.ViewportPhysicsLod;

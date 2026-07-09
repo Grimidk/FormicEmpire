@@ -5,7 +5,6 @@ import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Insets;
-import java.awt.Rectangle;
 import javax.swing.JComponent;
 import javax.swing.JSlider;
 import javax.swing.SwingConstants;

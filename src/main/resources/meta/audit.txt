@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 46% (115/251 checked)
+Completion: 55% (139/251 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -9,7 +9,7 @@ Legend: [ ] = not tested yet   [x] = tested (reset to [ ] if the mechanic change
 ================================================================================
 1. LAUNCHER / MAIN MENU
 ================================================================================
-[x] Intro splash (studio name, then content warning) auto-advances to main menu
+[ ] Intro splash (studio name, arthropod/arachnophobia warning, photosensitivity warning; click or timer to advance) auto-advances to main menu
 [x] Play — opens save slot screen
 [x] Help — encyclopedia (all tabs; see section 18)
 [x] Roadmap — development roadmap text dialog
@@ -24,7 +24,7 @@ Legend: [ ] = not tested yet   [x] = tested (reset to [ ] if the mechanic change
 General:
 [X] Language (en / es / fr / pt)
 [ ] Autosave frequency (monthly, 3/6/12 months, off)
-[ ] Allow turbo speed mode
+[X] Allow turbo speed mode
 [ ] Arachnophobia mode (replaces spider-like visuals)
 [ ] Pause on focus loss
 [ ] Confirm on quit (active session)
@@ -65,9 +65,9 @@ Roles (default hatch roles for new ants):
 [X] Tutorial dialog auto-opens on first create
 [X] Load existing save — resumes session
 [X] Delete save — removes slot data
-[ ] Back to main menu
+[X] Back to main menu
 [X] Autosave runs per settings frequency during play
-[ ] Back to menu from game (ESC > Back to Menu) — saves progress
+[X] Back to menu from game (ESC > Back to Menu) — saves progress
 [ ] Colony death — Reload or Main Menu options
 
 ================================================================================
@@ -149,7 +149,7 @@ Dynasty submenu (when dynasty unlocked):
 [X] Overworld — mouse wheel scrolls view
 [ ] Overworld auto-recenter after idle (when enabled)
 [X] Underworld — scroll panes for large colonies
-[ ] Mouse wheel zoom / scroll in game area
+[X] Mouse wheel zoom / scroll in game area
 [X] Daylight overlay tints overworld by time of day
 [X] Weather overlay tints overworld by weather
 
@@ -157,17 +157,17 @@ Dynasty submenu (when dynasty unlocked):
 8. ROLE MANAGEMENT (Q/W/E/R/T or ESC > Colony > Roles)
 ================================================================================
 Per ant type tab (Worker, Soldier, Major, Princess, Queen):
-[ ] Adjust role counts (spinner / input per unlocked role)
-[ ] Counts respect available ants and unlock state
-[ ] War economy view toggle (when at war)
-[ ] Copy peace economy to war economy
-[ ] Default role assignment for newly hatched ants (from settings)
+[X] Adjust role counts (spinner / input per unlocked role)
+[X] Counts respect available ants and unlock state
+[X] War economy view toggle (when at war)
+[X] Copy peace economy to war economy
+[X] Default role assignment for newly hatched ants (from settings)
 
 ================================================================================
 9. HATCH RATES (P or ESC > Hatch Rates)
 ================================================================================
-[ ] Per-type hatch rate spinners (Egg, Worker, Soldier, Major, Princess, Queen)
-[ ] Rates sum to 100% (auto-adjust worker remainder)
+[X] Per-type hatch rate spinners (Egg, Worker, Soldier, Major, Princess, Queen)
+[X] Rates sum to 100% (auto-adjust worker remainder)
 [ ] Subtype / assimilated variant rates when unlocked
 
 ================================================================================
@@ -275,34 +275,34 @@ Start / progress assimilations (RP + time). Each species:
 15. DYNASTY — OVERVIEW (A)
 ================================================================================
 [X] Colony list with sort options
-[ ] Per-colony Actions menu:
-    [ ] Rename / edit colony
-    [ ] View colony (switch active colony / camera)
-    [ ] Send diplomats to colony (when unlocked)
-[ ] Dynasty-wide automation toggles (when unlocked):
-    [ ] Default auto-build
-    [ ] Default automation
-    [ ] Default auto-tunnels
-    [ ] Auto-diplomacy
-[ ] Title progression as empire grows
+[X] Per-colony Actions menu:
+    [X] Rename / edit colony
+    [X] View colony (switch active colony / camera)
+    [X] Send diplomats to colony (when unlocked)
+[X] Dynasty-wide automation toggles (when unlocked):
+    [X] Default auto-build
+    [X] Default automation
+    [X] Default auto-tunnels
+    [X] Auto-diplomacy
+[X] Title progression as empire grows
 
 ================================================================================
 16. DYNASTY — TRADE / LOGISTICS (S)
 ================================================================================
 Neighbor trade rows (per adjacent hex):
-[ ] View incoming / outgoing trade amounts
-[ ] Tunnel status column (when Tunnels unlocked)
-[ ] Build tunnel to neighbor
-[ ] Create trade route — pick resources, amounts, direction
-[ ] One-way vs two-way trade
-[ ] Bilateral trade mode (when unlocked)
-[ ] Trade method combo (land / tunnel / etc. per unlocks)
-[ ] Max resource buttons on trade creator
-[ ] Optimize trade route button
-[ ] Confirm / update trade
-[ ] Cancel trade dialog
-[ ] Active trade edit from table actions
-[ ] Make two-way from one-way
+[X] View incoming / outgoing trade amounts
+[X] Tunnel status column (when Tunnels unlocked)
+[X] Build tunnel to neighbor
+[X] Create trade route — pick resources, amounts, direction
+[X] One-way vs two-way trade
+[X] Bilateral trade mode (when unlocked)
+[X] Trade method combo (land / tunnel / etc. per unlocks)
+[X] Max resource buttons on trade creator
+[ ] Bilateral Optimization button in trade creator footer (visible with Bilateral Trade unlock; enabled when incoming one-way route exists and bilateral unchecked)
+[X] Confirm / update trade
+[X] Cancel trade dialog
+[ ] Active trade edit from table actions (Manage / Establish)
+[ ] Make Two-Way button in logistics Actions column (visible with outgoing one-way route; enabled when matching incoming one-way route exists)
 
 ================================================================================
 17. DYNASTY — DIPLOMACY (D)
@@ -313,7 +313,7 @@ Per foreign dynasty Actions menu:
 [ ] Request trade agreement
 [ ] Open trade negotiation
 [ ] Send diplomats to dynasty
-[ ] Reputation / stance icons and tooltips
+[x] Reputation / stance icons and tooltips
 [ ] Cooldowns after pact break block war
 
 ================================================================================

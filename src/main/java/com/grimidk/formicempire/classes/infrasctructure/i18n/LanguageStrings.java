@@ -274,6 +274,7 @@ public final class LanguageStrings {
     public static final String UI_ROADMAP = "UI_ROADMAP";
     public static final String UI_QUIT = "UI_QUIT";
     public static final String INTRO_WARNING = "INTRO_WARNING";
+    public static final String INTRO_PHOTOSENSITIVITY_WARNING = "INTRO_PHOTOSENSITIVITY_WARNING";
     public static final String ROADMAP_TITLE = "ROADMAP_TITLE";
     public static final String ROADMAP_UNAVAILABLE = "ROADMAP_UNAVAILABLE";
     public static final String UI_CREDITS = "UI_CREDITS";
@@ -694,6 +695,8 @@ public final class LanguageStrings {
     public static final String TRADE_UPDATE = "TRADE_UPDATE";
     public static final String TRADE_OPTIMIZE = "TRADE_OPTIMIZE";
     public static final String TRADE_MAKE_TWO_WAY = "TRADE_MAKE_TWO_WAY";
+    public static final String TRADE_TWO_WAY_REQUIRES_INCOMING = "TRADE_TWO_WAY_REQUIRES_INCOMING";
+    public static final String TRADE_OPTIMIZE_REQUIRES_INCOMING = "TRADE_OPTIMIZE_REQUIRES_INCOMING";
     public static final String TRADE_ERROR_OVER_CAP = "TRADE_ERROR_OVER_CAP";
     public static final String TRADE_ERROR_NO_ANTS = "TRADE_ERROR_NO_ANTS";
     public static final String TRADE_ERROR_NO_LOAD = "TRADE_ERROR_NO_LOAD";

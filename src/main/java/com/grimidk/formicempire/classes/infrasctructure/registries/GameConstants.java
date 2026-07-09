@@ -56,7 +56,7 @@ public final class GameConstants {
         return icon;
     }
 
-    // --- Building room overlay sprites (native size; no runtime scaling) ---
+    // --- Building room overlay sprites ---
     public static final ImageIcon ROOM_ROYAL_L0 = loadIcon("sprites/buildings/rooms/RoyalL0.png");
     public static final ImageIcon ROOM_ROYAL_L1 = loadIcon("sprites/buildings/rooms/RoyalL1.png");
     public static final ImageIcon ROOM_ROYAL_L2 = loadIcon("sprites/buildings/rooms/RoyalL2.png");
@@ -101,7 +101,7 @@ public final class GameConstants {
     public static final ImageIcon ROOM_PASSIVE_GRAVE = loadIcon("sprites/buildings/rooms/PassiveGrave.png");
     public static final ImageIcon ROOM_PASSIVE_COMPOSTER = loadIcon("sprites/buildings/rooms/PassiveComposter.png");
 
-    // --- Convoy view tiles (simulation / view-convoy screen backgrounds) ---
+    // --- Convoy view tiles ---
     public static final ImageIcon CONVOY_TILE_SEA = loadIcon("backgrounds/convoy/SeaConvoyTile.png");
     public static final ImageIcon CONVOY_TILE_UNDERGROUND = loadIcon("backgrounds/convoy/UndergroundConvoyTile.png");
     public static final ImageIcon CONVOY_TILE_SKY = loadIcon("backgrounds/convoy/SkyConvoyTile.png");
@@ -770,7 +770,7 @@ public final class GameConstants {
 
     public static final String DIPLO_EXCLUSIVE_PACT = "pact";
 
-    // --- Diplomatic reputation modifiers (mutually exclusive within exclusiveGroupKey) ---
+    // --- Diplomatic reputation modifiers ---
     public static final DiplomaticReputationModifier DIPLO_MODIFIER_PACT = new DiplomaticReputationModifier(
         1, LanguageStrings.DIPLO_MODIFIER_PACT, 20, REPUTATION_CORDIAL.getMinScore(), DIPLO_EXCLUSIVE_PACT);
     static { diplomaticReputationModifiers.add(DIPLO_MODIFIER_PACT); }

@@ -4,8 +4,9 @@ Developer:
 Pixelartist:
     Grimidk
 
-Testers (request to be included):
-    
+Testers (in order of participation):
+    Gopher
+    Hazelmeadow
 
 Marketing:
     Grimidk

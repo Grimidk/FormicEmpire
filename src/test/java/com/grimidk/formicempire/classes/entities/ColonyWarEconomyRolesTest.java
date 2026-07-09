@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
-import com.grimidk.formicempire.classes.entities.Ant;
 
 class ColonyWarEconomyRolesTest {
 

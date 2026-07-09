@@ -75,6 +75,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("UI_ROADMAP", "Roteiro");
         pt.put("UI_QUIT", "Sair");
         pt.put("INTRO_WARNING", "Império Fôrmico é uma simulação de colónia com formigas, insetos e outros artrópodes pixelados.<br><br>Se aranhas ou criaturas semelhantes te incomodam, ativa o Modo aracnofobia nas Definições antes de jogar.");
+        pt.put("INTRO_PHOTOSENSITIVITY_WARNING", "Aviso de fotossensibilidade: este jogo contém luzes intermitentes e efeitos visuais que podem desencadear convulsões em pessoas com epilepsia fotossensível.<br><br>Se tu ou alguém na tua casa tem histórico de convulsões ou epilepsia, consulta um médico antes de jogar.");
         pt.put("ROADMAP_TITLE", "Roteiro de desenvolvimento");
         pt.put("ROADMAP_UNAVAILABLE", "Não foi possível carregar o roteiro.");
         pt.put("UI_CREDITS", "Créditos");
@@ -490,6 +491,8 @@ public class PortugueseTranslation implements Translation {
         pt.put("TRADE_UPDATE", "Atualizar rota comercial");
         pt.put("TRADE_OPTIMIZE", "Otimização bilateral");
         pt.put("TRADE_MAKE_TWO_WAY", "Comércio de mão dupla");
+        pt.put("TRADE_TWO_WAY_REQUIRES_INCOMING", "Requer uma rota de entrada unidirecional deste vizinho.");
+        pt.put("TRADE_OPTIMIZE_REQUIRES_INCOMING", "Requer uma rota de entrada unidirecional deste vizinho com o modo bilateral desligado.");
         pt.put("TRADE_ERROR_OVER_CAP", "A carga excede a capacidade de transporte!");
         pt.put("TRADE_ERROR_NO_ANTS", "Nenhuma formiga atribuída ao transporte!");
         pt.put("TRADE_ERROR_NO_LOAD", "Nenhum recurso selecionado para trocar!");
@@ -940,7 +943,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("ASSIMILATION_STEALTH", "Assimilação Formiga Fantasma");
         pt.put("ASSIMILATION_STEALTH_DESC", "Após assimilar o genoma da formiga fantasma:");
         pt.put("ASSIMILATED_FASTBITE_FLAVOR", "Mandíbulas Vampiro");
-        pt.put("ASSIMILATED_FASTBITE_DESC", "Sua dinastia pode perfurar exoesqueletos grossos com mandíbulas falciformes. (Mecânica em desenvolvimento.)");
+        pt.put("ASSIMILATED_FASTBITE_DESC", "Multiplica a velocidade de ataque base da colônia por 3.");
         pt.put("ASSIMILATION_FASTBITE", "Assimilação Formiga Drácula");
         pt.put("ASSIMILATION_FASTBITE_DESC", "Após assimilar o genoma da formiga drácula:");
         pt.put("ASSIMILATED_HEATRESIST_FLAVOR", "Tolerância ao Calor do Deserto");
@@ -1255,7 +1258,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("ASSIMILATED_STEALTH_FLAVOR", "Infiltração Fantasma");
         pt.put("ASSIMILATED_STEALTH_DESC", "Sua dinastia pode mover-se sem ser vista e nidificar em estruturas hostis. (Mecânica em desenvolvimento.)");
         pt.put("ASSIMILATED_FASTBITE_FLAVOR", "Mandíbulas Vampiro");
-        pt.put("ASSIMILATED_FASTBITE_DESC", "Sua dinastia pode perfurar exoesqueletos grossos com mandíbulas falciformes. (Mecânica em desenvolvimento.)");
+        pt.put("ASSIMILATED_FASTBITE_DESC", "Multiplica a velocidade de ataque base da colônia por 3.");
         pt.put("ASSIMILATED_HEATRESIST_FLAVOR", "Tolerância ao Calor do Deserto");
         pt.put("ASSIMILATED_HEATRESIST_DESC", "Sua dinastia pode forragear sob calor extremo do deserto. (Mecânica em desenvolvimento.)");
         pt.put("ASSIMILATED_DEADLYVENOM_FLAVOR", "Veneno Letal");

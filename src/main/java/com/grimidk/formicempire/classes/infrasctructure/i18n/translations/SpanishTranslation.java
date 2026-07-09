@@ -75,6 +75,7 @@ public class SpanishTranslation implements Translation {
         es.put("UI_ROADMAP", "Hoja de ruta");
         es.put("UI_QUIT", "Salir");
         es.put("INTRO_WARNING", "Imperio Fórmico es una simulación de colonias con hormigas, insectos y otros artrópodos en píxeles.<br><br>Si las arañas u otros arácnidos te molestan, activa el Modo aracnofobia en Ajustes antes de jugar.");
+        es.put("INTRO_PHOTOSENSITIVITY_WARNING", "Aviso de fotosensibilidad: este juego contiene luces intermitentes y efectos visuales que pueden provocar convulsiones en personas con epilepsia fotosensible.<br><br>Si tú o alguien de tu hogar tiene antecedentes de convulsiones o epilepsia, consulta a un médico antes de jugar.");
         es.put("ROADMAP_TITLE", "Hoja de ruta de desarrollo");
         es.put("ROADMAP_UNAVAILABLE", "No se pudo cargar la hoja de ruta.");
         es.put("UI_CREDITS", "Créditos");
@@ -490,6 +491,8 @@ public class SpanishTranslation implements Translation {
         es.put("TRADE_UPDATE", "Actualizar Ruta Comercial");
         es.put("TRADE_OPTIMIZE", "Optimización Bilateral");
         es.put("TRADE_MAKE_TWO_WAY", "Comercio de doble sentido");
+        es.put("TRADE_TWO_WAY_REQUIRES_INCOMING", "Requiere una ruta entrante de un solo sentido desde este vecino.");
+        es.put("TRADE_OPTIMIZE_REQUIRES_INCOMING", "Requiere una ruta entrante de un solo sentido desde este vecino con el modo bilateral desactivado.");
         es.put("TRADE_ERROR_OVER_CAP", "¡La carga excede la capacidad de transporte!");
         es.put("TRADE_ERROR_NO_ANTS", "¡No hay hormigas asignadas al transporte!");
         es.put("TRADE_ERROR_NO_LOAD", "¡No se seleccionaron recursos para comerciar!");
@@ -940,7 +943,7 @@ public class SpanishTranslation implements Translation {
         es.put("ASSIMILATION_STEALTH", "Asimilación de Hormiga Fantasma");
         es.put("ASSIMILATION_STEALTH_DESC", "Tras asimilar el genoma de la hormiga fantasma:");
         es.put("ASSIMILATED_FASTBITE_FLAVOR", "Mandíbulas Vampiro");
-        es.put("ASSIMILATED_FASTBITE_DESC", "Tu dinastía puede perforar exoesqueletos gruesos con mandíbulas en forma de hoz. (Mecánica en desarrollo.)");
+        es.put("ASSIMILATED_FASTBITE_DESC", "Multiplica la velocidad de ataque base de la colonia por 3.");
         es.put("ASSIMILATION_FASTBITE", "Asimilación de Hormiga Drácula");
         es.put("ASSIMILATION_FASTBITE_DESC", "Tras asimilar el genoma de la hormiga drácula:");
         es.put("ASSIMILATED_HEATRESIST_FLAVOR", "Tolerancia al Calor Desértico");
@@ -1255,7 +1258,7 @@ public class SpanishTranslation implements Translation {
         es.put("ASSIMILATED_STEALTH_FLAVOR", "Infiltración Fantasma");
         es.put("ASSIMILATED_STEALTH_DESC", "Tu dinastía puede moverse sin ser vista y anidar en estructuras hostiles. (Mecánica en desarrollo.)");
         es.put("ASSIMILATED_FASTBITE_FLAVOR", "Mandíbulas Vampiro");
-        es.put("ASSIMILATED_FASTBITE_DESC", "Tu dinastía puede perforar exoesqueletos gruesos con mandíbulas en forma de hoz. (Mecánica en desarrollo.)");
+        es.put("ASSIMILATED_FASTBITE_DESC", "Multiplica la velocidad de ataque base de la colonia por 3.");
         es.put("ASSIMILATED_HEATRESIST_FLAVOR", "Tolerancia al Calor Desértico");
         es.put("ASSIMILATED_HEATRESIST_DESC", "Tu dinastía puede recolectar bajo calor extremo del desierto. (Mecánica en desarrollo.)");
         es.put("ASSIMILATED_DEADLYVENOM_FLAVOR", "Veneno Letal");

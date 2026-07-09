@@ -75,6 +75,7 @@ public class EnglishTranslation implements Translation {
         en.put("UI_ROADMAP", "Roadmap");
         en.put("UI_QUIT", "Quit");
         en.put("INTRO_WARNING", "Formic Empire is a colony simulation about pixelated ants, bugs, and other arthropods.<br><br>If spiders or similar creatures bother you, enable Arachnophobia Mode in Settings before you play.");
+        en.put("INTRO_PHOTOSENSITIVITY_WARNING", "Photosensitivity warning: This game contains flashing lights and visual effects that may trigger seizures in people with photosensitive epilepsy.<br><br>If you or anyone in your household has a history of seizures or epilepsy, consult a doctor before playing.");
         en.put("ROADMAP_TITLE", "Development Roadmap");
         en.put("ROADMAP_UNAVAILABLE", "Roadmap file could not be loaded.");
         en.put("UI_CREDITS", "Credits");
@@ -490,6 +491,8 @@ public class EnglishTranslation implements Translation {
         en.put("TRADE_UPDATE", "Update Trade Route");
         en.put("TRADE_OPTIMIZE", "Bilateral Optimization");
         en.put("TRADE_MAKE_TWO_WAY", "Make Two-Way Trade");
+        en.put("TRADE_TWO_WAY_REQUIRES_INCOMING", "Requires an incoming one-way route from this neighbor.");
+        en.put("TRADE_OPTIMIZE_REQUIRES_INCOMING", "Requires an incoming one-way route from this neighbor while bilateral mode is off.");
         en.put("TRADE_ERROR_OVER_CAP", "Cargo exceeds transport capacity!");
         en.put("TRADE_ERROR_NO_ANTS", "No ants assigned to transport!");
         en.put("TRADE_ERROR_NO_LOAD", "No resources selected for trade!");

@@ -7,13 +7,26 @@ import javax.swing.*;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class IntroPanel extends JPanel {
-    private static final int SLIDE_MS = 2500;
+    private static final int STUDIO_SLIDE_MS = 5000;
+    private static final int WARNING_SLIDE_MS = 10000;
     private static final String STUDIO_NAME = "GrimIDK";
+
+    private static final int SLIDE_STUDIO = 0;
+    private static final int SLIDE_ARACHNOPHOBIA = 1;
+    private static final int SLIDE_PHOTOSENSITIVITY = 2;
 
     private final MainFrame frame;
     private final JLabel messageLabel = new JLabel();
+    private final MouseAdapter skipListener = new MouseAdapter() {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            advanceSlide();
+        }
+    };
     private Timer advanceTimer;
     private int slideIndex;
 
@@ -35,6 +48,9 @@ public class IntroPanel extends JPanel {
         c.insets = new Insets(48, 48, 48, 48);
         add(messageLabel, c);
 
+        addMouseListener(skipListener);
+        messageLabel.addMouseListener(skipListener);
+
         addAncestorListener(new AncestorListener() {
             @Override
             public void ancestorAdded(AncestorEvent event) {
@@ -52,18 +68,21 @@ public class IntroPanel extends JPanel {
     }
 
     public void refreshTranslations() {
-        if (slideIndex == 1) {
-            showWarningSlide();
+        if (slideIndex == SLIDE_ARACHNOPHOBIA) {
+            showArachnophobiaSlide();
+        } else if (slideIndex == SLIDE_PHOTOSENSITIVITY) {
+            showPhotosensitivitySlide();
         }
     }
 
     private void beginIntro() {
         cancelAdvance();
-        slideIndex = 0;
-        setCursor(null);
-        frame.applyGameCursors(frame);
+        slideIndex = SLIDE_STUDIO;
+        Cursor hand = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
+        setCursor(hand);
+        messageLabel.setCursor(hand);
         showStudioSlide();
-        scheduleNextSlide();
+        scheduleNextSlide(STUDIO_SLIDE_MS);
     }
 
     private void showStudioSlide() {
@@ -72,26 +91,39 @@ public class IntroPanel extends JPanel {
                 + STUDIO_NAME + "</body></html>");
     }
 
-    private void showWarningSlide() {
+    private void showArachnophobiaSlide() {
         String text = LanguageStrings.get(LanguageStrings.INTRO_WARNING);
-        messageLabel.setText("<html><body style='width: 520px; text-align: center; color: " + AssetStyles.COLOR_ABSOLUTE_WHITE_HTML
-                + "; font-family: " + AssetStyles.themeFontFamilyCss() + "; font-size: 13pt;'>"
-                + text + "</body></html>");
+        messageLabel.setText(warningHtml(text));
     }
 
-    private void scheduleNextSlide() {
+    private void showPhotosensitivitySlide() {
+        String text = LanguageStrings.get(LanguageStrings.INTRO_PHOTOSENSITIVITY_WARNING);
+        messageLabel.setText(warningHtml(text));
+    }
+
+    private static String warningHtml(String text) {
+        return "<html><body style='width: 520px; text-align: center; color: " + AssetStyles.COLOR_ABSOLUTE_WHITE_HTML
+                + "; font-family: " + AssetStyles.themeFontFamilyCss() + "; font-size: 13pt;'>"
+                + text + "</body></html>";
+    }
+
+    private void scheduleNextSlide(int delayMs) {
         cancelAdvance();
-        advanceTimer = new Timer(SLIDE_MS, e -> advanceSlide());
+        advanceTimer = new Timer(delayMs, e -> advanceSlide());
         advanceTimer.setRepeats(false);
         advanceTimer.start();
     }
 
     private void advanceSlide() {
         cancelAdvance();
-        if (slideIndex == 0) {
-            slideIndex = 1;
-            showWarningSlide();
-            scheduleNextSlide();
+        if (slideIndex == SLIDE_STUDIO) {
+            slideIndex = SLIDE_ARACHNOPHOBIA;
+            showArachnophobiaSlide();
+            scheduleNextSlide(WARNING_SLIDE_MS);
+        } else if (slideIndex == SLIDE_ARACHNOPHOBIA) {
+            slideIndex = SLIDE_PHOTOSENSITIVITY;
+            showPhotosensitivitySlide();
+            scheduleNextSlide(WARNING_SLIDE_MS);
         } else {
             frame.showCard(MainFrame.CARD_INIT);
         }

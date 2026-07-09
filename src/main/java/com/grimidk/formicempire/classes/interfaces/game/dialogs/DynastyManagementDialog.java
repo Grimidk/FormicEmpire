@@ -31,6 +31,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -441,10 +442,12 @@ public class DynastyManagementDialog extends ZeroDialog {
                 table.getColumnModel().getColumn(5).setCellRenderer(new TradeActionRenderer());
                 table.getColumnModel().getColumn(5).setCellEditor(new TradeActionEditor());
                 AssetStyles.applyTableHeaderAlignment(table, 5, SwingConstants.CENTER);
+                configureTradeActionColumn(5);
             } else {
                 table.getColumnModel().getColumn(4).setCellRenderer(new TradeActionRenderer());
                 table.getColumnModel().getColumn(4).setCellEditor(new TradeActionEditor());
                 AssetStyles.applyTableHeaderAlignment(table, 4, SwingConstants.CENTER);
+                configureTradeActionColumn(4);
             }
 
             tableScrollPane = AssetStyles.wrapScrollableTable(table);
@@ -582,6 +585,37 @@ public class DynastyManagementDialog extends ZeroDialog {
             }
             Trade incoming = findIncomingTrade(activeColony, data.neighbor);
             return incoming != null && !isTradeBilateral(incoming);
+        }
+
+        private boolean shouldShowTwoWayButton(TradeRowData data) {
+            if (data == null || data.neighbor == null || activeColony == null) {
+                return false;
+            }
+            if (!activeColony.hasUpgrade(GameUnlocks.ABILITY_BILATERAL_TRADE)) {
+                return false;
+            }
+            Trade outgoing = data.outgoingTrade;
+            return outgoing != null && !isTradeBilateral(outgoing);
+        }
+
+        private void configureTwoWayButton(JButton twoWayBtn, TradeRowData data) {
+            boolean show = shouldShowTwoWayButton(data);
+            twoWayBtn.setVisible(show);
+            if (!show) {
+                twoWayBtn.setEnabled(false);
+                twoWayBtn.setToolTipText(null);
+                return;
+            }
+            boolean enabled = canMakeTwoWayTrade(data);
+            twoWayBtn.setEnabled(enabled);
+            twoWayBtn.setToolTipText(enabled ? null : LanguageStrings.get(LanguageStrings.TRADE_TWO_WAY_REQUIRES_INCOMING));
+            AssetStyles.styleCompactButton(twoWayBtn);
+        }
+
+        private void configureTradeActionColumn(int actionCol) {
+            TableColumn column = table.getColumnModel().getColumn(actionCol);
+            column.setMinWidth(250);
+            column.setPreferredWidth(250);
         }
 
         private boolean mergeTradesIntoBilateral(Trade outgoing, Trade incoming) {
@@ -818,15 +852,15 @@ public class DynastyManagementDialog extends ZeroDialog {
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 setEnabled(true);
                 twoWayBtn.setVisible(false);
-                if (value instanceof TradeRowData) {
-                    TradeRowData data = (TradeRowData) value;
+                twoWayBtn.setEnabled(false);
+                if (value instanceof TradeRowData data) {
                     if (data.neighbor == null) {
                         actionBtn.setText(LanguageStrings.get(LanguageStrings.UI_ESTABLISH));
                         actionBtn.setEnabled(false);
                     } else {
                         actionBtn.setText(data.outgoingTrade == null ? LanguageStrings.get(LanguageStrings.UI_ESTABLISH) : LanguageStrings.get(LanguageStrings.UI_MANAGE));
                         actionBtn.setEnabled(true);
-                        twoWayBtn.setVisible(canMakeTwoWayTrade(data));
+                        configureTwoWayButton(twoWayBtn, data);
                     }
                 }
                 AssetStyles.styleCompactButton(actionBtn);
@@ -869,9 +903,10 @@ public class DynastyManagementDialog extends ZeroDialog {
                 currentData = (TradeRowData) value;
                 if (currentData != null) {
                     actionBtn.setText(currentData.outgoingTrade == null ? LanguageStrings.get(LanguageStrings.UI_ESTABLISH) : LanguageStrings.get(LanguageStrings.UI_MANAGE));
-                    twoWayBtn.setVisible(canMakeTwoWayTrade(currentData));
+                    configureTwoWayButton(twoWayBtn, currentData);
                 } else {
                     twoWayBtn.setVisible(false);
+                    twoWayBtn.setEnabled(false);
                 }
                 panel.setBackground(table.getSelectionBackground());
                 AssetStyles.styleCompactButton(actionBtn);
@@ -1180,16 +1215,20 @@ public class DynastyManagementDialog extends ZeroDialog {
 
             createBtn = new JButton(existingTrade == null ? LanguageStrings.get(LanguageStrings.TRADE_CONFIRM) : LanguageStrings.get(LanguageStrings.TRADE_UPDATE));
             createBtn.setFocusable(false);
+            AssetStyles.styleCompactButton(createBtn);
             createBtn.addActionListener(e -> attemptCreate());
             
             optimizeBtn = new JButton(LanguageStrings.get(LanguageStrings.TRADE_OPTIMIZE));
             optimizeBtn.setFocusable(false);
             AssetStyles.styleCompactButton(optimizeBtn);
-            optimizeBtn.setVisible(false);
+            boolean showOptimize = origin.hasUpgrade(GameUnlocks.ABILITY_BILATERAL_TRADE) && !crossDynasty;
+            optimizeBtn.setVisible(showOptimize);
+            optimizeBtn.setEnabled(false);
             optimizeBtn.addActionListener(e -> performOptimization());
             
             JButton cancelBtn = new JButton(LanguageStrings.get(LanguageStrings.UI_CANCEL));
             cancelBtn.setFocusable(false);
+            AssetStyles.styleCompactButton(cancelBtn);
             cancelBtn.addActionListener(e -> dispose());
             
             footerPanel.add(createBtn);
@@ -1361,12 +1400,20 @@ public class DynastyManagementDialog extends ZeroDialog {
             else if (noLoad) createBtn.setToolTipText(LanguageStrings.get(LanguageStrings.TRADE_ERROR_NO_LOAD));
             else createBtn.setToolTipText(null);
 
-            if (origin.hasUpgrade(GameUnlocks.ABILITY_BILATERAL_TRADE) && !crossDynasty && !bilateralCheck.isSelected()) {
+            if (origin.hasUpgrade(GameUnlocks.ABILITY_BILATERAL_TRADE) && !crossDynasty) {
                 Trade incoming = findIncomingTrade();
-                optimizeBtn.setVisible(incoming != null);
+                boolean canOptimize = !bilateralCheck.isSelected() && incoming != null;
+                optimizeBtn.setVisible(true);
+                optimizeBtn.setEnabled(canOptimize);
+                optimizeBtn.setToolTipText(canOptimize ? null
+                        : LanguageStrings.get(LanguageStrings.TRADE_OPTIMIZE_REQUIRES_INCOMING));
             } else {
                 optimizeBtn.setVisible(false);
+                optimizeBtn.setEnabled(false);
+                optimizeBtn.setToolTipText(null);
             }
+            AssetStyles.styleCompactButton(optimizeBtn);
+            AssetStyles.styleCompactButton(createBtn);
         }
 
         private Trade findIncomingTrade() {
