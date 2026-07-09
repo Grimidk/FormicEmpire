@@ -12,7 +12,6 @@ To Fix (By decreasing priority) :
 	Map hexes — look yank
 
 	Mid:
-	unclear control buttons and settings, need tooltips
 	trigger upgrades to help menu
 	  
 	Low:

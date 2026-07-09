@@ -728,6 +728,8 @@ public class SettingsPanel extends JPanel {
         defaultRolePrincessLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_DEFAULT_ROLE_PRINCESS));
         defaultRoleQueenLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_DEFAULT_ROLE_QUEEN));
         
+        applySettingTooltips();
+        
         saveButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_SAVE_APPLY));
         backButton.setText(LanguageStrings.get(LanguageStrings.UI_BACK));
         resetGeneralButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_RESET_TAB));
@@ -762,6 +764,39 @@ public class SettingsPanel extends JPanel {
     
     private void styleButton(JButton btn) {
         AssetStyles.styleButton(btn);
+    }
+
+    private void applySettingTooltips() {
+        setSettingTooltip(langLabel, languageCombo, LanguageStrings.SETTINGS_LANGUAGE_TT);
+        setSettingTooltip(autoLabel, autosaveCombo, LanguageStrings.SETTINGS_AUTOSAVE_TT);
+        setSettingTooltip(turboLabel, turboCheck, LanguageStrings.SETTINGS_TURBO_TT);
+        setSettingTooltip(arachLabel, arachnophobiaCheck, LanguageStrings.SETTINGS_ARACHNOPHOBIA_TT);
+        setSettingTooltip(pauseFocusLabel, pauseFocusCheck, LanguageStrings.SETTINGS_PAUSE_FOCUS_TT);
+        setSettingTooltip(confirmQuitLabel, confirmQuitCheck, LanguageStrings.SETTINGS_CONFIRM_QUIT_TT);
+        setSettingTooltip(escapeKeyGameActionsLabel, escapeKeyGameActionsCheck, LanguageStrings.SETTINGS_ESCAPE_KEY_GAME_ACTIONS_TT);
+        setSettingTooltip(tooltipsLabel, showTooltipsCheck, LanguageStrings.SETTINGS_SHOW_TOOLTIPS_TT);
+        setSettingTooltip(overworldAutoRecenterLabel, overworldAutoRecenterCheck, LanguageStrings.SETTINGS_OVERWORLD_AUTO_RECENTER_TT);
+        setSettingTooltip(fuzzParasiteAntsLabel, fuzzParasiteAntsCheck, LanguageStrings.SETTINGS_FUZZ_PARASITE_ANTS_TT);
+        setSettingTooltip(showAuditMenuLabel, showAuditMenuCheck, LanguageStrings.SETTINGS_SHOW_AUDIT_MENU_TT);
+        setSettingTooltip(sizeLabel, sizeCombo, LanguageStrings.SETTINGS_SCREEN_SIZE_TT);
+        setSettingTooltip(fsLabel, fullScreenCheck, LanguageStrings.SETTINGS_FULLSCREEN_TT);
+        setSettingTooltip(daylightColorOverlayLabel, daylightColorOverlayCheck, LanguageStrings.SETTINGS_DAYLIGHT_COLOR_OVERLAY_TT);
+        setSettingTooltip(weatherColorOverlayLabel, weatherColorOverlayCheck, LanguageStrings.SETTINGS_WEATHER_COLOR_OVERLAY_TT);
+        setSettingTooltip(darkModeLabel, darkModeCheck, LanguageStrings.SETTINGS_DARK_MODE_TT);
+        setSettingTooltip(masterLabel, masterVolSlider, LanguageStrings.SETTINGS_MASTER_VOL_TT);
+        setSettingTooltip(musicLabel, musicVolSlider, LanguageStrings.SETTINGS_MUSIC_VOL_TT);
+        setSettingTooltip(sfxLabel, sfxVolSlider, LanguageStrings.SETTINGS_SFX_VOL_TT);
+        setSettingTooltip(defaultRoleWorkerLabel, defaultRoleWorkerCombo, LanguageStrings.SETTINGS_DEFAULT_ROLE_WORKER_TT);
+        setSettingTooltip(defaultRoleSoldierLabel, defaultRoleSoldierCombo, LanguageStrings.SETTINGS_DEFAULT_ROLE_SOLDIER_TT);
+        setSettingTooltip(defaultRoleMajorLabel, defaultRoleMajorCombo, LanguageStrings.SETTINGS_DEFAULT_ROLE_MAJOR_TT);
+        setSettingTooltip(defaultRolePrincessLabel, defaultRolePrincessCombo, LanguageStrings.SETTINGS_DEFAULT_ROLE_PRINCESS_TT);
+        setSettingTooltip(defaultRoleQueenLabel, defaultRoleQueenCombo, LanguageStrings.SETTINGS_DEFAULT_ROLE_QUEEN_TT);
+    }
+
+    private static void setSettingTooltip(JLabel label, JComponent control, String tooltipKey) {
+        String text = LanguageStrings.get(tooltipKey);
+        label.setToolTipText(text);
+        control.setToolTipText(text);
     }
     
     private void setupNavigation(JComponent component) {

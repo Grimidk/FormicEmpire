@@ -1007,6 +1007,31 @@ public final class LanguageStrings {
     public static final String SETTINGS_MASTER_VOL = "SETTINGS_MASTER_VOL";
     public static final String SETTINGS_MUSIC_VOL = "SETTINGS_MUSIC_VOL";
     public static final String SETTINGS_SFX_VOL = "SETTINGS_SFX_VOL";
+
+    public static final String SETTINGS_LANGUAGE_TT = "SETTINGS_LANGUAGE_TT";
+    public static final String SETTINGS_AUTOSAVE_TT = "SETTINGS_AUTOSAVE_TT";
+    public static final String SETTINGS_TURBO_TT = "SETTINGS_TURBO_TT";
+    public static final String SETTINGS_ARACHNOPHOBIA_TT = "SETTINGS_ARACHNOPHOBIA_TT";
+    public static final String SETTINGS_PAUSE_FOCUS_TT = "SETTINGS_PAUSE_FOCUS_TT";
+    public static final String SETTINGS_CONFIRM_QUIT_TT = "SETTINGS_CONFIRM_QUIT_TT";
+    public static final String SETTINGS_ESCAPE_KEY_GAME_ACTIONS_TT = "SETTINGS_ESCAPE_KEY_GAME_ACTIONS_TT";
+    public static final String SETTINGS_SHOW_TOOLTIPS_TT = "SETTINGS_SHOW_TOOLTIPS_TT";
+    public static final String SETTINGS_OVERWORLD_AUTO_RECENTER_TT = "SETTINGS_OVERWORLD_AUTO_RECENTER_TT";
+    public static final String SETTINGS_FUZZ_PARASITE_ANTS_TT = "SETTINGS_FUZZ_PARASITE_ANTS_TT";
+    public static final String SETTINGS_SHOW_AUDIT_MENU_TT = "SETTINGS_SHOW_AUDIT_MENU_TT";
+    public static final String SETTINGS_SCREEN_SIZE_TT = "SETTINGS_SCREEN_SIZE_TT";
+    public static final String SETTINGS_FULLSCREEN_TT = "SETTINGS_FULLSCREEN_TT";
+    public static final String SETTINGS_DAYLIGHT_COLOR_OVERLAY_TT = "SETTINGS_DAYLIGHT_COLOR_OVERLAY_TT";
+    public static final String SETTINGS_WEATHER_COLOR_OVERLAY_TT = "SETTINGS_WEATHER_COLOR_OVERLAY_TT";
+    public static final String SETTINGS_DARK_MODE_TT = "SETTINGS_DARK_MODE_TT";
+    public static final String SETTINGS_MASTER_VOL_TT = "SETTINGS_MASTER_VOL_TT";
+    public static final String SETTINGS_MUSIC_VOL_TT = "SETTINGS_MUSIC_VOL_TT";
+    public static final String SETTINGS_SFX_VOL_TT = "SETTINGS_SFX_VOL_TT";
+    public static final String SETTINGS_DEFAULT_ROLE_WORKER_TT = "SETTINGS_DEFAULT_ROLE_WORKER_TT";
+    public static final String SETTINGS_DEFAULT_ROLE_SOLDIER_TT = "SETTINGS_DEFAULT_ROLE_SOLDIER_TT";
+    public static final String SETTINGS_DEFAULT_ROLE_MAJOR_TT = "SETTINGS_DEFAULT_ROLE_MAJOR_TT";
+    public static final String SETTINGS_DEFAULT_ROLE_PRINCESS_TT = "SETTINGS_DEFAULT_ROLE_PRINCESS_TT";
+    public static final String SETTINGS_DEFAULT_ROLE_QUEEN_TT = "SETTINGS_DEFAULT_ROLE_QUEEN_TT";
     
     public static final String WORLD_BIOME_PREFIX = "WORLD_BIOME_PREFIX";
     public static final String WORLD_TEMP_PREFIX = "WORLD_TEMP_PREFIX";

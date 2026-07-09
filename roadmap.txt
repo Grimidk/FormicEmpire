@@ -12,7 +12,6 @@ To Fix (By decreasing priority) :
 	Map hexes — look yank
 
 	Mid:
-	unclear control buttons and settings, need tooltips
 	trigger upgrades to help menu
 	  
 	Low:
@@ -58,6 +57,7 @@ Needed for launch (v1.0) (Launch Version):
 	rework abilities and alerts and triggers (new classes?)
 	rework saves to be cleaner
 	rework manager and aux files
+	clean tests
 	balance every upgrade
 	music and sounds and settings for them and player panel (to include in core engine)
 	promo video 
