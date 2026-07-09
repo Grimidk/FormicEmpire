@@ -304,6 +304,13 @@ public final class LanguageStrings {
     public static final String UI_SPEED_FAST = "UI_SPEED_FAST";
     public static final String UI_SPEED_VERY_FAST = "UI_SPEED_VERY_FAST";
     public static final String UI_SPEED_TURBO = "UI_SPEED_TURBO";
+    public static final String UI_CONTROL_SPEED_UP_TT = "UI_CONTROL_SPEED_UP_TT";
+    public static final String UI_CONTROL_SPEED_DOWN_TT = "UI_CONTROL_SPEED_DOWN_TT";
+    public static final String UI_CONTROL_PLAY_TT = "UI_CONTROL_PLAY_TT";
+    public static final String UI_CONTROL_PAUSE_TT = "UI_CONTROL_PAUSE_TT";
+    public static final String UI_CONTROL_MENU_TT = "UI_CONTROL_MENU_TT";
+    public static final String UI_CONTROL_SPEED_TT = "UI_CONTROL_SPEED_TT";
+    public static final String UI_CONTROL_PAUSED_TT = "UI_CONTROL_PAUSED_TT";
     public static final String UI_TICK_PREFIX = "UI_TICK_PREFIX";
     public static final String UI_MS_SUFFIX = "UI_MS_SUFFIX";
     public static final String UI_PAUSED_TICK = "UI_PAUSED_TICK";

@@ -28,6 +28,13 @@ public class SpanishTranslation implements Translation {
         es.put("UI_SPEED_FAST", "Rápida");
         es.put("UI_SPEED_VERY_FAST", "Muy Rápida");
         es.put("UI_SPEED_TURBO", "Turbo");
+        es.put("UI_CONTROL_SPEED_UP_TT", "Aumentar velocidad del juego (+)");
+        es.put("UI_CONTROL_SPEED_DOWN_TT", "Reducir velocidad del juego (-)");
+        es.put("UI_CONTROL_PLAY_TT", "Reanudar juego (Espacio)");
+        es.put("UI_CONTROL_PAUSE_TT", "Pausar juego (Espacio)");
+        es.put("UI_CONTROL_MENU_TT", "Menú del juego (Esc)");
+        es.put("UI_CONTROL_SPEED_TT", "Velocidad actual: %s (%s ms por tick)");
+        es.put("UI_CONTROL_PAUSED_TT", "Juego pausado (Espacio para reanudar)");
         es.put("UI_TICK_PREFIX", "Vel: ");
         es.put("UI_MS_SUFFIX", "ms");
         es.put("UI_PAUSED_TICK", "Pausado");

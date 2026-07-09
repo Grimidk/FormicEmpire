@@ -28,6 +28,13 @@ public class FrenchTranslation implements Translation {
         fr.put("UI_SPEED_FAST", "Rapide");
         fr.put("UI_SPEED_VERY_FAST", "Très rapide");
         fr.put("UI_SPEED_TURBO", "Turbo");
+        fr.put("UI_CONTROL_SPEED_UP_TT", "Augmenter la vitesse (+)");
+        fr.put("UI_CONTROL_SPEED_DOWN_TT", "Diminuer la vitesse (-)");
+        fr.put("UI_CONTROL_PLAY_TT", "Reprendre (Espace)");
+        fr.put("UI_CONTROL_PAUSE_TT", "Mettre en pause (Espace)");
+        fr.put("UI_CONTROL_MENU_TT", "Menu du jeu (Échap)");
+        fr.put("UI_CONTROL_SPEED_TT", "Vitesse actuelle : %s (%s ms par tic)");
+        fr.put("UI_CONTROL_PAUSED_TT", "Partie en pause (Espace pour reprendre)");
         fr.put("UI_TICK_PREFIX", "Tic : ");
         fr.put("UI_MS_SUFFIX", "ms");
         fr.put("UI_PAUSED_TICK", "En pause");

@@ -167,9 +167,10 @@ public class ControlPanel extends ZeroGamePanel {
     
     @Override
     public void refreshTranslations() {
-        speedUpButton.setToolTipText(LanguageStrings.get(LanguageStrings.UI_SPEED_UP));
-        speedDownButton.setToolTipText(LanguageStrings.get(LanguageStrings.UI_SPEED_DOWN));
+        speedUpButton.setToolTipText(LanguageStrings.get(LanguageStrings.UI_CONTROL_SPEED_UP_TT));
+        speedDownButton.setToolTipText(LanguageStrings.get(LanguageStrings.UI_CONTROL_SPEED_DOWN_TT));
         menuButton.setText(LanguageStrings.get(LanguageStrings.UI_MENU));
+        menuButton.setToolTipText(LanguageStrings.get(LanguageStrings.UI_CONTROL_MENU_TT));
         updateTickLabel(frame.getEngine());
         updatePlayPauseButton();
         
@@ -532,13 +533,14 @@ public class ControlPanel extends ZeroGamePanel {
         }
         if (eng.isPaused()) {
             tickLabel.setIcon(GameConstants.ICON_SPEED_ZERO);
-            tickLabel.setToolTipText(LanguageStrings.get(LanguageStrings.UI_PAUSED_TICK));
+            tickLabel.setToolTipText(LanguageStrings.get(LanguageStrings.UI_CONTROL_PAUSED_TT));
             return;
         }
         GameSpeed speed = eng.getSpeed();
         if (speed != null && speed.getIcon() != null) {
             tickLabel.setIcon(speed.getIcon());
-            tickLabel.setToolTipText(speed.getName());
+            tickLabel.setToolTipText(LanguageStrings.format(
+                    LanguageStrings.UI_CONTROL_SPEED_TT, speed.getName(), speed.getDelayMs()));
         } else {
             tickLabel.setIcon(null);
             tickLabel.setToolTipText(eng.getSpeedLabel());
@@ -549,7 +551,7 @@ public class ControlPanel extends ZeroGamePanel {
         playPauseButton.setIcon(isPaused ? GameConstants.ICON_SPEED_PLAY : GameConstants.ICON_SPEED_PAUSE);
         playPauseButton.setText("");
         playPauseButton.setToolTipText(LanguageStrings.get(
-                isPaused ? LanguageStrings.UI_PLAY : LanguageStrings.UI_PAUSE));
+                isPaused ? LanguageStrings.UI_CONTROL_PLAY_TT : LanguageStrings.UI_CONTROL_PAUSE_TT));
     }
 
     private static void configureIconControlButton(JButton button, ImageIcon icon) {

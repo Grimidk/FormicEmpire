@@ -28,6 +28,13 @@ public class PortugueseTranslation implements Translation {
         pt.put("UI_SPEED_FAST", "Rápida");
         pt.put("UI_SPEED_VERY_FAST", "Muito Rápida");
         pt.put("UI_SPEED_TURBO", "Turbo");
+        pt.put("UI_CONTROL_SPEED_UP_TT", "Aumentar velocidade do jogo (+)");
+        pt.put("UI_CONTROL_SPEED_DOWN_TT", "Diminuir velocidade do jogo (-)");
+        pt.put("UI_CONTROL_PLAY_TT", "Retomar jogo (Espaço)");
+        pt.put("UI_CONTROL_PAUSE_TT", "Pausar jogo (Espaço)");
+        pt.put("UI_CONTROL_MENU_TT", "Menu do jogo (Esc)");
+        pt.put("UI_CONTROL_SPEED_TT", "Velocidade atual: %s (%s ms por tick)");
+        pt.put("UI_CONTROL_PAUSED_TT", "Jogo pausado (Espaço para retomar)");
         pt.put("UI_TICK_PREFIX", "Vel.: ");
         pt.put("UI_MS_SUFFIX", "ms");
         pt.put("UI_PAUSED_TICK", "Pausado");

@@ -28,6 +28,13 @@ public class EnglishTranslation implements Translation {
         en.put("UI_SPEED_FAST", "Fast");
         en.put("UI_SPEED_VERY_FAST", "Very Fast");
         en.put("UI_SPEED_TURBO", "Turbo");
+        en.put("UI_CONTROL_SPEED_UP_TT", "Increase game speed (+)");
+        en.put("UI_CONTROL_SPEED_DOWN_TT", "Decrease game speed (-)");
+        en.put("UI_CONTROL_PLAY_TT", "Resume game (Space)");
+        en.put("UI_CONTROL_PAUSE_TT", "Pause game (Space)");
+        en.put("UI_CONTROL_MENU_TT", "Game menu (Esc)");
+        en.put("UI_CONTROL_SPEED_TT", "Current speed: %s (%s ms per tick)");
+        en.put("UI_CONTROL_PAUSED_TT", "Game paused (Space to resume)");
         en.put("UI_TICK_PREFIX", "Tick: ");
         en.put("UI_MS_SUFFIX", "ms");
         en.put("UI_PAUSED_TICK", "PAUSED");
