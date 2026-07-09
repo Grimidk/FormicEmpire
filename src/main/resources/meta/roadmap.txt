@@ -9,18 +9,18 @@ To Fix (By decreasing priority) :
 	TODO: icons all unlocks
 	TODO: sprites/buildings/rooms/*.png
 	TODO: species sprites and icon: honeypot, turtle, carpenter, weaver, floodplain, fire, jet, gliding, army, ghost, dracula, silver, maricopa, exploding, bulldog, shining black and desert
-	Map hexes — look yank
 
 	Mid:
-	trigger upgrades to help menu
+	(none right now)
 	  
 	Low:
-	(none right now)
+	was a war modifier -20 for 1 year
 
 	Can't reproduce:
 	(none right now)
 
 	Important not Urgent:
+	map hexes look kinda yank
 	hexagonal architecture
 	more icon borderless buttons
 	logistic map overlay and wars overlay with toggles
@@ -57,6 +57,7 @@ Needed for launch (v1.0) (Launch Version):
 	rework abilities and alerts and triggers (new classes?)
 	rework saves to be cleaner
 	rework manager and aux files
+	clean tests
 	balance every upgrade
 	music and sounds and settings for them and player panel (to include in core engine)
 	promo video 

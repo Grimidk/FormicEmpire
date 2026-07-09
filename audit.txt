@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 54% (137/252 checked)
+Completion: 69% (174/252 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -10,13 +10,13 @@ Legend: [ ] = not tested yet   [x] = tested (reset to [ ] if the mechanic change
 1. LAUNCHER / MAIN MENU
 ================================================================================
 [X] Intro splash (studio name, arthropod/arachnophobia warning, photosensitivity warning; click or timer to advance) auto-advances to main menu
-[x] Play — opens save slot screen
-[x] Help — encyclopedia (all tabs; see section 18)
-[x] Roadmap — development roadmap text dialog
-[x] Credits — credits text dialog
-[x] Mechanics Audit — this file (only when enabled in Settings > General)
-[ ] Settings — full settings panel (see section 2)
-[x] Quit — exit app (respects confirm-on-quit when a game session is active)
+[X] Play — opens save slot screen
+[X] Help — encyclopedia (all tabs; see section 18)
+[X] Roadmap — development roadmap text dialog
+[X] Credits — credits text dialog
+[X] Mechanics Audit — this file (only when enabled in Settings > General)
+[X] Settings — full settings panel (see section 2)
+[X] Quit — exit app (respects confirm-on-quit when a game session is active)
 
 ================================================================================
 2. SETTINGS (menu or in-game ESC > Settings)
@@ -301,18 +301,18 @@ Neighbor trade rows (per adjacent hex):
 [ ] Bilateral Optimization button in trade creator footer (visible with Bilateral Trade unlock; enabled when incoming one-way route exists and bilateral unchecked)
 [X] Confirm / update trade
 [X] Cancel trade dialog
-[ ] Active trade edit from table actions (Manage / Establish)
+[X] Active trade edit from table actions (Manage / Establish)
 [ ] Make Two-Way button in logistics Actions column (visible with outgoing one-way route; enabled when matching incoming one-way route exists)
 
 ================================================================================
 17. DYNASTY — DIPLOMACY (D)
 ================================================================================
 Per foreign dynasty Actions menu:
-[ ] Non-aggression pact — propose / accept / break
-[ ] Declare war (confirm dialog; population & military checks)
+[X] Non-aggression pact — propose / accept / break
+[X] Declare war (confirm dialog; population & military checks)
 [ ] Request trade agreement
 [ ] Open trade negotiation
-[ ] Send diplomats to dynasty
+[X] Send diplomats to dynasty
 [x] Reputation / stance icons and tooltips
 [ ] Cooldowns after pact break block war
 
@@ -321,7 +321,7 @@ Per foreign dynasty Actions menu:
 ================================================================================
 [X] Active wars list on map sidebar — click to focus war
 [X] War entries in dynasty table
-[ ] View battle — opens WarBattleDialog (hour-tick battle animation)
+[X] View battle — opens WarBattleDialog (hour-tick battle animation)
 [ ] Battle view updates each hour while open
 [ ] War standing / stage progression over time
 [ ] Redeploy delay between battles (24h)
@@ -355,16 +355,16 @@ In-game tutorial dialog (on new game + ESC > Tutorial):
 [X] Multi-page walkthrough — Back, Next, Skip, Finish
 
 Help encyclopedia (main menu Help):
-[x] Tutorials — Welcome, Getting Started, Dynasty, Hotkeys
-[x] Species reference
-[x] Ant types
-[x] Bugs / threats
-[x] Ant roles
-[x] Empire / dynasty concepts
-[x] Upgrades list (all GameUnlocks upgrades)
-[x] Buildings list
-[x] Assimilations list
-[x] World / biomes / hexes
+[X] Tutorials — Welcome, Getting Started, Dynasty, Hotkeys
+[X] Species reference
+[X] Ant types
+[X] Bugs / threats
+[X] Ant roles
+[X] Empire / dynasty concepts
+[X] Upgrades list (all GameUnlocks upgrades)
+[X] Buildings list
+[X] Assimilations list
+[X] World / biomes / hexes
 
 ================================================================================
 22. AUTOMATIC TRIGGERS (play until fired — popup unlocks)
@@ -375,7 +375,7 @@ Monthly:
 [ ] Parasitic mite outbreak event
 
 Daily:
-[ ] Graver role unlock
+[X] Graver role unlock
 [ ] Colony death detection
 [ ] NPC dynasty triggers
 [ ] Mass flight unlock
@@ -383,16 +383,16 @@ Daily:
 [ ] (and other TriggerManager daily checks)
 
 Hourly:
-[ ] Hourly trigger checks
+[X] Hourly trigger checks
 
-[ ] Trigger popup pauses game, shows title + message, grants upgrade
+[X] Trigger popup pauses game, shows title + message, grants upgrade
 
 ================================================================================
 23. SIMULATION MECHANICS (indirect player interaction — observe while playing)
 ================================================================================
 Colony labour & resources:
-[ ] Foraging, farming, nursing, laying, research generation
-[ ] Water / food / protein / syrup / rock / resin economy
+[X] Foraging, farming, nursing, laying, research generation
+[X] Water / food / protein / syrup / rock / resin economy
 [ ] Grave cleaning, policing, mite / parasite ant handling
 [ ] Building construction jobs
 [ ] Room passive effects (lab, farm, nurse, etc.)
@@ -400,13 +400,13 @@ Colony labour & resources:
 World:
 [X] Day / month / year / hour ticks
 [X] Weather changes
-[ ] Biome differences on hexes
+[X] Biome differences on hexes
 [X] Resource sources on map (plants, mushrooms, water, prey)
 [X] Nuptial flight colony founding on new hexes
 [ ] AI dynasties trade, tunnel, diplomacy, war
 
 Combat:
-[ ] Colony military power calculation
+[X] Colony military power calculation
 [ ] War stages: clash, hex defense, etc.
 [ ] Battle view stat multipliers vs standing multipliers
 
@@ -416,7 +416,7 @@ Combat:
 [X] Switch language mid-game — UI refreshes, logic keys unchanged
 [X] Toggle dark mode — theme refreshes on all open panels
 [ ] Open multiple dialogs — ESC closes topmost; dynasty keys defer when dynasty dialog open
-[ ] cleanupSession on back-to-menu — no leaked tick listeners
+[X] cleanupSession on back-to-menu — no leaked tick listeners
 [ ] Load second save while first loaded — prior session torn down
 [ ] Confirm exit with unsaved active session
 [ ] Arachnophobia mode — spider substitutes in gameplay & UI

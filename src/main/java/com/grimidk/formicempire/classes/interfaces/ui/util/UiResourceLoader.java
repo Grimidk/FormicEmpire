@@ -6,6 +6,7 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.net.URL;
 import javax.swing.ImageIcon;
+import javax.swing.Icon;
 
 public final class UiResourceLoader {
     private UiResourceLoader() {
@@ -36,5 +37,16 @@ public final class UiResourceLoader {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static Icon loadDialogIcon(Class<?> anchor, String path, int sizePx) {
+        Image image = loadImage(anchor, path);
+        if (image == null) {
+            return null;
+        }
+        if (image.getWidth(null) != sizePx || image.getHeight(null) != sizePx) {
+            image = image.getScaledInstance(sizePx, sizePx, Image.SCALE_SMOOTH);
+        }
+        return new ImageIcon(image);
     }
 }

@@ -40,6 +40,7 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
     private Cursor cursorClick;
     private AWTEventListener cursorEventListener;
     private boolean cursorPressed;
+    private boolean pausedForFocusLoss;
     private final Runnable translationRefresh = this::refreshTranslations;
 
     private boolean isGameWindow(Window window) {
@@ -95,6 +96,10 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         } else if (me.getID() == MouseEvent.MOUSE_DRAGGED && !cursorPressed) {
             window.setCursor(cursorNormal);
         }
+    }
+
+    public void clearFocusPauseState() {
+        pausedForFocusLoss = false;
     }
 
     public CardLayout getCardLayout() {
@@ -168,7 +173,11 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         addWindowFocusListener(new WindowFocusListener() {
             @Override
             public void windowGainedFocus(WindowEvent e) {
-                if (engine.isPauseOnFocusLoss() && gamePanel.isEngineStarted() && engine.isPaused()) {
+                if (!engine.isPauseOnFocusLoss() || !gamePanel.isEngineStarted() || !pausedForFocusLoss) {
+                    return;
+                }
+                pausedForFocusLoss = false;
+                if (engine.isPaused()) {
                     engine.resumeEngine();
                     gamePanel.updateStatusIndicator(false);
                 }
@@ -176,10 +185,12 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
 
             @Override
             public void windowLostFocus(WindowEvent e) {
-                if (engine.isPauseOnFocusLoss() && gamePanel.isEngineStarted() && !engine.isPaused()) {
-                    engine.pauseEngine();
-                    gamePanel.updateStatusIndicator(true);
+                if (!engine.isPauseOnFocusLoss() || !gamePanel.isEngineStarted() || engine.isPaused()) {
+                    return;
                 }
+                engine.pauseEngine();
+                pausedForFocusLoss = true;
+                gamePanel.updateStatusIndicator(true);
             }
         });
 
@@ -369,14 +380,18 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         boolean wasPaused = engine.isPaused();
         if (!wasPaused) {
             engine.pauseEngine();
-            if (gamePanel != null) gamePanel.updateStatusIndicator(true);
+            if (gamePanel != null) {
+                gamePanel.updateStatusIndicator(true);
+            }
         }
-        
-        UiOptionPane.showMessageDialog(this, message, title, JOptionPane.INFORMATION_MESSAGE);
-        
+
+        UiOptionPane.showForegroundMessageDialog(this, message, title, JOptionPane.INFORMATION_MESSAGE);
+
         if (!wasPaused) {
             engine.resumeEngine();
-            if (gamePanel != null) gamePanel.updateStatusIndicator(false);
+            if (gamePanel != null) {
+                gamePanel.updateStatusIndicator(false);
+            }
         }
 
         if (gamePanel != null) {
@@ -393,7 +408,7 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         String title = LanguageStrings.get(LanguageStrings.DEATH_TITLE);
         String message = LanguageStrings.get(LanguageStrings.DEATH_MESSAGE);
 
-        int choice = UiOptionPane.showOptionDialog(
+        int choice = UiOptionPane.showForegroundOptionDialog(
                 this,
                 message,
                 title,

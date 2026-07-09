@@ -36,17 +36,21 @@ public class TriggerManager {
     }
 
     public void registerListeners() {
-        unregisterListeners();
+        unregisterTickListeners();
         engine.addMonthTickListener(monthlyRunnable);
         engine.addDayTickListener(dailyRunnable);
         engine.addHourTickListener(hourlyRunnable);
     }
 
     public void unregisterListeners() {
+        unregisterTickListeners();
+        listeners.clear();
+    }
+
+    private void unregisterTickListeners() {
         engine.removeMonthTickListener(monthlyRunnable);
         engine.removeDayTickListener(dailyRunnable);
         engine.removeHourTickListener(hourlyRunnable);
-        listeners.clear();
     }
 
     public interface TriggerListener {

@@ -1182,6 +1182,7 @@ public class GamePanel extends ZeroGamePanel {
         }
 
         this.engineStarted = false;
+        frame.clearFocusPauseState();
         statusLabel.setText(LanguageStrings.get(LanguageStrings.UI_NOT_STARTED));
     }
 
@@ -1305,6 +1306,7 @@ public class GamePanel extends ZeroGamePanel {
                         }
                         installPlusSpeedKeyDispatcher();
                     }
+                    engine.pauseEngine();
                     refreshAllGUIData();
                     updateGameAreaSize();
                     centerOverworldScroll();

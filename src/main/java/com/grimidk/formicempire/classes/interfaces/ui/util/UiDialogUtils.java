@@ -8,6 +8,7 @@ import java.awt.Container;
 import java.awt.Window;
 import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
+import java.awt.KeyboardFocusManager;
 
 public final class UiDialogUtils {
     private UiDialogUtils() {
@@ -30,6 +31,42 @@ public final class UiDialogUtils {
         }
         dialog.setLocationRelativeTo(parent);
         dialog.setVisible(true);
+    }
+
+    /** Prefer the active or topmost owned window so alerts stack above open game dialogs. */
+    public static Window resolveForegroundOwner(Component fallback) {
+        Window root = fallback instanceof Window window ? window : SwingUtilities.getWindowAncestor(fallback);
+        Window active = KeyboardFocusManager.getCurrentKeyboardFocusManager().getActiveWindow();
+        if (active != null && isUnderGameRoot(active, root)) {
+            return active;
+        }
+        Window top = root;
+        if (root != null) {
+            for (Window window : Window.getWindows()) {
+                if (!window.isVisible() || !isUnderGameRoot(window, root)) {
+                    continue;
+                }
+                if (top == null || window instanceof java.awt.Dialog) {
+                    top = window;
+                }
+            }
+        }
+        return top != null ? top : root;
+    }
+
+    private static boolean isUnderGameRoot(Window window, Window root) {
+        if (window == null || root == null) {
+            return false;
+        }
+        if (window == root) {
+            return true;
+        }
+        for (Window owner = window.getOwner(); owner != null; owner = owner.getOwner()) {
+            if (owner == root) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static void applyGameCursors(JDialog dialog, Component parent) {

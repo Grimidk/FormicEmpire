@@ -13,6 +13,7 @@ import java.awt.event.MouseEvent;
 public class IntroPanel extends JPanel {
     private static final int STUDIO_SLIDE_MS = 5000;
     private static final int WARNING_SLIDE_MS = 10000;
+    private static final long SKIP_DEBOUNCE_MS = 200;
     private static final String STUDIO_NAME = "GrimIDK";
 
     private static final int SLIDE_STUDIO = 0;
@@ -20,15 +21,16 @@ public class IntroPanel extends JPanel {
     private static final int SLIDE_PHOTOSENSITIVITY = 2;
 
     private final MainFrame frame;
-    private final JLabel messageLabel = new JLabel();
+    private final JLabel messageLabel = new FullAreaLabel();
     private final MouseAdapter skipListener = new MouseAdapter() {
         @Override
-        public void mouseClicked(MouseEvent e) {
-            advanceSlide();
+        public void mousePressed(MouseEvent e) {
+            skipIntro();
         }
     };
     private Timer advanceTimer;
     private int slideIndex;
+    private long lastSkipMs;
 
     public IntroPanel(MainFrame frame) {
         this.frame = frame;
@@ -50,6 +52,7 @@ public class IntroPanel extends JPanel {
 
         addMouseListener(skipListener);
         messageLabel.addMouseListener(skipListener);
+        setFocusable(true);
 
         addAncestorListener(new AncestorListener() {
             @Override
@@ -83,6 +86,16 @@ public class IntroPanel extends JPanel {
         messageLabel.setCursor(hand);
         showStudioSlide();
         scheduleNextSlide(STUDIO_SLIDE_MS);
+        requestFocusInWindow();
+    }
+
+    private void skipIntro() {
+        long now = System.currentTimeMillis();
+        if (now - lastSkipMs < SKIP_DEBOUNCE_MS) {
+            return;
+        }
+        lastSkipMs = now;
+        advanceSlide();
     }
 
     private void showStudioSlide() {
@@ -133,6 +146,14 @@ public class IntroPanel extends JPanel {
         if (advanceTimer != null) {
             advanceTimer.stop();
             advanceTimer = null;
+        }
+    }
+
+    /** JLabel hit-testing is text-sized by default; treat the full layout cell as clickable. */
+    private static final class FullAreaLabel extends JLabel {
+        @Override
+        public boolean contains(int x, int y) {
+            return getWidth() > 0 && getHeight() > 0;
         }
     }
 }
