@@ -13,6 +13,10 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
+import javax.swing.ImageIcon;
 
 class AntSubtypeServiceTest {
 
@@ -106,5 +110,28 @@ class AntSubtypeServiceTest {
         colony.setSubtypeHatchRate(AntSubtypeSlot.HEAD, 2, 25f);
         Map<String, Double> flat = AntSubtypeService.flattenSubtypeRates(colony.getSubtypeHatchRates());
         assertEquals(25.0, flat.get("HEAD:2"));
+    }
+
+    @Test
+    void spriteFolderNamesCoverSinglesAndCombos() {
+        assertNull(AntSubtypeProfile.standard().buildSpriteFolder());
+        assertEquals("trapjaw", AntSubtypeProfile.of(2, 1, 1, 1).buildSpriteFolder());
+        assertEquals("doorhead", AntSubtypeProfile.of(3, 1, 1, 1).buildSpriteFolder());
+        assertEquals("bullet", AntSubtypeProfile.of(1, 1, 2, 1).buildSpriteFolder());
+        assertEquals("honeypot", AntSubtypeProfile.of(1, 1, 3, 1).buildSpriteFolder());
+        assertEquals("trapjaw-bullet", AntSubtypeProfile.of(2, 1, 2, 1).buildSpriteFolder());
+        assertEquals("trapjaw-honeypot", AntSubtypeProfile.of(2, 1, 3, 1).buildSpriteFolder());
+        assertEquals("doorhead-bullet", AntSubtypeProfile.of(3, 1, 2, 1).buildSpriteFolder());
+        assertEquals("doorhead-honeypot", AntSubtypeProfile.of(3, 1, 3, 1).buildSpriteFolder());
+    }
+
+    @Test
+    void omniComboSubtypeSpritesLoadFromClasspath() {
+        ImageIcon trapjawStinger = GameConstants.getAntSprite(
+                GameConstants.TYPE_SOLDIER, GameConstants.SPECIES_OMNI, AntSubtypeProfile.fromCode(2121));
+        ImageIcon doorheadHoneypot = GameConstants.getAntSprite(
+                GameConstants.TYPE_WORKER, GameConstants.SPECIES_OMNI, AntSubtypeProfile.fromCode(3131));
+        assertNotNull(trapjawStinger);
+        assertNotNull(doorheadHoneypot);
     }
 }

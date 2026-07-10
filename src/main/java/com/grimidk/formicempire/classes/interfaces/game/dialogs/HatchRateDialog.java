@@ -142,10 +142,8 @@ public class HatchRateDialog extends ZeroDialog {
                 JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT));
                 row.setOpaque(false);
 
-                JLabel subtypeLabel = new JLabel(subtype.getName());
-                if (!subtype.getDesc().isEmpty()) {
-                    subtypeLabel.setToolTipText(subtype.getDesc());
-                }
+                JLabel subtypeLabel = new JLabel(subtype.getIcon());
+                subtypeLabel.setToolTipText(subtypeTooltip(subtype));
                 row.add(subtypeLabel);
 
                 float currentRate = colony.getSubtypeHatchRate(slot, subtype.getDigit());
@@ -171,6 +169,14 @@ public class HatchRateDialog extends ZeroDialog {
             case ABDOMEN -> LanguageStrings.HATCH_SUBTYPE_ABDOMEN_SECTION;
             default -> LanguageStrings.HATCH_DESC;
         };
+    }
+
+    private static String subtypeTooltip(AntSubtype subtype) {
+        String desc = subtype.getDesc();
+        if (desc == null || desc.isEmpty()) {
+            return subtype.getName();
+        }
+        return subtype.getName() + " — " + desc;
     }
 
     private void handleSpinnerChange(AntType type, JSpinner spinner) {

@@ -121,7 +121,7 @@ public final class GameConstants {
         }
         if (type != TYPE_EGG && type != TYPE_LARVA && type != TYPE_PUPA
                 && type != TYPE_DEAD && type != TYPE_ZOMBIE) {
-            ImageIcon subtypeSprite = resolveSubtypeSprite(type, profile);
+            ImageIcon subtypeSprite = resolveSubtypeSprite(type, species, profile);
             if (subtypeSprite != null) {
                 return subtypeSprite;
             }
@@ -138,19 +138,33 @@ public final class GameConstants {
         return loadIcon(path);
     }
 
-    private static ImageIcon resolveSubtypeSprite(AntType type, AntSubtypeProfile profile) {
-        if (profile == null || profile.isStandard() || profile.countActiveSubtypes() != 1) {
+    private static ImageIcon resolveSubtypeSprite(AntType type, Species species, AntSubtypeProfile profile) {
+        if (profile == null || profile.isStandard()) {
             return null;
+        }
+        String folder = profile.buildSpriteFolder();
+        if (folder == null) {
+            return null;
+        }
+        String speciesDir = resolveSubtypeSpriteSpeciesDir(species, profile);
+        String path = "sprites/ants/" + speciesDir + "subtypes/" + folder + "/" + type.getSpriteName();
+        return loadIcon(path);
+    }
+
+    private static String resolveSubtypeSpriteSpeciesDir(Species species, AntSubtypeProfile profile) {
+        if (species != null && species.getId() == SPECIES_OMNI.getId()) {
+            return "omni/";
+        }
+        if (profile.countActiveSubtypes() > 1) {
+            return "omni/";
         }
         for (AntSubtypeSlot slot : AntSubtypeSlot.values()) {
             AntSubtype subtype = profile.getSubtype(slot);
             if (subtype != null && !subtype.isNone() && subtype.hasSprite()) {
-                String path = "sprites/ants/" + subtype.getSpriteSpeciesDir() + "subtypes/"
-                        + subtype.getSpriteFolder() + "/" + type.getSpriteName();
-                return loadIcon(path);
+                return subtype.getSpriteSpeciesDir();
             }
         }
-        return null;
+        return "omni/";
     }
 
     public static ImageIcon getAssimilatedDroneSprite(Species species) {
@@ -652,36 +666,39 @@ public final class GameConstants {
     public static final float SUBTYPE_FORAGE_MULT_HONEYPOT = 4f;
     public static final float SUBTYPE_SPEED_MULT_HONEYPOT = 0.75f;
 
+    // TODO asset: icons/subtypes/Nothing.png; icons/species/Omni.png (placeholder — replace final art)
+    private static final ImageIcon SUBTYPE_ICON_NOTHING = loadIcon("icons/species/Omni.png");
+
     public static final AntSubtype SUBTYPE_HEAD_NONE = new AntSubtype(1, LanguageStrings.SUBTYPE_NOTHING, AntSubtypeSlot.HEAD,
-            SUBTYPE_DIGIT_NONE, null, null, null);
+            SUBTYPE_DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, null, SUBTYPE_ICON_NOTHING);
     static { antSubtypes.add(SUBTYPE_HEAD_NONE); }
     public static final AntSubtype SUBTYPE_HEAD_TRAPJAW = new AntSubtype(2, LanguageStrings.SUBTYPE_HEAD_TRAPJAW, AntSubtypeSlot.HEAD,
             2, GameUnlocks.ASSIMILATED_TRAPJAW, "trapjaw/", "trapjaw",
-            SUBTYPE_ATTACK_MULT_TRAPJAW, true, 1f, 1f, 1f, null);
+            SUBTYPE_ATTACK_MULT_TRAPJAW, true, 1f, 1f, 1f, loadIcon("icons/subtypes/trapjaw.png"));
     static { antSubtypes.add(SUBTYPE_HEAD_TRAPJAW); }
     public static final AntSubtype SUBTYPE_HEAD_DOORHEAD = new AntSubtype(3, LanguageStrings.SUBTYPE_HEAD_DOORHEAD, AntSubtypeSlot.HEAD,
             3, GameUnlocks.ASSIMILATED_DOORHEAD, "turtle/", "doorhead",
-            1f, false, SUBTYPE_DEFENSE_MULT_DOORHEAD, 1f, 1f, null);
+            1f, false, SUBTYPE_DEFENSE_MULT_DOORHEAD, 1f, 1f, loadIcon("icons/subtypes/doorhead.png"));
     static { antSubtypes.add(SUBTYPE_HEAD_DOORHEAD); }
 
     public static final AntSubtype SUBTYPE_TORSO_NONE = new AntSubtype(4, LanguageStrings.SUBTYPE_NOTHING, AntSubtypeSlot.TORSO,
-            SUBTYPE_DIGIT_NONE, null, null, null);
+            SUBTYPE_DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, null, SUBTYPE_ICON_NOTHING);
     static { antSubtypes.add(SUBTYPE_TORSO_NONE); }
 
     public static final AntSubtype SUBTYPE_ABDOMEN_NONE = new AntSubtype(5, LanguageStrings.SUBTYPE_NOTHING, AntSubtypeSlot.ABDOMEN,
-            SUBTYPE_DIGIT_NONE, null, null, null);
+            SUBTYPE_DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, null, SUBTYPE_ICON_NOTHING);
     static { antSubtypes.add(SUBTYPE_ABDOMEN_NONE); }
     public static final AntSubtype SUBTYPE_ABDOMEN_STINGER = new AntSubtype(6, LanguageStrings.SUBTYPE_ABDOMEN_STINGER, AntSubtypeSlot.ABDOMEN,
             2, GameUnlocks.ASSIMILATED_STINGING, "bullet/", "bullet",
-            SUBTYPE_DAMAGE_MULT_STINGER, false, 1f, 1f, 1f, null);
+            SUBTYPE_DAMAGE_MULT_STINGER, false, 1f, 1f, 1f, loadIcon("icons/subtypes/bullet.png"));
     static { antSubtypes.add(SUBTYPE_ABDOMEN_STINGER); }
     public static final AntSubtype SUBTYPE_ABDOMEN_HONEYPOT = new AntSubtype(7, LanguageStrings.SUBTYPE_ABDOMEN_HONEYPOT, AntSubtypeSlot.ABDOMEN,
             3, GameUnlocks.ASSIMILATED_HONEYPOT, "honeypot/", "honeypot",
-            1f, false, 1f, SUBTYPE_SPEED_MULT_HONEYPOT, SUBTYPE_FORAGE_MULT_HONEYPOT, null);
+            1f, false, 1f, SUBTYPE_SPEED_MULT_HONEYPOT, SUBTYPE_FORAGE_MULT_HONEYPOT, loadIcon("icons/subtypes/honeypot.png"));
     static { antSubtypes.add(SUBTYPE_ABDOMEN_HONEYPOT); }
 
     public static final AntSubtype SUBTYPE_OTHER_NONE = new AntSubtype(8, LanguageStrings.SUBTYPE_NOTHING, AntSubtypeSlot.OTHER,
-            SUBTYPE_DIGIT_NONE, null, null, null);
+            SUBTYPE_DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, null, SUBTYPE_ICON_NOTHING);
     static { antSubtypes.add(SUBTYPE_OTHER_NONE); }
 
     // --- Ant Roles ---

@@ -58,6 +58,24 @@ public final class AntSubtypeProfile {
         return count;
     }
 
+    /** Head-abdomen folder name for subtype sprites (e.g. {@code trapjaw}, {@code trapjaw-bullet}). */
+    public String buildSpriteFolder() {
+        if (isStandard()) {
+            return null;
+        }
+        StringBuilder folder = new StringBuilder();
+        for (AntSubtypeSlot slot : GameConstants.getConfigurableSubtypeSlots()) {
+            AntSubtype subtype = getSubtype(slot);
+            if (subtype != null && !subtype.isNone() && subtype.hasSprite()) {
+                if (folder.length() > 0) {
+                    folder.append('-');
+                }
+                folder.append(subtype.getSpriteFolder());
+            }
+        }
+        return folder.isEmpty() ? null : folder.toString();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
