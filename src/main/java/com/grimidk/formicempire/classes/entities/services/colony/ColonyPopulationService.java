@@ -132,6 +132,10 @@ public class ColonyPopulationService {
         for (Ant pupa : pupaeToHatch) {
             AntType newType = determineHatchType(colony);
             pupa.transform(colony, newType);
+            if (AntSubtypeService.isEligibleType(newType)) {
+                pupa.setSubtypeProfile(AntSubtypeService.rollProfile(colony));
+                AntSubtypeService.applySubtypeStats(pupa, colony);
+            }
             colony.getAntsByType(newType).add(pupa);
         }
         colony.getPupae().removeAll(pupaeToHatch);

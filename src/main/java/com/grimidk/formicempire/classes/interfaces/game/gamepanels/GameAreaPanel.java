@@ -740,13 +740,11 @@ public class GameAreaPanel extends ZeroGamePanel {
         for (AntType type : GameConstants.getAntTypes()) {
             if (type == GameConstants.TYPE_DEAD) continue; 
 
-            ImageIcon spriteIcon = GameConstants.getAntSprite(type, colony.getSpecies());
-            if (spriteIcon == null) continue; 
-            
-            Image sprite = spriteIcon.getImage();
-            int w = spriteIcon.getIconWidth();
-            int h = spriteIcon.getIconHeight();
-            
+            List<Ant> ants = colony.getAntsByType(type);
+            if (ants.isEmpty()) {
+                continue;
+            }
+
             List<Species> assimilatedSpecies = new ArrayList<>();
             if (type == GameConstants.TYPE_DRONE && colony.getDynasty() != null) {
                 for (Species s : GameConstants.getSpecies()) {
@@ -757,10 +755,15 @@ public class GameAreaPanel extends ZeroGamePanel {
                 }
             }
 
-            List<Ant> ants = colony.getAntsByType(type);
             for (Ant ant : ants) {
                 if (ant.getDimension() != currentDimension) continue;
                 if (ant.getDimension() == WorldSpaces.TUNNEL_WORLD) continue;
+
+                ImageIcon antSpriteIcon = GameConstants.getAntSprite(type, colony.getSpecies(), ant.getSubtypeProfile());
+                if (antSpriteIcon == null) continue;
+                Image sprite = antSpriteIcon.getImage();
+                int w = antSpriteIcon.getIconWidth();
+                int h = antSpriteIcon.getIconHeight();
 
                 if (!ViewportPhysicsLod.antIntersectsViewport(lodViewportRect, ant.getX(), ant.getY(), w, h)) {
                     continue;

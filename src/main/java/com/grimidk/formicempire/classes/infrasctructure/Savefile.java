@@ -160,6 +160,12 @@ public class Savefile implements Serializable {
         public int eggs, pupae, larvae, workers, soldiers, majors, drones, princesses, queens;        
         public int plants, mushrooms, protein, water, syrups, resins, minerals;        
         public float hatchRateWorker, hatchRateSoldier, hatchRateMajor, hatchRateDrone, hatchRatePrincess;
+        public Map<String, Double> subtypeHatchRatesFlat = new HashMap<>();
+        public Map<String, Integer> workerSubtypes = new HashMap<>();
+        public Map<String, Integer> soldierSubtypes = new HashMap<>();
+        public Map<String, Integer> majorSubtypes = new HashMap<>();
+        public Map<String, Integer> princessSubtypes = new HashMap<>();
+        public Map<String, Integer> queenSubtypes = new HashMap<>();
         public int aphids, symbioticMites, dermestids, parasiteAnts, parasiticMites;
         public int pheromoneStormMonthsRemaining;
         public int recentlyConqueredMonthsRemaining;

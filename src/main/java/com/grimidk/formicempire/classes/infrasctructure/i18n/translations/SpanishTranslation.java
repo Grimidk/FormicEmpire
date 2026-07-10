@@ -182,15 +182,32 @@ public class SpanishTranslation implements Translation {
         es.put("ASSIMILATION_INFO", "Asigna Investigadoras para contribuir a la asimilación genética.");
         es.put("SYNERGY_COMING_SOON", "Sinergias - Próximamente");
         es.put("SYNERGY_REQUIREMENTS_FMT", "Combina: %s + %s");
+        es.put("SYNERGY_NONE_IN_PROGRESS", "No hay sinergias en progreso. Asimila rasgos genéticos para descubrir combinaciones.");
+        es.put("SYNERGY_STATUS_ACTIVE", "Activa");
+        es.put("SYNERGY_STATUS_PARTIAL", "En progreso (%s/%s)");
+        es.put("SYNERGY_REQUIREMENT_SEPARATOR", " + ");
+        es.put("SYNERGY_REQUIREMENT_MET_FMT", "[x] %s");
+        es.put("SYNERGY_REQUIREMENT_MISSING_FMT", "[ ] %s");
         es.put("SYNERGY_SUPER_VENOM", "Súper Veneno");
         es.put("SYNERGY_SUPER_VENOM_FLAVOR", "Súper Veneno");
-        es.put("SYNERGY_SUPER_VENOM_DESC", "Reemplaza la acumulación de veneno de fuego + maricopa (4+4) por un multiplicador de daño de 16x cuando ambos venenos están asimilados y las Sinergias están investigadas. El veneno punzante sigue sumando +4 (20x con los tres).");
+        es.put("SYNERGY_SUPER_VENOM_DESC", "Reemplaza la acumulación de veneno de fuego + maricopa (4+4) por un multiplicador de daño de 16x cuando ambos venenos están asimilados y las Sinergias están investigadas.");
 
         es.put("DIALOG_HATCH_RATES_TITLE", "Gestionar Tasas de Eclosión");
         es.put("HATCH_DESC", "Establecer probabilidad de eclosión:");
         es.put("HATCH_TOTAL", "Total: %s%%");
         es.put("HATCH_WARNING_TOTAL", "Advertencia: El total no es 100%%.");
         es.put("HATCH_TOTAL_OK", "El total es 100%");
+        es.put("HATCH_SUBTYPE_HEAD_SECTION", "Subtipos de cabeza (nuevas obreras, soldados, mayores, princesas):");
+        es.put("HATCH_SUBTYPE_ABDOMEN_SECTION", "Subtipos de abdomen (nuevas obreras, soldados, mayores, princesas):");
+        es.put("SUBTYPE_NOTHING", "Ninguno");
+        es.put("SUBTYPE_HEAD_TRAPJAW", "Mandíbula trampa");
+        es.put("SUBTYPE_HEAD_DOORHEAD", "Cabeza escudo");
+        es.put("SUBTYPE_ABDOMEN_STINGER", "Aguijón");
+        es.put("SUBTYPE_ABDOMEN_HONEYPOT", "Honeypot");
+        es.put("SUBTYPE_HEAD_TRAPJAW_DESC", "Cabeza mandíbula trampa: 3x ataque. Se suma a otros bonos de ataque de subtipo en lugar de multiplicarse.");
+        es.put("SUBTYPE_HEAD_DOORHEAD_DESC", "Cabeza escudo: 5x defensa.");
+        es.put("SUBTYPE_ABDOMEN_STINGER_DESC", "Abdomen aguijón: 4x ataque (se multiplica con otros bonos de ataque de subtipo).");
+        es.put("SUBTYPE_ABDOMEN_HONEYPOT_DESC", "Abdomen honeypot: 4x poder de recolección y capacidad de carga; 0.75x velocidad de movimiento.");
 
         es.put("DIALOG_ABILITIES_TITLE", "Operaciones de Colonia");
         es.put("ABILITY_RP_LABEL", "Puntos de Investigación: %s");
@@ -963,15 +980,15 @@ public class SpanishTranslation implements Translation {
         es.put("SPECIES_DESERT", "Hormiga del Desierto");
         es.put("SPECIES_DESERT_SCIENTIFIC", "Cataglyphis Fortis");
         es.put("ASSIMILATED_TRAPJAW_FLAVOR", "Mandíbulas de Resorte");
-        es.put("ASSIMILATED_TRAPJAW_DESC", "Tu dinastía puede desarrollar mandíbulas trampa capaces de golpes ultrarrápidos. (Mecánica en desarrollo.)");
+        es.put("ASSIMILATED_TRAPJAW_DESC", "Desbloquea el subtipo de cabeza Mandíbula trampa. Las hormigas trapjaw infligen 3x ataque, sumado a otros bonos de subtipo en lugar de multiplicarse con ellos.");
         es.put("ASSIMILATION_TRAPJAW", "Asimilación de Hormiga Trampa Mandíbula");
         es.put("ASSIMILATION_TRAPJAW_DESC", "Tras asimilar el genoma de la hormiga trampa mandíbula:");
         es.put("ASSIMILATED_HONEYPOT_FLAVOR", "Tarros de Miel Vivos");
-        es.put("ASSIMILATED_HONEYPOT_DESC", "Tu dinastía puede criar repletas que almacenan alimento líquido. (Mecánica en desarrollo.)");
+        es.put("ASSIMILATED_HONEYPOT_DESC", "Desbloquea el subtipo de abdomen Honeypot. Los foragers honeypot recolectan y cargan 4x más a 0.75x de velocidad.");
         es.put("ASSIMILATION_HONEYPOT", "Asimilación de Hormiga Mielera");
         es.put("ASSIMILATION_HONEYPOT_DESC", "Tras asimilar el genoma de la hormiga mielera:");
         es.put("ASSIMILATED_DOORHEAD_FLAVOR", "Tapones de Cabeza Acorazados");
-        es.put("ASSIMILATED_DOORHEAD_DESC", "Tu dinastía puede criar soldados que sellan entradas del nido. (Mecánica en desarrollo.)");
+        es.put("ASSIMILATED_DOORHEAD_DESC", "Desbloquea el subtipo de cabeza Cabeza escudo. Las hormigas doorhead tienen 5x defensa.");
         es.put("ASSIMILATION_DOORHEAD", "Asimilación de Hormiga Cabeza Puerta");
         es.put("ASSIMILATION_DOORHEAD_DESC", "Tras asimilar el genoma de la hormiga cabeza puerta:");
         es.put("ASSIMILATED_WOODBURROW_FLAVOR", "Excavación de Madera");
@@ -999,7 +1016,7 @@ public class SpanishTranslation implements Translation {
         es.put("ASSIMILATION_GLIDING", "Asimilación de Hormiga Planeadora");
         es.put("ASSIMILATION_GLIDING_DESC", "Tras asimilar el genoma de la hormiga planeadora:");
         es.put("ASSIMILATED_STINGING_FLAVOR", "Aguijón Excruciante");
-        es.put("ASSIMILATED_STINGING_DESC", "Tu dinastía puede usar uno de los aguijones más dolorosos del mundo insecto. (Mecánica en desarrollo.)");
+        es.put("ASSIMILATED_STINGING_DESC", "Desbloquea el subtipo de abdomen Aguijón. Las hormigas con este subtipo infligen 4x de daño.");
         es.put("ASSIMILATION_STINGING", "Asimilación de Hormiga Aguijonera");
         es.put("ASSIMILATION_STINGING_DESC", "Tras asimilar el genoma de la hormiga aguijonera:");
         es.put("ASSIMILATED_SWARMING_FLAVOR", "Enjambres de Incursión");
@@ -1302,11 +1319,11 @@ public class SpanishTranslation implements Translation {
         es.put("ASSIMILATED_MULTIQUEEN_DESC", "Tu dinastía ahora puede tener varias reinas en una sola colonia (requiere mejorar la Cámara Real).");
         es.put("ASSIMILATED_MULTIQUEEN_DESC", "Tu dinastía ahora puede tener varias reinas en una sola colonia (requiere mejorar la Cámara Real).");
         es.put("ASSIMILATED_TRAPJAW_FLAVOR", "Mandíbulas de Resorte");
-        es.put("ASSIMILATED_TRAPJAW_DESC", "Tu dinastía puede desarrollar mandíbulas trampa capaces de golpes ultrarrápidos. (Mecánica en desarrollo.)");
+        es.put("ASSIMILATED_TRAPJAW_DESC", "Desbloquea el subtipo de cabeza Mandíbula trampa. Las hormigas trapjaw infligen 3x ataque, sumado a otros bonos de subtipo en lugar de multiplicarse con ellos.");
         es.put("ASSIMILATED_HONEYPOT_FLAVOR", "Tarros de Miel Vivos");
-        es.put("ASSIMILATED_HONEYPOT_DESC", "Tu dinastía puede criar repletas que almacenan alimento líquido. (Mecánica en desarrollo.)");
+        es.put("ASSIMILATED_HONEYPOT_DESC", "Desbloquea el subtipo de abdomen Honeypot. Los foragers honeypot recolectan y cargan 4x más a 0.75x de velocidad.");
         es.put("ASSIMILATED_DOORHEAD_FLAVOR", "Tapones de Cabeza Acorazados");
-        es.put("ASSIMILATED_DOORHEAD_DESC", "Tu dinastía puede criar soldados que sellan entradas del nido. (Mecánica en desarrollo.)");
+        es.put("ASSIMILATED_DOORHEAD_DESC", "Desbloquea el subtipo de cabeza Cabeza escudo. Las hormigas doorhead tienen 5x defensa.");
         es.put("ASSIMILATED_WOODBURROW_FLAVOR", "Excavación de Madera");
         es.put("ASSIMILATED_WOODBURROW_DESC", "Tu dinastía puede excavar y anidar en madera. (Mecánica en desarrollo.)");
         es.put("ASSIMILATED_SILKWEAVE_FLAVOR", "Tejido de Nidos de Seda");
@@ -1320,7 +1337,7 @@ public class SpanishTranslation implements Translation {
         es.put("ASSIMILATED_GLIDING_FLAVOR", "Planeos Controlados");
         es.put("ASSIMILATED_GLIDING_DESC", "Tu dinastía puede planear entre árboles para cruzar huecos. (Mecánica en desarrollo.)");
         es.put("ASSIMILATED_STINGING_FLAVOR", "Aguijón Excruciante");
-        es.put("ASSIMILATED_STINGING_DESC", "Tu dinastía puede usar uno de los aguijones más dolorosos del mundo insecto. (Mecánica en desarrollo.)");
+        es.put("ASSIMILATED_STINGING_DESC", "Desbloquea el subtipo de abdomen Aguijón. Las hormigas con este subtipo infligen 4x de daño.");
         es.put("ASSIMILATED_SWARMING_FLAVOR", "Enjambres de Incursión");
         es.put("ASSIMILATED_SWARMING_DESC", "Tu dinastía puede coordinar incursiones masivas sin nido permanente. (Mecánica en desarrollo.)");
         es.put("ASSIMILATED_STEALTH_FLAVOR", "Infiltración Fantasma");
@@ -1761,6 +1778,8 @@ public class SpanishTranslation implements Translation {
         es.put("TRIGGER_BORER_ROLE_MSG", "¡Las rutas comerciales pueden ser peligrosas! Los Majors ahora pueden asignarse para excavar túneles y hacer las rutas más rápidas y seguras.");
         es.put("TRIGGER_ASSIMILATION_ABILITY_TITLE", "Asimilación genética");
         es.put("TRIGGER_ASSIMILATION_ABILITY_MSG", "Al absorber los restos de una dinastía derrotada, tus hormigas han aprendido que los rasgos genéticos pueden recolectarse. ¡Asimilación genética desbloqueada en el menú de Mejoras (Y)!");
+        es.put("TRIGGER_SYNERGY_SUPER_VENOM_TITLE", "Sinergia desbloqueada");
+        es.put("TRIGGER_SYNERGY_SUPER_VENOM_MSG", "¡%s ya está activa! Combinar %s reemplaza su acumulación separada por un multiplicador de daño de 16x. Abre Sinergias (O) para revisar.");
         es.put("TRIGGER_OPERATIONS_ABILITY_TITLE", "Operaciones de colonia");
         es.put("TRIGGER_OPERATIONS_ABILITY_MSG", "¡Has obtenido una habilidad activa especial! Ahora puedes acceder al menú de Operaciones de colonia pulsando (Z).");
 

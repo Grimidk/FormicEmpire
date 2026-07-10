@@ -24,6 +24,7 @@ import com.grimidk.formicempire.classes.entities.ResourceSource;
 import com.grimidk.formicempire.classes.entities.Trade;
 import com.grimidk.formicempire.classes.entities.Tunnel;
 import com.grimidk.formicempire.classes.entities.War;
+import com.grimidk.formicempire.classes.entities.services.colony.AntSubtypeService;
 import com.grimidk.formicempire.classes.entities.services.world.WarStagePhase;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.util.GamePaths;
@@ -563,6 +564,12 @@ public class SaveManager {
                     sc.hatchRateMajor = c.getHatchRateMajor();
                     sc.hatchRateDrone = c.getHatchRateDrone();
                     sc.hatchRatePrincess = c.getHatchRatePrincess();
+                    sc.subtypeHatchRatesFlat = AntSubtypeService.flattenSubtypeRates(c.getSubtypeHatchRates());
+                    sc.workerSubtypes = AntSubtypeService.aggregateSubtypeCounts(c.getWorkers());
+                    sc.soldierSubtypes = AntSubtypeService.aggregateSubtypeCounts(c.getSoldiers());
+                    sc.majorSubtypes = AntSubtypeService.aggregateSubtypeCounts(c.getMajors());
+                    sc.princessSubtypes = AntSubtypeService.aggregateSubtypeCounts(c.getPrincesses());
+                    sc.queenSubtypes = AntSubtypeService.aggregateSubtypeCounts(c.getQueens());
                     
                     // Stats
                     sc.aphids = c.getBugHandlingService().resolvePetCountForSave(c, GameConstants.TYPE_APHID);
@@ -803,6 +810,13 @@ public class SaveManager {
         writeJsonLine(w, "hatchRateMajor", sc.hatchRateMajor, false);
         writeJsonLine(w, "hatchRateDrone", sc.hatchRateDrone, false);
         writeJsonLine(w, "hatchRatePrincess", sc.hatchRatePrincess, false);
+        
+        w.write("      \"subtypeHatchRatesFlat\": " + serializeDoubleMapToJson(sc.subtypeHatchRatesFlat) + ","); w.newLine();
+        w.write("      \"workerSubtypes\": " + serializeMapToJson(sc.workerSubtypes) + ","); w.newLine();
+        w.write("      \"soldierSubtypes\": " + serializeMapToJson(sc.soldierSubtypes) + ","); w.newLine();
+        w.write("      \"majorSubtypes\": " + serializeMapToJson(sc.majorSubtypes) + ","); w.newLine();
+        w.write("      \"princessSubtypes\": " + serializeMapToJson(sc.princessSubtypes) + ","); w.newLine();
+        w.write("      \"queenSubtypes\": " + serializeMapToJson(sc.queenSubtypes) + ","); w.newLine();
         
         writeJsonLine(w, "aphids", sc.aphids, false);
         writeJsonLine(w, "symbioticMites", sc.symbioticMites, false);
@@ -1098,6 +1112,12 @@ public class SaveManager {
         sc.hatchRateMajor = Float.parseFloat(map.getOrDefault("hatchRateMajor", "0.0"));
         sc.hatchRateDrone = Float.parseFloat(map.getOrDefault("hatchRateDrone", "0.0"));
         sc.hatchRatePrincess = Float.parseFloat(map.getOrDefault("hatchRatePrincess", "0.0"));
+        sc.subtypeHatchRatesFlat = deserializeJsonToDoubleMap(map.get("subtypeHatchRatesFlat"));
+        sc.workerSubtypes = deserializeJsonToMap(map.get("workerSubtypes"));
+        sc.soldierSubtypes = deserializeJsonToMap(map.get("soldierSubtypes"));
+        sc.majorSubtypes = deserializeJsonToMap(map.get("majorSubtypes"));
+        sc.princessSubtypes = deserializeJsonToMap(map.get("princessSubtypes"));
+        sc.queenSubtypes = deserializeJsonToMap(map.get("queenSubtypes"));
         
         sc.aphids = Integer.parseInt(map.getOrDefault("aphids", "0"));
         sc.symbioticMites = Integer.parseInt(map.getOrDefault("symbioticMites",

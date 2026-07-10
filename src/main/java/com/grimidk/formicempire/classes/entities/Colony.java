@@ -15,6 +15,7 @@ import java.awt.Rectangle;
 import com.grimidk.formicempire.classes.entities.services.colony.*;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDiplomacyService;
 import com.grimidk.formicempire.classes.constants.misc.BugType;
+import com.grimidk.formicempire.classes.constants.ant.AntSubtypeSlot;
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ColonyLoyaltyModifier;
@@ -104,6 +105,8 @@ public class Colony {
     private float hatchRateMajor;
     private float hatchRateDrone;
     private float hatchRatePrincess;
+    private Map<AntSubtypeSlot, Map<Integer, Float>> subtypeHatchRates =
+            AntSubtypeService.defaultSubtypeRates();
 
     // --- Misc. Data ---
     private int totalDeaths;
@@ -267,6 +270,7 @@ public class Colony {
         this.hatchRateMajor = 0.0f;
         this.hatchRateDrone = 0.0f;
         this.hatchRatePrincess = 0.0f;
+        this.subtypeHatchRates = AntSubtypeService.defaultSubtypeRates();
         this.isActive = false;
         this.autoBuildEnabled = false;
         this.autoTunnelsEnabled = false;
@@ -364,16 +368,24 @@ public class Colony {
         this.hatchRateMajor = savedColony.hatchRateMajor;
         this.hatchRateDrone = savedColony.hatchRateDrone;
         this.hatchRatePrincess = savedColony.hatchRatePrincess;
+        if (savedColony.subtypeHatchRatesFlat != null && !savedColony.subtypeHatchRatesFlat.isEmpty()) {
+            this.subtypeHatchRates = AntSubtypeService.unflattenSubtypeRates(savedColony.subtypeHatchRatesFlat);
+        }
 
         populateAntList(getEggs(), savedColony.eggs, GameConstants.TYPE_EGG);
         populateAntList(getLarvae(), savedColony.larvae, GameConstants.TYPE_LARVA);
         populateAntList(getPupae(), savedColony.pupae, GameConstants.TYPE_PUPA);
-        populateAntList(getWorkers(), savedColony.workers, GameConstants.TYPE_WORKER);
-        populateAntList(getSoldiers(), savedColony.soldiers, GameConstants.TYPE_SOLDIER);
-        populateAntList(getMajors(), savedColony.majors, GameConstants.TYPE_MAJOR);
+        AntSubtypeService.populateAntsFromSubtypeCounts(this, getWorkers(), GameConstants.TYPE_WORKER,
+                savedColony.workerSubtypes, savedColony.workers);
+        AntSubtypeService.populateAntsFromSubtypeCounts(this, getSoldiers(), GameConstants.TYPE_SOLDIER,
+                savedColony.soldierSubtypes, savedColony.soldiers);
+        AntSubtypeService.populateAntsFromSubtypeCounts(this, getMajors(), GameConstants.TYPE_MAJOR,
+                savedColony.majorSubtypes, savedColony.majors);
         populateAntList(getDrones(), savedColony.drones, GameConstants.TYPE_DRONE);
-        populateAntList(getPrincesses(), savedColony.princesses, GameConstants.TYPE_PRINCESS);
-        populateAntList(getQueens(), savedColony.queens, GameConstants.TYPE_QUEEN);
+        AntSubtypeService.populateAntsFromSubtypeCounts(this, getPrincesses(), GameConstants.TYPE_PRINCESS,
+                savedColony.princessSubtypes, savedColony.princesses);
+        AntSubtypeService.populateAntsFromSubtypeCounts(this, getQueens(), GameConstants.TYPE_QUEEN,
+                savedColony.queenSubtypes, savedColony.queens);
         populateAntList(deadAnts, savedColony.deadAnts, GameConstants.TYPE_DEAD);
 
         this.plants = savedColony.plants;
@@ -1247,6 +1259,26 @@ public class Colony {
         else if (type == GameConstants.TYPE_MAJOR) this.hatchRateMajor = rate;
         else if (type == GameConstants.TYPE_DRONE) this.hatchRateDrone = rate;
         else if (type == GameConstants.TYPE_PRINCESS) this.hatchRatePrincess = rate;
+    }
+
+    public Map<AntSubtypeSlot, Map<Integer, Float>> getSubtypeHatchRates() {
+        return subtypeHatchRates;
+    }
+
+    public void setSubtypeHatchRates(Map<AntSubtypeSlot, Map<Integer, Float>> subtypeHatchRates) {
+        this.subtypeHatchRates = AntSubtypeService.deepCopyRates(subtypeHatchRates);
+    }
+
+    public float getSubtypeHatchRate(AntSubtypeSlot slot, int digit) {
+        Map<Integer, Float> slotRates = subtypeHatchRates.get(slot);
+        if (slotRates == null) {
+            return digit == GameConstants.SUBTYPE_DIGIT_NONE ? 100f : 0f;
+        }
+        return slotRates.getOrDefault(digit, 0f);
+    }
+
+    public void setSubtypeHatchRate(AntSubtypeSlot slot, int digit, float rate) {
+        subtypeHatchRates.computeIfAbsent(slot, ignored -> new HashMap<>()).put(digit, rate);
     }
 
     public int getTotalDeaths () { return totalDeaths; }

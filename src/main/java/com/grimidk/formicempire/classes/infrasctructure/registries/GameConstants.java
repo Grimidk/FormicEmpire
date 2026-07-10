@@ -4,6 +4,9 @@ import com.grimidk.formicempire.classes.infrasctructure.assets.GameSpritePreload
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntStatus;
+import com.grimidk.formicempire.classes.constants.ant.AntSubtype;
+import com.grimidk.formicempire.classes.constants.ant.AntSubtypeProfile;
+import com.grimidk.formicempire.classes.constants.ant.AntSubtypeSlot;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.ant.MoveStatus;
 import com.grimidk.formicempire.classes.constants.misc.BugType;
@@ -109,8 +112,21 @@ public final class GameConstants {
     public static final ImageIcon TUNNEL_SPRITE = loadIcon("sprites/buildings/TunnelSprite.png");
 
     public static ImageIcon getAntSprite(AntType type, Species species) {
-        if (type == null) return null;
-        
+        return getAntSprite(type, species, AntSubtypeProfile.standard());
+    }
+
+    public static ImageIcon getAntSprite(AntType type, Species species, AntSubtypeProfile profile) {
+        if (type == null) {
+            return null;
+        }
+        if (type != TYPE_EGG && type != TYPE_LARVA && type != TYPE_PUPA
+                && type != TYPE_DEAD && type != TYPE_ZOMBIE) {
+            ImageIcon subtypeSprite = resolveSubtypeSprite(type, profile);
+            if (subtypeSprite != null) {
+                return subtypeSprite;
+            }
+        }
+
         String path;
         if (type == TYPE_EGG || type == TYPE_LARVA || type == TYPE_PUPA || type == TYPE_DEAD || type == TYPE_ZOMBIE) {
             path = "sprites/ants/" + type.getSpriteName();
@@ -118,8 +134,23 @@ public final class GameConstants {
             String dir = (species != null) ? species.getDirectory() : "omni/";
             path = "sprites/ants/" + dir + type.getSpriteName();
         }
-        
+
         return loadIcon(path);
+    }
+
+    private static ImageIcon resolveSubtypeSprite(AntType type, AntSubtypeProfile profile) {
+        if (profile == null || profile.isStandard() || profile.countActiveSubtypes() != 1) {
+            return null;
+        }
+        for (AntSubtypeSlot slot : AntSubtypeSlot.values()) {
+            AntSubtype subtype = profile.getSubtype(slot);
+            if (subtype != null && !subtype.isNone() && subtype.hasSprite()) {
+                String path = "sprites/ants/" + subtype.getSpriteSpeciesDir() + "subtypes/"
+                        + subtype.getSpriteFolder() + "/" + type.getSpriteName();
+                return loadIcon(path);
+            }
+        }
+        return null;
     }
 
     public static ImageIcon getAssimilatedDroneSprite(Species species) {
@@ -147,6 +178,7 @@ public final class GameConstants {
     private static final List<MoveStatus> moveStatuses = new ArrayList<>();
     private static final List<BugType> bugTypes = new ArrayList<>();
     private static final List<AntType> antTypes = new ArrayList<>();
+    private static final List<AntSubtype> antSubtypes = new ArrayList<>();
     private static final List<AntRole> antRoles = new ArrayList<>();
     private static final List<ColonyRank> colonyRanks = new ArrayList<>();
     private static final List<GameSpeed> gameSpeeds = new ArrayList<>();
@@ -613,6 +645,44 @@ public final class GameConstants {
     static { antTypes.add(TYPE_ZOMBIE); }
 
     // --- Ant Subtypes ---
+    public static final int SUBTYPE_DIGIT_NONE = 1;
+    public static final float SUBTYPE_DAMAGE_MULT_STINGER = 4f;
+    public static final float SUBTYPE_ATTACK_MULT_TRAPJAW = 3f;
+    public static final float SUBTYPE_DEFENSE_MULT_DOORHEAD = 5f;
+    public static final float SUBTYPE_FORAGE_MULT_HONEYPOT = 4f;
+    public static final float SUBTYPE_SPEED_MULT_HONEYPOT = 0.75f;
+
+    public static final AntSubtype SUBTYPE_HEAD_NONE = new AntSubtype(1, LanguageStrings.SUBTYPE_NOTHING, AntSubtypeSlot.HEAD,
+            SUBTYPE_DIGIT_NONE, null, null, null);
+    static { antSubtypes.add(SUBTYPE_HEAD_NONE); }
+    public static final AntSubtype SUBTYPE_HEAD_TRAPJAW = new AntSubtype(2, LanguageStrings.SUBTYPE_HEAD_TRAPJAW, AntSubtypeSlot.HEAD,
+            2, GameUnlocks.ASSIMILATED_TRAPJAW, "trapjaw/", "trapjaw",
+            SUBTYPE_ATTACK_MULT_TRAPJAW, true, 1f, 1f, 1f, null);
+    static { antSubtypes.add(SUBTYPE_HEAD_TRAPJAW); }
+    public static final AntSubtype SUBTYPE_HEAD_DOORHEAD = new AntSubtype(3, LanguageStrings.SUBTYPE_HEAD_DOORHEAD, AntSubtypeSlot.HEAD,
+            3, GameUnlocks.ASSIMILATED_DOORHEAD, "turtle/", "doorhead",
+            1f, false, SUBTYPE_DEFENSE_MULT_DOORHEAD, 1f, 1f, null);
+    static { antSubtypes.add(SUBTYPE_HEAD_DOORHEAD); }
+
+    public static final AntSubtype SUBTYPE_TORSO_NONE = new AntSubtype(4, LanguageStrings.SUBTYPE_NOTHING, AntSubtypeSlot.TORSO,
+            SUBTYPE_DIGIT_NONE, null, null, null);
+    static { antSubtypes.add(SUBTYPE_TORSO_NONE); }
+
+    public static final AntSubtype SUBTYPE_ABDOMEN_NONE = new AntSubtype(5, LanguageStrings.SUBTYPE_NOTHING, AntSubtypeSlot.ABDOMEN,
+            SUBTYPE_DIGIT_NONE, null, null, null);
+    static { antSubtypes.add(SUBTYPE_ABDOMEN_NONE); }
+    public static final AntSubtype SUBTYPE_ABDOMEN_STINGER = new AntSubtype(6, LanguageStrings.SUBTYPE_ABDOMEN_STINGER, AntSubtypeSlot.ABDOMEN,
+            2, GameUnlocks.ASSIMILATED_STINGING, "bullet/", "bullet",
+            SUBTYPE_DAMAGE_MULT_STINGER, false, 1f, 1f, 1f, null);
+    static { antSubtypes.add(SUBTYPE_ABDOMEN_STINGER); }
+    public static final AntSubtype SUBTYPE_ABDOMEN_HONEYPOT = new AntSubtype(7, LanguageStrings.SUBTYPE_ABDOMEN_HONEYPOT, AntSubtypeSlot.ABDOMEN,
+            3, GameUnlocks.ASSIMILATED_HONEYPOT, "honeypot/", "honeypot",
+            1f, false, 1f, SUBTYPE_SPEED_MULT_HONEYPOT, SUBTYPE_FORAGE_MULT_HONEYPOT, null);
+    static { antSubtypes.add(SUBTYPE_ABDOMEN_HONEYPOT); }
+
+    public static final AntSubtype SUBTYPE_OTHER_NONE = new AntSubtype(8, LanguageStrings.SUBTYPE_NOTHING, AntSubtypeSlot.OTHER,
+            SUBTYPE_DIGIT_NONE, null, null, null);
+    static { antSubtypes.add(SUBTYPE_OTHER_NONE); }
 
     // --- Ant Roles ---
     public static final AntRole ROLE_FORAGER = new AntRole(1, TYPE_WORKER, LanguageStrings.ROLE_FORAGER, loadIcon("icons/roles/Forager.png"));
@@ -898,7 +968,6 @@ public final class GameConstants {
     public static final int MILITARY_BASELINE_DEFENSE = 5;
     public static final int MILITARY_BASELINE_ATTACK_SPEED = 1;
     public static final float ASSIMILATED_DAMAGE_MULT_FIRE = 4f;
-    public static final float ASSIMILATED_DAMAGE_ADD_STING = 4f;
     public static final float ASSIMILATED_DAMAGE_ADD_DEADLY = 4f;
     public static final float ASSIMILATED_DAMAGE_SYNERGY_FIRE_DEADLY = 16f;
     public static final float ASSIMILATED_ATTACK_SPEED_MULT_FASTBITE = 3f;
@@ -1237,6 +1306,40 @@ public final class GameConstants {
             }
         }
         return null;
+    }
+
+    public static List<AntSubtype> getAntSubtypes() { return Collections.unmodifiableList(antSubtypes); }
+
+    public static List<AntSubtypeSlot> getConfigurableSubtypeSlots() {
+        return List.of(AntSubtypeSlot.HEAD, AntSubtypeSlot.ABDOMEN);
+    }
+
+    public static AntSubtype getAntSubtypeBySlotAndDigit(AntSubtypeSlot slot, int digit) {
+        for (AntSubtype subtype : antSubtypes) {
+            if (subtype.getSlot() == slot && subtype.getDigit() == digit) {
+                return subtype;
+            }
+        }
+        return getDefaultSubtypeForSlot(slot);
+    }
+
+    public static AntSubtype getDefaultSubtypeForSlot(AntSubtypeSlot slot) {
+        return switch (slot) {
+            case HEAD -> SUBTYPE_HEAD_NONE;
+            case TORSO -> SUBTYPE_TORSO_NONE;
+            case ABDOMEN -> SUBTYPE_ABDOMEN_NONE;
+            case OTHER -> SUBTYPE_OTHER_NONE;
+        };
+    }
+
+    public static List<AntSubtype> getSubtypesForSlot(AntSubtypeSlot slot) {
+        List<AntSubtype> result = new ArrayList<>();
+        for (AntSubtype subtype : antSubtypes) {
+            if (subtype.getSlot() == slot) {
+                result.add(subtype);
+            }
+        }
+        return Collections.unmodifiableList(result);
     }
 
     public static List<AntRole> getAntRoles() { return Collections.unmodifiableList(antRoles); }

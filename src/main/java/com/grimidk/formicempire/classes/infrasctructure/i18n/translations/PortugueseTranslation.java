@@ -182,15 +182,32 @@ public class PortugueseTranslation implements Translation {
         pt.put("ASSIMILATION_INFO", "Atribua pesquisadoras para contribuir com a assimilação genética.");
         pt.put("SYNERGY_COMING_SOON", "Sinergias - em breve");
         pt.put("SYNERGY_REQUIREMENTS_FMT", "Combina: %s + %s");
+        pt.put("SYNERGY_NONE_IN_PROGRESS", "Nenhuma sinergia em progresso. Assimila traços genéticos para descobrir combinações.");
+        pt.put("SYNERGY_STATUS_ACTIVE", "Ativa");
+        pt.put("SYNERGY_STATUS_PARTIAL", "Em progresso (%s/%s)");
+        pt.put("SYNERGY_REQUIREMENT_SEPARATOR", " + ");
+        pt.put("SYNERGY_REQUIREMENT_MET_FMT", "[x] %s");
+        pt.put("SYNERGY_REQUIREMENT_MISSING_FMT", "[ ] %s");
         pt.put("SYNERGY_SUPER_VENOM", "Super Veneno");
         pt.put("SYNERGY_SUPER_VENOM_FLAVOR", "Super Veneno");
-        pt.put("SYNERGY_SUPER_VENOM_DESC", "Substitui o empilhamento de veneno de fogo + maricopa (4+4) por um multiplicador de dano de 16x quando ambos os venenos estão assimilados e Sinergias foram pesquisadas. O veneno picante ainda soma +4 (20x com os três).");
+        pt.put("SYNERGY_SUPER_VENOM_DESC", "Substitui o empilhamento de veneno de fogo + maricopa (4+4) por um multiplicador de dano de 16x quando ambos os venenos estão assimilados e Sinergias foram pesquisadas.");
 
         pt.put("DIALOG_HATCH_RATES_TITLE", "Taxas de eclosão");
         pt.put("HATCH_DESC", "Definir probabilidade de eclosão:");
         pt.put("HATCH_TOTAL", "Total: %s%%");
         pt.put("HATCH_WARNING_TOTAL", "Aviso: o total não é 100%%.");
         pt.put("HATCH_TOTAL_OK", "O total é 100%");
+        pt.put("HATCH_SUBTYPE_HEAD_SECTION", "Subtipos de cabeça (novas operárias, soldados, majores, princesas):");
+        pt.put("HATCH_SUBTYPE_ABDOMEN_SECTION", "Subtipos de abdômen (novas operárias, soldados, majores, princesas):");
+        pt.put("SUBTYPE_NOTHING", "Nenhum");
+        pt.put("SUBTYPE_HEAD_TRAPJAW", "Mandíbula-armadilha");
+        pt.put("SUBTYPE_HEAD_DOORHEAD", "Cabeça-escudo");
+        pt.put("SUBTYPE_ABDOMEN_STINGER", "Ferrão");
+        pt.put("SUBTYPE_ABDOMEN_HONEYPOT", "Honeypot");
+        pt.put("SUBTYPE_HEAD_TRAPJAW_DESC", "Cabeça mandíbula-armadilha: 3x ataque. Soma a outros bônus de ataque de subtipo em vez de multiplicar.");
+        pt.put("SUBTYPE_HEAD_DOORHEAD_DESC", "Cabeça-escudo: 5x defesa.");
+        pt.put("SUBTYPE_ABDOMEN_STINGER_DESC", "Abdômen ferrão: 4x ataque (multiplica com outros bônus de ataque de subtipo).");
+        pt.put("SUBTYPE_ABDOMEN_HONEYPOT_DESC", "Abdômen honeypot: 4x coleta e capacidade de carga; 0.75x velocidade de movimento.");
 
         pt.put("DIALOG_ABILITIES_TITLE", "Operações da colônia");
         pt.put("ABILITY_RP_LABEL", "Pontos de pesquisa: %s");
@@ -963,15 +980,15 @@ public class PortugueseTranslation implements Translation {
         pt.put("SPECIES_DESERT", "Formiga do Deserto");
         pt.put("SPECIES_DESERT_SCIENTIFIC", "Cataglyphis Fortis");
         pt.put("ASSIMILATED_TRAPJAW_FLAVOR", "Mandíbulas de Mola");
-        pt.put("ASSIMILATED_TRAPJAW_DESC", "Sua dinastia pode desenvolver mandíbulas armadilha ultrarrápidas. (Mecânica em desenvolvimento.)");
+        pt.put("ASSIMILATED_TRAPJAW_DESC", "Desbloqueia o subtipo de cabeça Mandíbula-armadilha. Formigas trapjaw causam 3x ataque, somado a outros bônus de subtipo em vez de multiplicar.");
         pt.put("ASSIMILATION_TRAPJAW", "Assimilação Formiga Armadilha");
         pt.put("ASSIMILATION_TRAPJAW_DESC", "Após assimilar o genoma da formiga armadilha:");
         pt.put("ASSIMILATED_HONEYPOT_FLAVOR", "Potes de Mel Vivos");
-        pt.put("ASSIMILATED_HONEYPOT_DESC", "Sua dinastia pode criar repletas que armazenam alimento líquido. (Mecânica em desenvolvimento.)");
+        pt.put("ASSIMILATED_HONEYPOT_DESC", "Desbloqueia o subtipo de abdômen Honeypot. Forrageadores honeypot coletam e carregam 4x mais a 0.75x de velocidade.");
         pt.put("ASSIMILATION_HONEYPOT", "Assimilação Formiga Melífera");
         pt.put("ASSIMILATION_HONEYPOT_DESC", "Após assimilar o genoma da formiga melífera:");
         pt.put("ASSIMILATED_DOORHEAD_FLAVOR", "Tampões de Cabeça Blindados");
-        pt.put("ASSIMILATED_DOORHEAD_DESC", "Sua dinastia pode criar soldados que selam entradas do ninho. (Mecânica em desenvolvimento.)");
+        pt.put("ASSIMILATED_DOORHEAD_DESC", "Desbloqueia o subtipo de cabeça Cabeça-escudo. Formigas doorhead têm 5x defesa.");
         pt.put("ASSIMILATION_DOORHEAD", "Assimilação Formiga Cabeça-Porta");
         pt.put("ASSIMILATION_DOORHEAD_DESC", "Após assimilar o genoma da formiga cabeça-porta:");
         pt.put("ASSIMILATED_WOODBURROW_FLAVOR", "Escavação de Madeira");
@@ -999,7 +1016,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("ASSIMILATION_GLIDING", "Assimilação Formiga Planadora");
         pt.put("ASSIMILATION_GLIDING_DESC", "Após assimilar o genoma da formiga planadora:");
         pt.put("ASSIMILATED_STINGING_FLAVOR", "Ferrão Excruciante");
-        pt.put("ASSIMILATED_STINGING_DESC", "Sua dinastia pode usar um dos ferrões mais dolorosos do mundo dos insetos. (Mecânica em desenvolvimento.)");
+        pt.put("ASSIMILATED_STINGING_DESC", "Desbloqueia o subtipo de abdômen Ferrão. Formigas com este subtipo causam 4x de dano.");
         pt.put("ASSIMILATION_STINGING", "Assimilação Formiga Ferrão");
         pt.put("ASSIMILATION_STINGING_DESC", "Após assimilar o genoma da formiga ferrão:");
         pt.put("ASSIMILATED_SWARMING_FLAVOR", "Enxames de Incursão");
@@ -1302,11 +1319,11 @@ public class PortugueseTranslation implements Translation {
         pt.put("ASSIMILATED_MULTIQUEEN_DESC", "Sua dinastia pode ter várias rainhas numa colônia (requer melhorar a câmara real).");
         pt.put("ASSIMILATED_MULTIQUEEN_DESC", "Sua dinastia pode ter várias rainhas numa colônia (requer melhorar a câmara real).");
         pt.put("ASSIMILATED_TRAPJAW_FLAVOR", "Mandíbulas de Mola");
-        pt.put("ASSIMILATED_TRAPJAW_DESC", "Sua dinastia pode desenvolver mandíbulas armadilha ultrarrápidas. (Mecânica em desenvolvimento.)");
+        pt.put("ASSIMILATED_TRAPJAW_DESC", "Desbloqueia o subtipo de cabeça Mandíbula-armadilha. Formigas trapjaw causam 3x ataque, somado a outros bônus de subtipo em vez de multiplicar.");
         pt.put("ASSIMILATED_HONEYPOT_FLAVOR", "Potes de Mel Vivos");
-        pt.put("ASSIMILATED_HONEYPOT_DESC", "Sua dinastia pode criar repletas que armazenam alimento líquido. (Mecânica em desenvolvimento.)");
+        pt.put("ASSIMILATED_HONEYPOT_DESC", "Desbloqueia o subtipo de abdômen Honeypot. Forrageadores honeypot coletam e carregam 4x mais a 0.75x de velocidade.");
         pt.put("ASSIMILATED_DOORHEAD_FLAVOR", "Tampões de Cabeça Blindados");
-        pt.put("ASSIMILATED_DOORHEAD_DESC", "Sua dinastia pode criar soldados que selam entradas do ninho. (Mecânica em desenvolvimento.)");
+        pt.put("ASSIMILATED_DOORHEAD_DESC", "Desbloqueia o subtipo de cabeça Cabeça-escudo. Formigas doorhead têm 5x defesa.");
         pt.put("ASSIMILATED_WOODBURROW_FLAVOR", "Escavação de Madeira");
         pt.put("ASSIMILATED_WOODBURROW_DESC", "Sua dinastia pode escavar e nidificar em madeira. (Mecânica em desenvolvimento.)");
         pt.put("ASSIMILATED_SILKWEAVE_FLAVOR", "Tecelagem de Ninhos de Seda");
@@ -1320,7 +1337,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("ASSIMILATED_GLIDING_FLAVOR", "Planos Controlados");
         pt.put("ASSIMILATED_GLIDING_DESC", "Sua dinastia pode planar entre árvores para cruzar vãos. (Mecânica em desenvolvimento.)");
         pt.put("ASSIMILATED_STINGING_FLAVOR", "Ferrão Excruciante");
-        pt.put("ASSIMILATED_STINGING_DESC", "Sua dinastia pode usar um dos ferrões mais dolorosos do mundo dos insetos. (Mecânica em desenvolvimento.)");
+        pt.put("ASSIMILATED_STINGING_DESC", "Desbloqueia o subtipo de abdômen Ferrão. Formigas com este subtipo causam 4x de dano.");
         pt.put("ASSIMILATED_SWARMING_FLAVOR", "Enxames de Incursão");
         pt.put("ASSIMILATED_SWARMING_DESC", "Sua dinastia pode coordenar incursões massivas sem ninho permanente. (Mecânica em desenvolvimento.)");
         pt.put("ASSIMILATED_STEALTH_FLAVOR", "Infiltração Fantasma");
@@ -1761,6 +1778,8 @@ public class PortugueseTranslation implements Translation {
         pt.put("TRIGGER_BORER_ROLE_MSG", "As rotas comerciais podem ser perigosas! Os Majors podem agora ser atribuídos para escavar túneis e tornar as rotas mais rápidas e seguras.");
         pt.put("TRIGGER_ASSIMILATION_ABILITY_TITLE", "Assimilação genética");
         pt.put("TRIGGER_ASSIMILATION_ABILITY_MSG", "Ao absorver os restos de uma dinastia derrotada, as tuas formigas aprenderam que traços genéticos podem ser colhidos! Assimilação genética desbloqueada no menu de Melhorias (Y).");
+        pt.put("TRIGGER_SYNERGY_SUPER_VENOM_TITLE", "Sinergia desbloqueada");
+        pt.put("TRIGGER_SYNERGY_SUPER_VENOM_MSG", "%s está agora ativa! Combinar %s substitui a acumulação separada por um multiplicador de dano de 16x. Abre Sinergias (O) para rever.");
         pt.put("TRIGGER_OPERATIONS_ABILITY_TITLE", "Operações da colónia");
         pt.put("TRIGGER_OPERATIONS_ABILITY_MSG", "Ganhaste uma habilidade ativa especial! Agora podes aceder ao menu de Operações da colónia premindo (Z).");
 

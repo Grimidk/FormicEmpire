@@ -182,15 +182,32 @@ public class EnglishTranslation implements Translation {
         en.put("ASSIMILATION_INFO", "Assign Researchers to contribute to genetic assimilation.");
         en.put("SYNERGY_COMING_SOON", "Synergies - Coming Soon");
         en.put("SYNERGY_REQUIREMENTS_FMT", "Combines: %s + %s");
+        en.put("SYNERGY_NONE_IN_PROGRESS", "No synergies in progress. Assimilate genetic traits to discover combinations.");
+        en.put("SYNERGY_STATUS_ACTIVE", "Active");
+        en.put("SYNERGY_STATUS_PARTIAL", "In progress (%s/%s)");
+        en.put("SYNERGY_REQUIREMENT_SEPARATOR", " + ");
+        en.put("SYNERGY_REQUIREMENT_MET_FMT", "[x] %s");
+        en.put("SYNERGY_REQUIREMENT_MISSING_FMT", "[ ] %s");
         en.put("SYNERGY_SUPER_VENOM", "Super Venom");
         en.put("SYNERGY_SUPER_VENOM_FLAVOR", "Super Venom");
-        en.put("SYNERGY_SUPER_VENOM_DESC", "Replaces Fire + Maricopa venom stacking (4+4) with a 16x colony damage multiplier when both venoms are assimilated and Synergies are researched. Stinging venom still adds +4 on top (20x with all three).");
+        en.put("SYNERGY_SUPER_VENOM_DESC", "Replaces Fire + Maricopa venom stacking (4+4) with a 16x colony damage multiplier when both venoms are assimilated and Synergies are researched.");
 
         en.put("DIALOG_HATCH_RATES_TITLE", "Manage Pupa Hatch Rates");
         en.put("HATCH_DESC", "Set hatch chance for new ants:");
         en.put("HATCH_TOTAL", "Total: %s%%");
         en.put("HATCH_WARNING_TOTAL", "Warning: Total is not 100%%.");
         en.put("HATCH_TOTAL_OK", "Total is 100%");
+        en.put("HATCH_SUBTYPE_HEAD_SECTION", "Head subtypes (new workers, soldiers, majors, princesses):");
+        en.put("HATCH_SUBTYPE_ABDOMEN_SECTION", "Abdomen subtypes (new workers, soldiers, majors, princesses):");
+        en.put("SUBTYPE_NOTHING", "Nothing");
+        en.put("SUBTYPE_HEAD_TRAPJAW", "Trapjaw");
+        en.put("SUBTYPE_HEAD_DOORHEAD", "Doorhead");
+        en.put("SUBTYPE_ABDOMEN_STINGER", "Stinger");
+        en.put("SUBTYPE_ABDOMEN_HONEYPOT", "Honeypot");
+        en.put("SUBTYPE_HEAD_TRAPJAW_DESC", "Trapjaw head: 3x attack. Adds to other subtype attack bonuses instead of multiplying them.");
+        en.put("SUBTYPE_HEAD_DOORHEAD_DESC", "Doorhead: 5x defense.");
+        en.put("SUBTYPE_ABDOMEN_STINGER_DESC", "Stinger abdomen: 4x attack (multiplies with other subtype attack bonuses).");
+        en.put("SUBTYPE_ABDOMEN_HONEYPOT_DESC", "Honeypot abdomen: 4x foraging power and carry capacity; 0.75x movement speed.");
 
         en.put("DIALOG_ABILITIES_TITLE", "Colony Operations");
         en.put("ABILITY_RP_LABEL", "Research Points: %s");
@@ -963,15 +980,15 @@ public class EnglishTranslation implements Translation {
         en.put("SPECIES_DESERT", "Desert Ant");
         en.put("SPECIES_DESERT_SCIENTIFIC", "Cataglyphis Fortis");
         en.put("ASSIMILATED_TRAPJAW_FLAVOR", "Spring-Loaded Mandibles");
-        en.put("ASSIMILATED_TRAPJAW_DESC", "Unlocks the Trapjaw ant subtype (assigned via hatch rates once subtypes are available).");
+        en.put("ASSIMILATED_TRAPJAW_DESC", "Unlocks the Trapjaw head subtype. Trapjaw ants deal 3x attack, added to other subtype attack bonuses rather than multiplied with them.");
         en.put("ASSIMILATION_TRAPJAW", "Trap-Jaw Ant Assimilation");
         en.put("ASSIMILATION_TRAPJAW_DESC", "After assimilating the trap-jaw ant genome:");
         en.put("ASSIMILATED_HONEYPOT_FLAVOR", "Living Honey Jars");
-        en.put("ASSIMILATED_HONEYPOT_DESC", "Unlocks the Honeypot ant subtype (assigned via hatch rates once subtypes are available).");
+        en.put("ASSIMILATED_HONEYPOT_DESC", "Unlocks the Honeypot abdomen subtype. Honeypot foragers gather and carry 4x as much at 0.75x movement speed.");
         en.put("ASSIMILATION_HONEYPOT", "Honey-Pot Ant Assimilation");
         en.put("ASSIMILATION_HONEYPOT_DESC", "After assimilating the honey-pot ant genome:");
         en.put("ASSIMILATED_DOORHEAD_FLAVOR", "Armored Head Plugs");
-        en.put("ASSIMILATED_DOORHEAD_DESC", "Unlocks the Turtle ant subtype (assigned via hatch rates once subtypes are available).");
+        en.put("ASSIMILATED_DOORHEAD_DESC", "Unlocks the Doorhead head subtype. Doorhead ants have 5x defense.");
         en.put("ASSIMILATION_DOORHEAD", "Turtle Ant Assimilation");
         en.put("ASSIMILATION_DOORHEAD_DESC", "After assimilating the turtle ant genome:");
         en.put("ASSIMILATED_WOODBURROW_FLAVOR", "Wood Excavation");
@@ -999,7 +1016,7 @@ public class EnglishTranslation implements Translation {
         en.put("ASSIMILATION_GLIDING", "Gliding Ant Assimilation");
         en.put("ASSIMILATION_GLIDING_DESC", "After assimilating the gliding ant genome:");
         en.put("ASSIMILATED_STINGING_FLAVOR", "Excruciating Sting");
-        en.put("ASSIMILATED_STINGING_DESC", "Unlocks the Bullet ant subtype (assigned via hatch rates once subtypes are available). Adds +4 to the colony damage multiplier.");
+        en.put("ASSIMILATED_STINGING_DESC", "Unlocks the Stinger abdomen subtype. Ants hatched with this subtype deal 4x damage.");
         en.put("ASSIMILATION_STINGING", "Bullet Ant Assimilation");
         en.put("ASSIMILATION_STINGING_DESC", "After assimilating the bullet ant genome:");
         en.put("ASSIMILATED_SWARMING_FLAVOR", "Raid Swarms");
@@ -1721,6 +1738,8 @@ public class EnglishTranslation implements Translation {
         en.put("TRIGGER_BORER_ROLE_MSG", "Trade routes can be dangerous! Majors can now be assigned to dig tunnels for faster, safer trade routes.");
         en.put("TRIGGER_ASSIMILATION_ABILITY_TITLE", "Genetic Assimilation");
         en.put("TRIGGER_ASSIMILATION_ABILITY_MSG", "By absorbing the remnants of a defeated dynasty, your ants have learned that genetic traits can be harvested! Genetic Assimilation unlocked in the Upgrades menu (Y).");
+        en.put("TRIGGER_SYNERGY_SUPER_VENOM_TITLE", "Synergy Unlocked");
+        en.put("TRIGGER_SYNERGY_SUPER_VENOM_MSG", "%s is now active! Combining %s replaces their separate stacking with a 16x colony damage multiplier. Open Synergies (O) to review.");
         en.put("TRIGGER_OPERATIONS_ABILITY_TITLE", "Colony Operations");
         en.put("TRIGGER_OPERATIONS_ABILITY_MSG", "You have gained a special active ability! You can now access the Colony Operations menu by pressing (Z).");
 

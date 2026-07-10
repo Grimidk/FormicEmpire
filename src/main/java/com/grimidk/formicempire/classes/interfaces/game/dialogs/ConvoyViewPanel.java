@@ -1,10 +1,16 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
+import com.grimidk.formicempire.classes.constants.ant.AntSubtype;
+import com.grimidk.formicempire.classes.constants.ant.AntSubtypeProfile;
+import com.grimidk.formicempire.classes.constants.ant.AntSubtypeSlot;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.Species;
 import com.grimidk.formicempire.classes.constants.misc.TradeMethod;
 import com.grimidk.formicempire.classes.constants.world.Biome;
+import com.grimidk.formicempire.classes.entities.Ant;
+import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Trade;
+import com.grimidk.formicempire.classes.entities.services.colony.AntSubtypeService;
 import com.grimidk.formicempire.classes.entities.services.colony.ConvoyScene;
 import com.grimidk.formicempire.classes.entities.services.colony.ConvoySceneBuilder;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
@@ -222,7 +228,7 @@ public class ConvoyViewPanel extends JPanel {
         double faceRadians = travelingRight ? Math.toRadians(90) : Math.toRadians(270);
 
         for (ConvoyAnt ant : ants) {
-            ImageIcon icon = GameConstants.getAntSprite(ant.type, ant.species);
+            ImageIcon icon = GameConstants.getAntSprite(ant.type, ant.species, ant.profile);
             if (icon == null) {
                 continue;
             }
@@ -244,6 +250,38 @@ public class ConvoyViewPanel extends JPanel {
     }
 
     private List<ConvoyAnt> buildAntPool(ConvoyScene scene) {
+        List<Ant> tripAnts = new ArrayList<>();
+        if (trade != null && trade.getAntsOnTrip() != null) {
+            for (Ant ant : trade.getAntsOnTrip()) {
+                if (ant == null || !ant.isAlive() || ant.getAntType() == null) {
+                    continue;
+                }
+                AntType type = ant.getAntType();
+                if (type == GameConstants.TYPE_DEAD || type == GameConstants.TYPE_DRONE) {
+                    continue;
+                }
+                tripAnts.add(ant);
+            }
+        }
+
+        if (!tripAnts.isEmpty()) {
+            int visualTotal = Math.min(tripAnts.size(), ConvoyScene.MAX_VISUAL_ANTS);
+            List<ConvoyAnt> ants = new ArrayList<>(visualTotal);
+            Random random = new Random(scene.getOriginName().hashCode() ^ scene.getDestinationName().hashCode());
+            for (int i = 0; i < visualTotal; i++) {
+                Ant source = tripAnts.get(i % tripAnts.size());
+                float angle = random.nextFloat() * (float) (Math.PI * 2);
+                float dist = (float) Math.sqrt(random.nextFloat());
+                AntSubtypeProfile profile = source.getSubtypeProfile() != null
+                        ? source.getSubtypeProfile()
+                        : AntSubtypeProfile.standard();
+                ants.add(new ConvoyAnt(source.getAntType(), scene.getSpecies(), profile,
+                        (float) Math.cos(angle) * dist,
+                        (float) Math.sin(angle) * dist));
+            }
+            return ants;
+        }
+
         if (scene.typeCounts().isEmpty()) {
             return List.of();
         }
@@ -255,6 +293,7 @@ public class ConvoyViewPanel extends JPanel {
         int visualCap = ConvoyScene.MAX_VISUAL_ANTS;
         int visualTotal = Math.min(total, visualCap);
         Map<AntType, Integer> allocated = allocateVisualCounts(scene.typeCounts(), total, visualTotal);
+        Colony originColony = trade != null && trade.getOrigin() != null ? trade.getOrigin().getColony() : null;
 
         List<ConvoyAnt> ants = new ArrayList<>(visualTotal);
         Random random = new Random(scene.getOriginName().hashCode() ^ scene.getDestinationName().hashCode());
@@ -266,7 +305,10 @@ public class ConvoyViewPanel extends JPanel {
             for (int i = 0; i < entry.getValue(); i++) {
                 float angle = random.nextFloat() * (float) (Math.PI * 2);
                 float dist = (float) Math.sqrt(random.nextFloat());
-                ants.add(new ConvoyAnt(type, scene.getSpecies(),
+                AntSubtypeProfile profile = originColony != null
+                        ? AntSubtypeService.sampleProfileFromColony(originColony, type)
+                        : AntSubtypeProfile.standard();
+                ants.add(new ConvoyAnt(type, scene.getSpecies(), profile,
                         (float) Math.cos(angle) * dist,
                         (float) Math.sin(angle) * dist));
             }
@@ -377,12 +419,14 @@ public class ConvoyViewPanel extends JPanel {
     private static final class ConvoyAnt {
         private final AntType type;
         private final Species species;
+        private final AntSubtypeProfile profile;
         private final float offsetX;
         private final float offsetY;
 
-        private ConvoyAnt(AntType type, Species species, float offsetX, float offsetY) {
+        private ConvoyAnt(AntType type, Species species, AntSubtypeProfile profile, float offsetX, float offsetY) {
             this.type = type;
             this.species = species;
+            this.profile = profile != null ? profile : AntSubtypeProfile.standard();
             this.offsetX = offsetX;
             this.offsetY = offsetY;
         }

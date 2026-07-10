@@ -1,11 +1,15 @@
 package com.grimidk.formicempire.classes.entities.services.colony;
 
+import com.grimidk.formicempire.classes.entities.services.colony.AntSubtypeService;
+import com.grimidk.formicempire.classes.constants.ant.AntSubtypeProfile;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import org.junit.jupiter.api.Test;
+
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -62,6 +66,50 @@ class ColonyMilitaryServiceTest {
 
         int typePoints = 50 + 50 + 45 + 10 + 50;
         assertEquals(typePoints, ColonyMilitaryService.computeFromSavedColony(saved, dynasty));
+    }
+
+    @Test
+    void stingerSoldiersIncreaseMilitaryPower() {
+        Colony colony = new Colony(3, "Test", true);
+        Dynasty dynasty = new Dynasty(3, "Dynasty", true, GameConstants.SPECIES_OMNI);
+        dynasty.unlockUpgrade(GameUnlocks.STAT_SKELETON);
+        dynasty.unlockUpgrade(GameUnlocks.STAT_ACID);
+        dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_STINGING);
+        colony.setDynasty(dynasty);
+
+        com.grimidk.formicempire.classes.entities.Ant standard = new com.grimidk.formicempire.classes.entities.Ant(
+                colony, GameConstants.TYPE_SOLDIER);
+        colony.getSoldiers().add(standard);
+
+        com.grimidk.formicempire.classes.entities.Ant stinger = new com.grimidk.formicempire.classes.entities.Ant(
+                colony, GameConstants.TYPE_SOLDIER);
+        stinger.setSubtypeProfile(AntSubtypeProfile.of(1, 1, 2, 1));
+        AntSubtypeService.applySubtypeStats(stinger, colony);
+
+        int standardPower = ColonyMilitaryService.computeMilitaryPowerFromPopulation(colony);
+        colony.getSoldiers().clear();
+        colony.getSoldiers().add(stinger);
+        int stingerPower = ColonyMilitaryService.computeMilitaryPowerFromPopulation(colony);
+
+        assertTrue(stingerPower > standardPower);
+    }
+
+    @Test
+    void savedColonySubtypeCountsAffectMilitaryPower() {
+        Savefile.SavedColony saved = new Savefile.SavedColony();
+        saved.soldiers = 0;
+        saved.soldierSubtypes = Map.of("1121", 4);
+
+        Dynasty dynasty = new Dynasty(4, "Rival", false, GameConstants.SPECIES_OMNI);
+        dynasty.unlockUpgrade(GameUnlocks.STAT_SKELETON);
+        dynasty.unlockUpgrade(GameUnlocks.STAT_ACID);
+        dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_STINGING);
+
+        Savefile.SavedColony standardOnly = new Savefile.SavedColony();
+        standardOnly.soldiers = 4;
+
+        assertTrue(ColonyMilitaryService.computeFromSavedColony(saved, dynasty)
+                > ColonyMilitaryService.computeFromSavedColony(standardOnly, dynasty));
     }
 
     @Test

@@ -1,5 +1,6 @@
 package com.grimidk.formicempire.classes.entities.services.colony;
 
+import com.grimidk.formicempire.classes.constants.misc.Species;
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Colony;
@@ -68,6 +69,7 @@ public class ColonyStarterService {
                     colony.setHatchRateMajor(capitalColony.getHatchRateMajor());
                     colony.setHatchRateDrone(capitalColony.getHatchRateDrone());
                     colony.setHatchRatePrincess(capitalColony.getHatchRatePrincess());
+                    AntSubtypeService.copySubtypeRates(colony, capitalColony);
                 }
                 if (d.isDefaultAutomationEnabled() && d.hasUpgrade(GameUnlocks.ABILITY_AUTOMATION)) {
                     colony.setAutomationEnabled(true);
@@ -89,6 +91,10 @@ public class ColonyStarterService {
         if (!colony.isPlayer()) {
             colony.setAutomationEnabled(true);
             System.out.println("[ColonyStarterService] Automation ENABLED for NPC colony.");
+            Species species = colony.getDynasty() != null ? colony.getDynasty().getSpecies() : null;
+            if (species != null) {
+                AntSubtypeService.applyNaturalSpeciesSubtypeRates(colony, species);
+            }
         }
         
         clearColonyLists(colony);
@@ -105,6 +111,10 @@ public class ColonyStarterService {
 
         if (colony.getAge() >= 7) {
             matureColony(colony);
+        }
+
+        if (!colony.isPlayer()) {
+            AntSubtypeService.assignNaturalSubtypesToPopulation(colony);
         }
         
         System.out.println("[ColonyStarterService] Initialization complete for " + colony.getName() + " (ID: " + colony.getId() + "). Current Age: " + colony.getAge());
@@ -252,6 +262,7 @@ public class ColonyStarterService {
             colony.setHatchRateMajor(capital.getHatchRateMajor());
             colony.setHatchRateDrone(capital.getHatchRateDrone());
             colony.setHatchRatePrincess(capital.getHatchRatePrincess());
+            AntSubtypeService.copySubtypeRates(colony, capital);
         }
         if (colony.isAutomationEnabled()) {
             if (overlord.isDefaultAutomationEnabled() && overlord.hasUpgrade(GameUnlocks.ABILITY_AUTOMATION)) {
@@ -287,6 +298,7 @@ public class ColonyStarterService {
         target.setHatchRateMajor(capital.getHatchRateMajor());
         target.setHatchRateDrone(capital.getHatchRateDrone());
         target.setHatchRatePrincess(capital.getHatchRatePrincess());
+        AntSubtypeService.copySubtypeRates(target, capital);
 
         Dynasty dynasty = target.getDynasty();
         if (dynasty != null) {

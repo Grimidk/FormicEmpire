@@ -37,7 +37,6 @@ Needed for launch (v1.0) (Launch Version):
 	random events (meteor, earthquake, tornado, tsunami, )
 	main menu screen maybe simulation like factorio
 	synergies ( Super majors + Chemical throwing = Artillery ants; Self destruction + Acid spitting = Corrosive bombs; Silk weaving + Hive building = Web building; Air-force ants + self destruction = Air-bomber ants)
-	rework synergies so they have a popup, show when you have part of the synergy, makes it properly replace uprades
 	more upgrades and more buildings and assimilations and synergies
 	implement pending roles (defender, miner, potter, bomber, carrier, artillery, siege) more roles (commander and captain roles, air force and paratroopers to skip a stage) and air warfare
 	more enemies ( Rebel ant colonies, Bugs, Arachnids, Reptiles, Birds, Rodents, Zombie ant colonies)

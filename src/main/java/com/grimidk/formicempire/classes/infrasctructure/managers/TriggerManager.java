@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.infrasctructure.managers;
 
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
+import com.grimidk.formicempire.classes.constants.unlocks.Synergy;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Dynasty;
@@ -80,6 +81,22 @@ public class TriggerManager {
             Object... messageArgs) {
         fireTrigger(upgrade, LanguageStrings.get(titleKey), LanguageStrings.format(messageKey, messageArgs));
     }
+
+    private void fireSynergyUnlocked(Synergy synergy) {
+        if (synergy == null) {
+            return;
+        }
+        String title = LanguageStrings.get(synergy.getTriggerTitleKey());
+        String message = LanguageStrings.format(
+                synergy.getTriggerMessageKey(),
+                synergy.getName(),
+                synergy.formatRequirementFlavorNames());
+        for (TriggerListener listener : listeners) {
+            SwingUtilities.invokeLater(() -> {
+                listener.onUpgradeTriggered(synergy.getReward(), title, message);
+            });
+        }
+    }
     
     private void fireColonyDeath() {
         for (TriggerListener listener : listeners) {
@@ -118,7 +135,18 @@ public class TriggerManager {
         checkTradeRoleTriggers();
         checkTunnelRoleUnlock();
         checkAssimilationAbilityUnlock();
+        checkSynergyUnlocks();
         checkAbilityMenuHint();
+    }
+
+    private void checkSynergyUnlocks() {
+        Dynasty dynasty = playerColony.getDynasty();
+        if (dynasty == null) {
+            return;
+        }
+        for (Synergy synergy : dynasty.drainPendingSynergyAlerts()) {
+            fireSynergyUnlocked(synergy);
+        }
     }
 
     private void checkAllNPCTriggers() {

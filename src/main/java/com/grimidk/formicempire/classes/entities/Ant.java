@@ -4,9 +4,11 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
+import com.grimidk.formicempire.classes.constants.ant.AntSubtypeProfile;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.entities.spatial.NeoPoint;
+import com.grimidk.formicempire.classes.entities.services.colony.AntSubtypeService;
 import com.grimidk.formicempire.classes.infrasctructure.registries.DeathCause;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.WorldSpaces;
@@ -14,6 +16,7 @@ import com.grimidk.formicempire.classes.infrasctructure.registries.WorldSpaces;
 public class Ant extends Bug {
     private AntType type;
     private AntRole role;
+    private AntSubtypeProfile subtypeProfile;
     private float tempRes;    
     private ResourceType carrying;
     private ResourceType carryingSec;
@@ -28,6 +31,7 @@ public class Ant extends Bug {
         
         this.type = type;
         this.role = null;
+        this.subtypeProfile = AntSubtypeProfile.standard();
         this.carrying = null;
         this.carryingSec = null;
         this.carryingAnt = null;
@@ -50,6 +54,9 @@ public class Ant extends Bug {
         this.setSpeed(colony.getBaseSpeed() * type.getSpeedMult());
         
         this.setDimension(WorldSpaces.OVERWORLD);
+        if (AntSubtypeService.isEligibleType(type)) {
+            AntSubtypeService.applySubtypeStats(this, colony);
+        }
     }
     
     public AntType getAntType() { return type; }
@@ -57,6 +64,11 @@ public class Ant extends Bug {
 
     public AntRole getRole() { return role; }
     public void setRole(AntRole role) { this.role = role; }
+
+    public AntSubtypeProfile getSubtypeProfile() { return subtypeProfile; }
+    public void setSubtypeProfile(AntSubtypeProfile subtypeProfile) {
+        this.subtypeProfile = subtypeProfile != null ? subtypeProfile : AntSubtypeProfile.standard();
+    }
 
     public float getTempRes() { return tempRes; }
     public void setTempRes(float tempRes) { this.tempRes = tempRes; }
@@ -133,19 +145,31 @@ public class Ant extends Bug {
     }
 
     public void transform(Colony colony, AntType newType) {
+        AntSubtypeProfile preserved = subtypeProfile;
         this.type = newType;
-        this.setMaxHealth((int)(colony.getBaseHealth() * newType.getHealtMult()));
-        this.setHealth(this.getMaxHealth());
-        this.setAge(0);
-        this.setRegen((int)(colony.getBaseRegen() * newType.getRegenMult()));
-        this.setConsumption(colony.getBaseConsumption() * newType.getConsumptionMult());
-        this.setAttack((int)(colony.getBaseAttack() * newType.getAttackMult()));
-        this.setAttackSpeed((int)(colony.getBaseAttackSpeed() * newType.getAttackSpeedMult()));
-        this.setDefense((int)(colony.getBaseDefense() * newType.getDefenseMult()));
-        this.setSpeed(colony.getBaseSpeed() * newType.getSpeedMult());
+        if (AntSubtypeService.isEligibleType(newType)) {
+            this.subtypeProfile = preserved != null ? preserved : AntSubtypeProfile.standard();
+            this.setAge(0);
+            AntSubtypeService.applySubtypeStats(this, colony);
+        } else {
+            this.subtypeProfile = AntSubtypeProfile.standard();
+            this.setMaxHealth((int)(colony.getBaseHealth() * newType.getHealtMult()));
+            this.setHealth(this.getMaxHealth());
+            this.setAge(0);
+            this.setRegen((int)(colony.getBaseRegen() * newType.getRegenMult()));
+            this.setConsumption(colony.getBaseConsumption() * newType.getConsumptionMult());
+            this.setAttack((int)(colony.getBaseAttack() * newType.getAttackMult()));
+            this.setAttackSpeed((int)(colony.getBaseAttackSpeed() * newType.getAttackSpeedMult()));
+            this.setDefense((int)(colony.getBaseDefense() * newType.getDefenseMult()));
+            this.setSpeed(colony.getBaseSpeed() * newType.getSpeedMult());
+        }
     }
 
     public void updateStatsFromColony(Colony colony) {
+        if (AntSubtypeService.isEligibleType(type)) {
+            AntSubtypeService.applySubtypeStats(this, colony);
+            return;
+        }
         this.setMaxHealth((int)(colony.getBaseHealth() * type.getHealtMult()));
         
         if (this.getHealth() > this.getMaxHealth()) {

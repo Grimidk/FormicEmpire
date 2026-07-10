@@ -333,6 +333,12 @@ public final class GameUnlocks {
         public static final Upgrade STAT_WORKER_SPEED_2 = new Upgrade(134, "STAT_WORKER_SPEED_2", "STAT_WORKER_SPEED_2_FLAVOR", "STAT_WORKER_SPEED_2_DESC", STAT_SCOUTING_3, 200000, null);
         static { upgrades.add(STAT_WORKER_SPEED_2); }
         // -- Assimilated --
+        // Implementation audit (gameplay wiring, not UI strings):
+        //   Implemented — ASSIMILATED_FARMING (ColonyLabourService), ASSIMILATED_MULTIQUEEN (queen capacity),
+        //     ASSIMILATED_FIREVENOM / ASSIMILATED_DEADLYVENOM / ASSIMILATED_STINGING / ASSIMILATED_FASTBITE
+        //     (ColonyStatsService combat), TYPE_MAJOR via ASSIMILATION_MARAUDER.
+        //   Implemented — ASSIMILATED_TRAPJAW / HONEYPOT / DOORHEAD / STINGING via ant subtype hatch rates + per-ant stats/sprites.
+        //   Not implemented — all others below marked TODO mechanic (reward has no simulation/UI effect yet).
         // TODO asset: icons/upgrades/AssimilatedFarming.png; icons/species/Leafcutter.png (placeholder — replace final art)
         public static final Upgrade ASSIMILATED_FARMING = new Upgrade(1001, "ASSIMILATED_FARMING", "ASSIMILATED_FARMING_FLAVOR", "ASSIMILATED_FARMING_DESC", ABILITY_ASSIMILATION, 0, null );
         static { upgrades.add(ASSIMILATED_FARMING); }
@@ -340,66 +346,78 @@ public final class GameUnlocks {
         public static final Upgrade ASSIMILATED_MULTIQUEEN = new Upgrade(1002, "ASSIMILATED_MULTIQUEEN", "ASSIMILATED_MULTIQUEEN_FLAVOR", "ASSIMILATED_MULTIQUEEN_DESC", ABILITY_ASSIMILATION, 0, null );
         static { upgrades.add(ASSIMILATED_MULTIQUEEN); }
         // TODO asset: icons/upgrades/AssimilatedTrapjaw.png; icons/species/Trapjaw.png (placeholder — replace final art)
-        // TODO subtype: Trap-jaw ant variant (hatch-rate assignment + per-role sprites)
+        // TODO mechanic: Trap-jaw subtype — hatch rates, sprites, and 3x additive attack per ant
         public static final Upgrade ASSIMILATED_TRAPJAW = new Upgrade(1003, "ASSIMILATED_TRAPJAW", "ASSIMILATED_TRAPJAW_FLAVOR", "ASSIMILATED_TRAPJAW_DESC", ABILITY_ASSIMILATION, 0, null );
         static { upgrades.add(ASSIMILATED_TRAPJAW); }
         // TODO asset: icons/upgrades/AssimilatedHoneypot.png; icons/species/Honeypot.png (placeholder — replace final art)
-        // TODO subtype: Honey-pot ant variant (hatch-rate assignment + per-role sprites)
+        // TODO mechanic: Honey-pot subtype — hatch rates, sprites, 4x forage/carry, 0.75x speed per ant
         public static final Upgrade ASSIMILATED_HONEYPOT = new Upgrade(1004, "ASSIMILATED_HONEYPOT", "ASSIMILATED_HONEYPOT_FLAVOR", "ASSIMILATED_HONEYPOT_DESC", ABILITY_ASSIMILATION, 0, null );
         static { upgrades.add(ASSIMILATED_HONEYPOT); }
         // TODO asset: icons/upgrades/AssimilatedDoorhead.png; icons/species/Turtle.png (placeholder — replace final art)
-        // TODO subtype: Door-head / Turtle ant variant (hatch-rate assignment + per-role sprites)
+        // TODO mechanic: Door-head subtype — hatch rates, sprites, and 5x defense per ant
         public static final Upgrade ASSIMILATED_DOORHEAD = new Upgrade(1005, "ASSIMILATED_DOORHEAD", "ASSIMILATED_DOORHEAD_FLAVOR", "ASSIMILATED_DOORHEAD_DESC", ABILITY_ASSIMILATION, 0, null );
         static { upgrades.add(ASSIMILATED_DOORHEAD); }
         // TODO asset: icons/upgrades/AssimilatedWoodburrow.png; icons/species/Carpenter.png (placeholder — replace final art)
+        // TODO mechanic: wood excavation / carpenter nesting — not implemented
         public static final Upgrade ASSIMILATED_WOODBURROW = new Upgrade(1006, "ASSIMILATED_WOODBURROW", "ASSIMILATED_WOODBURROW_FLAVOR", "ASSIMILATED_WOODBURROW_DESC", ABILITY_ASSIMILATION, 0, null );
         static { upgrades.add(ASSIMILATED_WOODBURROW); }
         // TODO asset: icons/upgrades/AssimilatedSilkweave.png; icons/species/Weaver.png (placeholder — replace final art)
+        // TODO mechanic: silk nest weaving — not implemented
         public static final Upgrade ASSIMILATED_SILKWEAVE = new Upgrade(1007, "ASSIMILATED_SILKWEAVE", "ASSIMILATED_SILKWEAVE_FLAVOR", "ASSIMILATED_SILKWEAVE_DESC", ABILITY_ASSIMILATION, 0, null );
         static { upgrades.add(ASSIMILATED_SILKWEAVE); }
         // TODO asset: icons/upgrades/AssimilatedRafting.png; icons/species/Floodplain.png (placeholder — replace final art)
+        // TODO mechanic: flood rafting — not implemented
         public static final Upgrade ASSIMILATED_RAFTING = new Upgrade(1008, "ASSIMILATED_RAFTING", "ASSIMILATED_RAFTING_FLAVOR", "ASSIMILATED_RAFTING_DESC", ABILITY_ASSIMILATION, 0, null );
         static { upgrades.add(ASSIMILATED_RAFTING); }
         // TODO asset: icons/upgrades/AssimilatedFirevenom.png; icons/species/Fire.png (placeholder — replace final art)
         public static final Upgrade ASSIMILATED_FIREVENOM = new Upgrade(1009, "ASSIMILATED_FIREVENOM", "ASSIMILATED_FIREVENOM_FLAVOR", "ASSIMILATED_FIREVENOM_DESC", ABILITY_ASSIMILATION, 0, null );
         static { upgrades.add(ASSIMILATED_FIREVENOM); }
         // TODO asset: icons/upgrades/AssimilatedJumping.png; icons/species/Jet.png (placeholder — replace final art)
+        // TODO mechanic: jump attacks — not implemented
         public static final Upgrade ASSIMILATED_JUMPING = new Upgrade(1010, "ASSIMILATED_JUMPING", "ASSIMILATED_JUMPING_FLAVOR", "ASSIMILATED_JUMPING_DESC", ABILITY_ASSIMILATION, 0, null );
         static { upgrades.add(ASSIMILATED_JUMPING); }
         // TODO asset: icons/upgrades/AssimilatedGliding.png; icons/species/Gliding.png (placeholder — replace final art)
+        // TODO mechanic: gliding movement — not implemented
         public static final Upgrade ASSIMILATED_GLIDING = new Upgrade(1011, "ASSIMILATED_GLIDING", "ASSIMILATED_GLIDING_FLAVOR", "ASSIMILATED_GLIDING_DESC", ABILITY_ASSIMILATION, 0, null );
         static { upgrades.add(ASSIMILATED_GLIDING); }
         // TODO asset: icons/upgrades/AssimilatedStinging.png; icons/species/Bullet.png (placeholder — replace final art)
-        // TODO subtype: Bullet ant variant (hatch-rate assignment + per-role sprites)
+        // TODO mechanic: Bullet subtype (hatch-rate assignment + per-role sprites); damage bonus wired in ColonyStatsService
         public static final Upgrade ASSIMILATED_STINGING = new Upgrade(1012, "ASSIMILATED_STINGING", "ASSIMILATED_STINGING_FLAVOR", "ASSIMILATED_STINGING_DESC", ABILITY_ASSIMILATION, 0, null );
         static { upgrades.add(ASSIMILATED_STINGING); }
         // TODO asset: icons/upgrades/AssimilatedSwarming.png; icons/species/Army.png (placeholder — replace final art)
+        // TODO mechanic: army-ant raiding swarms — not implemented
         public static final Upgrade ASSIMILATED_SWARMING = new Upgrade(1013, "ASSIMILATED_SWARMING", "ASSIMILATED_SWARMING_FLAVOR", "ASSIMILATED_SWARMING_DESC", ABILITY_ASSIMILATION, 0, null );
         static { upgrades.add(ASSIMILATED_SWARMING); }
         // TODO asset: icons/upgrades/AssimilatedStealth.png; icons/species/Ghost.png (placeholder — replace final art)
+        // TODO mechanic: ghost-ant stealth / hostile nesting — not implemented
         public static final Upgrade ASSIMILATED_STEALTH = new Upgrade(1014, "ASSIMILATED_STEALTH", "ASSIMILATED_STEALTH_FLAVOR", "ASSIMILATED_STEALTH_DESC", ABILITY_ASSIMILATION, 0, null );
         static { upgrades.add(ASSIMILATED_STEALTH); }
         // TODO asset: icons/upgrades/AssimilatedFastbite.png; icons/species/Dracula.png (placeholder — replace final art)
         public static final Upgrade ASSIMILATED_FASTBITE = new Upgrade(1015, "ASSIMILATED_FASTBITE", "ASSIMILATED_FASTBITE_FLAVOR", "ASSIMILATED_FASTBITE_DESC", ABILITY_ASSIMILATION, 0, null );
         static { upgrades.add(ASSIMILATED_FASTBITE); }
         // TODO asset: icons/upgrades/AssimilatedHeatresist.png; icons/species/Silver.png (placeholder — replace final art)
+        // TODO mechanic: desert heat foraging tolerance — not implemented
         public static final Upgrade ASSIMILATED_HEATRESIST = new Upgrade(1016, "ASSIMILATED_HEATRESIST", "ASSIMILATED_HEATRESIST_FLAVOR", "ASSIMILATED_HEATRESIST_DESC", ABILITY_ASSIMILATION, 0, null );
         static { upgrades.add(ASSIMILATED_HEATRESIST); }
         // TODO asset: icons/upgrades/AssimilatedDeadlyvenom.png; icons/species/Maricopa.png (placeholder — replace final art)
         public static final Upgrade ASSIMILATED_DEADLYVENOM = new Upgrade(1017, "ASSIMILATED_DEADLYVENOM", "ASSIMILATED_DEADLYVENOM_FLAVOR", "ASSIMILATED_DEADLYVENOM_DESC", ABILITY_ASSIMILATION, 0, null );
         static { upgrades.add(ASSIMILATED_DEADLYVENOM); }
         // TODO asset: icons/upgrades/AssimilatedSelfdestruct.png; icons/species/Exploding.png (placeholder — replace final art)
+        // TODO mechanic: exploding-ant self-destruct defense — not implemented
         public static final Upgrade ASSIMILATED_SELFDESTRUCT = new Upgrade(1018, "ASSIMILATED_SELFDESTRUCT", "ASSIMILATED_SELFDESTRUCT_FLAVOR", "ASSIMILATED_SELFDESTRUCT_DESC", ABILITY_ASSIMILATION, 0, null );
         static { upgrades.add(ASSIMILATED_SELFDESTRUCT); }
         // TODO asset: icons/upgrades/AssimilatedFarsight.png; icons/species/Bulldog.png (placeholder — replace final art)
+        // TODO mechanic: bulldog vision / tracking — not implemented
         public static final Upgrade ASSIMILATED_FARSIGHT = new Upgrade(1019, "ASSIMILATED_FARSIGHT", "ASSIMILATED_FARSIGHT_FLAVOR", "ASSIMILATED_FARSIGHT_DESC", ABILITY_ASSIMILATION, 0, null );
         static { upgrades.add(ASSIMILATED_FARSIGHT); }
         // TODO asset: icons/upgrades/AssimilatedHivebuild.png; icons/species/ShiningBlack.png (placeholder — replace final art)
+        // TODO mechanic: carton hive building — not implemented
         public static final Upgrade ASSIMILATED_HIVEBUILD = new Upgrade(1020, "ASSIMILATED_HIVEBUILD", "ASSIMILATED_HIVEBUILD_FLAVOR", "ASSIMILATED_HIVEBUILD_DESC", ABILITY_ASSIMILATION, 0, null );
         static { upgrades.add(ASSIMILATED_HIVEBUILD); }
         // TODO asset: icons/upgrades/AssimilatedLocsense.png; icons/species/Desert.png (placeholder — replace final art)
+        // TODO mechanic: desert route navigation — not implemented
         public static final Upgrade ASSIMILATED_LOCSENSE = new Upgrade(1021, "ASSIMILATED_LOCSENSE", "ASSIMILATED_LOCSENSE_FLAVOR", "ASSIMILATED_LOCSENSE_DESC", ABILITY_ASSIMILATION, 0, null );
-                static { upgrades.add(ASSIMILATED_LOCSENSE); }
+        static { upgrades.add(ASSIMILATED_LOCSENSE); }
 
         // TODO asset: icons/upgrades/SynergySuperVenom.png (placeholder — replace final art)
         public static final Upgrade SYNERGY_SUPER_VENOM = new Upgrade(10001, "SYNERGY_SUPER_VENOM", "SYNERGY_SUPER_VENOM_FLAVOR", "SYNERGY_SUPER_VENOM_DESC", null, 0, null);
@@ -587,65 +605,77 @@ public final class GameUnlocks {
         // TODO asset: icons/assimilations/Trapjaw.png; icons/species/Trapjaw.png (placeholder — replace final art)
         public static final Assimilation ASSIMILATION_TRAPJAW = new Assimilation(4, "ASSIMILATION_TRAPJAW", "ASSIMILATION_TRAPJAW_DESC", ASSIMILATED_TRAPJAW, ASSIMILATION_COST, null);
         static { assimilations.add(ASSIMILATION_TRAPJAW); }
-        // TODO asset: icons/assimilations/Honeypot.png; icons/species/Honeypot.png (placeholder — replace final art)
+
         public static final Assimilation ASSIMILATION_HONEYPOT = new Assimilation(5, "ASSIMILATION_HONEYPOT", "ASSIMILATION_HONEYPOT_DESC", ASSIMILATED_HONEYPOT, ASSIMILATION_COST, null);
         static { assimilations.add(ASSIMILATION_HONEYPOT); }
-        // TODO asset: icons/assimilations/Turtle.png; icons/species/Turtle.png (placeholder — replace final art)
+
         public static final Assimilation ASSIMILATION_DOORHEAD = new Assimilation(6, "ASSIMILATION_DOORHEAD", "ASSIMILATION_DOORHEAD_DESC", ASSIMILATED_DOORHEAD, ASSIMILATION_COST, null);
         static { assimilations.add(ASSIMILATION_DOORHEAD); }
         // TODO asset: icons/assimilations/Carpenter.png; icons/species/Carpenter.png (placeholder — replace final art)
+        // TODO mechanic: reward ASSIMILATED_WOODBURROW — not implemented
         public static final Assimilation ASSIMILATION_WOODBURROW = new Assimilation(7, "ASSIMILATION_WOODBURROW", "ASSIMILATION_WOODBURROW_DESC", ASSIMILATED_WOODBURROW, ASSIMILATION_COST, null);
         static { assimilations.add(ASSIMILATION_WOODBURROW); }
         // TODO asset: icons/assimilations/Weaver.png; icons/species/Weaver.png (placeholder — replace final art)
+        // TODO mechanic: reward ASSIMILATED_SILKWEAVE — not implemented
         public static final Assimilation ASSIMILATION_SILKWEAVE = new Assimilation(8, "ASSIMILATION_SILKWEAVE", "ASSIMILATION_SILKWEAVE_DESC", ASSIMILATED_SILKWEAVE, ASSIMILATION_COST, null);
         static { assimilations.add(ASSIMILATION_SILKWEAVE); }
         // TODO asset: icons/assimilations/Floodplain.png; icons/species/Floodplain.png (placeholder — replace final art)
+        // TODO mechanic: reward ASSIMILATED_RAFTING — not implemented
         public static final Assimilation ASSIMILATION_RAFTING = new Assimilation(9, "ASSIMILATION_RAFTING", "ASSIMILATION_RAFTING_DESC", ASSIMILATED_RAFTING, ASSIMILATION_COST, null);
         static { assimilations.add(ASSIMILATION_RAFTING); }
         // TODO asset: icons/assimilations/Fire.png; icons/species/Fire.png (placeholder — replace final art)
         public static final Assimilation ASSIMILATION_FIREVENOM = new Assimilation(10, "ASSIMILATION_FIREVENOM", "ASSIMILATION_FIREVENOM_DESC", ASSIMILATED_FIREVENOM, ASSIMILATION_COST, null);
         static { assimilations.add(ASSIMILATION_FIREVENOM); }
         // TODO asset: icons/assimilations/Jet.png; icons/species/Jet.png (placeholder — replace final art)
+        // TODO mechanic: reward ASSIMILATED_JUMPING — not implemented
         public static final Assimilation ASSIMILATION_JUMPING = new Assimilation(11, "ASSIMILATION_JUMPING", "ASSIMILATION_JUMPING_DESC", ASSIMILATED_JUMPING, ASSIMILATION_COST, null);
         static { assimilations.add(ASSIMILATION_JUMPING); }
         // TODO asset: icons/assimilations/Gliding.png; icons/species/Gliding.png (placeholder — replace final art)
+        // TODO mechanic: reward ASSIMILATED_GLIDING — not implemented
         public static final Assimilation ASSIMILATION_GLIDING = new Assimilation(12, "ASSIMILATION_GLIDING", "ASSIMILATION_GLIDING_DESC", ASSIMILATED_GLIDING, ASSIMILATION_COST, null);
         static { assimilations.add(ASSIMILATION_GLIDING); }
         // TODO asset: icons/assimilations/Bullet.png; icons/species/Bullet.png (placeholder — replace final art)
         public static final Assimilation ASSIMILATION_STINGING = new Assimilation(13, "ASSIMILATION_STINGING", "ASSIMILATION_STINGING_DESC", ASSIMILATED_STINGING, ASSIMILATION_COST, null);
         static { assimilations.add(ASSIMILATION_STINGING); }
         // TODO asset: icons/assimilations/Army.png; icons/species/Army.png (placeholder — replace final art)
+        // TODO mechanic: reward ASSIMILATED_SWARMING — not implemented
         public static final Assimilation ASSIMILATION_SWARMING = new Assimilation(14, "ASSIMILATION_SWARMING", "ASSIMILATION_SWARMING_DESC", ASSIMILATED_SWARMING, ASSIMILATION_COST, null);
         static { assimilations.add(ASSIMILATION_SWARMING); }
         // TODO asset: icons/assimilations/Ghost.png; icons/species/Ghost.png (placeholder — replace final art)
+        // TODO mechanic: reward ASSIMILATED_STEALTH — not implemented
         public static final Assimilation ASSIMILATION_STEALTH = new Assimilation(15, "ASSIMILATION_STEALTH", "ASSIMILATION_STEALTH_DESC", ASSIMILATED_STEALTH, ASSIMILATION_COST, null);
         static { assimilations.add(ASSIMILATION_STEALTH); }
         // TODO asset: icons/assimilations/Dracula.png; icons/species/Dracula.png (placeholder — replace final art)
         public static final Assimilation ASSIMILATION_FASTBITE = new Assimilation(16, "ASSIMILATION_FASTBITE", "ASSIMILATION_FASTBITE_DESC", ASSIMILATED_FASTBITE, ASSIMILATION_COST, null);
         static { assimilations.add(ASSIMILATION_FASTBITE); }
         // TODO asset: icons/assimilations/Silver.png; icons/species/Silver.png (placeholder — replace final art)
+        // TODO mechanic: reward ASSIMILATED_HEATRESIST — not implemented
         public static final Assimilation ASSIMILATION_HEATRESIST = new Assimilation(17, "ASSIMILATION_HEATRESIST", "ASSIMILATION_HEATRESIST_DESC", ASSIMILATED_HEATRESIST, ASSIMILATION_COST, null);
         static { assimilations.add(ASSIMILATION_HEATRESIST); }
         // TODO asset: icons/assimilations/Maricopa.png; icons/species/Maricopa.png (placeholder — replace final art)
         public static final Assimilation ASSIMILATION_DEADLYVENOM = new Assimilation(18, "ASSIMILATION_DEADLYVENOM", "ASSIMILATION_DEADLYVENOM_DESC", ASSIMILATED_DEADLYVENOM, ASSIMILATION_COST, null);
         static { assimilations.add(ASSIMILATION_DEADLYVENOM); }
         // TODO asset: icons/assimilations/Exploding.png; icons/species/Exploding.png (placeholder — replace final art)
+        // TODO mechanic: reward ASSIMILATED_SELFDESTRUCT — not implemented
         public static final Assimilation ASSIMILATION_SELFDESTRUCT = new Assimilation(19, "ASSIMILATION_SELFDESTRUCT", "ASSIMILATION_SELFDESTRUCT_DESC", ASSIMILATED_SELFDESTRUCT, ASSIMILATION_COST, null);
         static { assimilations.add(ASSIMILATION_SELFDESTRUCT); }
         // TODO asset: icons/assimilations/Bulldog.png; icons/species/Bulldog.png (placeholder — replace final art)
+        // TODO mechanic: reward ASSIMILATED_FARSIGHT — not implemented
         public static final Assimilation ASSIMILATION_FARSIGHT = new Assimilation(20, "ASSIMILATION_FARSIGHT", "ASSIMILATION_FARSIGHT_DESC", ASSIMILATED_FARSIGHT, ASSIMILATION_COST, null);
         static { assimilations.add(ASSIMILATION_FARSIGHT); }
         // TODO asset: icons/assimilations/ShiningBlack.png; icons/species/ShiningBlack.png (placeholder — replace final art)
+        // TODO mechanic: reward ASSIMILATED_HIVEBUILD — not implemented
         public static final Assimilation ASSIMILATION_HIVEBUILD = new Assimilation(21, "ASSIMILATION_HIVEBUILD", "ASSIMILATION_HIVEBUILD_DESC", ASSIMILATED_HIVEBUILD, ASSIMILATION_COST, null);
         static { assimilations.add(ASSIMILATION_HIVEBUILD); }
         // TODO asset: icons/assimilations/Desert.png; icons/species/Desert.png (placeholder — replace final art)
+        // TODO mechanic: reward ASSIMILATED_LOCSENSE — not implemented
         public static final Assimilation ASSIMILATION_LOCSENSE = new Assimilation(22, "ASSIMILATION_LOCSENSE", "ASSIMILATION_LOCSENSE_DESC", ASSIMILATED_LOCSENSE, ASSIMILATION_COST, null);
         static { assimilations.add(ASSIMILATION_LOCSENSE); }
 
         // --- Synergies ---
         // TODO asset: icons/synergies/SuperVenom.png
         public static final Synergy SUPER_VENOM_SYNERGY = new Synergy(1, "SYNERGY_SUPER_VENOM", "SYNERGY_SUPER_VENOM_DESC",
-                ASSIMILATED_FIREVENOM, ASSIMILATED_DEADLYVENOM, SYNERGY_SUPER_VENOM);
+                SYNERGY_SUPER_VENOM, ASSIMILATED_FIREVENOM, ASSIMILATED_DEADLYVENOM);
         static { synergies.add(SUPER_VENOM_SYNERGY); }
 
         // --- Getters ---

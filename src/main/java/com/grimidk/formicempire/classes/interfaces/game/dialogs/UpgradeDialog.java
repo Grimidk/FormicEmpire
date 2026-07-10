@@ -122,7 +122,7 @@ public class UpgradeDialog extends ZeroDialog {
         }
 
         // --- Synergies Tab ---
-        if (colony.getDynasty() != null && DynastySynergyService.hasAnyUnlocked(colony.getDynasty())) {
+        if (colony.hasUpgrade(GameUnlocks.ABILITY_SYNERGY)) {
             if (synergyPanel == null) {
                 synergyPanel = new SynergyPanel(colony);
             }
@@ -192,6 +192,18 @@ public class UpgradeDialog extends ZeroDialog {
                     dispose();
                 } else if (tabIndexMap.containsKey(TAB_ASSIMILATION)) {
                     tabbedPane.setSelectedIndex(tabIndexMap.get(TAB_ASSIMILATION));
+                }
+            }
+        });
+
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_O, 0), "toggleSynergy");
+        actionMap.put("toggleSynergy", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (isTabOpen(TAB_SYNERGY)) {
+                    dispose();
+                } else if (tabIndexMap.containsKey(TAB_SYNERGY)) {
+                    tabbedPane.setSelectedIndex(tabIndexMap.get(TAB_SYNERGY));
                 }
             }
         });
@@ -903,16 +915,16 @@ public class UpgradeDialog extends ZeroDialog {
                 return;
             }
 
-            List<Synergy> unlocked = new ArrayList<>();
-            for (Synergy synergy : GameUnlocks.getSynergies()) {
-                if (DynastySynergyService.isUnlocked(dynasty, synergy)) {
-                    unlocked.add(synergy);
+            List<Synergy> visible = DynastySynergyService.getVisibleSynergies(dynasty);
+            if (visible.isEmpty()) {
+                JLabel emptyLabel = new JLabel(LanguageStrings.get(LanguageStrings.SYNERGY_NONE_IN_PROGRESS));
+                emptyLabel.setForeground(AssetStyles.FONT_COLOR);
+                listPanel.add(emptyLabel);
+            } else {
+                for (Synergy synergy : visible) {
+                    listPanel.add(createSynergyCard(dynasty, synergy));
+                    listPanel.add(Box.createRigidArea(new Dimension(0, 5)));
                 }
-            }
-
-            for (Synergy synergy : unlocked) {
-                listPanel.add(createSynergyCard(synergy));
-                listPanel.add(Box.createRigidArea(new Dimension(0, 5)));
             }
 
             listPanel.revalidate();
@@ -920,12 +932,22 @@ public class UpgradeDialog extends ZeroDialog {
             SwingUtilities.invokeLater(() -> scrollPane.getViewport().setViewPosition(new Point(0, 0)));
         }
 
-        private JPanel createSynergyCard(Synergy synergy) {
+        private JPanel createSynergyCard(Dynasty dynasty, Synergy synergy) {
+            boolean active = DynastySynergyService.isActive(dynasty, synergy);
             JPanel panel = new JPanel(new BorderLayout(10, 10));
             panel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
 
-            TitledBorder border = new TitledBorder(AssetStyles.PANEL_BORDER, synergy.getName());
-            border.setTitleColor(AssetStyles.FONT_COLOR_HEADER);
+            String title = synergy.getName();
+            if (active) {
+                title += " — " + LanguageStrings.get(LanguageStrings.SYNERGY_STATUS_ACTIVE);
+            } else {
+                title += " — " + LanguageStrings.format(
+                        LanguageStrings.SYNERGY_STATUS_PARTIAL,
+                        DynastySynergyService.countRequirementsMet(dynasty, synergy),
+                        synergy.getRequirementCount());
+            }
+            TitledBorder border = new TitledBorder(AssetStyles.PANEL_BORDER, title);
+            border.setTitleColor(active ? AssetStyles.FONT_COLOR_HEADER : AssetStyles.FONT_COLOR_VALUE);
             border.setTitleFont(AssetStyles.FONT_BOLD);
             panel.setBorder(border);
 
@@ -933,14 +955,10 @@ public class UpgradeDialog extends ZeroDialog {
             infoPanel.setOpaque(false);
             infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
 
-            JLabel requirements = new JLabel(LanguageStrings.format(
-                    LanguageStrings.SYNERGY_REQUIREMENTS_FMT,
-                    synergy.getRequirement1().getFlavorName(),
-                    synergy.getRequirement2().getFlavorName()));
-            requirements.setForeground(AssetStyles.FONT_COLOR_VALUE);
-            requirements.setFont(AssetStyles.FONT_NORMAL);
-            requirements.setAlignmentX(Component.LEFT_ALIGNMENT);
-            infoPanel.add(requirements);
+            for (Upgrade requirement : synergy.getRequirements()) {
+                infoPanel.add(createRequirementLabel(dynasty, requirement));
+                infoPanel.add(Box.createRigidArea(new Dimension(0, 4)));
+            }
             infoPanel.add(Box.createRigidArea(new Dimension(0, 6)));
 
             JTextArea descriptionArea = new JTextArea(synergy.getDescription());
@@ -956,6 +974,16 @@ public class UpgradeDialog extends ZeroDialog {
             panel.add(infoPanel, BorderLayout.CENTER);
 
             return panel;
+        }
+
+        private JLabel createRequirementLabel(Dynasty dynasty, Upgrade requirement) {
+            boolean met = requirement != null && dynasty.hasUpgrade(requirement);
+            String key = met ? LanguageStrings.SYNERGY_REQUIREMENT_MET_FMT : LanguageStrings.SYNERGY_REQUIREMENT_MISSING_FMT;
+            JLabel label = new JLabel(LanguageStrings.format(key, requirement.getFlavorName()));
+            label.setForeground(met ? AssetStyles.FONT_COLOR_HEADER : AssetStyles.FONT_COLOR_VALUE);
+            label.setFont(AssetStyles.FONT_NORMAL);
+            label.setAlignmentX(Component.LEFT_ALIGNMENT);
+            return label;
         }
 
         @Override

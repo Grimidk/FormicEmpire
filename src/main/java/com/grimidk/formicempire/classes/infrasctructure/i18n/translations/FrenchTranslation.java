@@ -182,15 +182,32 @@ public class FrenchTranslation implements Translation {
         fr.put("ASSIMILATION_INFO", "Assignez des chercheuses pour contribuer à l'assimilation génétique.");
         fr.put("SYNERGY_COMING_SOON", "Synergies - Bientôt");
         fr.put("SYNERGY_REQUIREMENTS_FMT", "Combine : %s + %s");
+        fr.put("SYNERGY_NONE_IN_PROGRESS", "Aucune synergie en cours. Assimilez des traits génétiques pour découvrir des combinaisons.");
+        fr.put("SYNERGY_STATUS_ACTIVE", "Active");
+        fr.put("SYNERGY_STATUS_PARTIAL", "En cours (%s/%s)");
+        fr.put("SYNERGY_REQUIREMENT_SEPARATOR", " + ");
+        fr.put("SYNERGY_REQUIREMENT_MET_FMT", "[x] %s");
+        fr.put("SYNERGY_REQUIREMENT_MISSING_FMT", "[ ] %s");
         fr.put("SYNERGY_SUPER_VENOM", "Super Venin");
         fr.put("SYNERGY_SUPER_VENOM_FLAVOR", "Super Venin");
-        fr.put("SYNERGY_SUPER_VENOM_DESC", "Remplace l'empilement venin de feu + maricopa (4+4) par un multiplicateur de dégâts de 16x lorsque les deux venins sont assimilés et que les Synergies sont recherchées. Le venin piquant ajoute encore +4 (20x avec les trois).");
+        fr.put("SYNERGY_SUPER_VENOM_DESC", "Remplace l'empilement venin de feu + maricopa (4+4) par un multiplicateur de dégâts de 16x lorsque les deux venins sont assimilés et que les Synergies sont recherchées.");
 
         fr.put("DIALOG_HATCH_RATES_TITLE", "Taux d'éclosion des nymphes");
         fr.put("HATCH_DESC", "Probabilité d'éclosion pour les nouvelles fourmis :");
         fr.put("HATCH_TOTAL", "Total : %s%%");
         fr.put("HATCH_WARNING_TOTAL", "Attention : le total n'est pas 100%%.");
         fr.put("HATCH_TOTAL_OK", "Le total est 100%");
+        fr.put("HATCH_SUBTYPE_HEAD_SECTION", "Sous-types de tête (nouvelles ouvrières, soldats, majors, princesses) :");
+        fr.put("HATCH_SUBTYPE_ABDOMEN_SECTION", "Sous-types d'abdomen (nouvelles ouvrières, soldats, majors, princesses) :");
+        fr.put("SUBTYPE_NOTHING", "Aucun");
+        fr.put("SUBTYPE_HEAD_TRAPJAW", "Mâchoire-piège");
+        fr.put("SUBTYPE_HEAD_DOORHEAD", "Tête-bouclier");
+        fr.put("SUBTYPE_ABDOMEN_STINGER", "Dard");
+        fr.put("SUBTYPE_ABDOMEN_HONEYPOT", "Honeypot");
+        fr.put("SUBTYPE_HEAD_TRAPJAW_DESC", "Tête mâchoire-piège : 3x attaque. S'ajoute aux autres bonus d'attaque de sous-type au lieu de les multiplier.");
+        fr.put("SUBTYPE_HEAD_DOORHEAD_DESC", "Tête-bouclier : 5x défense.");
+        fr.put("SUBTYPE_ABDOMEN_STINGER_DESC", "Abdomen dard : 4x attaque (se multiplie avec les autres bonus d'attaque de sous-type).");
+        fr.put("SUBTYPE_ABDOMEN_HONEYPOT_DESC", "Abdomen honeypot : 4x collecte et capacité de port ; 0.75x vitesse de déplacement.");
 
         fr.put("DIALOG_ABILITIES_TITLE", "Opérations de colonie");
         fr.put("ABILITY_RP_LABEL", "Points de recherche : %s");
@@ -963,15 +980,15 @@ public class FrenchTranslation implements Translation {
         fr.put("SPECIES_DESERT", "Fourmi du Désert");
         fr.put("SPECIES_DESERT_SCIENTIFIC", "Cataglyphis Fortis");
         fr.put("ASSIMILATED_TRAPJAW_FLAVOR", "Mâchoires à Ressort");
-        fr.put("ASSIMILATED_TRAPJAW_DESC", "Votre dynastie peut développer des mandibules piège ultra-rapides. (Mécanique en développement.)");
+        fr.put("ASSIMILATED_TRAPJAW_DESC", "Débloque le sous-type de tête Mâchoire-piège. Les fourmis trapjaw infligent 3x attaque, ajouté aux autres bonus de sous-type plutôt que multiplié.");
         fr.put("ASSIMILATION_TRAPJAW", "Assimilation fourmi piège-mâchoire");
         fr.put("ASSIMILATION_TRAPJAW_DESC", "Après assimilation du génome de la fourmi piège-mâchoire :");
         fr.put("ASSIMILATED_HONEYPOT_FLAVOR", "Pots de Miel Vivants");
-        fr.put("ASSIMILATED_HONEYPOT_DESC", "Votre dynastie peut élever des réplètes stockant de la nourriture liquide. (Mécanique en développement.)");
+        fr.put("ASSIMILATED_HONEYPOT_DESC", "Débloque le sous-type d'abdomen Honeypot. Les butineuses honeypot collectent et portent 4x plus à 0.75x vitesse.");
         fr.put("ASSIMILATION_HONEYPOT", "Assimilation fourmi pot-de-miel");
         fr.put("ASSIMILATION_HONEYPOT_DESC", "Après assimilation du génome de la fourmi pot-de-miel :");
         fr.put("ASSIMILATED_DOORHEAD_FLAVOR", "Bouchons Crâniens Blindés");
-        fr.put("ASSIMILATED_DOORHEAD_DESC", "Votre dynastie peut sceller les entrées du nid avec des soldats à tête bouchon. (Mécanique en développement.)");
+        fr.put("ASSIMILATED_DOORHEAD_DESC", "Débloque le sous-type de tête Tête-bouclier. Les fourmis doorhead ont 5x défense.");
         fr.put("ASSIMILATION_DOORHEAD", "Assimilation fourmi tête-porte");
         fr.put("ASSIMILATION_DOORHEAD_DESC", "Après assimilation du génome de la fourmi tête-porte :");
         fr.put("ASSIMILATED_WOODBURROW_FLAVOR", "Excavation du Bois");
@@ -999,7 +1016,7 @@ public class FrenchTranslation implements Translation {
         fr.put("ASSIMILATION_GLIDING", "Assimilation fourmi planante");
         fr.put("ASSIMILATION_GLIDING_DESC", "Après assimilation du génome de la fourmi planante :");
         fr.put("ASSIMILATED_STINGING_FLAVOR", "Piqûre Excruciante");
-        fr.put("ASSIMILATED_STINGING_DESC", "Votre dynastie peut utiliser l'une des piqûres les plus douloureuses. (Mécanique en développement.)");
+        fr.put("ASSIMILATED_STINGING_DESC", "Débloque le sous-type d'abdomen Dard. Les fourmis avec ce sous-type infligent 4x les dégâts.");
         fr.put("ASSIMILATION_STINGING", "Assimilation fourmi piqueuse");
         fr.put("ASSIMILATION_STINGING_DESC", "Après assimilation du génome de la fourmi piqueuse :");
         fr.put("ASSIMILATED_SWARMING_FLAVOR", "Essaims de Raid");
@@ -1302,11 +1319,11 @@ public class FrenchTranslation implements Translation {
         fr.put("ASSIMILATED_MULTIQUEEN_DESC", "Plusieurs reines dans une même colonie (nécessite d'améliorer la chambre royale).");
         fr.put("ASSIMILATED_MULTIQUEEN_DESC", "Plusieurs reines dans une même colonie (nécessite d'améliorer la chambre royale).");
         fr.put("ASSIMILATED_TRAPJAW_FLAVOR", "Mâchoires à Ressort");
-        fr.put("ASSIMILATED_TRAPJAW_DESC", "Votre dynastie peut développer des mandibules piège ultra-rapides. (Mécanique en développement.)");
+        fr.put("ASSIMILATED_TRAPJAW_DESC", "Débloque le sous-type de tête Mâchoire-piège. Les fourmis trapjaw infligent 3x attaque, ajouté aux autres bonus de sous-type plutôt que multiplié.");
         fr.put("ASSIMILATED_HONEYPOT_FLAVOR", "Pots de Miel Vivants");
-        fr.put("ASSIMILATED_HONEYPOT_DESC", "Votre dynastie peut élever des réplètes stockant de la nourriture liquide. (Mécanique en développement.)");
+        fr.put("ASSIMILATED_HONEYPOT_DESC", "Débloque le sous-type d'abdomen Honeypot. Les butineuses honeypot collectent et portent 4x plus à 0.75x vitesse.");
         fr.put("ASSIMILATED_DOORHEAD_FLAVOR", "Bouchons Crâniens Blindés");
-        fr.put("ASSIMILATED_DOORHEAD_DESC", "Votre dynastie peut sceller les entrées du nid avec des soldats à tête bouchon. (Mécanique en développement.)");
+        fr.put("ASSIMILATED_DOORHEAD_DESC", "Débloque le sous-type de tête Tête-bouclier. Les fourmis doorhead ont 5x défense.");
         fr.put("ASSIMILATED_WOODBURROW_FLAVOR", "Excavation du Bois");
         fr.put("ASSIMILATED_WOODBURROW_DESC", "Votre dynastie peut creuser et nicher dans le bois. (Mécanique en développement.)");
         fr.put("ASSIMILATED_SILKWEAVE_FLAVOR", "Tissage de Nids en Soie");
@@ -1320,7 +1337,7 @@ public class FrenchTranslation implements Translation {
         fr.put("ASSIMILATED_GLIDING_FLAVOR", "Planés Contrôlées");
         fr.put("ASSIMILATED_GLIDING_DESC", "Votre dynastie peut planer entre les arbres. (Mécanique en développement.)");
         fr.put("ASSIMILATED_STINGING_FLAVOR", "Piqûre Excruciante");
-        fr.put("ASSIMILATED_STINGING_DESC", "Votre dynastie peut utiliser l'une des piqûres les plus douloureuses. (Mécanique en développement.)");
+        fr.put("ASSIMILATED_STINGING_DESC", "Débloque le sous-type d'abdomen Dard. Les fourmis avec ce sous-type infligent 4x les dégâts.");
         fr.put("ASSIMILATED_SWARMING_FLAVOR", "Essaims de Raid");
         fr.put("ASSIMILATED_SWARMING_DESC", "Votre dynastie peut coordonner de vastes raids sans nid permanent. (Mécanique en développement.)");
         fr.put("ASSIMILATED_STEALTH_FLAVOR", "Infiltration Fantôme");
@@ -1761,6 +1778,8 @@ public class FrenchTranslation implements Translation {
         fr.put("TRIGGER_BORER_ROLE_MSG", "Les routes commerciales peuvent être dangereuses ! Les Majors peuvent maintenant creuser des tunnels pour des routes plus rapides et plus sûres.");
         fr.put("TRIGGER_ASSIMILATION_ABILITY_TITLE", "Assimilation génétique");
         fr.put("TRIGGER_ASSIMILATION_ABILITY_MSG", "En absorbant les restes d'une dynastie vaincue, vos fourmis ont appris que les traits génétiques peuvent être récoltés ! Assimilation génétique débloquée dans le menu Améliorations (Y).");
+        fr.put("TRIGGER_SYNERGY_SUPER_VENOM_TITLE", "Synergie débloquée");
+        fr.put("TRIGGER_SYNERGY_SUPER_VENOM_MSG", "%s est maintenant active ! Combiner %s remplace leur empilement séparé par un multiplicateur de dégâts de 16x. Ouvrez Synergies (O) pour consulter.");
         fr.put("TRIGGER_OPERATIONS_ABILITY_TITLE", "Opérations de colonie");
         fr.put("TRIGGER_OPERATIONS_ABILITY_MSG", "Vous avez obtenu une capacité active spéciale ! Vous pouvez maintenant accéder au menu Opérations de colonie en appuyant sur (Z).");
 

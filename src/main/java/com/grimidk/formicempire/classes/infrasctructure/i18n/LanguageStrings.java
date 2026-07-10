@@ -459,6 +459,12 @@ public final class LanguageStrings {
     public static final String ASSIMILATION_INFO = "ASSIMILATION_INFO";
     public static final String SYNERGY_COMING_SOON = "SYNERGY_COMING_SOON";
     public static final String SYNERGY_REQUIREMENTS_FMT = "SYNERGY_REQUIREMENTS_FMT";
+    public static final String SYNERGY_NONE_IN_PROGRESS = "SYNERGY_NONE_IN_PROGRESS";
+    public static final String SYNERGY_STATUS_ACTIVE = "SYNERGY_STATUS_ACTIVE";
+    public static final String SYNERGY_STATUS_PARTIAL = "SYNERGY_STATUS_PARTIAL";
+    public static final String SYNERGY_REQUIREMENT_SEPARATOR = "SYNERGY_REQUIREMENT_SEPARATOR";
+    public static final String SYNERGY_REQUIREMENT_MET_FMT = "SYNERGY_REQUIREMENT_MET_FMT";
+    public static final String SYNERGY_REQUIREMENT_MISSING_FMT = "SYNERGY_REQUIREMENT_MISSING_FMT";
     public static final String SYNERGY_SUPER_VENOM = "SYNERGY_SUPER_VENOM";
     public static final String SYNERGY_SUPER_VENOM_FLAVOR = "SYNERGY_SUPER_VENOM_FLAVOR";
     public static final String SYNERGY_SUPER_VENOM_DESC = "SYNERGY_SUPER_VENOM_DESC";
@@ -468,6 +474,14 @@ public final class LanguageStrings {
     public static final String HATCH_TOTAL = "HATCH_TOTAL";
     public static final String HATCH_WARNING_TOTAL = "HATCH_WARNING_TOTAL";
     public static final String HATCH_TOTAL_OK = "HATCH_TOTAL_OK";
+    public static final String HATCH_SUBTYPE_HEAD_SECTION = "HATCH_SUBTYPE_HEAD_SECTION";
+    public static final String HATCH_SUBTYPE_ABDOMEN_SECTION = "HATCH_SUBTYPE_ABDOMEN_SECTION";
+
+    public static final String SUBTYPE_NOTHING = "SUBTYPE_NOTHING";
+    public static final String SUBTYPE_HEAD_TRAPJAW = "SUBTYPE_HEAD_TRAPJAW";
+    public static final String SUBTYPE_HEAD_DOORHEAD = "SUBTYPE_HEAD_DOORHEAD";
+    public static final String SUBTYPE_ABDOMEN_STINGER = "SUBTYPE_ABDOMEN_STINGER";
+    public static final String SUBTYPE_ABDOMEN_HONEYPOT = "SUBTYPE_ABDOMEN_HONEYPOT";
 
     public static final String DIALOG_ABILITIES_TITLE = "DIALOG_ABILITIES_TITLE";
     public static final String ABILITY_RP_LABEL = "ABILITY_RP_LABEL";

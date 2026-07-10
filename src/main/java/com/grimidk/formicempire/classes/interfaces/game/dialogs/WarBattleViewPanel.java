@@ -1,9 +1,12 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
+import com.grimidk.formicempire.classes.constants.ant.AntSubtypeProfile;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.Species;
 import com.grimidk.formicempire.classes.constants.world.Biome;
+import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.War;
+import com.grimidk.formicempire.classes.entities.services.colony.AntSubtypeService;
 import com.grimidk.formicempire.classes.entities.services.world.WarBattleScene;
 import com.grimidk.formicempire.classes.entities.services.world.WarBattleSceneBuilder;
 import com.grimidk.formicempire.classes.entities.services.world.WarService;
@@ -234,7 +237,7 @@ public class WarBattleViewPanel extends JPanel {
         int fieldRight = field.x + field.width;
         double faceRadians = attackerSide ? Math.toRadians(90) : Math.toRadians(270);
         for (BattleAnt ant : ants) {
-            ImageIcon icon = GameConstants.getAntSprite(ant.type, ant.species);
+            ImageIcon icon = GameConstants.getAntSprite(ant.type, ant.species, ant.profile);
             if (icon == null) {
                 continue;
             }
@@ -275,6 +278,7 @@ public class WarBattleViewPanel extends JPanel {
             return List.of();
         }
 
+        Dynasty dynasty = resolveDynasty(side.dynastyName());
         int visualCap = WarBattleScene.MAX_VISUAL_ANTS_PER_SIDE;
         int visualTotal = Math.min(total, visualCap);
         Map<AntType, Integer> allocated = allocateVisualCounts(side.typeCounts(), total, visualTotal);
@@ -289,13 +293,28 @@ public class WarBattleViewPanel extends JPanel {
             for (int i = 0; i < entry.getValue(); i++) {
                 float laneY = random.nextFloat();
                 float depthSpread = random.nextFloat() * CONTACT_DEPTH_SPREAD;
-                ants.add(new BattleAnt(type, side.species(), laneY,
+                AntSubtypeProfile profile = dynasty != null
+                        ? AntSubtypeService.sampleProfileFromDynasty(dynasty, type)
+                        : AntSubtypeProfile.standard();
+                ants.add(new BattleAnt(type, side.species(), profile, laneY,
                         CONTACT_DEPTH_BASE + depthSpread,
                         random.nextFloat() * (float) (Math.PI * 2),
                         0.85f + random.nextFloat() * 0.3f));
             }
         }
         return ants;
+    }
+
+    private Dynasty resolveDynasty(String dynastyName) {
+        if (dynastyName == null || dynastyName.isEmpty() || engine == null || engine.getWorld() == null) {
+            return null;
+        }
+        for (Dynasty dynasty : engine.getWorld().getDynastys()) {
+            if (dynasty != null && dynastyName.equals(dynasty.getName())) {
+                return dynasty;
+            }
+        }
+        return null;
     }
 
     /** Largest-remainder allocation so on-screen mix matches deployed type counts. */
@@ -420,15 +439,17 @@ public class WarBattleViewPanel extends JPanel {
     private static final class BattleAnt {
         private final AntType type;
         private final Species species;
+        private final AntSubtypeProfile profile;
         private final float laneY;
         private final float contactDepth;
         private final float wobblePhase;
         private final float motionRate;
 
-        private BattleAnt(AntType type, Species species, float laneY, float contactDepth, float wobblePhase,
-                float motionRate) {
+        private BattleAnt(AntType type, Species species, AntSubtypeProfile profile, float laneY, float contactDepth,
+                float wobblePhase, float motionRate) {
             this.type = type;
             this.species = species;
+            this.profile = profile != null ? profile : AntSubtypeProfile.standard();
             this.laneY = laneY;
             this.contactDepth = Math.min(0.995f, contactDepth);
             this.wobblePhase = wobblePhase;

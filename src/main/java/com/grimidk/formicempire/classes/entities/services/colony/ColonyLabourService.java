@@ -84,11 +84,13 @@ public class ColonyLabourService {
                 resources.addResource(colony, type, actualGathered);
                 
                 if (type == GameConstants.RESOURCE_PLANT) {
-                    for(int i = 0; i < actualGathered; i++) {
-                        if (workerIndex >= workers.size()) workerIndex = 0;
+                    for (int i = 0; i < actualGathered; ) {
+                        if (workerIndex >= workers.size()) {
+                            workerIndex = 0;
+                        }
                         Ant worker = workers.get(workerIndex);
                         worker.setCarrying(type);
-                        
+
                         if (colony.hasUpgrade(GameUnlocks.ABILITY_RESIN)) {
                             if (GameRandom.nextInt(100) < 1) {
                                 double addedResin = resources.addResource(colony, GameConstants.RESOURCE_RESIN, 1);
@@ -97,6 +99,7 @@ public class ColonyLabourService {
                                 }
                             }
                         }
+                        i += AntSubtypeService.forageCarrySlots(worker);
                         workerIndex++;
                     }
                     
@@ -125,7 +128,7 @@ public class ColonyLabourService {
             if (!foragers.isEmpty()) {
                 for(Ant a : foragers) a.clearLoad();
                 
-                int totalPower = (int) (foragers.size() * stats.getCollectingRate(colony));
+                int totalPower = AntSubtypeService.sumCollectingPower(colony, foragers);
                 List<ResourceSource> plantSources = locations.getSourcesByType(GameConstants.RESOURCE_PLANT);
                 List<ResourceSource> waterSources = locations.getSourcesByType(GameConstants.RESOURCE_WATER);
 
@@ -409,12 +412,14 @@ public class ColonyLabourService {
                     satellite.setHatchRateMajor(primaryColony.getHatchRateMajor());
                     satellite.setHatchRateDrone(primaryColony.getHatchRateDrone());
                     satellite.setHatchRatePrincess(primaryColony.getHatchRatePrincess());
+                    AntSubtypeService.copySubtypeRates(satellite, primaryColony);
                 } else {
                     satellite.setHatchRateWorker(colony.getHatchRateWorker());
                     satellite.setHatchRateSoldier(colony.getHatchRateSoldier());
                     satellite.setHatchRateMajor(colony.getHatchRateMajor());
                     satellite.setHatchRateDrone(colony.getHatchRateDrone());
                     satellite.setHatchRatePrincess(colony.getHatchRatePrincess());
+                    AntSubtypeService.copySubtypeRates(satellite, colony);
                 }
                 
                 neighbor.setColony(satellite);
@@ -618,7 +623,9 @@ public class ColonyLabourService {
         }
 
         for (int i = 0; i < queensToAdd; i++) {
+            Ant breeder = breederPrincesses.get(i);
             Ant newQueen = new Ant(colony, GameConstants.TYPE_QUEEN);
+            AntSubtypeService.inheritSubtype(breeder, newQueen, colony);
             newQueen.setDimension(WorldSpaces.UNDERWORLD);
 
             Rectangle royal = colony.getPhysicsService().getRoomBounds(colony, WorldSpaces.ROYAL_CHAMBER);

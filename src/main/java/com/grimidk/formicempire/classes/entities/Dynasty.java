@@ -19,6 +19,7 @@ import com.grimidk.formicempire.classes.constants.misc.Species;
 import com.grimidk.formicempire.classes.constants.misc.GeneticIntegrityModifier;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
+import com.grimidk.formicempire.classes.constants.unlocks.Synergy;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyAiService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyAutomationService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDiplomacyService;
@@ -59,6 +60,7 @@ public class Dynasty {
     private boolean autoDiplomacyEnabled;
     private boolean defaultAutoTunnelsEnabled;
     private final Set<Upgrade> unlockedUpgrades;
+    private final transient List<Synergy> pendingSynergyAlerts = new ArrayList<>();
     private final List<Colony> colonies;
     private final List<Tunnel> tunnels;
     private final Map<String, Integer> globalDeathStatistics;
@@ -1384,7 +1386,32 @@ public class Dynasty {
         }
         if (unlockedUpgrades.remove(upgrade)) {
             invalidateAffordableAlertCaches();
+            DynastySynergyService.refreshUnlocked(this);
         }
+    }
+
+    public void applySynergyReward(Upgrade reward, Synergy synergy) {
+        if (reward == null || unlockedUpgrades.contains(reward)) {
+            return;
+        }
+        unlockedUpgrades.add(reward);
+        invalidateAffordableAlertCaches();
+        enqueueSynergyAlert(synergy);
+    }
+
+    private void enqueueSynergyAlert(Synergy synergy) {
+        if (synergy != null && isPlayer) {
+            pendingSynergyAlerts.add(synergy);
+        }
+    }
+
+    public List<Synergy> drainPendingSynergyAlerts() {
+        if (pendingSynergyAlerts.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<Synergy> alerts = new ArrayList<>(pendingSynergyAlerts);
+        pendingSynergyAlerts.clear();
+        return alerts;
     }
 
     private void invalidateAffordableAlertCaches() {

@@ -31,9 +31,9 @@ class ColonyStatsServiceAssimilationTest {
     }
 
     @Test
-    void fireAndStingingStackAdditivelyToEight() {
+    void fireVenomUnaffectedByStingingAssimilation() {
         Dynasty dynasty = dynastyWith(GameUnlocks.ASSIMILATED_FIREVENOM, GameUnlocks.ASSIMILATED_STINGING);
-        assertEquals(8f, ColonyStatsService.getAssimilatedDamageMultiplier(dynasty), 0.0001f);
+        assertEquals(4f, ColonyStatsService.getAssimilatedDamageMultiplier(dynasty), 0.0001f);
     }
 
     @Test
@@ -63,14 +63,14 @@ class ColonyStatsServiceAssimilationTest {
     }
 
     @Test
-    void fireDeadlySynergyPlusStingingIsTwenty() {
+    void fireDeadlySynergyUnaffectedByStinging() {
         Dynasty dynasty = dynastyWith(
                 GameUnlocks.ABILITY_SYNERGY,
                 GameUnlocks.ASSIMILATED_FIREVENOM,
                 GameUnlocks.ASSIMILATED_DEADLYVENOM,
                 GameUnlocks.ASSIMILATED_STINGING,
                 GameUnlocks.SYNERGY_SUPER_VENOM);
-        assertEquals(20f, ColonyStatsService.getAssimilatedDamageMultiplier(dynasty), 0.0001f);
+        assertEquals(16f, ColonyStatsService.getAssimilatedDamageMultiplier(dynasty), 0.0001f);
     }
 
     @Test

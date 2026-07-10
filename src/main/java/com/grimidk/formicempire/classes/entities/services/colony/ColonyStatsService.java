@@ -5,6 +5,7 @@ import com.grimidk.formicempire.classes.constants.world.Temperature;
 import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastySynergyService;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 
@@ -197,7 +198,8 @@ public class ColonyStatsService {
 
     /**
      * Assimilated damage multiplier for colony base attack.
-     * Fire venom sets 4x; bullet and Maricopa venom add +4 each (additive).
+     * Fire venom sets 4x; Maricopa venom adds +4 (additive).
+     * Stinger abdomen subtype applies per-ant via {@link AntSubtypeService}.
      * {@link GameUnlocks#SYNERGY_SUPER_VENOM} replaces Fire + Maricopa stacking with
      * {@link GameConstants#ASSIMILATED_DAMAGE_SYNERGY_FIRE_DEADLY} (16x).
      */
@@ -205,25 +207,21 @@ public class ColonyStatsService {
         if (dynasty == null) {
             return 1f;
         }
-        boolean fire = dynasty.hasUpgrade(GameUnlocks.ASSIMILATED_FIREVENOM);
-        boolean stinging = dynasty.hasUpgrade(GameUnlocks.ASSIMILATED_STINGING);
-        boolean deadly = dynasty.hasUpgrade(GameUnlocks.ASSIMILATED_DEADLYVENOM);
-        boolean superVenom = dynasty.hasUpgrade(GameUnlocks.SYNERGY_SUPER_VENOM);
+        boolean superVenom = DynastySynergyService.isActive(dynasty, GameUnlocks.SUPER_VENOM_SYNERGY);
 
         float mult;
         if (superVenom) {
             mult = GameConstants.ASSIMILATED_DAMAGE_SYNERGY_FIRE_DEADLY;
         } else {
             mult = 1f;
+            boolean fire = dynasty.hasUpgrade(GameUnlocks.ASSIMILATED_FIREVENOM);
+            boolean deadly = dynasty.hasUpgrade(GameUnlocks.ASSIMILATED_DEADLYVENOM);
             if (fire) {
                 mult = GameConstants.ASSIMILATED_DAMAGE_MULT_FIRE;
             }
             if (deadly) {
                 mult += GameConstants.ASSIMILATED_DAMAGE_ADD_DEADLY;
             }
-        }
-        if (stinging) {
-            mult += GameConstants.ASSIMILATED_DAMAGE_ADD_STING;
         }
         return mult;
     }
