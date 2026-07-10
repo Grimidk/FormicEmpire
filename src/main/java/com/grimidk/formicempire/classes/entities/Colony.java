@@ -71,6 +71,8 @@ public class Colony {
     private final Map<Integer, Integer> outgoingColonyDiplomatMissions = new HashMap<>();
     private final Map<Integer, Integer> incomingColonyDiplomatSupport = new HashMap<>();
     private final Map<Integer, Integer> outgoingDynastyDiplomatMissions = new HashMap<>();
+    private int integrationDiplomatsDeployed;
+    private int nativeSpeciesId;
     private Boolean affordableResearchCached;
     private Building affordableBuildingCached;
     private boolean affordableBuildingCacheValid;
@@ -93,6 +95,7 @@ public class Colony {
 
     private int pheromoneStormMonthsRemaining;
     private int recentlyConqueredMonthsRemaining;
+    private int recentlyIntegratedMonthsRemaining;
     private int creatineDietMonthsRemaining;
 
     // --- Hatch Rate Data ---
@@ -389,7 +392,10 @@ public class Colony {
         this.parasiticMites = savedColony.parasiticMites;
         this.pheromoneStormMonthsRemaining = savedColony.pheromoneStormMonthsRemaining;
         this.recentlyConqueredMonthsRemaining = savedColony.recentlyConqueredMonthsRemaining;
+        this.recentlyIntegratedMonthsRemaining = savedColony.recentlyIntegratedMonthsRemaining;
         this.creatineDietMonthsRemaining = savedColony.creatineDietMonthsRemaining;
+        this.integrationDiplomatsDeployed = savedColony.integrationDiplomatsDeployed;
+        this.nativeSpeciesId = savedColony.nativeSpeciesId;
         for (int i = 0; i < this.parasiteAnts; i++) {
             Bug p = new Bug(GameConstants.TYPE_PARASITE_ANT);
             p.setDimension(WorldSpaces.UNDERWORLD);
@@ -565,6 +571,9 @@ public class Colony {
         if (recentlyConqueredMonthsRemaining > 0) {
             bonus += GameConstants.LOYALTY_MODIFIER_RECENTLY_CONQUERED.getLoyaltyDelta();
         }
+        if (recentlyIntegratedMonthsRemaining > 0) {
+            bonus += GameConstants.LOYALTY_MODIFIER_RECENTLY_INTEGRATED.getLoyaltyDelta();
+        }
         bonus += getMilitaryLoyaltyAdjustment();
         bonus += getDistanceFromCapitalLoyaltyAdjustment(world);
         return bonus;
@@ -645,6 +654,9 @@ public class Colony {
         }
         if (recentlyConqueredMonthsRemaining > 0) {
             appendLoyaltyModifierLine(sb, GameConstants.LOYALTY_MODIFIER_RECENTLY_CONQUERED);
+        }
+        if (recentlyIntegratedMonthsRemaining > 0) {
+            appendLoyaltyModifierLine(sb, GameConstants.LOYALTY_MODIFIER_RECENTLY_INTEGRATED);
         }
         int militaryAdj = getMilitaryLoyaltyAdjustment();
         if (militaryAdj != 0) {
@@ -732,12 +744,37 @@ public class Colony {
         }
     }
 
-    // Delegates to Dynasty
-    public Species getSpecies() { 
-        return dynasty != null ? dynasty.getSpecies() : GameConstants.SPECIES_OMNI; 
+    // Delegates to Dynasty unless this colony keeps a native species after integration.
+    public Species getSpecies() {
+        if (nativeSpeciesId > 0) {
+            Species nativeSpecies = GameConstants.getSpeciesById(nativeSpeciesId);
+            if (nativeSpecies != null) {
+                return nativeSpecies;
+            }
+        }
+        return dynasty != null ? dynasty.getSpecies() : GameConstants.SPECIES_OMNI;
     }
-    public void setSpecies(Species species) { 
-        if (dynasty != null) dynasty.setSpecies(species); 
+
+    public void setSpecies(Species species) {
+        if (dynasty != null) {
+            dynasty.setSpecies(species);
+        }
+    }
+
+    public int getNativeSpeciesId() {
+        return nativeSpeciesId;
+    }
+
+    public void setNativeSpeciesId(int nativeSpeciesId) {
+        this.nativeSpeciesId = Math.max(0, nativeSpeciesId);
+    }
+
+    public int getIntegrationDiplomatsDeployed() {
+        return integrationDiplomatsDeployed;
+    }
+
+    public void setIntegrationDiplomatsDeployed(int integrationDiplomatsDeployed) {
+        this.integrationDiplomatsDeployed = Math.max(0, integrationDiplomatsDeployed);
     }
     
     public int getResearchPoints() { 
@@ -789,6 +826,7 @@ public class Colony {
         for (int count : outgoingDynastyDiplomatMissions.values()) {
             total += count;
         }
+        total += integrationDiplomatsDeployed;
         return total;
     }
 
@@ -1383,6 +1421,18 @@ public class Colony {
         this.recentlyConqueredMonthsRemaining = Math.max(0, months);
     }
 
+    public boolean isRecentlyIntegrated() {
+        return recentlyIntegratedMonthsRemaining > 0;
+    }
+
+    public int getRecentlyIntegratedMonthsRemaining() {
+        return recentlyIntegratedMonthsRemaining;
+    }
+
+    public void setRecentlyIntegratedMonthsRemaining(int months) {
+        this.recentlyIntegratedMonthsRemaining = Math.max(0, months);
+    }
+
     public boolean isCreatineDietActive() {
         return creatineDietMonthsRemaining > 0;
     }
@@ -1433,6 +1483,9 @@ public class Colony {
         }
         if (recentlyConqueredMonthsRemaining > 0) {
             recentlyConqueredMonthsRemaining--;
+        }
+        if (recentlyIntegratedMonthsRemaining > 0) {
+            recentlyIntegratedMonthsRemaining--;
         }
         if (creatineDietMonthsRemaining > 0) {
             creatineDietMonthsRemaining--;

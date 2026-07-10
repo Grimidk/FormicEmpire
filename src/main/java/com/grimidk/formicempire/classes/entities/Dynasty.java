@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.entities;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.awt.Color;
 
 import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
+import com.grimidk.formicempire.classes.constants.misc.DiplomaticReputationModifier;
 import com.grimidk.formicempire.classes.constants.misc.DynastyTitle;
 import com.grimidk.formicempire.classes.constants.misc.Species;
 import com.grimidk.formicempire.classes.constants.misc.GeneticIntegrityModifier;
@@ -70,11 +72,13 @@ public class Dynasty {
     private int activeMilitaryPower;
     private int reserveMilitaryPower;
     private final Map<Integer, Integer> diplomaticReputations;
-    private final Map<Integer, String> diplomaticModifierKeys;
+    private final Map<Integer, Set<String>> diplomaticModifierKeys;
     private final List<Integer> crossDynastyTradeRepGrantedIds;
     private final Set<Integer> pendingPactRequestFromIds;
     private final Set<Integer> pendingWarDeclarationFromIds;
     private final List<PendingNpcWarAlert> pendingNpcWarAlerts;
+    private final List<PendingIntegrationVassalWarAlert> pendingIntegrationVassalWarAlerts;
+    private final List<Integer> pendingIntegrationCompletedTargetIds;
     private final Map<Integer, Integer> pactBrokenAtWorldMonth;
     private final Map<Integer, Integer> pactRequestDeclinedAtWorldMonth;
     private final Map<Integer, Integer> tradeRequestDeclinedAtWorldMonth;
@@ -85,6 +89,9 @@ public class Dynasty {
     private int originDynastyId;
     private int activeRebellionDynastyId;
     private int pendingRebellionResponseFromId;
+    private int integrationTargetDynastyId;
+    private double integrationProgressDays;
+    private boolean integrationDiplomatsManual;
 
     // Services
     private transient DynastyAutomationService automationService;
@@ -129,6 +136,8 @@ public class Dynasty {
         this.pendingPactRequestFromIds = new LinkedHashSet<>();
         this.pendingWarDeclarationFromIds = new LinkedHashSet<>();
         this.pendingNpcWarAlerts = new ArrayList<>();
+        this.pendingIntegrationVassalWarAlerts = new ArrayList<>();
+        this.pendingIntegrationCompletedTargetIds = new ArrayList<>();
         this.pactBrokenAtWorldMonth = new HashMap<>();
         this.pactRequestDeclinedAtWorldMonth = new HashMap<>();
         this.tradeRequestDeclinedAtWorldMonth = new HashMap<>();
@@ -138,6 +147,9 @@ public class Dynasty {
         this.originDynastyId = 0;
         this.activeRebellionDynastyId = 0;
         this.pendingRebellionResponseFromId = 0;
+        this.integrationTargetDynastyId = 0;
+        this.integrationProgressDays = 0;
+        this.integrationDiplomatsManual = false;
         
         initializeColor();
         initializeServices();
@@ -192,6 +204,8 @@ public class Dynasty {
         this.pendingPactRequestFromIds = new LinkedHashSet<>();
         this.pendingWarDeclarationFromIds = new LinkedHashSet<>();
         this.pendingNpcWarAlerts = new ArrayList<>();
+        this.pendingIntegrationVassalWarAlerts = new ArrayList<>();
+        this.pendingIntegrationCompletedTargetIds = new ArrayList<>();
         this.pactBrokenAtWorldMonth = new HashMap<>();
         this.pactRequestDeclinedAtWorldMonth = new HashMap<>();
         this.tradeRequestDeclinedAtWorldMonth = new HashMap<>();
@@ -201,6 +215,9 @@ public class Dynasty {
         this.originDynastyId = 0;
         this.activeRebellionDynastyId = 0;
         this.pendingRebellionResponseFromId = 0;
+        this.integrationTargetDynastyId = savedDynasty.integrationTargetDynastyId;
+        this.integrationProgressDays = savedDynasty.integrationProgressDays;
+        this.integrationDiplomatsManual = savedDynasty.integrationDiplomatsManual;
         
         this.absorbedDynastyIds = new ArrayList<>();
         if (savedDynasty.absorbedDynastyIds != null) {
@@ -253,13 +270,24 @@ public class Dynasty {
             }
         }
 
-        if (savedDynasty.diplomaticModifierKeys != null) {
+        if (savedDynasty.diplomaticModifierKeySets != null) {
+            for (Map.Entry<String, List<String>> entry : savedDynasty.diplomaticModifierKeySets.entrySet()) {
+                try {
+                    int otherDynastyId = Integer.parseInt(entry.getKey());
+                    if (otherDynastyId != this.id && entry.getValue() != null) {
+                        for (String modifierKey : entry.getValue()) {
+                            addDiplomaticModifierKey(otherDynastyId, modifierKey);
+                        }
+                    }
+                } catch (NumberFormatException ignored) {
+                }
+            }
+        } else if (savedDynasty.diplomaticModifierKeys != null) {
             for (Map.Entry<String, String> entry : savedDynasty.diplomaticModifierKeys.entrySet()) {
                 try {
                     int otherDynastyId = Integer.parseInt(entry.getKey());
-                    if (otherDynastyId != this.id && entry.getValue() != null
-                            && GameConstants.getDiplomaticReputationModifierByKey(entry.getValue()) != null) {
-                        diplomaticModifierKeys.put(otherDynastyId, entry.getValue());
+                    if (otherDynastyId != this.id && entry.getValue() != null) {
+                        addDiplomaticModifierKey(otherDynastyId, entry.getValue());
                     }
                 } catch (NumberFormatException ignored) {
                 }
@@ -268,6 +296,9 @@ public class Dynasty {
 
         if (savedDynasty.crossDynastyTradeRepGrantedIds != null) {
             this.crossDynastyTradeRepGrantedIds.addAll(savedDynasty.crossDynastyTradeRepGrantedIds);
+            for (int otherDynastyId : savedDynasty.crossDynastyTradeRepGrantedIds) {
+                addDiplomaticModifierKey(otherDynastyId, GameConstants.DIPLO_MODIFIER_TRADE.getNameKey());
+            }
         }
 
         if (savedDynasty.pendingPactRequestFromIds != null) {
@@ -737,11 +768,61 @@ public class Dynasty {
         return new HashMap<>(diplomaticReputations);
     }
 
+    public Set<String> getDiplomaticModifierKeys(int otherDynastyId) {
+        if (otherDynastyId == id) {
+            return Collections.emptySet();
+        }
+        Set<String> keys = diplomaticModifierKeys.get(otherDynastyId);
+        return keys == null ? Collections.emptySet() : Collections.unmodifiableSet(keys);
+    }
+
     public String getDiplomaticModifierKey(int otherDynastyId) {
         if (otherDynastyId == id) {
             return null;
         }
-        return diplomaticModifierKeys.get(otherDynastyId);
+        Set<String> keys = diplomaticModifierKeys.get(otherDynastyId);
+        if (keys == null || keys.isEmpty()) {
+            return null;
+        }
+        for (String key : keys) {
+            DiplomaticReputationModifier modifier = GameConstants.getDiplomaticReputationModifierByKey(key);
+            if (modifier != null && GameConstants.DIPLO_EXCLUSIVE_PACT.equals(modifier.getExclusiveGroupKey())) {
+                return key;
+            }
+        }
+        return keys.iterator().next();
+    }
+
+    public boolean hasDiplomaticModifierKey(int otherDynastyId, String modifierKey) {
+        if (otherDynastyId == id || modifierKey == null) {
+            return false;
+        }
+        Set<String> keys = diplomaticModifierKeys.get(otherDynastyId);
+        return keys != null && keys.contains(modifierKey);
+    }
+
+    public void addDiplomaticModifierKey(int otherDynastyId, String modifierKey) {
+        if (otherDynastyId == id || modifierKey == null) {
+            return;
+        }
+        if (GameConstants.getDiplomaticReputationModifierByKey(modifierKey) == null) {
+            return;
+        }
+        diplomaticModifierKeys.computeIfAbsent(otherDynastyId, ignored -> new LinkedHashSet<>()).add(modifierKey);
+    }
+
+    public void removeDiplomaticModifierKey(int otherDynastyId, String modifierKey) {
+        if (otherDynastyId == id || modifierKey == null) {
+            return;
+        }
+        Set<String> keys = diplomaticModifierKeys.get(otherDynastyId);
+        if (keys == null) {
+            return;
+        }
+        keys.remove(modifierKey);
+        if (keys.isEmpty()) {
+            diplomaticModifierKeys.remove(otherDynastyId);
+        }
     }
 
     public void setDiplomaticModifierKey(int otherDynastyId, String modifierKey) {
@@ -750,19 +831,37 @@ public class Dynasty {
         }
         if (modifierKey == null) {
             diplomaticModifierKeys.remove(otherDynastyId);
-        } else {
-            diplomaticModifierKeys.put(otherDynastyId, modifierKey);
+            return;
         }
+        DiplomaticReputationModifier modifier = GameConstants.getDiplomaticReputationModifierByKey(modifierKey);
+        if (modifier != null && modifier.getExclusiveGroupKey() != null) {
+            removeExclusiveGroupKeys(otherDynastyId, modifier.getExclusiveGroupKey());
+        }
+        addDiplomaticModifierKey(otherDynastyId, modifierKey);
     }
 
     public void clearDiplomaticModifierKey(int otherDynastyId) {
-        setDiplomaticModifierKey(otherDynastyId, null);
+        diplomaticModifierKeys.remove(otherDynastyId);
     }
 
-    public Map<String, String> copyDiplomaticModifierKeys() {
-        Map<String, String> copy = new HashMap<>();
-        for (Map.Entry<Integer, String> entry : diplomaticModifierKeys.entrySet()) {
-            copy.put(String.valueOf(entry.getKey()), entry.getValue());
+    private void removeExclusiveGroupKeys(int otherDynastyId, String exclusiveGroupKey) {
+        Set<String> keys = diplomaticModifierKeys.get(otherDynastyId);
+        if (keys == null || exclusiveGroupKey == null) {
+            return;
+        }
+        keys.removeIf(key -> {
+            DiplomaticReputationModifier modifier = GameConstants.getDiplomaticReputationModifierByKey(key);
+            return modifier != null && exclusiveGroupKey.equals(modifier.getExclusiveGroupKey());
+        });
+        if (keys.isEmpty()) {
+            diplomaticModifierKeys.remove(otherDynastyId);
+        }
+    }
+
+    public Map<String, List<String>> copyDiplomaticModifierKeySets() {
+        Map<String, List<String>> copy = new HashMap<>();
+        for (Map.Entry<Integer, Set<String>> entry : diplomaticModifierKeys.entrySet()) {
+            copy.put(String.valueOf(entry.getKey()), new ArrayList<>(entry.getValue()));
         }
         return copy;
     }
@@ -800,8 +899,8 @@ public class Dynasty {
     }
 
     public boolean isAtWar() {
-        for (String modifierKey : diplomaticModifierKeys.values()) {
-            if (GameConstants.DIPLO_MODIFIER_WAR.getNameKey().equals(modifierKey)) {
+        for (Set<String> keys : diplomaticModifierKeys.values()) {
+            if (keys.contains(GameConstants.DIPLO_MODIFIER_WAR.getNameKey())) {
                 return true;
             }
         }
@@ -812,13 +911,13 @@ public class Dynasty {
         if (otherDynastyId == id) {
             return false;
         }
-        return GameConstants.DIPLO_MODIFIER_WAR.getNameKey().equals(getDiplomaticModifierKey(otherDynastyId));
+        return hasDiplomaticModifierKey(otherDynastyId, GameConstants.DIPLO_MODIFIER_WAR.getNameKey());
     }
 
     public List<Integer> copyActiveWarDynastyIds() {
         List<Integer> ids = new ArrayList<>();
-        for (Map.Entry<Integer, String> entry : diplomaticModifierKeys.entrySet()) {
-            if (GameConstants.DIPLO_MODIFIER_WAR.getNameKey().equals(entry.getValue())) {
+        for (Map.Entry<Integer, Set<String>> entry : diplomaticModifierKeys.entrySet()) {
+            if (entry.getValue().contains(GameConstants.DIPLO_MODIFIER_WAR.getNameKey())) {
                 ids.add(entry.getKey());
             }
         }
@@ -951,6 +1050,46 @@ public class Dynasty {
         return new ArrayList<>(pendingNpcWarAlerts);
     }
 
+    public static final class PendingIntegrationVassalWarAlert {
+        public final int attackerId;
+        public final int vassalId;
+
+        public PendingIntegrationVassalWarAlert(int attackerId, int vassalId) {
+            this.attackerId = attackerId;
+            this.vassalId = vassalId;
+        }
+    }
+
+    public void addPendingIntegrationVassalWarAlert(int attackerId, int vassalId) {
+        if (attackerId != id && vassalId != id && attackerId != vassalId) {
+            pendingIntegrationVassalWarAlerts.add(new PendingIntegrationVassalWarAlert(attackerId, vassalId));
+        }
+    }
+
+    public void removePendingIntegrationVassalWarAlert(int attackerId, int vassalId) {
+        pendingIntegrationVassalWarAlerts.removeIf(alert ->
+                alert.attackerId == attackerId && alert.vassalId == vassalId);
+    }
+
+    public List<PendingIntegrationVassalWarAlert> copyPendingIntegrationVassalWarAlerts() {
+        return new ArrayList<>(pendingIntegrationVassalWarAlerts);
+    }
+
+    public void addPendingIntegrationCompletedAlert(int targetDynastyId) {
+        if (targetDynastyId != id && targetDynastyId > 0
+                && !pendingIntegrationCompletedTargetIds.contains(targetDynastyId)) {
+            pendingIntegrationCompletedTargetIds.add(targetDynastyId);
+        }
+    }
+
+    public void removePendingIntegrationCompletedAlert(int targetDynastyId) {
+        pendingIntegrationCompletedTargetIds.remove(Integer.valueOf(targetDynastyId));
+    }
+
+    public List<Integer> copyPendingIntegrationCompletedTargetIds() {
+        return new ArrayList<>(pendingIntegrationCompletedTargetIds);
+    }
+
     public void addPendingTradeProposal(CrossDynastyTradeProposal proposal) {
         if (proposal == null || proposal.isEmpty()) {
             return;
@@ -1013,6 +1152,48 @@ public class Dynasty {
 
     public void clearPendingRebellionResponse() {
         this.pendingRebellionResponseFromId = 0;
+    }
+
+    public int getIntegrationTargetDynastyId() {
+        return integrationTargetDynastyId;
+    }
+
+    public void setIntegrationTargetDynastyId(int integrationTargetDynastyId) {
+        this.integrationTargetDynastyId = Math.max(0, integrationTargetDynastyId);
+    }
+
+    public double getIntegrationProgressDays() {
+        return integrationProgressDays;
+    }
+
+    public void setIntegrationProgressDays(double integrationProgressDays) {
+        this.integrationProgressDays = Math.max(0, integrationProgressDays);
+    }
+
+    public void addIntegrationProgressDays(double days) {
+        this.integrationProgressDays = Math.max(0, this.integrationProgressDays + days);
+    }
+
+    public boolean hasActiveIntegration() {
+        return integrationTargetDynastyId > 0;
+    }
+
+    public boolean isIntegratingDynasty(Dynasty target) {
+        return target != null && integrationTargetDynastyId == target.getId();
+    }
+
+    public void clearIntegration() {
+        this.integrationTargetDynastyId = 0;
+        this.integrationProgressDays = 0;
+        this.integrationDiplomatsManual = false;
+    }
+
+    public boolean isIntegrationDiplomatsManual() {
+        return integrationDiplomatsManual;
+    }
+
+    public void setIntegrationDiplomatsManual(boolean integrationDiplomatsManual) {
+        this.integrationDiplomatsManual = integrationDiplomatsManual;
     }
 
     public int getForcedFlightCooldownDays() {
@@ -1251,10 +1432,12 @@ public class Dynasty {
 
     public double getDiplomaticGeneticIntegrityBonus() {
         double bonus = 0.0;
-        for (String modifierKey : diplomaticModifierKeys.values()) {
-            GeneticIntegrityModifier modifier = GameConstants.getGeneticIntegrityModifierForDiplomaticKey(modifierKey);
-            if (modifier != null) {
-                bonus += modifier.getIntegrityDelta();
+        for (Set<String> keys : diplomaticModifierKeys.values()) {
+            for (String modifierKey : keys) {
+                GeneticIntegrityModifier modifier = GameConstants.getGeneticIntegrityModifierForDiplomaticKey(modifierKey);
+                if (modifier != null) {
+                    bonus += modifier.getIntegrityDelta();
+                }
             }
         }
         return bonus;
@@ -1307,13 +1490,15 @@ public class Dynasty {
                     formatGeneticIntegrityDelta(-penalty))).append("<br>");
         }
 
-        for (String modifierKey : diplomaticModifierKeys.values()) {
-            GeneticIntegrityModifier modifier = GameConstants.getGeneticIntegrityModifierForDiplomaticKey(modifierKey);
-            if (modifier != null) {
-                sb.append(LanguageStrings.format(
-                        LanguageStrings.LOYALTY_MODIFIER_LINE,
-                        modifier.getName(),
-                        formatGeneticIntegrityDelta(modifier.getIntegrityDelta()))).append("<br>");
+        for (Set<String> keys : diplomaticModifierKeys.values()) {
+            for (String modifierKey : keys) {
+                GeneticIntegrityModifier modifier = GameConstants.getGeneticIntegrityModifierForDiplomaticKey(modifierKey);
+                if (modifier != null) {
+                    sb.append(LanguageStrings.format(
+                            LanguageStrings.LOYALTY_MODIFIER_LINE,
+                            modifier.getName(),
+                            formatGeneticIntegrityDelta(modifier.getIntegrityDelta()))).append("<br>");
+                }
             }
         }
 

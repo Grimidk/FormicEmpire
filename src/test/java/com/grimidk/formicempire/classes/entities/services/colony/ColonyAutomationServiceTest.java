@@ -1,5 +1,6 @@
 package com.grimidk.formicempire.classes.entities.services.colony;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -62,6 +63,37 @@ class ColonyAutomationServiceTest {
         automationService.runAutomation(colony);
 
         assertTrue(colony.getAssignedRoleCount(GameConstants.ROLE_BORER) >= 1);
+    }
+
+    @Test
+    void satelliteColonyAutomationAssignsRoyalRoleShares() {
+        Colony capital = new Colony(1, "Capital", false);
+        capital.setCapital(true);
+        Colony satellite = new Colony(2, "Satellite", false);
+        dynasty.addColony(capital);
+        dynasty.addColony(satellite);
+        satellite.setDynasty(dynasty);
+        satellite.setAutomationEnabled(true);
+        satellite.setAge(7);
+
+        satellite.unlockUpgrade(GameUnlocks.ROLE_BREEDER);
+        satellite.unlockUpgrade(GameUnlocks.ROLE_DIPLOMAT);
+        satellite.unlockUpgrade(GameUnlocks.ROLE_SKYTRANS);
+        satellite.unlockUpgrade(GameUnlocks.ROLE_RESEARCHER);
+
+        for (int i = 0; i < 10; i++) {
+            satellite.getPrincesses().add(new Ant(satellite, GameConstants.TYPE_PRINCESS));
+            satellite.getQueens().add(new Ant(satellite, GameConstants.TYPE_QUEEN));
+        }
+
+        automationService.runAutomation(satellite);
+
+        assertEquals(3, satellite.getAssignedRoleCount(GameConstants.ROLE_BREEDER));
+        assertEquals(3, satellite.getAssignedRoleCount(GameConstants.ROLE_DIPLOMAT));
+        assertEquals(1, satellite.getAssignedRoleCount(GameConstants.ROLE_SKYTRANS));
+        assertEquals(3, satellite.getAssignedRoleCount(GameConstants.ROLE_ASSISTANT));
+        assertEquals(3, satellite.getAssignedRoleCount(GameConstants.ROLE_RESEARCHER));
+        assertEquals(7, satellite.getAssignedRoleCount(GameConstants.ROLE_LAYER));
     }
 
     @Test

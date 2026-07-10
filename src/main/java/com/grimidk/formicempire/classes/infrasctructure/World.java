@@ -28,6 +28,7 @@ import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryS
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyStarterService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDeathService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyNamingService;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyIntegrationService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyRebellionService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastySynergyService;
 import com.grimidk.formicempire.classes.entities.services.world.WarService;
@@ -996,6 +997,7 @@ public class World {
         }
 
         warService.tickWarProgressDaily();
+        DynastyIntegrationService.tickIntegrationsDaily(this, engine != null ? engine.getTradeManager() : null);
         
         // --- Process Dynasty/Colony Deaths ---
         DYNASTY_DEATH_SERVICE.processDynastyDeaths(this);

@@ -1,5 +1,6 @@
 package com.grimidk.formicempire.classes.entities.services.colony;
 
+import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Dynasty;
@@ -230,6 +231,42 @@ public class ColonyStarterService {
         colony.setDaysWithoutQueen(0);
         colony.setPeaceAssignedRoleCount(GameConstants.ROLE_LAYER,
                 colony.getPeaceAssignedRoleCount(GameConstants.ROLE_LAYER) + 1);
+    }
+
+    /**
+     * Syncs an integrated colony with the overlord dynasty's research, assimilations, and capital infrastructure.
+     */
+    public void inheritIntegratedColonyFromOverlord(Dynasty overlord, Colony colony) {
+        if (overlord == null || colony == null) {
+            return;
+        }
+        Colony capital = overlord.getCapital();
+        if (capital != null) {
+            for (Building building : capital.getUnlockedBuildings()) {
+                if (!colony.hasBuilding(building)) {
+                    colony.unlockBuilding(building);
+                }
+            }
+            colony.setHatchRateWorker(capital.getHatchRateWorker());
+            colony.setHatchRateSoldier(capital.getHatchRateSoldier());
+            colony.setHatchRateMajor(capital.getHatchRateMajor());
+            colony.setHatchRateDrone(capital.getHatchRateDrone());
+            colony.setHatchRatePrincess(capital.getHatchRatePrincess());
+        }
+        if (colony.isAutomationEnabled()) {
+            if (overlord.isDefaultAutomationEnabled() && overlord.hasUpgrade(GameUnlocks.ABILITY_AUTOMATION)) {
+                colony.setAutomationEnabled(true);
+            }
+            if (overlord.isDefaultAutoBuildEnabled() && overlord.hasUpgrade(GameUnlocks.ABILITY_MANAGEMENT)) {
+                colony.setAutoBuildEnabled(true);
+            }
+            if (overlord.isDefaultAutoTunnelsEnabled() && overlord.hasUpgrade(GameUnlocks.ABILITY_AUTO_TUNNELS)) {
+                colony.setAutoTunnelsEnabled(true);
+            }
+            colony.invalidateActiveRoleCountCache();
+            colony.runRoleAssignment(null);
+        }
+        colony.refreshAntStats();
     }
 
     /**

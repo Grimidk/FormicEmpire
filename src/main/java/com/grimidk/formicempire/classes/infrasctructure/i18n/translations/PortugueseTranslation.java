@@ -372,6 +372,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("WAR_ORDINAL_5", "Quinta");
         pt.put("WAR_ORDINAL_N_FMT", "%sª");
         pt.put("WAR_WORLD_MONTH_FMT", "Ano %s, Mês %s");
+        pt.put("WORLD_DATE_FMT", "%s/%s/%s");
         pt.put("WAR_COL_NAME", "Guerra");
         pt.put("WAR_COL_OPPONENT", "Oponente");
         pt.put("WAR_COL_DECLARED_BY", "Declarada por");
@@ -801,6 +802,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("DIPLO_MODIFIER_WAR", "Guerra");
         pt.put("DIPLO_MODIFIER_TRADE", "Rota comercial");
         pt.put("DIPLO_MODIFIER_TRADE_REQUEST", "Pedido comercial");
+        pt.put("DIPLO_MODIFIER_TRADE_OFFER", "Oferta comercial");
         pt.put("DIPLO_MODIFIER_BORDER_FRICTION", "Fricção fronteiriça");
         pt.put("DIPLO_MODIFIER_GRANTED_INDEPENDENCE", "Independência concedida");
         pt.put("DIPLO_MODIFIER_WAS_AT_WAR", "Estiveram em guerra");
@@ -824,6 +826,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("LOYALTY_MODIFIER_CAPITAL", "Capital");
         pt.put("LOYALTY_MODIFIER_PHEROMONE_STORM", "Tempestade de Feromônios");
         pt.put("LOYALTY_MODIFIER_RECENTLY_CONQUERED", "Recém-conquistada");
+        pt.put("LOYALTY_MODIFIER_RECENTLY_INTEGRATED", "Recém-integrada");
         pt.put("LOYALTY_MODIFIER_MILITARY_VS_CAPITAL", "Militar vs capital");
         pt.put("LOYALTY_MODIFIER_DISTANCE_FROM_CAPITAL", "Distância da capital");
         pt.put("LOYALTY_MODIFIER_DISTANCE_LINE", "%s (%s casas): %s");
@@ -843,6 +846,10 @@ public class PortugueseTranslation implements Translation {
         pt.put("DIPLO_WAR_DECLARED_TITLE", "Guerra declarada");
         pt.put("DIPLO_WAR_DECLARED_MSG_FMT", "%s declarou guerra contra a sua dinastia.");
         pt.put("DIPLO_NPC_WAR_ALERT_FMT", "%s declarou guerra contra %s.");
+        pt.put("DIPLO_INTEGRATION_VASSAL_WAR_ALERT_TITLE", "Alvo de integração atacado");
+        pt.put("DIPLO_INTEGRATION_VASSAL_WAR_ALERT_FMT", "%s declarou guerra contra %s, a quem você está integrando. Sua dinastia assumiu a guerra.");
+        pt.put("DIPLO_INTEGRATION_COMPLETED_TITLE", "Integração concluída");
+        pt.put("DIPLO_INTEGRATION_COMPLETED_MSG_FMT", "%s foi totalmente integrada na sua dinastia.");
         pt.put("DIPLO_ERROR_PACT_BLOCKS_WAR", "Quebre o pacto de não agressão antes de declarar guerra.");
         pt.put("DIPLO_ERROR_WAR_COOLDOWN_FMT", "Aguarde mais %s mês(es) após quebrar um pacto antes de declarar guerra.");
         pt.put("DIPLO_ERROR_PACT_DECLINE_COOLDOWN_FMT", "Aguarde mais %s mês(es) após um pacto recusado antes de solicitar novamente.");
@@ -853,6 +860,20 @@ public class PortugueseTranslation implements Translation {
         pt.put("DIPLO_ACTION_TRADE", "Comerciar");
         pt.put("DIPLO_ACTION_REQUEST_TRADE", "Solicitar comércio");
         pt.put("DIPLO_ACTION_SEND_DIPLOMATS", "Enviar diplomatas");
+        pt.put("DIPLO_ACTION_INTEGRATE", "Iniciar integração");
+        pt.put("DIPLO_ACTION_CANCEL_INTEGRATION", "Cancelar integração");
+        pt.put("DIPLO_INTEGRATION_PROGRESS_FMT", "%s%% — %s (%s diplomatas)");
+        pt.put("DIPLO_INTEGRATION_PROGRESS_TOOLTIP_FMT", "Integração: %s%% concluída, conclusão prevista %s, %s diplomatas atribuídos");
+        pt.put("DIPLO_ACTION_MANAGE_INTEGRATION_DIPLOMATS", "Gerir diplomatas de integração");
+        pt.put("DIPLO_INTEGRATION_DIPLOMATS_PROMPT", "Atribua diplomatas à integração (até %s disponíveis na dinastia).");
+        pt.put("DIPLO_INTEGRATION_STANCE", "Integrando");
+        pt.put("DIPLO_INTEGRATION_STARTED_FMT", "A integração de %s começou.");
+        pt.put("DIPLO_INTEGRATION_CANCEL_CONFIRM_FMT", "Cancelar a integração de %s? O progresso será perdido.");
+        pt.put("DIPLO_ERROR_INTEGRATION_ACTIVE", "Só pode haver uma integração de cada vez.");
+        pt.put("DIPLO_ERROR_INTEGRATION_TARGET_BUSY", "Essa dinastia já está a ser integrada.");
+        pt.put("DIPLO_ERROR_INTEGRATION_MILITARY", "Requer pelo menos 5× o poder militar deles.");
+        pt.put("DIPLO_ERROR_INTEGRATION_REPUTATION", "Requer reputação Amigável ou melhor.");
+        pt.put("DIPLO_ERROR_INTEGRATION_DIPLOMATS", "Requer pelo menos um diplomata disponível.");
         pt.put("DIPLO_SEND_DIPLOMATS_TITLE", "Enviar diplomatas");
         pt.put("DIPLO_SEND_DIPLOMATS_PROMPT", "Envie até %s diplomata(s) (%s atribuídas). Cada uma melhora a estabilidade em %s.");
         pt.put("DIPLO_SEND_DIPLOMATS_SUCCESS_DYNASTY", "Enviadas %s diplomata(s). Reputação com %s aumentou em %s.");
@@ -1627,6 +1648,10 @@ public class PortugueseTranslation implements Translation {
         pt.put("LOG_PARASITE_ANT_SPREAD_FMT", "Uma infestação de formigas parasitas se espalhou! %s novas formigas parasitas detectadas.");
         pt.put("LOG_PARASITIC_MITE_SPREAD_FMT", "Ácaros parasitas se espalharam! %s novos ácaros detectados na colônia.");
         pt.put("LOG_DYNASTY_ABSORBED_FMT", "Restos de %s absorvidos!");
+        pt.put("LOG_INTEGRATION_STARTED_FMT", "Começou a integração de %s.");
+        pt.put("LOG_INTEGRATION_COMPLETED_FMT", "%s foi integrada na dinastia.");
+        pt.put("LOG_INTEGRATION_CANCELLED_FMT", "A integração de %s terminou — os requisitos deixaram de ser cumpridos.");
+        pt.put("LOG_INTEGRATION_CANCELLED_PLAYER_FMT", "Integração de %s cancelada.");
         pt.put("LOG_FAILURE_SATELLITE", "Uma colônia satélite não amadureceu por estagnação genética.");
         pt.put("LOG_SATELLITE_AT_FMT", "Nova colônia satélite em (%s, %s)");
         pt.put("LOG_SATELLITES_ESTABLISHED_FMT", "%s satélites estabelecidos.");

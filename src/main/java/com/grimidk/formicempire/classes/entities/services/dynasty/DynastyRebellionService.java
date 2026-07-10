@@ -389,7 +389,7 @@ public final class DynastyRebellionService {
         }
         rebellion.adjustDiplomaticReputation(parent.getId(),
                 GameConstants.DIPLO_MODIFIER_GRANTED_INDEPENDENCE.getReputationDelta());
-        rebellion.setDiplomaticModifierKey(parent.getId(),
+        rebellion.addDiplomaticModifierKey(parent.getId(),
                 GameConstants.DIPLO_MODIFIER_GRANTED_INDEPENDENCE.getNameKey());
         parent.setActiveRebellionDynastyId(0);
 

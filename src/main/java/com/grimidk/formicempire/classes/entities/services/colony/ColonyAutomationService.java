@@ -25,6 +25,10 @@ public class ColonyAutomationService {
     private static final int MIN_FARMERS = 1;
     private static final int WORKER_SURPLUS_FOR_TUNNEL = 5;
     private static final int MIN_COURIERS_FOR_LOGISTICS = 1;
+    private static final double SATELLITE_BREEDER_SHARE = 0.30;
+    private static final double SATELLITE_DIPLOMAT_SHARE = 0.30;
+    private static final double SATELLITE_RESEARCHER_SHARE = 0.30;
+    private static final double SATELLITE_SKYTRANS_SHARE = 0.10;
 
     public void runAutomation(Colony colony) {
         if (!colony.isAutomationEnabled()) return;
@@ -576,6 +580,11 @@ public class ColonyAutomationService {
             return;
         }
 
+        if (!colony.isCapital()) {
+            calculateSatellitePrincessQuotas(colony, targets, totalPrincesses);
+            return;
+        }
+
         int skyTrans = 0;
         if (colony.hasUpgrade(GameUnlocks.ROLE_SKYTRANS)) {
             int couriers = targets.getOrDefault(GameConstants.ROLE_COURIER, 0);
@@ -593,7 +602,29 @@ public class ColonyAutomationService {
         assignAutomatedDiplomatQuotas(colony, targets);
     }
 
+    private void calculateSatellitePrincessQuotas(Colony colony, Map<AntRole, Integer> targets, int totalPrincesses) {
+        int breeders = colony.hasUpgrade(GameUnlocks.ROLE_BREEDER)
+                ? percentOf(totalPrincesses, SATELLITE_BREEDER_SHARE) : 0;
+        int diplomats = colony.hasUpgrade(GameUnlocks.ROLE_DIPLOMAT)
+                ? percentOf(totalPrincesses, SATELLITE_DIPLOMAT_SHARE) : 0;
+        int skyTrans = colony.hasUpgrade(GameUnlocks.ROLE_SKYTRANS)
+                ? percentOf(totalPrincesses, SATELLITE_SKYTRANS_SHARE) : 0;
+        int assistants = Math.max(0, totalPrincesses - breeders - diplomats - skyTrans);
+
+        targets.put(GameConstants.ROLE_BREEDER, breeders);
+        targets.put(GameConstants.ROLE_DIPLOMAT, diplomats);
+        targets.put(GameConstants.ROLE_SKYTRANS, skyTrans);
+        targets.put(GameConstants.ROLE_ASSISTANT, assistants);
+    }
+
+    private static int percentOf(int total, double share) {
+        return (int) Math.round(total * share);
+    }
+
     private void assignAutomatedDiplomatQuotas(Colony colony, Map<AntRole, Integer> targets) {
+        if (!colony.isCapital()) {
+            return;
+        }
         Dynasty dynasty = colony.getDynasty();
         if (dynasty == null || !dynasty.hasUpgrade(GameUnlocks.ABILITY_AUTO_DIPLOMACY)) {
             return;
@@ -612,7 +643,7 @@ public class ColonyAutomationService {
         if (available <= 0) {
             return;
         }
-        int diplomatTarget = colony.isCapital() ? Math.min(2, available) : Math.min(1, available);
+        int diplomatTarget = Math.min(2, available);
         targets.put(GameConstants.ROLE_DIPLOMAT,
                 targets.getOrDefault(GameConstants.ROLE_DIPLOMAT, 0) + diplomatTarget);
     }
@@ -625,7 +656,14 @@ public class ColonyAutomationService {
     private void calculateQueenQuotas(Colony colony, Map<AntRole, Integer> targets) {
         List<Ant> queens = colony.getQueens();
         int totalQueens = queens.size();
-        if (totalQueens == 0) return;
+        if (totalQueens == 0) {
+            return;
+        }
+
+        if (!colony.isCapital()) {
+            calculateSatelliteQueenQuotas(colony, targets, totalQueens);
+            return;
+        }
 
         int waterCapacity = colony.getStatsService().getWaterCapacity(colony);
         int totalAnts = colony.getAntTotal();
@@ -639,6 +677,16 @@ public class ColonyAutomationService {
                 targets.put(GameConstants.ROLE_RESEARCHER, researchers);
                 targets.put(GameConstants.ROLE_LAYER, totalQueens - researchers);
             }
+        } else {
+            targets.put(GameConstants.ROLE_LAYER, totalQueens);
+        }
+    }
+
+    private void calculateSatelliteQueenQuotas(Colony colony, Map<AntRole, Integer> targets, int totalQueens) {
+        if (colony.hasUpgrade(GameUnlocks.ROLE_RESEARCHER)) {
+            int researchers = Math.min(totalQueens, percentOf(totalQueens, SATELLITE_RESEARCHER_SHARE));
+            targets.put(GameConstants.ROLE_RESEARCHER, researchers);
+            targets.put(GameConstants.ROLE_LAYER, totalQueens - researchers);
         } else {
             targets.put(GameConstants.ROLE_LAYER, totalQueens);
         }

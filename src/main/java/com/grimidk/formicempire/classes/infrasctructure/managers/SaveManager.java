@@ -390,7 +390,7 @@ public class SaveManager {
                 for (Map.Entry<Integer, Integer> entry : dynasty.copyDiplomaticReputations().entrySet()) {
                     sc.diplomaticReputations.put(String.valueOf(entry.getKey()), entry.getValue());
                 }
-                sc.diplomaticModifierKeys = dynasty.copyDiplomaticModifierKeys();
+                sc.diplomaticModifierKeySets = dynasty.copyDiplomaticModifierKeySets();
                 sc.crossDynastyTradeRepGrantedIds = dynasty.copyCrossDynastyTradeRepGrantedIds();
                 sc.pendingPactRequestFromIds = dynasty.copyPendingPactRequestFromIds();
                 sc.pendingWarDeclarationFromIds = dynasty.copyPendingWarDeclarationFromIds();
@@ -415,6 +415,9 @@ public class SaveManager {
                 sc.originDynastyId = dynasty.getOriginDynastyId();
                 sc.activeRebellionDynastyId = dynasty.getActiveRebellionDynastyId();
                 sc.pendingRebellionResponseFromId = dynasty.getPendingRebellionResponseFromId();
+                sc.integrationTargetDynastyId = dynasty.getIntegrationTargetDynastyId();
+                sc.integrationProgressDays = dynasty.getIntegrationProgressDays();
+                sc.integrationDiplomatsManual = dynasty.isIntegrationDiplomatsManual();
                 
                 sc.unlockedUpgradeIds = new ArrayList<>();
                 if (dynasty.getUnlockedUpgrades() != null) {
@@ -569,6 +572,9 @@ public class SaveManager {
                     sc.parasiticMites = c.getParasiticMites();
                     sc.pheromoneStormMonthsRemaining = c.getPheromoneStormMonthsRemaining();
                     sc.recentlyConqueredMonthsRemaining = c.getRecentlyConqueredMonthsRemaining();
+                    sc.recentlyIntegratedMonthsRemaining = c.getRecentlyIntegratedMonthsRemaining();
+                    sc.integrationDiplomatsDeployed = c.getIntegrationDiplomatsDeployed();
+                    sc.nativeSpeciesId = c.getNativeSpeciesId();
                     sc.creatineDietMonthsRemaining = c.getCreatineDietMonthsRemaining();
                     sc.totalDeaths = c.getTotalDeaths();
                     sc.militaryPower = c.getMilitaryPower();
@@ -722,7 +728,7 @@ public class SaveManager {
         writeJsonLine(w, "militaryPower", sc.militaryPower, false);
         w.write("      \"diplomatSupportToDynasty\": " + serializeMapToJson(sc.diplomatSupportToDynasty) + ","); w.newLine();
         w.write("      \"diplomaticReputations\": " + serializeMapToJson(sc.diplomaticReputations) + ","); w.newLine();
-        w.write("      \"diplomaticModifierKeys\": " + serializeStringMapToJson(sc.diplomaticModifierKeys) + ","); w.newLine();
+        w.write("      \"diplomaticModifierKeySets\": " + serializeStringListMapToJson(sc.diplomaticModifierKeySets) + ","); w.newLine();
         w.write("      \"crossDynastyTradeRepGrantedIds\": " + serializeListToJson(sc.crossDynastyTradeRepGrantedIds) + ","); w.newLine();
         w.write("      \"pendingPactRequestFromIds\": " + serializeListToJson(sc.pendingPactRequestFromIds) + ","); w.newLine();
         w.write("      \"pendingWarDeclarationFromIds\": " + serializeListToJson(sc.pendingWarDeclarationFromIds) + ","); w.newLine();
@@ -736,6 +742,9 @@ public class SaveManager {
         w.write("      \"originDynastyId\": " + sc.originDynastyId + ","); w.newLine();
         w.write("      \"activeRebellionDynastyId\": " + sc.activeRebellionDynastyId + ","); w.newLine();
         w.write("      \"pendingRebellionResponseFromId\": " + sc.pendingRebellionResponseFromId + ","); w.newLine();
+        w.write("      \"integrationTargetDynastyId\": " + sc.integrationTargetDynastyId + ","); w.newLine();
+        w.write("      \"integrationProgressDays\": " + sc.integrationProgressDays + ","); w.newLine();
+        w.write("      \"integrationDiplomatsManual\": " + sc.integrationDiplomatsManual + ","); w.newLine();
         w.write("      \"unlockedUpgradeIds\": " + serializeListToJson(sc.unlockedUpgradeIds) + ","); w.newLine();
         w.write("      \"absorbedDynastyIds\": " + serializeListToJson(sc.absorbedDynastyIds) + ","); w.newLine();
         w.write("      \"defeatedSpeciesIds\": " + serializeListToJson(sc.defeatedSpeciesIds) + ","); w.newLine();
@@ -802,6 +811,9 @@ public class SaveManager {
         writeJsonLine(w, "parasiticMites", sc.parasiticMites, false);
         writeJsonLine(w, "pheromoneStormMonthsRemaining", sc.pheromoneStormMonthsRemaining, false);
         writeJsonLine(w, "recentlyConqueredMonthsRemaining", sc.recentlyConqueredMonthsRemaining, false);
+        writeJsonLine(w, "recentlyIntegratedMonthsRemaining", sc.recentlyIntegratedMonthsRemaining, false);
+        writeJsonLine(w, "integrationDiplomatsDeployed", sc.integrationDiplomatsDeployed, false);
+        writeJsonLine(w, "nativeSpeciesId", sc.nativeSpeciesId, false);
         writeJsonLine(w, "creatineDietMonthsRemaining", sc.creatineDietMonthsRemaining, false);
         writeJsonLine(w, "totalDeaths", sc.totalDeaths, false);
 
@@ -979,7 +991,10 @@ public class SaveManager {
         sc.militaryPower = Integer.parseInt(map.getOrDefault("militaryPower", "0"));
         sc.diplomatSupportToDynasty = deserializeJsonToMap(map.get("diplomatSupportToDynasty"));
         sc.diplomaticReputations = deserializeJsonToMap(map.get("diplomaticReputations"));
-        sc.diplomaticModifierKeys = deserializeJsonToStringMap(map.get("diplomaticModifierKeys"));
+        sc.diplomaticModifierKeySets = deserializeJsonToStringListMap(map.get("diplomaticModifierKeySets"));
+        if (sc.diplomaticModifierKeySets.isEmpty()) {
+            sc.diplomaticModifierKeys = deserializeJsonToStringMap(map.get("diplomaticModifierKeys"));
+        }
         sc.crossDynastyTradeRepGrantedIds = deserializeJsonToList(map.get("crossDynastyTradeRepGrantedIds"));
         sc.pendingPactRequestFromIds = deserializeJsonToList(map.get("pendingPactRequestFromIds"));
         sc.pendingWarDeclarationFromIds = deserializeJsonToList(map.get("pendingWarDeclarationFromIds"));
@@ -993,6 +1008,14 @@ public class SaveManager {
         sc.originDynastyId = Integer.parseInt(map.getOrDefault("originDynastyId", "0"));
         sc.activeRebellionDynastyId = Integer.parseInt(map.getOrDefault("activeRebellionDynastyId", "0"));
         sc.pendingRebellionResponseFromId = Integer.parseInt(map.getOrDefault("pendingRebellionResponseFromId", "0"));
+        sc.integrationTargetDynastyId = Integer.parseInt(map.getOrDefault("integrationTargetDynastyId", "0"));
+        if (map.containsKey("integrationProgressDays")) {
+            sc.integrationProgressDays = Double.parseDouble(map.getOrDefault("integrationProgressDays", "0"));
+        } else {
+            sc.integrationProgressMonths = Double.parseDouble(map.getOrDefault("integrationProgressMonths", "0"));
+            sc.integrationProgressDays = sc.integrationProgressMonths * GameConstants.DAYS_PER_MONTH;
+        }
+        sc.integrationDiplomatsManual = Boolean.parseBoolean(map.getOrDefault("integrationDiplomatsManual", "false"));
         sc.unlockedUpgradeIds = deserializeJsonToList(map.get("unlockedUpgradeIds"));
         sc.absorbedDynastyIds = deserializeJsonToList(map.get("absorbedDynastyIds"));
         sc.defeatedSpeciesIds = deserializeJsonToList(map.get("defeatedSpeciesIds"));
@@ -1085,6 +1108,11 @@ public class SaveManager {
         sc.pheromoneStormMonthsRemaining = Integer.parseInt(map.getOrDefault("pheromoneStormMonthsRemaining", "0"));
         sc.recentlyConqueredMonthsRemaining = Integer.parseInt(
                 map.getOrDefault("recentlyConqueredMonthsRemaining", "0"));
+        sc.recentlyIntegratedMonthsRemaining = Integer.parseInt(
+                map.getOrDefault("recentlyIntegratedMonthsRemaining", "0"));
+        sc.integrationDiplomatsDeployed = Integer.parseInt(
+                map.getOrDefault("integrationDiplomatsDeployed", "0"));
+        sc.nativeSpeciesId = Integer.parseInt(map.getOrDefault("nativeSpeciesId", "0"));
         sc.creatineDietMonthsRemaining = Integer.parseInt(map.getOrDefault("creatineDietMonthsRemaining", "0"));
         sc.totalDeaths = Integer.parseInt(map.getOrDefault("totalDeaths", "0"));
         
@@ -1136,6 +1164,56 @@ public class SaveManager {
         }
         sb.append("}");
         return sb.toString();
+    }
+
+    private String serializeStringListMapToJson(Map<String, List<String>> map) {
+        if (map == null || map.isEmpty()) {
+            return "{}";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("{");
+        int i = 0;
+        for (Map.Entry<String, List<String>> entry : map.entrySet()) {
+            sb.append("\"");
+            sb.append(escapeJsonString(entry.getKey()));
+            sb.append("\":[");
+            List<String> values = entry.getValue();
+            for (int j = 0; j < values.size(); j++) {
+                sb.append("\"").append(escapeJsonString(values.get(j))).append("\"");
+                if (j < values.size() - 1) {
+                    sb.append(",");
+                }
+            }
+            sb.append("]");
+            if (i < map.size() - 1) {
+                sb.append(",");
+            }
+            i++;
+        }
+        sb.append("}");
+        return sb.toString();
+    }
+
+    private Map<String, List<String>> deserializeJsonToStringListMap(String json) {
+        Map<String, List<String>> map = new HashMap<>();
+        if (json == null || json.length() <= 2) {
+            return map;
+        }
+        Pattern entryPattern = Pattern.compile("\"([^\"]*)\":\\[([^\\]]*)]");
+        Matcher matcher = entryPattern.matcher(json);
+        while (matcher.find()) {
+            String dynastyId = unescapeJsonString(matcher.group(1));
+            String listBody = matcher.group(2).trim();
+            List<String> keys = new ArrayList<>();
+            if (!listBody.isEmpty()) {
+                Matcher keyMatcher = Pattern.compile("\"([^\"]*)\"").matcher(listBody);
+                while (keyMatcher.find()) {
+                    keys.add(unescapeJsonString(keyMatcher.group(1)));
+                }
+            }
+            map.put(dynastyId, keys);
+        }
+        return map;
     }
 
     private String serializeStringMapToJson(Map<String, String> map) {

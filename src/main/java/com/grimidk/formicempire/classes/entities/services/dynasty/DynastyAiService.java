@@ -37,6 +37,7 @@ public class DynastyAiService {
         runDiplomaticMissions(dynasty, world, tradeManager);
         runWarConsideration(dynasty, world, tradeManager);
         runCrossDynastyTrade(dynasty, world, tradeManager);
+        runIntegrationAttempts(dynasty, world, tradeManager);
         runAbilities(dynasty, world);
     }
 
@@ -325,6 +326,18 @@ public class DynastyAiService {
             return false;
         }
         return colony.getMushroomsPrecise() / mushroomCap < GameConstants.AI_CREATINE_FOOD_STRESS_RATIO;
+    }
+
+    private void runIntegrationAttempts(Dynasty dynasty, World world, TradeManager tradeManager) {
+        if (dynasty == null || dynasty.isPlayer() || dynasty.hasActiveIntegration()) {
+            return;
+        }
+        for (Dynasty other : DynastyIntegrationService.listIntegrationCandidates(dynasty, world)) {
+            if (DynastyIntegrationService.canStartIntegration(dynasty, other, world, tradeManager)) {
+                DynastyIntegrationService.startIntegration(world, dynasty, other, tradeManager);
+                return;
+            }
+        }
     }
 
     private static void logDynastyEvent(Dynasty dynasty, String message) {

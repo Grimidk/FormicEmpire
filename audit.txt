@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 69% (174/253 checked)
+Completion: 67% (174/261 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -315,7 +315,14 @@ Per foreign dynasty Actions menu:
 [X] Send diplomats to dynasty
 [x] Reputation / stance icons and tooltips
 [ ] Was at War reputation modifier after peace treaty (lasts 1 year)
-[ ] Cooldowns after pact break block war
+[X] Cooldowns after pact break block war
+[X] Begin integration (5× military, Friendly+, pact, border, diplomats)
+[X] Integration progress advances daily; ETA shows completion date
+[X] Manage integration diplomats (assign count; shown on progress bar)
+[X] Cancel integration (player overlord only)
+[ ] War on integration target redirects to overlord (vassal attack popup)
+[ ] Integration complete popup when annexation finishes
+[ ] Integrated colonies keep species; gain Recently Integrated loyalty (+25)
 
 ================================================================================
 18. DYNASTY — WARS (F)

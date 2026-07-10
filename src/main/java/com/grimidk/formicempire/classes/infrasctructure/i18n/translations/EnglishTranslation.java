@@ -372,6 +372,7 @@ public class EnglishTranslation implements Translation {
         en.put("WAR_ORDINAL_5", "Fifth");
         en.put("WAR_ORDINAL_N_FMT", "%s");
         en.put("WAR_WORLD_MONTH_FMT", "Year %s, Month %s");
+        en.put("WORLD_DATE_FMT", "%s/%s/%s");
         en.put("WAR_COL_NAME", "War");
         en.put("WAR_COL_OPPONENT", "Opponent");
         en.put("WAR_COL_DECLARED_BY", "Declared by");
@@ -801,6 +802,7 @@ public class EnglishTranslation implements Translation {
         en.put("DIPLO_MODIFIER_WAR", "War");
         en.put("DIPLO_MODIFIER_TRADE", "Trade Route");
         en.put("DIPLO_MODIFIER_TRADE_REQUEST", "Trade Request");
+        en.put("DIPLO_MODIFIER_TRADE_OFFER", "Trade Offer");
         en.put("DIPLO_MODIFIER_BORDER_FRICTION", "Border Friction");
         en.put("DIPLO_MODIFIER_GRANTED_INDEPENDENCE", "Granted Independence");
         en.put("DIPLO_MODIFIER_WAS_AT_WAR", "Was at War");
@@ -824,6 +826,7 @@ public class EnglishTranslation implements Translation {
         en.put("LOYALTY_MODIFIER_CAPITAL", "Capital");
         en.put("LOYALTY_MODIFIER_PHEROMONE_STORM", "Pheromone Storm");
         en.put("LOYALTY_MODIFIER_RECENTLY_CONQUERED", "Recently Conquered");
+        en.put("LOYALTY_MODIFIER_RECENTLY_INTEGRATED", "Recently Integrated");
         en.put("LOYALTY_MODIFIER_MILITARY_VS_CAPITAL", "Military vs Capital");
         en.put("LOYALTY_MODIFIER_DISTANCE_FROM_CAPITAL", "Distance from Capital");
         en.put("LOYALTY_MODIFIER_DISTANCE_LINE", "%s (%s tiles): %s");
@@ -843,6 +846,10 @@ public class EnglishTranslation implements Translation {
         en.put("DIPLO_WAR_DECLARED_TITLE", "War Declared");
         en.put("DIPLO_WAR_DECLARED_MSG_FMT", "%s has declared war on your dynasty.");
         en.put("DIPLO_NPC_WAR_ALERT_FMT", "%s has declared war on %s.");
+        en.put("DIPLO_INTEGRATION_VASSAL_WAR_ALERT_TITLE", "Integration Target Attacked");
+        en.put("DIPLO_INTEGRATION_VASSAL_WAR_ALERT_FMT", "%s has declared war on %s, whom you are integrating. Your dynasty has taken over the war.");
+        en.put("DIPLO_INTEGRATION_COMPLETED_TITLE", "Integration Complete");
+        en.put("DIPLO_INTEGRATION_COMPLETED_MSG_FMT", "%s has been fully integrated into your dynasty.");
         en.put("DIPLO_ERROR_PACT_BLOCKS_WAR", "Break the non-aggression pact before declaring war.");
         en.put("DIPLO_ERROR_WAR_COOLDOWN_FMT", "You must wait %s more month(s) after breaking a pact before declaring war.");
         en.put("DIPLO_ERROR_PACT_DECLINE_COOLDOWN_FMT", "You must wait %s more month(s) after a declined pact request before asking again.");
@@ -853,6 +860,20 @@ public class EnglishTranslation implements Translation {
         en.put("DIPLO_ACTION_TRADE", "Trade");
         en.put("DIPLO_ACTION_REQUEST_TRADE", "Request Trade");
         en.put("DIPLO_ACTION_SEND_DIPLOMATS", "Send Diplomats");
+        en.put("DIPLO_ACTION_INTEGRATE", "Begin Integration");
+        en.put("DIPLO_ACTION_CANCEL_INTEGRATION", "Cancel Integration");
+        en.put("DIPLO_INTEGRATION_PROGRESS_FMT", "%s%% — %s (%s diplomats)");
+        en.put("DIPLO_INTEGRATION_PROGRESS_TOOLTIP_FMT", "Integration: %s%% complete, ETA %s, %s diplomats assigned");
+        en.put("DIPLO_ACTION_MANAGE_INTEGRATION_DIPLOMATS", "Manage Integration Diplomats");
+        en.put("DIPLO_INTEGRATION_DIPLOMATS_PROMPT", "Assign diplomats to integration (up to %s available across the dynasty).");
+        en.put("DIPLO_INTEGRATION_STANCE", "Integrating");
+        en.put("DIPLO_INTEGRATION_STARTED_FMT", "Integration of %s has begun.");
+        en.put("DIPLO_INTEGRATION_CANCEL_CONFIRM_FMT", "Cancel integration of %s? Progress will be lost.");
+        en.put("DIPLO_ERROR_INTEGRATION_ACTIVE", "Only one integration can run at a time.");
+        en.put("DIPLO_ERROR_INTEGRATION_TARGET_BUSY", "That dynasty is already being integrated.");
+        en.put("DIPLO_ERROR_INTEGRATION_MILITARY", "Requires at least 5× their military power.");
+        en.put("DIPLO_ERROR_INTEGRATION_REPUTATION", "Requires Friendly reputation or better.");
+        en.put("DIPLO_ERROR_INTEGRATION_DIPLOMATS", "Requires at least one available diplomat.");
         en.put("DIPLO_SEND_DIPLOMATS_TITLE", "Send Diplomats");
         en.put("DIPLO_SEND_DIPLOMATS_PROMPT", "Send up to %s diplomat(s) (%s assigned). Each improves stability by %s.");
         en.put("DIPLO_SEND_DIPLOMATS_SUCCESS_DYNASTY", "Sent %s diplomat(s). Reputation with %s increased by %s.");
@@ -1587,6 +1608,10 @@ public class EnglishTranslation implements Translation {
         en.put("LOG_PARASITE_ANT_SPREAD_FMT", "A parasite ant infestation has spread! %s new parasite ants detected.");
         en.put("LOG_PARASITIC_MITE_SPREAD_FMT", "Parasitic mites have spread! %s new mites detected on the colony.");
         en.put("LOG_DYNASTY_ABSORBED_FMT", "Absorbed the remnants of %s!");
+        en.put("LOG_INTEGRATION_STARTED_FMT", "Began integrating %s.");
+        en.put("LOG_INTEGRATION_COMPLETED_FMT", "Integrated %s into the dynasty.");
+        en.put("LOG_INTEGRATION_CANCELLED_FMT", "Integration of %s ended — requirements were no longer met.");
+        en.put("LOG_INTEGRATION_CANCELLED_PLAYER_FMT", "Cancelled integration of %s.");
         en.put("LOG_FAILURE_SATELLITE", "A satellite colony failed to mature due to genetic stagnation.");
         en.put("LOG_SATELLITE_AT_FMT", "Established new satellite colony at (%s, %s)");
         en.put("LOG_SATELLITES_ESTABLISHED_FMT", "%s satellites established.");

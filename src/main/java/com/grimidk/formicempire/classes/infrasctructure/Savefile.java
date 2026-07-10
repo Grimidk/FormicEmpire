@@ -101,7 +101,9 @@ public class Savefile implements Serializable {
         public int militaryPower;
         public Map<String, Integer> deathStatistics = new HashMap<>();
         public Map<String, Integer> diplomaticReputations = new HashMap<>();
+        /** @deprecated legacy single-key saves; use diplomaticModifierKeySets */
         public Map<String, String> diplomaticModifierKeys = new HashMap<>();
+        public Map<String, List<String>> diplomaticModifierKeySets = new HashMap<>();
         public List<Integer> crossDynastyTradeRepGrantedIds = new ArrayList<>();
         public List<Integer> pendingPactRequestFromIds = new ArrayList<>();
         public List<Integer> pendingWarDeclarationFromIds = new ArrayList<>();
@@ -116,6 +118,11 @@ public class Savefile implements Serializable {
         public int originDynastyId;
         public int activeRebellionDynastyId;
         public int pendingRebellionResponseFromId;
+        public int integrationTargetDynastyId;
+        public double integrationProgressDays;
+        /** @deprecated legacy saves; migrated to integrationProgressDays on load */
+        public double integrationProgressMonths;
+        public boolean integrationDiplomatsManual;
     }
 
     public static class SavedCrossDynastyTradeProposal implements Serializable {
@@ -156,6 +163,9 @@ public class Savefile implements Serializable {
         public int aphids, symbioticMites, dermestids, parasiteAnts, parasiticMites;
         public int pheromoneStormMonthsRemaining;
         public int recentlyConqueredMonthsRemaining;
+        public int recentlyIntegratedMonthsRemaining;
+        public int integrationDiplomatsDeployed;
+        public int nativeSpeciesId;
         public int creatineDietMonthsRemaining;
         public int totalDeaths;
         public int loyalty = GameConstants.DEFAULT_COLONY_LOYALTY;

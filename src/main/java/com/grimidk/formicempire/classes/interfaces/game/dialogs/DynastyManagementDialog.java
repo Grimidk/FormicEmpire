@@ -16,8 +16,10 @@ import com.grimidk.formicempire.classes.entities.War;
 import com.grimidk.formicempire.classes.entities.CrossDynastyTradeProposal;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyTradeAutomation;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDiplomacyService;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyIntegrationService;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
+import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.styles.UiTableStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiDialogUtils;
@@ -1555,7 +1557,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                         return Species.class;
                     }
                     if (columnIndex == COL_STANCE) {
-                        return DiplomaticReputation.class;
+                        return Object.class;
                     }
                     if (columnIndex == COL_MILITARY) {
                         return Integer.class;
@@ -1591,8 +1593,23 @@ public class DynastyManagementDialog extends ZeroDialog {
                     int col = table.columnAtPoint(e.getPoint());
                     if (row >= 0 && row < displayedDynasties.size()
                             && (col == COL_REPUTATION || col == COL_STANCE)) {
-                        World world = engine.getWorld();
                         Dynasty other = displayedDynasties.get(row);
+                        World world = engine.getWorld();
+                        if (dynasty.isIntegratingDynasty(other)) {
+                            int pct = (int) Math.round(
+                                    DynastyIntegrationService.getIntegrationProgressPercent(dynasty, other));
+                            String completionDate = world != null
+                                    ? DynastyIntegrationService.getIntegrationEstimatedCompletionDate(
+                                            world, dynasty, other)
+                                    : "";
+                            int diplomats = DynastyIntegrationService.countIntegrationDiplomats(dynasty);
+                            table.setToolTipText(LanguageStrings.format(
+                                    LanguageStrings.DIPLO_INTEGRATION_PROGRESS_TOOLTIP_FMT,
+                                    AssetStyles.formatNumber(pct),
+                                    completionDate,
+                                    AssetStyles.formatNumber(diplomats)));
+                            return;
+                        }
                         if (world != null && dynasty.getDiplomacyService() != null) {
                             table.setToolTipText(
                                     dynasty.getDiplomacyService().buildReputationModifierTooltip(other, world));
@@ -1625,24 +1642,58 @@ public class DynastyManagementDialog extends ZeroDialog {
             }
         }
 
-        private class ReputationScoreRenderer extends DefaultTableCellRenderer {
+        private class ReputationScoreRenderer extends JPanel implements TableCellRenderer {
+            private final JLabel scoreLabel = new JLabel();
+            private final JProgressBar progressBar = new JProgressBar(0, 100);
+
+            ReputationScoreRenderer() {
+                setLayout(new BorderLayout());
+                scoreLabel.setHorizontalAlignment(JLabel.CENTER);
+                progressBar.setStringPainted(true);
+                AssetStyles.styleProgressBar(progressBar);
+            }
+
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
                     boolean hasFocus, int row, int column) {
-                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                setHorizontalAlignment(JLabel.CENTER);
+                setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
+                removeAll();
+                if (row >= 0 && row < displayedDynasties.size()) {
+                    Dynasty other = displayedDynasties.get(row);
+                    if (dynasty.isIntegratingDynasty(other)) {
+                        World world = engine.getWorld();
+                        int pct = (int) Math.round(DynastyIntegrationService.getIntegrationProgressPercent(dynasty, other));
+                        String completionDate = world != null
+                                ? DynastyIntegrationService.getIntegrationEstimatedCompletionDate(world, dynasty, other)
+                                : "";
+                        int diplomats = DynastyIntegrationService.countIntegrationDiplomats(dynasty);
+                        progressBar.setValue(pct);
+                        progressBar.setString(LanguageStrings.format(
+                                LanguageStrings.DIPLO_INTEGRATION_PROGRESS_FMT,
+                                AssetStyles.formatNumber(pct),
+                                completionDate,
+                                AssetStyles.formatNumber(diplomats)));
+                        add(progressBar, BorderLayout.CENTER);
+                        return this;
+                    }
+                }
+                scoreLabel.setForeground(isSelected ? table.getSelectionForeground() : table.getForeground());
+                scoreLabel.setBackground(getBackground());
+                scoreLabel.setOpaque(true);
                 if (row >= 0 && row < displayedDynasties.size()) {
                     World world = engine.getWorld();
                     Dynasty other = displayedDynasties.get(row);
                     int score = world != null && dynasty.getDiplomacyService() != null
                             ? dynasty.getDiplomacyService().getEffectiveDiplomaticReputation(other, world)
                             : 0;
-                    setText(String.valueOf(score));
-                    setIcon(GameConstants.ICON_STAT_REPUTATION);
-                    setIconTextGap(6);
+                    scoreLabel.setText(String.valueOf(score));
+                    scoreLabel.setIcon(GameConstants.ICON_STAT_REPUTATION);
+                    scoreLabel.setIconTextGap(6);
                 } else {
-                    setIcon(null);
+                    scoreLabel.setText(value != null ? String.valueOf(value) : "");
+                    scoreLabel.setIcon(null);
                 }
+                add(scoreLabel, BorderLayout.CENTER);
                 return this;
             }
         }
@@ -1683,11 +1734,14 @@ public class DynastyManagementDialog extends ZeroDialog {
             for (Dynasty other : displayedDynasties) {
                 int score = dynasty.getDiplomacyService().getEffectiveDiplomaticReputation(other, world);
                 DiplomaticReputation stance = GameConstants.getDiplomaticReputationLevel(score);
+                Object stanceValue = dynasty.isIntegratingDynasty(other)
+                        ? LanguageStrings.get(LanguageStrings.DIPLO_INTEGRATION_STANCE)
+                        : stance;
                 model.addRow(new Object[]{
                         other.getName(),
                         other.getSpecies(),
                         String.valueOf(score),
-                        stance,
+                        stanceValue,
                         other.getMilitaryPower(),
                         new DiplomacyRowData(other)
                 });
@@ -1737,6 +1791,89 @@ public class DynastyManagementDialog extends ZeroDialog {
                         LanguageStrings.get(LanguageStrings.DIPLO_ACTION_FORM_PACT),
                         JOptionPane.WARNING_MESSAGE);
             }
+            updateData();
+        }
+
+        private void performIntegrateAction(Dynasty other) {
+            World world = engine.getWorld();
+            if (other == null || world == null) {
+                return;
+            }
+            TradeManager tradeManager = engine.getTradeManager();
+            if (DynastyIntegrationService.startIntegration(world, dynasty, other, tradeManager)) {
+                UiOptionPane.showMessageDialog(this,
+                        LanguageStrings.format(LanguageStrings.DIPLO_INTEGRATION_STARTED_FMT, other.getName()),
+                        LanguageStrings.get(LanguageStrings.DIPLO_ACTION_INTEGRATE),
+                        JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                String message = resolveIntegrationErrorMessage(other, world, tradeManager);
+                UiOptionPane.showMessageDialog(this, message,
+                        LanguageStrings.get(LanguageStrings.DIPLO_ACTION_INTEGRATE),
+                        JOptionPane.WARNING_MESSAGE);
+            }
+            updateData();
+        }
+
+        private String resolveIntegrationErrorMessage(Dynasty other, World world, TradeManager tradeManager) {
+            if (dynasty.hasActiveIntegration() && !dynasty.isIntegratingDynasty(other)) {
+                return LanguageStrings.get(LanguageStrings.DIPLO_ERROR_INTEGRATION_ACTIVE);
+            }
+            if (DynastyIntegrationService.findIntegrationOverlord(world, other.getId()) != null) {
+                return LanguageStrings.get(LanguageStrings.DIPLO_ERROR_INTEGRATION_TARGET_BUSY);
+            }
+            DynastyDiplomacyService diplo = dynasty.getDiplomacyService();
+            if (diplo == null || !diplo.hasNonAggressionPact(other) || !diplo.sharesBorderWith(other, world)) {
+                return LanguageStrings.get(LanguageStrings.DIPLO_ERROR_NO_BORDER);
+            }
+            if (!DynastyIntegrationService.meetsMilitaryRequirement(dynasty, other)) {
+                return LanguageStrings.get(LanguageStrings.DIPLO_ERROR_INTEGRATION_MILITARY);
+            }
+            if (!DynastyIntegrationService.meetsReputationRequirement(dynasty, other, world)) {
+                return LanguageStrings.get(LanguageStrings.DIPLO_ERROR_INTEGRATION_REPUTATION);
+            }
+            if (DynastyIntegrationService.countTotalAvailableDiplomats(dynasty, world, engine.getTradeManager())
+                    < GameConstants.INTEGRATION_MIN_DIPLOMATS) {
+                return LanguageStrings.get(LanguageStrings.DIPLO_ERROR_INTEGRATION_DIPLOMATS);
+            }
+            return LanguageStrings.get(LanguageStrings.DIPLO_ERROR_INTEGRATION_ACTIVE);
+        }
+
+        private void performCancelIntegrationAction(Dynasty other) {
+            if (other == null || !dynasty.isIntegratingDynasty(other)) {
+                return;
+            }
+            int confirm = UiOptionPane.showConfirmDialog(this,
+                    LanguageStrings.format(LanguageStrings.DIPLO_INTEGRATION_CANCEL_CONFIRM_FMT, other.getName()),
+                    LanguageStrings.get(LanguageStrings.DIPLO_ACTION_CANCEL_INTEGRATION),
+                    JOptionPane.YES_NO_OPTION);
+            if (confirm != JOptionPane.YES_OPTION) {
+                return;
+            }
+            DynastyIntegrationService.cancelIntegration(
+                    engine.getWorld(), dynasty, engine.getTradeManager(), true);
+            updateData();
+        }
+
+        private void performManageIntegrationDiplomatsAction(Dynasty other) {
+            if (other == null || !dynasty.isIntegratingDynasty(other)) {
+                return;
+            }
+            int max = DynastyIntegrationService.countMaxAssignableIntegrationDiplomats(
+                    dynasty, engine.getWorld(), engine.getTradeManager());
+            if (max < GameConstants.INTEGRATION_MIN_DIPLOMATS) {
+                UiOptionPane.showMessageDialog(this,
+                        LanguageStrings.get(LanguageStrings.DIPLO_ERROR_INTEGRATION_DIPLOMATS),
+                        LanguageStrings.get(LanguageStrings.DIPLO_ACTION_MANAGE_INTEGRATION_DIPLOMATS),
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            int current = DynastyIntegrationService.countIntegrationDiplomats(dynasty);
+            int count = promptIntegrationDiplomatCount(this, max, current);
+            if (count < GameConstants.INTEGRATION_MIN_DIPLOMATS) {
+                return;
+            }
+            DynastyIntegrationService.assignIntegrationDiplomats(
+                    dynasty, count, true, engine.getWorld(), engine.getTradeManager());
             updateData();
         }
 
@@ -1996,6 +2133,38 @@ public class DynastyManagementDialog extends ZeroDialog {
             AssetStyles.styleMenuItem(pactItem);
             menu.add(pactItem);
 
+            if (dynasty.isIntegratingDynasty(other)) {
+                JMenuItem cancelIntegrationItem = new JMenuItem(
+                        LanguageStrings.get(LanguageStrings.DIPLO_ACTION_CANCEL_INTEGRATION));
+                cancelIntegrationItem.addActionListener(e -> performCancelIntegrationAction(other));
+                AssetStyles.styleMenuItem(cancelIntegrationItem);
+                menu.add(cancelIntegrationItem);
+
+                JMenuItem manageDiplomatsItem = new JMenuItem(
+                        LanguageStrings.get(LanguageStrings.DIPLO_ACTION_MANAGE_INTEGRATION_DIPLOMATS));
+                int maxDiplomats = DynastyIntegrationService.countMaxAssignableIntegrationDiplomats(
+                        dynasty, world, engine.getTradeManager());
+                if (maxDiplomats >= GameConstants.INTEGRATION_MIN_DIPLOMATS) {
+                    manageDiplomatsItem.addActionListener(e -> performManageIntegrationDiplomatsAction(other));
+                } else {
+                    manageDiplomatsItem.setEnabled(false);
+                    manageDiplomatsItem.setToolTipText(
+                            LanguageStrings.get(LanguageStrings.DIPLO_ERROR_INTEGRATION_DIPLOMATS));
+                }
+                AssetStyles.styleMenuItem(manageDiplomatsItem);
+                menu.add(manageDiplomatsItem);
+            } else if (!diplo.isAtWarWith(other)) {
+                JMenuItem integrateItem = new JMenuItem(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_INTEGRATE));
+                if (DynastyIntegrationService.canStartIntegration(dynasty, other, world, engine.getTradeManager())) {
+                    integrateItem.addActionListener(e -> performIntegrateAction(other));
+                } else {
+                    integrateItem.setEnabled(false);
+                    integrateItem.setToolTipText(resolveIntegrationErrorMessage(other, world, engine.getTradeManager()));
+                }
+                AssetStyles.styleMenuItem(integrateItem);
+                menu.add(integrateItem);
+            }
+
             if (!diplo.isAtWarWith(other)) {
                 JMenuItem warItem = new JMenuItem(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_DECLARE_WAR));
                 if (diplo.canDeclareWar(other, world)) {
@@ -2127,6 +2296,9 @@ public class DynastyManagementDialog extends ZeroDialog {
                 setText(reputation.getName());
                 setIcon(reputation.getIcon());
                 setIconTextGap(8);
+            } else if (value instanceof String stanceText) {
+                setText(stanceText);
+                setIcon(null);
             } else {
                 setText(LanguageStrings.get(LanguageStrings.WORLD_NA));
                 setIcon(null);
@@ -2772,6 +2944,32 @@ public class DynastyManagementDialog extends ZeroDialog {
                     JOptionPane.INFORMATION_MESSAGE);
             refreshDialog();
         }
+    }
+
+    private int promptIntegrationDiplomatCount(Component parent, int maxCount, int current) {
+        if (maxCount < GameConstants.INTEGRATION_MIN_DIPLOMATS) {
+            return -1;
+        }
+        String prompt = LanguageStrings.format(
+                LanguageStrings.DIPLO_INTEGRATION_DIPLOMATS_PROMPT,
+                AssetStyles.formatNumber(maxCount));
+        int initial = Math.max(GameConstants.INTEGRATION_MIN_DIPLOMATS, Math.min(current, maxCount));
+        SpinnerNumberModel model = new SpinnerNumberModel(
+                initial, GameConstants.INTEGRATION_MIN_DIPLOMATS, maxCount, 1);
+        JSpinner spinner = new JSpinner(model);
+        AssetStyles.styleSpinner(spinner);
+        JPanel panel = new JPanel(new BorderLayout(8, 8));
+        JLabel label = new JLabel(prompt);
+        label.setFont(AssetStyles.FONT_NORMAL);
+        panel.add(label, BorderLayout.NORTH);
+        panel.add(spinner, BorderLayout.CENTER);
+        int result = UiOptionPane.showConfirmDialog(parent, panel,
+                LanguageStrings.get(LanguageStrings.DIPLO_ACTION_MANAGE_INTEGRATION_DIPLOMATS),
+                JOptionPane.OK_CANCEL_OPTION);
+        if (result != JOptionPane.OK_OPTION) {
+            return -1;
+        }
+        return ((Number) spinner.getValue()).intValue();
     }
 
     private int promptDiplomatCount(Component parent, int assigned, int maxCount, int gainPerDiplomat) {

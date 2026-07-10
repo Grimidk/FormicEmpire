@@ -187,9 +187,10 @@ class DynastyRebellionServiceTest {
         DynastyRebellionService.grantIndependence(world, parent, rebellion);
 
         assertTrue(parent.getDiplomacyService().hasNonAggressionPact(rebellion));
-        assertEquals(
-                GameConstants.DIPLO_MODIFIER_GRANTED_INDEPENDENCE.getNameKey(),
-                rebellion.getDiplomaticModifierKey(parent.getId()));
+        assertTrue(rebellion.hasDiplomaticModifierKey(parent.getId(),
+                GameConstants.DIPLO_MODIFIER_GRANTED_INDEPENDENCE.getNameKey()));
+        assertTrue(rebellion.hasDiplomaticModifierKey(parent.getId(),
+                GameConstants.DIPLO_MODIFIER_PACT.getNameKey()));
         assertEquals(
                 GameConstants.DEFAULT_DIPLOMATIC_REPUTATION
                         + GameConstants.DIPLO_MODIFIER_PACT.getReputationDelta()

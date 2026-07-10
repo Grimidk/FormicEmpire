@@ -1605,6 +1605,8 @@ public class GamePanel extends ZeroGamePanel {
         processPendingRebellionResponse(world);
         processPendingPactRequests(world);
         processPendingWarDeclarations(world);
+        processPendingIntegrationVassalWarAlerts(world);
+        processPendingIntegrationCompletedAlerts(world);
         processPendingPeaceOffers(world);
         processPendingTradeProposals(world);
     }
@@ -1780,6 +1782,76 @@ public class GamePanel extends ZeroGamePanel {
             lastPeaceOfferPromptWarId = war.getId();
             showWarDialog();
             return;
+        }
+    }
+
+    private void processPendingIntegrationVassalWarAlerts(World world) {
+        if (world == null || !engineStarted) {
+            return;
+        }
+        Dynasty playerDynasty = null;
+        for (Dynasty dynasty : world.getDynastys()) {
+            if (dynasty.isPlayer() && !dynasty.isDefeated()) {
+                playerDynasty = dynasty;
+                break;
+            }
+        }
+        if (playerDynasty == null) {
+            return;
+        }
+
+        Colony alertColony = playerDynasty.getCapital();
+        if (alertColony == null && !playerDynasty.getColonies().isEmpty()) {
+            alertColony = playerDynasty.getColonies().get(0);
+        }
+        if (alertColony == null) {
+            return;
+        }
+
+        for (Dynasty.PendingIntegrationVassalWarAlert pending : playerDynasty.copyPendingIntegrationVassalWarAlerts()) {
+            playerDynasty.removePendingIntegrationVassalWarAlert(pending.attackerId, pending.vassalId);
+            Dynasty attacker = world.findDynastyById(pending.attackerId);
+            Dynasty vassal = world.findDynastyById(pending.vassalId);
+            if (attacker == null || vassal == null || attacker.isDefeated() || vassal.isDefeated()) {
+                continue;
+            }
+            String message = LanguageStrings.format(
+                    LanguageStrings.DIPLO_INTEGRATION_VASSAL_WAR_ALERT_FMT,
+                    attacker.getName(),
+                    vassal.getName());
+            alertColony.logEvent(ColonyLogPrefixes.WAR + " " + message);
+            UiOptionPane.showMessageDialog(this,
+                    message,
+                    LanguageStrings.get(LanguageStrings.DIPLO_INTEGRATION_VASSAL_WAR_ALERT_TITLE),
+                    JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    private void processPendingIntegrationCompletedAlerts(World world) {
+        if (world == null || !engineStarted) {
+            return;
+        }
+        Dynasty playerDynasty = null;
+        for (Dynasty dynasty : world.getDynastys()) {
+            if (dynasty.isPlayer() && !dynasty.isDefeated()) {
+                playerDynasty = dynasty;
+                break;
+            }
+        }
+        if (playerDynasty == null) {
+            return;
+        }
+
+        for (int targetId : playerDynasty.copyPendingIntegrationCompletedTargetIds()) {
+            playerDynasty.removePendingIntegrationCompletedAlert(targetId);
+            Dynasty integrated = world.findDynastyById(targetId);
+            String targetName = integrated != null
+                    ? integrated.getName()
+                    : LanguageStrings.get(LanguageStrings.STAT_UNKNOWN);
+            UiOptionPane.showMessageDialog(this,
+                    LanguageStrings.format(LanguageStrings.DIPLO_INTEGRATION_COMPLETED_MSG_FMT, targetName),
+                    LanguageStrings.get(LanguageStrings.DIPLO_INTEGRATION_COMPLETED_TITLE),
+                    JOptionPane.INFORMATION_MESSAGE);
         }
     }
 

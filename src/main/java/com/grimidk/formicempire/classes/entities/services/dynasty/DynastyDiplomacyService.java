@@ -4,8 +4,10 @@ import com.grimidk.formicempire.classes.entities.services.colony.ColonyAutomatio
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
@@ -104,8 +106,7 @@ public class DynastyDiplomacyService {
         if (other == null || other == dynasty) {
             return false;
         }
-        return GameConstants.DIPLO_MODIFIER_PACT.getNameKey()
-                .equals(dynasty.getDiplomaticModifierKey(other.getId()));
+        return dynasty.hasDiplomaticModifierKey(other.getId(), GameConstants.DIPLO_MODIFIER_PACT.getNameKey());
     }
 
     public boolean canFormNonAggressionPact(Dynasty other) {
@@ -219,8 +220,7 @@ public class DynastyDiplomacyService {
         if (other == null || other == dynasty) {
             return false;
         }
-        return GameConstants.DIPLO_MODIFIER_WAR.getNameKey()
-                .equals(dynasty.getDiplomaticModifierKey(other.getId()));
+        return dynasty.hasDiplomaticModifierKey(other.getId(), GameConstants.DIPLO_MODIFIER_WAR.getNameKey());
     }
 
     public void applyWar(Dynasty other) {
@@ -238,6 +238,20 @@ public class DynastyDiplomacyService {
         if (other == null || other == dynasty || !isDiplomaticallyContactable(dynasty) || !isDiplomaticallyContactable(other)) {
             return;
         }
+        int integrationVassalId = 0;
+        if (world != null) {
+            Dynasty overlord = DynastyIntegrationService.findIntegrationOverlord(world, other.getId());
+            if (overlord != null && overlord != dynasty) {
+                integrationVassalId = other.getId();
+                other = overlord;
+                if (overlord.isPlayer()) {
+                    overlord.addPendingIntegrationVassalWarAlert(dynasty.getId(), integrationVassalId);
+                }
+            }
+        }
+        if (other == dynasty || !isDiplomaticallyContactable(other)) {
+            return;
+        }
         if (isAtWarWith(other)) {
             return;
         }
@@ -245,7 +259,7 @@ public class DynastyDiplomacyService {
         applyModifierBothWays(other, GameConstants.DIPLO_MODIFIER_WAR);
         applyWarEconomyToDynasty(dynasty);
         applyWarEconomyToDynasty(other);
-        if (other.isPlayer()) {
+        if (other.isPlayer() && integrationVassalId <= 0) {
             other.addPendingWarDeclarationFrom(dynasty.getId());
         }
         if (world != null) {
@@ -462,8 +476,8 @@ public class DynastyDiplomacyService {
         String otherKey = other.getDiplomaticModifierKey(dynasty.getId());
         if (GameConstants.DIPLO_MODIFIER_DECLINED_PACT.getNameKey().equals(selfKey)
                 || GameConstants.DIPLO_MODIFIER_DECLINED_PACT.getNameKey().equals(otherKey)) {
-            dynasty.clearDiplomaticModifierKey(other.getId());
-            other.clearDiplomaticModifierKey(dynasty.getId());
+            dynasty.removeDiplomaticModifierKey(other.getId(), GameConstants.DIPLO_MODIFIER_DECLINED_PACT.getNameKey());
+            other.removeDiplomaticModifierKey(dynasty.getId(), GameConstants.DIPLO_MODIFIER_DECLINED_PACT.getNameKey());
             int reverse = -GameConstants.DIPLO_MODIFIER_DECLINED_PACT.getReputationDelta();
             dynasty.adjustDiplomaticReputation(other.getId(), reverse);
             other.adjustDiplomaticReputation(dynasty.getId(), reverse);
@@ -480,6 +494,8 @@ public class DynastyDiplomacyService {
         int reverse = -GameConstants.DIPLO_MODIFIER_TRADE_REQUEST.getReputationDelta();
         dynasty.adjustDiplomaticReputation(other.getId(), reverse);
         other.adjustDiplomaticReputation(dynasty.getId(), reverse);
+        dynasty.removeDiplomaticModifierKey(other.getId(), GameConstants.DIPLO_MODIFIER_TRADE_REQUEST.getNameKey());
+        other.removeDiplomaticModifierKey(dynasty.getId(), GameConstants.DIPLO_MODIFIER_TRADE_REQUEST.getNameKey());
     }
 
     private void recoverFromWasAtWarModifier(Dynasty other) {
@@ -493,8 +509,8 @@ public class DynastyDiplomacyService {
         String otherKey = other.getDiplomaticModifierKey(dynasty.getId());
         if (GameConstants.DIPLO_MODIFIER_WAS_AT_WAR.getNameKey().equals(selfKey)
                 || GameConstants.DIPLO_MODIFIER_WAS_AT_WAR.getNameKey().equals(otherKey)) {
-            dynasty.clearDiplomaticModifierKey(other.getId());
-            other.clearDiplomaticModifierKey(dynasty.getId());
+            dynasty.removeDiplomaticModifierKey(other.getId(), GameConstants.DIPLO_MODIFIER_WAS_AT_WAR.getNameKey());
+            other.removeDiplomaticModifierKey(dynasty.getId(), GameConstants.DIPLO_MODIFIER_WAS_AT_WAR.getNameKey());
             int reverse = -GameConstants.DIPLO_MODIFIER_WAS_AT_WAR.getReputationDelta();
             dynasty.adjustDiplomaticReputation(other.getId(), reverse);
             other.adjustDiplomaticReputation(dynasty.getId(), reverse);
@@ -570,8 +586,7 @@ public class DynastyDiplomacyService {
     List<ReputationModifierLine> collectVisibleReputationModifiers(Dynasty other, World world) {
         List<ReputationModifierLine> lines = new ArrayList<>();
 
-        String modifierKey = dynasty.getDiplomaticModifierKey(other.getId());
-        if (modifierKey != null) {
+        for (String modifierKey : dynasty.getDiplomaticModifierKeys(other.getId())) {
             DiplomaticReputationModifier modifier = GameConstants.getDiplomaticReputationModifierByKey(modifierKey);
             if (modifier != null) {
                 lines.add(new ReputationModifierLine(modifier.getName(), modifier.getReputationDelta()));
@@ -599,6 +614,14 @@ public class DynastyDiplomacyService {
         return lines;
     }
 
+    public int sumVisibleReputationModifierDeltas(Dynasty other, World world) {
+        int total = 0;
+        for (ReputationModifierLine line : collectVisibleReputationModifiers(other, world)) {
+            total += line.delta();
+        }
+        return total;
+    }
+
     private void appendReputationModifierLine(StringBuilder sb, String label, int delta) {
         sb.append(LanguageStrings.format(
                 LanguageStrings.DIPLO_MODIFIER_LINE,
@@ -607,10 +630,9 @@ public class DynastyDiplomacyService {
     }
 
     private void appendReputationModifierDetails(StringBuilder sb, Dynasty other, World world) {
-        int stored = dynasty.getDiplomaticReputation(other.getId());
         sb.append(LanguageStrings.get(LanguageStrings.DIPLO_TOOLTIP_BASE))
                 .append(": ")
-                .append(stored)
+                .append(GameConstants.DEFAULT_DIPLOMATIC_REPUTATION)
                 .append("<br>");
 
         List<ReputationModifierLine> modifiers = collectVisibleReputationModifiers(other, world);
@@ -1027,11 +1049,18 @@ public class DynastyDiplomacyService {
 
         int receiveDelta = GameConstants.CROSS_DYNASTY_TRADE_RECEIVER_REP;
         receiver.adjustDiplomaticReputation(sender.getId(), receiveDelta);
+        receiver.markCrossDynastyTradeRepBonus(sender.getId());
+        receiver.addDiplomaticModifierKey(sender.getId(), GameConstants.DIPLO_MODIFIER_TRADE.getNameKey());
 
         int senderDelta = kind == CrossDynastyTradeProposal.Kind.OFFER
                 ? GameConstants.CROSS_DYNASTY_TRADE_OFFER_SENDER_REP
                 : GameConstants.DIPLO_MODIFIER_TRADE_REQUEST.getReputationDelta();
         sender.adjustDiplomaticReputation(receiver.getId(), senderDelta);
+        if (kind == CrossDynastyTradeProposal.Kind.OFFER) {
+            sender.addDiplomaticModifierKey(receiver.getId(), GameConstants.DIPLO_MODIFIER_TRADE_OFFER.getNameKey());
+        } else {
+            sender.addDiplomaticModifierKey(receiver.getId(), GameConstants.DIPLO_MODIFIER_TRADE_REQUEST.getNameKey());
+        }
     }
 
     public void onCrossDynastyTradeEstablished(Dynasty sender, Dynasty receiver, CrossDynastyTradeProposal.Kind kind) {
@@ -1117,6 +1146,8 @@ public class DynastyDiplomacyService {
         int delta = GameConstants.DIPLO_MODIFIER_TRADE_REQUEST.getReputationDelta();
         dynasty.adjustDiplomaticReputation(other.getId(), delta);
         other.adjustDiplomaticReputation(dynasty.getId(), delta);
+        dynasty.addDiplomaticModifierKey(other.getId(), GameConstants.DIPLO_MODIFIER_TRADE_REQUEST.getNameKey());
+        other.addDiplomaticModifierKey(dynasty.getId(), GameConstants.DIPLO_MODIFIER_TRADE_REQUEST.getNameKey());
     }
 
     public static boolean isCrossDynastyTrade(Colony origin, Colony destination) {
@@ -1157,13 +1188,15 @@ public class DynastyDiplomacyService {
     }
 
     private void clearExclusiveGroupOnPair(Dynasty owner, Dynasty other, String exclusiveGroupKey) {
-        String currentKey = owner.getDiplomaticModifierKey(other.getId());
-        if (currentKey == null) {
+        if (exclusiveGroupKey == null) {
             return;
         }
-        DiplomaticReputationModifier current = GameConstants.getDiplomaticReputationModifierByKey(currentKey);
-        if (current != null && exclusiveGroupKey.equals(current.getExclusiveGroupKey())) {
-            owner.clearDiplomaticModifierKey(other.getId());
+        Set<String> keys = new LinkedHashSet<>(owner.getDiplomaticModifierKeys(other.getId()));
+        for (String currentKey : keys) {
+            DiplomaticReputationModifier current = GameConstants.getDiplomaticReputationModifierByKey(currentKey);
+            if (current != null && exclusiveGroupKey.equals(current.getExclusiveGroupKey())) {
+                owner.removeDiplomaticModifierKey(other.getId(), currentKey);
+            }
         }
     }
 
@@ -1389,14 +1422,14 @@ public class DynastyDiplomacyService {
         }
     }
 
-    private List<Colony> pickAutomatedDiplomatSources(Dynasty owner, TradeManager tradeManager, World world) {
+    public List<Colony> listDiplomatSourceColonies(TradeManager tradeManager, World world) {
         List<Colony> sources = new ArrayList<>();
-        Colony capital = owner.getCapital();
-        if (capital != null && capital.getAge() >= 7 && countAvailableDiplomats(capital) > 0) {
+        Colony capital = dynasty.getCapital();
+        if (capital != null && capital.getAge() >= 7) {
             sources.add(capital);
         }
-        for (Colony colony : owner.getColonies()) {
-            if (colony == capital || colony.getAge() < 7 || countAvailableDiplomats(colony) <= 0) {
+        for (Colony colony : dynasty.getColonies()) {
+            if (colony == capital || colony.getAge() < 7) {
                 continue;
             }
             int effectiveLoyalty = colony.getEffectiveLoyalty(tradeManager, world);
@@ -1404,8 +1437,17 @@ public class DynastyDiplomacyService {
                 sources.add(colony);
             }
         }
-        sources.sort(Comparator.comparingInt(this::countAvailableDiplomats).reversed());
         return sources;
+    }
+
+    private List<Colony> pickAutomatedDiplomatSources(Dynasty owner, TradeManager tradeManager, World world) {
+        if (owner == null || owner != dynasty || tradeManager == null || world == null) {
+            return List.of();
+        }
+        return listDiplomatSourceColonies(tradeManager, world).stream()
+                .filter(colony -> countAvailableDiplomats(colony) > 0)
+                .sorted(Comparator.comparingInt(this::countAvailableDiplomats).reversed())
+                .toList();
     }
 
     public boolean canSendDiplomatsToDynasty(Colony from, Dynasty other, World world) {

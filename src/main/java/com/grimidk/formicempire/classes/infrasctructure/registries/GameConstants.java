@@ -797,6 +797,9 @@ public final class GameConstants {
     public static final DiplomaticReputationModifier DIPLO_MODIFIER_TRADE_REQUEST = new DiplomaticReputationModifier(
         5, LanguageStrings.DIPLO_MODIFIER_TRADE_REQUEST, -5, REPUTATION_NEUTRAL.getMinScore(), null);
     static { diplomaticReputationModifiers.add(DIPLO_MODIFIER_TRADE_REQUEST); }
+    public static final DiplomaticReputationModifier DIPLO_MODIFIER_TRADE_OFFER = new DiplomaticReputationModifier(
+        10, LanguageStrings.DIPLO_MODIFIER_TRADE_OFFER, 5, REPUTATION_NEUTRAL.getMinScore(), null);
+    static { diplomaticReputationModifiers.add(DIPLO_MODIFIER_TRADE_OFFER); }
     public static final int CROSS_DYNASTY_TRADE_RECEIVER_REP = 20;
     public static final int CROSS_DYNASTY_TRADE_OFFER_SENDER_REP = 5;
     public static final DiplomaticReputationModifier DIPLO_MODIFIER_BORDER_FRICTION = new DiplomaticReputationModifier(
@@ -956,10 +959,19 @@ public final class GameConstants {
     public static final ColonyLoyaltyModifier LOYALTY_MODIFIER_RECENTLY_CONQUERED = new ColonyLoyaltyModifier(
         5, LanguageStrings.LOYALTY_MODIFIER_RECENTLY_CONQUERED, -5, 0, null);
     static { colonyLoyaltyModifiers.add(LOYALTY_MODIFIER_RECENTLY_CONQUERED); }
+    public static final ColonyLoyaltyModifier LOYALTY_MODIFIER_RECENTLY_INTEGRATED = new ColonyLoyaltyModifier(
+        6, LanguageStrings.LOYALTY_MODIFIER_RECENTLY_INTEGRATED, 25, 0, null);
+    static { colonyLoyaltyModifiers.add(LOYALTY_MODIFIER_RECENTLY_INTEGRATED); }
 
     public static final int PHEROMONE_STORM_SYRUP_COST = 500;
     public static final int PHEROMONE_STORM_DURATION_MONTHS = 12;
     public static final int RECENTLY_CONQUERED_LOYALTY_MONTHS = 6;
+    public static final int RECENTLY_INTEGRATED_LOYALTY_MONTHS = 6;
+
+    public static final float INTEGRATION_MILITARY_RATIO_REQUIRED = 5f;
+    public static final int INTEGRATION_MONTHS_PER_COLONY_SLOW = 30;
+    public static final int INTEGRATION_MIN_DIPLOMATS = 1;
+    public static final int DAYS_PER_MONTH = 30;
     public static final int AI_FORCED_FLIGHT_COOLDOWN_DAYS = 30;
     public static final int WAR_PACT_BREAK_COOLDOWN_MONTHS = 6;
     public static final int DIPLO_DECLINED_REQUEST_COOLDOWN_MONTHS = 1;
@@ -1014,7 +1026,7 @@ public final class GameConstants {
     public static final int DIPLOMAT_STABILITY_GAIN_PRESSURE_2 = 3;
     public static final int DIPLOMAT_STABILITY_GAIN_PRESSURE_3 = 5;
     
-    // --- Dynasty titles (display suffix for organization names) ---
+    // --- Dynasty titles ---
     public static final DynastyTitle DYNASTY_TITLE_DYNASTY = new DynastyTitle(
             1, LanguageStrings.DYNASTY_TITLE_DYNASTY, LanguageStrings.DYNASTY_TITLE_FMT_DYNASTY);
     static { dynastyTitles.add(DYNASTY_TITLE_DYNASTY); }
@@ -1437,6 +1449,22 @@ public final class GameConstants {
     }
 
     public static List<Species> getSpecies() { return Collections.unmodifiableList(species); }
+
+    public static Species getSpeciesById(int id) {
+        for (Species s : species) {
+            if (s.getId() == id) {
+                return s;
+            }
+        }
+        return null;
+    }
+
+    public static double computeIntegrationMonthsPerColony(double diplomatsPerColony) {
+        if (diplomatsPerColony <= 0.0) {
+            return INTEGRATION_MONTHS_PER_COLONY_SLOW;
+        }
+        return INTEGRATION_MONTHS_PER_COLONY_SLOW / Math.sqrt(diplomatsPerColony);
+    }
 
     public static List<Species> getNonOmniSpecies() {
         List<Species> result = new ArrayList<>();

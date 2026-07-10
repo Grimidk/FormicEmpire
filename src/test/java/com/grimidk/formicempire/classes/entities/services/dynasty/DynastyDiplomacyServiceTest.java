@@ -603,14 +603,38 @@ class DynastyDiplomacyServiceTest {
 
     @Test
     void reputationModifierTooltipUsesSignedDeltasSortedPositiveFirst() {
-        player.setDiplomaticModifierKey(neighbor.getId(), GameConstants.DIPLO_MODIFIER_PACT.getNameKey());
+        player.setDiplomaticReputation(neighbor.getId(), 60);
+        neighbor.setDiplomaticReputation(player.getId(), 60);
+        player.getDiplomacyService().formNonAggressionPact(neighbor);
 
         var lines = player.getDiplomacyService().collectVisibleReputationModifiers(neighbor, null);
-        assertEquals(1, lines.size());
-        assertEquals(20, lines.get(0).delta());
+        assertTrue(lines.stream().anyMatch(line -> line.delta() == 20));
 
         String tooltip = player.getDiplomacyService().buildStanceIconTooltip(neighbor, null);
+        assertTrue(tooltip.contains("Base: 50") || tooltip.contains("Base: 50<br>"));
         assertTrue(tooltip.contains("Pact: +20"));
+        assertTrue(tooltip.contains("Effective:"));
+    }
+
+    @Test
+    void reputationTooltipListsEverySavedModifierKey() {
+        player.setDiplomaticReputation(neighbor.getId(), 60);
+        neighbor.setDiplomaticReputation(player.getId(), 60);
+        player.getDiplomacyService().formNonAggressionPact(neighbor);
+        player.markCrossDynastyTradeRepBonus(neighbor.getId());
+        player.addDiplomaticModifierKey(neighbor.getId(), GameConstants.DIPLO_MODIFIER_TRADE.getNameKey());
+
+        var lines = player.getDiplomacyService().collectVisibleReputationModifiers(neighbor, null);
+        assertTrue(lines.stream().anyMatch(line ->
+                line.delta() == GameConstants.DIPLO_MODIFIER_PACT.getReputationDelta()));
+        assertTrue(lines.stream().anyMatch(line ->
+                line.delta() == GameConstants.DIPLO_MODIFIER_TRADE.getReputationDelta()));
+
+        String tooltip = player.getDiplomacyService().buildStanceIconTooltip(neighbor, null);
+        assertTrue(tooltip.contains("Base: 50") || tooltip.contains("Base: 50<br>"));
+        assertTrue(tooltip.contains("Pact: +20"));
+        assertTrue(tooltip.contains("Trade Route: +20"));
+        assertFalse(tooltip.contains("Prior relations"));
         assertTrue(tooltip.contains("Effective:"));
     }
 }
