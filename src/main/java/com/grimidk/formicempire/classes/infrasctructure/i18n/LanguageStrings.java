@@ -703,6 +703,13 @@ public final class LanguageStrings {
     public static final String BATTLE_PHASE_RESERVE = "BATTLE_PHASE_RESERVE";
     public static final String BATTLE_PHASE_REDEPLOY = "BATTLE_PHASE_REDEPLOY";
     public static final String BATTLE_REDEPLOY_FMT = "BATTLE_REDEPLOY_FMT";
+    public static final String DIALOG_CONVOY_TITLE = "DIALOG_CONVOY_TITLE";
+    public static final String CONVOY_ACTION_VIEW = "CONVOY_ACTION_VIEW";
+    public static final String CONVOY_ACTION_VIEW_LEG_FMT = "CONVOY_ACTION_VIEW_LEG_FMT";
+    public static final String CONVOY_NOT_AVAILABLE = "CONVOY_NOT_AVAILABLE";
+    public static final String CONVOY_ROUTE_FMT = "CONVOY_ROUTE_FMT";
+    public static final String CONVOY_PROGRESS_FMT = "CONVOY_PROGRESS_FMT";
+    public static final String CONVOY_FORCES_FMT = "CONVOY_FORCES_FMT";
     public static final String WAR_OFFER_PEACE_CONFIRM_FMT = "WAR_OFFER_PEACE_CONFIRM_FMT";
     public static final String WAR_ACCEPT_PEACE_CONFIRM_FMT = "WAR_ACCEPT_PEACE_CONFIRM_FMT";
     public static final String WAR_PEACE_OFFERED_TITLE = "WAR_PEACE_OFFERED_TITLE";

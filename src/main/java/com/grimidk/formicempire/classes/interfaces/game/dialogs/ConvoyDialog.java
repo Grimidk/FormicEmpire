@@ -1,6 +1,6 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
-import com.grimidk.formicempire.classes.entities.War;
+import com.grimidk.formicempire.classes.entities.Trade;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.interfaces.MainFrame;
@@ -11,18 +11,18 @@ import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-public class WarBattleDialog extends ZeroDialog {
+public class ConvoyDialog extends ZeroDialog {
 
     private final Engine engine;
-    private final WarBattleViewPanel battlePanel;
+    private final ConvoyViewPanel convoyPanel;
     private final Runnable refreshTask = this::liveUpdate;
 
-    public WarBattleDialog(JFrame owner, War war, Engine engine) {
-        super(owner, LanguageStrings.DIALOG_BATTLE_TITLE, AssetStyles.DEFAULT_DIALOG_SIZE);
+    public ConvoyDialog(JFrame owner, Trade trade, Engine engine) {
+        super(owner, LanguageStrings.DIALOG_CONVOY_TITLE, AssetStyles.DEFAULT_DIALOG_SIZE);
         this.engine = engine;
 
-        battlePanel = new WarBattleViewPanel(war, engine);
-        add(battlePanel, BorderLayout.CENTER);
+        convoyPanel = new ConvoyViewPanel(trade, engine);
+        add(convoyPanel, BorderLayout.CENTER);
 
         if (engine != null) {
             engine.addHourTickListener(refreshTask);
@@ -32,13 +32,13 @@ public class WarBattleDialog extends ZeroDialog {
             @Override
             public void windowClosed(WindowEvent e) {
                 detachTickListener();
-                battlePanel.stopAnimation();
+                convoyPanel.stopAnimation();
             }
 
             @Override
             public void windowClosing(WindowEvent e) {
                 detachTickListener();
-                battlePanel.stopAnimation();
+                convoyPanel.stopAnimation();
             }
         });
 
@@ -48,8 +48,8 @@ public class WarBattleDialog extends ZeroDialog {
     }
 
     public void showDialog() {
-        battlePanel.startAnimation();
-        battlePanel.refreshScene();
+        convoyPanel.startAnimation();
+        convoyPanel.refreshScene();
         pack();
         setLocationRelativeTo(null);
         setVisible(true);
@@ -63,19 +63,19 @@ public class WarBattleDialog extends ZeroDialog {
         if (!isShowing()) {
             return;
         }
-        battlePanel.refreshScene();
+        convoyPanel.refreshScene();
     }
 
     @Override
     public void dispose() {
         detachTickListener();
-        battlePanel.stopAnimation();
+        convoyPanel.stopAnimation();
         super.dispose();
     }
 
     @Override
     protected void refreshDialog() {
-        battlePanel.refreshScene();
+        convoyPanel.refreshScene();
     }
 
     private void detachTickListener() {

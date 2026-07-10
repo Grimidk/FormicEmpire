@@ -429,6 +429,13 @@ public class EnglishTranslation implements Translation {
         en.put("BATTLE_PHASE_RESERVE", "Hex defense");
         en.put("BATTLE_PHASE_REDEPLOY", "Redeploying");
         en.put("BATTLE_REDEPLOY_FMT", "Redeploying (%s h remaining)");
+        en.put("DIALOG_CONVOY_TITLE", "Convoy");
+        en.put("CONVOY_ACTION_VIEW", "See convoy");
+        en.put("CONVOY_ACTION_VIEW_LEG_FMT", "See convoy (%s → %s)");
+        en.put("CONVOY_NOT_AVAILABLE", "This route has no convoy in transit to display.");
+        en.put("CONVOY_ROUTE_FMT", "%s → %s");
+        en.put("CONVOY_PROGRESS_FMT", "%s — %s / %s h (%s%%)");
+        en.put("CONVOY_FORCES_FMT", "Convoy: %s ants");
         en.put("WAR_OFFER_PEACE_CONFIRM_FMT", "Offer peace to %s? They must accept while you hold the advantage.");
         en.put("WAR_ACCEPT_PEACE_CONFIRM_FMT", "Accept the peace offer from %s?");
         en.put("WAR_PEACE_OFFERED_TITLE", "Peace Offered");

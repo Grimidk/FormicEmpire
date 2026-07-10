@@ -429,6 +429,13 @@ public class PortugueseTranslation implements Translation {
         pt.put("BATTLE_PHASE_RESERVE", "Assalto às reservas");
         pt.put("BATTLE_PHASE_REDEPLOY", "Redeploy");
         pt.put("BATTLE_REDEPLOY_FMT", "Redeploy (%s h restantes)");
+        pt.put("DIALOG_CONVOY_TITLE", "Comboio");
+        pt.put("CONVOY_ACTION_VIEW", "Ver comboio");
+        pt.put("CONVOY_ACTION_VIEW_LEG_FMT", "Ver comboio (%s → %s)");
+        pt.put("CONVOY_NOT_AVAILABLE", "Esta rota não tem comboio em trânsito para exibir.");
+        pt.put("CONVOY_ROUTE_FMT", "%s → %s");
+        pt.put("CONVOY_PROGRESS_FMT", "%s — %s / %s h (%s%%)");
+        pt.put("CONVOY_FORCES_FMT", "Comboio: %s formigas");
         pt.put("WAR_OFFER_PEACE_CONFIRM_FMT", "Oferecer paz a %s? Eles devem aceitar enquanto tiver vantagem.");
         pt.put("WAR_ACCEPT_PEACE_CONFIRM_FMT", "Aceitar a oferta de paz de %s?");
         pt.put("WAR_PEACE_OFFERED_TITLE", "Paz oferecida");

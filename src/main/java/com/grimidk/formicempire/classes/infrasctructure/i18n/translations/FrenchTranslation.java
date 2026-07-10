@@ -429,6 +429,13 @@ public class FrenchTranslation implements Translation {
         fr.put("BATTLE_PHASE_RESERVE", "Assaut des réserves");
         fr.put("BATTLE_PHASE_REDEPLOY", "Redéploiement");
         fr.put("BATTLE_REDEPLOY_FMT", "Redéploiement (%s h restantes)");
+        fr.put("DIALOG_CONVOY_TITLE", "Convoi");
+        fr.put("CONVOY_ACTION_VIEW", "Voir le convoi");
+        fr.put("CONVOY_ACTION_VIEW_LEG_FMT", "Voir le convoi (%s → %s)");
+        fr.put("CONVOY_NOT_AVAILABLE", "Cette route n'a pas de convoi en transit à afficher.");
+        fr.put("CONVOY_ROUTE_FMT", "%s → %s");
+        fr.put("CONVOY_PROGRESS_FMT", "%s — %s / %s h (%s%%)");
+        fr.put("CONVOY_FORCES_FMT", "Convoi : %s fourmis");
         fr.put("WAR_OFFER_PEACE_CONFIRM_FMT", "Offrir la paix à %s ? Ils doivent accepter tant que vous avez l'avantage.");
         fr.put("WAR_ACCEPT_PEACE_CONFIRM_FMT", "Accepter l'offre de paix de %s ?");
         fr.put("WAR_PEACE_OFFERED_TITLE", "Paix proposée");

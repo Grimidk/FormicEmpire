@@ -14,6 +14,7 @@ import com.grimidk.formicempire.classes.entities.Trade;
 import com.grimidk.formicempire.classes.entities.Tunnel;
 import com.grimidk.formicempire.classes.entities.War;
 import com.grimidk.formicempire.classes.entities.CrossDynastyTradeProposal;
+import com.grimidk.formicempire.classes.entities.services.colony.ConvoySceneBuilder;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyTradeAutomation;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDiplomacyService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyIntegrationService;
@@ -61,6 +62,7 @@ public class DynastyManagementDialog extends ZeroDialog {
     private final Consumer<Colony> onGoToColony;
     private final Runnable onOpenWarRoles;
     private final Consumer<War> onViewBattle;
+    private final Consumer<Trade> onViewConvoy;
 
     private final JTabbedPane tabbedPane;
     private final Map<Integer, Integer> tabIndexMap = new HashMap<>();
@@ -73,13 +75,14 @@ public class DynastyManagementDialog extends ZeroDialog {
     private final Runnable refreshTask = this::liveUpdate;
 
     public DynastyManagementDialog(JFrame owner, Dynasty dynasty, Engine engine, Consumer<Colony> onGoToColony,
-            Runnable onOpenWarRoles, Consumer<War> onViewBattle) {
+            Runnable onOpenWarRoles, Consumer<War> onViewBattle, Consumer<Trade> onViewConvoy) {
         super(owner, LanguageStrings.DIALOG_DYNASTY_TITLE, AssetStyles.DYNASTY_DIALOG_SIZE);
         this.dynasty = dynasty;
         this.engine = engine;
         this.onGoToColony = onGoToColony;
         this.onOpenWarRoles = onOpenWarRoles;
         this.onViewBattle = onViewBattle;
+        this.onViewConvoy = onViewConvoy;
         dynasty.bindTradeManager(engine.getTradeManager());
 
         tabbedPane = new JTabbedPane();
@@ -326,55 +329,113 @@ public class DynastyManagementDialog extends ZeroDialog {
         dialog.setVisible(true);
     }
 
-    private void promptManageTradeRoute(Component parent, Colony activeColony, Trade trade) {
-        Colony neighbor = trade.getDestination().getColony();
-        Trade incoming = dynasty.getTradeService().findTrade(neighbor, activeColony);
-        boolean canTwoWay = activeColony.hasUpgrade(GameUnlocks.ABILITY_BILATERAL_TRADE)
-                && incoming != null
-                && !(trade.hasPendingUpdate() ? trade.isPendingBilateral() : trade.isBilateral())
-                && !(incoming.hasPendingUpdate() ? incoming.isPendingBilateral() : incoming.isBilateral());
 
-        java.util.List<String> options = new java.util.ArrayList<>();
-        options.add(LanguageStrings.get(LanguageStrings.DYNASTY_MODIFY));
-        if (canTwoWay) {
-            options.add(LanguageStrings.get(LanguageStrings.TRADE_MAKE_TWO_WAY));
+    private JPopupMenu buildTradeRowActionsMenu(TradePanel panel, TradePanel.TradeRowData data) {
+        JPopupMenu menu = new JPopupMenu();
+        if (data == null || data.neighbor == null || panel.activeColony == null) {
+            return menu;
         }
-        options.add(LanguageStrings.get(LanguageStrings.DYNASTY_CANCEL_ROUTE));
-        options.add(LanguageStrings.get(LanguageStrings.UI_CLOSE));
+        Colony colony = panel.activeColony;
+        Trade outgoing = data.outgoingTrade;
+        Trade incoming = data.incomingTrade;
+        boolean labelRoutes = outgoing != null && incoming != null
+                && !panel.isTradeBilateral(outgoing) && !panel.isTradeBilateral(incoming);
 
-        int res = UiOptionPane.showOptionDialog(parent,
-                LanguageStrings.format(LanguageStrings.DYNASTY_MANAGE_TRADE_MSG,                         trade.getDestination().getColony().getName()),
-                LanguageStrings.get(LanguageStrings.DYNASTY_MANAGE_TRADE_TITLE),
-                JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null,
-                options.toArray(), options.get(0));
+        Trade convoyTrade = resolveConvoyTrade(outgoing, incoming);
+        if (convoyTrade != null) {
+            JMenuItem convoy = new JMenuItem(LanguageStrings.get(LanguageStrings.CONVOY_ACTION_VIEW));
+            convoy.addActionListener(e -> {
+                if (onViewConvoy != null) {
+                    onViewConvoy.accept(convoyTrade);
+                }
+            });
+            AssetStyles.styleMenuItem(convoy);
+            menu.add(convoy);
+        }
 
-        if (res == 0) {
-            openTradeDialog(activeColony, trade.getDestination().getColony(), trade);
-        } else if (canTwoWay && res == 1) {
-            int confirm = UiOptionPane.showConfirmDialog(parent,
-                    LanguageStrings.format(LanguageStrings.TRADE_OPTIMIZE_MSG, neighbor.getName()),
-                    LanguageStrings.get(LanguageStrings.TRADE_MAKE_TWO_WAY),
-                    JOptionPane.YES_NO_OPTION);
-            if (confirm == JOptionPane.YES_OPTION) {
-                Map<ResourceType, Double> load = trade.hasPendingUpdate() && trade.getPendingLoad() != null
-                        ? new HashMap<>(trade.getPendingLoad())
-                        : new HashMap<>(trade.getLoad());
-                Map<ResourceType, Double> returnLoad = incoming.hasPendingUpdate() && incoming.getPendingLoad() != null
-                        ? new HashMap<>(incoming.getPendingLoad())
-                        : new HashMap<>(incoming.getLoad());
-                Map<AntType, Integer> transport = trade.hasPendingUpdate() && trade.getPendingTransport() != null
-                        ? new HashMap<>(trade.getPendingTransport())
-                        : new HashMap<>(trade.getTransport());
-                boolean recurrent = trade.hasPendingUpdate() ? trade.isPendingRecurrent() : trade.isRecurrent();
-                TradeMethod method = trade.hasPendingUpdate() ? trade.getPendingMethod() : trade.getMethod();
-                trade.setPendingUpdate(load, returnLoad, transport, recurrent, true, method);
-                incoming.cancel();
-                engine.getTradeManager().removeTrade(incoming);
+        if (outgoing == null) {
+            JMenuItem establish = new JMenuItem(LanguageStrings.get(LanguageStrings.UI_ESTABLISH));
+            establish.addActionListener(e -> panel.establishTrade(data.neighbor));
+            AssetStyles.styleMenuItem(establish);
+            menu.add(establish);
+        }
+
+        if (outgoing != null) {
+            appendTradeRouteMenuItems(menu, colony, data.neighbor, outgoing, labelRoutes);
+        }
+        if (incoming != null && (outgoing == null || !panel.isTradeBilateral(outgoing))) {
+            appendTradeRouteMenuItems(menu, data.neighbor, colony, incoming, labelRoutes);
+        }
+        if (panel.shouldShowTwoWayMenuItem(data)) {
+            JMenuItem twoWay = new JMenuItem(LanguageStrings.get(LanguageStrings.TRADE_MAKE_TWO_WAY));
+            if (panel.canMakeTwoWayTrade(data)) {
+                twoWay.addActionListener(e -> panel.makeTwoWayTrade(data));
+            } else {
+                twoWay.setEnabled(false);
+                twoWay.setToolTipText(LanguageStrings.get(LanguageStrings.TRADE_TWO_WAY_REQUIRES_INCOMING));
             }
-        } else if (res == (canTwoWay ? 2 : 1)) {
-            trade.cancel();
-            engine.getTradeManager().removeTrade(trade);
+            AssetStyles.styleMenuItem(twoWay);
+            menu.add(twoWay);
         }
+        return menu;
+    }
+
+    private static Trade resolveConvoyTrade(Trade outgoing, Trade incoming) {
+        if (ConvoySceneBuilder.isInTransit(outgoing)) {
+            return outgoing;
+        }
+        if (ConvoySceneBuilder.isInTransit(incoming)) {
+            return incoming;
+        }
+        return null;
+    }
+
+    private void appendTradeRouteMenuItems(JPopupMenu menu, Colony origin, Colony target, Trade trade,
+            boolean labelRoute) {
+        if (trade == null) {
+            return;
+        }
+
+        String routeLabel = LanguageStrings.format(LanguageStrings.CONVOY_ROUTE_FMT, origin.getName(), target.getName());
+        String modifyText = labelRoute
+                ? LanguageStrings.get(LanguageStrings.DYNASTY_MODIFY) + " — " + routeLabel
+                : LanguageStrings.get(LanguageStrings.DYNASTY_MODIFY);
+        JMenuItem modify = new JMenuItem(modifyText);
+        modify.addActionListener(e -> openTradeDialog(origin, target, trade));
+        AssetStyles.styleMenuItem(modify);
+        menu.add(modify);
+
+        JMenuItem cancel = new JMenuItem(LanguageStrings.get(LanguageStrings.DYNASTY_CANCEL_ROUTE));
+        cancel.addActionListener(e -> cancelTradeRoute(trade));
+        AssetStyles.styleMenuItem(cancel);
+        menu.add(cancel);
+    }
+
+    private void cancelTradeRoute(Trade trade) {
+        if (trade == null || engine.getTradeManager() == null) {
+            return;
+        }
+        trade.cancel();
+        engine.getTradeManager().removeTrade(trade);
+        if (tradePanel != null) {
+            tradePanel.updateData();
+        }
+    }
+
+    private void showTradeRowActionsMenu(TradePanel.TradeRowData data, JTable table, int row, int column) {
+        JPopupMenu menu = buildTradeRowActionsMenu(tradePanel, data);
+        if (menu.getComponentCount() == 0) {
+            return;
+        }
+        UiTableStyles.showCellPopupMenu(menu, table, row, column);
+    }
+
+    private void showTradeRowActionsMenu(TradePanel.TradeRowData data, Component invoker) {
+        JPopupMenu menu = buildTradeRowActionsMenu(tradePanel, data);
+        if (menu.getComponentCount() == 0) {
+            return;
+        }
+        UiTableStyles.showComponentPopupMenu(menu, invoker);
     }
 
     private class TradePanel extends JPanel implements LiveUpdatePanel {
@@ -542,7 +603,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 TradeRouteStatus outStatus = tradeRouteStatus(outgoing, bilateralOut);
                 TradeRouteStatus inStatus = tradeRouteStatus(incoming, bilateralIn);
 
-                TradeRowData rowData = new TradeRowData(neighborColony, neighborHex, outgoing, tunnel);
+                TradeRowData rowData = new TradeRowData(neighborColony, neighborHex, outgoing, incoming, tunnel);
 
                 if (tunnelsVisible) {
                     model.addRow(new Object[]{dirNames[i], neighborName, rowData, outStatus, inStatus, rowData});
@@ -589,6 +650,10 @@ public class DynastyManagementDialog extends ZeroDialog {
             return incoming != null && !isTradeBilateral(incoming);
         }
 
+        private boolean shouldShowTwoWayMenuItem(TradeRowData data) {
+            return shouldShowTwoWayButton(data);
+        }
+
         private boolean shouldShowTwoWayButton(TradeRowData data) {
             if (data == null || data.neighbor == null || activeColony == null) {
                 return false;
@@ -600,24 +665,10 @@ public class DynastyManagementDialog extends ZeroDialog {
             return outgoing != null && !isTradeBilateral(outgoing);
         }
 
-        private void configureTwoWayButton(JButton twoWayBtn, TradeRowData data) {
-            boolean show = shouldShowTwoWayButton(data);
-            twoWayBtn.setVisible(show);
-            if (!show) {
-                twoWayBtn.setEnabled(false);
-                twoWayBtn.setToolTipText(null);
-                return;
-            }
-            boolean enabled = canMakeTwoWayTrade(data);
-            twoWayBtn.setEnabled(enabled);
-            twoWayBtn.setToolTipText(enabled ? null : LanguageStrings.get(LanguageStrings.TRADE_TWO_WAY_REQUIRES_INCOMING));
-            AssetStyles.styleCompactButton(twoWayBtn);
-        }
-
         private void configureTradeActionColumn(int actionCol) {
             TableColumn column = table.getColumnModel().getColumn(actionCol);
-            column.setMinWidth(250);
-            column.setPreferredWidth(250);
+            column.setMinWidth(110);
+            column.setPreferredWidth(110);
         }
 
         private boolean mergeTradesIntoBilateral(Trade outgoing, Trade incoming) {
@@ -699,6 +750,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
                     boolean hasFocus, int row, int column) {
                 super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                setHorizontalAlignment(SwingConstants.CENTER);
                 if (value instanceof TradeRouteStatus status) {
                     setText(status.text);
                     setIcon(status.icon);
@@ -829,44 +881,41 @@ public class DynastyManagementDialog extends ZeroDialog {
             final Colony neighbor;
             final Hex neighborHex;
             final Trade outgoingTrade;
+            final Trade incomingTrade;
             final Tunnel tunnel;
-            TradeRowData(Colony neighbor, Hex neighborHex, Trade outgoingTrade, Tunnel tunnel) { 
-                this.neighbor = neighbor; 
+
+            TradeRowData(Colony neighbor, Hex neighborHex, Trade outgoingTrade, Trade incomingTrade, Tunnel tunnel) {
+                this.neighbor = neighbor;
                 this.neighborHex = neighborHex;
-                this.outgoingTrade = outgoingTrade; 
+                this.outgoingTrade = outgoingTrade;
+                this.incomingTrade = incomingTrade;
                 this.tunnel = tunnel;
             }
         }
 
         private class TradeActionRenderer extends JPanel implements TableCellRenderer {
             private final JButton actionBtn = new JButton();
-            private final JButton twoWayBtn = new JButton(LanguageStrings.get(LanguageStrings.TRADE_MAKE_TWO_WAY));
-            public TradeActionRenderer() {
+
+            TradeActionRenderer() {
                 setLayout(new FlowLayout(FlowLayout.CENTER, 4, 2));
                 actionBtn.setFocusable(false);
-                twoWayBtn.setFocusable(false);
                 AssetStyles.styleCompactButton(actionBtn);
-                AssetStyles.styleCompactButton(twoWayBtn);
                 add(actionBtn);
-                add(twoWayBtn);
             }
+
             @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                setEnabled(true);
-                twoWayBtn.setVisible(false);
-                twoWayBtn.setEnabled(false);
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                    boolean hasFocus, int row, int column) {
                 if (value instanceof TradeRowData data) {
                     if (data.neighbor == null) {
                         actionBtn.setText(LanguageStrings.get(LanguageStrings.UI_ESTABLISH));
                         actionBtn.setEnabled(false);
                     } else {
-                        actionBtn.setText(data.outgoingTrade == null ? LanguageStrings.get(LanguageStrings.UI_ESTABLISH) : LanguageStrings.get(LanguageStrings.UI_MANAGE));
+                        actionBtn.setText(LanguageStrings.get(LanguageStrings.UI_MANAGE));
                         actionBtn.setEnabled(true);
-                        configureTwoWayButton(twoWayBtn, data);
                     }
                 }
                 AssetStyles.styleCompactButton(actionBtn);
-                AssetStyles.styleCompactButton(twoWayBtn);
                 setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
                 return this;
             }
@@ -875,48 +924,53 @@ public class DynastyManagementDialog extends ZeroDialog {
         private class TradeActionEditor extends AbstractCellEditor implements TableCellEditor {
             private final JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 4, 2));
             private final JButton actionBtn = new JButton();
-            private final JButton twoWayBtn = new JButton(LanguageStrings.get(LanguageStrings.TRADE_MAKE_TWO_WAY));
             private TradeRowData currentData;
-            public TradeActionEditor() {
+            private JTable editingTable;
+            private int editingRow = -1;
+            private int editingCol = -1;
+
+            TradeActionEditor() {
                 actionBtn.setFocusable(false);
-                twoWayBtn.setFocusable(false);
                 AssetStyles.styleCompactButton(actionBtn);
-                AssetStyles.styleCompactButton(twoWayBtn);
                 panel.add(actionBtn);
-                panel.add(twoWayBtn);
                 actionBtn.addActionListener(e -> {
+                    JTable tableRef = editingTable;
+                    int row = editingRow;
+                    int col = editingCol;
+                    TradeRowData data = currentData;
                     fireEditingStopped();
-                    if (currentData == null || currentData.neighbor == null) return;
-                    if (currentData.outgoingTrade == null) {
-                        establishTrade(currentData.neighbor);
-                    } else {
-                        manageTrade(currentData.outgoingTrade);
+                    if (data == null || data.neighbor == null) {
+                        return;
                     }
-                });
-                twoWayBtn.addActionListener(e -> {
-                    fireEditingStopped();
-                    if (currentData != null) {
-                        makeTwoWayTrade(currentData);
-                    }
+                    showTradeRowActionsMenu(data, tableRef, row, col);
                 });
             }
+
             @Override
-            public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+            public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row,
+                    int column) {
                 currentData = (TradeRowData) value;
-                if (currentData != null) {
-                    actionBtn.setText(currentData.outgoingTrade == null ? LanguageStrings.get(LanguageStrings.UI_ESTABLISH) : LanguageStrings.get(LanguageStrings.UI_MANAGE));
-                    configureTwoWayButton(twoWayBtn, currentData);
-                } else {
-                    twoWayBtn.setVisible(false);
-                    twoWayBtn.setEnabled(false);
-                }
+                editingTable = table;
+                editingRow = row;
+                editingCol = column;
                 panel.setBackground(table.getSelectionBackground());
+                if (currentData != null) {
+                    if (currentData.neighbor == null) {
+                        actionBtn.setText(LanguageStrings.get(LanguageStrings.UI_ESTABLISH));
+                        actionBtn.setEnabled(false);
+                    } else {
+                        actionBtn.setText(LanguageStrings.get(LanguageStrings.UI_MANAGE));
+                        actionBtn.setEnabled(true);
+                    }
+                }
                 AssetStyles.styleCompactButton(actionBtn);
-                AssetStyles.styleCompactButton(twoWayBtn);
                 return panel;
             }
+
             @Override
-            public Object getCellEditorValue() { return currentData; }
+            public Object getCellEditorValue() {
+                return currentData;
+            }
         }
 
         private void establishTrade(Colony target) {
@@ -924,9 +978,21 @@ public class DynastyManagementDialog extends ZeroDialog {
             updateData();
         }
 
-        private void manageTrade(Trade trade) {
-            promptManageTradeRoute(this, activeColony, trade);
-            updateData();
+        private void showActionsMenuForNeighbor(Colony neighbor, Component invoker) {
+            World world = engine.getWorld();
+            activeColony = DynastyManagementDialog.this.getActivePlayerColony();
+            if (world == null || activeColony == null || neighbor == null) {
+                return;
+            }
+            Hex currentHex = world.getHexOfColony(activeColony);
+            Hex neighborHex = world.getHexOfColony(neighbor);
+            Trade outgoing = findTrade(activeColony, neighbor);
+            Trade incoming = findIncomingTrade(activeColony, neighbor);
+            Tunnel tunnel = currentHex != null && neighborHex != null
+                    ? dynasty.getTunnelBetween(currentHex, neighborHex)
+                    : null;
+            TradeRowData data = new TradeRowData(neighbor, neighborHex, outgoing, incoming, tunnel);
+            showTradeRowActionsMenu(data, invoker);
         }
 
         private void startTunnel(Hex targetHex) {
@@ -1944,10 +2010,10 @@ public class DynastyManagementDialog extends ZeroDialog {
             }
             Trade outgoing = dynasty.getTradeService().findTrade(activeColony, neighbor);
             Trade incoming = dynasty.getTradeService().findTrade(neighbor, activeColony);
-            if (outgoing != null) {
-                promptManageTradeRoute(this, activeColony, outgoing);
-            } else if (incoming != null) {
-                promptManageTradeRoute(this, neighbor, incoming);
+            if (outgoing != null || incoming != null) {
+                if (tradePanel != null) {
+                    tradePanel.showActionsMenuForNeighbor(neighbor, this);
+                }
             } else if (!dynasty.getDiplomacyService().canParticipateInCrossDynastyTrade(other, activeColony, world)) {
                 String message = LanguageStrings.get(LanguageStrings.DIPLO_ERROR_LOYALTY_REQUIRED);
                 if (!dynasty.hasUpgrade(GameUnlocks.ABILITY_TRADE)) {
@@ -2268,7 +2334,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 menu.add(diplomatItem);
             }
 
-            showTableCellPopup(menu, table, row, column);
+            UiTableStyles.showCellPopupMenu(menu, table, row, column);
         }
     }
 
@@ -2806,14 +2872,6 @@ public class DynastyManagementDialog extends ZeroDialog {
         public Object getCellEditorValue() { return currentColony; }
     }
 
-    private static void showTableCellPopup(JPopupMenu menu, JTable table, int row, int column) {
-        if (menu == null || table == null || row < 0 || column < 0 || !table.isShowing()) {
-            return;
-        }
-        Rectangle rect = table.getCellRect(row, column, true);
-        menu.show(table, rect.x, rect.y + rect.height);
-    }
-
     private void showColonyOverviewActionsMenu(Colony colony, JTable table, int row, int column) {
         if (colony == null) {
             return;
@@ -2850,7 +2908,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             menu.add(diplomatItem);
         }
 
-        showTableCellPopup(menu, table, row, column);
+        UiTableStyles.showCellPopupMenu(menu, table, row, column);
     }
 
     private void promptSendDiplomatsToColony(Component parent, Colony colony) {

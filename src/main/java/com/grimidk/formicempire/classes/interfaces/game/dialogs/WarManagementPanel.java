@@ -11,6 +11,7 @@ import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.styles.UiTableStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
 
 import javax.swing.*;
@@ -412,7 +413,7 @@ public class WarManagementPanel extends JPanel implements DynastyManagementDialo
         menu.add(battleItem);
 
         if (!rowData.playerInvolved || rowData.opponent == null) {
-            showTableCellPopup(menu, tableRef, row, column);
+            UiTableStyles.showCellPopupMenu(menu, tableRef, row, column);
             return;
         }
 
@@ -464,7 +465,7 @@ public class WarManagementPanel extends JPanel implements DynastyManagementDialo
             menu.add(rolesItem);
         }
 
-        showTableCellPopup(menu, tableRef, row, column);
+        UiTableStyles.showCellPopupMenu(menu, tableRef, row, column);
     }
 
     private DefaultTableModel createActiveModel() {
@@ -578,14 +579,6 @@ public class WarManagementPanel extends JPanel implements DynastyManagementDialo
         label.setHorizontalAlignment(SwingConstants.CENTER);
     }
 
-    private static void showTableCellPopup(JPopupMenu menu, JTable table, int row, int column) {
-        if (menu == null || table == null || row < 0 || column < 0 || !table.isShowing()) {
-            return;
-        }
-        Rectangle rect = table.getCellRect(row, column, true);
-        menu.show(table, rect.x, rect.y + rect.height);
-    }
-
     private static final class ActiveWarRowData {
         final War war;
         final Dynasty opponent;
@@ -635,7 +628,7 @@ public class WarManagementPanel extends JPanel implements DynastyManagementDialo
     }
 
     private class WarActionRenderer extends JPanel implements TableCellRenderer {
-        private final JButton actionsBtn = new JButton(LanguageStrings.get(LanguageStrings.UI_MANAGE));
+        private final JButton actionsBtn = new JButton(LanguageStrings.get(LanguageStrings.DYNASTY_ACTIONS));
 
         WarActionRenderer() {
             super(new FlowLayout(FlowLayout.CENTER, 0, 0));
@@ -660,7 +653,7 @@ public class WarManagementPanel extends JPanel implements DynastyManagementDialo
 
     private class WarActionEditor extends AbstractCellEditor implements TableCellEditor {
         private final JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
-        private final JButton actionsBtn = new JButton(LanguageStrings.get(LanguageStrings.UI_MANAGE));
+        private final JButton actionsBtn = new JButton(LanguageStrings.get(LanguageStrings.DYNASTY_ACTIONS));
         private ActiveWarRowData currentData;
         private JTable editingTable;
         private int editingRow;

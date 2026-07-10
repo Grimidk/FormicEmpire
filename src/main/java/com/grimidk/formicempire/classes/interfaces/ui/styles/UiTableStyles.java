@@ -5,6 +5,8 @@ import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
+import java.awt.Rectangle;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ScrollPaneConstants;
@@ -280,6 +282,23 @@ public final class UiTableStyles {
             return SwingConstants.CENTER;
         }
         return SwingConstants.LEFT;
+    }
+
+    /** Anchors a popup below a table cell — used by row action menus. */
+    public static void showCellPopupMenu(JPopupMenu menu, JTable table, int row, int column) {
+        if (menu == null || table == null || row < 0 || column < 0 || !table.isShowing()) {
+            return;
+        }
+        Rectangle rect = table.getCellRect(row, column, true);
+        menu.show(table, rect.x, rect.y + rect.height);
+    }
+
+    /** Shows a popup on a component when no table anchor is available. */
+    public static void showComponentPopupMenu(JPopupMenu menu, Component invoker) {
+        if (menu == null || invoker == null || !invoker.isShowing()) {
+            return;
+        }
+        menu.show(invoker, Math.max(0, invoker.getWidth() / 2), Math.max(0, invoker.getHeight() / 2));
     }
 
   /** Shows full cell text on hover when the column is too narrow. */

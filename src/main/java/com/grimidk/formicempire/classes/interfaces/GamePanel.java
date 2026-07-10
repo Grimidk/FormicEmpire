@@ -4,6 +4,7 @@ import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.CrossDynastyTradeProposal;
 import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.entities.Trade;
 import com.grimidk.formicempire.classes.entities.War;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyRebellionService;
 import com.grimidk.formicempire.classes.entities.services.world.WarService;
@@ -66,6 +67,7 @@ public class GamePanel extends ZeroGamePanel {
     private DynastyManagementDialog dynastyDialog;
     private WarDialog warDialog;
     private WarBattleDialog warBattleDialog;
+    private ConvoyDialog convoyDialog;
     private SettingsPanel.SettingsDialog settingsDialog;
 
     private AlertManager alertManager;
@@ -439,6 +441,7 @@ public class GamePanel extends ZeroGamePanel {
         if (dynastyDialog != null && dynastyDialog.isShowing()) dynastyDialog.refreshTranslations();
         if (warDialog != null && warDialog.isShowing()) warDialog.refreshTranslations();
         if (warBattleDialog != null && warBattleDialog.isShowing()) warBattleDialog.refreshTranslations();
+        if (convoyDialog != null && convoyDialog.isShowing()) convoyDialog.refreshTranslations();
         if (settingsDialog != null && settingsDialog.isShowing()) settingsDialog.refreshDialog();
     }
 
@@ -463,6 +466,7 @@ public class GamePanel extends ZeroGamePanel {
         if (dynastyDialog != null && dynastyDialog.isShowing()) dynastyDialog.refreshTheme();
         if (warDialog != null && warDialog.isShowing()) warDialog.refreshTheme();
         if (warBattleDialog != null && warBattleDialog.isShowing()) warBattleDialog.refreshTheme();
+        if (convoyDialog != null && convoyDialog.isShowing()) convoyDialog.refreshTheme();
         if (settingsDialog != null && settingsDialog.isShowing()) settingsDialog.refreshTheme();
     }
     
@@ -850,7 +854,7 @@ public class GamePanel extends ZeroGamePanel {
         }
 
         dynastyDialog = new DynastyManagementDialog(frame, colony.getDynasty(), engine, this::handleGoToColony,
-                this::showWarRolesFromManagement, this::showWarBattle);
+                this::showWarRolesFromManagement, this::showWarBattle, this::showConvoyView);
         dynastyDialog.showDialog(DynastyManagementDialog.TAB_OVERVIEW);
     }
 
@@ -882,7 +886,7 @@ public class GamePanel extends ZeroGamePanel {
         }
 
         dynastyDialog = new DynastyManagementDialog(frame, colony.getDynasty(), engine, this::handleGoToColony,
-                this::showWarRolesFromManagement, this::showWarBattle);
+                this::showWarRolesFromManagement, this::showWarBattle, this::showConvoyView);
         dynastyDialog.showDialog(DynastyManagementDialog.TAB_WARS);
     }
 
@@ -906,6 +910,24 @@ public class GamePanel extends ZeroGamePanel {
         }
         warBattleDialog = new WarBattleDialog(frame, war, engine);
         warBattleDialog.showDialog();
+    }
+
+    private void showConvoyView(Trade trade) {
+        if (trade == null) {
+            return;
+        }
+        Engine engine = frame.getEngine();
+        if (engine == null || engine.getWorld() == null) {
+            return;
+        }
+        if (convoyDialog != null && convoyDialog.isShowing()) {
+            convoyDialog.dispose();
+        }
+        if (convoyDialog != null) {
+            convoyDialog.dispose();
+        }
+        convoyDialog = new ConvoyDialog(frame, trade, engine);
+        convoyDialog.showDialog();
     }
 
     private WarManagementPanel.Callbacks createWarDialogCallbacks() {
@@ -960,7 +982,7 @@ public class GamePanel extends ZeroGamePanel {
         }
 
         dynastyDialog = new DynastyManagementDialog(frame, colony.getDynasty(), engine, this::handleGoToColony,
-                this::showWarRolesFromManagement, this::showWarBattle);
+                this::showWarRolesFromManagement, this::showWarBattle, this::showConvoyView);
         dynastyDialog.showDialog(tabIndex);
     }
 
@@ -985,7 +1007,7 @@ public class GamePanel extends ZeroGamePanel {
         }
 
         dynastyDialog = new DynastyManagementDialog(frame, colony.getDynasty(), engine, this::handleGoToColony,
-                this::showWarRolesFromManagement, this::showWarBattle);
+                this::showWarRolesFromManagement, this::showWarBattle, this::showConvoyView);
         dynastyDialog.showDialog(DynastyManagementDialog.TAB_TRADE);
     }
 
@@ -1012,7 +1034,7 @@ public class GamePanel extends ZeroGamePanel {
         }
 
         dynastyDialog = new DynastyManagementDialog(frame, colony.getDynasty(), engine, this::handleGoToColony,
-                this::showWarRolesFromManagement, this::showWarBattle);
+                this::showWarRolesFromManagement, this::showWarBattle, this::showConvoyView);
         dynastyDialog.showDialog(DynastyManagementDialog.TAB_DIPLOMACY);
     }
 
@@ -1084,6 +1106,19 @@ public class GamePanel extends ZeroGamePanel {
 
     private boolean closeVisibleDialogs() {
         boolean closed = false;
+        if (convoyDialog != null && convoyDialog.isShowing()) {
+            convoyDialog.dispose();
+            convoyDialog = null;
+            closed = true;
+        }
+        if (warBattleDialog != null && warBattleDialog.isShowing()) {
+            warBattleDialog.dispose();
+            warBattleDialog = null;
+            closed = true;
+        }
+        if (closed) {
+            return true;
+        }
         if (hatchDialog != null && hatchDialog.isShowing()) {
             hatchDialog.dispose();
             hatchDialog = null;
@@ -1142,6 +1177,7 @@ public class GamePanel extends ZeroGamePanel {
         if (dynastyDialog != null) { dynastyDialog.dispose(); dynastyDialog = null; }
         if (warDialog != null) { warDialog.dispose(); warDialog = null; }
         if (warBattleDialog != null) { warBattleDialog.dispose(); warBattleDialog = null; }
+        if (convoyDialog != null) { convoyDialog.dispose(); convoyDialog = null; }
         if (settingsDialog != null) { settingsDialog.dispose(); settingsDialog = null; }
     }
 
@@ -1529,6 +1565,9 @@ public class GamePanel extends ZeroGamePanel {
             }
             if (warBattleDialog != null && warBattleDialog.isShowing()) {
                 warBattleDialog.liveUpdate();
+            }
+            if (convoyDialog != null && convoyDialog.isShowing()) {
+                convoyDialog.liveUpdate();
             }
             if (controlPanel != null) {
                 controlPanel.updateResearchMenu(colony.hasUpgrade(GameUnlocks.ABILITY_RESEARCH));

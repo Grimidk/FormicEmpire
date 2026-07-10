@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 67% (174/261 checked)
+Completion: 66% (174/262 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -302,7 +302,8 @@ Neighbor trade rows (per adjacent hex):
 [X] Confirm / update trade
 [X] Cancel trade dialog
 [X] Active trade edit from table actions (Manage / Establish)
-[ ] Make Two-Way button in logistics Actions column (visible with outgoing one-way route; enabled when matching incoming one-way route exists)
+[ ] See convoy option in logistics Actions menu (opens convoy transit view)
+[ ] Make two-way trade option in logistics Actions menu (enabled when matching incoming one-way route exists)
 
 ================================================================================
 17. DYNASTY — DIPLOMACY (D)

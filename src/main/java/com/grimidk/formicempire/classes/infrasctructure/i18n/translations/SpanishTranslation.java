@@ -429,6 +429,13 @@ public class SpanishTranslation implements Translation {
         es.put("BATTLE_PHASE_RESERVE", "Asalto a reservas");
         es.put("BATTLE_PHASE_REDEPLOY", "Redespliegue");
         es.put("BATTLE_REDEPLOY_FMT", "Redespliegue (%s h restantes)");
+        es.put("DIALOG_CONVOY_TITLE", "Convoy");
+        es.put("CONVOY_ACTION_VIEW", "Ver convoy");
+        es.put("CONVOY_ACTION_VIEW_LEG_FMT", "Ver convoy (%s → %s)");
+        es.put("CONVOY_NOT_AVAILABLE", "Esta ruta no tiene un convoy en tránsito para mostrar.");
+        es.put("CONVOY_ROUTE_FMT", "%s → %s");
+        es.put("CONVOY_PROGRESS_FMT", "%s — %s / %s h (%s%%)");
+        es.put("CONVOY_FORCES_FMT", "Convoy: %s hormigas");
         es.put("WAR_OFFER_PEACE_CONFIRM_FMT", "¿Ofrecer paz a %s? Deben aceptar mientras tú tengas ventaja.");
         es.put("WAR_ACCEPT_PEACE_CONFIRM_FMT", "¿Aceptar la oferta de paz de %s?");
         es.put("WAR_PEACE_OFFERED_TITLE", "Paz ofrecida");
