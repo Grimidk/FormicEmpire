@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.List;
 
 import com.grimidk.formicempire.classes.constants.ant.AntType;
+import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.misc.TradeMethod;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyConvoyTransitService;
@@ -136,7 +137,12 @@ public class Trade {
 
     public void tick() {
         if (!isActive) return;
-        
+
+        if (!hasSufficientLiveEscorts()) {
+            cancelDueToEscortLoss();
+            return;
+        }
+
         remainingHours--;
         if (remainingHours <= 0) {
             if (!isReturning) {
@@ -163,7 +169,15 @@ public class Trade {
                 }
 
                 if (isRecurrent) {
-                    startTrip();
+                    if (!startTrip()) {
+                        Colony originColony = origin.getColony();
+                        if (originColony != null) {
+                            Colony destColony = destination.getColony();
+                            String destName = destColony != null ? destColony.getName() : "?";
+                            originColony.logEvent(ColonyLogPrefixes.TRADE + " "
+                                    + LanguageStrings.format(LanguageStrings.LOG_TRADE_ESCORT_LOSS_FMT, destName));
+                        }
+                    }
                 } else {
                     isActive = false;
                 }
@@ -268,13 +282,87 @@ public class Trade {
                     for (Map.Entry<ResourceType, Double> entry : load.entrySet()) {
                         originColony.getResourceService().addResource(originColony, entry.getKey(), entry.getValue());
                     }
+                    Colony destColony = destination.getColony();
                     originColony.logEvent(ColonyLogPrefixes.TRADE + " "
                         + String.format(LanguageStrings.get(LanguageStrings.LOG_TRADE_ROUTE_CANCELLED_FMT),
-                            destination.getColony().getName()));
+                            destColony != null ? destColony.getName() : "?"));
                 }
             }
             releaseAnts();
             isActive = false;
+        }
+    }
+
+    public void purgeDeadEscorts() {
+        antsOnTrip.removeIf(ant -> {
+            if (ant == null || !ant.isAlive()) {
+                if (ant != null) {
+                    ant.setOnTrade(false);
+                }
+                return true;
+            }
+            return false;
+        });
+    }
+
+    public boolean hasSufficientLiveEscorts() {
+        purgeDeadEscorts();
+        if (transport.isEmpty()) {
+            return true;
+        }
+        Map<AntType, Integer> liveCounts = new HashMap<>();
+        for (Ant ant : antsOnTrip) {
+            if (ant != null && ant.isAlive()) {
+                liveCounts.merge(ant.getAntType(), 1, Integer::sum);
+            }
+        }
+        if (antsOnTrip.isEmpty()) {
+            Colony originColony = origin.getColony();
+            if (originColony == null) {
+                return false;
+            }
+            for (Map.Entry<AntType, Integer> entry : transport.entrySet()) {
+                long available = originColony.getAntsByType(entry.getKey()).stream()
+                        .filter(a -> a.isAlive() && !a.isOnTrade())
+                        .count();
+                if (available < entry.getValue()) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        for (Map.Entry<AntType, Integer> entry : transport.entrySet()) {
+            if (liveCounts.getOrDefault(entry.getKey(), 0) < entry.getValue()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void cancelDueToEscortLoss() {
+        if (!isActive) {
+            return;
+        }
+        Colony originColony = origin.getColony();
+        Colony destColony = destination.getColony();
+        if (originColony != null) {
+            if (!isReturning) {
+                for (Map.Entry<ResourceType, Double> entry : load.entrySet()) {
+                    originColony.getResourceService().addResource(originColony, entry.getKey(), entry.getValue());
+                }
+            }
+            String destName = destColony != null ? destColony.getName() : "?";
+            originColony.logEvent(ColonyLogPrefixes.TRADE + " "
+                    + LanguageStrings.format(LanguageStrings.LOG_TRADE_ESCORT_LOSS_FMT, destName));
+        }
+        releaseAnts();
+        isActive = false;
+    }
+
+    public void cancelDueToEscortLoss(TradeManager tradeManager) {
+        cancelDueToEscortLoss();
+        if (tradeManager != null) {
+            tradeManager.removeTrade(this);
         }
     }
 

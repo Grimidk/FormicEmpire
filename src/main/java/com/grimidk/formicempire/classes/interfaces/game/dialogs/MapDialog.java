@@ -11,6 +11,7 @@ import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.DynastyColorSwatch;
 import com.grimidk.formicempire.classes.interfaces.ui.plaf.FlatChevronButton;
 import com.grimidk.formicempire.classes.interfaces.ui.styles.UiScrollBarStyles;
 
@@ -513,11 +514,8 @@ public class MapDialog extends ZeroDialog {
                 JPanel badges = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 2));
                 badges.setOpaque(false);
 
-                JPanel colorBox = new JPanel();
-                colorBox.setPreferredSize(new Dimension(12, 12));
-                colorBox.setBackground(d.getColor());
-                colorBox.setBorder(BorderFactory.createLineBorder(AssetStyles.COLOR_ABSOLUTE_BLACK, 1));
-                badges.add(colorBox);
+                DynastyColorSwatch colorSwatch = new DynastyColorSwatch(d.getColor());
+                badges.add(colorSwatch);
 
                 if (d.getSpecies() != null && d.getSpecies().getIcon() != null) {
                     badges.add(new JLabel(d.getSpecies().getIcon()));
@@ -551,30 +549,25 @@ public class MapDialog extends ZeroDialog {
                 Colony capital = d.getCapital();
                 Hex capitalHex = capital != null ? world.getHexOfColony(capital) : null;
                 if (capitalHex != null) {
-                    colorBox.setToolTipText(clickTooltip);
-                    colorBox.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                    colorBox.addMouseListener(new MouseAdapter() {
-                        @Override
-                        public void mouseClicked(MouseEvent e) {
-                            changeHex(capitalHex, true);
-                        }
-
-                        @Override
-                        public void mouseEntered(MouseEvent e) {
-                            colorBox.setBorder(BorderFactory.createLineBorder(AssetStyles.SELECTION_BACKGROUND, 2));
-                        }
-
-                        @Override
-                        public void mouseExited(MouseEvent e) {
-                            colorBox.setBorder(BorderFactory.createLineBorder(AssetStyles.COLOR_ABSOLUTE_BLACK, 1));
-                        }
-                    });
+                    Runnable goToCapital = () -> changeHex(capitalHex, true);
+                    colorSwatch.setClickAction(goToCapital, clickTooltip);
+                } else {
+                    colorSwatch.clearClickAction();
                 }
 
                 JLabel name = new JLabel(nameStr);
                 name.setFont(d.isPlayer() ? AssetStyles.FONT_BOLD.deriveFont(10f) : AssetStyles.FONT_SMALL);
                 name.setForeground(defeated ? AssetStyles.FONT_COLOR_ERROR : AssetStyles.FONT_COLOR);
                 name.setToolTipText(buildDynastyLegendInfoTooltip(d, playerDynasty));
+                if (capitalHex != null) {
+                    name.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    name.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            changeHex(capitalHex, true);
+                        }
+                    });
+                }
 
                 int pop = d.getStatService().getTotalPopulation(d);
                 int military = d.getMilitaryPower();

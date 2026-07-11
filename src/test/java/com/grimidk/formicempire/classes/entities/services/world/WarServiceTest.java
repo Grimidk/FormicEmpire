@@ -9,6 +9,7 @@ import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDiplomacyService;
 import com.grimidk.formicempire.classes.infrasctructure.World;
+import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
@@ -261,8 +262,9 @@ class WarServiceTest {
         assertEquals(GameConstants.DIPLO_MODIFIER_WAS_AT_WAR.getNameKey(),
                 player.getDiplomaticModifierKey(neighbor.getId()));
         assertEquals(12, player.getDiplomacyService().getWasAtWarModifierMonthsRemaining(neighbor, world));
-        assertEquals(DynastyDiplomacyService.worldMonthIndex(world),
-                player.getWasAtWarPeacedAtWorldMonth(neighbor.getId()));
+        assertEquals(GameConstants.DIPLO_MODIFIER_WAS_AT_WAR.getDurationDays(),
+                player.getDiplomaticModifierRemainingDays(
+                        neighbor.getId(), GameConstants.DIPLO_MODIFIER_WAS_AT_WAR.getNameKey()));
     }
 
     @Test
@@ -289,6 +291,7 @@ class WarServiceTest {
         player.setDiplomaticReputation(neighbor.getId(), 40);
         neighbor.setDiplomaticReputation(player.getId(), 40);
 
+        advanceWorldDays(GameConstants.DIPLO_MODIFIER_WAS_AT_WAR.getDurationDays());
         world.setYear(1);
         world.setMonth(0);
         player.getDiplomacyService().getEffectiveDiplomaticReputation(neighbor, world);
@@ -379,5 +382,13 @@ class WarServiceTest {
         colony.getWarAssignedRoleCounts().put(GameConstants.ROLE_DEFENDER, 10);
         ColonyMilitaryService.refreshColonyMilitaryPower(colony);
         ColonyMilitaryService.refreshDynastyMilitaryPower(dynasty);
+    }
+
+    private void advanceWorldDays(int days) {
+        TradeManager tradeManager = new TradeManager();
+        for (int i = 0; i < days; i++) {
+            player.runDailyJobs(world, tradeManager);
+            neighbor.runDailyJobs(world, tradeManager);
+        }
     }
 }

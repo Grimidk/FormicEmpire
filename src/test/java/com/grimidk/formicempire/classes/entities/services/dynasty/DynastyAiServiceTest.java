@@ -93,9 +93,13 @@ class DynastyAiServiceTest {
 
         Colony capital = new Colony(10, "Capital", false);
         capital.setAge(10);
-        capital.setAssignedRoleCount(GameConstants.ROLE_DIPLOMAT, 3);
+        Ant diplomat = new Ant(capital, GameConstants.TYPE_PRINCESS);
+        diplomat.setRole(GameConstants.ROLE_DIPLOMAT);
+        capital.getPrincesses().add(diplomat);
+        capital.setAssignedRoleCount(GameConstants.ROLE_DIPLOMAT, 1);
         capital.getWorkers().add(new Ant(capital, GameConstants.TYPE_WORKER));
         npc.addColony(capital);
+        npc.setCapital(capital);
         Colony neighborColony = new Colony(20, "Neighbor Capital", false);
         neighborColony.getWorkers().add(new Ant(neighborColony, GameConstants.TYPE_WORKER));
         neighbor.addColony(neighborColony);

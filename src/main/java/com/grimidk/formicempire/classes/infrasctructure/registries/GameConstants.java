@@ -168,10 +168,15 @@ public final class GameConstants {
     }
 
     public static ImageIcon getAssimilatedDroneSprite(Species species) {
-        if (species == null) {
+        if (species == null || !hasAssimilatedDroneSprite(species)) {
             return null;
         }
         return loadIcon("sprites/ants/zero-drones/" + species.getZeroDroneSpriteFileName());
+    }
+
+    /** True when {@code sprites/ants/zero-drones/} has art for this species (fully implemented assimilations only). */
+    public static boolean hasAssimilatedDroneSprite(Species species) {
+        return species != null && WORLD_SPAWNABLE_NPC_SPECIES_IDS.contains(species.getId());
     }
 
     private static Set<Upgrade> defaultSpeciesUpgrades(Upgrade speciesTrait) {
@@ -666,7 +671,6 @@ public final class GameConstants {
     public static final float SUBTYPE_FORAGE_MULT_HONEYPOT = 4f;
     public static final float SUBTYPE_SPEED_MULT_HONEYPOT = 0.75f;
 
-    // TODO asset: icons/subtypes/Nothing.png; icons/species/Omni.png (placeholder — replace final art)
     private static final ImageIcon SUBTYPE_ICON_NOTHING = loadIcon("icons/species/Omni.png");
 
     public static final AntSubtype SUBTYPE_HEAD_NONE = new AntSubtype(1, LanguageStrings.SUBTYPE_NOTHING, AntSubtypeSlot.HEAD,
@@ -865,6 +869,9 @@ public final class GameConstants {
 
     public static final String DIPLO_EXCLUSIVE_PACT = "pact";
 
+    /** Stored remaining-days sentinel: modifier does not expire on a timer. */
+    public static final int MODIFIER_PERMANENT = -1;
+
     // --- Diplomatic reputation modifiers ---
     public static final DiplomaticReputationModifier DIPLO_MODIFIER_PACT = new DiplomaticReputationModifier(
         1, LanguageStrings.DIPLO_MODIFIER_PACT, 20, REPUTATION_CORDIAL.getMinScore(), DIPLO_EXCLUSIVE_PACT);
@@ -873,7 +880,7 @@ public final class GameConstants {
         2, LanguageStrings.DIPLO_MODIFIER_BROKEN_PACT, -30, 0, DIPLO_EXCLUSIVE_PACT);
     static { diplomaticReputationModifiers.add(DIPLO_MODIFIER_BROKEN_PACT); }
     public static final DiplomaticReputationModifier DIPLO_MODIFIER_DECLINED_PACT = new DiplomaticReputationModifier(
-        7, LanguageStrings.DIPLO_MODIFIER_DECLINED_PACT, -10, 0, DIPLO_EXCLUSIVE_PACT);
+        7, LanguageStrings.DIPLO_MODIFIER_DECLINED_PACT, -10, 0, DIPLO_EXCLUSIVE_PACT, 30);
     static { diplomaticReputationModifiers.add(DIPLO_MODIFIER_DECLINED_PACT); }
     public static final DiplomaticReputationModifier DIPLO_MODIFIER_WAR = new DiplomaticReputationModifier(
         3, LanguageStrings.DIPLO_MODIFIER_WAR, -200, 0, DIPLO_EXCLUSIVE_PACT);
@@ -882,7 +889,7 @@ public final class GameConstants {
         4, LanguageStrings.DIPLO_MODIFIER_TRADE, 20, REPUTATION_NEUTRAL.getMinScore(), null);
     static { diplomaticReputationModifiers.add(DIPLO_MODIFIER_TRADE); }
     public static final DiplomaticReputationModifier DIPLO_MODIFIER_TRADE_REQUEST = new DiplomaticReputationModifier(
-        5, LanguageStrings.DIPLO_MODIFIER_TRADE_REQUEST, -5, REPUTATION_NEUTRAL.getMinScore(), null);
+        5, LanguageStrings.DIPLO_MODIFIER_TRADE_REQUEST, -5, REPUTATION_NEUTRAL.getMinScore(), null, 30);
     static { diplomaticReputationModifiers.add(DIPLO_MODIFIER_TRADE_REQUEST); }
     public static final DiplomaticReputationModifier DIPLO_MODIFIER_TRADE_OFFER = new DiplomaticReputationModifier(
         10, LanguageStrings.DIPLO_MODIFIER_TRADE_OFFER, 5, REPUTATION_NEUTRAL.getMinScore(), null);
@@ -896,8 +903,13 @@ public final class GameConstants {
         8, LanguageStrings.DIPLO_MODIFIER_GRANTED_INDEPENDENCE, 25, 0, null);
     static { diplomaticReputationModifiers.add(DIPLO_MODIFIER_GRANTED_INDEPENDENCE); }
     public static final DiplomaticReputationModifier DIPLO_MODIFIER_WAS_AT_WAR = new DiplomaticReputationModifier(
-        9, LanguageStrings.DIPLO_MODIFIER_WAS_AT_WAR, -20, 0, null);
+        9, LanguageStrings.DIPLO_MODIFIER_WAS_AT_WAR, -20, 0, null, 360);
     static { diplomaticReputationModifiers.add(DIPLO_MODIFIER_WAS_AT_WAR); }
+    public static final DiplomaticReputationModifier DIPLO_MODIFIER_GENETIC_EXCHANGE = new DiplomaticReputationModifier(
+        11, LanguageStrings.DIPLO_MODIFIER_GENETIC_EXCHANGE, 10, 0, null, 180);
+    static { diplomaticReputationModifiers.add(DIPLO_MODIFIER_GENETIC_EXCHANGE); }
+
+    public static final int GENETIC_EXCHANGE_DRONE_COST = 25;
 
     public static final double REBELLION_MONTHLY_CHANCE_MIN = 0.05;
     public static final double REBELLION_MONTHLY_CHANCE_MAX = 0.30;
@@ -916,6 +928,9 @@ public final class GameConstants {
     public static final GeneticIntegrityModifier GI_MODIFIER_PACT = new GeneticIntegrityModifier(
         1, LanguageStrings.GI_MODIFIER_PACT, 10.0, DIPLO_MODIFIER_PACT.getNameKey());
     static { geneticIntegrityModifiers.add(GI_MODIFIER_PACT); }
+    public static final GeneticIntegrityModifier GI_MODIFIER_GENETIC_EXCHANGE = new GeneticIntegrityModifier(
+        2, LanguageStrings.GI_MODIFIER_GENETIC_EXCHANGE, 10.0, DIPLO_MODIFIER_GENETIC_EXCHANGE.getNameKey());
+    static { geneticIntegrityModifiers.add(GI_MODIFIER_GENETIC_EXCHANGE); }
 
     public static final int COLONY_LOYALTY_MIN = 0;
     public static final int COLONY_LOYALTY_MAX = 100;
@@ -1040,13 +1055,13 @@ public final class GameConstants {
         3, LanguageStrings.LOYALTY_MODIFIER_CAPITAL, 200, 0, null);
     static { colonyLoyaltyModifiers.add(LOYALTY_MODIFIER_CAPITAL); }
     public static final ColonyLoyaltyModifier LOYALTY_MODIFIER_PHEROMONE_STORM = new ColonyLoyaltyModifier(
-        4, LanguageStrings.LOYALTY_MODIFIER_PHEROMONE_STORM, 10, 0, null);
+        4, LanguageStrings.LOYALTY_MODIFIER_PHEROMONE_STORM, 10, 0, null, 360);
     static { colonyLoyaltyModifiers.add(LOYALTY_MODIFIER_PHEROMONE_STORM); }
     public static final ColonyLoyaltyModifier LOYALTY_MODIFIER_RECENTLY_CONQUERED = new ColonyLoyaltyModifier(
-        5, LanguageStrings.LOYALTY_MODIFIER_RECENTLY_CONQUERED, -5, 0, null);
+        5, LanguageStrings.LOYALTY_MODIFIER_RECENTLY_CONQUERED, -5, 0, null, 180);
     static { colonyLoyaltyModifiers.add(LOYALTY_MODIFIER_RECENTLY_CONQUERED); }
     public static final ColonyLoyaltyModifier LOYALTY_MODIFIER_RECENTLY_INTEGRATED = new ColonyLoyaltyModifier(
-        6, LanguageStrings.LOYALTY_MODIFIER_RECENTLY_INTEGRATED, 25, 0, null);
+        6, LanguageStrings.LOYALTY_MODIFIER_RECENTLY_INTEGRATED, 25, 0, null, 180);
     static { colonyLoyaltyModifiers.add(LOYALTY_MODIFIER_RECENTLY_INTEGRATED); }
 
     public static final int PHEROMONE_STORM_SYRUP_COST = 500;
@@ -1059,6 +1074,31 @@ public final class GameConstants {
     public static final int INTEGRATION_MIN_DIPLOMATS = 1;
     public static final int DAYS_PER_MONTH = 30;
     public static final int AI_FORCED_FLIGHT_COOLDOWN_DAYS = 30;
+
+    public static int monthsToDays(int months) {
+        return Math.max(0, months) * DAYS_PER_MONTH;
+    }
+
+    public static int daysToMonthsCeil(int days) {
+        if (days <= 0) {
+            return 0;
+        }
+        return (days + DAYS_PER_MONTH - 1) / DAYS_PER_MONTH;
+    }
+
+    public static int initialModifierRemainingDays(DiplomaticReputationModifier modifier) {
+        if (modifier == null || !modifier.hasExpiration()) {
+            return MODIFIER_PERMANENT;
+        }
+        return modifier.getDurationDays();
+    }
+
+    public static int initialModifierRemainingDays(ColonyLoyaltyModifier modifier) {
+        if (modifier == null || !modifier.hasExpiration()) {
+            return MODIFIER_PERMANENT;
+        }
+        return modifier.getDurationDays();
+    }
     public static final int WAR_PACT_BREAK_COOLDOWN_MONTHS = 6;
     public static final int DIPLO_DECLINED_REQUEST_COOLDOWN_MONTHS = 1;
     public static final int WAS_AT_WAR_MODIFIER_MONTHS = 12;
@@ -1207,7 +1247,6 @@ public final class GameConstants {
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_RAFTING), loadIcon("icons/species/Floodplain.png"));
     static { species.add(SPECIES_FLOODPLAIN); }
 
-    // TODO asset: icons/species/Fire.png; sprites/ants/fire/*.png (placeholder — replace final art)
     public static final Species SPECIES_FIRE = new Species(11, LanguageStrings.SPECIES_FIRE, LanguageStrings.SPECIES_FIRE_SCIENTIFIC, "fire/", GameUnlocks.ASSIMILATION_FIREVENOM,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_FIREVENOM), loadIcon("icons/species/Fire.png"));
     static { species.add(SPECIES_FIRE); }
@@ -1246,7 +1285,6 @@ public final class GameConstants {
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_HEATRESIST), loadIcon("icons/species/Silver.png"));
     static { species.add(SPECIES_SILVER); }
 
-    // TODO asset: icons/species/Maricopa.png; sprites/ants/maricopa/*.png (placeholder — replace final art)
     public static final Species SPECIES_MARICOPA = new Species(19, LanguageStrings.SPECIES_MARICOPA, LanguageStrings.SPECIES_MARICOPA_SCIENTIFIC, "maricopa/", GameUnlocks.ASSIMILATION_DEADLYVENOM,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_DEADLYVENOM), loadIcon("icons/species/Maricopa.png"));
     static { species.add(SPECIES_MARICOPA); }

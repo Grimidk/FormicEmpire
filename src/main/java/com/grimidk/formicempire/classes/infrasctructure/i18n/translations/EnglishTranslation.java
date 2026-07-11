@@ -190,7 +190,7 @@ public class EnglishTranslation implements Translation {
         en.put("SYNERGY_REQUIREMENT_MISSING_FMT", "[ ] %s");
         en.put("SYNERGY_SUPER_VENOM", "Super Venom");
         en.put("SYNERGY_SUPER_VENOM_FLAVOR", "Super Venom");
-        en.put("SYNERGY_SUPER_VENOM_DESC", "Replaces Fire + Maricopa venom stacking (4+4) with a 16x colony damage multiplier when both venoms are assimilated and Synergies are researched.");
+        en.put("SYNERGY_SUPER_VENOM_DESC", "Replaces Fire + Neurotoxic venom stacking (4+4) with a 16x colony damage multiplier when both venoms are assimilated and Synergies are researched.");
 
         en.put("DIALOG_HATCH_RATES_TITLE", "Manage Pupa Hatch Rates");
         en.put("HATCH_DESC", "Set hatch chance for new ants:");
@@ -830,6 +830,7 @@ public class EnglishTranslation implements Translation {
         en.put("DIPLO_MODIFIER_BORDER_FRICTION", "Border Friction");
         en.put("DIPLO_MODIFIER_GRANTED_INDEPENDENCE", "Granted Independence");
         en.put("DIPLO_MODIFIER_WAS_AT_WAR", "Was at War");
+        en.put("DIPLO_MODIFIER_GENETIC_EXCHANGE", "Genetic Exchange");
         en.put("DYNASTY_REBELLION_NAME_FMT", "%s Rebellion");
         en.put("REBELLION_WAR_NAME_FMT", "%s %s Rebellion");
         en.put("ALERT_REBELLION_RISK_FMT", "Rebellion risk at %s!");
@@ -842,6 +843,7 @@ public class EnglishTranslation implements Translation {
         en.put("LOG_REBELLION_INDEPENDENCE_FMT", "Peaceful independence granted to %s.");
         en.put("DIPLO_MILITARY_STRENGTH", "Military Strength");
         en.put("GI_MODIFIER_PACT", "Pact Alliance");
+        en.put("GI_MODIFIER_GENETIC_EXCHANGE", "Genetic Exchange");
         en.put("GI_TOOLTIP_START", "Starting");
         en.put("GI_MODIFIER_SATELLITE_COLONIES", "Satellite colonies (%s): %s");
         en.put("GI_TOOLTIP_ASSIMILATION_FLOOR", "Assimilation floor (%s): %s%%");
@@ -884,6 +886,7 @@ public class EnglishTranslation implements Translation {
         en.put("DIPLO_ACTION_TRADE", "Trade");
         en.put("DIPLO_ACTION_REQUEST_TRADE", "Request Trade");
         en.put("DIPLO_ACTION_SEND_DIPLOMATS", "Send Diplomats");
+        en.put("DIPLO_ACTION_GENETIC_EXCHANGE", "Genetic Exchange");
         en.put("DIPLO_ACTION_INTEGRATE", "Begin Integration");
         en.put("DIPLO_ACTION_CANCEL_INTEGRATION", "Cancel Integration");
         en.put("DIPLO_INTEGRATION_PROGRESS_FMT", "%s%% — %s (%s diplomats)");
@@ -898,12 +901,18 @@ public class EnglishTranslation implements Translation {
         en.put("DIPLO_ERROR_INTEGRATION_MILITARY", "Requires at least 5× their military power.");
         en.put("DIPLO_ERROR_INTEGRATION_REPUTATION", "Requires Friendly reputation or better.");
         en.put("DIPLO_ERROR_INTEGRATION_DIPLOMATS", "Requires at least one available diplomat.");
+        en.put("DIPLO_ERROR_INTEGRATION_BORDER", "Your dynasty must share a border with this dynasty.");
+        en.put("DIPLO_ERROR_INTEGRATION_PACT", "Requires a non-aggression pact with this dynasty.");
         en.put("DIPLO_SEND_DIPLOMATS_TITLE", "Send Diplomats");
         en.put("DIPLO_SEND_DIPLOMATS_PROMPT", "Send up to %s diplomat(s) (%s assigned). Each improves stability by %s.");
         en.put("DIPLO_SEND_DIPLOMATS_SUCCESS_DYNASTY", "Sent %s diplomat(s). Reputation with %s increased by %s.");
         en.put("DIPLO_SEND_DIPLOMATS_SUCCESS_COLONY", "Sent %s diplomat(s). %s loyalty increased by %s.");
         en.put("DIPLO_ERROR_NO_DIPLOMATS", "No princesses are assigned to the Diplomat role in this colony.");
         en.put("DIPLO_ERROR_NO_DIPLOMAT_ROLE", "Unlock the Diplomat role before sending diplomats.");
+        en.put("DIPLO_ERROR_GENETIC_EXCHANGE_ACTIVE", "A genetic exchange boost is already active with this dynasty.");
+        en.put("DIPLO_ERROR_GENETIC_EXCHANGE_DRONES", "Need at least 25 live drones across your dynasty.");
+        en.put("DIPLO_ERROR_GENETIC_EXCHANGE_BORDER", "Your dynasty must have a colony bordering this dynasty.");
+        en.put("DIPLO_ERROR_GENETIC_EXCHANGE_REP", "Requires Cordial reputation or better.");
         en.put("DIPLO_ERROR_REPUTATION_STABLE", "Diplomats cannot be sent to dynasties with Aggressive reputation.");
         en.put("DIPLO_ERROR_LOYALTY_STABLE", "Diplomats cannot be sent to colonies with Rebellious loyalty.");
         en.put("DIPLO_ERROR_CORDIAL_REQUIRED", "Cordial reputation or better is required to form a pact.");
@@ -969,8 +978,8 @@ public class EnglishTranslation implements Translation {
         en.put("SPECIES_DRACULA_SCIENTIFIC", "Mystrium Sp.");
         en.put("SPECIES_SILVER", "Saharan Silver Ant");
         en.put("SPECIES_SILVER_SCIENTIFIC", "Cataglyphis Sp.");
-        en.put("SPECIES_MARICOPA", "Maricopa Ant");
-        en.put("SPECIES_MARICOPA_SCIENTIFIC", "Pogonomyrmex Maricopa");
+        en.put("SPECIES_MARICOPA", "Neurotoxic Ant");
+        en.put("SPECIES_MARICOPA_SCIENTIFIC", "Neurotoxica Grimunknowni");
         en.put("SPECIES_EXPLODING", "Exploding Ant");
         en.put("SPECIES_EXPLODING_SCIENTIFIC", "Camponotus Saundersi");
         en.put("SPECIES_BULLDOG", "Bulldog Ant");
@@ -1004,7 +1013,7 @@ public class EnglishTranslation implements Translation {
         en.put("ASSIMILATION_RAFTING", "Floodplain Ant Assimilation");
         en.put("ASSIMILATION_RAFTING_DESC", "After assimilating the floodplain ant genome:");
         en.put("ASSIMILATED_FIREVENOM_FLAVOR", "Burning Venom");
-        en.put("ASSIMILATED_FIREVENOM_DESC", "Multiplies colony base attack damage by 4. Super Venom synergy with Maricopa venom replaces this stacking with 16x.");
+        en.put("ASSIMILATED_FIREVENOM_DESC", "Multiplies colony base attack damage by 4. Super Venom synergy with Neurotoxic venom replaces this stacking with 16x.");
         en.put("ASSIMILATION_FIREVENOM", "Fire Ant Assimilation");
         en.put("ASSIMILATION_FIREVENOM_DESC", "After assimilating the fire ant genome:");
         en.put("ASSIMILATED_JUMPING_FLAVOR", "Leap Strikes");
@@ -1035,10 +1044,10 @@ public class EnglishTranslation implements Translation {
         en.put("ASSIMILATED_HEATRESIST_DESC", "Your dynasty can forage under extreme desert heat that would kill other ants. (Mechanic in development.)");
         en.put("ASSIMILATION_HEATRESIST", "Saharan Silver Ant Assimilation");
         en.put("ASSIMILATION_HEATRESIST_DESC", "After assimilating the saharan silver ant genome:");
-        en.put("ASSIMILATED_DEADLYVENOM_FLAVOR", "Lethal Venom");
+        en.put("ASSIMILATED_DEADLYVENOM_FLAVOR", "Neurotoxic Venom");
         en.put("ASSIMILATED_DEADLYVENOM_DESC", "Adds +4 to the colony damage multiplier. Super Venom synergy with Fire venom replaces this stacking with 16x.");
-        en.put("ASSIMILATION_DEADLYVENOM", "Maricopa Ant Assimilation");
-        en.put("ASSIMILATION_DEADLYVENOM_DESC", "After assimilating the Maricopa ant genome:");
+        en.put("ASSIMILATION_DEADLYVENOM", "Neurotoxic Venom Assimilation");
+        en.put("ASSIMILATION_DEADLYVENOM_DESC", "After assimilating neurotoxic venom genetics:");
         en.put("ASSIMILATED_SELFDESTRUCT_FLAVOR", "Suicidal Defense");
         en.put("ASSIMILATED_SELFDESTRUCT_DESC", "Your dynasty can rupture specialized workers to spray sticky toxins. (Mechanic in development.)");
         en.put("ASSIMILATION_SELFDESTRUCT", "Exploding Ant Assimilation");
@@ -1443,8 +1452,8 @@ public class EnglishTranslation implements Translation {
         en.put("ASSIMILATION_FASTBITE_DESC", "After assimilating the dracula ant genome:");
         en.put("ASSIMILATION_HEATRESIST", "Saharan Silver Ant Assimilation");
         en.put("ASSIMILATION_HEATRESIST_DESC", "After assimilating the saharan silver ant genome:");
-        en.put("ASSIMILATION_DEADLYVENOM", "Maricopa Ant Assimilation");
-        en.put("ASSIMILATION_DEADLYVENOM_DESC", "After assimilating the Maricopa ant genome:");
+        en.put("ASSIMILATION_DEADLYVENOM", "Neurotoxic Venom Assimilation");
+        en.put("ASSIMILATION_DEADLYVENOM_DESC", "After assimilating neurotoxic venom genetics:");
         en.put("ASSIMILATION_SELFDESTRUCT", "Exploding Ant Assimilation");
         en.put("ASSIMILATION_SELFDESTRUCT_DESC", "After assimilating the exploding ant genome:");
         en.put("ASSIMILATION_FARSIGHT", "Bulldog Ant Assimilation");
@@ -1662,6 +1671,11 @@ public class EnglishTranslation implements Translation {
         en.put("LOG_TRADE_CONVOY_RETURN_FMT", "Convoy from %s picked up return cargo.");
         en.put("LOG_TRADE_BILATERAL_RETURN_FMT", "Bilateral convoy returned with %s resource types.");
         en.put("LOG_TRADE_ROUTE_CANCELLED_FMT", "Route to %s cancelled. Resources refunded.");
+        en.put("LOG_TRADE_ESCORT_LOSS_FMT", "Convoy to %s cancelled: not enough escorts after casualties.");
+        en.put("LOG_DIPLOMAT_MISSION_COLLAPSED_COLONY_FMT", "Colony diplomatic mission to %s ended: not enough diplomats after casualties.");
+        en.put("LOG_DIPLOMAT_MISSION_COLLAPSED_DYNASTY_FMT", "Dynasty diplomatic mission to %s ended: not enough diplomats after casualties.");
+        en.put("LOG_GENETIC_EXCHANGE_FMT", "Sent 25 drones to %s for a genetic exchange (+10 reputation, +10%% integrity for 6 months).");
+        en.put("LOG_AI_GENETIC_EXCHANGE_FMT", "AI sent 25 drones to %s for a genetic exchange.");
         en.put("LOG_AUTOMATION_BUILD_FMT", "Started construction of %s");
         en.put("LOG_AUTOMATION_TUNNEL_FMT", "Started tunnel toward %s");
         en.put("LOG_AUTOMATION_TRADE_FMT", "Opened trade route to %s");

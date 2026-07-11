@@ -198,9 +198,9 @@ public class ColonyStatsService {
 
     /**
      * Assimilated damage multiplier for colony base attack.
-     * Fire venom sets 4x; Maricopa venom adds +4 (additive).
+     * Fire venom sets 4x; neurotoxic venom adds +4 (additive).
      * Stinger abdomen subtype applies per-ant via {@link AntSubtypeService}.
-     * {@link GameUnlocks#SYNERGY_SUPER_VENOM} replaces Fire + Maricopa stacking with
+     * {@link GameUnlocks#SYNERGY_SUPER_VENOM} replaces Fire + neurotoxic stacking with
      * {@link GameConstants#ASSIMILATED_DAMAGE_SYNERGY_FIRE_DEADLY} (16x).
      */
     public static float getAssimilatedDamageMultiplier(Dynasty dynasty) {

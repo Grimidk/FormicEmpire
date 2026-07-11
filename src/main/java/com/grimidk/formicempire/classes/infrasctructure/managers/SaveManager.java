@@ -391,15 +391,12 @@ public class SaveManager {
                 for (Map.Entry<Integer, Integer> entry : dynasty.copyDiplomaticReputations().entrySet()) {
                     sc.diplomaticReputations.put(String.valueOf(entry.getKey()), entry.getValue());
                 }
-                sc.diplomaticModifierKeySets = dynasty.copyDiplomaticModifierKeySets();
+                sc.diplomaticModifierRemainingDays = dynasty.copyDiplomaticModifierRemainingDays();
                 sc.crossDynastyTradeRepGrantedIds = dynasty.copyCrossDynastyTradeRepGrantedIds();
                 sc.pendingPactRequestFromIds = dynasty.copyPendingPactRequestFromIds();
                 sc.pendingWarDeclarationFromIds = dynasty.copyPendingWarDeclarationFromIds();
                 sc.activeWarDynastyIds = dynasty.copyActiveWarDynastyIds();
                 sc.pactBrokenAtWorldMonth = dynasty.copyPactBrokenAtWorldMonth();
-                sc.pactRequestDeclinedAtWorldMonth = dynasty.copyPactRequestDeclinedAtWorldMonth();
-                sc.tradeRequestDeclinedAtWorldMonth = dynasty.copyTradeRequestDeclinedAtWorldMonth();
-                sc.wasAtWarPeacedAtWorldMonth = dynasty.copyWasAtWarPeacedAtWorldMonth();
                 sc.pendingTradeProposals = new ArrayList<>();
                 for (CrossDynastyTradeProposal proposal : dynasty.copyPendingTradeProposals()) {
                     Savefile.SavedCrossDynastyTradeProposal saved = new Savefile.SavedCrossDynastyTradeProposal();
@@ -577,9 +574,7 @@ public class SaveManager {
                     sc.dermestids = c.getBugHandlingService().resolvePetCountForSave(c, GameConstants.TYPE_DERMESTID);
                     sc.parasiteAnts = c.getParasiteAnts();
                     sc.parasiticMites = c.getParasiticMites();
-                    sc.pheromoneStormMonthsRemaining = c.getPheromoneStormMonthsRemaining();
-                    sc.recentlyConqueredMonthsRemaining = c.getRecentlyConqueredMonthsRemaining();
-                    sc.recentlyIntegratedMonthsRemaining = c.getRecentlyIntegratedMonthsRemaining();
+                    sc.loyaltyModifierRemainingDays = c.copyLoyaltyModifierRemainingDays();
                     sc.integrationDiplomatsDeployed = c.getIntegrationDiplomatsDeployed();
                     sc.nativeSpeciesId = c.getNativeSpeciesId();
                     sc.creatineDietMonthsRemaining = c.getCreatineDietMonthsRemaining();
@@ -735,15 +730,12 @@ public class SaveManager {
         writeJsonLine(w, "militaryPower", sc.militaryPower, false);
         w.write("      \"diplomatSupportToDynasty\": " + serializeMapToJson(sc.diplomatSupportToDynasty) + ","); w.newLine();
         w.write("      \"diplomaticReputations\": " + serializeMapToJson(sc.diplomaticReputations) + ","); w.newLine();
-        w.write("      \"diplomaticModifierKeySets\": " + serializeStringListMapToJson(sc.diplomaticModifierKeySets) + ","); w.newLine();
+        w.write("      \"diplomaticModifierRemainingDays\": " + serializeNestedIntegerMapToJson(sc.diplomaticModifierRemainingDays) + ","); w.newLine();
         w.write("      \"crossDynastyTradeRepGrantedIds\": " + serializeListToJson(sc.crossDynastyTradeRepGrantedIds) + ","); w.newLine();
         w.write("      \"pendingPactRequestFromIds\": " + serializeListToJson(sc.pendingPactRequestFromIds) + ","); w.newLine();
         w.write("      \"pendingWarDeclarationFromIds\": " + serializeListToJson(sc.pendingWarDeclarationFromIds) + ","); w.newLine();
         w.write("      \"activeWarDynastyIds\": " + serializeListToJson(sc.activeWarDynastyIds) + ","); w.newLine();
         w.write("      \"pactBrokenAtWorldMonth\": " + serializeMapToJson(sc.pactBrokenAtWorldMonth) + ","); w.newLine();
-        w.write("      \"pactRequestDeclinedAtWorldMonth\": " + serializeMapToJson(sc.pactRequestDeclinedAtWorldMonth) + ","); w.newLine();
-        w.write("      \"tradeRequestDeclinedAtWorldMonth\": " + serializeMapToJson(sc.tradeRequestDeclinedAtWorldMonth) + ","); w.newLine();
-        w.write("      \"wasAtWarPeacedAtWorldMonth\": " + serializeMapToJson(sc.wasAtWarPeacedAtWorldMonth) + ","); w.newLine();
         w.write("      \"pendingTradeProposals\": " + serializeTradeProposalsToJson(sc.pendingTradeProposals) + ","); w.newLine();
         w.write("      \"forcedFlightCooldownDays\": " + sc.forcedFlightCooldownDays + ","); w.newLine();
         w.write("      \"originDynastyId\": " + sc.originDynastyId + ","); w.newLine();
@@ -823,9 +815,7 @@ public class SaveManager {
         writeJsonLine(w, "dermestids", sc.dermestids, false);
         writeJsonLine(w, "parasiteAnts", sc.parasiteAnts, false);
         writeJsonLine(w, "parasiticMites", sc.parasiticMites, false);
-        writeJsonLine(w, "pheromoneStormMonthsRemaining", sc.pheromoneStormMonthsRemaining, false);
-        writeJsonLine(w, "recentlyConqueredMonthsRemaining", sc.recentlyConqueredMonthsRemaining, false);
-        writeJsonLine(w, "recentlyIntegratedMonthsRemaining", sc.recentlyIntegratedMonthsRemaining, false);
+        w.write("      \"loyaltyModifierRemainingDays\": " + serializeMapToJson(sc.loyaltyModifierRemainingDays) + ","); w.newLine();
         writeJsonLine(w, "integrationDiplomatsDeployed", sc.integrationDiplomatsDeployed, false);
         writeJsonLine(w, "nativeSpeciesId", sc.nativeSpeciesId, false);
         writeJsonLine(w, "creatineDietMonthsRemaining", sc.creatineDietMonthsRemaining, false);
@@ -1005,9 +995,12 @@ public class SaveManager {
         sc.militaryPower = Integer.parseInt(map.getOrDefault("militaryPower", "0"));
         sc.diplomatSupportToDynasty = deserializeJsonToMap(map.get("diplomatSupportToDynasty"));
         sc.diplomaticReputations = deserializeJsonToMap(map.get("diplomaticReputations"));
-        sc.diplomaticModifierKeySets = deserializeJsonToStringListMap(map.get("diplomaticModifierKeySets"));
-        if (sc.diplomaticModifierKeySets.isEmpty()) {
-            sc.diplomaticModifierKeys = deserializeJsonToStringMap(map.get("diplomaticModifierKeys"));
+        sc.diplomaticModifierRemainingDays = deserializeJsonToNestedIntegerMap(map.get("diplomaticModifierRemainingDays"));
+        if (sc.diplomaticModifierRemainingDays.isEmpty()) {
+            sc.diplomaticModifierKeySets = deserializeJsonToStringListMap(map.get("diplomaticModifierKeySets"));
+            if (sc.diplomaticModifierKeySets.isEmpty()) {
+                sc.diplomaticModifierKeys = deserializeJsonToStringMap(map.get("diplomaticModifierKeys"));
+            }
         }
         sc.crossDynastyTradeRepGrantedIds = deserializeJsonToList(map.get("crossDynastyTradeRepGrantedIds"));
         sc.pendingPactRequestFromIds = deserializeJsonToList(map.get("pendingPactRequestFromIds"));
@@ -1017,6 +1010,7 @@ public class SaveManager {
         sc.pactRequestDeclinedAtWorldMonth = deserializeJsonToMap(map.get("pactRequestDeclinedAtWorldMonth"));
         sc.tradeRequestDeclinedAtWorldMonth = deserializeJsonToMap(map.get("tradeRequestDeclinedAtWorldMonth"));
         sc.wasAtWarPeacedAtWorldMonth = deserializeJsonToMap(map.get("wasAtWarPeacedAtWorldMonth"));
+        sc.geneticExchangeGrantedAtWorldMonth = deserializeJsonToMap(map.get("geneticExchangeGrantedAtWorldMonth"));
         sc.pendingTradeProposals = deserializeJsonToTradeProposals(map.get("pendingTradeProposals"));
         sc.forcedFlightCooldownDays = Integer.parseInt(map.getOrDefault("forcedFlightCooldownDays", "0"));
         sc.originDynastyId = Integer.parseInt(map.getOrDefault("originDynastyId", "0"));
@@ -1125,6 +1119,7 @@ public class SaveManager {
         sc.dermestids = Integer.parseInt(map.getOrDefault("dermestids", "0"));
         sc.parasiteAnts = Integer.parseInt(map.getOrDefault("parasiteAnts", map.getOrDefault("parasites", "0")));
         sc.parasiticMites = Integer.parseInt(map.getOrDefault("parasiticMites", "0"));
+        sc.loyaltyModifierRemainingDays = deserializeJsonToMap(map.get("loyaltyModifierRemainingDays"));
         sc.pheromoneStormMonthsRemaining = Integer.parseInt(map.getOrDefault("pheromoneStormMonthsRemaining", "0"));
         sc.recentlyConqueredMonthsRemaining = Integer.parseInt(
                 map.getOrDefault("recentlyConqueredMonthsRemaining", "0"));
@@ -1184,6 +1179,40 @@ public class SaveManager {
         }
         sb.append("}");
         return sb.toString();
+    }
+
+    private String serializeNestedIntegerMapToJson(Map<String, Map<String, Integer>> map) {
+        if (map == null || map.isEmpty()) {
+            return "{}";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("{");
+        int i = 0;
+        for (Map.Entry<String, Map<String, Integer>> entry : map.entrySet()) {
+            sb.append("\"");
+            sb.append(escapeJsonString(entry.getKey()));
+            sb.append("\":");
+            sb.append(serializeMapToJson(entry.getValue()));
+            if (i < map.size() - 1) {
+                sb.append(",");
+            }
+            i++;
+        }
+        sb.append("}");
+        return sb.toString();
+    }
+
+    private Map<String, Map<String, Integer>> deserializeJsonToNestedIntegerMap(String json) {
+        Map<String, Map<String, Integer>> map = new HashMap<>();
+        if (json == null || json.length() <= 2) {
+            return map;
+        }
+        Pattern entryPattern = Pattern.compile("\"([^\"]*)\":(\\{[^}]*\\})");
+        Matcher matcher = entryPattern.matcher(json);
+        while (matcher.find()) {
+            map.put(unescapeJsonString(matcher.group(1)), deserializeJsonToMap(matcher.group(2)));
+        }
+        return map;
     }
 
     private String serializeStringListMapToJson(Map<String, List<String>> map) {

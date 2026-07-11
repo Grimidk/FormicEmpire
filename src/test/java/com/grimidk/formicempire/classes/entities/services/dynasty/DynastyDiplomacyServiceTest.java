@@ -68,13 +68,28 @@ class DynastyDiplomacyServiceTest {
         assertEquals(10.0, player.getGeneticIntegrity(), 0.001);
     }
 
+    private static World emptyWorld() {
+        return new World();
+    }
+
     @Test
     void formPactRequiresCordialReputation() {
+        World world = emptyWorld();
         player.setDiplomaticReputation(neighbor.getId(), 59);
-        assertFalse(player.getDiplomacyService().canFormNonAggressionPact(neighbor));
+        assertFalse(player.getDiplomacyService().canFormNonAggressionPact(neighbor, world));
 
         player.setDiplomaticReputation(neighbor.getId(), 60);
-        assertTrue(player.getDiplomacyService().canFormNonAggressionPact(neighbor));
+        assertTrue(player.getDiplomacyService().canFormNonAggressionPact(neighbor, world));
+    }
+
+    @Test
+    void formPactUsesEffectiveReputationWhenWorldProvided() {
+        player.setMilitaryPower(10);
+        neighbor.setMilitaryPower(110);
+        player.setDiplomaticReputation(neighbor.getId(), 55);
+        World world = emptyWorld();
+
+        assertTrue(player.getDiplomacyService().canFormNonAggressionPact(neighbor, world));
     }
 
     @Test
@@ -82,20 +97,20 @@ class DynastyDiplomacyServiceTest {
         player.setDiplomaticReputation(neighbor.getId(), 60);
         neighbor.setDiplomaticReputation(player.getId(), 60);
 
-        player.getDiplomacyService().formNonAggressionPact(neighbor);
+        player.getDiplomacyService().formNonAggressionPact(neighbor, emptyWorld());
 
         assertTrue(player.getDiplomacyService().hasNonAggressionPact(neighbor));
         assertTrue(neighbor.getDiplomacyService().hasNonAggressionPact(player));
         assertEquals(80, player.getDiplomaticReputation(neighbor.getId()));
         assertEquals(80, neighbor.getDiplomaticReputation(player.getId()));
-        assertFalse(player.getDiplomacyService().canFormNonAggressionPact(neighbor));
+        assertFalse(player.getDiplomacyService().canFormNonAggressionPact(neighbor, emptyWorld()));
     }
 
     @Test
     void breakingPactAppliesPenaltyAndReplacesModifier() {
         player.setDiplomaticReputation(neighbor.getId(), 60);
         neighbor.setDiplomaticReputation(player.getId(), 60);
-        player.getDiplomacyService().formNonAggressionPact(neighbor);
+        player.getDiplomacyService().formNonAggressionPact(neighbor, emptyWorld());
 
         player.getDiplomacyService().breakNonAggressionPact(neighbor);
 
@@ -110,12 +125,12 @@ class DynastyDiplomacyServiceTest {
     void formingPactAfterBrokenPactReplacesModifier() {
         player.setDiplomaticReputation(neighbor.getId(), 60);
         neighbor.setDiplomaticReputation(player.getId(), 60);
-        player.getDiplomacyService().formNonAggressionPact(neighbor);
+        player.getDiplomacyService().formNonAggressionPact(neighbor, emptyWorld());
         player.getDiplomacyService().breakNonAggressionPact(neighbor);
 
         player.setDiplomaticReputation(neighbor.getId(), 60);
         neighbor.setDiplomaticReputation(player.getId(), 60);
-        player.getDiplomacyService().formNonAggressionPact(neighbor);
+        player.getDiplomacyService().formNonAggressionPact(neighbor, emptyWorld());
 
         assertTrue(player.getDiplomacyService().hasNonAggressionPact(neighbor));
         assertEquals(GameConstants.DIPLO_MODIFIER_PACT.getNameKey(),
@@ -134,7 +149,7 @@ class DynastyDiplomacyServiceTest {
         assertEquals(90.0, player.getGeneticIntegrity(), 0.001);
         assertEquals(0.0, player.getDiplomaticGeneticIntegrityBonus(), 0.001);
 
-        player.getDiplomacyService().formNonAggressionPact(neighbor);
+        player.getDiplomacyService().formNonAggressionPact(neighbor, emptyWorld());
 
         assertEquals(10.0, player.getDiplomaticGeneticIntegrityBonus(), 0.001);
         assertEquals(100.0, player.getGeneticIntegrity(), 0.001);
@@ -151,7 +166,7 @@ class DynastyDiplomacyServiceTest {
         addSatelliteColonies(player, 10);
         player.setDiplomaticReputation(neighbor.getId(), 60);
         neighbor.setDiplomaticReputation(player.getId(), 60);
-        player.getDiplomacyService().formNonAggressionPact(neighbor);
+        player.getDiplomacyService().formNonAggressionPact(neighbor, emptyWorld());
 
         player.getDiplomacyService().applyWar(neighbor);
 
@@ -167,7 +182,7 @@ class DynastyDiplomacyServiceTest {
     void declareWarBlockedByActivePact() {
         player.setDiplomaticReputation(neighbor.getId(), 60);
         neighbor.setDiplomaticReputation(player.getId(), 60);
-        player.getDiplomacyService().formNonAggressionPact(neighbor);
+        player.getDiplomacyService().formNonAggressionPact(neighbor, emptyWorld());
 
         assertFalse(player.getDiplomacyService().canDeclareWar(neighbor, null));
     }
@@ -233,7 +248,7 @@ class DynastyDiplomacyServiceTest {
         world.setMonth(6);
         player.setDiplomaticReputation(neighbor.getId(), 60);
         neighbor.setDiplomaticReputation(player.getId(), 60);
-        player.getDiplomacyService().formNonAggressionPact(neighbor);
+        player.getDiplomacyService().formNonAggressionPact(neighbor, emptyWorld());
         player.getDiplomacyService().breakNonAggressionPact(neighbor, world);
 
         assertFalse(player.getDiplomacyService().canDeclareWar(neighbor, world));
@@ -445,7 +460,7 @@ class DynastyDiplomacyServiceTest {
         player.setDiplomaticReputation(neighbor.getId(), 60);
         neighbor.setDiplomaticReputation(player.getId(), 60);
 
-        neighbor.getDiplomacyService().requestNonAggressionPact(player, null);
+        neighbor.getDiplomacyService().requestNonAggressionPact(player, emptyWorld());
 
         assertTrue(player.hasPendingPactRequestFrom(neighbor.getId()));
         assertFalse(neighbor.getDiplomacyService().hasNonAggressionPact(player));
@@ -457,7 +472,7 @@ class DynastyDiplomacyServiceTest {
         neighbor.setDiplomaticReputation(player.getId(), 60);
         player.addPendingPactRequest(neighbor.getId());
 
-        player.getDiplomacyService().acceptNonAggressionPact(neighbor);
+        player.getDiplomacyService().acceptNonAggressionPact(neighbor, emptyWorld());
 
         assertTrue(player.getDiplomacyService().hasNonAggressionPact(neighbor));
         assertFalse(player.hasPendingPactRequestFrom(neighbor.getId()));
@@ -560,6 +575,7 @@ class DynastyDiplomacyServiceTest {
         assertFalse(neighbor.getDiplomacyService().canRequestNonAggressionPact(player, world));
         assertEquals(1, neighbor.getDiplomacyService().getPactRequestDeclineCooldownMonthsRemaining(player, world));
 
+        advanceWorldDays(world, GameConstants.DIPLO_MODIFIER_DECLINED_PACT.getDurationDays());
         world.setMonth(4);
         assertTrue(neighbor.getDiplomacyService().canRequestNonAggressionPact(player, world));
         assertEquals(60, neighbor.getDiplomaticReputation(player.getId()));
@@ -583,6 +599,7 @@ class DynastyDiplomacyServiceTest {
         assertFalse(neighbor.getDiplomacyService().canRequestTrade(player, world));
         assertEquals(1, neighbor.getDiplomacyService().getTradeRequestDeclineCooldownMonthsRemaining(player, world));
 
+        advanceWorldDays(world, GameConstants.DIPLO_MODIFIER_TRADE_REQUEST.getDurationDays());
         world.setMonth(6);
         assertTrue(neighbor.getDiplomacyService().canRequestTrade(player, world));
         assertEquals(60, neighbor.getDiplomaticReputation(player.getId()));
@@ -605,7 +622,7 @@ class DynastyDiplomacyServiceTest {
     void reputationModifierTooltipUsesSignedDeltasSortedPositiveFirst() {
         player.setDiplomaticReputation(neighbor.getId(), 60);
         neighbor.setDiplomaticReputation(player.getId(), 60);
-        player.getDiplomacyService().formNonAggressionPact(neighbor);
+        player.getDiplomacyService().formNonAggressionPact(neighbor, emptyWorld());
 
         var lines = player.getDiplomacyService().collectVisibleReputationModifiers(neighbor, null);
         assertTrue(lines.stream().anyMatch(line -> line.delta() == 20));
@@ -620,7 +637,7 @@ class DynastyDiplomacyServiceTest {
     void reputationTooltipListsEverySavedModifierKey() {
         player.setDiplomaticReputation(neighbor.getId(), 60);
         neighbor.setDiplomaticReputation(player.getId(), 60);
-        player.getDiplomacyService().formNonAggressionPact(neighbor);
+        player.getDiplomacyService().formNonAggressionPact(neighbor, emptyWorld());
         player.markCrossDynastyTradeRepBonus(neighbor.getId());
         player.addDiplomaticModifierKey(neighbor.getId(), GameConstants.DIPLO_MODIFIER_TRADE.getNameKey());
 
@@ -636,5 +653,97 @@ class DynastyDiplomacyServiceTest {
         assertTrue(tooltip.contains("Trade Route: +20"));
         assertFalse(tooltip.contains("Prior relations"));
         assertTrue(tooltip.contains("Effective:"));
+    }
+
+    @Test
+    void diplomatMissionRecalledWhenPrincessDiplomatDies() {
+        World world = new World();
+        Hex playerHex = new Hex();
+        Hex neighborHex = new Hex();
+        playerHex.setQ(0);
+        playerHex.setR(0);
+        neighborHex.setQ(1);
+        neighborHex.setR(0);
+        playerHex.setNorthEast(neighborHex);
+        neighborHex.setSouthWest(playerHex);
+
+        Colony capital = player.getCapital();
+        capital.unlockUpgrade(GameUnlocks.ROLE_DIPLOMAT);
+        capital.setAssignedRoleCount(GameConstants.ROLE_DIPLOMAT, 1);
+        Ant princess = new Ant(capital, GameConstants.TYPE_PRINCESS);
+        princess.setRole(GameConstants.ROLE_DIPLOMAT);
+        capital.getPrincesses().add(princess);
+        playerHex.setColony(capital);
+        neighborHex.setColony(neighbor.getCapital());
+
+        ArrayList<Hex> hexes = new ArrayList<>();
+        hexes.add(playerHex);
+        hexes.add(neighborHex);
+        world.setHexes(hexes);
+        world.getDynastys().add(player);
+        world.getDynastys().add(neighbor);
+
+        int sent = player.getDiplomacyService().sendDiplomatsToDynasty(capital, neighbor, 1, world);
+        assertEquals(1, sent);
+        assertEquals(1, player.getDiplomatSupportTo(neighbor.getId()));
+
+        princess.goDie(capital, "Test");
+        capital.getPrincesses().remove(princess);
+        player.getDiplomacyService().reconcileDiplomatDeploymentsAfterCasualty(capital, GameConstants.ROLE_DIPLOMAT);
+
+        assertEquals(0, player.getDiplomatSupportTo(neighbor.getId()));
+        assertEquals(0, player.getDiplomacyService().getDiplomatReputationAdjustment(neighbor));
+    }
+
+    @Test
+    void geneticExchangeGrantsTargetReputationAndIntegrityModifier() {
+        Colony capital = player.getCapital();
+        player.setDiplomaticReputation(neighbor.getId(), 70);
+        neighbor.setDiplomaticReputation(player.getId(), 50);
+        for (int i = 0; i < GameConstants.GENETIC_EXCHANGE_DRONE_COST; i++) {
+            capital.getDrones().add(new Ant(capital, GameConstants.TYPE_DRONE));
+        }
+
+        World world = emptyWorld();
+        world.getDynastys().add(player);
+        world.getDynastys().add(neighbor);
+
+        assertTrue(player.getDiplomacyService().offerGeneticExchange(neighbor, world));
+        assertEquals(60, neighbor.getDiplomaticReputation(player.getId()));
+        assertTrue(neighbor.hasDiplomaticModifierKey(
+                player.getId(), GameConstants.DIPLO_MODIFIER_GENETIC_EXCHANGE.getNameKey()));
+        assertEquals(10.0, neighbor.getDiplomaticGeneticIntegrityBonus(), 0.001);
+        assertFalse(player.getDiplomacyService().canOfferGeneticExchange(neighbor, world));
+    }
+
+    @Test
+    void geneticExchangePullsDronesFromAllColonies() {
+        Colony capital = player.getCapital();
+        Colony interior = new Colony(102, "Interior", true);
+        player.addColony(interior);
+        player.setDiplomaticReputation(neighbor.getId(), 70);
+        for (int i = 0; i < 10; i++) {
+            capital.getDrones().add(new Ant(capital, GameConstants.TYPE_DRONE));
+        }
+        for (int i = 0; i < 15; i++) {
+            interior.getDrones().add(new Ant(interior, GameConstants.TYPE_DRONE));
+        }
+
+        World world = emptyWorld();
+        world.getDynastys().add(player);
+        world.getDynastys().add(neighbor);
+
+        assertEquals(25, player.getDiplomacyService().countDynastyLiveDrones());
+        assertTrue(player.getDiplomacyService().canOfferGeneticExchange(neighbor, world));
+        assertTrue(player.getDiplomacyService().offerGeneticExchange(neighbor, world));
+        assertEquals(0, player.getDiplomacyService().countDynastyLiveDrones());
+    }
+
+    private void advanceWorldDays(World world, int days) {
+        TradeManager tradeManager = new TradeManager();
+        for (int i = 0; i < days; i++) {
+            player.runDailyJobs(world, tradeManager);
+            neighbor.runDailyJobs(world, tradeManager);
+        }
     }
 }

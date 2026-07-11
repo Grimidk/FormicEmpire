@@ -205,4 +205,22 @@ public class TradeTest {
             fail(e.getMessage());
         }
     }
+
+    @Test
+    public void testCancelDueToEscortLossWhenAntsDie() {
+        destination.unlockBuilding(GameUnlocks.PLANT_CHAMBER_0);
+        origin.setPlants(200);
+        Trade trade = new Trade(originHex, destHex, load, null, transport, false, false, GameConstants.METHOD_LAND);
+        assertTrue(trade.startTrip());
+        assertEquals(10, trade.getAntsOnTrip().size());
+
+        for (int i = 0; i < 5; i++) {
+            Ant ant = trade.getAntsOnTrip().get(i);
+            ant.goDie(origin, "Test");
+        }
+
+        assertFalse(trade.hasSufficientLiveEscorts());
+        trade.cancelDueToEscortLoss();
+        assertFalse(trade.isActive());
+    }
 }

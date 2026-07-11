@@ -183,9 +183,12 @@ public class ColonyPopulationService {
         int agedDeaths = 0;
         for (Ant ant : antsToKill) {
              if (ant.isAlive()) { 
-                AntType originalType = ant.getAntType(); 
+                AntType originalType = ant.getAntType();
+                AntRole formerRole = ant.getRole();
+                boolean wasOnTrade = ant.isOnTrade();
                 ant.goDie(colony, DeathCause.OLD_AGE);
                 colony.recordAntDeath(ant, DeathCause.OLD_AGE);
+                colony.handleAntCasualtyAftermath(ant, originalType, formerRole, wasOnTrade);
                 
                 List<Ant> antList = colony.getAntsByType(originalType);
                 if (antList != null) antList.remove(ant);
@@ -279,8 +282,11 @@ public class ColonyPopulationService {
         for (Ant ant : ants) {
             if (ant.isAlive()) {
                 AntType originalType = ant.getAntType();
+                AntRole formerRole = ant.getRole();
+                boolean wasOnTrade = ant.isOnTrade();
                 ant.goDie(colony, cause);
                 colony.recordAntDeath(ant, cause);
+                colony.handleAntCasualtyAftermath(ant, originalType, formerRole, wasOnTrade);
                 
                 List<Ant> antList = colony.getAntsByType(originalType);
                 if (antList != null) antList.remove(ant);

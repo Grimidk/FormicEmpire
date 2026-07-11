@@ -190,7 +190,7 @@ public class FrenchTranslation implements Translation {
         fr.put("SYNERGY_REQUIREMENT_MISSING_FMT", "[ ] %s");
         fr.put("SYNERGY_SUPER_VENOM", "Super Venin");
         fr.put("SYNERGY_SUPER_VENOM_FLAVOR", "Super Venin");
-        fr.put("SYNERGY_SUPER_VENOM_DESC", "Remplace l'empilement venin de feu + maricopa (4+4) par un multiplicateur de dégâts de 16x lorsque les deux venins sont assimilés et que les Synergies sont recherchées.");
+        fr.put("SYNERGY_SUPER_VENOM_DESC", "Remplace l'empilement venin de feu + neurotoxique (4+4) par un multiplicateur de dégâts de 16x lorsque les deux venins sont assimilés et que les Synergies sont recherchées.");
 
         fr.put("DIALOG_HATCH_RATES_TITLE", "Taux d'éclosion des nymphes");
         fr.put("HATCH_DESC", "Probabilité d'éclosion pour les nouvelles fourmis :");
@@ -830,6 +830,7 @@ public class FrenchTranslation implements Translation {
         fr.put("DIPLO_MODIFIER_BORDER_FRICTION", "Friction frontalière");
         fr.put("DIPLO_MODIFIER_GRANTED_INDEPENDENCE", "Indépendance accordée");
         fr.put("DIPLO_MODIFIER_WAS_AT_WAR", "Étaient en guerre");
+        fr.put("DIPLO_MODIFIER_GENETIC_EXCHANGE", "Échange génétique");
         fr.put("DYNASTY_REBELLION_NAME_FMT", "%s Rébellion");
         fr.put("REBELLION_WAR_NAME_FMT", "%s %s Rébellion");
         fr.put("ALERT_REBELLION_RISK_FMT", "Risque de rébellion à %s !");
@@ -842,6 +843,7 @@ public class FrenchTranslation implements Translation {
         fr.put("LOG_REBELLION_INDEPENDENCE_FMT", "Indépendance pacifique accordée à %s.");
         fr.put("DIPLO_MILITARY_STRENGTH", "Force militaire");
         fr.put("GI_MODIFIER_PACT", "Alliance de pacte");
+        fr.put("GI_MODIFIER_GENETIC_EXCHANGE", "Échange génétique");
         fr.put("GI_TOOLTIP_START", "Initial");
         fr.put("GI_MODIFIER_SATELLITE_COLONIES", "Colonies satellites (%s) : %s");
         fr.put("GI_TOOLTIP_ASSIMILATION_FLOOR", "Plancher d'assimilation (%s) : %s%%");
@@ -884,6 +886,7 @@ public class FrenchTranslation implements Translation {
         fr.put("DIPLO_ACTION_TRADE", "Commerce");
         fr.put("DIPLO_ACTION_REQUEST_TRADE", "Demander un commerce");
         fr.put("DIPLO_ACTION_SEND_DIPLOMATS", "Envoyer des diplomates");
+        fr.put("DIPLO_ACTION_GENETIC_EXCHANGE", "Échange génétique");
         fr.put("DIPLO_ACTION_INTEGRATE", "Lancer l'intégration");
         fr.put("DIPLO_ACTION_CANCEL_INTEGRATION", "Annuler l'intégration");
         fr.put("DIPLO_INTEGRATION_PROGRESS_FMT", "%s%% — %s (%s diplomates)");
@@ -898,12 +901,18 @@ public class FrenchTranslation implements Translation {
         fr.put("DIPLO_ERROR_INTEGRATION_MILITARY", "Nécessite au moins 5× leur puissance militaire.");
         fr.put("DIPLO_ERROR_INTEGRATION_REPUTATION", "Nécessite une réputation Amicale ou meilleure.");
         fr.put("DIPLO_ERROR_INTEGRATION_DIPLOMATS", "Nécessite au moins un diplomate disponible.");
+        fr.put("DIPLO_ERROR_INTEGRATION_BORDER", "Votre dynastie doit partager une frontière avec cette dynastie.");
+        fr.put("DIPLO_ERROR_INTEGRATION_PACT", "Nécessite un pacte de non-agression avec cette dynastie.");
         fr.put("DIPLO_SEND_DIPLOMATS_TITLE", "Envoyer des diplomates");
         fr.put("DIPLO_SEND_DIPLOMATS_PROMPT", "Envoyez jusqu'à %s diplomate(s) (%s assignées). Chacune améliore la stabilité de %s.");
         fr.put("DIPLO_SEND_DIPLOMATS_SUCCESS_DYNASTY", "%s diplomate(s) envoyées. Réputation avec %s augmentée de %s.");
         fr.put("DIPLO_SEND_DIPLOMATS_SUCCESS_COLONY", "%s diplomate(s) envoyées. Loyauté de %s augmentée de %s.");
         fr.put("DIPLO_ERROR_NO_DIPLOMATS", "Aucune princesse n'a le rôle Diplomate dans cette colonie.");
         fr.put("DIPLO_ERROR_NO_DIPLOMAT_ROLE", "Débloquez le rôle Diplomate avant d'envoyer des diplomates.");
+        fr.put("DIPLO_ERROR_GENETIC_EXCHANGE_ACTIVE", "Un bonus d'échange génétique est déjà actif avec cette dynastie.");
+        fr.put("DIPLO_ERROR_GENETIC_EXCHANGE_DRONES", "Il faut au moins 25 mâles vivants dans toute votre dynastie.");
+        fr.put("DIPLO_ERROR_GENETIC_EXCHANGE_BORDER", "Votre dynastie doit avoir une colonie frontalière avec cette dynastie.");
+        fr.put("DIPLO_ERROR_GENETIC_EXCHANGE_REP", "Réputation Cordiale ou supérieure requise.");
         fr.put("DIPLO_ERROR_REPUTATION_STABLE", "Les diplomates ne peuvent pas être envoyés aux dynasties avec une réputation Agressive.");
         fr.put("DIPLO_ERROR_LOYALTY_STABLE", "Les diplomates ne peuvent pas être envoyés aux colonies avec une loyauté Rebelle.");
         fr.put("DIPLO_ERROR_CORDIAL_REQUIRED", "Une réputation cordiale ou meilleure est requise pour former un pacte.");
@@ -969,8 +978,8 @@ public class FrenchTranslation implements Translation {
         fr.put("SPECIES_DRACULA_SCIENTIFIC", "Mystrium Sp.");
         fr.put("SPECIES_SILVER", "Fourmi Argentée du Sahara");
         fr.put("SPECIES_SILVER_SCIENTIFIC", "Cataglyphis Sp.");
-        fr.put("SPECIES_MARICOPA", "Fourmi Maricopa");
-        fr.put("SPECIES_MARICOPA_SCIENTIFIC", "Pogonomyrmex Maricopa");
+        fr.put("SPECIES_MARICOPA", "Fourmi neurotoxique");
+        fr.put("SPECIES_MARICOPA_SCIENTIFIC", "Neurotoxica Grimunknowni");
         fr.put("SPECIES_EXPLODING", "Fourmi Explosive");
         fr.put("SPECIES_EXPLODING_SCIENTIFIC", "Camponotus Saundersi");
         fr.put("SPECIES_BULLDOG", "Fourmi Bulldog");
@@ -1035,10 +1044,10 @@ public class FrenchTranslation implements Translation {
         fr.put("ASSIMILATED_HEATRESIST_DESC", "Votre dynastie peut butiner sous une chaleur extrême du désert. (Mécanique en développement.)");
         fr.put("ASSIMILATION_HEATRESIST", "Assimilation fourmi argentée du sahara");
         fr.put("ASSIMILATION_HEATRESIST_DESC", "Après assimilation du génome de la fourmi argentée du sahara :");
-        fr.put("ASSIMILATED_DEADLYVENOM_FLAVOR", "Venin Mortel");
+        fr.put("ASSIMILATED_DEADLYVENOM_FLAVOR", "Venin neurotoxique");
         fr.put("ASSIMILATED_DEADLYVENOM_DESC", "Votre dynastie peut injecter un venin létal contre les petites proies. (Mécanique en développement.)");
-        fr.put("ASSIMILATION_DEADLYVENOM", "Assimilation fourmi maricopa");
-        fr.put("ASSIMILATION_DEADLYVENOM_DESC", "Après assimilation du génome de la fourmi maricopa :");
+        fr.put("ASSIMILATION_DEADLYVENOM", "Assimilation venin neurotoxique");
+        fr.put("ASSIMILATION_DEADLYVENOM_DESC", "Après assimilation de la génétique du venin neurotoxique :");
         fr.put("ASSIMILATED_SELFDESTRUCT_FLAVOR", "Défense Suicidaire");
         fr.put("ASSIMILATED_SELFDESTRUCT_DESC", "Votre dynastie peut faire éclater des ouvrières spécialisées. (Mécanique en développement.)");
         fr.put("ASSIMILATION_SELFDESTRUCT", "Assimilation fourmi explosive");
@@ -1346,7 +1355,7 @@ public class FrenchTranslation implements Translation {
         fr.put("ASSIMILATED_FASTBITE_DESC", "Multiplie la vitesse d'attaque de base de la colonie par 3.");
         fr.put("ASSIMILATED_HEATRESIST_FLAVOR", "Tolérance à la Chaleur");
         fr.put("ASSIMILATED_HEATRESIST_DESC", "Votre dynastie peut butiner sous une chaleur extrême du désert. (Mécanique en développement.)");
-        fr.put("ASSIMILATED_DEADLYVENOM_FLAVOR", "Venin Mortel");
+        fr.put("ASSIMILATED_DEADLYVENOM_FLAVOR", "Venin neurotoxique");
         fr.put("ASSIMILATED_DEADLYVENOM_DESC", "Votre dynastie peut injecter un venin létal contre les petites proies. (Mécanique en développement.)");
         fr.put("ASSIMILATED_SELFDESTRUCT_FLAVOR", "Défense Suicidaire");
         fr.put("ASSIMILATED_SELFDESTRUCT_DESC", "Votre dynastie peut faire éclater des ouvrières spécialisées. (Mécanique en développement.)");
@@ -1483,8 +1492,8 @@ public class FrenchTranslation implements Translation {
         fr.put("ASSIMILATION_FASTBITE_DESC", "Après assimilation du génome de la fourmi dracula :");
         fr.put("ASSIMILATION_HEATRESIST", "Assimilation fourmi argentée du sahara");
         fr.put("ASSIMILATION_HEATRESIST_DESC", "Après assimilation du génome de la fourmi argentée du sahara :");
-        fr.put("ASSIMILATION_DEADLYVENOM", "Assimilation fourmi maricopa");
-        fr.put("ASSIMILATION_DEADLYVENOM_DESC", "Après assimilation du génome de la fourmi maricopa :");
+        fr.put("ASSIMILATION_DEADLYVENOM", "Assimilation venin neurotoxique");
+        fr.put("ASSIMILATION_DEADLYVENOM_DESC", "Après assimilation de la génétique du venin neurotoxique :");
         fr.put("ASSIMILATION_SELFDESTRUCT", "Assimilation fourmi explosive");
         fr.put("ASSIMILATION_SELFDESTRUCT_DESC", "Après assimilation du génome de la fourmi explosive :");
         fr.put("ASSIMILATION_FARSIGHT", "Assimilation fourmi bulldog");
@@ -1702,6 +1711,11 @@ public class FrenchTranslation implements Translation {
         fr.put("LOG_TRADE_CONVOY_RETURN_FMT", "Convoi de %s : cargaison de retour récupérée.");
         fr.put("LOG_TRADE_BILATERAL_RETURN_FMT", "Convoi bilateral revenu avec %s types de ressources.");
         fr.put("LOG_TRADE_ROUTE_CANCELLED_FMT", "Route vers %s annulée. Ressources remboursées.");
+        fr.put("LOG_TRADE_ESCORT_LOSS_FMT", "Convoi vers %s annulé : escortes insuffisantes après des pertes.");
+        fr.put("LOG_DIPLOMAT_MISSION_COLLAPSED_COLONY_FMT", "Mission diplomatique vers la colonie %s terminée : diplomates insuffisants après des pertes.");
+        fr.put("LOG_DIPLOMAT_MISSION_COLLAPSED_DYNASTY_FMT", "Mission diplomatique vers la dynastie %s terminée : diplomates insuffisants après des pertes.");
+        fr.put("LOG_GENETIC_EXCHANGE_FMT", "25 mâles envoyés à %s pour un échange génétique (+10 réputation, +10%% d'intégrité pendant 6 mois).");
+        fr.put("LOG_AI_GENETIC_EXCHANGE_FMT", "L'IA a envoyé 25 mâles à %s pour un échange génétique.");
         fr.put("LOG_AUTOMATION_BUILD_FMT", "Construction démarrée : %s");
         fr.put("LOG_AUTOMATION_TUNNEL_FMT", "Tunnel démarré vers %s");
         fr.put("LOG_AUTOMATION_TRADE_FMT", "Route commerciale ouverte vers %s");

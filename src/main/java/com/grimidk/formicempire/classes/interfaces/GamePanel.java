@@ -1802,7 +1802,7 @@ public class GamePanel extends ZeroGamePanel {
 
         playerDynasty.removePendingPactRequest(fromId);
         if (choice == JOptionPane.YES_OPTION || choice == 0) {
-            playerDynasty.getDiplomacyService().acceptNonAggressionPact(requester);
+            playerDynasty.getDiplomacyService().acceptNonAggressionPact(requester, world);
         } else {
             playerDynasty.getDiplomacyService().declineNonAggressionPact(requester, world);
         }

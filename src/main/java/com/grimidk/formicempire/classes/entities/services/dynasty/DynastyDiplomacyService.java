@@ -3,11 +3,15 @@ package com.grimidk.formicempire.classes.entities.services.dynasty;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyAutomationService;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import com.grimidk.formicempire.classes.entities.Ant;
 
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
@@ -25,6 +29,7 @@ import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
+import com.grimidk.formicempire.classes.infrasctructure.registries.DeathCause;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
@@ -109,23 +114,24 @@ public class DynastyDiplomacyService {
         return dynasty.hasDiplomaticModifierKey(other.getId(), GameConstants.DIPLO_MODIFIER_PACT.getNameKey());
     }
 
-    public boolean canFormNonAggressionPact(Dynasty other) {
-        if (other == null || other == dynasty || !isDiplomaticallyContactable(dynasty) || !isDiplomaticallyContactable(other)) {
+    public boolean canFormNonAggressionPact(Dynasty other, World world) {
+        if (other == null || other == dynasty || world == null
+                || !isDiplomaticallyContactable(dynasty) || !isDiplomaticallyContactable(other)) {
             return false;
         }
         if (hasNonAggressionPact(other)) {
             return false;
         }
-        return GameConstants.DIPLO_MODIFIER_PACT
-                .meetsReputationRequirement(dynasty.getDiplomaticReputation(other.getId()));
+        return GameConstants.DIPLO_MODIFIER_PACT.meetsReputationRequirement(
+                getEffectiveDiplomaticReputation(other, world));
     }
 
     public boolean canBreakNonAggressionPact(Dynasty other) {
         return hasNonAggressionPact(other);
     }
 
-    public void formNonAggressionPact(Dynasty other) {
-        if (!canFormNonAggressionPact(other)) {
+    public void formNonAggressionPact(Dynasty other, World world) {
+        if (!canFormNonAggressionPact(other, world)) {
             return;
         }
         applyModifierBothWays(other, GameConstants.DIPLO_MODIFIER_PACT);
@@ -139,11 +145,13 @@ public class DynastyDiplomacyService {
     }
 
     public boolean canRequestNonAggressionPact(Dynasty other, World world) {
-        maybeRecoverDeclinedPactRequest(other, world);
+        if (world != null) {
+            dynasty.migrateLegacyTimedDiplomaticModifiers(world);
+        }
         if (getPactRequestDeclineCooldownMonthsRemaining(other, world) > 0) {
             return false;
         }
-        return canFormNonAggressionPact(other);
+        return canFormNonAggressionPact(other, world);
     }
 
     public static double computePactAcceptanceChance(int effectiveReputation) {
@@ -173,18 +181,18 @@ public class DynastyDiplomacyService {
 
         int effectiveRep = other.getDiplomacyService().getEffectiveDiplomaticReputation(dynasty, world);
         if (GameRandom.nextDouble() < computePactAcceptanceChance(effectiveRep)) {
-            formNonAggressionPact(other);
+            formNonAggressionPact(other, world);
         } else {
             other.getDiplomacyService().declineNonAggressionPact(dynasty, world);
         }
     }
 
-    public void acceptNonAggressionPact(Dynasty requester) {
+    public void acceptNonAggressionPact(Dynasty requester, World world) {
         if (requester == null || requester == dynasty) {
             return;
         }
         removePendingPactRequestIfAny(requester);
-        requester.getDiplomacyService().formNonAggressionPact(dynasty);
+        requester.getDiplomacyService().formNonAggressionPact(dynasty, world);
     }
 
     public void declineNonAggressionPact(Dynasty requester, World world) {
@@ -196,7 +204,6 @@ public class DynastyDiplomacyService {
             return;
         }
         applyModifierBothWays(requester, GameConstants.DIPLO_MODIFIER_DECLINED_PACT);
-        recordPactRequestDeclined(requester, world);
     }
 
     private void removePendingPactRequestIfAny(Dynasty requester) {
@@ -281,19 +288,14 @@ public class DynastyDiplomacyService {
             return;
         }
         applyModifierBothWays(other, GameConstants.DIPLO_MODIFIER_WAS_AT_WAR);
-        recordWasAtWarPeaced(other, world);
     }
 
     public int getWasAtWarModifierMonthsRemaining(Dynasty other, World world) {
-        Integer peacedAt = dynasty.getWasAtWarPeacedAtWorldMonth(other.getId());
-        if (peacedAt == null || world == null) {
-            return 0;
+        if (world != null) {
+            dynasty.migrateLegacyTimedDiplomaticModifiers(world);
         }
-        int since = worldMonthIndex(world) - peacedAt;
-        if (since >= GameConstants.WAS_AT_WAR_MODIFIER_MONTHS) {
-            return 0;
-        }
-        return GameConstants.WAS_AT_WAR_MODIFIER_MONTHS - since;
+        return GameConstants.daysToMonthsCeil(dynasty.getDiplomaticModifierRemainingDays(
+                other.getId(), GameConstants.DIPLO_MODIFIER_WAS_AT_WAR.getNameKey()));
     }
 
     public boolean canDeclareWar(Dynasty other, World world) {
@@ -341,27 +343,25 @@ public class DynastyDiplomacyService {
     }
 
     public int getPactRequestDeclineCooldownMonthsRemaining(Dynasty other, World world) {
-        Integer declinedAt = dynasty.getPactRequestDeclinedAtWorldMonth(other.getId());
-        if (declinedAt == null || world == null) {
+        if (other == null) {
             return 0;
         }
-        int since = worldMonthIndex(world) - declinedAt;
-        if (since >= GameConstants.DIPLO_DECLINED_REQUEST_COOLDOWN_MONTHS) {
-            return 0;
+        if (world != null) {
+            dynasty.migrateLegacyTimedDiplomaticModifiers(world);
         }
-        return GameConstants.DIPLO_DECLINED_REQUEST_COOLDOWN_MONTHS - since;
+        return GameConstants.daysToMonthsCeil(dynasty.getDiplomaticModifierRemainingDays(
+                other.getId(), GameConstants.DIPLO_MODIFIER_DECLINED_PACT.getNameKey()));
     }
 
     public int getTradeRequestDeclineCooldownMonthsRemaining(Dynasty other, World world) {
-        Integer declinedAt = dynasty.getTradeRequestDeclinedAtWorldMonth(other.getId());
-        if (declinedAt == null || world == null) {
+        if (other == null) {
             return 0;
         }
-        int since = worldMonthIndex(world) - declinedAt;
-        if (since >= GameConstants.DIPLO_DECLINED_REQUEST_COOLDOWN_MONTHS) {
-            return 0;
+        if (world != null) {
+            dynasty.migrateLegacyTimedDiplomaticModifiers(world);
         }
-        return GameConstants.DIPLO_DECLINED_REQUEST_COOLDOWN_MONTHS - since;
+        return GameConstants.daysToMonthsCeil(dynasty.getDiplomaticModifierRemainingDays(
+                other.getId(), GameConstants.DIPLO_MODIFIER_TRADE_REQUEST.getNameKey()));
     }
 
     public void declareWar(Dynasty other, World world, TradeManager tradeManager) {
@@ -397,124 +397,6 @@ public class DynastyDiplomacyService {
         int monthIndex = worldMonthIndex(world);
         dynasty.setPactBrokenAtWorldMonth(other.getId(), monthIndex);
         other.setPactBrokenAtWorldMonth(dynasty.getId(), monthIndex);
-    }
-
-    private void recordPactRequestDeclined(Dynasty other, World world) {
-        if (other == null) {
-            return;
-        }
-        int monthIndex = worldMonthIndex(world);
-        dynasty.setPactRequestDeclinedAtWorldMonth(other.getId(), monthIndex);
-        other.setPactRequestDeclinedAtWorldMonth(dynasty.getId(), monthIndex);
-    }
-
-    private void recordTradeRequestDeclined(Dynasty other, World world) {
-        if (other == null) {
-            return;
-        }
-        int monthIndex = worldMonthIndex(world);
-        dynasty.setTradeRequestDeclinedAtWorldMonth(other.getId(), monthIndex);
-        other.setTradeRequestDeclinedAtWorldMonth(dynasty.getId(), monthIndex);
-    }
-
-    private void recordWasAtWarPeaced(Dynasty other, World world) {
-        if (other == null) {
-            return;
-        }
-        int monthIndex = worldMonthIndex(world);
-        dynasty.setWasAtWarPeacedAtWorldMonth(other.getId(), monthIndex);
-        other.setWasAtWarPeacedAtWorldMonth(dynasty.getId(), monthIndex);
-    }
-
-    private void maybeRecoverDeclinedPactRequest(Dynasty other, World world) {
-        if (other == null || world == null) {
-            return;
-        }
-        Integer declinedAt = dynasty.getPactRequestDeclinedAtWorldMonth(other.getId());
-        if (declinedAt == null) {
-            return;
-        }
-        if (worldMonthIndex(world) - declinedAt >= GameConstants.DIPLO_DECLINED_REQUEST_COOLDOWN_MONTHS) {
-            recoverFromDeclinedPactRequest(other);
-        }
-    }
-
-    private void maybeRecoverDeclinedTradeRequest(Dynasty other, World world) {
-        if (other == null || world == null) {
-            return;
-        }
-        Integer declinedAt = dynasty.getTradeRequestDeclinedAtWorldMonth(other.getId());
-        if (declinedAt == null) {
-            return;
-        }
-        if (worldMonthIndex(world) - declinedAt >= GameConstants.DIPLO_DECLINED_REQUEST_COOLDOWN_MONTHS) {
-            recoverFromDeclinedTradeRequest(other);
-        }
-    }
-
-    private void maybeRecoverWasAtWarModifier(Dynasty other, World world) {
-        if (other == null || world == null) {
-            return;
-        }
-        Integer peacedAt = dynasty.getWasAtWarPeacedAtWorldMonth(other.getId());
-        if (peacedAt == null) {
-            return;
-        }
-        if (worldMonthIndex(world) - peacedAt >= GameConstants.WAS_AT_WAR_MODIFIER_MONTHS) {
-            recoverFromWasAtWarModifier(other);
-        }
-    }
-
-    private void recoverFromDeclinedPactRequest(Dynasty other) {
-        if (other == null) {
-            return;
-        }
-        dynasty.removePactRequestDeclinedAtWorldMonth(other.getId());
-        other.removePactRequestDeclinedAtWorldMonth(dynasty.getId());
-
-        String selfKey = dynasty.getDiplomaticModifierKey(other.getId());
-        String otherKey = other.getDiplomaticModifierKey(dynasty.getId());
-        if (GameConstants.DIPLO_MODIFIER_DECLINED_PACT.getNameKey().equals(selfKey)
-                || GameConstants.DIPLO_MODIFIER_DECLINED_PACT.getNameKey().equals(otherKey)) {
-            dynasty.removeDiplomaticModifierKey(other.getId(), GameConstants.DIPLO_MODIFIER_DECLINED_PACT.getNameKey());
-            other.removeDiplomaticModifierKey(dynasty.getId(), GameConstants.DIPLO_MODIFIER_DECLINED_PACT.getNameKey());
-            int reverse = -GameConstants.DIPLO_MODIFIER_DECLINED_PACT.getReputationDelta();
-            dynasty.adjustDiplomaticReputation(other.getId(), reverse);
-            other.adjustDiplomaticReputation(dynasty.getId(), reverse);
-        }
-    }
-
-    private void recoverFromDeclinedTradeRequest(Dynasty other) {
-        if (other == null) {
-            return;
-        }
-        dynasty.removeTradeRequestDeclinedAtWorldMonth(other.getId());
-        other.removeTradeRequestDeclinedAtWorldMonth(dynasty.getId());
-
-        int reverse = -GameConstants.DIPLO_MODIFIER_TRADE_REQUEST.getReputationDelta();
-        dynasty.adjustDiplomaticReputation(other.getId(), reverse);
-        other.adjustDiplomaticReputation(dynasty.getId(), reverse);
-        dynasty.removeDiplomaticModifierKey(other.getId(), GameConstants.DIPLO_MODIFIER_TRADE_REQUEST.getNameKey());
-        other.removeDiplomaticModifierKey(dynasty.getId(), GameConstants.DIPLO_MODIFIER_TRADE_REQUEST.getNameKey());
-    }
-
-    private void recoverFromWasAtWarModifier(Dynasty other) {
-        if (other == null) {
-            return;
-        }
-        dynasty.removeWasAtWarPeacedAtWorldMonth(other.getId());
-        other.removeWasAtWarPeacedAtWorldMonth(dynasty.getId());
-
-        String selfKey = dynasty.getDiplomaticModifierKey(other.getId());
-        String otherKey = other.getDiplomaticModifierKey(dynasty.getId());
-        if (GameConstants.DIPLO_MODIFIER_WAS_AT_WAR.getNameKey().equals(selfKey)
-                || GameConstants.DIPLO_MODIFIER_WAS_AT_WAR.getNameKey().equals(otherKey)) {
-            dynasty.removeDiplomaticModifierKey(other.getId(), GameConstants.DIPLO_MODIFIER_WAS_AT_WAR.getNameKey());
-            other.removeDiplomaticModifierKey(dynasty.getId(), GameConstants.DIPLO_MODIFIER_WAS_AT_WAR.getNameKey());
-            int reverse = -GameConstants.DIPLO_MODIFIER_WAS_AT_WAR.getReputationDelta();
-            dynasty.adjustDiplomaticReputation(other.getId(), reverse);
-            other.adjustDiplomaticReputation(dynasty.getId(), reverse);
-        }
     }
 
     private void applyWarEconomyToDynasty(Dynasty target) {
@@ -678,7 +560,6 @@ public class DynastyDiplomacyService {
         if (other == null || other == dynasty) {
             return GameConstants.DEFAULT_DIPLOMATIC_REPUTATION;
         }
-        maybeRecoverWasAtWarModifier(other, world);
         int score = dynasty.getDiplomaticReputation(other.getId())
                 + getBorderFrictionAdjustment(other, world)
                 + getMilitaryReputationAdjustment(other)
@@ -691,9 +572,27 @@ public class DynastyDiplomacyService {
             return 0;
         }
         int gainPer = getDiplomatStabilityGainPerAnt();
-        int ourSupport = dynasty.getDiplomatSupportTo(other.getId());
-        int theirSupport = other.getDiplomatSupportTo(dynasty.getId());
+        int ourSupport = Math.min(
+                dynasty.getDiplomatSupportTo(other.getId()),
+                countLiveDynastyMissionDiplomatsToward(other.getId()));
+        int theirSupport = Math.min(
+                other.getDiplomatSupportTo(dynasty.getId()),
+                other.getDiplomacyService() != null
+                        ? other.getDiplomacyService().countLiveDynastyMissionDiplomatsToward(dynasty.getId())
+                        : 0);
         return (ourSupport + theirSupport) * gainPer;
+    }
+
+    public int countLiveDynastyMissionDiplomatsToward(int targetDynastyId) {
+        int live = 0;
+        for (Colony colony : dynasty.getColonies()) {
+            int deployed = colony.getOutgoingDynastyDiplomatMissions().getOrDefault(targetDynastyId, 0);
+            if (deployed <= 0) {
+                continue;
+            }
+            live += Math.min(deployed, countLiveDiplomats(colony));
+        }
+        return live;
     }
 
     public int getMilitaryReputationAdjustment(Dynasty other) {
@@ -780,7 +679,9 @@ public class DynastyDiplomacyService {
         if (other == null || other == dynasty || !isDiplomaticallyContactable(dynasty) || !isDiplomaticallyContactable(other)) {
             return false;
         }
-        maybeRecoverDeclinedTradeRequest(other, world);
+        if (world != null) {
+            dynasty.migrateLegacyTimedDiplomaticModifiers(world);
+        }
         if (getTradeRequestDeclineCooldownMonthsRemaining(other, world) > 0) {
             return false;
         }
@@ -1000,7 +901,6 @@ public class DynastyDiplomacyService {
         dynasty.removePendingTradeProposal(proposal);
         proposer.removePendingTradeProposal(proposal);
         applyTradeDeclinePenalty(proposer);
-        recordTradeRequestDeclined(proposer, world);
         Colony logColony = proposer.getCapital();
         if (logColony == null && !proposer.getColonies().isEmpty()) {
             logColony = proposer.getColonies().get(0);
@@ -1472,5 +1372,189 @@ public class DynastyDiplomacyService {
         deployDynastyMission(from, other, toSend);
         dynasty.recordDiplomatsSent(toSend);
         return toSend;
+    }
+
+    public void validateAllDiplomatDeployments(World world) {
+        for (Colony colony : dynasty.getColonies()) {
+            reconcileDiplomatDeploymentsAfterCasualty(colony, null, world, false);
+        }
+    }
+
+    public void reconcileDiplomatDeploymentsAfterCasualty(Colony source, AntRole formerRole) {
+        reconcileDiplomatDeploymentsAfterCasualty(source, formerRole, null, true);
+    }
+
+    private void reconcileDiplomatDeploymentsAfterCasualty(
+            Colony source, AntRole formerRole, World world, boolean logCollapses) {
+        if (source == null || source.getDynasty() != dynasty) {
+            return;
+        }
+        if (!colonyHasDiplomatRole(source) && source.getDeployedDiplomatCount() == 0) {
+            return;
+        }
+
+        int liveDiplomats = countLiveDiplomats(source);
+        int assigned = source.getAssignedRoleCount(GameConstants.ROLE_DIPLOMAT);
+        int integrationDeployed = source.getIntegrationDiplomatsDeployed();
+        int missionDeployed = source.getDeployedDiplomatCount() - integrationDeployed;
+        int maxMissionSupport = Math.max(0, Math.min(assigned, liveDiplomats) - integrationDeployed);
+
+        if (missionDeployed <= maxMissionSupport) {
+            return;
+        }
+
+        Map<Integer, Integer> beforeColony = new HashMap<>(source.getOutgoingColonyDiplomatMissions());
+        Map<Integer, Integer> beforeDynasty = new HashMap<>(source.getOutgoingDynastyDiplomatMissions());
+        recallDiplomats(source, missionDeployed - maxMissionSupport);
+
+        if (!logCollapses) {
+            return;
+        }
+
+        for (Map.Entry<Integer, Integer> entry : beforeColony.entrySet()) {
+            if (entry.getValue() <= 0) {
+                continue;
+            }
+            int after = source.getOutgoingColonyDiplomatMissions().getOrDefault(entry.getKey(), 0);
+            if (after == 0) {
+                Colony target = findColonyById(entry.getKey());
+                String targetName = target != null ? target.getName() : "?";
+                source.logEvent(ColonyLogPrefixes.WARNING + " "
+                        + LanguageStrings.format(LanguageStrings.LOG_DIPLOMAT_MISSION_COLLAPSED_COLONY_FMT, targetName));
+            }
+        }
+        for (Map.Entry<Integer, Integer> entry : beforeDynasty.entrySet()) {
+            if (entry.getValue() <= 0) {
+                continue;
+            }
+            int after = source.getOutgoingDynastyDiplomatMissions().getOrDefault(entry.getKey(), 0);
+            if (after == 0) {
+                String targetName = "?";
+                if (world != null) {
+                    Dynasty target = world.findDynastyById(entry.getKey());
+                    if (target != null) {
+                        targetName = target.getName();
+                    }
+                }
+                source.logEvent(ColonyLogPrefixes.WARNING + " "
+                        + LanguageStrings.format(LanguageStrings.LOG_DIPLOMAT_MISSION_COLLAPSED_DYNASTY_FMT, targetName));
+            }
+        }
+    }
+
+    private int countLiveDiplomats(Colony colony) {
+        if (colony == null) {
+            return 0;
+        }
+        int count = 0;
+        for (Ant ant : colony.getPrincesses()) {
+            if (ant.isAlive() && ant.getRole() == GameConstants.ROLE_DIPLOMAT) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public int countDynastyLiveDrones() {
+        int total = 0;
+        for (Colony colony : dynasty.getColonies()) {
+            total += countLiveDrones(colony);
+        }
+        return total;
+    }
+
+    public boolean canOfferGeneticExchange(Dynasty target, World world) {
+        if (target == null || target == dynasty || world == null) {
+            return false;
+        }
+        if (isAtWarWith(target)) {
+            return false;
+        }
+        if (!isDiplomaticallyContactable(dynasty) || !isDiplomaticallyContactable(target)) {
+            return false;
+        }
+        if (getEffectiveDiplomaticReputation(target, world) < GameConstants.REPUTATION_CORDIAL.getMinScore()) {
+            return false;
+        }
+        if (hasActiveGeneticExchangeWith(target)) {
+            return false;
+        }
+        return countDynastyLiveDrones() >= GameConstants.GENETIC_EXCHANGE_DRONE_COST;
+    }
+
+    public boolean offerGeneticExchange(Dynasty target, World world) {
+        if (!canOfferGeneticExchange(target, world)) {
+            return false;
+        }
+        Colony logColony = spendDynastyRandomDrones(GameConstants.GENETIC_EXCHANGE_DRONE_COST);
+        if (logColony == null) {
+            return false;
+        }
+
+        target.adjustDiplomaticReputation(dynasty.getId(), GameConstants.DIPLO_MODIFIER_GENETIC_EXCHANGE.getReputationDelta());
+        target.addDiplomaticModifierKey(dynasty.getId(), GameConstants.DIPLO_MODIFIER_GENETIC_EXCHANGE.getNameKey());
+
+        logColony.logEvent(ColonyLogPrefixes.DYNASTY + " "
+                + LanguageStrings.format(LanguageStrings.LOG_GENETIC_EXCHANGE_FMT, target.getName()));
+        return true;
+    }
+
+    public boolean hasActiveGeneticExchangeWith(Dynasty other) {
+        if (other == null || other == dynasty) {
+            return false;
+        }
+        return other.hasDiplomaticModifierKey(
+                dynasty.getId(), GameConstants.DIPLO_MODIFIER_GENETIC_EXCHANGE.getNameKey());
+    }
+
+    private Colony spendDynastyRandomDrones(int count) {
+        List<Ant> liveDrones = new ArrayList<>();
+        Map<Ant, Colony> owners = new HashMap<>();
+        for (Colony colony : dynasty.getColonies()) {
+            for (Ant drone : colony.getDrones()) {
+                if (drone.isAlive()) {
+                    liveDrones.add(drone);
+                    owners.put(drone, colony);
+                }
+            }
+        }
+        if (liveDrones.size() < count) {
+            return null;
+        }
+        Collections.shuffle(liveDrones, GameRandom.getShuffleRandom());
+        Map<Colony, Integer> spentPerColony = new HashMap<>();
+        for (int i = 0; i < count; i++) {
+            Ant drone = liveDrones.get(i);
+            Colony colony = owners.get(drone);
+            drone.goDie(colony, DeathCause.OTHER);
+            colony.getDrones().remove(drone);
+            colony.recordAntDeath(drone, DeathCause.OTHER);
+            spentPerColony.merge(colony, 1, Integer::sum);
+        }
+        Colony logColony = null;
+        int mostSpent = 0;
+        for (Map.Entry<Colony, Integer> entry : spentPerColony.entrySet()) {
+            if (entry.getValue() > mostSpent) {
+                mostSpent = entry.getValue();
+                logColony = entry.getKey();
+            }
+        }
+        if (logColony == null) {
+            logColony = dynasty.getCapital();
+        }
+        return logColony;
+    }
+
+    private int countLiveDrones(Colony colony) {
+        if (colony == null) {
+            return 0;
+        }
+        int count = 0;
+        for (Ant drone : colony.getDrones()) {
+            if (drone.isAlive()) {
+                count++;
+            }
+        }
+        return count;
     }
 }

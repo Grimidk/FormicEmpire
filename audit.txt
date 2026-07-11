@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 68% (179/265 checked)
+Completion: 68% (183/268 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -68,7 +68,7 @@ Roles (default hatch roles for new ants):
 [X] Back to main menu
 [X] Autosave runs per settings frequency during play
 [X] Back to menu from game (ESC > Back to Menu) — saves progress
-[ ] Colony death — Reload or Main Menu options
+[X] Colony death — Reload or Main Menu options
 
 ================================================================================
 4. IN-GAME HUD (bottom control bar)
@@ -260,10 +260,10 @@ Start / progress assimilations (RP + time). Each species:
 ================================================================================
 13. SYNERGIES (O) — UpgradeDialog Synergy tab
 ================================================================================
-[ ] Synergies tab lists in-progress combinations (1/2 requirements met)
-[ ] Popup when synergy conditions are fully met
-[ ] Super Venom replaces Fire + Maricopa venom stacking with 16x damage
-[ ] Synergy effects apply to colony / dynasty stats
+[X] Synergies tab lists in-progress combinations (1/2 requirements met)
+[X] Popup when synergy conditions are fully met
+[ ] Super Venom replaces Fire + Neurotoxic venom stacking with 16x damage
+[X] Synergy effects apply to colony / dynasty stats
 
 ================================================================================
 14. COLONY OPERATIONS (C) — AbilitiesDialog
@@ -306,22 +306,25 @@ Neighbor trade rows (per adjacent hex):
 [X] Confirm / update trade
 [X] Cancel trade dialog
 [X] Active trade edit from table actions (Manage / Establish)
-[ ] See convoy option in logistics Actions menu (opens convoy transit view)
+[X] See convoy option in logistics Actions menu (opens convoy transit view)
 [ ] Make two-way trade option in logistics Actions menu (enabled when matching incoming one-way route exists)
 
 ================================================================================
 17. DYNASTY — DIPLOMACY (D)
 ================================================================================
 Per foreign dynasty Actions menu:
-[X] Non-aggression pact — propose / accept / break
+[ ] Non-aggression pact — propose / accept / break
 [X] Declare war (confirm dialog; population & military checks)
 [ ] Request trade agreement
 [ ] Open trade negotiation
 [X] Send diplomats to dynasty
+[ ] Genetic exchange (25 drones from any colony; +10 reputation and +10% genetic integrity to target for 6 months; once per dynasty until expiry)
+[ ] Convoy auto-cancelled with side alert when escorts die and route cannot be staffed
+[ ] Diplomat mission auto-cancelled with side alert when deployed diplomats die
 [x] Reputation / stance icons and tooltips
 [ ] Was at War reputation modifier after peace treaty (lasts 1 year)
 [X] Cooldowns after pact break block war
-[X] Begin integration (5× military, Friendly+, pact, border, diplomats)
+[ ] Begin integration (5× military, Friendly+, pact, dynasty border, diplomats from any colony)
 [X] Integration progress advances daily; ETA shows completion date
 [X] Manage integration diplomats (assign count; shown on progress bar)
 [X] Cancel integration (player overlord only)
@@ -421,7 +424,7 @@ World:
 Combat:
 [X] Colony military power calculation
 [ ] War stages: clash, hex defense, etc.
-[ ] Battle view stat multipliers vs standing multipliers
+[X] Battle view stat multipliers vs standing multipliers
 
 ================================================================================
 24. EDGE CASES & LIFECYCLE

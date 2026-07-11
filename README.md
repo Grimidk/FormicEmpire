@@ -4,7 +4,7 @@ Cursor is being used to help me debug and test, all pixelart made using Aseprite
 I plan to make everything from scratch including the music, assets, fonts and more.
 
 Please enjoy it, and send feedback to: thegrimidk@gmail.com .
-Check the roadmap file to see planned features and known bugs and credits for acknowledgments. 
+Check the roadmap to see planned features and known bugs and credits for acknowledgments. 
 
 The game will eventually be published, but I don't care about profits. Donations are always welcome.
 I aim to publish the game around October 2026, maybe, until then betas are available at itch.io or github.

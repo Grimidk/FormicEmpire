@@ -12,6 +12,7 @@ import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -71,7 +72,7 @@ public final class DynastyIntegrationService {
         if (!meetsReputationRequirement(overlord, target, world)) {
             return false;
         }
-        if (countTotalAvailableDiplomats(overlord, world, tradeManager) < GameConstants.INTEGRATION_MIN_DIPLOMATS) {
+        if (countIntegrationDiplomatCapacity(overlord) < GameConstants.INTEGRATION_MIN_DIPLOMATS) {
             return false;
         }
         return !target.getColonies().isEmpty();
@@ -232,13 +233,16 @@ public final class DynastyIntegrationService {
     }
 
     public static int countTotalAvailableDiplomats(Dynasty dynasty, World world, TradeManager tradeManager) {
-        if (dynasty == null || dynasty.getDiplomacyService() == null || world == null || tradeManager == null) {
+        return countIntegrationDiplomatCapacity(dynasty);
+    }
+
+    public static int countIntegrationDiplomatCapacity(Dynasty dynasty) {
+        if (dynasty == null) {
             return 0;
         }
-        DynastyDiplomacyService diplo = dynasty.getDiplomacyService();
         int total = 0;
-        for (Colony colony : diplo.listDiplomatSourceColonies(tradeManager, world)) {
-            total += diplo.countAvailableDiplomats(colony);
+        for (Colony colony : listIntegrationDiplomatColonies(dynasty)) {
+            total += integrationDiplomatCapacity(colony);
         }
         return total;
     }
@@ -255,26 +259,33 @@ public final class DynastyIntegrationService {
     }
 
     public static int countMaxAssignableIntegrationDiplomats(Dynasty dynasty, World world, TradeManager tradeManager) {
-        if (dynasty == null || dynasty.getDiplomacyService() == null || world == null || tradeManager == null) {
-            return 0;
+        return countIntegrationDiplomatCapacity(dynasty);
+    }
+
+    public static List<Colony> listIntegrationDiplomatColonies(Dynasty dynasty) {
+        List<Colony> colonies = new ArrayList<>();
+        if (dynasty == null) {
+            return colonies;
         }
-        int total = 0;
-        for (Colony colony : dynasty.getDiplomacyService().listDiplomatSourceColonies(tradeManager, world)) {
-            total += integrationDiplomatCapacity(colony);
+        for (Colony colony : dynasty.getColonies()) {
+            if (colony.getAge() < 7 || !colony.hasUpgrade(GameUnlocks.ROLE_DIPLOMAT)) {
+                continue;
+            }
+            if (integrationDiplomatCapacity(colony) > 0) {
+                colonies.add(colony);
+            }
         }
-        return total;
+        return colonies;
     }
 
     public static void assignIntegrationDiplomats(Dynasty overlord, int requestedTotal, boolean manual,
             World world, TradeManager tradeManager) {
-        if (overlord == null || overlord.getDiplomacyService() == null || world == null || tradeManager == null) {
+        if (overlord == null || world == null || tradeManager == null) {
             return;
         }
         clearIntegrationDiplomatDeployment(overlord);
-        int remaining = Math.max(0, Math.min(requestedTotal,
-                countMaxAssignableIntegrationDiplomats(overlord, world, tradeManager)));
-        List<Colony> sources = new ArrayList<>(
-                overlord.getDiplomacyService().listDiplomatSourceColonies(tradeManager, world));
+        int remaining = Math.max(0, Math.min(requestedTotal, countIntegrationDiplomatCapacity(overlord)));
+        List<Colony> sources = new ArrayList<>(listIntegrationDiplomatColonies(overlord));
         sources.sort(Comparator.comparingInt(DynastyIntegrationService::integrationDiplomatCapacity).reversed());
         for (Colony colony : sources) {
             if (remaining <= 0) {

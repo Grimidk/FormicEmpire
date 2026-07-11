@@ -312,8 +312,12 @@ public class ColonyLabourService {
             
             for (Ant antToCull : antsToCull) {
                 if (antToCull.isAlive()) {
+                    AntType originalType = antToCull.getAntType();
+                    AntRole formerRole = antToCull.getRole();
+                    boolean wasOnTrade = antToCull.isOnTrade();
                     antToCull.goDie(colony, DeathCause.LACK_OF_CARE);
                     colony.recordAntDeath(antToCull, DeathCause.LACK_OF_CARE);
+                    colony.handleAntCasualtyAftermath(antToCull, originalType, formerRole, wasOnTrade);
                     
                     list.remove(antToCull);
                     deathCount++;

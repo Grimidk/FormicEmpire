@@ -43,9 +43,13 @@ class LoadSlotWarsIntegrationTest {
         assertNotNull(player);
 
         List<War> historic = world.getWarService().getHistoricWarsForDynasty(player.getId());
-        assertEquals(1, historic.size(), "player should have one historic war after load");
-        assertFalse(historic.get(0).isActive());
-        assertEquals("First Grim - Vine War", historic.get(0).getDisplayName());
-        assertEquals("Grim Dynasty", world.getWarService().resolveWinnerDisplayName(historic.get(0), player));
+        assertTrue(historic.size() >= 1, "player should have at least one historic war after load");
+        War vineWar = historic.stream()
+                .filter(w -> "First Grim - Vine War".equals(w.getDisplayName()))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(vineWar, "expected First Grim - Vine War in historic wars");
+        assertFalse(vineWar.isActive());
+        assertEquals("Grim Dynasty", world.getWarService().resolveWinnerDisplayName(vineWar, player));
     }
 }

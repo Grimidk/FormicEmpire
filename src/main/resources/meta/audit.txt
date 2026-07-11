@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 68% (179/265 checked)
+Completion: 66% (177/268 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -262,7 +262,7 @@ Start / progress assimilations (RP + time). Each species:
 ================================================================================
 [ ] Synergies tab lists in-progress combinations (1/2 requirements met)
 [ ] Popup when synergy conditions are fully met
-[ ] Super Venom replaces Fire + Maricopa venom stacking with 16x damage
+[ ] Super Venom replaces Fire + Neurotoxic venom stacking with 16x damage
 [ ] Synergy effects apply to colony / dynasty stats
 
 ================================================================================
@@ -313,15 +313,18 @@ Neighbor trade rows (per adjacent hex):
 17. DYNASTY — DIPLOMACY (D)
 ================================================================================
 Per foreign dynasty Actions menu:
-[X] Non-aggression pact — propose / accept / break
+[ ] Non-aggression pact — propose / accept / break
 [X] Declare war (confirm dialog; population & military checks)
 [ ] Request trade agreement
 [ ] Open trade negotiation
 [X] Send diplomats to dynasty
+[ ] Genetic exchange (25 drones from any colony; +10 reputation and +10% genetic integrity to target for 6 months; once per dynasty until expiry)
+[ ] Convoy auto-cancelled with side alert when escorts die and route cannot be staffed
+[ ] Diplomat mission auto-cancelled with side alert when deployed diplomats die
 [x] Reputation / stance icons and tooltips
 [ ] Was at War reputation modifier after peace treaty (lasts 1 year)
 [X] Cooldowns after pact break block war
-[X] Begin integration (5× military, Friendly+, pact, border, diplomats)
+[ ] Begin integration (5× military, Friendly+, pact, dynasty border, diplomats from any colony)
 [X] Integration progress advances daily; ETA shows completion date
 [X] Manage integration diplomats (assign count; shown on progress bar)
 [X] Cancel integration (player overlord only)

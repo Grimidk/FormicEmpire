@@ -190,7 +190,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("SYNERGY_REQUIREMENT_MISSING_FMT", "[ ] %s");
         pt.put("SYNERGY_SUPER_VENOM", "Super Veneno");
         pt.put("SYNERGY_SUPER_VENOM_FLAVOR", "Super Veneno");
-        pt.put("SYNERGY_SUPER_VENOM_DESC", "Substitui o empilhamento de veneno de fogo + maricopa (4+4) por um multiplicador de dano de 16x quando ambos os venenos estão assimilados e Sinergias foram pesquisadas.");
+        pt.put("SYNERGY_SUPER_VENOM_DESC", "Substitui o empilhamento de veneno de fogo + neurotóxico (4+4) por um multiplicador de dano de 16x quando ambos os venenos estão assimilados e Sinergias foram pesquisadas.");
 
         pt.put("DIALOG_HATCH_RATES_TITLE", "Taxas de eclosão");
         pt.put("HATCH_DESC", "Definir probabilidade de eclosão:");
@@ -830,6 +830,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("DIPLO_MODIFIER_BORDER_FRICTION", "Fricção fronteiriça");
         pt.put("DIPLO_MODIFIER_GRANTED_INDEPENDENCE", "Independência concedida");
         pt.put("DIPLO_MODIFIER_WAS_AT_WAR", "Estiveram em guerra");
+        pt.put("DIPLO_MODIFIER_GENETIC_EXCHANGE", "Intercâmbio genético");
         pt.put("DYNASTY_REBELLION_NAME_FMT", "%s Rebelião");
         pt.put("REBELLION_WAR_NAME_FMT", "%s %s Rebelião");
         pt.put("ALERT_REBELLION_RISK_FMT", "Risco de rebelião em %s!");
@@ -842,6 +843,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("LOG_REBELLION_INDEPENDENCE_FMT", "Independência pacífica concedida a %s.");
         pt.put("DIPLO_MILITARY_STRENGTH", "Força militar");
         pt.put("GI_MODIFIER_PACT", "Aliança de pacto");
+        pt.put("GI_MODIFIER_GENETIC_EXCHANGE", "Intercâmbio genético");
         pt.put("GI_TOOLTIP_START", "Inicial");
         pt.put("GI_MODIFIER_SATELLITE_COLONIES", "Colónias satélite (%s): %s");
         pt.put("GI_TOOLTIP_ASSIMILATION_FLOOR", "Piso de assimilação (%s): %s%%");
@@ -884,6 +886,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("DIPLO_ACTION_TRADE", "Comerciar");
         pt.put("DIPLO_ACTION_REQUEST_TRADE", "Solicitar comércio");
         pt.put("DIPLO_ACTION_SEND_DIPLOMATS", "Enviar diplomatas");
+        pt.put("DIPLO_ACTION_GENETIC_EXCHANGE", "Intercâmbio genético");
         pt.put("DIPLO_ACTION_INTEGRATE", "Iniciar integração");
         pt.put("DIPLO_ACTION_CANCEL_INTEGRATION", "Cancelar integração");
         pt.put("DIPLO_INTEGRATION_PROGRESS_FMT", "%s%% — %s (%s diplomatas)");
@@ -898,12 +901,18 @@ public class PortugueseTranslation implements Translation {
         pt.put("DIPLO_ERROR_INTEGRATION_MILITARY", "Requer pelo menos 5× o poder militar deles.");
         pt.put("DIPLO_ERROR_INTEGRATION_REPUTATION", "Requer reputação Amigável ou melhor.");
         pt.put("DIPLO_ERROR_INTEGRATION_DIPLOMATS", "Requer pelo menos um diplomata disponível.");
+        pt.put("DIPLO_ERROR_INTEGRATION_BORDER", "A tua dinastia tem de partilhar fronteira com esta dinastia.");
+        pt.put("DIPLO_ERROR_INTEGRATION_PACT", "Requer um pacto de não agressão com esta dinastia.");
         pt.put("DIPLO_SEND_DIPLOMATS_TITLE", "Enviar diplomatas");
         pt.put("DIPLO_SEND_DIPLOMATS_PROMPT", "Envie até %s diplomata(s) (%s atribuídas). Cada uma melhora a estabilidade em %s.");
         pt.put("DIPLO_SEND_DIPLOMATS_SUCCESS_DYNASTY", "Enviadas %s diplomata(s). Reputação com %s aumentou em %s.");
         pt.put("DIPLO_SEND_DIPLOMATS_SUCCESS_COLONY", "Enviadas %s diplomata(s). Lealdade de %s aumentou em %s.");
         pt.put("DIPLO_ERROR_NO_DIPLOMATS", "Nenhuma princesa está atribuída ao papel Diplomata nesta colônia.");
         pt.put("DIPLO_ERROR_NO_DIPLOMAT_ROLE", "Desbloqueie o papel Diplomata antes de enviar diplomatas.");
+        pt.put("DIPLO_ERROR_GENETIC_EXCHANGE_ACTIVE", "Já há um bônus de intercâmbio genético ativo com esta dinastia.");
+        pt.put("DIPLO_ERROR_GENETIC_EXCHANGE_DRONES", "São necessários pelo menos 25 zangões vivos em toda a tua dinastia.");
+        pt.put("DIPLO_ERROR_GENETIC_EXCHANGE_BORDER", "A tua dinastia tem de ter uma colónia fronteiriça com esta dinastia.");
+        pt.put("DIPLO_ERROR_GENETIC_EXCHANGE_REP", "Requer reputação Cordial ou superior.");
         pt.put("DIPLO_ERROR_REPUTATION_STABLE", "Diplomatas não podem ser enviados a dinastias com reputação Agressiva.");
         pt.put("DIPLO_ERROR_LOYALTY_STABLE", "Diplomatas não podem ser enviados a colônias com lealdade Rebelde.");
         pt.put("DIPLO_ERROR_CORDIAL_REQUIRED", "Reputação cordial ou melhor é necessária para formar um pacto.");
@@ -969,8 +978,8 @@ public class PortugueseTranslation implements Translation {
         pt.put("SPECIES_DRACULA_SCIENTIFIC", "Mystrium Sp.");
         pt.put("SPECIES_SILVER", "Formiga Prateada do Saara");
         pt.put("SPECIES_SILVER_SCIENTIFIC", "Cataglyphis Sp.");
-        pt.put("SPECIES_MARICOPA", "Formiga Maricopa");
-        pt.put("SPECIES_MARICOPA_SCIENTIFIC", "Pogonomyrmex Maricopa");
+        pt.put("SPECIES_MARICOPA", "Formiga neurotóxica");
+        pt.put("SPECIES_MARICOPA_SCIENTIFIC", "Neurotoxica Grimunknowni");
         pt.put("SPECIES_EXPLODING", "Formiga Explosiva");
         pt.put("SPECIES_EXPLODING_SCIENTIFIC", "Camponotus Saundersi");
         pt.put("SPECIES_BULLDOG", "Formiga Bulldog");
@@ -1035,10 +1044,10 @@ public class PortugueseTranslation implements Translation {
         pt.put("ASSIMILATED_HEATRESIST_DESC", "Sua dinastia pode forragear sob calor extremo do deserto. (Mecânica em desenvolvimento.)");
         pt.put("ASSIMILATION_HEATRESIST", "Assimilação Formiga Prateada do Saara");
         pt.put("ASSIMILATION_HEATRESIST_DESC", "Após assimilar o genoma da formiga prateada do saara:");
-        pt.put("ASSIMILATED_DEADLYVENOM_FLAVOR", "Veneno Letal");
+        pt.put("ASSIMILATED_DEADLYVENOM_FLAVOR", "Veneno neurotóxico");
         pt.put("ASSIMILATED_DEADLYVENOM_DESC", "Sua dinastia pode injetar veneno capaz de matar presas pequenas rapidamente. (Mecânica em desenvolvimento.)");
-        pt.put("ASSIMILATION_DEADLYVENOM", "Assimilação Formiga Maricopa");
-        pt.put("ASSIMILATION_DEADLYVENOM_DESC", "Após assimilar o genoma da formiga maricopa:");
+        pt.put("ASSIMILATION_DEADLYVENOM", "Assimilação de veneno neurotóxico");
+        pt.put("ASSIMILATION_DEADLYVENOM_DESC", "Após assimilar a genética do veneno neurotóxico:");
         pt.put("ASSIMILATED_SELFDESTRUCT_FLAVOR", "Defesa Suicida");
         pt.put("ASSIMILATED_SELFDESTRUCT_DESC", "Sua dinastia pode romper operárias especializadas para borrifar toxinas. (Mecânica em desenvolvimento.)");
         pt.put("ASSIMILATION_SELFDESTRUCT", "Assimilação Formiga Explosiva");
@@ -1346,7 +1355,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("ASSIMILATED_FASTBITE_DESC", "Multiplica a velocidade de ataque base da colônia por 3.");
         pt.put("ASSIMILATED_HEATRESIST_FLAVOR", "Tolerância ao Calor do Deserto");
         pt.put("ASSIMILATED_HEATRESIST_DESC", "Sua dinastia pode forragear sob calor extremo do deserto. (Mecânica em desenvolvimento.)");
-        pt.put("ASSIMILATED_DEADLYVENOM_FLAVOR", "Veneno Letal");
+        pt.put("ASSIMILATED_DEADLYVENOM_FLAVOR", "Veneno neurotóxico");
         pt.put("ASSIMILATED_DEADLYVENOM_DESC", "Sua dinastia pode injetar veneno capaz de matar presas pequenas rapidamente. (Mecânica em desenvolvimento.)");
         pt.put("ASSIMILATED_SELFDESTRUCT_FLAVOR", "Defesa Suicida");
         pt.put("ASSIMILATED_SELFDESTRUCT_DESC", "Sua dinastia pode romper operárias especializadas para borrifar toxinas. (Mecânica em desenvolvimento.)");
@@ -1483,8 +1492,8 @@ public class PortugueseTranslation implements Translation {
         pt.put("ASSIMILATION_FASTBITE_DESC", "Após assimilar o genoma da formiga drácula:");
         pt.put("ASSIMILATION_HEATRESIST", "Assimilação Formiga Prateada do Saara");
         pt.put("ASSIMILATION_HEATRESIST_DESC", "Após assimilar o genoma da formiga prateada do saara:");
-        pt.put("ASSIMILATION_DEADLYVENOM", "Assimilação Formiga Maricopa");
-        pt.put("ASSIMILATION_DEADLYVENOM_DESC", "Após assimilar o genoma da formiga maricopa:");
+        pt.put("ASSIMILATION_DEADLYVENOM", "Assimilação de veneno neurotóxico");
+        pt.put("ASSIMILATION_DEADLYVENOM_DESC", "Após assimilar a genética do veneno neurotóxico:");
         pt.put("ASSIMILATION_SELFDESTRUCT", "Assimilação Formiga Explosiva");
         pt.put("ASSIMILATION_SELFDESTRUCT_DESC", "Após assimilar o genoma da formiga explosiva:");
         pt.put("ASSIMILATION_FARSIGHT", "Assimilação Formiga Bulldog");
@@ -1702,6 +1711,11 @@ public class PortugueseTranslation implements Translation {
         pt.put("LOG_TRADE_CONVOY_RETURN_FMT", "Comboio de %s recolheu carga de retorno.");
         pt.put("LOG_TRADE_BILATERAL_RETURN_FMT", "Comboio bilateral voltou com %s tipos de recursos.");
         pt.put("LOG_TRADE_ROUTE_CANCELLED_FMT", "Rota para %s cancelada. Recursos reembolsados.");
+        pt.put("LOG_TRADE_ESCORT_LOSS_FMT", "Comboio para %s cancelado: escoltas insuficientes após baixas.");
+        pt.put("LOG_DIPLOMAT_MISSION_COLLAPSED_COLONY_FMT", "Missão diplomática para a colônia %s encerrada: diplomatas insuficientes após baixas.");
+        pt.put("LOG_DIPLOMAT_MISSION_COLLAPSED_DYNASTY_FMT", "Missão diplomática para a dinastia %s encerrada: diplomatas insuficientes após baixas.");
+        pt.put("LOG_GENETIC_EXCHANGE_FMT", "Enviados 25 zangões a %s por um intercâmbio genético (+10 reputação, +10%% integridade por 6 meses).");
+        pt.put("LOG_AI_GENETIC_EXCHANGE_FMT", "A IA enviou 25 zangões a %s por um intercâmbio genético.");
         pt.put("LOG_AUTOMATION_BUILD_FMT", "Construção iniciada: %s");
         pt.put("LOG_AUTOMATION_TUNNEL_FMT", "Túnel iniciado em direção a %s");
         pt.put("LOG_AUTOMATION_TRADE_FMT", "Rota comercial aberta para %s");

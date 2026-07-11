@@ -8,10 +8,11 @@ To Fix (By decreasing priority) :
 	High:
 	TODO: icons all unlocks
 	TODO: sprites/buildings/rooms/*.png
-	TODO: species sprites and icon: carpenter, weaver, floodplain, fire, jet, gliding, army, ghost, dracula, silver, maricopa, exploding, bulldog, shining black and desert
+	TODO: species sprites and icon: carpenter, weaver, floodplain, jet, gliding, army, ghost, dracula, silver, exploding, bulldog, shining black and desert
 
 	Mid:
-	(none right now)
+	colony automation includes subtype preference
+	check hitbox for the go to colony square in map
 	  
 	Low:
 	(none right now)
@@ -24,11 +25,13 @@ To Fix (By decreasing priority) :
 	hexagonal architecture
 	Font - self explanatory
 	clickable ant cursor
+	excel for languages and tags
 	
 To Feature (to be done in order):
 Needed for launch (v1.0) (Launch Version):
 	Priority:
-	assimilations ( Trap-jaw (Trap jaw ants), Honey-pot (Honey pot ants), Door-head (Turtle ants), Wood burrowing (Carpenter ants), Silk weaving (Weaver ants), Rafting (Flood plains ants), Jumping (Jet ants), Gliding (Gliding ants), Swarming (Army ants), Stealth (Ghost ants), Heat resistance (Saharan silver ants), Self destruction (Exploding ants), Far sight (Bulldog ants), Hive building (Shining black ants), Location sensing (Desert ants))
+	type specific subtyping
+	assimilations (Wood burrowing (Carpenter ants), Silk weaving (Weaver ants), Rafting (Flood plains ants), Jumping (Jet ants), Gliding (Gliding ants), Swarming (Army ants), Stealth (Ghost ants), Heat resistance (Saharan silver ants), Self destruction (Exploding ants), Far sight (Bulldog ants), Hive building (Shining black ants), Location sensing (Desert ants))
 
 	Everything else :
 	minerals with uprades to find it and increase miner efficency, also mushroom detection 

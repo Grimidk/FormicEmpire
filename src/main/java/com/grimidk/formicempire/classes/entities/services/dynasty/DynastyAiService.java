@@ -4,6 +4,7 @@ import com.grimidk.formicempire.classes.entities.services.colony.ColonyStatsServ
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.entities.CrossDynastyTradeProposal;
+import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
@@ -104,6 +105,9 @@ public class DynastyAiService {
                 }
                 continue;
             }
+            if (tryAiGeneticExchange(dynasty, diplo, other, world)) {
+                continue;
+            }
             int effectiveRep = diplo.getEffectiveDiplomaticReputation(other, world);
             if (effectiveRep >= REPUTATION_MISSION_TARGET) {
                 continue;
@@ -122,6 +126,17 @@ public class DynastyAiService {
                         sent, other.getName(), gain));
             }
         }
+    }
+
+    private boolean tryAiGeneticExchange(Dynasty dynasty, DynastyDiplomacyService diplo, Dynasty other, World world) {
+        if (!diplo.canOfferGeneticExchange(other, world)) {
+            return false;
+        }
+        if (diplo.offerGeneticExchange(other, world)) {
+            logDynastyEvent(dynasty, LanguageStrings.format(LanguageStrings.LOG_AI_GENETIC_EXCHANGE_FMT, other.getName()));
+            return true;
+        }
+        return false;
     }
 
     private void runWarConsideration(Dynasty dynasty, World world, TradeManager tradeManager) {

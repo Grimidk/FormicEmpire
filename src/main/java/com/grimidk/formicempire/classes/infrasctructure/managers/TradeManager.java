@@ -38,10 +38,17 @@ public class TradeManager implements Runnable {
     }
 
     private void updateTrades() {
+        List<Trade> toRemove = new ArrayList<>();
         for (Trade trade : activeTrades) {
             if (trade.isActive()) {
                 trade.tick();
+                if (!trade.isActive()) {
+                    toRemove.add(trade);
+                }
+            } else {
+                toRemove.add(trade);
             }
         }
+        activeTrades.removeAll(toRemove);
     }
 }

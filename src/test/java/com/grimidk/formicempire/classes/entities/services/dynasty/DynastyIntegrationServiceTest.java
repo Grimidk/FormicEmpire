@@ -50,7 +50,7 @@ class DynastyIntegrationServiceTest {
         overlord.setMilitaryPower(500);
         target.setMilitaryPower(50);
         overlord.setDiplomaticReputation(target.getId(), GameConstants.REPUTATION_FRIENDLY.getMinScore());
-        overlord.getDiplomacyService().formNonAggressionPact(target);
+        overlord.getDiplomacyService().formNonAggressionPact(target, world);
     }
 
     @Test
@@ -238,7 +238,7 @@ class DynastyIntegrationServiceTest {
     }
 
     @Test
-    void integrationDiplomatsUseCapitalAndMilitantColoniesOnly() {
+    void integrationDiplomatsDrawFromAnyColonyWithCapacity() {
         Colony satellite = new Colony(3, "Satellite", false);
         satellite.setAge(7);
         satellite.setLoyalty(GameConstants.DEFAULT_COLONY_LOYALTY);
@@ -251,13 +251,41 @@ class DynastyIntegrationServiceTest {
         militant.setAssignedRoleCount(GameConstants.ROLE_DIPLOMAT, 3);
         overlord.addColony(militant);
 
-        assertEquals(4, DynastyIntegrationService.countMaxAssignableIntegrationDiplomats(
+        assertEquals(6, DynastyIntegrationService.countMaxAssignableIntegrationDiplomats(
                 overlord, world, tradeManager));
 
         DynastyIntegrationService.assignIntegrationDiplomats(overlord, 4, false, world, tradeManager);
-        assertEquals(1, overlord.getCapital().getIntegrationDiplomatsDeployed());
-        assertEquals(0, satellite.getIntegrationDiplomatsDeployed());
+        assertEquals(0, overlord.getCapital().getIntegrationDiplomatsDeployed());
+        assertEquals(1, satellite.getIntegrationDiplomatsDeployed());
         assertEquals(3, militant.getIntegrationDiplomatsDeployed());
+    }
+
+    @Test
+    void canStartIntegrationWhenBorderIsThroughNonCapitalColony() {
+        Colony borderColony = new Colony(5, "Frontier", false);
+        borderColony.setAge(7);
+        overlord.addColony(borderColony);
+
+        Hex capitalHex = new Hex();
+        Hex borderHex = new Hex();
+        Hex targetHex = new Hex();
+        capitalHex.setQ(0);
+        capitalHex.setR(0);
+        borderHex.setQ(1);
+        borderHex.setR(0);
+        targetHex.setQ(2);
+        targetHex.setR(0);
+        capitalHex.setNorthEast(borderHex);
+        borderHex.setSouthWest(capitalHex);
+        borderHex.setNorthEast(targetHex);
+        targetHex.setSouthWest(borderHex);
+        capitalHex.setColony(overlord.getCapital());
+        borderHex.setColony(borderColony);
+        targetHex.setColony(target.getColonies().get(0));
+        world.setHexes(new ArrayList<>(List.of(capitalHex, borderHex, targetHex)));
+
+        assertTrue(overlord.getDiplomacyService().sharesBorderWith(target, world));
+        assertTrue(DynastyIntegrationService.canStartIntegration(overlord, target, world, tradeManager));
     }
 
     @Test

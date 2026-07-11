@@ -190,7 +190,7 @@ public class SpanishTranslation implements Translation {
         es.put("SYNERGY_REQUIREMENT_MISSING_FMT", "[ ] %s");
         es.put("SYNERGY_SUPER_VENOM", "Súper Veneno");
         es.put("SYNERGY_SUPER_VENOM_FLAVOR", "Súper Veneno");
-        es.put("SYNERGY_SUPER_VENOM_DESC", "Reemplaza la acumulación de veneno de fuego + maricopa (4+4) por un multiplicador de daño de 16x cuando ambos venenos están asimilados y las Sinergias están investigadas.");
+        es.put("SYNERGY_SUPER_VENOM_DESC", "Reemplaza la acumulación de veneno de fuego + neurotóxico (4+4) por un multiplicador de daño de 16x cuando ambos venenos están asimilados y las Sinergias están investigadas.");
 
         es.put("DIALOG_HATCH_RATES_TITLE", "Gestionar Tasas de Eclosión");
         es.put("HATCH_DESC", "Establecer probabilidad de eclosión:");
@@ -830,6 +830,7 @@ public class SpanishTranslation implements Translation {
         es.put("DIPLO_MODIFIER_BORDER_FRICTION", "Fricción fronteriza");
         es.put("DIPLO_MODIFIER_GRANTED_INDEPENDENCE", "Independencia concedida");
         es.put("DIPLO_MODIFIER_WAS_AT_WAR", "Estuvieron en guerra");
+        es.put("DIPLO_MODIFIER_GENETIC_EXCHANGE", "Intercambio genético");
         es.put("DYNASTY_REBELLION_NAME_FMT", "%s Rebelión");
         es.put("REBELLION_WAR_NAME_FMT", "%s Rebelión %s");
         es.put("ALERT_REBELLION_RISK_FMT", "¡Riesgo de rebelión en %s!");
@@ -842,6 +843,7 @@ public class SpanishTranslation implements Translation {
         es.put("LOG_REBELLION_INDEPENDENCE_FMT", "Independencia pacífica concedida a %s.");
         es.put("DIPLO_MILITARY_STRENGTH", "Fuerza militar");
         es.put("GI_MODIFIER_PACT", "Alianza de pacto");
+        es.put("GI_MODIFIER_GENETIC_EXCHANGE", "Intercambio genético");
         es.put("GI_TOOLTIP_START", "Inicial");
         es.put("GI_MODIFIER_SATELLITE_COLONIES", "Colonias satélite (%s): %s");
         es.put("GI_TOOLTIP_ASSIMILATION_FLOOR", "Mínimo por asimilación (%s): %s%%");
@@ -884,6 +886,7 @@ public class SpanishTranslation implements Translation {
         es.put("DIPLO_ACTION_TRADE", "Comerciar");
         es.put("DIPLO_ACTION_REQUEST_TRADE", "Solicitar comercio");
         es.put("DIPLO_ACTION_SEND_DIPLOMATS", "Enviar diplomáticas");
+        es.put("DIPLO_ACTION_GENETIC_EXCHANGE", "Intercambio genético");
         es.put("DIPLO_ACTION_INTEGRATE", "Iniciar integración");
         es.put("DIPLO_ACTION_CANCEL_INTEGRATION", "Cancelar integración");
         es.put("DIPLO_INTEGRATION_PROGRESS_FMT", "%s%% — %s (%s diplomáticas)");
@@ -898,12 +901,18 @@ public class SpanishTranslation implements Translation {
         es.put("DIPLO_ERROR_INTEGRATION_MILITARY", "Requiere al menos 5× su poder militar.");
         es.put("DIPLO_ERROR_INTEGRATION_REPUTATION", "Requiere reputación Amistosa o mejor.");
         es.put("DIPLO_ERROR_INTEGRATION_DIPLOMATS", "Requiere al menos una diplomática disponible.");
+        es.put("DIPLO_ERROR_INTEGRATION_BORDER", "Tu dinastía debe compartir frontera con esta dinastía.");
+        es.put("DIPLO_ERROR_INTEGRATION_PACT", "Requiere un pacto de no agresión con esta dinastía.");
         es.put("DIPLO_SEND_DIPLOMATS_TITLE", "Enviar diplomáticas");
         es.put("DIPLO_SEND_DIPLOMATS_PROMPT", "Envía hasta %s diplomática(s) (%s asignadas). Cada una mejora la estabilidad en %s.");
         es.put("DIPLO_SEND_DIPLOMATS_SUCCESS_DYNASTY", "Enviadas %s diplomática(s). Reputación con %s aumentó en %s.");
         es.put("DIPLO_SEND_DIPLOMATS_SUCCESS_COLONY", "Enviadas %s diplomática(s). Lealtad de %s aumentó en %s.");
         es.put("DIPLO_ERROR_NO_DIPLOMATS", "No hay princesas con rol Diplomática asignado en esta colonia.");
         es.put("DIPLO_ERROR_NO_DIPLOMAT_ROLE", "Desbloquea el rol Diplomática antes de enviar diplomáticas.");
+        es.put("DIPLO_ERROR_GENETIC_EXCHANGE_ACTIVE", "Ya hay un impulso de intercambio genético activo con esta dinastía.");
+        es.put("DIPLO_ERROR_GENETIC_EXCHANGE_DRONES", "Se necesitan al menos 25 zánganos vivos en toda tu dinastía.");
+        es.put("DIPLO_ERROR_GENETIC_EXCHANGE_BORDER", "Tu dinastía debe tener una colonia fronteriza con esta dinastía.");
+        es.put("DIPLO_ERROR_GENETIC_EXCHANGE_REP", "Requiere reputación Cordial o superior.");
         es.put("DIPLO_ERROR_REPUTATION_STABLE", "No puedes enviar diplomáticas a dinastías con reputación Agresiva.");
         es.put("DIPLO_ERROR_LOYALTY_STABLE", "No puedes enviar diplomáticas a colonias con lealtad Rebelde.");
         es.put("DIPLO_ERROR_CORDIAL_REQUIRED", "Se requiere reputación cordial o mejor para formar un pacto.");
@@ -969,8 +978,8 @@ public class SpanishTranslation implements Translation {
         es.put("SPECIES_DRACULA_SCIENTIFIC", "Mystrium Sp.");
         es.put("SPECIES_SILVER", "Hormiga Plateada del Sahara");
         es.put("SPECIES_SILVER_SCIENTIFIC", "Cataglyphis Sp.");
-        es.put("SPECIES_MARICOPA", "Hormiga Maricopa");
-        es.put("SPECIES_MARICOPA_SCIENTIFIC", "Pogonomyrmex Maricopa");
+        es.put("SPECIES_MARICOPA", "Hormiga neurotóxica");
+        es.put("SPECIES_MARICOPA_SCIENTIFIC", "Neurotoxica Grimunknowni");
         es.put("SPECIES_EXPLODING", "Hormiga Explosiva");
         es.put("SPECIES_EXPLODING_SCIENTIFIC", "Camponotus Saundersi");
         es.put("SPECIES_BULLDOG", "Hormiga Bulldog");
@@ -1035,10 +1044,10 @@ public class SpanishTranslation implements Translation {
         es.put("ASSIMILATED_HEATRESIST_DESC", "Tu dinastía puede recolectar bajo calor extremo del desierto. (Mecánica en desarrollo.)");
         es.put("ASSIMILATION_HEATRESIST", "Asimilación de Hormiga Plateada del Sahara");
         es.put("ASSIMILATION_HEATRESIST_DESC", "Tras asimilar el genoma de la hormiga plateada del sahara:");
-        es.put("ASSIMILATED_DEADLYVENOM_FLAVOR", "Veneno Letal");
+        es.put("ASSIMILATED_DEADLYVENOM_FLAVOR", "Veneno neurotóxico");
         es.put("ASSIMILATED_DEADLYVENOM_DESC", "Tu dinastía puede inyectar veneno capaz de matar presas pequeñas rápidamente. (Mecánica en desarrollo.)");
-        es.put("ASSIMILATION_DEADLYVENOM", "Asimilación de Hormiga Maricopa");
-        es.put("ASSIMILATION_DEADLYVENOM_DESC", "Tras asimilar el genoma de la hormiga maricopa:");
+        es.put("ASSIMILATION_DEADLYVENOM", "Asimilación de veneno neurotóxico");
+        es.put("ASSIMILATION_DEADLYVENOM_DESC", "Tras asimilar la genética del veneno neurotóxico:");
         es.put("ASSIMILATED_SELFDESTRUCT_FLAVOR", "Defensa Suicida");
         es.put("ASSIMILATED_SELFDESTRUCT_DESC", "Tu dinastía puede reventar obreras especializadas para rociar toxinas. (Mecánica en desarrollo.)");
         es.put("ASSIMILATION_SELFDESTRUCT", "Asimilación de Hormiga Explosiva");
@@ -1346,7 +1355,7 @@ public class SpanishTranslation implements Translation {
         es.put("ASSIMILATED_FASTBITE_DESC", "Multiplica la velocidad de ataque base de la colonia por 3.");
         es.put("ASSIMILATED_HEATRESIST_FLAVOR", "Tolerancia al Calor Desértico");
         es.put("ASSIMILATED_HEATRESIST_DESC", "Tu dinastía puede recolectar bajo calor extremo del desierto. (Mecánica en desarrollo.)");
-        es.put("ASSIMILATED_DEADLYVENOM_FLAVOR", "Veneno Letal");
+        es.put("ASSIMILATED_DEADLYVENOM_FLAVOR", "Veneno neurotóxico");
         es.put("ASSIMILATED_DEADLYVENOM_DESC", "Tu dinastía puede inyectar veneno capaz de matar presas pequeñas rápidamente. (Mecánica en desarrollo.)");
         es.put("ASSIMILATED_SELFDESTRUCT_FLAVOR", "Defensa Suicida");
         es.put("ASSIMILATED_SELFDESTRUCT_DESC", "Tu dinastía puede reventar obreras especializadas para rociar toxinas. (Mecánica en desarrollo.)");
@@ -1483,8 +1492,8 @@ public class SpanishTranslation implements Translation {
         es.put("ASSIMILATION_FASTBITE_DESC", "Tras asimilar el genoma de la hormiga drácula:");
         es.put("ASSIMILATION_HEATRESIST", "Asimilación de Hormiga Plateada del Sahara");
         es.put("ASSIMILATION_HEATRESIST_DESC", "Tras asimilar el genoma de la hormiga plateada del sahara:");
-        es.put("ASSIMILATION_DEADLYVENOM", "Asimilación de Hormiga Maricopa");
-        es.put("ASSIMILATION_DEADLYVENOM_DESC", "Tras asimilar el genoma de la hormiga maricopa:");
+        es.put("ASSIMILATION_DEADLYVENOM", "Asimilación de veneno neurotóxico");
+        es.put("ASSIMILATION_DEADLYVENOM_DESC", "Tras asimilar la genética del veneno neurotóxico:");
         es.put("ASSIMILATION_SELFDESTRUCT", "Asimilación de Hormiga Explosiva");
         es.put("ASSIMILATION_SELFDESTRUCT_DESC", "Tras asimilar el genoma de la hormiga explosiva:");
         es.put("ASSIMILATION_FARSIGHT", "Asimilación de Hormiga Bulldog");
@@ -1702,6 +1711,11 @@ public class SpanishTranslation implements Translation {
         es.put("LOG_TRADE_CONVOY_RETURN_FMT", "Convoy de %s recogió carga de vuelta.");
         es.put("LOG_TRADE_BILATERAL_RETURN_FMT", "Convoy bilateral volvió con %s tipos de recursos.");
         es.put("LOG_TRADE_ROUTE_CANCELLED_FMT", "Ruta a %s cancelada. Recursos reembolsados.");
+        es.put("LOG_TRADE_ESCORT_LOSS_FMT", "Convoy a %s cancelado: no hay suficientes escoltas tras bajas.");
+        es.put("LOG_DIPLOMAT_MISSION_COLLAPSED_COLONY_FMT", "Misión diplomática a la colonia %s terminada: no hay suficientes diplomáticas tras bajas.");
+        es.put("LOG_DIPLOMAT_MISSION_COLLAPSED_DYNASTY_FMT", "Misión diplomática a la dinastía %s terminada: no hay suficientes diplomáticas tras bajas.");
+        es.put("LOG_GENETIC_EXCHANGE_FMT", "Se enviaron 25 zánganos a %s por un intercambio genético (+10 reputación, +10%% integridad durante 6 meses).");
+        es.put("LOG_AI_GENETIC_EXCHANGE_FMT", "La IA envió 25 zánganos a %s por un intercambio genético.");
         es.put("LOG_AUTOMATION_BUILD_FMT", "Iniciada construcción de %s");
         es.put("LOG_AUTOMATION_TUNNEL_FMT", "Túnel iniciado hacia %s");
         es.put("LOG_AUTOMATION_TRADE_FMT", "Ruta comercial abierta hacia %s");

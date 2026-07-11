@@ -104,6 +104,7 @@ public class Savefile implements Serializable {
         /** @deprecated legacy single-key saves; use diplomaticModifierKeySets */
         public Map<String, String> diplomaticModifierKeys = new HashMap<>();
         public Map<String, List<String>> diplomaticModifierKeySets = new HashMap<>();
+        public Map<String, Map<String, Integer>> diplomaticModifierRemainingDays = new HashMap<>();
         public List<Integer> crossDynastyTradeRepGrantedIds = new ArrayList<>();
         public List<Integer> pendingPactRequestFromIds = new ArrayList<>();
         public List<Integer> pendingWarDeclarationFromIds = new ArrayList<>();
@@ -112,6 +113,7 @@ public class Savefile implements Serializable {
         public Map<String, Integer> pactRequestDeclinedAtWorldMonth = new HashMap<>();
         public Map<String, Integer> tradeRequestDeclinedAtWorldMonth = new HashMap<>();
         public Map<String, Integer> wasAtWarPeacedAtWorldMonth = new HashMap<>();
+        public Map<String, Integer> geneticExchangeGrantedAtWorldMonth = new HashMap<>();
         public List<SavedCrossDynastyTradeProposal> pendingTradeProposals = new ArrayList<>();
         public int forcedFlightCooldownDays;
         public List<SavedTunnel> tunnels = new ArrayList<>();
@@ -167,9 +169,13 @@ public class Savefile implements Serializable {
         public Map<String, Integer> princessSubtypes = new HashMap<>();
         public Map<String, Integer> queenSubtypes = new HashMap<>();
         public int aphids, symbioticMites, dermestids, parasiteAnts, parasiticMites;
+        /** @deprecated migrated into loyaltyModifierRemainingDays on load */
         public int pheromoneStormMonthsRemaining;
+        /** @deprecated migrated into loyaltyModifierRemainingDays on load */
         public int recentlyConqueredMonthsRemaining;
+        /** @deprecated migrated into loyaltyModifierRemainingDays on load */
         public int recentlyIntegratedMonthsRemaining;
+        public Map<String, Integer> loyaltyModifierRemainingDays = new HashMap<>();
         public int integrationDiplomatsDeployed;
         public int nativeSpeciesId;
         public int creatineDietMonthsRemaining;

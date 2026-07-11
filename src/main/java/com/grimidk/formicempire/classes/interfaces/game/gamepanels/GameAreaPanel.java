@@ -749,7 +749,8 @@ public class GameAreaPanel extends ZeroGamePanel {
             if (type == GameConstants.TYPE_DRONE && colony.getDynasty() != null) {
                 for (Species s : GameConstants.getSpecies()) {
                     if (s == colony.getSpecies()) continue;
-                    if (s.getAssimilation() != null && colony.getDynasty().isAssimilationCompleted(s.getAssimilation())) {
+                    if (s.getAssimilation() != null && colony.getDynasty().isAssimilationCompleted(s.getAssimilation())
+                            && GameConstants.hasAssimilatedDroneSprite(s)) {
                         assimilatedSpecies.add(s);
                     }
                 }

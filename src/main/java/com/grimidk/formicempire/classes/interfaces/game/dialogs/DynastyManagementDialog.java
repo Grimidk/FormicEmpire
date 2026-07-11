@@ -22,6 +22,7 @@ import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.DynastyColorSwatch;
 import com.grimidk.formicempire.classes.interfaces.ui.styles.UiTableStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiDialogUtils;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
@@ -38,6 +39,7 @@ import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.WindowAdapter;
@@ -1645,6 +1647,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             AssetStyles.applyTableHeaderAlignment(table, COL_STANCE, SwingConstants.CENTER);
             AssetStyles.applyTableHeaderAlignment(table, COL_MILITARY, SwingConstants.CENTER);
             AssetStyles.applyTableHeaderAlignment(table, COL_ACTIONS, SwingConstants.CENTER);
+            table.getColumnModel().getColumn(COL_DYNASTY).setCellRenderer(new DynastyNameRenderer());
             table.getColumnModel().getColumn(COL_SPECIES).setCellRenderer(new SpeciesRenderer());
             table.getColumnModel().getColumn(COL_REPUTATION).setCellRenderer(new ReputationScoreRenderer());
             table.getColumnModel().getColumn(COL_STANCE).setCellRenderer(new ReputationStanceRenderer());
@@ -1655,6 +1658,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             table.addMouseMotionListener(new MouseMotionAdapter() {
                 @Override
                 public void mouseMoved(MouseEvent e) {
+                    updateDiplomacyTableCursor(e);
                     int row = table.rowAtPoint(e.getPoint());
                     int col = table.columnAtPoint(e.getPoint());
                     if (row >= 0 && row < displayedDynasties.size()
@@ -1690,8 +1694,104 @@ public class DynastyManagementDialog extends ZeroDialog {
                 }
             });
 
+            table.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    if (!SwingUtilities.isLeftMouseButton(e) || e.getClickCount() != 1) {
+                        return;
+                    }
+                    int row = table.rowAtPoint(e.getPoint());
+                    int col = table.columnAtPoint(e.getPoint());
+                    if (row < 0 || row >= displayedDynasties.size() || col != COL_DYNASTY) {
+                        return;
+                    }
+                    if (!isDiplomacyDynastySwatchClick(e.getPoint(), row)) {
+                        return;
+                    }
+                    navigateToDynastyCapital(displayedDynasties.get(row));
+                }
+            });
+
             tableScrollPane = AssetStyles.wrapScrollableTable(table);
             add(tableScrollPane, BorderLayout.CENTER);
+        }
+
+        private static final int DYNASTY_SWATCH_CELL_PADDING = 4;
+
+        private boolean isDiplomacyDynastySwatchClick(java.awt.Point point, int row) {
+            Rectangle cellRect = table.getCellRect(row, COL_DYNASTY, false);
+            int relativeX = point.x - cellRect.x;
+            return relativeX >= DYNASTY_SWATCH_CELL_PADDING
+                    && relativeX <= DYNASTY_SWATCH_CELL_PADDING + DynastyColorSwatch.hitboxWidth();
+        }
+
+        private void updateDiplomacyTableCursor(MouseEvent e) {
+            int row = table.rowAtPoint(e.getPoint());
+            int col = table.columnAtPoint(e.getPoint());
+            if (row >= 0 && row < displayedDynasties.size()
+                    && col == COL_DYNASTY
+                    && isDiplomacyDynastySwatchClick(e.getPoint(), row)
+                    && canNavigateToDynastyCapital(displayedDynasties.get(row))) {
+                table.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                return;
+            }
+            table.setCursor(Cursor.getDefaultCursor());
+        }
+
+        private boolean canNavigateToDynastyCapital(Dynasty other) {
+            if (other == null || engine.getWorld() == null) {
+                return false;
+            }
+            Colony capital = other.getCapital();
+            return capital != null && engine.getWorld().getHexOfColony(capital) != null;
+        }
+
+        private void navigateToDynastyCapital(Dynasty other) {
+            if (!canNavigateToDynastyCapital(other)) {
+                return;
+            }
+            performView(other.getCapital());
+        }
+
+        private class DynastyNameRenderer extends JPanel implements TableCellRenderer {
+            private final DynastyColorSwatch swatch = new DynastyColorSwatch(Color.GRAY);
+            private final JLabel nameLabel = new JLabel();
+
+            DynastyNameRenderer() {
+                setLayout(new BorderLayout(6, 0));
+                setBorder(BorderFactory.createEmptyBorder(0, DYNASTY_SWATCH_CELL_PADDING, 0, 4));
+                add(swatch, BorderLayout.WEST);
+                add(nameLabel, BorderLayout.CENTER);
+            }
+
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                    boolean hasFocus, int row, int column) {
+                Color background = isSelected ? table.getSelectionBackground() : table.getBackground();
+                Color foreground = isSelected ? table.getSelectionForeground() : table.getForeground();
+                setBackground(background);
+                nameLabel.setBackground(background);
+                nameLabel.setForeground(foreground);
+                nameLabel.setFont(table.getFont());
+
+                if (row >= 0 && row < displayedDynasties.size()) {
+                    Dynasty other = displayedDynasties.get(row);
+                    swatch.setDynastyColor(other.getColor());
+                    nameLabel.setText(other.getName());
+                    if (canNavigateToDynastyCapital(other)) {
+                        setToolTipText(LanguageStrings.format(
+                                LanguageStrings.MAP_CLICK_VIEW_CAPITAL, other.getName()));
+                    } else {
+                        setToolTipText(null);
+                    }
+                    swatch.clearClickAction();
+                } else {
+                    swatch.setDynastyColor(Color.GRAY);
+                    swatch.clearClickAction();
+                    nameLabel.setText(value != null ? String.valueOf(value) : "");
+                }
+                return this;
+            }
         }
 
         private class MilitaryPowerScoreRenderer extends DefaultTableCellRenderer {
@@ -1888,8 +1988,14 @@ public class DynastyManagementDialog extends ZeroDialog {
                 return LanguageStrings.get(LanguageStrings.DIPLO_ERROR_INTEGRATION_TARGET_BUSY);
             }
             DynastyDiplomacyService diplo = dynasty.getDiplomacyService();
-            if (diplo == null || !diplo.hasNonAggressionPact(other) || !diplo.sharesBorderWith(other, world)) {
-                return LanguageStrings.get(LanguageStrings.DIPLO_ERROR_NO_BORDER);
+            if (diplo == null) {
+                return LanguageStrings.get(LanguageStrings.DIPLO_ERROR_INTEGRATION_ACTIVE);
+            }
+            if (!diplo.hasNonAggressionPact(other)) {
+                return LanguageStrings.get(LanguageStrings.DIPLO_ERROR_INTEGRATION_PACT);
+            }
+            if (!diplo.sharesBorderWith(other, world)) {
+                return LanguageStrings.get(LanguageStrings.DIPLO_ERROR_INTEGRATION_BORDER);
             }
             if (!DynastyIntegrationService.meetsMilitaryRequirement(dynasty, other)) {
                 return LanguageStrings.get(LanguageStrings.DIPLO_ERROR_INTEGRATION_MILITARY);
@@ -1897,7 +2003,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             if (!DynastyIntegrationService.meetsReputationRequirement(dynasty, other, world)) {
                 return LanguageStrings.get(LanguageStrings.DIPLO_ERROR_INTEGRATION_REPUTATION);
             }
-            if (DynastyIntegrationService.countTotalAvailableDiplomats(dynasty, world, engine.getTradeManager())
+            if (DynastyIntegrationService.countIntegrationDiplomatCapacity(dynasty)
                     < GameConstants.INTEGRATION_MIN_DIPLOMATS) {
                 return LanguageStrings.get(LanguageStrings.DIPLO_ERROR_INTEGRATION_DIPLOMATS);
             }
@@ -2332,6 +2438,27 @@ public class DynastyManagementDialog extends ZeroDialog {
                 }
                 AssetStyles.styleMenuItem(diplomatItem);
                 menu.add(diplomatItem);
+
+                JMenuItem geneticExchangeItem = new JMenuItem(
+                        LanguageStrings.get(LanguageStrings.DIPLO_ACTION_GENETIC_EXCHANGE));
+                if (diplo.canOfferGeneticExchange(other, world)) {
+                    geneticExchangeItem.addActionListener(e -> performGeneticExchangeAction(other));
+                } else {
+                    geneticExchangeItem.setEnabled(false);
+                    if (diplo.hasActiveGeneticExchangeWith(other)) {
+                        geneticExchangeItem.setToolTipText(
+                                LanguageStrings.get(LanguageStrings.DIPLO_ERROR_GENETIC_EXCHANGE_ACTIVE));
+                    } else if (diplo.getEffectiveDiplomaticReputation(other, world)
+                            < GameConstants.REPUTATION_CORDIAL.getMinScore()) {
+                        geneticExchangeItem.setToolTipText(
+                                LanguageStrings.get(LanguageStrings.DIPLO_ERROR_GENETIC_EXCHANGE_REP));
+                    } else {
+                        geneticExchangeItem.setToolTipText(
+                                LanguageStrings.get(LanguageStrings.DIPLO_ERROR_GENETIC_EXCHANGE_DRONES));
+                    }
+                }
+                AssetStyles.styleMenuItem(geneticExchangeItem);
+                menu.add(geneticExchangeItem);
             }
 
             UiTableStyles.showCellPopupMenu(menu, table, row, column);
@@ -2952,6 +3079,27 @@ public class DynastyManagementDialog extends ZeroDialog {
                     LanguageStrings.format(LanguageStrings.DIPLO_SEND_DIPLOMATS_SUCCESS_COLONY,                             sent, colony.getName(), totalGain),
                     LanguageStrings.get(LanguageStrings.DIPLO_SEND_DIPLOMATS_TITLE),
                     JOptionPane.INFORMATION_MESSAGE);
+            refreshDialog();
+        }
+    }
+
+    private void performGeneticExchangeAction(Dynasty other) {
+        DynastyDiplomacyService diplo = dynasty.getDiplomacyService();
+        World world = engine.getWorld();
+        if (diplo == null || other == null || world == null) {
+            return;
+        }
+        if (!diplo.canOfferGeneticExchange(other, world)) {
+            return;
+        }
+        int confirmed = UiOptionPane.showConfirmDialog(this,
+                LanguageStrings.format(LanguageStrings.LOG_GENETIC_EXCHANGE_FMT, other.getName()),
+                LanguageStrings.get(LanguageStrings.DIPLO_ACTION_GENETIC_EXCHANGE),
+                JOptionPane.YES_NO_OPTION);
+        if (confirmed != JOptionPane.YES_OPTION) {
+            return;
+        }
+        if (diplo.offerGeneticExchange(other, world)) {
             refreshDialog();
         }
     }
