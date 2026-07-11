@@ -102,7 +102,7 @@ public class Trade {
                 if (availableCount < entry.getValue()) {
                     originColony.logEvent(ColonyLogPrefixes.TRADE + " "
                         + String.format(LanguageStrings.get(LanguageStrings.LOG_TRADE_CANCELLED_FMT),
-                            entry.getKey().getName() + "s"));
+                            entry.getKey().getName()));
                     isActive = false;
                     return false;
                 }

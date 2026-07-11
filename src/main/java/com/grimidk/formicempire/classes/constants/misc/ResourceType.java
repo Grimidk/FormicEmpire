@@ -63,7 +63,7 @@ public class ResourceType extends Constant {
         if (quantity >= SOURCE_QTY_MEDIUM && sourceSpriteMedium != null) {
             return sourceSpriteMedium;
         }
-        if (quantity >= SOURCE_QTY_SMALL && sourceSpriteSmall != null) {
+        if (sourceSpriteSmall != null) {
             return sourceSpriteSmall;
         }
         return getIcon();

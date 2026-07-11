@@ -101,7 +101,6 @@ public class WarService {
             return;
         }
         war.conclude(DynastyDiplomacyService.worldMonthIndex(world), winnerDynastyId, conclusionKey);
-        snapshotHistoricDynastyNames(war);
         historicWars.add(war);
         if (war.isRebellionWar()) {
             DynastyRebellionService.onRebellionWarConcluded(world, war, winnerDynastyId);
@@ -268,7 +267,6 @@ public class WarService {
                     ? LanguageStrings.WAR_CONCLUSION_DEFEAT
                     : LanguageStrings.WAR_CONCLUSION_UNKNOWN;
             war.conclude(DynastyDiplomacyService.worldMonthIndex(world), winnerId, conclusion);
-            snapshotHistoricDynastyNames(war);
             historicWars.add(war);
         }
     }
@@ -342,7 +340,6 @@ public class WarService {
                 continue;
             }
             War war = new War(saved);
-            backfillHistoricNamesIfMissing(war);
             if (saved.id >= nextWarId) {
                 nextWarId = saved.id + 1;
             }
@@ -462,60 +459,11 @@ public class WarService {
         if (war == null) {
             return "";
         }
-        String snapshot = war.getWinnerDynastyName();
-        if (snapshot != null && !snapshot.isEmpty()) {
-            return snapshot;
-        }
         Dynasty winner = resolveWinner(war);
         if (winner != null) {
             return winner.getName();
         }
         return LanguageStrings.get(LanguageStrings.WAR_WINNER_NONE);
-    }
-
-    private void snapshotHistoricDynastyNames(War war) {
-        if (war == null) {
-            return;
-        }
-        Dynasty dynastyA = world.findDynastyById(war.getDynastyIdA());
-        Dynasty dynastyB = world.findDynastyById(war.getDynastyIdB());
-        if (dynastyA != null) {
-            war.setDynastyNameA(dynastyA.getName());
-        }
-        if (dynastyB != null) {
-            war.setDynastyNameB(dynastyB.getName());
-        }
-        if (war.getWinnerDynastyId() > 0) {
-            Dynasty winner = world.findDynastyById(war.getWinnerDynastyId());
-            if (winner != null) {
-                war.setWinnerDynastyName(winner.getName());
-            }
-        }
-    }
-
-    private void backfillHistoricNamesIfMissing(War war) {
-        if (war == null) {
-            return;
-        }
-        if (war.getDynastyNameA() == null || war.getDynastyNameA().isEmpty()) {
-            Dynasty dynastyA = world.findDynastyById(war.getDynastyIdA());
-            if (dynastyA != null) {
-                war.setDynastyNameA(dynastyA.getName());
-            }
-        }
-        if (war.getDynastyNameB() == null || war.getDynastyNameB().isEmpty()) {
-            Dynasty dynastyB = world.findDynastyById(war.getDynastyIdB());
-            if (dynastyB != null) {
-                war.setDynastyNameB(dynastyB.getName());
-            }
-        }
-        if (war.getWinnerDynastyId() > 0
-                && (war.getWinnerDynastyName() == null || war.getWinnerDynastyName().isEmpty())) {
-            Dynasty winner = world.findDynastyById(war.getWinnerDynastyId());
-            if (winner != null) {
-                war.setWinnerDynastyName(winner.getName());
-            }
-        }
     }
 
     public WarStanding getStandingForDynasty(War war, Dynasty viewer) {
@@ -742,7 +690,10 @@ public class WarService {
         if (dynasty == null) {
             return "?";
         }
-        String theme = LanguageStrings.stripDynastyNameSuffix(dynasty.getName());
+        String theme = dynasty.getThemeBase();
+        if (theme == null || theme.isEmpty()) {
+            theme = LanguageStrings.stripDynastyNameSuffix(dynasty.getName());
+        }
         if (theme == null || theme.isEmpty()) {
             return dynasty.getName();
         }

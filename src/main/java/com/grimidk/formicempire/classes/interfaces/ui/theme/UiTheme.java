@@ -81,6 +81,7 @@ public final class UiTheme {
                 AssetStyles.UI_BORDER_COLOR, AssetStyles.BORDER_THICKNESS_BUTTON);
         AssetStyles.TAB_SELECTED_BG = dark ? COLOR_DARK_GRAY : COLOR_ABSOLUTE_WHITE;
         AssetStyles.TAB_UNSELECTED_BG = dark ? COLOR_NEAR_BLACK : COLOR_VERY_LIGHT_GRAY;
+        AssetStyles.MAP_HEX_INACTIVE_FADE = dark ? 0.25f : 0.4f;
     }
 
     public static JSeparator createInternalSeparator() {

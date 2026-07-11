@@ -79,6 +79,7 @@ public class Savefile implements Serializable {
         public int titleId;
         public String titleKey;
         public boolean isPlayer;
+        public boolean wildDynasty;
         public boolean isDefeated;
         public String rankName;
         public int speciesId;
@@ -89,6 +90,8 @@ public class Savefile implements Serializable {
         public boolean defaultAutoBuildEnabled;
         public boolean autoDiplomacyEnabled;
         public boolean defaultAutoTunnelsEnabled;
+        public String pactRequestIncomingPolicy = "MANUAL";
+        public int lastIncomingPactRequestWorldDay = -1;
         public Map<String, Integer> diplomatSupportToDynasty = new HashMap<>();
         public List<Integer> unlockedUpgradeIds = new ArrayList<>();
         public List<Integer> absorbedDynastyIds = new ArrayList<>();
@@ -268,8 +271,11 @@ public class Savefile implements Serializable {
         public int stageStartActiveDefender;
         public String capturedColonyIds = "";
         public String capturedByDynastyIds = "";
+        /** Legacy load-only; no longer written — use {@code dynastyIdA/B} and {@code winnerDynastyId}. */
         public String dynastyNameA;
+        /** Legacy load-only; no longer written. */
         public String dynastyNameB;
+        /** Legacy load-only; no longer written. */
         public String winnerDynastyName;
         public boolean rebellionWar;
     }

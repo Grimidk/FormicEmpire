@@ -7,8 +7,20 @@ To Fix (By decreasing priority) :
 	
 	High:
 	TODO: icons all unlocks
-	TODO: sprites/buildings/rooms/*.png
 	TODO: species sprites and icon: carpenter, weaver, floodplain, jet, gliding, army, ghost, dracula, silver, exploding, bulldog, shining black and desert
+	unlocked assimilations but not assimilation to get, may need to check absorbing colony remnant
+	war is way too fast, maybe add substeps
+	scale assimilation cost by 25% each time
+	tunels somehow building on their own with no diggers and 2 at the same time
+	war advance popup 
+	not seeing better colony names like grad and berg, add more and randomize post prime
+	separate trigger for auto tunnel (typo) and auto diplomacy so they are easier
+	mites not triggering at all
+	attacking unprepared dynasties is valid (auto win)
+	clean better dead colonies
+	add a subtab for triggered modifiers and progress with interrogations
+
+	revise audit tutorial and tests for blindspots
 
 	Mid:
 	(none right now)
@@ -21,7 +33,6 @@ To Fix (By decreasing priority) :
 
 	Important not Urgent:
 	map hexes look kinda yank
-	hexagonal architecture
 	Font - self explanatory
 	clickable ant cursor
 	excel for languages and tags
@@ -34,6 +45,7 @@ Needed for launch (v1.0) (Launch Version):
 
 	Everything else :
 	minerals with uprades to find it and increase miner efficency, also mushroom detection 
+	hovering on sources says how much is left
 	research tree and building tree (after icons) with available, purchasable, locked and list trigger based upgrades 
 	random events (meteor, earthquake, tornado, tsunami, )
 	main menu screen maybe simulation like factorio
@@ -46,6 +58,10 @@ Needed for launch (v1.0) (Launch Version):
 	non-ant assimilation ( Winged workers (Bees), Spiked larvae, Chemical throwing (Bombardier beetle), Chirping (Grass hopper), Diving, Mineralized exoskeletons, Rock mining, Bioluminescence (Fireflies), Static electricity generation, Pollination (Flies) )
 	revamp story and lore and maybe intro screen
 	more hive rooms, specially more twisty (research room after royal chamber, barrack room before royal chamber)
+	rework completely in-room sprites (overlay disabled in GameAreaPanel for now)
+		saved for later: RoomDecorationRenderer (storage/farm/nursery/royal two-band overlays, interior clip, door-aware padding)
+		saved for later: sprites/buildings/rooms/*.png wired on GameUnlocks Building.getSprite()
+		saved for later: GameConstantsRoomSpritesTest + RoomDecorationRendererTest
 	rework tutorial to clearer and obscure unlocks in menus, disable tutorial option and konami code to unboscure all
 	rework start and choose difficulty / biome / species
 	rework abilities and alerts and triggers (new classes?)
@@ -62,7 +78,7 @@ Needed for launch (v1.0) (Launch Version):
 	register Grim Games or Grimidk in steam as dev team
 	steam upload and demo version
 	versioning to go back to previous stable patches
-	cleanup code (no placeholders) and refactor inefficiencies with inheritance and stuff, hexagonal architecture, async functions and clean comments 
+	cleanup code (no placeholders) and refactor inefficiencies with inheritance and stuff, hexagonal architecture, async functions and clean comments, avoid monolithic classes 
 
 Post launch (v1.1) (Improvements Update):
     engine clean up for reusability (Core Engine Package)

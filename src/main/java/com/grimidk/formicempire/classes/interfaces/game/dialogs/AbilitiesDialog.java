@@ -1,7 +1,6 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
-import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyLabourService;
@@ -18,9 +17,10 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AbilitiesDialog extends ZeroDialog {
 
@@ -29,14 +29,20 @@ public class AbilitiesDialog extends ZeroDialog {
     private final Colony colony;
     private final JPanel listPanel;
     private final JLabel researchPointsLabel;
-    private final JScrollPane scrollPane;
 
-    private final Map<JButton, Upgrade> abilityButtons = new HashMap<>();
+    @FunctionalInterface
+    private interface TriggerSync {
+        void sync();
+    }
+
+    private record AbilityRow(JPanel panel, JButton button, JLabel costLabel) {}
+
+    private final List<TriggerSync> triggerSyncs = new ArrayList<>();
 
     public AbilitiesDialog(JFrame owner, Colony colony) {
         super(owner, LanguageStrings.DIALOG_ABILITIES_TITLE, AssetStyles.DEFAULT_DIALOG_SIZE);
         this.colony = colony;
-        
+
         JPanel northPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         northPanel.setBackground(AssetStyles.UI_BG_SECONDARY);
         northPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -52,141 +58,120 @@ public class AbilitiesDialog extends ZeroDialog {
         listPanel = new JPanel();
         listPanel.setBackground(AssetStyles.UI_BG_PRIMARY);
         listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
-        scrollPane = new JScrollPane(listPanel); 
+        JScrollPane scrollPane = new JScrollPane(listPanel);
         scrollPane.getViewport().setBackground(AssetStyles.UI_BG_PRIMARY);
         scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         add(scrollPane, BorderLayout.CENTER);
-        
+
         registerCloseKey(KeyEvent.VK_C);
     }
 
     @Override
     protected void refreshDialog() {
         listPanel.removeAll();
-        abilityButtons.clear();
-        
+        triggerSyncs.clear();
+
         updateResearchPointsLabel();
-        
+
         boolean hasAnyAbility = false;
 
         if (colony.hasUpgrade(GameUnlocks.ABILITY_FORCED_FLIGHT)) {
             int currentCost = colony.getNuptialFlightCost();
-            String failureReason = getNuptialFailureReason(currentCost);
-            boolean enabled = (failureReason == null);
-            
-            JPanel p = createAbilityPanel(LanguageStrings.get(LanguageStrings.ABILITY_FORCED_FLIGHT), 
-                LanguageStrings.format(LanguageStrings.ABILITY_FORCED_FLIGHT_DESC, currentCost),
-                currentCost, 
-                e -> {
-                    if (getOwner() instanceof MainFrame main) {
-                        Engine engine = main.getEngine();
-                        if (engine != null) {
-                            World world = engine.getWorld();
-                            if (world != null) {
-                                Hex targetHex = null;
-                                for(Hex h : world.getHexes()) {
-                                    if (h.getColony() == colony) {
-                                        targetHex = h;
-                                        break;
+            AbilityRow row = createAbilityPanel(
+                    LanguageStrings.get(LanguageStrings.ABILITY_FORCED_FLIGHT),
+                    LanguageStrings.format(LanguageStrings.ABILITY_FORCED_FLIGHT_DESC, currentCost),
+                    createCostLabel(GameConstants.ICON_RESEARCH, currentCost),
+                    e -> {
+                        if (getOwner() instanceof MainFrame main) {
+                            Engine engine = main.getEngine();
+                            if (engine != null) {
+                                World world = engine.getWorld();
+                                if (world != null) {
+                                    Hex targetHex = null;
+                                    for (Hex h : world.getHexes()) {
+                                        if (h.getColony() == colony) {
+                                            targetHex = h;
+                                            break;
+                                        }
                                     }
-                                }
-                                
-                                if (targetHex != null) {
-                                    colony.forceNuptialFlight(world, targetHex);
-                                    refreshDialog(); 
-                                } else {
-                                    UiOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.ABILITY_ERROR_LOCATE_COLONY));
+
+                                    if (targetHex != null) {
+                                        colony.forceNuptialFlight(world, targetHex);
+                                        refreshDialog();
+                                    } else {
+                                        UiOptionPane.showMessageDialog(this,
+                                                LanguageStrings.get(LanguageStrings.ABILITY_ERROR_LOCATE_COLONY));
+                                    }
                                 }
                             }
                         }
-                    }
-                },
-                enabled,
-                failureReason
-            );
-            listPanel.add(p);
+                    });
+            triggerSyncs.add(() -> syncForcedFlight(row));
+            listPanel.add(row.panel());
             listPanel.add(Box.createVerticalStrut(10));
             hasAnyAbility = true;
         }
 
         if (colony.hasUpgrade(GameUnlocks.ABILITY_MASS_FLIGHT) && colony.getDynasty() != null) {
             int massCost = colony.getDynasty().getMassNuptialFlightCost();
-            boolean hasRP = colony.getResearchPoints() >= massCost;
-            String fail = hasRP ? null : LanguageStrings.format(LanguageStrings.ABILITY_ERROR_NOT_ENOUGH_RP, massCost);
-
-            JPanel mp = createAbilityPanel(LanguageStrings.get(LanguageStrings.ABILITY_MASS_FLIGHT),
-                LanguageStrings.format(LanguageStrings.ABILITY_MASS_FLIGHT_DESC, massCost),
-                massCost,
-                e -> {
-                    if (getOwner() instanceof MainFrame main) {
-                        if (main.getEngine() != null && main.getEngine().getWorld() != null) {
-                            colony.getDynasty().runMassNuptialFlight(main.getEngine().getWorld());
-                            refreshDialog();
+            AbilityRow row = createAbilityPanel(
+                    LanguageStrings.get(LanguageStrings.ABILITY_MASS_FLIGHT),
+                    LanguageStrings.format(LanguageStrings.ABILITY_MASS_FLIGHT_DESC, massCost),
+                    createCostLabel(GameConstants.ICON_RESEARCH, massCost),
+                    e -> {
+                        if (getOwner() instanceof MainFrame main) {
+                            if (main.getEngine() != null && main.getEngine().getWorld() != null) {
+                                colony.getDynasty().runMassNuptialFlight(main.getEngine().getWorld());
+                                refreshDialog();
+                            }
                         }
-                    }
-                },
-                hasRP,
-                fail
-            );
-            listPanel.add(mp);
+                    });
+            triggerSyncs.add(() -> syncMassFlight(row, massCost));
+            listPanel.add(row.panel());
             listPanel.add(Box.createVerticalStrut(10));
             hasAnyAbility = true;
         }
 
         if (colony.hasUpgrade(GameUnlocks.ABILITY_PHEROMONE_STORM)) {
             int syrupCost = GameConstants.PHEROMONE_STORM_SYRUP_COST;
-            boolean hasSyrup = colony.getSyrups() >= syrupCost;
-            boolean alreadyActive = colony.isPheromoneStormActive();
-            String fail = alreadyActive
-                    ? LanguageStrings.get(LanguageStrings.ABILITY_ERROR_ALREADY_ACTIVE)
-                    : (hasSyrup ? null : String.format(
-                            LanguageStrings.get(LanguageStrings.ABILITY_ERROR_NOT_ENOUGH_RESOURCE),
-                            syrupCost,
-                            GameConstants.RESOURCE_SYRUP.getName()));
-
-            JPanel p = createResourceAbilityPanel(
+            AbilityRow row = createAbilityPanel(
                     GameUnlocks.ABILITY_PHEROMONE_STORM.getName(),
                     GameUnlocks.ABILITY_PHEROMONE_STORM.getDescription(),
-                    syrupCost,
-                    GameConstants.RESOURCE_SYRUP,
+                    createCostLabel(GameConstants.RESOURCE_SYRUP.getIcon(), syrupCost),
                     e -> {
                         if (colony.activatePheromoneStorm()) {
                             refreshDialog();
                         }
-                    },
-                    hasSyrup && !alreadyActive,
-                    fail
-            );
-            listPanel.add(p);
+                    });
+            triggerSyncs.add(() -> syncResourceAbility(
+                    row,
+                    syrupCost,
+                    GameConstants.RESOURCE_SYRUP,
+                    colony::isPheromoneStormActive,
+                    colony.getSyrups()));
+            listPanel.add(row.panel());
             listPanel.add(Box.createVerticalStrut(10));
             hasAnyAbility = true;
         }
 
         if (colony.hasUpgrade(GameUnlocks.ABILITY_CREATINE_DIET)) {
             int proteinCost = GameConstants.CREATINE_DIET_PROTEIN_COST;
-            boolean hasProtein = colony.getProtein() >= proteinCost;
-            boolean alreadyActive = colony.isCreatineDietActive();
-            String fail = alreadyActive
-                    ? LanguageStrings.get(LanguageStrings.ABILITY_ERROR_ALREADY_ACTIVE)
-                    : (hasProtein ? null : String.format(
-                            LanguageStrings.get(LanguageStrings.ABILITY_ERROR_NOT_ENOUGH_RESOURCE),
-                            proteinCost,
-                            GameConstants.RESOURCE_MEAT.getName()));
-
-            JPanel p = createResourceAbilityPanel(
+            AbilityRow row = createAbilityPanel(
                     GameUnlocks.ABILITY_CREATINE_DIET.getName(),
                     GameUnlocks.ABILITY_CREATINE_DIET.getDescription(),
-                    proteinCost,
-                    GameConstants.RESOURCE_MEAT,
+                    createCostLabel(GameConstants.RESOURCE_MEAT.getIcon(), proteinCost),
                     e -> {
                         if (colony.activateCreatineDiet()) {
                             refreshDialog();
                         }
-                    },
-                    hasProtein && !alreadyActive,
-                    fail
-            );
-            listPanel.add(p);
+                    });
+            triggerSyncs.add(() -> syncResourceAbility(
+                    row,
+                    proteinCost,
+                    GameConstants.RESOURCE_MEAT,
+                    colony::isCreatineDietActive,
+                    colony.getProtein()));
+            listPanel.add(row.panel());
             listPanel.add(Box.createVerticalStrut(10));
             hasAnyAbility = true;
         }
@@ -201,12 +186,58 @@ public class AbilitiesDialog extends ZeroDialog {
             listPanel.add(Box.createVerticalGlue());
         }
 
+        syncAllTriggers();
         listPanel.revalidate();
         listPanel.repaint();
     }
-    
+
+    private void syncForcedFlight(AbilityRow row) {
+        int cost = colony.getNuptialFlightCost();
+        row.costLabel().setText(AssetStyles.formatNumber(cost));
+        applyTriggerState(row.button(), getNuptialFailureReason(cost));
+    }
+
+    private void syncMassFlight(AbilityRow row, int cost) {
+        row.costLabel().setText(AssetStyles.formatNumber(cost));
+        String fail = colony.getResearchPoints() >= cost
+                ? null
+                : LanguageStrings.format(LanguageStrings.ABILITY_ERROR_NOT_ENOUGH_RP, cost);
+        applyTriggerState(row.button(), fail);
+    }
+
+    private void syncResourceAbility(AbilityRow row, int cost, ResourceType resourceType,
+            java.util.function.BooleanSupplier activeCheck, int available) {
+        row.costLabel().setText(AssetStyles.formatNumber(cost));
+        String fail;
+        if (activeCheck.getAsBoolean()) {
+            fail = LanguageStrings.get(LanguageStrings.ABILITY_ERROR_ALREADY_ACTIVE);
+        } else if (available >= cost) {
+            fail = null;
+        } else {
+            fail = String.format(
+                    LanguageStrings.get(LanguageStrings.ABILITY_ERROR_NOT_ENOUGH_RESOURCE),
+                    cost,
+                    resourceType.getName());
+        }
+        applyTriggerState(row.button(), fail);
+    }
+
+    private static void applyTriggerState(JButton button, String failureReason) {
+        boolean enabled = failureReason == null;
+        button.setEnabled(enabled);
+        button.setToolTipText(enabled ? null : failureReason);
+    }
+
+    private void syncAllTriggers() {
+        for (TriggerSync sync : triggerSyncs) {
+            sync.sync();
+        }
+    }
+
     private String getNuptialFailureReason(int cost) {
-        if (colony.getResearchPoints() < cost) return LanguageStrings.format(LanguageStrings.ABILITY_ERROR_NOT_ENOUGH_RP, cost);
+        if (colony.getResearchPoints() < cost) {
+            return LanguageStrings.format(LanguageStrings.ABILITY_ERROR_NOT_ENOUGH_RP, cost);
+        }
         if (!ColonyLabourService.meetsNuptialRequirements(colony)) {
             if (colony.getDrones().isEmpty()) {
                 return LanguageStrings.get(LanguageStrings.ABILITY_ERROR_NO_DRONES);
@@ -229,19 +260,10 @@ public class AbilitiesDialog extends ZeroDialog {
         return label;
     }
 
-    private JPanel createAbilityPanel(String title, String desc, int rpCost, java.awt.event.ActionListener action, boolean enabled, String tooltip) {
-        return createAbilityPanel(title, desc, createCostLabel(GameConstants.ICON_RESEARCH, rpCost), action, enabled, tooltip);
-    }
-
-    private JPanel createResourceAbilityPanel(String title, String desc, int resourceCost, ResourceType resourceType,
-            java.awt.event.ActionListener action, boolean enabled, String tooltip) {
-        return createAbilityPanel(title, desc, createCostLabel(resourceType.getIcon(), resourceCost), action, enabled, tooltip);
-    }
-
-    private JPanel createAbilityPanel(String title, String desc, JLabel costLabel,
-            java.awt.event.ActionListener action, boolean enabled, String tooltip) {
+    private AbilityRow createAbilityPanel(String title, String desc, JLabel costLabel, ActionListener action) {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBackground(AssetStyles.UI_BG_SECONDARY);
+        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
 
         TitledBorder border = new TitledBorder(AssetStyles.PANEL_BORDER, title);
         border.setTitleColor(AssetStyles.TEXT_HEADER);
@@ -253,50 +275,44 @@ public class AbilitiesDialog extends ZeroDialog {
         descriptionArea.setLineWrap(true);
         descriptionArea.setEditable(false);
         descriptionArea.setFocusable(false);
+        descriptionArea.setEnabled(false);
+        descriptionArea.setDisabledTextColor(AssetStyles.TEXT_NORMAL);
         descriptionArea.setBackground(panel.getBackground());
         descriptionArea.setForeground(AssetStyles.TEXT_NORMAL);
         descriptionArea.setFont(AssetStyles.FONT_NORMAL);
         panel.add(descriptionArea, BorderLayout.CENTER);
-        panel.add(createActionPanel(costLabel, action, enabled, tooltip), BorderLayout.EAST);
-        return panel;
-    }
 
-    private JPanel createActionPanel(JLabel costLabel, java.awt.event.ActionListener action,
-            boolean enabled, String tooltip) {
         JPanel actionPanel = new JPanel();
         actionPanel.setOpaque(false);
         actionPanel.setLayout(new BoxLayout(actionPanel, BoxLayout.Y_AXIS));
         actionPanel.setBorder(new EmptyBorder(0, 0, 0, 5));
-        actionPanel.setPreferredSize(new Dimension(ACTION_PANEL_WIDTH, 0));
-        actionPanel.setMinimumSize(new Dimension(ACTION_PANEL_WIDTH, 0));
 
         costLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        costLabel.setMaximumSize(new Dimension(ACTION_PANEL_WIDTH, Integer.MAX_VALUE));
 
         JButton btn = new JButton(LanguageStrings.get(LanguageStrings.UI_TRIGGER));
-        btn.setEnabled(enabled);
         AssetStyles.styleButton(btn);
         btn.setFocusable(false);
         btn.addActionListener(action);
         btn.setAlignmentX(Component.CENTER_ALIGNMENT);
-        btn.setMaximumSize(new Dimension(ACTION_PANEL_WIDTH, btn.getPreferredSize().height));
-
-        if (!enabled && tooltip != null) {
-            btn.setToolTipText(tooltip);
-        } else {
-            btn.setToolTipText(null);
-        }
+        Dimension btnSize = new Dimension(ACTION_PANEL_WIDTH, btn.getPreferredSize().height);
+        btn.setPreferredSize(btnSize);
+        btn.setMinimumSize(btnSize);
+        btn.setMaximumSize(btnSize);
 
         actionPanel.add(costLabel);
         actionPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         actionPanel.add(btn);
-        return actionPanel;
+        panel.add(actionPanel, BorderLayout.EAST);
+
+        return new AbilityRow(panel, btn, costLabel);
     }
-    
+
     @Override
     public void liveUpdate() {
-        if (!isShowing()) return;
+        if (!isShowing()) {
+            return;
+        }
         updateResearchPointsLabel();
-        refreshDialog(); 
+        syncAllTriggers();
     }
 }

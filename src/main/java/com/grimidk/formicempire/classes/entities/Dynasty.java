@@ -16,6 +16,7 @@ import java.awt.Color;
 import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
 import com.grimidk.formicempire.classes.constants.misc.DiplomaticReputationModifier;
 import com.grimidk.formicempire.classes.constants.misc.DynastyTitle;
+import com.grimidk.formicempire.classes.constants.misc.PactRequestIncomingPolicy;
 import com.grimidk.formicempire.classes.constants.misc.Species;
 import com.grimidk.formicempire.classes.constants.misc.GeneticIntegrityModifier;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
@@ -45,6 +46,7 @@ public class Dynasty {
     private String themeBase;
     private String titleKey;
     private boolean isPlayer;
+    private boolean wildDynasty;
     private Species species;
     private int researchPoints;
     private int totalNuptialFlights;
@@ -60,6 +62,9 @@ public class Dynasty {
     private boolean defaultAutoBuildEnabled;
     private boolean autoDiplomacyEnabled;
     private boolean defaultAutoTunnelsEnabled;
+    private PactRequestIncomingPolicy pactRequestIncomingPolicy;
+    private int lastIncomingPactRequestWorldDay;
+    private transient boolean pactRequestPromptOpen;
     private final Set<Upgrade> unlockedUpgrades;
     private final transient List<Synergy> pendingSynergyAlerts = new ArrayList<>();
     private final List<Colony> colonies;
@@ -140,6 +145,9 @@ public class Dynasty {
         this.defaultAutoBuildEnabled = false;
         this.autoDiplomacyEnabled = false;
         this.defaultAutoTunnelsEnabled = false;
+        this.pactRequestIncomingPolicy = PactRequestIncomingPolicy.MANUAL;
+        this.lastIncomingPactRequestWorldDay = -1;
+        this.pactRequestPromptOpen = false;
         this.diplomaticReputations = new HashMap<>();
         this.diplomaticModifierRemainingDays = new HashMap<>();
         this.crossDynastyTradeRepGrantedIds = new ArrayList<>();
@@ -185,6 +193,7 @@ public class Dynasty {
             }
         }
         this.isPlayer = savedDynasty.isPlayer;
+        this.wildDynasty = savedDynasty.wildDynasty || inferLegacyWildDynasty(savedDynasty);
         this.researchPoints = savedDynasty.researchPoints;
         this.totalNuptialFlights = savedDynasty.totalNuptialFlights;
         this.diplomatsSentTotal = savedDynasty.diplomatsSentTotal;
@@ -194,6 +203,10 @@ public class Dynasty {
         this.defaultAutoBuildEnabled = savedDynasty.defaultAutoBuildEnabled;
         this.autoDiplomacyEnabled = savedDynasty.autoDiplomacyEnabled;
         this.defaultAutoTunnelsEnabled = savedDynasty.defaultAutoTunnelsEnabled;
+        this.pactRequestIncomingPolicy = PactRequestIncomingPolicy.fromPersistenceKey(
+                savedDynasty.pactRequestIncomingPolicy);
+        this.lastIncomingPactRequestWorldDay = savedDynasty.lastIncomingPactRequestWorldDay;
+        this.pactRequestPromptOpen = false;
         this.militaryPower = savedDynasty.militaryPower;
         
         this.species = GameConstants.SPECIES_OMNI; 
@@ -471,17 +484,8 @@ public class Dynasty {
         String baseName = themeBase != null && !themeBase.isEmpty()
                 ? themeBase
                 : LanguageStrings.dynastyThemeBase(this.name, this.titleKey);
-        if (baseName.isEmpty()) {
-            baseName = "Player";
-        }
-        
         int count = colonies.size();
-        if (count == 0) return baseName + " Prime";
-        if (count == 1) return "New " + baseName;
-        if (count == 2) return baseName + " Secundus";
-        if (count == 3) return baseName + " Tertius";
-        if (count == 4) return baseName + " Quartus";
-        return baseName + " " + (count + 1);
+        return LanguageStrings.formatProceduralColonyName(baseName, count);
     }
 
     // --- Logic ---
@@ -714,18 +718,8 @@ public class Dynasty {
             return;
         }
         Colony current = capital;
-        if (current != null && colonies.contains(current) && isDynastyPrimeName(current.getName())) {
-            setCapital(current);
-            return;
-        }
-        String expectedPrime = LanguageStrings.expectedCapitalColonyName(name);
-        for (Colony c : colonies) {
-            if (expectedPrime.equals(c.getName())) {
-                setCapital(c);
-                return;
-            }
-        }
-        if (current != null && colonies.contains(current)) {
+        if (current != null && colonies.contains(current) && current.isCapital()
+                && colonyMatchesDynastyTheme(current)) {
             setCapital(current);
             return;
         }
@@ -735,20 +729,33 @@ public class Dynasty {
                 flagged.add(c);
             }
         }
-        if (flagged.size() == 1) {
+        if (flagged.size() == 1 && colonyMatchesDynastyTheme(flagged.get(0))) {
             setCapital(flagged.get(0));
             return;
         }
-        if (flagged.size() > 1) {
-            flagged.stream()
-                    .max(Comparator.comparingInt(Colony::getMilitaryPower)
-                            .thenComparingInt(Colony::getId))
-                    .ifPresent(this::setCapital);
+        if (current != null && colonies.contains(current) && colonyMatchesDynastyTheme(current)) {
+            setCapital(current);
             return;
         }
         colonies.stream()
+                .filter(this::colonyMatchesDynastyTheme)
                 .min(Comparator.comparingInt(Colony::getId))
+                .or(() -> colonies.stream().min(Comparator.comparingInt(Colony::getId)))
                 .ifPresent(this::setCapital);
+    }
+
+    private boolean colonyMatchesDynastyTheme(Colony colony) {
+        if (colony == null) {
+            return false;
+        }
+        String dynastyBase = themeBase != null && !themeBase.isEmpty()
+                ? themeBase
+                : LanguageStrings.dynastyThemeBase(name, titleKey);
+        if (dynastyBase == null || dynastyBase.isEmpty()) {
+            return true;
+        }
+        String colonyBase = LanguageStrings.dynastyThemeBase(colony.getName(), null);
+        return dynastyBase.equalsIgnoreCase(colonyBase);
     }
 
     public void setCapital(Colony colony) {
@@ -778,14 +785,6 @@ public class Dynasty {
         if (newCapital != null) {
             setCapital(newCapital);
         }
-    }
-
-    private boolean isDynastyPrimeName(String colonyName) {
-        if (colonyName == null || !colonyName.endsWith(" Prime")) {
-            return false;
-        }
-        String prefix = colonyName.substring(0, colonyName.length() - " Prime".length());
-        return prefix.equalsIgnoreCase(LanguageStrings.dynastyThemeBase(name));
     }
 
     public int getDiplomaticReputation(int otherDynastyId) {
@@ -929,6 +928,7 @@ public class Dynasty {
     public void tickDiplomaticModifierDays() {
         List<String> expiredKeys = new ArrayList<>();
         List<Integer> expiredOtherIds = new ArrayList<>();
+        List<Integer> emptyOtherIds = new ArrayList<>();
         for (Map.Entry<Integer, Map<String, Integer>> pairEntry : diplomaticModifierRemainingDays.entrySet()) {
             int otherDynastyId = pairEntry.getKey();
             Map<String, Integer> modifiers = pairEntry.getValue();
@@ -950,8 +950,11 @@ public class Dynasty {
                 expiredKeys.add(key);
             }
             if (modifiers.isEmpty()) {
-                diplomaticModifierRemainingDays.remove(otherDynastyId);
+                emptyOtherIds.add(otherDynastyId);
             }
+        }
+        for (Integer otherDynastyId : emptyOtherIds) {
+            diplomaticModifierRemainingDays.remove(otherDynastyId);
         }
         for (int i = 0; i < expiredKeys.size(); i++) {
             expireDiplomaticModifier(expiredOtherIds.get(i), expiredKeys.get(i));
@@ -1417,7 +1420,7 @@ public class Dynasty {
     }
 
     public void applyLocalizedName() {
-        if (isWildDynastyName()) {
+        if (wildDynasty) {
             this.name = LanguageStrings.formatWildDynastyName(this.titleKey);
             return;
         }
@@ -1436,17 +1439,30 @@ public class Dynasty {
         }
     }
 
-    private boolean isWildDynastyName() {
-        if (this.name != null && this.name.equals(LanguageStrings.get(LanguageStrings.DYNASTY_WILD_NAME))) {
+    private static boolean inferLegacyWildDynasty(Savefile.SavedDynasty savedDynasty) {
+        if (savedDynasty.isPlayer) {
+            return false;
+        }
+        if (savedDynasty.themeBase != null && !savedDynasty.themeBase.isEmpty()) {
+            return false;
+        }
+        String savedName = savedDynasty.name;
+        if (savedName == null || savedName.isEmpty()) {
+            return false;
+        }
+        if (savedName.equals(LanguageStrings.get(LanguageStrings.DYNASTY_WILD_NAME))) {
             return true;
         }
         for (DynastyTitle title : GameConstants.getDynastyTitles()) {
-            if (this.name != null && this.name.equals(LanguageStrings.formatWildDynastyName(title))) {
+            if (savedName.equals(LanguageStrings.formatWildDynastyName(title))) {
                 return true;
             }
         }
         return false;
     }
+
+    public boolean isWildDynasty() { return wildDynasty; }
+    public void setWildDynasty(boolean wildDynasty) { this.wildDynasty = wildDynasty; }
 
     public void setName(String name) { this.name = name; }
     public boolean isPlayer() { return isPlayer; }
@@ -1519,6 +1535,30 @@ public class Dynasty {
 
     public boolean isAutoDiplomacyEnabled() { return autoDiplomacyEnabled; }
     public void setAutoDiplomacyEnabled(boolean enabled) { this.autoDiplomacyEnabled = enabled; }
+
+    public PactRequestIncomingPolicy getPactRequestIncomingPolicy() {
+        return pactRequestIncomingPolicy != null ? pactRequestIncomingPolicy : PactRequestIncomingPolicy.MANUAL;
+    }
+
+    public void setPactRequestIncomingPolicy(PactRequestIncomingPolicy policy) {
+        this.pactRequestIncomingPolicy = policy != null ? policy : PactRequestIncomingPolicy.MANUAL;
+    }
+
+    public int getLastIncomingPactRequestWorldDay() {
+        return lastIncomingPactRequestWorldDay;
+    }
+
+    public void setLastIncomingPactRequestWorldDay(int worldDay) {
+        this.lastIncomingPactRequestWorldDay = worldDay;
+    }
+
+    public boolean isPactRequestPromptOpen() {
+        return pactRequestPromptOpen;
+    }
+
+    public void setPactRequestPromptOpen(boolean open) {
+        this.pactRequestPromptOpen = open;
+    }
 
     public boolean isDefaultAutoTunnelsEnabled() { return defaultAutoTunnelsEnabled; }
     public void setDefaultAutoTunnelsEnabled(boolean enabled) { this.defaultAutoTunnelsEnabled = enabled; }

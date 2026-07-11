@@ -30,17 +30,19 @@ import com.grimidk.formicempire.classes.infrasctructure.registries.WorldSpaces;
 
 public class ColonyLabourService {
 
+    private final List<Ant> workingAntsScratch = new ArrayList<>();
+
     // --- Actual Ant Objects ---
     private List<Ant> getWorkingAnts(Colony colony, AntRole role) {
-        List<Ant> workers = new ArrayList<>();
+        workingAntsScratch.clear();
         for (List<Ant> group : colony.getAntGroups().values()) {
             for (Ant ant : group) {
                 if (ant.isAlive() && !ant.isOnTrade() && ant.getRole() == role) {
-                    workers.add(ant);
+                    workingAntsScratch.add(ant);
                 }
             }
         }
-        return workers;
+        return workingAntsScratch;
     }
     
     private int processGathering(Colony colony, List<ResourceSource> sources, int powerAvailable, ResourceType type, List<Ant> workers) {
@@ -172,13 +174,11 @@ public class ColonyLabourService {
             }
         }
 
-        // --- Passive Water ---
+        // --- Passive Water (daily rate / 24, matches stats UI and lite sim) ---
         if (colony.hasBuilding(GameUnlocks.PASSIVE_WATER)) {
             double maxWater = stats.getWaterCapacity(colony);
-            double gain = (maxWater * 0.10);
-            if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
-                gain = (maxWater * 0.20);
-            }
+            double dailyPct = colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1) ? 0.20 : 0.10;
+            double gain = (maxWater * dailyPct) / 24.0;
             resources.addResource(colony, GameConstants.RESOURCE_WATER, gain);
         }
     }

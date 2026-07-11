@@ -26,6 +26,7 @@ public class TriggerManager {
     
     private final List<TriggerListener> listeners = new ArrayList<>();
     private boolean colonyDeathFired = false;
+    private int listenerGeneration = 0;
 
     private final Runnable monthlyRunnable = this::checkMonthlyTriggers;
     private final Runnable dailyRunnable = this::checkDailyTriggers;
@@ -47,6 +48,7 @@ public class TriggerManager {
     public void unregisterListeners() {
         unregisterTickListeners();
         listeners.clear();
+        listenerGeneration++;
     }
 
     private void unregisterTickListeners() {
@@ -66,9 +68,14 @@ public class TriggerManager {
     
     private void fireTrigger(Upgrade upgrade, String title, String message) {
         playerColony.unlockUpgrade(upgrade);
-        
-        for (TriggerListener listener : listeners) {
+
+        int generation = listenerGeneration;
+        List<TriggerListener> snapshot = new ArrayList<>(listeners);
+        for (TriggerListener listener : snapshot) {
             SwingUtilities.invokeLater(() -> {
+                if (generation != listenerGeneration) {
+                    return;
+                }
                 listener.onUpgradeTriggered(upgrade, title, message);
             });
         }
@@ -92,16 +99,26 @@ public class TriggerManager {
                 synergy.getTriggerMessageKey(),
                 synergy.getName(),
                 synergy.formatRequirementFlavorNames());
-        for (TriggerListener listener : listeners) {
+        int generation = listenerGeneration;
+        List<TriggerListener> snapshot = new ArrayList<>(listeners);
+        for (TriggerListener listener : snapshot) {
             SwingUtilities.invokeLater(() -> {
+                if (generation != listenerGeneration) {
+                    return;
+                }
                 listener.onUpgradeTriggered(synergy.getReward(), title, message);
             });
         }
     }
     
     private void fireColonyDeath() {
-        for (TriggerListener listener : listeners) {
+        int generation = listenerGeneration;
+        List<TriggerListener> snapshot = new ArrayList<>(listeners);
+        for (TriggerListener listener : snapshot) {
             SwingUtilities.invokeLater(() -> {
+                if (generation != listenerGeneration) {
+                    return;
+                }
                 listener.onColonyDeath();
             });
         }

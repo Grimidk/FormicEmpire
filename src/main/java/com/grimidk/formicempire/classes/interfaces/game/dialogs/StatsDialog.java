@@ -30,8 +30,6 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -69,8 +67,6 @@ public class StatsDialog extends ZeroDialog {
     private JScrollPane insectsScrollPane;
     private JScrollPane unitStatsScrollPane;
     private JScrollPane deathScrollPane;
-    
-    private final Runnable refreshTask = this::liveUpdate;
 
     public StatsDialog(JFrame owner, Colony colony, Engine engine) {
         super(owner, LanguageStrings.DIALOG_STATS_TITLE, AssetStyles.DEFAULT_DIALOG_SIZE);
@@ -121,34 +117,7 @@ public class StatsDialog extends ZeroDialog {
         });
         SwingUtilities.invokeLater(this::layoutAllTables);
 
-        if (this.engine != null) {
-            this.engine.addHourTickListener(refreshTask);
-        }
-        
-        this.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosed(WindowEvent e) {
-                detachTickListener();
-            }
-            @Override
-            public void windowClosing(WindowEvent e) {
-                detachTickListener();
-            }
-        });
-
         registerCloseKey(KeyEvent.VK_X);
-    }
-
-    private void detachTickListener() {
-        if (engine != null) {
-            engine.removeHourTickListener(refreshTask);
-        }
-    }
-
-    @Override
-    public void dispose() {
-        detachTickListener();
-        super.dispose();
     }
 
     @Override

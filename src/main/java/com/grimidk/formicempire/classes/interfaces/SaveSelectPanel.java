@@ -147,13 +147,20 @@ public class SaveSelectPanel extends JPanel {
 
             Savefile save = new Savefile(slotId, request.baseName());
             save.setPlayerDynastyTitleId(request.titleId());
-            saveManager.saveUserSlotAsync(save, () -> {
-                refreshSlots(); 
+            saveManager.saveUserSlotAsync(save, success -> {
+                if (!success) {
+                    UiOptionPane.showMessageDialog(frame,
+                            LanguageStrings.get(LanguageStrings.SAVE_ERROR_CREATE),
+                            LanguageStrings.get(LanguageStrings.UI_ERROR),
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                refreshSlots();
 
                 Savefile newSave = cachedSaves[idx];
                 if (newSave != null) {
                     HelpPanel.showTutorialDialog(frame);
-                    frame.openGameWithSave(newSave); 
+                    frame.openGameWithSave(newSave);
                 } else {
                     UiOptionPane.showMessageDialog(frame, LanguageStrings.get(LanguageStrings.SAVE_ERROR_CREATE), LanguageStrings.get(LanguageStrings.UI_ERROR), JOptionPane.ERROR_MESSAGE);
                 }

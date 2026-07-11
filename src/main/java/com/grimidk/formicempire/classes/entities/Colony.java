@@ -143,7 +143,6 @@ public class Colony {
     private transient ColonyDeathService deathService;
     private transient ColonyPhysicsService physicsService;
     private transient ColonyLocationService locationService;
-    private transient ColonySummarizationService summarizationService;
     private transient ColonyAutomationService automationService;
     private transient ColonyResourceService resourceService;
     private transient ColonyStarterService starterService;
@@ -161,7 +160,6 @@ public class Colony {
         this.populationService = new ColonyPopulationService();
         this.deathService = new ColonyDeathService();
         this.physicsService = new ColonyPhysicsService();
-        this.summarizationService = new ColonySummarizationService();
         this.automationService = new ColonyAutomationService(); 
         this.resourceService = new ColonyResourceService();
         this.starterService = ColonyStarterService.shared();
@@ -1382,7 +1380,6 @@ public class Colony {
     public ColonyDeathService getDeathService() { return this.deathService; }
     public ColonyPhysicsService getPhysicsService() { return this.physicsService; }
     public ColonyLocationService getLocationService() { return this.locationService; }
-    public ColonySummarizationService getSummarizationService() { return this.summarizationService; }
     public ColonyAutomationService getAutomationService() { return this.automationService; }
     public ColonyResourceService getResourceService() { return this.resourceService; }
     public ColonyStarterService getStarterService() { return this.starterService; }
@@ -1681,9 +1678,8 @@ public class Colony {
             }
             this.populationService.runRoleAssignment(this, engine);
             invalidateActiveRoleCountCache();
-            this.runResearch();
             this.labourService.runTunnelConstruction(this);
-            this.summarizationService.runHourlyLite(this, biome);
+            ColonyJobRules.runHourlyLite(this, biome);
         }
     }
 
@@ -1728,7 +1724,7 @@ public class Colony {
             this.runContamination(); 
             this.runPolicing(); 
         } else {
-            this.summarizationService.runDailyLite(this);
+            ColonyJobRules.runDailyLite(this, currentTemp);
         }
 
         this.age++;
@@ -1753,7 +1749,7 @@ public class Colony {
             this.runParasitation(biome, season);
             getBugHandlingService().runMonthlyParasiticMites(this, biome, season);
         } else {
-            this.summarizationService.runMonthlyLite(this, biome, season);
+            ColonyJobRules.runMonthlyLite(this, biome, season);
         }
     }
 

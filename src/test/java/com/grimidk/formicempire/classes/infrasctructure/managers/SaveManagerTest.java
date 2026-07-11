@@ -184,7 +184,9 @@ public class SaveManagerTest {
         assertEquals(2, loaded.size());
         assertEquals("First Grim - Vine War", loaded.get(1).displayName);
         assertEquals(15, loaded.get(1).dynastyIdB);
-        assertEquals("Grim Dynasty", loaded.get(1).winnerDynastyName);
+        assertEquals(1, loaded.get(1).winnerDynastyId);
+        assertFalse(json.contains("dynastyNameA"));
+        assertFalse(json.contains("winnerDynastyName"));
     }
 
     @Test

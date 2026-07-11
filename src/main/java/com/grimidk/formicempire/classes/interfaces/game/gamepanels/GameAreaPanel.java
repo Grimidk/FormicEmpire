@@ -10,7 +10,7 @@ import com.grimidk.formicempire.classes.entities.Bug;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonySpatialLayout;
-import com.grimidk.formicempire.classes.interfaces.game.rendering.RoomDecorationRenderer;
+// import com.grimidk.formicempire.classes.interfaces.game.rendering.RoomDecorationRenderer;
 import com.grimidk.formicempire.classes.entities.services.shared.ViewportPhysicsLod;
 import com.grimidk.formicempire.classes.entities.spatial.Dimension;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
@@ -296,6 +296,17 @@ public class GameAreaPanel extends ZeroGamePanel {
         }
     }
 
+    private boolean showsLogisticsChamber() {
+        return colony != null && colony.hasUpgrade(GameUnlocks.ABILITY_TRADE);
+    }
+
+    private boolean showsUnderworldThirdRow() {
+        if (colony == null) {
+            return false;
+        }
+        return colony.hasUpgrade(GameUnlocks.ROLE_BREEDER) || showsLogisticsChamber();
+    }
+
     private int calculateUnderworldHeight() {
         UnderworldRoomLayout layout = resolveUnderworldRoomLayout();
         if (layout == null) {
@@ -303,20 +314,16 @@ public class GameAreaPanel extends ZeroGamePanel {
         }
 
         int bottom = layout.roomYRow2 + layout.roomH;
-        if (colony != null) {
-            boolean hasBreeder = colony.hasUpgrade(GameUnlocks.ROLE_BREEDER);
-            boolean showLogisticsChamber = true;
-            if (hasBreeder || showLogisticsChamber) {
-                int row3Y = layout.hallY + 512;
-                int row3H = layout.roomH;
-                if (middleHallwayImg != null) {
-                    row3H = Math.max(row3H, middleHallwayImg.getHeight(this));
-                }
-                if (showLogisticsChamber && doubleRoomImg != null) {
-                    row3H = Math.max(row3H, doubleRoomImg.getHeight(this));
-                }
-                bottom = row3Y + row3H;
+        if (showsUnderworldThirdRow()) {
+            int row3Y = layout.hallY + 512;
+            int row3H = layout.roomH;
+            if (middleHallwayImg != null) {
+                row3H = Math.max(row3H, middleHallwayImg.getHeight(this));
             }
+            if (showsLogisticsChamber() && doubleRoomImg != null) {
+                row3H = Math.max(row3H, doubleRoomImg.getHeight(this));
+            }
+            bottom = row3Y + row3H;
         }
         return bottom + 50;
     }
@@ -356,7 +363,7 @@ public class GameAreaPanel extends ZeroGamePanel {
                 drawUnderworldStructure(g2d);
                 drawAnts(g2d);
                 drawBugs(g2d);
-                drawUnderworldRoomDecorationsOverlay(g2d);
+                // drawUnderworldRoomDecorationsOverlay(g2d); // disabled — see roadmap: in-room sprites rework
             } else {
                 g2d.translate(contentPadX, contentPadY);
                 overworldDeadBodySpritesRemaining = GameConstants.MAX_PEN_NON_ANT_SPRITES;
@@ -591,6 +598,10 @@ public class GameAreaPanel extends ZeroGamePanel {
         return new UnderworldRoomLayout(hallX, hallY, hallW, hallH, leftRoomX, rightRoomX, roomW, roomH, hallY, roomY2);
     }
 
+    /*
+     * In-room building decoration overlay — disabled for now (see roadmap).
+     * Re-enable by uncommenting the draw call in paint and restoring RoomDecorationRenderer import.
+     *
     private void drawUnderworldRoomDecorationsOverlay(Graphics2D g2d) {
         if (colony == null) {
             return;
@@ -618,6 +629,7 @@ public class GameAreaPanel extends ZeroGamePanel {
         RoomDecorationRenderer.drawRoyalRoomDecorations(g2d, colony, L.rightRoomX, L.roomYRow2, L.roomW, L.roomH, this);
         g2d.setTransform(old2);
     }
+    */
 
     private void drawUnderworldStructure(Graphics2D g2d) {
         if (firstHallwayImg == null || basicRoomImg == null || middleHallwayImg == null) {
@@ -673,9 +685,9 @@ public class GameAreaPanel extends ZeroGamePanel {
         
         g2d.setTransform(old2);
         
-        // --- ROW 3 (Floor 3) — logistics portal row; doubleRoom is logistics only ---
+        // --- ROW 3 (Floor 3) — breeder + logistics portal row ---
         boolean hasBreeder = colony.hasUpgrade(GameUnlocks.ROLE_BREEDER);
-        boolean showLogisticsChamber = true;
+        boolean showLogisticsChamber = showsLogisticsChamber();
 
         if (hasBreeder || showLogisticsChamber) {
             int thirdRowYOffset = 512;

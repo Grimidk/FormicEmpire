@@ -391,6 +391,13 @@ public class EnglishTranslation implements Translation {
         en.put("WAR_ORDINAL_4", "Fourth");
         en.put("WAR_ORDINAL_5", "Fifth");
         en.put("WAR_ORDINAL_N_FMT", "%s");
+        en.put("COLONY_NAME_DEFAULT_THEME", "Player");
+        en.put("COLONY_NAME_CAPITAL_FMT", "%s Prime");
+        en.put("COLONY_NAME_FIRST_SATELLITE_FMT", "New %s");
+        en.put("COLONY_NAME_SECUNDUS_FMT", "%s Secundus");
+        en.put("COLONY_NAME_TERTIUS_FMT", "%s Tertius");
+        en.put("COLONY_NAME_QUARTUS_FMT", "%s Quartus");
+        en.put("COLONY_NAME_ORDINAL_N_FMT", "%s %s");
         en.put("WAR_WORLD_MONTH_FMT", "Year %s, Month %s");
         en.put("WORLD_DATE_FMT", "%s/%s/%s");
         en.put("WAR_COL_NAME", "War");
@@ -865,6 +872,11 @@ public class EnglishTranslation implements Translation {
         en.put("DIPLO_PACT_REQUEST_MSG_FMT", "%s requests a non-aggression pact. Accept?");
         en.put("DIPLO_PACT_REQUEST_ACCEPT", "Accept");
         en.put("DIPLO_PACT_REQUEST_DECLINE", "Decline");
+        en.put("DIPLO_PACT_INCOMING_POLICY_SECTION", "Incoming pact requests");
+        en.put("DIPLO_PACT_INCOMING_POLICY_LABEL", "When another dynasty requests a non-aggression pact:");
+        en.put("DIPLO_PACT_INCOMING_MANUAL", "Ask me (popup)");
+        en.put("DIPLO_PACT_INCOMING_AUTO_ACCEPT", "Accept automatically");
+        en.put("DIPLO_PACT_INCOMING_AUTO_DECLINE", "Decline automatically");
         en.put("DIPLO_PACT_REQUEST_SENT_FMT", "Pact request sent to %s.");
         en.put("DIPLO_PACT_ACCEPTED_FMT", "%s accepted the non-aggression pact.");
         en.put("DIPLO_PACT_DECLINED_FMT", "%s declined the non-aggression pact.");
@@ -886,6 +898,7 @@ public class EnglishTranslation implements Translation {
         en.put("DIPLO_ERROR_WAR_POPULATION_FMT", "Your dynasty needs at least %s ants before declaring war or configuring war economy roles.");
         en.put("DIPLO_ERROR_WAR_ACTIVE_MILITARY", "Assign active military roles in war economy (Warrior, Defender, Militia, or Brute) before declaring war.");
         en.put("DIPLO_ERROR_WAR_TARGET_ACTIVE_MILITARY_FMT", "%s cannot be attacked yet — they have no active military roles.");
+        en.put("DIPLO_ERROR_WAR_NO_BORDER", "Can only declare war to a bordering dynasty.");
         en.put("DIPLO_ACTION_TRADE", "Trade");
         en.put("DIPLO_ACTION_REQUEST_TRADE", "Request Trade");
         en.put("DIPLO_ACTION_SEND_DIPLOMATS", "Send Diplomats");
@@ -908,6 +921,13 @@ public class EnglishTranslation implements Translation {
         en.put("DIPLO_ERROR_INTEGRATION_PACT", "Requires a non-aggression pact with this dynasty.");
         en.put("DIPLO_SEND_DIPLOMATS_TITLE", "Send Diplomats");
         en.put("DIPLO_SEND_DIPLOMATS_PROMPT", "Send up to %s diplomat(s) (%s assigned). Each improves stability by %s.");
+        en.put("DIPLO_DIPLOMATS_CURRENT_FMT", "Assigned: %s");
+        en.put("DIPLO_DIPLOMATS_AVAILABLE_FMT", "Available: %s");
+        en.put("DIPLO_DIPLOMATS_LIMIT_FMT", "Limit: %s");
+        en.put("DIPLO_DIPLOMATS_TARGET_COUNT", "Assign");
+        en.put("DIPLO_DIPLOMATS_EACH_FMT", "+%s each");
+        en.put("DIPLO_DIPLOMATS_BONUS_PREVIEW_FMT", "Bonus: +%s (%s)");
+        en.put("DIPLO_SEND_DIPLOMATS_FOR_FMT", "Send Diplomats — %s");
         en.put("DIPLO_SEND_DIPLOMATS_SUCCESS_DYNASTY", "Sent %s diplomat(s). Reputation with %s increased by %s.");
         en.put("DIPLO_SEND_DIPLOMATS_SUCCESS_COLONY", "Sent %s diplomat(s). %s loyalty increased by %s.");
         en.put("DIPLO_ERROR_NO_DIPLOMATS", "No princesses are assigned to the Diplomat role in this colony.");
@@ -917,6 +937,7 @@ public class EnglishTranslation implements Translation {
         en.put("DIPLO_ERROR_GENETIC_EXCHANGE_BORDER", "Your dynasty must have a colony bordering this dynasty.");
         en.put("DIPLO_ERROR_GENETIC_EXCHANGE_REP", "Requires Cordial reputation or better.");
         en.put("DIPLO_ERROR_REPUTATION_STABLE", "Diplomats cannot be sent to dynasties with Aggressive reputation.");
+        en.put("DIPLO_ERROR_DIPLOMATS_AT_WAR", "Diplomats cannot be sent while at war with this dynasty.");
         en.put("DIPLO_ERROR_LOYALTY_STABLE", "Diplomats cannot be sent to colonies with Rebellious loyalty.");
         en.put("DIPLO_ERROR_CORDIAL_REQUIRED", "Cordial reputation or better is required to form a pact.");
         en.put("DIPLO_ERROR_CORDIAL_REQUIRED_REQUEST", "Neutral reputation or better is required to request trade.");

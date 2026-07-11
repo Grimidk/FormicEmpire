@@ -2,12 +2,11 @@ package com.grimidk.formicempire.classes.infrasctructure.assets;
 
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import java.awt.Image;
-import java.awt.MediaTracker;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.function.BooleanSupplier;
 
 import javax.swing.ImageIcon;
-import javax.swing.JPanel;
 
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.BugType;
@@ -21,7 +20,8 @@ import com.grimidk.formicempire.classes.entities.ResourceSource;
  */
 public final class GameSpritePreloader {
 
-    private static final JPanel FALLBACK_TRACKER = new JPanel();
+    private static final int LOAD_WAIT_MS = 15_000;
+    private static final int WARM_SESSION_WAIT_MS = 30_000;
 
     private GameSpritePreloader() {
     }
@@ -30,17 +30,7 @@ public final class GameSpritePreloader {
         if (image == null) {
             return;
         }
-        if (image.getWidth(FALLBACK_TRACKER) >= 0 && image.getHeight(FALLBACK_TRACKER) >= 0) {
-            return;
-        }
-        MediaTracker tracker = new MediaTracker(FALLBACK_TRACKER);
-        int id = 1;
-        tracker.addImage(image, id);
-        try {
-            tracker.waitForID(id, 15_000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        waitForImage(image, LOAD_WAIT_MS);
     }
 
     public static void ensureLoaded(ImageIcon icon) {
@@ -50,6 +40,10 @@ public final class GameSpritePreloader {
     }
 
     public static void warmSession(Colony colony) {
+        warmSession(colony, null);
+    }
+
+    public static void warmSession(Colony colony, BooleanSupplier cancelled) {
         Set<Image> images = new LinkedHashSet<>();
         for (BugType bugType : GameConstants.getBugTypes()) {
             collectIcon(images, bugType.getSprite());
@@ -87,19 +81,33 @@ public final class GameSpritePreloader {
             }
         }
 
-        MediaTracker tracker = new MediaTracker(FALLBACK_TRACKER);
-        int id = 0;
         for (Image image : images) {
-            id++;
-            tracker.addImage(image, id);
+            if (cancelled != null && cancelled.getAsBoolean()) {
+                return;
+            }
+            waitForImage(image, WARM_SESSION_WAIT_MS);
         }
-        if (id == 0) {
+    }
+
+    private static void waitForImage(Image image, int timeoutMs) {
+        if (image.getWidth(null) >= 0 && image.getHeight(null) >= 0) {
             return;
         }
-        try {
-            tracker.waitForAll(30_000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+        long deadline = System.currentTimeMillis() + timeoutMs;
+        while (System.currentTimeMillis() < deadline) {
+            if (Thread.currentThread().isInterrupted()) {
+                Thread.currentThread().interrupt();
+                return;
+            }
+            if (image.getWidth(null) >= 0 && image.getHeight(null) >= 0) {
+                return;
+            }
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return;
+            }
         }
     }
 

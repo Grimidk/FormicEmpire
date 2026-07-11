@@ -103,7 +103,7 @@ class ColonyAutomationServiceTest {
         npc.setActive(false);
         npc.setMushrooms(0);
 
-        ColonyJobRules.runDailyLite(npc);
+        ColonyJobRules.runDailyLite(npc, GameConstants.TEMP_WARM);
         assertTrue(npc.getAge() >= 7);
     }
 }

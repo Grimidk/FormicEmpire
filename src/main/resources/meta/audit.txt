@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 67% (183/274 checked)
+Completion: 69% (190/275 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -286,7 +286,7 @@ Start / progress assimilations (RP + time). Each species:
 [X] Per-colony Actions menu:
     [X] Rename / edit colony
     [X] View colony (switch active colony / camera)
-    [X] Send diplomats to colony (when unlocked)
+    [ ] Send diplomats to colony (assign count 0–max; shows current, preview bonus)
 [X] Dynasty-wide automation toggles (when unlocked):
     [X] Default auto-build
     [X] Default automation
@@ -317,11 +317,12 @@ Neighbor trade rows (per adjacent hex):
 17. DYNASTY — DIPLOMACY (D)
 ================================================================================
 Per foreign dynasty Actions menu:
+[ ] Incoming pact request policy (Ask / Auto accept / Auto decline; max one received per day)
 [ ] Non-aggression pact — propose / accept / break
 [X] Declare war (confirm dialog; population & military checks)
 [ ] Request trade agreement
 [ ] Open trade negotiation
-[X] Send diplomats to dynasty
+[ ] Send diplomats to dynasty (assign count 0–max; shows current, preview reputation)
 [ ] Genetic exchange (25 drones from any colony; +10 reputation and +10% genetic integrity to target for 6 months; once per dynasty until expiry)
 [ ] Convoy auto-cancelled with side alert when escorts die and route cannot be staffed
 [ ] Diplomat mission auto-cancelled with side alert when deployed diplomats die

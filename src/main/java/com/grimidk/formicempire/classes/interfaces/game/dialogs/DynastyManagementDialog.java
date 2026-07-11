@@ -3,6 +3,7 @@ package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ColonyLoyalty;
 import com.grimidk.formicempire.classes.constants.misc.DiplomaticReputation;
+import com.grimidk.formicempire.classes.constants.misc.PactRequestIncomingPolicy;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.misc.Species;
 import com.grimidk.formicempire.classes.constants.misc.TradeMethod;
@@ -73,8 +74,7 @@ public class DynastyManagementDialog extends ZeroDialog {
     private TradePanel tradePanel;
     private DiplomacyPanel diplomacyPanel;
     private WarManagementPanel warsPanel;
-
-    private final Runnable refreshTask = this::liveUpdate;
+    private TradeCreationDialog tradeCreationDialog;
 
     public DynastyManagementDialog(JFrame owner, Dynasty dynasty, Engine engine, Consumer<Colony> onGoToColony,
             Runnable onOpenWarRoles, Consumer<War> onViewBattle, Consumer<Trade> onViewConvoy) {
@@ -100,23 +100,11 @@ public class DynastyManagementDialog extends ZeroDialog {
 
         refreshDialog();
         initKeyBindings();
-        
-        if (this.engine != null) {
-            this.engine.addHourTickListener(refreshTask);
-        }
 
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowOpened(WindowEvent e) {
                 tabbedPane.requestFocusInWindow();
-            }
-            @Override
-            public void windowClosed(WindowEvent e) {
-                detachTickListener();
-            }
-            @Override
-            public void windowClosing(WindowEvent e) {
-                detachTickListener();
             }
         });
         
@@ -140,16 +128,17 @@ public class DynastyManagementDialog extends ZeroDialog {
         }
     }
 
-    private void detachTickListener() {
-        if (engine != null) {
-            engine.removeHourTickListener(refreshTask);
-        }
-    }
-
     @Override
     public void dispose() {
-        detachTickListener();
+        disposeTradeCreationDialog();
         super.dispose();
+    }
+
+    private void disposeTradeCreationDialog() {
+        if (tradeCreationDialog != null) {
+            tradeCreationDialog.dispose();
+            tradeCreationDialog = null;
+        }
     }
 
     public void liveUpdate() {
@@ -326,9 +315,10 @@ public class DynastyManagementDialog extends ZeroDialog {
     }
 
     private void openTradeDialog(Colony origin, Colony target, Trade existingTrade) {
-        TradeCreationDialog dialog = new TradeCreationDialog(
+        disposeTradeCreationDialog();
+        tradeCreationDialog = new TradeCreationDialog(
                 SwingUtilities.getWindowAncestor(this), origin, target, engine, existingTrade);
-        dialog.setVisible(true);
+        tradeCreationDialog.setVisible(true);
     }
 
 
@@ -1592,6 +1582,7 @@ public class DynastyManagementDialog extends ZeroDialog {
         private JTable table;
         private DefaultTableModel model;
         private JScrollPane tableScrollPane;
+        private JComboBox<PactRequestIncomingPolicy> pactIncomingPolicyCombo;
         private final List<Dynasty> displayedDynasties = new ArrayList<>();
         private static final int COL_DYNASTY = 0;
         private static final int COL_SPECIES = 1;
@@ -1713,6 +1704,40 @@ public class DynastyManagementDialog extends ZeroDialog {
             });
 
             tableScrollPane = AssetStyles.wrapScrollableTable(table);
+
+            JPanel settingsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 10));
+            settingsPanel.setBorder(BorderFactory.createTitledBorder(
+                    LanguageStrings.get(LanguageStrings.DIPLO_PACT_INCOMING_POLICY_SECTION)));
+            settingsPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
+
+            pactIncomingPolicyCombo = new JComboBox<>(PactRequestIncomingPolicy.values());
+            pactIncomingPolicyCombo.setFocusable(false);
+            AssetStyles.styleComboBox(pactIncomingPolicyCombo);
+            pactIncomingPolicyCombo.setSelectedItem(dynasty.getPactRequestIncomingPolicy());
+            pactIncomingPolicyCombo.setRenderer(new DefaultListCellRenderer() {
+                @Override
+                public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                        boolean isSelected, boolean cellHasFocus) {
+                    super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                    if (value instanceof PactRequestIncomingPolicy policy) {
+                        setText(LanguageStrings.get(policy.getNameKey()));
+                    }
+                    return this;
+                }
+            });
+            pactIncomingPolicyCombo.addActionListener(e -> {
+                PactRequestIncomingPolicy selected =
+                        (PactRequestIncomingPolicy) pactIncomingPolicyCombo.getSelectedItem();
+                if (selected != null) {
+                    dynasty.setPactRequestIncomingPolicy(selected);
+                }
+            });
+
+            JLabel policyLabel = new JLabel(LanguageStrings.get(LanguageStrings.DIPLO_PACT_INCOMING_POLICY_LABEL));
+            policyLabel.setForeground(AssetStyles.FONT_COLOR);
+            settingsPanel.add(policyLabel);
+            settingsPanel.add(pactIncomingPolicyCombo);
+            add(settingsPanel, BorderLayout.NORTH);
             add(tableScrollPane, BorderLayout.CENTER);
         }
 
@@ -2074,7 +2099,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                     if (remaining > 0) {
                         message = LanguageStrings.format(LanguageStrings.DIPLO_ERROR_WAR_COOLDOWN_FMT, remaining);
                     } else {
-                        message = LanguageStrings.get(LanguageStrings.DIPLO_ERROR_NO_BORDER);
+                        message = LanguageStrings.get(LanguageStrings.DIPLO_ERROR_WAR_NO_BORDER);
                     }
                 }
                 UiOptionPane.showMessageDialog(this, message,
@@ -2361,7 +2386,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                             warItem.setToolTipText(LanguageStrings.format(
                                     LanguageStrings.DIPLO_ERROR_WAR_COOLDOWN_FMT, remaining));
                         } else {
-                            warItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_NO_BORDER));
+                            warItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_WAR_NO_BORDER));
                         }
                     }
                 }
@@ -2422,15 +2447,16 @@ public class DynastyManagementDialog extends ZeroDialog {
                 menu.add(tradeItem);
 
                 JMenuItem diplomatItem = new JMenuItem(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_SEND_DIPLOMATS));
-                if (activeColony != null && diplo.canSendDiplomatsToDynasty(activeColony, other, world)) {
-                    diplomatItem.addActionListener(e -> promptSendDiplomatsToDynasty(DynastyManagementDialog.this, activeColony, other));
+                if (diplo.canManageDynastyMissionDiplomats(other, world)) {
+                    diplomatItem.addActionListener(e -> promptManageDynastyDiplomats(DynastyManagementDialog.this, other));
                 } else {
                     diplomatItem.setEnabled(false);
-                    if (activeColony == null) {
-                        diplomatItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_ACTIVE_COLONY));
-                    } else if (!activeColony.hasUpgrade(GameUnlocks.ROLE_DIPLOMAT)) {
+                    if (!dynasty.hasUpgrade(GameUnlocks.ROLE_DIPLOMAT)) {
                         diplomatItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_NO_DIPLOMAT_ROLE));
-                    } else if (diplo.countAvailableDiplomats(activeColony) <= 0) {
+                    } else if (diplo.isAtWarWith(other)) {
+                        diplomatItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_DIPLOMATS_AT_WAR));
+                    } else if (diplo.countDynastyWideAvailableDiplomats() <= 0
+                            && diplo.countDynastyMissionDiplomatsToward(other) <= 0) {
                         diplomatItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_NO_DIPLOMATS));
                     } else if (!diplo.needsDiplomatMissionToDynasty(other, world)) {
                         diplomatItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_REPUTATION_STABLE));
@@ -3018,14 +3044,14 @@ public class DynastyManagementDialog extends ZeroDialog {
         DynastyDiplomacyService diplo = dynasty.getDiplomacyService();
         if (diplo != null) {
             JMenuItem diplomatItem = new JMenuItem(LanguageStrings.get(LanguageStrings.DIPLO_ACTION_SEND_DIPLOMATS));
-            Colony diplomatSource = diplo.pickDiplomatSourceColony(colony);
-            if (diplo.canSendDiplomatsToColony(diplomatSource, colony, engine.getTradeManager(), engine.getWorld())) {
-                diplomatItem.addActionListener(e -> promptSendDiplomatsToColony(this, colony));
+            if (diplo.canManageColonyMissionDiplomats(colony, engine.getTradeManager(), engine.getWorld())) {
+                diplomatItem.addActionListener(e -> promptManageColonyDiplomats(this, colony));
             } else {
                 diplomatItem.setEnabled(false);
                 if (!dynasty.hasUpgrade(GameUnlocks.ROLE_DIPLOMAT)) {
                     diplomatItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_NO_DIPLOMAT_ROLE));
-                } else if (diplomatSource == null || diplo.countAvailableDiplomats(diplomatSource) <= 0) {
+                } else if (diplo.countDynastyWideAvailableDiplomats() <= 0
+                        && diplo.countColonyMissionDiplomatsOn(colony) <= 0) {
                     diplomatItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_NO_DIPLOMATS));
                 } else if (!diplo.needsDiplomatMissionToColony(colony, engine.getTradeManager(), engine.getWorld())) {
                     diplomatItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_LOYALTY_STABLE));
@@ -3038,7 +3064,7 @@ public class DynastyManagementDialog extends ZeroDialog {
         UiTableStyles.showCellPopupMenu(menu, table, row, column);
     }
 
-    private void promptSendDiplomatsToColony(Component parent, Colony colony) {
+    private void promptManageColonyDiplomats(Component parent, Colony colony) {
         DynastyDiplomacyService diplo = dynasty.getDiplomacyService();
         if (diplo == null || colony == null) {
             return;
@@ -3050,37 +3076,195 @@ public class DynastyManagementDialog extends ZeroDialog {
                     JOptionPane.WARNING_MESSAGE);
             return;
         }
-        if (!diplo.needsDiplomatMissionToColony(colony, engine.getTradeManager(), engine.getWorld())) {
-            UiOptionPane.showMessageDialog(parent,
-                    LanguageStrings.get(LanguageStrings.DIPLO_ERROR_LOYALTY_STABLE),
-                    LanguageStrings.get(LanguageStrings.DIPLO_SEND_DIPLOMATS_TITLE),
-                    JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-        Colony from = diplo.pickDiplomatSourceColony(colony);
-        if (from == null || diplo.countAvailableDiplomats(from) <= 0) {
-            UiOptionPane.showMessageDialog(parent,
-                    LanguageStrings.get(LanguageStrings.DIPLO_ERROR_NO_DIPLOMATS),
-                    LanguageStrings.get(LanguageStrings.DIPLO_SEND_DIPLOMATS_TITLE),
-                    JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-        int available = diplo.countAvailableDiplomats(from);
-        int max = Math.min(available, diplo.getMaxDiplomatsForColonyMission());
+        int current = diplo.countColonyMissionDiplomatsOn(colony);
+        int max = diplo.computeMaxColonyMissionDiplomatsOn(colony);
+        int available = diplo.countDynastyWideAvailableDiplomats();
         int gainPer = diplo.getDiplomatStabilityGainPerAnt();
-        int count = promptDiplomatCount(parent, available, max, gainPer);
-        if (count <= 0) {
+        Integer selected = promptManageDiplomatCount(parent, colony.getName(), current, max, available, gainPer);
+        if (selected == null) {
             return;
         }
-        int sent = diplo.sendDiplomatsToColony(from, colony, count, engine.getTradeManager(), engine.getWorld());
-        if (sent > 0) {
-            int totalGain = sent * gainPer;
-            UiOptionPane.showMessageDialog(parent,
-                    LanguageStrings.format(LanguageStrings.DIPLO_SEND_DIPLOMATS_SUCCESS_COLONY,                             sent, colony.getName(), totalGain),
-                    LanguageStrings.get(LanguageStrings.DIPLO_SEND_DIPLOMATS_TITLE),
-                    JOptionPane.INFORMATION_MESSAGE);
-            refreshDialog();
+        diplo.assignColonyMissionDiplomats(colony, selected, engine.getTradeManager(), engine.getWorld());
+        refreshDialog();
+    }
+
+    private void promptManageDynastyDiplomats(Component parent, Dynasty other) {
+        DynastyDiplomacyService diplo = dynasty.getDiplomacyService();
+        World world = engine.getWorld();
+        if (diplo == null || other == null || world == null) {
+            return;
         }
+        if (!dynasty.hasUpgrade(GameUnlocks.ROLE_DIPLOMAT)) {
+            UiOptionPane.showMessageDialog(parent,
+                    LanguageStrings.get(LanguageStrings.DIPLO_ERROR_NO_DIPLOMAT_ROLE),
+                    LanguageStrings.get(LanguageStrings.DIPLO_SEND_DIPLOMATS_TITLE),
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        int current = diplo.countDynastyMissionDiplomatsToward(other);
+        int max = diplo.computeMaxDynastyMissionDiplomatsToward(other);
+        int available = diplo.countDynastyWideAvailableDiplomats();
+        int gainPer = diplo.getDiplomatStabilityGainPerAnt();
+        Integer selected = promptManageDiplomatCount(parent, other.getName(), current, max, available, gainPer);
+        if (selected == null) {
+            return;
+        }
+        diplo.assignDynastyMissionDiplomats(other, selected, world);
+        refreshDialog();
+    }
+
+    private static final Dimension DIPLOMAT_ASSIGN_DIALOG_SIZE = new Dimension(520, 320);
+    private static final int DIPLOMAT_ASSIGN_CONTENT_WIDTH_PX = 460;
+
+    private Integer promptManageDiplomatCount(Component parent, String targetName, int current, int maxCount,
+            int available, int gainPer) {
+        int perTargetLimit = dynasty.getDiplomacyService() != null
+                ? dynasty.getDiplomacyService().getMaxDiplomatsPerTarget()
+                : GameConstants.DIPLOMAT_MAX_PER_DYNASTY_MISSION;
+        int spinnerMax = Math.max(0, maxCount);
+        if (current > perTargetLimit) {
+            spinnerMax = Math.max(spinnerMax, current);
+        }
+        int spinnerInitial = Math.min(current, spinnerMax);
+        int maxButtonValue = current > perTargetLimit
+                ? Math.min(current, Math.max(maxCount, perTargetLimit))
+                : spinnerMax;
+
+        Window owner = parent instanceof Window window ? window : SwingUtilities.getWindowAncestor(parent);
+        JDialog dialog = new JDialog(owner,
+                LanguageStrings.get(LanguageStrings.DIPLO_SEND_DIPLOMATS_TITLE),
+                Dialog.ModalityType.APPLICATION_MODAL);
+        dialog.setLayout(new BorderLayout());
+        dialog.getContentPane().setBackground(AssetStyles.BACKGROUND_COLOR);
+
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setOpaque(true);
+        panel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        panel.setBorder(BorderFactory.createEmptyBorder(24, 30, 16, 30));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.weightx = 1.0;
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(0, 0, 8, 0);
+
+        int row = 0;
+        gbc.gridy = row++;
+        panel.add(diplomatCenteredLine(targetName, true), gbc);
+
+        gbc.insets = new Insets(0, 0, 6, 0);
+        gbc.gridy = row++;
+        panel.add(diplomatCenteredLine(LanguageStrings.format(
+                LanguageStrings.DIPLO_DIPLOMATS_CURRENT_FMT, AssetStyles.formatNumber(current)), false), gbc);
+
+        gbc.gridy = row++;
+        panel.add(diplomatCenteredLine(LanguageStrings.format(
+                LanguageStrings.DIPLO_DIPLOMATS_AVAILABLE_FMT, AssetStyles.formatNumber(available)), false), gbc);
+
+        gbc.insets = new Insets(12, 0, 12, 0);
+        gbc.gridy = row++;
+        gbc.fill = GridBagConstraints.NONE;
+        JPanel spinnerRow = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 0));
+        spinnerRow.setOpaque(false);
+        JLabel countLabel = new JLabel(LanguageStrings.get(LanguageStrings.DIPLO_DIPLOMATS_TARGET_COUNT));
+        countLabel.setFont(AssetStyles.FONT_NORMAL);
+        countLabel.setForeground(AssetStyles.FONT_COLOR);
+        spinnerRow.add(countLabel);
+
+        SpinnerNumberModel model = new SpinnerNumberModel(spinnerInitial, 0, spinnerMax, 1);
+        JSpinner spinner = new JSpinner(model);
+        spinner.setFocusable(false);
+        AssetStyles.styleSpinner(spinner);
+        spinnerRow.add(spinner);
+
+        JButton maxBtn = new JButton(LanguageStrings.get(LanguageStrings.UI_MAX));
+        maxBtn.setFocusable(false);
+        AssetStyles.styleCompactButton(maxBtn);
+        maxBtn.addActionListener(e -> spinner.setValue(maxButtonValue));
+        spinnerRow.add(maxBtn);
+        panel.add(spinnerRow, gbc);
+
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(0, 0, 0, 0);
+        gbc.gridy = row;
+        JLabel previewLabel = new JLabel("");
+        previewLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        previewLabel.setFont(AssetStyles.FONT_NORMAL);
+        previewLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(diplomatLinePanel(previewLabel), gbc);
+
+        Runnable updatePreview = () -> previewLabel.setText(LanguageStrings.format(
+                LanguageStrings.DIPLO_DIPLOMATS_BONUS_PREVIEW_FMT,
+                AssetStyles.formatNumber(((Number) spinner.getValue()).intValue() * gainPer),
+                formatDiplomatPreviewDelta(
+                        (((Number) spinner.getValue()).intValue() - current) * gainPer)));
+        spinner.addChangeListener(e -> updatePreview.run());
+        updatePreview.run();
+
+        JPanel wrapper = new JPanel(new GridBagLayout());
+        wrapper.setOpaque(true);
+        wrapper.setBackground(AssetStyles.BACKGROUND_COLOR);
+        GridBagConstraints wrapGbc = new GridBagConstraints();
+        wrapGbc.gridx = 0;
+        wrapGbc.gridy = 0;
+        wrapGbc.weightx = 1.0;
+        wrapGbc.weighty = 1.0;
+        wrapGbc.anchor = GridBagConstraints.CENTER;
+        wrapper.add(panel, wrapGbc);
+        dialog.add(wrapper, BorderLayout.CENTER);
+
+        final Integer[] result = {null};
+        JPanel buttons = new JPanel(new FlowLayout(FlowLayout.CENTER, 16, 0));
+        buttons.setOpaque(false);
+        buttons.setBorder(BorderFactory.createEmptyBorder(8, 16, 16, 16));
+        JButton cancelBtn = new JButton(LanguageStrings.get(LanguageStrings.UI_CANCEL));
+        cancelBtn.setFocusable(false);
+        AssetStyles.styleButton(cancelBtn);
+        cancelBtn.addActionListener(e -> {
+            result[0] = null;
+            dialog.dispose();
+        });
+        JButton okBtn = new JButton(LanguageStrings.get(LanguageStrings.UI_CONFIRM));
+        okBtn.setFocusable(false);
+        AssetStyles.styleButton(okBtn);
+        okBtn.addActionListener(e -> {
+            result[0] = ((Number) spinner.getValue()).intValue();
+            dialog.dispose();
+        });
+        buttons.add(cancelBtn);
+        buttons.add(okBtn);
+        dialog.add(buttons, BorderLayout.SOUTH);
+
+        dialog.setSize(DIPLOMAT_ASSIGN_DIALOG_SIZE);
+        dialog.setMinimumSize(DIPLOMAT_ASSIGN_DIALOG_SIZE);
+        UiDialogUtils.prepareDialog(dialog, parent);
+        dialog.setLocationRelativeTo(parent);
+        dialog.setVisible(true);
+        return result[0];
+    }
+
+    private static JComponent diplomatCenteredLine(String text, boolean bold) {
+        JLabel label = new JLabel(text);
+        label.setFont(bold ? AssetStyles.FONT_BOLD : AssetStyles.FONT_NORMAL);
+        label.setForeground(AssetStyles.FONT_COLOR);
+        label.setHorizontalAlignment(SwingConstants.CENTER);
+        return diplomatLinePanel(label);
+    }
+
+    private static JPanel diplomatLinePanel(JLabel label) {
+        JPanel line = new JPanel(new BorderLayout());
+        line.setOpaque(false);
+        line.setPreferredSize(new Dimension(DIPLOMAT_ASSIGN_CONTENT_WIDTH_PX, label.getPreferredSize().height));
+        line.add(label, BorderLayout.CENTER);
+        return line;
+    }
+
+    private static String formatDiplomatPreviewDelta(int delta) {
+        if (delta > 0) {
+            return "+" + AssetStyles.formatNumber(delta);
+        }
+        return AssetStyles.formatNumber(delta);
     }
 
     private void performGeneticExchangeAction(Dynasty other) {
@@ -3100,54 +3284,6 @@ public class DynastyManagementDialog extends ZeroDialog {
             return;
         }
         if (diplo.offerGeneticExchange(other, world)) {
-            refreshDialog();
-        }
-    }
-
-    private void promptSendDiplomatsToDynasty(Component parent, Colony from, Dynasty other) {
-        DynastyDiplomacyService diplo = dynasty.getDiplomacyService();
-        World world = engine.getWorld();
-        if (diplo == null || from == null || other == null) {
-            return;
-        }
-        if (!from.hasUpgrade(GameUnlocks.ROLE_DIPLOMAT)) {
-            UiOptionPane.showMessageDialog(parent,
-                    LanguageStrings.get(LanguageStrings.DIPLO_ERROR_NO_DIPLOMAT_ROLE),
-                    LanguageStrings.get(LanguageStrings.DIPLO_SEND_DIPLOMATS_TITLE),
-                    JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-        if (!diplo.needsDiplomatMissionToDynasty(other, world)) {
-            UiOptionPane.showMessageDialog(parent,
-                    LanguageStrings.get(LanguageStrings.DIPLO_ERROR_REPUTATION_STABLE),
-                    LanguageStrings.get(LanguageStrings.DIPLO_SEND_DIPLOMATS_TITLE),
-                    JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-        if (diplo.countAvailableDiplomats(from) <= 0) {
-            UiOptionPane.showMessageDialog(parent,
-                    LanguageStrings.get(LanguageStrings.DIPLO_ERROR_NO_DIPLOMATS),
-                    LanguageStrings.get(LanguageStrings.DIPLO_SEND_DIPLOMATS_TITLE),
-                    JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-        if (!diplo.canSendDiplomatsToDynasty(from, other, world)) {
-            return;
-        }
-        int available = diplo.countAvailableDiplomats(from);
-        int max = Math.min(available, diplo.getMaxDiplomatsForDynastyMission());
-        int gainPer = diplo.getDiplomatStabilityGainPerAnt();
-        int count = promptDiplomatCount(parent, available, max, gainPer);
-        if (count <= 0) {
-            return;
-        }
-        int sent = diplo.sendDiplomatsToDynasty(from, other, count, world);
-        if (sent > 0) {
-            int totalGain = sent * gainPer;
-            UiOptionPane.showMessageDialog(parent,
-                    LanguageStrings.format(LanguageStrings.DIPLO_SEND_DIPLOMATS_SUCCESS_DYNASTY,                             sent, other.getName(), totalGain),
-                    LanguageStrings.get(LanguageStrings.DIPLO_SEND_DIPLOMATS_TITLE),
-                    JOptionPane.INFORMATION_MESSAGE);
             refreshDialog();
         }
     }
@@ -3178,33 +3314,12 @@ public class DynastyManagementDialog extends ZeroDialog {
         return ((Number) spinner.getValue()).intValue();
     }
 
-    private int promptDiplomatCount(Component parent, int assigned, int maxCount, int gainPerDiplomat) {
-        if (maxCount <= 0) {
-            return -1;
-        }
-        String prompt = String.format(
-                LanguageStrings.get(LanguageStrings.DIPLO_SEND_DIPLOMATS_PROMPT),
-                maxCount, assigned, gainPerDiplomat);
-        SpinnerNumberModel model = new SpinnerNumberModel(1, 1, maxCount, 1);
-        JSpinner spinner = new JSpinner(model);
-        AssetStyles.styleSpinner(spinner);
-        JPanel panel = new JPanel(new BorderLayout(8, 8));
-        JLabel label = new JLabel(prompt);
-        label.setFont(AssetStyles.FONT_NORMAL);
-        panel.add(label, BorderLayout.NORTH);
-        panel.add(spinner, BorderLayout.CENTER);
-        int result = UiOptionPane.showConfirmDialog(parent, panel,
-                LanguageStrings.get(LanguageStrings.DIPLO_SEND_DIPLOMATS_TITLE),
-                JOptionPane.OK_CANCEL_OPTION);
-        if (result != JOptionPane.OK_OPTION) {
-            return -1;
-        }
-        return ((Number) spinner.getValue()).intValue();
-    }
-
     private void performEdit(Colony colony) {
-        if (colony == null) return;
-        String newName = UiOptionPane.showInputDialog(this, LanguageStrings.format(LanguageStrings.DYNASTY_RENAME_TITLE, colony.getName()), colony.getName());
+        if (colony == null) {
+            return;
+        }
+        String newName = UiOptionPane.showInputDialog(this,
+                LanguageStrings.format(LanguageStrings.DYNASTY_RENAME_TITLE, colony.getName()), colony.getName());
         if (newName != null && !newName.trim().isEmpty()) {
             colony.setName(newName.trim());
             refreshDialog();

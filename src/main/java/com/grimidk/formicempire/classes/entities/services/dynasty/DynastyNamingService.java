@@ -52,8 +52,8 @@ public class DynastyNamingService {
         return LanguageStrings.formatDynastyName(theme, title);
     }
 
-    public String generateCapitalName(String dynastyName) {
-        return LanguageStrings.expectedCapitalColonyName(dynastyName);
+    public String generateCapitalName(String themeBase) {
+        return LanguageStrings.formatProceduralColonyName(themeBase, 0);
     }
 
     private String getRandomTheme(Species species) {

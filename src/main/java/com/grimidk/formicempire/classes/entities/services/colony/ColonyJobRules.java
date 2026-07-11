@@ -5,8 +5,14 @@ import java.util.List;
 
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.Season;
+import com.grimidk.formicempire.classes.constants.world.Temperature;
+import com.grimidk.formicempire.classes.constants.ant.AntRole;
+import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
 import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
+import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.DeathCause;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
@@ -18,6 +24,11 @@ public final class ColonyJobRules {
     private ColonyJobRules() {
     }
 
+    /** Lite sim uses automation quotas; only the player's active colony runs per-ant labour. */
+    private static int liteRoleCount(Colony colony, AntRole role) {
+        return colony.getAssignedRoleCount(role);
+    }
+
     public static void runHourlyLite(Colony colony, Biome biome) {
         applyHourlyProduction(colony);
         applyHourlyResearch(colony);
@@ -26,7 +37,7 @@ public final class ColonyJobRules {
         applyHourlyRanching(colony);
     }
 
-    public static void runDailyLite(Colony colony) {
+    public static void runDailyLite(Colony colony, Temperature currentTemp) {
         colony.rankUp();
         applyDailyNursing(colony);
         applyDailyEating(colony);
@@ -58,14 +69,6 @@ public final class ColonyJobRules {
             plantGain = 0;
         }
 
-        if (sources.getTotalQuantityAvailable(GameConstants.RESOURCE_WATER) <= 0) {
-            double passiveOnly = 0;
-            if (colony.hasBuilding(GameUnlocks.PASSIVE_WATER)) {
-                double dailyPct = colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1) ? 0.20 : 0.10;
-                passiveOnly = (stats.getWaterCapacity(colony) * dailyPct) / 24.0;
-            }
-            waterGain = probabilisticRound(passiveOnly);
-        }
         if (sources.getTotalQuantityAvailable(GameConstants.RESOURCE_MEAT) <= 0) {
             meatGain = 0;
         }
@@ -125,7 +128,7 @@ public final class ColonyJobRules {
     }
 
     public static void applyHourlyLaying(Colony colony) {
-        int layerCount = colony.getAssignedRoleCount(GameConstants.ROLE_LAYER);
+        int layerCount = liteRoleCount(colony, GameConstants.ROLE_LAYER);
         if (layerCount <= 0) {
             return;
         }
@@ -144,6 +147,36 @@ public final class ColonyJobRules {
             newEgg.setDimension(WorldSpaces.UNDERWORLD);
             newEgg.setPosition(new java.awt.Point(0, 0));
             eggs.add(newEgg);
+        }
+    }
+
+    public static void applyDailyNursing(Colony colony) {
+        int nurseCount = liteRoleCount(colony, GameConstants.ROLE_NURSE);
+        if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
+            nurseCount += 2;
+        } else if (colony.hasBuilding(GameUnlocks.PASSIVE_LAB)) {
+            nurseCount += 1;
+        }
+
+        float nursingRate = colony.getStatsService().getNursingRate(colony);
+        int capacity = (int) (nurseCount * nursingRate);
+
+        int totalBrood = colony.getEggs().size() + colony.getLarvae().size() + colony.getPupae().size();
+
+        if (totalBrood > capacity) {
+            int toCull = totalBrood - capacity;
+
+            int killedEggs = cullBrood(colony, colony.getEggs(), toCull);
+            toCull -= killedEggs;
+
+            if (toCull > 0) {
+                int killedLarvae = cullBrood(colony, colony.getLarvae(), toCull);
+                toCull -= killedLarvae;
+            }
+
+            if (toCull > 0) {
+                cullBrood(colony, colony.getPupae(), toCull);
+            }
         }
     }
 
@@ -180,43 +213,13 @@ public final class ColonyJobRules {
         }
     }
 
-    public static void applyDailyNursing(Colony colony) {
-        int nurseCount = colony.getAssignedRoleCount(GameConstants.ROLE_NURSE);
-        if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
-            nurseCount += 2;
-        } else if (colony.hasBuilding(GameUnlocks.PASSIVE_LAB)) {
-            nurseCount += 1;
-        }
-
-        float nursingRate = colony.getStatsService().getNursingRate(colony);
-        int capacity = (int) (nurseCount * nursingRate);
-
-        int totalBrood = colony.getEggs().size() + colony.getLarvae().size() + colony.getPupae().size();
-
-        if (totalBrood > capacity) {
-            int toCull = totalBrood - capacity;
-
-            int killedEggs = cullBrood(colony, colony.getEggs(), toCull);
-            toCull -= killedEggs;
-
-            if (toCull > 0) {
-                int killedLarvae = cullBrood(colony, colony.getLarvae(), toCull);
-                toCull -= killedLarvae;
-            }
-
-            if (toCull > 0) {
-                cullBrood(colony, colony.getPupae(), toCull);
-            }
-        }
-    }
-
     public static void applyDailyComposting(Colony colony) {
         if (!colony.hasBuilding(GameUnlocks.BUILDING_COMPOSTER)) {
             return;
         }
 
         List<Ant> deadAnts = colony.getDeadAnts();
-        int graverCount = colony.getAssignedRoleCount(GameConstants.ROLE_GRAVER);
+        int graverCount = liteRoleCount(colony, GameConstants.ROLE_GRAVER);
         int potentialCompost = (int) colony.getStatsService().getGravingRate(colony) * graverCount;
 
         if (potentialCompost == 0 || deadAnts.isEmpty()) {
@@ -234,7 +237,7 @@ public final class ColonyJobRules {
     }
 
     public static void applyDailyGraveKeeping(Colony colony) {
-        int graverCount = colony.getAssignedRoleCount(GameConstants.ROLE_GRAVER);
+        int graverCount = liteRoleCount(colony, GameConstants.ROLE_GRAVER);
 
         if (colony.hasBuilding(GameUnlocks.PASSIVE_GRAVE)) {
             if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
@@ -243,6 +246,7 @@ public final class ColonyJobRules {
                 graverCount += 1;
             }
         }
+        graverCount += colony.getBugHandlingService().getDermestidGraveBonus(colony);
 
         if (graverCount <= 0) {
             return;
@@ -277,7 +281,7 @@ public final class ColonyJobRules {
             return;
         }
 
-        int policeCount = colony.getAssignedRoleCount(GameConstants.ROLE_POLICE);
+        int policeCount = liteRoleCount(colony, GameConstants.ROLE_POLICE);
         if (policeCount == 0) {
             return;
         }
@@ -304,7 +308,12 @@ public final class ColonyJobRules {
         if (!colony.hasUpgrade(GameUnlocks.ROLE_RESEARCHER)) {
             return;
         }
-        int researcherCount = colony.getAssignedRoleCount(GameConstants.ROLE_RESEARCHER);
+        Dynasty dynasty = colony.getDynasty();
+        if (dynasty == null) {
+            return;
+        }
+
+        int researcherCount = liteRoleCount(colony, GameConstants.ROLE_RESEARCHER);
 
         if (colony.hasBuilding(GameUnlocks.PASSIVE_LAB)) {
             if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
@@ -314,13 +323,32 @@ public final class ColonyJobRules {
             }
         }
 
-        int assistantCount = colony.getAssignedRoleCount(GameConstants.ROLE_ASSISTANT);
+        int assistantCount = liteRoleCount(colony, GameConstants.ROLE_ASSISTANT);
+        if (researcherCount <= 0 && assistantCount <= 0) {
+            return;
+        }
+
         int speed = colony.getStatsService().getResearchSpeed(colony);
 
-        int queenGain = researcherCount * speed;
-        int assistantGain = (int) (assistantCount * (speed / 5.0));
+        if (dynasty.getCurrentAssimilation() != null) {
+            double power = (researcherCount * speed + assistantCount * (speed / 5.0)) / 10.0;
+            dynasty.addAssimilationProgress(power);
 
-        colony.addResearchPoints(queenGain + assistantGain);
+            if (dynasty.getAssimilationProgress() >= dynasty.getCurrentAssimilation().getCost()) {
+                Assimilation assimilation = dynasty.getCurrentAssimilation();
+                dynasty.unlockUpgrade(assimilation.getReward());
+                dynasty.completeAssimilation(assimilation);
+                colony.logEvent(ColonyLogPrefixes.SUCCESS + " "
+                        + String.format(LanguageStrings.get(LanguageStrings.LOG_SUCCESS_ASSIMILATION_FMT),
+                                assimilation.getName(), assimilation.getReward().getFlavorName()));
+                dynasty.setCurrentAssimilation(null);
+                dynasty.setAssimilationProgress(0);
+            }
+        } else {
+            int queenGain = researcherCount * speed;
+            int assistantGain = (int) (assistantCount * (speed / 5.0));
+            colony.addResearchPoints(queenGain + assistantGain);
+        }
     }
 
     public static void applyHourlyBuilding(Colony colony) {

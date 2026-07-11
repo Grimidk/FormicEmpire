@@ -13,31 +13,22 @@ import java.awt.event.WindowEvent;
 
 public class ConvoyDialog extends ZeroDialog {
 
-    private final Engine engine;
     private final ConvoyViewPanel convoyPanel;
-    private final Runnable refreshTask = this::liveUpdate;
 
     public ConvoyDialog(JFrame owner, Trade trade, Engine engine) {
         super(owner, LanguageStrings.DIALOG_CONVOY_TITLE, AssetStyles.DEFAULT_DIALOG_SIZE);
-        this.engine = engine;
 
         convoyPanel = new ConvoyViewPanel(trade, engine);
         add(convoyPanel, BorderLayout.CENTER);
 
-        if (engine != null) {
-            engine.addHourTickListener(refreshTask);
-        }
-
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
-                detachTickListener();
                 convoyPanel.stopAnimation();
             }
 
             @Override
             public void windowClosing(WindowEvent e) {
-                detachTickListener();
                 convoyPanel.stopAnimation();
             }
         });
@@ -68,7 +59,6 @@ public class ConvoyDialog extends ZeroDialog {
 
     @Override
     public void dispose() {
-        detachTickListener();
         convoyPanel.stopAnimation();
         super.dispose();
     }
@@ -76,11 +66,5 @@ public class ConvoyDialog extends ZeroDialog {
     @Override
     protected void refreshDialog() {
         convoyPanel.refreshScene();
-    }
-
-    private void detachTickListener() {
-        if (engine != null) {
-            engine.removeHourTickListener(refreshTask);
-        }
     }
 }

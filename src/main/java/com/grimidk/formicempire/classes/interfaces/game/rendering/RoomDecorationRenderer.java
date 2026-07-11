@@ -15,6 +15,10 @@ import java.util.List;
 
 import javax.swing.ImageIcon;
 
+/**
+ * Draws building upgrade sprites inside underworld room interiors.
+ * Currently unused — overlay disabled in {@code GameAreaPanel}; see roadmap (in-room sprites rework).
+ */
 public final class RoomDecorationRenderer {
 
     private RoomDecorationRenderer() {

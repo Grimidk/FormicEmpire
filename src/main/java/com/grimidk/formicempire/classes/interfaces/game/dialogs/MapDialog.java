@@ -859,7 +859,7 @@ public class MapDialog extends ZeroDialog {
                 }
 
                 if (hex != world.getActiveHex()) {
-                    float fade = AssetStyles.isDarkMode() ? 0.25f : 0.4f;
+                    float fade = AssetStyles.mapInactiveHexFade();
                     fillColor = AssetStyles.fadeTowardBackground(fillColor, fade);
                 }
 

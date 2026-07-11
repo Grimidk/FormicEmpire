@@ -13,7 +13,8 @@ public final class WarBattleScene {
 
     public static final int MAX_VISUAL_ANTS_PER_SIDE = 200;
 
-    public record Side(String dynastyName, Species species, Map<AntType, Integer> typeCounts, int deployedPower) {
+    public record Side(int dynastyId, String dynastyName, Species species, Map<AntType, Integer> typeCounts,
+            int deployedPower) {
         public Side {
             typeCounts = typeCounts == null
                     ? Map.of()

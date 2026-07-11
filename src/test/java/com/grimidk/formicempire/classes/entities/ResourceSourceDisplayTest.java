@@ -28,6 +28,19 @@ class ResourceSourceDisplayTest {
     }
 
     @Test
+    void lowQuantityUsesSourceSpriteNotUiIcon() {
+        ResourceSource source = new ResourceSource(
+                GameConstants.RESOURCE_PLANT,
+                50,
+                ResourceType.SOURCE_QTY_BIG,
+                10,
+                20);
+        assertEquals(
+                GameConstants.RESOURCE_PLANT.getSourceSpriteSmall(),
+                source.getIconForDisplay());
+    }
+
+    @Test
     void centerUsesInitialDisplaySize() {
         ResourceSource source = new ResourceSource(
                 GameConstants.RESOURCE_WATER,

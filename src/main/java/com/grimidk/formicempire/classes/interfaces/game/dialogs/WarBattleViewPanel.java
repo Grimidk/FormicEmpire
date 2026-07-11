@@ -278,13 +278,13 @@ public class WarBattleViewPanel extends JPanel {
             return List.of();
         }
 
-        Dynasty dynasty = resolveDynasty(side.dynastyName());
+        Dynasty dynasty = resolveDynasty(side.dynastyId());
         int visualCap = WarBattleScene.MAX_VISUAL_ANTS_PER_SIDE;
         int visualTotal = Math.min(total, visualCap);
         Map<AntType, Integer> allocated = allocateVisualCounts(side.typeCounts(), total, visualTotal);
 
         List<BattleAnt> ants = new ArrayList<>(visualTotal);
-        Random random = new Random(side.dynastyName().hashCode() ^ (attackerSide ? 17 : 31));
+        Random random = new Random(side.dynastyId() ^ (attackerSide ? 17 : 31));
         for (Map.Entry<AntType, Integer> entry : allocated.entrySet()) {
             AntType type = entry.getKey();
             if (type == null || type == GameConstants.TYPE_DEAD || type == GameConstants.TYPE_DRONE) {
@@ -305,16 +305,11 @@ public class WarBattleViewPanel extends JPanel {
         return ants;
     }
 
-    private Dynasty resolveDynasty(String dynastyName) {
-        if (dynastyName == null || dynastyName.isEmpty() || engine == null || engine.getWorld() == null) {
+    private Dynasty resolveDynasty(int dynastyId) {
+        if (dynastyId <= 0 || engine == null || engine.getWorld() == null) {
             return null;
         }
-        for (Dynasty dynasty : engine.getWorld().getDynastys()) {
-            if (dynasty != null && dynastyName.equals(dynasty.getName())) {
-                return dynasty;
-            }
-        }
-        return null;
+        return engine.getWorld().findDynastyById(dynastyId);
     }
 
     /** Largest-remainder allocation so on-screen mix matches deployed type counts. */

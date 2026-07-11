@@ -391,6 +391,13 @@ public class SpanishTranslation implements Translation {
         es.put("WAR_ORDINAL_4", "Cuarta");
         es.put("WAR_ORDINAL_5", "Quinta");
         es.put("WAR_ORDINAL_N_FMT", "%sª");
+        es.put("COLONY_NAME_DEFAULT_THEME", "Jugador");
+        es.put("COLONY_NAME_CAPITAL_FMT", "%s Prime");
+        es.put("COLONY_NAME_FIRST_SATELLITE_FMT", "Nueva %s");
+        es.put("COLONY_NAME_SECUNDUS_FMT", "%s Secundus");
+        es.put("COLONY_NAME_TERTIUS_FMT", "%s Tertius");
+        es.put("COLONY_NAME_QUARTUS_FMT", "%s Quartus");
+        es.put("COLONY_NAME_ORDINAL_N_FMT", "%s %s");
         es.put("WAR_WORLD_MONTH_FMT", "Año %s, Mes %s");
         es.put("WORLD_DATE_FMT", "%s/%s/%s");
         es.put("WAR_COL_NAME", "Guerra");
@@ -865,6 +872,11 @@ public class SpanishTranslation implements Translation {
         es.put("DIPLO_PACT_REQUEST_MSG_FMT", "%s solicita un pacto de no agresión. ¿Aceptar?");
         es.put("DIPLO_PACT_REQUEST_ACCEPT", "Aceptar");
         es.put("DIPLO_PACT_REQUEST_DECLINE", "Rechazar");
+        es.put("DIPLO_PACT_INCOMING_POLICY_SECTION", "Solicitudes de pacto entrantes");
+        es.put("DIPLO_PACT_INCOMING_POLICY_LABEL", "Cuando otra dinastía solicite un pacto de no agresión:");
+        es.put("DIPLO_PACT_INCOMING_MANUAL", "Preguntarme (ventana emergente)");
+        es.put("DIPLO_PACT_INCOMING_AUTO_ACCEPT", "Aceptar automáticamente");
+        es.put("DIPLO_PACT_INCOMING_AUTO_DECLINE", "Rechazar automáticamente");
         es.put("DIPLO_PACT_REQUEST_SENT_FMT", "Solicitud de pacto enviada a %s.");
         es.put("DIPLO_PACT_ACCEPTED_FMT", "%s aceptó el pacto de no agresión.");
         es.put("DIPLO_PACT_DECLINED_FMT", "%s rechazó el pacto de no agresión.");
@@ -886,6 +898,7 @@ public class SpanishTranslation implements Translation {
         es.put("DIPLO_ERROR_WAR_POPULATION_FMT", "Tu dinastía necesita al menos %s hormigas antes de declarar la guerra o configurar roles de economía de guerra.");
         es.put("DIPLO_ERROR_WAR_ACTIVE_MILITARY", "Asigna roles militares activos en la economía de guerra (Guerrera, Defensora, Milicia o Bruto) antes de declarar la guerra.");
         es.put("DIPLO_ERROR_WAR_TARGET_ACTIVE_MILITARY_FMT", "%s aún no puede ser atacada: no tiene roles militares activos.");
+        es.put("DIPLO_ERROR_WAR_NO_BORDER", "Solo se puede declarar la guerra a una dinastía vecina.");
         es.put("DIPLO_ACTION_TRADE", "Comerciar");
         es.put("DIPLO_ACTION_REQUEST_TRADE", "Solicitar comercio");
         es.put("DIPLO_ACTION_SEND_DIPLOMATS", "Enviar diplomáticas");
@@ -908,6 +921,13 @@ public class SpanishTranslation implements Translation {
         es.put("DIPLO_ERROR_INTEGRATION_PACT", "Requiere un pacto de no agresión con esta dinastía.");
         es.put("DIPLO_SEND_DIPLOMATS_TITLE", "Enviar diplomáticas");
         es.put("DIPLO_SEND_DIPLOMATS_PROMPT", "Envía hasta %s diplomática(s) (%s asignadas). Cada una mejora la estabilidad en %s.");
+        es.put("DIPLO_DIPLOMATS_CURRENT_FMT", "Asignadas: %s");
+        es.put("DIPLO_DIPLOMATS_AVAILABLE_FMT", "Disponibles: %s");
+        es.put("DIPLO_DIPLOMATS_LIMIT_FMT", "Límite: %s");
+        es.put("DIPLO_DIPLOMATS_TARGET_COUNT", "Asignar");
+        es.put("DIPLO_DIPLOMATS_EACH_FMT", "+%s c/u");
+        es.put("DIPLO_DIPLOMATS_BONUS_PREVIEW_FMT", "Bonificación: +%s (%s)");
+        es.put("DIPLO_SEND_DIPLOMATS_FOR_FMT", "Enviar diplomáticas — %s");
         es.put("DIPLO_SEND_DIPLOMATS_SUCCESS_DYNASTY", "Enviadas %s diplomática(s). Reputación con %s aumentó en %s.");
         es.put("DIPLO_SEND_DIPLOMATS_SUCCESS_COLONY", "Enviadas %s diplomática(s). Lealtad de %s aumentó en %s.");
         es.put("DIPLO_ERROR_NO_DIPLOMATS", "No hay princesas con rol Diplomática asignado en esta colonia.");
@@ -917,6 +937,7 @@ public class SpanishTranslation implements Translation {
         es.put("DIPLO_ERROR_GENETIC_EXCHANGE_BORDER", "Tu dinastía debe tener una colonia fronteriza con esta dinastía.");
         es.put("DIPLO_ERROR_GENETIC_EXCHANGE_REP", "Requiere reputación Cordial o superior.");
         es.put("DIPLO_ERROR_REPUTATION_STABLE", "No puedes enviar diplomáticas a dinastías con reputación Agresiva.");
+        es.put("DIPLO_ERROR_DIPLOMATS_AT_WAR", "No puedes enviar diplomáticas mientras estés en guerra con esta dinastía.");
         es.put("DIPLO_ERROR_LOYALTY_STABLE", "No puedes enviar diplomáticas a colonias con lealtad Rebelde.");
         es.put("DIPLO_ERROR_CORDIAL_REQUIRED", "Se requiere reputación cordial o mejor para formar un pacto.");
         es.put("DIPLO_ERROR_CORDIAL_REQUIRED_REQUEST", "Se requiere reputación neutral o mejor para solicitar comercio.");

@@ -112,25 +112,26 @@ class WarServiceTest {
     }
 
     @Test
-    void concludeWarSnapshotsDynastyNames() {
+    void concludeWarPreservesDynastyIds() {
         War war = world.getWarService().beginWar(player, neighbor);
         world.getWarService().concludeWar(war, player.getId(), LanguageStrings.WAR_CONCLUSION_PEACE_TREATY);
 
         War historic = world.getWarService().getHistoricWarsForDynasty(player.getId()).get(0);
-        assertEquals("Meat Dynasty", historic.getDynastyNameA());
-        assertEquals("Crystal Dynasty", historic.getDynastyNameB());
-        assertEquals("Meat Dynasty", historic.getWinnerDynastyName());
+        assertEquals(player.getId(), historic.getDynastyIdA());
+        assertEquals(neighbor.getId(), historic.getDynastyIdB());
+        assertEquals(player.getId(), historic.getWinnerDynastyId());
     }
 
     @Test
-    void resolveWinnerDisplayNameFallsBackToSnapshot() {
+    void resolveWinnerDisplayNameWhenDynastyRemovedShowsNone() {
         War war = world.getWarService().beginWar(player, neighbor);
         world.getWarService().concludeWar(war, neighbor.getId(), LanguageStrings.WAR_CONCLUSION_DEFEAT);
 
         War historic = world.getWarService().getHistoricWarsForDynasty(player.getId()).get(0);
         world.getDynastys().remove(neighbor);
 
-        assertEquals("Crystal Dynasty", world.getWarService().resolveWinnerDisplayName(historic, player));
+        assertEquals(LanguageStrings.get(LanguageStrings.WAR_WINNER_NONE),
+                world.getWarService().resolveWinnerDisplayName(historic, player));
     }
 
     @Test

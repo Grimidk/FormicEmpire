@@ -119,6 +119,8 @@ public class AssetStyles {
     public static Color BACKGROUND_SECONDARY = COLOR_VERY_LIGHT_GRAY;
     public static Color BACKGROUND_DARK = COLOR_LIGHTER_GRAY;
     public static Color BACKGROUND_LIGHT = COLOR_ABSOLUTE_WHITE;
+    /** Inactive world-map hex tint toward background (light ≈ 0.4, dark ≈ 0.25). */
+    public static float MAP_HEX_INACTIVE_FADE = 0.4f;
 
     public static Color FONT_COLOR = COLOR_ABSOLUTE_BLACK;
     public static Color FONT_COLOR_BRIGHT = COLOR_ABSOLUTE_BLACK;
@@ -217,6 +219,10 @@ public class AssetStyles {
 
     public static boolean isDarkMode() {
         return darkMode;
+    }
+
+    public static float mapInactiveHexFade() {
+        return MAP_HEX_INACTIVE_FADE;
     }
 
     public static void applyTheme(boolean dark) {

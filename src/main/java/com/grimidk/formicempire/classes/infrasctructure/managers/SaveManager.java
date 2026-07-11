@@ -124,13 +124,18 @@ public class SaveManager {
         writeManualSave(save);
     }
 
-    public void saveUserSlotAsync(Savefile save, Runnable onComplete) {
+    public void saveUserSlotAsync(Savefile save, Consumer<Boolean> onDone) {
         SHARED_EXECUTOR.submit(() -> {
+            boolean success = false;
             try {
                 writeManualSave(save);
-                if (onComplete != null) SwingUtilities.invokeLater(onComplete);
+                success = true;
             } catch (Exception e) {
                 e.printStackTrace();
+            }
+            if (onDone != null) {
+                boolean ok = success;
+                SwingUtilities.invokeLater(() -> onDone.accept(ok));
             }
         });
     }
@@ -360,6 +365,7 @@ public class SaveManager {
                     sc.name = dynasty.getName();
                 }
                 sc.isPlayer = dynasty.isPlayer();
+                sc.wildDynasty = dynasty.isWildDynasty();
                 sc.isDefeated = dynasty.isDefeated();
                 sc.rankName = dynasty.getRank() != null ? dynasty.getRank().getNameKey() : LanguageStrings.RANK_ANT;
                 sc.researchPoints = dynasty.getResearchPoints();
@@ -370,6 +376,8 @@ public class SaveManager {
                 sc.defaultAutoBuildEnabled = dynasty.isDefaultAutoBuildEnabled();
                 sc.autoDiplomacyEnabled = dynasty.isAutoDiplomacyEnabled();
                 sc.defaultAutoTunnelsEnabled = dynasty.isDefaultAutoTunnelsEnabled();
+                sc.pactRequestIncomingPolicy = dynasty.getPactRequestIncomingPolicy().name();
+                sc.lastIncomingPactRequestWorldDay = dynasty.getLastIncomingPactRequestWorldDay();
                 sc.diplomatSupportToDynasty = new HashMap<>();
                 for (Map.Entry<Integer, Integer> entry : dynasty.copyDiplomatSupportToDynasty().entrySet()) {
                     sc.diplomatSupportToDynasty.put(String.valueOf(entry.getKey()), entry.getValue());
@@ -713,6 +721,7 @@ public class SaveManager {
         writeJsonLine(w, "name", sc.name != null ? sc.name : "", false);
         writeJsonLine(w, "titleKey", sc.titleKey != null ? sc.titleKey : LanguageStrings.DYNASTY_TITLE_DYNASTY, false);
         writeJsonLine(w, "isPlayer", sc.isPlayer, false);
+        writeJsonLine(w, "wildDynasty", sc.wildDynasty, false);
         writeJsonLine(w, "isDefeated", sc.isDefeated, false);
         writeJsonLine(w, "rank", sc.rankName, false);
         writeJsonLine(w, "speciesId", sc.speciesId, false);
@@ -723,6 +732,8 @@ public class SaveManager {
         writeJsonLine(w, "defaultAutoBuildEnabled", sc.defaultAutoBuildEnabled, false);
         writeJsonLine(w, "autoDiplomacyEnabled", sc.autoDiplomacyEnabled, false);
         writeJsonLine(w, "defaultAutoTunnelsEnabled", sc.defaultAutoTunnelsEnabled, false);
+        writeJsonLine(w, "pactRequestIncomingPolicy", sc.pactRequestIncomingPolicy, false);
+        writeJsonLine(w, "lastIncomingPactRequestWorldDay", sc.lastIncomingPactRequestWorldDay, false);
         writeJsonLine(w, "currentAssimilationId", sc.currentAssimilationId, false);
         writeJsonLine(w, "assimilationProgress", sc.assimilationProgress, false);
         writeJsonLine(w, "capitalColonyId", sc.capitalColonyId, false);
@@ -972,14 +983,15 @@ public class SaveManager {
         sc.id = Integer.parseInt(map.getOrDefault("id", "0"));
         sc.themeBase = map.getOrDefault("themeBase", "");
         sc.titleId = Integer.parseInt(map.getOrDefault("titleId", "0"));
-        sc.name = map.getOrDefault("name", "Dynasty");
+        sc.name = map.getOrDefault("name", "");
         sc.titleKey = map.getOrDefault("titleKey", LanguageStrings.DYNASTY_TITLE_DYNASTY);
         if (sc.titleId <= 0) {
             sc.titleId = GameConstants.getDynastyTitleByKey(sc.titleKey).getId();
         }
         sc.isPlayer = Boolean.parseBoolean(map.getOrDefault("isPlayer", "false"));
+        sc.wildDynasty = Boolean.parseBoolean(map.getOrDefault("wildDynasty", "false"));
         sc.isDefeated = Boolean.parseBoolean(map.getOrDefault("isDefeated", "false"));
-        sc.rankName = map.getOrDefault("rank", "Ant");
+        sc.rankName = map.getOrDefault("rank", LanguageStrings.RANK_ANT);
         sc.speciesId = Integer.parseInt(map.getOrDefault("speciesId", "1"));
         sc.researchPoints = Integer.parseInt(map.getOrDefault("researchPoints", "0"));
         sc.totalNuptialFlights = Integer.parseInt(map.getOrDefault("totalNuptialFlights", "0"));
@@ -988,6 +1000,9 @@ public class SaveManager {
         sc.defaultAutoBuildEnabled = Boolean.parseBoolean(map.getOrDefault("defaultAutoBuildEnabled", "false"));
         sc.autoDiplomacyEnabled = Boolean.parseBoolean(map.getOrDefault("autoDiplomacyEnabled", "false"));
         sc.defaultAutoTunnelsEnabled = Boolean.parseBoolean(map.getOrDefault("defaultAutoTunnelsEnabled", "false"));
+        sc.pactRequestIncomingPolicy = map.getOrDefault("pactRequestIncomingPolicy", "MANUAL");
+        sc.lastIncomingPactRequestWorldDay = Integer.parseInt(
+                map.getOrDefault("lastIncomingPactRequestWorldDay", "-1"));
         sc.currentAssimilationId = Integer.parseInt(map.getOrDefault("currentAssimilationId", "-1"));
         sc.assimilationProgress = Double.parseDouble(map.getOrDefault("assimilationProgress", "0.0"));
         sc.capitalColonyId = Integer.parseInt(map.getOrDefault("capitalColonyId", "-1"));
@@ -1067,8 +1082,8 @@ public class SaveManager {
         
         sc.id = Integer.parseInt(map.getOrDefault("id", "0"));
         sc.dynastyId = Integer.parseInt(map.getOrDefault("dynastyId", "0"));
-        sc.name = map.getOrDefault("name", "Colony");
-        sc.rankName = map.getOrDefault("rank", "Colony");
+        sc.name = map.getOrDefault("name", "");
+        sc.rankName = map.getOrDefault("rank", LanguageStrings.RANK_COLONY);
         sc.isPlayer = Boolean.parseBoolean(map.getOrDefault("isPlayer", "false"));
         sc.isCapital = Boolean.parseBoolean(map.getOrDefault("isCapital", "false"));
         sc.isAutomated = Boolean.parseBoolean(map.getOrDefault("isAutomated", "false"));
@@ -1980,12 +1995,6 @@ public class SaveManager {
                     war.capturedColonyIds != null ? war.capturedColonyIds : "")).append("\",");
             sb.append("\"capturedByDynastyIds\":\"").append(escapeJsonString(
                     war.capturedByDynastyIds != null ? war.capturedByDynastyIds : "")).append("\",");
-            sb.append("\"dynastyNameA\":\"").append(escapeJsonString(
-                    war.dynastyNameA != null ? war.dynastyNameA : "")).append("\",");
-            sb.append("\"dynastyNameB\":\"").append(escapeJsonString(
-                    war.dynastyNameB != null ? war.dynastyNameB : "")).append("\",");
-            sb.append("\"winnerDynastyName\":\"").append(escapeJsonString(
-                    war.winnerDynastyName != null ? war.winnerDynastyName : "")).append("\",");
             sb.append("\"rebellionWar\":").append(war.rebellionWar);
             sb.append("}");
             if (i < wars.size() - 1) {

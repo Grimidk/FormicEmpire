@@ -272,7 +272,9 @@ public class ColonyStatsService {
     }
     
     public int getEffectiveFarmerCount(Colony colony) {
-        int count = colony.getAssignedRoleCount(GameConstants.ROLE_FARMER);
+        int count = colony.runsFullSimulation()
+                ? colony.getActiveRoleCount(GameConstants.ROLE_FARMER)
+                : colony.getAssignedRoleCount(GameConstants.ROLE_FARMER);
         if (colony.hasBuilding(GameUnlocks.PASSIVE_FARM)) {
             if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) count += 2;
             else count += 1;

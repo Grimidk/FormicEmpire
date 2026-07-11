@@ -24,7 +24,7 @@ class ColonyNpcSimulationTest {
     }
 
     @Test
-    void focusedNpcColonyDailyJobsUseLiteStarvationNotPerAntMassacre() {
+    void focusedNpcColonyDailyJobsUseLiteEatingNotPerAntMassacre() {
         Colony npc = new Colony(3, "NPC", false);
         npc.setAge(10);
         npc.setActive(true);
@@ -44,8 +44,7 @@ class ColonyNpcSimulationTest {
         int workersAfter = npc.getWorkers().size();
         int deaths = workersBefore - workersAfter;
 
-        // Lite path caps worker starvation at deficit/5 (~10 here) plus some dehydration.
-        // Full runEating would wipe out most of the colony on zero food.
-        assertTrue(deaths < workersBefore / 2, "expected lite starvation, got " + deaths + " deaths");
+        assertTrue(deaths < workersBefore / 2,
+                "lite eating should not wipe the colony on zero food/water, got " + deaths + " deaths");
     }
 }

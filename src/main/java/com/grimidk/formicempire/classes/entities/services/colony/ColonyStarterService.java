@@ -26,10 +26,16 @@ public class ColonyStarterService {
     public static ColonyStarterService shared() {
         return SHARED;
     }
-    
-    private String colonyStarterBaseName(String dynastyName) {
-        String base = LanguageStrings.dynastyThemeBase(dynastyName);
-        return base.isEmpty() ? "Player" : base;
+
+    private static String colonyThemeBase(Dynasty dynasty) {
+        if (dynasty == null) {
+            return LanguageStrings.get(LanguageStrings.COLONY_NAME_DEFAULT_THEME);
+        }
+        String base = dynasty.getThemeBase();
+        if (base == null || base.isEmpty()) {
+            base = LanguageStrings.dynastyThemeBase(dynasty.getName(), dynasty.getTitleKey());
+        }
+        return base.isEmpty() ? LanguageStrings.get(LanguageStrings.COLONY_NAME_DEFAULT_THEME) : base;
     }
 
     public void initializeNewColony(Colony colony) {
@@ -38,20 +44,12 @@ public class ColonyStarterService {
         if (colony.getDynasty() != null) {
             Dynasty d = colony.getDynasty();
             
-            String baseName = colonyStarterBaseName(d.getName());
-            
             int index = d.getColonies().indexOf(colony);
-            if (index == -1) index = d.getColonies().size(); 
+            if (index == -1) {
+                index = d.getColonies().size();
+            }
             
-            String newName;
-            if (index == 0) newName = baseName + " Prime";
-            else if (index == 1) newName = "New " + baseName;
-            else if (index == 2) newName = baseName + " Secundus";
-            else if (index == 3) newName = baseName + " Tertius";
-            else if (index == 4) newName = baseName + " Quartus";
-            else newName = baseName + " " + (index + 1);
-            
-            colony.setName(newName);
+            colony.setName(LanguageStrings.formatProceduralColonyName(colonyThemeBase(d), index));
             
             boolean isFirst = (index == 0);
             if (isFirst) {

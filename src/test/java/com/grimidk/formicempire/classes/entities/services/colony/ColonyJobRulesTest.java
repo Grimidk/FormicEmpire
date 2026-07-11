@@ -10,10 +10,9 @@ import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 
-class ColonySummarizationServiceTest {
+class ColonyJobRulesTest {
 
     private Colony colony;
-    private ColonySummarizationService summarizationService;
 
     @BeforeEach
     void setUp() {
@@ -23,19 +22,18 @@ class ColonySummarizationServiceTest {
         colony.setActive(false);
         colony.unlockUpgrade(GameUnlocks.ROLE_FORAGER);
         colony.setAssignedRoleCount(GameConstants.ROLE_FORAGER, 5);
-        summarizationService = colony.getSummarizationService();
     }
 
     @Test
     void hourlyLiteCanRunWithoutException() {
-        summarizationService.runHourlyLite(colony, GameConstants.BIOME_PLAINS);
+        ColonyJobRules.runHourlyLite(colony, GameConstants.BIOME_PLAINS);
         assertTrue(colony.getAge() >= 0);
     }
 
     @Test
     void dailyLiteCanRunWithoutException() {
         colony.setAge(7);
-        summarizationService.runDailyLite(colony);
+        ColonyJobRules.runDailyLite(colony, GameConstants.TEMP_WARM);
         assertTrue(colony.getRank() != null);
     }
 }

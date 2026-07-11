@@ -42,6 +42,15 @@ import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 public class World {
 
     private static final DynastyDeathService DYNASTY_DEATH_SERVICE = new DynastyDeathService();
+    private static final List<Weather> STANDARD_RANDOM_WEATHERS = buildStandardRandomWeathers();
+
+    private static List<Weather> buildStandardRandomWeathers() {
+        List<Weather> weathers = new ArrayList<>(GameConstants.getWeathers());
+        weathers.remove(GameConstants.WEATHER_SAND_STORM);
+        weathers.remove(GameConstants.WEATHER_PYROCLASTIC_FOG);
+        weathers.remove(GameConstants.WEATHER_ACID_RAIN);
+        return Collections.unmodifiableList(weathers);
+    }
 
     private int minute;
     private int hour;
@@ -348,7 +357,7 @@ public class World {
         playerDynasty.setThemeBase(baseName);
         playerDynasty.getStarterService().initializeDynasty(playerDynasty);
         
-        String capName = namingService.generateCapitalName(dynName);
+        String capName = namingService.generateCapitalName(baseName);
         startColony.setName(capName);
         
         playerDynasty.addColony(startColony);
@@ -398,11 +407,13 @@ public class World {
             DynastyTitle npcTitle = namingService.pickRandomTitle();
             String npcDynName = namingService.generateDynastyName(npcSpecies, npcTitle);
             Dynasty npcDynasty = new Dynasty(dynastyId, npcDynName, npcTitle.getNameKey(), false, npcSpecies);
+            String npcTheme = LanguageStrings.dynastyThemeBase(npcDynName, npcTitle.getNameKey());
+            npcDynasty.setThemeBase(npcTheme);
             npcDynasty.getStarterService().initializeDynasty(npcDynasty);
             this.dynastys.add(npcDynasty);
 
             int colId = this.colonyIdCounter++;
-            String npcCapName = namingService.generateCapitalName(npcDynName);
+            String npcCapName = namingService.generateCapitalName(npcTheme);
             Colony aiColony = new Colony(colId, npcCapName, false);
             npcDynasty.addColony(aiColony);
 
@@ -556,12 +567,6 @@ public class World {
     }
     
     private Weather getRandomWeather(Biome biome) {
-        List<Weather> weathers = new ArrayList<>(GameConstants.getWeathers());
-        
-        weathers.remove(GameConstants.WEATHER_SAND_STORM);
-        weathers.remove(GameConstants.WEATHER_PYROCLASTIC_FOG);
-        weathers.remove(GameConstants.WEATHER_ACID_RAIN);
-        
         if (biome != null) {
             if (biome == GameConstants.BIOME_DESERT && GameRandom.nextInt(100) < 20) {
                 return GameConstants.WEATHER_SAND_STORM;
@@ -573,8 +578,8 @@ public class World {
                 return GameConstants.WEATHER_ACID_RAIN;
             }
         }
-        
-        return weathers.get(GameRandom.nextInt(weathers.size()));
+
+        return STANDARD_RANDOM_WEATHERS.get(GameRandom.nextInt(STANDARD_RANDOM_WEATHERS.size()));
     }
 
     public void startWorld(Biome biome, Colony colony, String baseName) {
@@ -667,6 +672,9 @@ public class World {
                             c.isPlayer(),
                             GameConstants.SPECIES_OMNI);
                     adHocDynasty.getStarterService().initializeDynasty(adHocDynasty);
+                    if (!c.isPlayer()) {
+                        adHocDynasty.setWildDynasty(true);
+                    }
                     adHocDynasty.addColony(c);
                     this.dynastys.add(adHocDynasty);
                     loadedDynastys.put(newDynastyId, adHocDynasty);
@@ -715,8 +723,7 @@ public class World {
             }
              
             if (colony == null) {
-                String playerDynName = LanguageStrings.formatDynastyName(baseName, playerTitleKey);
-                String playerCapName = namingService.generateCapitalName(playerDynName);
+                String playerCapName = namingService.generateCapitalName(baseName);
                 colony = new Colony(1, playerCapName, true);
             }
              

@@ -1,6 +1,5 @@
 package com.grimidk.formicempire.classes.entities.services.dynasty;
 
-import com.grimidk.formicempire.classes.entities.services.colony.ColonyAutomationService;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,6 +16,7 @@ import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.DiplomaticReputation;
 import com.grimidk.formicempire.classes.constants.misc.DiplomaticReputationModifier;
+import com.grimidk.formicempire.classes.constants.misc.PactRequestIncomingPolicy;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.misc.TradeMethod;
 import com.grimidk.formicempire.classes.entities.Colony;
@@ -63,10 +63,9 @@ public class DynastyDiplomacyService {
         if (existing > 0) {
             return existing;
         }
-        ColonyAutomationService automation = new ColonyAutomationService();
         int preview = 0;
         for (Colony colony : dynasty.getColonies()) {
-            preview += sumActiveMilitaryRoleCounts(automation.calculateWarEconomyQuotas(colony));
+            preview += sumActiveMilitaryRoleCounts(colony.getAutomationService().calculateWarEconomyQuotas(colony));
         }
         return preview;
     }
@@ -175,7 +174,7 @@ public class DynastyDiplomacyService {
         }
 
         if (other.isPlayer()) {
-            other.addPendingPactRequest(dynasty.getId());
+            other.getDiplomacyService().handleIncomingPactRequest(dynasty, world);
             return;
         }
 
@@ -193,6 +192,38 @@ public class DynastyDiplomacyService {
         }
         removePendingPactRequestIfAny(requester);
         requester.getDiplomacyService().formNonAggressionPact(dynasty, world);
+    }
+
+    public boolean canAcceptIncomingPactRequest(Dynasty requester, World world) {
+        if (requester == null || requester == dynasty || world == null) {
+            return false;
+        }
+        if (dynasty.isPactRequestPromptOpen()) {
+            return false;
+        }
+        if (!dynasty.copyPendingPactRequestFromIds().isEmpty()) {
+            return false;
+        }
+        int today = DynastyIntegrationService.worldDayIndex(world);
+        if (dynasty.getLastIncomingPactRequestWorldDay() == today) {
+            return false;
+        }
+        return !dynasty.hasPendingPactRequestFrom(requester.getId());
+    }
+
+    public void handleIncomingPactRequest(Dynasty requester, World world) {
+        if (!canAcceptIncomingPactRequest(requester, world)) {
+            return;
+        }
+        dynasty.setLastIncomingPactRequestWorldDay(DynastyIntegrationService.worldDayIndex(world));
+        PactRequestIncomingPolicy policy = dynasty.getPactRequestIncomingPolicy();
+        if (policy == PactRequestIncomingPolicy.AUTO_ACCEPT) {
+            acceptNonAggressionPact(requester, world);
+        } else if (policy == PactRequestIncomingPolicy.AUTO_DECLINE) {
+            declineNonAggressionPact(requester, world);
+        } else {
+            dynasty.addPendingPactRequest(requester.getId());
+        }
     }
 
     public void declineNonAggressionPact(Dynasty requester, World world) {
@@ -1108,6 +1139,10 @@ public class DynastyDiplomacyService {
         return GameConstants.DIPLOMAT_MAX_PER_COLONY_MISSION;
     }
 
+    public int getMaxDiplomatsPerTarget() {
+        return GameConstants.DIPLOMAT_MAX_PER_DYNASTY_MISSION;
+    }
+
     public int getDiplomatStabilityGainPerAnt() {
         if (dynasty.hasUpgrade(GameUnlocks.ABILITY_DIPLOMAT_PRESSURE_3)) {
             return GameConstants.DIPLOMAT_STABILITY_GAIN_PRESSURE_3;
@@ -1372,6 +1407,218 @@ public class DynastyDiplomacyService {
         deployDynastyMission(from, other, toSend);
         dynasty.recordDiplomatsSent(toSend);
         return toSend;
+    }
+
+    public boolean hasAnyDiplomatRoleColony() {
+        for (Colony colony : dynasty.getColonies()) {
+            if (colonyHasDiplomatRole(colony)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public int countDynastyWideAvailableDiplomats() {
+        int total = 0;
+        for (Colony colony : dynasty.getColonies()) {
+            total += countAvailableDiplomats(colony);
+        }
+        return total;
+    }
+
+    public int countDynastyMissionDiplomatsToward(Dynasty other) {
+        if (other == null) {
+            return 0;
+        }
+        int deployed = 0;
+        for (Colony colony : dynasty.getColonies()) {
+            deployed += colony.getOutgoingDynastyDiplomatMissions().getOrDefault(other.getId(), 0);
+        }
+        return deployed;
+    }
+
+    public int countColonyMissionDiplomatsOn(Colony target) {
+        if (target == null) {
+            return 0;
+        }
+        return target.getIncomingColonyDiplomatSupport().values().stream().mapToInt(Integer::intValue).sum();
+    }
+
+    public int computeMaxDynastyMissionDiplomatsToward(Dynasty other) {
+        if (other == null) {
+            return 0;
+        }
+        int total = 0;
+        for (Colony colony : dynasty.getColonies()) {
+            total += maxDynastyMissionFromColony(colony, other.getId());
+        }
+        return Math.min(getMaxDiplomatsPerTarget(), total);
+    }
+
+    public int computeMaxColonyMissionDiplomatsOn(Colony target) {
+        if (target == null) {
+            return 0;
+        }
+        int total = 0;
+        for (Colony colony : dynasty.getColonies()) {
+            if (colony == target) {
+                continue;
+            }
+            total += maxColonyMissionFromColony(colony, target.getId());
+        }
+        return Math.min(getMaxDiplomatsPerTarget(), total);
+    }
+
+    public boolean canManageDynastyMissionDiplomats(Dynasty other, World world) {
+        if (other == null || other == dynasty || world == null || isAtWarWith(other)) {
+            return false;
+        }
+        if (!hasAnyDiplomatRoleColony()) {
+            return false;
+        }
+        if (countDynastyMissionDiplomatsToward(other) > 0) {
+            return true;
+        }
+        return countDynastyWideAvailableDiplomats() > 0 && needsDiplomatMissionToDynasty(other, world);
+    }
+
+    public boolean canManageColonyMissionDiplomats(Colony target, TradeManager tradeManager, World world) {
+        if (target == null || target.getDynasty() != dynasty) {
+            return false;
+        }
+        if (!hasAnyDiplomatRoleColony()) {
+            return false;
+        }
+        if (countColonyMissionDiplomatsOn(target) > 0) {
+            return true;
+        }
+        return countDynastyWideAvailableDiplomats() > 0
+                && needsDiplomatMissionToColony(target, tradeManager, world);
+    }
+
+    public void assignDynastyMissionDiplomats(Dynasty other, int targetTotal, World world) {
+        if (other == null || other == dynasty || world == null) {
+            return;
+        }
+        int before = countDynastyMissionDiplomatsToward(other);
+        int capped = Math.max(0, Math.min(targetTotal, getMaxDiplomatsPerTarget()));
+        capped = Math.min(capped, computeMaxDynastyMissionDiplomatsToward(other));
+        clearDynastyMissionToward(other.getId());
+        int remaining = capped;
+        List<Colony> sources = listDiplomatDeploySources(null);
+        sources.sort(Comparator.comparingInt((Colony c) -> maxDynastyMissionFromColony(c, other.getId())).reversed());
+        for (Colony colony : sources) {
+            if (remaining <= 0) {
+                break;
+            }
+            int deploy = Math.min(remaining, maxDynastyMissionFromColony(colony, other.getId()));
+            if (deploy > 0) {
+                deployDynastyMission(colony, other, deploy);
+                remaining -= deploy;
+            }
+        }
+        int after = countDynastyMissionDiplomatsToward(other);
+        if (after > before) {
+            dynasty.recordDiplomatsSent(after - before);
+        }
+    }
+
+    public void assignColonyMissionDiplomats(Colony target, int targetTotal, TradeManager tradeManager, World world) {
+        if (target == null || target.getDynasty() != dynasty) {
+            return;
+        }
+        int before = countColonyMissionDiplomatsOn(target);
+        int capped = Math.max(0, Math.min(targetTotal, getMaxDiplomatsPerTarget()));
+        capped = Math.min(capped, computeMaxColonyMissionDiplomatsOn(target));
+        clearColonyMissionTo(target.getId());
+        int remaining = capped;
+        List<Colony> sources = listDiplomatDeploySources(target);
+        sources.sort(Comparator.comparingInt((Colony c) -> maxColonyMissionFromColony(c, target.getId())).reversed());
+        for (Colony colony : sources) {
+            if (remaining <= 0) {
+                break;
+            }
+            int deploy = Math.min(remaining, maxColonyMissionFromColony(colony, target.getId()));
+            if (deploy > 0) {
+                deployColonyMission(colony, target, deploy);
+                remaining -= deploy;
+            }
+        }
+        int after = countColonyMissionDiplomatsOn(target);
+        if (after > before) {
+            dynasty.recordDiplomatsSent(after - before);
+        }
+    }
+
+    private int maxDynastyMissionFromColony(Colony colony, int targetDynastyId) {
+        if (!colonyHasDiplomatRole(colony)) {
+            return 0;
+        }
+        int assigned = colony.getAssignedRoleCount(GameConstants.ROLE_DIPLOMAT);
+        int integration = colony.getIntegrationDiplomatsDeployed();
+        int otherMissionTotal = missionDeployedExcludingDynastyTarget(colony, targetDynastyId);
+        return Math.min(getMaxDiplomatsForDynastyMission(),
+                Math.max(0, assigned - integration - otherMissionTotal));
+    }
+
+    private int maxColonyMissionFromColony(Colony colony, int targetColonyId) {
+        if (colony == null || colony.getId() == targetColonyId || !colonyHasDiplomatRole(colony)) {
+            return 0;
+        }
+        int assigned = colony.getAssignedRoleCount(GameConstants.ROLE_DIPLOMAT);
+        int integration = colony.getIntegrationDiplomatsDeployed();
+        int otherMissionTotal = missionDeployedExcludingColonyTarget(colony, targetColonyId);
+        return Math.min(getMaxDiplomatsForColonyMission(),
+                Math.max(0, assigned - integration - otherMissionTotal));
+    }
+
+    private int missionDeployedExcludingDynastyTarget(Colony colony, int targetDynastyId) {
+        int total = colony.getOutgoingColonyDiplomatMissions().values().stream().mapToInt(Integer::intValue).sum();
+        for (Map.Entry<Integer, Integer> entry : colony.getOutgoingDynastyDiplomatMissions().entrySet()) {
+            if (entry.getKey() != targetDynastyId) {
+                total += entry.getValue();
+            }
+        }
+        return total;
+    }
+
+    private int missionDeployedExcludingColonyTarget(Colony colony, int targetColonyId) {
+        int total = colony.getOutgoingDynastyDiplomatMissions().values().stream().mapToInt(Integer::intValue).sum();
+        for (Map.Entry<Integer, Integer> entry : colony.getOutgoingColonyDiplomatMissions().entrySet()) {
+            if (entry.getKey() != targetColonyId) {
+                total += entry.getValue();
+            }
+        }
+        return total;
+    }
+
+    private void clearDynastyMissionToward(int targetDynastyId) {
+        for (Colony colony : dynasty.getColonies()) {
+            int deployed = colony.getOutgoingDynastyDiplomatMissions().getOrDefault(targetDynastyId, 0);
+            if (deployed > 0) {
+                undeployDynastyMission(colony, targetDynastyId, deployed);
+            }
+        }
+    }
+
+    private void clearColonyMissionTo(int targetColonyId) {
+        for (Colony colony : dynasty.getColonies()) {
+            int deployed = colony.getOutgoingColonyDiplomatMissions().getOrDefault(targetColonyId, 0);
+            if (deployed > 0) {
+                undeployColonyMission(colony, targetColonyId, deployed);
+            }
+        }
+    }
+
+    private List<Colony> listDiplomatDeploySources(Colony exclude) {
+        List<Colony> sources = new ArrayList<>();
+        for (Colony colony : dynasty.getColonies()) {
+            if (colony != exclude && colonyHasDiplomatRole(colony)) {
+                sources.add(colony);
+            }
+        }
+        sources.sort(Comparator.comparingInt(this::countAvailableDiplomats).reversed());
+        return sources;
     }
 
     public void validateAllDiplomatDeployments(World world) {

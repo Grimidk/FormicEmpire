@@ -234,8 +234,7 @@ public final class LanguageStrings {
     }
 
     public static String expectedCapitalColonyName(String dynastyName) {
-        String base = dynastyThemeBase(dynastyName);
-        return base.isEmpty() ? "Colony Prime" : base + " Prime";
+        return formatProceduralColonyName(dynastyThemeBase(dynastyName), 0);
     }
 
     public static String getWarOrdinal(int ordinal) {
@@ -249,6 +248,21 @@ public final class LanguageStrings {
             case 4 -> get(WAR_ORDINAL_4);
             case 5 -> get(WAR_ORDINAL_5);
             default -> format(WAR_ORDINAL_N_FMT, ordinal);
+        };
+    }
+
+    /** Procedural colony label from dynasty theme base and 0-based founding index (display only). */
+    public static String formatProceduralColonyName(String themeBase, int colonyIndex) {
+        String base = themeBase != null && !themeBase.trim().isEmpty()
+                ? themeBase.trim()
+                : get(COLONY_NAME_DEFAULT_THEME);
+        return switch (colonyIndex) {
+            case 0 -> format(COLONY_NAME_CAPITAL_FMT, base);
+            case 1 -> format(COLONY_NAME_FIRST_SATELLITE_FMT, base);
+            case 2 -> format(COLONY_NAME_SECUNDUS_FMT, base);
+            case 3 -> format(COLONY_NAME_TERTIUS_FMT, base);
+            case 4 -> format(COLONY_NAME_QUARTUS_FMT, base);
+            default -> format(COLONY_NAME_ORDINAL_N_FMT, base, colonyIndex + 1);
         };
     }
 
@@ -662,6 +676,13 @@ public final class LanguageStrings {
     public static final String WAR_ORDINAL_4 = "WAR_ORDINAL_4";
     public static final String WAR_ORDINAL_5 = "WAR_ORDINAL_5";
     public static final String WAR_ORDINAL_N_FMT = "WAR_ORDINAL_N_FMT";
+    public static final String COLONY_NAME_DEFAULT_THEME = "COLONY_NAME_DEFAULT_THEME";
+    public static final String COLONY_NAME_CAPITAL_FMT = "COLONY_NAME_CAPITAL_FMT";
+    public static final String COLONY_NAME_FIRST_SATELLITE_FMT = "COLONY_NAME_FIRST_SATELLITE_FMT";
+    public static final String COLONY_NAME_SECUNDUS_FMT = "COLONY_NAME_SECUNDUS_FMT";
+    public static final String COLONY_NAME_TERTIUS_FMT = "COLONY_NAME_TERTIUS_FMT";
+    public static final String COLONY_NAME_QUARTUS_FMT = "COLONY_NAME_QUARTUS_FMT";
+    public static final String COLONY_NAME_ORDINAL_N_FMT = "COLONY_NAME_ORDINAL_N_FMT";
     public static final String WAR_WORLD_MONTH_FMT = "WAR_WORLD_MONTH_FMT";
     public static final String WORLD_DATE_FMT = "WORLD_DATE_FMT";
     public static final String WAR_COL_NAME = "WAR_COL_NAME";
@@ -1274,6 +1295,11 @@ public final class LanguageStrings {
     public static final String DIPLO_PACT_REQUEST_MSG_FMT = "DIPLO_PACT_REQUEST_MSG_FMT";
     public static final String DIPLO_PACT_REQUEST_ACCEPT = "DIPLO_PACT_REQUEST_ACCEPT";
     public static final String DIPLO_PACT_REQUEST_DECLINE = "DIPLO_PACT_REQUEST_DECLINE";
+    public static final String DIPLO_PACT_INCOMING_POLICY_SECTION = "DIPLO_PACT_INCOMING_POLICY_SECTION";
+    public static final String DIPLO_PACT_INCOMING_POLICY_LABEL = "DIPLO_PACT_INCOMING_POLICY_LABEL";
+    public static final String DIPLO_PACT_INCOMING_MANUAL = "DIPLO_PACT_INCOMING_MANUAL";
+    public static final String DIPLO_PACT_INCOMING_AUTO_ACCEPT = "DIPLO_PACT_INCOMING_AUTO_ACCEPT";
+    public static final String DIPLO_PACT_INCOMING_AUTO_DECLINE = "DIPLO_PACT_INCOMING_AUTO_DECLINE";
     public static final String DIPLO_PACT_REQUEST_SENT_FMT = "DIPLO_PACT_REQUEST_SENT_FMT";
     public static final String DIPLO_PACT_ACCEPTED_FMT = "DIPLO_PACT_ACCEPTED_FMT";
     public static final String DIPLO_PACT_DECLINED_FMT = "DIPLO_PACT_DECLINED_FMT";
@@ -1295,6 +1321,7 @@ public final class LanguageStrings {
     public static final String DIPLO_ERROR_WAR_POPULATION_FMT = "DIPLO_ERROR_WAR_POPULATION_FMT";
     public static final String DIPLO_ERROR_WAR_ACTIVE_MILITARY = "DIPLO_ERROR_WAR_ACTIVE_MILITARY";
     public static final String DIPLO_ERROR_WAR_TARGET_ACTIVE_MILITARY_FMT = "DIPLO_ERROR_WAR_TARGET_ACTIVE_MILITARY_FMT";
+    public static final String DIPLO_ERROR_WAR_NO_BORDER = "DIPLO_ERROR_WAR_NO_BORDER";
     public static final String DIPLO_ACTION_TRADE = "DIPLO_ACTION_TRADE";
     public static final String DIPLO_ACTION_REQUEST_TRADE = "DIPLO_ACTION_REQUEST_TRADE";
     public static final String DIPLO_ACTION_SEND_DIPLOMATS = "DIPLO_ACTION_SEND_DIPLOMATS";
@@ -1321,6 +1348,13 @@ public final class LanguageStrings {
     public static final String LOG_INTEGRATION_CANCELLED_PLAYER_FMT = "LOG_INTEGRATION_CANCELLED_PLAYER_FMT";
     public static final String DIPLO_SEND_DIPLOMATS_TITLE = "DIPLO_SEND_DIPLOMATS_TITLE";
     public static final String DIPLO_SEND_DIPLOMATS_PROMPT = "DIPLO_SEND_DIPLOMATS_PROMPT";
+    public static final String DIPLO_DIPLOMATS_CURRENT_FMT = "DIPLO_DIPLOMATS_CURRENT_FMT";
+    public static final String DIPLO_DIPLOMATS_AVAILABLE_FMT = "DIPLO_DIPLOMATS_AVAILABLE_FMT";
+    public static final String DIPLO_DIPLOMATS_LIMIT_FMT = "DIPLO_DIPLOMATS_LIMIT_FMT";
+    public static final String DIPLO_DIPLOMATS_TARGET_COUNT = "DIPLO_DIPLOMATS_TARGET_COUNT";
+    public static final String DIPLO_DIPLOMATS_EACH_FMT = "DIPLO_DIPLOMATS_EACH_FMT";
+    public static final String DIPLO_DIPLOMATS_BONUS_PREVIEW_FMT = "DIPLO_DIPLOMATS_BONUS_PREVIEW_FMT";
+    public static final String DIPLO_SEND_DIPLOMATS_FOR_FMT = "DIPLO_SEND_DIPLOMATS_FOR_FMT";
     public static final String DIPLO_SEND_DIPLOMATS_SUCCESS_DYNASTY = "DIPLO_SEND_DIPLOMATS_SUCCESS_DYNASTY";
     public static final String DIPLO_SEND_DIPLOMATS_SUCCESS_COLONY = "DIPLO_SEND_DIPLOMATS_SUCCESS_COLONY";
     public static final String DIPLO_ERROR_NO_DIPLOMATS = "DIPLO_ERROR_NO_DIPLOMATS";
@@ -1330,6 +1364,7 @@ public final class LanguageStrings {
     public static final String DIPLO_ERROR_GENETIC_EXCHANGE_BORDER = "DIPLO_ERROR_GENETIC_EXCHANGE_BORDER";
     public static final String DIPLO_ERROR_GENETIC_EXCHANGE_REP = "DIPLO_ERROR_GENETIC_EXCHANGE_REP";
     public static final String DIPLO_ERROR_REPUTATION_STABLE = "DIPLO_ERROR_REPUTATION_STABLE";
+    public static final String DIPLO_ERROR_DIPLOMATS_AT_WAR = "DIPLO_ERROR_DIPLOMATS_AT_WAR";
     public static final String DIPLO_ERROR_LOYALTY_STABLE = "DIPLO_ERROR_LOYALTY_STABLE";
     public static final String DIPLO_ERROR_CORDIAL_REQUIRED = "DIPLO_ERROR_CORDIAL_REQUIRED";
     public static final String DIPLO_ERROR_CORDIAL_REQUIRED_REQUEST = "DIPLO_ERROR_CORDIAL_REQUIRED_REQUEST";
