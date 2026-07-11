@@ -712,6 +712,7 @@ public class StatsDialog extends ZeroDialog {
         int maxSources = 0;
         int prodPlants = 0, prodMushrooms = 0, prodProtein = 0, prodWater = 0, prodSyrups = 0, prodResins = 0, prodMinerals = 0;
         int consPlants = 0, consMushrooms = 0, consProtein = 0, consWater = 0, consMinerals = 0;
+        int subtypeFoodOverhead = 0;
 
         for (Colony c : coloniesToCount) {
             ColonyStatsService cs = c.getStatsService();
@@ -751,6 +752,7 @@ public class StatsDialog extends ZeroDialog {
 
             consPlants += cs.getPlantConsumption(c);
             consMushrooms += cs.getTotalConsumption(c);
+            subtypeFoodOverhead += cs.getSubtypeFoodOverhead(c);
             consProtein += cs.getProteinConsumption(c);
             consWater += cs.getWaterConsumption(c);
         }
@@ -766,6 +768,10 @@ public class StatsDialog extends ZeroDialog {
         model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR), "---", "---", "---", "---", "---", "---"});
         int netFood = prodMushrooms - consMushrooms;
         model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_TOTAL_FOOD), "---", "---", "---", prodMushrooms, consMushrooms, (netFood >= 0 ? "+" : "") + netFood});
+        if (subtypeFoodOverhead > 0) {
+            model.addRow(new Object[]{GameConstants.ICON_STAT_FOOD_CONSUMPTION, LanguageStrings.get(LanguageStrings.STAT_SUBTYPE_FOOD_OVERHEAD),
+                    "---", "---", "---", "---", subtypeFoodOverhead, "+" + subtypeFoodOverhead});
+        }
     }
 
     private void addResourceRow(DefaultTableModel model, ImageIcon icon, String name, int current, int cap, int sources, int maxSources, int production, int consumption) {

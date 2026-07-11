@@ -7,6 +7,7 @@ import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
+import com.grimidk.formicempire.classes.entities.services.colony.AntSubtypeService;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
@@ -135,6 +136,7 @@ public class TriggerManager {
         checkTradeRoleTriggers();
         checkTunnelRoleUnlock();
         checkAssimilationAbilityUnlock();
+        checkSubtypeHatchUnlock();
         checkSynergyUnlocks();
         checkAbilityMenuHint();
     }
@@ -509,6 +511,18 @@ public class TriggerManager {
                 LanguageStrings.TRIGGER_ASSIMILATION_ABILITY_TITLE,
                 LanguageStrings.TRIGGER_ASSIMILATION_ABILITY_MSG);
         }
+    }
+
+    private void checkSubtypeHatchUnlock() {
+        if (playerColony.hasUpgrade(GameUnlocks.ABILITY_SUBTYPE_HATCH)) {
+            return;
+        }
+        if (!AntSubtypeService.hasSubtypeAssimilation(playerColony)) {
+            return;
+        }
+        fireLocalizedTrigger(GameUnlocks.ABILITY_SUBTYPE_HATCH,
+                LanguageStrings.TRIGGER_SUBTYPE_HATCH_TITLE,
+                LanguageStrings.TRIGGER_SUBTYPE_HATCH_MSG);
     }
 
     private void checkAbilityMenuHint() {

@@ -176,7 +176,11 @@ public final class GameConstants {
 
     /** True when {@code sprites/ants/zero-drones/} has art for this species (fully implemented assimilations only). */
     public static boolean hasAssimilatedDroneSprite(Species species) {
-        return species != null && WORLD_SPAWNABLE_NPC_SPECIES_IDS.contains(species.getId());
+        if (species == null) {
+            return false;
+        }
+        String path = "sprites/ants/zero-drones/" + species.getZeroDroneSpriteFileName();
+        return Thread.currentThread().getContextClassLoader().getResource(path) != null;
     }
 
     private static Set<Upgrade> defaultSpeciesUpgrades(Upgrade speciesTrait) {
@@ -670,6 +674,8 @@ public final class GameConstants {
     public static final float SUBTYPE_DEFENSE_MULT_DOORHEAD = 5f;
     public static final float SUBTYPE_FORAGE_MULT_HONEYPOT = 4f;
     public static final float SUBTYPE_SPEED_MULT_HONEYPOT = 0.75f;
+    /** Additive food consumption per active body-part subtype (2 subtypes = 2x food). */
+    public static final float SUBTYPE_FOOD_CONSUMPTION_ADD_PER_TRAIT = 0.5f;
 
     private static final ImageIcon SUBTYPE_ICON_NOTHING = loadIcon("icons/species/Omni.png");
 
@@ -1634,20 +1640,11 @@ public final class GameConstants {
         return Collections.unmodifiableList(result);
     }
 
-    /** NPC dynasties at world gen — only species with art in {@code sprites/ants/zero-drones/}. */
-    private static final Set<Integer> WORLD_SPAWNABLE_NPC_SPECIES_IDS = Set.of(
-            SPECIES_LEAFCUTTER.getId(),
-            SPECIES_PHARAOH.getId(),
-            SPECIES_MARAUDER.getId(),
-            SPECIES_TRAPJAW.getId(),
-            SPECIES_HONEYPOT.getId(),
-            SPECIES_TURTLE.getId(),
-            SPECIES_BULLET.getId());
-
+    /** NPC dynasties at world gen — species with drone art in {@code sprites/ants/zero-drones/} (excludes Omni). */
     public static List<Species> getWorldSpawnableNpcSpecies() {
         List<Species> result = new ArrayList<>();
         for (Species s : species) {
-            if (WORLD_SPAWNABLE_NPC_SPECIES_IDS.contains(s.getId())) {
+            if (s.getId() != SPECIES_OMNI.getId() && hasAssimilatedDroneSprite(s)) {
                 result.add(s);
             }
         }

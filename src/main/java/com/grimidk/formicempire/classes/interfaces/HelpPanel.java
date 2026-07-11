@@ -1,12 +1,15 @@
 package com.grimidk.formicempire.classes.interfaces;
 
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
+import com.grimidk.formicempire.classes.constants.ant.AntSubtype;
+import com.grimidk.formicempire.classes.constants.ant.AntSubtypeSlot;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ColonyLoyalty;
 import com.grimidk.formicempire.classes.constants.misc.ColonyLoyaltyModifier;
 import com.grimidk.formicempire.classes.constants.misc.DiplomaticReputation;
 import com.grimidk.formicempire.classes.constants.misc.TradeMethod;
 import com.grimidk.formicempire.classes.constants.misc.BugType;
+import com.grimidk.formicempire.classes.constants.misc.GameSpeed;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.misc.Species;
 import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
@@ -106,6 +109,7 @@ public class HelpPanel extends JPanel {
                 createDictionaryPanel(new ArrayList<>(GameUnlocks.getBuildings()), false));
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_ASSIMILATIONS), createDictionaryPanel(new ArrayList<>(GameUnlocks.getAssimilations())));
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_WORLD), createWorldPanel());
+        mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_UI), createUiControlsPanel());
     }
     
     public void refreshTranslations() {
@@ -122,7 +126,8 @@ public class HelpPanel extends JPanel {
             LanguageStrings.get(LanguageStrings.HELP_TAB_UPGRADES),
             LanguageStrings.get(LanguageStrings.HELP_TAB_BUILDINGS),
             LanguageStrings.get(LanguageStrings.HELP_TAB_ASSIMILATIONS),
-            LanguageStrings.get(LanguageStrings.HELP_TAB_WORLD)
+            LanguageStrings.get(LanguageStrings.HELP_TAB_WORLD),
+            LanguageStrings.get(LanguageStrings.HELP_TAB_UI)
         };
         
         for (int i = 0; i < titles.length && i < mainTabs.getTabCount(); i++) {
@@ -270,6 +275,9 @@ public class HelpPanel extends JPanel {
         panel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
         for (Species s : GameConstants.getSpecies()) {
+            if (!GameConstants.hasAssimilatedDroneSprite(s)) {
+                continue;
+            }
             JPanel entry = new JPanel(new BorderLayout(10, 0));
             entry.setBackground(AssetStyles.BACKGROUND_COLOR);
             entry.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER, s.getName(), 
@@ -282,7 +290,7 @@ public class HelpPanel extends JPanel {
             spriteLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
             entry.add(spriteLabel, BorderLayout.WEST);
 
-            String baseUpgrades = s.getBaseUpgrades().stream().map(Upgrade::getName).collect(Collectors.joining(", "));
+            String baseUpgrades = s.getBaseUpgrades().stream().map(Upgrade::getFlavorName).collect(Collectors.joining(", "));
             String info = helpHtml("width:350px;font-size:11pt;",
                     "<b>" + LanguageStrings.get("HELP_SPECIES_SCIENTIFIC") + "</b> <i>" + s.getScientific() + "</i><br>"
                             + "<b>" + LanguageStrings.get("HELP_SPECIES_TRAITS") + "</b> " + baseUpgrades);
@@ -359,6 +367,15 @@ public class HelpPanel extends JPanel {
     }
 
     private JComponent createAntTypesPanel() {
+        JPanel split = new JPanel(new GridLayout(1, 2, 8, 0));
+        split.setBackground(AssetStyles.BACKGROUND_COLOR);
+        split.setBorder(new EmptyBorder(10, 10, 10, 10));
+        split.add(wrapTutorialSection(LanguageStrings.HELP_TAB_TYPES, createAntTypesListPanel()));
+        split.add(wrapTutorialSection(LanguageStrings.HELP_TAB_SUBTYPES, createAntSubtypesListPanel()));
+        return split;
+    }
+
+    private JComponent createAntTypesListPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBackground(AssetStyles.BACKGROUND_COLOR);
@@ -406,7 +423,74 @@ public class HelpPanel extends JPanel {
 
         JScrollPane scrollPane = new JScrollPane(panel);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        scrollPane.setBorder(null);
         return scrollPane;
+    }
+
+    private JComponent createAntSubtypesListPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        panel.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+        JLabel intro = new JLabel(tutorialHtml(LanguageStrings.get(LanguageStrings.HELP_SUBTYPES_INTRO)));
+        styleTutorialLabel(intro);
+        intro.setBorder(new EmptyBorder(0, 0, 10, 0));
+        panel.add(intro);
+
+        for (AntSubtypeSlot slot : GameConstants.getConfigurableSubtypeSlots()) {
+            String sectionKey = slot == AntSubtypeSlot.HEAD
+                    ? LanguageStrings.HATCH_SUBTYPE_HEAD_SECTION
+                    : LanguageStrings.HATCH_SUBTYPE_ABDOMEN_SECTION;
+            JLabel sectionLabel = new JLabel(LanguageStrings.get(sectionKey));
+            sectionLabel.setFont(AssetStyles.FONT_BOLD);
+            sectionLabel.setForeground(AssetStyles.FONT_COLOR_HEADER);
+            sectionLabel.setBorder(new EmptyBorder(8, 0, 4, 0));
+            sectionLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            panel.add(sectionLabel);
+
+            for (AntSubtype subtype : GameConstants.getSubtypesForSlot(slot)) {
+                if (subtype.isNone()) {
+                    continue;
+                }
+                panel.add(buildAntSubtypeEntry(panel, subtype));
+                panel.add(Box.createRigidArea(new Dimension(0, 5)));
+            }
+        }
+
+        JScrollPane scrollPane = new JScrollPane(panel);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        scrollPane.setBorder(null);
+        return scrollPane;
+    }
+
+    private JPanel buildAntSubtypeEntry(JPanel panel, AntSubtype subtype) {
+        JPanel entry = new JPanel(new BorderLayout(10, 0));
+        entry.setBackground(AssetStyles.BACKGROUND_COLOR);
+        entry.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER, subtype.getName(),
+                javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
+        entry.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        ImageIcon icon = subtype.getIcon();
+        if (icon != null) {
+            JLabel iconLabel = new JLabel(icon);
+            iconLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
+            entry.add(iconLabel, BorderLayout.WEST);
+        }
+
+        JTextArea descArea = new JTextArea(subtype.getDesc());
+        descArea.setFont(AssetStyles.FONT_NORMAL);
+        descArea.setForeground(AssetStyles.FONT_COLOR);
+        descArea.setWrapStyleWord(true);
+        descArea.setLineWrap(true);
+        descArea.setEditable(false);
+        descArea.setFocusable(false);
+        descArea.setBackground(panel.getBackground());
+        descArea.setBorder(new EmptyBorder(5, 5, 5, 5));
+        entry.add(descArea, BorderLayout.CENTER);
+        return entry;
     }
 
     private JComponent createBugsPanel() {
@@ -895,6 +979,139 @@ public class HelpPanel extends JPanel {
         JScrollPane scrollPane = new JScrollPane(panel);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         return scrollPane;
+    }
+
+    private JComponent createUiControlsPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        panel.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+        JLabel intro = new JLabel(tutorialHtml(LanguageStrings.get(LanguageStrings.HELP_UI_INTRO)));
+        styleTutorialLabel(intro);
+        intro.setBorder(new EmptyBorder(0, 0, 10, 0));
+        intro.setAlignmentX(Component.LEFT_ALIGNMENT);
+        panel.add(intro);
+
+        panel.add(createUiControlBarSection());
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(createGameSpeedIconsSection());
+
+        JScrollPane scrollPane = new JScrollPane(panel);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        return scrollPane;
+    }
+
+    private JPanel createUiControlBarSection() {
+        JPanel section = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 8));
+        section.setBackground(AssetStyles.BACKGROUND_COLOR);
+        section.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER, LanguageStrings.get(LanguageStrings.HELP_UI_BAR_TITLE),
+                javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
+        section.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        section.add(buildUiControlCell(GameConstants.ICON_SPEED_DOWN, LanguageStrings.UI_CONTROL_SPEED_DOWN_TT));
+        section.add(buildUiControlCell(GameConstants.ICON_SPEED_UP, LanguageStrings.UI_CONTROL_SPEED_UP_TT));
+        section.add(buildUiControlCell(GameConstants.SPEED_NORMAL.getIcon(), LanguageStrings.UI_CONTROL_SPEED_TT,
+                GameConstants.SPEED_NORMAL.getName(), GameConstants.SPEED_NORMAL.getDelayMs()));
+        section.add(buildUiControlCell(GameConstants.ICON_SPEED_PAUSE, LanguageStrings.UI_CONTROL_PAUSE_TT));
+        section.add(buildUiControlCell(GameConstants.ICON_SPEED_PLAY, LanguageStrings.UI_CONTROL_PLAY_TT));
+        section.add(buildUiMenuControlCell());
+
+        JPanel wrapper = new JPanel(new BorderLayout());
+        wrapper.setBackground(AssetStyles.BACKGROUND_COLOR);
+        wrapper.setAlignmentX(Component.LEFT_ALIGNMENT);
+        wrapper.add(section, BorderLayout.CENTER);
+        return wrapper;
+    }
+
+    private JPanel createGameSpeedIconsSection() {
+        JPanel grid = new JPanel(new GridLayout(0, 3, 10, 10));
+        grid.setBackground(AssetStyles.BACKGROUND_COLOR);
+        grid.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER, LanguageStrings.get(LanguageStrings.HELP_UI_SPEEDS_TITLE),
+                javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
+        grid.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        grid.add(buildSpeedIconCell(LanguageStrings.get(LanguageStrings.HELP_UI_SPEED_PAUSED),
+                GameConstants.ICON_SPEED_ZERO,
+                LanguageStrings.get(LanguageStrings.UI_CONTROL_PAUSED_TT)));
+
+        for (GameSpeed speed : GameConstants.getGameSpeeds()) {
+            grid.add(buildSpeedIconCell(speed.getName(), speed.getIcon(),
+                    LanguageStrings.format(LanguageStrings.HELP_UI_SPEED_MS,
+                            AssetStyles.formatNumber(speed.getDelayMs()))));
+        }
+
+        JPanel wrapper = new JPanel(new BorderLayout());
+        wrapper.setBackground(AssetStyles.BACKGROUND_COLOR);
+        wrapper.setAlignmentX(Component.LEFT_ALIGNMENT);
+        wrapper.add(grid, BorderLayout.CENTER);
+        return wrapper;
+    }
+
+    private JPanel buildUiControlCell(ImageIcon icon, String descKey) {
+        return buildUiControlCell(icon, null, descKey, null, null);
+    }
+
+    private JPanel buildUiControlCell(ImageIcon icon, String descFormatKey, String speedName, int delayMs) {
+        return buildUiControlCell(icon, descFormatKey, null, speedName, delayMs);
+    }
+
+    private JPanel buildUiControlCell(ImageIcon icon, String descFormatKey, String descKey,
+            String speedName, Integer delayMs) {
+        JPanel cell = new JPanel();
+        cell.setLayout(new BoxLayout(cell, BoxLayout.Y_AXIS));
+        cell.setBackground(AssetStyles.BACKGROUND_COLOR);
+
+        JLabel iconLabel = new JLabel(icon);
+        iconLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        iconLabel.setBorder(new EmptyBorder(0, 0, 4, 0));
+        cell.add(iconLabel);
+
+        String desc = descKey != null
+                ? LanguageStrings.get(descKey)
+                : LanguageStrings.format(descFormatKey, speedName, AssetStyles.formatNumber(delayMs));
+        JLabel descLabel = new JLabel(helpHtml("width:110px;font-size:10pt;text-align:center;", desc));
+        descLabel.setFont(AssetStyles.FONT_SMALL);
+        descLabel.setForeground(AssetStyles.FONT_COLOR);
+        descLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        cell.add(descLabel);
+        return cell;
+    }
+
+    private JPanel buildUiMenuControlCell() {
+        JPanel cell = new JPanel();
+        cell.setLayout(new BoxLayout(cell, BoxLayout.Y_AXIS));
+        cell.setBackground(AssetStyles.BACKGROUND_COLOR);
+
+        JButton menuPreview = new JButton(LanguageStrings.get(LanguageStrings.UI_MENU));
+        menuPreview.setEnabled(false);
+        menuPreview.setFocusable(false);
+        AssetStyles.styleButton(menuPreview);
+        menuPreview.setAlignmentX(Component.CENTER_ALIGNMENT);
+        cell.add(menuPreview);
+
+        JLabel descLabel = new JLabel(helpHtml("width:110px;font-size:10pt;text-align:center;",
+                LanguageStrings.get(LanguageStrings.UI_CONTROL_MENU_TT)));
+        descLabel.setFont(AssetStyles.FONT_SMALL);
+        descLabel.setForeground(AssetStyles.FONT_COLOR);
+        descLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        descLabel.setBorder(new EmptyBorder(4, 0, 0, 0));
+        cell.add(descLabel);
+        return cell;
+    }
+
+    private JLabel buildSpeedIconCell(String title, ImageIcon icon, String detail) {
+        String info = helpHtml("width:120px;font-size:11pt;",
+                "<b>" + title + "</b><br>" + detail);
+        JLabel label = new JLabel(info, icon, SwingConstants.LEFT);
+        label.setFont(AssetStyles.FONT_SMALL);
+        label.setForeground(AssetStyles.FONT_COLOR);
+        label.setIconTextGap(8);
+        return label;
     }
 
     private JComponent createDictionaryPanel(List<Constant> items) {

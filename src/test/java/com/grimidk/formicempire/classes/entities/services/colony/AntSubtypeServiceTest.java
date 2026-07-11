@@ -54,7 +54,7 @@ class AntSubtypeServiceTest {
     @Test
     void trapjawAttackStacksAdditivelyWithStinger() {
         AntSubtypeProfile profile = AntSubtypeProfile.of(2, 1, 2, 1);
-        assertEquals(6f, AntSubtypeService.combinedAttackMult(profile), 0.0001f);
+        assertEquals(7f, AntSubtypeService.combinedAttackMult(profile), 0.0001f);
     }
 
     @Test
@@ -93,8 +93,18 @@ class AntSubtypeServiceTest {
     void npcNaturalSpeciesSetsFiftyPercentSubtypeRate() {
         Colony colony = new Colony(4, "Trap", false);
         AntSubtypeService.applyNaturalSpeciesSubtypeRates(colony, GameConstants.SPECIES_TRAPJAW);
-        assertEquals(50f, colony.getSubtypeHatchRate(AntSubtypeSlot.HEAD, 2));
-        assertEquals(50f, colony.getSubtypeHatchRate(AntSubtypeSlot.HEAD, GameConstants.SUBTYPE_DIGIT_NONE));
+        assertEquals(50f, colony.getSubtypeHatchRate(GameConstants.TYPE_WORKER, AntSubtypeSlot.HEAD, 2));
+        assertEquals(50f, colony.getSubtypeHatchRate(GameConstants.TYPE_WORKER, AntSubtypeSlot.HEAD,
+                GameConstants.SUBTYPE_DIGIT_NONE));
+    }
+
+    @Test
+    void perTypeSubtypeRatesPersistIndependently() {
+        Colony colony = new Colony(6, "C", true);
+        colony.setSubtypeHatchRate(GameConstants.TYPE_WORKER, AntSubtypeSlot.HEAD, 2, 25f);
+        colony.setSubtypeHatchRate(GameConstants.TYPE_SOLDIER, AntSubtypeSlot.HEAD, 2, 75f);
+        assertEquals(25f, colony.getSubtypeHatchRate(GameConstants.TYPE_WORKER, AntSubtypeSlot.HEAD, 2));
+        assertEquals(75f, colony.getSubtypeHatchRate(GameConstants.TYPE_SOLDIER, AntSubtypeSlot.HEAD, 2));
     }
 
     @Test
@@ -107,9 +117,9 @@ class AntSubtypeServiceTest {
         Map<String, Integer> counts = AntSubtypeService.aggregateSubtypeCounts(colony.getWorkers());
         assertEquals(1, counts.get("2121"));
 
-        colony.setSubtypeHatchRate(AntSubtypeSlot.HEAD, 2, 25f);
+        colony.setSubtypeHatchRate(GameConstants.TYPE_WORKER, AntSubtypeSlot.HEAD, 2, 25f);
         Map<String, Double> flat = AntSubtypeService.flattenSubtypeRates(colony.getSubtypeHatchRates());
-        assertEquals(25.0, flat.get("HEAD:2"));
+        assertEquals(25.0, flat.get(GameConstants.TYPE_WORKER.getNameKey() + ":HEAD:2"));
     }
 
     @Test
@@ -133,5 +143,96 @@ class AntSubtypeServiceTest {
                 GameConstants.TYPE_WORKER, GameConstants.SPECIES_OMNI, AntSubtypeProfile.fromCode(3131));
         assertNotNull(trapjawStinger);
         assertNotNull(doorheadHoneypot);
+    }
+
+    @Test
+    void consumptionMultAddsFiftyPercentPerActiveSubtype() {
+        assertEquals(1f, AntSubtypeService.consumptionMult(AntSubtypeProfile.standard()), 0.0001f);
+        assertEquals(1.5f, AntSubtypeService.consumptionMult(AntSubtypeProfile.of(2, 1, 1, 1)), 0.0001f);
+        assertEquals(2f, AntSubtypeService.consumptionMult(AntSubtypeProfile.of(2, 1, 2, 1)), 0.0001f);
+    }
+
+    @Test
+    void automatedTrapjawAndBulletSoldiersUseFullComboRates() {
+        Dynasty dynasty = new Dynasty(7, "D", true, GameConstants.SPECIES_OMNI);
+        dynasty.unlockUpgrade(GameUnlocks.TYPE_SOLDIER);
+        dynasty.unlockUpgrade(GameUnlocks.TYPE_MAJOR);
+        dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_TRAPJAW);
+        dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_STINGING);
+        Colony colony = new Colony(8, "C", true);
+        colony.setDynasty(dynasty);
+        colony.setMushrooms(1000);
+        colony.setWater(100);
+
+        AntSubtypeService.applyAutomatedSubtypeRates(colony);
+
+        assertEquals(100f, colony.getSubtypeHatchRate(GameConstants.TYPE_SOLDIER, AntSubtypeSlot.HEAD, 2));
+        assertEquals(100f, colony.getSubtypeHatchRate(GameConstants.TYPE_SOLDIER, AntSubtypeSlot.ABDOMEN, 2));
+        assertEquals(100f, colony.getSubtypeHatchRate(GameConstants.TYPE_MAJOR, AntSubtypeSlot.HEAD, 2));
+        assertEquals(100f, colony.getSubtypeHatchRate(GameConstants.TYPE_MAJOR, AntSubtypeSlot.ABDOMEN, 2));
+    }
+
+    @Test
+    void automatedHoneypotRatesWorkersAndPrincesses() {
+        Dynasty dynasty = new Dynasty(8, "D", true, GameConstants.SPECIES_OMNI);
+        dynasty.unlockUpgrade(GameUnlocks.TYPE_WORKER);
+        dynasty.unlockUpgrade(GameUnlocks.TYPE_PRINCESS);
+        dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_HONEYPOT);
+        Colony colony = new Colony(9, "C", true);
+        colony.setDynasty(dynasty);
+        colony.setMushrooms(500);
+        colony.setWater(100);
+
+        AntSubtypeService.applyAutomatedSubtypeRates(colony);
+
+        assertEquals(50f, colony.getSubtypeHatchRate(GameConstants.TYPE_WORKER, AntSubtypeSlot.ABDOMEN, 3));
+        assertEquals(10f, colony.getSubtypeHatchRate(GameConstants.TYPE_PRINCESS, AntSubtypeSlot.ABDOMEN, 3));
+    }
+
+    @Test
+    void foodScarcityStopsAutomatedSubtypeUse() {
+        Dynasty dynasty = new Dynasty(9, "D", true, GameConstants.SPECIES_OMNI);
+        dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_TRAPJAW);
+        Colony colony = new Colony(10, "C", true);
+        colony.setDynasty(dynasty);
+        colony.setMushrooms(10);
+        colony.setWater(100);
+
+        AntSubtypeService.applyAutomatedSubtypeRates(colony);
+
+        assertEquals(100f, colony.getSubtypeHatchRate(GameConstants.TYPE_SOLDIER, AntSubtypeSlot.HEAD,
+                GameConstants.SUBTYPE_DIGIT_NONE));
+    }
+
+    @Test
+    void trapjawAndStingerCombinedAttackIsSevenTimesBase() {
+        Dynasty dynasty = new Dynasty(11, "D", true, GameConstants.SPECIES_OMNI);
+        dynasty.unlockUpgrade(GameUnlocks.STAT_ACID);
+        dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_TRAPJAW);
+        dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_STINGING);
+        Colony colony = new Colony(12, "C", true);
+        colony.setDynasty(dynasty);
+
+        Ant baseline = new Ant(colony, GameConstants.TYPE_SOLDIER);
+        AntSubtypeService.applySubtypeStats(baseline, colony);
+        Ant combo = new Ant(colony, GameConstants.TYPE_SOLDIER);
+        combo.setSubtypeProfile(AntSubtypeProfile.of(2, 1, 2, 1));
+        AntSubtypeService.applySubtypeStats(combo, colony);
+
+        assertEquals(baseline.getAttack() * 7, combo.getAttack());
+    }
+
+    @Test
+    void subtypeFoodConsumptionAppliedToAnt() {
+        Dynasty dynasty = new Dynasty(10, "D", true, GameConstants.SPECIES_OMNI);
+        dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_TRAPJAW);
+        dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_STINGING);
+        Colony colony = new Colony(11, "C", true);
+        colony.setDynasty(dynasty);
+        Ant soldier = new Ant(colony, GameConstants.TYPE_SOLDIER);
+        soldier.setSubtypeProfile(AntSubtypeProfile.of(2, 1, 2, 1));
+        AntSubtypeService.applySubtypeStats(soldier, colony);
+        Ant baseline = new Ant(colony, GameConstants.TYPE_SOLDIER);
+        assertEquals(baseline.getConsumption() * 2f, soldier.getConsumption(), 0.0001f);
     }
 }

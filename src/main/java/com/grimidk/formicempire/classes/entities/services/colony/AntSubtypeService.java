@@ -34,7 +34,27 @@ public final class AntSubtypeService {
                 || type == GameConstants.TYPE_QUEEN;
     }
 
-    public static Map<AntSubtypeSlot, Map<Integer, Float>> defaultSubtypeRates() {
+    public static List<AntType> getSubtypeRateTypes() {
+        return List.of(
+                GameConstants.TYPE_WORKER,
+                GameConstants.TYPE_SOLDIER,
+                GameConstants.TYPE_MAJOR,
+                GameConstants.TYPE_PRINCESS);
+    }
+
+    public static Map<AntType, Map<AntSubtypeSlot, Map<Integer, Float>>> defaultSubtypeRates() {
+        Map<AntType, Map<AntSubtypeSlot, Map<Integer, Float>>> rates = new HashMap<>();
+        for (AntType type : getSubtypeRateTypes()) {
+            rates.put(type, defaultSlotRates());
+        }
+        return rates;
+    }
+
+    public static Map<AntSubtypeSlot, Map<Integer, Float>> defaultRatesForType() {
+        return defaultSlotRates();
+    }
+
+    private static Map<AntSubtypeSlot, Map<Integer, Float>> defaultSlotRates() {
         Map<AntSubtypeSlot, Map<Integer, Float>> rates = new EnumMap<>(AntSubtypeSlot.class);
         for (AntSubtypeSlot slot : AntSubtypeSlot.values()) {
             Map<Integer, Float> slotRates = new HashMap<>();
@@ -51,17 +71,120 @@ public final class AntSubtypeService {
         target.setSubtypeHatchRates(deepCopyRates(source.getSubtypeHatchRates()));
     }
 
-    public static Map<AntSubtypeSlot, Map<Integer, Float>> deepCopyRates(
-            Map<AntSubtypeSlot, Map<Integer, Float>> source) {
-        Map<AntSubtypeSlot, Map<Integer, Float>> copy = new EnumMap<>(AntSubtypeSlot.class);
+    public static boolean hasSubtypeAssimilation(Colony colony) {
+        if (colony == null) {
+            return false;
+        }
+        return colony.hasUpgrade(GameUnlocks.ASSIMILATED_TRAPJAW)
+                || colony.hasUpgrade(GameUnlocks.ASSIMILATED_HONEYPOT)
+                || colony.hasUpgrade(GameUnlocks.ASSIMILATED_DOORHEAD)
+                || colony.hasUpgrade(GameUnlocks.ASSIMILATED_STINGING);
+    }
+
+    public static float consumptionMult(AntSubtypeProfile profile) {
+        if (profile == null || profile.isStandard()) {
+            return 1f;
+        }
+        int active = profile.countActiveSubtypes();
+        if (active <= 0) {
+            return 1f;
+        }
+        return 1f + active * GameConstants.SUBTYPE_FOOD_CONSUMPTION_ADD_PER_TRAIT;
+    }
+
+    /**
+     * Scales automated subtype assignment when fungi reserves lag behind water.
+     * {@code 1f} = full rates, {@code 0.5f} = halved, {@code 0f} = standard ants only.
+     */
+    public static float subtypeAutomationFoodScale(Colony colony) {
+        if (colony == null) {
+            return 1f;
+        }
+        double food = colony.getMushroomsPrecise();
+        double water = colony.getWaterPrecise();
+        if (food >= water) {
+            return 1f;
+        }
+        if (food >= water * 0.5) {
+            return 0.5f;
+        }
+        return 0f;
+    }
+
+    public static void applyAutomatedSubtypeRates(Colony colony) {
+        if (colony == null || !hasSubtypeAssimilation(colony)) {
+            return;
+        }
+
+        Map<AntType, Map<AntSubtypeSlot, Map<Integer, Float>>> rates = defaultSubtypeRates();
+        float scale = subtypeAutomationFoodScale(colony);
+        if (scale <= 0f) {
+            colony.setSubtypeHatchRates(rates);
+            return;
+        }
+
+        boolean trapjaw = colony.hasUpgrade(GameUnlocks.ASSIMILATED_TRAPJAW);
+        boolean honeypot = colony.hasUpgrade(GameUnlocks.ASSIMILATED_HONEYPOT);
+        boolean doorhead = colony.hasUpgrade(GameUnlocks.ASSIMILATED_DOORHEAD);
+        boolean bullet = colony.hasUpgrade(GameUnlocks.ASSIMILATED_STINGING);
+
+        if (honeypot) {
+            setAutomatedSlotRate(rates, GameConstants.TYPE_WORKER, AntSubtypeSlot.ABDOMEN, 3, 50f * scale);
+            setAutomatedSlotRate(rates, GameConstants.TYPE_PRINCESS, AntSubtypeSlot.ABDOMEN, 3, 10f * scale);
+        }
+        if (trapjaw) {
+            setAutomatedSlotRate(rates, GameConstants.TYPE_SOLDIER, AntSubtypeSlot.HEAD, 2, 100f * scale);
+            if (colony.hasUpgrade(GameUnlocks.TYPE_MAJOR)) {
+                setAutomatedSlotRate(rates, GameConstants.TYPE_MAJOR, AntSubtypeSlot.HEAD, 2, 100f * scale);
+            }
+        }
+        if (doorhead) {
+            setAutomatedSlotRate(rates, GameConstants.TYPE_WORKER, AntSubtypeSlot.HEAD, 3, 50f * scale);
+            if (!trapjaw && colony.hasUpgrade(GameUnlocks.TYPE_SOLDIER)) {
+                setAutomatedSlotRate(rates, GameConstants.TYPE_SOLDIER, AntSubtypeSlot.HEAD, 3, 50f * scale);
+            }
+        }
+        if (bullet) {
+            setAutomatedSlotRate(rates, GameConstants.TYPE_SOLDIER, AntSubtypeSlot.ABDOMEN, 2, 100f * scale);
+            if (colony.hasUpgrade(GameUnlocks.TYPE_MAJOR)) {
+                setAutomatedSlotRate(rates, GameConstants.TYPE_MAJOR, AntSubtypeSlot.ABDOMEN, 2, 100f * scale);
+            }
+        }
+
+        colony.setSubtypeHatchRates(rates);
+    }
+
+    private static void setAutomatedSlotRate(
+            Map<AntType, Map<AntSubtypeSlot, Map<Integer, Float>>> rates,
+            AntType type, AntSubtypeSlot slot, int digit, float subtypePct) {
+        if (rates == null || type == null || slot == null) {
+            return;
+        }
+        float clamped = Math.min(100f, Math.max(0f, subtypePct));
+        Map<Integer, Float> slotRates = rates.computeIfAbsent(type, ignored -> defaultRatesForType()).get(slot);
+        slotRates.clear();
+        slotRates.put(digit, clamped);
+        slotRates.put(GameConstants.SUBTYPE_DIGIT_NONE, 100f - clamped);
+    }
+
+    public static Map<AntType, Map<AntSubtypeSlot, Map<Integer, Float>>> deepCopyRates(
+            Map<AntType, Map<AntSubtypeSlot, Map<Integer, Float>>> source) {
+        Map<AntType, Map<AntSubtypeSlot, Map<Integer, Float>>> copy = new HashMap<>();
         if (source == null) {
             return defaultSubtypeRates();
         }
-        for (Map.Entry<AntSubtypeSlot, Map<Integer, Float>> entry : source.entrySet()) {
-            copy.put(entry.getKey(), new HashMap<>(entry.getValue()));
+        for (Map.Entry<AntType, Map<AntSubtypeSlot, Map<Integer, Float>>> entry : source.entrySet()) {
+            Map<AntSubtypeSlot, Map<Integer, Float>> slotCopy = new EnumMap<>(AntSubtypeSlot.class);
+            for (Map.Entry<AntSubtypeSlot, Map<Integer, Float>> slotEntry : entry.getValue().entrySet()) {
+                slotCopy.put(slotEntry.getKey(), new HashMap<>(slotEntry.getValue()));
+            }
+            for (AntSubtypeSlot slot : AntSubtypeSlot.values()) {
+                slotCopy.putIfAbsent(slot, new HashMap<>(Map.of(GameConstants.SUBTYPE_DIGIT_NONE, 100f)));
+            }
+            copy.put(entry.getKey(), slotCopy);
         }
-        for (AntSubtypeSlot slot : AntSubtypeSlot.values()) {
-            copy.putIfAbsent(slot, new HashMap<>(Map.of(GameConstants.SUBTYPE_DIGIT_NONE, 100f)));
+        for (AntType type : getSubtypeRateTypes()) {
+            copy.putIfAbsent(type, defaultSlotRates());
         }
         return copy;
     }
@@ -70,7 +193,7 @@ public final class AntSubtypeService {
         if (colony == null || species == null) {
             return;
         }
-        Map<AntSubtypeSlot, Map<Integer, Float>> rates = defaultSubtypeRates();
+        Map<AntType, Map<AntSubtypeSlot, Map<Integer, Float>>> rates = defaultSubtypeRates();
         for (Upgrade trait : species.getBaseUpgrades()) {
             AntSubtype subtype = findSubtypeForUpgrade(trait);
             if (subtype == null || subtype.isNone()) {
@@ -79,7 +202,9 @@ public final class AntSubtypeService {
             Map<Integer, Float> slotRates = new HashMap<>();
             slotRates.put(GameConstants.SUBTYPE_DIGIT_NONE, 100f - NPC_NATURAL_SUBTYPE_RATE);
             slotRates.put(subtype.getDigit(), NPC_NATURAL_SUBTYPE_RATE);
-            rates.put(subtype.getSlot(), slotRates);
+            for (AntType type : getSubtypeRateTypes()) {
+                rates.get(type).put(subtype.getSlot(), slotRates);
+            }
         }
         colony.setSubtypeHatchRates(rates);
     }
@@ -103,7 +228,7 @@ public final class AntSubtypeService {
             if (ant == null || !isEligibleType(ant.getAntType())) {
                 continue;
             }
-            AntSubtypeProfile profile = rollProfile(colony);
+            AntSubtypeProfile profile = rollProfile(colony, ant.getAntType());
             ant.setSubtypeProfile(profile);
             applySubtypeStats(ant, colony);
         }
@@ -136,15 +261,15 @@ public final class AntSubtypeService {
         return available;
     }
 
-    public static AntSubtypeProfile rollProfile(Colony colony) {
-        int head = rollSlotDigit(colony, AntSubtypeSlot.HEAD);
+    public static AntSubtypeProfile rollProfile(Colony colony, AntType type) {
+        int head = rollSlotDigit(colony, type, AntSubtypeSlot.HEAD);
         int torso = GameConstants.SUBTYPE_DIGIT_NONE;
-        int abdomen = rollSlotDigit(colony, AntSubtypeSlot.ABDOMEN);
+        int abdomen = rollSlotDigit(colony, type, AntSubtypeSlot.ABDOMEN);
         int other = GameConstants.SUBTYPE_DIGIT_NONE;
         return AntSubtypeProfile.of(head, torso, abdomen, other);
     }
 
-    private static int rollSlotDigit(Colony colony, AntSubtypeSlot slot) {
+    private static int rollSlotDigit(Colony colony, AntType type, AntSubtypeSlot slot) {
         if (!GameConstants.getConfigurableSubtypeSlots().contains(slot)) {
             return GameConstants.SUBTYPE_DIGIT_NONE;
         }
@@ -155,7 +280,7 @@ public final class AntSubtypeService {
         double rand = GameRandom.nextDouble() * 100.0;
         double cumulative = 0.0;
         for (AntSubtype subtype : options) {
-            cumulative += colony.getSubtypeHatchRate(slot, subtype.getDigit());
+            cumulative += colony.getSubtypeHatchRate(type, slot, subtype.getDigit());
             if (rand < cumulative) {
                 return subtype.getDigit();
             }
@@ -179,7 +304,7 @@ public final class AntSubtypeService {
             ant.setHealth(ant.getMaxHealth());
         }
         ant.setRegen((int) (colony.getBaseRegen() * type.getRegenMult()));
-        ant.setConsumption(colony.getBaseConsumption() * type.getConsumptionMult());
+        ant.setConsumption(colony.getBaseConsumption() * type.getConsumptionMult() * consumptionMult(profile));
         ant.setAttack((int) (colony.getBaseAttack() * type.getAttackMult() * combinedAttackMult(profile)));
         ant.setAttackSpeed((int) (colony.getBaseAttackSpeed() * type.getAttackSpeedMult()));
         ant.setDefense((int) (colony.getBaseDefense() * type.getDefenseMult() * combinedDefenseMult(profile)));
@@ -187,20 +312,17 @@ public final class AntSubtypeService {
     }
 
     public static float combinedAttackMult(AntSubtypeProfile profile) {
-        float multiplicative = 1f;
-        float additiveBonus = 0f;
+        float total = 0f;
+        boolean hasAttackSubtype = false;
         for (AntSubtypeSlot slot : AntSubtypeSlot.values()) {
             AntSubtype subtype = profile.getSubtype(slot);
             if (subtype == null || subtype.isNone() || subtype.getAttackMult() == 1f) {
                 continue;
             }
-            if (subtype.isAttackAdditive()) {
-                additiveBonus += subtype.getAttackMult() - 1f;
-            } else {
-                multiplicative *= subtype.getAttackMult();
-            }
+            total += subtype.getAttackMult();
+            hasAttackSubtype = true;
         }
-        return multiplicative + additiveBonus;
+        return hasAttackSubtype ? total : 1f;
     }
 
     public static float combinedDefenseMult(AntSubtypeProfile profile) {
@@ -328,7 +450,7 @@ public final class AntSubtypeService {
         }
         List<Ant> ants = colony.getAntsByType(type);
         if (ants.isEmpty()) {
-            return rollProfile(colony);
+            return rollProfile(colony, type);
         }
         Ant picked = ants.get(GameRandom.nextInt(ants.size()));
         AntSubtypeProfile profile = picked.getSubtypeProfile();
@@ -347,7 +469,7 @@ public final class AntSubtypeService {
         }
         if (pool.isEmpty()) {
             Colony capital = dynasty.getCapital();
-            return capital != null ? rollProfile(capital) : AntSubtypeProfile.standard();
+            return capital != null ? rollProfile(capital, type) : AntSubtypeProfile.standard();
         }
         Ant picked = pool.get(GameRandom.nextInt(pool.size()));
         AntSubtypeProfile profile = picked.getSubtypeProfile();
@@ -439,39 +561,80 @@ public final class AntSubtypeService {
         return ant;
     }
 
-    public static Map<String, Double> flattenSubtypeRates(Map<AntSubtypeSlot, Map<Integer, Float>> rates) {
+    public static Map<String, Double> flattenSubtypeRates(
+            Map<AntType, Map<AntSubtypeSlot, Map<Integer, Float>>> rates) {
         Map<String, Double> flat = new HashMap<>();
         if (rates == null) {
             return flat;
         }
-        for (Map.Entry<AntSubtypeSlot, Map<Integer, Float>> entry : rates.entrySet()) {
-            for (Map.Entry<Integer, Float> rateEntry : entry.getValue().entrySet()) {
-                flat.put(entry.getKey().name() + ":" + rateEntry.getKey(), rateEntry.getValue().doubleValue());
+        for (Map.Entry<AntType, Map<AntSubtypeSlot, Map<Integer, Float>>> typeEntry : rates.entrySet()) {
+            AntType type = typeEntry.getKey();
+            if (type == null) {
+                continue;
+            }
+            for (Map.Entry<AntSubtypeSlot, Map<Integer, Float>> slotEntry : typeEntry.getValue().entrySet()) {
+                for (Map.Entry<Integer, Float> rateEntry : slotEntry.getValue().entrySet()) {
+                    flat.put(type.getNameKey() + ":" + slotEntry.getKey().name() + ":" + rateEntry.getKey(),
+                            rateEntry.getValue().doubleValue());
+                }
             }
         }
         return flat;
     }
 
-    public static Map<AntSubtypeSlot, Map<Integer, Float>> unflattenSubtypeRates(Map<String, Double> flat) {
-        Map<AntSubtypeSlot, Map<Integer, Float>> rates = defaultSubtypeRates();
+    public static Map<AntType, Map<AntSubtypeSlot, Map<Integer, Float>>> unflattenSubtypeRates(Map<String, Double> flat) {
+        Map<AntType, Map<AntSubtypeSlot, Map<Integer, Float>>> rates = defaultSubtypeRates();
         if (flat == null || flat.isEmpty()) {
             return rates;
         }
+        Map<AntSubtypeSlot, Map<Integer, Float>> legacyRates = new EnumMap<>(AntSubtypeSlot.class);
         for (Map.Entry<String, Double> entry : flat.entrySet()) {
             String[] parts = entry.getKey().split(":");
-            if (parts.length != 2) {
+            if (parts.length == 2) {
+                try {
+                    AntSubtypeSlot slot = AntSubtypeSlot.valueOf(parts[0]);
+                    int digit = Integer.parseInt(parts[1]);
+                    legacyRates.computeIfAbsent(slot, ignored -> new HashMap<>())
+                            .put(digit, entry.getValue().floatValue());
+                } catch (Exception ignored) {
+                    // skip malformed legacy keys
+                }
+                continue;
+            }
+            if (parts.length != 3) {
                 continue;
             }
             try {
-                AntSubtypeSlot slot = AntSubtypeSlot.valueOf(parts[0]);
-                int digit = Integer.parseInt(parts[1]);
-                rates.computeIfAbsent(slot, ignored -> new HashMap<>())
+                AntType type = resolveSubtypeRateType(parts[0]);
+                if (type == null) {
+                    continue;
+                }
+                AntSubtypeSlot slot = AntSubtypeSlot.valueOf(parts[1]);
+                int digit = Integer.parseInt(parts[2]);
+                rates.computeIfAbsent(type, ignored -> defaultSlotRates())
+                        .computeIfAbsent(slot, ignored -> new HashMap<>())
                         .put(digit, entry.getValue().floatValue());
             } catch (Exception ignored) {
-                // skip malformed legacy keys
+                // skip malformed keys
+            }
+        }
+        if (!legacyRates.isEmpty()) {
+            for (AntType type : getSubtypeRateTypes()) {
+                for (Map.Entry<AntSubtypeSlot, Map<Integer, Float>> slotEntry : legacyRates.entrySet()) {
+                    rates.get(type).put(slotEntry.getKey(), new HashMap<>(slotEntry.getValue()));
+                }
             }
         }
         return rates;
+    }
+
+    private static AntType resolveSubtypeRateType(String key) {
+        for (AntType type : getSubtypeRateTypes()) {
+            if (type.getNameKey().equals(key)) {
+                return type;
+            }
+        }
+        return null;
     }
 
     public static void inheritSubtype(Ant source, Ant target, Colony colony) {

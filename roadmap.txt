@@ -11,7 +11,7 @@ To Fix (By decreasing priority) :
 	TODO: species sprites and icon: carpenter, weaver, floodplain, jet, gliding, army, ghost, dracula, silver, exploding, bulldog, shining black and desert
 
 	Mid:
-	colony automation includes subtype preference
+	(none right now)
 	  
 	Low:
 	(none right now)
@@ -29,7 +29,7 @@ To Fix (By decreasing priority) :
 To Feature (to be done in order):
 Needed for launch (v1.0) (Launch Version):
 	Priority:
-	type specific subtyping
+	assigng specific subtypes per role in a detailed mode
 	assimilations (Wood burrowing (Carpenter ants), Silk weaving (Weaver ants), Rafting (Flood plains ants), Jumping (Jet ants), Gliding (Gliding ants), Swarming (Army ants), Stealth (Ghost ants), Heat resistance (Saharan silver ants), Self destruction (Exploding ants), Far sight (Bulldog ants), Hive building (Shining black ants), Location sensing (Desert ants))
 
 	Everything else :

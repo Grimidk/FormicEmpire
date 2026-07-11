@@ -476,6 +476,8 @@ public final class LanguageStrings {
     public static final String HATCH_TOTAL_OK = "HATCH_TOTAL_OK";
     public static final String HATCH_SUBTYPE_HEAD_SECTION = "HATCH_SUBTYPE_HEAD_SECTION";
     public static final String HATCH_SUBTYPE_ABDOMEN_SECTION = "HATCH_SUBTYPE_ABDOMEN_SECTION";
+    public static final String HATCH_SUBTYPE_ROW_TOTAL = "HATCH_SUBTYPE_ROW_TOTAL";
+    public static final String SUBTYPE_FOOD_COST_PER_TRAIT = "SUBTYPE_FOOD_COST_PER_TRAIT";
 
     public static final String SUBTYPE_NOTHING = "SUBTYPE_NOTHING";
     public static final String SUBTYPE_HEAD_TRAPJAW = "SUBTYPE_HEAD_TRAPJAW";
@@ -584,6 +586,7 @@ public final class LanguageStrings {
     public static final String STAT_MORTALITY = "STAT_MORTALITY";
     public static final String STAT_GLOBAL_DEATHS = "STAT_GLOBAL_DEATHS";
     public static final String STAT_TOTAL_FOOD = "STAT_TOTAL_FOOD";
+    public static final String STAT_SUBTYPE_FOOD_OVERHEAD = "STAT_SUBTYPE_FOOD_OVERHEAD";
     public static final String STAT_ADULTS = "STAT_ADULTS";
     public static final String STAT_JUVENILES = "STAT_JUVENILES";
     public static final String STAT_COLONY_TOTAL = "STAT_COLONY_TOTAL";
@@ -1626,6 +1629,8 @@ public final class LanguageStrings {
     public static final String ABILITY_AUTO_TUNNELS_DESC = "ABILITY_AUTO_TUNNELS_DESC";
     public static final String ABILITY_AUTO_DIPLOMACY_FLAVOR = "ABILITY_AUTO_DIPLOMACY_FLAVOR";
     public static final String ABILITY_AUTO_DIPLOMACY_DESC = "ABILITY_AUTO_DIPLOMACY_DESC";
+    public static final String ABILITY_SUBTYPE_HATCH_FLAVOR = "ABILITY_SUBTYPE_HATCH_FLAVOR";
+    public static final String ABILITY_SUBTYPE_HATCH_DESC = "ABILITY_SUBTYPE_HATCH_DESC";
     public static final String ABILITY_TUNNELS_FLAVOR = "ABILITY_TUNNELS_FLAVOR";
     public static final String ABILITY_TUNNELS_DESC = "ABILITY_TUNNELS_DESC";
     public static final String ABILITY_BILATERAL_TRADE_FLAVOR = "ABILITY_BILATERAL_TRADE_FLAVOR";
@@ -1843,6 +1848,8 @@ public final class LanguageStrings {
     public static final String HELP_TAB_TUTORIALS = "HELP_TAB_TUTORIALS";
     public static final String HELP_TAB_SPECIES = "HELP_TAB_SPECIES";
     public static final String HELP_TAB_TYPES = "HELP_TAB_TYPES";
+    public static final String HELP_TAB_SUBTYPES = "HELP_TAB_SUBTYPES";
+    public static final String HELP_SUBTYPES_INTRO = "HELP_SUBTYPES_INTRO";
     public static final String HELP_TAB_BUGS = "HELP_TAB_BUGS";
     public static final String HELP_TAB_ANT_ROLES = "HELP_TAB_ANT_ROLES";
     public static final String HELP_TAB_EMPIRE = "HELP_TAB_EMPIRE";
@@ -1850,6 +1857,12 @@ public final class LanguageStrings {
     public static final String HELP_TAB_BUILDINGS = "HELP_TAB_BUILDINGS";
     public static final String HELP_TAB_ASSIMILATIONS = "HELP_TAB_ASSIMILATIONS";
     public static final String HELP_TAB_WORLD = "HELP_TAB_WORLD";
+    public static final String HELP_TAB_UI = "HELP_TAB_UI";
+    public static final String HELP_UI_INTRO = "HELP_UI_INTRO";
+    public static final String HELP_UI_BAR_TITLE = "HELP_UI_BAR_TITLE";
+    public static final String HELP_UI_SPEEDS_TITLE = "HELP_UI_SPEEDS_TITLE";
+    public static final String HELP_UI_SPEED_PAUSED = "HELP_UI_SPEED_PAUSED";
+    public static final String HELP_UI_SPEED_MS = "HELP_UI_SPEED_MS";
 
     public static final String HELP_WELCOME_STORY = "HELP_WELCOME_STORY";
     public static final String HELP_START_INFO = "HELP_START_INFO";
@@ -1995,6 +2008,8 @@ public final class LanguageStrings {
     public static final String TRIGGER_BORER_ROLE_MSG = "TRIGGER_BORER_ROLE_MSG";
     public static final String TRIGGER_ASSIMILATION_ABILITY_TITLE = "TRIGGER_ASSIMILATION_ABILITY_TITLE";
     public static final String TRIGGER_ASSIMILATION_ABILITY_MSG = "TRIGGER_ASSIMILATION_ABILITY_MSG";
+    public static final String TRIGGER_SUBTYPE_HATCH_TITLE = "TRIGGER_SUBTYPE_HATCH_TITLE";
+    public static final String TRIGGER_SUBTYPE_HATCH_MSG = "TRIGGER_SUBTYPE_HATCH_MSG";
     public static final String TRIGGER_OPERATIONS_ABILITY_TITLE = "TRIGGER_OPERATIONS_ABILITY_TITLE";
     public static final String TRIGGER_OPERATIONS_ABILITY_MSG = "TRIGGER_OPERATIONS_ABILITY_MSG";
 }

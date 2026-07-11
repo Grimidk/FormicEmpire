@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 66% (177/268 checked)
+Completion: 67% (183/274 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -168,8 +168,12 @@ Per ant type tab (Worker, Soldier, Major, Princess, Queen):
 ================================================================================
 [X] Per-type hatch rate spinners (Egg, Worker, Soldier, Major, Princess, Queen)
 [X] Rates sum to 100% (auto-adjust worker remainder)
-[ ] Head subtype hatch rates (Nothing, Trapjaw, Doorhead when assimilated)
-[ ] Abdomen subtype hatch rates (Nothing, Stinger, Honeypot when assimilated)
+[ ] Head subtype hatch rates per ant type (columns: Nothing, Trapjaw, Doorhead; each row sums to 100%)
+[ ] Abdomen subtype hatch rates per ant type (columns: Nothing, Stinger, Honeypot; each row sums to 100%)
+[ ] Subtype hatch matrix unlock alert after first body-part assimilation (explains P menu and +50% food per part)
+[ ] Automated colonies assign subtype rates by assimilation (honeypot workers/princesses, trapjaw/bullet soldiers/majors, doorhead workers/soldiers)
+[ ] Automated colonies reduce or drop subtypes when fungi stock is below water
+[ ] Each active body-part subtype adds +50% food consumption (two parts = 2x food); visible in Stats as subtype food overhead
 [ ] Stinger abdomen subtype: 4x damage on that ant (not dynasty-wide)
 
 ================================================================================
@@ -374,6 +378,7 @@ Help encyclopedia (main menu Help):
 [X] Tutorials — Welcome, Getting Started, Dynasty, Hotkeys
 [X] Species reference
 [X] Ant types
+[ ] Ant subtypes (Help > Ant Types tab, right column)
 [X] Bugs / threats
 [X] Ant roles
 [X] Empire / dynasty concepts
@@ -381,6 +386,7 @@ Help encyclopedia (main menu Help):
 [X] Buildings list
 [X] Assimilations list
 [X] World / biomes / hexes
+[ ] UI controls (Help > UI Controls tab — speed bar and icons)
 
 ================================================================================
 22. AUTOMATIC TRIGGERS (play until fired — popup unlocks)

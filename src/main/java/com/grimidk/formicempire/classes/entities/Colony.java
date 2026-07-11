@@ -3,6 +3,7 @@ package com.grimidk.formicempire.classes.entities;
 import com.grimidk.formicempire.classes.entities.spatial.Room;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -107,7 +108,7 @@ public class Colony {
     private float hatchRateMajor;
     private float hatchRateDrone;
     private float hatchRatePrincess;
-    private Map<AntSubtypeSlot, Map<Integer, Float>> subtypeHatchRates =
+    private Map<AntType, Map<AntSubtypeSlot, Map<Integer, Float>>> subtypeHatchRates =
             AntSubtypeService.defaultSubtypeRates();
 
     // --- Misc. Data ---
@@ -1293,24 +1294,36 @@ public class Colony {
         else if (type == GameConstants.TYPE_PRINCESS) this.hatchRatePrincess = rate;
     }
 
-    public Map<AntSubtypeSlot, Map<Integer, Float>> getSubtypeHatchRates() {
+    public Map<AntType, Map<AntSubtypeSlot, Map<Integer, Float>>> getSubtypeHatchRates() {
         return subtypeHatchRates;
     }
 
-    public void setSubtypeHatchRates(Map<AntSubtypeSlot, Map<Integer, Float>> subtypeHatchRates) {
+    public void setSubtypeHatchRates(Map<AntType, Map<AntSubtypeSlot, Map<Integer, Float>>> subtypeHatchRates) {
         this.subtypeHatchRates = AntSubtypeService.deepCopyRates(subtypeHatchRates);
     }
 
-    public float getSubtypeHatchRate(AntSubtypeSlot slot, int digit) {
-        Map<Integer, Float> slotRates = subtypeHatchRates.get(slot);
+    public float getSubtypeHatchRate(AntType type, AntSubtypeSlot slot, int digit) {
+        if (type == null) {
+            return digit == GameConstants.SUBTYPE_DIGIT_NONE ? 100f : 0f;
+        }
+        Map<AntSubtypeSlot, Map<Integer, Float>> typeRates = subtypeHatchRates.get(type);
+        if (typeRates == null) {
+            return digit == GameConstants.SUBTYPE_DIGIT_NONE ? 100f : 0f;
+        }
+        Map<Integer, Float> slotRates = typeRates.get(slot);
         if (slotRates == null) {
             return digit == GameConstants.SUBTYPE_DIGIT_NONE ? 100f : 0f;
         }
         return slotRates.getOrDefault(digit, 0f);
     }
 
-    public void setSubtypeHatchRate(AntSubtypeSlot slot, int digit, float rate) {
-        subtypeHatchRates.computeIfAbsent(slot, ignored -> new HashMap<>()).put(digit, rate);
+    public void setSubtypeHatchRate(AntType type, AntSubtypeSlot slot, int digit, float rate) {
+        if (type == null) {
+            return;
+        }
+        subtypeHatchRates.computeIfAbsent(type, ignored -> new EnumMap<>(AntSubtypeService.defaultRatesForType()))
+                .computeIfAbsent(slot, ignored -> new HashMap<>())
+                .put(digit, rate);
     }
 
     public int getTotalDeaths () { return totalDeaths; }

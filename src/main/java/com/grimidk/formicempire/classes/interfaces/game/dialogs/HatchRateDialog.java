@@ -23,17 +23,18 @@ public class HatchRateDialog extends ZeroDialog {
 
     private final Colony colony;
     private final Map<AntType, JSpinner> spinnerMap = new HashMap<>();
-    private final Map<AntSubtypeSlot, Map<Integer, JSpinner>> subtypeSpinnerMap = new EnumMap<>(AntSubtypeSlot.class);
-    private final Map<AntSubtypeSlot, JLabel> subtypeTotalLabels = new EnumMap<>(AntSubtypeSlot.class);
+    private final Map<AntSubtypeSlot, Map<AntType, Map<Integer, JSpinner>>> subtypeSpinnerMap =
+            new EnumMap<>(AntSubtypeSlot.class);
+    private final Map<AntSubtypeSlot, Map<AntType, JLabel>> subtypeRowTotalLabels = new EnumMap<>(AntSubtypeSlot.class);
     private final JLabel totalLabel = new JLabel(LanguageStrings.format(LanguageStrings.HATCH_TOTAL, 100.0f));
     private final JPanel centerPanel;
-    
+
     private boolean isAdjusting = false;
 
     public HatchRateDialog(JFrame owner, Colony colony) {
         super(owner, LanguageStrings.DIALOG_HATCH_RATES_TITLE, AssetStyles.DEFAULT_DIALOG_SIZE);
         this.colony = colony;
-        
+
         JPanel outer = new JPanel(new GridBagLayout());
         outer.setBackground(AssetStyles.BACKGROUND_COLOR);
 
@@ -44,17 +45,16 @@ public class HatchRateDialog extends ZeroDialog {
             BorderFactory.createEmptyBorder(20, 20, 20, 20)
         ));
         centerPanel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
-        
+
         outer.add(centerPanel);
         add(outer, BorderLayout.CENTER);
-        
+
         registerCloseKey(KeyEvent.VK_P);
     }
-    
+
     @Override
     public void showDialog() {
-        super.showDialog(); 
-        
+        super.showDialog();
         finalizeHatchRates();
     }
 
@@ -63,103 +63,199 @@ public class HatchRateDialog extends ZeroDialog {
         centerPanel.removeAll();
         spinnerMap.clear();
         subtypeSpinnerMap.clear();
-        subtypeTotalLabels.clear();
-        isAdjusting = false; 
-        
+        subtypeRowTotalLabels.clear();
+        isAdjusting = false;
+
         totalLabel.setFont(AssetStyles.FONT_BOLD);
         totalLabel.setForeground(AssetStyles.FONT_COLOR);
-        
+
         JLabel descLabel = new JLabel(LanguageStrings.get(LanguageStrings.HATCH_DESC));
         descLabel.setForeground(AssetStyles.FONT_COLOR);
-        
+
         centerPanel.add(descLabel);
         centerPanel.add(totalLabel);
         centerPanel.add(AssetStyles.createInternalSeparator());
-        
-        List<AntType> typesToRate = new ArrayList<>();
-        if (colony.hasUpgrade(GameUnlocks.TYPE_WORKER)) typesToRate.add(GameConstants.TYPE_WORKER);
-        if (colony.hasUpgrade(GameUnlocks.TYPE_SOLDIER)) typesToRate.add(GameConstants.TYPE_SOLDIER);
-        if (colony.hasUpgrade(GameUnlocks.TYPE_MAJOR)) typesToRate.add(GameConstants.TYPE_MAJOR);
-        if (colony.hasUpgrade(GameUnlocks.TYPE_PRINCESS)) {
-            typesToRate.add(GameConstants.TYPE_DRONE);
-            typesToRate.add(GameConstants.TYPE_PRINCESS);
-        }
+
+        List<AntType> typesToRate = buildUnlockedHatchTypes();
+        List<AntType> subtypeTypes = buildUnlockedSubtypeRateTypes();
+
+        JPanel ratesRow = new JPanel();
+        ratesRow.setLayout(new BoxLayout(ratesRow, BoxLayout.X_AXIS));
+        ratesRow.setOpaque(false);
+        ratesRow.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JPanel typePanel = new JPanel();
+        typePanel.setLayout(new BoxLayout(typePanel, BoxLayout.Y_AXIS));
+        typePanel.setOpaque(false);
+        typePanel.setAlignmentY(Component.TOP_ALIGNMENT);
 
         for (AntType type : typesToRate) {
-            JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 4));
             row.setOpaque(false);
-            
+
             JLabel typeLabel = new JLabel(type.getIcon());
             typeLabel.setToolTipText(type.getName());
             row.add(typeLabel);
-            
+
             float currentRate = colony.getHatchRate(type);
-            SpinnerModel model = new SpinnerNumberModel((double)currentRate, 0.0, 100.0, 0.1);
+            SpinnerModel model = new SpinnerNumberModel((double) currentRate, 0.0, 100.0, 0.1);
             JSpinner spinner = new JSpinner(model);
             AssetStyles.styleSpinner(spinner);
             spinner.setPreferredSize(new Dimension(80, 25));
 
             spinner.addChangeListener(e -> handleSpinnerChange(type, spinner));
-            
-            disableSpinnerLetterInput(spinner); 
-            
+
+            disableSpinnerLetterInput(spinner);
+
             spinnerMap.put(type, spinner);
             row.add(spinner);
-            centerPanel.add(row);
+            typePanel.add(row);
         }
 
-        buildSubtypeSections();
-        
+        ratesRow.add(typePanel);
+        ratesRow.add(Box.createHorizontalStrut(24));
+
+        JPanel subtypePanel = new JPanel();
+        subtypePanel.setLayout(new BoxLayout(subtypePanel, BoxLayout.Y_AXIS));
+        subtypePanel.setOpaque(false);
+        subtypePanel.setAlignmentY(Component.TOP_ALIGNMENT);
+        buildSubtypeSections(subtypeTypes, subtypePanel);
+
+        ratesRow.add(subtypePanel);
+
+        centerPanel.add(ratesRow);
+
         updateHatchRateTotals();
         centerPanel.revalidate();
         centerPanel.repaint();
     }
 
-    private void buildSubtypeSections() {
+    private List<AntType> buildUnlockedHatchTypes() {
+        List<AntType> typesToRate = new ArrayList<>();
+        if (colony.hasUpgrade(GameUnlocks.TYPE_WORKER)) {
+            typesToRate.add(GameConstants.TYPE_WORKER);
+        }
+        if (colony.hasUpgrade(GameUnlocks.TYPE_SOLDIER)) {
+            typesToRate.add(GameConstants.TYPE_SOLDIER);
+        }
+        if (colony.hasUpgrade(GameUnlocks.TYPE_MAJOR)) {
+            typesToRate.add(GameConstants.TYPE_MAJOR);
+        }
+        if (colony.hasUpgrade(GameUnlocks.TYPE_PRINCESS)) {
+            typesToRate.add(GameConstants.TYPE_DRONE);
+            typesToRate.add(GameConstants.TYPE_PRINCESS);
+        }
+        return typesToRate;
+    }
+
+    private List<AntType> buildUnlockedSubtypeRateTypes() {
+        List<AntType> types = new ArrayList<>();
+        for (AntType type : AntSubtypeService.getSubtypeRateTypes()) {
+            if (type == GameConstants.TYPE_WORKER && colony.hasUpgrade(GameUnlocks.TYPE_WORKER)) {
+                types.add(type);
+            } else if (type == GameConstants.TYPE_SOLDIER && colony.hasUpgrade(GameUnlocks.TYPE_SOLDIER)) {
+                types.add(type);
+            } else if (type == GameConstants.TYPE_MAJOR && colony.hasUpgrade(GameUnlocks.TYPE_MAJOR)) {
+                types.add(type);
+            } else if (type == GameConstants.TYPE_PRINCESS && colony.hasUpgrade(GameUnlocks.TYPE_PRINCESS)) {
+                types.add(type);
+            }
+        }
+        return types;
+    }
+
+    private void buildSubtypeSections(List<AntType> subtypeTypes, JPanel host) {
+        if (subtypeTypes.isEmpty() || !colony.hasUpgrade(GameUnlocks.ABILITY_SUBTYPE_HATCH)) {
+            return;
+        }
+
+        boolean firstSection = true;
         for (AntSubtypeSlot slot : GameConstants.getConfigurableSubtypeSlots()) {
             List<AntSubtype> subtypes = AntSubtypeService.getAvailableSubtypes(colony, slot);
             if (subtypes.size() <= 1) {
                 continue;
             }
 
-            centerPanel.add(AssetStyles.createInternalSeparator());
+            if (!firstSection) {
+                host.add(AssetStyles.createInternalSeparator());
+            }
+            firstSection = false;
 
             JLabel sectionLabel = new JLabel(LanguageStrings.get(sectionLabelKey(slot)));
             sectionLabel.setFont(AssetStyles.FONT_BOLD);
             sectionLabel.setForeground(AssetStyles.FONT_COLOR);
-            centerPanel.add(sectionLabel);
+            sectionLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            host.add(sectionLabel);
 
-            JLabel slotTotal = new JLabel(LanguageStrings.format(LanguageStrings.HATCH_TOTAL, 100.0f));
-            slotTotal.setFont(AssetStyles.FONT_BOLD);
-            slotTotal.setForeground(AssetStyles.FONT_COLOR);
-            subtypeTotalLabels.put(slot, slotTotal);
-            centerPanel.add(slotTotal);
+            JPanel matrixPanel = new JPanel(new GridBagLayout());
+            matrixPanel.setOpaque(false);
+            matrixPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-            Map<Integer, JSpinner> slotSpinners = new HashMap<>();
-            subtypeSpinnerMap.put(slot, slotSpinners);
+            GridBagConstraints header = new GridBagConstraints();
+            header.gridy = 0;
+            header.insets = new Insets(4, 4, 4, 4);
+            header.anchor = GridBagConstraints.CENTER;
 
+            int column = 1;
             for (AntSubtype subtype : subtypes) {
-                JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT));
-                row.setOpaque(false);
-
-                JLabel subtypeLabel = new JLabel(subtype.getIcon());
-                subtypeLabel.setToolTipText(subtypeTooltip(subtype));
-                row.add(subtypeLabel);
-
-                float currentRate = colony.getSubtypeHatchRate(slot, subtype.getDigit());
-                SpinnerModel model = new SpinnerNumberModel((double) currentRate, 0.0, 100.0, 0.1);
-                JSpinner spinner = new JSpinner(model);
-                AssetStyles.styleSpinner(spinner);
-                spinner.setPreferredSize(new Dimension(80, 25));
-                spinner.addChangeListener(e -> handleSubtypeSpinnerChange(slot, subtype.getDigit(), spinner));
-                disableSpinnerLetterInput(spinner);
-
-                slotSpinners.put(subtype.getDigit(), spinner);
-                row.add(spinner);
-                centerPanel.add(row);
+                header.gridx = column++;
+                JLabel subtypeHeader = new JLabel(subtype.getIcon());
+                subtypeHeader.setToolTipText(subtypeTooltip(subtype));
+                matrixPanel.add(subtypeHeader, header);
             }
 
-            updateSubtypeTotals(slot);
+            header.gridx = column;
+            JLabel totalHeader = new JLabel(LanguageStrings.get(LanguageStrings.HATCH_SUBTYPE_ROW_TOTAL));
+            totalHeader.setFont(AssetStyles.FONT_BOLD);
+            totalHeader.setForeground(AssetStyles.FONT_COLOR);
+            matrixPanel.add(totalHeader, header);
+
+            Map<AntType, Map<Integer, JSpinner>> typeSpinners = new HashMap<>();
+            subtypeSpinnerMap.put(slot, typeSpinners);
+            Map<AntType, JLabel> rowTotals = new HashMap<>();
+            subtypeRowTotalLabels.put(slot, rowTotals);
+
+            int rowIndex = 1;
+            GridBagConstraints cell = new GridBagConstraints();
+            cell.insets = new Insets(4, 4, 4, 4);
+            cell.anchor = GridBagConstraints.CENTER;
+
+            for (AntType type : subtypeTypes) {
+                cell.gridy = rowIndex;
+                cell.gridx = 0;
+                JLabel typeLabel = new JLabel(type.getIcon());
+                typeLabel.setToolTipText(type.getName());
+                matrixPanel.add(typeLabel, cell);
+
+                Map<Integer, JSpinner> digitSpinners = new HashMap<>();
+                typeSpinners.put(type, digitSpinners);
+
+                column = 1;
+                for (AntSubtype subtype : subtypes) {
+                    cell.gridx = column++;
+                    float currentRate = colony.getSubtypeHatchRate(type, slot, subtype.getDigit());
+                    SpinnerModel model = new SpinnerNumberModel((double) currentRate, 0.0, 100.0, 0.1);
+                    JSpinner spinner = new JSpinner(model);
+                    AssetStyles.styleSpinner(spinner);
+                    spinner.setPreferredSize(new Dimension(70, 25));
+                    spinner.addChangeListener(e -> handleSubtypeSpinnerChange(slot, type, subtype.getDigit(), spinner));
+                    disableSpinnerLetterInput(spinner);
+                    digitSpinners.put(subtype.getDigit(), spinner);
+                    matrixPanel.add(spinner, cell);
+                }
+
+                cell.gridx = column;
+                JLabel rowTotal = new JLabel(LanguageStrings.format(LanguageStrings.HATCH_TOTAL, 100.0f));
+                rowTotal.setFont(AssetStyles.FONT_BOLD);
+                rowTotal.setForeground(AssetStyles.FONT_COLOR);
+                rowTotals.put(type, rowTotal);
+                matrixPanel.add(rowTotal, cell);
+
+                updateSubtypeRowTotals(slot, type);
+                rowIndex++;
+            }
+
+            host.add(matrixPanel);
         }
     }
 
@@ -173,14 +269,21 @@ public class HatchRateDialog extends ZeroDialog {
 
     private static String subtypeTooltip(AntSubtype subtype) {
         String desc = subtype.getDesc();
+        String name = subtype.getName();
+        String foodNote = LanguageStrings.get(LanguageStrings.SUBTYPE_FOOD_COST_PER_TRAIT);
         if (desc == null || desc.isEmpty()) {
-            return subtype.getName();
+            return subtype.isNone() ? name : name + " — " + foodNote;
         }
-        return subtype.getName() + " — " + desc;
+        if (subtype.isNone()) {
+            return name + " — " + desc;
+        }
+        return name + " — " + desc + " " + foodNote;
     }
 
     private void handleSpinnerChange(AntType type, JSpinner spinner) {
-        if (isAdjusting) return;
+        if (isAdjusting) {
+            return;
+        }
         isAdjusting = true;
 
         try {
@@ -223,34 +326,38 @@ public class HatchRateDialog extends ZeroDialog {
         }
     }
 
-    private void handleSubtypeSpinnerChange(AntSubtypeSlot slot, int digit, JSpinner spinner) {
+    private void handleSubtypeSpinnerChange(AntSubtypeSlot slot, AntType type, int digit, JSpinner spinner) {
         if (isAdjusting) {
             return;
         }
         isAdjusting = true;
         try {
             double newValue = (Double) spinner.getValue();
-            Map<Integer, JSpinner> slotSpinners = subtypeSpinnerMap.get(slot);
+            Map<AntType, Map<Integer, JSpinner>> slotSpinners = subtypeSpinnerMap.get(slot);
             if (slotSpinners == null) {
+                return;
+            }
+            Map<Integer, JSpinner> typeSpinners = slotSpinners.get(type);
+            if (typeSpinners == null) {
                 return;
             }
 
             double otherTotal = 0.0;
-            for (Map.Entry<Integer, JSpinner> entry : slotSpinners.entrySet()) {
+            for (Map.Entry<Integer, JSpinner> entry : typeSpinners.entrySet()) {
                 if (entry.getKey() != digit) {
                     otherTotal += (Double) entry.getValue().getValue();
                 }
             }
 
             if (newValue + otherTotal > 100.0) {
-                JSpinner noneSpinner = slotSpinners.get(GameConstants.SUBTYPE_DIGIT_NONE);
+                JSpinner noneSpinner = typeSpinners.get(GameConstants.SUBTYPE_DIGIT_NONE);
                 if (digit != GameConstants.SUBTYPE_DIGIT_NONE && noneSpinner != null) {
                     double noneValue = (Double) noneSpinner.getValue();
                     double excess = (newValue + otherTotal) - 100.0;
                     if (noneValue >= excess) {
                         double newNoneValue = noneValue - excess;
                         noneSpinner.setValue(newNoneValue);
-                        colony.setSubtypeHatchRate(slot, GameConstants.SUBTYPE_DIGIT_NONE, (float) newNoneValue);
+                        colony.setSubtypeHatchRate(type, slot, GameConstants.SUBTYPE_DIGIT_NONE, (float) newNoneValue);
                     } else {
                         newValue = 100.0 - otherTotal;
                         spinner.setValue(newValue);
@@ -261,8 +368,8 @@ public class HatchRateDialog extends ZeroDialog {
                 }
             }
 
-            colony.setSubtypeHatchRate(slot, digit, (float) newValue);
-            updateSubtypeTotals(slot);
+            colony.setSubtypeHatchRate(type, slot, digit, (float) newValue);
+            updateSubtypeRowTotals(slot, type);
         } finally {
             isAdjusting = false;
         }
@@ -277,7 +384,7 @@ public class HatchRateDialog extends ZeroDialog {
         if (currentTotal < 99.99) {
             double remainder = 100.0 - currentTotal;
             float currentWorkerRate = colony.getHatchRate(GameConstants.TYPE_WORKER);
-            
+
             colony.setHatchRate(GameConstants.TYPE_WORKER, currentWorkerRate + (float) remainder);
         }
 
@@ -287,18 +394,23 @@ public class HatchRateDialog extends ZeroDialog {
     }
 
     private void finalizeSubtypeRates(AntSubtypeSlot slot) {
-        Map<Integer, JSpinner> slotSpinners = subtypeSpinnerMap.get(slot);
+        Map<AntType, Map<Integer, JSpinner>> slotSpinners = subtypeSpinnerMap.get(slot);
         if (slotSpinners == null) {
             return;
         }
-        double currentTotal = 0.0;
-        for (JSpinner spinner : slotSpinners.values()) {
-            currentTotal += (Double) spinner.getValue();
-        }
-        if (currentTotal < 99.99) {
-            double remainder = 100.0 - currentTotal;
-            float currentNoneRate = colony.getSubtypeHatchRate(slot, GameConstants.SUBTYPE_DIGIT_NONE);
-            colony.setSubtypeHatchRate(slot, GameConstants.SUBTYPE_DIGIT_NONE, currentNoneRate + (float) remainder);
+        for (Map.Entry<AntType, Map<Integer, JSpinner>> typeEntry : slotSpinners.entrySet()) {
+            AntType type = typeEntry.getKey();
+            Map<Integer, JSpinner> digitSpinners = typeEntry.getValue();
+            double currentTotal = 0.0;
+            for (JSpinner spinner : digitSpinners.values()) {
+                currentTotal += (Double) spinner.getValue();
+            }
+            if (currentTotal < 99.99) {
+                double remainder = 100.0 - currentTotal;
+                float currentNoneRate = colony.getSubtypeHatchRate(type, slot, GameConstants.SUBTYPE_DIGIT_NONE);
+                colony.setSubtypeHatchRate(type, slot, GameConstants.SUBTYPE_DIGIT_NONE,
+                        currentNoneRate + (float) remainder);
+            }
         }
     }
 
@@ -320,10 +432,10 @@ public class HatchRateDialog extends ZeroDialog {
         for (JSpinner s : spinnerMap.values()) {
             totalAssigned += (Double) s.getValue();
         }
-        
+
         totalLabel.setText(LanguageStrings.format(LanguageStrings.HATCH_TOTAL, totalAssigned));
-        
-        if (Math.abs(100.0 - totalAssigned) > 0.1) { 
+
+        if (Math.abs(100.0 - totalAssigned) > 0.1) {
             totalLabel.setForeground(AssetStyles.FONT_COLOR_ERROR);
             totalLabel.setToolTipText(LanguageStrings.get(LanguageStrings.HATCH_WARNING_TOTAL));
         } else {
@@ -332,23 +444,28 @@ public class HatchRateDialog extends ZeroDialog {
         }
     }
 
-    private void updateSubtypeTotals(AntSubtypeSlot slot) {
-        JLabel slotTotal = subtypeTotalLabels.get(slot);
-        Map<Integer, JSpinner> slotSpinners = subtypeSpinnerMap.get(slot);
-        if (slotTotal == null || slotSpinners == null) {
+    private void updateSubtypeRowTotals(AntSubtypeSlot slot, AntType type) {
+        Map<AntType, JLabel> rowTotals = subtypeRowTotalLabels.get(slot);
+        Map<AntType, Map<Integer, JSpinner>> slotSpinners = subtypeSpinnerMap.get(slot);
+        if (rowTotals == null || slotSpinners == null) {
+            return;
+        }
+        JLabel rowTotal = rowTotals.get(type);
+        Map<Integer, JSpinner> typeSpinners = slotSpinners.get(type);
+        if (rowTotal == null || typeSpinners == null) {
             return;
         }
         double totalAssigned = 0.0;
-        for (JSpinner spinner : slotSpinners.values()) {
+        for (JSpinner spinner : typeSpinners.values()) {
             totalAssigned += (Double) spinner.getValue();
         }
-        slotTotal.setText(LanguageStrings.format(LanguageStrings.HATCH_TOTAL, totalAssigned));
+        rowTotal.setText(LanguageStrings.format(LanguageStrings.HATCH_TOTAL, totalAssigned));
         if (Math.abs(100.0 - totalAssigned) > 0.1) {
-            slotTotal.setForeground(AssetStyles.FONT_COLOR_ERROR);
-            slotTotal.setToolTipText(LanguageStrings.get(LanguageStrings.HATCH_WARNING_TOTAL));
+            rowTotal.setForeground(AssetStyles.FONT_COLOR_ERROR);
+            rowTotal.setToolTipText(LanguageStrings.get(LanguageStrings.HATCH_WARNING_TOTAL));
         } else {
-            slotTotal.setForeground(AssetStyles.FONT_COLOR);
-            slotTotal.setToolTipText(LanguageStrings.get(LanguageStrings.HATCH_TOTAL_OK));
+            rowTotal.setForeground(AssetStyles.FONT_COLOR);
+            rowTotal.setToolTipText(LanguageStrings.get(LanguageStrings.HATCH_TOTAL_OK));
         }
     }
 }

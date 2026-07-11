@@ -196,6 +196,9 @@ public final class GameUnlocks {
         public static final Upgrade ABILITY_AUTO_DIPLOMACY = new Upgrade(523, "ABILITY_AUTO_DIPLOMACY", "ABILITY_AUTO_DIPLOMACY_FLAVOR", "ABILITY_AUTO_DIPLOMACY_DESC", ABILITY_AUTOMATION, 0, null);
         static { upgrades.add(ABILITY_AUTO_DIPLOMACY); }
 
+        public static final Upgrade ABILITY_SUBTYPE_HATCH = new Upgrade(524, "ABILITY_SUBTYPE_HATCH", "ABILITY_SUBTYPE_HATCH_FLAVOR", "ABILITY_SUBTYPE_HATCH_DESC", ABILITY_ASSIMILATION, 0, null);
+        static { upgrades.add(ABILITY_SUBTYPE_HATCH); }
+
         public static boolean meetsExtraAutomationPrerequisites(Dynasty dynasty, Upgrade upgrade) {
             if (upgrade != ABILITY_AUTO_TUNNELS && upgrade != ABILITY_AUTO_DIPLOMACY) {
                 return true;

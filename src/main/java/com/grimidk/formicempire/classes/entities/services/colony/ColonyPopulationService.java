@@ -133,7 +133,7 @@ public class ColonyPopulationService {
             AntType newType = determineHatchType(colony);
             pupa.transform(colony, newType);
             if (AntSubtypeService.isEligibleType(newType)) {
-                pupa.setSubtypeProfile(AntSubtypeService.rollProfile(colony));
+                pupa.setSubtypeProfile(AntSubtypeService.rollProfile(colony, newType));
                 AntSubtypeService.applySubtypeStats(pupa, colony);
             }
             colony.getAntsByType(newType).add(pupa);
@@ -146,7 +146,7 @@ public class ColonyPopulationService {
         float m = colony.hasUpgrade(GameUnlocks.TYPE_MAJOR) ? 5.0f : 0f;
         float p = 0f;
         float d = 0f;
-        
+
         if (colony.hasUpgrade(GameUnlocks.TYPE_PRINCESS)) {
             p = 4.0f;
             d = 1.0f;
@@ -159,6 +159,7 @@ public class ColonyPopulationService {
         colony.setHatchRate(GameConstants.TYPE_MAJOR, m);
         colony.setHatchRate(GameConstants.TYPE_PRINCESS, p);
         colony.setHatchRate(GameConstants.TYPE_DRONE, d);
+        AntSubtypeService.applyAutomatedSubtypeRates(colony);
     }
 
     public void runHatching(Colony colony){
@@ -242,17 +243,16 @@ public class ColonyPopulationService {
         
         List<Ant> hungryCandidates = new ArrayList<>();
         int foodNeeded = 0;
-        int baseConsumption = stats.getBaseConsumption(colony);
 
         for (AntType type : eatTypes) {
-            int consumptionPerAnt = (int) (type.getConsumptionMult() * baseConsumption);
-            if (consumptionPerAnt <= 0) consumptionPerAnt = 1; 
-            if (type == GameConstants.TYPE_EGG || type == GameConstants.TYPE_PUPA) continue;
-            
+            if (type == GameConstants.TYPE_EGG || type == GameConstants.TYPE_PUPA) {
+                continue;
+            }
             List<Ant> list = colony.getAntsByType(type);
             for (Ant ant : list) {
+                int consumptionPerAnt = Math.max(1, (int) Math.ceil(ant.getConsumption()));
                 foodNeeded += consumptionPerAnt;
-                hungryCandidates.add(ant); 
+                hungryCandidates.add(ant);
             }
         }
 
@@ -269,7 +269,7 @@ public class ColonyPopulationService {
             foodDeficit -= syrupConsumed;
         }
 
-        int approxAntsToKill = (int) (foodDeficit / (baseConsumption <= 0 ? 1 : baseConsumption));
+        int approxAntsToKill = (int) (foodDeficit / Math.max(1, stats.getBaseConsumption(colony)));
         List<Ant> doomedHungry = ColonyResourceDeathSelection.selectVictims(
             hungryCandidates, approxAntsToKill, new HashSet<>(doomedThirsty));
 

@@ -374,14 +374,37 @@ public class ColonyStatsService {
     }
 
     public int getTotalConsumption(Colony colony){
-        double totalConsumption = 0;
+        int totalConsumption = 0;
         for (Map.Entry<AntType, List<Ant>> entry : colony.getAntGroups().entrySet()) {
-            double typeMult = entry.getKey().getConsumptionMult();
-            int perAnt = (int)(typeMult * getBaseConsumption(colony));
-            if (perAnt <= 0) perAnt = 1;
-            
-            totalConsumption += entry.getValue().size() * perAnt;
+            for (Ant ant : entry.getValue()) {
+                if (ant == null || !ant.isAlive()) {
+                    continue;
+                }
+                totalConsumption += Math.max(1, (int) Math.ceil(ant.getConsumption()));
+            }
         }
-        return (int) totalConsumption;
+        return totalConsumption;
+    }
+
+    public int getSubtypeFoodOverhead(Colony colony) {
+        if (colony == null) {
+            return 0;
+        }
+        int base = getBaseConsumption(colony);
+        int overhead = 0;
+        for (Map.Entry<AntType, List<Ant>> entry : colony.getAntGroups().entrySet()) {
+            AntType type = entry.getKey();
+            if (type == null || !AntSubtypeService.isEligibleType(type)) {
+                continue;
+            }
+            float baseline = base * type.getConsumptionMult();
+            for (Ant ant : entry.getValue()) {
+                if (ant == null || !ant.isAlive()) {
+                    continue;
+                }
+                overhead += Math.max(0, (int) Math.ceil(ant.getConsumption() - baseline));
+            }
+        }
+        return overhead;
     }
 }
