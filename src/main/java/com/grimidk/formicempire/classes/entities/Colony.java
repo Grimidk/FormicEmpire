@@ -98,7 +98,6 @@ public class Colony {
     private int pheromoneStormMonthsRemaining;
     private int recentlyConqueredMonthsRemaining;
     private int recentlyIntegratedMonthsRemaining;
-    /** Loyalty modifier key -> remaining days ({@link GameConstants#MODIFIER_PERMANENT} = no expiry). */
     private final Map<String, Integer> loyaltyModifierRemainingDays = new HashMap<>();
     private int creatineDietMonthsRemaining;
 
@@ -637,7 +636,6 @@ public class Colony {
         return GameConstants.getCapitalDistanceLoyaltyPenalty(tiles);
     }
 
-    /** Hex tile distance to dynasty capital, or -1 if unknown. */
     public int getCapitalHexDistance(World world) {
         if (isDynastyCapital() || dynasty == null || world == null) {
             return 0;
@@ -787,7 +785,6 @@ public class Colony {
         }
     }
 
-    // Delegates to Dynasty unless this colony keeps a native species after integration.
     public Species getSpecies() {
         if (nativeSpeciesId > 0) {
             Species nativeSpecies = GameConstants.getSpeciesById(nativeSpeciesId);
@@ -849,7 +846,6 @@ public class Colony {
     public boolean isActive() { return isActive; }
     public void setActive(boolean isActive) { this.isActive = isActive; }
 
-    /** Full per-ant labour/eating sim runs only on the player's viewed colony; NPC hexes stay on lite sim even when focused. */
     public boolean runsFullSimulation() {
         return isActive && isPlayer;
     }
@@ -905,10 +901,6 @@ public class Colony {
 
     public Map<AntType, List<Ant>> getAntGroups() { return antGroups; }
 
-    /**
-     * Live ants by type. {@link GameConstants#TYPE_DEAD} is stored in {@link #getDeadAnts()} (not in {@code antGroups}).
-     * Unknown types return an empty immutable list (never a fresh throwaway {@link CopyOnWriteArrayList}).
-     */
     public List<Ant> getAntsByType(AntType type) {
         if (type == GameConstants.TYPE_DEAD) {
             return deadAnts;

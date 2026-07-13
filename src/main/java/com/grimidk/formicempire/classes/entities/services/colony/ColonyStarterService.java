@@ -146,6 +146,53 @@ public class ColonyStarterService {
         hex.setColony(null);
     }
 
+    public static boolean isReclaimableDeadColony(Colony colony) {
+        if (colony == null || colony.getAntTotal() > 0) {
+            return false;
+        }
+        if (colony.getAge() >= 7 || colony.getDaysWithoutQueen() >= 7) {
+            return true;
+        }
+        Dynasty dynasty = colony.getDynasty();
+        if (dynasty != null && dynasty.isDefeated()) {
+            return true;
+        }
+        return colony.getDynasty() == null;
+    }
+
+    public void finalizeDeadRemnant(Colony colony) {
+        if (colony == null) {
+            return;
+        }
+        colony.setActive(false);
+        colony.setAutomationEnabled(false);
+        clearColonyLists(colony);
+        if (colony.getDeadAnts() != null) {
+            colony.getDeadAnts().clear();
+        }
+        if (colony.getBugs() != null) {
+            colony.getBugs().clear();
+        }
+    }
+
+    public void reclaimDeadColonyForSpread(Hex hex, Dynasty absorbingDynasty, Colony logColony) {
+        if (hex == null || !isReclaimableDeadColony(hex.getColony())) {
+            return;
+        }
+        Colony dead = hex.getColony();
+        Dynasty oldDynasty = dead.getDynasty();
+        if (oldDynasty != null && absorbingDynasty != null && oldDynasty != absorbingDynasty) {
+            absorbingDynasty.inheritAssimilationsFrom(oldDynasty);
+            if (logColony != null) {
+                logColony.logEvent(ColonyLogPrefixes.DYNASTY + " "
+                        + String.format(LanguageStrings.get(LanguageStrings.LOG_DYNASTY_ABSORBED_FMT),
+                                oldDynasty.getName()));
+            }
+            oldDynasty.removeColony(dead);
+        }
+        dismantleColony(hex);
+    }
+
     public void matureColony(Colony colony) {
         System.out.println("[ColonyStarterService] Maturation complete. Spawning workforce for " + colony.getName());
 
@@ -201,9 +248,6 @@ public class ColonyStarterService {
         colony.logEvent(ColonyLogPrefixes.INFO + " " + LanguageStrings.get(LanguageStrings.LOG_MATURATION_COMPLETE));
     }
 
-    /**
-     * Rebuilds a colony immediately after conquest so battle losses do not leave it queenless or depopulated.
-     */
     public void stabilizeConqueredColony(Dynasty victor, Colony colony) {
         if (victor == null || colony == null) {
             return;
@@ -241,9 +285,6 @@ public class ColonyStarterService {
                 colony.getPeaceAssignedRoleCount(GameConstants.ROLE_LAYER) + 1);
     }
 
-    /**
-     * Syncs an integrated colony with the overlord dynasty's research, assimilations, and capital infrastructure.
-     */
     public void inheritIntegratedColonyFromOverlord(Dynasty overlord, Colony colony) {
         if (overlord == null || colony == null) {
             return;
@@ -278,9 +319,6 @@ public class ColonyStarterService {
         colony.refreshAntStats();
     }
 
-    /**
-     * Seeds workforce, peace roles, resources, and food so a queenless captured colony can sustain after war.
-     */
     public void reestablishCapturedColony(Colony capital, Colony target) {
         if (capital == null || target == null || target.getQueens().isEmpty()) {
             return;

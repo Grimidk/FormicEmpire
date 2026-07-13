@@ -196,13 +196,6 @@ public class ColonyStatsService {
     public int getBaseRegen(Colony colony) { return colony.hasUpgrade(GameUnlocks.STAT_SKELETON) ? 1 : 0; }
     public int getBaseConsumption(Colony colony) { return colony.hasUpgrade(GameUnlocks.STAT_LONGEVITY) ? 1 : 0; }
 
-    /**
-     * Assimilated damage multiplier for colony base attack.
-     * Fire venom sets 4x; neurotoxic venom adds +4 (additive).
-     * Stinger abdomen subtype applies per-ant via {@link AntSubtypeService}.
-     * {@link GameUnlocks#SYNERGY_SUPER_VENOM} replaces Fire + neurotoxic stacking with
-     * {@link GameConstants#ASSIMILATED_DAMAGE_SYNERGY_FIRE_DEADLY} (16x).
-     */
     public static float getAssimilatedDamageMultiplier(Dynasty dynasty) {
         if (dynasty == null) {
             return 1f;

@@ -1,9 +1,5 @@
 package com.grimidk.formicempire.classes.interfaces.ui.util;
 
-/**
- * Compact metric-style display for user-facing counts (1k, 1.5m, …).
- * Values with magnitude below 1000 render without a suffix.
- */
 public final class UiNumberFormat {
     private static final double COMPACT_THRESHOLD = 1000.0;
     private static final char[] SUFFIXES = {'k', 'm', 'b', 't', 'q', 'Q'};

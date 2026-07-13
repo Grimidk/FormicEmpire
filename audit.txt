@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 69% (190/275 checked)
+Completion: 83% (229/277 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -253,13 +253,14 @@ Passive / special rooms:
 ================================================================================
 12. ASSIMILATION (I) — UpgradeDialog Assimilation tab
 ================================================================================
-Start / progress assimilations (RP + time). Each species:
+Start / progress assimilations (RP + time). Target RP cost scales +25% per completed assimilation (5th = 200% base). Each species:
 [X] Leafcutter, Pharaoh, Marauder, Trapjaw, Honeypot, Doorhead
 [ ] Woodburrow, Silkweave, Rafting, Firevenom, Jumping, Gliding
 [X] Stinging, Swarming, Stealth, Fastbite, Heatresist, Deadlyvenom
 [ ] Selfdestruct, Farsight, Hivebuild, Locsense
 
-[X] Completed assimilation unlocks hatch subtypes (trapjaw, honeypot, doorhead, stinger); other passives still pending
+[ ] Assimilation RP target cost scales +25% per completed assimilation (5th = 200% base)
+[ ] Completed assimilation unlocks hatch subtypes (trapjaw, honeypot, doorhead, stinger); other passives still pending
 
 ================================================================================
 13. SYNERGIES (O) — UpgradeDialog Synergy tab
@@ -319,7 +320,7 @@ Neighbor trade rows (per adjacent hex):
 Per foreign dynasty Actions menu:
 [ ] Incoming pact request policy (Ask / Auto accept / Auto decline; max one received per day)
 [X] Non-aggression pact — propose / accept / break
-[X] Declare war (confirm dialog; population & military checks)
+[ ] Declare war (confirm dialog; population + attacker active military; target may lack active roles → hex defense)
 [ ] Request trade agreement
 [ ] Open trade negotiation
 [ ] Send diplomats to dynasty (assign count 0–max; shows current, preview reputation)
@@ -426,11 +427,12 @@ World:
 [X] Biome differences on hexes
 [X] Resource sources on map (plants, mushrooms, water, prey)
 [X] Nuptial flight colony founding on new hexes
+[ ] Spreading onto dead/defeated hex inherits species genomes and completed assimilations
 [ ] AI dynasties trade, tunnel, diplomacy, war
 
 Combat:
 [X] Colony military power calculation
-[ ] War stages: clash, hex defense, etc.
+[ ] War skips active clash when defender has no assigned active military roles (hex defense)
 [X] Battle view stat multipliers vs standing multipliers
 
 ================================================================================

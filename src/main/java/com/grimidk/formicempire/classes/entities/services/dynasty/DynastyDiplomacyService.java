@@ -51,6 +51,18 @@ public class DynastyDiplomacyService {
         return countPreparedActiveMilitaryRoles(dynasty) > 0;
     }
 
+    public static int countAssignedActiveMilitaryRoles(Dynasty dynasty) {
+        if (dynasty == null || dynasty.isDefeated()) {
+            return 0;
+        }
+        ensureSoldierWarRoleUpgrades(dynasty);
+        int assigned = 0;
+        for (Colony colony : dynasty.getColonies()) {
+            assigned += sumActiveMilitaryRoleCounts(colony.getWarAssignedRoleCounts());
+        }
+        return assigned;
+    }
+
     public static int countPreparedActiveMilitaryRoles(Dynasty dynasty) {
         if (dynasty == null || dynasty.isDefeated()) {
             return 0;
@@ -337,9 +349,6 @@ public class DynastyDiplomacyService {
             return false;
         }
         if (!meetsWarActiveMilitaryRequirement(dynasty)) {
-            return false;
-        }
-        if (!meetsWarActiveMilitaryRequirement(other)) {
             return false;
         }
         if (!sharesBorderWith(other, world)) {

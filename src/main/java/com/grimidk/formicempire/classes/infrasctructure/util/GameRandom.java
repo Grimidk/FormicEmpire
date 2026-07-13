@@ -40,12 +40,10 @@ public final class GameRandom {
         return RNG.nextInt(bound);
     }
 
-    /** Shared RNG for {@link Collections#shuffle} and similar APIs that require a {@link Random}. */
     public static Random getShuffleRandom() {
         return RNG;
     }
 
-    /** Deterministic int in {@code [0, bound)} from a seed (no allocation). */
     public static int seededNextInt(long seed, int bound) {
         if (bound <= 0) {
             return 0;
@@ -54,7 +52,6 @@ public final class GameRandom {
         return (int) ((mixed >>> 32) % bound);
     }
 
-    /** Deterministic float in {@code [0, 1)} from a seed (no allocation). */
     public static float seededNextFloat(long seed) {
         long mixed = mixSeed(seed);
         return ((mixed >>> 40) & 0xFFFFFF) / (float) (1 << 24);

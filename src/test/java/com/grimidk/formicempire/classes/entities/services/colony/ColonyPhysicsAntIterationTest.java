@@ -11,10 +11,6 @@ import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.WorldSpaces;
 
-/**
- * Regression: physics must not use indexed access on {@link java.util.concurrent.CopyOnWriteArrayList}
- * ant lists while {@code updateAntLogic} can remove ants (e.g. nuptial flight).
- */
 class ColonyPhysicsAntIterationTest {
 
     private ColonyPhysicsService physicsService;

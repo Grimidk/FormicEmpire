@@ -8,17 +8,28 @@ To Fix (By decreasing priority) :
 	High:
 	TODO: icons all unlocks
 	TODO: species sprites and icon: carpenter, weaver, floodplain, jet, gliding, army, ghost, dracula, silver, exploding, bulldog, shining black and desert
-	unlocked assimilations but not assimilation to get, may need to check absorbing colony remnant
-	war is way too fast, maybe add substeps
-	scale assimilation cost by 25% each time
 	tunels somehow building on their own with no diggers and 2 at the same time
 	war advance popup 
-	not seeing better colony names like grad and berg, add more and randomize post prime
+	give 50% defense boost in hex defense
+	not seeing better colony names like grad and berg, add more and randomize post prime, rework dynasty naming to max 3 per species
 	separate trigger for auto tunnel (typo) and auto diplomacy so they are easier
 	mites not triggering at all
-	attacking unprepared dynasties is valid (auto win)
-	clean better dead colonies
 	add a subtab for triggered modifiers and progress with interrogations
+	improve alert reading by simplyfing and using icons
+	ai doesnt fight mites 
+	rework cursor in general by making all small buttons bigger
+	rebalance initial ant spawning so they dont die as much, maybe 30 ants
+	watching other colonies shouldnt affect alerts or triggers
+	rework pet insect balance
+	center on home -> go back home
+	diplomatic pressure upgrade wording
+	diplomacy tab sorting by distance and searcher
+	parasites are broken
+	scrollbars can be slow
+	random pausing and unpausing
+	history in savefiles
+	look into scarcity better
+	show source amounts with tooltip and what they are
 
 	revise audit tutorial and tests for blindspots
 
@@ -84,7 +95,7 @@ Post launch (v1.1) (Improvements Update):
     engine clean up for reusability (Core Engine Package)
 	editable stat panel 
 	logistic lines in map with tunnels and progress and method, and war overlays by stage
-	world editing (size, difficulty, islands) and further dynasty editing like color species and starting upgrades
+	world editing (size, islands, dynasty amounts and size) and further dynasty editing like color species and starting upgrades
 	console and commands for debugging (to include in core)
 	native universal modding support (to include in core)
 	custom key bind settings for all keys (to include in core)

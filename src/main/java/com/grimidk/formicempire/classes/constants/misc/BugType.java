@@ -27,11 +27,6 @@ public class BugType extends Constant{
         this.sprite = sprite;
     }
 
-    //no icon
-    public BugType(int id, String name, String scientificNameKey, float baseHealth, float baseRegen, float baseAttack, float baseAttackSpeed, float baseDefense, float baseSpeed, ImageIcon sprite) {
-        this(id, name, scientificNameKey, baseHealth, baseRegen, baseAttack, baseAttackSpeed, baseDefense, baseSpeed, null, sprite);
-    }
-
     public String getScientificName() {
         return LanguageStrings.get(scientificNameKey);
     }

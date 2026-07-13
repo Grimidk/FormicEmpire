@@ -8,7 +8,6 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import javax.swing.Icon;
 
-/** Flat radio glyphs: hollow circle (off) or filled disc (on). */
 public final class SquareRadioIcons {
     public static final int ICON_SIZE = 12;
 

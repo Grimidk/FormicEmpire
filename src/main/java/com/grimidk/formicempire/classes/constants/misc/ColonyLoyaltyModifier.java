@@ -8,7 +8,6 @@ public class ColonyLoyaltyModifier {
     private final int loyaltyDelta;
     private final int minLoyaltyRequired;
     private final String exclusiveGroupKey;
-    /** Days until the modifier expires after application; 0 = not stored (dynamic/permanent check elsewhere). */
     private final int durationDays;
 
     public ColonyLoyaltyModifier(int id, String nameKey, int loyaltyDelta,

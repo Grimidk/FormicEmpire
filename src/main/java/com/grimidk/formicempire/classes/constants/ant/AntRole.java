@@ -12,11 +12,6 @@ public class AntRole extends Constant {
         this.antType = antType;
     }
 
-    //(no icon)
-    public AntRole(int id, AntType antType, String name) {
-        this(id, antType, name, null);
-    }
-
     public AntType getAntType() {
         return antType;
     }

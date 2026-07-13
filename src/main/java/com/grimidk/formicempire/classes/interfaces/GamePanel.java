@@ -560,7 +560,6 @@ public class GamePanel extends ZeroGamePanel {
                 });
     }
 
-    /** Catches typed {@code +} on non-US layouts where InputMap shift+= does not match. */
     private void installPlusSpeedKeyDispatcher() {
         if (plusSpeedKeyDispatcher != null) {
             return;

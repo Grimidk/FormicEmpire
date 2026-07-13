@@ -6,7 +6,6 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.security.CodeSource;
 
-/** Resolves writable paths next to the running application (jar, exe, or .app bundle). */
 public final class GamePaths {
 
     private GamePaths() {
@@ -32,7 +31,6 @@ public final class GamePaths {
         return new File(System.getProperty("user.dir", "."));
     }
 
-    /** jpackage app-image puts the game jar under {@code lib/}; saves belong at the image root. */
     private static File normalizePackagedAppDirectory(File appDir) {
         if (appDir == null) {
             return null;
@@ -46,7 +44,6 @@ public final class GamePaths {
         return appDir;
     }
 
-    /** When running the shaded jar from Maven {@code target/}, keep saves at the repo root. */
     private static File resolveDevProjectRoot(File appDir) {
         File dir = appDir;
         if (dir != null && "classes".equals(dir.getName())) {

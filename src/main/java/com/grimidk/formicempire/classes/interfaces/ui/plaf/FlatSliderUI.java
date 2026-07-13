@@ -11,7 +11,6 @@ import javax.swing.SwingConstants;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicSliderUI;
 
-/** Flat track line and bordered thumb (matches {@link FlatScrollBarUI}). */
 public final class FlatSliderUI extends BasicSliderUI {
     public static final Dimension VERTICAL_SIZE = new Dimension(FlatScrollBarUI.VERTICAL_BAR_WIDTH, 96);
     private static final int TRACK_BREADTH = FlatScrollBarUI.VERTICAL_BAR_WIDTH;

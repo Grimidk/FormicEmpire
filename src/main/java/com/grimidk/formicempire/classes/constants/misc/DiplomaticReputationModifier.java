@@ -8,7 +8,6 @@ public class DiplomaticReputationModifier {
     private final int reputationDelta;
     private final int minReputationRequired;
     private final String exclusiveGroupKey;
-    /** Days until the modifier expires after application; 0 = permanent. */
     private final int durationDays;
 
     public DiplomaticReputationModifier(int id, String nameKey, int reputationDelta,

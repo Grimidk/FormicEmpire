@@ -91,7 +91,6 @@ public class ColonyBugHandlingService {
         return total;
     }
 
-    /** Display cap: sum of tender capacity for unlocked pet species, limited by the shared catcher pool when present. */
     public int getUnlockedPetCapacityMax(Colony colony) {
         if (colony == null) {
             return 0;
@@ -342,7 +341,6 @@ public class ColonyBugHandlingService {
         }
     }
 
-    /** Keeps pet sprite entities in their overworld pens once colony bounds are known. */
     public void syncPetPenPositionsFromBounds(Colony colony) {
         if (colony == null) {
             return;

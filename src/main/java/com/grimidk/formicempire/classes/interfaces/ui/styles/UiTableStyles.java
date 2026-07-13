@@ -17,7 +17,6 @@ import javax.swing.table.TableColumn;
 
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiNumberFormat;
 
-/** Shared JTable layout helpers — column sizing and dialog defaults. */
 public final class UiTableStyles {
     private static final int DEFAULT_PADDING = 16;
     private static final int DEFAULT_MIN = 48;
@@ -43,7 +42,6 @@ public final class UiTableStyles {
         applyDefaultNumberRenderers(table);
     }
 
-    /** Fixed column widths; use {@link #layoutColumnsForViewport} after data updates. */
     public static void applyScrollableDialogTable(JTable table) {
         applyDialogTable(table);
         if (table != null) {
@@ -173,9 +171,6 @@ public final class UiTableStyles {
         applyColumnWidth(table, columnIndex, width, minWidth);
     }
 
-    /**
-     * Sizes columns from header + cell content, then expands growable columns to fill the viewport.
-     */
     public static void layoutColumnsForViewport(JTable table, int viewportWidth, boolean[] growableColumns) {
         if (table == null || table.getColumnCount() == 0 || viewportWidth <= 0) {
             return;
@@ -284,7 +279,6 @@ public final class UiTableStyles {
         return SwingConstants.LEFT;
     }
 
-    /** Anchors a popup below a table cell — used by row action menus. */
     public static void showCellPopupMenu(JPopupMenu menu, JTable table, int row, int column) {
         if (menu == null || table == null || row < 0 || column < 0 || !table.isShowing()) {
             return;
@@ -293,7 +287,6 @@ public final class UiTableStyles {
         menu.show(table, rect.x, rect.y + rect.height);
     }
 
-    /** Shows a popup on a component when no table anchor is available. */
     public static void showComponentPopupMenu(JPopupMenu menu, Component invoker) {
         if (menu == null || invoker == null || !invoker.isShowing()) {
             return;
@@ -301,7 +294,6 @@ public final class UiTableStyles {
         menu.show(invoker, Math.max(0, invoker.getWidth() / 2), Math.max(0, invoker.getHeight() / 2));
     }
 
-  /** Shows full cell text on hover when the column is too narrow. */
     public static class TooltipCellRenderer extends DefaultTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,

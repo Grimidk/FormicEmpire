@@ -424,7 +424,6 @@ public class WarService {
         return null;
     }
 
-    /** @deprecated use {@link #findActiveWar(int, int)} */
     public War findWar(int dynastyIdOne, int dynastyIdTwo) {
         return findActiveWar(dynastyIdOne, dynastyIdTwo);
     }

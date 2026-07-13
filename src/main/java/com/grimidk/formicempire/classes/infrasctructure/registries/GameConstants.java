@@ -174,7 +174,6 @@ public final class GameConstants {
         return loadIcon("sprites/ants/zero-drones/" + species.getZeroDroneSpriteFileName());
     }
 
-    /** True when {@code sprites/ants/zero-drones/} has art for this species (fully implemented assimilations only). */
     public static boolean hasAssimilatedDroneSprite(Species species) {
         if (species == null) {
             return false;
@@ -674,7 +673,6 @@ public final class GameConstants {
     public static final float SUBTYPE_DEFENSE_MULT_DOORHEAD = 5f;
     public static final float SUBTYPE_FORAGE_MULT_HONEYPOT = 4f;
     public static final float SUBTYPE_SPEED_MULT_HONEYPOT = 0.75f;
-    /** Additive food consumption per active body-part subtype (2 subtypes = 2x food). */
     public static final float SUBTYPE_FOOD_CONSUMPTION_ADD_PER_TRAIT = 0.5f;
 
     private static final ImageIcon SUBTYPE_ICON_NOTHING = loadIcon("icons/species/Omni.png");
@@ -822,23 +820,23 @@ public final class GameConstants {
 
     // --- Game speeds (tick delay ms; icons under icons/speed/) ---
     public static final GameSpeed SPEED_VERY_SLOW = new GameSpeed(
-            GameSpeed.ID_VERY_SLOW, LanguageStrings.UI_SPEED_VERY_SLOW, 1000,
+            GameSpeed.ID_VERY_SLOW, LanguageStrings.UI_SPEED_VERY_SLOW, 200,
             loadIcon("icons/speed/VerySlow.png"));
     static { gameSpeeds.add(SPEED_VERY_SLOW); }
     public static final GameSpeed SPEED_SLOW = new GameSpeed(
-            GameSpeed.ID_SLOW, LanguageStrings.UI_SPEED_SLOW, 500,
+            GameSpeed.ID_SLOW, LanguageStrings.UI_SPEED_SLOW, 100,
             loadIcon("icons/speed/Slow.png"));
     static { gameSpeeds.add(SPEED_SLOW); }
     public static final GameSpeed SPEED_NORMAL = new GameSpeed(
-            GameSpeed.ID_NORMAL, LanguageStrings.UI_SPEED_NORMAL, 250,
+            GameSpeed.ID_NORMAL, LanguageStrings.UI_SPEED_NORMAL, 50,
             loadIcon("icons/speed/Normal.png"));
     static { gameSpeeds.add(SPEED_NORMAL); }
     public static final GameSpeed SPEED_FAST = new GameSpeed(
-            GameSpeed.ID_FAST, LanguageStrings.UI_SPEED_FAST, 100,
+            GameSpeed.ID_FAST, LanguageStrings.UI_SPEED_FAST, 20,
             loadIcon("icons/speed/Fast.png"));
     static { gameSpeeds.add(SPEED_FAST); }
     public static final GameSpeed SPEED_VERY_FAST = new GameSpeed(
-            GameSpeed.ID_VERY_FAST, LanguageStrings.UI_SPEED_VERY_FAST, 50,
+            GameSpeed.ID_VERY_FAST, LanguageStrings.UI_SPEED_VERY_FAST, 10,
             loadIcon("icons/speed/VeryFast.png"));
     static { gameSpeeds.add(SPEED_VERY_FAST); }
     public static final GameSpeed SPEED_TURBO = new GameSpeed(
@@ -875,7 +873,6 @@ public final class GameConstants {
 
     public static final String DIPLO_EXCLUSIVE_PACT = "pact";
 
-    /** Stored remaining-days sentinel: modifier does not expire on a timer. */
     public static final int MODIFIER_PERMANENT = -1;
 
     // --- Diplomatic reputation modifiers ---
@@ -1496,7 +1493,6 @@ public final class GameConstants {
         return level;
     }
 
-    /** True when effective reputation is Wary or better (not Aggressive). */
     public static boolean allowsDiplomatMissionToDynasty(int effectiveReputation) {
         return getDiplomaticReputationLevel(effectiveReputation) != REPUTATION_AGGRESSIVE;
     }
@@ -1640,7 +1636,6 @@ public final class GameConstants {
         return Collections.unmodifiableList(result);
     }
 
-    /** NPC dynasties at world gen — species with drone art in {@code sprites/ants/zero-drones/} (excludes Omni). */
     public static List<Species> getWorldSpawnableNpcSpecies() {
         List<Species> result = new ArrayList<>();
         for (Species s : species) {

@@ -9,6 +9,7 @@ import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryS
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +31,26 @@ class WarProgressServiceTest {
     void setUp() {
         aggressor = new Dynasty(1, "Aggressor Dynasty", true, GameConstants.SPECIES_OMNI);
         defender = new Dynasty(2, "Defender Dynasty", false, GameConstants.SPECIES_OMNI);
+        aggressor.unlockUpgrade(GameUnlocks.STAT_ACID);
+        aggressor.unlockUpgrade(GameUnlocks.STAT_SKELETON);
+        defender.unlockUpgrade(GameUnlocks.STAT_ACID);
+        defender.unlockUpgrade(GameUnlocks.STAT_SKELETON);
         world = buildBorderWorld();
+    }
+
+    @Test
+    void warBeginsAtHexDefenseWhenDefenderHasNoActiveMilitaryRoles() {
+        Colony defenderColony = defender.getColonies().get(0);
+        defenderColony.getWarAssignedRoleCounts().clear();
+        ColonyMilitaryService.refreshColonyMilitaryPower(defenderColony);
+        ColonyMilitaryService.refreshDynastyMilitaryPower(defender);
+
+        War war = world.getWarService().beginWar(aggressor, defender);
+
+        assertNotNull(war);
+        assertEquals(WarStagePhase.RESERVE_ASSAULT, war.getStagePhase());
+        assertTrue(war.getDeployedReserveDefender() > 0);
+        assertEquals(0, war.getDeployedActiveDefender());
     }
 
     @Test

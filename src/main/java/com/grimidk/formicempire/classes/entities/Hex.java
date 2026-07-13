@@ -22,7 +22,6 @@ public class Hex {
     private Weather localWeather;
     private boolean isActive;
 
-    /** Counts non-water overworld sources spawned on this hex (scouting); drives {@link #getResourceDepletionPercent()}. */
     private int nonWaterResourceSourcesGenerated;
 
     public Hex(Biome biome, Colony colony, Hex north, Hex northWest, Hex northEast, Hex south, Hex southWest, Hex southEast) {
@@ -73,7 +72,6 @@ public class Hex {
 
     public void setSouthEast(Hex southEast) { this.southEast = southEast; }
 
-    /** Six hex-grid neighbors (may contain nulls at map edges). */
     public Hex[] getAdjacentNeighbors() {
         return new Hex[] {
             north, northWest, northEast, south, southWest, southEast
@@ -108,16 +106,10 @@ public class Hex {
         this.nonWaterResourceSourcesGenerated = Math.max(0, count);
     }
 
-    /**
-     * 0–100% depletion derived from non-water sources spawned; +1% per {@link GameConstants#HEX_RESOURCE_DEPLETION_SOURCES_PER_PERCENT} sources.
-     */
     public int getResourceDepletionPercent() {
         return Math.min(100, nonWaterResourceSourcesGenerated / GameConstants.HEX_RESOURCE_DEPLETION_SOURCES_PER_PERCENT);
     }
 
-    /**
-     * Raw depletion clamped to {@code maxPercent} (e.g. {@link GameConstants#HEX_SUSTAIN_MAX_DEPLETION_PCT} with sustainability upgrade).
-     */
     public int getResourceDepletionPercentCapped(int maxPercent) {
         int cap = Math.min(100, Math.max(0, maxPercent));
         return Math.min(getResourceDepletionPercent(), cap);

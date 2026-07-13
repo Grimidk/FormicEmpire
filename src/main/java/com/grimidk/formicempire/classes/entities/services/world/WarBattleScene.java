@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-/** Read-only snapshot for the war battle simulation view. */
 public final class WarBattleScene {
 
     public static final int MAX_VISUAL_ANTS_PER_SIDE = 200;
@@ -98,7 +97,6 @@ public final class WarBattleScene {
         return redeployHoursRemaining;
     }
 
-    /** Reserve assault on the contested hex — entire field uses the defender colony biome. */
     public boolean isDefenseOnlyBiome() {
         return defenseOnlyBiome;
     }

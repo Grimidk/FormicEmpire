@@ -51,7 +51,6 @@ public class ColonySpatialService {
         return new NeoPoint(x, y, WorldSpaces.OVERWORLD);
     }
 
-    /** Off-map portal to the right of the logistics / transit chamber (underworld). */
     public NeoPoint getTransitPortal(Colony colony) {
         java.awt.Rectangle transit = colony.getTransitBounds();
         if (transit != null) {
@@ -65,7 +64,6 @@ public class ColonySpatialService {
                 WorldSpaces.UNDERWORLD);
     }
 
-    /** Interior staging point inside the logistics / transit chamber. */
     public NeoPoint getTransitStagingPoint(Colony colony) {
         java.awt.Rectangle transit = colony.getTransitBounds();
         if (transit != null) {

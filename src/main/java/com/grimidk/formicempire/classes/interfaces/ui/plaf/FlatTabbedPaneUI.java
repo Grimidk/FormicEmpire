@@ -11,7 +11,6 @@ import javax.swing.JComponent;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicTabbedPaneUI;
 
-/** Flat tab chrome — selected tab is elevated with a brighter/darker fill. */
 public final class FlatTabbedPaneUI extends BasicTabbedPaneUI {
     private static final int SELECTED_LIFT_PX = 2;
 

@@ -8,17 +8,14 @@ To Fix (By decreasing priority) :
 	High:
 	TODO: icons all unlocks
 	TODO: species sprites and icon: carpenter, weaver, floodplain, jet, gliding, army, ghost, dracula, silver, exploding, bulldog, shining black and desert
-	unlocked assimilations but not assimilation to get, may need to check absorbing colony remnant
-	war is way too fast, maybe add substeps
-	scale assimilation cost by 25% each time
 	tunels somehow building on their own with no diggers and 2 at the same time
 	war advance popup 
 	not seeing better colony names like grad and berg, add more and randomize post prime
 	separate trigger for auto tunnel (typo) and auto diplomacy so they are easier
 	mites not triggering at all
-	attacking unprepared dynasties is valid (auto win)
-	clean better dead colonies
 	add a subtab for triggered modifiers and progress with interrogations
+	improve alert reading by simplyfing and using icons
+	ai doesnt fight mites 
 
 	revise audit tutorial and tests for blindspots
 

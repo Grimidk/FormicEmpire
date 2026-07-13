@@ -12,7 +12,6 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
-/** Styled checkbox renderer/editor for {@link Boolean} table columns. */
 public final class UiTableBooleanStyles {
     private static final TableCellRenderer RENDERER = new BooleanCheckBoxRenderer();
     private static final TableCellEditor EDITOR = new BooleanCheckBoxEditor();

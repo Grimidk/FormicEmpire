@@ -92,10 +92,6 @@ public final class AntSubtypeService {
         return 1f + active * GameConstants.SUBTYPE_FOOD_CONSUMPTION_ADD_PER_TRAIT;
     }
 
-    /**
-     * Scales automated subtype assignment when fungi reserves lag behind water.
-     * {@code 1f} = full rates, {@code 0.5f} = halved, {@code 0f} = standard ants only.
-     */
     public static float subtypeAutomationFoodScale(Colony colony) {
         if (colony == null) {
             return 1f;
@@ -351,9 +347,6 @@ public final class AntSubtypeService {
         return 1f;
     }
 
-    /**
-     * Combat stat multiplier for one ant profile, using the same bases as {@link #applySubtypeStats}.
-     */
     public static float computeCombatStatMultiplier(AntType type, AntSubtypeProfile profile, Colony colony) {
         if (colony == null || type == null || !isEligibleType(type)) {
             return 0f;
@@ -597,7 +590,6 @@ public final class AntSubtypeService {
                     legacyRates.computeIfAbsent(slot, ignored -> new HashMap<>())
                             .put(digit, entry.getValue().floatValue());
                 } catch (Exception ignored) {
-                    // skip malformed legacy keys
                 }
                 continue;
             }
@@ -615,7 +607,6 @@ public final class AntSubtypeService {
                         .computeIfAbsent(slot, ignored -> new HashMap<>())
                         .put(digit, entry.getValue().floatValue());
             } catch (Exception ignored) {
-                // skip malformed keys
             }
         }
         if (!legacyRates.isEmpty()) {

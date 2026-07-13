@@ -15,10 +15,6 @@ import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.War;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 
-/**
- * Optional developer fixture: slot 1 manual/autosave with a finished "First Grim - Vine War".
- * Skips quietly when that save is absent or no longer contains historic wars.
- */
 class LoadSlotWarsIntegrationTest {
 
     private static final String FIXTURE_WAR_DISPLAY_NAME = "First Grim - Vine War";

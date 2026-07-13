@@ -8,9 +8,6 @@ import java.awt.Graphics;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-/**
- * Dynasty color indicator with a fixed outer hitbox and a smaller centered swatch.
- */
 public class DynastyColorSwatch extends JPanel {
 
     public static final int HITBOX_SIZE = 18;

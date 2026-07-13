@@ -10,7 +10,6 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import javax.swing.Icon;
 
-/** Flat checkbox glyphs: hollow square (off) or filled square with Unicode X (on). */
 public final class SquareCheckIcons {
     public static final int ICON_SIZE = 12;
     private static final String CHECK_MARK = "\u2716";

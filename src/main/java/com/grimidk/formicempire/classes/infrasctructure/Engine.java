@@ -62,7 +62,6 @@ public class Engine extends Thread {
     private int defaultRolePrincess = 23; // ROLE_BREEDER
     private int defaultRoleQueen = 25; // ROLE_LAYER
 
-    /** Ignores duplicate speed input within one Swing key sequence (VK + typed char). */
     private long lastSpeedDownStepMs;
     private long lastSpeedUpStepMs;
     private static final long SPEED_STEP_COALESCE_MS = 120;
@@ -145,7 +144,6 @@ public class Engine extends Thread {
         adjustSpeedStep(-1);
     }
 
-    /** Unpauses if needed, then steps speed up or down (one tier per call). */
     public void adjustSpeedStep(int direction) {
         if (direction == 0) {
             return;

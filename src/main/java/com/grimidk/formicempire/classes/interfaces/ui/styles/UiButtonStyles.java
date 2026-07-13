@@ -12,7 +12,6 @@ import javax.swing.AbstractButton;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
-/** Button chrome — padding is a compound border on {@link AssetStyles#buttonPaddingBorder()}. */
 public final class UiButtonStyles {
     private static final Insets NO_MARGIN = new Insets(0, 0, 0, 0);
 
@@ -37,14 +36,12 @@ public final class UiButtonStyles {
         button.setBorder(AssetStyles.buttonPaddingBorder());
     }
 
-    /** Smaller padding for table cells and inline controls. */
     public static void styleCompact(AbstractButton button) {
         style(button);
         button.setFont(AssetStyles.FONT_NORMAL);
         button.setBorder(AssetStyles.buttonCompactPaddingBorder());
     }
 
-    /** Borderless icon-only control (e.g. speed / play toolbar buttons). */
     public static void styleIcon(AbstractButton button) {
         if (!(button.getUI() instanceof IconButtonUI)) {
             button.setUI(IconButtonUI.INSTANCE);
@@ -64,7 +61,6 @@ public final class UiButtonStyles {
         button.putClientProperty(AssetStyles.ICON_BUTTON_CLIENT_KEY, Boolean.TRUE);
     }
 
-    /** Fixed-size tab strip button — matches {@link FlatTabbedPaneUI} tab dimensions. */
     public static void styleSectionTab(AbstractButton button) {
         if (!(button.getUI() instanceof PanelBorderButtonUI)) {
             button.setUI(PanelBorderButtonUI.INSTANCE);

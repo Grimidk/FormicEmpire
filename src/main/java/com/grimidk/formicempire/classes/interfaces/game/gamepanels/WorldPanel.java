@@ -105,10 +105,8 @@ public class WorldPanel extends ZeroGamePanel {
     public void refreshTranslations() {
         super.refreshTranslations();
         if (lastWorldRef != null) {
-            // Force refresh of localized tooltips
             updateStaticData(lastWorldRef);
             
-            // Re-apply tooltips for time/weather/etc
             if (lastTimeOfDay != null) timeOfDayLabel.setToolTipText(lastTimeOfDay.getName());
             if (lastWeather != null) weatherLabel.setToolTipText(lastWeather.getName());
             if (lastMoonPhase != null) moonPhaseLabel.setToolTipText(lastMoonPhase.getName());

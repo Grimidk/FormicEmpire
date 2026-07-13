@@ -11,7 +11,6 @@ import javax.swing.JScrollBar;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicScrollBarUI;
 
-/** Thin vertical scrollbar track with a visible bordered thumb; no arrow buttons. */
 public final class FlatScrollBarUI extends BasicScrollBarUI {
     public static final int VERTICAL_BAR_WIDTH = 8;
     public static final int MIN_THUMB_LENGTH = 24;

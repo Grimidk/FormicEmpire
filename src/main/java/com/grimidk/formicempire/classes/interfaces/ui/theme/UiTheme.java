@@ -21,7 +21,6 @@ import javax.swing.SwingConstants;
 
 import static com.grimidk.formicempire.classes.interfaces.ui.theme.UiPalette.*;
 
-/** Theme application and component walk — mutates {@link AssetStyles} palette fields. */
 public final class UiTheme {
     private UiTheme() {
     }

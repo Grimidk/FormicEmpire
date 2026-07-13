@@ -8,11 +8,6 @@ import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.KeyStroke;
 
-/**
- * Play/pause and speed keys for the game session.
- * {@link com.grimidk.formicempire.classes.infrasctructure.Engine} coalesces rapid
- * repeats so typed {@code '+'} can coexist with {@code shift VK_EQUALS} without double-stepping.
- */
 public final class GameControlKeyBindings {
 
     private static final long ACTION_COALESCE_MS = 100;

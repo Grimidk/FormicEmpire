@@ -2088,10 +2088,6 @@ public class DynastyManagementDialog extends ZeroDialog {
                             GameConstants.WAR_DECLARATION_MIN_POPULATION);
                 } else if (!DynastyDiplomacyService.meetsWarActiveMilitaryRequirement(dynasty)) {
                     message = LanguageStrings.get(LanguageStrings.DIPLO_ERROR_WAR_ACTIVE_MILITARY);
-                } else if (!DynastyDiplomacyService.meetsWarActiveMilitaryRequirement(other)) {
-                    message = LanguageStrings.format(
-                            LanguageStrings.DIPLO_ERROR_WAR_TARGET_ACTIVE_MILITARY_FMT,
-                            other.getName());
                 } else if (diplo.hasNonAggressionPact(other)) {
                     message = LanguageStrings.get(LanguageStrings.DIPLO_ERROR_PACT_BLOCKS_WAR);
                 } else {
@@ -2374,10 +2370,6 @@ public class DynastyManagementDialog extends ZeroDialog {
                                 GameConstants.WAR_DECLARATION_MIN_POPULATION));
                     } else if (!DynastyDiplomacyService.meetsWarActiveMilitaryRequirement(dynasty)) {
                         warItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_WAR_ACTIVE_MILITARY));
-                    } else if (!DynastyDiplomacyService.meetsWarActiveMilitaryRequirement(other)) {
-                        warItem.setToolTipText(LanguageStrings.format(
-                                LanguageStrings.DIPLO_ERROR_WAR_TARGET_ACTIVE_MILITARY_FMT,
-                                other.getName()));
                     } else if (diplo.hasNonAggressionPact(other)) {
                         warItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_PACT_BLOCKS_WAR));
                     } else {

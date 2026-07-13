@@ -790,7 +790,8 @@ public class UpgradeDialog extends ZeroDialog {
             east.setOpaque(false);
             east.setLayout(new BoxLayout(east, BoxLayout.Y_AXIS));
             
-            JLabel cost = new JLabel(LanguageStrings.format(LanguageStrings.ASSIMILATION_TARGET, a.getCost()));
+            JLabel cost = new JLabel(LanguageStrings.format(LanguageStrings.ASSIMILATION_TARGET,
+                    colony.getDynasty().getAssimilationTargetCost()));
             cost.setForeground(AssetStyles.FONT_COLOR_VALUE);
             cost.setFont(AssetStyles.FONT_BOLD);
             cost.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -823,13 +824,14 @@ public class UpgradeDialog extends ZeroDialog {
             panel.setBorder(border);
 
             double prog = colony.getDynasty().getAssimilationProgress();
-            int percent = (int)((prog / a.getCost()) * 100);
+            int targetCost = colony.getDynasty().getAssimilationTargetCost();
+            int percent = targetCost > 0 ? (int) ((prog / targetCost) * 100) : 0;
 
             JProgressBar bar = new JProgressBar(0, 100);
             AssetStyles.styleProgressBar(bar);
             bar.setValue(percent);
             bar.setStringPainted(true);
-            bar.setString(LanguageStrings.format(LanguageStrings.ASSIMILATION_PROGRESS, prog, a.getCost(), percent));
+            bar.setString(LanguageStrings.format(LanguageStrings.ASSIMILATION_PROGRESS, prog, targetCost, percent));
             panel.add(bar, BorderLayout.CENTER);
 
             JButton cancel = new JButton(LanguageStrings.get(LanguageStrings.UI_CANCEL));
@@ -878,9 +880,10 @@ public class UpgradeDialog extends ZeroDialog {
                 if (p.getComponentCount() > 0 && p.getComponent(0) instanceof JProgressBar) {
                     JProgressBar bar = (JProgressBar) p.getComponent(0);
                     double prog = d.getAssimilationProgress();
-                    int percent = (int)((prog / a.getCost()) * 100);
+                    int targetCost = d.getAssimilationTargetCost();
+                    int percent = targetCost > 0 ? (int) ((prog / targetCost) * 100) : 0;
                     bar.setValue(percent);
-                    bar.setString(LanguageStrings.format(LanguageStrings.ASSIMILATION_PROGRESS, prog, a.getCost(), percent));
+                    bar.setString(LanguageStrings.format(LanguageStrings.ASSIMILATION_PROGRESS, prog, targetCost, percent));
                 }
             }
         }

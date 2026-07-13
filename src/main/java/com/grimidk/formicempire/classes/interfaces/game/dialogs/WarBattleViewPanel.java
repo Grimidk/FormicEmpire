@@ -32,10 +32,8 @@ public class WarBattleViewPanel extends JPanel {
     private static final int HEADER_HEIGHT = 72;
     private static final int FIELD_MARGIN = 0;
     private static final int ANT_SPRITE_SCALE = 2;
-    /** How close marching ants sit to the contact line (0 = rear edge, 1 = line). */
     private static final float CONTACT_DEPTH_BASE = 0.97f;
     private static final float CONTACT_DEPTH_SPREAD = 0.025f;
-    /** Wall-clock animation; independent of sim speed and pause. */
     private static final int ANIMATION_FRAME_MS = 50;
     private static final float WOBBLE_SPEED = 5.5f;
     private static final float MARCH_SPEED = 2.8f;
@@ -156,7 +154,6 @@ public class WarBattleViewPanel extends JPanel {
         g2d.dispose();
     }
 
-    /** Entire field uses one biome (hex defense on the contested colony). */
     private void drawFullBiomeField(Graphics2D g2d, int fieldX, int fieldY, int fieldW, int fieldH, Biome biome) {
         Image tile = tileForBiome(biome);
         int tileW = tileWidth(tile);
@@ -164,7 +161,6 @@ public class WarBattleViewPanel extends JPanel {
         tileRegion(g2d, tile, fieldX, fieldY, fieldW, fieldH, tileW, tileH);
     }
 
-    /** Fixed 50/50 biome split; tiles at native size like {@link com.grimidk.formicempire.classes.interfaces.game.gamepanels.GameAreaPanel}. */
     private void drawBattlefieldBiomes(Graphics2D g2d, int fieldX, int fieldY, int fieldW, int fieldH,
             int splitX, Biome leftBiome, Biome rightBiome) {
         Image leftTile = tileForBiome(leftBiome);
@@ -312,7 +308,6 @@ public class WarBattleViewPanel extends JPanel {
         return engine.getWorld().findDynastyById(dynastyId);
     }
 
-    /** Largest-remainder allocation so on-screen mix matches deployed type counts. */
     private static Map<AntType, Integer> allocateVisualCounts(Map<AntType, Integer> typeCounts, int total,
             int visualTotal) {
         Map<AntType, Integer> allocated = new HashMap<>();

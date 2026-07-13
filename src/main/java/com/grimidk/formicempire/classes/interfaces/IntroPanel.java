@@ -149,7 +149,6 @@ public class IntroPanel extends JPanel {
         }
     }
 
-    /** JLabel hit-testing is text-sized by default; treat the full layout cell as clickable. */
     private static final class FullAreaLabel extends JLabel {
         @Override
         public boolean contains(int x, int y) {

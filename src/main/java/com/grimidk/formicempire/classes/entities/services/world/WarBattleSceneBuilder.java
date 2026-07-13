@@ -20,7 +20,6 @@ public final class WarBattleSceneBuilder {
     private WarBattleSceneBuilder() {
     }
 
-    /** Builds a read-only battle view from assigned war roles (declared wars always have active military roles). */
     public static WarBattleScene build(World world, War war, WarService warService) {
         if (world == null || war == null || !war.isActive() || !war.isCampaignInitialized()) {
             return unavailable(war, warService, world);

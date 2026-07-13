@@ -18,7 +18,6 @@ public final class DynastySynergyService {
         return dynasty != null && dynasty.hasUpgrade(GameUnlocks.ABILITY_SYNERGY);
     }
 
-    /** Synergy is currently active when all of its upgrade requirements are met right now. */
     public static boolean isActive(Dynasty dynasty, Synergy synergy) {
         return meetsRequirements(dynasty, synergy);
     }
@@ -27,7 +26,6 @@ public final class DynastySynergyService {
         return isActive(dynasty, synergy);
     }
 
-    /** Permanent marker that the player has earned this synergy reward at least once. */
     public static boolean hasAchieved(Dynasty dynasty, Synergy synergy) {
         return dynasty != null && synergy != null && dynasty.hasUpgrade(synergy.getReward());
     }
@@ -69,7 +67,6 @@ public final class DynastySynergyService {
         return met > 0 && met < synergy.getRequirementCount();
     }
 
-    /** Show in the Synergies tab once the player has started, achieved, or completed a combination. */
     public static boolean isVisibleInPanel(Dynasty dynasty, Synergy synergy) {
         if (!isSynergyAbilityUnlocked(dynasty) || synergy == null) {
             return false;
@@ -92,7 +89,6 @@ public final class DynastySynergyService {
         return visible;
     }
 
-    /** Requirement upgrade is folded into an active synergy and should not apply on its own. */
     public static boolean isUpgradeSuperseded(Dynasty dynasty, Upgrade upgrade) {
         if (dynasty == null || upgrade == null) {
             return false;
@@ -110,7 +106,6 @@ public final class DynastySynergyService {
         return false;
     }
 
-    /** Grants synergy reward upgrades the first time requirements are met. Never revokes them. */
     public static void refreshUnlocked(Dynasty dynasty) {
         if (dynasty == null) {
             return;

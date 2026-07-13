@@ -8,10 +8,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * War between two dynasties. Dynasty ids are stored in ascending order.
- * Active wars have {@code endedWorldMonth < 0}; concluded wars move to history.
- */
 public class War {
 
     public static final int ACTIVE_END_MONTH = -1;
@@ -30,18 +26,13 @@ public class War {
     private String conclusionKey;
     private int pendingPeaceOfferFromDynastyId;
 
-    /** Overall war progress: 0 = defender absolute victory, 50 = start, 100 = aggressor absolute victory. */
     private float progressPercent = 50f;
-    /** Hex stages between capitals at war start; drives progress scale. */
     private int totalStages;
     private int aggressorStagesCaptured;
     private int defenderStagesCaptured;
-    /** Progress within the current contested stage, in {@code [0, 1]}. */
     private float stageProgress;
     private WarStagePhase stagePhase = WarStagePhase.ACTIVE_CLASH;
-    /** Colony id of the hex currently being fought over; {@code 0} when not initialized. */
     private int contestedColonyId;
-    /** Dynasty on offense for the current stage (trying to take {@link #contestedColonyId}). */
     private int stageAttackerDynastyId;
     private int deployedActiveAttacker;
     private int deployedActiveDefender;

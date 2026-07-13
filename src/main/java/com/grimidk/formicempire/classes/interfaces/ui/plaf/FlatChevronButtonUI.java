@@ -11,7 +11,6 @@ import javax.swing.JComponent;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicButtonUI;
 
-/** Paints {@link FlatChevronButton} with a flat border and rotated triangle glyph. */
 public final class FlatChevronButtonUI extends BasicButtonUI {
     private static final String ARROW_GLYPH = "\u25B2";
 

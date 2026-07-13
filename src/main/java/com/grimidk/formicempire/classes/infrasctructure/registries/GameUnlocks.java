@@ -595,6 +595,17 @@ public final class GameUnlocks {
 
         // --- Assimilations ---
         public static final int ASSIMILATION_COST = 10000;
+        public static final double ASSIMILATION_COST_STEP = 0.25;
+
+        public static int getAssimilationTargetCost(Dynasty dynasty) {
+                int completed = dynasty == null ? 0 : dynasty.getCompletedAssimilations().size();
+                return getAssimilationTargetCostForCompletedCount(completed);
+        }
+
+        public static int getAssimilationTargetCostForCompletedCount(int completedAssimilations) {
+                double multiplier = 1.0 + ASSIMILATION_COST_STEP * Math.max(0, completedAssimilations);
+                return (int) Math.round(ASSIMILATION_COST * multiplier);
+        }
 
         // TODO asset: icons/assimilations/Leafcutter.png; icons/species/Leafcutter.png (placeholder — replace final art)
         public static final Assimilation ASSIMILATION_LEAFCUTTER = new Assimilation(1, "ASSIMILATION_LEAFCUTTER", "ASSIMILATION_LEAFCUTTER_DESC", ASSIMILATED_FARMING, ASSIMILATION_COST, null);

@@ -174,7 +174,7 @@ public class ColonyLabourService {
             }
         }
 
-        // --- Passive Water (daily rate / 24, matches stats UI and lite sim) ---
+        // --- Passive Water ---
         if (colony.hasBuilding(GameUnlocks.PASSIVE_WATER)) {
             double maxWater = stats.getWaterCapacity(colony);
             double dailyPct = colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1) ? 0.20 : 0.10;
@@ -362,21 +362,12 @@ public class ColonyLabourService {
             }
             
             Colony existingColony = neighbor.getColony();
-            boolean isDead = existingColony != null && existingColony.getAntTotal() == 0 && existingColony.getAge() >= 7;
+            boolean reclaimable = ColonyStarterService.isReclaimableDeadColony(existingColony);
             
-            if (existingColony == null || isDead) {
+            if (existingColony == null || reclaimable) {
                 
-                if (isDead) {
-                    Dynasty oldDynasty = existingColony.getDynasty();
-                    if (oldDynasty != null) {
-                        if (!dynasty.getAbsorbedDynastyIds().contains(oldDynasty.getId())) {
-                            dynasty.addAbsorbedDynasty(oldDynasty.getId());
-                            colony.logEvent(ColonyLogPrefixes.DYNASTY + " "
-                                + String.format(LanguageStrings.get(LanguageStrings.LOG_DYNASTY_ABSORBED_FMT), oldDynasty.getName()));
-                        }
-                        oldDynasty.removeColony(existingColony);
-                    }
-                    existingColony.setDynasty(null);
+                if (reclaimable) {
+                    starter.reclaimDeadColonyForSpread(neighbor, dynasty, colony);
                 }
 
                 double integrity = dynasty.getGeneticIntegrity();
@@ -705,9 +696,6 @@ public class ColonyLabourService {
         return breeders;
     }
 
-    /**
-     * Sends one breeder princess and one drone from the capital to establish a queen in a captured colony.
-     */
     public static boolean establishQueenFromBreederPair(Colony capital, Colony target) {
         if (capital == null || target == null || capital == target) {
             return false;
@@ -837,7 +825,7 @@ public class ColonyLabourService {
                 double power = (researcherCount * speed + assistantCount * (speed / 5.0)) / 10.0;
                 dynasty.addAssimilationProgress(power);
                 
-                if (dynasty.getAssimilationProgress() >= dynasty.getCurrentAssimilation().getCost()) {
+                if (dynasty.getAssimilationProgress() >= dynasty.getAssimilationTargetCost()) {
                     Assimilation a = dynasty.getCurrentAssimilation();
                     dynasty.unlockUpgrade(a.getReward());
                     dynasty.completeAssimilation(a);

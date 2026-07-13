@@ -1,7 +1,8 @@
 package com.grimidk.formicempire.classes.entities.services.dynasty;
 
-import com.grimidk.formicempire.classes.entities.services.colony.ColonyStatsService;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
+import com.grimidk.formicempire.classes.entities.services.colony.ColonyStarterService;
+import com.grimidk.formicempire.classes.entities.services.colony.ColonyStatsService;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.entities.CrossDynastyTradeProposal;
 import com.grimidk.formicempire.classes.entities.Ant;
@@ -203,7 +204,7 @@ public class DynastyAiService {
                 if (existing == null) {
                     return true;
                 }
-                if (existing.getAntTotal() == 0 && existing.getAge() >= 7) {
+                if (ColonyStarterService.isReclaimableDeadColony(existing)) {
                     return true;
                 }
             }

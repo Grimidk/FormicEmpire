@@ -104,7 +104,6 @@ public class Savefile implements Serializable {
         public int militaryPower;
         public Map<String, Integer> deathStatistics = new HashMap<>();
         public Map<String, Integer> diplomaticReputations = new HashMap<>();
-        /** @deprecated legacy single-key saves; use diplomaticModifierKeySets */
         public Map<String, String> diplomaticModifierKeys = new HashMap<>();
         public Map<String, List<String>> diplomaticModifierKeySets = new HashMap<>();
         public Map<String, Map<String, Integer>> diplomaticModifierRemainingDays = new HashMap<>();
@@ -125,7 +124,6 @@ public class Savefile implements Serializable {
         public int pendingRebellionResponseFromId;
         public int integrationTargetDynastyId;
         public double integrationProgressDays;
-        /** @deprecated legacy saves; migrated to integrationProgressDays on load */
         public double integrationProgressMonths;
         public boolean integrationDiplomatsManual;
     }
@@ -172,11 +170,8 @@ public class Savefile implements Serializable {
         public Map<String, Integer> princessSubtypes = new HashMap<>();
         public Map<String, Integer> queenSubtypes = new HashMap<>();
         public int aphids, symbioticMites, dermestids, parasiteAnts, parasiticMites;
-        /** @deprecated migrated into loyaltyModifierRemainingDays on load */
         public int pheromoneStormMonthsRemaining;
-        /** @deprecated migrated into loyaltyModifierRemainingDays on load */
         public int recentlyConqueredMonthsRemaining;
-        /** @deprecated migrated into loyaltyModifierRemainingDays on load */
         public int recentlyIntegratedMonthsRemaining;
         public Map<String, Integer> loyaltyModifierRemainingDays = new HashMap<>();
         public int integrationDiplomatsDeployed;
@@ -217,7 +212,6 @@ public class Savefile implements Serializable {
         public boolean hasColony;
         public int timeOffset;
         public int weatherId;
-        /** Non-water overworld sources spawned on this hex (drives depletion). */
         public int nonWaterResourceSourcesGenerated;
 
         public SavedHex(int q, int r, int biomeId, boolean hasColony, int timeOffset, int weatherId) {
@@ -271,11 +265,8 @@ public class Savefile implements Serializable {
         public int stageStartActiveDefender;
         public String capturedColonyIds = "";
         public String capturedByDynastyIds = "";
-        /** Legacy load-only; no longer written — use {@code dynastyIdA/B} and {@code winnerDynastyId}. */
         public String dynastyNameA;
-        /** Legacy load-only; no longer written. */
         public String dynastyNameB;
-        /** Legacy load-only; no longer written. */
         public String winnerDynastyName;
         public boolean rebellionWar;
     }
@@ -295,7 +286,6 @@ public class Savefile implements Serializable {
         public int remainingHours;
         public boolean isReturning;
         
-        // Pending Updates
         public boolean hasPendingUpdate;
         public Map<Integer, Double> pendingLoad = new HashMap<>();
         public Map<Integer, Double> pendingReturnLoad = new HashMap<>();
@@ -344,7 +334,6 @@ public class Savefile implements Serializable {
         this.playerDynastyTitleId = playerDynastyTitleId;
     }
 
-    /** Persisted title id when present; otherwise derived from legacy titleKey. */
     public int resolvePlayerDynastyTitleId() {
         if (playerDynastyTitleId > 0) {
             return playerDynastyTitleId;

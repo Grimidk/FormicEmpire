@@ -94,7 +94,6 @@ public class Trade {
             return false;
         }
 
-        // Validate ant availability first
         if (antsOnTrip.isEmpty()) {
             for (Map.Entry<AntType, Integer> entry : transport.entrySet()) {
                 List<Ant> colonyAnts = originColony.getAntsByType(entry.getKey());

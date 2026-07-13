@@ -44,12 +44,8 @@ import com.grimidk.formicempire.classes.interfaces.ui.util.UiResourceLoader;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
-/**
- * Central UI styling API. Palette and fonts live under {@code ui/theme}; per-widget styling under {@code ui/styles};
- * Swing PLAF under {@code ui/plaf}. Edit those packages or call methods here to restyle the app.
- */
+
 public class AssetStyles {
-    /** Classpath paths under {@code meta/} (UI chrome, not in-game menu icons). */
     public static final String META_CURSOR_NORMAL = "/meta/ui/CursorNormal.png";
     public static final String META_CURSOR_CLICK = "/meta/ui/CursorClick.png";
     public static final String META_APP_ICON = "/meta/icon.ico";
@@ -59,10 +55,9 @@ public class AssetStyles {
     public static final String META_CREDITS = "/meta/credits.txt";
     public static final String META_AUDIT = "/meta/audit.txt";
 
-    /** Client property on borderless icon-only toolbar buttons (see {@link #styleIconButton}). */
     public static final String ICON_BUTTON_CLIENT_KEY = "formicempire.iconButton";
 
-    // --- Palette (fixed) ---
+    // --- Palette ---
     public static final Color COLOR_ABSOLUTE_BLACK = UiPalette.COLOR_ABSOLUTE_BLACK;
     public static final Color COLOR_ABSOLUTE_WHITE = UiPalette.COLOR_ABSOLUTE_WHITE;
     public static final String COLOR_ABSOLUTE_WHITE_HTML = UiPalette.COLOR_ABSOLUTE_WHITE_HTML;
@@ -114,12 +109,11 @@ public class AssetStyles {
     public static final Color PLAYER_COLOR = UiPalette.PLAYER_COLOR;
     public static final Color PLAYER_FACTION = UiPalette.PLAYER_FACTION;
 
-    // --- Theme (mutable; updated by applyTheme) ---
+    // --- Theme  ---
     public static Color BACKGROUND_COLOR = COLOR_LIGHTEST_GRAY;
     public static Color BACKGROUND_SECONDARY = COLOR_VERY_LIGHT_GRAY;
     public static Color BACKGROUND_DARK = COLOR_LIGHTER_GRAY;
     public static Color BACKGROUND_LIGHT = COLOR_ABSOLUTE_WHITE;
-    /** Inactive world-map hex tint toward background (light ≈ 0.4, dark ≈ 0.25). */
     public static float MAP_HEX_INACTIVE_FADE = 0.4f;
 
     public static Color FONT_COLOR = COLOR_ABSOLUTE_BLACK;
@@ -137,9 +131,7 @@ public class AssetStyles {
     public static Color UI_BG_HEADER = BACKGROUND_SECONDARY;
     public static Color UI_BORDER_COLOR = BORDER_COLOR;
 
-    /** Selected tab strip (JTabbedPane + section buttons). */
     public static Color TAB_SELECTED_BG = BACKGROUND_LIGHT;
-    /** Unselected tab strip. */
     public static Color TAB_UNSELECTED_BG = BACKGROUND_DARK;
 
     public static Color TEXT_NORMAL = COLOR_ABSOLUTE_BLACK;
@@ -165,10 +157,8 @@ public class AssetStyles {
     public static final Insets BUTTON_MARGIN_INSETS = new Insets(12, 28, 12, 28);
     public static final Insets BUTTON_COMPACT_MARGIN_INSETS = new Insets(5, 12, 5, 12);
 
-    /** Inner padding for tab labels. */
     public static final Insets TAB_MARGIN_INSETS = new Insets(4, 10, 4, 10);
 
-    /** Fixed width for every tab strip label (JTabbedPane and section buttons). */
     public static final int TAB_STRIP_WIDTH = 110;
 
     public static final int TAB_STRIP_HEIGHT;
@@ -182,12 +172,10 @@ public class AssetStyles {
         return new Dimension(TAB_STRIP_WIDTH, TAB_STRIP_HEIGHT);
     }
 
-    /** CSS hex for the current theme body text (for HTML labels). */
     public static String themeTextColorHtml() {
         return colorToHtml(FONT_COLOR);
     }
 
-    /** CSS font-family for the current UI font (for HTML labels). */
     public static String themeFontFamilyCss() {
         return FONT_NORMAL.getFamily();
     }
@@ -196,7 +184,6 @@ public class AssetStyles {
         return String.format("#%06X", color.getRGB() & 0xFFFFFF);
     }
 
-    /** 1px outline + inner text padding; rebuilt when theme colors change. */
     public static Border buttonPaddingBorder() {
         return BorderFactory.createCompoundBorder(
                 BUTTON_BORDER,

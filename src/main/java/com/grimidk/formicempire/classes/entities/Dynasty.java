@@ -80,7 +80,6 @@ public class Dynasty {
     private int activeMilitaryPower;
     private int reserveMilitaryPower;
     private final Map<Integer, Integer> diplomaticReputations;
-    /** Per other dynasty: modifier key -> remaining days ({@link GameConstants#MODIFIER_PERMANENT} = no expiry). */
     private final Map<Integer, Map<String, Integer>> diplomaticModifierRemainingDays;
     private final List<Integer> crossDynastyTradeRepGrantedIds;
     private final Set<Integer> pendingPactRequestFromIds;
@@ -89,13 +88,9 @@ public class Dynasty {
     private final List<PendingIntegrationVassalWarAlert> pendingIntegrationVassalWarAlerts;
     private final List<Integer> pendingIntegrationCompletedTargetIds;
     private final Map<Integer, Integer> pactBrokenAtWorldMonth;
-    /** @deprecated migrated into {@link #diplomaticModifierRemainingDays} on load */
     private final Map<Integer, Integer> pactRequestDeclinedAtWorldMonth;
-    /** @deprecated migrated into {@link #diplomaticModifierRemainingDays} on load */
     private final Map<Integer, Integer> tradeRequestDeclinedAtWorldMonth;
-    /** @deprecated migrated into {@link #diplomaticModifierRemainingDays} on load */
     private final Map<Integer, Integer> wasAtWarPeacedAtWorldMonth;
-    /** @deprecated migrated into {@link #diplomaticModifierRemainingDays} on load */
     private final Map<Integer, Integer> geneticExchangeGrantedAtWorldMonth;
     private boolean legacyTimedModifiersMigrated;
     private final List<CrossDynastyTradeProposal> pendingTradeProposals;
@@ -569,12 +564,6 @@ public class Dynasty {
         }
     }
 
-    /**
-     * Transfers the loser's species genome unlocks and completed assimilations to this dynasty.
-     * Skips species and assimilations already held by the winner.
-     *
-     * @return count of newly inherited entries (species genomes + completed assimilations)
-     */
     public int inheritAssimilationsFrom(Dynasty defeated) {
         if (defeated == null || defeated == this) {
             return 0;
@@ -711,7 +700,6 @@ public class Dynasty {
         return capital;
     }
 
-    /** Infer or repair capital after load, flag drift, or legacy war-capture corruption. */
     public void resolveCapitalFromColonies() {
         if (colonies == null || colonies.isEmpty()) {
             capital = null;
@@ -768,7 +756,6 @@ public class Dynasty {
         }
     }
 
-    /** Crown the strongest remaining colony after the capital is lost (death or war capture). */
     public void promoteNewCapital() {
         if (colonies == null || colonies.isEmpty()) {
             capital = null;
@@ -1522,7 +1509,6 @@ public class Dynasty {
         return statService.getTotalPopulation(this) > 0;
     }
 
-    /** Living dynasties the player can still treat as diplomatic partners. */
     public boolean isActiveForDiplomacy() {
         return !isDefeated && hasLivingPopulation();
     }
@@ -1675,6 +1661,10 @@ public class Dynasty {
     public double getAssimilationProgress() { return assimilationProgress; }
     public void setAssimilationProgress(double progress) { this.assimilationProgress = progress; }
     public void addAssimilationProgress(double amount) { this.assimilationProgress += amount; }
+
+    public int getAssimilationTargetCost() {
+        return GameUnlocks.getAssimilationTargetCost(this);
+    }
     
     public Map<String, Integer> getGlobalDeathStatistics() { return globalDeathStatistics; }
     
@@ -1724,7 +1714,6 @@ public class Dynasty {
         return countSatelliteColonies() * GameConstants.GENETIC_INTEGRITY_SATELLITE_PENALTY;
     }
 
-    /** Integrity after the starting value and satellite spread penalty, before diplomatic bonuses. */
     public double getBaseGeneticIntegrity() {
         return GameConstants.GENETIC_INTEGRITY_START - getSatelliteColonyIntegrityPenalty();
     }

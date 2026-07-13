@@ -5,7 +5,6 @@ import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 
-/** Shared flat track/thumb painting for scrollbars and sliders. */
 final class UiControlChrome {
     static final int THUMB_BREADTH = FlatScrollBarUI.VERTICAL_BAR_WIDTH - 2;
 

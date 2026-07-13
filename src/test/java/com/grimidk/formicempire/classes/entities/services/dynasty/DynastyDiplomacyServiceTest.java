@@ -208,12 +208,22 @@ class DynastyDiplomacyServiceTest {
         assertFalse(player.getDiplomacyService().canDeclareWar(neighbor, world));
 
         playerBorderColony.getWarAssignedRoleCounts().put(GameConstants.ROLE_WARRIOR, 5);
-        assertFalse(player.getDiplomacyService().canDeclareWar(neighbor, world));
-
         ensureWarPopulation(player, playerBorderColony);
         ensureWarPopulation(neighbor, neighborBorderColony);
+        assertTrue(player.getDiplomacyService().canDeclareWar(neighbor, world));
+    }
+
+    @Test
+    void declareWarAllowedWhenTargetHasNoActiveMilitaryRoles() {
+        World world = buildBorderWorld();
+        Colony playerBorderColony = world.getHexes().get(0).getColony();
+        Colony neighborBorderColony = world.getHexes().get(1).getColony();
+        ensureWarPopulation(player, playerBorderColony);
+        ensureWarPopulation(neighbor, neighborBorderColony);
+        neighborBorderColony.getWarAssignedRoleCounts().clear();
         playerBorderColony.getWarAssignedRoleCounts().put(GameConstants.ROLE_WARRIOR, 5);
-        neighborBorderColony.getWarAssignedRoleCounts().put(GameConstants.ROLE_WARRIOR, 5);
+
+        assertEquals(0, DynastyDiplomacyService.countAssignedActiveMilitaryRoles(neighbor));
         assertTrue(player.getDiplomacyService().canDeclareWar(neighbor, world));
     }
 

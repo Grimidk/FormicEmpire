@@ -8,7 +8,6 @@ import java.awt.Insets;
 import javax.swing.JComponent;
 import javax.swing.text.JTextComponent;
 
-/** Shared minimum size for text entry fields. */
 public final class UiTextFieldStyles {
     public static final int MIN_WIDTH = 148;
     public static final int MIN_HEIGHT = 28;

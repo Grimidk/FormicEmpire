@@ -29,7 +29,6 @@ public class GameSpeed extends Constant {
         return delayMs;
     }
 
-    /** Localized speed label (alias for {@link #getName()}). */
     public String getLabel() {
         return getName();
     }
@@ -43,7 +42,6 @@ public class GameSpeed extends Constant {
         return allowTurbo ? MAX_PLAYABLE_ID : MAX_PLAYABLE_ID_WITHOUT_TURBO;
     }
 
-    /** Move one speed id up or down; clamps to playable range. Pause is not part of this ladder. */
     public static GameSpeed step(GameSpeed current, int delta, boolean allowTurbo) {
         GameSpeed base = current != null ? current : GameConstants.SPEED_NORMAL;
         int minId = MIN_PLAYABLE_ID;

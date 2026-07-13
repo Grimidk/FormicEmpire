@@ -14,7 +14,6 @@ import javax.swing.border.Border;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicButtonUI;
 
-/** Paints flat buttons with a 1px outline and centered label. */
 public final class PanelBorderButtonUI extends BasicButtonUI {
     public static final PanelBorderButtonUI INSTANCE = new PanelBorderButtonUI();
 
@@ -77,7 +76,6 @@ public final class PanelBorderButtonUI extends BasicButtonUI {
     }
 
     private static Color buttonTextColor(AbstractButton b) {
-        // Model flag only — isEnabled() also walks parents; table cell renderers disable the row panel.
         if (!b.getModel().isEnabled()) {
             return AssetStyles.COLOR_LIGHT_GRAY;
         }

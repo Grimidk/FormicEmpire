@@ -7,6 +7,7 @@ import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.War;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyStarterService;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDiplomacyService;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
@@ -15,11 +16,6 @@ import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 
 import java.util.Map;
 
-/**
- * Simulates staged war progress: active clash at the border, reserve assault on the contested hex,
- * capture and advance toward capitals. Progress starts at 50% and moves toward 0% (defender win)
- * or 100% (aggressor win).
- */
 public final class WarProgressService {
 
     private WarProgressService() {
@@ -71,7 +67,6 @@ public final class WarProgressService {
         }
     }
 
-    /** @deprecated use {@link #tickActiveWarsHourly} and {@link #tickActiveWarsDaily} */
     public static void tickActiveWars(World world, WarService warService) {
         tickActiveWarsHourly(world, warService);
         tickActiveWarsDaily(world, warService);
@@ -458,6 +453,11 @@ public final class WarProgressService {
         ColonyMilitaryService.refreshDynastyMilitaryPower(stageAttacker);
         ColonyMilitaryService.refreshDynastyMilitaryPower(stageDefender);
 
+        if (DynastyDiplomacyService.countAssignedActiveMilitaryRoles(stageDefender) <= 0) {
+            beginDirectReserveAssault(world, war, stageAttacker, stageDefender, contested);
+            return;
+        }
+
         war.setStagePhase(WarStagePhase.ACTIVE_CLASH);
         war.setRedeployHoursRemaining(0);
         war.setDeployedActiveAttacker(ColonyMilitaryService.powerForWarStanding(stageAttacker));
@@ -465,6 +465,25 @@ public final class WarProgressService {
         war.setDeployedReserveDefender(0);
         war.setStageStartActiveAggressor(ColonyMilitaryService.powerForWarStanding(aggressor));
         war.setStageStartActiveDefender(ColonyMilitaryService.powerForWarStanding(defender));
+    }
+
+    private static void beginDirectReserveAssault(World world, War war, Dynasty stageAttacker,
+            Dynasty stageDefender, Colony contested) {
+        if (contested == null) {
+            return;
+        }
+        ColonyMilitaryService.refreshColonyMilitaryPower(contested);
+        war.setStagePhase(WarStagePhase.RESERVE_ASSAULT);
+        war.setRedeployHoursRemaining(0);
+        war.setStageAttackerDynastyId(stageAttacker.getId());
+        war.setContestedColonyId(contested.getId());
+        war.setDeployedActiveAttacker(Math.max(0, ColonyMilitaryService.powerForWarStanding(stageAttacker)));
+        war.setDeployedActiveDefender(0);
+        war.setDeployedReserveDefender(ColonyMilitaryService.computeReserveMilitaryPower(contested));
+        war.setStageStartActiveAggressor(ColonyMilitaryService.powerForWarStanding(
+                world.findDynastyById(war.getAggressorDynastyId())));
+        war.setStageStartActiveDefender(ColonyMilitaryService.powerForWarStanding(
+                world.findDynastyById(war.getDefenderDynastyId())));
     }
 
     private static void reassignContestedColony(World world, War war, Dynasty aggressor, Dynasty defender) {

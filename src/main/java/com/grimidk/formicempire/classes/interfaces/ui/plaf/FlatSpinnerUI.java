@@ -12,7 +12,6 @@ import javax.swing.JSpinner;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicSpinnerUI;
 
-/** Flat spinner with bordered step buttons. */
 public final class FlatSpinnerUI extends BasicSpinnerUI {
     private static final Dimension STEP_BUTTON_SIZE = new Dimension(26, 22);
 

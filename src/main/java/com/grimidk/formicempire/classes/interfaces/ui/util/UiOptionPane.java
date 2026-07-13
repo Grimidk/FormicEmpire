@@ -8,7 +8,6 @@ import javax.swing.Icon;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
-/** Themed wrappers around {@link JOptionPane} — flat buttons and palette via global LaF + theme walk. */
 public final class UiOptionPane {
     private static final int DIALOG_ICON_SIZE_PX = 32;
     private static Icon dialogIcon;

@@ -6,7 +6,6 @@ import java.awt.GraphicsEnvironment;
 import java.io.IOException;
 import java.io.InputStream;
 
-/** Loads and exposes UI fonts from classpath {@code /meta/fonts/font.ttf}. */
 public final class UiFonts {
     private static final String FONT_RESOURCE = "/meta/fonts/font.ttf";
     private static final Font customFont;

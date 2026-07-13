@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 69% (190/275 checked)
+Completion: 83% (229/277 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -68,7 +68,7 @@ Roles (default hatch roles for new ants):
 [X] Back to main menu
 [X] Autosave runs per settings frequency during play
 [X] Back to menu from game (ESC > Back to Menu) — saves progress
-[ ] Colony death — Reload or Main Menu options
+[X] Colony death — Reload or Main Menu options
 
 ================================================================================
 4. IN-GAME HUD (bottom control bar)
@@ -168,13 +168,13 @@ Per ant type tab (Worker, Soldier, Major, Princess, Queen):
 ================================================================================
 [X] Per-type hatch rate spinners (Egg, Worker, Soldier, Major, Princess, Queen)
 [X] Rates sum to 100% (auto-adjust worker remainder)
-[ ] Head subtype hatch rates per ant type (columns: Nothing, Trapjaw, Doorhead; each row sums to 100%)
-[ ] Abdomen subtype hatch rates per ant type (columns: Nothing, Stinger, Honeypot; each row sums to 100%)
-[ ] Subtype hatch matrix unlock alert after first body-part assimilation (explains P menu and +50% food per part)
-[ ] Automated colonies assign subtype rates by assimilation (honeypot workers/princesses, trapjaw/bullet soldiers/majors, doorhead workers/soldiers)
-[ ] Automated colonies reduce or drop subtypes when fungi stock is below water
-[ ] Each active body-part subtype adds +50% food consumption (two parts = 2x food); visible in Stats as subtype food overhead
-[ ] Stinger abdomen subtype: 4x damage on that ant (not dynasty-wide)
+[X] Head subtype hatch rates per ant type (columns: Nothing, Trapjaw, Doorhead; each row sums to 100%)
+[X] Abdomen subtype hatch rates per ant type (columns: Nothing, Stinger, Honeypot; each row sums to 100%)
+[X] Subtype hatch matrix unlock alert after first body-part assimilation (explains P menu and +50% food per part)
+[X] Automated colonies assign subtype rates by assimilation (honeypot workers/princesses, trapjaw/bullet soldiers/majors, doorhead workers/soldiers)
+[X] Automated colonies reduce or drop subtypes when fungi stock is below water
+[X] Each active body-part subtype adds +50% food consumption (two parts = 2x food); visible in Stats as subtype food overhead
+[X] Stinger abdomen subtype: 4x damage on that ant (not dynasty-wide)
 
 ================================================================================
 10. RESEARCH (Y) — UpgradeDialog Research tab
@@ -182,92 +182,93 @@ Per ant type tab (Worker, Soldier, Major, Princess, Queen):
 Purchase with research points (RP). Test buy on each category:
 
 Ant types:
-[ ] Egg, Worker, Soldier, Major, Princess, Queen
+[X] Egg, Worker, Soldier, Major, Princess, Queen
 
 Worker roles:
-[ ] Forager, Nurse, Farmer, Graver, Scout, Miner, Potter, Builder, Rancher, Militia
+[X] Forager, Nurse, Farmer, Graver, Scout, Miner, Potter, Builder, Rancher, Militia
 
 Soldier roles:
-[ ] Hunter, Warrior, Defender, Police, Bomber, Catcher
+[X] Hunter, Warrior, Defender, Police, Bomber, Catcher
 
 Major roles:
-[ ] Brute, Carrier, Artillery, Siege, Crane
+[X] Brute, Carrier, Artillery, Siege, Crane
 
 Princess roles:
-[ ] Breeder, Diplomat, Assistant
+[X] Breeder, Diplomat, Assistant
 
 Queen roles:
-[ ] Layer, Researcher
+[X] Layer, Researcher
 
 Advanced logistics roles (late tree):
-[ ] Courier, Borer, Transport, Escort, Engineer, Skytrans
+[X] Courier, Borer, Transport, Escort, Engineer, Skytrans
 
 Colony abilities (unlock tree):
-[ ] Research, Build, Spread, Resin, Synergy, Assimilation
-[ ] Forced Flight, Dynasty, Trade, Spread 2, Automation, Tunnels
-[ ] Bilateral Trade, Management, Mass Flight, Cloning
+[X] Research, Build, Spread, Resin, Synergy, Assimilation
+[X] Forced Flight, Dynasty, Trade, Spread 2, Automation, Tunnels
+[X] Bilateral Trade, Management, Mass Flight, Cloning
 [ ] Parasitic Mite Alert, Catch Symbiotic Mite, Catch Dermestid
-[ ] Diplomat Pressure 2 & 3
-[ ] Ability slot, Pheromone Storm, Creatine Diet
-[ ] Auto Tunnels, Auto Diplomacy
+[X] Diplomat Pressure 2 & 3
+[X] Ability slot, Pheromone Storm, Creatine Diet
+[X] Auto Tunnels, Auto Diplomacy
 
 Stat upgrades (RP tiers):
-[ ] Skeleton, Acid, Longevity
-[ ] Research 1–3, Growth 1–3, Thirst 1–3
-[ ] Logistics 1, Passive 1, Laying 1–3
-[ ] Scouting 1–3, Farming 1–3, Contamination 1–3
+[X] Skeleton, Acid, Longevity
+[X] Research 1–3, Growth 1–3, Thirst 1–3
+[X] Logistics 1, Passive 1, Laying 1–3
+[X] Scouting 1–3, Farming 1–3, Contamination 1–3
 [ ] Symbiotic Mite 1, Dermestid 1, Graving 1–3
-[ ] Policing 1–3, Hex Sustain, Worker Speed 2
+[X] Policing 1–3, Hex Sustain, Worker Speed 2
 
 Assimilated species passives (research tree):
-[ ] Farming, Multiqueen, Trapjaw, Honeypot, Doorhead, Woodburrow
+[X] Farming, Multiqueen, Trapjaw, Honeypot, Doorhead, Woodburrow
 [ ] Silkweave, Rafting, Firevenom, Jumping, Gliding, Stinging
 [ ] Swarming, Stealth, Fastbite, Heatresist, Deadlyvenom, Selfdestruct
 [ ] Farsight, Hivebuild, Locsense
 
-[ ] Insufficient RP blocks purchase with message
-[ ] Prerequisites hide or disable locked nodes
+[X] Insufficient RP blocks purchase with message
+[X] Prerequisites hide or disable locked nodes
 
 ================================================================================
 11. CONSTRUCTION (U) — UpgradeDialog Build tab
 ================================================================================
 Room upgrade chains (each tier L0→L3 where applicable):
-[ ] Royal Chamber
-[ ] Egg Chamber
-[ ] Mushroom Chamber
-[ ] Plant Chamber
-[ ] Water Reservoir
-[ ] Meat Chamber
-[ ] Syrup Reservoir
-[ ] Rock Warehouse
-[ ] Resin Reservoir
+[X] Royal Chamber
+[X] Egg Chamber
+[X] Mushroom Chamber
+[X] Plant Chamber
+[X] Water Reservoir
+[X] Meat Chamber
+[X] Syrup Reservoir
+[X] Rock Warehouse
+[X] Resin Reservoir
 
 Passive / special rooms:
-[ ] Passive Lab, Passive Water, Passive Aphid, Passive Nurse
-[ ] Passive Farm, Passive Grave, Composter
+[X] Passive Lab, Passive Water, Passive Aphid, Passive Nurse
+[X] Passive Farm, Passive Grave, Composter
 
-[ ] Build queues with rock + RP costs
-[ ] Under-construction progress displays
-[ ] Completed rooms appear in underworld layout
+[X] Build queues with rock + RP costs
+[X] Under-construction progress displays
+[X] Completed rooms appear in underworld layout
 
 ================================================================================
 12. ASSIMILATION (I) — UpgradeDialog Assimilation tab
 ================================================================================
-Start / progress assimilations (RP + time). Each species:
-[ ] Leafcutter, Pharaoh, Marauder, Trapjaw, Honeypot, Doorhead
+Start / progress assimilations (RP + time). Target RP cost scales +25% per completed assimilation (5th = 200% base). Each species:
+[X] Leafcutter, Pharaoh, Marauder, Trapjaw, Honeypot, Doorhead
 [ ] Woodburrow, Silkweave, Rafting, Firevenom, Jumping, Gliding
-[ ] Stinging, Swarming, Stealth, Fastbite, Heatresist, Deadlyvenom
+[X] Stinging, Swarming, Stealth, Fastbite, Heatresist, Deadlyvenom
 [ ] Selfdestruct, Farsight, Hivebuild, Locsense
 
+[ ] Assimilation RP target cost scales +25% per completed assimilation (5th = 200% base)
 [ ] Completed assimilation unlocks hatch subtypes (trapjaw, honeypot, doorhead, stinger); other passives still pending
 
 ================================================================================
 13. SYNERGIES (O) — UpgradeDialog Synergy tab
 ================================================================================
-[ ] Synergies tab lists in-progress combinations (1/2 requirements met)
-[ ] Popup when synergy conditions are fully met
+[X] Synergies tab lists in-progress combinations (1/2 requirements met)
+[X] Popup when synergy conditions are fully met
 [ ] Super Venom replaces Fire + Neurotoxic venom stacking with 16x damage
-[ ] Synergy effects apply to colony / dynasty stats
+[X] Synergy effects apply to colony / dynasty stats
 
 ================================================================================
 14. COLONY OPERATIONS (C) — AbilitiesDialog
@@ -286,7 +287,7 @@ Start / progress assimilations (RP + time). Each species:
 [X] Per-colony Actions menu:
     [X] Rename / edit colony
     [X] View colony (switch active colony / camera)
-    [ ] Send diplomats to colony (assign count 0–max; shows current, preview bonus)
+    [X] Send diplomats to colony (assign count 0–max; shows current, preview bonus)
 [X] Dynasty-wide automation toggles (when unlocked):
     [X] Default auto-build
     [X] Default automation
@@ -310,7 +311,7 @@ Neighbor trade rows (per adjacent hex):
 [X] Confirm / update trade
 [X] Cancel trade dialog
 [X] Active trade edit from table actions (Manage / Establish)
-[ ] See convoy option in logistics Actions menu (opens convoy transit view)
+[X] See convoy option in logistics Actions menu (opens convoy transit view)
 [ ] Make two-way trade option in logistics Actions menu (enabled when matching incoming one-way route exists)
 
 ================================================================================
@@ -318,8 +319,8 @@ Neighbor trade rows (per adjacent hex):
 ================================================================================
 Per foreign dynasty Actions menu:
 [ ] Incoming pact request policy (Ask / Auto accept / Auto decline; max one received per day)
-[ ] Non-aggression pact — propose / accept / break
-[X] Declare war (confirm dialog; population & military checks)
+[X] Non-aggression pact — propose / accept / break
+[ ] Declare war (confirm dialog; population + attacker active military; target may lack active roles → hex defense)
 [ ] Request trade agreement
 [ ] Open trade negotiation
 [ ] Send diplomats to dynasty (assign count 0–max; shows current, preview reputation)
@@ -343,7 +344,7 @@ Per foreign dynasty Actions menu:
 [X] Active wars list on map sidebar — click to focus war
 [X] War entries in dynasty table
 [X] View battle — opens WarBattleDialog (hour-tick battle animation)
-[ ] Battle view updates each hour while open
+[X] Battle view updates each hour while open
 [ ] War standing / stage progression over time
 [ ] Redeploy delay between battles (24h)
 [ ] War role economy in role dialogs
@@ -379,7 +380,7 @@ Help encyclopedia (main menu Help):
 [X] Tutorials — Welcome, Getting Started, Dynasty, Hotkeys
 [X] Species reference
 [X] Ant types
-[ ] Ant subtypes (Help > Ant Types tab, right column)
+[X] Ant subtypes (Help > Ant Types tab, right column)
 [X] Bugs / threats
 [X] Ant roles
 [X] Empire / dynasty concepts
@@ -387,7 +388,7 @@ Help encyclopedia (main menu Help):
 [X] Buildings list
 [X] Assimilations list
 [X] World / biomes / hexes
-[ ] UI controls (Help > UI Controls tab — speed bar and icons)
+[X] UI controls (Help > UI Controls tab — speed bar and icons)
 
 ================================================================================
 22. AUTOMATIC TRIGGERS (play until fired — popup unlocks)
@@ -426,12 +427,13 @@ World:
 [X] Biome differences on hexes
 [X] Resource sources on map (plants, mushrooms, water, prey)
 [X] Nuptial flight colony founding on new hexes
+[ ] Spreading onto dead/defeated hex inherits species genomes and completed assimilations
 [ ] AI dynasties trade, tunnel, diplomacy, war
 
 Combat:
 [X] Colony military power calculation
-[ ] War stages: clash, hex defense, etc.
-[ ] Battle view stat multipliers vs standing multipliers
+[ ] War skips active clash when defender has no assigned active military roles (hex defense)
+[X] Battle view stat multipliers vs standing multipliers
 
 ================================================================================
 24. EDGE CASES & LIFECYCLE

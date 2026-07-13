@@ -282,7 +282,6 @@ public class ColonyPanel extends ZeroGamePanel {
         super.refreshTranslations();
         updateTooltips();
         if (lastColonyRef != null) {
-            // Force refresh text fields
             lastMushrooms = -1;
             lastTotalConsumption = -1;
             lastMilitaryPower = -1;

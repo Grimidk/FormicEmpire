@@ -634,7 +634,6 @@ public class MapDialog extends ZeroDialog {
             return sb.toString();
         }
 
-        /** Scrollable legend list — tracks viewport width so rows are not clipped on the right. */
         private final class LegendScrollContent extends JPanel implements Scrollable {
             LegendScrollContent() {
                 setOpaque(true);

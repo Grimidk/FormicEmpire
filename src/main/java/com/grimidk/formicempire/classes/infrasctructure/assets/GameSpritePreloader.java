@@ -15,9 +15,6 @@ import com.grimidk.formicempire.classes.constants.misc.Species;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
 
-/**
- * Blocks until classpath sprite images are decoded so the first paint shows real art, not blanks.
- */
 public final class GameSpritePreloader {
 
     private static final int LOAD_WAIT_MS = 15_000;

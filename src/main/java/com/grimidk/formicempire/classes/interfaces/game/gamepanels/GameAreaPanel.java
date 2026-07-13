@@ -70,7 +70,6 @@ public class GameAreaPanel extends ZeroGamePanel {
     public Rectangle transitRoomBounds;
     public Rectangle insectPenBounds;
 
-    /** Overworld corpse draw budget in graver yard (reset each frame). */
     private int overworldDeadBodySpritesRemaining;
     private int lastPetPenBoundsSyncKey = Integer.MIN_VALUE;
 
@@ -227,9 +226,6 @@ public class GameAreaPanel extends ZeroGamePanel {
         return overworldLayoutOffsetY;
     }
 
-    /**
-     * Colony entrance in {@link #paintComponent} panel coordinates for the current overworld layout.
-     */
     public Point computeOverworldColonyCenterPanelPixels(Colony sessionColony, int viewportWidth, int viewportHeight) {
         int pad = Math.max(OVERWORLD_PAN_OUTSET, Math.max(viewportWidth, viewportHeight) / 2);
         int contentPadX = pad;

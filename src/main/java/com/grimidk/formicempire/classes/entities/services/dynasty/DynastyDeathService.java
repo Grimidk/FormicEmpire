@@ -47,8 +47,7 @@ public class DynastyDeathService {
 
                 for (Colony dead : deadColonies) {
                     if (dead == remnant) {
-                        dead.setActive(false);
-                        dead.setAutomationEnabled(false);
+                        STARTER.finalizeDeadRemnant(dead);
                         dead.logEvent(ColonyLogPrefixes.INFO + " "
                             + LanguageStrings.get(LanguageStrings.LOG_LAST_COLONY_FALLEN));
                     } else {

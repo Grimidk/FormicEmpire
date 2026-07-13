@@ -7,7 +7,6 @@ import javax.swing.JComponent;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicButtonUI;
 
-/** Icon-only control with no border or fill — for toolbar glyphs. */
 public final class IconButtonUI extends BasicButtonUI {
     public static final IconButtonUI INSTANCE = new IconButtonUI();
 

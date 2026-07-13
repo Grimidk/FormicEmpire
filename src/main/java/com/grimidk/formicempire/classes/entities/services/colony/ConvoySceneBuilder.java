@@ -64,7 +64,6 @@ public final class ConvoySceneBuilder {
                 true);
     }
 
-    /** True while a route leg is underway (outbound or return), including after save load. */
     public static boolean isInTransit(Trade trade) {
         if (trade == null || !trade.isActive()) {
             return false;

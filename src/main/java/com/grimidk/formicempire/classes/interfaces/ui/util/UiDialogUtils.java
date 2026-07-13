@@ -33,7 +33,6 @@ public final class UiDialogUtils {
         dialog.setVisible(true);
     }
 
-    /** Prefer the active or topmost owned window so alerts stack above open game dialogs. */
     public static Window resolveForegroundOwner(Component fallback) {
         Window root = fallback instanceof Window window ? window : SwingUtilities.getWindowAncestor(fallback);
         Window active = KeyboardFocusManager.getCurrentKeyboardFocusManager().getActiveWindow();

@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-/** Read-only snapshot for the convoy transit view. */
 public final class ConvoyScene {
 
     public static final int MAX_VISUAL_ANTS = 120;
@@ -70,7 +69,6 @@ public final class ConvoyScene {
         return backgroundKind;
     }
 
-    /** Biome tile for overland convoys — always the current leg destination hex. */
     public Biome getLandBiome() {
         return landBiome;
     }

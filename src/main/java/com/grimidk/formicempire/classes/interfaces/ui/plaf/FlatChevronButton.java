@@ -6,7 +6,6 @@ import java.awt.Dimension;
 import java.awt.Insets;
 import javax.swing.JButton;
 
-/** Small flat button that paints a chevron glyph (no text label). */
 public final class FlatChevronButton extends JButton {
 
     public enum ChevronDirection {

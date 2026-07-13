@@ -24,7 +24,6 @@ public final class ColonyJobRules {
     private ColonyJobRules() {
     }
 
-    /** Lite sim uses automation quotas; only the player's active colony runs per-ant labour. */
     private static int liteRoleCount(Colony colony, AntRole role) {
         return colony.getAssignedRoleCount(role);
     }
@@ -334,7 +333,7 @@ public final class ColonyJobRules {
             double power = (researcherCount * speed + assistantCount * (speed / 5.0)) / 10.0;
             dynasty.addAssimilationProgress(power);
 
-            if (dynasty.getAssimilationProgress() >= dynasty.getCurrentAssimilation().getCost()) {
+            if (dynasty.getAssimilationProgress() >= dynasty.getAssimilationTargetCost()) {
                 Assimilation assimilation = dynasty.getCurrentAssimilation();
                 dynasty.unlockUpgrade(assimilation.getReward());
                 dynasty.completeAssimilation(assimilation);
@@ -415,7 +414,6 @@ public final class ColonyJobRules {
         return removed;
     }
 
-    /** Inactive colonies: each slowed ant counts as half a worker without per-ant infection sync. */
     private static double parasiticMiteWorkEfficiency(Colony colony) {
         int antTotal = colony.getAntTotal();
         if (antTotal <= 0 || colony.getParasiticMites() <= 0) {

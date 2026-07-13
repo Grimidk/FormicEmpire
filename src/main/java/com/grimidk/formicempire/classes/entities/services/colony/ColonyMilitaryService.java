@@ -11,11 +11,6 @@ import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 
 import java.util.Map;
 
-/**
- * Colony military power from adult ant type counts scaled by combat base stats.
- * During war, war-role assignments split power into active (front-line roles) and reserve (remaining adults).
- * Refreshed at most once per colony per world day ({@link Colony#runDailyJobs}).
- */
 public final class ColonyMilitaryService {
 
     private ColonyMilitaryService() {
@@ -57,20 +52,14 @@ public final class ColonyMilitaryService {
         return (hpFactor + atkFactor + defFactor + spdFactor) / 4f;
     }
 
-    /** Floor for battle view scaling when combat upgrades are missing. */
     public static float effectiveStatMultiplier(Colony colony) {
         return Math.max(0.01f, computeStatMultiplier(colony));
     }
 
-    /** War campaign power uses a higher floor so stages are not resolved in a single hour. */
     public static float warStandingStatMultiplier(Colony colony) {
         return Math.max(0.35f, computeStatMultiplier(colony));
     }
 
-    /**
-     * Maps stronger:weaker military power ratio to a delta in {@code [0, MILITARY_STRENGTH_DELTA_MAX]}.
-     * Ratio {@code <= 1} yields 0; ratio {@code >= MILITARY_STRENGTH_RATIO_MAX} yields max delta.
-     */
     public static int getMilitaryStrengthDelta(int strongerPower, int weakerPower) {
         if (strongerPower <= 0 || weakerPower <= 0 || strongerPower <= weakerPower) {
             return 0;
@@ -84,7 +73,6 @@ public final class ColonyMilitaryService {
                 Math.max(0, Math.round(normalized * GameConstants.MILITARY_STRENGTH_DELTA_MAX)));
     }
 
-    /** Signed adjustment from this dynasty's perspective toward {@code other} (negative if stronger). */
     public static int getMilitaryReputationAdjustment(int viewerPower, int otherPower) {
         if (viewerPower > otherPower) {
             return -getMilitaryStrengthDelta(viewerPower, otherPower);
@@ -95,7 +83,6 @@ public final class ColonyMilitaryService {
         return 0;
     }
 
-    /** Signed loyalty adjustment vs dynasty capital (negative if this colony is stronger). */
     public static int getMilitaryLoyaltyAdjustment(int colonyPower, int capitalPower, boolean isCapital) {
         if (isCapital || capitalPower <= 0) {
             return 0;
@@ -109,11 +96,6 @@ public final class ColonyMilitaryService {
         return 0;
     }
 
-    /**
-     * Daily AI war probability toward a bordering target. Returns 0 when the target exceeds
-     * {@link GameConstants#AI_DECLARE_WAR_MAX_TARGET_STRENGTH_RATIO} times the AI's military power.
-     * Chance rises as effective reputation falls and as the AI becomes relatively weaker (up to that cap).
-     */
     public static double computeAiWarDeclarationChance(int aiPower, int otherPower, int effectiveReputation) {
         if (otherPower <= 0 || aiPower <= 0) {
             return 0;
@@ -233,7 +215,6 @@ public final class ColonyMilitaryService {
         return Math.max(0, total - active);
     }
 
-    /** Recompute from persisted colony counts and dynasty combat upgrades (for saves / inactive colonies). */
     public static int computeFromSavedColony(Savefile.SavedColony savedColony, Dynasty dynasty) {
         if (savedColony == null) {
             return 0;

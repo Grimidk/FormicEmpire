@@ -47,7 +47,6 @@ public class ResourceSource {
         return getY() + getPlacementDisplaySizePx() / 2;
     }
 
-    /** Display size tier at discovery; anchor point stays fixed while quantity depletes. */
     private int getPlacementDisplaySizePx() {
         return resourceType.getDisplaySizeForSourceQuantity(initialQuantity);
     }

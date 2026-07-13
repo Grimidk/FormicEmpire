@@ -67,7 +67,6 @@ public final class LanguageStrings {
         return key;
     }
 
-    /** Like {@link String#format(String, Object...)} but compact-formats numeric arguments for display. */
     public static String format(String key, Object... args) {
         return String.format(get(key), UiNumberFormat.formatDisplayArgs(args));
     }
@@ -179,7 +178,6 @@ public final class LanguageStrings {
         return result;
     }
 
-    /** Localized dynasty label for a save slot (theme base + title id, never a frozen locale string). */
     public static String formatSaveSlotDisplayName(String saveName, int titleId, int slotId) {
         if (saveName == null || saveName.trim().isEmpty()) {
             return saveName;
@@ -196,7 +194,6 @@ public final class LanguageStrings {
         return formatSaveSlotDisplayName(saveName, GameConstants.getDynastyTitleByKey(titleKey).getId(), slotId);
     }
 
-    /** Theme base from save root name (plain base or legacy localized full name). */
     public static String resolvePlayerThemeName(String saveName, int titleId) {
         if (saveName == null || saveName.isEmpty()) {
             return "";
@@ -251,7 +248,6 @@ public final class LanguageStrings {
         };
     }
 
-    /** Procedural colony label from dynasty theme base and 0-based founding index (display only). */
     public static String formatProceduralColonyName(String themeBase, int colonyIndex) {
         String base = themeBase != null && !themeBase.trim().isEmpty()
                 ? themeBase.trim()
@@ -270,7 +266,6 @@ public final class LanguageStrings {
         return "Autosave".equals(name) || get(SAVE_AUTOSAVE_NAME).equals(name);
     }
 
-    /** True for default slot labels (not a user-chosen colony/world name). */
     public static boolean isGenericSaveName(String name, int slotId) {
         if (name == null || name.trim().isEmpty()) {
             return true;
@@ -300,7 +295,6 @@ public final class LanguageStrings {
     }
 
     // --- Keys ---
-    /** Product window title — never localized. */
     public static final String APP_DISPLAY_NAME = "Formic Empire";
     public static final String UI_APP_TITLE = "UI_APP_TITLE";
     public static final String UI_BACK_TO_GAME = "UI_BACK_TO_GAME";

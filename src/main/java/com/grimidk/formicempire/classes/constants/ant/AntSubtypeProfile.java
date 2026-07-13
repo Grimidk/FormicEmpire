@@ -58,7 +58,6 @@ public final class AntSubtypeProfile {
         return count;
     }
 
-    /** Head-abdomen folder name for subtype sprites (e.g. {@code trapjaw}, {@code trapjaw-bullet}). */
     public String buildSpriteFolder() {
         if (isStandard()) {
             return null;

@@ -15,7 +15,6 @@ import javax.swing.plaf.basic.BasicComboBoxUI;
 import javax.swing.plaf.basic.BasicComboPopup;
 import javax.swing.plaf.basic.ComboPopup;
 
-/** Flat combo field with a bordered arrow button. */
 public final class FlatComboBoxUI extends BasicComboBoxUI {
     private static final String ARROW_GLYPH = "\u25BC";
 

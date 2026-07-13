@@ -8,7 +8,6 @@ import javax.swing.JComponent;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicProgressBarUI;
 
-/** Flat bordered progress track with solid fill. */
 public final class FlatProgressBarUI extends BasicProgressBarUI {
     public static ComponentUI createUI(JComponent c) {
         return new FlatProgressBarUI();
