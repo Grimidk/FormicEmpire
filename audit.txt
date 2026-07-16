@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 81% (229/281 checked)
+Completion: 79% (232/292 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -181,6 +181,9 @@ Per ant type tab (Worker, Soldier, Major, Princess, Queen):
 ================================================================================
 Purchase with research points (RP). Test buy on each category:
 
+[ ] Research → Triggers subtab lists in-progress and unlocked trigger goals
+[ ] Research → Available subtab still lists purchasable RP upgrades
+
 Ant types:
 [X] Egg, Worker, Soldier, Major, Princess, Queen
 
@@ -209,7 +212,8 @@ Colony abilities (unlock tree):
 [ ] Parasitic Mite Alert, Catch Symbiotic Mite, Catch Dermestid
 [X] Diplomat Pressure 2 & 3
 [X] Ability slot, Pheromone Storm, Creatine Diet
-[X] Auto Tunnels, Auto Diplomacy
+[ ] Auto-Tunnels
+[ ] Auto-Diplomacy
 
 Stat upgrades (RP tiers):
 [X] Skeleton, Acid, Longevity
@@ -291,8 +295,8 @@ Start / progress assimilations (RP + time). Target RP cost scales +25% per compl
 [X] Dynasty-wide automation toggles (when unlocked):
     [X] Default auto-build
     [X] Default automation
-    [X] Default auto-tunnels
-    [X] Auto-diplomacy
+    [ ] Default Auto-Tunnels
+    [ ] Auto-Diplomacy
 [X] Title progression as empire grows
 
 ================================================================================
@@ -301,7 +305,7 @@ Start / progress assimilations (RP + time). Target RP cost scales +25% per compl
 Neighbor trade rows (per adjacent hex):
 [X] View incoming / outgoing trade amounts
 [X] Tunnel status column (when Tunnels unlocked)
-[X] Build tunnel to neighbor
+[ ] Build tunnel to neighbor
 [X] Create trade route — pick resources, amounts, direction
 [X] One-way vs two-way trade
 [X] Bilateral trade mode (when unlocked)
@@ -407,6 +411,7 @@ Daily:
 [ ] NPC dynasty triggers
 [ ] Mass flight unlock
 [ ] Cloning unlock
+[ ] Scout unlock from plant harvest (any plant source)
 [ ] (and other TriggerManager daily checks)
 
 Hourly:

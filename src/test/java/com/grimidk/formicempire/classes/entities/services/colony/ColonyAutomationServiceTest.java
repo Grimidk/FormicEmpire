@@ -1,6 +1,8 @@
 package com.grimidk.formicempire.classes.entities.services.colony;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -63,6 +65,80 @@ class ColonyAutomationServiceTest {
         automationService.runAutomation(colony);
 
         assertTrue(colony.getAssignedRoleCount(GameConstants.ROLE_BORER) >= 1);
+    }
+
+    @Test
+    void doesNotAssignBorersJustToPrepareWithoutAutoTunnels() {
+        dynasty.unlockUpgrade(GameUnlocks.ABILITY_TUNNELS);
+        dynasty.unlockUpgrade(GameUnlocks.ABILITY_AUTO_TUNNELS);
+        colony.unlockUpgrade(GameUnlocks.ROLE_BORER);
+        dynasty.addColony(new Colony(2, "Secundus", false));
+        colony.setAutoTunnelsEnabled(false);
+
+        for (int i = 0; i < 6; i++) {
+            colony.getMajors().add(new Ant(colony, GameConstants.TYPE_MAJOR));
+        }
+
+        automationService.runAutomation(colony);
+
+        assertEquals(0, colony.getAssignedRoleCount(GameConstants.ROLE_BORER));
+    }
+
+    @Test
+    void doesNotAutoStartTunnelWithoutAutoTunnelsEnabled() {
+        dynasty.unlockUpgrade(GameUnlocks.ABILITY_TUNNELS);
+        dynasty.unlockUpgrade(GameUnlocks.ABILITY_AUTO_TUNNELS);
+        colony.unlockUpgrade(GameUnlocks.ROLE_BORER);
+        colony.setAutoTunnelsEnabled(false);
+        colony.setAssignedRoleCount(GameConstants.ROLE_BORER, 2);
+
+        Colony neighbor = new Colony(2, "Secundus", false);
+        dynasty.addColony(neighbor);
+        neighbor.setDynasty(dynasty);
+
+        Hex hexA = new Hex();
+        Hex hexB = new Hex();
+        hexA.setColony(colony);
+        hexB.setColony(neighbor);
+        linkAdjacent(hexA, hexB);
+
+        automationService.checkAndStartTunnel(colony, hexA);
+
+        assertNull(colony.getCurrentTunnelProject());
+        assertTrue(dynasty.getTunnels().isEmpty());
+    }
+
+    @Test
+    void autoStartsOneTunnelWhenAutoTunnelsEnabled() {
+        dynasty.unlockUpgrade(GameUnlocks.ABILITY_TUNNELS);
+        dynasty.unlockUpgrade(GameUnlocks.ABILITY_AUTO_TUNNELS);
+        colony.unlockUpgrade(GameUnlocks.ROLE_BORER);
+        colony.setAutoTunnelsEnabled(true);
+        colony.setAssignedRoleCount(GameConstants.ROLE_BORER, 2);
+
+        Colony neighbor = new Colony(2, "Secundus", false);
+        dynasty.addColony(neighbor);
+        neighbor.setDynasty(dynasty);
+
+        Hex hexA = new Hex();
+        Hex hexB = new Hex();
+        hexA.setColony(colony);
+        hexB.setColony(neighbor);
+        linkAdjacent(hexA, hexB);
+
+        automationService.checkAndStartTunnel(colony, hexA);
+
+        assertNotNull(colony.getCurrentTunnelProject());
+        assertEquals(1, dynasty.getTunnels().size());
+        assertNull(neighbor.getCurrentTunnelProject());
+
+        automationService.checkAndStartTunnel(colony, hexA);
+        assertEquals(1, dynasty.getTunnels().size());
+    }
+
+    private static void linkAdjacent(Hex a, Hex b) {
+        a.setSouth(b);
+        b.setNorth(a);
     }
 
     @Test

@@ -730,7 +730,7 @@ public class GamePanel extends ZeroGamePanel {
         if (upgradeDialog != null) {
             upgradeDialog.dispose();
         }
-        upgradeDialog = new UpgradeDialog(frame, colony);
+        upgradeDialog = new UpgradeDialog(frame, colony, engine);
         upgradeDialog.showDialog(UpgradeDialog.TAB_RESEARCH);
     }
     
@@ -753,7 +753,7 @@ public class GamePanel extends ZeroGamePanel {
         if (upgradeDialog != null) {
             upgradeDialog.dispose();
         }
-        upgradeDialog = new UpgradeDialog(frame, colony);
+        upgradeDialog = new UpgradeDialog(frame, colony, engine);
         upgradeDialog.showDialog(UpgradeDialog.TAB_BUILD);
     }
 
@@ -776,7 +776,7 @@ public class GamePanel extends ZeroGamePanel {
         if (upgradeDialog != null) {
             upgradeDialog.dispose();
         }
-        upgradeDialog = new UpgradeDialog(frame, colony);
+        upgradeDialog = new UpgradeDialog(frame, colony, engine);
         upgradeDialog.showDialog(UpgradeDialog.TAB_ASSIMILATION);
     }
 
@@ -799,7 +799,7 @@ public class GamePanel extends ZeroGamePanel {
         if (upgradeDialog != null) {
             upgradeDialog.dispose();
         }
-        upgradeDialog = new UpgradeDialog(frame, colony);
+        upgradeDialog = new UpgradeDialog(frame, colony, engine);
         upgradeDialog.showDialog(UpgradeDialog.TAB_SYNERGY);
     }
 

@@ -23,7 +23,6 @@ public class ColonyAutomationService {
     private static final int MIN_NURSES = 4;
     private static final int MIN_FORAGERS = 4;
     private static final int MIN_FARMERS = 1;
-    private static final int WORKER_SURPLUS_FOR_TUNNEL = 5;
     private static final int MIN_COURIERS_FOR_LOGISTICS = 1;
     private static final double SATELLITE_BREEDER_SHARE = 0.30;
     private static final double SATELLITE_DIPLOMAT_SHARE = 0.30;
@@ -101,6 +100,7 @@ public class ColonyAutomationService {
     public void checkAndStartTunnel(Colony colony, Hex currentHex) {
         if (colony.getCurrentTunnelProject() != null) return;
         if (!colony.isAutomationEnabled()) return;
+        if (!usesAggressiveTunnelAutomation(colony)) return;
         if (!colony.hasUpgrade(GameUnlocks.ABILITY_TUNNELS)) return;
         if (!colony.hasUpgrade(GameUnlocks.ROLE_BORER) && !colony.hasUpgrade(GameUnlocks.ROLE_ENGINEER)) return;
 
@@ -110,8 +110,9 @@ public class ColonyAutomationService {
 
         Dynasty dynasty = colony.getDynasty();
         if (dynasty == null || currentHex == null) return;
+        if (dynasty.hasIncompleteTunnelAt(currentHex)) return;
 
-        Hex targetHex = findTunnelTarget(colony, dynasty, currentHex);
+        Hex targetHex = findTunnelTarget(dynasty, currentHex);
         if (targetHex == null) return;
 
         Tunnel tunnel = new Tunnel(currentHex, targetHex, GameConstants.TUNNEL_WORK_REQUIRED);
@@ -122,24 +123,22 @@ public class ColonyAutomationService {
                 targetHex.getColony() != null ? targetHex.getColony().getName() : "?"));
     }
 
-    private Hex findTunnelTarget(Colony colony, Dynasty dynasty, Hex currentHex) {
+    private Hex findTunnelTarget(Dynasty dynasty, Hex currentHex) {
         Hex sameDynastyTarget = null;
-        Hex anyTarget = null;
 
         for (Hex neighbor : currentHex.getAdjacentNeighbors()) {
             if (neighbor == null) continue;
+            if (neighbor.getColony() == null || neighbor.getColony().getDynasty() != dynasty) continue;
 
             Tunnel existing = dynasty.getTunnelBetween(currentHex, neighbor);
             if (existing != null) continue;
+            if (dynasty.hasIncompleteTunnelAt(neighbor)) continue;
 
-            if (neighbor.getColony() != null && neighbor.getColony().getDynasty() == dynasty) {
-                sameDynastyTarget = neighbor;
-            } else if (anyTarget == null) {
-                anyTarget = neighbor;
-            }
+            sameDynastyTarget = neighbor;
+            break;
         }
 
-        return sameDynastyTarget != null ? sameDynastyTarget : anyTarget;
+        return sameDynastyTarget;
     }
 
     private Map<AntRole, Integer> calculateNeedsBasedQuotas(Colony colony) {
@@ -262,15 +261,13 @@ public class ColonyAutomationService {
         if (remaining <= 0) return remaining;
 
         boolean aggressive = usesAggressiveTunnelAutomation(colony);
-        if (!aggressive && remaining < WORKER_SURPLUS_FOR_TUNNEL) return remaining;
-
         boolean digging = colony.getCurrentTunnelProject() != null;
-        boolean preparing = !digging && needsTunnelDigging(colony);
+        boolean preparing = !digging && aggressive && needsTunnelDigging(colony);
         if (!digging && !preparing) return remaining;
 
         int engineerTarget = aggressive
                 ? Math.min(remaining, Math.max(1, remaining / 3))
-                : Math.min(remaining, digging ? Math.max(1, remaining / 5) : 1);
+                : Math.min(remaining, Math.max(1, remaining / 5));
         targets.put(GameConstants.ROLE_ENGINEER, engineerTarget);
         return remaining - engineerTarget;
     }
@@ -416,13 +413,13 @@ public class ColonyAutomationService {
         int assignedBorers = 0;
         if (colony.hasUpgrade(GameUnlocks.ROLE_BORER) && colony.hasUpgrade(GameUnlocks.ABILITY_TUNNELS)) {
             boolean digging = colony.getCurrentTunnelProject() != null;
-            boolean preparing = !digging && needsTunnelDigging(colony);
+            boolean aggressive = usesAggressiveTunnelAutomation(colony);
+            boolean preparing = !digging && aggressive && needsTunnelDigging(colony);
             if (digging || preparing) {
-                boolean aggressive = usesAggressiveTunnelAutomation(colony);
                 int borerShare = aggressive ? 2 : 3;
                 assignedBorers = Math.min(totalMajors, digging
                         ? Math.max(1, totalMajors / borerShare)
-                        : (aggressive ? Math.max(1, totalMajors / 4) : 1));
+                        : Math.max(1, totalMajors / 4));
                 targets.put(GameConstants.ROLE_BORER, assignedBorers);
             }
         }

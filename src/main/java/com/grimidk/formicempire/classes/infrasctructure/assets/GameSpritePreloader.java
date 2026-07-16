@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.infrasctructure.assets;
 
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import java.awt.Image;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -65,6 +66,7 @@ public final class GameSpritePreloader {
                     continue;
                 }
                 if (species.getAssimilation() != null
+                        && colony.getDynasty().hasUpgrade(GameUnlocks.ABILITY_CLONING)
                         && colony.getDynasty().isAssimilationCompleted(species.getAssimilation())
                         && GameConstants.hasAssimilatedDroneSprite(species)) {
                     collectIcon(images, GameConstants.getAssimilatedDroneSprite(species));

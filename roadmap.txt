@@ -6,16 +6,13 @@ To Fix (By decreasing priority) :
 	(none right now)
 	
 	High:
+	Rebalance upgrades, research, assistants and researchers in general
 	TODO: icons all unlocks
 	TODO: species sprites and icon: carpenter, weaver, floodplain, jet, gliding, army, ghost, dracula, silver, exploding, bulldog, shining black and desert
-	tunels somehow building on their own with no diggers and 2 at the same time
-	separate trigger for auto tunnel (typo) and auto diplomacy so they are easier
 	mites not triggering at all
-	add a subtab for triggered modifiers and progress with interrogations
 	improve alert reading by simplyfing and using icons
 	ai doesnt fight mites 
 	rework cursor in general by making all small buttons bigger
-	rebalance initial ant spawning so they dont die as much, maybe 30 ants
 	watching other colonies shouldnt affect alerts or triggers
 	rework pet insect balance
 	diplomacy tab sorting by distance and searcher
@@ -59,7 +56,7 @@ Needed for launch (v1.0) (Launch Version):
 	synergies ( Super majors + Chemical throwing = Artillery ants; Self destruction + Acid spitting = Corrosive bombs; Silk weaving + Hive building = Web building; Air-force ants + self destruction = Air-bomber ants)
 	more upgrades and more buildings and assimilations and synergies
 	implement pending roles (defender, miner, potter, bomber, carrier, artillery, siege) more roles (commander and captain roles, air force and paratroopers to skip a stage) and air warfare
-	more enemies ( Rebel ant colonies, Bugs (ant lions), Arachnids (catapult ants), Reptiles, Birds, Rodents, Zombie ant colonies)
+	more enemies ( Rebel ant colonies, Bugs (ant lions, vinegaroons, cricket moles), Arachnids (catapult ants), Reptiles, Birds, Rodents, Zombie ant colonies)
 	uncolonizable terrain with boss enemies  
 	more stats (kills, historic productions, graphs?)
 	more bugs (constants and icons and scienctific name)
@@ -78,7 +75,6 @@ Needed for launch (v1.0) (Launch Version):
 	proper ant and bug animation with 4 frame cycle for legs and jaws
 	rework how carrying looks completely, maybe have an item inside jaws
 	clean tests
-	balance every upgrade
 	music and sounds and settings for them and player panel (to include in core engine)
 	promo video 
 	langs (GER, RUS, CHN, JAP) and translate credits and roadmap

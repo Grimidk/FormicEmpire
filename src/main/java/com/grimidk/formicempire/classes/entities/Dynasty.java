@@ -738,6 +738,18 @@ public class Dynasty {
             .orElse(null);
     }
 
+    public boolean hasIncompleteTunnelAt(Hex hex) {
+        if (hex == null) {
+            return false;
+        }
+        for (Tunnel tunnel : tunnels) {
+            if (!tunnel.isComplete() && (tunnel.getHexA() == hex || tunnel.getHexB() == hex)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public Colony getCapital() {
         if (capital == null) {
             resolveCapitalFromColonies();
@@ -1568,9 +1580,12 @@ public class Dynasty {
         return count;
     }
 
-    public boolean meetsAdvancedAutomationPrerequisites() {
-        return countCompleteTunnels() >= GameConstants.AUTO_UPGRADE_MIN_COMPLETE_TUNNELS
-                && diplomatsSentTotal >= GameConstants.AUTO_UPGRADE_MIN_DIPLOMATS_SENT;
+    public boolean meetsAutoTunnelsPrerequisites() {
+        return countCompleteTunnels() >= GameConstants.AUTO_UPGRADE_MIN_COMPLETE_TUNNELS;
+    }
+
+    public boolean meetsAutoDiplomacyPrerequisites() {
+        return diplomatsSentTotal >= GameConstants.AUTO_UPGRADE_MIN_DIPLOMATS_SENT;
     }
 
     public boolean isDefeated() { return isDefeated; }
@@ -1790,6 +1805,9 @@ public class Dynasty {
     }
 
     public double getMinGeneticIntegrity() {
+        if (!hasUpgrade(GameUnlocks.ABILITY_CLONING)) {
+            return 0.0;
+        }
         return Math.min(100.0, completedAssimilations.size() * GameConstants.GENETIC_INTEGRITY_ASSIMILATION_FLOOR_STEP);
     }
 

@@ -58,6 +58,10 @@ class DynastyDiplomacyServiceTest {
         assertEquals(95.0, player.getGeneticIntegrity(), 0.001);
 
         player.completeAssimilation(GameUnlocks.ASSIMILATION_LEAFCUTTER);
+        assertEquals(0.0, player.getMinGeneticIntegrity(), 0.001);
+        assertEquals(95.0, player.getGeneticIntegrity(), 0.001);
+
+        player.unlockUpgrade(GameUnlocks.ABILITY_CLONING);
         assertEquals(5.0, player.getMinGeneticIntegrity(), 0.001);
         assertEquals(95.0, player.getGeneticIntegrity(), 0.001);
 

@@ -754,7 +754,8 @@ public class GameAreaPanel extends ZeroGamePanel {
             }
 
             List<Species> assimilatedSpecies = new ArrayList<>();
-            if (type == GameConstants.TYPE_DRONE && colony.getDynasty() != null) {
+            if (type == GameConstants.TYPE_DRONE && colony.getDynasty() != null
+                    && colony.getDynasty().hasUpgrade(GameUnlocks.ABILITY_CLONING)) {
                 for (Species s : GameConstants.getSpecies()) {
                     if (s == colony.getSpecies()) continue;
                     if (s.getAssimilation() != null && colony.getDynasty().isAssimilationCompleted(s.getAssimilation())

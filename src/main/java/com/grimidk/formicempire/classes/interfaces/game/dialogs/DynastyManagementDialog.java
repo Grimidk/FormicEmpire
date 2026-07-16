@@ -771,6 +771,14 @@ public class DynastyManagementDialog extends ZeroDialog {
             if (data.tunnel != null && data.tunnel.isComplete()) {
                 return false;
             }
+            World world = engine.getWorld();
+            if (world != null) {
+                Hex originHex = world.getHexOfColony(activeColony);
+                if (originHex != null && dynasty.hasIncompleteTunnelAt(originHex)
+                        && (data.tunnel == null || data.tunnel.isComplete())) {
+                    return false;
+                }
+            }
             return true;
         }
 
@@ -989,10 +997,16 @@ public class DynastyManagementDialog extends ZeroDialog {
 
         private void startTunnel(Hex targetHex) {
             Hex originHex = engine.getWorld().getHexOfColony(activeColony);
+            if (originHex == null || targetHex == null) {
+                return;
+            }
             Tunnel existing = dynasty.getTunnelBetween(originHex, targetHex);
             if (existing != null && !existing.isComplete()) {
                 activeColony.setCurrentTunnelProject(existing);
             } else if (existing == null) {
+                if (activeColony.getCurrentTunnelProject() != null || dynasty.hasIncompleteTunnelAt(originHex)) {
+                    return;
+                }
                 Tunnel tunnel = new Tunnel(originHex, targetHex, GameConstants.TUNNEL_WORK_REQUIRED);
                 dynasty.addTunnel(tunnel);
                 activeColony.setCurrentTunnelProject(tunnel);

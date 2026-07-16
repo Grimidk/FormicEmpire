@@ -83,20 +83,15 @@ public class WorldTest {
         
         assertNotNull(cA);
         assertNotNull(cB);
-        
-        // The fix should ensure BOTH colonies get the project if they belong to the dynasty
-        // because we don't know which one started it, so we assign to both to be safe/efficient.
-        // Wait, did I implement "assign to both"? Yes:
-        // if (hA... && hA...getDynasty() == d) ...
-        // if (hB... && hB...getDynasty() == d) ...
-        
+
+        // Incomplete tunnels resume on a single sponsor (hex A preferred) so both
+        // endpoints do not dig the same project and progress without diggers.
         Tunnel tA = cA.getCurrentTunnelProject();
         Tunnel tB = cB.getCurrentTunnelProject();
-        
+
         assertNotNull(tA, "Colony A should have resumed tunnel project");
-        assertNotNull(tB, "Colony B should have resumed tunnel project");
-        
-        assertSame(tA, tB, "Both colonies should be working on the SAME tunnel instance");
+        assertNull(tB, "Colony B should not also sponsor the same tunnel");
+
         assertEquals(50.0, tA.getProgress(), 0.001);
         assertFalse(tA.isComplete());
     }

@@ -751,11 +751,14 @@ public class World {
                             d.addTunnel(tunnel);
                             
                             if (!st.isComplete) {
+                                Colony sponsor = null;
                                 if (hA.getColony() != null && hA.getColony().getDynasty() == d) {
-                                    hA.getColony().setCurrentTunnelProject(tunnel);
+                                    sponsor = hA.getColony();
+                                } else if (hB.getColony() != null && hB.getColony().getDynasty() == d) {
+                                    sponsor = hB.getColony();
                                 }
-                                if (hB.getColony() != null && hB.getColony().getDynasty() == d) {
-                                    hB.getColony().setCurrentTunnelProject(tunnel);
+                                if (sponsor != null && sponsor.getCurrentTunnelProject() == null) {
+                                    sponsor.setCurrentTunnelProject(tunnel);
                                 }
                             }
                         }

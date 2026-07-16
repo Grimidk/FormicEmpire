@@ -8,7 +8,10 @@ import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastySynergyService;
+import com.grimidk.formicempire.classes.entities.services.shared.TriggerProgressService;
+import com.grimidk.formicempire.classes.entities.services.shared.TriggerProgressService.TriggerProgress;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
+import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
@@ -35,9 +38,10 @@ public class UpgradeDialog extends ZeroDialog {
     public static final int TAB_SYNERGY = 3;
 
     private final Colony colony;
+    private final Engine engine;
     private final JTabbedPane tabbedPane;
     
-    private ResearchPanel researchPanel;
+    private ResearchHubPanel researchPanel;
     private BuildPanel buildPanel;
     private JPanel assimilationPanel;
     private SynergyPanel synergyPanel;
@@ -46,9 +50,10 @@ public class UpgradeDialog extends ZeroDialog {
     
     private int targetTab = -1;
 
-    public UpgradeDialog(JFrame owner, Colony colony) {
+    public UpgradeDialog(JFrame owner, Colony colony, Engine engine) {
         super(owner, LanguageStrings.DIALOG_UPGRADES_TITLE, AssetStyles.DEFAULT_DIALOG_SIZE);
         this.colony = colony;
+        this.engine = engine;
 
         tabbedPane = new JTabbedPane();
         AssetStyles.styleTabbedPane(tabbedPane);
@@ -86,6 +91,9 @@ public class UpgradeDialog extends ZeroDialog {
         super.refreshTheme();
         AssetStyles.styleTabbedPane(tabbedPane);
         tabbedPane.updateUI();
+        if (researchPanel != null) {
+            researchPanel.updateUI();
+        }
     }
 
     @Override
@@ -97,7 +105,7 @@ public class UpgradeDialog extends ZeroDialog {
 
         // --- Research Tab ---
         if (colony.hasUpgrade(GameUnlocks.ABILITY_RESEARCH)) {
-            if (researchPanel == null) researchPanel = new ResearchPanel(colony);
+            if (researchPanel == null) researchPanel = new ResearchHubPanel(colony, engine);
             researchPanel.updateData();
             tabbedPane.addTab(LanguageStrings.get(LanguageStrings.TAB_RESEARCH), GameConstants.ROLE_RESEARCHER.getIcon(), researchPanel);
             tabIndexMap.put(TAB_RESEARCH, currentIndex++);
@@ -213,6 +221,172 @@ public class UpgradeDialog extends ZeroDialog {
     interface LiveUpdatePanel {
         void liveUpdate();
         void updateData();
+    }
+
+    private class ResearchHubPanel extends JPanel implements LiveUpdatePanel {
+        private final JTabbedPane subTabs;
+        private final ResearchPanel availablePanel;
+        private final TriggerProgressPanel triggersPanel;
+
+        public ResearchHubPanel(Colony colony, Engine engine) {
+            super(new BorderLayout());
+            setBackground(AssetStyles.BACKGROUND_COLOR);
+            subTabs = new JTabbedPane();
+            AssetStyles.styleTabbedPane(subTabs);
+            availablePanel = new ResearchPanel(colony);
+            triggersPanel = new TriggerProgressPanel(colony, engine);
+            subTabs.addTab(LanguageStrings.get(LanguageStrings.TAB_RESEARCH_AVAILABLE), availablePanel);
+            subTabs.addTab(LanguageStrings.get(LanguageStrings.TAB_TRIGGERS), triggersPanel);
+            add(subTabs, BorderLayout.CENTER);
+        }
+
+        @Override
+        public void updateData() {
+            availablePanel.updateData();
+            triggersPanel.updateData();
+        }
+
+        @Override
+        public void liveUpdate() {
+            availablePanel.liveUpdate();
+            triggersPanel.liveUpdate();
+        }
+
+        @Override
+        public void updateUI() {
+            super.updateUI();
+            if (subTabs != null) {
+                AssetStyles.styleTabbedPane(subTabs);
+            }
+        }
+    }
+
+    private class TriggerProgressPanel extends JPanel implements LiveUpdatePanel {
+        private final Colony colony;
+        private final Engine engine;
+        private final JPanel listPanel;
+        private final JScrollPane scrollPane;
+        private final JCheckBox showCompletedCheck;
+
+        public TriggerProgressPanel(Colony colony, Engine engine) {
+            super(new BorderLayout());
+            this.colony = colony;
+            this.engine = engine;
+            setBackground(AssetStyles.BACKGROUND_COLOR);
+
+            JPanel northPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            northPanel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
+            northPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+            showCompletedCheck = new JCheckBox(LanguageStrings.get(LanguageStrings.TRIGGER_PROGRESS_SHOW_COMPLETED));
+            AssetStyles.styleCheckBox(showCompletedCheck);
+            showCompletedCheck.setFocusable(false);
+            showCompletedCheck.setOpaque(false);
+            showCompletedCheck.setSelected(false);
+            showCompletedCheck.addActionListener(e -> updateData());
+            northPanel.add(showCompletedCheck);
+            add(northPanel, BorderLayout.NORTH);
+
+            listPanel = new JPanel();
+            listPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
+            listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
+            scrollPane = new JScrollPane(listPanel);
+            scrollPane.getViewport().setBackground(AssetStyles.BACKGROUND_COLOR);
+            scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+            add(scrollPane, BorderLayout.CENTER);
+        }
+
+        @Override
+        public void updateData() {
+            listPanel.removeAll();
+            showCompletedCheck.setText(LanguageStrings.get(LanguageStrings.TRIGGER_PROGRESS_SHOW_COMPLETED));
+            List<TriggerProgress> visible = TriggerProgressService.getVisible(
+                    colony, engine, showCompletedCheck.isSelected());
+            if (visible.isEmpty()) {
+                JLabel emptyLabel = new JLabel(LanguageStrings.get(LanguageStrings.TRIGGER_PROGRESS_NONE));
+                emptyLabel.setForeground(AssetStyles.FONT_COLOR);
+                listPanel.add(emptyLabel);
+            } else {
+                for (TriggerProgress progress : visible) {
+                    listPanel.add(createTriggerCard(progress));
+                    listPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+                }
+            }
+            listPanel.revalidate();
+            listPanel.repaint();
+            SwingUtilities.invokeLater(() -> scrollPane.getViewport().setViewPosition(new Point(0, 0)));
+        }
+
+        private JPanel createTriggerCard(TriggerProgress progress) {
+            JPanel panel = new JPanel(new BorderLayout(10, 10));
+            panel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
+
+            String title = progress.getTitle();
+            if (progress.isUnlocked()) {
+                title += " — " + LanguageStrings.get(LanguageStrings.TRIGGER_PROGRESS_STATUS_UNLOCKED);
+            } else {
+                title += " — " + LanguageStrings.format(
+                        LanguageStrings.TRIGGER_PROGRESS_STATUS_PARTIAL,
+                        progress.getCurrent(),
+                        progress.getRequired());
+            }
+            TitledBorder border = new TitledBorder(AssetStyles.PANEL_BORDER, title);
+            border.setTitleColor(progress.isUnlocked()
+                    ? AssetStyles.FONT_COLOR_HEADER
+                    : AssetStyles.FONT_COLOR_VALUE);
+            border.setTitleFont(AssetStyles.FONT_BOLD);
+            panel.setBorder(border);
+
+            JPanel infoPanel = new JPanel();
+            infoPanel.setOpaque(false);
+            infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+
+            JLabel metricLabel = new JLabel(LanguageStrings.format(
+                    LanguageStrings.TRIGGER_PROGRESS_METRIC_FMT,
+                    progress.getMetricLabel(),
+                    progress.getCurrent(),
+                    progress.getRequired()));
+            metricLabel.setForeground(progress.isUnlocked()
+                    ? AssetStyles.FONT_COLOR_HEADER
+                    : AssetStyles.FONT_COLOR_VALUE);
+            metricLabel.setFont(AssetStyles.FONT_NORMAL);
+            metricLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            infoPanel.add(metricLabel);
+            infoPanel.add(Box.createRigidArea(new Dimension(0, 6)));
+
+            JTextArea hintArea = new JTextArea(progress.getHint());
+            hintArea.setWrapStyleWord(true);
+            hintArea.setLineWrap(true);
+            hintArea.setEditable(false);
+            hintArea.setFocusable(false);
+            hintArea.setBackground(panel.getBackground());
+            hintArea.setForeground(AssetStyles.FONT_COLOR);
+            hintArea.setFont(AssetStyles.FONT_NORMAL);
+            hintArea.setBorder(null);
+            hintArea.setAlignmentX(Component.LEFT_ALIGNMENT);
+            infoPanel.add(hintArea);
+
+            if (progress.getUpgrade() != null) {
+                infoPanel.add(Box.createRigidArea(new Dimension(0, 6)));
+                JTextArea descriptionArea = new JTextArea(progress.getUpgrade().getDescription());
+                descriptionArea.setWrapStyleWord(true);
+                descriptionArea.setLineWrap(true);
+                descriptionArea.setEditable(false);
+                descriptionArea.setFocusable(false);
+                descriptionArea.setBackground(panel.getBackground());
+                descriptionArea.setForeground(AssetStyles.FONT_COLOR);
+                descriptionArea.setFont(AssetStyles.FONT_NORMAL);
+                descriptionArea.setBorder(null);
+                descriptionArea.setAlignmentX(Component.LEFT_ALIGNMENT);
+                infoPanel.add(descriptionArea);
+            }
+
+            panel.add(infoPanel, BorderLayout.CENTER);
+            return panel;
+        }
+
+        @Override
+        public void liveUpdate() {
+        }
     }
 
     private class ResearchPanel extends JPanel implements LiveUpdatePanel {

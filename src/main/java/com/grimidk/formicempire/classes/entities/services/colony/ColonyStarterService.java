@@ -19,7 +19,11 @@ import java.util.List;
 
 public class ColonyStarterService {
 
-    private static final int MIN_SUSTAIN_WORKERS = 9;
+    private static final int STARTING_NURSES = 15;
+    private static final int STARTING_FORAGERS = 12;
+    private static final int STARTING_FARMERS = 3;
+    private static final int STARTING_WORKERS = STARTING_NURSES + STARTING_FORAGERS + STARTING_FARMERS;
+    private static final int MIN_SUSTAIN_WORKERS = STARTING_WORKERS;
 
     private static final ColonyStarterService SHARED = new ColonyStarterService();
 
@@ -192,26 +196,7 @@ public class ColonyStarterService {
     public void matureColony(Colony colony) {
         System.out.println("[ColonyStarterService] Maturation complete. Spawning workforce for " + colony.getName());
 
-        List<Ant> workerList = colony.getWorkers();
-        for (int i = 0; i < 9; i++) {
-            Ant worker = new Ant(colony, GameConstants.TYPE_WORKER);
-            workerList.add(worker);
-        }
-
-        colony.configureWorker(0, GameConstants.ROLE_NURSE, WorldSpaces.UNDERWORLD);
-        colony.configureWorker(1, GameConstants.ROLE_NURSE, WorldSpaces.UNDERWORLD);
-        colony.configureWorker(2, GameConstants.ROLE_FARMER, WorldSpaces.UNDERWORLD);
-        colony.configureWorker(3, GameConstants.ROLE_NURSE, WorldSpaces.UNDERWORLD);
-        colony.configureWorker(4, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
-        colony.configureWorker(5, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
-        colony.configureWorker(6, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
-        colony.configureWorker(7, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
-        colony.configureWorker(8, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
-
-        colony.setPeaceAssignedRoleCount(GameConstants.ROLE_LAYER, 1);
-        colony.setPeaceAssignedRoleCount(GameConstants.ROLE_NURSE, 3);
-        colony.setPeaceAssignedRoleCount(GameConstants.ROLE_FARMER, 1);
-        colony.setPeaceAssignedRoleCount(GameConstants.ROLE_FORAGER, 5);
+        applyStarterWorkforce(colony);
 
         if (colony.getLocationService() != null) {
             if (colony.getLocationService().getDiscoveredSources().isEmpty()) {
@@ -367,31 +352,34 @@ public class ColonyStarterService {
     }
 
     private void ensurePeaceEconomyRoles(Colony colony) {
-        colony.setPeaceAssignedRoleCount(GameConstants.ROLE_LAYER,
-                Math.max(colony.getQueens().size(), colony.getPeaceAssignedRoleCount(GameConstants.ROLE_LAYER)));
-        if (colony.getPeaceAssignedRoleCount(GameConstants.ROLE_NURSE) < 3) {
-            colony.setPeaceAssignedRoleCount(GameConstants.ROLE_NURSE, 3);
-        }
-        if (colony.getPeaceAssignedRoleCount(GameConstants.ROLE_FARMER) < 1) {
-            colony.setPeaceAssignedRoleCount(GameConstants.ROLE_FARMER, 1);
-        }
-        if (colony.getPeaceAssignedRoleCount(GameConstants.ROLE_FORAGER) < 5) {
-            colony.setPeaceAssignedRoleCount(GameConstants.ROLE_FORAGER, 5);
+        applyStarterWorkforce(colony);
+    }
+
+    private void applyStarterWorkforce(Colony colony) {
+        List<Ant> workers = colony.getWorkers();
+        while (workers.size() < STARTING_WORKERS) {
+            workers.add(new Ant(colony, GameConstants.TYPE_WORKER));
         }
 
-        List<Ant> workers = colony.getWorkers();
-        if (workers.size() < MIN_SUSTAIN_WORKERS) {
-            return;
+        int index = 0;
+        for (int i = 0; i < STARTING_NURSES; i++) {
+            colony.configureWorker(index++, GameConstants.ROLE_NURSE, WorldSpaces.UNDERWORLD);
         }
-        colony.configureWorker(0, GameConstants.ROLE_NURSE, WorldSpaces.UNDERWORLD);
-        colony.configureWorker(1, GameConstants.ROLE_NURSE, WorldSpaces.UNDERWORLD);
-        colony.configureWorker(2, GameConstants.ROLE_FARMER, WorldSpaces.UNDERWORLD);
-        colony.configureWorker(3, GameConstants.ROLE_NURSE, WorldSpaces.UNDERWORLD);
-        colony.configureWorker(4, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
-        colony.configureWorker(5, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
-        colony.configureWorker(6, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
-        colony.configureWorker(7, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
-        colony.configureWorker(8, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
+        for (int i = 0; i < STARTING_FARMERS; i++) {
+            colony.configureWorker(index++, GameConstants.ROLE_FARMER, WorldSpaces.UNDERWORLD);
+        }
+        for (int i = 0; i < STARTING_FORAGERS; i++) {
+            colony.configureWorker(index++, GameConstants.ROLE_FORAGER, WorldSpaces.OVERWORLD);
+        }
+
+        colony.setPeaceAssignedRoleCount(GameConstants.ROLE_LAYER,
+                Math.max(colony.getQueens().size(), Math.max(1, colony.getPeaceAssignedRoleCount(GameConstants.ROLE_LAYER))));
+        colony.setPeaceAssignedRoleCount(GameConstants.ROLE_NURSE,
+                Math.max(STARTING_NURSES, colony.getPeaceAssignedRoleCount(GameConstants.ROLE_NURSE)));
+        colony.setPeaceAssignedRoleCount(GameConstants.ROLE_FARMER,
+                Math.max(STARTING_FARMERS, colony.getPeaceAssignedRoleCount(GameConstants.ROLE_FARMER)));
+        colony.setPeaceAssignedRoleCount(GameConstants.ROLE_FORAGER,
+                Math.max(STARTING_FORAGERS, colony.getPeaceAssignedRoleCount(GameConstants.ROLE_FORAGER)));
     }
 
     private void ensureStarterResourceSources(Colony colony) {

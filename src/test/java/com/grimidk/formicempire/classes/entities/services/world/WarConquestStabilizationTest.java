@@ -59,7 +59,7 @@ class WarConquestStabilizationTest {
 
         assertEquals(aggressor, defenderColony.getDynasty());
         assertFalse(defenderColony.getQueens().isEmpty());
-        assertTrue(defenderColony.getWorkers().size() >= 9);
+        assertTrue(defenderColony.getWorkers().size() >= 30);
         assertEquals(0, defenderColony.getDaysWithoutQueen());
         assertEquals(GameConstants.RECENTLY_CONQUERED_LOYALTY_MONTHS,
                 defenderColony.getRecentlyConqueredMonthsRemaining());
@@ -94,7 +94,7 @@ class WarConquestStabilizationTest {
         ColonyStarterService.shared().stabilizeConqueredColony(victor, captured);
 
         assertEquals(1, captured.getQueens().size());
-        assertTrue(captured.getWorkers().size() >= 9);
+        assertTrue(captured.getWorkers().size() >= 30);
         assertEquals(GameConstants.RECENTLY_CONQUERED_LOYALTY_MONTHS,
                 captured.getRecentlyConqueredMonthsRemaining());
     }

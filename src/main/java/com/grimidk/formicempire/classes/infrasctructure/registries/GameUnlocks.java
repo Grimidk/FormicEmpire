@@ -200,10 +200,13 @@ public final class GameUnlocks {
         static { upgrades.add(ABILITY_SUBTYPE_HATCH); }
 
         public static boolean meetsExtraAutomationPrerequisites(Dynasty dynasty, Upgrade upgrade) {
-            if (upgrade != ABILITY_AUTO_TUNNELS && upgrade != ABILITY_AUTO_DIPLOMACY) {
-                return true;
+            if (upgrade == ABILITY_AUTO_TUNNELS) {
+                return dynasty != null && dynasty.meetsAutoTunnelsPrerequisites();
             }
-            return dynasty != null && dynasty.meetsAdvancedAutomationPrerequisites();
+            if (upgrade == ABILITY_AUTO_DIPLOMACY) {
+                return dynasty != null && dynasty.meetsAutoDiplomacyPrerequisites();
+            }
+            return true;
         }
 
         // -- Advanced Roles --
