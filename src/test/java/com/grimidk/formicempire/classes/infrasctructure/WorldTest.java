@@ -119,4 +119,43 @@ public class WorldTest {
                     "Missing NPC dynasty for species id " + species.getId());
         }
     }
+
+    @Test
+    void minDynastyHexDistanceUsesClosestColonyPair() {
+        World world = new World();
+        ArrayList<Hex> hexes = new ArrayList<>();
+
+        Dynasty dynastyA = new Dynasty(1, "Alpha", true, GameConstants.SPECIES_OMNI);
+        Dynasty dynastyB = new Dynasty(2, "Beta", false, GameConstants.SPECIES_OMNI);
+
+        Colony aFar = new Colony(1, "A Far", true);
+        Colony aNear = new Colony(2, "A Near", true);
+        Colony bOnly = new Colony(3, "B Only", false);
+        aFar.setDynasty(dynastyA);
+        aNear.setDynasty(dynastyA);
+        bOnly.setDynasty(dynastyB);
+
+        Hex hexAFar = new Hex();
+        hexAFar.setQ(0);
+        hexAFar.setR(0);
+        hexAFar.setColony(aFar);
+
+        Hex hexANear = new Hex();
+        hexANear.setQ(3);
+        hexANear.setR(0);
+        hexANear.setColony(aNear);
+
+        Hex hexB = new Hex();
+        hexB.setQ(4);
+        hexB.setR(0);
+        hexB.setColony(bOnly);
+
+        hexes.add(hexAFar);
+        hexes.add(hexANear);
+        hexes.add(hexB);
+        world.setHexes(hexes);
+
+        assertEquals(1, world.minDynastyHexDistance(dynastyA, dynastyB));
+        assertEquals(Integer.MAX_VALUE, world.minDynastyHexDistance(dynastyA, null));
+    }
 }

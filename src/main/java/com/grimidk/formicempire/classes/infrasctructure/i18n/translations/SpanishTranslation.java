@@ -28,7 +28,7 @@ public class SpanishTranslation implements Translation {
         es.put("UI_SPEED_FAST", "Rápida");
         es.put("UI_SPEED_VERY_FAST", "Muy Rápida");
         es.put("UI_SPEED_TURBO", "Turbo");
-        es.put("UI_CONTROL_SPEED_UP_TT", "Aumentar velocidad del juego (+)");
+        es.put("UI_CONTROL_SPEED_UP_TT", "Aumentar velocidad del juego (+ / =)");
         es.put("UI_CONTROL_SPEED_DOWN_TT", "Reducir velocidad del juego (-)");
         es.put("UI_CONTROL_PLAY_TT", "Reanudar juego (Espacio)");
         es.put("UI_CONTROL_PAUSE_TT", "Pausar juego (Espacio)");
@@ -1911,6 +1911,12 @@ public class SpanishTranslation implements Translation {
         es.put("DYNASTY_SORT_LOYALTY_LOW", "Lealtad (menor primero)");
         es.put("DYNASTY_SORT_MILITARY_HIGH", "Poder militar (mayor primero)");
         es.put("DYNASTY_SORT_MILITARY_LOW", "Poder militar (menor primero)");
+        es.put("DYNASTY_SORT_REPUTATION_HIGH", "Reputación (mayor primero)");
+        es.put("DYNASTY_SORT_DISTANCE_NEAR", "Distancia (más cercana primero)");
+        es.put("DYNASTY_SORT_DISTANCE_FAR", "Distancia (más lejana primero)");
+        es.put("DYNASTY_SEARCH", "Buscar:");
+        es.put("DYNASTY_SEARCH_TOOLTIP", "Filtrar por nombre de dinastía o colonia");
+        es.put("COLONY_SEARCH_TOOLTIP", "Filtrar por nombre de colonia");
 
         es.put("SETTINGS_DEFAULT_ROLE_WORKER", "Rol de obrera por defecto:");
         es.put("SETTINGS_DEFAULT_ROLE_SOLDIER", "Rol de soldado por defecto:");

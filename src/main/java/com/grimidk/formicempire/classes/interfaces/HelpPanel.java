@@ -350,7 +350,7 @@ public class HelpPanel extends JPanel {
         
         HotkeyRow row = new HotkeyRow();
         row.add("Spacebar", LanguageStrings.get("HOTKEY_PAUSE"));
-        row.add("+ / -", LanguageStrings.get("HOTKEY_SPEED"));
+        row.add("+ / = / -", LanguageStrings.get("HOTKEY_SPEED"));
         row.add("Z", LanguageStrings.get("HOTKEY_VIEW"));
         row.add("ESC", LanguageStrings.get("HOTKEY_ESC"));
         row.addSeparator();

@@ -896,6 +896,12 @@ public final class LanguageStrings {
     public static final String STAT_RESERVE_MILITARY_POWER = "STAT_RESERVE_MILITARY_POWER";
     public static final String DYNASTY_SORT_MILITARY_HIGH = "DYNASTY_SORT_MILITARY_HIGH";
     public static final String DYNASTY_SORT_MILITARY_LOW = "DYNASTY_SORT_MILITARY_LOW";
+    public static final String DYNASTY_SORT_REPUTATION_HIGH = "DYNASTY_SORT_REPUTATION_HIGH";
+    public static final String DYNASTY_SORT_DISTANCE_NEAR = "DYNASTY_SORT_DISTANCE_NEAR";
+    public static final String DYNASTY_SORT_DISTANCE_FAR = "DYNASTY_SORT_DISTANCE_FAR";
+    public static final String DYNASTY_SEARCH = "DYNASTY_SEARCH";
+    public static final String DYNASTY_SEARCH_TOOLTIP = "DYNASTY_SEARCH_TOOLTIP";
+    public static final String COLONY_SEARCH_TOOLTIP = "COLONY_SEARCH_TOOLTIP";
     public static final String MAP_LEGEND_MILITARY = "MAP_LEGEND_MILITARY";
     public static final String MAP_TOOLTIP_MILITARY_POWER = "MAP_TOOLTIP_MILITARY_POWER";
     public static final String MAP_TOOLTIP_DYNASTY_MILITARY_POWER = "MAP_TOOLTIP_DYNASTY_MILITARY_POWER";

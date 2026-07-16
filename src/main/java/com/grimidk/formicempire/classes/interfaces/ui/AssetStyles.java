@@ -276,6 +276,10 @@ public class AssetStyles {
         UiScrollBarStyles.style(scrollBar);
     }
 
+    public static void styleScrollPane(javax.swing.JScrollPane scrollPane) {
+        UiScrollBarStyles.style(scrollPane);
+    }
+
     public static void styleTabbedPane(JTabbedPane tabbedPane) {
         UiTabbedPaneStyles.style(tabbedPane);
         if (tabbedPane == null) {

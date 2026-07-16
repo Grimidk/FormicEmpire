@@ -15,14 +15,10 @@ To Fix (By decreasing priority) :
 	rework cursor in general by making all small buttons bigger
 	watching other colonies shouldnt affect alerts or triggers
 	rework pet insect balance
-	diplomacy tab sorting by distance and searcher
 	parasites are broken
-	scrollbars can be slow
-	random pausing and unpausing
 	history in savefiles
 	look into scarcity better
 	show source amounts with tooltip and what they are
-	= as alternative for speed up
 
 	revise audit, tutorials and tests for blindspots
 

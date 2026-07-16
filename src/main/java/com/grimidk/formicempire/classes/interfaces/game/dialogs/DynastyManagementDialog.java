@@ -26,6 +26,7 @@ import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.DynastyColorSwatch;
 import com.grimidk.formicempire.classes.interfaces.ui.styles.UiTableStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiDialogUtils;
+import com.grimidk.formicempire.classes.interfaces.ui.util.UiNameSearchBar;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
@@ -37,6 +38,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
+import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -255,6 +257,10 @@ public class DynastyManagementDialog extends ZeroDialog {
     }
 
     private void switchTabOrClose(int tabIndex) {
+        Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+        if (focusOwner instanceof JTextComponent) {
+            return;
+        }
         if (isTabOpen(tabIndex)) {
             dispose();
         } else if (tabIndexMap.containsKey(tabIndex)) {
@@ -1597,6 +1603,9 @@ public class DynastyManagementDialog extends ZeroDialog {
         private DefaultTableModel model;
         private JScrollPane tableScrollPane;
         private JComboBox<PactRequestIncomingPolicy> pactIncomingPolicyCombo;
+        private final JComboBox<String> sortCombo;
+        private final UiNameSearchBar searchBar;
+        private Comparator<Dynasty> currentSorter;
         private final List<Dynasty> displayedDynasties = new ArrayList<>();
         private static final int COL_DYNASTY = 0;
         private static final int COL_SPECIES = 1;
@@ -1607,7 +1616,88 @@ public class DynastyManagementDialog extends ZeroDialog {
 
         public DiplomacyPanel() {
             super(new BorderLayout());
+            this.currentSorter = reputationSorter(true);
+            this.sortCombo = new JComboBox<>(new String[]{
+                    LanguageStrings.get(LanguageStrings.DYNASTY_SORT_REPUTATION_HIGH),
+                    LanguageStrings.get(LanguageStrings.DYNASTY_SORT_DISTANCE_NEAR),
+                    LanguageStrings.get(LanguageStrings.DYNASTY_SORT_DISTANCE_FAR)
+            });
+            this.sortCombo.setFocusable(false);
+            AssetStyles.styleComboBox(this.sortCombo);
+            this.sortCombo.addActionListener(e -> updateSorter());
+
+            this.searchBar = new UiNameSearchBar(
+                    LanguageStrings.get(LanguageStrings.DYNASTY_SEARCH),
+                    LanguageStrings.get(LanguageStrings.DYNASTY_SEARCH_TOOLTIP),
+                    this::updateData);
             initUI();
+        }
+
+        private Comparator<Dynasty> reputationSorter(boolean highestFirst) {
+            Comparator<Dynasty> byReputation = Comparator.comparingInt((Dynasty d) -> {
+                World world = engine.getWorld();
+                if (world == null || dynasty.getDiplomacyService() == null) {
+                    return 0;
+                }
+                return dynasty.getDiplomacyService().getEffectiveDiplomaticReputation(d, world);
+            });
+            if (highestFirst) {
+                byReputation = byReputation.reversed();
+            }
+            return byReputation.thenComparing(Dynasty::getName, String.CASE_INSENSITIVE_ORDER);
+        }
+
+        private Comparator<Dynasty> distanceSorter(boolean closestFirst) {
+            Comparator<Dynasty> byDistance = Comparator.comparingInt((Dynasty d) -> {
+                World world = engine.getWorld();
+                if (world == null) {
+                    return Integer.MAX_VALUE;
+                }
+                return world.minDynastyHexDistance(dynasty, d);
+            });
+            if (!closestFirst) {
+                byDistance = byDistance.reversed();
+            }
+            return byDistance.thenComparing(Dynasty::getName, String.CASE_INSENSITIVE_ORDER);
+        }
+
+        private void updateSorter() {
+            int idx = sortCombo.getSelectedIndex();
+            switch (idx) {
+                case 1:
+                    currentSorter = distanceSorter(true);
+                    break;
+                case 2:
+                    currentSorter = distanceSorter(false);
+                    break;
+                case 0:
+                default:
+                    currentSorter = reputationSorter(true);
+                    break;
+            }
+            updateData();
+        }
+
+        private boolean matchesDiplomacySearch(Dynasty other) {
+            if (searchBar.isBlank()) {
+                return true;
+            }
+            if (other == null) {
+                return false;
+            }
+            if (searchBar.matchesAny(other.getName())) {
+                return true;
+            }
+            List<Colony> colonies = other.getColonies();
+            if (colonies == null) {
+                return false;
+            }
+            for (Colony colony : colonies) {
+                if (colony != null && searchBar.matchesAny(colony.getName())) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         private void initUI() {
@@ -1719,6 +1809,20 @@ public class DynastyManagementDialog extends ZeroDialog {
 
             tableScrollPane = AssetStyles.wrapScrollableTable(table);
 
+            JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 10));
+            filterPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
+            filterPanel.setBorder(BorderFactory.createMatteBorder(
+                    0, 0, AssetStyles.BORDER_THICKNESS_INTERNAL, 0, AssetStyles.BORDER_COLOR));
+
+            JPanel sortPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+            sortPanel.setOpaque(false);
+            JLabel sortLabel = new JLabel(LanguageStrings.get(LanguageStrings.DYNASTY_SORT_BY));
+            sortLabel.setForeground(AssetStyles.FONT_COLOR);
+            sortPanel.add(sortLabel);
+            sortPanel.add(sortCombo);
+            filterPanel.add(sortPanel);
+            filterPanel.add(searchBar);
+
             JPanel settingsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 10));
             settingsPanel.setBorder(BorderFactory.createTitledBorder(
                     LanguageStrings.get(LanguageStrings.DIPLO_PACT_INCOMING_POLICY_SECTION)));
@@ -1751,7 +1855,15 @@ public class DynastyManagementDialog extends ZeroDialog {
             policyLabel.setForeground(AssetStyles.FONT_COLOR);
             settingsPanel.add(policyLabel);
             settingsPanel.add(pactIncomingPolicyCombo);
-            add(settingsPanel, BorderLayout.NORTH);
+
+            JPanel northPanel = new JPanel();
+            northPanel.setLayout(new BoxLayout(northPanel, BoxLayout.Y_AXIS));
+            northPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
+            filterPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            settingsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            northPanel.add(filterPanel);
+            northPanel.add(settingsPanel);
+            add(northPanel, BorderLayout.NORTH);
             add(tableScrollPane, BorderLayout.CENTER);
         }
 
@@ -1927,13 +2039,14 @@ public class DynastyManagementDialog extends ZeroDialog {
 
             List<Dynasty> others = new ArrayList<>();
             for (Dynasty other : world.getDynastys()) {
-                if (other != dynasty && other.isActiveForDiplomacy()) {
+                if (other != dynasty && other.isActiveForDiplomacy()
+                        && matchesDiplomacySearch(other)) {
                     others.add(other);
                 }
             }
-            others.sort(Comparator
-                    .comparingInt((Dynasty d) -> dynasty.getDiplomacyService().getEffectiveDiplomaticReputation(d, world)).reversed()
-                    .thenComparing(Dynasty::getName, String.CASE_INSENSITIVE_ORDER));
+            if (currentSorter != null) {
+                others.sort(currentSorter);
+            }
 
             displayedDynasties.addAll(others);
             for (Dynasty other : displayedDynasties) {
@@ -2549,6 +2662,7 @@ public class DynastyManagementDialog extends ZeroDialog {
         private int actionCol = -1;
         
         private final JComboBox<String> sortCombo;
+        private final UiNameSearchBar searchBar;
         private Comparator<Colony> currentSorter;
 
         private JCheckBox defaultAutoBuildCheck;
@@ -2578,6 +2692,10 @@ public class DynastyManagementDialog extends ZeroDialog {
             this.sortCombo.setFocusable(false);
             AssetStyles.styleComboBox(this.sortCombo);
             this.sortCombo.addActionListener(e -> updateSorter());
+            this.searchBar = new UiNameSearchBar(
+                    LanguageStrings.get(LanguageStrings.DYNASTY_SEARCH),
+                    LanguageStrings.get(LanguageStrings.COLONY_SEARCH_TOOLTIP),
+                    this::updateData);
             
             initUI();
         }
@@ -2630,6 +2748,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             sortPanel.add(sortLabel);
             sortPanel.add(sortCombo);
             topPanel.add(sortPanel);
+            topPanel.add(searchBar);
             
             topPanel.add(Box.createHorizontalStrut(20));
 
@@ -2824,7 +2943,11 @@ public class DynastyManagementDialog extends ZeroDialog {
             List<Colony> rawColonies = dynasty.getColonies();
             World world = engine.getWorld();
 
-            displayedColonies.addAll(rawColonies);
+            for (Colony colony : rawColonies) {
+                if (colony != null && searchBar.matchesAny(colony.getName())) {
+                    displayedColonies.add(colony);
+                }
+            }
             if (currentSorter != null) {
                 displayedColonies.sort(currentSorter);
             }

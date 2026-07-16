@@ -10,6 +10,9 @@ import javax.swing.JScrollPane;
 
 public final class UiScrollBarStyles {
     public static final String HIDDEN_SCROLLBAR_KEY = "formicempire.hiddenScrollbar";
+    /** Pixels per mouse-wheel unit; Swing default is 1 and feels glacial in menus. */
+    public static final int DEFAULT_UNIT_INCREMENT = 32;
+    public static final int DEFAULT_BLOCK_INCREMENT = 128;
 
     private UiScrollBarStyles() {
     }
@@ -32,10 +35,23 @@ public final class UiScrollBarStyles {
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
     }
 
+    public static void style(JScrollPane scrollPane) {
+        if (scrollPane == null) {
+            return;
+        }
+        style(scrollPane.getVerticalScrollBar());
+        style(scrollPane.getHorizontalScrollBar());
+    }
+
     public static void style(JScrollBar scrollBar) {
+        if (scrollBar == null) {
+            return;
+        }
         scrollBar.setBackground(AssetStyles.BACKGROUND_DARK);
         scrollBar.setForeground(AssetStyles.BACKGROUND_LIGHT);
         scrollBar.setBorder(null);
+        scrollBar.setUnitIncrement(DEFAULT_UNIT_INCREMENT);
+        scrollBar.setBlockIncrement(DEFAULT_BLOCK_INCREMENT);
         if (scrollBar.getOrientation() == JScrollBar.VERTICAL) {
             Dimension size = new Dimension(FlatScrollBarUI.VERTICAL_BAR_WIDTH, 48);
             scrollBar.setPreferredSize(size);

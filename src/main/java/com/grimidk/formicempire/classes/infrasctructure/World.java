@@ -235,6 +235,40 @@ public class World {
         }
         return GameConstants.axialHexDistance(fromHex.getQ(), fromHex.getR(), toHex.getQ(), toHex.getR());
     }
+
+    /**
+     * Minimum axial hex distance between any colony of {@code a} and any colony of {@code b}.
+     * Returns {@link Integer#MAX_VALUE} when either dynasty has no placeable colony hexes.
+     */
+    public int minDynastyHexDistance(Dynasty a, Dynasty b) {
+        if (a == null || b == null) {
+            return Integer.MAX_VALUE;
+        }
+        List<Colony> aColonies = a.getColonies();
+        List<Colony> bColonies = b.getColonies();
+        if (aColonies == null || bColonies == null || aColonies.isEmpty() || bColonies.isEmpty()) {
+            return Integer.MAX_VALUE;
+        }
+        int min = Integer.MAX_VALUE;
+        for (Colony from : aColonies) {
+            Hex fromHex = getHexOfColony(from);
+            if (fromHex == null) {
+                continue;
+            }
+            for (Colony to : bColonies) {
+                Hex toHex = getHexOfColony(to);
+                if (toHex == null) {
+                    continue;
+                }
+                int distance = GameConstants.axialHexDistance(
+                        fromHex.getQ(), fromHex.getR(), toHex.getQ(), toHex.getR());
+                if (distance < min) {
+                    min = distance;
+                }
+            }
+        }
+        return min;
+    }
     
     public List<Dynasty> getDynastys() { return dynastys; }
 

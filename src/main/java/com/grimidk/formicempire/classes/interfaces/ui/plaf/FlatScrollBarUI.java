@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.interfaces.ui.plaf;
 
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.styles.UiScrollBarStyles;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -17,6 +18,17 @@ public final class FlatScrollBarUI extends BasicScrollBarUI {
 
     public static ComponentUI createUI(JComponent c) {
         return new FlatScrollBarUI();
+    }
+
+    @Override
+    protected void installDefaults() {
+        super.installDefaults();
+        if (scrollbar.getUnitIncrement() <= 1) {
+            scrollbar.setUnitIncrement(UiScrollBarStyles.DEFAULT_UNIT_INCREMENT);
+        }
+        if (scrollbar.getBlockIncrement() <= 10) {
+            scrollbar.setBlockIncrement(UiScrollBarStyles.DEFAULT_BLOCK_INCREMENT);
+        }
     }
 
     @Override

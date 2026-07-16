@@ -184,8 +184,7 @@ public final class UiTheme {
             if (UiScrollBarStyles.isHidden(scrollPane)) {
                 scrollPane.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
             } else {
-                UiScrollBarStyles.style(scrollPane.getVerticalScrollBar());
-                scrollPane.getVerticalScrollBar().updateUI();
+                UiScrollBarStyles.style(scrollPane);
             }
         } else if (component instanceof javax.swing.JScrollBar scrollBar) {
             if (!UiScrollBarStyles.isHidden(scrollBar)) {

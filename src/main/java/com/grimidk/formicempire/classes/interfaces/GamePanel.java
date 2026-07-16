@@ -576,7 +576,8 @@ public class GamePanel extends ZeroGamePanel {
             if (sourceWindow != frame) {
                 return false;
             }
-            if (e.getKeyChar() == '+') {
+            char keyChar = e.getKeyChar();
+            if (keyChar == '+' || keyChar == '=') {
                 controlPanel.stepSpeedFromInput(1);
                 return true;
             }

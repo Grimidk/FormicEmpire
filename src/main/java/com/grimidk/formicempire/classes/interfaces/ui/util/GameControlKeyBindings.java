@@ -32,8 +32,10 @@ public final class GameControlKeyBindings {
         AbstractAction action = coalescedAction(speedUp);
         actionMap.put("speedUp", action);
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ADD, 0), "speedUp");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, 0), "speedUp");
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, InputEvent.SHIFT_DOWN_MASK), "speedUp");
         inputMap.put(KeyStroke.getKeyStroke('+'), "speedUp");
+        inputMap.put(KeyStroke.getKeyStroke('='), "speedUp");
     }
 
     private static void bindSpeedDown(InputMap inputMap, ActionMap actionMap, Runnable speedDown) {

@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 79% (232/292 checked)
+Completion: 78% (225/288 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -74,7 +74,7 @@ Roles (default hatch roles for new ants):
 4. IN-GAME HUD (bottom control bar)
 ================================================================================
 [X] Speed down button (also - key)
-[X] Speed up button (also + key)
+[ ] Speed up button (also + / = keys)
 [X] Tick speed icon / label updates with speed tier
 [X] Play / Pause button (also Space)
 [X] Turbo speeds only when allowed in settings
@@ -92,7 +92,7 @@ Side panels (live updates while playing):
 5. HOTKEYS (also in Help > Tutorials > Hotkeys)
 ================================================================================
 [X] Space — pause / resume
-[X] + / - — increase / decrease speed
+[ ] + / = / - — increase / decrease speed
 [X] Z — toggle Overworld / Underworld view
 [X] ESC — game menu (Colony & Dynasty submenus) or close top dialog
 [X] Q — Workers role dialog (toggle)
@@ -288,6 +288,7 @@ Start / progress assimilations (RP + time). Target RP cost scales +25% per compl
 15. DYNASTY — OVERVIEW (A)
 ================================================================================
 [X] Colony list with sort options
+[ ] Search filter by colony name (substring match)
 [X] Per-colony Actions menu:
     [X] Rename / edit colony
     [X] View colony (switch active colony / camera)
@@ -321,6 +322,8 @@ Neighbor trade rows (per adjacent hex):
 ================================================================================
 17. DYNASTY — DIPLOMACY (D)
 ================================================================================
+[ ] Sort dynasty list (reputation / distance closest / distance furthest)
+[ ] Search filter by dynasty or colony name (substring match)
 Per foreign dynasty Actions menu:
 [ ] Incoming pact request policy (Ask / Auto accept / Auto decline; max one received per day)
 [X] Non-aggression pact — propose / accept / break

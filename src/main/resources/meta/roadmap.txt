@@ -15,14 +15,10 @@ To Fix (By decreasing priority) :
 	rework cursor in general by making all small buttons bigger
 	watching other colonies shouldnt affect alerts or triggers
 	rework pet insect balance
-	diplomacy tab sorting by distance and searcher
 	parasites are broken
-	scrollbars can be slow
-	random pausing and unpausing
 	history in savefiles
 	look into scarcity better
 	show source amounts with tooltip and what they are
-	= as alternative for speed up
 
 	revise audit, tutorials and tests for blindspots
 
@@ -56,7 +52,7 @@ Needed for launch (v1.0) (Launch Version):
 	synergies ( Super majors + Chemical throwing = Artillery ants; Self destruction + Acid spitting = Corrosive bombs; Silk weaving + Hive building = Web building; Air-force ants + self destruction = Air-bomber ants)
 	more upgrades and more buildings and assimilations and synergies
 	implement pending roles (defender, miner, potter, bomber, carrier, artillery, siege) more roles (commander and captain roles, air force and paratroopers to skip a stage) and air warfare
-	more enemies ( Rebel ant colonies, Bugs (ant lions), Arachnids (catapult ants), Reptiles, Birds, Rodents, Zombie ant colonies)
+	more enemies ( Rebel ant colonies, Bugs (ant lions, vinegaroons, cricket moles), Arachnids (catapult ants), Reptiles, Birds, Rodents, Zombie ant colonies)
 	uncolonizable terrain with boss enemies  
 	more stats (kills, historic productions, graphs?)
 	more bugs (constants and icons and scienctific name)

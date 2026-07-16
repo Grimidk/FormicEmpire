@@ -118,6 +118,7 @@ public final class UiTableStyles {
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.getViewport().setBackground(AssetStyles.BACKGROUND_COLOR);
         scrollPane.setBorder(null);
+        UiScrollBarStyles.style(scrollPane);
         return scrollPane;
     }
 
