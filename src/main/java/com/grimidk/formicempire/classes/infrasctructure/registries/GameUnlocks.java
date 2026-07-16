@@ -336,12 +336,6 @@ public final class GameUnlocks {
         public static final Upgrade STAT_WORKER_SPEED_2 = new Upgrade(134, "STAT_WORKER_SPEED_2", "STAT_WORKER_SPEED_2_FLAVOR", "STAT_WORKER_SPEED_2_DESC", STAT_SCOUTING_3, 200000, null);
         static { upgrades.add(STAT_WORKER_SPEED_2); }
         // -- Assimilated --
-        // Implementation audit (gameplay wiring, not UI strings):
-        //   Implemented — ASSIMILATED_FARMING (ColonyLabourService), ASSIMILATED_MULTIQUEEN (queen capacity),
-        //     ASSIMILATED_FIREVENOM / ASSIMILATED_DEADLYVENOM / ASSIMILATED_STINGING / ASSIMILATED_FASTBITE
-        //     (ColonyStatsService combat), TYPE_MAJOR via ASSIMILATION_MARAUDER.
-        //   Implemented — ASSIMILATED_TRAPJAW / HONEYPOT / DOORHEAD / STINGING via ant subtype hatch rates + per-ant stats/sprites.
-        //   Not implemented — all others below marked TODO mechanic (reward has no simulation/UI effect yet).
         // TODO asset: icons/upgrades/AssimilatedFarming.png; icons/species/Leafcutter.png (placeholder — replace final art)
         public static final Upgrade ASSIMILATED_FARMING = new Upgrade(1001, "ASSIMILATED_FARMING", "ASSIMILATED_FARMING_FLAVOR", "ASSIMILATED_FARMING_DESC", ABILITY_ASSIMILATION, 0, null );
         static { upgrades.add(ASSIMILATED_FARMING); }
@@ -349,15 +343,12 @@ public final class GameUnlocks {
         public static final Upgrade ASSIMILATED_MULTIQUEEN = new Upgrade(1002, "ASSIMILATED_MULTIQUEEN", "ASSIMILATED_MULTIQUEEN_FLAVOR", "ASSIMILATED_MULTIQUEEN_DESC", ABILITY_ASSIMILATION, 0, null );
         static { upgrades.add(ASSIMILATED_MULTIQUEEN); }
         // TODO asset: icons/upgrades/AssimilatedTrapjaw.png; icons/species/Trapjaw.png (placeholder — replace final art)
-        // TODO mechanic: Trap-jaw subtype — hatch rates, sprites, and 3x additive attack per ant
         public static final Upgrade ASSIMILATED_TRAPJAW = new Upgrade(1003, "ASSIMILATED_TRAPJAW", "ASSIMILATED_TRAPJAW_FLAVOR", "ASSIMILATED_TRAPJAW_DESC", ABILITY_ASSIMILATION, 0, null );
         static { upgrades.add(ASSIMILATED_TRAPJAW); }
         // TODO asset: icons/upgrades/AssimilatedHoneypot.png; icons/species/Honeypot.png (placeholder — replace final art)
-        // TODO mechanic: Honey-pot subtype — hatch rates, sprites, 4x forage/carry, 0.75x speed per ant
         public static final Upgrade ASSIMILATED_HONEYPOT = new Upgrade(1004, "ASSIMILATED_HONEYPOT", "ASSIMILATED_HONEYPOT_FLAVOR", "ASSIMILATED_HONEYPOT_DESC", ABILITY_ASSIMILATION, 0, null );
         static { upgrades.add(ASSIMILATED_HONEYPOT); }
         // TODO asset: icons/upgrades/AssimilatedDoorhead.png; icons/species/Turtle.png (placeholder — replace final art)
-        // TODO mechanic: Door-head subtype — hatch rates, sprites, and 5x defense per ant
         public static final Upgrade ASSIMILATED_DOORHEAD = new Upgrade(1005, "ASSIMILATED_DOORHEAD", "ASSIMILATED_DOORHEAD_FLAVOR", "ASSIMILATED_DOORHEAD_DESC", ABILITY_ASSIMILATION, 0, null );
         static { upgrades.add(ASSIMILATED_DOORHEAD); }
         // TODO asset: icons/upgrades/AssimilatedWoodburrow.png; icons/species/Carpenter.png (placeholder — replace final art)
@@ -384,7 +375,6 @@ public final class GameUnlocks {
         public static final Upgrade ASSIMILATED_GLIDING = new Upgrade(1011, "ASSIMILATED_GLIDING", "ASSIMILATED_GLIDING_FLAVOR", "ASSIMILATED_GLIDING_DESC", ABILITY_ASSIMILATION, 0, null );
         static { upgrades.add(ASSIMILATED_GLIDING); }
         // TODO asset: icons/upgrades/AssimilatedStinging.png; icons/species/Bullet.png (placeholder — replace final art)
-        // TODO mechanic: Bullet subtype (hatch-rate assignment + per-role sprites); damage bonus wired in ColonyStatsService
         public static final Upgrade ASSIMILATED_STINGING = new Upgrade(1012, "ASSIMILATED_STINGING", "ASSIMILATED_STINGING_FLAVOR", "ASSIMILATED_STINGING_DESC", ABILITY_ASSIMILATION, 0, null );
         static { upgrades.add(ASSIMILATED_STINGING); }
         // TODO asset: icons/upgrades/AssimilatedSwarming.png; icons/species/Army.png (placeholder — replace final art)

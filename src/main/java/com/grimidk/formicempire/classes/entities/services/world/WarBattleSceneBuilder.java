@@ -52,9 +52,9 @@ public final class WarBattleSceneBuilder {
 
         if (war.getStagePhase() == WarStagePhase.RESERVE_ASSAULT) {
             attackerPower = war.getDeployedActiveAttacker();
-            defenderPower = war.getDeployedReserveDefender();
+            defenderPower = GameConstants.warHexDefenseEffectivePower(war.getDeployedReserveDefender());
             attackerCounts = compositionForDynastyActive(stageAttacker, attackerPower);
-            defenderCounts = compositionForColonyReserve(contested, defenderPower);
+            defenderCounts = compositionForColonyReserve(contested, war.getDeployedReserveDefender());
         } else {
             attackerPower = war.getDeployedActiveAttacker();
             defenderPower = war.getDeployedActiveDefender();
@@ -63,7 +63,8 @@ public final class WarBattleSceneBuilder {
         }
 
         float powerRatio = computePowerRatio(attackerPower, defenderPower);
-        float frontline = 0.5f + (powerRatio - 0.5f) * war.getStageProgress();
+        float stageProgress = war.getStageProgress();
+        float frontline = 0.5f + (powerRatio - 0.5f) * (0.25f + 0.75f * stageProgress);
 
         String warName = warService != null
                 ? warService.formatWarNameForDisplay(war, aggressor)

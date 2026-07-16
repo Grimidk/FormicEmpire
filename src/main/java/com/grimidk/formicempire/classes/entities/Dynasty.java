@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.awt.Color;
 
+import com.grimidk.formicempire.classes.constants.misc.CityTitle;
 import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
 import com.grimidk.formicempire.classes.constants.misc.DiplomaticReputationModifier;
 import com.grimidk.formicempire.classes.constants.misc.DynastyTitle;
@@ -38,6 +39,7 @@ import com.grimidk.formicempire.classes.infrasctructure.registries.DeathCause;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
+import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 
 public class Dynasty {
 
@@ -86,6 +88,7 @@ public class Dynasty {
     private final Set<Integer> pendingWarDeclarationFromIds;
     private final List<PendingNpcWarAlert> pendingNpcWarAlerts;
     private final List<PendingIntegrationVassalWarAlert> pendingIntegrationVassalWarAlerts;
+    private final List<PendingWarStageResultAlert> pendingWarStageResultAlerts;
     private final List<Integer> pendingIntegrationCompletedTargetIds;
     private final Map<Integer, Integer> pactBrokenAtWorldMonth;
     private final Map<Integer, Integer> pactRequestDeclinedAtWorldMonth;
@@ -150,6 +153,7 @@ public class Dynasty {
         this.pendingWarDeclarationFromIds = new LinkedHashSet<>();
         this.pendingNpcWarAlerts = new ArrayList<>();
         this.pendingIntegrationVassalWarAlerts = new ArrayList<>();
+        this.pendingWarStageResultAlerts = new ArrayList<>();
         this.pendingIntegrationCompletedTargetIds = new ArrayList<>();
         this.pactBrokenAtWorldMonth = new HashMap<>();
         this.pactRequestDeclinedAtWorldMonth = new HashMap<>();
@@ -224,6 +228,7 @@ public class Dynasty {
         this.pendingWarDeclarationFromIds = new LinkedHashSet<>();
         this.pendingNpcWarAlerts = new ArrayList<>();
         this.pendingIntegrationVassalWarAlerts = new ArrayList<>();
+        this.pendingWarStageResultAlerts = new ArrayList<>();
         this.pendingIntegrationCompletedTargetIds = new ArrayList<>();
         this.pactBrokenAtWorldMonth = new HashMap<>();
         this.pactRequestDeclinedAtWorldMonth = new HashMap<>();
@@ -476,11 +481,51 @@ public class Dynasty {
     }
 
     public String generateNextColonyName() {
+        return generateColonyName(colonies.size());
+    }
+
+    public String generateColonyName(int colonyIndex) {
         String baseName = themeBase != null && !themeBase.isEmpty()
                 ? themeBase
                 : LanguageStrings.dynastyThemeBase(this.name, this.titleKey);
-        int count = colonies.size();
-        return LanguageStrings.formatProceduralColonyName(baseName, count);
+        if (colonyIndex <= 0) {
+            return LanguageStrings.formatCityName(baseName, GameConstants.CITY_TITLE_PRIME);
+        }
+        Set<String> usedCityTitleKeys = collectUsedCityTitleKeys();
+        List<CityTitle> available = new ArrayList<>();
+        for (CityTitle title : GameConstants.getSatelliteCityTitles()) {
+            if (!usedCityTitleKeys.contains(title.getNameKey())) {
+                available.add(title);
+            }
+        }
+        if (!available.isEmpty()) {
+            CityTitle cityTitle = available.get(GameRandom.nextInt(available.size()));
+            return LanguageStrings.formatCityName(baseName, cityTitle);
+        }
+        return LanguageStrings.formatProceduralColonyName(baseName, colonyIndex);
+    }
+
+    private Set<String> collectUsedCityTitleKeys() {
+        Set<String> used = new HashSet<>();
+        for (Colony colony : colonies) {
+            if (colony == null || colony.getName() == null) {
+                continue;
+            }
+            for (CityTitle title : GameConstants.getCityTitles()) {
+                String formatted = LanguageStrings.formatCityName(
+                        LanguageStrings.resolveDynastyThemeDisplay(themeBase != null ? themeBase : ""), title);
+                if (colony.getName().equals(formatted)) {
+                    used.add(title.getNameKey());
+                    break;
+                }
+                String stripped = LanguageStrings.stripCityTitleAffix(colony.getName(), title.getNameKey());
+                if (stripped != null && !stripped.equals(colony.getName().trim())) {
+                    used.add(title.getNameKey());
+                    break;
+                }
+            }
+        }
+        return used;
     }
 
     // --- Logic ---
@@ -737,7 +782,7 @@ public class Dynasty {
             return false;
         }
         String dynastyBase = themeBase != null && !themeBase.isEmpty()
-                ? themeBase
+                ? LanguageStrings.resolveDynastyThemeDisplay(themeBase)
                 : LanguageStrings.dynastyThemeBase(name, titleKey);
         if (dynastyBase == null || dynastyBase.isEmpty()) {
             return true;
@@ -1264,6 +1309,31 @@ public class Dynasty {
         return new ArrayList<>(pendingIntegrationVassalWarAlerts);
     }
 
+    public static final class PendingWarStageResultAlert {
+        public final String title;
+        public final String message;
+
+        public PendingWarStageResultAlert(String title, String message) {
+            this.title = title;
+            this.message = message;
+        }
+    }
+
+    public void addPendingWarStageResultAlert(String title, String message) {
+        if (title == null || message == null || title.isBlank() || message.isBlank()) {
+            return;
+        }
+        pendingWarStageResultAlerts.add(new PendingWarStageResultAlert(title, message));
+    }
+
+    public List<PendingWarStageResultAlert> copyPendingWarStageResultAlerts() {
+        return new ArrayList<>(pendingWarStageResultAlerts);
+    }
+
+    public void removePendingWarStageResultAlert(PendingWarStageResultAlert alert) {
+        pendingWarStageResultAlerts.remove(alert);
+    }
+
     public void addPendingIntegrationCompletedAlert(int targetDynastyId) {
         if (targetDynastyId != id && targetDynastyId > 0
                 && !pendingIntegrationCompletedTargetIds.contains(targetDynastyId)) {
@@ -1421,7 +1491,8 @@ public class Dynasty {
         if (theme != null && !theme.isEmpty()) {
             this.name = LanguageStrings.formatDynastyName(theme, this.titleKey);
             if (this.themeBase == null || this.themeBase.isEmpty()) {
-                this.themeBase = theme;
+                String key = LanguageStrings.findDynastyThemeKey(theme);
+                this.themeBase = key != null ? key : theme;
             }
         }
     }

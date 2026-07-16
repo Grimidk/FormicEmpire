@@ -14,8 +14,13 @@ public class BugType extends Constant{
     private final float baseDefense;
     private final float baseSpeed;
     private final ImageIcon sprite;
+    private final boolean pet;
 
     public BugType(int id, String name, String scientificNameKey, float baseHealth, float baseRegen, float baseAttack, float baseAttackSpeed, float baseDefense, float baseSpeed, ImageIcon icon, ImageIcon sprite) {
+        this(id, name, scientificNameKey, baseHealth, baseRegen, baseAttack, baseAttackSpeed, baseDefense, baseSpeed, icon, sprite, false);
+    }
+
+    public BugType(int id, String name, String scientificNameKey, float baseHealth, float baseRegen, float baseAttack, float baseAttackSpeed, float baseDefense, float baseSpeed, ImageIcon icon, ImageIcon sprite, boolean pet) {
         super(id, name, icon);
         this.scientificNameKey = scientificNameKey;
         this.baseHealth = baseHealth;
@@ -25,6 +30,11 @@ public class BugType extends Constant{
         this.baseDefense = baseDefense;
         this.baseSpeed = baseSpeed;
         this.sprite = sprite;
+        this.pet = pet;
+    }
+
+    public boolean isPet() {
+        return pet;
     }
 
     public String getScientificName() {

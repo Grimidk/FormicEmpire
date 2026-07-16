@@ -1,45 +1,54 @@
 package com.grimidk.formicempire.classes.entities.services.dynasty;
 
+import com.grimidk.formicempire.classes.constants.misc.CityTitle;
 import com.grimidk.formicempire.classes.constants.misc.DynastyTitle;
 import com.grimidk.formicempire.classes.constants.misc.Species;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class DynastyNamingService {
-    private static final List<String> ALL_THEMES = Arrays.asList(
-        "Leafcutter", "Sand", "Rock", "Iron", "Mushroom", "Meat", "Water", "Fire", "Wind", "Dirt", 
-        "Wood", "Gold", "Bug", "Stone", "Clay", "Steel", "Ice", "Flame", "Storm", "Dust",
-        "Vine", "Root", "Seed", "Pollen", "Honey", "Silk", "Web", "Shadow", "Night", "Day",
-        "Silver", "Copper", "Bronze", "Emerald", "Ruby", "Sapphire", "Quartz", "Granite",
-        "Swamp", "Marsh", "Ocean", "River", "Peak", "Valley", "Cave", "Forest", "Jungle"
-    );
-
-    private static final Map<Integer, List<String>> SPECIES_PREFERENCES = new HashMap<>();
-
-    static {
-        // Omni
-        SPECIES_PREFERENCES.put(1, Arrays.asList("Iron", "Gold", "Stone", "Bug", "Silver", "Copper", "Bronze", "Steel"));
-        // Leafcutter
-        SPECIES_PREFERENCES.put(2, Arrays.asList("Leafcutter", "Wood", "Vine", "Root", "Seed", "Forest", "Jungle", "Mushroom"));
-        // Pharaoh
-        SPECIES_PREFERENCES.put(3, Arrays.asList("Sand", "Dust", "Emerald", "Ruby", "Sapphire", "Gold", "Silver", "Silk"));
-        // Marauder
-        SPECIES_PREFERENCES.put(4, Arrays.asList("Meat", "Fire", "Flame", "Storm", "Shadow", "Night", "Marsh", "Swamp"));
-    }
-
-    private final Set<String> usedThemes = new HashSet<>();
+    private final Set<String> usedThemeKeys = new HashSet<>();
 
     public DynastyTitle pickRandomTitle() {
         List<DynastyTitle> titles = GameConstants.getDynastyTitles();
         return titles.get(GameRandom.nextInt(titles.size()));
     }
 
-    public DynastyTitle pickRandomCityTitle() {
-        List<DynastyTitle> titles = GameConstants.getCityTitles();
+    public CityTitle pickRandomCapitalCityTitle() {
+        List<CityTitle> titles = GameConstants.getCapitalCityTitles();
+        if (titles.isEmpty()) {
+            return GameConstants.CITY_TITLE_PRIME;
+        }
         return titles.get(GameRandom.nextInt(titles.size()));
+    }
+
+    public CityTitle pickRandomSatelliteCityTitle() {
+        return pickUnusedSatelliteCityTitle(Set.of());
+    }
+
+    public CityTitle pickUnusedSatelliteCityTitle(Set<String> usedTitleKeys) {
+        List<CityTitle> pool = new ArrayList<>();
+        for (CityTitle title : GameConstants.getSatelliteCityTitles()) {
+            if (usedTitleKeys == null || !usedTitleKeys.contains(title.getNameKey())) {
+                pool.add(title);
+            }
+        }
+        if (pool.isEmpty()) {
+            return null;
+        }
+        return pool.get(GameRandom.nextInt(pool.size()));
+    }
+
+    public String claimThemeKey(Species species) {
+        String key = pickThemeKey(species);
+        usedThemeKeys.add(key);
+        return key;
     }
 
     public String generateDynastyName(Species species) {
@@ -47,45 +56,71 @@ public class DynastyNamingService {
     }
 
     public String generateDynastyName(Species species, DynastyTitle title) {
-        String theme = getRandomTheme(species);
-        usedThemes.add(theme);
-        return LanguageStrings.formatDynastyName(theme, title);
+        String themeKey = claimThemeKey(species);
+        return LanguageStrings.formatDynastyName(LanguageStrings.resolveDynastyThemeDisplay(themeKey), title);
     }
 
     public String generateCapitalName(String themeBase) {
-        return LanguageStrings.formatProceduralColonyName(themeBase, 0);
+        return LanguageStrings.formatCityName(themeBase, pickRandomCapitalCityTitle());
     }
 
-    private String getRandomTheme(Species species) {
+    public String generateSatelliteColonyName(String themeBase, Set<String> usedCityTitleKeys) {
+        CityTitle cityTitle = pickUnusedSatelliteCityTitle(usedCityTitleKeys);
+        if (cityTitle != null) {
+            return LanguageStrings.formatCityName(themeBase, cityTitle);
+        }
+        int fallbackIndex = usedCityTitleKeys == null ? 1 : usedCityTitleKeys.size() + 1;
+        return LanguageStrings.formatProceduralColonyName(themeBase, fallbackIndex);
+    }
+
+    private String pickThemeKey(Species species) {
         List<String> pool = new ArrayList<>();
-        
-        if (species != null && SPECIES_PREFERENCES.containsKey(species.getId())) {
-            for (String pref : SPECIES_PREFERENCES.get(species.getId())) {
-                if (!usedThemes.contains(pref)) {
-                    pool.add(pref);
+
+        if (species != null) {
+            for (String key : species.getPreferredNameKeys()) {
+                if (key != null && !key.isEmpty() && !usedThemeKeys.contains(key)) {
+                    pool.add(key);
                 }
             }
         }
 
         if (pool.isEmpty()) {
-            for (String theme : ALL_THEMES) {
-                if (!usedThemes.contains(theme)) {
-                    pool.add(theme);
+            for (String key : GameConstants.getGenericDynastyThemeKeys()) {
+                if (key != null && !key.isEmpty() && !usedThemeKeys.contains(key)) {
+                    pool.add(key);
                 }
             }
         }
 
         if (pool.isEmpty()) {
-            return ALL_THEMES.get(GameRandom.nextInt(ALL_THEMES.size()));
+            List<String> generics = GameConstants.getGenericDynastyThemeKeys();
+            if (!generics.isEmpty()) {
+                return generics.get(GameRandom.nextInt(generics.size()));
+            }
+            return LanguageStrings.DYNASTY_THEME_ANT;
         }
 
         return pool.get(GameRandom.nextInt(pool.size()));
     }
-    
+
     public void registerUsedName(String dynastyName) {
         String theme = LanguageStrings.stripDynastyNameSuffix(dynastyName);
-        if (theme != null && !theme.isEmpty()) {
-            usedThemes.add(theme);
+        if (theme == null || theme.isEmpty()) {
+            return;
         }
+        String key = LanguageStrings.findDynastyThemeKey(theme);
+        usedThemeKeys.add(key != null ? key : theme);
+    }
+
+    public void registerUsedThemeKey(String themeKeyOrDisplay) {
+        if (themeKeyOrDisplay == null || themeKeyOrDisplay.isEmpty()) {
+            return;
+        }
+        if (LanguageStrings.isDynastyThemeKey(themeKeyOrDisplay)) {
+            usedThemeKeys.add(themeKeyOrDisplay);
+            return;
+        }
+        String key = LanguageStrings.findDynastyThemeKey(themeKeyOrDisplay);
+        usedThemeKeys.add(key != null ? key : themeKeyOrDisplay);
     }
 }

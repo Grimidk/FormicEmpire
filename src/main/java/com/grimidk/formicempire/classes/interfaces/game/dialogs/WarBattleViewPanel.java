@@ -48,6 +48,7 @@ public class WarBattleViewPanel extends JPanel {
     private List<BattleAnt> attackerAnts = List.of();
     private List<BattleAnt> defenderAnts = List.of();
     private float contactLineRatio = 0.5f;
+    private float targetContactLineRatio = 0.5f;
     private Timer animationTimer;
     private float animationSeconds;
 
@@ -73,7 +74,7 @@ public class WarBattleViewPanel extends JPanel {
         WarService warService = world != null ? world.getWarService() : null;
         scene = WarBattleSceneBuilder.build(world, war, warService);
         if (scene.isAvailable()) {
-            contactLineRatio = scene.getFrontlineRatio();
+            targetContactLineRatio = scene.getFrontlineRatio();
             attackerAnts = buildAntPool(scene.getAttacker(), true);
             defenderAnts = buildAntPool(scene.getDefender(), false);
             statusLabel.setText(buildHeaderText(scene));
@@ -93,6 +94,12 @@ public class WarBattleViewPanel extends JPanel {
             animationSeconds += ANIMATION_FRAME_MS / 1000f;
             if (animationSeconds > 10_000f) {
                 animationSeconds = 0f;
+            }
+            float delta = targetContactLineRatio - contactLineRatio;
+            if (Math.abs(delta) > 0.0005f) {
+                contactLineRatio += delta * 0.06f;
+            } else {
+                contactLineRatio = targetContactLineRatio;
             }
             repaint();
         });

@@ -10,6 +10,7 @@ import com.grimidk.formicempire.classes.constants.ant.AntSubtypeSlot;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.ant.MoveStatus;
 import com.grimidk.formicempire.classes.constants.misc.BugType;
+import com.grimidk.formicempire.classes.constants.misc.CityTitle;
 import com.grimidk.formicempire.classes.constants.misc.ColonyLoyalty;
 import com.grimidk.formicempire.classes.constants.misc.ColonyLoyaltyModifier;
 import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
@@ -33,6 +34,7 @@ import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import javax.swing.ImageIcon;
@@ -210,7 +212,7 @@ public final class GameConstants {
     private static final List<ColonyLoyalty> colonyLoyalties = new ArrayList<>();
     private static final List<ColonyLoyaltyModifier> colonyLoyaltyModifiers = new ArrayList<>();
     private static final List<DynastyTitle> dynastyTitles = new ArrayList<>();
-    private static final List<DynastyTitle> cityTitles = new ArrayList<>();
+    private static final List<CityTitle> cityTitles = new ArrayList<>();
     private static final List<Species> species = new ArrayList<>();
     private static final List<TradeMethod> tradeMethods = new ArrayList<>();
     private static final List<Humidity> humidity = new ArrayList<>();
@@ -562,16 +564,16 @@ public final class GameConstants {
         loadIcon("icons/ants/omni/Worker.png"), loadIcon("sprites/ants/omni/Worker.png"));
     static { bugTypes.add(TYPE_ANT); }
     public static final BugType TYPE_APHID = new BugType(2, LanguageStrings.BUG_APHID, LanguageStrings.BUG_APHID_SCIENTIFIC, 1, 1, 0, 0, 5, 0.5f,
-        loadIcon("icons/bugs/Aphid.png") , loadIcon("sprites/bugs/Aphid.png"));
+        loadIcon("icons/bugs/Aphid.png") , loadIcon("sprites/bugs/Aphid.png"), true);
     static { bugTypes.add(TYPE_APHID); }
     public static final BugType TYPE_PARASITE_ANT = new BugType(3, LanguageStrings.BUG_PARASITE_ANT, LanguageStrings.BUG_PARASITE_ANT_SCIENTIFIC, 1, 1, 0, 0, 1, 1,
         loadIcon("icons/bugs/Parasite.png") , loadIcon("sprites/bugs/Parasite.png"));
     static { bugTypes.add(TYPE_PARASITE_ANT); }
     public static final BugType TYPE_SYMBIOTIC_MITE = new BugType(4, LanguageStrings.BUG_SYMBIOTIC_MITE, LanguageStrings.BUG_SYMBIOTIC_MITE_SCIENTIFIC, 1, 0, 0, 0, 2, 0.4f, 
-        loadIcon("icons/bugs/SoilMite.png"), loadIcon("sprites/bugs/SoilMite.png"));
+        loadIcon("icons/bugs/SoilMite.png"), loadIcon("sprites/bugs/SoilMite.png"), true);
     static { bugTypes.add(TYPE_SYMBIOTIC_MITE); }
     public static final BugType TYPE_DERMESTID = new BugType(5, LanguageStrings.BUG_DERMESTID, LanguageStrings.BUG_DERMESTID_SCIENTIFIC, 1, 0, 0, 0, 3, 0.35f,
-            loadIcon("icons/bugs/Dermestid.png"), loadIcon("sprites/bugs/Dermestid.png"));
+            loadIcon("icons/bugs/Dermestid.png"), loadIcon("sprites/bugs/Dermestid.png"), true);
     static { bugTypes.add(TYPE_DERMESTID); }
     public static final BugType TYPE_PARASITIC_MITE = new BugType(6, LanguageStrings.BUG_PARASITIC_MITE, LanguageStrings.BUG_PARASITIC_MITE_SCIENTIFIC, 1, 0, 0, 0, 1, 0.25f,
             loadIcon("icons/bugs/ParasiticMite.png"), loadIcon("sprites/bugs/ParasiticMite.png"));
@@ -1114,9 +1116,12 @@ public final class GameConstants {
     public static final float WAR_BATTLE_WIN_CHANCE_AT_PARITY = 0.5f;
     public static final float WAR_BATTLE_LOSS_FRACTION_AT_PARITY = 0.006f;
     public static final float WAR_BATTLE_WINNER_LOSS_FRACTION_MAX = 0.035f;
-    public static final float WAR_STAGE_PROGRESS_PER_DAY = 0.035f;
-    public static final float WAR_STAGE_PROGRESS_PER_HOUR = WAR_STAGE_PROGRESS_PER_DAY / 24f;
+    /** Stage capture progress added each war hour (0–1 scale); ~8 hours per hex at 13%/hour. */
+    public static final float WAR_STAGE_PROGRESS_PER_HOUR = 0.13f;
+    public static final float WAR_STAGE_PROGRESS_PER_DAY = WAR_STAGE_PROGRESS_PER_HOUR * 24f;
     public static final int WAR_REDEPLOY_HOURS = 24;
+    /** Hex defenders fight at +50% effective military power during local reserve/hex defense. */
+    public static final float WAR_HEX_DEFENSE_POWER_MULTIPLIER = 1.5f;
     public static final float WAR_AI_FALLBACK_MAX_POWER_RATIO = 1f;
     public static final float WAR_AI_FALLBACK_RECOVERY_RATIO = 0.75f;
     public static final int WAR_AI_FALLBACK_MIN_ACTIVE = 500;
@@ -1138,6 +1143,20 @@ public final class GameConstants {
     public static float warBattleWinnerLossFraction(float strongerOverWeakerRatio) {
         float loserFraction = warBattleLoserLossFraction(strongerOverWeakerRatio);
         return Math.min(WAR_BATTLE_WINNER_LOSS_FRACTION_MAX, loserFraction * 0.1f);
+    }
+
+    public static int warHexDefenseEffectivePower(int baseReservePower) {
+        if (baseReservePower <= 0) {
+            return 0;
+        }
+        return Math.max(1, Math.round(baseReservePower * WAR_HEX_DEFENSE_POWER_MULTIPLIER));
+    }
+
+    public static int warHexDefenseEffectiveLossToActual(int effectiveLoss) {
+        if (effectiveLoss <= 0) {
+            return 0;
+        }
+        return Math.max(0, Math.round(effectiveLoss / WAR_HEX_DEFENSE_POWER_MULTIPLIER));
     }
 
     public static final int AI_EXPANSION_COLONY_TARGET = 6;
@@ -1192,124 +1211,269 @@ public final class GameConstants {
             12, LanguageStrings.DYNASTY_TITLE_REPUBLIC, LanguageStrings.DYNASTY_TITLE_FMT_REPUBLIC);
     static { dynastyTitles.add(DYNASTY_TITLE_REPUBLIC); }
 
-    public static final DynastyTitle CITY_TITLE_CITY = new DynastyTitle(
-            8, LanguageStrings.DYNASTY_TITLE_CITY, LanguageStrings.DYNASTY_TITLE_FMT_CITY);
+    // --- City titles ---
+    public static final CityTitle CITY_TITLE_PRIME = new CityTitle(
+            1, LanguageStrings.CITY_TITLE_PRIME, CityTitle.Affix.SUFFIX, CityTitle.ColonyRole.CAPITAL);
+    static { cityTitles.add(CITY_TITLE_PRIME); }
+
+    public static final CityTitle CITY_TITLE_NEW = new CityTitle(
+            2, LanguageStrings.CITY_TITLE_NEW, CityTitle.Affix.PREFIX, CityTitle.ColonyRole.SATELLITE);
+    static { cityTitles.add(CITY_TITLE_NEW); }
+
+    public static final CityTitle CITY_TITLE_CITY = new CityTitle(
+            3, LanguageStrings.CITY_TITLE_CITY, CityTitle.Affix.SUFFIX, CityTitle.ColonyRole.SATELLITE);
     static { cityTitles.add(CITY_TITLE_CITY); }
 
-    public static final DynastyTitle CITY_TITLE_BERG = new DynastyTitle(
-            9, LanguageStrings.DYNASTY_TITLE_BERG, LanguageStrings.DYNASTY_TITLE_FMT_BERG);
+    public static final CityTitle CITY_TITLE_BERG = new CityTitle(
+            4, LanguageStrings.CITY_TITLE_BERG, CityTitle.Affix.SUFFIX, CityTitle.ColonyRole.SATELLITE);
     static { cityTitles.add(CITY_TITLE_BERG); }
 
-    public static final DynastyTitle CITY_TITLE_GRAD = new DynastyTitle(
-            10, LanguageStrings.DYNASTY_TITLE_GRAD, LanguageStrings.DYNASTY_TITLE_FMT_GRAD);
+    public static final CityTitle CITY_TITLE_GRAD = new CityTitle(
+            5, LanguageStrings.CITY_TITLE_GRAD, CityTitle.Affix.SUFFIX, CityTitle.ColonyRole.SATELLITE);
     static { cityTitles.add(CITY_TITLE_GRAD); }
+
+    public static final CityTitle CITY_TITLE_BURG = new CityTitle(
+            6, LanguageStrings.CITY_TITLE_BURG, CityTitle.Affix.SUFFIX, CityTitle.ColonyRole.SATELLITE);
+    static { cityTitles.add(CITY_TITLE_BURG); }
+
+    public static final CityTitle CITY_TITLE_HAVEN = new CityTitle(
+            7, LanguageStrings.CITY_TITLE_HAVEN, CityTitle.Affix.SUFFIX, CityTitle.ColonyRole.SATELLITE);
+    static { cityTitles.add(CITY_TITLE_HAVEN); }
+
+    public static final CityTitle CITY_TITLE_NEST = new CityTitle(
+            8, LanguageStrings.CITY_TITLE_NEST, CityTitle.Affix.SUFFIX, CityTitle.ColonyRole.SATELLITE);
+    static { cityTitles.add(CITY_TITLE_NEST); }
+
+    public static final CityTitle CITY_TITLE_HOLD = new CityTitle(
+            9, LanguageStrings.CITY_TITLE_HOLD, CityTitle.Affix.SUFFIX, CityTitle.ColonyRole.SATELLITE);
+    static { cityTitles.add(CITY_TITLE_HOLD); }
+
+    public static final CityTitle CITY_TITLE_FORD = new CityTitle(
+            10, LanguageStrings.CITY_TITLE_FORD, CityTitle.Affix.SUFFIX, CityTitle.ColonyRole.SATELLITE);
+    static { cityTitles.add(CITY_TITLE_FORD); }
+
+    public static final CityTitle CITY_TITLE_FORT = new CityTitle(
+            11, LanguageStrings.CITY_TITLE_FORT, CityTitle.Affix.PREFIX, CityTitle.ColonyRole.SATELLITE);
+    static { cityTitles.add(CITY_TITLE_FORT); }
+
+    public static final CityTitle CITY_TITLE_CASTLE = new CityTitle(
+            12, LanguageStrings.CITY_TITLE_CASTLE, CityTitle.Affix.PREFIX, CityTitle.ColonyRole.SATELLITE);
+    static { cityTitles.add(CITY_TITLE_CASTLE); }
+
+    private static final List<String> genericDynastyThemeKeys = List.of(
+            LanguageStrings.DYNASTY_THEME_LEAFCUTTER,
+            LanguageStrings.DYNASTY_THEME_SAND,
+            LanguageStrings.DYNASTY_THEME_ROCK,
+            LanguageStrings.DYNASTY_THEME_IRON,
+            LanguageStrings.DYNASTY_THEME_MUSHROOM,
+            LanguageStrings.DYNASTY_THEME_MEAT,
+            LanguageStrings.DYNASTY_THEME_WATER,
+            LanguageStrings.DYNASTY_THEME_FIRE,
+            LanguageStrings.DYNASTY_THEME_WIND,
+            LanguageStrings.DYNASTY_THEME_DIRT,
+            LanguageStrings.DYNASTY_THEME_WOOD,
+            LanguageStrings.DYNASTY_THEME_GOLD,
+            LanguageStrings.DYNASTY_THEME_BUG,
+            LanguageStrings.DYNASTY_THEME_STONE,
+            LanguageStrings.DYNASTY_THEME_CLAY,
+            LanguageStrings.DYNASTY_THEME_STEEL,
+            LanguageStrings.DYNASTY_THEME_ICE,
+            LanguageStrings.DYNASTY_THEME_FLAME,
+            LanguageStrings.DYNASTY_THEME_STORM,
+            LanguageStrings.DYNASTY_THEME_DUST,
+            LanguageStrings.DYNASTY_THEME_VINE,
+            LanguageStrings.DYNASTY_THEME_ROOT,
+            LanguageStrings.DYNASTY_THEME_SEED,
+            LanguageStrings.DYNASTY_THEME_POLLEN,
+            LanguageStrings.DYNASTY_THEME_HONEY,
+            LanguageStrings.DYNASTY_THEME_SILK,
+            LanguageStrings.DYNASTY_THEME_WEB,
+            LanguageStrings.DYNASTY_THEME_SHADOW,
+            LanguageStrings.DYNASTY_THEME_NIGHT,
+            LanguageStrings.DYNASTY_THEME_DAY,
+            LanguageStrings.DYNASTY_THEME_SILVER,
+            LanguageStrings.DYNASTY_THEME_COPPER,
+            LanguageStrings.DYNASTY_THEME_BRONZE,
+            LanguageStrings.DYNASTY_THEME_EMERALD,
+            LanguageStrings.DYNASTY_THEME_RUBY,
+            LanguageStrings.DYNASTY_THEME_SAPPHIRE,
+            LanguageStrings.DYNASTY_THEME_QUARTZ,
+            LanguageStrings.DYNASTY_THEME_GRANITE,
+            LanguageStrings.DYNASTY_THEME_SWAMP,
+            LanguageStrings.DYNASTY_THEME_MARSH,
+            LanguageStrings.DYNASTY_THEME_OCEAN,
+            LanguageStrings.DYNASTY_THEME_RIVER,
+            LanguageStrings.DYNASTY_THEME_PEAK,
+            LanguageStrings.DYNASTY_THEME_VALLEY,
+            LanguageStrings.DYNASTY_THEME_CAVE,
+            LanguageStrings.DYNASTY_THEME_FOREST,
+            LanguageStrings.DYNASTY_THEME_JUNGLE
+    );
 
     // --- Species ---
     public static final Species SPECIES_OMNI = new Species(1, LanguageStrings.SPECIES_OMNI, LanguageStrings.SPECIES_OMNI_SCIENTIFIC,  "omni/", null, 
         Set.of(GameUnlocks.TYPE_EGG, GameUnlocks.TYPE_QUEEN, GameUnlocks.TYPE_WORKER, GameUnlocks.ROLE_FORAGER, 
             GameUnlocks.ROLE_FARMER, GameUnlocks.ROLE_NURSE, GameUnlocks.ROLE_LAYER, 
-            GameUnlocks.STAT_SKELETON, GameUnlocks.STAT_ACID, GameUnlocks.STAT_LONGEVITY), loadIcon("icons/species/Omni.png"));
+            GameUnlocks.STAT_SKELETON, GameUnlocks.STAT_ACID, GameUnlocks.STAT_LONGEVITY),
+        Set.of(LanguageStrings.DYNASTY_THEME_PLAYER, LanguageStrings.DYNASTY_THEME_OMNI, LanguageStrings.DYNASTY_THEME_ANT,
+                LanguageStrings.DYNASTY_THEME_IRON, LanguageStrings.DYNASTY_THEME_GOLD, LanguageStrings.DYNASTY_THEME_STONE,
+                LanguageStrings.DYNASTY_THEME_BUG, LanguageStrings.DYNASTY_THEME_SILVER, LanguageStrings.DYNASTY_THEME_COPPER,
+                LanguageStrings.DYNASTY_THEME_BRONZE, LanguageStrings.DYNASTY_THEME_STEEL),
+        loadIcon("icons/species/Omni.png"));
     static { species.add(SPECIES_OMNI); }
     
     public static final Species SPECIES_LEAFCUTTER = new Species(2, LanguageStrings.SPECIES_LEAFCUTTER, LanguageStrings.SPECIES_LEAFCUTTER_SCIENTIFIC, "leafcutter/", GameUnlocks.ASSIMILATION_LEAFCUTTER, 
-        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_FARMING), loadIcon("icons/species/Leafcutter.png"));
+        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_FARMING),
+        Set.of(LanguageStrings.DYNASTY_THEME_LEAF, LanguageStrings.DYNASTY_THEME_PLANT, LanguageStrings.DYNASTY_THEME_SEED,
+                LanguageStrings.DYNASTY_THEME_LEAFCUTTER, LanguageStrings.DYNASTY_THEME_WOOD, LanguageStrings.DYNASTY_THEME_VINE,
+                LanguageStrings.DYNASTY_THEME_ROOT, LanguageStrings.DYNASTY_THEME_FOREST, LanguageStrings.DYNASTY_THEME_JUNGLE,
+                LanguageStrings.DYNASTY_THEME_MUSHROOM),
+        loadIcon("icons/species/Leafcutter.png"));
     static { species.add(SPECIES_LEAFCUTTER); }
     
     public static final Species SPECIES_PHARAOH = new Species(3, LanguageStrings.SPECIES_PHARAOH, LanguageStrings.SPECIES_PHARAOH_SCIENTIFIC, "pharaoh/", GameUnlocks.ASSIMILATION_PHARAOH, 
-        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_MULTIQUEEN), loadIcon("icons/species/Pharaoh.png"));
+        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_MULTIQUEEN),
+        Set.of(LanguageStrings.DYNASTY_THEME_PHARAOH, LanguageStrings.DYNASTY_THEME_RUBY, LanguageStrings.DYNASTY_THEME_TOPAZ,
+                LanguageStrings.DYNASTY_THEME_SAND, LanguageStrings.DYNASTY_THEME_DUST, LanguageStrings.DYNASTY_THEME_EMERALD,
+                LanguageStrings.DYNASTY_THEME_SAPPHIRE, LanguageStrings.DYNASTY_THEME_GOLD, LanguageStrings.DYNASTY_THEME_SILVER,
+                LanguageStrings.DYNASTY_THEME_SILK),
+        loadIcon("icons/species/Pharaoh.png"));
     static { species.add(SPECIES_PHARAOH); }
     
     public static final Species SPECIES_MARAUDER = new Species(4, LanguageStrings.SPECIES_MARAUDER, LanguageStrings.SPECIES_MARAUDER_SCIENTIFIC, "marauder/", GameUnlocks.ASSIMILATION_MARAUDER, 
-        defaultSpeciesUpgrades(GameUnlocks.TYPE_MAJOR), loadIcon("icons/species/Marauder.png"));
+        defaultSpeciesUpgrades(GameUnlocks.TYPE_MAJOR),
+        Set.of(LanguageStrings.DYNASTY_THEME_MARAUDER, LanguageStrings.DYNASTY_THEME_SCORPION, LanguageStrings.DYNASTY_THEME_COCKROACH,
+                LanguageStrings.DYNASTY_THEME_MEAT, LanguageStrings.DYNASTY_THEME_FIRE, LanguageStrings.DYNASTY_THEME_FLAME,
+                LanguageStrings.DYNASTY_THEME_STORM, LanguageStrings.DYNASTY_THEME_SHADOW, LanguageStrings.DYNASTY_THEME_NIGHT,
+                LanguageStrings.DYNASTY_THEME_MARSH, LanguageStrings.DYNASTY_THEME_SWAMP),
+        loadIcon("icons/species/Marauder.png"));
     static { species.add(SPECIES_MARAUDER); }
 
     public static final Species SPECIES_TRAPJAW = new Species(5, LanguageStrings.SPECIES_TRAPJAW, LanguageStrings.SPECIES_TRAPJAW_SCIENTIFIC, "trapjaw/", GameUnlocks.ASSIMILATION_TRAPJAW,
-        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_TRAPJAW), loadIcon("icons/species/Trapjaw.png"));
+        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_TRAPJAW),
+        Set.of(LanguageStrings.DYNASTY_THEME_TRAPJAW, LanguageStrings.DYNASTY_THEME_TRAP, LanguageStrings.DYNASTY_THEME_JAW),
+        loadIcon("icons/species/Trapjaw.png"));
     static { species.add(SPECIES_TRAPJAW); }
 
     public static final Species SPECIES_HONEYPOT = new Species(6, LanguageStrings.SPECIES_HONEYPOT, LanguageStrings.SPECIES_HONEYPOT_SCIENTIFIC, "honeypot/", GameUnlocks.ASSIMILATION_HONEYPOT,
-        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_HONEYPOT), loadIcon("icons/species/Honeypot.png"));
+        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_HONEYPOT),
+        Set.of(LanguageStrings.DYNASTY_THEME_HONEYPOT, LanguageStrings.DYNASTY_THEME_HONEY, LanguageStrings.DYNASTY_THEME_BEE),
+        loadIcon("icons/species/Honeypot.png"));
     static { species.add(SPECIES_HONEYPOT); }
 
     public static final Species SPECIES_TURTLE = new Species(7, LanguageStrings.SPECIES_TURTLE, LanguageStrings.SPECIES_TURTLE_SCIENTIFIC, "turtle/", GameUnlocks.ASSIMILATION_DOORHEAD,
-        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_DOORHEAD), loadIcon("icons/species/Turtle.png"));
+        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_DOORHEAD),
+        Set.of(LanguageStrings.DYNASTY_THEME_TURTLE, LanguageStrings.DYNASTY_THEME_SHELL, LanguageStrings.DYNASTY_THEME_TORTOISE),
+        loadIcon("icons/species/Turtle.png"));
     static { species.add(SPECIES_TURTLE); }
 
     // TODO asset: icons/species/Carpenter.png; sprites/ants/carpenter/*.png (placeholder — replace final art)
     public static final Species SPECIES_CARPENTER = new Species(8, LanguageStrings.SPECIES_CARPENTER, LanguageStrings.SPECIES_CARPENTER_SCIENTIFIC, "carpenter/", GameUnlocks.ASSIMILATION_WOODBURROW,
-        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_WOODBURROW), loadIcon("icons/species/Carpenter.png"));
+        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_WOODBURROW),
+        Set.of(LanguageStrings.DYNASTY_THEME_CARPENTER, LanguageStrings.DYNASTY_THEME_WOOD, LanguageStrings.DYNASTY_THEME_TREE),
+        loadIcon("icons/species/Carpenter.png"));
     static { species.add(SPECIES_CARPENTER); }
 
     // TODO asset: icons/species/Weaver.png; sprites/ants/weaver/*.png (placeholder — replace final art)
     public static final Species SPECIES_WEAVER = new Species(9, LanguageStrings.SPECIES_WEAVER, LanguageStrings.SPECIES_WEAVER_SCIENTIFIC, "weaver/", GameUnlocks.ASSIMILATION_SILKWEAVE,
-        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_SILKWEAVE), loadIcon("icons/species/Weaver.png"));
+        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_SILKWEAVE),
+        Set.of(LanguageStrings.DYNASTY_THEME_WEAVER, LanguageStrings.DYNASTY_THEME_SILK, LanguageStrings.DYNASTY_THEME_SPIDER),
+        loadIcon("icons/species/Weaver.png"));
     static { species.add(SPECIES_WEAVER); }
 
     // TODO asset: icons/species/Floodplain.png; sprites/ants/floodplain/*.png (placeholder — replace final art)
     public static final Species SPECIES_FLOODPLAIN = new Species(10, LanguageStrings.SPECIES_FLOODPLAIN, LanguageStrings.SPECIES_FLOODPLAIN_SCIENTIFIC, "floodplain/", GameUnlocks.ASSIMILATION_RAFTING,
-        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_RAFTING), loadIcon("icons/species/Floodplain.png"));
+        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_RAFTING),
+        Set.of(LanguageStrings.DYNASTY_THEME_FLOODPLAIN, LanguageStrings.DYNASTY_THEME_RIVER, LanguageStrings.DYNASTY_THEME_WATER),
+        loadIcon("icons/species/Floodplain.png"));
     static { species.add(SPECIES_FLOODPLAIN); }
 
     public static final Species SPECIES_FIRE = new Species(11, LanguageStrings.SPECIES_FIRE, LanguageStrings.SPECIES_FIRE_SCIENTIFIC, "fire/", GameUnlocks.ASSIMILATION_FIREVENOM,
-        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_FIREVENOM), loadIcon("icons/species/Fire.png"));
+        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_FIREVENOM),
+        Set.of(LanguageStrings.DYNASTY_THEME_FIRE, LanguageStrings.DYNASTY_THEME_FLAME, LanguageStrings.DYNASTY_THEME_BURN),
+        loadIcon("icons/species/Fire.png"));
     static { species.add(SPECIES_FIRE); }
 
     // TODO asset: icons/species/Jet.png; sprites/ants/jet/*.png (placeholder — replace final art)
     public static final Species SPECIES_JET = new Species(12, LanguageStrings.SPECIES_JET, LanguageStrings.SPECIES_JET_SCIENTIFIC, "jet/", GameUnlocks.ASSIMILATION_JUMPING,
-        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_JUMPING), loadIcon("icons/species/Jet.png"));
+        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_JUMPING),
+        Set.of(LanguageStrings.DYNASTY_THEME_JET, LanguageStrings.DYNASTY_THEME_TORNADO, LanguageStrings.DYNASTY_THEME_WIND),
+        loadIcon("icons/species/Jet.png"));
     static { species.add(SPECIES_JET); }
 
     // TODO asset: icons/species/Gliding.png; sprites/ants/gliding/*.png (placeholder — replace final art)
     public static final Species SPECIES_GLIDING = new Species(13, LanguageStrings.SPECIES_GLIDING, LanguageStrings.SPECIES_GLIDING_SCIENTIFIC, "gliding/", GameUnlocks.ASSIMILATION_GLIDING,
-        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_GLIDING), loadIcon("icons/species/Gliding.png"));
+        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_GLIDING),
+        Set.of(LanguageStrings.DYNASTY_THEME_GLIDING, LanguageStrings.DYNASTY_THEME_AIR, LanguageStrings.DYNASTY_THEME_FLY),
+        loadIcon("icons/species/Gliding.png"));
     static { species.add(SPECIES_GLIDING); }
 
     public static final Species SPECIES_BULLET = new Species(14, LanguageStrings.SPECIES_BULLET, LanguageStrings.SPECIES_BULLET_SCIENTIFIC, "bullet/", GameUnlocks.ASSIMILATION_STINGING,
-        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_STINGING), loadIcon("icons/species/Bullet.png"));
+        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_STINGING),
+        Set.of(LanguageStrings.DYNASTY_THEME_BULLET, LanguageStrings.DYNASTY_THEME_STING, LanguageStrings.DYNASTY_THEME_PUNCH),
+        loadIcon("icons/species/Bullet.png"));
     static { species.add(SPECIES_BULLET); }
 
     // TODO asset: icons/species/Army.png; sprites/ants/army/*.png (placeholder — replace final art)
     public static final Species SPECIES_ARMY = new Species(15, LanguageStrings.SPECIES_ARMY, LanguageStrings.SPECIES_ARMY_SCIENTIFIC, "army/", GameUnlocks.ASSIMILATION_SWARMING,
-        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_SWARMING), loadIcon("icons/species/Army.png"));
+        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_SWARMING),
+        Set.of(LanguageStrings.DYNASTY_THEME_ARMY, LanguageStrings.DYNASTY_THEME_SOLDIER, LanguageStrings.DYNASTY_THEME_WARRIOR),
+        loadIcon("icons/species/Army.png"));
     static { species.add(SPECIES_ARMY); }
 
     // TODO asset: icons/species/Ghost.png; sprites/ants/ghost/*.png (placeholder — replace final art)
     public static final Species SPECIES_GHOST = new Species(16, LanguageStrings.SPECIES_GHOST, LanguageStrings.SPECIES_GHOST_SCIENTIFIC, "ghost/", GameUnlocks.ASSIMILATION_STEALTH,
-        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_STEALTH), loadIcon("icons/species/Ghost.png"));
+        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_STEALTH),
+        Set.of(LanguageStrings.DYNASTY_THEME_GHOST, LanguageStrings.DYNASTY_THEME_SHADOW, LanguageStrings.DYNASTY_THEME_PHANTOM),
+        loadIcon("icons/species/Ghost.png"));
     static { species.add(SPECIES_GHOST); }
 
     // TODO asset: icons/species/Dracula.png; sprites/ants/dracula/*.png (placeholder — replace final art)
     public static final Species SPECIES_DRACULA = new Species(17, LanguageStrings.SPECIES_DRACULA, LanguageStrings.SPECIES_DRACULA_SCIENTIFIC, "dracula/", GameUnlocks.ASSIMILATION_FASTBITE,
-        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_FASTBITE), loadIcon("icons/species/Dracula.png"));
+        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_FASTBITE),
+        Set.of(LanguageStrings.DYNASTY_THEME_DRACULA, LanguageStrings.DYNASTY_THEME_VAMPIRE, LanguageStrings.DYNASTY_THEME_BLOOD),
+        loadIcon("icons/species/Dracula.png"));
     static { species.add(SPECIES_DRACULA); }
 
     // TODO asset: icons/species/Silver.png; sprites/ants/silver/*.png (placeholder — replace final art)
     public static final Species SPECIES_SILVER = new Species(18, LanguageStrings.SPECIES_SILVER, LanguageStrings.SPECIES_SILVER_SCIENTIFIC, "silver/", GameUnlocks.ASSIMILATION_HEATRESIST,
-        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_HEATRESIST), loadIcon("icons/species/Silver.png"));
+        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_HEATRESIST),
+        Set.of(LanguageStrings.DYNASTY_THEME_SILVER, LanguageStrings.DYNASTY_THEME_METAL, LanguageStrings.DYNASTY_THEME_GOLD),
+        loadIcon("icons/species/Silver.png"));
     static { species.add(SPECIES_SILVER); }
 
     public static final Species SPECIES_MARICOPA = new Species(19, LanguageStrings.SPECIES_MARICOPA, LanguageStrings.SPECIES_MARICOPA_SCIENTIFIC, "maricopa/", GameUnlocks.ASSIMILATION_DEADLYVENOM,
-        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_DEADLYVENOM), loadIcon("icons/species/Maricopa.png"));
+        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_DEADLYVENOM),
+        Set.of(LanguageStrings.DYNASTY_THEME_MARICOPA, LanguageStrings.DYNASTY_THEME_VENOM, LanguageStrings.DYNASTY_THEME_POISON),
+        loadIcon("icons/species/Maricopa.png"));
     static { species.add(SPECIES_MARICOPA); }
 
     // TODO asset: icons/species/Exploding.png; sprites/ants/exploding/*.png (placeholder — replace final art)
     public static final Species SPECIES_EXPLODING = new Species(20, LanguageStrings.SPECIES_EXPLODING, LanguageStrings.SPECIES_EXPLODING_SCIENTIFIC, "exploding/", GameUnlocks.ASSIMILATION_SELFDESTRUCT,
-        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_SELFDESTRUCT), loadIcon("icons/species/Exploding.png"));
+        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_SELFDESTRUCT),
+        Set.of(LanguageStrings.DYNASTY_THEME_EXPLODING, LanguageStrings.DYNASTY_THEME_BOMB, LanguageStrings.DYNASTY_THEME_EXPLOSION),
+        loadIcon("icons/species/Exploding.png"));
     static { species.add(SPECIES_EXPLODING); }
 
     // TODO asset: icons/species/Bulldog.png; sprites/ants/bulldog/*.png (placeholder — replace final art)
     public static final Species SPECIES_BULLDOG = new Species(21, LanguageStrings.SPECIES_BULLDOG, LanguageStrings.SPECIES_BULLDOG_SCIENTIFIC, "bulldog/", GameUnlocks.ASSIMILATION_FARSIGHT,
-        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_FARSIGHT), loadIcon("icons/species/Bulldog.png"));
+        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_FARSIGHT),
+        Set.of(LanguageStrings.DYNASTY_THEME_BULLDOG, LanguageStrings.DYNASTY_THEME_DOG, LanguageStrings.DYNASTY_THEME_HOUND),
+        loadIcon("icons/species/Bulldog.png"));
     static { species.add(SPECIES_BULLDOG); }
 
     // TODO asset: icons/species/ShiningBlack.png; sprites/ants/shiningblack/*.png (placeholder — replace final art)
     public static final Species SPECIES_SHININGBLACK = new Species(22, LanguageStrings.SPECIES_SHININGBLACK, LanguageStrings.SPECIES_SHININGBLACK_SCIENTIFIC, "shiningblack/", GameUnlocks.ASSIMILATION_HIVEBUILD,
-        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_HIVEBUILD), loadIcon("icons/species/ShiningBlack.png"));
+        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_HIVEBUILD),
+        Set.of(LanguageStrings.DYNASTY_THEME_SHINING, LanguageStrings.DYNASTY_THEME_BLACK, LanguageStrings.DYNASTY_THEME_DARK),
+        loadIcon("icons/species/ShiningBlack.png"));
     static { species.add(SPECIES_SHININGBLACK); }
 
     // TODO asset: icons/species/Desert.png; sprites/ants/desert/*.png (placeholder — replace final art)
     public static final Species SPECIES_DESERT = new Species(23, LanguageStrings.SPECIES_DESERT, LanguageStrings.SPECIES_DESERT_SCIENTIFIC, "desert/", GameUnlocks.ASSIMILATION_LOCSENSE,
-        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_LOCSENSE), loadIcon("icons/species/Desert.png"));
+        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_LOCSENSE),
+        Set.of(LanguageStrings.DYNASTY_THEME_DESERT, LanguageStrings.DYNASTY_THEME_SAND, LanguageStrings.DYNASTY_THEME_DIRT),
+        loadIcon("icons/species/Desert.png"));
     static { species.add(SPECIES_DESERT); }
 
     // --- Trade Methods ---
@@ -1425,14 +1589,42 @@ public final class GameConstants {
 
     public static List<ColonyRank> getColonyRanks() { return Collections.unmodifiableList(colonyRanks); }
     public static List<DynastyTitle> getDynastyTitles() { return Collections.unmodifiableList(dynastyTitles); }
-    public static List<DynastyTitle> getCityTitles() { return Collections.unmodifiableList(cityTitles); }
+    public static List<CityTitle> getCityTitles() { return Collections.unmodifiableList(cityTitles); }
+
+    public static List<CityTitle> getCapitalCityTitles() {
+        List<CityTitle> capitals = new ArrayList<>();
+        for (CityTitle title : cityTitles) {
+            if (title.isCapital()) {
+                capitals.add(title);
+            }
+        }
+        return Collections.unmodifiableList(capitals);
+    }
+
+    public static List<CityTitle> getSatelliteCityTitles() {
+        List<CityTitle> satellites = new ArrayList<>();
+        for (CityTitle title : cityTitles) {
+            if (title.isSatellite()) {
+                satellites.add(title);
+            }
+        }
+        return Collections.unmodifiableList(satellites);
+    }
+
+    public static List<String> getGenericDynastyThemeKeys() {
+        return genericDynastyThemeKeys;
+    }
+
+    public static List<String> getAllDynastyThemeKeys() {
+        LinkedHashSet<String> keys = new LinkedHashSet<>(genericDynastyThemeKeys);
+        for (Species s : species) {
+            keys.addAll(s.getPreferredNameKeys());
+        }
+        return List.copyOf(keys);
+    }
 
     public static DynastyTitle getDynastyTitleByKey(String key) {
-        DynastyTitle title = findTitleByKey(dynastyTitles, key);
-        if (title != null) {
-            return title;
-        }
-        title = findTitleByKey(cityTitles, key);
+        DynastyTitle title = findDynastyTitleByKey(dynastyTitles, key);
         return title != null ? title : DYNASTY_TITLE_DYNASTY;
     }
 
@@ -1442,24 +1634,40 @@ public final class GameConstants {
                 return title;
             }
         }
-        for (DynastyTitle title : cityTitles) {
+        return DYNASTY_TITLE_DYNASTY;
+    }
+
+    public static CityTitle getCityTitleByKey(String key) {
+        CityTitle title = findCityTitleByKey(key);
+        return title != null ? title : CITY_TITLE_CITY;
+    }
+
+    public static CityTitle getCityTitleById(int id) {
+        for (CityTitle title : cityTitles) {
             if (title.getId() == id) {
                 return title;
             }
         }
-        return DYNASTY_TITLE_DYNASTY;
+        return CITY_TITLE_PRIME;
     }
 
-    public static DynastyTitle getCityTitleByKey(String key) {
-        DynastyTitle title = findTitleByKey(cityTitles, key);
-        return title != null ? title : CITY_TITLE_CITY;
-    }
-
-    private static DynastyTitle findTitleByKey(List<DynastyTitle> titles, String key) {
+    private static DynastyTitle findDynastyTitleByKey(List<DynastyTitle> titles, String key) {
         if (key == null) {
             return null;
         }
         for (DynastyTitle title : titles) {
+            if (title.getNameKey().equals(key)) {
+                return title;
+            }
+        }
+        return null;
+    }
+
+    private static CityTitle findCityTitleByKey(String key) {
+        if (key == null) {
+            return null;
+        }
+        for (CityTitle title : cityTitles) {
             if (title.getNameKey().equals(key)) {
                 return title;
             }

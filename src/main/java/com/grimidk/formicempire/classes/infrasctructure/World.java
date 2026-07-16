@@ -405,15 +405,15 @@ public class World {
 
             int dynastyId = this.dynastyIdCounter++;
             DynastyTitle npcTitle = namingService.pickRandomTitle();
-            String npcDynName = namingService.generateDynastyName(npcSpecies, npcTitle);
+            String npcThemeKey = namingService.claimThemeKey(npcSpecies);
+            String npcDynName = LanguageStrings.formatDynastyName(npcThemeKey, npcTitle);
             Dynasty npcDynasty = new Dynasty(dynastyId, npcDynName, npcTitle.getNameKey(), false, npcSpecies);
-            String npcTheme = LanguageStrings.dynastyThemeBase(npcDynName, npcTitle.getNameKey());
-            npcDynasty.setThemeBase(npcTheme);
+            npcDynasty.setThemeBase(npcThemeKey);
             npcDynasty.getStarterService().initializeDynasty(npcDynasty);
             this.dynastys.add(npcDynasty);
 
             int colId = this.colonyIdCounter++;
-            String npcCapName = namingService.generateCapitalName(npcTheme);
+            String npcCapName = namingService.generateCapitalName(npcThemeKey);
             Colony aiColony = new Colony(colId, npcCapName, false);
             npcDynasty.addColony(aiColony);
 
@@ -645,6 +645,9 @@ public class World {
                 loadedDynastys.put(dynasty.getId(), dynasty);
                 this.dynastys.add(dynasty);
                 namingService.registerUsedName(dynasty.getName());
+                if (dynasty.getThemeBase() != null && !dynasty.getThemeBase().isEmpty()) {
+                    namingService.registerUsedThemeKey(dynasty.getThemeBase());
+                }
                 if (dynasty.getId() > maxDynastyId) maxDynastyId = dynasty.getId();
             }
         }

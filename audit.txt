@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 83% (229/277 checked)
+Completion: 81% (229/281 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -346,7 +346,8 @@ Per foreign dynasty Actions menu:
 [X] View battle — opens WarBattleDialog (hour-tick battle animation)
 [X] Battle view updates each hour while open
 [ ] War standing / stage progression over time
-[ ] Redeploy delay between battles (24h)
+[ ] War stage progress: +13% per hour; hex capture when stage bar fills (plus 24h redeploy between stages)
+[ ] Battle won/lost popup when a war stage resolves
 [ ] War role economy in role dialogs
 
 ================================================================================
@@ -361,6 +362,8 @@ Per foreign dynasty Actions menu:
 [X] Dynasty badges: color, species icon, stance, defeated marker
 [X] Mouse wheel zoom on map
 [X] Legend / overlay toggles if present
+[ ] Go Back Home button — recenters map on player capital
+[ ] New colonies after capital use randomized city titles (City/Berg/Grad/Burg/Haven/Nest/Hold/Ford), no repeats within dynasty
 
 ================================================================================
 20. STATISTICS (X)
@@ -433,6 +436,7 @@ World:
 Combat:
 [X] Colony military power calculation
 [ ] War skips active clash when defender has no assigned active military roles (hex defense)
+[ ] Hex defense: local reserve defenders fight at +50% effective military power
 [X] Battle view stat multipliers vs standing multipliers
 
 ================================================================================

@@ -27,17 +27,6 @@ public class ColonyStarterService {
         return SHARED;
     }
 
-    private static String colonyThemeBase(Dynasty dynasty) {
-        if (dynasty == null) {
-            return LanguageStrings.get(LanguageStrings.COLONY_NAME_DEFAULT_THEME);
-        }
-        String base = dynasty.getThemeBase();
-        if (base == null || base.isEmpty()) {
-            base = LanguageStrings.dynastyThemeBase(dynasty.getName(), dynasty.getTitleKey());
-        }
-        return base.isEmpty() ? LanguageStrings.get(LanguageStrings.COLONY_NAME_DEFAULT_THEME) : base;
-    }
-
     public void initializeNewColony(Colony colony) {
         String type = colony.isPlayer() ? "Player" : "AI";
         
@@ -48,8 +37,15 @@ public class ColonyStarterService {
             if (index == -1) {
                 index = d.getColonies().size();
             }
-            
-            colony.setName(LanguageStrings.formatProceduralColonyName(colonyThemeBase(d), index));
+
+            // Capitals may already be named by World; satellites always use city titles.
+            if (index == 0) {
+                if (colony.getName() == null || colony.getName().isEmpty()) {
+                    colony.setName(d.generateColonyName(0));
+                }
+            } else {
+                colony.setName(d.generateColonyName(index));
+            }
             
             boolean isFirst = (index == 0);
             if (isFirst) {

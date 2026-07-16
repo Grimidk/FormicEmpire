@@ -25,17 +25,18 @@ import com.grimidk.formicempire.classes.infrasctructure.registries.WorldSpaces;
 
 public class ColonyBugHandlingService {
 
-    private static final List<BugType> PET_TYPES = List.of(
-            GameConstants.TYPE_APHID,
-            GameConstants.TYPE_SYMBIOTIC_MITE,
-            GameConstants.TYPE_DERMESTID);
-
     public static List<BugType> getPetTypes() {
-        return PET_TYPES;
+        List<BugType> pets = new ArrayList<>();
+        for (BugType type : GameConstants.getBugTypes()) {
+            if (type != null && type.isPet()) {
+                pets.add(type);
+            }
+        }
+        return Collections.unmodifiableList(pets);
     }
 
     public static boolean isPetBug(BugType type) {
-        return type != null && PET_TYPES.contains(type);
+        return type != null && type.isPet();
     }
 
     public boolean canCatchPetBug(Colony colony, BugType type) {
@@ -72,7 +73,7 @@ public class ColonyBugHandlingService {
 
     public int getTotalPetCount(Colony colony) {
         int total = 0;
-        for (BugType type : PET_TYPES) {
+        for (BugType type : getPetTypes()) {
             total += getCount(colony, type);
         }
         return total;
@@ -83,7 +84,7 @@ public class ColonyBugHandlingService {
             return 0;
         }
         int total = 0;
-        for (BugType type : PET_TYPES) {
+        for (BugType type : getPetTypes()) {
             if (canCatchPetBug(colony, type)) {
                 total += getCount(colony, type);
             }
@@ -96,7 +97,7 @@ public class ColonyBugHandlingService {
             return 0;
         }
         int speciesTotal = 0;
-        for (BugType type : PET_TYPES) {
+        for (BugType type : getPetTypes()) {
             if (canCatchPetBug(colony, type)) {
                 speciesTotal += getSpeciesTenderCapacity(colony, type);
             }
@@ -202,7 +203,7 @@ public class ColonyBugHandlingService {
     }
 
     private void runBreeding(Colony colony) {
-        for (BugType type : PET_TYPES) {
+        for (BugType type : getPetTypes()) {
             if (!canCatchPetBug(colony, type)) {
                 continue;
             }
@@ -345,7 +346,7 @@ public class ColonyBugHandlingService {
         if (colony == null) {
             return;
         }
-        for (BugType type : PET_TYPES) {
+        for (BugType type : getPetTypes()) {
             int count = getCount(colony, type);
             if (count <= 0) {
                 continue;

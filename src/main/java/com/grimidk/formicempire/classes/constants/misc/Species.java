@@ -1,4 +1,6 @@
 package com.grimidk.formicempire.classes.constants.misc;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import javax.swing.ImageIcon;
@@ -13,18 +15,24 @@ public class Species extends Constant {
     private final String directory;
     private final Assimilation assimilation;
     private final Set<Upgrade> baseUpgrades;
+    /** LanguageStrings keys for preferred dynasty theme names (not display text). */
+    private final Set<String> preferredNameKeys;
 
-    public Species(int id, String name, String scientific, String directory, Assimilation assimilation, Set<Upgrade> baseUpgrades, ImageIcon icon) {
+    public Species(int id, String name, String scientific, String directory, Assimilation assimilation,
+            Set<Upgrade> baseUpgrades, Set<String> preferredNameKeys, ImageIcon icon) {
         super(id, name, icon);
         this.scientific = scientific;
         this.directory = directory;
         this.assimilation = assimilation;
         this.baseUpgrades = baseUpgrades;
+        this.preferredNameKeys = preferredNameKeys == null
+                ? Set.of()
+                : Collections.unmodifiableSet(new LinkedHashSet<>(preferredNameKeys));
     }
 
-    // (no icon)
-    public Species(int id, String name, String scientific, String directory, Assimilation assimilation, Set<Upgrade> baseUpgrades) {
-        this(id, name, scientific, directory, assimilation, baseUpgrades, null);
+    public Species(int id, String name, String scientific, String directory, Assimilation assimilation,
+            Set<Upgrade> baseUpgrades, Set<String> preferredNameKeys) {
+        this(id, name, scientific, directory, assimilation, baseUpgrades, preferredNameKeys, null);
     }
 
     public String getScientific() {
@@ -54,4 +62,7 @@ public class Species extends Constant {
         return baseUpgrades;
     }
 
+    public Set<String> getPreferredNameKeys() {
+        return preferredNameKeys;
+    }
 }

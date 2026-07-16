@@ -145,11 +145,13 @@ public final class WarProgressService {
         }
 
         if (forfeitier.getId() == stageDefender.getId()) {
-            completeStage(world, warService, war, aggressor, defender, stageAttacker, stageDefender, contested, false);
+            completeStage(world, warService, war, aggressor, defender, stageAttacker, stageDefender, contested, false,
+                    true);
             return true;
         }
         if (forfeitier.getId() == stageAttacker.getId()) {
-            completeStage(world, warService, war, aggressor, defender, stageAttacker, stageDefender, contested, true);
+            completeStage(world, warService, war, aggressor, defender, stageAttacker, stageDefender, contested, true,
+                    true);
             return true;
         }
         return false;
@@ -336,12 +338,14 @@ public final class WarProgressService {
             return;
         }
 
-        BattleTickResult result = resolveBattleTick(attackerPower, reservePower);
+        int effectiveReservePower = GameConstants.warHexDefenseEffectivePower(reservePower);
+        BattleTickResult result = resolveBattleTick(attackerPower, effectiveReservePower);
+        int actualReserveLoss = GameConstants.warHexDefenseEffectiveLossToActual(result.defenderLoss);
         war.setDeployedActiveAttacker(Math.max(0, attackerPower - result.attackerLoss));
-        war.setDeployedReserveDefender(Math.max(0, reservePower - result.defenderLoss));
+        war.setDeployedReserveDefender(Math.max(0, reservePower - actualReserveLoss));
 
         applyActivePoolLoss(stageAttacker, result.attackerLoss);
-        applyReservePoolLoss(contested, result.defenderLoss);
+        applyReservePoolLoss(contested, actualReserveLoss);
         ColonyMilitaryService.refreshColonyMilitaryPower(contested);
         ColonyMilitaryService.refreshDynastyMilitaryPower(stageAttacker);
         ColonyMilitaryService.refreshDynastyMilitaryPower(stageDefender);
@@ -349,9 +353,10 @@ public final class WarProgressService {
         war.setStageProgress(Math.min(1f, war.getStageProgress() + GameConstants.WAR_STAGE_PROGRESS_PER_HOUR));
         war.recomputeProgressPercent();
 
-        if (war.getDeployedReserveDefender() <= 0 || !colonyHasQueenDefense(contested)) {
+        if (isStageReadyToResolve(war)
+                && (war.getDeployedReserveDefender() <= 0 || !colonyHasQueenDefense(contested))) {
             completeStage(world, warService, war, aggressor, defender, stageAttacker,
-                    contested.getDynasty(), contested, false);
+                    contested.getDynasty(), contested, false, false);
             return;
         }
         if (war.getDeployedActiveAttacker() <= 0) {
@@ -359,9 +364,16 @@ public final class WarProgressService {
         }
     }
 
+    private static boolean isStageReadyToResolve(War war) {
+        return war != null && war.getStageProgress() >= 1f - 0.0001f;
+    }
+
     private static void completeStage(World world, WarService warService, War war,
             Dynasty aggressor, Dynasty defender, Dynasty stageAttacker, Dynasty stageDefender,
-            Colony contested, boolean attackerRetreat) {
+            Colony contested, boolean attackerRetreat, boolean forceImmediate) {
+        if (!forceImmediate && !isStageReadyToResolve(war)) {
+            return;
+        }
         Dynasty victor = attackerRetreat ? stageDefender : stageAttacker;
         Dynasty hexOwner = contested.getDynasty();
         boolean captured = !attackerRetreat && victor.getId() == stageAttacker.getId()
@@ -792,6 +804,14 @@ public final class WarProgressService {
                     victor.getName(),
                     contested.getName(),
                     progress);
+        }
+        Dynasty player = findPlayerDynasty(world);
+        if (player != null && war.involves(player.getId())) {
+            boolean playerWon = victor.getId() == player.getId();
+            String title = playerWon
+                    ? LanguageStrings.get(LanguageStrings.WAR_STAGE_WON_TITLE)
+                    : LanguageStrings.get(LanguageStrings.WAR_STAGE_LOST_TITLE);
+            player.addPendingWarStageResultAlert(title, message);
         }
         notifyPlayerWarEvent(world, war, message);
     }

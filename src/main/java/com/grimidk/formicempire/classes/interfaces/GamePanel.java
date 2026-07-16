@@ -1653,6 +1653,7 @@ public class GamePanel extends ZeroGamePanel {
         processPendingWarDeclarations(world);
         processPendingIntegrationVassalWarAlerts(world);
         processPendingIntegrationCompletedAlerts(world);
+        processPendingWarStageResultAlerts(world);
         processPendingPeaceOffers(world);
         processPendingTradeProposals(world);
     }
@@ -1885,6 +1886,30 @@ public class GamePanel extends ZeroGamePanel {
                     message,
                     LanguageStrings.get(LanguageStrings.DIPLO_INTEGRATION_VASSAL_WAR_ALERT_TITLE),
                     JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    private void processPendingWarStageResultAlerts(World world) {
+        if (world == null || !engineStarted) {
+            return;
+        }
+        Dynasty playerDynasty = null;
+        for (Dynasty dynasty : world.getDynastys()) {
+            if (dynasty.isPlayer() && !dynasty.isDefeated()) {
+                playerDynasty = dynasty;
+                break;
+            }
+        }
+        if (playerDynasty == null) {
+            return;
+        }
+
+        for (Dynasty.PendingWarStageResultAlert pending : playerDynasty.copyPendingWarStageResultAlerts()) {
+            playerDynasty.removePendingWarStageResultAlert(pending);
+            UiOptionPane.showMessageDialog(this,
+                    pending.message,
+                    pending.title,
+                    JOptionPane.INFORMATION_MESSAGE);
         }
     }
 

@@ -1,5 +1,6 @@
 package com.grimidk.formicempire.classes.infrasctructure.i18n;
 
+import com.grimidk.formicempire.classes.constants.misc.CityTitle;
 import com.grimidk.formicempire.classes.constants.misc.DynastyTitle;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.translations.EnglishTranslation;
@@ -87,7 +88,7 @@ public final class LanguageStrings {
         if (title == null) {
             title = GameConstants.DYNASTY_TITLE_DYNASTY;
         }
-        return title.formatName(baseName);
+        return title.formatName(resolveDynastyThemeDisplay(baseName));
     }
 
     public static String formatDynastyName(String baseName, int titleId) {
@@ -98,11 +99,11 @@ public final class LanguageStrings {
         return formatDynastyName(baseName, GameConstants.getDynastyTitleByKey(titleKey));
     }
 
-    public static String formatCityName(String baseName, DynastyTitle cityTitle) {
+    public static String formatCityName(String baseName, CityTitle cityTitle) {
         if (cityTitle == null) {
             cityTitle = GameConstants.CITY_TITLE_CITY;
         }
-        return cityTitle.formatName(baseName);
+        return cityTitle.formatName(resolveDynastyThemeDisplay(baseName));
     }
 
     public static String formatCityName(String baseName, String cityTitleKey) {
@@ -145,11 +146,6 @@ public final class LanguageStrings {
                 titles.add(title);
             }
         }
-        for (DynastyTitle title : GameConstants.getCityTitles()) {
-            if (!titles.contains(title)) {
-                titles.add(title);
-            }
-        }
 
         for (DynastyTitle title : titles) {
             if (title == null) {
@@ -176,6 +172,51 @@ public final class LanguageStrings {
             result = trimmed.substring(0, trimmed.length() - legacySuffix.length());
         }
         return result;
+    }
+
+    public static String stripCityTitleAffix(String colonyName) {
+        return stripCityTitleAffix(colonyName, null);
+    }
+
+    public static String stripCityTitleAffix(String colonyName, String cityTitleKey) {
+        if (colonyName == null) {
+            return null;
+        }
+        String trimmed = colonyName.trim();
+        String best = trimmed;
+        int bestRemoved = 0;
+
+        List<CityTitle> titles = new ArrayList<>();
+        if (cityTitleKey != null) {
+            titles.add(GameConstants.getCityTitleByKey(cityTitleKey));
+        }
+        for (CityTitle title : GameConstants.getCityTitles()) {
+            if (!titles.contains(title)) {
+                titles.add(title);
+            }
+        }
+
+        for (CityTitle title : titles) {
+            if (title == null) {
+                continue;
+            }
+            for (Map<String, String> langMap : translations.values()) {
+                String localized = langMap.get(title.getNameKey());
+                if (localized == null || localized.isEmpty()) {
+                    continue;
+                }
+                String stripped = title.stripLocalizedTitle(trimmed, localized);
+                if (stripped == null || stripped.equals(trimmed)) {
+                    continue;
+                }
+                int removed = trimmed.length() - stripped.length();
+                if (removed > bestRemoved) {
+                    bestRemoved = removed;
+                    best = stripped;
+                }
+            }
+        }
+        return best;
     }
 
     public static String formatSaveSlotDisplayName(String saveName, int titleId, int slotId) {
@@ -223,15 +264,15 @@ public final class LanguageStrings {
     }
 
     public static String dynastyThemeBase(String dynastyName) {
-        return capitalizeTheme(stripDynastyNameSuffix(dynastyName));
+        return capitalizeTheme(stripCityTitleAffix(stripDynastyNameSuffix(dynastyName)));
     }
 
     public static String dynastyThemeBase(String dynastyName, String titleKey) {
-        return capitalizeTheme(stripDynastyNameSuffix(dynastyName, titleKey));
+        return capitalizeTheme(stripCityTitleAffix(stripDynastyNameSuffix(dynastyName, titleKey)));
     }
 
     public static String expectedCapitalColonyName(String dynastyName) {
-        return formatProceduralColonyName(dynastyThemeBase(dynastyName), 0);
+        return formatCityName(dynastyThemeBase(dynastyName), GameConstants.CITY_TITLE_PRIME);
     }
 
     public static String getWarOrdinal(int ordinal) {
@@ -249,17 +290,57 @@ public final class LanguageStrings {
     }
 
     public static String formatProceduralColonyName(String themeBase, int colonyIndex) {
-        String base = themeBase != null && !themeBase.trim().isEmpty()
-                ? themeBase.trim()
-                : get(COLONY_NAME_DEFAULT_THEME);
-        return switch (colonyIndex) {
-            case 0 -> format(COLONY_NAME_CAPITAL_FMT, base);
-            case 1 -> format(COLONY_NAME_FIRST_SATELLITE_FMT, base);
-            case 2 -> format(COLONY_NAME_SECUNDUS_FMT, base);
-            case 3 -> format(COLONY_NAME_TERTIUS_FMT, base);
-            case 4 -> format(COLONY_NAME_QUARTUS_FMT, base);
-            default -> format(COLONY_NAME_ORDINAL_N_FMT, base, colonyIndex + 1);
-        };
+        String base = resolveDynastyThemeDisplay(themeBase);
+        if (base.isEmpty()) {
+            base = get(COLONY_NAME_DEFAULT_THEME);
+        }
+        if (colonyIndex <= 0) {
+            return formatCityName(base, GameConstants.CITY_TITLE_PRIME);
+        }
+        List<CityTitle> satellites = GameConstants.getSatelliteCityTitles();
+        int satelliteIndex = colonyIndex - 1;
+        if (satelliteIndex < satellites.size()) {
+            return formatCityName(base, satellites.get(satelliteIndex));
+        }
+        return format(COLONY_NAME_ORDINAL_N_FMT, base, colonyIndex + 1);
+    }
+
+    public static boolean isDynastyThemeKey(String value) {
+        return value != null && value.startsWith("DYNASTY_THEME_");
+    }
+
+    public static String resolveDynastyThemeDisplay(String themeKeyOrDisplay) {
+        if (themeKeyOrDisplay == null || themeKeyOrDisplay.trim().isEmpty()) {
+            return "";
+        }
+        String trimmed = themeKeyOrDisplay.trim();
+        if (isDynastyThemeKey(trimmed)) {
+            String translated = get(trimmed);
+            return translated != null && !translated.isEmpty() ? translated : trimmed;
+        }
+        return trimmed;
+    }
+
+    public static String findDynastyThemeKey(String displayOrKey) {
+        if (displayOrKey == null || displayOrKey.trim().isEmpty()) {
+            return null;
+        }
+        String trimmed = displayOrKey.trim();
+        if (isDynastyThemeKey(trimmed)) {
+            return trimmed;
+        }
+        for (String key : GameConstants.getAllDynastyThemeKeys()) {
+            if (trimmed.equalsIgnoreCase(key)) {
+                return key;
+            }
+            for (Map<String, String> langMap : translations.values()) {
+                String localized = langMap.get(key);
+                if (localized != null && trimmed.equalsIgnoreCase(localized)) {
+                    return key;
+                }
+            }
+        }
+        return null;
     }
 
     public static boolean isAutosaveSaveName(String name) {
@@ -671,11 +752,6 @@ public final class LanguageStrings {
     public static final String WAR_ORDINAL_5 = "WAR_ORDINAL_5";
     public static final String WAR_ORDINAL_N_FMT = "WAR_ORDINAL_N_FMT";
     public static final String COLONY_NAME_DEFAULT_THEME = "COLONY_NAME_DEFAULT_THEME";
-    public static final String COLONY_NAME_CAPITAL_FMT = "COLONY_NAME_CAPITAL_FMT";
-    public static final String COLONY_NAME_FIRST_SATELLITE_FMT = "COLONY_NAME_FIRST_SATELLITE_FMT";
-    public static final String COLONY_NAME_SECUNDUS_FMT = "COLONY_NAME_SECUNDUS_FMT";
-    public static final String COLONY_NAME_TERTIUS_FMT = "COLONY_NAME_TERTIUS_FMT";
-    public static final String COLONY_NAME_QUARTUS_FMT = "COLONY_NAME_QUARTUS_FMT";
     public static final String COLONY_NAME_ORDINAL_N_FMT = "COLONY_NAME_ORDINAL_N_FMT";
     public static final String WAR_WORLD_MONTH_FMT = "WAR_WORLD_MONTH_FMT";
     public static final String WORLD_DATE_FMT = "WORLD_DATE_FMT";
@@ -718,6 +794,8 @@ public final class LanguageStrings {
     public static final String WAR_STAGE_FORFEITED_FMT = "WAR_STAGE_FORFEITED_FMT";
     public static final String WAR_STAGE_REDEPLOY_FMT = "WAR_STAGE_REDEPLOY_FMT";
     public static final String WAR_STAGE_CLASH_FMT = "WAR_STAGE_CLASH_FMT";
+    public static final String WAR_STAGE_WON_TITLE = "WAR_STAGE_WON_TITLE";
+    public static final String WAR_STAGE_LOST_TITLE = "WAR_STAGE_LOST_TITLE";
     public static final String WAR_CAPITAL_COLONIZED_CAPTURES_FMT = "WAR_CAPITAL_COLONIZED_CAPTURES_FMT";
     public static final String WAR_QUEEN_FROM_CAPITAL_FMT = "WAR_QUEEN_FROM_CAPITAL_FMT";
     public static final String WAR_ACTION_GO_TO_CAPITAL = "WAR_ACTION_GO_TO_CAPITAL";
@@ -860,9 +938,18 @@ public final class LanguageStrings {
     public static final String DYNASTY_TITLE_TECHNOCRACY = "DYNASTY_TITLE_TECHNOCRACY";
     public static final String DYNASTY_TITLE_EMPIRE = "DYNASTY_TITLE_EMPIRE";
     public static final String DYNASTY_TITLE_DOMINION = "DYNASTY_TITLE_DOMINION";
-    public static final String DYNASTY_TITLE_CITY = "DYNASTY_TITLE_CITY";
-    public static final String DYNASTY_TITLE_BERG = "DYNASTY_TITLE_BERG";
-    public static final String DYNASTY_TITLE_GRAD = "DYNASTY_TITLE_GRAD";
+    public static final String CITY_TITLE_CITY = "CITY_TITLE_CITY";
+    public static final String CITY_TITLE_BERG = "CITY_TITLE_BERG";
+    public static final String CITY_TITLE_GRAD = "CITY_TITLE_GRAD";
+    public static final String CITY_TITLE_BURG = "CITY_TITLE_BURG";
+    public static final String CITY_TITLE_HAVEN = "CITY_TITLE_HAVEN";
+    public static final String CITY_TITLE_NEST = "CITY_TITLE_NEST";
+    public static final String CITY_TITLE_HOLD = "CITY_TITLE_HOLD";
+    public static final String CITY_TITLE_FORD = "CITY_TITLE_FORD";
+    public static final String CITY_TITLE_FORT = "CITY_TITLE_FORT";
+    public static final String CITY_TITLE_CASTLE = "CITY_TITLE_CASTLE";
+    public static final String CITY_TITLE_PRIME = "CITY_TITLE_PRIME";
+    public static final String CITY_TITLE_NEW = "CITY_TITLE_NEW";
     public static final String DYNASTY_TITLE_NATION = "DYNASTY_TITLE_NATION";
     public static final String DYNASTY_TITLE_REPUBLIC = "DYNASTY_TITLE_REPUBLIC";
     public static final String DYNASTY_TITLE_FMT_DYNASTY = "DYNASTY_TITLE_FMT_DYNASTY";
@@ -872,11 +959,110 @@ public final class LanguageStrings {
     public static final String DYNASTY_TITLE_FMT_TECHNOCRACY = "DYNASTY_TITLE_FMT_TECHNOCRACY";
     public static final String DYNASTY_TITLE_FMT_EMPIRE = "DYNASTY_TITLE_FMT_EMPIRE";
     public static final String DYNASTY_TITLE_FMT_DOMINION = "DYNASTY_TITLE_FMT_DOMINION";
-    public static final String DYNASTY_TITLE_FMT_CITY = "DYNASTY_TITLE_FMT_CITY";
-    public static final String DYNASTY_TITLE_FMT_BERG = "DYNASTY_TITLE_FMT_BERG";
-    public static final String DYNASTY_TITLE_FMT_GRAD = "DYNASTY_TITLE_FMT_GRAD";
     public static final String DYNASTY_TITLE_FMT_NATION = "DYNASTY_TITLE_FMT_NATION";
     public static final String DYNASTY_TITLE_FMT_REPUBLIC = "DYNASTY_TITLE_FMT_REPUBLIC";
+
+    public static final String DYNASTY_THEME_PLAYER = "DYNASTY_THEME_PLAYER";
+    public static final String DYNASTY_THEME_OMNI = "DYNASTY_THEME_OMNI";
+    public static final String DYNASTY_THEME_ANT = "DYNASTY_THEME_ANT";
+    public static final String DYNASTY_THEME_LEAF = "DYNASTY_THEME_LEAF";
+    public static final String DYNASTY_THEME_PLANT = "DYNASTY_THEME_PLANT";
+    public static final String DYNASTY_THEME_SEED = "DYNASTY_THEME_SEED";
+    public static final String DYNASTY_THEME_PHARAOH = "DYNASTY_THEME_PHARAOH";
+    public static final String DYNASTY_THEME_RUBY = "DYNASTY_THEME_RUBY";
+    public static final String DYNASTY_THEME_TOPAZ = "DYNASTY_THEME_TOPAZ";
+    public static final String DYNASTY_THEME_MARAUDER = "DYNASTY_THEME_MARAUDER";
+    public static final String DYNASTY_THEME_SCORPION = "DYNASTY_THEME_SCORPION";
+    public static final String DYNASTY_THEME_COCKROACH = "DYNASTY_THEME_COCKROACH";
+    public static final String DYNASTY_THEME_TRAPJAW = "DYNASTY_THEME_TRAPJAW";
+    public static final String DYNASTY_THEME_TRAP = "DYNASTY_THEME_TRAP";
+    public static final String DYNASTY_THEME_JAW = "DYNASTY_THEME_JAW";
+    public static final String DYNASTY_THEME_HONEYPOT = "DYNASTY_THEME_HONEYPOT";
+    public static final String DYNASTY_THEME_HONEY = "DYNASTY_THEME_HONEY";
+    public static final String DYNASTY_THEME_BEE = "DYNASTY_THEME_BEE";
+    public static final String DYNASTY_THEME_TURTLE = "DYNASTY_THEME_TURTLE";
+    public static final String DYNASTY_THEME_SHELL = "DYNASTY_THEME_SHELL";
+    public static final String DYNASTY_THEME_TORTOISE = "DYNASTY_THEME_TORTOISE";
+    public static final String DYNASTY_THEME_CARPENTER = "DYNASTY_THEME_CARPENTER";
+    public static final String DYNASTY_THEME_WOOD = "DYNASTY_THEME_WOOD";
+    public static final String DYNASTY_THEME_TREE = "DYNASTY_THEME_TREE";
+    public static final String DYNASTY_THEME_WEAVER = "DYNASTY_THEME_WEAVER";
+    public static final String DYNASTY_THEME_SILK = "DYNASTY_THEME_SILK";
+    public static final String DYNASTY_THEME_SPIDER = "DYNASTY_THEME_SPIDER";
+    public static final String DYNASTY_THEME_FLOODPLAIN = "DYNASTY_THEME_FLOODPLAIN";
+    public static final String DYNASTY_THEME_RIVER = "DYNASTY_THEME_RIVER";
+    public static final String DYNASTY_THEME_WATER = "DYNASTY_THEME_WATER";
+    public static final String DYNASTY_THEME_FIRE = "DYNASTY_THEME_FIRE";
+    public static final String DYNASTY_THEME_FLAME = "DYNASTY_THEME_FLAME";
+    public static final String DYNASTY_THEME_BURN = "DYNASTY_THEME_BURN";
+    public static final String DYNASTY_THEME_JET = "DYNASTY_THEME_JET";
+    public static final String DYNASTY_THEME_TORNADO = "DYNASTY_THEME_TORNADO";
+    public static final String DYNASTY_THEME_WIND = "DYNASTY_THEME_WIND";
+    public static final String DYNASTY_THEME_GLIDING = "DYNASTY_THEME_GLIDING";
+    public static final String DYNASTY_THEME_AIR = "DYNASTY_THEME_AIR";
+    public static final String DYNASTY_THEME_FLY = "DYNASTY_THEME_FLY";
+    public static final String DYNASTY_THEME_BULLET = "DYNASTY_THEME_BULLET";
+    public static final String DYNASTY_THEME_STING = "DYNASTY_THEME_STING";
+    public static final String DYNASTY_THEME_PUNCH = "DYNASTY_THEME_PUNCH";
+    public static final String DYNASTY_THEME_ARMY = "DYNASTY_THEME_ARMY";
+    public static final String DYNASTY_THEME_SOLDIER = "DYNASTY_THEME_SOLDIER";
+    public static final String DYNASTY_THEME_WARRIOR = "DYNASTY_THEME_WARRIOR";
+    public static final String DYNASTY_THEME_GHOST = "DYNASTY_THEME_GHOST";
+    public static final String DYNASTY_THEME_SHADOW = "DYNASTY_THEME_SHADOW";
+    public static final String DYNASTY_THEME_PHANTOM = "DYNASTY_THEME_PHANTOM";
+    public static final String DYNASTY_THEME_DRACULA = "DYNASTY_THEME_DRACULA";
+    public static final String DYNASTY_THEME_VAMPIRE = "DYNASTY_THEME_VAMPIRE";
+    public static final String DYNASTY_THEME_BLOOD = "DYNASTY_THEME_BLOOD";
+    public static final String DYNASTY_THEME_SILVER = "DYNASTY_THEME_SILVER";
+    public static final String DYNASTY_THEME_METAL = "DYNASTY_THEME_METAL";
+    public static final String DYNASTY_THEME_GOLD = "DYNASTY_THEME_GOLD";
+    public static final String DYNASTY_THEME_MARICOPA = "DYNASTY_THEME_MARICOPA";
+    public static final String DYNASTY_THEME_VENOM = "DYNASTY_THEME_VENOM";
+    public static final String DYNASTY_THEME_POISON = "DYNASTY_THEME_POISON";
+    public static final String DYNASTY_THEME_EXPLODING = "DYNASTY_THEME_EXPLODING";
+    public static final String DYNASTY_THEME_BOMB = "DYNASTY_THEME_BOMB";
+    public static final String DYNASTY_THEME_EXPLOSION = "DYNASTY_THEME_EXPLOSION";
+    public static final String DYNASTY_THEME_BULLDOG = "DYNASTY_THEME_BULLDOG";
+    public static final String DYNASTY_THEME_DOG = "DYNASTY_THEME_DOG";
+    public static final String DYNASTY_THEME_HOUND = "DYNASTY_THEME_HOUND";
+    public static final String DYNASTY_THEME_SHINING = "DYNASTY_THEME_SHINING";
+    public static final String DYNASTY_THEME_BLACK = "DYNASTY_THEME_BLACK";
+    public static final String DYNASTY_THEME_DARK = "DYNASTY_THEME_DARK";
+    public static final String DYNASTY_THEME_DESERT = "DYNASTY_THEME_DESERT";
+    public static final String DYNASTY_THEME_SAND = "DYNASTY_THEME_SAND";
+    public static final String DYNASTY_THEME_DIRT = "DYNASTY_THEME_DIRT";
+    public static final String DYNASTY_THEME_LEAFCUTTER = "DYNASTY_THEME_LEAFCUTTER";
+    public static final String DYNASTY_THEME_ROCK = "DYNASTY_THEME_ROCK";
+    public static final String DYNASTY_THEME_IRON = "DYNASTY_THEME_IRON";
+    public static final String DYNASTY_THEME_MUSHROOM = "DYNASTY_THEME_MUSHROOM";
+    public static final String DYNASTY_THEME_MEAT = "DYNASTY_THEME_MEAT";
+    public static final String DYNASTY_THEME_BUG = "DYNASTY_THEME_BUG";
+    public static final String DYNASTY_THEME_STONE = "DYNASTY_THEME_STONE";
+    public static final String DYNASTY_THEME_CLAY = "DYNASTY_THEME_CLAY";
+    public static final String DYNASTY_THEME_STEEL = "DYNASTY_THEME_STEEL";
+    public static final String DYNASTY_THEME_ICE = "DYNASTY_THEME_ICE";
+    public static final String DYNASTY_THEME_STORM = "DYNASTY_THEME_STORM";
+    public static final String DYNASTY_THEME_DUST = "DYNASTY_THEME_DUST";
+    public static final String DYNASTY_THEME_VINE = "DYNASTY_THEME_VINE";
+    public static final String DYNASTY_THEME_ROOT = "DYNASTY_THEME_ROOT";
+    public static final String DYNASTY_THEME_POLLEN = "DYNASTY_THEME_POLLEN";
+    public static final String DYNASTY_THEME_WEB = "DYNASTY_THEME_WEB";
+    public static final String DYNASTY_THEME_NIGHT = "DYNASTY_THEME_NIGHT";
+    public static final String DYNASTY_THEME_DAY = "DYNASTY_THEME_DAY";
+    public static final String DYNASTY_THEME_COPPER = "DYNASTY_THEME_COPPER";
+    public static final String DYNASTY_THEME_BRONZE = "DYNASTY_THEME_BRONZE";
+    public static final String DYNASTY_THEME_EMERALD = "DYNASTY_THEME_EMERALD";
+    public static final String DYNASTY_THEME_SAPPHIRE = "DYNASTY_THEME_SAPPHIRE";
+    public static final String DYNASTY_THEME_QUARTZ = "DYNASTY_THEME_QUARTZ";
+    public static final String DYNASTY_THEME_GRANITE = "DYNASTY_THEME_GRANITE";
+    public static final String DYNASTY_THEME_SWAMP = "DYNASTY_THEME_SWAMP";
+    public static final String DYNASTY_THEME_MARSH = "DYNASTY_THEME_MARSH";
+    public static final String DYNASTY_THEME_OCEAN = "DYNASTY_THEME_OCEAN";
+    public static final String DYNASTY_THEME_PEAK = "DYNASTY_THEME_PEAK";
+    public static final String DYNASTY_THEME_VALLEY = "DYNASTY_THEME_VALLEY";
+    public static final String DYNASTY_THEME_CAVE = "DYNASTY_THEME_CAVE";
+    public static final String DYNASTY_THEME_FOREST = "DYNASTY_THEME_FOREST";
+    public static final String DYNASTY_THEME_JUNGLE = "DYNASTY_THEME_JUNGLE";
     public static final String SAVE_ENTER_DYNASTY_TITLE = "SAVE_ENTER_DYNASTY_TITLE";
     public static final String SAVE_DYNASTY_PREVIEW = "SAVE_DYNASTY_PREVIEW";
     public static final String SAVE_DYNASTY_CONFIRM = "SAVE_DYNASTY_CONFIRM";

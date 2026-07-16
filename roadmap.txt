@@ -9,9 +9,6 @@ To Fix (By decreasing priority) :
 	TODO: icons all unlocks
 	TODO: species sprites and icon: carpenter, weaver, floodplain, jet, gliding, army, ghost, dracula, silver, exploding, bulldog, shining black and desert
 	tunels somehow building on their own with no diggers and 2 at the same time
-	war advance popup 
-	give 50% defense boost in hex defense
-	not seeing better colony names like grad and berg, add more and randomize post prime, rework dynasty naming to max 3 per species
 	separate trigger for auto tunnel (typo) and auto diplomacy so they are easier
 	mites not triggering at all
 	add a subtab for triggered modifiers and progress with interrogations
@@ -21,8 +18,6 @@ To Fix (By decreasing priority) :
 	rebalance initial ant spawning so they dont die as much, maybe 30 ants
 	watching other colonies shouldnt affect alerts or triggers
 	rework pet insect balance
-	center on home -> go back home
-	diplomatic pressure upgrade wording
 	diplomacy tab sorting by distance and searcher
 	parasites are broken
 	scrollbars can be slow
@@ -30,8 +25,9 @@ To Fix (By decreasing priority) :
 	history in savefiles
 	look into scarcity better
 	show source amounts with tooltip and what they are
+	= as alternative for speed up
 
-	revise audit tutorial and tests for blindspots
+	revise audit, tutorials and tests for blindspots
 
 	Mid:
 	(none right now)
@@ -46,7 +42,7 @@ To Fix (By decreasing priority) :
 	map hexes look kinda yank
 	Font - self explanatory
 	clickable ant cursor
-	excel for languages and tags
+	excel for languages and tags and script to update it
 	
 To Feature (to be done in order):
 Needed for launch (v1.0) (Launch Version):
@@ -63,10 +59,11 @@ Needed for launch (v1.0) (Launch Version):
 	synergies ( Super majors + Chemical throwing = Artillery ants; Self destruction + Acid spitting = Corrosive bombs; Silk weaving + Hive building = Web building; Air-force ants + self destruction = Air-bomber ants)
 	more upgrades and more buildings and assimilations and synergies
 	implement pending roles (defender, miner, potter, bomber, carrier, artillery, siege) more roles (commander and captain roles, air force and paratroopers to skip a stage) and air warfare
-	more enemies ( Rebel ant colonies, Bugs, Arachnids, Reptiles, Birds, Rodents, Zombie ant colonies)
+	more enemies ( Rebel ant colonies, Bugs (ant lions), Arachnids (catapult ants), Reptiles, Birds, Rodents, Zombie ant colonies)
+	uncolonizable terrain with boss enemies  
 	more stats (kills, historic productions, graphs?)
 	more bugs (constants and icons and scienctific name)
-	non-ant assimilation ( Winged workers (Bees), Spiked larvae, Chemical throwing (Bombardier beetle), Chirping (Grass hopper), Diving, Mineralized exoskeletons, Rock mining, Bioluminescence (Fireflies), Static electricity generation, Pollination (Flies) )
+	non-ant assimilation ( Winged workers (Bees), Spiked larvae, Chemical throwing (Bombardier beetle), Chirping (Grass hopper), Diving, Mineralized exoskeletons and dense armor (diabolical ironclad beetles), Rock mining, Bioluminescence (Fireflies), Static electricity generation, Pollination (Flies) )
 	revamp story and lore and maybe intro screen
 	more hive rooms, specially more twisty (research room after royal chamber, barrack room before royal chamber)
 	rework completely in-room sprites (overlay disabled in GameAreaPanel for now)
@@ -89,7 +86,7 @@ Needed for launch (v1.0) (Launch Version):
 	register Grim Games or Grimidk in steam as dev team
 	steam upload and demo version
 	versioning to go back to previous stable patches
-	cleanup code (no placeholders) and refactor inefficiencies with inheritance and stuff, hexagonal architecture, async functions and clean comments, avoid monolithic classes 
+	cleanup code (no placeholders) and refactor inefficiencies with inheritance and stuff, hexagonal architecture, async functions and clean comments, avoid monolithic classes no hardcoded pseudo constant, remove code related to retrofit saves and oneoff use code
 
 Post launch (v1.1) (Improvements Update):
     engine clean up for reusability (Core Engine Package)
