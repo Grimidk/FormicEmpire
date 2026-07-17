@@ -207,6 +207,7 @@ public class FrenchTranslation implements Translation {
         fr.put("TRIGGER_PROGRESS_METRIC_ABSORBED", "Dynasties absorbées");
         fr.put("TRIGGER_PROGRESS_METRIC_RANK", "Niveau de rang dynastique");
         fr.put("TRIGGER_PROGRESS_METRIC_PLANTS", "Méga-plante récoltée");
+        fr.put("TRIGGER_PROGRESS_METRIC_RESOURCES", "Ressources stockées");
         fr.put("TRIGGER_PROGRESS_HINT_RESEARCHER", "Survivez jusqu'au deuxième mois pour débloquer les chercheuses.");
         fr.put("TRIGGER_PROGRESS_HINT_GRAVER", "Accumulez des cadavres dans la colonie pour débloquer les fossoyeuses.");
         fr.put("TRIGGER_PROGRESS_HINT_RESEARCH", "Gagnez des points de recherche avec des reines chercheuses.");
@@ -219,6 +220,7 @@ public class FrenchTranslation implements Translation {
         fr.put("TRIGGER_PROGRESS_HINT_ABSORBED", "Vainquez et absorbez une autre dynastie.");
         fr.put("TRIGGER_PROGRESS_HINT_RANK", "Atteignez le rang dynastique Empire pour débloquer le Clonage (intégrité par assimilation et mâles assimilés).");
         fr.put("TRIGGER_PROGRESS_HINT_SCOUT", "Récoltez assez de plantes depuis n'importe quelle source de plantes découverte.");
+        fr.put("TRIGGER_PROGRESS_HINT_PARASITIC_MITE", "Stockez des ressources. Les épidémies (biomes froids, automne/hiver) débloquent la capture d'acariens symbiotiques pour toute la dynastie.");
         fr.put("SYNERGY_SUPER_VENOM", "Super Venin");
         fr.put("SYNERGY_SUPER_VENOM_FLAVOR", "Super Venin");
         fr.put("SYNERGY_SUPER_VENOM_DESC", "Remplace l'empilement venin de feu + neurotoxique (4+4) par un multiplicateur de dégâts de 16x lorsque les deux venins sont assimilés et que les Synergies sont recherchées.");

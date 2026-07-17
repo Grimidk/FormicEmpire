@@ -231,7 +231,41 @@ public final class TriggerProgressService {
                 plantHarvestProgress(colony),
                 GameConstants.TRIGGER_SCOUT_PLANT_COLLECTED));
 
+        boolean parasiticMiteUnlocked = colony.hasUpgrade(GameUnlocks.ABILITY_PARASITIC_MITE_ALERT);
+        entries.add(numeric(
+                GameUnlocks.ABILITY_PARASITIC_MITE_ALERT,
+                LanguageStrings.TRIGGER_PARASITIC_MITE_TITLE,
+                LanguageStrings.TRIGGER_PROGRESS_HINT_PARASITIC_MITE,
+                LanguageStrings.TRIGGER_PROGRESS_METRIC_RESOURCES,
+                parasiticMiteUnlocked,
+                true,
+                dynastyStoredResourceProgress(colony),
+                GameConstants.PARASITIC_MITE_RESOURCE_THRESHOLD));
+
         return entries;
+    }
+
+    private static int dynastyStoredResourceProgress(Colony colony) {
+        if (colony == null) {
+            return 0;
+        }
+        Dynasty dynasty = colony.getDynasty();
+        if (dynasty == null || dynasty.getColonies() == null || dynasty.getColonies().isEmpty()) {
+            return storedResourceProgress(colony);
+        }
+        int best = 0;
+        for (Colony member : dynasty.getColonies()) {
+            best = Math.max(best, storedResourceProgress(member));
+        }
+        return best;
+    }
+
+    private static int storedResourceProgress(Colony colony) {
+        if (colony == null || colony.getResourceService() == null) {
+            return 0;
+        }
+        long stored = colony.getResourceService().getStoredResourceTotal(colony);
+        return (int) Math.min(Integer.MAX_VALUE, Math.max(0L, stored));
     }
 
     private static int elapsedMonths(World world) {

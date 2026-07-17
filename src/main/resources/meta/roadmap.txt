@@ -16,9 +16,10 @@ To Fix (By decreasing priority) :
 	watching other colonies shouldnt affect alerts or triggers
 	rework pet insect balance
 	parasites are broken
-	history in savefiles
+	history in savefiles (colony death and births, dynasty deaths, wars, nuptial flights, )
 	look into scarcity better
 	show source amounts with tooltip and what they are
+	make sure dynasty wide queen count and ant birth rate is counted
 
 	revise audit, tutorials and tests for blindspots
 

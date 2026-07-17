@@ -207,6 +207,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("TRIGGER_PROGRESS_METRIC_ABSORBED", "Dinastias absorvidas");
         pt.put("TRIGGER_PROGRESS_METRIC_RANK", "Nível de posto dinástico");
         pt.put("TRIGGER_PROGRESS_METRIC_PLANTS", "Mega-planta colhida");
+        pt.put("TRIGGER_PROGRESS_METRIC_RESOURCES", "Recursos armazenados");
         pt.put("TRIGGER_PROGRESS_HINT_RESEARCHER", "Sobrevive até ao segundo mês para desbloquear investigadoras.");
         pt.put("TRIGGER_PROGRESS_HINT_GRAVER", "Acumula cadáveres na colónia para desbloquear coveiras.");
         pt.put("TRIGGER_PROGRESS_HINT_RESEARCH", "Ganha pontos de pesquisa com rainhas investigadoras.");
@@ -219,6 +220,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("TRIGGER_PROGRESS_HINT_ABSORBED", "Derrota e absorve outra dinastia.");
         pt.put("TRIGGER_PROGRESS_HINT_RANK", "Alcança o posto dinástico Império para desbloquear Clonagem (integridade por assimilação e zangões assimilados).");
         pt.put("TRIGGER_PROGRESS_HINT_SCOUT", "Colhe plantas suficientes de qualquer fonte de plantas descoberta.");
+        pt.put("TRIGGER_PROGRESS_HINT_PARASITIC_MITE", "Acumula recursos. Surtos (biomas frios, outono/inverno) desbloqueiam a captura de ácaros simbióticos em toda a dinastia.");
         pt.put("SYNERGY_SUPER_VENOM", "Super Veneno");
         pt.put("SYNERGY_SUPER_VENOM_FLAVOR", "Super Veneno");
         pt.put("SYNERGY_SUPER_VENOM_DESC", "Substitui o empilhamento de veneno de fogo + neurotóxico (4+4) por um multiplicador de dano de 16x quando ambos os venenos estão assimilados e Sinergias foram pesquisadas.");

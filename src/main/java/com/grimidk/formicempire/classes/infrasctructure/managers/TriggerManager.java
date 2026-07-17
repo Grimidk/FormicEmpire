@@ -2,7 +2,6 @@ package com.grimidk.formicempire.classes.infrasctructure.managers;
 
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.constants.unlocks.Synergy;
-import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
@@ -182,6 +181,7 @@ public class TriggerManager {
             checkNPCUnitRoles(npc);
             checkNPCAbilities(npc);
             checkNPCCloning(npc);
+            checkNPCParasiticMites(npc);
         }
     }
     
@@ -191,6 +191,10 @@ public class TriggerManager {
     
     private void checkNPCCloning(Colony npc) {
         applyCloningUnlockIfEligible(npc, false);
+    }
+
+    private void checkNPCParasiticMites(Colony npc) {
+        applyParasiticMiteUnlockIfEligible(npc, false);
     }
 
     private void applyCloningUnlockIfEligible(Colony colony, boolean notifyPlayer) {
@@ -393,32 +397,58 @@ public class TriggerManager {
     }
 
     private void checkParasiticMiteOutbreak() {
-        if (playerColony.getParasiticMites() <= 0) {
+        applyParasiticMiteUnlockIfEligible(playerColony, true);
+    }
+
+    private void applyParasiticMiteUnlockIfEligible(Colony colony, boolean notifyPlayer) {
+        if (colony == null || colony.getDynasty() == null) {
             return;
         }
-        Hex hex = world.getHexOfColony(playerColony);
-        Biome biome = hex != null ? hex.getBiome() : null;
-        if (biome == null || !biome.hasNativeParasite(GameConstants.TYPE_PARASITIC_MITE)) {
+        boolean needsAlert = !colony.hasUpgrade(GameUnlocks.ABILITY_PARASITIC_MITE_ALERT);
+        boolean needsSymbioticMiteCatch = !colony.hasUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE);
+        if (!needsAlert && !needsSymbioticMiteCatch) {
+            return;
+        }
+        // Biome only gates spawning; unlock is dynasty-wide once any colony has mites.
+        if (!dynastyHasAnyParasiticMites(colony.getDynasty())) {
             return;
         }
 
-        boolean needsAlert = !playerColony.hasUpgrade(GameUnlocks.ABILITY_PARASITIC_MITE_ALERT);
-        boolean needsSymbioticMiteCatch = !playerColony.hasUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE);
-        if (!needsAlert && !needsSymbioticMiteCatch) {
+        if (notifyPlayer && needsAlert) {
+            colony.unlockUpgrade(GameUnlocks.ABILITY_PARASITIC_MITE_ALERT);
+            if (needsSymbioticMiteCatch) {
+                colony.unlockUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE);
+            }
+            fireLocalizedTrigger(GameUnlocks.ABILITY_PARASITIC_MITE_ALERT,
+                    LanguageStrings.TRIGGER_PARASITIC_MITE_TITLE,
+                    LanguageStrings.TRIGGER_PARASITIC_MITE_MSG);
             return;
         }
 
         if (needsAlert) {
-            playerColony.unlockUpgrade(GameUnlocks.ABILITY_PARASITIC_MITE_ALERT);
-            if (needsSymbioticMiteCatch) {
-                playerColony.unlockUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE);
-            }
-            fireLocalizedTrigger(GameUnlocks.ABILITY_PARASITIC_MITE_ALERT,
-                LanguageStrings.TRIGGER_PARASITIC_MITE_TITLE,
-                LanguageStrings.TRIGGER_PARASITIC_MITE_MSG);
-        } else {
-            playerColony.unlockUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE);
+            colony.unlockUpgrade(GameUnlocks.ABILITY_PARASITIC_MITE_ALERT);
         }
+        if (needsSymbioticMiteCatch) {
+            colony.unlockUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE);
+        }
+        // NPCs do not research Catcher; grant it so automation can staff anti-mite roles.
+        if (!notifyPlayer
+                && colony.hasUpgrade(GameUnlocks.ROLE_HUNTER)
+                && !colony.hasUpgrade(GameUnlocks.ROLE_CATCHER)) {
+            colony.unlockUpgrade(GameUnlocks.ROLE_CATCHER);
+        }
+    }
+
+    private static boolean dynastyHasAnyParasiticMites(Dynasty dynasty) {
+        if (dynasty == null || dynasty.getColonies() == null) {
+            return false;
+        }
+        for (Colony member : dynasty.getColonies()) {
+            if (member != null && member.getParasiticMites() > 0) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void checkMassFlightUnlock() {

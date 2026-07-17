@@ -1652,9 +1652,11 @@ public class Colony {
             return;
         }
 
+        Season season = engine != null && engine.getWorld() != null ? engine.getWorld().getSeason() : null;
+
         if (this.runsFullSimulation()) {
             if (this.automationEnabled) {
-                this.automationService.runAutomation(this);
+                this.automationService.runAutomation(this, biome, season);
             }
             this.runRoleAssignment(engine);
             invalidateActiveRoleCountCache();
@@ -1666,7 +1668,7 @@ public class Colony {
             this.runCollecting(); 
         } else {
             if (this.automationEnabled) {
-                this.automationService.runAutomation(this);
+                this.automationService.runAutomation(this, biome, season);
             }
             this.populationService.runRoleAssignment(this, engine);
             invalidateActiveRoleCountCache();

@@ -182,4 +182,56 @@ class ColonyAutomationServiceTest {
         ColonyJobRules.runDailyLite(npc, GameConstants.TEMP_WARM);
         assertTrue(npc.getAge() >= 7);
     }
+
+    @Test
+    void assignsPoliceToFightAndPreventParasiteAnts() {
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_POLICE);
+        for (int i = 0; i < 50; i++) {
+            colony.getSoldiers().add(new Ant(colony, GameConstants.TYPE_SOLDIER));
+        }
+        for (int i = 0; i < 5_000; i++) {
+            colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+        }
+
+        automationService.runAutomation(
+                colony, GameConstants.BIOME_DESERT, GameConstants.SEASON_SUMMER);
+
+        int police = colony.getAssignedRoleCount(GameConstants.ROLE_POLICE);
+        int required = colony.getPopulationService().requiredPoliceToPreventParasiteAntOutbreak(
+                colony, GameConstants.BIOME_DESERT, GameConstants.SEASON_SUMMER);
+        assertTrue(police >= Math.min(50, required));
+        assertTrue(police >= 1);
+    }
+
+    @Test
+    void assignsCatchersToFightParasiticMites() {
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_CATCHER);
+        dynasty.unlockUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE);
+        for (int i = 0; i < 30; i++) {
+            colony.getSoldiers().add(new Ant(colony, GameConstants.TYPE_SOLDIER));
+        }
+        colony.setParasiticMites(100);
+
+        automationService.runAutomation(colony);
+
+        assertEquals(10, colony.getAssignedRoleCount(GameConstants.ROLE_CATCHER));
+    }
+
+    @Test
+    void assignsCatchersToPreventParasiticMiteOutbreak() {
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_CATCHER);
+        dynasty.unlockUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE);
+        for (int i = 0; i < 40; i++) {
+            colony.getSoldiers().add(new Ant(colony, GameConstants.TYPE_SOLDIER));
+        }
+        for (int i = 0; i < 2_000; i++) {
+            colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+        }
+        colony.setPlants(12_000);
+
+        automationService.runAutomation(
+                colony, GameConstants.BIOME_TUNDRA, GameConstants.SEASON_WINTER);
+
+        assertTrue(colony.getAssignedRoleCount(GameConstants.ROLE_CATCHER) >= 1);
+    }
 }

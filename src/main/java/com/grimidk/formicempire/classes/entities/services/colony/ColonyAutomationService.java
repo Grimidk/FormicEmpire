@@ -2,6 +2,8 @@ package com.grimidk.formicempire.classes.entities.services.colony;
 
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
+import com.grimidk.formicempire.classes.constants.world.Biome;
+import com.grimidk.formicempire.classes.constants.world.Season;
 import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Dynasty;
@@ -30,28 +32,36 @@ public class ColonyAutomationService {
     private static final double SATELLITE_SKYTRANS_SHARE = 0.10;
 
     public void runAutomation(Colony colony) {
+        runAutomation(colony, null, null);
+    }
+
+    public void runAutomation(Colony colony, Biome biome, Season season) {
         if (!colony.isAutomationEnabled()) return;
 
         Map<AntRole, Integer> roleQuotas = usesWarEconomy(colony)
-                ? calculateWarEconomyQuotas(colony)
-                : calculateNeedsBasedQuotas(colony);
+                ? calculateWarEconomyQuotas(colony, biome, season)
+                : calculateNeedsBasedQuotas(colony, biome, season);
         applyQuotas(colony, roleQuotas);
     }
 
     public void applyWarEconomyQuotas(Colony colony) {
-        Map<AntRole, Integer> roleQuotas = calculateWarEconomyQuotas(colony);
+        Map<AntRole, Integer> roleQuotas = calculateWarEconomyQuotas(colony, null, null);
         for (Map.Entry<AntRole, Integer> entry : roleQuotas.entrySet()) {
             colony.setWarAssignedRoleCount(entry.getKey(), entry.getValue());
         }
     }
 
     public Map<AntRole, Integer> calculateWarEconomyQuotas(Colony colony) {
+        return calculateWarEconomyQuotas(colony, null, null);
+    }
+
+    public Map<AntRole, Integer> calculateWarEconomyQuotas(Colony colony, Biome biome, Season season) {
         Map<AntRole, Integer> targets = new HashMap<>();
         for (AntRole role : GameConstants.getAntRoles()) {
             targets.put(role, 0);
         }
         calculateWarWorkerQuotas(colony, targets);
-        calculateWarSoldierQuotas(colony, targets);
+        calculateWarSoldierQuotas(colony, targets, biome, season);
         calculateWarMajorQuotas(colony, targets);
         calculateMinimalPrincessQuotas(colony, targets);
         calculateMinimalQueenQuotas(colony, targets);
@@ -141,12 +151,12 @@ public class ColonyAutomationService {
         return sameDynastyTarget;
     }
 
-    private Map<AntRole, Integer> calculateNeedsBasedQuotas(Colony colony) {
+    private Map<AntRole, Integer> calculateNeedsBasedQuotas(Colony colony, Biome biome, Season season) {
         Map<AntRole, Integer> targets = new HashMap<>();
         for (AntRole role : GameConstants.getAntRoles()) targets.put(role, 0);
 
         calculateWorkerQuotas(colony, targets);
-        calculateSoldierQuotas(colony, targets);
+        calculateSoldierQuotas(colony, targets, biome, season);
         calculateMajorQuotas(colony, targets);
         calculatePrincessQuotas(colony, targets);
         calculateQueenQuotas(colony, targets);
@@ -362,27 +372,20 @@ public class ColonyAutomationService {
         return 0;
     }
 
-    private void calculateSoldierQuotas(Colony colony, Map<AntRole, Integer> targets) {
+    private void calculateSoldierQuotas(Colony colony, Map<AntRole, Integer> targets, Biome biome, Season season) {
         if (usesWarEconomy(colony)) {
-            calculateWarSoldierQuotas(colony, targets);
+            calculateWarSoldierQuotas(colony, targets, biome, season);
             return;
         }
         int remainingSoldiers = colony.getSoldiers().size();
         if (remainingSoldiers == 0) return;
 
-        int assignedPolice = 0;
-        if (colony.getParasiteAnts() > 0 && colony.hasUpgrade(GameUnlocks.ROLE_POLICE)) {
-            int maxPolice = (int) (colony.getSoldiers().size() * 0.20);
-            assignedPolice = Math.min(maxPolice, remainingSoldiers);
-
-            if (assignedPolice == 0 && maxPolice > 0 && remainingSoldiers > 0) assignedPolice = 1;
-        }
+        int assignedPolice = Math.min(remainingSoldiers, desiredPoliceCount(colony, biome, season, remainingSoldiers));
         targets.put(GameConstants.ROLE_POLICE, assignedPolice);
         remainingSoldiers -= assignedPolice;
 
-        int assignedCatchers = 0;
-        if (colony.getParasiticMites() > 0 && colony.hasUpgrade(GameUnlocks.ROLE_CATCHER)) {
-            assignedCatchers = Math.min(remainingSoldiers, Math.max(1, colony.getParasiticMites() / 10));
+        int assignedCatchers = Math.min(remainingSoldiers, desiredCatcherCount(colony, biome, season, remainingSoldiers));
+        if (assignedCatchers > 0) {
             targets.put(GameConstants.ROLE_CATCHER, assignedCatchers);
             remainingSoldiers -= assignedCatchers;
         }
@@ -400,6 +403,48 @@ public class ColonyAutomationService {
         if (remainingSoldiers > 0 && colony.hasUpgrade(GameUnlocks.ROLE_HUNTER)) {
             targets.put(GameConstants.ROLE_HUNTER, remainingSoldiers);
         }
+    }
+
+    private int desiredPoliceCount(Colony colony, Biome biome, Season season, int availableSoldiers) {
+        if (!colony.hasUpgrade(GameUnlocks.ROLE_POLICE) || availableSoldiers <= 0) {
+            return 0;
+        }
+        int needed = 0;
+        int parasiteAnts = colony.getParasiteAnts();
+        if (parasiteAnts > 0) {
+            needed = Math.max(1, parasiteAnts);
+        }
+        if (biome != null && season != null) {
+            int prevent = colony.getPopulationService()
+                    .requiredPoliceToPreventParasiteAntOutbreak(colony, biome, season);
+            needed = Math.max(needed, prevent);
+        }
+        return Math.min(availableSoldiers, needed);
+    }
+
+    private int desiredCatcherCount(Colony colony, Biome biome, Season season, int availableSoldiers) {
+        if (!colony.hasUpgrade(GameUnlocks.ROLE_CATCHER)
+                || !colony.hasUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE)
+                || availableSoldiers <= 0) {
+            return 0;
+        }
+        int needed = 0;
+        int parasiticMites = colony.getParasiticMites();
+        if (parasiticMites > 0) {
+            needed = Math.max(1, parasiticMites / GameConstants.PARASITIC_MITES_PER_SLOWED_ANT);
+        }
+        if (biome != null && season != null) {
+            ColonyBugHandlingService bugs = colony.getBugHandlingService();
+            int requiredMites = bugs.requiredSymbioticMitesToPreventOutbreak(colony, biome, season);
+            int have = colony.getSymbioticMites();
+            if (requiredMites > have) {
+                int shortfall = requiredMites - have;
+                int catchersForPrevention = Math.max(1,
+                        (int) Math.ceil(shortfall / (double) GameConstants.PET_CAPACITY_PER_TENDER));
+                needed = Math.max(needed, catchersForPrevention);
+            }
+        }
+        return Math.min(availableSoldiers, needed);
     }
 
     private void calculateMajorQuotas(Colony colony, Map<AntRole, Integer> targets) {
@@ -508,18 +553,26 @@ public class ColonyAutomationService {
         }
     }
 
-    private void calculateWarSoldierQuotas(Colony colony, Map<AntRole, Integer> targets) {
+    private void calculateWarSoldierQuotas(Colony colony, Map<AntRole, Integer> targets, Biome biome, Season season) {
         int remainingSoldiers = colony.getSoldiers().size();
         if (remainingSoldiers == 0) {
             return;
         }
 
-        int assignedPolice = 0;
-        if (colony.getParasiteAnts() > 0 && colony.hasUpgrade(GameUnlocks.ROLE_POLICE)) {
-            int maxPolice = Math.max(1, (int) (colony.getSoldiers().size() * 0.10));
-            assignedPolice = Math.min(maxPolice, remainingSoldiers);
+        int warCap = Math.max(1, (int) (colony.getSoldiers().size() * 0.10));
+        int assignedPolice = Math.min(warCap, desiredPoliceCount(colony, biome, season, remainingSoldiers));
+        if (assignedPolice > 0) {
             targets.put(GameConstants.ROLE_POLICE, assignedPolice);
             remainingSoldiers -= assignedPolice;
+        }
+
+        int assignedCatchers = Math.min(
+                Math.max(1, (int) (colony.getSoldiers().size() * 0.10)),
+                desiredCatcherCount(colony, biome, season, remainingSoldiers));
+        if (assignedCatchers > 0 && remainingSoldiers > 0) {
+            assignedCatchers = Math.min(assignedCatchers, remainingSoldiers);
+            targets.put(GameConstants.ROLE_CATCHER, assignedCatchers);
+            remainingSoldiers -= assignedCatchers;
         }
 
         if (remainingSoldiers <= 0) {

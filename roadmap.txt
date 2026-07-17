@@ -9,16 +9,14 @@ To Fix (By decreasing priority) :
 	Rebalance upgrades, research, assistants and researchers in general
 	TODO: icons all unlocks
 	TODO: species sprites and icon: carpenter, weaver, floodplain, jet, gliding, army, ghost, dracula, silver, exploding, bulldog, shining black and desert
-	mites not triggering at all
 	improve alert reading by simplyfing and using icons
-	ai doesnt fight mites 
 	rework cursor in general by making all small buttons bigger
 	watching other colonies shouldnt affect alerts or triggers
 	rework pet insect balance
-	parasites are broken
-	history in savefiles
+	history in savefiles (colony death and births, dynasty deaths, wars, nuptial flights, )
 	look into scarcity better
 	show source amounts with tooltip and what they are
+	make sure dynasty wide queen count and ant birth rate is counted
 
 	revise audit, tutorials and tests for blindspots
 

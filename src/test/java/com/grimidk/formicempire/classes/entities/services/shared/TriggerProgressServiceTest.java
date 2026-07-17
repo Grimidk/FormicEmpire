@@ -79,6 +79,31 @@ class TriggerProgressServiceTest {
         assertEquals(GameConstants.AUTO_UPGRADE_MIN_COMPLETE_TUNNELS, tunnels.getRequired());
     }
 
+    @Test
+    void parasiticMitesShowsDynastyResourceProgressWithoutBiomeGate() {
+        colony.setPlants(2_000);
+        Colony satellite = new Colony(2, "Secundus", true);
+        dynasty.addColony(satellite);
+        satellite.setDynasty(dynasty);
+        satellite.setPlants(8_500);
+
+        List<TriggerProgress> visible = TriggerProgressService.getVisible(colony, null);
+        TriggerProgress mites = find(visible, GameUnlocks.ABILITY_PARASITIC_MITE_ALERT);
+        assertTrue(mites != null);
+        assertFalse(mites.isUnlocked());
+        assertEquals(8_500, mites.getCurrent());
+        assertEquals(GameConstants.PARASITIC_MITE_RESOURCE_THRESHOLD, mites.getRequired());
+    }
+
+    @Test
+    void parasiticMitesShowsWhenUnlocked() {
+        colony.unlockUpgrade(GameUnlocks.ABILITY_PARASITIC_MITE_ALERT);
+
+        List<TriggerProgress> visible = TriggerProgressService.getVisible(colony, null, true);
+        TriggerProgress mites = find(visible, GameUnlocks.ABILITY_PARASITIC_MITE_ALERT);
+        assertTrue(mites != null && mites.isUnlocked());
+    }
+
     private static TriggerProgress find(List<TriggerProgress> list, Object upgrade) {
         for (TriggerProgress progress : list) {
             if (progress.getUpgrade() == upgrade) {

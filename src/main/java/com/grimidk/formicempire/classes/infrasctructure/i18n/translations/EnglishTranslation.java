@@ -207,6 +207,7 @@ public class EnglishTranslation implements Translation {
         en.put("TRIGGER_PROGRESS_METRIC_ABSORBED", "Absorbed dynasties");
         en.put("TRIGGER_PROGRESS_METRIC_RANK", "Dynasty rank tier");
         en.put("TRIGGER_PROGRESS_METRIC_PLANTS", "Mega-plant harvested");
+        en.put("TRIGGER_PROGRESS_METRIC_RESOURCES", "Stored resources");
         en.put("TRIGGER_PROGRESS_HINT_RESEARCHER", "Survive into the second month to unlock researchers.");
         en.put("TRIGGER_PROGRESS_HINT_GRAVER", "Accumulate corpses in the colony to unlock grave keepers.");
         en.put("TRIGGER_PROGRESS_HINT_RESEARCH", "Earn research points from researcher queens.");
@@ -219,6 +220,7 @@ public class EnglishTranslation implements Translation {
         en.put("TRIGGER_PROGRESS_HINT_ABSORBED", "Defeat and absorb another dynasty.");
         en.put("TRIGGER_PROGRESS_HINT_RANK", "Reach Empire dynasty rank to unlock Cloning (assimilation integrity gains and assimilated drones).");
         en.put("TRIGGER_PROGRESS_HINT_SCOUT", "Harvest enough plants from any discovered plant source.");
+        en.put("TRIGGER_PROGRESS_HINT_PARASITIC_MITE", "Stockpile resources. Outbreaks (cold biomes, fall/winter) unlock symbiotic mite catching dynasty-wide.");
         en.put("SYNERGY_SUPER_VENOM", "Super Venom");
         en.put("SYNERGY_SUPER_VENOM_FLAVOR", "Super Venom");
         en.put("SYNERGY_SUPER_VENOM_DESC", "Replaces Fire + Neurotoxic venom stacking (4+4) with a 16x colony damage multiplier when both venoms are assimilated and Synergies are researched.");
