@@ -32,6 +32,9 @@ import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyIntegra
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyRebellionService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastySynergyService;
 import com.grimidk.formicempire.classes.entities.services.world.WarService;
+import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryEvent;
+import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryEventType;
+import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryService;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
@@ -73,6 +76,7 @@ public class World {
     private int dynastyIdCounter = 1;
     private final DynastyNamingService namingService;
     private final WarService warService;
+    private final WorldHistoryService historyService;
 
     public World() {
         this.minute = 0;
@@ -90,10 +94,25 @@ public class World {
         this.weather = GameConstants.WEATHER_CLEAR;
         this.namingService = new DynastyNamingService();
         this.warService = new WarService(this);
+        this.historyService = new WorldHistoryService(this);
     }
     
+    public void registerDynasty(Dynasty dynasty) {
+        if (dynasty == null) {
+            return;
+        }
+        dynasty.setOwningWorld(this);
+        if (!dynastys.contains(dynasty)) {
+            dynastys.add(dynasty);
+        }
+    }
+
     public WarService getWarService() {
         return warService;
+    }
+
+    public WorldHistoryService getHistoryService() {
+        return historyService;
     }
     
     public Engine getEngine() {
@@ -395,7 +414,14 @@ public class World {
         startColony.setName(capName);
         
         playerDynasty.addColony(startColony);
-        this.dynastys.add(playerDynasty);
+        registerDynasty(playerDynasty);
+        historyService.record(WorldHistoryEventType.DYNASTY_FORMED, LanguageStrings.HISTORY_DYNASTY_FORMED_FMT,
+                playerDynasty.getId(), startColony.getId(), -1,
+                WorldHistoryEvent.dynastyArg(playerDynasty.getId()));
+        historyService.record(WorldHistoryEventType.COLONY_FOUNDED, LanguageStrings.HISTORY_COLONY_FOUNDED_FMT,
+                playerDynasty.getId(), startColony.getId(), -1,
+                WorldHistoryEvent.colonyArg(startColony.getId()),
+                WorldHistoryEvent.dynastyArg(playerDynasty.getId()));
         
         this.colonyIdCounter = startColony.getId() + 1;
 
@@ -444,7 +470,6 @@ public class World {
             Dynasty npcDynasty = new Dynasty(dynastyId, npcDynName, npcTitle.getNameKey(), false, npcSpecies);
             npcDynasty.setThemeBase(npcThemeKey);
             npcDynasty.getStarterService().initializeDynasty(npcDynasty);
-            this.dynastys.add(npcDynasty);
 
             int colId = this.colonyIdCounter++;
             String npcCapName = namingService.generateCapitalName(npcThemeKey);
@@ -453,6 +478,14 @@ public class World {
 
             starterService.initializeNewColony(aiColony);
             hex.setColony(aiColony);
+            registerDynasty(npcDynasty);
+            historyService.record(WorldHistoryEventType.DYNASTY_FORMED, LanguageStrings.HISTORY_DYNASTY_FORMED_FMT,
+                    npcDynasty.getId(), aiColony.getId(), -1,
+                    WorldHistoryEvent.dynastyArg(npcDynasty.getId()));
+            historyService.record(WorldHistoryEventType.COLONY_FOUNDED, LanguageStrings.HISTORY_COLONY_FOUNDED_FMT,
+                    npcDynasty.getId(), aiColony.getId(), -1,
+                    WorldHistoryEvent.colonyArg(aiColony.getId()),
+                    WorldHistoryEvent.dynastyArg(npcDynasty.getId()));
         }
 
         linkNeighbors(hexMap);
@@ -666,6 +699,8 @@ public class World {
 
         this.hexes.clear();
         this.dynastys.clear();
+        this.historyService.clear();
+        this.historyService.setRecordingEnabled(false);
         Map<String, Hex> hexMap = new HashMap<>();
         Map<String, Colony> loadedColonies = new HashMap<>();
         Map<Integer, Dynasty> loadedDynastys = new HashMap<>();
@@ -677,7 +712,7 @@ public class World {
             for (Savefile.SavedDynasty sc : savefile.getDynastys()) {
                 Dynasty dynasty = new Dynasty(sc);
                 loadedDynastys.put(dynasty.getId(), dynasty);
-                this.dynastys.add(dynasty);
+                registerDynasty(dynasty);
                 namingService.registerUsedName(dynasty.getName());
                 if (dynasty.getThemeBase() != null && !dynasty.getThemeBase().isEmpty()) {
                     namingService.registerUsedThemeKey(dynasty.getThemeBase());
@@ -713,7 +748,7 @@ public class World {
                         adHocDynasty.setWildDynasty(true);
                     }
                     adHocDynasty.addColony(c);
-                    this.dynastys.add(adHocDynasty);
+                    registerDynasty(adHocDynasty);
                     loadedDynastys.put(newDynastyId, adHocDynasty);
                     System.out.println("[World] Created ad-hoc Dynasty ID " + newDynastyId + " for orphan colony " + c.getName());
                 }
@@ -873,6 +908,10 @@ public class World {
             warService.syncFromDynasties();
         }
         warService.pruneInvalidWars();
+        if (savefile.getWorldHistory() != null) {
+            historyService.loadFromSave(savefile.getWorldHistory());
+        }
+        historyService.setRecordingEnabled(true);
 
         relocalizeDynastyNames();
         changeActiveHex(getSpawnHex());

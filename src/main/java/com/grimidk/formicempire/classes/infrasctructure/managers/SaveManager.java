@@ -510,6 +510,7 @@ public class SaveManager {
         }
         save.setTrades(savedTrades);
         save.setWars(w.getWarService().toSavedWars());
+        save.setWorldHistory(w.getHistoryService().toSaved());
 
         // Save Hexes & Colonies
         if (w.getHexes() != null) {
@@ -693,6 +694,8 @@ public class SaveManager {
         w.write("  \"trades\": " + serializeTradesToJson(s.getTrades()) + ",");
         w.newLine();
         w.write("  \"wars\": " + serializeWarsToJson(s.getWars()) + ",");
+        w.newLine();
+        w.write("  \"worldHistory\": " + serializeWorldHistoryToJson(s.getWorldHistory()) + ",");
         w.newLine();
 
         // - Colonies -
@@ -901,6 +904,7 @@ public class SaveManager {
 
         s.setTrades(deserializeJsonToTrades(rootMap.get("trades")));
         s.setWars(deserializeJsonToWars(rootMap.get("wars")));
+        s.setWorldHistory(deserializeJsonToWorldHistory(rootMap.get("worldHistory")));
         
         return s;
     }
@@ -2077,6 +2081,110 @@ public class SaveManager {
                     start = i + 1;
                 }
             }
+        }
+        return list;
+    }
+
+    private String serializeWorldHistoryToJson(List<Savefile.SavedWorldHistoryEvent> events) {
+        if (events == null || events.isEmpty()) {
+            return "[]";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (int i = 0; i < events.size(); i++) {
+            Savefile.SavedWorldHistoryEvent event = events.get(i);
+            sb.append("{");
+            sb.append("\"year\":").append(event.year).append(",");
+            sb.append("\"month\":").append(event.month).append(",");
+            sb.append("\"day\":").append(event.day).append(",");
+            sb.append("\"hour\":").append(event.hour).append(",");
+            sb.append("\"minute\":").append(event.minute).append(",");
+            sb.append("\"type\":\"").append(escapeJsonString(event.type != null ? event.type : "")).append("\",");
+            sb.append("\"messageKey\":\"").append(escapeJsonString(event.messageKey != null ? event.messageKey : "")).append("\",");
+            sb.append("\"args\":").append(serializeStringListToJson(event.args)).append(",");
+            sb.append("\"relatedDynastyId\":").append(event.relatedDynastyId).append(",");
+            sb.append("\"relatedColonyId\":").append(event.relatedColonyId).append(",");
+            sb.append("\"relatedWarId\":").append(event.relatedWarId);
+            sb.append("}");
+            if (i < events.size() - 1) {
+                sb.append(",");
+            }
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
+    private String serializeStringListToJson(List<String> list) {
+        if (list == null || list.isEmpty()) {
+            return "[]";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (int i = 0; i < list.size(); i++) {
+            sb.append("\"").append(escapeJsonString(list.get(i) != null ? list.get(i) : "")).append("\"");
+            if (i < list.size() - 1) {
+                sb.append(",");
+            }
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
+    private List<Savefile.SavedWorldHistoryEvent> deserializeJsonToWorldHistory(String jsonArray) {
+        List<Savefile.SavedWorldHistoryEvent> list = new ArrayList<>();
+        if (jsonArray == null || !jsonArray.startsWith("[")) {
+            return list;
+        }
+        int lastIdx = jsonArray.lastIndexOf("]");
+        if (lastIdx <= 1) {
+            return list;
+        }
+        String content = jsonArray.substring(1, lastIdx);
+        int braceDepth = 0;
+        int start = 0;
+        for (int i = 0; i < content.length(); i++) {
+            char c = content.charAt(i);
+            if (c == '{') {
+                braceDepth++;
+            }
+            if (c == '}') {
+                braceDepth--;
+                if (braceDepth == 0) {
+                    String eventJson = content.substring(start, i + 1).trim();
+                    if (eventJson.startsWith(",")) {
+                        eventJson = eventJson.substring(1).trim();
+                    }
+                    if (!eventJson.isEmpty() && eventJson.startsWith("{")) {
+                        Map<String, String> map = parseTopLevelJson(eventJson);
+                        Savefile.SavedWorldHistoryEvent event = new Savefile.SavedWorldHistoryEvent();
+                        event.year = Integer.parseInt(map.getOrDefault("year", "0"));
+                        event.month = Integer.parseInt(map.getOrDefault("month", "1"));
+                        event.day = Integer.parseInt(map.getOrDefault("day", "1"));
+                        event.hour = Integer.parseInt(map.getOrDefault("hour", "0"));
+                        event.minute = Integer.parseInt(map.getOrDefault("minute", "0"));
+                        event.type = map.getOrDefault("type", "");
+                        event.messageKey = map.getOrDefault("messageKey", "");
+                        event.args = deserializeJsonToStringList(map.get("args"));
+                        event.relatedDynastyId = Integer.parseInt(map.getOrDefault("relatedDynastyId", "-1"));
+                        event.relatedColonyId = Integer.parseInt(map.getOrDefault("relatedColonyId", "-1"));
+                        event.relatedWarId = Integer.parseInt(map.getOrDefault("relatedWarId", "-1"));
+                        list.add(event);
+                    }
+                    start = i + 1;
+                }
+            }
+        }
+        return list;
+    }
+
+    private List<String> deserializeJsonToStringList(String json) {
+        List<String> list = new ArrayList<>();
+        if (json == null || json.length() <= 2) {
+            return list;
+        }
+        Matcher keyMatcher = Pattern.compile("\"([^\"]*)\"").matcher(json);
+        while (keyMatcher.find()) {
+            list.add(unescapeJsonString(keyMatcher.group(1)));
         }
         return list;
     }

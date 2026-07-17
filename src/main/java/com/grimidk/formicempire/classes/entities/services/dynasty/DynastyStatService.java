@@ -78,6 +78,25 @@ public class DynastyStatService {
         return dynasty != null ? dynasty.getColonies().size() : 0;
     }
 
+    public int getTotalQueens(Dynasty dynasty) {
+        if (dynasty == null) return 0;
+        int total = 0;
+        for (Colony c : dynasty.getColonies()) {
+            total += c.getQueens().size();
+        }
+        return total;
+    }
+
+    public int getGlobalBirthRateDaily(Dynasty dynasty) {
+        if (dynasty == null) return 0;
+        int totalDaily = 0;
+        for (Colony c : dynasty.getColonies()) {
+            int layers = c.getAssignedRoleCount(GameConstants.ROLE_LAYER);
+            totalDaily += (int) (layers * c.getStatsService().getLayingRate(c) * 24);
+        }
+        return totalDaily;
+    }
+
     public int getMilitaryPower(Dynasty dynasty) {
         return dynasty != null ? dynasty.getMilitaryPower() : 0;
     }

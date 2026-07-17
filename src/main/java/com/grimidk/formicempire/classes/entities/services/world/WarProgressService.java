@@ -395,6 +395,15 @@ public final class WarProgressService {
 
         notifyPlayerWarStageComplete(world, war, victor, contested, attackerRetreat, captured);
 
+        String battleKey = captured
+                ? LanguageStrings.HISTORY_BATTLE_CAPTURE_FMT
+                : LanguageStrings.HISTORY_BATTLE_FMT;
+        world.getHistoryService().record(WorldHistoryEventType.BATTLE, battleKey,
+                victor.getId(), contested.getId(), war.getId(),
+                WorldHistoryEvent.dynastyArg(victor.getId()),
+                WorldHistoryEvent.colonyArg(contested.getId()),
+                WorldHistoryEvent.plainArg(war.getId()));
+
         if (contestedWasCapital && victor.getId() == aggressor.getId()) {
             war.setProgressPercent(100f);
             warService.concludeWar(war, aggressor.getId(), LanguageStrings.WAR_CONCLUSION_ABSOLUTE_VICTORY);

@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 78% (225/288 checked)
+Completion: 77% (225/294 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -112,6 +112,12 @@ Side panels (live updates while playing):
 [X] F — Dynasty Wars tab (toggle)
 [X] M — World map (toggle)
 [X] X — Statistics (toggle)
+[ ] Statistics — Dynasty tab shows total queens and birth rate (eggs/day)
+[ ] Statistics — Dynasty tab defeated species is a count
+[ ] Statistics — World History tab lists dated events (newest first)
+[ ] Statistics — World History category filter
+[ ] Statistics — World History “Only my dynasty” filter
+[ ] Statistics — Population tab includes insects section at end
 [X] Repeat same hotkey closes the bound dialog/tab
 
 ================================================================================

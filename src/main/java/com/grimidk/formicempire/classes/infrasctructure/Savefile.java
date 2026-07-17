@@ -52,6 +52,7 @@ public class Savefile implements Serializable {
     private List<SavedDynasty> dynastys;
     private List<SavedTrade> trades;
     private List<SavedWar> wars;
+    private List<SavedWorldHistoryEvent> worldHistory;
 
     public Savefile(int id, String name) {
         this.id = id;
@@ -62,6 +63,7 @@ public class Savefile implements Serializable {
         this.dynastys = new ArrayList<>();
         this.trades = new ArrayList<>();
         this.wars = new ArrayList<>();
+        this.worldHistory = new ArrayList<>();
         this.minute = 0;
         this.hour = 0;
         this.day = 1;
@@ -271,6 +273,21 @@ public class Savefile implements Serializable {
         public boolean rebellionWar;
     }
 
+    public static class SavedWorldHistoryEvent implements Serializable {
+        private static final long serialVersionUID = 1L;
+        public int year;
+        public int month;
+        public int day;
+        public int hour;
+        public int minute;
+        public String type;
+        public String messageKey;
+        public List<String> args = new ArrayList<>();
+        public int relatedDynastyId = -1;
+        public int relatedColonyId = -1;
+        public int relatedWarId = -1;
+    }
+
     public static class SavedTrade implements Serializable {
         private static final long serialVersionUID = 1L;
         public int qOrigin, rOrigin;
@@ -396,4 +413,7 @@ public class Savefile implements Serializable {
 
     public List<SavedWar> getWars() { return wars; }
     public void setWars(List<SavedWar> wars) { this.wars = wars; }
+
+    public List<SavedWorldHistoryEvent> getWorldHistory() { return worldHistory; }
+    public void setWorldHistory(List<SavedWorldHistoryEvent> worldHistory) { this.worldHistory = worldHistory; }
 }

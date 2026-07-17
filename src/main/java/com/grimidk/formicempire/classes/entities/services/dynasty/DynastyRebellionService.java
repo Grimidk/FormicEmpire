@@ -11,6 +11,8 @@ import com.grimidk.formicempire.classes.entities.Tunnel;
 import com.grimidk.formicempire.classes.entities.War;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
 import com.grimidk.formicempire.classes.entities.services.world.WarService;
+import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryEvent;
+import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryEventType;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
@@ -185,7 +187,6 @@ public final class DynastyRebellionService {
         rebellion.setOriginDynastyId(parent.getId());
         rebellion.inheritProgressFrom(parent);
         rebellion.getStarterService().initializeDynasty(rebellion);
-        world.getDynastys().add(rebellion);
 
         Set<Integer> rebelIds = new HashSet<>();
         for (Colony colony : rebels) {
@@ -200,6 +201,17 @@ public final class DynastyRebellionService {
                     + LanguageStrings.format(LanguageStrings.LOG_REBELLION_COLONY_JOINED_FMT, rebelName));
         }
         rebellion.setCapital(seed);
+        world.registerDynasty(rebellion);
+        world.getHistoryService().record(WorldHistoryEventType.REBELLION,
+                LanguageStrings.HISTORY_REBELLION_FORMED_FMT,
+                rebellion.getId(), seed.getId(), -1,
+                WorldHistoryEvent.dynastyArg(rebellion.getId()),
+                WorldHistoryEvent.dynastyArg(parent.getId()),
+                WorldHistoryEvent.plainArg(rebels.size()));
+        world.getHistoryService().record(WorldHistoryEventType.DYNASTY_FORMED,
+                LanguageStrings.HISTORY_DYNASTY_FORMED_FMT,
+                rebellion.getId(), seed.getId(), -1,
+                WorldHistoryEvent.dynastyArg(rebellion.getId()));
 
         splitTunnels(parent, rebellion, rebelIds, world);
         splitTrades(parent, rebellion, rebelIds, tradeManager);
@@ -392,6 +404,13 @@ public final class DynastyRebellionService {
         rebellion.addDiplomaticModifierKey(parent.getId(),
                 GameConstants.DIPLO_MODIFIER_GRANTED_INDEPENDENCE.getNameKey());
         parent.setActiveRebellionDynastyId(0);
+        if (world != null) {
+            world.getHistoryService().record(WorldHistoryEventType.REBELLION,
+                    LanguageStrings.HISTORY_REBELLION_INDEPENDENCE_FMT,
+                    rebellion.getId(), -1, -1,
+                    WorldHistoryEvent.dynastyArg(parent.getId()),
+                    WorldHistoryEvent.dynastyArg(rebellion.getId()));
+        }
 
         Colony logColony = parent.getCapital();
         if (logColony != null) {
@@ -409,6 +428,11 @@ public final class DynastyRebellionService {
             return;
         }
         warService.beginRebellionWar(parent, rebellion);
+        world.getHistoryService().record(WorldHistoryEventType.REBELLION,
+                LanguageStrings.HISTORY_REBELLION_FIGHT_FMT,
+                parent.getId(), -1, -1,
+                WorldHistoryEvent.dynastyArg(parent.getId()),
+                WorldHistoryEvent.dynastyArg(rebellion.getId()));
         DynastyDiplomacyService parentDiplo = parent.getDiplomacyService();
         if (parentDiplo != null) {
             parentDiplo.applyWar(rebellion, tradeManager, world);

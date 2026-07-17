@@ -1,6 +1,8 @@
 package com.grimidk.formicempire.classes.entities.services.dynasty;
 
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyStarterService;
+import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryEvent;
+import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryEventType;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,6 +39,15 @@ public class DynastyDeathService {
                     if (c.isCapital()) {
                         capitalDied = true;
                     }
+                    String causeKey = deadFromZeroAnts
+                            ? LanguageStrings.HISTORY_CAUSE_ZERO_ANTS
+                            : LanguageStrings.HISTORY_CAUSE_NO_QUEEN;
+                    world.getHistoryService().record(WorldHistoryEventType.COLONY_DIED,
+                            LanguageStrings.HISTORY_COLONY_DIED_FMT,
+                            dynasty.getId(), c.getId(), -1,
+                            WorldHistoryEvent.colonyArg(c.getId()),
+                            WorldHistoryEvent.dynastyArg(dynasty.getId()),
+                            WorldHistoryEvent.keyArg(causeKey));
                 }
             }
 
@@ -59,6 +70,11 @@ public class DynastyDeathService {
                 dynasty.setDefeated(true);
                 world.getWarService().endWarsInvolving(dynasty);
                 logDynastyOutcome(dynasty, "Dynasty defeated (all colonies dead)");
+                world.getHistoryService().record(WorldHistoryEventType.DYNASTY_DIED,
+                        LanguageStrings.HISTORY_DYNASTY_DIED_FMT,
+                        dynasty.getId(), -1, -1,
+                        WorldHistoryEvent.dynastyArg(dynasty.getId()),
+                        WorldHistoryEvent.keyArg(LanguageStrings.HISTORY_CAUSE_ALL_COLONIES_DEAD));
 
             } else {
                 for (Colony dead : deadColonies) {
@@ -92,7 +108,23 @@ public class DynastyDeathService {
         dynasty.setDefeated(true);
         world.getWarService().endWarsInvolving(dynasty);
         String causeHint = inferExtinctionCause(dynasty);
+        String causeKey = extinctionCauseKey(causeHint);
         logDynastyOutcome(dynasty, "Dynasty marked extinct (no living ants across all colonies)" + causeHint);
+        world.getHistoryService().record(WorldHistoryEventType.DYNASTY_DIED,
+                LanguageStrings.HISTORY_DYNASTY_DIED_FMT,
+                dynasty.getId(), -1, -1,
+                WorldHistoryEvent.dynastyArg(dynasty.getId()),
+                WorldHistoryEvent.keyArg(causeKey));
+    }
+
+    private static String extinctionCauseKey(String causeHint) {
+        if (causeHint != null && causeHint.contains("dehydration")) {
+            return LanguageStrings.HISTORY_CAUSE_EXTINCT_DEHYDRATION;
+        }
+        if (causeHint != null && causeHint.contains("resource exhaustion")) {
+            return LanguageStrings.HISTORY_CAUSE_EXTINCT_EXHAUSTION;
+        }
+        return LanguageStrings.HISTORY_CAUSE_EXTINCT;
     }
 
     private static String inferExtinctionCause(Dynasty dynasty) {

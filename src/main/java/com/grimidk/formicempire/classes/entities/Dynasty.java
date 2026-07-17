@@ -32,6 +32,8 @@ import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyStatSer
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastySynergyService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyTradeService;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
+import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryEvent;
+import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryEventType;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
@@ -114,6 +116,7 @@ public class Dynasty {
     private transient DynastyStatService statService;
     private transient DynastyTradeService tradeService;
     private transient DynastyDiplomacyService diplomacyService;
+    private transient World owningWorld;
 
     public Dynasty(int id, String name, boolean isPlayer, Species species) {
         this(id, name, LanguageStrings.DYNASTY_TITLE_DYNASTY, isPlayer, species);
@@ -560,6 +563,7 @@ public class Dynasty {
     }
     
     private void rankUp() {
+        ColonyRank previous = this.rank;
         int total = this.statService.getTotalPopulation(this);
                 
         if (total >= GameConstants.RANK_GIGA.getPopulation()) this.rank = GameConstants.RANK_GIGA;
@@ -575,6 +579,15 @@ public class Dynasty {
         else if (total >= GameConstants.RANK_COUNTY.getPopulation()) this.rank = GameConstants.RANK_COUNTY;
         else if (total >= GameConstants.RANK_COLONY.getPopulation()) this.rank = GameConstants.RANK_COLONY;
         else this.rank = GameConstants.RANK_ANT;
+
+        if (previous != null && this.rank != null && previous != this.rank
+                && this.rank.getPopulation() > previous.getPopulation()) {
+            recordHistory(WorldHistoryEventType.DYNASTY_RANK_UP, LanguageStrings.HISTORY_DYNASTY_RANK_UP_FMT,
+                    id, -1, -1,
+                    WorldHistoryEvent.dynastyArg(id),
+                    WorldHistoryEvent.rankArg(previous),
+                    WorldHistoryEvent.rankArg(this.rank));
+        }
     }
     
     public void recordDeath(String cause) {
@@ -600,6 +613,10 @@ public class Dynasty {
     public void addAbsorbedDynasty(int dynastyId) {
         if (!absorbedDynastyIds.contains(dynastyId)) {
             absorbedDynastyIds.add(dynastyId);
+            recordHistory(WorldHistoryEventType.DYNASTY_ABSORBED, LanguageStrings.HISTORY_DYNASTY_ABSORBED_FMT,
+                    id, -1, -1,
+                    WorldHistoryEvent.dynastyArg(id),
+                    WorldHistoryEvent.dynastyArg(dynastyId));
         }
     }
 
@@ -639,7 +656,7 @@ public class Dynasty {
             if (assimilation.getReward() != null) {
                 unlockUpgrade(assimilation.getReward());
             }
-            completeAssimilation(assimilation);
+            completedAssimilations.add(assimilation);
             if (currentAssimilation == assimilation) {
                 currentAssimilation = null;
                 assimilationProgress = 0;
@@ -663,7 +680,7 @@ public class Dynasty {
                 if (assimilation.getReward() != null) {
                     unlockUpgrade(assimilation.getReward());
                 }
-                completeAssimilation(assimilation);
+                completedAssimilations.add(assimilation);
             }
         }
         for (int speciesId : new ArrayList<>(parent.getDefeatedSpeciesIds())) {
@@ -804,12 +821,19 @@ public class Dynasty {
     }
 
     public void setCapital(Colony colony) {
+        Colony previous = this.capital;
         if (colony != null && !colonies.contains(colony)) {
             addColony(colony);
         }
         this.capital = colony;
         for (Colony c : colonies) {
             c.setCapital(c == colony);
+        }
+        if (colony != null && previous != null && previous != colony) {
+            recordHistory(WorldHistoryEventType.CAPITAL_MOVED, LanguageStrings.HISTORY_CAPITAL_MOVED_FMT,
+                    id, colony.getId(), -1,
+                    WorldHistoryEvent.dynastyArg(id),
+                    WorldHistoryEvent.colonyArg(colony.getId()));
         }
     }
 
@@ -1737,9 +1761,29 @@ public class Dynasty {
     public boolean isAssimilationCompleted(Assimilation a) { return completedAssimilations.contains(a); }
     
     public void completeAssimilation(Assimilation a) { 
-        if (!completedAssimilations.contains(a)) {
+        if (a != null && !completedAssimilations.contains(a)) {
             completedAssimilations.add(a);
+            recordHistory(WorldHistoryEventType.ASSIMILATION_COMPLETED, LanguageStrings.HISTORY_ASSIMILATION_COMPLETED_FMT,
+                    id, -1, -1,
+                    WorldHistoryEvent.dynastyArg(id),
+                    WorldHistoryEvent.assimilationArg(a.getId()));
         }
+    }
+
+    public void setOwningWorld(World world) {
+        this.owningWorld = world;
+    }
+
+    public World getOwningWorld() {
+        return owningWorld;
+    }
+
+    private void recordHistory(WorldHistoryEventType type, String messageKey,
+            int relatedDynastyId, int relatedColonyId, int relatedWarId, String... args) {
+        if (owningWorld == null || owningWorld.getHistoryService() == null) {
+            return;
+        }
+        owningWorld.getHistoryService().record(type, messageKey, relatedDynastyId, relatedColonyId, relatedWarId, args);
     }
 
     public Assimilation getCurrentAssimilation() { return currentAssimilation; }

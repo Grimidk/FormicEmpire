@@ -19,6 +19,8 @@ import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
 import com.grimidk.formicempire.classes.entities.Tunnel;
 import com.grimidk.formicempire.classes.entities.spatial.NeoPoint;
+import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryEvent;
+import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryEventType;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.registries.DeathCause;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
@@ -420,6 +422,13 @@ public class ColonyLabourService {
                 neighbor.setColony(satellite);
                 
                 satellitesSpawned++;
+                if (world != null && dynasty != null) {
+                    world.getHistoryService().record(WorldHistoryEventType.COLONY_FOUNDED,
+                            LanguageStrings.HISTORY_COLONY_FOUNDED_FMT,
+                            dynasty.getId(), satellite.getId(), -1,
+                            WorldHistoryEvent.colonyArg(satellite.getId()),
+                            WorldHistoryEvent.dynastyArg(dynasty.getId()));
+                }
                 colony.logEvent(ColonyLogPrefixes.INFO + " "
                     + String.format(LanguageStrings.get(LanguageStrings.LOG_SATELLITE_AT_FMT), neighbor.getQ(), neighbor.getR()));
             }
@@ -640,6 +649,15 @@ public class ColonyLabourService {
 
         if (colony.getDynasty() != null) {
             colony.getDynasty().incrementNuptialFlights();
+        }
+        if (world != null) {
+            Dynasty dynasty = colony.getDynasty();
+            world.getHistoryService().record(WorldHistoryEventType.NUPTIAL_FLIGHT,
+                    LanguageStrings.HISTORY_NUPTIAL_FLIGHT_FMT,
+                    dynasty != null ? dynasty.getId() : -1, colony.getId(), -1,
+                    WorldHistoryEvent.colonyArg(colony.getId()),
+                    WorldHistoryEvent.plainArg(queensToAdd),
+                    WorldHistoryEvent.plainArg(queensLeaving));
         }
 
         if (queensLeaving > 0) {

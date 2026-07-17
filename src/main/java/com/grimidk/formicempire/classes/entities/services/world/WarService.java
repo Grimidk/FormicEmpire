@@ -59,6 +59,12 @@ public class WarService {
         Dynasty aggressor = declarer;
         Dynasty defender = declarer.getId() == pair[0] ? dynastyB : dynastyA;
         WarProgressService.initializeCampaign(world, war, aggressor, defender);
+        world.getHistoryService().record(WorldHistoryEventType.WAR_STARTED,
+                LanguageStrings.HISTORY_WAR_STARTED_FMT,
+                declarer.getId(), -1, war.getId(),
+                WorldHistoryEvent.dynastyArg(declarer.getId()),
+                WorldHistoryEvent.dynastyArg(target.getId()),
+                WorldHistoryEvent.plainArg(war.getId()));
         return war;
     }
 
@@ -89,6 +95,12 @@ public class WarService {
         war.setRebellionWar(true);
         activeWars.add(war);
         WarProgressService.initializeCampaign(world, war, parent, rebellion);
+        world.getHistoryService().record(WorldHistoryEventType.WAR_STARTED,
+                LanguageStrings.HISTORY_WAR_STARTED_FMT,
+                parent.getId(), -1, war.getId(),
+                WorldHistoryEvent.dynastyArg(parent.getId()),
+                WorldHistoryEvent.dynastyArg(rebellion.getId()),
+                WorldHistoryEvent.plainArg(war.getId()));
         return war;
     }
 
@@ -102,6 +114,15 @@ public class WarService {
         }
         war.conclude(DynastyDiplomacyService.worldMonthIndex(world), winnerDynastyId, conclusionKey);
         historicWars.add(war);
+        String conclusion = conclusionKey != null ? conclusionKey : LanguageStrings.WAR_CONCLUSION_UNKNOWN;
+        world.getHistoryService().record(WorldHistoryEventType.WAR_ENDED,
+                LanguageStrings.HISTORY_WAR_ENDED_FMT,
+                winnerDynastyId > 0 ? winnerDynastyId : war.getDynastyIdA(), -1, war.getId(),
+                WorldHistoryEvent.plainArg(war.getId()),
+                winnerDynastyId > 0
+                        ? WorldHistoryEvent.dynastyArg(winnerDynastyId)
+                        : WorldHistoryEvent.keyArg(LanguageStrings.ASSIMILATION_NONE),
+                WorldHistoryEvent.keyArg(conclusion));
         if (war.isRebellionWar()) {
             DynastyRebellionService.onRebellionWarConcluded(world, war, winnerDynastyId);
         }
@@ -426,6 +447,23 @@ public class WarService {
 
     public War findWar(int dynastyIdOne, int dynastyIdTwo) {
         return findActiveWar(dynastyIdOne, dynastyIdTwo);
+    }
+
+    public War findWarById(int warId) {
+        if (warId <= 0) {
+            return null;
+        }
+        for (War war : activeWars) {
+            if (war.getId() == warId) {
+                return war;
+            }
+        }
+        for (War war : historicWars) {
+            if (war.getId() == warId) {
+                return war;
+            }
+        }
+        return null;
     }
 
     public boolean hasActiveWars() {

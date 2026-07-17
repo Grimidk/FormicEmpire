@@ -4,7 +4,6 @@ import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ColonyLoyalty;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
-import com.grimidk.formicempire.classes.constants.misc.Species;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.Season;
 import com.grimidk.formicempire.classes.constants.world.Weather;
@@ -16,6 +15,8 @@ import com.grimidk.formicempire.classes.entities.services.colony.ColonyBugHandli
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyStatService;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyLocationService;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyStatsService;
+import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryEvent;
+import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryEventType;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
@@ -34,7 +35,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import com.grimidk.formicempire.classes.interfaces.ui.styles.UiTableStyles;
 
@@ -54,18 +54,18 @@ public class StatsDialog extends ZeroDialog {
     private JTable populationTable;
     private JTable localHexTable;
     private JTable ratesTable;
-    private JTable insectsTable;
-    private JTable unitStatsTable;
     private JTable deathTable;
+    private JTable worldHistoryTable;
+    private JComboBox<HistoryFilterOption> worldHistoryFilter;
+    private JCheckBox worldHistoryOwnOnly;
 
     private JScrollPane generalScrollPane;
     private JScrollPane dynastyScrollPane;
+    private JScrollPane worldHistoryScrollPane;
     private JScrollPane resourcesScrollPane;
     private JScrollPane populationScrollPane;
     private JScrollPane localHexScrollPane;
     private JScrollPane ratesScrollPane;
-    private JScrollPane insectsScrollPane;
-    private JScrollPane unitStatsScrollPane;
     private JScrollPane deathScrollPane;
 
     public StatsDialog(JFrame owner, Colony colony, Engine engine) {
@@ -98,12 +98,11 @@ public class StatsDialog extends ZeroDialog {
         
         initGeneralTab();
         initDynastyTab();
+        initWorldHistoryTab();
         initResourceTab();
         initPopulationTab();
         initLocalHexTab();
         initRatesTab();
-        initInsectsTab();
-        initUnitStatsTab();
         initDeathTab();
         
         updateTabTitles();
@@ -125,6 +124,13 @@ public class StatsDialog extends ZeroDialog {
         super.refreshTheme();
         topPanel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
         dynastyModeToggle.setForeground(AssetStyles.FONT_COLOR_HEADER);
+        if (worldHistoryFilter != null) {
+            AssetStyles.styleComboBox(worldHistoryFilter);
+        }
+        if (worldHistoryOwnOnly != null) {
+            AssetStyles.styleCheckBox(worldHistoryOwnOnly);
+            worldHistoryOwnOnly.setForeground(AssetStyles.FONT_COLOR_HEADER);
+        }
         AssetStyles.styleTabbedPane(tabbedPane);
         tabbedPane.updateUI();
     }
@@ -132,13 +138,18 @@ public class StatsDialog extends ZeroDialog {
     private void updateTabTitles() {
         tabbedPane.setTitleAt(0, LanguageStrings.get(LanguageStrings.STATS_TAB_GENERAL));
         tabbedPane.setTitleAt(1, LanguageStrings.get(LanguageStrings.STATS_TAB_DYNASTY));
-        tabbedPane.setTitleAt(2, LanguageStrings.get(LanguageStrings.STATS_TAB_ECONOMY));
-        tabbedPane.setTitleAt(3, LanguageStrings.get(LanguageStrings.STATS_TAB_POPULATION));
-        tabbedPane.setTitleAt(4, LanguageStrings.get(LanguageStrings.STATS_TAB_LOCAL_HEX));
-        tabbedPane.setTitleAt(5, LanguageStrings.get(LanguageStrings.STATS_TAB_RATES));
-        tabbedPane.setTitleAt(6, LanguageStrings.get(LanguageStrings.STATS_TAB_INSECTS));
-        tabbedPane.setTitleAt(7, LanguageStrings.get(LanguageStrings.STATS_TAB_UNIT_STATS));
-        tabbedPane.setTitleAt(8, LanguageStrings.get(LanguageStrings.STATS_TAB_MORTALITY));
+        tabbedPane.setTitleAt(2, LanguageStrings.get(LanguageStrings.STATS_TAB_WORLD_HISTORY));
+        tabbedPane.setTitleAt(3, LanguageStrings.get(LanguageStrings.STATS_TAB_ECONOMY));
+        tabbedPane.setTitleAt(4, LanguageStrings.get(LanguageStrings.STATS_TAB_POPULATION));
+        tabbedPane.setTitleAt(5, LanguageStrings.get(LanguageStrings.STATS_TAB_LOCAL_HEX));
+        tabbedPane.setTitleAt(6, LanguageStrings.get(LanguageStrings.STATS_TAB_RATES));
+        tabbedPane.setTitleAt(7, LanguageStrings.get(LanguageStrings.STATS_TAB_MORTALITY));
+        if (worldHistoryFilter != null) {
+            refreshWorldHistoryFilterLabels();
+        }
+        if (worldHistoryOwnOnly != null) {
+            worldHistoryOwnOnly.setText(LanguageStrings.get(LanguageStrings.HISTORY_FILTER_OWN_ONLY));
+        }
     }
 
     public void liveUpdate() {
@@ -282,18 +293,18 @@ public class StatsDialog extends ZeroDialog {
                 new boolean[]{false, true, true});
         AssetStyles.layoutTableColumnsForViewport(dynastyTable, viewportWidth(dynastyScrollPane),
                 new boolean[]{false, false, true, true});
+        if (worldHistoryTable != null) {
+            AssetStyles.layoutTableColumnsForViewport(worldHistoryTable, viewportWidth(worldHistoryScrollPane),
+                    new boolean[]{false, false, true});
+        }
         AssetStyles.layoutTableColumnsForViewport(resourcesTable, viewportWidth(resourcesScrollPane),
                 new boolean[]{false, true, true, true, true, true, true, true});
         AssetStyles.layoutTableColumnsForViewport(populationTable, viewportWidth(populationScrollPane),
-                new boolean[]{false, true, true, false});
+                new boolean[]{false, true, true, false, false});
         AssetStyles.layoutTableColumnsForViewport(localHexTable, viewportWidth(localHexScrollPane),
                 new boolean[]{false, true, true});
         AssetStyles.layoutTableColumnsForViewport(ratesTable, viewportWidth(ratesScrollPane),
                 new boolean[]{true, false, false, false});
-        AssetStyles.layoutTableColumnsForViewport(insectsTable, viewportWidth(insectsScrollPane),
-                new boolean[]{false, true, false, false, false});
-        AssetStyles.layoutTableColumnsForViewport(unitStatsTable, viewportWidth(unitStatsScrollPane),
-                new boolean[]{false, false, true});
         AssetStyles.layoutTableColumnsForViewport(deathTable, viewportWidth(deathScrollPane),
                 new boolean[]{true, false});
     }
@@ -338,6 +349,44 @@ public class StatsDialog extends ZeroDialog {
         tabbedPane.addTab(LanguageStrings.get(LanguageStrings.STATS_TAB_DYNASTY), dynastyScrollPane);
     }
 
+    private void initWorldHistoryTab() {
+        JPanel panel = new JPanel(new BorderLayout(0, 6));
+        panel.setOpaque(false);
+
+        JPanel filterRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        filterRow.setOpaque(false);
+        worldHistoryFilter = new JComboBox<>();
+        for (HistoryFilterOption option : HistoryFilterOption.values()) {
+            worldHistoryFilter.addItem(option);
+        }
+        AssetStyles.styleComboBox(worldHistoryFilter);
+        worldHistoryFilter.addActionListener(e -> updateWorldHistoryData());
+        filterRow.add(worldHistoryFilter);
+
+        worldHistoryOwnOnly = new JCheckBox(LanguageStrings.get(LanguageStrings.HISTORY_FILTER_OWN_ONLY));
+        AssetStyles.styleCheckBox(worldHistoryOwnOnly);
+        worldHistoryOwnOnly.setOpaque(false);
+        worldHistoryOwnOnly.setForeground(AssetStyles.FONT_COLOR_HEADER);
+        worldHistoryOwnOnly.setFocusable(false);
+        worldHistoryOwnOnly.addActionListener(e -> updateWorldHistoryData());
+        filterRow.add(worldHistoryOwnOnly);
+
+        panel.add(filterRow, BorderLayout.NORTH);
+
+        String[] columns = {
+                LanguageStrings.get(LanguageStrings.HISTORY_COL_DATE),
+                LanguageStrings.get(LanguageStrings.HISTORY_COL_CATEGORY),
+                LanguageStrings.get(LanguageStrings.HISTORY_COL_EVENT)
+        };
+        worldHistoryTable = new JTable(createIconModel(columns));
+        applyTextColumnRenderer(worldHistoryTable, 0, SwingConstants.LEFT);
+        applyTextColumnRenderer(worldHistoryTable, 1, SwingConstants.LEFT);
+        applyTextColumnRenderer(worldHistoryTable, 2, SwingConstants.LEFT);
+        worldHistoryScrollPane = createTablePane(worldHistoryTable);
+        panel.add(worldHistoryScrollPane, BorderLayout.CENTER);
+        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.STATS_TAB_WORLD_HISTORY), panel);
+    }
+
     private void initResourceTab() {
         String[] columns = {"", LanguageStrings.get(LanguageStrings.COL_RESOURCE), LanguageStrings.get(LanguageStrings.COL_CURRENT), LanguageStrings.get(LanguageStrings.COL_CAPACITY), LanguageStrings.get(LanguageStrings.COL_SOURCES), LanguageStrings.get(LanguageStrings.COL_PROD_DAY), LanguageStrings.get(LanguageStrings.COL_CONS_DAY), LanguageStrings.get(LanguageStrings.COL_NET)};
         resourcesTable = new JTable(createIconModel(columns));
@@ -353,13 +402,20 @@ public class StatsDialog extends ZeroDialog {
     }
 
     private void initPopulationTab() {
-        String[] columns = {"", LanguageStrings.get(LanguageStrings.COL_TYPE), LanguageStrings.get(LanguageStrings.COL_ROLE), LanguageStrings.get(LanguageStrings.COL_COUNT)};
+        String[] columns = {
+                "",
+                LanguageStrings.get(LanguageStrings.COL_TYPE),
+                LanguageStrings.get(LanguageStrings.COL_ROLE),
+                LanguageStrings.get(LanguageStrings.COL_COUNT),
+                LanguageStrings.get(LanguageStrings.COL_CAPACITY)
+        };
         populationTable = new JTable(createIconModel(columns));
         
         applyIconColumnRenderer(populationTable, 0);
         applyTextColumnRenderer(populationTable, 1, SwingConstants.LEFT);
         applyTextColumnRenderer(populationTable, 2, SwingConstants.LEFT);
         applyNumericColumnRenderer(populationTable, 3);
+        applyTextColumnRenderer(populationTable, 4, SwingConstants.LEFT);
 
         populationScrollPane = createTablePane(populationTable);
         tabbedPane.addTab(LanguageStrings.get(LanguageStrings.STATS_TAB_POPULATION), populationScrollPane);
@@ -386,28 +442,6 @@ public class StatsDialog extends ZeroDialog {
         tabbedPane.addTab(LanguageStrings.get(LanguageStrings.STATS_TAB_RATES), ratesScrollPane);
     }
 
-    private void initInsectsTab() {
-        String[] columns = {"", LanguageStrings.get(LanguageStrings.COL_TYPE), LanguageStrings.get(LanguageStrings.COL_COUNT), LanguageStrings.get(LanguageStrings.COL_CAPACITY), LanguageStrings.get(LanguageStrings.COL_CARETAKERS)};
-        insectsTable = new JTable(createIconModel(columns));
-        applyIconColumnRenderer(insectsTable, 0);
-        applyTextColumnRenderer(insectsTable, 1, SwingConstants.LEFT);
-        for (int col = 2; col <= 4; col++) {
-            applyNumericColumnRenderer(insectsTable, col);
-        }
-        insectsScrollPane = createTablePane(insectsTable);
-        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.STATS_TAB_INSECTS), insectsScrollPane);
-    }
-
-    private void initUnitStatsTab() {
-        String[] columns = {LanguageStrings.get(LanguageStrings.COL_STAT), LanguageStrings.get(LanguageStrings.COL_BASE_VAL), LanguageStrings.get(LanguageStrings.COL_DESCRIPTION)};
-        unitStatsTable = new JTable(createIconModel(columns));
-        applyTextColumnRenderer(unitStatsTable, 0, SwingConstants.LEFT);
-        applyTextColumnRenderer(unitStatsTable, 1, SwingConstants.LEFT);
-        applyTextColumnRenderer(unitStatsTable, 2, SwingConstants.LEFT);
-        unitStatsScrollPane = createTablePane(unitStatsTable);
-        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.STATS_TAB_UNIT_STATS), unitStatsScrollPane);
-    }
-
     private void initDeathTab() {
         String[] columns = {LanguageStrings.get(LanguageStrings.COL_CAUSE), LanguageStrings.get(LanguageStrings.COL_TOTAL)};
         deathTable = new JTable(createIconModel(columns));
@@ -422,13 +456,12 @@ public class StatsDialog extends ZeroDialog {
     @Override
     protected void refreshDialog() {
         updateGeneralData();
-        updateDynastyData(); 
+        updateDynastyData();
+        updateWorldHistoryData();
         updateResourceData();
         updatePopulationData();
         updateLocalHexData();
         updateRatesData();
-        updateInsectsData();
-        updateUnitStatsData();
         updateDeathData();
         layoutAllTables();
     }
@@ -530,9 +563,7 @@ public class StatsDialog extends ZeroDialog {
                 model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.COL_VALUE), dynasty.getSpecies() != null ? dynasty.getSpecies().getName() : LanguageStrings.get(LanguageStrings.STAT_UNKNOWN)});
                 model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_TOTAL_COLONIES), dynasty.getColonies().size()});
                 model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_GLOBAL_POP), dynastyStatsService.getTotalPopulation(dynasty)});
-                
-                int totalQueens = dynasty.getColonies().stream().mapToInt(c -> c.getQueens().size()).sum();
-                model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_GLOBAL_QUEENS), totalQueens});
+                model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_GLOBAL_QUEENS), dynastyStatsService.getTotalQueens(dynasty)});
                 model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_MILITARY_POWER), dynasty.getMilitaryPower()});
             }
         } else {
@@ -611,21 +642,15 @@ public class StatsDialog extends ZeroDialog {
         
         model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_TOTAL_COLONIES), dynastyStatsService.getTotalColonies(dynasty)});
         model.addRow(new Object[]{GameConstants.ICON_STAT_POPULATION, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_GLOBAL_POP), dynastyStatsService.getTotalPopulation(dynasty)});
+        model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_GLOBAL_QUEENS), dynastyStatsService.getTotalQueens(dynasty)});
+        model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_BIRTH_RATE), LanguageStrings.format(LanguageStrings.STAT_RATE_EGGS_DAY, dynastyStatsService.getGlobalBirthRateDaily(dynasty))});
         model.addRow(new Object[]{GameConstants.ICON_STAT_MILITARY_POWER, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_MILITARY_POWER), dynasty.getMilitaryPower()});
         model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_NUPTIAL_FLIGHTS), dynasty.getTotalNuptialFlights()});
         model.addRow(new Object[]{GameConstants.ICON_STAT_GENETIC_INTEGRITY, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_GENETIC_INTEGRITY), String.format("%.1f%%", dynasty.getGeneticIntegrity())});
 
         // Conquest & Expansion
         model.addRow(new Object[]{null, null, LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR), LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR)});
-        String defeated = dynasty.getDefeatedSpeciesIds().stream()
-            .map(id -> {
-                for (Species s : GameConstants.getSpecies()) {
-                    if (s.getId() == id) return s.getName();
-                }
-                return LanguageStrings.format(LanguageStrings.STAT_DEFEATED_UNKNOWN_FMT, id);
-            })
-            .collect(Collectors.joining(", "));
-        model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_DEFEATED_SPECIES), defeated.isEmpty() ? LanguageStrings.get(LanguageStrings.ASSIMILATION_NONE) : defeated});
+        model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_DEFEATED_SPECIES), dynasty.getDefeatedSpeciesIds().size()});
         
         // Unlocks
         model.addRow(new Object[]{null, null, LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR), LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR)});
@@ -662,6 +687,89 @@ public class StatsDialog extends ZeroDialog {
             totalDeaths = dynasty.getGlobalDeathStatistics().values().stream().mapToInt(Integer::intValue).sum();
         }
         model.addRow(new Object[]{GameConstants.STATUS_DEAD.getIcon(), LanguageStrings.get(LanguageStrings.STAT_MORTALITY), LanguageStrings.get(LanguageStrings.STAT_GLOBAL_DEATHS), totalDeaths});
+    }
+
+    private void updateWorldHistoryData() {
+        if (worldHistoryTable == null) {
+            return;
+        }
+        DefaultTableModel model = (DefaultTableModel) worldHistoryTable.getModel();
+        model.setRowCount(0);
+        World world = engine != null ? engine.getWorld() : null;
+        if (world == null || world.getHistoryService() == null) {
+            model.addRow(new Object[]{"—", "—", LanguageStrings.get(LanguageStrings.HISTORY_EMPTY)});
+            return;
+        }
+        HistoryFilterOption filter = worldHistoryFilter != null
+                ? (HistoryFilterOption) worldHistoryFilter.getSelectedItem()
+                : HistoryFilterOption.ALL;
+        List<WorldHistoryEvent> events = filter == null || filter.category == null
+                ? world.getHistoryService().getEvents()
+                : world.getHistoryService().getEvents(filter.category);
+        boolean ownOnly = worldHistoryOwnOnly != null && worldHistoryOwnOnly.isSelected();
+        int ownDynastyId = -1;
+        if (ownOnly) {
+            Dynasty own = colony != null ? colony.getDynasty() : null;
+            if (own == null) {
+                for (Dynasty d : world.getDynastys()) {
+                    if (d.isPlayer()) {
+                        own = d;
+                        break;
+                    }
+                }
+            }
+            ownDynastyId = own != null ? own.getId() : -1;
+        }
+        int shown = 0;
+        for (WorldHistoryEvent event : events) {
+            if (ownOnly && (ownDynastyId <= 0 || !event.involvesDynasty(world, ownDynastyId))) {
+                continue;
+            }
+            model.addRow(new Object[]{
+                    event.formatDateTime(),
+                    event.formatCategoryLabel(),
+                    event.formatMessage(world)
+            });
+            shown++;
+        }
+        if (shown == 0) {
+            model.addRow(new Object[]{"—", "—", LanguageStrings.get(LanguageStrings.HISTORY_EMPTY)});
+        }
+    }
+
+    private void refreshWorldHistoryFilterLabels() {
+        HistoryFilterOption selected = (HistoryFilterOption) worldHistoryFilter.getSelectedItem();
+        worldHistoryFilter.removeAllItems();
+        for (HistoryFilterOption option : HistoryFilterOption.values()) {
+            worldHistoryFilter.addItem(option);
+        }
+        if (selected != null) {
+            worldHistoryFilter.setSelectedItem(selected);
+        }
+    }
+
+    private enum HistoryFilterOption {
+        ALL(null, LanguageStrings.HISTORY_FILTER_ALL),
+        COLONY(WorldHistoryEventType.WorldHistoryCategory.COLONY, LanguageStrings.HISTORY_FILTER_COLONY),
+        DYNASTY(WorldHistoryEventType.WorldHistoryCategory.DYNASTY, LanguageStrings.HISTORY_FILTER_DYNASTY),
+        WAR(WorldHistoryEventType.WorldHistoryCategory.WAR, LanguageStrings.HISTORY_FILTER_WAR),
+        BATTLE(WorldHistoryEventType.WorldHistoryCategory.BATTLE, LanguageStrings.HISTORY_FILTER_BATTLE),
+        REBELLION(WorldHistoryEventType.WorldHistoryCategory.REBELLION, LanguageStrings.HISTORY_FILTER_REBELLION),
+        NUPTIAL(WorldHistoryEventType.WorldHistoryCategory.NUPTIAL, LanguageStrings.HISTORY_FILTER_NUPTIAL),
+        ASSIMILATION(WorldHistoryEventType.WorldHistoryCategory.ASSIMILATION, LanguageStrings.HISTORY_FILTER_ASSIMILATION);
+
+        private final WorldHistoryEventType.WorldHistoryCategory category;
+        private final String labelKey;
+
+        HistoryFilterOption(WorldHistoryEventType.WorldHistoryCategory category, String labelKey) {
+            this.category = category;
+            this.labelKey = labelKey;
+        }
+
+        @Override
+        public String toString() {
+            return LanguageStrings.get(labelKey);
+        }
     }
 
     private void updateResourceData() {
@@ -801,24 +909,25 @@ public class StatsDialog extends ZeroDialog {
             Integer count = typeTotals.get(type);
             if (count == null || count == 0) continue;
 
-            model.addRow(new Object[]{type.getIcon(), type.getName(), LanguageStrings.get(LanguageStrings.UI_TOTAL), count});
+            model.addRow(new Object[]{type.getIcon(), type.getName(), LanguageStrings.get(LanguageStrings.UI_TOTAL), count, "—"});
 
             if (type != GameConstants.TYPE_EGG && type != GameConstants.TYPE_LARVA && type != GameConstants.TYPE_PUPA && type != GameConstants.TYPE_DEAD) {
                 for (AntRole role : GameConstants.getAntRoles()) {
                     if (role.getAntType() == type) {
                         Integer rCount = roleTotals.get(role);
                         if (rCount != null && rCount > 0) {
-                            model.addRow(new Object[]{null, "", role.getName(), rCount});
+                            model.addRow(new Object[]{null, "", role.getName(), rCount, "—"});
                         }
                     }
                 }
             }
         }
         
-        model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR), LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR), LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR)});
-        model.addRow(new Object[]{GameConstants.TYPE_WORKER.getIcon(), LanguageStrings.get(LanguageStrings.UI_SUMMARY), LanguageStrings.get(LanguageStrings.STAT_ADULTS), totalAdult});
-        model.addRow(new Object[]{GameConstants.TYPE_EGG.getIcon(), LanguageStrings.get(LanguageStrings.UI_SUMMARY), LanguageStrings.get(LanguageStrings.STAT_JUVENILES), totalJuvenile});
-        model.addRow(new Object[]{GameConstants.ICON_STAT_POPULATION, LanguageStrings.get(LanguageStrings.UI_SUMMARY), dynastyModeToggle.isSelected() ? LanguageStrings.get(LanguageStrings.STAT_DYNASTY_TOTAL) : LanguageStrings.get(LanguageStrings.STAT_COLONY_TOTAL), grandTotal});
+        String sep = LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR);
+        model.addRow(new Object[]{null, sep, sep, sep, sep});
+        model.addRow(new Object[]{GameConstants.TYPE_WORKER.getIcon(), LanguageStrings.get(LanguageStrings.UI_SUMMARY), LanguageStrings.get(LanguageStrings.STAT_ADULTS), totalAdult, "—"});
+        model.addRow(new Object[]{GameConstants.TYPE_EGG.getIcon(), LanguageStrings.get(LanguageStrings.UI_SUMMARY), LanguageStrings.get(LanguageStrings.STAT_JUVENILES), totalJuvenile, "—"});
+        model.addRow(new Object[]{GameConstants.ICON_STAT_POPULATION, LanguageStrings.get(LanguageStrings.UI_SUMMARY), dynastyModeToggle.isSelected() ? LanguageStrings.get(LanguageStrings.STAT_DYNASTY_TOTAL) : LanguageStrings.get(LanguageStrings.STAT_COLONY_TOTAL), grandTotal, "—"});
 
         int militaryTotal = 0;
         for (Colony c : coloniesToCount) {
@@ -828,8 +937,174 @@ public class StatsDialog extends ZeroDialog {
                 GameConstants.ICON_STAT_MILITARY_POWER,
                 LanguageStrings.get(LanguageStrings.UI_SUMMARY),
                 LanguageStrings.get(LanguageStrings.STAT_MILITARY_POWER),
-                militaryTotal
+                militaryTotal,
+                "—"
         });
+
+        appendInsectsToPopulation(model, coloniesToCount);
+    }
+
+    private void appendInsectsToPopulation(DefaultTableModel model, List<Colony> coloniesToCount) {
+        int aphids = 0, aphidCap = 0, ranchers = 0;
+        int symbioticMites = 0, symbioticMiteCap = 0, catchers = 0;
+        int dermestids = 0, dermestidCap = 0, gravers = 0;
+        int poolUsed = 0, poolMax = 0;
+        int parasiticMites = 0, slowedAnts = 0, parasiticKillPerDay = 0;
+        int projectedParasiticMiteSpawn = 0;
+        int requiredSymbioticMites = 0;
+        int symbioticMitesForPrevention = 0;
+        int parasiteAnts = 0;
+        boolean showAphids = false;
+        boolean showSymbioticMites = false;
+        boolean showDermestids = false;
+        boolean showPool = false;
+        boolean showParasitic = false;
+        boolean showParasiteAnts = false;
+
+        World world = engine != null ? engine.getWorld() : null;
+        Season season = world != null ? world.getSeason() : null;
+
+        for (Colony c : coloniesToCount) {
+            ColonyBugHandlingService bugs = c.getBugHandlingService();
+            Biome biome = resolveColonyBiome(c, world);
+
+            if (c.hasUpgrade(GameUnlocks.ROLE_RANCHER) || c.getAphids() > 0) {
+                showAphids = true;
+                aphids += c.getAphids();
+                aphidCap += bugs.getMaxCapacity(c, GameConstants.TYPE_APHID);
+                ranchers += c.getAssignedRoleCount(GameConstants.ROLE_RANCHER);
+            }
+            if (c.hasUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE) || c.getSymbioticMites() > 0) {
+                showSymbioticMites = true;
+                symbioticMites += c.getSymbioticMites();
+                symbioticMiteCap += bugs.getMaxCapacity(c, GameConstants.TYPE_SYMBIOTIC_MITE);
+            }
+            if (c.hasUpgrade(GameUnlocks.ABILITY_CATCH_DERMESTID) || c.getDermestids() > 0) {
+                showDermestids = true;
+                dermestids += c.getDermestids();
+                dermestidCap += bugs.getMaxCapacity(c, GameConstants.TYPE_DERMESTID);
+            }
+            if (c.hasUpgrade(GameUnlocks.ROLE_CATCHER)) {
+                showPool = true;
+                catchers += c.getAssignedRoleCount(GameConstants.ROLE_CATCHER);
+                poolUsed += bugs.getUnlockedPetCount(c);
+                poolMax += bugs.getUnlockedPetCapacityMax(c);
+            }
+            if (c.hasUpgrade(GameUnlocks.ROLE_GRAVER)) {
+                gravers += c.getAssignedRoleCount(GameConstants.ROLE_GRAVER);
+            }
+
+            if (c.hasUpgrade(GameUnlocks.ABILITY_PARASITIC_MITE_ALERT)
+                    || c.hasUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE)
+                    || c.getParasiticMites() > 0) {
+                showParasitic = true;
+            }
+            parasiticMites += c.getParasiticMites();
+            slowedAnts += c.getParasiticMiteSlowedAntCount();
+            if (c.hasUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE) || c.getSymbioticMites() > 0) {
+                parasiticKillPerDay += c.getSymbioticMites() * bugs.getSymbioticMiteParasiticMiteKillPerDay(c);
+                symbioticMitesForPrevention += c.getSymbioticMites();
+            }
+            if (biome != null && season != null) {
+                projectedParasiticMiteSpawn += bugs.projectParasiticMiteMonthlySpawn(c, biome, season);
+                requiredSymbioticMites += bugs.requiredSymbioticMitesToPreventOutbreak(c, biome, season);
+            }
+            if (c.hasUpgrade(GameUnlocks.ROLE_POLICE)) {
+                showParasiteAnts = true;
+                parasiteAnts += c.getParasiteAnts();
+            }
+        }
+
+        if (!showAphids && !showSymbioticMites && !showDermestids && !showPool
+                && !showParasitic && !showParasiteAnts) {
+            return;
+        }
+
+        String sep = LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR);
+        model.addRow(new Object[]{null, sep, sep, sep, sep});
+        model.addRow(new Object[]{
+                null,
+                LanguageStrings.get(LanguageStrings.STATS_TAB_INSECTS),
+                LanguageStrings.get(LanguageStrings.UI_SUMMARY),
+                "—",
+                "—"
+        });
+
+        if (showAphids) {
+            model.addRow(new Object[]{
+                GameConstants.ICON_APHID,
+                LanguageStrings.get(LanguageStrings.BUG_APHID),
+                LanguageStrings.format(LanguageStrings.STAT_RATE_RANCHERS_FMT, ranchers),
+                aphids,
+                aphidCap
+            });
+        }
+        if (showSymbioticMites) {
+            model.addRow(new Object[]{
+                GameConstants.ICON_SYMBIOTIC_MITE,
+                LanguageStrings.get(LanguageStrings.BUG_SYMBIOTIC_MITE),
+                LanguageStrings.format(LanguageStrings.STAT_INSECT_CATCHERS_FMT, catchers),
+                symbioticMites,
+                symbioticMiteCap
+            });
+        }
+        if (showDermestids) {
+            model.addRow(new Object[]{
+                GameConstants.ICON_DERMESTID,
+                LanguageStrings.get(LanguageStrings.BUG_DERMESTID),
+                LanguageStrings.format(LanguageStrings.STAT_RATE_GRAVERS_FMT, gravers),
+                dermestids,
+                dermestidCap
+            });
+        }
+        if (showPool) {
+            model.addRow(new Object[]{
+                null,
+                LanguageStrings.get(LanguageStrings.STAT_INSECT_POOL),
+                LanguageStrings.format(LanguageStrings.STAT_INSECT_CATCHERS_FMT, catchers),
+                poolUsed,
+                poolMax
+            });
+        }
+
+        if (showParasitic || showParasiteAnts) {
+            if (showAphids || showSymbioticMites || showDermestids || showPool) {
+                model.addRow(new Object[]{null, sep, sep, sep, sep});
+            }
+            if (showParasitic) {
+                String rateCol = String.format(
+                        LanguageStrings.get(LanguageStrings.STAT_INSECT_PARASITIC_KILL_FMT),
+                        slowedAnts, parasiticKillPerDay);
+                if (projectedParasiticMiteSpawn > 0) {
+                    String prevention = String.format(
+                            LanguageStrings.get(LanguageStrings.STAT_OUTBREAK_PREV_FMT),
+                            symbioticMitesForPrevention, requiredSymbioticMites, projectedParasiticMiteSpawn);
+                    if (symbioticMitesForPrevention >= requiredSymbioticMites) {
+                        prevention = LanguageStrings.get(LanguageStrings.STAT_OUTBREAK_PREV_BLOCKED) + " — " + prevention;
+                    }
+                    rateCol = rateCol + " | " + prevention;
+                }
+                model.addRow(new Object[]{
+                    GameConstants.ICON_PARASITIC_MITE,
+                    LanguageStrings.get(LanguageStrings.BUG_PARASITIC_MITE),
+                    rateCol,
+                    parasiticMites,
+                    projectedParasiticMiteSpawn > 0
+                            ? LanguageStrings.format(LanguageStrings.STAT_OUTBREAK_PREV_PROJECTED_FMT, projectedParasiticMiteSpawn)
+                            : LanguageStrings.format(LanguageStrings.STAT_INSECT_PARASITIC_CAP_FMT,
+                                    GameConstants.PARASITIC_MITES_PER_SLOWED_ANT)
+                });
+            }
+            if (showParasiteAnts) {
+                model.addRow(new Object[]{
+                    GameConstants.TYPE_PARASITE_ANT.getIcon(),
+                    LanguageStrings.get(LanguageStrings.BUG_PARASITE_ANT),
+                    LanguageStrings.get(LanguageStrings.ROLE_POLICE),
+                    parasiteAnts,
+                    LanguageStrings.get(LanguageStrings.WORLD_NA)
+                });
+            }
+        }
     }
 
     private void updateRatesData() {
@@ -941,213 +1216,12 @@ public class StatsDialog extends ZeroDialog {
         }
     }
 
-    private void updateInsectsData() {
-        DefaultTableModel model = (DefaultTableModel) insectsTable.getModel();
-        model.setRowCount(0);
-
-        List<Colony> coloniesToCount = new ArrayList<>();
-        if (dynastyModeToggle.isSelected() && colony.getDynasty() != null) {
-            coloniesToCount.addAll(colony.getDynasty().getColonies());
-        } else {
-            coloniesToCount.add(colony);
-        }
-
-        int aphids = 0, aphidCap = 0, ranchers = 0;
-        int symbioticMites = 0, symbioticMiteCap = 0, catchers = 0;
-        int dermestids = 0, dermestidCap = 0, gravers = 0;
-        int poolUsed = 0, poolMax = 0;
-        int parasiticMites = 0, slowedAnts = 0, parasiticKillPerDay = 0;
-        int projectedParasiticMiteSpawn = 0;
-        int requiredSymbioticMites = 0;
-        int symbioticMitesForPrevention = 0;
-        int parasiteAnts = 0;
-        boolean showAphids = false;
-        boolean showSymbioticMites = false;
-        boolean showDermestids = false;
-        boolean showPool = false;
-        boolean showParasitic = false;
-        boolean showParasiteAnts = false;
-
-        World world = engine != null ? engine.getWorld() : null;
-        Season season = world != null ? world.getSeason() : null;
-
-        for (Colony c : coloniesToCount) {
-            ColonyBugHandlingService bugs = c.getBugHandlingService();
-            Biome biome = resolveColonyBiome(c, world);
-
-            if (c.hasUpgrade(GameUnlocks.ROLE_RANCHER) || c.getAphids() > 0) {
-                showAphids = true;
-                aphids += c.getAphids();
-                aphidCap += bugs.getMaxCapacity(c, GameConstants.TYPE_APHID);
-                ranchers += c.getAssignedRoleCount(GameConstants.ROLE_RANCHER);
-            }
-            if (c.hasUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE) || c.getSymbioticMites() > 0) {
-                showSymbioticMites = true;
-                symbioticMites += c.getSymbioticMites();
-                symbioticMiteCap += bugs.getMaxCapacity(c, GameConstants.TYPE_SYMBIOTIC_MITE);
-            }
-            if (c.hasUpgrade(GameUnlocks.ABILITY_CATCH_DERMESTID) || c.getDermestids() > 0) {
-                showDermestids = true;
-                dermestids += c.getDermestids();
-                dermestidCap += bugs.getMaxCapacity(c, GameConstants.TYPE_DERMESTID);
-            }
-            if (c.hasUpgrade(GameUnlocks.ROLE_CATCHER)) {
-                showPool = true;
-                catchers += c.getAssignedRoleCount(GameConstants.ROLE_CATCHER);
-                poolUsed += bugs.getUnlockedPetCount(c);
-                poolMax += bugs.getUnlockedPetCapacityMax(c);
-            }
-            if (c.hasUpgrade(GameUnlocks.ROLE_GRAVER)) {
-                gravers += c.getAssignedRoleCount(GameConstants.ROLE_GRAVER);
-            }
-
-            if (c.hasUpgrade(GameUnlocks.ABILITY_PARASITIC_MITE_ALERT)
-                    || c.hasUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE)
-                    || c.getParasiticMites() > 0) {
-                showParasitic = true;
-            }
-            int pm = c.getParasiticMites();
-            parasiticMites += pm;
-            slowedAnts += c.getParasiticMiteSlowedAntCount();
-            if (c.hasUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE) || c.getSymbioticMites() > 0) {
-                parasiticKillPerDay += c.getSymbioticMites() * bugs.getSymbioticMiteParasiticMiteKillPerDay(c);
-                symbioticMitesForPrevention += c.getSymbioticMites();
-            }
-            if (biome != null && season != null) {
-                projectedParasiticMiteSpawn += bugs.projectParasiticMiteMonthlySpawn(c, biome, season);
-                requiredSymbioticMites += bugs.requiredSymbioticMitesToPreventOutbreak(c, biome, season);
-            }
-            if (c.hasUpgrade(GameUnlocks.ROLE_POLICE)) {
-                showParasiteAnts = true;
-                parasiteAnts += c.getParasiteAnts();
-            }
-        }
-
-        if (!showAphids && !showSymbioticMites && !showDermestids && !showPool
-                && !showParasitic && !showParasiteAnts) {
-            model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_NO_INSECTS), "---", "---", "---"});
-            return;
-        }
-
-        if (showAphids) {
-            model.addRow(new Object[]{
-                GameConstants.ICON_APHID,
-                LanguageStrings.get(LanguageStrings.BUG_APHID),
-                aphids,
-                aphidCap,
-                LanguageStrings.format(LanguageStrings.STAT_RATE_RANCHERS_FMT, ranchers)
-            });
-        }
-        if (showSymbioticMites) {
-            model.addRow(new Object[]{
-                GameConstants.ICON_SYMBIOTIC_MITE,
-                LanguageStrings.get(LanguageStrings.BUG_SYMBIOTIC_MITE),
-                symbioticMites,
-                symbioticMiteCap,
-                LanguageStrings.format(LanguageStrings.STAT_INSECT_CATCHERS_FMT, catchers)
-            });
-        }
-        if (showDermestids) {
-            model.addRow(new Object[]{
-                GameConstants.ICON_DERMESTID,
-                LanguageStrings.get(LanguageStrings.BUG_DERMESTID),
-                dermestids,
-                dermestidCap,
-                LanguageStrings.format(LanguageStrings.STAT_RATE_GRAVERS_FMT, gravers)
-            });
-        }
-        if (showPool) {
-            model.addRow(new Object[]{
-                null,
-                LanguageStrings.get(LanguageStrings.STAT_INSECT_POOL),
-                poolUsed,
-                poolMax,
-                LanguageStrings.format(LanguageStrings.STAT_INSECT_CATCHERS_FMT, catchers)
-            });
-        }
-
-        if (showParasitic || showParasiteAnts) {
-            if (showAphids || showSymbioticMites || showDermestids || showPool) {
-                model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR), LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR), LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR), LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR)});
-            }
-            if (showParasitic) {
-                String rateCol = String.format(
-                        LanguageStrings.get(LanguageStrings.STAT_INSECT_PARASITIC_KILL_FMT),
-                        slowedAnts, parasiticKillPerDay);
-                if (projectedParasiticMiteSpawn > 0) {
-                    String prevention = String.format(
-                            LanguageStrings.get(LanguageStrings.STAT_OUTBREAK_PREV_FMT),
-                            symbioticMitesForPrevention, requiredSymbioticMites, projectedParasiticMiteSpawn);
-                    if (symbioticMitesForPrevention >= requiredSymbioticMites) {
-                        prevention = LanguageStrings.get(LanguageStrings.STAT_OUTBREAK_PREV_BLOCKED) + " — " + prevention;
-                    }
-                    rateCol = rateCol + " | " + prevention;
-                }
-                model.addRow(new Object[]{
-                    GameConstants.ICON_PARASITIC_MITE,
-                    LanguageStrings.get(LanguageStrings.BUG_PARASITIC_MITE),
-                    parasiticMites,
-                    projectedParasiticMiteSpawn > 0
-                            ? LanguageStrings.format(LanguageStrings.STAT_OUTBREAK_PREV_PROJECTED_FMT, projectedParasiticMiteSpawn)
-                            : LanguageStrings.format(LanguageStrings.STAT_INSECT_PARASITIC_CAP_FMT,                                     GameConstants.PARASITIC_MITES_PER_SLOWED_ANT),
-                    rateCol
-                });
-            }
-            if (showParasiteAnts) {
-                model.addRow(new Object[]{
-                    GameConstants.TYPE_PARASITE_ANT.getIcon(),
-                    LanguageStrings.get(LanguageStrings.BUG_PARASITE_ANT),
-                    parasiteAnts,
-                    LanguageStrings.get(LanguageStrings.WORLD_NA),
-                    LanguageStrings.get(LanguageStrings.ROLE_POLICE)
-                });
-            }
-        }
-    }
-
     private Biome resolveColonyBiome(Colony c, World world) {
         if (c == null || world == null) {
             return null;
         }
         Hex hex = world.getHexOfColony(c);
         return hex != null ? hex.getBiome() : null;
-    }
-
-    private void updateUnitStatsData() {
-        DefaultTableModel model = (DefaultTableModel) unitStatsTable.getModel();
-        model.setRowCount(0);
-        ColonyStatsService stats = colony.getStatsService();
-
-        int hp = stats.getBaseHealth(colony);
-        if (hp > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.UNIT_STAT_HEALTH), hp, LanguageStrings.get(LanguageStrings.UNIT_STAT_HEALTH_DESC)});
-
-        int def = stats.getBaseDefense(colony);
-        if (def > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.UNIT_STAT_DEFENSE), def, LanguageStrings.get(LanguageStrings.UNIT_STAT_DEFENSE_DESC)});
-
-        int atk = stats.getBaseAttack(colony);
-        if (atk > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.UNIT_STAT_ATTACK), atk, LanguageStrings.get(LanguageStrings.UNIT_STAT_ATTACK_DESC)});
-
-        int spd = stats.getBaseSpeed(colony);
-        if (spd > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.UNIT_STAT_SPEED), spd, LanguageStrings.get(LanguageStrings.UNIT_STAT_SPEED_DESC)});
-
-        int regen = stats.getBaseRegen(colony);
-        if (regen > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.UNIT_STAT_REGEN), regen, LanguageStrings.get(LanguageStrings.UNIT_STAT_REGEN_DESC)});
-
-        int tempRes = stats.getBaseTempRes(colony);
-        if (tempRes > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.UNIT_STAT_TEMP_RES), tempRes, LanguageStrings.get(LanguageStrings.UNIT_STAT_TEMP_RES_DESC)});
-
-        int cons = stats.getBaseConsumption(colony);
-        if (cons > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.UNIT_STAT_CONSUMPTION), cons, LanguageStrings.get(LanguageStrings.UNIT_STAT_CONSUMPTION_DESC)});
-
-        float detect = stats.getParasiteDetection(colony);
-        if (detect > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.UNIT_STAT_DETECTION), String.format("%.2f", detect), LanguageStrings.get(LanguageStrings.UNIT_STAT_DETECTION_DESC)});
-
-        if (colony.hasUpgrade(GameUnlocks.STAT_WORKER_SPEED_2)) {
-            model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.UNIT_STAT_WORKER_MARCH), LanguageStrings.get(LanguageStrings.UI_ENABLED), LanguageStrings.get(LanguageStrings.UNIT_STAT_WORKER_MARCH_DESC)});
-        }
-        
-        float contam = stats.getContaminationMitigation(colony);
-        if (contam < 1.0f) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.UNIT_STAT_IMMUNITY), String.format("%.0f%%", (1.0f - contam) * 100), LanguageStrings.get(LanguageStrings.UNIT_STAT_IMMUNITY_DESC)});
     }
 
     private void updateDeathData() {
