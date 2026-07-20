@@ -6,6 +6,7 @@ import com.grimidk.formicempire.classes.interfaces.ui.styles.UiComboBoxStyles;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import javax.swing.JButton;
@@ -53,6 +54,10 @@ public final class FlatComboBoxUI extends BasicComboBoxUI {
         button.setOpaque(false);
         button.setBackground(AssetStyles.BACKGROUND_SECONDARY);
         button.setForeground(AssetStyles.FONT_COLOR);
+        button.setCursor(AssetStyles.cursorClickable());
+        Dimension arrowSize = AssetStyles.minControlHitSize();
+        button.setPreferredSize(arrowSize);
+        button.setMinimumSize(arrowSize);
         return button;
     }
 

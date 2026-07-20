@@ -11,7 +11,7 @@ import java.awt.RenderingHints;
 import javax.swing.Icon;
 
 public final class SquareCheckIcons {
-    public static final int ICON_SIZE = 12;
+    public static final int ICON_SIZE = AssetStyles.MIN_CONTROL_HIT_SIZE;
     private static final String CHECK_MARK = "\u2716";
 
     public static final Icon UNCHECKED = new SquareIcon(false);
@@ -45,7 +45,7 @@ public final class SquareCheckIcons {
 
     private static void paintMark(Graphics2D g2, int x, int y, int size, Color color) {
         g2.setColor(color);
-        g2.setFont(AssetStyles.FONT_BOLD.deriveFont(10f));
+        g2.setFont(AssetStyles.FONT_BOLD.deriveFont(14f));
         FontMetrics fm = g2.getFontMetrics();
         int textX = x + (size - fm.stringWidth(CHECK_MARK)) / 2;
         int textY = y + ((size - fm.getHeight()) / 2) + fm.getAscent();

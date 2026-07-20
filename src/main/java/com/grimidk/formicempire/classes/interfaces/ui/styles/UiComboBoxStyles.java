@@ -13,6 +13,7 @@ public final class UiComboBoxStyles {
         box.setOpaque(true);
         applyComboColors(box);
         box.setBorder(AssetStyles.INTERNAL_BORDER);
+        box.setCursor(AssetStyles.cursorClickable());
     }
 
     public static void applyComboColors(JComboBox<?> box) {

@@ -101,7 +101,7 @@ public class HatchRateDialog extends ZeroDialog {
             SpinnerModel model = new SpinnerNumberModel((double) currentRate, 0.0, 100.0, 0.1);
             JSpinner spinner = new JSpinner(model);
             AssetStyles.styleSpinner(spinner);
-            spinner.setPreferredSize(new Dimension(80, 25));
+            spinner.setPreferredSize(AssetStyles.preferredSpinnerSize(80));
 
             spinner.addChangeListener(e -> handleSpinnerChange(type, spinner));
 
@@ -237,7 +237,7 @@ public class HatchRateDialog extends ZeroDialog {
                     SpinnerModel model = new SpinnerNumberModel((double) currentRate, 0.0, 100.0, 0.1);
                     JSpinner spinner = new JSpinner(model);
                     AssetStyles.styleSpinner(spinner);
-                    spinner.setPreferredSize(new Dimension(70, 25));
+                    spinner.setPreferredSize(AssetStyles.preferredSpinnerSize(70));
                     spinner.addChangeListener(e -> handleSubtypeSpinnerChange(slot, type, subtype.getDigit(), spinner));
                     disableSpinnerLetterInput(spinner);
                     digitSpinners.put(subtype.getDigit(), spinner);

@@ -11,6 +11,7 @@ public final class UiSliderStyles {
     public static void style(JSlider slider) {
         slider.setBackground(AssetStyles.BACKGROUND_COLOR);
         slider.setForeground(AssetStyles.FONT_COLOR_HEADER);
+        slider.setCursor(AssetStyles.cursorClickable());
         if (slider.getOrientation() == JSlider.VERTICAL) {
             slider.setOpaque(false);
             slider.setFont(AssetStyles.FONT_SMALL);

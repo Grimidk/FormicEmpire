@@ -402,7 +402,7 @@ public class RoleManagementDialog extends ZeroDialog {
             SpinnerModel model = new SpinnerNumberModel(currentAssigned, 0, Integer.MAX_VALUE, 1); 
             JSpinner spinner = new JSpinner(model);
             AssetStyles.styleSpinner(spinner);
-            spinner.setPreferredSize(new Dimension(80, 25));
+            spinner.setPreferredSize(AssetStyles.preferredSpinnerSize(80));
 
             spinner.addChangeListener(e -> {
                 if (isUpdating) return;

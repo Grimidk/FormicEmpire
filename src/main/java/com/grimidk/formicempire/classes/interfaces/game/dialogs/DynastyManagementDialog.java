@@ -1883,10 +1883,10 @@ public class DynastyManagementDialog extends ZeroDialog {
                     && col == COL_DYNASTY
                     && isDiplomacyDynastySwatchClick(e.getPoint(), row)
                     && canNavigateToDynastyCapital(displayedDynasties.get(row))) {
-                table.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                table.setCursor(AssetStyles.cursorClickable());
                 return;
             }
-            table.setCursor(Cursor.getDefaultCursor());
+            table.setCursor(null);
         }
 
         private boolean canNavigateToDynastyCapital(Dynasty other) {

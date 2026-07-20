@@ -16,6 +16,7 @@ public final class UiCheckBoxStyles {
         box.setForeground(AssetStyles.FONT_COLOR);
         box.setBackground(AssetStyles.BACKGROUND_COLOR);
         box.setFocusPainted(false);
+        box.setCursor(AssetStyles.cursorClickable());
         box.setIcon(SquareCheckIcons.UNCHECKED);
         box.setSelectedIcon(SquareCheckIcons.CHECKED);
         box.setDisabledIcon(SquareCheckIcons.UNCHECKED_DISABLED);

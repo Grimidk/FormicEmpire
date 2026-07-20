@@ -9,7 +9,6 @@ To Fix (By decreasing priority) :
 	Rebalance upgrades, research, assimilation, assistants and researchers in general
 	TODO: icons all unlocks
 	TODO: species sprites and icon: carpenter, weaver, floodplain, jet, gliding, army, ghost, dracula, silver, exploding, bulldog, shining black and desert
-	rework cursor in general by making all small buttons bigger
 
 	revise audit, tutorials, stats and tests for blindspots
 

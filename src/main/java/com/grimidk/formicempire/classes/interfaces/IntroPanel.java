@@ -81,9 +81,9 @@ public class IntroPanel extends JPanel {
     private void beginIntro() {
         cancelAdvance();
         slideIndex = SLIDE_STUDIO;
-        Cursor hand = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
-        setCursor(hand);
-        messageLabel.setCursor(hand);
+        Cursor clickable = AssetStyles.cursorClickable();
+        setCursor(clickable);
+        messageLabel.setCursor(clickable);
         showStudioSlide();
         scheduleNextSlide(STUDIO_SLIDE_MS);
         requestFocusInWindow();

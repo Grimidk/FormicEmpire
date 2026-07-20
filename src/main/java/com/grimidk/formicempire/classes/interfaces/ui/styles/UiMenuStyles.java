@@ -14,6 +14,7 @@ public final class UiMenuStyles {
         menuItem.setForeground(AssetStyles.FONT_COLOR);
         menuItem.setBackground(AssetStyles.BACKGROUND_COLOR);
         menuItem.setOpaque(true);
+        menuItem.setCursor(AssetStyles.cursorClickable());
         if (!(menuItem.getUI() instanceof BasicMenuItemUI)) {
             menuItem.setUI((MenuItemUI) BasicMenuItemUI.createUI(menuItem));
         }

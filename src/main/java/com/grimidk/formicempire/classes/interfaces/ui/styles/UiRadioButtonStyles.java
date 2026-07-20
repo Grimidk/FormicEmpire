@@ -16,6 +16,7 @@ public final class UiRadioButtonStyles {
         button.setForeground(AssetStyles.FONT_COLOR);
         button.setBackground(AssetStyles.BACKGROUND_COLOR);
         button.setFocusPainted(false);
+        button.setCursor(AssetStyles.cursorClickable());
         button.setIcon(SquareRadioIcons.UNSELECTED);
         button.setSelectedIcon(SquareRadioIcons.SELECTED);
         button.setDisabledIcon(SquareRadioIcons.UNSELECTED_DISABLED);

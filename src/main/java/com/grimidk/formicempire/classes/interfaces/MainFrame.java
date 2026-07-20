@@ -8,6 +8,7 @@ import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TriggerManager;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.util.UiCursors;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
@@ -40,6 +41,8 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
     private Cursor cursorClick;
     private AWTEventListener cursorEventListener;
     private boolean cursorPressed;
+    private Component pressedCursorComponent;
+    private Cursor pressedCursorPrevious;
     private boolean pausedForFocusLoss;
     private final Runnable translationRefresh = this::refreshTranslations;
 
@@ -65,7 +68,7 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
     private void clearInheritedCursors(Container container) {
         for (Component child : container.getComponents()) {
             Cursor childCursor = child.getCursor();
-            if (childCursor != null && childCursor.getType() == Cursor.HAND_CURSOR) {
+            if (UiCursors.isHoverCursor(childCursor)) {
                 continue;
             }
             child.setCursor(null);
@@ -89,9 +92,17 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         }
         if (me.getID() == MouseEvent.MOUSE_PRESSED) {
             cursorPressed = true;
+            pressedCursorComponent = source;
+            pressedCursorPrevious = source.getCursor();
+            source.setCursor(cursorClick);
             window.setCursor(cursorClick);
         } else if (me.getID() == MouseEvent.MOUSE_RELEASED) {
             cursorPressed = false;
+            if (pressedCursorComponent != null) {
+                pressedCursorComponent.setCursor(pressedCursorPrevious);
+                pressedCursorComponent = null;
+                pressedCursorPrevious = null;
+            }
             window.setCursor(cursorNormal);
         } else if (me.getID() == MouseEvent.MOUSE_DRAGGED && !cursorPressed) {
             window.setCursor(cursorNormal);
@@ -120,6 +131,14 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
 
     public Cursor getGameCursorClick() {
         return cursorClick;
+    }
+
+    public Cursor getGameCursorClickable() {
+        return AssetStyles.cursorClickable();
+    }
+
+    public Cursor getGameCursorWriteable() {
+        return AssetStyles.cursorWriteable();
     }
 
     public SaveSelectPanel getSaveSelectPanel() {
@@ -264,9 +283,10 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
     }
 
     private void initCursors() {
-        cursorNormal = AssetStyles.loadCustomCursor(AssetStyles.META_CURSOR_NORMAL, "AntCursorNormal");
-        cursorClick = AssetStyles.loadCustomCursor(AssetStyles.META_CURSOR_CLICK, "AntCursorClick");
-        
+        AssetStyles.installCursors();
+        cursorNormal = AssetStyles.cursorNormal();
+        cursorClick = AssetStyles.cursorClick();
+
         setCursor(cursorNormal);
 
         Toolkit.getDefaultToolkit().addAWTEventListener(cursorEventListener = event -> {

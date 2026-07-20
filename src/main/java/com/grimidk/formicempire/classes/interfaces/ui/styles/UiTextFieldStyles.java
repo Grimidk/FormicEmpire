@@ -25,6 +25,7 @@ public final class UiTextFieldStyles {
         field.setForeground(AssetStyles.FONT_COLOR);
         field.setCaretColor(AssetStyles.FONT_COLOR);
         field.setBorder(AssetStyles.INTERNAL_BORDER);
+        field.setCursor(field.isEditable() ? AssetStyles.cursorWriteable() : AssetStyles.cursorNormal());
         applyMinimumSize(field);
     }
 

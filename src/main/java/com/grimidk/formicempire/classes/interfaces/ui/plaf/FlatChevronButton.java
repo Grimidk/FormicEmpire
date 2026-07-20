@@ -27,7 +27,8 @@ public final class FlatChevronButton extends JButton {
         setBackground(AssetStyles.BACKGROUND_COLOR);
         setForeground(AssetStyles.FONT_COLOR);
         setFont(AssetStyles.FONT_BOLD.deriveFont(11f));
-        Dimension size = new Dimension(24, 24);
+        setCursor(AssetStyles.cursorClickable());
+        Dimension size = AssetStyles.minControlHitSize();
         setPreferredSize(size);
         setMinimumSize(size);
         setMaximumSize(size);

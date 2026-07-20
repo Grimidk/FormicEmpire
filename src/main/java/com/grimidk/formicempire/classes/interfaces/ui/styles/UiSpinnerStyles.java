@@ -3,6 +3,7 @@ package com.grimidk.formicempire.classes.interfaces.ui.styles;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.plaf.FlatSpinnerUI;
 
+import javax.swing.JComponent;
 import javax.swing.JSpinner;
 import javax.swing.text.JTextComponent;
 
@@ -18,10 +19,20 @@ public final class UiSpinnerStyles {
         spinner.setBackground(AssetStyles.BACKGROUND_SECONDARY);
         spinner.setForeground(AssetStyles.FONT_COLOR);
         spinner.setBorder(AssetStyles.INTERNAL_BORDER);
-        if (spinner.getEditor() instanceof JTextComponent editor) {
-            UiTextFieldStyles.style(editor);
-        }
         spinner.updateUI();
+        styleEditor(spinner);
         FlatSpinnerUI.styleStepButtons(spinner);
+        FlatSpinnerUI.applySpinnerMinimumSize(spinner);
+    }
+
+    private static void styleEditor(JSpinner spinner) {
+        JComponent editor = spinner.getEditor();
+        if (editor instanceof JSpinner.DefaultEditor defaultEditor) {
+            UiTextFieldStyles.style(defaultEditor.getTextField());
+            return;
+        }
+        if (editor instanceof JTextComponent text) {
+            UiTextFieldStyles.style(text);
+        }
     }
 }

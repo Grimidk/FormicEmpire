@@ -155,12 +155,21 @@ public final class UiTheme {
         } else if (component instanceof javax.swing.JTextArea textArea) {
             textArea.setBackground(AssetStyles.BACKGROUND_COLOR);
             textArea.setForeground(AssetStyles.FONT_COLOR);
+            textArea.setCursor(textArea.isEditable()
+                    ? AssetStyles.cursorWriteable()
+                    : AssetStyles.cursorNormal());
         } else if (component instanceof javax.swing.JTextPane textPane) {
             textPane.setBackground(AssetStyles.BACKGROUND_COLOR);
             textPane.setForeground(AssetStyles.FONT_COLOR);
+            textPane.setCursor(textPane.isEditable()
+                    ? AssetStyles.cursorWriteable()
+                    : AssetStyles.cursorNormal());
         } else if (component instanceof javax.swing.JEditorPane editorPane) {
             editorPane.setBackground(AssetStyles.BACKGROUND_COLOR);
             editorPane.setForeground(AssetStyles.FONT_COLOR);
+            editorPane.setCursor(editorPane.isEditable()
+                    ? AssetStyles.cursorWriteable()
+                    : AssetStyles.cursorNormal());
         } else if (component instanceof javax.swing.JList<?> list) {
             list.setBackground(AssetStyles.BACKGROUND_COLOR);
             list.setForeground(AssetStyles.FONT_COLOR);

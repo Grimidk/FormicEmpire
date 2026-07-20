@@ -13,7 +13,6 @@ import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicSpinnerUI;
 
 public final class FlatSpinnerUI extends BasicSpinnerUI {
-    private static final Dimension STEP_BUTTON_SIZE = new Dimension(26, 22);
 
     public static ComponentUI createUI(JComponent c) {
         return new FlatSpinnerUI();
@@ -50,6 +49,15 @@ public final class FlatSpinnerUI extends BasicSpinnerUI {
 
     private static JButton createStepButton(String label) {
         JButton button = new JButton(label);
+        applyStepButtonChrome(button);
+        return button;
+    }
+
+    private static Dimension stepButtonSize() {
+        return AssetStyles.minControlHitSize();
+    }
+
+    private static void applyStepButtonChrome(JButton button) {
         UiButtonStyles.styleCompact(button);
         button.setFont(AssetStyles.FONT_BOLD.deriveFont(11f));
         button.setFocusable(false);
@@ -57,9 +65,9 @@ public final class FlatSpinnerUI extends BasicSpinnerUI {
         button.setOpaque(true);
         button.setContentAreaFilled(true);
         button.setBackground(AssetStyles.BACKGROUND_SECONDARY);
-        button.setPreferredSize(STEP_BUTTON_SIZE);
-        button.setMinimumSize(STEP_BUTTON_SIZE);
-        return button;
+        Dimension size = stepButtonSize();
+        button.setPreferredSize(size);
+        button.setMinimumSize(size);
     }
 
     @Override
@@ -70,6 +78,48 @@ public final class FlatSpinnerUI extends BasicSpinnerUI {
             spinner.setForeground(AssetStyles.FONT_COLOR);
             spinner.setBorder(AssetStyles.INTERNAL_BORDER);
             styleStepButtons(spinner);
+            applySpinnerMinimumSize(spinner);
+        }
+    }
+
+    @Override
+    public Dimension getPreferredSize(JComponent c) {
+        Dimension size = super.getPreferredSize(c);
+        return enforceSpinnerSize(size);
+    }
+
+    @Override
+    public Dimension getMinimumSize(JComponent c) {
+        Dimension size = super.getMinimumSize(c);
+        return enforceSpinnerSize(size);
+    }
+
+    private static Dimension enforceSpinnerSize(Dimension size) {
+        if (size == null) {
+            return AssetStyles.preferredSpinnerSize(0);
+        }
+        Dimension min = AssetStyles.preferredSpinnerSize(size.width);
+        return new Dimension(Math.max(size.width, min.width), Math.max(size.height, min.height));
+    }
+
+    public static void applySpinnerMinimumSize(JSpinner spinner) {
+        if (spinner == null) {
+            return;
+        }
+        Dimension min = AssetStyles.preferredSpinnerSize(0);
+        Dimension currentMin = spinner.getMinimumSize();
+        if (currentMin == null
+                || currentMin.width < min.width
+                || currentMin.height < min.height) {
+            spinner.setMinimumSize(min);
+        }
+        Dimension preferred = spinner.getPreferredSize();
+        if (preferred == null
+                || preferred.width < min.width
+                || preferred.height < min.height) {
+            spinner.setPreferredSize(new Dimension(
+                    preferred == null ? min.width : Math.max(preferred.width, min.width),
+                    preferred == null ? min.height : Math.max(preferred.height, min.height)));
         }
     }
 
@@ -79,13 +129,7 @@ public final class FlatSpinnerUI extends BasicSpinnerUI {
         }
         for (Component child : spinner.getComponents()) {
             if (child instanceof JButton button) {
-                UiButtonStyles.styleCompact(button);
-                button.setFont(AssetStyles.FONT_BOLD.deriveFont(11f));
-                button.setPreferredSize(STEP_BUTTON_SIZE);
-                button.setMinimumSize(STEP_BUTTON_SIZE);
-                button.setOpaque(true);
-                button.setContentAreaFilled(true);
-                button.setBackground(AssetStyles.BACKGROUND_SECONDARY);
+                applyStepButtonChrome(button);
             }
         }
     }

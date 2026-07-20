@@ -10,7 +10,7 @@ import java.awt.event.MouseEvent;
 
 public class DynastyColorSwatch extends JPanel {
 
-    public static final int HITBOX_SIZE = 18;
+    public static final int HITBOX_SIZE = AssetStyles.MIN_CONTROL_HIT_SIZE;
     public static final int SWATCH_SIZE = 12;
 
     private Color dynastyColor = Color.GRAY;
@@ -43,22 +43,26 @@ public class DynastyColorSwatch extends JPanel {
         this.onClick = onClick;
         this.clickable = onClick != null;
         setToolTipText(tooltip);
-        setCursor(clickable
-                ? Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
-                : Cursor.getDefaultCursor());
+        if (clickable) {
+            AssetStyles.markClickable(this);
+        } else {
+            AssetStyles.clearClickable(this);
+            setCursor(Cursor.getDefaultCursor());
+        }
     }
 
     public void clearClickAction() {
         onClick = null;
         clickable = false;
         setToolTipText(null);
+        AssetStyles.clearClickable(this);
         setCursor(Cursor.getDefaultCursor());
         hovered = false;
         repaint();
     }
 
     private void applyFixedSize() {
-        Dimension size = new Dimension(HITBOX_SIZE, HITBOX_SIZE);
+        Dimension size = AssetStyles.minControlHitSize();
         setPreferredSize(size);
         setMinimumSize(size);
         setMaximumSize(size);

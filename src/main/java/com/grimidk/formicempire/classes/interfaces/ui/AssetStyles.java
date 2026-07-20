@@ -39,8 +39,10 @@ import com.grimidk.formicempire.classes.interfaces.ui.styles.UiTabbedPaneStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.styles.UiTextFieldStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.styles.UiTableStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.styles.UiTableBooleanStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.util.UiCursors;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiNumberFormat;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiResourceLoader;
+import javax.swing.JComponent;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
@@ -48,6 +50,8 @@ import javax.swing.border.EmptyBorder;
 public class AssetStyles {
     public static final String META_CURSOR_NORMAL = "/meta/ui/CursorNormal.png";
     public static final String META_CURSOR_CLICK = "/meta/ui/CursorClick.png";
+    public static final String META_CURSOR_CLICKABLE = "/meta/ui/CursorClickable.png";
+    public static final String META_CURSOR_WRITEABLE = "/meta/ui/CursorWriteable.png";
     public static final String META_APP_ICON = "/meta/icon.ico";
     public static final String META_DIALOG_ICON = "/meta/icon.iconset/icon_32x32@2x.png";
     public static final String META_FONT = "/meta/fonts/font.ttf";
@@ -56,6 +60,10 @@ public class AssetStyles {
     public static final String META_AUDIT = "/meta/audit.txt";
 
     public static final String ICON_BUTTON_CLIENT_KEY = "formicempire.iconButton";
+
+    /** Matches cursor PNG size; no interactive control should be smaller on either axis. */
+    public static final int MIN_CONTROL_HIT_SIZE = 20;
+    public static final int MIN_SPINNER_HEIGHT = MIN_CONTROL_HIT_SIZE * 2;
 
     // --- Palette ---
     public static final Color COLOR_ABSOLUTE_BLACK = UiPalette.COLOR_ABSOLUTE_BLACK;
@@ -368,8 +376,56 @@ public class AssetStyles {
         UiLookAndFeel.applyGlobalStyles();
     }
 
+    public static void installCursors() {
+        UiCursors.install(
+                AssetStyles.class,
+                META_CURSOR_NORMAL,
+                META_CURSOR_CLICK,
+                META_CURSOR_CLICKABLE,
+                META_CURSOR_WRITEABLE);
+    }
+
     public static java.awt.Cursor loadCustomCursor(String path, String name) {
         return UiResourceLoader.loadCustomCursor(AssetStyles.class, path, name);
+    }
+
+    public static java.awt.Cursor cursorNormal() {
+        return UiCursors.normal();
+    }
+
+    public static java.awt.Cursor cursorClick() {
+        return UiCursors.click();
+    }
+
+    public static java.awt.Cursor cursorClickable() {
+        return UiCursors.clickable();
+    }
+
+    public static java.awt.Cursor cursorWriteable() {
+        return UiCursors.writeable();
+    }
+
+    public static void markClickable(JComponent component) {
+        UiCursors.markClickable(component);
+    }
+
+    public static void clearClickable(JComponent component) {
+        UiCursors.clearClickable(component);
+    }
+
+    public static Dimension minControlHitSize() {
+        int size = Math.max(MIN_CONTROL_HIT_SIZE, UiCursors.pixelSize());
+        return new Dimension(size, size);
+    }
+
+    public static Dimension ensureMinControlHit(int width, int height) {
+        int min = Math.max(MIN_CONTROL_HIT_SIZE, UiCursors.pixelSize());
+        return new Dimension(Math.max(width, min), Math.max(height, min));
+    }
+
+    public static Dimension preferredSpinnerSize(int width) {
+        int min = Math.max(MIN_CONTROL_HIT_SIZE, UiCursors.pixelSize());
+        return new Dimension(Math.max(width, min * 2), Math.max(MIN_SPINNER_HEIGHT, min * 2));
     }
 
     public static java.awt.Image loadImage(String path) {

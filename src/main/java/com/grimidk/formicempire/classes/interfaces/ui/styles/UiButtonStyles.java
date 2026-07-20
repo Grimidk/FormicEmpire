@@ -25,7 +25,7 @@ public final class UiButtonStyles {
         button.setFont(AssetStyles.FONT_BOLD);
         button.setForeground(AssetStyles.FONT_COLOR);
         button.setBackground(AssetStyles.BACKGROUND_COLOR);
-        button.setCursor(null);
+        button.setCursor(AssetStyles.cursorClickable());
         button.setHorizontalAlignment(SwingConstants.CENTER);
         button.setVerticalAlignment(SwingConstants.CENTER);
         button.setOpaque(false);
@@ -49,7 +49,7 @@ public final class UiButtonStyles {
         button.setFont(AssetStyles.FONT_NORMAL);
         button.setForeground(AssetStyles.FONT_COLOR);
         button.setBackground(AssetStyles.BACKGROUND_COLOR);
-        button.setCursor(null);
+        button.setCursor(AssetStyles.cursorClickable());
         button.setHorizontalAlignment(SwingConstants.CENTER);
         button.setVerticalAlignment(SwingConstants.CENTER);
         button.setOpaque(false);
@@ -68,7 +68,7 @@ public final class UiButtonStyles {
         button.setFont(AssetStyles.FONT_BOLD);
         button.setForeground(AssetStyles.FONT_COLOR);
         button.setBackground(AssetStyles.TAB_UNSELECTED_BG);
-        button.setCursor(null);
+        button.setCursor(AssetStyles.cursorClickable());
         button.setHorizontalAlignment(SwingConstants.CENTER);
         button.setVerticalAlignment(SwingConstants.CENTER);
         button.setOpaque(false);

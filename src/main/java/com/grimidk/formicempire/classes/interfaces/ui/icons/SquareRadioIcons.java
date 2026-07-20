@@ -9,7 +9,7 @@ import java.awt.RenderingHints;
 import javax.swing.Icon;
 
 public final class SquareRadioIcons {
-    public static final int ICON_SIZE = 12;
+    public static final int ICON_SIZE = AssetStyles.MIN_CONTROL_HIT_SIZE;
 
     public static final Icon UNSELECTED = new RadioIcon(false);
     public static final Icon SELECTED = new RadioIcon(true);

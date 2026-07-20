@@ -232,7 +232,7 @@ public class MapDialog extends ZeroDialog {
             activeWarsHeader.setBorder(new EmptyBorder(0, 4, 4, 4));
             activeWarsHeader.add(activeWarsToggle, BorderLayout.WEST);
             activeWarsHeader.add(activeWarsTitle, BorderLayout.CENTER);
-            activeWarsHeader.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            AssetStyles.markClickable(activeWarsHeader);
             activeWarsHeader.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
@@ -343,7 +343,7 @@ public class MapDialog extends ZeroDialog {
                 warLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
                 warLabel.setBorder(new EmptyBorder(0, 8, 2, 0));
                 if (playerCanManageWars && onOpenWarDialog != null) {
-                    warLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    AssetStyles.markClickable(warLabel);
                     warLabel.setToolTipText(LanguageStrings.get(LanguageStrings.MAP_ACTIVE_WAR_OPEN));
                     warLabel.addMouseListener(new MouseAdapter() {
                         @Override
@@ -560,7 +560,7 @@ public class MapDialog extends ZeroDialog {
                 name.setForeground(defeated ? AssetStyles.FONT_COLOR_ERROR : AssetStyles.FONT_COLOR);
                 name.setToolTipText(buildDynastyLegendInfoTooltip(d, playerDynasty));
                 if (capitalHex != null) {
-                    name.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    AssetStyles.markClickable(name);
                     name.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {

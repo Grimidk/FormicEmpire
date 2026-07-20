@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 74% (228/307 checked)
+Completion: 74% (222/299 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -461,6 +461,8 @@ Combat:
 ================================================================================
 [X] Switch language mid-game — UI refreshes, logic keys unchanged
 [X] Toggle dark mode — theme refreshes on all open panels
+[ ] Custom cursors — normal default, clickable on controls/links, writeable on text fields, click glyph while pressed
+[ ] Small controls (spinner arrows, chevrons, checkboxes, color swatches, combo arrows) — hitboxes at least cursor-sized
 [ ] Open multiple dialogs — ESC closes topmost; dynasty keys defer when dynasty dialog open
 [X] cleanupSession on back-to-menu — no leaked tick listeners
 [ ] Load second save while first loaded — prior session torn down

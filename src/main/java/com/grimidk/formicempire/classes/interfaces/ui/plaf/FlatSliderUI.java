@@ -12,8 +12,7 @@ import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicSliderUI;
 
 public final class FlatSliderUI extends BasicSliderUI {
-    public static final Dimension VERTICAL_SIZE = new Dimension(FlatScrollBarUI.VERTICAL_BAR_WIDTH, 96);
-    private static final int TRACK_BREADTH = FlatScrollBarUI.VERTICAL_BAR_WIDTH;
+    public static final Dimension VERTICAL_SIZE = new Dimension(AssetStyles.MIN_CONTROL_HIT_SIZE, 96);
 
     public FlatSliderUI(JSlider slider) {
         super(slider);
@@ -42,7 +41,8 @@ public final class FlatSliderUI extends BasicSliderUI {
     @Override
     public Dimension getPreferredHorizontalSize() {
         Dimension size = super.getPreferredHorizontalSize();
-        size.height = Math.max(size.height, TRACK_BREADTH + UiControlChrome.THUMB_BREADTH);
+        int min = AssetStyles.MIN_CONTROL_HIT_SIZE;
+        size.height = Math.max(size.height, min);
         return size;
     }
 
@@ -110,9 +110,10 @@ public final class FlatSliderUI extends BasicSliderUI {
 
     @Override
     protected Dimension getThumbSize() {
+        int hit = AssetStyles.MIN_CONTROL_HIT_SIZE;
         if (slider.getOrientation() == SwingConstants.HORIZONTAL) {
-            return new Dimension(FlatScrollBarUI.MIN_THUMB_LENGTH, UiControlChrome.THUMB_BREADTH);
+            return new Dimension(Math.max(FlatScrollBarUI.MIN_THUMB_LENGTH, hit), hit);
         }
-        return new Dimension(UiControlChrome.THUMB_BREADTH, UiControlChrome.THUMB_BREADTH);
+        return new Dimension(hit, hit);
     }
 }
