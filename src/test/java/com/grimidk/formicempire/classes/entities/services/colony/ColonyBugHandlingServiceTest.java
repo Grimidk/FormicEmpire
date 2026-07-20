@@ -77,10 +77,41 @@ class ColonyBugHandlingServiceTest {
     }
 
     @Test
-    void breedingAddsHalfColonyWhenAtLeastTwo() {
-        service.setCount(colony, GameConstants.TYPE_APHID, 4);
+    void breedingAddsAboutOneTenthWhenAtLeastTwo() {
+        service.setCount(colony, GameConstants.TYPE_APHID, 10);
         service.runDaily(colony, null);
-        assertEquals(6, colony.getAphids());
+        assertEquals(11, colony.getAphids());
+    }
+
+    @Test
+    void aphidsUseRancherCapacityWithoutCatchers() {
+        Dynasty dynasty = new Dynasty(12, "Ranch", true, GameConstants.SPECIES_OMNI);
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_RANCHER);
+        Colony gated = new Colony(12, "Ranch", true);
+        dynasty.addColony(gated);
+        gated.setAssignedRoleCount(GameConstants.ROLE_RANCHER, 2);
+
+        assertEquals(20, gated.getBugHandlingService().getMaxCapacity(gated, GameConstants.TYPE_APHID));
+        gated.getBugHandlingService().setCount(gated, GameConstants.TYPE_APHID, 15);
+        assertEquals(15, gated.getAphids());
+    }
+
+    @Test
+    void overCapacityPetsEscapeNextDay() {
+        colony.applyPetBugCount(GameConstants.TYPE_APHID, 20);
+        colony.setAssignedRoleCount(GameConstants.ROLE_RANCHER, 1);
+        assertEquals(20, colony.getAphids());
+        service.runEscapes(colony);
+        assertEquals(10, colony.getAphids());
+    }
+
+    @Test
+    void passiveAphidPreventsAphidEscape() {
+        colony.unlockBuilding(GameUnlocks.PASSIVE_APHID);
+        colony.applyPetBugCount(GameConstants.TYPE_APHID, 30);
+        colony.setAssignedRoleCount(GameConstants.ROLE_RANCHER, 1);
+        service.runEscapes(colony);
+        assertEquals(30, colony.getAphids());
     }
 
     @Test
@@ -135,12 +166,12 @@ class ColonyBugHandlingServiceTest {
         assertEquals(20, capService.getUnlockedPetCapacityMax(gated));
 
         dynasty.unlockUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE);
-        assertEquals(50, capService.getUnlockedPetCapacityMax(gated));
+        assertEquals(70, capService.getUnlockedPetCapacityMax(gated));
 
         dynasty.unlockUpgrade(GameUnlocks.ROLE_GRAVER);
         dynasty.unlockUpgrade(GameUnlocks.ABILITY_CATCH_DERMESTID);
         gated.setAssignedRoleCount(GameConstants.ROLE_GRAVER, 1);
-        assertEquals(50, capService.getUnlockedPetCapacityMax(gated));
+        assertEquals(70, capService.getUnlockedPetCapacityMax(gated));
     }
 
     @Test
@@ -157,12 +188,16 @@ class ColonyBugHandlingServiceTest {
     }
 
     @Test
-    void sharedCatcherPoolLimitsTotalPets() {
+    void sharedCatcherPoolLimitsMitesAndDermestidsNotAphids() {
         colony.setAssignedRoleCount(GameConstants.ROLE_CATCHER, 1);
-        service.setCount(colony, GameConstants.TYPE_APHID, 8);
+        service.setCount(colony, GameConstants.TYPE_APHID, 15);
         service.setCount(colony, GameConstants.TYPE_SYMBIOTIC_MITE, 5);
-        assertEquals(8, colony.getAphids());
-        assertEquals(2, colony.getSymbioticMites());
+        assertEquals(15, colony.getAphids());
+        assertEquals(5, colony.getSymbioticMites());
+
+        service.setCount(colony, GameConstants.TYPE_DERMESTID, 8);
+        assertEquals(5, colony.getSymbioticMites());
+        assertEquals(5, colony.getDermestids());
     }
 
     @Test
@@ -251,6 +286,7 @@ class ColonyBugHandlingServiceTest {
 
     @Test
     void petBugEntitiesCapAtVisibleSpriteLimitWhileCountsStayFull() {
+        colony.setActive(true);
         for (int i = 0; i < 600; i++) {
             colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
         }

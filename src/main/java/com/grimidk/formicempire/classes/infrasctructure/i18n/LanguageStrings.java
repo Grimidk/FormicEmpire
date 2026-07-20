@@ -520,6 +520,7 @@ public final class LanguageStrings {
     public static final String TOOLTIP_PARASITE_ANTS = "TOOLTIP_PARASITE_ANTS";
     public static final String TOOLTIP_POLICING = "TOOLTIP_POLICING";
     public static final String TOOLTIP_RESEARCH_POINTS = "TOOLTIP_RESEARCH_POINTS";
+    public static final String TOOLTIP_RESOURCE_SOURCE_FMT = "TOOLTIP_RESOURCE_SOURCE_FMT";
 
     public static final String DIALOG_UPGRADES_TITLE = "DIALOG_UPGRADES_TITLE";
     public static final String TAB_RESEARCH = "TAB_RESEARCH";
@@ -998,6 +999,23 @@ public final class LanguageStrings {
     public static final String ALERT_BUILT_PREFIX = "ALERT_BUILT_PREFIX";
     public static final String ALERT_COMPOST_RECYCLED_PREFIX = "ALERT_COMPOST_RECYCLED_PREFIX";
     public static final String ALERT_COMPOST_BODIES_SUFFIX = "ALERT_COMPOST_BODIES_SUFFIX";
+    public static final String ALERT_DETAIL_DEATH = "ALERT_DETAIL_DEATH";
+    public static final String ALERT_DETAIL_DEAD = "ALERT_DETAIL_DEAD";
+    public static final String ALERT_DETAIL_STARVE = "ALERT_DETAIL_STARVE";
+    public static final String ALERT_DETAIL_RESEARCH = "ALERT_DETAIL_RESEARCH";
+    public static final String ALERT_DETAIL_BUILD = "ALERT_DETAIL_BUILD";
+    public static final String ALERT_DETAIL_SUCC = "ALERT_DETAIL_SUCC";
+    public static final String ALERT_DETAIL_COMP = "ALERT_DETAIL_COMP";
+    public static final String ALERT_DETAIL_NUPTIAL = "ALERT_DETAIL_NUPTIAL";
+    public static final String ALERT_DETAIL_REBEL = "ALERT_DETAIL_REBEL";
+    public static final String ALERT_DETAIL_WAR = "ALERT_DETAIL_WAR";
+    public static final String ALERT_DETAIL_TRADE = "ALERT_DETAIL_TRADE";
+    public static final String ALERT_DETAIL_DYN = "ALERT_DETAIL_DYN";
+    public static final String ALERT_DETAIL_WARN = "ALERT_DETAIL_WARN";
+    public static final String ALERT_DETAIL_FAIL = "ALERT_DETAIL_FAIL";
+    public static final String ALERT_DETAIL_AUTO = "ALERT_DETAIL_AUTO";
+    public static final String ALERT_DETAIL_PROMO = "ALERT_DETAIL_PROMO";
+    public static final String ALERT_DETAIL_INFO = "ALERT_DETAIL_INFO";
 
     public static final String ASSIMILATION_DIALOG_SUCCESS_TITLE = "ASSIMILATION_DIALOG_SUCCESS_TITLE";
     public static final String ASSIMILATION_DIALOG_SUCCESS_BODY = "ASSIMILATION_DIALOG_SUCCESS_BODY";
@@ -1216,6 +1234,7 @@ public final class LanguageStrings {
     public static final String LOG_PARASITE_ANTS_ELIMINATED_FMT = "LOG_PARASITE_ANTS_ELIMINATED_FMT";
     public static final String LOG_CAUGHT_BUGS_SUMMARY_FMT = "LOG_CAUGHT_BUGS_SUMMARY_FMT";
     public static final String LOG_CAUGHT_BUG_BRED_FMT = "LOG_CAUGHT_BUG_BRED_FMT";
+    public static final String LOG_PET_BUGS_ESCAPED_FMT = "LOG_PET_BUGS_ESCAPED_FMT";
     public static final String LOG_SYMBIOTIC_MITES_PREDATION_FMT = "LOG_SYMBIOTIC_MITES_PREDATION_FMT";
     public static final String LOG_NUPTIAL_QUEENS_FMT = "LOG_NUPTIAL_QUEENS_FMT";
     public static final String LOG_SUCCESS_ASSIMILATION_FMT = "LOG_SUCCESS_ASSIMILATION_FMT";

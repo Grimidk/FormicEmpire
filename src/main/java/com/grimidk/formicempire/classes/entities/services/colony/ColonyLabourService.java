@@ -473,7 +473,9 @@ public class ColonyLabourService {
     public void runScoutting(Colony colony, Biome biome, Hex currentHex) {
         if (!colony.hasUpgrade(GameUnlocks.ROLE_SCOUT)) return;
 
-        int scoutCount = colony.getActiveRoleCount(GameConstants.ROLE_SCOUT);
+        int scoutCount = colony.runsFullSimulation()
+                ? colony.getActiveRoleCount(GameConstants.ROLE_SCOUT)
+                : colony.getAssignedRoleCount(GameConstants.ROLE_SCOUT);
         if (scoutCount == 0) return;
 
         float chancePerScout = colony.getStatsService().getScoutingRate(colony); 

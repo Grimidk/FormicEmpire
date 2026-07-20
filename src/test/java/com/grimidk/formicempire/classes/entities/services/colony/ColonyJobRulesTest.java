@@ -1,5 +1,6 @@
 package com.grimidk.formicempire.classes.entities.services.colony;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -7,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 
@@ -33,7 +35,51 @@ class ColonyJobRulesTest {
     @Test
     void dailyLiteCanRunWithoutException() {
         colony.setAge(7);
-        ColonyJobRules.runDailyLite(colony, GameConstants.TEMP_WARM);
+        ColonyJobRules.runDailyLite(colony, GameConstants.TEMP_WARM, GameConstants.BIOME_PLAINS);
         assertTrue(colony.getRank() != null);
+    }
+
+    @Test
+    void dailyLiteCatchesAndBreedsPetBugs() {
+        Dynasty dynasty = colony.getDynasty();
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_CATCHER);
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_RANCHER);
+        dynasty.unlockUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE);
+        colony.setAssignedRoleCount(GameConstants.ROLE_CATCHER, 20);
+        colony.setAssignedRoleCount(GameConstants.ROLE_RANCHER, 2);
+        colony.setAge(7);
+
+        boolean caught = false;
+        for (int i = 0; i < 80 && !caught; i++) {
+            ColonyJobRules.runDailyLite(colony, GameConstants.TEMP_WARM, GameConstants.BIOME_PLAINS);
+            caught = colony.getAphids() > 0 || colony.getSymbioticMites() > 0;
+        }
+        assertTrue(caught);
+
+        colony.applyPetBugCount(GameConstants.TYPE_APHID, 10);
+        ColonyJobRules.runDailyLite(colony, GameConstants.TEMP_WARM, null);
+        assertEquals(11, colony.getAphids());
+    }
+
+    @Test
+    void dailyLiteScoutsWithAssignedScouts() {
+        Dynasty dynasty = colony.getDynasty();
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_SCOUT);
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_FORAGER);
+        colony.setAssignedRoleCount(GameConstants.ROLE_SCOUT, 20);
+        colony.setAge(7);
+
+        Hex hex = new Hex();
+        hex.setBiome(GameConstants.BIOME_PLAINS);
+
+        int before = colony.getLocationService().getDiscoveredSources().size();
+        boolean found = false;
+        for (int i = 0; i < 40 && !found; i++) {
+            ColonyJobRules.runDailyLite(colony, GameConstants.TEMP_WARM, GameConstants.BIOME_PLAINS, hex);
+            found = colony.getLocationService().getDiscoveredSources().size() > before;
+        }
+        assertTrue(found);
+        assertTrue(hex.getNonWaterResourceSourcesGenerated() > 0
+                || colony.getLocationService().getSourcesByType(GameConstants.RESOURCE_WATER).size() > 0);
     }
 }

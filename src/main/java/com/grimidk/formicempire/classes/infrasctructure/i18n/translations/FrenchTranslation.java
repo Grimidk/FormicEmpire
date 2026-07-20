@@ -149,7 +149,8 @@ public class FrenchTranslation implements Translation {
         fr.put("COLONY_MILITARY_POWER", "Puissance militaire : %s");
         fr.put("COLONY_MILITARY_POWER_AT_WAR", "Puissance militaire : %1$s (Active : %2$s, Réserve : %3$s)");
 
-        fr.put("TOOLTIP_PET_INSECTS", "Insectes de compagnie gardés par les éleveuses et capturantes. Voir l'onglet Population dans les statistiques de colonie (X) pour le détail par espèce.");
+        fr.put("TOOLTIP_PET_INSECTS", "Insectes de compagnie : les pucerons utilisent la capacité des éleveuses ; acariens et dermestes partagent le pool des capturantes. Si la capacité baisse, ils s'échappent le lendemain (Élevage passif empêche la fuite des pucerons). Voir Population (X) pour le détail.");
+        fr.put("TOOLTIP_RESOURCE_SOURCE_FMT", "%s (%s) : %s restants");
         fr.put("TOOLTIP_PARASITIC_MITES", "Acariens microscopiques sur vos fourmis. Tous les 10 acariens ralentissent une fourmi de moitié. Propagation mensuelle quand les réserves sont élevées.");
         fr.put("TOOLTIP_PARASITE_ANTS", "Fourmis parasites dans la colonie");
         fr.put("TOOLTIP_POLICING", "Efficacité de la police");
@@ -1023,7 +1024,7 @@ public class FrenchTranslation implements Translation {
         fr.put("DIPLO_MODIFIER_GENETIC_EXCHANGE", "Échange génétique");
         fr.put("DYNASTY_REBELLION_NAME_FMT", "%s Rébellion");
         fr.put("REBELLION_WAR_NAME_FMT", "%s %s Rébellion");
-        fr.put("ALERT_REBELLION_RISK_FMT", "Risque de rébellion à %s !");
+        fr.put("ALERT_REBELLION_RISK_FMT", "Risque de rébellion : %s");
         fr.put("REBELLION_RESPONSE_TITLE", "Rébellion");
         fr.put("REBELLION_RESPONSE_MSG_FMT", "%s s'est séparée avec %s colonies. Combattre pour les reprendre ou accorder une indépendance pacifique ?");
         fr.put("REBELLION_ACTION_FIGHT", "Combattre");
@@ -1369,7 +1370,7 @@ public class FrenchTranslation implements Translation {
         fr.put("ROLE_MILITIA_DESC", "Permet aux ouvrières des tâches défensives simples.");
         fr.put("ROLE_CATCHER_UPGRADE", "Rôle capturatrice");
         fr.put("ROLE_CATCHER_FLAVOR", "Chasse aux insectes");
-        fr.put("ROLE_CATCHER_DESC", "Permet aux soldates de capturer des insectes natifs à la surface. Chaque capturante maintient jusqu'à 10 insectes de compagnie au total. Les pucerons exigent le rôle Éleveuse ; les acariens symbiotiques se débloquent à l'apparition des acariens parasitaires ; les dermestes exigent la recherche Capture de coléoptères de fosse. Les couples se reproduisent chaque jour à partir de deux spécimens.");
+        fr.put("ROLE_CATCHER_DESC", "Permet aux soldates de capturer des insectes natifs à la surface. Chaque capturante maintient jusqu'à 10 acariens et dermestes au total (pool partagé). Les pucerons utilisent la capacité des éleveuses séparément et exigent le rôle Éleveuse ; les acariens symbiotiques se débloquent à l'apparition des acariens parasitaires ; les dermestes exigent la recherche Capture de coléoptères de fosse. Les couples se reproduisent lentement à partir de deux spécimens.");
         fr.put("ROLE_CRANE_UPGRADE", "Rôle grue de chantier");
         fr.put("ROLE_CRANE_FLAVOR", "Travail lourd");
         fr.put("ROLE_CRANE_DESC", "Permet aux majores d'aider à la construction ; chacune vaut 25 ouvrières.");
@@ -1770,7 +1771,7 @@ public class FrenchTranslation implements Translation {
         fr.put("HELP_TYPE_QUEEN_DESC", "Cœur de la colonie. Pondre ou rechercher.");
 
         fr.put("HELP_BUG_ANT_DESC", "Fourmis sauvages ou rivales sur la surface. Elles peuvent combattre vos fourmis et rivaliser pour l'espace.");
-        fr.put("HELP_BUG_APHID_DESC", "Insectes qui se nourrissent de plantes. Natifs de la plupart des biomes sauf les secs. Exigent le rôle Éleveuse avant que les capturantes puissent les collecter. Les éleveuses en gardent jusqu'à 10 chacune pour le miellat.");
+        fr.put("HELP_BUG_APHID_DESC", "Insectes qui se nourrissent de plantes. Natifs de la plupart des biomes sauf les secs. Exigent le rôle Éleveuse avant que les capturantes puissent les collecter. Les éleveuses en gardent jusqu'à 10 chacune pour le miellat ; les pucerons n'utilisent pas le pool des capturantes. En cas de baisse de capacité, ils s'échappent le lendemain sauf avec l'Élevage de pucerons passif.");
         fr.put("HELP_BUG_SYMBIOTIC_MITE_DESC", "Acariens prédateurs de lutte biologique. Natifs de tous les biomes. La capture se débloque à la première apparition d'acariens parasitaires. Dans l'enclos à insectes. Chaque acarien symbiotique élimine jusqu'à 5 acariens parasitaires par jour (12 avec Dressage d'acariens symbiotiques).");
         fr.put("HELP_BUG_DERMESTID_DESC", "Coléoptères qui nettoient les carcasses. Natifs de la plupart des biomes sauf les froids. Exigent la recherche Capture de coléoptères de fosse. Les fossoyeuses en gardent jusqu'à 10 chacune. Avec Coléoptères de fosse, chacun compte comme une fossoyeuse.");
         fr.put("HELP_BUG_PARASITE_ANT_DESC", "Fourmis parasites cachées dans le nid qui drainent secrètement vos réserves. Natifs des biomes chauds. Flambées au printemps et en été au-delà de 1 000 fourmis (25% par mois). Assignez des Policiers pour les éliminer.");
@@ -1819,14 +1820,31 @@ public class FrenchTranslation implements Translation {
         fr.put("HELP_SKIP_TUTORIAL", "Passer le tutoriel");
         fr.put("HELP_FINISH", "Terminer");
 
-        fr.put("ALERT_STARVATION_RISK", "Risque de famine");
-        fr.put("ALERT_NEW_RESEARCH", "Nouvelle recherche disponible");
-        fr.put("ALERT_CAN_BUILD_FMT", "Construction possible : %s");
-        fr.put("ALERT_BODY_PILE_FMT", "Tas de cadavres élevé : %s");
-        fr.put("ALERT_NUPTIAL_FLIGHT", "Essaim nuptial");
+        fr.put("ALERT_STARVATION_RISK", "Famine");
+        fr.put("ALERT_NEW_RESEARCH", "Recherche");
+        fr.put("ALERT_CAN_BUILD_FMT", "Peut construire : %s");
+        fr.put("ALERT_BODY_PILE_FMT", "Cadavres : %s");
+        fr.put("ALERT_NUPTIAL_FLIGHT", "Nuptial");
         fr.put("ALERT_BUILT_PREFIX", "Construit : ");
         fr.put("ALERT_COMPOST_RECYCLED_PREFIX", "Recyclés ");
         fr.put("ALERT_COMPOST_BODIES_SUFFIX", " corps");
+        fr.put("ALERT_DETAIL_DEATH", "Des fourmis sont mortes dans l'une de vos colonies.");
+        fr.put("ALERT_DETAIL_DEAD", "Le tas de cadavres est élevé — risque de maladie. Assignez des fossoyeuses.");
+        fr.put("ALERT_DETAIL_STARVE", "La consommation dépasse la production et les stocks de champignons sont bas.");
+        fr.put("ALERT_DETAIL_RESEARCH", "Vous pouvez vous offrir une nouvelle recherche.");
+        fr.put("ALERT_DETAIL_BUILD", "Vous pouvez vous offrir de commencer ce bâtiment.");
+        fr.put("ALERT_DETAIL_SUCC", "Une construction ou un projet est terminé.");
+        fr.put("ALERT_DETAIL_COMP", "Les fossoyeuses ont composté des cadavres en champignons.");
+        fr.put("ALERT_DETAIL_NUPTIAL", "Un essaim nuptial a ajouté de nouvelles reines.");
+        fr.put("ALERT_DETAIL_REBEL", "La loyauté de cette colonie est critique et elle peut se rebeller.");
+        fr.put("ALERT_DETAIL_WAR", "Un événement de guerre concernant votre dynastie.");
+        fr.put("ALERT_DETAIL_TRADE", "Une mise à jour de commerce ou de convoi pour votre dynastie.");
+        fr.put("ALERT_DETAIL_DYN", "Un événement au niveau de la dynastie.");
+        fr.put("ALERT_DETAIL_WARN", "Un avertissement d'une de vos colonies.");
+        fr.put("ALERT_DETAIL_FAIL", "Quelque chose a échoué dans une de vos colonies.");
+        fr.put("ALERT_DETAIL_AUTO", "Une action d'automatisation s'est exécutée.");
+        fr.put("ALERT_DETAIL_PROMO", "Un changement de rang ou de capitale de colonie a eu lieu.");
+        fr.put("ALERT_DETAIL_INFO", "Information de colonie.");
 
         fr.put("ASSIMILATION_DIALOG_SUCCESS_TITLE", "Assimilation réussie");
         fr.put("ASSIMILATION_DIALOG_SUCCESS_BODY", "Assimilation génétique terminée !\n\n%s terminée.\nDébloqué : %s");
@@ -1908,6 +1926,7 @@ public class FrenchTranslation implements Translation {
         fr.put("LOG_PARASITE_ANTS_ELIMINATED_FMT", "%s fourmis parasites éliminées.");
         fr.put("LOG_CAUGHT_BUGS_SUMMARY_FMT", "Les capturantes ont rapporté %s insecte(s) de la surface.");
         fr.put("LOG_CAUGHT_BUG_BRED_FMT", "%s %s se sont reproduits en captivité.");
+        fr.put("LOG_PET_BUGS_ESCAPED_FMT", "%s insecte(s) de compagnie se sont échappés après une baisse de capacité.");
         fr.put("LOG_SYMBIOTIC_MITES_PREDATION_FMT", "Les acariens symbiotiques ont éliminé %s acarien(s) parasitaire(s).");
         fr.put("LOG_NUPTIAL_QUEENS_FMT", "Essaim nuptial : %s nouvelles reines ont rejoint.");
         fr.put("LOG_SUCCESS_ASSIMILATION_FMT", "%s terminée ! Récompense : %s");

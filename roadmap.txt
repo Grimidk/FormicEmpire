@@ -6,17 +6,12 @@ To Fix (By decreasing priority) :
 	(none right now)
 	
 	High:
-	Rebalance upgrades, research, assistants and researchers in general
+	Rebalance upgrades, research, assimilation, assistants and researchers in general
 	TODO: icons all unlocks
 	TODO: species sprites and icon: carpenter, weaver, floodplain, jet, gliding, army, ghost, dracula, silver, exploding, bulldog, shining black and desert
-	improve alert reading by simplyfing and using icons
 	rework cursor in general by making all small buttons bigger
-	watching other colonies shouldnt affect alerts or triggers
-	rework pet insect balance
-	look into scarcity better
-	show source amounts with tooltip and what they are
 
-	revise audit, tutorials and tests for blindspots
+	revise audit, tutorials, stats and tests for blindspots
 
 	Mid:
 	(none right now)
@@ -28,9 +23,9 @@ To Fix (By decreasing priority) :
 	(none right now)
 
 	Important not Urgent:
+	Modifiable constants for later
 	map hexes look kinda yank
 	Font - self explanatory
-	clickable ant cursor
 	excel for languages and tags and script to update it
 	
 To Feature (to be done in order):

@@ -149,7 +149,8 @@ public class PortugueseTranslation implements Translation {
         pt.put("COLONY_MILITARY_POWER", "Poder militar: %s");
         pt.put("COLONY_MILITARY_POWER_AT_WAR", "Poder militar: %1$s (Ativo: %2$s, Reserva: %3$s)");
 
-        pt.put("TOOLTIP_PET_INSECTS", "Insetos de estimação cuidados por pastoras e capturadoras. Veja a aba População nas estatísticas da colônia (X) para o detalhe por espécie.");
+        pt.put("TOOLTIP_PET_INSECTS", "Insetos de estimação: pulgões usam capacidade de pastoras; ácaros e dermestídeos partilham o grupo de capturadoras. Se a capacidade cair, fogem no dia seguinte (Fazenda passiva impede fuga de pulgões). Veja População (X) para o detalhe.");
+        pt.put("TOOLTIP_RESOURCE_SOURCE_FMT", "%s (%s): %s restantes");
         pt.put("TOOLTIP_PARASITIC_MITES", "Ácaros microscópicos nas formigas. A cada 10 ácaros, uma formiga fica com metade da velocidade. Espalham-se mensalmente com muitos recursos armazenados.");
         pt.put("TOOLTIP_PARASITE_ANTS", "Formigas parasitas na colônia");
         pt.put("TOOLTIP_POLICING", "Eficiência de vigilância");
@@ -1023,7 +1024,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("DIPLO_MODIFIER_GENETIC_EXCHANGE", "Intercâmbio genético");
         pt.put("DYNASTY_REBELLION_NAME_FMT", "%s Rebelião");
         pt.put("REBELLION_WAR_NAME_FMT", "%s %s Rebelião");
-        pt.put("ALERT_REBELLION_RISK_FMT", "Risco de rebelião em %s!");
+        pt.put("ALERT_REBELLION_RISK_FMT", "Risco de rebelião: %s");
         pt.put("REBELLION_RESPONSE_TITLE", "Rebelião");
         pt.put("REBELLION_RESPONSE_MSG_FMT", "%s separou-se com %s colónias. Lutar para recuperá-las ou conceder independência pacífica?");
         pt.put("REBELLION_ACTION_FIGHT", "Lutar");
@@ -1369,7 +1370,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("ROLE_MILITIA_DESC", "Permite tarefas defensivas básicas às operárias.");
         pt.put("ROLE_CATCHER_UPGRADE", "Função capturadora");
         pt.put("ROLE_CATCHER_FLAVOR", "Captura de insetos");
-        pt.put("ROLE_CATCHER_DESC", "Permite que soldadas capturem insetos nativos no exterior. Cada capturadora mantém até 10 insetos de estimação no total. Pulgões exigem o papel Pastora; ácaros simbióticos desbloqueiam quando aparecem ácaros parasitas; dermestídeos exigem a pesquisa Captura de besouros de cova. Pares reproduzem-se diariamente com pelo menos dois exemplares.");
+        pt.put("ROLE_CATCHER_DESC", "Permite que soldadas capturem insetos nativos no exterior. Cada capturadora mantém até 10 ácaros e dermestídeos no total (grupo partilhado). Pulgões usam capacidade de pastoras em separado e exigem o papel Pastora; ácaros simbióticos desbloqueiam quando aparecem ácaros parasitas; dermestídeos exigem a pesquisa Captura de besouros de cova. Pares reproduzem-se lentamente com pelo menos dois exemplares.");
         pt.put("ROLE_CRANE_UPGRADE", "Função guindaste de construção");
         pt.put("ROLE_CRANE_FLAVOR", "Trabalho pesado");
         pt.put("ROLE_CRANE_DESC", "Permite que majors ajudem na construção; cada uma equivale a 25 operárias.");
@@ -1770,7 +1771,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("HELP_TYPE_QUEEN_DESC", "Coração da colônia. Pode por ovos ou pesquisar.");
 
         pt.put("HELP_BUG_ANT_DESC", "Formigas selvagens ou rivais que aparecem na superfície. Podem lutar com as suas formigas e competir por espaço.");
-        pt.put("HELP_BUG_APHID_DESC", "Insetos que se alimentam de plantas. Nativos da maioria dos biomas exceto secos. Exigem o papel Pastora antes de capturadoras os recolherem. Pastoras cuidam de até 10 cada para xarope.");
+        pt.put("HELP_BUG_APHID_DESC", "Insetos que se alimentam de plantas. Nativos da maioria dos biomas exceto secos. Exigem o papel Pastora antes de capturadoras os recolherem. Pastoras cuidam de até 10 cada para xarope; pulgões não usam o grupo de capturadoras. Se a capacidade cair, fogem no dia seguinte salvo com Fazenda de pulgões passiva.");
         pt.put("HELP_BUG_SYMBIOTIC_MITE_DESC", "Ácaros predadores de controlo biológico. Nativos de todos os biomas. A captura desbloqueia na primeira aparição de ácaros parasitas. No curral de insetos. Cada ácaro simbiótico elimina até 5 ácaros parasitas por dia (12 com Treino de ácaros simbióticos).");
         pt.put("HELP_BUG_DERMESTID_DESC", "Besouros que limpam carcaças. Nativos da maioria dos biomas exceto frios. Exigem a pesquisa Captura de besouros de cova. Coveiras cuidam de até 10 cada. Com Besouros de cova, cada um conta como uma coveira.");
         pt.put("HELP_BUG_PARASITE_ANT_DESC", "Formigas parasitas que se escondem no formigueiro e drenam comida em segredo. Nativas de biomas quentes. Surto na primavera e verão com mais de 1.000 formigas (25% por mês). Atribua Polícias para eliminá-las.");
@@ -1819,14 +1820,31 @@ public class PortugueseTranslation implements Translation {
         pt.put("HELP_SKIP_TUTORIAL", "Pular tutorial");
         pt.put("HELP_FINISH", "Concluir");
 
-        pt.put("ALERT_STARVATION_RISK", "Risco de fome");
-        pt.put("ALERT_NEW_RESEARCH", "Nova pesquisa disponível");
+        pt.put("ALERT_STARVATION_RISK", "Fome");
+        pt.put("ALERT_NEW_RESEARCH", "Pesquisa");
         pt.put("ALERT_CAN_BUILD_FMT", "Pode construir: %s");
-        pt.put("ALERT_BODY_PILE_FMT", "Muitos cadáveres: %s");
-        pt.put("ALERT_NUPTIAL_FLIGHT", "Voo nupcial");
+        pt.put("ALERT_BODY_PILE_FMT", "Cadáveres: %s");
+        pt.put("ALERT_NUPTIAL_FLIGHT", "Nupcial");
         pt.put("ALERT_BUILT_PREFIX", "Construído: ");
         pt.put("ALERT_COMPOST_RECYCLED_PREFIX", "Reciclados ");
         pt.put("ALERT_COMPOST_BODIES_SUFFIX", " corpos");
+        pt.put("ALERT_DETAIL_DEATH", "Formigas morreram em uma das suas colônias.");
+        pt.put("ALERT_DETAIL_DEAD", "Há muitos cadáveres — o risco de doença sobe. Atribua coveiras.");
+        pt.put("ALERT_DETAIL_STARVE", "O consumo supera a produção e as reservas de cogumelos estão baixas.");
+        pt.put("ALERT_DETAIL_RESEARCH", "Você pode custear uma nova pesquisa.");
+        pt.put("ALERT_DETAIL_BUILD", "Você pode custear começar este edifício.");
+        pt.put("ALERT_DETAIL_SUCC", "Uma construção ou projeto terminou.");
+        pt.put("ALERT_DETAIL_COMP", "As coveiras compostaram cadáveres em cogumelos.");
+        pt.put("ALERT_DETAIL_NUPTIAL", "Um voo nupcial adicionou novas rainhas.");
+        pt.put("ALERT_DETAIL_REBEL", "A lealdade desta colônia está crítica e ela pode se rebelar.");
+        pt.put("ALERT_DETAIL_WAR", "Um evento de guerra envolvendo sua dinastia.");
+        pt.put("ALERT_DETAIL_TRADE", "Uma atualização de comércio ou comboio da sua dinastia.");
+        pt.put("ALERT_DETAIL_DYN", "Um evento em nível de dinastia.");
+        pt.put("ALERT_DETAIL_WARN", "Um aviso de uma das suas colônias.");
+        pt.put("ALERT_DETAIL_FAIL", "Algo falhou em uma das suas colônias.");
+        pt.put("ALERT_DETAIL_AUTO", "Uma ação de automação foi executada.");
+        pt.put("ALERT_DETAIL_PROMO", "Houve uma mudança de posto ou capital da colônia.");
+        pt.put("ALERT_DETAIL_INFO", "Informação da colônia.");
 
         pt.put("ASSIMILATION_DIALOG_SUCCESS_TITLE", "Assimilação concluída");
         pt.put("ASSIMILATION_DIALOG_SUCCESS_BODY", "Assimilação genética concluída!\n\n%s finalizada.\nDesbloqueado: %s");
@@ -1908,6 +1926,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("LOG_PARASITE_ANTS_ELIMINATED_FMT", "Eliminadas %s formigas parasitas.");
         pt.put("LOG_CAUGHT_BUGS_SUMMARY_FMT", "Capturadoras trouxeram %s inseto(s) do exterior.");
         pt.put("LOG_CAUGHT_BUG_BRED_FMT", "%s %s reproduziram-se em cativeiro.");
+        pt.put("LOG_PET_BUGS_ESCAPED_FMT", "%s inseto(s) de estimação fugiram após a capacidade cair.");
         pt.put("LOG_SYMBIOTIC_MITES_PREDATION_FMT", "Ácaros simbióticos eliminaram %s ácaro(s) parasita(s).");
         pt.put("LOG_NUPTIAL_QUEENS_FMT", "Voo nupcial. %s novas rainhas se juntaram.");
         pt.put("LOG_SUCCESS_ASSIMILATION_FMT", "%s concluída! Recompensa: %s");

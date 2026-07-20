@@ -20,9 +20,12 @@ import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants
 import com.grimidk.formicempire.classes.infrasctructure.assets.GameSpritePreloader;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.registries.WorldSpaces;
+import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
+import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.net.URL;
 import java.util.ArrayList;
@@ -78,6 +81,7 @@ public class GameAreaPanel extends ZeroGamePanel {
         setOpaque(true);
         initComponents();
         initLayout();
+        ToolTipManager.sharedInstance().registerComponent(this);
     }
 
     @Override
@@ -417,6 +421,51 @@ public class GameAreaPanel extends ZeroGamePanel {
             g2d.drawImage(icon.getImage(), -displayPx / 2, -displayPx / 2, displayPx, displayPx, this);
             g2d.setTransform(oldTx);
         }
+    }
+
+    @Override
+    public String getToolTipText(MouseEvent event) {
+        if (event == null || currentDimension != WorldSpaces.OVERWORLD || colony == null
+                || colony.getLocationService() == null) {
+            return null;
+        }
+        int localX = event.getX() - overworldLayoutOffsetX;
+        int localY = event.getY() - overworldLayoutOffsetY;
+        ResourceSource hit = findResourceSourceAt(localX, localY);
+        if (hit == null || hit.getResourceType() == null) {
+            return null;
+        }
+        String sizeLabel = LanguageStrings.get(hit.getResourceType().getSourceSizeLabelKey(hit.getQuantity()));
+        return LanguageStrings.format(
+                LanguageStrings.TOOLTIP_RESOURCE_SOURCE_FMT,
+                hit.getResourceType().getName(),
+                sizeLabel,
+                AssetStyles.formatNumber(hit.getQuantity()));
+    }
+
+    private ResourceSource findResourceSourceAt(int localX, int localY) {
+        ResourceSource best = null;
+        double bestDistSq = Double.POSITIVE_INFINITY;
+        for (ResourceSource src : colony.getLocationService().getDiscoveredSources()) {
+            if (src.getQuantity() <= 0) {
+                continue;
+            }
+            int displayPx = src.getDisplaySizePx();
+            int half = Math.max(1, displayPx / 2);
+            int cx = src.getCenterX();
+            int cy = src.getCenterY();
+            if (localX < cx - half || localX > cx + half || localY < cy - half || localY > cy + half) {
+                continue;
+            }
+            double dx = localX - cx;
+            double dy = localY - cy;
+            double distSq = dx * dx + dy * dy;
+            if (distSq < bestDistSq) {
+                bestDistSq = distSq;
+                best = src;
+            }
+        }
+        return best;
     }
 
     private static double resourceSourceRotationDegrees(ResourceSource src) {

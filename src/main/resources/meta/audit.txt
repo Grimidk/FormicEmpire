@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 77% (225/294 checked)
+Completion: 74% (228/307 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -86,7 +86,7 @@ Side panels (live updates while playing):
 [X] Colony panel (name, rank)
 [X] Resources panel
 [X] Ant population panel
-[X] Alerts panel (mite outbreaks, shortages, etc.)
+[ ] Alerts panel (icons + short labels; mite outbreaks, shortages, etc.)
 
 ================================================================================
 5. HOTKEYS (also in Help > Tutorials > Hotkeys)
@@ -253,7 +253,7 @@ Room upgrade chains (each tier L0→L3 where applicable):
 [X] Resin Reservoir
 
 Passive / special rooms:
-[X] Passive Lab, Passive Water, Passive Aphid, Passive Nurse
+[ ] Passive Lab, Passive Water, Passive Aphid, Passive Nurse
 [X] Passive Farm, Passive Grave, Composter
 
 [X] Build queues with rock + RP costs
@@ -435,6 +435,9 @@ Colony labour & resources:
 [X] Foraging, farming, nursing, laying, research generation
 [X] Water / food / protein / syrup / rock / resin economy
 [ ] Grave cleaning, policing, mite / parasite ant handling
+[ ] Pet insects — aphids on rancher capacity; mites/dermestids on catcher pool; slow breeding; over-capacity escape next day
+[ ] NPC colonies catch and breed pet insects
+[ ] NPC colonies scout for resource sources (lite daily)
 [ ] Building construction jobs
 [ ] Room passive effects (lab, farm, nurse, etc.)
 
@@ -442,7 +445,7 @@ World:
 [X] Day / month / year / hour ticks
 [X] Weather changes
 [X] Biome differences on hexes
-[X] Resource sources on map (plants, mushrooms, water, prey)
+[ ] Resource sources on map — hover tooltip shows type, size tier, remaining amount
 [X] Nuptial flight colony founding on new hexes
 [ ] Spreading onto dead/defeated hex inherits species genomes and completed assimilations
 [ ] AI dynasties trade, tunnel, diplomacy, war

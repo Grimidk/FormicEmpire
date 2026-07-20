@@ -149,7 +149,8 @@ public class SpanishTranslation implements Translation {
         es.put("COLONY_MILITARY_POWER", "Poder militar: %s");
         es.put("COLONY_MILITARY_POWER_AT_WAR", "Poder militar: %1$s (Activo: %2$s, Reserva: %3$s)");
         
-        es.put("TOOLTIP_PET_INSECTS", "Insectos mascota cuidados por pastoras y capturadoras. Consulta la pestaña Población en estadísticas de colonia (X) para el desglose por especie.");
+        es.put("TOOLTIP_PET_INSECTS", "Insectos mascota: los áfidos usan capacidad de pastoras; ácaros y derméstidos comparten el grupo de capturadoras. Si la capacidad baja, escapan al día siguiente (Áfidos pasivos evita fugas de áfidos). Consulta Población (X) para el detalle.");
+        es.put("TOOLTIP_RESOURCE_SOURCE_FMT", "%s (%s): %s restantes");
         es.put("TOOLTIP_PARASITIC_MITES", "Ácaros microscópicos en tus hormigas. Cada 10 ácaros ralentizan una hormiga a la mitad. Se propagan mensualmente con muchos recursos almacenados.");
         es.put("TOOLTIP_PARASITE_ANTS", "Hormigas parásitas en la colonia");
         es.put("TOOLTIP_POLICING", "Eficiencia de Vigilancia");
@@ -1023,7 +1024,7 @@ public class SpanishTranslation implements Translation {
         es.put("DIPLO_MODIFIER_GENETIC_EXCHANGE", "Intercambio genético");
         es.put("DYNASTY_REBELLION_NAME_FMT", "%s Rebelión");
         es.put("REBELLION_WAR_NAME_FMT", "%s Rebelión %s");
-        es.put("ALERT_REBELLION_RISK_FMT", "¡Riesgo de rebelión en %s!");
+        es.put("ALERT_REBELLION_RISK_FMT", "Riesgo de rebelión: %s");
         es.put("REBELLION_RESPONSE_TITLE", "Rebelión");
         es.put("REBELLION_RESPONSE_MSG_FMT", "%s se ha separado con %s colonias. ¿Luchar para recuperarlas o conceder independencia pacífica?");
         es.put("REBELLION_ACTION_FIGHT", "Luchar");
@@ -1369,7 +1370,7 @@ public class SpanishTranslation implements Translation {
         es.put("ROLE_MILITIA_DESC", "Permite a las obreras realizar tareas defensivas básicas.");
         es.put("ROLE_CATCHER_UPGRADE", "Rol Capturadora");
         es.put("ROLE_CATCHER_FLAVOR", "Captura de Bichos");
-        es.put("ROLE_CATCHER_DESC", "Permite a las soldados capturar insectos nativos en el exterior. Cada capturadora mantiene hasta 10 insectos mascota en total. Los áfidos requieren el rol Pastora; los ácaros simbióticos se desbloquean al aparecer ácaros parásitos; los derméstidos requieren la investigación Captura de escarabajos de fosa. Las parejas se reproducen diariamente con al menos dos ejemplares.");
+        es.put("ROLE_CATCHER_DESC", "Permite a las soldados capturar insectos nativos en el exterior. Cada capturadora mantiene hasta 10 ácaros y derméstidos en total (grupo compartido). Los áfidos usan capacidad de pastoras por separado y requieren el rol Pastora; los ácaros simbióticos se desbloquean al aparecer ácaros parásitos; los derméstidos requieren la investigación Captura de escarabajos de fosa. Las parejas se reproducen lentamente con al menos dos ejemplares.");
         es.put("ROLE_CRANE_UPGRADE", "Rol Grúa de Construcción");
         es.put("ROLE_CRANE_FLAVOR", "Trabajo Pesado");
         es.put("ROLE_CRANE_DESC", "Permite a los majors ayudar en la construcción; cada uno equivale a 25 obreras.");
@@ -1770,7 +1771,7 @@ public class SpanishTranslation implements Translation {
         es.put("HELP_TYPE_QUEEN_DESC", "El corazón de la colonia. Se puede asignar a Poner Huevos o Investigar nuevas tecnologías.");
 
         es.put("HELP_BUG_ANT_DESC", "Hormigas salvajes o rivales que aparecen en el supramundo. Pueden luchar contra tus hormigas y competir por espacio.");
-        es.put("HELP_BUG_APHID_DESC", "Insectos que se alimentan de plantas. Nativos de la mayoría de biomas excepto los secos. Requieren el rol Pastora antes de que las capturadoras puedan recogerlos. Las pastoras cuidan hasta 10 por pastora para obtener jarabe.");
+        es.put("HELP_BUG_APHID_DESC", "Insectos que se alimentan de plantas. Nativos de la mayoría de biomas excepto los secos. Requieren el rol Pastora antes de que las capturadoras puedan recogerlos. Las pastoras cuidan hasta 10 por pastora para jarabe; los áfidos no usan el grupo de capturadoras. Si la capacidad baja, escapan al día siguiente salvo con Granja de Áfidos Pasiva.");
         es.put("HELP_BUG_SYMBIOTIC_MITE_DESC", "Ácaros depredadores de control biológico. Nativos de todos los biomas. Se desbloquea la captura al aparecer los primeros ácaros parásitos. En el corral de insectos. Cada ácaro simbiótico elimina hasta 5 ácaros parásitos al día (12 con Entrenamiento de ácaros simbióticos).");
         es.put("HELP_BUG_DERMESTID_DESC", "Escarabajos que limpian carroña. Nativos de la mayoría de biomas excepto los fríos. Requieren la investigación Captura de escarabajos de fosa. Las coveiras cuidan hasta 10 cada una. Con Escarabajos de fosa, cada uno cuenta como una coveira.");
         es.put("HELP_BUG_PARASITE_ANT_DESC", "Hormigas parásitas que se esconden en el nido y drenan comida en secreto. Nativas de biomas cálidos. Brotes en primavera y verano con más de 1.000 hormigas (25% de probabilidad mensual). Asigna Vigilantes para eliminarlas.");
@@ -1819,14 +1820,31 @@ public class SpanishTranslation implements Translation {
         es.put("HELP_SKIP_TUTORIAL", "Saltar Tutorial");
         es.put("HELP_FINISH", "Finalizar");
 
-        es.put("ALERT_STARVATION_RISK", "Riesgo de inanición");
-        es.put("ALERT_NEW_RESEARCH", "Nueva investigación disponible");
+        es.put("ALERT_STARVATION_RISK", "Hambre");
+        es.put("ALERT_NEW_RESEARCH", "Investigación");
         es.put("ALERT_CAN_BUILD_FMT", "Se puede construir: %s");
-        es.put("ALERT_BODY_PILE_FMT", "Muchos cadáveres: %s");
-        es.put("ALERT_NUPTIAL_FLIGHT", "Vuelo nupcial");
+        es.put("ALERT_BODY_PILE_FMT", "Cadáveres: %s");
+        es.put("ALERT_NUPTIAL_FLIGHT", "Nupcial");
         es.put("ALERT_BUILT_PREFIX", "Construido: ");
         es.put("ALERT_COMPOST_RECYCLED_PREFIX", "Reciclados ");
         es.put("ALERT_COMPOST_BODIES_SUFFIX", " cadáveres");
+        es.put("ALERT_DETAIL_DEATH", "Murieron hormigas en una de tus colonias.");
+        es.put("ALERT_DETAIL_DEAD", "Hay demasiados cadáveres: sube el riesgo de enfermedad. Asigna sepultureras.");
+        es.put("ALERT_DETAIL_STARVE", "El consumo supera la producción y las reservas de hongos son bajas.");
+        es.put("ALERT_DETAIL_RESEARCH", "Puedes costear una nueva mejora de investigación.");
+        es.put("ALERT_DETAIL_BUILD", "Puedes costear empezar este edificio.");
+        es.put("ALERT_DETAIL_SUCC", "Se terminó una construcción o proyecto.");
+        es.put("ALERT_DETAIL_COMP", "Las sepultureras compostaron cadáveres en hongos.");
+        es.put("ALERT_DETAIL_NUPTIAL", "Un vuelo nupcial añadió nuevas reinas.");
+        es.put("ALERT_DETAIL_REBEL", "La lealtad de esta colonia es crítica y puede rebelarse.");
+        es.put("ALERT_DETAIL_WAR", "Un evento de guerra que involucra a tu dinastía.");
+        es.put("ALERT_DETAIL_TRADE", "Una actualización de comercio o convoy de tu dinastía.");
+        es.put("ALERT_DETAIL_DYN", "Un evento a nivel de dinastía.");
+        es.put("ALERT_DETAIL_WARN", "Una advertencia de una de tus colonias.");
+        es.put("ALERT_DETAIL_FAIL", "Algo falló en una de tus colonias.");
+        es.put("ALERT_DETAIL_AUTO", "Se ejecutó una acción de automatización.");
+        es.put("ALERT_DETAIL_PROMO", "Hubo un cambio de rango o capital de colonia.");
+        es.put("ALERT_DETAIL_INFO", "Información de la colonia.");
 
         es.put("ASSIMILATION_DIALOG_SUCCESS_TITLE", "Asimilación completada");
         es.put("ASSIMILATION_DIALOG_SUCCESS_BODY", "Asimilación genética completada\n\n%s finalizada.\nDesbloqueado: %s");
@@ -1908,6 +1926,7 @@ public class SpanishTranslation implements Translation {
         es.put("LOG_PARASITE_ANTS_ELIMINATED_FMT", "Eliminadas %s hormigas parásitas.");
         es.put("LOG_CAUGHT_BUGS_SUMMARY_FMT", "Las capturadoras trajeron %s insecto(s) del exterior.");
         es.put("LOG_CAUGHT_BUG_BRED_FMT", "%s %s se reprodujeron en cautiverio.");
+        es.put("LOG_PET_BUGS_ESCAPED_FMT", "%s insecto(s) mascota escaparon tras caer la capacidad.");
         es.put("LOG_SYMBIOTIC_MITES_PREDATION_FMT", "Los ácaros simbióticos eliminaron %s ácaro(s) parásito(s).");
         es.put("LOG_NUPTIAL_QUEENS_FMT", "Vuelo nupcial. Se unieron %s reinas nuevas.");
         es.put("LOG_SUCCESS_ASSIMILATION_FMT", "¡%s completada! Recompensa: %s");

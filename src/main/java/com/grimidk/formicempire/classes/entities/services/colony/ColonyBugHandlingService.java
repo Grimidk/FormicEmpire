@@ -79,6 +79,19 @@ public class ColonyBugHandlingService {
         return total;
     }
 
+    public int getCatcherPoolPetCount(Colony colony) {
+        if (colony == null) {
+            return 0;
+        }
+        int total = 0;
+        for (BugType type : getPetTypes()) {
+            if (type != GameConstants.TYPE_APHID) {
+                total += getCount(colony, type);
+            }
+        }
+        return total;
+    }
+
     public int getUnlockedPetCount(Colony colony) {
         if (colony == null) {
             return 0;
@@ -92,13 +105,37 @@ public class ColonyBugHandlingService {
         return total;
     }
 
+    public int getUnlockedCatcherPoolPetCount(Colony colony) {
+        if (colony == null) {
+            return 0;
+        }
+        int total = 0;
+        for (BugType type : getPetTypes()) {
+            if (type != GameConstants.TYPE_APHID && canCatchPetBug(colony, type)) {
+                total += getCount(colony, type);
+            }
+        }
+        return total;
+    }
+
     public int getUnlockedPetCapacityMax(Colony colony) {
+        if (colony == null) {
+            return 0;
+        }
+        int aphidCap = 0;
+        if (canCatchPetBug(colony, GameConstants.TYPE_APHID)) {
+            aphidCap = getSpeciesTenderCapacity(colony, GameConstants.TYPE_APHID);
+        }
+        return aphidCap + getUnlockedCatcherPoolCapacityMax(colony);
+    }
+
+    public int getUnlockedCatcherPoolCapacityMax(Colony colony) {
         if (colony == null) {
             return 0;
         }
         int speciesTotal = 0;
         for (BugType type : getPetTypes()) {
-            if (canCatchPetBug(colony, type)) {
+            if (type != GameConstants.TYPE_APHID && canCatchPetBug(colony, type)) {
                 speciesTotal += getSpeciesTenderCapacity(colony, type);
             }
         }
@@ -109,7 +146,7 @@ public class ColonyBugHandlingService {
         if (pool > 0) {
             return Math.min(speciesTotal, pool);
         }
-        return speciesTotal;
+        return 0;
     }
 
     public void setCount(Colony colony, BugType type, int count) {
@@ -118,7 +155,9 @@ public class ColonyBugHandlingService {
         }
         int capped = Math.max(0, Math.min(count, getMaxCapacity(colony, type)));
         colony.applyPetBugCount(type, capped);
-        syncPetBugEntities(colony, type, capped);
+        if (colony.runsFullSimulation()) {
+            syncPetBugEntities(colony, type, capped);
+        }
     }
 
     public int getCatcherPoolCapacity(Colony colony) {
@@ -149,12 +188,12 @@ public class ColonyBugHandlingService {
             return 0;
         }
         int speciesMax = getSpeciesTenderCapacity(colony, type);
-        int poolMax = getCatcherPoolCapacity(colony);
-        int others = getTotalPetCount(colony) - getCount(colony, type);
-        int poolRoom = poolMax - others;
-        if (speciesMax == Integer.MAX_VALUE) {
-            return Math.max(0, poolRoom);
+        if (type == GameConstants.TYPE_APHID) {
+            return Math.max(0, speciesMax);
         }
+        int poolMax = getCatcherPoolCapacity(colony);
+        int others = getCatcherPoolPetCount(colony) - getCount(colony, type);
+        int poolRoom = poolMax - others;
         return Math.max(0, Math.min(speciesMax, poolRoom));
     }
 
@@ -162,11 +201,106 @@ public class ColonyBugHandlingService {
         if (colony == null) {
             return;
         }
+        runEscapes(colony);
         if (colony.hasUpgrade(GameUnlocks.ROLE_CATCHER)) {
             runCatching(colony, biome);
         }
         runBreeding(colony);
         runSymbioticMitePredation(colony);
+    }
+
+    /**
+     * When tender/pool capacity falls below current counts, excess pets leave the next day.
+     * Passive Aphid prevents aphid escapes.
+     */
+    public void runEscapes(Colony colony) {
+        if (colony == null) {
+            return;
+        }
+        int escapedTotal = 0;
+        escapedTotal += escapeAphids(colony);
+        escapedTotal += escapeCatcherPoolPets(colony);
+        if (escapedTotal > 0) {
+            colony.logEvent(ColonyLogPrefixes.INFO + " "
+                    + String.format(LanguageStrings.get(LanguageStrings.LOG_PET_BUGS_ESCAPED_FMT), escapedTotal));
+        }
+    }
+
+    private int escapeAphids(Colony colony) {
+        if (colony.hasBuilding(GameUnlocks.PASSIVE_APHID)) {
+            return 0;
+        }
+        int count = getCount(colony, GameConstants.TYPE_APHID);
+        int max = getMaxCapacity(colony, GameConstants.TYPE_APHID);
+        if (count <= max) {
+            return 0;
+        }
+        int escaped = count - max;
+        applyPetCountUnchecked(colony, GameConstants.TYPE_APHID, max);
+        return escaped;
+    }
+
+    private int escapeCatcherPoolPets(Colony colony) {
+        List<BugType> poolTypes = new ArrayList<>();
+        for (BugType type : getPetTypes()) {
+            if (type != GameConstants.TYPE_APHID) {
+                poolTypes.add(type);
+            }
+        }
+        if (poolTypes.isEmpty()) {
+            return 0;
+        }
+
+        int escaped = 0;
+        int[] targets = new int[poolTypes.size()];
+        for (int i = 0; i < poolTypes.size(); i++) {
+            BugType type = poolTypes.get(i);
+            int count = getCount(colony, type);
+            int speciesMax = getSpeciesTenderCapacity(colony, type);
+            targets[i] = Math.min(count, speciesMax);
+            if (count > targets[i]) {
+                escaped += count - targets[i];
+            }
+        }
+
+        int poolMax = getCatcherPoolCapacity(colony);
+        int sum = 0;
+        for (int target : targets) {
+            sum += target;
+        }
+        if (sum > poolMax) {
+            int overflow = sum - poolMax;
+            escaped += overflow;
+            while (overflow > 0) {
+                int richest = 0;
+                for (int i = 1; i < targets.length; i++) {
+                    if (targets[i] > targets[richest]) {
+                        richest = i;
+                    }
+                }
+                if (targets[richest] <= 0) {
+                    break;
+                }
+                targets[richest]--;
+                overflow--;
+            }
+        }
+
+        for (int i = 0; i < poolTypes.size(); i++) {
+            BugType type = poolTypes.get(i);
+            if (getCount(colony, type) != targets[i]) {
+                applyPetCountUnchecked(colony, type, targets[i]);
+            }
+        }
+        return escaped;
+    }
+
+    private void applyPetCountUnchecked(Colony colony, BugType type, int count) {
+        int sane = Math.max(0, count);
+        colony.applyPetBugCount(type, sane);
+        if (colony.runsFullSimulation()) {
+            syncPetBugEntities(colony, type, sane);
+        }
     }
 
     private void runCatching(Colony colony, Biome biome) {
@@ -211,7 +345,11 @@ public class ColonyBugHandlingService {
             if (count < GameConstants.PET_BREED_MIN_COUNT) {
                 continue;
             }
-            int offspring = count / 2;
+            double expected = count / (double) GameConstants.PET_BREED_DIVISOR;
+            int offspring = (int) expected;
+            if (GameRandom.nextFloat() < (expected - offspring)) {
+                offspring++;
+            }
             int max = getMaxCapacity(colony, type);
             int room = max - count;
             if (offspring <= 0 || room <= 0) {
@@ -281,11 +419,15 @@ public class ColonyBugHandlingService {
         }
         int sane = Math.max(0, Math.min(count, petSaveLoadCap(colony, type)));
         colony.applyPetBugCount(type, sane);
-        syncPetBugEntities(colony, type, sane);
+        if (colony.runsFullSimulation()) {
+            syncPetBugEntities(colony, type, sane);
+        }
     }
 
     private int petSaveLoadCap(Colony colony, BugType type) {
-        int fromRoles = getMaxCapacity(colony, type);
+        int fromRoles = type == GameConstants.TYPE_APHID
+                ? getSpeciesTenderCapacity(colony, type)
+                : getMaxCapacity(colony, type);
         int fromScale = Math.max(
                 GameConstants.PARASITIC_MITE_MIN_MONTHLY_SPAWN,
                 colony.getAntTotal() * GameConstants.PET_CAPACITY_PER_TENDER);
@@ -297,6 +439,9 @@ public class ColonyBugHandlingService {
             return 0;
         }
         int count = getCount(colony, type);
+        if (type == GameConstants.TYPE_APHID && colony.hasBuilding(GameUnlocks.PASSIVE_APHID)) {
+            return count;
+        }
         int cap = getMaxCapacity(colony, type);
         if (cap > 0) {
             return Math.min(count, cap);

@@ -1718,7 +1718,7 @@ public class Colony {
             this.runContamination(); 
             this.runPolicing(); 
         } else {
-            ColonyJobRules.runDailyLite(this, currentTemp);
+            ColonyJobRules.runDailyLite(this, currentTemp, biome, currentHex);
         }
 
         this.age++;

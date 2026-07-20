@@ -149,7 +149,8 @@ public class EnglishTranslation implements Translation {
         en.put("COLONY_MILITARY_POWER", "Military Power: %s");
         en.put("COLONY_MILITARY_POWER_AT_WAR", "Military Power: %1$s (Active: %2$s, Reserve: %3$s)");
         
-        en.put("TOOLTIP_PET_INSECTS", "Pet insects kept by ranchers and catchers. See the Population tab in colony statistics (X) for a breakdown by species.");
+        en.put("TOOLTIP_PET_INSECTS", "Pet insects: aphids use rancher capacity; mites and dermestids share the catcher pool. Over-capacity pets escape the next day (Passive Aphid prevents aphid escapes). See Population (X) for species detail.");
+        en.put("TOOLTIP_RESOURCE_SOURCE_FMT", "%s (%s): %s remaining");
         en.put("TOOLTIP_PARASITIC_MITES", "Microscopic mites on your ants. Every 10 mites slow one ant to half speed. Spread monthly when stored resources are high.");
         en.put("TOOLTIP_PARASITE_ANTS", "Parasite ants in colony");
         en.put("TOOLTIP_POLICING", "Policing Efficiency");
@@ -1023,7 +1024,7 @@ public class EnglishTranslation implements Translation {
         en.put("DIPLO_MODIFIER_GENETIC_EXCHANGE", "Genetic Exchange");
         en.put("DYNASTY_REBELLION_NAME_FMT", "%s Rebellion");
         en.put("REBELLION_WAR_NAME_FMT", "%s %s Rebellion");
-        en.put("ALERT_REBELLION_RISK_FMT", "Rebellion risk at %s!");
+        en.put("ALERT_REBELLION_RISK_FMT", "Rebellion risk: %s");
         en.put("REBELLION_RESPONSE_TITLE", "Rebellion");
         en.put("REBELLION_RESPONSE_MSG_FMT", "%s has broken away with %s colonies. Fight to reclaim them or grant peaceful independence?");
         en.put("REBELLION_ACTION_FIGHT", "Fight");
@@ -1368,7 +1369,7 @@ public class EnglishTranslation implements Translation {
         en.put("ROLE_MILITIA_DESC", "Allows workers to perform basic defensive duties.");
         en.put("ROLE_CATCHER_UPGRADE", "Catcher Role");
         en.put("ROLE_CATCHER_FLAVOR", "Bug Catching");
-        en.put("ROLE_CATCHER_DESC", "Allows soldiers to catch native insects on the overworld. Each catcher maintains up to 10 pet insects total. Aphids need the Rancher role; symbiotic mites unlock when parasitic mites appear; dermestids need Grave Beetle Catching research. Pairs breed daily when you have at least two.");
+        en.put("ROLE_CATCHER_DESC", "Allows soldiers to catch native insects on the overworld. Each catcher maintains up to 10 mites and dermestids total (shared pool). Aphids use rancher capacity separately and need the Rancher role; symbiotic mites unlock when parasitic mites appear; dermestids need Grave Beetle Catching research. Pairs breed slowly when you have at least two.");
         en.put("ROLE_CRANE_UPGRADE", "Construction Crane Role");
         en.put("ROLE_CRANE_FLAVOR", "Heavy Duty");
         en.put("ROLE_CRANE_DESC", "Allows majors to help in the construction of buildings, each one is 25 times as strong.");
@@ -1730,7 +1731,7 @@ public class EnglishTranslation implements Translation {
         en.put("HELP_TYPE_QUEEN_DESC", "The heart of the colony. Can be assigned to Lay Eggs or Research new technologies.");
 
         en.put("HELP_BUG_ANT_DESC", "Wild or rival ants that appear on the overworld. They can fight your ants and compete for space.");
-        en.put("HELP_BUG_APHID_DESC", "Soft-bodied insects that feed on plants. Native to most biomes except dry ones. Requires the Rancher role before catchers can collect them. Ranchers tend penned aphids (up to 10 per rancher) for syrup income.");
+        en.put("HELP_BUG_APHID_DESC", "Soft-bodied insects that feed on plants. Native to most biomes except dry ones. Requires the Rancher role before catchers can collect them. Ranchers tend penned aphids (up to 10 per rancher) for syrup income; aphids do not use the catcher pool. Over-capacity aphids escape the next day unless Passive Aphid is built.");
         en.put("HELP_BUG_SYMBIOTIC_MITE_DESC", "Small predatory mites used as biological control. Native to all biomes. Unlocks for catching when parasitic mites first appear. Kept in the insect pen. Each symbiotic mite eliminates up to 5 parasitic mites per day (12 with Symbiotic Mite Training).");
         en.put("HELP_BUG_DERMESTID_DESC", "Carrion beetles that clean dead tissue. Native to most biomes except cold ones. Requires Grave Beetle Catching research before catchers can collect them. Gravers tend up to 10 each in the graveyard. With Grave Beetles research, each dermestid counts as one graver.");
         en.put("HELP_BUG_PARASITE_ANT_DESC", "Parasite ants that hide in the nest and secretly drain your food. Native to hot biomes. Outbreaks can occur in spring and summer when the colony exceeds 1,000 ants (25% chance per month). Assign Police to find and eliminate them before they spread.");
@@ -1779,14 +1780,31 @@ public class EnglishTranslation implements Translation {
         en.put("HELP_SKIP_TUTORIAL", "Skip Tutorial");
         en.put("HELP_FINISH", "Finish");
 
-        en.put("ALERT_STARVATION_RISK", "Starvation Risk!");
-        en.put("ALERT_NEW_RESEARCH", "New Research Available");
-        en.put("ALERT_CAN_BUILD_FMT", "Can Build: %s");
-        en.put("ALERT_BODY_PILE_FMT", "Body Pile High: %s");
-        en.put("ALERT_NUPTIAL_FLIGHT", "Nuptial Flight Occurred");
+        en.put("ALERT_STARVATION_RISK", "Starving");
+        en.put("ALERT_NEW_RESEARCH", "Research");
+        en.put("ALERT_CAN_BUILD_FMT", "Can build: %s");
+        en.put("ALERT_BODY_PILE_FMT", "Bodies: %s");
+        en.put("ALERT_NUPTIAL_FLIGHT", "Nuptial");
         en.put("ALERT_BUILT_PREFIX", "Built: ");
         en.put("ALERT_COMPOST_RECYCLED_PREFIX", "Recycled ");
         en.put("ALERT_COMPOST_BODIES_SUFFIX", " Bodies");
+        en.put("ALERT_DETAIL_DEATH", "Ants died in one of your colonies.");
+        en.put("ALERT_DETAIL_DEAD", "Corpse pile is high — disease risk rises. Assign gravers.");
+        en.put("ALERT_DETAIL_STARVE", "Food use exceeds production and mushroom stores are low.");
+        en.put("ALERT_DETAIL_RESEARCH", "You can afford a new research upgrade.");
+        en.put("ALERT_DETAIL_BUILD", "You can afford to start this building.");
+        en.put("ALERT_DETAIL_SUCC", "A construction or project finished.");
+        en.put("ALERT_DETAIL_COMP", "Gravers composted corpses into mushrooms.");
+        en.put("ALERT_DETAIL_NUPTIAL", "A nuptial flight added new queens.");
+        en.put("ALERT_DETAIL_REBEL", "This colony's loyalty is critically low and may rebel.");
+        en.put("ALERT_DETAIL_WAR", "A war-related event involving your dynasty.");
+        en.put("ALERT_DETAIL_TRADE", "A trade or convoy update for your dynasty.");
+        en.put("ALERT_DETAIL_DYN", "A dynasty-level event.");
+        en.put("ALERT_DETAIL_WARN", "A warning from one of your colonies.");
+        en.put("ALERT_DETAIL_FAIL", "Something failed in one of your colonies.");
+        en.put("ALERT_DETAIL_AUTO", "An automation action ran.");
+        en.put("ALERT_DETAIL_PROMO", "A colony rank or capital change occurred.");
+        en.put("ALERT_DETAIL_INFO", "Colony information.");
 
         en.put("ASSIMILATION_DIALOG_SUCCESS_TITLE", "Assimilation Success");
         en.put("ASSIMILATION_DIALOG_SUCCESS_BODY", "Genetic Assimilation Complete!\n\n%s finished.\nUnlocked: %s");
@@ -1868,6 +1886,7 @@ public class EnglishTranslation implements Translation {
         en.put("LOG_PARASITE_ANTS_ELIMINATED_FMT", "Eliminated %s parasite ants.");
         en.put("LOG_CAUGHT_BUGS_SUMMARY_FMT", "Catchers brought in %s insect(s) from the wild.");
         en.put("LOG_CAUGHT_BUG_BRED_FMT", "%s %s bred in captivity.");
+        en.put("LOG_PET_BUGS_ESCAPED_FMT", "%s pet insect(s) escaped after capacity fell.");
         en.put("LOG_SYMBIOTIC_MITES_PREDATION_FMT", "Symbiotic mites eliminated %s parasitic mite(s).");
         en.put("LOG_NUPTIAL_QUEENS_FMT", "Nuptial flight occurred. %s new queens joined.");
         en.put("LOG_SUCCESS_ASSIMILATION_FMT", "%s completed! Reward: %s");

@@ -276,6 +276,7 @@ public final class GameConstants {
     public static final int PET_POOL_PER_CATCHER = 10;
     public static final int PET_CAPACITY_PER_TENDER = 10;
     public static final int PET_BREED_MIN_COUNT = 2;
+    public static final int PET_BREED_DIVISOR = 10;
     public static final int PET_COUNT_SAVE_ABS_MAX = 10_000;
     public static final int MAX_PEN_NON_ANT_SPRITES = 500;
     public static final float CATCH_BASE_CHANCE_PER_CATCHER = 0.12f;

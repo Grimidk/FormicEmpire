@@ -11,6 +11,7 @@ import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
 import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.DeathCause;
@@ -37,6 +38,14 @@ public final class ColonyJobRules {
     }
 
     public static void runDailyLite(Colony colony, Temperature currentTemp) {
+        runDailyLite(colony, currentTemp, null, null);
+    }
+
+    public static void runDailyLite(Colony colony, Temperature currentTemp, Biome biome) {
+        runDailyLite(colony, currentTemp, biome, null);
+    }
+
+    public static void runDailyLite(Colony colony, Temperature currentTemp, Biome biome, Hex currentHex) {
         colony.rankUp();
         applyDailyNursing(colony);
         applyDailyEating(colony);
@@ -45,7 +54,8 @@ public final class ColonyJobRules {
         applyDailyComposting(colony);
         applyDailyGraveKeeping(colony);
         applyDailyPolicing(colony);
-        colony.getBugHandlingService().runSymbioticMitePredationLite(colony);
+        colony.getBugHandlingService().runDaily(colony, biome);
+        colony.runScoutting(biome, currentHex);
         colony.getPopulationService().runContamination(colony);
     }
 

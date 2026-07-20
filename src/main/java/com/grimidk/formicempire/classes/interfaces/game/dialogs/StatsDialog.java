@@ -987,8 +987,8 @@ public class StatsDialog extends ZeroDialog {
             if (c.hasUpgrade(GameUnlocks.ROLE_CATCHER)) {
                 showPool = true;
                 catchers += c.getAssignedRoleCount(GameConstants.ROLE_CATCHER);
-                poolUsed += bugs.getUnlockedPetCount(c);
-                poolMax += bugs.getUnlockedPetCapacityMax(c);
+                poolUsed += bugs.getUnlockedCatcherPoolPetCount(c);
+                poolMax += bugs.getUnlockedCatcherPoolCapacityMax(c);
             }
             if (c.hasUpgrade(GameUnlocks.ROLE_GRAVER)) {
                 gravers += c.getAssignedRoleCount(GameConstants.ROLE_GRAVER);
@@ -1172,7 +1172,7 @@ public class StatsDialog extends ZeroDialog {
 
             ranchers += c.getAssignedRoleCount(GameConstants.ROLE_RANCHER);
             aphids += c.getAphids();
-            aphidCap += c.getAssignedRoleCount(GameConstants.ROLE_RANCHER) * cs.getAphidCapacity(c);
+            aphidCap += c.getBugHandlingService().getMaxCapacity(c, GameConstants.TYPE_APHID);
 
             police += c.getAssignedRoleCount(GameConstants.ROLE_POLICE);
             parasiteAnts += c.getParasiteAnts();

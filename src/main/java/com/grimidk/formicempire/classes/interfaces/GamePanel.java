@@ -1331,7 +1331,7 @@ public class GamePanel extends ZeroGamePanel {
 
                     gameAreaPanel.setColony(colony);
 
-                    alertManager = new AlertManager(colony, alertPanel);
+                    alertManager = new AlertManager(colony.getDynasty(), alertPanel);
 
                     triggerManager = new TriggerManager(world, colony, engine);
                     if (frame instanceof TriggerManager.TriggerListener) {
@@ -1507,9 +1507,6 @@ public class GamePanel extends ZeroGamePanel {
         Colony colony = world != null && world.getActiveHex() != null ? world.getActiveHex().getColony() : null;
 
         gameAreaPanel.setColony(colony);
-        if (alertManager != null && colony != null) {
-            alertManager.setColony(colony);
-        }
         if (colony != null && gameAreaPanel.getCurrentDimension() == WorldSpaces.UNDERWORLD) {
             updateGameAreaSize();
         }
@@ -1606,21 +1603,6 @@ public class GamePanel extends ZeroGamePanel {
     private void flushPlayerWarAlerts(World world) {
         if (world == null || alertManager == null || !engineStarted) {
             return;
-        }
-        Dynasty playerDynasty = null;
-        for (Dynasty dynasty : world.getDynastys()) {
-            if (dynasty.isPlayer() && !dynasty.isDefeated()) {
-                playerDynasty = dynasty;
-                break;
-            }
-        }
-        if (playerDynasty == null) {
-            return;
-        }
-        for (Colony playerColony : playerDynasty.getColonies()) {
-            for (String msg : playerColony.consumeEventsWithPrefix(ColonyLogPrefixes.WAR)) {
-                alertManager.ingestLogEvent(msg);
-            }
         }
         alertManager.checkStatus();
     }
