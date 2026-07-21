@@ -15,6 +15,7 @@ import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.Tunnel;
 import com.grimidk.formicempire.classes.entities.services.shared.TriggerProgressService.TriggerProgress;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 
 class TriggerProgressServiceTest {
@@ -45,7 +46,7 @@ class TriggerProgressServiceTest {
         assertTrue(management != null);
         assertFalse(management.isUnlocked());
         assertEquals(3, management.getCurrent());
-        assertEquals(GameConstants.TRIGGER_MANAGEMENT_MIN_COLONIES, management.getRequired());
+        assertEquals(GameNumbers.TRIGGER_MANAGEMENT_MIN_COLONIES, management.getRequired());
     }
 
     @Test
@@ -76,7 +77,7 @@ class TriggerProgressServiceTest {
         TriggerProgress tunnels = find(after, GameUnlocks.ABILITY_AUTO_TUNNELS);
         assertTrue(tunnels != null);
         assertEquals(1, tunnels.getCurrent());
-        assertEquals(GameConstants.AUTO_UPGRADE_MIN_COMPLETE_TUNNELS, tunnels.getRequired());
+        assertEquals(GameNumbers.AUTO_UPGRADE_MIN_COMPLETE_TUNNELS, tunnels.getRequired());
     }
 
     @Test
@@ -92,7 +93,7 @@ class TriggerProgressServiceTest {
         assertTrue(mites != null);
         assertFalse(mites.isUnlocked());
         assertEquals(8_500, mites.getCurrent());
-        assertEquals(GameConstants.PARASITIC_MITE_RESOURCE_THRESHOLD, mites.getRequired());
+        assertEquals(GameNumbers.PARASITIC_MITE_RESOURCE_THRESHOLD, mites.getRequired());
     }
 
     @Test

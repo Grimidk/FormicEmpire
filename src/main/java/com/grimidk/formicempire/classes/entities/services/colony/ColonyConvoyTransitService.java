@@ -12,6 +12,7 @@ import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.Trade;
 import com.grimidk.formicempire.classes.entities.spatial.NeoPoint;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.registries.WorldSpaces;
 
@@ -72,9 +73,9 @@ public class ColonyConvoyTransitService {
                         continue;
                     }
                     updateConvoyAnt(colony, ant, trade);
-                    float moveSpeed = GameConstants.BASE_SPRITE_SPEED;
+                    float moveSpeed = GameNumbers.BASE_SPRITE_SPEED;
                     if (colony.isCreatineDietActive()) {
-                        moveSpeed *= GameConstants.CREATINE_DIET_SPEED_MULTIPLIER;
+                        moveSpeed *= GameNumbers.CREATINE_DIET_SPEED_MULTIPLIER;
                     }
                     if (entry.getKey() == GameConstants.TYPE_WORKER
                             && colony.hasUpgrade(GameUnlocks.STAT_WORKER_SPEED_2)) {
@@ -117,7 +118,7 @@ public class ColonyConvoyTransitService {
 
     private void approachTransitPortal(Colony colony, Ant ant, Trade trade) {
         NeoPoint portal = colony.getSpatialService().getTransitPortal(colony);
-        if (distance(ant.getX(), ant.getY(), portal.x, portal.y) <= GameConstants.CONVOY_PORTAL_APPROACH_PX) {
+        if (distance(ant.getX(), ant.getY(), portal.x, portal.y) <= GameNumbers.CONVOY_PORTAL_APPROACH_PX) {
             enterTunnelWorld(ant, trade);
             return;
         }
@@ -135,8 +136,8 @@ public class ColonyConvoyTransitService {
 
     private void aimTunnelTravel(Ant ant, Trade trade) {
         double bearing = trade.getTunnelBearingRadians();
-        int farX = (int) (ant.getX() + Math.cos(bearing) * GameConstants.CONVOY_TUNNEL_LEG_DISTANCE);
-        int farY = (int) (ant.getY() + Math.sin(bearing) * GameConstants.CONVOY_TUNNEL_LEG_DISTANCE);
+        int farX = (int) (ant.getX() + Math.cos(bearing) * GameNumbers.CONVOY_TUNNEL_LEG_DISTANCE);
+        int farY = (int) (ant.getY() + Math.sin(bearing) * GameNumbers.CONVOY_TUNNEL_LEG_DISTANCE);
         if (!ant.isMoving()) {
             ant.moveTo(new Point(farX, farY));
         }

@@ -6,7 +6,6 @@ To Fix (By decreasing priority) :
 	(none right now)
 	
 	High:
-	Rebalance upgrades, research, assimilation, assistants and researchers in general
 	TODO: icons all unlocks
 	TODO: species sprites and icon: carpenter, weaver, floodplain, jet, gliding, army, ghost, dracula, silver, exploding, bulldog, shining black and desert
 
@@ -22,7 +21,6 @@ To Fix (By decreasing priority) :
 	(none right now)
 
 	Important not Urgent:
-	Modifiable constants for later
 	map hexes look kinda yank
 	Font - self explanatory
 	excel for languages and tags and script to update it

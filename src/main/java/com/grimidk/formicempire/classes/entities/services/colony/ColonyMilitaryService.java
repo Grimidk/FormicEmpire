@@ -7,8 +7,10 @@ import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 
+import java.util.List;
 import java.util.Map;
 
 public final class ColonyMilitaryService {
@@ -17,18 +19,18 @@ public final class ColonyMilitaryService {
     }
 
     public static int computeTypePoints(int workers, int soldiers, int majors, int princesses, int queens) {
-        return workers * GameConstants.MILITARY_WEIGHT_WORKER
-                + soldiers * GameConstants.MILITARY_WEIGHT_SOLDIER
-                + majors * GameConstants.MILITARY_WEIGHT_MAJOR
-                + princesses * GameConstants.MILITARY_WEIGHT_PRINCESS
-                + queens * GameConstants.MILITARY_WEIGHT_QUEEN;
+        return workers * GameNumbers.MILITARY_WEIGHT_WORKER
+                + soldiers * GameNumbers.MILITARY_WEIGHT_SOLDIER
+                + majors * GameNumbers.MILITARY_WEIGHT_MAJOR
+                + princesses * GameNumbers.MILITARY_WEIGHT_PRINCESS
+                + queens * GameNumbers.MILITARY_WEIGHT_QUEEN;
     }
 
     public static float computeStatMultiplier(boolean hasSkeleton, boolean hasAcid) {
-        int hp = hasSkeleton ? GameConstants.MILITARY_BASELINE_HEALTH : 0;
-        int def = hasSkeleton ? GameConstants.MILITARY_BASELINE_DEFENSE : 0;
-        int atk = hasAcid ? GameConstants.MILITARY_BASELINE_ATTACK : 0;
-        int atkSpd = hasAcid ? GameConstants.MILITARY_BASELINE_ATTACK_SPEED : 0;
+        int hp = hasSkeleton ? GameNumbers.MILITARY_BASELINE_HEALTH : 0;
+        int def = hasSkeleton ? GameNumbers.MILITARY_BASELINE_DEFENSE : 0;
+        int atk = hasAcid ? GameNumbers.MILITARY_BASELINE_ATTACK : 0;
+        int atkSpd = hasAcid ? GameNumbers.MILITARY_BASELINE_ATTACK_SPEED : 0;
         return computeStatMultiplierFromBases(hp, atk, def, atkSpd);
     }
 
@@ -45,10 +47,10 @@ public final class ColonyMilitaryService {
     }
 
     public static float computeStatMultiplierFromBases(int baseHealth, int baseAttack, int baseDefense, int baseAttackSpeed) {
-        float hpFactor = baseHealth / (float) GameConstants.MILITARY_BASELINE_HEALTH;
-        float atkFactor = baseAttack / (float) GameConstants.MILITARY_BASELINE_ATTACK;
-        float defFactor = baseDefense / (float) GameConstants.MILITARY_BASELINE_DEFENSE;
-        float spdFactor = baseAttackSpeed / (float) GameConstants.MILITARY_BASELINE_ATTACK_SPEED;
+        float hpFactor = baseHealth / (float) GameNumbers.MILITARY_BASELINE_HEALTH;
+        float atkFactor = baseAttack / (float) GameNumbers.MILITARY_BASELINE_ATTACK;
+        float defFactor = baseDefense / (float) GameNumbers.MILITARY_BASELINE_DEFENSE;
+        float spdFactor = baseAttackSpeed / (float) GameNumbers.MILITARY_BASELINE_ATTACK_SPEED;
         return (hpFactor + atkFactor + defFactor + spdFactor) / 4f;
     }
 
@@ -68,9 +70,9 @@ public final class ColonyMilitaryService {
         if (ratio <= 1f) {
             return 0;
         }
-        float normalized = (ratio - 1f) / (GameConstants.MILITARY_STRENGTH_RATIO_MAX - 1f);
-        return Math.min(GameConstants.MILITARY_STRENGTH_DELTA_MAX,
-                Math.max(0, Math.round(normalized * GameConstants.MILITARY_STRENGTH_DELTA_MAX)));
+        float normalized = (ratio - 1f) / (GameNumbers.MILITARY_STRENGTH_RATIO_MAX - 1f);
+        return Math.min(GameNumbers.MILITARY_STRENGTH_DELTA_MAX,
+                Math.max(0, Math.round(normalized * GameNumbers.MILITARY_STRENGTH_DELTA_MAX)));
     }
 
     public static int getMilitaryReputationAdjustment(int viewerPower, int otherPower) {
@@ -100,7 +102,7 @@ public final class ColonyMilitaryService {
         if (otherPower <= 0 || aiPower <= 0) {
             return 0;
         }
-        float maxRatio = GameConstants.AI_DECLARE_WAR_MAX_TARGET_STRENGTH_RATIO;
+        float maxRatio = GameNumbers.AI_DECLARE_WAR_MAX_TARGET_STRENGTH_RATIO;
         if (otherPower > aiPower * maxRatio) {
             return 0;
         }
@@ -121,7 +123,7 @@ public final class ColonyMilitaryService {
             return 0;
         }
 
-        return GameConstants.AI_DECLARE_WAR_CHANCE
+        return GameNumbers.AI_DECLARE_WAR_CHANCE
                 * repPressure
                 * (0.40 + 0.60 * weaknessUrgency);
     }
@@ -221,13 +223,13 @@ public final class ColonyMilitaryService {
         }
         boolean hasSkeleton = dynasty != null && dynasty.hasUpgrade(GameUnlocks.STAT_SKELETON);
         boolean hasAcid = dynasty != null && dynasty.hasUpgrade(GameUnlocks.STAT_ACID);
-        int baseHealth = hasSkeleton ? GameConstants.MILITARY_BASELINE_HEALTH : 0;
-        int baseDefense = hasSkeleton ? GameConstants.MILITARY_BASELINE_DEFENSE : 0;
+        int baseHealth = hasSkeleton ? GameNumbers.MILITARY_BASELINE_HEALTH : 0;
+        int baseDefense = hasSkeleton ? GameNumbers.MILITARY_BASELINE_DEFENSE : 0;
         int baseAttack = hasAcid
-                ? Math.round(GameConstants.MILITARY_BASELINE_ATTACK * ColonyStatsService.getAssimilatedDamageMultiplier(dynasty))
+                ? Math.round(GameNumbers.MILITARY_BASELINE_ATTACK * ColonyStatsService.getAssimilatedDamageMultiplier(dynasty))
                 : 0;
         int baseAttackSpeed = hasAcid
-                ? Math.round(GameConstants.MILITARY_BASELINE_ATTACK_SPEED
+                ? Math.round(GameNumbers.MILITARY_BASELINE_ATTACK_SPEED
                         * ColonyStatsService.getAssimilatedAttackSpeedMultiplier(dynasty))
                 : 0;
 
@@ -339,7 +341,7 @@ public final class ColonyMilitaryService {
         return dynasty.isAtWar() ? dynasty.getActiveMilitaryPower() : dynasty.getMilitaryPower();
     }
 
-    private static int sizeOf(java.util.List<?> list) {
+    private static int sizeOf(List<?> list) {
         return list != null ? list.size() : 0;
     }
 }

@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 
 class ResourceSourceDisplayTest {
 
@@ -18,10 +19,10 @@ class ResourceSourceDisplayTest {
                 ResourceType.SOURCE_QTY_HUGE,
                 100,
                 200);
-        assertEquals(GameConstants.SOURCE_DISPLAY_PX_HUGE, source.getDisplaySizePx());
+        assertEquals(GameNumbers.SOURCE_DISPLAY_PX_HUGE, source.getDisplaySizePx());
 
         source.decreaseQuantity(ResourceType.SOURCE_QTY_HUGE - ResourceType.SOURCE_QTY_MEDIUM);
-        assertEquals(GameConstants.SOURCE_DISPLAY_PX_MEDIUM, source.getDisplaySizePx());
+        assertEquals(GameNumbers.SOURCE_DISPLAY_PX_MEDIUM, source.getDisplaySizePx());
         assertNotSame(
                 GameConstants.RESOURCE_PLANT.getSourceSpriteHuge(),
                 source.getIconForDisplay());

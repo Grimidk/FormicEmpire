@@ -1375,7 +1375,7 @@ public class EnglishTranslation implements Translation {
         en.put("ROLE_CRANE_DESC", "Allows majors to help in the construction of buildings, each one is 25 times as strong.");
         en.put("ROLE_ASSISTANT_UPGRADE", "Lab Assistant Role");
         en.put("ROLE_ASSISTANT_FLAVOR", "Lab Internship");
-        en.put("ROLE_ASSISTANT_DESC", "Allows princesses to help research with 1/5 the efficiency of queens.");
+        en.put("ROLE_ASSISTANT_DESC", "Allows princesses to help research with 1/50 the efficiency of queens.");
         en.put("ROLE_COURIER_UPGRADE", "Courier Role");
         en.put("ROLE_COURIER_FLAVOR", "Logistic Network");
         en.put("ROLE_COURIER_DESC", "Allows workers to transport resources between colonies.");

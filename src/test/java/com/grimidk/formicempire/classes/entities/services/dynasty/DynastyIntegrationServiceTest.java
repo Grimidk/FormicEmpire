@@ -8,6 +8,7 @@ import com.grimidk.formicempire.classes.entities.services.colony.ColonyStarterSe
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -55,12 +56,12 @@ class DynastyIntegrationServiceTest {
 
     @Test
     void computeIntegrationMonthsPerColonyScalesWithDiplomats() {
-        assertEquals(30.0, GameConstants.computeIntegrationMonthsPerColony(1.0), 0.001);
-        assertEquals(3.0, GameConstants.computeIntegrationMonthsPerColony(100.0), 0.001);
-        assertEquals(0.3, GameConstants.computeIntegrationMonthsPerColony(10000.0), 0.001);
-        assertTrue(GameConstants.computeIntegrationMonthsPerColony(50.0) < 30.0);
-        assertTrue(GameConstants.computeIntegrationMonthsPerColony(200.0)
-                < GameConstants.computeIntegrationMonthsPerColony(100.0));
+        assertEquals(30.0, GameNumbers.computeIntegrationMonthsPerColony(1.0), 0.001);
+        assertEquals(3.0, GameNumbers.computeIntegrationMonthsPerColony(100.0), 0.001);
+        assertEquals(0.3, GameNumbers.computeIntegrationMonthsPerColony(10000.0), 0.001);
+        assertTrue(GameNumbers.computeIntegrationMonthsPerColony(50.0) < 30.0);
+        assertTrue(GameNumbers.computeIntegrationMonthsPerColony(200.0)
+                < GameNumbers.computeIntegrationMonthsPerColony(100.0));
     }
 
     @Test
@@ -241,7 +242,7 @@ class DynastyIntegrationServiceTest {
     void integrationDiplomatsDrawFromAnyColonyWithCapacity() {
         Colony satellite = new Colony(3, "Satellite", false);
         satellite.setAge(7);
-        satellite.setLoyalty(GameConstants.DEFAULT_COLONY_LOYALTY);
+        satellite.setLoyalty(GameNumbers.DEFAULT_COLONY_LOYALTY);
         satellite.setAssignedRoleCount(GameConstants.ROLE_DIPLOMAT, 2);
         overlord.addColony(satellite);
 
@@ -301,7 +302,7 @@ class DynastyIntegrationServiceTest {
 
     private static void ensureWarPopulation(Dynasty dynasty, Colony colony) {
         dynasty.unlockUpgrade(GameUnlocks.TYPE_SOLDIER);
-        int needed = GameConstants.WAR_DECLARATION_MIN_POPULATION
+        int needed = GameNumbers.WAR_DECLARATION_MIN_POPULATION
                 - dynasty.getStatService().getTotalPopulation(dynasty);
         for (int i = 0; i < needed; i++) {
             colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));

@@ -38,6 +38,7 @@ import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryServ
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
@@ -252,7 +253,7 @@ public class World {
         if (fromHex == null || toHex == null) {
             return 0;
         }
-        return GameConstants.axialHexDistance(fromHex.getQ(), fromHex.getR(), toHex.getQ(), toHex.getR());
+        return GameNumbers.axialHexDistance(fromHex.getQ(), fromHex.getR(), toHex.getQ(), toHex.getR());
     }
 
     /**
@@ -279,7 +280,7 @@ public class World {
                 if (toHex == null) {
                     continue;
                 }
-                int distance = GameConstants.axialHexDistance(
+                int distance = GameNumbers.axialHexDistance(
                         fromHex.getQ(), fromHex.getR(), toHex.getQ(), toHex.getR());
                 if (distance < min) {
                     min = distance;

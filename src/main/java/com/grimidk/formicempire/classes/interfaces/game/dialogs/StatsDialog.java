@@ -22,6 +22,7 @@ import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogTexts;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
@@ -511,7 +512,7 @@ public class StatsDialog extends ZeroDialog {
 
         model.addRow(new Object[]{null, null, sep, sep});
         int maxDepl = colony.hasUpgrade(GameUnlocks.STAT_HEX_SUSTAIN)
-                ? GameConstants.HEX_SUSTAIN_MAX_DEPLETION_PCT
+                ? GameNumbers.HEX_SUSTAIN_MAX_DEPLETION_PCT
                 : 100;
         int depletionPct = hex.getResourceDepletionPercentCapped(maxDepl);
         ColonyLocationService locations = colony.getLocationService();
@@ -526,7 +527,7 @@ public class StatsDialog extends ZeroDialog {
             }
         }
         float maxEffDistance = (locations == null || sampleWorker.isEmpty())
-                ? GameConstants.GATHER_FULL_EFFICIENCY_RADIUS_BASE
+                ? GameNumbers.GATHER_FULL_EFFICIENCY_RADIUS_BASE
                 : locations.computeFullEfficiencyRadius(colony, sampleWorker);
         model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_CAT_OVERWORLD), LanguageStrings.get(LanguageStrings.STAT_HEX_DEPLETION), depletionPct + "%"});
         model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_CAT_OVERWORLD), LanguageStrings.get(LanguageStrings.STAT_HEX_SOURCES_FOUND), String.valueOf(sourcesFound)});
@@ -1092,7 +1093,7 @@ public class StatsDialog extends ZeroDialog {
                     projectedParasiticMiteSpawn > 0
                             ? LanguageStrings.format(LanguageStrings.STAT_OUTBREAK_PREV_PROJECTED_FMT, projectedParasiticMiteSpawn)
                             : LanguageStrings.format(LanguageStrings.STAT_INSECT_PARASITIC_CAP_FMT,
-                                    GameConstants.PARASITIC_MITES_PER_SLOWED_ANT)
+                                    GameNumbers.PARASITIC_MITES_PER_SLOWED_ANT)
                 });
             }
             if (showParasiteAnts) {
@@ -1157,7 +1158,7 @@ public class StatsDialog extends ZeroDialog {
             researchers += c.getAssignedRoleCount(GameConstants.ROLE_RESEARCHER);
             assistants += c.getAssignedRoleCount(GameConstants.ROLE_ASSISTANT);
             int baseSpeed = cs.getResearchSpeed(c);
-            dailyRP += (researchers * baseSpeed + (int)(assistants * (baseSpeed / 5.0))) * 24;
+            dailyRP += (researchers * baseSpeed + (int)(assistants * (baseSpeed / (double) GameNumbers.RESEARCH_ASSISTANT_EFFICIENCY_DIVISOR))) * 24;
 
             layers += c.getAssignedRoleCount(GameConstants.ROLE_LAYER);
             dailyEggs += (int)(c.getAssignedRoleCount(GameConstants.ROLE_LAYER) * cs.getLayingRate(c) * 24);

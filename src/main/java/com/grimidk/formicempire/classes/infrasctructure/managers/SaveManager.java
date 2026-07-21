@@ -31,6 +31,7 @@ import com.grimidk.formicempire.classes.infrasctructure.util.GamePaths;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
 import java.util.ArrayList;
@@ -1040,7 +1041,7 @@ public class SaveManager {
             sc.integrationProgressDays = Double.parseDouble(map.getOrDefault("integrationProgressDays", "0"));
         } else {
             sc.integrationProgressMonths = Double.parseDouble(map.getOrDefault("integrationProgressMonths", "0"));
-            sc.integrationProgressDays = sc.integrationProgressMonths * GameConstants.DAYS_PER_MONTH;
+            sc.integrationProgressDays = sc.integrationProgressMonths * GameNumbers.DAYS_PER_MONTH;
         }
         sc.integrationDiplomatsManual = Boolean.parseBoolean(map.getOrDefault("integrationDiplomatsManual", "false"));
         sc.unlockedUpgradeIds = deserializeJsonToList(map.get("unlockedUpgradeIds"));
@@ -1095,7 +1096,7 @@ public class SaveManager {
         sc.autoTunnelsEnabled = Boolean.parseBoolean(map.getOrDefault("autoTunnelsEnabled", "false"));
         sc.age = Integer.parseInt(map.getOrDefault("age", "0"));
         sc.daysWithoutQueen = Integer.parseInt(map.getOrDefault("daysWithoutQueen", "0"));
-        sc.loyalty = Integer.parseInt(map.getOrDefault("loyalty", String.valueOf(GameConstants.DEFAULT_COLONY_LOYALTY)));
+        sc.loyalty = Integer.parseInt(map.getOrDefault("loyalty", String.valueOf(GameNumbers.DEFAULT_COLONY_LOYALTY)));
         sc.militaryPower = Integer.parseInt(map.getOrDefault("militaryPower", "0"));
         sc.q = Integer.parseInt(map.getOrDefault("q", "0"));
         sc.r = Integer.parseInt(map.getOrDefault("r", "0"));

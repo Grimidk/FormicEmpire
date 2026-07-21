@@ -1376,7 +1376,7 @@ public class FrenchTranslation implements Translation {
         fr.put("ROLE_CRANE_DESC", "Permet aux majores d'aider à la construction ; chacune vaut 25 ouvrières.");
         fr.put("ROLE_ASSISTANT_UPGRADE", "Rôle assistante de labo");
         fr.put("ROLE_ASSISTANT_FLAVOR", "Stage en laboratoire");
-        fr.put("ROLE_ASSISTANT_DESC", "Permet aux princesses d'aider la recherche à 1/5 de l'efficacité des reines.");
+        fr.put("ROLE_ASSISTANT_DESC", "Permet aux princesses d'aider la recherche à 1/50e de l'efficacité des reines.");
         fr.put("ROLE_COURIER_UPGRADE", "Rôle messagère");
         fr.put("ROLE_COURIER_FLAVOR", "Réseau logistique");
         fr.put("ROLE_COURIER_DESC", "Permet de transporter des ressources entre colonies.");

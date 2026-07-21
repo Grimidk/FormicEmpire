@@ -14,6 +14,7 @@ import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
@@ -507,7 +508,7 @@ public class ColonyPanel extends ZeroGamePanel {
             int assistantCount = colony.getAssignedRoleCount(GameConstants.ROLE_ASSISTANT);
             int speed = colony.getResearchSpeed();
             int hourlyQueen = researcherCount * speed;
-            int hourlyAssistant = (int) (assistantCount * (speed / 5.0)); 
+            int hourlyAssistant = (int) (assistantCount * (speed / (double) GameNumbers.RESEARCH_ASSISTANT_EFFICIENCY_DIVISOR)); 
             researchRateLabel.setText(LanguageStrings.format(LanguageStrings.COLONY_RESEARCH_RATE, (hourlyQueen + hourlyAssistant) * 24));
         }
 

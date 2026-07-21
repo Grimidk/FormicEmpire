@@ -6,6 +6,7 @@ import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import org.junit.jupiter.api.Test;
 
@@ -95,7 +96,7 @@ class AntSubtypeServiceTest {
         AntSubtypeService.applyNaturalSpeciesSubtypeRates(colony, GameConstants.SPECIES_TRAPJAW);
         assertEquals(50f, colony.getSubtypeHatchRate(GameConstants.TYPE_WORKER, AntSubtypeSlot.HEAD, 2));
         assertEquals(50f, colony.getSubtypeHatchRate(GameConstants.TYPE_WORKER, AntSubtypeSlot.HEAD,
-                GameConstants.SUBTYPE_DIGIT_NONE));
+                GameNumbers.SUBTYPE_DIGIT_NONE));
     }
 
     @Test
@@ -201,7 +202,7 @@ class AntSubtypeServiceTest {
         AntSubtypeService.applyAutomatedSubtypeRates(colony);
 
         assertEquals(100f, colony.getSubtypeHatchRate(GameConstants.TYPE_SOLDIER, AntSubtypeSlot.HEAD,
-                GameConstants.SUBTYPE_DIGIT_NONE));
+                GameNumbers.SUBTYPE_DIGIT_NONE));
     }
 
     @Test

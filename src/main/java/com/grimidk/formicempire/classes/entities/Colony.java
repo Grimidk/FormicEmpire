@@ -34,6 +34,7 @@ import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
@@ -57,7 +58,7 @@ public class Colony {
     private boolean isCapital = false;
     private int age;
     private int daysWithoutQueen;
-    private int loyalty = GameConstants.DEFAULT_COLONY_LOYALTY;
+    private int loyalty = GameNumbers.DEFAULT_COLONY_LOYALTY;
     private int militaryPower;
     private int activeMilitaryPower;
     private int reserveMilitaryPower;
@@ -274,7 +275,7 @@ public class Colony {
         this.isActive = false;
         this.autoBuildEnabled = false;
         this.autoTunnelsEnabled = false;
-        this.loyalty = GameConstants.DEFAULT_COLONY_LOYALTY;
+        this.loyalty = GameNumbers.DEFAULT_COLONY_LOYALTY;
     }
 
     private void initializeBuildings() {
@@ -345,7 +346,7 @@ public class Colony {
         this.autoTunnelsEnabled = savedColony.autoTunnelsEnabled;
         this.age = savedColony.age;
         this.daysWithoutQueen = savedColony.daysWithoutQueen;
-        this.loyalty = GameConstants.clampColonyLoyalty(savedColony.loyalty);
+        this.loyalty = GameNumbers.clampColonyLoyalty(savedColony.loyalty);
         this.militaryPower = savedColony.militaryPower;
         this.totalDeaths = savedColony.totalDeaths;
 
@@ -599,7 +600,7 @@ public class Colony {
     }
 
     public void setLoyalty(int loyalty) {
-        this.loyalty = GameConstants.clampColonyLoyalty(loyalty);
+        this.loyalty = GameNumbers.clampColonyLoyalty(loyalty);
     }
 
     public int getLoyaltyModifierBonus(TradeManager tradeManager, World world) {
@@ -633,7 +634,7 @@ public class Colony {
             return 0;
         }
         int tiles = world.colonyHexDistance(this, capital);
-        return GameConstants.getCapitalDistanceLoyaltyPenalty(tiles);
+        return GameNumbers.getCapitalDistanceLoyaltyPenalty(tiles);
     }
 
     public int getCapitalHexDistance(World world) {
@@ -660,7 +661,7 @@ public class Colony {
     }
 
     public int getEffectiveLoyalty(TradeManager tradeManager, World world) {
-        return GameConstants.clampColonyLoyalty(
+        return GameNumbers.clampColonyLoyalty(
                 loyalty + getLoyaltyModifierBonus(tradeManager, world) + getDiplomatLoyaltyBonus());
     }
 
@@ -1294,15 +1295,15 @@ public class Colony {
 
     public float getSubtypeHatchRate(AntType type, AntSubtypeSlot slot, int digit) {
         if (type == null) {
-            return digit == GameConstants.SUBTYPE_DIGIT_NONE ? 100f : 0f;
+            return digit == GameNumbers.SUBTYPE_DIGIT_NONE ? 100f : 0f;
         }
         Map<AntSubtypeSlot, Map<Integer, Float>> typeRates = subtypeHatchRates.get(type);
         if (typeRates == null) {
-            return digit == GameConstants.SUBTYPE_DIGIT_NONE ? 100f : 0f;
+            return digit == GameNumbers.SUBTYPE_DIGIT_NONE ? 100f : 0f;
         }
         Map<Integer, Float> slotRates = typeRates.get(slot);
         if (slotRates == null) {
-            return digit == GameConstants.SUBTYPE_DIGIT_NONE ? 100f : 0f;
+            return digit == GameNumbers.SUBTYPE_DIGIT_NONE ? 100f : 0f;
         }
         return slotRates.getOrDefault(digit, 0f);
     }
@@ -1472,7 +1473,7 @@ public class Colony {
     }
 
     public int getPheromoneStormMonthsRemaining() {
-        return GameConstants.daysToMonthsCeil(
+        return GameNumbers.daysToMonthsCeil(
                 getLoyaltyModifierRemainingDays(GameConstants.LOYALTY_MODIFIER_PHEROMONE_STORM.getNameKey()));
     }
 
@@ -1481,12 +1482,12 @@ public class Colony {
     }
 
     public int getRecentlyConqueredMonthsRemaining() {
-        return GameConstants.daysToMonthsCeil(
+        return GameNumbers.daysToMonthsCeil(
                 getLoyaltyModifierRemainingDays(GameConstants.LOYALTY_MODIFIER_RECENTLY_CONQUERED.getNameKey()));
     }
 
     public void setRecentlyConqueredMonthsRemaining(int months) {
-        applyLoyaltyModifier(GameConstants.LOYALTY_MODIFIER_RECENTLY_CONQUERED, GameConstants.monthsToDays(months));
+        applyLoyaltyModifier(GameConstants.LOYALTY_MODIFIER_RECENTLY_CONQUERED, GameNumbers.monthsToDays(months));
     }
 
     public boolean isRecentlyIntegrated() {
@@ -1494,12 +1495,12 @@ public class Colony {
     }
 
     public int getRecentlyIntegratedMonthsRemaining() {
-        return GameConstants.daysToMonthsCeil(
+        return GameNumbers.daysToMonthsCeil(
                 getLoyaltyModifierRemainingDays(GameConstants.LOYALTY_MODIFIER_RECENTLY_INTEGRATED.getNameKey()));
     }
 
     public void setRecentlyIntegratedMonthsRemaining(int months) {
-        applyLoyaltyModifier(GameConstants.LOYALTY_MODIFIER_RECENTLY_INTEGRATED, GameConstants.monthsToDays(months));
+        applyLoyaltyModifier(GameConstants.LOYALTY_MODIFIER_RECENTLY_INTEGRATED, GameNumbers.monthsToDays(months));
     }
 
     public boolean hasActiveLoyaltyModifier(String modifierKey) {
@@ -1508,7 +1509,7 @@ public class Colony {
         }
         Integer remaining = loyaltyModifierRemainingDays.get(modifierKey);
         return remaining != null
-                && (remaining == GameConstants.MODIFIER_PERMANENT || remaining > 0);
+                && (remaining == GameNumbers.MODIFIER_PERMANENT || remaining > 0);
     }
 
     public int getLoyaltyModifierRemainingDays(String modifierKey) {
@@ -1519,7 +1520,7 @@ public class Colony {
         if (modifier == null) {
             return;
         }
-        applyLoyaltyModifier(modifier, GameConstants.initialModifierRemainingDays(modifier));
+        applyLoyaltyModifier(modifier, GameNumbers.initialModifierRemainingDays(modifier));
     }
 
     public void applyLoyaltyModifier(ColonyLoyaltyModifier modifier, int remainingDays) {
@@ -1537,17 +1538,17 @@ public class Colony {
         if (pheromoneStormMonthsRemaining > 0) {
             applyLoyaltyModifier(
                     GameConstants.LOYALTY_MODIFIER_PHEROMONE_STORM,
-                    GameConstants.monthsToDays(pheromoneStormMonthsRemaining));
+                    GameNumbers.monthsToDays(pheromoneStormMonthsRemaining));
         }
         if (recentlyConqueredMonthsRemaining > 0) {
             applyLoyaltyModifier(
                     GameConstants.LOYALTY_MODIFIER_RECENTLY_CONQUERED,
-                    GameConstants.monthsToDays(recentlyConqueredMonthsRemaining));
+                    GameNumbers.monthsToDays(recentlyConqueredMonthsRemaining));
         }
         if (recentlyIntegratedMonthsRemaining > 0) {
             applyLoyaltyModifier(
                     GameConstants.LOYALTY_MODIFIER_RECENTLY_INTEGRATED,
-                    GameConstants.monthsToDays(recentlyIntegratedMonthsRemaining));
+                    GameNumbers.monthsToDays(recentlyIntegratedMonthsRemaining));
         }
         pheromoneStormMonthsRemaining = 0;
         recentlyConqueredMonthsRemaining = 0;
@@ -1558,7 +1559,7 @@ public class Colony {
         List<String> expired = new ArrayList<>();
         for (Map.Entry<String, Integer> entry : loyaltyModifierRemainingDays.entrySet()) {
             int remaining = entry.getValue();
-            if (remaining == GameConstants.MODIFIER_PERMANENT) {
+            if (remaining == GameNumbers.MODIFIER_PERMANENT) {
                 continue;
             }
             if (remaining <= 1) {
@@ -1588,7 +1589,7 @@ public class Colony {
         if (!hasUpgrade(GameUnlocks.ABILITY_PHEROMONE_STORM) || isPheromoneStormActive()) {
             return false;
         }
-        int cost = GameConstants.PHEROMONE_STORM_SYRUP_COST;
+        int cost = GameNumbers.PHEROMONE_STORM_SYRUP_COST;
         if (getSyrups() < cost) {
             return false;
         }
@@ -1597,7 +1598,7 @@ public class Colony {
         logEvent(ColonyLogPrefixes.INFO + " "
                 + LanguageStrings.format(LanguageStrings.LOG_PHEROMONE_STORM_STARTED_FMT,
                         GameConstants.LOYALTY_MODIFIER_PHEROMONE_STORM.getLoyaltyDelta(),
-                        GameConstants.PHEROMONE_STORM_DURATION_MONTHS));
+                        GameNumbers.PHEROMONE_STORM_DURATION_MONTHS));
         return true;
     }
 
@@ -1605,15 +1606,15 @@ public class Colony {
         if (!hasUpgrade(GameUnlocks.ABILITY_CREATINE_DIET) || isCreatineDietActive()) {
             return false;
         }
-        int cost = GameConstants.CREATINE_DIET_PROTEIN_COST;
+        int cost = GameNumbers.CREATINE_DIET_PROTEIN_COST;
         if (getProtein() < cost) {
             return false;
         }
         setProtein(getProteinPrecise() - cost);
-        creatineDietMonthsRemaining = GameConstants.CREATINE_DIET_DURATION_MONTHS;
+        creatineDietMonthsRemaining = GameNumbers.CREATINE_DIET_DURATION_MONTHS;
         logEvent(ColonyLogPrefixes.INFO + " "
                 + LanguageStrings.format(LanguageStrings.LOG_CREATINE_DIET_STARTED_FMT,
-                        GameConstants.CREATINE_DIET_DURATION_MONTHS));
+                        GameNumbers.CREATINE_DIET_DURATION_MONTHS));
         return true;
     }
 

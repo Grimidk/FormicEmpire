@@ -12,6 +12,7 @@ import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.Tunnel;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 
 public final class DynastyTradeAutomation {
@@ -76,13 +77,13 @@ public final class DynastyTradeAutomation {
         double originRatio = originAmount / originCap;
         double destRatio = destAmount / destCap;
 
-        if (originRatio < GameConstants.TRADE_AUTOMATION_SURPLUS_RATIO
-                || destRatio > GameConstants.TRADE_AUTOMATION_DEFICIT_RATIO) {
+        if (originRatio < GameNumbers.TRADE_AUTOMATION_SURPLUS_RATIO
+                || destRatio > GameNumbers.TRADE_AUTOMATION_DEFICIT_RATIO) {
             return;
         }
 
-        double surplus = originAmount - (originCap * GameConstants.TRADE_AUTOMATION_DEFICIT_RATIO);
-        double destRoom = (destCap * GameConstants.TRADE_AUTOMATION_SURPLUS_RATIO) - destAmount;
+        double surplus = originAmount - (originCap * GameNumbers.TRADE_AUTOMATION_DEFICIT_RATIO);
+        double destRoom = (destCap * GameNumbers.TRADE_AUTOMATION_SURPLUS_RATIO) - destAmount;
         double amount = Math.min(surplus, destRoom);
 
         if (amount >= 1.0) {

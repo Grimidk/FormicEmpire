@@ -6,6 +6,7 @@ import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 
 import java.util.HashMap;
 import java.util.List;
@@ -67,7 +68,7 @@ public class DynastyStatService {
             int assistants = c.getAssignedRoleCount(GameConstants.ROLE_ASSISTANT);            
             int baseSpeed = c.getStatsService().getResearchSpeed(c);
             int hourlyQueen = researchers * baseSpeed;
-            int hourlyAssistant = (int) (assistants * (baseSpeed / 5.0));
+            int hourlyAssistant = (int) (assistants * (baseSpeed / (double) GameNumbers.RESEARCH_ASSISTANT_EFFICIENCY_DIVISOR));
             
             totalDaily += (hourlyQueen + hourlyAssistant) * 24;
         }

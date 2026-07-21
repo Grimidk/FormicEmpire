@@ -7,6 +7,7 @@ import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastySynergyService;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 
 import java.util.List;
@@ -204,16 +205,16 @@ public class ColonyStatsService {
 
         float mult;
         if (superVenom) {
-            mult = GameConstants.ASSIMILATED_DAMAGE_SYNERGY_FIRE_DEADLY;
+            mult = GameNumbers.ASSIMILATED_DAMAGE_SYNERGY_FIRE_DEADLY;
         } else {
             mult = 1f;
             boolean fire = dynasty.hasUpgrade(GameUnlocks.ASSIMILATED_FIREVENOM);
             boolean deadly = dynasty.hasUpgrade(GameUnlocks.ASSIMILATED_DEADLYVENOM);
             if (fire) {
-                mult = GameConstants.ASSIMILATED_DAMAGE_MULT_FIRE;
+                mult = GameNumbers.ASSIMILATED_DAMAGE_MULT_FIRE;
             }
             if (deadly) {
-                mult += GameConstants.ASSIMILATED_DAMAGE_ADD_DEADLY;
+                mult += GameNumbers.ASSIMILATED_DAMAGE_ADD_DEADLY;
             }
         }
         return mult;
@@ -221,7 +222,7 @@ public class ColonyStatsService {
 
     public static float getAssimilatedAttackSpeedMultiplier(Dynasty dynasty) {
         if (dynasty != null && dynasty.hasUpgrade(GameUnlocks.ASSIMILATED_FASTBITE)) {
-            return GameConstants.ASSIMILATED_ATTACK_SPEED_MULT_FASTBITE;
+            return GameNumbers.ASSIMILATED_ATTACK_SPEED_MULT_FASTBITE;
         }
         return 1f;
     }
@@ -231,7 +232,7 @@ public class ColonyStatsService {
             return 0;
         }
         float mult = getAssimilatedDamageMultiplier(colony.getDynasty());
-        return Math.round(GameConstants.MILITARY_BASELINE_ATTACK * mult);
+        return Math.round(GameNumbers.MILITARY_BASELINE_ATTACK * mult);
     }
 
     public int getBaseAttackSpeed(Colony colony) {
@@ -239,7 +240,7 @@ public class ColonyStatsService {
             return 0;
         }
         float mult = getAssimilatedAttackSpeedMultiplier(colony.getDynasty());
-        return Math.round(GameConstants.MILITARY_BASELINE_ATTACK_SPEED * mult);
+        return Math.round(GameNumbers.MILITARY_BASELINE_ATTACK_SPEED * mult);
     }
 
     public int getBaseDefense(Colony colony) { return colony.hasUpgrade(GameUnlocks.STAT_SKELETON) ? 5 : 0; }

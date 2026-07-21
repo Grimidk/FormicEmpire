@@ -1376,7 +1376,7 @@ public class SpanishTranslation implements Translation {
         es.put("ROLE_CRANE_DESC", "Permite a los majors ayudar en la construcción; cada uno equivale a 25 obreras.");
         es.put("ROLE_ASSISTANT_UPGRADE", "Rol Asistente de Laboratorio");
         es.put("ROLE_ASSISTANT_FLAVOR", "Pasantía en Laboratorio");
-        es.put("ROLE_ASSISTANT_DESC", "Permite a las princesas ayudar en investigación con 1/5 de la eficiencia de las reinas.");
+        es.put("ROLE_ASSISTANT_DESC", "Permite a las princesas ayudar en investigación con 1/50 de la eficiencia de las reinas.");
         es.put("ROLE_COURIER_UPGRADE", "Rol Mensajera");
         es.put("ROLE_COURIER_FLAVOR", "Red Logística");
         es.put("ROLE_COURIER_DESC", "Permite a las obreras transportar recursos entre colonias.");

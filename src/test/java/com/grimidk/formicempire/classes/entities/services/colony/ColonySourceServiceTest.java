@@ -11,6 +11,7 @@ import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 
 class ColonySourceServiceTest {
@@ -51,6 +52,6 @@ class ColonySourceServiceTest {
         double near = ColonySourceService.GatheringMath.gatheringEfficiency(0, 0, 10, 10, 100f);
         double far = ColonySourceService.GatheringMath.gatheringEfficiency(0, 0, 500, 500, 100f);
         assertTrue(near > far);
-        assertTrue(far >= GameConstants.GATHER_MIN_EFFICIENCY);
+        assertTrue(far >= GameNumbers.GATHER_MIN_EFFICIENCY);
     }
 }

@@ -12,6 +12,7 @@ import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -371,7 +372,7 @@ class WarServiceTest {
 
     private static void ensureWarPopulation(Dynasty dynasty, Colony colony) {
         dynasty.unlockUpgrade(GameUnlocks.TYPE_SOLDIER);
-        int needed = GameConstants.WAR_DECLARATION_MIN_POPULATION
+        int needed = GameNumbers.WAR_DECLARATION_MIN_POPULATION
                 - dynasty.getStatService().getTotalPopulation(dynasty);
         for (int i = 0; i < needed; i++) {
             colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));

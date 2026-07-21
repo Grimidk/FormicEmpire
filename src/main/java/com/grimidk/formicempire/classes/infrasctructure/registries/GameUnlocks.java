@@ -30,7 +30,7 @@ public final class GameUnlocks {
         public static final Upgrade TYPE_MAJOR = new Upgrade(4, "TYPE_MAJOR", "TYPE_MAJOR_FLAVOR", "TYPE_MAJOR_DESC", TYPE_SOLDIER, 0, null );
         static { upgrades.add(TYPE_MAJOR); }
         // TODO asset: icons/types/Princess.png (upgrade tree icon)
-        public static final Upgrade TYPE_PRINCESS = new Upgrade(5, "TYPE_PRINCESS_DRONE", "TYPE_PRINCESS_FLAVOR", "TYPE_PRINCESS_DESC", TYPE_EGG, 3000, null );
+        public static final Upgrade TYPE_PRINCESS = new Upgrade(5, "TYPE_PRINCESS_DRONE", "TYPE_PRINCESS_FLAVOR", "TYPE_PRINCESS_DESC", TYPE_EGG, 1000, null );
         static { upgrades.add(TYPE_PRINCESS); }
         // TODO asset: icons/types/Queen.png (upgrade tree icon)
         public static final Upgrade TYPE_QUEEN = new Upgrade(6, "TYPE_QUEEN", "TYPE_QUEEN_FLAVOR", "TYPE_QUEEN_DESC", TYPE_PRINCESS, 0, null );
@@ -56,13 +56,13 @@ public final class GameUnlocks {
         public static final Upgrade ROLE_LAYER = new Upgrade(12, "ROLE_LAYER_UPGRADE", "ROLE_LAYER_FLAVOR", "ROLE_LAYER_DESC", TYPE_QUEEN, 0, null );
         static { upgrades.add(ROLE_LAYER); }
         // TODO asset: icons/roles/Rancher.png (upgrade tree icon; may diverge from role icon)
-        public static final Upgrade ROLE_RANCHER = new Upgrade(13, "ROLE_RANCHER_UPGRADE", "ROLE_RANCHER_FLAVOR", "ROLE_RANCHER_DESC", ROLE_FORAGER, 500, null );
+        public static final Upgrade ROLE_RANCHER = new Upgrade(13, "ROLE_RANCHER_UPGRADE", "ROLE_RANCHER_FLAVOR", "ROLE_RANCHER_DESC", ROLE_FORAGER, 250, null );
         static { upgrades.add(ROLE_RANCHER); }
         // TODO asset: icons/roles/Researcher.png (upgrade tree icon; may diverge from role icon)
         public static final Upgrade ROLE_RESEARCHER = new Upgrade(14, "ROLE_RESEARCHER_UPGRADE", "ROLE_RESEARCHER_FLAVOR", "ROLE_RESEARCHER_DESC", TYPE_QUEEN, 0, null );
         static { upgrades.add(ROLE_RESEARCHER); }
         // TODO asset: icons/roles/Builder.png (upgrade tree icon; may diverge from role icon)
-        public static final Upgrade ROLE_BUILDER = new Upgrade(15, "ROLE_BUILDER_UPGRADE", "ROLE_BUILDER_FLAVOR", "ROLE_BUILDER_DESC", TYPE_WORKER, 250, null );
+        public static final Upgrade ROLE_BUILDER = new Upgrade(15, "ROLE_BUILDER_UPGRADE", "ROLE_BUILDER_FLAVOR", "ROLE_BUILDER_DESC", TYPE_WORKER, 150, null );
         static { upgrades.add(ROLE_BUILDER); }
         // TODO asset: icons/roles/Scout.png (upgrade tree icon; may diverge from role icon)
         public static final Upgrade ROLE_SCOUT = new Upgrade(16, "ROLE_SCOUT_UPGRADE", "ROLE_SCOUT_FLAVOR", "ROLE_SCOUT_DESC", TYPE_WORKER, 0, null );
@@ -113,7 +113,7 @@ public final class GameUnlocks {
         public static final Upgrade ROLE_CRANE = new Upgrade(34, "ROLE_CRANE_UPGRADE", "ROLE_CRANE_FLAVOR", "ROLE_CRANE_DESC", TYPE_MAJOR, 250000, null );
         static { upgrades.add(ROLE_CRANE); }
         // TODO asset: icons/roles/Assistant.png (upgrade tree icon; may diverge from role icon)
-        public static final Upgrade ROLE_ASSISTANT = new Upgrade(36, "ROLE_ASSISTANT_UPGRADE", "ROLE_ASSISTANT_FLAVOR", "ROLE_ASSISTANT_DESC", TYPE_PRINCESS, 1500, null );
+        public static final Upgrade ROLE_ASSISTANT = new Upgrade(36, "ROLE_ASSISTANT_UPGRADE", "ROLE_ASSISTANT_FLAVOR", "ROLE_ASSISTANT_DESC", TYPE_PRINCESS, 1200, null );
         static { upgrades.add(ROLE_ASSISTANT); }
 
         // -- Abilities --
@@ -240,13 +240,13 @@ public final class GameUnlocks {
         public static final Upgrade STAT_LONGEVITY = new Upgrade(103, "STAT_LONGEVITY", "STAT_LONGEVITY_FLAVOR", "STAT_LONGEVITY_DESC", TYPE_EGG, 0, null );
         static { upgrades.add(STAT_LONGEVITY); }
         // TODO asset: icons/upgrades/StatResearch1.png
-        public static final Upgrade STAT_RESEARCH_1 = new Upgrade(104, "STAT_RESEARCH_1", "STAT_RESEARCH_1_FLAVOR", "STAT_RESEARCH_1_DESC", ROLE_RESEARCHER, 800, null );
+        public static final Upgrade STAT_RESEARCH_1 = new Upgrade(104, "STAT_RESEARCH_1", "STAT_RESEARCH_1_FLAVOR", "STAT_RESEARCH_1_DESC", ROLE_RESEARCHER, 500, null );
         static { upgrades.add(STAT_RESEARCH_1); }
         // TODO asset: icons/upgrades/StatResearch2.png
-        public static final Upgrade STAT_RESEARCH_2 = new Upgrade(105, "STAT_RESEARCH_2", "STAT_RESEARCH_2_FLAVOR", "STAT_RESEARCH_2_DESC", STAT_RESEARCH_1, 2500, null );
+        public static final Upgrade STAT_RESEARCH_2 = new Upgrade(105, "STAT_RESEARCH_2", "STAT_RESEARCH_2_FLAVOR", "STAT_RESEARCH_2_DESC", STAT_RESEARCH_1, 2000, null );
         static { upgrades.add(STAT_RESEARCH_2); }
         // TODO asset: icons/upgrades/StatResearch3.png
-        public static final Upgrade STAT_RESEARCH_3 = new Upgrade(106, "STAT_RESEARCH_3", "STAT_RESEARCH_3_FLAVOR", "STAT_RESEARCH_3_DESC", STAT_RESEARCH_2, 12000, null );
+        public static final Upgrade STAT_RESEARCH_3 = new Upgrade(106, "STAT_RESEARCH_3", "STAT_RESEARCH_3_FLAVOR", "STAT_RESEARCH_3_DESC", STAT_RESEARCH_2, 7500, null );
         static { upgrades.add(STAT_RESEARCH_3); }
         // TODO asset: icons/upgrades/StatGrowth1.png
         public static final Upgrade STAT_GROWTH_1 = new Upgrade(107, "STAT_GROWTH_1", "STAT_GROWTH_1_FLAVOR", "STAT_GROWTH_1_DESC", TYPE_EGG, 3500, null );

@@ -9,6 +9,7 @@ import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryS
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -146,7 +147,7 @@ class WarCapitalCaptureTest {
     }
 
     private static void seedMilitary(Dynasty dynasty, Colony colony) {
-        for (int i = 0; i < GameConstants.WAR_DECLARATION_MIN_POPULATION; i++) {
+        for (int i = 0; i < GameNumbers.WAR_DECLARATION_MIN_POPULATION; i++) {
             colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
         }
         for (int i = 0; i < 20; i++) {

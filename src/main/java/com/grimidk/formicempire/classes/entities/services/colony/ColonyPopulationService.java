@@ -9,6 +9,7 @@ import com.grimidk.formicempire.classes.infrasctructure.registries.DeathCause;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.Season;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
@@ -390,7 +391,7 @@ public class ColonyPopulationService {
         if (spawn <= 0) {
             return 0;
         }
-        return spawn * GameConstants.PARASITE_OUTBREAK_PREVENTION_MULTIPLIER;
+        return spawn * GameNumbers.PARASITE_OUTBREAK_PREVENTION_MULTIPLIER;
     }
 
     public boolean isParasiteAntOutbreakPrevented(Colony colony, Biome biome, Season season) {
@@ -413,7 +414,7 @@ public class ColonyPopulationService {
         if (isParasiteAntOutbreakPrevented(colony, biome, season)) {
             return;
         }
-        if (GameRandom.nextFloat() > GameConstants.PARASITE_OUTBREAK_CHANCE) {
+        if (GameRandom.nextFloat() > GameNumbers.PARASITE_OUTBREAK_CHANCE) {
             return;
         }
 

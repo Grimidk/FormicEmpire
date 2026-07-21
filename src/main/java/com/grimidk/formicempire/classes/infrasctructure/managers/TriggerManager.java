@@ -10,6 +10,7 @@ import com.grimidk.formicempire.classes.entities.services.colony.AntSubtypeServi
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
@@ -281,7 +282,7 @@ public class TriggerManager {
     private void checkResearchRoleUnlock() {
         if (playerColony.hasUpgrade(GameUnlocks.ROLE_RESEARCHER)) return;
 
-        boolean timeMet = (world.getYear() * 12 + world.getMonth()) >= GameConstants.TRIGGER_RESEARCHER_MIN_MONTHS;
+        boolean timeMet = (world.getYear() * 12 + world.getMonth()) >= GameNumbers.TRIGGER_RESEARCHER_MIN_MONTHS;
         if (timeMet) {
             fireLocalizedTrigger(GameUnlocks.ROLE_RESEARCHER,
                 LanguageStrings.TRIGGER_RESEARCHER_ROLE_TITLE,
@@ -292,7 +293,7 @@ public class TriggerManager {
     private void checkGraveKeeperUnlock() {
         if (playerColony.hasUpgrade(GameUnlocks.ROLE_GRAVER)) return;
         
-        if (playerColony.getDeadAnts().size() >= GameConstants.TRIGGER_GRAVER_DEAD_ANTS) { 
+        if (playerColony.getDeadAnts().size() >= GameNumbers.TRIGGER_GRAVER_DEAD_ANTS) { 
             fireLocalizedTrigger(GameUnlocks.ROLE_GRAVER,
                 LanguageStrings.TRIGGER_GRAVER_ROLE_TITLE,
                 LanguageStrings.TRIGGER_GRAVER_ROLE_MSG);
@@ -302,7 +303,7 @@ public class TriggerManager {
     private void checkResearchAbilityUnlock() {
         if (playerColony.hasUpgrade(GameUnlocks.ABILITY_RESEARCH)) return;
         
-        if (playerColony.getResearchPoints() >= GameConstants.TRIGGER_RESEARCH_MIN_RP) {
+        if (playerColony.getResearchPoints() >= GameNumbers.TRIGGER_RESEARCH_MIN_RP) {
             fireLocalizedTrigger(GameUnlocks.ABILITY_RESEARCH,
                 LanguageStrings.TRIGGER_RESEARCH_ABILITY_TITLE,
                 LanguageStrings.TRIGGER_RESEARCH_ABILITY_MSG);
@@ -362,7 +363,7 @@ public class TriggerManager {
     private void checkScoutRoleUnlock() {
         if (playerColony.hasUpgrade(GameUnlocks.ROLE_SCOUT)) return;
 
-        if (plantHarvestProgress(playerColony) >= GameConstants.TRIGGER_SCOUT_PLANT_COLLECTED) {
+        if (plantHarvestProgress(playerColony) >= GameNumbers.TRIGGER_SCOUT_PLANT_COLLECTED) {
             fireLocalizedTrigger(GameUnlocks.ROLE_SCOUT,
                 LanguageStrings.TRIGGER_SCOUT_ROLE_TITLE,
                 LanguageStrings.TRIGGER_SCOUT_ROLE_MSG);
@@ -389,7 +390,7 @@ public class TriggerManager {
     private void checkPoliceRoleUnlock() {
         if (playerColony.hasUpgrade(GameUnlocks.ROLE_POLICE)) return;
         
-        if (playerColony.getRank().getPopulation() >= GameConstants.TRIGGER_POLICE_MIN_POPULATION) {
+        if (playerColony.getRank().getPopulation() >= GameNumbers.TRIGGER_POLICE_MIN_POPULATION) {
             fireLocalizedTrigger(GameUnlocks.ROLE_POLICE,
                 LanguageStrings.TRIGGER_POLICE_ROLE_TITLE,
                 LanguageStrings.TRIGGER_POLICE_ROLE_MSG);
@@ -455,7 +456,7 @@ public class TriggerManager {
         if (playerColony.getDynasty() == null) return;
         if (playerColony.hasUpgrade(GameUnlocks.ABILITY_MASS_FLIGHT)) return;
 
-        if (playerColony.getDynasty().getTotalNuptialFlights() >= GameConstants.TRIGGER_MASS_FLIGHT_MIN_NUPTIALS) {
+        if (playerColony.getDynasty().getTotalNuptialFlights() >= GameNumbers.TRIGGER_MASS_FLIGHT_MIN_NUPTIALS) {
             fireLocalizedTrigger(GameUnlocks.ABILITY_MASS_FLIGHT,
                 LanguageStrings.TRIGGER_MASS_FLIGHT_TITLE,
                 LanguageStrings.TRIGGER_MASS_FLIGHT_MSG);
@@ -473,7 +474,7 @@ public class TriggerManager {
         fireLocalizedTrigger(GameUnlocks.ABILITY_AUTO_TUNNELS,
                 LanguageStrings.TRIGGER_AUTO_TUNNELS_TITLE,
                 LanguageStrings.TRIGGER_AUTO_TUNNELS_MSG,
-                GameConstants.AUTO_UPGRADE_MIN_COMPLETE_TUNNELS);
+                GameNumbers.AUTO_UPGRADE_MIN_COMPLETE_TUNNELS);
     }
 
     private void checkAutoDiplomacyUnlock() {
@@ -487,7 +488,7 @@ public class TriggerManager {
         fireLocalizedTrigger(GameUnlocks.ABILITY_AUTO_DIPLOMACY,
                 LanguageStrings.TRIGGER_AUTO_DIPLOMACY_TITLE,
                 LanguageStrings.TRIGGER_AUTO_DIPLOMACY_MSG,
-                GameConstants.AUTO_UPGRADE_MIN_DIPLOMATS_SENT);
+                GameNumbers.AUTO_UPGRADE_MIN_DIPLOMATS_SENT);
     }
     
     private void checkDynastyTriggers() {
@@ -495,38 +496,38 @@ public class TriggerManager {
         
         int colonyCount = playerColony.getDynasty().getColonies().size();
 
-        if (colonyCount >= GameConstants.TRIGGER_DYNASTY_MIN_COLONIES && !playerColony.hasUpgrade(GameUnlocks.ABILITY_DYNASTY)) {
+        if (colonyCount >= GameNumbers.TRIGGER_DYNASTY_MIN_COLONIES && !playerColony.hasUpgrade(GameUnlocks.ABILITY_DYNASTY)) {
             fireLocalizedTrigger(GameUnlocks.ABILITY_DYNASTY,
                 LanguageStrings.TRIGGER_DYNASTY_ABILITY_TITLE,
                 LanguageStrings.TRIGGER_DYNASTY_ABILITY_MSG);
         }
         
-        if (colonyCount >= GameConstants.TRIGGER_TRADE_MIN_COLONIES && !playerColony.hasUpgrade(GameUnlocks.ABILITY_TRADE)) {
+        if (colonyCount >= GameNumbers.TRIGGER_TRADE_MIN_COLONIES && !playerColony.hasUpgrade(GameUnlocks.ABILITY_TRADE)) {
             fireLocalizedTrigger(GameUnlocks.ABILITY_TRADE,
                 LanguageStrings.TRIGGER_TRADE_ABILITY_TITLE,
                 LanguageStrings.TRIGGER_TRADE_ABILITY_MSG);
         }
 
-        if (colonyCount >= GameConstants.TRIGGER_MANAGEMENT_MIN_COLONIES && !playerColony.hasUpgrade(GameUnlocks.ABILITY_MANAGEMENT)) {
+        if (colonyCount >= GameNumbers.TRIGGER_MANAGEMENT_MIN_COLONIES && !playerColony.hasUpgrade(GameUnlocks.ABILITY_MANAGEMENT)) {
             fireLocalizedTrigger(GameUnlocks.ABILITY_MANAGEMENT,
                 LanguageStrings.TRIGGER_MANAGEMENT_ABILITY_TITLE,
                 LanguageStrings.TRIGGER_MANAGEMENT_ABILITY_MSG);
         }
 
-        if (colonyCount >= GameConstants.TRIGGER_SPREAD_2_MIN_COLONIES && !playerColony.hasUpgrade(GameUnlocks.ABILITY_SPREAD_2)) {
+        if (colonyCount >= GameNumbers.TRIGGER_SPREAD_2_MIN_COLONIES && !playerColony.hasUpgrade(GameUnlocks.ABILITY_SPREAD_2)) {
             fireLocalizedTrigger(GameUnlocks.ABILITY_SPREAD_2,
                 LanguageStrings.TRIGGER_SPREAD_2_ABILITY_TITLE,
                 LanguageStrings.TRIGGER_SPREAD_2_ABILITY_MSG);
         }
         
-        if (colonyCount >= GameConstants.TRIGGER_AUTOMATION_MIN_COLONIES && !playerColony.hasUpgrade(GameUnlocks.ABILITY_AUTOMATION)) {
+        if (colonyCount >= GameNumbers.TRIGGER_AUTOMATION_MIN_COLONIES && !playerColony.hasUpgrade(GameUnlocks.ABILITY_AUTOMATION)) {
             fireLocalizedTrigger(GameUnlocks.ABILITY_AUTOMATION,
                 LanguageStrings.TRIGGER_AUTOMATION_ABILITY_TITLE,
                 LanguageStrings.TRIGGER_AUTOMATION_ABILITY_MSG);
         }
 
         if (engine.getTradeManager() != null
-                && engine.getTradeManager().getActiveTrades().size() >= GameConstants.TRIGGER_BILATERAL_MIN_TRADES) {
+                && engine.getTradeManager().getActiveTrades().size() >= GameNumbers.TRIGGER_BILATERAL_MIN_TRADES) {
             if (!playerColony.hasUpgrade(GameUnlocks.ABILITY_BILATERAL_TRADE)) {
                 fireLocalizedTrigger(GameUnlocks.ABILITY_BILATERAL_TRADE,
                     LanguageStrings.TRIGGER_BILATERAL_TRADE_TITLE,
@@ -559,7 +560,7 @@ public class TriggerManager {
         if (playerColony.getDynasty() == null) return;
         if (playerColony.hasUpgrade(GameUnlocks.ABILITY_ASSIMILATION)) return;
 
-        if (playerColony.getDynasty().getAbsorbedDynastyIds().size() >= GameConstants.TRIGGER_ASSIMILATION_MIN_ABSORBED) {
+        if (playerColony.getDynasty().getAbsorbedDynastyIds().size() >= GameNumbers.TRIGGER_ASSIMILATION_MIN_ABSORBED) {
             fireLocalizedTrigger(GameUnlocks.ABILITY_ASSIMILATION,
                 LanguageStrings.TRIGGER_ASSIMILATION_ABILITY_TITLE,
                 LanguageStrings.TRIGGER_ASSIMILATION_ABILITY_MSG);

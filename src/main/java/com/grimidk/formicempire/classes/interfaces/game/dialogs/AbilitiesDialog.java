@@ -9,6 +9,7 @@ import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.interfaces.MainFrame;
@@ -133,7 +134,7 @@ public class AbilitiesDialog extends ZeroDialog {
         }
 
         if (colony.hasUpgrade(GameUnlocks.ABILITY_PHEROMONE_STORM)) {
-            int syrupCost = GameConstants.PHEROMONE_STORM_SYRUP_COST;
+            int syrupCost = GameNumbers.PHEROMONE_STORM_SYRUP_COST;
             AbilityRow row = createAbilityPanel(
                     GameUnlocks.ABILITY_PHEROMONE_STORM.getName(),
                     GameUnlocks.ABILITY_PHEROMONE_STORM.getDescription(),
@@ -155,7 +156,7 @@ public class AbilitiesDialog extends ZeroDialog {
         }
 
         if (colony.hasUpgrade(GameUnlocks.ABILITY_CREATINE_DIET)) {
-            int proteinCost = GameConstants.CREATINE_DIET_PROTEIN_COST;
+            int proteinCost = GameNumbers.CREATINE_DIET_PROTEIN_COST;
             AbilityRow row = createAbilityPanel(
                     GameUnlocks.ABILITY_CREATINE_DIET.getName(),
                     GameUnlocks.ABILITY_CREATINE_DIET.getDescription(),

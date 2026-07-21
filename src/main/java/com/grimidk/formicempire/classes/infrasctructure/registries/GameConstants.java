@@ -32,15 +32,16 @@ import com.grimidk.formicempire.classes.constants.world.TimeOfDay;
 import com.grimidk.formicempire.classes.constants.world.Weather;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.swing.ImageIcon;
-import java.net.URL; 
-import java.util.HashMap;
-import java.util.Map;
 
 public final class GameConstants {
     private GameConstants() {}
@@ -248,56 +249,6 @@ public final class GameConstants {
     static { misc.add(ICON_STAT_FOOD_PRODUCTION); }
     public static final ImageIcon ICON_STAT_NET_FOOD = loadIcon("icons/misc/NetFood.png");
     static { misc.add(ICON_STAT_NET_FOOD); }
-
-    // --- Base Stats ---
-    public static final float BASE_SPRITE_SPEED = 2.5f;
-    public static final int PARASITIC_MITES_ON_ANT_SPRITE = 5;
-
-    public static final float GATHER_FULL_EFFICIENCY_RADIUS_BASE = 500f;
-    public static final double GATHER_MIN_EFFICIENCY = 0.01;
-    public static final float GATHER_COLONY_SPEED_RADIUS_MULT = 1.25f;
-
-    public static final int HEX_RESOURCE_DEPLETION_SOURCES_PER_PERCENT = 20;
-    public static final int HEX_DEPLETION_SPAWN_BUFFER_EXTRA_MAX = 500;
-    
-    public static final int RESOURCE_SPAWN_VIEWPORT_MARGIN = 64;
-    public static final int RESOURCE_SPAWN_EXTRA_DISTANCE_MIN = 80;
-    public static final int RESOURCE_SPAWN_EXTRA_DISTANCE_MAX = 320;
-    public static final int RESOURCE_SPAWN_BUFFER_EXTRA_CAP = 400;
-    public static final int SOURCE_DISPLAY_PX_SMALL = 36;
-    public static final int SOURCE_DISPLAY_PX_MEDIUM = 52;
-    public static final int SOURCE_DISPLAY_PX_BIG = 72;
-    public static final int SOURCE_DISPLAY_PX_HUGE = 96;
-    public static final int HEX_SUSTAIN_MAX_DEPLETION_PCT = 80;
-
-    public static final int BIOME_COLD_TEMP_MAX = 15;
-    public static final int BIOME_DRY_HUMIDITY_MAX = 1;
-
-    public static final int PET_POOL_PER_CATCHER = 10;
-    public static final int PET_CAPACITY_PER_TENDER = 10;
-    public static final int PET_BREED_MIN_COUNT = 2;
-    public static final int PET_BREED_DIVISOR = 10;
-    public static final int PET_COUNT_SAVE_ABS_MAX = 10_000;
-    public static final int MAX_PEN_NON_ANT_SPRITES = 500;
-    public static final float CATCH_BASE_CHANCE_PER_CATCHER = 0.12f;
-
-    public static int capPenNonAntSprites(int count) {
-        return Math.min(Math.max(0, count), MAX_PEN_NON_ANT_SPRITES);
-    }
-
-    public static final int CONVOY_TUNNEL_LEG_DISTANCE = 10_000;
-    public static final int CONVOY_PORTAL_APPROACH_PX = 36;
-    public static final int SYMBIOTIC_MITE_PARASITIC_MITE_KILL_PER_DAY = 5;
-    public static final int SYMBIOTIC_MITE_PARASITIC_MITE_KILL_UPGRADED = 12;
-
-    public static final int PARASITIC_MITE_RESOURCE_THRESHOLD = 10_000;
-    public static final float PARASITE_OUTBREAK_CHANCE = 0.25f;
-    public static final int PARASITE_OUTBREAK_PREVENTION_MULTIPLIER = 2;
-    public static final int PARASITIC_MITE_MIN_MONTHLY_SPAWN = 1_000;
-    public static final int PARASITIC_MITE_PER_ANT = 1;
-    public static final float PARASITIC_MITE_SPREAD_FACTOR = 0.10f;
-    public static final int PARASITIC_MITES_PER_SLOWED_ANT = 10;
-    public static final float PARASITIC_MITE_SPEED_MULTIPLIER = 0.5f;
 
     // --- Temperatures ---
     public static final Temperature TEMP_FREEZING = new Temperature(1, LanguageStrings.TEMP_FREEZING, 5,
@@ -670,46 +621,38 @@ public final class GameConstants {
     static { antTypes.add(TYPE_ZOMBIE); }
 
     // --- Ant Subtypes ---
-    public static final int SUBTYPE_DIGIT_NONE = 1;
-    public static final float SUBTYPE_DAMAGE_MULT_STINGER = 4f;
-    public static final float SUBTYPE_ATTACK_MULT_TRAPJAW = 3f;
-    public static final float SUBTYPE_DEFENSE_MULT_DOORHEAD = 5f;
-    public static final float SUBTYPE_FORAGE_MULT_HONEYPOT = 4f;
-    public static final float SUBTYPE_SPEED_MULT_HONEYPOT = 0.75f;
-    public static final float SUBTYPE_FOOD_CONSUMPTION_ADD_PER_TRAIT = 0.5f;
-
     private static final ImageIcon SUBTYPE_ICON_NOTHING = loadIcon("icons/species/Omni.png");
 
     public static final AntSubtype SUBTYPE_HEAD_NONE = new AntSubtype(1, LanguageStrings.SUBTYPE_NOTHING, AntSubtypeSlot.HEAD,
-            SUBTYPE_DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, null, SUBTYPE_ICON_NOTHING);
+            GameNumbers.SUBTYPE_DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, null, SUBTYPE_ICON_NOTHING);
     static { antSubtypes.add(SUBTYPE_HEAD_NONE); }
     public static final AntSubtype SUBTYPE_HEAD_TRAPJAW = new AntSubtype(2, LanguageStrings.SUBTYPE_HEAD_TRAPJAW, AntSubtypeSlot.HEAD,
             2, GameUnlocks.ASSIMILATED_TRAPJAW, "trapjaw/", "trapjaw",
-            SUBTYPE_ATTACK_MULT_TRAPJAW, true, 1f, 1f, 1f, loadIcon("icons/subtypes/trapjaw.png"));
+            GameNumbers.SUBTYPE_ATTACK_MULT_TRAPJAW, true, 1f, 1f, 1f, loadIcon("icons/subtypes/trapjaw.png"));
     static { antSubtypes.add(SUBTYPE_HEAD_TRAPJAW); }
     public static final AntSubtype SUBTYPE_HEAD_DOORHEAD = new AntSubtype(3, LanguageStrings.SUBTYPE_HEAD_DOORHEAD, AntSubtypeSlot.HEAD,
             3, GameUnlocks.ASSIMILATED_DOORHEAD, "turtle/", "doorhead",
-            1f, false, SUBTYPE_DEFENSE_MULT_DOORHEAD, 1f, 1f, loadIcon("icons/subtypes/doorhead.png"));
+            1f, false, GameNumbers.SUBTYPE_DEFENSE_MULT_DOORHEAD, 1f, 1f, loadIcon("icons/subtypes/doorhead.png"));
     static { antSubtypes.add(SUBTYPE_HEAD_DOORHEAD); }
 
     public static final AntSubtype SUBTYPE_TORSO_NONE = new AntSubtype(4, LanguageStrings.SUBTYPE_NOTHING, AntSubtypeSlot.TORSO,
-            SUBTYPE_DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, null, SUBTYPE_ICON_NOTHING);
+            GameNumbers.SUBTYPE_DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, null, SUBTYPE_ICON_NOTHING);
     static { antSubtypes.add(SUBTYPE_TORSO_NONE); }
 
     public static final AntSubtype SUBTYPE_ABDOMEN_NONE = new AntSubtype(5, LanguageStrings.SUBTYPE_NOTHING, AntSubtypeSlot.ABDOMEN,
-            SUBTYPE_DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, null, SUBTYPE_ICON_NOTHING);
+            GameNumbers.SUBTYPE_DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, null, SUBTYPE_ICON_NOTHING);
     static { antSubtypes.add(SUBTYPE_ABDOMEN_NONE); }
     public static final AntSubtype SUBTYPE_ABDOMEN_STINGER = new AntSubtype(6, LanguageStrings.SUBTYPE_ABDOMEN_STINGER, AntSubtypeSlot.ABDOMEN,
             2, GameUnlocks.ASSIMILATED_STINGING, "bullet/", "bullet",
-            SUBTYPE_DAMAGE_MULT_STINGER, false, 1f, 1f, 1f, loadIcon("icons/subtypes/bullet.png"));
+            GameNumbers.SUBTYPE_DAMAGE_MULT_STINGER, false, 1f, 1f, 1f, loadIcon("icons/subtypes/bullet.png"));
     static { antSubtypes.add(SUBTYPE_ABDOMEN_STINGER); }
     public static final AntSubtype SUBTYPE_ABDOMEN_HONEYPOT = new AntSubtype(7, LanguageStrings.SUBTYPE_ABDOMEN_HONEYPOT, AntSubtypeSlot.ABDOMEN,
             3, GameUnlocks.ASSIMILATED_HONEYPOT, "honeypot/", "honeypot",
-            1f, false, 1f, SUBTYPE_SPEED_MULT_HONEYPOT, SUBTYPE_FORAGE_MULT_HONEYPOT, loadIcon("icons/subtypes/honeypot.png"));
+            1f, false, 1f, GameNumbers.SUBTYPE_SPEED_MULT_HONEYPOT, GameNumbers.SUBTYPE_FORAGE_MULT_HONEYPOT, loadIcon("icons/subtypes/honeypot.png"));
     static { antSubtypes.add(SUBTYPE_ABDOMEN_HONEYPOT); }
 
     public static final AntSubtype SUBTYPE_OTHER_NONE = new AntSubtype(8, LanguageStrings.SUBTYPE_NOTHING, AntSubtypeSlot.OTHER,
-            SUBTYPE_DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, null, SUBTYPE_ICON_NOTHING);
+            GameNumbers.SUBTYPE_DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, null, SUBTYPE_ICON_NOTHING);
     static { antSubtypes.add(SUBTYPE_OTHER_NONE); }
 
     // --- Ant Roles ---
@@ -852,11 +795,6 @@ public final class GameConstants {
     public static final ImageIcon ICON_SPEED_PLAY = loadIcon("icons/speed/Play.png");
     public static final ImageIcon ICON_SPEED_PAUSE = loadIcon("icons/speed/Pause.png");
 
-    public static final int DIPLOMATIC_REPUTATION_MIN = 0;
-    public static final int DIPLOMATIC_REPUTATION_MAX = 100;
-    public static final int DIPLOMATIC_REPUTATION_TIER_STEP = 20;
-    public static final int DEFAULT_DIPLOMATIC_REPUTATION = 50;
-
     // --- Diplomatic Reputation ---
     public static final DiplomaticReputation REPUTATION_AGGRESSIVE = new DiplomaticReputation(
         1, LanguageStrings.REPUTATION_AGGRESSIVE, 0, loadIcon("icons/diplomacy/Aggressive.png"));
@@ -875,8 +813,6 @@ public final class GameConstants {
     static { diplomaticReputations.add(REPUTATION_FRIENDLY); }
 
     public static final String DIPLO_EXCLUSIVE_PACT = "pact";
-
-    public static final int MODIFIER_PERMANENT = -1;
 
     // --- Diplomatic reputation modifiers ---
     public static final DiplomaticReputationModifier DIPLO_MODIFIER_PACT = new DiplomaticReputationModifier(
@@ -900,8 +836,6 @@ public final class GameConstants {
     public static final DiplomaticReputationModifier DIPLO_MODIFIER_TRADE_OFFER = new DiplomaticReputationModifier(
         10, LanguageStrings.DIPLO_MODIFIER_TRADE_OFFER, 5, REPUTATION_NEUTRAL.getMinScore(), null);
     static { diplomaticReputationModifiers.add(DIPLO_MODIFIER_TRADE_OFFER); }
-    public static final int CROSS_DYNASTY_TRADE_RECEIVER_REP = 20;
-    public static final int CROSS_DYNASTY_TRADE_OFFER_SENDER_REP = 5;
     public static final DiplomaticReputationModifier DIPLO_MODIFIER_BORDER_FRICTION = new DiplomaticReputationModifier(
         6, LanguageStrings.DIPLO_MODIFIER_BORDER_FRICTION, -10, 0, null);
     static { diplomaticReputationModifiers.add(DIPLO_MODIFIER_BORDER_FRICTION); }
@@ -915,22 +849,6 @@ public final class GameConstants {
         11, LanguageStrings.DIPLO_MODIFIER_GENETIC_EXCHANGE, 10, 0, null, 180);
     static { diplomaticReputationModifiers.add(DIPLO_MODIFIER_GENETIC_EXCHANGE); }
 
-    public static final int GENETIC_EXCHANGE_DRONE_COST = 25;
-
-    public static final double REBELLION_MONTHLY_CHANCE_MIN = 0.05;
-    public static final double REBELLION_MONTHLY_CHANCE_MAX = 0.30;
-    public static final double REBELLION_JOIN_BASE_CHANCE = 0.15;
-    public static final double REBELLION_JOIN_DISTANCE_WEIGHT = 0.40;
-    public static final double REBELLION_JOIN_LOYALTY_WEIGHT = 0.35;
-    public static final double REBELLION_NPC_FIGHT_CHANCE_MIN = 0.20;
-    public static final double REBELLION_NPC_FIGHT_CHANCE_MAX = 0.80;
-    public static final double REBELLION_NPC_FIGHT_RATIO_LOW = 0.85;
-    public static final double REBELLION_NPC_FIGHT_RATIO_HIGH = 1.15;
-
-    // --- Genetic integrity modifiers ---
-    public static final double GENETIC_INTEGRITY_START = 100.0;
-    public static final double GENETIC_INTEGRITY_SATELLITE_PENALTY = 1.0;
-    public static final double GENETIC_INTEGRITY_ASSIMILATION_FLOOR_STEP = 5.0;
     public static final GeneticIntegrityModifier GI_MODIFIER_PACT = new GeneticIntegrityModifier(
         1, LanguageStrings.GI_MODIFIER_PACT, 10.0, DIPLO_MODIFIER_PACT.getNameKey());
     static { geneticIntegrityModifiers.add(GI_MODIFIER_PACT); }
@@ -938,25 +856,14 @@ public final class GameConstants {
         2, LanguageStrings.GI_MODIFIER_GENETIC_EXCHANGE, 10.0, DIPLO_MODIFIER_GENETIC_EXCHANGE.getNameKey());
     static { geneticIntegrityModifiers.add(GI_MODIFIER_GENETIC_EXCHANGE); }
 
-    public static final int COLONY_LOYALTY_MIN = 0;
-    public static final int COLONY_LOYALTY_MAX = 100;
-    public static final int COLONY_LOYALTY_TIER_STEP = 20;
-    public static final int DEFAULT_COLONY_LOYALTY = 50;
-
-    public static final int MILITARY_WEIGHT_WORKER = 1;
-    public static final int MILITARY_WEIGHT_SOLDIER = 5;
-    public static final int MILITARY_WEIGHT_MAJOR = 15;
-    public static final int MILITARY_WEIGHT_PRINCESS = 10;
-    public static final int MILITARY_WEIGHT_QUEEN = 50;
-
     private static final AntRole[] ACTIVE_MILITARY_ROLES = {
             ROLE_WARRIOR, ROLE_DEFENDER,
             ROLE_MILITIA,
             ROLE_BRUTE, ROLE_ARTILLERY, ROLE_SIEGE
     };
 
-    private static final java.util.Set<AntRole> WAR_ECONOMY_EXCLUSIVE_ROLES =
-            java.util.Set.copyOf(java.util.Arrays.asList(ACTIVE_MILITARY_ROLES));
+    private static final Set<AntRole> WAR_ECONOMY_EXCLUSIVE_ROLES =
+            Set.copyOf(Arrays.asList(ACTIVE_MILITARY_ROLES));
 
     public static boolean isWarEconomyExclusiveRole(AntRole role) {
         return role != null && WAR_ECONOMY_EXCLUSIVE_ROLES.contains(role);
@@ -980,57 +887,25 @@ public final class GameConstants {
 
     public static int getMilitaryWeightForAntType(AntType type) {
         if (type == TYPE_WORKER) {
-            return MILITARY_WEIGHT_WORKER;
+            return GameNumbers.MILITARY_WEIGHT_WORKER;
         }
         if (type == TYPE_SOLDIER) {
-            return MILITARY_WEIGHT_SOLDIER;
+            return GameNumbers.MILITARY_WEIGHT_SOLDIER;
         }
         if (type == TYPE_MAJOR) {
-            return MILITARY_WEIGHT_MAJOR;
+            return GameNumbers.MILITARY_WEIGHT_MAJOR;
         }
         if (type == TYPE_PRINCESS) {
-            return MILITARY_WEIGHT_PRINCESS;
+            return GameNumbers.MILITARY_WEIGHT_PRINCESS;
         }
         if (type == TYPE_QUEEN) {
-            return MILITARY_WEIGHT_QUEEN;
+            return GameNumbers.MILITARY_WEIGHT_QUEEN;
         }
         return 0;
     }
 
     public static int getActiveMilitaryRoleWeight(AntRole role) {
         return role != null ? getMilitaryWeightForAntType(role.getAntType()) : 0;
-    }
-
-    public static final int MILITARY_BASELINE_HEALTH = 100;
-    public static final int MILITARY_BASELINE_ATTACK = 10;
-    public static final int MILITARY_BASELINE_DEFENSE = 5;
-    public static final int MILITARY_BASELINE_ATTACK_SPEED = 1;
-    public static final float ASSIMILATED_DAMAGE_MULT_FIRE = 4f;
-    public static final float ASSIMILATED_DAMAGE_ADD_DEADLY = 4f;
-    public static final float ASSIMILATED_DAMAGE_SYNERGY_FIRE_DEADLY = 16f;
-    public static final float ASSIMILATED_ATTACK_SPEED_MULT_FASTBITE = 3f;
-    public static final float MILITARY_STRENGTH_RATIO_MAX = 11f;
-    public static final int MILITARY_STRENGTH_DELTA_MAX = 10;
-    public static final int LOYALTY_CAPITAL_DISTANCE_NEUTRAL = 1;
-    public static final int LOYALTY_CAPITAL_DISTANCE_MAX = 10;
-    public static final int LOYALTY_CAPITAL_DISTANCE_PENALTY_MAX = 10;
-
-    public static int getCapitalDistanceLoyaltyPenalty(int hexDistance) {
-        if (hexDistance <= LOYALTY_CAPITAL_DISTANCE_NEUTRAL) {
-            return 0;
-        }
-        if (hexDistance >= LOYALTY_CAPITAL_DISTANCE_MAX) {
-            return -LOYALTY_CAPITAL_DISTANCE_PENALTY_MAX;
-        }
-        float normalized = (hexDistance - LOYALTY_CAPITAL_DISTANCE_NEUTRAL)
-                / (float) (LOYALTY_CAPITAL_DISTANCE_MAX - LOYALTY_CAPITAL_DISTANCE_NEUTRAL);
-        return -Math.round(normalized * LOYALTY_CAPITAL_DISTANCE_PENALTY_MAX);
-    }
-
-    public static int axialHexDistance(int q1, int r1, int q2, int r2) {
-        int dq = q1 - q2;
-        int dr = r1 - r2;
-        return (Math.abs(dq) + Math.abs(dr) + Math.abs(dq + dr)) / 2;
     }
 
     // --- Colony Loyalty ---
@@ -1070,124 +945,7 @@ public final class GameConstants {
         6, LanguageStrings.LOYALTY_MODIFIER_RECENTLY_INTEGRATED, 25, 0, null, 180);
     static { colonyLoyaltyModifiers.add(LOYALTY_MODIFIER_RECENTLY_INTEGRATED); }
 
-    public static final int PHEROMONE_STORM_SYRUP_COST = 500;
-    public static final int PHEROMONE_STORM_DURATION_MONTHS = 12;
-    public static final int RECENTLY_CONQUERED_LOYALTY_MONTHS = 6;
-    public static final int RECENTLY_INTEGRATED_LOYALTY_MONTHS = 6;
-
-    public static final float INTEGRATION_MILITARY_RATIO_REQUIRED = 5f;
-    public static final int INTEGRATION_MONTHS_PER_COLONY_SLOW = 30;
-    public static final int INTEGRATION_MIN_DIPLOMATS = 1;
-    public static final int DAYS_PER_MONTH = 30;
-    public static final int AI_FORCED_FLIGHT_COOLDOWN_DAYS = 30;
-
-    public static int monthsToDays(int months) {
-        return Math.max(0, months) * DAYS_PER_MONTH;
-    }
-
-    public static int daysToMonthsCeil(int days) {
-        if (days <= 0) {
-            return 0;
-        }
-        return (days + DAYS_PER_MONTH - 1) / DAYS_PER_MONTH;
-    }
-
-    public static int initialModifierRemainingDays(DiplomaticReputationModifier modifier) {
-        if (modifier == null || !modifier.hasExpiration()) {
-            return MODIFIER_PERMANENT;
-        }
-        return modifier.getDurationDays();
-    }
-
-    public static int initialModifierRemainingDays(ColonyLoyaltyModifier modifier) {
-        if (modifier == null || !modifier.hasExpiration()) {
-            return MODIFIER_PERMANENT;
-        }
-        return modifier.getDurationDays();
-    }
-    public static final int WAR_PACT_BREAK_COOLDOWN_MONTHS = 6;
-    public static final int DIPLO_DECLINED_REQUEST_COOLDOWN_MONTHS = 1;
-    public static final int WAS_AT_WAR_MODIFIER_MONTHS = 12;
-    public static final int WAR_DECLARATION_MIN_POPULATION = 1000;
-    public static final float WAR_STANDING_MILITARY_RATIO = 1.15f;
-    public static final double AI_ACCEPT_PEACE_CHANCE = 0.85;
-    public static final double AI_DECLARE_WAR_CHANCE = 0.12;
-    public static final float AI_DECLARE_WAR_MAX_TARGET_STRENGTH_RATIO = 2f;
-    public static final float WAR_BATTLE_RATIO_MAX = 10f;
-    public static final float WAR_BATTLE_WIN_CHANCE_AT_PARITY = 0.5f;
-    public static final float WAR_BATTLE_LOSS_FRACTION_AT_PARITY = 0.006f;
-    public static final float WAR_BATTLE_WINNER_LOSS_FRACTION_MAX = 0.035f;
-    /** Stage capture progress added each war hour (0–1 scale); ~8 hours per hex at 13%/hour. */
-    public static final float WAR_STAGE_PROGRESS_PER_HOUR = 0.13f;
-    public static final float WAR_STAGE_PROGRESS_PER_DAY = WAR_STAGE_PROGRESS_PER_HOUR * 24f;
-    public static final int WAR_REDEPLOY_HOURS = 24;
-    /** Hex defenders fight at +50% effective military power during local reserve/hex defense. */
-    public static final float WAR_HEX_DEFENSE_POWER_MULTIPLIER = 1.5f;
-    public static final float WAR_AI_FALLBACK_MAX_POWER_RATIO = 1f;
-    public static final float WAR_AI_FALLBACK_RECOVERY_RATIO = 0.75f;
-    public static final int WAR_AI_FALLBACK_MIN_ACTIVE = 500;
-    public static final int WAR_AI_FALLBACK_MIN_SPARE_COLONIES = 3;
-    public static final double AI_WAR_FALLBACK_CHANCE = 0.06;
-
-    public static float warBattleWinChance(float strongerOverWeakerRatio) {
-        float ratio = Math.max(1f, Math.min(WAR_BATTLE_RATIO_MAX, strongerOverWeakerRatio));
-        return WAR_BATTLE_WIN_CHANCE_AT_PARITY
-                + (1f - WAR_BATTLE_WIN_CHANCE_AT_PARITY) * (ratio - 1f) / (WAR_BATTLE_RATIO_MAX - 1f);
-    }
-
-    public static float warBattleLoserLossFraction(float strongerOverWeakerRatio) {
-        float ratio = Math.max(1f, Math.min(WAR_BATTLE_RATIO_MAX, strongerOverWeakerRatio));
-        return WAR_BATTLE_LOSS_FRACTION_AT_PARITY
-                + (1f - WAR_BATTLE_LOSS_FRACTION_AT_PARITY) * (ratio - 1f) / (WAR_BATTLE_RATIO_MAX - 1f);
-    }
-
-    public static float warBattleWinnerLossFraction(float strongerOverWeakerRatio) {
-        float loserFraction = warBattleLoserLossFraction(strongerOverWeakerRatio);
-        return Math.min(WAR_BATTLE_WINNER_LOSS_FRACTION_MAX, loserFraction * 0.1f);
-    }
-
-    public static int warHexDefenseEffectivePower(int baseReservePower) {
-        if (baseReservePower <= 0) {
-            return 0;
-        }
-        return Math.max(1, Math.round(baseReservePower * WAR_HEX_DEFENSE_POWER_MULTIPLIER));
-    }
-
-    public static int warHexDefenseEffectiveLossToActual(int effectiveLoss) {
-        if (effectiveLoss <= 0) {
-            return 0;
-        }
-        return Math.max(0, Math.round(effectiveLoss / WAR_HEX_DEFENSE_POWER_MULTIPLIER));
-    }
-
-    public static final int AI_EXPANSION_COLONY_TARGET = 6;
-    public static final double AI_CREATINE_FOOD_STRESS_RATIO = 0.35;
-    public static final double TRADE_AUTOMATION_SURPLUS_RATIO = 0.50;
-    public static final double TRADE_AUTOMATION_DEFICIT_RATIO = 0.25;
-    public static final int CREATINE_DIET_PROTEIN_COST = 300;
-    public static final int CREATINE_DIET_DURATION_MONTHS = 6;
-    public static final float CREATINE_DIET_SPEED_MULTIPLIER = 2f;
-    public static final int DIPLOMAT_MAX_PER_DYNASTY_MISSION = 5;
-    public static final int DIPLOMAT_MAX_PER_COLONY_MISSION = 3;
-    public static final int AUTO_UPGRADE_MIN_COMPLETE_TUNNELS = 5;
-    public static final int AUTO_UPGRADE_MIN_DIPLOMATS_SENT = 10;
-    public static final int TRIGGER_GRAVER_DEAD_ANTS = 100;
-    public static final int TRIGGER_RESEARCH_MIN_RP = 100;
-    public static final int TRIGGER_POLICE_MIN_POPULATION = 1000;
-    public static final int TRIGGER_MASS_FLIGHT_MIN_NUPTIALS = 10;
-    public static final int TRIGGER_BILATERAL_MIN_TRADES = 5;
-    public static final int TRIGGER_SCOUT_PLANT_COLLECTED = 6000;
     public static final ColonyRank TRIGGER_CLONING_MIN_RANK = RANK_EMPIRE;
-    public static final int TRIGGER_DYNASTY_MIN_COLONIES = 2;
-    public static final int TRIGGER_TRADE_MIN_COLONIES = 3;
-    public static final int TRIGGER_MANAGEMENT_MIN_COLONIES = 4;
-    public static final int TRIGGER_SPREAD_2_MIN_COLONIES = 5;
-    public static final int TRIGGER_AUTOMATION_MIN_COLONIES = 7;
-    public static final int TRIGGER_RESEARCHER_MIN_MONTHS = 2;
-    public static final int TRIGGER_ASSIMILATION_MIN_ABSORBED = 1;
-    public static final int DIPLOMAT_STABILITY_GAIN_BASE = 1;
-    public static final int DIPLOMAT_STABILITY_GAIN_PRESSURE_2 = 3;
-    public static final int DIPLOMAT_STABILITY_GAIN_PRESSURE_3 = 5;
     
     // --- Dynasty titles ---
     public static final DynastyTitle DYNASTY_TITLE_DYNASTY = new DynastyTitle(
@@ -1505,9 +1263,6 @@ public final class GameConstants {
         loadIcon("icons/convoy/TunnelConvoy.png"));
     static { tradeMethods.add(METHOD_TUNNEL); }
     
-    // --- Construction Costs ---
-    public static final double TUNNEL_WORK_REQUIRED = 5000000.0;
-    
     // --- Getters ---
     public static List<Biome> getBiomes() { return Collections.unmodifiableList(biomes); }
 
@@ -1701,12 +1456,8 @@ public final class GameConstants {
         return null;
     }
 
-    public static int clampDiplomaticReputation(int score) {
-        return Math.max(DIPLOMATIC_REPUTATION_MIN, Math.min(DIPLOMATIC_REPUTATION_MAX, score));
-    }
-
     public static DiplomaticReputation getDiplomaticReputationLevel(int score) {
-        score = clampDiplomaticReputation(score);
+        score = GameNumbers.clampDiplomaticReputation(score);
         DiplomaticReputation level = REPUTATION_AGGRESSIVE;
         for (DiplomaticReputation candidate : diplomaticReputations) {
             if (score >= candidate.getMinScore()) {
@@ -1799,12 +1550,8 @@ public final class GameConstants {
         return Collections.unmodifiableList(colonyLoyaltyModifiers);
     }
 
-    public static int clampColonyLoyalty(int score) {
-        return Math.max(COLONY_LOYALTY_MIN, Math.min(COLONY_LOYALTY_MAX, score));
-    }
-
     public static ColonyLoyalty getColonyLoyaltyLevel(int score) {
-        score = clampColonyLoyalty(score);
+        score = GameNumbers.clampColonyLoyalty(score);
         ColonyLoyalty level = LOYALTY_REBELLIOUS;
         for (ColonyLoyalty candidate : colonyLoyalties) {
             if (score >= candidate.getMinScore()) {
@@ -1840,13 +1587,6 @@ public final class GameConstants {
             }
         }
         return null;
-    }
-
-    public static double computeIntegrationMonthsPerColony(double diplomatsPerColony) {
-        if (diplomatsPerColony <= 0.0) {
-            return INTEGRATION_MONTHS_PER_COLONY_SLOW;
-        }
-        return INTEGRATION_MONTHS_PER_COLONY_SLOW / Math.sqrt(diplomatsPerColony);
     }
 
     public static List<Species> getNonOmniSpecies() {

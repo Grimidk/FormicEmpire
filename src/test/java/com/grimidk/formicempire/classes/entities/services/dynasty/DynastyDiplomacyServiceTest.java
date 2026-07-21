@@ -10,6 +10,7 @@ import com.grimidk.formicempire.classes.entities.Trade;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -239,7 +240,7 @@ class DynastyDiplomacyServiceTest {
         assertFalse(DynastyDiplomacyService.meetsWarDeclarationPopulationRequirement(player));
         assertFalse(player.getDiplomacyService().canDeclareWar(neighbor, null));
 
-        for (int i = 0; i < GameConstants.WAR_DECLARATION_MIN_POPULATION; i++) {
+        for (int i = 0; i < GameNumbers.WAR_DECLARATION_MIN_POPULATION; i++) {
             smallColony.getWorkers().add(
                     new com.grimidk.formicempire.classes.entities.Ant(smallColony, GameConstants.TYPE_WORKER));
         }
@@ -365,7 +366,7 @@ class DynastyDiplomacyServiceTest {
 
     private static void ensureWarPopulation(Dynasty dynasty, Colony colony) {
         dynasty.unlockUpgrade(GameUnlocks.TYPE_SOLDIER);
-        int needed = GameConstants.WAR_DECLARATION_MIN_POPULATION
+        int needed = GameNumbers.WAR_DECLARATION_MIN_POPULATION
                 - dynasty.getStatService().getTotalPopulation(dynasty);
         for (int i = 0; i < needed; i++) {
             colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
@@ -637,7 +638,7 @@ class DynastyDiplomacyServiceTest {
         Colony capital = new Colony(1, "Capital", true);
         capital.setCapital(true);
         capital.setLoyalty(0);
-        assertEquals(GameConstants.COLONY_LOYALTY_MAX, capital.getEffectiveLoyalty(null, null));
+        assertEquals(GameNumbers.COLONY_LOYALTY_MAX, capital.getEffectiveLoyalty(null, null));
     }
 
     @Test
@@ -847,7 +848,7 @@ class DynastyDiplomacyServiceTest {
         Colony capital = player.getCapital();
         player.setDiplomaticReputation(neighbor.getId(), 70);
         neighbor.setDiplomaticReputation(player.getId(), 50);
-        for (int i = 0; i < GameConstants.GENETIC_EXCHANGE_DRONE_COST; i++) {
+        for (int i = 0; i < GameNumbers.GENETIC_EXCHANGE_DRONE_COST; i++) {
             capital.getDrones().add(new Ant(capital, GameConstants.TYPE_DRONE));
         }
 

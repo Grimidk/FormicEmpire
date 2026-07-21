@@ -11,6 +11,7 @@ import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 
 class ColonyParasiteOutbreakTest {
@@ -98,7 +99,7 @@ class ColonyParasiteOutbreakTest {
         colony.setMushrooms(10_000);
         int projected = bugService.projectParasiticMiteMonthlySpawn(
                 colony, GameConstants.BIOME_TUNDRA, GameConstants.SEASON_WINTER);
-        assertEquals(GameConstants.PARASITIC_MITE_MIN_MONTHLY_SPAWN, projected);
+        assertEquals(GameNumbers.PARASITIC_MITE_MIN_MONTHLY_SPAWN, projected);
         assertEquals(2_000, bugService.requiredSymbioticMitesToPreventOutbreak(
                 colony, GameConstants.BIOME_TUNDRA, GameConstants.SEASON_WINTER));
     }

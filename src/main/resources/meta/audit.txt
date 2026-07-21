@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 74% (222/299 checked)
+Completion: 74% (220/299 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -203,7 +203,7 @@ Major roles:
 [X] Brute, Carrier, Artillery, Siege, Crane
 
 Princess roles:
-[X] Breeder, Diplomat, Assistant
+[ ] Breeder, Diplomat, Assistant (assistants research at 1/50 queen efficiency)
 
 Queen roles:
 [X] Layer, Researcher
@@ -432,7 +432,7 @@ Hourly:
 23. SIMULATION MECHANICS (indirect player interaction — observe while playing)
 ================================================================================
 Colony labour & resources:
-[X] Foraging, farming, nursing, laying, research generation
+[ ] Foraging, farming, nursing, laying, research generation
 [X] Water / food / protein / syrup / rock / resin economy
 [ ] Grave cleaning, policing, mite / parasite ant handling
 [ ] Pet insects — aphids on rancher capacity; mites/dermestids on catcher pool; slow breeding; over-capacity escape next day

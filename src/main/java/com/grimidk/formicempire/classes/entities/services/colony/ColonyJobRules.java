@@ -1,13 +1,10 @@
 package com.grimidk.formicempire.classes.entities.services.colony;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.grimidk.formicempire.classes.constants.ant.AntRole;
+import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.Season;
 import com.grimidk.formicempire.classes.constants.world.Temperature;
-import com.grimidk.formicempire.classes.constants.ant.AntRole;
-import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
 import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Dynasty;
@@ -16,9 +13,14 @@ import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.DeathCause;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
-import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.registries.WorldSpaces;
+import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
+
+import java.awt.Point;
+import java.util.ArrayList;
+import java.util.List;
 
 public final class ColonyJobRules {
 
@@ -154,7 +156,7 @@ public final class ColonyJobRules {
         for (int i = 0; i < toLay; i++) {
             Ant newEgg = new Ant(colony, GameConstants.TYPE_EGG);
             newEgg.setDimension(WorldSpaces.UNDERWORLD);
-            newEgg.setPosition(new java.awt.Point(0, 0));
+            newEgg.setPosition(new Point(0, 0));
             eggs.add(newEgg);
         }
     }
@@ -340,7 +342,7 @@ public final class ColonyJobRules {
         int speed = colony.getStatsService().getResearchSpeed(colony);
 
         if (dynasty.getCurrentAssimilation() != null) {
-            double power = (researcherCount * speed + assistantCount * (speed / 5.0)) / 10.0;
+            double power = (researcherCount * speed + assistantCount * (speed / (double) GameNumbers.RESEARCH_ASSISTANT_EFFICIENCY_DIVISOR)) / 10.0;
             dynasty.addAssimilationProgress(power);
 
             if (dynasty.getAssimilationProgress() >= dynasty.getAssimilationTargetCost()) {
@@ -355,7 +357,7 @@ public final class ColonyJobRules {
             }
         } else {
             int queenGain = researcherCount * speed;
-            int assistantGain = (int) (assistantCount * (speed / 5.0));
+            int assistantGain = (int) (assistantCount * (speed / (double) GameNumbers.RESEARCH_ASSISTANT_EFFICIENCY_DIVISOR));
             colony.addResearchPoints(queenGain + assistantGain);
         }
     }

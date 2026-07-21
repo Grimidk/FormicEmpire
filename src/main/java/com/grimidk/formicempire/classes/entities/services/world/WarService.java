@@ -14,6 +14,7 @@ import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 
 import java.util.ArrayList;
@@ -656,7 +657,7 @@ public class WarService {
 
     private void evaluateAiPeaceResponse(War war, Dynasty ai, Dynasty offerer) {
         if (getStandingForDynasty(war, ai) == WarStanding.LOSING
-                && GameRandom.nextDouble() < GameConstants.AI_ACCEPT_PEACE_CHANCE) {
+                && GameRandom.nextDouble() < GameNumbers.AI_ACCEPT_PEACE_CHANCE) {
             acceptPeaceOffer(war, ai);
         } else {
             war.clearPendingPeaceOffer();
@@ -684,7 +685,7 @@ public class WarService {
         if (powerA <= 0 && powerB <= 0) {
             return WarStanding.EVEN;
         }
-        float ratio = GameConstants.WAR_STANDING_MILITARY_RATIO;
+        float ratio = GameNumbers.WAR_STANDING_MILITARY_RATIO;
         if (powerA >= powerB * ratio) {
             return WarStanding.WINNING;
         }

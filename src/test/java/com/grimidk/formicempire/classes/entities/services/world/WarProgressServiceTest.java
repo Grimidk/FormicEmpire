@@ -9,6 +9,7 @@ import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryS
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -86,7 +87,7 @@ class WarProgressServiceTest {
 
         assertEquals(beforeCaptured + 1, war.getAggressorStagesCaptured());
         assertEquals(WarStagePhase.REDEPLOYING, war.getStagePhase());
-        assertEquals(GameConstants.WAR_REDEPLOY_HOURS, war.getRedeployHoursRemaining());
+        assertEquals(GameNumbers.WAR_REDEPLOY_HOURS, war.getRedeployHoursRemaining());
     }
 
     @Test
@@ -232,7 +233,7 @@ class WarProgressServiceTest {
     }
 
     private static void seedPopulation(Dynasty dynasty, Colony colony) {
-        int needed = GameConstants.WAR_DECLARATION_MIN_POPULATION
+        int needed = GameNumbers.WAR_DECLARATION_MIN_POPULATION
                 - dynasty.getStatService().getTotalPopulation(dynasty);
         for (int i = 0; i < needed; i++) {
             colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));

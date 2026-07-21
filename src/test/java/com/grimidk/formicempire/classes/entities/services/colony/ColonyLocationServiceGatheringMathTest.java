@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 
 class ColonyLocationServiceGatheringMathTest {
 
@@ -23,7 +24,7 @@ class ColonyLocationServiceGatheringMathTest {
     @Test
     void beyondRadiusScalesDownWithFloor() {
         double e = ColonySourceService.GatheringMath.gatheringEfficiency(0, 0, 0, 50_000, 500f);
-        assertEquals(GameConstants.GATHER_MIN_EFFICIENCY, e, 1e-9);
+        assertEquals(GameNumbers.GATHER_MIN_EFFICIENCY, e, 1e-9);
     }
 
     @Test

@@ -29,6 +29,7 @@ import com.grimidk.formicempire.classes.interfaces.ui.util.UiDialogUtils;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiNameSearchBar;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
@@ -1013,7 +1014,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 if (activeColony.getCurrentTunnelProject() != null || dynasty.hasIncompleteTunnelAt(originHex)) {
                     return;
                 }
-                Tunnel tunnel = new Tunnel(originHex, targetHex, GameConstants.TUNNEL_WORK_REQUIRED);
+                Tunnel tunnel = new Tunnel(originHex, targetHex, GameNumbers.TUNNEL_WORK_REQUIRED);
                 dynasty.addTunnel(tunnel);
                 activeColony.setCurrentTunnelProject(tunnel);
             }
@@ -2156,7 +2157,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 return LanguageStrings.get(LanguageStrings.DIPLO_ERROR_INTEGRATION_REPUTATION);
             }
             if (DynastyIntegrationService.countIntegrationDiplomatCapacity(dynasty)
-                    < GameConstants.INTEGRATION_MIN_DIPLOMATS) {
+                    < GameNumbers.INTEGRATION_MIN_DIPLOMATS) {
                 return LanguageStrings.get(LanguageStrings.DIPLO_ERROR_INTEGRATION_DIPLOMATS);
             }
             return LanguageStrings.get(LanguageStrings.DIPLO_ERROR_INTEGRATION_ACTIVE);
@@ -2184,7 +2185,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             }
             int max = DynastyIntegrationService.countMaxAssignableIntegrationDiplomats(
                     dynasty, engine.getWorld(), engine.getTradeManager());
-            if (max < GameConstants.INTEGRATION_MIN_DIPLOMATS) {
+            if (max < GameNumbers.INTEGRATION_MIN_DIPLOMATS) {
                 UiOptionPane.showMessageDialog(this,
                         LanguageStrings.get(LanguageStrings.DIPLO_ERROR_INTEGRATION_DIPLOMATS),
                         LanguageStrings.get(LanguageStrings.DIPLO_ACTION_MANAGE_INTEGRATION_DIPLOMATS),
@@ -2193,7 +2194,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             }
             int current = DynastyIntegrationService.countIntegrationDiplomats(dynasty);
             int count = promptIntegrationDiplomatCount(this, max, current);
-            if (count < GameConstants.INTEGRATION_MIN_DIPLOMATS) {
+            if (count < GameNumbers.INTEGRATION_MIN_DIPLOMATS) {
                 return;
             }
             DynastyIntegrationService.assignIntegrationDiplomats(
@@ -2212,7 +2213,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 if (!DynastyDiplomacyService.meetsWarDeclarationPopulationRequirement(dynasty)) {
                     message = LanguageStrings.format(
                             LanguageStrings.DIPLO_ERROR_WAR_POPULATION_FMT,
-                            GameConstants.WAR_DECLARATION_MIN_POPULATION);
+                            GameNumbers.WAR_DECLARATION_MIN_POPULATION);
                 } else if (!DynastyDiplomacyService.meetsWarActiveMilitaryRequirement(dynasty)) {
                     message = LanguageStrings.get(LanguageStrings.DIPLO_ERROR_WAR_ACTIVE_MILITARY);
                 } else if (diplo.hasNonAggressionPact(other)) {
@@ -2464,7 +2465,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                         LanguageStrings.get(LanguageStrings.DIPLO_ACTION_MANAGE_INTEGRATION_DIPLOMATS));
                 int maxDiplomats = DynastyIntegrationService.countMaxAssignableIntegrationDiplomats(
                         dynasty, world, engine.getTradeManager());
-                if (maxDiplomats >= GameConstants.INTEGRATION_MIN_DIPLOMATS) {
+                if (maxDiplomats >= GameNumbers.INTEGRATION_MIN_DIPLOMATS) {
                     manageDiplomatsItem.addActionListener(e -> performManageIntegrationDiplomatsAction(other));
                 } else {
                     manageDiplomatsItem.setEnabled(false);
@@ -2494,7 +2495,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                     if (!DynastyDiplomacyService.meetsWarDeclarationPopulationRequirement(dynasty)) {
                         warItem.setToolTipText(LanguageStrings.format(
                                 LanguageStrings.DIPLO_ERROR_WAR_POPULATION_FMT,
-                                GameConstants.WAR_DECLARATION_MIN_POPULATION));
+                                GameNumbers.WAR_DECLARATION_MIN_POPULATION));
                     } else if (!DynastyDiplomacyService.meetsWarActiveMilitaryRequirement(dynasty)) {
                         warItem.setToolTipText(LanguageStrings.get(LanguageStrings.DIPLO_ERROR_WAR_ACTIVE_MILITARY));
                     } else if (diplo.hasNonAggressionPact(other)) {
@@ -3249,7 +3250,7 @@ public class DynastyManagementDialog extends ZeroDialog {
             int available, int gainPer) {
         int perTargetLimit = dynasty.getDiplomacyService() != null
                 ? dynasty.getDiplomacyService().getMaxDiplomatsPerTarget()
-                : GameConstants.DIPLOMAT_MAX_PER_DYNASTY_MISSION;
+                : GameNumbers.DIPLOMAT_MAX_PER_DYNASTY_MISSION;
         int spinnerMax = Math.max(0, maxCount);
         if (current > perTargetLimit) {
             spinnerMax = Math.max(spinnerMax, current);
@@ -3418,15 +3419,15 @@ public class DynastyManagementDialog extends ZeroDialog {
     }
 
     private int promptIntegrationDiplomatCount(Component parent, int maxCount, int current) {
-        if (maxCount < GameConstants.INTEGRATION_MIN_DIPLOMATS) {
+        if (maxCount < GameNumbers.INTEGRATION_MIN_DIPLOMATS) {
             return -1;
         }
         String prompt = LanguageStrings.format(
                 LanguageStrings.DIPLO_INTEGRATION_DIPLOMATS_PROMPT,
                 AssetStyles.formatNumber(maxCount));
-        int initial = Math.max(GameConstants.INTEGRATION_MIN_DIPLOMATS, Math.min(current, maxCount));
+        int initial = Math.max(GameNumbers.INTEGRATION_MIN_DIPLOMATS, Math.min(current, maxCount));
         SpinnerNumberModel model = new SpinnerNumberModel(
-                initial, GameConstants.INTEGRATION_MIN_DIPLOMATS, maxCount, 1);
+                initial, GameNumbers.INTEGRATION_MIN_DIPLOMATS, maxCount, 1);
         JSpinner spinner = new JSpinner(model);
         AssetStyles.styleSpinner(spinner);
         JPanel panel = new JPanel(new BorderLayout(8, 8));

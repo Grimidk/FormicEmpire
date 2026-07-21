@@ -9,6 +9,7 @@ import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.WorldSpaces;
@@ -234,7 +235,7 @@ public class ColonyStarterService {
             return;
         }
 
-        colony.setRecentlyConqueredMonthsRemaining(GameConstants.RECENTLY_CONQUERED_LOYALTY_MONTHS);
+        colony.setRecentlyConqueredMonthsRemaining(GameNumbers.RECENTLY_CONQUERED_LOYALTY_MONTHS);
         Colony capital = victor.getCapital();
 
         if (colony.getQueens().isEmpty()) {

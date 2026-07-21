@@ -9,6 +9,7 @@ import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 
 import java.util.ArrayList;
@@ -69,7 +70,7 @@ public final class TriggerProgressService {
                 colony.hasUpgrade(GameUnlocks.ROLE_RESEARCHER),
                 true,
                 elapsedMonths(world),
-                GameConstants.TRIGGER_RESEARCHER_MIN_MONTHS));
+                GameNumbers.TRIGGER_RESEARCHER_MIN_MONTHS));
 
         entries.add(numeric(
                 GameUnlocks.ROLE_GRAVER,
@@ -79,7 +80,7 @@ public final class TriggerProgressService {
                 colony.hasUpgrade(GameUnlocks.ROLE_GRAVER),
                 true,
                 colony.getDeadAnts() != null ? colony.getDeadAnts().size() : 0,
-                GameConstants.TRIGGER_GRAVER_DEAD_ANTS));
+                GameNumbers.TRIGGER_GRAVER_DEAD_ANTS));
 
         entries.add(numeric(
                 GameUnlocks.ABILITY_RESEARCH,
@@ -89,7 +90,7 @@ public final class TriggerProgressService {
                 colony.hasUpgrade(GameUnlocks.ABILITY_RESEARCH),
                 true,
                 colony.getResearchPoints(),
-                GameConstants.TRIGGER_RESEARCH_MIN_RP));
+                GameNumbers.TRIGGER_RESEARCH_MIN_RP));
 
         entries.add(numeric(
                 GameUnlocks.ROLE_POLICE,
@@ -99,7 +100,7 @@ public final class TriggerProgressService {
                 colony.hasUpgrade(GameUnlocks.ROLE_POLICE),
                 true,
                 colony.getRank() != null ? (int) Math.min(Integer.MAX_VALUE, colony.getRank().getPopulation()) : 0,
-                GameConstants.TRIGGER_POLICE_MIN_POPULATION));
+                GameNumbers.TRIGGER_POLICE_MIN_POPULATION));
 
         int colonyCount = dynasty != null ? dynasty.getColonies().size() : 0;
         boolean hasDynasty = dynasty != null;
@@ -112,7 +113,7 @@ public final class TriggerProgressService {
                 colony.hasUpgrade(GameUnlocks.ABILITY_DYNASTY),
                 hasDynasty,
                 colonyCount,
-                GameConstants.TRIGGER_DYNASTY_MIN_COLONIES));
+                GameNumbers.TRIGGER_DYNASTY_MIN_COLONIES));
 
         entries.add(numeric(
                 GameUnlocks.ABILITY_TRADE,
@@ -122,7 +123,7 @@ public final class TriggerProgressService {
                 colony.hasUpgrade(GameUnlocks.ABILITY_TRADE),
                 hasDynasty,
                 colonyCount,
-                GameConstants.TRIGGER_TRADE_MIN_COLONIES));
+                GameNumbers.TRIGGER_TRADE_MIN_COLONIES));
 
         entries.add(numeric(
                 GameUnlocks.ABILITY_MANAGEMENT,
@@ -132,7 +133,7 @@ public final class TriggerProgressService {
                 colony.hasUpgrade(GameUnlocks.ABILITY_MANAGEMENT),
                 hasDynasty,
                 colonyCount,
-                GameConstants.TRIGGER_MANAGEMENT_MIN_COLONIES));
+                GameNumbers.TRIGGER_MANAGEMENT_MIN_COLONIES));
 
         entries.add(numeric(
                 GameUnlocks.ABILITY_SPREAD_2,
@@ -142,7 +143,7 @@ public final class TriggerProgressService {
                 colony.hasUpgrade(GameUnlocks.ABILITY_SPREAD_2),
                 hasDynasty,
                 colonyCount,
-                GameConstants.TRIGGER_SPREAD_2_MIN_COLONIES));
+                GameNumbers.TRIGGER_SPREAD_2_MIN_COLONIES));
 
         entries.add(numeric(
                 GameUnlocks.ABILITY_AUTOMATION,
@@ -152,7 +153,7 @@ public final class TriggerProgressService {
                 colony.hasUpgrade(GameUnlocks.ABILITY_AUTOMATION),
                 hasDynasty,
                 colonyCount,
-                GameConstants.TRIGGER_AUTOMATION_MIN_COLONIES));
+                GameNumbers.TRIGGER_AUTOMATION_MIN_COLONIES));
 
         int nuptials = dynasty != null ? dynasty.getTotalNuptialFlights() : 0;
         entries.add(numeric(
@@ -163,7 +164,7 @@ public final class TriggerProgressService {
                 colony.hasUpgrade(GameUnlocks.ABILITY_MASS_FLIGHT),
                 hasDynasty,
                 nuptials,
-                GameConstants.TRIGGER_MASS_FLIGHT_MIN_NUPTIALS));
+                GameNumbers.TRIGGER_MASS_FLIGHT_MIN_NUPTIALS));
 
         int activeTrades = tradeManager != null ? tradeManager.getActiveTrades().size() : 0;
         entries.add(numeric(
@@ -174,7 +175,7 @@ public final class TriggerProgressService {
                 colony.hasUpgrade(GameUnlocks.ABILITY_BILATERAL_TRADE),
                 true,
                 activeTrades,
-                GameConstants.TRIGGER_BILATERAL_MIN_TRADES));
+                GameNumbers.TRIGGER_BILATERAL_MIN_TRADES));
 
         boolean automationUnlocked = colony.hasUpgrade(GameUnlocks.ABILITY_AUTOMATION);
         int tunnels = dynasty != null ? dynasty.countCompleteTunnels() : 0;
@@ -186,7 +187,7 @@ public final class TriggerProgressService {
                 colony.hasUpgrade(GameUnlocks.ABILITY_AUTO_TUNNELS),
                 automationUnlocked,
                 tunnels,
-                GameConstants.AUTO_UPGRADE_MIN_COMPLETE_TUNNELS));
+                GameNumbers.AUTO_UPGRADE_MIN_COMPLETE_TUNNELS));
 
         int diplomatsSent = dynasty != null ? dynasty.getDiplomatsSentTotal() : 0;
         entries.add(numeric(
@@ -197,7 +198,7 @@ public final class TriggerProgressService {
                 colony.hasUpgrade(GameUnlocks.ABILITY_AUTO_DIPLOMACY),
                 automationUnlocked,
                 diplomatsSent,
-                GameConstants.AUTO_UPGRADE_MIN_DIPLOMATS_SENT));
+                GameNumbers.AUTO_UPGRADE_MIN_DIPLOMATS_SENT));
 
         int absorbed = dynasty != null ? dynasty.getAbsorbedDynastyIds().size() : 0;
         entries.add(numeric(
@@ -208,7 +209,7 @@ public final class TriggerProgressService {
                 colony.hasUpgrade(GameUnlocks.ABILITY_ASSIMILATION),
                 hasDynasty,
                 absorbed,
-                GameConstants.TRIGGER_ASSIMILATION_MIN_ABSORBED));
+                GameNumbers.TRIGGER_ASSIMILATION_MIN_ABSORBED));
 
         int rankId = dynasty != null && dynasty.getRank() != null ? dynasty.getRank().getId() : 0;
         entries.add(numeric(
@@ -229,7 +230,7 @@ public final class TriggerProgressService {
                 colony.hasUpgrade(GameUnlocks.ROLE_SCOUT),
                 true,
                 plantHarvestProgress(colony),
-                GameConstants.TRIGGER_SCOUT_PLANT_COLLECTED));
+                GameNumbers.TRIGGER_SCOUT_PLANT_COLLECTED));
 
         boolean parasiticMiteUnlocked = colony.hasUpgrade(GameUnlocks.ABILITY_PARASITIC_MITE_ALERT);
         entries.add(numeric(
@@ -240,7 +241,7 @@ public final class TriggerProgressService {
                 parasiticMiteUnlocked,
                 true,
                 dynastyStoredResourceProgress(colony),
-                GameConstants.PARASITIC_MITE_RESOURCE_THRESHOLD));
+                GameNumbers.PARASITIC_MITE_RESOURCE_THRESHOLD));
 
         return entries;
     }

@@ -1,11 +1,11 @@
 package com.grimidk.formicempire.classes.constants.world;
 
-import java.util.List;
-
-import javax.swing.ImageIcon;
-
 import com.grimidk.formicempire.classes.constants.Constant;
 import com.grimidk.formicempire.classes.constants.misc.BugType;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
+
+import java.util.List;
+import javax.swing.ImageIcon;
 
 public class Biome extends Constant{
     private final int temperature;
@@ -55,11 +55,11 @@ public class Biome extends Constant{
     }
 
     public boolean isDry() {
-        return humidity <= 1;
+        return humidity <= GameNumbers.BIOME_DRY_HUMIDITY_MAX;
     }
 
     public boolean isCold() {
-        return temperature <= 15;
+        return temperature <= GameNumbers.BIOME_COLD_TEMP_MAX;
     }
 
     public boolean isHot() {

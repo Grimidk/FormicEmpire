@@ -17,6 +17,7 @@ import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.entities.spatial.NeoPoint;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.assets.GameSpritePreloader;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.registries.WorldSpaces;
@@ -366,7 +367,7 @@ public class GameAreaPanel extends ZeroGamePanel {
                 // drawUnderworldRoomDecorationsOverlay(g2d); // disabled — see roadmap: in-room sprites rework
             } else {
                 g2d.translate(contentPadX, contentPadY);
-                overworldDeadBodySpritesRemaining = GameConstants.MAX_PEN_NON_ANT_SPRITES;
+                overworldDeadBodySpritesRemaining = GameNumbers.MAX_PEN_NON_ANT_SPRITES;
                 drawOverworldStructure(g2d);
                 drawResourceSources(g2d);
                 drawAnts(g2d);
@@ -559,7 +560,7 @@ public class GameAreaPanel extends ZeroGamePanel {
 
                 if (drawDeadPile && overworldDeadBodySpritesRemaining > 0) {
                     int deadSprites = Math.min(
-                            GameConstants.capPenNonAntSprites(colony.getDeadAnts().size()),
+                            GameNumbers.capPenNonAntSprites(colony.getDeadAnts().size()),
                             overworldDeadBodySpritesRemaining);
                     drawStaticItemsLocal(g2d, deadBodyImg, safeX, safeY, safeW, safeH, deadSprites);
                     overworldDeadBodySpritesRemaining -= deadSprites;
@@ -870,7 +871,7 @@ public class GameAreaPanel extends ZeroGamePanel {
         int halfW = miteW / 2;
         int halfH = miteH / 2;
         int[][] offsets = {{-4, -5}, {4, -4}, {-5, 2}, {5, 3}, {0, 5}};
-        int count = Math.min(GameConstants.PARASITIC_MITES_ON_ANT_SPRITE, offsets.length);
+        int count = Math.min(GameNumbers.PARASITIC_MITES_ON_ANT_SPRITE, offsets.length);
         for (int i = 0; i < count; i++) {
             g2d.drawImage(mite, offsets[i][0] - halfW, offsets[i][1] - halfH, this);
         }
@@ -888,7 +889,7 @@ public class GameAreaPanel extends ZeroGamePanel {
         int aphidSprites = 0;
         int symbioticMiteSprites = 0;
         int dermestidSprites = 0;
-        final int typeSpriteCap = GameConstants.MAX_PEN_NON_ANT_SPRITES;
+        final int typeSpriteCap = GameNumbers.MAX_PEN_NON_ANT_SPRITES;
 
         for (Bug bug : colony.getBugs()) {
             if (bug.getDimension() != currentDimension) {

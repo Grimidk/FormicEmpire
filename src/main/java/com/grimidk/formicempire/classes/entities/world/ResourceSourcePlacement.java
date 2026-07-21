@@ -6,6 +6,7 @@ import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 
 import com.grimidk.formicempire.classes.entities.spatial.NeoPoint;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 
 public final class ResourceSourcePlacement {
 
@@ -15,7 +16,7 @@ public final class ResourceSourcePlacement {
     public static int minSpawnDistanceFromEntrance(
             int entranceX, int entranceY, int viewportW, int viewportH, int displaySizePx) {
         int half = Math.max(1, displaySizePx / 2);
-        int margin = GameConstants.RESOURCE_SPAWN_VIEWPORT_MARGIN;
+        int margin = GameNumbers.RESOURCE_SPAWN_VIEWPORT_MARGIN;
         int farthestCorner = 0;
         int[][] corners = {{0, 0}, {viewportW, 0}, {0, viewportH}, {viewportW, viewportH}};
         for (int[] corner : corners) {

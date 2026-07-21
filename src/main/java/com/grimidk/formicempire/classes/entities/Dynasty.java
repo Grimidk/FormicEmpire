@@ -39,6 +39,7 @@ import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.registries.DeathCause;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
@@ -291,7 +292,7 @@ public class Dynasty {
                     int otherDynastyId = Integer.parseInt(entry.getKey());
                     if (otherDynastyId != this.id && entry.getValue() != null) {
                         diplomaticReputations.put(otherDynastyId,
-                                GameConstants.clampDiplomaticReputation(entry.getValue()));
+                                GameNumbers.clampDiplomaticReputation(entry.getValue()));
                     }
                 } catch (NumberFormatException ignored) {
                 }
@@ -857,17 +858,17 @@ public class Dynasty {
 
     public int getDiplomaticReputation(int otherDynastyId) {
         if (otherDynastyId == id) {
-            return GameConstants.DEFAULT_DIPLOMATIC_REPUTATION;
+            return GameNumbers.DEFAULT_DIPLOMATIC_REPUTATION;
         }
-        return GameConstants.clampDiplomaticReputation(
-                diplomaticReputations.getOrDefault(otherDynastyId, GameConstants.DEFAULT_DIPLOMATIC_REPUTATION));
+        return GameNumbers.clampDiplomaticReputation(
+                diplomaticReputations.getOrDefault(otherDynastyId, GameNumbers.DEFAULT_DIPLOMATIC_REPUTATION));
     }
 
     public void setDiplomaticReputation(int otherDynastyId, int score) {
         if (otherDynastyId == id) {
             return;
         }
-        diplomaticReputations.put(otherDynastyId, GameConstants.clampDiplomaticReputation(score));
+        diplomaticReputations.put(otherDynastyId, GameNumbers.clampDiplomaticReputation(score));
     }
 
     public void adjustDiplomaticReputation(int otherDynastyId, int delta) {
@@ -931,7 +932,7 @@ public class Dynasty {
             return;
         }
         putDiplomaticModifierRemainingDays(
-                otherDynastyId, modifierKey, GameConstants.initialModifierRemainingDays(modifier));
+                otherDynastyId, modifierKey, GameNumbers.initialModifierRemainingDays(modifier));
     }
 
     public void putDiplomaticModifierRemainingDays(int otherDynastyId, String modifierKey, int remainingDays) {
@@ -1003,7 +1004,7 @@ public class Dynasty {
             List<String> toRemove = new ArrayList<>();
             for (Map.Entry<String, Integer> modifierEntry : modifiers.entrySet()) {
                 int remaining = modifierEntry.getValue();
-                if (remaining == GameConstants.MODIFIER_PERMANENT) {
+                if (remaining == GameNumbers.MODIFIER_PERMANENT) {
                     continue;
                 }
                 if (remaining <= 1) {
@@ -1046,22 +1047,22 @@ public class Dynasty {
                 pactRequestDeclinedAtWorldMonth,
                 GameConstants.DIPLO_MODIFIER_DECLINED_PACT,
                 worldMonth,
-                GameConstants.monthsToDays(GameConstants.DIPLO_DECLINED_REQUEST_COOLDOWN_MONTHS));
+                GameNumbers.monthsToDays(GameNumbers.DIPLO_DECLINED_REQUEST_COOLDOWN_MONTHS));
         migrateLegacyTimedEntry(
                 tradeRequestDeclinedAtWorldMonth,
                 GameConstants.DIPLO_MODIFIER_TRADE_REQUEST,
                 worldMonth,
-                GameConstants.monthsToDays(GameConstants.DIPLO_DECLINED_REQUEST_COOLDOWN_MONTHS));
+                GameNumbers.monthsToDays(GameNumbers.DIPLO_DECLINED_REQUEST_COOLDOWN_MONTHS));
         migrateLegacyTimedEntry(
                 wasAtWarPeacedAtWorldMonth,
                 GameConstants.DIPLO_MODIFIER_WAS_AT_WAR,
                 worldMonth,
-                GameConstants.monthsToDays(GameConstants.WAS_AT_WAR_MODIFIER_MONTHS));
+                GameNumbers.monthsToDays(GameNumbers.WAS_AT_WAR_MODIFIER_MONTHS));
         migrateLegacyTimedEntry(
                 geneticExchangeGrantedAtWorldMonth,
                 GameConstants.DIPLO_MODIFIER_GENETIC_EXCHANGE,
                 worldMonth,
-                GameConstants.monthsToDays(6));
+                GameNumbers.monthsToDays(6));
         pactRequestDeclinedAtWorldMonth.clear();
         tradeRequestDeclinedAtWorldMonth.clear();
         wasAtWarPeacedAtWorldMonth.clear();
@@ -1082,7 +1083,7 @@ public class Dynasty {
             if (startedAt == null) {
                 continue;
             }
-            int elapsedDays = Math.max(0, (worldMonth - startedAt) * GameConstants.DAYS_PER_MONTH);
+            int elapsedDays = Math.max(0, (worldMonth - startedAt) * GameNumbers.DAYS_PER_MONTH);
             int remaining = Math.max(0, totalDays - elapsedDays);
             if (remaining <= 0) {
                 if (hasDiplomaticModifierKey(otherDynastyId, modifier.getNameKey())) {
@@ -1605,11 +1606,11 @@ public class Dynasty {
     }
 
     public boolean meetsAutoTunnelsPrerequisites() {
-        return countCompleteTunnels() >= GameConstants.AUTO_UPGRADE_MIN_COMPLETE_TUNNELS;
+        return countCompleteTunnels() >= GameNumbers.AUTO_UPGRADE_MIN_COMPLETE_TUNNELS;
     }
 
     public boolean meetsAutoDiplomacyPrerequisites() {
-        return diplomatsSentTotal >= GameConstants.AUTO_UPGRADE_MIN_DIPLOMATS_SENT;
+        return diplomatsSentTotal >= GameNumbers.AUTO_UPGRADE_MIN_DIPLOMATS_SENT;
     }
 
     public boolean isDefeated() { return isDefeated; }
@@ -1841,18 +1842,18 @@ public class Dynasty {
     }
 
     public double getSatelliteColonyIntegrityPenalty() {
-        return countSatelliteColonies() * GameConstants.GENETIC_INTEGRITY_SATELLITE_PENALTY;
+        return countSatelliteColonies() * GameNumbers.GENETIC_INTEGRITY_SATELLITE_PENALTY;
     }
 
     public double getBaseGeneticIntegrity() {
-        return GameConstants.GENETIC_INTEGRITY_START - getSatelliteColonyIntegrityPenalty();
+        return GameNumbers.GENETIC_INTEGRITY_START - getSatelliteColonyIntegrityPenalty();
     }
 
     public double getMinGeneticIntegrity() {
         if (!hasUpgrade(GameUnlocks.ABILITY_CLONING)) {
             return 0.0;
         }
-        return Math.min(100.0, completedAssimilations.size() * GameConstants.GENETIC_INTEGRITY_ASSIMILATION_FLOOR_STEP);
+        return Math.min(100.0, completedAssimilations.size() * GameNumbers.GENETIC_INTEGRITY_ASSIMILATION_FLOOR_STEP);
     }
 
     public double getGeneticIntegrity() {
@@ -1864,7 +1865,7 @@ public class Dynasty {
         StringBuilder sb = new StringBuilder("<html>");
         sb.append(LanguageStrings.get(LanguageStrings.GI_TOOLTIP_START))
                 .append(": ")
-                .append(String.format("%.1f%%", GameConstants.GENETIC_INTEGRITY_START))
+                .append(String.format("%.1f%%", GameNumbers.GENETIC_INTEGRITY_START))
                 .append("<br>");
 
         int satelliteCount = countSatelliteColonies();

@@ -11,6 +11,7 @@ import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 
 class ColonyBugHandlingServiceTest {
@@ -248,7 +249,7 @@ class ColonyBugHandlingServiceTest {
             spawned = colony.getParasiticMites() > 0;
         }
         assertTrue(spawned);
-        assertTrue(colony.getParasiticMites() >= GameConstants.PARASITIC_MITE_MIN_MONTHLY_SPAWN);
+        assertTrue(colony.getParasiticMites() >= GameNumbers.PARASITIC_MITE_MIN_MONTHLY_SPAWN);
     }
 
     @Test
@@ -260,7 +261,7 @@ class ColonyBugHandlingServiceTest {
         for (int i = 0; i < 80; i++) {
             service.runMonthlyParasiticMites(colony, GameConstants.BIOME_TUNDRA, GameConstants.SEASON_WINTER);
         }
-        assertTrue(colony.getParasiticMites() <= 100 * GameConstants.PARASITIC_MITES_PER_SLOWED_ANT);
+        assertTrue(colony.getParasiticMites() <= 100 * GameNumbers.PARASITIC_MITES_PER_SLOWED_ANT);
     }
 
     @Test
@@ -294,11 +295,11 @@ class ColonyBugHandlingServiceTest {
         assertEquals(5_000, colony.getAphids());
         assertEquals(5_000, colony.getSymbioticMites());
         assertEquals(5_000, colony.getDermestids());
-        assertEquals(GameConstants.MAX_PEN_NON_ANT_SPRITES,
+        assertEquals(GameNumbers.MAX_PEN_NON_ANT_SPRITES,
                 colony.getBugs().stream().filter(b -> b.getBugType() == GameConstants.TYPE_APHID).count());
-        assertEquals(GameConstants.MAX_PEN_NON_ANT_SPRITES,
+        assertEquals(GameNumbers.MAX_PEN_NON_ANT_SPRITES,
                 colony.getBugs().stream().filter(b -> b.getBugType() == GameConstants.TYPE_SYMBIOTIC_MITE).count());
-        assertEquals(GameConstants.MAX_PEN_NON_ANT_SPRITES,
+        assertEquals(GameNumbers.MAX_PEN_NON_ANT_SPRITES,
                 colony.getBugs().stream().filter(b -> b.getBugType() == GameConstants.TYPE_DERMESTID).count());
     }
 

@@ -11,6 +11,7 @@ import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.Tunnel;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
@@ -125,7 +126,7 @@ public class ColonyAutomationService {
         Hex targetHex = findTunnelTarget(dynasty, currentHex);
         if (targetHex == null) return;
 
-        Tunnel tunnel = new Tunnel(currentHex, targetHex, GameConstants.TUNNEL_WORK_REQUIRED);
+        Tunnel tunnel = new Tunnel(currentHex, targetHex, GameNumbers.TUNNEL_WORK_REQUIRED);
         dynasty.addTunnel(tunnel);
         colony.setCurrentTunnelProject(tunnel);
         colony.logEvent(ColonyLogPrefixes.AUTOMATION + " "
@@ -431,7 +432,7 @@ public class ColonyAutomationService {
         int needed = 0;
         int parasiticMites = colony.getParasiticMites();
         if (parasiticMites > 0) {
-            needed = Math.max(1, parasiticMites / GameConstants.PARASITIC_MITES_PER_SLOWED_ANT);
+            needed = Math.max(1, parasiticMites / GameNumbers.PARASITIC_MITES_PER_SLOWED_ANT);
         }
         if (biome != null && season != null) {
             ColonyBugHandlingService bugs = colony.getBugHandlingService();
@@ -440,7 +441,7 @@ public class ColonyAutomationService {
             if (requiredMites > have) {
                 int shortfall = requiredMites - have;
                 int catchersForPrevention = Math.max(1,
-                        (int) Math.ceil(shortfall / (double) GameConstants.PET_CAPACITY_PER_TENDER));
+                        (int) Math.ceil(shortfall / (double) GameNumbers.PET_CAPACITY_PER_TENDER));
                 needed = Math.max(needed, catchersForPrevention);
             }
         }

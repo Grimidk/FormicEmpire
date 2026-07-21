@@ -16,6 +16,7 @@ import com.grimidk.formicempire.classes.entities.War;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyStarterService;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 
 class WarConquestStabilizationTest {
 
@@ -61,7 +62,7 @@ class WarConquestStabilizationTest {
         assertFalse(defenderColony.getQueens().isEmpty());
         assertTrue(defenderColony.getWorkers().size() >= 30);
         assertEquals(0, defenderColony.getDaysWithoutQueen());
-        assertEquals(GameConstants.RECENTLY_CONQUERED_LOYALTY_MONTHS,
+        assertEquals(GameNumbers.RECENTLY_CONQUERED_LOYALTY_MONTHS,
                 defenderColony.getRecentlyConqueredMonthsRemaining());
     }
 
@@ -69,7 +70,7 @@ class WarConquestStabilizationTest {
     void recentlyConqueredAppliesLoyaltyPenalty() {
         Colony colony = new Colony(1, "Frontier", true);
         colony.setLoyalty(50);
-        colony.setRecentlyConqueredMonthsRemaining(GameConstants.RECENTLY_CONQUERED_LOYALTY_MONTHS);
+        colony.setRecentlyConqueredMonthsRemaining(GameNumbers.RECENTLY_CONQUERED_LOYALTY_MONTHS);
 
         int effective = colony.getEffectiveLoyalty(null, null);
 
@@ -95,7 +96,7 @@ class WarConquestStabilizationTest {
 
         assertEquals(1, captured.getQueens().size());
         assertTrue(captured.getWorkers().size() >= 30);
-        assertEquals(GameConstants.RECENTLY_CONQUERED_LOYALTY_MONTHS,
+        assertEquals(GameNumbers.RECENTLY_CONQUERED_LOYALTY_MONTHS,
                 captured.getRecentlyConqueredMonthsRemaining());
     }
 }

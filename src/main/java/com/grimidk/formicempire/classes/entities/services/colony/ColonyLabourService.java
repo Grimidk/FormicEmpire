@@ -24,6 +24,7 @@ import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryEven
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.registries.DeathCause;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
@@ -565,15 +566,15 @@ public class ColonyLabourService {
         if (gameH <= 100) gameH = 1440;
         
         int maxDepl = colony.hasUpgrade(GameUnlocks.STAT_HEX_SUSTAIN)
-                ? GameConstants.HEX_SUSTAIN_MAX_DEPLETION_PCT
+                ? GameNumbers.HEX_SUSTAIN_MAX_DEPLETION_PCT
                 : 100;
         int depletionPct = currentHex != null ? currentHex.getResourceDepletionPercentCapped(maxDepl) : 0;
         int depletionExtra = (int) Math.round(
-            (depletionPct / 100.0) * GameConstants.HEX_DEPLETION_SPAWN_BUFFER_EXTRA_MAX);
-        depletionExtra = Math.min(depletionExtra, GameConstants.RESOURCE_SPAWN_BUFFER_EXTRA_CAP);
+            (depletionPct / 100.0) * GameNumbers.HEX_DEPLETION_SPAWN_BUFFER_EXTRA_MAX);
+        depletionExtra = Math.min(depletionExtra, GameNumbers.RESOURCE_SPAWN_BUFFER_EXTRA_CAP);
 
-        int extraMin = GameConstants.RESOURCE_SPAWN_EXTRA_DISTANCE_MIN + depletionExtra;
-        int extraMax = GameConstants.RESOURCE_SPAWN_EXTRA_DISTANCE_MAX + depletionExtra;
+        int extraMin = GameNumbers.RESOURCE_SPAWN_EXTRA_DISTANCE_MIN + depletionExtra;
+        int extraMax = GameNumbers.RESOURCE_SPAWN_EXTRA_DISTANCE_MAX + depletionExtra;
         int extraDistance = extraMin + GameRandom.nextInt(Math.max(1, extraMax - extraMin));
 
         int displayPx = selectedType.getDisplaySizeForSourceQuantity(quantity);
@@ -842,7 +843,7 @@ public class ColonyLabourService {
             int speed = colony.getStatsService().getResearchSpeed(colony);
             
             if (dynasty.getCurrentAssimilation() != null) {
-                double power = (researcherCount * speed + assistantCount * (speed / 5.0)) / 10.0;
+                double power = (researcherCount * speed + assistantCount * (speed / (double) GameNumbers.RESEARCH_ASSISTANT_EFFICIENCY_DIVISOR)) / 10.0;
                 dynasty.addAssimilationProgress(power);
                 
                 if (dynasty.getAssimilationProgress() >= dynasty.getAssimilationTargetCost()) {
@@ -858,7 +859,7 @@ public class ColonyLabourService {
                 }
             } else {
                 int queenGain = researcherCount * speed;
-                int assistantGain = (int) (assistantCount * (speed / 5.0));
+                int assistantGain = (int) (assistantCount * (speed / (double) GameNumbers.RESEARCH_ASSISTANT_EFFICIENCY_DIVISOR));
                 colony.addResearchPoints(queenGain + assistantGain);
             }
         }

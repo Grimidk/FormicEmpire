@@ -13,6 +13,7 @@ import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 import org.junit.jupiter.api.AfterEach;
@@ -43,7 +44,7 @@ class DynastyRebellionServiceTest {
     void monthlyChanceRisesAsLoyaltyFalls() {
         assertTrue(DynastyRebellionService.computeMonthlyRebellionChance(0)
                 > DynastyRebellionService.computeMonthlyRebellionChance(19));
-        assertEquals(GameConstants.REBELLION_MONTHLY_CHANCE_MAX,
+        assertEquals(GameNumbers.REBELLION_MONTHLY_CHANCE_MAX,
                 DynastyRebellionService.computeMonthlyRebellionChance(0), 0.0001);
     }
 
@@ -192,7 +193,7 @@ class DynastyRebellionServiceTest {
         assertTrue(rebellion.hasDiplomaticModifierKey(parent.getId(),
                 GameConstants.DIPLO_MODIFIER_PACT.getNameKey()));
         assertEquals(
-                GameConstants.DEFAULT_DIPLOMATIC_REPUTATION
+                GameNumbers.DEFAULT_DIPLOMATIC_REPUTATION
                         + GameConstants.DIPLO_MODIFIER_PACT.getReputationDelta()
                         + GameConstants.DIPLO_MODIFIER_GRANTED_INDEPENDENCE.getReputationDelta(),
                 rebellion.getDiplomaticReputation(parent.getId()));
@@ -570,7 +571,7 @@ class DynastyRebellionServiceTest {
         }
         Colony colony = dynasty.getCapital();
         dynasty.unlockUpgrade(GameUnlocks.TYPE_SOLDIER);
-        int needed = GameConstants.WAR_DECLARATION_MIN_POPULATION
+        int needed = GameNumbers.WAR_DECLARATION_MIN_POPULATION
                 - dynasty.getStatService().getTotalPopulation(dynasty);
         for (int i = 0; i < needed; i++) {
             colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));

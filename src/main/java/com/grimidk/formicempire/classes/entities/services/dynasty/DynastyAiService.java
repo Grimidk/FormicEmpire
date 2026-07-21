@@ -13,6 +13,7 @@ import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
@@ -274,7 +275,7 @@ public class DynastyAiService {
 
     private void runAbilities(Dynasty dynasty, World world) {
         int colonyCount = dynasty.getColonies().size();
-        boolean expanding = colonyCount < GameConstants.AI_EXPANSION_COLONY_TARGET;
+        boolean expanding = colonyCount < GameNumbers.AI_EXPANSION_COLONY_TARGET;
 
         if (dynasty.hasUpgrade(GameUnlocks.ABILITY_MASS_FLIGHT) && expanding) {
             int massCost = dynasty.getMassNuptialFlightCost();
@@ -309,7 +310,7 @@ public class DynastyAiService {
             int costBefore = capital.getResearchPoints();
             capital.forceNuptialFlight(world, capitalHex);
             if (capital.getResearchPoints() < costBefore) {
-                dynasty.setForcedFlightCooldownDays(GameConstants.AI_FORCED_FLIGHT_COOLDOWN_DAYS);
+                dynasty.setForcedFlightCooldownDays(GameNumbers.AI_FORCED_FLIGHT_COOLDOWN_DAYS);
             }
         }
     }
@@ -318,7 +319,7 @@ public class DynastyAiService {
         if (!dynasty.hasUpgrade(GameUnlocks.ABILITY_CREATINE_DIET)) {
             return;
         }
-        int proteinCost = GameConstants.CREATINE_DIET_PROTEIN_COST;
+        int proteinCost = GameNumbers.CREATINE_DIET_PROTEIN_COST;
         for (Colony colony : dynasty.getColonies()) {
             if (colony.getAge() < 7 || colony.isCreatineDietActive()) {
                 continue;
@@ -341,7 +342,7 @@ public class DynastyAiService {
         if (mushroomCap <= 0) {
             return false;
         }
-        return colony.getMushroomsPrecise() / mushroomCap < GameConstants.AI_CREATINE_FOOD_STRESS_RATIO;
+        return colony.getMushroomsPrecise() / mushroomCap < GameNumbers.AI_CREATINE_FOOD_STRESS_RATIO;
     }
 
     private void runIntegrationAttempts(Dynasty dynasty, World world, TradeManager tradeManager) {

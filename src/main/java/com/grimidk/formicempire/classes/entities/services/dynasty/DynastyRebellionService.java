@@ -18,6 +18,7 @@ import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 
 import java.util.ArrayDeque;
@@ -68,11 +69,11 @@ public final class DynastyRebellionService {
             return 0.0;
         }
         if (effectiveLoyalty <= 0) {
-            return GameConstants.REBELLION_MONTHLY_CHANCE_MAX;
+            return GameNumbers.REBELLION_MONTHLY_CHANCE_MAX;
         }
         float t = effectiveLoyalty / (float) rebelliousMax;
-        return GameConstants.REBELLION_MONTHLY_CHANCE_MIN
-                + (GameConstants.REBELLION_MONTHLY_CHANCE_MAX - GameConstants.REBELLION_MONTHLY_CHANCE_MIN) * (1.0 - t);
+        return GameNumbers.REBELLION_MONTHLY_CHANCE_MIN
+                + (GameNumbers.REBELLION_MONTHLY_CHANCE_MAX - GameNumbers.REBELLION_MONTHLY_CHANCE_MIN) * (1.0 - t);
     }
 
     public static boolean isRebellionRisk(Colony colony, TradeManager tradeManager, World world) {
@@ -101,9 +102,9 @@ public final class DynastyRebellionService {
         int loyalty = candidate.getEffectiveLoyalty(tradeManager, world);
         float loyaltyFactor = Math.max(0f, (GameConstants.LOYALTY_COMPLACENT.getMinScore() - 1 - loyalty)
                 / (float) (GameConstants.LOYALTY_COMPLACENT.getMinScore() - 1));
-        return Math.min(0.95, GameConstants.REBELLION_JOIN_BASE_CHANCE
-                + GameConstants.REBELLION_JOIN_DISTANCE_WEIGHT * distanceFactor
-                + GameConstants.REBELLION_JOIN_LOYALTY_WEIGHT * loyaltyFactor);
+        return Math.min(0.95, GameNumbers.REBELLION_JOIN_BASE_CHANCE
+                + GameNumbers.REBELLION_JOIN_DISTANCE_WEIGHT * distanceFactor
+                + GameNumbers.REBELLION_JOIN_LOYALTY_WEIGHT * loyaltyFactor);
     }
 
     public static boolean hasBlockingRebellion(World world, Dynasty parent) {
@@ -367,10 +368,10 @@ public final class DynastyRebellionService {
             return GameRandom.nextBoolean();
         }
         double ratio = parentPower / (double) Math.max(1, rebelPower);
-        double fightChance = GameConstants.REBELLION_NPC_FIGHT_CHANCE_MIN
-                + (GameConstants.REBELLION_NPC_FIGHT_CHANCE_MAX - GameConstants.REBELLION_NPC_FIGHT_CHANCE_MIN)
-                * clamp01((ratio - GameConstants.REBELLION_NPC_FIGHT_RATIO_LOW)
-                        / (GameConstants.REBELLION_NPC_FIGHT_RATIO_HIGH - GameConstants.REBELLION_NPC_FIGHT_RATIO_LOW));
+        double fightChance = GameNumbers.REBELLION_NPC_FIGHT_CHANCE_MIN
+                + (GameNumbers.REBELLION_NPC_FIGHT_CHANCE_MAX - GameNumbers.REBELLION_NPC_FIGHT_CHANCE_MIN)
+                * clamp01((ratio - GameNumbers.REBELLION_NPC_FIGHT_RATIO_LOW)
+                        / (GameNumbers.REBELLION_NPC_FIGHT_RATIO_HIGH - GameNumbers.REBELLION_NPC_FIGHT_RATIO_LOW));
         return GameRandom.nextDouble() < fightChance;
     }
 

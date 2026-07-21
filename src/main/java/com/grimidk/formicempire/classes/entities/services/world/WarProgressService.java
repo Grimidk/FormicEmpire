@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.entities.services.world;
 
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
+import com.grimidk.formicempire.classes.entities.Ant;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
@@ -12,8 +13,10 @@ import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 
+import java.util.List;
 import java.util.Map;
 
 public final class WarProgressService {
@@ -230,7 +233,7 @@ public final class WarProgressService {
         if (!canAiFallback(world, war, ai, opponent)) {
             return;
         }
-        if (GameRandom.nextDouble() < GameConstants.AI_WAR_FALLBACK_CHANCE) {
+        if (GameRandom.nextDouble() < GameNumbers.AI_WAR_FALLBACK_CHANCE) {
             forfeitStage(world, warService, war, ai);
         }
     }
@@ -244,22 +247,22 @@ public final class WarProgressService {
         }
         int aiActive = ColonyMilitaryService.powerForWarStanding(ai);
         int opponentActive = ColonyMilitaryService.powerForWarStanding(opponent);
-        if (aiActive > opponentActive * GameConstants.WAR_AI_FALLBACK_MAX_POWER_RATIO) {
+        if (aiActive > opponentActive * GameNumbers.WAR_AI_FALLBACK_MAX_POWER_RATIO) {
             return false;
         }
         Colony contested = findColonyById(world, war.getContestedColonyId());
         if (contested == null || contested.isCapital()) {
             return false;
         }
-        if (ai.getColonies().size() < GameConstants.WAR_AI_FALLBACK_MIN_SPARE_COLONIES) {
+        if (ai.getColonies().size() < GameNumbers.WAR_AI_FALLBACK_MIN_SPARE_COLONIES) {
             return false;
         }
-        if (aiActive < GameConstants.WAR_AI_FALLBACK_MIN_ACTIVE) {
+        if (aiActive < GameNumbers.WAR_AI_FALLBACK_MIN_ACTIVE) {
             return false;
         }
         int stageStartActive = war.getStageStartActiveFor(ai.getId());
         if (stageStartActive > 0
-                && aiActive < stageStartActive * GameConstants.WAR_AI_FALLBACK_RECOVERY_RATIO) {
+                && aiActive < stageStartActive * GameNumbers.WAR_AI_FALLBACK_RECOVERY_RATIO) {
             return false;
         }
         Dynasty stageDefender = contested.getDynasty();
@@ -286,7 +289,7 @@ public final class WarProgressService {
         ColonyMilitaryService.refreshDynastyMilitaryPower(stageAttacker);
         ColonyMilitaryService.refreshDynastyMilitaryPower(stageDefender);
 
-        war.setStageProgress(Math.min(1f, war.getStageProgress() + GameConstants.WAR_STAGE_PROGRESS_PER_HOUR));
+        war.setStageProgress(Math.min(1f, war.getStageProgress() + GameNumbers.WAR_STAGE_PROGRESS_PER_HOUR));
         war.recomputeProgressPercent();
     }
 
@@ -338,9 +341,9 @@ public final class WarProgressService {
             return;
         }
 
-        int effectiveReservePower = GameConstants.warHexDefenseEffectivePower(reservePower);
+        int effectiveReservePower = GameNumbers.warHexDefenseEffectivePower(reservePower);
         BattleTickResult result = resolveBattleTick(attackerPower, effectiveReservePower);
-        int actualReserveLoss = GameConstants.warHexDefenseEffectiveLossToActual(result.defenderLoss);
+        int actualReserveLoss = GameNumbers.warHexDefenseEffectiveLossToActual(result.defenderLoss);
         war.setDeployedActiveAttacker(Math.max(0, attackerPower - result.attackerLoss));
         war.setDeployedReserveDefender(Math.max(0, reservePower - actualReserveLoss));
 
@@ -350,7 +353,7 @@ public final class WarProgressService {
         ColonyMilitaryService.refreshDynastyMilitaryPower(stageAttacker);
         ColonyMilitaryService.refreshDynastyMilitaryPower(stageDefender);
 
-        war.setStageProgress(Math.min(1f, war.getStageProgress() + GameConstants.WAR_STAGE_PROGRESS_PER_HOUR));
+        war.setStageProgress(Math.min(1f, war.getStageProgress() + GameNumbers.WAR_STAGE_PROGRESS_PER_HOUR));
         war.recomputeProgressPercent();
 
         if (isStageReadyToResolve(war)
@@ -430,7 +433,7 @@ public final class WarProgressService {
 
     private static void enterRedeploying(World world, War war, Dynasty aggressor, Dynasty defender) {
         war.setStagePhase(WarStagePhase.REDEPLOYING);
-        war.setRedeployHoursRemaining(GameConstants.WAR_REDEPLOY_HOURS);
+        war.setRedeployHoursRemaining(GameNumbers.WAR_REDEPLOY_HOURS);
         war.setDeployedActiveAttacker(0);
         war.setDeployedActiveDefender(0);
         war.setDeployedReserveDefender(0);
@@ -642,13 +645,13 @@ public final class WarProgressService {
         int stronger = Math.max(sideOnePower, sideTwoPower);
         int weaker = Math.min(sideOnePower, sideTwoPower);
         float ratio = stronger / (float) weaker;
-        float winChance = GameConstants.warBattleWinChance(ratio);
+        float winChance = GameNumbers.warBattleWinChance(ratio);
         boolean sideOneIsStronger = sideOnePower >= sideTwoPower;
         boolean strongerWins = GameRandom.nextDouble() < winChance;
         boolean sideOneWins = sideOneIsStronger == strongerWins;
 
-        float lossFraction = GameConstants.warBattleLoserLossFraction(ratio);
-        float winnerLossFraction = GameConstants.warBattleWinnerLossFraction(ratio);
+        float lossFraction = GameNumbers.warBattleLoserLossFraction(ratio);
+        float winnerLossFraction = GameNumbers.warBattleWinnerLossFraction(ratio);
         if (sideOneWins) {
             return new BattleTickResult(
                     computeBattleLoss(sideOnePower, winnerLossFraction),
@@ -752,18 +755,18 @@ public final class WarProgressService {
         int remaining = pointBudget;
 
         remaining -= reduceAntList(colony.getSoldiers(), remaining,
-                GameConstants.MILITARY_WEIGHT_SOLDIER);
+                GameNumbers.MILITARY_WEIGHT_SOLDIER);
         remaining -= reduceAntList(colony.getMajors(), remaining,
-                GameConstants.MILITARY_WEIGHT_MAJOR);
+                GameNumbers.MILITARY_WEIGHT_MAJOR);
         remaining -= reduceAntList(colony.getWorkers(), remaining,
-                GameConstants.MILITARY_WEIGHT_WORKER);
+                GameNumbers.MILITARY_WEIGHT_WORKER);
         if (remaining > 0) {
             eliminateColonyQueens(colony);
         }
         ColonyMilitaryService.refreshColonyMilitaryPower(colony);
     }
 
-    private static int reduceAntList(java.util.List<com.grimidk.formicempire.classes.entities.Ant> ants,
+    private static int reduceAntList(List<Ant> ants,
             int pointBudget, int weightPerAnt) {
         if (ants == null || ants.isEmpty() || pointBudget <= 0 || weightPerAnt <= 0) {
             return 0;
@@ -833,7 +836,7 @@ public final class WarProgressService {
         if (next == null) {
             return;
         }
-        String hours = String.valueOf(GameConstants.WAR_REDEPLOY_HOURS);
+        String hours = String.valueOf(GameNumbers.WAR_REDEPLOY_HOURS);
         String message = LanguageStrings.format(
                 LanguageStrings.WAR_STAGE_REDEPLOY_FMT,
                 hours,

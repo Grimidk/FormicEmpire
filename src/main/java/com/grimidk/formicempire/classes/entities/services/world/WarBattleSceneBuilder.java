@@ -11,6 +11,7 @@ import com.grimidk.formicempire.classes.entities.War;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -52,7 +53,7 @@ public final class WarBattleSceneBuilder {
 
         if (war.getStagePhase() == WarStagePhase.RESERVE_ASSAULT) {
             attackerPower = war.getDeployedActiveAttacker();
-            defenderPower = GameConstants.warHexDefenseEffectivePower(war.getDeployedReserveDefender());
+            defenderPower = GameNumbers.warHexDefenseEffectivePower(war.getDeployedReserveDefender());
             attackerCounts = compositionForDynastyActive(stageAttacker, attackerPower);
             defenderCounts = compositionForColonyReserve(contested, war.getDeployedReserveDefender());
         } else {

@@ -4,6 +4,7 @@ import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.Weather;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 
 public class Hex {
     private Biome biome;
@@ -107,7 +108,7 @@ public class Hex {
     }
 
     public int getResourceDepletionPercent() {
-        return Math.min(100, nonWaterResourceSourcesGenerated / GameConstants.HEX_RESOURCE_DEPLETION_SOURCES_PER_PERCENT);
+        return Math.min(100, nonWaterResourceSourcesGenerated / GameNumbers.HEX_RESOURCE_DEPLETION_SOURCES_PER_PERCENT);
     }
 
     public int getResourceDepletionPercentCapped(int maxPercent) {

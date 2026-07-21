@@ -3,6 +3,7 @@ package com.grimidk.formicempire.classes.infrasctructure;
 import com.grimidk.formicempire.classes.entities.War;
 import com.grimidk.formicempire.classes.entities.services.world.WarStagePhase;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
 import java.io.Serializable;
@@ -180,7 +181,7 @@ public class Savefile implements Serializable {
         public int nativeSpeciesId;
         public int creatineDietMonthsRemaining;
         public int totalDeaths;
-        public int loyalty = GameConstants.DEFAULT_COLONY_LOYALTY;
+        public int loyalty = GameNumbers.DEFAULT_COLONY_LOYALTY;
         public int militaryPower;
         public Map<String, Integer> assignedRoleCounts = new HashMap<>();
         public Map<String, Integer> warAssignedRoleCounts = new HashMap<>();

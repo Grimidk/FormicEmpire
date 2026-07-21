@@ -11,6 +11,7 @@ import com.grimidk.formicempire.classes.entities.spatial.Dimension;
 import com.grimidk.formicempire.classes.entities.spatial.NeoPoint;
 import com.grimidk.formicempire.classes.entities.spatial.Room;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.registries.WorldSpaces;
@@ -71,21 +72,21 @@ public class ColonyPhysicsService {
                         updateAntLogic(colony, ant);
                     }
 
-                    float moveSpeed = GameConstants.BASE_SPRITE_SPEED;
+                    float moveSpeed = GameNumbers.BASE_SPRITE_SPEED;
                     if (colony.isCreatineDietActive()) {
-                        moveSpeed *= GameConstants.CREATINE_DIET_SPEED_MULTIPLIER;
+                        moveSpeed *= GameNumbers.CREATINE_DIET_SPEED_MULTIPLIER;
                     }
                     if (lodSameDim && !inView) {
                         if (!ViewportPhysicsLod.shouldRunOffViewportPosition(physicsStepIndex, ant)) {
                             continue;
                         }
-                        moveSpeed = ViewportPhysicsLod.compensatedMoveSpeed(GameConstants.BASE_SPRITE_SPEED);
+                        moveSpeed = ViewportPhysicsLod.compensatedMoveSpeed(GameNumbers.BASE_SPRITE_SPEED);
                     }
                     if (type == GameConstants.TYPE_WORKER && colony.hasUpgrade(GameUnlocks.STAT_WORKER_SPEED_2)) {
                         moveSpeed *= 2f;
                     }
                     if (ant.isParasiticMiteInfected()) {
-                        moveSpeed *= GameConstants.PARASITIC_MITE_SPEED_MULTIPLIER;
+                        moveSpeed *= GameNumbers.PARASITIC_MITE_SPEED_MULTIPLIER;
                     }
                     ant.updatePosition(moveSpeed);
                 }
@@ -115,15 +116,15 @@ public class ColonyPhysicsService {
                     updateBugLogic(colony, bug);
                 }
 
-                float bugMove = GameConstants.BASE_SPRITE_SPEED;
+                float bugMove = GameNumbers.BASE_SPRITE_SPEED;
                 if (colony.isCreatineDietActive()) {
-                    bugMove *= GameConstants.CREATINE_DIET_SPEED_MULTIPLIER;
+                    bugMove *= GameNumbers.CREATINE_DIET_SPEED_MULTIPLIER;
                 }
                 if (lod && !bugInView) {
                     if (!ViewportPhysicsLod.shouldRunOffViewportBugMove(physicsStepIndex, bugHash)) {
                         continue;
                     }
-                    bugMove = ViewportPhysicsLod.compensatedMoveSpeed(GameConstants.BASE_SPRITE_SPEED);
+                    bugMove = ViewportPhysicsLod.compensatedMoveSpeed(GameNumbers.BASE_SPRITE_SPEED);
                 }
                 bug.updatePosition(bugMove);
             }

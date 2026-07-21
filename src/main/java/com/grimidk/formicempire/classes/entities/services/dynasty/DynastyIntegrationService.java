@@ -12,6 +12,7 @@ import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ public final class DynastyIntegrationService {
         if (targetPower <= 0) {
             return false;
         }
-        return overlord.getMilitaryPower() >= targetPower * GameConstants.INTEGRATION_MILITARY_RATIO_REQUIRED;
+        return overlord.getMilitaryPower() >= targetPower * GameNumbers.INTEGRATION_MILITARY_RATIO_REQUIRED;
     }
 
     public static boolean meetsReputationRequirement(Dynasty overlord, Dynasty target, World world) {
@@ -72,7 +73,7 @@ public final class DynastyIntegrationService {
         if (!meetsReputationRequirement(overlord, target, world)) {
             return false;
         }
-        if (countIntegrationDiplomatCapacity(overlord) < GameConstants.INTEGRATION_MIN_DIPLOMATS) {
+        if (countIntegrationDiplomatCapacity(overlord) < GameNumbers.INTEGRATION_MIN_DIPLOMATS) {
             return false;
         }
         return !target.getColonies().isEmpty();
@@ -101,7 +102,7 @@ public final class DynastyIntegrationService {
         if (!meetsReputationRequirement(overlord, target, world)) {
             return false;
         }
-        if (countIntegrationDiplomats(overlord) < GameConstants.INTEGRATION_MIN_DIPLOMATS) {
+        if (countIntegrationDiplomats(overlord) < GameNumbers.INTEGRATION_MIN_DIPLOMATS) {
             return false;
         }
         return !target.getColonies().isEmpty();
@@ -167,11 +168,11 @@ public final class DynastyIntegrationService {
         int colonyCount = target.getColonies().size();
         int diplomats = countIntegrationDiplomats(overlord);
         double diplomatsPerColony = diplomats / (double) colonyCount;
-        return colonyCount * GameConstants.computeIntegrationMonthsPerColony(diplomatsPerColony);
+        return colonyCount * GameNumbers.computeIntegrationMonthsPerColony(diplomatsPerColony);
     }
 
     public static double computeTotalIntegrationDays(Dynasty overlord, Dynasty target) {
-        return computeTotalIntegrationMonths(overlord, target) * GameConstants.DAYS_PER_MONTH;
+        return computeTotalIntegrationMonths(overlord, target) * GameNumbers.DAYS_PER_MONTH;
     }
 
     public static double getIntegrationProgressPercent(Dynasty overlord, Dynasty target) {
@@ -205,12 +206,12 @@ public final class DynastyIntegrationService {
         if (world == null) {
             return 0;
         }
-        return (world.getYear() * 12 + (world.getMonth() - 1)) * GameConstants.DAYS_PER_MONTH + (world.getDay() - 1);
+        return (world.getYear() * 12 + (world.getMonth() - 1)) * GameNumbers.DAYS_PER_MONTH + (world.getDay() - 1);
     }
 
     public static String formatWorldDate(int worldDayIndex) {
-        int dayOfMonth = (worldDayIndex % GameConstants.DAYS_PER_MONTH) + 1;
-        int monthIndex = worldDayIndex / GameConstants.DAYS_PER_MONTH;
+        int dayOfMonth = (worldDayIndex % GameNumbers.DAYS_PER_MONTH) + 1;
+        int monthIndex = worldDayIndex / GameNumbers.DAYS_PER_MONTH;
         int year = monthIndex / 12;
         int month = (monthIndex % 12) + 1;
         return LanguageStrings.format(
@@ -353,7 +354,7 @@ public final class DynastyIntegrationService {
             colony.setDynasty(overlord);
             colony.setCapital(false);
             ColonyStarterService.shared().inheritIntegratedColonyFromOverlord(overlord, colony);
-            colony.setRecentlyIntegratedMonthsRemaining(GameConstants.RECENTLY_INTEGRATED_LOYALTY_MONTHS);
+            colony.setRecentlyIntegratedMonthsRemaining(GameNumbers.RECENTLY_INTEGRATED_LOYALTY_MONTHS);
             ColonyMilitaryService.refreshColonyMilitaryPower(colony);
         }
 
