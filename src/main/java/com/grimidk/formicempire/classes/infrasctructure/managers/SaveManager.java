@@ -598,6 +598,8 @@ public class SaveManager {
                     for (Map.Entry<AntRole, Integer> entry : c.getWarAssignedRoleCounts().entrySet()) {
                         sc.warAssignedRoleCounts.put(String.valueOf(entry.getKey().getId()), entry.getValue());
                     }
+                    sc.roleDisallowedSubtypesFlat = c.flattenPeaceRoleDisallowedSubtypes();
+                    sc.warRoleDisallowedSubtypesFlat = c.flattenWarRoleDisallowedSubtypes();
                     for (Map.Entry<Integer, Integer> entry : c.getOutgoingColonyDiplomatMissions().entrySet()) {
                         sc.outgoingColonyDiplomatMissions.put(String.valueOf(entry.getKey()), entry.getValue());
                     }
@@ -839,6 +841,8 @@ public class SaveManager {
         // Serialized Lists within Colony
         w.write("      \"assignedRoleCounts\": " + serializeMapToJson(sc.assignedRoleCounts) + ","); w.newLine();
         w.write("      \"warAssignedRoleCounts\": " + serializeMapToJson(sc.warAssignedRoleCounts) + ","); w.newLine();
+        w.write("      \"roleDisallowedSubtypesFlat\": " + serializeMapToJson(sc.roleDisallowedSubtypesFlat) + ","); w.newLine();
+        w.write("      \"warRoleDisallowedSubtypesFlat\": " + serializeMapToJson(sc.warRoleDisallowedSubtypesFlat) + ","); w.newLine();
         w.write("      \"outgoingColonyDiplomatMissions\": " + serializeMapToJson(sc.outgoingColonyDiplomatMissions) + ","); w.newLine();
         w.write("      \"incomingColonyDiplomatSupport\": " + serializeMapToJson(sc.incomingColonyDiplomatSupport) + ","); w.newLine();
         w.write("      \"outgoingDynastyDiplomatMissions\": " + serializeMapToJson(sc.outgoingDynastyDiplomatMissions) + ","); w.newLine();
@@ -1154,6 +1158,8 @@ public class SaveManager {
         // Nested structures
         sc.assignedRoleCounts = deserializeJsonToMap(map.get("assignedRoleCounts"));
         sc.warAssignedRoleCounts = deserializeJsonToMap(map.get("warAssignedRoleCounts"));
+        sc.roleDisallowedSubtypesFlat = deserializeJsonToMap(map.get("roleDisallowedSubtypesFlat"));
+        sc.warRoleDisallowedSubtypesFlat = deserializeJsonToMap(map.get("warRoleDisallowedSubtypesFlat"));
         sc.outgoingColonyDiplomatMissions = deserializeJsonToMap(map.get("outgoingColonyDiplomatMissions"));
         sc.incomingColonyDiplomatSupport = deserializeJsonToMap(map.get("incomingColonyDiplomatSupport"));
         sc.outgoingDynastyDiplomatMissions = deserializeJsonToMap(map.get("outgoingDynastyDiplomatMissions"));

@@ -421,6 +421,8 @@ public class SpanishTranslation implements Translation {
         es.put("ROLE_WAR_ECONOMY_TOGGLE", "Roles de economía de guerra");
         es.put("ROLE_WAR_ECONOMY_TOGGLE_TIP", "Ver y editar la distribución de roles en guerra. Solo activa mientras tu dinastía esté en guerra.");
         es.put("ROLE_COPY_PEACE_TO_WAR", "Copiar de tiempos de paz");
+        es.put("ROLE_AVAILABLE_SUBTYPES_PREFIX", "Hormigas disponibles:");
+        es.put("ROLE_SUBTYPE_ALLOW_TIP", "Permitir hormigas %s en este rol");
         es.put("COLONY_AT_PEACE", "En paz");
         es.put("COLONY_AT_WAR", "En guerra");
 

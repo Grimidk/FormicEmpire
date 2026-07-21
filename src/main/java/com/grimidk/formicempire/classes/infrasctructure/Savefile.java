@@ -185,6 +185,8 @@ public class Savefile implements Serializable {
         public int militaryPower;
         public Map<String, Integer> assignedRoleCounts = new HashMap<>();
         public Map<String, Integer> warAssignedRoleCounts = new HashMap<>();
+        public Map<String, Integer> roleDisallowedSubtypesFlat = new HashMap<>();
+        public Map<String, Integer> warRoleDisallowedSubtypesFlat = new HashMap<>();
         public Map<String, Integer> localDeathStatistics = new HashMap<>();
         public List<Integer> unlockedBuildingIds = new ArrayList<>();
         public List<SavedResourceSource> savedResourceSources = new ArrayList<>();

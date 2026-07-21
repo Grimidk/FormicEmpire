@@ -16,6 +16,7 @@ import java.awt.Rectangle;
 import com.grimidk.formicempire.classes.entities.services.colony.*;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDiplomacyService;
 import com.grimidk.formicempire.classes.constants.misc.BugType;
+import com.grimidk.formicempire.classes.constants.ant.AntSubtype;
 import com.grimidk.formicempire.classes.constants.ant.AntSubtypeSlot;
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
@@ -70,6 +71,8 @@ public class Colony {
     
     private final Map<AntRole, Integer> peaceAssignedRoleCounts = createEmptyRoleCountMap();
     private final Map<AntRole, Integer> warAssignedRoleCounts = createEmptyRoleCountMap();
+    private final Map<AntRole, Set<Integer>> peaceRoleDisallowedSubtypes = new HashMap<>();
+    private final Map<AntRole, Set<Integer>> warRoleDisallowedSubtypes = new HashMap<>();
     private Map<AntRole, Integer> activeRoleCountCache;
     private final Map<Integer, Integer> outgoingColonyDiplomatMissions = new HashMap<>();
     private final Map<Integer, Integer> incomingColonyDiplomatSupport = new HashMap<>();
@@ -242,6 +245,27 @@ public class Colony {
             applySavedRoleCounts(warAssignedRoleCounts, savedColony.warAssignedRoleCounts);
         } else if (savedColony.assignedRoleCounts != null && !savedColony.assignedRoleCounts.isEmpty()) {
             copyPeaceRolesToWar();
+        }
+        applySavedRoleDisallowedSubtypes(peaceRoleDisallowedSubtypes, savedColony.roleDisallowedSubtypesFlat);
+        if (savedColony.warRoleDisallowedSubtypesFlat != null && !savedColony.warRoleDisallowedSubtypesFlat.isEmpty()) {
+            applySavedRoleDisallowedSubtypes(warRoleDisallowedSubtypes, savedColony.warRoleDisallowedSubtypesFlat);
+        } else if (savedColony.roleDisallowedSubtypesFlat != null && !savedColony.roleDisallowedSubtypesFlat.isEmpty()) {
+            copyPeaceRoleSubtypeAllowsToWar();
+        }
+    }
+
+    private static void applySavedRoleDisallowedSubtypes(Map<AntRole, Set<Integer>> target,
+            Map<String, Integer> flat) {
+        target.clear();
+        Map<AntRole, Set<Integer>> loaded = AntSubtypeService.unflattenRoleDisallowedSubtypes(flat);
+        for (Map.Entry<AntRole, Set<Integer>> entry : loaded.entrySet()) {
+            Set<Integer> cleaned = new HashSet<>(entry.getValue());
+            for (AntSubtype forced : entry.getKey().getForcedAllowedSubtypes()) {
+                cleaned.remove(forced.getId());
+            }
+            if (!cleaned.isEmpty()) {
+                target.put(entry.getKey(), cleaned);
+            }
         }
     }
 
@@ -1172,6 +1196,109 @@ public class Colony {
             }
             warAssignedRoleCounts.put(role, peaceAssignedRoleCounts.getOrDefault(role, 0));
         }
+        copyPeaceRoleSubtypeAllowsToWar();
+    }
+
+    public void copyPeaceRoleSubtypeAllowsToWar() {
+        warRoleDisallowedSubtypes.clear();
+        for (Map.Entry<AntRole, Set<Integer>> entry : peaceRoleDisallowedSubtypes.entrySet()) {
+            if (GameConstants.isWarEconomyExclusiveRole(entry.getKey())) {
+                continue;
+            }
+            warRoleDisallowedSubtypes.put(entry.getKey(), new HashSet<>(entry.getValue()));
+        }
+    }
+
+    public boolean isRoleSubtypeAllowed(AntRole role, AntSubtype subtype) {
+        return isRoleSubtypeAllowed(role, subtype, usesWarEconomyRoles());
+    }
+
+    public boolean isPeaceRoleSubtypeAllowed(AntRole role, AntSubtype subtype) {
+        return isRoleSubtypeAllowed(role, subtype, false);
+    }
+
+    public boolean isWarRoleSubtypeAllowed(AntRole role, AntSubtype subtype) {
+        return isRoleSubtypeAllowed(role, subtype, true);
+    }
+
+    private boolean isRoleSubtypeAllowed(AntRole role, AntSubtype subtype, boolean war) {
+        if (role == null || subtype == null || subtype.isNone()) {
+            return true;
+        }
+        if (role.isSubtypeForcedAllowed(subtype)) {
+            return true;
+        }
+        Map<AntRole, Set<Integer>> disallowed = war ? warRoleDisallowedSubtypes : peaceRoleDisallowedSubtypes;
+        Set<Integer> blocked = disallowed.get(role);
+        return blocked == null || !blocked.contains(subtype.getId());
+    }
+
+    public void setRoleSubtypeAllowed(AntRole role, AntSubtype subtype, boolean allowed) {
+        if (usesWarEconomyRoles()) {
+            setWarRoleSubtypeAllowed(role, subtype, allowed);
+        } else {
+            setPeaceRoleSubtypeAllowed(role, subtype, allowed);
+        }
+    }
+
+    public void setPeaceRoleSubtypeAllowed(AntRole role, AntSubtype subtype, boolean allowed) {
+        setRoleSubtypeAllowed(role, subtype, allowed, peaceRoleDisallowedSubtypes);
+    }
+
+    public void setWarRoleSubtypeAllowed(AntRole role, AntSubtype subtype, boolean allowed) {
+        setRoleSubtypeAllowed(role, subtype, allowed, warRoleDisallowedSubtypes);
+    }
+
+    private void setRoleSubtypeAllowed(AntRole role, AntSubtype subtype, boolean allowed,
+            Map<AntRole, Set<Integer>> disallowedByRole) {
+        if (role == null || subtype == null || subtype.isNone()) {
+            return;
+        }
+        if (role.isSubtypeForcedAllowed(subtype)) {
+            allowed = true;
+        }
+        Set<Integer> blocked = disallowedByRole.computeIfAbsent(role, ignored -> new HashSet<>());
+        if (allowed) {
+            blocked.remove(subtype.getId());
+            if (blocked.isEmpty()) {
+                disallowedByRole.remove(role);
+            }
+        } else {
+            blocked.add(subtype.getId());
+        }
+    }
+
+    public Set<Integer> getAllowedSpecialSubtypeIdsForRole(AntRole role) {
+        return getAllowedSpecialSubtypeIdsForRole(role, usesWarEconomyRoles());
+    }
+
+    public Set<Integer> getPeaceAllowedSpecialSubtypeIdsForRole(AntRole role) {
+        return getAllowedSpecialSubtypeIdsForRole(role, false);
+    }
+
+    public Set<Integer> getWarAllowedSpecialSubtypeIdsForRole(AntRole role) {
+        return getAllowedSpecialSubtypeIdsForRole(role, true);
+    }
+
+    private Set<Integer> getAllowedSpecialSubtypeIdsForRole(AntRole role, boolean war) {
+        Set<Integer> allowed = new HashSet<>();
+        for (AntSubtype subtype : GameConstants.getAntSubtypes()) {
+            if (subtype.isNone()) {
+                continue;
+            }
+            if (isRoleSubtypeAllowed(role, subtype, war)) {
+                allowed.add(subtype.getId());
+            }
+        }
+        return AntSubtypeService.effectiveAllowedSubtypeIds(role, allowed);
+    }
+
+    public Map<String, Integer> flattenPeaceRoleDisallowedSubtypes() {
+        return AntSubtypeService.flattenRoleDisallowedSubtypes(peaceRoleDisallowedSubtypes);
+    }
+
+    public Map<String, Integer> flattenWarRoleDisallowedSubtypes() {
+        return AntSubtypeService.flattenRoleDisallowedSubtypes(warRoleDisallowedSubtypes);
     }
 
     public void refreshRoleAssignmentForWarState(Engine engine) {

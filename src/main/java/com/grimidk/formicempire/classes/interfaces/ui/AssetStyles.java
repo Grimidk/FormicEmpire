@@ -151,6 +151,7 @@ public class AssetStyles {
     public static Color SELECTION_BACKGROUND = COLOR_LIGHTER_GRAY;
 
     public static final Dimension DEFAULT_DIALOG_SIZE = new Dimension(1150, 720);
+    public static final Dimension ROLE_DIALOG_SIZE = new Dimension(1320, 820);
     public static final Dimension DYNASTY_DIALOG_SIZE = new Dimension(1400, 860);
     public static final Dimension MAP_DIALOG_SIZE = new Dimension(1280, 820);
 

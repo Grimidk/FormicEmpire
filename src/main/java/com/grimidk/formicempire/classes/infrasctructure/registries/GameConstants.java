@@ -674,7 +674,10 @@ public final class GameConstants {
     static { antRoles.add(ROLE_MINER); }
     public static final AntRole ROLE_COURIER = new AntRole(9, TYPE_WORKER, LanguageStrings.ROLE_COURIER, loadIcon("icons/roles/Courier.png"));
     static { antRoles.add(ROLE_COURIER); }
-    public static final AntRole ROLE_POTTER = new AntRole(10, TYPE_WORKER, LanguageStrings.ROLE_POTTER, loadIcon("icons/roles/Potter.png"));
+    // Portable-Feeder requires honeypot abdomen; forced-allowed so the allow-check cannot be cleared.
+    public static final AntRole ROLE_POTTER = new AntRole(10, TYPE_WORKER, LanguageStrings.ROLE_POTTER,
+            loadIcon("icons/roles/Potter.png"),
+            Set.of(SUBTYPE_ABDOMEN_HONEYPOT), Set.of(SUBTYPE_ABDOMEN_HONEYPOT));
     static { antRoles.add(ROLE_POTTER); }
     public static final AntRole ROLE_WARRIOR = new AntRole(12, TYPE_SOLDIER, LanguageStrings.ROLE_WARRIOR, loadIcon("icons/roles/Warrior.png"));
     static { antRoles.add(ROLE_WARRIOR); }
@@ -690,7 +693,9 @@ public final class GameConstants {
     static { antRoles.add(ROLE_BRUTE); }
     public static final AntRole ROLE_CARRIER = new AntRole(18, TYPE_MAJOR, LanguageStrings.ROLE_CARRIER, loadIcon("icons/roles/Carrier.png"));
     static { antRoles.add(ROLE_CARRIER); }
-    public static final AntRole ROLE_ARTILLERY = new AntRole(19, TYPE_MAJOR, LanguageStrings.ROLE_ARTILLERY, loadIcon("icons/roles/Artillery.png"));
+    // Chemical-throwing subtype not implemented yet; pass required/forced sets when that subtype exists.
+    public static final AntRole ROLE_ARTILLERY = new AntRole(19, TYPE_MAJOR, LanguageStrings.ROLE_ARTILLERY,
+            loadIcon("icons/roles/Artillery.png"), Set.of(), Set.of());
     static { antRoles.add(ROLE_ARTILLERY); }
     public static final AntRole ROLE_SIEGE = new AntRole(20, TYPE_MAJOR, LanguageStrings.ROLE_SIEGE, loadIcon("icons/roles/Siege.png"));
     static { antRoles.add(ROLE_SIEGE); }
@@ -1301,6 +1306,15 @@ public final class GameConstants {
     }
 
     public static List<AntSubtype> getAntSubtypes() { return Collections.unmodifiableList(antSubtypes); }
+
+    public static AntSubtype getAntSubtypeById(int id) {
+        for (AntSubtype subtype : antSubtypes) {
+            if (subtype.getId() == id) {
+                return subtype;
+            }
+        }
+        return null;
+    }
 
     public static List<AntSubtypeSlot> getConfigurableSubtypeSlots() {
         return List.of(AntSubtypeSlot.HEAD, AntSubtypeSlot.ABDOMEN);

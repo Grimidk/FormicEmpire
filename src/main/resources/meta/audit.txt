@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 70% (220/313 checked)
+Completion: 70% (219/314 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -123,7 +123,7 @@ Side panels (live updates while playing):
 [X] Statistics (X)
 
 Colony submenu (items appear when unlocked):
-[X] Manage roles
+[ ] Manage roles (available-per-subtype counts; per-role subtype allow checks; required/forced subtypes e.g. Potter→Honeypot)
 [X] Hatch rates
 [X] Research (Y)
 [X] Construction (U)
@@ -355,7 +355,7 @@ Per foreign dynasty Actions menu:
 [ ] War standing / stage progression over time
 [ ] War stage progress: +13% per hour; hex capture when stage bar fills (plus 24h redeploy between stages)
 [ ] Battle won/lost popup when a war stage resolves
-[ ] War role economy in role dialogs
+[ ] War role economy in role dialogs (wartime quotas + subtype allows; copy from peacetime)
 
 ================================================================================
 19. WORLD MAP (M)

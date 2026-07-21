@@ -421,6 +421,8 @@ public class PortugueseTranslation implements Translation {
         pt.put("ROLE_WAR_ECONOMY_TOGGLE", "Funções de economia de guerra");
         pt.put("ROLE_WAR_ECONOMY_TOGGLE_TIP", "Ver e editar a distribuição de funções de guerra. Ativa apenas enquanto a dinastia estiver em guerra.");
         pt.put("ROLE_COPY_PEACE_TO_WAR", "Copiar da paz");
+        pt.put("ROLE_AVAILABLE_SUBTYPES_PREFIX", "Formigas disponíveis:");
+        pt.put("ROLE_SUBTYPE_ALLOW_TIP", "Permitir formigas %s nesta função");
         pt.put("COLONY_AT_PEACE", "Em paz");
         pt.put("COLONY_AT_WAR", "Em guerra");
 

@@ -784,6 +784,8 @@ public final class LanguageStrings {
     public static final String ROLE_WAR_ECONOMY_TOGGLE = "ROLE_WAR_ECONOMY_TOGGLE";
     public static final String ROLE_WAR_ECONOMY_TOGGLE_TIP = "ROLE_WAR_ECONOMY_TOGGLE_TIP";
     public static final String ROLE_COPY_PEACE_TO_WAR = "ROLE_COPY_PEACE_TO_WAR";
+    public static final String ROLE_AVAILABLE_SUBTYPES_PREFIX = "ROLE_AVAILABLE_SUBTYPES_PREFIX";
+    public static final String ROLE_SUBTYPE_ALLOW_TIP = "ROLE_SUBTYPE_ALLOW_TIP";
     public static final String COLONY_AT_PEACE = "COLONY_AT_PEACE";
     public static final String COLONY_AT_WAR = "COLONY_AT_WAR";
 

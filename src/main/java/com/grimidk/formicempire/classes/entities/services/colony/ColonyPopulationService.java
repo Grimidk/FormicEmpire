@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class ColonyPopulationService {
 
@@ -61,10 +62,14 @@ public class ColonyPopulationService {
             
             int neededCount = Math.max(0, desiredCount - currentlyOnTradeWithThisRole);
             int assignedCount = 0;
+            Set<Integer> allowedSubtypes = colony.getAllowedSpecialSubtypeIdsForRole(role);
             Iterator<Ant> antIterator = availableAnts.iterator();
             
             while (assignedCount < neededCount && antIterator.hasNext()) {
                 Ant antToAssign = antIterator.next();
+                if (!AntSubtypeService.isAntEligibleForRole(antToAssign, role, allowedSubtypes)) {
+                    continue;
+                }
                 antToAssign.setRole(role); 
                 antIterator.remove();
                 assignedCount++;

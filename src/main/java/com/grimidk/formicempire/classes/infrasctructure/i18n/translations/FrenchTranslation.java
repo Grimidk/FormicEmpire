@@ -421,6 +421,8 @@ public class FrenchTranslation implements Translation {
         fr.put("ROLE_WAR_ECONOMY_TOGGLE", "Rôles d'économie de guerre");
         fr.put("ROLE_WAR_ECONOMY_TOGGLE_TIP", "Afficher et modifier la répartition des rôles de guerre. Actifs seulement pendant une guerre.");
         fr.put("ROLE_COPY_PEACE_TO_WAR", "Copier depuis la paix");
+        fr.put("ROLE_AVAILABLE_SUBTYPES_PREFIX", "Fourmis disponibles :");
+        fr.put("ROLE_SUBTYPE_ALLOW_TIP", "Autoriser les fourmis %s dans ce rôle");
         fr.put("COLONY_AT_PEACE", "En paix");
         fr.put("COLONY_AT_WAR", "En guerre");
 

@@ -1,5 +1,6 @@
 package com.grimidk.formicempire.classes.entities.services.colony;
 
+import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntSubtype;
 import com.grimidk.formicempire.classes.constants.ant.AntSubtypeProfile;
 import com.grimidk.formicempire.classes.constants.ant.AntSubtypeSlot;
@@ -18,8 +19,10 @@ import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public final class AntSubtypeService {
 
@@ -628,6 +631,163 @@ public final class AntSubtypeService {
             }
         }
         return null;
+    }
+
+    public static boolean profileHasSubtype(AntSubtypeProfile profile, AntSubtype subtype) {
+        if (profile == null || subtype == null || subtype.isNone()) {
+            return false;
+        }
+        AntSubtype present = profile.getSubtype(subtype.getSlot());
+        return present != null && present.getId() == subtype.getId();
+    }
+
+    public static boolean antHasSubtype(Ant ant, AntSubtype subtype) {
+        return ant != null && profileHasSubtype(ant.getSubtypeProfile(), subtype);
+    }
+
+    public static boolean isStandardMorph(Ant ant) {
+        if (ant == null) {
+            return true;
+        }
+        AntSubtypeProfile profile = ant.getSubtypeProfile();
+        return profile == null || profile.countActiveSubtypes() == 0;
+    }
+
+    /**
+     * Whether {@code ant} may fill {@code role} given the colony's allowed special subtypes.
+     * Standard ("nothing") ants are eligible only when the role has no required subtypes.
+     * Special ants need every active special trait allowed (forced-allowed always counts as allowed).
+     */
+    public static boolean isAntEligibleForRole(Ant ant, AntRole role, Set<Integer> allowedSpecialSubtypeIds) {
+        if (ant == null || role == null) {
+            return false;
+        }
+        AntSubtypeProfile profile = ant.getSubtypeProfile();
+        if (profile == null) {
+            profile = AntSubtypeProfile.standard();
+        }
+
+        for (AntSubtype required : role.getRequiredSubtypes()) {
+            if (!profileHasSubtype(profile, required)) {
+                return false;
+            }
+        }
+
+        if (profile.countActiveSubtypes() == 0) {
+            return !role.requiresSubtypes();
+        }
+
+        Set<Integer> allowed = allowedSpecialSubtypeIds != null ? allowedSpecialSubtypeIds : Set.of();
+        for (AntSubtypeSlot slot : GameConstants.getConfigurableSubtypeSlots()) {
+            AntSubtype subtype = profile.getSubtype(slot);
+            if (subtype == null || subtype.isNone()) {
+                continue;
+            }
+            if (role.isSubtypeForcedAllowed(subtype)) {
+                continue;
+            }
+            if (!allowed.contains(subtype.getId())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static Set<Integer> effectiveAllowedSubtypeIds(AntRole role, Set<Integer> storedAllowed) {
+        Set<Integer> effective = new HashSet<>();
+        if (storedAllowed != null) {
+            effective.addAll(storedAllowed);
+        }
+        if (role != null) {
+            for (AntSubtype forced : role.getForcedAllowedSubtypes()) {
+                effective.add(forced.getId());
+            }
+        }
+        return effective;
+    }
+
+    public static List<AntSubtype> listUnlockedSpecialSubtypes(Colony colony) {
+        List<AntSubtype> unlocked = new ArrayList<>();
+        if (colony == null) {
+            return unlocked;
+        }
+        for (AntSubtypeSlot slot : GameConstants.getConfigurableSubtypeSlots()) {
+            for (AntSubtype subtype : getAvailableSubtypes(colony, slot)) {
+                if (!subtype.isNone()) {
+                    unlocked.add(subtype);
+                }
+            }
+        }
+        return unlocked;
+    }
+
+    public static int countStandardAntsOfType(Colony colony, AntType type) {
+        if (colony == null || type == null) {
+            return 0;
+        }
+        int count = 0;
+        for (Ant ant : colony.getAntsByType(type)) {
+            if (ant.isAlive() && isStandardMorph(ant)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public static int countAntsWithSubtype(Colony colony, AntType type, AntSubtype subtype) {
+        if (colony == null || type == null || subtype == null || subtype.isNone()) {
+            return 0;
+        }
+        int count = 0;
+        for (Ant ant : colony.getAntsByType(type)) {
+            if (ant.isAlive() && antHasSubtype(ant, subtype)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public static Map<String, Integer> flattenRoleDisallowedSubtypes(Map<AntRole, Set<Integer>> disallowedByRole) {
+        Map<String, Integer> flat = new HashMap<>();
+        if (disallowedByRole == null) {
+            return flat;
+        }
+        for (Map.Entry<AntRole, Set<Integer>> entry : disallowedByRole.entrySet()) {
+            if (entry.getKey() == null || entry.getValue() == null) {
+                continue;
+            }
+            for (Integer subtypeId : entry.getValue()) {
+                if (subtypeId != null) {
+                    flat.put(entry.getKey().getId() + "_" + subtypeId, 1);
+                }
+            }
+        }
+        return flat;
+    }
+
+    public static Map<AntRole, Set<Integer>> unflattenRoleDisallowedSubtypes(Map<String, Integer> flat) {
+        Map<AntRole, Set<Integer>> result = new HashMap<>();
+        if (flat == null || flat.isEmpty()) {
+            return result;
+        }
+        for (Map.Entry<String, Integer> entry : flat.entrySet()) {
+            if (entry.getKey() == null || entry.getValue() == null || entry.getValue() <= 0) {
+                continue;
+            }
+            String[] parts = entry.getKey().split("_", 2);
+            if (parts.length != 2) {
+                continue;
+            }
+            try {
+                AntRole role = GameConstants.getAntRoleById(Integer.parseInt(parts[0]));
+                int subtypeId = Integer.parseInt(parts[1]);
+                if (role != null && GameConstants.getAntSubtypeById(subtypeId) != null) {
+                    result.computeIfAbsent(role, ignored -> new HashSet<>()).add(subtypeId);
+                }
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        return result;
     }
 
     public static void inheritSubtype(Ant source, Ant target, Colony colony) {

@@ -421,6 +421,8 @@ public class EnglishTranslation implements Translation {
         en.put("ROLE_WAR_ECONOMY_TOGGLE", "War economy roles");
         en.put("ROLE_WAR_ECONOMY_TOGGLE_TIP", "View and edit the wartime role distribution. Active only while your dynasty is at war.");
         en.put("ROLE_COPY_PEACE_TO_WAR", "Copy from peacetime");
+        en.put("ROLE_AVAILABLE_SUBTYPES_PREFIX", "Available ants:");
+        en.put("ROLE_SUBTYPE_ALLOW_TIP", "Allow %s ants in this role");
         en.put("COLONY_AT_PEACE", "At peace");
         en.put("COLONY_AT_WAR", "At war");
 

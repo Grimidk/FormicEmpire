@@ -1,17 +1,19 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
+import com.grimidk.formicempire.classes.constants.ant.AntSubtype;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.entities.services.colony.AntSubtypeService;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDiplomacyService;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
-import com.grimidk.formicempire.classes.interfaces.MainFrame;
-import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
+import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
-import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
-import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDiplomacyService;
+import com.grimidk.formicempire.classes.interfaces.MainFrame;
+import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,6 +24,7 @@ import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -49,7 +52,7 @@ public class RoleManagementDialog extends ZeroDialog {
     }
 
     public RoleManagementDialog(JFrame owner, Colony colony, Engine engine) {
-        super(owner, LanguageStrings.get(LanguageStrings.DIALOG_ROLES_TITLE), AssetStyles.DEFAULT_DIALOG_SIZE);
+        super(owner, LanguageStrings.get(LanguageStrings.DIALOG_ROLES_TITLE), AssetStyles.ROLE_DIALOG_SIZE);
         this.colony = colony;
         this.engine = engine;
 
@@ -62,13 +65,18 @@ public class RoleManagementDialog extends ZeroDialog {
 
         copyPeaceToWarButton = new JButton(LanguageStrings.get(LanguageStrings.ROLE_COPY_PEACE_TO_WAR));
         AssetStyles.styleButton(copyPeaceToWarButton);
-        copyPeaceToWarButton.setVisible(false);
+        copyPeaceToWarButton.setEnabled(false);
         copyPeaceToWarButton.addActionListener(e -> onCopyPeaceToWar());
 
         JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         headerPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
         headerPanel.add(warEconomyCheck);
         headerPanel.add(copyPeaceToWarButton);
+        // Keep header height stable when war-economy controls hide/show.
+        headerPanel.setPreferredSize(new Dimension(
+                AssetStyles.ROLE_DIALOG_SIZE.width,
+                Math.max(AssetStyles.MIN_CONTROL_HIT_SIZE + 16, copyPeaceToWarButton.getPreferredSize().height + 12)));
+        headerPanel.setMinimumSize(headerPanel.getPreferredSize());
 
         JPanel contentPanel = new JPanel(new BorderLayout());
         contentPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
@@ -106,7 +114,7 @@ public class RoleManagementDialog extends ZeroDialog {
 
     private void onWarEconomyViewToggle() {
         editingWarRoles = warEconomyCheck.isSelected();
-        copyPeaceToWarButton.setVisible(editingWarRoles && isWarEconomyUnlocked());
+        copyPeaceToWarButton.setEnabled(editingWarRoles && isWarEconomyUnlocked());
         for (RolePanel panel : rolePanels) {
             panel.updateData();
         }
@@ -120,15 +128,16 @@ public class RoleManagementDialog extends ZeroDialog {
     private void updateWarEconomyControlsVisibility() {
         boolean unlocked = isWarEconomyUnlocked();
         warEconomyCheck.setVisible(unlocked);
+        copyPeaceToWarButton.setVisible(unlocked);
         if (!unlocked) {
             if (warEconomyCheck.isSelected()) {
                 warEconomyCheck.setSelected(false);
             }
             editingWarRoles = false;
-            copyPeaceToWarButton.setVisible(false);
+            copyPeaceToWarButton.setEnabled(false);
             return;
         }
-        copyPeaceToWarButton.setVisible(editingWarRoles);
+        copyPeaceToWarButton.setEnabled(editingWarRoles);
     }
 
     private void onCopyPeaceToWar() {
@@ -301,8 +310,11 @@ public class RoleManagementDialog extends ZeroDialog {
         private final JLabel totalLabel;
         private final JLabel assignedLabel;
         private final JLabel unassignedLabel;
+        private final JPanel availableSubtypesPanel;
+        private final JPanel rolesGrid;
         private final Map<AntRole, JSpinner> spinnerMap = new HashMap<>();
-        
+        private final Map<AntRole, Map<AntSubtype, JCheckBox>> subtypeAllowMap = new HashMap<>();
+        private final Map<AntRole, JPanel> subtypeAllowPanels = new HashMap<>();
         private final Set<AntRole> displayedRoles = new HashSet<>();
         private boolean isUpdating = false;
 
@@ -312,29 +324,58 @@ public class RoleManagementDialog extends ZeroDialog {
             this.engine = engine;
             this.owner = owner;
 
-            setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+            setLayout(new BorderLayout(0, 8));
             setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
             setBackground(AssetStyles.BACKGROUND_COLOR);
+
+            JPanel summaryPanel = new JPanel();
+            summaryPanel.setLayout(new BoxLayout(summaryPanel, BoxLayout.Y_AXIS));
+            summaryPanel.setOpaque(false);
 
             int totalAnts = colony.getAntsByType(antType).size();
             
             totalLabel = new JLabel(LanguageStrings.format(LanguageStrings.ROLE_TOTAL_PREFIX, antType.getName(), totalAnts));
             totalLabel.setFont(totalLabel.getFont().deriveFont(Font.BOLD));
             totalLabel.setForeground(AssetStyles.FONT_COLOR);
+            totalLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
             
             assignedLabel = new JLabel(LanguageStrings.format(LanguageStrings.ROLE_ASSIGNED_PREFIX, 0));
             assignedLabel.setForeground(AssetStyles.FONT_COLOR);
+            assignedLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
             
             unassignedLabel = new JLabel(LanguageStrings.format(LanguageStrings.ROLE_UNASSIGNED_PREFIX, totalAnts));
             unassignedLabel.setForeground(AssetStyles.FONT_COLOR);
+            unassignedLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+            availableSubtypesPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 2));
+            availableSubtypesPanel.setOpaque(false);
+            availableSubtypesPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
             
-            add(totalLabel);
-            add(assignedLabel);
-            add(unassignedLabel);
-            add(AssetStyles.createInternalSeparator());
+            summaryPanel.add(totalLabel);
+            summaryPanel.add(assignedLabel);
+            summaryPanel.add(unassignedLabel);
+            summaryPanel.add(Box.createVerticalStrut(4));
+            summaryPanel.add(availableSubtypesPanel);
+            summaryPanel.add(AssetStyles.createInternalSeparator());
+
+            rolesGrid = new JPanel(new GridBagLayout());
+            rolesGrid.setOpaque(false);
+
+            JPanel rolesHost = new JPanel(new BorderLayout());
+            rolesHost.setOpaque(false);
+            rolesHost.add(rolesGrid, BorderLayout.NORTH);
+
+            JScrollPane scrollPane = new JScrollPane(rolesHost);
+            scrollPane.setBorder(null);
+            scrollPane.setOpaque(false);
+            scrollPane.getViewport().setOpaque(false);
+            scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+            AssetStyles.styleScrollPane(scrollPane);
+
+            add(summaryPanel, BorderLayout.NORTH);
+            add(scrollPane, BorderLayout.CENTER);
 
             checkAndAddRoles();
-            
             updateData();
         }
         
@@ -378,31 +419,24 @@ public class RoleManagementDialog extends ZeroDialog {
             if (!displayedRoles.contains(role)) {
                 return;
             }
-            JSpinner spinner = spinnerMap.remove(role);
-            if (spinner != null) {
-                Container parent = spinner.getParent();
-                if (parent != null) {
-                    remove(parent);
-                }
-            }
+            spinnerMap.remove(role);
+            subtypeAllowMap.remove(role);
+            subtypeAllowPanels.remove(role);
             displayedRoles.remove(role);
+            rebuildRolesGrid();
             revalidate();
             repaint();
         }
 
         private void addRoleRow(AntRole role) {
-            JPanel roleRow = new JPanel(new FlowLayout(FlowLayout.LEFT));
-            roleRow.setOpaque(false);
-            JLabel label = new JLabel(role.getName() + ":", role.getIcon(), SwingConstants.LEFT);
-            label.setIconTextGap(6);
-            label.setForeground(AssetStyles.FONT_COLOR);
-            roleRow.add(label);
-            
             int currentAssigned = getRoleCount(role);
             SpinnerModel model = new SpinnerNumberModel(currentAssigned, 0, Integer.MAX_VALUE, 1); 
             JSpinner spinner = new JSpinner(model);
             AssetStyles.styleSpinner(spinner);
-            spinner.setPreferredSize(AssetStyles.preferredSpinnerSize(80));
+            Dimension spinnerSize = AssetStyles.preferredSpinnerSize(80);
+            spinner.setPreferredSize(spinnerSize);
+            spinner.setMinimumSize(spinnerSize);
+            spinner.setMaximumSize(spinnerSize);
 
             spinner.addChangeListener(e -> {
                 if (isUpdating) return;
@@ -462,10 +496,204 @@ public class RoleManagementDialog extends ZeroDialog {
             });
             
             disableSpinnerLetterInput(spinner);
-            
-            roleRow.add(spinner);
+
+            JPanel subtypeAllows = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
+            subtypeAllows.setOpaque(false);
+            Map<AntSubtype, JCheckBox> checks = new LinkedHashMap<>();
+            subtypeAllowMap.put(role, checks);
+            subtypeAllowPanels.put(role, subtypeAllows);
             spinnerMap.put(role, spinner);
-            add(roleRow);
+            rebuildSubtypeAllowControls(role);
+            rebuildRolesGrid();
+        }
+
+        private void rebuildRolesGrid() {
+            rolesGrid.removeAll();
+
+            GridBagConstraints labelGbc = new GridBagConstraints();
+            labelGbc.gridx = 0;
+            labelGbc.weightx = 1.0;
+            labelGbc.fill = GridBagConstraints.HORIZONTAL;
+            labelGbc.anchor = GridBagConstraints.WEST;
+            labelGbc.insets = new Insets(2, 4, 2, 8);
+
+            GridBagConstraints spinnerGbc = new GridBagConstraints();
+            spinnerGbc.gridx = 1;
+            spinnerGbc.weightx = 0;
+            spinnerGbc.fill = GridBagConstraints.NONE;
+            spinnerGbc.anchor = GridBagConstraints.EAST;
+            spinnerGbc.insets = new Insets(2, 4, 2, 8);
+
+            GridBagConstraints subtypeGbc = new GridBagConstraints();
+            subtypeGbc.gridx = 2;
+            subtypeGbc.weightx = 0;
+            subtypeGbc.fill = GridBagConstraints.NONE;
+            subtypeGbc.anchor = GridBagConstraints.WEST;
+            subtypeGbc.insets = new Insets(2, 4, 2, 4);
+
+            int row = 0;
+            boolean firstRole = true;
+            for (AntRole role : GameConstants.getAntRoles()) {
+                if (!displayedRoles.contains(role)) {
+                    continue;
+                }
+                JSpinner spinner = spinnerMap.get(role);
+                JPanel subtypeAllows = subtypeAllowPanels.get(role);
+                if (spinner == null || subtypeAllows == null) {
+                    continue;
+                }
+
+                if (!firstRole) {
+                    GridBagConstraints sepGbc = new GridBagConstraints();
+                    sepGbc.gridx = 0;
+                    sepGbc.gridy = row++;
+                    sepGbc.gridwidth = 3;
+                    sepGbc.weightx = 1.0;
+                    sepGbc.fill = GridBagConstraints.HORIZONTAL;
+                    sepGbc.insets = new Insets(2, 0, 2, 0);
+                    rolesGrid.add(AssetStyles.createInternalSeparator(), sepGbc);
+                }
+                firstRole = false;
+
+                JLabel label = new JLabel(role.getName() + ":", role.getIcon(), SwingConstants.LEFT);
+                label.setIconTextGap(6);
+                label.setForeground(AssetStyles.FONT_COLOR);
+
+                labelGbc.gridy = row;
+                spinnerGbc.gridy = row;
+                subtypeGbc.gridy = row;
+                rolesGrid.add(label, labelGbc);
+                rolesGrid.add(spinner, spinnerGbc);
+                rolesGrid.add(subtypeAllows, subtypeGbc);
+                row++;
+            }
+            rolesGrid.revalidate();
+            rolesGrid.repaint();
+        }
+
+        private void rebuildSubtypeAllowControls(AntRole role) {
+            JPanel host = subtypeAllowPanels.get(role);
+            Map<AntSubtype, JCheckBox> checks = subtypeAllowMap.get(role);
+            if (host == null || checks == null) {
+                return;
+            }
+            host.removeAll();
+            checks.clear();
+
+            List<AntSubtype> unlocked = AntSubtypeService.listUnlockedSpecialSubtypes(colony);
+            for (AntSubtype subtype : unlocked) {
+                JPanel cell = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 0));
+                cell.setOpaque(false);
+
+                JLabel iconLabel = new JLabel(subtype.getIcon());
+                iconLabel.setToolTipText(subtype.getName());
+                cell.add(iconLabel);
+
+                boolean allowed = isSubtypeAllowed(role, subtype);
+                boolean forced = role.isSubtypeForcedAllowed(subtype);
+                JCheckBox check = new JCheckBox();
+                check.setSelected(allowed || forced);
+                check.setEnabled(!forced);
+                check.setOpaque(false);
+                check.setToolTipText(LanguageStrings.format(LanguageStrings.ROLE_SUBTYPE_ALLOW_TIP, subtype.getName()));
+                AssetStyles.styleCheckBox(check);
+                if (!forced) {
+                    check.addActionListener(e -> {
+                        if (isUpdating) {
+                            return;
+                        }
+                        setSubtypeAllowed(role, subtype, check.isSelected());
+                    });
+                }
+                checks.put(subtype, check);
+                cell.add(check);
+                host.add(cell);
+            }
+            host.revalidate();
+            host.repaint();
+        }
+
+        private void syncSubtypeAllowControls(AntRole role) {
+            Map<AntSubtype, JCheckBox> checks = subtypeAllowMap.get(role);
+            List<AntSubtype> unlocked = AntSubtypeService.listUnlockedSpecialSubtypes(colony);
+            if (checks == null || checks.size() != unlocked.size() || !checks.keySet().containsAll(unlocked)) {
+                rebuildSubtypeAllowControls(role);
+                return;
+            }
+            for (AntSubtype subtype : unlocked) {
+                JCheckBox check = checks.get(subtype);
+                if (check == null) {
+                    rebuildSubtypeAllowControls(role);
+                    return;
+                }
+                boolean forced = role.isSubtypeForcedAllowed(subtype);
+                boolean allowed = isSubtypeAllowed(role, subtype) || forced;
+                if (check.isSelected() != allowed) {
+                    check.setSelected(allowed);
+                }
+                if (check.isEnabled() == forced) {
+                    check.setEnabled(!forced);
+                }
+            }
+        }
+
+        private void refreshAvailableSubtypesSummary() {
+            availableSubtypesPanel.removeAll();
+
+            List<AntSubtype> unlocked = AntSubtypeService.listUnlockedSpecialSubtypes(colony);
+            if (unlocked.isEmpty()) {
+                availableSubtypesPanel.setVisible(false);
+                availableSubtypesPanel.revalidate();
+                availableSubtypesPanel.repaint();
+                return;
+            }
+
+            availableSubtypesPanel.setVisible(true);
+
+            JLabel prefix = new JLabel(LanguageStrings.get(LanguageStrings.ROLE_AVAILABLE_SUBTYPES_PREFIX));
+            prefix.setForeground(AssetStyles.FONT_COLOR);
+            prefix.setFont(AssetStyles.FONT_BOLD);
+            availableSubtypesPanel.add(prefix);
+
+            int nothingCount = AntSubtypeService.countStandardAntsOfType(colony, antType);
+            availableSubtypesPanel.add(buildAvailableSubtypeChip(
+                    GameConstants.SUBTYPE_HEAD_NONE.getIcon(),
+                    LanguageStrings.get(LanguageStrings.SUBTYPE_NOTHING),
+                    nothingCount));
+
+            for (AntSubtype subtype : unlocked) {
+                int count = AntSubtypeService.countAntsWithSubtype(colony, antType, subtype);
+                availableSubtypesPanel.add(buildAvailableSubtypeChip(subtype.getIcon(), subtype.getName(), count));
+            }
+
+            availableSubtypesPanel.revalidate();
+            availableSubtypesPanel.repaint();
+        }
+
+        private JPanel buildAvailableSubtypeChip(Icon icon, String name, int count) {
+            JPanel chip = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
+            chip.setOpaque(false);
+            JLabel iconLabel = new JLabel(icon);
+            iconLabel.setToolTipText(name);
+            chip.add(iconLabel);
+            JLabel text = new JLabel(name + ": " + AssetStyles.formatNumber(count));
+            text.setForeground(AssetStyles.FONT_COLOR);
+            chip.add(text);
+            return chip;
+        }
+
+        private boolean isSubtypeAllowed(AntRole role, AntSubtype subtype) {
+            return owner.isEditingWarRoles()
+                    ? colony.isWarRoleSubtypeAllowed(role, subtype)
+                    : colony.isPeaceRoleSubtypeAllowed(role, subtype);
+        }
+
+        private void setSubtypeAllowed(AntRole role, AntSubtype subtype, boolean allowed) {
+            if (owner.isEditingWarRoles()) {
+                colony.setWarRoleSubtypeAllowed(role, subtype, allowed);
+            } else {
+                colony.setPeaceRoleSubtypeAllowed(role, subtype, allowed);
+            }
         }
 
         private int getRoleCount(AntRole role) {
@@ -493,6 +721,7 @@ public class RoleManagementDialog extends ZeroDialog {
                     if ((Integer)entry.getValue().getValue() != colonyValue) {
                         entry.getValue().setValue(colonyValue);
                     }
+                    syncSubtypeAllowControls(entry.getKey());
                 }
                 
                 int totalAnts = colony.getAntsByType(antType).size();
@@ -507,6 +736,7 @@ public class RoleManagementDialog extends ZeroDialog {
                 
                 assignedLabel.setText(LanguageStrings.format(LanguageStrings.ROLE_ASSIGNED_PREFIX, totalAssigned));
                 unassignedLabel.setText(LanguageStrings.format(LanguageStrings.ROLE_UNASSIGNED_PREFIX, unassigned));
+                refreshAvailableSubtypesSummary();
 
                 if (totalAssigned > totalAnts) {
                     assignedLabel.setForeground(AssetStyles.FONT_COLOR_ERROR);
