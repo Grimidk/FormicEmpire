@@ -10,8 +10,7 @@ To Fix (By decreasing priority) :
 	TODO: species sprites and icon: carpenter, weaver, floodplain, jet, gliding, army, ghost, dracula, silver, exploding, bulldog, shining black and desert
 
 	Mid:
-	formic empire should never get translated
-	dynast and name should flip in other languages
+	(none right now)
 	  
 	Low:
 	(none right now)
@@ -43,7 +42,7 @@ Needed for launch (v1.0) (Launch Version):
 		Arachnids (catapult ants, tarantulas, vinegaroons, horsehoecrabs), 
 		Anphibians (Salamander, frog, toad)
 		Reptiles, 
-		Birds, 
+		Birds (Crow, Finch), 
 		Mammals (Rats, Possum, Anteater), 
 		Zombie ant colonies
 	uncolonizable terrain with boss enemies  

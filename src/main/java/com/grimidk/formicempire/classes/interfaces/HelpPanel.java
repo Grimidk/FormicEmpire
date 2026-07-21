@@ -1236,7 +1236,7 @@ public class HelpPanel extends JPanel {
 
     public static void showTutorialDialog(Component parent) {
         Window window = SwingUtilities.getWindowAncestor(parent);
-        JDialog dialog = new JDialog(window, LanguageStrings.get("HELP_TUTORIAL_TITLE"), Dialog.ModalityType.APPLICATION_MODAL);
+        JDialog dialog = new JDialog(window, LanguageStrings.withAppDisplayName(LanguageStrings.HELP_TUTORIAL_TITLE), Dialog.ModalityType.APPLICATION_MODAL);
         dialog.setLayout(new BorderLayout());
 
         JPanel cardPanel = new JPanel(new CardLayout());

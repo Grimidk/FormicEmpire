@@ -105,7 +105,7 @@ public class IntroPanel extends JPanel {
     }
 
     private void showArachnophobiaSlide() {
-        String text = LanguageStrings.get(LanguageStrings.INTRO_WARNING);
+        String text = LanguageStrings.withAppDisplayName(LanguageStrings.INTRO_WARNING);
         messageLabel.setText(warningHtml(text));
     }
 

@@ -56,6 +56,10 @@ public final class LanguageStrings {
     }
 
     public static String get(String key) {
+        // Brand name is never localized — always English "Formic Empire".
+        if (UI_APP_TITLE.equals(key)) {
+            return APP_DISPLAY_NAME;
+        }
         Map<String, String> langMap = translations.get(currentLanguage);
         if (langMap != null && langMap.containsKey(key)) {
             return langMap.get(key);
@@ -66,6 +70,11 @@ public final class LanguageStrings {
             return langMap.get(key);
         }
         return key;
+    }
+
+    /** Player-facing strings that include the product name must inject this (never translate it). */
+    public static String withAppDisplayName(String key) {
+        return format(key, APP_DISPLAY_NAME);
     }
 
     public static String format(String key, Object... args) {
@@ -134,7 +143,7 @@ public final class LanguageStrings {
             return null;
         }
         String trimmed = dynastyName.trim();
-        int longestSuffix = 0;
+        int bestRemoved = 0;
         String result = trimmed;
 
         List<DynastyTitle> titles = new ArrayList<>();
@@ -153,25 +162,80 @@ public final class LanguageStrings {
             }
             for (Map<String, String> langMap : translations.values()) {
                 String format = langMap.get(title.getFormatKey());
-                if (format == null) {
-                    continue;
+                String strippedByFormat = stripByDynastyTitleFormat(trimmed, format);
+                if (strippedByFormat != null) {
+                    int removed = trimmed.length() - strippedByFormat.length();
+                    if (removed > bestRemoved) {
+                        bestRemoved = removed;
+                        result = strippedByFormat;
+                    }
                 }
-                String suffix = String.format(format, "");
-                if (suffix.isEmpty() || !trimmed.endsWith(suffix)) {
-                    continue;
-                }
-                if (suffix.length() > longestSuffix) {
-                    longestSuffix = suffix.length();
-                    result = trimmed.substring(0, trimmed.length() - suffix.length());
+                String localizedTitle = langMap.get(title.getNameKey());
+                String strippedByTitle = stripByDynastyTitleWord(trimmed, localizedTitle);
+                if (strippedByTitle != null) {
+                    int removed = trimmed.length() - strippedByTitle.length();
+                    if (removed > bestRemoved) {
+                        bestRemoved = removed;
+                        result = strippedByTitle;
+                    }
                 }
             }
         }
 
         String legacySuffix = " Dynasty";
-        if (legacySuffix.length() > longestSuffix && trimmed.endsWith(legacySuffix)) {
+        if (legacySuffix.length() > bestRemoved && trimmed.endsWith(legacySuffix)) {
             result = trimmed.substring(0, trimmed.length() - legacySuffix.length());
         }
-        return result;
+        return result.trim();
+    }
+
+    /** Strips theme from "%s Title" or "Title %s" formats (and mixed legacy orderings). */
+    private static String stripByDynastyTitleFormat(String fullName, String format) {
+        if (fullName == null || format == null) {
+            return null;
+        }
+        int placeholder = format.indexOf("%s");
+        if (placeholder < 0) {
+            return null;
+        }
+        String prefix = format.substring(0, placeholder);
+        String suffix = format.substring(placeholder + 2);
+        if (prefix.isEmpty() && suffix.isEmpty()) {
+            return null;
+        }
+        if (!prefix.isEmpty()
+                && !fullName.regionMatches(true, 0, prefix, 0, prefix.length())) {
+            return null;
+        }
+        if (!suffix.isEmpty()) {
+            int suffixStart = fullName.length() - suffix.length();
+            if (suffixStart < prefix.length()
+                    || !fullName.regionMatches(true, suffixStart, suffix, 0, suffix.length())) {
+                return null;
+            }
+        }
+        return fullName.substring(prefix.length(), fullName.length() - suffix.length()).trim();
+    }
+
+    /** Title word as prefix or suffix so legacy "Theme Title" still strips after Romance flip. */
+    private static String stripByDynastyTitleWord(String fullName, String localizedTitle) {
+        if (fullName == null || localizedTitle == null || localizedTitle.isEmpty()) {
+            return null;
+        }
+        String title = localizedTitle.trim();
+        if (title.isEmpty()) {
+            return null;
+        }
+        String prefix = title + " ";
+        if (fullName.regionMatches(true, 0, prefix, 0, prefix.length())) {
+            return fullName.substring(prefix.length()).trim();
+        }
+        String suffix = " " + title;
+        if (fullName.length() > suffix.length()
+                && fullName.regionMatches(true, fullName.length() - suffix.length(), suffix, 0, suffix.length())) {
+            return fullName.substring(0, fullName.length() - suffix.length()).trim();
+        }
+        return null;
     }
 
     public static String stripCityTitleAffix(String colonyName) {
@@ -376,6 +440,7 @@ public final class LanguageStrings {
     }
 
     // --- Keys ---
+    /** Product / window title — English only; never pass through locale maps. */
     public static final String APP_DISPLAY_NAME = "Formic Empire";
     public static final String UI_APP_TITLE = "UI_APP_TITLE";
     public static final String UI_BACK_TO_GAME = "UI_BACK_TO_GAME";

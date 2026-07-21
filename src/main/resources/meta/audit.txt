@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 84% (262/313 checked)
+Completion: 83% (261/313 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -61,7 +61,7 @@ Roles (default hatch roles for new ants):
 3. SAVE / LOAD FLOW
 ================================================================================
 [X] Three save slots — empty slot shows Create
-[X] Create new save — name + title, live dynasty preview, confirm prompt; full dynasty name shown in slot list
+[ ] Create new save — name + title, live dynasty preview (EN: Theme Title; ES/FR/PT: Title Theme), confirm prompt; full dynasty name shown in slot list
 [X] Tutorial dialog auto-opens on first create
 [X] Load existing save — resumes session
 [X] Delete save — removes slot data

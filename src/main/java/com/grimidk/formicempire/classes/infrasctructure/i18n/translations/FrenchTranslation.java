@@ -12,7 +12,7 @@ public class FrenchTranslation implements Translation {
     @Override
     public Map<String, String> getStrings() {
         Map<String, String> fr = new HashMap<>();
-        fr.put("UI_APP_TITLE", "Empire Formique");
+        fr.put("UI_APP_TITLE", "Formic Empire"); // brand — never translate; LanguageStrings.get ignores locale
         fr.put("UI_BACK_TO_GAME", "Retour au jeu");
         fr.put("UI_BACK_TO_MENU", "Quitter vers le menu principal");
         fr.put("UI_MENU", "Menu");
@@ -81,7 +81,7 @@ public class FrenchTranslation implements Translation {
         fr.put("UI_HELP", "Aide");
         fr.put("UI_ROADMAP", "Feuille de route");
         fr.put("UI_QUIT", "Quitter");
-        fr.put("INTRO_WARNING", "Empire Formique est une simulation de colonie avec des fourmis, insectes et autres arthropodes en pixels.<br><br>Si les araignées ou créatures similaires vous gênent, activez le Mode arachnophobie dans les Paramètres avant de jouer.");
+        fr.put("INTRO_WARNING", "%s est une simulation de colonie avec des fourmis, insectes et autres arthropodes en pixels.<br><br>Si les araignées ou créatures similaires vous gênent, activez le Mode arachnophobie dans les Paramètres avant de jouer.");
         fr.put("INTRO_PHOTOSENSITIVITY_WARNING", "Avertissement photosensibilité : ce jeu contient des lumières clignotantes et des effets visuels susceptibles de provoquer des crises chez les personnes atteintes d'épilepsie photosensible.<br><br>Si vous ou un membre de votre foyer a des antécédents de crises ou d'épilepsie, consultez un médecin avant de jouer.");
         fr.put("ROADMAP_TITLE", "Feuille de route du développement");
         fr.put("ROADMAP_UNAVAILABLE", "Impossible de charger la feuille de route.");
@@ -639,7 +639,7 @@ public class FrenchTranslation implements Translation {
         fr.put("SAVE_ERROR_WRITE", "Échec de la sauvegarde. Retour au menu.");
         fr.put("SAVE_ERROR_WRITE_TITLE", "Échec de la sauvegarde");
         fr.put("SAVE_AUTOSAVE_NAME", "Sauvegarde auto");
-        fr.put("DYNASTY_PLAYER_NAME_FMT", "%s Dynastie");
+        fr.put("DYNASTY_PLAYER_NAME_FMT", "Dynastie %s");
         fr.put("DYNASTY_WILD_NAME", "Dynastie sauvage");
         fr.put("DYNASTY_WILD_NAME_FMT", "%s sauvage");
         fr.put("DYNASTY_TITLE_DYNASTY", "Dynastie");
@@ -663,15 +663,15 @@ public class FrenchTranslation implements Translation {
         fr.put("CITY_TITLE_CASTLE", "Château");
         fr.put("CITY_TITLE_PRIME", "Prime");
         fr.put("CITY_TITLE_NEW", "Nouvelle");
-        fr.put("DYNASTY_TITLE_FMT_DYNASTY", "%s Dynastie");
-        fr.put("DYNASTY_TITLE_FMT_CONGLOMERATE", "%s Conglomérat");
-        fr.put("DYNASTY_TITLE_FMT_UNION", "%s Union");
-        fr.put("DYNASTY_TITLE_FMT_SYNDICATE", "%s Syndicat");
-        fr.put("DYNASTY_TITLE_FMT_TECHNOCRACY", "%s Technocratie");
-        fr.put("DYNASTY_TITLE_FMT_EMPIRE", "%s Empire");
-        fr.put("DYNASTY_TITLE_FMT_DOMINION", "%s Dominion");
-        fr.put("DYNASTY_TITLE_FMT_NATION", "%s Nation");
-        fr.put("DYNASTY_TITLE_FMT_REPUBLIC", "%s République");
+        fr.put("DYNASTY_TITLE_FMT_DYNASTY", "Dynastie %s");
+        fr.put("DYNASTY_TITLE_FMT_CONGLOMERATE", "Conglomérat %s");
+        fr.put("DYNASTY_TITLE_FMT_UNION", "Union %s");
+        fr.put("DYNASTY_TITLE_FMT_SYNDICATE", "Syndicat %s");
+        fr.put("DYNASTY_TITLE_FMT_TECHNOCRACY", "Technocratie %s");
+        fr.put("DYNASTY_TITLE_FMT_EMPIRE", "Empire %s");
+        fr.put("DYNASTY_TITLE_FMT_DOMINION", "Dominion %s");
+        fr.put("DYNASTY_TITLE_FMT_NATION", "Nation %s");
+        fr.put("DYNASTY_TITLE_FMT_REPUBLIC", "République %s");
         fr.put("SAVE_DELETE_CONFIRM", "Supprimer la sauvegarde de l'emplacement %s ?");
         fr.put("SAVE_DELETE_TITLE", "Supprimer la sauvegarde");
         fr.put("SAVE_DELETE_ERROR", "Échec de la suppression (fichier peut-être absent).");
@@ -1793,7 +1793,7 @@ public class FrenchTranslation implements Translation {
         fr.put("HELP_SELECT_ITEM", "Sélectionnez un élément pour sa description.");
         fr.put("HELP_BUILD_BASE_COST", "Coût de base");
 
-        fr.put("HELP_TUTORIAL_TITLE", "Bienvenue dans Empire Formique !");
+        fr.put("HELP_TUTORIAL_TITLE", "Bienvenue dans %s !");
         fr.put("HELP_TUTORIAL_TIPS", "<b>Conseils :</b><br><br>Aliment principal : <b>champignons</b>, consommés chaque jour.<br><br>Assignez des <b>ouvrières</b> (Q) en <b>ramasseuses</b> pour plantes et eau. Sans eau, soif !<br><br>Les <b>agricultrices</b> (Q) transforment les plantes en champignons. En général 1 agricultrice pour ~6 ramasseuses.<br><br>Les <b>nourrices</b> (Q) s'occupent des <b>œufs, larves et nymphes</b>. Sans assez de nourrices, la couvée meurt !<br><br><b>Z</b> bascule <b>souterrain</b> / <b>surface</b>. Appuyez sur <b>X</b> pour les Statistiques (dont l'Histoire du monde).<br><br><i>QoL : si vous assignez un rôle sans fourmis libres, le jeu les prend sur votre effectif par défaut (ex. ramasseuses).</i>");
         fr.put("HELP_TUTORIAL_THREATS", "<b>Menaces :</b><br><br><b>Contamination :</b> les morts naturels s'accumulent et propagent la maladie. <b>Fossoyeuses</b> pour nettoyer.<br><br><b>Fourmis parasites :</b> drainent les champignons. <b>Police</b> pour les détecter et éliminer.<br><br><b>Épuisement :</b> les ressources s'épuisent. <b>Éclaireuses</b> pour en trouver d'autres.");
         fr.put("HELP_TUTORIAL_DYNASTY", "<b>Dynastie :</b><br><br>Débloquez des princesses <b>reproductrices</b> pour fonder des colonies sur la <b>carte (M)</b>.<br><i>Les éclipses peuvent déclencher des essaims gratuits !</i><br><br>Plusieurs colonies débloquent le menu dynastie : <b>A</b> Aperçu, <b>S</b> Commerce, <b>D</b> Diplomatie, <b>F</b> Guerres (ESC → sous-menu Dynastie). Déclarez la guerre depuis Diplomatie ; suivez les campagnes dans l'onglet Guerres.");

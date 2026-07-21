@@ -12,7 +12,7 @@ public class SpanishTranslation implements Translation {
     @Override
     public Map<String, String> getStrings() {
         Map<String, String> es = new HashMap<>();
-        es.put("UI_APP_TITLE", "Imperio Fórmico");
+        es.put("UI_APP_TITLE", "Formic Empire"); // brand — never translate; LanguageStrings.get ignores locale
         es.put("UI_BACK_TO_GAME", "Volver al Juego");
         es.put("UI_BACK_TO_MENU", "Salir al Menú Principal");
         es.put("UI_MENU", "Menú");
@@ -81,7 +81,7 @@ public class SpanishTranslation implements Translation {
         es.put("UI_HELP", "Ayuda");
         es.put("UI_ROADMAP", "Hoja de ruta");
         es.put("UI_QUIT", "Salir");
-        es.put("INTRO_WARNING", "Imperio Fórmico es una simulación de colonias con hormigas, insectos y otros artrópodos en píxeles.<br><br>Si las arañas u otros arácnidos te molestan, activa el Modo aracnofobia en Ajustes antes de jugar.");
+        es.put("INTRO_WARNING", "%s es una simulación de colonias con hormigas, insectos y otros artrópodos en píxeles.<br><br>Si las arañas u otros arácnidos te molestan, activa el Modo aracnofobia en Ajustes antes de jugar.");
         es.put("INTRO_PHOTOSENSITIVITY_WARNING", "Aviso de fotosensibilidad: este juego contiene luces intermitentes y efectos visuales que pueden provocar convulsiones en personas con epilepsia fotosensible.<br><br>Si tú o alguien de tu hogar tiene antecedentes de convulsiones o epilepsia, consulta a un médico antes de jugar.");
         es.put("ROADMAP_TITLE", "Hoja de ruta de desarrollo");
         es.put("ROADMAP_UNAVAILABLE", "No se pudo cargar la hoja de ruta.");
@@ -639,7 +639,7 @@ public class SpanishTranslation implements Translation {
         es.put("SAVE_ERROR_WRITE", "No se pudo guardar la partida. Volviendo al menú.");
         es.put("SAVE_ERROR_WRITE_TITLE", "Error al guardar");
         es.put("SAVE_AUTOSAVE_NAME", "Autoguardado");
-        es.put("DYNASTY_PLAYER_NAME_FMT", "%s Dinastía");
+        es.put("DYNASTY_PLAYER_NAME_FMT", "Dinastía %s");
         es.put("DYNASTY_WILD_NAME", "Dinastía salvaje");
         es.put("DYNASTY_WILD_NAME_FMT", "%s salvaje");
         es.put("DYNASTY_TITLE_DYNASTY", "Dinastía");
@@ -663,15 +663,15 @@ public class SpanishTranslation implements Translation {
         es.put("CITY_TITLE_CASTLE", "Castillo");
         es.put("CITY_TITLE_PRIME", "Prime");
         es.put("CITY_TITLE_NEW", "Nueva");
-        es.put("DYNASTY_TITLE_FMT_DYNASTY", "%s Dinastía");
-        es.put("DYNASTY_TITLE_FMT_CONGLOMERATE", "%s Conglomerado");
-        es.put("DYNASTY_TITLE_FMT_UNION", "%s Unión");
-        es.put("DYNASTY_TITLE_FMT_SYNDICATE", "%s Sindicato");
-        es.put("DYNASTY_TITLE_FMT_TECHNOCRACY", "%s Tecnocracia");
-        es.put("DYNASTY_TITLE_FMT_EMPIRE", "%s Imperio");
-        es.put("DYNASTY_TITLE_FMT_DOMINION", "%s Dominio");
-        es.put("DYNASTY_TITLE_FMT_NATION", "%s Nación");
-        es.put("DYNASTY_TITLE_FMT_REPUBLIC", "%s República");
+        es.put("DYNASTY_TITLE_FMT_DYNASTY", "Dinastía %s");
+        es.put("DYNASTY_TITLE_FMT_CONGLOMERATE", "Conglomerado %s");
+        es.put("DYNASTY_TITLE_FMT_UNION", "Unión %s");
+        es.put("DYNASTY_TITLE_FMT_SYNDICATE", "Sindicato %s");
+        es.put("DYNASTY_TITLE_FMT_TECHNOCRACY", "Tecnocracia %s");
+        es.put("DYNASTY_TITLE_FMT_EMPIRE", "Imperio %s");
+        es.put("DYNASTY_TITLE_FMT_DOMINION", "Dominio %s");
+        es.put("DYNASTY_TITLE_FMT_NATION", "Nación %s");
+        es.put("DYNASTY_TITLE_FMT_REPUBLIC", "República %s");
         es.put("SAVE_DELETE_CONFIRM", "¿Eliminar guardado en el espacio %s?");
         es.put("SAVE_DELETE_TITLE", "Eliminar Guardado");
         es.put("SAVE_DELETE_ERROR", "Error al eliminar guardado (el archivo puede no existir).");
@@ -1793,7 +1793,7 @@ public class SpanishTranslation implements Translation {
         es.put("HELP_SELECT_ITEM", "Selecciona un elemento de la lista para ver su descripción.");
         es.put("HELP_BUILD_BASE_COST", "Coste Base");
 
-        es.put("HELP_TUTORIAL_TITLE", "¡Bienvenido a Imperio Fórmico!");
+        es.put("HELP_TUTORIAL_TITLE", "¡Bienvenido a %s!");
         es.put("HELP_TUTORIAL_TIPS", "<b>Consejos Básicos:</b><br><br>Tu principal alimento son los <b>Hongos</b>, que las hormigas comerán a diario.<br><br>Asigna <b>Obreras</b> (Q) a roles de <b>Recolectora</b> para recoger Plantas y Agua. ¡Sin ellas tus hormigas morirán de sed!<br><br>Asigna <b>Granjeras</b> (Q) para convertir las Plantas recogidas en Hongos. Una Granjera generalmente puede manejar a 6 Recolectoras.<br><br>Asigna <b>Niñeras</b> (Q) para cuidar de tus <b>Huevos, Larvas y Pupas</b>. ¡Sin suficientes niñeras, tus crías morirán por descuido!<br><br>Presiona <b>Z</b> para alternar el <b>Inframundo</b> y el <b>Supramundo</b>. Presiona <b>X</b> para Estadísticas (incluida la Historia del Mundo).<br><br><i>Consejo de QoL: Si asignas un nuevo rol pero no tienes hormigas sin asignar, el juego las tomará automáticamente de tu fuerza de trabajo por defecto (como las Recolectoras).</i>");
         es.put("HELP_TUTORIAL_THREATS", "<b>Amenazas a la Colonia:</b><br><br><b>Contaminación:</b> Las hormigas mueren naturalmente de vejez. Si los cuerpos se acumulan, la enfermedad se propagará y matará a tu colonia. Asigna <b>Sepultureras</b> para limpiar a los muertos.<br><br><b>Hormigas parásitas:</b> Plagas invisibles absorberán tus reservas de Hongos. Asigna <b>Vigilantes</b> para detectarlos y eliminarlos.<br><br><b>Agotamiento:</b> Los nodos de recursos no duran para siempre. Si tus recolectoras se quedan sin plantas o agua, asigna <b>Exploradoras</b> para encontrar nuevos recursos cerca.");
         es.put("HELP_TUTORIAL_DYNASTY", "<b>Dinastía:</b><br><br>Desbloquea Princesas <b>Criadoras</b> para fundar colonias en el <b>Mapa Mundial (M)</b>.<br><i>¡Los eclipses pueden activar Vuelos Nupciales gratuitos!</i><br><br>Varias colonias desbloquean el menú de dinastía: <b>A</b> Resumen, <b>S</b> Comercio, <b>D</b> Diplomacia, <b>F</b> Guerras (ESC → submenú Dinastía). Declara la guerra desde Diplomacia; sigue las campañas en la pestaña Guerras.");

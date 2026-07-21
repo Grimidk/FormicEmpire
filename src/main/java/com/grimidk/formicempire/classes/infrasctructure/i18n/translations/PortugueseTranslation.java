@@ -12,7 +12,7 @@ public class PortugueseTranslation implements Translation {
     @Override
     public Map<String, String> getStrings() {
         Map<String, String> pt = new HashMap<>();
-        pt.put("UI_APP_TITLE", "Império Fôrmico");
+        pt.put("UI_APP_TITLE", "Formic Empire"); // brand — never translate; LanguageStrings.get ignores locale
         pt.put("UI_BACK_TO_GAME", "Voltar ao Jogo");
         pt.put("UI_BACK_TO_MENU", "Sair para o Menu Principal");
         pt.put("UI_MENU", "Menu");
@@ -81,7 +81,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("UI_HELP", "Ajuda");
         pt.put("UI_ROADMAP", "Roteiro");
         pt.put("UI_QUIT", "Sair");
-        pt.put("INTRO_WARNING", "Império Fôrmico é uma simulação de colónia com formigas, insetos e outros artrópodes pixelados.<br><br>Se aranhas ou criaturas semelhantes te incomodam, ativa o Modo aracnofobia nas Definições antes de jogar.");
+        pt.put("INTRO_WARNING", "%s é uma simulação de colónia com formigas, insetos e outros artrópodes pixelados.<br><br>Se aranhas ou criaturas semelhantes te incomodam, ativa o Modo aracnofobia nas Definições antes de jogar.");
         pt.put("INTRO_PHOTOSENSITIVITY_WARNING", "Aviso de fotossensibilidade: este jogo contém luzes intermitentes e efeitos visuais que podem desencadear convulsões em pessoas com epilepsia fotossensível.<br><br>Se tu ou alguém na tua casa tem histórico de convulsões ou epilepsia, consulta um médico antes de jogar.");
         pt.put("ROADMAP_TITLE", "Roteiro de desenvolvimento");
         pt.put("ROADMAP_UNAVAILABLE", "Não foi possível carregar o roteiro.");
@@ -639,7 +639,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("SAVE_ERROR_WRITE", "Falha ao salvar o jogo. Voltando ao menu.");
         pt.put("SAVE_ERROR_WRITE_TITLE", "Falha ao salvar");
         pt.put("SAVE_AUTOSAVE_NAME", "Salvamento automático");
-        pt.put("DYNASTY_PLAYER_NAME_FMT", "%s Dinastia");
+        pt.put("DYNASTY_PLAYER_NAME_FMT", "Dinastia %s");
         pt.put("DYNASTY_WILD_NAME", "Dinastia selvagem");
         pt.put("DYNASTY_WILD_NAME_FMT", "%s selvagem");
         pt.put("DYNASTY_TITLE_DYNASTY", "Dinastia");
@@ -663,15 +663,15 @@ public class PortugueseTranslation implements Translation {
         pt.put("CITY_TITLE_CASTLE", "Castelo");
         pt.put("CITY_TITLE_PRIME", "Prime");
         pt.put("CITY_TITLE_NEW", "Nova");
-        pt.put("DYNASTY_TITLE_FMT_DYNASTY", "%s Dinastia");
-        pt.put("DYNASTY_TITLE_FMT_CONGLOMERATE", "%s Conglomerado");
-        pt.put("DYNASTY_TITLE_FMT_UNION", "%s União");
-        pt.put("DYNASTY_TITLE_FMT_SYNDICATE", "%s Sindicato");
-        pt.put("DYNASTY_TITLE_FMT_TECHNOCRACY", "%s Tecnocracia");
-        pt.put("DYNASTY_TITLE_FMT_EMPIRE", "%s Império");
-        pt.put("DYNASTY_TITLE_FMT_DOMINION", "%s Domínio");
-        pt.put("DYNASTY_TITLE_FMT_NATION", "%s Nação");
-        pt.put("DYNASTY_TITLE_FMT_REPUBLIC", "%s República");
+        pt.put("DYNASTY_TITLE_FMT_DYNASTY", "Dinastia %s");
+        pt.put("DYNASTY_TITLE_FMT_CONGLOMERATE", "Conglomerado %s");
+        pt.put("DYNASTY_TITLE_FMT_UNION", "União %s");
+        pt.put("DYNASTY_TITLE_FMT_SYNDICATE", "Sindicato %s");
+        pt.put("DYNASTY_TITLE_FMT_TECHNOCRACY", "Tecnocracia %s");
+        pt.put("DYNASTY_TITLE_FMT_EMPIRE", "Império %s");
+        pt.put("DYNASTY_TITLE_FMT_DOMINION", "Domínio %s");
+        pt.put("DYNASTY_TITLE_FMT_NATION", "Nação %s");
+        pt.put("DYNASTY_TITLE_FMT_REPUBLIC", "República %s");
         pt.put("SAVE_DELETE_CONFIRM", "Excluir save no slot %s?");
         pt.put("SAVE_DELETE_TITLE", "Excluir save");
         pt.put("SAVE_DELETE_ERROR", "Erro ao excluir save (o arquivo pode não existir).");
@@ -1793,7 +1793,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("HELP_SELECT_ITEM", "Selecione um item da lista para ver a descrição.");
         pt.put("HELP_BUILD_BASE_COST", "Custo base");
 
-        pt.put("HELP_TUTORIAL_TITLE", "Bem-vindo ao Império Fôrmico!");
+        pt.put("HELP_TUTORIAL_TITLE", "Bem-vindo ao %s!");
         pt.put("HELP_TUTORIAL_TIPS", "<b>Dicas:</b><br><br>O principal alimento são <b>cogumelos</b>, consumidos diariamente.<br><br>Atribua <b>operárias</b> (Q) como <b>coletoras</b> para plantas e água. Sem água, suas formigas morrem de sede!<br><br>Atribua <b>agricultoras</b> (Q) para converter plantas em cogumelos. Uma agricultora costuma atender ~6 coletoras.<br><br>Atribua <b>babás</b> (Q) para <b>ovos, larvas e pupas</b>. Sem babás, as crias morrem!<br><br>Pressione <b>Z</b> para alternar submundo e supermundo. Pressione <b>X</b> para Estatísticas (incluindo a História do Mundo).<br><br><i>Se não houver formigas livres ao mudar função, o jogo pode puxar da força padrão (ex.: coletoras).</i>");
         pt.put("HELP_TUTORIAL_THREATS", "<b>Ameaças:</b><br><br><b>Contaminação:</b> formigas morrem de velhice. Corpos acumulam doença. Use <b>coveiras</b>.<br><br><b>Formigas parasitas:</b> drenam cogumelos. Use <b>vigilantes</b>.<br><br><b>Esgotamento:</b> fontes acabam. Use <b>batedoras</b> para achar novas.");
         pt.put("HELP_TUTORIAL_DYNASTY", "<b>Dinastia:</b><br><br>Desbloqueie princesas <b>reprodutoras</b> para fundar colônias no <b>mapa mundial (M)</b>.<br><i>Eclipses podem gerar voos nupciais gratuitos!</i><br><br>Várias colônias desbloqueiam o menu da dinastia: <b>A</b> Visão geral, <b>S</b> Comércio, <b>D</b> Diplomacia, <b>F</b> Guerras (ESC → submenu Dinastia). Declare guerra em Diplomacia; acompanhe campanhas na aba Guerras.");

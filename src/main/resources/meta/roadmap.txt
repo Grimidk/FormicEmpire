@@ -42,7 +42,7 @@ Needed for launch (v1.0) (Launch Version):
 		Arachnids (catapult ants, tarantulas, vinegaroons, horsehoecrabs), 
 		Anphibians (Salamander, frog, toad)
 		Reptiles, 
-		Birds, 
+		Birds (Crow, Finch), 
 		Mammals (Rats, Possum, Anteater), 
 		Zombie ant colonies
 	uncolonizable terrain with boss enemies  
