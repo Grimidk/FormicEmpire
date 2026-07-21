@@ -68,35 +68,35 @@ public final class GameUnlocks {
         public static final Upgrade ROLE_SCOUT = new Upgrade(16, "ROLE_SCOUT_UPGRADE", "ROLE_SCOUT_FLAVOR", "ROLE_SCOUT_DESC", TYPE_WORKER, 0, null );
         static { upgrades.add(ROLE_SCOUT); }
         // TODO asset: icons/roles/Miner.png (upgrade tree icon; may diverge from role icon)
-        public static final Upgrade ROLE_MINER = new Upgrade(17, "ROLE_MINER_UPGRADE", "ROLE_MINER_FLAVOR", "ROLE_MINER_DESC", TYPE_WORKER, 0, null );     
-        static { upgrades.add(ROLE_MINER); }
+        // Not purchasable until minerals / miner unlock path is implemented (cost 0 is never offered in Research)
+        public static final Upgrade ROLE_MINER = new Upgrade(17, "ROLE_MINER_UPGRADE", "ROLE_MINER_FLAVOR", "ROLE_MINER_DESC", TYPE_WORKER, 0, null );
         // TODO asset: icons/roles/Potter.png (upgrade tree icon; may diverge from role icon)
+        // Not purchasable until implemented
         public static final Upgrade ROLE_POTTER = new Upgrade(19, "ROLE_POTTER_UPGRADE", "ROLE_POTTER_FLAVOR", "ROLE_POTTER_DESC", TYPE_WORKER, 0, null );
-        static { upgrades.add(ROLE_POTTER); }
         // TODO asset: icons/roles/Warrior.png (upgrade tree icon; may diverge from role icon)
         public static final Upgrade ROLE_WARRIOR = new Upgrade(21, "ROLE_WARRIOR_UPGRADE", "ROLE_WARRIOR_FLAVOR", "ROLE_WARRIOR_DESC", TYPE_SOLDIER, 0, null );
         static { upgrades.add(ROLE_WARRIOR); }
         // TODO asset: icons/roles/Defender.png (upgrade tree icon; may diverge from role icon)
+        // Not purchasable until implemented
         public static final Upgrade ROLE_DEFENDER = new Upgrade(22, "ROLE_DEFENDER_UPGRADE", "ROLE_DEFENDER_FLAVOR", "ROLE_DEFENDER_DESC", TYPE_SOLDIER, 0, null );
-        static { upgrades.add(ROLE_DEFENDER); }
         // TODO asset: icons/roles/Police.png (upgrade tree icon; may diverge from role icon)
         public static final Upgrade ROLE_POLICE = new Upgrade(23, "ROLE_POLICE_UPGRADE", "ROLE_POLICE_FLAVOR", "ROLE_POLICE_DESC", TYPE_SOLDIER, 0, null ); 
         static { upgrades.add(ROLE_POLICE); }
         // TODO asset: icons/roles/Bomber.png (upgrade tree icon; may diverge from role icon)
+        // Not purchasable until implemented
         public static final Upgrade ROLE_BOMBER = new Upgrade(24, "ROLE_BOMBER_UPGRADE", "ROLE_BOMBER_FLAVOR", "ROLE_BOMBER_DESC", TYPE_SOLDIER, 0, null );
-        static { upgrades.add(ROLE_BOMBER); }
         // TODO asset: icons/roles/Brute.png (upgrade tree icon; may diverge from role icon)
         public static final Upgrade ROLE_BRUTE = new Upgrade(25, "ROLE_BRUTE_UPGRADE", "ROLE_BRUTE_FLAVOR", "ROLE_BRUTE_DESC", TYPE_MAJOR, 0, null );
         static { upgrades.add(ROLE_BRUTE); }
         // TODO asset: icons/roles/Carrier.png (upgrade tree icon; may diverge from role icon)
+        // Not purchasable until implemented
         public static final Upgrade ROLE_CARRIER = new Upgrade(26, "ROLE_CARRIER_UPGRADE", "ROLE_CARRIER_FLAVOR", "ROLE_CARRIER_DESC", TYPE_MAJOR, 0, null );
-        static { upgrades.add(ROLE_CARRIER); }
         // TODO asset: icons/roles/Artillery.png (upgrade tree icon; may diverge from role icon)
+        // Not purchasable until implemented
         public static final Upgrade ROLE_ARTILLERY = new Upgrade(27, "ROLE_ARTILLERY_UPGRADE", "ROLE_ARTILLERY_FLAVOR", "ROLE_ARTILLERY_DESC", TYPE_MAJOR, 0, null );
-        static { upgrades.add(ROLE_ARTILLERY); }
         // TODO asset: icons/roles/Siege.png (upgrade tree icon; may diverge from role icon)
+        // Not purchasable until implemented
         public static final Upgrade ROLE_SIEGE = new Upgrade(28, "ROLE_SIEGE_UPGRADE", "ROLE_SIEGE_FLAVOR", "ROLE_SIEGE_DESC", TYPE_MAJOR, 0, null );
-        static { upgrades.add(ROLE_SIEGE); }
         // TODO asset: icons/roles/Breeder.png (upgrade tree icon; may diverge from role icon)
         public static final Upgrade ROLE_BREEDER = new Upgrade(30,"ROLE_BREEDER_UPGRADE", "ROLE_BREEDER_FLAVOR", "ROLE_BREEDER_DESC", TYPE_PRINCESS, 0, null );
         static { upgrades.add(ROLE_BREEDER); }

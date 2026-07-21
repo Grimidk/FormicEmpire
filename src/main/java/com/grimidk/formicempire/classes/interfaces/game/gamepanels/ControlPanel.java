@@ -198,6 +198,12 @@ public class ControlPanel extends ZeroGamePanel {
         showTutorial.setText(LanguageStrings.get(LanguageStrings.UI_TUTORIAL));
         showAudit.setText(LanguageStrings.get(LanguageStrings.UI_AUDIT));
         quitToMenu.setText(LanguageStrings.get(LanguageStrings.UI_BACK_TO_MENU));
+        if (colonyMenu != null) {
+            colonyMenu.setText(LanguageStrings.get(LanguageStrings.MENU_GROUP_COLONY));
+        }
+        if (dynastyMenu != null) {
+            dynastyMenu.setText(LanguageStrings.get(LanguageStrings.MENU_GROUP_DYNASTY));
+        }
     }
 
     @Override

@@ -145,6 +145,7 @@ public class TriggerManager {
         checkResearchAbilityUnlock();
         checkBuildAbilityUnlock();
         checkHunterRoleUnlock();
+        checkMilitiaRoleRetrofit();
         checkBreederRoleUnlock();
         checkBruteRoleUnlock();
         checkSpreadAbilityUnlock();
@@ -327,6 +328,16 @@ public class TriggerManager {
             fireLocalizedTrigger(GameUnlocks.ROLE_HUNTER,
                 LanguageStrings.TRIGGER_HUNTER_ROLE_TITLE,
                 LanguageStrings.TRIGGER_HUNTER_ROLE_MSG);
+        }
+    }
+
+    /** Existing saves may have Soldiers without Militia (war-economy worker role). */
+    private void checkMilitiaRoleRetrofit() {
+        if (playerColony.hasUpgrade(GameUnlocks.ROLE_MILITIA)) {
+            return;
+        }
+        if (playerColony.hasUpgrade(GameUnlocks.TYPE_SOLDIER)) {
+            playerColony.unlockUpgrade(GameUnlocks.ROLE_MILITIA);
         }
     }
     

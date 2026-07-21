@@ -385,14 +385,25 @@ public class RoleManagementDialog extends ZeroDialog {
                 if (role.getAntType() != antType) {
                     continue;
                 }
+                if (!GameConstants.isObtainableRole(role)) {
+                    removeRoleRow(role);
+                    continue;
+                }
+
+                Upgrade roleUpgrade = getUpgradeForRole(role);
+                boolean unlocked = roleUpgrade != null && colony.hasUpgrade(roleUpgrade);
+
                 if (GameConstants.isWarEconomyExclusiveRole(role)) {
-                    if (!owner.isEditingWarRoles() || !owner.isWarEconomyUnlocked()) {
+                    // War-only roles must still appear on their type tab once unlocked.
+                    // Quotas always read/write the war distribution (see usesWarRoleCounts).
+                    if (!unlocked) {
                         removeRoleRow(role);
                         continue;
                     }
                     if (!displayedRoles.contains(role)) {
-                        addRoleRow(role);
+                        // Must mark displayed before addRoleRow — rebuildRolesGrid skips unmarked roles.
                         displayedRoles.add(role);
+                        addRoleRow(role);
                         addedAny = true;
                     }
                     continue;
@@ -401,11 +412,10 @@ public class RoleManagementDialog extends ZeroDialog {
                     continue;
                 }
 
-                Upgrade roleUpgrade = getUpgradeForRole(role);
-
-                if (roleUpgrade != null && colony.hasUpgrade(roleUpgrade)) {
-                    addRoleRow(role);
+                if (unlocked) {
+                    // Must mark displayed before addRoleRow — rebuildRolesGrid skips unmarked roles.
                     displayedRoles.add(role);
+                    addRoleRow(role);
                     addedAny = true;
                 }
             }
@@ -441,12 +451,17 @@ public class RoleManagementDialog extends ZeroDialog {
             spinner.addChangeListener(e -> {
                 if (isUpdating) return;
                 int newValue = (Integer) spinner.getValue();
+                boolean warCounts = usesWarRoleCounts(role);
                 
                 int otherSpinnersTotal = 0;
                 for (Map.Entry<AntRole, JSpinner> entry : spinnerMap.entrySet()) {
-                    if (entry.getValue() != spinner) {
-                        otherSpinnersTotal += (Integer) entry.getValue().getValue();
+                    if (entry.getValue() == spinner) {
+                        continue;
                     }
+                    if (usesWarRoleCounts(entry.getKey()) != warCounts) {
+                        continue;
+                    }
+                    otherSpinnersTotal += (Integer) entry.getValue().getValue();
                 }
 
                 int currentTotalAnts = RolePanel.this.colony.getAntsByType(RolePanel.this.antType).size();
@@ -456,7 +471,8 @@ public class RoleManagementDialog extends ZeroDialog {
 
                     AntRole defaultRole = Engine.resolveDefaultRoleForAntType(antType, engine);
                     
-                    if (defaultRole != null && !role.equals(defaultRole) && spinnerMap.containsKey(defaultRole)) {
+                    if (defaultRole != null && !role.equals(defaultRole) && spinnerMap.containsKey(defaultRole)
+                            && usesWarRoleCounts(defaultRole) == warCounts) {
                         
                         int deficit = newTotalAssigned - currentTotalAnts;
                         JSpinner defaultSpinner = spinnerMap.get(defaultRole);
@@ -682,14 +698,18 @@ public class RoleManagementDialog extends ZeroDialog {
             return chip;
         }
 
+        private boolean usesWarRoleCounts(AntRole role) {
+            return owner.isEditingWarRoles() || GameConstants.isWarEconomyExclusiveRole(role);
+        }
+
         private boolean isSubtypeAllowed(AntRole role, AntSubtype subtype) {
-            return owner.isEditingWarRoles()
+            return usesWarRoleCounts(role)
                     ? colony.isWarRoleSubtypeAllowed(role, subtype)
                     : colony.isPeaceRoleSubtypeAllowed(role, subtype);
         }
 
         private void setSubtypeAllowed(AntRole role, AntSubtype subtype, boolean allowed) {
-            if (owner.isEditingWarRoles()) {
+            if (usesWarRoleCounts(role)) {
                 colony.setWarRoleSubtypeAllowed(role, subtype, allowed);
             } else {
                 colony.setPeaceRoleSubtypeAllowed(role, subtype, allowed);
@@ -697,13 +717,13 @@ public class RoleManagementDialog extends ZeroDialog {
         }
 
         private int getRoleCount(AntRole role) {
-            return owner.isEditingWarRoles()
+            return usesWarRoleCounts(role)
                     ? colony.getWarAssignedRoleCount(role)
                     : colony.getPeaceAssignedRoleCount(role);
         }
 
         private void setRoleCount(AntRole role, int count) {
-            if (owner.isEditingWarRoles()) {
+            if (usesWarRoleCounts(role)) {
                 colony.setWarAssignedRoleCount(role, count);
             } else {
                 colony.setPeaceAssignedRoleCount(role, count);
@@ -728,8 +748,13 @@ public class RoleManagementDialog extends ZeroDialog {
                 totalLabel.setText(LanguageStrings.format(LanguageStrings.ROLE_TOTAL_PREFIX, antType.getName(), totalAnts));
 
                 int totalAssigned = 0;
-                for (JSpinner s : spinnerMap.values()) {
-                    totalAssigned += (Integer) s.getValue();
+                for (Map.Entry<AntRole, JSpinner> entry : spinnerMap.entrySet()) {
+                    // In peace view, war-exclusive rows edit war prep quotas — exclude from peace totals.
+                    if (!owner.isEditingWarRoles()
+                            && GameConstants.isWarEconomyExclusiveRole(entry.getKey())) {
+                        continue;
+                    }
+                    totalAssigned += (Integer) entry.getValue().getValue();
                 }
                 
                 int unassigned = totalAnts - totalAssigned;

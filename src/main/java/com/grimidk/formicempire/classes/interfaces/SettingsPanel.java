@@ -424,7 +424,7 @@ public class SettingsPanel extends JPanel {
     private JComboBox<AntRole> createAntRoleCombo(AntType type) {
         JComboBox<AntRole> combo = new JComboBox<>();
         for (AntRole r : Engine.antRolesForAntType(type)) {
-            if (!GameConstants.isWarEconomyExclusiveRole(r)) {
+            if (!GameConstants.isWarEconomyExclusiveRole(r) && GameConstants.isObtainableRole(r)) {
                 combo.addItem(r);
             }
         }
@@ -518,7 +518,7 @@ public class SettingsPanel extends JPanel {
     private void resetRolesTabToDefaults() {
         selectRoleCombo(defaultRoleWorkerCombo, GameConstants.TYPE_WORKER, GameConstants.ROLE_FORAGER.getId());
         selectRoleCombo(defaultRoleSoldierCombo, GameConstants.TYPE_SOLDIER, GameConstants.ROLE_HUNTER.getId());
-        selectRoleCombo(defaultRoleMajorCombo, GameConstants.TYPE_MAJOR, GameConstants.ROLE_CARRIER.getId());
+        selectRoleCombo(defaultRoleMajorCombo, GameConstants.TYPE_MAJOR, GameConstants.ROLE_CRANE.getId());
         selectRoleCombo(defaultRolePrincessCombo, GameConstants.TYPE_PRINCESS, GameConstants.ROLE_BREEDER.getId());
         selectRoleCombo(defaultRoleQueenCombo, GameConstants.TYPE_QUEEN, GameConstants.ROLE_LAYER.getId());
     }
@@ -921,7 +921,7 @@ public class SettingsPanel extends JPanel {
 
         applyDefaultRoleFromCombo(defaultRoleWorkerCombo, GameConstants.TYPE_WORKER, GameConstants.ROLE_FORAGER.getId());
         applyDefaultRoleFromCombo(defaultRoleSoldierCombo, GameConstants.TYPE_SOLDIER, GameConstants.ROLE_HUNTER.getId());
-        applyDefaultRoleFromCombo(defaultRoleMajorCombo, GameConstants.TYPE_MAJOR, GameConstants.ROLE_CARRIER.getId());
+        applyDefaultRoleFromCombo(defaultRoleMajorCombo, GameConstants.TYPE_MAJOR, GameConstants.ROLE_CRANE.getId());
         applyDefaultRoleFromCombo(defaultRolePrincessCombo, GameConstants.TYPE_PRINCESS, GameConstants.ROLE_BREEDER.getId());
         applyDefaultRoleFromCombo(defaultRoleQueenCombo, GameConstants.TYPE_QUEEN, GameConstants.ROLE_LAYER.getId());
 

@@ -870,8 +870,16 @@ public final class GameConstants {
     private static final Set<AntRole> WAR_ECONOMY_EXCLUSIVE_ROLES =
             Set.copyOf(Arrays.asList(ACTIVE_MILITARY_ROLES));
 
+    /** Defined in data but not playable yet (no unlock path / job incomplete). */
+    private static final Set<AntRole> UNOBTAINABLE_ROLES = Set.of(
+            ROLE_POTTER, ROLE_DEFENDER, ROLE_BOMBER, ROLE_CARRIER, ROLE_ARTILLERY, ROLE_SIEGE, ROLE_MINER);
+
     public static boolean isWarEconomyExclusiveRole(AntRole role) {
         return role != null && WAR_ECONOMY_EXCLUSIVE_ROLES.contains(role);
+    }
+
+    public static boolean isObtainableRole(AntRole role) {
+        return role != null && !UNOBTAINABLE_ROLES.contains(role);
     }
 
     public static boolean isActiveMilitaryRole(AntRole role) {

@@ -1709,6 +1709,9 @@ public class Dynasty {
             if (!hasUpgrade(GameUnlocks.ROLE_WARRIOR)) {
                 unlockedUpgrades.add(GameUnlocks.ROLE_WARRIOR);
             }
+            if (!hasUpgrade(GameUnlocks.ROLE_MILITIA)) {
+                unlockedUpgrades.add(GameUnlocks.ROLE_MILITIA);
+            }
         }
         DynastySynergyService.refreshUnlocked(this);
         invalidateAffordableAlertCaches();

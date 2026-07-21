@@ -104,6 +104,9 @@ public class DynastyDiplomacyService {
         if (!dynasty.hasUpgrade(GameUnlocks.ROLE_WARRIOR)) {
             dynasty.unlockUpgrade(GameUnlocks.ROLE_WARRIOR);
         }
+        if (!dynasty.hasUpgrade(GameUnlocks.ROLE_MILITIA)) {
+            dynasty.unlockUpgrade(GameUnlocks.ROLE_MILITIA);
+        }
     }
 
     public enum TradeProposalResult {

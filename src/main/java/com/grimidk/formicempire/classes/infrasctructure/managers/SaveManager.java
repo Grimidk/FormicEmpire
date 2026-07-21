@@ -1947,7 +1947,7 @@ public class SaveManager {
             engine.setDefaultRoleMajor(Engine.sanitizeDefaultRoleId(
                     GameConstants.TYPE_MAJOR,
                     Integer.parseInt(m.getOrDefault("defaultRoleMajor", String.valueOf(engine.getDefaultRoleMajor()))),
-                    GameConstants.ROLE_CARRIER.getId()));
+                    GameConstants.ROLE_CRANE.getId()));
             engine.setDefaultRolePrincess(Engine.sanitizeDefaultRoleId(
                     GameConstants.TYPE_PRINCESS,
                     Integer.parseInt(m.getOrDefault("defaultRolePrincess", String.valueOf(engine.getDefaultRolePrincess()))),

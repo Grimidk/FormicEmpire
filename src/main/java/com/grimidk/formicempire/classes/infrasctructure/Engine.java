@@ -58,7 +58,7 @@ public class Engine extends Thread {
     private boolean darkMode = false;
     private int defaultRoleWorker = 1; // ROLE_FORAGER
     private int defaultRoleSoldier = 16; // ROLE_HUNTER
-    private int defaultRoleMajor = 18; // ROLE_CARRIER
+    private int defaultRoleMajor = 29; // ROLE_CRANE
     private int defaultRolePrincess = 23; // ROLE_BREEDER
     private int defaultRoleQueen = 25; // ROLE_LAYER
 
@@ -563,7 +563,8 @@ public class Engine extends Thread {
             }
             AntRole chosen = GameConstants.getAntRoleById(roleId);
             if (chosen != null && chosen.getAntType() == type
-                    && !GameConstants.isWarEconomyExclusiveRole(chosen)) {
+                    && !GameConstants.isWarEconomyExclusiveRole(chosen)
+                    && GameConstants.isObtainableRole(chosen)) {
                 return chosen;
             }
         }
@@ -578,7 +579,7 @@ public class Engine extends Thread {
             return GameConstants.ROLE_HUNTER;
         }
         if (type == GameConstants.TYPE_MAJOR) {
-            return GameConstants.ROLE_CARRIER;
+            return GameConstants.ROLE_CRANE;
         }
         if (type == GameConstants.TYPE_PRINCESS) {
             return GameConstants.ROLE_BREEDER;
@@ -594,12 +595,14 @@ public class Engine extends Thread {
 
     public static int sanitizeDefaultRoleId(AntType type, int desiredRoleId, int fallbackRoleId) {
         AntRole r = GameConstants.getAntRoleById(desiredRoleId);
-        if (r != null && r.getAntType() == type && !GameConstants.isWarEconomyExclusiveRole(r)) {
+        if (r != null && r.getAntType() == type && !GameConstants.isWarEconomyExclusiveRole(r)
+                && GameConstants.isObtainableRole(r)) {
             return desiredRoleId;
         }
         AntRole fallback = GameConstants.getAntRoleById(fallbackRoleId);
         if (fallback != null && fallback.getAntType() == type
-                && !GameConstants.isWarEconomyExclusiveRole(fallback)) {
+                && !GameConstants.isWarEconomyExclusiveRole(fallback)
+                && GameConstants.isObtainableRole(fallback)) {
             return fallbackRoleId;
         }
         AntRole legacy = legacyDefaultRoleForAntType(type);
