@@ -110,6 +110,41 @@ public class ColonyStatsService {
         if (colony.hasUpgrade(GameUnlocks.ROLE_RESEARCHER)) return 1;
         return 0;
     }
+
+    /** Passive Lab contributes virtual researchers (+1, or +2 with Passive 1). */
+    public int getPassiveLabResearcherBonus(Colony colony) {
+        if (colony == null || !colony.hasBuilding(GameUnlocks.PASSIVE_LAB)) {
+            return 0;
+        }
+        return colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1) ? 2 : 1;
+    }
+
+    public int getEffectiveResearcherCount(Colony colony) {
+        if (colony == null) {
+            return 0;
+        }
+        return colony.getAssignedRoleCount(GameConstants.ROLE_RESEARCHER) + getPassiveLabResearcherBonus(colony);
+    }
+
+    /** Hourly RP gain matching labour / lite research (assigned roles + Passive Lab). */
+    public int getHourlyResearchPoints(Colony colony) {
+        if (colony == null) {
+            return 0;
+        }
+        int researchers = getEffectiveResearcherCount(colony);
+        int assistants = colony.getAssignedRoleCount(GameConstants.ROLE_ASSISTANT);
+        if (researchers <= 0 && assistants <= 0) {
+            return 0;
+        }
+        int speed = getResearchSpeed(colony);
+        int queenGain = researchers * speed;
+        int assistantGain = (int) (assistants * (speed / (double) GameNumbers.RESEARCH_ASSISTANT_EFFICIENCY_DIVISOR));
+        return queenGain + assistantGain;
+    }
+
+    public int getDailyResearchPoints(Colony colony) {
+        return getHourlyResearchPoints(colony) * 24;
+    }
     public int getGrowthTime(Colony colony) {
         if (colony.hasUpgrade(GameUnlocks.STAT_GROWTH_3)) return 1;
         if (colony.hasUpgrade(GameUnlocks.STAT_GROWTH_2)) return 2;

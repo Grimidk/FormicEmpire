@@ -2169,6 +2169,7 @@ public final class LanguageStrings {
     public static final String HELP_TAB_UPGRADES = "HELP_TAB_UPGRADES";
     public static final String HELP_TAB_BUILDINGS = "HELP_TAB_BUILDINGS";
     public static final String HELP_TAB_ASSIMILATIONS = "HELP_TAB_ASSIMILATIONS";
+    public static final String HELP_TAB_SYNERGIES = "HELP_TAB_SYNERGIES";
     public static final String HELP_TAB_WORLD = "HELP_TAB_WORLD";
     public static final String HELP_TAB_UI = "HELP_TAB_UI";
     public static final String HELP_UI_INTRO = "HELP_UI_INTRO";

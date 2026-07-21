@@ -14,6 +14,7 @@ import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.misc.Species;
 import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
+import com.grimidk.formicempire.classes.constants.unlocks.Synergy;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.Humidity;
@@ -108,6 +109,8 @@ public class HelpPanel extends JPanel {
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_BUILDINGS),
                 createDictionaryPanel(new ArrayList<>(GameUnlocks.getBuildings()), false));
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_ASSIMILATIONS), createDictionaryPanel(new ArrayList<>(GameUnlocks.getAssimilations())));
+        mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_SYNERGIES),
+                createDictionaryPanel(new ArrayList<>(GameUnlocks.getSynergies())));
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_WORLD), createWorldPanel());
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_UI), createUiControlsPanel());
     }
@@ -126,6 +129,7 @@ public class HelpPanel extends JPanel {
             LanguageStrings.get(LanguageStrings.HELP_TAB_UPGRADES),
             LanguageStrings.get(LanguageStrings.HELP_TAB_BUILDINGS),
             LanguageStrings.get(LanguageStrings.HELP_TAB_ASSIMILATIONS),
+            LanguageStrings.get(LanguageStrings.HELP_TAB_SYNERGIES),
             LanguageStrings.get(LanguageStrings.HELP_TAB_WORLD),
             LanguageStrings.get(LanguageStrings.HELP_TAB_UI)
         };
@@ -710,7 +714,8 @@ public class HelpPanel extends JPanel {
         JLabel iconLabel = new JLabel(GameConstants.ICON_STAT_MILITARY_POWER);
         iconLabel.setVerticalAlignment(SwingConstants.TOP);
         panel.add(iconLabel, BorderLayout.WEST);
-        JLabel body = new JLabel("<html>" + LanguageStrings.get(LanguageStrings.HELP_MILITARY_POWER_BODY) + "</html>");
+        JLabel body = new JLabel("<html><body style='width:280px'>"
+                + LanguageStrings.get(LanguageStrings.HELP_MILITARY_POWER_BODY) + "</body></html>");
         body.setFont(AssetStyles.FONT_NORMAL);
         body.setForeground(AssetStyles.FONT_COLOR);
         panel.add(body, BorderLayout.CENTER);
@@ -1207,6 +1212,16 @@ public class HelpPanel extends JPanel {
                         body.append("<b>").append(a.getName()).append("</b><br><br>");
                         body.append(a.getDescription()).append("<br><br>");
                         body.append("<b>").append(LanguageStrings.get("UI_COST")).append(":</b> ").append(AssetStyles.formatNumber(a.getCost())).append(" RP");
+                    } else if (selected instanceof Synergy) {
+                        Synergy s = (Synergy) selected;
+                        body.append("<b>").append(s.getName()).append("</b><br><br>");
+                        body.append(s.getDescription()).append("<br><br>");
+                        body.append("<b>").append(LanguageStrings.get("UI_REQUIREMENTS")).append(":</b> ")
+                                .append(s.formatRequirementFlavorNames());
+                        if (s.getReward() != null) {
+                            body.append("<br><b>").append(LanguageStrings.get(LanguageStrings.TAB_SYNERGIES)).append(":</b> ")
+                                    .append(s.getReward().getFlavorName());
+                        }
                     }
                     
                     descriptionArea.setText(helpHtml("font-size:11pt;width:250px;", body.toString()));

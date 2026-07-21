@@ -1157,8 +1157,7 @@ public class StatsDialog extends ZeroDialog {
 
             researchers += c.getAssignedRoleCount(GameConstants.ROLE_RESEARCHER);
             assistants += c.getAssignedRoleCount(GameConstants.ROLE_ASSISTANT);
-            int baseSpeed = cs.getResearchSpeed(c);
-            dailyRP += (researchers * baseSpeed + (int)(assistants * (baseSpeed / (double) GameNumbers.RESEARCH_ASSISTANT_EFFICIENCY_DIVISOR))) * 24;
+            dailyRP += cs.getDailyResearchPoints(c);
 
             layers += c.getAssignedRoleCount(GameConstants.ROLE_LAYER);
             dailyEggs += (int)(c.getAssignedRoleCount(GameConstants.ROLE_LAYER) * cs.getLayingRate(c) * 24);
@@ -1189,7 +1188,7 @@ public class StatsDialog extends ZeroDialog {
         if (hunters > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.ROLE_HUNTER), AssetStyles.formatNumber(hunters) + " " + LanguageStrings.get(LanguageStrings.ROLE_HUNTER), LanguageStrings.get(LanguageStrings.UI_COMBINED), LanguageStrings.format(LanguageStrings.STAT_RATE_PWR_DAY, dailyHunt)});
         if (miners > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.ROLE_MINER), AssetStyles.formatNumber(miners) + " " + LanguageStrings.get(LanguageStrings.ROLE_MINER), LanguageStrings.get(LanguageStrings.UI_COMBINED), LanguageStrings.format(LanguageStrings.STAT_RATE_PWR_DAY, dailyMine)});
         if (scouts > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.ROLE_SCOUT), AssetStyles.formatNumber(scouts) + " " + LanguageStrings.get(LanguageStrings.ROLE_SCOUT), "---", LanguageStrings.get(LanguageStrings.STAT_RATE_SCOUT_STATUS)});
-        if (researchers + assistants > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.TAB_RESEARCH), LanguageStrings.format(LanguageStrings.STAT_RATE_RESEARCH_ASST_FMT, researchers, assistants), LanguageStrings.get(LanguageStrings.UI_COMBINED), LanguageStrings.format(LanguageStrings.STAT_RATE_PTS_DAY_FMT, dailyRP)});
+        if (researchers + assistants > 0 || dailyRP > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.TAB_RESEARCH), LanguageStrings.format(LanguageStrings.STAT_RATE_RESEARCH_ASST_FMT, researchers, assistants), LanguageStrings.get(LanguageStrings.UI_COMBINED), LanguageStrings.format(LanguageStrings.STAT_RATE_PTS_DAY_FMT, dailyRP)});
         if (layers > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_JOB_EGG_LAYING), LanguageStrings.format(LanguageStrings.STAT_RATE_LAYERS_FMT, layers), LanguageStrings.get(LanguageStrings.UI_COMBINED), LanguageStrings.format(LanguageStrings.STAT_RATE_EGGS_DAY, dailyEggs)});
         if (nurses > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.ROLE_NURSE), LanguageStrings.format(LanguageStrings.STAT_RATE_NURSES_FMT, nurses), LanguageStrings.format(LanguageStrings.STAT_RATE_CAP_SHORT, nurseCap), LanguageStrings.format(LanguageStrings.STAT_RATE_LOAD_FMT, babies, nurseCap)});
         if (gravers > 0) model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.ROLE_GRAVER), LanguageStrings.format(LanguageStrings.STAT_RATE_GRAVERS_FMT, gravers), LanguageStrings.format(LanguageStrings.STAT_RATE_CAP_SHORT, graveCap), LanguageStrings.format(LanguageStrings.STAT_RATE_LOAD_FMT, deadAnts, graveCap)});

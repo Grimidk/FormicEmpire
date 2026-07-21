@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 74% (220/299 checked)
+Completion: 70% (220/313 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -112,12 +112,6 @@ Side panels (live updates while playing):
 [X] F — Dynasty Wars tab (toggle)
 [X] M — World map (toggle)
 [X] X — Statistics (toggle)
-[ ] Statistics — Dynasty tab shows total queens and birth rate (eggs/day)
-[ ] Statistics — Dynasty tab defeated species is a count
-[ ] Statistics — World History tab lists dated events (newest first)
-[ ] Statistics — World History category filter
-[ ] Statistics — World History “Only my dynasty” filter
-[ ] Statistics — Population tab includes insects section at end
 [X] Repeat same hotkey closes the bound dialog/tab
 
 ================================================================================
@@ -381,7 +375,18 @@ Per foreign dynasty Actions menu:
 ================================================================================
 20. STATISTICS (X)
 ================================================================================
-[X] General stats table — hover tooltips on rows
+Tabs (live refresh while open; dynasty-mode toggle where applicable):
+[X] General & World — colony/world overview rows with hover tooltips
+[ ] Dynasty Overview — aggregates, total queens, birth rate (eggs/day), defeated species count
+[ ] World History — dated events newest first
+[ ] World History — category filter (colonies / dynasties / wars / battles / rebellions / nuptial / assimilations)
+[ ] World History — “Only my dynasty” filter
+[ ] Economy — stock / capacity / production / consumption; subtype food overhead when subtypes active
+[ ] Population — ant types and roles; insects section at end (aphids, mites, dermestids, parasites)
+[ ] Local Hex — biome, depletion, sources found, max efficiency distance, neighbors
+[ ] Rates & Jobs — foraging/farming/hunting/mining/research/laying/nursing/etc.; Passive Lab included in research rate
+[ ] Mortality — death causes
+
 [X] Colony stats when colony selected
 [X] Dynasty-wide aggregates
 [X] Live refresh while dialog open
@@ -403,6 +408,7 @@ Help encyclopedia (main menu Help):
 [X] Upgrades list (all GameUnlocks upgrades)
 [X] Buildings list
 [X] Assimilations list
+[ ] Synergies list (Help > Synergies — Super Venom and future combos)
 [X] World / biomes / hexes
 [X] UI controls (Help > UI Controls tab — speed bar and icons)
 
@@ -412,19 +418,29 @@ Help encyclopedia (main menu Help):
 Monthly:
 [ ] Researcher role unlock
 [ ] Police role unlock
-[ ] Parasitic mite outbreak event
+[ ] Parasitic mite outbreak event (dynasty-wide unlock; grants Catch Symbiotic Mite)
 
 Daily:
 [X] Graver role unlock
+[ ] Scout unlock from plant harvest (any plant source)
+[ ] Hunter / Breeder / Brute role unlocks
+[ ] Research / Build / Spread ability unlocks
+[ ] Dynasty / Trade / Management / Spread 2 / Automation unlocks by colony count
+[ ] Bilateral Trade unlock from active trade count
+[ ] Courier / Borer role unlocks
+[ ] Assimilation ability unlock from absorbed dynasties
+[ ] Subtype hatch ability unlock after body-part assimilation
+[ ] Colony Operations ability unlock
+[ ] Mass Flight unlock
+[ ] Cloning unlock
+[ ] Auto-Tunnels / Auto-Diplomacy unlocks (after Automation + prerequisites)
 [ ] Colony death detection
 [ ] NPC dynasty triggers
-[ ] Mass flight unlock
-[ ] Cloning unlock
-[ ] Scout unlock from plant harvest (any plant source)
 [ ] (and other TriggerManager daily checks)
 
 Hourly:
 [X] Hourly trigger checks
+[ ] Research → Triggers subtab mirrors in-progress / unlocked goals (also listed under Research)
 
 [X] Trigger popup pauses game, shows title + message, grants upgrade
 

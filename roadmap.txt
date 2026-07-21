@@ -9,8 +9,6 @@ To Fix (By decreasing priority) :
 	TODO: icons all unlocks
 	TODO: species sprites and icon: carpenter, weaver, floodplain, jet, gliding, army, ghost, dracula, silver, exploding, bulldog, shining black and desert
 
-	revise audit, tutorials, stats and tests for blindspots
-
 	Mid:
 	(none right now)
 	  
