@@ -1,35 +1,47 @@
 package com.grimidk.formicempire.classes.entities;
 
+import com.grimidk.formicempire.classes.entities.spatial.Room;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList; 
 import java.awt.Rectangle;
-import java.awt.Point; 
 
-import com.grimidk.formicempire.classes.entities.services.*; 
+import com.grimidk.formicempire.classes.entities.services.colony.*;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDiplomacyService;
 import com.grimidk.formicempire.classes.constants.misc.BugType;
+import com.grimidk.formicempire.classes.constants.ant.AntSubtype;
+import com.grimidk.formicempire.classes.constants.ant.AntSubtypeSlot;
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
+import com.grimidk.formicempire.classes.constants.misc.ColonyLoyaltyModifier;
 import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
 import com.grimidk.formicempire.classes.constants.misc.Species;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
-import com.grimidk.formicempire.classes.infrasctructure.Dimension;
+import com.grimidk.formicempire.classes.entities.spatial.Dimension;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
+import com.grimidk.formicempire.classes.entities.Trade;
+import com.grimidk.formicempire.classes.entities.Tunnel;
 import com.grimidk.formicempire.classes.infrasctructure.World;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.ColonyLogPrefixes;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.WorldSpaces;
+import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
+import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
+import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
+import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
+import com.grimidk.formicempire.classes.infrasctructure.registries.WorldSpaces;
 import com.grimidk.formicempire.classes.constants.world.Biome;
+import com.grimidk.formicempire.classes.constants.world.Season;
 import com.grimidk.formicempire.classes.constants.world.Temperature;
 
 public class Colony {
@@ -43,16 +55,33 @@ public class Colony {
     private boolean isActive;
     private boolean automationEnabled = false; 
     private boolean autoBuildEnabled = false;
+    private boolean autoTunnelsEnabled = false;
     private boolean isCapital = false;
     private int age;
     private int daysWithoutQueen;
+    private int loyalty = GameNumbers.DEFAULT_COLONY_LOYALTY;
+    private int militaryPower;
+    private int activeMilitaryPower;
+    private int reserveMilitaryPower;
     
     // --- Population Data ---
     private final Map<AntType, List<Ant>> antGroups;
     private final List<Ant> deadAnts;
     private final List<Bug> bugs; 
     
-    private Map<AntRole, Integer> assignedRoleCounts;
+    private final Map<AntRole, Integer> peaceAssignedRoleCounts = createEmptyRoleCountMap();
+    private final Map<AntRole, Integer> warAssignedRoleCounts = createEmptyRoleCountMap();
+    private final Map<AntRole, Set<Integer>> peaceRoleDisallowedSubtypes = new HashMap<>();
+    private final Map<AntRole, Set<Integer>> warRoleDisallowedSubtypes = new HashMap<>();
+    private Map<AntRole, Integer> activeRoleCountCache;
+    private final Map<Integer, Integer> outgoingColonyDiplomatMissions = new HashMap<>();
+    private final Map<Integer, Integer> incomingColonyDiplomatSupport = new HashMap<>();
+    private final Map<Integer, Integer> outgoingDynastyDiplomatMissions = new HashMap<>();
+    private int integrationDiplomatsDeployed;
+    private int nativeSpeciesId;
+    private Boolean affordableResearchCached;
+    private Building affordableBuildingCached;
+    private boolean affordableBuildingCacheValid;
     private final Set<Building> buildings;
 
     // --- Resource Data ---
@@ -65,10 +94,16 @@ public class Colony {
     private double minerals;
     
     private int aphids; 
-    private int soilMites;
+    private int symbioticMites;
     private int dermestids;
-    private int parasites;
+    private int parasiteAnts;
     private int parasiticMites;
+
+    private int pheromoneStormMonthsRemaining;
+    private int recentlyConqueredMonthsRemaining;
+    private int recentlyIntegratedMonthsRemaining;
+    private final Map<String, Integer> loyaltyModifierRemainingDays = new HashMap<>();
+    private int creatineDietMonthsRemaining;
 
     // --- Hatch Rate Data ---
     private float hatchRateWorker;
@@ -76,6 +111,8 @@ public class Colony {
     private float hatchRateMajor;
     private float hatchRateDrone;
     private float hatchRatePrincess;
+    private Map<AntType, Map<AntSubtypeSlot, Map<Integer, Float>>> subtypeHatchRates =
+            AntSubtypeService.defaultSubtypeRates();
 
     // --- Misc. Data ---
     private int totalDeaths;
@@ -101,28 +138,36 @@ public class Colony {
 
     // --- Service Dependencies ---
     private transient ColonyStatsService statsService;
+    private transient ColonySpatialService spatialService;
+    private transient ColonySourceService sourceService;
+    private transient ColonyPathfindingService pathfindingService;
     private transient ColonyLabourService labourService;
     private transient ColonyPopulationService populationService;
+    private transient ColonyDeathService deathService;
     private transient ColonyPhysicsService physicsService;
     private transient ColonyLocationService locationService;
-    private transient ColonySumarizationService sumarizationService;
     private transient ColonyAutomationService automationService;
     private transient ColonyResourceService resourceService;
     private transient ColonyStarterService starterService;
     private transient ColonyBugHandlingService bugHandlingService;
+    private transient ColonyConvoyTransitService convoyTransitService;
 
     // --- Service Initializer ---
     private void initializeServices() {
         this.statsService = new ColonyStatsService();
+        this.spatialService = new ColonySpatialService();
+        this.sourceService = new ColonySourceService(spatialService);
+        this.pathfindingService = new ColonyPathfindingService(spatialService);
+        this.locationService = new ColonyLocationService(spatialService, sourceService, pathfindingService);
         this.labourService = new ColonyLabourService();
         this.populationService = new ColonyPopulationService();
+        this.deathService = new ColonyDeathService();
         this.physicsService = new ColonyPhysicsService();
-        this.locationService = new ColonyLocationService();
-        this.sumarizationService = new ColonySumarizationService();
         this.automationService = new ColonyAutomationService(); 
         this.resourceService = new ColonyResourceService();
-        this.starterService = new ColonyStarterService();
+        this.starterService = ColonyStarterService.shared();
         this.bugHandlingService = new ColonyBugHandlingService();
+        this.convoyTransitService = new ColonyConvoyTransitService();
     }
 
     // --- Initialization Methods ---
@@ -138,10 +183,97 @@ public class Colony {
         this.antGroups.put(GameConstants.TYPE_QUEEN, new CopyOnWriteArrayList<>());
     }
 
-    private void initializeAssignedRoles() {
-        this.assignedRoleCounts = new HashMap<>();
+    private static Map<AntRole, Integer> createEmptyRoleCountMap() {
+        Map<AntRole, Integer> map = new HashMap<>();
         for (AntRole role : GameConstants.getAntRoles()) {
-            this.assignedRoleCounts.put(role, 0);
+            map.put(role, 0);
+        }
+        return map;
+    }
+
+    private void initializeAssignedRoles() {
+        for (AntRole role : GameConstants.getAntRoles()) {
+            peaceAssignedRoleCounts.put(role, 0);
+            warAssignedRoleCounts.put(role, 0);
+        }
+    }
+
+    private boolean usesWarEconomyRoles() {
+        Dynasty owner = getDynasty();
+        return owner != null && owner.isAtWar();
+    }
+
+    private Map<AntRole, Integer> activeAssignedRoleCounts() {
+        return usesWarEconomyRoles() ? warAssignedRoleCounts : peaceAssignedRoleCounts;
+    }
+
+    private static void applySavedRoleCounts(Map<AntRole, Integer> target, Map<String, Integer> saved) {
+        if (saved == null || saved.isEmpty()) {
+            return;
+        }
+        for (Map.Entry<String, Integer> entry : saved.entrySet()) {
+            AntRole role = GameConstants.getAntRoleByPersistenceKey(entry.getKey());
+            if (role != null && entry.getValue() != null) {
+                target.put(role, entry.getValue());
+            }
+        }
+    }
+
+    private static void copyRoleCounts(Map<AntRole, Integer> source, Map<AntRole, Integer> destination) {
+        for (AntRole role : GameConstants.getAntRoles()) {
+            destination.put(role, source.getOrDefault(role, 0));
+        }
+    }
+
+    private static Map<Integer, Integer> parseIntKeyMap(Map<String, Integer> saved) {
+        Map<Integer, Integer> parsed = new HashMap<>();
+        if (saved == null) {
+            return parsed;
+        }
+        for (Map.Entry<String, Integer> entry : saved.entrySet()) {
+            if (entry.getKey() != null && entry.getValue() != null) {
+                parsed.put(Integer.parseInt(entry.getKey()), entry.getValue());
+            }
+        }
+        return parsed;
+    }
+
+    private void loadAssignedRoleCountsFromSave(Savefile.SavedColony savedColony) {
+        applySavedRoleCounts(peaceAssignedRoleCounts, savedColony.assignedRoleCounts);
+        stripWarEconomyExclusiveFromPeace();
+        if (savedColony.warAssignedRoleCounts != null && !savedColony.warAssignedRoleCounts.isEmpty()) {
+            applySavedRoleCounts(warAssignedRoleCounts, savedColony.warAssignedRoleCounts);
+        } else if (savedColony.assignedRoleCounts != null && !savedColony.assignedRoleCounts.isEmpty()) {
+            copyPeaceRolesToWar();
+        }
+        applySavedRoleDisallowedSubtypes(peaceRoleDisallowedSubtypes, savedColony.roleDisallowedSubtypesFlat);
+        if (savedColony.warRoleDisallowedSubtypesFlat != null && !savedColony.warRoleDisallowedSubtypesFlat.isEmpty()) {
+            applySavedRoleDisallowedSubtypes(warRoleDisallowedSubtypes, savedColony.warRoleDisallowedSubtypesFlat);
+        } else if (savedColony.roleDisallowedSubtypesFlat != null && !savedColony.roleDisallowedSubtypesFlat.isEmpty()) {
+            copyPeaceRoleSubtypeAllowsToWar();
+        }
+    }
+
+    private static void applySavedRoleDisallowedSubtypes(Map<AntRole, Set<Integer>> target,
+            Map<String, Integer> flat) {
+        target.clear();
+        Map<AntRole, Set<Integer>> loaded = AntSubtypeService.unflattenRoleDisallowedSubtypes(flat);
+        for (Map.Entry<AntRole, Set<Integer>> entry : loaded.entrySet()) {
+            Set<Integer> cleaned = new HashSet<>(entry.getValue());
+            for (AntSubtype forced : entry.getKey().getForcedAllowedSubtypes()) {
+                cleaned.remove(forced.getId());
+            }
+            if (!cleaned.isEmpty()) {
+                target.put(entry.getKey(), cleaned);
+            }
+        }
+    }
+
+    private void stripWarEconomyExclusiveFromPeace() {
+        for (AntRole role : GameConstants.getAntRoles()) {
+            if (GameConstants.isWarEconomyExclusiveRole(role)) {
+                peaceAssignedRoleCounts.put(role, 0);
+            }
         }
     }
     
@@ -154,17 +286,20 @@ public class Colony {
         this.resins = 0;
         this.minerals = 0;
         this.aphids = 0;
-        this.soilMites = 0;
+        this.symbioticMites = 0;
         this.dermestids = 0;
-        this.parasites = 0;
+        this.parasiteAnts = 0;
         this.parasiticMites = 0;
         this.hatchRateWorker = 100.0f;
         this.hatchRateSoldier = 0.0f;
         this.hatchRateMajor = 0.0f;
         this.hatchRateDrone = 0.0f;
         this.hatchRatePrincess = 0.0f;
+        this.subtypeHatchRates = AntSubtypeService.defaultSubtypeRates();
         this.isActive = false;
         this.autoBuildEnabled = false;
+        this.autoTunnelsEnabled = false;
+        this.loyalty = GameNumbers.DEFAULT_COLONY_LOYALTY;
     }
 
     private void initializeBuildings() {
@@ -232,43 +367,50 @@ public class Colony {
         this.isCapital = savedColony.isCapital;
         this.automationEnabled = savedColony.isAutomated;
         this.autoBuildEnabled = savedColony.autoBuildEnabled;
+        this.autoTunnelsEnabled = savedColony.autoTunnelsEnabled;
         this.age = savedColony.age;
         this.daysWithoutQueen = savedColony.daysWithoutQueen;
+        this.loyalty = GameNumbers.clampColonyLoyalty(savedColony.loyalty);
+        this.militaryPower = savedColony.militaryPower;
         this.totalDeaths = savedColony.totalDeaths;
 
         loadBuildings(savedColony);
         initializeAssignedRoles(); 
         initializeServices(); 
         
-        if (this.populationService != null && savedColony.localDeathStatistics != null) {
-            this.populationService.loadDeathStatistics(savedColony.localDeathStatistics);
+        if (this.deathService != null && savedColony.localDeathStatistics != null) {
+            this.deathService.loadDeathStatistics(savedColony.localDeathStatistics);
         }
         
-        Map<String, Integer> savedRoles = savedColony.assignedRoleCounts;
-        if (savedRoles != null && !savedRoles.isEmpty()) {
-            for (AntRole role : GameConstants.getAntRoles()) {
-                Integer count = savedRoles.get(role.getName());
-                if (count != null) {
-                    this.assignedRoleCounts.put(role, count);
-                }
-            }
-        }
+        loadAssignedRoleCountsFromSave(savedColony);
+        copyDiplomatMissionMaps(
+                parseIntKeyMap(savedColony.outgoingColonyDiplomatMissions),
+                parseIntKeyMap(savedColony.incomingColonyDiplomatSupport),
+                parseIntKeyMap(savedColony.outgoingDynastyDiplomatMissions));
         
         this.hatchRateWorker = savedColony.hatchRateWorker;
         this.hatchRateSoldier = savedColony.hatchRateSoldier;
         this.hatchRateMajor = savedColony.hatchRateMajor;
         this.hatchRateDrone = savedColony.hatchRateDrone;
         this.hatchRatePrincess = savedColony.hatchRatePrincess;
+        if (savedColony.subtypeHatchRatesFlat != null && !savedColony.subtypeHatchRatesFlat.isEmpty()) {
+            this.subtypeHatchRates = AntSubtypeService.unflattenSubtypeRates(savedColony.subtypeHatchRatesFlat);
+        }
 
         populateAntList(getEggs(), savedColony.eggs, GameConstants.TYPE_EGG);
         populateAntList(getLarvae(), savedColony.larvae, GameConstants.TYPE_LARVA);
         populateAntList(getPupae(), savedColony.pupae, GameConstants.TYPE_PUPA);
-        populateAntList(getWorkers(), savedColony.workers, GameConstants.TYPE_WORKER);
-        populateAntList(getSoldiers(), savedColony.soldiers, GameConstants.TYPE_SOLDIER);
-        populateAntList(getMajors(), savedColony.majors, GameConstants.TYPE_MAJOR);
+        AntSubtypeService.populateAntsFromSubtypeCounts(this, getWorkers(), GameConstants.TYPE_WORKER,
+                savedColony.workerSubtypes, savedColony.workers);
+        AntSubtypeService.populateAntsFromSubtypeCounts(this, getSoldiers(), GameConstants.TYPE_SOLDIER,
+                savedColony.soldierSubtypes, savedColony.soldiers);
+        AntSubtypeService.populateAntsFromSubtypeCounts(this, getMajors(), GameConstants.TYPE_MAJOR,
+                savedColony.majorSubtypes, savedColony.majors);
         populateAntList(getDrones(), savedColony.drones, GameConstants.TYPE_DRONE);
-        populateAntList(getPrincesses(), savedColony.princesses, GameConstants.TYPE_PRINCESS);
-        populateAntList(getQueens(), savedColony.queens, GameConstants.TYPE_QUEEN);
+        AntSubtypeService.populateAntsFromSubtypeCounts(this, getPrincesses(), GameConstants.TYPE_PRINCESS,
+                savedColony.princessSubtypes, savedColony.princesses);
+        AntSubtypeService.populateAntsFromSubtypeCounts(this, getQueens(), GameConstants.TYPE_QUEEN,
+                savedColony.queenSubtypes, savedColony.queens);
         populateAntList(deadAnts, savedColony.deadAnts, GameConstants.TYPE_DEAD);
 
         this.plants = savedColony.plants;
@@ -280,17 +422,32 @@ public class Colony {
         this.minerals = savedColony.minerals;
 
         this.aphids = savedColony.aphids;
-        this.soilMites = savedColony.soilMites;
+        this.symbioticMites = savedColony.symbioticMites;
         this.dermestids = savedColony.dermestids;
 
-        this.parasites = savedColony.parasites;
+        this.parasiteAnts = savedColony.parasiteAnts;
         this.parasiticMites = savedColony.parasiticMites;
-        for (int i = 0; i < this.parasites; i++) {
-            Bug p = new Bug(GameConstants.TYPE_PARASITE);
+        this.pheromoneStormMonthsRemaining = savedColony.pheromoneStormMonthsRemaining;
+        this.recentlyConqueredMonthsRemaining = savedColony.recentlyConqueredMonthsRemaining;
+        this.recentlyIntegratedMonthsRemaining = savedColony.recentlyIntegratedMonthsRemaining;
+        if (savedColony.loyaltyModifierRemainingDays != null) {
+            loyaltyModifierRemainingDays.putAll(savedColony.loyaltyModifierRemainingDays);
+        } else {
+            migrateLegacyLoyaltyModifierFields();
+        }
+        this.creatineDietMonthsRemaining = savedColony.creatineDietMonthsRemaining;
+        this.integrationDiplomatsDeployed = savedColony.integrationDiplomatsDeployed;
+        this.nativeSpeciesId = savedColony.nativeSpeciesId;
+        for (int i = 0; i < this.parasiteAnts; i++) {
+            Bug p = new Bug(GameConstants.TYPE_PARASITE_ANT);
             p.setDimension(WorldSpaces.UNDERWORLD);
             this.bugs.add(p);
         }
-        
+
+        getBugHandlingService().restorePetCountsFromSave(
+                this, savedColony.aphids, savedColony.symbioticMites, savedColony.dermestids);
+        getBugHandlingService().setParasiticMiteCount(this, savedColony.parasiticMites);
+
         this.totalDeaths = savedColony.totalDeaths;
         
         if (savedColony.savedResourceSources != null && this.locationService != null) {
@@ -317,11 +474,6 @@ public class Colony {
                 }
             }
         }
-
-        getBugHandlingService().syncPetBugEntities(this, GameConstants.TYPE_APHID, aphids);
-        getBugHandlingService().syncPetBugEntities(this, GameConstants.TYPE_SOIL_MITE, soilMites);
-        getBugHandlingService().syncPetBugEntities(this, GameConstants.TYPE_DERMESTID, dermestids);
-        getBugHandlingService().syncParasiticMiteInfections(this);
 
         rankUp();
     }
@@ -369,13 +521,62 @@ public class Colony {
         return consumed;
     }
 
+    public List<String> consumeEventsWithPrefix(String prefix) {
+        if (prefix == null || prefix.isEmpty()) {
+            return List.of();
+        }
+        List<String> consumed = new ArrayList<>();
+        synchronized (eventLog) {
+            Iterator<String> it = eventLog.iterator();
+            while (it.hasNext()) {
+                String msg = it.next();
+                if (msg.startsWith(prefix)) {
+                    consumed.add(msg);
+                    it.remove();
+                }
+            }
+        }
+        return consumed;
+    }
+
     // --- Death Tracking Wrapper ---
     public void recordAntDeath(Ant ant, String cause) {
         if (ant == null) return;
         this.totalDeaths++;
         this.deadAnts.add(ant);
-        if (populationService != null) {
-            populationService.recordDeath(cause, this);
+        if (deathService != null) {
+            deathService.recordDeath(cause, this);
+        }
+    }
+
+    public void handleAntCasualtyAftermath(Ant ant, AntType formerType, AntRole formerRole, boolean wasOnTrade) {
+        if (wasOnTrade) {
+            ant.setOnTrade(false);
+            handleConvoyEscortCasualty();
+        }
+        if (dynasty != null && formerType == GameConstants.TYPE_PRINCESS) {
+            DynastyDiplomacyService diplo = dynasty.getDiplomacyService();
+            if (diplo != null) {
+                diplo.reconcileDiplomatDeploymentsAfterCasualty(this, formerRole);
+            }
+        }
+    }
+
+    private void handleConvoyEscortCasualty() {
+        if (dynasty == null || dynasty.getTradeService() == null) {
+            return;
+        }
+        TradeManager tradeManager = dynasty.getTradeService().getTradeManager();
+        if (tradeManager == null) {
+            return;
+        }
+        for (Trade trade : tradeManager.getActiveTrades()) {
+            if (!trade.isActive() || trade.getOrigin().getColony() != this) {
+                continue;
+            }
+            if (!trade.hasSufficientLiveEscorts()) {
+                trade.cancelDueToEscortLoss(tradeManager);
+            }
         }
     }
 
@@ -385,10 +586,218 @@ public class Colony {
     public void setName(String name) { this.name = name; }
     public boolean isCapital() { return isCapital; }
     public void setCapital(boolean isCapital) { this.isCapital = isCapital; }
+
+    private boolean isDynastyCapital() {
+        if (dynasty != null) {
+            Colony capitalColony = dynasty.getCapital();
+            return capitalColony != null && capitalColony == this;
+        }
+        return isCapital;
+    }
     public int getAge() { return age; }
     public void setAge(int age) { this.age = age; }
     public int getDaysWithoutQueen() { return daysWithoutQueen; }
     public void setDaysWithoutQueen(int days) { this.daysWithoutQueen = days; }
+
+    public int getLoyalty() { return loyalty; }
+
+    public int getMilitaryPower() { return militaryPower; }
+
+    public void setMilitaryPower(int militaryPower) {
+        this.militaryPower = Math.max(0, militaryPower);
+    }
+
+    public int getActiveMilitaryPower() {
+        return activeMilitaryPower;
+    }
+
+    public void setActiveMilitaryPower(int activeMilitaryPower) {
+        this.activeMilitaryPower = Math.max(0, activeMilitaryPower);
+    }
+
+    public int getReserveMilitaryPower() {
+        return reserveMilitaryPower;
+    }
+
+    public void setReserveMilitaryPower(int reserveMilitaryPower) {
+        this.reserveMilitaryPower = Math.max(0, reserveMilitaryPower);
+    }
+
+    public void setLoyalty(int loyalty) {
+        this.loyalty = GameNumbers.clampColonyLoyalty(loyalty);
+    }
+
+    public int getLoyaltyModifierBonus(TradeManager tradeManager, World world) {
+        int bonus = 0;
+        if (tradeManager != null && world != null && participatesInActiveTrade(tradeManager, world)) {
+            bonus += GameConstants.LOYALTY_MODIFIER_TRADE.getLoyaltyDelta();
+        }
+        if (world != null && dynasty != null && hasCompleteTunnel(world)) {
+            bonus += GameConstants.LOYALTY_MODIFIER_TUNNEL.getLoyaltyDelta();
+        }
+        if (isDynastyCapital()) {
+            bonus += GameConstants.LOYALTY_MODIFIER_CAPITAL.getLoyaltyDelta();
+        }
+        for (Map.Entry<String, Integer> entry : loyaltyModifierRemainingDays.entrySet()) {
+            ColonyLoyaltyModifier modifier = GameConstants.getColonyLoyaltyModifierByKey(entry.getKey());
+            if (modifier != null) {
+                bonus += modifier.getLoyaltyDelta();
+            }
+        }
+        bonus += getMilitaryLoyaltyAdjustment();
+        bonus += getDistanceFromCapitalLoyaltyAdjustment(world);
+        return bonus;
+    }
+
+    private int getDistanceFromCapitalLoyaltyAdjustment(World world) {
+        if (isDynastyCapital() || dynasty == null || world == null) {
+            return 0;
+        }
+        Colony capital = dynasty.getCapital();
+        if (capital == null || capital == this) {
+            return 0;
+        }
+        int tiles = world.colonyHexDistance(this, capital);
+        return GameNumbers.getCapitalDistanceLoyaltyPenalty(tiles);
+    }
+
+    public int getCapitalHexDistance(World world) {
+        if (isDynastyCapital() || dynasty == null || world == null) {
+            return 0;
+        }
+        Colony capital = dynasty.getCapital();
+        if (capital == null || capital == this) {
+            return -1;
+        }
+        return world.colonyHexDistance(this, capital);
+    }
+
+    private int getMilitaryLoyaltyAdjustment() {
+        if (isDynastyCapital() || dynasty == null) {
+            return 0;
+        }
+        Colony capital = dynasty.getCapital();
+        if (capital == null || capital == this) {
+            return 0;
+        }
+        return ColonyMilitaryService.getMilitaryLoyaltyAdjustment(
+                getMilitaryPower(), capital.getMilitaryPower(), isDynastyCapital());
+    }
+
+    public int getEffectiveLoyalty(TradeManager tradeManager, World world) {
+        return GameNumbers.clampColonyLoyalty(
+                loyalty + getLoyaltyModifierBonus(tradeManager, world) + getDiplomatLoyaltyBonus());
+    }
+
+    public int getDiplomatLoyaltyBonus() {
+        if (dynasty == null || incomingColonyDiplomatSupport.isEmpty()) {
+            return 0;
+        }
+        DynastyDiplomacyService diplo = dynasty.getDiplomacyService();
+        if (diplo == null) {
+            return 0;
+        }
+        int gainPer = diplo.getDiplomatStabilityGainPerAnt();
+        int diplomats = incomingColonyDiplomatSupport.values().stream().mapToInt(Integer::intValue).sum();
+        return diplomats * gainPer;
+    }
+
+    public String buildLoyaltyModifierTooltip(TradeManager tradeManager, World world) {
+        StringBuilder sb = new StringBuilder("<html>");
+        sb.append(LanguageStrings.get(LanguageStrings.LOYALTY_TOOLTIP_BASE))
+                .append(": ")
+                .append(loyalty)
+                .append("<br>");
+
+        if (isDynastyCapital()) {
+            appendLoyaltyModifierLine(sb, GameConstants.LOYALTY_MODIFIER_CAPITAL);
+        }
+        if (tradeManager != null && world != null && participatesInActiveTrade(tradeManager, world)) {
+            appendLoyaltyModifierLine(sb, GameConstants.LOYALTY_MODIFIER_TRADE);
+        }
+        if (world != null && dynasty != null && hasCompleteTunnel(world)) {
+            appendLoyaltyModifierLine(sb, GameConstants.LOYALTY_MODIFIER_TUNNEL);
+        }
+        for (Map.Entry<String, Integer> entry : loyaltyModifierRemainingDays.entrySet()) {
+            ColonyLoyaltyModifier modifier = GameConstants.getColonyLoyaltyModifierByKey(entry.getKey());
+            if (modifier != null) {
+                appendLoyaltyModifierLine(sb, modifier);
+            }
+        }
+        int militaryAdj = getMilitaryLoyaltyAdjustment();
+        if (militaryAdj != 0) {
+            sb.append(LanguageStrings.format(
+                    LanguageStrings.LOYALTY_MODIFIER_LINE,
+                    LanguageStrings.get(LanguageStrings.LOYALTY_MODIFIER_MILITARY_VS_CAPITAL),
+                    LanguageStrings.formatSigned(militaryAdj))).append("<br>");
+        }
+        int distanceAdj = getDistanceFromCapitalLoyaltyAdjustment(world);
+        if (distanceAdj != 0) {
+            int tiles = getCapitalHexDistance(world);
+            sb.append(LanguageStrings.format(
+                    LanguageStrings.LOYALTY_MODIFIER_DISTANCE_LINE,
+                    LanguageStrings.get(LanguageStrings.LOYALTY_MODIFIER_DISTANCE_FROM_CAPITAL),
+                    tiles,
+                    LanguageStrings.formatSigned(distanceAdj))).append("<br>");
+        }
+        int diplomatAdj = getDiplomatLoyaltyBonus();
+        if (diplomatAdj != 0) {
+            sb.append(LanguageStrings.format(
+                    LanguageStrings.LOYALTY_MODIFIER_LINE,
+                    LanguageStrings.get(LanguageStrings.LOYALTY_MODIFIER_DIPLOMAT_MISSION),
+                    LanguageStrings.formatSigned(diplomatAdj))).append("<br>");
+        }
+
+        sb.append(LanguageStrings.get(LanguageStrings.LOYALTY_TOOLTIP_EFFECTIVE))
+                .append(": ")
+                .append(LanguageStrings.formatNumber(getEffectiveLoyalty(tradeManager, world)));
+        sb.append("</html>");
+        return sb.toString();
+    }
+
+    private static void appendLoyaltyModifierLine(StringBuilder sb, ColonyLoyaltyModifier modifier) {
+        sb.append(LanguageStrings.format(
+                LanguageStrings.LOYALTY_MODIFIER_LINE,
+                modifier.getName(),
+                LanguageStrings.formatSigned(modifier.getLoyaltyDelta()))).append("<br>");
+    }
+
+    public boolean participatesInActiveTrade(TradeManager tradeManager, World world) {
+        if (tradeManager == null || world == null) {
+            return false;
+        }
+        Hex colonyHex = world.getHexOfColony(this);
+        if (colonyHex == null) {
+            return false;
+        }
+        for (Trade trade : tradeManager.getActiveTrades()) {
+            if (!trade.isActive()) {
+                continue;
+            }
+            Hex originHex = trade.getOrigin();
+            Hex destinationHex = trade.getDestination();
+            if (originHex == colonyHex || destinationHex == colonyHex) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean hasCompleteTunnel(World world) {
+        if (dynasty == null || world == null) {
+            return false;
+        }
+        Hex colonyHex = world.getHexOfColony(this);
+        if (colonyHex == null) {
+            return false;
+        }
+        for (Tunnel tunnel : dynasty.getTunnels()) {
+            if (tunnel.isComplete() && (tunnel.getHexA() == colonyHex || tunnel.getHexB() == colonyHex)) {
+                return true;
+            }
+        }
+        return false;
+    }
     
     public Dynasty getDynasty() { return dynasty; }
     public void setDynasty(Dynasty dynasty) { 
@@ -401,12 +810,36 @@ public class Colony {
         }
     }
 
-    // Delegates to Dynasty
-    public Species getSpecies() { 
-        return dynasty != null ? dynasty.getSpecies() : GameConstants.SPECIES_OMNI; 
+    public Species getSpecies() {
+        if (nativeSpeciesId > 0) {
+            Species nativeSpecies = GameConstants.getSpeciesById(nativeSpeciesId);
+            if (nativeSpecies != null) {
+                return nativeSpecies;
+            }
+        }
+        return dynasty != null ? dynasty.getSpecies() : GameConstants.SPECIES_OMNI;
     }
-    public void setSpecies(Species species) { 
-        if (dynasty != null) dynasty.setSpecies(species); 
+
+    public void setSpecies(Species species) {
+        if (dynasty != null) {
+            dynasty.setSpecies(species);
+        }
+    }
+
+    public int getNativeSpeciesId() {
+        return nativeSpeciesId;
+    }
+
+    public void setNativeSpeciesId(int nativeSpeciesId) {
+        this.nativeSpeciesId = Math.max(0, nativeSpeciesId);
+    }
+
+    public int getIntegrationDiplomatsDeployed() {
+        return integrationDiplomatsDeployed;
+    }
+
+    public void setIntegrationDiplomatsDeployed(int integrationDiplomatsDeployed) {
+        this.integrationDiplomatsDeployed = Math.max(0, integrationDiplomatsDeployed);
     }
     
     public int getResearchPoints() { 
@@ -423,7 +856,9 @@ public class Colony {
         return dynasty != null && dynasty.hasUpgrade(upgrade);
     }
     public void unlockUpgrade(Upgrade upgrade) {
-        if (dynasty != null) dynasty.unlockUpgrade(upgrade);
+        if (dynasty != null) {
+            dynasty.unlockUpgrade(upgrade);
+        }
     }
     public Set<Upgrade> getUnlockedUpgrades() {
         return dynasty != null ? dynasty.getUnlockedUpgrades() : new HashSet<>();
@@ -435,17 +870,62 @@ public class Colony {
     public void setRank(ColonyRank rank) { this.rank = rank; }
     public boolean isActive() { return isActive; }
     public void setActive(boolean isActive) { this.isActive = isActive; }
+
+    public boolean runsFullSimulation() {
+        return isActive && isPlayer;
+    }
+
     public boolean isAutomationEnabled() { return automationEnabled; }
     public void setAutomationEnabled(boolean automationEnabled) { this.automationEnabled = automationEnabled; }
     public boolean isAutoBuildEnabled() { return autoBuildEnabled; }
     public void setAutoBuildEnabled(boolean autoBuildEnabled) { this.autoBuildEnabled = autoBuildEnabled; }
+    public boolean isAutoTunnelsEnabled() { return autoTunnelsEnabled; }
+    public void setAutoTunnelsEnabled(boolean autoTunnelsEnabled) { this.autoTunnelsEnabled = autoTunnelsEnabled; }
+
+    public int getDeployedDiplomatCount() {
+        int total = 0;
+        for (int count : outgoingColonyDiplomatMissions.values()) {
+            total += count;
+        }
+        for (int count : outgoingDynastyDiplomatMissions.values()) {
+            total += count;
+        }
+        total += integrationDiplomatsDeployed;
+        return total;
+    }
+
+    public Map<Integer, Integer> getOutgoingColonyDiplomatMissions() {
+        return outgoingColonyDiplomatMissions;
+    }
+
+    public Map<Integer, Integer> getIncomingColonyDiplomatSupport() {
+        return incomingColonyDiplomatSupport;
+    }
+
+    public Map<Integer, Integer> getOutgoingDynastyDiplomatMissions() {
+        return outgoingDynastyDiplomatMissions;
+    }
+
+    public void copyDiplomatMissionMaps(
+            Map<Integer, Integer> outgoingColony,
+            Map<Integer, Integer> incomingColony,
+            Map<Integer, Integer> outgoingDynasty) {
+        outgoingColonyDiplomatMissions.clear();
+        incomingColonyDiplomatSupport.clear();
+        outgoingDynastyDiplomatMissions.clear();
+        if (outgoingColony != null) {
+            outgoingColonyDiplomatMissions.putAll(outgoingColony);
+        }
+        if (incomingColony != null) {
+            incomingColonyDiplomatSupport.putAll(incomingColony);
+        }
+        if (outgoingDynasty != null) {
+            outgoingDynastyDiplomatMissions.putAll(outgoingDynasty);
+        }
+    }
 
     public Map<AntType, List<Ant>> getAntGroups() { return antGroups; }
 
-    /**
-     * Live ants by type. {@link GameConstants#TYPE_DEAD} is stored in {@link #getDeadAnts()} (not in {@code antGroups}).
-     * Unknown types return an empty immutable list (never a fresh throwaway {@link CopyOnWriteArrayList}).
-     */
     public List<Ant> getAntsByType(AntType type) {
         if (type == GameConstants.TYPE_DEAD) {
             return deadAnts;
@@ -487,10 +967,16 @@ public class Colony {
     }
 
     public boolean hasBuilding(Building building) { return this.buildings.contains(building); }
-    public void unlockBuilding(Building building) { this.buildings.add(building); }
+    public void unlockBuilding(Building building) {
+        this.buildings.add(building);
+        invalidateAffordableAlertCache();
+    }
     public Set<Building> getUnlockedBuildings() { return this.buildings; }
     public Building getCurrentBuildingProject() { return currentBuildingProject; }
-    public void setCurrentBuildingProject(Building b) { this.currentBuildingProject = b; }
+    public void setCurrentBuildingProject(Building b) {
+        this.currentBuildingProject = b;
+        invalidateAffordableAlertCache();
+    }
     public Tunnel getCurrentTunnelProject() { return currentTunnelProject; }
     public void setCurrentTunnelProject(Tunnel t) { this.currentTunnelProject = t; }
     public double getBuildingProgressHours() { return buildingProgressHours; }
@@ -504,8 +990,8 @@ public class Colony {
         
         resourceService.consumeResource(this, GameConstants.RESOURCE_ROCK, building.getMineralCost());
         resourceService.consumeResource(this, GameConstants.RESOURCE_RESIN, building.getResinCost());
-        
-        this.currentBuildingProject = building;
+
+        setCurrentBuildingProject(building);
         this.buildingProgressHours = 0.0;
         return true;
     }
@@ -542,11 +1028,13 @@ public class Colony {
     public void setSyrups(double syrups) { 
         this.syrups = Math.max(0, syrups); 
     }
-    public void setResins(double resins) { 
-        this.resins = Math.max(0, resins); 
+    public void setResins(double resins) {
+        this.resins = Math.max(0, resins);
+        invalidateAffordableAlertCache();
     }
-    public void setMinerals(double minerals) { 
-        this.minerals = Math.max(0, minerals); 
+    public void setMinerals(double minerals) {
+        this.minerals = Math.max(0, minerals);
+        invalidateAffordableAlertCache();
     }
 
     public int getAphids() { return aphids; }
@@ -554,9 +1042,9 @@ public class Colony {
         getBugHandlingService().setCount(this, GameConstants.TYPE_APHID, count);
     }
 
-    public int getSoilMites() { return soilMites; }
-    public void setSoilMites(int count) {
-        getBugHandlingService().setCount(this, GameConstants.TYPE_SOIL_MITE, count);
+    public int getSymbioticMites() { return symbioticMites; }
+    public void setSymbioticMites(int count) {
+        getBugHandlingService().setCount(this, GameConstants.TYPE_SYMBIOTIC_MITE, count);
     }
 
     public int getDermestids() { return dermestids; }
@@ -567,27 +1055,28 @@ public class Colony {
     public void applyPetBugCount(BugType type, int count) {
         if (type == GameConstants.TYPE_APHID) {
             this.aphids = count;
-        } else if (type == GameConstants.TYPE_SOIL_MITE) {
-            this.soilMites = count;
+        } else if (type == GameConstants.TYPE_SYMBIOTIC_MITE) {
+            this.symbioticMites = count;
         } else if (type == GameConstants.TYPE_DERMESTID) {
             this.dermestids = count;
         }
     }
 
-    public void applyParasiteCount(int count) {
-        this.parasites = count;
+    public void applyParasiteAntCount(int count) {
+        this.parasiteAnts = count;
     }
 
     public ColonyBugHandlingService getBugHandlingService() {
-        if (bugHandlingService == null) {
-            bugHandlingService = new ColonyBugHandlingService();
-        }
         return bugHandlingService;
     }
 
-    public int getParasites() { return parasites; }
-    public void setParasites(int count) {
-        getBugHandlingService().setParasiteCount(this, count);
+    public ColonyConvoyTransitService getConvoyTransitService() {
+        return convoyTransitService;
+    }
+
+    public int getParasiteAnts() { return parasiteAnts; }
+    public void setParasiteAnts(int count) {
+        getBugHandlingService().setParasiteAntCount(this, count);
     }
 
     public int getParasiticMites() { return parasiticMites; }
@@ -604,11 +1093,11 @@ public class Colony {
         return getBugHandlingService().getParasiticMiteSlowedAntCount(this);
     }
 
-    public String getParasiteCountDisplay(boolean fuzzEnabled) {
+    public String getParasiteAntCountDisplay(boolean fuzzEnabled) {
         if (!hasUpgrade(GameUnlocks.ROLE_POLICE)) {
             return "???";
         }
-        int actual = getParasites();
+        int actual = getParasiteAnts();
         
         if (!fuzzEnabled) {
             return String.valueOf(actual);
@@ -616,8 +1105,8 @@ public class Colony {
 
         if (actual == 0) return "~0";
         
-        double fuzz = Math.random() * 0.2; 
-        boolean up = Math.random() > 0.5;
+        double fuzz = GameRandom.nextDouble() * 0.2; 
+        boolean up = GameRandom.nextDouble() > 0.5;
         
         int display = actual;
         if (up) display += (int)(actual * fuzz);
@@ -639,9 +1128,262 @@ public class Colony {
     public int getGameAreaWidth() { return this.gameAreaWidth; }
     public int getGameAreaHeight() { return this.gameAreaHeight; }
 
-    public int getAssignedRoleCount(AntRole role) { return assignedRoleCounts.getOrDefault(role, 0); }
-    public void setAssignedRoleCount(AntRole role, int count) { if (count >= 0) assignedRoleCounts.put(role, count); }
-    public Map<AntRole, Integer> getAssignedRoleCounts() { return assignedRoleCounts; }
+    public int getAssignedRoleCount(AntRole role) {
+        return activeAssignedRoleCounts().getOrDefault(role, 0);
+    }
+
+    public void setAssignedRoleCount(AntRole role, int count) {
+        if (count >= 0) {
+            int previous = activeAssignedRoleCounts().getOrDefault(role, 0);
+            activeAssignedRoleCounts().put(role, count);
+            reconcileDiplomatDeploymentsIfNeeded(role, previous, count, true);
+        }
+    }
+
+    private void reconcileDiplomatDeploymentsIfNeeded(AntRole role, int previous, int next, boolean activeEconomy) {
+        if (!activeEconomy || role != GameConstants.ROLE_DIPLOMAT || next >= previous || dynasty == null) {
+            return;
+        }
+        DynastyDiplomacyService diplo = dynasty.getDiplomacyService();
+        if (diplo != null) {
+            diplo.reconcileDiplomatDeployments(this, next);
+        }
+    }
+
+    public Map<AntRole, Integer> getAssignedRoleCounts() {
+        return activeAssignedRoleCounts();
+    }
+
+    public int getPeaceAssignedRoleCount(AntRole role) {
+        return peaceAssignedRoleCounts.getOrDefault(role, 0);
+    }
+
+    public void setPeaceAssignedRoleCount(AntRole role, int count) {
+        if (GameConstants.isWarEconomyExclusiveRole(role)) {
+            count = 0;
+        }
+        if (count >= 0) {
+            int previous = peaceAssignedRoleCounts.getOrDefault(role, 0);
+            peaceAssignedRoleCounts.put(role, count);
+            reconcileDiplomatDeploymentsIfNeeded(role, previous, count, !usesWarEconomyRoles());
+        }
+    }
+
+    public Map<AntRole, Integer> getPeaceAssignedRoleCounts() {
+        return peaceAssignedRoleCounts;
+    }
+
+    public int getWarAssignedRoleCount(AntRole role) {
+        return warAssignedRoleCounts.getOrDefault(role, 0);
+    }
+
+    public void setWarAssignedRoleCount(AntRole role, int count) {
+        if (count >= 0) {
+            int previous = warAssignedRoleCounts.getOrDefault(role, 0);
+            warAssignedRoleCounts.put(role, count);
+            reconcileDiplomatDeploymentsIfNeeded(role, previous, count, usesWarEconomyRoles());
+        }
+    }
+
+    public Map<AntRole, Integer> getWarAssignedRoleCounts() {
+        return warAssignedRoleCounts;
+    }
+
+    public void copyPeaceRolesToWar() {
+        for (AntRole role : GameConstants.getAntRoles()) {
+            if (GameConstants.isWarEconomyExclusiveRole(role)) {
+                continue;
+            }
+            warAssignedRoleCounts.put(role, peaceAssignedRoleCounts.getOrDefault(role, 0));
+        }
+        copyPeaceRoleSubtypeAllowsToWar();
+    }
+
+    public void copyPeaceRoleSubtypeAllowsToWar() {
+        warRoleDisallowedSubtypes.clear();
+        for (Map.Entry<AntRole, Set<Integer>> entry : peaceRoleDisallowedSubtypes.entrySet()) {
+            if (GameConstants.isWarEconomyExclusiveRole(entry.getKey())) {
+                continue;
+            }
+            warRoleDisallowedSubtypes.put(entry.getKey(), new HashSet<>(entry.getValue()));
+        }
+    }
+
+    public boolean isRoleSubtypeAllowed(AntRole role, AntSubtype subtype) {
+        return isRoleSubtypeAllowed(role, subtype, usesWarEconomyRoles());
+    }
+
+    public boolean isPeaceRoleSubtypeAllowed(AntRole role, AntSubtype subtype) {
+        return isRoleSubtypeAllowed(role, subtype, false);
+    }
+
+    public boolean isWarRoleSubtypeAllowed(AntRole role, AntSubtype subtype) {
+        return isRoleSubtypeAllowed(role, subtype, true);
+    }
+
+    private boolean isRoleSubtypeAllowed(AntRole role, AntSubtype subtype, boolean war) {
+        if (role == null || subtype == null || subtype.isNone()) {
+            return true;
+        }
+        if (role.isSubtypeForcedAllowed(subtype)) {
+            return true;
+        }
+        Map<AntRole, Set<Integer>> disallowed = war ? warRoleDisallowedSubtypes : peaceRoleDisallowedSubtypes;
+        Set<Integer> blocked = disallowed.get(role);
+        return blocked == null || !blocked.contains(subtype.getId());
+    }
+
+    public void setRoleSubtypeAllowed(AntRole role, AntSubtype subtype, boolean allowed) {
+        if (usesWarEconomyRoles()) {
+            setWarRoleSubtypeAllowed(role, subtype, allowed);
+        } else {
+            setPeaceRoleSubtypeAllowed(role, subtype, allowed);
+        }
+    }
+
+    public void setPeaceRoleSubtypeAllowed(AntRole role, AntSubtype subtype, boolean allowed) {
+        setRoleSubtypeAllowed(role, subtype, allowed, peaceRoleDisallowedSubtypes);
+    }
+
+    public void setWarRoleSubtypeAllowed(AntRole role, AntSubtype subtype, boolean allowed) {
+        setRoleSubtypeAllowed(role, subtype, allowed, warRoleDisallowedSubtypes);
+    }
+
+    private void setRoleSubtypeAllowed(AntRole role, AntSubtype subtype, boolean allowed,
+            Map<AntRole, Set<Integer>> disallowedByRole) {
+        if (role == null || subtype == null || subtype.isNone()) {
+            return;
+        }
+        if (role.isSubtypeForcedAllowed(subtype)) {
+            allowed = true;
+        }
+        Set<Integer> blocked = disallowedByRole.computeIfAbsent(role, ignored -> new HashSet<>());
+        if (allowed) {
+            blocked.remove(subtype.getId());
+            if (blocked.isEmpty()) {
+                disallowedByRole.remove(role);
+            }
+        } else {
+            blocked.add(subtype.getId());
+        }
+    }
+
+    public Set<Integer> getAllowedSpecialSubtypeIdsForRole(AntRole role) {
+        return getAllowedSpecialSubtypeIdsForRole(role, usesWarEconomyRoles());
+    }
+
+    public Set<Integer> getPeaceAllowedSpecialSubtypeIdsForRole(AntRole role) {
+        return getAllowedSpecialSubtypeIdsForRole(role, false);
+    }
+
+    public Set<Integer> getWarAllowedSpecialSubtypeIdsForRole(AntRole role) {
+        return getAllowedSpecialSubtypeIdsForRole(role, true);
+    }
+
+    private Set<Integer> getAllowedSpecialSubtypeIdsForRole(AntRole role, boolean war) {
+        Set<Integer> allowed = new HashSet<>();
+        for (AntSubtype subtype : GameConstants.getAntSubtypes()) {
+            if (subtype.isNone()) {
+                continue;
+            }
+            if (isRoleSubtypeAllowed(role, subtype, war)) {
+                allowed.add(subtype.getId());
+            }
+        }
+        return AntSubtypeService.effectiveAllowedSubtypeIds(role, allowed);
+    }
+
+    public Map<String, Integer> flattenPeaceRoleDisallowedSubtypes() {
+        return AntSubtypeService.flattenRoleDisallowedSubtypes(peaceRoleDisallowedSubtypes);
+    }
+
+    public Map<String, Integer> flattenWarRoleDisallowedSubtypes() {
+        return AntSubtypeService.flattenRoleDisallowedSubtypes(warRoleDisallowedSubtypes);
+    }
+
+    public void refreshRoleAssignmentForWarState(Engine engine) {
+        invalidateActiveRoleCountCache();
+        runRoleAssignment(engine);
+        ColonyMilitaryService.refreshColonyMilitaryPower(this);
+        Dynasty owner = getDynasty();
+        if (owner != null) {
+            ColonyMilitaryService.refreshDynastyMilitaryPower(owner);
+        }
+    }
+
+    public void invalidateActiveRoleCountCache() {
+        activeRoleCountCache = null;
+    }
+
+    public void invalidateAffordableAlertCache() {
+        affordableResearchCached = null;
+        affordableBuildingCacheValid = false;
+        affordableBuildingCached = null;
+    }
+
+    public boolean hasAffordableResearch() {
+        if (affordableResearchCached == null) {
+            affordableResearchCached = computeHasAffordableResearch();
+        }
+        return affordableResearchCached;
+    }
+
+    public Building getAffordableBuildingForAlert() {
+        if (!affordableBuildingCacheValid) {
+            affordableBuildingCached = computeAffordableBuildingForAlert();
+            affordableBuildingCacheValid = true;
+        }
+        return affordableBuildingCached;
+    }
+
+    private boolean computeHasAffordableResearch() {
+        if (!hasUpgrade(GameUnlocks.ABILITY_RESEARCH)) {
+            return false;
+        }
+        int researchPoints = getResearchPoints();
+        for (Upgrade upgrade : GameUnlocks.getUpgrades()) {
+            if (!hasUpgrade(upgrade) && upgrade.getCost() > 0
+                    && (upgrade.getRequirement() == null || hasUpgrade(upgrade.getRequirement()))
+                    && researchPoints >= upgrade.getCost()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private Building computeAffordableBuildingForAlert() {
+        if (!hasUpgrade(GameUnlocks.ABILITY_BUILD) || currentBuildingProject != null) {
+            return null;
+        }
+        int minerals = getMinerals();
+        int resins = getResins();
+        for (Building building : GameUnlocks.getBuildings()) {
+            if (!hasBuilding(building) && minerals >= building.getMineralCost()
+                    && resins >= building.getResinCost() && hasBuilding(building.getRequirement())) {
+                return building;
+            }
+        }
+        return null;
+    }
+
+    public int getActiveRoleCount(AntRole role) {
+        if (activeRoleCountCache == null) {
+            rebuildActiveRoleCountCache();
+        }
+        return activeRoleCountCache.getOrDefault(role, 0);
+    }
+
+    private void rebuildActiveRoleCountCache() {
+        Map<AntRole, Integer> counts = new HashMap<>();
+        for (List<Ant> group : antGroups.values()) {
+            for (Ant ant : group) {
+                if (ant.isAlive() && !ant.isOnTrade() && ant.getRole() != null) {
+                    counts.merge(ant.getRole(), 1, Integer::sum);
+                }
+            }
+        }
+        activeRoleCountCache = counts;
+    }
     
     public float getHatchRateWorker() { return hatchRateWorker; }
     public void setHatchRateWorker(float hatchRateWorker) { this.hatchRateWorker = hatchRateWorker; }
@@ -668,6 +1410,38 @@ public class Colony {
         else if (type == GameConstants.TYPE_MAJOR) this.hatchRateMajor = rate;
         else if (type == GameConstants.TYPE_DRONE) this.hatchRateDrone = rate;
         else if (type == GameConstants.TYPE_PRINCESS) this.hatchRatePrincess = rate;
+    }
+
+    public Map<AntType, Map<AntSubtypeSlot, Map<Integer, Float>>> getSubtypeHatchRates() {
+        return subtypeHatchRates;
+    }
+
+    public void setSubtypeHatchRates(Map<AntType, Map<AntSubtypeSlot, Map<Integer, Float>>> subtypeHatchRates) {
+        this.subtypeHatchRates = AntSubtypeService.deepCopyRates(subtypeHatchRates);
+    }
+
+    public float getSubtypeHatchRate(AntType type, AntSubtypeSlot slot, int digit) {
+        if (type == null) {
+            return digit == GameNumbers.SUBTYPE_DIGIT_NONE ? 100f : 0f;
+        }
+        Map<AntSubtypeSlot, Map<Integer, Float>> typeRates = subtypeHatchRates.get(type);
+        if (typeRates == null) {
+            return digit == GameNumbers.SUBTYPE_DIGIT_NONE ? 100f : 0f;
+        }
+        Map<Integer, Float> slotRates = typeRates.get(slot);
+        if (slotRates == null) {
+            return digit == GameNumbers.SUBTYPE_DIGIT_NONE ? 100f : 0f;
+        }
+        return slotRates.getOrDefault(digit, 0f);
+    }
+
+    public void setSubtypeHatchRate(AntType type, AntSubtypeSlot slot, int digit, float rate) {
+        if (type == null) {
+            return;
+        }
+        subtypeHatchRates.computeIfAbsent(type, ignored -> new EnumMap<>(AntSubtypeService.defaultRatesForType()))
+                .computeIfAbsent(slot, ignored -> new HashMap<>())
+                .put(digit, rate);
     }
 
     public int getTotalDeaths () { return totalDeaths; }
@@ -718,11 +1492,14 @@ public class Colony {
 
     // --- Public getters for services ---
     public ColonyStatsService getStatsService() { return this.statsService; }
+    public ColonySpatialService getSpatialService() { return this.spatialService; }
+    public ColonySourceService getSourceService() { return this.sourceService; }
+    public ColonyPathfindingService getPathfindingService() { return this.pathfindingService; }
     public ColonyLabourService getLabourService() { return this.labourService; }
     public ColonyPopulationService getPopulationService() { return this.populationService; }
+    public ColonyDeathService getDeathService() { return this.deathService; }
     public ColonyPhysicsService getPhysicsService() { return this.physicsService; }
     public ColonyLocationService getLocationService() { return this.locationService; }
-    public ColonySumarizationService getSumarizationService() { return this.sumarizationService; }
     public ColonyAutomationService getAutomationService() { return this.automationService; }
     public ColonyResourceService getResourceService() { return this.resourceService; }
     public ColonyStarterService getStarterService() { return this.starterService; }
@@ -786,7 +1563,9 @@ public class Colony {
     }
     public void runScoutting(Biome biome, Hex currentHex) { labourService.runScoutting(this, biome, currentHex); }
     public void runComposting() { labourService.runComposting(this); }
-    public void runParasitation() { populationService.runParasitation(this); }
+    public void runParasitation(Biome biome, Season season) {
+        populationService.runParasitation(this, biome, season);
+    }
     public void runPolicing() { labourService.runPolicing(this); }
     
     public int getNuptialFlightCost() {
@@ -806,17 +1585,173 @@ public class Colony {
         
         int cost = getNuptialFlightCost();
         if (getResearchPoints() < cost) return;
-        
-        boolean hasDrones = !getDrones().isEmpty();
-        boolean hasBreeders = getPrincesses().stream().anyMatch(p -> p.getRole() == GameConstants.ROLE_BREEDER);
-        
-        if (!hasDrones || !hasBreeders) {
+
+        if (!ColonyLabourService.meetsNuptialRequirements(this)) {
             logEvent(ColonyLogPrefixes.INFO + " " + LanguageStrings.get(LanguageStrings.LOG_FORCE_FLIGHT_BLOCKED));
             return;
         }
 
         addResearchPoints(-cost);
         this.labourService.runNuptial(this, world, currentHex);
+    }
+
+    public boolean isPheromoneStormActive() {
+        return hasActiveLoyaltyModifier(GameConstants.LOYALTY_MODIFIER_PHEROMONE_STORM.getNameKey());
+    }
+
+    public int getPheromoneStormMonthsRemaining() {
+        return GameNumbers.daysToMonthsCeil(
+                getLoyaltyModifierRemainingDays(GameConstants.LOYALTY_MODIFIER_PHEROMONE_STORM.getNameKey()));
+    }
+
+    public boolean isRecentlyConquered() {
+        return hasActiveLoyaltyModifier(GameConstants.LOYALTY_MODIFIER_RECENTLY_CONQUERED.getNameKey());
+    }
+
+    public int getRecentlyConqueredMonthsRemaining() {
+        return GameNumbers.daysToMonthsCeil(
+                getLoyaltyModifierRemainingDays(GameConstants.LOYALTY_MODIFIER_RECENTLY_CONQUERED.getNameKey()));
+    }
+
+    public void setRecentlyConqueredMonthsRemaining(int months) {
+        applyLoyaltyModifier(GameConstants.LOYALTY_MODIFIER_RECENTLY_CONQUERED, GameNumbers.monthsToDays(months));
+    }
+
+    public boolean isRecentlyIntegrated() {
+        return hasActiveLoyaltyModifier(GameConstants.LOYALTY_MODIFIER_RECENTLY_INTEGRATED.getNameKey());
+    }
+
+    public int getRecentlyIntegratedMonthsRemaining() {
+        return GameNumbers.daysToMonthsCeil(
+                getLoyaltyModifierRemainingDays(GameConstants.LOYALTY_MODIFIER_RECENTLY_INTEGRATED.getNameKey()));
+    }
+
+    public void setRecentlyIntegratedMonthsRemaining(int months) {
+        applyLoyaltyModifier(GameConstants.LOYALTY_MODIFIER_RECENTLY_INTEGRATED, GameNumbers.monthsToDays(months));
+    }
+
+    public boolean hasActiveLoyaltyModifier(String modifierKey) {
+        if (modifierKey == null) {
+            return false;
+        }
+        Integer remaining = loyaltyModifierRemainingDays.get(modifierKey);
+        return remaining != null
+                && (remaining == GameNumbers.MODIFIER_PERMANENT || remaining > 0);
+    }
+
+    public int getLoyaltyModifierRemainingDays(String modifierKey) {
+        return loyaltyModifierRemainingDays.getOrDefault(modifierKey, 0);
+    }
+
+    public void applyLoyaltyModifier(ColonyLoyaltyModifier modifier) {
+        if (modifier == null) {
+            return;
+        }
+        applyLoyaltyModifier(modifier, GameNumbers.initialModifierRemainingDays(modifier));
+    }
+
+    public void applyLoyaltyModifier(ColonyLoyaltyModifier modifier, int remainingDays) {
+        if (modifier == null || remainingDays == 0) {
+            return;
+        }
+        loyaltyModifierRemainingDays.put(modifier.getNameKey(), remainingDays);
+    }
+
+    public Map<String, Integer> copyLoyaltyModifierRemainingDays() {
+        return new HashMap<>(loyaltyModifierRemainingDays);
+    }
+
+    private void migrateLegacyLoyaltyModifierFields() {
+        if (pheromoneStormMonthsRemaining > 0) {
+            applyLoyaltyModifier(
+                    GameConstants.LOYALTY_MODIFIER_PHEROMONE_STORM,
+                    GameNumbers.monthsToDays(pheromoneStormMonthsRemaining));
+        }
+        if (recentlyConqueredMonthsRemaining > 0) {
+            applyLoyaltyModifier(
+                    GameConstants.LOYALTY_MODIFIER_RECENTLY_CONQUERED,
+                    GameNumbers.monthsToDays(recentlyConqueredMonthsRemaining));
+        }
+        if (recentlyIntegratedMonthsRemaining > 0) {
+            applyLoyaltyModifier(
+                    GameConstants.LOYALTY_MODIFIER_RECENTLY_INTEGRATED,
+                    GameNumbers.monthsToDays(recentlyIntegratedMonthsRemaining));
+        }
+        pheromoneStormMonthsRemaining = 0;
+        recentlyConqueredMonthsRemaining = 0;
+        recentlyIntegratedMonthsRemaining = 0;
+    }
+
+    public void tickLoyaltyModifierDays() {
+        List<String> expired = new ArrayList<>();
+        for (Map.Entry<String, Integer> entry : loyaltyModifierRemainingDays.entrySet()) {
+            int remaining = entry.getValue();
+            if (remaining == GameNumbers.MODIFIER_PERMANENT) {
+                continue;
+            }
+            if (remaining <= 1) {
+                expired.add(entry.getKey());
+            } else {
+                entry.setValue(remaining - 1);
+            }
+        }
+        for (String key : expired) {
+            loyaltyModifierRemainingDays.remove(key);
+            if (GameConstants.LOYALTY_MODIFIER_PHEROMONE_STORM.getNameKey().equals(key)) {
+                logEvent(ColonyLogPrefixes.INFO + " "
+                        + LanguageStrings.get(LanguageStrings.LOG_PHEROMONE_STORM_ENDED));
+            }
+        }
+    }
+
+    public boolean isCreatineDietActive() {
+        return creatineDietMonthsRemaining > 0;
+    }
+
+    public int getCreatineDietMonthsRemaining() {
+        return creatineDietMonthsRemaining;
+    }
+
+    public boolean activatePheromoneStorm() {
+        if (!hasUpgrade(GameUnlocks.ABILITY_PHEROMONE_STORM) || isPheromoneStormActive()) {
+            return false;
+        }
+        int cost = GameNumbers.PHEROMONE_STORM_SYRUP_COST;
+        if (getSyrups() < cost) {
+            return false;
+        }
+        setSyrups(getSyrupsPrecise() - cost);
+        applyLoyaltyModifier(GameConstants.LOYALTY_MODIFIER_PHEROMONE_STORM);
+        logEvent(ColonyLogPrefixes.INFO + " "
+                + LanguageStrings.format(LanguageStrings.LOG_PHEROMONE_STORM_STARTED_FMT,
+                        GameConstants.LOYALTY_MODIFIER_PHEROMONE_STORM.getLoyaltyDelta(),
+                        GameNumbers.PHEROMONE_STORM_DURATION_MONTHS));
+        return true;
+    }
+
+    public boolean activateCreatineDiet() {
+        if (!hasUpgrade(GameUnlocks.ABILITY_CREATINE_DIET) || isCreatineDietActive()) {
+            return false;
+        }
+        int cost = GameNumbers.CREATINE_DIET_PROTEIN_COST;
+        if (getProtein() < cost) {
+            return false;
+        }
+        setProtein(getProteinPrecise() - cost);
+        creatineDietMonthsRemaining = GameNumbers.CREATINE_DIET_DURATION_MONTHS;
+        logEvent(ColonyLogPrefixes.INFO + " "
+                + LanguageStrings.format(LanguageStrings.LOG_CREATINE_DIET_STARTED_FMT,
+                        GameNumbers.CREATINE_DIET_DURATION_MONTHS));
+        return true;
+    }
+
+    private void tickAbilityDurations() {
+        if (creatineDietMonthsRemaining > 0) {
+            creatineDietMonthsRemaining--;
+            if (creatineDietMonthsRemaining == 0) {
+                logEvent(ColonyLogPrefixes.INFO + " " + LanguageStrings.get(LanguageStrings.LOG_CREATINE_DIET_ENDED));
+            }
+        }
     }
     
     public void runPhysics(Dimension activeDimension) {
@@ -828,12 +1763,14 @@ public class Colony {
             return;
         }
         physicsStepSequence++;
+        convoyTransitService.runConvoyPhysics(this);
         physicsService.runPhysics(this, activeDimension, viewportPanelBounds, physicsStepSequence);
     }
 
     // --- Job Schedulers ---
     public void runMinutelyJobs() {
-        if (this.isActive) {
+        invalidateActiveRoleCountCache();
+        if (this.runsFullSimulation()) {
             this.runConverting();
         }
     }
@@ -843,11 +1780,14 @@ public class Colony {
             return;
         }
 
-        if (this.isActive) {
+        Season season = engine != null && engine.getWorld() != null ? engine.getWorld().getSeason() : null;
+
+        if (this.runsFullSimulation()) {
             if (this.automationEnabled) {
-                this.automationService.runAutomation(this);
+                this.automationService.runAutomation(this, biome, season);
             }
             this.runRoleAssignment(engine);
+            invalidateActiveRoleCountCache();
             this.runLaying();
             this.runResearch();
             this.runRanching();
@@ -856,12 +1796,12 @@ public class Colony {
             this.runCollecting(); 
         } else {
             if (this.automationEnabled) {
-                this.automationService.runAutomation(this);
+                this.automationService.runAutomation(this, biome, season);
             }
-            this.populationService.runRoleAssignment(this, engine); 
-            this.runResearch();
+            this.populationService.runRoleAssignment(this, engine);
+            invalidateActiveRoleCountCache();
             this.labourService.runTunnelConstruction(this);
-            this.sumarizationService.runHourlyLite(this, biome);
+            ColonyJobRules.runHourlyLite(this, biome);
         }
     }
 
@@ -871,6 +1811,7 @@ public class Colony {
             if (this.age >= 7) {
                 matureColony();
             }
+            ColonyMilitaryService.refreshColonyMilitaryPower(this);
             return;
         }
 
@@ -878,19 +1819,21 @@ public class Colony {
             this.daysWithoutQueen++;
             if (this.daysWithoutQueen == 1 || this.daysWithoutQueen == 6) {
                 this.logEvent(ColonyLogPrefixes.WARNING + " "
-                    + String.format(LanguageStrings.get(LanguageStrings.LOG_WARNING_NO_QUEEN_FMT), this.daysWithoutQueen));
+                    + LanguageStrings.format(LanguageStrings.LOG_WARNING_NO_QUEEN_FMT, this.daysWithoutQueen));
             }
         } else {
             this.daysWithoutQueen = 0;
         }
 
         if (this.automationEnabled) {
-            this.automationService.runDailyAutomation(this);
+            this.automationService.runDailyAutomation(this, currentHex);
         } else if (this.autoBuildEnabled) {
             this.automationService.runAutoBuild(this);
         }
 
-        if (this.isActive) {
+        tickLoyaltyModifierDays();
+
+        if (this.runsFullSimulation()) {
             this.rankUp();
             this.runEating(currentTemp); 
             this.runHatching();
@@ -903,10 +1846,11 @@ public class Colony {
             this.runContamination(); 
             this.runPolicing(); 
         } else {
-            this.sumarizationService.runDailyLite(this);
+            ColonyJobRules.runDailyLite(this, currentTemp, biome, currentHex);
         }
 
         this.age++;
+        ColonyMilitaryService.refreshColonyMilitaryPower(this);
     }
 
     public void matureColony() {
@@ -921,10 +1865,13 @@ public class Colony {
         }
     }
 
-    public void runMonthlyJobs() { 
-        if (this.isActive || this.isPlayer) {
-            this.runParasitation();
-            getBugHandlingService().runMonthlyParasiticMites(this);
+    public void runMonthlyJobs(Season season, Biome biome) {
+        tickAbilityDurations();
+        if (this.runsFullSimulation()) {
+            this.runParasitation(biome, season);
+            getBugHandlingService().runMonthlyParasiticMites(this, biome, season);
+        } else {
+            ColonyJobRules.runMonthlyLite(this, biome, season);
         }
     }
 

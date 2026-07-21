@@ -1,11 +1,20 @@
 package com.grimidk.formicempire.classes.interfaces;
 
+import com.grimidk.formicempire.classes.constants.ant.AntRole;
+import com.grimidk.formicempire.classes.constants.ant.AntSubtype;
+import com.grimidk.formicempire.classes.constants.ant.AntSubtypeSlot;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
+import com.grimidk.formicempire.classes.constants.misc.ColonyLoyalty;
+import com.grimidk.formicempire.classes.constants.misc.ColonyLoyaltyModifier;
+import com.grimidk.formicempire.classes.constants.misc.DiplomaticReputation;
+import com.grimidk.formicempire.classes.constants.misc.TradeMethod;
 import com.grimidk.formicempire.classes.constants.misc.BugType;
+import com.grimidk.formicempire.classes.constants.misc.GameSpeed;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.misc.Species;
 import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
+import com.grimidk.formicempire.classes.constants.unlocks.Synergy;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.Humidity;
@@ -14,10 +23,12 @@ import com.grimidk.formicempire.classes.constants.world.Season;
 import com.grimidk.formicempire.classes.constants.world.Temperature;
 import com.grimidk.formicempire.classes.constants.world.TimeOfDay;
 import com.grimidk.formicempire.classes.constants.world.Weather;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
+import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.util.UiDialogUtils;
+import com.grimidk.formicempire.classes.infrasctructure.assets.ClasspathTextFiles;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
+import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.constants.Constant;
 
 import javax.swing.*;
@@ -47,9 +58,7 @@ public class HelpPanel extends JPanel {
         setBackground(AssetStyles.BACKGROUND_COLOR);
 
         mainTabs = new JTabbedPane();
-        mainTabs.setFont(AssetStyles.FONT_BOLD);
-        mainTabs.setBackground(AssetStyles.BACKGROUND_SECONDARY);
-        mainTabs.setForeground(AssetStyles.FONT_COLOR);
+        AssetStyles.styleTabbedPane(mainTabs);
 
         backButton = new JButton();
         
@@ -60,10 +69,8 @@ public class HelpPanel extends JPanel {
 
         JPanel southPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         southPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
-        
-        backButton.setFont(AssetStyles.FONT_BOLD);
-        backButton.setBackground(AssetStyles.BACKGROUND_SECONDARY);
-        backButton.setForeground(AssetStyles.FONT_COLOR);
+
+        AssetStyles.styleButton(backButton);
         backButton.addActionListener(e -> this.frame.showCard(MainFrame.CARD_INIT));
         
         setupButtonNavigation(backButton);
@@ -72,8 +79,6 @@ public class HelpPanel extends JPanel {
         add(southPanel, BorderLayout.SOUTH);
         
         refreshTranslations();
-        
-        LanguageStrings.addListener(this::refreshTranslations);
 
         addAncestorListener(new AncestorListener() {
             @Override
@@ -91,29 +96,23 @@ public class HelpPanel extends JPanel {
     
     private void initTabs() {
         mainTabs.removeAll();
-        
-        // Filter Role Upgrades vs Generic Upgrades
-        List<Constant> roleConstants = GameUnlocks.getUpgrades().stream()
-                .filter(u -> u.getNameKey().toLowerCase().contains("role"))
-                .collect(Collectors.toList());
-        
-        List<Constant> genericUpgrades = GameUnlocks.getUpgrades().stream()
-                .filter(u -> !u.getNameKey().toLowerCase().contains("role"))
-                .collect(Collectors.toList());
 
         // Add tabs
-        mainTabs.addTab("Welcome", createWelcomePanel());
-        mainTabs.addTab("Getting Started", createGettingStartedPanel());
-        mainTabs.addTab("Dynasty", createEmpireManagementPanel());
-        mainTabs.addTab("Hotkeys", createHotkeysPanel());
-        mainTabs.addTab("Species", createSpeciesPanel());
-        mainTabs.addTab("Ant Types", createAntTypesPanel());
-        mainTabs.addTab("Bugs", createBugsPanel());
-        mainTabs.addTab("Roles", createDictionaryPanel(roleConstants));
-        mainTabs.addTab("Upgrades", createDictionaryPanel(genericUpgrades));
-        mainTabs.addTab("Buildings", createDictionaryPanel(new ArrayList<>(GameUnlocks.getBuildings())));
-        mainTabs.addTab("Assimilations", createDictionaryPanel(new ArrayList<>(GameUnlocks.getAssimilations())));
-        mainTabs.addTab("World", createWorldPanel());
+        mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_TUTORIALS), createTutorialsPanel());
+        mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_SPECIES), createSpeciesPanel());
+        mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_TYPES), createAntTypesPanel());
+        mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_BUGS), createBugsPanel());
+        mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_ANT_ROLES), createAntRolesPanel());
+        mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_EMPIRE), createEmpirePanel());
+        mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_UPGRADES),
+                createDictionaryPanel(new ArrayList<>(GameUnlocks.getUpgrades())));
+        mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_BUILDINGS),
+                createDictionaryPanel(new ArrayList<>(GameUnlocks.getBuildings()), false));
+        mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_ASSIMILATIONS), createDictionaryPanel(new ArrayList<>(GameUnlocks.getAssimilations())));
+        mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_SYNERGIES),
+                createDictionaryPanel(new ArrayList<>(GameUnlocks.getSynergies())));
+        mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_WORLD), createWorldPanel());
+        mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_UI), createUiControlsPanel());
     }
     
     public void refreshTranslations() {
@@ -121,18 +120,18 @@ public class HelpPanel extends JPanel {
         
         // Update tab titles
         String[] titles = {
-            LanguageStrings.get("HELP_TAB_WELCOME"),
-            LanguageStrings.get("HELP_TAB_STARTED"),
-            LanguageStrings.get("HELP_TAB_DYNASTY"),
-            LanguageStrings.get("HELP_TAB_HOTKEYS"),
-            LanguageStrings.get("HELP_TAB_SPECIES"),
-            LanguageStrings.get("HELP_TAB_TYPES"),
-            LanguageStrings.get("HELP_TAB_BUGS"),
-            LanguageStrings.get("HELP_TAB_ROLES"),
-            LanguageStrings.get("HELP_TAB_UPGRADES"),
-            LanguageStrings.get("HELP_TAB_BUILDINGS"),
-            LanguageStrings.get("HELP_TAB_ASSIMILATIONS"),
-            LanguageStrings.get("HELP_TAB_WORLD")
+            LanguageStrings.get(LanguageStrings.HELP_TAB_TUTORIALS),
+            LanguageStrings.get(LanguageStrings.HELP_TAB_SPECIES),
+            LanguageStrings.get(LanguageStrings.HELP_TAB_TYPES),
+            LanguageStrings.get(LanguageStrings.HELP_TAB_BUGS),
+            LanguageStrings.get(LanguageStrings.HELP_TAB_ANT_ROLES),
+            LanguageStrings.get(LanguageStrings.HELP_TAB_EMPIRE),
+            LanguageStrings.get(LanguageStrings.HELP_TAB_UPGRADES),
+            LanguageStrings.get(LanguageStrings.HELP_TAB_BUILDINGS),
+            LanguageStrings.get(LanguageStrings.HELP_TAB_ASSIMILATIONS),
+            LanguageStrings.get(LanguageStrings.HELP_TAB_SYNERGIES),
+            LanguageStrings.get(LanguageStrings.HELP_TAB_WORLD),
+            LanguageStrings.get(LanguageStrings.HELP_TAB_UI)
         };
         
         for (int i = 0; i < titles.length && i < mainTabs.getTabCount(); i++) {
@@ -145,6 +144,18 @@ public class HelpPanel extends JPanel {
         if (selected >= 0 && selected < mainTabs.getTabCount()) {
             mainTabs.setSelectedIndex(selected);
         }
+    }
+
+    public void refreshTheme() {
+        setBackground(AssetStyles.BACKGROUND_COLOR);
+        AssetStyles.styleTabbedPane(mainTabs);
+        AssetStyles.styleButton(backButton);
+        int selected = mainTabs.getSelectedIndex();
+        initTabs();
+        if (selected >= 0 && selected < mainTabs.getTabCount()) {
+            mainTabs.setSelectedIndex(selected);
+        }
+        AssetStyles.applyThemeToContainer(this);
     }
     
     private void setupButtonNavigation(JButton button) {
@@ -177,53 +188,86 @@ public class HelpPanel extends JPanel {
         tabs.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, backwardKeys);
     }
 
+    private JComponent createTutorialsPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        panel.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+        panel.add(wrapTutorialSection(LanguageStrings.HELP_TAB_WELCOME, createWelcomePanel()));
+        panel.add(Box.createRigidArea(new Dimension(0, 12)));
+        panel.add(wrapTutorialSection(LanguageStrings.HELP_TAB_STARTED, createGettingStartedPanel()));
+        panel.add(Box.createRigidArea(new Dimension(0, 12)));
+        panel.add(wrapTutorialSection(LanguageStrings.HELP_TAB_DYNASTY, createEmpireManagementPanel()));
+        panel.add(Box.createRigidArea(new Dimension(0, 12)));
+        panel.add(wrapTutorialSection(LanguageStrings.HELP_TAB_HOTKEYS, buildHotkeysGrid()));
+
+        JScrollPane scrollPane = new JScrollPane(panel);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        return scrollPane;
+    }
+
+    private JPanel wrapTutorialSection(String titleKey, JComponent content) {
+        JPanel section = new JPanel(new BorderLayout());
+        section.setBackground(AssetStyles.BACKGROUND_COLOR);
+        section.setBorder(BorderFactory.createTitledBorder(
+                AssetStyles.PANEL_BORDER,
+                LanguageStrings.get(titleKey),
+                javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                AssetStyles.FONT_BOLD,
+                AssetStyles.FONT_COLOR_HEADER));
+        section.add(content, BorderLayout.CENTER);
+        return section;
+    }
+
+    private String tutorialHtml(String body) {
+        return helpHtml("width:450px;font-size:12pt;", body);
+    }
+
+    private static String helpHtml(String extraStyle, String body) {
+        return "<html><div style='" + extraStyle + "font-family:" + AssetStyles.themeFontFamilyCss()
+                + ";color:" + AssetStyles.themeTextColorHtml() + ";'>" + body + "</div></html>";
+    }
+
+    private void styleTutorialLabel(JLabel label) {
+        label.setFont(AssetStyles.FONT_NORMAL);
+        label.setForeground(AssetStyles.FONT_COLOR);
+    }
+
     private JComponent createWelcomePanel() {
-        String story = "<html><div style='width: 450px; font-family: sans-serif;'>" +
-                "<p style='font-size: 14pt;'>" +
-                LanguageStrings.get("HELP_WELCOME_STORY") +
-                "</p></div></html>";
-        
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(AssetStyles.BACKGROUND_COLOR);
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
-        
-        JLabel label = new JLabel(story);
-        label.setFont(AssetStyles.FONT_NORMAL);
-        label.setForeground(AssetStyles.FONT_COLOR);
+
+        JLabel label = new JLabel(tutorialHtml(LanguageStrings.get("HELP_WELCOME_STORY")));
+        styleTutorialLabel(label);
         panel.add(label);
         return panel;
     }
 
     private JComponent createGettingStartedPanel() {
-        String gameInfo = "<html><div style='width: 450px; font-family: sans-serif; font-size: 11pt;'>" +
-                LanguageStrings.get("HELP_START_INFO") +
-                "<br><br>" +
-                LanguageStrings.get("HELP_OVERWORLD_GATHERING") +
-                "</div></html>";
-        
+        String body = LanguageStrings.get("HELP_START_INFO")
+                + "<br><br>"
+                + LanguageStrings.get("HELP_OVERWORLD_GATHERING");
+
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(AssetStyles.BACKGROUND_COLOR);
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
-        
-        JLabel label = new JLabel(gameInfo);
-        label.setFont(AssetStyles.FONT_NORMAL);
-        label.setForeground(AssetStyles.FONT_COLOR);
+
+        JLabel label = new JLabel(tutorialHtml(body));
+        styleTutorialLabel(label);
         panel.add(label);
         return panel;
     }
 
     private JComponent createEmpireManagementPanel() {
-        String empireInfo = "<html><div style='width: 450px; font-family: sans-serif; font-size: 11pt;'>" +
-                LanguageStrings.get("HELP_DYNASTY_INFO") +
-                "</div></html>";
-        
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(AssetStyles.BACKGROUND_COLOR);
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
-        
-        JLabel label = new JLabel(empireInfo);
-        label.setFont(AssetStyles.FONT_NORMAL);
-        label.setForeground(AssetStyles.FONT_COLOR);
+
+        JLabel label = new JLabel(tutorialHtml(LanguageStrings.get("HELP_DYNASTY_INFO")));
+        styleTutorialLabel(label);
         panel.add(label);
         return panel;
     }
@@ -235,6 +279,9 @@ public class HelpPanel extends JPanel {
         panel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
         for (Species s : GameConstants.getSpecies()) {
+            if (!GameConstants.hasAssimilatedDroneSprite(s)) {
+                continue;
+            }
             JPanel entry = new JPanel(new BorderLayout(10, 0));
             entry.setBackground(AssetStyles.BACKGROUND_COLOR);
             entry.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER, s.getName(), 
@@ -242,13 +289,15 @@ public class HelpPanel extends JPanel {
                 javax.swing.border.TitledBorder.DEFAULT_POSITION, 
                 AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
 
-            JLabel icon = new JLabel(s.getIcon());
-            icon.setBorder(new EmptyBorder(5, 5, 5, 5));
-            entry.add(icon, BorderLayout.WEST);
+            ImageIcon sprite = GameConstants.getAntSprite(GameConstants.TYPE_WORKER, s);
+            JLabel spriteLabel = new JLabel(sprite != null ? sprite : s.getIcon());
+            spriteLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
+            entry.add(spriteLabel, BorderLayout.WEST);
 
-            String baseUpgrades = s.getBaseUpgrades().stream().map(Upgrade::getName).collect(Collectors.joining(", "));
-            String info = "<html><div style='width: 350px; font-family: sans-serif; font-size: 11pt;'><b>" + LanguageStrings.get("HELP_SPECIES_SCIENTIFIC") + "</b> <i>" + s.getScientific() + "</i><br>" +
-                          "<b>" + LanguageStrings.get("HELP_SPECIES_TRAITS") + "</b> " + baseUpgrades + "</div></html>";
+            String baseUpgrades = s.getBaseUpgrades().stream().map(Upgrade::getFlavorName).collect(Collectors.joining(", "));
+            String info = helpHtml("width:350px;font-size:11pt;",
+                    "<b>" + LanguageStrings.get("HELP_SPECIES_SCIENTIFIC") + "</b> <i>" + s.getScientific() + "</i><br>"
+                            + "<b>" + LanguageStrings.get("HELP_SPECIES_TRAITS") + "</b> " + baseUpgrades);
             
             JLabel infoLabel = new JLabel(info);
             infoLabel.setFont(AssetStyles.FONT_NORMAL);
@@ -265,10 +314,10 @@ public class HelpPanel extends JPanel {
         return scrollPane;
     }
 
-    private JComponent createHotkeysPanel() {
+    private JPanel buildHotkeysGrid() {
         JPanel hotkeyPanel = new JPanel(new GridBagLayout());
         hotkeyPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
-        hotkeyPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
+        hotkeyPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
         GridBagConstraints c = new GridBagConstraints();
         c.insets = new Insets(5, 10, 5, 10);
         c.anchor = GridBagConstraints.WEST;
@@ -282,7 +331,7 @@ public class HelpPanel extends JPanel {
                 keyLabel.setFont(AssetStyles.FONT_BOLD);
                 keyLabel.setForeground(AssetStyles.FONT_COLOR_HEADER);
                 hotkeyPanel.add(keyLabel, c);
-                
+
                 c.gridx = 1;
                 JLabel descLabel = new JLabel(desc);
                 descLabel.setFont(AssetStyles.FONT_NORMAL);
@@ -305,16 +354,16 @@ public class HelpPanel extends JPanel {
         
         HotkeyRow row = new HotkeyRow();
         row.add("Spacebar", LanguageStrings.get("HOTKEY_PAUSE"));
-        row.add("+ / -", LanguageStrings.get("HOTKEY_SPEED"));
-        row.add("A", LanguageStrings.get("HOTKEY_VIEW"));
+        row.add("+ / = / -", LanguageStrings.get("HOTKEY_SPEED"));
+        row.add("Z", LanguageStrings.get("HOTKEY_VIEW"));
         row.add("ESC", LanguageStrings.get("HOTKEY_ESC"));
         row.addSeparator();
         row.add("Q / W / E / R / T", LanguageStrings.get("HOTKEY_ROLES"));
         row.addSeparator();
         row.add("P", LanguageStrings.get("HOTKEY_P"));
         row.add("Y / U / I / O", LanguageStrings.get("HOTKEY_UPGRADES"));
-        row.add("Z", LanguageStrings.get("HOTKEY_Z"));
-        row.add("S / A", LanguageStrings.get("HOTKEY_DYNASTY"));
+        row.add("C", LanguageStrings.get("HOTKEY_ABILITIES"));
+        row.add("A / S / D / F", LanguageStrings.get("HOTKEY_DYNASTY"));
         row.add("M", LanguageStrings.get("HOTKEY_M"));
         row.add("X", LanguageStrings.get("HOTKEY_X"));
 
@@ -322,6 +371,15 @@ public class HelpPanel extends JPanel {
     }
 
     private JComponent createAntTypesPanel() {
+        JPanel split = new JPanel(new GridLayout(1, 2, 8, 0));
+        split.setBackground(AssetStyles.BACKGROUND_COLOR);
+        split.setBorder(new EmptyBorder(10, 10, 10, 10));
+        split.add(wrapTutorialSection(LanguageStrings.HELP_TAB_TYPES, createAntTypesListPanel()));
+        split.add(wrapTutorialSection(LanguageStrings.HELP_TAB_SUBTYPES, createAntSubtypesListPanel()));
+        return split;
+    }
+
+    private JComponent createAntTypesListPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBackground(AssetStyles.BACKGROUND_COLOR);
@@ -369,7 +427,74 @@ public class HelpPanel extends JPanel {
 
         JScrollPane scrollPane = new JScrollPane(panel);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        scrollPane.setBorder(null);
         return scrollPane;
+    }
+
+    private JComponent createAntSubtypesListPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        panel.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+        JLabel intro = new JLabel(tutorialHtml(LanguageStrings.get(LanguageStrings.HELP_SUBTYPES_INTRO)));
+        styleTutorialLabel(intro);
+        intro.setBorder(new EmptyBorder(0, 0, 10, 0));
+        panel.add(intro);
+
+        for (AntSubtypeSlot slot : GameConstants.getConfigurableSubtypeSlots()) {
+            String sectionKey = slot == AntSubtypeSlot.HEAD
+                    ? LanguageStrings.HATCH_SUBTYPE_HEAD_SECTION
+                    : LanguageStrings.HATCH_SUBTYPE_ABDOMEN_SECTION;
+            JLabel sectionLabel = new JLabel(LanguageStrings.get(sectionKey));
+            sectionLabel.setFont(AssetStyles.FONT_BOLD);
+            sectionLabel.setForeground(AssetStyles.FONT_COLOR_HEADER);
+            sectionLabel.setBorder(new EmptyBorder(8, 0, 4, 0));
+            sectionLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            panel.add(sectionLabel);
+
+            for (AntSubtype subtype : GameConstants.getSubtypesForSlot(slot)) {
+                if (subtype.isNone()) {
+                    continue;
+                }
+                panel.add(buildAntSubtypeEntry(panel, subtype));
+                panel.add(Box.createRigidArea(new Dimension(0, 5)));
+            }
+        }
+
+        JScrollPane scrollPane = new JScrollPane(panel);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        scrollPane.setBorder(null);
+        return scrollPane;
+    }
+
+    private JPanel buildAntSubtypeEntry(JPanel panel, AntSubtype subtype) {
+        JPanel entry = new JPanel(new BorderLayout(10, 0));
+        entry.setBackground(AssetStyles.BACKGROUND_COLOR);
+        entry.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER, subtype.getName(),
+                javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
+        entry.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        ImageIcon icon = subtype.getIcon();
+        if (icon != null) {
+            JLabel iconLabel = new JLabel(icon);
+            iconLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
+            entry.add(iconLabel, BorderLayout.WEST);
+        }
+
+        JTextArea descArea = new JTextArea(subtype.getDesc());
+        descArea.setFont(AssetStyles.FONT_NORMAL);
+        descArea.setForeground(AssetStyles.FONT_COLOR);
+        descArea.setWrapStyleWord(true);
+        descArea.setLineWrap(true);
+        descArea.setEditable(false);
+        descArea.setFocusable(false);
+        descArea.setBackground(panel.getBackground());
+        descArea.setBorder(new EmptyBorder(5, 5, 5, 5));
+        entry.add(descArea, BorderLayout.CENTER);
+        return entry;
     }
 
     private JComponent createBugsPanel() {
@@ -396,21 +521,21 @@ public class HelpPanel extends JPanel {
                 desc = LanguageStrings.get(LanguageStrings.HELP_BUG_ANT_DESC);
             } else if (type == GameConstants.TYPE_APHID) {
                 desc = LanguageStrings.get(LanguageStrings.HELP_BUG_APHID_DESC);
-            } else if (type == GameConstants.TYPE_SOIL_MITE) {
-                desc = LanguageStrings.get(LanguageStrings.HELP_BUG_SOIL_MITE_DESC);
+            } else if (type == GameConstants.TYPE_SYMBIOTIC_MITE) {
+                desc = LanguageStrings.get(LanguageStrings.HELP_BUG_SYMBIOTIC_MITE_DESC);
             } else if (type == GameConstants.TYPE_DERMESTID) {
                 desc = LanguageStrings.get(LanguageStrings.HELP_BUG_DERMESTID_DESC);
-            } else if (type == GameConstants.TYPE_PARASITE) {
-                desc = LanguageStrings.get(LanguageStrings.HELP_BUG_PARASITE_DESC);
+            } else if (type == GameConstants.TYPE_PARASITE_ANT) {
+                desc = LanguageStrings.get(LanguageStrings.HELP_BUG_PARASITE_ANT_DESC);
             } else if (type == GameConstants.TYPE_PARASITIC_MITE) {
                 desc = LanguageStrings.get(LanguageStrings.HELP_BUG_PARASITIC_MITE_DESC);
             } else {
                 desc = "";
             }
 
-            String info = "<html><div style='width: 350px; font-family: sans-serif; font-size: 11pt;'><b>"
-                    + LanguageStrings.get(LanguageStrings.HELP_SPECIES_SCIENTIFIC) + "</b> <i>" + type.getScientificName()
-                    + "</i><br><br>" + desc + "</div></html>";
+            String info = helpHtml("width:350px;font-size:11pt;",
+                    "<b>" + LanguageStrings.get(LanguageStrings.HELP_SPECIES_SCIENTIFIC) + "</b> <i>" + type.getScientificName()
+                            + "</i><br><br>" + desc);
 
             JLabel infoLabel = new JLabel(info);
             infoLabel.setFont(AssetStyles.FONT_NORMAL);
@@ -424,6 +549,195 @@ public class HelpPanel extends JPanel {
         JScrollPane scrollPane = new JScrollPane(panel);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         return scrollPane;
+    }
+
+    private static String roleDescriptionKey(AntRole role) {
+        return role.getNameKey() + "_DESC";
+    }
+
+    private JComponent createAntRolesPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        panel.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+        List<AntRole> roles = new ArrayList<>(GameConstants.getAntRoles());
+        Collections.sort(roles, (a, b) -> a.getName().compareToIgnoreCase(b.getName()));
+
+        for (AntRole role : roles) {
+            JPanel entry = new JPanel(new BorderLayout(10, 0));
+            entry.setBackground(AssetStyles.BACKGROUND_COLOR);
+            entry.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER, role.getName(),
+                javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
+
+            JLabel icon = new JLabel(role.getIcon());
+            icon.setBorder(new EmptyBorder(5, 5, 5, 5));
+            entry.add(icon, BorderLayout.WEST);
+
+            AntType antType = role.getAntType();
+            String typeLine = antType != null
+                    ? LanguageStrings.format(LanguageStrings.HELP_ROLE_ANT_TYPE, antType.getName())
+                    : "";
+            String desc = LanguageStrings.get(roleDescriptionKey(role));
+            String body = helpHtml("width:350px;font-size:11pt;",
+                    (typeLine.isEmpty() ? "" : "<b>" + typeLine + "</b><br><br>") + desc);
+
+            JLabel infoLabel = new JLabel(body);
+            infoLabel.setFont(AssetStyles.FONT_NORMAL);
+            infoLabel.setForeground(AssetStyles.FONT_COLOR);
+            infoLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
+            entry.add(infoLabel, BorderLayout.CENTER);
+
+            panel.add(entry);
+            panel.add(Box.createRigidArea(new Dimension(0, 5)));
+        }
+
+        JScrollPane scrollPane = new JScrollPane(panel);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        return scrollPane;
+    }
+
+    private JComponent createEmpirePanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        panel.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+        panel.add(wrapEmpireSection(LanguageStrings.HELP_EMPIRE_TRADE, createTradeMethodSection()));
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(wrapEmpireSection(LanguageStrings.HELP_EMPIRE_LOYALTY, createLoyaltySection()));
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(wrapEmpireSection(LanguageStrings.HELP_EMPIRE_MILITARY_POWER, createMilitaryPowerSection()));
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(wrapEmpireSection(LanguageStrings.HELP_EMPIRE_REPUTATION, createReputationSection()));
+
+        JScrollPane scrollPane = new JScrollPane(panel);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        return scrollPane;
+    }
+
+    private JPanel wrapEmpireSection(String titleKey, JComponent content) {
+        JPanel section = new JPanel(new BorderLayout());
+        section.setBackground(AssetStyles.BACKGROUND_COLOR);
+        section.setBorder(BorderFactory.createTitledBorder(
+                AssetStyles.PANEL_BORDER,
+                LanguageStrings.get(titleKey),
+                javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                AssetStyles.FONT_BOLD,
+                AssetStyles.FONT_COLOR_HEADER));
+        section.add(content, BorderLayout.CENTER);
+        return section;
+    }
+
+    private JPanel createTradeMethodSection() {
+        JPanel grid = new JPanel(new GridLayout(0, 1, 0, 8));
+        grid.setBackground(AssetStyles.BACKGROUND_COLOR);
+        grid.setBorder(new EmptyBorder(8, 8, 8, 8));
+
+        for (TradeMethod method : GameConstants.getTradeMethods()) {
+            String descKey = method.getNameKey() + "_DESC";
+            String info = helpHtml("width:420px;font-size:11pt;",
+                    "<b>" + method.getName() + "</b><br>" + LanguageStrings.get(descKey));
+            JLabel row = new JLabel(info, method.getIcon(), SwingConstants.LEFT);
+            row.setFont(AssetStyles.FONT_NORMAL);
+            row.setForeground(AssetStyles.FONT_COLOR);
+            row.setIconTextGap(10);
+            grid.add(row);
+        }
+        return grid;
+    }
+
+    private JPanel createLoyaltySection() {
+        JPanel list = new JPanel();
+        list.setLayout(new BoxLayout(list, BoxLayout.Y_AXIS));
+        list.setBackground(AssetStyles.BACKGROUND_COLOR);
+        list.setBorder(new EmptyBorder(8, 8, 8, 8));
+
+        for (ColonyLoyalty loyalty : GameConstants.getColonyLoyalties()) {
+            String label = loyalty.getName() + String.format(
+                    LanguageStrings.get(LanguageStrings.HELP_TIER_MIN_SCORE), loyalty.getMinScore());
+            JLabel item = new JLabel(label, loyalty.getIcon(), SwingConstants.LEFT);
+            item.setFont(AssetStyles.FONT_NORMAL);
+            item.setForeground(AssetStyles.FONT_COLOR);
+            item.setIconTextGap(8);
+            list.add(item);
+        }
+
+        list.add(Box.createRigidArea(new Dimension(0, 8)));
+        JLabel modifiersTitle = new JLabel(LanguageStrings.get(LanguageStrings.HELP_LOYALTY_MODIFIERS_TITLE));
+        modifiersTitle.setFont(AssetStyles.FONT_BOLD);
+        modifiersTitle.setForeground(AssetStyles.FONT_COLOR_HEADER);
+        modifiersTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
+        list.add(modifiersTitle);
+        list.add(Box.createRigidArea(new Dimension(0, 4)));
+
+        for (ColonyLoyaltyModifier modifier : GameConstants.getColonyLoyaltyModifiers()) {
+            String line = String.format(
+                    LanguageStrings.get(LanguageStrings.LOYALTY_MODIFIER_LINE),
+                    modifier.getName(),
+                    modifier.getLoyaltyDelta());
+            JLabel item = new JLabel(line, GameConstants.ICON_STAT_LOYALTY, SwingConstants.LEFT);
+            item.setFont(AssetStyles.FONT_NORMAL);
+            item.setForeground(AssetStyles.FONT_COLOR);
+            item.setIconTextGap(8);
+            item.setAlignmentX(Component.LEFT_ALIGNMENT);
+            list.add(item);
+        }
+        JLabel militaryLine = new JLabel(
+                LanguageStrings.get(LanguageStrings.HELP_LOYALTY_MODIFIER_MILITARY),
+                GameConstants.ICON_STAT_MILITARY_POWER,
+                SwingConstants.LEFT);
+        militaryLine.setFont(AssetStyles.FONT_NORMAL);
+        militaryLine.setForeground(AssetStyles.FONT_COLOR);
+        militaryLine.setIconTextGap(8);
+        militaryLine.setAlignmentX(Component.LEFT_ALIGNMENT);
+        list.add(militaryLine);
+        JLabel distanceLine = new JLabel(
+                LanguageStrings.get(LanguageStrings.HELP_LOYALTY_MODIFIER_DISTANCE),
+                GameConstants.ICON_STAT_LOYALTY,
+                SwingConstants.LEFT);
+        distanceLine.setFont(AssetStyles.FONT_NORMAL);
+        distanceLine.setForeground(AssetStyles.FONT_COLOR);
+        distanceLine.setIconTextGap(8);
+        distanceLine.setAlignmentX(Component.LEFT_ALIGNMENT);
+        list.add(distanceLine);
+        return list;
+    }
+
+    private JPanel createMilitaryPowerSection() {
+        JPanel panel = new JPanel(new BorderLayout(8, 0));
+        panel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        panel.setBorder(new EmptyBorder(8, 8, 8, 8));
+        JLabel iconLabel = new JLabel(GameConstants.ICON_STAT_MILITARY_POWER);
+        iconLabel.setVerticalAlignment(SwingConstants.TOP);
+        panel.add(iconLabel, BorderLayout.WEST);
+        JLabel body = new JLabel("<html><body style='width:280px'>"
+                + LanguageStrings.get(LanguageStrings.HELP_MILITARY_POWER_BODY) + "</body></html>");
+        body.setFont(AssetStyles.FONT_NORMAL);
+        body.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(body, BorderLayout.CENTER);
+        return panel;
+    }
+
+    private JPanel createReputationSection() {
+        JPanel list = new JPanel();
+        list.setLayout(new BoxLayout(list, BoxLayout.Y_AXIS));
+        list.setBackground(AssetStyles.BACKGROUND_COLOR);
+        list.setBorder(new EmptyBorder(8, 8, 8, 8));
+
+        for (DiplomaticReputation reputation : GameConstants.getDiplomaticReputations()) {
+            String label = reputation.getName() + String.format(
+                    LanguageStrings.get(LanguageStrings.HELP_TIER_MIN_SCORE), reputation.getMinScore());
+            JLabel item = new JLabel(label, reputation.getIcon(), SwingConstants.LEFT);
+            item.setFont(AssetStyles.FONT_NORMAL);
+            item.setForeground(AssetStyles.FONT_COLOR);
+            item.setIconTextGap(8);
+            list.add(item);
+        }
+        return list;
     }
 
     private JPanel createSeasonListPanel(String title, List<Season> constants) {
@@ -636,12 +950,13 @@ public class HelpPanel extends JPanel {
                 AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
         
         for (Biome b : GameConstants.getBiomes()) {
-            String bInfo = "<html><div style='width: 120px; font-family: sans-serif;'><b>" + b.getName() + "</b><br>" +
-                           LanguageStrings.get("HELP_BIOME_TEMP") + b.getTemperature() + "°C<br>" +
-                           LanguageStrings.get("HELP_BIOME_HUMID") + b.isIsHumid() + "/5<br>" +
-                           LanguageStrings.get("RESOURCE_PLANT") + ": " + b.getPlantAbundance() + "x<br>" +
-                           LanguageStrings.get("RESOURCE_MEAT") + ": " + b.getAnimalAbundance() + "x<br>" +
-                           LanguageStrings.get("RESOURCE_ROCK") + ": " + b.getMineralAbundance() + "x</div></html>";
+            String bInfo = helpHtml("width:120px;",
+                    "<b>" + b.getName() + "</b><br>"
+                            + LanguageStrings.get("HELP_BIOME_TEMP") + b.getTemperature() + "°C<br>"
+                            + LanguageStrings.get("HELP_BIOME_HUMID") + b.isIsHumid() + "/5<br>"
+                            + LanguageStrings.get("RESOURCE_PLANT") + ": " + b.getPlantAbundance() + "x<br>"
+                            + LanguageStrings.get("RESOURCE_MEAT") + ": " + b.getAnimalAbundance() + "x<br>"
+                            + LanguageStrings.get("RESOURCE_ROCK") + ": " + b.getMineralAbundance() + "x");
             JLabel bLabel = new JLabel(bInfo, b.getIcon(), SwingConstants.LEFT);
             bLabel.setFont(AssetStyles.FONT_SMALL);
             bLabel.setForeground(AssetStyles.FONT_COLOR);
@@ -671,7 +986,144 @@ public class HelpPanel extends JPanel {
         return scrollPane;
     }
 
+    private JComponent createUiControlsPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        panel.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+        JLabel intro = new JLabel(tutorialHtml(LanguageStrings.get(LanguageStrings.HELP_UI_INTRO)));
+        styleTutorialLabel(intro);
+        intro.setBorder(new EmptyBorder(0, 0, 10, 0));
+        intro.setAlignmentX(Component.LEFT_ALIGNMENT);
+        panel.add(intro);
+
+        panel.add(createUiControlBarSection());
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(createGameSpeedIconsSection());
+
+        JScrollPane scrollPane = new JScrollPane(panel);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        return scrollPane;
+    }
+
+    private JPanel createUiControlBarSection() {
+        JPanel section = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 8));
+        section.setBackground(AssetStyles.BACKGROUND_COLOR);
+        section.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER, LanguageStrings.get(LanguageStrings.HELP_UI_BAR_TITLE),
+                javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
+        section.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        section.add(buildUiControlCell(GameConstants.ICON_SPEED_DOWN, LanguageStrings.UI_CONTROL_SPEED_DOWN_TT));
+        section.add(buildUiControlCell(GameConstants.ICON_SPEED_UP, LanguageStrings.UI_CONTROL_SPEED_UP_TT));
+        section.add(buildUiControlCell(GameConstants.SPEED_NORMAL.getIcon(), LanguageStrings.UI_CONTROL_SPEED_TT,
+                GameConstants.SPEED_NORMAL.getName(), GameConstants.SPEED_NORMAL.getDelayMs()));
+        section.add(buildUiControlCell(GameConstants.ICON_SPEED_PAUSE, LanguageStrings.UI_CONTROL_PAUSE_TT));
+        section.add(buildUiControlCell(GameConstants.ICON_SPEED_PLAY, LanguageStrings.UI_CONTROL_PLAY_TT));
+        section.add(buildUiMenuControlCell());
+
+        JPanel wrapper = new JPanel(new BorderLayout());
+        wrapper.setBackground(AssetStyles.BACKGROUND_COLOR);
+        wrapper.setAlignmentX(Component.LEFT_ALIGNMENT);
+        wrapper.add(section, BorderLayout.CENTER);
+        return wrapper;
+    }
+
+    private JPanel createGameSpeedIconsSection() {
+        JPanel grid = new JPanel(new GridLayout(0, 3, 10, 10));
+        grid.setBackground(AssetStyles.BACKGROUND_COLOR);
+        grid.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER, LanguageStrings.get(LanguageStrings.HELP_UI_SPEEDS_TITLE),
+                javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
+        grid.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        grid.add(buildSpeedIconCell(LanguageStrings.get(LanguageStrings.HELP_UI_SPEED_PAUSED),
+                GameConstants.ICON_SPEED_ZERO,
+                LanguageStrings.get(LanguageStrings.UI_CONTROL_PAUSED_TT)));
+
+        for (GameSpeed speed : GameConstants.getGameSpeeds()) {
+            grid.add(buildSpeedIconCell(speed.getName(), speed.getIcon(),
+                    LanguageStrings.format(LanguageStrings.HELP_UI_SPEED_MS,
+                            AssetStyles.formatNumber(speed.getDelayMs()))));
+        }
+
+        JPanel wrapper = new JPanel(new BorderLayout());
+        wrapper.setBackground(AssetStyles.BACKGROUND_COLOR);
+        wrapper.setAlignmentX(Component.LEFT_ALIGNMENT);
+        wrapper.add(grid, BorderLayout.CENTER);
+        return wrapper;
+    }
+
+    private JPanel buildUiControlCell(ImageIcon icon, String descKey) {
+        return buildUiControlCell(icon, null, descKey, null, null);
+    }
+
+    private JPanel buildUiControlCell(ImageIcon icon, String descFormatKey, String speedName, int delayMs) {
+        return buildUiControlCell(icon, descFormatKey, null, speedName, delayMs);
+    }
+
+    private JPanel buildUiControlCell(ImageIcon icon, String descFormatKey, String descKey,
+            String speedName, Integer delayMs) {
+        JPanel cell = new JPanel();
+        cell.setLayout(new BoxLayout(cell, BoxLayout.Y_AXIS));
+        cell.setBackground(AssetStyles.BACKGROUND_COLOR);
+
+        JLabel iconLabel = new JLabel(icon);
+        iconLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        iconLabel.setBorder(new EmptyBorder(0, 0, 4, 0));
+        cell.add(iconLabel);
+
+        String desc = descKey != null
+                ? LanguageStrings.get(descKey)
+                : LanguageStrings.format(descFormatKey, speedName, AssetStyles.formatNumber(delayMs));
+        JLabel descLabel = new JLabel(helpHtml("width:110px;font-size:10pt;text-align:center;", desc));
+        descLabel.setFont(AssetStyles.FONT_SMALL);
+        descLabel.setForeground(AssetStyles.FONT_COLOR);
+        descLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        cell.add(descLabel);
+        return cell;
+    }
+
+    private JPanel buildUiMenuControlCell() {
+        JPanel cell = new JPanel();
+        cell.setLayout(new BoxLayout(cell, BoxLayout.Y_AXIS));
+        cell.setBackground(AssetStyles.BACKGROUND_COLOR);
+
+        JButton menuPreview = new JButton(LanguageStrings.get(LanguageStrings.UI_MENU));
+        menuPreview.setEnabled(false);
+        menuPreview.setFocusable(false);
+        AssetStyles.styleButton(menuPreview);
+        menuPreview.setAlignmentX(Component.CENTER_ALIGNMENT);
+        cell.add(menuPreview);
+
+        JLabel descLabel = new JLabel(helpHtml("width:110px;font-size:10pt;text-align:center;",
+                LanguageStrings.get(LanguageStrings.UI_CONTROL_MENU_TT)));
+        descLabel.setFont(AssetStyles.FONT_SMALL);
+        descLabel.setForeground(AssetStyles.FONT_COLOR);
+        descLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        descLabel.setBorder(new EmptyBorder(4, 0, 0, 0));
+        cell.add(descLabel);
+        return cell;
+    }
+
+    private JLabel buildSpeedIconCell(String title, ImageIcon icon, String detail) {
+        String info = helpHtml("width:120px;font-size:11pt;",
+                "<b>" + title + "</b><br>" + detail);
+        JLabel label = new JLabel(info, icon, SwingConstants.LEFT);
+        label.setFont(AssetStyles.FONT_SMALL);
+        label.setForeground(AssetStyles.FONT_COLOR);
+        label.setIconTextGap(8);
+        return label;
+    }
+
     private JComponent createDictionaryPanel(List<Constant> items) {
+        return createDictionaryPanel(items, true);
+    }
+
+    private JComponent createDictionaryPanel(List<Constant> items, boolean showIcons) {
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setBackground(AssetStyles.BACKGROUND_COLOR);
         
@@ -704,7 +1156,7 @@ public class HelpPanel extends JPanel {
                 if (value instanceof Constant) {
                     Constant c = (Constant) value;
                     setText((c instanceof Upgrade) ? ((Upgrade) c).getFlavorName() : c.getName());
-                    setIcon(c.getIcon());
+                    setIcon(showIcons ? c.getIcon() : null);
                 }
                 return this;
             }
@@ -731,40 +1183,48 @@ public class HelpPanel extends JPanel {
                 if (!e.getValueIsAdjusting()) {
                     Constant selected = list.getSelectedValue();
                     if (selected == null) {
-                        descriptionArea.setText("<html><div style='font-family: sans-serif; font-size: 11pt; color: black;'>" + LanguageStrings.get("HELP_SELECT_ITEM") + "</div></html>");
+                        descriptionArea.setText(helpHtml("font-size:11pt;", LanguageStrings.get("HELP_SELECT_ITEM")));
                         return;
                     }
                     
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("<html><div style='font-family: sans-serif; font-size: 11pt; color: black; width: 250px;'>");
+                    StringBuilder body = new StringBuilder();
                     
                     if (selected instanceof Upgrade) {
                         Upgrade u = (Upgrade) selected;
-                        sb.append("<b>").append(u.getFlavorName()).append("</b><br><br>");
-                        sb.append(u.getDescription()).append("<br><br>");
-                        sb.append("<b>").append(LanguageStrings.get("UI_COST")).append(":</b> ").append(u.getCost()).append(" RP");
+                        body.append("<b>").append(u.getFlavorName()).append("</b><br><br>");
+                        body.append(u.getDescription()).append("<br><br>");
+                        body.append("<b>").append(LanguageStrings.get("UI_COST")).append(":</b> ").append(AssetStyles.formatNumber(u.getCost())).append(" RP");
                         if (u.getRequirement() != null) {
-                            sb.append("<br><b>").append(LanguageStrings.get("UI_REQUIREMENTS")).append(":</b> ").append(u.getRequirement().getFlavorName());
+                            body.append("<br><b>").append(LanguageStrings.get("UI_REQUIREMENTS")).append(":</b> ").append(u.getRequirement().getFlavorName());
                         }
                     } else if (selected instanceof Building) {
                         Building b = (Building) selected;
-                        sb.append("<b>").append(b.getName()).append("</b><br><br>");
-                        sb.append(b.getDescription());
+                        body.append("<b>").append(b.getName()).append("</b><br><br>");
+                        body.append(b.getDescription());
                         if (b.getBuildTime() > 0) {
-                             sb.append("<br><br><b>").append(LanguageStrings.get("HELP_BUILD_BASE_COST")).append(":</b><br>");
-                             sb.append(b.getMineralCost()).append(" ").append(LanguageStrings.get("RESOURCE_ROCK")).append(", ");
-                             sb.append(b.getResinCost()).append(" ").append(LanguageStrings.get("RESOURCE_RESIN")).append(", ");
-                             sb.append(b.getBuildTime()).append(" Hours");
+                             body.append("<br><br><b>").append(LanguageStrings.get("HELP_BUILD_BASE_COST")).append(":</b><br>");
+                             body.append(AssetStyles.formatNumber(b.getMineralCost())).append(" ").append(LanguageStrings.get("RESOURCE_ROCK")).append(", ");
+                             body.append(AssetStyles.formatNumber(b.getResinCost())).append(" ").append(LanguageStrings.get("RESOURCE_RESIN")).append(", ");
+                             body.append(AssetStyles.formatNumber(b.getBuildTime())).append(" Hours");
                         }
                     } else if (selected instanceof Assimilation) {
                         Assimilation a = (Assimilation) selected;
-                        sb.append("<b>").append(a.getName()).append("</b><br><br>");
-                        sb.append(a.getDescription()).append("<br><br>");
-                        sb.append("<b>").append(LanguageStrings.get("UI_COST")).append(":</b> ").append(a.getCost()).append(" RP");
+                        body.append("<b>").append(a.getName()).append("</b><br><br>");
+                        body.append(a.getDescription()).append("<br><br>");
+                        body.append("<b>").append(LanguageStrings.get("UI_COST")).append(":</b> ").append(AssetStyles.formatNumber(a.getCost())).append(" RP");
+                    } else if (selected instanceof Synergy) {
+                        Synergy s = (Synergy) selected;
+                        body.append("<b>").append(s.getName()).append("</b><br><br>");
+                        body.append(s.getDescription()).append("<br><br>");
+                        body.append("<b>").append(LanguageStrings.get("UI_REQUIREMENTS")).append(":</b> ")
+                                .append(s.formatRequirementFlavorNames());
+                        if (s.getReward() != null) {
+                            body.append("<br><b>").append(LanguageStrings.get(LanguageStrings.TAB_SYNERGIES)).append(":</b> ")
+                                    .append(s.getReward().getFlavorName());
+                        }
                     }
                     
-                    sb.append("</div></html>");
-                    descriptionArea.setText(sb.toString());
+                    descriptionArea.setText(helpHtml("font-size:11pt;width:250px;", body.toString()));
                     descriptionArea.setCaretPosition(0);
                 }
             }
@@ -776,16 +1236,14 @@ public class HelpPanel extends JPanel {
 
     public static void showTutorialDialog(Component parent) {
         Window window = SwingUtilities.getWindowAncestor(parent);
-        JDialog dialog = new JDialog(window, LanguageStrings.get("HELP_TUTORIAL_TITLE"), Dialog.ModalityType.APPLICATION_MODAL);
+        JDialog dialog = new JDialog(window, LanguageStrings.withAppDisplayName(LanguageStrings.HELP_TUTORIAL_TITLE), Dialog.ModalityType.APPLICATION_MODAL);
         dialog.setLayout(new BorderLayout());
 
         JPanel cardPanel = new JPanel(new CardLayout());
         cardPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
         
         // --- Page 1: Story ---
-        String story = "<html><div style='width: 350px; font-family: sans-serif;'><p style='font-size: 12pt;'>" +
-                LanguageStrings.get("HELP_WELCOME_STORY") +
-                "</p></div></html>";
+        String story = helpHtml("width:350px;font-size:12pt;", "<p>" + LanguageStrings.get("HELP_WELCOME_STORY") + "</p>");
         JPanel page1 = new JPanel(new BorderLayout());
         page1.setBackground(AssetStyles.BACKGROUND_COLOR);
         page1.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -794,9 +1252,7 @@ public class HelpPanel extends JPanel {
         page1.add(storyLabel, BorderLayout.CENTER);
 
         // --- Page 2: Game Info ---
-        String gameInfo = "<html><div style='width: 350px; font-family: sans-serif;'><p style='font-size: 11pt;'>" +
-                LanguageStrings.get("HELP_TUTORIAL_TIPS") +
-                "</p></div></html>";
+        String gameInfo = helpHtml("width:350px;font-size:11pt;", "<p>" + LanguageStrings.get("HELP_TUTORIAL_TIPS") + "</p>");
         JPanel page2 = new JPanel(new BorderLayout());
         page2.setBackground(AssetStyles.BACKGROUND_COLOR);
         page2.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -805,9 +1261,7 @@ public class HelpPanel extends JPanel {
         page2.add(infoLabel, BorderLayout.CENTER);
         
         // --- Page 3: Threats & Mechanics ---
-        String threatInfo = "<html><div style='width: 350px; font-family: sans-serif;'><p style='font-size: 11pt;'>" +
-                LanguageStrings.get("HELP_TUTORIAL_THREATS") +
-                "</p></div></html>";
+        String threatInfo = helpHtml("width:350px;font-size:11pt;", "<p>" + LanguageStrings.get("HELP_TUTORIAL_THREATS") + "</p>");
         JPanel page3 = new JPanel(new BorderLayout());
         page3.setBackground(AssetStyles.BACKGROUND_COLOR);
         page3.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -816,9 +1270,7 @@ public class HelpPanel extends JPanel {
         page3.add(threatLabel, BorderLayout.CENTER);
 
         // --- Page 4: Dynasty Management ---
-        String empireInfo = "<html><div style='width: 350px; font-family: sans-serif;'><p style='font-size: 11pt;'>" +
-                LanguageStrings.get("HELP_TUTORIAL_DYNASTY") +
-                "</p></div></html>";
+        String empireInfo = helpHtml("width:350px;font-size:11pt;", "<p>" + LanguageStrings.get("HELP_TUTORIAL_DYNASTY") + "</p>");
         JPanel page4 = new JPanel(new BorderLayout());
         page4.setBackground(AssetStyles.BACKGROUND_COLOR);
         page4.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -837,11 +1289,12 @@ public class HelpPanel extends JPanel {
         Object[][] keysData = {
             {LanguageStrings.get("HOTKEY_PAUSE_LABEL"), "Spacebar"},
             {LanguageStrings.get("HOTKEY_ESC_LABEL"), "ESC"},
-            {LanguageStrings.get("HOTKEY_VIEW_LABEL"), "A"},
+            {LanguageStrings.get("HOTKEY_VIEW_LABEL"), "Z"},
             {LanguageStrings.get("HOTKEY_ROLES_LABEL"), "Q-T"},
             {LanguageStrings.get("HOTKEY_UPGRADES_LABEL"), "Y-O"},
             {LanguageStrings.get("HOTKEY_P_LABEL"), "P"},
-            {LanguageStrings.get("HOTKEY_DYNASTY_LABEL"), "S / A"},
+            {LanguageStrings.get("HOTKEY_ABILITIES_LABEL"), "C"},
+            {LanguageStrings.get("HOTKEY_DYNASTY_LABEL"), "A / S / D / F"},
             {LanguageStrings.get("HOTKEY_M_LABEL"), "M"},
             {LanguageStrings.get("HOTKEY_X_LABEL"), "X"}
         };
@@ -880,10 +1333,8 @@ public class HelpPanel extends JPanel {
         JButton nextBtn = new JButton(LanguageStrings.get("UI_NEXT") + " >");
         JButton finishBtn = new JButton(LanguageStrings.get("UI_FINISH"));
         
-        for(JButton btn : new JButton[]{skipBtn, backBtn, nextBtn, finishBtn}) {
-            btn.setFont(AssetStyles.FONT_BOLD);
-            btn.setBackground(AssetStyles.BACKGROUND_SECONDARY);
-            btn.setForeground(AssetStyles.FONT_COLOR);
+        for (JButton btn : new JButton[]{skipBtn, backBtn, nextBtn, finishBtn}) {
+            AssetStyles.styleButton(btn);
         }
 
         skipBtn.addActionListener(e -> dialog.dispose());
@@ -929,8 +1380,52 @@ public class HelpPanel extends JPanel {
 
         dialog.add(cardPanel, BorderLayout.CENTER);
         dialog.add(buttonPanel, BorderLayout.SOUTH);
-        dialog.pack();
-        dialog.setLocationRelativeTo(parent);
-        dialog.setVisible(true);
+        UiDialogUtils.show(dialog, parent);
+    }
+
+    public static void showRoadmapDialog(Component parent) {
+        showTextFileDialog(parent, LanguageStrings.ROADMAP_TITLE,
+                ClasspathTextFiles.load("/meta/roadmap.txt", LanguageStrings.ROADMAP_UNAVAILABLE));
+    }
+
+    public static void showCreditsDialog(Component parent) {
+        showTextFileDialog(parent, LanguageStrings.CREDITS_TITLE,
+                ClasspathTextFiles.load("/meta/credits.txt", LanguageStrings.CREDITS_UNAVAILABLE));
+    }
+
+    public static void showAuditDialog(Component parent) {
+        showTextFileDialog(parent, LanguageStrings.AUDIT_TITLE,
+                ClasspathTextFiles.load(AssetStyles.META_AUDIT, LanguageStrings.AUDIT_UNAVAILABLE));
+    }
+
+    private static void showTextFileDialog(Component parent, String titleKey, String text) {
+        Window window = SwingUtilities.getWindowAncestor(parent);
+        JDialog dialog = new JDialog(window, LanguageStrings.get(titleKey), Dialog.ModalityType.APPLICATION_MODAL);
+        dialog.setLayout(new BorderLayout());
+
+        JTextArea textArea = new JTextArea(text);
+        textArea.setEditable(false);
+        textArea.setLineWrap(false);
+        textArea.setFont(AssetStyles.FONT_MONOSPACED);
+        textArea.setBackground(AssetStyles.BACKGROUND_COLOR);
+        textArea.setForeground(AssetStyles.FONT_COLOR);
+        textArea.setBorder(new EmptyBorder(12, 12, 12, 12));
+        textArea.setCaretPosition(0);
+
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        scrollPane.setPreferredSize(new Dimension(720, 520));
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        dialog.add(scrollPane, BorderLayout.CENTER);
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        buttonPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
+
+        JButton closeButton = new JButton(LanguageStrings.get(LanguageStrings.UI_CLOSE));
+        AssetStyles.styleButton(closeButton);
+        closeButton.addActionListener(e -> dialog.dispose());
+        buttonPanel.add(closeButton);
+
+        dialog.add(buttonPanel, BorderLayout.SOUTH);
+        UiDialogUtils.show(dialog, parent);
     }
 }

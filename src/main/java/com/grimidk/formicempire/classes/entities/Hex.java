@@ -3,7 +3,8 @@ package com.grimidk.formicempire.classes.entities;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.Weather;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 
 public class Hex {
     private Biome biome;
@@ -22,7 +23,6 @@ public class Hex {
     private Weather localWeather;
     private boolean isActive;
 
-    /** Counts non-water overworld sources spawned on this hex (scouting); drives {@link #getResourceDepletionPercent()}. */
     private int nonWaterResourceSourcesGenerated;
 
     public Hex(Biome biome, Colony colony, Hex north, Hex northWest, Hex northEast, Hex south, Hex southWest, Hex southEast) {
@@ -73,6 +73,12 @@ public class Hex {
 
     public void setSouthEast(Hex southEast) { this.southEast = southEast; }
 
+    public Hex[] getAdjacentNeighbors() {
+        return new Hex[] {
+            north, northWest, northEast, south, southWest, southEast
+        };
+    }
+
     public int getQ() { return q; }
 
     public void setQ(int q) { this.q = q; }
@@ -101,16 +107,10 @@ public class Hex {
         this.nonWaterResourceSourcesGenerated = Math.max(0, count);
     }
 
-    /**
-     * 0–100% depletion derived from non-water sources spawned; +1% per {@link GameConstants#HEX_RESOURCE_DEPLETION_SOURCES_PER_PERCENT} sources.
-     */
     public int getResourceDepletionPercent() {
-        return Math.min(100, nonWaterResourceSourcesGenerated / GameConstants.HEX_RESOURCE_DEPLETION_SOURCES_PER_PERCENT);
+        return Math.min(100, nonWaterResourceSourcesGenerated / GameNumbers.HEX_RESOURCE_DEPLETION_SOURCES_PER_PERCENT);
     }
 
-    /**
-     * Raw depletion clamped to {@code maxPercent} (e.g. {@link GameConstants#HEX_SUSTAIN_MAX_DEPLETION_PCT} with sustainability upgrade).
-     */
     public int getResourceDepletionPercentCapped(int maxPercent) {
         int cap = Math.min(100, Math.max(0, maxPercent));
         return Math.min(getResourceDepletionPercent(), cap);

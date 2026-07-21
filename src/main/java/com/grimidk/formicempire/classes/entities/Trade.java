@@ -6,12 +6,14 @@ import java.util.Map;
 import java.util.List;
 
 import com.grimidk.formicempire.classes.constants.ant.AntType;
+import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.misc.TradeMethod;
-import com.grimidk.formicempire.classes.entities.services.ColonyResourceService;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.ColonyLogPrefixes;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
+import com.grimidk.formicempire.classes.entities.services.colony.ColonyConvoyTransitService;
+import com.grimidk.formicempire.classes.entities.services.colony.ColonyResourceService;
+import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
 public class Trade {
 
@@ -29,6 +31,8 @@ public class Trade {
     private int totalHours;
     private int remainingHours;
     private boolean isReturning;
+
+    private double tunnelBearingRadians;
 
     private Map<ResourceType, Double> pendingLoad;
     private Map<ResourceType, Double> pendingReturnLoad;
@@ -90,7 +94,6 @@ public class Trade {
             return false;
         }
 
-        // Validate ant availability first
         if (antsOnTrip.isEmpty()) {
             for (Map.Entry<AntType, Integer> entry : transport.entrySet()) {
                 List<Ant> colonyAnts = originColony.getAntsByType(entry.getKey());
@@ -98,7 +101,7 @@ public class Trade {
                 if (availableCount < entry.getValue()) {
                     originColony.logEvent(ColonyLogPrefixes.TRADE + " "
                         + String.format(LanguageStrings.get(LanguageStrings.LOG_TRADE_CANCELLED_FMT),
-                            entry.getKey().getName() + "s"));
+                            entry.getKey().getName()));
                     isActive = false;
                     return false;
                 }
@@ -123,6 +126,8 @@ public class Trade {
         for (Map.Entry<ResourceType, Double> entry : load.entrySet()) {
             resService.consumeResource(originColony, entry.getKey(), entry.getValue());
         }
+
+        originColony.getConvoyTransitService().beginConvoyTransit(originColony, this);
         
         this.isReturning = false;
         this.remainingHours = this.totalHours;
@@ -131,7 +136,12 @@ public class Trade {
 
     public void tick() {
         if (!isActive) return;
-        
+
+        if (!hasSufficientLiveEscorts()) {
+            cancelDueToEscortLoss();
+            return;
+        }
+
         remainingHours--;
         if (remainingHours <= 0) {
             if (!isReturning) {
@@ -141,6 +151,10 @@ public class Trade {
                 }
                 isReturning = true;
                 remainingHours = totalHours;
+                Colony originColony = origin.getColony();
+                if (originColony != null) {
+                    originColony.getConvoyTransitService().onReturnLegStarted(originColony, this);
+                }
             } else {
                 if (isBilateral) {
                     deliverReturnLoad();
@@ -154,7 +168,15 @@ public class Trade {
                 }
 
                 if (isRecurrent) {
-                    startTrip();
+                    if (!startTrip()) {
+                        Colony originColony = origin.getColony();
+                        if (originColony != null) {
+                            Colony destColony = destination.getColony();
+                            String destName = destColony != null ? destColony.getName() : "?";
+                            originColony.logEvent(ColonyLogPrefixes.TRADE + " "
+                                    + LanguageStrings.format(LanguageStrings.LOG_TRADE_ESCORT_LOSS_FMT, destName));
+                        }
+                    }
                 } else {
                     isActive = false;
                 }
@@ -241,6 +263,10 @@ public class Trade {
     }
 
     private void releaseAnts() {
+        Colony originColony = origin.getColony();
+        if (originColony != null) {
+            originColony.getConvoyTransitService().restoreConvoyAnts(originColony, this);
+        }
         for (Ant ant : antsOnTrip) {
             ant.setOnTrade(false);
         }
@@ -255,13 +281,87 @@ public class Trade {
                     for (Map.Entry<ResourceType, Double> entry : load.entrySet()) {
                         originColony.getResourceService().addResource(originColony, entry.getKey(), entry.getValue());
                     }
+                    Colony destColony = destination.getColony();
                     originColony.logEvent(ColonyLogPrefixes.TRADE + " "
                         + String.format(LanguageStrings.get(LanguageStrings.LOG_TRADE_ROUTE_CANCELLED_FMT),
-                            destination.getColony().getName()));
+                            destColony != null ? destColony.getName() : "?"));
                 }
             }
             releaseAnts();
             isActive = false;
+        }
+    }
+
+    public void purgeDeadEscorts() {
+        antsOnTrip.removeIf(ant -> {
+            if (ant == null || !ant.isAlive()) {
+                if (ant != null) {
+                    ant.setOnTrade(false);
+                }
+                return true;
+            }
+            return false;
+        });
+    }
+
+    public boolean hasSufficientLiveEscorts() {
+        purgeDeadEscorts();
+        if (transport.isEmpty()) {
+            return true;
+        }
+        Map<AntType, Integer> liveCounts = new HashMap<>();
+        for (Ant ant : antsOnTrip) {
+            if (ant != null && ant.isAlive()) {
+                liveCounts.merge(ant.getAntType(), 1, Integer::sum);
+            }
+        }
+        if (antsOnTrip.isEmpty()) {
+            Colony originColony = origin.getColony();
+            if (originColony == null) {
+                return false;
+            }
+            for (Map.Entry<AntType, Integer> entry : transport.entrySet()) {
+                long available = originColony.getAntsByType(entry.getKey()).stream()
+                        .filter(a -> a.isAlive() && !a.isOnTrade())
+                        .count();
+                if (available < entry.getValue()) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        for (Map.Entry<AntType, Integer> entry : transport.entrySet()) {
+            if (liveCounts.getOrDefault(entry.getKey(), 0) < entry.getValue()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void cancelDueToEscortLoss() {
+        if (!isActive) {
+            return;
+        }
+        Colony originColony = origin.getColony();
+        Colony destColony = destination.getColony();
+        if (originColony != null) {
+            if (!isReturning) {
+                for (Map.Entry<ResourceType, Double> entry : load.entrySet()) {
+                    originColony.getResourceService().addResource(originColony, entry.getKey(), entry.getValue());
+                }
+            }
+            String destName = destColony != null ? destColony.getName() : "?";
+            originColony.logEvent(ColonyLogPrefixes.TRADE + " "
+                    + LanguageStrings.format(LanguageStrings.LOG_TRADE_ESCORT_LOSS_FMT, destName));
+        }
+        releaseAnts();
+        isActive = false;
+    }
+
+    public void cancelDueToEscortLoss(TradeManager tradeManager) {
+        cancelDueToEscortLoss();
+        if (tradeManager != null) {
+            tradeManager.removeTrade(this);
         }
     }
 
@@ -291,6 +391,16 @@ public class Trade {
 
     public int getRemainingHours() {
         return remainingHours;
+    }
+
+    public int getTotalHours() {
+        return totalHours;
+    }
+
+    public void restoreTripState(int totalHours, int remainingHours, boolean isReturning) {
+        this.totalHours = totalHours;
+        this.remainingHours = remainingHours;
+        this.isReturning = isReturning;
     }
 
     public boolean isReturning() {
@@ -331,6 +441,22 @@ public class Trade {
 
     public boolean isActive() {
         return isActive;
+    }
+
+    public List<Ant> getAntsOnTrip() {
+        return antsOnTrip;
+    }
+
+    public boolean containsAnt(Ant ant) {
+        return ant != null && antsOnTrip.contains(ant);
+    }
+
+    public double getTunnelBearingRadians() {
+        return tunnelBearingRadians;
+    }
+
+    public void initializeTunnelBearing(boolean returning) {
+        this.tunnelBearingRadians = ColonyConvoyTransitService.bearingFromHexes(origin, destination, returning);
     }
 
     public void setActive(boolean isActive) {

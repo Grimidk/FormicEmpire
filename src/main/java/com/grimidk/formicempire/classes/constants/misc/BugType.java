@@ -3,7 +3,7 @@ package com.grimidk.formicempire.classes.constants.misc;
 import javax.swing.ImageIcon;
 
 import com.grimidk.formicempire.classes.constants.Constant;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
+import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
 public class BugType extends Constant{
     private final String scientificNameKey;
@@ -14,8 +14,13 @@ public class BugType extends Constant{
     private final float baseDefense;
     private final float baseSpeed;
     private final ImageIcon sprite;
+    private final boolean pet;
 
     public BugType(int id, String name, String scientificNameKey, float baseHealth, float baseRegen, float baseAttack, float baseAttackSpeed, float baseDefense, float baseSpeed, ImageIcon icon, ImageIcon sprite) {
+        this(id, name, scientificNameKey, baseHealth, baseRegen, baseAttack, baseAttackSpeed, baseDefense, baseSpeed, icon, sprite, false);
+    }
+
+    public BugType(int id, String name, String scientificNameKey, float baseHealth, float baseRegen, float baseAttack, float baseAttackSpeed, float baseDefense, float baseSpeed, ImageIcon icon, ImageIcon sprite, boolean pet) {
         super(id, name, icon);
         this.scientificNameKey = scientificNameKey;
         this.baseHealth = baseHealth;
@@ -25,11 +30,11 @@ public class BugType extends Constant{
         this.baseDefense = baseDefense;
         this.baseSpeed = baseSpeed;
         this.sprite = sprite;
+        this.pet = pet;
     }
 
-    //no icon
-    public BugType(int id, String name, String scientificNameKey, float baseHealth, float baseRegen, float baseAttack, float baseAttackSpeed, float baseDefense, float baseSpeed, ImageIcon sprite) {
-        this(id, name, scientificNameKey, baseHealth, baseRegen, baseAttack, baseAttackSpeed, baseDefense, baseSpeed, null, sprite);
+    public boolean isPet() {
+        return pet;
     }
 
     public String getScientificName() {

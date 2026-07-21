@@ -1,13 +1,17 @@
 package com.grimidk.formicempire.classes.infrasctructure;
 
 import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.Tunnel;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -79,21 +83,79 @@ public class WorldTest {
         
         assertNotNull(cA);
         assertNotNull(cB);
-        
-        // The fix should ensure BOTH colonies get the project if they belong to the dynasty
-        // because we don't know which one started it, so we assign to both to be safe/efficient.
-        // Wait, did I implement "assign to both"? Yes:
-        // if (hA... && hA...getDynasty() == d) ...
-        // if (hB... && hB...getDynasty() == d) ...
-        
+
+        // Incomplete tunnels resume on a single sponsor (hex A preferred) so both
+        // endpoints do not dig the same project and progress without diggers.
         Tunnel tA = cA.getCurrentTunnelProject();
         Tunnel tB = cB.getCurrentTunnelProject();
-        
+
         assertNotNull(tA, "Colony A should have resumed tunnel project");
-        assertNotNull(tB, "Colony B should have resumed tunnel project");
-        
-        assertSame(tA, tB, "Both colonies should be working on the SAME tunnel instance");
+        assertNull(tB, "Colony B should not also sponsor the same tunnel");
+
         assertEquals(50.0, tA.getProgress(), 0.001);
         assertFalse(tA.isComplete());
+    }
+
+    @Test
+    void generateWorldIncludesEachNonOmniSpecies() {
+        World world = new World();
+        Colony colony = new Colony(1, "Test Prime", true);
+        world.generateWorld(
+                GameConstants.BIOME_PLAINS,
+                8,
+                colony,
+                "Test",
+                LanguageStrings.DYNASTY_TITLE_DYNASTY);
+
+        Set<Integer> npcSpeciesIds = new HashSet<>();
+        for (Dynasty dynasty : world.getDynastys()) {
+            if (!dynasty.isPlayer() && dynasty.getSpecies() != null) {
+                npcSpeciesIds.add(dynasty.getSpecies().getId());
+            }
+        }
+
+        for (var species : GameConstants.getWorldSpawnableNpcSpecies()) {
+            assertTrue(npcSpeciesIds.contains(species.getId()),
+                    "Missing NPC dynasty for species id " + species.getId());
+        }
+    }
+
+    @Test
+    void minDynastyHexDistanceUsesClosestColonyPair() {
+        World world = new World();
+        ArrayList<Hex> hexes = new ArrayList<>();
+
+        Dynasty dynastyA = new Dynasty(1, "Alpha", true, GameConstants.SPECIES_OMNI);
+        Dynasty dynastyB = new Dynasty(2, "Beta", false, GameConstants.SPECIES_OMNI);
+
+        Colony aFar = new Colony(1, "A Far", true);
+        Colony aNear = new Colony(2, "A Near", true);
+        Colony bOnly = new Colony(3, "B Only", false);
+        aFar.setDynasty(dynastyA);
+        aNear.setDynasty(dynastyA);
+        bOnly.setDynasty(dynastyB);
+
+        Hex hexAFar = new Hex();
+        hexAFar.setQ(0);
+        hexAFar.setR(0);
+        hexAFar.setColony(aFar);
+
+        Hex hexANear = new Hex();
+        hexANear.setQ(3);
+        hexANear.setR(0);
+        hexANear.setColony(aNear);
+
+        Hex hexB = new Hex();
+        hexB.setQ(4);
+        hexB.setR(0);
+        hexB.setColony(bOnly);
+
+        hexes.add(hexAFar);
+        hexes.add(hexANear);
+        hexes.add(hexB);
+        world.setHexes(hexes);
+
+        assertEquals(1, world.minDynastyHexDistance(dynastyA, dynastyB));
+        assertEquals(Integer.MAX_VALUE, world.minDynastyHexDistance(dynastyA, null));
     }
 }

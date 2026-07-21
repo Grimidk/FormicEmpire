@@ -12,11 +12,6 @@ public class MoveStatus extends Constant {
         this.speedMult = speedMult;
     }
 
-    //(no icon)
-    public MoveStatus(int id, String name, float speedMult) {
-        this(id, name, speedMult, null);
-    }
-
     public float getSpeedMult() {
         return speedMult;
     }

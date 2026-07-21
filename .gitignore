@@ -25,7 +25,10 @@ dependency-reduced-pom.xml
 GEMINI.md
 AGENTS.md
 
-# Package
+# Package / bundled runtimes
+outputs/
 FormicEmpire_Release/
 FormicEmpire_Release.zip
 jre/
+jre-linux/
+jdk-*-jre/

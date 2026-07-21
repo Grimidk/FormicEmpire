@@ -7,16 +7,19 @@ import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TriggerManager;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
+import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.util.UiCursors;
+import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
+import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
 import java.awt.*;
+import java.awt.event.AWTEventListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
-
 public class MainFrame extends JFrame implements TriggerManager.TriggerListener {
+    public static final String CARD_INTRO = "INTRO";
     public static final String CARD_INIT = "INIT";
     public static final String CARD_SAVE = "SAVE";
     public static final String CARD_HELP = "HELP";
@@ -29,11 +32,86 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
     private final GamePanel gamePanel;
     private final SaveSelectPanel saveSelectPanel;
     private final SettingsPanel settingsPanel;
+    private final IntroPanel introPanel;
     private final InitPanel initPanel;
     private final HelpPanel helpPanel;
+    private String menuReturnCard = CARD_INIT;
 
     private Cursor cursorNormal;
     private Cursor cursorClick;
+    private AWTEventListener cursorEventListener;
+    private boolean cursorPressed;
+    private Component pressedCursorComponent;
+    private Cursor pressedCursorPrevious;
+    private boolean pausedForFocusLoss;
+    private final Runnable translationRefresh = this::refreshTranslations;
+
+    private boolean isGameWindow(Window window) {
+        if (window == null) {
+            return false;
+        }
+        if (window == this) {
+            return true;
+        }
+        return window instanceof Dialog dialog && dialog.getOwner() == this;
+    }
+
+    public void applyGameCursors(Window window) {
+        if (window == null || cursorNormal == null) {
+            return;
+        }
+        cursorPressed = false;
+        window.setCursor(cursorNormal);
+        clearInheritedCursors(window);
+    }
+
+    private void clearInheritedCursors(Container container) {
+        for (Component child : container.getComponents()) {
+            Cursor childCursor = child.getCursor();
+            if (UiCursors.isHoverCursor(childCursor)) {
+                continue;
+            }
+            child.setCursor(null);
+            if (child instanceof Container nested) {
+                clearInheritedCursors(nested);
+            }
+        }
+    }
+
+    private void applyGameCursorForMouseEvent(MouseEvent me) {
+        if (cursorNormal == null || cursorClick == null) {
+            return;
+        }
+        Component source = me.getComponent();
+        if (source == null) {
+            return;
+        }
+        Window window = SwingUtilities.getWindowAncestor(source);
+        if (!isGameWindow(window)) {
+            return;
+        }
+        if (me.getID() == MouseEvent.MOUSE_PRESSED) {
+            cursorPressed = true;
+            pressedCursorComponent = source;
+            pressedCursorPrevious = source.getCursor();
+            source.setCursor(cursorClick);
+            window.setCursor(cursorClick);
+        } else if (me.getID() == MouseEvent.MOUSE_RELEASED) {
+            cursorPressed = false;
+            if (pressedCursorComponent != null) {
+                pressedCursorComponent.setCursor(pressedCursorPrevious);
+                pressedCursorComponent = null;
+                pressedCursorPrevious = null;
+            }
+            window.setCursor(cursorNormal);
+        } else if (me.getID() == MouseEvent.MOUSE_DRAGGED && !cursorPressed) {
+            window.setCursor(cursorNormal);
+        }
+    }
+
+    public void clearFocusPauseState() {
+        pausedForFocusLoss = false;
+    }
 
     public CardLayout getCardLayout() {
         return cardLayout;
@@ -47,6 +125,22 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         return gamePanel;
     }
 
+    public Cursor getGameCursorNormal() {
+        return cursorNormal;
+    }
+
+    public Cursor getGameCursorClick() {
+        return cursorClick;
+    }
+
+    public Cursor getGameCursorClickable() {
+        return AssetStyles.cursorClickable();
+    }
+
+    public Cursor getGameCursorWriteable() {
+        return AssetStyles.cursorWriteable();
+    }
+
     public SaveSelectPanel getSaveSelectPanel() {
         return saveSelectPanel;
     }
@@ -56,10 +150,10 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
     }
 
     public MainFrame(Engine engine) {
-        super(LanguageStrings.get(LanguageStrings.UI_APP_TITLE));
+        super(LanguageStrings.APP_DISPLAY_NAME);
         this.engine = engine;
         
-        Image icon = AssetStyles.loadImage("/icon.ico");
+        Image icon = AssetStyles.loadImage(AssetStyles.META_APP_ICON);
         if (icon != null) {
             setIconImage(icon);
         }
@@ -69,12 +163,14 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
 
         initCursors();
 
+        this.introPanel = new IntroPanel(this);
         this.initPanel = new InitPanel(this);
         this.saveSelectPanel = new SaveSelectPanel(this);
         this.helpPanel = new HelpPanel(this);
         this.settingsPanel = new SettingsPanel(this);
         this.gamePanel = new GamePanel(this);
 
+        cards.add(introPanel, CARD_INTRO);
         cards.add(initPanel, CARD_INIT);
         cards.add(saveSelectPanel, CARD_SAVE);
         cards.add(helpPanel, CARD_HELP);
@@ -96,7 +192,11 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         addWindowFocusListener(new WindowFocusListener() {
             @Override
             public void windowGainedFocus(WindowEvent e) {
-                if (engine.isPauseOnFocusLoss() && gamePanel.isEngineStarted() && engine.isPaused()) {
+                if (!engine.isPauseOnFocusLoss() || !gamePanel.isEngineStarted() || !pausedForFocusLoss) {
+                    return;
+                }
+                pausedForFocusLoss = false;
+                if (engine.isPaused()) {
                     engine.resumeEngine();
                     gamePanel.updateStatusIndicator(false);
                 }
@@ -104,52 +204,96 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
 
             @Override
             public void windowLostFocus(WindowEvent e) {
-                if (engine.isPauseOnFocusLoss() && gamePanel.isEngineStarted() && !engine.isPaused()) {
-                    engine.pauseEngine();
-                    gamePanel.updateStatusIndicator(true);
+                if (!engine.isPauseOnFocusLoss() || !gamePanel.isEngineStarted() || engine.isPaused()) {
+                    return;
                 }
+                engine.pauseEngine();
+                pausedForFocusLoss = true;
+                gamePanel.updateStatusIndicator(true);
             }
         });
 
         applyEngineSettings();
         
-        LanguageStrings.addListener(this::refreshTranslations);
+        LanguageStrings.addListener(translationRefresh);
+    }
+
+    public void applyTheme() {
+        AssetStyles.applyTheme(engine.isDarkMode());
+        AssetStyles.applyGlobalStyles();
+        SwingUtilities.updateComponentTreeUI(this);
+        getContentPane().setBackground(AssetStyles.BACKGROUND_COLOR);
+        cards.setBackground(AssetStyles.BACKGROUND_COLOR);
+        AssetStyles.applyThemeToContainer(cards);
+        applyGameCursors(this);
+        settingsPanel.refreshTheme();
+        helpPanel.refreshTheme();
+        saveSelectPanel.refreshTheme();
+        initPanel.refreshTheme();
+        gamePanel.refreshTheme();
+    }
+
+    public void requestExit() {
+        handleExit();
     }
     
     private void handleExit() {
-        if (engine.isConfirmOnQuit()) {
-            int res = JOptionPane.showConfirmDialog(this, 
-                LanguageStrings.get("UI_CONFIRM_EXIT_MSG"), 
-                LanguageStrings.get("UI_CONFIRM_EXIT_TITLE"), 
+        if (gamePanel.isEngineStarted() && engine.isConfirmOnQuit()) {
+            int res = UiOptionPane.showConfirmDialog(this, 
+                LanguageStrings.get(LanguageStrings.UI_CONFIRM_EXIT_MSG), 
+                LanguageStrings.get(LanguageStrings.UI_CONFIRM_EXIT_TITLE), 
                 JOptionPane.YES_NO_OPTION);
             if (res == JOptionPane.YES_OPTION) {
-                System.exit(0);
+                shutdownAndExit();
             }
         } else {
-            System.exit(0);
+            shutdownAndExit();
         }
+    }
+
+    private void shutdownAndExit() {
+        gamePanel.endSession();
+        LanguageStrings.removeListener(translationRefresh);
+        engine.pauseEngine();
+        SaveManager.shutdownSharedExecutor();
+        if (cursorEventListener != null) {
+            Toolkit.getDefaultToolkit().removeAWTEventListener(cursorEventListener);
+            cursorEventListener = null;
+        }
+        System.exit(0);
     }
     
     private void refreshTranslations() {
-        setTitle(LanguageStrings.get(LanguageStrings.UI_APP_TITLE));
+        setTitle(LanguageStrings.APP_DISPLAY_NAME);
         saveSelectPanel.refreshTranslations();
+        introPanel.refreshTranslations();
         initPanel.refreshTranslations();
         helpPanel.refreshTranslations();
+        settingsPanel.refreshTranslations();
+        gamePanel.refreshTranslations();
+    }
+
+    public String getMenuReturnCard() {
+        return menuReturnCard;
+    }
+
+    public void showSettingsMenu(String returnTo) {
+        menuReturnCard = returnTo;
+        showCard(CARD_SETTINGS);
     }
 
     private void initCursors() {
-        cursorNormal = AssetStyles.loadCustomCursor("/icons/ui/cursor_normal.png", "AntCursorNormal");
-        cursorClick = AssetStyles.loadCustomCursor("/icons/ui/cursor_click.png", "AntCursorClick");
-        
+        AssetStyles.installCursors();
+        cursorNormal = AssetStyles.cursorNormal();
+        cursorClick = AssetStyles.cursorClick();
+
         setCursor(cursorNormal);
 
-        Toolkit.getDefaultToolkit().addAWTEventListener(event -> {
-            if (event instanceof MouseEvent) {
-                MouseEvent me = (MouseEvent) event;
-                if (me.getID() == MouseEvent.MOUSE_PRESSED) {
-                    setCursor(cursorClick);
-                } else if (me.getID() == MouseEvent.MOUSE_RELEASED) {
-                    setCursor(cursorNormal);
+        Toolkit.getDefaultToolkit().addAWTEventListener(cursorEventListener = event -> {
+            if (event instanceof MouseEvent me) {
+                int id = me.getID();
+                if (id == MouseEvent.MOUSE_PRESSED || id == MouseEvent.MOUSE_RELEASED || id == MouseEvent.MOUSE_DRAGGED) {
+                    applyGameCursorForMouseEvent(me);
                 }
             }
         }, AWTEvent.MOUSE_EVENT_MASK);
@@ -159,33 +303,75 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         return engine;
     }
 
-    public void applyEngineSettings() {
-        if (engine.isFullScreen()) {
-            dispose();
-            setUndecorated(true);
-            
-            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-            setSize(screenSize);
-            setVisible(true);
-            
-            setExtendedState(JFrame.MAXIMIZED_BOTH);
-        } else {
-            dispose();
-            setUndecorated(false);
-            setExtendedState(JFrame.NORMAL);
-            String[] size = engine.getScreenSize().split("x");
-            try {
-                int width = Integer.parseInt(size[0]);
-                int height = Integer.parseInt(size[1]);
-                setSize(width, height);
-            } catch (Exception e) {
-                setSize(1000, 700);
-            }
-            setLocationRelativeTo(null);
-            setVisible(true);
-        }
-        
+    public void applyRuntimeSettings() {
         ToolTipManager.sharedInstance().setEnabled(engine.isShowTooltips());
+        initPanel.refreshMenuOptions();
+        if (gamePanel != null) {
+            gamePanel.refreshAuditMenuOption();
+        }
+        applyTheme();
+    }
+
+    public void applyEngineSettings() {
+        reapplyWindowChrome();
+        applyRuntimeSettings();
+    }
+
+    private void reapplyWindowChrome() {
+        Runnable apply = () -> {
+            boolean wantFullscreen = engine.isFullScreen();
+
+            if (wantFullscreen) {
+                setVisible(false);
+                dispose();
+                setUndecorated(true);
+                setExtendedState(JFrame.NORMAL);
+                Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+                setSize(screenSize);
+                setVisible(true);
+                setExtendedState(JFrame.MAXIMIZED_BOTH);
+            } else {
+                if (isUndecorated()) {
+                    setVisible(false);
+                    dispose();
+                    setUndecorated(false);
+                }
+                setExtendedState(JFrame.NORMAL);
+                applyWindowedSizeFromEngine();
+                setLocationRelativeTo(null);
+                setVisible(true);
+            }
+
+            validate();
+            repaint();
+            applyGameCursors(this);
+            requestFocus();
+            if (gamePanel != null) {
+                gamePanel.onWindowGeometryChanged();
+            }
+        };
+
+        if (SwingUtilities.isEventDispatchThread()) {
+            apply.run();
+        } else {
+            SwingUtilities.invokeLater(apply);
+        }
+    }
+
+    private void applyWindowedSizeFromEngine() {
+        String screenSize = engine.getScreenSize();
+        if (screenSize == null || !screenSize.contains("x")) {
+            setSize(1000, 700);
+            return;
+        }
+        String[] parts = screenSize.split("x");
+        try {
+            int width = Integer.parseInt(parts[0].trim());
+            int height = Integer.parseInt(parts[1].trim());
+            setSize(Math.max(width, 640), Math.max(height, 480));
+        } catch (NumberFormatException e) {
+            setSize(1000, 700);
+        }
     }
 
     public void showCard(String card) {
@@ -200,12 +386,13 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
             } catch (Exception ignore) {}
         }
         cardLayout.show(cards, card);
+        applyGameCursors(this);
     }
 
     public void openGameWithSave(Savefile savefile) {
         showCard(CARD_GAME);
         gamePanel.enterWithSavefile(savefile);
-        applyEngineSettings();
+        applyRuntimeSettings();
     }
     
     @Override
@@ -213,14 +400,18 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         boolean wasPaused = engine.isPaused();
         if (!wasPaused) {
             engine.pauseEngine();
-            if (gamePanel != null) gamePanel.updateStatusIndicator(true);
+            if (gamePanel != null) {
+                gamePanel.updateStatusIndicator(true);
+            }
         }
-        
-        JOptionPane.showMessageDialog(this, message, title, JOptionPane.INFORMATION_MESSAGE);
-        
+
+        UiOptionPane.showForegroundMessageDialog(this, message, title, JOptionPane.INFORMATION_MESSAGE);
+
         if (!wasPaused) {
             engine.resumeEngine();
-            if (gamePanel != null) gamePanel.updateStatusIndicator(false);
+            if (gamePanel != null) {
+                gamePanel.updateStatusIndicator(false);
+            }
         }
 
         if (gamePanel != null) {
@@ -237,7 +428,7 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         String title = LanguageStrings.get(LanguageStrings.DEATH_TITLE);
         String message = LanguageStrings.get(LanguageStrings.DEATH_MESSAGE);
 
-        int choice = JOptionPane.showOptionDialog(
+        int choice = UiOptionPane.showForegroundOptionDialog(
                 this,
                 message,
                 title,
@@ -252,16 +443,16 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
             int slotId = (engine.getWorld() != null) ? engine.getWorld().getSaveSlotId() : 0;
             
             if (slotId == 0) {
-                JOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.DEATH_LOAD_FAILED_NEW_GAME), LanguageStrings.get(LanguageStrings.DEATH_LOAD_FAILED_TITLE), JOptionPane.ERROR_MESSAGE);
+                UiOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.DEATH_LOAD_FAILED_NEW_GAME), LanguageStrings.get(LanguageStrings.DEATH_LOAD_FAILED_TITLE), JOptionPane.ERROR_MESSAGE);
                 handleQuitToMenu();
             } else {
-                SaveManager sm = new SaveManager();
+                SaveManager sm = engine.getSaveManager();
                 Savefile saveToLoad = sm.loadAutosaveForSlot(slotId);
                 
                 if (saveToLoad != null) {
                     openGameWithSave(saveToLoad);
                 } else {
-                    JOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.DEATH_LOAD_FAILED_NO_AUTOSAVE), LanguageStrings.get(LanguageStrings.DEATH_LOAD_FAILED_TITLE), JOptionPane.ERROR_MESSAGE);
+                    UiOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.DEATH_LOAD_FAILED_NO_AUTOSAVE), LanguageStrings.get(LanguageStrings.DEATH_LOAD_FAILED_TITLE), JOptionPane.ERROR_MESSAGE);
                     handleQuitToMenu();
                 }
             }

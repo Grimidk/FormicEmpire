@@ -3,7 +3,9 @@ package com.grimidk.formicempire.classes.constants.misc;
 import javax.swing.ImageIcon;
 
 import com.grimidk.formicempire.classes.constants.Constant;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 
 public class ResourceType extends Constant {
     public static final int SOURCE_QTY_SMALL = 100;
@@ -63,7 +65,7 @@ public class ResourceType extends Constant {
         if (quantity >= SOURCE_QTY_MEDIUM && sourceSpriteMedium != null) {
             return sourceSpriteMedium;
         }
-        if (quantity >= SOURCE_QTY_SMALL && sourceSpriteSmall != null) {
+        if (sourceSpriteSmall != null) {
             return sourceSpriteSmall;
         }
         return getIcon();
@@ -71,14 +73,27 @@ public class ResourceType extends Constant {
 
     public int getDisplaySizeForSourceQuantity(int quantity) {
         if (quantity >= SOURCE_QTY_HUGE) {
-            return GameConstants.SOURCE_DISPLAY_PX_HUGE;
+            return GameNumbers.SOURCE_DISPLAY_PX_HUGE;
         }
         if (quantity >= SOURCE_QTY_BIG) {
-            return GameConstants.SOURCE_DISPLAY_PX_BIG;
+            return GameNumbers.SOURCE_DISPLAY_PX_BIG;
         }
         if (quantity >= SOURCE_QTY_MEDIUM) {
-            return GameConstants.SOURCE_DISPLAY_PX_MEDIUM;
+            return GameNumbers.SOURCE_DISPLAY_PX_MEDIUM;
         }
-        return GameConstants.SOURCE_DISPLAY_PX_SMALL;
+        return GameNumbers.SOURCE_DISPLAY_PX_SMALL;
+    }
+
+    public String getSourceSizeLabelKey(int quantity) {
+        if (quantity >= SOURCE_QTY_HUGE) {
+            return LanguageStrings.HELP_RESOURCE_SOURCE_HUGE;
+        }
+        if (quantity >= SOURCE_QTY_BIG) {
+            return LanguageStrings.HELP_RESOURCE_SOURCE_BIG;
+        }
+        if (quantity >= SOURCE_QTY_MEDIUM) {
+            return LanguageStrings.HELP_RESOURCE_SOURCE_MEDIUM;
+        }
+        return LanguageStrings.HELP_RESOURCE_SOURCE_SMALL;
     }
 }

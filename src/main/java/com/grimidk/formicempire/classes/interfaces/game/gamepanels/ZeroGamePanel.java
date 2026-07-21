@@ -1,7 +1,7 @@
 package com.grimidk.formicempire.classes.interfaces.game.gamepanels;
 
-import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
+import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
+import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -31,6 +31,13 @@ public abstract class ZeroGamePanel extends JPanel {
         for (Map.Entry<JPanel, String> entry : titledPanels.entrySet()) {
             updateTitledBorder(entry.getKey(), entry.getValue());
         }
+    }
+
+    public void refreshTheme() {
+        setBackground(AssetStyles.UI_BG_PRIMARY);
+        setForeground(AssetStyles.TEXT_NORMAL);
+        refreshTranslations();
+        AssetStyles.applyThemeToContainer(this);
     }
 
     protected void setTitledBorder(String key) {

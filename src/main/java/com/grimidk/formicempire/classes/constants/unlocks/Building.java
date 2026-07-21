@@ -2,7 +2,7 @@ package com.grimidk.formicempire.classes.constants.unlocks;
 
 import javax.swing.ImageIcon;
 import com.grimidk.formicempire.classes.constants.Constant;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
+import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
 public class Building extends Constant {
     private final int level;
@@ -22,6 +22,10 @@ public class Building extends Constant {
         this.mineralCost = mineralCost;
         this.buildTime = buildTime;
         this.sprite = sprite;
+    }
+
+    public Building(int id, String nameKey, int level, String descriptionKey, Building requirement, int resinCost, int mineralCost, int buildTime, ImageIcon roomArt) {
+        this(id, nameKey, level, descriptionKey, requirement, resinCost, mineralCost, buildTime, roomArt, roomArt);
     }
 
     //(no icon/sprite)

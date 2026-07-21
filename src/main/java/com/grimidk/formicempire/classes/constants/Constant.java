@@ -1,7 +1,7 @@
 package com.grimidk.formicempire.classes.constants;
 
 import javax.swing.ImageIcon;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
+import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
 public class Constant {
     private final int id;
@@ -21,7 +21,7 @@ public class Constant {
     public String getName() {
         return LanguageStrings.get(nameKey);
     }
-    
+
     public String getNameKey() {
         return nameKey;
     }

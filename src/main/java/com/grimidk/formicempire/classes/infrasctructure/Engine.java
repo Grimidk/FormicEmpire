@@ -11,12 +11,12 @@ import com.grimidk.formicempire.classes.constants.misc.GameSpeed;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
 public class Engine extends Thread {
     private World world;
-    private GameSpeed speed = GameSpeed.NORMAL;
+    private GameSpeed speed = GameConstants.SPEED_NORMAL;
     private final Semaphore semaphore;
     private boolean killSwitch;
     private volatile boolean paused;
@@ -36,27 +36,35 @@ public class Engine extends Thread {
     private String language = "en";
     private boolean allowTurboMode = false;
     private String screenSize = "1000x700";
-    private boolean fullScreen = false;
+    private boolean fullScreen = true;
     private int autosaveFrequency = 1; // 1 = every month
     
     private boolean daylightColorOverlayEnabled = true;
     private boolean weatherColorOverlayEnabled = true;
     private boolean arachnophobiaMode = false;
     
-    private int masterVolume = 80;
-    private int musicVolume = 70;
-    private int sfxVolume = 100;
+    private int masterVolume = 50;
+    private int musicVolume = 50;
+    private int sfxVolume = 50;
     
     private boolean pauseOnFocusLoss = true;
     private boolean confirmOnQuit = true;
+    private boolean escapeKeyGameActions = true;
     private boolean showTooltips = true;
     
-    private boolean fuzzParasites = true;
+    private boolean fuzzParasiteAnts = true;
+    private boolean showAuditMenu = false;
+    private boolean overworldAutoRecenter = true;
+    private boolean darkMode = false;
     private int defaultRoleWorker = 1; // ROLE_FORAGER
     private int defaultRoleSoldier = 16; // ROLE_HUNTER
-    private int defaultRoleMajor = 17; // ROLE_BRUTE
+    private int defaultRoleMajor = 29; // ROLE_CRANE
     private int defaultRolePrincess = 23; // ROLE_BREEDER
     private int defaultRoleQueen = 25; // ROLE_LAYER
+
+    private long lastSpeedDownStepMs;
+    private long lastSpeedUpStepMs;
+    private static final long SPEED_STEP_COALESCE_MS = 120;
 
     public Engine() {
         this.semaphore = new Semaphore(1);
@@ -70,6 +78,10 @@ public class Engine extends Thread {
 
     public TradeManager getTradeManager() {
         return tradeManager;
+    }
+
+    public SaveManager getSaveManager() {
+        return settingsSaveManager;
     }
 
     public void loadGlobalSettings() {
@@ -96,30 +108,81 @@ public class Engine extends Thread {
     }
 
     public void setDelay(float delay) {
-        // Find closest speed for backward compatibility
-        GameSpeed closest = GameSpeed.NORMAL;
-        int minDiff = Integer.MAX_VALUE;
-        for (GameSpeed s : GameSpeed.values()) {
-            int diff = Math.abs(s.getDelayMs() - (int)delay);
-            if (diff < minDiff) {
-                minDiff = diff;
-                closest = s;
-            }
-        }
-        this.speed = closest;
+        this.speed = GameSpeed.closestToDelayMs((int) delay);
     }
-    
+
     public GameSpeed getSpeed() {
         return speed;
     }
-    
+
+    public String getSpeedLabel() {
+        if (paused) {
+            return LanguageStrings.get(LanguageStrings.UI_PAUSED_TICK);
+        }
+        return speed.getLabel();
+    }
+
     public void setSpeed(GameSpeed speed) {
-        if (speed != null) {
-            if (speed == GameSpeed.TURBO && !allowTurboMode) {
-                this.speed = GameSpeed.VERY_FAST;
-            } else {
-                this.speed = speed;
+        if (speed == null) {
+            return;
+        }
+        GameSpeed resolved = speed;
+        if (speed.getId() > GameSpeed.maxPlayableId(allowTurboMode)) {
+            resolved = GameSpeed.fromId(GameSpeed.maxPlayableId(allowTurboMode));
+        }
+        if (this.speed != resolved) {
+            this.speed = resolved;
+            interrupt();
+        }
+    }
+
+    public void stepSpeedUp() {
+        adjustSpeedStep(1);
+    }
+
+    public void stepSpeedDown() {
+        adjustSpeedStep(-1);
+    }
+
+    public void adjustSpeedStep(int direction) {
+        if (direction == 0) {
+            return;
+        }
+        long now = System.currentTimeMillis();
+        if (direction < 0) {
+            if (now - lastSpeedDownStepMs < SPEED_STEP_COALESCE_MS) {
+                return;
             }
+            lastSpeedDownStepMs = now;
+        } else {
+            if (now - lastSpeedUpStepMs < SPEED_STEP_COALESCE_MS) {
+                return;
+            }
+            lastSpeedUpStepMs = now;
+        }
+        if (direction < 0) {
+            if (paused) {
+                return;
+            }
+            if (speed.getId() == GameSpeed.ID_VERY_SLOW) {
+                pauseEngine();
+                return;
+            }
+            setSpeed(GameSpeed.step(speed, -1, allowTurboMode));
+            return;
+        }
+        if (paused) {
+            resumeEngine();
+            return;
+        }
+        setSpeed(GameSpeed.step(speed, 1, allowTurboMode));
+    }
+
+    public void togglePause() {
+        if (paused) {
+            resumeEngine();
+        } else {
+            pauseEngine();
         }
     }
 
@@ -234,6 +297,7 @@ public class Engine extends Thread {
 
     public void startUp(Savefile savefile) {
         System.out.println("[Engine] Starting up Engine...");
+        tradeManager.clearActiveTrades();
         World world = new World();
         this.setWorld(world);
 
@@ -253,19 +317,17 @@ public class Engine extends Thread {
             try {
                 Thread.sleep(speed.getDelayMs());
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Thread.interrupted();
+                continue;
             }
 
             if (!paused) {
+                semaphore.acquireUninterruptibly();
                 try {
-                    semaphore.acquire();
                     if (this.world != null) {
-                        this.world.runMinute(); 
-                        notifyMinuteListeners(); 
+                        this.world.runMinute();
+                        notifyMinuteListeners();
                     }
-
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
                 } finally {
                     semaphore.release();
                 }
@@ -281,6 +343,9 @@ public class Engine extends Thread {
     public void setLanguage(String language) {
         this.language = (language != null) ? language : "en";
         LanguageStrings.setLanguage(this.language);
+        if (this.world != null) {
+            this.world.relocalizeDynastyNames();
+        }
     }
 
     public boolean isAllowTurboMode() {
@@ -289,8 +354,8 @@ public class Engine extends Thread {
 
     public void setAllowTurboMode(boolean allowTurboMode) {
         this.allowTurboMode = allowTurboMode;
-        if (!allowTurboMode && speed == GameSpeed.TURBO) {
-            speed = GameSpeed.VERY_FAST;
+        if (!allowTurboMode && speed.getId() > GameSpeed.maxPlayableId(false)) {
+            speed = GameSpeed.fromId(GameSpeed.maxPlayableId(false));
         }
     }
 
@@ -382,6 +447,14 @@ public class Engine extends Thread {
         this.confirmOnQuit = confirmOnQuit;
     }
 
+    public boolean isEscapeKeyGameActions() {
+        return escapeKeyGameActions;
+    }
+
+    public void setEscapeKeyGameActions(boolean escapeKeyGameActions) {
+        this.escapeKeyGameActions = escapeKeyGameActions;
+    }
+
     public boolean isShowTooltips() {
         return showTooltips;
     }
@@ -390,12 +463,36 @@ public class Engine extends Thread {
         this.showTooltips = showTooltips;
     }
 
-    public boolean isFuzzParasites() {
-        return fuzzParasites;
+    public boolean isFuzzParasiteAnts() {
+        return fuzzParasiteAnts;
     }
 
-    public void setFuzzParasites(boolean fuzzParasites) {
-        this.fuzzParasites = fuzzParasites;
+    public void setFuzzParasiteAnts(boolean fuzzParasiteAnts) {
+        this.fuzzParasiteAnts = fuzzParasiteAnts;
+    }
+
+    public boolean isShowAuditMenu() {
+        return showAuditMenu;
+    }
+
+    public void setShowAuditMenu(boolean showAuditMenu) {
+        this.showAuditMenu = showAuditMenu;
+    }
+
+    public boolean isOverworldAutoRecenter() {
+        return overworldAutoRecenter;
+    }
+
+    public void setOverworldAutoRecenter(boolean overworldAutoRecenter) {
+        this.overworldAutoRecenter = overworldAutoRecenter;
+    }
+
+    public boolean isDarkMode() {
+        return darkMode;
+    }
+
+    public void setDarkMode(boolean darkMode) {
+        this.darkMode = darkMode;
     }
 
     public int getDefaultRoleWorker() {
@@ -465,7 +562,9 @@ public class Engine extends Thread {
                 return legacyDefaultRoleForAntType(type);
             }
             AntRole chosen = GameConstants.getAntRoleById(roleId);
-            if (chosen != null && chosen.getAntType() == type) {
+            if (chosen != null && chosen.getAntType() == type
+                    && !GameConstants.isWarEconomyExclusiveRole(chosen)
+                    && GameConstants.isObtainableRole(chosen)) {
                 return chosen;
             }
         }
@@ -480,7 +579,7 @@ public class Engine extends Thread {
             return GameConstants.ROLE_HUNTER;
         }
         if (type == GameConstants.TYPE_MAJOR) {
-            return GameConstants.ROLE_BRUTE;
+            return GameConstants.ROLE_CRANE;
         }
         if (type == GameConstants.TYPE_PRINCESS) {
             return GameConstants.ROLE_BREEDER;
@@ -496,10 +595,18 @@ public class Engine extends Thread {
 
     public static int sanitizeDefaultRoleId(AntType type, int desiredRoleId, int fallbackRoleId) {
         AntRole r = GameConstants.getAntRoleById(desiredRoleId);
-        if (r != null && r.getAntType() == type) {
+        if (r != null && r.getAntType() == type && !GameConstants.isWarEconomyExclusiveRole(r)
+                && GameConstants.isObtainableRole(r)) {
             return desiredRoleId;
         }
-        return fallbackRoleId;
+        AntRole fallback = GameConstants.getAntRoleById(fallbackRoleId);
+        if (fallback != null && fallback.getAntType() == type
+                && !GameConstants.isWarEconomyExclusiveRole(fallback)
+                && GameConstants.isObtainableRole(fallback)) {
+            return fallbackRoleId;
+        }
+        AntRole legacy = legacyDefaultRoleForAntType(type);
+        return legacy != null ? legacy.getId() : fallbackRoleId;
     }
 
     public static int defaultRoleIdForAntType(AntType type, Engine engine) {

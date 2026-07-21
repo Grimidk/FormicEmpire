@@ -5,7 +5,7 @@ import com.grimidk.formicempire.classes.constants.world.Season;
 import com.grimidk.formicempire.classes.constants.world.TimeOfDay;
 import com.grimidk.formicempire.classes.constants.world.Weather;
 import com.grimidk.formicempire.classes.infrasctructure.World;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
+import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
 import javax.swing.*;
 import java.awt.*;
@@ -105,10 +105,8 @@ public class WorldPanel extends ZeroGamePanel {
     public void refreshTranslations() {
         super.refreshTranslations();
         if (lastWorldRef != null) {
-            // Force refresh of localized tooltips
             updateStaticData(lastWorldRef);
             
-            // Re-apply tooltips for time/weather/etc
             if (lastTimeOfDay != null) timeOfDayLabel.setToolTipText(lastTimeOfDay.getName());
             if (lastWeather != null) weatherLabel.setToolTipText(lastWeather.getName());
             if (lastMoonPhase != null) moonPhaseLabel.setToolTipText(lastMoonPhase.getName());

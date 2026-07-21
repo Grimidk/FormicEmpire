@@ -1,20 +1,16 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
-import com.grimidk.formicempire.classes.infrasctructure.Engine;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
+import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
+import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.interfaces.MainFrame;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
 public abstract class ZeroDialog extends JDialog {
 
     protected final JPanel southPanel;
-    private static final float[] SPEED_DELAYS = { 250f, 125f, 60f, 30f, 15f, 5f, 1f};
     
     private final String titleKey;
     private final JButton closeButton;
@@ -22,6 +18,10 @@ public abstract class ZeroDialog extends JDialog {
     public ZeroDialog(JFrame owner, String titleKey, Dimension preferredSize) {
         super(owner, LanguageStrings.get(titleKey), true);
         this.titleKey = titleKey;
+
+        if (owner instanceof MainFrame mainFrame) {
+            mainFrame.applyGameCursors(this);
+        }
         
         getContentPane().setBackground(AssetStyles.UI_BG_PRIMARY);
         setLayout(new BorderLayout());
@@ -33,15 +33,13 @@ public abstract class ZeroDialog extends JDialog {
         southPanel.setBackground(AssetStyles.UI_BG_SECONDARY);
         
         closeButton = new JButton(LanguageStrings.get(LanguageStrings.UI_CLOSE));
-        closeButton.setFont(AssetStyles.FONT_NORMAL);
         closeButton.setFocusable(false);
+        AssetStyles.styleButton(closeButton);
         closeButton.addActionListener(e -> dispose());
         southPanel.add(closeButton);
         add(southPanel, BorderLayout.SOUTH);
 
-        initGlobalKeyBindings();
-
-        getRootPane().registerKeyboardAction(e -> dispose(),
+        getRootPane().registerKeyboardAction(e -> handleEscapeKey(),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_IN_FOCUSED_WINDOW);
         
@@ -51,6 +49,14 @@ public abstract class ZeroDialog extends JDialog {
     public void refreshTranslations() {
         setTitle(LanguageStrings.get(titleKey));
         closeButton.setText(LanguageStrings.get(LanguageStrings.UI_CLOSE));
+        refreshDialog();
+    }
+
+    public void refreshTheme() {
+        getContentPane().setBackground(AssetStyles.UI_BG_PRIMARY);
+        southPanel.setBackground(AssetStyles.UI_BG_SECONDARY);
+        AssetStyles.styleButton(closeButton);
+        AssetStyles.applyThemeToContainer(getContentPane());
         refreshDialog();
     }
 
@@ -65,84 +71,12 @@ public abstract class ZeroDialog extends JDialog {
         }
     }
 
-    private void initGlobalKeyBindings() {
-        InputMap inputMap = getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        ActionMap actionMap = getRootPane().getActionMap();
-
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0), "togglePause");
-        actionMap.put("togglePause", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Engine engine = getEngine();
-                if (engine == null) return;
-                if (engine.isPaused()) {
-                    engine.resumeEngine();
-                } else {
-                    engine.pauseEngine();
-                }
-                syncWithMainControlPanel();
-            }
-        });
-
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ADD, 0), "speedUp");
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, InputEvent.SHIFT_DOWN_MASK), "speedUp");
-        actionMap.put("speedUp", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                adjustSpeed(1);
-                syncWithMainControlPanel();
-            }
-        });
-
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_SUBTRACT, 0), "speedDown");
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, 0), "speedDown");
-        actionMap.put("speedDown", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                adjustSpeed(-1);
-                syncWithMainControlPanel();
-            }
-        });
-    }
-
-    private void adjustSpeed(int delta) {
-        Engine engine = getEngine();
-        if (engine == null) return;
-
-        float currentDelay = engine.getDelay();
-        int currentIndex = 0;
-        for (int i = 0; i < SPEED_DELAYS.length; i++) {
-            if (Math.abs(SPEED_DELAYS[i] - currentDelay) < 0.1) {
-                currentIndex = i;
-                break;
-            }
+    private void handleEscapeKey() {
+        if (getOwner() instanceof MainFrame frame && frame.getGamePanel() != null
+                && frame.getGamePanel().handleEscapeKey()) {
+            return;
         }
-
-        int newIndex = currentIndex + delta;
-        if (newIndex >= 0 && newIndex < SPEED_DELAYS.length) {
-            engine.setDelay(SPEED_DELAYS[newIndex]);
-            if (engine.isPaused()) engine.resumeEngine();
-        }
-    }
-
-    private void syncWithMainControlPanel() {
-        if (getOwner() instanceof MainFrame frame) {
-            if (frame.getGamePanel() != null) {
-                frame.getGamePanel().refreshAllGUIData();
-                
-                Engine engine = frame.getEngine();
-                if (engine != null) {
-                    frame.getGamePanel().updateStatusIndicator(engine.isPaused());
-                }
-            }
-        }
-    }
-
-    private Engine getEngine() {
-        if (getOwner() instanceof MainFrame frame) {
-            return frame.getEngine();
-        }
-        return null;
+        dispose();
     }
 
     protected void registerCloseKey(int keyEvent) {
@@ -175,6 +109,10 @@ public abstract class ZeroDialog extends JDialog {
             setLocationRelativeTo(null);
             Point loc = getLocation();
             setLocation(loc.x, loc.y + 60);
+        }
+
+        if (getOwner() instanceof MainFrame mainFrame) {
+            mainFrame.applyGameCursors(this);
         }
 
         setVisible(true);

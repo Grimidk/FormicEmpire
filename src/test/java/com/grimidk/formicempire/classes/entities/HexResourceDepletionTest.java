@@ -4,16 +4,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 
 class HexResourceDepletionTest {
 
     @Test
     void cappedDepletionRespectsMax() {
         Hex h = new Hex();
-        h.setNonWaterResourceSourcesGenerated(400 * GameConstants.HEX_RESOURCE_DEPLETION_SOURCES_PER_PERCENT);
+        h.setNonWaterResourceSourcesGenerated(400 * GameNumbers.HEX_RESOURCE_DEPLETION_SOURCES_PER_PERCENT);
         assertEquals(100, h.getResourceDepletionPercent());
-        assertEquals(80, h.getResourceDepletionPercentCapped(GameConstants.HEX_SUSTAIN_MAX_DEPLETION_PCT));
+        assertEquals(80, h.getResourceDepletionPercentCapped(GameNumbers.HEX_SUSTAIN_MAX_DEPLETION_PCT));
         assertEquals(100, h.getResourceDepletionPercentCapped(100));
     }
 }

@@ -40,11 +40,15 @@ public class ResourceSource {
     }
 
     public int getCenterX() {
-        return getX() + getDisplaySizePx() / 2;
+        return getX() + getPlacementDisplaySizePx() / 2;
     }
 
     public int getCenterY() {
-        return getY() + getDisplaySizePx() / 2;
+        return getY() + getPlacementDisplaySizePx() / 2;
+    }
+
+    private int getPlacementDisplaySizePx() {
+        return resourceType.getDisplaySizeForSourceQuantity(initialQuantity);
     }
 
     public int getQuantity() {

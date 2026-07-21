@@ -3,9 +3,10 @@ package com.grimidk.formicempire.classes.interfaces;
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
+import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.interfaces.game.dialogs.ZeroDialog;
 
 import javax.swing.*;
@@ -17,10 +18,23 @@ import java.util.Set;
 import java.util.List;
 
 public class SettingsPanel extends JPanel {
+    private static final String SECTION_GENERAL = "general";
+    private static final String SECTION_VIDEO = "video";
+    private static final String SECTION_AUDIO = "audio";
+    private static final String SECTION_ROLES = "roles";
+
     private final MainFrame frame;
     private final Engine engine;
+    private final boolean inDialog;
 
-    private JTabbedPane tabbedPane;
+    private final CardLayout sectionLayout = new CardLayout();
+    private final JPanel sectionCards = new JPanel(sectionLayout);
+    private final JPanel sectionTabs = new JPanel();
+    private JButton generalTabButton;
+    private JButton videoTabButton;
+    private JButton audioTabButton;
+    private JButton rolesTabButton;
+    private String selectedSection = SECTION_GENERAL;
     
     // --- General Tab ---
     private JComboBox<LanguageOption> languageCombo;
@@ -29,22 +43,26 @@ public class SettingsPanel extends JPanel {
     private JCheckBox arachnophobiaCheck;
     private JCheckBox pauseFocusCheck;
     private JCheckBox confirmQuitCheck;
+    private JCheckBox escapeKeyGameActionsCheck;
     private JCheckBox showTooltipsCheck;
-    private JCheckBox fuzzParasitesCheck;
+    private JCheckBox fuzzParasiteAntsCheck;
+    private JCheckBox showAuditMenuCheck;
+    private JCheckBox overworldAutoRecenterCheck;
     
     // --- Video Tab ---
     private JComboBox<String> sizeCombo;
     private JCheckBox fullScreenCheck;
     private JCheckBox daylightColorOverlayCheck;
     private JCheckBox weatherColorOverlayCheck;
+    private JCheckBox darkModeCheck;
 
     // --- Audio Tab ---
     private JSlider masterVolSlider;
     private JSlider musicVolSlider;
     private JSlider sfxVolSlider;
     
-    private JLabel langLabel, autoLabel, turboLabel, arachLabel, pauseFocusLabel, confirmQuitLabel, tooltipsLabel, fuzzParasitesLabel;
-    private JLabel sizeLabel, fsLabel, daylightColorOverlayLabel, weatherColorOverlayLabel;
+    private JLabel langLabel, autoLabel, turboLabel, arachLabel, pauseFocusLabel, confirmQuitLabel, escapeKeyGameActionsLabel, tooltipsLabel, overworldAutoRecenterLabel, fuzzParasiteAntsLabel, showAuditMenuLabel;
+    private JLabel sizeLabel, fsLabel, daylightColorOverlayLabel, weatherColorOverlayLabel, darkModeLabel;
     private JLabel masterLabel, musicLabel, sfxLabel;
     private JLabel defaultRoleWorkerLabel, defaultRoleSoldierLabel, defaultRoleMajorLabel, defaultRolePrincessLabel, defaultRoleQueenLabel;
     private JComboBox<AntRole> defaultRoleWorkerCombo, defaultRoleSoldierCombo, defaultRoleMajorCombo, defaultRolePrincessCombo, defaultRoleQueenCombo;
@@ -55,6 +73,8 @@ public class SettingsPanel extends JPanel {
     private JButton resetVideoButton;
     private JButton resetAudioButton;
     private JButton resetRolesButton;
+    private boolean loadedFullScreen;
+    private String loadedScreenSize;
 
     private static class AutosaveOption {
         String label;
@@ -85,17 +105,32 @@ public class SettingsPanel extends JPanel {
     public SettingsPanel(MainFrame frame, boolean isInDialog) {
         this.frame = frame;
         this.engine = frame.getEngine();
+        this.inDialog = isInDialog;
         setLayout(new BorderLayout());
         setBackground(AssetStyles.BACKGROUND_COLOR);
-        
-        tabbedPane = new JTabbedPane();
-        tabbedPane.setFont(AssetStyles.FONT_BOLD);
-        tabbedPane.setBackground(AssetStyles.BACKGROUND_SECONDARY);
-        tabbedPane.setForeground(AssetStyles.FONT_COLOR);
-        
+
+        sectionTabs.setLayout(new java.awt.GridLayout(1, 4, -1, 0));
+        sectionTabs.setBackground(AssetStyles.BACKGROUND_DARK);
+        sectionCards.setBackground(AssetStyles.BACKGROUND_COLOR);
+
         initUI();
-        
-        add(tabbedPane, BorderLayout.CENTER);
+
+        generalTabButton = createSectionTab(SECTION_GENERAL);
+        videoTabButton = createSectionTab(SECTION_VIDEO);
+        audioTabButton = createSectionTab(SECTION_AUDIO);
+        rolesTabButton = createSectionTab(SECTION_ROLES);
+        sectionTabs.add(generalTabButton);
+        sectionTabs.add(videoTabButton);
+        sectionTabs.add(audioTabButton);
+        sectionTabs.add(rolesTabButton);
+
+        JPanel body = new JPanel(new BorderLayout());
+        body.setBackground(AssetStyles.BACKGROUND_COLOR);
+        body.add(sectionTabs, BorderLayout.NORTH);
+        body.add(sectionCards, BorderLayout.CENTER);
+        add(body, BorderLayout.CENTER);
+
+        showSection(SECTION_GENERAL);
         
         JPanel southPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         southPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
@@ -114,7 +149,7 @@ public class SettingsPanel extends JPanel {
                     window.dispose();
                 }
             } else {
-                this.frame.showCard(MainFrame.CARD_INIT);
+                this.frame.showCard(this.frame.getMenuReturnCard());
             }
         });
         setupNavigation(backButton);
@@ -124,8 +159,6 @@ public class SettingsPanel extends JPanel {
         add(southPanel, BorderLayout.SOUTH);
         
         refreshTranslations();
-        
-        LanguageStrings.addListener(this::refreshTranslations);
 
         addAncestorListener(new AncestorListener() {
             @Override
@@ -140,12 +173,33 @@ public class SettingsPanel extends JPanel {
     }
     
     private void initUI() {
-        tabbedPane.removeAll();
-        
-        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.SETTINGS_TAB_GENERAL), createGeneralTab());
-        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.SETTINGS_TAB_VIDEO), createVideoTab());
-        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.SETTINGS_TAB_AUDIO), createAudioTab());
-        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.SETTINGS_TAB_ROLES), createRolesTab());
+        sectionCards.removeAll();
+
+        sectionCards.add(createGeneralTab(), SECTION_GENERAL);
+        sectionCards.add(createVideoTab(), SECTION_VIDEO);
+        sectionCards.add(createAudioTab(), SECTION_AUDIO);
+        sectionCards.add(createRolesTab(), SECTION_ROLES);
+    }
+
+    private JButton createSectionTab(String sectionId) {
+        JButton button = new JButton();
+        AssetStyles.styleSectionTabButton(button);
+        button.addActionListener(e -> showSection(sectionId));
+        setupNavigation(button);
+        return button;
+    }
+
+    private void showSection(String sectionId) {
+        selectedSection = sectionId;
+        sectionLayout.show(sectionCards, sectionId);
+        styleSectionTab(generalTabButton, SECTION_GENERAL.equals(sectionId));
+        styleSectionTab(videoTabButton, SECTION_VIDEO.equals(sectionId));
+        styleSectionTab(audioTabButton, SECTION_AUDIO.equals(sectionId));
+        styleSectionTab(rolesTabButton, SECTION_ROLES.equals(sectionId));
+    }
+
+    private void styleSectionTab(JButton button, boolean selected) {
+        AssetStyles.applyTabSelection(button, selected);
     }
     
     private JPanel createGeneralTab() {
@@ -226,9 +280,20 @@ public class SettingsPanel extends JPanel {
         confirmQuitCheck = new JCheckBox();
         styleCheckBox(confirmQuitCheck);
         c.gridx = 1; panel.add(confirmQuitCheck, c);
+
+        // Escape key: close dialogs / open menu
+        c.gridy = 6; c.gridx = 0;
+        escapeKeyGameActionsLabel = new JLabel();
+        escapeKeyGameActionsLabel.setFont(AssetStyles.FONT_NORMAL);
+        escapeKeyGameActionsLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(escapeKeyGameActionsLabel, c);
+
+        escapeKeyGameActionsCheck = new JCheckBox();
+        styleCheckBox(escapeKeyGameActionsCheck);
+        c.gridx = 1; panel.add(escapeKeyGameActionsCheck, c);
         
         // Show Tooltips
-        c.gridy = 6; c.gridx = 0;
+        c.gridy = 7; c.gridx = 0;
         tooltipsLabel = new JLabel();
         tooltipsLabel.setFont(AssetStyles.FONT_NORMAL);
         tooltipsLabel.setForeground(AssetStyles.FONT_COLOR);
@@ -238,18 +303,39 @@ public class SettingsPanel extends JPanel {
         styleCheckBox(showTooltipsCheck);
         c.gridx = 1; panel.add(showTooltipsCheck, c);
         
-        // Fuzz Parasites
-        c.gridy = 7; c.gridx = 0;
-        fuzzParasitesLabel = new JLabel();
-        fuzzParasitesLabel.setFont(AssetStyles.FONT_NORMAL);
-        fuzzParasitesLabel.setForeground(AssetStyles.FONT_COLOR);
-        panel.add(fuzzParasitesLabel, c);
-        
-        fuzzParasitesCheck = new JCheckBox();
-        styleCheckBox(fuzzParasitesCheck);
-        c.gridx = 1; panel.add(fuzzParasitesCheck, c);
+        // Overworld auto-recenter
+        c.gridy = 8; c.gridx = 0;
+        overworldAutoRecenterLabel = new JLabel();
+        overworldAutoRecenterLabel.setFont(AssetStyles.FONT_NORMAL);
+        overworldAutoRecenterLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(overworldAutoRecenterLabel, c);
 
-        c.gridy = 8;
+        overworldAutoRecenterCheck = new JCheckBox();
+        styleCheckBox(overworldAutoRecenterCheck);
+        c.gridx = 1; panel.add(overworldAutoRecenterCheck, c);
+
+        // Fuzz parasite ants
+        c.gridy = 9; c.gridx = 0;
+        fuzzParasiteAntsLabel = new JLabel();
+        fuzzParasiteAntsLabel.setFont(AssetStyles.FONT_NORMAL);
+        fuzzParasiteAntsLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(fuzzParasiteAntsLabel, c);
+        
+        fuzzParasiteAntsCheck = new JCheckBox();
+        styleCheckBox(fuzzParasiteAntsCheck);
+        c.gridx = 1; panel.add(fuzzParasiteAntsCheck, c);
+
+        c.gridy = 10; c.gridx = 0;
+        showAuditMenuLabel = new JLabel();
+        showAuditMenuLabel.setFont(AssetStyles.FONT_NORMAL);
+        showAuditMenuLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(showAuditMenuLabel, c);
+
+        showAuditMenuCheck = new JCheckBox();
+        styleCheckBox(showAuditMenuCheck);
+        c.gridx = 1; panel.add(showAuditMenuCheck, c);
+
+        c.gridy = 11;
         c.gridx = 0;
         c.gridwidth = 2;
         c.anchor = GridBagConstraints.EAST;
@@ -338,9 +424,23 @@ public class SettingsPanel extends JPanel {
     private JComboBox<AntRole> createAntRoleCombo(AntType type) {
         JComboBox<AntRole> combo = new JComboBox<>();
         for (AntRole r : Engine.antRolesForAntType(type)) {
-            combo.addItem(r);
+            if (!GameConstants.isWarEconomyExclusiveRole(r) && GameConstants.isObtainableRole(r)) {
+                combo.addItem(r);
+            }
         }
         styleComboBox(combo);
+        combo.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof AntRole role) {
+                    setText(role.getName());
+                    setIcon(role.getIcon());
+                    setIconTextGap(8);
+                }
+                return this;
+            }
+        });
         return combo;
     }
 
@@ -391,8 +491,11 @@ public class SettingsPanel extends JPanel {
         arachnophobiaCheck.setSelected(false);
         pauseFocusCheck.setSelected(true);
         confirmQuitCheck.setSelected(true);
+        escapeKeyGameActionsCheck.setSelected(true);
         showTooltipsCheck.setSelected(true);
-        fuzzParasitesCheck.setSelected(true);
+        overworldAutoRecenterCheck.setSelected(true);
+        fuzzParasiteAntsCheck.setSelected(true);
+        showAuditMenuCheck.setSelected(false);
     }
 
     private void resetVideoTabToDefaults() {
@@ -400,9 +503,10 @@ public class SettingsPanel extends JPanel {
         if (sizeCombo.getSelectedItem() == null) {
             sizeCombo.setSelectedIndex(0);
         }
-        fullScreenCheck.setSelected(false);
+        fullScreenCheck.setSelected(true);
         daylightColorOverlayCheck.setSelected(true);
         weatherColorOverlayCheck.setSelected(true);
+        darkModeCheck.setSelected(false);
     }
 
     private void resetAudioTabToDefaults() {
@@ -414,7 +518,7 @@ public class SettingsPanel extends JPanel {
     private void resetRolesTabToDefaults() {
         selectRoleCombo(defaultRoleWorkerCombo, GameConstants.TYPE_WORKER, GameConstants.ROLE_FORAGER.getId());
         selectRoleCombo(defaultRoleSoldierCombo, GameConstants.TYPE_SOLDIER, GameConstants.ROLE_HUNTER.getId());
-        selectRoleCombo(defaultRoleMajorCombo, GameConstants.TYPE_MAJOR, GameConstants.ROLE_BRUTE.getId());
+        selectRoleCombo(defaultRoleMajorCombo, GameConstants.TYPE_MAJOR, GameConstants.ROLE_CRANE.getId());
         selectRoleCombo(defaultRolePrincessCombo, GameConstants.TYPE_PRINCESS, GameConstants.ROLE_BREEDER.getId());
         selectRoleCombo(defaultRoleQueenCombo, GameConstants.TYPE_QUEEN, GameConstants.ROLE_LAYER.getId());
     }
@@ -494,7 +598,21 @@ public class SettingsPanel extends JPanel {
         styleCheckBox(weatherColorOverlayCheck);
         c.gridx = 1; panel.add(weatherColorOverlayCheck, c);
 
-        c.gridy = 4;
+        // Dark mode
+        c.gridy = 4; c.gridx = 0;
+        c.gridwidth = 1;
+        c.anchor = GridBagConstraints.WEST;
+        c.insets = new Insets(10, 15, 10, 15);
+        darkModeLabel = new JLabel();
+        darkModeLabel.setFont(AssetStyles.FONT_NORMAL);
+        darkModeLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(darkModeLabel, c);
+
+        darkModeCheck = new JCheckBox();
+        styleCheckBox(darkModeCheck);
+        c.gridx = 1; panel.add(darkModeCheck, c);
+
+        c.gridy = 5;
         c.gridx = 0;
         c.gridwidth = 2;
         c.anchor = GridBagConstraints.EAST;
@@ -517,35 +635,38 @@ public class SettingsPanel extends JPanel {
         c.anchor = GridBagConstraints.WEST;
         c.weightx = 1.0;
 
-        // Master Volume
-        c.gridy = 0; c.gridx = 0; 
+        c.gridy = 0;
+        c.gridx = 0;
         masterLabel = new JLabel();
         masterLabel.setFont(AssetStyles.FONT_NORMAL);
         masterLabel.setForeground(AssetStyles.FONT_COLOR);
         panel.add(masterLabel, c);
-        
-        masterVolSlider = createVolumeSlider();
-        c.gridx = 1; panel.add(masterVolSlider, c);
 
-        // Music Volume
-        c.gridy = 1; c.gridx = 0; 
+        masterVolSlider = createVolumeSlider();
+        c.gridx = 1;
+        panel.add(masterVolSlider, c);
+
+        c.gridy = 1;
+        c.gridx = 0;
         musicLabel = new JLabel();
         musicLabel.setFont(AssetStyles.FONT_NORMAL);
         musicLabel.setForeground(AssetStyles.FONT_COLOR);
         panel.add(musicLabel, c);
-        
-        musicVolSlider = createVolumeSlider();
-        c.gridx = 1; panel.add(musicVolSlider, c);
 
-        // SFX Volume
-        c.gridy = 2; c.gridx = 0; 
+        musicVolSlider = createVolumeSlider();
+        c.gridx = 1;
+        panel.add(musicVolSlider, c);
+
+        c.gridy = 2;
+        c.gridx = 0;
         sfxLabel = new JLabel();
         sfxLabel.setFont(AssetStyles.FONT_NORMAL);
         sfxLabel.setForeground(AssetStyles.FONT_COLOR);
         panel.add(sfxLabel, c);
-        
+
         sfxVolSlider = createVolumeSlider();
-        c.gridx = 1; panel.add(sfxVolSlider, c);
+        c.gridx = 1;
+        panel.add(sfxVolSlider, c);
 
         c.gridy = 3;
         c.gridx = 0;
@@ -557,24 +678,27 @@ public class SettingsPanel extends JPanel {
         resetAudioButton.addActionListener(e -> resetAudioTabToDefaults());
         setupNavigation(resetAudioButton);
         panel.add(resetAudioButton, c);
-        
+
         return panel;
     }
-    
+
     private JSlider createVolumeSlider() {
         JSlider slider = new JSlider(0, 100);
-        slider.setBackground(AssetStyles.BACKGROUND_COLOR);
-        slider.setForeground(AssetStyles.FONT_COLOR_HEADER);
-        slider.setMajorTickSpacing(20);
+        slider.setMajorTickSpacing(10);
         slider.setPaintTicks(true);
+        slider.setSnapToTicks(true);
+        AssetStyles.styleSlider(slider);
         return slider;
     }
     
     public void refreshTranslations() {
-        tabbedPane.setTitleAt(0, LanguageStrings.get(LanguageStrings.SETTINGS_TAB_GENERAL));
-        tabbedPane.setTitleAt(1, LanguageStrings.get(LanguageStrings.SETTINGS_TAB_VIDEO));
-        tabbedPane.setTitleAt(2, LanguageStrings.get(LanguageStrings.SETTINGS_TAB_AUDIO));
-        tabbedPane.setTitleAt(3, LanguageStrings.get(LanguageStrings.SETTINGS_TAB_ROLES));
+        if (generalTabButton != null) {
+            generalTabButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_TAB_GENERAL));
+            videoTabButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_TAB_VIDEO));
+            audioTabButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_TAB_AUDIO));
+            rolesTabButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_TAB_ROLES));
+            showSection(selectedSection);
+        }
         
         langLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_LANGUAGE));
         autoLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_AUTOSAVE));
@@ -582,13 +706,17 @@ public class SettingsPanel extends JPanel {
         arachLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_ARACHNOPHOBIA));
         pauseFocusLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_PAUSE_FOCUS));
         confirmQuitLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_CONFIRM_QUIT));
+        escapeKeyGameActionsLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_ESCAPE_KEY_GAME_ACTIONS));
         tooltipsLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_SHOW_TOOLTIPS));
-        fuzzParasitesLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_FUZZ_PARASITES));
+        overworldAutoRecenterLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_OVERWORLD_AUTO_RECENTER));
+        fuzzParasiteAntsLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_FUZZ_PARASITE_ANTS));
+        showAuditMenuLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_SHOW_AUDIT_MENU));
         
         sizeLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_SCREEN_SIZE));
         fsLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_FULLSCREEN));
         daylightColorOverlayLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_DAYLIGHT_COLOR_OVERLAY));
         weatherColorOverlayLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_WEATHER_COLOR_OVERLAY));
+        darkModeLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_DARK_MODE));
         
         masterLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_MASTER_VOL));
         musicLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_MUSIC_VOL));
@@ -599,6 +727,8 @@ public class SettingsPanel extends JPanel {
         defaultRoleMajorLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_DEFAULT_ROLE_MAJOR));
         defaultRolePrincessLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_DEFAULT_ROLE_PRINCESS));
         defaultRoleQueenLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_DEFAULT_ROLE_QUEEN));
+        
+        applySettingTooltips();
         
         saveButton.setText(LanguageStrings.get(LanguageStrings.SETTINGS_SAVE_APPLY));
         backButton.setText(LanguageStrings.get(LanguageStrings.UI_BACK));
@@ -625,21 +755,48 @@ public class SettingsPanel extends JPanel {
     }
     
     private void styleComboBox(JComboBox<?> box) {
-        box.setFont(AssetStyles.FONT_NORMAL);
-        box.setBackground(AssetStyles.BACKGROUND_SECONDARY);
-        box.setForeground(AssetStyles.FONT_COLOR);
+        AssetStyles.styleComboBox(box);
     }
     
     private void styleCheckBox(JCheckBox box) {
-        box.setBackground(AssetStyles.BACKGROUND_COLOR);
-        box.setForeground(AssetStyles.FONT_COLOR);
-        box.setFont(AssetStyles.FONT_NORMAL);
+        AssetStyles.styleCheckBox(box);
     }
     
     private void styleButton(JButton btn) {
-        btn.setFont(AssetStyles.FONT_BOLD);
-        btn.setBackground(AssetStyles.BACKGROUND_SECONDARY);
-        btn.setForeground(AssetStyles.FONT_COLOR);
+        AssetStyles.styleButton(btn);
+    }
+
+    private void applySettingTooltips() {
+        setSettingTooltip(langLabel, languageCombo, LanguageStrings.SETTINGS_LANGUAGE_TT);
+        setSettingTooltip(autoLabel, autosaveCombo, LanguageStrings.SETTINGS_AUTOSAVE_TT);
+        setSettingTooltip(turboLabel, turboCheck, LanguageStrings.SETTINGS_TURBO_TT);
+        setSettingTooltip(arachLabel, arachnophobiaCheck, LanguageStrings.SETTINGS_ARACHNOPHOBIA_TT);
+        setSettingTooltip(pauseFocusLabel, pauseFocusCheck, LanguageStrings.SETTINGS_PAUSE_FOCUS_TT);
+        setSettingTooltip(confirmQuitLabel, confirmQuitCheck, LanguageStrings.SETTINGS_CONFIRM_QUIT_TT);
+        setSettingTooltip(escapeKeyGameActionsLabel, escapeKeyGameActionsCheck, LanguageStrings.SETTINGS_ESCAPE_KEY_GAME_ACTIONS_TT);
+        setSettingTooltip(tooltipsLabel, showTooltipsCheck, LanguageStrings.SETTINGS_SHOW_TOOLTIPS_TT);
+        setSettingTooltip(overworldAutoRecenterLabel, overworldAutoRecenterCheck, LanguageStrings.SETTINGS_OVERWORLD_AUTO_RECENTER_TT);
+        setSettingTooltip(fuzzParasiteAntsLabel, fuzzParasiteAntsCheck, LanguageStrings.SETTINGS_FUZZ_PARASITE_ANTS_TT);
+        setSettingTooltip(showAuditMenuLabel, showAuditMenuCheck, LanguageStrings.SETTINGS_SHOW_AUDIT_MENU_TT);
+        setSettingTooltip(sizeLabel, sizeCombo, LanguageStrings.SETTINGS_SCREEN_SIZE_TT);
+        setSettingTooltip(fsLabel, fullScreenCheck, LanguageStrings.SETTINGS_FULLSCREEN_TT);
+        setSettingTooltip(daylightColorOverlayLabel, daylightColorOverlayCheck, LanguageStrings.SETTINGS_DAYLIGHT_COLOR_OVERLAY_TT);
+        setSettingTooltip(weatherColorOverlayLabel, weatherColorOverlayCheck, LanguageStrings.SETTINGS_WEATHER_COLOR_OVERLAY_TT);
+        setSettingTooltip(darkModeLabel, darkModeCheck, LanguageStrings.SETTINGS_DARK_MODE_TT);
+        setSettingTooltip(masterLabel, masterVolSlider, LanguageStrings.SETTINGS_MASTER_VOL_TT);
+        setSettingTooltip(musicLabel, musicVolSlider, LanguageStrings.SETTINGS_MUSIC_VOL_TT);
+        setSettingTooltip(sfxLabel, sfxVolSlider, LanguageStrings.SETTINGS_SFX_VOL_TT);
+        setSettingTooltip(defaultRoleWorkerLabel, defaultRoleWorkerCombo, LanguageStrings.SETTINGS_DEFAULT_ROLE_WORKER_TT);
+        setSettingTooltip(defaultRoleSoldierLabel, defaultRoleSoldierCombo, LanguageStrings.SETTINGS_DEFAULT_ROLE_SOLDIER_TT);
+        setSettingTooltip(defaultRoleMajorLabel, defaultRoleMajorCombo, LanguageStrings.SETTINGS_DEFAULT_ROLE_MAJOR_TT);
+        setSettingTooltip(defaultRolePrincessLabel, defaultRolePrincessCombo, LanguageStrings.SETTINGS_DEFAULT_ROLE_PRINCESS_TT);
+        setSettingTooltip(defaultRoleQueenLabel, defaultRoleQueenCombo, LanguageStrings.SETTINGS_DEFAULT_ROLE_QUEEN_TT);
+    }
+
+    private static void setSettingTooltip(JLabel label, JComponent control, String tooltipKey) {
+        String text = LanguageStrings.get(tooltipKey);
+        label.setToolTipText(text);
+        control.setToolTipText(text);
     }
     
     private void setupNavigation(JComponent component) {
@@ -662,13 +819,21 @@ public class SettingsPanel extends JPanel {
         arachnophobiaCheck.setSelected(engine.isArachnophobiaMode());
         pauseFocusCheck.setSelected(engine.isPauseOnFocusLoss());
         confirmQuitCheck.setSelected(engine.isConfirmOnQuit());
+        escapeKeyGameActionsCheck.setSelected(engine.isEscapeKeyGameActions());
         showTooltipsCheck.setSelected(engine.isShowTooltips());
-        fuzzParasitesCheck.setSelected(engine.isFuzzParasites());
+        overworldAutoRecenterCheck.setSelected(engine.isOverworldAutoRecenter());
+        fuzzParasiteAntsCheck.setSelected(engine.isFuzzParasiteAnts());
+        showAuditMenuCheck.setSelected(engine.isShowAuditMenu());
         
         sizeCombo.setSelectedItem(engine.getScreenSize());
+        if (sizeCombo.getSelectedItem() == null) {
+            ensureScreenSizeInCombo(engine.getScreenSize());
+            sizeCombo.setSelectedItem(engine.getScreenSize());
+        }
         fullScreenCheck.setSelected(engine.isFullScreen());
         daylightColorOverlayCheck.setSelected(engine.isDaylightColorOverlayEnabled());
         weatherColorOverlayCheck.setSelected(engine.isWeatherColorOverlayEnabled());
+        darkModeCheck.setSelected(engine.isDarkMode());
 
         masterVolSlider.setValue(engine.getMasterVolume());
         musicVolSlider.setValue(engine.getMusicVolume());
@@ -679,6 +844,47 @@ public class SettingsPanel extends JPanel {
         selectRoleCombo(defaultRoleMajorCombo, GameConstants.TYPE_MAJOR, engine.getDefaultRoleMajor());
         selectRoleCombo(defaultRolePrincessCombo, GameConstants.TYPE_PRINCESS, engine.getDefaultRolePrincess());
         selectRoleCombo(defaultRoleQueenCombo, GameConstants.TYPE_QUEEN, engine.getDefaultRoleQueen());
+
+        loadedFullScreen = engine.isFullScreen();
+        loadedScreenSize = engine.getScreenSize();
+    }
+
+    private void ensureScreenSizeInCombo(String size) {
+        if (size == null || size.isBlank()) {
+            return;
+        }
+        for (int i = 0; i < sizeCombo.getItemCount(); i++) {
+            if (size.equals(sizeCombo.getItemAt(i))) {
+                return;
+            }
+        }
+        sizeCombo.addItem(size);
+    }
+
+    private boolean windowChromeChanged() {
+        if (fullScreenCheck.isSelected() != loadedFullScreen) {
+            return true;
+        }
+        if (!fullScreenCheck.isSelected()) {
+            return !resolveSelectedScreenSize().equals(loadedScreenSize);
+        }
+        return false;
+    }
+
+    private String resolveSelectedScreenSize() {
+        Object selectedSize = sizeCombo.getSelectedItem();
+        if (selectedSize instanceof String size && !size.isBlank()) {
+            return size;
+        }
+        return engine.getScreenSize() != null ? engine.getScreenSize() : "1000x700";
+    }
+
+    private void showSavedMessage() {
+        Component parent = inDialog ? frame : this;
+        SwingUtilities.invokeLater(() -> UiOptionPane.showMessageDialog(parent,
+                LanguageStrings.get(LanguageStrings.SETTINGS_SAVED_MSG),
+                LanguageStrings.get(LanguageStrings.UI_SETTINGS),
+                JOptionPane.INFORMATION_MESSAGE));
     }
 
     private void saveSettings() {
@@ -697,13 +903,17 @@ public class SettingsPanel extends JPanel {
         engine.setArachnophobiaMode(arachnophobiaCheck.isSelected());
         engine.setPauseOnFocusLoss(pauseFocusCheck.isSelected());
         engine.setConfirmOnQuit(confirmQuitCheck.isSelected());
+        engine.setEscapeKeyGameActions(escapeKeyGameActionsCheck.isSelected());
         engine.setShowTooltips(showTooltipsCheck.isSelected());
-        engine.setFuzzParasites(fuzzParasitesCheck.isSelected());
+        engine.setOverworldAutoRecenter(overworldAutoRecenterCheck.isSelected());
+        engine.setFuzzParasiteAnts(fuzzParasiteAntsCheck.isSelected());
+        engine.setShowAuditMenu(showAuditMenuCheck.isSelected());
         
-        engine.setScreenSize((String) sizeCombo.getSelectedItem());
+        engine.setScreenSize(resolveSelectedScreenSize());
         engine.setFullScreen(fullScreenCheck.isSelected());
         engine.setDaylightColorOverlayEnabled(daylightColorOverlayCheck.isSelected());
         engine.setWeatherColorOverlayEnabled(weatherColorOverlayCheck.isSelected());
+        engine.setDarkMode(darkModeCheck.isSelected());
 
         engine.setMasterVolume(masterVolSlider.getValue());
         engine.setMusicVolume(musicVolSlider.getValue());
@@ -711,16 +921,55 @@ public class SettingsPanel extends JPanel {
 
         applyDefaultRoleFromCombo(defaultRoleWorkerCombo, GameConstants.TYPE_WORKER, GameConstants.ROLE_FORAGER.getId());
         applyDefaultRoleFromCombo(defaultRoleSoldierCombo, GameConstants.TYPE_SOLDIER, GameConstants.ROLE_HUNTER.getId());
-        applyDefaultRoleFromCombo(defaultRoleMajorCombo, GameConstants.TYPE_MAJOR, GameConstants.ROLE_BRUTE.getId());
+        applyDefaultRoleFromCombo(defaultRoleMajorCombo, GameConstants.TYPE_MAJOR, GameConstants.ROLE_CRANE.getId());
         applyDefaultRoleFromCombo(defaultRolePrincessCombo, GameConstants.TYPE_PRINCESS, GameConstants.ROLE_BREEDER.getId());
         applyDefaultRoleFromCombo(defaultRoleQueenCombo, GameConstants.TYPE_QUEEN, GameConstants.ROLE_LAYER.getId());
 
         engine.saveGlobalSettings();
-        frame.applyEngineSettings();
+        boolean chromeChanged = windowChromeChanged();
 
-        SwingUtilities.invokeLater(() -> {
-            JOptionPane.showMessageDialog(this, LanguageStrings.get(LanguageStrings.SETTINGS_SAVED_MSG), LanguageStrings.get(LanguageStrings.UI_SETTINGS), JOptionPane.INFORMATION_MESSAGE);
-        });
+        if (inDialog) {
+            frame.applyRuntimeSettings();
+            if (chromeChanged) {
+                Window window = SwingUtilities.getWindowAncestor(this);
+                if (window != null) {
+                    window.dispose();
+                }
+                SwingUtilities.invokeLater(() -> {
+                    frame.applyEngineSettings();
+                    if (frame.getGamePanel() != null) {
+                        frame.getGamePanel().applyOverworldRecenterSetting();
+                    }
+                    loadedFullScreen = engine.isFullScreen();
+                    loadedScreenSize = engine.getScreenSize();
+                    showSavedMessage();
+                });
+                return;
+            }
+        } else {
+            frame.applyEngineSettings();
+        }
+        if (frame.getGamePanel() != null) {
+            frame.getGamePanel().applyOverworldRecenterSetting();
+        }
+
+        loadedFullScreen = engine.isFullScreen();
+        loadedScreenSize = engine.getScreenSize();
+        showSavedMessage();
+    }
+
+    public void refreshTheme() {
+        setBackground(AssetStyles.BACKGROUND_COLOR);
+        sectionTabs.setBackground(AssetStyles.BACKGROUND_DARK);
+        sectionCards.setBackground(AssetStyles.BACKGROUND_COLOR);
+        showSection(selectedSection);
+        styleButton(saveButton);
+        styleButton(backButton);
+        styleButton(resetGeneralButton);
+        styleButton(resetVideoButton);
+        styleButton(resetAudioButton);
+        styleButton(resetRolesButton);
+        AssetStyles.applyThemeToContainer(this);
     }
 
     public static class SettingsDialog extends ZeroDialog {
@@ -740,6 +989,12 @@ public class SettingsPanel extends JPanel {
         @Override
         protected void refreshDialog() {
             settingsPanel.refreshTranslations();
+        }
+
+        @Override
+        public void refreshTheme() {
+            super.refreshTheme();
+            settingsPanel.refreshTheme();
         }
     }
 }

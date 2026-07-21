@@ -1,13 +1,13 @@
 package com.grimidk.formicempire.classes.infrasctructure;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
-import java.lang.reflect.Field;
 
 import com.grimidk.formicempire.classes.constants.ant.AntType;
+import com.grimidk.formicempire.classes.constants.misc.DynastyTitle;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.misc.Species;
 import com.grimidk.formicempire.classes.constants.misc.TradeMethod;
@@ -23,15 +23,38 @@ import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.Trade;
 import com.grimidk.formicempire.classes.entities.Tunnel;
-import com.grimidk.formicempire.classes.entities.services.ColonyStarterService;
-import com.grimidk.formicempire.classes.entities.services.DynastyDeathService;
-import com.grimidk.formicempire.classes.entities.services.DynastyNamingService;
-import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.ColonyLogPrefixes;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
+import com.grimidk.formicempire.classes.entities.services.colony.ColonyLabourService;
+import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
+import com.grimidk.formicempire.classes.entities.services.colony.ColonyStarterService;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDeathService;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyNamingService;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyIntegrationService;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyRebellionService;
+import com.grimidk.formicempire.classes.entities.services.dynasty.DynastySynergyService;
+import com.grimidk.formicempire.classes.entities.services.world.WarService;
+import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryEvent;
+import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryEventType;
+import com.grimidk.formicempire.classes.entities.services.world.WorldHistoryService;
+import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
+import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
+import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
+import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
 public class World {
+
+    private static final DynastyDeathService DYNASTY_DEATH_SERVICE = new DynastyDeathService();
+    private static final List<Weather> STANDARD_RANDOM_WEATHERS = buildStandardRandomWeathers();
+
+    private static List<Weather> buildStandardRandomWeathers() {
+        List<Weather> weathers = new ArrayList<>(GameConstants.getWeathers());
+        weathers.remove(GameConstants.WEATHER_SAND_STORM);
+        weathers.remove(GameConstants.WEATHER_PYROCLASTIC_FOG);
+        weathers.remove(GameConstants.WEATHER_ACID_RAIN);
+        return Collections.unmodifiableList(weathers);
+    }
 
     private int minute;
     private int hour;
@@ -49,11 +72,12 @@ public class World {
     private Hex activeHex; 
     private int saveSlotId = 0; // 0 = no slot (ad-hoc)
     private Engine engine;
-    private Random random;    
     private int worldRadius = 8; 
     private int colonyIdCounter = 1;
     private int dynastyIdCounter = 1;
     private final DynastyNamingService namingService;
+    private final WarService warService;
+    private final WorldHistoryService historyService;
 
     public World() {
         this.minute = 0;
@@ -69,8 +93,27 @@ public class World {
         this.moonPhase = GameConstants.PHASE_NEW_MOON;
         this.season = GameConstants.SEASON_SPRING;
         this.weather = GameConstants.WEATHER_CLEAR;
-        this.random = new Random();
         this.namingService = new DynastyNamingService();
+        this.warService = new WarService(this);
+        this.historyService = new WorldHistoryService(this);
+    }
+    
+    public void registerDynasty(Dynasty dynasty) {
+        if (dynasty == null) {
+            return;
+        }
+        dynasty.setOwningWorld(this);
+        if (!dynastys.contains(dynasty)) {
+            dynastys.add(dynasty);
+        }
+    }
+
+    public WarService getWarService() {
+        return warService;
+    }
+
+    public WorldHistoryService getHistoryService() {
+        return historyService;
     }
     
     public Engine getEngine() {
@@ -79,6 +122,10 @@ public class World {
 
     public synchronized int getNextColonyId() {
         return colonyIdCounter++;
+    }
+
+    public synchronized int allocateDynastyId() {
+        return dynastyIdCounter++;
     }
 
     public void setEngine(Engine engine) {
@@ -199,8 +246,70 @@ public class World {
         }
         return null;
     }
+
+    public int colonyHexDistance(Colony from, Colony to) {
+        Hex fromHex = getHexOfColony(from);
+        Hex toHex = getHexOfColony(to);
+        if (fromHex == null || toHex == null) {
+            return 0;
+        }
+        return GameNumbers.axialHexDistance(fromHex.getQ(), fromHex.getR(), toHex.getQ(), toHex.getR());
+    }
+
+    /**
+     * Minimum axial hex distance between any colony of {@code a} and any colony of {@code b}.
+     * Returns {@link Integer#MAX_VALUE} when either dynasty has no placeable colony hexes.
+     */
+    public int minDynastyHexDistance(Dynasty a, Dynasty b) {
+        if (a == null || b == null) {
+            return Integer.MAX_VALUE;
+        }
+        List<Colony> aColonies = a.getColonies();
+        List<Colony> bColonies = b.getColonies();
+        if (aColonies == null || bColonies == null || aColonies.isEmpty() || bColonies.isEmpty()) {
+            return Integer.MAX_VALUE;
+        }
+        int min = Integer.MAX_VALUE;
+        for (Colony from : aColonies) {
+            Hex fromHex = getHexOfColony(from);
+            if (fromHex == null) {
+                continue;
+            }
+            for (Colony to : bColonies) {
+                Hex toHex = getHexOfColony(to);
+                if (toHex == null) {
+                    continue;
+                }
+                int distance = GameNumbers.axialHexDistance(
+                        fromHex.getQ(), fromHex.getR(), toHex.getQ(), toHex.getR());
+                if (distance < min) {
+                    min = distance;
+                }
+            }
+        }
+        return min;
+    }
     
     public List<Dynasty> getDynastys() { return dynastys; }
+
+    public Dynasty findDynastyById(int dynastyId) {
+        for (Dynasty dynasty : dynastys) {
+            if (dynasty.getId() == dynastyId) {
+                return dynasty;
+            }
+        }
+        return null;
+    }
+
+    public void bindDynastyTradeServices() {
+        if (engine == null || engine.getTradeManager() == null) {
+            return;
+        }
+        TradeManager tradeManager = engine.getTradeManager();
+        for (Dynasty dynasty : dynastys) {
+            dynasty.bindTradeManager(tradeManager);
+        }
+    }
     
     public int getWorldRadius() {
         return worldRadius;
@@ -284,29 +393,40 @@ public class World {
         name = name.trim();
         return name.substring(0, 1).toUpperCase() + name.substring(1);
     }
-    
-    public void generateWorld(Biome startBiome, int size, Colony startColony, String baseName) {
+
+    public void generateWorld(Biome startBiome, int size, Colony startColony, String baseName, String playerTitleKey) {
         System.out.println("Generating World... Size: " + size + " rings.");
         this.worldRadius = size;
         this.hexes.clear();
         this.dynastys.clear();
         Map<String, Hex> hexMap = new HashMap<>();
-        ColonyStarterService starterService = new ColonyStarterService();
+        ColonyStarterService starterService = ColonyStarterService.shared();
         
         baseName = formatName(baseName);
-        String dynName = baseName + " Dynasty";
+        DynastyTitle playerTitle = GameConstants.getDynastyTitleByKey(playerTitleKey);
+        String dynName = LanguageStrings.formatDynastyName(baseName, playerTitle);
         namingService.registerUsedName(dynName);
         
-        Dynasty playerDynasty = new Dynasty(this.dynastyIdCounter++, dynName, true, GameConstants.SPECIES_OMNI);
+        Dynasty playerDynasty = new Dynasty(this.dynastyIdCounter++, dynName, playerTitle.getNameKey(), true, GameConstants.SPECIES_OMNI);
+        playerDynasty.setThemeBase(baseName);
         playerDynasty.getStarterService().initializeDynasty(playerDynasty);
         
-        String capName = namingService.generateCapitalName(dynName);
+        String capName = namingService.generateCapitalName(baseName);
         startColony.setName(capName);
         
         playerDynasty.addColony(startColony);
-        this.dynastys.add(playerDynasty);
+        registerDynasty(playerDynasty);
+        historyService.record(WorldHistoryEventType.DYNASTY_FORMED, LanguageStrings.HISTORY_DYNASTY_FORMED_FMT,
+                playerDynasty.getId(), startColony.getId(), -1,
+                WorldHistoryEvent.dynastyArg(playerDynasty.getId()));
+        historyService.record(WorldHistoryEventType.COLONY_FOUNDED, LanguageStrings.HISTORY_COLONY_FOUNDED_FMT,
+                playerDynasty.getId(), startColony.getId(), -1,
+                WorldHistoryEvent.colonyArg(startColony.getId()),
+                WorldHistoryEvent.dynastyArg(playerDynasty.getId()));
         
         this.colonyIdCounter = startColony.getId() + 1;
+
+        List<Hex> eligibleNpcHexes = new ArrayList<>();
 
         for (int q = -size; q <= size; q++) {
             int r1 = Math.max(-size, -q - size);
@@ -327,33 +447,10 @@ public class World {
                 if (dist == 0) {
                     hex.setColony(startColony); 
                     startColony.setActive(true);
+                } else if (dist > 1 && !isWaterBiome(ringBiome)) {
+                    eligibleNpcHexes.add(hex);
                 } else {
-                    if (dist > 1 && !isWaterBiome(ringBiome) && random.nextInt(100) < 30) {
-                        int dynastyId = this.dynastyIdCounter++;
-                        
-                        // Random non-omni species
-                        List<Species> allSpecies = GameConstants.getSpecies();
-                        List<Species> nonOmni = new ArrayList<>();
-                        for (Species s : allSpecies) {
-                            if (s.getId() != 1) nonOmni.add(s);
-                        }
-                        Species randomSpecies = nonOmni.isEmpty() ? GameConstants.SPECIES_OMNI : nonOmni.get(random.nextInt(nonOmni.size()));
-                        
-                        String npcDynName = namingService.generateDynastyName(randomSpecies);
-                        Dynasty npcDynasty = new Dynasty(dynastyId, npcDynName, false, randomSpecies);
-                        npcDynasty.getStarterService().initializeDynasty(npcDynasty);
-                        this.dynastys.add(npcDynasty);
-                        
-                        int colId = this.colonyIdCounter++;
-                        String npcCapName = namingService.generateCapitalName(npcDynName);
-                        Colony aiColony = new Colony(colId, npcCapName, false);
-                        npcDynasty.addColony(aiColony);
-                        
-                        starterService.initializeNewColony(aiColony);
-                        hex.setColony(aiColony);
-                    } else {
-                        hex.setColony(null);
-                    }
+                    hex.setColony(null);
                 }
                 
                 hexMap.put(q + "," + r, hex);
@@ -361,8 +458,78 @@ public class World {
             }
         }
 
-        linkNeighbors(hexMap);        
-        printWorldToConsole(size, hexMap);
+        List<Hex> npcColonyHexes = selectNpcColonyHexes(eligibleNpcHexes);
+        List<Species> npcSpeciesAssignments = assignNpcSpecies(npcColonyHexes.size());
+        for (int i = 0; i < npcColonyHexes.size(); i++) {
+            Hex hex = npcColonyHexes.get(i);
+            Species npcSpecies = npcSpeciesAssignments.get(i);
+
+            int dynastyId = this.dynastyIdCounter++;
+            DynastyTitle npcTitle = namingService.pickRandomTitle();
+            String npcThemeKey = namingService.claimThemeKey(npcSpecies);
+            String npcDynName = LanguageStrings.formatDynastyName(npcThemeKey, npcTitle);
+            Dynasty npcDynasty = new Dynasty(dynastyId, npcDynName, npcTitle.getNameKey(), false, npcSpecies);
+            npcDynasty.setThemeBase(npcThemeKey);
+            npcDynasty.getStarterService().initializeDynasty(npcDynasty);
+
+            int colId = this.colonyIdCounter++;
+            String npcCapName = namingService.generateCapitalName(npcThemeKey);
+            Colony aiColony = new Colony(colId, npcCapName, false);
+            npcDynasty.addColony(aiColony);
+
+            starterService.initializeNewColony(aiColony);
+            hex.setColony(aiColony);
+            registerDynasty(npcDynasty);
+            historyService.record(WorldHistoryEventType.DYNASTY_FORMED, LanguageStrings.HISTORY_DYNASTY_FORMED_FMT,
+                    npcDynasty.getId(), aiColony.getId(), -1,
+                    WorldHistoryEvent.dynastyArg(npcDynasty.getId()));
+            historyService.record(WorldHistoryEventType.COLONY_FOUNDED, LanguageStrings.HISTORY_COLONY_FOUNDED_FMT,
+                    npcDynasty.getId(), aiColony.getId(), -1,
+                    WorldHistoryEvent.colonyArg(aiColony.getId()),
+                    WorldHistoryEvent.dynastyArg(npcDynasty.getId()));
+        }
+
+        linkNeighbors(hexMap);
+        bindDynastyTradeServices();
+    }
+
+    private List<Hex> selectNpcColonyHexes(List<Hex> eligible) {
+        List<Hex> selected = new ArrayList<>();
+        List<Hex> remaining = new ArrayList<>();
+        for (Hex hex : eligible) {
+            if (GameRandom.nextInt(100) < 30) {
+                selected.add(hex);
+            } else {
+                remaining.add(hex);
+            }
+        }
+
+        int required = GameConstants.getWorldSpawnableNpcSpecies().size();
+        Collections.shuffle(remaining, GameRandom.getShuffleRandom());
+        for (Hex hex : remaining) {
+            if (selected.size() >= required) {
+                break;
+            }
+            selected.add(hex);
+        }
+        return selected;
+    }
+
+    private List<Species> assignNpcSpecies(int colonyCount) {
+        List<Species> nonOmni = new ArrayList<>(GameConstants.getWorldSpawnableNpcSpecies());
+        if (colonyCount == 0 || nonOmni.isEmpty()) {
+            return List.of();
+        }
+        Collections.shuffle(nonOmni, GameRandom.getShuffleRandom());
+        List<Species> assignment = new ArrayList<>(colonyCount);
+        for (int i = 0; i < colonyCount; i++) {
+            if (i < nonOmni.size()) {
+                assignment.add(nonOmni.get(i));
+            } else {
+                assignment.add(nonOmni.get(GameRandom.nextInt(nonOmni.size())));
+            }
+        }
+        return assignment;
     }
     
     private boolean isWaterBiome(Biome biome) {
@@ -384,8 +551,6 @@ public class World {
     }
     
     private Biome getBiomeForRing(int ring) {
-        if (this.random == null) this.random = new Random();
-        
         List<Biome> options = new ArrayList<>();
         
         switch (ring) {
@@ -436,7 +601,23 @@ public class World {
                 break;
         }
         
-        return options.get(random.nextInt(options.size()));
+        return pickBiomeForRing(ring, options);
+    }
+
+    private Biome pickBiomeForRing(int ring, List<Biome> options) {
+        if (options.isEmpty()) {
+            return GameConstants.BIOME_PLAINS;
+        }
+        int targetDifficulty = Math.min(5, Math.max(1, ring / 2 + 1));
+        List<Biome> weighted = new ArrayList<>();
+        for (Biome biome : options) {
+            int distance = Math.abs(biome.getDifficulty() - targetDifficulty);
+            int weight = Math.max(1, 4 - distance);
+            for (int i = 0; i < weight; i++) {
+                weighted.add(biome);
+            }
+        }
+        return weighted.get(GameRandom.nextInt(weighted.size()));
     }
     
     private Biome getBiomeById(int id) {
@@ -454,75 +635,48 @@ public class World {
     }
     
     private Weather getRandomWeather(Biome biome) {
-        if (random == null) random = new Random();
-        List<Weather> weathers = new ArrayList<>(GameConstants.getWeathers());
-        
-        weathers.remove(GameConstants.WEATHER_SAND_STORM);
-        weathers.remove(GameConstants.WEATHER_PYROCLASTIC_FOG);
-        weathers.remove(GameConstants.WEATHER_ACID_RAIN);
-        
         if (biome != null) {
-            if (biome == GameConstants.BIOME_DESERT && random.nextInt(100) < 20) {
+            if (biome == GameConstants.BIOME_DESERT && GameRandom.nextInt(100) < 20) {
                 return GameConstants.WEATHER_SAND_STORM;
             }
-            if (biome == GameConstants.BIOME_VOLCANIC && random.nextInt(100) < 30) {
+            if (biome == GameConstants.BIOME_VOLCANIC && GameRandom.nextInt(100) < 30) {
                 return GameConstants.WEATHER_PYROCLASTIC_FOG;
             }
-            if (biome == GameConstants.BIOME_URBAN && random.nextInt(100) < 15) {
+            if (biome == GameConstants.BIOME_URBAN && GameRandom.nextInt(100) < 15) {
                 return GameConstants.WEATHER_ACID_RAIN;
             }
         }
-        
-        return weathers.get(random.nextInt(weathers.size()));
-    }
 
-    private void printWorldToConsole(int size, Map<String, Hex> hexMap) {
-        System.out.println("\n--- Generated World Map ---\n");
-        for (int r = -size; r <= size; r++) {
-            StringBuilder line = new StringBuilder();
-            
-            int indent = Math.abs(r);
-            for (int s = 0; s < indent; s++) line.append(" ");
-            
-            int q1 = Math.max(-size, -r - size);
-            int q2 = Math.min(size, -r + size);
-
-            for (int q = q1; q <= q2; q++) {
-                Hex hex = hexMap.get(q + "," + r);
-                if (hex != null) {
-                    char c = (hex.getBiome().getName().length() > 0) ? hex.getBiome().getName().charAt(0) : '?';
-                    
-                    if (hex.getColony() != null) {
-                        if (hex.getColony().isPlayer()) {
-                            line.append("P ");
-                        } else {
-                            line.append("E ");
-                        }
-                    } else {
-                        line.append(c).append(" ");
-                    }
-                } else {
-                    line.append("  ");
-                }
-            }
-            System.out.println(line.toString());
-        }
+        return STANDARD_RANDOM_WEATHERS.get(GameRandom.nextInt(STANDARD_RANDOM_WEATHERS.size()));
     }
 
     public void startWorld(Biome biome, Colony colony, String baseName) {
+        startWorld(biome, colony, baseName, LanguageStrings.DYNASTY_TITLE_DYNASTY);
+    }
+
+    public void startWorld(Biome biome, Colony colony, String baseName, String playerTitleKey) {
         System.out.println("[World] startWorld called. Colony ants before init: " + colony.getAntTotal());
 
         if (colony.getAntTotal() == 0) {
-            ColonyStarterService starterService = new ColonyStarterService();
+            ColonyStarterService starterService = ColonyStarterService.shared();
             starterService.initializeNewColony(colony);
         }
         
         System.out.println("[World] Colony ants after init: " + colony.getAntTotal());
 
         baseName = formatName(baseName);
-        generateWorld(biome, 8, colony, baseName);
+        generateWorld(biome, 8, colony, baseName, playerTitleKey);
         changeActiveHex(getSpawnHex()); 
         updateEnvironmentalConditions();
+    }
+
+    public void relocalizeDynastyNames() {
+        if (dynastys == null) {
+            return;
+        }
+        for (Dynasty dynasty : dynastys) {
+            dynasty.applyLocalizedName();
+        }
     }
 
     public void loadWorld(Savefile savefile) {
@@ -533,17 +687,21 @@ public class World {
         this.year = savefile.getYear();  
         this.worldRadius = (savefile.getWorldRadius() > 0) ? savefile.getWorldRadius() : 8;
         
+        String playerTitleKey = GameConstants.getDynastyTitleById(savefile.resolvePlayerDynastyTitleId()).getNameKey();
+
         String baseName = "Player";
         if (savefile.getName() != null && !savefile.getName().trim().isEmpty()) {
             String sName = savefile.getName().trim();
-            if (!sName.startsWith("Save ") && !sName.equals("Autosave")) {
-                baseName = sName;
+            if (!LanguageStrings.isGenericSaveName(sName, savefile.getId())) {
+                baseName = LanguageStrings.resolvePlayerThemeName(sName, savefile.resolvePlayerDynastyTitleId());
             }
         }
         baseName = formatName(baseName);
 
         this.hexes.clear();
         this.dynastys.clear();
+        this.historyService.clear();
+        this.historyService.setRecordingEnabled(false);
         Map<String, Hex> hexMap = new HashMap<>();
         Map<String, Colony> loadedColonies = new HashMap<>();
         Map<Integer, Dynasty> loadedDynastys = new HashMap<>();
@@ -555,8 +713,11 @@ public class World {
             for (Savefile.SavedDynasty sc : savefile.getDynastys()) {
                 Dynasty dynasty = new Dynasty(sc);
                 loadedDynastys.put(dynasty.getId(), dynasty);
-                this.dynastys.add(dynasty);
+                registerDynasty(dynasty);
                 namingService.registerUsedName(dynasty.getName());
+                if (dynasty.getThemeBase() != null && !dynasty.getThemeBase().isEmpty()) {
+                    namingService.registerUsedThemeKey(dynasty.getThemeBase());
+                }
                 if (dynasty.getId() > maxDynastyId) maxDynastyId = dynasty.getId();
             }
         }
@@ -572,12 +733,23 @@ public class World {
                     loadedDynastys.get(sc.dynastyId).addColony(c);
                 } else {
                     int newDynastyId = ++maxDynastyId;
-                    String dynName = c.isPlayer() ? (baseName + " Dynasty") : "Wild Dynasty";
+                    DynastyTitle adHocTitle = namingService.pickRandomTitle();
+                    String dynName = c.isPlayer()
+                            ? LanguageStrings.formatDynastyName(baseName, playerTitleKey)
+                            : LanguageStrings.formatWildDynastyName(adHocTitle);
                     namingService.registerUsedName(dynName);
-                    Dynasty adHocDynasty = new Dynasty(newDynastyId, dynName, c.isPlayer(), GameConstants.SPECIES_OMNI);
+                    Dynasty adHocDynasty = new Dynasty(
+                            newDynastyId,
+                            dynName,
+                            c.isPlayer() ? playerTitleKey : adHocTitle.getNameKey(),
+                            c.isPlayer(),
+                            GameConstants.SPECIES_OMNI);
                     adHocDynasty.getStarterService().initializeDynasty(adHocDynasty);
+                    if (!c.isPlayer()) {
+                        adHocDynasty.setWildDynasty(true);
+                    }
                     adHocDynasty.addColony(c);
-                    this.dynastys.add(adHocDynasty);
+                    registerDynasty(adHocDynasty);
                     loadedDynastys.put(newDynastyId, adHocDynasty);
                     System.out.println("[World] Created ad-hoc Dynasty ID " + newDynastyId + " for orphan colony " + c.getName());
                 }
@@ -624,17 +796,16 @@ public class World {
             }
              
             if (colony == null) {
-                String playerDynName = baseName + " Dynasty";
-                String playerCapName = namingService.generateCapitalName(playerDynName);
+                String playerCapName = namingService.generateCapitalName(baseName);
                 colony = new Colony(1, playerCapName, true);
             }
              
             if (colony.getAntTotal() == 0) {
-                ColonyStarterService starter = new ColonyStarterService();
+                ColonyStarterService starter = ColonyStarterService.shared();
                 starter.initializeNewColony(colony);
             }
 
-            generateWorld(GameConstants.BIOME_PLAINS, this.worldRadius, colony, baseName);
+            generateWorld(GameConstants.BIOME_PLAINS, this.worldRadius, colony, baseName, playerTitleKey);
         }
 
         if (savefile.getDynastys() != null) {
@@ -646,22 +817,18 @@ public class World {
                         Hex hB = getHexAt(st.qB, st.rB);
                         if (hA != null && hB != null) {
                             Tunnel tunnel = new Tunnel(hA, hB, st.totalCost);
-                            try {
-                                Field pf = Tunnel.class.getDeclaredField("progress");
-                                Field icf = Tunnel.class.getDeclaredField("isComplete");
-                                pf.setAccessible(true);
-                                icf.setAccessible(true);
-                                pf.set(tunnel, st.progress);
-                                icf.set(tunnel, st.isComplete);
-                            } catch (Exception e) { e.printStackTrace(); }
+                            tunnel.restoreState(st.progress, st.isComplete);
                             d.addTunnel(tunnel);
                             
                             if (!st.isComplete) {
+                                Colony sponsor = null;
                                 if (hA.getColony() != null && hA.getColony().getDynasty() == d) {
-                                    hA.getColony().setCurrentTunnelProject(tunnel);
+                                    sponsor = hA.getColony();
+                                } else if (hB.getColony() != null && hB.getColony().getDynasty() == d) {
+                                    sponsor = hB.getColony();
                                 }
-                                if (hB.getColony() != null && hB.getColony().getDynasty() == d) {
-                                    hB.getColony().setCurrentTunnelProject(tunnel);
+                                if (sponsor != null && sponsor.getCurrentTunnelProject() == null) {
+                                    sponsor.setCurrentTunnelProject(tunnel);
                                 }
                             }
                         }
@@ -670,61 +837,44 @@ public class World {
             }
         }
 
-        if (savefile.getTrades() != null && engine != null && engine.getTradeManager() != null) {
-            engine.getTradeManager().getActiveTrades().forEach(t -> engine.getTradeManager().removeTrade(t));
+        if (engine != null && engine.getTradeManager() != null) {
+            if (savefile.getTrades() != null) {
             for (Savefile.SavedTrade st : savefile.getTrades()) {
                 Hex hO = getHexAt(st.qOrigin, st.rOrigin);
                 Hex hD = getHexAt(st.qDest, st.rDest);
                 if (hO != null && hD != null) {
                     Map<ResourceType, Double> load = new HashMap<>();
-                    for (Map.Entry<Integer, Double> e : st.load.entrySet()) {
-                        GameConstants.getResources().stream().filter(r -> r.getId() == e.getKey()).findFirst().ifPresent(r -> load.put(r, e.getValue()));
-                    }
+                    putResourceLoad(st.load, load);
                     Map<ResourceType, Double> returnLoad = new HashMap<>();
-                    if (st.returnLoad != null) {
-                        for (Map.Entry<Integer, Double> e : st.returnLoad.entrySet()) {
-                            GameConstants.getResources().stream().filter(r -> r.getId() == e.getKey()).findFirst().ifPresent(r -> returnLoad.put(r, e.getValue()));
-                        }
-                    }
+                    putResourceLoad(st.returnLoad, returnLoad);
                     Map<AntType, Integer> trans = new HashMap<>();
-                    for (Map.Entry<Integer, Integer> e : st.transport.entrySet()) {
-                        GameConstants.getAntTypes().stream().filter(at -> at.getId() == e.getKey()).findFirst().ifPresent(at -> trans.put(at, e.getValue()));
+                    putAntTransport(st.transport, trans);
+                    TradeMethod method = GameConstants.getTradeMethodById(st.methodId);
+                    if (method == null) {
+                        method = GameConstants.METHOD_LAND;
                     }
-                    TradeMethod method = GameConstants.getTradeMethods().stream().filter(m -> m.getId() == st.methodId).findFirst().orElse(GameConstants.METHOD_LAND);
-                    
+
                     Trade trade = new Trade(hO, hD, load, returnLoad, trans, st.isRecurrent, st.isBilateral, method);
                     trade.setActive(st.isActive);
 
                     if (st.hasPendingUpdate) {
                         Map<ResourceType, Double> pLoad = new HashMap<>();
-                        for (Map.Entry<Integer, Double> e : st.pendingLoad.entrySet()) {
-                            GameConstants.getResources().stream().filter(r -> r.getId() == e.getKey()).findFirst().ifPresent(r -> pLoad.put(r, e.getValue()));
-                        }
+                        putResourceLoad(st.pendingLoad, pLoad);
                         Map<ResourceType, Double> pReturnLoad = new HashMap<>();
-                        for (Map.Entry<Integer, Double> e : st.pendingReturnLoad.entrySet()) {
-                            GameConstants.getResources().stream().filter(r -> r.getId() == e.getKey()).findFirst().ifPresent(r -> pReturnLoad.put(r, e.getValue()));
-                        }
+                        putResourceLoad(st.pendingReturnLoad, pReturnLoad);
                         Map<AntType, Integer> pTrans = new HashMap<>();
-                        for (Map.Entry<Integer, Integer> e : st.pendingTransport.entrySet()) {
-                            GameConstants.getAntTypes().stream().filter(at -> at.getId() == e.getKey()).findFirst().ifPresent(at -> pTrans.put(at, e.getValue()));
+                        putAntTransport(st.pendingTransport, pTrans);
+                        TradeMethod pMethod = GameConstants.getTradeMethodById(st.pendingMethodId);
+                        if (pMethod == null) {
+                            pMethod = method;
                         }
-                        TradeMethod pMethod = GameConstants.getTradeMethods().stream().filter(m -> m.getId() == st.pendingMethodId).findFirst().orElse(method);
                         trade.setPendingUpdate(pLoad, pReturnLoad, pTrans, st.pendingRecurrent, st.pendingIsBilateral, pMethod);
                     }
 
-                    try {
-                        Field th = Trade.class.getDeclaredField("totalHours");
-                        Field rh = Trade.class.getDeclaredField("remainingHours");
-                        Field ret = Trade.class.getDeclaredField("isReturning");
-                        th.setAccessible(true);
-                        rh.setAccessible(true);
-                        ret.setAccessible(true);
-                        th.set(trade, st.totalHours);
-                        rh.set(trade, st.remainingHours);
-                        ret.set(trade, st.isReturning);
-                    } catch (Exception e) { e.printStackTrace(); }
+                    trade.restoreTripState(st.totalHours, st.remainingHours, st.isReturning);
                     engine.getTradeManager().addTrade(trade);
                 }
+            }
             }
         }
 
@@ -742,12 +892,30 @@ public class World {
                         }
                     }
                 }
+                if (d != null) {
+                    d.resolveCapitalFromColonies();
+                }
             }
         }
 
+        DynastySynergyService.refreshAll(this.dynastys);
+
         reapplyRoleAssignmentsAfterLoad();
-        
-        changeActiveHex(getSpawnHex()); 
+        bindDynastyTradeServices();
+        ColonyMilitaryService.refreshAllMilitaryPower(this.dynastys);
+        if (savefile.getWars() != null) {
+            warService.loadFromSave(savefile.getWars());
+        } else {
+            warService.syncFromDynasties();
+        }
+        warService.pruneInvalidWars();
+        if (savefile.getWorldHistory() != null) {
+            historyService.loadFromSave(savefile.getWorldHistory());
+        }
+        historyService.setRecordingEnabled(true);
+
+        relocalizeDynastyNames();
+        changeActiveHex(getSpawnHex());
         updateEnvironmentalConditions();
     }
 
@@ -805,8 +973,8 @@ public class World {
     }
 
     private void randomizeWeather() {
-        if (random.nextInt(1000) == 0) {
-            if (random.nextBoolean()) {
+        if (GameRandom.nextInt(1000) == 0) {
+            if (GameRandom.nextBoolean()) {
                 this.setWeather(GameConstants.WEATHER_FROG);
             } else {
                 this.setWeather(GameConstants.WEATHER_BLOOD);
@@ -828,14 +996,14 @@ public class World {
                 possibleWeathers.add(GameConstants.WEATHER_HEAVY_RAIN);
                 possibleWeathers.add(GameConstants.WEATHER_WIND);
             }
-            Weather newWeather = possibleWeathers.get(random.nextInt(possibleWeathers.size()));
+            Weather newWeather = possibleWeathers.get(GameRandom.nextInt(possibleWeathers.size()));
             if (this.weather != newWeather) {
                 this.setWeather(newWeather);
             }
         }
         
         for (Hex h : this.hexes) {
-             if (random.nextInt(100) < 5) { 
+             if (GameRandom.nextInt(100) < 5) { 
                  h.setLocalWeather(getRandomWeather(h.getBiome()));
              }
         }
@@ -888,6 +1056,8 @@ public class World {
             engine.notifyHourListeners();
         }
 
+        warService.tickWarProgressHourly();
+
         if (this.hour > 23) {
             this.hour = 0;
             this.runDay();
@@ -898,32 +1068,41 @@ public class World {
         this.day++;
         
         for (Dynasty dynasty : this.dynastys) {
-            dynasty.runDailyJobs();
+            dynasty.runDailyJobs(this, engine != null ? engine.getTradeManager() : null);
         }
         
         for (Hex hex : this.hexes) {
             if (hex.getColony() != null) {
-                hex.getColony().runDailyJobs(this.getTemperatureIcon(), hex.getBiome(), hex);
+                Colony colony = hex.getColony();
+                colony.runDailyJobs(this.getTemperatureIcon(), hex.getBiome(), hex);
+                tryQueenRecoveryNuptial(this, colony, hex);
             }
         }
+
+        for (Dynasty dynasty : this.dynastys) {
+            ColonyMilitaryService.refreshDynastyMilitaryPower(dynasty);
+        }
+
+        warService.tickWarProgressDaily();
+        DynastyIntegrationService.tickIntegrationsDaily(this, engine != null ? engine.getTradeManager() : null);
         
         // --- Process Dynasty/Colony Deaths ---
-        DynastyDeathService deathService = new DynastyDeathService();
-        deathService.processDynastyDeaths(this);
+        DYNASTY_DEATH_SERVICE.processDynastyDeaths(this);
 
         randomizeWeather();
 
-        if (random.nextInt(1000) == 0) {
-            if (random.nextBoolean()) {
+        if (GameRandom.nextInt(1000) == 0) {
+            if (GameRandom.nextBoolean()) {
                 this.setTimeOfDay(GameConstants.TIME_SOLAR_ECLIPSE);
             } else {
                 this.setTimeOfDay(GameConstants.TIME_LUNAR_ECLIPSE);
             }
             
             for (Hex hex : this.hexes) {
-                if (hex.getColony() != null && !hex.getColony().getDynasty().isDefeated()) {
-                    hex.getColony().getLabourService().runNuptial(hex.getColony(), this, hex);
-                    hex.getColony().logEvent(ColonyLogPrefixes.NUPTIAL + " "
+                Colony colony = hex.getColony();
+                if (colonyHasActiveDynasty(colony)) {
+                    colony.getLabourService().runNuptial(colony, this, hex);
+                    colony.logEvent(ColonyLogPrefixes.NUPTIAL + " "
                         + LanguageStrings.get(LanguageStrings.EVENT_ECLIPSE_NUPTIAL));
                 }
             }
@@ -964,31 +1143,25 @@ public class World {
 
     public void runMonth() {
         this.month++;
-        
+        Season monthSeason = GameConstants.seasonForMonth(this.month);
+
         for (Hex hex : this.hexes) {
-            if (hex.getColony() != null && !hex.getColony().getDynasty().isDefeated()) {
-                hex.getColony().runMonthlyJobs();
+            Colony colony = hex.getColony();
+            if (colonyHasActiveDynasty(colony)) {
+                colony.runMonthlyJobs(monthSeason, hex.getBiome());
             }
         }
 
-        if (this.month >= 1 && this.month < 4) {
-            this.setSeason(GameConstants.SEASON_SPRING);
-        } else if (this.month >= 4 && this.month < 7) {
-            this.setSeason(GameConstants.SEASON_SUMMER);
-        } else if (this.month >= 7 && this.month < 10) {
-            this.setSeason(GameConstants.SEASON_AUTUMN);
-        } else if (this.month >= 10 && this.month < 12) {
-            this.setSeason(GameConstants.SEASON_WINTER);
-        } else {
-            this.setSeason(GameConstants.SEASON_SPRING);
-        }
+        TradeManager tradeManager = engine != null ? engine.getTradeManager() : null;
+        DynastyRebellionService.runMonthlyChecks(this, tradeManager);
+
+        this.setSeason(monthSeason);
 
         try {
             if (this.engine != null) {
                 int freq = this.engine.getAutosaveFrequency();
                 if (freq > 0 && (this.month % freq == 0)) {
-                    SaveManager sm = new SaveManager();
-                    sm.saveAutosave(this, this.engine);
+                    this.engine.getSaveManager().saveAutosave(this, this.engine);
                 }
             }
         } catch (Exception ex) {
@@ -1009,8 +1182,53 @@ public class World {
         this.year++;
         
         for (Hex hex : this.hexes) {
-            if (hex.getColony() != null && !hex.getColony().getDynasty().isDefeated()) {
-                hex.getColony().runYearlyJobs(this, hex);
+            Colony colony = hex.getColony();
+            if (colonyHasActiveDynasty(colony)) {
+                colony.runYearlyJobs(this, hex);
+            }
+        }
+    }
+
+    private void tryQueenRecoveryNuptial(World world, Colony colony, Hex hex) {
+        if (!colonyHasActiveDynasty(colony) || hex == null || world == null) {
+            return;
+        }
+        if (!colony.getQueens().isEmpty() || colony.getDaysWithoutQueen() <= 0) {
+            return;
+        }
+        if (!colony.hasUpgrade(GameUnlocks.TYPE_PRINCESS)) {
+            return;
+        }
+        if (!ColonyLabourService.meetsNuptialRequirements(colony)) {
+            return;
+        }
+        colony.getLabourService().runNuptial(colony, world, hex);
+    }
+
+    private static boolean colonyHasActiveDynasty(Colony colony) {
+        return colony != null && colony.getDynasty() != null && !colony.getDynasty().isDefeated();
+    }
+
+    private static void putResourceLoad(Map<Integer, Double> src, Map<ResourceType, Double> dest) {
+        if (src == null) {
+            return;
+        }
+        for (Map.Entry<Integer, Double> entry : src.entrySet()) {
+            ResourceType resource = GameConstants.getResourceById(entry.getKey());
+            if (resource != null) {
+                dest.put(resource, entry.getValue());
+            }
+        }
+    }
+
+    private static void putAntTransport(Map<Integer, Integer> src, Map<AntType, Integer> dest) {
+        if (src == null) {
+            return;
+        }
+        for (Map.Entry<Integer, Integer> entry : src.entrySet()) {
+            AntType antType = GameConstants.getAntTypeById(entry.getKey());
+            if (antType != null) {
+                dest.put(antType, entry.getValue());
             }
         }
     }

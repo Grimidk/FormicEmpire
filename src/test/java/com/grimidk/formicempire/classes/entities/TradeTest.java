@@ -2,8 +2,8 @@ package com.grimidk.formicempire.classes.entities;
 
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -204,5 +204,23 @@ public class TradeTest {
         } catch (Exception e) {
             fail(e.getMessage());
         }
+    }
+
+    @Test
+    public void testCancelDueToEscortLossWhenAntsDie() {
+        destination.unlockBuilding(GameUnlocks.PLANT_CHAMBER_0);
+        origin.setPlants(200);
+        Trade trade = new Trade(originHex, destHex, load, null, transport, false, false, GameConstants.METHOD_LAND);
+        assertTrue(trade.startTrip());
+        assertEquals(10, trade.getAntsOnTrip().size());
+
+        for (int i = 0; i < 5; i++) {
+            Ant ant = trade.getAntsOnTrip().get(i);
+            ant.goDie(origin, "Test");
+        }
+
+        assertFalse(trade.hasSufficientLiveEscorts());
+        trade.cancelDueToEscortLoss();
+        assertFalse(trade.isActive());
     }
 }

@@ -2,7 +2,7 @@ package com.grimidk.formicempire.classes.constants.unlocks;
 
 import javax.swing.ImageIcon;
 import com.grimidk.formicempire.classes.constants.Constant;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
+import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
 public class Upgrade extends Constant {
     private final String flavorNameKey;

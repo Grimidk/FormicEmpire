@@ -1,15 +1,21 @@
 package com.grimidk.formicempire.classes.interfaces.game.gamepanels;
 
+import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
+import com.grimidk.formicempire.classes.constants.misc.ColonyLoyalty;
 import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
+import com.grimidk.formicempire.classes.constants.world.Biome;
+import com.grimidk.formicempire.classes.constants.world.Season;
 import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.entities.services.ColonyLocationService;
+import com.grimidk.formicempire.classes.entities.Hex;
+import com.grimidk.formicempire.classes.entities.services.colony.ColonyLocationService;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.AssetStyles;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.GameConstants;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.GameUnlocks;
-import com.grimidk.formicempire.classes.infrasctructure.repositories.LanguageStrings;
+import com.grimidk.formicempire.classes.infrasctructure.World;
+import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
+import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,10 +28,12 @@ public class ColonyPanel extends ZeroGamePanel {
     private boolean isShowingContent = true;
 
     // --- Rank Components ---
+    private final JLabel colonyNameLabel = new JLabel("");
+    private final JLabel warStatusLabel = new JLabel();
     private final JLabel rankLabel = new JLabel(LanguageStrings.get(LanguageStrings.COLONY_RANK));
     
     // --- Resources Components ---
-    private final JLabel totalResourcesLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.COLONY_TOTAL_RESOURCES), 0));
+    private final JLabel totalResourcesLabel = new JLabel(LanguageStrings.format(LanguageStrings.COLONY_TOTAL_RESOURCES, 0));
     private final JLabel mushroomsLabel = new JLabel("0");
     private final JLabel plantLabel = new JLabel("0");
     private final JLabel proteinLabel = new JLabel("0");
@@ -35,8 +43,8 @@ public class ColonyPanel extends ZeroGamePanel {
     private final JLabel mineralLabel = new JLabel("0");
     
     // --- Ant Components ---
-    private final JLabel totalAntLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.COLONY_TOTAL_ANTS), 0));
-    private final JLabel queensLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.COLONY_QUEENS), 0, 0));
+    private final JLabel totalAntLabel = new JLabel(LanguageStrings.format(LanguageStrings.COLONY_TOTAL_ANTS, 0));
+    private final JLabel queensLabel = new JLabel(LanguageStrings.format(LanguageStrings.COLONY_QUEENS, 0, 0));
     private final JLabel princessLabel = new JLabel("0");
     private final JLabel droneLabel = new JLabel("0");
     private final JLabel majorLabel = new JLabel("0");
@@ -48,20 +56,22 @@ public class ColonyPanel extends ZeroGamePanel {
     private final JLabel deadAntsLabel = new JLabel("0");
     
     // --- Stats Components ---
-    private final JLabel totalConsumptionLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.COLONY_CONSUMPTION), 0));
-    private final JLabel totalProductionLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.COLONY_MAX_FOOD_PROD), 0));
-    private final JLabel netMushroomsLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.COLONY_NET_FOOD), 0));
-    private final JLabel layingRateLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.COLONY_LAYING_RATE), 0));
-    private final JLabel nurseCoverageLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.COLONY_NURSE_COVERAGE), 0, 0));
-    private final JLabel graveKeepingLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.COLONY_GRAVE_CLEANING), 0, 0));
-    private final JLabel petInsectsLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.COLONY_PET_INSECTS), 0, 0));
-    private final JLabel parasiticMiteCountLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.COLONY_PARASITIC_MITES), 0, 0));
-    private final JLabel parasiteCountLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.COLONY_PARASITES), LanguageStrings.get(LanguageStrings.WORLD_NA))); 
-    private final JLabel policeStatsLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.COLONY_POLICING), 0)); 
-    private final JLabel researchPointsLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.COLONY_RESEARCH), 0));
-    private final JLabel researchRateLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.COLONY_RESEARCH_RATE), 0));
-    private final JLabel babyAntsLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.COLONY_JUVENILE_ANTS), 0));
-    private final JLabel adultAntsLabel = new JLabel(String.format(LanguageStrings.get(LanguageStrings.COLONY_ADULT_ANTS), 0));
+    private final JLabel totalConsumptionLabel = new JLabel(LanguageStrings.format(LanguageStrings.COLONY_CONSUMPTION, 0));
+    private final JLabel totalProductionLabel = new JLabel(LanguageStrings.format(LanguageStrings.COLONY_MAX_FOOD_PROD, 0));
+    private final JLabel netMushroomsLabel = new JLabel(LanguageStrings.format(LanguageStrings.COLONY_NET_FOOD, 0));
+    private final JLabel layingRateLabel = new JLabel(LanguageStrings.format(LanguageStrings.COLONY_LAYING_RATE, 0));
+    private final JLabel nurseCoverageLabel = new JLabel(LanguageStrings.format(LanguageStrings.COLONY_NURSE_COVERAGE, 0, 0));
+    private final JLabel graveKeepingLabel = new JLabel(LanguageStrings.format(LanguageStrings.COLONY_GRAVE_CLEANING, 0, 0));
+    private final JLabel petInsectsLabel = new JLabel(LanguageStrings.format(LanguageStrings.COLONY_PET_INSECTS, 0, 0));
+    private final JLabel parasiticMiteCountLabel = new JLabel(LanguageStrings.format(LanguageStrings.COLONY_PARASITIC_MITES, 0, 0));
+    private final JLabel parasiteAntCountLabel = new JLabel(LanguageStrings.format(LanguageStrings.COLONY_PARASITE_ANTS, LanguageStrings.get(LanguageStrings.WORLD_NA))); 
+    private final JLabel policeStatsLabel = new JLabel(LanguageStrings.format(LanguageStrings.COLONY_POLICING, 0)); 
+    private final JLabel researchPointsLabel = new JLabel(LanguageStrings.format(LanguageStrings.COLONY_RESEARCH, 0));
+    private final JLabel researchRateLabel = new JLabel(LanguageStrings.format(LanguageStrings.COLONY_RESEARCH_RATE, 0));
+    private final JLabel babyAntsLabel = new JLabel(LanguageStrings.format(LanguageStrings.COLONY_JUVENILE_ANTS, 0));
+    private final JLabel adultAntsLabel = new JLabel(LanguageStrings.format(LanguageStrings.COLONY_ADULT_ANTS, 0));
+    private final JLabel militaryPowerLabel = new JLabel(LanguageStrings.format(LanguageStrings.COLONY_MILITARY_POWER, 0));
+    private final JLabel loyaltyLabel = new JLabel();
     
     // --- Cached Values ---
     private Colony lastColonyRef;
@@ -82,7 +92,11 @@ public class ColonyPanel extends ZeroGamePanel {
     
     private int lastTotalConsumption = -1;
     private int lastEggs = -1;
+    private int lastMilitaryPower = -1;
+    private int lastEffectiveLoyalty = -1;
     private ColonyRank lastRank = null;
+    private String lastColonyName = "";
+    private boolean lastAtWar = false;
 
     public ColonyPanel() {
         super(new CardLayout()); 
@@ -109,7 +123,7 @@ public class ColonyPanel extends ZeroGamePanel {
         graveKeepingLabel.setVisible(false);
         petInsectsLabel.setVisible(false);
         parasiticMiteCountLabel.setVisible(false);
-        parasiteCountLabel.setVisible(false);
+        parasiteAntCountLabel.setVisible(false);
         policeStatsLabel.setVisible(false);
         researchPointsLabel.setVisible(false);
         researchRateLabel.setVisible(false);
@@ -136,11 +150,25 @@ public class ColonyPanel extends ZeroGamePanel {
         setupConstantLabel(deadAntsLabel, GameConstants.TYPE_DEAD);
 
         // Special Icons & Tooltips
+        setupStatLabel(totalAntLabel, GameConstants.ICON_STAT_POPULATION);
+        setupStatLabel(totalConsumptionLabel, GameConstants.ICON_STAT_FOOD_CONSUMPTION);
+        setupStatLabel(totalProductionLabel, GameConstants.ICON_STAT_FOOD_PRODUCTION);
+        setupStatLabel(netMushroomsLabel, GameConstants.ICON_STAT_NET_FOOD);
+        setupConstantLabel(layingRateLabel, GameConstants.ROLE_LAYER);
+        setupConstantLabel(nurseCoverageLabel, GameConstants.ROLE_NURSE);
+        setupConstantLabel(graveKeepingLabel, GameConstants.ROLE_GRAVER);
+        setupConstantLabel(babyAntsLabel, GameConstants.TYPE_EGG);
+        setupConstantLabel(adultAntsLabel, GameConstants.TYPE_WORKER);
         petInsectsLabel.setIcon(GameConstants.ICON_APHID);
         parasiticMiteCountLabel.setIcon(GameConstants.ICON_PARASITIC_MITE);
-        parasiteCountLabel.setIcon(GameConstants.TYPE_PARASITE.getIcon());
-        policeStatsLabel.setIcon(GameConstants.TYPE_SOLDIER.getIcon());
+        parasiteAntCountLabel.setIcon(GameConstants.TYPE_PARASITE_ANT.getIcon());
+        policeStatsLabel.setIcon(GameConstants.ROLE_POLICE.getIcon());
         researchPointsLabel.setIcon(GameConstants.ICON_RESEARCH);
+        researchRateLabel.setIcon(GameConstants.ROLE_RESEARCHER.getIcon());
+        militaryPowerLabel.setIcon(GameConstants.ICON_STAT_MILITARY_POWER);
+        militaryPowerLabel.setToolTipText(LanguageStrings.get(LanguageStrings.STAT_MILITARY_POWER_DESC));
+        loyaltyLabel.setIcon(GameConstants.ICON_STAT_LOYALTY);
+        loyaltyLabel.setIconTextGap(6);
         
         updateTooltips();
         
@@ -178,7 +206,7 @@ public class ColonyPanel extends ZeroGamePanel {
         
         petInsectsLabel.setToolTipText(LanguageStrings.get(LanguageStrings.TOOLTIP_PET_INSECTS));
         parasiticMiteCountLabel.setToolTipText(LanguageStrings.get(LanguageStrings.TOOLTIP_PARASITIC_MITES));
-        parasiteCountLabel.setToolTipText(LanguageStrings.get(LanguageStrings.TOOLTIP_PARASITES));
+        parasiteAntCountLabel.setToolTipText(LanguageStrings.get(LanguageStrings.TOOLTIP_PARASITE_ANTS));
         policeStatsLabel.setToolTipText(LanguageStrings.get(LanguageStrings.TOOLTIP_POLICING));
         researchPointsLabel.setToolTipText(LanguageStrings.get(LanguageStrings.TOOLTIP_RESEARCH_POINTS));
     }
@@ -188,8 +216,19 @@ public class ColonyPanel extends ZeroGamePanel {
         label.setForeground(AssetStyles.FONT_COLOR);
     }
 
+    private void setupConstantLabel(JLabel label, AntRole role) {
+        label.setIcon(role.getIcon());
+        label.setForeground(AssetStyles.FONT_COLOR);
+    }
+
     private void setupConstantLabel(JLabel label, ResourceType resource) { 
         label.setIcon(resource.getIcon());
+        label.setForeground(AssetStyles.FONT_COLOR);
+    }
+
+    private void setupStatLabel(JLabel label, ImageIcon icon) {
+        label.setIcon(icon);
+        label.setIconTextGap(6);
         label.setForeground(AssetStyles.FONT_COLOR);
     }
 
@@ -229,7 +268,11 @@ public class ColonyPanel extends ZeroGamePanel {
         lastMineralsAvailable = -1;
         lastTotalConsumption = -1;
         lastEggs = -1;
+        lastMilitaryPower = -1;
+        lastEffectiveLoyalty = -1;
         lastRank = null;
+        lastColonyName = "";
+        lastAtWar = false;
         
         setView(false);
     }
@@ -239,9 +282,10 @@ public class ColonyPanel extends ZeroGamePanel {
         super.refreshTranslations();
         updateTooltips();
         if (lastColonyRef != null) {
-            // Force refresh text fields
             lastMushrooms = -1;
             lastTotalConsumption = -1;
+            lastMilitaryPower = -1;
+            lastEffectiveLoyalty = -1;
             lastRank = null;
             updateMinuteData(lastColonyRef);
             updateHourData(lastColonyRef);
@@ -287,8 +331,17 @@ public class ColonyPanel extends ZeroGamePanel {
     private JPanel createColonyStatsPanel() {
         JPanel panel = createTitledPanel(LanguageStrings.PANEL_COLONY_STATS, new BoxLayout(null, BoxLayout.Y_AXIS));
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        colonyNameLabel.setForeground(AssetStyles.FONT_COLOR);
+        colonyNameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        warStatusLabel.setForeground(AssetStyles.FONT_COLOR);
+        warStatusLabel.setIconTextGap(6);
+        warStatusLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        warStatusLabel.setText(LanguageStrings.get(LanguageStrings.COLONY_AT_PEACE));
+        setupStatLabel(warStatusLabel, GameConstants.ROLE_DIPLOMAT.getIcon());
         rankLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         rankLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(colonyNameLabel);
+        panel.add(warStatusLabel);
         panel.add(rankLabel);
         panel.add(AssetStyles.createInternalSeparator());
         
@@ -300,12 +353,14 @@ public class ColonyPanel extends ZeroGamePanel {
         graveKeepingLabel.setForeground(AssetStyles.FONT_COLOR);
         petInsectsLabel.setForeground(AssetStyles.FONT_COLOR);
         parasiticMiteCountLabel.setForeground(AssetStyles.FONT_COLOR);
-        parasiteCountLabel.setForeground(AssetStyles.FONT_COLOR);
+        parasiteAntCountLabel.setForeground(AssetStyles.FONT_COLOR);
         policeStatsLabel.setForeground(AssetStyles.FONT_COLOR);
         researchPointsLabel.setForeground(AssetStyles.FONT_COLOR);
         researchRateLabel.setForeground(AssetStyles.FONT_COLOR);
         babyAntsLabel.setForeground(AssetStyles.FONT_COLOR);
         adultAntsLabel.setForeground(AssetStyles.FONT_COLOR);
+        militaryPowerLabel.setForeground(AssetStyles.FONT_COLOR);
+        loyaltyLabel.setForeground(AssetStyles.FONT_COLOR);
 
         panel.add(totalConsumptionLabel);
         panel.add(totalProductionLabel);
@@ -315,12 +370,14 @@ public class ColonyPanel extends ZeroGamePanel {
         panel.add(graveKeepingLabel);
         panel.add(petInsectsLabel);
         panel.add(parasiticMiteCountLabel);
-        panel.add(parasiteCountLabel);
+        panel.add(parasiteAntCountLabel);
         panel.add(policeStatsLabel);
         panel.add(researchPointsLabel);
         panel.add(researchRateLabel);
         panel.add(babyAntsLabel);
         panel.add(adultAntsLabel);
+        panel.add(militaryPowerLabel);
+        panel.add(loyaltyLabel);
         return panel;
     }
 
@@ -347,42 +404,42 @@ public class ColonyPanel extends ZeroGamePanel {
         int waterAvail = locService != null ? locService.getTotalQuantityAvailable(GameConstants.RESOURCE_WATER) : 0;
         int mineralsAvail = locService != null ? locService.getTotalQuantityAvailable(GameConstants.RESOURCE_ROCK) : 0;
 
-        totalResourcesLabel.setText(String.format(LanguageStrings.get(LanguageStrings.COLONY_TOTAL_RESOURCES), totalResources));
-        if (mushrooms != lastMushrooms) mushroomsLabel.setText(String.valueOf(mushrooms));
+        totalResourcesLabel.setText(LanguageStrings.format(LanguageStrings.COLONY_TOTAL_RESOURCES, totalResources));
+        if (mushrooms != lastMushrooms) mushroomsLabel.setText(AssetStyles.formatNumber(mushrooms));
         
         if (plants != lastPlants || plantsAvail != lastPlantsAvailable) {
-            plantLabel.setText(plants + " / (" + plantsAvail + ")");
+            plantLabel.setText(AssetStyles.formatNumber(plants) + " / (" + AssetStyles.formatNumber(plantsAvail) + ")");
             lastPlantsAvailable = plantsAvail;
         }
         
         if (protein != lastProtein || proteinAvail != lastProteinAvailable) {
-            proteinLabel.setText(protein + " / (" + proteinAvail + ")");
+            proteinLabel.setText(AssetStyles.formatNumber(protein) + " / (" + AssetStyles.formatNumber(proteinAvail) + ")");
             lastProteinAvailable = proteinAvail;
         }
         
         if (water != lastWater || waterAvail != lastWaterAvailable) {
-            waterLabel.setText(water + " / (" + waterAvail + ")");
+            waterLabel.setText(AssetStyles.formatNumber(water) + " / (" + AssetStyles.formatNumber(waterAvail) + ")");
             lastWaterAvailable = waterAvail;
         }
 
         boolean hasRanching = colony.hasUpgrade(GameUnlocks.ROLE_RANCHER);
         syrupLabel.setVisible(hasRanching);
-        if (hasRanching && syrups != lastSyrups) syrupLabel.setText(String.valueOf(syrups));
+        if (hasRanching && syrups != lastSyrups) syrupLabel.setText(AssetStyles.formatNumber(syrups));
 
         boolean hasResinResonation = colony.hasUpgrade(GameUnlocks.ABILITY_RESIN);
         resinLabel.setVisible(hasResinResonation);
-        if (hasResinResonation && resins != lastResins) resinLabel.setText(String.valueOf(resins));
+        if (hasResinResonation && resins != lastResins) resinLabel.setText(AssetStyles.formatNumber(resins));
 
         boolean hasMining = colony.hasUpgrade(GameUnlocks.ROLE_MINER);
         mineralLabel.setVisible(hasMining);
         if (hasMining && (minerals != lastMinerals || mineralsAvail != lastMineralsAvailable)) {
-             mineralLabel.setText(minerals + " / (" + mineralsAvail + ")");
+             mineralLabel.setText(AssetStyles.formatNumber(minerals) + " / (" + AssetStyles.formatNumber(mineralsAvail) + ")");
              lastMineralsAvailable = mineralsAvail;
         }
 
         int totalConsumption = colony.getTotalConsumption();
         int netMushrooms = colony.getTotalProduction() - totalConsumption;
-        netMushroomsLabel.setText(String.format(LanguageStrings.get(LanguageStrings.COLONY_NET_FOOD), netMushrooms));
+        netMushroomsLabel.setText(LanguageStrings.format(LanguageStrings.COLONY_NET_FOOD, netMushrooms));
         
         lastMushrooms = mushrooms; 
         lastPlants = plants; 
@@ -401,21 +458,21 @@ public class ColonyPanel extends ZeroGamePanel {
         this.lastColonyRef = colony;
 
         int eggs = colony.getEggs() != null ? colony.getEggs().size() : 0;
-        if (eggs != lastEggs) eggsLabel.setText(String.valueOf(eggs));
+        if (eggs != lastEggs) eggsLabel.setText(AssetStyles.formatNumber(eggs));
         
         boolean hasHunter = colony.hasUpgrade(GameUnlocks.ROLE_HUNTER);
         proteinLabel.setVisible(hasHunter);
         
         int totalConsumption = colony.getTotalConsumption();
-        if (totalConsumption != lastTotalConsumption) totalConsumptionLabel.setText(String.format(LanguageStrings.get(LanguageStrings.COLONY_CONSUMPTION), totalConsumption));
-        totalProductionLabel.setText(String.format(LanguageStrings.get(LanguageStrings.COLONY_MAX_FOOD_PROD), colony.getTotalProduction()));
+        if (totalConsumption != lastTotalConsumption) totalConsumptionLabel.setText(LanguageStrings.format(LanguageStrings.COLONY_CONSUMPTION, totalConsumption));
+        totalProductionLabel.setText(LanguageStrings.format(LanguageStrings.COLONY_MAX_FOOD_PROD, colony.getTotalProduction()));
 
         boolean hasLayer = colony.hasUpgrade(GameUnlocks.ROLE_LAYER);
         layingRateLabel.setVisible(hasLayer);
         if (hasLayer) {
             int layerCount = colony.getAssignedRoleCount(GameConstants.ROLE_LAYER);
             int hourlyLayingRate = layerCount * (int) colony.getLayingRate();
-            layingRateLabel.setText(String.format(LanguageStrings.get(LanguageStrings.COLONY_LAYING_RATE), hourlyLayingRate * 24));
+            layingRateLabel.setText(LanguageStrings.format(LanguageStrings.COLONY_LAYING_RATE, hourlyLayingRate * 24));
         }
         
         boolean hasNurse = colony.hasUpgrade(GameUnlocks.ROLE_NURSE);
@@ -429,7 +486,7 @@ public class ColonyPanel extends ZeroGamePanel {
             }
             int babyAntTotal = colony.getEggs().size() + colony.getLarvae().size() + colony.getPupae().size();
             int nurseCapacity = (int) (nurseCount * colony.getNursingRate());
-            nurseCoverageLabel.setText(String.format(LanguageStrings.get(LanguageStrings.COLONY_NURSE_COVERAGE), babyAntTotal, nurseCapacity));
+            nurseCoverageLabel.setText(LanguageStrings.format(LanguageStrings.COLONY_NURSE_COVERAGE, babyAntTotal, nurseCapacity));
         }
 
         boolean hasResearcher = colony.hasUpgrade(GameUnlocks.ROLE_RESEARCHER);
@@ -438,20 +495,9 @@ public class ColonyPanel extends ZeroGamePanel {
         researchRateLabel.setVisible(hasResearcher || hasAssistant);
         
         if (hasResearcher || hasAssistant) {
-            researchPointsLabel.setText(String.format(LanguageStrings.get(LanguageStrings.COLONY_RESEARCH), colony.getResearchPoints()));
-            int researcherCount = colony.getAssignedRoleCount(GameConstants.ROLE_RESEARCHER);
-            if (colony.hasBuilding(GameUnlocks.PASSIVE_LAB)) {
-                if (colony.hasUpgrade(GameUnlocks.STAT_PASSIVE_1)) {
-                    researcherCount += 2;
-                } else {
-                    researcherCount += 1;
-                }
-            }
-            int assistantCount = colony.getAssignedRoleCount(GameConstants.ROLE_ASSISTANT);
-            int speed = colony.getResearchSpeed();
-            int hourlyQueen = researcherCount * speed;
-            int hourlyAssistant = (int) (assistantCount * (speed / 5.0)); 
-            researchRateLabel.setText(String.format(LanguageStrings.get(LanguageStrings.COLONY_RESEARCH_RATE), (hourlyQueen + hourlyAssistant) * 24));
+            researchPointsLabel.setText(LanguageStrings.format(LanguageStrings.COLONY_RESEARCH, colony.getResearchPoints()));
+            researchRateLabel.setText(LanguageStrings.format(LanguageStrings.COLONY_RESEARCH_RATE,
+                    colony.getStatsService().getDailyResearchPoints(colony)));
         }
 
         lastEggs = eggs; 
@@ -466,7 +512,25 @@ public class ColonyPanel extends ZeroGamePanel {
         this.lastColonyRef = colony;
         
         int totalAnts = colony.getAntTotal();
-        totalAntLabel.setText(String.format(LanguageStrings.get(LanguageStrings.COLONY_TOTAL_ANTS), totalAnts));
+        totalAntLabel.setText(LanguageStrings.format(LanguageStrings.COLONY_TOTAL_ANTS, totalAnts));
+
+        String colonyName = colony.getName();
+        if (!colonyName.equals(lastColonyName)) {
+            colonyNameLabel.setText(colonyName);
+            lastColonyName = colonyName;
+        }
+
+        boolean atWar = colony.getDynasty() != null && colony.getDynasty().isAtWar();
+        if (atWar != lastAtWar) {
+            if (atWar) {
+                warStatusLabel.setText(LanguageStrings.get(LanguageStrings.COLONY_AT_WAR));
+                setupStatLabel(warStatusLabel, GameConstants.ICON_STAT_MILITARY_POWER);
+            } else {
+                warStatusLabel.setText(LanguageStrings.get(LanguageStrings.COLONY_AT_PEACE));
+                setupStatLabel(warStatusLabel, GameConstants.ROLE_DIPLOMAT.getIcon());
+            }
+            lastAtWar = atWar;
+        }
         
         ColonyRank currentRank = colony.getRank();
         if (currentRank != lastRank) {
@@ -478,33 +542,33 @@ public class ColonyPanel extends ZeroGamePanel {
         queensLabel.setVisible(colony.hasUpgrade(GameUnlocks.TYPE_QUEEN));
         int queenCount = colony.getQueens() != null ? colony.getQueens().size() : 0;
         int queenCapacity = colony.getQueensCapacity();
-        queensLabel.setText(queenCount + " / " + queenCapacity);
+        queensLabel.setText(AssetStyles.formatRatio(queenCount, queenCapacity));
         
         boolean hasPrincess = colony.hasUpgrade(GameUnlocks.TYPE_PRINCESS);
         princessLabel.setVisible(hasPrincess);
-        princessLabel.setText(String.valueOf(colony.getPrincesses() != null ? colony.getPrincesses().size() : 0));
+        princessLabel.setText(AssetStyles.formatNumber(colony.getPrincesses() != null ? colony.getPrincesses().size() : 0));
         droneLabel.setVisible(hasPrincess);
-        droneLabel.setText(String.valueOf(colony.getDrones() != null ? colony.getDrones().size() : 0));
+        droneLabel.setText(AssetStyles.formatNumber(colony.getDrones() != null ? colony.getDrones().size() : 0));
         
         majorLabel.setVisible(colony.hasUpgrade(GameUnlocks.TYPE_MAJOR));
-        majorLabel.setText(String.valueOf(colony.getMajors() != null ? colony.getMajors().size() : 0));
+        majorLabel.setText(AssetStyles.formatNumber(colony.getMajors() != null ? colony.getMajors().size() : 0));
         
         soldiersLabel.setVisible(colony.hasUpgrade(GameUnlocks.TYPE_SOLDIER));
-        soldiersLabel.setText(String.valueOf(colony.getSoldiers() != null ? colony.getSoldiers().size() : 0));
+        soldiersLabel.setText(AssetStyles.formatNumber(colony.getSoldiers() != null ? colony.getSoldiers().size() : 0));
         
         workersLabel.setVisible(colony.hasUpgrade(GameUnlocks.TYPE_WORKER));
-        workersLabel.setText(String.valueOf(colony.getWorkers() != null ? colony.getWorkers().size() : 0));
+        workersLabel.setText(AssetStyles.formatNumber(colony.getWorkers() != null ? colony.getWorkers().size() : 0));
         
         boolean hasBabies = colony.hasUpgrade(GameUnlocks.TYPE_EGG);
         pupaLabel.setVisible(hasBabies);
-        pupaLabel.setText(String.valueOf(colony.getPupae() != null ? colony.getPupae().size() : 0));
+        pupaLabel.setText(AssetStyles.formatNumber(colony.getPupae() != null ? colony.getPupae().size() : 0));
         larvaLabel.setVisible(hasBabies);
-        larvaLabel.setText(String.valueOf(colony.getLarvae() != null ? colony.getLarvae().size() : 0));
+        larvaLabel.setText(AssetStyles.formatNumber(colony.getLarvae() != null ? colony.getLarvae().size() : 0));
         eggsLabel.setVisible(hasBabies);
         
-        deadAntsLabel.setText(String.valueOf(colony.getDeadAnts() != null ? colony.getDeadAnts().size() : 0));
+        deadAntsLabel.setText(AssetStyles.formatNumber(colony.getDeadAnts() != null ? colony.getDeadAnts().size() : 0));
 
-        if (colony.getMushrooms() != lastMushrooms) mushroomsLabel.setText(String.valueOf(colony.getMushrooms()));
+        if (colony.getMushrooms() != lastMushrooms) mushroomsLabel.setText(AssetStyles.formatNumber(colony.getMushrooms()));
         
         boolean hasGraver = colony.hasUpgrade(GameUnlocks.ROLE_GRAVER);
         graveKeepingLabel.setVisible(hasGraver);
@@ -519,49 +583,99 @@ public class ColonyPanel extends ZeroGamePanel {
             }
             int graveCapacity = graverCount * (int) colony.getGravingRate();
             int currentDead = colony.getDeadAnts() != null ? colony.getDeadAnts().size() : 0;
-            graveKeepingLabel.setText(String.format(LanguageStrings.get(LanguageStrings.COLONY_GRAVE_CLEANING), currentDead, graveCapacity));
+            graveKeepingLabel.setText(LanguageStrings.format(LanguageStrings.COLONY_GRAVE_CLEANING, currentDead, graveCapacity));
         }
 
         boolean hasRancher = colony.hasUpgrade(GameUnlocks.ROLE_RANCHER);
         boolean hasCatcher = colony.hasUpgrade(GameUnlocks.ROLE_CATCHER);
-        petInsectsLabel.setVisible(hasRancher || hasCatcher);
-        if (hasRancher || hasCatcher) {
+        boolean hasSymbioticMiteCatch = colony.hasUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE);
+        boolean hasDermestidCatch = colony.hasUpgrade(GameUnlocks.ABILITY_CATCH_DERMESTID);
+        boolean showPetInsects = hasRancher || hasCatcher || hasSymbioticMiteCatch || hasDermestidCatch
+                || colony.getAphids() > 0 || colony.getSymbioticMites() > 0 || colony.getDermestids() > 0;
+        petInsectsLabel.setVisible(showPetInsects);
+        if (showPetInsects) {
             var bugHandling = colony.getBugHandlingService();
-            int poolUsed = bugHandling.getTotalPetCount(colony);
-            int poolMax = hasCatcher
-                    ? bugHandling.getCatcherPoolCapacity(colony)
-                    : bugHandling.getMaxCapacity(colony, GameConstants.TYPE_APHID);
-            petInsectsLabel.setText(String.format(
-                    LanguageStrings.get(LanguageStrings.COLONY_PET_INSECTS), poolUsed, poolMax));
+            int poolUsed = bugHandling.getUnlockedPetCount(colony);
+            int poolMax = bugHandling.getUnlockedPetCapacityMax(colony);
+            petInsectsLabel.setText(LanguageStrings.format(
+                    LanguageStrings.COLONY_PET_INSECTS, poolUsed, poolMax));
         }
 
         int parasiticMites = colony.getParasiticMites();
         parasiticMiteCountLabel.setVisible(parasiticMites > 0);
         if (parasiticMites > 0) {
             int slowed = colony.getParasiticMiteSlowedAntCount();
-            parasiticMiteCountLabel.setText(String.format(
-                    LanguageStrings.get(LanguageStrings.COLONY_PARASITIC_MITES), parasiticMites, slowed));
+            parasiticMiteCountLabel.setText(LanguageStrings.format(
+                    LanguageStrings.COLONY_PARASITIC_MITES, parasiticMites, slowed));
         }
         
         boolean hasPolice = colony.hasUpgrade(GameUnlocks.ROLE_POLICE);
-        parasiteCountLabel.setVisible(hasPolice);
+        parasiteAntCountLabel.setVisible(hasPolice);
         policeStatsLabel.setVisible(hasPolice);
         if (hasPolice) {
-            boolean fuzz = engine != null && engine.isFuzzParasites();
-            parasiteCountLabel.setText(String.format(LanguageStrings.get(LanguageStrings.COLONY_PARASITES), colony.getParasiteCountDisplay(fuzz)));
+            boolean fuzz = engine != null && engine.isFuzzParasiteAnts();
+            parasiteAntCountLabel.setText(LanguageStrings.format(LanguageStrings.COLONY_PARASITE_ANTS, colony.getParasiteAntCountDisplay(fuzz)));
             float detection = colony.getStatsService().getParasiteDetection(colony);
             int policeCount = colony.getAssignedRoleCount(GameConstants.ROLE_POLICE);
-            policeStatsLabel.setText(String.format(LanguageStrings.get(LanguageStrings.COLONY_DETECTION_RATE), Math.round(policeCount * detection)));
+            policeStatsLabel.setText(LanguageStrings.format(LanguageStrings.COLONY_DETECTION_RATE, Math.round(policeCount * detection)));
+
+            World world = engine != null ? engine.getWorld() : null;
+            if (world != null) {
+                Hex hex = world.getHexOfColony(colony);
+                Biome biome = hex != null ? hex.getBiome() : null;
+                Season season = world.getSeason();
+                if (biome != null && season != null) {
+                    int projected = colony.getPopulationService().projectParasiteAntMonthlySpawn(colony, biome, season);
+                    if (projected > 0) {
+                        int required = colony.getPopulationService().requiredPoliceToPreventParasiteAntOutbreak(colony, biome, season);
+                        String prevention = LanguageStrings.format(
+                                LanguageStrings.STAT_OUTBREAK_PREV_FMT,
+                                policeCount, required, projected);
+                        if (policeCount >= required) {
+                            prevention = LanguageStrings.get(LanguageStrings.STAT_OUTBREAK_PREV_BLOCKED) + " — " + prevention;
+                        }
+                        policeStatsLabel.setToolTipText(
+                                LanguageStrings.get(LanguageStrings.TOOLTIP_POLICING) + "<br>"
+                                + LanguageStrings.get(LanguageStrings.TOOLTIP_OUTBREAK_PREV_POLICE) + "<br>"
+                                + prevention);
+                    } else {
+                        policeStatsLabel.setToolTipText(LanguageStrings.get(LanguageStrings.TOOLTIP_POLICING));
+                    }
+                }
+            }
         }
         
         int eggs = colony.getEggs() != null ? colony.getEggs().size() : 0;
         int larva = colony.getLarvae() != null ? colony.getLarvae().size() : 0;
         int pupa = colony.getPupae() != null ? colony.getPupae().size() : 0;
         int babyTotal = eggs + larva + pupa;
-        babyAntsLabel.setText(String.format(LanguageStrings.get(LanguageStrings.COLONY_JUVENILE_ANTS), babyTotal));
+        babyAntsLabel.setText(LanguageStrings.format(LanguageStrings.COLONY_JUVENILE_ANTS, babyTotal));
 
         int adultTotal = (colony.getQueens().size() + colony.getPrincesses().size() + colony.getDrones().size() + colony.getMajors().size() + colony.getSoldiers().size() + colony.getWorkers().size());
-        adultAntsLabel.setText(String.format(LanguageStrings.get(LanguageStrings.COLONY_ADULT_ANTS), adultTotal));
+        adultAntsLabel.setText(LanguageStrings.format(LanguageStrings.COLONY_ADULT_ANTS, adultTotal));
+
+        int militaryPower = colony.getMilitaryPower();
+        if (militaryPower != lastMilitaryPower) {
+            militaryPowerLabel.setText(LanguageStrings.format(
+                    LanguageStrings.COLONY_MILITARY_POWER, militaryPower));
+            lastMilitaryPower = militaryPower;
+        }
+
+        int effectiveLoyalty = colony.getEffectiveLoyalty(
+                engine != null ? engine.getTradeManager() : null,
+                engine != null ? engine.getWorld() : null);
+        if (effectiveLoyalty != lastEffectiveLoyalty) {
+            ColonyLoyalty tier = GameConstants.getColonyLoyaltyLevel(effectiveLoyalty);
+            loyaltyLabel.setText(LanguageStrings.format(
+                    LanguageStrings.SCORE_TIER_FORMAT,
+                    effectiveLoyalty,
+                    tier.getName()));
+            loyaltyLabel.setIcon(tier.getIcon());
+            loyaltyLabel.setToolTipText(colony.buildLoyaltyModifierTooltip(
+                    engine != null ? engine.getTradeManager() : null,
+                    engine != null ? engine.getWorld() : null));
+            lastEffectiveLoyalty = effectiveLoyalty;
+        }
 
         lastMushrooms = colony.getMushrooms(); 
     }
