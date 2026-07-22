@@ -21,7 +21,7 @@ import com.grimidk.formicempire.classes.constants.ant.AntSubtypeSlot;
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ColonyLoyaltyModifier;
-import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
+import com.grimidk.formicempire.classes.constants.misc.Rank;
 import com.grimidk.formicempire.classes.constants.misc.Species;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
@@ -51,7 +51,7 @@ public class Colony {
     private Dynasty dynasty;
     private String name;
     private boolean isPlayer;
-    private ColonyRank rank;
+    private Rank rank;
     private boolean isActive;
     private boolean automationEnabled = false; 
     private boolean autoBuildEnabled = false;
@@ -866,8 +866,8 @@ public class Colony {
     
     public boolean isPlayer() { return isPlayer; }
     public void setIsPlayer(boolean isPlayer) { this.isPlayer = isPlayer; }
-    public ColonyRank getRank() { return rank; }
-    public void setRank(ColonyRank rank) { this.rank = rank; }
+    public Rank getRank() { return rank; }
+    public void setRank(Rank rank) { this.rank = rank; }
     public boolean isActive() { return isActive; }
     public void setActive(boolean isActive) { this.isActive = isActive; }
 
@@ -983,7 +983,8 @@ public class Colony {
     public void setBuildingProgressHours(double d) { this.buildingProgressHours = d; }
 
     public boolean startBuildingProject(Building building) {
-        if (currentBuildingProject != null) return false; 
+        if (currentBuildingProject != null) return false;
+        if (building == null || !building.isAvailableFor(getDynasty())) return false;
         if (getMinerals() < building.getMineralCost() || getResins() < building.getResinCost()) {
             return false; 
         }
@@ -1344,6 +1345,8 @@ public class Colony {
         for (Upgrade upgrade : GameUnlocks.getUpgrades()) {
             if (!hasUpgrade(upgrade) && upgrade.getCost() > 0
                     && (upgrade.getRequirement() == null || hasUpgrade(upgrade.getRequirement()))
+                    && GameUnlocks.meetsExtraAutomationPrerequisites(getDynasty(), upgrade)
+                    && upgrade.isAvailableFor(getDynasty())
                     && researchPoints >= upgrade.getCost()) {
                 return true;
             }
@@ -1359,7 +1362,8 @@ public class Colony {
         int resins = getResins();
         for (Building building : GameUnlocks.getBuildings()) {
             if (!hasBuilding(building) && minerals >= building.getMineralCost()
-                    && resins >= building.getResinCost() && hasBuilding(building.getRequirement())) {
+                    && resins >= building.getResinCost() && hasBuilding(building.getRequirement())
+                    && building.isAvailableFor(getDynasty())) {
                 return building;
             }
         }

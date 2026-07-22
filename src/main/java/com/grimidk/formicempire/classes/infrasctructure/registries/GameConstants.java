@@ -13,7 +13,7 @@ import com.grimidk.formicempire.classes.constants.misc.BugType;
 import com.grimidk.formicempire.classes.constants.misc.CityTitle;
 import com.grimidk.formicempire.classes.constants.misc.ColonyLoyalty;
 import com.grimidk.formicempire.classes.constants.misc.ColonyLoyaltyModifier;
-import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
+import com.grimidk.formicempire.classes.constants.misc.Rank;
 import com.grimidk.formicempire.classes.constants.misc.DynastyTitle;
 import com.grimidk.formicempire.classes.constants.misc.DiplomaticReputation;
 import com.grimidk.formicempire.classes.constants.misc.DiplomaticReputationModifier;
@@ -21,6 +21,7 @@ import com.grimidk.formicempire.classes.constants.misc.GameSpeed;
 import com.grimidk.formicempire.classes.constants.misc.GeneticIntegrityModifier;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.misc.Species;
+import com.grimidk.formicempire.classes.constants.misc.Tier;
 import com.grimidk.formicempire.classes.constants.misc.TradeMethod;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.constants.world.Biome;
@@ -204,7 +205,7 @@ public final class GameConstants {
     private static final List<AntType> antTypes = new ArrayList<>();
     private static final List<AntSubtype> antSubtypes = new ArrayList<>();
     private static final List<AntRole> antRoles = new ArrayList<>();
-    private static final List<ColonyRank> colonyRanks = new ArrayList<>();
+    private static final List<Rank> colonyRanks = new ArrayList<>();
     private static final List<GameSpeed> gameSpeeds = new ArrayList<>();
     private static final List<DiplomaticReputation> diplomaticReputations = new ArrayList<>();
     private static final List<DiplomaticReputationModifier> diplomaticReputationModifiers = new ArrayList<>();
@@ -218,6 +219,7 @@ public final class GameConstants {
     private static final List<Humidity> humidity = new ArrayList<>();
     private static final List<Temperature> temperature = new ArrayList<>();
     private static final List<ImageIcon> misc = new ArrayList<>();
+    private static final List<Tier> tiers = new ArrayList<>();
 
     // --- Misc Icons ---
     public static final ImageIcon ICON_SOCIALISM = loadIcon("icons/misc/Socialism.png");
@@ -733,47 +735,73 @@ public final class GameConstants {
     static { antRoles.add(ROLE_SKYTRANS); }
 
     // --- Colony Ranks ---
-    public static final ColonyRank RANK_ANT = new ColonyRank(1, LanguageStrings.RANK_ANT, 1l, 
+    public static final Rank RANK_ANT = new Rank(1, LanguageStrings.RANK_ANT, 1l, 
         loadIcon("icons/ranks/Ant.png"));
     static { colonyRanks.add(RANK_ANT); }
-    public static final ColonyRank RANK_COLONY = new ColonyRank(2, LanguageStrings.RANK_COLONY, 10l, 
+    public static final Rank RANK_COLONY = new Rank(2, LanguageStrings.RANK_COLONY, 10l, 
         loadIcon("icons/ranks/Colony.png"));
     static { colonyRanks.add(RANK_COLONY); }
-    public static final ColonyRank RANK_COUNTY = new ColonyRank(3, LanguageStrings.RANK_COUNTY, 100l, 
+    public static final Rank RANK_COUNTY = new Rank(3, LanguageStrings.RANK_COUNTY, 100l, 
         loadIcon("icons/ranks/County.png"));
     static { colonyRanks.add(RANK_COUNTY); }
-    public static final ColonyRank RANK_DUCHY = new ColonyRank(4, LanguageStrings.RANK_DUCHY, 1000l, 
+    public static final Rank RANK_DUCHY = new Rank(4, LanguageStrings.RANK_DUCHY, 1000l, 
         loadIcon("icons/ranks/Duchy.png"));
     static { colonyRanks.add(RANK_DUCHY); }
-    public static final ColonyRank RANK_KINGDOM = new ColonyRank(5, LanguageStrings.RANK_KINGDOM, 10000l, 
+    public static final Rank RANK_KINGDOM = new Rank(5, LanguageStrings.RANK_KINGDOM, 10000l, 
         loadIcon("icons/ranks/Kingdom.png"));
     static { colonyRanks.add(RANK_KINGDOM); }
-    public static final ColonyRank RANK_EMPIRE = new ColonyRank(6, LanguageStrings.RANK_EMPIRE, 100000l, 
+    public static final Rank RANK_EMPIRE = new Rank(6, LanguageStrings.RANK_EMPIRE, 100000l, 
         loadIcon("icons/ranks/Empire.png"));
     static { colonyRanks.add(RANK_EMPIRE); }
-    public static final ColonyRank RANK_SUPER = new ColonyRank(7, LanguageStrings.RANK_SUPER, 1000000l, 
+    public static final Rank RANK_SUPER = new Rank(7, LanguageStrings.RANK_SUPER, 1000000l, 
         loadIcon("icons/ranks/Super.png"));
     static { colonyRanks.add(RANK_SUPER); }
-    public static final ColonyRank RANK_ULTRA = new ColonyRank(8, LanguageStrings.RANK_ULTRA, 10000000l, 
+    public static final Rank RANK_ULTRA = new Rank(8, LanguageStrings.RANK_ULTRA, 10000000l, 
         loadIcon("icons/ranks/Ultra.png"));
     static { colonyRanks.add(RANK_ULTRA); }
-    public static final ColonyRank RANK_HYPER = new ColonyRank(9, LanguageStrings.RANK_HYPER, 100000000l, 
+    public static final Rank RANK_HYPER = new Rank(9, LanguageStrings.RANK_HYPER, 100000000l, 
         loadIcon("icons/ranks/Hyper.png"));
     static { colonyRanks.add(RANK_HYPER); }
-    public static final ColonyRank RANK_MEGA = new ColonyRank(10, LanguageStrings.RANK_MEGA, 1000000000l, 
+    public static final Rank RANK_MEGA = new Rank(10, LanguageStrings.RANK_MEGA, 1000000000l, 
         loadIcon("icons/ranks/Mega.png"));
     static { colonyRanks.add(RANK_MEGA); }
-    public static final ColonyRank RANK_ULTIMATE = new ColonyRank(11, LanguageStrings.RANK_ULTIMATE, 10000000000l, 
+    public static final Rank RANK_ULTIMATE = new Rank(11, LanguageStrings.RANK_ULTIMATE, 10000000000l, 
         loadIcon("icons/ranks/Ultimate.png"));
     static { colonyRanks.add(RANK_ULTIMATE); }
-    public static final ColonyRank RANK_SUPREME = new ColonyRank(12, LanguageStrings.RANK_SUPREME, 100000000000l, 
+    public static final Rank RANK_SUPREME = new Rank(12, LanguageStrings.RANK_SUPREME, 100000000000l, 
         loadIcon("icons/ranks/Supreme.png"));
     static { colonyRanks.add(RANK_SUPREME); }
-    public static final ColonyRank RANK_GIGA = new ColonyRank(13, LanguageStrings.RANK_GIGA, 1000000000000l, 
+    public static final Rank RANK_GIGA = new Rank(13, LanguageStrings.RANK_GIGA, 1000000000000l, 
         loadIcon("icons/ranks/Giga.png"));
     static { colonyRanks.add(RANK_GIGA); }
 
-    // --- Game speeds (tick delay ms; icons under icons/speed/) ---
+    // --- Tiers ---
+    public static final Tier TIER_0 = new Tier(1, LanguageStrings.TIER_0, RANK_COLONY, 10L, 0, loadIcon("icons/tiers/Tier0.png"));
+    static { tiers.add(TIER_0); }
+    public static final Tier TIER_1 = new Tier(2, LanguageStrings.TIER_1, RANK_COUNTY, 100L, 0, loadIcon("icons/tiers/Tier1.png"));
+    static { tiers.add(TIER_1); }
+    public static final Tier TIER_2 = new Tier(3, LanguageStrings.TIER_2, RANK_DUCHY, 1_000L, 200, loadIcon("icons/tiers/Tier2.png"));
+    static { tiers.add(TIER_2); }
+    public static final Tier TIER_3 = new Tier(4, LanguageStrings.TIER_3, RANK_KINGDOM, 10_000L, 500, loadIcon("icons/tiers/Tier3.png"));
+    static { tiers.add(TIER_3); }
+    public static final Tier TIER_4 = new Tier(5, LanguageStrings.TIER_4, RANK_EMPIRE, 100_000L, 1_000, loadIcon("icons/tiers/Tier4.png"));
+    static { tiers.add(TIER_4); }
+    public static final Tier TIER_5 = new Tier(6, LanguageStrings.TIER_5, RANK_SUPER, 1_000_000L, 2_500, loadIcon("icons/tiers/Tier5.png"));
+    static { tiers.add(TIER_5); }
+    public static final Tier TIER_6 = new Tier(7, LanguageStrings.TIER_6, RANK_ULTRA, 10_000_000L, 5_000, loadIcon("icons/tiers/Tier6.png"));
+    static { tiers.add(TIER_6); }
+    public static final Tier TIER_7 = new Tier(8, LanguageStrings.TIER_7, RANK_HYPER, 100_000_000L, 10_000, loadIcon("icons/tiers/Tier7.png"));
+    static { tiers.add(TIER_7); }
+    public static final Tier TIER_8 = new Tier(9, LanguageStrings.TIER_8, RANK_MEGA, 1_000_000_000L, 25_000, loadIcon("icons/tiers/Tier8.png"));
+    static { tiers.add(TIER_8); }
+    public static final Tier TIER_9 = new Tier(10, LanguageStrings.TIER_9, RANK_ULTIMATE, 10_000_000_000L, 50_000, loadIcon("icons/tiers/Tier9.png"));
+    static { tiers.add(TIER_9); }
+    public static final Tier TIER_10 = new Tier(11, LanguageStrings.TIER_10, RANK_SUPREME, 100_000_000_000L, 100_000, loadIcon("icons/tiers/Tier10.png"));
+    static { tiers.add(TIER_10); }
+    public static final Tier TIER_11 = new Tier(12, LanguageStrings.TIER_11, RANK_GIGA, 1_000_000_000_000L, 250_000, loadIcon("icons/tiers/Tier11.png"));
+    static { tiers.add(TIER_11); }  
+
+    // --- Game speeds ---
     public static final GameSpeed SPEED_VERY_SLOW = new GameSpeed(
             GameSpeed.ID_VERY_SLOW, LanguageStrings.UI_SPEED_VERY_SLOW, 200,
             loadIcon("icons/speed/VerySlow.png"));
@@ -950,7 +978,7 @@ public final class GameConstants {
         6, LanguageStrings.LOYALTY_MODIFIER_RECENTLY_INTEGRATED, 25, 0, null, 180);
     static { colonyLoyaltyModifiers.add(LOYALTY_MODIFIER_RECENTLY_INTEGRATED); }
 
-    public static final ColonyRank TRIGGER_CLONING_MIN_RANK = RANK_EMPIRE;
+    public static final Rank TRIGGER_CLONING_MIN_RANK = RANK_EMPIRE;
     
     // --- Dynasty titles ---
     public static final DynastyTitle DYNASTY_TITLE_DYNASTY = new DynastyTitle(
@@ -1371,7 +1399,21 @@ public final class GameConstants {
         return null;
     }
 
-    public static List<ColonyRank> getColonyRanks() { return Collections.unmodifiableList(colonyRanks); }
+    public static List<Rank> getColonyRanks() { return Collections.unmodifiableList(colonyRanks); }
+    public static List<Tier> getTiers() { return Collections.unmodifiableList(tiers); }
+
+    public static Rank getColonyRankByKey(String key) {
+        if (key == null || key.isEmpty()) {
+            return RANK_ANT;
+        }
+        for (Rank rank : colonyRanks) {
+            if (rank.getNameKey().equals(key)) {
+                return rank;
+            }
+        }
+        return RANK_ANT;
+    }
+
     public static List<DynastyTitle> getDynastyTitles() { return Collections.unmodifiableList(dynastyTitles); }
     public static List<CityTitle> getCityTitles() { return Collections.unmodifiableList(cityTitles); }
 

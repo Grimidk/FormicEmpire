@@ -1001,6 +1001,19 @@ public class FrenchTranslation implements Translation {
         fr.put("RANK_SUPREME", "Colonie suprême");
         fr.put("RANK_GIGA", "Giga-colonie");
 
+        fr.put("TIER_0", "Tier 0");
+        fr.put("TIER_1", "Tier 1");
+        fr.put("TIER_2", "Tier 2");
+        fr.put("TIER_3", "Tier 3");
+        fr.put("TIER_4", "Tier 4");
+        fr.put("TIER_5", "Tier 5");
+        fr.put("TIER_6", "Tier 6");
+        fr.put("TIER_7", "Tier 7");
+        fr.put("TIER_8", "Tier 8");
+        fr.put("TIER_9", "Tier 9");
+        fr.put("TIER_10", "Tier 10");
+        fr.put("TIER_11", "Tier 11");
+
         fr.put("REPUTATION_AGGRESSIVE", "Agressif");
         fr.put("REPUTATION_WARY", "Méfiant");
         fr.put("REPUTATION_NEUTRAL", "Neutre");
@@ -1725,7 +1738,7 @@ public class FrenchTranslation implements Translation {
         fr.put("HELP_SUBTYPES_INTRO", "Les traits assimilés de parties du corps peuvent apparaître sur les nouvelles éclosions. Réglez les probabilités par type de fourmi dans Taux d'éclosion (P). Chaque partie active du sous-type ajoute +50 % de consommation alimentaire.");
         fr.put("HELP_TAB_BUGS", "Autres insectes");
         fr.put("HELP_TAB_ANT_ROLES", "Rôles de Fourmi");
-        fr.put("HELP_TAB_EMPIRE", "Empire");
+        fr.put("HELP_TAB_EMPIRE", "Dynastie");
         fr.put("HELP_TAB_UPGRADES", "Améliorations");
         fr.put("HELP_TAB_BUILDINGS", "Bâtiments");
         fr.put("HELP_TAB_ASSIMILATIONS", "Assimilations");
@@ -1804,6 +1817,9 @@ public class FrenchTranslation implements Translation {
         fr.put("HELP_MILITARY_POWER_BODY", "Types adultes (rôles ignorés) : Ouvrière×1, Soldat×5, Major×15, Princesse×10, Reine×50.<br>Modulé par Squelette + Acide. Recalculé chaque jour du monde.<br>Un fort écart de puissance pousse diplomatie et loyauté vers le plus fort.");
         fr.put("HELP_EMPIRE_REPUTATION", "Postures de réputation diplomatique");
         fr.put("HELP_EMPIRE_MOVEMENT", "Mouvement des insectes de compagnie");
+        fr.put("HELP_EMPIRE_RANKS", "Rangs de dynastie");
+        fr.put("HELP_RANK_MIN_POPULATION", " (pop. min. %s)");
+        fr.put("HELP_RANK_UNLOCKS_TIER", "débloque");
         fr.put("HELP_TIER_MIN_SCORE", " (min. %s)");
         fr.put("HELP_LOYALTY_MODIFIERS_TITLE", "Modificateurs actifs");
         fr.put("HELP_LOYALTY_MODIFIER_MILITARY", "Militaire vs capitale : +/-1 à +/-10 selon le ratio de puissance avec la capitale (colonies plus faibles gagnent ; satellites plus forts perdent).");
@@ -1990,6 +2006,26 @@ public class FrenchTranslation implements Translation {
 
         fr.put("TRIGGER_CLONING_TITLE", "Cuves de clonage");
         fr.put("TRIGGER_CLONING_MSG", "Votre colonie a atteint le rang Empire ! Clonage débloqué : les assimilations relèvent le plancher d'intégrité génétique, et les mâles des espèces assimilées apparaissent.");
+        fr.put("TRIGGER_RANK_COUNTY_TITLE", "Comté");
+        fr.put("TRIGGER_RANK_COUNTY_MSG", "Votre dynastie est devenue un Comté ! De nouveaux paliers de recherche et de construction s'ouvrent à mesure que la population croît.");
+        fr.put("TRIGGER_RANK_DUCHY_TITLE", "Duché");
+        fr.put("TRIGGER_RANK_DUCHY_MSG", "Votre dynastie est désormais un Duché. Son influence régionale grandit, et des améliorations et bâtiments de niveau supérieur deviennent disponibles.");
+        fr.put("TRIGGER_RANK_KINGDOM_TITLE", "Royaume");
+        fr.put("TRIGGER_RANK_KINGDOM_MSG", "Un Royaume s'élève ! Votre dynastie commande un essaim à l'échelle d'un royaume et débloque le palier suivant.");
+        fr.put("TRIGGER_RANK_SUPER_TITLE", "Super-colonie");
+        fr.put("TRIGGER_RANK_SUPER_MSG", "Votre dynastie est devenue une Super-colonie — un vaste réseau vivant. De nouveaux paliers technologiques s'ouvrent à cette échelle.");
+        fr.put("TRIGGER_RANK_ULTRA_TITLE", "Ultra-colonie");
+        fr.put("TRIGGER_RANK_ULTRA_MSG", "Ultra-colonie atteinte ! Vos effectifs remodelent le paysage et les avancées de palier ultra deviennent disponibles.");
+        fr.put("TRIGGER_RANK_HYPER_TITLE", "Hyper-colonie");
+        fr.put("TRIGGER_RANK_HYPER_MSG", "Statut d'Hyper-colonie ! La densité de l'essaim débloque les améliorations et bâtiments de palier hyper.");
+        fr.put("TRIGGER_RANK_MEGA_TITLE", "Méga-colonie");
+        fr.put("TRIGGER_RANK_MEGA_MSG", "Méga-colonie ! La masse de votre dynastie est légendaire et ouvre les avancées de palier méga.");
+        fr.put("TRIGGER_RANK_ULTIMATE_TITLE", "Colonie ultime");
+        fr.put("TRIGGER_RANK_ULTIMATE_MSG", "Colonie ultime ! Peu d'essaims atteignent cette hauteur — les options de palier ultime sont débloquées.");
+        fr.put("TRIGGER_RANK_SUPREME_TITLE", "Colonie suprême");
+        fr.put("TRIGGER_RANK_SUPREME_MSG", "Colonie suprême ! Votre dynastie figure parmi les plus grandes, avec la technologie de palier suprême disponible.");
+        fr.put("TRIGGER_RANK_GIGA_TITLE", "Giga-colonie");
+        fr.put("TRIGGER_RANK_GIGA_MSG", "Giga-colonie — le rang ultime ! Les derniers paliers d'améliorations et de bâtiments sont à votre portée.");
         fr.put("TRIGGER_RESEARCHER_ROLE_TITLE", "Nouvelles idées");
         fr.put("TRIGGER_RESEARCHER_ROLE_MSG", "Un mois s'est écoulé. Votre reine a mûri et peut désormais consacrer du temps à la Recherche, débloquant le rôle Chercheuse.");
         fr.put("TRIGGER_GRAVER_ROLE_TITLE", "Un problème odorant");

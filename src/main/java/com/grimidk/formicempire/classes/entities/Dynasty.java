@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.awt.Color;
 
 import com.grimidk.formicempire.classes.constants.misc.CityTitle;
-import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
+import com.grimidk.formicempire.classes.constants.misc.Rank;
 import com.grimidk.formicempire.classes.constants.misc.DiplomaticReputationModifier;
 import com.grimidk.formicempire.classes.constants.misc.DynastyTitle;
 import com.grimidk.formicempire.classes.constants.misc.PactRequestIncomingPolicy;
@@ -56,7 +56,7 @@ public class Dynasty {
     private int researchPoints;
     private int totalNuptialFlights;
     private int diplomatsSentTotal;
-    private ColonyRank rank;
+    private Rank rank;
     private Color color;
     
     // --- State Flags ---
@@ -71,6 +71,7 @@ public class Dynasty {
     private int lastIncomingPactRequestWorldDay;
     private transient boolean pactRequestPromptOpen;
     private final Set<Upgrade> unlockedUpgrades;
+    private final Set<Integer> announcedRankIds;
     private final transient List<Synergy> pendingSynergyAlerts = new ArrayList<>();
     private final List<Colony> colonies;
     private final List<Tunnel> tunnels;
@@ -131,6 +132,8 @@ public class Dynasty {
         this.species = species;
         this.colonies = new ArrayList<>();
         this.unlockedUpgrades = new HashSet<>();
+        this.announcedRankIds = new LinkedHashSet<>();
+        seedStartingAnnouncedRanks();
         this.tunnels = new ArrayList<>();
         this.globalDeathStatistics = new ConcurrentHashMap<>();
         this.absorbedDynastyIds = new ArrayList<>();
@@ -222,6 +225,7 @@ public class Dynasty {
 
         this.colonies = new ArrayList<>();
         this.unlockedUpgrades = new HashSet<>();
+        this.announcedRankIds = new LinkedHashSet<>();
         this.tunnels = new ArrayList<>();
         this.globalDeathStatistics = new ConcurrentHashMap<>();
         this.completedAssimilations = new HashSet<>();
@@ -458,6 +462,12 @@ public class Dynasty {
                 }
             }
         }
+
+        if (savedDynasty.announcedRankIds != null) {
+            this.announcedRankIds.addAll(savedDynasty.announcedRankIds);
+        } else {
+            seedAnnouncedRanksThrough(GameConstants.getColonyRankByKey(savedDynasty.rankName));
+        }
         
         initializeColor();
         initializeServices();
@@ -564,7 +574,7 @@ public class Dynasty {
     }
     
     private void rankUp() {
-        ColonyRank previous = this.rank;
+        Rank previous = this.rank;
         int total = this.statService.getTotalPopulation(this);
                 
         if (total >= GameConstants.RANK_GIGA.getPopulation()) this.rank = GameConstants.RANK_GIGA;
@@ -1571,8 +1581,8 @@ public class Dynasty {
     public Color getColor() { return color; }
     public void setColor(Color color) { this.color = color; }
     
-    public ColonyRank getRank() { return rank; }
-    public void setRank(ColonyRank rank) { this.rank = rank; }
+    public Rank getRank() { return rank; }
+    public void setRank(Rank rank) { this.rank = rank; }
 
     public int getResearchPoints() { return researchPoints; }
     public void setResearchPoints(int researchPoints) {
@@ -1696,6 +1706,37 @@ public class Dynasty {
     }
 
     public Set<Upgrade> getUnlockedUpgrades() { return unlockedUpgrades; }
+
+    public boolean hasAnnouncedRank(Rank rank) {
+        return rank != null && announcedRankIds.contains(rank.getId());
+    }
+
+    public void markRankAnnounced(Rank rank) {
+        if (rank != null) {
+            announcedRankIds.add(rank.getId());
+        }
+    }
+
+    public List<Integer> copyAnnouncedRankIds() {
+        return new ArrayList<>(announcedRankIds);
+    }
+
+    private void seedStartingAnnouncedRanks() {
+        announcedRankIds.add(GameConstants.RANK_ANT.getId());
+        announcedRankIds.add(GameConstants.RANK_COLONY.getId());
+    }
+
+    private void seedAnnouncedRanksThrough(Rank through) {
+        seedStartingAnnouncedRanks();
+        if (through == null) {
+            return;
+        }
+        for (Rank rank : GameConstants.getColonyRanks()) {
+            if (rank.getId() <= through.getId()) {
+                announcedRankIds.add(rank.getId());
+            }
+        }
+    }
     public boolean hasUpgrade(Upgrade upgrade) { return unlockedUpgrades.contains(upgrade); }
     public void unlockUpgrade(Upgrade upgrade) {
         if (upgrade == null || unlockedUpgrades.contains(upgrade)) {

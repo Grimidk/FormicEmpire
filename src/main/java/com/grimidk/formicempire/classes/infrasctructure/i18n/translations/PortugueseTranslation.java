@@ -1001,6 +1001,19 @@ public class PortugueseTranslation implements Translation {
         pt.put("RANK_SUPREME", "Colônia suprema");
         pt.put("RANK_GIGA", "Gigacolônia");
 
+        pt.put("TIER_0", "Tier 0");
+        pt.put("TIER_1", "Tier 1");
+        pt.put("TIER_2", "Tier 2");
+        pt.put("TIER_3", "Tier 3");
+        pt.put("TIER_4", "Tier 4");
+        pt.put("TIER_5", "Tier 5");
+        pt.put("TIER_6", "Tier 6");
+        pt.put("TIER_7", "Tier 7");
+        pt.put("TIER_8", "Tier 8");
+        pt.put("TIER_9", "Tier 9");
+        pt.put("TIER_10", "Tier 10");
+        pt.put("TIER_11", "Tier 11");
+
         pt.put("REPUTATION_AGGRESSIVE", "Agressivo");
         pt.put("REPUTATION_WARY", "Desconfiado");
         pt.put("REPUTATION_NEUTRAL", "Neutro");
@@ -1725,7 +1738,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("HELP_SUBTYPES_INTRO", "Traços assimilados de partes do corpo podem surgir em novas eclosões. Configure as probabilidades por tipo de formiga em Taxas de eclosão (P). Cada parte ativa do subtipo adiciona +50% de consumo de alimento.");
         pt.put("HELP_TAB_BUGS", "Outros insetos");
         pt.put("HELP_TAB_ANT_ROLES", "Funções de Formiga");
-        pt.put("HELP_TAB_EMPIRE", "Império");
+        pt.put("HELP_TAB_EMPIRE", "Dinastia");
         pt.put("HELP_TAB_UPGRADES", "Melhorias");
         pt.put("HELP_TAB_BUILDINGS", "Edifícios");
         pt.put("HELP_TAB_ASSIMILATIONS", "Assimilações");
@@ -1804,6 +1817,9 @@ public class PortugueseTranslation implements Translation {
         pt.put("HELP_MILITARY_POWER_BODY", "Tipos adultos (papéis ignorados): Operária×1, Soldado×5, Major×15, Princesa×10, Rainha×50.<br>Escalado por Esqueleto + Ácido. Recalculado a cada dia do mundo.<br>Grandes diferenças de poder inclinam diplomacia e lealdade para o mais forte.");
         pt.put("HELP_EMPIRE_REPUTATION", "Posturas de Reputação Diplomática");
         pt.put("HELP_EMPIRE_MOVEMENT", "Movimento de Insetos de Estimação");
+        pt.put("HELP_EMPIRE_RANKS", "Postos da Dinastia");
+        pt.put("HELP_RANK_MIN_POPULATION", " (pop. mín. %s)");
+        pt.put("HELP_RANK_UNLOCKS_TIER", "desbloqueia");
         pt.put("HELP_TIER_MIN_SCORE", " (mín. %s)");
         pt.put("HELP_LOYALTY_MODIFIERS_TITLE", "Modificadores ativos");
         pt.put("HELP_LOYALTY_MODIFIER_MILITARY", "Militar vs capital: +/-1 a +/-10 pela razão de poder com a capital (colônias mais fracas ganham lealdade; satélites mais fortes perdem).");
@@ -1990,6 +2006,26 @@ public class PortugueseTranslation implements Translation {
 
         pt.put("TRIGGER_CLONING_TITLE", "Câmaras de clonagem");
         pt.put("TRIGGER_CLONING_MSG", "A tua colónia atingiu o posto Império! Clonagem desbloqueada: assimilações sobem o piso de integridade genética e aparecem zangões de espécies assimiladas.");
+        pt.put("TRIGGER_RANK_COUNTY_TITLE", "Condado");
+        pt.put("TRIGGER_RANK_COUNTY_MSG", "A tua dinastia tornou-se um Condado! Novos níveis de investigação e construção ficam ao alcance à medida que a população cresce.");
+        pt.put("TRIGGER_RANK_DUCHY_TITLE", "Ducado");
+        pt.put("TRIGGER_RANK_DUCHY_MSG", "A tua dinastia é agora um Ducado. A influência regional cresce e desbloqueiam-se melhorias e edifícios de nível superior.");
+        pt.put("TRIGGER_RANK_KINGDOM_TITLE", "Reino");
+        pt.put("TRIGGER_RANK_KINGDOM_MSG", "Um Reino ergue-se! A tua dinastia comanda um enxame à escala de um reino e desbloqueia o próximo nível de avanços.");
+        pt.put("TRIGGER_RANK_SUPER_TITLE", "Supercolônia");
+        pt.put("TRIGGER_RANK_SUPER_MSG", "A tua dinastia tornou-se uma Supercolônia — uma vasta rede viva. Novos níveis de tecnologia abrem-se nesta escala.");
+        pt.put("TRIGGER_RANK_ULTRA_TITLE", "Ultracolônia");
+        pt.put("TRIGGER_RANK_ULTRA_MSG", "Ultracolônia alcançada! Os teus números remodelam a terra e avanços de nível ultra ficam disponíveis.");
+        pt.put("TRIGGER_RANK_HYPER_TITLE", "Hipercolônia");
+        pt.put("TRIGGER_RANK_HYPER_MSG", "Estatuto de Hipercolônia! A densidade do enxame desbloqueia melhorias e edifícios de nível hiper.");
+        pt.put("TRIGGER_RANK_MEGA_TITLE", "Megacolônia");
+        pt.put("TRIGGER_RANK_MEGA_MSG", "Megacolônia! A massa da tua dinastia é lendária e abre avanços de nível mega.");
+        pt.put("TRIGGER_RANK_ULTIMATE_TITLE", "Colônia definitiva");
+        pt.put("TRIGGER_RANK_ULTIMATE_MSG", "Colônia definitiva! Poucos enxames chegam tão alto — as opções de nível definitivo estão desbloqueadas.");
+        pt.put("TRIGGER_RANK_SUPREME_TITLE", "Colônia suprema");
+        pt.put("TRIGGER_RANK_SUPREME_MSG", "Colônia suprema! A tua dinastia conta-se entre as maiores, com tecnologia de nível supremo disponível.");
+        pt.put("TRIGGER_RANK_GIGA_TITLE", "Gigacolônia");
+        pt.put("TRIGGER_RANK_GIGA_MSG", "Gigacolônia — o posto máximo! Os últimos níveis de melhorias e edifícios estão ao teu alcance.");
         pt.put("TRIGGER_RESEARCHER_ROLE_TITLE", "Novas ideias");
         pt.put("TRIGGER_RESEARCHER_ROLE_MSG", "Passou um mês. A tua rainha amadureceu e agora pode dedicar tempo à Investigação, desbloqueando a função de Investigadora.");
         pt.put("TRIGGER_GRAVER_ROLE_TITLE", "Um problema fedorento");

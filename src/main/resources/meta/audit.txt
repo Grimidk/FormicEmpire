@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 83% (262/314 checked)
+Completion: 83% (261/315 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -183,7 +183,7 @@ Per ant type tab (Worker, Soldier, Major, Princess, Queen):
 Purchase with research points (RP). Test buy on each category:
 
 [X] Research → Triggers subtab lists in-progress and unlocked trigger goals
-[X] Research → Available subtab still lists purchasable RP upgrades
+[X] Research → Available subtab still lists purchasable RP upgrades (gated by dynasty tier)
 
 Ant types:
 [X] Egg, Worker, Soldier, Major, Princess, Queen
@@ -405,7 +405,7 @@ Help encyclopedia (main menu Help):
 [X] Ant subtypes (Help > Ant Types tab, right column)
 [X] Bugs / threats
 [X] Ant roles
-[X] Empire / dynasty concepts
+[ ] Dynasty tab (ranks, tiers, trade, loyalty, military, reputation)
 [X] Upgrades list (all GameUnlocks upgrades)
 [X] Buildings list
 [X] Assimilations list
@@ -433,7 +433,8 @@ Daily:
 [ ] Subtype hatch ability unlock after body-part assimilation
 [ ] Colony Operations ability unlock
 [ ] Mass Flight unlock
-[ ] Cloning unlock
+[ ] Cloning unlock (Empire rank special popup)
+[ ] Dynasty rank-up popups (County, Duchy, Kingdom, Super→Giga; first time per save; Ant/Colony skipped)
 [ ] Auto-Tunnels / Auto-Diplomacy unlocks (after Automation + prerequisites)
 [ ] Colony death detection
 [ ] NPC dynasty triggers

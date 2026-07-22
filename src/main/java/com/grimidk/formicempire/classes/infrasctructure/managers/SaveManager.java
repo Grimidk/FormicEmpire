@@ -429,6 +429,7 @@ public class SaveManager {
                         sc.unlockedUpgradeIds.add(u.getId());
                     }
                 }
+                sc.announcedRankIds = dynasty.copyAnnouncedRankIds();
                 sc.absorbedDynastyIds = (dynasty.getAbsorbedDynastyIds() != null) ? new ArrayList<>(dynasty.getAbsorbedDynastyIds()) : new ArrayList<>();
                 
                 sc.deathStatistics = (dynasty.getGlobalDeathStatistics() != null) ? new HashMap<>(dynasty.getGlobalDeathStatistics()) : new HashMap<>();
@@ -759,6 +760,7 @@ public class SaveManager {
         w.write("      \"integrationProgressDays\": " + sc.integrationProgressDays + ","); w.newLine();
         w.write("      \"integrationDiplomatsManual\": " + sc.integrationDiplomatsManual + ","); w.newLine();
         w.write("      \"unlockedUpgradeIds\": " + serializeListToJson(sc.unlockedUpgradeIds) + ","); w.newLine();
+        w.write("      \"announcedRankIds\": " + serializeListToJson(sc.announcedRankIds) + ","); w.newLine();
         w.write("      \"absorbedDynastyIds\": " + serializeListToJson(sc.absorbedDynastyIds) + ","); w.newLine();
         w.write("      \"defeatedSpeciesIds\": " + serializeListToJson(sc.defeatedSpeciesIds) + ","); w.newLine();
         w.write("      \"completedAssimilationIds\": " + serializeListToJson(sc.completedAssimilationIds) + ","); w.newLine();
@@ -1046,6 +1048,11 @@ public class SaveManager {
         }
         sc.integrationDiplomatsManual = Boolean.parseBoolean(map.getOrDefault("integrationDiplomatsManual", "false"));
         sc.unlockedUpgradeIds = deserializeJsonToList(map.get("unlockedUpgradeIds"));
+        if (map.containsKey("announcedRankIds")) {
+            sc.announcedRankIds = deserializeJsonToList(map.get("announcedRankIds"));
+        } else {
+            sc.announcedRankIds = null;
+        }
         sc.absorbedDynastyIds = deserializeJsonToList(map.get("absorbedDynastyIds"));
         sc.defeatedSpeciesIds = deserializeJsonToList(map.get("defeatedSpeciesIds"));
         sc.completedAssimilationIds = deserializeJsonToList(map.get("completedAssimilationIds"));

@@ -24,10 +24,11 @@ public class DynastyAutomationService {
         for (Upgrade u : GameUnlocks.getUpgrades()) {
             boolean notOwned = !dynasty.hasUpgrade(u);
             boolean reqMet = (u.getRequirement() == null || dynasty.hasUpgrade(u.getRequirement()));
+            boolean tierMet = u.isAvailableFor(dynasty);
             boolean validCost = u.getCost() > 0;
             boolean canAfford = dynasty.getResearchPoints() >= u.getCost();
 
-            if (notOwned && reqMet && validCost && canAfford) {
+            if (notOwned && reqMet && tierMet && validCost && canAfford) {
                 candidates.add(u);
             }
         }

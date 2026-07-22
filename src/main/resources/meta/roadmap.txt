@@ -6,7 +6,6 @@ To Fix (By decreasing priority) :
 	(none right now)
 	
 	High:
-	rework upgrades with tiers
 	TODO: icons all unlocks
 	TODO: species sprites and icon: carpenter, weaver, floodplain, jet, gliding, army, ghost, dracula, silver, exploding, bulldog, shining black and desert
 

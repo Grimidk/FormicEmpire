@@ -1596,6 +1596,19 @@ public final class LanguageStrings {
     public static final String RANK_SUPREME = "RANK_SUPREME";
     public static final String RANK_GIGA = "RANK_GIGA";
 
+    public static final String TIER_0 = "TIER_0";
+    public static final String TIER_1 = "TIER_1";
+    public static final String TIER_2 = "TIER_2";
+    public static final String TIER_3 = "TIER_3";
+    public static final String TIER_4 = "TIER_4";
+    public static final String TIER_5 = "TIER_5";
+    public static final String TIER_6 = "TIER_6";
+    public static final String TIER_7 = "TIER_7";
+    public static final String TIER_8 = "TIER_8";
+    public static final String TIER_9 = "TIER_9";
+    public static final String TIER_10 = "TIER_10";
+    public static final String TIER_11 = "TIER_11";
+
     public static final String REPUTATION_AGGRESSIVE = "REPUTATION_AGGRESSIVE";
     public static final String REPUTATION_WARY = "REPUTATION_WARY";
     public static final String REPUTATION_NEUTRAL = "REPUTATION_NEUTRAL";
@@ -2259,6 +2272,9 @@ public final class LanguageStrings {
     public static final String HELP_EMPIRE_LOYALTY = "HELP_EMPIRE_LOYALTY";
     public static final String HELP_EMPIRE_REPUTATION = "HELP_EMPIRE_REPUTATION";
     public static final String HELP_EMPIRE_MOVEMENT = "HELP_EMPIRE_MOVEMENT";
+    public static final String HELP_EMPIRE_RANKS = "HELP_EMPIRE_RANKS";
+    public static final String HELP_RANK_MIN_POPULATION = "HELP_RANK_MIN_POPULATION";
+    public static final String HELP_RANK_UNLOCKS_TIER = "HELP_RANK_UNLOCKS_TIER";
     public static final String HELP_TIER_MIN_SCORE = "HELP_TIER_MIN_SCORE";
     public static final String HELP_LOYALTY_MODIFIERS_TITLE = "HELP_LOYALTY_MODIFIERS_TITLE";
     public static final String HELP_LOYALTY_MODIFIER_MILITARY = "HELP_LOYALTY_MODIFIER_MILITARY";
@@ -2349,6 +2365,26 @@ public final class LanguageStrings {
     // -- Trigger unlock dialogs --
     public static final String TRIGGER_CLONING_TITLE = "TRIGGER_CLONING_TITLE";
     public static final String TRIGGER_CLONING_MSG = "TRIGGER_CLONING_MSG";
+    public static final String TRIGGER_RANK_COUNTY_TITLE = "TRIGGER_RANK_COUNTY_TITLE";
+    public static final String TRIGGER_RANK_COUNTY_MSG = "TRIGGER_RANK_COUNTY_MSG";
+    public static final String TRIGGER_RANK_DUCHY_TITLE = "TRIGGER_RANK_DUCHY_TITLE";
+    public static final String TRIGGER_RANK_DUCHY_MSG = "TRIGGER_RANK_DUCHY_MSG";
+    public static final String TRIGGER_RANK_KINGDOM_TITLE = "TRIGGER_RANK_KINGDOM_TITLE";
+    public static final String TRIGGER_RANK_KINGDOM_MSG = "TRIGGER_RANK_KINGDOM_MSG";
+    public static final String TRIGGER_RANK_SUPER_TITLE = "TRIGGER_RANK_SUPER_TITLE";
+    public static final String TRIGGER_RANK_SUPER_MSG = "TRIGGER_RANK_SUPER_MSG";
+    public static final String TRIGGER_RANK_ULTRA_TITLE = "TRIGGER_RANK_ULTRA_TITLE";
+    public static final String TRIGGER_RANK_ULTRA_MSG = "TRIGGER_RANK_ULTRA_MSG";
+    public static final String TRIGGER_RANK_HYPER_TITLE = "TRIGGER_RANK_HYPER_TITLE";
+    public static final String TRIGGER_RANK_HYPER_MSG = "TRIGGER_RANK_HYPER_MSG";
+    public static final String TRIGGER_RANK_MEGA_TITLE = "TRIGGER_RANK_MEGA_TITLE";
+    public static final String TRIGGER_RANK_MEGA_MSG = "TRIGGER_RANK_MEGA_MSG";
+    public static final String TRIGGER_RANK_ULTIMATE_TITLE = "TRIGGER_RANK_ULTIMATE_TITLE";
+    public static final String TRIGGER_RANK_ULTIMATE_MSG = "TRIGGER_RANK_ULTIMATE_MSG";
+    public static final String TRIGGER_RANK_SUPREME_TITLE = "TRIGGER_RANK_SUPREME_TITLE";
+    public static final String TRIGGER_RANK_SUPREME_MSG = "TRIGGER_RANK_SUPREME_MSG";
+    public static final String TRIGGER_RANK_GIGA_TITLE = "TRIGGER_RANK_GIGA_TITLE";
+    public static final String TRIGGER_RANK_GIGA_MSG = "TRIGGER_RANK_GIGA_MSG";
     public static final String TRIGGER_RESEARCHER_ROLE_TITLE = "TRIGGER_RESEARCHER_ROLE_TITLE";
     public static final String TRIGGER_RESEARCHER_ROLE_MSG = "TRIGGER_RESEARCHER_ROLE_MSG";
     public static final String TRIGGER_GRAVER_ROLE_TITLE = "TRIGGER_GRAVER_ROLE_TITLE";

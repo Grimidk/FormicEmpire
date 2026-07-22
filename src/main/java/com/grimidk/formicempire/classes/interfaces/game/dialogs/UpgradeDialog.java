@@ -434,8 +434,9 @@ public class UpgradeDialog extends ZeroDialog {
                 boolean owned = colony.hasUpgrade(upgrade);
                 boolean reqMet = (upgrade.getRequirement() == null || colony.hasUpgrade(upgrade.getRequirement()))
                         && GameUnlocks.meetsExtraAutomationPrerequisites(colony.getDynasty(), upgrade);
+                boolean tierMet = upgrade.isAvailableFor(colony.getDynasty());
 
-                if (!owned && reqMet && upgrade.getCost() > 0) {
+                if (!owned && reqMet && tierMet && upgrade.getCost() > 0) {
                     availableUpgrades.add(upgrade);
                 }
             }
@@ -467,10 +468,16 @@ public class UpgradeDialog extends ZeroDialog {
             JPanel panel = new JPanel(new BorderLayout(10, 10));
             panel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
             
-            TitledBorder border = new TitledBorder(AssetStyles.PANEL_BORDER, upgrade.getFlavorName());
+            TitledBorder border = new TitledBorder(AssetStyles.PANEL_BORDER, upgrade.getDisplayName());
             border.setTitleColor(AssetStyles.FONT_COLOR_HEADER);
             border.setTitleFont(AssetStyles.FONT_BOLD);
             panel.setBorder(border);
+
+            JLabel tierIcon = new JLabel(upgrade.getTierIcon());
+            tierIcon.setToolTipText(upgrade.getTier().getName());
+            tierIcon.setBorder(new EmptyBorder(4, 6, 0, 0));
+            tierIcon.setVerticalAlignment(SwingConstants.TOP);
+            panel.add(tierIcon, BorderLayout.WEST);
 
             JPanel infoPanel = new JPanel();
             infoPanel.setOpaque(false);
@@ -612,8 +619,9 @@ public class UpgradeDialog extends ZeroDialog {
                 for (Building building : allBuildings) {
                     boolean owned = colony.hasBuilding(building);
                     boolean reqMet = (building.getRequirement() == null || colony.hasBuilding(building.getRequirement()));
+                    boolean tierMet = building.isAvailableFor(colony.getDynasty());
 
-                    if (!owned && reqMet) {
+                    if (!owned && reqMet && tierMet) {
                         availableBuildings.add(building);
                     }
                 }
@@ -655,10 +663,16 @@ public class UpgradeDialog extends ZeroDialog {
             JPanel panel = new JPanel(new BorderLayout(10, 10));
             panel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
             
-            TitledBorder border = new TitledBorder(AssetStyles.PANEL_BORDER, building.getName());
+            TitledBorder border = new TitledBorder(AssetStyles.PANEL_BORDER, building.getDisplayName());
             border.setTitleColor(AssetStyles.FONT_COLOR_HEADER);
             border.setTitleFont(AssetStyles.FONT_BOLD);
             panel.setBorder(border);
+
+            JLabel tierIcon = new JLabel(building.getTierIcon());
+            tierIcon.setToolTipText(building.getTier().getName());
+            tierIcon.setBorder(new EmptyBorder(4, 6, 0, 0));
+            tierIcon.setVerticalAlignment(SwingConstants.TOP);
+            panel.add(tierIcon, BorderLayout.WEST);
 
             JPanel infoPanel = new JPanel();
             infoPanel.setOpaque(false);
@@ -714,10 +728,16 @@ public class UpgradeDialog extends ZeroDialog {
             JPanel panel = new JPanel(new BorderLayout(10, 10));
             panel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
             
-            TitledBorder border = new TitledBorder(AssetStyles.PANEL_BORDER, LanguageStrings.format(LanguageStrings.BUILD_UNDER_CONSTRUCTION, project.getName()));
+            TitledBorder border = new TitledBorder(AssetStyles.PANEL_BORDER, LanguageStrings.format(LanguageStrings.BUILD_UNDER_CONSTRUCTION, project.getDisplayName()));
             border.setTitleColor(AssetStyles.FONT_COLOR_HEADER);
             border.setTitleFont(AssetStyles.FONT_BOLD);
             panel.setBorder(border);
+
+            JLabel tierIcon = new JLabel(project.getTierIcon());
+            tierIcon.setToolTipText(project.getTier().getName());
+            tierIcon.setBorder(new EmptyBorder(4, 6, 0, 0));
+            tierIcon.setVerticalAlignment(SwingConstants.TOP);
+            panel.add(tierIcon, BorderLayout.WEST);
 
             int builderCount = colony.getAssignedRoleCount(GameConstants.ROLE_BUILDER);
             int craneCount = colony.getAssignedRoleCount(GameConstants.ROLE_CRANE);
@@ -794,7 +814,7 @@ public class UpgradeDialog extends ZeroDialog {
                     JPanel progressPanel = (JPanel) listPanel.getComponent(0);
                     Border b = progressPanel.getBorder();
                     
-                    if (b instanceof TitledBorder && ((TitledBorder) b).getTitle().contains(currentProject.getName())
+                    if (b instanceof TitledBorder && ((TitledBorder) b).getTitle().contains(currentProject.getDisplayName())
                             && progressPanel.getComponentCount() > 0 
                             && progressPanel.getComponent(0) instanceof JProgressBar) {
                         

@@ -97,6 +97,8 @@ public class Savefile implements Serializable {
         public int lastIncomingPactRequestWorldDay = -1;
         public Map<String, Integer> diplomatSupportToDynasty = new HashMap<>();
         public List<Integer> unlockedUpgradeIds = new ArrayList<>();
+        /** Null means legacy save without this field (seed announced ranks on load). */
+        public List<Integer> announcedRankIds;
         public List<Integer> absorbedDynastyIds = new ArrayList<>();
         public List<Integer> defeatedSpeciesIds = new ArrayList<>();
         public List<Integer> completedAssimilationIds = new ArrayList<>();

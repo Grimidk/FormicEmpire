@@ -1,6 +1,6 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
-import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
+import com.grimidk.formicempire.classes.constants.misc.Rank;
 import com.grimidk.formicempire.classes.constants.misc.DiplomaticReputation;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.entities.Dynasty;
@@ -877,7 +877,7 @@ public class MapDialog extends ZeroDialog {
 
                 if (hex.getColony() != null) {
                     Colony c = hex.getColony();
-                    ColonyRank rank = c.getRank();
+                    Rank rank = c.getRank();
 
                     if (rank != null && rank.getIcon() != null) {
                         Image rankImg = rank.getIcon().getImage();

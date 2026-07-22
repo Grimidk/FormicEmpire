@@ -1001,6 +1001,19 @@ public class EnglishTranslation implements Translation {
         en.put("RANK_SUPREME", "Ant Supreme Colony");
         en.put("RANK_GIGA", "Ant Giga Colony");
 
+        en.put("TIER_0", "Tier 0");
+        en.put("TIER_1", "Tier 1");
+        en.put("TIER_2", "Tier 2");
+        en.put("TIER_3", "Tier 3");
+        en.put("TIER_4", "Tier 4");
+        en.put("TIER_5", "Tier 5");
+        en.put("TIER_6", "Tier 6");
+        en.put("TIER_7", "Tier 7");
+        en.put("TIER_8", "Tier 8");
+        en.put("TIER_9", "Tier 9");
+        en.put("TIER_10", "Tier 10");
+        en.put("TIER_11", "Tier 11");
+
         en.put("REPUTATION_AGGRESSIVE", "Aggressive");
         en.put("REPUTATION_WARY", "Wary");
         en.put("REPUTATION_NEUTRAL", "Neutral");
@@ -1685,7 +1698,7 @@ public class EnglishTranslation implements Translation {
         en.put("HELP_SUBTYPES_INTRO", "Assimilated body-part traits can roll onto new hatchlings. Configure odds per ant type in Hatch Rates (P). Each active subtype part adds +50% food consumption.");
         en.put("HELP_TAB_BUGS", "Other insects");
         en.put("HELP_TAB_ANT_ROLES", "Ant Roles");
-        en.put("HELP_TAB_EMPIRE", "Empire");
+        en.put("HELP_TAB_EMPIRE", "Dynasty");
         en.put("HELP_TAB_UPGRADES", "Upgrades");
         en.put("HELP_TAB_BUILDINGS", "Buildings");
         en.put("HELP_TAB_ASSIMILATIONS", "Assimilations");
@@ -1764,6 +1777,9 @@ public class EnglishTranslation implements Translation {
         en.put("HELP_MILITARY_POWER_BODY", "Adult types (roles ignored): Worker×1, Soldier×5, Major×15, Princess×10, Queen×50.<br>Scaled by Skeleton + Acid. Recalculated each world day.<br>Large power gaps nudge diplomacy and loyalty toward the stronger side.");
         en.put("HELP_EMPIRE_REPUTATION", "Diplomatic Reputation Stances");
         en.put("HELP_EMPIRE_MOVEMENT", "Pet Insect Movement");
+        en.put("HELP_EMPIRE_RANKS", "Dynasty Ranks");
+        en.put("HELP_RANK_MIN_POPULATION", " (min pop. %s)");
+        en.put("HELP_RANK_UNLOCKS_TIER", "unlocks");
         en.put("HELP_TIER_MIN_SCORE", " (min %s)");
         en.put("HELP_LOYALTY_MODIFIERS_TITLE", "Active modifiers");
         en.put("HELP_LOYALTY_MODIFIER_MILITARY", "Military vs Capital: +/-1 to +/-10 from power ratio vs capital (weaker colonies gain loyalty; stronger satellites lose it).");
@@ -1950,6 +1966,26 @@ public class EnglishTranslation implements Translation {
 
         en.put("TRIGGER_CLONING_TITLE", "Cloning Vats");
         en.put("TRIGGER_CLONING_MSG", "Your colony has reached the Empire rank! Cloning unlocked: assimilations now raise your genetic integrity floor, and assimilated species drones appear among yours.");
+        en.put("TRIGGER_RANK_COUNTY_TITLE", "Ant County");
+        en.put("TRIGGER_RANK_COUNTY_MSG", "Your dynasty has grown into an Ant County! New research and construction tiers are within reach as your population expands.");
+        en.put("TRIGGER_RANK_DUCHY_TITLE", "Ant Duchy");
+        en.put("TRIGGER_RANK_DUCHY_MSG", "Your dynasty is now an Ant Duchy. Regional influence grows, and higher-tier upgrades and buildings become available.");
+        en.put("TRIGGER_RANK_KINGDOM_TITLE", "Ant Queendom");
+        en.put("TRIGGER_RANK_KINGDOM_MSG", "A Queendom rises! Your dynasty commands a kingdom-scale swarm, unlocking the next tier of advancements.");
+        en.put("TRIGGER_RANK_SUPER_TITLE", "Ant Super Colony");
+        en.put("TRIGGER_RANK_SUPER_MSG", "Your dynasty has become a Super Colony — a vast living network. New tiers of technology open to a swarm of this scale.");
+        en.put("TRIGGER_RANK_ULTRA_TITLE", "Ant Ultra Colony");
+        en.put("TRIGGER_RANK_ULTRA_MSG", "Ultra Colony achieved! Your numbers reshape the land, and ultra-tier research and construction become available.");
+        en.put("TRIGGER_RANK_HYPER_TITLE", "Ant Hyper Colony");
+        en.put("TRIGGER_RANK_HYPER_MSG", "Hyper Colony status! The swarm's density unlocks hyper-tier upgrades and buildings.");
+        en.put("TRIGGER_RANK_MEGA_TITLE", "Ant Mega Colony");
+        en.put("TRIGGER_RANK_MEGA_MSG", "Mega Colony! Your dynasty's mass is legendary, opening mega-tier advancements.");
+        en.put("TRIGGER_RANK_ULTIMATE_TITLE", "Ant Ultimate Colony");
+        en.put("TRIGGER_RANK_ULTIMATE_MSG", "Ultimate Colony! Few swarms ever reach this height — ultimate-tier options are now unlocked.");
+        en.put("TRIGGER_RANK_SUPREME_TITLE", "Ant Supreme Colony");
+        en.put("TRIGGER_RANK_SUPREME_MSG", "Supreme Colony! Your dynasty stands among the greatest, with supreme-tier technology available.");
+        en.put("TRIGGER_RANK_GIGA_TITLE", "Ant Giga Colony");
+        en.put("TRIGGER_RANK_GIGA_MSG", "Giga Colony — the apex rank! The final tiers of upgrades and buildings are now within your grasp.");
         en.put("TRIGGER_RESEARCHER_ROLE_TITLE", "New Ideas");
         en.put("TRIGGER_RESEARCHER_ROLE_MSG", "A month has passed. Your Queen has grown wise and can now dedicate time to Research, unlocking the Researcher role!");
         en.put("TRIGGER_GRAVER_ROLE_TITLE", "A Smelly Problem");

@@ -7,6 +7,8 @@ import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ColonyLoyalty;
 import com.grimidk.formicempire.classes.constants.misc.ColonyLoyaltyModifier;
 import com.grimidk.formicempire.classes.constants.misc.DiplomaticReputation;
+import com.grimidk.formicempire.classes.constants.misc.Rank;
+import com.grimidk.formicempire.classes.constants.misc.Tier;
 import com.grimidk.formicempire.classes.constants.misc.TradeMethod;
 import com.grimidk.formicempire.classes.constants.misc.BugType;
 import com.grimidk.formicempire.classes.constants.misc.GameSpeed;
@@ -627,10 +629,55 @@ public class HelpPanel extends JPanel {
         panel.add(wrapEmpireSection(LanguageStrings.HELP_EMPIRE_MILITARY_POWER, createMilitaryPowerSection()));
         panel.add(Box.createRigidArea(new Dimension(0, 10)));
         panel.add(wrapEmpireSection(LanguageStrings.HELP_EMPIRE_REPUTATION, createReputationSection()));
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(wrapEmpireSection(LanguageStrings.HELP_EMPIRE_RANKS, createRanksSection()));
 
         JScrollPane scrollPane = new JScrollPane(panel);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         return scrollPane;
+    }
+
+    private JPanel createRanksSection() {
+        JPanel list = new JPanel();
+        list.setLayout(new BoxLayout(list, BoxLayout.Y_AXIS));
+        list.setBackground(AssetStyles.BACKGROUND_COLOR);
+        list.setBorder(new EmptyBorder(8, 8, 8, 8));
+
+        for (Rank rank : GameConstants.getColonyRanks()) {
+            Tier unlockedTier = null;
+            for (Tier tier : GameConstants.getTiers()) {
+                if (tier.getRankRequirement() == rank) {
+                    unlockedTier = tier;
+                    break;
+                }
+            }
+
+            JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 2));
+            row.setOpaque(false);
+            row.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+            String label = rank.getName() + LanguageStrings.format(
+                    LanguageStrings.HELP_RANK_MIN_POPULATION, AssetStyles.formatNumber(rank.getPopulation()));
+            JLabel rankLabel = new JLabel(label, rank.getIcon(), SwingConstants.LEFT);
+            rankLabel.setFont(AssetStyles.FONT_NORMAL);
+            rankLabel.setForeground(AssetStyles.FONT_COLOR);
+            rankLabel.setIconTextGap(8);
+            row.add(rankLabel);
+
+            if (unlockedTier != null) {
+                JLabel unlocksLabel = new JLabel(LanguageStrings.get(LanguageStrings.HELP_RANK_UNLOCKS_TIER));
+                unlocksLabel.setFont(AssetStyles.FONT_NORMAL);
+                unlocksLabel.setForeground(AssetStyles.FONT_COLOR);
+                row.add(unlocksLabel);
+
+                JLabel tierIcon = new JLabel(unlockedTier.getIcon());
+                tierIcon.setToolTipText(unlockedTier.getName());
+                row.add(tierIcon);
+            }
+
+            list.add(row);
+        }
+        return list;
     }
 
     private JPanel wrapEmpireSection(String titleKey, JComponent content) {
@@ -1138,6 +1185,36 @@ public class HelpPanel extends JPanel {
         return createDictionaryPanel(items, true);
     }
 
+    private static String displayName(Constant c) {
+        if (c instanceof Upgrade) {
+            return ((Upgrade) c).getDisplayName();
+        }
+        if (c instanceof Building) {
+            return ((Building) c).getDisplayName();
+        }
+        return c.getName();
+    }
+
+    private static ImageIcon tierIconOf(Constant c) {
+        if (c instanceof Upgrade) {
+            return ((Upgrade) c).getTierIcon();
+        }
+        if (c instanceof Building) {
+            return ((Building) c).getTierIcon();
+        }
+        return null;
+    }
+
+    private static String tierNameOf(Constant c) {
+        if (c instanceof Upgrade) {
+            return ((Upgrade) c).getTier().getName();
+        }
+        if (c instanceof Building) {
+            return ((Building) c).getTier().getName();
+        }
+        return null;
+    }
+
     private JComponent createDictionaryPanel(List<Constant> items, boolean showIcons) {
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setBackground(AssetStyles.BACKGROUND_COLOR);
@@ -1154,8 +1231,8 @@ public class HelpPanel extends JPanel {
         
         List<Constant> sortedItems = new ArrayList<>(items);
         Collections.sort(sortedItems, (a, b) -> {
-            String nameA = (a instanceof Upgrade) ? ((Upgrade) a).getFlavorName() : a.getName();
-            String nameB = (b instanceof Upgrade) ? ((Upgrade) b).getFlavorName() : b.getName();
+            String nameA = displayName(a);
+            String nameB = displayName(b);
             return nameA.compareTo(nameB);
         });
         
@@ -1167,13 +1244,37 @@ public class HelpPanel extends JPanel {
         list.setCellRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof Constant) {
-                    Constant c = (Constant) value;
-                    setText((c instanceof Upgrade) ? ((Upgrade) c).getFlavorName() : c.getName());
-                    setIcon(showIcons ? c.getIcon() : null);
+                JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (!(value instanceof Constant)) {
+                    return label;
                 }
-                return this;
+                Constant c = (Constant) value;
+                label.setText(displayName(c));
+                ImageIcon tierIcon = tierIconOf(c);
+                if (showIcons && c.getIcon() != null) {
+                    label.setIcon(c.getIcon());
+                } else if (tierIcon != null) {
+                    label.setIcon(tierIcon);
+                    label.setToolTipText(tierNameOf(c));
+                } else {
+                    label.setIcon(null);
+                }
+                if (showIcons && tierIcon != null) {
+                    JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
+                    row.setOpaque(true);
+                    row.setBackground(label.getBackground());
+                    JLabel itemIcon = new JLabel(c.getIcon());
+                    JLabel nameLabel = new JLabel(displayName(c));
+                    nameLabel.setFont(label.getFont());
+                    nameLabel.setForeground(label.getForeground());
+                    JLabel tierLabel = new JLabel(tierIcon);
+                    tierLabel.setToolTipText(tierNameOf(c));
+                    row.add(itemIcon);
+                    row.add(nameLabel);
+                    row.add(tierLabel);
+                    return row;
+                }
+                return label;
             }
         });
         
@@ -1206,15 +1307,15 @@ public class HelpPanel extends JPanel {
                     
                     if (selected instanceof Upgrade) {
                         Upgrade u = (Upgrade) selected;
-                        body.append("<b>").append(u.getFlavorName()).append("</b><br><br>");
+                        body.append("<b>").append(u.getDisplayName()).append("</b><br><br>");
                         body.append(u.getDescription()).append("<br><br>");
                         body.append("<b>").append(LanguageStrings.get("UI_COST")).append(":</b> ").append(AssetStyles.formatNumber(u.getCost())).append(" RP");
                         if (u.getRequirement() != null) {
-                            body.append("<br><b>").append(LanguageStrings.get("UI_REQUIREMENTS")).append(":</b> ").append(u.getRequirement().getFlavorName());
+                            body.append("<br><b>").append(LanguageStrings.get("UI_REQUIREMENTS")).append(":</b> ").append(u.getRequirement().getDisplayName());
                         }
                     } else if (selected instanceof Building) {
                         Building b = (Building) selected;
-                        body.append("<b>").append(b.getName()).append("</b><br><br>");
+                        body.append("<b>").append(b.getDisplayName()).append("</b><br><br>");
                         body.append(b.getDescription());
                         if (b.getBuildTime() > 0) {
                              body.append("<br><br><b>").append(LanguageStrings.get("HELP_BUILD_BASE_COST")).append(":</b><br>");

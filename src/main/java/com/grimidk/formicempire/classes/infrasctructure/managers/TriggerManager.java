@@ -2,6 +2,7 @@ package com.grimidk.formicempire.classes.infrasctructure.managers;
 
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.constants.unlocks.Synergy;
+import com.grimidk.formicempire.classes.constants.misc.Rank;
 import com.grimidk.formicempire.classes.entities.Colony;
 import com.grimidk.formicempire.classes.entities.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
@@ -90,6 +91,21 @@ public class TriggerManager {
         fireTrigger(upgrade, LanguageStrings.get(titleKey), LanguageStrings.format(messageKey, messageArgs));
     }
 
+    private void fireInfoPopup(String titleKey, String messageKey) {
+        String title = LanguageStrings.get(titleKey);
+        String message = LanguageStrings.get(messageKey);
+        int generation = listenerGeneration;
+        List<TriggerListener> snapshot = new ArrayList<>(listeners);
+        for (TriggerListener listener : snapshot) {
+            SwingUtilities.invokeLater(() -> {
+                if (generation != listenerGeneration) {
+                    return;
+                }
+                listener.onUpgradeTriggered(null, title, message);
+            });
+        }
+    }
+
     private void fireSynergyUnlocked(Synergy synergy) {
         if (synergy == null) {
             return;
@@ -137,6 +153,7 @@ public class TriggerManager {
         checkAllNPCTriggers();
         checkMassFlightUnlock();
         checkCloningAbilityUnlock();
+        checkDynastyRankPopups();
         checkAutoTunnelsUnlock();
         checkAutoDiplomacyUnlock();
     }
@@ -208,10 +225,72 @@ public class TriggerManager {
                 fireLocalizedTrigger(GameUnlocks.ABILITY_CLONING,
                         LanguageStrings.TRIGGER_CLONING_TITLE,
                         LanguageStrings.TRIGGER_CLONING_MSG);
+                colony.getDynasty().markRankAnnounced(GameConstants.RANK_EMPIRE);
             } else {
                 colony.unlockUpgrade(GameUnlocks.ABILITY_CLONING);
             }
         }
+    }
+
+    private void checkDynastyRankPopups() {
+        Dynasty dynasty = playerColony.getDynasty();
+        if (dynasty == null || !dynasty.isPlayer() || dynasty.getRank() == null) {
+            return;
+        }
+        Rank current = dynasty.getRank();
+        for (Rank rank : GameConstants.getColonyRanks()) {
+            if (rank.getId() <= GameConstants.RANK_COLONY.getId()) {
+                continue;
+            }
+            if (rank.getId() > current.getId()) {
+                break;
+            }
+            if (dynasty.hasAnnouncedRank(rank)) {
+                continue;
+            }
+            if (rank == GameConstants.RANK_EMPIRE) {
+                // Empire uses the special Cloning trigger popup instead.
+                if (playerColony.hasUpgrade(GameUnlocks.ABILITY_CLONING)) {
+                    dynasty.markRankAnnounced(rank);
+                }
+                continue;
+            }
+            String titleKey = rankPopupTitleKey(rank);
+            String messageKey = rankPopupMessageKey(rank);
+            if (titleKey == null || messageKey == null) {
+                continue;
+            }
+            dynasty.markRankAnnounced(rank);
+            fireInfoPopup(titleKey, messageKey);
+        }
+    }
+
+    private static String rankPopupTitleKey(Rank rank) {
+        if (rank == GameConstants.RANK_COUNTY) return LanguageStrings.TRIGGER_RANK_COUNTY_TITLE;
+        if (rank == GameConstants.RANK_DUCHY) return LanguageStrings.TRIGGER_RANK_DUCHY_TITLE;
+        if (rank == GameConstants.RANK_KINGDOM) return LanguageStrings.TRIGGER_RANK_KINGDOM_TITLE;
+        if (rank == GameConstants.RANK_SUPER) return LanguageStrings.TRIGGER_RANK_SUPER_TITLE;
+        if (rank == GameConstants.RANK_ULTRA) return LanguageStrings.TRIGGER_RANK_ULTRA_TITLE;
+        if (rank == GameConstants.RANK_HYPER) return LanguageStrings.TRIGGER_RANK_HYPER_TITLE;
+        if (rank == GameConstants.RANK_MEGA) return LanguageStrings.TRIGGER_RANK_MEGA_TITLE;
+        if (rank == GameConstants.RANK_ULTIMATE) return LanguageStrings.TRIGGER_RANK_ULTIMATE_TITLE;
+        if (rank == GameConstants.RANK_SUPREME) return LanguageStrings.TRIGGER_RANK_SUPREME_TITLE;
+        if (rank == GameConstants.RANK_GIGA) return LanguageStrings.TRIGGER_RANK_GIGA_TITLE;
+        return null;
+    }
+
+    private static String rankPopupMessageKey(Rank rank) {
+        if (rank == GameConstants.RANK_COUNTY) return LanguageStrings.TRIGGER_RANK_COUNTY_MSG;
+        if (rank == GameConstants.RANK_DUCHY) return LanguageStrings.TRIGGER_RANK_DUCHY_MSG;
+        if (rank == GameConstants.RANK_KINGDOM) return LanguageStrings.TRIGGER_RANK_KINGDOM_MSG;
+        if (rank == GameConstants.RANK_SUPER) return LanguageStrings.TRIGGER_RANK_SUPER_MSG;
+        if (rank == GameConstants.RANK_ULTRA) return LanguageStrings.TRIGGER_RANK_ULTRA_MSG;
+        if (rank == GameConstants.RANK_HYPER) return LanguageStrings.TRIGGER_RANK_HYPER_MSG;
+        if (rank == GameConstants.RANK_MEGA) return LanguageStrings.TRIGGER_RANK_MEGA_MSG;
+        if (rank == GameConstants.RANK_ULTIMATE) return LanguageStrings.TRIGGER_RANK_ULTIMATE_MSG;
+        if (rank == GameConstants.RANK_SUPREME) return LanguageStrings.TRIGGER_RANK_SUPREME_MSG;
+        if (rank == GameConstants.RANK_GIGA) return LanguageStrings.TRIGGER_RANK_GIGA_MSG;
+        return null;
     }
 
     private void checkNPCResearcher(Colony npc) {

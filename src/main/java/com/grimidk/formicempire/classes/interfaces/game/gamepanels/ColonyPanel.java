@@ -3,7 +3,7 @@ package com.grimidk.formicempire.classes.interfaces.game.gamepanels;
 import com.grimidk.formicempire.classes.constants.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ColonyLoyalty;
-import com.grimidk.formicempire.classes.constants.misc.ColonyRank;
+import com.grimidk.formicempire.classes.constants.misc.Rank;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.Season;
@@ -94,7 +94,7 @@ public class ColonyPanel extends ZeroGamePanel {
     private int lastEggs = -1;
     private int lastMilitaryPower = -1;
     private int lastEffectiveLoyalty = -1;
-    private ColonyRank lastRank = null;
+    private Rank lastRank = null;
     private String lastColonyName = "";
     private boolean lastAtWar = false;
 
@@ -532,7 +532,7 @@ public class ColonyPanel extends ZeroGamePanel {
             lastAtWar = atWar;
         }
         
-        ColonyRank currentRank = colony.getRank();
+        Rank currentRank = colony.getRank();
         if (currentRank != lastRank) {
             rankLabel.setText(currentRank.getName());
             rankLabel.setIcon(currentRank.getIcon());

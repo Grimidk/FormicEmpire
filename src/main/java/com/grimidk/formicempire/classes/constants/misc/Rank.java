@@ -4,10 +4,10 @@ import javax.swing.ImageIcon;
 
 import com.grimidk.formicempire.classes.constants.Constant;
 
-public class ColonyRank extends Constant {
+public class Rank extends Constant {
     private final long population;
 
-    public ColonyRank(int id, String name, long population, ImageIcon icon) {
+    public Rank(int id, String name, long population, ImageIcon icon) {
         super(id, name, icon);
         this.population = population;
     }
