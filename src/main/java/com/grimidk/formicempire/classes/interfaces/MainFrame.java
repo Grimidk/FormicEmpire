@@ -268,9 +268,10 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         saveSelectPanel.refreshTranslations();
         introPanel.refreshTranslations();
         initPanel.refreshTranslations();
-        helpPanel.refreshTranslations();
         settingsPanel.refreshTranslations();
         gamePanel.refreshTranslations();
+        // Help encyclopedia rebuild is deferred until Help is shown (see HelpPanel).
+        helpPanel.refreshTranslations();
     }
 
     public String getMenuReturnCard() {
@@ -383,6 +384,11 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         if (CARD_SETTINGS.equals(card)) {
             try {
                 settingsPanel.loadSettings();
+            } catch (Exception ignore) {}
+        }
+        if (CARD_HELP.equals(card)) {
+            try {
+                helpPanel.ensureTabsContentCurrent();
             } catch (Exception ignore) {}
         }
         cardLayout.show(cards, card);

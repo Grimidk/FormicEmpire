@@ -12,19 +12,31 @@ public class AntRole extends Constant {
     private final AntType antType;
     private final Set<AntSubtype> requiredSubtypes;
     private final Set<AntSubtype> forcedAllowedSubtypes;
+    private final boolean isActiveMilitary;
 
     public AntRole(int id, AntType antType, String name, ImageIcon icon) {
-        this(id, antType, name, icon, Set.of(), Set.of());
+        this(id, antType, name, icon, Set.of(), Set.of(), false);
+    }
+
+    public AntRole(int id, AntType antType, String name, ImageIcon icon, boolean isActiveMilitary) {
+        this(id, antType, name, icon, Set.of(), Set.of(), isActiveMilitary);
     }
 
     public AntRole(int id, AntType antType, String name, ImageIcon icon,
             Set<AntSubtype> requiredSubtypes, Set<AntSubtype> forcedAllowedSubtypes) {
+        this(id, antType, name, icon, requiredSubtypes, forcedAllowedSubtypes, false);
+    }
+
+    public AntRole(int id, AntType antType, String name, ImageIcon icon,
+            Set<AntSubtype> requiredSubtypes, Set<AntSubtype> forcedAllowedSubtypes,
+            boolean isActiveMilitary) {
         super(id, name, icon);
         this.antType = antType;
         this.requiredSubtypes = copySubtypeSet(requiredSubtypes);
         LinkedHashSet<AntSubtype> forced = copySubtypeSet(forcedAllowedSubtypes);
         forced.addAll(this.requiredSubtypes);
         this.forcedAllowedSubtypes = Collections.unmodifiableSet(forced);
+        this.isActiveMilitary = isActiveMilitary;
     }
 
     private static LinkedHashSet<AntSubtype> copySubtypeSet(Set<AntSubtype> source) {
@@ -57,6 +69,14 @@ public class AntRole extends Constant {
      */
     public Set<AntSubtype> getForcedAllowedSubtypes() {
         return forcedAllowedSubtypes;
+    }
+
+    /**
+     * War-economy combat roles (Warrior, Militia, Brute, …). Quotas live only on the war
+     * distribution and the role UI shows them only when war economy mode is enabled.
+     */
+    public boolean isActiveMilitary() {
+        return isActiveMilitary;
     }
 
     public boolean requiresSubtypes() {

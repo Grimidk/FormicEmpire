@@ -890,8 +890,8 @@ public class SettingsPanel extends JPanel {
     private void saveSettings() {
         LanguageOption selectedLang = (LanguageOption) languageCombo.getSelectedItem();
         if (selectedLang != null) {
+            // Engine.setLanguage already updates LanguageStrings and notifies UI once.
             engine.setLanguage(selectedLang.code);
-            LanguageStrings.setLanguage(selectedLang.code); 
         }
         
         AutosaveOption selectedFreq = (AutosaveOption) autosaveCombo.getSelectedItem();
@@ -946,8 +946,13 @@ public class SettingsPanel extends JPanel {
                 });
                 return;
             }
-        } else {
+        } else if (chromeChanged) {
+            // Only tear down / recreate the window when size or fullscreen actually changed.
+            // Language-only saves used to always dispose the frame, which re-fired IntroPanel
+            // ancestor listeners and could yank the UI into Play → Load.
             frame.applyEngineSettings();
+        } else {
+            frame.applyRuntimeSettings();
         }
         if (frame.getGamePanel() != null) {
             frame.getGamePanel().applyOverworldRecenterSetting();

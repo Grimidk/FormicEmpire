@@ -34,7 +34,6 @@ import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -679,9 +678,11 @@ public final class GameConstants {
             loadIcon("icons/roles/Potter.png"),
             Set.of(SUBTYPE_ABDOMEN_HONEYPOT), Set.of(SUBTYPE_ABDOMEN_HONEYPOT));
     static { antRoles.add(ROLE_POTTER); }
-    public static final AntRole ROLE_WARRIOR = new AntRole(12, TYPE_SOLDIER, LanguageStrings.ROLE_WARRIOR, loadIcon("icons/roles/Warrior.png"));
+    public static final AntRole ROLE_WARRIOR = new AntRole(12, TYPE_SOLDIER, LanguageStrings.ROLE_WARRIOR,
+            loadIcon("icons/roles/Warrior.png"), true);
     static { antRoles.add(ROLE_WARRIOR); }
-    public static final AntRole ROLE_DEFENDER = new AntRole(13, TYPE_SOLDIER, LanguageStrings.ROLE_DEFENDER, loadIcon("icons/roles/Defender.png"));
+    public static final AntRole ROLE_DEFENDER = new AntRole(13, TYPE_SOLDIER, LanguageStrings.ROLE_DEFENDER,
+            loadIcon("icons/roles/Defender.png"), true);
     static { antRoles.add(ROLE_DEFENDER); }
     public static final AntRole ROLE_POLICE = new AntRole(14, TYPE_SOLDIER, LanguageStrings.ROLE_POLICE, loadIcon("icons/roles/Police.png"));
     static { antRoles.add(ROLE_POLICE); }
@@ -689,15 +690,17 @@ public final class GameConstants {
     static { antRoles.add(ROLE_BOMBER); }
     public static final AntRole ROLE_HUNTER = new AntRole(16, TYPE_SOLDIER, LanguageStrings.ROLE_HUNTER, loadIcon("icons/roles/Hunter.png"));
     static { antRoles.add(ROLE_HUNTER); }
-    public static final AntRole ROLE_BRUTE = new AntRole(17, TYPE_MAJOR, LanguageStrings.ROLE_BRUTE, loadIcon("icons/roles/Brute.png"));
+    public static final AntRole ROLE_BRUTE = new AntRole(17, TYPE_MAJOR, LanguageStrings.ROLE_BRUTE,
+            loadIcon("icons/roles/Brute.png"), true);
     static { antRoles.add(ROLE_BRUTE); }
     public static final AntRole ROLE_CARRIER = new AntRole(18, TYPE_MAJOR, LanguageStrings.ROLE_CARRIER, loadIcon("icons/roles/Carrier.png"));
     static { antRoles.add(ROLE_CARRIER); }
     // Chemical-throwing subtype not implemented yet; pass required/forced sets when that subtype exists.
     public static final AntRole ROLE_ARTILLERY = new AntRole(19, TYPE_MAJOR, LanguageStrings.ROLE_ARTILLERY,
-            loadIcon("icons/roles/Artillery.png"), Set.of(), Set.of());
+            loadIcon("icons/roles/Artillery.png"), Set.of(), Set.of(), true);
     static { antRoles.add(ROLE_ARTILLERY); }
-    public static final AntRole ROLE_SIEGE = new AntRole(20, TYPE_MAJOR, LanguageStrings.ROLE_SIEGE, loadIcon("icons/roles/Siege.png"));
+    public static final AntRole ROLE_SIEGE = new AntRole(20, TYPE_MAJOR, LanguageStrings.ROLE_SIEGE,
+            loadIcon("icons/roles/Siege.png"), true);
     static { antRoles.add(ROLE_SIEGE); }
     public static final AntRole ROLE_BORER = new AntRole(21, TYPE_MAJOR, LanguageStrings.ROLE_BORER, loadIcon("icons/roles/Borer.png"));
     static { antRoles.add(ROLE_BORER); }
@@ -711,7 +714,8 @@ public final class GameConstants {
     static { antRoles.add(ROLE_LAYER); }
     public static final AntRole ROLE_RESEARCHER = new AntRole(26, TYPE_QUEEN, LanguageStrings.ROLE_RESEARCHER, loadIcon("icons/roles/Researcher.png"));
     static { antRoles.add(ROLE_RESEARCHER); }
-    public static final AntRole ROLE_MILITIA = new AntRole(27, TYPE_WORKER, LanguageStrings.ROLE_MILITIA, loadIcon("icons/roles/Militia.png"));
+    public static final AntRole ROLE_MILITIA = new AntRole(27, TYPE_WORKER, LanguageStrings.ROLE_MILITIA,
+            loadIcon("icons/roles/Militia.png"), true);
     static { antRoles.add(ROLE_MILITIA); }
     public static final AntRole ROLE_CATCHER = new AntRole(28, TYPE_SOLDIER, LanguageStrings.ROLE_CATCHER, loadIcon("icons/roles/Catcher.png"));
     static { antRoles.add(ROLE_CATCHER); }
@@ -861,21 +865,17 @@ public final class GameConstants {
         2, LanguageStrings.GI_MODIFIER_GENETIC_EXCHANGE, 10.0, DIPLO_MODIFIER_GENETIC_EXCHANGE.getNameKey());
     static { geneticIntegrityModifiers.add(GI_MODIFIER_GENETIC_EXCHANGE); }
 
-    private static final AntRole[] ACTIVE_MILITARY_ROLES = {
-            ROLE_WARRIOR, ROLE_DEFENDER,
-            ROLE_MILITIA,
-            ROLE_BRUTE, ROLE_ARTILLERY, ROLE_SIEGE
-    };
-
-    private static final Set<AntRole> WAR_ECONOMY_EXCLUSIVE_ROLES =
-            Set.copyOf(Arrays.asList(ACTIVE_MILITARY_ROLES));
-
     /** Defined in data but not playable yet (no unlock path / job incomplete). */
     private static final Set<AntRole> UNOBTAINABLE_ROLES = Set.of(
             ROLE_POTTER, ROLE_DEFENDER, ROLE_BOMBER, ROLE_CARRIER, ROLE_ARTILLERY, ROLE_SIEGE, ROLE_MINER);
 
+    private static final AntRole[] ACTIVE_MILITARY_ROLES = antRoles.stream()
+            .filter(AntRole::isActiveMilitary)
+            .toArray(AntRole[]::new);
+
+    /** Active-military roles are war-economy exclusive (quotas only on the war distribution). */
     public static boolean isWarEconomyExclusiveRole(AntRole role) {
-        return role != null && WAR_ECONOMY_EXCLUSIVE_ROLES.contains(role);
+        return role != null && role.isActiveMilitary();
     }
 
     public static boolean isObtainableRole(AntRole role) {
@@ -883,15 +883,7 @@ public final class GameConstants {
     }
 
     public static boolean isActiveMilitaryRole(AntRole role) {
-        if (role == null) {
-            return false;
-        }
-        for (AntRole activeRole : ACTIVE_MILITARY_ROLES) {
-            if (activeRole == role) {
-                return true;
-            }
-        }
-        return false;
+        return role != null && role.isActiveMilitary();
     }
 
     public static AntRole[] getActiveMilitaryRoles() {

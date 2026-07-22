@@ -36,11 +36,16 @@ public final class LanguageStrings {
         languageNames.put(code, translation.getLanguageName());
     }
 
-    public static void setLanguage(String lang) {
-        if (translations.containsKey(lang)) {
-            currentLanguage = lang;
-            notifyListeners();
+    /**
+     * @return true if the active language actually changed (listeners were notified)
+     */
+    public static boolean setLanguage(String lang) {
+        if (lang == null || !translations.containsKey(lang) || lang.equals(currentLanguage)) {
+            return false;
         }
+        currentLanguage = lang;
+        notifyListeners();
+        return true;
     }
     
     public static String getCurrentLanguage() {
@@ -434,7 +439,8 @@ public final class LanguageStrings {
     }
     
     private static void notifyListeners() {
-        for (Runnable listener : listeners) {
+        // Copy so a listener cannot ConcurrentModify the list mid-notify.
+        for (Runnable listener : List.copyOf(listeners)) {
             listener.run();
         }
     }

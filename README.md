@@ -1,3 +1,5 @@
+Manage a colony of ants, then a whole dynasty, and eventually the world. Unlock more upgrades by researching or defeating enemy species or other bugs. Think of this game like an unholy combination of games like Stellaris, Rimworld, and Spore with an Ant coat of paint.
+
 A game about ants developed solely on Java, autism, energy drinks (or coffee), and cigarettes. 
 I refuse to use an engine or learn proper UI/UX.
 Cursor is being used to help me debug and test, all pixelart made using Aseprite with my own trackpad. 

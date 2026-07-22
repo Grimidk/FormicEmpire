@@ -73,6 +73,9 @@ public class SaveSelectPanel extends JPanel {
         addAncestorListener(new AncestorListener() {
             @Override
             public void ancestorAdded(AncestorEvent event) {
+                if (!isShowing()) {
+                    return;
+                }
                 if (slotButtons[0] != null) {
                     slotButtons[0].requestFocusInWindow();
                 }
@@ -87,7 +90,9 @@ public class SaveSelectPanel extends JPanel {
     }
     
     public void refreshTranslations() {
-        refreshSlots();
+        // Relabel from cache only — do not re-read save files on the EDT (language
+        // changes used to hit disk twice and intermittently freeze the UI).
+        applySlotLabels();
         backButton.setText(LanguageStrings.get(LanguageStrings.UI_BACK));
     }
 
@@ -117,9 +122,15 @@ public class SaveSelectPanel extends JPanel {
 
     public void refreshSlots() {
         for (int i = 0; i < 3; i++) {
+            cachedSaves[i] = saveManager.loadSlot(i + 1);
+        }
+        applySlotLabels();
+    }
+
+    private void applySlotLabels() {
+        for (int i = 0; i < 3; i++) {
             int slotId = i + 1;
-            Savefile s = saveManager.loadSlot(slotId);
-            cachedSaves[i] = s;
+            Savefile s = cachedSaves[i];
 
             if (s == null) {
                 slotLabels[i].setText(LanguageStrings.get(LanguageStrings.SAVE_EMPTY_SLOT));

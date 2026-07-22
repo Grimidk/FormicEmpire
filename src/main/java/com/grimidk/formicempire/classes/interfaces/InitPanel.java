@@ -31,6 +31,9 @@ public class InitPanel extends JPanel {
         addAncestorListener(new AncestorListener() {
             @Override
             public void ancestorAdded(AncestorEvent event) {
+                if (!isShowing()) {
+                    return;
+                }
                 refreshMenuOptions();
                 play.requestFocusInWindow();
             }

@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 83% (261/313 checked)
+Completion: 83% (262/314 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -61,7 +61,7 @@ Roles (default hatch roles for new ants):
 3. SAVE / LOAD FLOW
 ================================================================================
 [X] Three save slots — empty slot shows Create
-[ ] Create new save — name + title, live dynasty preview (EN: Theme Title; ES/FR/PT: Title Theme), confirm prompt; full dynasty name shown in slot list
+[X] Create new save — name + title, live dynasty preview (EN: Theme Title; ES/FR/PT: Title Theme), confirm prompt; full dynasty name shown in slot list
 [X] Tutorial dialog auto-opens on first create
 [X] Load existing save — resumes session
 [X] Delete save — removes slot data
@@ -159,7 +159,8 @@ Dynasty submenu (when dynasty unlocked):
 Per ant type tab (Worker, Soldier, Major, Princess, Queen):
 [X] Adjust role counts (spinner / input per unlocked role)
 [X] Counts respect available ants and unlock state
-[X] War economy view toggle (when at war)
+[X] War economy view toggle (when unlocked)
+[ ] Active military roles (Militia, Warrior, Brute, …) appear only in war economy view
 [X] Copy peace economy to war economy
 [X] Default role assignment for newly hatched ants (from settings)
 

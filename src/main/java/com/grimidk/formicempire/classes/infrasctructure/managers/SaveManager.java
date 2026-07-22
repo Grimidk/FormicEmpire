@@ -254,12 +254,9 @@ public class SaveManager {
 
         if (manualSave != null && autosave != null) {
             if (autosave.getTimestamp() > manualSave.getTimestamp()) {
-                System.out.println("[SaveManager] Loading autosave for slot " + slotId);
                 return autosave;
-            } else {
-                System.out.println("[SaveManager] Loading manual save for slot " + slotId);
-                return manualSave;
             }
+            return manualSave;
         } else if (manualSave != null) {
             return manualSave;
         } else if (autosave != null) {

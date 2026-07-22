@@ -57,7 +57,11 @@ public class IntroPanel extends JPanel {
         addAncestorListener(new AncestorListener() {
             @Override
             public void ancestorAdded(AncestorEvent event) {
-                beginIntro();
+                // CardLayout keeps all cards in the hierarchy; only start when this card is shown.
+                // Saving settings used to dispose/recreate the frame and re-fire this for hidden intro.
+                if (isShowing()) {
+                    beginIntro();
+                }
             }
 
             @Override

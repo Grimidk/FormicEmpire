@@ -393,10 +393,9 @@ public class RoleManagementDialog extends ZeroDialog {
                 Upgrade roleUpgrade = getUpgradeForRole(role);
                 boolean unlocked = roleUpgrade != null && colony.hasUpgrade(roleUpgrade);
 
-                if (GameConstants.isWarEconomyExclusiveRole(role)) {
-                    // War-only roles must still appear on their type tab once unlocked.
-                    // Quotas always read/write the war distribution (see usesWarRoleCounts).
-                    if (!unlocked) {
+                if (role.isActiveMilitary()) {
+                    // Active military roles only appear while war economy mode is on.
+                    if (!owner.isEditingWarRoles() || !unlocked) {
                         removeRoleRow(role);
                         continue;
                     }
@@ -699,7 +698,7 @@ public class RoleManagementDialog extends ZeroDialog {
         }
 
         private boolean usesWarRoleCounts(AntRole role) {
-            return owner.isEditingWarRoles() || GameConstants.isWarEconomyExclusiveRole(role);
+            return owner.isEditingWarRoles() || role.isActiveMilitary();
         }
 
         private boolean isSubtypeAllowed(AntRole role, AntSubtype subtype) {
@@ -749,9 +748,8 @@ public class RoleManagementDialog extends ZeroDialog {
 
                 int totalAssigned = 0;
                 for (Map.Entry<AntRole, JSpinner> entry : spinnerMap.entrySet()) {
-                    // In peace view, war-exclusive rows edit war prep quotas — exclude from peace totals.
-                    if (!owner.isEditingWarRoles()
-                            && GameConstants.isWarEconomyExclusiveRole(entry.getKey())) {
+                    // In peace view, active-military rows are hidden; skip if still present.
+                    if (!owner.isEditingWarRoles() && entry.getKey().isActiveMilitary()) {
                         continue;
                     }
                     totalAssigned += (Integer) entry.getValue().getValue();

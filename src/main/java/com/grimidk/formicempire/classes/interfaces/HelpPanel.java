@@ -51,6 +51,8 @@ public class HelpPanel extends JPanel {
     private final MainFrame frame;
     private final JTabbedPane mainTabs;
     private final JButton backButton;
+    /** True when language/theme content needs a full tab rebuild. */
+    private boolean tabsContentDirty;
 
     public HelpPanel(MainFrame frame) {
         this.frame = frame;
@@ -78,11 +80,12 @@ public class HelpPanel extends JPanel {
         southPanel.add(backButton);
         add(southPanel, BorderLayout.SOUTH);
         
-        refreshTranslations();
+        backButton.setText(LanguageStrings.get(LanguageStrings.UI_BACK));
 
         addAncestorListener(new AncestorListener() {
             @Override
             public void ancestorAdded(AncestorEvent event) {
+                ensureTabsContentCurrent();
                 backButton.requestFocusInWindow();
             }
 
@@ -117,28 +120,39 @@ public class HelpPanel extends JPanel {
     
     public void refreshTranslations() {
         backButton.setText(LanguageStrings.get(LanguageStrings.UI_BACK));
-        
-        // Update tab titles
-        String[] titles = {
-            LanguageStrings.get(LanguageStrings.HELP_TAB_TUTORIALS),
-            LanguageStrings.get(LanguageStrings.HELP_TAB_SPECIES),
-            LanguageStrings.get(LanguageStrings.HELP_TAB_TYPES),
-            LanguageStrings.get(LanguageStrings.HELP_TAB_BUGS),
-            LanguageStrings.get(LanguageStrings.HELP_TAB_ANT_ROLES),
-            LanguageStrings.get(LanguageStrings.HELP_TAB_EMPIRE),
-            LanguageStrings.get(LanguageStrings.HELP_TAB_UPGRADES),
-            LanguageStrings.get(LanguageStrings.HELP_TAB_BUILDINGS),
-            LanguageStrings.get(LanguageStrings.HELP_TAB_ASSIMILATIONS),
-            LanguageStrings.get(LanguageStrings.HELP_TAB_SYNERGIES),
-            LanguageStrings.get(LanguageStrings.HELP_TAB_WORLD),
-            LanguageStrings.get(LanguageStrings.HELP_TAB_UI)
-        };
-        
-        for (int i = 0; i < titles.length && i < mainTabs.getTabCount(); i++) {
-            mainTabs.setTitleAt(i, titles[i]);
+        // Mark dirty instead of rebuilding every language change — rapid Save/Apply
+        // used to queue multiple full encyclopedia rebuilds and freeze the EDT.
+        tabsContentDirty = true;
+        if (isShowing()) {
+            ensureTabsContentCurrent();
+        } else {
+            // Keep visible tab titles in sync even while content rebuild is deferred.
+            String[] titles = {
+                LanguageStrings.get(LanguageStrings.HELP_TAB_TUTORIALS),
+                LanguageStrings.get(LanguageStrings.HELP_TAB_SPECIES),
+                LanguageStrings.get(LanguageStrings.HELP_TAB_TYPES),
+                LanguageStrings.get(LanguageStrings.HELP_TAB_BUGS),
+                LanguageStrings.get(LanguageStrings.HELP_TAB_ANT_ROLES),
+                LanguageStrings.get(LanguageStrings.HELP_TAB_EMPIRE),
+                LanguageStrings.get(LanguageStrings.HELP_TAB_UPGRADES),
+                LanguageStrings.get(LanguageStrings.HELP_TAB_BUILDINGS),
+                LanguageStrings.get(LanguageStrings.HELP_TAB_ASSIMILATIONS),
+                LanguageStrings.get(LanguageStrings.HELP_TAB_SYNERGIES),
+                LanguageStrings.get(LanguageStrings.HELP_TAB_WORLD),
+                LanguageStrings.get(LanguageStrings.HELP_TAB_UI)
+            };
+            for (int i = 0; i < titles.length && i < mainTabs.getTabCount(); i++) {
+                mainTabs.setTitleAt(i, titles[i]);
+            }
         }
-        
-        // Fully re-init tabs to refresh internal content
+    }
+
+    /** Rebuild tab bodies if a language/theme change happened while Help was hidden. */
+    public void ensureTabsContentCurrent() {
+        if (!tabsContentDirty) {
+            return;
+        }
+        tabsContentDirty = false;
         int selected = mainTabs.getSelectedIndex();
         initTabs();
         if (selected >= 0 && selected < mainTabs.getTabCount()) {
@@ -150,6 +164,7 @@ public class HelpPanel extends JPanel {
         setBackground(AssetStyles.BACKGROUND_COLOR);
         AssetStyles.styleTabbedPane(mainTabs);
         AssetStyles.styleButton(backButton);
+        tabsContentDirty = false;
         int selected = mainTabs.getSelectedIndex();
         initTabs();
         if (selected >= 0 && selected < mainTabs.getTabCount()) {
