@@ -36,7 +36,7 @@ class AntSubtypeServiceTest {
     }
 
     @Test
-    void stingerAbdomenQuadruplesAntAttack() {
+    void stingerAbdomenBoostsAntAttackByOnePointFive() {
         Dynasty dynasty = new Dynasty(1, "Test", true, GameConstants.SPECIES_OMNI);
         dynasty.unlockUpgrade(GameUnlocks.STAT_ACID);
         dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_STINGING);
@@ -49,25 +49,25 @@ class AntSubtypeServiceTest {
         ant.setSubtypeProfile(AntSubtypeProfile.of(1, 1, 2, 1));
         AntSubtypeService.applySubtypeStats(ant, colony);
 
-        assertEquals(standard.getAttack() * 4, ant.getAttack());
+        assertEquals(Math.round(standard.getAttack() * 1.5f), ant.getAttack());
     }
 
     @Test
     void trapjawAttackStacksAdditivelyWithStinger() {
         AntSubtypeProfile profile = AntSubtypeProfile.of(2, 1, 2, 1);
-        assertEquals(7f, AntSubtypeService.combinedAttackMult(profile), 0.0001f);
-    }
-
-    @Test
-    void trapjawAloneTriplesAttack() {
-        AntSubtypeProfile profile = AntSubtypeProfile.of(2, 1, 1, 1);
         assertEquals(3f, AntSubtypeService.combinedAttackMult(profile), 0.0001f);
     }
 
     @Test
-    void doorheadQuintuplesDefense() {
+    void trapjawAloneIsOnePointFiveAttack() {
+        AntSubtypeProfile profile = AntSubtypeProfile.of(2, 1, 1, 1);
+        assertEquals(1.5f, AntSubtypeService.combinedAttackMult(profile), 0.0001f);
+    }
+
+    @Test
+    void doorheadAddsTwentyPercentDefense() {
         AntSubtypeProfile profile = AntSubtypeProfile.of(3, 1, 1, 1);
-        assertEquals(5f, AntSubtypeService.combinedDefenseMult(profile), 0.0001f);
+        assertEquals(20f, AntSubtypeService.combinedDefenseBonus(profile), 0.0001f);
     }
 
     @Test
@@ -206,7 +206,7 @@ class AntSubtypeServiceTest {
     }
 
     @Test
-    void trapjawAndStingerCombinedAttackIsSevenTimesBase() {
+    void trapjawAndStingerCombinedAttackIsThreeTimesBase() {
         Dynasty dynasty = new Dynasty(11, "D", true, GameConstants.SPECIES_OMNI);
         dynasty.unlockUpgrade(GameUnlocks.STAT_ACID);
         dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_TRAPJAW);
@@ -220,7 +220,24 @@ class AntSubtypeServiceTest {
         combo.setSubtypeProfile(AntSubtypeProfile.of(2, 1, 2, 1));
         AntSubtypeService.applySubtypeStats(combo, colony);
 
-        assertEquals(baseline.getAttack() * 7, combo.getAttack());
+        assertEquals(baseline.getAttack() * 3, combo.getAttack());
+    }
+
+    @Test
+    void honeypotIncreasesRegenByFifteenPercent() {
+        Dynasty dynasty = new Dynasty(13, "D", true, GameConstants.SPECIES_OMNI);
+        dynasty.unlockUpgrade(GameUnlocks.STAT_SKELETON);
+        dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_HONEYPOT);
+        Colony colony = new Colony(14, "C", true);
+        colony.setDynasty(dynasty);
+
+        Ant baseline = new Ant(colony, GameConstants.TYPE_WORKER);
+        AntSubtypeService.applySubtypeStats(baseline, colony);
+        Ant honeypot = new Ant(colony, GameConstants.TYPE_WORKER);
+        honeypot.setSubtypeProfile(AntSubtypeProfile.of(1, 1, 3, 1));
+        AntSubtypeService.applySubtypeStats(honeypot, colony);
+
+        assertEquals(Math.round(baseline.getRegen() * 1.15f), Math.round(honeypot.getRegen()));
     }
 
     @Test

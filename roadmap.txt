@@ -6,7 +6,7 @@ To Fix (By decreasing priority) :
 	(none right now)
 	
 	High:
-	TODO: icons all unlocks
+	TODO: icons all unlocks (and class critter)
 	TODO: species sprites and icon: carpenter, weaver, floodplain, jet, gliding, army, ghost, dracula, silver, exploding, bulldog, shining black and desert
 
 	Mid:

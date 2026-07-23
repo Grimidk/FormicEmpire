@@ -108,6 +108,6 @@ class DynastySynergyServiceTest {
         dynasty.revokeUpgrade(GameUnlocks.ASSIMILATED_FIREVENOM);
 
         assertTrue(dynasty.hasUpgrade(GameUnlocks.SYNERGY_SUPER_VENOM));
-        assertEquals(5f, ColonyStatsService.getAssimilatedDamageMultiplier(dynasty), 0.0001f);
+        assertEquals(1.5f, ColonyStatsService.getAssimilatedDamageMultiplier(dynasty), 0.0001f);
     }
 }

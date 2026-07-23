@@ -17,6 +17,7 @@ public class AntSubtype extends Constant {
     private final float defenseMult;
     private final float speedMult;
     private final float forageMult;
+    private final float regenMult;
     private final String descKey;
 
     public AntSubtype(int id, String nameKey, AntSubtypeSlot slot, int digit, Upgrade requiredUpgrade,
@@ -24,13 +25,29 @@ public class AntSubtype extends Constant {
             float attackMult, boolean attackAdditive, float defenseMult, float speedMult, float forageMult,
             ImageIcon icon) {
         this(id, nameKey, slot, digit, requiredUpgrade, spriteSpeciesDir, spriteFolder,
-                attackMult, attackAdditive, defenseMult, speedMult, forageMult, nameKey + "_DESC", icon);
+                attackMult, attackAdditive, defenseMult, speedMult, forageMult, 1f, nameKey + "_DESC", icon);
+    }
+
+    public AntSubtype(int id, String nameKey, AntSubtypeSlot slot, int digit, Upgrade requiredUpgrade,
+            String spriteSpeciesDir, String spriteFolder,
+            float attackMult, boolean attackAdditive, float defenseMult, float speedMult, float forageMult,
+            float regenMult, ImageIcon icon) {
+        this(id, nameKey, slot, digit, requiredUpgrade, spriteSpeciesDir, spriteFolder,
+                attackMult, attackAdditive, defenseMult, speedMult, forageMult, regenMult, nameKey + "_DESC", icon);
     }
 
     public AntSubtype(int id, String nameKey, AntSubtypeSlot slot, int digit, Upgrade requiredUpgrade,
             String spriteSpeciesDir, String spriteFolder,
             float attackMult, boolean attackAdditive, float defenseMult, float speedMult, float forageMult,
             String descKey, ImageIcon icon) {
+        this(id, nameKey, slot, digit, requiredUpgrade, spriteSpeciesDir, spriteFolder,
+                attackMult, attackAdditive, defenseMult, speedMult, forageMult, 1f, descKey, icon);
+    }
+
+    public AntSubtype(int id, String nameKey, AntSubtypeSlot slot, int digit, Upgrade requiredUpgrade,
+            String spriteSpeciesDir, String spriteFolder,
+            float attackMult, boolean attackAdditive, float defenseMult, float speedMult, float forageMult,
+            float regenMult, String descKey, ImageIcon icon) {
         super(id, nameKey, icon);
         this.slot = slot;
         this.digit = digit;
@@ -42,13 +59,14 @@ public class AntSubtype extends Constant {
         this.defenseMult = defenseMult;
         this.speedMult = speedMult;
         this.forageMult = forageMult;
+        this.regenMult = regenMult;
         this.descKey = descKey;
     }
 
     public AntSubtype(int id, String nameKey, AntSubtypeSlot slot, int digit, Upgrade requiredUpgrade,
             String spriteSpeciesDir, String spriteFolder) {
         this(id, nameKey, slot, digit, requiredUpgrade, spriteSpeciesDir, spriteFolder,
-                1f, false, 1f, 1f, 1f, null);
+                1f, false, 1f, 1f, 1f, 1f, null, null);
     }
 
     public AntSubtypeSlot getSlot() {
@@ -89,6 +107,10 @@ public class AntSubtype extends Constant {
 
     public float getForageMult() {
         return forageMult;
+    }
+
+    public float getRegenMult() {
+        return regenMult;
     }
 
     public String getDescKey() {

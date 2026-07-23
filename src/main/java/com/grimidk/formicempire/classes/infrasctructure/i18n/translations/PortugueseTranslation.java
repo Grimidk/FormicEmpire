@@ -224,7 +224,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("TRIGGER_PROGRESS_HINT_PARASITIC_MITE", "Acumula recursos. Surtos (biomas frios, outono/inverno) desbloqueiam a captura de ácaros simbióticos em toda a dinastia.");
         pt.put("SYNERGY_SUPER_VENOM", "Super Veneno");
         pt.put("SYNERGY_SUPER_VENOM_FLAVOR", "Super Veneno");
-        pt.put("SYNERGY_SUPER_VENOM_DESC", "Substitui o empilhamento de veneno de fogo + neurotóxico (4+4) por um multiplicador de dano de 16x quando ambos os venenos estão assimilados e Sinergias foram pesquisadas.");
+        pt.put("SYNERGY_SUPER_VENOM_DESC", "Substitui o empilhamento de veneno de fogo + neurotóxico (+50% cada) por um bónus de ataque de +200% (3x total) quando ambos os venenos estão assimilados e Sinergias foram pesquisadas.");
 
         pt.put("DIALOG_HATCH_RATES_TITLE", "Taxas de eclosão");
         pt.put("HATCH_DESC", "Definir probabilidade de eclosão:");
@@ -240,10 +240,10 @@ public class PortugueseTranslation implements Translation {
         pt.put("SUBTYPE_HEAD_DOORHEAD", "Cabeça-escudo");
         pt.put("SUBTYPE_ABDOMEN_STINGER", "Ferrão");
         pt.put("SUBTYPE_ABDOMEN_HONEYPOT", "Honeypot");
-        pt.put("SUBTYPE_HEAD_TRAPJAW_DESC", "Cabeça mandíbula-armadilha: +3x multiplicador de ataque. Soma-se a outros bônus de ataque de subtipo (com Ferrão: 7x no total, não 12x).");
-        pt.put("SUBTYPE_HEAD_DOORHEAD_DESC", "Cabeça-escudo: 5x defesa.");
-        pt.put("SUBTYPE_ABDOMEN_STINGER_DESC", "Abdômen ferrão: +4x multiplicador de ataque. Soma-se a outros bônus de ataque de subtipo (com Mandíbula-armadilha: 7x no total, não 12x).");
-        pt.put("SUBTYPE_ABDOMEN_HONEYPOT_DESC", "Abdômen honeypot: 4x coleta e capacidade de carga; 0.75x velocidade de movimento.");
+        pt.put("SUBTYPE_HEAD_TRAPJAW_DESC", "Cabeça mandíbula-armadilha: 1.5x ataque. Soma-se a outros bônus de ataque de subtipo (com Ferrão: 3x no total, não 2.25x).");
+        pt.put("SUBTYPE_HEAD_DOORHEAD_DESC", "Cabeça-escudo: +20% defesa.");
+        pt.put("SUBTYPE_ABDOMEN_STINGER_DESC", "Abdômen ferrão: 1.5x ataque. Soma-se a outros bônus de ataque de subtipo (com Mandíbula-armadilha: 3x no total, não 2.25x).");
+        pt.put("SUBTYPE_ABDOMEN_HONEYPOT_DESC", "Abdômen honeypot: 4x coleta e capacidade de carga; 0.75x velocidade; +15% regeneração.");
 
         pt.put("DIALOG_ABILITIES_TITLE", "Operações da colônia");
         pt.put("ABILITY_RP_LABEL", "Pontos de pesquisa: %s");
@@ -403,7 +403,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("UNIT_STAT_SPEED", "Velocidade de movimento");
         pt.put("UNIT_STAT_SPEED_DESC", "Pixels por tick");
         pt.put("UNIT_STAT_REGEN", "Regeneração");
-        pt.put("UNIT_STAT_REGEN_DESC", "Vida recuperada por tick");
+        pt.put("UNIT_STAT_REGEN_DESC", "Percentual do HP máximo recuperado por tick");
         pt.put("UNIT_STAT_TEMP_RES", "Resist. térm.");
         pt.put("UNIT_STAT_TEMP_RES_DESC", "Graus de tolerância");
         pt.put("UNIT_STAT_CONSUMPTION", "Consumo base");
@@ -1219,15 +1219,15 @@ public class PortugueseTranslation implements Translation {
         pt.put("SPECIES_DESERT", "Formiga do Deserto");
         pt.put("SPECIES_DESERT_SCIENTIFIC", "Cataglyphis Fortis");
         pt.put("ASSIMILATED_TRAPJAW_FLAVOR", "Mandíbulas de Mola");
-        pt.put("ASSIMILATED_TRAPJAW_DESC", "Desbloqueia o subtipo de cabeça Mandíbula-armadilha. Contribui +3x ao multiplicador de ataque; acumula por soma com outros bônus de ataque de subtipo.");
+        pt.put("ASSIMILATED_TRAPJAW_DESC", "Desbloqueia o subtipo de cabeça Mandíbula-armadilha. Contribui 1.5x ataque; acumula por soma com outros bônus de ataque de subtipo.");
         pt.put("ASSIMILATION_TRAPJAW", "Assimilação Formiga Armadilha");
         pt.put("ASSIMILATION_TRAPJAW_DESC", "Após assimilar o genoma da formiga armadilha:");
         pt.put("ASSIMILATED_HONEYPOT_FLAVOR", "Potes de Mel Vivos");
-        pt.put("ASSIMILATED_HONEYPOT_DESC", "Desbloqueia o subtipo de abdômen Honeypot. Forrageadores honeypot coletam e carregam 4x mais a 0.75x de velocidade.");
+        pt.put("ASSIMILATED_HONEYPOT_DESC", "Desbloqueia o subtipo de abdômen Honeypot. Forrageadores honeypot coletam e carregam 4x a 0.75x velocidade, e ganham +15% regeneração.");
         pt.put("ASSIMILATION_HONEYPOT", "Assimilação Formiga Melífera");
         pt.put("ASSIMILATION_HONEYPOT_DESC", "Após assimilar o genoma da formiga melífera:");
         pt.put("ASSIMILATED_DOORHEAD_FLAVOR", "Tampões de Cabeça Blindados");
-        pt.put("ASSIMILATED_DOORHEAD_DESC", "Desbloqueia o subtipo de cabeça Cabeça-escudo. Formigas doorhead têm 5x defesa.");
+        pt.put("ASSIMILATED_DOORHEAD_DESC", "Desbloqueia o subtipo de cabeça Cabeça-escudo. Formigas doorhead ganham +20% defesa.");
         pt.put("ASSIMILATION_DOORHEAD", "Assimilação Formiga Cabeça-Porta");
         pt.put("ASSIMILATION_DOORHEAD_DESC", "Após assimilar o genoma da formiga cabeça-porta:");
         pt.put("ASSIMILATED_WOODBURROW_FLAVOR", "Escavação de Madeira");
@@ -1243,7 +1243,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("ASSIMILATION_RAFTING", "Assimilação Formiga Flutuante");
         pt.put("ASSIMILATION_RAFTING_DESC", "Após assimilar o genoma da formiga flutuante:");
         pt.put("ASSIMILATED_FIREVENOM_FLAVOR", "Veneno Ardente");
-        pt.put("ASSIMILATED_FIREVENOM_DESC", "Sua dinastia pode aplicar um ferrão ardente e doloroso. (Mecânica em desenvolvimento.)");
+        pt.put("ASSIMILATED_FIREVENOM_DESC", "Adiciona +50% ao ataque base da colónia. A sinergia Super Veneno com veneno neurotóxico substitui ambos +50% por um bónus de +200% (3x total).");
         pt.put("ASSIMILATION_FIREVENOM", "Assimilação Formiga Veneno de Fogo");
         pt.put("ASSIMILATION_FIREVENOM_DESC", "Após assimilar o genoma da formiga veneno de fogo:");
         pt.put("ASSIMILATED_JUMPING_FLAVOR", "Saltos de Ataque");
@@ -1255,7 +1255,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("ASSIMILATION_GLIDING", "Assimilação Formiga Planadora");
         pt.put("ASSIMILATION_GLIDING_DESC", "Após assimilar o genoma da formiga planadora:");
         pt.put("ASSIMILATED_STINGING_FLAVOR", "Ferrão Excruciante");
-        pt.put("ASSIMILATED_STINGING_DESC", "Desbloqueia o subtipo de abdômen Ferrão. Contribui +4x ao multiplicador de ataque; acumula por soma com outros bônus de ataque de subtipo (Mandíbula-armadilha + Ferrão = 7x, não 12x).");
+        pt.put("ASSIMILATED_STINGING_DESC", "Desbloqueia o subtipo de abdômen Ferrão. Contribui 1.5x ataque; acumula por soma (Mandíbula-armadilha + Ferrão = 3x, não 2.25x).");
         pt.put("ASSIMILATION_STINGING", "Assimilação Formiga Ferrão");
         pt.put("ASSIMILATION_STINGING_DESC", "Após assimilar o genoma da formiga ferrão:");
         pt.put("ASSIMILATED_SWARMING_FLAVOR", "Enxames de Incursão");
@@ -1267,7 +1267,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("ASSIMILATION_STEALTH", "Assimilação Formiga Fantasma");
         pt.put("ASSIMILATION_STEALTH_DESC", "Após assimilar o genoma da formiga fantasma:");
         pt.put("ASSIMILATED_FASTBITE_FLAVOR", "Mandíbulas Vampiro");
-        pt.put("ASSIMILATED_FASTBITE_DESC", "Multiplica a velocidade de ataque base da colônia por 3.");
+        pt.put("ASSIMILATED_FASTBITE_DESC", "Multiplica a velocidade de ataque base da colônia por 2. Soldados e majors atacam o dobro (2 base, 4 com esta assimilação).");
         pt.put("ASSIMILATION_FASTBITE", "Assimilação Formiga Drácula");
         pt.put("ASSIMILATION_FASTBITE_DESC", "Após assimilar o genoma da formiga drácula:");
         pt.put("ASSIMILATED_HEATRESIST_FLAVOR", "Tolerância ao Calor do Deserto");
@@ -1275,7 +1275,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("ASSIMILATION_HEATRESIST", "Assimilação Formiga Prateada do Saara");
         pt.put("ASSIMILATION_HEATRESIST_DESC", "Após assimilar o genoma da formiga prateada do saara:");
         pt.put("ASSIMILATED_DEADLYVENOM_FLAVOR", "Veneno neurotóxico");
-        pt.put("ASSIMILATED_DEADLYVENOM_DESC", "Sua dinastia pode injetar veneno capaz de matar presas pequenas rapidamente. (Mecânica em desenvolvimento.)");
+        pt.put("ASSIMILATED_DEADLYVENOM_DESC", "Adiciona +50% ao ataque base da colónia. A sinergia Super Veneno com veneno de fogo substitui ambos +50% por um bónus de +200% (3x total).");
         pt.put("ASSIMILATION_DEADLYVENOM", "Assimilação de veneno neurotóxico");
         pt.put("ASSIMILATION_DEADLYVENOM_DESC", "Após assimilar a genética do veneno neurotóxico:");
         pt.put("ASSIMILATED_SELFDESTRUCT_FLAVOR", "Defesa Suicida");
@@ -1475,7 +1475,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("ABILITY_ABILITY_DESC", "Permite ver o menu de habilidades e usar habilidades ativas.");
 
         pt.put("STAT_SKELETON_FLAVOR", "Exoesqueletos básicos");
-        pt.put("STAT_SKELETON_DESC", "Defesa básica para todas as formigas: 100 de vida, 5 de defesa e 1 de regeneração por segundo.");
+        pt.put("STAT_SKELETON_DESC", "Vitalidade básica antes dos multiplicadores de tipo: 100 de vida e 10% do HP máximo regenerado por tick. Defesa depende do tipo (majors e rainhas começam em 20%).");
         pt.put("STAT_ACID_FLAVOR", "Cuspe ácido");
         pt.put("STAT_ACID_DESC", "Ataque básico: 10 de dano, 1 ataque/s e 1 de velocidade.");
         pt.put("STAT_LONGEVITY_FLAVOR", "Longevidade padrão");
@@ -1562,11 +1562,11 @@ public class PortugueseTranslation implements Translation {
         pt.put("ASSIMILATED_MULTIQUEEN_DESC", "Sua dinastia pode ter várias rainhas numa colônia (requer melhorar a câmara real).");
         pt.put("ASSIMILATED_MULTIQUEEN_DESC", "Sua dinastia pode ter várias rainhas numa colônia (requer melhorar a câmara real).");
         pt.put("ASSIMILATED_TRAPJAW_FLAVOR", "Mandíbulas de Mola");
-        pt.put("ASSIMILATED_TRAPJAW_DESC", "Desbloqueia o subtipo de cabeça Mandíbula-armadilha. Contribui +3x ao multiplicador de ataque; acumula por soma com outros bônus de ataque de subtipo.");
+        pt.put("ASSIMILATED_TRAPJAW_DESC", "Desbloqueia o subtipo de cabeça Mandíbula-armadilha. Contribui 1.5x ataque; acumula por soma com outros bônus de ataque de subtipo.");
         pt.put("ASSIMILATED_HONEYPOT_FLAVOR", "Potes de Mel Vivos");
-        pt.put("ASSIMILATED_HONEYPOT_DESC", "Desbloqueia o subtipo de abdômen Honeypot. Forrageadores honeypot coletam e carregam 4x mais a 0.75x de velocidade.");
+        pt.put("ASSIMILATED_HONEYPOT_DESC", "Desbloqueia o subtipo de abdômen Honeypot. Forrageadores honeypot coletam e carregam 4x a 0.75x velocidade, e ganham +15% regeneração.");
         pt.put("ASSIMILATED_DOORHEAD_FLAVOR", "Tampões de Cabeça Blindados");
-        pt.put("ASSIMILATED_DOORHEAD_DESC", "Desbloqueia o subtipo de cabeça Cabeça-escudo. Formigas doorhead têm 5x defesa.");
+        pt.put("ASSIMILATED_DOORHEAD_DESC", "Desbloqueia o subtipo de cabeça Cabeça-escudo. Formigas doorhead ganham +20% defesa.");
         pt.put("ASSIMILATED_WOODBURROW_FLAVOR", "Escavação de Madeira");
         pt.put("ASSIMILATED_WOODBURROW_DESC", "Sua dinastia pode escavar e nidificar em madeira. (Mecânica em desenvolvimento.)");
         pt.put("ASSIMILATED_SILKWEAVE_FLAVOR", "Tecelagem de Ninhos de Seda");
@@ -1574,23 +1574,23 @@ public class PortugueseTranslation implements Translation {
         pt.put("ASSIMILATED_RAFTING_FLAVOR", "Jangadas Vivas");
         pt.put("ASSIMILATED_RAFTING_DESC", "Sua dinastia pode formar jangadas para cruzar enchentes. (Mecânica em desenvolvimento.)");
         pt.put("ASSIMILATED_FIREVENOM_FLAVOR", "Veneno Ardente");
-        pt.put("ASSIMILATED_FIREVENOM_DESC", "Sua dinastia pode aplicar um ferrão ardente e doloroso. (Mecânica em desenvolvimento.)");
+        pt.put("ASSIMILATED_FIREVENOM_DESC", "Adiciona +50% ao ataque base da colónia. A sinergia Super Veneno com veneno neurotóxico substitui ambos +50% por um bónus de +200% (3x total).");
         pt.put("ASSIMILATED_JUMPING_FLAVOR", "Saltos de Ataque");
         pt.put("ASSIMILATED_JUMPING_DESC", "Sua dinastia pode lançar ataques em salto com pernas poderosas. (Mecânica em desenvolvimento.)");
         pt.put("ASSIMILATED_GLIDING_FLAVOR", "Planos Controlados");
         pt.put("ASSIMILATED_GLIDING_DESC", "Sua dinastia pode planar entre árvores para cruzar vãos. (Mecânica em desenvolvimento.)");
         pt.put("ASSIMILATED_STINGING_FLAVOR", "Ferrão Excruciante");
-        pt.put("ASSIMILATED_STINGING_DESC", "Desbloqueia o subtipo de abdômen Ferrão. Contribui +4x ao multiplicador de ataque; acumula por soma com outros bônus de ataque de subtipo (Mandíbula-armadilha + Ferrão = 7x, não 12x).");
+        pt.put("ASSIMILATED_STINGING_DESC", "Desbloqueia o subtipo de abdômen Ferrão. Contribui 1.5x ataque; acumula por soma (Mandíbula-armadilha + Ferrão = 3x, não 2.25x).");
         pt.put("ASSIMILATED_SWARMING_FLAVOR", "Enxames de Incursão");
         pt.put("ASSIMILATED_SWARMING_DESC", "Sua dinastia pode coordenar incursões massivas sem ninho permanente. (Mecânica em desenvolvimento.)");
         pt.put("ASSIMILATED_STEALTH_FLAVOR", "Infiltração Fantasma");
         pt.put("ASSIMILATED_STEALTH_DESC", "Sua dinastia pode mover-se sem ser vista e nidificar em estruturas hostis. (Mecânica em desenvolvimento.)");
         pt.put("ASSIMILATED_FASTBITE_FLAVOR", "Mandíbulas Vampiro");
-        pt.put("ASSIMILATED_FASTBITE_DESC", "Multiplica a velocidade de ataque base da colônia por 3.");
+        pt.put("ASSIMILATED_FASTBITE_DESC", "Multiplica a velocidade de ataque base da colônia por 2. Soldados e majors atacam o dobro (2 base, 4 com esta assimilação).");
         pt.put("ASSIMILATED_HEATRESIST_FLAVOR", "Tolerância ao Calor do Deserto");
         pt.put("ASSIMILATED_HEATRESIST_DESC", "Sua dinastia pode forragear sob calor extremo do deserto. (Mecânica em desenvolvimento.)");
         pt.put("ASSIMILATED_DEADLYVENOM_FLAVOR", "Veneno neurotóxico");
-        pt.put("ASSIMILATED_DEADLYVENOM_DESC", "Sua dinastia pode injetar veneno capaz de matar presas pequenas rapidamente. (Mecânica em desenvolvimento.)");
+        pt.put("ASSIMILATED_DEADLYVENOM_DESC", "Adiciona +50% ao ataque base da colónia. A sinergia Super Veneno com veneno de fogo substitui ambos +50% por um bónus de +200% (3x total).");
         pt.put("ASSIMILATED_SELFDESTRUCT_FLAVOR", "Defesa Suicida");
         pt.put("ASSIMILATED_SELFDESTRUCT_DESC", "Sua dinastia pode romper operárias especializadas para borrifar toxinas. (Mecânica em desenvolvimento.)");
         pt.put("ASSIMILATED_FARSIGHT_FLAVOR", "Visão Excepcional");
@@ -2085,7 +2085,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("TRIGGER_SUBTYPE_HATCH_TITLE", "Subtipos corporais");
         pt.put("TRIGGER_SUBTYPE_HATCH_MSG", "Traços assimilados podem mudar a eclosão! Abre Taxas de eclosão (P) para definir subtipos por tipo; cada parte ativa adiciona +50% de alimento.");
         pt.put("TRIGGER_SYNERGY_SUPER_VENOM_TITLE", "Sinergia desbloqueada");
-        pt.put("TRIGGER_SYNERGY_SUPER_VENOM_MSG", "%s está agora ativa! Combinar %s substitui a acumulação separada por um multiplicador de dano de 16x. Abre Sinergias (O) para rever.");
+        pt.put("TRIGGER_SYNERGY_SUPER_VENOM_MSG", "%s já está ativa! Combinar %s substitui os +50% separados por um bónus de ataque de +200% (3x total). Abra Sinergias (O) para rever.");
         pt.put("TRIGGER_OPERATIONS_ABILITY_TITLE", "Operações da colónia");
         pt.put("TRIGGER_OPERATIONS_ABILITY_MSG", "Ganhaste uma habilidade ativa especial! Agora podes aceder ao menu de Operações da colónia premindo (Z).");
 

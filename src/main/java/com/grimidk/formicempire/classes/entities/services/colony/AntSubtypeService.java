@@ -300,15 +300,16 @@ public final class AntSubtypeService {
             ant.setSubtypeProfile(profile);
         }
 
-        ant.setMaxHealth((int) (colony.getBaseHealth() * type.getHealtMult() * combinedHealthMult(profile)));
+        ant.setMaxHealth(Math.max(0, Math.round(colony.getBaseHealth() * type.getHealtMult() * combinedHealthMult(profile))));
         if (ant.getHealth() > ant.getMaxHealth()) {
             ant.setHealth(ant.getMaxHealth());
         }
-        ant.setRegen((int) (colony.getBaseRegen() * type.getRegenMult()));
+        ant.setRegen(Math.round(colony.getBaseRegen() * type.getRegenMult() * combinedRegenMult(profile)));
         ant.setConsumption(colony.getBaseConsumption() * type.getConsumptionMult() * consumptionMult(profile));
         ant.setAttack((int) (colony.getBaseAttack() * type.getAttackMult() * combinedAttackMult(profile)));
         ant.setAttackSpeed((int) (colony.getBaseAttackSpeed() * type.getAttackSpeedMult()));
-        ant.setDefense((int) (colony.getBaseDefense() * type.getDefenseMult() * combinedDefenseMult(profile)));
+        ant.setDefense(GameNumbers.clampDefensePercent(
+                type.getDefenseMult() + combinedDefenseBonus(profile)));
         ant.setSpeed(colony.getBaseSpeed() * type.getSpeedMult() * combinedSpeedMult(profile));
     }
 
@@ -326,12 +327,25 @@ public final class AntSubtypeService {
         return hasAttackSubtype ? total : 1f;
     }
 
-    public static float combinedDefenseMult(AntSubtypeProfile profile) {
+    /** Extra defense percent from subtypes (e.g. Doorhead +20). Neutral subtypes contribute 0. */
+    public static float combinedDefenseBonus(AntSubtypeProfile profile) {
+        float total = 0f;
+        for (AntSubtypeSlot slot : AntSubtypeSlot.values()) {
+            AntSubtype subtype = profile.getSubtype(slot);
+            if (subtype == null || subtype.isNone() || subtype.getDefenseMult() == 1f) {
+                continue;
+            }
+            total += subtype.getDefenseMult();
+        }
+        return total;
+    }
+
+    public static float combinedRegenMult(AntSubtypeProfile profile) {
         float mult = 1f;
         for (AntSubtypeSlot slot : AntSubtypeSlot.values()) {
             AntSubtype subtype = profile.getSubtype(slot);
             if (subtype != null && !subtype.isNone()) {
-                mult *= subtype.getDefenseMult();
+                mult *= subtype.getRegenMult();
             }
         }
         return mult;
@@ -361,9 +375,10 @@ public final class AntSubtypeService {
             return 0f;
         }
         AntSubtypeProfile resolved = profile != null ? profile : AntSubtypeProfile.standard();
-        int hp = (int) (stats.getBaseHealth(colony) * type.getHealtMult() * combinedHealthMult(resolved));
+        int hp = Math.max(0, Math.round(stats.getBaseHealth(colony) * type.getHealtMult() * combinedHealthMult(resolved)));
         int atk = (int) (stats.getBaseAttack(colony) * type.getAttackMult() * combinedAttackMult(resolved));
-        int def = (int) (stats.getBaseDefense(colony) * type.getDefenseMult() * combinedDefenseMult(resolved));
+        int def = Math.round(GameNumbers.clampDefensePercent(
+                type.getDefenseMult() + combinedDefenseBonus(resolved)));
         int atkSpd = (int) (stats.getBaseAttackSpeed(colony) * type.getAttackSpeedMult());
         return ColonyMilitaryService.computeStatMultiplierFromBases(hp, atk, def, atkSpd);
     }
@@ -382,9 +397,10 @@ public final class AntSubtypeService {
             return 0f;
         }
         AntSubtypeProfile resolved = profile != null ? profile : AntSubtypeProfile.standard();
-        int hp = (int) (baseHealth * type.getHealtMult() * combinedHealthMult(resolved));
+        int hp = Math.max(0, Math.round(baseHealth * type.getHealtMult() * combinedHealthMult(resolved)));
         int atk = (int) (baseAttack * type.getAttackMult() * combinedAttackMult(resolved));
-        int def = (int) (baseDefense * type.getDefenseMult() * combinedDefenseMult(resolved));
+        int def = Math.round(GameNumbers.clampDefensePercent(
+                type.getDefenseMult() + combinedDefenseBonus(resolved)));
         int atkSpd = (int) (baseAttackSpeed * type.getAttackSpeedMult());
         return ColonyMilitaryService.computeStatMultiplierFromBases(hp, atk, def, atkSpd);
     }

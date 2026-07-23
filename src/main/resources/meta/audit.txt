@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 83% (270/325 checked)
+Completion: 82% (257/315 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -175,7 +175,7 @@ Per ant type tab (Worker, Soldier, Major, Princess, Queen):
 [X] Automated colonies assign subtype rates by assimilation (honeypot workers/princesses, trapjaw/bullet soldiers/majors, doorhead workers/soldiers)
 [X] Automated colonies reduce or drop subtypes when fungi stock is below water
 [X] Each active body-part subtype adds +50% food consumption (two parts = 2x food); visible in Stats as subtype food overhead
-[X] Stinger abdomen subtype: 4x damage on that ant (not dynasty-wide)
+[ ] Stinger abdomen subtype: 1.5x attack on that ant (additive with Trapjaw; not dynasty-wide)
 
 ================================================================================
 10. RESEARCH (Y) — UpgradeDialog Research tab
@@ -217,7 +217,7 @@ Colony abilities (unlock tree):
 [X] Auto-Diplomacy
 
 Stat upgrades (RP tiers):
-[X] Skeleton, Acid, Longevity
+[ ] Skeleton, Acid, Longevity
 [X] Research 1–3, Growth 1–3, Thirst 1–3
 [X] Logistics 1, Passive 1, Laying 1–3
 [X] Scouting 1–3, Farming 1–3, Contamination 1–3
@@ -227,7 +227,7 @@ Stat upgrades (RP tiers):
 Assimilated species passives (research tree):
 [X] Farming, Multiqueen, Trapjaw, Honeypot, Doorhead, Woodburrow
 [X] Silkweave, Rafting, Firevenom, Jumping, Gliding, Stinging
-[X] Swarming, Stealth, Fastbite, Heatresist, Deadlyvenom, Selfdestruct
+[ ] Swarming, Stealth, Fastbite (ants 1→2; soldiers/majors 2→4), Heatresist, Deadlyvenom, Selfdestruct
 [X] Farsight, Hivebuild, Locsense
 
 [X] Insufficient RP blocks purchase with message
@@ -261,7 +261,7 @@ Passive / special rooms:
 Start / progress assimilations (RP + time). Target RP cost scales +25% per completed assimilation (5th = 200% base). Each species:
 [X] Leafcutter, Pharaoh, Marauder, Trapjaw, Honeypot, Doorhead
 [X] Woodburrow, Silkweave, Rafting, Firevenom, Jumping, Gliding
-[X] Stinging, Swarming, Stealth, Fastbite, Heatresist, Deadlyvenom
+[ ] Stinging, Swarming, Stealth, Fastbite (ants 1→2; soldiers/majors 2→4), Heatresist, Deadlyvenom
 [X] Selfdestruct, Farsight, Hivebuild, Locsense
 
 [X] Assimilation RP target cost scales +25% per completed assimilation (5th = 200% base)
@@ -272,7 +272,7 @@ Start / progress assimilations (RP + time). Target RP cost scales +25% per compl
 ================================================================================
 [X] Synergies tab lists in-progress combinations (1/2 requirements met)
 [X] Popup when synergy conditions are fully met
-[X] Super Venom replaces Fire + Neurotoxic venom stacking with 16x damage
+[ ] Super Venom replaces Fire + Neurotoxic +50% each with +200% attack (3x total)
 [X] Synergy effects apply to colony / dynasty stats
 
 ================================================================================

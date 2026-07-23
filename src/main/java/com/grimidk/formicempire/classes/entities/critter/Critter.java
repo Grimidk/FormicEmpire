@@ -6,6 +6,7 @@ import com.grimidk.formicempire.classes.constants.critter.ant.MoveStatus;
 import com.grimidk.formicempire.classes.entities.spatial.Dimension;
 import com.grimidk.formicempire.classes.entities.spatial.Room;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.WorldSpaces;
 
 import java.awt.Point;
@@ -46,7 +47,7 @@ public class Critter {
         this.regen = species.getBaseRegen();
         this.attack = species.getBaseAttack();
         this.attackSpeed = species.getBaseAttackSpeed();
-        this.defense = species.getBaseDefense();
+        this.defense = GameNumbers.clampDefensePercent(species.getBaseDefense());
         this.speed = species.getBaseSpeed();
 
         this.dimension = WorldSpaces.OVERWORLD;
@@ -146,7 +147,11 @@ public class Critter {
     }
 
     public void setDefense(int defense) {
-        this.defense = defense;
+        this.defense = GameNumbers.clampDefensePercent(defense);
+    }
+
+    public void setDefense(float defense) {
+        this.defense = GameNumbers.clampDefensePercent(defense);
     }
 
     public float getSpeed() {

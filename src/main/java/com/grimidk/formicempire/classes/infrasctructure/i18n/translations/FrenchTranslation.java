@@ -224,7 +224,7 @@ public class FrenchTranslation implements Translation {
         fr.put("TRIGGER_PROGRESS_HINT_PARASITIC_MITE", "Stockez des ressources. Les épidémies (biomes froids, automne/hiver) débloquent la capture d'acariens symbiotiques pour toute la dynastie.");
         fr.put("SYNERGY_SUPER_VENOM", "Super Venin");
         fr.put("SYNERGY_SUPER_VENOM_FLAVOR", "Super Venin");
-        fr.put("SYNERGY_SUPER_VENOM_DESC", "Remplace l'empilement venin de feu + neurotoxique (4+4) par un multiplicateur de dégâts de 16x lorsque les deux venins sont assimilés et que les Synergies sont recherchées.");
+        fr.put("SYNERGY_SUPER_VENOM_DESC", "Remplace l'empilement venin de feu + neurotoxique (+50 % chacun) par un bonus d'attaque de +200 % (3x au total) lorsque les deux venins sont assimilés et que les Synergies sont recherchées.");
 
         fr.put("DIALOG_HATCH_RATES_TITLE", "Taux d'éclosion des nymphes");
         fr.put("HATCH_DESC", "Probabilité d'éclosion pour les nouvelles fourmis :");
@@ -240,10 +240,10 @@ public class FrenchTranslation implements Translation {
         fr.put("SUBTYPE_HEAD_DOORHEAD", "Tête-bouclier");
         fr.put("SUBTYPE_ABDOMEN_STINGER", "Dard");
         fr.put("SUBTYPE_ABDOMEN_HONEYPOT", "Honeypot");
-        fr.put("SUBTYPE_HEAD_TRAPJAW_DESC", "Tête mâchoire-piège : +3x multiplicateur d'attaque. S'additionne aux autres bonus d'attaque de sous-type (avec Dard : 7x au total, pas 12x).");
-        fr.put("SUBTYPE_HEAD_DOORHEAD_DESC", "Tête-bouclier : 5x défense.");
-        fr.put("SUBTYPE_ABDOMEN_STINGER_DESC", "Abdomen dard : +4x multiplicateur d'attaque. S'additionne aux autres bonus d'attaque de sous-type (avec Mâchoire-piège : 7x au total, pas 12x).");
-        fr.put("SUBTYPE_ABDOMEN_HONEYPOT_DESC", "Abdomen honeypot : 4x collecte et capacité de port ; 0.75x vitesse de déplacement.");
+        fr.put("SUBTYPE_HEAD_TRAPJAW_DESC", "Tête mâchoire-piège : 1,5x attaque. S'additionne aux autres bonus d'attaque de sous-type (avec Dard : 3x au total, pas 2,25x).");
+        fr.put("SUBTYPE_HEAD_DOORHEAD_DESC", "Tête-bouclier : +20 % de défense.");
+        fr.put("SUBTYPE_ABDOMEN_STINGER_DESC", "Abdomen dard : 1,5x attaque. S'additionne aux autres bonus d'attaque de sous-type (avec Mâchoire-piège : 3x au total, pas 2,25x).");
+        fr.put("SUBTYPE_ABDOMEN_HONEYPOT_DESC", "Abdomen honeypot : 4x collecte et capacité de port ; 0,75x vitesse ; +15 % régénération.");
 
         fr.put("DIALOG_ABILITIES_TITLE", "Opérations de colonie");
         fr.put("ABILITY_RP_LABEL", "Points de recherche : %s");
@@ -403,7 +403,7 @@ public class FrenchTranslation implements Translation {
         fr.put("UNIT_STAT_SPEED", "Vitesse de déplacement");
         fr.put("UNIT_STAT_SPEED_DESC", "Pixels par tic");
         fr.put("UNIT_STAT_REGEN", "Régénération");
-        fr.put("UNIT_STAT_REGEN_DESC", "Santé récupérée par tic");
+        fr.put("UNIT_STAT_REGEN_DESC", "Pourcentage des PV max récupérés par tic");
         fr.put("UNIT_STAT_TEMP_RES", "Résist. therm.");
         fr.put("UNIT_STAT_TEMP_RES_DESC", "Degrés de tolérance");
         fr.put("UNIT_STAT_CONSUMPTION", "Consommation de base");
@@ -1219,15 +1219,15 @@ public class FrenchTranslation implements Translation {
         fr.put("SPECIES_DESERT", "Fourmi du Désert");
         fr.put("SPECIES_DESERT_SCIENTIFIC", "Cataglyphis Fortis");
         fr.put("ASSIMILATED_TRAPJAW_FLAVOR", "Mâchoires à Ressort");
-        fr.put("ASSIMILATED_TRAPJAW_DESC", "Débloque le sous-type de tête Mâchoire-piège. Apporte +3x au multiplicateur d'attaque ; s'empile par addition avec les autres bonus d'attaque de sous-type.");
+        fr.put("ASSIMILATED_TRAPJAW_DESC", "Débloque le sous-type de tête Mâchoire-piège. Apporte 1,5x attaque ; s'empile par addition avec les autres bonus d'attaque de sous-type.");
         fr.put("ASSIMILATION_TRAPJAW", "Assimilation fourmi piège-mâchoire");
         fr.put("ASSIMILATION_TRAPJAW_DESC", "Après assimilation du génome de la fourmi piège-mâchoire :");
         fr.put("ASSIMILATED_HONEYPOT_FLAVOR", "Pots de Miel Vivants");
-        fr.put("ASSIMILATED_HONEYPOT_DESC", "Débloque le sous-type d'abdomen Honeypot. Les butineuses honeypot collectent et portent 4x plus à 0.75x vitesse.");
+        fr.put("ASSIMILATED_HONEYPOT_DESC", "Débloque le sous-type d'abdomen Honeypot. Les butineuses honeypot collectent et portent 4x à 0,75x vitesse, et gagnent +15 % de régénération.");
         fr.put("ASSIMILATION_HONEYPOT", "Assimilation fourmi pot-de-miel");
         fr.put("ASSIMILATION_HONEYPOT_DESC", "Après assimilation du génome de la fourmi pot-de-miel :");
         fr.put("ASSIMILATED_DOORHEAD_FLAVOR", "Bouchons Crâniens Blindés");
-        fr.put("ASSIMILATED_DOORHEAD_DESC", "Débloque le sous-type de tête Tête-bouclier. Les fourmis doorhead ont 5x défense.");
+        fr.put("ASSIMILATED_DOORHEAD_DESC", "Débloque le sous-type de tête Tête-bouclier. Les fourmis doorhead gagnent +20 % de défense.");
         fr.put("ASSIMILATION_DOORHEAD", "Assimilation fourmi tête-porte");
         fr.put("ASSIMILATION_DOORHEAD_DESC", "Après assimilation du génome de la fourmi tête-porte :");
         fr.put("ASSIMILATED_WOODBURROW_FLAVOR", "Excavation du Bois");
@@ -1243,7 +1243,7 @@ public class FrenchTranslation implements Translation {
         fr.put("ASSIMILATION_RAFTING", "Assimilation fourmi radeuse");
         fr.put("ASSIMILATION_RAFTING_DESC", "Après assimilation du génome de la fourmi radeuse :");
         fr.put("ASSIMILATED_FIREVENOM_FLAVOR", "Venin Brûlant");
-        fr.put("ASSIMILATED_FIREVENOM_DESC", "Votre dynastie peut infliger une piqûre brûlante et douloureuse. (Mécanique en développement.)");
+        fr.put("ASSIMILATED_FIREVENOM_DESC", "Ajoute +50 % à l'attaque de base de la colonie. La synergie Super Venin avec le venin neurotoxique remplace les deux +50 % par un bonus de +200 % (3x au total).");
         fr.put("ASSIMILATION_FIREVENOM", "Assimilation fourmi venin de feu");
         fr.put("ASSIMILATION_FIREVENOM_DESC", "Après assimilation du génome de la fourmi venin de feu :");
         fr.put("ASSIMILATED_JUMPING_FLAVOR", "Frappes Sautées");
@@ -1255,7 +1255,7 @@ public class FrenchTranslation implements Translation {
         fr.put("ASSIMILATION_GLIDING", "Assimilation fourmi planante");
         fr.put("ASSIMILATION_GLIDING_DESC", "Après assimilation du génome de la fourmi planante :");
         fr.put("ASSIMILATED_STINGING_FLAVOR", "Piqûre Excruciante");
-        fr.put("ASSIMILATED_STINGING_DESC", "Débloque le sous-type d'abdomen Dard. Apporte +4x au multiplicateur d'attaque ; s'empile par addition avec les autres bonus d'attaque de sous-type (Mâchoire-piège + Dard = 7x, pas 12x).");
+        fr.put("ASSIMILATED_STINGING_DESC", "Débloque le sous-type d'abdomen Dard. Apporte 1,5x attaque ; s'empile par addition (Mâchoire-piège + Dard = 3x, pas 2,25x).");
         fr.put("ASSIMILATION_STINGING", "Assimilation fourmi piqueuse");
         fr.put("ASSIMILATION_STINGING_DESC", "Après assimilation du génome de la fourmi piqueuse :");
         fr.put("ASSIMILATED_SWARMING_FLAVOR", "Essaims de Raid");
@@ -1267,7 +1267,7 @@ public class FrenchTranslation implements Translation {
         fr.put("ASSIMILATION_STEALTH", "Assimilation fourmi fantôme");
         fr.put("ASSIMILATION_STEALTH_DESC", "Après assimilation du génome de la fourmi fantôme :");
         fr.put("ASSIMILATED_FASTBITE_FLAVOR", "Mandibules Vampire");
-        fr.put("ASSIMILATED_FASTBITE_DESC", "Multiplie la vitesse d'attaque de base de la colonie par 3.");
+        fr.put("ASSIMILATED_FASTBITE_DESC", "Multiplie la vitesse d'attaque de base de la colonie par 2. Les soldats et majors attaquent deux fois plus souvent (2 de base, 4 avec cette assimilation).");
         fr.put("ASSIMILATION_FASTBITE", "Assimilation fourmi dracula");
         fr.put("ASSIMILATION_FASTBITE_DESC", "Après assimilation du génome de la fourmi dracula :");
         fr.put("ASSIMILATED_HEATRESIST_FLAVOR", "Tolérance à la Chaleur");
@@ -1275,7 +1275,7 @@ public class FrenchTranslation implements Translation {
         fr.put("ASSIMILATION_HEATRESIST", "Assimilation fourmi argentée du sahara");
         fr.put("ASSIMILATION_HEATRESIST_DESC", "Après assimilation du génome de la fourmi argentée du sahara :");
         fr.put("ASSIMILATED_DEADLYVENOM_FLAVOR", "Venin neurotoxique");
-        fr.put("ASSIMILATED_DEADLYVENOM_DESC", "Votre dynastie peut injecter un venin létal contre les petites proies. (Mécanique en développement.)");
+        fr.put("ASSIMILATED_DEADLYVENOM_DESC", "Ajoute +50 % à l'attaque de base de la colonie. La synergie Super Venin avec le venin de feu remplace les deux +50 % par un bonus de +200 % (3x au total).");
         fr.put("ASSIMILATION_DEADLYVENOM", "Assimilation venin neurotoxique");
         fr.put("ASSIMILATION_DEADLYVENOM_DESC", "Après assimilation de la génétique du venin neurotoxique :");
         fr.put("ASSIMILATED_SELFDESTRUCT_FLAVOR", "Défense Suicidaire");
@@ -1475,7 +1475,7 @@ public class FrenchTranslation implements Translation {
         fr.put("ABILITY_ABILITY_DESC", "Affiche le menu des capacités et les capacités actives.");
 
         fr.put("STAT_SKELETON_FLAVOR", "Exosquelettes de base");
-        fr.put("STAT_SKELETON_DESC", "Défense de base : 100 PV, 5 défense, 1 régénération par seconde.");
+        fr.put("STAT_SKELETON_DESC", "Vitalité de base avant multiplicateurs de type : 100 PV et 10 % des PV max régénérés par tic. La défense dépend du type (majors et reines à 20 %).");
         fr.put("STAT_ACID_FLAVOR", "Crachat acide");
         fr.put("STAT_ACID_DESC", "Attaque de base : 10 dégâts, 1 attaque/s, 1 vitesse.");
         fr.put("STAT_LONGEVITY_FLAVOR", "Longévité standard");
@@ -1562,11 +1562,11 @@ public class FrenchTranslation implements Translation {
         fr.put("ASSIMILATED_MULTIQUEEN_DESC", "Plusieurs reines dans une même colonie (nécessite d'améliorer la chambre royale).");
         fr.put("ASSIMILATED_MULTIQUEEN_DESC", "Plusieurs reines dans une même colonie (nécessite d'améliorer la chambre royale).");
         fr.put("ASSIMILATED_TRAPJAW_FLAVOR", "Mâchoires à Ressort");
-        fr.put("ASSIMILATED_TRAPJAW_DESC", "Débloque le sous-type de tête Mâchoire-piège. Apporte +3x au multiplicateur d'attaque ; s'empile par addition avec les autres bonus d'attaque de sous-type.");
+        fr.put("ASSIMILATED_TRAPJAW_DESC", "Débloque le sous-type de tête Mâchoire-piège. Apporte 1,5x attaque ; s'empile par addition avec les autres bonus d'attaque de sous-type.");
         fr.put("ASSIMILATED_HONEYPOT_FLAVOR", "Pots de Miel Vivants");
-        fr.put("ASSIMILATED_HONEYPOT_DESC", "Débloque le sous-type d'abdomen Honeypot. Les butineuses honeypot collectent et portent 4x plus à 0.75x vitesse.");
+        fr.put("ASSIMILATED_HONEYPOT_DESC", "Débloque le sous-type d'abdomen Honeypot. Les butineuses honeypot collectent et portent 4x à 0,75x vitesse, et gagnent +15 % de régénération.");
         fr.put("ASSIMILATED_DOORHEAD_FLAVOR", "Bouchons Crâniens Blindés");
-        fr.put("ASSIMILATED_DOORHEAD_DESC", "Débloque le sous-type de tête Tête-bouclier. Les fourmis doorhead ont 5x défense.");
+        fr.put("ASSIMILATED_DOORHEAD_DESC", "Débloque le sous-type de tête Tête-bouclier. Les fourmis doorhead gagnent +20 % de défense.");
         fr.put("ASSIMILATED_WOODBURROW_FLAVOR", "Excavation du Bois");
         fr.put("ASSIMILATED_WOODBURROW_DESC", "Votre dynastie peut creuser et nicher dans le bois. (Mécanique en développement.)");
         fr.put("ASSIMILATED_SILKWEAVE_FLAVOR", "Tissage de Nids en Soie");
@@ -1574,23 +1574,23 @@ public class FrenchTranslation implements Translation {
         fr.put("ASSIMILATED_RAFTING_FLAVOR", "Radeaux Vivants");
         fr.put("ASSIMILATED_RAFTING_DESC", "Votre dynastie peut former des radeaux pour traverser les crues. (Mécanique en développement.)");
         fr.put("ASSIMILATED_FIREVENOM_FLAVOR", "Venin Brûlant");
-        fr.put("ASSIMILATED_FIREVENOM_DESC", "Votre dynastie peut infliger une piqûre brûlante et douloureuse. (Mécanique en développement.)");
+        fr.put("ASSIMILATED_FIREVENOM_DESC", "Ajoute +50 % à l'attaque de base de la colonie. La synergie Super Venin avec le venin neurotoxique remplace les deux +50 % par un bonus de +200 % (3x au total).");
         fr.put("ASSIMILATED_JUMPING_FLAVOR", "Frappes Sautées");
         fr.put("ASSIMILATED_JUMPING_DESC", "Votre dynastie peut lancer des attaques en saut. (Mécanique en développement.)");
         fr.put("ASSIMILATED_GLIDING_FLAVOR", "Planés Contrôlées");
         fr.put("ASSIMILATED_GLIDING_DESC", "Votre dynastie peut planer entre les arbres. (Mécanique en développement.)");
         fr.put("ASSIMILATED_STINGING_FLAVOR", "Piqûre Excruciante");
-        fr.put("ASSIMILATED_STINGING_DESC", "Débloque le sous-type d'abdomen Dard. Apporte +4x au multiplicateur d'attaque ; s'empile par addition avec les autres bonus d'attaque de sous-type (Mâchoire-piège + Dard = 7x, pas 12x).");
+        fr.put("ASSIMILATED_STINGING_DESC", "Débloque le sous-type d'abdomen Dard. Apporte 1,5x attaque ; s'empile par addition (Mâchoire-piège + Dard = 3x, pas 2,25x).");
         fr.put("ASSIMILATED_SWARMING_FLAVOR", "Essaims de Raid");
         fr.put("ASSIMILATED_SWARMING_DESC", "Votre dynastie peut coordonner de vastes raids sans nid permanent. (Mécanique en développement.)");
         fr.put("ASSIMILATED_STEALTH_FLAVOR", "Infiltration Fantôme");
         fr.put("ASSIMILATED_STEALTH_DESC", "Votre dynastie peut se déplacer invisible et nicher dans des structures hostiles. (Mécanique en développement.)");
         fr.put("ASSIMILATED_FASTBITE_FLAVOR", "Mandibules Vampire");
-        fr.put("ASSIMILATED_FASTBITE_DESC", "Multiplie la vitesse d'attaque de base de la colonie par 3.");
+        fr.put("ASSIMILATED_FASTBITE_DESC", "Multiplie la vitesse d'attaque de base de la colonie par 2. Les soldats et majors attaquent deux fois plus souvent (2 de base, 4 avec cette assimilation).");
         fr.put("ASSIMILATED_HEATRESIST_FLAVOR", "Tolérance à la Chaleur");
         fr.put("ASSIMILATED_HEATRESIST_DESC", "Votre dynastie peut butiner sous une chaleur extrême du désert. (Mécanique en développement.)");
         fr.put("ASSIMILATED_DEADLYVENOM_FLAVOR", "Venin neurotoxique");
-        fr.put("ASSIMILATED_DEADLYVENOM_DESC", "Votre dynastie peut injecter un venin létal contre les petites proies. (Mécanique en développement.)");
+        fr.put("ASSIMILATED_DEADLYVENOM_DESC", "Ajoute +50 % à l'attaque de base de la colonie. La synergie Super Venin avec le venin de feu remplace les deux +50 % par un bonus de +200 % (3x au total).");
         fr.put("ASSIMILATED_SELFDESTRUCT_FLAVOR", "Défense Suicidaire");
         fr.put("ASSIMILATED_SELFDESTRUCT_DESC", "Votre dynastie peut faire éclater des ouvrières spécialisées. (Mécanique en développement.)");
         fr.put("ASSIMILATED_FARSIGHT_FLAVOR", "Vision Exceptionnelle");
@@ -2085,7 +2085,7 @@ public class FrenchTranslation implements Translation {
         fr.put("TRIGGER_SUBTYPE_HATCH_TITLE", "Sous-types corporels");
         fr.put("TRIGGER_SUBTYPE_HATCH_MSG", "Les traits assimilés peuvent changer l'éclosion ! Ouvrez Taux d'éclosion (P) pour régler les sous-types par type ; chaque partie active ajoute +50 % d'aliment.");
         fr.put("TRIGGER_SYNERGY_SUPER_VENOM_TITLE", "Synergie débloquée");
-        fr.put("TRIGGER_SYNERGY_SUPER_VENOM_MSG", "%s est maintenant active ! Combiner %s remplace leur empilement séparé par un multiplicateur de dégâts de 16x. Ouvrez Synergies (O) pour consulter.");
+        fr.put("TRIGGER_SYNERGY_SUPER_VENOM_MSG", "%s est maintenant active ! Combiner %s remplace leurs +50 % séparés par un bonus d'attaque de +200 % (3x au total). Ouvrez Synergies (O) pour consulter.");
         fr.put("TRIGGER_OPERATIONS_ABILITY_TITLE", "Opérations de colonie");
         fr.put("TRIGGER_OPERATIONS_ABILITY_MSG", "Vous avez obtenu une capacité active spéciale ! Vous pouvez maintenant accéder au menu Opérations de colonie en appuyant sur (Z).");
 

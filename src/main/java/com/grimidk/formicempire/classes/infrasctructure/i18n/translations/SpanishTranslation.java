@@ -224,7 +224,7 @@ public class SpanishTranslation implements Translation {
         es.put("TRIGGER_PROGRESS_HINT_PARASITIC_MITE", "Acumula recursos. Los brotes (biomas fríos, otoño/invierno) desbloquean la captura de ácaros simbióticos en toda la dinastía.");
         es.put("SYNERGY_SUPER_VENOM", "Súper Veneno");
         es.put("SYNERGY_SUPER_VENOM_FLAVOR", "Súper Veneno");
-        es.put("SYNERGY_SUPER_VENOM_DESC", "Reemplaza la acumulación de veneno de fuego + neurotóxico (4+4) por un multiplicador de daño de 16x cuando ambos venenos están asimilados y las Sinergias están investigadas.");
+        es.put("SYNERGY_SUPER_VENOM_DESC", "Sustituye el apilamiento de veneno de fuego + neurotóxico (+50% cada uno) por un bonus de ataque de +200% (3x total) cuando ambos venenos están asimilados y se investigaron Sinergias.");
 
         es.put("DIALOG_HATCH_RATES_TITLE", "Gestionar Tasas de Eclosión");
         es.put("HATCH_DESC", "Establecer probabilidad de eclosión:");
@@ -240,10 +240,10 @@ public class SpanishTranslation implements Translation {
         es.put("SUBTYPE_HEAD_DOORHEAD", "Cabeza escudo");
         es.put("SUBTYPE_ABDOMEN_STINGER", "Aguijón");
         es.put("SUBTYPE_ABDOMEN_HONEYPOT", "Honeypot");
-        es.put("SUBTYPE_HEAD_TRAPJAW_DESC", "Cabeza mandíbula trampa: +3x multiplicador de ataque. Se suma con otros bonos de ataque de subtipo (con Aguijón: 7x total, no 12x).");
-        es.put("SUBTYPE_HEAD_DOORHEAD_DESC", "Cabeza escudo: 5x defensa.");
-        es.put("SUBTYPE_ABDOMEN_STINGER_DESC", "Abdomen aguijón: +4x multiplicador de ataque. Se suma con otros bonos de ataque de subtipo (con Mandíbula trampa: 7x total, no 12x).");
-        es.put("SUBTYPE_ABDOMEN_HONEYPOT_DESC", "Abdomen honeypot: 4x poder de recolección y capacidad de carga; 0.75x velocidad de movimiento.");
+        es.put("SUBTYPE_HEAD_TRAPJAW_DESC", "Cabeza mandíbula-trampa: 1.5x ataque. Se suma a otros bonus de ataque de subtipo (con Aguijón: 3x total, no 2.25x).");
+        es.put("SUBTYPE_HEAD_DOORHEAD_DESC", "Cabeza-escudo: +20% defensa.");
+        es.put("SUBTYPE_ABDOMEN_STINGER_DESC", "Abdomen aguijón: 1.5x ataque. Se suma a otros bonus de ataque de subtipo (con Mandíbula-trampa: 3x total, no 2.25x).");
+        es.put("SUBTYPE_ABDOMEN_HONEYPOT_DESC", "Abdomen honeypot: 4x recolección y capacidad de carga; 0.75x velocidad; +15% regeneración.");
 
         es.put("DIALOG_ABILITIES_TITLE", "Operaciones de Colonia");
         es.put("ABILITY_RP_LABEL", "Puntos de Investigación: %s");
@@ -403,7 +403,7 @@ public class SpanishTranslation implements Translation {
         es.put("UNIT_STAT_SPEED", "Velocidad de Movimiento");
         es.put("UNIT_STAT_SPEED_DESC", "Píxeles por tick");
         es.put("UNIT_STAT_REGEN", "Regeneración");
-        es.put("UNIT_STAT_REGEN_DESC", "Salud recuperada por tick");
+        es.put("UNIT_STAT_REGEN_DESC", "Porcentaje de HP máximo recuperado por tick");
         es.put("UNIT_STAT_TEMP_RES", "Resist. Temp.");
         es.put("UNIT_STAT_TEMP_RES_DESC", "Grados de tolerancia");
         es.put("UNIT_STAT_CONSUMPTION", "Consumo Base");
@@ -1219,15 +1219,15 @@ public class SpanishTranslation implements Translation {
         es.put("SPECIES_DESERT", "Hormiga del Desierto");
         es.put("SPECIES_DESERT_SCIENTIFIC", "Cataglyphis Fortis");
         es.put("ASSIMILATED_TRAPJAW_FLAVOR", "Mandíbulas de Resorte");
-        es.put("ASSIMILATED_TRAPJAW_DESC", "Desbloquea el subtipo de cabeza Mandíbula trampa. Aporta +3x al multiplicador de ataque; se acumula por suma con otros bonos de ataque de subtipo.");
+        es.put("ASSIMILATED_TRAPJAW_DESC", "Desbloquea el subtipo de cabeza Mandíbula-trampa. Aporta 1.5x ataque; se apila por suma con otros bonus de ataque de subtipo.");
         es.put("ASSIMILATION_TRAPJAW", "Asimilación de Hormiga Trampa Mandíbula");
         es.put("ASSIMILATION_TRAPJAW_DESC", "Tras asimilar el genoma de la hormiga trampa mandíbula:");
         es.put("ASSIMILATED_HONEYPOT_FLAVOR", "Tarros de Miel Vivos");
-        es.put("ASSIMILATED_HONEYPOT_DESC", "Desbloquea el subtipo de abdomen Honeypot. Los foragers honeypot recolectan y cargan 4x más a 0.75x de velocidad.");
+        es.put("ASSIMILATED_HONEYPOT_DESC", "Desbloquea el subtipo de abdomen Honeypot. Las recolectoras honeypot reúnen y llevan 4x a 0.75x velocidad, y ganan +15% regeneración.");
         es.put("ASSIMILATION_HONEYPOT", "Asimilación de Hormiga Mielera");
         es.put("ASSIMILATION_HONEYPOT_DESC", "Tras asimilar el genoma de la hormiga mielera:");
         es.put("ASSIMILATED_DOORHEAD_FLAVOR", "Tapones de Cabeza Acorazados");
-        es.put("ASSIMILATED_DOORHEAD_DESC", "Desbloquea el subtipo de cabeza Cabeza escudo. Las hormigas doorhead tienen 5x defensa.");
+        es.put("ASSIMILATED_DOORHEAD_DESC", "Desbloquea el subtipo de cabeza Cabeza-escudo. Las hormigas doorhead ganan +20% defensa.");
         es.put("ASSIMILATION_DOORHEAD", "Asimilación de Hormiga Cabeza Puerta");
         es.put("ASSIMILATION_DOORHEAD_DESC", "Tras asimilar el genoma de la hormiga cabeza puerta:");
         es.put("ASSIMILATED_WOODBURROW_FLAVOR", "Excavación de Madera");
@@ -1243,7 +1243,7 @@ public class SpanishTranslation implements Translation {
         es.put("ASSIMILATION_RAFTING", "Asimilación de Hormiga Flotante");
         es.put("ASSIMILATION_RAFTING_DESC", "Tras asimilar el genoma de la hormiga flotante:");
         es.put("ASSIMILATED_FIREVENOM_FLAVOR", "Veneno Ardiente");
-        es.put("ASSIMILATED_FIREVENOM_DESC", "Tu dinastía puede infligir un aguijón ardiente y doloroso. (Mecánica en desarrollo.)");
+        es.put("ASSIMILATED_FIREVENOM_DESC", "Añade +50% al ataque base de la colonia. La sinergia Super Veneno con veneno neurotóxico sustituye ambos +50% por un bonus de +200% (3x total).");
         es.put("ASSIMILATION_FIREVENOM", "Asimilación de Hormiga Veneno Ígneo");
         es.put("ASSIMILATION_FIREVENOM_DESC", "Tras asimilar el genoma de la hormiga veneno ígneo:");
         es.put("ASSIMILATED_JUMPING_FLAVOR", "Saltos de Ataque");
@@ -1255,7 +1255,7 @@ public class SpanishTranslation implements Translation {
         es.put("ASSIMILATION_GLIDING", "Asimilación de Hormiga Planeadora");
         es.put("ASSIMILATION_GLIDING_DESC", "Tras asimilar el genoma de la hormiga planeadora:");
         es.put("ASSIMILATED_STINGING_FLAVOR", "Aguijón Excruciante");
-        es.put("ASSIMILATED_STINGING_DESC", "Desbloquea el subtipo de abdomen Aguijón. Aporta +4x al multiplicador de ataque; se acumula por suma con otros bonos de ataque de subtipo (Mandíbula trampa + Aguijón = 7x, no 12x).");
+        es.put("ASSIMILATED_STINGING_DESC", "Desbloquea el subtipo de abdomen Aguijón. Aporta 1.5x ataque; se apila por suma (Mandíbula-trampa + Aguijón = 3x, no 2.25x).");
         es.put("ASSIMILATION_STINGING", "Asimilación de Hormiga Aguijonera");
         es.put("ASSIMILATION_STINGING_DESC", "Tras asimilar el genoma de la hormiga aguijonera:");
         es.put("ASSIMILATED_SWARMING_FLAVOR", "Enjambres de Incursión");
@@ -1267,7 +1267,7 @@ public class SpanishTranslation implements Translation {
         es.put("ASSIMILATION_STEALTH", "Asimilación de Hormiga Fantasma");
         es.put("ASSIMILATION_STEALTH_DESC", "Tras asimilar el genoma de la hormiga fantasma:");
         es.put("ASSIMILATED_FASTBITE_FLAVOR", "Mandíbulas Vampiro");
-        es.put("ASSIMILATED_FASTBITE_DESC", "Multiplica la velocidad de ataque base de la colonia por 3.");
+        es.put("ASSIMILATED_FASTBITE_DESC", "Multiplica la velocidad de ataque base de la colonia por 2. Soldados y mayores atacan el doble (2 base, 4 con esta asimilación).");
         es.put("ASSIMILATION_FASTBITE", "Asimilación de Hormiga Drácula");
         es.put("ASSIMILATION_FASTBITE_DESC", "Tras asimilar el genoma de la hormiga drácula:");
         es.put("ASSIMILATED_HEATRESIST_FLAVOR", "Tolerancia al Calor Desértico");
@@ -1275,7 +1275,7 @@ public class SpanishTranslation implements Translation {
         es.put("ASSIMILATION_HEATRESIST", "Asimilación de Hormiga Plateada del Sahara");
         es.put("ASSIMILATION_HEATRESIST_DESC", "Tras asimilar el genoma de la hormiga plateada del sahara:");
         es.put("ASSIMILATED_DEADLYVENOM_FLAVOR", "Veneno neurotóxico");
-        es.put("ASSIMILATED_DEADLYVENOM_DESC", "Tu dinastía puede inyectar veneno capaz de matar presas pequeñas rápidamente. (Mecánica en desarrollo.)");
+        es.put("ASSIMILATED_DEADLYVENOM_DESC", "Añade +50% al ataque base de la colonia. La sinergia Super Veneno con veneno de fuego sustituye ambos +50% por un bonus de +200% (3x total).");
         es.put("ASSIMILATION_DEADLYVENOM", "Asimilación de veneno neurotóxico");
         es.put("ASSIMILATION_DEADLYVENOM_DESC", "Tras asimilar la genética del veneno neurotóxico:");
         es.put("ASSIMILATED_SELFDESTRUCT_FLAVOR", "Defensa Suicida");
@@ -1475,7 +1475,7 @@ public class SpanishTranslation implements Translation {
         es.put("ABILITY_ABILITY_DESC", "Permite ver el menú de habilidades y usar habilidades activas.");
 
         es.put("STAT_SKELETON_FLAVOR", "Exoesqueletos Básicos");
-        es.put("STAT_SKELETON_DESC", "Defensa básica para todas las hormigas: 100 de salud, 5 de defensa y 1 de regeneración por segundo.");
+        es.put("STAT_SKELETON_DESC", "Vitalidad básica antes de multiplicadores de tipo: 100 de salud y 10% del HP máximo regenerado por tick. La defensa depende del tipo (mayores y reinas empiezan en 20%).");
         es.put("STAT_ACID_FLAVOR", "Salivazo Ácido");
         es.put("STAT_ACID_DESC", "Ataque básico para todas las hormigas: 10 de daño, 1 ataque por segundo y 1 de velocidad.");
         es.put("STAT_LONGEVITY_FLAVOR", "Longevidad Estándar");
@@ -1562,11 +1562,11 @@ public class SpanishTranslation implements Translation {
         es.put("ASSIMILATED_MULTIQUEEN_DESC", "Tu dinastía ahora puede tener varias reinas en una sola colonia (requiere mejorar la Cámara Real).");
         es.put("ASSIMILATED_MULTIQUEEN_DESC", "Tu dinastía ahora puede tener varias reinas en una sola colonia (requiere mejorar la Cámara Real).");
         es.put("ASSIMILATED_TRAPJAW_FLAVOR", "Mandíbulas de Resorte");
-        es.put("ASSIMILATED_TRAPJAW_DESC", "Desbloquea el subtipo de cabeza Mandíbula trampa. Aporta +3x al multiplicador de ataque; se acumula por suma con otros bonos de ataque de subtipo.");
+        es.put("ASSIMILATED_TRAPJAW_DESC", "Desbloquea el subtipo de cabeza Mandíbula-trampa. Aporta 1.5x ataque; se apila por suma con otros bonus de ataque de subtipo.");
         es.put("ASSIMILATED_HONEYPOT_FLAVOR", "Tarros de Miel Vivos");
-        es.put("ASSIMILATED_HONEYPOT_DESC", "Desbloquea el subtipo de abdomen Honeypot. Los foragers honeypot recolectan y cargan 4x más a 0.75x de velocidad.");
+        es.put("ASSIMILATED_HONEYPOT_DESC", "Desbloquea el subtipo de abdomen Honeypot. Las recolectoras honeypot reúnen y llevan 4x a 0.75x velocidad, y ganan +15% regeneración.");
         es.put("ASSIMILATED_DOORHEAD_FLAVOR", "Tapones de Cabeza Acorazados");
-        es.put("ASSIMILATED_DOORHEAD_DESC", "Desbloquea el subtipo de cabeza Cabeza escudo. Las hormigas doorhead tienen 5x defensa.");
+        es.put("ASSIMILATED_DOORHEAD_DESC", "Desbloquea el subtipo de cabeza Cabeza-escudo. Las hormigas doorhead ganan +20% defensa.");
         es.put("ASSIMILATED_WOODBURROW_FLAVOR", "Excavación de Madera");
         es.put("ASSIMILATED_WOODBURROW_DESC", "Tu dinastía puede excavar y anidar en madera. (Mecánica en desarrollo.)");
         es.put("ASSIMILATED_SILKWEAVE_FLAVOR", "Tejido de Nidos de Seda");
@@ -1574,23 +1574,23 @@ public class SpanishTranslation implements Translation {
         es.put("ASSIMILATED_RAFTING_FLAVOR", "Balsas Vivas");
         es.put("ASSIMILATED_RAFTING_DESC", "Tu dinastía puede unir cuerpos en balsas para cruzar inundaciones. (Mecánica en desarrollo.)");
         es.put("ASSIMILATED_FIREVENOM_FLAVOR", "Veneno Ardiente");
-        es.put("ASSIMILATED_FIREVENOM_DESC", "Tu dinastía puede infligir un aguijón ardiente y doloroso. (Mecánica en desarrollo.)");
+        es.put("ASSIMILATED_FIREVENOM_DESC", "Añade +50% al ataque base de la colonia. La sinergia Super Veneno con veneno neurotóxico sustituye ambos +50% por un bonus de +200% (3x total).");
         es.put("ASSIMILATED_JUMPING_FLAVOR", "Saltos de Ataque");
         es.put("ASSIMILATED_JUMPING_DESC", "Tu dinastía puede lanzar ataques en salto con patas poderosas. (Mecánica en desarrollo.)");
         es.put("ASSIMILATED_GLIDING_FLAVOR", "Planeos Controlados");
         es.put("ASSIMILATED_GLIDING_DESC", "Tu dinastía puede planear entre árboles para cruzar huecos. (Mecánica en desarrollo.)");
         es.put("ASSIMILATED_STINGING_FLAVOR", "Aguijón Excruciante");
-        es.put("ASSIMILATED_STINGING_DESC", "Desbloquea el subtipo de abdomen Aguijón. Aporta +4x al multiplicador de ataque; se acumula por suma con otros bonos de ataque de subtipo (Mandíbula trampa + Aguijón = 7x, no 12x).");
+        es.put("ASSIMILATED_STINGING_DESC", "Desbloquea el subtipo de abdomen Aguijón. Aporta 1.5x ataque; se apila por suma (Mandíbula-trampa + Aguijón = 3x, no 2.25x).");
         es.put("ASSIMILATED_SWARMING_FLAVOR", "Enjambres de Incursión");
         es.put("ASSIMILATED_SWARMING_DESC", "Tu dinastía puede coordinar incursiones masivas sin nido permanente. (Mecánica en desarrollo.)");
         es.put("ASSIMILATED_STEALTH_FLAVOR", "Infiltración Fantasma");
         es.put("ASSIMILATED_STEALTH_DESC", "Tu dinastía puede moverse sin ser vista y anidar en estructuras hostiles. (Mecánica en desarrollo.)");
         es.put("ASSIMILATED_FASTBITE_FLAVOR", "Mandíbulas Vampiro");
-        es.put("ASSIMILATED_FASTBITE_DESC", "Multiplica la velocidad de ataque base de la colonia por 3.");
+        es.put("ASSIMILATED_FASTBITE_DESC", "Multiplica la velocidad de ataque base de la colonia por 2. Soldados y mayores atacan el doble (2 base, 4 con esta asimilación).");
         es.put("ASSIMILATED_HEATRESIST_FLAVOR", "Tolerancia al Calor Desértico");
         es.put("ASSIMILATED_HEATRESIST_DESC", "Tu dinastía puede recolectar bajo calor extremo del desierto. (Mecánica en desarrollo.)");
         es.put("ASSIMILATED_DEADLYVENOM_FLAVOR", "Veneno neurotóxico");
-        es.put("ASSIMILATED_DEADLYVENOM_DESC", "Tu dinastía puede inyectar veneno capaz de matar presas pequeñas rápidamente. (Mecánica en desarrollo.)");
+        es.put("ASSIMILATED_DEADLYVENOM_DESC", "Añade +50% al ataque base de la colonia. La sinergia Super Veneno con veneno de fuego sustituye ambos +50% por un bonus de +200% (3x total).");
         es.put("ASSIMILATED_SELFDESTRUCT_FLAVOR", "Defensa Suicida");
         es.put("ASSIMILATED_SELFDESTRUCT_DESC", "Tu dinastía puede reventar obreras especializadas para rociar toxinas. (Mecánica en desarrollo.)");
         es.put("ASSIMILATED_FARSIGHT_FLAVOR", "Visión Excepcional");
@@ -2085,7 +2085,7 @@ public class SpanishTranslation implements Translation {
         es.put("TRIGGER_SUBTYPE_HATCH_TITLE", "Subtipos corporales");
         es.put("TRIGGER_SUBTYPE_HATCH_MSG", "¡Los rasgos asimilados pueden cambiar la eclosión! Abre Tasas de eclosión (P) para fijar subtipos por tipo; cada parte activa añade +50% de alimento.");
         es.put("TRIGGER_SYNERGY_SUPER_VENOM_TITLE", "Sinergia desbloqueada");
-        es.put("TRIGGER_SYNERGY_SUPER_VENOM_MSG", "¡%s ya está activa! Combinar %s reemplaza su acumulación separada por un multiplicador de daño de 16x. Abre Sinergias (O) para revisar.");
+        es.put("TRIGGER_SYNERGY_SUPER_VENOM_MSG", "%s ya está activa! Combinar %s sustituye sus +50% separados por un bonus de ataque de +200% (3x total). Abre Sinergias (O) para revisar.");
         es.put("TRIGGER_OPERATIONS_ABILITY_TITLE", "Operaciones de colonia");
         es.put("TRIGGER_OPERATIONS_ABILITY_MSG", "¡Has obtenido una habilidad activa especial! Ahora puedes acceder al menú de Operaciones de colonia pulsando (Z).");
 

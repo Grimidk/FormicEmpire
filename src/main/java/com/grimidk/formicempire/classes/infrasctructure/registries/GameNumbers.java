@@ -55,11 +55,14 @@ public final class GameNumbers {
 
     // --- Ant subtypes ---
     public static final int SUBTYPE_DIGIT_NONE = 1;
-    public static final float SUBTYPE_DAMAGE_MULT_STINGER = 4f;
-    public static final float SUBTYPE_ATTACK_MULT_TRAPJAW = 3f;
-    public static final float SUBTYPE_DEFENSE_MULT_DOORHEAD = 5f;
+    public static final float SUBTYPE_DAMAGE_MULT_STINGER = 1.5f;
+    public static final float SUBTYPE_ATTACK_MULT_TRAPJAW = 1.5f;
+    /** Doorhead: flat extra defense percent (damage reduction). */
+    public static final float SUBTYPE_DEFENSE_ADD_DOORHEAD = 20f;
     public static final float SUBTYPE_FORAGE_MULT_HONEYPOT = 4f;
     public static final float SUBTYPE_SPEED_MULT_HONEYPOT = 0.75f;
+    /** Honeypot abdomen: regen is this × colony/type regen (15% more). */
+    public static final float SUBTYPE_REGEN_MULT_HONEYPOT = 1.15f;
     public static final float SUBTYPE_FOOD_CONSUMPTION_ADD_PER_TRAIT = 0.5f;
 
     // --- Diplomacy / reputation ---
@@ -109,12 +112,25 @@ public final class GameNumbers {
     public static final int MILITARY_WEIGHT_QUEEN = 50;
     public static final int MILITARY_BASELINE_HEALTH = 100;
     public static final int MILITARY_BASELINE_ATTACK = 10;
-    public static final int MILITARY_BASELINE_DEFENSE = 5;
+    /** Colony-wide defense baseline (ants use type absolute % instead). */
+    public static final int MILITARY_BASELINE_DEFENSE = 0;
+    /** Defense is percent damage reduction; always clamp to this range. */
+    public static final float DEFENSE_PERCENT_MIN = 0f;
+    public static final float DEFENSE_PERCENT_MAX = 100f;
+    /** Major / queen innate defense percent. */
+    public static final float ANT_DEFENSE_PERCENT_MAJOR = 20f;
+    public static final float ANT_DEFENSE_PERCENT_QUEEN = 20f;
+    /** Divisor for military-power defense factor from ant defense %. */
+    public static final float MILITARY_DEFENSE_FACTOR_BASELINE = ANT_DEFENSE_PERCENT_MAJOR;
+    /** Colony skeleton regen baseline: percent of max HP recovered per tick. */
+    public static final int ANT_REGEN_PERCENT_BASE = 10;
     public static final int MILITARY_BASELINE_ATTACK_SPEED = 1;
-    public static final float ASSIMILATED_DAMAGE_MULT_FIRE = 4f;
-    public static final float ASSIMILATED_DAMAGE_ADD_DEADLY = 4f;
-    public static final float ASSIMILATED_DAMAGE_SYNERGY_FIRE_DEADLY = 16f;
-    public static final float ASSIMILATED_ATTACK_SPEED_MULT_FASTBITE = 3f;
+    /** Each venom assimilation adds this fraction to colony attack (0.5 = +50%). */
+    public static final float ASSIMILATED_DAMAGE_ADD_FIRE = 0.5f;
+    public static final float ASSIMILATED_DAMAGE_ADD_DEADLY = 0.5f;
+    /** Super Venom absolute attack mult: replaces both +50% bonuses with a +200% bonus (3×). */
+    public static final float ASSIMILATED_DAMAGE_SYNERGY_FIRE_DEADLY = 3f;
+    public static final float ASSIMILATED_ATTACK_SPEED_MULT_FASTBITE = 2f;
     public static final float MILITARY_STRENGTH_RATIO_MAX = 11f;
     public static final int MILITARY_STRENGTH_DELTA_MAX = 10;
 
@@ -279,6 +295,35 @@ public final class GameNumbers {
 
     public static int clampColonyLoyalty(int score) {
         return Math.max(COLONY_LOYALTY_MIN, Math.min(COLONY_LOYALTY_MAX, score));
+    }
+
+    /** Defense is percent damage reduction in {@code [0, 100]}. */
+    public static float clampDefensePercent(float defensePercent) {
+        if (Float.isNaN(defensePercent) || Float.isInfinite(defensePercent)) {
+            return DEFENSE_PERCENT_MIN;
+        }
+        return Math.max(DEFENSE_PERCENT_MIN, Math.min(DEFENSE_PERCENT_MAX, defensePercent));
+    }
+
+    public static int clampDefensePercent(int defensePercent) {
+        return Math.round(clampDefensePercent((float) defensePercent));
+    }
+
+    /** Applies percent damage reduction; {@code defensePercent} is clamped to 0–100. */
+    public static float damageAfterDefense(float rawDamage, float defensePercent) {
+        if (rawDamage <= 0f) {
+            return 0f;
+        }
+        float reduction = clampDefensePercent(defensePercent) / 100f;
+        return rawDamage * (1f - reduction);
+    }
+
+    /** {@code regenPercent} is % of max HP recovered; result is HP restored this tick. */
+    public static float regenAmountFromPercent(float maxHealth, float regenPercent) {
+        if (maxHealth <= 0f || regenPercent <= 0f) {
+            return 0f;
+        }
+        return maxHealth * (regenPercent / 100f);
     }
 
     public static double computeIntegrationMonthsPerColony(double diplomatsPerColony) {

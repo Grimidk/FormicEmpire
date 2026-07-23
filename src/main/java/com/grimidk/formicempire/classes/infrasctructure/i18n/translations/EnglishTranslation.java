@@ -224,7 +224,7 @@ public class EnglishTranslation implements Translation {
         en.put("TRIGGER_PROGRESS_HINT_PARASITIC_MITE", "Stockpile resources. Outbreaks (cold biomes, fall/winter) unlock symbiotic mite catching dynasty-wide.");
         en.put("SYNERGY_SUPER_VENOM", "Super Venom");
         en.put("SYNERGY_SUPER_VENOM_FLAVOR", "Super Venom");
-        en.put("SYNERGY_SUPER_VENOM_DESC", "Replaces Fire + Neurotoxic venom stacking (4+4) with a 16x colony damage multiplier when both venoms are assimilated and Synergies are researched.");
+        en.put("SYNERGY_SUPER_VENOM_DESC", "Replaces Fire + Neurotoxic venom stacking (+50% each) with a +200% colony attack bonus (3x total) when both venoms are assimilated and Synergies are researched.");
 
         en.put("DIALOG_HATCH_RATES_TITLE", "Manage Pupa Hatch Rates");
         en.put("HATCH_DESC", "Set hatch chance for new ants:");
@@ -240,10 +240,10 @@ public class EnglishTranslation implements Translation {
         en.put("SUBTYPE_HEAD_DOORHEAD", "Doorhead");
         en.put("SUBTYPE_ABDOMEN_STINGER", "Stinger");
         en.put("SUBTYPE_ABDOMEN_HONEYPOT", "Honeypot");
-        en.put("SUBTYPE_HEAD_TRAPJAW_DESC", "Trapjaw head: +3x attack multiplier. Adds together with other subtype attack bonuses (with Stinger: 7x total, not 12x).");
-        en.put("SUBTYPE_HEAD_DOORHEAD_DESC", "Doorhead: 5x defense.");
-        en.put("SUBTYPE_ABDOMEN_STINGER_DESC", "Stinger abdomen: +4x attack multiplier. Adds together with other subtype attack bonuses (with Trapjaw: 7x total, not 12x).");
-        en.put("SUBTYPE_ABDOMEN_HONEYPOT_DESC", "Honeypot abdomen: 4x foraging power and carry capacity; 0.75x movement speed.");
+        en.put("SUBTYPE_HEAD_TRAPJAW_DESC", "Trapjaw head: 1.5x attack. Adds together with other subtype attack bonuses (with Stinger: 3x total, not 2.25x).");
+        en.put("SUBTYPE_HEAD_DOORHEAD_DESC", "Doorhead: +20% defense.");
+        en.put("SUBTYPE_ABDOMEN_STINGER_DESC", "Stinger abdomen: 1.5x attack. Adds together with other subtype attack bonuses (with Trapjaw: 3x total, not 2.25x).");
+        en.put("SUBTYPE_ABDOMEN_HONEYPOT_DESC", "Honeypot abdomen: 4x foraging power and carry capacity; 0.75x movement speed; +15% regeneration.");
 
         en.put("DIALOG_ABILITIES_TITLE", "Colony Operations");
         en.put("ABILITY_RP_LABEL", "Research Points: %s");
@@ -403,7 +403,7 @@ public class EnglishTranslation implements Translation {
         en.put("UNIT_STAT_SPEED", "Movement Speed");
         en.put("UNIT_STAT_SPEED_DESC", "Pixels per tick");
         en.put("UNIT_STAT_REGEN", "Regeneration");
-        en.put("UNIT_STAT_REGEN_DESC", "Health recovered per tick");
+        en.put("UNIT_STAT_REGEN_DESC", "Percent of max HP recovered per tick");
         en.put("UNIT_STAT_TEMP_RES", "Temp. Resist");
         en.put("UNIT_STAT_TEMP_RES_DESC", "Degrees tolerance");
         en.put("UNIT_STAT_CONSUMPTION", "Base Consumption");
@@ -1219,15 +1219,15 @@ public class EnglishTranslation implements Translation {
         en.put("SPECIES_DESERT", "Desert Ant");
         en.put("SPECIES_DESERT_SCIENTIFIC", "Cataglyphis Fortis");
         en.put("ASSIMILATED_TRAPJAW_FLAVOR", "Spring-Loaded Mandibles");
-        en.put("ASSIMILATED_TRAPJAW_DESC", "Unlocks the Trapjaw head subtype. Contributes +3x to the attack multiplier; stacks by addition with other subtype attack bonuses.");
+        en.put("ASSIMILATED_TRAPJAW_DESC", "Unlocks the Trapjaw head subtype. Contributes 1.5x attack; stacks by addition with other subtype attack bonuses.");
         en.put("ASSIMILATION_TRAPJAW", "Trap-Jaw Ant Assimilation");
         en.put("ASSIMILATION_TRAPJAW_DESC", "After assimilating the trap-jaw ant genome:");
         en.put("ASSIMILATED_HONEYPOT_FLAVOR", "Living Honey Jars");
-        en.put("ASSIMILATED_HONEYPOT_DESC", "Unlocks the Honeypot abdomen subtype. Honeypot foragers gather and carry 4x as much at 0.75x movement speed.");
+        en.put("ASSIMILATED_HONEYPOT_DESC", "Unlocks the Honeypot abdomen subtype. Honeypot foragers gather and carry 4x as much at 0.75x movement speed, and gain +15% regeneration.");
         en.put("ASSIMILATION_HONEYPOT", "Honey-Pot Ant Assimilation");
         en.put("ASSIMILATION_HONEYPOT_DESC", "After assimilating the honey-pot ant genome:");
         en.put("ASSIMILATED_DOORHEAD_FLAVOR", "Armored Head Plugs");
-        en.put("ASSIMILATED_DOORHEAD_DESC", "Unlocks the Doorhead head subtype. Doorhead ants have 5x defense.");
+        en.put("ASSIMILATED_DOORHEAD_DESC", "Unlocks the Doorhead head subtype. Doorhead ants gain +20% defense.");
         en.put("ASSIMILATION_DOORHEAD", "Turtle Ant Assimilation");
         en.put("ASSIMILATION_DOORHEAD_DESC", "After assimilating the turtle ant genome:");
         en.put("ASSIMILATED_WOODBURROW_FLAVOR", "Wood Excavation");
@@ -1243,7 +1243,7 @@ public class EnglishTranslation implements Translation {
         en.put("ASSIMILATION_RAFTING", "Floodplain Ant Assimilation");
         en.put("ASSIMILATION_RAFTING_DESC", "After assimilating the floodplain ant genome:");
         en.put("ASSIMILATED_FIREVENOM_FLAVOR", "Burning Venom");
-        en.put("ASSIMILATED_FIREVENOM_DESC", "Multiplies colony base attack damage by 4. Super Venom synergy with Neurotoxic venom replaces this stacking with 16x.");
+        en.put("ASSIMILATED_FIREVENOM_DESC", "Adds +50% to colony base attack. Super Venom synergy with Neurotoxic venom replaces both +50% bonuses with a +200% bonus (3x total).");
         en.put("ASSIMILATION_FIREVENOM", "Fire Ant Assimilation");
         en.put("ASSIMILATION_FIREVENOM_DESC", "After assimilating the fire ant genome:");
         en.put("ASSIMILATED_JUMPING_FLAVOR", "Leap Strikes");
@@ -1255,7 +1255,7 @@ public class EnglishTranslation implements Translation {
         en.put("ASSIMILATION_GLIDING", "Gliding Ant Assimilation");
         en.put("ASSIMILATION_GLIDING_DESC", "After assimilating the gliding ant genome:");
         en.put("ASSIMILATED_STINGING_FLAVOR", "Excruciating Sting");
-        en.put("ASSIMILATED_STINGING_DESC", "Unlocks the Stinger abdomen subtype. Contributes +4x to the attack multiplier; stacks by addition with other subtype attack bonuses (Trapjaw + Stinger = 7x, not 12x).");
+        en.put("ASSIMILATED_STINGING_DESC", "Unlocks the Stinger abdomen subtype. Contributes 1.5x attack; stacks by addition with other subtype attack bonuses (Trapjaw + Stinger = 3x, not 2.25x).");
         en.put("ASSIMILATION_STINGING", "Bullet Ant Assimilation");
         en.put("ASSIMILATION_STINGING_DESC", "After assimilating the bullet ant genome:");
         en.put("ASSIMILATED_SWARMING_FLAVOR", "Raid Swarms");
@@ -1267,7 +1267,7 @@ public class EnglishTranslation implements Translation {
         en.put("ASSIMILATION_STEALTH", "Ghost Ant Assimilation");
         en.put("ASSIMILATION_STEALTH_DESC", "After assimilating the ghost ant genome:");
         en.put("ASSIMILATED_FASTBITE_FLAVOR", "Vampire Mandibles");
-        en.put("ASSIMILATED_FASTBITE_DESC", "Multiplies colony base attack speed by 3.");
+        en.put("ASSIMILATED_FASTBITE_DESC", "Multiplies colony base attack speed by 2. Soldiers and majors attack twice as often (2 base, 4 with this assimilation).");
         en.put("ASSIMILATION_FASTBITE", "Dracula Ant Assimilation");
         en.put("ASSIMILATION_FASTBITE_DESC", "After assimilating the dracula ant genome:");
         en.put("ASSIMILATED_HEATRESIST_FLAVOR", "Desert Heat Tolerance");
@@ -1275,7 +1275,7 @@ public class EnglishTranslation implements Translation {
         en.put("ASSIMILATION_HEATRESIST", "Saharan Silver Ant Assimilation");
         en.put("ASSIMILATION_HEATRESIST_DESC", "After assimilating the saharan silver ant genome:");
         en.put("ASSIMILATED_DEADLYVENOM_FLAVOR", "Neurotoxic Venom");
-        en.put("ASSIMILATED_DEADLYVENOM_DESC", "Adds +4 to the colony damage multiplier. Super Venom synergy with Fire venom replaces this stacking with 16x.");
+        en.put("ASSIMILATED_DEADLYVENOM_DESC", "Adds +50% to colony base attack. Super Venom synergy with Fire venom replaces both +50% bonuses with a +200% bonus (3x total).");
         en.put("ASSIMILATION_DEADLYVENOM", "Neurotoxic Venom Assimilation");
         en.put("ASSIMILATION_DEADLYVENOM_DESC", "After assimilating neurotoxic venom genetics:");
         en.put("ASSIMILATED_SELFDESTRUCT_FLAVOR", "Suicidal Defense");
@@ -1474,7 +1474,7 @@ public class EnglishTranslation implements Translation {
         en.put("ABILITY_ABILITY_DESC", "Allows you to see the abilities menu and use active abilities.");
 
         en.put("STAT_SKELETON_FLAVOR", "Basic Exoskeletons");
-        en.put("STAT_SKELETON_DESC", "The basic defense stats for all the ants in your colony before multipliers. 100 health points, 5 defense points and 1 health point recovered per second.");
+        en.put("STAT_SKELETON_DESC", "Basic vitality for colony ants before type multipliers: 100 health points and 10% of max HP regenerated per tick. Defense is type-based (majors and queens start at 20%).");
         en.put("STAT_ACID_FLAVOR", "Acidic Spit");
         en.put("STAT_ACID_DESC", "The basic offensive stats for all the ants in your colony before multipliers. 10 attack points, 1 attack per second and 1 speed point.");
         en.put("STAT_LONGEVITY_FLAVOR", "Standard Lifespan");
@@ -2045,7 +2045,7 @@ public class EnglishTranslation implements Translation {
         en.put("TRIGGER_SUBTYPE_HATCH_TITLE", "Body-Part Subtypes");
         en.put("TRIGGER_SUBTYPE_HATCH_MSG", "Assimilated traits can shape new hatchlings! Open Hatch Rates (P) to set subtypes per ant type—each active part adds +50% food.");
         en.put("TRIGGER_SYNERGY_SUPER_VENOM_TITLE", "Synergy Unlocked");
-        en.put("TRIGGER_SYNERGY_SUPER_VENOM_MSG", "%s is now active! Combining %s replaces their separate stacking with a 16x colony damage multiplier. Open Synergies (O) to review.");
+        en.put("TRIGGER_SYNERGY_SUPER_VENOM_MSG", "%s is now active! Combining %s replaces their separate +50% bonuses with a +200% colony attack bonus (3x total). Open Synergies (O) to review.");
         en.put("TRIGGER_OPERATIONS_ABILITY_TITLE", "Colony Operations");
         en.put("TRIGGER_OPERATIONS_ABILITY_MSG", "You have gained a special active ability! You can now access the Colony Operations menu by pressing (Z).");
 

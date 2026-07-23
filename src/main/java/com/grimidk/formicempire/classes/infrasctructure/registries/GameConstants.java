@@ -547,16 +547,16 @@ public final class GameConstants {
     public static final Species TYPE_ANT = new Species(1, LanguageStrings.BUG_ANT, CRITTER_CLASS_ANT, LanguageStrings.BUG_ANT_SCIENTIFIC, 1, 1, 1, 1, 1, 1,
         loadIcon("icons/ants/omni/Worker.png"), loadIcon("sprites/ants/omni/Worker.png"));
     static { critterSpecies.add(TYPE_ANT); }
-    public static final Species TYPE_APHID = new Species(2, LanguageStrings.BUG_APHID, CRITTER_CLASS_INSECT, LanguageStrings.BUG_APHID_SCIENTIFIC, 1, 1, 0, 0, 5, 0.5f,
+    public static final Species TYPE_APHID = new Species(2, LanguageStrings.BUG_APHID, CRITTER_CLASS_INSECT, LanguageStrings.BUG_APHID_SCIENTIFIC, 1, 1, 0, 0, 0, 0.5f,
         loadIcon("icons/critters/Aphid.png") , loadIcon("sprites/critters/Aphid.png"), true);
     static { critterSpecies.add(TYPE_APHID); }
     public static final Species TYPE_PARASITE_ANT = new Species(3, LanguageStrings.BUG_PARASITE_ANT, CRITTER_CLASS_ANT, LanguageStrings.BUG_PARASITE_ANT_SCIENTIFIC, 1, 1, 0, 0, 1, 1,
         loadIcon("icons/critters/Parasite.png") , loadIcon("sprites/critters/Parasite.png"));
     static { critterSpecies.add(TYPE_PARASITE_ANT); }
-    public static final Species TYPE_SYMBIOTIC_MITE = new Species(4, LanguageStrings.BUG_SYMBIOTIC_MITE, CRITTER_CLASS_ARACHNID, LanguageStrings.BUG_SYMBIOTIC_MITE_SCIENTIFIC, 1, 0, 0, 0, 2, 0.4f, 
+    public static final Species TYPE_SYMBIOTIC_MITE = new Species(4, LanguageStrings.BUG_SYMBIOTIC_MITE, CRITTER_CLASS_ARACHNID, LanguageStrings.BUG_SYMBIOTIC_MITE_SCIENTIFIC, 1, 0, 0, 0, 0, 0.4f, 
         loadIcon("icons/critters/SoilMite.png"), loadIcon("sprites/critters/SoilMite.png"), true);
     static { critterSpecies.add(TYPE_SYMBIOTIC_MITE); }
-    public static final Species TYPE_DERMESTID = new Species(5, LanguageStrings.BUG_DERMESTID, CRITTER_CLASS_INSECT, LanguageStrings.BUG_DERMESTID_SCIENTIFIC, 1, 0, 0, 0, 3, 0.35f,
+    public static final Species TYPE_DERMESTID = new Species(5, LanguageStrings.BUG_DERMESTID, CRITTER_CLASS_INSECT, LanguageStrings.BUG_DERMESTID_SCIENTIFIC, 1, 0, 0, 0, 0, 0.35f,
             loadIcon("icons/critters/Dermestid.png"), loadIcon("sprites/critters/Dermestid.png"), true);
     static { critterSpecies.add(TYPE_DERMESTID); }
     public static final Species TYPE_PARASITIC_MITE = new Species(6, LanguageStrings.BUG_PARASITIC_MITE, CRITTER_CLASS_ARACHNID, LanguageStrings.BUG_PARASITIC_MITE_SCIENTIFIC, 1, 0, 0, 0, 1, 0.25f,
@@ -618,37 +618,40 @@ public final class GameConstants {
     }
 
     // --- Ant Types ---
-    public static final AntType TYPE_EGG = new AntType(1, LanguageStrings.TYPE_EGG, 1f, 0f, 0f, 0f, 0f, 0f, 0f,
+    // Mult order: health, attack, regen, consumption, attackSpeed, defense(% abs for majors/queens), speed
+    // Regen mult × colony base regen (10 with skeleton) = % of max HP recovered per tick.
+    // Juveniles and drones do not fight: 1 HP and zero combat stats.
+    public static final AntType TYPE_EGG = new AntType(1, LanguageStrings.TYPE_EGG, 0.01f, 0f, 0f, 0f, 0f, 0f, 0f,
         loadIcon("icons/ants/Egg.png"), "Egg.png");
     static { antTypes.add(TYPE_EGG); }    
-    public static final AntType TYPE_LARVA = new AntType(2, LanguageStrings.TYPE_LARVA, 1f, 1/2f, 1/2f, 1f, 1f, 1/2f, 1/2f,
+    public static final AntType TYPE_LARVA = new AntType(2, LanguageStrings.TYPE_LARVA, 0.01f, 0f, 0f, 1f, 0f, 0f, 0.5f,
         loadIcon("icons/ants/Larva.png"), "Larva.png");
     static { antTypes.add(TYPE_LARVA); }
-    public static final AntType TYPE_PUPA = new AntType(3, LanguageStrings.TYPE_PUPA, 1f, 0f, 1f, 0f, 0f, 1/2f, 0f,
+    public static final AntType TYPE_PUPA = new AntType(3, LanguageStrings.TYPE_PUPA, 0.01f, 0f, 0f, 0f, 0f, 0f, 0f,
         loadIcon("icons/ants/Pupa.png"), "Pupa.png");
     static { antTypes.add(TYPE_PUPA); }
-    public static final AntType TYPE_WORKER = new AntType(4, LanguageStrings.TYPE_WORKER, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 
+    public static final AntType TYPE_WORKER = new AntType(4, LanguageStrings.TYPE_WORKER, 1f, 1f, 1f, 1f, 1f, 0f, 1f, 
         loadIcon("icons/ants/omni/Worker.png"), "Worker.png");
     static { antTypes.add(TYPE_WORKER); }
-    public static final AntType TYPE_SOLDIER = new AntType(5, LanguageStrings.TYPE_SOLDIER, 3f, 3f, 3f, 2f, 3f, 5f, 3f, 
+    public static final AntType TYPE_SOLDIER = new AntType(5, LanguageStrings.TYPE_SOLDIER, 3f, 3f, 1f, 2f, 2f, 0f, 3f, 
         loadIcon("icons/ants/omni/Soldier.png"), "Soldier.png");
     static { antTypes.add(TYPE_SOLDIER); }
-    public static final AntType TYPE_MAJOR = new AntType(6, LanguageStrings.TYPE_MAJOR, 10f, 15f, 20f, 5f, 2f, 50f, 2f, 
+    public static final AntType TYPE_MAJOR = new AntType(6, LanguageStrings.TYPE_MAJOR, 10f, 15f, 1f, 5f, 2f, GameNumbers.ANT_DEFENSE_PERCENT_MAJOR, 2f, 
         loadIcon("icons/ants/omni/Major.png"), "Major.png");
     static { antTypes.add(TYPE_MAJOR); }
-    public static final AntType TYPE_DRONE = new AntType(7, LanguageStrings.TYPE_DRONE, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 
+    public static final AntType TYPE_DRONE = new AntType(7, LanguageStrings.TYPE_DRONE, 0.01f, 0f, 0f, 1f, 0f, 0f, 1f, 
         loadIcon("icons/ants/omni/Drone.png"), "Drone.png");
     static { antTypes.add(TYPE_DRONE); }
-    public static final AntType TYPE_PRINCESS = new AntType(8, LanguageStrings.TYPE_PRINCESS, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 
+    public static final AntType TYPE_PRINCESS = new AntType(8, LanguageStrings.TYPE_PRINCESS, 1f, 1f, 1f, 1f, 1f, 0f, 1f, 
         loadIcon("icons/ants/omni/Princess.png"), "Princess.png");
     static { antTypes.add(TYPE_PRINCESS); }
-    public static final AntType TYPE_QUEEN = new AntType(9, LanguageStrings.TYPE_QUEEN, 50f, 2f, 50f, 10f, 1/2f, 50f, 1/4f, 
+    public static final AntType TYPE_QUEEN = new AntType(9, LanguageStrings.TYPE_QUEEN, 50f, 2f, 1f, 10f, 1f, GameNumbers.ANT_DEFENSE_PERCENT_QUEEN, 1/4f, 
         loadIcon("icons/ants/omni/Queen.png"), "Queen.png");
     static { antTypes.add(TYPE_QUEEN); }
     public static final AntType TYPE_DEAD = new AntType(10, LanguageStrings.TYPE_DEAD, 0, 0, 0, 0, 0, 0, 0,
         loadIcon("icons/ants/Dead.png"), "Dead.png");
     static { antTypes.add(TYPE_DEAD); }
-    public static final AntType TYPE_ZOMBIE = new AntType(11, LanguageStrings.TYPE_ZOMBIE,  1f, 1f, 1f, 1f, 1f, 1f, 1f, 
+    public static final AntType TYPE_ZOMBIE = new AntType(11, LanguageStrings.TYPE_ZOMBIE,  1f, 1f, 1f, 1f, 1f, 0f, 1f, 
         loadIcon("icons/ants/Zombie.png"), "Zombie.png");
     static { antTypes.add(TYPE_ZOMBIE); }
 
@@ -664,7 +667,7 @@ public final class GameConstants {
     static { antSubtypes.add(SUBTYPE_HEAD_TRAPJAW); }
     public static final AntSubtype SUBTYPE_HEAD_DOORHEAD = new AntSubtype(3, LanguageStrings.SUBTYPE_HEAD_DOORHEAD, AntSubtypeSlot.HEAD,
             3, GameUnlocks.ASSIMILATED_DOORHEAD, "turtle/", "doorhead",
-            1f, false, GameNumbers.SUBTYPE_DEFENSE_MULT_DOORHEAD, 1f, 1f, loadIcon("icons/subtypes/doorhead.png"));
+            1f, false, GameNumbers.SUBTYPE_DEFENSE_ADD_DOORHEAD, 1f, 1f, loadIcon("icons/subtypes/doorhead.png"));
     static { antSubtypes.add(SUBTYPE_HEAD_DOORHEAD); }
 
     public static final AntSubtype SUBTYPE_TORSO_NONE = new AntSubtype(4, LanguageStrings.SUBTYPE_NOTHING, AntSubtypeSlot.TORSO,
@@ -680,7 +683,8 @@ public final class GameConstants {
     static { antSubtypes.add(SUBTYPE_ABDOMEN_STINGER); }
     public static final AntSubtype SUBTYPE_ABDOMEN_HONEYPOT = new AntSubtype(7, LanguageStrings.SUBTYPE_ABDOMEN_HONEYPOT, AntSubtypeSlot.ABDOMEN,
             3, GameUnlocks.ASSIMILATED_HONEYPOT, "honeypot/", "honeypot",
-            1f, false, 1f, GameNumbers.SUBTYPE_SPEED_MULT_HONEYPOT, GameNumbers.SUBTYPE_FORAGE_MULT_HONEYPOT, loadIcon("icons/subtypes/honeypot.png"));
+            1f, false, 1f, GameNumbers.SUBTYPE_SPEED_MULT_HONEYPOT, GameNumbers.SUBTYPE_FORAGE_MULT_HONEYPOT,
+            GameNumbers.SUBTYPE_REGEN_MULT_HONEYPOT, loadIcon("icons/subtypes/honeypot.png"));
     static { antSubtypes.add(SUBTYPE_ABDOMEN_HONEYPOT); }
 
     public static final AntSubtype SUBTYPE_OTHER_NONE = new AntSubtype(8, LanguageStrings.SUBTYPE_NOTHING, AntSubtypeSlot.OTHER,

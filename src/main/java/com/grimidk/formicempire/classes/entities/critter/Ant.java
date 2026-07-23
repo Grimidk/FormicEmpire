@@ -12,6 +12,7 @@ import com.grimidk.formicempire.classes.entities.services.colony.AntSubtypeServi
 import com.grimidk.formicempire.classes.entities.spatial.NeoPoint;
 import com.grimidk.formicempire.classes.infrasctructure.registries.DeathCause;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.WorldSpaces;
 
 public class Ant extends Critter {
@@ -41,7 +42,7 @@ public class Ant extends Critter {
         this.isNuptial = false;
         
         this.setStatus(GameConstants.STATUS_ALIVE);
-        this.setMaxHealth((int)(colony.getBaseHealth() * type.getHealtMult())); 
+        this.setMaxHealth(Math.max(0, Math.round(colony.getBaseHealth() * type.getHealtMult()))); 
         this.setHealth(this.getMaxHealth());
         this.setAge(0);
         
@@ -51,7 +52,7 @@ public class Ant extends Critter {
         this.setConsumption(colony.getBaseConsumption() * type.getConsumptionMult());
         this.setAttack((int)(colony.getBaseAttack() * type.getAttackMult()));
         this.setAttackSpeed((int)(colony.getBaseAttackSpeed() * type.getAttackSpeedMult()));
-        this.setDefense((int)(colony.getBaseDefense() * type.getDefenseMult()));        
+        this.setDefense(GameNumbers.clampDefensePercent(type.getDefenseMult()));        
         this.setSpeed(colony.getBaseSpeed() * type.getSpeedMult());
         
         this.setDimension(WorldSpaces.OVERWORLD);
@@ -154,14 +155,14 @@ public class Ant extends Critter {
             AntSubtypeService.applySubtypeStats(this, colony);
         } else {
             this.subtypeProfile = AntSubtypeProfile.standard();
-            this.setMaxHealth((int)(colony.getBaseHealth() * newType.getHealtMult()));
+            this.setMaxHealth(Math.max(0, Math.round(colony.getBaseHealth() * newType.getHealtMult())));
             this.setHealth(this.getMaxHealth());
             this.setAge(0);
             this.setRegen((int)(colony.getBaseRegen() * newType.getRegenMult()));
             this.setConsumption(colony.getBaseConsumption() * newType.getConsumptionMult());
             this.setAttack((int)(colony.getBaseAttack() * newType.getAttackMult()));
             this.setAttackSpeed((int)(colony.getBaseAttackSpeed() * newType.getAttackSpeedMult()));
-            this.setDefense((int)(colony.getBaseDefense() * newType.getDefenseMult()));
+            this.setDefense(GameNumbers.clampDefensePercent(newType.getDefenseMult()));
             this.setSpeed(colony.getBaseSpeed() * newType.getSpeedMult());
         }
     }
@@ -171,7 +172,7 @@ public class Ant extends Critter {
             AntSubtypeService.applySubtypeStats(this, colony);
             return;
         }
-        this.setMaxHealth((int)(colony.getBaseHealth() * type.getHealtMult()));
+        this.setMaxHealth(Math.max(0, Math.round(colony.getBaseHealth() * type.getHealtMult())));
         
         if (this.getHealth() > this.getMaxHealth()) {
             this.setHealth(this.getMaxHealth());
@@ -182,7 +183,7 @@ public class Ant extends Critter {
         this.setConsumption(colony.getBaseConsumption() * type.getConsumptionMult());
         this.setAttack((int)(colony.getBaseAttack() * type.getAttackMult()));
         this.setAttackSpeed((int)(colony.getBaseAttackSpeed() * type.getAttackSpeedMult()));
-        this.setDefense((int)(colony.getBaseDefense() * type.getDefenseMult()));        
+        this.setDefense(GameNumbers.clampDefensePercent(type.getDefenseMult()));        
         this.setSpeed(colony.getBaseSpeed() * type.getSpeedMult());
     }
 }

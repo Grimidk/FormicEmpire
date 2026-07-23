@@ -28,10 +28,9 @@ public final class ColonyMilitaryService {
 
     public static float computeStatMultiplier(boolean hasSkeleton, boolean hasAcid) {
         int hp = hasSkeleton ? GameNumbers.MILITARY_BASELINE_HEALTH : 0;
-        int def = hasSkeleton ? GameNumbers.MILITARY_BASELINE_DEFENSE : 0;
         int atk = hasAcid ? GameNumbers.MILITARY_BASELINE_ATTACK : 0;
         int atkSpd = hasAcid ? GameNumbers.MILITARY_BASELINE_ATTACK_SPEED : 0;
-        return computeStatMultiplierFromBases(hp, atk, def, atkSpd);
+        return computeColonyStatMultiplierFromBases(hp, atk, atkSpd);
     }
 
     public static float computeStatMultiplier(Colony colony) {
@@ -39,17 +38,27 @@ public final class ColonyMilitaryService {
             return 0f;
         }
         ColonyStatsService stats = colony.getStatsService();
-        return computeStatMultiplierFromBases(
+        return computeColonyStatMultiplierFromBases(
                 stats.getBaseHealth(colony),
                 stats.getBaseAttack(colony),
-                stats.getBaseDefense(colony),
                 stats.getBaseAttackSpeed(colony));
     }
 
+    /** Colony-wide military mult from vitality/offense unlocks. Defense is type-based, not colony-wide. */
+    public static float computeColonyStatMultiplierFromBases(int baseHealth, int baseAttack, int baseAttackSpeed) {
+        float hpFactor = baseHealth / (float) GameNumbers.MILITARY_BASELINE_HEALTH;
+        float atkFactor = baseAttack / (float) GameNumbers.MILITARY_BASELINE_ATTACK;
+        float spdFactor = baseAttackSpeed / (float) GameNumbers.MILITARY_BASELINE_ATTACK_SPEED;
+        return (hpFactor + atkFactor + spdFactor) / 3f;
+    }
+
+    /** Per-ant combat mult including type defense % (vs {@link GameNumbers#MILITARY_DEFENSE_FACTOR_BASELINE}). */
     public static float computeStatMultiplierFromBases(int baseHealth, int baseAttack, int baseDefense, int baseAttackSpeed) {
         float hpFactor = baseHealth / (float) GameNumbers.MILITARY_BASELINE_HEALTH;
         float atkFactor = baseAttack / (float) GameNumbers.MILITARY_BASELINE_ATTACK;
-        float defFactor = baseDefense / (float) GameNumbers.MILITARY_BASELINE_DEFENSE;
+        float defFactor = GameNumbers.MILITARY_DEFENSE_FACTOR_BASELINE <= 0f
+                ? 0f
+                : baseDefense / GameNumbers.MILITARY_DEFENSE_FACTOR_BASELINE;
         float spdFactor = baseAttackSpeed / (float) GameNumbers.MILITARY_BASELINE_ATTACK_SPEED;
         return (hpFactor + atkFactor + defFactor + spdFactor) / 4f;
     }
@@ -224,7 +233,7 @@ public final class ColonyMilitaryService {
         boolean hasSkeleton = dynasty != null && dynasty.hasUpgrade(GameUnlocks.STAT_SKELETON);
         boolean hasAcid = dynasty != null && dynasty.hasUpgrade(GameUnlocks.STAT_ACID);
         int baseHealth = hasSkeleton ? GameNumbers.MILITARY_BASELINE_HEALTH : 0;
-        int baseDefense = hasSkeleton ? GameNumbers.MILITARY_BASELINE_DEFENSE : 0;
+        int baseDefense = 0;
         int baseAttack = hasAcid
                 ? Math.round(GameNumbers.MILITARY_BASELINE_ATTACK * ColonyStatsService.getAssimilatedDamageMultiplier(dynasty))
                 : 0;
@@ -254,7 +263,7 @@ public final class ColonyMilitaryService {
                 savedColony.majors,
                 savedColony.princesses,
                 savedColony.queens);
-        return Math.round(typePoints * computeStatMultiplierFromBases(baseHealth, baseAttack, baseDefense, baseAttackSpeed));
+        return Math.round(typePoints * computeColonyStatMultiplierFromBases(baseHealth, baseAttack, baseAttackSpeed));
     }
 
     private static int sumSavedMilitaryPoints(Map<String, Integer> subtypeCounts, int legacyCount, AntType type,
@@ -263,7 +272,7 @@ public final class ColonyMilitaryService {
         if (weight == 0) {
             return 0;
         }
-        float colonyMult = computeStatMultiplierFromBases(baseHealth, baseAttack, baseDefense, baseAttackSpeed);
+        float colonyMult = computeColonyStatMultiplierFromBases(baseHealth, baseAttack, baseAttackSpeed);
         if (subtypeCounts != null && !subtypeCounts.isEmpty()) {
             int total = 0;
             for (Map.Entry<String, Integer> entry : subtypeCounts.entrySet()) {

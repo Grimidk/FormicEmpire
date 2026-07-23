@@ -4,6 +4,7 @@ import javax.swing.ImageIcon;
 
 import com.grimidk.formicempire.classes.constants.Constant;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 
 public class Species extends Constant {
     private final CritterClass critterClass;
@@ -34,7 +35,7 @@ public class Species extends Constant {
         this.baseRegen = baseRegen;
         this.baseAttack = baseAttack;
         this.baseAttackSpeed = baseAttackSpeed;
-        this.baseDefense = baseDefense;
+        this.baseDefense = GameNumbers.clampDefensePercent(baseDefense);
         this.baseSpeed = baseSpeed;
         this.sprite = sprite;
         this.pet = pet;

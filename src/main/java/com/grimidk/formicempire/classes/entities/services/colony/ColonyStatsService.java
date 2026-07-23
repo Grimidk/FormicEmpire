@@ -229,28 +229,24 @@ public class ColonyStatsService {
     // --- Stats ---
     public int getBaseHealth(Colony colony) { return colony.hasUpgrade(GameUnlocks.STAT_SKELETON) ? 100 : 0; }
     public int getBaseTempRes(Colony colony) { return colony.hasUpgrade(GameUnlocks.STAT_LONGEVITY) ? 25 : 0; }
-    public int getBaseRegen(Colony colony) { return colony.hasUpgrade(GameUnlocks.STAT_SKELETON) ? 1 : 0; }
+    public int getBaseRegen(Colony colony) {
+        return colony.hasUpgrade(GameUnlocks.STAT_SKELETON) ? GameNumbers.ANT_REGEN_PERCENT_BASE : 0;
+    }
     public int getBaseConsumption(Colony colony) { return colony.hasUpgrade(GameUnlocks.STAT_LONGEVITY) ? 1 : 0; }
 
     public static float getAssimilatedDamageMultiplier(Dynasty dynasty) {
         if (dynasty == null) {
             return 1f;
         }
-        boolean superVenom = DynastySynergyService.isActive(dynasty, GameUnlocks.SUPER_VENOM_SYNERGY);
-
-        float mult;
-        if (superVenom) {
-            mult = GameNumbers.ASSIMILATED_DAMAGE_SYNERGY_FIRE_DEADLY;
-        } else {
-            mult = 1f;
-            boolean fire = dynasty.hasUpgrade(GameUnlocks.ASSIMILATED_FIREVENOM);
-            boolean deadly = dynasty.hasUpgrade(GameUnlocks.ASSIMILATED_DEADLYVENOM);
-            if (fire) {
-                mult = GameNumbers.ASSIMILATED_DAMAGE_MULT_FIRE;
-            }
-            if (deadly) {
-                mult += GameNumbers.ASSIMILATED_DAMAGE_ADD_DEADLY;
-            }
+        if (DynastySynergyService.isActive(dynasty, GameUnlocks.SUPER_VENOM_SYNERGY)) {
+            return GameNumbers.ASSIMILATED_DAMAGE_SYNERGY_FIRE_DEADLY;
+        }
+        float mult = 1f;
+        if (dynasty.hasUpgrade(GameUnlocks.ASSIMILATED_FIREVENOM)) {
+            mult += GameNumbers.ASSIMILATED_DAMAGE_ADD_FIRE;
+        }
+        if (dynasty.hasUpgrade(GameUnlocks.ASSIMILATED_DEADLYVENOM)) {
+            mult += GameNumbers.ASSIMILATED_DAMAGE_ADD_DEADLY;
         }
         return mult;
     }
@@ -278,7 +274,9 @@ public class ColonyStatsService {
         return Math.round(GameNumbers.MILITARY_BASELINE_ATTACK_SPEED * mult);
     }
 
-    public int getBaseDefense(Colony colony) { return colony.hasUpgrade(GameUnlocks.STAT_SKELETON) ? 5 : 0; }
+    public int getBaseDefense(Colony colony) {
+        return 0;
+    }
     public int getBaseSpeed(Colony colony) { return colony.hasUpgrade(GameUnlocks.STAT_ACID) ? 1 : 0; }
     public int getBaseSize(Colony colony){ return colony.hasUpgrade(GameUnlocks.STAT_LONGEVITY) ? 1 : 0; }
     
