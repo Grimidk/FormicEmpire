@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.entities.critter.Ant;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 
 class ColonyNpcSimulationTest {
 

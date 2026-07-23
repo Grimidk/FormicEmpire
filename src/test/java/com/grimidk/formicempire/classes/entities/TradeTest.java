@@ -1,6 +1,6 @@
 package com.grimidk.formicempire.classes.entities;
 
-import com.grimidk.formicempire.classes.constants.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
@@ -12,6 +12,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
+import com.grimidk.formicempire.classes.entities.critter.Ant;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Trade;
 
 public class TradeTest {
 

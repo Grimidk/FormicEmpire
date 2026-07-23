@@ -932,6 +932,16 @@ public class SpanishTranslation implements Translation {
         es.put("MOVE_FLY_DESC", "Movimiento volador.");
         es.put("MOVE_PATROL_DESC", "Patrulla alrededor de un corral o puesto.");
 
+        es.put("CRITTER_CLASS_ANT", "Hormiga");
+        es.put("CRITTER_CLASS_INSECT", "Insecto");
+        es.put("CRITTER_CLASS_ARACHNID", "Arácnido");
+        es.put("CRITTER_CLASS_REPTILE", "Reptil");
+        es.put("CRITTER_CLASS_RODENT", "Roedor");
+        es.put("CRITTER_CLASS_MAMMAL", "Mamífero");
+        es.put("CRITTER_CLASS_FUNGI", "Hongo");
+        es.put("CRITTER_CLASS_PLANT", "Planta");
+        es.put("CRITTER_CLASS_XENO", "Xeno");
+
         es.put("BUG_ANT", "Hormiga");
         es.put("BUG_APHID", "Pulgón");
         es.put("BUG_SYMBIOTIC_MITE", "Ácaro simbiótico");
@@ -2009,7 +2019,7 @@ public class SpanishTranslation implements Translation {
         es.put("TRIGGER_RANK_COUNTY_TITLE", "Condado");
         es.put("TRIGGER_RANK_COUNTY_MSG", "¡Tu dinastía se ha convertido en un Condado! Nuevos niveles de investigación y construcción están a tu alcance a medida que crece la población.");
         es.put("TRIGGER_RANK_DUCHY_TITLE", "Ducado");
-        es.put("TRIGGER_RANK_DUCHY_MSG", "Tu dinastía es ahora un Ducado. Crece su influencia regional y se desbloquean mejoras y edificios de mayor nivel.");
+        es.put("TRIGGER_RANK_DUCHY_MSG", "Tu dinastía es ahora un Ducado. Se desbloquean mejoras y edificios de mayor nivel — y la colonia es lo bastante grande como para que se infiltren hormigas parásitas, desbloqueando el rol de Policía.");
         es.put("TRIGGER_RANK_KINGDOM_TITLE", "Reino");
         es.put("TRIGGER_RANK_KINGDOM_MSG", "¡Surge un Reino! Tu dinastía comanda un enjambre a escala de reino y desbloquea el siguiente nivel de avances.");
         es.put("TRIGGER_RANK_SUPER_TITLE", "Supercolonia");

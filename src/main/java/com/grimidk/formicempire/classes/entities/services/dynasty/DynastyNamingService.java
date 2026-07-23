@@ -1,8 +1,8 @@
 package com.grimidk.formicempire.classes.entities.services.dynasty;
 
-import com.grimidk.formicempire.classes.constants.misc.CityTitle;
-import com.grimidk.formicempire.classes.constants.misc.DynastyTitle;
-import com.grimidk.formicempire.classes.constants.misc.Species;
+import com.grimidk.formicempire.classes.constants.dynasty.DynastyTitle;
+import com.grimidk.formicempire.classes.constants.dynasty.colony.CityTitle;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
@@ -45,17 +45,17 @@ public class DynastyNamingService {
         return pool.get(GameRandom.nextInt(pool.size()));
     }
 
-    public String claimThemeKey(Species species) {
+    public String claimThemeKey(AntSpecies species) {
         String key = pickThemeKey(species);
         usedThemeKeys.add(key);
         return key;
     }
 
-    public String generateDynastyName(Species species) {
+    public String generateDynastyName(AntSpecies species) {
         return generateDynastyName(species, pickRandomTitle());
     }
 
-    public String generateDynastyName(Species species, DynastyTitle title) {
+    public String generateDynastyName(AntSpecies species, DynastyTitle title) {
         String themeKey = claimThemeKey(species);
         return LanguageStrings.formatDynastyName(LanguageStrings.resolveDynastyThemeDisplay(themeKey), title);
     }
@@ -73,7 +73,7 @@ public class DynastyNamingService {
         return LanguageStrings.formatProceduralColonyName(themeBase, fallbackIndex);
     }
 
-    private String pickThemeKey(Species species) {
+    private String pickThemeKey(AntSpecies species) {
         List<String> pool = new ArrayList<>();
 
         if (species != null) {

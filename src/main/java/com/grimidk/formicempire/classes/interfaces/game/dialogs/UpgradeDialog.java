@@ -1,12 +1,12 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
-import com.grimidk.formicempire.classes.constants.misc.Species;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.constants.unlocks.Synergy;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
-import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastySynergyService;
 import com.grimidk.formicempire.classes.entities.services.shared.TriggerProgressService;
 import com.grimidk.formicempire.classes.entities.services.shared.TriggerProgressService.TriggerProgress;
@@ -913,7 +913,7 @@ public class UpgradeDialog extends ZeroDialog {
 
                 for (Assimilation a : all) {
                     int speciesId = -1;
-                    for (Species s : GameConstants.getSpecies()) {
+                    for (AntSpecies s : GameConstants.getSpecies()) {
                         if (s.getAssimilation() == a) {
                             speciesId = s.getId();
                             break;

@@ -1,19 +1,19 @@
 package com.grimidk.formicempire.classes.interfaces;
 
-import com.grimidk.formicempire.classes.constants.ant.AntRole;
-import com.grimidk.formicempire.classes.constants.ant.AntSubtype;
-import com.grimidk.formicempire.classes.constants.ant.AntSubtypeSlot;
-import com.grimidk.formicempire.classes.constants.ant.AntType;
-import com.grimidk.formicempire.classes.constants.misc.ColonyLoyalty;
-import com.grimidk.formicempire.classes.constants.misc.ColonyLoyaltyModifier;
-import com.grimidk.formicempire.classes.constants.misc.DiplomaticReputation;
-import com.grimidk.formicempire.classes.constants.misc.Rank;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtype;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeSlot;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.dynasty.colony.ColonyLoyalty;
+import com.grimidk.formicempire.classes.constants.dynasty.colony.ColonyLoyaltyModifier;
+import com.grimidk.formicempire.classes.constants.dynasty.DiplomaticReputation;
+import com.grimidk.formicempire.classes.constants.dynasty.Rank;
 import com.grimidk.formicempire.classes.constants.misc.Tier;
-import com.grimidk.formicempire.classes.constants.misc.TradeMethod;
-import com.grimidk.formicempire.classes.constants.misc.BugType;
+import com.grimidk.formicempire.classes.constants.dynasty.TradeMethod;
+import com.grimidk.formicempire.classes.constants.critter.Species;
 import com.grimidk.formicempire.classes.constants.misc.GameSpeed;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
-import com.grimidk.formicempire.classes.constants.misc.Species;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.constants.unlocks.Synergy;
@@ -295,7 +295,7 @@ public class HelpPanel extends JPanel {
         panel.setBackground(AssetStyles.BACKGROUND_COLOR);
         panel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        for (Species s : GameConstants.getSpecies()) {
+        for (AntSpecies s : GameConstants.getSpecies()) {
             if (!GameConstants.hasAssimilatedDroneSprite(s)) {
                 continue;
             }
@@ -520,7 +520,7 @@ public class HelpPanel extends JPanel {
         panel.setBackground(AssetStyles.BACKGROUND_COLOR);
         panel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        for (BugType type : GameConstants.getBugTypes()) {
+        for (Species type : GameConstants.getCritterSpecies()) {
             JPanel entry = new JPanel(new BorderLayout(10, 0));
             entry.setBackground(AssetStyles.BACKGROUND_COLOR);
             entry.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER, type.getName(),
@@ -644,13 +644,7 @@ public class HelpPanel extends JPanel {
         list.setBorder(new EmptyBorder(8, 8, 8, 8));
 
         for (Rank rank : GameConstants.getColonyRanks()) {
-            Tier unlockedTier = null;
-            for (Tier tier : GameConstants.getTiers()) {
-                if (tier.getRankRequirement() == rank) {
-                    unlockedTier = tier;
-                    break;
-                }
-            }
+            Tier unlockedTier = GameConstants.getTierForRank(rank);
 
             JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 2));
             row.setOpaque(false);

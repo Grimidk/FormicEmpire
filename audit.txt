@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 83% (261/315 checked)
+Completion: 83% (270/325 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -160,7 +160,7 @@ Per ant type tab (Worker, Soldier, Major, Princess, Queen):
 [X] Adjust role counts (spinner / input per unlocked role)
 [X] Counts respect available ants and unlock state
 [X] War economy view toggle (when unlocked)
-[ ] Active military roles (Militia, Warrior, Brute, …) appear only in war economy view
+[X] Active military roles (Militia, Warrior, Brute, …) appear only in war economy view
 [X] Copy peace economy to war economy
 [X] Default role assignment for newly hatched ants (from settings)
 
@@ -418,7 +418,6 @@ Help encyclopedia (main menu Help):
 ================================================================================
 Monthly:
 [X] Researcher role unlock
-[ ] Police role unlock
 [ ] Parasitic mite outbreak event (dynasty-wide unlock; grants Catch Symbiotic Mite)
 
 Daily:
@@ -433,8 +432,9 @@ Daily:
 [ ] Subtype hatch ability unlock after body-part assimilation
 [ ] Colony Operations ability unlock
 [ ] Mass Flight unlock
-[ ] Cloning unlock (Empire rank special popup)
-[ ] Dynasty rank-up popups (County, Duchy, Kingdom, Super→Giga; first time per save; Ant/Colony skipped)
+[ ] Police role unlock (fused into Duchy rank-up popup)
+[ ] Cloning unlock (fused into Empire rank-up popup)
+[ ] Dynasty rank-up popups (County→Giga; Duchy grants Police, Empire grants Cloning; Ant/Colony skipped)
 [ ] Auto-Tunnels / Auto-Diplomacy unlocks (after Automation + prerequisites)
 [ ] Colony death detection
 [ ] NPC dynasty triggers

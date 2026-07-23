@@ -1,11 +1,11 @@
 package com.grimidk.formicempire.classes.entities.services.colony;
 
 import com.grimidk.formicempire.classes.entities.services.shared.ViewportPhysicsLod;
-import com.grimidk.formicempire.classes.constants.ant.AntRole;
-import com.grimidk.formicempire.classes.constants.ant.AntType;
-import com.grimidk.formicempire.classes.entities.Ant;
-import com.grimidk.formicempire.classes.entities.Bug;
-import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.entities.critter.Ant;
+import com.grimidk.formicempire.classes.entities.critter.Critter;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
 import com.grimidk.formicempire.classes.entities.spatial.Dimension;
 import com.grimidk.formicempire.classes.entities.spatial.NeoPoint;
@@ -94,14 +94,14 @@ public class ColonyPhysicsService {
         }
 
         // -- Bugs --
-        List<Bug> bugs = colony.getBugs();
-        synchronized (bugs) {
-            for (Bug bug : bugs) {
+        List<Critter> critters = colony.getCritters();
+        synchronized (critters) {
+            for (Critter bug : critters) {
                 if (!bug.isAlive() || bug.getDimension() != activeDimension) {
                     continue;
                 }
 
-                ImageIcon bugIcon = bug.getBugType().getSprite();
+                ImageIcon bugIcon = bug.getSpecies().getSprite();
                 int bw = bugIcon != null ? bugIcon.getIconWidth() : 16;
                 int bh = bugIcon != null ? bugIcon.getIconHeight() : 16;
 
@@ -179,27 +179,27 @@ public class ColonyPhysicsService {
             }
         }
         
-        List<Bug> bugs = colony.getBugs();
-        synchronized (bugs) {
-            for (Bug bug : bugs) {
-                if (bug.getBugType() == GameConstants.TYPE_APHID && colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) {
+        List<Critter> critters = colony.getCritters();
+        synchronized (critters) {
+            for (Critter bug : critters) {
+                if (bug.getSpecies() == GameConstants.TYPE_APHID && colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) {
                     Rectangle yard = getRoomBounds(colony, WorldSpaces.RANCHER_YARD);
                     bug.setPosition(getRandomPointInRoom(colony, yard, virtualWidth));
-                } else if (bug.getBugType() == GameConstants.TYPE_SYMBIOTIC_MITE
+                } else if (bug.getSpecies() == GameConstants.TYPE_SYMBIOTIC_MITE
                         && colony.hasUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE)) {
                     Rectangle pen = colony.getInsectPenBounds();
                     if (pen == null) {
                         pen = getRoomBounds(colony, WorldSpaces.INSECT_PEN);
                     }
                     bug.setPosition(getRandomPointInRoom(colony, pen, virtualWidth));
-                } else if (bug.getBugType() == GameConstants.TYPE_DERMESTID
+                } else if (bug.getSpecies() == GameConstants.TYPE_DERMESTID
                         && colony.hasUpgrade(GameUnlocks.ABILITY_CATCH_DERMESTID)) {
                     Rectangle yard = colony.getGraverBounds();
                     if (yard == null) {
                         yard = getRoomBounds(colony, WorldSpaces.GRAVEYARD);
                     }
                     bug.setPosition(getRandomPointInRoom(colony, yard, virtualWidth));
-                } else if (bug.getBugType() == GameConstants.TYPE_PARASITE_ANT) {
+                } else if (bug.getSpecies() == GameConstants.TYPE_PARASITE_ANT) {
                     bug.setDimension(WorldSpaces.UNDERWORLD);
                     Rectangle hideout = getRoomBounds(colony, WorldSpaces.STORAGE);
                     bug.setPosition(getRandomPointInRoom(colony, hideout, virtualWidth));
@@ -322,8 +322,8 @@ public class ColonyPhysicsService {
         }
     }
 
-    private void updateBugLogic(Colony colony, Bug bug) {
-        if (bug.getDimension() == WorldSpaces.OVERWORLD && bug.getBugType() == GameConstants.TYPE_APHID) {
+    private void updateBugLogic(Colony colony, Critter bug) {
+        if (bug.getDimension() == WorldSpaces.OVERWORLD && bug.getSpecies() == GameConstants.TYPE_APHID) {
             if (colony.hasUpgrade(GameUnlocks.ROLE_RANCHER)) {
                 Rectangle yard = colony.getRancherBounds();
                 if (yard == null) {
@@ -334,7 +334,7 @@ public class ColonyPhysicsService {
                 bug.setPosition(new Point(-1000, -1000));
             }
         } else if (bug.getDimension() == WorldSpaces.OVERWORLD
-                && bug.getBugType() == GameConstants.TYPE_SYMBIOTIC_MITE
+                && bug.getSpecies() == GameConstants.TYPE_SYMBIOTIC_MITE
                 && (colony.hasUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE) || colony.getSymbioticMites() > 0)) {
             Rectangle pen = colony.getInsectPenBounds();
             if (pen == null) {
@@ -342,7 +342,7 @@ public class ColonyPhysicsService {
             }
             wanderInBoundaries(colony, bug, pen, 0.05);
         } else if (bug.getDimension() == WorldSpaces.OVERWORLD
-                && bug.getBugType() == GameConstants.TYPE_DERMESTID
+                && bug.getSpecies() == GameConstants.TYPE_DERMESTID
                 && colony.hasUpgrade(GameUnlocks.ABILITY_CATCH_DERMESTID)) {
             Rectangle yard = colony.getGraverBounds();
             if (yard == null) {
@@ -350,7 +350,7 @@ public class ColonyPhysicsService {
             }
             wanderInBoundaries(colony, bug, yard, 0.05);
         }
-        else if (bug.getBugType() == GameConstants.TYPE_PARASITE_ANT) {
+        else if (bug.getSpecies() == GameConstants.TYPE_PARASITE_ANT) {
             if (bug.getDimension() != WorldSpaces.UNDERWORLD) {
                 bug.setDimension(WorldSpaces.UNDERWORLD);
             }
@@ -630,7 +630,7 @@ public class ColonyPhysicsService {
         return new Rectangle(x, y, room.getWidth(), room.getHeight());
     }
 
-    private void wanderInBoundaries(Colony colony, Bug entity, Rectangle bounds, double chance) {
+    private void wanderInBoundaries(Colony colony, Critter entity, Rectangle bounds, double chance) {
         if (bounds == null) {
             return;
         }
@@ -644,9 +644,9 @@ public class ColonyPhysicsService {
         }
     }
 
-    private Rectangle getBugWalkBounds(Colony colony, Rectangle bounds, Bug entity) {
+    private Rectangle getBugWalkBounds(Colony colony, Rectangle bounds, Critter entity) {
         if (bounds.width <= 200 || bounds.height <= 200) {
-            ImageIcon icon = entity.getBugType().getSprite();
+            ImageIcon icon = entity.getSpecies().getSprite();
             int spriteW = icon != null ? Math.max(1, icon.getIconWidth()) : ColonySpatialLayout.ANT_SIZE;
             int spriteH = icon != null ? Math.max(1, icon.getIconHeight()) : ColonySpatialLayout.ANT_SIZE;
             return getCompactPenWalkBounds(bounds, spriteW, spriteH);

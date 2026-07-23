@@ -9,8 +9,8 @@ import java.util.Queue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.grimidk.formicempire.classes.entities.Ant;
-import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.critter.Ant;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.spatial.NeoPoint;
 import com.grimidk.formicempire.classes.entities.spatial.Room;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;

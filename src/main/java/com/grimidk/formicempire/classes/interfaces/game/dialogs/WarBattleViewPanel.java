@@ -1,11 +1,11 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
-import com.grimidk.formicempire.classes.constants.ant.AntSubtypeProfile;
-import com.grimidk.formicempire.classes.constants.ant.AntType;
-import com.grimidk.formicempire.classes.constants.misc.Species;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeProfile;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.constants.world.Biome;
-import com.grimidk.formicempire.classes.entities.Dynasty;
-import com.grimidk.formicempire.classes.entities.War;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
+import com.grimidk.formicempire.classes.entities.dynasty.War;
 import com.grimidk.formicempire.classes.entities.services.colony.AntSubtypeService;
 import com.grimidk.formicempire.classes.entities.services.world.WarBattleScene;
 import com.grimidk.formicempire.classes.entities.services.world.WarBattleSceneBuilder;
@@ -435,14 +435,14 @@ public class WarBattleViewPanel extends JPanel {
 
     private static final class BattleAnt {
         private final AntType type;
-        private final Species species;
+        private final AntSpecies species;
         private final AntSubtypeProfile profile;
         private final float laneY;
         private final float contactDepth;
         private final float wobblePhase;
         private final float motionRate;
 
-        private BattleAnt(AntType type, Species species, AntSubtypeProfile profile, float laneY, float contactDepth,
+        private BattleAnt(AntType type, AntSpecies species, AntSubtypeProfile profile, float laneY, float contactDepth,
                 float wobblePhase, float motionRate) {
             this.type = type;
             this.species = species;

@@ -9,11 +9,11 @@ import java.util.function.BooleanSupplier;
 
 import javax.swing.ImageIcon;
 
-import com.grimidk.formicempire.classes.constants.ant.AntType;
-import com.grimidk.formicempire.classes.constants.misc.BugType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.Species;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
-import com.grimidk.formicempire.classes.constants.misc.Species;
-import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
 
 public final class GameSpritePreloader {
@@ -43,7 +43,7 @@ public final class GameSpritePreloader {
 
     public static void warmSession(Colony colony, BooleanSupplier cancelled) {
         Set<Image> images = new LinkedHashSet<>();
-        for (BugType bugType : GameConstants.getBugTypes()) {
+        for (Species bugType : GameConstants.getCritterSpecies()) {
             collectIcon(images, bugType.getSprite());
             collectIcon(images, bugType.getIcon());
         }
@@ -54,14 +54,14 @@ public final class GameSpritePreloader {
             collectIcon(images, resourceType.getSourceSpriteBig());
             collectIcon(images, resourceType.getSourceSpriteHuge());
         }
-        Species colonySpecies = colony != null ? colony.getSpecies() : GameConstants.SPECIES_OMNI;
+        AntSpecies colonySpecies = colony != null ? colony.getSpecies() : GameConstants.SPECIES_OMNI;
         if (colonySpecies != null) {
             for (AntType antType : GameConstants.getAntTypes()) {
                 collectIcon(images, GameConstants.getAntSprite(antType, colonySpecies));
             }
         }
         if (colony != null && colony.getDynasty() != null) {
-            for (Species species : GameConstants.getSpecies()) {
+            for (AntSpecies species : GameConstants.getSpecies()) {
                 if (species == colonySpecies) {
                     continue;
                 }

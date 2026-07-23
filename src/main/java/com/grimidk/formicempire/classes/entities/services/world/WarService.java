@@ -1,9 +1,9 @@
 package com.grimidk.formicempire.classes.entities.services.world;
 
-import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
-import com.grimidk.formicempire.classes.entities.War;
+import com.grimidk.formicempire.classes.entities.dynasty.War;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyLabourService;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDiplomacyService;

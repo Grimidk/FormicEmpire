@@ -1,17 +1,17 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
-import com.grimidk.formicempire.classes.constants.ant.AntRole;
-import com.grimidk.formicempire.classes.constants.ant.AntType;
-import com.grimidk.formicempire.classes.constants.misc.ColonyLoyalty;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.dynasty.colony.ColonyLoyalty;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.Season;
 import com.grimidk.formicempire.classes.constants.world.Weather;
-import com.grimidk.formicempire.classes.entities.Dynasty;
-import com.grimidk.formicempire.classes.entities.Ant;
-import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
+import com.grimidk.formicempire.classes.entities.critter.Ant;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
-import com.grimidk.formicempire.classes.entities.services.colony.ColonyBugHandlingService;
+import com.grimidk.formicempire.classes.entities.services.colony.ColonyCritterHandlingService;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyStatService;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyLocationService;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyStatsService;
@@ -966,7 +966,7 @@ public class StatsDialog extends ZeroDialog {
         Season season = world != null ? world.getSeason() : null;
 
         for (Colony c : coloniesToCount) {
-            ColonyBugHandlingService bugs = c.getBugHandlingService();
+            ColonyCritterHandlingService bugs = c.getBugHandlingService();
             Biome biome = resolveColonyBiome(c, world);
 
             if (c.hasUpgrade(GameUnlocks.ROLE_RANCHER) || c.getAphids() > 0) {

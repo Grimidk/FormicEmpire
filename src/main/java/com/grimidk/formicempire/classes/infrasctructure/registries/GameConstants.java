@@ -2,27 +2,28 @@ package com.grimidk.formicempire.classes.infrasctructure.registries;
 
 import com.grimidk.formicempire.classes.infrasctructure.assets.GameSpritePreloader;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
-import com.grimidk.formicempire.classes.constants.ant.AntRole;
-import com.grimidk.formicempire.classes.constants.ant.AntStatus;
-import com.grimidk.formicempire.classes.constants.ant.AntSubtype;
-import com.grimidk.formicempire.classes.constants.ant.AntSubtypeProfile;
-import com.grimidk.formicempire.classes.constants.ant.AntSubtypeSlot;
-import com.grimidk.formicempire.classes.constants.ant.AntType;
-import com.grimidk.formicempire.classes.constants.ant.MoveStatus;
-import com.grimidk.formicempire.classes.constants.misc.BugType;
-import com.grimidk.formicempire.classes.constants.misc.CityTitle;
-import com.grimidk.formicempire.classes.constants.misc.ColonyLoyalty;
-import com.grimidk.formicempire.classes.constants.misc.ColonyLoyaltyModifier;
-import com.grimidk.formicempire.classes.constants.misc.Rank;
-import com.grimidk.formicempire.classes.constants.misc.DynastyTitle;
-import com.grimidk.formicempire.classes.constants.misc.DiplomaticReputation;
-import com.grimidk.formicempire.classes.constants.misc.DiplomaticReputationModifier;
+import com.grimidk.formicempire.classes.constants.critter.CritterClass;
+import com.grimidk.formicempire.classes.constants.critter.Species;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntStatus;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtype;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeProfile;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeSlot;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.MoveStatus;
+import com.grimidk.formicempire.classes.constants.dynasty.colony.CityTitle;
+import com.grimidk.formicempire.classes.constants.dynasty.colony.ColonyLoyalty;
+import com.grimidk.formicempire.classes.constants.dynasty.colony.ColonyLoyaltyModifier;
+import com.grimidk.formicempire.classes.constants.dynasty.Rank;
+import com.grimidk.formicempire.classes.constants.dynasty.DynastyTitle;
+import com.grimidk.formicempire.classes.constants.dynasty.DiplomaticReputation;
+import com.grimidk.formicempire.classes.constants.dynasty.DiplomaticReputationModifier;
 import com.grimidk.formicempire.classes.constants.misc.GameSpeed;
-import com.grimidk.formicempire.classes.constants.misc.GeneticIntegrityModifier;
+import com.grimidk.formicempire.classes.constants.dynasty.GeneticIntegrityModifier;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
-import com.grimidk.formicempire.classes.constants.misc.Species;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.constants.misc.Tier;
-import com.grimidk.formicempire.classes.constants.misc.TradeMethod;
+import com.grimidk.formicempire.classes.constants.dynasty.TradeMethod;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.Humidity;
@@ -114,11 +115,11 @@ public final class GameConstants {
 
     public static final ImageIcon TUNNEL_SPRITE = loadIcon("sprites/buildings/TunnelSprite.png");
 
-    public static ImageIcon getAntSprite(AntType type, Species species) {
+    public static ImageIcon getAntSprite(AntType type, AntSpecies species) {
         return getAntSprite(type, species, AntSubtypeProfile.standard());
     }
 
-    public static ImageIcon getAntSprite(AntType type, Species species, AntSubtypeProfile profile) {
+    public static ImageIcon getAntSprite(AntType type, AntSpecies species, AntSubtypeProfile profile) {
         if (type == null) {
             return null;
         }
@@ -141,7 +142,7 @@ public final class GameConstants {
         return loadIcon(path);
     }
 
-    private static ImageIcon resolveSubtypeSprite(AntType type, Species species, AntSubtypeProfile profile) {
+    private static ImageIcon resolveSubtypeSprite(AntType type, AntSpecies species, AntSubtypeProfile profile) {
         if (profile == null || profile.isStandard()) {
             return null;
         }
@@ -154,7 +155,7 @@ public final class GameConstants {
         return loadIcon(path);
     }
 
-    private static String resolveSubtypeSpriteSpeciesDir(Species species, AntSubtypeProfile profile) {
+    private static String resolveSubtypeSpriteSpeciesDir(AntSpecies species, AntSubtypeProfile profile) {
         if (species != null && species.getId() == SPECIES_OMNI.getId()) {
             return "omni/";
         }
@@ -170,14 +171,14 @@ public final class GameConstants {
         return "omni/";
     }
 
-    public static ImageIcon getAssimilatedDroneSprite(Species species) {
+    public static ImageIcon getAssimilatedDroneSprite(AntSpecies species) {
         if (species == null || !hasAssimilatedDroneSprite(species)) {
             return null;
         }
         return loadIcon("sprites/ants/zero-drones/" + species.getZeroDroneSpriteFileName());
     }
 
-    public static boolean hasAssimilatedDroneSprite(Species species) {
+    public static boolean hasAssimilatedDroneSprite(AntSpecies species) {
         if (species == null) {
             return false;
         }
@@ -201,7 +202,8 @@ public final class GameConstants {
     private static final List<Weather> weathers = new ArrayList<>();
     private static final List<AntStatus> antStatuses = new ArrayList<>();
     private static final List<MoveStatus> moveStatuses = new ArrayList<>();
-    private static final List<BugType> bugTypes = new ArrayList<>();
+    private static final List<CritterClass> critterClasses = new ArrayList<>();
+    private static final List<Species> critterSpecies = new ArrayList<>();
     private static final List<AntType> antTypes = new ArrayList<>();
     private static final List<AntSubtype> antSubtypes = new ArrayList<>();
     private static final List<AntRole> antRoles = new ArrayList<>();
@@ -214,7 +216,7 @@ public final class GameConstants {
     private static final List<ColonyLoyaltyModifier> colonyLoyaltyModifiers = new ArrayList<>();
     private static final List<DynastyTitle> dynastyTitles = new ArrayList<>();
     private static final List<CityTitle> cityTitles = new ArrayList<>();
-    private static final List<Species> species = new ArrayList<>();
+    private static final List<AntSpecies> species = new ArrayList<>();
     private static final List<TradeMethod> tradeMethods = new ArrayList<>();
     private static final List<Humidity> humidity = new ArrayList<>();
     private static final List<Temperature> temperature = new ArrayList<>();
@@ -224,13 +226,13 @@ public final class GameConstants {
     // --- Misc Icons ---
     public static final ImageIcon ICON_SOCIALISM = loadIcon("icons/misc/Socialism.png");
     static { misc.add(ICON_SOCIALISM); }
-    public static final ImageIcon ICON_APHID = loadIcon("icons/bugs/Aphid.png");
+    public static final ImageIcon ICON_APHID = loadIcon("icons/critters/Aphid.png");
     static { misc.add(ICON_APHID); }
-    public static final ImageIcon ICON_SYMBIOTIC_MITE = loadIcon("icons/bugs/SoilMite.png");
+    public static final ImageIcon ICON_SYMBIOTIC_MITE = loadIcon("icons/critters/SoilMite.png");
     static { misc.add(ICON_SYMBIOTIC_MITE); }
-    public static final ImageIcon ICON_DERMESTID = loadIcon("icons/bugs/Dermestid.png");
+    public static final ImageIcon ICON_DERMESTID = loadIcon("icons/critters/Dermestid.png");
     static { misc.add(ICON_DERMESTID); }
-    public static final ImageIcon ICON_PARASITIC_MITE = loadIcon("icons/bugs/ParasiticMite.png");
+    public static final ImageIcon ICON_PARASITIC_MITE = loadIcon("icons/critters/ParasiticMite.png");
     static { misc.add(ICON_PARASITIC_MITE); }
     public static final ImageIcon ICON_RESEARCH = loadIcon("icons/misc/Research.png");
     static { misc.add(ICON_RESEARCH); }
@@ -512,25 +514,54 @@ public final class GameConstants {
     public static final MoveStatus MOVE_PATROL = new MoveStatus(6, LanguageStrings.MOVE_PATROL, 1f, loadIcon("icons/moves/Patrol.png"));
     static { moveStatuses.add(MOVE_PATROL); }
 
-    // --- Bug Types ---
-    public static final BugType TYPE_ANT = new BugType(1, LanguageStrings.BUG_ANT, LanguageStrings.BUG_ANT_SCIENTIFIC, 1, 1, 1, 1, 1, 1,
+    // --- Critter Class ---
+    public static final CritterClass CRITTER_CLASS_ANT = new CritterClass(1, LanguageStrings.CRITTER_CLASS_ANT,
+        loadIcon("icons/critterclasses/Ant.png"));
+    static { critterClasses.add(CRITTER_CLASS_ANT); }
+    public static final CritterClass CRITTER_CLASS_INSECT = new CritterClass(2, LanguageStrings.CRITTER_CLASS_INSECT,
+        loadIcon("icons/critterclasses/Insect.png"));
+    static { critterClasses.add(CRITTER_CLASS_INSECT); }
+    public static final CritterClass CRITTER_CLASS_ARACHNID = new CritterClass(3, LanguageStrings.CRITTER_CLASS_ARACHNID,
+        loadIcon("icons/critterclasses/Arachnid.png"));
+    static { critterClasses.add(CRITTER_CLASS_ARACHNID); }
+    public static final CritterClass CRITTER_CLASS_REPTILE = new CritterClass(4, LanguageStrings.CRITTER_CLASS_REPTILE,
+        loadIcon("icons/critterclasses/Reptile.png"));
+    static { critterClasses.add(CRITTER_CLASS_REPTILE); }
+    public static final CritterClass CRITTER_CLASS_RODENT = new CritterClass(5, LanguageStrings.CRITTER_CLASS_RODENT,
+        loadIcon("icons/critterclasses/Rodent.png"));
+    static { critterClasses.add(CRITTER_CLASS_RODENT); }
+    public static final CritterClass CRITTER_CLASS_MAMMAL = new CritterClass(6, LanguageStrings.CRITTER_CLASS_MAMMAL,
+        loadIcon("icons/critterclasses/Mammal.png"));
+    static { critterClasses.add(CRITTER_CLASS_MAMMAL); }
+    public static final CritterClass CRITTER_CLASS_FUNGI = new CritterClass(7, LanguageStrings.CRITTER_CLASS_FUNGI,
+        loadIcon("icons/critterclasses/Fungi.png"));
+    static { critterClasses.add(CRITTER_CLASS_FUNGI); }
+    public static final CritterClass CRITTER_CLASS_PLANT = new CritterClass(8, LanguageStrings.CRITTER_CLASS_PLANT,
+        loadIcon("icons/critterclasses/Plant.png"));
+    static { critterClasses.add(CRITTER_CLASS_PLANT); }
+    public static final CritterClass CRITTER_CLASS_XENO = new CritterClass(9, LanguageStrings.CRITTER_CLASS_XENO,
+        loadIcon("icons/critterclasses/Xeno.png"));
+    static { critterClasses.add(CRITTER_CLASS_XENO); }
+
+    // --- Species ---
+    public static final Species TYPE_ANT = new Species(1, LanguageStrings.BUG_ANT, CRITTER_CLASS_ANT, LanguageStrings.BUG_ANT_SCIENTIFIC, 1, 1, 1, 1, 1, 1,
         loadIcon("icons/ants/omni/Worker.png"), loadIcon("sprites/ants/omni/Worker.png"));
-    static { bugTypes.add(TYPE_ANT); }
-    public static final BugType TYPE_APHID = new BugType(2, LanguageStrings.BUG_APHID, LanguageStrings.BUG_APHID_SCIENTIFIC, 1, 1, 0, 0, 5, 0.5f,
-        loadIcon("icons/bugs/Aphid.png") , loadIcon("sprites/bugs/Aphid.png"), true);
-    static { bugTypes.add(TYPE_APHID); }
-    public static final BugType TYPE_PARASITE_ANT = new BugType(3, LanguageStrings.BUG_PARASITE_ANT, LanguageStrings.BUG_PARASITE_ANT_SCIENTIFIC, 1, 1, 0, 0, 1, 1,
-        loadIcon("icons/bugs/Parasite.png") , loadIcon("sprites/bugs/Parasite.png"));
-    static { bugTypes.add(TYPE_PARASITE_ANT); }
-    public static final BugType TYPE_SYMBIOTIC_MITE = new BugType(4, LanguageStrings.BUG_SYMBIOTIC_MITE, LanguageStrings.BUG_SYMBIOTIC_MITE_SCIENTIFIC, 1, 0, 0, 0, 2, 0.4f, 
-        loadIcon("icons/bugs/SoilMite.png"), loadIcon("sprites/bugs/SoilMite.png"), true);
-    static { bugTypes.add(TYPE_SYMBIOTIC_MITE); }
-    public static final BugType TYPE_DERMESTID = new BugType(5, LanguageStrings.BUG_DERMESTID, LanguageStrings.BUG_DERMESTID_SCIENTIFIC, 1, 0, 0, 0, 3, 0.35f,
-            loadIcon("icons/bugs/Dermestid.png"), loadIcon("sprites/bugs/Dermestid.png"), true);
-    static { bugTypes.add(TYPE_DERMESTID); }
-    public static final BugType TYPE_PARASITIC_MITE = new BugType(6, LanguageStrings.BUG_PARASITIC_MITE, LanguageStrings.BUG_PARASITIC_MITE_SCIENTIFIC, 1, 0, 0, 0, 1, 0.25f,
-            loadIcon("icons/bugs/ParasiticMite.png"), loadIcon("sprites/bugs/ParasiticMite.png"));
-    static { bugTypes.add(TYPE_PARASITIC_MITE); }
+    static { critterSpecies.add(TYPE_ANT); }
+    public static final Species TYPE_APHID = new Species(2, LanguageStrings.BUG_APHID, CRITTER_CLASS_INSECT, LanguageStrings.BUG_APHID_SCIENTIFIC, 1, 1, 0, 0, 5, 0.5f,
+        loadIcon("icons/critters/Aphid.png") , loadIcon("sprites/critters/Aphid.png"), true);
+    static { critterSpecies.add(TYPE_APHID); }
+    public static final Species TYPE_PARASITE_ANT = new Species(3, LanguageStrings.BUG_PARASITE_ANT, CRITTER_CLASS_ANT, LanguageStrings.BUG_PARASITE_ANT_SCIENTIFIC, 1, 1, 0, 0, 1, 1,
+        loadIcon("icons/critters/Parasite.png") , loadIcon("sprites/critters/Parasite.png"));
+    static { critterSpecies.add(TYPE_PARASITE_ANT); }
+    public static final Species TYPE_SYMBIOTIC_MITE = new Species(4, LanguageStrings.BUG_SYMBIOTIC_MITE, CRITTER_CLASS_ARACHNID, LanguageStrings.BUG_SYMBIOTIC_MITE_SCIENTIFIC, 1, 0, 0, 0, 2, 0.4f, 
+        loadIcon("icons/critters/SoilMite.png"), loadIcon("sprites/critters/SoilMite.png"), true);
+    static { critterSpecies.add(TYPE_SYMBIOTIC_MITE); }
+    public static final Species TYPE_DERMESTID = new Species(5, LanguageStrings.BUG_DERMESTID, CRITTER_CLASS_INSECT, LanguageStrings.BUG_DERMESTID_SCIENTIFIC, 1, 0, 0, 0, 3, 0.35f,
+            loadIcon("icons/critters/Dermestid.png"), loadIcon("sprites/critters/Dermestid.png"), true);
+    static { critterSpecies.add(TYPE_DERMESTID); }
+    public static final Species TYPE_PARASITIC_MITE = new Species(6, LanguageStrings.BUG_PARASITIC_MITE, CRITTER_CLASS_ARACHNID, LanguageStrings.BUG_PARASITIC_MITE_SCIENTIFIC, 1, 0, 0, 0, 1, 0.25f,
+            loadIcon("icons/critters/ParasiticMite.png"), loadIcon("sprites/critters/ParasiticMite.png"));
+    static { critterSpecies.add(TYPE_PARASITIC_MITE); }
 
     static {
         for (Biome biome : biomes) {
@@ -539,8 +570,8 @@ public final class GameConstants {
         }
     }
 
-    private static List<BugType> buildNativeBugsForBiome(Biome biome) {
-        List<BugType> natives = new ArrayList<>();
+    private static List<Species> buildNativeBugsForBiome(Biome biome) {
+        List<Species> natives = new ArrayList<>();
         if (!biome.isDry()) {
             natives.add(TYPE_APHID);
         }
@@ -551,8 +582,8 @@ public final class GameConstants {
         return List.copyOf(natives);
     }
 
-    private static List<BugType> buildNativeParasitesForBiome(Biome biome) {
-        List<BugType> natives = new ArrayList<>();
+    private static List<Species> buildNativeParasitesForBiome(Biome biome) {
+        List<Species> natives = new ArrayList<>();
         if (biome.isHot()) {
             natives.add(TYPE_PARASITE_ANT);
         }
@@ -735,45 +766,63 @@ public final class GameConstants {
     static { antRoles.add(ROLE_SKYTRANS); }
 
     // --- Colony Ranks ---
-    public static final Rank RANK_ANT = new Rank(1, LanguageStrings.RANK_ANT, 1l, 
+    public static final Rank RANK_ANT = new Rank(1, LanguageStrings.RANK_ANT, 1L,
         loadIcon("icons/ranks/Ant.png"));
     static { colonyRanks.add(RANK_ANT); }
-    public static final Rank RANK_COLONY = new Rank(2, LanguageStrings.RANK_COLONY, 10l, 
+    public static final Rank RANK_COLONY = new Rank(2, LanguageStrings.RANK_COLONY, 10L,
         loadIcon("icons/ranks/Colony.png"));
     static { colonyRanks.add(RANK_COLONY); }
-    public static final Rank RANK_COUNTY = new Rank(3, LanguageStrings.RANK_COUNTY, 100l, 
+    public static final Rank RANK_COUNTY = new Rank(3, LanguageStrings.RANK_COUNTY, 100L,
+        LanguageStrings.TRIGGER_RANK_COUNTY_TITLE, LanguageStrings.TRIGGER_RANK_COUNTY_MSG,
         loadIcon("icons/ranks/County.png"));
     static { colonyRanks.add(RANK_COUNTY); }
-    public static final Rank RANK_DUCHY = new Rank(4, LanguageStrings.RANK_DUCHY, 1000l, 
+    public static final Rank RANK_DUCHY = new Rank(4, LanguageStrings.RANK_DUCHY, 1000L,
+        LanguageStrings.TRIGGER_RANK_DUCHY_TITLE, LanguageStrings.TRIGGER_RANK_DUCHY_MSG,
         loadIcon("icons/ranks/Duchy.png"));
     static { colonyRanks.add(RANK_DUCHY); }
-    public static final Rank RANK_KINGDOM = new Rank(5, LanguageStrings.RANK_KINGDOM, 10000l, 
+    public static final Rank RANK_KINGDOM = new Rank(5, LanguageStrings.RANK_KINGDOM, 10000L,
+        LanguageStrings.TRIGGER_RANK_KINGDOM_TITLE, LanguageStrings.TRIGGER_RANK_KINGDOM_MSG,
         loadIcon("icons/ranks/Kingdom.png"));
     static { colonyRanks.add(RANK_KINGDOM); }
-    public static final Rank RANK_EMPIRE = new Rank(6, LanguageStrings.RANK_EMPIRE, 100000l, 
+    /** Empire rank popup is fused with cloning unlock copy. */
+    public static final Rank RANK_EMPIRE = new Rank(6, LanguageStrings.RANK_EMPIRE, 100000L,
+        LanguageStrings.TRIGGER_CLONING_TITLE, LanguageStrings.TRIGGER_CLONING_MSG,
         loadIcon("icons/ranks/Empire.png"));
     static { colonyRanks.add(RANK_EMPIRE); }
-    public static final Rank RANK_SUPER = new Rank(7, LanguageStrings.RANK_SUPER, 1000000l, 
+    public static final Rank RANK_SUPER = new Rank(7, LanguageStrings.RANK_SUPER, 1000000L,
+        LanguageStrings.TRIGGER_RANK_SUPER_TITLE, LanguageStrings.TRIGGER_RANK_SUPER_MSG,
         loadIcon("icons/ranks/Super.png"));
     static { colonyRanks.add(RANK_SUPER); }
-    public static final Rank RANK_ULTRA = new Rank(8, LanguageStrings.RANK_ULTRA, 10000000l, 
+    public static final Rank RANK_ULTRA = new Rank(8, LanguageStrings.RANK_ULTRA, 10000000L,
+        LanguageStrings.TRIGGER_RANK_ULTRA_TITLE, LanguageStrings.TRIGGER_RANK_ULTRA_MSG,
         loadIcon("icons/ranks/Ultra.png"));
     static { colonyRanks.add(RANK_ULTRA); }
-    public static final Rank RANK_HYPER = new Rank(9, LanguageStrings.RANK_HYPER, 100000000l, 
+    public static final Rank RANK_HYPER = new Rank(9, LanguageStrings.RANK_HYPER, 100000000L,
+        LanguageStrings.TRIGGER_RANK_HYPER_TITLE, LanguageStrings.TRIGGER_RANK_HYPER_MSG,
         loadIcon("icons/ranks/Hyper.png"));
     static { colonyRanks.add(RANK_HYPER); }
-    public static final Rank RANK_MEGA = new Rank(10, LanguageStrings.RANK_MEGA, 1000000000l, 
+    public static final Rank RANK_MEGA = new Rank(10, LanguageStrings.RANK_MEGA, 1000000000L,
+        LanguageStrings.TRIGGER_RANK_MEGA_TITLE, LanguageStrings.TRIGGER_RANK_MEGA_MSG,
         loadIcon("icons/ranks/Mega.png"));
     static { colonyRanks.add(RANK_MEGA); }
-    public static final Rank RANK_ULTIMATE = new Rank(11, LanguageStrings.RANK_ULTIMATE, 10000000000l, 
+    public static final Rank RANK_ULTIMATE = new Rank(11, LanguageStrings.RANK_ULTIMATE, 10000000000L,
+        LanguageStrings.TRIGGER_RANK_ULTIMATE_TITLE, LanguageStrings.TRIGGER_RANK_ULTIMATE_MSG,
         loadIcon("icons/ranks/Ultimate.png"));
     static { colonyRanks.add(RANK_ULTIMATE); }
-    public static final Rank RANK_SUPREME = new Rank(12, LanguageStrings.RANK_SUPREME, 100000000000l, 
+
+    public static final Rank RANK_SUPREME = new Rank(12, LanguageStrings.RANK_SUPREME, 100000000000L,
+        LanguageStrings.TRIGGER_RANK_SUPREME_TITLE, LanguageStrings.TRIGGER_RANK_SUPREME_MSG,
         loadIcon("icons/ranks/Supreme.png"));
     static { colonyRanks.add(RANK_SUPREME); }
-    public static final Rank RANK_GIGA = new Rank(13, LanguageStrings.RANK_GIGA, 1000000000000l, 
+    public static final Rank RANK_GIGA = new Rank(13, LanguageStrings.RANK_GIGA, 1000000000000L,
+        LanguageStrings.TRIGGER_RANK_GIGA_TITLE, LanguageStrings.TRIGGER_RANK_GIGA_MSG,
         loadIcon("icons/ranks/Giga.png"));
     static { colonyRanks.add(RANK_GIGA); }
+
+    static {
+        RANK_DUCHY.setUnlockOnAnnounce(GameUnlocks.ROLE_POLICE);
+        RANK_EMPIRE.setUnlockOnAnnounce(GameUnlocks.ABILITY_CLONING);
+    }
 
     // --- Tiers ---
     public static final Tier TIER_0 = new Tier(1, LanguageStrings.TIER_0, RANK_COLONY, 10L, 0, loadIcon("icons/tiers/Tier0.png"));
@@ -978,8 +1027,6 @@ public final class GameConstants {
         6, LanguageStrings.LOYALTY_MODIFIER_RECENTLY_INTEGRATED, 25, 0, null, 180);
     static { colonyLoyaltyModifiers.add(LOYALTY_MODIFIER_RECENTLY_INTEGRATED); }
 
-    public static final Rank TRIGGER_CLONING_MIN_RANK = RANK_EMPIRE;
-    
     // --- Dynasty titles ---
     public static final DynastyTitle DYNASTY_TITLE_DYNASTY = new DynastyTitle(
             1, LanguageStrings.DYNASTY_TITLE_DYNASTY, LanguageStrings.DYNASTY_TITLE_FMT_DYNASTY);
@@ -1116,8 +1163,8 @@ public final class GameConstants {
             LanguageStrings.DYNASTY_THEME_JUNGLE
     );
 
-    // --- Species ---
-    public static final Species SPECIES_OMNI = new Species(1, LanguageStrings.SPECIES_OMNI, LanguageStrings.SPECIES_OMNI_SCIENTIFIC,  "omni/", null, 
+    // --- AntSpecies ---
+    public static final AntSpecies SPECIES_OMNI = new AntSpecies(1, LanguageStrings.SPECIES_OMNI, LanguageStrings.SPECIES_OMNI_SCIENTIFIC,  "omni/", null, 
         Set.of(GameUnlocks.TYPE_EGG, GameUnlocks.TYPE_QUEEN, GameUnlocks.TYPE_WORKER, GameUnlocks.ROLE_FORAGER, 
             GameUnlocks.ROLE_FARMER, GameUnlocks.ROLE_NURSE, GameUnlocks.ROLE_LAYER, 
             GameUnlocks.STAT_SKELETON, GameUnlocks.STAT_ACID, GameUnlocks.STAT_LONGEVITY),
@@ -1128,7 +1175,7 @@ public final class GameConstants {
         loadIcon("icons/species/Omni.png"));
     static { species.add(SPECIES_OMNI); }
     
-    public static final Species SPECIES_LEAFCUTTER = new Species(2, LanguageStrings.SPECIES_LEAFCUTTER, LanguageStrings.SPECIES_LEAFCUTTER_SCIENTIFIC, "leafcutter/", GameUnlocks.ASSIMILATION_LEAFCUTTER, 
+    public static final AntSpecies SPECIES_LEAFCUTTER = new AntSpecies(2, LanguageStrings.SPECIES_LEAFCUTTER, LanguageStrings.SPECIES_LEAFCUTTER_SCIENTIFIC, "leafcutter/", GameUnlocks.ASSIMILATION_LEAFCUTTER, 
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_FARMING),
         Set.of(LanguageStrings.DYNASTY_THEME_LEAF, LanguageStrings.DYNASTY_THEME_PLANT, LanguageStrings.DYNASTY_THEME_SEED,
                 LanguageStrings.DYNASTY_THEME_LEAFCUTTER, LanguageStrings.DYNASTY_THEME_WOOD, LanguageStrings.DYNASTY_THEME_VINE,
@@ -1137,7 +1184,7 @@ public final class GameConstants {
         loadIcon("icons/species/Leafcutter.png"));
     static { species.add(SPECIES_LEAFCUTTER); }
     
-    public static final Species SPECIES_PHARAOH = new Species(3, LanguageStrings.SPECIES_PHARAOH, LanguageStrings.SPECIES_PHARAOH_SCIENTIFIC, "pharaoh/", GameUnlocks.ASSIMILATION_PHARAOH, 
+    public static final AntSpecies SPECIES_PHARAOH = new AntSpecies(3, LanguageStrings.SPECIES_PHARAOH, LanguageStrings.SPECIES_PHARAOH_SCIENTIFIC, "pharaoh/", GameUnlocks.ASSIMILATION_PHARAOH, 
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_MULTIQUEEN),
         Set.of(LanguageStrings.DYNASTY_THEME_PHARAOH, LanguageStrings.DYNASTY_THEME_RUBY, LanguageStrings.DYNASTY_THEME_TOPAZ,
                 LanguageStrings.DYNASTY_THEME_SAND, LanguageStrings.DYNASTY_THEME_DUST, LanguageStrings.DYNASTY_THEME_EMERALD,
@@ -1146,7 +1193,7 @@ public final class GameConstants {
         loadIcon("icons/species/Pharaoh.png"));
     static { species.add(SPECIES_PHARAOH); }
     
-    public static final Species SPECIES_MARAUDER = new Species(4, LanguageStrings.SPECIES_MARAUDER, LanguageStrings.SPECIES_MARAUDER_SCIENTIFIC, "marauder/", GameUnlocks.ASSIMILATION_MARAUDER, 
+    public static final AntSpecies SPECIES_MARAUDER = new AntSpecies(4, LanguageStrings.SPECIES_MARAUDER, LanguageStrings.SPECIES_MARAUDER_SCIENTIFIC, "marauder/", GameUnlocks.ASSIMILATION_MARAUDER, 
         defaultSpeciesUpgrades(GameUnlocks.TYPE_MAJOR),
         Set.of(LanguageStrings.DYNASTY_THEME_MARAUDER, LanguageStrings.DYNASTY_THEME_SCORPION, LanguageStrings.DYNASTY_THEME_COCKROACH,
                 LanguageStrings.DYNASTY_THEME_MEAT, LanguageStrings.DYNASTY_THEME_FIRE, LanguageStrings.DYNASTY_THEME_FLAME,
@@ -1155,128 +1202,128 @@ public final class GameConstants {
         loadIcon("icons/species/Marauder.png"));
     static { species.add(SPECIES_MARAUDER); }
 
-    public static final Species SPECIES_TRAPJAW = new Species(5, LanguageStrings.SPECIES_TRAPJAW, LanguageStrings.SPECIES_TRAPJAW_SCIENTIFIC, "trapjaw/", GameUnlocks.ASSIMILATION_TRAPJAW,
+    public static final AntSpecies SPECIES_TRAPJAW = new AntSpecies(5, LanguageStrings.SPECIES_TRAPJAW, LanguageStrings.SPECIES_TRAPJAW_SCIENTIFIC, "trapjaw/", GameUnlocks.ASSIMILATION_TRAPJAW,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_TRAPJAW),
         Set.of(LanguageStrings.DYNASTY_THEME_TRAPJAW, LanguageStrings.DYNASTY_THEME_TRAP, LanguageStrings.DYNASTY_THEME_JAW),
         loadIcon("icons/species/Trapjaw.png"));
     static { species.add(SPECIES_TRAPJAW); }
 
-    public static final Species SPECIES_HONEYPOT = new Species(6, LanguageStrings.SPECIES_HONEYPOT, LanguageStrings.SPECIES_HONEYPOT_SCIENTIFIC, "honeypot/", GameUnlocks.ASSIMILATION_HONEYPOT,
+    public static final AntSpecies SPECIES_HONEYPOT = new AntSpecies(6, LanguageStrings.SPECIES_HONEYPOT, LanguageStrings.SPECIES_HONEYPOT_SCIENTIFIC, "honeypot/", GameUnlocks.ASSIMILATION_HONEYPOT,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_HONEYPOT),
         Set.of(LanguageStrings.DYNASTY_THEME_HONEYPOT, LanguageStrings.DYNASTY_THEME_HONEY, LanguageStrings.DYNASTY_THEME_BEE),
         loadIcon("icons/species/Honeypot.png"));
     static { species.add(SPECIES_HONEYPOT); }
 
-    public static final Species SPECIES_TURTLE = new Species(7, LanguageStrings.SPECIES_TURTLE, LanguageStrings.SPECIES_TURTLE_SCIENTIFIC, "turtle/", GameUnlocks.ASSIMILATION_DOORHEAD,
+    public static final AntSpecies SPECIES_TURTLE = new AntSpecies(7, LanguageStrings.SPECIES_TURTLE, LanguageStrings.SPECIES_TURTLE_SCIENTIFIC, "turtle/", GameUnlocks.ASSIMILATION_DOORHEAD,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_DOORHEAD),
         Set.of(LanguageStrings.DYNASTY_THEME_TURTLE, LanguageStrings.DYNASTY_THEME_SHELL, LanguageStrings.DYNASTY_THEME_TORTOISE),
         loadIcon("icons/species/Turtle.png"));
     static { species.add(SPECIES_TURTLE); }
 
     // TODO asset: icons/species/Carpenter.png; sprites/ants/carpenter/*.png (placeholder — replace final art)
-    public static final Species SPECIES_CARPENTER = new Species(8, LanguageStrings.SPECIES_CARPENTER, LanguageStrings.SPECIES_CARPENTER_SCIENTIFIC, "carpenter/", GameUnlocks.ASSIMILATION_WOODBURROW,
+    public static final AntSpecies SPECIES_CARPENTER = new AntSpecies(8, LanguageStrings.SPECIES_CARPENTER, LanguageStrings.SPECIES_CARPENTER_SCIENTIFIC, "carpenter/", GameUnlocks.ASSIMILATION_WOODBURROW,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_WOODBURROW),
         Set.of(LanguageStrings.DYNASTY_THEME_CARPENTER, LanguageStrings.DYNASTY_THEME_WOOD, LanguageStrings.DYNASTY_THEME_TREE),
         loadIcon("icons/species/Carpenter.png"));
     static { species.add(SPECIES_CARPENTER); }
 
     // TODO asset: icons/species/Weaver.png; sprites/ants/weaver/*.png (placeholder — replace final art)
-    public static final Species SPECIES_WEAVER = new Species(9, LanguageStrings.SPECIES_WEAVER, LanguageStrings.SPECIES_WEAVER_SCIENTIFIC, "weaver/", GameUnlocks.ASSIMILATION_SILKWEAVE,
+    public static final AntSpecies SPECIES_WEAVER = new AntSpecies(9, LanguageStrings.SPECIES_WEAVER, LanguageStrings.SPECIES_WEAVER_SCIENTIFIC, "weaver/", GameUnlocks.ASSIMILATION_SILKWEAVE,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_SILKWEAVE),
         Set.of(LanguageStrings.DYNASTY_THEME_WEAVER, LanguageStrings.DYNASTY_THEME_SILK, LanguageStrings.DYNASTY_THEME_SPIDER),
         loadIcon("icons/species/Weaver.png"));
     static { species.add(SPECIES_WEAVER); }
 
     // TODO asset: icons/species/Floodplain.png; sprites/ants/floodplain/*.png (placeholder — replace final art)
-    public static final Species SPECIES_FLOODPLAIN = new Species(10, LanguageStrings.SPECIES_FLOODPLAIN, LanguageStrings.SPECIES_FLOODPLAIN_SCIENTIFIC, "floodplain/", GameUnlocks.ASSIMILATION_RAFTING,
+    public static final AntSpecies SPECIES_FLOODPLAIN = new AntSpecies(10, LanguageStrings.SPECIES_FLOODPLAIN, LanguageStrings.SPECIES_FLOODPLAIN_SCIENTIFIC, "floodplain/", GameUnlocks.ASSIMILATION_RAFTING,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_RAFTING),
         Set.of(LanguageStrings.DYNASTY_THEME_FLOODPLAIN, LanguageStrings.DYNASTY_THEME_RIVER, LanguageStrings.DYNASTY_THEME_WATER),
         loadIcon("icons/species/Floodplain.png"));
     static { species.add(SPECIES_FLOODPLAIN); }
 
-    public static final Species SPECIES_FIRE = new Species(11, LanguageStrings.SPECIES_FIRE, LanguageStrings.SPECIES_FIRE_SCIENTIFIC, "fire/", GameUnlocks.ASSIMILATION_FIREVENOM,
+    public static final AntSpecies SPECIES_FIRE = new AntSpecies(11, LanguageStrings.SPECIES_FIRE, LanguageStrings.SPECIES_FIRE_SCIENTIFIC, "fire/", GameUnlocks.ASSIMILATION_FIREVENOM,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_FIREVENOM),
         Set.of(LanguageStrings.DYNASTY_THEME_FIRE, LanguageStrings.DYNASTY_THEME_FLAME, LanguageStrings.DYNASTY_THEME_BURN),
         loadIcon("icons/species/Fire.png"));
     static { species.add(SPECIES_FIRE); }
 
     // TODO asset: icons/species/Jet.png; sprites/ants/jet/*.png (placeholder — replace final art)
-    public static final Species SPECIES_JET = new Species(12, LanguageStrings.SPECIES_JET, LanguageStrings.SPECIES_JET_SCIENTIFIC, "jet/", GameUnlocks.ASSIMILATION_JUMPING,
+    public static final AntSpecies SPECIES_JET = new AntSpecies(12, LanguageStrings.SPECIES_JET, LanguageStrings.SPECIES_JET_SCIENTIFIC, "jet/", GameUnlocks.ASSIMILATION_JUMPING,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_JUMPING),
         Set.of(LanguageStrings.DYNASTY_THEME_JET, LanguageStrings.DYNASTY_THEME_TORNADO, LanguageStrings.DYNASTY_THEME_WIND),
         loadIcon("icons/species/Jet.png"));
     static { species.add(SPECIES_JET); }
 
     // TODO asset: icons/species/Gliding.png; sprites/ants/gliding/*.png (placeholder — replace final art)
-    public static final Species SPECIES_GLIDING = new Species(13, LanguageStrings.SPECIES_GLIDING, LanguageStrings.SPECIES_GLIDING_SCIENTIFIC, "gliding/", GameUnlocks.ASSIMILATION_GLIDING,
+    public static final AntSpecies SPECIES_GLIDING = new AntSpecies(13, LanguageStrings.SPECIES_GLIDING, LanguageStrings.SPECIES_GLIDING_SCIENTIFIC, "gliding/", GameUnlocks.ASSIMILATION_GLIDING,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_GLIDING),
         Set.of(LanguageStrings.DYNASTY_THEME_GLIDING, LanguageStrings.DYNASTY_THEME_AIR, LanguageStrings.DYNASTY_THEME_FLY),
         loadIcon("icons/species/Gliding.png"));
     static { species.add(SPECIES_GLIDING); }
 
-    public static final Species SPECIES_BULLET = new Species(14, LanguageStrings.SPECIES_BULLET, LanguageStrings.SPECIES_BULLET_SCIENTIFIC, "bullet/", GameUnlocks.ASSIMILATION_STINGING,
+    public static final AntSpecies SPECIES_BULLET = new AntSpecies(14, LanguageStrings.SPECIES_BULLET, LanguageStrings.SPECIES_BULLET_SCIENTIFIC, "bullet/", GameUnlocks.ASSIMILATION_STINGING,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_STINGING),
         Set.of(LanguageStrings.DYNASTY_THEME_BULLET, LanguageStrings.DYNASTY_THEME_STING, LanguageStrings.DYNASTY_THEME_PUNCH),
         loadIcon("icons/species/Bullet.png"));
     static { species.add(SPECIES_BULLET); }
 
     // TODO asset: icons/species/Army.png; sprites/ants/army/*.png (placeholder — replace final art)
-    public static final Species SPECIES_ARMY = new Species(15, LanguageStrings.SPECIES_ARMY, LanguageStrings.SPECIES_ARMY_SCIENTIFIC, "army/", GameUnlocks.ASSIMILATION_SWARMING,
+    public static final AntSpecies SPECIES_ARMY = new AntSpecies(15, LanguageStrings.SPECIES_ARMY, LanguageStrings.SPECIES_ARMY_SCIENTIFIC, "army/", GameUnlocks.ASSIMILATION_SWARMING,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_SWARMING),
         Set.of(LanguageStrings.DYNASTY_THEME_ARMY, LanguageStrings.DYNASTY_THEME_SOLDIER, LanguageStrings.DYNASTY_THEME_WARRIOR),
         loadIcon("icons/species/Army.png"));
     static { species.add(SPECIES_ARMY); }
 
     // TODO asset: icons/species/Ghost.png; sprites/ants/ghost/*.png (placeholder — replace final art)
-    public static final Species SPECIES_GHOST = new Species(16, LanguageStrings.SPECIES_GHOST, LanguageStrings.SPECIES_GHOST_SCIENTIFIC, "ghost/", GameUnlocks.ASSIMILATION_STEALTH,
+    public static final AntSpecies SPECIES_GHOST = new AntSpecies(16, LanguageStrings.SPECIES_GHOST, LanguageStrings.SPECIES_GHOST_SCIENTIFIC, "ghost/", GameUnlocks.ASSIMILATION_STEALTH,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_STEALTH),
         Set.of(LanguageStrings.DYNASTY_THEME_GHOST, LanguageStrings.DYNASTY_THEME_SHADOW, LanguageStrings.DYNASTY_THEME_PHANTOM),
         loadIcon("icons/species/Ghost.png"));
     static { species.add(SPECIES_GHOST); }
 
     // TODO asset: icons/species/Dracula.png; sprites/ants/dracula/*.png (placeholder — replace final art)
-    public static final Species SPECIES_DRACULA = new Species(17, LanguageStrings.SPECIES_DRACULA, LanguageStrings.SPECIES_DRACULA_SCIENTIFIC, "dracula/", GameUnlocks.ASSIMILATION_FASTBITE,
+    public static final AntSpecies SPECIES_DRACULA = new AntSpecies(17, LanguageStrings.SPECIES_DRACULA, LanguageStrings.SPECIES_DRACULA_SCIENTIFIC, "dracula/", GameUnlocks.ASSIMILATION_FASTBITE,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_FASTBITE),
         Set.of(LanguageStrings.DYNASTY_THEME_DRACULA, LanguageStrings.DYNASTY_THEME_VAMPIRE, LanguageStrings.DYNASTY_THEME_BLOOD),
         loadIcon("icons/species/Dracula.png"));
     static { species.add(SPECIES_DRACULA); }
 
     // TODO asset: icons/species/Silver.png; sprites/ants/silver/*.png (placeholder — replace final art)
-    public static final Species SPECIES_SILVER = new Species(18, LanguageStrings.SPECIES_SILVER, LanguageStrings.SPECIES_SILVER_SCIENTIFIC, "silver/", GameUnlocks.ASSIMILATION_HEATRESIST,
+    public static final AntSpecies SPECIES_SILVER = new AntSpecies(18, LanguageStrings.SPECIES_SILVER, LanguageStrings.SPECIES_SILVER_SCIENTIFIC, "silver/", GameUnlocks.ASSIMILATION_HEATRESIST,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_HEATRESIST),
         Set.of(LanguageStrings.DYNASTY_THEME_SILVER, LanguageStrings.DYNASTY_THEME_METAL, LanguageStrings.DYNASTY_THEME_GOLD),
         loadIcon("icons/species/Silver.png"));
     static { species.add(SPECIES_SILVER); }
 
-    public static final Species SPECIES_MARICOPA = new Species(19, LanguageStrings.SPECIES_MARICOPA, LanguageStrings.SPECIES_MARICOPA_SCIENTIFIC, "maricopa/", GameUnlocks.ASSIMILATION_DEADLYVENOM,
+    public static final AntSpecies SPECIES_MARICOPA = new AntSpecies(19, LanguageStrings.SPECIES_MARICOPA, LanguageStrings.SPECIES_MARICOPA_SCIENTIFIC, "maricopa/", GameUnlocks.ASSIMILATION_DEADLYVENOM,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_DEADLYVENOM),
         Set.of(LanguageStrings.DYNASTY_THEME_MARICOPA, LanguageStrings.DYNASTY_THEME_VENOM, LanguageStrings.DYNASTY_THEME_POISON),
         loadIcon("icons/species/Maricopa.png"));
     static { species.add(SPECIES_MARICOPA); }
 
     // TODO asset: icons/species/Exploding.png; sprites/ants/exploding/*.png (placeholder — replace final art)
-    public static final Species SPECIES_EXPLODING = new Species(20, LanguageStrings.SPECIES_EXPLODING, LanguageStrings.SPECIES_EXPLODING_SCIENTIFIC, "exploding/", GameUnlocks.ASSIMILATION_SELFDESTRUCT,
+    public static final AntSpecies SPECIES_EXPLODING = new AntSpecies(20, LanguageStrings.SPECIES_EXPLODING, LanguageStrings.SPECIES_EXPLODING_SCIENTIFIC, "exploding/", GameUnlocks.ASSIMILATION_SELFDESTRUCT,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_SELFDESTRUCT),
         Set.of(LanguageStrings.DYNASTY_THEME_EXPLODING, LanguageStrings.DYNASTY_THEME_BOMB, LanguageStrings.DYNASTY_THEME_EXPLOSION),
         loadIcon("icons/species/Exploding.png"));
     static { species.add(SPECIES_EXPLODING); }
 
     // TODO asset: icons/species/Bulldog.png; sprites/ants/bulldog/*.png (placeholder — replace final art)
-    public static final Species SPECIES_BULLDOG = new Species(21, LanguageStrings.SPECIES_BULLDOG, LanguageStrings.SPECIES_BULLDOG_SCIENTIFIC, "bulldog/", GameUnlocks.ASSIMILATION_FARSIGHT,
+    public static final AntSpecies SPECIES_BULLDOG = new AntSpecies(21, LanguageStrings.SPECIES_BULLDOG, LanguageStrings.SPECIES_BULLDOG_SCIENTIFIC, "bulldog/", GameUnlocks.ASSIMILATION_FARSIGHT,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_FARSIGHT),
         Set.of(LanguageStrings.DYNASTY_THEME_BULLDOG, LanguageStrings.DYNASTY_THEME_DOG, LanguageStrings.DYNASTY_THEME_HOUND),
         loadIcon("icons/species/Bulldog.png"));
     static { species.add(SPECIES_BULLDOG); }
 
     // TODO asset: icons/species/ShiningBlack.png; sprites/ants/shiningblack/*.png (placeholder — replace final art)
-    public static final Species SPECIES_SHININGBLACK = new Species(22, LanguageStrings.SPECIES_SHININGBLACK, LanguageStrings.SPECIES_SHININGBLACK_SCIENTIFIC, "shiningblack/", GameUnlocks.ASSIMILATION_HIVEBUILD,
+    public static final AntSpecies SPECIES_SHININGBLACK = new AntSpecies(22, LanguageStrings.SPECIES_SHININGBLACK, LanguageStrings.SPECIES_SHININGBLACK_SCIENTIFIC, "shiningblack/", GameUnlocks.ASSIMILATION_HIVEBUILD,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_HIVEBUILD),
         Set.of(LanguageStrings.DYNASTY_THEME_SHINING, LanguageStrings.DYNASTY_THEME_BLACK, LanguageStrings.DYNASTY_THEME_DARK),
         loadIcon("icons/species/ShiningBlack.png"));
     static { species.add(SPECIES_SHININGBLACK); }
 
     // TODO asset: icons/species/Desert.png; sprites/ants/desert/*.png (placeholder — replace final art)
-    public static final Species SPECIES_DESERT = new Species(23, LanguageStrings.SPECIES_DESERT, LanguageStrings.SPECIES_DESERT_SCIENTIFIC, "desert/", GameUnlocks.ASSIMILATION_LOCSENSE,
+    public static final AntSpecies SPECIES_DESERT = new AntSpecies(23, LanguageStrings.SPECIES_DESERT, LanguageStrings.SPECIES_DESERT_SCIENTIFIC, "desert/", GameUnlocks.ASSIMILATION_LOCSENSE,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_LOCSENSE),
         Set.of(LanguageStrings.DYNASTY_THEME_DESERT, LanguageStrings.DYNASTY_THEME_SAND, LanguageStrings.DYNASTY_THEME_DIRT),
         loadIcon("icons/species/Desert.png"));
@@ -1402,6 +1449,30 @@ public final class GameConstants {
     public static List<Rank> getColonyRanks() { return Collections.unmodifiableList(colonyRanks); }
     public static List<Tier> getTiers() { return Collections.unmodifiableList(tiers); }
 
+    public static Tier getTierForRank(Rank rank) {
+        if (rank == null) {
+            return null;
+        }
+        for (Tier tier : tiers) {
+            if (tier.getRankRequirement() == rank) {
+                return tier;
+            }
+        }
+        return null;
+    }
+
+    /** Exclusive upper RP bound for a tier (next tier's minimum), or {@link Long#MAX_VALUE} for the top tier. */
+    public static long getTierMaximumRpExclusive(Tier tier) {
+        if (tier == null) {
+            return Long.MAX_VALUE;
+        }
+        int index = tiers.indexOf(tier);
+        if (index < 0 || index >= tiers.size() - 1) {
+            return Long.MAX_VALUE;
+        }
+        return tiers.get(index + 1).getMinimumRp();
+    }
+
     public static Rank getColonyRankByKey(String key) {
         if (key == null || key.isEmpty()) {
             return RANK_ANT;
@@ -1443,7 +1514,7 @@ public final class GameConstants {
 
     public static List<String> getAllDynastyThemeKeys() {
         LinkedHashSet<String> keys = new LinkedHashSet<>(genericDynastyThemeKeys);
-        for (Species s : species) {
+        for (AntSpecies s : species) {
             keys.addAll(s.getPreferredNameKeys());
         }
         return List.copyOf(keys);
@@ -1634,10 +1705,10 @@ public final class GameConstants {
         return Collections.unmodifiableList(colonyLoyalties);
     }
 
-    public static List<Species> getSpecies() { return Collections.unmodifiableList(species); }
+    public static List<AntSpecies> getSpecies() { return Collections.unmodifiableList(species); }
 
-    public static Species getSpeciesById(int id) {
-        for (Species s : species) {
+    public static AntSpecies getSpeciesById(int id) {
+        for (AntSpecies s : species) {
             if (s.getId() == id) {
                 return s;
             }
@@ -1645,9 +1716,9 @@ public final class GameConstants {
         return null;
     }
 
-    public static List<Species> getNonOmniSpecies() {
-        List<Species> result = new ArrayList<>();
-        for (Species s : species) {
+    public static List<AntSpecies> getNonOmniSpecies() {
+        List<AntSpecies> result = new ArrayList<>();
+        for (AntSpecies s : species) {
             if (s.getId() != SPECIES_OMNI.getId()) {
                 result.add(s);
             }
@@ -1655,9 +1726,9 @@ public final class GameConstants {
         return Collections.unmodifiableList(result);
     }
 
-    public static List<Species> getWorldSpawnableNpcSpecies() {
-        List<Species> result = new ArrayList<>();
-        for (Species s : species) {
+    public static List<AntSpecies> getWorldSpawnableNpcSpecies() {
+        List<AntSpecies> result = new ArrayList<>();
+        for (AntSpecies s : species) {
             if (s.getId() != SPECIES_OMNI.getId() && hasAssimilatedDroneSprite(s)) {
                 result.add(s);
             }
@@ -1680,7 +1751,9 @@ public final class GameConstants {
 
     public static List<Temperature> getTemperature() { return Collections.unmodifiableList(temperature); }
 
-    public static List<BugType> getBugTypes() { return Collections.unmodifiableList(bugTypes); }
+    public static List<Species> getCritterSpecies() { return Collections.unmodifiableList(critterSpecies); }
+
+    public static List<CritterClass> getCritterClasses() { return Collections.unmodifiableList(critterClasses); }
 
     public static List<ImageIcon> getMisc() { return Collections.unmodifiableList(misc); }
 }

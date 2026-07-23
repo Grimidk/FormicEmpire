@@ -1,8 +1,8 @@
 package com.grimidk.formicempire.classes.entities.services.colony;
 
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
-import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastySynergyService;

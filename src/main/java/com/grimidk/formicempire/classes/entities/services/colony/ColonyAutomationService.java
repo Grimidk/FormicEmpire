@@ -1,12 +1,12 @@
 package com.grimidk.formicempire.classes.entities.services.colony;
 
-import com.grimidk.formicempire.classes.constants.ant.AntRole;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.Season;
-import com.grimidk.formicempire.classes.entities.Ant;
-import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.entities.critter.Ant;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.Tunnel;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
@@ -436,7 +436,7 @@ public class ColonyAutomationService {
             needed = Math.max(1, parasiticMites / GameNumbers.PARASITIC_MITES_PER_SLOWED_ANT);
         }
         if (biome != null && season != null) {
-            ColonyBugHandlingService bugs = colony.getBugHandlingService();
+            ColonyCritterHandlingService bugs = colony.getBugHandlingService();
             int requiredMites = bugs.requiredSymbioticMitesToPreventOutbreak(colony, biome, season);
             int have = colony.getSymbioticMites();
             if (requiredMites > have) {

@@ -1,15 +1,15 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
-import com.grimidk.formicempire.classes.constants.ant.AntSubtype;
-import com.grimidk.formicempire.classes.constants.ant.AntSubtypeProfile;
-import com.grimidk.formicempire.classes.constants.ant.AntSubtypeSlot;
-import com.grimidk.formicempire.classes.constants.ant.AntType;
-import com.grimidk.formicempire.classes.constants.misc.Species;
-import com.grimidk.formicempire.classes.constants.misc.TradeMethod;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtype;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeProfile;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeSlot;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
+import com.grimidk.formicempire.classes.constants.dynasty.TradeMethod;
 import com.grimidk.formicempire.classes.constants.world.Biome;
-import com.grimidk.formicempire.classes.entities.Ant;
-import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.entities.Trade;
+import com.grimidk.formicempire.classes.entities.critter.Ant;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Trade;
 import com.grimidk.formicempire.classes.entities.services.colony.AntSubtypeService;
 import com.grimidk.formicempire.classes.entities.services.colony.ConvoyScene;
 import com.grimidk.formicempire.classes.entities.services.colony.ConvoySceneBuilder;
@@ -418,12 +418,12 @@ public class ConvoyViewPanel extends JPanel {
 
     private static final class ConvoyAnt {
         private final AntType type;
-        private final Species species;
+        private final AntSpecies species;
         private final AntSubtypeProfile profile;
         private final float offsetX;
         private final float offsetY;
 
-        private ConvoyAnt(AntType type, Species species, AntSubtypeProfile profile, float offsetX, float offsetY) {
+        private ConvoyAnt(AntType type, AntSpecies species, AntSubtypeProfile profile, float offsetX, float offsetY) {
             this.type = type;
             this.species = species;
             this.profile = profile != null ? profile : AntSubtypeProfile.standard();

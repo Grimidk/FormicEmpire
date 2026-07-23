@@ -2,7 +2,8 @@ package com.grimidk.formicempire.classes.constants.misc;
 
 import javax.swing.ImageIcon;
 import com.grimidk.formicempire.classes.constants.Constant;
-import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.constants.dynasty.Rank;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 
 public class Tier extends Constant {
     private final Rank rankRequirement;

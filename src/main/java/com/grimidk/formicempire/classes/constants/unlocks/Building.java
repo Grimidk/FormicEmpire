@@ -5,7 +5,7 @@ import java.util.List;
 import javax.swing.ImageIcon;
 import com.grimidk.formicempire.classes.constants.Constant;
 import com.grimidk.formicempire.classes.constants.misc.Tier;
-import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 

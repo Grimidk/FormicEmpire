@@ -4,10 +4,10 @@ import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryS
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyStarterService;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyStatsService;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
-import com.grimidk.formicempire.classes.entities.CrossDynastyTradeProposal;
-import com.grimidk.formicempire.classes.entities.Ant;
-import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.entities.dynasty.CrossDynastyTradeProposal;
+import com.grimidk.formicempire.classes.entities.critter.Ant;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;

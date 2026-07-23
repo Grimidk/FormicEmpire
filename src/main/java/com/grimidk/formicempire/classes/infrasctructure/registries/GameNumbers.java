@@ -1,7 +1,7 @@
 package com.grimidk.formicempire.classes.infrasctructure.registries;
 
-import com.grimidk.formicempire.classes.constants.misc.ColonyLoyaltyModifier;
-import com.grimidk.formicempire.classes.constants.misc.DiplomaticReputationModifier;
+import com.grimidk.formicempire.classes.constants.dynasty.colony.ColonyLoyaltyModifier;
+import com.grimidk.formicempire.classes.constants.dynasty.DiplomaticReputationModifier;
 
 public final class GameNumbers {
     private GameNumbers() {}
@@ -166,7 +166,6 @@ public final class GameNumbers {
     // --- Triggers ---
     public static final int TRIGGER_GRAVER_DEAD_ANTS = 100;
     public static final int TRIGGER_RESEARCH_MIN_RP = 100;
-    public static final int TRIGGER_POLICE_MIN_POPULATION = 1000;
     public static final int TRIGGER_MASS_FLIGHT_MIN_NUPTIALS = 10;
     public static final int TRIGGER_BILATERAL_MIN_TRADES = 5;
     public static final int TRIGGER_SCOUT_PLANT_COLLECTED = 6000;
@@ -177,6 +176,12 @@ public final class GameNumbers {
     public static final int TRIGGER_AUTOMATION_MIN_COLONIES = 7;
     public static final int TRIGGER_RESEARCHER_MIN_MONTHS = 2;
     public static final int TRIGGER_ASSIMILATION_MIN_ABSORBED = 1;
+    public static final int TRIGGER_NPC_RESEARCHER_MIN_ANTS = 20;
+    public static final int TRIGGER_NPC_GRAVER_DEAD_ANTS = 20;
+    public static final int TRIGGER_NPC_SCOUT_MIN_ANTS = 50;
+    public static final double TRIGGER_NPC_SCOUT_FOOD_RATIO = 0.2;
+    public static final int TRIGGER_NPC_ABILITY_MENU_MIN_RP = 4000;
+    public static final int PARASITE_ANT_OUTBREAK_MIN_POPULATION = 1000;
     public static final int DIPLOMAT_STABILITY_GAIN_BASE = 1;
     public static final int DIPLOMAT_STABILITY_GAIN_PRESSURE_2 = 3;
     public static final int DIPLOMAT_STABILITY_GAIN_PRESSURE_3 = 5;

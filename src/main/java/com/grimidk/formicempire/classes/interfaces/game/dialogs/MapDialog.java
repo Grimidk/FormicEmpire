@@ -1,12 +1,12 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
-import com.grimidk.formicempire.classes.constants.misc.Rank;
-import com.grimidk.formicempire.classes.constants.misc.DiplomaticReputation;
+import com.grimidk.formicempire.classes.constants.dynasty.Rank;
+import com.grimidk.formicempire.classes.constants.dynasty.DiplomaticReputation;
 import com.grimidk.formicempire.classes.constants.world.Biome;
-import com.grimidk.formicempire.classes.entities.Dynasty;
-import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
-import com.grimidk.formicempire.classes.entities.War;
+import com.grimidk.formicempire.classes.entities.dynasty.War;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;

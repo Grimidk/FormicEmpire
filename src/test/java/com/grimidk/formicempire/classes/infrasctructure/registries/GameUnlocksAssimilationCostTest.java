@@ -1,6 +1,6 @@
 package com.grimidk.formicempire.classes.infrasctructure.registries;
 
-import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

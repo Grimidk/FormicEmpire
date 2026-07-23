@@ -932,6 +932,16 @@ public class PortugueseTranslation implements Translation {
         pt.put("MOVE_FLY_DESC", "Movimento voador.");
         pt.put("MOVE_PATROL_DESC", "Patrulha em torno de um curral ou posto.");
 
+        pt.put("CRITTER_CLASS_ANT", "Formiga");
+        pt.put("CRITTER_CLASS_INSECT", "Inseto");
+        pt.put("CRITTER_CLASS_ARACHNID", "Aracnídeo");
+        pt.put("CRITTER_CLASS_REPTILE", "Réptil");
+        pt.put("CRITTER_CLASS_RODENT", "Roedor");
+        pt.put("CRITTER_CLASS_MAMMAL", "Mamífero");
+        pt.put("CRITTER_CLASS_FUNGI", "Fungo");
+        pt.put("CRITTER_CLASS_PLANT", "Planta");
+        pt.put("CRITTER_CLASS_XENO", "Xeno");
+
         pt.put("BUG_ANT", "Formiga");
         pt.put("BUG_APHID", "Pulgão");
         pt.put("BUG_SYMBIOTIC_MITE", "Ácaro simbiótico");
@@ -2009,7 +2019,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("TRIGGER_RANK_COUNTY_TITLE", "Condado");
         pt.put("TRIGGER_RANK_COUNTY_MSG", "A tua dinastia tornou-se um Condado! Novos níveis de investigação e construção ficam ao alcance à medida que a população cresce.");
         pt.put("TRIGGER_RANK_DUCHY_TITLE", "Ducado");
-        pt.put("TRIGGER_RANK_DUCHY_MSG", "A tua dinastia é agora um Ducado. A influência regional cresce e desbloqueiam-se melhorias e edifícios de nível superior.");
+        pt.put("TRIGGER_RANK_DUCHY_MSG", "A tua dinastia é agora um Ducado. Desbloqueiam-se melhorias e edifícios de nível superior — e a colónia é grande o suficiente para formigas parasitas se infiltrarem, desbloqueando o papel de Polícia.");
         pt.put("TRIGGER_RANK_KINGDOM_TITLE", "Reino");
         pt.put("TRIGGER_RANK_KINGDOM_MSG", "Um Reino ergue-se! A tua dinastia comanda um enxame à escala de um reino e desbloqueia o próximo nível de avanços.");
         pt.put("TRIGGER_RANK_SUPER_TITLE", "Supercolônia");

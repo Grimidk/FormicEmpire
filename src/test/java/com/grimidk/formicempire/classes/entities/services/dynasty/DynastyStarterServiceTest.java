@@ -1,8 +1,8 @@
 package com.grimidk.formicempire.classes.entities.services.dynasty;
 
-import com.grimidk.formicempire.classes.constants.misc.Species;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
-import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import org.junit.jupiter.api.Test;
 
@@ -14,7 +14,7 @@ public class DynastyStarterServiceTest {
     public void testInitializeDynastyWithOmniSpecies() {
         // Setup
         DynastyStarterService starterService = new DynastyStarterService();
-        Species omni = GameConstants.SPECIES_OMNI;
+        AntSpecies omni = GameConstants.SPECIES_OMNI;
         Dynasty dynasty = new Dynasty(1, "Test Dynasty", true, omni);
 
         // Action
@@ -32,7 +32,7 @@ public class DynastyStarterServiceTest {
     public void testInitializeDynastyWithLeafcutterSpecies() {
         // Setup
         DynastyStarterService starterService = new DynastyStarterService();
-        Species leafcutter = GameConstants.SPECIES_LEAFCUTTER;
+        AntSpecies leafcutter = GameConstants.SPECIES_LEAFCUTTER;
         Dynasty dynasty = new Dynasty(2, "Leafcutter Dynasty", false, leafcutter);
 
         // Action

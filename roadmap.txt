@@ -28,19 +28,20 @@ Needed for launch (v1.0) (Launch Version):
 	Priority:
 	assimilations (Wood burrowing (Carpenter ants), Silk weaving (Weaver ants), Rafting (Flood plains ants), Jumping (Jet ants), Gliding (Gliding ants), Swarming (Army ants), Stealth (Ghost ants), Heat resistance (Saharan silver ants), Self destruction (Exploding ants), Far sight (Bulldog ants), Hive building (Shining black ants), Location sensing (Desert ants))
 	green ants for acid spitting
-
-	Everything else :
 	minerals with uprades to find it and increase miner efficency, also mushroom detection 
 	research tree and building tree (after icons) with available, purchasable, locked and list trigger based upgrades 
 	random events (meteor, earthquake, tornado, tsunami, hunts (for later) plus special weathers (rare events))
-	main menu screen maybe simulation like factorio
+	main menu screen maybe simulation like factorio and title header
 	synergies ( Super majors + Chemical throwing = Artillery ants; Self destruction + Acid spitting = Corrosive bombs; Silk weaving + Hive building = Web building; Air-force ants + self destruction = Air-bomber ants)
 	more upgrades (combat) and more buildings and assimilations and synergies
 	implement pending roles (defender, miner, potter, bomber, carrier, artillery, siege) more roles (commander and captain roles, air force and paratroopers to skip a stage) and air warfare
 	rework war by using attack vs defense in hex defense and that difference dictates loses, with more risk like randomness, artillery line (doesnt lose unless targeted by other artillery, and air support)
 	each tick each ant chooses 1 attack, start with basic bite, trapjaw unlocks powerful bite (replaces basic bite), fast bitting allows attacking twice, stinger is another attack, spitting is an attack
+	creature vs swarm battle system
+	
+	Everything else :
 	more enemies (single battle, size determines amount of attacks):
-		Bugs (Bombardier beetle, ant lions, soldier and exploding aphids, termites, bees, hornets, dragonfly, dung beetle, cuban cockroach, goliath beetle, cricket moles, locust swarms), 
+		Bugs (Bombardier beetle, ant lions, soldier and exploding aphids, termites, bees, hornets, dragonfly, dung beetle, cuban cockroach, goliath beetle, cricket moles, locust swarms, scalopendra), 
 		Arachnids (catapult ants, tarantulas, vinegaroons, horsehoecrabs), 
 		Anphibians (Salamander, frog, toad)
 		Reptiles, 

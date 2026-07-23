@@ -1,7 +1,7 @@
 package com.grimidk.formicempire.classes.entities.services.world;
 
-import com.grimidk.formicempire.classes.constants.ant.AntType;
-import com.grimidk.formicempire.classes.constants.misc.Species;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 
 import java.util.Collections;
@@ -12,7 +12,7 @@ public final class WarBattleScene {
 
     public static final int MAX_VISUAL_ANTS_PER_SIDE = 200;
 
-    public record Side(int dynastyId, String dynastyName, Species species, Map<AntType, Integer> typeCounts,
+    public record Side(int dynastyId, String dynastyName, AntSpecies species, Map<AntType, Integer> typeCounts,
             int deployedPower) {
         public Side {
             typeCounts = typeCounts == null

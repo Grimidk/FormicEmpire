@@ -6,11 +6,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.grimidk.formicempire.classes.constants.ant.AntType;
-import com.grimidk.formicempire.classes.constants.misc.DynastyTitle;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.dynasty.DynastyTitle;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
-import com.grimidk.formicempire.classes.constants.misc.Species;
-import com.grimidk.formicempire.classes.constants.misc.TradeMethod;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
+import com.grimidk.formicempire.classes.constants.dynasty.TradeMethod;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.Humidity;
 import com.grimidk.formicempire.classes.constants.world.MoonPhase;
@@ -18,10 +18,10 @@ import com.grimidk.formicempire.classes.constants.world.Season;
 import com.grimidk.formicempire.classes.constants.world.Temperature;
 import com.grimidk.formicempire.classes.constants.world.TimeOfDay;
 import com.grimidk.formicempire.classes.constants.world.Weather;
-import com.grimidk.formicempire.classes.entities.Dynasty;
-import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
-import com.grimidk.formicempire.classes.entities.Trade;
+import com.grimidk.formicempire.classes.entities.dynasty.Trade;
 import com.grimidk.formicempire.classes.entities.Tunnel;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyLabourService;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
@@ -459,10 +459,10 @@ public class World {
         }
 
         List<Hex> npcColonyHexes = selectNpcColonyHexes(eligibleNpcHexes);
-        List<Species> npcSpeciesAssignments = assignNpcSpecies(npcColonyHexes.size());
+        List<AntSpecies> npcSpeciesAssignments = assignNpcSpecies(npcColonyHexes.size());
         for (int i = 0; i < npcColonyHexes.size(); i++) {
             Hex hex = npcColonyHexes.get(i);
-            Species npcSpecies = npcSpeciesAssignments.get(i);
+            AntSpecies npcSpecies = npcSpeciesAssignments.get(i);
 
             int dynastyId = this.dynastyIdCounter++;
             DynastyTitle npcTitle = namingService.pickRandomTitle();
@@ -515,13 +515,13 @@ public class World {
         return selected;
     }
 
-    private List<Species> assignNpcSpecies(int colonyCount) {
-        List<Species> nonOmni = new ArrayList<>(GameConstants.getWorldSpawnableNpcSpecies());
+    private List<AntSpecies> assignNpcSpecies(int colonyCount) {
+        List<AntSpecies> nonOmni = new ArrayList<>(GameConstants.getWorldSpawnableNpcSpecies());
         if (colonyCount == 0 || nonOmni.isEmpty()) {
             return List.of();
         }
         Collections.shuffle(nonOmni, GameRandom.getShuffleRandom());
-        List<Species> assignment = new ArrayList<>(colonyCount);
+        List<AntSpecies> assignment = new ArrayList<>(colonyCount);
         for (int i = 0; i < colonyCount; i++) {
             if (i < nonOmni.size()) {
                 assignment.add(nonOmni.get(i));

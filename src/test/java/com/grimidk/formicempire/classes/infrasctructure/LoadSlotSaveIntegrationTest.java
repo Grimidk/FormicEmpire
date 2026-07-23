@@ -1,6 +1,6 @@
 package com.grimidk.formicempire.classes.infrasctructure;
 
-import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.assets.GameSpritePreloader;
 

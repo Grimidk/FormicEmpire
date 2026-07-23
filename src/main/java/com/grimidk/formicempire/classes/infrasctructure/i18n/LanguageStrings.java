@@ -1,7 +1,7 @@
 package com.grimidk.formicempire.classes.infrasctructure.i18n;
 
-import com.grimidk.formicempire.classes.constants.misc.CityTitle;
-import com.grimidk.formicempire.classes.constants.misc.DynastyTitle;
+import com.grimidk.formicempire.classes.constants.dynasty.DynastyTitle;
+import com.grimidk.formicempire.classes.constants.dynasty.colony.CityTitle;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.translations.EnglishTranslation;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.translations.FrenchTranslation;
@@ -1522,6 +1522,16 @@ public final class LanguageStrings {
     public static final String MOVE_SPEED = "MOVE_SPEED";
     public static final String MOVE_FLY = "MOVE_FLY";
     public static final String MOVE_PATROL = "MOVE_PATROL";
+
+    public static final String CRITTER_CLASS_ANT = "CRITTER_CLASS_ANT";
+    public static final String CRITTER_CLASS_INSECT = "CRITTER_CLASS_INSECT";
+    public static final String CRITTER_CLASS_ARACHNID = "CRITTER_CLASS_ARACHNID";
+    public static final String CRITTER_CLASS_REPTILE = "CRITTER_CLASS_REPTILE";
+    public static final String CRITTER_CLASS_RODENT = "CRITTER_CLASS_RODENT";
+    public static final String CRITTER_CLASS_MAMMAL = "CRITTER_CLASS_MAMMAL";
+    public static final String CRITTER_CLASS_FUNGI = "CRITTER_CLASS_FUNGI";
+    public static final String CRITTER_CLASS_PLANT = "CRITTER_CLASS_PLANT";
+    public static final String CRITTER_CLASS_XENO = "CRITTER_CLASS_XENO";
 
     public static final String BUG_ANT = "BUG_ANT";
     public static final String BUG_APHID = "BUG_APHID";

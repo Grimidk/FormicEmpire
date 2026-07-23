@@ -1,6 +1,6 @@
 package com.grimidk.formicempire.classes.infrasctructure;
 
-import com.grimidk.formicempire.classes.entities.War;
+import com.grimidk.formicempire.classes.entities.dynasty.War;
 import com.grimidk.formicempire.classes.entities.services.world.WarStagePhase;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;

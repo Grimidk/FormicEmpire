@@ -1,12 +1,12 @@
 package com.grimidk.formicempire.classes.entities.services.dynasty;
 
-import com.grimidk.formicempire.classes.constants.misc.PactRequestIncomingPolicy;
-import com.grimidk.formicempire.classes.entities.Ant;
-import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.entities.CrossDynastyTradeProposal;
-import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.constants.dynasty.PactRequestIncomingPolicy;
+import com.grimidk.formicempire.classes.entities.critter.Ant;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.CrossDynastyTradeProposal;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
-import com.grimidk.formicempire.classes.entities.Trade;
+import com.grimidk.formicempire.classes.entities.dynasty.Trade;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
@@ -242,7 +242,7 @@ class DynastyDiplomacyServiceTest {
 
         for (int i = 0; i < GameNumbers.WAR_DECLARATION_MIN_POPULATION; i++) {
             smallColony.getWorkers().add(
-                    new com.grimidk.formicempire.classes.entities.Ant(smallColony, GameConstants.TYPE_WORKER));
+                    new com.grimidk.formicempire.classes.entities.critter.Ant(smallColony, GameConstants.TYPE_WORKER));
         }
         assertTrue(DynastyDiplomacyService.meetsWarDeclarationPopulationRequirement(player));
     }
@@ -252,7 +252,7 @@ class DynastyDiplomacyServiceTest {
         World world = buildBorderWorld();
         player.getDiplomacyService().applyWar(neighbor, null, world);
 
-        List<com.grimidk.formicempire.classes.entities.War> wars = world.getWarService().getActiveWars();
+        List<com.grimidk.formicempire.classes.entities.dynasty.War> wars = world.getWarService().getActiveWars();
         assertEquals(1, wars.size());
         assertTrue(wars.get(0).involves(player.getId()));
     }

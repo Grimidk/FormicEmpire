@@ -1,14 +1,14 @@
 package com.grimidk.formicempire.classes.entities.services.colony;
 
-import com.grimidk.formicempire.classes.constants.ant.AntType;
-import com.grimidk.formicempire.classes.constants.misc.Species;
-import com.grimidk.formicempire.classes.constants.misc.TradeMethod;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
+import com.grimidk.formicempire.classes.constants.dynasty.TradeMethod;
 import com.grimidk.formicempire.classes.constants.world.Biome;
-import com.grimidk.formicempire.classes.entities.Ant;
-import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.entities.critter.Ant;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
-import com.grimidk.formicempire.classes.entities.Trade;
+import com.grimidk.formicempire.classes.entities.dynasty.Trade;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 
@@ -42,7 +42,7 @@ public final class ConvoySceneBuilder {
         ConvoyScene.BackgroundKind backgroundKind = resolveBackgroundKind(method);
 
         Dynasty dynasty = originColony.getDynasty();
-        Species species = dynasty != null ? dynasty.getSpecies() : GameConstants.SPECIES_OMNI;
+        AntSpecies species = dynasty != null ? dynasty.getSpecies() : GameConstants.SPECIES_OMNI;
         Map<AntType, Integer> typeCounts = aggregateAntTypes(trade);
 
         int totalHours = Math.max(1, trade.getTotalHours());

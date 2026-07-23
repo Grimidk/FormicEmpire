@@ -11,8 +11,8 @@ import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 
-import com.grimidk.formicempire.classes.entities.Dynasty;
-import com.grimidk.formicempire.classes.entities.War;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
+import com.grimidk.formicempire.classes.entities.dynasty.War;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 
 class LoadSlotWarsIntegrationTest {

@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Semaphore;
 
-import com.grimidk.formicempire.classes.constants.ant.AntRole;
-import com.grimidk.formicempire.classes.constants.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.GameSpeed;
-import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;

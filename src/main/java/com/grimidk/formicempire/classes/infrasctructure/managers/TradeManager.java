@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import com.grimidk.formicempire.classes.entities.Trade;
+import com.grimidk.formicempire.classes.entities.dynasty.Trade;
 
 public class TradeManager implements Runnable {
 

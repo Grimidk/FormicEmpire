@@ -2,7 +2,7 @@ package com.grimidk.formicempire.classes.entities.services.dynasty;
 
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
-import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyStatsService;
 import org.junit.jupiter.api.Test;
 

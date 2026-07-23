@@ -2,7 +2,7 @@ package com.grimidk.formicempire.classes.entities.services.dynasty;
 
 import com.grimidk.formicempire.classes.constants.unlocks.Synergy;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
-import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 
 import java.util.ArrayList;

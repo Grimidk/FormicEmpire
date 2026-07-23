@@ -932,6 +932,16 @@ public class EnglishTranslation implements Translation {
         en.put("MOVE_FLY_DESC", "Flying movement.");
         en.put("MOVE_PATROL_DESC", "Patrol movement around a pen or post.");
 
+        en.put("CRITTER_CLASS_ANT", "Ant");
+        en.put("CRITTER_CLASS_INSECT", "Insect");
+        en.put("CRITTER_CLASS_ARACHNID", "Arachnid");
+        en.put("CRITTER_CLASS_REPTILE", "Reptile");
+        en.put("CRITTER_CLASS_RODENT", "Rodent");
+        en.put("CRITTER_CLASS_MAMMAL", "Mammal");
+        en.put("CRITTER_CLASS_FUNGI", "Fungi");
+        en.put("CRITTER_CLASS_PLANT", "Plant");
+        en.put("CRITTER_CLASS_XENO", "Xeno");
+
         en.put("BUG_ANT", "Ant");
         en.put("BUG_APHID", "Aphid");
         en.put("BUG_SYMBIOTIC_MITE", "Symbiotic mite");
@@ -1969,7 +1979,7 @@ public class EnglishTranslation implements Translation {
         en.put("TRIGGER_RANK_COUNTY_TITLE", "Ant County");
         en.put("TRIGGER_RANK_COUNTY_MSG", "Your dynasty has grown into an Ant County! New research and construction tiers are within reach as your population expands.");
         en.put("TRIGGER_RANK_DUCHY_TITLE", "Ant Duchy");
-        en.put("TRIGGER_RANK_DUCHY_MSG", "Your dynasty is now an Ant Duchy. Regional influence grows, and higher-tier upgrades and buildings become available.");
+        en.put("TRIGGER_RANK_DUCHY_MSG", "Your dynasty is now an Ant Duchy. Higher-tier upgrades and buildings become available — and the colony is large enough that parasite ants may infiltrate, unlocking the Police role.");
         en.put("TRIGGER_RANK_KINGDOM_TITLE", "Ant Queendom");
         en.put("TRIGGER_RANK_KINGDOM_MSG", "A Queendom rises! Your dynasty commands a kingdom-scale swarm, unlocking the next tier of advancements.");
         en.put("TRIGGER_RANK_SUPER_TITLE", "Ant Super Colony");

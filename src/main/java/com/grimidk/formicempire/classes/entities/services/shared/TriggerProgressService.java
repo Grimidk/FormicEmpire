@@ -1,8 +1,8 @@
 package com.grimidk.formicempire.classes.entities.services.shared;
 
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
-import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.ResourceSource;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
@@ -96,11 +96,11 @@ public final class TriggerProgressService {
                 GameUnlocks.ROLE_POLICE,
                 LanguageStrings.TRIGGER_POLICE_ROLE_TITLE,
                 LanguageStrings.TRIGGER_PROGRESS_HINT_POLICE,
-                LanguageStrings.TRIGGER_PROGRESS_METRIC_POPULATION,
+                LanguageStrings.TRIGGER_PROGRESS_METRIC_RANK,
                 colony.hasUpgrade(GameUnlocks.ROLE_POLICE),
                 true,
-                colony.getRank() != null ? (int) Math.min(Integer.MAX_VALUE, colony.getRank().getPopulation()) : 0,
-                GameNumbers.TRIGGER_POLICE_MIN_POPULATION));
+                colony.getRank() != null ? colony.getRank().getId() : 0,
+                GameConstants.RANK_DUCHY.getId()));
 
         int colonyCount = dynasty != null ? dynasty.getColonies().size() : 0;
         boolean hasDynasty = dynasty != null;
@@ -220,7 +220,7 @@ public final class TriggerProgressService {
                 colony.hasUpgrade(GameUnlocks.ABILITY_CLONING),
                 hasDynasty,
                 rankId,
-                GameConstants.TRIGGER_CLONING_MIN_RANK.getId()));
+                GameConstants.RANK_EMPIRE.getId()));
 
         entries.add(numeric(
                 GameUnlocks.ROLE_SCOUT,

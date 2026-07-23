@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.grimidk.formicempire.classes.constants.unlocks.*;
-import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 
 public final class GameUnlocks {
         private GameUnlocks() {}

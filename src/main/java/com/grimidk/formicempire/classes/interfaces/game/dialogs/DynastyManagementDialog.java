@@ -1,20 +1,20 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
-import com.grimidk.formicempire.classes.constants.ant.AntType;
-import com.grimidk.formicempire.classes.constants.misc.ColonyLoyalty;
-import com.grimidk.formicempire.classes.constants.misc.DiplomaticReputation;
-import com.grimidk.formicempire.classes.constants.misc.PactRequestIncomingPolicy;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.dynasty.colony.ColonyLoyalty;
+import com.grimidk.formicempire.classes.constants.dynasty.DiplomaticReputation;
+import com.grimidk.formicempire.classes.constants.dynasty.PactRequestIncomingPolicy;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
-import com.grimidk.formicempire.classes.constants.misc.Species;
-import com.grimidk.formicempire.classes.constants.misc.TradeMethod;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
+import com.grimidk.formicempire.classes.constants.dynasty.TradeMethod;
 import com.grimidk.formicempire.classes.constants.world.Biome;
-import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
-import com.grimidk.formicempire.classes.entities.Trade;
+import com.grimidk.formicempire.classes.entities.dynasty.Trade;
 import com.grimidk.formicempire.classes.entities.Tunnel;
-import com.grimidk.formicempire.classes.entities.War;
-import com.grimidk.formicempire.classes.entities.CrossDynastyTradeProposal;
+import com.grimidk.formicempire.classes.entities.dynasty.War;
+import com.grimidk.formicempire.classes.entities.dynasty.CrossDynastyTradeProposal;
 import com.grimidk.formicempire.classes.entities.services.colony.ConvoySceneBuilder;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyTradeAutomation;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDiplomacyService;
@@ -1718,7 +1718,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 @Override
                 public Class<?> getColumnClass(int columnIndex) {
                     if (columnIndex == COL_SPECIES) {
-                        return Species.class;
+                        return AntSpecies.class;
                     }
                     if (columnIndex == COL_STANCE) {
                         return Object.class;
@@ -2615,7 +2615,7 @@ public class DynastyManagementDialog extends ZeroDialog {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            if (value instanceof Species species) {
+            if (value instanceof AntSpecies species) {
                 setText(species.getName());
                 setIcon(species.getIcon());
                 setIconTextGap(8);

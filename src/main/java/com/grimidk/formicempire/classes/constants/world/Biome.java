@@ -1,7 +1,7 @@
 package com.grimidk.formicempire.classes.constants.world;
 
 import com.grimidk.formicempire.classes.constants.Constant;
-import com.grimidk.formicempire.classes.constants.misc.BugType;
+import com.grimidk.formicempire.classes.constants.critter.Species;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 
 import java.util.List;
@@ -15,8 +15,8 @@ public class Biome extends Constant{
     private final float mineralAbundance;
     private final int difficulty;
     private final ImageIcon background;
-    private List<BugType> nativeBugs = List.of();
-    private List<BugType> nativeParasites = List.of();
+    private List<Species> nativeBugs = List.of();
+    private List<Species> nativeParasites = List.of();
 
     public Biome(int id, String name, int temperature, int humidity, float plantAbundance, float animalAbundance,
             float mineralAbundance, int difficulty, ImageIcon icon, ImageIcon background) {
@@ -30,27 +30,27 @@ public class Biome extends Constant{
         this.background = background;
     }
 
-    public void setNativeBugs(List<BugType> nativeBugs) {
+    public void setNativeBugs(List<Species> nativeBugs) {
         this.nativeBugs = nativeBugs == null || nativeBugs.isEmpty()
                 ? List.of()
                 : List.copyOf(nativeBugs);
     }
 
-    public List<BugType> getNativeBugs() {
+    public List<Species> getNativeBugs() {
         return nativeBugs;
     }
 
-    public void setNativeParasites(List<BugType> nativeParasites) {
+    public void setNativeParasites(List<Species> nativeParasites) {
         this.nativeParasites = nativeParasites == null || nativeParasites.isEmpty()
                 ? List.of()
                 : List.copyOf(nativeParasites);
     }
 
-    public List<BugType> getNativeParasites() {
+    public List<Species> getNativeParasites() {
         return nativeParasites;
     }
 
-    public boolean hasNativeParasite(BugType type) {
+    public boolean hasNativeParasite(Species type) {
         return type != null && nativeParasites.contains(type);
     }
 

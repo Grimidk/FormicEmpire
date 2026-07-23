@@ -4,11 +4,11 @@ import com.grimidk.formicempire.classes.entities.services.colony.ColonyStatsServ
 import java.util.HashMap;
 import java.util.Map;
 
-import com.grimidk.formicempire.classes.constants.ant.AntType;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
-import com.grimidk.formicempire.classes.constants.misc.TradeMethod;
-import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.constants.dynasty.TradeMethod;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.Tunnel;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;

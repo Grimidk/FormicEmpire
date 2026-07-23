@@ -1,6 +1,6 @@
 package com.grimidk.formicempire.classes.interfaces;
 
-import com.grimidk.formicempire.classes.constants.misc.DynastyTitle;
+import com.grimidk.formicempire.classes.constants.dynasty.DynastyTitle;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;

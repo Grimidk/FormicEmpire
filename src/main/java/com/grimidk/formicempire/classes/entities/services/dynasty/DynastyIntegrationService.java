@@ -1,8 +1,8 @@
 package com.grimidk.formicempire.classes.entities.services.dynasty;
 
-import com.grimidk.formicempire.classes.constants.misc.Species;
-import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.Tunnel;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
@@ -340,7 +340,7 @@ public final class DynastyIntegrationService {
 
     private static void completeIntegration(World world, Dynasty overlord, Dynasty target, TradeManager tradeManager) {
         List<Colony> colonies = new ArrayList<>(target.getColonies());
-        Species targetSpecies = target.getSpecies();
+        AntSpecies targetSpecies = target.getSpecies();
         clearIntegrationDiplomatDeployment(overlord);
         overlord.clearIntegration();
 

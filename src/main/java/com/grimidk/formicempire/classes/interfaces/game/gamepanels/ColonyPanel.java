@@ -1,13 +1,13 @@
 package com.grimidk.formicempire.classes.interfaces.game.gamepanels;
 
-import com.grimidk.formicempire.classes.constants.ant.AntRole;
-import com.grimidk.formicempire.classes.constants.ant.AntType;
-import com.grimidk.formicempire.classes.constants.misc.ColonyLoyalty;
-import com.grimidk.formicempire.classes.constants.misc.Rank;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.dynasty.colony.ColonyLoyalty;
+import com.grimidk.formicempire.classes.constants.dynasty.Rank;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.constants.world.Season;
-import com.grimidk.formicempire.classes.entities.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyLocationService;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;

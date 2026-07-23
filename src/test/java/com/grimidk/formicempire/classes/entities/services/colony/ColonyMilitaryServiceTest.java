@@ -1,9 +1,9 @@
 package com.grimidk.formicempire.classes.entities.services.colony;
 
 import com.grimidk.formicempire.classes.entities.services.colony.AntSubtypeService;
-import com.grimidk.formicempire.classes.constants.ant.AntSubtypeProfile;
-import com.grimidk.formicempire.classes.entities.Colony;
-import com.grimidk.formicempire.classes.entities.Dynasty;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeProfile;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
@@ -41,10 +41,10 @@ class ColonyMilitaryServiceTest {
         colony.setDynasty(dynasty);
 
         for (int i = 0; i < 20; i++) {
-            colony.getWorkers().add(new com.grimidk.formicempire.classes.entities.Ant(colony, GameConstants.TYPE_WORKER));
+            colony.getWorkers().add(new com.grimidk.formicempire.classes.entities.critter.Ant(colony, GameConstants.TYPE_WORKER));
         }
         for (int i = 0; i < 4; i++) {
-            colony.getSoldiers().add(new com.grimidk.formicempire.classes.entities.Ant(colony, GameConstants.TYPE_SOLDIER));
+            colony.getSoldiers().add(new com.grimidk.formicempire.classes.entities.critter.Ant(colony, GameConstants.TYPE_SOLDIER));
         }
 
         int expected = Math.round(ColonyMilitaryService.computeTypePoints(20, 4, 0, 0, 0) * 1f);
@@ -77,11 +77,11 @@ class ColonyMilitaryServiceTest {
         dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_STINGING);
         colony.setDynasty(dynasty);
 
-        com.grimidk.formicempire.classes.entities.Ant standard = new com.grimidk.formicempire.classes.entities.Ant(
+        com.grimidk.formicempire.classes.entities.critter.Ant standard = new com.grimidk.formicempire.classes.entities.critter.Ant(
                 colony, GameConstants.TYPE_SOLDIER);
         colony.getSoldiers().add(standard);
 
-        com.grimidk.formicempire.classes.entities.Ant stinger = new com.grimidk.formicempire.classes.entities.Ant(
+        com.grimidk.formicempire.classes.entities.critter.Ant stinger = new com.grimidk.formicempire.classes.entities.critter.Ant(
                 colony, GameConstants.TYPE_SOLDIER);
         stinger.setSubtypeProfile(AntSubtypeProfile.of(1, 1, 2, 1));
         AntSubtypeService.applySubtypeStats(stinger, colony);

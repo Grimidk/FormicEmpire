@@ -932,6 +932,16 @@ public class FrenchTranslation implements Translation {
         fr.put("MOVE_FLY_DESC", "Déplacement volant.");
         fr.put("MOVE_PATROL_DESC", "Patrouille autour d'un enclos ou d'un poste.");
 
+        fr.put("CRITTER_CLASS_ANT", "Fourmi");
+        fr.put("CRITTER_CLASS_INSECT", "Insecte");
+        fr.put("CRITTER_CLASS_ARACHNID", "Arachnide");
+        fr.put("CRITTER_CLASS_REPTILE", "Reptile");
+        fr.put("CRITTER_CLASS_RODENT", "Rongeur");
+        fr.put("CRITTER_CLASS_MAMMAL", "Mammifère");
+        fr.put("CRITTER_CLASS_FUNGI", "Champignon");
+        fr.put("CRITTER_CLASS_PLANT", "Plante");
+        fr.put("CRITTER_CLASS_XENO", "Xéno");
+
         fr.put("BUG_ANT", "Fourmi");
         fr.put("BUG_APHID", "Puceron");
         fr.put("BUG_SYMBIOTIC_MITE", "Acarien symbiotique");
@@ -2009,7 +2019,7 @@ public class FrenchTranslation implements Translation {
         fr.put("TRIGGER_RANK_COUNTY_TITLE", "Comté");
         fr.put("TRIGGER_RANK_COUNTY_MSG", "Votre dynastie est devenue un Comté ! De nouveaux paliers de recherche et de construction s'ouvrent à mesure que la population croît.");
         fr.put("TRIGGER_RANK_DUCHY_TITLE", "Duché");
-        fr.put("TRIGGER_RANK_DUCHY_MSG", "Votre dynastie est désormais un Duché. Son influence régionale grandit, et des améliorations et bâtiments de niveau supérieur deviennent disponibles.");
+        fr.put("TRIGGER_RANK_DUCHY_MSG", "Votre dynastie est désormais un Duché. Des améliorations et bâtiments de niveau supérieur deviennent disponibles — et la colonie est assez grande pour que des fourmis parasites s'infiltrent, débloquant le rôle Police.");
         fr.put("TRIGGER_RANK_KINGDOM_TITLE", "Royaume");
         fr.put("TRIGGER_RANK_KINGDOM_MSG", "Un Royaume s'élève ! Votre dynastie commande un essaim à l'échelle d'un royaume et débloque le palier suivant.");
         fr.put("TRIGGER_RANK_SUPER_TITLE", "Super-colonie");

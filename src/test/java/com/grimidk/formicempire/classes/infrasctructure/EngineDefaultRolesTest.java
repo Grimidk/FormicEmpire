@@ -1,6 +1,6 @@
 package com.grimidk.formicempire.classes.infrasctructure;
 
-import com.grimidk.formicempire.classes.constants.ant.AntRole;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import org.junit.jupiter.api.Test;
 
