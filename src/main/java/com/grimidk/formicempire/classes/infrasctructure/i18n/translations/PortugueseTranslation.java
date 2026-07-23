@@ -206,6 +206,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("TRIGGER_PROGRESS_METRIC_TUNNELS", "Túneis concluídos");
         pt.put("TRIGGER_PROGRESS_METRIC_DIPLOMATS", "Diplomatas enviados");
         pt.put("TRIGGER_PROGRESS_METRIC_ABSORBED", "Dinastias absorvidas");
+        pt.put("TRIGGER_PROGRESS_METRIC_WARS", "Guerras participadas");
         pt.put("TRIGGER_PROGRESS_METRIC_RANK", "Nível de posto dinástico");
         pt.put("TRIGGER_PROGRESS_METRIC_PLANTS", "Mega-planta colhida");
         pt.put("TRIGGER_PROGRESS_METRIC_RESOURCES", "Recursos armazenados");
@@ -219,12 +220,16 @@ public class PortugueseTranslation implements Translation {
         pt.put("TRIGGER_PROGRESS_HINT_TUNNELS", "Conclui túneis entre colónias da dinastia. Requer Automação primeiro.");
         pt.put("TRIGGER_PROGRESS_HINT_DIPLOMATS", "Envia diplomatas em missões de lealdade ou reputação. Requer Automação primeiro.");
         pt.put("TRIGGER_PROGRESS_HINT_ABSORBED", "Derrota e absorve outra dinastia.");
+        pt.put("TRIGGER_PROGRESS_HINT_COMMANDER", "Participa em guerras e mantém mais de uma rainha numa colónia para desbloquear Comandante.");
         pt.put("TRIGGER_PROGRESS_HINT_RANK", "Alcança o posto dinástico Império para desbloquear Clonagem (integridade por assimilação e zangões assimilados).");
         pt.put("TRIGGER_PROGRESS_HINT_SCOUT", "Colhe plantas suficientes de qualquer fonte de plantas descoberta.");
         pt.put("TRIGGER_PROGRESS_HINT_PARASITIC_MITE", "Acumula recursos. Surtos (biomas frios, outono/inverno) desbloqueiam a captura de ácaros simbióticos em toda a dinastia.");
         pt.put("SYNERGY_SUPER_VENOM", "Super Veneno");
         pt.put("SYNERGY_SUPER_VENOM_FLAVOR", "Super Veneno");
         pt.put("SYNERGY_SUPER_VENOM_DESC", "Substitui o empilhamento de veneno de fogo + neurotóxico (+50% cada) por um bónus de ataque de +200% (3x total) quando ambos os venenos estão assimilados e Sinergias foram pesquisadas.");
+        pt.put("SYNERGY_ACID_ARTILLERY", "Artilharia ácida");
+        pt.put("SYNERGY_ACID_ARTILLERY_FLAVOR", "Obuses vivos");
+        pt.put("SYNERGY_ACID_ARTILLERY_DESC", "Desbloqueia a função Artilharia para majors. Majors de artilharia ganham a habilidade Artilharia ácida (500% dano, 50% precisão). Requer assimilação de Cuspe ácido e formigas Major.");
 
         pt.put("DIALOG_HATCH_RATES_TITLE", "Taxas de eclosão");
         pt.put("HATCH_DESC", "Definir probabilidade de eclosão:");
@@ -244,6 +249,18 @@ public class PortugueseTranslation implements Translation {
         pt.put("SUBTYPE_HEAD_DOORHEAD_DESC", "Cabeça-escudo: +20% defesa.");
         pt.put("SUBTYPE_ABDOMEN_STINGER_DESC", "Abdômen ferrão: 1.5x ataque. Soma-se a outros bônus de ataque de subtipo (com Mandíbula-armadilha: 3x no total, não 2.25x).");
         pt.put("SUBTYPE_ABDOMEN_HONEYPOT_DESC", "Abdômen honeypot: 4x coleta e capacidade de carga; 0.75x velocidade; +15% regeneração.");
+
+        pt.put("SKILL_BASIC_BITE", "Mordida básica");
+        pt.put("SKILL_POWERFUL_BITE", "Mordida poderosa");
+        pt.put("SKILL_STINGING", "Ferrão");
+        pt.put("SKILL_SHIELDING", "Escudo");
+        pt.put("SKILL_BOOST_REGEN", "Regeneração reforçada");
+        pt.put("SKILL_ACID_SPITTING", "Cuspe ácido");
+        pt.put("SKILL_ACID_ARTILLERY", "Artilharia ácida");
+
+        pt.put("BATTLE_LINE_INFANTRY", "Infantaria");
+        pt.put("BATTLE_LINE_ARTILLERY", "Artilharia");
+        pt.put("BATTLE_LINE_AIR_SUPPORT", "Apoio aéreo");
 
         pt.put("DIALOG_ABILITIES_TITLE", "Operações da colônia");
         pt.put("ABILITY_RP_LABEL", "Pontos de pesquisa: %s");
@@ -525,9 +542,9 @@ public class PortugueseTranslation implements Translation {
         pt.put("BATTLE_LOCATION_FMT", "Em %s");
         pt.put("BATTLE_POWER_FMT", "%s: %s");
         pt.put("BATTLE_FORCES_FMT", "Forças: %s vs %s formigas");
-        pt.put("BATTLE_PHASE_CLASH", "Choque frontal");
-        pt.put("BATTLE_PHASE_RESERVE", "Assalto às reservas");
-        pt.put("BATTLE_PHASE_REDEPLOY", "Redeploy");
+        pt.put("BATTLE_PHASE_CLASH", "Choque fronteiriço");
+        pt.put("BATTLE_PHASE_RESERVE", "Cerco de colônia");
+        pt.put("BATTLE_PHASE_REDEPLOY", "Redistribuição");
         pt.put("BATTLE_REDEPLOY_FMT", "Redeploy (%s h restantes)");
         pt.put("DIALOG_CONVOY_TITLE", "Comboio");
         pt.put("CONVOY_ACTION_VIEW", "Ver comboio");
@@ -577,6 +594,8 @@ public class PortugueseTranslation implements Translation {
         pt.put("STAT_LOYALTY", "Lealdade");
         pt.put("STAT_MILITARY_POWER", "Poder militar");
         pt.put("STAT_MILITARY_POWER_DESC", "Contagem de tipos adultos ponderada pelas estatísticas de combate base. Em guerra, as atribuições de papéis de guerra separam a força ativa (linha de frente) e de reserva. Atualizado uma vez por dia.");
+        pt.put("STAT_COMBAT_CAPACITY", "Capacidade de combate");
+        pt.put("STAT_COMBAT_CAPACITY_DESC", "Quantos combatentes a tua dinastia pode enviar. Começa em 1.000; atribuir uma Rainha como Comandante sobe para 2.500. Os limites de implantação ainda não são aplicados.");
         pt.put("STAT_ACTIVE_MILITARY_POWER", "Poder militar ativo");
         pt.put("STAT_RESERVE_MILITARY_POWER", "Poder militar de reserva");
         pt.put("DYNASTY_REPUTATION", "Reputação");
@@ -768,6 +787,8 @@ public class PortugueseTranslation implements Translation {
         pt.put("DYNASTY_THEME_COPPER", "Cobre");
         pt.put("DYNASTY_THEME_BRONZE", "Bronze");
         pt.put("DYNASTY_THEME_EMERALD", "Esmeralda");
+        pt.put("DYNASTY_THEME_GREEN", "Verde");
+        pt.put("DYNASTY_THEME_ACID", "Ácido");
         pt.put("DYNASTY_THEME_SAPPHIRE", "Safira");
         pt.put("DYNASTY_THEME_QUARTZ", "Quartzo");
         pt.put("DYNASTY_THEME_GRANITE", "Granito");
@@ -936,6 +957,8 @@ public class PortugueseTranslation implements Translation {
         pt.put("CRITTER_CLASS_INSECT", "Inseto");
         pt.put("CRITTER_CLASS_ARACHNID", "Aracnídeo");
         pt.put("CRITTER_CLASS_REPTILE", "Réptil");
+        pt.put("CRITTER_CLASS_AMPHIBIAN", "Anfíbio");
+        pt.put("CRITTER_CLASS_BIRD", "Ave");
         pt.put("CRITTER_CLASS_RODENT", "Roedor");
         pt.put("CRITTER_CLASS_MAMMAL", "Mamífero");
         pt.put("CRITTER_CLASS_FUNGI", "Fungo");
@@ -988,6 +1011,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("ROLE_DIPLOMAT", "Diplomata");
         pt.put("ROLE_LAYER", "Postura de ovos");
         pt.put("ROLE_RESEARCHER", "Pesquisadora");
+        pt.put("ROLE_COMMANDER", "Comandante");
         pt.put("ROLE_MILITIA", "Milícia auxiliar");
         pt.put("ROLE_CATCHER", "Capturadora");
         pt.put("ROLE_CRANE", "Guindaste");
@@ -1102,7 +1126,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("DIPLO_ERROR_PACT_DECLINE_COOLDOWN_FMT", "Aguarde mais %s mês(es) após um pacto recusado antes de solicitar novamente.");
         pt.put("DIPLO_ERROR_TRADE_DECLINE_COOLDOWN_FMT", "Aguarde mais %s mês(es) após uma proposta comercial recusada antes de propor novamente.");
         pt.put("DIPLO_ERROR_WAR_POPULATION_FMT", "A sua dinastia precisa de pelo menos %s formigas antes de declarar guerra ou configurar funções de economia de guerra.");
-        pt.put("DIPLO_ERROR_WAR_ACTIVE_MILITARY", "Atribua funções militares activas na economia de guerra (Guerreira, Defensora, Milícia ou Bruto) antes de declarar guerra.");
+        pt.put("DIPLO_ERROR_WAR_ACTIVE_MILITARY", "Atribua funções militares activas na economia de guerra (Guerreira, Defensora, Milícia, Bruto ou Comandante) antes de declarar guerra.");
         pt.put("DIPLO_ERROR_WAR_TARGET_ACTIVE_MILITARY_FMT", "%s ainda não pode ser atacada — não tem funções militares activas.");
         pt.put("DIPLO_ERROR_WAR_NO_BORDER", "Só é possível declarar guerra a uma dinastia fronteiriça.");
         pt.put("DIPLO_ACTION_TRADE", "Comerciar");
@@ -1218,6 +1242,8 @@ public class PortugueseTranslation implements Translation {
         pt.put("SPECIES_SHININGBLACK_SCIENTIFIC", "Lasius Fuliginosus");
         pt.put("SPECIES_DESERT", "Formiga do Deserto");
         pt.put("SPECIES_DESERT_SCIENTIFIC", "Cataglyphis Fortis");
+        pt.put("SPECIES_GREEN", "Formiga Verde");
+        pt.put("SPECIES_GREEN_SCIENTIFIC", "Formica Rufa");
         pt.put("ASSIMILATED_TRAPJAW_FLAVOR", "Mandíbulas de Mola");
         pt.put("ASSIMILATED_TRAPJAW_DESC", "Desbloqueia o subtipo de cabeça Mandíbula-armadilha. Contribui 1.5x ataque; acumula por soma com outros bônus de ataque de subtipo.");
         pt.put("ASSIMILATION_TRAPJAW", "Assimilação Formiga Armadilha");
@@ -1294,6 +1320,10 @@ public class PortugueseTranslation implements Translation {
         pt.put("ASSIMILATED_LOCSENSE_DESC", "Sua dinastia pode navegar longas rotas desérticas com bússola solar e contagem de passos. (Mecânica em desenvolvimento.)");
         pt.put("ASSIMILATION_LOCSENSE", "Assimilação Formiga do Deserto");
         pt.put("ASSIMILATION_LOCSENSE_DESC", "Após assimilar o genoma da formiga do deserto:");
+        pt.put("ASSIMILATED_ACIDSPIT_FLAVOR", "Bateria fórmica");
+        pt.put("ASSIMILATED_ACIDSPIT_DESC", "Desbloqueia a habilidade Cuspe ácido para as formigas da sua colônia.");
+        pt.put("ASSIMILATION_ACIDSPIT", "Assimilação Formiga Verde");
+        pt.put("ASSIMILATION_ACIDSPIT_DESC", "Após assimilar o genoma da formiga verde:");
 
         pt.put("METHOD_LAND", "Terra");
         pt.put("METHOD_AIR", "Ar");
@@ -1348,6 +1378,9 @@ public class PortugueseTranslation implements Translation {
         pt.put("ROLE_RESEARCHER_UPGRADE", "Função pesquisadora");
         pt.put("ROLE_RESEARCHER_FLAVOR", "Ciência formiga");
         pt.put("ROLE_RESEARCHER_DESC", "Permite que rainhas gerem pontos de pesquisa. 1 rainha gera 1 ponto por hora.");
+        pt.put("ROLE_COMMANDER_UPGRADE", "Função comandante");
+        pt.put("ROLE_COMMANDER_FLAVOR", "Senhora de guerra real");
+        pt.put("ROLE_COMMANDER_DESC", "Função militar activa para rainhas. Atribuir uma Comandante sobe a capacidade de combate da dinastia de 1.000 para 2.500.");
         pt.put("ROLE_BUILDER_UPGRADE", "Função construtora");
         pt.put("ROLE_BUILDER_FLAVOR", "Construção de base");
         pt.put("ROLE_BUILDER_DESC", "Permite que operárias construam novas câmaras na colônia.");
@@ -1736,6 +1769,8 @@ public class PortugueseTranslation implements Translation {
         pt.put("ASSIMILATION_HIVEBUILD_DESC", "Após assimilar o genoma da formiga preta brilhante:");
         pt.put("ASSIMILATION_LOCSENSE", "Assimilação Formiga do Deserto");
         pt.put("ASSIMILATION_LOCSENSE_DESC", "Após assimilar o genoma da formiga do deserto:");
+        pt.put("ASSIMILATION_ACIDSPIT", "Assimilação Formiga Verde");
+        pt.put("ASSIMILATION_ACIDSPIT_DESC", "Após assimilar o genoma da formiga verde:");
 
         pt.put("HELP_TAB_WELCOME", "Boas-vindas");
         pt.put("HELP_TAB_STARTED", "Primeiros passos");
@@ -1753,6 +1788,23 @@ public class PortugueseTranslation implements Translation {
         pt.put("HELP_TAB_BUILDINGS", "Edifícios");
         pt.put("HELP_TAB_ASSIMILATIONS", "Assimilações");
         pt.put("HELP_TAB_SYNERGIES", "Sinergias");
+        pt.put("HELP_TAB_COMBAT", "Combate");
+        pt.put("HELP_COMBAT_INTRO", "O combate usa <b>habilidades</b> (multiplicadores de precisão e dano), <b>linhas de batalha</b> (faixas de funções e acerto) e as <b>fases</b> / <b>posição</b> de guerra nas campanhas.");
+        pt.put("HELP_COMBAT_SKILLS", "Habilidades");
+        pt.put("HELP_COMBAT_BATTLE_LINES", "Linhas de batalha");
+        pt.put("HELP_COMBAT_WAR_PHASES", "Fases de etapa de guerra");
+        pt.put("HELP_COMBAT_WAR_STANDING", "Posição na guerra");
+        pt.put("HELP_SKILL_ACCURACY_FMT", "Precisão: %s");
+        pt.put("HELP_SKILL_DAMAGE_FMT", "Dano: %s");
+        pt.put("HELP_BATTLE_LINE_ACCURACY_FMT", "Precisão base: %s");
+        pt.put("HELP_BATTLE_LINE_ROLES_FMT", "Funções: %s");
+        pt.put("HELP_BATTLE_LINE_ROLES_NONE", "Funções: nenhuma ainda");
+        pt.put("HELP_WAR_PHASE_CLASH_DESC", "Batalha inicial na fronteira disputada entre as duas dinastias.");
+        pt.put("HELP_WAR_PHASE_RESERVE_DESC", "Cerco a uma colônia após o choque fronteiriço.");
+        pt.put("HELP_WAR_PHASE_REDEPLOY_DESC", "As forças deslocam-se para o próximo alvo após uma batalha.");
+        pt.put("HELP_WAR_STANDING_WINNING_DESC", "O seu lado lidera a guerra pelo poder de combate.");
+        pt.put("HELP_WAR_STANDING_LOSING_DESC", "O inimigo lidera a guerra pelo poder de combate.");
+        pt.put("HELP_WAR_STANDING_EVEN_DESC", "Nenhum lado tem vantagem clara de poder de combate.");
         pt.put("HELP_TAB_WORLD", "Mundo");
         pt.put("HELP_TAB_UI", "Controles da interface");
         pt.put("HELP_UI_INTRO", "Durante uma sessão de colônia, a barra de controle inferior direita ajusta a velocidade da simulação, a pausa e abre o menu do jogo.");
@@ -2050,6 +2102,8 @@ public class PortugueseTranslation implements Translation {
         pt.put("TRIGGER_BREEDER_ROLE_MSG", "Ao desbloquear os tipos Princesa e Drone, a função 'Criador' foi desbloqueada automaticamente.");
         pt.put("TRIGGER_BRUTE_ROLE_TITLE", "Soldado pesado");
         pt.put("TRIGGER_BRUTE_ROLE_MSG", "Ao desbloquear o tipo Major, a função 'Bruto' foi desbloqueada automaticamente.");
+        pt.put("TRIGGER_COMMANDER_ROLE_TITLE", "Comando de campo");
+        pt.put("TRIGGER_COMMANDER_ROLE_MSG", "Com várias rainhas e experiência de guerra, uma Rainha pode assumir a função de Comandante — aumentando a capacidade de combate da dinastia.");
         pt.put("TRIGGER_SPREAD_ABILITY_TITLE", "Colonização");
         pt.put("TRIGGER_SPREAD_ABILITY_MSG", "Com a capacidade de criar novas rainhas, a tua colónia agora sabe como se expandir. Podes fundar novas colónias no mapa mundial (M).");
         pt.put("TRIGGER_SCOUT_ROLE_TITLE", "Chamada da aventura");
@@ -2086,6 +2140,8 @@ public class PortugueseTranslation implements Translation {
         pt.put("TRIGGER_SUBTYPE_HATCH_MSG", "Traços assimilados podem mudar a eclosão! Abre Taxas de eclosão (P) para definir subtipos por tipo; cada parte ativa adiciona +50% de alimento.");
         pt.put("TRIGGER_SYNERGY_SUPER_VENOM_TITLE", "Sinergia desbloqueada");
         pt.put("TRIGGER_SYNERGY_SUPER_VENOM_MSG", "%s já está ativa! Combinar %s substitui os +50% separados por um bónus de ataque de +200% (3x total). Abra Sinergias (O) para rever.");
+        pt.put("TRIGGER_SYNERGY_ACID_ARTILLERY_TITLE", "Sinergia desbloqueada");
+        pt.put("TRIGGER_SYNERGY_ACID_ARTILLERY_MSG", "%s já está ativa! Combinar %s desbloqueia a função Artilharia para majors e a habilidade Artilharia ácida. Abra Sinergias (O) para rever.");
         pt.put("TRIGGER_OPERATIONS_ABILITY_TITLE", "Operações da colónia");
         pt.put("TRIGGER_OPERATIONS_ABILITY_MSG", "Ganhaste uma habilidade ativa especial! Agora podes aceder ao menu de Operações da colónia premindo (Z).");
 

@@ -206,6 +206,7 @@ public class FrenchTranslation implements Translation {
         fr.put("TRIGGER_PROGRESS_METRIC_TUNNELS", "Tunnels terminés");
         fr.put("TRIGGER_PROGRESS_METRIC_DIPLOMATS", "Diplomates envoyés");
         fr.put("TRIGGER_PROGRESS_METRIC_ABSORBED", "Dynasties absorbées");
+        fr.put("TRIGGER_PROGRESS_METRIC_WARS", "Guerres menées");
         fr.put("TRIGGER_PROGRESS_METRIC_RANK", "Niveau de rang dynastique");
         fr.put("TRIGGER_PROGRESS_METRIC_PLANTS", "Méga-plante récoltée");
         fr.put("TRIGGER_PROGRESS_METRIC_RESOURCES", "Ressources stockées");
@@ -219,12 +220,16 @@ public class FrenchTranslation implements Translation {
         fr.put("TRIGGER_PROGRESS_HINT_TUNNELS", "Achevez des tunnels entre colonies de la dynastie. Nécessite d'abord Automatisation.");
         fr.put("TRIGGER_PROGRESS_HINT_DIPLOMATS", "Envoyez des diplomates en missions de loyauté ou de réputation. Nécessite d'abord Automatisation.");
         fr.put("TRIGGER_PROGRESS_HINT_ABSORBED", "Vainquez et absorbez une autre dynastie.");
+        fr.put("TRIGGER_PROGRESS_HINT_COMMANDER", "Participez à des guerres et gardez plus d'une reine dans une colonie pour débloquer Commandante.");
         fr.put("TRIGGER_PROGRESS_HINT_RANK", "Atteignez le rang dynastique Empire pour débloquer le Clonage (intégrité par assimilation et mâles assimilés).");
         fr.put("TRIGGER_PROGRESS_HINT_SCOUT", "Récoltez assez de plantes depuis n'importe quelle source de plantes découverte.");
         fr.put("TRIGGER_PROGRESS_HINT_PARASITIC_MITE", "Stockez des ressources. Les épidémies (biomes froids, automne/hiver) débloquent la capture d'acariens symbiotiques pour toute la dynastie.");
         fr.put("SYNERGY_SUPER_VENOM", "Super Venin");
         fr.put("SYNERGY_SUPER_VENOM_FLAVOR", "Super Venin");
         fr.put("SYNERGY_SUPER_VENOM_DESC", "Remplace l'empilement venin de feu + neurotoxique (+50 % chacun) par un bonus d'attaque de +200 % (3x au total) lorsque les deux venins sont assimilés et que les Synergies sont recherchées.");
+        fr.put("SYNERGY_ACID_ARTILLERY", "Artillerie acide");
+        fr.put("SYNERGY_ACID_ARTILLERY_FLAVOR", "Obusiers vivants");
+        fr.put("SYNERGY_ACID_ARTILLERY_DESC", "Débloque le rôle Artillerie pour les majores. Les majores d'artillerie gagnent la compétence Artillerie acide (500 % dégâts, 50 % précision). Nécessite l'assimilation Crachat d'acide et des fourmis Majores.");
 
         fr.put("DIALOG_HATCH_RATES_TITLE", "Taux d'éclosion des nymphes");
         fr.put("HATCH_DESC", "Probabilité d'éclosion pour les nouvelles fourmis :");
@@ -244,6 +249,18 @@ public class FrenchTranslation implements Translation {
         fr.put("SUBTYPE_HEAD_DOORHEAD_DESC", "Tête-bouclier : +20 % de défense.");
         fr.put("SUBTYPE_ABDOMEN_STINGER_DESC", "Abdomen dard : 1,5x attaque. S'additionne aux autres bonus d'attaque de sous-type (avec Mâchoire-piège : 3x au total, pas 2,25x).");
         fr.put("SUBTYPE_ABDOMEN_HONEYPOT_DESC", "Abdomen honeypot : 4x collecte et capacité de port ; 0,75x vitesse ; +15 % régénération.");
+
+        fr.put("SKILL_BASIC_BITE", "Morsure basique");
+        fr.put("SKILL_POWERFUL_BITE", "Morsure puissante");
+        fr.put("SKILL_STINGING", "Piqûre");
+        fr.put("SKILL_SHIELDING", "Bouclier");
+        fr.put("SKILL_BOOST_REGEN", "Régénération renforcée");
+        fr.put("SKILL_ACID_SPITTING", "Crachat d'acide");
+        fr.put("SKILL_ACID_ARTILLERY", "Artillerie acide");
+
+        fr.put("BATTLE_LINE_INFANTRY", "Infanterie");
+        fr.put("BATTLE_LINE_ARTILLERY", "Artillerie");
+        fr.put("BATTLE_LINE_AIR_SUPPORT", "Appui aérien");
 
         fr.put("DIALOG_ABILITIES_TITLE", "Opérations de colonie");
         fr.put("ABILITY_RP_LABEL", "Points de recherche : %s");
@@ -525,8 +542,8 @@ public class FrenchTranslation implements Translation {
         fr.put("BATTLE_LOCATION_FMT", "À %s");
         fr.put("BATTLE_POWER_FMT", "%s : %s");
         fr.put("BATTLE_FORCES_FMT", "Forces : %s vs %s fourmis");
-        fr.put("BATTLE_PHASE_CLASH", "Affrontement");
-        fr.put("BATTLE_PHASE_RESERVE", "Assaut des réserves");
+        fr.put("BATTLE_PHASE_CLASH", "Affrontement frontalier");
+        fr.put("BATTLE_PHASE_RESERVE", "Siège de colonie");
         fr.put("BATTLE_PHASE_REDEPLOY", "Redéploiement");
         fr.put("BATTLE_REDEPLOY_FMT", "Redéploiement (%s h restantes)");
         fr.put("DIALOG_CONVOY_TITLE", "Convoi");
@@ -577,6 +594,8 @@ public class FrenchTranslation implements Translation {
         fr.put("STAT_LOYALTY", "Loyauté");
         fr.put("STAT_MILITARY_POWER", "Puissance militaire");
         fr.put("STAT_MILITARY_POWER_DESC", "Effectifs par type adulte pondérés par les stats de combat de base. En guerre, les rôles de guerre séparent la force active (première ligne) et de réserve. Mis à jour une fois par jour.");
+        fr.put("STAT_COMBAT_CAPACITY", "Capacité de combat");
+        fr.put("STAT_COMBAT_CAPACITY_DESC", "Combien de combattants votre dynastie peut déployer. Commence à 1 000 ; assigner une Reine comme Commandante la porte à 2 500. Les limites de déploiement ne sont pas encore appliquées.");
         fr.put("STAT_ACTIVE_MILITARY_POWER", "Puissance militaire active");
         fr.put("STAT_RESERVE_MILITARY_POWER", "Puissance militaire de réserve");
         fr.put("DYNASTY_REPUTATION", "Réputation");
@@ -768,6 +787,8 @@ public class FrenchTranslation implements Translation {
         fr.put("DYNASTY_THEME_COPPER", "Cuivre");
         fr.put("DYNASTY_THEME_BRONZE", "Bronze");
         fr.put("DYNASTY_THEME_EMERALD", "Émeraude");
+        fr.put("DYNASTY_THEME_GREEN", "Vert");
+        fr.put("DYNASTY_THEME_ACID", "Acide");
         fr.put("DYNASTY_THEME_SAPPHIRE", "Saphir");
         fr.put("DYNASTY_THEME_QUARTZ", "Quartz");
         fr.put("DYNASTY_THEME_GRANITE", "Granit");
@@ -936,6 +957,8 @@ public class FrenchTranslation implements Translation {
         fr.put("CRITTER_CLASS_INSECT", "Insecte");
         fr.put("CRITTER_CLASS_ARACHNID", "Arachnide");
         fr.put("CRITTER_CLASS_REPTILE", "Reptile");
+        fr.put("CRITTER_CLASS_AMPHIBIAN", "Amphibien");
+        fr.put("CRITTER_CLASS_BIRD", "Oiseau");
         fr.put("CRITTER_CLASS_RODENT", "Rongeur");
         fr.put("CRITTER_CLASS_MAMMAL", "Mammifère");
         fr.put("CRITTER_CLASS_FUNGI", "Champignon");
@@ -988,6 +1011,7 @@ public class FrenchTranslation implements Translation {
         fr.put("ROLE_DIPLOMAT", "Diplomate");
         fr.put("ROLE_LAYER", "Pondeuse");
         fr.put("ROLE_RESEARCHER", "Chercheuse");
+        fr.put("ROLE_COMMANDER", "Commandante");
         fr.put("ROLE_MILITIA", "Milice auxiliaire");
         fr.put("ROLE_CATCHER", "Capturatrice");
         fr.put("ROLE_CRANE", "Grue de chantier");
@@ -1102,7 +1126,7 @@ public class FrenchTranslation implements Translation {
         fr.put("DIPLO_ERROR_PACT_DECLINE_COOLDOWN_FMT", "Vous devez attendre encore %s mois après un pacte refusé avant de redemander.");
         fr.put("DIPLO_ERROR_TRADE_DECLINE_COOLDOWN_FMT", "Vous devez attendre encore %s mois après une proposition commerciale refusée avant de reproposer.");
         fr.put("DIPLO_ERROR_WAR_POPULATION_FMT", "Votre dynastie doit compter au moins %s fourmis avant de déclarer la guerre ou configurer les rôles de guerre.");
-        fr.put("DIPLO_ERROR_WAR_ACTIVE_MILITARY", "Assignez des rôles militaires actifs en économie de guerre (Guerrière, Défenseuse, Milice ou Brute) avant de déclarer la guerre.");
+        fr.put("DIPLO_ERROR_WAR_ACTIVE_MILITARY", "Assignez des rôles militaires actifs en économie de guerre (Guerrière, Défenseuse, Milice, Brute ou Commandante) avant de déclarer la guerre.");
         fr.put("DIPLO_ERROR_WAR_TARGET_ACTIVE_MILITARY_FMT", "%s ne peut pas encore être attaquée : aucun rôle militaire actif.");
         fr.put("DIPLO_ERROR_WAR_NO_BORDER", "On ne peut déclarer la guerre qu'à une dynastie voisine.");
         fr.put("DIPLO_ACTION_TRADE", "Commerce");
@@ -1218,6 +1242,8 @@ public class FrenchTranslation implements Translation {
         fr.put("SPECIES_SHININGBLACK_SCIENTIFIC", "Lasius Fuliginosus");
         fr.put("SPECIES_DESERT", "Fourmi du Désert");
         fr.put("SPECIES_DESERT_SCIENTIFIC", "Cataglyphis Fortis");
+        fr.put("SPECIES_GREEN", "Fourmi Verte");
+        fr.put("SPECIES_GREEN_SCIENTIFIC", "Formica Rufa");
         fr.put("ASSIMILATED_TRAPJAW_FLAVOR", "Mâchoires à Ressort");
         fr.put("ASSIMILATED_TRAPJAW_DESC", "Débloque le sous-type de tête Mâchoire-piège. Apporte 1,5x attaque ; s'empile par addition avec les autres bonus d'attaque de sous-type.");
         fr.put("ASSIMILATION_TRAPJAW", "Assimilation fourmi piège-mâchoire");
@@ -1294,6 +1320,10 @@ public class FrenchTranslation implements Translation {
         fr.put("ASSIMILATED_LOCSENSE_DESC", "Votre dynastie peut naviguer de longues routes désertiques. (Mécanique en développement.)");
         fr.put("ASSIMILATION_LOCSENSE", "Assimilation fourmi du désert");
         fr.put("ASSIMILATION_LOCSENSE_DESC", "Après assimilation du génome de la fourmi du désert :");
+        fr.put("ASSIMILATED_ACIDSPIT_FLAVOR", "Batterie formique");
+        fr.put("ASSIMILATED_ACIDSPIT_DESC", "Débloque la compétence Crachat d'acide pour les fourmis de votre colonie.");
+        fr.put("ASSIMILATION_ACIDSPIT", "Assimilation fourmi verte");
+        fr.put("ASSIMILATION_ACIDSPIT_DESC", "Après assimilation du génome de la fourmi verte :");
 
         fr.put("METHOD_LAND", "Terre");
         fr.put("METHOD_AIR", "Air");
@@ -1348,6 +1378,9 @@ public class FrenchTranslation implements Translation {
         fr.put("ROLE_RESEARCHER_UPGRADE", "Rôle chercheuse");
         fr.put("ROLE_RESEARCHER_FLAVOR", "Science fourmi");
         fr.put("ROLE_RESEARCHER_DESC", "Permet aux reines de générer des points de recherche. 1 reine = 1 point par heure.");
+        fr.put("ROLE_COMMANDER_UPGRADE", "Rôle commandante");
+        fr.put("ROLE_COMMANDER_FLAVOR", "Seigneur de guerre royale");
+        fr.put("ROLE_COMMANDER_DESC", "Rôle militaire actif pour les reines. Assigner une Commandante porte la capacité de combat dynastique de 1 000 à 2 500.");
         fr.put("ROLE_BUILDER_UPGRADE", "Rôle constructrice");
         fr.put("ROLE_BUILDER_FLAVOR", "Construction de base");
         fr.put("ROLE_BUILDER_DESC", "Permet de construire de nouvelles salles dans la colonie.");
@@ -1736,6 +1769,8 @@ public class FrenchTranslation implements Translation {
         fr.put("ASSIMILATION_HIVEBUILD_DESC", "Après assimilation du génome de la fourmi noire brillante :");
         fr.put("ASSIMILATION_LOCSENSE", "Assimilation fourmi du désert");
         fr.put("ASSIMILATION_LOCSENSE_DESC", "Après assimilation du génome de la fourmi du désert :");
+        fr.put("ASSIMILATION_ACIDSPIT", "Assimilation fourmi verte");
+        fr.put("ASSIMILATION_ACIDSPIT_DESC", "Après assimilation du génome de la fourmi verte :");
 
         fr.put("HELP_TAB_WELCOME", "Bienvenue");
         fr.put("HELP_TAB_STARTED", "Prise en main");
@@ -1753,6 +1788,23 @@ public class FrenchTranslation implements Translation {
         fr.put("HELP_TAB_BUILDINGS", "Bâtiments");
         fr.put("HELP_TAB_ASSIMILATIONS", "Assimilations");
         fr.put("HELP_TAB_SYNERGIES", "Synergies");
+        fr.put("HELP_TAB_COMBAT", "Combat");
+        fr.put("HELP_COMBAT_INTRO", "Le combat utilise des <b>compétences</b> (multiplicateurs de précision et de dégâts), des <b>lignes de bataille</b> (bandes de rôles et chances de toucher) et les <b>phases</b> / <b>position</b> de guerre pendant les campagnes.");
+        fr.put("HELP_COMBAT_SKILLS", "Compétences");
+        fr.put("HELP_COMBAT_BATTLE_LINES", "Lignes de bataille");
+        fr.put("HELP_COMBAT_WAR_PHASES", "Phases d'étape de guerre");
+        fr.put("HELP_COMBAT_WAR_STANDING", "Position de guerre");
+        fr.put("HELP_SKILL_ACCURACY_FMT", "Précision : %s");
+        fr.put("HELP_SKILL_DAMAGE_FMT", "Dégâts : %s");
+        fr.put("HELP_BATTLE_LINE_ACCURACY_FMT", "Précision de base : %s");
+        fr.put("HELP_BATTLE_LINE_ROLES_FMT", "Rôles : %s");
+        fr.put("HELP_BATTLE_LINE_ROLES_NONE", "Rôles : aucun pour l'instant");
+        fr.put("HELP_WAR_PHASE_CLASH_DESC", "Bataille d'ouverture à la frontière contestée entre les deux dynasties.");
+        fr.put("HELP_WAR_PHASE_RESERVE_DESC", "Assaut de siège contre une colonie après l'affrontement frontalier.");
+        fr.put("HELP_WAR_PHASE_REDEPLOY_DESC", "Les forces se déplacent vers la prochaine cible après une bataille.");
+        fr.put("HELP_WAR_STANDING_WINNING_DESC", "Votre camp mène la guerre en puissance de combat.");
+        fr.put("HELP_WAR_STANDING_LOSING_DESC", "L'ennemi mène la guerre en puissance de combat.");
+        fr.put("HELP_WAR_STANDING_EVEN_DESC", "Aucun camp n'a d'avantage clair en puissance de combat.");
         fr.put("HELP_TAB_WORLD", "Monde");
         fr.put("HELP_TAB_UI", "Contrôles de l'interface");
         fr.put("HELP_UI_INTRO", "Pendant une session de colonie, la barre en bas à droite règle la vitesse de simulation, la pause et ouvre le menu du jeu.");
@@ -2050,6 +2102,8 @@ public class FrenchTranslation implements Translation {
         fr.put("TRIGGER_BREEDER_ROLE_MSG", "Le déblocage des types Princesse et Drone a automatiquement débloqué le rôle « Éleveur ».");
         fr.put("TRIGGER_BRUTE_ROLE_TITLE", "Soldat lourd");
         fr.put("TRIGGER_BRUTE_ROLE_MSG", "Le déblocage du type Major a automatiquement débloqué le rôle « Brute ».");
+        fr.put("TRIGGER_COMMANDER_ROLE_TITLE", "Commandement de campagne");
+        fr.put("TRIGGER_COMMANDER_ROLE_MSG", "Avec plusieurs reines et l'expérience de la guerre, une Reine peut prendre le rôle de Commandante — augmentant la capacité de combat de votre dynastie.");
         fr.put("TRIGGER_SPREAD_ABILITY_TITLE", "Colonisation");
         fr.put("TRIGGER_SPREAD_ABILITY_MSG", "Avec la capacité d'élever de nouvelles reines, votre colonie sait maintenant se propager. Vous pouvez fonder de nouvelles colonies depuis la carte du monde (M).");
         fr.put("TRIGGER_SCOUT_ROLE_TITLE", "Appel de l'aventure");
@@ -2086,6 +2140,8 @@ public class FrenchTranslation implements Translation {
         fr.put("TRIGGER_SUBTYPE_HATCH_MSG", "Les traits assimilés peuvent changer l'éclosion ! Ouvrez Taux d'éclosion (P) pour régler les sous-types par type ; chaque partie active ajoute +50 % d'aliment.");
         fr.put("TRIGGER_SYNERGY_SUPER_VENOM_TITLE", "Synergie débloquée");
         fr.put("TRIGGER_SYNERGY_SUPER_VENOM_MSG", "%s est maintenant active ! Combiner %s remplace leurs +50 % séparés par un bonus d'attaque de +200 % (3x au total). Ouvrez Synergies (O) pour consulter.");
+        fr.put("TRIGGER_SYNERGY_ACID_ARTILLERY_TITLE", "Synergie débloquée");
+        fr.put("TRIGGER_SYNERGY_ACID_ARTILLERY_MSG", "%s est maintenant active ! Combiner %s débloque le rôle Artillerie pour les majores et la compétence Artillerie acide. Ouvrez Synergies (O) pour consulter.");
         fr.put("TRIGGER_OPERATIONS_ABILITY_TITLE", "Opérations de colonie");
         fr.put("TRIGGER_OPERATIONS_ABILITY_MSG", "Vous avez obtenu une capacité active spéciale ! Vous pouvez maintenant accéder au menu Opérations de colonie en appuyant sur (Z).");
 

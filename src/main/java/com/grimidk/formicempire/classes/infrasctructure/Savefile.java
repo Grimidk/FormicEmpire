@@ -1,7 +1,6 @@
 package com.grimidk.formicempire.classes.infrasctructure;
 
 import com.grimidk.formicempire.classes.entities.dynasty.War;
-import com.grimidk.formicempire.classes.entities.services.world.WarStagePhase;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
@@ -259,7 +258,7 @@ public class Savefile implements Serializable {
         public int aggressorStagesCaptured;
         public int defenderStagesCaptured;
         public float stageProgress;
-        public String stagePhaseKey = WarStagePhase.ACTIVE_CLASH.name();
+        public String stagePhaseKey = GameConstants.WAR_STAGE_ACTIVE_CLASH.getPersistenceKey();
         public int contestedColonyId;
         public int stageAttackerDynastyId;
         public int deployedActiveAttacker;

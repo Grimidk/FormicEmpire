@@ -1,8 +1,11 @@
 package com.grimidk.formicempire.classes.entities.critter;
 
+import com.grimidk.formicempire.classes.constants.critter.Skill;
 import com.grimidk.formicempire.classes.constants.critter.Species;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntStatus;
 import com.grimidk.formicempire.classes.constants.critter.ant.MoveStatus;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.services.shared.CritterSkillService;
 import com.grimidk.formicempire.classes.entities.spatial.Dimension;
 import com.grimidk.formicempire.classes.entities.spatial.Room;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
@@ -10,6 +13,7 @@ import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.WorldSpaces;
 
 import java.awt.Point;
+import java.util.List;
 
 public class Critter {
     private AntStatus status;
@@ -64,6 +68,16 @@ public class Critter {
 
     public void setSpecies(Species species) {
         this.species = species;
+    }
+
+    /** Skills available to this critter, derived from species base skills and ant subtypes. */
+    public List<Skill> getAvailableSkills() {
+        return CritterSkillService.resolveAvailableSkills(this);
+    }
+
+    /** Skills including colony upgrade unlocks (e.g. acid spitting from assimilation). */
+    public List<Skill> getAvailableSkills(Colony colony) {
+        return CritterSkillService.resolveAvailableSkills(this, colony);
     }
 
     public String getScientificName() {

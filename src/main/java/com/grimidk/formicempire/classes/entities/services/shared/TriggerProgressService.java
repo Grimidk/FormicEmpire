@@ -243,6 +243,21 @@ public final class TriggerProgressService {
                 dynastyStoredResourceProgress(colony),
                 GameNumbers.PARASITIC_MITE_RESOURCE_THRESHOLD));
 
+        int warsParticipated = 0;
+        if (dynasty != null && world != null && world.getWarService() != null) {
+            warsParticipated = world.getWarService().countWarsForDynasty(dynasty.getId());
+        }
+        // Show when wars are underway; unlock still requires multi-queen (see TriggerManager).
+        entries.add(numeric(
+                GameUnlocks.ROLE_COMMANDER,
+                LanguageStrings.TRIGGER_COMMANDER_ROLE_TITLE,
+                LanguageStrings.TRIGGER_PROGRESS_HINT_COMMANDER,
+                LanguageStrings.TRIGGER_PROGRESS_METRIC_WARS,
+                colony.hasUpgrade(GameUnlocks.ROLE_COMMANDER),
+                hasDynasty,
+                warsParticipated,
+                GameNumbers.TRIGGER_COMMANDER_MIN_WARS));
+
         return entries;
     }
 

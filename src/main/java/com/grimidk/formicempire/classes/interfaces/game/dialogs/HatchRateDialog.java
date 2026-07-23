@@ -7,7 +7,6 @@ import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.services.colony.AntSubtypeService;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
-import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
@@ -351,14 +350,14 @@ public class HatchRateDialog extends ZeroDialog {
             }
 
             if (newValue + otherTotal > 100.0) {
-                JSpinner noneSpinner = typeSpinners.get(GameNumbers.SUBTYPE_DIGIT_NONE);
-                if (digit != GameNumbers.SUBTYPE_DIGIT_NONE && noneSpinner != null) {
+                JSpinner noneSpinner = typeSpinners.get(AntSubtype.DIGIT_NONE);
+                if (digit != AntSubtype.DIGIT_NONE && noneSpinner != null) {
                     double noneValue = (Double) noneSpinner.getValue();
                     double excess = (newValue + otherTotal) - 100.0;
                     if (noneValue >= excess) {
                         double newNoneValue = noneValue - excess;
                         noneSpinner.setValue(newNoneValue);
-                        colony.setSubtypeHatchRate(type, slot, GameNumbers.SUBTYPE_DIGIT_NONE, (float) newNoneValue);
+                        colony.setSubtypeHatchRate(type, slot, AntSubtype.DIGIT_NONE, (float) newNoneValue);
                     } else {
                         newValue = 100.0 - otherTotal;
                         spinner.setValue(newValue);
@@ -408,8 +407,8 @@ public class HatchRateDialog extends ZeroDialog {
             }
             if (currentTotal < 99.99) {
                 double remainder = 100.0 - currentTotal;
-                float currentNoneRate = colony.getSubtypeHatchRate(type, slot, GameNumbers.SUBTYPE_DIGIT_NONE);
-                colony.setSubtypeHatchRate(type, slot, GameNumbers.SUBTYPE_DIGIT_NONE,
+                float currentNoneRate = colony.getSubtypeHatchRate(type, slot, AntSubtype.DIGIT_NONE);
+                colony.setSubtypeHatchRate(type, slot, AntSubtype.DIGIT_NONE,
                         currentNoneRate + (float) remainder);
             }
         }

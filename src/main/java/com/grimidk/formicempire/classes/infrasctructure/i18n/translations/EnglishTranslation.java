@@ -206,6 +206,7 @@ public class EnglishTranslation implements Translation {
         en.put("TRIGGER_PROGRESS_METRIC_TUNNELS", "Completed tunnels");
         en.put("TRIGGER_PROGRESS_METRIC_DIPLOMATS", "Diplomats sent");
         en.put("TRIGGER_PROGRESS_METRIC_ABSORBED", "Absorbed dynasties");
+        en.put("TRIGGER_PROGRESS_METRIC_WARS", "Wars participated");
         en.put("TRIGGER_PROGRESS_METRIC_RANK", "Dynasty rank tier");
         en.put("TRIGGER_PROGRESS_METRIC_PLANTS", "Mega-plant harvested");
         en.put("TRIGGER_PROGRESS_METRIC_RESOURCES", "Stored resources");
@@ -219,12 +220,16 @@ public class EnglishTranslation implements Translation {
         en.put("TRIGGER_PROGRESS_HINT_TUNNELS", "Complete tunnels between dynasty colonies. Requires Automation first.");
         en.put("TRIGGER_PROGRESS_HINT_DIPLOMATS", "Send diplomats on loyalty or reputation missions. Requires Automation first.");
         en.put("TRIGGER_PROGRESS_HINT_ABSORBED", "Defeat and absorb another dynasty.");
+        en.put("TRIGGER_PROGRESS_HINT_COMMANDER", "Fight in wars and keep more than one queen in a colony to unlock Commander.");
         en.put("TRIGGER_PROGRESS_HINT_RANK", "Reach Empire dynasty rank to unlock Cloning (assimilation integrity gains and assimilated drones).");
         en.put("TRIGGER_PROGRESS_HINT_SCOUT", "Harvest enough plants from any discovered plant source.");
         en.put("TRIGGER_PROGRESS_HINT_PARASITIC_MITE", "Stockpile resources. Outbreaks (cold biomes, fall/winter) unlock symbiotic mite catching dynasty-wide.");
         en.put("SYNERGY_SUPER_VENOM", "Super Venom");
         en.put("SYNERGY_SUPER_VENOM_FLAVOR", "Super Venom");
         en.put("SYNERGY_SUPER_VENOM_DESC", "Replaces Fire + Neurotoxic venom stacking (+50% each) with a +200% colony attack bonus (3x total) when both venoms are assimilated and Synergies are researched.");
+        en.put("SYNERGY_ACID_ARTILLERY", "Acid Artillery");
+        en.put("SYNERGY_ACID_ARTILLERY_FLAVOR", "Living Howitzers");
+        en.put("SYNERGY_ACID_ARTILLERY_DESC", "Unlocks the Artillery role for majors. Artillery majors gain the Acid Artillery skill (500% damage, 50% accuracy). Requires Acid Spitting assimilation and Major ants.");
 
         en.put("DIALOG_HATCH_RATES_TITLE", "Manage Pupa Hatch Rates");
         en.put("HATCH_DESC", "Set hatch chance for new ants:");
@@ -244,6 +249,18 @@ public class EnglishTranslation implements Translation {
         en.put("SUBTYPE_HEAD_DOORHEAD_DESC", "Doorhead: +20% defense.");
         en.put("SUBTYPE_ABDOMEN_STINGER_DESC", "Stinger abdomen: 1.5x attack. Adds together with other subtype attack bonuses (with Trapjaw: 3x total, not 2.25x).");
         en.put("SUBTYPE_ABDOMEN_HONEYPOT_DESC", "Honeypot abdomen: 4x foraging power and carry capacity; 0.75x movement speed; +15% regeneration.");
+
+        en.put("SKILL_BASIC_BITE", "Basic Bite");
+        en.put("SKILL_POWERFUL_BITE", "Powerful Bite");
+        en.put("SKILL_STINGING", "Stinging");
+        en.put("SKILL_SHIELDING", "Shielding");
+        en.put("SKILL_BOOST_REGEN", "Boost Regen");
+        en.put("SKILL_ACID_SPITTING", "Acid Spitting");
+        en.put("SKILL_ACID_ARTILLERY", "Acid Artillery");
+
+        en.put("BATTLE_LINE_INFANTRY", "Infantry");
+        en.put("BATTLE_LINE_ARTILLERY", "Artillery");
+        en.put("BATTLE_LINE_AIR_SUPPORT", "Air Support");
 
         en.put("DIALOG_ABILITIES_TITLE", "Colony Operations");
         en.put("ABILITY_RP_LABEL", "Research Points: %s");
@@ -525,9 +542,9 @@ public class EnglishTranslation implements Translation {
         en.put("BATTLE_LOCATION_FMT", "At %s");
         en.put("BATTLE_POWER_FMT", "%s: %s");
         en.put("BATTLE_FORCES_FMT", "Forces: %s vs %s ants");
-        en.put("BATTLE_PHASE_CLASH", "Front clash");
-        en.put("BATTLE_PHASE_RESERVE", "Hex defense");
-        en.put("BATTLE_PHASE_REDEPLOY", "Redeploying");
+        en.put("BATTLE_PHASE_CLASH", "Border Clash");
+        en.put("BATTLE_PHASE_RESERVE", "Colony Siege");
+        en.put("BATTLE_PHASE_REDEPLOY", "Redeployment");
         en.put("BATTLE_REDEPLOY_FMT", "Redeploying (%s h remaining)");
         en.put("DIALOG_CONVOY_TITLE", "Convoy");
         en.put("CONVOY_ACTION_VIEW", "See convoy");
@@ -577,6 +594,8 @@ public class EnglishTranslation implements Translation {
         en.put("STAT_LOYALTY", "Loyalty");
         en.put("STAT_MILITARY_POWER", "Military Power");
         en.put("STAT_MILITARY_POWER_DESC", "Adult type counts weighted by combat base stats. During war, wartime role assignments split active (front-line) and reserve strength. Updated once per world day.");
+        en.put("STAT_COMBAT_CAPACITY", "Combat Capacity");
+        en.put("STAT_COMBAT_CAPACITY_DESC", "How many combatants your dynasty can field. Starts at 1,000; assigning a Queen as Commander raises it to 2,500. Battle deployment limits are not enforced yet.");
         en.put("STAT_ACTIVE_MILITARY_POWER", "Active Military Power");
         en.put("STAT_RESERVE_MILITARY_POWER", "Reserve Military Power");
         en.put("DYNASTY_REPUTATION", "Reputation");
@@ -768,6 +787,8 @@ public class EnglishTranslation implements Translation {
         en.put("DYNASTY_THEME_COPPER", "Copper");
         en.put("DYNASTY_THEME_BRONZE", "Bronze");
         en.put("DYNASTY_THEME_EMERALD", "Emerald");
+        en.put("DYNASTY_THEME_GREEN", "Green");
+        en.put("DYNASTY_THEME_ACID", "Acid");
         en.put("DYNASTY_THEME_SAPPHIRE", "Sapphire");
         en.put("DYNASTY_THEME_QUARTZ", "Quartz");
         en.put("DYNASTY_THEME_GRANITE", "Granite");
@@ -936,6 +957,8 @@ public class EnglishTranslation implements Translation {
         en.put("CRITTER_CLASS_INSECT", "Insect");
         en.put("CRITTER_CLASS_ARACHNID", "Arachnid");
         en.put("CRITTER_CLASS_REPTILE", "Reptile");
+        en.put("CRITTER_CLASS_AMPHIBIAN", "Amphibian");
+        en.put("CRITTER_CLASS_BIRD", "Bird");
         en.put("CRITTER_CLASS_RODENT", "Rodent");
         en.put("CRITTER_CLASS_MAMMAL", "Mammal");
         en.put("CRITTER_CLASS_FUNGI", "Fungi");
@@ -988,6 +1011,7 @@ public class EnglishTranslation implements Translation {
         en.put("ROLE_DIPLOMAT", "Diplomat");
         en.put("ROLE_LAYER", "Egg-Layer");
         en.put("ROLE_RESEARCHER", "Researcher");
+        en.put("ROLE_COMMANDER", "Commander");
         en.put("ROLE_MILITIA", "Militia Auxiliary");
         en.put("ROLE_CATCHER", "Catcher");
         en.put("ROLE_CRANE", "Construction Crane");
@@ -1102,7 +1126,7 @@ public class EnglishTranslation implements Translation {
         en.put("DIPLO_ERROR_PACT_DECLINE_COOLDOWN_FMT", "You must wait %s more month(s) after a declined pact request before asking again.");
         en.put("DIPLO_ERROR_TRADE_DECLINE_COOLDOWN_FMT", "You must wait %s more month(s) after a declined trade proposal before proposing again.");
         en.put("DIPLO_ERROR_WAR_POPULATION_FMT", "Your dynasty needs at least %s ants before declaring war or configuring war economy roles.");
-        en.put("DIPLO_ERROR_WAR_ACTIVE_MILITARY", "Assign active military roles in war economy (Warrior, Defender, Militia, or Brute) before declaring war.");
+        en.put("DIPLO_ERROR_WAR_ACTIVE_MILITARY", "Assign active military roles in war economy (Warrior, Defender, Militia, Brute, or Commander) before declaring war.");
         en.put("DIPLO_ERROR_WAR_TARGET_ACTIVE_MILITARY_FMT", "%s cannot be attacked yet — they have no active military roles.");
         en.put("DIPLO_ERROR_WAR_NO_BORDER", "Can only declare war to a bordering dynasty.");
         en.put("DIPLO_ACTION_TRADE", "Trade");
@@ -1218,6 +1242,8 @@ public class EnglishTranslation implements Translation {
         en.put("SPECIES_SHININGBLACK_SCIENTIFIC", "Lasius Fuliginosus");
         en.put("SPECIES_DESERT", "Desert Ant");
         en.put("SPECIES_DESERT_SCIENTIFIC", "Cataglyphis Fortis");
+        en.put("SPECIES_GREEN", "Green Ant");
+        en.put("SPECIES_GREEN_SCIENTIFIC", "Formica Rufa");
         en.put("ASSIMILATED_TRAPJAW_FLAVOR", "Spring-Loaded Mandibles");
         en.put("ASSIMILATED_TRAPJAW_DESC", "Unlocks the Trapjaw head subtype. Contributes 1.5x attack; stacks by addition with other subtype attack bonuses.");
         en.put("ASSIMILATION_TRAPJAW", "Trap-Jaw Ant Assimilation");
@@ -1294,6 +1320,10 @@ public class EnglishTranslation implements Translation {
         en.put("ASSIMILATED_LOCSENSE_DESC", "Your dynasty can navigate long desert routes using sun compass and step counting. (Mechanic in development.)");
         en.put("ASSIMILATION_LOCSENSE", "Desert Ant Assimilation");
         en.put("ASSIMILATION_LOCSENSE_DESC", "After assimilating the desert ant genome:");
+        en.put("ASSIMILATED_ACIDSPIT_FLAVOR", "Formic Battery");
+        en.put("ASSIMILATED_ACIDSPIT_DESC", "Unlocks the Acid Spitting skill for ants in your colony.");
+        en.put("ASSIMILATION_ACIDSPIT", "Green Ant Assimilation");
+        en.put("ASSIMILATION_ACIDSPIT_DESC", "After assimilating the green ant genome:");
         en.put("METHOD_LAND", "Land");
         en.put("METHOD_AIR", "Air");
         en.put("METHOD_SEA", "Sea");
@@ -1347,6 +1377,9 @@ public class EnglishTranslation implements Translation {
         en.put("ROLE_RESEARCHER_UPGRADE", "Research Role");
         en.put("ROLE_RESEARCHER_FLAVOR", "Ant Science");
         en.put("ROLE_RESEARCHER_DESC", "Allows queens to generate research points. 1 ant research 1 point per hour.");
+        en.put("ROLE_COMMANDER_UPGRADE", "Commander Role");
+        en.put("ROLE_COMMANDER_FLAVOR", "Royal Warlord");
+        en.put("ROLE_COMMANDER_DESC", "Active military role for queens. Assigning a Commander raises dynasty combat capacity from 1,000 to 2,500.");
         en.put("ROLE_BUILDER_UPGRADE", "Builder Role");
         en.put("ROLE_BUILDER_FLAVOR", "Base Building");
         en.put("ROLE_BUILDER_DESC", "Allows workers to build new rooms in the colony.");
@@ -1696,6 +1729,8 @@ public class EnglishTranslation implements Translation {
         en.put("ASSIMILATION_HIVEBUILD_DESC", "After assimilating the shining black ant genome:");
         en.put("ASSIMILATION_LOCSENSE", "Desert Ant Assimilation");
         en.put("ASSIMILATION_LOCSENSE_DESC", "After assimilating the desert ant genome:");
+        en.put("ASSIMILATION_ACIDSPIT", "Green Ant Assimilation");
+        en.put("ASSIMILATION_ACIDSPIT_DESC", "After assimilating the green ant genome:");
 
         en.put("HELP_TAB_WELCOME", "Welcome");
         en.put("HELP_TAB_STARTED", "Getting Started");
@@ -1713,6 +1748,23 @@ public class EnglishTranslation implements Translation {
         en.put("HELP_TAB_BUILDINGS", "Buildings");
         en.put("HELP_TAB_ASSIMILATIONS", "Assimilations");
         en.put("HELP_TAB_SYNERGIES", "Synergies");
+        en.put("HELP_TAB_COMBAT", "Combat");
+        en.put("HELP_COMBAT_INTRO", "Combat uses <b>skills</b> (accuracy and damage multipliers), <b>battle lines</b> (role bands and hit chance), and war <b>phases</b> / <b>standing</b> during campaigns.");
+        en.put("HELP_COMBAT_SKILLS", "Skills");
+        en.put("HELP_COMBAT_BATTLE_LINES", "Battle Lines");
+        en.put("HELP_COMBAT_WAR_PHASES", "War Stage Phases");
+        en.put("HELP_COMBAT_WAR_STANDING", "War Standing");
+        en.put("HELP_SKILL_ACCURACY_FMT", "Accuracy: %s");
+        en.put("HELP_SKILL_DAMAGE_FMT", "Damage: %s");
+        en.put("HELP_BATTLE_LINE_ACCURACY_FMT", "Base accuracy: %s");
+        en.put("HELP_BATTLE_LINE_ROLES_FMT", "Roles: %s");
+        en.put("HELP_BATTLE_LINE_ROLES_NONE", "Roles: none yet");
+        en.put("HELP_WAR_PHASE_CLASH_DESC", "Opening battle at the contested border between the two dynasties.");
+        en.put("HELP_WAR_PHASE_RESERVE_DESC", "Siege assault on a colony after the border clash.");
+        en.put("HELP_WAR_PHASE_REDEPLOY_DESC", "Forces move to the next stage target after a battle resolves.");
+        en.put("HELP_WAR_STANDING_WINNING_DESC", "Your side leads the war by combat power.");
+        en.put("HELP_WAR_STANDING_LOSING_DESC", "The enemy leads the war by combat power.");
+        en.put("HELP_WAR_STANDING_EVEN_DESC", "Neither side has a clear combat-power lead.");
         en.put("HELP_TAB_WORLD", "World");
         en.put("HELP_TAB_UI", "UI Controls");
         en.put("HELP_UI_INTRO", "During a colony session, the control bar at the bottom-right adjusts simulation speed, pause, and opens the game menu.");
@@ -2010,6 +2062,8 @@ public class EnglishTranslation implements Translation {
         en.put("TRIGGER_BREEDER_ROLE_MSG", "Unlocking the Princess and Drone ant types has automatically unlocked the 'Breeder' role.");
         en.put("TRIGGER_BRUTE_ROLE_TITLE", "Heavy Trooper");
         en.put("TRIGGER_BRUTE_ROLE_MSG", "Unlocking the Major ant type has automatically unlocked the 'Brute' role for them.");
+        en.put("TRIGGER_COMMANDER_ROLE_TITLE", "Field Command");
+        en.put("TRIGGER_COMMANDER_ROLE_MSG", "With multiple queens and hard-won war experience, a Queen can take the Commander role — raising your dynasty's combat capacity.");
         en.put("TRIGGER_SPREAD_ABILITY_TITLE", "Colony Colonization");
         en.put("TRIGGER_SPREAD_ABILITY_MSG", "With the ability to breed new queens, your colony now understands how to spread. You can found new colonies from the World Map (M).");
         en.put("TRIGGER_SCOUT_ROLE_TITLE", "Adventure's Call");
@@ -2046,6 +2100,8 @@ public class EnglishTranslation implements Translation {
         en.put("TRIGGER_SUBTYPE_HATCH_MSG", "Assimilated traits can shape new hatchlings! Open Hatch Rates (P) to set subtypes per ant type—each active part adds +50% food.");
         en.put("TRIGGER_SYNERGY_SUPER_VENOM_TITLE", "Synergy Unlocked");
         en.put("TRIGGER_SYNERGY_SUPER_VENOM_MSG", "%s is now active! Combining %s replaces their separate +50% bonuses with a +200% colony attack bonus (3x total). Open Synergies (O) to review.");
+        en.put("TRIGGER_SYNERGY_ACID_ARTILLERY_TITLE", "Synergy Unlocked");
+        en.put("TRIGGER_SYNERGY_ACID_ARTILLERY_MSG", "%s is now active! Combining %s unlocks the Artillery role for majors and the Acid Artillery skill. Open Synergies (O) to review.");
         en.put("TRIGGER_OPERATIONS_ABILITY_TITLE", "Colony Operations");
         en.put("TRIGGER_OPERATIONS_ABILITY_MSG", "You have gained a special active ability! You can now access the Colony Operations menu by pressing (Z).");
 

@@ -40,7 +40,7 @@ public final class WarProgressService {
             if (!aggressor.getDiplomacyService().isAtWarWith(defender)) {
                 continue;
             }
-            if (war.getStagePhase() == WarStagePhase.REDEPLOYING) {
+            if (war.getStagePhase() == GameConstants.WAR_STAGE_REDEPLOYING) {
                 tickRedeployHour(world, warService, war, aggressor, defender);
                 continue;
             }
@@ -95,7 +95,7 @@ public final class WarProgressService {
         war.setAggressorStagesCaptured(0);
         war.setDefenderStagesCaptured(0);
         war.setStageProgress(0f);
-        war.setStagePhase(WarStagePhase.ACTIVE_CLASH);
+        war.setStagePhase(GameConstants.WAR_STAGE_ACTIVE_CLASH);
         war.setContestedColonyId(contested.getId());
         war.setStageAttackerDynastyId(aggressor.getId());
         war.setAggressorCapitalColonyId(aggressorCapital.getId());
@@ -108,7 +108,7 @@ public final class WarProgressService {
         if (world == null || war == null || forfeitier == null || !war.isActive() || !war.isCampaignInitialized()) {
             return false;
         }
-        if (war.getStagePhase() == WarStagePhase.REDEPLOYING) {
+        if (war.getStagePhase() == GameConstants.WAR_STAGE_REDEPLOYING) {
             return false;
         }
         if (!war.involves(forfeitier.getId())) {
@@ -186,7 +186,7 @@ public final class WarProgressService {
             return;
         }
 
-        if (war.getStagePhase() == WarStagePhase.ACTIVE_CLASH) {
+        if (war.getStagePhase() == GameConstants.WAR_STAGE_ACTIVE_CLASH) {
             resolveActiveClashHour(world, war, stageAttacker, stageDefender);
             if (war.getDeployedActiveAttacker() <= 0 || war.getDeployedActiveDefender() <= 0) {
                 beginReserveAssault(world, war, stageAttacker, stageDefender);
@@ -242,7 +242,7 @@ public final class WarProgressService {
         if (world == null || war == null || ai == null || opponent == null || !war.isActive()) {
             return false;
         }
-        if (war.getStagePhase() != WarStagePhase.REDEPLOYING) {
+        if (war.getStagePhase() != GameConstants.WAR_STAGE_REDEPLOYING) {
             return false;
         }
         int aiActive = ColonyMilitaryService.powerForWarStanding(ai);
@@ -329,7 +329,7 @@ public final class WarProgressService {
         war.setDeployedActiveAttacker(winnerPower);
         war.setDeployedActiveDefender(0);
         war.setDeployedReserveDefender(ColonyMilitaryService.computeReserveMilitaryPower(reserveTarget));
-        war.setStagePhase(WarStagePhase.RESERVE_ASSAULT);
+        war.setStagePhase(GameConstants.WAR_STAGE_RESERVE_ASSAULT);
     }
 
     private static void resolveReserveAssaultHour(World world, WarService warService, War war,
@@ -432,7 +432,7 @@ public final class WarProgressService {
     }
 
     private static void enterRedeploying(World world, War war, Dynasty aggressor, Dynasty defender) {
-        war.setStagePhase(WarStagePhase.REDEPLOYING);
+        war.setStagePhase(GameConstants.WAR_STAGE_REDEPLOYING);
         war.setRedeployHoursRemaining(GameNumbers.WAR_REDEPLOY_HOURS);
         war.setDeployedActiveAttacker(0);
         war.setDeployedActiveDefender(0);
@@ -459,7 +459,7 @@ public final class WarProgressService {
             next = victor.getCapital();
         }
         war.setContestedColonyId(next.getId());
-        war.setStagePhase(WarStagePhase.ACTIVE_CLASH);
+        war.setStagePhase(GameConstants.WAR_STAGE_ACTIVE_CLASH);
         war.setDeployedReserveDefender(0);
     }
 
@@ -482,7 +482,7 @@ public final class WarProgressService {
             return;
         }
 
-        war.setStagePhase(WarStagePhase.ACTIVE_CLASH);
+        war.setStagePhase(GameConstants.WAR_STAGE_ACTIVE_CLASH);
         war.setRedeployHoursRemaining(0);
         war.setDeployedActiveAttacker(ColonyMilitaryService.powerForWarStanding(stageAttacker));
         war.setDeployedActiveDefender(ColonyMilitaryService.powerForWarStanding(stageDefender));
@@ -497,7 +497,7 @@ public final class WarProgressService {
             return;
         }
         ColonyMilitaryService.refreshColonyMilitaryPower(contested);
-        war.setStagePhase(WarStagePhase.RESERVE_ASSAULT);
+        war.setStagePhase(GameConstants.WAR_STAGE_RESERVE_ASSAULT);
         war.setRedeployHoursRemaining(0);
         war.setStageAttackerDynastyId(stageAttacker.getId());
         war.setContestedColonyId(contested.getId());
@@ -755,11 +755,11 @@ public final class WarProgressService {
         int remaining = pointBudget;
 
         remaining -= reduceAntList(colony.getSoldiers(), remaining,
-                GameNumbers.MILITARY_WEIGHT_SOLDIER);
+                GameConstants.TYPE_SOLDIER.getMilitaryWeight());
         remaining -= reduceAntList(colony.getMajors(), remaining,
-                GameNumbers.MILITARY_WEIGHT_MAJOR);
+                GameConstants.TYPE_MAJOR.getMilitaryWeight());
         remaining -= reduceAntList(colony.getWorkers(), remaining,
-                GameNumbers.MILITARY_WEIGHT_WORKER);
+                GameConstants.TYPE_WORKER.getMilitaryWeight());
         if (remaining > 0) {
             eliminateColonyQueens(colony);
         }

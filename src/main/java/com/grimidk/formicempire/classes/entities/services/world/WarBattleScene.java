@@ -2,7 +2,9 @@ package com.grimidk.formicempire.classes.entities.services.world;
 
 import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
+import com.grimidk.formicempire.classes.constants.dynasty.WarStagePhase;
 import com.grimidk.formicempire.classes.constants.world.Biome;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -44,7 +46,7 @@ public final class WarBattleScene {
         this.defenderBiome = defenderBiome;
         this.attacker = attacker;
         this.defender = defender;
-        this.phase = phase != null ? phase : WarStagePhase.ACTIVE_CLASH;
+        this.phase = phase != null ? phase : GameConstants.WAR_STAGE_ACTIVE_CLASH;
         this.frontlineRatio = Math.max(0.05f, Math.min(0.95f, frontlineRatio));
         this.stageProgress = Math.max(0f, Math.min(1f, stageProgress));
         this.warProgressPercent = warProgressPercent;

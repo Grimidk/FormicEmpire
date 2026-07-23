@@ -10,7 +10,7 @@ import com.grimidk.formicempire.classes.entities.services.colony.AntSubtypeServi
 import com.grimidk.formicempire.classes.entities.services.world.WarBattleScene;
 import com.grimidk.formicempire.classes.entities.services.world.WarBattleSceneBuilder;
 import com.grimidk.formicempire.classes.entities.services.world.WarService;
-import com.grimidk.formicempire.classes.entities.services.world.WarStagePhase;
+import com.grimidk.formicempire.classes.constants.dynasty.WarStagePhase;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
@@ -375,7 +375,7 @@ public class WarBattleViewPanel extends JPanel {
                 LanguageStrings.BATTLE_FORCES_FMT,
                 AssetStyles.formatNumber(attackerAnts),
                 AssetStyles.formatNumber(defenderAnts));
-        if (scene.getPhase() == WarStagePhase.REDEPLOYING) {
+        if (scene.getPhase() == GameConstants.WAR_STAGE_REDEPLOYING) {
             String redeploy = LanguageStrings.format(
                     LanguageStrings.BATTLE_REDEPLOY_FMT,
                     String.valueOf(scene.getRedeployHoursRemaining()));
@@ -399,13 +399,10 @@ public class WarBattleViewPanel extends JPanel {
     }
 
     private static String formatPhase(WarStagePhase phase) {
-        if (phase == WarStagePhase.RESERVE_ASSAULT) {
-            return LanguageStrings.get(LanguageStrings.BATTLE_PHASE_RESERVE);
+        if (phase == null) {
+            return GameConstants.WAR_STAGE_ACTIVE_CLASH.getName();
         }
-        if (phase == WarStagePhase.REDEPLOYING) {
-            return LanguageStrings.get(LanguageStrings.BATTLE_PHASE_REDEPLOY);
-        }
-        return LanguageStrings.get(LanguageStrings.BATTLE_PHASE_CLASH);
+        return phase.getName();
     }
 
     private void loadBiomeTiles() {

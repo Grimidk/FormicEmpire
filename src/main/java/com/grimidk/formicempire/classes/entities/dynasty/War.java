@@ -1,8 +1,9 @@
 package com.grimidk.formicempire.classes.entities.dynasty;
 
-import com.grimidk.formicempire.classes.entities.services.world.WarStagePhase;
+import com.grimidk.formicempire.classes.constants.dynasty.WarStagePhase;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,7 +32,7 @@ public class War {
     private int aggressorStagesCaptured;
     private int defenderStagesCaptured;
     private float stageProgress;
-    private WarStagePhase stagePhase = WarStagePhase.ACTIVE_CLASH;
+    private WarStagePhase stagePhase = GameConstants.WAR_STAGE_ACTIVE_CLASH;
     private int contestedColonyId;
     private int stageAttackerDynastyId;
     private int deployedActiveAttacker;
@@ -214,7 +215,7 @@ public class War {
     }
 
     public void setStagePhase(WarStagePhase stagePhase) {
-        this.stagePhase = stagePhase != null ? stagePhase : WarStagePhase.ACTIVE_CLASH;
+        this.stagePhase = stagePhase != null ? stagePhase : GameConstants.WAR_STAGE_ACTIVE_CLASH;
     }
 
     public int getContestedColonyId() {
@@ -439,7 +440,9 @@ public class War {
         saved.aggressorStagesCaptured = aggressorStagesCaptured;
         saved.defenderStagesCaptured = defenderStagesCaptured;
         saved.stageProgress = stageProgress;
-        saved.stagePhaseKey = stagePhase != null ? stagePhase.name() : WarStagePhase.ACTIVE_CLASH.name();
+        saved.stagePhaseKey = stagePhase != null
+                ? stagePhase.getPersistenceKey()
+                : GameConstants.WAR_STAGE_ACTIVE_CLASH.getPersistenceKey();
         saved.contestedColonyId = contestedColonyId;
         saved.stageAttackerDynastyId = stageAttackerDynastyId;
         saved.deployedActiveAttacker = deployedActiveAttacker;
@@ -488,13 +491,6 @@ public class War {
     }
 
     private static WarStagePhase parseStagePhase(String key) {
-        if (key == null || key.isEmpty()) {
-            return WarStagePhase.ACTIVE_CLASH;
-        }
-        try {
-            return WarStagePhase.valueOf(key);
-        } catch (IllegalArgumentException ex) {
-            return WarStagePhase.ACTIVE_CLASH;
-        }
+        return GameConstants.getWarStagePhaseByPersistenceKey(key);
     }
 }

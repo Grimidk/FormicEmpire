@@ -1,19 +1,23 @@
 package com.grimidk.formicempire.classes.interfaces;
 
+import com.grimidk.formicempire.classes.constants.critter.Skill;
+import com.grimidk.formicempire.classes.constants.critter.Species;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtype;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeSlot;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
+import com.grimidk.formicempire.classes.constants.dynasty.BattleLine;
+import com.grimidk.formicempire.classes.constants.dynasty.WarStagePhase;
+import com.grimidk.formicempire.classes.constants.dynasty.WarStanding;
 import com.grimidk.formicempire.classes.constants.dynasty.colony.ColonyLoyalty;
 import com.grimidk.formicempire.classes.constants.dynasty.colony.ColonyLoyaltyModifier;
 import com.grimidk.formicempire.classes.constants.dynasty.DiplomaticReputation;
 import com.grimidk.formicempire.classes.constants.dynasty.Rank;
-import com.grimidk.formicempire.classes.constants.misc.Tier;
 import com.grimidk.formicempire.classes.constants.dynasty.TradeMethod;
-import com.grimidk.formicempire.classes.constants.critter.Species;
 import com.grimidk.formicempire.classes.constants.misc.GameSpeed;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
-import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
+import com.grimidk.formicempire.classes.constants.misc.Tier;
 import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.constants.unlocks.Synergy;
@@ -116,6 +120,7 @@ public class HelpPanel extends JPanel {
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_ASSIMILATIONS), createDictionaryPanel(new ArrayList<>(GameUnlocks.getAssimilations())));
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_SYNERGIES),
                 createDictionaryPanel(new ArrayList<>(GameUnlocks.getSynergies())));
+        mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_COMBAT), createCombatPanel());
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_WORLD), createWorldPanel());
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_UI), createUiControlsPanel());
     }
@@ -140,6 +145,7 @@ public class HelpPanel extends JPanel {
                 LanguageStrings.get(LanguageStrings.HELP_TAB_BUILDINGS),
                 LanguageStrings.get(LanguageStrings.HELP_TAB_ASSIMILATIONS),
                 LanguageStrings.get(LanguageStrings.HELP_TAB_SYNERGIES),
+                LanguageStrings.get(LanguageStrings.HELP_TAB_COMBAT),
                 LanguageStrings.get(LanguageStrings.HELP_TAB_WORLD),
                 LanguageStrings.get(LanguageStrings.HELP_TAB_UI)
             };
@@ -512,6 +518,174 @@ public class HelpPanel extends JPanel {
         descArea.setBorder(new EmptyBorder(5, 5, 5, 5));
         entry.add(descArea, BorderLayout.CENTER);
         return entry;
+    }
+
+    private JComponent createCombatPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        panel.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+        JLabel intro = new JLabel(tutorialHtml(LanguageStrings.get(LanguageStrings.HELP_COMBAT_INTRO)));
+        styleTutorialLabel(intro);
+        intro.setBorder(new EmptyBorder(0, 0, 10, 0));
+        intro.setAlignmentX(Component.LEFT_ALIGNMENT);
+        panel.add(intro);
+
+        panel.add(buildCombatSection(LanguageStrings.HELP_COMBAT_SKILLS, buildCombatSkillsSection()));
+        panel.add(Box.createRigidArea(new Dimension(0, 12)));
+        panel.add(buildCombatSection(LanguageStrings.HELP_COMBAT_BATTLE_LINES, buildCombatBattleLinesSection()));
+        panel.add(Box.createRigidArea(new Dimension(0, 12)));
+        panel.add(buildCombatSection(LanguageStrings.HELP_COMBAT_WAR_PHASES, buildCombatWarPhasesSection()));
+        panel.add(Box.createRigidArea(new Dimension(0, 12)));
+        panel.add(buildCombatSection(LanguageStrings.HELP_COMBAT_WAR_STANDING, buildCombatWarStandingSection()));
+
+        JScrollPane scrollPane = new JScrollPane(panel);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        scrollPane.setBorder(null);
+        return scrollPane;
+    }
+
+    private JPanel buildCombatSection(String titleKey, JPanel content) {
+        JPanel section = new JPanel(new BorderLayout());
+        section.setBackground(AssetStyles.BACKGROUND_COLOR);
+        section.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER,
+                LanguageStrings.get(titleKey),
+                javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
+        section.setAlignmentX(Component.LEFT_ALIGNMENT);
+        content.setOpaque(false);
+        section.add(content, BorderLayout.CENTER);
+        return section;
+    }
+
+    private JPanel buildCombatSkillsSection() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        for (Skill skill : GameConstants.getSkills()) {
+            panel.add(buildCombatConstantEntry(panel, skill.getName(), skill.getIcon(), formatSkillHelpBody(skill)));
+            panel.add(Box.createRigidArea(new Dimension(0, 5)));
+        }
+        return panel;
+    }
+
+    private JPanel buildCombatBattleLinesSection() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        for (BattleLine line : GameConstants.getBattleLines()) {
+            panel.add(buildCombatConstantEntry(panel, line.getName(), line.getIcon(), formatBattleLineHelpBody(line)));
+            panel.add(Box.createRigidArea(new Dimension(0, 5)));
+        }
+        return panel;
+    }
+
+    private JPanel buildCombatWarPhasesSection() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        for (WarStagePhase phase : GameConstants.getWarStagePhases()) {
+            panel.add(buildCombatConstantEntry(panel, phase.getName(), phase.getIcon(),
+                    formatWarPhaseHelpBody(phase)));
+            panel.add(Box.createRigidArea(new Dimension(0, 5)));
+        }
+        return panel;
+    }
+
+    private JPanel buildCombatWarStandingSection() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(AssetStyles.BACKGROUND_COLOR);
+        for (WarStanding standing : GameConstants.getWarStandings()) {
+            panel.add(buildCombatConstantEntry(panel, standing.getName(), standing.getIcon(),
+                    formatWarStandingHelpBody(standing)));
+            panel.add(Box.createRigidArea(new Dimension(0, 5)));
+        }
+        return panel;
+    }
+
+    private String formatWarPhaseHelpBody(WarStagePhase phase) {
+        if (phase == GameConstants.WAR_STAGE_ACTIVE_CLASH) {
+            return LanguageStrings.get(LanguageStrings.HELP_WAR_PHASE_CLASH_DESC);
+        }
+        if (phase == GameConstants.WAR_STAGE_RESERVE_ASSAULT) {
+            return LanguageStrings.get(LanguageStrings.HELP_WAR_PHASE_RESERVE_DESC);
+        }
+        if (phase == GameConstants.WAR_STAGE_REDEPLOYING) {
+            return LanguageStrings.get(LanguageStrings.HELP_WAR_PHASE_REDEPLOY_DESC);
+        }
+        return "";
+    }
+
+    private String formatWarStandingHelpBody(WarStanding standing) {
+        if (standing == GameConstants.WAR_STANDING_WINNING) {
+            return LanguageStrings.get(LanguageStrings.HELP_WAR_STANDING_WINNING_DESC);
+        }
+        if (standing == GameConstants.WAR_STANDING_LOSING) {
+            return LanguageStrings.get(LanguageStrings.HELP_WAR_STANDING_LOSING_DESC);
+        }
+        if (standing == GameConstants.WAR_STANDING_EVEN) {
+            return LanguageStrings.get(LanguageStrings.HELP_WAR_STANDING_EVEN_DESC);
+        }
+        return "";
+    }
+
+    private JPanel buildCombatConstantEntry(JPanel parent, String title, ImageIcon icon, String bodyText) {
+        JPanel entry = new JPanel(new BorderLayout(10, 0));
+        entry.setBackground(AssetStyles.BACKGROUND_COLOR);
+        entry.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER, title,
+                javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
+        entry.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        if (icon != null) {
+            JLabel iconLabel = new JLabel(icon);
+            iconLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
+            entry.add(iconLabel, BorderLayout.WEST);
+        }
+
+        JTextArea descArea = new JTextArea(bodyText);
+        descArea.setFont(AssetStyles.FONT_NORMAL);
+        descArea.setForeground(AssetStyles.FONT_COLOR);
+        descArea.setWrapStyleWord(true);
+        descArea.setLineWrap(true);
+        descArea.setEditable(false);
+        descArea.setFocusable(false);
+        descArea.setBackground(parent.getBackground());
+        descArea.setBorder(new EmptyBorder(5, 5, 5, 5));
+        entry.add(descArea, BorderLayout.CENTER);
+        return entry;
+    }
+
+    private static String formatPercentMult(float mult) {
+        return String.format("%.0f%%", mult * 100f);
+    }
+
+    private String formatSkillHelpBody(Skill skill) {
+        StringBuilder body = new StringBuilder();
+        body.append(LanguageStrings.format(LanguageStrings.HELP_SKILL_ACCURACY_FMT, formatPercentMult(skill.getAccuracyMult())));
+        body.append('\n');
+        body.append(LanguageStrings.format(LanguageStrings.HELP_SKILL_DAMAGE_FMT, formatPercentMult(skill.getDamageMult())));
+        return body.toString();
+    }
+
+    private String formatBattleLineHelpBody(BattleLine line) {
+        StringBuilder body = new StringBuilder();
+        body.append(LanguageStrings.format(LanguageStrings.HELP_BATTLE_LINE_ACCURACY_FMT,
+                String.format("%.0f%%", line.getBaseAccuracyPercent())));
+        body.append('\n');
+        if (line.getAllowedRoles().isEmpty()) {
+            body.append(LanguageStrings.get(LanguageStrings.HELP_BATTLE_LINE_ROLES_NONE));
+        } else {
+            String roles = line.getAllowedRoles().stream()
+                    .map(AntRole::getName)
+                    .collect(Collectors.joining(", "));
+            body.append(LanguageStrings.format(LanguageStrings.HELP_BATTLE_LINE_ROLES_FMT, roles));
+        }
+        return body.toString();
     }
 
     private JComponent createBugsPanel() {

@@ -53,16 +53,7 @@ public final class GameNumbers {
     public static final int PARASITIC_MITES_PER_SLOWED_ANT = 10;
     public static final float PARASITIC_MITE_SPEED_MULTIPLIER = 0.5f;
 
-    // --- Ant subtypes ---
-    public static final int SUBTYPE_DIGIT_NONE = 1;
-    public static final float SUBTYPE_DAMAGE_MULT_STINGER = 1.5f;
-    public static final float SUBTYPE_ATTACK_MULT_TRAPJAW = 1.5f;
-    /** Doorhead: flat extra defense percent (damage reduction). */
-    public static final float SUBTYPE_DEFENSE_ADD_DOORHEAD = 20f;
-    public static final float SUBTYPE_FORAGE_MULT_HONEYPOT = 4f;
-    public static final float SUBTYPE_SPEED_MULT_HONEYPOT = 0.75f;
-    /** Honeypot abdomen: regen is this × colony/type regen (15% more). */
-    public static final float SUBTYPE_REGEN_MULT_HONEYPOT = 1.15f;
+    // --- Ant subtypes (shared rules, not per-subtype attrs) ---
     public static final float SUBTYPE_FOOD_CONSUMPTION_ADD_PER_TRAIT = 0.5f;
 
     // --- Diplomacy / reputation ---
@@ -105,11 +96,6 @@ public final class GameNumbers {
     public static final int RECENTLY_INTEGRATED_LOYALTY_MONTHS = 6;
 
     // --- Military ---
-    public static final int MILITARY_WEIGHT_WORKER = 1;
-    public static final int MILITARY_WEIGHT_SOLDIER = 5;
-    public static final int MILITARY_WEIGHT_MAJOR = 15;
-    public static final int MILITARY_WEIGHT_PRINCESS = 10;
-    public static final int MILITARY_WEIGHT_QUEEN = 50;
     public static final int MILITARY_BASELINE_HEALTH = 100;
     public static final int MILITARY_BASELINE_ATTACK = 10;
     /** Colony-wide defense baseline (ants use type absolute % instead). */
@@ -117,11 +103,6 @@ public final class GameNumbers {
     /** Defense is percent damage reduction; always clamp to this range. */
     public static final float DEFENSE_PERCENT_MIN = 0f;
     public static final float DEFENSE_PERCENT_MAX = 100f;
-    /** Major / queen innate defense percent. */
-    public static final float ANT_DEFENSE_PERCENT_MAJOR = 20f;
-    public static final float ANT_DEFENSE_PERCENT_QUEEN = 20f;
-    /** Divisor for military-power defense factor from ant defense %. */
-    public static final float MILITARY_DEFENSE_FACTOR_BASELINE = ANT_DEFENSE_PERCENT_MAJOR;
     /** Colony skeleton regen baseline: percent of max HP recovered per tick. */
     public static final int ANT_REGEN_PERCENT_BASE = 10;
     public static final int MILITARY_BASELINE_ATTACK_SPEED = 1;
@@ -165,6 +146,12 @@ public final class GameNumbers {
     public static final int WAR_AI_FALLBACK_MIN_ACTIVE = 500;
     public static final int WAR_AI_FALLBACK_MIN_SPARE_COLONIES = 3;
     public static final double AI_WAR_FALLBACK_CHANCE = 0.06;
+
+    /** Dynasty combat capacity (scaffold for future deployment limits). */
+    public static final int COMBAT_CAPACITY_BASE = 1000;
+    public static final int COMBAT_CAPACITY_WITH_COMMANDER = 2500;
+    public static final int TRIGGER_COMMANDER_MIN_WARS = 3;
+    public static final int TRIGGER_COMMANDER_MIN_QUEENS_IN_COLONY = 2;
 
     // --- AI / trade automation ---
     public static final int AI_EXPANSION_COLONY_TARGET = 6;

@@ -19,11 +19,11 @@ public final class ColonyMilitaryService {
     }
 
     public static int computeTypePoints(int workers, int soldiers, int majors, int princesses, int queens) {
-        return workers * GameNumbers.MILITARY_WEIGHT_WORKER
-                + soldiers * GameNumbers.MILITARY_WEIGHT_SOLDIER
-                + majors * GameNumbers.MILITARY_WEIGHT_MAJOR
-                + princesses * GameNumbers.MILITARY_WEIGHT_PRINCESS
-                + queens * GameNumbers.MILITARY_WEIGHT_QUEEN;
+        return workers * GameConstants.TYPE_WORKER.getMilitaryWeight()
+                + soldiers * GameConstants.TYPE_SOLDIER.getMilitaryWeight()
+                + majors * GameConstants.TYPE_MAJOR.getMilitaryWeight()
+                + princesses * GameConstants.TYPE_PRINCESS.getMilitaryWeight()
+                + queens * GameConstants.TYPE_QUEEN.getMilitaryWeight();
     }
 
     public static float computeStatMultiplier(boolean hasSkeleton, boolean hasAcid) {
@@ -52,13 +52,12 @@ public final class ColonyMilitaryService {
         return (hpFactor + atkFactor + spdFactor) / 3f;
     }
 
-    /** Per-ant combat mult including type defense % (vs {@link GameNumbers#MILITARY_DEFENSE_FACTOR_BASELINE}). */
+    /** Per-ant combat mult including type defense % (vs {@link GameConstants#TYPE_MAJOR} defense). */
     public static float computeStatMultiplierFromBases(int baseHealth, int baseAttack, int baseDefense, int baseAttackSpeed) {
         float hpFactor = baseHealth / (float) GameNumbers.MILITARY_BASELINE_HEALTH;
         float atkFactor = baseAttack / (float) GameNumbers.MILITARY_BASELINE_ATTACK;
-        float defFactor = GameNumbers.MILITARY_DEFENSE_FACTOR_BASELINE <= 0f
-                ? 0f
-                : baseDefense / GameNumbers.MILITARY_DEFENSE_FACTOR_BASELINE;
+        float defenseBaseline = GameConstants.TYPE_MAJOR.getDefenseMult();
+        float defFactor = defenseBaseline <= 0f ? 0f : baseDefense / defenseBaseline;
         float spdFactor = baseAttackSpeed / (float) GameNumbers.MILITARY_BASELINE_ATTACK_SPEED;
         return (hpFactor + atkFactor + defFactor + spdFactor) / 4f;
     }

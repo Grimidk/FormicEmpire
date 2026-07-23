@@ -63,7 +63,7 @@ public final class AntSubtypeService {
         Map<AntSubtypeSlot, Map<Integer, Float>> rates = new EnumMap<>(AntSubtypeSlot.class);
         for (AntSubtypeSlot slot : AntSubtypeSlot.values()) {
             Map<Integer, Float> slotRates = new HashMap<>();
-            slotRates.put(GameNumbers.SUBTYPE_DIGIT_NONE, 100f);
+            slotRates.put(AntSubtype.DIGIT_NONE, 100f);
             rates.put(slot, slotRates);
         }
         return rates;
@@ -165,7 +165,7 @@ public final class AntSubtypeService {
         Map<Integer, Float> slotRates = rates.computeIfAbsent(type, ignored -> defaultRatesForType()).get(slot);
         slotRates.clear();
         slotRates.put(digit, clamped);
-        slotRates.put(GameNumbers.SUBTYPE_DIGIT_NONE, 100f - clamped);
+        slotRates.put(AntSubtype.DIGIT_NONE, 100f - clamped);
     }
 
     public static Map<AntType, Map<AntSubtypeSlot, Map<Integer, Float>>> deepCopyRates(
@@ -180,7 +180,7 @@ public final class AntSubtypeService {
                 slotCopy.put(slotEntry.getKey(), new HashMap<>(slotEntry.getValue()));
             }
             for (AntSubtypeSlot slot : AntSubtypeSlot.values()) {
-                slotCopy.putIfAbsent(slot, new HashMap<>(Map.of(GameNumbers.SUBTYPE_DIGIT_NONE, 100f)));
+                slotCopy.putIfAbsent(slot, new HashMap<>(Map.of(AntSubtype.DIGIT_NONE, 100f)));
             }
             copy.put(entry.getKey(), slotCopy);
         }
@@ -201,7 +201,7 @@ public final class AntSubtypeService {
                 continue;
             }
             Map<Integer, Float> slotRates = new HashMap<>();
-            slotRates.put(GameNumbers.SUBTYPE_DIGIT_NONE, 100f - NPC_NATURAL_SUBTYPE_RATE);
+            slotRates.put(AntSubtype.DIGIT_NONE, 100f - NPC_NATURAL_SUBTYPE_RATE);
             slotRates.put(subtype.getDigit(), NPC_NATURAL_SUBTYPE_RATE);
             for (AntType type : getSubtypeRateTypes()) {
                 rates.get(type).put(subtype.getSlot(), slotRates);
@@ -264,19 +264,19 @@ public final class AntSubtypeService {
 
     public static AntSubtypeProfile rollProfile(Colony colony, AntType type) {
         int head = rollSlotDigit(colony, type, AntSubtypeSlot.HEAD);
-        int torso = GameNumbers.SUBTYPE_DIGIT_NONE;
+        int torso = AntSubtype.DIGIT_NONE;
         int abdomen = rollSlotDigit(colony, type, AntSubtypeSlot.ABDOMEN);
-        int other = GameNumbers.SUBTYPE_DIGIT_NONE;
+        int other = AntSubtype.DIGIT_NONE;
         return AntSubtypeProfile.of(head, torso, abdomen, other);
     }
 
     private static int rollSlotDigit(Colony colony, AntType type, AntSubtypeSlot slot) {
         if (!GameConstants.getConfigurableSubtypeSlots().contains(slot)) {
-            return GameNumbers.SUBTYPE_DIGIT_NONE;
+            return AntSubtype.DIGIT_NONE;
         }
         List<AntSubtype> options = getAvailableSubtypes(colony, slot);
         if (options.size() <= 1) {
-            return GameNumbers.SUBTYPE_DIGIT_NONE;
+            return AntSubtype.DIGIT_NONE;
         }
         double rand = GameRandom.nextDouble() * 100.0;
         double cumulative = 0.0;
@@ -286,7 +286,7 @@ public final class AntSubtypeService {
                 return subtype.getDigit();
             }
         }
-        return GameNumbers.SUBTYPE_DIGIT_NONE;
+        return AntSubtype.DIGIT_NONE;
     }
 
     public static void applySubtypeStats(Ant ant, Colony colony) {

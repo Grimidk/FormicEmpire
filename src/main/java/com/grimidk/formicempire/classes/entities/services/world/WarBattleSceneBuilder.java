@@ -51,7 +51,7 @@ public final class WarBattleSceneBuilder {
         Map<AntType, Integer> attackerCounts;
         Map<AntType, Integer> defenderCounts;
 
-        if (war.getStagePhase() == WarStagePhase.RESERVE_ASSAULT) {
+        if (war.getStagePhase() == GameConstants.WAR_STAGE_RESERVE_ASSAULT) {
             attackerPower = war.getDeployedActiveAttacker();
             defenderPower = GameNumbers.warHexDefenseEffectivePower(war.getDeployedReserveDefender());
             attackerCounts = compositionForDynastyActive(stageAttacker, attackerPower);
@@ -86,7 +86,7 @@ public final class WarBattleSceneBuilder {
                 war.getStageProgress(),
                 war.getProgressPercent(),
                 war.getRedeployHoursRemaining(),
-                war.getStagePhase() == WarStagePhase.RESERVE_ASSAULT,
+                war.getStagePhase() == GameConstants.WAR_STAGE_RESERVE_ASSAULT,
                 true);
     }
 
@@ -105,7 +105,7 @@ public final class WarBattleSceneBuilder {
                 GameConstants.BIOME_PLAINS,
                 new WarBattleScene.Side(-1, "?", GameConstants.SPECIES_OMNI, Map.of(), 0),
                 new WarBattleScene.Side(-1, "?", GameConstants.SPECIES_OMNI, Map.of(), 0),
-                WarStagePhase.ACTIVE_CLASH,
+                GameConstants.WAR_STAGE_ACTIVE_CLASH,
                 0.5f,
                 0f,
                 war != null ? war.getProgressPercent() : 50f,

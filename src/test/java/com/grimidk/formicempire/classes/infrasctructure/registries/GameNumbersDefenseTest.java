@@ -93,9 +93,9 @@ class GameNumbersDefenseTest {
         assertEquals(1f, GameConstants.TYPE_SOLDIER.getRegenMult(), 0.0001f);
         assertEquals(0f, GameConstants.TYPE_SOLDIER.getDefenseMult(), 0.0001f);
         assertEquals(1f, GameConstants.TYPE_MAJOR.getRegenMult(), 0.0001f);
-        assertEquals(GameNumbers.ANT_DEFENSE_PERCENT_MAJOR, GameConstants.TYPE_MAJOR.getDefenseMult(), 0.0001f);
+        assertEquals(20f, GameConstants.TYPE_MAJOR.getDefenseMult(), 0.0001f);
         assertEquals(1f, GameConstants.TYPE_QUEEN.getRegenMult(), 0.0001f);
-        assertEquals(GameNumbers.ANT_DEFENSE_PERCENT_QUEEN, GameConstants.TYPE_QUEEN.getDefenseMult(), 0.0001f);
+        assertEquals(20f, GameConstants.TYPE_QUEEN.getDefenseMult(), 0.0001f);
         assertEquals(10, GameNumbers.ANT_REGEN_PERCENT_BASE);
     }
 }

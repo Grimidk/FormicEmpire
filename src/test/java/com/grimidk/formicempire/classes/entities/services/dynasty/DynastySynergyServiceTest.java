@@ -110,4 +110,16 @@ class DynastySynergyServiceTest {
         assertTrue(dynasty.hasUpgrade(GameUnlocks.SYNERGY_SUPER_VENOM));
         assertEquals(1.5f, ColonyStatsService.getAssimilatedDamageMultiplier(dynasty), 0.0001f);
     }
+
+    @Test
+    void acidArtillerySynergyUnlocksArtilleryRole() {
+        Dynasty dynasty = new Dynasty(10, "Test", true, GameConstants.SPECIES_OMNI);
+        dynasty.unlockUpgrade(GameUnlocks.ABILITY_SYNERGY);
+        dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_ACIDSPIT);
+        dynasty.unlockUpgrade(GameUnlocks.TYPE_MAJOR);
+
+        assertTrue(DynastySynergyService.isUnlocked(dynasty, GameUnlocks.ACID_ARTILLERY_SYNERGY));
+        assertTrue(dynasty.hasUpgrade(GameUnlocks.ROLE_ARTILLERY));
+        assertTrue(GameConstants.isObtainableRole(GameConstants.ROLE_ARTILLERY));
+    }
 }

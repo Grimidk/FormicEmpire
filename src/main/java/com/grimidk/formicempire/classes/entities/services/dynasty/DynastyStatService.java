@@ -6,6 +6,7 @@ import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 
 import java.util.HashMap;
 import java.util.List;
@@ -92,5 +93,40 @@ public class DynastyStatService {
 
     public int getMilitaryPower(Dynasty dynasty) {
         return dynasty != null ? dynasty.getMilitaryPower() : 0;
+    }
+
+    public int getCombatCapacity(Dynasty dynasty) {
+        if (dynasty == null) {
+            return GameNumbers.COMBAT_CAPACITY_BASE;
+        }
+        if (hasAssignedCommanders(dynasty)) {
+            return GameNumbers.COMBAT_CAPACITY_WITH_COMMANDER;
+        }
+        return GameNumbers.COMBAT_CAPACITY_BASE;
+    }
+
+    public boolean hasAssignedCommanders(Dynasty dynasty) {
+        if (dynasty == null || dynasty.getColonies() == null) {
+            return false;
+        }
+        for (Colony colony : dynasty.getColonies()) {
+            if (colony != null && colony.getWarAssignedRoleCount(GameConstants.ROLE_COMMANDER) > 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean hasMultiQueenColony(Dynasty dynasty) {
+        if (dynasty == null || dynasty.getColonies() == null) {
+            return false;
+        }
+        int minQueens = GameNumbers.TRIGGER_COMMANDER_MIN_QUEENS_IN_COLONY;
+        for (Colony colony : dynasty.getColonies()) {
+            if (colony != null && colony.getQueens() != null && colony.getQueens().size() >= minQueens) {
+                return true;
+            }
+        }
+        return false;
     }
 }

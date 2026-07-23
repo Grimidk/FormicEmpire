@@ -9,7 +9,6 @@ import com.grimidk.formicempire.classes.entities.dynasty.Trade;
 import com.grimidk.formicempire.classes.entities.dynasty.War;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyRebellionService;
 import com.grimidk.formicempire.classes.entities.services.world.WarService;
-import com.grimidk.formicempire.classes.entities.services.world.WarStanding;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.World;
@@ -22,6 +21,7 @@ import com.grimidk.formicempire.classes.interfaces.ui.util.GameControlKeyBinding
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiDialogUtils;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
 import com.grimidk.formicempire.classes.infrasctructure.assets.GameSpritePreloader;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.registries.WorldSpaces;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
@@ -1808,7 +1808,7 @@ public class GamePanel extends ZeroGamePanel {
             if (offererId <= 0) {
                 continue;
             }
-            if (warService.getStandingForDynasty(war, playerDynasty) != WarStanding.LOSING) {
+            if (warService.getStandingForDynasty(war, playerDynasty) != GameConstants.WAR_STANDING_LOSING) {
                 continue;
             }
             if (lastPeaceOfferPromptWarId == war.getId()) {

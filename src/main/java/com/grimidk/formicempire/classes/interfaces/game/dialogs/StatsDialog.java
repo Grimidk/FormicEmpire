@@ -241,6 +241,11 @@ public class StatsDialog extends ZeroDialog {
                 setIcon(GameConstants.ICON_STAT_MILITARY_POWER);
                 setIconTextGap(6);
                 setToolTipText(LanguageStrings.get(LanguageStrings.STAT_MILITARY_POWER_DESC));
+            } else if (LanguageStrings.get(LanguageStrings.STAT_COMBAT_CAPACITY).equals(property) && value instanceof Integer capacity) {
+                setText(AssetStyles.formatNumber(capacity));
+                setIcon(GameConstants.ICON_STAT_COMBAT_CAPACITY);
+                setIconTextGap(6);
+                setToolTipText(LanguageStrings.get(LanguageStrings.STAT_COMBAT_CAPACITY_DESC));
             } else if (value instanceof Number number) {
                 setIcon(null);
                 setText(AssetStyles.formatNumber(number));
@@ -566,6 +571,7 @@ public class StatsDialog extends ZeroDialog {
                 model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_GLOBAL_POP), dynastyStatsService.getTotalPopulation(dynasty)});
                 model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_GLOBAL_QUEENS), dynastyStatsService.getTotalQueens(dynasty)});
                 model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_MILITARY_POWER), dynasty.getMilitaryPower()});
+                model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_COMBAT_CAPACITY), dynasty.getCombatCapacity()});
             }
         } else {
             // Colony Info
@@ -646,6 +652,7 @@ public class StatsDialog extends ZeroDialog {
         model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_GLOBAL_QUEENS), dynastyStatsService.getTotalQueens(dynasty)});
         model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_BIRTH_RATE), LanguageStrings.format(LanguageStrings.STAT_RATE_EGGS_DAY, dynastyStatsService.getGlobalBirthRateDaily(dynasty))});
         model.addRow(new Object[]{GameConstants.ICON_STAT_MILITARY_POWER, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_MILITARY_POWER), dynasty.getMilitaryPower()});
+        model.addRow(new Object[]{GameConstants.ICON_STAT_COMBAT_CAPACITY, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_COMBAT_CAPACITY), dynasty.getCombatCapacity()});
         model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_NUPTIAL_FLIGHTS), dynasty.getTotalNuptialFlights()});
         model.addRow(new Object[]{GameConstants.ICON_STAT_GENETIC_INTEGRITY, LanguageStrings.get(LanguageStrings.STAT_DYNASTY), LanguageStrings.get(LanguageStrings.STAT_GENETIC_INTEGRITY), String.format("%.1f%%", dynasty.getGeneticIntegrity())});
 

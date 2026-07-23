@@ -5,7 +5,7 @@ import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.dynasty.War;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDiplomacyService;
 import com.grimidk.formicempire.classes.entities.services.world.WarService;
-import com.grimidk.formicempire.classes.entities.services.world.WarStanding;
+import com.grimidk.formicempire.classes.constants.dynasty.WarStanding;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
@@ -255,12 +255,12 @@ public class WarManagementPanel extends JPanel implements DynastyManagementDialo
     private static String formatNeutralStanding(WarService warService, War war) {
         Dynasty leader = warService.getLeadingDynasty(war);
         if (leader == null) {
-            return warService.formatStanding(WarStanding.EVEN);
+            return warService.formatStanding(GameConstants.WAR_STANDING_EVEN);
         }
         return LanguageStrings.format(
                 LanguageStrings.WAR_STANDING_LEADER_FMT,
                 leader.getName(),
-                warService.formatStanding(WarStanding.WINNING));
+                warService.formatStanding(GameConstants.WAR_STANDING_WINNING));
     }
 
     private void updateHistoricWars() {

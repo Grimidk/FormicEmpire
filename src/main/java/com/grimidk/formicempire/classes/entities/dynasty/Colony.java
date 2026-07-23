@@ -1430,15 +1430,15 @@ public class Colony {
 
     public float getSubtypeHatchRate(AntType type, AntSubtypeSlot slot, int digit) {
         if (type == null) {
-            return digit == GameNumbers.SUBTYPE_DIGIT_NONE ? 100f : 0f;
+            return digit == AntSubtype.DIGIT_NONE ? 100f : 0f;
         }
         Map<AntSubtypeSlot, Map<Integer, Float>> typeRates = subtypeHatchRates.get(type);
         if (typeRates == null) {
-            return digit == GameNumbers.SUBTYPE_DIGIT_NONE ? 100f : 0f;
+            return digit == AntSubtype.DIGIT_NONE ? 100f : 0f;
         }
         Map<Integer, Float> slotRates = typeRates.get(slot);
         if (slotRates == null) {
-            return digit == GameNumbers.SUBTYPE_DIGIT_NONE ? 100f : 0f;
+            return digit == AntSubtype.DIGIT_NONE ? 100f : 0f;
         }
         return slotRates.getOrDefault(digit, 0f);
     }

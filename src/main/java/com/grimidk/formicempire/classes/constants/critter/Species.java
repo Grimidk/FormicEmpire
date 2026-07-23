@@ -1,5 +1,7 @@
 package com.grimidk.formicempire.classes.constants.critter;
 
+import java.util.List;
+
 import javax.swing.ImageIcon;
 
 import com.grimidk.formicempire.classes.constants.Constant;
@@ -17,17 +19,25 @@ public class Species extends Constant {
     private final float baseSpeed;
     private final ImageIcon sprite;
     private final boolean pet;
+    private final List<Skill> baseSkills;
 
     public Species(int id, String name, CritterClass critterClass, String scientificNameKey, float baseHealth,
             float baseRegen, float baseAttack, float baseAttackSpeed, float baseDefense, float baseSpeed,
             ImageIcon icon, ImageIcon sprite) {
         this(id, name, critterClass, scientificNameKey, baseHealth, baseRegen, baseAttack, baseAttackSpeed,
-                baseDefense, baseSpeed, icon, sprite, false);
+                baseDefense, baseSpeed, icon, sprite, false, List.of());
     }
 
     public Species(int id, String name, CritterClass critterClass, String scientificNameKey, float baseHealth,
             float baseRegen, float baseAttack, float baseAttackSpeed, float baseDefense, float baseSpeed,
             ImageIcon icon, ImageIcon sprite, boolean pet) {
+        this(id, name, critterClass, scientificNameKey, baseHealth, baseRegen, baseAttack, baseAttackSpeed,
+                baseDefense, baseSpeed, icon, sprite, pet, List.of());
+    }
+
+    public Species(int id, String name, CritterClass critterClass, String scientificNameKey, float baseHealth,
+            float baseRegen, float baseAttack, float baseAttackSpeed, float baseDefense, float baseSpeed,
+            ImageIcon icon, ImageIcon sprite, boolean pet, List<Skill> baseSkills) {
         super(id, name, icon);
         this.critterClass = critterClass;
         this.scientificNameKey = scientificNameKey;
@@ -39,6 +49,7 @@ public class Species extends Constant {
         this.baseSpeed = baseSpeed;
         this.sprite = sprite;
         this.pet = pet;
+        this.baseSkills = baseSkills == null || baseSkills.isEmpty() ? List.of() : List.copyOf(baseSkills);
     }
 
     public CritterClass getCritterClass() {
@@ -79,5 +90,9 @@ public class Species extends Constant {
 
     public ImageIcon getSprite() {
         return sprite;
+    }
+
+    public List<Skill> getBaseSkills() {
+        return baseSkills;
     }
 }

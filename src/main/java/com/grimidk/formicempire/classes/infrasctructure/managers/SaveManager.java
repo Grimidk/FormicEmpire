@@ -25,7 +25,6 @@ import com.grimidk.formicempire.classes.entities.dynasty.Trade;
 import com.grimidk.formicempire.classes.entities.Tunnel;
 import com.grimidk.formicempire.classes.entities.dynasty.War;
 import com.grimidk.formicempire.classes.entities.services.colony.AntSubtypeService;
-import com.grimidk.formicempire.classes.entities.services.world.WarStagePhase;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.util.GamePaths;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
@@ -1995,7 +1994,7 @@ public class SaveManager {
             sb.append("\"defenderStagesCaptured\":").append(war.defenderStagesCaptured).append(",");
             sb.append("\"stageProgress\":").append(war.stageProgress).append(",");
             sb.append("\"stagePhaseKey\":\"").append(escapeJsonString(
-                    war.stagePhaseKey != null ? war.stagePhaseKey : WarStagePhase.ACTIVE_CLASH.name())).append("\",");
+                    war.stagePhaseKey != null ? war.stagePhaseKey : GameConstants.WAR_STAGE_ACTIVE_CLASH.getPersistenceKey())).append("\",");
             sb.append("\"contestedColonyId\":").append(war.contestedColonyId).append(",");
             sb.append("\"stageAttackerDynastyId\":").append(war.stageAttackerDynastyId).append(",");
             sb.append("\"deployedActiveAttacker\":").append(war.deployedActiveAttacker).append(",");
@@ -2067,7 +2066,7 @@ public class SaveManager {
                         war.aggressorStagesCaptured = Integer.parseInt(map.getOrDefault("aggressorStagesCaptured", "0"));
                         war.defenderStagesCaptured = Integer.parseInt(map.getOrDefault("defenderStagesCaptured", "0"));
                         war.stageProgress = parseFloat(map.get("stageProgress"), 0f);
-                        war.stagePhaseKey = map.getOrDefault("stagePhaseKey", WarStagePhase.ACTIVE_CLASH.name());
+                        war.stagePhaseKey = map.getOrDefault("stagePhaseKey", GameConstants.WAR_STAGE_ACTIVE_CLASH.getPersistenceKey());
                         war.contestedColonyId = Integer.parseInt(map.getOrDefault("contestedColonyId", "0"));
                         war.stageAttackerDynastyId = Integer.parseInt(map.getOrDefault("stageAttackerDynastyId", "0"));
                         war.deployedActiveAttacker = Integer.parseInt(map.getOrDefault("deployedActiveAttacker", "0"));

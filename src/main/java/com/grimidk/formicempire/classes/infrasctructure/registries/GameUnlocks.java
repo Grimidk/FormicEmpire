@@ -61,6 +61,10 @@ public final class GameUnlocks {
         // TODO asset: icons/roles/Researcher.png (upgrade tree icon; may diverge from role icon)
         public static final Upgrade ROLE_RESEARCHER = new Upgrade(14, "ROLE_RESEARCHER_UPGRADE", "ROLE_RESEARCHER_FLAVOR", "ROLE_RESEARCHER_DESC", TYPE_QUEEN, 0, null, 0);
         static { upgrades.add(ROLE_RESEARCHER); }
+        // TODO asset: icons/roles/Commander.png (upgrade tree icon; may diverge from role icon)
+        // Unlocked via wars participated + multi-queen colony trigger (not RP-purchasable).
+        public static final Upgrade ROLE_COMMANDER = new Upgrade(40, "ROLE_COMMANDER_UPGRADE", "ROLE_COMMANDER_FLAVOR", "ROLE_COMMANDER_DESC", TYPE_QUEEN, 0, null, 0);
+        static { upgrades.add(ROLE_COMMANDER); }
         // TODO asset: icons/roles/Builder.png (upgrade tree icon; may diverge from role icon)
         public static final Upgrade ROLE_BUILDER = new Upgrade(15, "ROLE_BUILDER_UPGRADE", "ROLE_BUILDER_FLAVOR", "ROLE_BUILDER_DESC", TYPE_WORKER, 150, null, 1);
         static { upgrades.add(ROLE_BUILDER); }
@@ -92,8 +96,9 @@ public final class GameUnlocks {
         // Not purchasable until implemented
         public static final Upgrade ROLE_CARRIER = new Upgrade(26, "ROLE_CARRIER_UPGRADE", "ROLE_CARRIER_FLAVOR", "ROLE_CARRIER_DESC", TYPE_MAJOR, 0, null, 0);
         // TODO asset: icons/roles/Artillery.png (upgrade tree icon; may diverge from role icon)
-        // Not purchasable until implemented
+        // Unlocked via Acid Spit + Major synergy (not RP-purchasable).
         public static final Upgrade ROLE_ARTILLERY = new Upgrade(27, "ROLE_ARTILLERY_UPGRADE", "ROLE_ARTILLERY_FLAVOR", "ROLE_ARTILLERY_DESC", TYPE_MAJOR, 0, null, 0);
+        static { upgrades.add(ROLE_ARTILLERY); }
         // TODO asset: icons/roles/Siege.png (upgrade tree icon; may diverge from role icon)
         // Not purchasable until implemented
         public static final Upgrade ROLE_SIEGE = new Upgrade(28, "ROLE_SIEGE_UPGRADE", "ROLE_SIEGE_FLAVOR", "ROLE_SIEGE_DESC", TYPE_MAJOR, 0, null, 0);
@@ -414,6 +419,9 @@ public final class GameUnlocks {
         // TODO mechanic: desert route navigation — not implemented
         public static final Upgrade ASSIMILATED_LOCSENSE = new Upgrade(1021, "ASSIMILATED_LOCSENSE", "ASSIMILATED_LOCSENSE_FLAVOR", "ASSIMILATED_LOCSENSE_DESC", ABILITY_ASSIMILATION, 0, null, 0);
         static { upgrades.add(ASSIMILATED_LOCSENSE); }
+        // TODO asset: icons/upgrades/AssimilatedAcidspit.png; icons/species/Green.png (placeholder — replace final art)
+        public static final Upgrade ASSIMILATED_ACIDSPIT = new Upgrade(1022, "ASSIMILATED_ACIDSPIT", "ASSIMILATED_ACIDSPIT_FLAVOR", "ASSIMILATED_ACIDSPIT_DESC", ABILITY_ASSIMILATION, 0, null, 0);
+        static { upgrades.add(ASSIMILATED_ACIDSPIT); }
 
         // TODO asset: icons/upgrades/SynergySuperVenom.png (placeholder — replace final art)
         public static final Upgrade SYNERGY_SUPER_VENOM = new Upgrade(10001, "SYNERGY_SUPER_VENOM", "SYNERGY_SUPER_VENOM_FLAVOR", "SYNERGY_SUPER_VENOM_DESC", null, 0, null, 0);
@@ -635,12 +643,19 @@ public final class GameUnlocks {
         // TODO mechanic: reward ASSIMILATED_LOCSENSE — not implemented
         public static final Assimilation ASSIMILATION_LOCSENSE = new Assimilation(22, "ASSIMILATION_LOCSENSE", "ASSIMILATION_LOCSENSE_DESC", ASSIMILATED_LOCSENSE, ASSIMILATION_COST, null);
         static { assimilations.add(ASSIMILATION_LOCSENSE); }
+        // TODO asset: icons/assimilations/Green.png; icons/species/Green.png (placeholder — replace final art)
+        public static final Assimilation ASSIMILATION_ACIDSPIT = new Assimilation(23, "ASSIMILATION_ACIDSPIT", "ASSIMILATION_ACIDSPIT_DESC", ASSIMILATED_ACIDSPIT, ASSIMILATION_COST, null);
+        static { assimilations.add(ASSIMILATION_ACIDSPIT); }
 
         // --- Synergies ---
         // TODO asset: icons/synergies/SuperVenom.png
         public static final Synergy SUPER_VENOM_SYNERGY = new Synergy(1, "SYNERGY_SUPER_VENOM", "SYNERGY_SUPER_VENOM_DESC",
                 SYNERGY_SUPER_VENOM, ASSIMILATED_FIREVENOM, ASSIMILATED_DEADLYVENOM);
         static { synergies.add(SUPER_VENOM_SYNERGY); }
+        // TODO asset: icons/synergies/AcidArtillery.png
+        public static final Synergy ACID_ARTILLERY_SYNERGY = new Synergy(2, "SYNERGY_ACID_ARTILLERY", "SYNERGY_ACID_ARTILLERY_DESC",
+                ROLE_ARTILLERY, ASSIMILATED_ACIDSPIT, TYPE_MAJOR);
+        static { synergies.add(ACID_ARTILLERY_SYNERGY); }
 
         // --- Getters ---
         public static List<Upgrade> getUpgrades() { return Collections.unmodifiableList(upgrades); }

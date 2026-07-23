@@ -163,6 +163,7 @@ public class TriggerManager {
         checkMilitiaRoleRetrofit();
         checkBreederRoleUnlock();
         checkBruteRoleUnlock();
+        checkCommanderRoleUnlock();
         checkSpreadAbilityUnlock();
         checkScoutRoleUnlock();
         checkDynastyTriggers();
@@ -401,6 +402,25 @@ public class TriggerManager {
             fireLocalizedTrigger(GameUnlocks.ROLE_BRUTE,
                 LanguageStrings.TRIGGER_BRUTE_ROLE_TITLE,
                 LanguageStrings.TRIGGER_BRUTE_ROLE_MSG);
+        }
+    }
+
+    private void checkCommanderRoleUnlock() {
+        if (playerColony.hasUpgrade(GameUnlocks.ROLE_COMMANDER)) {
+            return;
+        }
+        Dynasty dynasty = playerColony.getDynasty();
+        if (dynasty == null || world == null || world.getWarService() == null) {
+            return;
+        }
+        if (dynasty.getStatService() == null || !dynasty.getStatService().hasMultiQueenColony(dynasty)) {
+            return;
+        }
+        int wars = world.getWarService().countWarsForDynasty(dynasty.getId());
+        if (wars >= GameNumbers.TRIGGER_COMMANDER_MIN_WARS) {
+            fireLocalizedTrigger(GameUnlocks.ROLE_COMMANDER,
+                    LanguageStrings.TRIGGER_COMMANDER_ROLE_TITLE,
+                    LanguageStrings.TRIGGER_COMMANDER_ROLE_MSG);
         }
     }
     

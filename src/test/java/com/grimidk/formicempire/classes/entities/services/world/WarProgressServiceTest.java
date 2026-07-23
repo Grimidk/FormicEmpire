@@ -49,7 +49,7 @@ class WarProgressServiceTest {
         War war = world.getWarService().beginWar(aggressor, defender);
 
         assertNotNull(war);
-        assertEquals(WarStagePhase.RESERVE_ASSAULT, war.getStagePhase());
+        assertEquals(GameConstants.WAR_STAGE_RESERVE_ASSAULT, war.getStagePhase());
         assertTrue(war.getDeployedReserveDefender() > 0);
         assertEquals(0, war.getDeployedActiveDefender());
     }
@@ -61,7 +61,7 @@ class WarProgressServiceTest {
         assertNotNull(war);
         assertTrue(war.isCampaignInitialized());
         assertEquals(50f, war.getProgressPercent(), 0.01f);
-        assertEquals(WarStagePhase.ACTIVE_CLASH, war.getStagePhase());
+        assertEquals(GameConstants.WAR_STAGE_ACTIVE_CLASH, war.getStagePhase());
         assertEquals(aggressor.getId(), war.getStageAttackerDynastyId());
         assertEquals(defender.getColonies().get(0).getId(), war.getContestedColonyId());
     }
@@ -86,7 +86,7 @@ class WarProgressServiceTest {
         assertTrue(wideWorld.getWarService().forfeitWarStage(war, defender));
 
         assertEquals(beforeCaptured + 1, war.getAggressorStagesCaptured());
-        assertEquals(WarStagePhase.REDEPLOYING, war.getStagePhase());
+        assertEquals(GameConstants.WAR_STAGE_REDEPLOYING, war.getStagePhase());
         assertEquals(GameNumbers.WAR_REDEPLOY_HOURS, war.getRedeployHoursRemaining());
     }
 
@@ -103,7 +103,7 @@ class WarProgressServiceTest {
     void aiNeverFallbacksWhenStronger() {
         World wideWorld = buildThreeHexWorld();
         War war = wideWorld.getWarService().beginWar(aggressor, defender);
-        war.setStagePhase(WarStagePhase.REDEPLOYING);
+        war.setStagePhase(GameConstants.WAR_STAGE_REDEPLOYING);
         war.setContestedColonyId(wideWorld.getHexes().get(1).getColony().getId());
         defender.setActiveMilitaryPower(9000);
         aggressor.setActiveMilitaryPower(1000);
@@ -115,7 +115,7 @@ class WarProgressServiceTest {
     @Test
     void aiNeverFallbacksWithoutSpareHexes() {
         War war = world.getWarService().beginWar(aggressor, defender);
-        war.setStagePhase(WarStagePhase.REDEPLOYING);
+        war.setStagePhase(GameConstants.WAR_STAGE_REDEPLOYING);
         defender.setActiveMilitaryPower(1000);
         aggressor.setActiveMilitaryPower(2000);
         war.setStageStartActiveDefender(900);

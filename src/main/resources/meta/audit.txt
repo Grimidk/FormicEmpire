@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 82% (257/315 checked)
+Completion: 80% (257/320 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -229,6 +229,7 @@ Assimilated species passives (research tree):
 [X] Silkweave, Rafting, Firevenom, Jumping, Gliding, Stinging
 [ ] Swarming, Stealth, Fastbite (ants 1→2; soldiers/majors 2→4), Heatresist, Deadlyvenom, Selfdestruct
 [X] Farsight, Hivebuild, Locsense
+[ ] Acidspit (Green Ant — unlocks Acid Spitting skill)
 
 [X] Insufficient RP blocks purchase with message
 [X] Prerequisites hide or disable locked nodes
@@ -263,6 +264,7 @@ Start / progress assimilations (RP + time). Target RP cost scales +25% per compl
 [X] Woodburrow, Silkweave, Rafting, Firevenom, Jumping, Gliding
 [ ] Stinging, Swarming, Stealth, Fastbite (ants 1→2; soldiers/majors 2→4), Heatresist, Deadlyvenom
 [X] Selfdestruct, Farsight, Hivebuild, Locsense
+[ ] Acidspit (Green Ant)
 
 [X] Assimilation RP target cost scales +25% per completed assimilation (5th = 200% base)
 [X] Completed assimilation unlocks hatch subtypes (trapjaw, honeypot, doorhead, stinger); other passives still pending
@@ -273,6 +275,7 @@ Start / progress assimilations (RP + time). Target RP cost scales +25% per compl
 [X] Synergies tab lists in-progress combinations (1/2 requirements met)
 [X] Popup when synergy conditions are fully met
 [ ] Super Venom replaces Fire + Neurotoxic +50% each with +200% attack (3x total)
+[ ] Acid Artillery (Acid Spit + Major) unlocks Artillery role and Acid Artillery skill
 [X] Synergy effects apply to colony / dynasty stats
 
 ================================================================================
@@ -410,6 +413,7 @@ Help encyclopedia (main menu Help):
 [X] Buildings list
 [X] Assimilations list
 [X] Synergies list (Help > Synergies — Super Venom and future combos)
+[ ] Combat (Help > Combat — skills, battle lines, war phases / standing)
 [X] World / biomes / hexes
 [X] UI controls (Help > UI Controls tab — speed bar and icons)
 
@@ -424,6 +428,7 @@ Daily:
 [X] Graver role unlock
 [X] Scout unlock from plant harvest (any plant source)
 [ ] Hunter / Breeder / Brute role unlocks
+[ ] Commander role unlock (3 wars participated + multi-queen colony)
 [ ] Research / Build / Spread ability unlocks
 [ ] Dynasty / Trade / Management / Spread 2 / Automation unlocks by colony count
 [ ] Bilateral Trade unlock from active trade count

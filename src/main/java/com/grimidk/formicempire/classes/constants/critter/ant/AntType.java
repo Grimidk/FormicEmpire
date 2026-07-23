@@ -12,9 +12,18 @@ public class AntType extends Constant {
     private final float attackSpeedMult;
     private final float defenseMult;
     private final float speedMult;
+    private final int militaryWeight;
     private final String spriteName;
 
-    public AntType(int id, String name, float healtMult, float attackMult, float regenMult, float consumptionMult, float attackSpeedMult, float defenseMult, float speedMult, ImageIcon icon, String spriteName) {
+    public AntType(int id, String name, float healtMult, float attackMult, float regenMult, float consumptionMult,
+            float attackSpeedMult, float defenseMult, float speedMult, ImageIcon icon, String spriteName) {
+        this(id, name, healtMult, attackMult, regenMult, consumptionMult, attackSpeedMult, defenseMult, speedMult,
+                0, icon, spriteName);
+    }
+
+    public AntType(int id, String name, float healtMult, float attackMult, float regenMult, float consumptionMult,
+            float attackSpeedMult, float defenseMult, float speedMult, int militaryWeight, ImageIcon icon,
+            String spriteName) {
         super(id, name, icon);
         this.healtMult = healtMult;
         this.attackMult = attackMult;
@@ -23,6 +32,7 @@ public class AntType extends Constant {
         this.attackSpeedMult = attackSpeedMult;
         this.defenseMult = defenseMult;
         this.speedMult = speedMult;
+        this.militaryWeight = Math.max(0, militaryWeight);
         this.spriteName = spriteName;
     }
 
@@ -52,6 +62,10 @@ public class AntType extends Constant {
 
     public float getSpeedMult() {
         return speedMult;
+    }
+
+    public int getMilitaryWeight() {
+        return militaryWeight;
     }
 
     public String getSpriteName() {

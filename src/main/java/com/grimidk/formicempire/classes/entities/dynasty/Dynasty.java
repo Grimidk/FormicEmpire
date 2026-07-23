@@ -1965,6 +1965,10 @@ public class Dynasty {
         this.militaryPower = Math.max(0, militaryPower);
     }
 
+    public int getCombatCapacity() {
+        return getStatService() != null ? getStatService().getCombatCapacity(this) : GameNumbers.COMBAT_CAPACITY_BASE;
+    }
+
     public int getActiveMilitaryPower() {
         return activeMilitaryPower;
     }

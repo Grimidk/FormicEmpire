@@ -3,6 +3,7 @@ package com.grimidk.formicempire.classes.infrasctructure.registries;
 import com.grimidk.formicempire.classes.infrasctructure.assets.GameSpritePreloader;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.constants.critter.CritterClass;
+import com.grimidk.formicempire.classes.constants.critter.Skill;
 import com.grimidk.formicempire.classes.constants.critter.Species;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntStatus;
@@ -18,6 +19,9 @@ import com.grimidk.formicempire.classes.constants.dynasty.Rank;
 import com.grimidk.formicempire.classes.constants.dynasty.DynastyTitle;
 import com.grimidk.formicempire.classes.constants.dynasty.DiplomaticReputation;
 import com.grimidk.formicempire.classes.constants.dynasty.DiplomaticReputationModifier;
+import com.grimidk.formicempire.classes.constants.dynasty.BattleLine;
+import com.grimidk.formicempire.classes.constants.dynasty.WarStagePhase;
+import com.grimidk.formicempire.classes.constants.dynasty.WarStanding;
 import com.grimidk.formicempire.classes.constants.misc.GameSpeed;
 import com.grimidk.formicempire.classes.constants.dynasty.GeneticIntegrityModifier;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
@@ -203,6 +207,7 @@ public final class GameConstants {
     private static final List<AntStatus> antStatuses = new ArrayList<>();
     private static final List<MoveStatus> moveStatuses = new ArrayList<>();
     private static final List<CritterClass> critterClasses = new ArrayList<>();
+    private static final List<Skill> skills = new ArrayList<>();
     private static final List<Species> critterSpecies = new ArrayList<>();
     private static final List<AntType> antTypes = new ArrayList<>();
     private static final List<AntSubtype> antSubtypes = new ArrayList<>();
@@ -218,6 +223,9 @@ public final class GameConstants {
     private static final List<CityTitle> cityTitles = new ArrayList<>();
     private static final List<AntSpecies> species = new ArrayList<>();
     private static final List<TradeMethod> tradeMethods = new ArrayList<>();
+    private static final List<WarStagePhase> warStagePhases = new ArrayList<>();
+    private static final List<WarStanding> warStandings = new ArrayList<>();
+    private static final List<BattleLine> battleLines = new ArrayList<>();
     private static final List<Humidity> humidity = new ArrayList<>();
     private static final List<Temperature> temperature = new ArrayList<>();
     private static final List<ImageIcon> misc = new ArrayList<>();
@@ -244,6 +252,8 @@ public final class GameConstants {
     static { misc.add(ICON_STAT_GENETIC_INTEGRITY); }
     public static final ImageIcon ICON_STAT_MILITARY_POWER = loadIcon("icons/misc/MilitaryPower.png");
     static { misc.add(ICON_STAT_MILITARY_POWER); }
+    public static final ImageIcon ICON_STAT_COMBAT_CAPACITY = loadIcon("icons/misc/CombatCapacity.png");
+    static { misc.add(ICON_STAT_COMBAT_CAPACITY); }
     public static final ImageIcon ICON_STAT_POPULATION = loadIcon("icons/misc/Population.png");
     static { misc.add(ICON_STAT_POPULATION); }
     public static final ImageIcon ICON_STAT_FOOD_CONSUMPTION = loadIcon("icons/misc/FoodConsumption.png");
@@ -527,25 +537,59 @@ public final class GameConstants {
     public static final CritterClass CRITTER_CLASS_REPTILE = new CritterClass(4, LanguageStrings.CRITTER_CLASS_REPTILE,
         loadIcon("icons/critterclasses/Reptile.png"));
     static { critterClasses.add(CRITTER_CLASS_REPTILE); }
-    public static final CritterClass CRITTER_CLASS_RODENT = new CritterClass(5, LanguageStrings.CRITTER_CLASS_RODENT,
-        loadIcon("icons/critterclasses/Rodent.png"));
-    static { critterClasses.add(CRITTER_CLASS_RODENT); }
-    public static final CritterClass CRITTER_CLASS_MAMMAL = new CritterClass(6, LanguageStrings.CRITTER_CLASS_MAMMAL,
+    public static final CritterClass CRITTER_CLASS_AMPHIBIAN = new CritterClass(5, LanguageStrings.CRITTER_CLASS_AMPHIBIAN,
+        loadIcon("icons/critterclasses/Amphibian.png"));
+    static { critterClasses.add(CRITTER_CLASS_AMPHIBIAN); }
+    public static final CritterClass CRITTER_CLASS_BIRD = new CritterClass(6, LanguageStrings.CRITTER_CLASS_BIRD,
+        loadIcon("icons/critterclasses/Bird.png"));
+    static { critterClasses.add(CRITTER_CLASS_BIRD); }
+    public static final CritterClass CRITTER_CLASS_MAMMAL = new CritterClass(5, LanguageStrings.CRITTER_CLASS_MAMMAL,
         loadIcon("icons/critterclasses/Mammal.png"));
     static { critterClasses.add(CRITTER_CLASS_MAMMAL); }
-    public static final CritterClass CRITTER_CLASS_FUNGI = new CritterClass(7, LanguageStrings.CRITTER_CLASS_FUNGI,
+    public static final CritterClass CRITTER_CLASS_FUNGI = new CritterClass(6, LanguageStrings.CRITTER_CLASS_FUNGI,
         loadIcon("icons/critterclasses/Fungi.png"));
     static { critterClasses.add(CRITTER_CLASS_FUNGI); }
-    public static final CritterClass CRITTER_CLASS_PLANT = new CritterClass(8, LanguageStrings.CRITTER_CLASS_PLANT,
+    public static final CritterClass CRITTER_CLASS_PLANT = new CritterClass(7, LanguageStrings.CRITTER_CLASS_PLANT,
         loadIcon("icons/critterclasses/Plant.png"));
     static { critterClasses.add(CRITTER_CLASS_PLANT); }
-    public static final CritterClass CRITTER_CLASS_XENO = new CritterClass(9, LanguageStrings.CRITTER_CLASS_XENO,
+    public static final CritterClass CRITTER_CLASS_XENO = new CritterClass(8, LanguageStrings.CRITTER_CLASS_XENO,
         loadIcon("icons/critterclasses/Xeno.png"));
     static { critterClasses.add(CRITTER_CLASS_XENO); }
 
+    // --- Skills ---
+    // TODO asset: icons/skills/BasicBite.png (placeholder — replace final art)
+    public static final Skill SKILL_BASIC_BITE = new Skill(1, LanguageStrings.SKILL_BASIC_BITE,
+            1f, 1f, loadIcon("icons/skills/BasicBite.png"));
+    static { skills.add(SKILL_BASIC_BITE); }
+    // TODO asset: icons/skills/PowerfulBite.png (placeholder — replace final art)
+    public static final Skill SKILL_POWERFUL_BITE = new Skill(2, LanguageStrings.SKILL_POWERFUL_BITE,
+            1f, 2f, loadIcon("icons/skills/PowerfulBite.png"));
+    static { skills.add(SKILL_POWERFUL_BITE); }
+    // TODO asset: icons/skills/Stinging.png (placeholder — replace final art)
+    public static final Skill SKILL_STINGING = new Skill(3, LanguageStrings.SKILL_STINGING,
+            0.8f, 2.5f, loadIcon("icons/skills/Stinging.png"));
+    static { skills.add(SKILL_STINGING); }
+    // TODO asset: icons/skills/Shielding.png (placeholder — replace final art)
+    public static final Skill SKILL_SHIELDING = new Skill(4, LanguageStrings.SKILL_SHIELDING,
+            1f, 0f, loadIcon("icons/skills/Shielding.png"));
+    static { skills.add(SKILL_SHIELDING); }
+    // TODO asset: icons/skills/BoostRegen.png (placeholder — replace final art)
+    public static final Skill SKILL_BOOST_REGEN = new Skill(5, LanguageStrings.SKILL_BOOST_REGEN,
+            1f, 0f, loadIcon("icons/skills/BoostRegen.png"));
+    static { skills.add(SKILL_BOOST_REGEN); }
+    // TODO asset: icons/skills/AcidSpitting.png (placeholder — replace final art)
+    public static final Skill SKILL_ACID_SPITTING = new Skill(6, LanguageStrings.SKILL_ACID_SPITTING,
+            0.75f, 2f, GameUnlocks.ASSIMILATED_ACIDSPIT, loadIcon("icons/skills/AcidSpitting.png"));
+    static { skills.add(SKILL_ACID_SPITTING); }
+    // TODO asset: icons/skills/AcidArtillery.png (placeholder — replace final art)
+    // Required role wired after ROLE_ARTILLERY (see Ant Roles section).
+    public static final Skill SKILL_ACID_ARTILLERY = new Skill(7, LanguageStrings.SKILL_ACID_ARTILLERY,
+            0.5f, 5f, loadIcon("icons/skills/AcidArtillery.png"));
+    static { skills.add(SKILL_ACID_ARTILLERY); }
+
     // --- Species ---
     public static final Species TYPE_ANT = new Species(1, LanguageStrings.BUG_ANT, CRITTER_CLASS_ANT, LanguageStrings.BUG_ANT_SCIENTIFIC, 1, 1, 1, 1, 1, 1,
-        loadIcon("icons/ants/omni/Worker.png"), loadIcon("sprites/ants/omni/Worker.png"));
+        loadIcon("icons/ants/omni/Worker.png"), loadIcon("sprites/ants/omni/Worker.png"), false, List.of(SKILL_BASIC_BITE));
     static { critterSpecies.add(TYPE_ANT); }
     public static final Species TYPE_APHID = new Species(2, LanguageStrings.BUG_APHID, CRITTER_CLASS_INSECT, LanguageStrings.BUG_APHID_SCIENTIFIC, 1, 1, 0, 0, 0, 0.5f,
         loadIcon("icons/critters/Aphid.png") , loadIcon("sprites/critters/Aphid.png"), true);
@@ -618,9 +662,6 @@ public final class GameConstants {
     }
 
     // --- Ant Types ---
-    // Mult order: health, attack, regen, consumption, attackSpeed, defense(% abs for majors/queens), speed
-    // Regen mult × colony base regen (10 with skeleton) = % of max HP recovered per tick.
-    // Juveniles and drones do not fight: 1 HP and zero combat stats.
     public static final AntType TYPE_EGG = new AntType(1, LanguageStrings.TYPE_EGG, 0.01f, 0f, 0f, 0f, 0f, 0f, 0f,
         loadIcon("icons/ants/Egg.png"), "Egg.png");
     static { antTypes.add(TYPE_EGG); }    
@@ -630,22 +671,22 @@ public final class GameConstants {
     public static final AntType TYPE_PUPA = new AntType(3, LanguageStrings.TYPE_PUPA, 0.01f, 0f, 0f, 0f, 0f, 0f, 0f,
         loadIcon("icons/ants/Pupa.png"), "Pupa.png");
     static { antTypes.add(TYPE_PUPA); }
-    public static final AntType TYPE_WORKER = new AntType(4, LanguageStrings.TYPE_WORKER, 1f, 1f, 1f, 1f, 1f, 0f, 1f, 
+    public static final AntType TYPE_WORKER = new AntType(4, LanguageStrings.TYPE_WORKER, 1f, 1f, 1f, 1f, 1f, 0f, 1f, 1,
         loadIcon("icons/ants/omni/Worker.png"), "Worker.png");
     static { antTypes.add(TYPE_WORKER); }
-    public static final AntType TYPE_SOLDIER = new AntType(5, LanguageStrings.TYPE_SOLDIER, 3f, 3f, 1f, 2f, 2f, 0f, 3f, 
+    public static final AntType TYPE_SOLDIER = new AntType(5, LanguageStrings.TYPE_SOLDIER, 3f, 3f, 1f, 2f, 2f, 0f, 3f, 5,
         loadIcon("icons/ants/omni/Soldier.png"), "Soldier.png");
     static { antTypes.add(TYPE_SOLDIER); }
-    public static final AntType TYPE_MAJOR = new AntType(6, LanguageStrings.TYPE_MAJOR, 10f, 15f, 1f, 5f, 2f, GameNumbers.ANT_DEFENSE_PERCENT_MAJOR, 2f, 
+    public static final AntType TYPE_MAJOR = new AntType(6, LanguageStrings.TYPE_MAJOR, 10f, 15f, 1f, 5f, 2f, 20f, 2f, 15,
         loadIcon("icons/ants/omni/Major.png"), "Major.png");
     static { antTypes.add(TYPE_MAJOR); }
     public static final AntType TYPE_DRONE = new AntType(7, LanguageStrings.TYPE_DRONE, 0.01f, 0f, 0f, 1f, 0f, 0f, 1f, 
         loadIcon("icons/ants/omni/Drone.png"), "Drone.png");
     static { antTypes.add(TYPE_DRONE); }
-    public static final AntType TYPE_PRINCESS = new AntType(8, LanguageStrings.TYPE_PRINCESS, 1f, 1f, 1f, 1f, 1f, 0f, 1f, 
+    public static final AntType TYPE_PRINCESS = new AntType(8, LanguageStrings.TYPE_PRINCESS, 1f, 1f, 1f, 1f, 1f, 0f, 1f, 10,
         loadIcon("icons/ants/omni/Princess.png"), "Princess.png");
     static { antTypes.add(TYPE_PRINCESS); }
-    public static final AntType TYPE_QUEEN = new AntType(9, LanguageStrings.TYPE_QUEEN, 50f, 2f, 1f, 10f, 1f, GameNumbers.ANT_DEFENSE_PERCENT_QUEEN, 1/4f, 
+    public static final AntType TYPE_QUEEN = new AntType(9, LanguageStrings.TYPE_QUEEN, 50f, 2f, 1f, 10f, 1f, 20f, 1/4f, 50,
         loadIcon("icons/ants/omni/Queen.png"), "Queen.png");
     static { antTypes.add(TYPE_QUEEN); }
     public static final AntType TYPE_DEAD = new AntType(10, LanguageStrings.TYPE_DEAD, 0, 0, 0, 0, 0, 0, 0,
@@ -659,36 +700,38 @@ public final class GameConstants {
     private static final ImageIcon SUBTYPE_ICON_NOTHING = loadIcon("icons/species/Omni.png");
 
     public static final AntSubtype SUBTYPE_HEAD_NONE = new AntSubtype(1, LanguageStrings.SUBTYPE_NOTHING, AntSubtypeSlot.HEAD,
-            GameNumbers.SUBTYPE_DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, null, SUBTYPE_ICON_NOTHING);
+            AntSubtype.DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, null, SUBTYPE_ICON_NOTHING);
     static { antSubtypes.add(SUBTYPE_HEAD_NONE); }
     public static final AntSubtype SUBTYPE_HEAD_TRAPJAW = new AntSubtype(2, LanguageStrings.SUBTYPE_HEAD_TRAPJAW, AntSubtypeSlot.HEAD,
             2, GameUnlocks.ASSIMILATED_TRAPJAW, "trapjaw/", "trapjaw",
-            GameNumbers.SUBTYPE_ATTACK_MULT_TRAPJAW, true, 1f, 1f, 1f, loadIcon("icons/subtypes/trapjaw.png"));
+            1.5f, true, 1f, 1f, 1f,
+            SKILL_POWERFUL_BITE, SKILL_BASIC_BITE, loadIcon("icons/subtypes/trapjaw.png"));
     static { antSubtypes.add(SUBTYPE_HEAD_TRAPJAW); }
     public static final AntSubtype SUBTYPE_HEAD_DOORHEAD = new AntSubtype(3, LanguageStrings.SUBTYPE_HEAD_DOORHEAD, AntSubtypeSlot.HEAD,
             3, GameUnlocks.ASSIMILATED_DOORHEAD, "turtle/", "doorhead",
-            1f, false, GameNumbers.SUBTYPE_DEFENSE_ADD_DOORHEAD, 1f, 1f, loadIcon("icons/subtypes/doorhead.png"));
+            1f, false, 20f, 1f, 1f,
+            SKILL_SHIELDING, null, loadIcon("icons/subtypes/doorhead.png"));
     static { antSubtypes.add(SUBTYPE_HEAD_DOORHEAD); }
 
     public static final AntSubtype SUBTYPE_TORSO_NONE = new AntSubtype(4, LanguageStrings.SUBTYPE_NOTHING, AntSubtypeSlot.TORSO,
-            GameNumbers.SUBTYPE_DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, null, SUBTYPE_ICON_NOTHING);
+            AntSubtype.DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, null, SUBTYPE_ICON_NOTHING);
     static { antSubtypes.add(SUBTYPE_TORSO_NONE); }
 
     public static final AntSubtype SUBTYPE_ABDOMEN_NONE = new AntSubtype(5, LanguageStrings.SUBTYPE_NOTHING, AntSubtypeSlot.ABDOMEN,
-            GameNumbers.SUBTYPE_DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, null, SUBTYPE_ICON_NOTHING);
+            AntSubtype.DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, null, SUBTYPE_ICON_NOTHING);
     static { antSubtypes.add(SUBTYPE_ABDOMEN_NONE); }
     public static final AntSubtype SUBTYPE_ABDOMEN_STINGER = new AntSubtype(6, LanguageStrings.SUBTYPE_ABDOMEN_STINGER, AntSubtypeSlot.ABDOMEN,
             2, GameUnlocks.ASSIMILATED_STINGING, "bullet/", "bullet",
-            GameNumbers.SUBTYPE_DAMAGE_MULT_STINGER, false, 1f, 1f, 1f, loadIcon("icons/subtypes/bullet.png"));
+            1.5f, false, 1f, 1f, 1f,
+            SKILL_STINGING, null, loadIcon("icons/subtypes/bullet.png"));
     static { antSubtypes.add(SUBTYPE_ABDOMEN_STINGER); }
     public static final AntSubtype SUBTYPE_ABDOMEN_HONEYPOT = new AntSubtype(7, LanguageStrings.SUBTYPE_ABDOMEN_HONEYPOT, AntSubtypeSlot.ABDOMEN,
             3, GameUnlocks.ASSIMILATED_HONEYPOT, "honeypot/", "honeypot",
-            1f, false, 1f, GameNumbers.SUBTYPE_SPEED_MULT_HONEYPOT, GameNumbers.SUBTYPE_FORAGE_MULT_HONEYPOT,
-            GameNumbers.SUBTYPE_REGEN_MULT_HONEYPOT, loadIcon("icons/subtypes/honeypot.png"));
+            1f, false, 1f, 0.75f, 4f,
+            1.15f, SKILL_BOOST_REGEN, null, loadIcon("icons/subtypes/honeypot.png"));
     static { antSubtypes.add(SUBTYPE_ABDOMEN_HONEYPOT); }
-
     public static final AntSubtype SUBTYPE_OTHER_NONE = new AntSubtype(8, LanguageStrings.SUBTYPE_NOTHING, AntSubtypeSlot.OTHER,
-            GameNumbers.SUBTYPE_DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, null, SUBTYPE_ICON_NOTHING);
+            AntSubtype.DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, null, SUBTYPE_ICON_NOTHING);
     static { antSubtypes.add(SUBTYPE_OTHER_NONE); }
 
     // --- Ant Roles ---
@@ -710,34 +753,28 @@ public final class GameConstants {
     static { antRoles.add(ROLE_MINER); }
     public static final AntRole ROLE_COURIER = new AntRole(9, TYPE_WORKER, LanguageStrings.ROLE_COURIER, loadIcon("icons/roles/Courier.png"));
     static { antRoles.add(ROLE_COURIER); }
-    // Portable-Feeder requires honeypot abdomen; forced-allowed so the allow-check cannot be cleared.
-    public static final AntRole ROLE_POTTER = new AntRole(10, TYPE_WORKER, LanguageStrings.ROLE_POTTER,
-            loadIcon("icons/roles/Potter.png"),
-            Set.of(SUBTYPE_ABDOMEN_HONEYPOT), Set.of(SUBTYPE_ABDOMEN_HONEYPOT));
+    public static final AntRole ROLE_POTTER = new AntRole(10, TYPE_WORKER, LanguageStrings.ROLE_POTTER, loadIcon("icons/roles/Potter.png"), Set.of(SUBTYPE_ABDOMEN_HONEYPOT), Set.of(SUBTYPE_ABDOMEN_HONEYPOT), true);
     static { antRoles.add(ROLE_POTTER); }
-    public static final AntRole ROLE_WARRIOR = new AntRole(12, TYPE_SOLDIER, LanguageStrings.ROLE_WARRIOR,
-            loadIcon("icons/roles/Warrior.png"), true);
+    static { SKILL_BOOST_REGEN.setRequiredRole(ROLE_POTTER); }
+    public static final AntRole ROLE_WARRIOR = new AntRole(12, TYPE_SOLDIER, LanguageStrings.ROLE_WARRIOR, loadIcon("icons/roles/Warrior.png"), true);
     static { antRoles.add(ROLE_WARRIOR); }
-    public static final AntRole ROLE_DEFENDER = new AntRole(13, TYPE_SOLDIER, LanguageStrings.ROLE_DEFENDER,
-            loadIcon("icons/roles/Defender.png"), true);
+    public static final AntRole ROLE_DEFENDER = new AntRole(13, TYPE_SOLDIER, LanguageStrings.ROLE_DEFENDER, loadIcon("icons/roles/Defender.png"), true);
     static { antRoles.add(ROLE_DEFENDER); }
+    static { SKILL_SHIELDING.setRequiredRole(ROLE_DEFENDER); }
     public static final AntRole ROLE_POLICE = new AntRole(14, TYPE_SOLDIER, LanguageStrings.ROLE_POLICE, loadIcon("icons/roles/Police.png"));
     static { antRoles.add(ROLE_POLICE); }
     public static final AntRole ROLE_BOMBER = new AntRole(15, TYPE_SOLDIER, LanguageStrings.ROLE_BOMBER, loadIcon("icons/roles/Bomber.png"));
     static { antRoles.add(ROLE_BOMBER); }
     public static final AntRole ROLE_HUNTER = new AntRole(16, TYPE_SOLDIER, LanguageStrings.ROLE_HUNTER, loadIcon("icons/roles/Hunter.png"));
     static { antRoles.add(ROLE_HUNTER); }
-    public static final AntRole ROLE_BRUTE = new AntRole(17, TYPE_MAJOR, LanguageStrings.ROLE_BRUTE,
-            loadIcon("icons/roles/Brute.png"), true);
+    public static final AntRole ROLE_BRUTE = new AntRole(17, TYPE_MAJOR, LanguageStrings.ROLE_BRUTE,loadIcon("icons/roles/Brute.png"), true);
     static { antRoles.add(ROLE_BRUTE); }
     public static final AntRole ROLE_CARRIER = new AntRole(18, TYPE_MAJOR, LanguageStrings.ROLE_CARRIER, loadIcon("icons/roles/Carrier.png"));
     static { antRoles.add(ROLE_CARRIER); }
-    // Chemical-throwing subtype not implemented yet; pass required/forced sets when that subtype exists.
-    public static final AntRole ROLE_ARTILLERY = new AntRole(19, TYPE_MAJOR, LanguageStrings.ROLE_ARTILLERY,
-            loadIcon("icons/roles/Artillery.png"), Set.of(), Set.of(), true);
+    public static final AntRole ROLE_ARTILLERY = new AntRole(19, TYPE_MAJOR, LanguageStrings.ROLE_ARTILLERY,loadIcon("icons/roles/Artillery.png"), Set.of(), Set.of(), true);
     static { antRoles.add(ROLE_ARTILLERY); }
-    public static final AntRole ROLE_SIEGE = new AntRole(20, TYPE_MAJOR, LanguageStrings.ROLE_SIEGE,
-            loadIcon("icons/roles/Siege.png"), true);
+    static { SKILL_ACID_ARTILLERY.setRequiredRole(ROLE_ARTILLERY); }
+    public static final AntRole ROLE_SIEGE = new AntRole(20, TYPE_MAJOR, LanguageStrings.ROLE_SIEGE, loadIcon("icons/roles/Siege.png"), true);
     static { antRoles.add(ROLE_SIEGE); }
     public static final AntRole ROLE_BORER = new AntRole(21, TYPE_MAJOR, LanguageStrings.ROLE_BORER, loadIcon("icons/roles/Borer.png"));
     static { antRoles.add(ROLE_BORER); }
@@ -751,8 +788,9 @@ public final class GameConstants {
     static { antRoles.add(ROLE_LAYER); }
     public static final AntRole ROLE_RESEARCHER = new AntRole(26, TYPE_QUEEN, LanguageStrings.ROLE_RESEARCHER, loadIcon("icons/roles/Researcher.png"));
     static { antRoles.add(ROLE_RESEARCHER); }
-    public static final AntRole ROLE_MILITIA = new AntRole(27, TYPE_WORKER, LanguageStrings.ROLE_MILITIA,
-            loadIcon("icons/roles/Militia.png"), true);
+    public static final AntRole ROLE_COMMANDER = new AntRole(35, TYPE_QUEEN, LanguageStrings.ROLE_COMMANDER, loadIcon("icons/roles/Commander.png"), true);
+    static { antRoles.add(ROLE_COMMANDER); }
+    public static final AntRole ROLE_MILITIA = new AntRole(27, TYPE_WORKER, LanguageStrings.ROLE_MILITIA, loadIcon("icons/roles/Militia.png"), true);
     static { antRoles.add(ROLE_MILITIA); }
     public static final AntRole ROLE_CATCHER = new AntRole(28, TYPE_SOLDIER, LanguageStrings.ROLE_CATCHER, loadIcon("icons/roles/Catcher.png"));
     static { antRoles.add(ROLE_CATCHER); }
@@ -946,15 +984,13 @@ public final class GameConstants {
         2, LanguageStrings.GI_MODIFIER_GENETIC_EXCHANGE, 10.0, DIPLO_MODIFIER_GENETIC_EXCHANGE.getNameKey());
     static { geneticIntegrityModifiers.add(GI_MODIFIER_GENETIC_EXCHANGE); }
 
-    /** Defined in data but not playable yet (no unlock path / job incomplete). */
     private static final Set<AntRole> UNOBTAINABLE_ROLES = Set.of(
-            ROLE_POTTER, ROLE_DEFENDER, ROLE_BOMBER, ROLE_CARRIER, ROLE_ARTILLERY, ROLE_SIEGE, ROLE_MINER);
+            ROLE_POTTER, ROLE_DEFENDER, ROLE_BOMBER, ROLE_CARRIER, ROLE_SIEGE, ROLE_MINER);
 
     private static final AntRole[] ACTIVE_MILITARY_ROLES = antRoles.stream()
             .filter(AntRole::isActiveMilitary)
             .toArray(AntRole[]::new);
 
-    /** Active-military roles are war-economy exclusive (quotas only on the war distribution). */
     public static boolean isWarEconomyExclusiveRole(AntRole role) {
         return role != null && role.isActiveMilitary();
     }
@@ -972,22 +1008,7 @@ public final class GameConstants {
     }
 
     public static int getMilitaryWeightForAntType(AntType type) {
-        if (type == TYPE_WORKER) {
-            return GameNumbers.MILITARY_WEIGHT_WORKER;
-        }
-        if (type == TYPE_SOLDIER) {
-            return GameNumbers.MILITARY_WEIGHT_SOLDIER;
-        }
-        if (type == TYPE_MAJOR) {
-            return GameNumbers.MILITARY_WEIGHT_MAJOR;
-        }
-        if (type == TYPE_PRINCESS) {
-            return GameNumbers.MILITARY_WEIGHT_PRINCESS;
-        }
-        if (type == TYPE_QUEEN) {
-            return GameNumbers.MILITARY_WEIGHT_QUEEN;
-        }
-        return 0;
+        return type != null ? type.getMilitaryWeight() : 0;
     }
 
     public static int getActiveMilitaryRoleWeight(AntRole role) {
@@ -1333,6 +1354,12 @@ public final class GameConstants {
         loadIcon("icons/species/Desert.png"));
     static { species.add(SPECIES_DESERT); }
 
+    public static final AntSpecies SPECIES_GREEN = new AntSpecies(24, LanguageStrings.SPECIES_GREEN, LanguageStrings.SPECIES_GREEN_SCIENTIFIC, "green/", GameUnlocks.ASSIMILATION_ACIDSPIT,
+        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_ACIDSPIT),
+        Set.of(LanguageStrings.DYNASTY_THEME_GREEN, LanguageStrings.DYNASTY_THEME_ACID, LanguageStrings.DYNASTY_THEME_EMERALD),
+        loadIcon("icons/species/Green.png"));
+    static { species.add(SPECIES_GREEN); }
+
     // --- Trade Methods ---
     public static final TradeMethod METHOD_LAND = new TradeMethod(1, LanguageStrings.METHOD_LAND, 1.0f, 1.0f, 0.35f,
         loadIcon("icons/convoy/LandConvoy.png"));
@@ -1346,6 +1373,42 @@ public final class GameConstants {
     public static final TradeMethod METHOD_TUNNEL = new TradeMethod(4, LanguageStrings.METHOD_TUNNEL, 2.0f, 2.0f, 0.05f,
         loadIcon("icons/convoy/TunnelConvoy.png"));
     static { tradeMethods.add(METHOD_TUNNEL); }
+
+    // --- War stage phases / standing ---
+    public static final WarStagePhase WAR_STAGE_ACTIVE_CLASH = new WarStagePhase(
+            1, LanguageStrings.BATTLE_PHASE_CLASH, "ACTIVE_CLASH", loadIcon("icons/war/BorderClash.png"));
+    static { warStagePhases.add(WAR_STAGE_ACTIVE_CLASH); }
+    public static final WarStagePhase WAR_STAGE_RESERVE_ASSAULT = new WarStagePhase(
+            2, LanguageStrings.BATTLE_PHASE_RESERVE, "RESERVE_ASSAULT", loadIcon("icons/war/ColonySiege.png"));
+    static { warStagePhases.add(WAR_STAGE_RESERVE_ASSAULT); }
+    public static final WarStagePhase WAR_STAGE_REDEPLOYING = new WarStagePhase(
+            3, LanguageStrings.BATTLE_PHASE_REDEPLOY, "REDEPLOYING", loadIcon("icons/war/Redeployment.png"));
+    static { warStagePhases.add(WAR_STAGE_REDEPLOYING); }
+
+    public static final WarStanding WAR_STANDING_WINNING = new WarStanding(
+            1, LanguageStrings.WAR_STANDING_WINNING, loadIcon("icons/war/Winning.png"));
+    static { warStandings.add(WAR_STANDING_WINNING); }
+    public static final WarStanding WAR_STANDING_LOSING = new WarStanding(
+            2, LanguageStrings.WAR_STANDING_LOSING, loadIcon("icons/war/Losing.png"));
+    static { warStandings.add(WAR_STANDING_LOSING); }
+    public static final WarStanding WAR_STANDING_EVEN = new WarStanding(
+            3, LanguageStrings.WAR_STANDING_EVEN, loadIcon("icons/war/Even.png"));
+    static { warStandings.add(WAR_STANDING_EVEN); }
+
+    // --- Battle lines ---
+    public static final BattleLine BATTLE_LINE_INFANTRY = new BattleLine(
+            1, LanguageStrings.BATTLE_LINE_INFANTRY, 100f,
+            Set.of(ROLE_MILITIA, ROLE_WARRIOR, ROLE_DEFENDER, ROLE_BRUTE, ROLE_SIEGE, ROLE_BOMBER, ROLE_POTTER),
+            loadIcon("icons/battleLines/Infantry.png"));
+    static { battleLines.add(BATTLE_LINE_INFANTRY); }
+    public static final BattleLine BATTLE_LINE_ARTILLERY = new BattleLine(
+            2, LanguageStrings.BATTLE_LINE_ARTILLERY, 50f,
+            Set.of(ROLE_ARTILLERY), loadIcon("icons/battleLines/Artillery.png"));
+    static { battleLines.add(BATTLE_LINE_ARTILLERY); }
+    public static final BattleLine BATTLE_LINE_AIR_SUPPORT = new BattleLine(
+            3, LanguageStrings.BATTLE_LINE_AIR_SUPPORT, 25f,
+            Set.of(), loadIcon("icons/battleLines/AirSupport.png"));
+    static { battleLines.add(BATTLE_LINE_AIR_SUPPORT); }
     
     // --- Getters ---
     public static List<Biome> getBiomes() { return Collections.unmodifiableList(biomes); }
@@ -1372,6 +1435,56 @@ public final class GameConstants {
     public static List<AntStatus> getAntStatuses() { return Collections.unmodifiableList(antStatuses); }
 
     public static List<MoveStatus> getMoveStatuses() { return Collections.unmodifiableList(moveStatuses); }
+
+    public static List<Skill> getSkills() { return Collections.unmodifiableList(skills); }
+
+    public static Skill getSkillById(int id) {
+        for (Skill skill : skills) {
+            if (skill.getId() == id) {
+                return skill;
+            }
+        }
+        return null;
+    }
+
+    public static List<WarStagePhase> getWarStagePhases() { return Collections.unmodifiableList(warStagePhases); }
+
+    public static WarStagePhase getWarStagePhaseByPersistenceKey(String key) {
+        if (key == null || key.isEmpty()) {
+            return WAR_STAGE_ACTIVE_CLASH;
+        }
+        for (WarStagePhase phase : warStagePhases) {
+            if (phase.getPersistenceKey().equals(key) || phase.getNameKey().equals(key)) {
+                return phase;
+            }
+        }
+        return WAR_STAGE_ACTIVE_CLASH;
+    }
+
+    public static List<WarStanding> getWarStandings() { return Collections.unmodifiableList(warStandings); }
+
+    public static List<BattleLine> getBattleLines() { return Collections.unmodifiableList(battleLines); }
+
+    public static BattleLine getBattleLineById(int id) {
+        for (BattleLine line : battleLines) {
+            if (line.getId() == id) {
+                return line;
+            }
+        }
+        return null;
+    }
+
+    public static BattleLine getBattleLineForRole(AntRole role) {
+        if (role == null) {
+            return null;
+        }
+        for (BattleLine line : battleLines) {
+            if (line.allowsRole(role)) {
+                return line;
+            }
+        }
+        return null;
+    }
 
     public static List<AntType> getAntTypes() { return Collections.unmodifiableList(antTypes); }
 
