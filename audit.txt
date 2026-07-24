@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 76% (251/330 checked)
+Completion: 74% (245/332 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -106,10 +106,10 @@ Side panels (live updates while playing):
 [X] I — Assimilation (when unlocked)
 [X] O — Synergies (when unlocked)
 [X] C — Colony Operations / abilities (when unlocked)
-[X] A — Dynasty Overview tab (toggle)
-[X] S — Dynasty Trade / Logistics tab (toggle)
-[X] D — Dynasty Diplomacy tab (toggle)
-[X] F — Dynasty Wars tab (toggle)
+[X] A — Dynasty Overview tab (always available; toggle)
+[ ] S — Dynasty Trade / Logistics tab (always available; toggle)
+[X] D — Dynasty Diplomacy tab (always available; toggle)
+[ ] F — Dynasty Wars tab (always available; toggle)
 [X] M — World map (toggle)
 [X] X — Statistics (toggle)
 [X] Repeat same hotkey closes the bound dialog/tab
@@ -130,11 +130,11 @@ Colony submenu (items appear when unlocked):
 [X] Assimilation (I)
 [X] Colony Operations (C)
 
-Dynasty submenu (when dynasty unlocked):
-[X] Dynasty management (overview)
-[X] Trade / logistics (S)
-[X] Diplomacy (D)
-[X] Wars (F)
+Dynasty submenu (always available in session):
+[ ] Dynasty management (overview)
+[ ] Trade / logistics (S)
+[ ] Diplomacy (D)
+[ ] Wars (F)
 
 [X] Settings
 [X] Tutorial (in-game)
@@ -345,6 +345,7 @@ Per foreign dynasty Actions menu:
 [ ] Diplomat mission auto-cancelled with side alert when deployed diplomats die
 [x] Reputation / stance icons and tooltips
 [ ] Was at War reputation modifier after peace treaty (lasts 1 year)
+[ ] Warmonger reputation modifier (−20 with all dynasties after declaring 5 wars)
 [X] Cooldowns after pact break block war
 [ ] Begin integration (5× military, Friendly+, pact, dynasty border, diplomats from any colony)
 [X] Integration progress advances daily; ETA shows completion date
@@ -433,6 +434,7 @@ Daily:
 [X] Scout unlock from plant harvest (any plant source)
 [ ] Hunter / Breeder / Brute role unlocks
 [ ] Commander role unlock (3 wars participated + multi-queen colony)
+[ ] Commander assignment: max 1 per colony; requires spare queen off combat; raises dynasty combat capacity 1k→2.5k once
 [ ] Research / Build / Spread ability unlocks
 [ ] Dynasty / Trade / Management / Spread 2 / Automation unlocks by colony count
 [ ] Bilateral Trade unlock from active trade count

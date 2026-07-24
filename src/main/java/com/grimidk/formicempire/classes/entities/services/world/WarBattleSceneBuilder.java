@@ -140,7 +140,6 @@ public final class WarBattleSceneBuilder {
             for (AntRole role : GameConstants.getBorderBattleRoles()) {
                 addRoleQuota(pooled, colony, role);
             }
-            addQueenCount(pooled, colony);
         }
         SideComposition seated = seatByCapacity(pooled, capacity, false);
         if (seated.livingArmy() > 0) {
@@ -160,7 +159,6 @@ public final class WarBattleSceneBuilder {
                 addRoleQuota(pooled, colony, role);
             }
             addRoleQuota(pooled, colony, GameConstants.ROLE_SIEGE);
-            addQueenCount(pooled, colony);
         }
         SideComposition seated = seatByCapacity(pooled, capacity, false);
         if (seated.livingArmy() > 0) {
@@ -169,7 +167,7 @@ public final class WarBattleSceneBuilder {
         return compositionFromPhysicalMilitary(dynasty, capacity);
     }
 
-    /** Last-resort visuals: living soldiers/majors/queens even when war quotas are unset. */
+    /** Last-resort visuals: living soldiers/majors even when war quotas are unset. */
     private static SideComposition compositionFromPhysicalMilitary(Dynasty dynasty, int capacity) {
         Map<BattleLine, Map<AntType, Integer>> pooled = emptyLineMaps();
         if (dynasty == null) {
@@ -180,7 +178,6 @@ public final class WarBattleSceneBuilder {
                     countLivingOfType(colony, GameConstants.TYPE_SOLDIER));
             putType(pooled, GameConstants.BATTLE_LINE_INFANTRY, GameConstants.TYPE_MAJOR,
                     countLivingOfType(colony, GameConstants.TYPE_MAJOR));
-            addQueenCount(pooled, colony);
         }
         return seatByCapacity(pooled, capacity, false);
     }
@@ -267,10 +264,6 @@ public final class WarBattleSceneBuilder {
         }
         List<Ant> list = colony.getAntsByType(type);
         return list != null ? list : List.of();
-    }
-
-    private static void addQueenCount(Map<BattleLine, Map<AntType, Integer>> pooled, Colony colony) {
-        putType(pooled, GameConstants.BATTLE_LINE_INFANTRY, GameConstants.TYPE_QUEEN, sizeOf(colony.getQueens()));
     }
 
     private static SideComposition seatByCapacity(Map<BattleLine, Map<AntType, Integer>> pooled, int capacity,

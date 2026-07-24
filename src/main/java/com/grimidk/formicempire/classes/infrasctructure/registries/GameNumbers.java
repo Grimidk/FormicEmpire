@@ -168,11 +168,16 @@ public final class GameNumbers {
     /** Border clash: side loses when this fraction of its starting army (active+reserve) is dead. */
     public static final float WAR_BATTLE_ARMY_DEFEAT_RATIO = 0.9f;
 
-    /** Dynasty combat capacity (scaffold for future deployment limits). */
+    /** Dynasty combat capacity: base, or with at least one assigned Commander (does not stack). */
     public static final int COMBAT_CAPACITY_BASE = 1000;
     public static final int COMBAT_CAPACITY_WITH_COMMANDER = 2500;
+    /** Max Commander war-quota per colony (capacity still only bumps once dynasty-wide). */
+    public static final int COMMANDER_MAX_PER_COLONY = 1;
     public static final int TRIGGER_COMMANDER_MIN_WARS = 3;
+    /** Living queens required in a colony before one may be a Commander (last queen stays off combat). */
     public static final int TRIGGER_COMMANDER_MIN_QUEENS_IN_COLONY = 2;
+    /** Declared wars (as aggressor) before Warmonger −20 applies with all dynasties. */
+    public static final int WARMONGER_DECLARED_WARS_THRESHOLD = 5;
 
     // --- AI / trade automation ---
     public static final int AI_EXPANSION_COLONY_TARGET = 6;

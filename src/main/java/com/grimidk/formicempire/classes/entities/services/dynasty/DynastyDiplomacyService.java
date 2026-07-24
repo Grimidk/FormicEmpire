@@ -524,6 +524,11 @@ public class DynastyDiplomacyService {
             lines.add(new ReputationModifierLine(GameConstants.DIPLO_MODIFIER_BORDER_FRICTION.getName(), friction));
         }
 
+        int warmonger = getWarmongerAdjustment(other, world);
+        if (warmonger != 0) {
+            lines.add(new ReputationModifierLine(GameConstants.DIPLO_MODIFIER_WARMONGER.getName(), warmonger));
+        }
+
         int militaryAdj = getMilitaryReputationAdjustment(other);
         if (militaryAdj != 0) {
             lines.add(new ReputationModifierLine(
@@ -600,12 +605,28 @@ public class DynastyDiplomacyService {
         return GameConstants.DIPLO_MODIFIER_BORDER_FRICTION.getReputationDelta();
     }
 
+    /**
+     * −20 with every dynasty once either side has declared
+     * {@link GameNumbers#WARMONGER_DECLARED_WARS_THRESHOLD} wars (does not stack if both qualify).
+     */
+    public int getWarmongerAdjustment(Dynasty other, World world) {
+        if (other == null || other == dynasty || world == null || world.getWarService() == null) {
+            return 0;
+        }
+        if (world.getWarService().isWarmonger(dynasty.getId())
+                || world.getWarService().isWarmonger(other.getId())) {
+            return GameConstants.DIPLO_MODIFIER_WARMONGER.getReputationDelta();
+        }
+        return 0;
+    }
+
     public int getEffectiveDiplomaticReputation(Dynasty other, World world) {
         if (other == null || other == dynasty) {
             return GameNumbers.DEFAULT_DIPLOMATIC_REPUTATION;
         }
         int score = dynasty.getDiplomaticReputation(other.getId())
                 + getBorderFrictionAdjustment(other, world)
+                + getWarmongerAdjustment(other, world)
                 + getMilitaryReputationAdjustment(other)
                 + getDiplomatReputationAdjustment(other);
         return GameNumbers.clampDiplomaticReputation(score);

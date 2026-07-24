@@ -152,8 +152,7 @@ public class DynastyManagementDialog extends ZeroDialog {
 
         if (!isShowing()) return;
 
-        boolean hasTrade = dynasty.hasUpgrade(GameUnlocks.ABILITY_TRADE);
-        int expectedTabs = 3 + (hasTrade ? 1 : 0);
+        int expectedTabs = 4;
         boolean currentAuto = dynasty.hasUpgrade(GameUnlocks.ABILITY_AUTOMATION);
         boolean currentAutoBuild = dynasty.hasUpgrade(GameUnlocks.ABILITY_MANAGEMENT);
         boolean currentAutoTunnels = dynasty.hasUpgrade(GameUnlocks.ABILITY_AUTO_TUNNELS);
@@ -206,13 +205,11 @@ public class DynastyManagementDialog extends ZeroDialog {
         tabbedPane.addTab(LanguageStrings.get(LanguageStrings.TAB_OVERVIEW), overviewPanel);
         tabIndexMap.put(TAB_OVERVIEW, currentIndex++);
 
-        if (dynasty.hasUpgrade(GameUnlocks.ABILITY_TRADE)) {
-            if (tradePanel == null) {
-                tradePanel = new TradePanel();
-            }
-            tabbedPane.addTab(LanguageStrings.get(LanguageStrings.TAB_LOGISTICS), tradePanel);
-            tabIndexMap.put(TAB_TRADE, currentIndex++);
+        if (tradePanel == null) {
+            tradePanel = new TradePanel();
         }
+        tabbedPane.addTab(LanguageStrings.get(LanguageStrings.TAB_LOGISTICS), tradePanel);
+        tabIndexMap.put(TAB_TRADE, currentIndex++);
 
         if (diplomacyPanel == null) {
             diplomacyPanel = new DiplomacyPanel();

@@ -551,6 +551,9 @@ public class Colony {
         if (deathService != null) {
             deathService.recordDeath(cause, this);
         }
+        if (ant.getAntType() == GameConstants.TYPE_QUEEN) {
+            clampCommanderWarAssignment();
+        }
     }
 
     public void handleAntCasualtyAftermath(Ant ant, AntType formerType, AntRole formerRole, boolean wasOnTrade) {
@@ -1183,10 +1186,42 @@ public class Colony {
     }
 
     public void setWarAssignedRoleCount(AntRole role, int count) {
-        if (count >= 0) {
-            int previous = warAssignedRoleCounts.getOrDefault(role, 0);
-            warAssignedRoleCounts.put(role, count);
-            reconcileDiplomatDeploymentsIfNeeded(role, previous, count, usesWarEconomyRoles());
+        if (count < 0) {
+            return;
+        }
+        if (role == GameConstants.ROLE_COMMANDER) {
+            count = Math.min(count, getMaxAssignableCommanders());
+        }
+        int previous = warAssignedRoleCounts.getOrDefault(role, 0);
+        warAssignedRoleCounts.put(role, count);
+        reconcileDiplomatDeploymentsIfNeeded(role, previous, count, usesWarEconomyRoles());
+    }
+
+    /**
+     * Commander is war-only, max {@link GameNumbers#COMMANDER_MAX_PER_COLONY} per colony, and only when
+     * the colony has enough living queens that at least one can stay off combat.
+     */
+    public int getMaxAssignableCommanders() {
+        int livingQueens = 0;
+        if (getQueens() != null) {
+            for (Ant queen : getQueens()) {
+                if (queen != null && queen.isAlive()) {
+                    livingQueens++;
+                }
+            }
+        }
+        if (livingQueens < GameNumbers.TRIGGER_COMMANDER_MIN_QUEENS_IN_COLONY) {
+            return 0;
+        }
+        return GameNumbers.COMMANDER_MAX_PER_COLONY;
+    }
+
+    /** Drops illegal Commander quotas when queens die or leave. */
+    public void clampCommanderWarAssignment() {
+        int max = getMaxAssignableCommanders();
+        int current = getWarAssignedRoleCount(GameConstants.ROLE_COMMANDER);
+        if (current > max) {
+            setWarAssignedRoleCount(GameConstants.ROLE_COMMANDER, max);
         }
     }
 

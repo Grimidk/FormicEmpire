@@ -439,7 +439,9 @@ public class RoleManagementDialog extends ZeroDialog {
 
         private void addRoleRow(AntRole role) {
             int currentAssigned = getRoleCount(role);
-            SpinnerModel model = new SpinnerNumberModel(currentAssigned, 0, Integer.MAX_VALUE, 1); 
+            int spinnerMax = roleMaxAssignable(role);
+            int initial = Math.min(currentAssigned, spinnerMax);
+            SpinnerModel model = new SpinnerNumberModel(initial, 0, spinnerMax, 1); 
             JSpinner spinner = new JSpinner(model);
             AssetStyles.styleSpinner(spinner);
             Dimension spinnerSize = AssetStyles.preferredSpinnerSize(80);
@@ -450,6 +452,16 @@ public class RoleManagementDialog extends ZeroDialog {
             spinner.addChangeListener(e -> {
                 if (isUpdating) return;
                 int newValue = (Integer) spinner.getValue();
+                int roleMax = roleMaxAssignable(role);
+                if (newValue > roleMax) {
+                    newValue = roleMax;
+                    isUpdating = true;
+                    try {
+                        spinner.setValue(roleMax);
+                    } finally {
+                        isUpdating = false;
+                    }
+                }
                 boolean warCounts = usesWarRoleCounts(role);
                 
                 int otherSpinnersTotal = 0;
@@ -697,6 +709,13 @@ public class RoleManagementDialog extends ZeroDialog {
             return chip;
         }
 
+        private int roleMaxAssignable(AntRole role) {
+            if (role == GameConstants.ROLE_COMMANDER) {
+                return colony.getMaxAssignableCommanders();
+            }
+            return Integer.MAX_VALUE;
+        }
+
         private boolean usesWarRoleCounts(AntRole role) {
             return owner.isEditingWarRoles() || role.isActiveMilitary();
         }
@@ -736,11 +755,21 @@ public class RoleManagementDialog extends ZeroDialog {
                 checkAndAddRoles();
                 
                 for (Map.Entry<AntRole, JSpinner> entry : spinnerMap.entrySet()) {
-                    int colonyValue = getRoleCount(entry.getKey());
-                    if ((Integer)entry.getValue().getValue() != colonyValue) {
-                        entry.getValue().setValue(colonyValue);
+                    AntRole role = entry.getKey();
+                    JSpinner spinner = entry.getValue();
+                    int roleMax = roleMaxAssignable(role);
+                    SpinnerNumberModel model = (SpinnerNumberModel) spinner.getModel();
+                    if (model.getMaximum() == null || ((Number) model.getMaximum()).intValue() != roleMax) {
+                        model.setMaximum(roleMax);
                     }
-                    syncSubtypeAllowControls(entry.getKey());
+                    int colonyValue = Math.min(getRoleCount(role), roleMax);
+                    if (getRoleCount(role) != colonyValue) {
+                        setRoleCount(role, colonyValue);
+                    }
+                    if ((Integer) spinner.getValue() != colonyValue) {
+                        spinner.setValue(colonyValue);
+                    }
+                    syncSubtypeAllowControls(role);
                 }
                 
                 int totalAnts = colony.getAntsByType(antType).size();

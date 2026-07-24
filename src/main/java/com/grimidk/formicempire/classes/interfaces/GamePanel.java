@@ -888,8 +888,7 @@ public class GamePanel extends ZeroGamePanel {
     private void showDynastyWarsTab() {
         Engine engine = frame.getEngine();
         Colony colony = getColonyFromEngine(engine);
-        if (colony == null || colony.getDynasty() == null
-                || !colony.hasUpgrade(GameUnlocks.ABILITY_DYNASTY)) {
+        if (colony == null || colony.getDynasty() == null) {
             return;
         }
 
@@ -1578,9 +1577,9 @@ public class GamePanel extends ZeroGamePanel {
                 controlPanel.updateAssimilationMenu(colony.hasUpgrade(GameUnlocks.ABILITY_ASSIMILATION));
                 controlPanel.updateSynergyMenu(colony.hasUpgrade(GameUnlocks.ABILITY_SYNERGY));
                 controlPanel.updateAbilitiesMenu(colony.hasUpgrade(GameUnlocks.ABILITY_FORCED_FLIGHT));
-                controlPanel.updateDynastyMenu(colony.hasUpgrade(GameUnlocks.ABILITY_DYNASTY));
-                controlPanel.updateTradeMenu(colony.hasUpgrade(GameUnlocks.ABILITY_TRADE));
-                controlPanel.updateWarsMenu(colony.hasUpgrade(GameUnlocks.ABILITY_DYNASTY));
+                controlPanel.updateDynastyMenu(true);
+                controlPanel.updateTradeMenu(true);
+                controlPanel.updateWarsMenu(true);
                 controlPanel.updateAuditMenu(frame.getEngine().isShowAuditMenu());
             }
         } else {

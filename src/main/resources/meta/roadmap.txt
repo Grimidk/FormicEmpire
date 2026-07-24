@@ -12,6 +12,7 @@ To Fix (By decreasing priority) :
 	
 	Mid:
 	warmonger modifier
+	allow dyansty tabs to be seen 
 	  
 	Low:
 	(none right now)
@@ -37,7 +38,6 @@ Needed for launch (v1.0) (Launch Version):
 	implement pending roles (miner, carrier, artillery) more roles (commander and captain roles, air force and paratroopers to skip a stage) and air warfare
 	potter (honeypot workers + Boost Regen), defender (doorhead + Shielding), and siege participate in hex defense only — border clash uses other active military
 	withdraw to hex defense / NPC bait when hex odds beat border odds (player Wars action + AI); counterattack after holding hex already flips stageAttacker
-	DONE: creature-vs-creature battle resolution (per-line combat capacity, reserves, skills, 90% army / last queen wins; replaces power-ratio ticks)
 	remaining war gaps: mid-clash attacker abort without ceding; richer AI role assignment for bait setups; player/NPC peacetime staging of Defender/Siege quotas
 	air force roles
 	creature vs swarm battle system

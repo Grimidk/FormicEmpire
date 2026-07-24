@@ -1676,6 +1676,7 @@ public final class LanguageStrings {
     public static final String DIPLO_MODIFIER_GRANTED_INDEPENDENCE = "DIPLO_MODIFIER_GRANTED_INDEPENDENCE";
     public static final String DIPLO_MODIFIER_WAS_AT_WAR = "DIPLO_MODIFIER_WAS_AT_WAR";
     public static final String DIPLO_MODIFIER_GENETIC_EXCHANGE = "DIPLO_MODIFIER_GENETIC_EXCHANGE";
+    public static final String DIPLO_MODIFIER_WARMONGER = "DIPLO_MODIFIER_WARMONGER";
     public static final String DYNASTY_REBELLION_NAME_FMT = "DYNASTY_REBELLION_NAME_FMT";
     public static final String REBELLION_WAR_NAME_FMT = "REBELLION_WAR_NAME_FMT";
     public static final String ALERT_REBELLION_RISK_FMT = "ALERT_REBELLION_RISK_FMT";

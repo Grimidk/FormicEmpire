@@ -21,6 +21,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DynastyDiplomacyServiceTest {
@@ -885,6 +886,49 @@ class DynastyDiplomacyServiceTest {
         assertTrue(player.getDiplomacyService().canOfferGeneticExchange(neighbor, world));
         assertTrue(player.getDiplomacyService().offerGeneticExchange(neighbor, world));
         assertEquals(0, player.getDiplomacyService().countDynastyLiveDrones());
+    }
+
+    @Test
+    void warmongerAppliesAfterFiveDeclaredWarsWithAllDynasties() {
+        World world = emptyWorld();
+        world.getDynastys().add(player);
+        world.getDynastys().add(neighbor);
+        List<Dynasty> victims = new ArrayList<>();
+        for (int i = 0; i < GameNumbers.WARMONGER_DECLARED_WARS_THRESHOLD; i++) {
+            Dynasty victim = new Dynasty(100 + i, "Victim " + i, false, GameConstants.SPECIES_OMNI);
+            seedDiplomaticPopulation(victim);
+            world.getDynastys().add(victim);
+            victims.add(victim);
+        }
+        Dynasty bystander = new Dynasty(200, "Bystander", false, GameConstants.SPECIES_OMNI);
+        seedDiplomaticPopulation(bystander);
+        world.getDynastys().add(bystander);
+
+        player.setDiplomaticReputation(bystander.getId(), GameNumbers.DEFAULT_DIPLOMATIC_REPUTATION);
+        bystander.setDiplomaticReputation(player.getId(), GameNumbers.DEFAULT_DIPLOMATIC_REPUTATION);
+
+        assertEquals(0, player.getDiplomacyService().getWarmongerAdjustment(bystander, world));
+        assertFalse(world.getWarService().isWarmonger(player.getId()));
+
+        for (int i = 0; i < GameNumbers.WARMONGER_DECLARED_WARS_THRESHOLD - 1; i++) {
+            assertNotNull(world.getWarService().beginWar(player, victims.get(i)));
+        }
+        assertFalse(world.getWarService().isWarmonger(player.getId()));
+        assertEquals(0, player.getDiplomacyService().getWarmongerAdjustment(bystander, world));
+
+        assertNotNull(world.getWarService().beginWar(player, victims.get(GameNumbers.WARMONGER_DECLARED_WARS_THRESHOLD - 1)));
+        assertTrue(world.getWarService().isWarmonger(player.getId()));
+        assertEquals(GameConstants.DIPLO_MODIFIER_WARMONGER.getReputationDelta(),
+                player.getDiplomacyService().getWarmongerAdjustment(bystander, world));
+        assertEquals(GameConstants.DIPLO_MODIFIER_WARMONGER.getReputationDelta(),
+                bystander.getDiplomacyService().getWarmongerAdjustment(player, world));
+        assertEquals(
+                GameNumbers.clampDiplomaticReputation(
+                        GameNumbers.DEFAULT_DIPLOMATIC_REPUTATION
+                                + GameConstants.DIPLO_MODIFIER_WARMONGER.getReputationDelta()),
+                player.getDiplomacyService().getEffectiveDiplomaticReputation(bystander, world));
+        assertTrue(player.getDiplomacyService().collectVisibleReputationModifiers(bystander, world).stream()
+                .anyMatch(line -> line.delta() == GameConstants.DIPLO_MODIFIER_WARMONGER.getReputationDelta()));
     }
 
     private void advanceWorldDays(World world, int days) {

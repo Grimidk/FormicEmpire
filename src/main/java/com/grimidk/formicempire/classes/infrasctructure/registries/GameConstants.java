@@ -1045,6 +1045,9 @@ public final class GameConstants {
     public static final DiplomaticReputationModifier DIPLO_MODIFIER_GENETIC_EXCHANGE = new DiplomaticReputationModifier(
         11, LanguageStrings.DIPLO_MODIFIER_GENETIC_EXCHANGE, 10, 0, null, 180);
     static { diplomaticReputationModifiers.add(DIPLO_MODIFIER_GENETIC_EXCHANGE); }
+    public static final DiplomaticReputationModifier DIPLO_MODIFIER_WARMONGER = new DiplomaticReputationModifier(
+        12, LanguageStrings.DIPLO_MODIFIER_WARMONGER, -20, 0, null);
+    static { diplomaticReputationModifiers.add(DIPLO_MODIFIER_WARMONGER); }
 
     public static final GeneticIntegrityModifier GI_MODIFIER_PACT = new GeneticIntegrityModifier(
         1, LanguageStrings.GI_MODIFIER_PACT, 10.0, DIPLO_MODIFIER_PACT.getNameKey());
@@ -1491,7 +1494,8 @@ public final class GameConstants {
     // --- Battle lines ---
     public static final BattleLine BATTLE_LINE_INFANTRY = new BattleLine(
             1, LanguageStrings.BATTLE_LINE_INFANTRY, 100f,
-            Set.of(ROLE_MILITIA, ROLE_WARRIOR, ROLE_DEFENDER, ROLE_BRUTE, ROLE_SIEGE, ROLE_BOMBER, ROLE_POTTER),
+            Set.of(ROLE_MILITIA, ROLE_WARRIOR, ROLE_DEFENDER, ROLE_BRUTE, ROLE_SIEGE, ROLE_BOMBER, ROLE_POTTER,
+                    ROLE_COMMANDER),
             loadIcon("icons/battleLines/Infantry.png"));
     static { battleLines.add(BATTLE_LINE_INFANTRY); }
     public static final BattleLine BATTLE_LINE_ARTILLERY = new BattleLine(

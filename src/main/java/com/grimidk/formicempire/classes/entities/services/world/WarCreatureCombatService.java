@@ -398,7 +398,6 @@ public final class WarCreatureCombatService {
         Map<Ant, Boolean> seen = new IdentityHashMap<>();
         for (Colony colony : dynasty.getColonies()) {
             claimBorderQuotas(colony, pool, seen);
-            claimQueens(colony, pool, seen);
         }
         seatParticipants(side, pool, dynasty.getCombatCapacity(), hexPriority);
         side.setStartingArmySize(side.livingArmySize());
@@ -412,7 +411,6 @@ public final class WarCreatureCombatService {
         for (Colony colony : dynasty.getColonies()) {
             claimBorderQuotas(colony, pool, seen);
             claimRoleQuota(colony, GameConstants.ROLE_SIEGE, pool, seen);
-            claimQueens(colony, pool, seen);
         }
         seatParticipants(side, pool, dynasty.getCombatCapacity(), false);
         side.setStartingArmySize(side.livingArmySize());
@@ -442,19 +440,6 @@ public final class WarCreatureCombatService {
             Map<Ant, Boolean> seen) {
         for (AntRole role : GameConstants.getBorderBattleRoles()) {
             claimRoleQuota(colony, role, pool, seen);
-        }
-    }
-
-    private static void claimQueens(Colony colony, List<WarBattleParticipant> pool, Map<Ant, Boolean> seen) {
-        if (colony == null || colony.getQueens() == null) {
-            return;
-        }
-        for (Ant queen : colony.getQueens()) {
-            if (queen == null || !queen.isAlive() || seen.containsKey(queen)) {
-                continue;
-            }
-            seen.put(queen, Boolean.TRUE);
-            pool.add(new WarBattleParticipant(queen, GameConstants.BATTLE_LINE_INFANTRY, queen.getRole(), false));
         }
     }
 

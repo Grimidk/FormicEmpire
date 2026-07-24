@@ -443,6 +443,26 @@ public class WarService {
         return count;
     }
 
+    /** Wars this dynasty started (aggressor), active and historic. */
+    public int countWarsDeclaredBy(int dynastyId) {
+        int count = 0;
+        for (War war : activeWars) {
+            if (war.getDeclaredByDynastyId() == dynastyId) {
+                count++;
+            }
+        }
+        for (War war : historicWars) {
+            if (war.getDeclaredByDynastyId() == dynastyId) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public boolean isWarmonger(int dynastyId) {
+        return countWarsDeclaredBy(dynastyId) >= GameNumbers.WARMONGER_DECLARED_WARS_THRESHOLD;
+    }
+
     public boolean hasWarHistoryForDynasty(int dynastyId) {
         for (War war : historicWars) {
             if (war.involves(dynastyId)) {
