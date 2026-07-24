@@ -633,13 +633,11 @@ public final class GameConstants {
     public static final Skill SKILL_ACID_ARTILLERY = new Skill(7, LanguageStrings.SKILL_ACID_ARTILLERY, 0.5f, 5f, 1, true,
             loadIcon("icons/skills/AcidArtillery.png"));
     static { skills.add(SKILL_ACID_ARTILLERY); }
-    // TODO asset: icons/skills/Selfdestruct.png
-    public static final Skill SKILL_SELFDESTRUCT = new Skill(8, LanguageStrings.SKILL_SELFDESTRUCT, 0.9f, 5f, 5, true,
-            null);
+    public static final Skill SKILL_SELFDESTRUCT = new Skill(8, LanguageStrings.SKILL_SELFDESTRUCT, 0.9f, 5f, 5, true, 
+            loadIcon("icons/skills/Selfdestruct.png"));
     static { skills.add(SKILL_SELFDESTRUCT); }
-    // TODO asset: icons/skills/AcidicSelfdestruct.png
     public static final Skill SKILL_ACIDIC_SELFDESTRUCT = new Skill(9, LanguageStrings.SKILL_ACIDIC_SELFDESTRUCT, 0.9f, 10f, 7, true,
-            null);
+            loadIcon("icons/skills/AcidicSelfdestruct.png"));
     static { skills.add(SKILL_ACIDIC_SELFDESTRUCT); }
 
     // --- Species ---
@@ -767,11 +765,10 @@ public final class GameConstants {
             1f, false, 20f, 1f, 1f,
             SKILL_SHIELDING, null, loadIcon("icons/subtypes/doorhead.png"));
     static { antSubtypes.add(SUBTYPE_HEAD_DOORHEAD); }
-    // TODO asset: icons/subtypes/farsight.png; sprites/ants/bulldog/subtypes/farsight/*.png
     public static final AntSubtype SUBTYPE_HEAD_FARSIGHT = new AntSubtype(9, LanguageStrings.SUBTYPE_HEAD_FARSIGHT, AntSubtypeSlot.HEAD,
             4, GameUnlocks.ASSIMILATED_FARSIGHT, "bulldog/", "farsight",
             1f, false, 1f, 1f, 1f,
-            1f, 0.15f, LanguageStrings.SUBTYPE_HEAD_FARSIGHT_DESC, null, null, null);
+            1f, 0.15f, LanguageStrings.SUBTYPE_HEAD_FARSIGHT_DESC, null, null, loadIcon("icons/subtypes/farsight.png"));
     static { antSubtypes.add(SUBTYPE_HEAD_FARSIGHT); }
 
     public static final AntSubtype SUBTYPE_TORSO_NONE = new AntSubtype(4, LanguageStrings.SUBTYPE_NOTHING, AntSubtypeSlot.TORSO,
@@ -1402,7 +1399,6 @@ public final class GameConstants {
         loadIcon("icons/species/Ghost.png"));
     static { species.add(SPECIES_GHOST); }
 
-    // TODO asset: icons/species/Dracula.png; sprites/ants/dracula/*.png (placeholder — replace final art)
     public static final AntSpecies SPECIES_DRACULA = new AntSpecies(17, LanguageStrings.SPECIES_DRACULA, LanguageStrings.SPECIES_DRACULA_SCIENTIFIC, "dracula/", GameUnlocks.ASSIMILATION_FASTBITE,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_FASTBITE),
         Set.of(LanguageStrings.DYNASTY_THEME_DRACULA, LanguageStrings.DYNASTY_THEME_VAMPIRE, LanguageStrings.DYNASTY_THEME_BLOOD),
@@ -1422,14 +1418,12 @@ public final class GameConstants {
         loadIcon("icons/species/Maricopa.png"));
     static { species.add(SPECIES_MARICOPA); }
 
-    // TODO asset: icons/species/Exploding.png; sprites/ants/exploding/*.png (placeholder — replace final art)
     public static final AntSpecies SPECIES_EXPLODING = new AntSpecies(20, LanguageStrings.SPECIES_EXPLODING, LanguageStrings.SPECIES_EXPLODING_SCIENTIFIC, "exploding/", GameUnlocks.ASSIMILATION_SELFDESTRUCT,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_SELFDESTRUCT),
         Set.of(LanguageStrings.DYNASTY_THEME_EXPLODING, LanguageStrings.DYNASTY_THEME_BOMB, LanguageStrings.DYNASTY_THEME_EXPLOSION),
         loadIcon("icons/species/Exploding.png"));
     static { species.add(SPECIES_EXPLODING); }
 
-    // TODO asset: icons/species/Bulldog.png; sprites/ants/bulldog/*.png (placeholder — replace final art)
     public static final AntSpecies SPECIES_BULLDOG = new AntSpecies(21, LanguageStrings.SPECIES_BULLDOG, LanguageStrings.SPECIES_BULLDOG_SCIENTIFIC, "bulldog/", GameUnlocks.ASSIMILATION_FARSIGHT,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_FARSIGHT),
         Set.of(LanguageStrings.DYNASTY_THEME_BULLDOG, LanguageStrings.DYNASTY_THEME_DOG, LanguageStrings.DYNASTY_THEME_HOUND),

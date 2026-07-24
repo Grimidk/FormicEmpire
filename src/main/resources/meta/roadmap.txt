@@ -11,8 +11,7 @@ To Fix (By decreasing priority) :
 	TODO: species sprites and icon: carpenter, weaver, floodplain, jet, gliding, army, ghost, dracula, silver, exploding, bulldog, shining black, desert
 	
 	Mid:
-	warmonger modifier
-	allow dyansty tabs to be seen 
+	(none right now)
 	  
 	Low:
 	(none right now)

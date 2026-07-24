@@ -7,12 +7,10 @@ To Fix (By decreasing priority) :
 	
 	High:
 	TODO: icons all unlocks
-	dracula, bulldog, exploding
-	TODO: species sprites and icon: carpenter, weaver, floodplain, jet, gliding, army, ghost, dracula, silver, exploding, bulldog, shining black, desert
+	TODO: species sprites and icon: carpenter, weaver, floodplain, jet, gliding, army, ghost, silver, shining black, desert
 	
 	Mid:
-	warmonger modifier
-	allow dyansty tabs to be seen 
+	(none right now)
 	  
 	Low:
 	(none right now)
@@ -35,8 +33,7 @@ Needed for launch (v1.0) (Launch Version):
 	main menu screen maybe simulation like factorio and title header
 	synergies ( Silk weaving + Hive building = Web building; Air-force ants + self destruction = Air-bomber ants)
 	more upgrades (combat) and more buildings and assimilations and synergies
-	implement pending roles (miner, carrier, artillery) more roles (commander and captain roles, air force and paratroopers to skip a stage) and air warfare
-	potter (honeypot workers + Boost Regen), defender (doorhead + Shielding), and siege participate in hex defense only — border clash uses other active military
+	implement pending roles (miner, carrier) more roles (captain roles, air force and paratroopers to skip a stage) and air warfare
 	withdraw to hex defense / NPC bait when hex odds beat border odds (player Wars action + AI); counterattack after holding hex already flips stageAttacker
 	remaining war gaps: mid-clash attacker abort without ceding; richer AI role assignment for bait setups; player/NPC peacetime staging of Defender/Siege quotas
 	air force roles
