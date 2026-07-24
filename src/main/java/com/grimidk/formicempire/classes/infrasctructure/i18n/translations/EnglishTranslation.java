@@ -230,6 +230,9 @@ public class EnglishTranslation implements Translation {
         en.put("SYNERGY_ACID_ARTILLERY", "Acid Artillery");
         en.put("SYNERGY_ACID_ARTILLERY_FLAVOR", "Living Howitzers");
         en.put("SYNERGY_ACID_ARTILLERY_DESC", "Unlocks the Artillery role for majors. Artillery majors gain the Acid Artillery skill (500% damage, 50% accuracy). Requires Acid Spitting assimilation and Major ants.");
+        en.put("SYNERGY_CORROSIVE_BOMBS", "Corrosive Bombs");
+        en.put("SYNERGY_CORROSIVE_BOMBS_FLAVOR", "Acidic Sacrifice");
+        en.put("SYNERGY_CORROSIVE_BOMBS_DESC", "Replaces Selfdestruct for Bombers with Acidic Selfdestruct (1000% damage, 90% accuracy, 7 targets; the ant dies). Requires Selfdestruct and Acid Spitting assimilations.");
 
         en.put("DIALOG_HATCH_RATES_TITLE", "Manage Pupa Hatch Rates");
         en.put("HATCH_DESC", "Set hatch chance for new ants:");
@@ -243,11 +246,13 @@ public class EnglishTranslation implements Translation {
         en.put("SUBTYPE_NOTHING", "Nothing");
         en.put("SUBTYPE_HEAD_TRAPJAW", "Trapjaw");
         en.put("SUBTYPE_HEAD_DOORHEAD", "Doorhead");
+        en.put("SUBTYPE_HEAD_FARSIGHT", "Far Sight");
         en.put("SUBTYPE_ABDOMEN_STINGER", "Stinger");
         en.put("SUBTYPE_ABDOMEN_HONEYPOT", "Honeypot");
-        en.put("SUBTYPE_HEAD_TRAPJAW_DESC", "Trapjaw head: 1.5x attack. Adds together with other subtype attack bonuses (with Stinger: 3x total, not 2.25x).");
+        en.put("SUBTYPE_HEAD_TRAPJAW_DESC", "Trapjaw head: 1.5x attack on infantry skills. Adds together with other subtype attack bonuses (with Stinger: 3x total, not 2.25x).");
         en.put("SUBTYPE_HEAD_DOORHEAD_DESC", "Doorhead: +20% defense.");
-        en.put("SUBTYPE_ABDOMEN_STINGER_DESC", "Stinger abdomen: 1.5x attack. Adds together with other subtype attack bonuses (with Trapjaw: 3x total, not 2.25x).");
+        en.put("SUBTYPE_HEAD_FARSIGHT_DESC", "Far Sight head: +15% accuracy to all skills (capped at 100%).");
+        en.put("SUBTYPE_ABDOMEN_STINGER_DESC", "Stinger abdomen: 1.5x attack on infantry skills. Adds together with other subtype attack bonuses (with Trapjaw: 3x total, not 2.25x).");
         en.put("SUBTYPE_ABDOMEN_HONEYPOT_DESC", "Honeypot abdomen: 4x foraging power and carry capacity; 0.75x movement speed; +15% regeneration.");
 
         en.put("SKILL_BASIC_BITE", "Basic Bite");
@@ -257,6 +262,8 @@ public class EnglishTranslation implements Translation {
         en.put("SKILL_BOOST_REGEN", "Boost Regen");
         en.put("SKILL_ACID_SPITTING", "Acid Spitting");
         en.put("SKILL_ACID_ARTILLERY", "Acid Artillery");
+        en.put("SKILL_SELFDESTRUCT", "Selfdestruct");
+        en.put("SKILL_ACIDIC_SELFDESTRUCT", "Acidic Selfdestruct");
 
         en.put("BATTLE_LINE_INFANTRY", "Infantry");
         en.put("BATTLE_LINE_ARTILLERY", "Artillery");
@@ -521,7 +528,11 @@ public class EnglishTranslation implements Translation {
         en.put("WAR_COL_PROGRESS", "Progress");
         en.put("WAR_PROGRESS_FMT", "%s%%");
         en.put("WAR_ACTION_FALLBACK", "Fallback (forfeit stage)");
-        en.put("WAR_FALLBACK_CONFIRM_FMT", "Forfeit the current stage in %s? Your forces will retreat without losses.");
+        en.put("WAR_FALLBACK_CONFIRM_FMT", "Forfeit the current stage against %s? You cede this hex without fighting it out.");
+        en.put("WAR_ACTION_WITHDRAW_HEX", "Withdraw to hex defense");
+        en.put("WAR_WITHDRAW_HEX_CONFIRM_FMT",
+                "Pull out of the border clash at %s and fight the hex assault at home? Your border army is preserved; defending ants gain hex-defense boosts.");
+        en.put("WAR_STAGE_HEX_BAIT_FMT", "%s withdrew to hex defense at %s.");
         en.put("WAR_STAGE_CAPTURED_FMT", "%1$s captured %2$s. War progress: %3$s%%.");
         en.put("WAR_STAGE_DEFENDER_HELD_FMT", "%1$s held %2$s. War progress: %3$s%%.");
         en.put("WAR_STAGE_FORFEITED_FMT", "%1$s won the stage at %2$s after a retreat. War progress: %3$s%%.");
@@ -595,7 +606,7 @@ public class EnglishTranslation implements Translation {
         en.put("STAT_MILITARY_POWER", "Military Power");
         en.put("STAT_MILITARY_POWER_DESC", "Adult type counts weighted by combat base stats. During war, wartime role assignments split active (front-line) and reserve strength. Updated once per world day.");
         en.put("STAT_COMBAT_CAPACITY", "Combat Capacity");
-        en.put("STAT_COMBAT_CAPACITY_DESC", "How many combatants your dynasty can field. Starts at 1,000; assigning a Queen as Commander raises it to 2,500. Battle deployment limits are not enforced yet.");
+        en.put("STAT_COMBAT_CAPACITY_DESC", "How many combatants your dynasty can field as active per battle line. Starts at 1,000; assigning a Queen as Commander raises it to 2,500. Extra assigned military wait as reserves and step into the line when active ants fall.");
         en.put("STAT_ACTIVE_MILITARY_POWER", "Active Military Power");
         en.put("STAT_RESERVE_MILITARY_POWER", "Reserve Military Power");
         en.put("DYNASTY_REPUTATION", "Reputation");
@@ -1245,15 +1256,15 @@ public class EnglishTranslation implements Translation {
         en.put("SPECIES_GREEN", "Green Ant");
         en.put("SPECIES_GREEN_SCIENTIFIC", "Formica Rufa");
         en.put("ASSIMILATED_TRAPJAW_FLAVOR", "Spring-Loaded Mandibles");
-        en.put("ASSIMILATED_TRAPJAW_DESC", "Unlocks the Trapjaw head subtype. Contributes 1.5x attack; stacks by addition with other subtype attack bonuses.");
+        en.put("ASSIMILATED_TRAPJAW_DESC", "Unlocks the Trapjaw head subtype. Contributes 1.5x attack on infantry skills; stacks by addition with other subtype attack bonuses. Grants the Powerful Bite skill (replaces Basic Bite).");
         en.put("ASSIMILATION_TRAPJAW", "Trap-Jaw Ant Assimilation");
         en.put("ASSIMILATION_TRAPJAW_DESC", "After assimilating the trap-jaw ant genome:");
         en.put("ASSIMILATED_HONEYPOT_FLAVOR", "Living Honey Jars");
-        en.put("ASSIMILATED_HONEYPOT_DESC", "Unlocks the Honeypot abdomen subtype. Honeypot foragers gather and carry 4x as much at 0.75x movement speed, and gain +15% regeneration.");
+        en.put("ASSIMILATED_HONEYPOT_DESC", "Unlocks the Honeypot abdomen subtype and the Portable-Feeder (Potter) role for workers with that subtype. Honeypot foragers gather and carry 4x as much at 0.75x movement speed, and gain +15% regeneration. Grants Boost Regen (doubles next redeploy heal when used).");
         en.put("ASSIMILATION_HONEYPOT", "Honey-Pot Ant Assimilation");
         en.put("ASSIMILATION_HONEYPOT_DESC", "After assimilating the honey-pot ant genome:");
         en.put("ASSIMILATED_DOORHEAD_FLAVOR", "Armored Head Plugs");
-        en.put("ASSIMILATED_DOORHEAD_DESC", "Unlocks the Doorhead head subtype. Doorhead ants gain +20% defense.");
+        en.put("ASSIMILATED_DOORHEAD_DESC", "Unlocks the Doorhead head subtype and the Defender role for soldiers with that subtype. Doorhead ants gain +20% defense. Grants Shielding (defenders absorb hits meant for queens in hex defense until they die).");
         en.put("ASSIMILATION_DOORHEAD", "Turtle Ant Assimilation");
         en.put("ASSIMILATION_DOORHEAD_DESC", "After assimilating the turtle ant genome:");
         en.put("ASSIMILATED_WOODBURROW_FLAVOR", "Wood Excavation");
@@ -1281,7 +1292,7 @@ public class EnglishTranslation implements Translation {
         en.put("ASSIMILATION_GLIDING", "Gliding Ant Assimilation");
         en.put("ASSIMILATION_GLIDING_DESC", "After assimilating the gliding ant genome:");
         en.put("ASSIMILATED_STINGING_FLAVOR", "Excruciating Sting");
-        en.put("ASSIMILATED_STINGING_DESC", "Unlocks the Stinger abdomen subtype. Contributes 1.5x attack; stacks by addition with other subtype attack bonuses (Trapjaw + Stinger = 3x, not 2.25x).");
+        en.put("ASSIMILATED_STINGING_DESC", "Unlocks the Stinger abdomen subtype. Contributes 1.5x attack on infantry skills; stacks by addition with other subtype attack bonuses (Trapjaw + Stinger = 3x, not 2.25x). Grants the Stinging skill.");
         en.put("ASSIMILATION_STINGING", "Bullet Ant Assimilation");
         en.put("ASSIMILATION_STINGING_DESC", "After assimilating the bullet ant genome:");
         en.put("ASSIMILATED_SWARMING_FLAVOR", "Raid Swarms");
@@ -1305,11 +1316,11 @@ public class EnglishTranslation implements Translation {
         en.put("ASSIMILATION_DEADLYVENOM", "Neurotoxic Venom Assimilation");
         en.put("ASSIMILATION_DEADLYVENOM_DESC", "After assimilating neurotoxic venom genetics:");
         en.put("ASSIMILATED_SELFDESTRUCT_FLAVOR", "Suicidal Defense");
-        en.put("ASSIMILATED_SELFDESTRUCT_DESC", "Your dynasty can rupture specialized workers to spray sticky toxins. (Mechanic in development.)");
+        en.put("ASSIMILATED_SELFDESTRUCT_DESC", "Unlocks the Bomber role and Selfdestruct skill (500% damage, 90% accuracy, 5 targets; the ant dies).");
         en.put("ASSIMILATION_SELFDESTRUCT", "Exploding Ant Assimilation");
         en.put("ASSIMILATION_SELFDESTRUCT_DESC", "After assimilating the exploding ant genome:");
         en.put("ASSIMILATED_FARSIGHT_FLAVOR", "Exceptional Vision");
-        en.put("ASSIMILATED_FARSIGHT_DESC", "Your dynasty can track prey and landmarks using keen compound eyes. (Mechanic in development.)");
+        en.put("ASSIMILATED_FARSIGHT_DESC", "Unlocks the Far Sight head subtype. When equipped, +15% accuracy to all skills (capped at 100%).");
         en.put("ASSIMILATION_FARSIGHT", "Bulldog Ant Assimilation");
         en.put("ASSIMILATION_FARSIGHT_DESC", "After assimilating the bulldog ant genome:");
         en.put("ASSIMILATED_HIVEBUILD_FLAVOR", "Carton Nest Building");
@@ -1391,19 +1402,19 @@ public class EnglishTranslation implements Translation {
         en.put("ROLE_MINER_DESC", "Allows workers to mine minerals from the earth.");
         en.put("ROLE_POTTER_UPGRADE", "Portable-Feeder Role");
         en.put("ROLE_POTTER_FLAVOR", "A Helping Hand");
-        en.put("ROLE_POTTER_DESC", "Allows workers to store and transport food to other ants.");
+        en.put("ROLE_POTTER_DESC", "Allows honeypot workers to store and transport food and use Boost Regen in war. Unlocked by Honeypot assimilation; requires the Honeypot subtype.");
         en.put("ROLE_WARRIOR_UPGRADE", "Warrior Role");
         en.put("ROLE_WARRIOR_FLAVOR", "Phalanx Formation");
         en.put("ROLE_WARRIOR_DESC", "Allows soldiers to fight in organized groups.");
         en.put("ROLE_DEFENDER_UPGRADE", "Defender Role");
         en.put("ROLE_DEFENDER_FLAVOR", "Royal Shield");
-        en.put("ROLE_DEFENDER_DESC", "Allows soldiers to protect the queen directly.");
+        en.put("ROLE_DEFENDER_DESC", "Allows doorhead soldiers to guard the queen in hex defense with Shielding. Unlocked by Doorhead assimilation; requires the Doorhead subtype. Does not fight in border clashes. In hex defense, Defenders gain 3x attack and defense (defense capped at 100%); other defending ants gain 1.5x.");
         en.put("ROLE_POLICE_UPGRADE", "Parasite-Ant Police Role");
         en.put("ROLE_POLICE_FLAVOR", "Police Brutality");
         en.put("ROLE_POLICE_DESC", "Allows soldiers to detect parasite ants disguising as your ants; each one has a 10% chance to detect parasite ants per day.");
         en.put("ROLE_BOMBER_UPGRADE", "Bomber Role");
         en.put("ROLE_BOMBER_FLAVOR", "Explosive Finish");
-        en.put("ROLE_BOMBER_DESC", "Allows specialized soldiers to explode on death.");
+        en.put("ROLE_BOMBER_DESC", "Allows soldiers to use Selfdestruct (or Acidic Selfdestruct with Corrosive Bombs). Unlocked by Exploding Ant assimilation.");
         en.put("ROLE_BRUTE_UPGRADE", "Brute Role");
         en.put("ROLE_BRUTE_FLAVOR", "Heavy Trooper");
         en.put("ROLE_BRUTE_DESC", "Allows majors to become massive menaces in battle.");
@@ -1415,7 +1426,7 @@ public class EnglishTranslation implements Translation {
         en.put("ROLE_ARTILLERY_DESC", "Allows majors to spit acid at long range.");
         en.put("ROLE_SIEGE_UPGRADE", "Siege-Machine Role");
         en.put("ROLE_SIEGE_FLAVOR", "Siege Technology");
-        en.put("ROLE_SIEGE_DESC", "Allows majors to break down enemy colony defenses.");
+        en.put("ROLE_SIEGE_DESC", "Allows majors to break down enemy colony defenses during hex assault only (not border clashes). Siege engines gain 3x attack and defense while attacking a hex (defense capped at 100%); other attackers gain no hex-defense boost.");
         en.put("ROLE_BREEDER_UPGRADE", "Breeder Roles");
         en.put("ROLE_BREEDER_FLAVOR", "Nuptial Flights");
         en.put("ROLE_BREEDER_DESC", "Allows Princesses and Drones to go to nuptial flights and get more queens or spread to new places.");
@@ -1507,7 +1518,7 @@ public class EnglishTranslation implements Translation {
         en.put("ABILITY_ABILITY_DESC", "Allows you to see the abilities menu and use active abilities.");
 
         en.put("STAT_SKELETON_FLAVOR", "Basic Exoskeletons");
-        en.put("STAT_SKELETON_DESC", "Basic vitality for colony ants before type multipliers: 100 health points and 10% of max HP regenerated per tick. Defense is type-based (majors and queens start at 20%).");
+        en.put("STAT_SKELETON_DESC", "Basic vitality for colony ants before type multipliers: 100 health points and 10% of max HP regenerated each war redeploy. Defense is type-based (majors and queens start at 20%).");
         en.put("STAT_ACID_FLAVOR", "Acidic Spit");
         en.put("STAT_ACID_DESC", "The basic offensive stats for all the ants in your colony before multipliers. 10 attack points, 1 attack per second and 1 speed point.");
         en.put("STAT_LONGEVITY_FLAVOR", "Standard Lifespan");
@@ -1737,11 +1748,11 @@ public class EnglishTranslation implements Translation {
         en.put("HELP_TAB_DYNASTY", "Dynasty");
         en.put("HELP_TAB_HOTKEYS", "Hotkeys");
         en.put("HELP_TAB_TUTORIALS", "Tutorials");
-        en.put("HELP_TAB_SPECIES", "Species");
+        en.put("HELP_TAB_SPECIES", "Ant Species");
         en.put("HELP_TAB_TYPES", "Ant Types");
         en.put("HELP_TAB_SUBTYPES", "Ant Subtypes");
         en.put("HELP_SUBTYPES_INTRO", "Assimilated body-part traits can roll onto new hatchlings. Configure odds per ant type in Hatch Rates (P). Each active subtype part adds +50% food consumption.");
-        en.put("HELP_TAB_BUGS", "Other insects");
+        en.put("HELP_TAB_BUGS", "Critter Species");
         en.put("HELP_TAB_ANT_ROLES", "Ant Roles");
         en.put("HELP_TAB_EMPIRE", "Dynasty");
         en.put("HELP_TAB_UPGRADES", "Upgrades");
@@ -1749,22 +1760,29 @@ public class EnglishTranslation implements Translation {
         en.put("HELP_TAB_ASSIMILATIONS", "Assimilations");
         en.put("HELP_TAB_SYNERGIES", "Synergies");
         en.put("HELP_TAB_COMBAT", "Combat");
-        en.put("HELP_COMBAT_INTRO", "Combat uses <b>skills</b> (accuracy and damage multipliers), <b>battle lines</b> (role bands and hit chance), and war <b>phases</b> / <b>standing</b> during campaigns.");
+        en.put("HELP_COMBAT_INTRO", "Battles resolve creature-vs-creature each hour. Active ants (up to combat capacity per battle line) act with skills; reserves fill gaps. Hit chance is skill accuracy × line accuracy (capped at 100%). Damage uses attack × skill multiplier, reduced once by the target's defense %. Border clash ends when ~90% of an army (including reserves) is dead; hex assault ends when the last defending queen dies. Queens are always on the line as commanders; while any Defenders live, attacks prefer non-queens.");
         en.put("HELP_COMBAT_SKILLS", "Skills");
         en.put("HELP_COMBAT_BATTLE_LINES", "Battle Lines");
         en.put("HELP_COMBAT_WAR_PHASES", "War Stage Phases");
         en.put("HELP_COMBAT_WAR_STANDING", "War Standing");
         en.put("HELP_SKILL_ACCURACY_FMT", "Accuracy: %s");
         en.put("HELP_SKILL_DAMAGE_FMT", "Damage: %s");
+        en.put("HELP_SKILL_TARGETS_FMT", "Targets: %s");
+        en.put("HELP_SKILL_SACRIFICES_SELF", "The ant dies when using this skill.");
+        en.put("HELP_SKILL_BATTLE_LINE_FMT", "Battle line: %s");
+        en.put("HELP_SKILL_BOOST_REGEN_EFFECT",
+                "Support: doubles this ant's HP healed on the next war redeploy (regen % of max HP). Portable-Feeders with Honeypot use it automatically until battle skill picks exist.");
+        en.put("HELP_SKILL_SHIELDING_EFFECT",
+                "Support: in hex defense, this Defender takes losses meant for queens until the ant dies. Doorhead Defenders arm Shielding when hex defense begins.");
         en.put("HELP_BATTLE_LINE_ACCURACY_FMT", "Base accuracy: %s");
         en.put("HELP_BATTLE_LINE_ROLES_FMT", "Roles: %s");
         en.put("HELP_BATTLE_LINE_ROLES_NONE", "Roles: none yet");
-        en.put("HELP_WAR_PHASE_CLASH_DESC", "Opening battle at the contested border between the two dynasties.");
-        en.put("HELP_WAR_PHASE_RESERVE_DESC", "Siege assault on a colony after the border clash.");
+        en.put("HELP_WAR_PHASE_CLASH_DESC", "Creature battle at the contested border. Each active ant spends actions on attack or support skills; infantry act every hour, artillery every 2nd, air every 3rd. Win by defeating ~90% of the enemy army (active + reserves).");
+        en.put("HELP_WAR_PHASE_RESERVE_DESC", "Siege assault on a colony after the border clash. The contested colony fields every local ant (Defenders, Siege, and queens start active); attackers bring dynasty border-active military plus dynasty-wide Siege (Defenders never leave home). Hex boosts: defending ants 1.5x attack/defense (Defenders 3x); Siege attackers 3x. Defense cannot exceed 100%. Attackers win by killing the last queen.");
         en.put("HELP_WAR_PHASE_REDEPLOY_DESC", "Forces move to the next stage target after a battle resolves.");
-        en.put("HELP_WAR_STANDING_WINNING_DESC", "Your side leads the war by combat power.");
-        en.put("HELP_WAR_STANDING_LOSING_DESC", "The enemy leads the war by combat power.");
-        en.put("HELP_WAR_STANDING_EVEN_DESC", "Neither side has a clear combat-power lead.");
+        en.put("HELP_WAR_STANDING_WINNING_DESC", "Your side leads the war by stage progress.");
+        en.put("HELP_WAR_STANDING_LOSING_DESC", "The enemy leads the war by stage progress.");
+        en.put("HELP_WAR_STANDING_EVEN_DESC", "Neither side has a clear stage-progress lead.");
         en.put("HELP_TAB_WORLD", "World");
         en.put("HELP_TAB_UI", "UI Controls");
         en.put("HELP_UI_INTRO", "During a colony session, the control bar at the bottom-right adjusts simulation speed, pause, and opens the game menu.");
@@ -1779,7 +1797,7 @@ public class EnglishTranslation implements Translation {
         en.put("HELP_DYNASTY_INFO", "<b>Expanding Your Dynasty:</b><br>Once you unlock <b>Breeders</b>, perform Nuptial Flights to spread via the <b>World Map (M)</b>.<br><i>Tip: Eclipses trigger spontaneous, free Nuptial Flights!</i><br><br><b>Dynasty Menu:</b> Open from the game menu (<b>ESC</b> → <b>Dynasty</b>) or press <b>A</b> Overview, <b>S</b> Trade, <b>D</b> Diplomacy, <b>F</b> Wars (press the same key again on that tab to close).<br><br><b>Logistics & Trade:</b><br>Founding multiple colonies unlocks <b>Trade Routes</b> on the Trade tab. Assign transport ants and pick a convoy method:<br>- <b>Land:</b> Standard overland convoys.<br>- <b>Sea:</b> High capacity between coastal colonies.<br>- <b>Tunnel:</b> Secure and fast; requires a completed tunnel and tunnel-capable roles.<br>- <b>Air:</b> Fast but low capacity; requires <b>Sky Transports</b> (Princesses).<br>- <b>Bilateral:</b> Merges outgoing and incoming routes into one two-way convoy.<br><br><b>Loyalty & Diplomacy:</b><br>Each colony has <b>Loyalty</b> to your dynasty (tier icons in Overview). Low loyalty blocks trade. Other dynasties have <b>Reputation</b> and stance tiers that affect pacts and trade.<br><br><b>War:</b><br>Declare war from Diplomacy when both sides have active military roles assigned. Track campaigns on the <b>Wars (F)</b> tab — progress, peace offers, and battle view.<br><br><b>Milestones:</b><br>- <b>Mass Colonization:</b> Removes satellite colony limits.<br>- <b>Automation:</b> NPC colonies can manage themselves.<br><br><b>Evolution:</b><br>Unlock <b>Synergies</b> and <b>Assimilations</b> to combine and absorb traits.");
         
         en.put("HELP_SPECIES_SCIENTIFIC", "Scientific Name:");
-        en.put("HELP_SPECIES_TRAITS", "Base Traits:");
+        en.put("HELP_SPECIES_ASSIMILATION_FMT", "Assimilation: %s");
 
         en.put("HELP_RESOURCE_SOURCE_SMALL", "Small");
         en.put("HELP_RESOURCE_SOURCE_MEDIUM", "Medium");
@@ -2102,6 +2120,8 @@ public class EnglishTranslation implements Translation {
         en.put("TRIGGER_SYNERGY_SUPER_VENOM_MSG", "%s is now active! Combining %s replaces their separate +50% bonuses with a +200% colony attack bonus (3x total). Open Synergies (O) to review.");
         en.put("TRIGGER_SYNERGY_ACID_ARTILLERY_TITLE", "Synergy Unlocked");
         en.put("TRIGGER_SYNERGY_ACID_ARTILLERY_MSG", "%s is now active! Combining %s unlocks the Artillery role for majors and the Acid Artillery skill. Open Synergies (O) to review.");
+        en.put("TRIGGER_SYNERGY_CORROSIVE_BOMBS_TITLE", "Synergy Unlocked");
+        en.put("TRIGGER_SYNERGY_CORROSIVE_BOMBS_MSG", "%s is now active! Combining %s upgrades Bomber Selfdestruct into Acidic Selfdestruct. Open Synergies (O) to review.");
         en.put("TRIGGER_OPERATIONS_ABILITY_TITLE", "Colony Operations");
         en.put("TRIGGER_OPERATIONS_ABILITY_MSG", "You have gained a special active ability! You can now access the Colony Operations menu by pressing (Z).");
 

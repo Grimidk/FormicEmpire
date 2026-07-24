@@ -625,6 +625,14 @@ public class WarService {
         return WarProgressService.canForfeitStage(world, war, forfeitier);
     }
 
+    public boolean withdrawToHexDefense(War war, Dynasty withdrawer) {
+        return WarProgressService.withdrawToHexDefense(world, war, withdrawer);
+    }
+
+    public boolean canWithdrawToHexDefense(War war, Dynasty withdrawer) {
+        return WarProgressService.canWithdrawToHexDefense(world, war, withdrawer);
+    }
+
     public void tickWarProgressHourly() {
         WarProgressService.tickActiveWarsHourly(world, this);
     }

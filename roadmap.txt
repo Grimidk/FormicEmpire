@@ -7,10 +7,11 @@ To Fix (By decreasing priority) :
 	
 	High:
 	TODO: icons all unlocks
+	dracula, bulldog, exploding
 	TODO: species sprites and icon: carpenter, weaver, floodplain, jet, gliding, army, ghost, dracula, silver, exploding, bulldog, shining black, desert
 	
 	Mid:
-	use alternate sprites in the help list for species
+	warmonger modifier
 	  
 	Low:
 	(none right now)
@@ -26,16 +27,19 @@ To Fix (By decreasing priority) :
 To Feature (to be done in order):
 Needed for launch (v1.0) (Launch Version):
 	Priority:
-	assimilations (Wood burrowing (Carpenter ants), Silk weaving (Weaver ants), Rafting (Flood plains ants), Jumping (Jet ants), Gliding (Gliding ants), Swarming (Army ants), Stealth (Ghost ants), Heat resistance (Saharan silver ants), Self destruction (Exploding ants), Far sight (Bulldog ants), Hive building (Shining black ants), Location sensing (Desert ants))
+	assimilations (Wood burrowing (Carpenter ants), Silk weaving (Weaver ants), Rafting (Flood plains ants), Jumping (Jet ants), Gliding (Gliding ants), Swarming (Army ants), Stealth (Ghost ants), Heat resistance (Saharan silver ants),  Hive building (Shining black ants), Location sensing (Desert ants))
 	minerals with uprades to find it and increase miner efficency, also mushroom detection 
 	research tree and building tree (after icons) with available, purchasable, locked and list trigger based upgrades 
 	random events (meteor, earthquake, tornado, tsunami, hunts (for later) plus special weathers (rare events))
 	main menu screen maybe simulation like factorio and title header
-	synergies ( Self destruction + Acid spitting = Corrosive bombs; Silk weaving + Hive building = Web building; Air-force ants + self destruction = Air-bomber ants)
+	synergies ( Silk weaving + Hive building = Web building; Air-force ants + self destruction = Air-bomber ants)
 	more upgrades (combat) and more buildings and assimilations and synergies
-	implement pending roles (defender, miner, potter, bomber, carrier, artillery, siege) more roles (commander and captain roles, air force and paratroopers to skip a stage) and air warfare
-	rework war by using attack vs defense in hex defense and that difference dictates loses, with more risk like randomness, artillery line (doesnt lose unless targeted by other artillery, and air support)
-	New Battle System Each frontier battle: attacker goes first, each CREATURE chooses N ATTACKMOVES from available per Creaturte, focuses on 1 target until dead unless its AoE attack. if hit lands, base damage by attack multiplier divided by defense, that is reduced from health, until 0 or less. until all creatures from one side are dead. In hex defensed defenders get 50% more health and attack, guards get 200% more (dont go to border battle), and siege engines get 200% more as attackers (dont go to border battle)
+	implement pending roles (miner, carrier, artillery) more roles (commander and captain roles, air force and paratroopers to skip a stage) and air warfare
+	potter (honeypot workers + Boost Regen), defender (doorhead + Shielding), and siege participate in hex defense only — border clash uses other active military
+	withdraw to hex defense / NPC bait when hex odds beat border odds (player Wars action + AI); counterattack after holding hex already flips stageAttacker
+	DONE: creature-vs-creature battle resolution (per-line combat capacity, reserves, skills, 90% army / last queen wins; replaces power-ratio ticks)
+	remaining war gaps: mid-clash attacker abort without ceding; richer AI role assignment for bait setups; player/NPC peacetime staging of Defender/Siege quotas
+	air force roles
 	creature vs swarm battle system
 	
 	Everything else :

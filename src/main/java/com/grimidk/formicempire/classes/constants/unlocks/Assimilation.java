@@ -22,6 +22,12 @@ public class Assimilation extends Constant{
     }
 
     public String getDescription() {
+        if (reward != null) {
+            String rewardDescription = reward.getDescription();
+            if (rewardDescription != null && !rewardDescription.isBlank()) {
+                return rewardDescription;
+            }
+        }
         return LanguageStrings.get(descriptionKey);
     }
 

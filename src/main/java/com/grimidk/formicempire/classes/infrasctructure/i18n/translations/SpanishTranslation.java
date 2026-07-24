@@ -230,6 +230,9 @@ public class SpanishTranslation implements Translation {
         es.put("SYNERGY_ACID_ARTILLERY", "Artillería ácida");
         es.put("SYNERGY_ACID_ARTILLERY_FLAVOR", "Obuses vivientes");
         es.put("SYNERGY_ACID_ARTILLERY_DESC", "Desbloquea el rol Artillería para majors. Las majors de artillería obtienen la habilidad Artillería ácida (500% daño, 50% precisión). Requiere asimilación de Escupitajo ácido y hormigas Major.");
+        es.put("SYNERGY_CORROSIVE_BOMBS", "Bombas corrosivas");
+        es.put("SYNERGY_CORROSIVE_BOMBS_FLAVOR", "Sacrificio ácido");
+        es.put("SYNERGY_CORROSIVE_BOMBS_DESC", "Sustituye Autodestrucción de las Bombarderas por Autodestrucción ácida (1000% daño, 90% precisión, 7 objetivos; la hormiga muere). Requiere asimilaciones Autodestrucción y Escupitajo ácido.");
 
         es.put("DIALOG_HATCH_RATES_TITLE", "Gestionar Tasas de Eclosión");
         es.put("HATCH_DESC", "Establecer probabilidad de eclosión:");
@@ -243,11 +246,13 @@ public class SpanishTranslation implements Translation {
         es.put("SUBTYPE_NOTHING", "Ninguno");
         es.put("SUBTYPE_HEAD_TRAPJAW", "Mandíbula trampa");
         es.put("SUBTYPE_HEAD_DOORHEAD", "Cabeza escudo");
+        es.put("SUBTYPE_HEAD_FARSIGHT", "Vista lejana");
         es.put("SUBTYPE_ABDOMEN_STINGER", "Aguijón");
         es.put("SUBTYPE_ABDOMEN_HONEYPOT", "Honeypot");
-        es.put("SUBTYPE_HEAD_TRAPJAW_DESC", "Cabeza mandíbula-trampa: 1.5x ataque. Se suma a otros bonus de ataque de subtipo (con Aguijón: 3x total, no 2.25x).");
+        es.put("SUBTYPE_HEAD_TRAPJAW_DESC", "Cabeza mandíbula-trampa: 1.5x ataque en habilidades de infantería. Se suma a otros bonus de ataque de subtipo (con Aguijón: 3x total, no 2.25x).");
         es.put("SUBTYPE_HEAD_DOORHEAD_DESC", "Cabeza-escudo: +20% defensa.");
-        es.put("SUBTYPE_ABDOMEN_STINGER_DESC", "Abdomen aguijón: 1.5x ataque. Se suma a otros bonus de ataque de subtipo (con Mandíbula-trampa: 3x total, no 2.25x).");
+        es.put("SUBTYPE_HEAD_FARSIGHT_DESC", "Cabeza Vista lejana: +15% precisión a todas las habilidades (máximo 100%).");
+        es.put("SUBTYPE_ABDOMEN_STINGER_DESC", "Abdomen aguijón: 1.5x ataque en habilidades de infantería. Se suma a otros bonus de ataque de subtipo (con Mandíbula-trampa: 3x total, no 2.25x).");
         es.put("SUBTYPE_ABDOMEN_HONEYPOT_DESC", "Abdomen honeypot: 4x recolección y capacidad de carga; 0.75x velocidad; +15% regeneración.");
 
         es.put("SKILL_BASIC_BITE", "Mordida básica");
@@ -257,6 +262,8 @@ public class SpanishTranslation implements Translation {
         es.put("SKILL_BOOST_REGEN", "Regeneración reforzada");
         es.put("SKILL_ACID_SPITTING", "Escupitajo ácido");
         es.put("SKILL_ACID_ARTILLERY", "Artillería ácida");
+        es.put("SKILL_SELFDESTRUCT", "Autodestrucción");
+        es.put("SKILL_ACIDIC_SELFDESTRUCT", "Autodestrucción ácida");
 
         es.put("BATTLE_LINE_INFANTRY", "Infantería");
         es.put("BATTLE_LINE_ARTILLERY", "Artillería");
@@ -521,7 +528,11 @@ public class SpanishTranslation implements Translation {
         es.put("WAR_COL_PROGRESS", "Progreso");
         es.put("WAR_PROGRESS_FMT", "%s%%");
         es.put("WAR_ACTION_FALLBACK", "Retirada (ceder etapa)");
-        es.put("WAR_FALLBACK_CONFIRM_FMT", "¿Ceder la etapa actual en %s? Tus fuerzas se retirarán sin pérdidas.");
+        es.put("WAR_FALLBACK_CONFIRM_FMT", "¿Ceder la etapa actual contra %s? Entregas este hexágono sin pelearlo hasta el final.");
+        es.put("WAR_ACTION_WITHDRAW_HEX", "Retirarse a defensa de hexágono");
+        es.put("WAR_WITHDRAW_HEX_CONFIRM_FMT",
+                "¿Abandonar el choque fronterizo en %s y pelear el asalto en casa? Tu ejército fronterizo se conserva; los defensores reciben bonos de defensa de hexágono.");
+        es.put("WAR_STAGE_HEX_BAIT_FMT", "%s se retiró a defensa de hexágono en %s.");
         es.put("WAR_STAGE_CAPTURED_FMT", "%1$s capturó %2$s. Progreso de guerra: %3$s%%.");
         es.put("WAR_STAGE_DEFENDER_HELD_FMT", "%1$s mantuvo %2$s. Progreso de guerra: %3$s%%.");
         es.put("WAR_STAGE_FORFEITED_FMT", "%1$s ganó la etapa en %2$s tras una retirada. Progreso de guerra: %3$s%%.");
@@ -595,7 +606,7 @@ public class SpanishTranslation implements Translation {
         es.put("STAT_MILITARY_POWER", "Poder militar");
         es.put("STAT_MILITARY_POWER_DESC", "Recuento de tipos adultos ponderado por estadísticas de combate base. En guerra, las asignaciones de roles de guerra dividen la fuerza activa (primera línea) y de reserva. Se actualiza una vez al día.");
         es.put("STAT_COMBAT_CAPACITY", "Capacidad de combate");
-        es.put("STAT_COMBAT_CAPACITY_DESC", "Cuántos combatientes puede desplegar tu dinastía. Empieza en 1.000; asignar una Reina como Comandante la sube a 2.500. Los límites de despliegue aún no se aplican.");
+        es.put("STAT_COMBAT_CAPACITY_DESC", "Cuántos combatientes puede desplegar tu dinastía como activos por línea de batalla. Empieza en 1.000; asignar una Reina como Comandante la sube a 2.500. El resto queda en reserva y entra a la línea cuando caen activos.");
         es.put("STAT_ACTIVE_MILITARY_POWER", "Poder militar activo");
         es.put("STAT_RESERVE_MILITARY_POWER", "Poder militar de reserva");
         es.put("DYNASTY_REPUTATION", "Reputación");
@@ -1245,15 +1256,15 @@ public class SpanishTranslation implements Translation {
         es.put("SPECIES_GREEN", "Hormiga Verde");
         es.put("SPECIES_GREEN_SCIENTIFIC", "Formica Rufa");
         es.put("ASSIMILATED_TRAPJAW_FLAVOR", "Mandíbulas de Resorte");
-        es.put("ASSIMILATED_TRAPJAW_DESC", "Desbloquea el subtipo de cabeza Mandíbula-trampa. Aporta 1.5x ataque; se apila por suma con otros bonus de ataque de subtipo.");
+        es.put("ASSIMILATED_TRAPJAW_DESC", "Desbloquea el subtipo de cabeza Mandíbula-trampa. Aporta 1.5x ataque en habilidades de infantería; se apila por suma con otros bonus de ataque de subtipo. Otorga la habilidad Mordida poderosa (reemplaza Mordida básica).");
         es.put("ASSIMILATION_TRAPJAW", "Asimilación de Hormiga Trampa Mandíbula");
         es.put("ASSIMILATION_TRAPJAW_DESC", "Tras asimilar el genoma de la hormiga trampa mandíbula:");
         es.put("ASSIMILATED_HONEYPOT_FLAVOR", "Tarros de Miel Vivos");
-        es.put("ASSIMILATED_HONEYPOT_DESC", "Desbloquea el subtipo de abdomen Honeypot. Las recolectoras honeypot reúnen y llevan 4x a 0.75x velocidad, y ganan +15% regeneración.");
+        es.put("ASSIMILATED_HONEYPOT_DESC", "Desbloquea el subtipo de abdomen Honeypot y el rol Hormiga-Copa (Potter) para obreras con ese subtipo. Las recolectoras honeypot reúnen y llevan 4x a 0.75x velocidad, y ganan +15% regeneración. Otorga Regeneración reforzada (duplica la curación del siguiente redespliegue al usarla).");
         es.put("ASSIMILATION_HONEYPOT", "Asimilación de Hormiga Mielera");
         es.put("ASSIMILATION_HONEYPOT_DESC", "Tras asimilar el genoma de la hormiga mielera:");
         es.put("ASSIMILATED_DOORHEAD_FLAVOR", "Tapones de Cabeza Acorazados");
-        es.put("ASSIMILATED_DOORHEAD_DESC", "Desbloquea el subtipo de cabeza Cabeza-escudo. Las hormigas doorhead ganan +20% defensa.");
+        es.put("ASSIMILATED_DOORHEAD_DESC", "Desbloquea el subtipo de cabeza Cabeza-escudo y el rol Defensora para soldados con ese subtipo. Las hormigas doorhead ganan +20% defensa. Otorga Escudo (las defensoras absorben golpes destinados a las reinas en defensa de hexágono hasta morir).");
         es.put("ASSIMILATION_DOORHEAD", "Asimilación de Hormiga Cabeza Puerta");
         es.put("ASSIMILATION_DOORHEAD_DESC", "Tras asimilar el genoma de la hormiga cabeza puerta:");
         es.put("ASSIMILATED_WOODBURROW_FLAVOR", "Excavación de Madera");
@@ -1281,7 +1292,7 @@ public class SpanishTranslation implements Translation {
         es.put("ASSIMILATION_GLIDING", "Asimilación de Hormiga Planeadora");
         es.put("ASSIMILATION_GLIDING_DESC", "Tras asimilar el genoma de la hormiga planeadora:");
         es.put("ASSIMILATED_STINGING_FLAVOR", "Aguijón Excruciante");
-        es.put("ASSIMILATED_STINGING_DESC", "Desbloquea el subtipo de abdomen Aguijón. Aporta 1.5x ataque; se apila por suma (Mandíbula-trampa + Aguijón = 3x, no 2.25x).");
+        es.put("ASSIMILATED_STINGING_DESC", "Desbloquea el subtipo de abdomen Aguijón. Aporta 1.5x ataque en habilidades de infantería; se apila por suma (Mandíbula-trampa + Aguijón = 3x, no 2.25x). Otorga la habilidad Aguijón.");
         es.put("ASSIMILATION_STINGING", "Asimilación de Hormiga Aguijonera");
         es.put("ASSIMILATION_STINGING_DESC", "Tras asimilar el genoma de la hormiga aguijonera:");
         es.put("ASSIMILATED_SWARMING_FLAVOR", "Enjambres de Incursión");
@@ -1305,11 +1316,11 @@ public class SpanishTranslation implements Translation {
         es.put("ASSIMILATION_DEADLYVENOM", "Asimilación de veneno neurotóxico");
         es.put("ASSIMILATION_DEADLYVENOM_DESC", "Tras asimilar la genética del veneno neurotóxico:");
         es.put("ASSIMILATED_SELFDESTRUCT_FLAVOR", "Defensa Suicida");
-        es.put("ASSIMILATED_SELFDESTRUCT_DESC", "Tu dinastía puede reventar obreras especializadas para rociar toxinas. (Mecánica en desarrollo.)");
+        es.put("ASSIMILATED_SELFDESTRUCT_DESC", "Desbloquea el rol Bombardera y la habilidad Autodestrucción (500% daño, 90% precisión, 5 objetivos; la hormiga muere).");
         es.put("ASSIMILATION_SELFDESTRUCT", "Asimilación de Hormiga Explosiva");
         es.put("ASSIMILATION_SELFDESTRUCT_DESC", "Tras asimilar el genoma de la hormiga explosiva:");
         es.put("ASSIMILATED_FARSIGHT_FLAVOR", "Visión Excepcional");
-        es.put("ASSIMILATED_FARSIGHT_DESC", "Tu dinastía puede rastrear presas y puntos de referencia con ojos compuestos agudos. (Mecánica en desarrollo.)");
+        es.put("ASSIMILATED_FARSIGHT_DESC", "Desbloquea el subtipo de cabeza Vista lejana. Al equiparlo, +15% precisión a todas las habilidades (máximo 100%).");
         es.put("ASSIMILATION_FARSIGHT", "Asimilación de Hormiga Bulldog");
         es.put("ASSIMILATION_FARSIGHT_DESC", "Tras asimilar el genoma de la hormiga bulldog:");
         es.put("ASSIMILATED_HIVEBUILD_FLAVOR", "Construcción de Nidos de Cartón");
@@ -1390,21 +1401,21 @@ public class SpanishTranslation implements Translation {
         es.put("ROLE_MINER_UPGRADE", "Rol Minera");
         es.put("ROLE_MINER_FLAVOR", "Anhelo por las Minas");
         es.put("ROLE_MINER_DESC", "Permite a las obreras extraer minerales de la tierra.");
-        es.put("ROLE_POTTER_UPGRADE", "Rol Alimentadora");
+        es.put("ROLE_POTTER_UPGRADE", "Rol Hormiga-Copa");
         es.put("ROLE_POTTER_FLAVOR", "Una Mano Amiga");
-        es.put("ROLE_POTTER_DESC", "Permite a las obreras almacenar y transportar comida a otras hormigas.");
+        es.put("ROLE_POTTER_DESC", "Permite a obreras honeypot almacenar y transportar comida y usar Regeneración reforzada en guerra. Se desbloquea con la asimilación Honeypot; requiere el subtipo Honeypot.");
         es.put("ROLE_WARRIOR_UPGRADE", "Rol Guerrera");
         es.put("ROLE_WARRIOR_FLAVOR", "Formación de Falange");
         es.put("ROLE_WARRIOR_DESC", "Permite a los soldados luchar en grupos organizados.");
         es.put("ROLE_DEFENDER_UPGRADE", "Rol Defensora");
         es.put("ROLE_DEFENDER_FLAVOR", "Escudo Real");
-        es.put("ROLE_DEFENDER_DESC", "Permite a los soldados proteger directamente a la reina.");
+        es.put("ROLE_DEFENDER_DESC", "Permite a soldados doorhead proteger a la reina en defensa de hexágono con Escudo. Se desbloquea con la asimilación Doorhead; requiere el subtipo Doorhead. No lucha en choques fronterizos. En defensa de hexágono, las Defensoras ganan 3x ataque y defensa (defensa tope 100%); el resto de defensores ganan 1.5x.");
         es.put("ROLE_POLICE_UPGRADE", "Rol Vigilante");
         es.put("ROLE_POLICE_FLAVOR", "Brutalidad Policial");
         es.put("ROLE_POLICE_DESC", "Permite a los soldados detectar hormigas parásitas disfrazadas; cada uno tiene 10% de probabilidad diaria.");
         es.put("ROLE_BOMBER_UPGRADE", "Rol Bombardera");
         es.put("ROLE_BOMBER_FLAVOR", "Final Explosivo");
-        es.put("ROLE_BOMBER_DESC", "Permite que soldados especializados exploten al morir.");
+        es.put("ROLE_BOMBER_DESC", "Permite que las soldadas usen Autodestrucción (o Autodestrucción ácida con Bombas corrosivas). Se desbloquea con la asimilación de Hormiga Explosiva.");
         es.put("ROLE_BRUTE_UPGRADE", "Rol Bruto");
         es.put("ROLE_BRUTE_FLAVOR", "Tropa Pesada");
         es.put("ROLE_BRUTE_DESC", "Permite que los majors se conviertan en amenazas masivas en batalla.");
@@ -1416,7 +1427,7 @@ public class SpanishTranslation implements Translation {
         es.put("ROLE_ARTILLERY_DESC", "Permite que los majors escupan ácido a gran distancia.");
         es.put("ROLE_SIEGE_UPGRADE", "Rol Motor de Asedio");
         es.put("ROLE_SIEGE_FLAVOR", "Tecnología de Asedio");
-        es.put("ROLE_SIEGE_DESC", "Permite que los majors destruyan las defensas de colonias enemigas.");
+        es.put("ROLE_SIEGE_DESC", "Permite que los majors destruyan defensas enemigas solo durante el asalto a hexágonos (no en choques fronterizos). Las máquinas de asedio ganan 3x ataque y defensa al atacar un hexágono (defensa tope 100%); el resto de atacantes no reciben bonus.");
         es.put("ROLE_BREEDER_UPGRADE", "Roles de Cría");
         es.put("ROLE_BREEDER_FLAVOR", "Vuelos Nupciales");
         es.put("ROLE_BREEDER_DESC", "Permite a princesas y zánganos realizar vuelos nupciales para crear colonias u obtener reinas.");
@@ -1508,7 +1519,7 @@ public class SpanishTranslation implements Translation {
         es.put("ABILITY_ABILITY_DESC", "Permite ver el menú de habilidades y usar habilidades activas.");
 
         es.put("STAT_SKELETON_FLAVOR", "Exoesqueletos Básicos");
-        es.put("STAT_SKELETON_DESC", "Vitalidad básica antes de multiplicadores de tipo: 100 de salud y 10% del HP máximo regenerado por tick. La defensa depende del tipo (mayores y reinas empiezan en 20%).");
+        es.put("STAT_SKELETON_DESC", "Vitalidad básica antes de multiplicadores de tipo: 100 de salud y 10% del HP máximo regenerado en cada redespliegue de guerra. La defensa depende del tipo (mayores y reinas empiezan en 20%).");
         es.put("STAT_ACID_FLAVOR", "Salivazo Ácido");
         es.put("STAT_ACID_DESC", "Ataque básico para todas las hormigas: 10 de daño, 1 ataque por segundo y 1 de velocidad.");
         es.put("STAT_LONGEVITY_FLAVOR", "Longevidad Estándar");
@@ -1595,11 +1606,11 @@ public class SpanishTranslation implements Translation {
         es.put("ASSIMILATED_MULTIQUEEN_DESC", "Tu dinastía ahora puede tener varias reinas en una sola colonia (requiere mejorar la Cámara Real).");
         es.put("ASSIMILATED_MULTIQUEEN_DESC", "Tu dinastía ahora puede tener varias reinas en una sola colonia (requiere mejorar la Cámara Real).");
         es.put("ASSIMILATED_TRAPJAW_FLAVOR", "Mandíbulas de Resorte");
-        es.put("ASSIMILATED_TRAPJAW_DESC", "Desbloquea el subtipo de cabeza Mandíbula-trampa. Aporta 1.5x ataque; se apila por suma con otros bonus de ataque de subtipo.");
+        es.put("ASSIMILATED_TRAPJAW_DESC", "Desbloquea el subtipo de cabeza Mandíbula-trampa. Aporta 1.5x ataque en habilidades de infantería; se apila por suma con otros bonus de ataque de subtipo. Otorga la habilidad Mordida poderosa (reemplaza Mordida básica).");
         es.put("ASSIMILATED_HONEYPOT_FLAVOR", "Tarros de Miel Vivos");
-        es.put("ASSIMILATED_HONEYPOT_DESC", "Desbloquea el subtipo de abdomen Honeypot. Las recolectoras honeypot reúnen y llevan 4x a 0.75x velocidad, y ganan +15% regeneración.");
+        es.put("ASSIMILATED_HONEYPOT_DESC", "Desbloquea el subtipo de abdomen Honeypot y el rol Hormiga-Copa (Potter) para obreras con ese subtipo. Las recolectoras honeypot reúnen y llevan 4x a 0.75x velocidad, y ganan +15% regeneración. Otorga Regeneración reforzada (duplica la curación del siguiente redespliegue al usarla).");
         es.put("ASSIMILATED_DOORHEAD_FLAVOR", "Tapones de Cabeza Acorazados");
-        es.put("ASSIMILATED_DOORHEAD_DESC", "Desbloquea el subtipo de cabeza Cabeza-escudo. Las hormigas doorhead ganan +20% defensa.");
+        es.put("ASSIMILATED_DOORHEAD_DESC", "Desbloquea el subtipo de cabeza Cabeza-escudo y el rol Defensora para soldados con ese subtipo. Las hormigas doorhead ganan +20% defensa. Otorga Escudo (las defensoras absorben golpes destinados a las reinas en defensa de hexágono hasta morir).");
         es.put("ASSIMILATED_WOODBURROW_FLAVOR", "Excavación de Madera");
         es.put("ASSIMILATED_WOODBURROW_DESC", "Tu dinastía puede excavar y anidar en madera. (Mecánica en desarrollo.)");
         es.put("ASSIMILATED_SILKWEAVE_FLAVOR", "Tejido de Nidos de Seda");
@@ -1613,7 +1624,7 @@ public class SpanishTranslation implements Translation {
         es.put("ASSIMILATED_GLIDING_FLAVOR", "Planeos Controlados");
         es.put("ASSIMILATED_GLIDING_DESC", "Tu dinastía puede planear entre árboles para cruzar huecos. (Mecánica en desarrollo.)");
         es.put("ASSIMILATED_STINGING_FLAVOR", "Aguijón Excruciante");
-        es.put("ASSIMILATED_STINGING_DESC", "Desbloquea el subtipo de abdomen Aguijón. Aporta 1.5x ataque; se apila por suma (Mandíbula-trampa + Aguijón = 3x, no 2.25x).");
+        es.put("ASSIMILATED_STINGING_DESC", "Desbloquea el subtipo de abdomen Aguijón. Aporta 1.5x ataque en habilidades de infantería; se apila por suma (Mandíbula-trampa + Aguijón = 3x, no 2.25x). Otorga la habilidad Aguijón.");
         es.put("ASSIMILATED_SWARMING_FLAVOR", "Enjambres de Incursión");
         es.put("ASSIMILATED_SWARMING_DESC", "Tu dinastía puede coordinar incursiones masivas sin nido permanente. (Mecánica en desarrollo.)");
         es.put("ASSIMILATED_STEALTH_FLAVOR", "Infiltración Fantasma");
@@ -1625,9 +1636,9 @@ public class SpanishTranslation implements Translation {
         es.put("ASSIMILATED_DEADLYVENOM_FLAVOR", "Veneno neurotóxico");
         es.put("ASSIMILATED_DEADLYVENOM_DESC", "Añade +50% al ataque base de la colonia. La sinergia Super Veneno con veneno de fuego sustituye ambos +50% por un bonus de +200% (3x total).");
         es.put("ASSIMILATED_SELFDESTRUCT_FLAVOR", "Defensa Suicida");
-        es.put("ASSIMILATED_SELFDESTRUCT_DESC", "Tu dinastía puede reventar obreras especializadas para rociar toxinas. (Mecánica en desarrollo.)");
+        es.put("ASSIMILATED_SELFDESTRUCT_DESC", "Desbloquea el rol Bombardera y la habilidad Autodestrucción (500% daño, 90% precisión, 5 objetivos; la hormiga muere).");
         es.put("ASSIMILATED_FARSIGHT_FLAVOR", "Visión Excepcional");
-        es.put("ASSIMILATED_FARSIGHT_DESC", "Tu dinastía puede rastrear presas y puntos de referencia con ojos compuestos agudos. (Mecánica en desarrollo.)");
+        es.put("ASSIMILATED_FARSIGHT_DESC", "Desbloquea el subtipo de cabeza Vista lejana. Al equiparlo, +15% precisión a todas las habilidades (máximo 100%).");
         es.put("ASSIMILATED_HIVEBUILD_FLAVOR", "Construcción de Nidos de Cartón");
         es.put("ASSIMILATED_HIVEBUILD_DESC", "Tu dinastía puede construir nidos duraderos de cartón vegetal masticado. (Mecánica en desarrollo.)");
         es.put("ASSIMILATED_LOCSENSE_FLAVOR", "Integración de Ruta");
@@ -1777,11 +1788,11 @@ public class SpanishTranslation implements Translation {
         es.put("HELP_TAB_DYNASTY", "Dinastía");
         es.put("HELP_TAB_HOTKEYS", "Teclas");
         es.put("HELP_TAB_TUTORIALS", "Tutoriales");
-        es.put("HELP_TAB_SPECIES", "Especies");
+        es.put("HELP_TAB_SPECIES", "Especies de hormiga");
         es.put("HELP_TAB_TYPES", "Tipos");
         es.put("HELP_TAB_SUBTYPES", "Subtipos de hormiga");
         es.put("HELP_SUBTYPES_INTRO", "Los rasgos asimilados de partes del cuerpo pueden aparecer en nuevas eclosiones. Configura las probabilidades por tipo de hormiga en Tasas de eclosión (P). Cada parte activa del subtipo añade +50% de consumo de alimento.");
-        es.put("HELP_TAB_BUGS", "Otros insectos");
+        es.put("HELP_TAB_BUGS", "Especies de criaturas");
         es.put("HELP_TAB_ANT_ROLES", "Roles de Hormiga");
         es.put("HELP_TAB_EMPIRE", "Dinastía");
         es.put("HELP_TAB_UPGRADES", "Mejoras");
@@ -1789,22 +1800,29 @@ public class SpanishTranslation implements Translation {
         es.put("HELP_TAB_ASSIMILATIONS", "Asimilaciones");
         es.put("HELP_TAB_SYNERGIES", "Sinergias");
         es.put("HELP_TAB_COMBAT", "Combate");
-        es.put("HELP_COMBAT_INTRO", "El combate usa <b>habilidades</b> (multiplicadores de precisión y daño), <b>líneas de batalla</b> (bandas de roles y acierto) y las <b>fases</b> / <b>posición</b> de guerra en las campañas.");
+        es.put("HELP_COMBAT_INTRO", "Las batallas se resuelven criatura contra criatura cada hora. Las hormigas activas (hasta la capacidad de combate por línea) actúan con habilidades; las reservas cubren bajas. El acierto es precisión de habilidad × precisión de línea (máx. 100%). El daño usa ataque × multiplicador, reducido una vez por la defensa %. El choque fronterizo termina al ~90% del ejército muerto (incl. reservas); el asalto de hexágono, al morir la última reina defensora. Las reinas siempre están en línea como comandantes; si hay Defensoras vivas, los ataques priorizan no-reinas.");
         es.put("HELP_COMBAT_SKILLS", "Habilidades");
         es.put("HELP_COMBAT_BATTLE_LINES", "Líneas de batalla");
         es.put("HELP_COMBAT_WAR_PHASES", "Fases de etapa de guerra");
         es.put("HELP_COMBAT_WAR_STANDING", "Posición en la guerra");
         es.put("HELP_SKILL_ACCURACY_FMT", "Precisión: %s");
         es.put("HELP_SKILL_DAMAGE_FMT", "Daño: %s");
+        es.put("HELP_SKILL_TARGETS_FMT", "Objetivos: %s");
+        es.put("HELP_SKILL_SACRIFICES_SELF", "La hormiga muere al usar esta habilidad.");
+        es.put("HELP_SKILL_BATTLE_LINE_FMT", "Línea de batalla: %s");
+        es.put("HELP_SKILL_BOOST_REGEN_EFFECT",
+                "Soporte: duplica la curación de HP de esta hormiga en el siguiente redespliegue de guerra (% de regeneración del HP máximo). Las Hormiga-Copa con Honeypot la usan automáticamente hasta que existan elecciones de habilidad en batalla.");
+        es.put("HELP_SKILL_SHIELDING_EFFECT",
+                "Soporte: en defensa de hexágono, esta Defensora asume las bajas destinadas a las reinas hasta morir. Las Defensoras doorhead activan Escudo al comenzar la defensa de hexágono.");
         es.put("HELP_BATTLE_LINE_ACCURACY_FMT", "Precisión base: %s");
         es.put("HELP_BATTLE_LINE_ROLES_FMT", "Roles: %s");
         es.put("HELP_BATTLE_LINE_ROLES_NONE", "Roles: ninguno aún");
-        es.put("HELP_WAR_PHASE_CLASH_DESC", "Batalla inicial en la frontera disputada entre las dos dinastías.");
-        es.put("HELP_WAR_PHASE_RESERVE_DESC", "Asedio a una colonia tras el choque fronterizo.");
+        es.put("HELP_WAR_PHASE_CLASH_DESC", "Batalla de criaturas en la frontera disputada. Cada hormiga activa gasta acciones en habilidades de ataque o soporte; infantería cada hora, artillería cada 2.ª, aire cada 3.ª. Victoria al derrotar ~90% del ejército enemigo (activos + reservas).");
+        es.put("HELP_WAR_PHASE_RESERVE_DESC", "Asalto de asedio a una colonia tras el choque fronterizo. La colonia disputada despliega todas las hormigas locales (Defensoras, Asedio y reinas empiezan activas); los atacantes traen el militar fronterizo de la dinastía más Asedio a escala de dinastía (las Defensoras no salen). Bonos: defensores 1.5x ataque/defensa (Defensoras 3x); Asedio atacante 3x. La defensa no supera el 100%. Los atacantes ganan al matar a la última reina.");
         es.put("HELP_WAR_PHASE_REDEPLOY_DESC", "Las fuerzas se desplazan al siguiente objetivo tras resolver una batalla.");
-        es.put("HELP_WAR_STANDING_WINNING_DESC", "Tu bando lidera la guerra por poder de combate.");
-        es.put("HELP_WAR_STANDING_LOSING_DESC", "El enemigo lidera la guerra por poder de combate.");
-        es.put("HELP_WAR_STANDING_EVEN_DESC", "Ningún bando tiene una ventaja clara de poder de combate.");
+        es.put("HELP_WAR_STANDING_WINNING_DESC", "Tu bando lidera la guerra por progreso de etapas.");
+        es.put("HELP_WAR_STANDING_LOSING_DESC", "El enemigo lidera la guerra por progreso de etapas.");
+        es.put("HELP_WAR_STANDING_EVEN_DESC", "Ningún bando tiene una ventaja clara de progreso de etapas.");
         es.put("HELP_TAB_WORLD", "Mundo");
         es.put("HELP_TAB_UI", "Controles de interfaz");
         es.put("HELP_UI_INTRO", "Durante una partida en colonia, la barra de control inferior derecha ajusta la velocidad de simulación, la pausa y abre el menú del juego.");
@@ -1819,7 +1837,7 @@ public class SpanishTranslation implements Translation {
         es.put("HELP_DYNASTY_INFO", "<b>Expandiendo tu Dinastía:</b><br>Una vez que desbloquees a las <b>Criadoras</b>, realiza Vuelos Nupciales para expandirte a través del <b>Mapa Mundial (M)</b>.<br><i>Consejo: ¡Vigila el cielo! ¡Los eclipses activan Vuelos Nupciales espontáneos y gratuitos!</i><br><br><b>Menú de Dinastía:</b> ESC → submenú <b>Dinastía</b>, o teclas <b>A</b> Resumen, <b>S</b> Comercio, <b>D</b> Diplomacia, <b>F</b> Guerras (pulsa de nuevo para cerrar).<br><br><b>Logística y Comercio:</b><br>Fundar múltiples colonias desbloquea las <b>Rutas Comerciales</b> en la pestaña Comercio. Asigna hormigas de transporte y elige un método de convoy:<br>- <b>Tierra:</b> Convoyes terrestres estándar.<br>- <b>Mar:</b> Alta capacidad entre colonias costeras.<br>- <b>Túnel:</b> Seguro y rápido; requiere túnel completado y roles de túnel.<br>- <b>Aire:</b> Rápido pero de baja capacidad; requiere <b>Transporte Aéreo</b> (Princesas).<br>- <b>Bilateral:</b> Fusiona rutas de ida y vuelta en un convoy bidireccional.<br><br><b>Lealtad y Diplomacia:</b><br>Cada colonia tiene <b>Lealtad</b> a tu dinastía (iconos en Resumen). La baja lealtad bloquea el comercio. Otras dinastías tienen <b>Reputación</b> y postura diplomática.<br><br><b>Guerra:</b><br>Declara la guerra desde Diplomacia cuando ambos bandos tengan roles militares activos. Sigue las campañas en <b>Guerras (F)</b>: progreso, ofertas de paz y vista de batalla.<br><br><b>Hitos:</b><br>- <b>Colonización Masiva:</b> Elimina los límites de colonias satélite.<br>- <b>Automatización:</b> Las colonias NPC pueden gestionarse solas.<br><br><b>Evolución:</b><br>Desbloquea <b>Sinergias</b> y <b>Asimilaciones</b> para combinar y absorber rasgos.");
         
         es.put("HELP_SPECIES_SCIENTIFIC", "Nombre Científico:");
-        es.put("HELP_SPECIES_TRAITS", "Rasgos Base:");
+        es.put("HELP_SPECIES_ASSIMILATION_FMT", "Asimilación: %s");
 
         es.put("HELP_RESOURCE_SOURCE_SMALL", "Pequeño");
         es.put("HELP_RESOURCE_SOURCE_MEDIUM", "Mediano");
@@ -2142,6 +2160,8 @@ public class SpanishTranslation implements Translation {
         es.put("TRIGGER_SYNERGY_SUPER_VENOM_MSG", "%s ya está activa! Combinar %s sustituye sus +50% separados por un bonus de ataque de +200% (3x total). Abre Sinergias (O) para revisar.");
         es.put("TRIGGER_SYNERGY_ACID_ARTILLERY_TITLE", "Sinergia desbloqueada");
         es.put("TRIGGER_SYNERGY_ACID_ARTILLERY_MSG", "%s ya está activa! Combinar %s desbloquea el rol Artillería para majors y la habilidad Artillería ácida. Abre Sinergias (O) para revisar.");
+        es.put("TRIGGER_SYNERGY_CORROSIVE_BOMBS_TITLE", "Sinergia desbloqueada");
+        es.put("TRIGGER_SYNERGY_CORROSIVE_BOMBS_MSG", "%s ya está activa! Combinar %s mejora Autodestrucción de Bombarderas a Autodestrucción ácida. Abre Sinergias (O) para revisar.");
         es.put("TRIGGER_OPERATIONS_ABILITY_TITLE", "Operaciones de colonia");
         es.put("TRIGGER_OPERATIONS_ABILITY_MSG", "¡Has obtenido una habilidad activa especial! Ahora puedes acceder al menú de Operaciones de colonia pulsando (Z).");
 

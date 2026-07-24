@@ -428,6 +428,7 @@ public class SaveManager {
                         sc.unlockedUpgradeIds.add(u.getId());
                     }
                 }
+                sc.unlockedSkillIds = dynasty.copyUnlockedSkillIds();
                 sc.announcedRankIds = dynasty.copyAnnouncedRankIds();
                 sc.absorbedDynastyIds = (dynasty.getAbsorbedDynastyIds() != null) ? new ArrayList<>(dynasty.getAbsorbedDynastyIds()) : new ArrayList<>();
                 
@@ -759,6 +760,7 @@ public class SaveManager {
         w.write("      \"integrationProgressDays\": " + sc.integrationProgressDays + ","); w.newLine();
         w.write("      \"integrationDiplomatsManual\": " + sc.integrationDiplomatsManual + ","); w.newLine();
         w.write("      \"unlockedUpgradeIds\": " + serializeListToJson(sc.unlockedUpgradeIds) + ","); w.newLine();
+        w.write("      \"unlockedSkillIds\": " + serializeListToJson(sc.unlockedSkillIds) + ","); w.newLine();
         w.write("      \"announcedRankIds\": " + serializeListToJson(sc.announcedRankIds) + ","); w.newLine();
         w.write("      \"absorbedDynastyIds\": " + serializeListToJson(sc.absorbedDynastyIds) + ","); w.newLine();
         w.write("      \"defeatedSpeciesIds\": " + serializeListToJson(sc.defeatedSpeciesIds) + ","); w.newLine();
@@ -1047,6 +1049,11 @@ public class SaveManager {
         }
         sc.integrationDiplomatsManual = Boolean.parseBoolean(map.getOrDefault("integrationDiplomatsManual", "false"));
         sc.unlockedUpgradeIds = deserializeJsonToList(map.get("unlockedUpgradeIds"));
+        if (map.containsKey("unlockedSkillIds")) {
+            sc.unlockedSkillIds = deserializeJsonToList(map.get("unlockedSkillIds"));
+        } else {
+            sc.unlockedSkillIds = null;
+        }
         if (map.containsKey("announcedRankIds")) {
             sc.announcedRankIds = deserializeJsonToList(map.get("announcedRankIds"));
         } else {

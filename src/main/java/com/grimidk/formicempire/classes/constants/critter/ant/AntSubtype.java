@@ -22,6 +22,8 @@ public class AntSubtype extends Constant {
     private final float speedMult;
     private final float forageMult;
     private final float regenMult;
+    /** Additive skill accuracy bonus (e.g. 0.15 = +15%). Clamped with skill base at resolve time. */
+    private final float accuracyBonus;
     private final String descKey;
     private final Skill grantedSkill;
     private final Skill replacesSkill;
@@ -83,6 +85,16 @@ public class AntSubtype extends Constant {
             String spriteSpeciesDir, String spriteFolder,
             float attackMult, boolean attackAdditive, float defenseMult, float speedMult, float forageMult,
             float regenMult, String descKey, Skill grantedSkill, Skill replacesSkill, ImageIcon icon) {
+        this(id, nameKey, slot, digit, requiredUpgrade, spriteSpeciesDir, spriteFolder,
+                attackMult, attackAdditive, defenseMult, speedMult, forageMult, regenMult, 0f, descKey,
+                grantedSkill, replacesSkill, icon);
+    }
+
+    public AntSubtype(int id, String nameKey, AntSubtypeSlot slot, int digit, Upgrade requiredUpgrade,
+            String spriteSpeciesDir, String spriteFolder,
+            float attackMult, boolean attackAdditive, float defenseMult, float speedMult, float forageMult,
+            float regenMult, float accuracyBonus, String descKey, Skill grantedSkill, Skill replacesSkill,
+            ImageIcon icon) {
         super(id, nameKey, icon);
         this.slot = slot;
         this.digit = digit;
@@ -95,6 +107,7 @@ public class AntSubtype extends Constant {
         this.speedMult = speedMult;
         this.forageMult = forageMult;
         this.regenMult = regenMult;
+        this.accuracyBonus = accuracyBonus;
         this.descKey = descKey;
         this.grantedSkill = grantedSkill;
         this.replacesSkill = replacesSkill;
@@ -103,7 +116,7 @@ public class AntSubtype extends Constant {
     public AntSubtype(int id, String nameKey, AntSubtypeSlot slot, int digit, Upgrade requiredUpgrade,
             String spriteSpeciesDir, String spriteFolder) {
         this(id, nameKey, slot, digit, requiredUpgrade, spriteSpeciesDir, spriteFolder,
-                1f, false, 1f, 1f, 1f, 1f, null, null, null, null);
+                1f, false, 1f, 1f, 1f, 1f, 0f, null, null, null, null);
     }
 
     public AntSubtypeSlot getSlot() {
@@ -148,6 +161,10 @@ public class AntSubtype extends Constant {
 
     public float getRegenMult() {
         return regenMult;
+    }
+
+    public float getAccuracyBonus() {
+        return accuracyBonus;
     }
 
     public String getDescKey() {

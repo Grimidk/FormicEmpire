@@ -192,6 +192,118 @@ public final class ColonyMilitaryService {
     }
 
     public static int computeActiveMilitaryPowerFromWarCounts(Colony colony, Map<AntRole, Integer> warCounts) {
+        return computeRolePowerFromWarCounts(colony, warCounts, true, false);
+    }
+
+    /** Power from hex-defense-only roles (Defender, Siege). */
+    public static int computeHexDefenseOnlyPower(Colony colony) {
+        if (colony == null) {
+            return 0;
+        }
+        Dynasty dynasty = colony.getDynasty();
+        if (dynasty != null && dynasty.isAtWar()) {
+            return computeRolePowerFromWarCounts(colony, colony.getWarAssignedRoleCounts(), false, true);
+        }
+        return 0;
+    }
+
+    public static int computeHexDefenseOnlyPower(Dynasty dynasty) {
+        if (dynasty == null) {
+            return 0;
+        }
+        int total = 0;
+        for (Colony colony : dynasty.getColonies()) {
+            total += computeHexDefenseOnlyPower(colony);
+        }
+        return total;
+    }
+
+    /**
+     * Contested-colony hex defense: every ant at that colony fights locally.
+     * Defender-role ants always stay here (never join dynasty assaults).
+     * Siege engines at this colony also defend here; only the attacker's dynasty-wide
+     * Siege join the assault side.
+     */
+    public static int computeHexDefenseMilitaryPower(Colony colony) {
+        if (colony == null) {
+            return 0;
+        }
+        return computeMilitaryPowerFromPopulation(colony);
+    }
+
+    /**
+     * Hex-assault attacker base power: all remaining border-battle active military
+     * dynasty-wide, plus dynasty-wide Siege. Defender-role ants never contribute.
+     */
+    public static int computeHexAssaultAttackerPower(Dynasty dynasty) {
+        if (dynasty == null) {
+            return 0;
+        }
+        return Math.max(0, powerForWarStanding(dynasty)) + computeSiegeAssaultPower(dynasty);
+    }
+
+    /** Effective hex-assault attacker power after Siege 3x / other 1x multipliers. */
+    public static int computeHexAssaultEffectiveAttackerPower(Dynasty dynasty) {
+        if (dynasty == null) {
+            return 0;
+        }
+        int siege = computeSiegeAssaultPower(dynasty);
+        int nonSiege = Math.max(0, powerForWarStanding(dynasty));
+        return GameNumbers.warHexAssaultEffectiveAttackerPower(nonSiege, siege);
+    }
+
+    /** Effective contested-colony defense after 1.5x / Defender 3x multipliers. */
+    public static int computeHexDefenseEffectivePower(Colony colony) {
+        if (colony == null) {
+            return 0;
+        }
+        int base = computeHexDefenseMilitaryPower(colony);
+        int defenderRole = Math.min(base, computeDefenderRolePower(colony));
+        int standard = Math.max(0, base - defenderRole);
+        return GameNumbers.warHexDefenseEffectiveDefenderPower(standard, defenderRole);
+    }
+
+    /** Power from a single war-assigned active role. */
+    public static int computeAssignedRolePower(Colony colony, AntRole role) {
+        if (colony == null || role == null || !role.isActiveMilitary()) {
+            return 0;
+        }
+        Dynasty dynasty = colony.getDynasty();
+        if (dynasty == null || !dynasty.isAtWar()) {
+            return 0;
+        }
+        Map<AntRole, Integer> warCounts = colony.getWarAssignedRoleCounts();
+        int count = warCounts.getOrDefault(role, 0);
+        if (count <= 0 || role.getAntType() == null) {
+            return 0;
+        }
+        float colonyMult = computeStatMultiplier(colony);
+        int roleWeight = GameConstants.getActiveMilitaryRoleWeight(role);
+        int typePoints = count * roleWeight;
+        float avgSubtypeFactor = AntSubtypeService.weightedSubtypeCombatFactor(colony,
+                role.getAntType(), AntSubtypeService.aggregateSubtypeCounts(colony.getAntsByType(role.getAntType())));
+        float points = count * roleWeight * colonyMult * avgSubtypeFactor;
+        return withWarStandingFloor(colony, typePoints, Math.round(points));
+    }
+
+    public static int computeDefenderRolePower(Colony colony) {
+        return computeAssignedRolePower(colony, GameConstants.ROLE_DEFENDER);
+    }
+
+    /** Siege engines available for hex assault across the dynasty. */
+    public static int computeSiegeAssaultPower(Dynasty dynasty) {
+        if (dynasty == null) {
+            return 0;
+        }
+        int total = 0;
+        for (Colony colony : dynasty.getColonies()) {
+            total += computeAssignedRolePower(colony, GameConstants.ROLE_SIEGE);
+        }
+        return total;
+    }
+
+    private static int computeRolePowerFromWarCounts(Colony colony, Map<AntRole, Integer> warCounts,
+            boolean includeBorder, boolean includeHexDefenseOnly) {
         if (colony == null || warCounts == null) {
             return 0;
         }
@@ -199,6 +311,13 @@ public final class ColonyMilitaryService {
         float points = 0f;
         int typePoints = 0;
         for (AntRole role : GameConstants.getActiveMilitaryRoles()) {
+            if (role.isHexDefenseOnly()) {
+                if (!includeHexDefenseOnly) {
+                    continue;
+                }
+            } else if (!includeBorder) {
+                continue;
+            }
             int count = warCounts.getOrDefault(role, 0);
             if (count <= 0 || role.getAntType() == null) {
                 continue;
@@ -221,8 +340,10 @@ public final class ColonyMilitaryService {
             return computeMilitaryPowerFromPopulation(colony);
         }
         int total = computeMilitaryPowerFromPopulation(colony);
-        int active = computeActiveMilitaryPower(colony);
-        return Math.max(0, total - active);
+        // Subtract border-battle active roles only. Hex-defense-only roles (Defender, Siege)
+        // remain in the local reserve / home-colony pool — they never leave for border clash.
+        int assignedBorder = computeRolePowerFromWarCounts(colony, colony.getWarAssignedRoleCounts(), true, false);
+        return Math.max(0, total - assignedBorder);
     }
 
     public static int computeFromSavedColony(Savefile.SavedColony savedColony, Dynasty dynasty) {

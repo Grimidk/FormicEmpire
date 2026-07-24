@@ -146,6 +146,61 @@ public final class GameConstants {
         return loadIcon(path);
     }
 
+    /**
+     * Help-encyclopedia sprite for a species: majors for major-granting species,
+     * soldiers for attack subtypes (trapjaw / bullet), workers for other subtypes
+     * (turtle / honeypot), otherwise a plain worker.
+     */
+    public static ImageIcon getRepresentativeAntSprite(AntSpecies species) {
+        AntType type = TYPE_WORKER;
+        AntSubtypeProfile profile = AntSubtypeProfile.standard();
+
+        if (species != null && species.getBaseUpgrades().contains(GameUnlocks.TYPE_MAJOR)) {
+            type = TYPE_MAJOR;
+        }
+
+        AntSubtype traitSubtype = findSpeciesTraitSubtype(species);
+        if (traitSubtype != null) {
+            profile = profileWithSubtype(traitSubtype);
+            if (traitSubtype.getAttackMult() > 1f) {
+                type = TYPE_SOLDIER;
+            } else {
+                type = TYPE_WORKER;
+            }
+        }
+
+        return getAntSprite(type, species, profile);
+    }
+
+    private static AntSubtype findSpeciesTraitSubtype(AntSpecies species) {
+        if (species == null) {
+            return null;
+        }
+        for (AntSubtype subtype : antSubtypes) {
+            if (subtype == null || subtype.isNone() || subtype.getRequiredUpgrade() == null) {
+                continue;
+            }
+            if (species.getBaseUpgrades().contains(subtype.getRequiredUpgrade())) {
+                return subtype;
+            }
+        }
+        return null;
+    }
+
+    private static AntSubtypeProfile profileWithSubtype(AntSubtype subtype) {
+        int head = AntSubtype.DIGIT_NONE;
+        int torso = AntSubtype.DIGIT_NONE;
+        int abdomen = AntSubtype.DIGIT_NONE;
+        int other = AntSubtype.DIGIT_NONE;
+        switch (subtype.getSlot()) {
+            case HEAD -> head = subtype.getDigit();
+            case TORSO -> torso = subtype.getDigit();
+            case ABDOMEN -> abdomen = subtype.getDigit();
+            case OTHER -> other = subtype.getDigit();
+        }
+        return AntSubtypeProfile.of(head, torso, abdomen, other);
+    }
+
     private static ImageIcon resolveSubtypeSprite(AntType type, AntSpecies species, AntSubtypeProfile profile) {
         if (profile == null || profile.isStandard()) {
             return null;
@@ -557,35 +612,35 @@ public final class GameConstants {
     static { critterClasses.add(CRITTER_CLASS_XENO); }
 
     // --- Skills ---
-    // TODO asset: icons/skills/BasicBite.png (placeholder — replace final art)
-    public static final Skill SKILL_BASIC_BITE = new Skill(1, LanguageStrings.SKILL_BASIC_BITE,
-            1f, 1f, loadIcon("icons/skills/BasicBite.png"));
+    public static final Skill SKILL_BASIC_BITE = new Skill(1, LanguageStrings.SKILL_BASIC_BITE, 1f, 1f, 1, true,
+            loadIcon("icons/skills/BasicBite.png"));
     static { skills.add(SKILL_BASIC_BITE); }
-    // TODO asset: icons/skills/PowerfulBite.png (placeholder — replace final art)
-    public static final Skill SKILL_POWERFUL_BITE = new Skill(2, LanguageStrings.SKILL_POWERFUL_BITE,
-            1f, 2f, loadIcon("icons/skills/PowerfulBite.png"));
+    public static final Skill SKILL_POWERFUL_BITE = new Skill(2, LanguageStrings.SKILL_POWERFUL_BITE, 1f, 2f, 1, true,
+            loadIcon("icons/skills/PowerfulBite.png"));
     static { skills.add(SKILL_POWERFUL_BITE); }
-    // TODO asset: icons/skills/Stinging.png (placeholder — replace final art)
-    public static final Skill SKILL_STINGING = new Skill(3, LanguageStrings.SKILL_STINGING,
-            0.8f, 2.5f, loadIcon("icons/skills/Stinging.png"));
+    public static final Skill SKILL_STINGING = new Skill(3, LanguageStrings.SKILL_STINGING, 0.8f, 2.5f, 1, true,
+            loadIcon("icons/skills/Stinging.png"));
     static { skills.add(SKILL_STINGING); }
-    // TODO asset: icons/skills/Shielding.png (placeholder — replace final art)
-    public static final Skill SKILL_SHIELDING = new Skill(4, LanguageStrings.SKILL_SHIELDING,
-            1f, 0f, loadIcon("icons/skills/Shielding.png"));
+    public static final Skill SKILL_SHIELDING = new Skill(4, LanguageStrings.SKILL_SHIELDING, 1f, 0f, -1, false,
+            loadIcon("icons/skills/Shielding.png"));
     static { skills.add(SKILL_SHIELDING); }
-    // TODO asset: icons/skills/BoostRegen.png (placeholder — replace final art)
-    public static final Skill SKILL_BOOST_REGEN = new Skill(5, LanguageStrings.SKILL_BOOST_REGEN,
-            1f, 0f, loadIcon("icons/skills/BoostRegen.png"));
+    public static final Skill SKILL_BOOST_REGEN = new Skill(5, LanguageStrings.SKILL_BOOST_REGEN, 1f, 0f, -1, false,
+            loadIcon("icons/skills/BoostRegen.png"));
     static { skills.add(SKILL_BOOST_REGEN); }
-    // TODO asset: icons/skills/AcidSpitting.png (placeholder — replace final art)
-    public static final Skill SKILL_ACID_SPITTING = new Skill(6, LanguageStrings.SKILL_ACID_SPITTING,
-            0.75f, 2f, GameUnlocks.ASSIMILATED_ACIDSPIT, loadIcon("icons/skills/AcidSpitting.png"));
+    public static final Skill SKILL_ACID_SPITTING = new Skill(6, LanguageStrings.SKILL_ACID_SPITTING, 0.75f, 2f, 1, true,
+            loadIcon("icons/skills/AcidSpitting.png"));
     static { skills.add(SKILL_ACID_SPITTING); }
-    // TODO asset: icons/skills/AcidArtillery.png (placeholder — replace final art)
-    // Required role wired after ROLE_ARTILLERY (see Ant Roles section).
-    public static final Skill SKILL_ACID_ARTILLERY = new Skill(7, LanguageStrings.SKILL_ACID_ARTILLERY,
-            0.5f, 5f, loadIcon("icons/skills/AcidArtillery.png"));
+    public static final Skill SKILL_ACID_ARTILLERY = new Skill(7, LanguageStrings.SKILL_ACID_ARTILLERY, 0.5f, 5f, 1, true,
+            loadIcon("icons/skills/AcidArtillery.png"));
     static { skills.add(SKILL_ACID_ARTILLERY); }
+    // TODO asset: icons/skills/Selfdestruct.png
+    public static final Skill SKILL_SELFDESTRUCT = new Skill(8, LanguageStrings.SKILL_SELFDESTRUCT, 0.9f, 5f, 5, true,
+            null);
+    static { skills.add(SKILL_SELFDESTRUCT); }
+    // TODO asset: icons/skills/AcidicSelfdestruct.png
+    public static final Skill SKILL_ACIDIC_SELFDESTRUCT = new Skill(9, LanguageStrings.SKILL_ACIDIC_SELFDESTRUCT, 0.9f, 10f, 7, true,
+            null);
+    static { skills.add(SKILL_ACIDIC_SELFDESTRUCT); }
 
     // --- Species ---
     public static final Species TYPE_ANT = new Species(1, LanguageStrings.BUG_ANT, CRITTER_CLASS_ANT, LanguageStrings.BUG_ANT_SCIENTIFIC, 1, 1, 1, 1, 1, 1,
@@ -712,6 +767,12 @@ public final class GameConstants {
             1f, false, 20f, 1f, 1f,
             SKILL_SHIELDING, null, loadIcon("icons/subtypes/doorhead.png"));
     static { antSubtypes.add(SUBTYPE_HEAD_DOORHEAD); }
+    // TODO asset: icons/subtypes/farsight.png; sprites/ants/bulldog/subtypes/farsight/*.png
+    public static final AntSubtype SUBTYPE_HEAD_FARSIGHT = new AntSubtype(9, LanguageStrings.SUBTYPE_HEAD_FARSIGHT, AntSubtypeSlot.HEAD,
+            4, GameUnlocks.ASSIMILATED_FARSIGHT, "bulldog/", "farsight",
+            1f, false, 1f, 1f, 1f,
+            1f, 0.15f, LanguageStrings.SUBTYPE_HEAD_FARSIGHT_DESC, null, null, null);
+    static { antSubtypes.add(SUBTYPE_HEAD_FARSIGHT); }
 
     public static final AntSubtype SUBTYPE_TORSO_NONE = new AntSubtype(4, LanguageStrings.SUBTYPE_NOTHING, AntSubtypeSlot.TORSO,
             AntSubtype.DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, null, SUBTYPE_ICON_NOTHING);
@@ -733,6 +794,13 @@ public final class GameConstants {
     public static final AntSubtype SUBTYPE_OTHER_NONE = new AntSubtype(8, LanguageStrings.SUBTYPE_NOTHING, AntSubtypeSlot.OTHER,
             AntSubtype.DIGIT_NONE, null, null, null, 1f, false, 1f, 1f, 1f, null, SUBTYPE_ICON_NOTHING);
     static { antSubtypes.add(SUBTYPE_OTHER_NONE); }
+
+    static {
+        SKILL_POWERFUL_BITE.setRequiredSubtype(SUBTYPE_HEAD_TRAPJAW);
+        SKILL_STINGING.setRequiredSubtype(SUBTYPE_ABDOMEN_STINGER);
+        SKILL_SHIELDING.setRequiredSubtype(SUBTYPE_HEAD_DOORHEAD);
+        SKILL_BOOST_REGEN.setRequiredSubtype(SUBTYPE_ABDOMEN_HONEYPOT);
+    }
 
     // --- Ant Roles ---
     public static final AntRole ROLE_FORAGER = new AntRole(1, TYPE_WORKER, LanguageStrings.ROLE_FORAGER, loadIcon("icons/roles/Forager.png"));
@@ -758,13 +826,15 @@ public final class GameConstants {
     static { SKILL_BOOST_REGEN.setRequiredRole(ROLE_POTTER); }
     public static final AntRole ROLE_WARRIOR = new AntRole(12, TYPE_SOLDIER, LanguageStrings.ROLE_WARRIOR, loadIcon("icons/roles/Warrior.png"), true);
     static { antRoles.add(ROLE_WARRIOR); }
-    public static final AntRole ROLE_DEFENDER = new AntRole(13, TYPE_SOLDIER, LanguageStrings.ROLE_DEFENDER, loadIcon("icons/roles/Defender.png"), true);
+    public static final AntRole ROLE_DEFENDER = new AntRole(13, TYPE_SOLDIER, LanguageStrings.ROLE_DEFENDER, loadIcon("icons/roles/Defender.png"), Set.of(SUBTYPE_HEAD_DOORHEAD), Set.of(SUBTYPE_HEAD_DOORHEAD), true, true);
     static { antRoles.add(ROLE_DEFENDER); }
     static { SKILL_SHIELDING.setRequiredRole(ROLE_DEFENDER); }
     public static final AntRole ROLE_POLICE = new AntRole(14, TYPE_SOLDIER, LanguageStrings.ROLE_POLICE, loadIcon("icons/roles/Police.png"));
     static { antRoles.add(ROLE_POLICE); }
-    public static final AntRole ROLE_BOMBER = new AntRole(15, TYPE_SOLDIER, LanguageStrings.ROLE_BOMBER, loadIcon("icons/roles/Bomber.png"));
+    public static final AntRole ROLE_BOMBER = new AntRole(15, TYPE_SOLDIER, LanguageStrings.ROLE_BOMBER, loadIcon("icons/roles/Bomber.png"), true);
     static { antRoles.add(ROLE_BOMBER); }
+    static { SKILL_SELFDESTRUCT.setRequiredRole(ROLE_BOMBER); }
+    static { SKILL_ACIDIC_SELFDESTRUCT.setRequiredRole(ROLE_BOMBER); }
     public static final AntRole ROLE_HUNTER = new AntRole(16, TYPE_SOLDIER, LanguageStrings.ROLE_HUNTER, loadIcon("icons/roles/Hunter.png"));
     static { antRoles.add(ROLE_HUNTER); }
     public static final AntRole ROLE_BRUTE = new AntRole(17, TYPE_MAJOR, LanguageStrings.ROLE_BRUTE,loadIcon("icons/roles/Brute.png"), true);
@@ -774,7 +844,7 @@ public final class GameConstants {
     public static final AntRole ROLE_ARTILLERY = new AntRole(19, TYPE_MAJOR, LanguageStrings.ROLE_ARTILLERY,loadIcon("icons/roles/Artillery.png"), Set.of(), Set.of(), true);
     static { antRoles.add(ROLE_ARTILLERY); }
     static { SKILL_ACID_ARTILLERY.setRequiredRole(ROLE_ARTILLERY); }
-    public static final AntRole ROLE_SIEGE = new AntRole(20, TYPE_MAJOR, LanguageStrings.ROLE_SIEGE, loadIcon("icons/roles/Siege.png"), true);
+    public static final AntRole ROLE_SIEGE = new AntRole(20, TYPE_MAJOR, LanguageStrings.ROLE_SIEGE, loadIcon("icons/roles/Siege.png"), Set.of(), Set.of(), true, true);
     static { antRoles.add(ROLE_SIEGE); }
     public static final AntRole ROLE_BORER = new AntRole(21, TYPE_MAJOR, LanguageStrings.ROLE_BORER, loadIcon("icons/roles/Borer.png"));
     static { antRoles.add(ROLE_BORER); }
@@ -826,7 +896,6 @@ public final class GameConstants {
         LanguageStrings.TRIGGER_RANK_KINGDOM_TITLE, LanguageStrings.TRIGGER_RANK_KINGDOM_MSG,
         loadIcon("icons/ranks/Kingdom.png"));
     static { colonyRanks.add(RANK_KINGDOM); }
-    /** Empire rank popup is fused with cloning unlock copy. */
     public static final Rank RANK_EMPIRE = new Rank(6, LanguageStrings.RANK_EMPIRE, 100000L,
         LanguageStrings.TRIGGER_CLONING_TITLE, LanguageStrings.TRIGGER_CLONING_MSG,
         loadIcon("icons/ranks/Empire.png"));
@@ -985,10 +1054,18 @@ public final class GameConstants {
     static { geneticIntegrityModifiers.add(GI_MODIFIER_GENETIC_EXCHANGE); }
 
     private static final Set<AntRole> UNOBTAINABLE_ROLES = Set.of(
-            ROLE_POTTER, ROLE_DEFENDER, ROLE_BOMBER, ROLE_CARRIER, ROLE_SIEGE, ROLE_MINER);
+            ROLE_CARRIER, ROLE_SIEGE, ROLE_MINER);
 
     private static final AntRole[] ACTIVE_MILITARY_ROLES = antRoles.stream()
             .filter(AntRole::isActiveMilitary)
+            .toArray(AntRole[]::new);
+
+    private static final AntRole[] BORDER_BATTLE_ROLES = antRoles.stream()
+            .filter(AntRole::participatesInBorderBattle)
+            .toArray(AntRole[]::new);
+
+    private static final AntRole[] HEX_DEFENSE_ONLY_ROLES = antRoles.stream()
+            .filter(AntRole::isHexDefenseOnly)
             .toArray(AntRole[]::new);
 
     public static boolean isWarEconomyExclusiveRole(AntRole role) {
@@ -1003,8 +1080,24 @@ public final class GameConstants {
         return role != null && role.isActiveMilitary();
     }
 
+    public static boolean isBorderBattleRole(AntRole role) {
+        return role != null && role.participatesInBorderBattle();
+    }
+
+    public static boolean isHexDefenseOnlyRole(AntRole role) {
+        return role != null && role.isHexDefenseOnly();
+    }
+
     public static AntRole[] getActiveMilitaryRoles() {
         return ACTIVE_MILITARY_ROLES.clone();
+    }
+
+    public static AntRole[] getBorderBattleRoles() {
+        return BORDER_BATTLE_ROLES.clone();
+    }
+
+    public static AntRole[] getHexDefenseOnlyRoles() {
+        return HEX_DEFENSE_ONLY_ROLES.clone();
     }
 
     public static int getMilitaryWeightForAntType(AntType type) {
@@ -1409,7 +1502,22 @@ public final class GameConstants {
             3, LanguageStrings.BATTLE_LINE_AIR_SUPPORT, 25f,
             Set.of(), loadIcon("icons/battleLines/AirSupport.png"));
     static { battleLines.add(BATTLE_LINE_AIR_SUPPORT); }
-    
+
+    static {
+        SKILL_BASIC_BITE.setBattleLine(BATTLE_LINE_INFANTRY);
+        SKILL_POWERFUL_BITE.setBattleLine(BATTLE_LINE_INFANTRY);
+        SKILL_STINGING.setBattleLine(BATTLE_LINE_INFANTRY);
+        SKILL_SHIELDING.setBattleLine(BATTLE_LINE_INFANTRY);
+        SKILL_BOOST_REGEN.setBattleLine(BATTLE_LINE_INFANTRY);
+        SKILL_ACID_SPITTING.setBattleLine(BATTLE_LINE_INFANTRY);
+        SKILL_ACID_ARTILLERY.setBattleLine(BATTLE_LINE_ARTILLERY);
+        SKILL_SELFDESTRUCT.setBattleLine(BATTLE_LINE_INFANTRY);
+        SKILL_ACIDIC_SELFDESTRUCT.setBattleLine(BATTLE_LINE_INFANTRY);
+        SKILL_SELFDESTRUCT.setSacrificesSelf(true);
+        SKILL_ACIDIC_SELFDESTRUCT.setSacrificesSelf(true);
+        SKILL_ACIDIC_SELFDESTRUCT.setReplacesSkill(SKILL_SELFDESTRUCT);
+    }
+
     // --- Getters ---
     public static List<Biome> getBiomes() { return Collections.unmodifiableList(biomes); }
 
@@ -1578,7 +1686,6 @@ public final class GameConstants {
         return null;
     }
 
-    /** Exclusive upper RP bound for a tier (next tier's minimum), or {@link Long#MAX_VALUE} for the top tier. */
     public static long getTierMaximumRpExclusive(Tier tier) {
         if (tier == null) {
             return Long.MAX_VALUE;

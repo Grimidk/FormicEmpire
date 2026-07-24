@@ -45,6 +45,8 @@ class WarBattleSceneBuilderTest {
         assertTrue(scene.getFrontlineRatio() >= 0.05f && scene.getFrontlineRatio() <= 0.95f);
         assertFalse(scene.getAttacker().typeCounts().isEmpty());
         assertFalse(scene.getDefender().typeCounts().isEmpty());
+        assertTrue(scene.getAttacker().livingArmy() > 0);
+        assertTrue(scene.getDefender().livingArmy() > 0);
     }
 
     @Test
@@ -93,6 +95,10 @@ class WarBattleSceneBuilderTest {
 
     private static void seedWarPopulation(Dynasty dynasty, Colony colony) {
         dynasty.unlockUpgrade(GameUnlocks.TYPE_SOLDIER);
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_WARRIOR);
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_DEFENDER);
+        dynasty.unlockUpgrade(GameUnlocks.STAT_ACID);
+        dynasty.unlockUpgrade(GameUnlocks.STAT_SKELETON);
         int needed = GameNumbers.WAR_DECLARATION_MIN_POPULATION
                 - dynasty.getStatService().getTotalPopulation(dynasty);
         for (int i = 0; i < needed; i++) {
@@ -100,6 +106,9 @@ class WarBattleSceneBuilderTest {
         }
         for (int i = 0; i < 20; i++) {
             colony.getSoldiers().add(new Ant(colony, GameConstants.TYPE_SOLDIER));
+        }
+        if (colony.getQueens().isEmpty()) {
+            colony.getQueens().add(new Ant(colony, GameConstants.TYPE_QUEEN));
         }
         colony.getWarAssignedRoleCounts().put(GameConstants.ROLE_WARRIOR, 10);
         colony.getWarAssignedRoleCounts().put(GameConstants.ROLE_DEFENDER, 10);

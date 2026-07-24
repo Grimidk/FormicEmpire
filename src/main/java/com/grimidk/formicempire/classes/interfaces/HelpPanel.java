@@ -117,7 +117,6 @@ public class HelpPanel extends JPanel {
                 createDictionaryPanel(new ArrayList<>(GameUnlocks.getUpgrades())));
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_BUILDINGS),
                 createDictionaryPanel(new ArrayList<>(GameUnlocks.getBuildings()), false));
-        mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_ASSIMILATIONS), createDictionaryPanel(new ArrayList<>(GameUnlocks.getAssimilations())));
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_SYNERGIES),
                 createDictionaryPanel(new ArrayList<>(GameUnlocks.getSynergies())));
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_COMBAT), createCombatPanel());
@@ -143,7 +142,6 @@ public class HelpPanel extends JPanel {
                 LanguageStrings.get(LanguageStrings.HELP_TAB_EMPIRE),
                 LanguageStrings.get(LanguageStrings.HELP_TAB_UPGRADES),
                 LanguageStrings.get(LanguageStrings.HELP_TAB_BUILDINGS),
-                LanguageStrings.get(LanguageStrings.HELP_TAB_ASSIMILATIONS),
                 LanguageStrings.get(LanguageStrings.HELP_TAB_SYNERGIES),
                 LanguageStrings.get(LanguageStrings.HELP_TAB_COMBAT),
                 LanguageStrings.get(LanguageStrings.HELP_TAB_WORLD),
@@ -307,27 +305,37 @@ public class HelpPanel extends JPanel {
             }
             JPanel entry = new JPanel(new BorderLayout(10, 0));
             entry.setBackground(AssetStyles.BACKGROUND_COLOR);
-            entry.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER, s.getName(), 
-                javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, 
-                javax.swing.border.TitledBorder.DEFAULT_POSITION, 
+            entry.setBorder(BorderFactory.createTitledBorder(AssetStyles.PANEL_BORDER, s.getName(),
+                javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                javax.swing.border.TitledBorder.DEFAULT_POSITION,
                 AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER));
+            entry.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-            ImageIcon sprite = GameConstants.getAntSprite(GameConstants.TYPE_WORKER, s);
+            ImageIcon sprite = GameConstants.getRepresentativeAntSprite(s);
             JLabel spriteLabel = new JLabel(sprite != null ? sprite : s.getIcon());
             spriteLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
             entry.add(spriteLabel, BorderLayout.WEST);
 
-            String baseUpgrades = s.getBaseUpgrades().stream().map(Upgrade::getFlavorName).collect(Collectors.joining(", "));
-            String info = helpHtml("width:350px;font-size:11pt;",
-                    "<b>" + LanguageStrings.get("HELP_SPECIES_SCIENTIFIC") + "</b> <i>" + s.getScientific() + "</i><br>"
-                            + "<b>" + LanguageStrings.get("HELP_SPECIES_TRAITS") + "</b> " + baseUpgrades);
-            
-            JLabel infoLabel = new JLabel(info);
-            infoLabel.setFont(AssetStyles.FONT_NORMAL);
-            infoLabel.setForeground(AssetStyles.FONT_COLOR);
-            infoLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
-            
-            entry.add(infoLabel, BorderLayout.CENTER);
+            JPanel info = new JPanel();
+            info.setLayout(new BoxLayout(info, BoxLayout.Y_AXIS));
+            info.setBackground(AssetStyles.BACKGROUND_COLOR);
+            info.setBorder(new EmptyBorder(5, 5, 5, 5));
+
+            JLabel scientificLabel = new JLabel(helpHtml("width:350px;font-size:11pt;",
+                    "<b>" + LanguageStrings.get(LanguageStrings.HELP_SPECIES_SCIENTIFIC) + "</b> <i>"
+                            + s.getScientific() + "</i>"));
+            scientificLabel.setFont(AssetStyles.FONT_NORMAL);
+            scientificLabel.setForeground(AssetStyles.FONT_COLOR);
+            scientificLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            info.add(scientificLabel);
+
+            Assimilation assimilation = s.getAssimilation();
+            if (assimilation != null) {
+                info.add(Box.createRigidArea(new Dimension(0, 6)));
+                info.add(buildSpeciesAssimilationBlock(info, assimilation, s));
+            }
+
+            entry.add(info, BorderLayout.CENTER);
             panel.add(entry);
             panel.add(Box.createRigidArea(new Dimension(0, 5)));
         }
@@ -335,6 +343,43 @@ public class HelpPanel extends JPanel {
         JScrollPane scrollPane = new JScrollPane(panel);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         return scrollPane;
+    }
+
+    private JPanel buildSpeciesAssimilationBlock(JPanel parent, Assimilation assimilation, AntSpecies species) {
+        JPanel block = new JPanel(new BorderLayout(8, 0));
+        block.setBackground(AssetStyles.BACKGROUND_COLOR);
+        block.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        ImageIcon assimilationIcon = assimilation.getIcon() != null ? assimilation.getIcon() : species.getIcon();
+        if (assimilationIcon != null) {
+            JLabel iconLabel = new JLabel(assimilationIcon);
+            iconLabel.setVerticalAlignment(SwingConstants.TOP);
+            block.add(iconLabel, BorderLayout.WEST);
+        }
+
+        JPanel text = new JPanel(new BorderLayout(0, 2));
+        text.setBackground(AssetStyles.BACKGROUND_COLOR);
+
+        JLabel title = new JLabel(LanguageStrings.format(LanguageStrings.HELP_SPECIES_ASSIMILATION_FMT,
+                assimilation.getName()));
+        title.setFont(AssetStyles.FONT_BOLD);
+        title.setForeground(AssetStyles.FONT_COLOR_HEADER);
+        text.add(title, BorderLayout.NORTH);
+
+        JTextArea descArea = new JTextArea(assimilation.getDescription());
+        descArea.setFont(AssetStyles.FONT_NORMAL);
+        descArea.setForeground(AssetStyles.FONT_COLOR);
+        descArea.setWrapStyleWord(true);
+        descArea.setLineWrap(true);
+        descArea.setEditable(false);
+        descArea.setFocusable(false);
+        descArea.setOpaque(false);
+        descArea.setBackground(parent.getBackground());
+        descArea.setBorder(new EmptyBorder(2, 0, 0, 0));
+        text.add(descArea, BorderLayout.CENTER);
+
+        block.add(text, BorderLayout.CENTER);
+        return block;
     }
 
     private JPanel buildHotkeysGrid() {
@@ -666,9 +711,35 @@ public class HelpPanel extends JPanel {
 
     private String formatSkillHelpBody(Skill skill) {
         StringBuilder body = new StringBuilder();
+        if (!skill.isAttack()) {
+            if (skill == GameConstants.SKILL_BOOST_REGEN) {
+                body.append(LanguageStrings.get(LanguageStrings.HELP_SKILL_BOOST_REGEN_EFFECT));
+            } else if (skill == GameConstants.SKILL_SHIELDING) {
+                body.append(LanguageStrings.get(LanguageStrings.HELP_SKILL_SHIELDING_EFFECT));
+            }
+            if (skill.getBattleLine() != null) {
+                if (body.length() > 0) {
+                    body.append('\n');
+                }
+                body.append(LanguageStrings.format(LanguageStrings.HELP_SKILL_BATTLE_LINE_FMT, skill.getBattleLine().getName()));
+            }
+            return body.toString();
+        }
         body.append(LanguageStrings.format(LanguageStrings.HELP_SKILL_ACCURACY_FMT, formatPercentMult(skill.getAccuracyMult())));
         body.append('\n');
         body.append(LanguageStrings.format(LanguageStrings.HELP_SKILL_DAMAGE_FMT, formatPercentMult(skill.getDamageMult())));
+        if (skill.getTargetCount() > 0) {
+            body.append('\n');
+            body.append(LanguageStrings.format(LanguageStrings.HELP_SKILL_TARGETS_FMT, skill.getTargetCount()));
+        }
+        if (skill.sacrificesSelf()) {
+            body.append('\n');
+            body.append(LanguageStrings.get(LanguageStrings.HELP_SKILL_SACRIFICES_SELF));
+        }
+        if (skill.getBattleLine() != null) {
+            body.append('\n');
+            body.append(LanguageStrings.format(LanguageStrings.HELP_SKILL_BATTLE_LINE_FMT, skill.getBattleLine().getName()));
+        }
         return body.toString();
     }
 

@@ -230,6 +230,9 @@ public class PortugueseTranslation implements Translation {
         pt.put("SYNERGY_ACID_ARTILLERY", "Artilharia ácida");
         pt.put("SYNERGY_ACID_ARTILLERY_FLAVOR", "Obuses vivos");
         pt.put("SYNERGY_ACID_ARTILLERY_DESC", "Desbloqueia a função Artilharia para majors. Majors de artilharia ganham a habilidade Artilharia ácida (500% dano, 50% precisão). Requer assimilação de Cuspe ácido e formigas Major.");
+        pt.put("SYNERGY_CORROSIVE_BOMBS", "Bombas corrosivas");
+        pt.put("SYNERGY_CORROSIVE_BOMBS_FLAVOR", "Sacrifício ácido");
+        pt.put("SYNERGY_CORROSIVE_BOMBS_DESC", "Substitui Autodestruição das Bombardeiras por Autodestruição ácida (1000% dano, 90% precisão, 7 alvos; a formiga morre). Requer assimilações Autodestruição e Cuspe ácido.");
 
         pt.put("DIALOG_HATCH_RATES_TITLE", "Taxas de eclosão");
         pt.put("HATCH_DESC", "Definir probabilidade de eclosão:");
@@ -243,11 +246,13 @@ public class PortugueseTranslation implements Translation {
         pt.put("SUBTYPE_NOTHING", "Nenhum");
         pt.put("SUBTYPE_HEAD_TRAPJAW", "Mandíbula-armadilha");
         pt.put("SUBTYPE_HEAD_DOORHEAD", "Cabeça-escudo");
+        pt.put("SUBTYPE_HEAD_FARSIGHT", "Visão longa");
         pt.put("SUBTYPE_ABDOMEN_STINGER", "Ferrão");
         pt.put("SUBTYPE_ABDOMEN_HONEYPOT", "Honeypot");
-        pt.put("SUBTYPE_HEAD_TRAPJAW_DESC", "Cabeça mandíbula-armadilha: 1.5x ataque. Soma-se a outros bônus de ataque de subtipo (com Ferrão: 3x no total, não 2.25x).");
+        pt.put("SUBTYPE_HEAD_TRAPJAW_DESC", "Cabeça mandíbula-armadilha: 1.5x ataque em habilidades de infantaria. Soma-se a outros bônus de ataque de subtipo (com Ferrão: 3x no total, não 2.25x).");
         pt.put("SUBTYPE_HEAD_DOORHEAD_DESC", "Cabeça-escudo: +20% defesa.");
-        pt.put("SUBTYPE_ABDOMEN_STINGER_DESC", "Abdômen ferrão: 1.5x ataque. Soma-se a outros bônus de ataque de subtipo (com Mandíbula-armadilha: 3x no total, não 2.25x).");
+        pt.put("SUBTYPE_HEAD_FARSIGHT_DESC", "Cabeça Visão longa: +15% precisão a todas as habilidades (máximo 100%).");
+        pt.put("SUBTYPE_ABDOMEN_STINGER_DESC", "Abdômen ferrão: 1.5x ataque em habilidades de infantaria. Soma-se a outros bônus de ataque de subtipo (com Mandíbula-armadilha: 3x no total, não 2.25x).");
         pt.put("SUBTYPE_ABDOMEN_HONEYPOT_DESC", "Abdômen honeypot: 4x coleta e capacidade de carga; 0.75x velocidade; +15% regeneração.");
 
         pt.put("SKILL_BASIC_BITE", "Mordida básica");
@@ -257,6 +262,8 @@ public class PortugueseTranslation implements Translation {
         pt.put("SKILL_BOOST_REGEN", "Regeneração reforçada");
         pt.put("SKILL_ACID_SPITTING", "Cuspe ácido");
         pt.put("SKILL_ACID_ARTILLERY", "Artilharia ácida");
+        pt.put("SKILL_SELFDESTRUCT", "Autodestruição");
+        pt.put("SKILL_ACIDIC_SELFDESTRUCT", "Autodestruição ácida");
 
         pt.put("BATTLE_LINE_INFANTRY", "Infantaria");
         pt.put("BATTLE_LINE_ARTILLERY", "Artilharia");
@@ -521,7 +528,11 @@ public class PortugueseTranslation implements Translation {
         pt.put("WAR_COL_PROGRESS", "Progresso");
         pt.put("WAR_PROGRESS_FMT", "%s%%");
         pt.put("WAR_ACTION_FALLBACK", "Recuar (ceder etapa)");
-        pt.put("WAR_FALLBACK_CONFIRM_FMT", "Ceder a etapa atual em %s? Suas forças recuarão sem perdas.");
+        pt.put("WAR_FALLBACK_CONFIRM_FMT", "Ceder a etapa atual contra %s? Você entrega este hexágono sem combater até o fim.");
+        pt.put("WAR_ACTION_WITHDRAW_HEX", "Retirar para defesa de hexágono");
+        pt.put("WAR_WITHDRAW_HEX_CONFIRM_FMT",
+                "Sair do choque fronteiriço em %s e defender o hexágono em casa? Seu exército de fronteira é preservado; defensores recebem bônus de defesa de hexágono.");
+        pt.put("WAR_STAGE_HEX_BAIT_FMT", "%s retirou-se para defesa de hexágono em %s.");
         pt.put("WAR_STAGE_CAPTURED_FMT", "%1$s capturou %2$s. Progresso da guerra: %3$s%%.");
         pt.put("WAR_STAGE_DEFENDER_HELD_FMT", "%1$s manteve %2$s. Progresso da guerra: %3$s%%.");
         pt.put("WAR_STAGE_FORFEITED_FMT", "%1$s venceu a etapa em %2$s após uma retirada. Progresso da guerra: %3$s%%.");
@@ -595,7 +606,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("STAT_MILITARY_POWER", "Poder militar");
         pt.put("STAT_MILITARY_POWER_DESC", "Contagem de tipos adultos ponderada pelas estatísticas de combate base. Em guerra, as atribuições de papéis de guerra separam a força ativa (linha de frente) e de reserva. Atualizado uma vez por dia.");
         pt.put("STAT_COMBAT_CAPACITY", "Capacidade de combate");
-        pt.put("STAT_COMBAT_CAPACITY_DESC", "Quantos combatentes a tua dinastia pode enviar. Começa em 1.000; atribuir uma Rainha como Comandante sobe para 2.500. Os limites de implantação ainda não são aplicados.");
+        pt.put("STAT_COMBAT_CAPACITY_DESC", "Quantos combatentes a tua dinastia pode enviar como ativos por linha de batalha. Começa em 1.000; atribuir uma Rainha como Comandante sobe para 2.500. O resto fica na reserva e entra na linha quando ativos caem.");
         pt.put("STAT_ACTIVE_MILITARY_POWER", "Poder militar ativo");
         pt.put("STAT_RESERVE_MILITARY_POWER", "Poder militar de reserva");
         pt.put("DYNASTY_REPUTATION", "Reputação");
@@ -1245,15 +1256,15 @@ public class PortugueseTranslation implements Translation {
         pt.put("SPECIES_GREEN", "Formiga Verde");
         pt.put("SPECIES_GREEN_SCIENTIFIC", "Formica Rufa");
         pt.put("ASSIMILATED_TRAPJAW_FLAVOR", "Mandíbulas de Mola");
-        pt.put("ASSIMILATED_TRAPJAW_DESC", "Desbloqueia o subtipo de cabeça Mandíbula-armadilha. Contribui 1.5x ataque; acumula por soma com outros bônus de ataque de subtipo.");
+        pt.put("ASSIMILATED_TRAPJAW_DESC", "Desbloqueia o subtipo de cabeça Mandíbula-armadilha. Contribui 1.5x ataque em habilidades de infantaria; acumula por soma com outros bônus de ataque de subtipo. Concede a habilidade Mordida poderosa (substitui Mordida básica).");
         pt.put("ASSIMILATION_TRAPJAW", "Assimilação Formiga Armadilha");
         pt.put("ASSIMILATION_TRAPJAW_DESC", "Após assimilar o genoma da formiga armadilha:");
         pt.put("ASSIMILATED_HONEYPOT_FLAVOR", "Potes de Mel Vivos");
-        pt.put("ASSIMILATED_HONEYPOT_DESC", "Desbloqueia o subtipo de abdômen Honeypot. Forrageadores honeypot coletam e carregam 4x a 0.75x velocidade, e ganham +15% regeneração.");
+        pt.put("ASSIMILATED_HONEYPOT_DESC", "Desbloqueia o subtipo de abdômen Honeypot e a função Alimentadora portátil (Potter) para operárias com esse subtipo. Forrageadores honeypot coletam e carregam 4x a 0.75x velocidade, e ganham +15% regeneração. Concede Regeneração reforçada (duplica a cura do próximo redesdobramento ao usar).");
         pt.put("ASSIMILATION_HONEYPOT", "Assimilação Formiga Melífera");
         pt.put("ASSIMILATION_HONEYPOT_DESC", "Após assimilar o genoma da formiga melífera:");
         pt.put("ASSIMILATED_DOORHEAD_FLAVOR", "Tampões de Cabeça Blindados");
-        pt.put("ASSIMILATED_DOORHEAD_DESC", "Desbloqueia o subtipo de cabeça Cabeça-escudo. Formigas doorhead ganham +20% defesa.");
+        pt.put("ASSIMILATED_DOORHEAD_DESC", "Desbloqueia o subtipo de cabeça Cabeça-escudo e a função Defensora para soldadas com esse subtipo. Formigas doorhead ganham +20% defesa. Concede Escudo (defensoras absorvem golpes destinados às rainhas na defesa de hexágono até morrerem).");
         pt.put("ASSIMILATION_DOORHEAD", "Assimilação Formiga Cabeça-Porta");
         pt.put("ASSIMILATION_DOORHEAD_DESC", "Após assimilar o genoma da formiga cabeça-porta:");
         pt.put("ASSIMILATED_WOODBURROW_FLAVOR", "Escavação de Madeira");
@@ -1281,7 +1292,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("ASSIMILATION_GLIDING", "Assimilação Formiga Planadora");
         pt.put("ASSIMILATION_GLIDING_DESC", "Após assimilar o genoma da formiga planadora:");
         pt.put("ASSIMILATED_STINGING_FLAVOR", "Ferrão Excruciante");
-        pt.put("ASSIMILATED_STINGING_DESC", "Desbloqueia o subtipo de abdômen Ferrão. Contribui 1.5x ataque; acumula por soma (Mandíbula-armadilha + Ferrão = 3x, não 2.25x).");
+        pt.put("ASSIMILATED_STINGING_DESC", "Desbloqueia o subtipo de abdômen Ferrão. Contribui 1.5x ataque em habilidades de infantaria; acumula por soma (Mandíbula-armadilha + Ferrão = 3x, não 2.25x). Concede a habilidade Ferrão.");
         pt.put("ASSIMILATION_STINGING", "Assimilação Formiga Ferrão");
         pt.put("ASSIMILATION_STINGING_DESC", "Após assimilar o genoma da formiga ferrão:");
         pt.put("ASSIMILATED_SWARMING_FLAVOR", "Enxames de Incursão");
@@ -1305,11 +1316,11 @@ public class PortugueseTranslation implements Translation {
         pt.put("ASSIMILATION_DEADLYVENOM", "Assimilação de veneno neurotóxico");
         pt.put("ASSIMILATION_DEADLYVENOM_DESC", "Após assimilar a genética do veneno neurotóxico:");
         pt.put("ASSIMILATED_SELFDESTRUCT_FLAVOR", "Defesa Suicida");
-        pt.put("ASSIMILATED_SELFDESTRUCT_DESC", "Sua dinastia pode romper operárias especializadas para borrifar toxinas. (Mecânica em desenvolvimento.)");
+        pt.put("ASSIMILATED_SELFDESTRUCT_DESC", "Desbloqueia a função Bombardeira e a habilidade Autodestruição (500% dano, 90% precisão, 5 alvos; a formiga morre).");
         pt.put("ASSIMILATION_SELFDESTRUCT", "Assimilação Formiga Explosiva");
         pt.put("ASSIMILATION_SELFDESTRUCT_DESC", "Após assimilar o genoma da formiga explosiva:");
         pt.put("ASSIMILATED_FARSIGHT_FLAVOR", "Visão Excepcional");
-        pt.put("ASSIMILATED_FARSIGHT_DESC", "Sua dinastia pode rastrear presas e marcos com olhos compostos aguçados. (Mecânica em desenvolvimento.)");
+        pt.put("ASSIMILATED_FARSIGHT_DESC", "Desbloqueia o subtipo de cabeça Visão longa. Equipado, +15% precisão a todas as habilidades (máximo 100%).");
         pt.put("ASSIMILATION_FARSIGHT", "Assimilação Formiga Bulldog");
         pt.put("ASSIMILATION_FARSIGHT_DESC", "Após assimilar o genoma da formiga bulldog:");
         pt.put("ASSIMILATED_HIVEBUILD_FLAVOR", "Construção de Ninhos de Cartão");
@@ -1392,19 +1403,19 @@ public class PortugueseTranslation implements Translation {
         pt.put("ROLE_MINER_DESC", "Permite extrair minerais da terra.");
         pt.put("ROLE_POTTER_UPGRADE", "Função alimentadora");
         pt.put("ROLE_POTTER_FLAVOR", "Mão amiga");
-        pt.put("ROLE_POTTER_DESC", "Permite armazenar e transportar comida para outras formigas.");
+        pt.put("ROLE_POTTER_DESC", "Permite a operárias honeypot armazenar e transportar comida e usar Regeneração reforçada na guerra. Desbloqueada pela assimilação Honeypot; requer o subtipo Honeypot.");
         pt.put("ROLE_WARRIOR_UPGRADE", "Função guerreira");
         pt.put("ROLE_WARRIOR_FLAVOR", "Formação em falange");
         pt.put("ROLE_WARRIOR_DESC", "Permite que soldadas lutem em grupos organizados.");
         pt.put("ROLE_DEFENDER_UPGRADE", "Função defensora");
         pt.put("ROLE_DEFENDER_FLAVOR", "Escudo real");
-        pt.put("ROLE_DEFENDER_DESC", "Permite que soldadas protejam diretamente a rainha.");
+        pt.put("ROLE_DEFENDER_DESC", "Permite que soldadas doorhead protejam a rainha na defesa de hexágono com Escudo. Desbloqueada pela assimilação Doorhead; requer o subtipo Doorhead. Não luta em choques fronteiriços. Na defesa de hexágono, Defensoras ganham 3x ataque e defesa (defesa limitada a 100%); demais defensores ganham 1.5x.");
         pt.put("ROLE_POLICE_UPGRADE", "Função vigilante");
         pt.put("ROLE_POLICE_FLAVOR", "Brutalidade policial");
         pt.put("ROLE_POLICE_DESC", "Permite detectar formigas parasitas disfarçadas; cada uma tem 10% de chance diária.");
         pt.put("ROLE_BOMBER_UPGRADE", "Função bombardeira");
         pt.put("ROLE_BOMBER_FLAVOR", "Final explosivo");
-        pt.put("ROLE_BOMBER_DESC", "Permite que soldadas especializadas explodam ao morrer.");
+        pt.put("ROLE_BOMBER_DESC", "Permite que soldadas usem Autodestruição (ou Autodestruição ácida com Bombas corrosivas). Desbloqueada pela assimilação Formiga Explosiva.");
         pt.put("ROLE_BRUTE_UPGRADE", "Função bruta");
         pt.put("ROLE_BRUTE_FLAVOR", "Tropa pesada");
         pt.put("ROLE_BRUTE_DESC", "Permite que majors se tornem ameaças massivas em batalha.");
@@ -1416,7 +1427,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("ROLE_ARTILLERY_DESC", "Permite que majors cuspam ácido à distância.");
         pt.put("ROLE_SIEGE_UPGRADE", "Função máquina de cerco");
         pt.put("ROLE_SIEGE_FLAVOR", "Tecnologia de cerco");
-        pt.put("ROLE_SIEGE_DESC", "Permite que majors destruam defesas de colônias inimigas.");
+        pt.put("ROLE_SIEGE_DESC", "Permite que majors destruam defesas inimigas apenas durante o assalto a hexágonos (não em choques fronteiriços). Máquinas de cerco ganham 3x ataque e defesa ao atacar um hexágono (defesa limitada a 100%); demais atacantes não recebem bônus.");
         pt.put("ROLE_BREEDER_UPGRADE", "Funções de reprodução");
         pt.put("ROLE_BREEDER_FLAVOR", "Voos nupciais");
         pt.put("ROLE_BREEDER_DESC", "Permite que princesas e zangões façam voos nupciais para criar colônias ou obter rainhas.");
@@ -1508,7 +1519,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("ABILITY_ABILITY_DESC", "Permite ver o menu de habilidades e usar habilidades ativas.");
 
         pt.put("STAT_SKELETON_FLAVOR", "Exoesqueletos básicos");
-        pt.put("STAT_SKELETON_DESC", "Vitalidade básica antes dos multiplicadores de tipo: 100 de vida e 10% do HP máximo regenerado por tick. Defesa depende do tipo (majors e rainhas começam em 20%).");
+        pt.put("STAT_SKELETON_DESC", "Vitalidade básica antes dos multiplicadores de tipo: 100 de vida e 10% do HP máximo regenerado em cada redesdobramento de guerra. Defesa depende do tipo (majors e rainhas começam em 20%).");
         pt.put("STAT_ACID_FLAVOR", "Cuspe ácido");
         pt.put("STAT_ACID_DESC", "Ataque básico: 10 de dano, 1 ataque/s e 1 de velocidade.");
         pt.put("STAT_LONGEVITY_FLAVOR", "Longevidade padrão");
@@ -1595,11 +1606,11 @@ public class PortugueseTranslation implements Translation {
         pt.put("ASSIMILATED_MULTIQUEEN_DESC", "Sua dinastia pode ter várias rainhas numa colônia (requer melhorar a câmara real).");
         pt.put("ASSIMILATED_MULTIQUEEN_DESC", "Sua dinastia pode ter várias rainhas numa colônia (requer melhorar a câmara real).");
         pt.put("ASSIMILATED_TRAPJAW_FLAVOR", "Mandíbulas de Mola");
-        pt.put("ASSIMILATED_TRAPJAW_DESC", "Desbloqueia o subtipo de cabeça Mandíbula-armadilha. Contribui 1.5x ataque; acumula por soma com outros bônus de ataque de subtipo.");
+        pt.put("ASSIMILATED_TRAPJAW_DESC", "Desbloqueia o subtipo de cabeça Mandíbula-armadilha. Contribui 1.5x ataque em habilidades de infantaria; acumula por soma com outros bônus de ataque de subtipo. Concede a habilidade Mordida poderosa (substitui Mordida básica).");
         pt.put("ASSIMILATED_HONEYPOT_FLAVOR", "Potes de Mel Vivos");
-        pt.put("ASSIMILATED_HONEYPOT_DESC", "Desbloqueia o subtipo de abdômen Honeypot. Forrageadores honeypot coletam e carregam 4x a 0.75x velocidade, e ganham +15% regeneração.");
+        pt.put("ASSIMILATED_HONEYPOT_DESC", "Desbloqueia o subtipo de abdômen Honeypot e a função Alimentadora portátil (Potter) para operárias com esse subtipo. Forrageadores honeypot coletam e carregam 4x a 0.75x velocidade, e ganham +15% regeneração. Concede Regeneração reforçada (duplica a cura do próximo redesdobramento ao usar).");
         pt.put("ASSIMILATED_DOORHEAD_FLAVOR", "Tampões de Cabeça Blindados");
-        pt.put("ASSIMILATED_DOORHEAD_DESC", "Desbloqueia o subtipo de cabeça Cabeça-escudo. Formigas doorhead ganham +20% defesa.");
+        pt.put("ASSIMILATED_DOORHEAD_DESC", "Desbloqueia o subtipo de cabeça Cabeça-escudo e a função Defensora para soldadas com esse subtipo. Formigas doorhead ganham +20% defesa. Concede Escudo (defensoras absorvem golpes destinados às rainhas na defesa de hexágono até morrerem).");
         pt.put("ASSIMILATED_WOODBURROW_FLAVOR", "Escavação de Madeira");
         pt.put("ASSIMILATED_WOODBURROW_DESC", "Sua dinastia pode escavar e nidificar em madeira. (Mecânica em desenvolvimento.)");
         pt.put("ASSIMILATED_SILKWEAVE_FLAVOR", "Tecelagem de Ninhos de Seda");
@@ -1613,7 +1624,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("ASSIMILATED_GLIDING_FLAVOR", "Planos Controlados");
         pt.put("ASSIMILATED_GLIDING_DESC", "Sua dinastia pode planar entre árvores para cruzar vãos. (Mecânica em desenvolvimento.)");
         pt.put("ASSIMILATED_STINGING_FLAVOR", "Ferrão Excruciante");
-        pt.put("ASSIMILATED_STINGING_DESC", "Desbloqueia o subtipo de abdômen Ferrão. Contribui 1.5x ataque; acumula por soma (Mandíbula-armadilha + Ferrão = 3x, não 2.25x).");
+        pt.put("ASSIMILATED_STINGING_DESC", "Desbloqueia o subtipo de abdômen Ferrão. Contribui 1.5x ataque em habilidades de infantaria; acumula por soma (Mandíbula-armadilha + Ferrão = 3x, não 2.25x). Concede a habilidade Ferrão.");
         pt.put("ASSIMILATED_SWARMING_FLAVOR", "Enxames de Incursão");
         pt.put("ASSIMILATED_SWARMING_DESC", "Sua dinastia pode coordenar incursões massivas sem ninho permanente. (Mecânica em desenvolvimento.)");
         pt.put("ASSIMILATED_STEALTH_FLAVOR", "Infiltração Fantasma");
@@ -1625,9 +1636,9 @@ public class PortugueseTranslation implements Translation {
         pt.put("ASSIMILATED_DEADLYVENOM_FLAVOR", "Veneno neurotóxico");
         pt.put("ASSIMILATED_DEADLYVENOM_DESC", "Adiciona +50% ao ataque base da colónia. A sinergia Super Veneno com veneno de fogo substitui ambos +50% por um bónus de +200% (3x total).");
         pt.put("ASSIMILATED_SELFDESTRUCT_FLAVOR", "Defesa Suicida");
-        pt.put("ASSIMILATED_SELFDESTRUCT_DESC", "Sua dinastia pode romper operárias especializadas para borrifar toxinas. (Mecânica em desenvolvimento.)");
+        pt.put("ASSIMILATED_SELFDESTRUCT_DESC", "Desbloqueia a função Bombardeira e a habilidade Autodestruição (500% dano, 90% precisão, 5 alvos; a formiga morre).");
         pt.put("ASSIMILATED_FARSIGHT_FLAVOR", "Visão Excepcional");
-        pt.put("ASSIMILATED_FARSIGHT_DESC", "Sua dinastia pode rastrear presas e marcos com olhos compostos aguçados. (Mecânica em desenvolvimento.)");
+        pt.put("ASSIMILATED_FARSIGHT_DESC", "Desbloqueia o subtipo de cabeça Visão longa. Equipado, +15% precisão a todas as habilidades (máximo 100%).");
         pt.put("ASSIMILATED_HIVEBUILD_FLAVOR", "Construção de Ninhos de Cartão");
         pt.put("ASSIMILATED_HIVEBUILD_DESC", "Sua dinastia pode construir ninhos duráveis de cartão vegetal mastigado. (Mecânica em desenvolvimento.)");
         pt.put("ASSIMILATED_LOCSENSE_FLAVOR", "Integração de Rota");
@@ -1777,11 +1788,11 @@ public class PortugueseTranslation implements Translation {
         pt.put("HELP_TAB_DYNASTY", "Dinastia");
         pt.put("HELP_TAB_HOTKEYS", "Teclas");
         pt.put("HELP_TAB_TUTORIALS", "Tutoriais");
-        pt.put("HELP_TAB_SPECIES", "Espécies");
+        pt.put("HELP_TAB_SPECIES", "Espécies de formiga");
         pt.put("HELP_TAB_TYPES", "Tipos");
         pt.put("HELP_TAB_SUBTYPES", "Subtipos de formiga");
         pt.put("HELP_SUBTYPES_INTRO", "Traços assimilados de partes do corpo podem surgir em novas eclosões. Configure as probabilidades por tipo de formiga em Taxas de eclosão (P). Cada parte ativa do subtipo adiciona +50% de consumo de alimento.");
-        pt.put("HELP_TAB_BUGS", "Outros insetos");
+        pt.put("HELP_TAB_BUGS", "Espécies de criaturas");
         pt.put("HELP_TAB_ANT_ROLES", "Funções de Formiga");
         pt.put("HELP_TAB_EMPIRE", "Dinastia");
         pt.put("HELP_TAB_UPGRADES", "Melhorias");
@@ -1789,22 +1800,29 @@ public class PortugueseTranslation implements Translation {
         pt.put("HELP_TAB_ASSIMILATIONS", "Assimilações");
         pt.put("HELP_TAB_SYNERGIES", "Sinergias");
         pt.put("HELP_TAB_COMBAT", "Combate");
-        pt.put("HELP_COMBAT_INTRO", "O combate usa <b>habilidades</b> (multiplicadores de precisão e dano), <b>linhas de batalha</b> (faixas de funções e acerto) e as <b>fases</b> / <b>posição</b> de guerra nas campanhas.");
+        pt.put("HELP_COMBAT_INTRO", "As batalhas resolvem-se criatura contra criatura a cada hora. Formigas ativas (até à capacidade de combate por linha) agem com habilidades; reservas cobrem baixas. O acerto é precisão da habilidade × precisão da linha (máx. 100%). O dano usa ataque × multiplicador, reduzido uma vez pela defesa %. O embate de fronteira termina com ~90% do exército morto (incl. reservas); o assalto de hexágono, quando morre a última rainha defensora. Rainhas ficam sempre na linha como comandantes; enquanto houver Defensoras vivas, os ataques preferem não-rainhas.");
         pt.put("HELP_COMBAT_SKILLS", "Habilidades");
         pt.put("HELP_COMBAT_BATTLE_LINES", "Linhas de batalha");
         pt.put("HELP_COMBAT_WAR_PHASES", "Fases de etapa de guerra");
         pt.put("HELP_COMBAT_WAR_STANDING", "Posição na guerra");
         pt.put("HELP_SKILL_ACCURACY_FMT", "Precisão: %s");
         pt.put("HELP_SKILL_DAMAGE_FMT", "Dano: %s");
+        pt.put("HELP_SKILL_TARGETS_FMT", "Alvos: %s");
+        pt.put("HELP_SKILL_SACRIFICES_SELF", "A formiga morre ao usar esta habilidade.");
+        pt.put("HELP_SKILL_BATTLE_LINE_FMT", "Linha de batalha: %s");
+        pt.put("HELP_SKILL_BOOST_REGEN_EFFECT",
+                "Suporte: duplica o HP curado desta formiga no próximo redesdobramento de guerra (% de regeneração do HP máximo). Alimentadoras portáteis com Honeypot usam automaticamente até existirem escolhas de habilidade em batalha.");
+        pt.put("HELP_SKILL_SHIELDING_EFFECT",
+                "Suporte: na defesa de hexágono, esta Defensora assume as baixas destinadas às rainhas até morrer. Defensoras doorhead ativam Escudo quando a defesa de hexágono começa.");
         pt.put("HELP_BATTLE_LINE_ACCURACY_FMT", "Precisão base: %s");
         pt.put("HELP_BATTLE_LINE_ROLES_FMT", "Funções: %s");
         pt.put("HELP_BATTLE_LINE_ROLES_NONE", "Funções: nenhuma ainda");
-        pt.put("HELP_WAR_PHASE_CLASH_DESC", "Batalha inicial na fronteira disputada entre as duas dinastias.");
-        pt.put("HELP_WAR_PHASE_RESERVE_DESC", "Cerco a uma colônia após o choque fronteiriço.");
+        pt.put("HELP_WAR_PHASE_CLASH_DESC", "Batalha criatura contra criatura na fronteira disputada. Cada formiga ativa gasta ações em habilidades de ataque ou suporte; infantaria a cada hora, artilharia a cada 2.º, ar a cada 3.º. Vitória ao derrotar ~90% do exército inimigo (ativos + reservas).");
+        pt.put("HELP_WAR_PHASE_RESERVE_DESC", "Assalto de cerco a uma colônia após o choque fronteiriço. A colônia disputada alinha todas as formigas locais (Defensoras, Cerco e rainhas começam ativas); atacantes trazem o militar fronteiriço da dinastia mais Cerco dinástico (Defensoras não saem). Bônus: defensores 1.5x ataque/defesa (Defensoras 3x); Cerco atacante 3x. Defesa não passa de 100%. Atacantes vencem ao matar a última rainha.");
         pt.put("HELP_WAR_PHASE_REDEPLOY_DESC", "As forças deslocam-se para o próximo alvo após uma batalha.");
-        pt.put("HELP_WAR_STANDING_WINNING_DESC", "O seu lado lidera a guerra pelo poder de combate.");
-        pt.put("HELP_WAR_STANDING_LOSING_DESC", "O inimigo lidera a guerra pelo poder de combate.");
-        pt.put("HELP_WAR_STANDING_EVEN_DESC", "Nenhum lado tem vantagem clara de poder de combate.");
+        pt.put("HELP_WAR_STANDING_WINNING_DESC", "O seu lado lidera a guerra pelo progresso das etapas.");
+        pt.put("HELP_WAR_STANDING_LOSING_DESC", "O inimigo lidera a guerra pelo progresso das etapas.");
+        pt.put("HELP_WAR_STANDING_EVEN_DESC", "Nenhum lado tem vantagem clara de progresso das etapas.");
         pt.put("HELP_TAB_WORLD", "Mundo");
         pt.put("HELP_TAB_UI", "Controles da interface");
         pt.put("HELP_UI_INTRO", "Durante uma sessão de colônia, a barra de controle inferior direita ajusta a velocidade da simulação, a pausa e abre o menu do jogo.");
@@ -1819,7 +1837,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("HELP_DYNASTY_INFO", "<b>Expandindo a dinastia:</b><br>Com <b>reprodutoras</b>, faça voos nupciais pelo <b>mapa mundial (M)</b>.<br><i>Dica: eclipses ativam voos nupciais espontâneos e gratuitos!</i><br><br><b>Menu da dinastia:</b> ESC → submenu <b>Dinastia</b>, ou teclas <b>A</b> Visão geral, <b>S</b> Comércio, <b>D</b> Diplomacia, <b>F</b> Guerras (pressione de novo para fechar).<br><br><b>Logística e comércio:</b><br>Várias colônias desbloqueiam <b>rotas comerciais</b> na aba Comércio. Atribua formigas de transporte e escolha um método de comboio:<br>- <b>Terra:</b> comboios terrestres padrão.<br>- <b>Mar:</b> alta capacidade entre colônias costeiras.<br>- <b>Túnel:</b> seguro e rápido; túnel concluído e funções de túnel necessárias.<br>- <b>Ar:</b> rápido, baixa capacidade; requer <b>transporte aéreo</b> (princesas).<br>- <b>Bilateral:</b> funde rotas de ida e volta num comboio bidirecional.<br><br><b>Lealdade e diplomacia:</b><br>Cada colônia tem <b>lealdade</b> à sua dinastia (ícones em Visão geral). Baixa lealdade bloqueia comércio. Outras dinastias têm <b>reputação</b> e postura diplomática.<br><br><b>Guerra:</b><br>Declare guerra em Diplomacia quando ambos os lados tiverem funções militares ativas. Acompanhe campanhas em <b>Guerras (F)</b>: progresso, ofertas de paz e vista de batalha.<br><br><b>Marcos:</b><br>- <b>Colonização em massa:</b> remove limite de satélites.<br>- <b>Automação:</b> colônias NPC se gerem.<br><br><b>Evolução:</b><br><b>Sinergias</b> e <b>assimilações</b> para combinar e absorver traços.");
 
         pt.put("HELP_SPECIES_SCIENTIFIC", "Nome científico:");
-        pt.put("HELP_SPECIES_TRAITS", "Traços base:");
+        pt.put("HELP_SPECIES_ASSIMILATION_FMT", "Assimilação: %s");
 
         pt.put("HELP_RESOURCE_SOURCE_SMALL", "Pequeno");
         pt.put("HELP_RESOURCE_SOURCE_MEDIUM", "Médio");
@@ -2142,6 +2160,8 @@ public class PortugueseTranslation implements Translation {
         pt.put("TRIGGER_SYNERGY_SUPER_VENOM_MSG", "%s já está ativa! Combinar %s substitui os +50% separados por um bónus de ataque de +200% (3x total). Abra Sinergias (O) para rever.");
         pt.put("TRIGGER_SYNERGY_ACID_ARTILLERY_TITLE", "Sinergia desbloqueada");
         pt.put("TRIGGER_SYNERGY_ACID_ARTILLERY_MSG", "%s já está ativa! Combinar %s desbloqueia a função Artilharia para majors e a habilidade Artilharia ácida. Abra Sinergias (O) para rever.");
+        pt.put("TRIGGER_SYNERGY_CORROSIVE_BOMBS_TITLE", "Sinergia desbloqueada");
+        pt.put("TRIGGER_SYNERGY_CORROSIVE_BOMBS_MSG", "%s já está ativa! Combinar %s melhora Autodestruição das Bombardeiras para Autodestruição ácida. Abra Sinergias (O) para rever.");
         pt.put("TRIGGER_OPERATIONS_ABILITY_TITLE", "Operações da colónia");
         pt.put("TRIGGER_OPERATIONS_ABILITY_MSG", "Ganhaste uma habilidade ativa especial! Agora podes aceder ao menu de Operações da colónia premindo (Z).");
 

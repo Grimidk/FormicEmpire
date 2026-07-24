@@ -3,6 +3,8 @@ package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeProfile;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
+import com.grimidk.formicempire.classes.constants.dynasty.BattleLine;
+import com.grimidk.formicempire.classes.constants.dynasty.WarStagePhase;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.dynasty.War;
@@ -10,7 +12,6 @@ import com.grimidk.formicempire.classes.entities.services.colony.AntSubtypeServi
 import com.grimidk.formicempire.classes.entities.services.world.WarBattleScene;
 import com.grimidk.formicempire.classes.entities.services.world.WarBattleSceneBuilder;
 import com.grimidk.formicempire.classes.entities.services.world.WarService;
-import com.grimidk.formicempire.classes.constants.dynasty.WarStagePhase;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
@@ -32,13 +33,11 @@ public class WarBattleViewPanel extends JPanel {
     private static final int HEADER_HEIGHT = 72;
     private static final int FIELD_MARGIN = 0;
     private static final int ANT_SPRITE_SCALE = 2;
-    private static final float CONTACT_DEPTH_BASE = 0.97f;
-    private static final float CONTACT_DEPTH_SPREAD = 0.025f;
     private static final int ANIMATION_FRAME_MS = 50;
     private static final float WOBBLE_SPEED = 5.5f;
-    private static final float MARCH_SPEED = 2.8f;
     private static final float WOBBLE_AMPLITUDE_PX = 2f;
-    private static final float MARCH_DEPTH_AMPLITUDE = 0.018f;
+    private static final int LINE_JITTER_PX = 10;
+    private static final int RESERVE_WALK_PX_PER_SEC = 28;
 
     private final War war;
     private final Engine engine;
@@ -236,30 +235,35 @@ public class WarBattleViewPanel extends JPanel {
         if (ants.isEmpty() || field.width <= 4 || field.height <= 4) {
             return;
         }
-        int edgePad = 1;
+        int edgePad = 4;
         int fieldRight = field.x + field.width;
         double faceRadians = attackerSide ? Math.toRadians(90) : Math.toRadians(270);
         for (BattleAnt ant : ants) {
             ImageIcon icon = GameConstants.getAntSprite(ant.type, ant.species, ant.profile);
-            if (icon == null) {
-                continue;
-            }
-            Image image = icon.getImage();
-            int w = Math.max(8, icon.getIconWidth() / ANT_SPRITE_SCALE);
-            int h = Math.max(8, icon.getIconHeight() / ANT_SPRITE_SCALE);
+            Image image = icon != null ? icon.getImage() : null;
+            int w = icon != null ? Math.max(8, icon.getIconWidth() / ANT_SPRITE_SCALE) : 12;
+            int h = icon != null ? Math.max(8, icon.getIconHeight() / ANT_SPRITE_SCALE) : 12;
 
-            float depth = ant.animatedContactDepth(animationSeconds);
             float wobble = (float) Math.sin(ant.wobblePhase + animationSeconds * WOBBLE_SPEED * ant.motionRate)
                     * WOBBLE_AMPLITUDE_PX;
-            int drawY = field.y + edgePad + Math.round(ant.laneY * (field.height - h - edgePad * 2)) + Math.round(wobble);
+            int drawY = field.y + edgePad
+                    + Math.round(ant.laneY * (field.height - h - edgePad * 2f))
+                    + Math.round(wobble);
+
+            int lineOffset = lineOffsetPx(ant.battleLine, ant.reserve);
+            if (ant.reserve) {
+                lineOffset = Math.max(WarBattleScene.ARTILLERY_LINE_OFFSET_PX,
+                        lineOffset - Math.round(animationSeconds * RESERVE_WALK_PX_PER_SEC * ant.motionRate));
+            }
+            int jitter = Math.round((ant.laneJitter - 0.5f) * 2f * LINE_JITTER_PX);
 
             int drawX;
             if (attackerSide) {
-                int marchSpan = Math.max(1, contactLineX - field.x - w - edgePad);
-                drawX = field.x + edgePad + Math.round(depth * marchSpan);
+                drawX = contactLineX - w - edgePad - lineOffset + jitter;
+                drawX = Math.max(field.x + edgePad, drawX);
             } else {
-                int marchSpan = Math.max(1, fieldRight - contactLineX - w - edgePad);
-                drawX = contactLineX + edgePad + Math.round((1f - depth) * marchSpan);
+                drawX = contactLineX + edgePad + lineOffset + jitter;
+                drawX = Math.min(fieldRight - w - edgePad, drawX);
             }
 
             AffineTransform old = g2d.getTransform();
@@ -267,45 +271,143 @@ public class WarBattleViewPanel extends JPanel {
             double cy = drawY + h / 2.0;
             g2d.translate(cx, cy);
             g2d.rotate(faceRadians);
-            g2d.drawImage(image, -w / 2, -h / 2, w, h, this);
+            if (image != null) {
+                g2d.drawImage(image, -w / 2, -h / 2, w, h, this);
+            } else {
+                g2d.setColor(attackerSide ? AssetStyles.FONT_COLOR : AssetStyles.FONT_COLOR_VALUE);
+                g2d.fillRect(-w / 2, -h / 2, w, h);
+            }
             g2d.setTransform(old);
         }
     }
 
+    private static int lineOffsetPx(BattleLine line, boolean reserve) {
+        if (reserve) {
+            return WarBattleScene.RESERVE_LINE_OFFSET_PX;
+        }
+        if (line == GameConstants.BATTLE_LINE_ARTILLERY) {
+            return WarBattleScene.ARTILLERY_LINE_OFFSET_PX;
+        }
+        if (line == GameConstants.BATTLE_LINE_AIR_SUPPORT) {
+            return WarBattleScene.AIR_SUPPORT_LINE_OFFSET_PX;
+        }
+        return 0;
+    }
+
     private List<BattleAnt> buildAntPool(WarBattleScene.Side side, boolean attackerSide) {
-        if (side == null || side.typeCounts().isEmpty()) {
+        if (side == null) {
             return List.of();
         }
-        int total = side.typeCounts().values().stream().mapToInt(Integer::intValue).sum();
-        if (total <= 0) {
-            return List.of();
-        }
-
         Dynasty dynasty = resolveDynasty(side.dynastyId());
-        int visualCap = WarBattleScene.MAX_VISUAL_ANTS_PER_SIDE;
-        int visualTotal = Math.min(total, visualCap);
-        Map<AntType, Integer> allocated = allocateVisualCounts(side.typeCounts(), total, visualTotal);
-
-        List<BattleAnt> ants = new ArrayList<>(visualTotal);
         Random random = new Random(side.dynastyId() ^ (attackerSide ? 17 : 31));
-        for (Map.Entry<AntType, Integer> entry : allocated.entrySet()) {
-            AntType type = entry.getKey();
-            if (type == null || type == GameConstants.TYPE_DEAD || type == GameConstants.TYPE_DRONE) {
+        List<BattleAnt> ants = new ArrayList<>();
+
+        appendLineAnts(ants, side.activeByLine(), dynasty, side.species(), random, false);
+        Map<BattleLine, Map<AntType, Integer>> reserveVisual =
+                allocateReserveVisual(side.reserveByLine(), WarBattleScene.MAX_VISUAL_RESERVE_ANTS_PER_SIDE);
+        appendLineAnts(ants, reserveVisual, dynasty, side.species(), random, true);
+        return ants;
+    }
+
+    private static void appendLineAnts(List<BattleAnt> ants, Map<BattleLine, Map<AntType, Integer>> byLine,
+            Dynasty dynasty, AntSpecies species, Random random, boolean reserve) {
+        if (byLine == null || byLine.isEmpty()) {
+            return;
+        }
+        for (BattleLine line : GameConstants.getBattleLines()) {
+            Map<AntType, Integer> typeCounts = byLine.get(line);
+            if (typeCounts == null || typeCounts.isEmpty()) {
                 continue;
             }
-            for (int i = 0; i < entry.getValue(); i++) {
-                float laneY = random.nextFloat();
-                float depthSpread = random.nextFloat() * CONTACT_DEPTH_SPREAD;
-                AntSubtypeProfile profile = dynasty != null
-                        ? AntSubtypeService.sampleProfileFromDynasty(dynasty, type)
-                        : AntSubtypeProfile.standard();
-                ants.add(new BattleAnt(type, side.species(), profile, laneY,
-                        CONTACT_DEPTH_BASE + depthSpread,
-                        random.nextFloat() * (float) (Math.PI * 2),
-                        0.85f + random.nextFloat() * 0.3f));
+            int lineTotal = 0;
+            for (Integer c : typeCounts.values()) {
+                if (c != null) {
+                    lineTotal += c;
+                }
+            }
+            if (lineTotal <= 0) {
+                continue;
+            }
+            int indexInLine = 0;
+            for (Map.Entry<AntType, Integer> entry : typeCounts.entrySet()) {
+                AntType type = entry.getKey();
+                int count = entry.getValue() != null ? entry.getValue() : 0;
+                if (type == null || type == GameConstants.TYPE_DEAD || type == GameConstants.TYPE_DRONE || count <= 0) {
+                    continue;
+                }
+                for (int i = 0; i < count; i++) {
+                    float laneY = lineTotal <= 1 ? 0.5f : indexInLine / (float) (lineTotal - 1);
+                    // Mild stagger so packed lines aren't a perfect grid.
+                    laneY = Math.max(0f, Math.min(1f, laneY + (random.nextFloat() - 0.5f) * 0.02f));
+                    AntSubtypeProfile profile = dynasty != null
+                            ? AntSubtypeService.sampleProfileFromDynasty(dynasty, type)
+                            : AntSubtypeProfile.standard();
+                    ants.add(new BattleAnt(type, species, profile, line, laneY, random.nextFloat(),
+                            random.nextFloat() * (float) (Math.PI * 2),
+                            0.85f + random.nextFloat() * 0.3f,
+                            reserve));
+                    indexInLine++;
+                }
             }
         }
-        return ants;
+    }
+
+    private static Map<BattleLine, Map<AntType, Integer>> allocateReserveVisual(
+            Map<BattleLine, Map<AntType, Integer>> reserveByLine, int visualCap) {
+        if (reserveByLine == null || reserveByLine.isEmpty() || visualCap <= 0) {
+            return Map.of();
+        }
+        int total = 0;
+        for (Map<AntType, Integer> counts : reserveByLine.values()) {
+            if (counts == null) {
+                continue;
+            }
+            for (Integer c : counts.values()) {
+                if (c != null) {
+                    total += c;
+                }
+            }
+        }
+        if (total <= 0) {
+            return Map.of();
+        }
+        if (total <= visualCap) {
+            return reserveByLine;
+        }
+        float scale = visualCap / (float) total;
+        Map<BattleLine, Map<AntType, Integer>> scaled = new HashMap<>();
+        int assigned = 0;
+        for (Map.Entry<BattleLine, Map<AntType, Integer>> lineEntry : reserveByLine.entrySet()) {
+            Map<AntType, Integer> out = new HashMap<>();
+            if (lineEntry.getValue() != null) {
+                for (Map.Entry<AntType, Integer> e : lineEntry.getValue().entrySet()) {
+                    int count = e.getValue() != null ? e.getValue() : 0;
+                    int visual = Math.max(0, Math.round(count * scale));
+                    if (visual > 0 && e.getKey() != null) {
+                        out.put(e.getKey(), visual);
+                        assigned += visual;
+                    }
+                }
+            }
+            if (!out.isEmpty()) {
+                scaled.put(lineEntry.getKey(), out);
+            }
+        }
+        // Guarantee at least one sprite if reserves exist but rounding wiped them.
+        if (assigned == 0) {
+            for (Map.Entry<BattleLine, Map<AntType, Integer>> lineEntry : reserveByLine.entrySet()) {
+                if (lineEntry.getValue() == null) {
+                    continue;
+                }
+                for (Map.Entry<AntType, Integer> e : lineEntry.getValue().entrySet()) {
+                    if (e.getKey() != null && e.getValue() != null && e.getValue() > 0) {
+                        scaled.put(lineEntry.getKey(), Map.of(e.getKey(), 1));
+                        return scaled;
+                    }
+                }
+            }
+        }
+        return scaled;
     }
 
     private Dynasty resolveDynasty(int dynastyId) {
@@ -315,46 +417,6 @@ public class WarBattleViewPanel extends JPanel {
         return engine.getWorld().findDynastyById(dynastyId);
     }
 
-    private static Map<AntType, Integer> allocateVisualCounts(Map<AntType, Integer> typeCounts, int total,
-            int visualTotal) {
-        Map<AntType, Integer> allocated = new HashMap<>();
-        if (visualTotal <= 0 || total <= 0) {
-            return allocated;
-        }
-        if (visualTotal >= total) {
-            for (Map.Entry<AntType, Integer> entry : typeCounts.entrySet()) {
-                if (entry.getKey() != null && entry.getValue() != null && entry.getValue() > 0) {
-                    allocated.put(entry.getKey(), entry.getValue());
-                }
-            }
-            return allocated;
-        }
-
-        int assigned = 0;
-        List<RemainderSlot> remainders = new ArrayList<>();
-        for (Map.Entry<AntType, Integer> entry : typeCounts.entrySet()) {
-            AntType type = entry.getKey();
-            int count = entry.getValue() != null ? entry.getValue() : 0;
-            if (type == null || count <= 0) {
-                continue;
-            }
-            float exact = count * (visualTotal / (float) total);
-            int floor = (int) exact;
-            allocated.put(type, floor);
-            assigned += floor;
-            remainders.add(new RemainderSlot(type, exact - floor));
-        }
-        remainders.sort((a, b) -> Float.compare(b.fraction, a.fraction));
-        int slotsLeft = visualTotal - assigned;
-        for (int i = 0; i < slotsLeft && i < remainders.size(); i++) {
-            AntType type = remainders.get(i).type;
-            allocated.merge(type, 1, Integer::sum);
-        }
-        return allocated;
-    }
-
-    private record RemainderSlot(AntType type, float fraction) {}
-
     private String buildHeaderText(WarBattleScene scene) {
         int attackerAnts = sumTypeCounts(scene.getAttacker().typeCounts());
         int defenderAnts = sumTypeCounts(scene.getDefender().typeCounts());
@@ -363,11 +425,11 @@ public class WarBattleViewPanel extends JPanel {
         String attackerPower = LanguageStrings.format(
                 LanguageStrings.BATTLE_POWER_FMT,
                 scene.getAttacker().dynastyName(),
-                AssetStyles.formatNumber(scene.getAttacker().deployedPower()));
+                AssetStyles.formatNumber(scene.getAttacker().livingActive()));
         String defenderPower = LanguageStrings.format(
                 LanguageStrings.BATTLE_POWER_FMT,
                 scene.getDefender().dynastyName(),
-                AssetStyles.formatNumber(scene.getDefender().deployedPower()));
+                AssetStyles.formatNumber(scene.getDefender().livingActive()));
         String progress = LanguageStrings.format(
                 LanguageStrings.WAR_PROGRESS_FMT,
                 Math.round(scene.getWarProgressPercent()));
@@ -434,25 +496,24 @@ public class WarBattleViewPanel extends JPanel {
         private final AntType type;
         private final AntSpecies species;
         private final AntSubtypeProfile profile;
+        private final BattleLine battleLine;
         private final float laneY;
-        private final float contactDepth;
+        private final float laneJitter;
         private final float wobblePhase;
         private final float motionRate;
+        private final boolean reserve;
 
-        private BattleAnt(AntType type, AntSpecies species, AntSubtypeProfile profile, float laneY, float contactDepth,
-                float wobblePhase, float motionRate) {
+        private BattleAnt(AntType type, AntSpecies species, AntSubtypeProfile profile, BattleLine battleLine,
+                float laneY, float laneJitter, float wobblePhase, float motionRate, boolean reserve) {
             this.type = type;
             this.species = species;
             this.profile = profile != null ? profile : AntSubtypeProfile.standard();
+            this.battleLine = battleLine != null ? battleLine : GameConstants.BATTLE_LINE_INFANTRY;
             this.laneY = laneY;
-            this.contactDepth = Math.min(0.995f, contactDepth);
+            this.laneJitter = laneJitter;
             this.wobblePhase = wobblePhase;
             this.motionRate = motionRate;
-        }
-
-        private float animatedContactDepth(float seconds) {
-            float march = (float) Math.sin(wobblePhase + seconds * MARCH_SPEED * motionRate) * MARCH_DEPTH_AMPLITUDE;
-            return Math.max(0.05f, Math.min(0.995f, contactDepth + march));
+            this.reserve = reserve;
         }
     }
 }

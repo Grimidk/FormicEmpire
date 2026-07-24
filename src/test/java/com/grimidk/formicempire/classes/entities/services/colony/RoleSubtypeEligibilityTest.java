@@ -87,6 +87,25 @@ class RoleSubtypeEligibilityTest {
     }
 
     @Test
+    void defenderRequiresDoorheadSubtype() {
+        Colony colony = new Colony(14, "Elig", true);
+        Ant ant = new Ant(colony, GameConstants.TYPE_SOLDIER);
+        ant.setSubtypeProfile(AntSubtypeProfile.standard());
+
+        assertFalse(AntSubtypeService.isAntEligibleForRole(
+                ant, GameConstants.ROLE_DEFENDER, Set.of(GameConstants.SUBTYPE_HEAD_DOORHEAD.getId())));
+
+        ant.setSubtypeProfile(AntSubtypeProfile.of(
+                GameConstants.SUBTYPE_HEAD_DOORHEAD.getDigit(),
+                AntSubtype.DIGIT_NONE,
+                AntSubtype.DIGIT_NONE,
+                AntSubtype.DIGIT_NONE));
+        assertTrue(AntSubtypeService.isAntEligibleForRole(
+                ant, GameConstants.ROLE_DEFENDER, Set.of(GameConstants.SUBTYPE_HEAD_DOORHEAD.getId())));
+        assertTrue(GameConstants.ROLE_DEFENDER.isHexDefenseOnly());
+    }
+
+    @Test
     void copyPeaceRolesToWarCopiesSubtypeAllows() {
         Colony colony = new Colony(2, "Test", true);
         colony.setPeaceRoleSubtypeAllowed(

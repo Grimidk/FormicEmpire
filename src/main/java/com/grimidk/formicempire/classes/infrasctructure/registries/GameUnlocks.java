@@ -75,20 +75,23 @@ public final class GameUnlocks {
         // Not purchasable until minerals / miner unlock path is implemented (cost 0 is never offered in Research)
         public static final Upgrade ROLE_MINER = new Upgrade(17, "ROLE_MINER_UPGRADE", "ROLE_MINER_FLAVOR", "ROLE_MINER_DESC", TYPE_WORKER, 0, null, 0);
         // TODO asset: icons/roles/Potter.png (upgrade tree icon; may diverge from role icon)
-        // Not purchasable until implemented
+        // Unlocked via Honeypot assimilation (not RP-purchasable). Requires honeypot subtype.
         public static final Upgrade ROLE_POTTER = new Upgrade(19, "ROLE_POTTER_UPGRADE", "ROLE_POTTER_FLAVOR", "ROLE_POTTER_DESC", TYPE_WORKER, 0, null, 0);
+        static { upgrades.add(ROLE_POTTER); }
         // TODO asset: icons/roles/Warrior.png (upgrade tree icon; may diverge from role icon)
         public static final Upgrade ROLE_WARRIOR = new Upgrade(21, "ROLE_WARRIOR_UPGRADE", "ROLE_WARRIOR_FLAVOR", "ROLE_WARRIOR_DESC", TYPE_SOLDIER, 0, null, 0);
         static { upgrades.add(ROLE_WARRIOR); }
         // TODO asset: icons/roles/Defender.png (upgrade tree icon; may diverge from role icon)
-        // Not purchasable until implemented
+        // Unlocked via Doorhead assimilation (not RP-purchasable). Requires doorhead subtype.
         public static final Upgrade ROLE_DEFENDER = new Upgrade(22, "ROLE_DEFENDER_UPGRADE", "ROLE_DEFENDER_FLAVOR", "ROLE_DEFENDER_DESC", TYPE_SOLDIER, 0, null, 0);
+        static { upgrades.add(ROLE_DEFENDER); }
         // TODO asset: icons/roles/Police.png (upgrade tree icon; may diverge from role icon)
         public static final Upgrade ROLE_POLICE = new Upgrade(23, "ROLE_POLICE_UPGRADE", "ROLE_POLICE_FLAVOR", "ROLE_POLICE_DESC", TYPE_SOLDIER, 0, null, 0); 
         static { upgrades.add(ROLE_POLICE); }
         // TODO asset: icons/roles/Bomber.png (upgrade tree icon; may diverge from role icon)
-        // Not purchasable until implemented
+        // Unlocked via Exploding Ant / Selfdestruct assimilation (not RP-purchasable).
         public static final Upgrade ROLE_BOMBER = new Upgrade(24, "ROLE_BOMBER_UPGRADE", "ROLE_BOMBER_FLAVOR", "ROLE_BOMBER_DESC", TYPE_SOLDIER, 0, null, 0);
+        static { upgrades.add(ROLE_BOMBER); }
         // TODO asset: icons/roles/Brute.png (upgrade tree icon; may diverge from role icon)
         public static final Upgrade ROLE_BRUTE = new Upgrade(25, "ROLE_BRUTE_UPGRADE", "ROLE_BRUTE_FLAVOR", "ROLE_BRUTE_DESC", TYPE_MAJOR, 0, null, 0);
         static { upgrades.add(ROLE_BRUTE); }
@@ -404,11 +407,9 @@ public final class GameUnlocks {
         public static final Upgrade ASSIMILATED_DEADLYVENOM = new Upgrade(1017, "ASSIMILATED_DEADLYVENOM", "ASSIMILATED_DEADLYVENOM_FLAVOR", "ASSIMILATED_DEADLYVENOM_DESC", ABILITY_ASSIMILATION, 0, null, 0);
         static { upgrades.add(ASSIMILATED_DEADLYVENOM); }
         // TODO asset: icons/upgrades/AssimilatedSelfdestruct.png; icons/species/Exploding.png (placeholder — replace final art)
-        // TODO mechanic: exploding-ant self-destruct defense — not implemented
         public static final Upgrade ASSIMILATED_SELFDESTRUCT = new Upgrade(1018, "ASSIMILATED_SELFDESTRUCT", "ASSIMILATED_SELFDESTRUCT_FLAVOR", "ASSIMILATED_SELFDESTRUCT_DESC", ABILITY_ASSIMILATION, 0, null, 0);
         static { upgrades.add(ASSIMILATED_SELFDESTRUCT); }
         // TODO asset: icons/upgrades/AssimilatedFarsight.png; icons/species/Bulldog.png (placeholder — replace final art)
-        // TODO mechanic: bulldog vision / tracking — not implemented
         public static final Upgrade ASSIMILATED_FARSIGHT = new Upgrade(1019, "ASSIMILATED_FARSIGHT", "ASSIMILATED_FARSIGHT_FLAVOR", "ASSIMILATED_FARSIGHT_DESC", ABILITY_ASSIMILATION, 0, null, 0);
         static { upgrades.add(ASSIMILATED_FARSIGHT); }
         // TODO asset: icons/upgrades/AssimilatedHivebuild.png; icons/species/ShiningBlack.png (placeholder — replace final art)
@@ -426,6 +427,9 @@ public final class GameUnlocks {
         // TODO asset: icons/upgrades/SynergySuperVenom.png (placeholder — replace final art)
         public static final Upgrade SYNERGY_SUPER_VENOM = new Upgrade(10001, "SYNERGY_SUPER_VENOM", "SYNERGY_SUPER_VENOM_FLAVOR", "SYNERGY_SUPER_VENOM_DESC", null, 0, null, 0);
         static { upgrades.add(SYNERGY_SUPER_VENOM); }
+        // TODO asset: icons/upgrades/SynergyCorrosiveBombs.png (placeholder — replace final art)
+        public static final Upgrade SYNERGY_CORROSIVE_BOMBS = new Upgrade(10002, "SYNERGY_CORROSIVE_BOMBS", "SYNERGY_CORROSIVE_BOMBS_FLAVOR", "SYNERGY_CORROSIVE_BOMBS_DESC", null, 0, null, 0);
+        static { upgrades.add(SYNERGY_CORROSIVE_BOMBS); }
 
         // --- Buildings ---
 
@@ -628,11 +632,9 @@ public final class GameUnlocks {
         public static final Assimilation ASSIMILATION_DEADLYVENOM = new Assimilation(18, "ASSIMILATION_DEADLYVENOM", "ASSIMILATION_DEADLYVENOM_DESC", ASSIMILATED_DEADLYVENOM, ASSIMILATION_COST, null);
         static { assimilations.add(ASSIMILATION_DEADLYVENOM); }
         // TODO asset: icons/assimilations/Exploding.png; icons/species/Exploding.png (placeholder — replace final art)
-        // TODO mechanic: reward ASSIMILATED_SELFDESTRUCT — not implemented
         public static final Assimilation ASSIMILATION_SELFDESTRUCT = new Assimilation(19, "ASSIMILATION_SELFDESTRUCT", "ASSIMILATION_SELFDESTRUCT_DESC", ASSIMILATED_SELFDESTRUCT, ASSIMILATION_COST, null);
         static { assimilations.add(ASSIMILATION_SELFDESTRUCT); }
         // TODO asset: icons/assimilations/Bulldog.png; icons/species/Bulldog.png (placeholder — replace final art)
-        // TODO mechanic: reward ASSIMILATED_FARSIGHT — not implemented
         public static final Assimilation ASSIMILATION_FARSIGHT = new Assimilation(20, "ASSIMILATION_FARSIGHT", "ASSIMILATION_FARSIGHT_DESC", ASSIMILATED_FARSIGHT, ASSIMILATION_COST, null);
         static { assimilations.add(ASSIMILATION_FARSIGHT); }
         // TODO asset: icons/assimilations/ShiningBlack.png; icons/species/ShiningBlack.png (placeholder — replace final art)
@@ -656,6 +658,10 @@ public final class GameUnlocks {
         public static final Synergy ACID_ARTILLERY_SYNERGY = new Synergy(2, "SYNERGY_ACID_ARTILLERY", "SYNERGY_ACID_ARTILLERY_DESC",
                 ROLE_ARTILLERY, ASSIMILATED_ACIDSPIT, TYPE_MAJOR);
         static { synergies.add(ACID_ARTILLERY_SYNERGY); }
+        // TODO asset: icons/synergies/CorrosiveBombs.png
+        public static final Synergy CORROSIVE_BOMBS_SYNERGY = new Synergy(3, "SYNERGY_CORROSIVE_BOMBS", "SYNERGY_CORROSIVE_BOMBS_DESC",
+                SYNERGY_CORROSIVE_BOMBS, ASSIMILATED_SELFDESTRUCT, ASSIMILATED_ACIDSPIT);
+        static { synergies.add(CORROSIVE_BOMBS_SYNERGY); }
 
         // --- Getters ---
         public static List<Upgrade> getUpgrades() { return Collections.unmodifiableList(upgrades); }

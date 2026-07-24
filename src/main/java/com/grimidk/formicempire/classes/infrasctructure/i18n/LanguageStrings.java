@@ -634,6 +634,9 @@ public final class LanguageStrings {
     public static final String SYNERGY_ACID_ARTILLERY = "SYNERGY_ACID_ARTILLERY";
     public static final String SYNERGY_ACID_ARTILLERY_FLAVOR = "SYNERGY_ACID_ARTILLERY_FLAVOR";
     public static final String SYNERGY_ACID_ARTILLERY_DESC = "SYNERGY_ACID_ARTILLERY_DESC";
+    public static final String SYNERGY_CORROSIVE_BOMBS = "SYNERGY_CORROSIVE_BOMBS";
+    public static final String SYNERGY_CORROSIVE_BOMBS_FLAVOR = "SYNERGY_CORROSIVE_BOMBS_FLAVOR";
+    public static final String SYNERGY_CORROSIVE_BOMBS_DESC = "SYNERGY_CORROSIVE_BOMBS_DESC";
     public static final String TRIGGER_PROGRESS_NONE = "TRIGGER_PROGRESS_NONE";
     public static final String TRIGGER_PROGRESS_SHOW_COMPLETED = "TRIGGER_PROGRESS_SHOW_COMPLETED";
     public static final String TRIGGER_PROGRESS_STATUS_UNLOCKED = "TRIGGER_PROGRESS_STATUS_UNLOCKED";
@@ -681,6 +684,8 @@ public final class LanguageStrings {
     public static final String SUBTYPE_NOTHING = "SUBTYPE_NOTHING";
     public static final String SUBTYPE_HEAD_TRAPJAW = "SUBTYPE_HEAD_TRAPJAW";
     public static final String SUBTYPE_HEAD_DOORHEAD = "SUBTYPE_HEAD_DOORHEAD";
+    public static final String SUBTYPE_HEAD_FARSIGHT = "SUBTYPE_HEAD_FARSIGHT";
+    public static final String SUBTYPE_HEAD_FARSIGHT_DESC = "SUBTYPE_HEAD_FARSIGHT_DESC";
     public static final String SUBTYPE_ABDOMEN_STINGER = "SUBTYPE_ABDOMEN_STINGER";
     public static final String SUBTYPE_ABDOMEN_HONEYPOT = "SUBTYPE_ABDOMEN_HONEYPOT";
 
@@ -691,6 +696,8 @@ public final class LanguageStrings {
     public static final String SKILL_BOOST_REGEN = "SKILL_BOOST_REGEN";
     public static final String SKILL_ACID_SPITTING = "SKILL_ACID_SPITTING";
     public static final String SKILL_ACID_ARTILLERY = "SKILL_ACID_ARTILLERY";
+    public static final String SKILL_SELFDESTRUCT = "SKILL_SELFDESTRUCT";
+    public static final String SKILL_ACIDIC_SELFDESTRUCT = "SKILL_ACIDIC_SELFDESTRUCT";
 
     public static final String BATTLE_LINE_INFANTRY = "BATTLE_LINE_INFANTRY";
     public static final String BATTLE_LINE_ARTILLERY = "BATTLE_LINE_ARTILLERY";
@@ -953,6 +960,9 @@ public final class LanguageStrings {
     public static final String WAR_PROGRESS_FMT = "WAR_PROGRESS_FMT";
     public static final String WAR_ACTION_FALLBACK = "WAR_ACTION_FALLBACK";
     public static final String WAR_FALLBACK_CONFIRM_FMT = "WAR_FALLBACK_CONFIRM_FMT";
+    public static final String WAR_ACTION_WITHDRAW_HEX = "WAR_ACTION_WITHDRAW_HEX";
+    public static final String WAR_WITHDRAW_HEX_CONFIRM_FMT = "WAR_WITHDRAW_HEX_CONFIRM_FMT";
+    public static final String WAR_STAGE_HEX_BAIT_FMT = "WAR_STAGE_HEX_BAIT_FMT";
     public static final String WAR_STAGE_CAPTURED_FMT = "WAR_STAGE_CAPTURED_FMT";
     public static final String WAR_STAGE_DEFENDER_HELD_FMT = "WAR_STAGE_DEFENDER_HELD_FMT";
     public static final String WAR_STAGE_FORFEITED_FMT = "WAR_STAGE_FORFEITED_FMT";
@@ -2308,6 +2318,11 @@ public final class LanguageStrings {
     public static final String HELP_COMBAT_WAR_STANDING = "HELP_COMBAT_WAR_STANDING";
     public static final String HELP_SKILL_ACCURACY_FMT = "HELP_SKILL_ACCURACY_FMT";
     public static final String HELP_SKILL_DAMAGE_FMT = "HELP_SKILL_DAMAGE_FMT";
+    public static final String HELP_SKILL_TARGETS_FMT = "HELP_SKILL_TARGETS_FMT";
+    public static final String HELP_SKILL_SACRIFICES_SELF = "HELP_SKILL_SACRIFICES_SELF";
+    public static final String HELP_SKILL_BATTLE_LINE_FMT = "HELP_SKILL_BATTLE_LINE_FMT";
+    public static final String HELP_SKILL_BOOST_REGEN_EFFECT = "HELP_SKILL_BOOST_REGEN_EFFECT";
+    public static final String HELP_SKILL_SHIELDING_EFFECT = "HELP_SKILL_SHIELDING_EFFECT";
     public static final String HELP_BATTLE_LINE_ACCURACY_FMT = "HELP_BATTLE_LINE_ACCURACY_FMT";
     public static final String HELP_BATTLE_LINE_ROLES_FMT = "HELP_BATTLE_LINE_ROLES_FMT";
     public static final String HELP_BATTLE_LINE_ROLES_NONE = "HELP_BATTLE_LINE_ROLES_NONE";
@@ -2355,7 +2370,7 @@ public final class LanguageStrings {
     public static final String MOVE_PATROL_DESC = "MOVE_PATROL_DESC";
 
     public static final String HELP_SPECIES_SCIENTIFIC = "HELP_SPECIES_SCIENTIFIC";
-    public static final String HELP_SPECIES_TRAITS = "HELP_SPECIES_TRAITS";
+    public static final String HELP_SPECIES_ASSIMILATION_FMT = "HELP_SPECIES_ASSIMILATION_FMT";
 
     public static final String HELP_RESOURCE_SOURCE_SMALL = "HELP_RESOURCE_SOURCE_SMALL";
     public static final String HELP_RESOURCE_SOURCE_MEDIUM = "HELP_RESOURCE_SOURCE_MEDIUM";

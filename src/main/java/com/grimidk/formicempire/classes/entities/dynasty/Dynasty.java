@@ -18,7 +18,9 @@ import com.grimidk.formicempire.classes.constants.dynasty.colony.CityTitle;
 import com.grimidk.formicempire.classes.constants.dynasty.DiplomaticReputationModifier;
 import com.grimidk.formicempire.classes.constants.dynasty.DynastyTitle;
 import com.grimidk.formicempire.classes.constants.dynasty.PactRequestIncomingPolicy;
+import com.grimidk.formicempire.classes.constants.critter.Skill;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtype;
 import com.grimidk.formicempire.classes.constants.dynasty.GeneticIntegrityModifier;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
@@ -73,6 +75,7 @@ public class Dynasty {
     private int lastIncomingPactRequestWorldDay;
     private transient boolean pactRequestPromptOpen;
     private final Set<Upgrade> unlockedUpgrades;
+    private final Set<Skill> unlockedSkills;
     private final Set<Integer> announcedRankIds;
     private final transient List<Synergy> pendingSynergyAlerts = new ArrayList<>();
     private final List<Colony> colonies;
@@ -134,6 +137,8 @@ public class Dynasty {
         this.species = species;
         this.colonies = new ArrayList<>();
         this.unlockedUpgrades = new HashSet<>();
+        this.unlockedSkills = new LinkedHashSet<>();
+        seedStartingSkills();
         this.announcedRankIds = new LinkedHashSet<>();
         seedStartingAnnouncedRanks();
         this.tunnels = new ArrayList<>();
@@ -227,6 +232,7 @@ public class Dynasty {
 
         this.colonies = new ArrayList<>();
         this.unlockedUpgrades = new HashSet<>();
+        this.unlockedSkills = new LinkedHashSet<>();
         this.announcedRankIds = new LinkedHashSet<>();
         this.tunnels = new ArrayList<>();
         this.globalDeathStatistics = new ConcurrentHashMap<>();
@@ -462,6 +468,23 @@ public class Dynasty {
                 if (u != null) {
                     this.unlockedUpgrades.add(u);
                 }
+            }
+        }
+
+        if (savedDynasty.unlockedSkillIds != null && !savedDynasty.unlockedSkillIds.isEmpty()) {
+            for (Integer skillId : savedDynasty.unlockedSkillIds) {
+                Skill skill = GameConstants.getSkillById(skillId);
+                if (skill != null) {
+                    this.unlockedSkills.add(skill);
+                }
+            }
+            if (!this.unlockedSkills.contains(GameConstants.SKILL_BASIC_BITE)) {
+                this.unlockedSkills.add(GameConstants.SKILL_BASIC_BITE);
+            }
+        } else {
+            seedStartingSkills();
+            for (Upgrade upgrade : unlockedUpgrades) {
+                applySkillUnlocksForUpgrade(upgrade);
             }
         }
 
@@ -1728,6 +1751,66 @@ public class Dynasty {
         announcedRankIds.add(GameConstants.RANK_COLONY.getId());
     }
 
+    private void seedStartingSkills() {
+        unlockedSkills.add(GameConstants.SKILL_BASIC_BITE);
+    }
+
+    private void applySkillUnlocksForUpgrade(Upgrade upgrade) {
+        if (upgrade == null) {
+            return;
+        }
+        for (AntSubtype subtype : GameConstants.getAntSubtypes()) {
+            if (upgrade.equals(subtype.getRequiredUpgrade()) && subtype.getGrantedSkill() != null) {
+                unlockSkill(subtype.getGrantedSkill());
+            }
+        }
+        if (upgrade == GameUnlocks.ASSIMILATED_ACIDSPIT) {
+            unlockSkill(GameConstants.SKILL_ACID_SPITTING);
+        } else if (upgrade == GameUnlocks.ASSIMILATED_SELFDESTRUCT) {
+            unlockSkill(GameConstants.SKILL_SELFDESTRUCT);
+            if (!hasUpgrade(GameUnlocks.ROLE_BOMBER)) {
+                unlockedUpgrades.add(GameUnlocks.ROLE_BOMBER);
+            }
+        } else if (upgrade == GameUnlocks.ASSIMILATED_HONEYPOT) {
+            if (!hasUpgrade(GameUnlocks.ROLE_POTTER)) {
+                unlockedUpgrades.add(GameUnlocks.ROLE_POTTER);
+            }
+        } else if (upgrade == GameUnlocks.ASSIMILATED_DOORHEAD) {
+            if (!hasUpgrade(GameUnlocks.ROLE_DEFENDER)) {
+                unlockedUpgrades.add(GameUnlocks.ROLE_DEFENDER);
+            }
+        } else if (upgrade == GameUnlocks.ROLE_BOMBER) {
+            unlockSkill(GameConstants.SKILL_SELFDESTRUCT);
+        } else if (upgrade == GameUnlocks.ROLE_ARTILLERY) {
+            unlockSkill(GameConstants.SKILL_ACID_ARTILLERY);
+        } else if (upgrade == GameUnlocks.SYNERGY_CORROSIVE_BOMBS) {
+            unlockSkill(GameConstants.SKILL_ACIDIC_SELFDESTRUCT);
+        }
+    }
+
+    public Set<Skill> getUnlockedSkills() {
+        return Collections.unmodifiableSet(unlockedSkills);
+    }
+
+    public boolean hasSkill(Skill skill) {
+        return skill != null && unlockedSkills.contains(skill);
+    }
+
+    public void unlockSkill(Skill skill) {
+        if (skill == null) {
+            return;
+        }
+        unlockedSkills.add(skill);
+    }
+
+    public List<Integer> copyUnlockedSkillIds() {
+        List<Integer> ids = new ArrayList<>(unlockedSkills.size());
+        for (Skill skill : unlockedSkills) {
+            ids.add(skill.getId());
+        }
+        return ids;
+    }
+
     private void seedAnnouncedRanksThrough(Rank through) {
         seedStartingAnnouncedRanks();
         if (through == null) {
@@ -1745,6 +1828,7 @@ public class Dynasty {
             return;
         }
         unlockedUpgrades.add(upgrade);
+        applySkillUnlocksForUpgrade(upgrade);
         if (upgrade == GameUnlocks.TYPE_SOLDIER) {
             if (!hasUpgrade(GameUnlocks.ROLE_HUNTER)) {
                 unlockedUpgrades.add(GameUnlocks.ROLE_HUNTER);
@@ -1775,6 +1859,7 @@ public class Dynasty {
             return;
         }
         unlockedUpgrades.add(reward);
+        applySkillUnlocksForUpgrade(reward);
         invalidateAffordableAlertCaches();
         enqueueSynergyAlert(synergy);
     }

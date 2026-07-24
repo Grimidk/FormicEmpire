@@ -122,4 +122,16 @@ class DynastySynergyServiceTest {
         assertTrue(dynasty.hasUpgrade(GameUnlocks.ROLE_ARTILLERY));
         assertTrue(GameConstants.isObtainableRole(GameConstants.ROLE_ARTILLERY));
     }
+
+    @Test
+    void corrosiveBombsSynergyUnlocksAcidicSelfdestruct() {
+        Dynasty dynasty = new Dynasty(11, "Test", true, GameConstants.SPECIES_OMNI);
+        dynasty.unlockUpgrade(GameUnlocks.ABILITY_SYNERGY);
+        dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_SELFDESTRUCT);
+        dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_ACIDSPIT);
+
+        assertTrue(DynastySynergyService.isUnlocked(dynasty, GameUnlocks.CORROSIVE_BOMBS_SYNERGY));
+        assertTrue(dynasty.hasUpgrade(GameUnlocks.SYNERGY_CORROSIVE_BOMBS));
+        assertTrue(dynasty.hasSkill(GameConstants.SKILL_ACIDIC_SELFDESTRUCT));
+    }
 }

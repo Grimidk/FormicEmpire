@@ -10,10 +10,11 @@ import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtype;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeProfile;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeSlot;
-import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.critter.Critter;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
+import com.grimidk.formicempire.classes.entities.services.colony.AntSubtypeService;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 
 public final class CritterSkillService {
@@ -45,15 +46,76 @@ public final class CritterSkillService {
     public static List<Skill> resolveAvailableSkills(Species species, AntSubtypeProfile profile, Colony colony,
             AntRole role) {
         Set<Skill> skills = new LinkedHashSet<>();
-        if (species != null) {
-            skills.addAll(species.getBaseSkills());
+        Dynasty dynasty = colony != null ? colony.getDynasty() : null;
+        if (dynasty != null) {
+            for (Skill skill : dynasty.getUnlockedSkills()) {
+                if (allowsSkill(skill, role, profile)) {
+                    skills.add(skill);
+                }
+            }
+        } else {
+            if (species != null) {
+                for (Skill skill : species.getBaseSkills()) {
+                    if (allowsSkill(skill, role, profile)) {
+                        skills.add(skill);
+                    }
+                }
+            }
+            applySubtypeGrantedSkills(skills, profile, role);
         }
-        applySubtypeSkills(skills, profile, role);
-        applyConditionalSkills(skills, colony, role);
+        applySubtypeReplaces(skills, profile);
+        applySkillReplaces(skills);
         return List.copyOf(skills);
     }
 
-    private static void applySubtypeSkills(Set<Skill> skills, AntSubtypeProfile profile, AntRole role) {
+    /**
+     * Effective skill accuracy after subtype bonuses (e.g. Farsight +15%), capped at 100%.
+     */
+    public static float resolveAccuracyMult(Skill skill, AntSubtypeProfile profile) {
+        if (skill == null) {
+            return 0f;
+        }
+        float accuracy = skill.getAccuracyMult() + AntSubtypeService.combinedAccuracyBonus(profile);
+        return Math.min(1f, Math.max(0f, accuracy));
+    }
+
+    /**
+     * Subtype attack multiplier for skill damage. Trapjaw / Stinger apply only to infantry skills.
+     */
+    public static float resolveSubtypeAttackMult(Skill skill, AntSubtypeProfile profile) {
+        if (skill == null || skill.getBattleLine() != GameConstants.BATTLE_LINE_INFANTRY) {
+            return 1f;
+        }
+        return AntSubtypeService.combinedAttackMult(profile);
+    }
+
+    /**
+     * Effective skill damage multiplier including infantry-only subtype attack boosts.
+     */
+    public static float resolveDamageMult(Skill skill, AntSubtypeProfile profile) {
+        if (skill == null) {
+            return 0f;
+        }
+        return skill.getDamageMult() * resolveSubtypeAttackMult(skill, profile);
+    }
+
+    private static void applySubtypeGrantedSkills(Set<Skill> skills, AntSubtypeProfile profile, AntRole role) {
+        if (profile == null || skills == null) {
+            return;
+        }
+        for (AntSubtypeSlot slot : AntSubtypeSlot.values()) {
+            AntSubtype subtype = profile.getSubtype(slot);
+            if (subtype == null || subtype.isNone()) {
+                continue;
+            }
+            Skill granted = subtype.getGrantedSkill();
+            if (granted != null && allowsSkill(granted, role, profile)) {
+                skills.add(granted);
+            }
+        }
+    }
+
+    private static void applySubtypeReplaces(Set<Skill> skills, AntSubtypeProfile profile) {
         if (profile == null || skills == null) {
             return;
         }
@@ -66,50 +128,49 @@ public final class CritterSkillService {
             if (replaces != null) {
                 skills.remove(replaces);
             }
-            Skill granted = subtype.getGrantedSkill();
-            if (granted != null && roleAllowsSkill(granted, role)) {
-                skills.add(granted);
-            }
         }
     }
 
-    private static void applyConditionalSkills(Set<Skill> skills, Colony colony, AntRole role) {
-        if (skills == null) {
+    private static void applySkillReplaces(Set<Skill> skills) {
+        if (skills == null || skills.isEmpty()) {
             return;
         }
-        for (Skill skill : GameConstants.getSkills()) {
-            if (isSubtypeGrantedSkill(skill)) {
-                continue;
+        Set<Skill> toRemove = new LinkedHashSet<>();
+        for (Skill skill : skills) {
+            Skill replaces = skill.getReplacesSkill();
+            if (replaces != null && skills.contains(skill)) {
+                toRemove.add(replaces);
             }
-            Upgrade requiredUpgrade = skill.getRequiredUpgrade();
-            AntRole requiredRole = skill.getRequiredRole();
-            if (requiredUpgrade == null && requiredRole == null) {
-                continue;
-            }
-            if (requiredUpgrade != null && (colony == null || !colony.hasUpgrade(requiredUpgrade))) {
-                continue;
-            }
-            if (!roleAllowsSkill(skill, role)) {
-                continue;
-            }
-            skills.add(skill);
         }
+        skills.removeAll(toRemove);
     }
 
-    private static boolean roleAllowsSkill(Skill skill, AntRole role) {
-        AntRole requiredRole = skill.getRequiredRole();
-        return requiredRole == null || requiredRole == role;
-    }
-
-    private static boolean isSubtypeGrantedSkill(Skill skill) {
+    private static boolean allowsSkill(Skill skill, AntRole role, AntSubtypeProfile profile) {
         if (skill == null) {
             return false;
         }
-        for (AntSubtype subtype : GameConstants.getAntSubtypes()) {
-            if (subtype.getGrantedSkill() == skill) {
-                return true;
-            }
+        AntRole requiredRole = skill.getRequiredRole();
+        if (requiredRole != null && requiredRole != role) {
+            return false;
         }
-        return false;
+        AntSubtype requiredSubtype = skill.getRequiredSubtype();
+        if (requiredSubtype != null && !profileHasSubtype(profile, requiredSubtype)) {
+            return false;
+        }
+        return battleLineAllowsSkill(skill, role);
+    }
+
+    private static boolean profileHasSubtype(AntSubtypeProfile profile, AntSubtype required) {
+        if (profile == null || required == null || required.getSlot() == null) {
+            return false;
+        }
+        return profile.getSubtype(required.getSlot()) == required;
+    }
+
+    private static boolean battleLineAllowsSkill(Skill skill, AntRole role) {
+        if (skill.getBattleLine() == null || role == null) {
+            return true;
+        }
+        return skill.getBattleLine() == GameConstants.getBattleLineForRole(role);
     }
 }

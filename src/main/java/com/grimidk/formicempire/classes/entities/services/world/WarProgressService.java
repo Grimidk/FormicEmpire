@@ -8,7 +8,7 @@ import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.dynasty.War;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyStarterService;
-import com.grimidk.formicempire.classes.entities.services.dynasty.DynastyDiplomacyService;
+import com.grimidk.formicempire.classes.entities.services.shared.WarCombatSkillService;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
@@ -160,6 +160,48 @@ public final class WarProgressService {
         return false;
     }
 
+    /**
+     * Contested-colony owner withdraws from border clash into hex defense without army losses.
+     * Hex assault attacker/defender are already tracked via {@link War#getStageAttackerDynastyId()}
+     * and the contested colony owner; border clash has no attacker/defender distinction beyond pools.
+     */
+    public static boolean canWithdrawToHexDefense(World world, War war, Dynasty withdrawer) {
+        if (world == null || war == null || withdrawer == null || !war.isActive() || !war.isCampaignInitialized()) {
+            return false;
+        }
+        if (war.getStagePhase() != GameConstants.WAR_STAGE_ACTIVE_CLASH) {
+            return false;
+        }
+        if (!war.involves(withdrawer.getId())) {
+            return false;
+        }
+        Colony contested = findColonyById(world, war.getContestedColonyId());
+        if (contested == null || contested.getDynasty() == null) {
+            return false;
+        }
+        // Only the hex owner can bait: pull border forces home and fight with hex-defense boosts.
+        return contested.getDynasty().getId() == withdrawer.getId();
+    }
+
+    public static boolean withdrawToHexDefense(World world, War war, Dynasty withdrawer) {
+        if (!canWithdrawToHexDefense(world, war, withdrawer)) {
+            return false;
+        }
+        Colony contested = findColonyById(world, war.getContestedColonyId());
+        Dynasty stageAttacker = world.findDynastyById(war.getStageAttackerDynastyId());
+        Dynasty stageDefender = contested != null ? contested.getDynasty() : null;
+        if (contested == null || stageAttacker == null || stageDefender == null) {
+            return false;
+        }
+
+        // Preserve armies: contested owner clears their border pool and opens hex defense.
+        war.setDeployedActiveDefender(0);
+        WarCreatureCombatService.clear(war);
+        beginReserveAssault(world, war, stageAttacker, stageDefender);
+        notifyPlayerWarHexBait(world, war, withdrawer, contested);
+        return war.getStagePhase() == GameConstants.WAR_STAGE_RESERVE_ASSAULT;
+    }
+
     private static void tickWarHour(World world, WarService warService, War war, Dynasty aggressor, Dynasty defender) {
         if (war.getProgressPercent() >= 100f) {
             warService.concludeWar(war, aggressor.getId(), LanguageStrings.WAR_CONCLUSION_ABSOLUTE_VICTORY);
@@ -187,10 +229,11 @@ public final class WarProgressService {
         }
 
         if (war.getStagePhase() == GameConstants.WAR_STAGE_ACTIVE_CLASH) {
-            resolveActiveClashHour(world, war, stageAttacker, stageDefender);
-            if (war.getDeployedActiveAttacker() <= 0 || war.getDeployedActiveDefender() <= 0) {
-                beginReserveAssault(world, war, stageAttacker, stageDefender);
+            considerAiHexBait(world, war, aggressor, defender, stageAttacker, stageDefender, contested);
+            if (war.getStagePhase() != GameConstants.WAR_STAGE_ACTIVE_CLASH) {
+                return;
             }
+            resolveActiveClashHour(world, war, stageAttacker, stageDefender);
             return;
         }
 
@@ -273,43 +316,86 @@ public final class WarProgressService {
         return ai.getId() == stageDefender.getId() || ai.getId() == stageAttacker.getId();
     }
 
-    private static void resolveActiveClashHour(World world, War war, Dynasty stageAttacker, Dynasty stageDefender) {
-        int attackerPower = war.getDeployedActiveAttacker();
-        int defenderPower = war.getDeployedActiveDefender();
-        if (attackerPower <= 0 && defenderPower <= 0) {
+    private static void considerAiHexBait(World world, War war, Dynasty aggressor, Dynasty defender,
+            Dynasty stageAttacker, Dynasty stageDefender, Colony contested) {
+        tryAiHexBait(world, war, aggressor, stageAttacker, contested);
+        if (war.getStagePhase() != GameConstants.WAR_STAGE_ACTIVE_CLASH) {
             return;
         }
+        tryAiHexBait(world, war, defender, stageAttacker, contested);
+    }
 
-        BattleTickResult result = resolveBattleTick(attackerPower, defenderPower);
-        war.setDeployedActiveAttacker(Math.max(0, attackerPower - result.attackerLoss));
-        war.setDeployedActiveDefender(Math.max(0, defenderPower - result.defenderLoss));
+    private static void tryAiHexBait(World world, War war, Dynasty ai, Dynasty stageAttacker, Colony contested) {
+        if (ai == null || ai.isPlayer() || ai.isDefeated()) {
+            return;
+        }
+        if (!canAiHexBait(world, war, ai, stageAttacker, contested)) {
+            return;
+        }
+        if (GameRandom.nextDouble() < GameNumbers.AI_WAR_HEX_BAIT_CHANCE) {
+            withdrawToHexDefense(world, war, ai);
+        }
+    }
 
-        applyActivePoolLoss(stageAttacker, result.attackerLoss);
-        applyActivePoolLoss(stageDefender, result.defenderLoss);
+    static boolean canAiHexBait(World world, War war, Dynasty ai, Dynasty stageAttacker, Colony contested) {
+        if (!canWithdrawToHexDefense(world, war, ai)) {
+            return false;
+        }
+        if (stageAttacker == null || contested == null || contested.getDynasty() != ai) {
+            return false;
+        }
+        int borderAi = Math.max(0, war.getDeployedActiveDefender());
+        int borderEnemy = Math.max(0, war.getDeployedActiveAttacker());
+        if (borderAi <= 0 && borderEnemy <= 0) {
+            return false;
+        }
+        float borderOdds = borderAi / (float) Math.max(1, borderEnemy);
+
+        ColonyMilitaryService.refreshColonyMilitaryPower(contested);
+        ColonyMilitaryService.refreshDynastyMilitaryPower(stageAttacker);
+        int hexDefense = ColonyMilitaryService.computeHexDefenseEffectivePower(contested);
+        int hexAssault = ColonyMilitaryService.computeHexAssaultEffectiveAttackerPower(stageAttacker);
+        if (hexDefense <= 0 || hexAssault <= 0) {
+            return false;
+        }
+        float hexOdds = hexDefense / (float) hexAssault;
+        if (hexOdds < GameNumbers.WAR_AI_HEX_BAIT_MIN_HEX_ODDS) {
+            return false;
+        }
+        return hexOdds >= borderOdds * GameNumbers.WAR_AI_HEX_BAIT_ODDS_IMPROVEMENT;
+    }
+
+    private static void resolveActiveClashHour(World world, War war, Dynasty stageAttacker, Dynasty stageDefender) {
+        if (!WarCreatureCombatService.hasLivingCombatants(war)) {
+            WarCreatureCombatService.clear(war);
+            WarCreatureCombatService.startBorderBattle(war, stageAttacker, stageDefender);
+        }
+        WarCreatureCombatService.TickOutcome outcome = WarCreatureCombatService.tick(war);
         ColonyMilitaryService.refreshDynastyMilitaryPower(stageAttacker);
         ColonyMilitaryService.refreshDynastyMilitaryPower(stageDefender);
-
-        war.setStageProgress(Math.min(1f, war.getStageProgress() + GameNumbers.WAR_STAGE_PROGRESS_PER_HOUR));
-        war.recomputeProgressPercent();
+        if (outcome == WarCreatureCombatService.TickOutcome.ATTACKER_WINS) {
+            // Border winner assaults the loser's hex.
+            war.setDeployedActiveDefender(0);
+            beginReserveAssault(world, war, stageAttacker, stageDefender);
+        } else if (outcome == WarCreatureCombatService.TickOutcome.DEFENDER_WINS) {
+            war.setDeployedActiveAttacker(0);
+            beginReserveAssault(world, war, stageAttacker, stageDefender);
+        }
     }
 
     private static void beginReserveAssault(World world, War war, Dynasty stageAttacker, Dynasty stageDefender) {
         Dynasty activeWinner;
         Dynasty activeLoser;
-        int winnerPower;
         if (war.getDeployedActiveAttacker() > 0 && war.getDeployedActiveDefender() <= 0) {
             activeWinner = stageAttacker;
             activeLoser = stageDefender;
-            winnerPower = war.getDeployedActiveAttacker();
         } else if (war.getDeployedActiveDefender() > 0 && war.getDeployedActiveAttacker() <= 0) {
             activeWinner = stageDefender;
             activeLoser = stageAttacker;
-            winnerPower = war.getDeployedActiveDefender();
         } else {
             activeWinner = war.getDeployedActiveAttacker() >= war.getDeployedActiveDefender()
                     ? stageAttacker : stageDefender;
             activeLoser = activeWinner == stageAttacker ? stageDefender : stageAttacker;
-            winnerPower = Math.max(war.getDeployedActiveAttacker(), war.getDeployedActiveDefender());
         }
 
         Colony reserveTarget = findBorderColonyFacing(world, activeLoser, activeWinner);
@@ -326,43 +412,28 @@ public final class WarProgressService {
         ColonyMilitaryService.refreshColonyMilitaryPower(reserveTarget);
         war.setContestedColonyId(reserveTarget.getId());
         war.setStageAttackerDynastyId(activeWinner.getId());
-        war.setDeployedActiveAttacker(winnerPower);
-        war.setDeployedActiveDefender(0);
-        war.setDeployedReserveDefender(ColonyMilitaryService.computeReserveMilitaryPower(reserveTarget));
         war.setStagePhase(GameConstants.WAR_STAGE_RESERVE_ASSAULT);
+        WarCreatureCombatService.clear(war);
+        WarCreatureCombatService.startHexBattle(war, activeWinner, reserveTarget);
     }
 
     private static void resolveReserveAssaultHour(World world, WarService warService, War war,
             Dynasty aggressor, Dynasty defender, Dynasty stageAttacker, Dynasty stageDefender, Colony contested) {
-        int attackerPower = war.getDeployedActiveAttacker();
-        int reservePower = war.getDeployedReserveDefender();
-        if (attackerPower <= 0 && reservePower <= 0) {
-            beginActiveClash(world, war, aggressor, defender);
-            return;
+        if (!WarCreatureCombatService.hasLivingCombatants(war)) {
+            WarCreatureCombatService.clear(war);
+            WarCreatureCombatService.startHexBattle(war, stageAttacker, contested);
         }
-
-        int effectiveReservePower = GameNumbers.warHexDefenseEffectivePower(reservePower);
-        BattleTickResult result = resolveBattleTick(attackerPower, effectiveReservePower);
-        int actualReserveLoss = GameNumbers.warHexDefenseEffectiveLossToActual(result.defenderLoss);
-        war.setDeployedActiveAttacker(Math.max(0, attackerPower - result.attackerLoss));
-        war.setDeployedReserveDefender(Math.max(0, reservePower - actualReserveLoss));
-
-        applyActivePoolLoss(stageAttacker, result.attackerLoss);
-        applyReservePoolLoss(contested, actualReserveLoss);
+        WarCreatureCombatService.TickOutcome outcome = WarCreatureCombatService.tick(war);
         ColonyMilitaryService.refreshColonyMilitaryPower(contested);
         ColonyMilitaryService.refreshDynastyMilitaryPower(stageAttacker);
         ColonyMilitaryService.refreshDynastyMilitaryPower(stageDefender);
 
-        war.setStageProgress(Math.min(1f, war.getStageProgress() + GameNumbers.WAR_STAGE_PROGRESS_PER_HOUR));
-        war.recomputeProgressPercent();
-
-        if (isStageReadyToResolve(war)
-                && (war.getDeployedReserveDefender() <= 0 || !colonyHasQueenDefense(contested))) {
+        if (outcome == WarCreatureCombatService.TickOutcome.ATTACKER_WINS) {
+            WarCreatureCombatService.clear(war);
             completeStage(world, warService, war, aggressor, defender, stageAttacker,
-                    contested.getDynasty(), contested, false, false);
-            return;
-        }
-        if (war.getDeployedActiveAttacker() <= 0) {
+                    contested.getDynasty(), contested, false, true);
+        } else if (outcome == WarCreatureCombatService.TickOutcome.DEFENDER_WINS) {
+            WarCreatureCombatService.clear(war);
             enterRedeploying(world, war, aggressor, defender);
         }
     }
@@ -379,6 +450,7 @@ public final class WarProgressService {
         }
         Dynasty victor = attackerRetreat ? stageDefender : stageAttacker;
         Dynasty hexOwner = contested.getDynasty();
+        WarCreatureCombatService.clear(war);
         boolean captured = !attackerRetreat && victor.getId() == stageAttacker.getId()
                 && hexOwner != null && hexOwner != victor;
         boolean contestedWasCapital = captured && contested.isCapital();
@@ -432,11 +504,14 @@ public final class WarProgressService {
     }
 
     private static void enterRedeploying(World world, War war, Dynasty aggressor, Dynasty defender) {
+        WarCreatureCombatService.clear(war);
         war.setStagePhase(GameConstants.WAR_STAGE_REDEPLOYING);
         war.setRedeployHoursRemaining(GameNumbers.WAR_REDEPLOY_HOURS);
         war.setDeployedActiveAttacker(0);
         war.setDeployedActiveDefender(0);
         war.setDeployedReserveDefender(0);
+        WarCombatSkillService.applyRedeployRegen(aggressor);
+        WarCombatSkillService.applyRedeployRegen(defender);
         ColonyMilitaryService.refreshDynastyMilitaryPower(aggressor);
         ColonyMilitaryService.refreshDynastyMilitaryPower(defender);
         war.setStageStartActiveAggressor(ColonyMilitaryService.powerForWarStanding(aggressor));
@@ -477,18 +552,17 @@ public final class WarProgressService {
         ColonyMilitaryService.refreshDynastyMilitaryPower(stageAttacker);
         ColonyMilitaryService.refreshDynastyMilitaryPower(stageDefender);
 
-        if (DynastyDiplomacyService.countAssignedActiveMilitaryRoles(stageDefender) <= 0) {
+        if (countAssignedBorderBattleRoles(stageDefender) <= 0) {
             beginDirectReserveAssault(world, war, stageAttacker, stageDefender, contested);
             return;
         }
 
         war.setStagePhase(GameConstants.WAR_STAGE_ACTIVE_CLASH);
         war.setRedeployHoursRemaining(0);
-        war.setDeployedActiveAttacker(ColonyMilitaryService.powerForWarStanding(stageAttacker));
-        war.setDeployedActiveDefender(ColonyMilitaryService.powerForWarStanding(stageDefender));
-        war.setDeployedReserveDefender(0);
         war.setStageStartActiveAggressor(ColonyMilitaryService.powerForWarStanding(aggressor));
         war.setStageStartActiveDefender(ColonyMilitaryService.powerForWarStanding(defender));
+        WarCreatureCombatService.clear(war);
+        WarCreatureCombatService.startBorderBattle(war, stageAttacker, stageDefender);
     }
 
     private static void beginDirectReserveAssault(World world, War war, Dynasty stageAttacker,
@@ -501,13 +575,12 @@ public final class WarProgressService {
         war.setRedeployHoursRemaining(0);
         war.setStageAttackerDynastyId(stageAttacker.getId());
         war.setContestedColonyId(contested.getId());
-        war.setDeployedActiveAttacker(Math.max(0, ColonyMilitaryService.powerForWarStanding(stageAttacker)));
-        war.setDeployedActiveDefender(0);
-        war.setDeployedReserveDefender(ColonyMilitaryService.computeReserveMilitaryPower(contested));
         war.setStageStartActiveAggressor(ColonyMilitaryService.powerForWarStanding(
                 world.findDynastyById(war.getAggressorDynastyId())));
         war.setStageStartActiveDefender(ColonyMilitaryService.powerForWarStanding(
                 world.findDynastyById(war.getDefenderDynastyId())));
+        WarCreatureCombatService.clear(war);
+        WarCreatureCombatService.startHexBattle(war, stageAttacker, contested);
     }
 
     private static void reassignContestedColony(World world, War war, Dynasty aggressor, Dynasty defender) {
@@ -603,7 +676,21 @@ public final class WarProgressService {
             return false;
         }
         return !colony.getQueens().isEmpty()
-                && ColonyMilitaryService.computeReserveMilitaryPower(colony) > 0;
+                && ColonyMilitaryService.computeHexDefenseMilitaryPower(colony) > 0;
+    }
+
+    private static int countAssignedBorderBattleRoles(Dynasty dynasty) {
+        if (dynasty == null) {
+            return 0;
+        }
+        int assigned = 0;
+        for (Colony colony : dynasty.getColonies()) {
+            Map<AntRole, Integer> counts = colony.getWarAssignedRoleCounts();
+            for (AntRole role : GameConstants.getBorderBattleRoles()) {
+                assigned += counts.getOrDefault(role, 0);
+            }
+        }
+        return assigned;
     }
 
     private static boolean isAdjacentToDynasty(Hex hex, Dynasty dynasty) {
@@ -692,16 +779,67 @@ public final class WarProgressService {
         }
     }
 
+    /** Hex-assault attacker losses hit border roles and Siege proportionally by base power. */
+    private static void applyHexAssaultAttackerLoss(Dynasty dynasty, int powerLoss) {
+        if (dynasty == null || powerLoss <= 0) {
+            return;
+        }
+        int siegePower = ColonyMilitaryService.computeSiegeAssaultPower(dynasty);
+        int borderPower = ColonyMilitaryService.powerForWarStanding(dynasty);
+        int total = siegePower + borderPower;
+        if (total <= 0) {
+            return;
+        }
+        int siegeLoss = Math.min(siegePower,
+                (int) Math.round(powerLoss * (siegePower / (double) total)));
+        int borderLoss = Math.max(0, powerLoss - siegeLoss);
+        if (borderLoss > 0) {
+            applyActivePoolLoss(dynasty, borderLoss);
+        }
+        if (siegeLoss > 0) {
+            reduceSiegeAssaultPower(dynasty, siegeLoss);
+        }
+    }
+
+    private static void reduceSiegeAssaultPower(Dynasty dynasty, int powerLoss) {
+        if (dynasty == null || powerLoss <= 0) {
+            return;
+        }
+        int remaining = powerLoss;
+        for (Colony colony : dynasty.getColonies()) {
+            if (remaining <= 0) {
+                break;
+            }
+            int siegePower = ColonyMilitaryService.computeAssignedRolePower(colony, GameConstants.ROLE_SIEGE);
+            if (siegePower <= 0) {
+                continue;
+            }
+            int colonyLoss = Math.min(siegePower, remaining);
+            float mult = Math.max(0.01f, ColonyMilitaryService.computeStatMultiplier(colony));
+            int pointBudget = Math.round(colonyLoss / mult);
+            int roleWeight = GameConstants.getActiveMilitaryRoleWeight(GameConstants.ROLE_SIEGE);
+            if (roleWeight <= 0) {
+                roleWeight = GameConstants.getMilitaryWeightForAntType(GameConstants.TYPE_MAJOR);
+            }
+            int count = colony.getWarAssignedRoleCount(GameConstants.ROLE_SIEGE);
+            int remove = Math.min(count, (pointBudget + roleWeight - 1) / Math.max(1, roleWeight));
+            colony.setWarAssignedRoleCount(GameConstants.ROLE_SIEGE, Math.max(0, count - remove));
+            remaining -= Math.max(1, remove * roleWeight);
+            ColonyMilitaryService.refreshColonyMilitaryPower(colony);
+        }
+        ColonyMilitaryService.refreshDynastyMilitaryPower(dynasty);
+    }
+
     private static void applyReservePoolLoss(Colony colony, int powerLoss) {
         if (colony == null || powerLoss <= 0) {
             return;
         }
-        int reserve = ColonyMilitaryService.computeReserveMilitaryPower(colony);
-        if (reserve <= 0) {
+        int hexDefense = ColonyMilitaryService.computeHexDefenseMilitaryPower(colony);
+        if (hexDefense <= 0) {
             eliminateColonyQueens(colony);
             return;
         }
-        int remaining = Math.max(0, reserve - powerLoss);
+        int remaining = Math.max(0, hexDefense - powerLoss);
         if (remaining <= 0) {
             eliminateColonyQueens(colony);
         }
@@ -716,14 +854,14 @@ public final class WarProgressService {
         float mult = Math.max(0.01f, ColonyMilitaryService.computeStatMultiplier(colony));
         int pointBudget = Math.round(powerLoss / mult);
         int totalPoints = 0;
-        for (AntRole role : GameConstants.getActiveMilitaryRoles()) {
+        for (AntRole role : GameConstants.getBorderBattleRoles()) {
             totalPoints += counts.getOrDefault(role, 0) * GameConstants.getActiveMilitaryRoleWeight(role);
         }
         if (totalPoints <= 0) {
             return;
         }
         int remaining = pointBudget;
-        AntRole[] roles = GameConstants.getActiveMilitaryRoles();
+        AntRole[] roles = GameConstants.getBorderBattleRoles();
         for (int i = 0; i < roles.length && remaining > 0; i++) {
             AntRole role = roles[i];
             int count = counts.getOrDefault(role, 0);
@@ -746,24 +884,61 @@ public final class WarProgressService {
         if (colony == null || powerLoss <= 0) {
             return;
         }
-        int reserve = ColonyMilitaryService.computeReserveMilitaryPower(colony);
-        if (reserve <= powerLoss) {
+        int hexDefense = ColonyMilitaryService.computeHexDefenseMilitaryPower(colony);
+        if (hexDefense <= powerLoss) {
             eliminateColonyQueens(colony);
         }
         float mult = Math.max(0.01f, ColonyMilitaryService.computeStatMultiplier(colony));
         int pointBudget = Math.round(powerLoss / mult);
         int remaining = pointBudget;
 
-        remaining -= reduceAntList(colony.getSoldiers(), remaining,
-                GameConstants.TYPE_SOLDIER.getMilitaryWeight());
-        remaining -= reduceAntList(colony.getMajors(), remaining,
-                GameConstants.TYPE_MAJOR.getMilitaryWeight());
-        remaining -= reduceAntList(colony.getWorkers(), remaining,
-                GameConstants.TYPE_WORKER.getMilitaryWeight());
+        int shieldWeight = GameConstants.getActiveMilitaryRoleWeight(GameConstants.ROLE_DEFENDER);
+        if (shieldWeight <= 0) {
+            shieldWeight = GameConstants.getMilitaryWeightForAntType(GameConstants.TYPE_SOLDIER);
+        }
+        int shieldsToSacrifice = Math.min(
+                WarCombatSkillService.countShieldingDefenders(colony),
+                (remaining + shieldWeight - 1) / Math.max(1, shieldWeight));
+        int sacrificed = WarCombatSkillService.sacrificeShieldingDefenders(colony, shieldsToSacrifice);
+        remaining -= sacrificed * shieldWeight;
+
+        if (remaining > 0) {
+            remaining -= reduceHexDefenseOnlyRoleCounts(colony, remaining);
+        }
+        if (remaining > 0) {
+            remaining -= reduceAntList(colony.getSoldiers(), remaining,
+                    GameConstants.TYPE_SOLDIER.getMilitaryWeight());
+            remaining -= reduceAntList(colony.getMajors(), remaining,
+                    GameConstants.TYPE_MAJOR.getMilitaryWeight());
+            remaining -= reduceAntList(colony.getWorkers(), remaining,
+                    GameConstants.TYPE_WORKER.getMilitaryWeight());
+        }
         if (remaining > 0) {
             eliminateColonyQueens(colony);
         }
         ColonyMilitaryService.refreshColonyMilitaryPower(colony);
+    }
+
+    private static int reduceHexDefenseOnlyRoleCounts(Colony colony, int pointBudget) {
+        if (colony == null || pointBudget <= 0) {
+            return 0;
+        }
+        Map<AntRole, Integer> counts = colony.getWarAssignedRoleCounts();
+        int spent = 0;
+        for (AntRole role : GameConstants.getHexDefenseOnlyRoles()) {
+            if (spent >= pointBudget) {
+                break;
+            }
+            int count = counts.getOrDefault(role, 0);
+            if (count <= 0) {
+                continue;
+            }
+            int roleWeight = GameConstants.getActiveMilitaryRoleWeight(role);
+            int remove = Math.min(count, (pointBudget - spent + roleWeight - 1) / roleWeight);
+            counts.put(role, count - remove);
+            spent += remove * roleWeight;
+        }
+        return spent;
     }
 
     private static int reduceAntList(List<Ant> ants,
@@ -780,6 +955,10 @@ public final class WarProgressService {
 
     private static void eliminateColonyQueens(Colony colony) {
         if (colony == null || colony.getQueens() == null) {
+            return;
+        }
+        WarCombatSkillService.sacrificeShieldingDefenders(colony, Integer.MAX_VALUE);
+        if (WarCombatSkillService.countShieldingDefenders(colony) > 0) {
             return;
         }
         colony.getQueens().clear();
@@ -841,6 +1020,17 @@ public final class WarProgressService {
                 LanguageStrings.WAR_STAGE_REDEPLOY_FMT,
                 hours,
                 next.getName());
+        notifyPlayerWarEvent(world, war, message);
+    }
+
+    private static void notifyPlayerWarHexBait(World world, War war, Dynasty withdrawer, Colony contested) {
+        if (world == null || war == null || withdrawer == null || contested == null) {
+            return;
+        }
+        String message = LanguageStrings.format(
+                LanguageStrings.WAR_STAGE_HEX_BAIT_FMT,
+                withdrawer.getName(),
+                contested.getName());
         notifyPlayerWarEvent(world, war, message);
     }
 

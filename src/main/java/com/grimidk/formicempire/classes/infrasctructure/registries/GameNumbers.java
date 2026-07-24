@@ -103,8 +103,10 @@ public final class GameNumbers {
     /** Defense is percent damage reduction; always clamp to this range. */
     public static final float DEFENSE_PERCENT_MIN = 0f;
     public static final float DEFENSE_PERCENT_MAX = 100f;
-    /** Colony skeleton regen baseline: percent of max HP recovered per tick. */
+    /** Colony skeleton regen baseline: percent of max HP recovered per redeploy. */
     public static final int ANT_REGEN_PERCENT_BASE = 10;
+    /** Multiplier applied to redeploy regen when Boost Regen was used in the prior stage. */
+    public static final float BOOST_REGEN_NEXT_REDEPLOY_MULT = 2f;
     public static final int MILITARY_BASELINE_ATTACK_SPEED = 1;
     /** Each venom assimilation adds this fraction to colony attack (0.5 = +50%). */
     public static final float ASSIMILATED_DAMAGE_ADD_FIRE = 0.5f;
@@ -139,13 +141,32 @@ public final class GameNumbers {
     public static final float WAR_STAGE_PROGRESS_PER_HOUR = 0.13f;
     public static final float WAR_STAGE_PROGRESS_PER_DAY = WAR_STAGE_PROGRESS_PER_HOUR * 24f;
     public static final int WAR_REDEPLOY_HOURS = 24;
-    /** Hex defenders fight at +50% effective military power during local reserve/hex defense. */
-    public static final float WAR_HEX_DEFENSE_POWER_MULTIPLIER = 1.5f;
+    /**
+     * Hex-defense attack/defense multipliers (creature combat + effective power).
+     * Defense after multiply is clamped to {@link #DEFENSE_PERCENT_MAX}.
+     */
+    public static final float WAR_HEX_DEFENDING_STAT_MULT = 1.5f;
+    public static final float WAR_HEX_DEFENDER_ROLE_STAT_MULT = 3f;
+    public static final float WAR_HEX_SIEGE_ATTACKER_STAT_MULT = 3f;
+    public static final float WAR_HEX_ATTACKER_STAT_MULT = 1f;
+    /** @deprecated Prefer {@link #WAR_HEX_DEFENDING_STAT_MULT}; kept for call sites using flat reserve power. */
+    public static final float WAR_HEX_DEFENSE_POWER_MULTIPLIER = WAR_HEX_DEFENDING_STAT_MULT;
     public static final float WAR_AI_FALLBACK_MAX_POWER_RATIO = 1f;
     public static final float WAR_AI_FALLBACK_RECOVERY_RATIO = 0.75f;
     public static final int WAR_AI_FALLBACK_MIN_ACTIVE = 500;
     public static final int WAR_AI_FALLBACK_MIN_SPARE_COLONIES = 3;
     public static final double AI_WAR_FALLBACK_CHANCE = 0.06;
+    /**
+     * NPC chance per clash hour to withdraw from border into hex defense when local odds look better
+     * (bait / counterattack setup).
+     */
+    public static final double AI_WAR_HEX_BAIT_CHANCE = 0.14;
+    /** Hex effective defense must beat assault by at least this ratio to consider baiting. */
+    public static final float WAR_AI_HEX_BAIT_MIN_HEX_ODDS = 1.05f;
+    /** Hex odds must improve on border odds by at least this factor (hexOdds >= borderOdds * factor). */
+    public static final float WAR_AI_HEX_BAIT_ODDS_IMPROVEMENT = 1.2f;
+    /** Border clash: side loses when this fraction of its starting army (active+reserve) is dead. */
+    public static final float WAR_BATTLE_ARMY_DEFEAT_RATIO = 0.9f;
 
     /** Dynasty combat capacity (scaffold for future deployment limits). */
     public static final int COMBAT_CAPACITY_BASE = 1000;
@@ -263,17 +284,68 @@ public final class GameNumbers {
     }
 
     public static int warHexDefenseEffectivePower(int baseReservePower) {
-        if (baseReservePower <= 0) {
-            return 0;
+        return warHexDefenseEffectiveDefenderPower(baseReservePower, 0);
+    }
+
+    /**
+     * Effective defending power in hex defense: standard defending ants at
+     * {@link #WAR_HEX_DEFENDING_STAT_MULT}, Defender role at {@link #WAR_HEX_DEFENDER_ROLE_STAT_MULT}.
+     */
+    public static int warHexDefenseEffectiveDefenderPower(int standardDefendingPower, int defenderRolePower) {
+        int standard = Math.max(0, standardDefendingPower);
+        int defenders = Math.max(0, defenderRolePower);
+        long effective = Math.round(standard * (double) WAR_HEX_DEFENDING_STAT_MULT)
+                + Math.round(defenders * (double) WAR_HEX_DEFENDER_ROLE_STAT_MULT);
+        if (effective <= 0 && (standard > 0 || defenders > 0)) {
+            return 1;
         }
-        return Math.max(1, Math.round(baseReservePower * WAR_HEX_DEFENSE_POWER_MULTIPLIER));
+        return (int) Math.min(Integer.MAX_VALUE, Math.max(0, effective));
+    }
+
+    /**
+     * Effective attacker power in hex assault: non-siege at {@link #WAR_HEX_ATTACKER_STAT_MULT},
+     * Siege at {@link #WAR_HEX_SIEGE_ATTACKER_STAT_MULT}.
+     */
+    public static int warHexAssaultEffectiveAttackerPower(int nonSiegePower, int siegePower) {
+        int nonSiege = Math.max(0, nonSiegePower);
+        int siege = Math.max(0, siegePower);
+        long effective = Math.round(nonSiege * (double) WAR_HEX_ATTACKER_STAT_MULT)
+                + Math.round(siege * (double) WAR_HEX_SIEGE_ATTACKER_STAT_MULT);
+        return (int) Math.min(Integer.MAX_VALUE, Math.max(0, effective));
     }
 
     public static int warHexDefenseEffectiveLossToActual(int effectiveLoss) {
-        if (effectiveLoss <= 0) {
+        return warHexDefenseEffectiveLossToActual(effectiveLoss, WAR_HEX_DEFENDING_STAT_MULT);
+    }
+
+    public static int warHexDefenseEffectiveLossToActual(int effectiveLoss, float averageMultiplier) {
+        if (effectiveLoss <= 0 || averageMultiplier <= 0f) {
             return 0;
         }
-        return Math.max(0, Math.round(effectiveLoss / WAR_HEX_DEFENSE_POWER_MULTIPLIER));
+        return Math.max(0, Math.round(effectiveLoss / averageMultiplier));
+    }
+
+    public static int warHexDefenseEffectiveLossToActual(int effectiveLoss, int basePower, int effectivePower) {
+        if (effectiveLoss <= 0 || basePower <= 0 || effectivePower <= 0) {
+            return 0;
+        }
+        return Math.max(0, Math.round(effectiveLoss * (basePower / (float) effectivePower)));
+    }
+
+    /** Hex-defense attack after role/side multiplier (no cap). */
+    public static float applyHexDefenseAttack(float baseAttack, float statMult) {
+        if (baseAttack <= 0f || statMult <= 0f) {
+            return 0f;
+        }
+        return baseAttack * statMult;
+    }
+
+    /** Hex-defense defense % after multiplier, clamped to {@link #DEFENSE_PERCENT_MAX}. */
+    public static float applyHexDefenseDefense(float baseDefensePercent, float statMult) {
+        if (statMult <= 0f) {
+            return clampDefensePercent(0f);
+        }
+        return clampDefensePercent(baseDefensePercent * statMult);
     }
 
     public static int clampDiplomaticReputation(int score) {

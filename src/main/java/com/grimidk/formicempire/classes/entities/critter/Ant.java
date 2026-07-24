@@ -27,6 +27,10 @@ public class Ant extends Critter {
     private boolean isOnTrade;
     private boolean isNuptial;
     private boolean parasiticMiteInfected;
+    /** Next redeploy heals with Boost Regen multiplier when true. */
+    private boolean boostRegenPending;
+    /** When true, this defender absorbs hits that would otherwise hit queens. */
+    private boolean shieldingActive;
 
     public Ant(Colony colony, AntType type) {
         super(GameConstants.TYPE_ANT); 
@@ -95,6 +99,22 @@ public class Ant extends Critter {
     public boolean isParasiticMiteInfected() { return parasiticMiteInfected; }
     public void setParasiticMiteInfected(boolean parasiticMiteInfected) {
         this.parasiticMiteInfected = parasiticMiteInfected;
+    }
+
+    public boolean isBoostRegenPending() {
+        return boostRegenPending;
+    }
+
+    public void setBoostRegenPending(boolean boostRegenPending) {
+        this.boostRegenPending = boostRegenPending;
+    }
+
+    public boolean isShieldingActive() {
+        return shieldingActive;
+    }
+
+    public void setShieldingActive(boolean shieldingActive) {
+        this.shieldingActive = shieldingActive;
     }
 
     // --- Navigation Queue ---

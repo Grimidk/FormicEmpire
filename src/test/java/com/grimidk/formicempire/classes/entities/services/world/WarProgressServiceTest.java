@@ -78,6 +78,37 @@ class WarProgressServiceTest {
     }
 
     @Test
+    void withdrawToHexDefensePreservesArmiesAndOpensAssault() {
+        War war = world.getWarService().beginWar(aggressor, defender);
+        assertEquals(GameConstants.WAR_STAGE_ACTIVE_CLASH, war.getStagePhase());
+        assertTrue(WarProgressService.canWithdrawToHexDefense(world, war, defender));
+        assertFalse(WarProgressService.canWithdrawToHexDefense(world, war, aggressor));
+
+        int defenderWarriors = defender.getColonies().get(0).getWarAssignedRoleCount(GameConstants.ROLE_WARRIOR);
+        assertTrue(world.getWarService().withdrawToHexDefense(war, defender));
+
+        assertEquals(GameConstants.WAR_STAGE_RESERVE_ASSAULT, war.getStagePhase());
+        assertEquals(0, war.getDeployedActiveDefender());
+        assertTrue(war.getDeployedActiveAttacker() > 0);
+        assertTrue(war.getDeployedReserveDefender() > 0);
+        assertEquals(defenderWarriors,
+                defender.getColonies().get(0).getWarAssignedRoleCount(GameConstants.ROLE_WARRIOR));
+        assertEquals(aggressor.getId(), war.getStageAttackerDynastyId());
+    }
+
+    @Test
+    void aiHexBaitRejectedWhenAlreadyWinningBorderClash() {
+        War war = world.getWarService().beginWar(aggressor, defender);
+        Colony contested = defender.getColonies().get(0);
+        war.setDeployedActiveAttacker(100);
+        war.setDeployedActiveDefender(10_000);
+        ColonyMilitaryService.refreshColonyMilitaryPower(contested);
+        ColonyMilitaryService.refreshDynastyMilitaryPower(aggressor);
+
+        assertFalse(WarProgressService.canAiHexBait(world, war, defender, aggressor, contested));
+    }
+
+    @Test
     void forfeitStageAdvancesOpponentWithoutBattle() {
         World wideWorld = buildThreeHexWorld();
         War war = wideWorld.getWarService().beginWar(aggressor, defender);

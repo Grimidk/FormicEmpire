@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 80% (257/320 checked)
+Completion: 76% (251/330 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -193,6 +193,7 @@ Worker roles:
 
 Soldier roles:
 [X] Hunter, Warrior, Police, Catcher
+[ ] Bomber (unlocked by Exploding Ant / Selfdestruct assimilation; war-economy active military)
 
 Major roles:
 [X] Brute, Crane
@@ -225,10 +226,13 @@ Stat upgrades (RP tiers):
 [X] Policing 1–3, Hex Sustain, Worker Speed 2
 
 Assimilated species passives (research tree):
-[X] Farming, Multiqueen, Trapjaw, Honeypot, Doorhead, Woodburrow
-[X] Silkweave, Rafting, Firevenom, Jumping, Gliding, Stinging
-[ ] Swarming, Stealth, Fastbite (ants 1→2; soldiers/majors 2→4), Heatresist, Deadlyvenom, Selfdestruct
-[X] Farsight, Hivebuild, Locsense
+[ ] Farming, Multiqueen, Trapjaw (Powerful Bite; infantry attack), Woodburrow
+[ ] Honeypot (Potter role + Boost Regen), Doorhead (Defender role + Shielding)
+[ ] Silkweave, Rafting, Firevenom, Jumping, Gliding, Stinging (Stinging skill; infantry attack)
+[ ] Swarming, Stealth, Fastbite (ants 1→2; soldiers/majors 2→4), Heatresist, Deadlyvenom
+[ ] Selfdestruct (Bomber role + Selfdestruct skill 500%/90%/5 targets; ant dies)
+[ ] Farsight (Far Sight head subtype: +15% accuracy to all skills, capped at 100%)
+[X] Hivebuild, Locsense
 [ ] Acidspit (Green Ant — unlocks Acid Spitting skill)
 
 [X] Insufficient RP blocks purchase with message
@@ -267,7 +271,7 @@ Start / progress assimilations (RP + time). Target RP cost scales +25% per compl
 [ ] Acidspit (Green Ant)
 
 [X] Assimilation RP target cost scales +25% per completed assimilation (5th = 200% base)
-[X] Completed assimilation unlocks hatch subtypes (trapjaw, honeypot, doorhead, stinger); other passives still pending
+[ ] Completed assimilation unlocks hatch subtypes (trapjaw, honeypot, doorhead, stinger, farsight); other passives still pending
 
 ================================================================================
 13. SYNERGIES (O) — UpgradeDialog Synergy tab
@@ -276,6 +280,7 @@ Start / progress assimilations (RP + time). Target RP cost scales +25% per compl
 [X] Popup when synergy conditions are fully met
 [ ] Super Venom replaces Fire + Neurotoxic +50% each with +200% attack (3x total)
 [ ] Acid Artillery (Acid Spit + Major) unlocks Artillery role and Acid Artillery skill
+[ ] Corrosive Bombs (Selfdestruct + Acid Spit) replaces Bomber Selfdestruct with Acidic Selfdestruct (1000%/7 targets)
 [X] Synergy effects apply to colony / dynasty stats
 
 ================================================================================
@@ -357,7 +362,7 @@ Per foreign dynasty Actions menu:
 [X] View battle — opens WarBattleDialog (hour-tick battle animation)
 [X] Battle view updates each hour while open
 [ ] War standing / stage progression over time
-[ ] War stage progress: +13% per hour; hex capture when stage bar fills (plus 24h redeploy between stages)
+[ ] Creature combat: border clash resolves by ~90% army casualties (active + reserves); hex assault by last queen; combat capacity per battle line + reserves; battle view shows active/reserve
 [ ] Battle won/lost popup when a war stage resolves
 [ ] War role economy in role dialogs (wartime quotas + subtype allows; copy from peacetime)
 
@@ -403,17 +408,16 @@ In-game tutorial dialog (on new game + ESC > Tutorial):
 
 Help encyclopedia (main menu Help):
 [X] Tutorials — Welcome, Getting Started, Dynasty, Hotkeys
-[X] Species reference
+[ ] Ant Species (assimilation name, icon, description; representative castes / subtypes)
 [X] Ant types
 [X] Ant subtypes (Help > Ant Types tab, right column)
-[X] Bugs / threats
+[ ] Critter Species
 [X] Ant roles
 [ ] Dynasty tab (ranks, tiers, trade, loyalty, military, reputation)
 [X] Upgrades list (all GameUnlocks upgrades)
 [X] Buildings list
-[X] Assimilations list
 [X] Synergies list (Help > Synergies — Super Venom and future combos)
-[ ] Combat (Help > Combat — skills, battle lines, war phases / standing)
+[ ] Combat (Help > Combat — creature battles, skills, battle lines, capacity/reserves, war phases)
 [X] World / biomes / hexes
 [X] UI controls (Help > UI Controls tab — speed bar and icons)
 
@@ -475,8 +479,14 @@ World:
 
 Combat:
 [X] Colony military power calculation
-[ ] War skips active clash when defender has no assigned active military roles (hex defense)
-[ ] Hex defense: local reserve defenders fight at +50% effective military power
+[ ] War skips active clash when defender has no border-battle active roles (goes to hex defense)
+[ ] Hex defense: contested colony fields all local ants; attackers use dynasty-wide border-active + dynasty Siege (Defenders never assault)
+[ ] Hex defense mults: defending ants 1.5x attack/defense; Defender role 3x; Siege attackers 3x; other attackers 1x; defense capped at 100%
+[ ] Withdraw to hex defense during border clash (preserve army; NPC bait when hex odds look better); Fallback still forfeits the stage
+[ ] Redeploy: ants heal regen% of max HP; Boost Regen doubles next redeploy heal (Potter / Honeypot)
+[ ] Shielding: doorhead Defenders absorb queen losses in hex defense until dead
+[ ] Defender and Siege are active military but only fight in hex defense (not border clash)
+[ ] Honeypot unlocks Potter (honeypot workers only); Doorhead unlocks Defender (doorhead soldiers only)
 [X] Battle view stat multipliers vs standing multipliers
 
 ================================================================================

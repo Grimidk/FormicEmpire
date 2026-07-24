@@ -36,7 +36,7 @@ class AntSubtypeServiceTest {
     }
 
     @Test
-    void stingerAbdomenBoostsAntAttackByOnePointFive() {
+    void stingerAbdomenDoesNotBakeAttackIntoAntStats() {
         Dynasty dynasty = new Dynasty(1, "Test", true, GameConstants.SPECIES_OMNI);
         dynasty.unlockUpgrade(GameUnlocks.STAT_ACID);
         dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_STINGING);
@@ -49,7 +49,8 @@ class AntSubtypeServiceTest {
         ant.setSubtypeProfile(AntSubtypeProfile.of(1, 1, 2, 1));
         AntSubtypeService.applySubtypeStats(ant, colony);
 
-        assertEquals(Math.round(standard.getAttack() * 1.5f), ant.getAttack());
+        assertEquals(standard.getAttack(), ant.getAttack());
+        assertEquals(1.5f, AntSubtypeService.combinedAttackMult(AntSubtypeProfile.of(1, 1, 2, 1)), 0.0001f);
     }
 
     @Test
@@ -206,7 +207,10 @@ class AntSubtypeServiceTest {
     }
 
     @Test
-    void trapjawAndStingerCombinedAttackIsThreeTimesBase() {
+    void trapjawAndStingerCombinedAttackMultIsThree() {
+        AntSubtypeProfile profile = AntSubtypeProfile.of(2, 1, 2, 1);
+        assertEquals(3f, AntSubtypeService.combinedAttackMult(profile), 0.0001f);
+
         Dynasty dynasty = new Dynasty(11, "D", true, GameConstants.SPECIES_OMNI);
         dynasty.unlockUpgrade(GameUnlocks.STAT_ACID);
         dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_TRAPJAW);
@@ -217,10 +221,10 @@ class AntSubtypeServiceTest {
         Ant baseline = new Ant(colony, GameConstants.TYPE_SOLDIER);
         AntSubtypeService.applySubtypeStats(baseline, colony);
         Ant combo = new Ant(colony, GameConstants.TYPE_SOLDIER);
-        combo.setSubtypeProfile(AntSubtypeProfile.of(2, 1, 2, 1));
+        combo.setSubtypeProfile(profile);
         AntSubtypeService.applySubtypeStats(combo, colony);
 
-        assertEquals(baseline.getAttack() * 3, combo.getAttack());
+        assertEquals(baseline.getAttack(), combo.getAttack());
     }
 
     @Test

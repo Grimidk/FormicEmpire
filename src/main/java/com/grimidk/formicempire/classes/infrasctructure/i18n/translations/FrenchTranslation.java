@@ -230,6 +230,9 @@ public class FrenchTranslation implements Translation {
         fr.put("SYNERGY_ACID_ARTILLERY", "Artillerie acide");
         fr.put("SYNERGY_ACID_ARTILLERY_FLAVOR", "Obusiers vivants");
         fr.put("SYNERGY_ACID_ARTILLERY_DESC", "Débloque le rôle Artillerie pour les majores. Les majores d'artillerie gagnent la compétence Artillerie acide (500 % dégâts, 50 % précision). Nécessite l'assimilation Crachat d'acide et des fourmis Majores.");
+        fr.put("SYNERGY_CORROSIVE_BOMBS", "Bombes corrosives");
+        fr.put("SYNERGY_CORROSIVE_BOMBS_FLAVOR", "Sacrifice acide");
+        fr.put("SYNERGY_CORROSIVE_BOMBS_DESC", "Remplace Autodestruction des Bombardières par Autodestruction acide (1000 % dégâts, 90 % précision, 7 cibles ; la fourmi meurt). Nécessite les assimilations Autodestruction et Crachat d'acide.");
 
         fr.put("DIALOG_HATCH_RATES_TITLE", "Taux d'éclosion des nymphes");
         fr.put("HATCH_DESC", "Probabilité d'éclosion pour les nouvelles fourmis :");
@@ -243,11 +246,13 @@ public class FrenchTranslation implements Translation {
         fr.put("SUBTYPE_NOTHING", "Aucun");
         fr.put("SUBTYPE_HEAD_TRAPJAW", "Mâchoire-piège");
         fr.put("SUBTYPE_HEAD_DOORHEAD", "Tête-bouclier");
+        fr.put("SUBTYPE_HEAD_FARSIGHT", "Longue vue");
         fr.put("SUBTYPE_ABDOMEN_STINGER", "Dard");
         fr.put("SUBTYPE_ABDOMEN_HONEYPOT", "Honeypot");
-        fr.put("SUBTYPE_HEAD_TRAPJAW_DESC", "Tête mâchoire-piège : 1,5x attaque. S'additionne aux autres bonus d'attaque de sous-type (avec Dard : 3x au total, pas 2,25x).");
+        fr.put("SUBTYPE_HEAD_TRAPJAW_DESC", "Tête mâchoire-piège : 1,5x attaque sur les compétences d'infanterie. S'additionne aux autres bonus d'attaque de sous-type (avec Dard : 3x au total, pas 2,25x).");
         fr.put("SUBTYPE_HEAD_DOORHEAD_DESC", "Tête-bouclier : +20 % de défense.");
-        fr.put("SUBTYPE_ABDOMEN_STINGER_DESC", "Abdomen dard : 1,5x attaque. S'additionne aux autres bonus d'attaque de sous-type (avec Mâchoire-piège : 3x au total, pas 2,25x).");
+        fr.put("SUBTYPE_HEAD_FARSIGHT_DESC", "Tête Longue vue : +15 % de précision à toutes les compétences (plafond 100 %).");
+        fr.put("SUBTYPE_ABDOMEN_STINGER_DESC", "Abdomen dard : 1,5x attaque sur les compétences d'infanterie. S'additionne aux autres bonus d'attaque de sous-type (avec Mâchoire-piège : 3x au total, pas 2,25x).");
         fr.put("SUBTYPE_ABDOMEN_HONEYPOT_DESC", "Abdomen honeypot : 4x collecte et capacité de port ; 0,75x vitesse ; +15 % régénération.");
 
         fr.put("SKILL_BASIC_BITE", "Morsure basique");
@@ -257,6 +262,8 @@ public class FrenchTranslation implements Translation {
         fr.put("SKILL_BOOST_REGEN", "Régénération renforcée");
         fr.put("SKILL_ACID_SPITTING", "Crachat d'acide");
         fr.put("SKILL_ACID_ARTILLERY", "Artillerie acide");
+        fr.put("SKILL_SELFDESTRUCT", "Autodestruction");
+        fr.put("SKILL_ACIDIC_SELFDESTRUCT", "Autodestruction acide");
 
         fr.put("BATTLE_LINE_INFANTRY", "Infanterie");
         fr.put("BATTLE_LINE_ARTILLERY", "Artillerie");
@@ -521,7 +528,11 @@ public class FrenchTranslation implements Translation {
         fr.put("WAR_COL_PROGRESS", "Progression");
         fr.put("WAR_PROGRESS_FMT", "%s %%");
         fr.put("WAR_ACTION_FALLBACK", "Repli (abandonner l'étape)");
-        fr.put("WAR_FALLBACK_CONFIRM_FMT", "Abandonner l'étape en cours contre %s ? Vos forces se replient sans pertes.");
+        fr.put("WAR_FALLBACK_CONFIRM_FMT", "Abandonner l'étape en cours contre %s ? Vous cédez cet hexagone sans le combattre jusqu'au bout.");
+        fr.put("WAR_ACTION_WITHDRAW_HEX", "Se replier en défense d'hexagone");
+        fr.put("WAR_WITHDRAW_HEX_CONFIRM_FMT",
+                "Quitter l'affrontement frontalier à %s pour défendre l'hexagone chez vous ? Votre armée de frontière est préservée ; les défenseurs reçoivent les bonus de défense d'hexagone.");
+        fr.put("WAR_STAGE_HEX_BAIT_FMT", "%s s'est replié en défense d'hexagone à %s.");
         fr.put("WAR_STAGE_CAPTURED_FMT", "%1$s a capturé %2$s. Progrès de guerre : %3$s%%.");
         fr.put("WAR_STAGE_DEFENDER_HELD_FMT", "%1$s a tenu %2$s. Progrès de guerre : %3$s%%.");
         fr.put("WAR_STAGE_FORFEITED_FMT", "%1$s a remporté l'étape à %2$s après une retraite. Progrès de guerre : %3$s%%.");
@@ -595,7 +606,7 @@ public class FrenchTranslation implements Translation {
         fr.put("STAT_MILITARY_POWER", "Puissance militaire");
         fr.put("STAT_MILITARY_POWER_DESC", "Effectifs par type adulte pondérés par les stats de combat de base. En guerre, les rôles de guerre séparent la force active (première ligne) et de réserve. Mis à jour une fois par jour.");
         fr.put("STAT_COMBAT_CAPACITY", "Capacité de combat");
-        fr.put("STAT_COMBAT_CAPACITY_DESC", "Combien de combattants votre dynastie peut déployer. Commence à 1 000 ; assigner une Reine comme Commandante la porte à 2 500. Les limites de déploiement ne sont pas encore appliquées.");
+        fr.put("STAT_COMBAT_CAPACITY_DESC", "Combien de combattants votre dynastie peut déployer comme actifs par ligne de bataille. Commence à 1 000 ; assigner une Reine comme Commandante la porte à 2 500. Le surplus reste en réserve et rejoint la ligne quand des actifs tombent.");
         fr.put("STAT_ACTIVE_MILITARY_POWER", "Puissance militaire active");
         fr.put("STAT_RESERVE_MILITARY_POWER", "Puissance militaire de réserve");
         fr.put("DYNASTY_REPUTATION", "Réputation");
@@ -1245,15 +1256,15 @@ public class FrenchTranslation implements Translation {
         fr.put("SPECIES_GREEN", "Fourmi Verte");
         fr.put("SPECIES_GREEN_SCIENTIFIC", "Formica Rufa");
         fr.put("ASSIMILATED_TRAPJAW_FLAVOR", "Mâchoires à Ressort");
-        fr.put("ASSIMILATED_TRAPJAW_DESC", "Débloque le sous-type de tête Mâchoire-piège. Apporte 1,5x attaque ; s'empile par addition avec les autres bonus d'attaque de sous-type.");
+        fr.put("ASSIMILATED_TRAPJAW_DESC", "Débloque le sous-type de tête Mâchoire-piège. Apporte 1,5x attaque sur les compétences d'infanterie ; s'empile par addition avec les autres bonus d'attaque de sous-type. Accorde la compétence Morsure puissante (remplace Morsure basique).");
         fr.put("ASSIMILATION_TRAPJAW", "Assimilation fourmi piège-mâchoire");
         fr.put("ASSIMILATION_TRAPJAW_DESC", "Après assimilation du génome de la fourmi piège-mâchoire :");
         fr.put("ASSIMILATED_HONEYPOT_FLAVOR", "Pots de Miel Vivants");
-        fr.put("ASSIMILATED_HONEYPOT_DESC", "Débloque le sous-type d'abdomen Honeypot. Les butineuses honeypot collectent et portent 4x à 0,75x vitesse, et gagnent +15 % de régénération.");
+        fr.put("ASSIMILATED_HONEYPOT_DESC", "Débloque le sous-type d'abdomen Honeypot et le rôle Porteuse nourriture (Potter) pour les ouvrières avec ce sous-type. Les butineuses honeypot collectent et portent 4x à 0,75x vitesse, et gagnent +15 % de régénération. Accorde Régénération renforcée (double la guérison du prochain redéploiement).");
         fr.put("ASSIMILATION_HONEYPOT", "Assimilation fourmi pot-de-miel");
         fr.put("ASSIMILATION_HONEYPOT_DESC", "Après assimilation du génome de la fourmi pot-de-miel :");
         fr.put("ASSIMILATED_DOORHEAD_FLAVOR", "Bouchons Crâniens Blindés");
-        fr.put("ASSIMILATED_DOORHEAD_DESC", "Débloque le sous-type de tête Tête-bouclier. Les fourmis doorhead gagnent +20 % de défense.");
+        fr.put("ASSIMILATED_DOORHEAD_DESC", "Débloque le sous-type de tête Tête-bouclier et le rôle Défenseuse pour les soldates avec ce sous-type. Les fourmis doorhead gagnent +20 % de défense. Accorde Bouclier (les défenseuses absorbent les coups destinés aux reines en défense d'hexagone jusqu'à leur mort).");
         fr.put("ASSIMILATION_DOORHEAD", "Assimilation fourmi tête-porte");
         fr.put("ASSIMILATION_DOORHEAD_DESC", "Après assimilation du génome de la fourmi tête-porte :");
         fr.put("ASSIMILATED_WOODBURROW_FLAVOR", "Excavation du Bois");
@@ -1281,7 +1292,7 @@ public class FrenchTranslation implements Translation {
         fr.put("ASSIMILATION_GLIDING", "Assimilation fourmi planante");
         fr.put("ASSIMILATION_GLIDING_DESC", "Après assimilation du génome de la fourmi planante :");
         fr.put("ASSIMILATED_STINGING_FLAVOR", "Piqûre Excruciante");
-        fr.put("ASSIMILATED_STINGING_DESC", "Débloque le sous-type d'abdomen Dard. Apporte 1,5x attaque ; s'empile par addition (Mâchoire-piège + Dard = 3x, pas 2,25x).");
+        fr.put("ASSIMILATED_STINGING_DESC", "Débloque le sous-type d'abdomen Dard. Apporte 1,5x attaque sur les compétences d'infanterie ; s'empile par addition (Mâchoire-piège + Dard = 3x, pas 2,25x). Accorde la compétence Piqûre.");
         fr.put("ASSIMILATION_STINGING", "Assimilation fourmi piqueuse");
         fr.put("ASSIMILATION_STINGING_DESC", "Après assimilation du génome de la fourmi piqueuse :");
         fr.put("ASSIMILATED_SWARMING_FLAVOR", "Essaims de Raid");
@@ -1305,11 +1316,11 @@ public class FrenchTranslation implements Translation {
         fr.put("ASSIMILATION_DEADLYVENOM", "Assimilation venin neurotoxique");
         fr.put("ASSIMILATION_DEADLYVENOM_DESC", "Après assimilation de la génétique du venin neurotoxique :");
         fr.put("ASSIMILATED_SELFDESTRUCT_FLAVOR", "Défense Suicidaire");
-        fr.put("ASSIMILATED_SELFDESTRUCT_DESC", "Votre dynastie peut faire éclater des ouvrières spécialisées. (Mécanique en développement.)");
+        fr.put("ASSIMILATED_SELFDESTRUCT_DESC", "Débloque le rôle Bombardière et la compétence Autodestruction (500 % dégâts, 90 % précision, 5 cibles ; la fourmi meurt).");
         fr.put("ASSIMILATION_SELFDESTRUCT", "Assimilation fourmi explosive");
         fr.put("ASSIMILATION_SELFDESTRUCT_DESC", "Après assimilation du génome de la fourmi explosive :");
         fr.put("ASSIMILATED_FARSIGHT_FLAVOR", "Vision Exceptionnelle");
-        fr.put("ASSIMILATED_FARSIGHT_DESC", "Votre dynastie peut repérer proies et repères avec une vue aiguë. (Mécanique en développement.)");
+        fr.put("ASSIMILATED_FARSIGHT_DESC", "Débloque le sous-type de tête Longue vue. Équipé, +15 % de précision à toutes les compétences (plafond 100 %).");
         fr.put("ASSIMILATION_FARSIGHT", "Assimilation fourmi bulldog");
         fr.put("ASSIMILATION_FARSIGHT_DESC", "Après assimilation du génome de la fourmi bulldog :");
         fr.put("ASSIMILATED_HIVEBUILD_FLAVOR", "Construction de Nids en Carton");
@@ -1392,19 +1403,19 @@ public class FrenchTranslation implements Translation {
         fr.put("ROLE_MINER_DESC", "Permet d'extraire des minéraux du sol.");
         fr.put("ROLE_POTTER_UPGRADE", "Rôle porteuse nourriture");
         fr.put("ROLE_POTTER_FLAVOR", "Coup de main");
-        fr.put("ROLE_POTTER_DESC", "Permet de stocker et transporter de la nourriture aux autres fourmis.");
+        fr.put("ROLE_POTTER_DESC", "Permet aux ouvrières honeypot de stocker et transporter de la nourriture et d'utiliser Régénération renforcée en guerre. Débloqué par l'assimilation Honeypot ; nécessite le sous-type Honeypot.");
         fr.put("ROLE_WARRIOR_UPGRADE", "Rôle guerrière");
         fr.put("ROLE_WARRIOR_FLAVOR", "Formation phalange");
         fr.put("ROLE_WARRIOR_DESC", "Permet aux soldates de combattre en groupe.");
         fr.put("ROLE_DEFENDER_UPGRADE", "Rôle défenseuse");
         fr.put("ROLE_DEFENDER_FLAVOR", "Bouclier royal");
-        fr.put("ROLE_DEFENDER_DESC", "Permet aux soldates de protéger directement la reine.");
+        fr.put("ROLE_DEFENDER_DESC", "Permet aux soldates doorhead de protéger la reine en défense d'hexagone avec Bouclier. Débloqué par l'assimilation Doorhead ; nécessite le sous-type Doorhead. Ne combat pas aux affrontements frontaliers. En défense d'hexagone, les Défenseuses gagnent 3x attaque et défense (défense plafonnée à 100 %) ; les autres défenseurs gagnent 1,5x.");
         fr.put("ROLE_POLICE_UPGRADE", "Rôle police anti-fourmis parasites");
         fr.put("ROLE_POLICE_FLAVOR", "Brutalité policière");
         fr.put("ROLE_POLICE_DESC", "Permet de détecter les fourmis parasites déguisées ; 10% de chance par jour chacune.");
         fr.put("ROLE_BOMBER_UPGRADE", "Rôle bombardière");
         fr.put("ROLE_BOMBER_FLAVOR", "Fin explosive");
-        fr.put("ROLE_BOMBER_DESC", "Permet à certaines soldates d'exploser à la mort.");
+        fr.put("ROLE_BOMBER_DESC", "Permet aux soldates d'utiliser Autodestruction (ou Autodestruction acide avec Bombes corrosives). Débloqué par l'assimilation fourmi explosive.");
         fr.put("ROLE_BRUTE_UPGRADE", "Rôle brute");
         fr.put("ROLE_BRUTE_FLAVOR", "Troupe lourde");
         fr.put("ROLE_BRUTE_DESC", "Permet aux majores de devenir des menaces massives au combat.");
@@ -1416,7 +1427,7 @@ public class FrenchTranslation implements Translation {
         fr.put("ROLE_ARTILLERY_DESC", "Permet aux majores de cracher de l'acide à distance.");
         fr.put("ROLE_SIEGE_UPGRADE", "Rôle machine de siège");
         fr.put("ROLE_SIEGE_FLAVOR", "Technologie de siège");
-        fr.put("ROLE_SIEGE_DESC", "Permet aux majores de briser les défenses ennemies.");
+        fr.put("ROLE_SIEGE_DESC", "Permet aux majores de briser les défenses ennemies uniquement pendant l'assaut d'hexagone (pas aux affrontements frontaliers). Les machines de siège gagnent 3x attaque et défense en attaquant un hexagone (défense plafonnée à 100 %) ; les autres attaquants n'ont pas de bonus.");
         fr.put("ROLE_BREEDER_UPGRADE", "Rôles reproducteurs");
         fr.put("ROLE_BREEDER_FLAVOR", "Essaims nuptiaux");
         fr.put("ROLE_BREEDER_DESC", "Permet aux princesses et mâles d'essaimer pour de nouvelles colonies ou reines.");
@@ -1508,7 +1519,7 @@ public class FrenchTranslation implements Translation {
         fr.put("ABILITY_ABILITY_DESC", "Affiche le menu des capacités et les capacités actives.");
 
         fr.put("STAT_SKELETON_FLAVOR", "Exosquelettes de base");
-        fr.put("STAT_SKELETON_DESC", "Vitalité de base avant multiplicateurs de type : 100 PV et 10 % des PV max régénérés par tic. La défense dépend du type (majors et reines à 20 %).");
+        fr.put("STAT_SKELETON_DESC", "Vitalité de base avant multiplicateurs de type : 100 PV et 10 % des PV max régénérés à chaque redéploiement de guerre. La défense dépend du type (majors et reines à 20 %).");
         fr.put("STAT_ACID_FLAVOR", "Crachat acide");
         fr.put("STAT_ACID_DESC", "Attaque de base : 10 dégâts, 1 attaque/s, 1 vitesse.");
         fr.put("STAT_LONGEVITY_FLAVOR", "Longévité standard");
@@ -1595,11 +1606,11 @@ public class FrenchTranslation implements Translation {
         fr.put("ASSIMILATED_MULTIQUEEN_DESC", "Plusieurs reines dans une même colonie (nécessite d'améliorer la chambre royale).");
         fr.put("ASSIMILATED_MULTIQUEEN_DESC", "Plusieurs reines dans une même colonie (nécessite d'améliorer la chambre royale).");
         fr.put("ASSIMILATED_TRAPJAW_FLAVOR", "Mâchoires à Ressort");
-        fr.put("ASSIMILATED_TRAPJAW_DESC", "Débloque le sous-type de tête Mâchoire-piège. Apporte 1,5x attaque ; s'empile par addition avec les autres bonus d'attaque de sous-type.");
+        fr.put("ASSIMILATED_TRAPJAW_DESC", "Débloque le sous-type de tête Mâchoire-piège. Apporte 1,5x attaque sur les compétences d'infanterie ; s'empile par addition avec les autres bonus d'attaque de sous-type. Accorde la compétence Morsure puissante (remplace Morsure basique).");
         fr.put("ASSIMILATED_HONEYPOT_FLAVOR", "Pots de Miel Vivants");
-        fr.put("ASSIMILATED_HONEYPOT_DESC", "Débloque le sous-type d'abdomen Honeypot. Les butineuses honeypot collectent et portent 4x à 0,75x vitesse, et gagnent +15 % de régénération.");
+        fr.put("ASSIMILATED_HONEYPOT_DESC", "Débloque le sous-type d'abdomen Honeypot et le rôle Porteuse nourriture (Potter) pour les ouvrières avec ce sous-type. Les butineuses honeypot collectent et portent 4x à 0,75x vitesse, et gagnent +15 % de régénération. Accorde Régénération renforcée (double la guérison du prochain redéploiement).");
         fr.put("ASSIMILATED_DOORHEAD_FLAVOR", "Bouchons Crâniens Blindés");
-        fr.put("ASSIMILATED_DOORHEAD_DESC", "Débloque le sous-type de tête Tête-bouclier. Les fourmis doorhead gagnent +20 % de défense.");
+        fr.put("ASSIMILATED_DOORHEAD_DESC", "Débloque le sous-type de tête Tête-bouclier et le rôle Défenseuse pour les soldates avec ce sous-type. Les fourmis doorhead gagnent +20 % de défense. Accorde Bouclier (les défenseuses absorbent les coups destinés aux reines en défense d'hexagone jusqu'à leur mort).");
         fr.put("ASSIMILATED_WOODBURROW_FLAVOR", "Excavation du Bois");
         fr.put("ASSIMILATED_WOODBURROW_DESC", "Votre dynastie peut creuser et nicher dans le bois. (Mécanique en développement.)");
         fr.put("ASSIMILATED_SILKWEAVE_FLAVOR", "Tissage de Nids en Soie");
@@ -1613,7 +1624,7 @@ public class FrenchTranslation implements Translation {
         fr.put("ASSIMILATED_GLIDING_FLAVOR", "Planés Contrôlées");
         fr.put("ASSIMILATED_GLIDING_DESC", "Votre dynastie peut planer entre les arbres. (Mécanique en développement.)");
         fr.put("ASSIMILATED_STINGING_FLAVOR", "Piqûre Excruciante");
-        fr.put("ASSIMILATED_STINGING_DESC", "Débloque le sous-type d'abdomen Dard. Apporte 1,5x attaque ; s'empile par addition (Mâchoire-piège + Dard = 3x, pas 2,25x).");
+        fr.put("ASSIMILATED_STINGING_DESC", "Débloque le sous-type d'abdomen Dard. Apporte 1,5x attaque sur les compétences d'infanterie ; s'empile par addition (Mâchoire-piège + Dard = 3x, pas 2,25x). Accorde la compétence Piqûre.");
         fr.put("ASSIMILATED_SWARMING_FLAVOR", "Essaims de Raid");
         fr.put("ASSIMILATED_SWARMING_DESC", "Votre dynastie peut coordonner de vastes raids sans nid permanent. (Mécanique en développement.)");
         fr.put("ASSIMILATED_STEALTH_FLAVOR", "Infiltration Fantôme");
@@ -1625,9 +1636,9 @@ public class FrenchTranslation implements Translation {
         fr.put("ASSIMILATED_DEADLYVENOM_FLAVOR", "Venin neurotoxique");
         fr.put("ASSIMILATED_DEADLYVENOM_DESC", "Ajoute +50 % à l'attaque de base de la colonie. La synergie Super Venin avec le venin de feu remplace les deux +50 % par un bonus de +200 % (3x au total).");
         fr.put("ASSIMILATED_SELFDESTRUCT_FLAVOR", "Défense Suicidaire");
-        fr.put("ASSIMILATED_SELFDESTRUCT_DESC", "Votre dynastie peut faire éclater des ouvrières spécialisées. (Mécanique en développement.)");
+        fr.put("ASSIMILATED_SELFDESTRUCT_DESC", "Débloque le rôle Bombardière et la compétence Autodestruction (500 % dégâts, 90 % précision, 5 cibles ; la fourmi meurt).");
         fr.put("ASSIMILATED_FARSIGHT_FLAVOR", "Vision Exceptionnelle");
-        fr.put("ASSIMILATED_FARSIGHT_DESC", "Votre dynastie peut repérer proies et repères avec une vue aiguë. (Mécanique en développement.)");
+        fr.put("ASSIMILATED_FARSIGHT_DESC", "Débloque le sous-type de tête Longue vue. Équipé, +15 % de précision à toutes les compétences (plafond 100 %).");
         fr.put("ASSIMILATED_HIVEBUILD_FLAVOR", "Construction de Nids en Carton");
         fr.put("ASSIMILATED_HIVEBUILD_DESC", "Votre dynastie peut bâtir des nids durables en carton végétal. (Mécanique en développement.)");
         fr.put("ASSIMILATED_LOCSENSE_FLAVOR", "Intégration de Trajectoire");
@@ -1777,11 +1788,11 @@ public class FrenchTranslation implements Translation {
         fr.put("HELP_TAB_DYNASTY", "Dynastie");
         fr.put("HELP_TAB_HOTKEYS", "Raccourcis");
         fr.put("HELP_TAB_TUTORIALS", "Tutoriels");
-        fr.put("HELP_TAB_SPECIES", "Espèces");
+        fr.put("HELP_TAB_SPECIES", "Espèces de fourmis");
         fr.put("HELP_TAB_TYPES", "Types");
         fr.put("HELP_TAB_SUBTYPES", "Sous-types de fourmi");
         fr.put("HELP_SUBTYPES_INTRO", "Les traits assimilés de parties du corps peuvent apparaître sur les nouvelles éclosions. Réglez les probabilités par type de fourmi dans Taux d'éclosion (P). Chaque partie active du sous-type ajoute +50 % de consommation alimentaire.");
-        fr.put("HELP_TAB_BUGS", "Autres insectes");
+        fr.put("HELP_TAB_BUGS", "Espèces de créatures");
         fr.put("HELP_TAB_ANT_ROLES", "Rôles de Fourmi");
         fr.put("HELP_TAB_EMPIRE", "Dynastie");
         fr.put("HELP_TAB_UPGRADES", "Améliorations");
@@ -1789,22 +1800,29 @@ public class FrenchTranslation implements Translation {
         fr.put("HELP_TAB_ASSIMILATIONS", "Assimilations");
         fr.put("HELP_TAB_SYNERGIES", "Synergies");
         fr.put("HELP_TAB_COMBAT", "Combat");
-        fr.put("HELP_COMBAT_INTRO", "Le combat utilise des <b>compétences</b> (multiplicateurs de précision et de dégâts), des <b>lignes de bataille</b> (bandes de rôles et chances de toucher) et les <b>phases</b> / <b>position</b> de guerre pendant les campagnes.");
+        fr.put("HELP_COMBAT_INTRO", "Les batailles se résolvent créature contre créature chaque heure. Les fourmis actives (jusqu'à la capacité de combat par ligne) agissent avec des compétences ; les réserves comblent les pertes. La chance de toucher est précision de compétence × précision de ligne (plafonnée à 100 %). Les dégâts utilisent attaque × multiplicateur, réduits une fois par la défense %. L'affrontement frontalier se termine à ~90 % d'armée morte (réserves incluses) ; l'assaut d'hexagone, à la mort de la dernière reine défenderesse. Les reines sont toujours en ligne comme commandantes ; tant que des Défenseuses vivent, les attaques préfèrent les non-reines.");
         fr.put("HELP_COMBAT_SKILLS", "Compétences");
         fr.put("HELP_COMBAT_BATTLE_LINES", "Lignes de bataille");
         fr.put("HELP_COMBAT_WAR_PHASES", "Phases d'étape de guerre");
         fr.put("HELP_COMBAT_WAR_STANDING", "Position de guerre");
         fr.put("HELP_SKILL_ACCURACY_FMT", "Précision : %s");
         fr.put("HELP_SKILL_DAMAGE_FMT", "Dégâts : %s");
+        fr.put("HELP_SKILL_TARGETS_FMT", "Cibles : %s");
+        fr.put("HELP_SKILL_SACRIFICES_SELF", "La fourmi meurt en utilisant cette compétence.");
+        fr.put("HELP_SKILL_BATTLE_LINE_FMT", "Ligne de bataille : %s");
+        fr.put("HELP_SKILL_BOOST_REGEN_EFFECT",
+                "Soutien : double les PV soignés de cette fourmi au prochain redéploiement de guerre (% de régénération des PV max). Les Porteuses nourriture Honeypot l'utilisent automatiquement tant qu'il n'y a pas de choix de compétences en bataille.");
+        fr.put("HELP_SKILL_SHIELDING_EFFECT",
+                "Soutien : en défense d'hexagone, cette Défenseuse prend les pertes destinées aux reines jusqu'à sa mort. Les Défenseuses doorhead activent Bouclier au début de la défense d'hexagone.");
         fr.put("HELP_BATTLE_LINE_ACCURACY_FMT", "Précision de base : %s");
         fr.put("HELP_BATTLE_LINE_ROLES_FMT", "Rôles : %s");
         fr.put("HELP_BATTLE_LINE_ROLES_NONE", "Rôles : aucun pour l'instant");
-        fr.put("HELP_WAR_PHASE_CLASH_DESC", "Bataille d'ouverture à la frontière contestée entre les deux dynasties.");
-        fr.put("HELP_WAR_PHASE_RESERVE_DESC", "Assaut de siège contre une colonie après l'affrontement frontalier.");
+        fr.put("HELP_WAR_PHASE_CLASH_DESC", "Bataille créature contre créature à la frontière contestée. Chaque fourmi active dépense des actions en compétences d'attaque ou de soutien ; infanterie chaque heure, artillerie tous les 2 tics, air tous les 3. Victoire en battant ~90 % de l'armée ennemie (actifs + réserves).");
+        fr.put("HELP_WAR_PHASE_RESERVE_DESC", "Assaut de siège après l'affrontement frontalier. La colonie contestée aligne toutes ses fourmis locales (Défenseuses, Siège et reines commencent actives) ; les attaquants amènent le militaire frontalier dynastique plus le Siège dynastique (les Défenseuses ne quittent pas le nid). Bonus : défenseurs 1,5x attaque/défense (Défenseuses 3x) ; Siège attaquant 3x. La défense ne dépasse pas 100 %. Les attaquants gagnent en tuant la dernière reine.");
         fr.put("HELP_WAR_PHASE_REDEPLOY_DESC", "Les forces se déplacent vers la prochaine cible après une bataille.");
-        fr.put("HELP_WAR_STANDING_WINNING_DESC", "Votre camp mène la guerre en puissance de combat.");
-        fr.put("HELP_WAR_STANDING_LOSING_DESC", "L'ennemi mène la guerre en puissance de combat.");
-        fr.put("HELP_WAR_STANDING_EVEN_DESC", "Aucun camp n'a d'avantage clair en puissance de combat.");
+        fr.put("HELP_WAR_STANDING_WINNING_DESC", "Votre camp mène la guerre par progression d'étapes.");
+        fr.put("HELP_WAR_STANDING_LOSING_DESC", "L'ennemi mène la guerre par progression d'étapes.");
+        fr.put("HELP_WAR_STANDING_EVEN_DESC", "Aucun camp n'a d'avantage clair en progression d'étapes.");
         fr.put("HELP_TAB_WORLD", "Monde");
         fr.put("HELP_TAB_UI", "Contrôles de l'interface");
         fr.put("HELP_UI_INTRO", "Pendant une session de colonie, la barre en bas à droite règle la vitesse de simulation, la pause et ouvre le menu du jeu.");
@@ -1819,7 +1837,7 @@ public class FrenchTranslation implements Translation {
         fr.put("HELP_DYNASTY_INFO", "<b>Étendre la dynastie :</b><br>Avec les <b>reproductrices</b>, les essaims nuptiaux vous font progresser sur la <b>carte du monde (M)</b>.<br><i>Astuce : les éclipses déclenchent des essaims gratuits !</i><br><br><b>Menu dynastie :</b> ESC → sous-menu <b>Dynastie</b>, ou touches <b>A</b> Aperçu, <b>S</b> Commerce, <b>D</b> Diplomatie, <b>F</b> Guerres (réappuyer pour fermer).<br><br><b>Logistique et commerce :</b><br>Plusieurs colonies débloquent les <b>routes commerciales</b> dans l'onglet Commerce. Assignez des transporteuses et choisissez une méthode de convoi :<br>- <b>Terre :</b> convois terrestres standard.<br>- <b>Mer :</b> haute capacité entre colonies côtières.<br>- <b>Tunnel :</b> sûr et rapide ; tunnel terminé et rôles de tunnel requis.<br>- <b>Air :</b> rapide, faible capacité ; <b>transport aérien</b> (princesses).<br>- <b>Bilatéral :</b> fusionne les routes aller et retour.<br><br><b>Loyauté et diplomatie :</b><br>Chaque colonie a une <b>loyauté</b> envers votre dynastie (icônes dans Aperçu). Une faible loyauté bloque le commerce. Les autres dynasties ont une <b>réputation</b> et une posture diplomatique.<br><br><b>Guerre :</b><br>Déclarez la guerre depuis Diplomatie quand les deux camps ont des rôles militaires actifs. Suivez les campagnes dans <b>Guerres (F)</b> : progression, offres de paix et vue de bataille.<br><br><b>Étapes :</b><br>- <b>Colonisation de masse :</b> plus de limite de satellites.<br>- <b>Automatisation :</b> colonies PNJ autonomes.<br><br><b>Évolution :</b><br><b>Synergies</b> et <b>assimilations</b> pour combiner et absorber des traits.");
 
         fr.put("HELP_SPECIES_SCIENTIFIC", "Nom scientifique :");
-        fr.put("HELP_SPECIES_TRAITS", "Traits de base :");
+        fr.put("HELP_SPECIES_ASSIMILATION_FMT", "Assimilation : %s");
 
         fr.put("HELP_RESOURCE_SOURCE_SMALL", "Petit");
         fr.put("HELP_RESOURCE_SOURCE_MEDIUM", "Moyen");
@@ -2142,6 +2160,8 @@ public class FrenchTranslation implements Translation {
         fr.put("TRIGGER_SYNERGY_SUPER_VENOM_MSG", "%s est maintenant active ! Combiner %s remplace leurs +50 % séparés par un bonus d'attaque de +200 % (3x au total). Ouvrez Synergies (O) pour consulter.");
         fr.put("TRIGGER_SYNERGY_ACID_ARTILLERY_TITLE", "Synergie débloquée");
         fr.put("TRIGGER_SYNERGY_ACID_ARTILLERY_MSG", "%s est maintenant active ! Combiner %s débloque le rôle Artillerie pour les majores et la compétence Artillerie acide. Ouvrez Synergies (O) pour consulter.");
+        fr.put("TRIGGER_SYNERGY_CORROSIVE_BOMBS_TITLE", "Synergie débloquée");
+        fr.put("TRIGGER_SYNERGY_CORROSIVE_BOMBS_MSG", "%s est maintenant active ! Combiner %s améliore Autodestruction des Bombardières en Autodestruction acide. Ouvrez Synergies (O) pour consulter.");
         fr.put("TRIGGER_OPERATIONS_ABILITY_TITLE", "Opérations de colonie");
         fr.put("TRIGGER_OPERATIONS_ABILITY_MSG", "Vous avez obtenu une capacité active spéciale ! Vous pouvez maintenant accéder au menu Opérations de colonie en appuyant sur (Z).");
 

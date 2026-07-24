@@ -13,23 +13,31 @@ public class AntRole extends Constant {
     private final Set<AntSubtype> requiredSubtypes;
     private final Set<AntSubtype> forcedAllowedSubtypes;
     private final boolean isActiveMilitary;
+    /** Active military that only fight in hex defense, never border clash. */
+    private final boolean hexDefenseOnly;
 
     public AntRole(int id, AntType antType, String name, ImageIcon icon) {
-        this(id, antType, name, icon, Set.of(), Set.of(), false);
+        this(id, antType, name, icon, Set.of(), Set.of(), false, false);
     }
 
     public AntRole(int id, AntType antType, String name, ImageIcon icon, boolean isActiveMilitary) {
-        this(id, antType, name, icon, Set.of(), Set.of(), isActiveMilitary);
+        this(id, antType, name, icon, Set.of(), Set.of(), isActiveMilitary, false);
     }
 
     public AntRole(int id, AntType antType, String name, ImageIcon icon,
             Set<AntSubtype> requiredSubtypes, Set<AntSubtype> forcedAllowedSubtypes) {
-        this(id, antType, name, icon, requiredSubtypes, forcedAllowedSubtypes, false);
+        this(id, antType, name, icon, requiredSubtypes, forcedAllowedSubtypes, false, false);
     }
 
     public AntRole(int id, AntType antType, String name, ImageIcon icon,
             Set<AntSubtype> requiredSubtypes, Set<AntSubtype> forcedAllowedSubtypes,
             boolean isActiveMilitary) {
+        this(id, antType, name, icon, requiredSubtypes, forcedAllowedSubtypes, isActiveMilitary, false);
+    }
+
+    public AntRole(int id, AntType antType, String name, ImageIcon icon,
+            Set<AntSubtype> requiredSubtypes, Set<AntSubtype> forcedAllowedSubtypes,
+            boolean isActiveMilitary, boolean hexDefenseOnly) {
         super(id, name, icon);
         this.antType = antType;
         this.requiredSubtypes = copySubtypeSet(requiredSubtypes);
@@ -37,6 +45,7 @@ public class AntRole extends Constant {
         forced.addAll(this.requiredSubtypes);
         this.forcedAllowedSubtypes = Collections.unmodifiableSet(forced);
         this.isActiveMilitary = isActiveMilitary;
+        this.hexDefenseOnly = isActiveMilitary && hexDefenseOnly;
     }
 
     private static LinkedHashSet<AntSubtype> copySubtypeSet(Set<AntSubtype> source) {
@@ -77,6 +86,17 @@ public class AntRole extends Constant {
      */
     public boolean isActiveMilitary() {
         return isActiveMilitary;
+    }
+
+    /**
+     * Active military that only join hex defense (reserve assault), not frontier/border clash.
+     */
+    public boolean isHexDefenseOnly() {
+        return hexDefenseOnly;
+    }
+
+    public boolean participatesInBorderBattle() {
+        return isActiveMilitary && !hexDefenseOnly;
     }
 
     public boolean requiresSubtypes() {

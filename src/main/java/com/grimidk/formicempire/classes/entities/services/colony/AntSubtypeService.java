@@ -306,7 +306,8 @@ public final class AntSubtypeService {
         }
         ant.setRegen(Math.round(colony.getBaseRegen() * type.getRegenMult() * combinedRegenMult(profile)));
         ant.setConsumption(colony.getBaseConsumption() * type.getConsumptionMult() * consumptionMult(profile));
-        ant.setAttack((int) (colony.getBaseAttack() * type.getAttackMult() * combinedAttackMult(profile)));
+        // Subtype attack boosts apply to infantry skills only (see CritterSkillService.resolveSubtypeAttackMult).
+        ant.setAttack((int) (colony.getBaseAttack() * type.getAttackMult()));
         ant.setAttackSpeed((int) (colony.getBaseAttackSpeed() * type.getAttackSpeedMult()));
         ant.setDefense(GameNumbers.clampDefensePercent(
                 type.getDefenseMult() + combinedDefenseBonus(profile)));
@@ -325,6 +326,22 @@ public final class AntSubtypeService {
             hasAttackSubtype = true;
         }
         return hasAttackSubtype ? total : 1f;
+    }
+
+    /** Additive accuracy bonus from subtypes (e.g. Farsight +0.15). */
+    public static float combinedAccuracyBonus(AntSubtypeProfile profile) {
+        float total = 0f;
+        if (profile == null) {
+            return total;
+        }
+        for (AntSubtypeSlot slot : AntSubtypeSlot.values()) {
+            AntSubtype subtype = profile.getSubtype(slot);
+            if (subtype == null || subtype.isNone()) {
+                continue;
+            }
+            total += subtype.getAccuracyBonus();
+        }
+        return total;
     }
 
     /** Extra defense percent from subtypes (e.g. Doorhead +20). Neutral subtypes contribute 0. */
@@ -376,7 +393,7 @@ public final class AntSubtypeService {
         }
         AntSubtypeProfile resolved = profile != null ? profile : AntSubtypeProfile.standard();
         int hp = Math.max(0, Math.round(stats.getBaseHealth(colony) * type.getHealtMult() * combinedHealthMult(resolved)));
-        int atk = (int) (stats.getBaseAttack(colony) * type.getAttackMult() * combinedAttackMult(resolved));
+        int atk = (int) (stats.getBaseAttack(colony) * type.getAttackMult());
         int def = Math.round(GameNumbers.clampDefensePercent(
                 type.getDefenseMult() + combinedDefenseBonus(resolved)));
         int atkSpd = (int) (stats.getBaseAttackSpeed(colony) * type.getAttackSpeedMult());
@@ -398,7 +415,7 @@ public final class AntSubtypeService {
         }
         AntSubtypeProfile resolved = profile != null ? profile : AntSubtypeProfile.standard();
         int hp = Math.max(0, Math.round(baseHealth * type.getHealtMult() * combinedHealthMult(resolved)));
-        int atk = (int) (baseAttack * type.getAttackMult() * combinedAttackMult(resolved));
+        int atk = (int) (baseAttack * type.getAttackMult());
         int def = Math.round(GameNumbers.clampDefensePercent(
                 type.getDefenseMult() + combinedDefenseBonus(resolved)));
         int atkSpd = (int) (baseAttackSpeed * type.getAttackSpeedMult());
