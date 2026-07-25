@@ -22,8 +22,10 @@ class BattleLineTest {
                 GameConstants.getBattleLineForRole(GameConstants.ROLE_WARRIOR));
         assertEquals(GameConstants.BATTLE_LINE_INFANTRY,
                 GameConstants.getBattleLineForRole(GameConstants.ROLE_BOMBER));
-        assertEquals(GameConstants.BATTLE_LINE_INFANTRY,
+        assertEquals(GameConstants.BATTLE_LINE_ARTILLERY,
                 GameConstants.getBattleLineForRole(GameConstants.ROLE_POTTER));
+        assertEquals(GameConstants.BATTLE_LINE_ARTILLERY,
+                GameConstants.getBattleLineForRole(GameConstants.ROLE_COMMANDER));
         assertEquals(GameConstants.BATTLE_LINE_ARTILLERY,
                 GameConstants.getBattleLineForRole(GameConstants.ROLE_ARTILLERY));
         assertTrue(GameConstants.BATTLE_LINE_INFANTRY.allowsRole(GameConstants.ROLE_MILITIA));

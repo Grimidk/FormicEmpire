@@ -1197,9 +1197,6 @@ public final class LanguageStrings {
     public static final String DYNASTY_THEME_JET = "DYNASTY_THEME_JET";
     public static final String DYNASTY_THEME_TORNADO = "DYNASTY_THEME_TORNADO";
     public static final String DYNASTY_THEME_WIND = "DYNASTY_THEME_WIND";
-    public static final String DYNASTY_THEME_GLIDING = "DYNASTY_THEME_GLIDING";
-    public static final String DYNASTY_THEME_AIR = "DYNASTY_THEME_AIR";
-    public static final String DYNASTY_THEME_FLY = "DYNASTY_THEME_FLY";
     public static final String DYNASTY_THEME_BULLET = "DYNASTY_THEME_BULLET";
     public static final String DYNASTY_THEME_STING = "DYNASTY_THEME_STING";
     public static final String DYNASTY_THEME_PUNCH = "DYNASTY_THEME_PUNCH";
@@ -1862,12 +1859,6 @@ public final class LanguageStrings {
     public static final String ASSIMILATED_JUMPING_DESC = "ASSIMILATED_JUMPING_DESC";
     public static final String ASSIMILATION_JUMPING = "ASSIMILATION_JUMPING";
     public static final String ASSIMILATION_JUMPING_DESC = "ASSIMILATION_JUMPING_DESC";
-    public static final String SPECIES_GLIDING = "SPECIES_GLIDING";
-    public static final String SPECIES_GLIDING_SCIENTIFIC = "SPECIES_GLIDING_SCIENTIFIC";
-    public static final String ASSIMILATED_GLIDING_FLAVOR = "ASSIMILATED_GLIDING_FLAVOR";
-    public static final String ASSIMILATED_GLIDING_DESC = "ASSIMILATED_GLIDING_DESC";
-    public static final String ASSIMILATION_GLIDING = "ASSIMILATION_GLIDING";
-    public static final String ASSIMILATION_GLIDING_DESC = "ASSIMILATION_GLIDING_DESC";
     public static final String SPECIES_BULLET = "SPECIES_BULLET";
     public static final String SPECIES_BULLET_SCIENTIFIC = "SPECIES_BULLET_SCIENTIFIC";
     public static final String ASSIMILATED_STINGING_FLAVOR = "ASSIMILATED_STINGING_FLAVOR";

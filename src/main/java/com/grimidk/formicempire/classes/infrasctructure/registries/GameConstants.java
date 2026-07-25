@@ -1372,13 +1372,6 @@ public final class GameConstants {
         loadIcon("icons/species/Jet.png"));
     static { species.add(SPECIES_JET); }
 
-    // TODO asset: icons/species/Gliding.png; sprites/ants/gliding/*.png (placeholder — replace final art)
-    public static final AntSpecies SPECIES_GLIDING = new AntSpecies(13, LanguageStrings.SPECIES_GLIDING, LanguageStrings.SPECIES_GLIDING_SCIENTIFIC, "gliding/", GameUnlocks.ASSIMILATION_GLIDING,
-        defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_GLIDING),
-        Set.of(LanguageStrings.DYNASTY_THEME_GLIDING, LanguageStrings.DYNASTY_THEME_AIR, LanguageStrings.DYNASTY_THEME_FLY),
-        loadIcon("icons/species/Gliding.png"));
-    static { species.add(SPECIES_GLIDING); }
-
     public static final AntSpecies SPECIES_BULLET = new AntSpecies(14, LanguageStrings.SPECIES_BULLET, LanguageStrings.SPECIES_BULLET_SCIENTIFIC, "bullet/", GameUnlocks.ASSIMILATION_STINGING,
         defaultSpeciesUpgrades(GameUnlocks.ASSIMILATED_STINGING),
         Set.of(LanguageStrings.DYNASTY_THEME_BULLET, LanguageStrings.DYNASTY_THEME_STING, LanguageStrings.DYNASTY_THEME_PUNCH),
@@ -1488,13 +1481,13 @@ public final class GameConstants {
     // --- Battle lines ---
     public static final BattleLine BATTLE_LINE_INFANTRY = new BattleLine(
             1, LanguageStrings.BATTLE_LINE_INFANTRY, 100f,
-            Set.of(ROLE_MILITIA, ROLE_WARRIOR, ROLE_DEFENDER, ROLE_BRUTE, ROLE_SIEGE, ROLE_BOMBER, ROLE_POTTER,
-                    ROLE_COMMANDER),
+            Set.of(ROLE_MILITIA, ROLE_WARRIOR, ROLE_DEFENDER, ROLE_BRUTE, ROLE_SIEGE, ROLE_BOMBER),
             loadIcon("icons/battleLines/Infantry.png"));
     static { battleLines.add(BATTLE_LINE_INFANTRY); }
     public static final BattleLine BATTLE_LINE_ARTILLERY = new BattleLine(
             2, LanguageStrings.BATTLE_LINE_ARTILLERY, 50f,
-            Set.of(ROLE_ARTILLERY), loadIcon("icons/battleLines/Artillery.png"));
+            Set.of(ROLE_ARTILLERY, ROLE_POTTER, ROLE_COMMANDER),
+            loadIcon("icons/battleLines/Artillery.png"));
     static { battleLines.add(BATTLE_LINE_ARTILLERY); }
     public static final BattleLine BATTLE_LINE_AIR_SUPPORT = new BattleLine(
             3, LanguageStrings.BATTLE_LINE_AIR_SUPPORT, 25f,
@@ -1506,7 +1499,7 @@ public final class GameConstants {
         SKILL_POWERFUL_BITE.setBattleLine(BATTLE_LINE_INFANTRY);
         SKILL_STINGING.setBattleLine(BATTLE_LINE_INFANTRY);
         SKILL_SHIELDING.setBattleLine(BATTLE_LINE_INFANTRY);
-        SKILL_BOOST_REGEN.setBattleLine(BATTLE_LINE_INFANTRY);
+        SKILL_BOOST_REGEN.setBattleLine(BATTLE_LINE_ARTILLERY);
         SKILL_ACID_SPITTING.setBattleLine(BATTLE_LINE_INFANTRY);
         SKILL_ACID_ARTILLERY.setBattleLine(BATTLE_LINE_ARTILLERY);
         SKILL_SELFDESTRUCT.setBattleLine(BATTLE_LINE_INFANTRY);

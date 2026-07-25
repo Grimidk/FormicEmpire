@@ -74,9 +74,9 @@ class CritterSkillServiceTest {
 
         skills = CritterSkillService.resolveAvailableSkills(
                 GameConstants.TYPE_ANT, AntSubtypeProfile.of(1, 1, 3, 1), null, GameConstants.ROLE_POTTER);
-        assertTrue(skills.contains(GameConstants.SKILL_BASIC_BITE));
         assertTrue(skills.contains(GameConstants.SKILL_BOOST_REGEN));
-        assertEquals(2, skills.size());
+        assertFalse(skills.contains(GameConstants.SKILL_BASIC_BITE));
+        assertEquals(1, skills.size());
     }
 
     @Test
@@ -188,7 +188,7 @@ class CritterSkillServiceTest {
         assertEquals(GameConstants.BATTLE_LINE_INFANTRY, GameConstants.SKILL_POWERFUL_BITE.getBattleLine());
         assertEquals(GameConstants.BATTLE_LINE_INFANTRY, GameConstants.SKILL_STINGING.getBattleLine());
         assertEquals(GameConstants.BATTLE_LINE_INFANTRY, GameConstants.SKILL_SHIELDING.getBattleLine());
-        assertEquals(GameConstants.BATTLE_LINE_INFANTRY, GameConstants.SKILL_BOOST_REGEN.getBattleLine());
+        assertEquals(GameConstants.BATTLE_LINE_ARTILLERY, GameConstants.SKILL_BOOST_REGEN.getBattleLine());
         assertEquals(GameConstants.BATTLE_LINE_INFANTRY, GameConstants.SKILL_ACID_SPITTING.getBattleLine());
         assertEquals(GameConstants.BATTLE_LINE_ARTILLERY, GameConstants.SKILL_ACID_ARTILLERY.getBattleLine());
         assertEquals(GameConstants.BATTLE_LINE_INFANTRY, GameConstants.SKILL_SELFDESTRUCT.getBattleLine());
