@@ -94,6 +94,27 @@ class WarProgressServiceTest {
         assertEquals(defenderWarriors,
                 defender.getColonies().get(0).getWarAssignedRoleCount(GameConstants.ROLE_WARRIOR));
         assertEquals(aggressor.getId(), war.getStageAttackerDynastyId());
+        assertEquals(defender.getColonies().get(0).getId(), war.getContestedColonyId());
+    }
+
+    @Test
+    void holdingHexFlipsStageAttackerForCounterattack() {
+        World wideWorld = buildThreeHexWorld();
+        War war = wideWorld.getWarService().beginWar(aggressor, defender);
+        Colony mid = wideWorld.getHexes().get(1).getColony();
+        assertNotNull(mid);
+        assertEquals(mid.getId(), war.getContestedColonyId());
+
+        assertTrue(wideWorld.getWarService().withdrawToHexDefense(war, defender));
+        assertEquals(GameConstants.WAR_STAGE_RESERVE_ASSAULT, war.getStagePhase());
+
+        int beforeDefenderStages = war.getDefenderStagesCaptured();
+        assertTrue(WarProgressService.resolveHexDefenseHold(wideWorld, wideWorld.getWarService(), war));
+
+        assertEquals(beforeDefenderStages + 1, war.getDefenderStagesCaptured());
+        assertEquals(GameConstants.WAR_STAGE_REDEPLOYING, war.getStagePhase());
+        assertEquals(defender.getId(), war.getStageAttackerDynastyId());
+        assertEquals(aggressor.getCapital().getId(), war.getContestedColonyId());
     }
 
     @Test
@@ -105,6 +126,55 @@ class WarProgressServiceTest {
         ColonyMilitaryService.refreshColonyMilitaryPower(contested);
         ColonyMilitaryService.refreshDynastyMilitaryPower(aggressor);
 
+        assertFalse(WarProgressService.canAiHexBait(world, war, defender, aggressor, contested));
+    }
+
+    @Test
+    void aiHexBaitAcceptedWhenHexAndCounterattackOddsFavorHold() {
+        War war = world.getWarService().beginWar(aggressor, defender);
+        Colony contested = defender.getColonies().get(0);
+        Colony aggressorCapital = aggressor.getCapital();
+        // Losing the border badly...
+        war.setDeployedActiveAttacker(10_000);
+        war.setDeployedActiveDefender(100);
+        // Strong local hex defense for the bait.
+        contested.getWarAssignedRoleCounts().put(GameConstants.ROLE_DEFENDER, 80);
+        contested.getWarAssignedRoleCounts().put(GameConstants.ROLE_WARRIOR, 40);
+        // Soft counterattack target: thin population defense, keep a small assault threat.
+        aggressorCapital.getWorkers().clear();
+        while (aggressorCapital.getSoldiers().size() > 5) {
+            aggressorCapital.getSoldiers().remove(aggressorCapital.getSoldiers().size() - 1);
+        }
+        aggressorCapital.getWarAssignedRoleCounts().clear();
+        aggressorCapital.getWarAssignedRoleCounts().put(GameConstants.ROLE_WARRIOR, 5);
+        ColonyMilitaryService.refreshColonyMilitaryPower(contested);
+        ColonyMilitaryService.refreshColonyMilitaryPower(aggressorCapital);
+        ColonyMilitaryService.refreshDynastyMilitaryPower(aggressor);
+        ColonyMilitaryService.refreshDynastyMilitaryPower(defender);
+
+        assertTrue(ColonyMilitaryService.computeHexAssaultEffectiveAttackerPower(aggressor) > 0);
+        assertTrue(WarProgressService.counterattackOddsLookFavorable(world, defender, aggressor));
+        assertTrue(WarProgressService.canAiHexBait(world, war, defender, aggressor, contested));
+    }
+
+    @Test
+    void aiHexBaitRejectedWhenCounterattackLooksHopeless() {
+        War war = world.getWarService().beginWar(aggressor, defender);
+        Colony contested = defender.getColonies().get(0);
+        war.setDeployedActiveAttacker(10_000);
+        war.setDeployedActiveDefender(100);
+        contested.getWarAssignedRoleCounts().put(GameConstants.ROLE_DEFENDER, 80);
+        contested.getWarAssignedRoleCounts().put(GameConstants.ROLE_WARRIOR, 40);
+        // Strip defender dynasty assault power so a counterattack cannot follow the hold.
+        for (Colony colony : defender.getColonies()) {
+            colony.getWarAssignedRoleCounts().clear();
+            colony.getWarAssignedRoleCounts().put(GameConstants.ROLE_DEFENDER, 80);
+            ColonyMilitaryService.refreshColonyMilitaryPower(colony);
+        }
+        ColonyMilitaryService.refreshDynastyMilitaryPower(defender);
+        ColonyMilitaryService.refreshDynastyMilitaryPower(aggressor);
+
+        assertFalse(WarProgressService.counterattackOddsLookFavorable(world, defender, aggressor));
         assertFalse(WarProgressService.canAiHexBait(world, war, defender, aggressor, contested));
     }
 
@@ -216,6 +286,12 @@ class WarProgressServiceTest {
     }
 
     private World buildThreeHexWorld() {
+        // Isolate from @BeforeEach border colonies on the shared dynasties.
+        aggressor.getColonies().clear();
+        defender.getColonies().clear();
+        aggressor.setCapital(null);
+        defender.setCapital(null);
+
         World world = new World();
         Hex h0 = new Hex();
         Hex h1 = new Hex();

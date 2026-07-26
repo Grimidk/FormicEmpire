@@ -6,6 +6,7 @@ import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.Tunnel;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -102,7 +103,7 @@ public class WorldTest {
         Colony colony = new Colony(1, "Test Prime", true);
         world.generateWorld(
                 GameConstants.BIOME_PLAINS,
-                8,
+                7,
                 colony,
                 "Test",
                 LanguageStrings.DYNASTY_TITLE_DYNASTY);
@@ -157,5 +158,75 @@ public class WorldTest {
 
         assertEquals(1, world.minDynastyHexDistance(dynastyA, dynastyB));
         assertEquals(Integer.MAX_VALUE, world.minDynastyHexDistance(dynastyA, null));
+    }
+
+    @Test
+    void generateWorldUsesContinentCorePlusCoastalAndOuterOceanRings() {
+        World world = new World();
+        Colony colony = new Colony(1, "Test Prime", true);
+        int core = GameNumbers.WORLD_DEFAULT_CONTINENT_CORE_RADIUS;
+        world.generateWorld(
+                GameConstants.BIOME_PLAINS,
+                core,
+                colony,
+                "Test",
+                LanguageStrings.DYNASTY_TITLE_DYNASTY);
+
+        assertEquals(core, world.getContinentCoreRadius());
+        assertEquals(GameNumbers.worldRadiusForContinentCore(core), world.getWorldRadius());
+        assertTrue(world.getContinentCount() >= 1);
+
+        int outerDist = world.getWorldRadius();
+        for (Hex hex : world.getHexes()) {
+            int dist = (Math.abs(hex.getQ()) + Math.abs(hex.getQ() + hex.getR()) + Math.abs(hex.getR())) / 2;
+            if (dist == outerDist) {
+                assertEquals(GameConstants.BIOME_OCEAN, hex.getBiome(),
+                        "Outer ring must be pure ocean at " + hex.getQ() + "," + hex.getR());
+            }
+            if (hex.isIsland()) {
+                assertNull(hex.getColony(), "Islands must not spawn colonies");
+                assertNotEquals(GameConstants.BIOME_OCEAN, hex.getBiome());
+                assertNotEquals(GameConstants.BIOME_LAKE, hex.getBiome());
+            }
+        }
+    }
+
+    @Test
+    void classifyLandmassesMarksDisconnectedLandAsIslands() {
+        World world = new World();
+        world.setContinentCoreRadius(1);
+
+        Hex core = new Hex();
+        core.setQ(0);
+        core.setR(0);
+        core.setBiome(GameConstants.BIOME_PLAINS);
+
+        Hex island = new Hex();
+        island.setQ(3);
+        island.setR(0);
+        island.setBiome(GameConstants.BIOME_PLAINS);
+
+        Hex ocean = new Hex();
+        ocean.setQ(1);
+        ocean.setR(0);
+        ocean.setBiome(GameConstants.BIOME_OCEAN);
+
+        core.setSouthEast(ocean);
+        ocean.setNorthWest(core);
+        ocean.setSouthEast(island);
+        island.setNorthWest(ocean);
+
+        ArrayList<Hex> hexes = new ArrayList<>();
+        hexes.add(core);
+        hexes.add(ocean);
+        hexes.add(island);
+        world.setHexes(hexes);
+
+        world.classifyLandmasses();
+
+        assertEquals(1, world.getContinentCount());
+        assertEquals(1, world.getIslandCount());
+        assertFalse(core.isIsland());
+        assertTrue(island.isIsland());
     }
 }

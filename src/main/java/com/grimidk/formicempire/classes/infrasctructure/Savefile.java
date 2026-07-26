@@ -26,6 +26,7 @@ public class Savefile implements Serializable {
     private int month;
     private int year;
     private int worldRadius;
+    private int continentCoreRadius;
     private String playerDynastyTitleKey;
     private int playerDynastyTitleId;
     
@@ -69,7 +70,8 @@ public class Savefile implements Serializable {
         this.day = 1;
         this.month = 1;
         this.year = 0; 
-        this.worldRadius = 8;
+        this.worldRadius = GameNumbers.worldRadiusForContinentCore(GameNumbers.WORLD_DEFAULT_CONTINENT_CORE_RADIUS);
+        this.continentCoreRadius = GameNumbers.WORLD_DEFAULT_CONTINENT_CORE_RADIUS;
         this.playerDynastyTitleKey = LanguageStrings.DYNASTY_TITLE_DYNASTY;
     }
 
@@ -346,6 +348,8 @@ public class Savefile implements Serializable {
 
     public int getWorldRadius() { return worldRadius; }
     public void setWorldRadius(int worldRadius) { this.worldRadius = worldRadius; }
+    public int getContinentCoreRadius() { return continentCoreRadius; }
+    public void setContinentCoreRadius(int continentCoreRadius) { this.continentCoreRadius = continentCoreRadius; }
 
     public String getPlayerDynastyTitleKey() { return playerDynastyTitleKey; }
     public void setPlayerDynastyTitleKey(String playerDynastyTitleKey) {

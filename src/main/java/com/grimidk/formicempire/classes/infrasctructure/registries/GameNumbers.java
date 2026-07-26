@@ -13,6 +13,26 @@ public final class GameNumbers {
     public static final double GATHER_MIN_EFFICIENCY = 0.01;
     public static final float GATHER_COLONY_SPEED_RADIUS_MULT = 1.25f;
 
+    // --- World generation ---
+    /** Land rings from the spawn hex outward before coastal ocean rings. */
+    public static final int WORLD_DEFAULT_CONTINENT_CORE_RADIUS = 7;
+    /** Ocean rings beyond the continent core that may roll land (shelf / islands). */
+    public static final int WORLD_COASTAL_RING_COUNT = 5;
+    /** Final pure-ocean ring after the coastal shelf. */
+    public static final int WORLD_OUTER_OCEAN_RING_COUNT = 1;
+    /**
+     * Land chance percent for coastal rings 1..{@link #WORLD_COASTAL_RING_COUNT}
+     * (index 0 = first ring beyond the core). Rings 1–4 require mainland adjacency;
+     * the last ring may form islands.
+     */
+    public static final int[] WORLD_COASTAL_LAND_CHANCE_PERCENT = { 80, 40, 20, 10, 5 };
+
+    public static int worldRadiusForContinentCore(int continentCoreRadius) {
+        return Math.max(0, continentCoreRadius)
+                + WORLD_COASTAL_RING_COUNT
+                + WORLD_OUTER_OCEAN_RING_COUNT;
+    }
+
     // --- Hex resources / spawn ---
     public static final int HEX_RESOURCE_DEPLETION_SOURCES_PER_PERCENT = 20;
     public static final int HEX_DEPLETION_SPAWN_BUFFER_EXTRA_MAX = 500;
@@ -165,6 +185,11 @@ public final class GameNumbers {
     public static final float WAR_AI_HEX_BAIT_MIN_HEX_ODDS = 1.05f;
     /** Hex odds must improve on border odds by at least this factor (hexOdds >= borderOdds * factor). */
     public static final float WAR_AI_HEX_BAIT_ODDS_IMPROVEMENT = 1.2f;
+    /**
+     * After a successful hex hold, projected counterattack assault/defense odds must meet this
+     * floor or the NPC will not bait (no point inviting an assault they cannot follow up).
+     */
+    public static final float WAR_AI_HEX_BAIT_MIN_COUNTER_ODDS = 0.9f;
     /** Border clash: side loses when this fraction of its starting army (active+reserve) is dead. */
     public static final float WAR_BATTLE_ARMY_DEFEAT_RATIO = 0.9f;
 

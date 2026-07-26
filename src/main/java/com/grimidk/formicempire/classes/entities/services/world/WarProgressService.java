@@ -148,13 +148,13 @@ public final class WarProgressService {
         }
 
         if (forfeitier.getId() == stageDefender.getId()) {
-            completeStage(world, warService, war, aggressor, defender, stageAttacker, stageDefender, contested, false,
-                    true);
+            completeStage(world, warService, war, aggressor, defender, stageAttacker, stageDefender, contested,
+                    StageOutcome.CAPTURE, true);
             return true;
         }
         if (forfeitier.getId() == stageAttacker.getId()) {
-            completeStage(world, warService, war, aggressor, defender, stageAttacker, stageDefender, contested, true,
-                    true);
+            completeStage(world, warService, war, aggressor, defender, stageAttacker, stageDefender, contested,
+                    StageOutcome.ATTACKER_RETREAT, true);
             return true;
         }
         return false;
@@ -194,10 +194,11 @@ public final class WarProgressService {
             return false;
         }
 
-        // Preserve armies: contested owner clears their border pool and opens hex defense.
+        // Preserve armies: contested owner clears their border pool and opens hex defense
+        // on the same contested hex (original stage attacker assaults into the bait).
         war.setDeployedActiveDefender(0);
         WarCreatureCombatService.clear(war);
-        beginReserveAssault(world, war, stageAttacker, stageDefender);
+        beginDirectReserveAssault(world, war, stageAttacker, stageDefender, contested);
         notifyPlayerWarHexBait(world, war, withdrawer, contested);
         return war.getStagePhase() == GameConstants.WAR_STAGE_RESERVE_ASSAULT;
     }
@@ -353,6 +354,7 @@ public final class WarProgressService {
 
         ColonyMilitaryService.refreshColonyMilitaryPower(contested);
         ColonyMilitaryService.refreshDynastyMilitaryPower(stageAttacker);
+        ColonyMilitaryService.refreshDynastyMilitaryPower(ai);
         int hexDefense = ColonyMilitaryService.computeHexDefenseEffectivePower(contested);
         int hexAssault = ColonyMilitaryService.computeHexAssaultEffectiveAttackerPower(stageAttacker);
         if (hexDefense <= 0 || hexAssault <= 0) {
@@ -362,7 +364,37 @@ public final class WarProgressService {
         if (hexOdds < GameNumbers.WAR_AI_HEX_BAIT_MIN_HEX_ODDS) {
             return false;
         }
-        return hexOdds >= borderOdds * GameNumbers.WAR_AI_HEX_BAIT_ODDS_IMPROVEMENT;
+        if (hexOdds < borderOdds * GameNumbers.WAR_AI_HEX_BAIT_ODDS_IMPROVEMENT) {
+            return false;
+        }
+        // Bait only when a follow-up counterattack into the assaulting dynasty looks viable.
+        return counterattackOddsLookFavorable(world, ai, stageAttacker);
+    }
+
+    /**
+     * After holding the contested hex, {@code ai} becomes stage attacker and pushes into
+     * {@code enemy}'s adjacent territory. Require a reachable target and decent assault odds.
+     */
+    static boolean counterattackOddsLookFavorable(World world, Dynasty ai, Dynasty enemy) {
+        if (world == null || ai == null || enemy == null || ai == enemy) {
+            return false;
+        }
+        Colony counterTarget = findBorderColonyFacing(world, enemy, ai);
+        if (counterTarget == null) {
+            counterTarget = enemy.getCapital();
+        }
+        if (counterTarget == null) {
+            return false;
+        }
+        ColonyMilitaryService.refreshColonyMilitaryPower(counterTarget);
+        ColonyMilitaryService.refreshDynastyMilitaryPower(ai);
+        int counterDefense = ColonyMilitaryService.computeHexDefenseEffectivePower(counterTarget);
+        int counterAssault = ColonyMilitaryService.computeHexAssaultEffectiveAttackerPower(ai);
+        if (counterAssault <= 0) {
+            return false;
+        }
+        float counterOdds = counterAssault / (float) Math.max(1, counterDefense);
+        return counterOdds >= GameNumbers.WAR_AI_HEX_BAIT_MIN_COUNTER_ODDS;
     }
 
     private static void resolveActiveClashHour(World world, War war, Dynasty stageAttacker, Dynasty stageDefender) {
@@ -431,10 +463,13 @@ public final class WarProgressService {
         if (outcome == WarCreatureCombatService.TickOutcome.ATTACKER_WINS) {
             WarCreatureCombatService.clear(war);
             completeStage(world, warService, war, aggressor, defender, stageAttacker,
-                    contested.getDynasty(), contested, false, true);
+                    contested.getDynasty(), contested, StageOutcome.CAPTURE, true);
         } else if (outcome == WarCreatureCombatService.TickOutcome.DEFENDER_WINS) {
+            // Holding the hex awards the stage to the defender and flips stageAttacker
+            // so the next redeploy is a counterattack into the failed assaulter's territory.
             WarCreatureCombatService.clear(war);
-            enterRedeploying(world, war, aggressor, defender);
+            completeStage(world, warService, war, aggressor, defender, stageAttacker,
+                    contested.getDynasty(), contested, StageOutcome.DEFENDER_HOLD, true);
         }
     }
 
@@ -442,16 +477,26 @@ public final class WarProgressService {
         return war != null && war.getStageProgress() >= 1f - 0.0001f;
     }
 
+    /** How a stage ends — drives victor, capture, and player-facing copy. */
+    enum StageOutcome {
+        CAPTURE,
+        ATTACKER_RETREAT,
+        DEFENDER_HOLD
+    }
+
     private static void completeStage(World world, WarService warService, War war,
             Dynasty aggressor, Dynasty defender, Dynasty stageAttacker, Dynasty stageDefender,
-            Colony contested, boolean attackerRetreat, boolean forceImmediate) {
+            Colony contested, StageOutcome outcome, boolean forceImmediate) {
         if (!forceImmediate && !isStageReadyToResolve(war)) {
             return;
         }
-        Dynasty victor = attackerRetreat ? stageDefender : stageAttacker;
+        if (outcome == null) {
+            outcome = StageOutcome.CAPTURE;
+        }
+        Dynasty victor = outcome == StageOutcome.CAPTURE ? stageAttacker : stageDefender;
         Dynasty hexOwner = contested.getDynasty();
         WarCreatureCombatService.clear(war);
-        boolean captured = !attackerRetreat && victor.getId() == stageAttacker.getId()
+        boolean captured = outcome == StageOutcome.CAPTURE
                 && hexOwner != null && hexOwner != victor;
         boolean contestedWasCapital = captured && contested.isCapital();
 
@@ -468,7 +513,7 @@ public final class WarProgressService {
         war.setStageProgress(0f);
         war.recomputeProgressPercent();
 
-        notifyPlayerWarStageComplete(world, war, victor, contested, attackerRetreat, captured);
+        notifyPlayerWarStageComplete(world, war, victor, contested, outcome);
 
         String battleKey = captured
                 ? LanguageStrings.HISTORY_BATTLE_CAPTURE_FMT
@@ -498,9 +543,38 @@ public final class WarProgressService {
             return;
         }
 
-        setupNextStage(world, war, aggressor, defender, victor,
-                hexOwner != null ? hexOwner : stageDefender);
+        // Victor becomes stageAttacker and advances toward the loser's capital (counterattack).
+        Dynasty loser = victor.getId() == aggressor.getId() ? defender : aggressor;
+        setupNextStage(world, war, aggressor, defender, victor, loser);
         enterRedeploying(world, war, aggressor, defender);
+    }
+
+    /**
+     * Resolves the current hex assault as a successful hold by the contested owner.
+     * Awards the stage, flips {@code stageAttacker} for counterattack, and enters redeploy.
+     */
+    static boolean resolveHexDefenseHold(World world, WarService warService, War war) {
+        if (world == null || war == null || !war.isActive() || !war.isCampaignInitialized()) {
+            return false;
+        }
+        if (war.getStagePhase() != GameConstants.WAR_STAGE_RESERVE_ASSAULT) {
+            return false;
+        }
+        Dynasty aggressor = world.findDynastyById(war.getAggressorDynastyId());
+        Dynasty defender = world.findDynastyById(war.getDefenderDynastyId());
+        Dynasty stageAttacker = world.findDynastyById(war.getStageAttackerDynastyId());
+        Colony contested = findColonyById(world, war.getContestedColonyId());
+        if (aggressor == null || defender == null || stageAttacker == null || contested == null
+                || contested.getDynasty() == null) {
+            return false;
+        }
+        if (warService == null) {
+            warService = world.getWarService();
+        }
+        completeStage(world, warService, war, aggressor, defender, stageAttacker,
+                contested.getDynasty(), contested, StageOutcome.DEFENDER_HOLD, true);
+        return war.getStagePhase() == GameConstants.WAR_STAGE_REDEPLOYING
+                || !war.isActive();
     }
 
     private static void enterRedeploying(World world, War war, Dynasty aggressor, Dynasty defender) {
@@ -971,27 +1045,27 @@ public final class WarProgressService {
     }
 
     private static void notifyPlayerWarStageComplete(World world, War war, Dynasty victor,
-            Colony contested, boolean attackerRetreat, boolean captured) {
+            Colony contested, StageOutcome outcome) {
         if (world == null || war == null || victor == null || contested == null) {
             return;
         }
         String progress = formatWarProgressPercent(war.getProgressPercent());
         String message;
-        if (attackerRetreat) {
+        if (outcome == StageOutcome.ATTACKER_RETREAT) {
             message = LanguageStrings.format(
                     LanguageStrings.WAR_STAGE_FORFEITED_FMT,
                     victor.getName(),
                     contested.getName(),
                     progress);
-        } else if (captured) {
+        } else if (outcome == StageOutcome.DEFENDER_HOLD) {
             message = LanguageStrings.format(
-                    LanguageStrings.WAR_STAGE_CAPTURED_FMT,
+                    LanguageStrings.WAR_STAGE_DEFENDER_HELD_FMT,
                     victor.getName(),
                     contested.getName(),
                     progress);
         } else {
             message = LanguageStrings.format(
-                    LanguageStrings.WAR_STAGE_DEFENDER_HELD_FMT,
+                    LanguageStrings.WAR_STAGE_CAPTURED_FMT,
                     victor.getName(),
                     contested.getName(),
                     progress);

@@ -23,6 +23,8 @@ public class Hex {
     private int timeOffset; 
     private Weather localWeather;
     private boolean isActive;
+    /** True when this land hex belongs to an island landmass (not a continent). */
+    private boolean island;
 
     private int nonWaterResourceSourcesGenerated;
 
@@ -99,6 +101,10 @@ public class Hex {
     public boolean isActive() { return isActive; }
     
     public void setActive(boolean isActive) { this.isActive = isActive; }
+
+    public boolean isIsland() { return island; }
+
+    public void setIsland(boolean island) { this.island = island; }
 
     public int getNonWaterResourceSourcesGenerated() {
         return nonWaterResourceSourcesGenerated;

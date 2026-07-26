@@ -363,6 +363,9 @@ public class ColonyLabourService {
             if (neighbor.getBiome() == GameConstants.BIOME_OCEAN || neighbor.getBiome() == GameConstants.BIOME_LAKE) {
                 continue;
             }
+            if (neighbor.isIsland()) {
+                continue;
+            }
             
             Colony existingColony = neighbor.getColony();
             boolean reclaimable = ColonyStarterService.isReclaimableDeadColony(existingColony);

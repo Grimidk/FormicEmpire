@@ -198,7 +198,8 @@ public class DynastyAiService {
                     continue;
                 }
                 if (neighbor.getBiome() == GameConstants.BIOME_OCEAN
-                        || neighbor.getBiome() == GameConstants.BIOME_LAKE) {
+                        || neighbor.getBiome() == GameConstants.BIOME_LAKE
+                        || neighbor.isIsland()) {
                     continue;
                 }
                 Colony existing = neighbor.getColony();

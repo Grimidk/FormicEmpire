@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 73% (244/333 checked)
+Completion: 73% (244/335 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -474,6 +474,8 @@ World:
 [X] Day / month / year / hour ticks
 [X] Weather changes
 [X] Biome differences on hexes
+[ ] World gen — continent core landmass + 5 coastal rings (80/40/20/10/5% land; rings 1–4 mainland-connected; ring 5 can form islands) + outer pure ocean
+[ ] Continents vs islands counted; colonies never spawn or spread onto islands
 [X] Resource sources on map — hover tooltip shows type, size tier, remaining amount
 [X] Nuptial flight colony founding on new hexes
 [ ] Spreading onto dead/defeated hex inherits species genomes and completed assimilations
@@ -484,7 +486,7 @@ Combat:
 [ ] War skips active clash when defender has no border-battle active roles (goes to hex defense)
 [ ] Hex defense: contested colony fields all local ants; attackers use dynasty-wide border-active + dynasty Siege (Defenders never assault)
 [ ] Hex defense mults: defending ants 1.5x attack/defense; Defender role 3x; Siege attackers 3x; other attackers 1x; defense capped at 100%
-[ ] Withdraw to hex defense during border clash (preserve army; NPC bait when hex odds look better); Fallback still forfeits the stage
+[ ] Withdraw to hex defense during border clash (preserve army; NPC baits when hex odds beat border and counterattack looks viable); holding hex awards stage + flips stageAttacker for counterattack; Fallback still forfeits the stage
 [ ] Redeploy: ants heal regen% of max HP; Boost Regen doubles next redeploy heal (Potter / Honeypot)
 [ ] Shielding: doorhead Defenders absorb queen losses in hex defense until dead
 [ ] Defender and Siege are active military but only fight in hex defense (not border clash)

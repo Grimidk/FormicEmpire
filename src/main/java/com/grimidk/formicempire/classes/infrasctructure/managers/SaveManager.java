@@ -333,6 +333,7 @@ public class SaveManager {
         save.setYear(w.getYear());
         save.setPlayTime(computePlayTime(w));
         save.setWorldRadius(w.getWorldRadius());
+        save.setContinentCoreRadius(w.getContinentCoreRadius());
 
         if (w.getDynastys() != null) {
             for (Dynasty dynasty : w.getDynastys()) {
@@ -662,6 +663,7 @@ public class SaveManager {
         writeJsonLine(w, "month", s.getMonth(), false);
         writeJsonLine(w, "year", s.getYear(), false);
         writeJsonLine(w, "worldRadius", s.getWorldRadius(), false);
+        writeJsonLine(w, "continentCoreRadius", s.getContinentCoreRadius(), false);
         writeJsonLine(w, "playerDynastyTitleId", s.resolvePlayerDynastyTitleId(), false);
         writeJsonLine(w, "playerDynastyTitleKey", s.getPlayerDynastyTitleKey() != null ? s.getPlayerDynastyTitleKey() : LanguageStrings.DYNASTY_TITLE_DYNASTY, false);
         
@@ -888,6 +890,7 @@ public class SaveManager {
         s.setMonth(Integer.parseInt(rootMap.getOrDefault("month", "1")));
         s.setYear(Integer.parseInt(rootMap.getOrDefault("year", "0")));
         s.setWorldRadius(Integer.parseInt(rootMap.getOrDefault("worldRadius", "8")));
+        s.setContinentCoreRadius(Integer.parseInt(rootMap.getOrDefault("continentCoreRadius", "0")));
         s.setPlayerDynastyTitleId(Integer.parseInt(rootMap.getOrDefault("playerDynastyTitleId", "0")));
         s.setPlayerDynastyTitleKey(rootMap.getOrDefault("playerDynastyTitleKey", LanguageStrings.DYNASTY_TITLE_DYNASTY));
         
