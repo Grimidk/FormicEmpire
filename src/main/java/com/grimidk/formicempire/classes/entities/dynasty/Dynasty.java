@@ -1783,6 +1783,18 @@ public class Dynasty {
             unlockSkill(GameConstants.SKILL_SELFDESTRUCT);
         } else if (upgrade == GameUnlocks.ROLE_ARTILLERY) {
             unlockSkill(GameConstants.SKILL_ACID_ARTILLERY);
+        } else if (upgrade == GameUnlocks.ROLE_COMMANDER) {
+            unlockSkill(GameConstants.SKILL_ARTILLERY_LEADER);
+            if (!hasUpgrade(GameUnlocks.ROLE_CAPTAIN)) {
+                unlockedUpgrades.add(GameUnlocks.ROLE_CAPTAIN);
+            }
+            unlockSkill(GameConstants.SKILL_INFANTRY_LEADER);
+        } else if (upgrade == GameUnlocks.ROLE_CAPTAIN) {
+            unlockSkill(GameConstants.SKILL_INFANTRY_LEADER);
+        } else if (upgrade == GameUnlocks.ROLE_AIR_SUPPORT) {
+            unlockSkill(GameConstants.SKILL_CLOSE_ANT_SUPPORT);
+        } else if (upgrade == GameUnlocks.ROLE_AIR_BOMBER) {
+            unlockSkill(GameConstants.SKILL_AIR_BOMBING);
         } else if (upgrade == GameUnlocks.SYNERGY_CORROSIVE_BOMBS) {
             unlockSkill(GameConstants.SKILL_ACIDIC_SELFDESTRUCT);
         }

@@ -632,6 +632,20 @@ public final class GameConstants {
     public static final Skill SKILL_ACIDIC_SELFDESTRUCT = new Skill(9, LanguageStrings.SKILL_ACIDIC_SELFDESTRUCT, 0.9f, 10f, 7, true,
             loadIcon("icons/skills/AcidicSelfdestruct.png"));
     static { skills.add(SKILL_ACIDIC_SELFDESTRUCT); }
+    public static final Skill SKILL_ARTILLERY_LEADER = new Skill(10, LanguageStrings.SKILL_ARTILLERY_LEADER, 1f, 0f, -1, false,
+            true, GameNumbers.COMMANDER_ARTILLERY_DAMAGE_BONUS, null,
+            loadIcon("icons/skills/PreciseCommands.png"));
+    static { skills.add(SKILL_ARTILLERY_LEADER); }
+    public static final Skill SKILL_INFANTRY_LEADER = new Skill(11, LanguageStrings.SKILL_INFANTRY_LEADER, 1f, 0f, -1, false,
+            true, GameNumbers.CAPTAIN_INFANTRY_DAMAGE_BONUS, null,
+            loadIcon("icons/skills/InfantryCommand.png"));
+    static { skills.add(SKILL_INFANTRY_LEADER); }
+    public static final Skill SKILL_CLOSE_ANT_SUPPORT = new Skill(12, LanguageStrings.SKILL_CLOSE_ANT_SUPPORT, 0.9f, 10f, 1, true,
+            loadIcon("icons/skills/CloseAntSupport.png"));
+    static { skills.add(SKILL_CLOSE_ANT_SUPPORT); }
+    public static final Skill SKILL_AIR_BOMBING = new Skill(13, LanguageStrings.SKILL_AIR_BOMBING, 0.9f, 20f, 7, true,
+            loadIcon("icons/skills/AirBombing.png"));
+    static { skills.add(SKILL_AIR_BOMBING); }
 
     // --- Species ---
     public static final Species TYPE_ANT = new Species(1, LanguageStrings.BUG_ANT, CRITTER_CLASS_ANT, LanguageStrings.BUG_ANT_SCIENTIFIC, 1, 1, 1, 1, 1, 1,
@@ -850,6 +864,16 @@ public final class GameConstants {
     static { antRoles.add(ROLE_RESEARCHER); }
     public static final AntRole ROLE_COMMANDER = new AntRole(35, TYPE_QUEEN, LanguageStrings.ROLE_COMMANDER, loadIcon("icons/roles/Commander.png"), true);
     static { antRoles.add(ROLE_COMMANDER); }
+    static { SKILL_ARTILLERY_LEADER.setRequiredRole(ROLE_COMMANDER); }
+    public static final AntRole ROLE_CAPTAIN = new AntRole(36, TYPE_PRINCESS, LanguageStrings.ROLE_CAPTAIN, loadIcon("icons/roles/Captain.png"), true);
+    static { antRoles.add(ROLE_CAPTAIN); }
+    static { SKILL_INFANTRY_LEADER.setRequiredRole(ROLE_CAPTAIN); }
+    public static final AntRole ROLE_AIR_SUPPORT = new AntRole(37, TYPE_PRINCESS, LanguageStrings.ROLE_AIR_SUPPORT, loadIcon("icons/roles/AirSupport.png"), true);
+    static { antRoles.add(ROLE_AIR_SUPPORT); }
+    static { SKILL_CLOSE_ANT_SUPPORT.setRequiredRole(ROLE_AIR_SUPPORT); }
+    public static final AntRole ROLE_AIR_BOMBER = new AntRole(38, TYPE_PRINCESS, LanguageStrings.ROLE_AIR_BOMBER, loadIcon("icons/roles/AirBomber.png"), true);
+    static { antRoles.add(ROLE_AIR_BOMBER); }
+    static { SKILL_AIR_BOMBING.setRequiredRole(ROLE_AIR_BOMBER); }
     public static final AntRole ROLE_MILITIA = new AntRole(27, TYPE_WORKER, LanguageStrings.ROLE_MILITIA, loadIcon("icons/roles/Militia.png"), true);
     static { antRoles.add(ROLE_MILITIA); }
     public static final AntRole ROLE_CATCHER = new AntRole(28, TYPE_SOLDIER, LanguageStrings.ROLE_CATCHER, loadIcon("icons/roles/Catcher.png"));
@@ -922,6 +946,7 @@ public final class GameConstants {
 
     static {
         RANK_DUCHY.setUnlockOnAnnounce(GameUnlocks.ROLE_POLICE);
+        RANK_KINGDOM.setUnlockOnAnnounce(GameUnlocks.ROLE_AIR_SUPPORT);
         RANK_EMPIRE.setUnlockOnAnnounce(GameUnlocks.ABILITY_CLONING);
     }
 
@@ -1276,7 +1301,7 @@ public final class GameConstants {
 
     // --- AntSpecies ---
     // palette(head, torso, abdomen, wingPrimary, wingSecondary, drone, droneWingPrimary, droneWingSecondary, honeypot)
-    public static final AntSpecies SPECIES_OMNI = new AntSpecies(1, LanguageStrings.SPECIES_OMNI, LanguageStrings.SPECIES_OMNI_SCIENTIFIC,  "omni/", null, 
+    public static final AntSpecies SPECIES_OMNI = new AntSpecies(1, LanguageStrings.SPECIES_OMNI, LanguageStrings.SPECIES_OMNI_SCIENTIFIC,  "omni/", GameUnlocks.ASSIMILATION_OMNI, 
         Set.of(GameUnlocks.TYPE_EGG, GameUnlocks.TYPE_QUEEN, GameUnlocks.TYPE_WORKER, GameUnlocks.ROLE_FORAGER, 
             GameUnlocks.ROLE_FARMER, GameUnlocks.ROLE_NURSE, GameUnlocks.ROLE_LAYER, 
             GameUnlocks.STAT_SKELETON, GameUnlocks.STAT_ACID, GameUnlocks.STAT_LONGEVITY),
@@ -1498,7 +1523,7 @@ public final class GameConstants {
     // --- Battle lines ---
     public static final BattleLine BATTLE_LINE_INFANTRY = new BattleLine(
             1, LanguageStrings.BATTLE_LINE_INFANTRY, 100f,
-            Set.of(ROLE_MILITIA, ROLE_WARRIOR, ROLE_DEFENDER, ROLE_BRUTE, ROLE_SIEGE, ROLE_BOMBER),
+            Set.of(ROLE_MILITIA, ROLE_WARRIOR, ROLE_DEFENDER, ROLE_BRUTE, ROLE_SIEGE, ROLE_BOMBER, ROLE_CAPTAIN),
             loadIcon("icons/battleLines/Infantry.png"));
     static { battleLines.add(BATTLE_LINE_INFANTRY); }
     public static final BattleLine BATTLE_LINE_ARTILLERY = new BattleLine(
@@ -1507,8 +1532,8 @@ public final class GameConstants {
             loadIcon("icons/battleLines/Artillery.png"));
     static { battleLines.add(BATTLE_LINE_ARTILLERY); }
     public static final BattleLine BATTLE_LINE_AIR_SUPPORT = new BattleLine(
-            3, LanguageStrings.BATTLE_LINE_AIR_SUPPORT, 25f,
-            Set.of(), loadIcon("icons/battleLines/AirSupport.png"));
+            3, LanguageStrings.BATTLE_LINE_AIR_SUPPORT, 100f,
+            Set.of(ROLE_AIR_SUPPORT, ROLE_AIR_BOMBER), loadIcon("icons/battleLines/AirSupport.png"));
     static { battleLines.add(BATTLE_LINE_AIR_SUPPORT); }
 
     static {
@@ -1521,8 +1546,13 @@ public final class GameConstants {
         SKILL_ACID_ARTILLERY.setBattleLine(BATTLE_LINE_ARTILLERY);
         SKILL_SELFDESTRUCT.setBattleLine(BATTLE_LINE_INFANTRY);
         SKILL_ACIDIC_SELFDESTRUCT.setBattleLine(BATTLE_LINE_INFANTRY);
+        SKILL_ARTILLERY_LEADER.setBattleLine(BATTLE_LINE_ARTILLERY);
+        SKILL_INFANTRY_LEADER.setBattleLine(BATTLE_LINE_INFANTRY);
+        SKILL_CLOSE_ANT_SUPPORT.setBattleLine(BATTLE_LINE_AIR_SUPPORT);
+        SKILL_AIR_BOMBING.setBattleLine(BATTLE_LINE_AIR_SUPPORT);
         SKILL_SELFDESTRUCT.setSacrificesSelf(true);
         SKILL_ACIDIC_SELFDESTRUCT.setSacrificesSelf(true);
+        SKILL_AIR_BOMBING.setSacrificesSelf(true);
         SKILL_ACIDIC_SELFDESTRUCT.setReplacesSkill(SKILL_SELFDESTRUCT);
     }
 

@@ -207,6 +207,10 @@ public final class GameNumbers {
     public static final int TRIGGER_COMMANDER_MIN_WARS = 3;
     /** Living queens required in a colony before one may be a Commander (last queen stays off combat). */
     public static final int TRIGGER_COMMANDER_MIN_QUEENS_IN_COLONY = 2;
+    /** Passive Artillery Leader: additive artillery-line damage while a living Commander is in battle. */
+    public static final float COMMANDER_ARTILLERY_DAMAGE_BONUS = 0.5f;
+    /** Passive Infantry Leader: additive infantry-line damage while a living Captain is in battle. */
+    public static final float CAPTAIN_INFANTRY_DAMAGE_BONUS = 0.25f;
     /** Declared wars (as aggressor) before Warmonger −20 applies with all dynasties. */
     public static final int WARMONGER_DECLARED_WARS_THRESHOLD = 5;
 

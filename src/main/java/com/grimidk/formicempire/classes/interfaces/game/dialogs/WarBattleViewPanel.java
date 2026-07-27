@@ -39,7 +39,10 @@ public class WarBattleViewPanel extends JPanel {
     private static final int LINE_JITTER_PX = 10;
     private static final int RESERVE_WALK_PX_PER_SEC = 28;
     private static final float ATTACK_JAW_SNAP_SPEED = 4.2f;
-    private static final float AIR_SUPPORT_FLY_CYCLE_SEC = 4.5f;
+    /** Full flyby + off-screen reload wait before the next pass. */
+    private static final float AIR_SUPPORT_FLY_CYCLE_SEC = 6.0f;
+    /** Fraction of the cycle spent crossing the field (remainder is deload/reload wait). */
+    private static final float AIR_SUPPORT_FLY_PORTION = 0.32f;
 
     private final War war;
     private final Engine engine;
@@ -277,11 +280,16 @@ public class WarBattleViewPanel extends JPanel {
             if (airSupport) {
                 float cycle = (animationSeconds / AIR_SUPPORT_FLY_CYCLE_SEC) + ant.flyPhase;
                 cycle = cycle - (float) Math.floor(cycle);
+                // Deload past the far edge, then wait off-screen before reloading for the next pass.
+                if (cycle > AIR_SUPPORT_FLY_PORTION) {
+                    continue;
+                }
+                float t = cycle / AIR_SUPPORT_FLY_PORTION;
                 int travel = field.width + w * 2;
                 if (attackerSide) {
-                    drawX = field.x - w + Math.round(cycle * travel);
+                    drawX = field.x - w + Math.round(t * travel);
                 } else {
-                    drawX = fieldRight - Math.round(cycle * travel);
+                    drawX = fieldRight - Math.round(t * travel);
                 }
             } else {
                 int lineOffset = lineOffsetPx(ant.battleLine, ant.reserve);

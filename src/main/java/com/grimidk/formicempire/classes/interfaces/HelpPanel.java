@@ -711,13 +711,16 @@ public class HelpPanel extends JPanel {
 
     private String formatSkillHelpBody(Skill skill) {
         StringBuilder body = new StringBuilder();
-        if (!skill.isAttack()) {
-            if (skill == GameConstants.SKILL_BOOST_REGEN) {
+        if (!skill.isAttack() || skill.isPassive()) {
+            if (skill.isPassive() && skill.getLaneDamageBonus() > 0f && skill.getBattleLine() != null) {
+                body.append(LanguageStrings.format(LanguageStrings.HELP_SKILL_PASSIVE_LANE_DAMAGE_FMT,
+                        formatPercentMult(skill.getLaneDamageBonus()), skill.getBattleLine().getName()));
+            } else if (skill == GameConstants.SKILL_BOOST_REGEN) {
                 body.append(LanguageStrings.get(LanguageStrings.HELP_SKILL_BOOST_REGEN_EFFECT));
             } else if (skill == GameConstants.SKILL_SHIELDING) {
                 body.append(LanguageStrings.get(LanguageStrings.HELP_SKILL_SHIELDING_EFFECT));
             }
-            if (skill.getBattleLine() != null) {
+            if (skill.getBattleLine() != null && !(skill.isPassive() && skill.getLaneDamageBonus() > 0f)) {
                 if (body.length() > 0) {
                     body.append('\n');
                 }
@@ -912,6 +915,18 @@ public class HelpPanel extends JPanel {
                 JLabel tierIcon = new JLabel(unlockedTier.getIcon());
                 tierIcon.setToolTipText(unlockedTier.getName());
                 row.add(tierIcon);
+            }
+
+            if (rank.getUnlockOnAnnounce() != null) {
+                JLabel unlocksUpgradeLabel = new JLabel(LanguageStrings.get(LanguageStrings.HELP_RANK_UNLOCKS_UPGRADE));
+                unlocksUpgradeLabel.setFont(AssetStyles.FONT_NORMAL);
+                unlocksUpgradeLabel.setForeground(AssetStyles.FONT_COLOR);
+                row.add(unlocksUpgradeLabel);
+
+                Upgrade unlock = rank.getUnlockOnAnnounce();
+                JLabel upgradeIcon = new JLabel(unlock.getIcon());
+                upgradeIcon.setToolTipText(unlock.getDisplayName());
+                row.add(upgradeIcon);
             }
 
             list.add(row);

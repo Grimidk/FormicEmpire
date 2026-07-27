@@ -13,7 +13,7 @@ class BattleLineTest {
     void accuraciesMatchDesignBaselines() {
         assertEquals(100f, GameConstants.BATTLE_LINE_INFANTRY.getBaseAccuracyPercent(), 0.0001f);
         assertEquals(50f, GameConstants.BATTLE_LINE_ARTILLERY.getBaseAccuracyPercent(), 0.0001f);
-        assertEquals(25f, GameConstants.BATTLE_LINE_AIR_SUPPORT.getBaseAccuracyPercent(), 0.0001f);
+        assertEquals(100f, GameConstants.BATTLE_LINE_AIR_SUPPORT.getBaseAccuracyPercent(), 0.0001f);
     }
 
     @Test
@@ -28,8 +28,13 @@ class BattleLineTest {
                 GameConstants.getBattleLineForRole(GameConstants.ROLE_COMMANDER));
         assertEquals(GameConstants.BATTLE_LINE_ARTILLERY,
                 GameConstants.getBattleLineForRole(GameConstants.ROLE_ARTILLERY));
+        assertEquals(GameConstants.BATTLE_LINE_AIR_SUPPORT,
+                GameConstants.getBattleLineForRole(GameConstants.ROLE_AIR_SUPPORT));
+        assertEquals(GameConstants.BATTLE_LINE_AIR_SUPPORT,
+                GameConstants.getBattleLineForRole(GameConstants.ROLE_AIR_BOMBER));
         assertTrue(GameConstants.BATTLE_LINE_INFANTRY.allowsRole(GameConstants.ROLE_MILITIA));
         assertTrue(GameConstants.ROLE_POTTER.isActiveMilitary());
-        assertTrue(GameConstants.BATTLE_LINE_AIR_SUPPORT.getAllowedRoles().isEmpty());
+        assertTrue(GameConstants.BATTLE_LINE_AIR_SUPPORT.allowsRole(GameConstants.ROLE_AIR_SUPPORT));
+        assertTrue(GameConstants.BATTLE_LINE_AIR_SUPPORT.allowsRole(GameConstants.ROLE_AIR_BOMBER));
     }
 }

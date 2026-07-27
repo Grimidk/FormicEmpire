@@ -920,10 +920,18 @@ public class UpgradeDialog extends ZeroDialog {
                         }
                     }
 
-                    boolean defeated = (speciesId != -1 && dynasty.getDefeatedSpeciesIds().contains(speciesId));
                     boolean completed = dynasty.isAssimilationCompleted(a);
+                    if (completed) {
+                        continue;
+                    }
 
-                    if (defeated && !completed) {
+                    boolean isOmniKeystone = a == GameUnlocks.ASSIMILATION_OMNI;
+                    boolean defeated = speciesId != -1 && dynasty.getDefeatedSpeciesIds().contains(speciesId);
+                    boolean omniSelfAvailable = isOmniKeystone
+                            && dynasty.getSpecies() == GameConstants.SPECIES_OMNI;
+                    boolean foreignAllowed = isOmniKeystone || GameUnlocks.canAssimilateForeignSpecies(dynasty);
+
+                    if ((defeated || omniSelfAvailable) && foreignAllowed) {
                         available.add(a);
                     }
                 }

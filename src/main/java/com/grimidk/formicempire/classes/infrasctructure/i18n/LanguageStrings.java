@@ -637,6 +637,8 @@ public final class LanguageStrings {
     public static final String SYNERGY_CORROSIVE_BOMBS = "SYNERGY_CORROSIVE_BOMBS";
     public static final String SYNERGY_CORROSIVE_BOMBS_FLAVOR = "SYNERGY_CORROSIVE_BOMBS_FLAVOR";
     public static final String SYNERGY_CORROSIVE_BOMBS_DESC = "SYNERGY_CORROSIVE_BOMBS_DESC";
+    public static final String SYNERGY_AIR_BOMBER = "SYNERGY_AIR_BOMBER";
+    public static final String SYNERGY_AIR_BOMBER_DESC = "SYNERGY_AIR_BOMBER_DESC";
     public static final String TRIGGER_PROGRESS_NONE = "TRIGGER_PROGRESS_NONE";
     public static final String TRIGGER_PROGRESS_SHOW_COMPLETED = "TRIGGER_PROGRESS_SHOW_COMPLETED";
     public static final String TRIGGER_PROGRESS_STATUS_UNLOCKED = "TRIGGER_PROGRESS_STATUS_UNLOCKED";
@@ -698,6 +700,10 @@ public final class LanguageStrings {
     public static final String SKILL_ACID_ARTILLERY = "SKILL_ACID_ARTILLERY";
     public static final String SKILL_SELFDESTRUCT = "SKILL_SELFDESTRUCT";
     public static final String SKILL_ACIDIC_SELFDESTRUCT = "SKILL_ACIDIC_SELFDESTRUCT";
+    public static final String SKILL_ARTILLERY_LEADER = "SKILL_ARTILLERY_LEADER";
+    public static final String SKILL_INFANTRY_LEADER = "SKILL_INFANTRY_LEADER";
+    public static final String SKILL_CLOSE_ANT_SUPPORT = "SKILL_CLOSE_ANT_SUPPORT";
+    public static final String SKILL_AIR_BOMBING = "SKILL_AIR_BOMBING";
 
     public static final String BATTLE_LINE_INFANTRY = "BATTLE_LINE_INFANTRY";
     public static final String BATTLE_LINE_ARTILLERY = "BATTLE_LINE_ARTILLERY";
@@ -1614,6 +1620,9 @@ public final class LanguageStrings {
     public static final String ROLE_LAYER = "ROLE_LAYER";
     public static final String ROLE_RESEARCHER = "ROLE_RESEARCHER";
     public static final String ROLE_COMMANDER = "ROLE_COMMANDER";
+    public static final String ROLE_CAPTAIN = "ROLE_CAPTAIN";
+    public static final String ROLE_AIR_SUPPORT = "ROLE_AIR_SUPPORT";
+    public static final String ROLE_AIR_BOMBER = "ROLE_AIR_BOMBER";
     public static final String ROLE_MILITIA = "ROLE_MILITIA";
     public static final String ROLE_CATCHER = "ROLE_CATCHER";
     public static final String ROLE_CRANE = "ROLE_CRANE";
@@ -1926,6 +1935,10 @@ public final class LanguageStrings {
     public static final String ASSIMILATED_ACIDSPIT_DESC = "ASSIMILATED_ACIDSPIT_DESC";
     public static final String ASSIMILATION_ACIDSPIT = "ASSIMILATION_ACIDSPIT";
     public static final String ASSIMILATION_ACIDSPIT_DESC = "ASSIMILATION_ACIDSPIT_DESC";
+    public static final String ASSIMILATED_ASSIMILATION_FLAVOR = "ASSIMILATED_ASSIMILATION_FLAVOR";
+    public static final String ASSIMILATED_ASSIMILATION_DESC = "ASSIMILATED_ASSIMILATION_DESC";
+    public static final String ASSIMILATION_OMNI = "ASSIMILATION_OMNI";
+    public static final String ASSIMILATION_OMNI_DESC = "ASSIMILATION_OMNI_DESC";
 
     public static final String METHOD_LAND = "METHOD_LAND";
     public static final String METHOD_AIR = "METHOD_AIR";
@@ -1976,6 +1989,15 @@ public final class LanguageStrings {
     public static final String ROLE_COMMANDER_UPGRADE = "ROLE_COMMANDER_UPGRADE";
     public static final String ROLE_COMMANDER_FLAVOR = "ROLE_COMMANDER_FLAVOR";
     public static final String ROLE_COMMANDER_DESC = "ROLE_COMMANDER_DESC";
+    public static final String ROLE_CAPTAIN_UPGRADE = "ROLE_CAPTAIN_UPGRADE";
+    public static final String ROLE_CAPTAIN_FLAVOR = "ROLE_CAPTAIN_FLAVOR";
+    public static final String ROLE_CAPTAIN_DESC = "ROLE_CAPTAIN_DESC";
+    public static final String ROLE_AIR_SUPPORT_UPGRADE = "ROLE_AIR_SUPPORT_UPGRADE";
+    public static final String ROLE_AIR_SUPPORT_FLAVOR = "ROLE_AIR_SUPPORT_FLAVOR";
+    public static final String ROLE_AIR_SUPPORT_DESC = "ROLE_AIR_SUPPORT_DESC";
+    public static final String ROLE_AIR_BOMBER_UPGRADE = "ROLE_AIR_BOMBER_UPGRADE";
+    public static final String ROLE_AIR_BOMBER_FLAVOR = "ROLE_AIR_BOMBER_FLAVOR";
+    public static final String ROLE_AIR_BOMBER_DESC = "ROLE_AIR_BOMBER_DESC";
     public static final String ROLE_BUILDER_UPGRADE = "ROLE_BUILDER_UPGRADE";
     public static final String ROLE_BUILDER_FLAVOR = "ROLE_BUILDER_FLAVOR";
     public static final String ROLE_BUILDER_DESC = "ROLE_BUILDER_DESC";
@@ -2315,6 +2337,8 @@ public final class LanguageStrings {
     public static final String HELP_SKILL_BATTLE_LINE_FMT = "HELP_SKILL_BATTLE_LINE_FMT";
     public static final String HELP_SKILL_BOOST_REGEN_EFFECT = "HELP_SKILL_BOOST_REGEN_EFFECT";
     public static final String HELP_SKILL_SHIELDING_EFFECT = "HELP_SKILL_SHIELDING_EFFECT";
+    public static final String HELP_SKILL_PASSIVE_LANE_DAMAGE_FMT = "HELP_SKILL_PASSIVE_LANE_DAMAGE_FMT";
+    public static final String HELP_RANK_UNLOCKS_UPGRADE = "HELP_RANK_UNLOCKS_UPGRADE";
     public static final String HELP_BATTLE_LINE_ACCURACY_FMT = "HELP_BATTLE_LINE_ACCURACY_FMT";
     public static final String HELP_BATTLE_LINE_ROLES_FMT = "HELP_BATTLE_LINE_ROLES_FMT";
     public static final String HELP_BATTLE_LINE_ROLES_NONE = "HELP_BATTLE_LINE_ROLES_NONE";

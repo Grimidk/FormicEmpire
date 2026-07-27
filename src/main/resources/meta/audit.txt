@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 73% (244/335 checked)
+Completion: 71% (244/342 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -200,9 +200,13 @@ Major roles:
 
 Princess roles:
 [X] Breeder, Diplomat, Assistant (assistants research at 1/50 queen efficiency)
+[ ] Captain (unlocked with Commander; infantry line; Infantry Leader +25% infantry damage)
+[ ] Air Support (Queendom rank; princesses; air-support line; Close Ant Support 1000%/90%)
+[ ] Air Bomber (synergy: Air Support + Bomber + Acid Spit; Air Bombing 2000%/90%/7 targets; ant dies)
 
 Queen roles:
 [X] Layer, Researcher
+[ ] Commander (artillery line; Artillery Leader +50% artillery damage; unlocks Captain)
 
 Advanced logistics roles (late tree):
 [X] Courier, Borer, Transport, Escort, Engineer, Skytrans
@@ -234,6 +238,7 @@ Assimilated species passives (research tree):
 [ ] Farsight (Far Sight head subtype: +15% accuracy to all skills, capped at 100%)
 [X] Hivebuild, Locsense
 [ ] Acidspit (Green Ant — unlocks Acid Spitting skill)
+[ ] Assimilation / Genome Bridge (Omni — required before other species assimilations)
 
 [X] Insufficient RP blocks purchase with message
 [X] Prerequisites hide or disable locked nodes
@@ -433,6 +438,7 @@ Daily:
 [X] Graver role unlock
 [X] Scout unlock from plant harvest (any plant source)
 [ ] Hunter / Breeder / Brute role unlocks
+[ ] Queendom rank unlocks Air Support princess role
 [ ] Commander role unlock (3 wars participated + multi-queen colony)
 [ ] Commander assignment: max 1 per colony; requires spare queen off combat; raises dynasty combat capacity 1k→2.5k once
 [ ] Research / Build / Spread ability unlocks
@@ -440,6 +446,7 @@ Daily:
 [ ] Bilateral Trade unlock from active trade count
 [ ] Courier / Borer role unlocks
 [ ] Assimilation ability unlock from absorbed dynasties
+[ ] Omni Assimilation (Genome Bridge) gates other species assimilations; Omni dynasty can start it without defeating Omni
 [ ] Subtype hatch ability unlock after body-part assimilation
 [ ] Colony Operations ability unlock
 [ ] Mass Flight unlock
@@ -490,7 +497,7 @@ Combat:
 [ ] Redeploy: ants heal regen% of max HP; Boost Regen doubles next redeploy heal (Potter / Honeypot)
 [ ] Shielding: doorhead Defenders absorb queen losses in hex defense until dead
 [ ] Defender and Siege are active military but only fight in hex defense (not border clash)
-[ ] Battle lines: Infantry (Militia, Warrior, Defender, Brute, Siege, Bomber); Artillery (Artillery, Potter, Commander); Air Support (none yet)
+[ ] Battle lines: Infantry (Militia, Warrior, Defender, Brute, Siege, Bomber, Captain); Artillery (Artillery, Potter, Commander); Air Support (Air Support, Air Bomber) with flyby + reload dwell
 [ ] Honeypot unlocks Potter (honeypot workers only); Doorhead unlocks Defender (doorhead soldiers only)
 [X] Battle view stat multipliers vs standing multipliers
 

@@ -178,7 +178,7 @@ public class SpanishTranslation implements Translation {
         es.put("BUILD_COST_FORMAT", "<html>%s Minerales<br>%s Resina<br>%s Horas (base)</html>");
         es.put("ASSIMILATION_CURRENT", "Asimilación Actual: %s");
         es.put("ASSIMILATION_NONE", "Ninguna");
-        es.put("ASSIMILATION_NO_GENOMES", "No hay genomas disponibles para asimilación. Derrota a otras especies para desbloquear.");
+        es.put("ASSIMILATION_NO_GENOMES", "No hay genomas disponibles para asimilación. Completa primero la Asimilación Omni; luego derrota otras especies para desbloquear sus genomas.");
         es.put("ASSIMILATION_TARGET", "Objetivo: %s");
         es.put("ASSIMILATION_ACTIVE", "Asimilando: %s");
         es.put("ASSIMILATION_PROGRESS", "%s / %s ( %s%% )");
@@ -233,6 +233,8 @@ public class SpanishTranslation implements Translation {
         es.put("SYNERGY_CORROSIVE_BOMBS", "Bombas corrosivas");
         es.put("SYNERGY_CORROSIVE_BOMBS_FLAVOR", "Sacrificio ácido");
         es.put("SYNERGY_CORROSIVE_BOMBS_DESC", "Sustituye Autodestrucción de las Bombarderas por Autodestrucción ácida (1000% daño, 90% precisión, 7 objetivos; la hormiga muere). Requiere asimilaciones Autodestrucción y Escupitajo ácido.");
+        es.put("SYNERGY_AIR_BOMBER", "Bombardera aérea");
+        es.put("SYNERGY_AIR_BOMBER_DESC", "Desbloquea el rol Bombardera aérea para princesas. Otorga Bombardeo aéreo (2000% daño, 90% precisión, 7 objetivos; la hormiga muere). Requiere Apoyo aéreo, Bombardera y Escupitajo ácido.");
 
         es.put("DIALOG_HATCH_RATES_TITLE", "Gestionar Tasas de Eclosión");
         es.put("HATCH_DESC", "Establecer probabilidad de eclosión:");
@@ -264,6 +266,10 @@ public class SpanishTranslation implements Translation {
         es.put("SKILL_ACID_ARTILLERY", "Artillería ácida");
         es.put("SKILL_SELFDESTRUCT", "Autodestrucción");
         es.put("SKILL_ACIDIC_SELFDESTRUCT", "Autodestrucción ácida");
+        es.put("SKILL_ARTILLERY_LEADER", "Líder de artillería");
+        es.put("SKILL_INFANTRY_LEADER", "Líder de infantería");
+        es.put("SKILL_CLOSE_ANT_SUPPORT", "Apoyo ant cercano");
+        es.put("SKILL_AIR_BOMBING", "Bombardeo aéreo");
 
         es.put("BATTLE_LINE_INFANTRY", "Infantería");
         es.put("BATTLE_LINE_ARTILLERY", "Artillería");
@@ -1020,6 +1026,9 @@ public class SpanishTranslation implements Translation {
         es.put("ROLE_LAYER", "Ponedora");
         es.put("ROLE_RESEARCHER", "Investigadora");
         es.put("ROLE_COMMANDER", "Comandante");
+        es.put("ROLE_CAPTAIN", "Capitana");
+        es.put("ROLE_AIR_SUPPORT", "Apoyo aéreo");
+        es.put("ROLE_AIR_BOMBER", "Bombardera aérea");
         es.put("ROLE_MILITIA", "Milicia Auxiliar");
         es.put("ROLE_CATCHER", "Capturadora");
         es.put("ROLE_CRANE", "Grúa Constr.");
@@ -1325,6 +1334,10 @@ public class SpanishTranslation implements Translation {
         es.put("ASSIMILATION_LOCSENSE_DESC", "Tras asimilar el genoma de la hormiga del desierto:");
         es.put("ASSIMILATED_ACIDSPIT_FLAVOR", "Batería fórmica");
         es.put("ASSIMILATED_ACIDSPIT_DESC", "Desbloquea la habilidad Escupitajo ácido para las hormigas de tu colonia.");
+        es.put("ASSIMILATED_ASSIMILATION_FLAVOR", "Puente genómico");
+        es.put("ASSIMILATED_ASSIMILATION_DESC", "Permite a tu dinastía asimilar genomas de otras especies. Sin esta clave Omni, las especies derrotadas no se pueden asimilar.");
+        es.put("ASSIMILATION_OMNI", "Asimilación Omni");
+        es.put("ASSIMILATION_OMNI_DESC", "Tras asimilar el puente genómico Omni:");
         es.put("ASSIMILATION_ACIDSPIT", "Escupitajo ácido");
         es.put("ASSIMILATION_ACIDSPIT_DESC", "Tras asimilar el genoma de la hormiga verde:");
 
@@ -1383,7 +1396,16 @@ public class SpanishTranslation implements Translation {
         es.put("ROLE_RESEARCHER_DESC", "Permite a las reinas generar puntos de investigación. 1 reina genera 1 punto por hora.");
         es.put("ROLE_COMMANDER_UPGRADE", "Rol Comandante");
         es.put("ROLE_COMMANDER_FLAVOR", "Señora de guerra real");
-        es.put("ROLE_COMMANDER_DESC", "Rol militar activo para reinas. Máx. 1 por colonia, y solo si otra reina permanece en un rol no combatiente. Asignar una Comandante sube la capacidad de combate de la dinastía de 1.000 a 2.500 (no se acumula).");
+        es.put("ROLE_COMMANDER_DESC", "Rol militar activo para reinas (línea de artillería). Máx. 1 por colonia, y solo si otra reina permanece en un rol no combatiente. Asignar una Comandante sube la capacidad de combate de la dinastía de 1.000 a 2.500 (no se acumula). Otorga Líder de artillería (+50% de daño de artillería mientras haya una Comandante viva en batalla). También desbloquea el rol Capitana para princesas.");
+        es.put("ROLE_CAPTAIN_UPGRADE", "Rol Capitana");
+        es.put("ROLE_CAPTAIN_FLAVOR", "Capitana de campo");
+        es.put("ROLE_CAPTAIN_DESC", "Rol militar activo para princesas (línea de infantería). Otorga Líder de infantería (+25% de daño de infantería mientras haya una Capitana viva en batalla). Se desbloquea con el rol Comandante.");
+        es.put("ROLE_AIR_SUPPORT_UPGRADE", "Rol Apoyo aéreo");
+        es.put("ROLE_AIR_SUPPORT_FLAVOR", "Cobertura aérea cercana");
+        es.put("ROLE_AIR_SUPPORT_DESC", "Rol militar activo para princesas en la línea de apoyo aéreo. Otorga Apoyo ant cercano (1000% daño, 90% precisión). Se desbloquea al rango Reino.");
+        es.put("ROLE_AIR_BOMBER_UPGRADE", "Rol Bombardera aérea");
+        es.put("ROLE_AIR_BOMBER_FLAVOR", "Picado suicida");
+        es.put("ROLE_AIR_BOMBER_DESC", "Rol militar activo para princesas en apoyo aéreo. Otorga Bombardeo aéreo (2000% daño, 90% precisión, 7 objetivos; la hormiga muere). Sinergia Apoyo aéreo + Bombardera + Escupitajo ácido.");
         es.put("ROLE_BUILDER_UPGRADE", "Rol Constructora");
         es.put("ROLE_BUILDER_FLAVOR", "Construcción de Base");
         es.put("ROLE_BUILDER_DESC", "Permite a las obreras construir nuevas cámaras en la colonia.");
@@ -1802,6 +1824,7 @@ public class SpanishTranslation implements Translation {
                 "Soporte: duplica la curación de HP de esta hormiga en el siguiente redespliegue de guerra (% de regeneración del HP máximo). Las Hormiga-Copa con Honeypot la usan automáticamente hasta que existan elecciones de habilidad en batalla.");
         es.put("HELP_SKILL_SHIELDING_EFFECT",
                 "Soporte: en defensa de hexágono, esta Defensora asume las bajas destinadas a las reinas hasta morir. Las Defensoras doorhead activan Escudo al comenzar la defensa de hexágono.");
+        es.put("HELP_SKILL_PASSIVE_LANE_DAMAGE_FMT", "Pasiva: +%s de daño a la línea %s mientras una hormiga viva con esta habilidad esté en batalla.");
         es.put("HELP_BATTLE_LINE_ACCURACY_FMT", "Precisión base: %s");
         es.put("HELP_BATTLE_LINE_ROLES_FMT", "Roles: %s");
         es.put("HELP_BATTLE_LINE_ROLES_NONE", "Roles: ninguno aún");
@@ -1888,6 +1911,7 @@ public class SpanishTranslation implements Translation {
         es.put("HELP_EMPIRE_RANKS", "Rangos de Dinastía");
         es.put("HELP_RANK_MIN_POPULATION", " (pob. mín. %s)");
         es.put("HELP_RANK_UNLOCKS_TIER", "desbloquea");
+        es.put("HELP_RANK_UNLOCKS_UPGRADE", "desbloquea");
         es.put("HELP_TIER_MIN_SCORE", " (mín. %s)");
         es.put("HELP_LOYALTY_MODIFIERS_TITLE", "Modificadores activos");
         es.put("HELP_LOYALTY_MODIFIER_MILITARY", "Militar vs capital: +/-1 a +/-10 según la ratio de poder con la capital (colonias más débiles ganan lealtad; satélites más fuertes la pierden).");
@@ -2079,7 +2103,7 @@ public class SpanishTranslation implements Translation {
         es.put("TRIGGER_RANK_DUCHY_TITLE", "Ducado");
         es.put("TRIGGER_RANK_DUCHY_MSG", "Tu dinastía es ahora un Ducado. Se desbloquean mejoras y edificios de mayor nivel — y la colonia es lo bastante grande como para que se infiltren hormigas parásitas, desbloqueando el rol de Policía.");
         es.put("TRIGGER_RANK_KINGDOM_TITLE", "Reino");
-        es.put("TRIGGER_RANK_KINGDOM_MSG", "¡Surge un Reino! Tu dinastía comanda un enjambre a escala de reino y desbloquea el siguiente nivel de avances.");
+        es.put("TRIGGER_RANK_KINGDOM_MSG", "¡Surge un Reino! Tu dinastía comanda un enjambre a escala de reino — las princesas desbloquean el rol Apoyo aéreo para pasadas de cobertura cercana.");
         es.put("TRIGGER_RANK_SUPER_TITLE", "Supercolonia");
         es.put("TRIGGER_RANK_SUPER_MSG", "Tu dinastía se ha convertido en una Supercolonia: una vasta red viviente. Se abren nuevos niveles de tecnología a esta escala.");
         es.put("TRIGGER_RANK_ULTRA_TITLE", "Ultracolonia");
@@ -2109,7 +2133,7 @@ public class SpanishTranslation implements Translation {
         es.put("TRIGGER_BRUTE_ROLE_TITLE", "Soldado pesado");
         es.put("TRIGGER_BRUTE_ROLE_MSG", "Al desbloquear el tipo Major, se ha desbloqueado automáticamente el rol de 'Bruto'.");
         es.put("TRIGGER_COMMANDER_ROLE_TITLE", "Mando de campo");
-        es.put("TRIGGER_COMMANDER_ROLE_MSG", "Con varias reinas y experiencia de guerra, una Reina puede asumir el rol de Comandante — aumentando la capacidad de combate de tu dinastía.");
+        es.put("TRIGGER_COMMANDER_ROLE_MSG", "Con varias reinas y experiencia de guerra, una Reina puede asumir el rol de Comandante — aumentando la capacidad de combate y desbloqueando Líder de artillería. Las princesas también desbloquean el rol Capitana como Líder de infantería.");
         es.put("TRIGGER_SPREAD_ABILITY_TITLE", "Colonización");
         es.put("TRIGGER_SPREAD_ABILITY_MSG", "Con la capacidad de criar nuevas reinas, tu colonia ahora sabe cómo expandirse. Puedes fundar nuevas colonias desde el mapa mundial (M).");
         es.put("TRIGGER_SCOUT_ROLE_TITLE", "Llamada de la aventura");
@@ -2150,6 +2174,8 @@ public class SpanishTranslation implements Translation {
         es.put("TRIGGER_SYNERGY_ACID_ARTILLERY_MSG", "%s ya está activa! Combinar %s desbloquea el rol Artillería para majors y la habilidad Artillería ácida. Abre Sinergias (O) para revisar.");
         es.put("TRIGGER_SYNERGY_CORROSIVE_BOMBS_TITLE", "Sinergia desbloqueada");
         es.put("TRIGGER_SYNERGY_CORROSIVE_BOMBS_MSG", "%s ya está activa! Combinar %s mejora Autodestrucción de Bombarderas a Autodestrucción ácida. Abre Sinergias (O) para revisar.");
+        es.put("TRIGGER_SYNERGY_AIR_BOMBER_TITLE", "Sinergia desbloqueada");
+        es.put("TRIGGER_SYNERGY_AIR_BOMBER_MSG", "%s ya está activa! Combinar %s desbloquea el rol Bombardera aérea y la habilidad Bombardeo aéreo. Abre Sinergias (O) para revisar.");
         es.put("TRIGGER_OPERATIONS_ABILITY_TITLE", "Operaciones de colonia");
         es.put("TRIGGER_OPERATIONS_ABILITY_MSG", "¡Has obtenido una habilidad activa especial! Ahora puedes acceder al menú de Operaciones de colonia pulsando (Z).");
 

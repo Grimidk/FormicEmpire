@@ -134,4 +134,21 @@ class DynastySynergyServiceTest {
         assertTrue(dynasty.hasUpgrade(GameUnlocks.SYNERGY_CORROSIVE_BOMBS));
         assertTrue(dynasty.hasSkill(GameConstants.SKILL_ACIDIC_SELFDESTRUCT));
     }
+
+    @Test
+    void airBomberSynergyUnlocksAirBomberRoleAndSkill() {
+        Dynasty dynasty = new Dynasty(12, "Test", true, GameConstants.SPECIES_OMNI);
+        dynasty.unlockUpgrade(GameUnlocks.ABILITY_SYNERGY);
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_AIR_SUPPORT);
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_BOMBER);
+        dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_ACIDSPIT);
+
+        assertTrue(DynastySynergyService.isUnlocked(dynasty, GameUnlocks.AIR_BOMBER_SYNERGY));
+        assertTrue(dynasty.hasUpgrade(GameUnlocks.ROLE_AIR_BOMBER));
+        assertTrue(dynasty.hasSkill(GameConstants.SKILL_AIR_BOMBING));
+        assertTrue(GameConstants.SKILL_AIR_BOMBING.sacrificesSelf());
+        assertEquals(20f, GameConstants.SKILL_AIR_BOMBING.getDamageMult(), 0.0001f);
+        assertEquals(0.9f, GameConstants.SKILL_AIR_BOMBING.getAccuracyMult(), 0.0001f);
+        assertEquals(GameConstants.BATTLE_LINE_AIR_SUPPORT, GameConstants.SKILL_AIR_BOMBING.getBattleLine());
+    }
 }

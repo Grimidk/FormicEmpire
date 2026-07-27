@@ -178,7 +178,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("BUILD_COST_FORMAT", "<html>%s minerais<br>%s resina<br>%s horas (base)</html>");
         pt.put("ASSIMILATION_CURRENT", "Assimilação atual: %s");
         pt.put("ASSIMILATION_NONE", "Nenhuma");
-        pt.put("ASSIMILATION_NO_GENOMES", "Nenhum genoma disponível para assimilação. Derrote outras espécies para desbloquear.");
+        pt.put("ASSIMILATION_NO_GENOMES", "Nenhum genoma disponível para assimilação. Conclua primeiro a Assimilação Omni; depois derrote outras espécies para desbloquear os seus genomas.");
         pt.put("ASSIMILATION_TARGET", "Alvo: %s");
         pt.put("ASSIMILATION_ACTIVE", "Assimilando: %s");
         pt.put("ASSIMILATION_PROGRESS", "%s / %s ( %s%% )");
@@ -233,6 +233,8 @@ public class PortugueseTranslation implements Translation {
         pt.put("SYNERGY_CORROSIVE_BOMBS", "Bombas corrosivas");
         pt.put("SYNERGY_CORROSIVE_BOMBS_FLAVOR", "Sacrifício ácido");
         pt.put("SYNERGY_CORROSIVE_BOMBS_DESC", "Substitui Autodestruição das Bombardeiras por Autodestruição ácida (1000% dano, 90% precisão, 7 alvos; a formiga morre). Requer assimilações Autodestruição e Cuspe ácido.");
+        pt.put("SYNERGY_AIR_BOMBER", "Bombardeira aérea");
+        pt.put("SYNERGY_AIR_BOMBER_DESC", "Desbloqueia a função Bombardeira aérea para princesas. Concede Bombardeamento aéreo (2000% dano, 90% precisão, 7 alvos; a formiga morre). Requer Apoio aéreo, Bombardeira e Cuspe ácido.");
 
         pt.put("DIALOG_HATCH_RATES_TITLE", "Taxas de eclosão");
         pt.put("HATCH_DESC", "Definir probabilidade de eclosão:");
@@ -264,6 +266,10 @@ public class PortugueseTranslation implements Translation {
         pt.put("SKILL_ACID_ARTILLERY", "Artilharia ácida");
         pt.put("SKILL_SELFDESTRUCT", "Autodestruição");
         pt.put("SKILL_ACIDIC_SELFDESTRUCT", "Autodestruição ácida");
+        pt.put("SKILL_ARTILLERY_LEADER", "Líder de artilharia");
+        pt.put("SKILL_INFANTRY_LEADER", "Líder de infantaria");
+        pt.put("SKILL_CLOSE_ANT_SUPPORT", "Apoio formiga próximo");
+        pt.put("SKILL_AIR_BOMBING", "Bombardeamento aéreo");
 
         pt.put("BATTLE_LINE_INFANTRY", "Infantaria");
         pt.put("BATTLE_LINE_ARTILLERY", "Artilharia");
@@ -1020,6 +1026,9 @@ public class PortugueseTranslation implements Translation {
         pt.put("ROLE_LAYER", "Postura de ovos");
         pt.put("ROLE_RESEARCHER", "Pesquisadora");
         pt.put("ROLE_COMMANDER", "Comandante");
+        pt.put("ROLE_CAPTAIN", "Capitã");
+        pt.put("ROLE_AIR_SUPPORT", "Apoio aéreo");
+        pt.put("ROLE_AIR_BOMBER", "Bombardeira aérea");
         pt.put("ROLE_MILITIA", "Milícia auxiliar");
         pt.put("ROLE_CATCHER", "Capturadora");
         pt.put("ROLE_CRANE", "Guindaste");
@@ -1325,6 +1334,10 @@ public class PortugueseTranslation implements Translation {
         pt.put("ASSIMILATION_LOCSENSE_DESC", "Após assimilar o genoma da formiga do deserto:");
         pt.put("ASSIMILATED_ACIDSPIT_FLAVOR", "Bateria fórmica");
         pt.put("ASSIMILATED_ACIDSPIT_DESC", "Desbloqueia a habilidade Cuspe ácido para as formigas da sua colônia.");
+        pt.put("ASSIMILATED_ASSIMILATION_FLAVOR", "Ponte genómica");
+        pt.put("ASSIMILATED_ASSIMILATION_DESC", "Permite à tua dinastia assimilar genomas de outras espécies. Sem esta chave Omni, espécies derrotadas não podem ser assimiladas.");
+        pt.put("ASSIMILATION_OMNI", "Assimilação Omni");
+        pt.put("ASSIMILATION_OMNI_DESC", "Após assimilar a ponte genómica Omni:");
         pt.put("ASSIMILATION_ACIDSPIT", "Cuspe ácido");
         pt.put("ASSIMILATION_ACIDSPIT_DESC", "Após assimilar o genoma da formiga verde:");
 
@@ -1383,7 +1396,16 @@ public class PortugueseTranslation implements Translation {
         pt.put("ROLE_RESEARCHER_DESC", "Permite que rainhas gerem pontos de pesquisa. 1 rainha gera 1 ponto por hora.");
         pt.put("ROLE_COMMANDER_UPGRADE", "Função comandante");
         pt.put("ROLE_COMMANDER_FLAVOR", "Senhora de guerra real");
-        pt.put("ROLE_COMMANDER_DESC", "Função militar activa para rainhas. Máx. 1 por colónia, e só se outra rainha permanecer num papel não combatente. Atribuir uma Comandante sobe a capacidade de combate da dinastia de 1.000 para 2.500 (não acumula).");
+        pt.put("ROLE_COMMANDER_DESC", "Função militar activa para rainhas (linha de artilharia). Máx. 1 por colónia, e só se outra rainha permanecer num papel não combatente. Atribuir uma Comandante sobe a capacidade de combate da dinastia de 1.000 para 2.500 (não acumula). Concede Líder de artilharia (+50% de dano de artilharia enquanto uma Comandante viva estiver em batalha). Também desbloqueia a função Capitã para princesas.");
+        pt.put("ROLE_CAPTAIN_UPGRADE", "Função capitã");
+        pt.put("ROLE_CAPTAIN_FLAVOR", "Capitã de campo");
+        pt.put("ROLE_CAPTAIN_DESC", "Função militar activa para princesas (linha de infantaria). Concede Líder de infantaria (+25% de dano de infantaria enquanto uma Capitã viva estiver em batalha). Desbloqueada com a função Comandante.");
+        pt.put("ROLE_AIR_SUPPORT_UPGRADE", "Função apoio aéreo");
+        pt.put("ROLE_AIR_SUPPORT_FLAVOR", "Cobertura aérea próxima");
+        pt.put("ROLE_AIR_SUPPORT_DESC", "Função militar activa para princesas na linha de apoio aéreo. Concede Apoio formiga próximo (1000% dano, 90% precisão). Desbloqueada no posto Reino.");
+        pt.put("ROLE_AIR_BOMBER_UPGRADE", "Função bombardeira aérea");
+        pt.put("ROLE_AIR_BOMBER_FLAVOR", "Mergulho suicida");
+        pt.put("ROLE_AIR_BOMBER_DESC", "Função militar activa para princesas no apoio aéreo. Concede Bombardeamento aéreo (2000% dano, 90% precisão, 7 alvos; a formiga morre). Sinergia Apoio aéreo + Bombardeira + Cuspe ácido.");
         pt.put("ROLE_BUILDER_UPGRADE", "Função construtora");
         pt.put("ROLE_BUILDER_FLAVOR", "Construção de base");
         pt.put("ROLE_BUILDER_DESC", "Permite que operárias construam novas câmaras na colônia.");
@@ -1802,6 +1824,7 @@ public class PortugueseTranslation implements Translation {
                 "Suporte: duplica o HP curado desta formiga no próximo redesdobramento de guerra (% de regeneração do HP máximo). Alimentadoras portáteis com Honeypot usam automaticamente até existirem escolhas de habilidade em batalha.");
         pt.put("HELP_SKILL_SHIELDING_EFFECT",
                 "Suporte: na defesa de hexágono, esta Defensora assume as baixas destinadas às rainhas até morrer. Defensoras doorhead ativam Escudo quando a defesa de hexágono começa.");
+        pt.put("HELP_SKILL_PASSIVE_LANE_DAMAGE_FMT", "Passiva: +%s de dano à linha %s enquanto uma formiga viva com esta habilidade estiver em batalha.");
         pt.put("HELP_BATTLE_LINE_ACCURACY_FMT", "Precisão base: %s");
         pt.put("HELP_BATTLE_LINE_ROLES_FMT", "Funções: %s");
         pt.put("HELP_BATTLE_LINE_ROLES_NONE", "Funções: nenhuma ainda");
@@ -1888,6 +1911,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("HELP_EMPIRE_RANKS", "Postos da Dinastia");
         pt.put("HELP_RANK_MIN_POPULATION", " (pop. mín. %s)");
         pt.put("HELP_RANK_UNLOCKS_TIER", "desbloqueia");
+        pt.put("HELP_RANK_UNLOCKS_UPGRADE", "desbloqueia");
         pt.put("HELP_TIER_MIN_SCORE", " (mín. %s)");
         pt.put("HELP_LOYALTY_MODIFIERS_TITLE", "Modificadores ativos");
         pt.put("HELP_LOYALTY_MODIFIER_MILITARY", "Militar vs capital: +/-1 a +/-10 pela razão de poder com a capital (colônias mais fracas ganham lealdade; satélites mais fortes perdem).");
@@ -2079,7 +2103,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("TRIGGER_RANK_DUCHY_TITLE", "Ducado");
         pt.put("TRIGGER_RANK_DUCHY_MSG", "A tua dinastia é agora um Ducado. Desbloqueiam-se melhorias e edifícios de nível superior — e a colónia é grande o suficiente para formigas parasitas se infiltrarem, desbloqueando o papel de Polícia.");
         pt.put("TRIGGER_RANK_KINGDOM_TITLE", "Reino");
-        pt.put("TRIGGER_RANK_KINGDOM_MSG", "Um Reino ergue-se! A tua dinastia comanda um enxame à escala de um reino e desbloqueia o próximo nível de avanços.");
+        pt.put("TRIGGER_RANK_KINGDOM_MSG", "Um Reino ergue-se! A tua dinastia comanda um enxame à escala de um reino — as princesas desbloqueiam a função Apoio aéreo para passagens de cobertura próxima.");
         pt.put("TRIGGER_RANK_SUPER_TITLE", "Supercolônia");
         pt.put("TRIGGER_RANK_SUPER_MSG", "A tua dinastia tornou-se uma Supercolônia — uma vasta rede viva. Novos níveis de tecnologia abrem-se nesta escala.");
         pt.put("TRIGGER_RANK_ULTRA_TITLE", "Ultracolônia");
@@ -2109,7 +2133,7 @@ public class PortugueseTranslation implements Translation {
         pt.put("TRIGGER_BRUTE_ROLE_TITLE", "Soldado pesado");
         pt.put("TRIGGER_BRUTE_ROLE_MSG", "Ao desbloquear o tipo Major, a função 'Bruto' foi desbloqueada automaticamente.");
         pt.put("TRIGGER_COMMANDER_ROLE_TITLE", "Comando de campo");
-        pt.put("TRIGGER_COMMANDER_ROLE_MSG", "Com várias rainhas e experiência de guerra, uma Rainha pode assumir a função de Comandante — aumentando a capacidade de combate da dinastia.");
+        pt.put("TRIGGER_COMMANDER_ROLE_MSG", "Com várias rainhas e experiência de guerra, uma Rainha pode assumir a função de Comandante — aumentando a capacidade de combate e desbloqueando Líder de artilharia. As princesas também desbloqueiam a função Capitã como Líder de infantaria.");
         pt.put("TRIGGER_SPREAD_ABILITY_TITLE", "Colonização");
         pt.put("TRIGGER_SPREAD_ABILITY_MSG", "Com a capacidade de criar novas rainhas, a tua colónia agora sabe como se expandir. Podes fundar novas colónias no mapa mundial (M).");
         pt.put("TRIGGER_SCOUT_ROLE_TITLE", "Chamada da aventura");
@@ -2150,6 +2174,8 @@ public class PortugueseTranslation implements Translation {
         pt.put("TRIGGER_SYNERGY_ACID_ARTILLERY_MSG", "%s já está ativa! Combinar %s desbloqueia a função Artilharia para majors e a habilidade Artilharia ácida. Abra Sinergias (O) para rever.");
         pt.put("TRIGGER_SYNERGY_CORROSIVE_BOMBS_TITLE", "Sinergia desbloqueada");
         pt.put("TRIGGER_SYNERGY_CORROSIVE_BOMBS_MSG", "%s já está ativa! Combinar %s melhora Autodestruição das Bombardeiras para Autodestruição ácida. Abra Sinergias (O) para rever.");
+        pt.put("TRIGGER_SYNERGY_AIR_BOMBER_TITLE", "Sinergia desbloqueada");
+        pt.put("TRIGGER_SYNERGY_AIR_BOMBER_MSG", "%s já está ativa! Combinar %s desbloqueia a função Bombardeira aérea e a habilidade Bombardeamento aéreo. Abra Sinergias (O) para rever.");
         pt.put("TRIGGER_OPERATIONS_ABILITY_TITLE", "Operações da colónia");
         pt.put("TRIGGER_OPERATIONS_ABILITY_MSG", "Ganhaste uma habilidade ativa especial! Agora podes aceder ao menu de Operações da colónia premindo (Z).");
 

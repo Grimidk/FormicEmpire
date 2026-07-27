@@ -73,6 +73,14 @@ public final class GameUnlocks {
         static { upgrades.add(ROLE_RESEARCHER); }
         public static final Upgrade ROLE_COMMANDER = new Upgrade(40, "ROLE_COMMANDER_UPGRADE", "ROLE_COMMANDER_FLAVOR", "ROLE_COMMANDER_DESC", TYPE_QUEEN, 0, loadIcon("icons/upgrades/RoleCommander.png"), 0);
         static { upgrades.add(ROLE_COMMANDER); }
+        public static final Upgrade ROLE_CAPTAIN = new Upgrade(41, "ROLE_CAPTAIN_UPGRADE", "ROLE_CAPTAIN_FLAVOR", "ROLE_CAPTAIN_DESC", TYPE_PRINCESS, 0, loadIcon("icons/upgrades/RoleCaptain.png"), 0);
+        static { upgrades.add(ROLE_CAPTAIN); }
+        // TODO asset: icons/upgrades/RoleAirSupport.png (placeholder)
+        public static final Upgrade ROLE_AIR_SUPPORT = new Upgrade(42, "ROLE_AIR_SUPPORT_UPGRADE", "ROLE_AIR_SUPPORT_FLAVOR", "ROLE_AIR_SUPPORT_DESC", TYPE_PRINCESS, 0, loadIcon("icons/upgrades/RoleAirSupport.png"), 0);
+        static { upgrades.add(ROLE_AIR_SUPPORT); }
+        // TODO asset: icons/upgrades/RoleAirBomber.png (placeholder)
+        public static final Upgrade ROLE_AIR_BOMBER = new Upgrade(43, "ROLE_AIR_BOMBER_UPGRADE", "ROLE_AIR_BOMBER_FLAVOR", "ROLE_AIR_BOMBER_DESC", TYPE_PRINCESS, 0, loadIcon("icons/upgrades/RoleAirBomber.png"), 0);
+        static { upgrades.add(ROLE_AIR_BOMBER); }
         public static final Upgrade ROLE_BUILDER = new Upgrade(15, "ROLE_BUILDER_UPGRADE", "ROLE_BUILDER_FLAVOR", "ROLE_BUILDER_DESC", TYPE_WORKER, 150, loadIcon("icons/upgrades/RoleBuilder.png"), 1);
         static { upgrades.add(ROLE_BUILDER); }
         public static final Upgrade ROLE_SCOUT = new Upgrade(16, "ROLE_SCOUT_UPGRADE", "ROLE_SCOUT_FLAVOR", "ROLE_SCOUT_DESC", TYPE_WORKER, 0, loadIcon("icons/upgrades/RoleScout.png"), 0);
@@ -375,6 +383,8 @@ public final class GameUnlocks {
         static { upgrades.add(ASSIMILATED_LOCSENSE); }
         public static final Upgrade ASSIMILATED_ACIDSPIT = new Upgrade(1022, "ASSIMILATED_ACIDSPIT", "ASSIMILATED_ACIDSPIT_FLAVOR", "ASSIMILATED_ACIDSPIT_DESC", ABILITY_ASSIMILATION, 0, loadIcon("icons/upgrades/AssimilatedAcidspit.png"), 0);
         static { upgrades.add(ASSIMILATED_ACIDSPIT); }
+        public static final Upgrade ASSIMILATED_ASSIMILATION = new Upgrade(1023, "ASSIMILATED_ASSIMILATION", "ASSIMILATED_ASSIMILATION_FLAVOR", "ASSIMILATED_ASSIMILATION_DESC", ABILITY_ASSIMILATION, 0, loadIcon("icons/upgrades/AssimilatedAssimilation.png"), 0);
+        static { upgrades.add(ASSIMILATED_ASSIMILATION); }
 
         // TODO asset: icons/upgrades/SynergySuperVenom.png (placeholder — replace final art)
         public static final Upgrade SYNERGY_SUPER_VENOM = new Upgrade(10001, "SYNERGY_SUPER_VENOM", "SYNERGY_SUPER_VENOM_FLAVOR", "SYNERGY_SUPER_VENOM_DESC", null, 0, null, 0);
@@ -521,6 +531,15 @@ public final class GameUnlocks {
                 return (int) Math.round(ASSIMILATION_COST * multiplier);
         }
 
+        /** Omni keystone: required before other species assimilations can be started. */
+        public static final Assimilation ASSIMILATION_OMNI = new Assimilation(12, "ASSIMILATION_OMNI", "ASSIMILATION_OMNI_DESC", ASSIMILATED_ASSIMILATION, ASSIMILATION_COST, loadIcon("icons/assimilations/Omni.png"));
+        static { assimilations.add(ASSIMILATION_OMNI); }
+
+        public static boolean canAssimilateForeignSpecies(Dynasty dynasty) {
+                return dynasty != null && (dynasty.hasUpgrade(ASSIMILATED_ASSIMILATION)
+                        || dynasty.isAssimilationCompleted(ASSIMILATION_OMNI));
+        }
+
         public static final Assimilation ASSIMILATION_LEAFCUTTER = new Assimilation(1, "ASSIMILATION_LEAFCUTTER", "ASSIMILATION_LEAFCUTTER_DESC", ASSIMILATED_FARMING, ASSIMILATION_COST, loadIcon("icons/assimilations/Leafcutter.png"));
         static { assimilations.add(ASSIMILATION_LEAFCUTTER); }
         public static final Assimilation ASSIMILATION_PHARAOH = new Assimilation(2, "ASSIMILATION_PHARAOH", "ASSIMILATION_PHARAOH_DESC", ASSIMILATED_MULTIQUEEN, ASSIMILATION_COST, loadIcon("icons/assimilations/Pharaoh.png"));
@@ -588,6 +607,11 @@ public final class GameUnlocks {
         public static final Synergy CORROSIVE_BOMBS_SYNERGY = new Synergy(3, "SYNERGY_CORROSIVE_BOMBS", "SYNERGY_CORROSIVE_BOMBS_DESC",
                 SYNERGY_CORROSIVE_BOMBS, ASSIMILATED_SELFDESTRUCT, ASSIMILATED_ACIDSPIT);
         static { synergies.add(CORROSIVE_BOMBS_SYNERGY); }
+        // TODO asset: icons/synergies/AirBomber.png (placeholder)
+        public static final Synergy AIR_BOMBER_SYNERGY = new Synergy(4, "SYNERGY_AIR_BOMBER", "SYNERGY_AIR_BOMBER_DESC",
+                ROLE_AIR_BOMBER, loadIcon("icons/synergies/AirBomber.png"),
+                ROLE_AIR_SUPPORT, ROLE_BOMBER, ASSIMILATED_ACIDSPIT);
+        static { synergies.add(AIR_BOMBER_SYNERGY); }
 
         // --- Getters ---
         public static List<Upgrade> getUpgrades() { return Collections.unmodifiableList(upgrades); }

@@ -5,12 +5,12 @@ To Fix (By decreasing priority):
 	(none right now)
 	
 	High:
+	excel for languages and tags and script to update it
 	TODO: icons for 85 unlocks
 	TODO: tune AntSpeciesPalette hexes + icons for placeholder species (carpenter, weaver, floodplain, jet, army, ghost, silver, shining black, desert)
-		(runtime ant bodies recolor zero-shared layers — per-species Worker.png art optional)
  	
 	Mid:
-	assimilation for assimilation, assimilation fastbite doesnt have icon
+	(none right now)
 	  
 	Low:
 	(none right now)
@@ -21,7 +21,6 @@ To Fix (By decreasing priority):
 	Important not Urgent:
 	map hexes look kinda yank
 	Font - self explanatory
-	excel for languages and tags and script to update it
 	
 To Feature (to be done in order):
 Needed for launch (v1.0) (Launch Version):
@@ -30,8 +29,7 @@ Needed for launch (v1.0) (Launch Version):
 	research tree and building tree (orchard) (after icons) with available, purchasable, locked and list trigger based upgrades 
 	main menu screen maybe simulation like factorio and title header
 	more upgrades (mid game upgrade to health, defense, attck and late for defense health attack and atkspeed) and more buildings lvl 4 a 5
-	implement pending roles (miner, carrier) more roles (captain roles (passive boost damage also for commander), air force and paratroopers to skip a stage) 
-	air force roles, touch simulation for fast fliyin ants, 	Air-force ants + self destruction = Air-bomber ants
+	implement pending roles (miner, carrier) more roles (paratroopers to skip a stage)
 	music and sounds and settings for them and player panel (to include in core engine)
 
 	critter sprite composite + palette recolor (code wired; refine art/palettes):
@@ -43,11 +41,10 @@ Needed for launch (v1.0) (Launch Version):
 			AntSpeciesPalette on each AntSpecies (hex): head, torso, abdomen, wingPrimary/Secondary,
 				drone, droneWingPrimary/Secondary, honeypot
 			AntSpriteCompositor builds legs→abdomen→torso→head→jaws→wings; GameConstants.getAntSprite uses it
-			Walk/jaw/wing frames: colony idle rare snaps; battle attack jaw snaps; air-support flyby wings open
+			Walk/jaw/wing: colony hourly viewport rolls, open for 30 in-game minutes; battle attack snaps; air-support flyby wings open
 			Per-species body PNG folders removed — only zero-shared (+ zero-drones/princesses + Egg/Larva/Pupa/Dead/Zombie)
 			Non-ant walkers: sprites/critters/shared/legs/{Aphid|Dermestid|SoilMite}/Leg1…Leg4.png still TODO
 	rework how carrying looks completely, maybe have an item inside jaws
-	
 	
 	Everything else :
 	swarm vs creature battles

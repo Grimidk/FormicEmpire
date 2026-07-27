@@ -196,6 +196,7 @@ public class TriggerManager {
             checkNPCGraver(npc);
             checkNPCScout(npc);
             checkNPCPolice(npc);
+            checkNPCAirSupport(npc);
             checkNPCUnitRoles(npc);
             checkNPCAbilities(npc);
             checkNPCCloning(npc);
@@ -286,6 +287,17 @@ public class TriggerManager {
         Rank rank = npc.getRank();
         if (rank != null && rank.meetsOrExceeds(GameConstants.RANK_DUCHY)) {
             npc.unlockUpgrade(GameUnlocks.ROLE_POLICE);
+        }
+    }
+
+    private void checkNPCAirSupport(Colony npc) {
+        if (npc.hasUpgrade(GameUnlocks.ROLE_AIR_SUPPORT)) {
+            return;
+        }
+        Dynasty dynasty = npc.getDynasty();
+        Rank rank = dynasty != null ? dynasty.getRank() : npc.getRank();
+        if (rank != null && rank.meetsOrExceeds(GameConstants.RANK_KINGDOM)) {
+            npc.unlockUpgrade(GameUnlocks.ROLE_AIR_SUPPORT);
         }
     }
 

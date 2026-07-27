@@ -12,6 +12,9 @@ public class Skill extends Constant {
     private final float damageMult;
     private final int targetCount;
     private final boolean isAttack;
+    /** Passive aura: never chosen as a battle action; may boost its battle line's damage. */
+    private final boolean passive;
+    private final float laneDamageBonus;
     private AntRole requiredRole;
     private AntSubtype requiredSubtype;
     private BattleLine battleLine;
@@ -20,16 +23,23 @@ public class Skill extends Constant {
 
     public Skill(int id, String nameKey, float accuracyMult, float damageMult, int targetCount, boolean isAttack,
             ImageIcon icon) {
-        this(id, nameKey, accuracyMult, damageMult, targetCount, isAttack, null, icon);
+        this(id, nameKey, accuracyMult, damageMult, targetCount, isAttack, false, 0f, null, icon);
     }
 
     public Skill(int id, String nameKey, float accuracyMult, float damageMult, int targetCount, boolean isAttack,
             AntRole requiredRole, ImageIcon icon) {
+        this(id, nameKey, accuracyMult, damageMult, targetCount, isAttack, false, 0f, requiredRole, icon);
+    }
+
+    public Skill(int id, String nameKey, float accuracyMult, float damageMult, int targetCount, boolean isAttack,
+            boolean passive, float laneDamageBonus, AntRole requiredRole, ImageIcon icon) {
         super(id, nameKey, icon);
         this.accuracyMult = accuracyMult;
         this.damageMult = damageMult;
         this.targetCount = targetCount;
         this.isAttack = isAttack;
+        this.passive = passive;
+        this.laneDamageBonus = Math.max(0f, laneDamageBonus);
         this.requiredRole = requiredRole;
     }
 
@@ -47,6 +57,15 @@ public class Skill extends Constant {
 
     public boolean isAttack() {
         return isAttack;
+    }
+
+    public boolean isPassive() {
+        return passive;
+    }
+
+    /** Additive damage bonus applied to the skill's battle line while a living ant with this skill is present. */
+    public float getLaneDamageBonus() {
+        return laneDamageBonus;
     }
 
     public AntRole getRequiredRole() {

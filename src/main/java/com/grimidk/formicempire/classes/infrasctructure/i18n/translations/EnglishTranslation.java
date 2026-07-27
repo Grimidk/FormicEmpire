@@ -178,7 +178,7 @@ public class EnglishTranslation implements Translation {
         en.put("BUILD_COST_FORMAT", "<html>%s Minerals<br>%s Resin<br>%s Hours (base)</html>");
         en.put("ASSIMILATION_CURRENT", "Current Assimilation: %s");
         en.put("ASSIMILATION_NONE", "None");
-        en.put("ASSIMILATION_NO_GENOMES", "  No genetic genomes available for assimilation. Defeat other species to unlock.");
+        en.put("ASSIMILATION_NO_GENOMES", "  No genetic genomes available for assimilation. Complete Omni Assimilation first, then defeat other species to unlock their genomes.");
         en.put("ASSIMILATION_TARGET", "Target: %s");
         en.put("ASSIMILATION_ACTIVE", "Assimilating: %s");
         en.put("ASSIMILATION_PROGRESS", "%s / %s ( %s%% )");
@@ -233,6 +233,8 @@ public class EnglishTranslation implements Translation {
         en.put("SYNERGY_CORROSIVE_BOMBS", "Corrosive Bombs");
         en.put("SYNERGY_CORROSIVE_BOMBS_FLAVOR", "Acidic Sacrifice");
         en.put("SYNERGY_CORROSIVE_BOMBS_DESC", "Replaces Selfdestruct for Bombers with Acidic Selfdestruct (1000% damage, 90% accuracy, 7 targets; the ant dies). Requires Selfdestruct and Acid Spitting assimilations.");
+        en.put("SYNERGY_AIR_BOMBER", "Air Bomber");
+        en.put("SYNERGY_AIR_BOMBER_DESC", "Unlocks the Air Bomber role for princesses. Air Bombers gain Air Bombing (2000% damage, 90% accuracy, 7 targets; the ant dies). Requires Air Support, Bomber, and Acid Spitting assimilation.");
 
         en.put("DIALOG_HATCH_RATES_TITLE", "Manage Pupa Hatch Rates");
         en.put("HATCH_DESC", "Set hatch chance for new ants:");
@@ -264,6 +266,10 @@ public class EnglishTranslation implements Translation {
         en.put("SKILL_ACID_ARTILLERY", "Acid Artillery");
         en.put("SKILL_SELFDESTRUCT", "Selfdestruct");
         en.put("SKILL_ACIDIC_SELFDESTRUCT", "Acidic Selfdestruct");
+        en.put("SKILL_ARTILLERY_LEADER", "Artillery Leader");
+        en.put("SKILL_INFANTRY_LEADER", "Infantry Leader");
+        en.put("SKILL_CLOSE_ANT_SUPPORT", "Close Ant Support");
+        en.put("SKILL_AIR_BOMBING", "Air Bombing");
 
         en.put("BATTLE_LINE_INFANTRY", "Infantry");
         en.put("BATTLE_LINE_ARTILLERY", "Artillery");
@@ -1020,6 +1026,9 @@ public class EnglishTranslation implements Translation {
         en.put("ROLE_LAYER", "Egg-Layer");
         en.put("ROLE_RESEARCHER", "Researcher");
         en.put("ROLE_COMMANDER", "Commander");
+        en.put("ROLE_CAPTAIN", "Captain");
+        en.put("ROLE_AIR_SUPPORT", "Air Support");
+        en.put("ROLE_AIR_BOMBER", "Air Bomber");
         en.put("ROLE_MILITIA", "Militia Auxiliary");
         en.put("ROLE_CATCHER", "Catcher");
         en.put("ROLE_CRANE", "Construction Crane");
@@ -1135,7 +1144,7 @@ public class EnglishTranslation implements Translation {
         en.put("DIPLO_ERROR_PACT_DECLINE_COOLDOWN_FMT", "You must wait %s more month(s) after a declined pact request before asking again.");
         en.put("DIPLO_ERROR_TRADE_DECLINE_COOLDOWN_FMT", "You must wait %s more month(s) after a declined trade proposal before proposing again.");
         en.put("DIPLO_ERROR_WAR_POPULATION_FMT", "Your dynasty needs at least %s ants before declaring war or configuring war economy roles.");
-        en.put("DIPLO_ERROR_WAR_ACTIVE_MILITARY", "Assign active military roles in war economy (Warrior, Defender, Militia, Brute, or Commander) before declaring war.");
+        en.put("DIPLO_ERROR_WAR_ACTIVE_MILITARY", "Assign active military roles in war economy (Warrior, Defender, Militia, Brute, Captain, or Commander) before declaring war.");
         en.put("DIPLO_ERROR_WAR_TARGET_ACTIVE_MILITARY_FMT", "%s cannot be attacked yet — they have no active military roles.");
         en.put("DIPLO_ERROR_WAR_NO_BORDER", "Can only declare war to a bordering dynasty.");
         en.put("DIPLO_ACTION_TRADE", "Trade");
@@ -1327,6 +1336,10 @@ public class EnglishTranslation implements Translation {
         en.put("ASSIMILATED_ACIDSPIT_DESC", "Unlocks the Acid Spitting skill for ants in your colony.");
         en.put("ASSIMILATION_ACIDSPIT", "Acid Spit");
         en.put("ASSIMILATION_ACIDSPIT_DESC", "After assimilating the green ant genome:");
+        en.put("ASSIMILATED_ASSIMILATION_FLAVOR", "Genome Bridge");
+        en.put("ASSIMILATED_ASSIMILATION_DESC", "Allows your dynasty to assimilate genomes from other species. Without this Omni keystone, defeated species cannot be assimilated.");
+        en.put("ASSIMILATION_OMNI", "Omni Assimilation");
+        en.put("ASSIMILATION_OMNI_DESC", "After assimilating the Omni genome bridge:");
         en.put("METHOD_LAND", "Land");
         en.put("METHOD_AIR", "Air");
         en.put("METHOD_SEA", "Sea");
@@ -1382,7 +1395,16 @@ public class EnglishTranslation implements Translation {
         en.put("ROLE_RESEARCHER_DESC", "Allows queens to generate research points. 1 ant research 1 point per hour.");
         en.put("ROLE_COMMANDER_UPGRADE", "Commander Role");
         en.put("ROLE_COMMANDER_FLAVOR", "Royal Warlord");
-        en.put("ROLE_COMMANDER_DESC", "Active military role for queens. Max 1 per colony, and only if another queen remains in a non-combat role. Assigning a Commander raises dynasty combat capacity from 1,000 to 2,500 (does not stack).");
+        en.put("ROLE_COMMANDER_DESC", "Active military role for queens (artillery line). Max 1 per colony, and only if another queen remains in a non-combat role. Assigning a Commander raises dynasty combat capacity from 1,000 to 2,500 (does not stack). Grants Artillery Leader (+50% artillery-line damage while a living Commander is in battle). Also unlocks the Captain princess role.");
+        en.put("ROLE_CAPTAIN_UPGRADE", "Captain Role");
+        en.put("ROLE_CAPTAIN_FLAVOR", "Field Captain");
+        en.put("ROLE_CAPTAIN_DESC", "Active military role for princesses (infantry line). Grants Infantry Leader (+25% infantry-line damage while a living Captain is in battle). Unlocked with the Commander role.");
+        en.put("ROLE_AIR_SUPPORT_UPGRADE", "Air Support Role");
+        en.put("ROLE_AIR_SUPPORT_FLAVOR", "Close Air Cover");
+        en.put("ROLE_AIR_SUPPORT_DESC", "Active military role for princesses on the air-support battle line. Grants Close Ant Support (1000% damage, 90% accuracy). Unlocked at Ant Queendom rank.");
+        en.put("ROLE_AIR_BOMBER_UPGRADE", "Air Bomber Role");
+        en.put("ROLE_AIR_BOMBER_FLAVOR", "Suicide Dive");
+        en.put("ROLE_AIR_BOMBER_DESC", "Active military role for princesses on the air-support line. Grants Air Bombing (2000% damage, 90% accuracy, 7 targets; the ant dies). Unlocked by the Air Bomber synergy (Air Support + Bomber + Acid Spitting).");
         en.put("ROLE_BUILDER_UPGRADE", "Builder Role");
         en.put("ROLE_BUILDER_FLAVOR", "Base Building");
         en.put("ROLE_BUILDER_DESC", "Allows workers to build new rooms in the colony.");
@@ -1764,6 +1786,7 @@ public class EnglishTranslation implements Translation {
                 "Support: doubles this ant's HP healed on the next war redeploy (regen % of max HP). Portable-Feeders with Honeypot use it automatically until battle skill picks exist.");
         en.put("HELP_SKILL_SHIELDING_EFFECT",
                 "Support: in hex defense, this Defender takes losses meant for queens until the ant dies. Doorhead Defenders arm Shielding when hex defense begins.");
+        en.put("HELP_SKILL_PASSIVE_LANE_DAMAGE_FMT", "Passive: +%s damage to the %s battle line while a living ant with this skill is in battle.");
         en.put("HELP_BATTLE_LINE_ACCURACY_FMT", "Base accuracy: %s");
         en.put("HELP_BATTLE_LINE_ROLES_FMT", "Roles: %s");
         en.put("HELP_BATTLE_LINE_ROLES_NONE", "Roles: none yet");
@@ -1850,6 +1873,7 @@ public class EnglishTranslation implements Translation {
         en.put("HELP_EMPIRE_RANKS", "Dynasty Ranks");
         en.put("HELP_RANK_MIN_POPULATION", " (min pop. %s)");
         en.put("HELP_RANK_UNLOCKS_TIER", "unlocks");
+        en.put("HELP_RANK_UNLOCKS_UPGRADE", "unlocks");
         en.put("HELP_TIER_MIN_SCORE", " (min %s)");
         en.put("HELP_LOYALTY_MODIFIERS_TITLE", "Active modifiers");
         en.put("HELP_LOYALTY_MODIFIER_MILITARY", "Military vs Capital: +/-1 to +/-10 from power ratio vs capital (weaker colonies gain loyalty; stronger satellites lose it).");
@@ -2041,7 +2065,7 @@ public class EnglishTranslation implements Translation {
         en.put("TRIGGER_RANK_DUCHY_TITLE", "Ant Duchy");
         en.put("TRIGGER_RANK_DUCHY_MSG", "Your dynasty is now an Ant Duchy. Higher-tier upgrades and buildings become available — and the colony is large enough that parasite ants may infiltrate, unlocking the Police role.");
         en.put("TRIGGER_RANK_KINGDOM_TITLE", "Ant Queendom");
-        en.put("TRIGGER_RANK_KINGDOM_MSG", "A Queendom rises! Your dynasty commands a kingdom-scale swarm, unlocking the next tier of advancements.");
+        en.put("TRIGGER_RANK_KINGDOM_MSG", "A Queendom rises! Your dynasty commands a kingdom-scale swarm — princesses unlock the Air Support role for close air cover flybys.");
         en.put("TRIGGER_RANK_SUPER_TITLE", "Ant Super Colony");
         en.put("TRIGGER_RANK_SUPER_MSG", "Your dynasty has become a Super Colony — a vast living network. New tiers of technology open to a swarm of this scale.");
         en.put("TRIGGER_RANK_ULTRA_TITLE", "Ant Ultra Colony");
@@ -2071,7 +2095,7 @@ public class EnglishTranslation implements Translation {
         en.put("TRIGGER_BRUTE_ROLE_TITLE", "Heavy Trooper");
         en.put("TRIGGER_BRUTE_ROLE_MSG", "Unlocking the Major ant type has automatically unlocked the 'Brute' role for them.");
         en.put("TRIGGER_COMMANDER_ROLE_TITLE", "Field Command");
-        en.put("TRIGGER_COMMANDER_ROLE_MSG", "With multiple queens and hard-won war experience, a Queen can take the Commander role — raising your dynasty's combat capacity.");
+        en.put("TRIGGER_COMMANDER_ROLE_MSG", "With multiple queens and hard-won war experience, a Queen can take the Commander role — raising combat capacity and unlocking Artillery Leader. Princesses also unlock the Captain role with Infantry Leader.");
         en.put("TRIGGER_SPREAD_ABILITY_TITLE", "Colony Colonization");
         en.put("TRIGGER_SPREAD_ABILITY_MSG", "With the ability to breed new queens, your colony now understands how to spread. You can found new colonies from the World Map (M).");
         en.put("TRIGGER_SCOUT_ROLE_TITLE", "Adventure's Call");
@@ -2112,6 +2136,8 @@ public class EnglishTranslation implements Translation {
         en.put("TRIGGER_SYNERGY_ACID_ARTILLERY_MSG", "%s is now active! Combining %s unlocks the Artillery role for majors and the Acid Artillery skill. Open Synergies (O) to review.");
         en.put("TRIGGER_SYNERGY_CORROSIVE_BOMBS_TITLE", "Synergy Unlocked");
         en.put("TRIGGER_SYNERGY_CORROSIVE_BOMBS_MSG", "%s is now active! Combining %s upgrades Bomber Selfdestruct into Acidic Selfdestruct. Open Synergies (O) to review.");
+        en.put("TRIGGER_SYNERGY_AIR_BOMBER_TITLE", "Synergy Unlocked");
+        en.put("TRIGGER_SYNERGY_AIR_BOMBER_MSG", "%s is now active! Combining %s unlocks the Air Bomber role and Air Bombing skill. Open Synergies (O) to review.");
         en.put("TRIGGER_OPERATIONS_ABILITY_TITLE", "Colony Operations");
         en.put("TRIGGER_OPERATIONS_ABILITY_MSG", "You have gained a special active ability! You can now access the Colony Operations menu by pressing (Z).");
 

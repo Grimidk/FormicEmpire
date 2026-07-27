@@ -194,10 +194,16 @@ public final class WarCreatureCombatService {
         Ant ant = actor.getAnt();
         Colony colony = findColonyOf(ant, actingSide.getDynasty());
         List<Skill> skills = CritterSkillService.resolveAvailableSkills(ant, colony);
-        if (skills.isEmpty()) {
-            skills = List.of(GameConstants.SKILL_BASIC_BITE);
+        List<Skill> actionable = new ArrayList<>();
+        for (Skill candidate : skills) {
+            if (candidate != null && !candidate.isPassive()) {
+                actionable.add(candidate);
+            }
         }
-        Skill skill = skills.get(GameRandom.nextInt(skills.size()));
+        if (actionable.isEmpty()) {
+            actionable = List.of(GameConstants.SKILL_BASIC_BITE);
+        }
+        Skill skill = actionable.get(GameRandom.nextInt(actionable.size()));
         if (!skill.isAttack()) {
             useSupportSkill(ant, colony, skill);
             return;
@@ -245,7 +251,8 @@ public final class WarCreatureCombatService {
             defenseStat = WarCombatSkillService.effectiveHexDefenseDefense(defAnt, !attackerIsAttackerSide);
         }
         float damageMult = CritterSkillService.resolveDamageMult(skill, atkAnt.getSubtypeProfile());
-        float raw = damageMult * attackStat;
+        WarBattleSideState actingSide = attackerIsAttackerSide ? state.getAttacker() : state.getDefender();
+        float raw = damageMult * attackStat * laneDamageMultiplier(actingSide, attacker.getBattleLine());
         float dealt = GameNumbers.damageAfterDefense(raw, defenseStat);
         if (dealt <= 0f) {
             return;
@@ -253,6 +260,33 @@ public final class WarCreatureCombatService {
         if (target.applyBattleDamage(dealt) <= 0f) {
             killParticipant(state, target, targetSide);
         }
+    }
+
+    /** Additive passive auras from living Commanders (artillery) / Captains (infantry). Does not stack per unit. */
+    private static float laneDamageMultiplier(WarBattleSideState side, BattleLine line) {
+        if (side == null || line == null) {
+            return 1f;
+        }
+        float mult = 1f;
+        if (line == GameConstants.BATTLE_LINE_ARTILLERY && sideHasLivingRole(side, GameConstants.ROLE_COMMANDER)) {
+            mult += GameNumbers.COMMANDER_ARTILLERY_DAMAGE_BONUS;
+        }
+        if (line == GameConstants.BATTLE_LINE_INFANTRY && sideHasLivingRole(side, GameConstants.ROLE_CAPTAIN)) {
+            mult += GameNumbers.CAPTAIN_INFANTRY_DAMAGE_BONUS;
+        }
+        return mult;
+    }
+
+    private static boolean sideHasLivingRole(WarBattleSideState side, AntRole role) {
+        if (side == null || role == null) {
+            return false;
+        }
+        for (WarBattleParticipant participant : side.allLivingActive()) {
+            if (participant != null && participant.getAnt() != null && participant.getAnt().getRole() == role) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static void killParticipant(WarBattleState state, WarBattleParticipant victim, WarBattleSideState side) {

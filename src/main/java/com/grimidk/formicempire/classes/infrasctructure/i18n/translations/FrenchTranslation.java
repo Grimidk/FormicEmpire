@@ -178,7 +178,7 @@ public class FrenchTranslation implements Translation {
         fr.put("BUILD_COST_FORMAT", "<html>%s minéraux<br>%s résine<br>%s heures (base)</html>");
         fr.put("ASSIMILATION_CURRENT", "Assimilation actuelle : %s");
         fr.put("ASSIMILATION_NONE", "Aucune");
-        fr.put("ASSIMILATION_NO_GENOMES", "Aucun génome disponible pour l'assimilation. Battez d'autres espèces pour débloquer.");
+        fr.put("ASSIMILATION_NO_GENOMES", "Aucun génome disponible pour l'assimilation. Terminez d'abord l'Assimilation Omni, puis battez d'autres espèces pour débloquer leurs génomes.");
         fr.put("ASSIMILATION_TARGET", "Cible : %s");
         fr.put("ASSIMILATION_ACTIVE", "Assimilation : %s");
         fr.put("ASSIMILATION_PROGRESS", "%s / %s ( %s%% )");
@@ -233,6 +233,8 @@ public class FrenchTranslation implements Translation {
         fr.put("SYNERGY_CORROSIVE_BOMBS", "Bombes corrosives");
         fr.put("SYNERGY_CORROSIVE_BOMBS_FLAVOR", "Sacrifice acide");
         fr.put("SYNERGY_CORROSIVE_BOMBS_DESC", "Remplace Autodestruction des Bombardières par Autodestruction acide (1000 % dégâts, 90 % précision, 7 cibles ; la fourmi meurt). Nécessite les assimilations Autodestruction et Crachat d'acide.");
+        fr.put("SYNERGY_AIR_BOMBER", "Bombardière aérienne");
+        fr.put("SYNERGY_AIR_BOMBER_DESC", "Débloque le rôle Bombardière aérienne pour les princesses. Accorde Bombardement aérien (2000 % dégâts, 90 % précision, 7 cibles ; la fourmi meurt). Nécessite Appui aérien, Bombardière et Crachat d'acide.");
 
         fr.put("DIALOG_HATCH_RATES_TITLE", "Taux d'éclosion des nymphes");
         fr.put("HATCH_DESC", "Probabilité d'éclosion pour les nouvelles fourmis :");
@@ -264,6 +266,10 @@ public class FrenchTranslation implements Translation {
         fr.put("SKILL_ACID_ARTILLERY", "Artillerie acide");
         fr.put("SKILL_SELFDESTRUCT", "Autodestruction");
         fr.put("SKILL_ACIDIC_SELFDESTRUCT", "Autodestruction acide");
+        fr.put("SKILL_ARTILLERY_LEADER", "Chef d'artillerie");
+        fr.put("SKILL_INFANTRY_LEADER", "Chef d'infanterie");
+        fr.put("SKILL_CLOSE_ANT_SUPPORT", "Appui fourmi rapproché");
+        fr.put("SKILL_AIR_BOMBING", "Bombardement aérien");
 
         fr.put("BATTLE_LINE_INFANTRY", "Infanterie");
         fr.put("BATTLE_LINE_ARTILLERY", "Artillerie");
@@ -1020,6 +1026,9 @@ public class FrenchTranslation implements Translation {
         fr.put("ROLE_LAYER", "Pondeuse");
         fr.put("ROLE_RESEARCHER", "Chercheuse");
         fr.put("ROLE_COMMANDER", "Commandante");
+        fr.put("ROLE_CAPTAIN", "Capitaine");
+        fr.put("ROLE_AIR_SUPPORT", "Appui aérien");
+        fr.put("ROLE_AIR_BOMBER", "Bombardière aérienne");
         fr.put("ROLE_MILITIA", "Milice auxiliaire");
         fr.put("ROLE_CATCHER", "Capturatrice");
         fr.put("ROLE_CRANE", "Grue de chantier");
@@ -1325,6 +1334,10 @@ public class FrenchTranslation implements Translation {
         fr.put("ASSIMILATION_LOCSENSE_DESC", "Après assimilation du génome de la fourmi du désert :");
         fr.put("ASSIMILATED_ACIDSPIT_FLAVOR", "Batterie formique");
         fr.put("ASSIMILATED_ACIDSPIT_DESC", "Débloque la compétence Crachat d'acide pour les fourmis de votre colonie.");
+        fr.put("ASSIMILATED_ASSIMILATION_FLAVOR", "Pont génomique");
+        fr.put("ASSIMILATED_ASSIMILATION_DESC", "Permet à votre dynastie d'assimiler les génomes d'autres espèces. Sans cette clé Omni, les espèces vaincues ne peuvent pas être assimilées.");
+        fr.put("ASSIMILATION_OMNI", "Assimilation Omni");
+        fr.put("ASSIMILATION_OMNI_DESC", "Après avoir assimilé le pont génomique Omni :");
         fr.put("ASSIMILATION_ACIDSPIT", "Crachat d'acide");
         fr.put("ASSIMILATION_ACIDSPIT_DESC", "Après assimilation du génome de la fourmi verte :");
 
@@ -1383,7 +1396,16 @@ public class FrenchTranslation implements Translation {
         fr.put("ROLE_RESEARCHER_DESC", "Permet aux reines de générer des points de recherche. 1 reine = 1 point par heure.");
         fr.put("ROLE_COMMANDER_UPGRADE", "Rôle commandante");
         fr.put("ROLE_COMMANDER_FLAVOR", "Seigneur de guerre royale");
-        fr.put("ROLE_COMMANDER_DESC", "Rôle militaire actif pour les reines. Max. 1 par colonie, et seulement si une autre reine reste dans un rôle non combat. Assigner une Commandante porte la capacité de combat dynastique de 1 000 à 2 500 (ne se cumule pas).");
+        fr.put("ROLE_COMMANDER_DESC", "Rôle militaire actif pour les reines (ligne d'artillerie). Max. 1 par colonie, et seulement si une autre reine reste dans un rôle non combat. Assigner une Commandante porte la capacité de combat dynastique de 1 000 à 2 500 (ne se cumule pas). Accorde Chef d'artillerie (+50 % de dégâts d'artillerie tant qu'une Commandante vivante est en bataille). Débloque aussi le rôle Capitaine pour les princesses.");
+        fr.put("ROLE_CAPTAIN_UPGRADE", "Rôle capitaine");
+        fr.put("ROLE_CAPTAIN_FLAVOR", "Capitaine de campagne");
+        fr.put("ROLE_CAPTAIN_DESC", "Rôle militaire actif pour les princesses (ligne d'infanterie). Accorde Chef d'infanterie (+25 % de dégâts d'infanterie tant qu'une Capitaine vivante est en bataille). Débloqué avec le rôle Commandante.");
+        fr.put("ROLE_AIR_SUPPORT_UPGRADE", "Rôle appui aérien");
+        fr.put("ROLE_AIR_SUPPORT_FLAVOR", "Couverture aérienne rapprochée");
+        fr.put("ROLE_AIR_SUPPORT_DESC", "Rôle militaire actif pour princesses sur la ligne d'appui aérien. Accorde Appui fourmi rapproché (1000 % dégâts, 90 % précision). Débloqué au rang Royaume.");
+        fr.put("ROLE_AIR_BOMBER_UPGRADE", "Rôle bombardière aérienne");
+        fr.put("ROLE_AIR_BOMBER_FLAVOR", "Piqué suicidaire");
+        fr.put("ROLE_AIR_BOMBER_DESC", "Rôle militaire actif pour princesses en appui aérien. Accorde Bombardement aérien (2000 % dégâts, 90 % précision, 7 cibles ; la fourmi meurt). Synergie Appui aérien + Bombardière + Crachat d'acide.");
         fr.put("ROLE_BUILDER_UPGRADE", "Rôle constructrice");
         fr.put("ROLE_BUILDER_FLAVOR", "Construction de base");
         fr.put("ROLE_BUILDER_DESC", "Permet de construire de nouvelles salles dans la colonie.");
@@ -1802,6 +1824,7 @@ public class FrenchTranslation implements Translation {
                 "Soutien : double les PV soignés de cette fourmi au prochain redéploiement de guerre (% de régénération des PV max). Les Porteuses nourriture Honeypot l'utilisent automatiquement tant qu'il n'y a pas de choix de compétences en bataille.");
         fr.put("HELP_SKILL_SHIELDING_EFFECT",
                 "Soutien : en défense d'hexagone, cette Défenseuse prend les pertes destinées aux reines jusqu'à sa mort. Les Défenseuses doorhead activent Bouclier au début de la défense d'hexagone.");
+        fr.put("HELP_SKILL_PASSIVE_LANE_DAMAGE_FMT", "Passif : +%s de dégâts à la ligne %s tant qu'une fourmi vivante avec cette compétence est en bataille.");
         fr.put("HELP_BATTLE_LINE_ACCURACY_FMT", "Précision de base : %s");
         fr.put("HELP_BATTLE_LINE_ROLES_FMT", "Rôles : %s");
         fr.put("HELP_BATTLE_LINE_ROLES_NONE", "Rôles : aucun pour l'instant");
@@ -1888,6 +1911,7 @@ public class FrenchTranslation implements Translation {
         fr.put("HELP_EMPIRE_RANKS", "Rangs de dynastie");
         fr.put("HELP_RANK_MIN_POPULATION", " (pop. min. %s)");
         fr.put("HELP_RANK_UNLOCKS_TIER", "débloque");
+        fr.put("HELP_RANK_UNLOCKS_UPGRADE", "débloque");
         fr.put("HELP_TIER_MIN_SCORE", " (min. %s)");
         fr.put("HELP_LOYALTY_MODIFIERS_TITLE", "Modificateurs actifs");
         fr.put("HELP_LOYALTY_MODIFIER_MILITARY", "Militaire vs capitale : +/-1 à +/-10 selon le ratio de puissance avec la capitale (colonies plus faibles gagnent ; satellites plus forts perdent).");
@@ -2079,7 +2103,7 @@ public class FrenchTranslation implements Translation {
         fr.put("TRIGGER_RANK_DUCHY_TITLE", "Duché");
         fr.put("TRIGGER_RANK_DUCHY_MSG", "Votre dynastie est désormais un Duché. Des améliorations et bâtiments de niveau supérieur deviennent disponibles — et la colonie est assez grande pour que des fourmis parasites s'infiltrent, débloquant le rôle Police.");
         fr.put("TRIGGER_RANK_KINGDOM_TITLE", "Royaume");
-        fr.put("TRIGGER_RANK_KINGDOM_MSG", "Un Royaume s'élève ! Votre dynastie commande un essaim à l'échelle d'un royaume et débloque le palier suivant.");
+        fr.put("TRIGGER_RANK_KINGDOM_MSG", "Un Royaume s'élève ! Votre dynastie commande un essaim à l'échelle d'un royaume — les princesses débloquent le rôle Appui aérien pour des passages de couverture rapprochée.");
         fr.put("TRIGGER_RANK_SUPER_TITLE", "Super-colonie");
         fr.put("TRIGGER_RANK_SUPER_MSG", "Votre dynastie est devenue une Super-colonie — un vaste réseau vivant. De nouveaux paliers technologiques s'ouvrent à cette échelle.");
         fr.put("TRIGGER_RANK_ULTRA_TITLE", "Ultra-colonie");
@@ -2109,7 +2133,7 @@ public class FrenchTranslation implements Translation {
         fr.put("TRIGGER_BRUTE_ROLE_TITLE", "Soldat lourd");
         fr.put("TRIGGER_BRUTE_ROLE_MSG", "Le déblocage du type Major a automatiquement débloqué le rôle « Brute ».");
         fr.put("TRIGGER_COMMANDER_ROLE_TITLE", "Commandement de campagne");
-        fr.put("TRIGGER_COMMANDER_ROLE_MSG", "Avec plusieurs reines et l'expérience de la guerre, une Reine peut prendre le rôle de Commandante — augmentant la capacité de combat de votre dynastie.");
+        fr.put("TRIGGER_COMMANDER_ROLE_MSG", "Avec plusieurs reines et l'expérience de la guerre, une Reine peut prendre le rôle de Commandante — augmentant la capacité de combat et débloquant Chef d'artillerie. Les princesses débloquent aussi le rôle Capitaine comme Chef d'infanterie.");
         fr.put("TRIGGER_SPREAD_ABILITY_TITLE", "Colonisation");
         fr.put("TRIGGER_SPREAD_ABILITY_MSG", "Avec la capacité d'élever de nouvelles reines, votre colonie sait maintenant se propager. Vous pouvez fonder de nouvelles colonies depuis la carte du monde (M).");
         fr.put("TRIGGER_SCOUT_ROLE_TITLE", "Appel de l'aventure");
@@ -2150,6 +2174,8 @@ public class FrenchTranslation implements Translation {
         fr.put("TRIGGER_SYNERGY_ACID_ARTILLERY_MSG", "%s est maintenant active ! Combiner %s débloque le rôle Artillerie pour les majores et la compétence Artillerie acide. Ouvrez Synergies (O) pour consulter.");
         fr.put("TRIGGER_SYNERGY_CORROSIVE_BOMBS_TITLE", "Synergie débloquée");
         fr.put("TRIGGER_SYNERGY_CORROSIVE_BOMBS_MSG", "%s est maintenant active ! Combiner %s améliore Autodestruction des Bombardières en Autodestruction acide. Ouvrez Synergies (O) pour consulter.");
+        fr.put("TRIGGER_SYNERGY_AIR_BOMBER_TITLE", "Synergie débloquée");
+        fr.put("TRIGGER_SYNERGY_AIR_BOMBER_MSG", "%s est maintenant active ! Combiner %s débloque le rôle Bombardière aérienne et la compétence Bombardement aérien. Ouvrez Synergies (O) pour consulter.");
         fr.put("TRIGGER_OPERATIONS_ABILITY_TITLE", "Opérations de colonie");
         fr.put("TRIGGER_OPERATIONS_ABILITY_MSG", "Vous avez obtenu une capacité active spéciale ! Vous pouvez maintenant accéder au menu Opérations de colonie en appuyant sur (Z).");
 
