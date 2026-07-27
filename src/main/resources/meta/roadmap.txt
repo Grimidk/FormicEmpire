@@ -1,16 +1,16 @@
 Here is the current roadmap of features and fixes:
 
 To Fix (By decreasing priority): 
-		
 	Game Breaking:
 	(none right now)
 	
 	High:
 	TODO: icons for 85 unlocks
-	TODO: species sprites and icon: carpenter, weaver, floodplain, jet, army, ghost, silver, shining black, desert
-	
+	TODO: tune AntSpeciesPalette hexes + icons for placeholder species (carpenter, weaver, floodplain, jet, army, ghost, silver, shining black, desert)
+		(runtime ant bodies recolor zero-shared layers — per-species Worker.png art optional)
+ 	
 	Mid:
-	(none right now)
+	assimilation for assimilation, assimilation fastbite doesnt have icon
 	  
 	Low:
 	(none right now)
@@ -30,11 +30,24 @@ Needed for launch (v1.0) (Launch Version):
 	research tree and building tree (orchard) (after icons) with available, purchasable, locked and list trigger based upgrades 
 	main menu screen maybe simulation like factorio and title header
 	more upgrades (mid game upgrade to health, defense, attck and late for defense health attack and atkspeed) and more buildings lvl 4 a 5
-	implement pending roles (miner, carrier) more roles (captain roles (passive boost damage), air force and paratroopers to skip a stage) 
+	implement pending roles (miner, carrier) more roles (captain roles (passive boost damage also for commander), air force and paratroopers to skip a stage) 
 	air force roles, touch simulation for fast fliyin ants, 	Air-force ants + self destruction = Air-bomber ants
 	music and sounds and settings for them and player panel (to include in core engine)
-	proper ant and bug animation with 4 frame cycle for legs and jaws, animate each attack, rework how subtype sprites are built to be composite
+
+	critter sprite composite + palette recolor (code wired; refine art/palettes):
+		zero-shared holds ALL layered parts (marker RGB → species palette):
+			legs/, jaws/, head/, torso/, abdomen/, wings/
+			Markers: head FF0000, torso 00FF00, abdomen 0000FF, wingPrimary FFFF00, wingSecondary 00FFFF,
+				drone FF00FF, droneWingPrimary FF8000, droneWingSecondary 8000FF, honeypot FF0080;
+				black 000000 never recolored
+			AntSpeciesPalette on each AntSpecies (hex): head, torso, abdomen, wingPrimary/Secondary,
+				drone, droneWingPrimary/Secondary, honeypot
+			AntSpriteCompositor builds legs→abdomen→torso→head→jaws→wings; GameConstants.getAntSprite uses it
+			Walk/jaw/wing frames: colony idle rare snaps; battle attack jaw snaps; air-support flyby wings open
+			Per-species body PNG folders removed — only zero-shared (+ zero-drones/princesses + Egg/Larva/Pupa/Dead/Zombie)
+			Non-ant walkers: sprites/critters/shared/legs/{Aphid|Dermestid|SoilMite}/Leg1…Leg4.png still TODO
 	rework how carrying looks completely, maybe have an item inside jaws
+	
 	
 	Everything else :
 	swarm vs creature battles

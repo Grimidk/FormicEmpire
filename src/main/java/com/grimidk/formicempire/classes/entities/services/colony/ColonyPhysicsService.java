@@ -755,4 +755,60 @@ public class ColonyPhysicsService {
     public Point getSpecificRoomPoint(Colony c, Rectangle r) { 
         return getRandomPointInRoom(c, r, c.getGameAreaWidth()); 
     }
+
+    /** Decrement jaw/wing open timers once per in-game minute. */
+    public void tickAntSpriteAnimMinutes(Colony colony) {
+        if (colony == null) {
+            return;
+        }
+        for (Map.Entry<AntType, List<Ant>> entry : colony.getAntGroups().entrySet()) {
+            AntType type = entry.getKey();
+            if (type == GameConstants.TYPE_EGG || type == GameConstants.TYPE_LARVA
+                    || type == GameConstants.TYPE_PUPA || type == GameConstants.TYPE_DEAD) {
+                continue;
+            }
+            List<Ant> ants = entry.getValue();
+            synchronized (ants) {
+                for (Ant ant : ants) {
+                    if (ant.isAlive()) {
+                        ant.tickSpriteAnimMinute();
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Once per in-game hour, rarely start jaw/wing snaps for ants currently in the
+     * last known physics viewport (colony view only).
+     */
+    public void rollAntSpriteAnimHourly(Colony colony, Dimension activeDimension, Rectangle viewportBounds) {
+        if (colony == null || activeDimension == null || !ViewportPhysicsLod.isLodActive(viewportBounds)) {
+            return;
+        }
+        for (Map.Entry<AntType, List<Ant>> entry : colony.getAntGroups().entrySet()) {
+            AntType type = entry.getKey();
+            if (type == GameConstants.TYPE_EGG || type == GameConstants.TYPE_LARVA
+                    || type == GameConstants.TYPE_PUPA || type == GameConstants.TYPE_DEAD
+                    || type == GameConstants.TYPE_ZOMBIE) {
+                continue;
+            }
+            ImageIcon spriteIcon = GameConstants.getAntSprite(type, colony.getSpecies());
+            int spriteW = spriteIcon != null ? spriteIcon.getIconWidth() : 16;
+            int spriteH = spriteIcon != null ? spriteIcon.getIconHeight() : 16;
+            List<Ant> ants = entry.getValue();
+            synchronized (ants) {
+                for (Ant ant : ants) {
+                    if (!ant.isAlive() || ant.getDimension() != activeDimension) {
+                        continue;
+                    }
+                    if (!ViewportPhysicsLod.antIntersectsViewport(
+                            viewportBounds, ant.getX(), ant.getY(), spriteW, spriteH)) {
+                        continue;
+                    }
+                    ant.rollHourlySpriteAnim();
+                }
+            }
+        }
+    }
 }

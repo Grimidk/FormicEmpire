@@ -123,6 +123,8 @@ public class Colony {
     private int gameAreaWidth = 1;
     private int gameAreaHeight = 1;
     private long physicsStepSequence;
+    private Rectangle lastPhysicsViewport;
+    private Dimension lastPhysicsDimension;
     private Building currentBuildingProject = null;
     private Tunnel currentTunnelProject = null;
     private double buildingProgressHours = 0.0;
@@ -1806,6 +1808,8 @@ public class Colony {
             return;
         }
         physicsStepSequence++;
+        this.lastPhysicsViewport = viewportPanelBounds;
+        this.lastPhysicsDimension = activeDimension;
         convoyTransitService.runConvoyPhysics(this);
         physicsService.runPhysics(this, activeDimension, viewportPanelBounds, physicsStepSequence);
     }
@@ -1815,6 +1819,7 @@ public class Colony {
         invalidateActiveRoleCountCache();
         if (this.runsFullSimulation()) {
             this.runConverting();
+            physicsService.tickAntSpriteAnimMinutes(this);
         }
     }
 
@@ -1836,7 +1841,8 @@ public class Colony {
             this.runRanching();
             this.runBuilding();
             this.labourService.runTunnelConstruction(this);
-            this.runCollecting(); 
+            this.runCollecting();
+            physicsService.rollAntSpriteAnimHourly(this, lastPhysicsDimension, lastPhysicsViewport);
         } else {
             if (this.automationEnabled) {
                 this.automationService.runAutomation(this, biome, season);

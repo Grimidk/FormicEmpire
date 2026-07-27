@@ -10,6 +10,7 @@ import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.services.colony.AntSubtypeService;
 import com.grimidk.formicempire.classes.entities.spatial.NeoPoint;
+import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 import com.grimidk.formicempire.classes.infrasctructure.registries.DeathCause;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
@@ -31,6 +32,11 @@ public class Ant extends Critter {
     private boolean boostRegenPending;
     /** When true, this defender absorbs hits that would otherwise hit queens. */
     private boolean shieldingActive;
+    /** 1 = closed, 2 = open (jaw / wing sprite frames). */
+    private int jawFrame = 1;
+    private int wingFrame = 1;
+    private int jawOpenMinutesRemaining;
+    private int wingOpenMinutesRemaining;
 
     public Ant(Colony colony, AntType type) {
         super(GameConstants.TYPE_ANT); 
@@ -205,5 +211,53 @@ public class Ant extends Critter {
         this.setAttackSpeed((int)(colony.getBaseAttackSpeed() * type.getAttackSpeedMult()));
         this.setDefense(GameNumbers.clampDefensePercent(type.getDefenseMult()));        
         this.setSpeed(colony.getBaseSpeed() * type.getSpeedMult());
+    }
+
+    public int getJawFrame() {
+        return jawFrame;
+    }
+
+    public int getWingFrame() {
+        return wingFrame;
+    }
+
+    /** Count down open jaw/wing timers (call once per in-game minute). */
+    public void tickSpriteAnimMinute() {
+        if (jawOpenMinutesRemaining > 0) {
+            jawOpenMinutesRemaining--;
+            if (jawOpenMinutesRemaining <= 0) {
+                jawFrame = 1;
+            }
+        }
+        if (wingOpenMinutesRemaining > 0) {
+            wingOpenMinutesRemaining--;
+            if (wingOpenMinutesRemaining <= 0) {
+                wingFrame = 1;
+            }
+        }
+    }
+
+    /**
+     * Rare idle jaw/wing snaps for colony view. Call once per in-game hour for ants
+     * currently in the viewport only.
+     */
+    public void rollHourlySpriteAnim() {
+        if (jawOpenMinutesRemaining <= 0
+                && GameRandom.nextDouble() < GameNumbers.ANT_JAW_SNAP_CHANCE_PER_HOUR) {
+            jawFrame = 2;
+            jawOpenMinutesRemaining = GameNumbers.ANT_SPRITE_SNAP_MINUTES;
+        }
+
+        boolean winged = type == GameConstants.TYPE_DRONE || type == GameConstants.TYPE_PRINCESS;
+        if (!winged) {
+            wingFrame = 1;
+            wingOpenMinutesRemaining = 0;
+            return;
+        }
+        if (wingOpenMinutesRemaining <= 0
+                && GameRandom.nextDouble() < GameNumbers.ANT_WING_FLICK_CHANCE_PER_HOUR) {
+            wingFrame = 2;
+            wingOpenMinutesRemaining = GameNumbers.ANT_SPRITE_SNAP_MINUTES;
+        }
     }
 }

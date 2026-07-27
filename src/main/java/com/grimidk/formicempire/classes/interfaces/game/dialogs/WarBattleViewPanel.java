@@ -38,6 +38,8 @@ public class WarBattleViewPanel extends JPanel {
     private static final float WOBBLE_AMPLITUDE_PX = 2f;
     private static final int LINE_JITTER_PX = 10;
     private static final int RESERVE_WALK_PX_PER_SEC = 28;
+    private static final float ATTACK_JAW_SNAP_SPEED = 4.2f;
+    private static final float AIR_SUPPORT_FLY_CYCLE_SEC = 4.5f;
 
     private final War war;
     private final Engine engine;
@@ -239,7 +241,28 @@ public class WarBattleViewPanel extends JPanel {
         int fieldRight = field.x + field.width;
         double faceRadians = attackerSide ? Math.toRadians(90) : Math.toRadians(270);
         for (BattleAnt ant : ants) {
-            ImageIcon icon = GameConstants.getAntSprite(ant.type, ant.species, ant.profile);
+            boolean winged = ant.type == GameConstants.TYPE_DRONE || ant.type == GameConstants.TYPE_PRINCESS;
+            boolean airSupport = !ant.reserve && ant.battleLine == GameConstants.BATTLE_LINE_AIR_SUPPORT;
+            int jawFrame = 1;
+            int wingFrame = 1;
+            if (airSupport) {
+                wingFrame = winged ? 2 : 1;
+            } else if (!ant.reserve) {
+                // Brief jaw open near the crest of each attack pulse.
+                double attackPulse = Math.sin(ant.wobblePhase + animationSeconds * ATTACK_JAW_SNAP_SPEED * ant.motionRate);
+                if (attackPulse > 0.82) {
+                    jawFrame = 2;
+                }
+            }
+            if (!airSupport && winged) {
+                double wingPulse = Math.sin(ant.wobblePhase * 0.7 + animationSeconds * 1.3 * ant.motionRate);
+                if (wingPulse > 0.92) {
+                    wingFrame = 2;
+                }
+            }
+
+            ImageIcon icon = GameConstants.getAntSprite(
+                    ant.type, ant.species, ant.profile, 1, jawFrame, wingFrame);
             Image image = icon != null ? icon.getImage() : null;
             int w = icon != null ? Math.max(8, icon.getIconWidth() / ANT_SPRITE_SCALE) : 12;
             int h = icon != null ? Math.max(8, icon.getIconHeight() / ANT_SPRITE_SCALE) : 12;
@@ -250,20 +273,31 @@ public class WarBattleViewPanel extends JPanel {
                     + Math.round(ant.laneY * (field.height - h - edgePad * 2f))
                     + Math.round(wobble);
 
-            int lineOffset = lineOffsetPx(ant.battleLine, ant.reserve);
-            if (ant.reserve) {
-                lineOffset = Math.max(WarBattleScene.ARTILLERY_LINE_OFFSET_PX,
-                        lineOffset - Math.round(animationSeconds * RESERVE_WALK_PX_PER_SEC * ant.motionRate));
-            }
-            int jitter = Math.round((ant.laneJitter - 0.5f) * 2f * LINE_JITTER_PX);
-
             int drawX;
-            if (attackerSide) {
-                drawX = contactLineX - w - edgePad - lineOffset + jitter;
-                drawX = Math.max(field.x + edgePad, drawX);
+            if (airSupport) {
+                float cycle = (animationSeconds / AIR_SUPPORT_FLY_CYCLE_SEC) + ant.flyPhase;
+                cycle = cycle - (float) Math.floor(cycle);
+                int travel = field.width + w * 2;
+                if (attackerSide) {
+                    drawX = field.x - w + Math.round(cycle * travel);
+                } else {
+                    drawX = fieldRight - Math.round(cycle * travel);
+                }
             } else {
-                drawX = contactLineX + edgePad + lineOffset + jitter;
-                drawX = Math.min(fieldRight - w - edgePad, drawX);
+                int lineOffset = lineOffsetPx(ant.battleLine, ant.reserve);
+                if (ant.reserve) {
+                    lineOffset = Math.max(WarBattleScene.ARTILLERY_LINE_OFFSET_PX,
+                            lineOffset - Math.round(animationSeconds * RESERVE_WALK_PX_PER_SEC * ant.motionRate));
+                }
+                int jitter = Math.round((ant.laneJitter - 0.5f) * 2f * LINE_JITTER_PX);
+
+                if (attackerSide) {
+                    drawX = contactLineX - w - edgePad - lineOffset + jitter;
+                    drawX = Math.max(field.x + edgePad, drawX);
+                } else {
+                    drawX = contactLineX + edgePad + lineOffset + jitter;
+                    drawX = Math.min(fieldRight - w - edgePad, drawX);
+                }
             }
 
             AffineTransform old = g2d.getTransform();
@@ -332,7 +366,11 @@ public class WarBattleViewPanel extends JPanel {
             for (Map.Entry<AntType, Integer> entry : typeCounts.entrySet()) {
                 AntType type = entry.getKey();
                 int count = entry.getValue() != null ? entry.getValue() : 0;
-                if (type == null || type == GameConstants.TYPE_DEAD || type == GameConstants.TYPE_DRONE || count <= 0) {
+                if (type == null || type == GameConstants.TYPE_DEAD || count <= 0) {
+                    continue;
+                }
+                // Drones are nuptial / non-combat except air-support flybys.
+                if (type == GameConstants.TYPE_DRONE && line != GameConstants.BATTLE_LINE_AIR_SUPPORT) {
                     continue;
                 }
                 for (int i = 0; i < count; i++) {
@@ -345,6 +383,7 @@ public class WarBattleViewPanel extends JPanel {
                     ants.add(new BattleAnt(type, species, profile, line, laneY, random.nextFloat(),
                             random.nextFloat() * (float) (Math.PI * 2),
                             0.85f + random.nextFloat() * 0.3f,
+                            random.nextFloat(),
                             reserve));
                     indexInLine++;
                 }
@@ -501,10 +540,11 @@ public class WarBattleViewPanel extends JPanel {
         private final float laneJitter;
         private final float wobblePhase;
         private final float motionRate;
+        private final float flyPhase;
         private final boolean reserve;
 
         private BattleAnt(AntType type, AntSpecies species, AntSubtypeProfile profile, BattleLine battleLine,
-                float laneY, float laneJitter, float wobblePhase, float motionRate, boolean reserve) {
+                float laneY, float laneJitter, float wobblePhase, float motionRate, float flyPhase, boolean reserve) {
             this.type = type;
             this.species = species;
             this.profile = profile != null ? profile : AntSubtypeProfile.standard();
@@ -513,6 +553,7 @@ public class WarBattleViewPanel extends JPanel {
             this.laneJitter = laneJitter;
             this.wobblePhase = wobblePhase;
             this.motionRate = motionRate;
+            this.flyPhase = flyPhase;
             this.reserve = reserve;
         }
     }

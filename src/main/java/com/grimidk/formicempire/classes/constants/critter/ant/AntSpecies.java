@@ -17,9 +17,10 @@ public class AntSpecies extends Constant {
     private final Set<Upgrade> baseUpgrades;
     /** LanguageStrings keys for preferred dynasty theme names (not display text). */
     private final Set<String> preferredNameKeys;
+    private final AntSpeciesPalette palette;
 
     public AntSpecies(int id, String name, String scientific, String directory, Assimilation assimilation,
-            Set<Upgrade> baseUpgrades, Set<String> preferredNameKeys, ImageIcon icon) {
+            Set<Upgrade> baseUpgrades, Set<String> preferredNameKeys, AntSpeciesPalette palette, ImageIcon icon) {
         super(id, name, icon);
         this.scientific = scientific;
         this.directory = directory;
@@ -28,11 +29,12 @@ public class AntSpecies extends Constant {
         this.preferredNameKeys = preferredNameKeys == null
                 ? Set.of()
                 : Collections.unmodifiableSet(new LinkedHashSet<>(preferredNameKeys));
+        this.palette = palette;
     }
 
     public AntSpecies(int id, String name, String scientific, String directory, Assimilation assimilation,
-            Set<Upgrade> baseUpgrades, Set<String> preferredNameKeys) {
-        this(id, name, scientific, directory, assimilation, baseUpgrades, preferredNameKeys, null);
+            Set<Upgrade> baseUpgrades, Set<String> preferredNameKeys, AntSpeciesPalette palette) {
+        this(id, name, scientific, directory, assimilation, baseUpgrades, preferredNameKeys, palette, null);
     }
 
     public String getScientific() {
@@ -64,5 +66,9 @@ public class AntSpecies extends Constant {
 
     public Set<String> getPreferredNameKeys() {
         return preferredNameKeys;
+    }
+
+    public AntSpeciesPalette getPalette() {
+        return palette;
     }
 }

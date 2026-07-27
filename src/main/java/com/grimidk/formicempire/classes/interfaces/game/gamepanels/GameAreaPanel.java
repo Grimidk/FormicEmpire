@@ -819,7 +819,13 @@ public class GameAreaPanel extends ZeroGamePanel {
                 if (ant.getDimension() != currentDimension) continue;
                 if (ant.getDimension() == WorldSpaces.TUNNEL_WORLD) continue;
 
-                ImageIcon antSpriteIcon = GameConstants.getAntSprite(type, colony.getSpecies(), ant.getSubtypeProfile());
+                ImageIcon antSpriteIcon = GameConstants.getAntSprite(
+                        type,
+                        colony.getSpecies(),
+                        ant.getSubtypeProfile(),
+                        1,
+                        ant.getJawFrame(),
+                        ant.getWingFrame());
                 if (antSpriteIcon == null) continue;
                 Image sprite = antSpriteIcon.getImage();
                 int w = antSpriteIcon.getIconWidth();
