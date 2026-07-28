@@ -16,6 +16,7 @@ import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.interfaces.game.rendering.RouteViewVisuals;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiResourceLoader;
 
@@ -38,9 +39,8 @@ public class WarBattleViewPanel extends JPanel {
     private static final float WOBBLE_AMPLITUDE_PX = 2f;
     private static final int LINE_JITTER_PX = 10;
     private static final int RESERVE_WALK_PX_PER_SEC = 28;
-    private static final float ATTACK_JAW_SNAP_SPEED = 4.2f;
-    private static final float AIR_SUPPORT_FLY_CYCLE_SEC = 6.0f;
-    private static final float AIR_SUPPORT_FLY_PORTION = 0.32f;
+    private static final float AIR_SUPPORT_FLY_CYCLE_SEC = 14.0f;
+    private static final float AIR_SUPPORT_FLY_PORTION = 0.36f;
 
     private final War war;
     private final Engine engine;
@@ -240,26 +240,13 @@ public class WarBattleViewPanel extends JPanel {
         }
         int edgePad = 4;
         int fieldRight = field.x + field.width;
-        double faceRadians = attackerSide ? Math.toRadians(90) : Math.toRadians(270);
         for (BattleAnt ant : ants) {
-            boolean winged = ant.type == GameConstants.TYPE_DRONE || ant.type == GameConstants.TYPE_PRINCESS;
+            boolean winged = RouteViewVisuals.isWinged(ant.type);
             boolean airSupport = !ant.reserve && ant.battleLine == GameConstants.BATTLE_LINE_AIR_SUPPORT;
-            int jawFrame = 1;
-            int wingFrame = 1;
-            if (airSupport) {
-                wingFrame = winged ? 2 : 1;
-            } else if (!ant.reserve) {
-                double attackPulse = Math.sin(ant.wobblePhase + animationSeconds * ATTACK_JAW_SNAP_SPEED * ant.motionRate);
-                if (attackPulse > 0.82) {
-                    jawFrame = 2;
-                }
-            }
-            if (!airSupport && winged) {
-                double wingPulse = Math.sin(ant.wobblePhase * 0.7 + animationSeconds * 1.3 * ant.motionRate);
-                if (wingPulse > 0.92) {
-                    wingFrame = 2;
-                }
-            }
+            int jawFrame = RouteViewVisuals.resolveJawFrame(ant.type, ant.reserve, ant.wobblePhase, animationSeconds,
+                    ant.motionRate);
+            int wingFrame = RouteViewVisuals.resolveWingFrame(ant.type, airSupport && winged, ant.wobblePhase,
+                    animationSeconds, ant.motionRate);
 
             ImageIcon icon = GameConstants.getAntSprite(
                     ant.type, ant.species, ant.profile, 1, jawFrame, wingFrame);
@@ -308,7 +295,8 @@ public class WarBattleViewPanel extends JPanel {
             double cx = drawX + w / 2.0;
             double cy = drawY + h / 2.0;
             g2d.translate(cx, cy);
-            g2d.rotate(faceRadians);
+            float faceAngle = RouteViewVisuals.movementFacingDegrees(attackerSide ? 1f : -1f, 0f);
+            g2d.rotate(Math.toRadians(faceAngle));
             if (image != null) {
                 g2d.drawImage(image, -w / 2, -h / 2, w, h, this);
             } else {
@@ -373,7 +361,11 @@ public class WarBattleViewPanel extends JPanel {
                 if (type == null || type == GameConstants.TYPE_DEAD || count <= 0) {
                     continue;
                 }
-                if (type == GameConstants.TYPE_DRONE && line != GameConstants.BATTLE_LINE_AIR_SUPPORT) {
+                if (line == GameConstants.BATTLE_LINE_AIR_SUPPORT) {
+                    if (!RouteViewVisuals.isWinged(type)) {
+                        continue;
+                    }
+                } else if (type == GameConstants.TYPE_DRONE) {
                     continue;
                 }
                 for (int i = 0; i < count; i++) {

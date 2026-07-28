@@ -1,5 +1,6 @@
 package com.grimidk.formicempire.classes.interfaces;
 
+import com.grimidk.formicempire.classes.interfaces.menu.MenuHeaderPanel;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
@@ -14,6 +15,8 @@ import java.util.Set;
 public class InitPanel extends JPanel {
     private final MainFrame frame;
     
+    private final MenuHeaderPanel menuHeader = new MenuHeaderPanel();
+    
     private JButton play;
     private JButton help;
     private JButton audit;
@@ -24,6 +27,7 @@ public class InitPanel extends JPanel {
 
     public InitPanel(MainFrame frame) {
         this.frame = frame;
+        setOpaque(false);
         setLayout(new GridBagLayout());
         
         initComponents();
@@ -76,16 +80,21 @@ public class InitPanel extends JPanel {
         removeAll();
 
         GridBagConstraints c = new GridBagConstraints();
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.insets = new Insets(8, 8, 8, 8);
         c.gridx = 0;
+        c.insets = new Insets(8, 8, 8, 8);
+        c.anchor = GridBagConstraints.CENTER;
 
+        c.gridy = 0;
+        c.fill = GridBagConstraints.NONE;
+        add(menuHeader, c);
+
+        c.fill = GridBagConstraints.HORIZONTAL;
         JButton[] buttons = audit.isVisible()
                 ? new JButton[] { play, help, audit, roadmap, credits, settings, quit }
                 : new JButton[] { play, help, roadmap, credits, settings, quit };
 
         for (int i = 0; i < buttons.length; i++) {
-            c.gridy = i;
+            c.gridy = i + 1;
             add(buttons[i], c);
         }
 

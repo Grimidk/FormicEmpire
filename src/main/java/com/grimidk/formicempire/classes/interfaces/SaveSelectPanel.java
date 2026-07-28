@@ -4,6 +4,7 @@ import com.grimidk.formicempire.classes.constants.dynasty.DynastyTitle;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.interfaces.menu.MenuHeaderPanel;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
@@ -29,6 +30,7 @@ public class SaveSelectPanel extends JPanel {
     private final JButton[] slotButtons = new JButton[3];
     private final JButton[] deleteButtons = new JButton[3];
     private final JLabel[] slotLabels = new JLabel[3];
+    private final MenuHeaderPanel menuHeader = new MenuHeaderPanel();
     private final JButton backButton;
     
     private final Savefile[] cachedSaves = new Savefile[3];
@@ -36,10 +38,20 @@ public class SaveSelectPanel extends JPanel {
     public SaveSelectPanel(MainFrame frame) {
         this.frame = frame;
         this.saveManager = frame.getEngine().getSaveManager();
+        setOpaque(false);
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
-        c.insets = new Insets(8,8,8,8);
+        c.insets = new Insets(8, 8, 8, 8);
+        c.gridx = 0;
+        c.anchor = GridBagConstraints.CENTER;
+
+        c.gridy = 0;
+        c.gridwidth = 3;
+        c.fill = GridBagConstraints.NONE;
+        add(menuHeader, c);
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.gridwidth = 1;
 
         for (int i = 0; i < 3; i++) {
             int slotId = i + 1;
@@ -56,9 +68,13 @@ public class SaveSelectPanel extends JPanel {
             int idx = i;
             slotButtons[i].addActionListener(e -> onCreateOrLoad(slotId, idx));
             deleteButtons[i].addActionListener(e -> onDelete(slotId, idx));
-            c.gridx = 0; c.gridy = i; add(slotLabels[i], c);
-            c.gridx = 1; add(slotButtons[i], c);
-            c.gridx = 2; add(deleteButtons[i], c);
+            c.gridx = 0;
+            c.gridy = i + 1;
+            add(slotLabels[i], c);
+            c.gridx = 1;
+            add(slotButtons[i], c);
+            c.gridx = 2;
+            add(deleteButtons[i], c);
         }
 
         backButton = new JButton(LanguageStrings.get(LanguageStrings.UI_BACK));
@@ -68,7 +84,10 @@ public class SaveSelectPanel extends JPanel {
             frame.showCard(MainFrame.CARD_INIT);
         });
 
-        c.gridx = 0; c.gridy = 4; c.gridwidth = 2; add(backButton, c);
+        c.gridx = 0;
+        c.gridy = 5;
+        c.gridwidth = 2;
+        add(backButton, c);
 
         addAncestorListener(new AncestorListener() {
             @Override

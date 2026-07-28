@@ -10,10 +10,13 @@ import com.grimidk.formicempire.classes.infrasctructure.managers.TriggerManager;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiCursors;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
+import com.grimidk.formicempire.classes.interfaces.menu.MenuChaoticPanel;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
 import java.awt.*;
 import java.awt.event.AWTEventListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -35,6 +38,7 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
     private final IntroPanel introPanel;
     private final InitPanel initPanel;
     private final HelpPanel helpPanel;
+    private final MenuChaoticPanel menuChaoticPanel;
     private String menuReturnCard = CARD_INIT;
 
     private Cursor cursorNormal;
@@ -160,6 +164,7 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         
         this.cardLayout = new CardLayout();
         this.cards = new JPanel(cardLayout);
+        cards.setOpaque(false);
 
         initCursors();
 
@@ -177,8 +182,32 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         cards.add(settingsPanel, CARD_SETTINGS);
         cards.add(gamePanel, CARD_GAME);
 
+        menuChaoticPanel = new MenuChaoticPanel();
+        JLayeredPane layeredPane = new JLayeredPane();
+        layeredPane.add(menuChaoticPanel, JLayeredPane.DEFAULT_LAYER);
+        layeredPane.add(cards, JLayeredPane.PALETTE_LAYER);
+        Runnable syncLayerBounds = () -> {
+            Dimension size = layeredPane.getSize();
+            int w = Math.max(0, size.width);
+            int h = Math.max(0, size.height);
+            menuChaoticPanel.setBounds(0, 0, w, h);
+            cards.setBounds(0, 0, w, h);
+        };
+        layeredPane.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                syncLayerBounds.run();
+            }
+
+            @Override
+            public void componentShown(ComponentEvent e) {
+                syncLayerBounds.run();
+            }
+        });
+        SwingUtilities.invokeLater(syncLayerBounds);
+
         getContentPane().setLayout(new BorderLayout());
-        getContentPane().add(cards, BorderLayout.CENTER);
+        getContentPane().add(layeredPane, BorderLayout.CENTER);
 
         // --- Window Listeners ---
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -253,6 +282,7 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
 
     private void shutdownAndExit() {
         gamePanel.endSession();
+        menuChaoticPanel.setActive(false);
         LanguageStrings.removeListener(translationRefresh);
         engine.pauseEngine();
         SaveManager.shutdownSharedExecutor();
@@ -391,7 +421,19 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
             } catch (Exception ignore) {}
         }
         cardLayout.show(cards, card);
+        boolean showcaseActive = CARD_INIT.equals(card) || CARD_SAVE.equals(card);
+        menuChaoticPanel.setActive(showcaseActive);
         applyGameCursors(this);
+        SwingUtilities.invokeLater(() -> {
+            Container parent = cards.getParent();
+            if (parent != null) {
+                Dimension size = parent.getSize();
+                int w = Math.max(0, size.width);
+                int h = Math.max(0, size.height);
+                menuChaoticPanel.setBounds(0, 0, w, h);
+                cards.setBounds(0, 0, w, h);
+            }
+        });
     }
 
     public void openGameWithSave(Savefile savefile) {
