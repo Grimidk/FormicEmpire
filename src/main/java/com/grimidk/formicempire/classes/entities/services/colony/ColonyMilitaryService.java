@@ -44,7 +44,6 @@ public final class ColonyMilitaryService {
                 stats.getBaseAttackSpeed(colony));
     }
 
-    /** Colony-wide military mult from vitality/offense unlocks. Defense is type-based, not colony-wide. */
     public static float computeColonyStatMultiplierFromBases(int baseHealth, int baseAttack, int baseAttackSpeed) {
         float hpFactor = baseHealth / (float) GameNumbers.MILITARY_BASELINE_HEALTH;
         float atkFactor = baseAttack / (float) GameNumbers.MILITARY_BASELINE_ATTACK;
@@ -52,7 +51,6 @@ public final class ColonyMilitaryService {
         return (hpFactor + atkFactor + spdFactor) / 3f;
     }
 
-    /** Per-ant combat mult including type defense % (vs {@link GameConstants#TYPE_MAJOR} defense). */
     public static float computeStatMultiplierFromBases(int baseHealth, int baseAttack, int baseDefense, int baseAttackSpeed) {
         float hpFactor = baseHealth / (float) GameNumbers.MILITARY_BASELINE_HEALTH;
         float atkFactor = baseAttack / (float) GameNumbers.MILITARY_BASELINE_ATTACK;
@@ -195,7 +193,6 @@ public final class ColonyMilitaryService {
         return computeRolePowerFromWarCounts(colony, warCounts, true, false);
     }
 
-    /** Power from hex-defense-only roles (Defender, Siege). */
     public static int computeHexDefenseOnlyPower(Colony colony) {
         if (colony == null) {
             return 0;
@@ -218,12 +215,6 @@ public final class ColonyMilitaryService {
         return total;
     }
 
-    /**
-     * Contested-colony hex defense: every ant at that colony fights locally.
-     * Defender-role ants always stay here (never join dynasty assaults).
-     * Siege engines at this colony also defend here; only the attacker's dynasty-wide
-     * Siege join the assault side.
-     */
     public static int computeHexDefenseMilitaryPower(Colony colony) {
         if (colony == null) {
             return 0;
@@ -231,10 +222,6 @@ public final class ColonyMilitaryService {
         return computeMilitaryPowerFromPopulation(colony);
     }
 
-    /**
-     * Hex-assault attacker base power: all remaining border-battle active military
-     * dynasty-wide, plus dynasty-wide Siege. Defender-role ants never contribute.
-     */
     public static int computeHexAssaultAttackerPower(Dynasty dynasty) {
         if (dynasty == null) {
             return 0;
@@ -242,7 +229,6 @@ public final class ColonyMilitaryService {
         return Math.max(0, powerForWarStanding(dynasty)) + computeSiegeAssaultPower(dynasty);
     }
 
-    /** Effective hex-assault attacker power after Siege 3x / other 1x multipliers. */
     public static int computeHexAssaultEffectiveAttackerPower(Dynasty dynasty) {
         if (dynasty == null) {
             return 0;
@@ -252,7 +238,6 @@ public final class ColonyMilitaryService {
         return GameNumbers.warHexAssaultEffectiveAttackerPower(nonSiege, siege);
     }
 
-    /** Effective contested-colony defense after 1.5x / Defender 3x multipliers. */
     public static int computeHexDefenseEffectivePower(Colony colony) {
         if (colony == null) {
             return 0;
@@ -263,7 +248,6 @@ public final class ColonyMilitaryService {
         return GameNumbers.warHexDefenseEffectiveDefenderPower(standard, defenderRole);
     }
 
-    /** Power from a single war-assigned active role. */
     public static int computeAssignedRolePower(Colony colony, AntRole role) {
         if (colony == null || role == null || !role.isActiveMilitary()) {
             return 0;
@@ -290,7 +274,6 @@ public final class ColonyMilitaryService {
         return computeAssignedRolePower(colony, GameConstants.ROLE_DEFENDER);
     }
 
-    /** Siege engines available for hex assault across the dynasty. */
     public static int computeSiegeAssaultPower(Dynasty dynasty) {
         if (dynasty == null) {
             return 0;
@@ -340,8 +323,6 @@ public final class ColonyMilitaryService {
             return computeMilitaryPowerFromPopulation(colony);
         }
         int total = computeMilitaryPowerFromPopulation(colony);
-        // Subtract border-battle active roles only. Hex-defense-only roles (Defender, Siege)
-        // remain in the local reserve / home-colony pool — they never leave for border clash.
         int assignedBorder = computeRolePowerFromWarCounts(colony, colony.getWarAssignedRoleCounts(), true, false);
         return Math.max(0, total - assignedBorder);
     }

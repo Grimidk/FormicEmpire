@@ -531,7 +531,6 @@ public final class GameUnlocks {
                 return (int) Math.round(ASSIMILATION_COST * multiplier);
         }
 
-        /** Omni keystone: required before other species assimilations can be started. */
         public static final Assimilation ASSIMILATION_OMNI = new Assimilation(12, "ASSIMILATION_OMNI", "ASSIMILATION_OMNI_DESC", ASSIMILATED_ASSIMILATION, ASSIMILATION_COST, loadIcon("icons/assimilations/Omni.png"));
         static { assimilations.add(ASSIMILATION_OMNI); }
 

@@ -70,12 +70,10 @@ public class Critter {
         this.species = species;
     }
 
-    /** Skills available to this critter, derived from species base skills and ant subtypes. */
     public List<Skill> getAvailableSkills() {
         return CritterSkillService.resolveAvailableSkills(this);
     }
 
-    /** Skills including colony upgrade unlocks (e.g. acid spitting from assimilation). */
     public List<Skill> getAvailableSkills(Colony colony) {
         return CritterSkillService.resolveAvailableSkills(this, colony);
     }

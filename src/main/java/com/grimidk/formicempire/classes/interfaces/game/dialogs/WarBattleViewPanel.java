@@ -39,9 +39,7 @@ public class WarBattleViewPanel extends JPanel {
     private static final int LINE_JITTER_PX = 10;
     private static final int RESERVE_WALK_PX_PER_SEC = 28;
     private static final float ATTACK_JAW_SNAP_SPEED = 4.2f;
-    /** Full flyby + off-screen reload wait before the next pass. */
     private static final float AIR_SUPPORT_FLY_CYCLE_SEC = 6.0f;
-    /** Fraction of the cycle spent crossing the field (remainder is deload/reload wait). */
     private static final float AIR_SUPPORT_FLY_PORTION = 0.32f;
 
     private final War war;
@@ -251,7 +249,6 @@ public class WarBattleViewPanel extends JPanel {
             if (airSupport) {
                 wingFrame = winged ? 2 : 1;
             } else if (!ant.reserve) {
-                // Brief jaw open near the crest of each attack pulse.
                 double attackPulse = Math.sin(ant.wobblePhase + animationSeconds * ATTACK_JAW_SNAP_SPEED * ant.motionRate);
                 if (attackPulse > 0.82) {
                     jawFrame = 2;
@@ -280,7 +277,6 @@ public class WarBattleViewPanel extends JPanel {
             if (airSupport) {
                 float cycle = (animationSeconds / AIR_SUPPORT_FLY_CYCLE_SEC) + ant.flyPhase;
                 cycle = cycle - (float) Math.floor(cycle);
-                // Deload past the far edge, then wait off-screen before reloading for the next pass.
                 if (cycle > AIR_SUPPORT_FLY_PORTION) {
                     continue;
                 }
@@ -377,13 +373,11 @@ public class WarBattleViewPanel extends JPanel {
                 if (type == null || type == GameConstants.TYPE_DEAD || count <= 0) {
                     continue;
                 }
-                // Drones are nuptial / non-combat except air-support flybys.
                 if (type == GameConstants.TYPE_DRONE && line != GameConstants.BATTLE_LINE_AIR_SUPPORT) {
                     continue;
                 }
                 for (int i = 0; i < count; i++) {
                     float laneY = lineTotal <= 1 ? 0.5f : indexInLine / (float) (lineTotal - 1);
-                    // Mild stagger so packed lines aren't a perfect grid.
                     laneY = Math.max(0f, Math.min(1f, laneY + (random.nextFloat() - 0.5f) * 0.02f));
                     AntSubtypeProfile profile = dynasty != null
                             ? AntSubtypeService.sampleProfileFromDynasty(dynasty, type)
@@ -440,7 +434,6 @@ public class WarBattleViewPanel extends JPanel {
                 scaled.put(lineEntry.getKey(), out);
             }
         }
-        // Guarantee at least one sprite if reserves exist but rounding wiped them.
         if (assigned == 0) {
             for (Map.Entry<BattleLine, Map<AntType, Integer>> lineEntry : reserveByLine.entrySet()) {
                 if (lineEntry.getValue() == null) {

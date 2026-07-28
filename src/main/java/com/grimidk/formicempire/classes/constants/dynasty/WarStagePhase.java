@@ -12,7 +12,6 @@ public class WarStagePhase extends Constant {
         this.persistenceKey = persistenceKey;
     }
 
-    /** Save/load key (legacy enum name). Not a display string. */
     public String getPersistenceKey() {
         return persistenceKey;
     }

@@ -11,15 +11,11 @@ import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 
-/**
- * Support-skill effects used in war (Boost Regen, Shielding) and redeploy healing.
- */
 public final class WarCombatSkillService {
 
     private WarCombatSkillService() {
     }
 
-    /** Marks Boost Regen for the next redeploy. Returns false if the ant cannot use it. */
     public static boolean useBoostRegen(Ant ant, Colony colony) {
         if (ant == null || !canUseSkill(ant, colony, GameConstants.SKILL_BOOST_REGEN)) {
             return false;
@@ -28,7 +24,6 @@ public final class WarCombatSkillService {
         return true;
     }
 
-    /** Activates Shielding so this defender absorbs hits meant for queens. */
     public static boolean useShielding(Ant ant, Colony colony) {
         if (ant == null || !canUseSkill(ant, colony, GameConstants.SKILL_SHIELDING)) {
             return false;
@@ -44,10 +39,6 @@ public final class WarCombatSkillService {
         return CritterSkillService.resolveAvailableSkills(ant, colony).contains(skill);
     }
 
-    /**
-     * Arms Boost Regen on every potter that can use it (interim until battle skill picks exist),
-     * then heals all ants by their regen % of max HP (boosted when pending).
-     */
     public static void applyRedeployRegen(Dynasty dynasty) {
         if (dynasty == null) {
             return;
@@ -108,10 +99,6 @@ public final class WarCombatSkillService {
         ant.setHealth(newHealth);
     }
 
-    /**
-     * Removes shielding defenders (and reduces their war quota) before queens can be eliminated.
-     * Returns how many shielding ants were sacrificed.
-     */
     public static int sacrificeShieldingDefenders(Colony colony, int maxToSacrifice) {
         if (colony == null || maxToSacrifice <= 0) {
             return 0;
@@ -151,10 +138,6 @@ public final class WarCombatSkillService {
         return count;
     }
 
-    /**
-     * Attack/defense multiplier in hex defense or hex assault for this ant's role and side.
-     * Defending ants: 1.5x; Defender role: 3x; attackers: 1x except Siege at 3x.
-     */
     public static float hexDefenseStatMultiplier(Ant ant, boolean attacking) {
         AntRole role = ant != null ? ant.getRole() : null;
         return hexDefenseStatMultiplier(role, attacking);
@@ -178,7 +161,6 @@ public final class WarCombatSkillService {
         return GameNumbers.applyHexDefenseAttack(ant.getAttack(), hexDefenseStatMultiplier(ant, attacking));
     }
 
-    /** Defense percent after hex-defense multiplier, never above 100%. */
     public static float effectiveHexDefenseDefense(Ant ant, boolean attacking) {
         if (ant == null) {
             return 0f;

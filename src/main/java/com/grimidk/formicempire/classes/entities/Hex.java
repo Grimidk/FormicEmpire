@@ -23,7 +23,6 @@ public class Hex {
     private int timeOffset; 
     private Weather localWeather;
     private boolean isActive;
-    /** True when this land hex belongs to an island landmass (not a continent). */
     private boolean island;
 
     private int nonWaterResourceSourcesGenerated;

@@ -15,7 +15,6 @@ public class AntSpecies extends Constant {
     private final String directory;
     private final Assimilation assimilation;
     private final Set<Upgrade> baseUpgrades;
-    /** LanguageStrings keys for preferred dynasty theme names (not display text). */
     private final Set<String> preferredNameKeys;
     private final AntSpeciesPalette palette;
 

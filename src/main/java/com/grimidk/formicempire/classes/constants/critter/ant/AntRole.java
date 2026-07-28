@@ -13,7 +13,6 @@ public class AntRole extends Constant {
     private final Set<AntSubtype> requiredSubtypes;
     private final Set<AntSubtype> forcedAllowedSubtypes;
     private final boolean isActiveMilitary;
-    /** Active military that only fight in hex defense, never border clash. */
     private final boolean hexDefenseOnly;
 
     public AntRole(int id, AntType antType, String name, ImageIcon icon) {
@@ -64,33 +63,18 @@ public class AntRole extends Constant {
         return antType;
     }
 
-    /**
-     * Subtypes an ant must possess to fill this role. Empty means no subtype requirement
-     * (standard / "nothing" ants remain eligible when no special subtypes are allowed).
-     */
     public Set<AntSubtype> getRequiredSubtypes() {
         return requiredSubtypes;
     }
 
-    /**
-     * Special subtypes that are always allowed for this role (checkboxes stay on).
-     * Required subtypes are always included here.
-     */
     public Set<AntSubtype> getForcedAllowedSubtypes() {
         return forcedAllowedSubtypes;
     }
 
-    /**
-     * War-economy combat roles (Warrior, Militia, Brute, …). Quotas live only on the war
-     * distribution and the role UI shows them only when war economy mode is enabled.
-     */
     public boolean isActiveMilitary() {
         return isActiveMilitary;
     }
 
-    /**
-     * Active military that only join hex defense (reserve assault), not frontier/border clash.
-     */
     public boolean isHexDefenseOnly() {
         return hexDefenseOnly;
     }

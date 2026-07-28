@@ -12,7 +12,7 @@ public class FrenchTranslation implements Translation {
     @Override
     public Map<String, String> getStrings() {
         Map<String, String> fr = new HashMap<>();
-        fr.put("UI_APP_TITLE", "Formic Empire"); // brand — never translate; LanguageStrings.get ignores locale
+        fr.put("UI_APP_TITLE", "Formic Empire");
         fr.put("UI_BACK_TO_GAME", "Retour au jeu");
         fr.put("UI_BACK_TO_MENU", "Quitter vers le menu principal");
         fr.put("UI_MENU", "Menu");

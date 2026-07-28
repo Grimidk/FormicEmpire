@@ -28,11 +28,8 @@ public class Ant extends Critter {
     private boolean isOnTrade;
     private boolean isNuptial;
     private boolean parasiticMiteInfected;
-    /** Next redeploy heals with Boost Regen multiplier when true. */
     private boolean boostRegenPending;
-    /** When true, this defender absorbs hits that would otherwise hit queens. */
     private boolean shieldingActive;
-    /** 1 = closed, 2 = open (jaw / wing sprite frames). */
     private int jawFrame = 1;
     private int wingFrame = 1;
     private int jawOpenMinutesRemaining;
@@ -221,7 +218,6 @@ public class Ant extends Critter {
         return wingFrame;
     }
 
-    /** Count down open jaw/wing timers (call once per in-game minute). */
     public void tickSpriteAnimMinute() {
         if (jawOpenMinutesRemaining > 0) {
             jawOpenMinutesRemaining--;
@@ -237,10 +233,6 @@ public class Ant extends Critter {
         }
     }
 
-    /**
-     * Rare idle jaw/wing snaps for colony view. Call once per in-game hour for ants
-     * currently in the viewport only.
-     */
     public void rollHourlySpriteAnim() {
         if (jawOpenMinutesRemaining <= 0
                 && GameRandom.nextDouble() < GameNumbers.ANT_JAW_SNAP_CHANCE_PER_HOUR) {

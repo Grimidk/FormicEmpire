@@ -263,10 +263,6 @@ public class World {
         return GameNumbers.axialHexDistance(fromHex.getQ(), fromHex.getR(), toHex.getQ(), toHex.getR());
     }
 
-    /**
-     * Minimum axial hex distance between any colony of {@code a} and any colony of {@code b}.
-     * Returns {@link Integer#MAX_VALUE} when either dynasty has no placeable colony hexes.
-     */
     public int minDynastyHexDistance(Dynasty a, Dynasty b) {
         if (a == null || b == null) {
             return Integer.MAX_VALUE;
@@ -606,11 +602,6 @@ public class World {
         return false;
     }
 
-    /**
-     * Marks each land hex as continent or island and updates counts.
-     * Continents are landmasses that include at least one hex within the continent core;
-     * all other landmasses are islands.
-     */
     public void classifyLandmasses() {
         this.continentCount = 0;
         this.islandCount = 0;

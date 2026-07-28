@@ -43,7 +43,6 @@ public class ColonyStarterService {
                 index = d.getColonies().size();
             }
 
-            // Capitals may already be named by World; satellites always use city titles.
             if (index == 0) {
                 if (colony.getName() == null || colony.getName().isEmpty()) {
                     colony.setName(d.generateColonyName(0));

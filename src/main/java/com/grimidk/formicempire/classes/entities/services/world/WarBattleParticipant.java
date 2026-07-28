@@ -9,11 +9,6 @@ import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 
-/**
- * One ant in an ongoing creature battle, with persistent focus targets for multi-hit skills.
- * War quotas may temporarily assign a battle role; {@link #restorePeaceRole()} undoes that.
- * Battle HP is tracked separately so ants with 0 colony HP (no Skeleton yet) can still fight.
- */
 final class WarBattleParticipant {
     private final Ant ant;
     private final BattleLine battleLine;
@@ -64,7 +59,6 @@ final class WarBattleParticipant {
         return battleMaxHealth;
     }
 
-    /** Applies damage to battle HP; returns remaining battle HP. */
     float applyBattleDamage(float damage) {
         if (damage <= 0f) {
             return battleHealth;

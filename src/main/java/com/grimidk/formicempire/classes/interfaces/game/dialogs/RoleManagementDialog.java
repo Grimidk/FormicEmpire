@@ -72,7 +72,6 @@ public class RoleManagementDialog extends ZeroDialog {
         headerPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
         headerPanel.add(warEconomyCheck);
         headerPanel.add(copyPeaceToWarButton);
-        // Keep header height stable when war-economy controls hide/show.
         headerPanel.setPreferredSize(new Dimension(
                 AssetStyles.ROLE_DIALOG_SIZE.width,
                 Math.max(AssetStyles.MIN_CONTROL_HIT_SIZE + 16, copyPeaceToWarButton.getPreferredSize().height + 12)));
@@ -394,13 +393,11 @@ public class RoleManagementDialog extends ZeroDialog {
                 boolean unlocked = roleUpgrade != null && colony.hasUpgrade(roleUpgrade);
 
                 if (role.isActiveMilitary()) {
-                    // Active military roles only appear while war economy mode is on.
                     if (!owner.isEditingWarRoles() || !unlocked) {
                         removeRoleRow(role);
                         continue;
                     }
                     if (!displayedRoles.contains(role)) {
-                        // Must mark displayed before addRoleRow — rebuildRolesGrid skips unmarked roles.
                         displayedRoles.add(role);
                         addRoleRow(role);
                         addedAny = true;
@@ -412,7 +409,6 @@ public class RoleManagementDialog extends ZeroDialog {
                 }
 
                 if (unlocked) {
-                    // Must mark displayed before addRoleRow — rebuildRolesGrid skips unmarked roles.
                     displayedRoles.add(role);
                     addRoleRow(role);
                     addedAny = true;
@@ -777,7 +773,6 @@ public class RoleManagementDialog extends ZeroDialog {
 
                 int totalAssigned = 0;
                 for (Map.Entry<AntRole, JSpinner> entry : spinnerMap.entrySet()) {
-                    // In peace view, active-military rows are hidden; skip if still present.
                     if (!owner.isEditingWarRoles() && entry.getKey().isActiveMilitary()) {
                         continue;
                     }

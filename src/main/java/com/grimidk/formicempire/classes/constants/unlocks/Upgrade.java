@@ -14,7 +14,6 @@ public class Upgrade extends Constant {
     private final String descriptionKey;
     private final Upgrade requirement;
     private final int cost;
-    /** 0-based index into {@link GameConstants#getTiers()}; resolved lazily to avoid static init cycles. */
     private final int tierIndex;
 
     public Upgrade(int id, String nameKey, String flavorNameKey, String descriptionKey, Upgrade requirement, int cost, ImageIcon icon, int tierIndex) {

@@ -9,9 +9,6 @@ import javax.swing.ImageIcon;
 import com.grimidk.formicempire.classes.constants.Constant;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
 
-/**
- * War battle-line band (infantry / artillery / air). Scaffolding for future combat resolution.
- */
 public class BattleLine extends Constant {
     private final float baseAccuracyPercent;
     private final Set<AntRole> allowedRoles;
@@ -24,7 +21,6 @@ public class BattleLine extends Constant {
                 : Collections.unmodifiableSet(new LinkedHashSet<>(allowedRoles));
     }
 
-    /** Hit chance baseline as a percent (100 = always accurate at baseline). */
     public float getBaseAccuracyPercent() {
         return baseAccuracyPercent;
     }

@@ -1126,7 +1126,6 @@ public class StatsDialog extends ZeroDialog {
             coloniesToCount.add(colony);
         }
 
-        // We'll aggregate counts and daily totals
         int foragers = 0, dailyForage = 0;
         int farmers = 0, dailyFarm = 0;
         int hunters = 0, dailyHunt = 0;

@@ -47,7 +47,6 @@ public final class WarBattleSceneBuilder {
         Biome defenderBiome = biomeAtColony(world, contested);
         Biome attackerBiome = resolveAttackerApproachBiome(world, contested, stageAttacker, stageDefender);
 
-        // View is read-only: never start/clear combat here (that belongs to WarProgressService).
         WarBattleState battle = WarCreatureCombatService.getState(war);
         SideComposition attackerComp;
         SideComposition defenderComp;
@@ -167,7 +166,6 @@ public final class WarBattleSceneBuilder {
         return compositionFromPhysicalMilitary(dynasty, capacity);
     }
 
-    /** Last-resort visuals: living soldiers/majors even when war quotas are unset. */
     private static SideComposition compositionFromPhysicalMilitary(Dynasty dynasty, int capacity) {
         Map<BattleLine, Map<AntType, Integer>> pooled = emptyLineMaps();
         if (dynasty == null) {
@@ -193,7 +191,6 @@ public final class WarBattleSceneBuilder {
         putType(pooled, GameConstants.BATTLE_LINE_INFANTRY, GameConstants.TYPE_MAJOR, sizeOf(contested.getMajors()));
         putType(pooled, GameConstants.BATTLE_LINE_INFANTRY, GameConstants.TYPE_PRINCESS, sizeOf(contested.getPrincesses()));
         putType(pooled, GameConstants.BATTLE_LINE_INFANTRY, GameConstants.TYPE_QUEEN, sizeOf(contested.getQueens()));
-        // Prefer actual role lines for war-assigned military.
         for (AntRole role : GameConstants.getActiveMilitaryRoles()) {
             int count = contested.getWarAssignedRoleCount(role);
             if (count <= 0 || role.getAntType() == null) {
@@ -203,7 +200,6 @@ public final class WarBattleSceneBuilder {
             if (line == null) {
                 line = GameConstants.BATTLE_LINE_INFANTRY;
             }
-            // Move quota ants from the generic infantry type bucket onto the role's line.
             Map<AntType, Integer> infantry = pooled.get(GameConstants.BATTLE_LINE_INFANTRY);
             int available = infantry.getOrDefault(role.getAntType(), 0);
             int move = Math.min(count, available);
@@ -223,7 +219,6 @@ public final class WarBattleSceneBuilder {
         if (count <= 0) {
             return;
         }
-        // Never display more ants than actually exist for that type.
         int available = countLivingOfType(colony, role.getAntType());
         if (available > 0) {
             count = Math.min(count, available);
@@ -285,7 +280,6 @@ public final class WarBattleSceneBuilder {
                 boolean forceActive = type == GameConstants.TYPE_QUEEN
                         || (hexHomeAlwaysActive && (type == GameConstants.TYPE_SOLDIER || type == GameConstants.TYPE_MAJOR));
                 if (forceActive) {
-                    // Approximate: queens / hex priority fill active without capacity limit.
                     putType(active, line, type, count);
                     livingActive += count;
                     continue;

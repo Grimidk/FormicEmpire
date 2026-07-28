@@ -90,8 +90,6 @@ public class SaveSelectPanel extends JPanel {
     }
     
     public void refreshTranslations() {
-        // Relabel from cache only — do not re-read save files on the EDT (language
-        // changes used to hit disk twice and intermittently freeze the UI).
         applySlotLabels();
         backButton.setText(LanguageStrings.get(LanguageStrings.UI_BACK));
     }

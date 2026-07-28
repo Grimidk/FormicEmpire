@@ -42,7 +42,6 @@ public class Rank extends Constant {
         return unlockOnAnnounce;
     }
 
-    /** Wired from {@code GameUnlocks} after upgrades exist (avoids static init cycles). */
     public void setUnlockOnAnnounce(Upgrade unlockOnAnnounce) {
         this.unlockOnAnnounce = unlockOnAnnounce;
     }

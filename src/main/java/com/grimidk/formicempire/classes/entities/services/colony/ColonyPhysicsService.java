@@ -756,7 +756,6 @@ public class ColonyPhysicsService {
         return getRandomPointInRoom(c, r, c.getGameAreaWidth()); 
     }
 
-    /** Decrement jaw/wing open timers once per in-game minute. */
     public void tickAntSpriteAnimMinutes(Colony colony) {
         if (colony == null) {
             return;
@@ -778,10 +777,6 @@ public class ColonyPhysicsService {
         }
     }
 
-    /**
-     * Once per in-game hour, rarely start jaw/wing snaps for ants currently in the
-     * last known physics viewport (colony view only).
-     */
     public void rollAntSpriteAnimHourly(Colony colony, Dimension activeDimension, Rectangle viewportBounds) {
         if (colony == null || activeDimension == null || !ViewportPhysicsLod.isLodActive(viewportBounds)) {
             return;

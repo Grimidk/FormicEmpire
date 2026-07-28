@@ -12,8 +12,8 @@ public class SpanishTranslation implements Translation {
     @Override
     public Map<String, String> getStrings() {
         Map<String, String> es = new HashMap<>();
-        es.put("UI_APP_TITLE", "Formic Empire"); // brand — never translate; LanguageStrings.get ignores locale
-        es.put("UI_BACK_TO_GAME", "Volver al Juego");
+        es.put("UI_APP_TITLE", "Formic Empire");
+        es.put("UI_BACK_TO_GAME", "Volver al Juego");   
         es.put("UI_BACK_TO_MENU", "Salir al Menú Principal");
         es.put("UI_MENU", "Menú");
         es.put("UI_SETTINGS", "Ajustes");

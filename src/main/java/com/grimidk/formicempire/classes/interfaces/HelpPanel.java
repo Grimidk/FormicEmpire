@@ -57,7 +57,6 @@ public class HelpPanel extends JPanel {
     private final MainFrame frame;
     private final JTabbedPane mainTabs;
     private final JButton backButton;
-    /** True when language/theme content needs a full tab rebuild. */
     private boolean tabsContentDirty;
 
     public HelpPanel(MainFrame frame) {
@@ -126,13 +125,10 @@ public class HelpPanel extends JPanel {
     
     public void refreshTranslations() {
         backButton.setText(LanguageStrings.get(LanguageStrings.UI_BACK));
-        // Mark dirty instead of rebuilding every language change — rapid Save/Apply
-        // used to queue multiple full encyclopedia rebuilds and freeze the EDT.
         tabsContentDirty = true;
         if (isShowing()) {
             ensureTabsContentCurrent();
         } else {
-            // Keep visible tab titles in sync even while content rebuild is deferred.
             String[] titles = {
                 LanguageStrings.get(LanguageStrings.HELP_TAB_TUTORIALS),
                 LanguageStrings.get(LanguageStrings.HELP_TAB_SPECIES),
@@ -153,7 +149,6 @@ public class HelpPanel extends JPanel {
         }
     }
 
-    /** Rebuild tab bodies if a language/theme change happened while Help was hidden. */
     public void ensureTabsContentCurrent() {
         if (!tabsContentDirty) {
             return;
@@ -1191,7 +1186,6 @@ public class HelpPanel extends JPanel {
         panel.setBackground(AssetStyles.BACKGROUND_COLOR);
         panel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        // Resources: one header row (icon + name per resource, like original), then rows of pile sizes (small..huge) aligned in columns
         JPanel resourcesPanel = new JPanel();
         resourcesPanel.setLayout(new BoxLayout(resourcesPanel, BoxLayout.Y_AXIS));
         resourcesPanel.setBackground(AssetStyles.BACKGROUND_COLOR);

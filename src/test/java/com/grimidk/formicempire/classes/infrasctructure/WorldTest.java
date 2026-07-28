@@ -69,7 +69,7 @@ public class WorldTest {
 
         // 2. Load World
         World world = new World();
-        world.setEngine(null); // No engine needed for tunnel test
+        world.setEngine(null);
         world.loadWorld(savefile);
 
         // 3. Verify

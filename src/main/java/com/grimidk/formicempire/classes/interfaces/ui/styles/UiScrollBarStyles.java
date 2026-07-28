@@ -10,7 +10,6 @@ import javax.swing.JScrollPane;
 
 public final class UiScrollBarStyles {
     public static final String HIDDEN_SCROLLBAR_KEY = "formicempire.hiddenScrollbar";
-    /** Pixels per mouse-wheel unit; Swing default is 1 and feels glacial in menus. */
     public static final int DEFAULT_UNIT_INCREMENT = 32;
     public static final int DEFAULT_BLOCK_INCREMENT = 128;
 

@@ -154,7 +154,6 @@ class WarCombatSkillServiceTest {
         assertEquals(borderActive + siege, assault);
         assertTrue(borderActive > 0);
         assertTrue(siege > 0);
-        // Defender role is not in border-active assault pool.
         assertEquals(borderActive, home.getActiveMilitaryPower());
 
         int fullColony = ColonyMilitaryService.computeHexDefenseMilitaryPower(home);

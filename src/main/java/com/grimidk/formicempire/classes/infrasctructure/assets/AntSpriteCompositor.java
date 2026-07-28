@@ -18,12 +18,7 @@ import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeSlot;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 
-/**
- * Builds ant sprites from {@code sprites/ants/zero-shared} layers by replacing marker
- * RGB values with {@link AntSpeciesPalette} colors. {@code #000000} is never recolored.
- */
 public final class AntSpriteCompositor {
-    /** Marker RGB in shared art (RRGGBB). */
     public static final int MARKER_HEAD = 0xFF0000;
     public static final int MARKER_TORSO = 0x00FF00;
     public static final int MARKER_ABDOMEN = 0x0000FF;
@@ -216,7 +211,6 @@ public final class AntSpriteCompositor {
             if (img == null) {
                 return null;
             }
-            // Defensive copy into TYPE_INT_ARGB for reliable getRGB/setRGB.
             BufferedImage copy = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = copy.createGraphics();
             try {

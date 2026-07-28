@@ -68,9 +68,6 @@ public final class CritterSkillService {
         return List.copyOf(skills);
     }
 
-    /**
-     * Effective skill accuracy after subtype bonuses (e.g. Farsight +15%), capped at 100%.
-     */
     public static float resolveAccuracyMult(Skill skill, AntSubtypeProfile profile) {
         if (skill == null) {
             return 0f;
@@ -79,9 +76,6 @@ public final class CritterSkillService {
         return Math.min(1f, Math.max(0f, accuracy));
     }
 
-    /**
-     * Subtype attack multiplier for skill damage. Trapjaw / Stinger apply only to infantry skills.
-     */
     public static float resolveSubtypeAttackMult(Skill skill, AntSubtypeProfile profile) {
         if (skill == null || skill.getBattleLine() != GameConstants.BATTLE_LINE_INFANTRY) {
             return 1f;
@@ -89,9 +83,6 @@ public final class CritterSkillService {
         return AntSubtypeService.combinedAttackMult(profile);
     }
 
-    /**
-     * Effective skill damage multiplier including infantry-only subtype attack boosts.
-     */
     public static float resolveDamageMult(Skill skill, AntSubtypeProfile profile) {
         if (skill == null) {
             return 0f;

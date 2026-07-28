@@ -647,7 +647,7 @@ public class GameAreaPanel extends ZeroGamePanel {
     /*
      * In-room building decoration overlay — disabled for now (see roadmap).
      * Re-enable by uncommenting the draw call in paint and restoring RoomDecorationRenderer import.
-     *
+     *  
     private void drawUnderworldRoomDecorationsOverlay(Graphics2D g2d) {
         if (colony == null) {
             return;

@@ -10,9 +10,6 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-/**
- * Reusable labeled search field that filters by case-insensitive substring match.
- */
 public class UiNameSearchBar extends JPanel {
     public static final int DEFAULT_COLUMNS = 18;
 

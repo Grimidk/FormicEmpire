@@ -17,7 +17,6 @@ public class Building extends Constant {
     private final int mineralCost;
     private final int buildTime;
     private final ImageIcon sprite;
-    /** 0-based index into {@link GameConstants#getTiers()}; resolved lazily to avoid static init cycles. */
     private final int tierIndex;
 
     public Building(int id, String nameKey, int level, String descriptionKey, Building requirement, int resinCost, int mineralCost, int buildTime, ImageIcon icon, ImageIcon sprite, int tierIndex) {

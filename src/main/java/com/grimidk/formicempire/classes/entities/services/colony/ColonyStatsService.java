@@ -111,7 +111,6 @@ public class ColonyStatsService {
         return 0;
     }
 
-    /** Passive Lab contributes virtual researchers (+1, or +2 with Passive 1). */
     public int getPassiveLabResearcherBonus(Colony colony) {
         if (colony == null || !colony.hasBuilding(GameUnlocks.PASSIVE_LAB)) {
             return 0;
@@ -126,7 +125,6 @@ public class ColonyStatsService {
         return colony.getAssignedRoleCount(GameConstants.ROLE_RESEARCHER) + getPassiveLabResearcherBonus(colony);
     }
 
-    /** Hourly RP gain matching labour / lite research (assigned roles + Passive Lab). */
     public int getHourlyResearchPoints(Colony colony) {
         if (colony == null) {
             return 0;
@@ -338,7 +336,7 @@ public class ColonyStatsService {
         return minerCount * getCollectingRate(colony);
     }
 
-    // Daily estimates 
+    
     public int getPlantProduction(Colony colony) {
         return (int) (getPlantProductionHourly(colony) * 24.0);
     }

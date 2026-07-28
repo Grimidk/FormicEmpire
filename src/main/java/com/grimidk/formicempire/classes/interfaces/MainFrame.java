@@ -270,7 +270,6 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         initPanel.refreshTranslations();
         settingsPanel.refreshTranslations();
         gamePanel.refreshTranslations();
-        // Help encyclopedia rebuild is deferred until Help is shown (see HelpPanel).
         helpPanel.refreshTranslations();
     }
 

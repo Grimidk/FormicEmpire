@@ -72,3 +72,8 @@ Run on macOS: `open outputs/FormicEmpire.app`
 Run on Linux: ship `outputs/FormicEmpire.linux.zip` (unzip, then run `FormicEmpire/bin/FormicEmpire`). Saves are created beside the app folder at first run.  
 Run on Windows: ship `outputs/FormicEmpire.windows.zip` (unzip, then run `FormicEmpire.exe`). Saves are created beside the exe at first run.  
 Run anywhere with Java 17+: unzip `outputs/FormicEmpire.jar.zip` and run `./FormicEmpire.sh`
+
+In order to add new ant assets you need to use these colors in order to properly map the species: 
+    	head FF0000, torso 00FF00, abdomen 0000FF, wingPrimary FFFF00, wingSecondary 00FFFF, 
+        drone FF00FF, droneWingPrimary FF8000, droneWingSecondary 8000FF, honeypot FF0080;
+		borders (and appendages) 000000

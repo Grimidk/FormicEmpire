@@ -210,10 +210,6 @@ public class ColonyCritterHandlingService {
         runSymbioticMitePredation(colony);
     }
 
-    /**
-     * When tender/pool capacity falls below current counts, excess pets leave the next day.
-     * Passive Aphid prevents aphid escapes.
-     */
     public void runEscapes(Colony colony) {
         if (colony == null) {
             return;

@@ -306,7 +306,6 @@ public final class AntSubtypeService {
         }
         ant.setRegen(Math.round(colony.getBaseRegen() * type.getRegenMult() * combinedRegenMult(profile)));
         ant.setConsumption(colony.getBaseConsumption() * type.getConsumptionMult() * consumptionMult(profile));
-        // Subtype attack boosts apply to infantry skills only (see CritterSkillService.resolveSubtypeAttackMult).
         ant.setAttack((int) (colony.getBaseAttack() * type.getAttackMult()));
         ant.setAttackSpeed((int) (colony.getBaseAttackSpeed() * type.getAttackSpeedMult()));
         ant.setDefense(GameNumbers.clampDefensePercent(
@@ -328,7 +327,6 @@ public final class AntSubtypeService {
         return hasAttackSubtype ? total : 1f;
     }
 
-    /** Additive accuracy bonus from subtypes (e.g. Farsight +0.15). */
     public static float combinedAccuracyBonus(AntSubtypeProfile profile) {
         float total = 0f;
         if (profile == null) {
@@ -344,7 +342,6 @@ public final class AntSubtypeService {
         return total;
     }
 
-    /** Extra defense percent from subtypes (e.g. Doorhead +20). Neutral subtypes contribute 0. */
     public static float combinedDefenseBonus(AntSubtypeProfile profile) {
         float total = 0f;
         for (AntSubtypeSlot slot : AntSubtypeSlot.values()) {
@@ -686,11 +683,6 @@ public final class AntSubtypeService {
         return profile == null || profile.countActiveSubtypes() == 0;
     }
 
-    /**
-     * Whether {@code ant} may fill {@code role} given the colony's allowed special subtypes.
-     * Standard ("nothing") ants are eligible only when the role has no required subtypes.
-     * Special ants need every active special trait allowed (forced-allowed always counts as allowed).
-     */
     public static boolean isAntEligibleForRole(Ant ant, AntRole role, Set<Integer> allowedSpecialSubtypeIds) {
         if (ant == null || role == null) {
             return false;

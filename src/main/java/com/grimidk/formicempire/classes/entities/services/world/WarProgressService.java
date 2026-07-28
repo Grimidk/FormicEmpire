@@ -160,11 +160,6 @@ public final class WarProgressService {
         return false;
     }
 
-    /**
-     * Contested-colony owner withdraws from border clash into hex defense without army losses.
-     * Hex assault attacker/defender are already tracked via {@link War#getStageAttackerDynastyId()}
-     * and the contested colony owner; border clash has no attacker/defender distinction beyond pools.
-     */
     public static boolean canWithdrawToHexDefense(World world, War war, Dynasty withdrawer) {
         if (world == null || war == null || withdrawer == null || !war.isActive() || !war.isCampaignInitialized()) {
             return false;
@@ -179,7 +174,6 @@ public final class WarProgressService {
         if (contested == null || contested.getDynasty() == null) {
             return false;
         }
-        // Only the hex owner can bait: pull border forces home and fight with hex-defense boosts.
         return contested.getDynasty().getId() == withdrawer.getId();
     }
 
@@ -194,8 +188,6 @@ public final class WarProgressService {
             return false;
         }
 
-        // Preserve armies: contested owner clears their border pool and opens hex defense
-        // on the same contested hex (original stage attacker assaults into the bait).
         war.setDeployedActiveDefender(0);
         WarCreatureCombatService.clear(war);
         beginDirectReserveAssault(world, war, stageAttacker, stageDefender, contested);
@@ -367,14 +359,9 @@ public final class WarProgressService {
         if (hexOdds < borderOdds * GameNumbers.WAR_AI_HEX_BAIT_ODDS_IMPROVEMENT) {
             return false;
         }
-        // Bait only when a follow-up counterattack into the assaulting dynasty looks viable.
         return counterattackOddsLookFavorable(world, ai, stageAttacker);
     }
 
-    /**
-     * After holding the contested hex, {@code ai} becomes stage attacker and pushes into
-     * {@code enemy}'s adjacent territory. Require a reachable target and decent assault odds.
-     */
     static boolean counterattackOddsLookFavorable(World world, Dynasty ai, Dynasty enemy) {
         if (world == null || ai == null || enemy == null || ai == enemy) {
             return false;
@@ -406,7 +393,6 @@ public final class WarProgressService {
         ColonyMilitaryService.refreshDynastyMilitaryPower(stageAttacker);
         ColonyMilitaryService.refreshDynastyMilitaryPower(stageDefender);
         if (outcome == WarCreatureCombatService.TickOutcome.ATTACKER_WINS) {
-            // Border winner assaults the loser's hex.
             war.setDeployedActiveDefender(0);
             beginReserveAssault(world, war, stageAttacker, stageDefender);
         } else if (outcome == WarCreatureCombatService.TickOutcome.DEFENDER_WINS) {
@@ -465,8 +451,6 @@ public final class WarProgressService {
             completeStage(world, warService, war, aggressor, defender, stageAttacker,
                     contested.getDynasty(), contested, StageOutcome.CAPTURE, true);
         } else if (outcome == WarCreatureCombatService.TickOutcome.DEFENDER_WINS) {
-            // Holding the hex awards the stage to the defender and flips stageAttacker
-            // so the next redeploy is a counterattack into the failed assaulter's territory.
             WarCreatureCombatService.clear(war);
             completeStage(world, warService, war, aggressor, defender, stageAttacker,
                     contested.getDynasty(), contested, StageOutcome.DEFENDER_HOLD, true);
@@ -477,7 +461,6 @@ public final class WarProgressService {
         return war != null && war.getStageProgress() >= 1f - 0.0001f;
     }
 
-    /** How a stage ends — drives victor, capture, and player-facing copy. */
     enum StageOutcome {
         CAPTURE,
         ATTACKER_RETREAT,
@@ -543,16 +526,11 @@ public final class WarProgressService {
             return;
         }
 
-        // Victor becomes stageAttacker and advances toward the loser's capital (counterattack).
         Dynasty loser = victor.getId() == aggressor.getId() ? defender : aggressor;
         setupNextStage(world, war, aggressor, defender, victor, loser);
         enterRedeploying(world, war, aggressor, defender);
     }
 
-    /**
-     * Resolves the current hex assault as a successful hold by the contested owner.
-     * Awards the stage, flips {@code stageAttacker} for counterattack, and enters redeploy.
-     */
     static boolean resolveHexDefenseHold(World world, WarService warService, War war) {
         if (world == null || war == null || !war.isActive() || !war.isCampaignInitialized()) {
             return false;
@@ -853,7 +831,6 @@ public final class WarProgressService {
         }
     }
 
-    /** Hex-assault attacker losses hit border roles and Siege proportionally by base power. */
     private static void applyHexAssaultAttackerLoss(Dynasty dynasty, int powerLoss) {
         if (dynasty == null || powerLoss <= 0) {
             return;

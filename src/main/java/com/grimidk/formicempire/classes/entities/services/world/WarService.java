@@ -442,8 +442,7 @@ public class WarService {
         }
         return count;
     }
-
-    /** Wars this dynasty started (aggressor), active and historic. */
+    
     public int countWarsDeclaredBy(int dynastyId) {
         int count = 0;
         for (War war : activeWars) {

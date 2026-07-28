@@ -21,9 +21,6 @@ import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 
-/**
- * Creature-vs-creature war battle resolution (border clash and hex assault).
- */
 public final class WarCreatureCombatService {
 
     public enum TickOutcome {
@@ -262,7 +259,6 @@ public final class WarCreatureCombatService {
         }
     }
 
-    /** Additive passive auras from living Commanders (artillery) / Captains (infantry). Does not stack per unit. */
     private static float laneDamageMultiplier(WarBattleSideState side, BattleLine line) {
         if (side == null || line == null) {
             return 1f;
@@ -358,7 +354,6 @@ public final class WarCreatureCombatService {
                 pool = nonQueens;
             }
         }
-        // Prefer living defenders when any queen would otherwise be chosen.
         boolean hasDefender = false;
         for (WarBattleParticipant p : pool) {
             if (p.isDefenderRole()) {
@@ -373,7 +368,6 @@ public final class WarCreatureCombatService {
                     defenders.add(p);
                 }
             }
-            // Soft redirect: if random would be queen, force defender — implemented by removing queens when defenders exist.
             List<WarBattleParticipant> withoutQueens = new ArrayList<>();
             for (WarBattleParticipant p : pool) {
                 if (!p.isQueen()) {
@@ -456,7 +450,6 @@ public final class WarCreatureCombatService {
         WarBattleSideState side = new WarBattleSideState(dynasty);
         List<WarBattleParticipant> pool = new ArrayList<>();
         Map<Ant, Boolean> seen = new IdentityHashMap<>();
-        // Apply war quotas onto ants first so Defender/Siege skills and always-active rules work.
         claimRoleQuota(contested, GameConstants.ROLE_DEFENDER, pool, seen);
         claimRoleQuota(contested, GameConstants.ROLE_SIEGE, pool, seen);
         for (AntRole role : GameConstants.getBorderBattleRoles()) {
@@ -477,10 +470,6 @@ public final class WarCreatureCombatService {
         }
     }
 
-    /**
-     * Claims up to the war-assigned quota of ants of the role's type. Temporarily sets
-     * {@link Ant#setRole(AntRole)} so skills resolve; restored via {@link #clear(War)}.
-     */
     private static void claimRoleQuota(Colony colony, AntRole role, List<WarBattleParticipant> pool,
             Map<Ant, Boolean> seen) {
         if (colony == null || role == null || role.getAntType() == null) {
@@ -598,7 +587,6 @@ public final class WarCreatureCombatService {
         }
     }
 
-    /** Queens always active (commanders). Hex defense: Defenders + Siege too. Hex assault: Siege too. */
     private static boolean forcesAlwaysActive(WarBattleParticipant p, boolean hexDefenderSide) {
         if (p.isQueen()) {
             return true;

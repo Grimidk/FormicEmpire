@@ -8,7 +8,6 @@ import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
 public class AntSubtype extends Constant {
-    /** Digit used by empty/"nothing" subtype slots in hatch-rate maps. */
     public static final int DIGIT_NONE = 1;
 
     private final AntSubtypeSlot slot;
@@ -22,7 +21,6 @@ public class AntSubtype extends Constant {
     private final float speedMult;
     private final float forageMult;
     private final float regenMult;
-    /** Additive skill accuracy bonus (e.g. 0.15 = +15%). Clamped with skill base at resolve time. */
     private final float accuracyBonus;
     private final String descKey;
     private final Skill grantedSkill;

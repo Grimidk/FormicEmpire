@@ -14,10 +14,8 @@ import java.util.Map;
 
 public final class WarBattleScene {
 
-    /** Soft cap for reserve sprites only (active ants are drawn 1:1). */
     public static final int MAX_VISUAL_RESERVE_ANTS_PER_SIDE = 120;
 
-    /** Pixel gap behind the infantry contact line for each deeper battle line. */
     public static final int ARTILLERY_LINE_OFFSET_PX = 200;
     public static final int AIR_SUPPORT_LINE_OFFSET_PX = 400;
     public static final int RESERVE_LINE_OFFSET_PX = 560;
@@ -39,7 +37,6 @@ public final class WarBattleScene {
             return flatten(reserveByLine);
         }
 
-        /** Total living ants by type (active + reserve). */
         public Map<AntType, Integer> typeCounts() {
             Map<AntType, Integer> total = new HashMap<>(activeTypeCounts());
             for (Map.Entry<AntType, Integer> e : reserveTypeCounts().entrySet()) {

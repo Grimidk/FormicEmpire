@@ -605,10 +605,6 @@ public class DynastyDiplomacyService {
         return GameConstants.DIPLO_MODIFIER_BORDER_FRICTION.getReputationDelta();
     }
 
-    /**
-     * −20 with every dynasty once either side has declared
-     * {@link GameNumbers#WARMONGER_DECLARED_WARS_THRESHOLD} wars (does not stack if both qualify).
-     */
     public int getWarmongerAdjustment(Dynasty other, World world) {
         if (other == null || other == dynasty || world == null || world.getWarService() == null) {
             return 0;

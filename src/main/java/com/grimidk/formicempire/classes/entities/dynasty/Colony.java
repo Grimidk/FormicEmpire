@@ -1199,10 +1199,6 @@ public class Colony {
         reconcileDiplomatDeploymentsIfNeeded(role, previous, count, usesWarEconomyRoles());
     }
 
-    /**
-     * Commander is war-only, max {@link GameNumbers#COMMANDER_MAX_PER_COLONY} per colony, and only when
-     * the colony has enough living queens that at least one can stay off combat.
-     */
     public int getMaxAssignableCommanders() {
         int livingQueens = 0;
         if (getQueens() != null) {
@@ -1218,7 +1214,6 @@ public class Colony {
         return GameNumbers.COMMANDER_MAX_PER_COLONY;
     }
 
-    /** Drops illegal Commander quotas when queens die or leave. */
     public void clampCommanderWarAssignment() {
         int max = getMaxAssignableCommanders();
         int current = getWarAssignedRoleCount(GameConstants.ROLE_COMMANDER);

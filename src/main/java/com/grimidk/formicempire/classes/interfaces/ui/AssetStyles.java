@@ -61,7 +61,6 @@ public class AssetStyles {
 
     public static final String ICON_BUTTON_CLIENT_KEY = "formicempire.iconButton";
 
-    /** Matches cursor PNG size; no interactive control should be smaller on either axis. */
     public static final int MIN_CONTROL_HIT_SIZE = 20;
     public static final int MIN_SPINNER_HEIGHT = MIN_CONTROL_HIT_SIZE * 2;
 

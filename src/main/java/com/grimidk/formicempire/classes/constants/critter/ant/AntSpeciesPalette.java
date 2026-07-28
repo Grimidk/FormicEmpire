@@ -1,10 +1,5 @@
 package com.grimidk.formicempire.classes.constants.critter.ant;
 
-/**
- * Per-species recolor targets for marker pixels in {@code sprites/ants/zero-shared} layers.
- * Hex strings are RRGGBB (optional leading {@code #}). Marker map is in
- * {@link com.grimidk.formicempire.classes.infrasctructure.assets.AntSpriteCompositor}.
- */
 public final class AntSpeciesPalette {
     private final int headColor;
     private final int torsoColor;

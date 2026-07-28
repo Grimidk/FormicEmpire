@@ -150,7 +150,6 @@ public final class GameConstants {
         return null;
     }
 
-    /** Species body/wing recolor targets for zero-shared marker sprites (RRGGBB hex). */
     private static AntSpeciesPalette palette(
             String headColor,
             String torsoColor,
@@ -168,11 +167,6 @@ public final class GameConstants {
                 honeypotColor);
     }
 
-    /**
-     * Help-encyclopedia sprite for a species: majors for major-granting species,
-     * soldiers for attack subtypes (trapjaw / bullet), workers for other subtypes
-     * (turtle / honeypot), otherwise a plain worker.
-     */
     public static ImageIcon getRepresentativeAntSprite(AntSpecies species) {
         AntType type = TYPE_WORKER;
         AntSubtypeProfile profile = AntSubtypeProfile.standard();

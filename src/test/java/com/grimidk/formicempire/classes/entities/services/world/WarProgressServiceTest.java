@@ -134,13 +134,10 @@ class WarProgressServiceTest {
         War war = world.getWarService().beginWar(aggressor, defender);
         Colony contested = defender.getColonies().get(0);
         Colony aggressorCapital = aggressor.getCapital();
-        // Losing the border badly...
         war.setDeployedActiveAttacker(10_000);
         war.setDeployedActiveDefender(100);
-        // Strong local hex defense for the bait.
         contested.getWarAssignedRoleCounts().put(GameConstants.ROLE_DEFENDER, 80);
         contested.getWarAssignedRoleCounts().put(GameConstants.ROLE_WARRIOR, 40);
-        // Soft counterattack target: thin population defense, keep a small assault threat.
         aggressorCapital.getWorkers().clear();
         while (aggressorCapital.getSoldiers().size() > 5) {
             aggressorCapital.getSoldiers().remove(aggressorCapital.getSoldiers().size() - 1);
@@ -165,7 +162,6 @@ class WarProgressServiceTest {
         war.setDeployedActiveDefender(100);
         contested.getWarAssignedRoleCounts().put(GameConstants.ROLE_DEFENDER, 80);
         contested.getWarAssignedRoleCounts().put(GameConstants.ROLE_WARRIOR, 40);
-        // Strip defender dynasty assault power so a counterattack cannot follow the hold.
         for (Colony colony : defender.getColonies()) {
             colony.getWarAssignedRoleCounts().clear();
             colony.getWarAssignedRoleCounts().put(GameConstants.ROLE_DEFENDER, 80);
@@ -286,7 +282,6 @@ class WarProgressServiceTest {
     }
 
     private World buildThreeHexWorld() {
-        // Isolate from @BeforeEach border colonies on the shared dynasties.
         aggressor.getColonies().clear();
         defender.getColonies().clear();
         aggressor.setCapital(null);

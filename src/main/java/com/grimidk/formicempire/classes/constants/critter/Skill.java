@@ -12,7 +12,6 @@ public class Skill extends Constant {
     private final float damageMult;
     private final int targetCount;
     private final boolean isAttack;
-    /** Passive aura: never chosen as a battle action; may boost its battle line's damage. */
     private final boolean passive;
     private final float laneDamageBonus;
     private AntRole requiredRole;
@@ -63,7 +62,6 @@ public class Skill extends Constant {
         return passive;
     }
 
-    /** Additive damage bonus applied to the skill's battle line while a living ant with this skill is present. */
     public float getLaneDamageBonus() {
         return laneDamageBonus;
     }

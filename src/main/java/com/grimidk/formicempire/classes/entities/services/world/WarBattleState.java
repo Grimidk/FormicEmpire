@@ -1,8 +1,5 @@
 package com.grimidk.formicempire.classes.entities.services.world;
 
-/**
- * In-memory creature-combat state for one war stage battle (border clash or hex assault).
- */
 public final class WarBattleState {
     private final WarBattleSideState attacker;
     private final WarBattleSideState defender;

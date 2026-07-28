@@ -36,9 +36,6 @@ public final class LanguageStrings {
         languageNames.put(code, translation.getLanguageName());
     }
 
-    /**
-     * @return true if the active language actually changed (listeners were notified)
-     */
     public static boolean setLanguage(String lang) {
         if (lang == null || !translations.containsKey(lang) || lang.equals(currentLanguage)) {
             return false;
@@ -61,7 +58,6 @@ public final class LanguageStrings {
     }
 
     public static String get(String key) {
-        // Brand name is never localized — always English "Formic Empire".
         if (UI_APP_TITLE.equals(key)) {
             return APP_DISPLAY_NAME;
         }
@@ -69,7 +65,6 @@ public final class LanguageStrings {
         if (langMap != null && langMap.containsKey(key)) {
             return langMap.get(key);
         }
-        // Fallback to English
         langMap = translations.get("en");
         if (langMap != null && langMap.containsKey(key)) {
             return langMap.get(key);
@@ -77,7 +72,6 @@ public final class LanguageStrings {
         return key;
     }
 
-    /** Player-facing strings that include the product name must inject this (never translate it). */
     public static String withAppDisplayName(String key) {
         return format(key, APP_DISPLAY_NAME);
     }
@@ -191,10 +185,9 @@ public final class LanguageStrings {
         if (legacySuffix.length() > bestRemoved && trimmed.endsWith(legacySuffix)) {
             result = trimmed.substring(0, trimmed.length() - legacySuffix.length());
         }
-        return result.trim();
+        return result.trim();   
     }
 
-    /** Strips theme from "%s Title" or "Title %s" formats (and mixed legacy orderings). */
     private static String stripByDynastyTitleFormat(String fullName, String format) {
         if (fullName == null || format == null) {
             return null;
@@ -222,7 +215,6 @@ public final class LanguageStrings {
         return fullName.substring(prefix.length(), fullName.length() - suffix.length()).trim();
     }
 
-    /** Title word as prefix or suffix so legacy "Theme Title" still strips after Romance flip. */
     private static String stripByDynastyTitleWord(String fullName, String localizedTitle) {
         if (fullName == null || localizedTitle == null || localizedTitle.isEmpty()) {
             return null;
@@ -439,14 +431,12 @@ public final class LanguageStrings {
     }
     
     private static void notifyListeners() {
-        // Copy so a listener cannot ConcurrentModify the list mid-notify.
         for (Runnable listener : List.copyOf(listeners)) {
             listener.run();
         }
     }
 
     // --- Keys ---
-    /** Product / window title — English only; never pass through locale maps. */
     public static final String APP_DISPLAY_NAME = "Formic Empire";
     public static final String UI_APP_TITLE = "UI_APP_TITLE";
     public static final String UI_BACK_TO_GAME = "UI_BACK_TO_GAME";

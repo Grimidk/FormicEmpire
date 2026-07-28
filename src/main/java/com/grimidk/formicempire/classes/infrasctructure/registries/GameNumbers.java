@@ -8,11 +8,8 @@ public final class GameNumbers {
 
     // --- Movement / gathering ---
     public static final int PARASITIC_MITES_ON_ANT_SPRITE = 5;
-    /** Per-hour chance (viewport ants only) to start a jaw snap outside battle. */
     public static final double ANT_JAW_SNAP_CHANCE_PER_HOUR = 0.08;
-    /** Per-hour chance (viewport winged ants only) to start a wing flick outside battle. */
     public static final double ANT_WING_FLICK_CHANCE_PER_HOUR = 0.06;
-    /** In-game minutes to hold jaw/wing open after a colony-view snap/flick. */
     public static final int ANT_SPRITE_SNAP_MINUTES = 30;
     public static final float BASE_SPRITE_SPEED = 2.5f;
     public static final float GATHER_FULL_EFFICIENCY_RADIUS_BASE = 500f;
@@ -20,17 +17,9 @@ public final class GameNumbers {
     public static final float GATHER_COLONY_SPEED_RADIUS_MULT = 1.25f;
 
     // --- World generation ---
-    /** Land rings from the spawn hex outward before coastal ocean rings. */
     public static final int WORLD_DEFAULT_CONTINENT_CORE_RADIUS = 7;
-    /** Ocean rings beyond the continent core that may roll land (shelf / islands). */
     public static final int WORLD_COASTAL_RING_COUNT = 5;
-    /** Final pure-ocean ring after the coastal shelf. */
     public static final int WORLD_OUTER_OCEAN_RING_COUNT = 1;
-    /**
-     * Land chance percent for coastal rings 1..{@link #WORLD_COASTAL_RING_COUNT}
-     * (index 0 = first ring beyond the core). Rings 1–4 require mainland adjacency;
-     * the last ring may form islands.
-     */
     public static final int[] WORLD_COASTAL_LAND_CHANCE_PERCENT = { 80, 40, 20, 10, 5 };
 
     public static int worldRadiusForContinentCore(int continentCoreRadius) {
@@ -124,20 +113,14 @@ public final class GameNumbers {
     // --- Military ---
     public static final int MILITARY_BASELINE_HEALTH = 100;
     public static final int MILITARY_BASELINE_ATTACK = 10;
-    /** Colony-wide defense baseline (ants use type absolute % instead). */
     public static final int MILITARY_BASELINE_DEFENSE = 0;
-    /** Defense is percent damage reduction; always clamp to this range. */
     public static final float DEFENSE_PERCENT_MIN = 0f;
     public static final float DEFENSE_PERCENT_MAX = 100f;
-    /** Colony skeleton regen baseline: percent of max HP recovered per redeploy. */
     public static final int ANT_REGEN_PERCENT_BASE = 10;
-    /** Multiplier applied to redeploy regen when Boost Regen was used in the prior stage. */
     public static final float BOOST_REGEN_NEXT_REDEPLOY_MULT = 2f;
     public static final int MILITARY_BASELINE_ATTACK_SPEED = 1;
-    /** Each venom assimilation adds this fraction to colony attack (0.5 = +50%). */
     public static final float ASSIMILATED_DAMAGE_ADD_FIRE = 0.5f;
     public static final float ASSIMILATED_DAMAGE_ADD_DEADLY = 0.5f;
-    /** Super Venom absolute attack mult: replaces both +50% bonuses with a +200% bonus (3×). */
     public static final float ASSIMILATED_DAMAGE_SYNERGY_FIRE_DEADLY = 3f;
     public static final float ASSIMILATED_ATTACK_SPEED_MULT_FASTBITE = 2f;
     public static final float MILITARY_STRENGTH_RATIO_MAX = 11f;
@@ -163,55 +146,32 @@ public final class GameNumbers {
     public static final float WAR_BATTLE_WIN_CHANCE_AT_PARITY = 0.5f;
     public static final float WAR_BATTLE_LOSS_FRACTION_AT_PARITY = 0.006f;
     public static final float WAR_BATTLE_WINNER_LOSS_FRACTION_MAX = 0.035f;
-    /** Stage capture progress added each war hour (0–1 scale); ~8 hours per hex at 13%/hour. */
     public static final float WAR_STAGE_PROGRESS_PER_HOUR = 0.13f;
     public static final float WAR_STAGE_PROGRESS_PER_DAY = WAR_STAGE_PROGRESS_PER_HOUR * 24f;
     public static final int WAR_REDEPLOY_HOURS = 24;
-    /**
-     * Hex-defense attack/defense multipliers (creature combat + effective power).
-     * Defense after multiply is clamped to {@link #DEFENSE_PERCENT_MAX}.
-     */
     public static final float WAR_HEX_DEFENDING_STAT_MULT = 1.5f;
     public static final float WAR_HEX_DEFENDER_ROLE_STAT_MULT = 3f;
     public static final float WAR_HEX_SIEGE_ATTACKER_STAT_MULT = 3f;
     public static final float WAR_HEX_ATTACKER_STAT_MULT = 1f;
-    /** @deprecated Prefer {@link #WAR_HEX_DEFENDING_STAT_MULT}; kept for call sites using flat reserve power. */
     public static final float WAR_HEX_DEFENSE_POWER_MULTIPLIER = WAR_HEX_DEFENDING_STAT_MULT;
     public static final float WAR_AI_FALLBACK_MAX_POWER_RATIO = 1f;
     public static final float WAR_AI_FALLBACK_RECOVERY_RATIO = 0.75f;
     public static final int WAR_AI_FALLBACK_MIN_ACTIVE = 500;
     public static final int WAR_AI_FALLBACK_MIN_SPARE_COLONIES = 3;
     public static final double AI_WAR_FALLBACK_CHANCE = 0.06;
-    /**
-     * NPC chance per clash hour to withdraw from border into hex defense when local odds look better
-     * (bait / counterattack setup).
-     */
     public static final double AI_WAR_HEX_BAIT_CHANCE = 0.14;
-    /** Hex effective defense must beat assault by at least this ratio to consider baiting. */
     public static final float WAR_AI_HEX_BAIT_MIN_HEX_ODDS = 1.05f;
-    /** Hex odds must improve on border odds by at least this factor (hexOdds >= borderOdds * factor). */
     public static final float WAR_AI_HEX_BAIT_ODDS_IMPROVEMENT = 1.2f;
-    /**
-     * After a successful hex hold, projected counterattack assault/defense odds must meet this
-     * floor or the NPC will not bait (no point inviting an assault they cannot follow up).
-     */
     public static final float WAR_AI_HEX_BAIT_MIN_COUNTER_ODDS = 0.9f;
-    /** Border clash: side loses when this fraction of its starting army (active+reserve) is dead. */
     public static final float WAR_BATTLE_ARMY_DEFEAT_RATIO = 0.9f;
 
-    /** Dynasty combat capacity: base, or with at least one assigned Commander (does not stack). */
     public static final int COMBAT_CAPACITY_BASE = 1000;
-    public static final int COMBAT_CAPACITY_WITH_COMMANDER = 2500;
-    /** Max Commander war-quota per colony (capacity still only bumps once dynasty-wide). */
+    public static final int COMBAT_CAPACITY_WITH_COMMANDER = 2500;  
     public static final int COMMANDER_MAX_PER_COLONY = 1;
     public static final int TRIGGER_COMMANDER_MIN_WARS = 3;
-    /** Living queens required in a colony before one may be a Commander (last queen stays off combat). */
     public static final int TRIGGER_COMMANDER_MIN_QUEENS_IN_COLONY = 2;
-    /** Passive Artillery Leader: additive artillery-line damage while a living Commander is in battle. */
     public static final float COMMANDER_ARTILLERY_DAMAGE_BONUS = 0.5f;
-    /** Passive Infantry Leader: additive infantry-line damage while a living Captain is in battle. */
     public static final float CAPTAIN_INFANTRY_DAMAGE_BONUS = 0.25f;
-    /** Declared wars (as aggressor) before Warmonger −20 applies with all dynasties. */
     public static final int WARMONGER_DECLARED_WARS_THRESHOLD = 5;
 
     // --- AI / trade automation ---
@@ -254,7 +214,6 @@ public final class GameNumbers {
     public static final double TUNNEL_WORK_REQUIRED = 5000000.0;
 
     // --- Research ---
-    /** Lab assistants contribute at 1/N of researcher-queen efficiency. */
     public static final int RESEARCH_ASSISTANT_EFFICIENCY_DIVISOR = 50;
 
     // --- Numeric helpers ---
@@ -327,10 +286,6 @@ public final class GameNumbers {
         return warHexDefenseEffectiveDefenderPower(baseReservePower, 0);
     }
 
-    /**
-     * Effective defending power in hex defense: standard defending ants at
-     * {@link #WAR_HEX_DEFENDING_STAT_MULT}, Defender role at {@link #WAR_HEX_DEFENDER_ROLE_STAT_MULT}.
-     */
     public static int warHexDefenseEffectiveDefenderPower(int standardDefendingPower, int defenderRolePower) {
         int standard = Math.max(0, standardDefendingPower);
         int defenders = Math.max(0, defenderRolePower);
@@ -342,10 +297,6 @@ public final class GameNumbers {
         return (int) Math.min(Integer.MAX_VALUE, Math.max(0, effective));
     }
 
-    /**
-     * Effective attacker power in hex assault: non-siege at {@link #WAR_HEX_ATTACKER_STAT_MULT},
-     * Siege at {@link #WAR_HEX_SIEGE_ATTACKER_STAT_MULT}.
-     */
     public static int warHexAssaultEffectiveAttackerPower(int nonSiegePower, int siegePower) {
         int nonSiege = Math.max(0, nonSiegePower);
         int siege = Math.max(0, siegePower);
@@ -372,7 +323,6 @@ public final class GameNumbers {
         return Math.max(0, Math.round(effectiveLoss * (basePower / (float) effectivePower)));
     }
 
-    /** Hex-defense attack after role/side multiplier (no cap). */
     public static float applyHexDefenseAttack(float baseAttack, float statMult) {
         if (baseAttack <= 0f || statMult <= 0f) {
             return 0f;
@@ -380,7 +330,6 @@ public final class GameNumbers {
         return baseAttack * statMult;
     }
 
-    /** Hex-defense defense % after multiplier, clamped to {@link #DEFENSE_PERCENT_MAX}. */
     public static float applyHexDefenseDefense(float baseDefensePercent, float statMult) {
         if (statMult <= 0f) {
             return clampDefensePercent(0f);
@@ -396,7 +345,6 @@ public final class GameNumbers {
         return Math.max(COLONY_LOYALTY_MIN, Math.min(COLONY_LOYALTY_MAX, score));
     }
 
-    /** Defense is percent damage reduction in {@code [0, 100]}. */
     public static float clampDefensePercent(float defensePercent) {
         if (Float.isNaN(defensePercent) || Float.isInfinite(defensePercent)) {
             return DEFENSE_PERCENT_MIN;
@@ -408,7 +356,6 @@ public final class GameNumbers {
         return Math.round(clampDefensePercent((float) defensePercent));
     }
 
-    /** Applies percent damage reduction; {@code defensePercent} is clamped to 0–100. */
     public static float damageAfterDefense(float rawDamage, float defensePercent) {
         if (rawDamage <= 0f) {
             return 0f;
@@ -417,7 +364,6 @@ public final class GameNumbers {
         return rawDamage * (1f - reduction);
     }
 
-    /** {@code regenPercent} is % of max HP recovered; result is HP restored this tick. */
     public static float regenAmountFromPercent(float maxHealth, float regenPercent) {
         if (maxHealth <= 0f || regenPercent <= 0f) {
             return 0f;

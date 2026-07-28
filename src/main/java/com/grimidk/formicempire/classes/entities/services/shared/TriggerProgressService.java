@@ -247,7 +247,6 @@ public final class TriggerProgressService {
         if (dynasty != null && world != null && world.getWarService() != null) {
             warsParticipated = world.getWarService().countWarsForDynasty(dynasty.getId());
         }
-        // Show when wars are underway; unlock still requires multi-queen (see TriggerManager).
         entries.add(numeric(
                 GameUnlocks.ROLE_COMMANDER,
                 LanguageStrings.TRIGGER_COMMANDER_ROLE_TITLE,
