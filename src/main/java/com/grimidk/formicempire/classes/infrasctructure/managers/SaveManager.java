@@ -1528,15 +1528,17 @@ public class SaveManager {
 
     private Map<String, Double> deserializeJsonToDoubleMap(String json) {
         Map<String, Double> map = new HashMap<>();
-        if (json == null || json.length() <= 2) return map;
-        String content = json.substring(1, json.length() - 1);
-        String[] parts = content.split(",");
-        for (String part : parts) {
-            String[] kv = part.split(":");
-            if (kv.length == 2) {
-                String k = kv[0].trim().replace("\"", "");
-                double v = Double.parseDouble(kv[1].trim());
-                map.put(k, v);
+        if (json == null || json.length() <= 2) {
+            return map;
+        }
+        Matcher m = JSON_PAIR_PATTERN.matcher(json);
+        while (m.find()) {
+            try {
+                String key = unescapeJsonString(m.group(1));
+                double value = Double.parseDouble(m.group(2));
+                map.put(key, value);
+            } catch (Exception e) {
+                System.err.println("Error parsing double map pair: " + m.group(0));
             }
         }
         return map;

@@ -118,11 +118,6 @@ public final class AntSubtypeService {
         }
 
         Map<AntType, Map<AntSubtypeSlot, Map<Integer, Float>>> rates = defaultSubtypeRates();
-        float scale = subtypeAutomationFoodScale(colony);
-        if (scale <= 0f) {
-            colony.setSubtypeHatchRates(rates);
-            return;
-        }
 
         boolean trapjaw = colony.hasUpgrade(GameUnlocks.ASSIMILATED_TRAPJAW);
         boolean honeypot = colony.hasUpgrade(GameUnlocks.ASSIMILATED_HONEYPOT);
@@ -130,25 +125,25 @@ public final class AntSubtypeService {
         boolean bullet = colony.hasUpgrade(GameUnlocks.ASSIMILATED_STINGING);
 
         if (honeypot) {
-            setAutomatedSlotRate(rates, GameConstants.TYPE_WORKER, AntSubtypeSlot.ABDOMEN, 3, 50f * scale);
-            setAutomatedSlotRate(rates, GameConstants.TYPE_PRINCESS, AntSubtypeSlot.ABDOMEN, 3, 10f * scale);
+            setAutomatedSlotRate(rates, GameConstants.TYPE_WORKER, AntSubtypeSlot.ABDOMEN, 3, 50f);
+            setAutomatedSlotRate(rates, GameConstants.TYPE_PRINCESS, AntSubtypeSlot.ABDOMEN, 3, 10f);
         }
         if (trapjaw) {
-            setAutomatedSlotRate(rates, GameConstants.TYPE_SOLDIER, AntSubtypeSlot.HEAD, 2, 100f * scale);
+            setAutomatedSlotRate(rates, GameConstants.TYPE_SOLDIER, AntSubtypeSlot.HEAD, 2, 100f);
             if (colony.hasUpgrade(GameUnlocks.TYPE_MAJOR)) {
-                setAutomatedSlotRate(rates, GameConstants.TYPE_MAJOR, AntSubtypeSlot.HEAD, 2, 100f * scale);
+                setAutomatedSlotRate(rates, GameConstants.TYPE_MAJOR, AntSubtypeSlot.HEAD, 2, 100f);
             }
         }
         if (doorhead) {
-            setAutomatedSlotRate(rates, GameConstants.TYPE_WORKER, AntSubtypeSlot.HEAD, 3, 50f * scale);
+            setAutomatedSlotRate(rates, GameConstants.TYPE_WORKER, AntSubtypeSlot.HEAD, 3, 50f);
             if (!trapjaw && colony.hasUpgrade(GameUnlocks.TYPE_SOLDIER)) {
-                setAutomatedSlotRate(rates, GameConstants.TYPE_SOLDIER, AntSubtypeSlot.HEAD, 3, 50f * scale);
+                setAutomatedSlotRate(rates, GameConstants.TYPE_SOLDIER, AntSubtypeSlot.HEAD, 3, 50f);
             }
         }
         if (bullet) {
-            setAutomatedSlotRate(rates, GameConstants.TYPE_SOLDIER, AntSubtypeSlot.ABDOMEN, 2, 100f * scale);
+            setAutomatedSlotRate(rates, GameConstants.TYPE_SOLDIER, AntSubtypeSlot.ABDOMEN, 2, 100f);
             if (colony.hasUpgrade(GameUnlocks.TYPE_MAJOR)) {
-                setAutomatedSlotRate(rates, GameConstants.TYPE_MAJOR, AntSubtypeSlot.ABDOMEN, 2, 100f * scale);
+                setAutomatedSlotRate(rates, GameConstants.TYPE_MAJOR, AntSubtypeSlot.ABDOMEN, 2, 100f);
             }
         }
 
@@ -278,10 +273,17 @@ public final class AntSubtypeService {
         if (options.size() <= 1) {
             return AntSubtype.DIGIT_NONE;
         }
+        float foodScale = 1f;
+        if (colony != null && colony.isAutomationEnabled()) {
+            foodScale = subtypeAutomationFoodScale(colony);
+            if (foodScale <= 0f) {
+                return AntSubtype.DIGIT_NONE;
+            }
+        }
         double rand = GameRandom.nextDouble() * 100.0;
         double cumulative = 0.0;
         for (AntSubtype subtype : options) {
-            cumulative += colony.getSubtypeHatchRate(type, slot, subtype.getDigit());
+            cumulative += colony.getSubtypeHatchRate(type, slot, subtype.getDigit()) * foodScale;
             if (rand < cumulative) {
                 return subtype.getDigit();
             }
@@ -602,7 +604,7 @@ public final class AntSubtypeService {
             }
             for (Map.Entry<AntSubtypeSlot, Map<Integer, Float>> slotEntry : typeEntry.getValue().entrySet()) {
                 for (Map.Entry<Integer, Float> rateEntry : slotEntry.getValue().entrySet()) {
-                    flat.put(type.getNameKey() + ":" + slotEntry.getKey().name() + ":" + rateEntry.getKey(),
+                    flat.put(type.getNameKey() + "|" + slotEntry.getKey().name() + "|" + rateEntry.getKey(),
                             rateEntry.getValue().doubleValue());
                 }
             }
@@ -617,7 +619,8 @@ public final class AntSubtypeService {
         }
         Map<AntSubtypeSlot, Map<Integer, Float>> legacyRates = new EnumMap<>(AntSubtypeSlot.class);
         for (Map.Entry<String, Double> entry : flat.entrySet()) {
-            String[] parts = entry.getKey().split(":");
+            String key = entry.getKey();
+            String[] parts = key.contains("|") ? key.split("\\|", -1) : key.split(":", -1);
             if (parts.length == 2) {
                 try {
                     AntSubtypeSlot slot = AntSubtypeSlot.valueOf(parts[0]);

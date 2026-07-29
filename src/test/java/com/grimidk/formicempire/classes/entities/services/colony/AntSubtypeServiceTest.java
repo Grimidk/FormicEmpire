@@ -16,6 +16,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import javax.swing.ImageIcon;
 
@@ -121,7 +122,22 @@ class AntSubtypeServiceTest {
 
         colony.setSubtypeHatchRate(GameConstants.TYPE_WORKER, AntSubtypeSlot.HEAD, 2, 25f);
         Map<String, Double> flat = AntSubtypeService.flattenSubtypeRates(colony.getSubtypeHatchRates());
-        assertEquals(25.0, flat.get(GameConstants.TYPE_WORKER.getNameKey() + ":HEAD:2"));
+        assertEquals(25.0, flat.get(GameConstants.TYPE_WORKER.getNameKey() + "|HEAD|2"));
+    }
+
+    @Test
+    void unflattenAcceptsLegacyColonKeysAndPipeKeys() {
+        Map<String, Double> legacy = Map.of(
+                "TYPE_WORKER:HEAD:3", 1.6,
+                "TYPE_WORKER:HEAD:1", 98.4);
+        assertEquals(1.6f, AntSubtypeService.unflattenSubtypeRates(legacy)
+                .get(GameConstants.TYPE_WORKER).get(AntSubtypeSlot.HEAD).get(3), 0.01f);
+
+        Map<String, Double> pipes = Map.of(
+                "TYPE_SOLDIER|HEAD|2", 2.0,
+                "TYPE_SOLDIER|HEAD|1", 98.0);
+        assertEquals(2.0f, AntSubtypeService.unflattenSubtypeRates(pipes)
+                .get(GameConstants.TYPE_SOLDIER).get(AntSubtypeSlot.HEAD).get(2), 0.01f);
     }
 
     @Test
@@ -192,18 +208,45 @@ class AntSubtypeServiceTest {
     }
 
     @Test
-    void foodScarcityStopsAutomatedSubtypeUse() {
+    void foodScarcityKeepsAutomatedTargetsButBlocksRolls() {
         Dynasty dynasty = new Dynasty(9, "D", true, GameConstants.SPECIES_OMNI);
+        dynasty.unlockUpgrade(GameUnlocks.TYPE_SOLDIER);
         dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_TRAPJAW);
         Colony colony = new Colony(10, "C", true);
         colony.setDynasty(dynasty);
+        colony.setAutomationEnabled(true);
         colony.setMushrooms(10);
         colony.setWater(100);
 
         AntSubtypeService.applyAutomatedSubtypeRates(colony);
 
-        assertEquals(100f, colony.getSubtypeHatchRate(GameConstants.TYPE_SOLDIER, AntSubtypeSlot.HEAD,
-                AntSubtype.DIGIT_NONE));
+        assertEquals(100f, colony.getSubtypeHatchRate(GameConstants.TYPE_SOLDIER, AntSubtypeSlot.HEAD, 2));
+        assertEquals(0f, AntSubtypeService.subtypeAutomationFoodScale(colony));
+        for (int i = 0; i < 40; i++) {
+            assertTrue(AntSubtypeService.rollProfile(colony, GameConstants.TYPE_SOLDIER).isStandard());
+        }
+    }
+
+    @Test
+    void foodScarcityDoesNotWipeManualSubtypeRates() {
+        Dynasty dynasty = new Dynasty(19, "D", true, GameConstants.SPECIES_OMNI);
+        dynasty.unlockUpgrade(GameUnlocks.TYPE_WORKER);
+        dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_DOORHEAD);
+        Colony colony = new Colony(20, "C", true);
+        dynasty.addColony(colony);
+        colony.setAutomationEnabled(true);
+        colony.setSubtypeHatchRate(GameConstants.TYPE_WORKER, AntSubtypeSlot.HEAD, 3, 40f);
+        colony.setSubtypeHatchRate(GameConstants.TYPE_WORKER, AntSubtypeSlot.HEAD, AntSubtype.DIGIT_NONE, 60f);
+        colony.setMushrooms(5);
+        colony.setWater(100);
+
+        AntSubtypeService.applyAutomatedSubtypeRates(colony);
+
+        assertEquals(50f, colony.getSubtypeHatchRate(GameConstants.TYPE_WORKER, AntSubtypeSlot.HEAD, 3));
+        colony.setMushrooms(5);
+        colony.setWater(100);
+        assertEquals(0f, AntSubtypeService.subtypeAutomationFoodScale(colony));
+        assertEquals(50f, colony.getSubtypeHatchRate(GameConstants.TYPE_WORKER, AntSubtypeSlot.HEAD, 3));
     }
 
     @Test

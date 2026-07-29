@@ -1,7 +1,10 @@
 package com.grimidk.formicempire.classes.infrasctructure.managers;
 
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtype;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeSlot;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
+import com.grimidk.formicempire.classes.entities.services.colony.AntSubtypeService;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
@@ -74,6 +77,48 @@ public class SaveManagerTest {
         assertTrue(result.hasPendingUpdate);
         assertFalse(result.pendingIsBilateral);
         assertEquals(40.0, result.pendingReturnLoad.get(GameConstants.RESOURCE_FUNGI.getId()));
+    }
+
+    @Test
+    void subtypeHatchRatesFlatRoundTripThroughColonyJson() throws Exception {
+        Savefile.SavedColony sc = new Savefile.SavedColony();
+        sc.id = 1;
+        sc.name = "SubtypeRates";
+        Colony live = new Colony(1, "SubtypeRates", true);
+        live.setSubtypeHatchRate(GameConstants.TYPE_WORKER, AntSubtypeSlot.HEAD, 2, 25f);
+        live.setSubtypeHatchRate(GameConstants.TYPE_WORKER, AntSubtypeSlot.HEAD, AntSubtype.DIGIT_NONE, 75f);
+        live.setSubtypeHatchRate(GameConstants.TYPE_SOLDIER, AntSubtypeSlot.ABDOMEN, 3, 40f);
+        live.setSubtypeHatchRate(GameConstants.TYPE_SOLDIER, AntSubtypeSlot.ABDOMEN, AntSubtype.DIGIT_NONE, 60f);
+        sc.subtypeHatchRatesFlat = AntSubtypeService.flattenSubtypeRates(live.getSubtypeHatchRates());
+
+        SaveManager saveManager = new SaveManager();
+        StringWriter writer = new StringWriter();
+        try (java.io.BufferedWriter w = new java.io.BufferedWriter(writer)) {
+            Method writeColony = SaveManager.class.getDeclaredMethod(
+                    "writeSavedColony", java.io.BufferedWriter.class, Savefile.SavedColony.class, boolean.class);
+            writeColony.setAccessible(true);
+            writeColony.invoke(saveManager, w, sc, true);
+        }
+
+        String json = writer.toString();
+        String workerHeadKey = GameConstants.TYPE_WORKER.getNameKey() + "|HEAD|2";
+        assertTrue(json.contains("\"" + workerHeadKey + "\":"),
+                "serialized colony should keep pipe keys in subtypeHatchRatesFlat");
+
+        Method parseColony = SaveManager.class.getDeclaredMethod("parseColonyObject", String.class);
+        parseColony.setAccessible(true);
+        Savefile.SavedColony loaded = (Savefile.SavedColony) parseColony.invoke(saveManager, json);
+        assertEquals(25.0, loaded.subtypeHatchRatesFlat.get(workerHeadKey));
+        assertEquals(40.0, loaded.subtypeHatchRatesFlat.get(
+                GameConstants.TYPE_SOLDIER.getNameKey() + "|ABDOMEN|3"));
+
+        Colony colony = new Colony(loaded);
+        assertEquals(25f, colony.getSubtypeHatchRate(GameConstants.TYPE_WORKER, AntSubtypeSlot.HEAD, 2));
+        assertEquals(75f, colony.getSubtypeHatchRate(
+                GameConstants.TYPE_WORKER, AntSubtypeSlot.HEAD, AntSubtype.DIGIT_NONE));
+        assertEquals(40f, colony.getSubtypeHatchRate(GameConstants.TYPE_SOLDIER, AntSubtypeSlot.ABDOMEN, 3));
+        assertEquals(60f, colony.getSubtypeHatchRate(
+                GameConstants.TYPE_SOLDIER, AntSubtypeSlot.ABDOMEN, AntSubtype.DIGIT_NONE));
     }
 
     @Test
@@ -240,5 +285,50 @@ public class SaveManagerTest {
         assertEquals(12, loaded.activeRebellionDynastyId);
         assertEquals(12, loaded.pendingRebellionResponseFromId);
         assertEquals(0, loaded.originDynastyId);
+    }
+
+    @Test
+    void automatedSubtypeRatesAppearInColonyJson() throws Exception {
+        Dynasty dynasty = new Dynasty(1, "Test", true, GameConstants.SPECIES_OMNI);
+        dynasty.unlockUpgrade(GameUnlocks.TYPE_WORKER);
+        dynasty.unlockUpgrade(GameUnlocks.TYPE_SOLDIER);
+        dynasty.unlockUpgrade(GameUnlocks.TYPE_MAJOR);
+        dynasty.unlockUpgrade(GameUnlocks.TYPE_PRINCESS);
+        dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_HONEYPOT);
+        dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_TRAPJAW);
+        dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_DOORHEAD);
+        dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_STINGING);
+        Colony colony = new Colony(1, "C", true);
+        dynasty.addColony(colony);
+        colony.setAutomationEnabled(true);
+        colony.setMushrooms(15000);
+        colony.setWater(2500);
+        colony.getPopulationService().runHatching(colony);
+
+        assertTrue(colony.getSubtypeHatchRate(GameConstants.TYPE_WORKER, AntSubtypeSlot.ABDOMEN, 3) > 0f,
+                "automation should set honeypot worker rate before save");
+
+        Savefile.SavedColony sc = new Savefile.SavedColony();
+        sc.id = 1;
+        sc.name = "C";
+        sc.subtypeHatchRatesFlat = AntSubtypeService.flattenSubtypeRates(colony.getSubtypeHatchRates());
+
+        SaveManager saveManager = new SaveManager();
+        StringWriter writer = new StringWriter();
+        try (java.io.BufferedWriter w = new java.io.BufferedWriter(writer)) {
+            Method writeColony = SaveManager.class.getDeclaredMethod(
+                    "writeSavedColony", java.io.BufferedWriter.class, Savefile.SavedColony.class, boolean.class);
+            writeColony.setAccessible(true);
+            writeColony.invoke(saveManager, w, sc, true);
+        }
+        String json = writer.toString();
+        String honeypotKey = GameConstants.TYPE_WORKER.getNameKey() + "|ABDOMEN|3";
+        assertTrue(json.contains("\"" + honeypotKey + "\":"), json);
+
+        Method parseColony = SaveManager.class.getDeclaredMethod("parseColonyObject", String.class);
+        parseColony.setAccessible(true);
+        Savefile.SavedColony loaded = (Savefile.SavedColony) parseColony.invoke(saveManager, json);
+        Colony restored = new Colony(loaded);
+        assertEquals(50f, restored.getSubtypeHatchRate(GameConstants.TYPE_WORKER, AntSubtypeSlot.ABDOMEN, 3));
     }
 }
