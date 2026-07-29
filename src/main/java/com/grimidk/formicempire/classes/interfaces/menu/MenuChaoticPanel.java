@@ -1,12 +1,10 @@
 package com.grimidk.formicempire.classes.interfaces.menu;
 
-import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.entities.services.colony.ConvoyScene;
 import com.grimidk.formicempire.classes.entities.services.world.WarBattleScene;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.interfaces.game.rendering.RouteViewVisuals;
-import com.grimidk.formicempire.classes.interfaces.game.rendering.RouteViewVisuals.ConvoyResourceProp;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiResourceLoader;
 
@@ -23,13 +21,13 @@ import java.util.Random;
 public class MenuChaoticPanel extends JPanel {
 
     private static final int SPRITE_SCALE = 2;
-    private static final float WOBBLE_SPEED = 5.5f;
-    private static final float WOBBLE_AMPLITUDE_PX = 2f;
     private static final int LINE_JITTER_PX = 10;
     private static final float AIR_SUPPORT_FLY_CYCLE_SEC = 14.0f;
     private static final float AIR_SUPPORT_FLY_PORTION = 0.36f;
     private static final float CONVOY_SCROLL_SPEED_PX = 120f;
     private static final int MENU_DIM_ALPHA = 96;
+    private static final Color MENU_DIM = new Color(0, 0, 0, MENU_DIM_ALPHA);
+    private static final float FRAME_ANIM_HZ = 6f;
 
     private final List<MenuChaoticWorld> worlds;
     private final List<Integer> playOrder = new ArrayList<>();
@@ -40,6 +38,8 @@ public class MenuChaoticPanel extends JPanel {
     private float animationSeconds;
     private Timer animationTimer;
     private boolean active;
+    private int frameIntervalMs = MenuChaoticCatalog.ANIMATION_FRAME_MS;
+    private long lastTickNanos;
 
     public MenuChaoticPanel() {
         setOpaque(true);
@@ -66,6 +66,13 @@ public class MenuChaoticPanel extends JPanel {
         }
     }
 
+    public void applyVisualFrameInterval(int intervalMs) {
+        frameIntervalMs = Math.max(1, intervalMs);
+        if (animationTimer != null) {
+            animationTimer.setDelay(frameIntervalMs);
+        }
+    }
+
     private void reshufflePlayOrder(Random random) {
         playOrder.clear();
         for (int i = 0; i < worlds.size(); i++) {
@@ -79,7 +86,8 @@ public class MenuChaoticPanel extends JPanel {
         if (animationTimer != null) {
             return;
         }
-        animationTimer = new Timer(MenuChaoticCatalog.ANIMATION_FRAME_MS, e -> tick());
+        lastTickNanos = System.nanoTime();
+        animationTimer = new Timer(frameIntervalMs, e -> tick());
         animationTimer.setCoalesce(true);
         animationTimer.start();
     }
@@ -92,15 +100,20 @@ public class MenuChaoticPanel extends JPanel {
     }
 
     private void tick() {
-        if (!active || worlds.isEmpty() || playOrder.isEmpty()) {
+        if (!active || !isShowing() || worlds.isEmpty() || playOrder.isEmpty()) {
             return;
         }
-        float delta = MenuChaoticCatalog.ANIMATION_FRAME_MS / 1000f;
+        long now = System.nanoTime();
+        float delta = (now - lastTickNanos) / 1_000_000_000f;
+        lastTickNanos = now;
+        if (delta <= 0f || delta > 0.25f) {
+            delta = frameIntervalMs / 1000f;
+        }
         animationSeconds += delta;
         if (animationSeconds > 10_000f) {
             animationSeconds = 0f;
         }
-        scenarioElapsedMs += MenuChaoticCatalog.ANIMATION_FRAME_MS;
+        scenarioElapsedMs += Math.max(1, Math.round(delta * 1000f));
         if (scenarioElapsedMs >= MenuChaoticCatalog.SCENARIO_DURATION_MS) {
             scenarioElapsedMs = 0;
             playOrderIndex++;
@@ -137,13 +150,13 @@ public class MenuChaoticPanel extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        if (worlds.isEmpty() || playOrder.isEmpty()) {
+        if (!active || worlds.isEmpty() || playOrder.isEmpty()) {
             return;
         }
         MenuChaoticWorld world = currentWorld();
         Graphics2D g2d = (Graphics2D) g.create();
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+        g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED);
 
         int fieldW = getWidth();
         int fieldH = getHeight();
@@ -159,9 +172,13 @@ public class MenuChaoticPanel extends JPanel {
             case CONVOY -> paintConvoy(g2d, world, fieldW, fieldH);
         }
 
-        g2d.setColor(new Color(0, 0, 0, MENU_DIM_ALPHA));
+        g2d.setColor(MENU_DIM);
         g2d.fillRect(0, 0, fieldW, fieldH);
         g2d.dispose();
+    }
+
+    private float quantizedAnimSeconds() {
+        return (float) Math.floor(animationSeconds * FRAME_ANIM_HZ) / FRAME_ANIM_HZ;
     }
 
     private void paintOverworld(Graphics2D g2d, MenuChaoticWorld world, int fieldW, int fieldH) {
@@ -201,21 +218,23 @@ public class MenuChaoticPanel extends JPanel {
 
     private void paintConvoy(Graphics2D g2d, MenuChaoticWorld world, int fieldW, int fieldH) {
         boolean travelingRight = world.isConvoyTravelingRight();
+        float scrollPixels = animationSeconds * CONVOY_SCROLL_SPEED_PX;
         int scrollOffset = computeConvoyScrollOffset(fieldW, world, travelingRight);
         drawConvoyField(g2d, 0, 0, fieldW, fieldH, scrollOffset, world);
-        drawConvoyResources(g2d, world.getConvoyResources(), 0, 0, fieldW, fieldH, scrollOffset);
+        RouteViewVisuals.paintConvoyResources(g2d, world.getConvoyResources(), 0, 0, fieldW, fieldH, scrollPixels,
+                travelingRight, this);
         Rectangle field = new Rectangle(0, 0, fieldW, fieldH);
         drawConvoyFormation(g2d, world.getAnts(), field, travelingRight);
     }
 
     private void drawWanderingAnt(Graphics2D g2d, MenuChaoticWorld.ShowcaseAnt ant, int fieldW, int fieldH) {
-        int jawFrame = RouteViewVisuals.resolveJawFrame(ant.type, false, ant.wobblePhase, animationSeconds,
-                ant.motionRate);
+        float anim = quantizedAnimSeconds();
+        int jawFrame = RouteViewVisuals.resolveJawFrame(ant.type, false, ant.wobblePhase, anim, ant.motionRate);
         int wingFrame = RouteViewVisuals.resolveWingFrame(ant.type, RouteViewVisuals.isWinged(ant.type),
-                ant.wobblePhase, animationSeconds, ant.motionRate);
+                ant.wobblePhase, anim, ant.motionRate);
         float angle = RouteViewVisuals.movementFacingDegrees(ant.vx, ant.vy);
-        drawAntSprite(g2d, ant.type, ant.species, ant.profile, jawFrame, wingFrame,
-                Math.round(ant.xNorm * fieldW), Math.round(ant.yNorm * fieldH), angle);
+        drawCachedAnt(g2d, ant, jawFrame, wingFrame, Math.round(ant.xNorm * fieldW), Math.round(ant.yNorm * fieldH),
+                angle);
     }
 
     private void drawCritter(Graphics2D g2d, MenuChaoticWorld.ShowcaseCritter critter, int fieldW, int fieldH) {
@@ -229,10 +248,8 @@ public class MenuChaoticPanel extends JPanel {
         if (w <= 0 || h <= 0) {
             return;
         }
-        float wobble = (float) Math.sin(critter.wobblePhase + animationSeconds * WOBBLE_SPEED * critter.motionRate)
-                * WOBBLE_AMPLITUDE_PX;
         int drawX = Math.round(critter.xNorm * fieldW);
-        int drawY = Math.round(critter.yNorm * fieldH + wobble);
+        int drawY = Math.round(critter.yNorm * fieldH);
         float angle = RouteViewVisuals.movementFacingDegrees(critter.vx, critter.vy);
         AffineTransform old = g2d.getTransform();
         g2d.translate(drawX, drawY);
@@ -245,26 +262,22 @@ public class MenuChaoticPanel extends JPanel {
             int contactLineX, boolean attackerSide) {
         int edgePad = 4;
         int fieldRight = field.x + field.width;
+        float anim = quantizedAnimSeconds();
         for (MenuChaoticWorld.ShowcaseAnt ant : ants) {
             if (ant.attackerSide != attackerSide) {
                 continue;
             }
             boolean winged = RouteViewVisuals.isWinged(ant.type);
             boolean airSupport = !ant.reserve && ant.battleLine == GameConstants.BATTLE_LINE_AIR_SUPPORT;
-            int jawFrame = RouteViewVisuals.resolveJawFrame(ant.type, ant.reserve, ant.wobblePhase, animationSeconds,
+            int jawFrame = RouteViewVisuals.resolveJawFrame(ant.type, ant.reserve, ant.wobblePhase, anim, ant.motionRate);
+            int wingFrame = RouteViewVisuals.resolveWingFrame(ant.type, airSupport && winged, ant.wobblePhase, anim,
                     ant.motionRate);
-            int wingFrame = RouteViewVisuals.resolveWingFrame(ant.type, airSupport && winged, ant.wobblePhase,
-                    animationSeconds, ant.motionRate);
+            ensureCachedSprite(ant, jawFrame, wingFrame);
+            int w = ant.cachedDrawW > 0 ? ant.cachedDrawW : 12;
+            int h = ant.cachedDrawH > 0 ? ant.cachedDrawH : 12;
 
-            ImageIcon icon = GameConstants.getAntSprite(ant.type, ant.species, ant.profile, 1, jawFrame, wingFrame);
-            int w = icon != null ? Math.max(8, icon.getIconWidth() / SPRITE_SCALE) : 12;
-            int h = icon != null ? Math.max(8, icon.getIconHeight() / SPRITE_SCALE) : 12;
-
-            float wobble = (float) Math.sin(ant.wobblePhase + animationSeconds * WOBBLE_SPEED * ant.motionRate)
-                    * WOBBLE_AMPLITUDE_PX;
             int drawY = field.y + edgePad
-                    + Math.round(ant.laneY * (field.height - h - edgePad * 2f))
-                    + Math.round(wobble);
+                    + Math.round(ant.laneY * (field.height - h - edgePad * 2f));
 
             int drawX;
             if (airSupport) {
@@ -298,16 +311,13 @@ public class MenuChaoticPanel extends JPanel {
             }
 
             float faceAngle = RouteViewVisuals.movementFacingDegrees(attackerSide ? 1f : -1f, 0f);
-
-            Image image = icon != null ? icon.getImage() : null;
-            AffineTransform old = g2d.getTransform();
-            double cx = drawX + w / 2.0;
-            double cy = drawY + h / 2.0;
-            g2d.translate(cx, cy);
-            g2d.rotate(Math.toRadians(faceAngle));
-            if (image != null) {
-                g2d.drawImage(image, -w / 2, -h / 2, w, h, this);
+            if (ant.cachedSprite == null) {
+                continue;
             }
+            AffineTransform old = g2d.getTransform();
+            g2d.translate(drawX + w / 2.0, drawY + h / 2.0);
+            g2d.rotate(Math.toRadians(faceAngle));
+            g2d.drawImage(ant.cachedSprite, -w / 2, -h / 2, w, h, this);
             g2d.setTransform(old);
         }
     }
@@ -322,59 +332,14 @@ public class MenuChaoticPanel extends JPanel {
         float radiusX = Math.min(field.width * 0.2f, 56f + ants.size() * 0.5f);
         float radiusY = Math.min(field.height * 0.34f, 44f + ants.size() * 0.38f);
         float faceAngle = RouteViewVisuals.convoyFacingDegrees(travelingRight);
+        float anim = quantizedAnimSeconds();
         for (MenuChaoticWorld.ShowcaseAnt ant : ants) {
-            int jawFrame = RouteViewVisuals.resolveJawFrame(ant.type, false, ant.wobblePhase, animationSeconds,
-                    ant.motionRate);
+            int jawFrame = RouteViewVisuals.resolveJawFrame(ant.type, false, ant.wobblePhase, anim, ant.motionRate);
             int wingFrame = RouteViewVisuals.resolveWingFrame(ant.type, RouteViewVisuals.isWinged(ant.type),
-                    ant.wobblePhase, animationSeconds, ant.motionRate);
-            ImageIcon icon = GameConstants.getAntSprite(ant.type, ant.species, ant.profile, 1, jawFrame, wingFrame);
-            if (icon == null) {
-                continue;
-            }
-            Image image = icon.getImage();
-            int w = Math.max(8, icon.getIconWidth() / SPRITE_SCALE);
-            int h = Math.max(8, icon.getIconHeight() / SPRITE_SCALE);
+                    ant.wobblePhase, anim, ant.motionRate);
             int drawX = centerX + Math.round(ant.offsetX * radiusX);
             int drawY = centerY + Math.round(ant.offsetY * radiusY);
-            AffineTransform old = g2d.getTransform();
-            double cx = drawX + w / 2.0;
-            double cy = drawY + h / 2.0;
-            g2d.translate(cx, cy);
-            g2d.rotate(Math.toRadians(faceAngle));
-            g2d.drawImage(image, -w / 2, -h / 2, w, h, this);
-            g2d.setTransform(old);
-        }
-    }
-
-    private void drawConvoyResources(Graphics2D g2d, List<ConvoyResourceProp> props, int fieldX, int fieldY, int fieldW,
-            int fieldH, int scrollOffset) {
-        if (props == null || props.isEmpty()) {
-            return;
-        }
-        int spacing = Math.max(220, fieldW / 2);
-        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        for (ConvoyResourceProp prop : props) {
-            if (prop.resourceType() == null) {
-                continue;
-            }
-            ImageIcon icon = prop.resourceType().getIconForSourceQuantity(prop.quantity());
-            if (icon == null) {
-                continue;
-            }
-            int displayPx = prop.resourceType().getDisplaySizeForSourceQuantity(prop.quantity());
-            int phasePx = Math.round(prop.xPhase() * spacing);
-            int anchorX = fieldX + Math.floorMod(phasePx + scrollOffset, Math.max(1, spacing));
-            for (int x = anchorX - spacing * 2; x < fieldX + fieldW + spacing; x += spacing) {
-                if (x + displayPx < fieldX || x > fieldX + fieldW) {
-                    continue;
-                }
-                int drawY = fieldY + Math.round(prop.yNorm() * fieldH) - displayPx / 2;
-                AffineTransform old = g2d.getTransform();
-                g2d.translate(x, drawY + displayPx / 2.0);
-                g2d.rotate(Math.toRadians(prop.rotationDegrees()));
-                g2d.drawImage(icon.getImage(), -displayPx / 2, -displayPx / 2, displayPx, displayPx, this);
-                g2d.setTransform(old);
-            }
+            drawCachedAnt(g2d, ant, jawFrame, wingFrame, drawX, drawY, faceAngle);
         }
     }
 
@@ -481,22 +446,37 @@ public class MenuChaoticPanel extends JPanel {
         }
     }
 
-    private void drawAntSprite(Graphics2D g2d, AntType type,
-            com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies species,
-            com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeProfile profile,
-            int jawFrame, int wingFrame, int drawX, int drawY, float angleDegrees) {
-        ImageIcon icon = GameConstants.getAntSprite(type, species, profile, 1, jawFrame, wingFrame);
-        if (icon == null) {
+    private void drawCachedAnt(Graphics2D g2d, MenuChaoticWorld.ShowcaseAnt ant, int jawFrame, int wingFrame,
+            int drawX, int drawY, float angleDegrees) {
+        ensureCachedSprite(ant, jawFrame, wingFrame);
+        if (ant.cachedSprite == null) {
             return;
         }
-        Image image = icon.getImage();
-        int w = Math.max(6, icon.getIconWidth() / SPRITE_SCALE);
-        int h = Math.max(6, icon.getIconHeight() / SPRITE_SCALE);
+        int w = ant.cachedDrawW;
+        int h = ant.cachedDrawH;
         AffineTransform old = g2d.getTransform();
         g2d.translate(drawX, drawY);
         g2d.rotate(Math.toRadians(angleDegrees));
-        g2d.drawImage(image, -w / 2, -h / 2, w, h, this);
+        g2d.drawImage(ant.cachedSprite, -w / 2, -h / 2, w, h, this);
         g2d.setTransform(old);
+    }
+
+    private void ensureCachedSprite(MenuChaoticWorld.ShowcaseAnt ant, int jawFrame, int wingFrame) {
+        if (ant.cachedSprite != null && ant.cachedJawFrame == jawFrame && ant.cachedWingFrame == wingFrame) {
+            return;
+        }
+        ImageIcon icon = GameConstants.getAntSprite(ant.type, ant.species, ant.profile, 1, jawFrame, wingFrame);
+        if (icon == null) {
+            ant.cachedSprite = null;
+            ant.cachedJawFrame = jawFrame;
+            ant.cachedWingFrame = wingFrame;
+            return;
+        }
+        ant.cachedSprite = icon.getImage();
+        ant.cachedDrawW = Math.max(6, icon.getIconWidth() / SPRITE_SCALE);
+        ant.cachedDrawH = Math.max(6, icon.getIconHeight() / SPRITE_SCALE);
+        ant.cachedJawFrame = jawFrame;
+        ant.cachedWingFrame = wingFrame;
     }
 
     private Image tileForBiome(Biome biome) {

@@ -48,6 +48,7 @@ public class ConvoyViewPanel extends JPanel {
     private List<ConvoyResourceProp> convoyResources = List.of();
     private Timer animationTimer;
     private float animationSeconds;
+    private long lastTickNanos;
 
     public ConvoyViewPanel(Trade trade, Engine engine) {
         super(new BorderLayout());
@@ -87,8 +88,17 @@ public class ConvoyViewPanel extends JPanel {
         if (animationTimer != null) {
             return;
         }
-        animationTimer = new Timer(ANIMATION_FRAME_MS, e -> {
-            animationSeconds += ANIMATION_FRAME_MS / 1000f;
+        lastTickNanos = System.nanoTime();
+        int intervalMs = engine != null ? engine.getVisualFrameIntervalMs() : ANIMATION_FRAME_MS;
+        animationTimer = new Timer(intervalMs, e -> {
+            long now = System.nanoTime();
+            float delta = (now - lastTickNanos) / 1_000_000_000f;
+            lastTickNanos = now;
+            if (delta <= 0f || delta > 0.25f) {
+                int fallbackMs = animationTimer != null ? animationTimer.getDelay() : intervalMs;
+                delta = Math.max(1, fallbackMs) / 1000f;
+            }
+            animationSeconds += delta;
             if (animationSeconds > 10_000f) {
                 animationSeconds = 0f;
             }
@@ -96,6 +106,12 @@ public class ConvoyViewPanel extends JPanel {
         });
         animationTimer.setCoalesce(true);
         animationTimer.start();
+    }
+
+    public void applyVisualFrameRate() {
+        if (animationTimer != null && engine != null) {
+            animationTimer.setDelay(engine.getVisualFrameIntervalMs());
+        }
     }
 
     public void stopAnimation() {
@@ -137,9 +153,11 @@ public class ConvoyViewPanel extends JPanel {
         }
 
         boolean travelingRight = !scene.isReturning();
+        float scrollPixels = animationSeconds * SCROLL_SPEED_PX;
         int scrollOffset = computeScrollOffset(fieldW, travelingRight);
         drawScrollingField(g2d, fieldX, fieldY, fieldW, fieldH, scrollOffset, scene);
-        drawConvoyResources(g2d, convoyResources, fieldX, fieldY, fieldW, fieldH, scrollOffset);
+        RouteViewVisuals.paintConvoyResources(g2d, convoyResources, fieldX, fieldY, fieldW, fieldH, scrollPixels,
+                travelingRight, this);
 
         Rectangle field = new Rectangle(fieldX, fieldY, fieldW, fieldH);
         drawConvoyFormation(g2d, convoyAnts, field, travelingRight);
@@ -258,38 +276,6 @@ public class ConvoyViewPanel extends JPanel {
             g2d.rotate(Math.toRadians(faceAngle));
             g2d.drawImage(image, -w / 2, -h / 2, w, h, this);
             g2d.setTransform(old);
-        }
-    }
-
-    private void drawConvoyResources(Graphics2D g2d, List<ConvoyResourceProp> props, int fieldX, int fieldY, int fieldW,
-            int fieldH, int scrollOffset) {
-        if (props == null || props.isEmpty()) {
-            return;
-        }
-        int spacing = Math.max(220, fieldW / 2);
-        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        for (ConvoyResourceProp prop : props) {
-            if (prop.resourceType() == null) {
-                continue;
-            }
-            ImageIcon icon = prop.resourceType().getIconForSourceQuantity(prop.quantity());
-            if (icon == null) {
-                continue;
-            }
-            int displayPx = prop.resourceType().getDisplaySizeForSourceQuantity(prop.quantity());
-            int phasePx = Math.round(prop.xPhase() * spacing);
-            int anchorX = fieldX + Math.floorMod(phasePx + scrollOffset, Math.max(1, spacing));
-            for (int x = anchorX - spacing * 2; x < fieldX + fieldW + spacing; x += spacing) {
-                if (x + displayPx < fieldX || x > fieldX + fieldW) {
-                    continue;
-                }
-                int drawY = fieldY + Math.round(prop.yNorm() * fieldH) - displayPx / 2;
-                AffineTransform old = g2d.getTransform();
-                g2d.translate(x, drawY + displayPx / 2.0);
-                g2d.rotate(Math.toRadians(prop.rotationDegrees()));
-                g2d.drawImage(icon.getImage(), -displayPx / 2, -displayPx / 2, displayPx, displayPx, this);
-                g2d.setTransform(old);
-            }
         }
     }
 

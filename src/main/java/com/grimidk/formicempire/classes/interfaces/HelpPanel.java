@@ -1463,6 +1463,16 @@ public class HelpPanel extends JPanel {
         return null;
     }
 
+    private static int tierIdOf(Constant c) {
+        if (c instanceof Upgrade) {
+            return ((Upgrade) c).getTier().getId();
+        }
+        if (c instanceof Building) {
+            return ((Building) c).getTier().getId();
+        }
+        return Integer.MAX_VALUE;
+    }
+
     private JComponent createDictionaryPanel(List<Constant> items, boolean showIcons) {
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setBackground(AssetStyles.BACKGROUND_COLOR);
@@ -1479,9 +1489,11 @@ public class HelpPanel extends JPanel {
         
         List<Constant> sortedItems = new ArrayList<>(items);
         Collections.sort(sortedItems, (a, b) -> {
-            String nameA = displayName(a);
-            String nameB = displayName(b);
-            return nameA.compareTo(nameB);
+            int byTier = Integer.compare(tierIdOf(a), tierIdOf(b));
+            if (byTier != 0) {
+                return byTier;
+            }
+            return displayName(a).compareTo(displayName(b));
         });
         
         for (Constant item : sortedItems) {

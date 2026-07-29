@@ -57,6 +57,10 @@ public class WarBattleDialog extends ZeroDialog {
         battlePanel.refreshScene();
     }
 
+    public void applyVisualFrameRate() {
+        battlePanel.applyVisualFrameRate();
+    }
+
     @Override
     public void dispose() {
         battlePanel.stopAnimation();

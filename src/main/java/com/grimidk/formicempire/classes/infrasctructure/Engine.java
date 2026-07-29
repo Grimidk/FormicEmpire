@@ -56,6 +56,7 @@ public class Engine extends Thread {
     private boolean showAuditMenu = false;
     private boolean overworldAutoRecenter = true;
     private boolean darkMode = false;
+    private int frameRateCap = 0;
     private int defaultRoleWorker = 1; // ROLE_FORAGER
     private int defaultRoleSoldier = 16; // ROLE_HUNTER
     private int defaultRoleMajor = 29; // ROLE_CRANE
@@ -492,6 +493,35 @@ public class Engine extends Thread {
 
     public void setDarkMode(boolean darkMode) {
         this.darkMode = darkMode;
+    }
+
+    public int getFrameRateCap() {
+        return frameRateCap;
+    }
+
+    public void setFrameRateCap(int frameRateCap) {
+        this.frameRateCap = sanitizeFrameRateCap(frameRateCap);
+    }
+
+    public static int sanitizeFrameRateCap(int hz) {
+        if (hz <= 0) {
+            return 0;
+        }
+        if (hz <= 30) {
+            return 30;
+        }
+        if (hz <= 60) {
+            return 60;
+        }
+        return 120;
+    }
+
+    public int getVisualFrameIntervalMs() {
+        int hz = frameRateCap;
+        if (hz <= 0) {
+            return 1;
+        }
+        return Math.max(1, 1000 / hz);
     }
 
     public int getDefaultRoleWorker() {

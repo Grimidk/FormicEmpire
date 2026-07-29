@@ -12,6 +12,7 @@ import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants
 import com.grimidk.formicempire.classes.interfaces.game.rendering.RouteViewVisuals;
 import com.grimidk.formicempire.classes.interfaces.game.rendering.RouteViewVisuals.ConvoyResourceProp;
 
+import java.awt.Image;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -40,6 +41,11 @@ public final class MenuChaoticWorld {
         public float offsetX;
         public float offsetY;
         public float wanderTimer;
+        public Image cachedSprite;
+        public int cachedJawFrame = -1;
+        public int cachedWingFrame = -1;
+        public int cachedDrawW;
+        public int cachedDrawH;
 
         private ShowcaseAnt(MenuChaoticAntEntry entry, Random random) {
             type = entry.type();
@@ -96,7 +102,8 @@ public final class MenuChaoticWorld {
         List<ShowcaseAnt> ants = new ArrayList<>(definition.antCount());
         List<MenuChaoticAntEntry> template = definition.antTemplate();
         if (!template.isEmpty()) {
-            for (int i = 0; i < definition.antCount(); i++) {
+            int antCount = Math.min(definition.antCount(), MenuChaoticCatalog.MAX_ANTS);
+            for (int i = 0; i < antCount; i++) {
                 MenuChaoticAntEntry entry = template.get(i % template.size());
                 ants.add(new ShowcaseAnt(entry, random));
             }
@@ -257,7 +264,7 @@ public final class MenuChaoticWorld {
 
     private void updateColony(float deltaSeconds) {
         float speedScale = MenuChaoticCatalog.COLONY_SPEED_SCALE;
-        Random random = new Random(definition.layoutSeed());
+        Random random = null;
         for (int i = 0; i < ants.size(); i++) {
             ShowcaseAnt ant = ants.get(i);
             tickWander(ant, deltaSeconds);
@@ -266,6 +273,9 @@ public final class MenuChaoticWorld {
             if (ant.xNorm < 0f || ant.xNorm > 1f || ant.yNorm < 0f || ant.yNorm > 1f) {
                 ant.xNorm = COLONY_ENTRANCE_X;
                 ant.yNorm = COLONY_ENTRANCE_Y;
+                if (random == null) {
+                    random = new Random();
+                }
                 random.setSeed(definition.layoutSeed() ^ (i * 0x9E37_79B9L) ^ (long) (ant.wobblePhase * 1000));
                 assignWanderVelocity(ant, random);
                 ant.wanderTimer = 0.2f + ant.laneJitter * 0.6f;

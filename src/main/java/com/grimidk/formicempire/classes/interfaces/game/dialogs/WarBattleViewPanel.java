@@ -53,6 +53,7 @@ public class WarBattleViewPanel extends JPanel {
     private float targetContactLineRatio = 0.5f;
     private Timer animationTimer;
     private float animationSeconds;
+    private long lastTickNanos;
 
     public WarBattleViewPanel(War war, Engine engine) {
         super(new BorderLayout());
@@ -92,14 +93,24 @@ public class WarBattleViewPanel extends JPanel {
         if (animationTimer != null) {
             return;
         }
-        animationTimer = new Timer(ANIMATION_FRAME_MS, e -> {
-            animationSeconds += ANIMATION_FRAME_MS / 1000f;
+        lastTickNanos = System.nanoTime();
+        int intervalMs = engine != null ? engine.getVisualFrameIntervalMs() : ANIMATION_FRAME_MS;
+        animationTimer = new Timer(intervalMs, e -> {
+            long now = System.nanoTime();
+            float deltaSec = (now - lastTickNanos) / 1_000_000_000f;
+            lastTickNanos = now;
+            if (deltaSec <= 0f || deltaSec > 0.25f) {
+                int fallbackMs = animationTimer != null ? animationTimer.getDelay() : intervalMs;
+                deltaSec = Math.max(1, fallbackMs) / 1000f;
+            }
+            animationSeconds += deltaSec;
             if (animationSeconds > 10_000f) {
                 animationSeconds = 0f;
             }
             float delta = targetContactLineRatio - contactLineRatio;
             if (Math.abs(delta) > 0.0005f) {
-                contactLineRatio += delta * 0.06f;
+                float step = 1f - (float) Math.exp(-1.237f * deltaSec);
+                contactLineRatio += delta * step;
             } else {
                 contactLineRatio = targetContactLineRatio;
             }
@@ -107,6 +118,12 @@ public class WarBattleViewPanel extends JPanel {
         });
         animationTimer.setCoalesce(true);
         animationTimer.start();
+    }
+
+    public void applyVisualFrameRate() {
+        if (animationTimer != null && engine != null) {
+            animationTimer.setDelay(engine.getVisualFrameIntervalMs());
+        }
     }
 
     public void stopAnimation() {

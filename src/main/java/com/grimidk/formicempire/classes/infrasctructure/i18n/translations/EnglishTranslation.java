@@ -844,6 +844,8 @@ public class EnglishTranslation implements Translation {
         en.put("SETTINGS_SHOW_AUDIT_MENU", "Show mechanics audit on main menu");
         en.put("SETTINGS_OVERWORLD_AUTO_RECENTER", "Auto-recenter overworld on colony entrance");
         en.put("SETTINGS_DARK_MODE", "Dark mode");
+        en.put("SETTINGS_FRAME_RATE", "Frame rate cap:");
+        en.put("SETTINGS_FRAME_RATE_UNCAPPED", "Uncapped");
 
         en.put("SETTINGS_MASTER_VOL", "Master Volume:");
         en.put("SETTINGS_MUSIC_VOL", "Music Volume:");
@@ -864,6 +866,7 @@ public class EnglishTranslation implements Translation {
         en.put("SETTINGS_DAYLIGHT_COLOR_OVERLAY_TT", "Tints the colony view based on time of day (dawn, noon, dusk, night).");
         en.put("SETTINGS_WEATHER_COLOR_OVERLAY_TT", "Tints the colony view based on current weather.");
         en.put("SETTINGS_DARK_MODE_TT", "Uses a dark palette for menus and panels. Does not change the game canvas.");
+        en.put("SETTINGS_FRAME_RATE_TT", "Limits how often game visuals refresh. Uncapped runs as fast as the system allows. Does not change simulation speed.");
         en.put("SETTINGS_MASTER_VOL_TT", "Overall volume multiplier for music and sound effects.");
         en.put("SETTINGS_MUSIC_VOL_TT", "Background music volume.");
         en.put("SETTINGS_SFX_VOL_TT", "UI and gameplay sound effect volume.");

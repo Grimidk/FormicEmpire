@@ -57,6 +57,10 @@ public class ConvoyDialog extends ZeroDialog {
         convoyPanel.refreshScene();
     }
 
+    public void applyVisualFrameRate() {
+        convoyPanel.applyVisualFrameRate();
+    }
+
     @Override
     public void dispose() {
         convoyPanel.stopAnimation();

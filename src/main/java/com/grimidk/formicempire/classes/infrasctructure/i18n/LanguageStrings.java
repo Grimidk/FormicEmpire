@@ -1424,6 +1424,8 @@ public final class LanguageStrings {
     public static final String SETTINGS_SHOW_AUDIT_MENU = "SETTINGS_SHOW_AUDIT_MENU";
     public static final String SETTINGS_OVERWORLD_AUTO_RECENTER = "SETTINGS_OVERWORLD_AUTO_RECENTER";
     public static final String SETTINGS_DARK_MODE = "SETTINGS_DARK_MODE";
+    public static final String SETTINGS_FRAME_RATE = "SETTINGS_FRAME_RATE";
+    public static final String SETTINGS_FRAME_RATE_UNCAPPED = "SETTINGS_FRAME_RATE_UNCAPPED";
     public static final String SETTINGS_DEFAULT_ROLE_WORKER = "SETTINGS_DEFAULT_ROLE_WORKER";
     public static final String SETTINGS_DEFAULT_ROLE_SOLDIER = "SETTINGS_DEFAULT_ROLE_SOLDIER";
     public static final String SETTINGS_DEFAULT_ROLE_MAJOR = "SETTINGS_DEFAULT_ROLE_MAJOR";
@@ -1450,6 +1452,7 @@ public final class LanguageStrings {
     public static final String SETTINGS_DAYLIGHT_COLOR_OVERLAY_TT = "SETTINGS_DAYLIGHT_COLOR_OVERLAY_TT";
     public static final String SETTINGS_WEATHER_COLOR_OVERLAY_TT = "SETTINGS_WEATHER_COLOR_OVERLAY_TT";
     public static final String SETTINGS_DARK_MODE_TT = "SETTINGS_DARK_MODE_TT";
+    public static final String SETTINGS_FRAME_RATE_TT = "SETTINGS_FRAME_RATE_TT";
     public static final String SETTINGS_MASTER_VOL_TT = "SETTINGS_MASTER_VOL_TT";
     public static final String SETTINGS_MUSIC_VOL_TT = "SETTINGS_MUSIC_VOL_TT";
     public static final String SETTINGS_SFX_VOL_TT = "SETTINGS_SFX_VOL_TT";

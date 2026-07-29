@@ -844,6 +844,8 @@ public class FrenchTranslation implements Translation {
         fr.put("SETTINGS_SHOW_AUDIT_MENU", "Afficher l'audit des mécaniques dans le menu principal");
         fr.put("SETTINGS_OVERWORLD_AUTO_RECENTER", "Recentrer automatiquement la surface sur l'entrée de la colonie");
         fr.put("SETTINGS_DARK_MODE", "Mode sombre");
+        fr.put("SETTINGS_FRAME_RATE", "Limite d'images :");
+        fr.put("SETTINGS_FRAME_RATE_UNCAPPED", "Sans limite");
 
         fr.put("SETTINGS_MASTER_VOL", "Volume principal :");
         fr.put("SETTINGS_MUSIC_VOL", "Volume musique :");
@@ -864,6 +866,7 @@ public class FrenchTranslation implements Translation {
         fr.put("SETTINGS_DAYLIGHT_COLOR_OVERLAY_TT", "Teinte la vue de colonie selon l'heure (aube, midi, crépuscule, nuit).");
         fr.put("SETTINGS_WEATHER_COLOR_OVERLAY_TT", "Teinte la vue de colonie selon la météo actuelle.");
         fr.put("SETTINGS_DARK_MODE_TT", "Palette sombre pour menus et panneaux. Ne change pas la zone de jeu.");
+        fr.put("SETTINGS_FRAME_RATE_TT", "Limite la fréquence de rafraîchissement des graphismes. Sans limite utilise le maximum du système. Ne change pas la vitesse de simulation.");
         fr.put("SETTINGS_MASTER_VOL_TT", "Multiplicateur de volume global pour musique et effets.");
         fr.put("SETTINGS_MUSIC_VOL_TT", "Volume de la musique de fond.");
         fr.put("SETTINGS_SFX_VOL_TT", "Volume des effets d'interface et de gameplay.");

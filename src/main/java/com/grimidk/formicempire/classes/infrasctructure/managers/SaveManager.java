@@ -1849,6 +1849,7 @@ public class SaveManager {
             writeJsonLine(w, "showAuditMenu", engine.isShowAuditMenu(), false);
             writeJsonLine(w, "overworldAutoRecenter", engine.isOverworldAutoRecenter(), false);
             writeJsonLine(w, "darkMode", engine.isDarkMode(), false);
+            writeJsonLine(w, "frameRateCap", engine.getFrameRateCap(), false);
             writeJsonLine(w, "defaultRoleWorker", engine.getDefaultRoleWorker(), false);
             writeJsonLine(w, "defaultRoleSoldier", engine.getDefaultRoleSoldier(), false);
             writeJsonLine(w, "defaultRoleMajor", engine.getDefaultRoleMajor(), false);
@@ -1949,6 +1950,7 @@ public class SaveManager {
             engine.setOverworldAutoRecenter(Boolean.parseBoolean(m.getOrDefault("overworldAutoRecenter",
                     String.valueOf(engine.isOverworldAutoRecenter()))));
             engine.setDarkMode(Boolean.parseBoolean(m.getOrDefault("darkMode", String.valueOf(engine.isDarkMode()))));
+            engine.setFrameRateCap(Integer.parseInt(m.getOrDefault("frameRateCap", String.valueOf(engine.getFrameRateCap()))));
             engine.setDefaultRoleWorker(Engine.sanitizeDefaultRoleId(
                     GameConstants.TYPE_WORKER,
                     Integer.parseInt(m.getOrDefault("defaultRoleWorker", String.valueOf(engine.getDefaultRoleWorker()))),

@@ -338,6 +338,10 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         initPanel.refreshMenuOptions();
         if (gamePanel != null) {
             gamePanel.refreshAuditMenuOption();
+            gamePanel.applyVisualFrameRateSetting();
+        }
+        if (menuChaoticPanel != null) {
+            menuChaoticPanel.applyVisualFrameInterval(engine.getVisualFrameIntervalMs());
         }
         applyTheme();
     }

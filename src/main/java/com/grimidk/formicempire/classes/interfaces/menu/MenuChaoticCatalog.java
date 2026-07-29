@@ -9,7 +9,7 @@ import java.util.List;
 
 public final class MenuChaoticCatalog {
 
-    public static final int MAX_ANTS = 1000;
+    public static final int MAX_ANTS = 500;
     public static final int SCENARIO_DURATION_MS = 20_000;
     public static final int ANIMATION_FRAME_MS = 20;
     public static final float OVERWORLD_SPEED_SCALE = 1.4f;
@@ -43,7 +43,7 @@ public final class MenuChaoticCatalog {
                         MenuChaoticAntEntry.overworld(GameConstants.TYPE_WORKER, GameConstants.SPECIES_HONEYPOT, 1171),
                         MenuChaoticAntEntry.overworld(GameConstants.TYPE_DRONE, GameConstants.SPECIES_OMNI, 1111),
                         MenuChaoticAntEntry.overworld(GameConstants.TYPE_MAJOR, GameConstants.SPECIES_MARAUDER, 1161)),
-                900,
+                500,
                 List.of(
                         new MenuChaoticCritterEntry(GameConstants.TYPE_APHID),
                         new MenuChaoticCritterEntry(GameConstants.TYPE_SYMBIOTIC_MITE)),
@@ -64,7 +64,7 @@ public final class MenuChaoticCatalog {
                         MenuChaoticAntEntry.overworld(GameConstants.TYPE_WORKER, GameConstants.SPECIES_PHARAOH, 1111),
                         MenuChaoticAntEntry.overworld(GameConstants.TYPE_PRINCESS, GameConstants.SPECIES_JET, 1111),
                         MenuChaoticAntEntry.overworld(GameConstants.TYPE_MAJOR, GameConstants.SPECIES_TRAPJAW, 2111)),
-                850,
+                480,
                 List.of(
                         new MenuChaoticCritterEntry(GameConstants.TYPE_APHID),
                         new MenuChaoticCritterEntry(GameConstants.TYPE_DERMESTID)),
@@ -85,7 +85,7 @@ public final class MenuChaoticCatalog {
                         MenuChaoticAntEntry.overworld(GameConstants.TYPE_WORKER, GameConstants.SPECIES_FLOODPLAIN, 1171),
                         MenuChaoticAntEntry.overworld(GameConstants.TYPE_DRONE, GameConstants.SPECIES_WEAVER, 1111),
                         MenuChaoticAntEntry.overworld(GameConstants.TYPE_MAJOR, GameConstants.SPECIES_CARPENTER, 1161)),
-                800,
+                460,
                 List.of(
                         new MenuChaoticCritterEntry(GameConstants.TYPE_PARASITE_ANT),
                         new MenuChaoticCritterEntry(GameConstants.TYPE_SYMBIOTIC_MITE)),
@@ -105,7 +105,7 @@ public final class MenuChaoticCatalog {
                         MenuChaoticAntEntry.colony(GameConstants.TYPE_SOLDIER, GameConstants.SPECIES_TURTLE, 2111),
                         MenuChaoticAntEntry.colony(GameConstants.TYPE_WORKER, GameConstants.SPECIES_HONEYPOT, 1171),
                         MenuChaoticAntEntry.colony(GameConstants.TYPE_MAJOR, GameConstants.SPECIES_TURTLE, 1161)),
-                700,
+                500,
                 List.of(),
                 0,
                 0x4A11_000AL));
@@ -123,7 +123,7 @@ public final class MenuChaoticCatalog {
                         MenuChaoticAntEntry.colony(GameConstants.TYPE_SOLDIER, GameConstants.SPECIES_FLOODPLAIN, 1161),
                         MenuChaoticAntEntry.colony(GameConstants.TYPE_DRONE, GameConstants.SPECIES_FLOODPLAIN, 1111),
                         MenuChaoticAntEntry.colony(GameConstants.TYPE_MAJOR, GameConstants.SPECIES_MARAUDER, 2111)),
-                680,
+                480,
                 List.of(),
                 0,
                 0x4A11_000BL));
@@ -141,7 +141,7 @@ public final class MenuChaoticCatalog {
                         MenuChaoticAntEntry.colony(GameConstants.TYPE_SOLDIER, GameConstants.SPECIES_CARPENTER, 2111),
                         MenuChaoticAntEntry.colony(GameConstants.TYPE_WORKER, GameConstants.SPECIES_TRAPJAW, 2111),
                         MenuChaoticAntEntry.colony(GameConstants.TYPE_PRINCESS, GameConstants.SPECIES_JET, 1111)),
-                720,
+                500,
                 List.of(),
                 0,
                 0x4A11_000CL));
@@ -156,7 +156,7 @@ public final class MenuChaoticCatalog {
                 buildBattleTemplate(
                         GameConstants.SPECIES_FIRE,
                         GameConstants.SPECIES_TURTLE),
-                800,
+                500,
                 List.of(),
                 0,
                 0x4A11_0004L));
@@ -171,7 +171,7 @@ public final class MenuChaoticCatalog {
                 buildBattleTemplate(
                         GameConstants.SPECIES_MARAUDER,
                         GameConstants.SPECIES_FLOODPLAIN),
-                820,
+                500,
                 List.of(),
                 0,
                 0x4A11_0005L));
@@ -186,7 +186,7 @@ public final class MenuChaoticCatalog {
                 buildBattleTemplate(
                         GameConstants.SPECIES_PHARAOH,
                         GameConstants.SPECIES_CARPENTER),
-                780,
+                480,
                 List.of(),
                 0,
                 0x4A11_0006L));

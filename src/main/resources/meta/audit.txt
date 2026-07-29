@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 71% (244/342 checked)
+Completion: 71% (244/343 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -41,6 +41,7 @@ Video:
 [X] Daylight color overlay
 [X] Weather color overlay
 [X] Dark mode
+[ ] Frame rate cap (Uncapped / 30 Hz / 60 Hz / 120 Hz)
 [X] Reset tab to defaults
 
 Audio:

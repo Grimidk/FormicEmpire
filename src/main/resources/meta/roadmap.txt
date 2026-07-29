@@ -12,7 +12,6 @@ To Fix (By decreasing priority):
 		
 	Mid:
 		(none right now)
-	  
 	Low:
 		(none right now)
 
@@ -29,12 +28,11 @@ Needed for launch (v1.0) (Launch Version):
 		minerals with uprades to find it and increase miner efficency, also mushroom detection 
 		research tree and building tree (orchard) (after icons) with available, purchasable, locked and list trigger based upgrades 
 		more upgrades (mid game upgrade to health, defense, attck and late for defense health attack and atkspeed) and more buildings lvl 4 a 5
-		implement pending roles (miner, carrier) more roles (paratroopers to skip a stage)
 		music and sounds and settings for them and player panel (to include in core engine)
-		critter sprite composite + palette recolor (code wired; refine art/palettes):
+		critter sprite composite:
 			Ant walking cycle on viewport, sprites needed for leg 4 frame cycle
 			Non-ant walkers: sprites/critters/shared/legs/{Aphid|Dermestid|SoilMite}/Leg1…Leg4.png still TODO
-		rework how carrying looks completely, maybe have an item inside jaws
+		rework how carrying looks completely, maybe have an resource icon (do not scale) inside jaws
 	
 	Everything else :
 		swarm vs creature battles
@@ -46,6 +44,7 @@ Needed for launch (v1.0) (Launch Version):
 			Birds (Crow, Finch, Chicken)
 			Mammals (Rats, Possum, Anteater)
 			Zombie ant colonies (Cordiceps)
+		implement pending roles ( carrier) more roles (paratroopers to skip a stage)
 		(Wood burrowing and mounds (Carpenter ants), Silk weaving (Weaver ants), Rafting (Flood plains ants), Jumping (Jet ants), Swarming (Army ants), Stealth (Ghost ants), Heat resistance (Saharan silver ants), reinforced Hive building (Shining black ants), Location sensing (Desert ants))
 		Silk weaving + Hive building = Web building (Passive proteing capture)
 		uncolonizable terrain with boss enemies  (non ant assimilation reward, unique bosses)

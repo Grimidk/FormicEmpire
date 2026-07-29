@@ -55,7 +55,8 @@ class MenuChaoticCatalogTest {
     void worldsBuildFromDefinitionsWithoutAllocatingEachTick() {
         for (MenuChaoticDefinition definition : MenuChaoticCatalog.getScenarios()) {
             MenuChaoticWorld world = MenuChaoticWorld.fromDefinition(definition);
-            assertEquals(definition.antCount(), world.getAnts().size());
+            int expectedAnts = Math.min(definition.antCount(), MenuChaoticCatalog.MAX_ANTS);
+            assertEquals(expectedAnts, world.getAnts().size());
             assertEquals(definition.critterCount(), world.getCritters().size());
             world.update(0.02f, 1280, 720);
             Biome primary = world.getPrimaryBiome();

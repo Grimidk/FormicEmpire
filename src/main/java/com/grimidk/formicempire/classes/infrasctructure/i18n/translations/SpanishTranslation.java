@@ -844,6 +844,8 @@ public class SpanishTranslation implements Translation {
         es.put("SETTINGS_SHOW_AUDIT_MENU", "Mostrar auditoría de mecánicas en el menú principal");
         es.put("SETTINGS_OVERWORLD_AUTO_RECENTER", "Recentrar automáticamente el exterior en la entrada de la colonia");
         es.put("SETTINGS_DARK_MODE", "Modo oscuro");
+        es.put("SETTINGS_FRAME_RATE", "Límite de fotogramas:");
+        es.put("SETTINGS_FRAME_RATE_UNCAPPED", "Sin límite");
 
         es.put("SETTINGS_MASTER_VOL", "Volumen Maestro:");
         es.put("SETTINGS_MUSIC_VOL", "Volumen Música:");
@@ -864,6 +866,7 @@ public class SpanishTranslation implements Translation {
         es.put("SETTINGS_DAYLIGHT_COLOR_OVERLAY_TT", "Tiñe la vista de la colonia según la hora del día (amanecer, mediodía, atardecer, noche).");
         es.put("SETTINGS_WEATHER_COLOR_OVERLAY_TT", "Tiñe la vista de la colonia según el clima actual.");
         es.put("SETTINGS_DARK_MODE_TT", "Usa una paleta oscura en menús y paneles. No cambia el lienzo del juego.");
+        es.put("SETTINGS_FRAME_RATE_TT", "Limita con qué frecuencia se redibujan los gráficos. Sin límite usa la máxima tasa del sistema. No cambia la velocidad de simulación.");
         es.put("SETTINGS_MASTER_VOL_TT", "Multiplicador de volumen general para música y efectos.");
         es.put("SETTINGS_MUSIC_VOL_TT", "Volumen de la música de fondo.");
         es.put("SETTINGS_SFX_VOL_TT", "Volumen de efectos de interfaz y jugabilidad.");

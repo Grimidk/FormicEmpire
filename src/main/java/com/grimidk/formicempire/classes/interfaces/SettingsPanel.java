@@ -55,6 +55,7 @@ public class SettingsPanel extends JPanel {
     private JCheckBox daylightColorOverlayCheck;
     private JCheckBox weatherColorOverlayCheck;
     private JCheckBox darkModeCheck;
+    private JComboBox<FrameRateOption> frameRateCombo;
 
     // --- Audio Tab ---
     private JSlider masterVolSlider;
@@ -62,7 +63,7 @@ public class SettingsPanel extends JPanel {
     private JSlider sfxVolSlider;
     
     private JLabel langLabel, autoLabel, turboLabel, arachLabel, pauseFocusLabel, confirmQuitLabel, escapeKeyGameActionsLabel, tooltipsLabel, overworldAutoRecenterLabel, fuzzParasiteAntsLabel, showAuditMenuLabel;
-    private JLabel sizeLabel, fsLabel, daylightColorOverlayLabel, weatherColorOverlayLabel, darkModeLabel;
+    private JLabel sizeLabel, fsLabel, daylightColorOverlayLabel, weatherColorOverlayLabel, darkModeLabel, frameRateLabel;
     private JLabel masterLabel, musicLabel, sfxLabel;
     private JLabel defaultRoleWorkerLabel, defaultRoleSoldierLabel, defaultRoleMajorLabel, defaultRolePrincessLabel, defaultRoleQueenLabel;
     private JComboBox<AntRole> defaultRoleWorkerCombo, defaultRoleSoldierCombo, defaultRoleMajorCombo, defaultRolePrincessCombo, defaultRoleQueenCombo;
@@ -82,6 +83,17 @@ public class SettingsPanel extends JPanel {
         public AutosaveOption(String label, int value) {
             this.label = label;
             this.value = value;
+        }
+        @Override
+        public String toString() { return label; }
+    }
+
+    private static class FrameRateOption {
+        String label;
+        int hz;
+        public FrameRateOption(String label, int hz) {
+            this.label = label;
+            this.hz = hz;
         }
         @Override
         public String toString() { return label; }
@@ -484,6 +496,19 @@ public class SettingsPanel extends JPanel {
         }
     }
 
+    private void selectFrameRateByValue(int hz) {
+        int safe = Engine.sanitizeFrameRateCap(hz);
+        for (int i = 0; i < frameRateCombo.getItemCount(); i++) {
+            if (frameRateCombo.getItemAt(i).hz == safe) {
+                frameRateCombo.setSelectedIndex(i);
+                return;
+            }
+        }
+        if (frameRateCombo.getItemCount() > 0) {
+            frameRateCombo.setSelectedIndex(0);
+        }
+    }
+
     private void resetGeneralTabToDefaults() {
         selectLanguageByCode("en");
         selectAutosaveByValue(1);
@@ -507,6 +532,7 @@ public class SettingsPanel extends JPanel {
         daylightColorOverlayCheck.setSelected(true);
         weatherColorOverlayCheck.setSelected(true);
         darkModeCheck.setSelected(false);
+        selectFrameRateByValue(0);
     }
 
     private void resetAudioTabToDefaults() {
@@ -612,7 +638,17 @@ public class SettingsPanel extends JPanel {
         styleCheckBox(darkModeCheck);
         c.gridx = 1; panel.add(darkModeCheck, c);
 
-        c.gridy = 5;
+        c.gridy = 5; c.gridx = 0;
+        frameRateLabel = new JLabel();
+        frameRateLabel.setFont(AssetStyles.FONT_NORMAL);
+        frameRateLabel.setForeground(AssetStyles.FONT_COLOR);
+        panel.add(frameRateLabel, c);
+
+        frameRateCombo = new JComboBox<>(buildFrameRateOptions());
+        styleComboBox(frameRateCombo);
+        c.gridx = 1; panel.add(frameRateCombo, c);
+
+        c.gridy = 6;
         c.gridx = 0;
         c.gridwidth = 2;
         c.anchor = GridBagConstraints.EAST;
@@ -624,6 +660,15 @@ public class SettingsPanel extends JPanel {
         panel.add(resetVideoButton, c);
         
         return panel;
+    }
+
+    private FrameRateOption[] buildFrameRateOptions() {
+        return new FrameRateOption[]{
+                new FrameRateOption(LanguageStrings.get(LanguageStrings.SETTINGS_FRAME_RATE_UNCAPPED), 0),
+                new FrameRateOption("30 Hz", 30),
+                new FrameRateOption("60 Hz", 60),
+                new FrameRateOption("120 Hz", 120)
+        };
     }
     
     private JPanel createAudioTab() {
@@ -717,6 +762,7 @@ public class SettingsPanel extends JPanel {
         daylightColorOverlayLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_DAYLIGHT_COLOR_OVERLAY));
         weatherColorOverlayLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_WEATHER_COLOR_OVERLAY));
         darkModeLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_DARK_MODE));
+        frameRateLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_FRAME_RATE));
         
         masterLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_MASTER_VOL));
         musicLabel.setText(LanguageStrings.get(LanguageStrings.SETTINGS_MUSIC_VOL));
@@ -752,6 +798,12 @@ public class SettingsPanel extends JPanel {
                 break;
             }
         }
+
+        int currentFrameRate = (frameRateCombo.getSelectedItem() != null)
+                ? ((FrameRateOption) frameRateCombo.getSelectedItem()).hz
+                : 0;
+        frameRateCombo.setModel(new DefaultComboBoxModel<>(buildFrameRateOptions()));
+        selectFrameRateByValue(currentFrameRate);
     }
     
     private void styleComboBox(JComboBox<?> box) {
@@ -783,6 +835,7 @@ public class SettingsPanel extends JPanel {
         setSettingTooltip(daylightColorOverlayLabel, daylightColorOverlayCheck, LanguageStrings.SETTINGS_DAYLIGHT_COLOR_OVERLAY_TT);
         setSettingTooltip(weatherColorOverlayLabel, weatherColorOverlayCheck, LanguageStrings.SETTINGS_WEATHER_COLOR_OVERLAY_TT);
         setSettingTooltip(darkModeLabel, darkModeCheck, LanguageStrings.SETTINGS_DARK_MODE_TT);
+        setSettingTooltip(frameRateLabel, frameRateCombo, LanguageStrings.SETTINGS_FRAME_RATE_TT);
         setSettingTooltip(masterLabel, masterVolSlider, LanguageStrings.SETTINGS_MASTER_VOL_TT);
         setSettingTooltip(musicLabel, musicVolSlider, LanguageStrings.SETTINGS_MUSIC_VOL_TT);
         setSettingTooltip(sfxLabel, sfxVolSlider, LanguageStrings.SETTINGS_SFX_VOL_TT);
@@ -834,6 +887,7 @@ public class SettingsPanel extends JPanel {
         daylightColorOverlayCheck.setSelected(engine.isDaylightColorOverlayEnabled());
         weatherColorOverlayCheck.setSelected(engine.isWeatherColorOverlayEnabled());
         darkModeCheck.setSelected(engine.isDarkMode());
+        selectFrameRateByValue(engine.getFrameRateCap());
 
         masterVolSlider.setValue(engine.getMasterVolume());
         musicVolSlider.setValue(engine.getMusicVolume());
@@ -914,6 +968,10 @@ public class SettingsPanel extends JPanel {
         engine.setDaylightColorOverlayEnabled(daylightColorOverlayCheck.isSelected());
         engine.setWeatherColorOverlayEnabled(weatherColorOverlayCheck.isSelected());
         engine.setDarkMode(darkModeCheck.isSelected());
+        FrameRateOption selectedFrameRate = (FrameRateOption) frameRateCombo.getSelectedItem();
+        if (selectedFrameRate != null) {
+            engine.setFrameRateCap(selectedFrameRate.hz);
+        }
 
         engine.setMasterVolume(masterVolSlider.getValue());
         engine.setMusicVolume(musicVolSlider.getValue());

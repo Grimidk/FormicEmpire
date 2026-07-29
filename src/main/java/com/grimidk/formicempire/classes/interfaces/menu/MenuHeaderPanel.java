@@ -7,17 +7,13 @@ import java.awt.*;
 
 public class MenuHeaderPanel extends JPanel {
 
-    public static final int ASSET_WIDTH = 1000;
-    public static final int ASSET_HEIGHT = 400;
-    public static final int DISPLAY_WIDTH = 500;
-    public static final int DISPLAY_HEIGHT = 200;
     private static final String HEADER_IMAGE_PATH = "/meta/menu/GameHeader.png";
 
     private Image headerImage;
 
     public MenuHeaderPanel() {
         setOpaque(false);
-        Dimension size = new Dimension(DISPLAY_WIDTH, DISPLAY_HEIGHT);
+        Dimension size = new Dimension(500, 200);
         setPreferredSize(size);
         setMinimumSize(size);
         setMaximumSize(size);

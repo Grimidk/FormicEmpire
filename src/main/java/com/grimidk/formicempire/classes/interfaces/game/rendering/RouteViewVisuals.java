@@ -5,6 +5,12 @@ import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.entities.services.colony.ConvoyScene;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 
+import javax.swing.ImageIcon;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
+import java.awt.image.ImageObserver;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -15,6 +21,7 @@ public final class RouteViewVisuals {
     private static final float WING_FLICKER_CYCLE_SEC = 5.5f;
     private static final float WING_FLICKER_CLOSED_START_SEC = 4.2f;
     private static final float WING_FLICKER_CLOSED_END_SEC = 5.2f;
+    public static final int CONVOY_RESOURCE_LOOP_PX = 960;
 
     public record ConvoyResourceProp(
             ResourceType resourceType,
@@ -103,13 +110,52 @@ public final class RouteViewVisuals {
             };
             boolean upperBand = random.nextBoolean();
             float yNorm = upperBand ? 0.14f + random.nextFloat() * 0.1f : 0.76f + random.nextFloat() * 0.1f;
+            float slot = (i + 0.5f) / count;
+            float xPhase = (slot + (random.nextFloat() - 0.5f) * 0.18f + 1f) % 1f;
             props.add(new ConvoyResourceProp(
                     type,
                     quantity,
-                    random.nextFloat(),
+                    xPhase,
                     yNorm,
                     random.nextInt(360)));
         }
         return List.copyOf(props);
+    }
+
+    public static void paintConvoyResources(Graphics2D g2d, List<ConvoyResourceProp> props, int fieldX, int fieldY,
+            int fieldW, int fieldH, float scrollPixels, boolean travelingRight, ImageObserver observer) {
+        if (props == null || props.isEmpty() || fieldW <= 0 || fieldH <= 0) {
+            return;
+        }
+        int loop = Math.max(CONVOY_RESOURCE_LOOP_PX, fieldW + 160);
+        float scrolled = travelingRight ? scrollPixels : -scrollPixels;
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        for (ConvoyResourceProp prop : props) {
+            if (prop.resourceType() == null) {
+                continue;
+            }
+            ImageIcon icon = prop.resourceType().getIconForSourceQuantity(prop.quantity());
+            if (icon == null) {
+                continue;
+            }
+            Image image = icon.getImage();
+            if (image == null) {
+                continue;
+            }
+            int displayPx = prop.resourceType().getDisplaySizeForSourceQuantity(prop.quantity());
+            int worldX = Math.round(prop.xPhase() * loop);
+            int baseX = fieldX + Math.floorMod(worldX - Math.round(scrolled), loop);
+            int drawY = fieldY + Math.round(prop.yNorm() * fieldH) - displayPx / 2;
+            for (int x = baseX - loop; x < fieldX + fieldW + displayPx; x += loop) {
+                if (x + displayPx < fieldX || x > fieldX + fieldW) {
+                    continue;
+                }
+                AffineTransform old = g2d.getTransform();
+                g2d.translate(x + displayPx / 2.0, drawY + displayPx / 2.0);
+                g2d.rotate(Math.toRadians(prop.rotationDegrees()));
+                g2d.drawImage(image, -displayPx / 2, -displayPx / 2, displayPx, displayPx, observer);
+                g2d.setTransform(old);
+            }
+        }
     }
 }

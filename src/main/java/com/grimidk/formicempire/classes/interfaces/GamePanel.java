@@ -175,6 +175,23 @@ public class GamePanel extends ZeroGamePanel {
         }
     }
 
+    public void applyVisualFrameRateSetting() {
+        Engine engine = frame.getEngine();
+        int intervalMs = engine != null ? engine.getVisualFrameIntervalMs() : 1;
+        if (minuteDrainTimer != null) {
+            minuteDrainTimer.setDelay(intervalMs);
+        }
+        if (overworldSpringTimer != null) {
+            overworldSpringTimer.setDelay(intervalMs);
+        }
+        if (convoyDialog != null && convoyDialog.isShowing()) {
+            convoyDialog.applyVisualFrameRate();
+        }
+        if (warBattleDialog != null && warBattleDialog.isShowing()) {
+            warBattleDialog.applyVisualFrameRate();
+        }
+    }
+
     public void refreshAuditMenuOption() {
         if (controlPanel != null) {
             controlPanel.updateAuditMenu(frame.getEngine().isShowAuditMenu());
@@ -404,7 +421,8 @@ public class GamePanel extends ZeroGamePanel {
         overworldSpringStartPos = new Point(start);
         overworldSpringTargetPos = new Point(target);
         overworldSpringStartMs = System.currentTimeMillis();
-        overworldSpringTimer = new Timer(16, e -> {
+        int intervalMs = frame.getEngine() != null ? frame.getEngine().getVisualFrameIntervalMs() : 1;
+        overworldSpringTimer = new Timer(intervalMs, e -> {
             long elapsed = System.currentTimeMillis() - overworldSpringStartMs;
             float t = Math.min(1f, elapsed / (float) OVERWORLD_SPRING_DURATION_MS);
             float ease = 1f - (1f - t) * (1f - t);
@@ -1394,8 +1412,11 @@ public class GamePanel extends ZeroGamePanel {
         engine.addMonthTickListener(monthTickListener);
 
         if (minuteDrainTimer == null) {
-            minuteDrainTimer = new Timer(16, e -> drainPendingMinuteGuiSteps());
+            int intervalMs = engine.getVisualFrameIntervalMs();
+            minuteDrainTimer = new Timer(intervalMs, e -> drainPendingMinuteGuiSteps());
             minuteDrainTimer.setRepeats(true);
+        } else {
+            minuteDrainTimer.setDelay(engine.getVisualFrameIntervalMs());
         }
         minuteDrainTimer.start();
         setupOverworldScrollbarPanTracking();
