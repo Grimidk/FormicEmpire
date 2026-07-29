@@ -5,8 +5,6 @@ To Fix (By decreasing priority):
 		(none right now)
 	
 	High:
-		header 
-		excel for languages and tags and script to update it
 		TODO: icons for 70 unlocks
 		TODO: tune AntSpeciesPalette hexes + icons for placeholder species (carpenter, weaver, floodplain, jet, army, ghost, silver, shining black, desert)
 		

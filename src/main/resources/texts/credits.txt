@@ -1,16 +1,10 @@
-Developer:
-    Grimidk
-
-Pixelartist:
+Development, Art, Sound and Marketing:
     Grimidk
 
 Testers (in order of participation):
     Gopher
     Hazelmeadow
-
-Marketing:
-    Grimidk
-
+    
 Translations:
     English: Grimidk
     Spanish: Grimidk
