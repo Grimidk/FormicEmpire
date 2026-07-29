@@ -1761,12 +1761,12 @@ public class HelpPanel extends JPanel {
 
     public static void showRoadmapDialog(Component parent) {
         showTextFileDialog(parent, LanguageStrings.ROADMAP_TITLE,
-                ClasspathTextFiles.load("/meta/roadmap.txt", LanguageStrings.ROADMAP_UNAVAILABLE));
+                ClasspathTextFiles.load(AssetStyles.META_ROADMAP, LanguageStrings.ROADMAP_UNAVAILABLE));
     }
 
     public static void showCreditsDialog(Component parent) {
         showTextFileDialog(parent, LanguageStrings.CREDITS_TITLE,
-                ClasspathTextFiles.load("/meta/credits.txt", LanguageStrings.CREDITS_UNAVAILABLE));
+                ClasspathTextFiles.load(AssetStyles.META_CREDITS, LanguageStrings.CREDITS_UNAVAILABLE));
     }
 
     public static void showAuditDialog(Component parent) {

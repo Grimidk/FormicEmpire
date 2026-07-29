@@ -10,7 +10,7 @@ Check the roadmap to see planned features and known bugs and credits for acknowl
 
 The game will eventually be published, but I don't care about profits. Donations are always welcome.
 I aim to publish the game around October 2026, maybe, until then betas are available at itch.io or github.
-After that expect regular but sparse updates including a Core Engine.
+After that expect regular but sparse updates including a Core Engine Package.
 
 Use 'production' branch for a stable version and 'development' branch for unstable beta features.
 
@@ -77,3 +77,5 @@ In order to add new ant assets you need to use these colors in order to properly
     	head FF0000, torso 00FF00, abdomen 0000FF, wingPrimary FFFF00, wingSecondary 00FFFF, 
         drone FF00FF, droneWingPrimary FF8000, droneWingSecondary 8000FF, honeypot FF0080;
 		borders (and appendages) 000000
+
+In case of wanting to edit or add new languages, please look into the translation_sheet.csv, there you can look for the string or add a new column (you still need to declare it in the codegen tool and for the settings).

@@ -55,9 +55,9 @@ public class AssetStyles {
     public static final String META_APP_ICON = "/meta/icon.ico";
     public static final String META_DIALOG_ICON = "/meta/icon.iconset/icon_32x32@2x.png";
     public static final String META_FONT = "/meta/fonts/font.ttf";
-    public static final String META_ROADMAP = "/meta/roadmap.txt";
-    public static final String META_CREDITS = "/meta/credits.txt";
-    public static final String META_AUDIT = "/meta/audit.txt";
+    public static final String META_ROADMAP = "/texts/roadmap.txt";
+    public static final String META_CREDITS = "/texts/credits.txt";
+    public static final String META_AUDIT = "/texts/audit.txt";
 
     public static final String ICON_BUTTON_CLIENT_KEY = "formicempire.iconButton";
 
