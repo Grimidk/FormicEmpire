@@ -2187,6 +2187,20 @@ public final class LanguageStrings {
     public static final String STAT_HEX_SUSTAIN_DESC = "STAT_HEX_SUSTAIN_DESC";
     public static final String STAT_WORKER_SPEED_2_FLAVOR = "STAT_WORKER_SPEED_2_FLAVOR";
     public static final String STAT_WORKER_SPEED_2_DESC = "STAT_WORKER_SPEED_2_DESC";
+    public static final String STAT_HEALTH_1_FLAVOR = "STAT_HEALTH_1_FLAVOR";
+    public static final String STAT_HEALTH_1_DESC = "STAT_HEALTH_1_DESC";
+    public static final String STAT_ATTACK_1_FLAVOR = "STAT_ATTACK_1_FLAVOR";
+    public static final String STAT_ATTACK_1_DESC = "STAT_ATTACK_1_DESC";
+    public static final String STAT_DEFENSE_1_FLAVOR = "STAT_DEFENSE_1_FLAVOR";
+    public static final String STAT_DEFENSE_1_DESC = "STAT_DEFENSE_1_DESC";
+    public static final String STAT_HEALTH_2_FLAVOR = "STAT_HEALTH_2_FLAVOR";
+    public static final String STAT_HEALTH_2_DESC = "STAT_HEALTH_2_DESC";
+    public static final String STAT_ATTACK_2_FLAVOR = "STAT_ATTACK_2_FLAVOR";
+    public static final String STAT_ATTACK_2_DESC = "STAT_ATTACK_2_DESC";
+    public static final String STAT_DEFENSE_2_FLAVOR = "STAT_DEFENSE_2_FLAVOR";
+    public static final String STAT_DEFENSE_2_DESC = "STAT_DEFENSE_2_DESC";
+    public static final String STAT_ATTACK_SPEED_1_FLAVOR = "STAT_ATTACK_SPEED_1_FLAVOR";
+    public static final String STAT_ATTACK_SPEED_1_DESC = "STAT_ATTACK_SPEED_1_DESC";
 
     public static final String STAT_CAT_OVERWORLD = "STAT_CAT_OVERWORLD";
     public static final String STAT_HEX_DEPLETION = "STAT_HEX_DEPLETION";

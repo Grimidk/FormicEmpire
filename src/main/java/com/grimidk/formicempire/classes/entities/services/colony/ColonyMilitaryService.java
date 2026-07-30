@@ -8,7 +8,6 @@ import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.infrasctructure.Savefile;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
-import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 
 import java.util.List;
 import java.util.Map;
@@ -331,17 +330,10 @@ public final class ColonyMilitaryService {
         if (savedColony == null) {
             return 0;
         }
-        boolean hasSkeleton = dynasty != null && dynasty.hasUpgrade(GameUnlocks.STAT_SKELETON);
-        boolean hasAcid = dynasty != null && dynasty.hasUpgrade(GameUnlocks.STAT_ACID);
-        int baseHealth = hasSkeleton ? GameNumbers.MILITARY_BASELINE_HEALTH : 0;
-        int baseDefense = 0;
-        int baseAttack = hasAcid
-                ? Math.round(GameNumbers.MILITARY_BASELINE_ATTACK * ColonyStatsService.getAssimilatedDamageMultiplier(dynasty))
-                : 0;
-        int baseAttackSpeed = hasAcid
-                ? Math.round(GameNumbers.MILITARY_BASELINE_ATTACK_SPEED
-                        * ColonyStatsService.getAssimilatedAttackSpeedMultiplier(dynasty))
-                : 0;
+        int baseHealth = ColonyStatsService.resolveBaseHealth(dynasty);
+        int baseDefense = ColonyStatsService.resolveBaseDefense(dynasty);
+        int baseAttack = ColonyStatsService.resolveBaseAttack(dynasty);
+        int baseAttackSpeed = ColonyStatsService.resolveBaseAttackSpeed(dynasty);
 
         int points = 0;
         points += sumSavedMilitaryPoints(savedColony.workerSubtypes, savedColony.workers, GameConstants.TYPE_WORKER,

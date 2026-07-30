@@ -311,7 +311,7 @@ public final class AntSubtypeService {
         ant.setAttack((int) (colony.getBaseAttack() * type.getAttackMult()));
         ant.setAttackSpeed((int) (colony.getBaseAttackSpeed() * type.getAttackSpeedMult()));
         ant.setDefense(GameNumbers.clampDefensePercent(
-                type.getDefenseMult() + combinedDefenseBonus(profile)));
+                type.getDefenseMult() + colony.getBaseDefense() + combinedDefenseBonus(profile)));
         ant.setSpeed(colony.getBaseSpeed() * type.getSpeedMult() * combinedSpeedMult(profile));
     }
 
@@ -394,7 +394,7 @@ public final class AntSubtypeService {
         int hp = Math.max(0, Math.round(stats.getBaseHealth(colony) * type.getHealtMult() * combinedHealthMult(resolved)));
         int atk = (int) (stats.getBaseAttack(colony) * type.getAttackMult());
         int def = Math.round(GameNumbers.clampDefensePercent(
-                type.getDefenseMult() + combinedDefenseBonus(resolved)));
+                type.getDefenseMult() + stats.getBaseDefense(colony) + combinedDefenseBonus(resolved)));
         int atkSpd = (int) (stats.getBaseAttackSpeed(colony) * type.getAttackSpeedMult());
         return ColonyMilitaryService.computeStatMultiplierFromBases(hp, atk, def, atkSpd);
     }
@@ -416,7 +416,7 @@ public final class AntSubtypeService {
         int hp = Math.max(0, Math.round(baseHealth * type.getHealtMult() * combinedHealthMult(resolved)));
         int atk = (int) (baseAttack * type.getAttackMult());
         int def = Math.round(GameNumbers.clampDefensePercent(
-                type.getDefenseMult() + combinedDefenseBonus(resolved)));
+                type.getDefenseMult() + baseDefense + combinedDefenseBonus(resolved)));
         int atkSpd = (int) (baseAttackSpeed * type.getAttackSpeedMult());
         return ColonyMilitaryService.computeStatMultiplierFromBases(hp, atk, def, atkSpd);
     }

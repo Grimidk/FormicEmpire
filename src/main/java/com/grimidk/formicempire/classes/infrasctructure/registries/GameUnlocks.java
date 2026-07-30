@@ -331,6 +331,27 @@ public final class GameUnlocks {
         // TODO asset: icons/upgrades/StatWorkerSpeed2.png
         public static final Upgrade STAT_WORKER_SPEED_2 = new Upgrade(134, "STAT_WORKER_SPEED_2", "STAT_WORKER_SPEED_2_FLAVOR", "STAT_WORKER_SPEED_2_DESC", STAT_SCOUTING_3, 200000, null, 5);
         static { upgrades.add(STAT_WORKER_SPEED_2); }
+        // TODO asset: icons/upgrades/StatHealth1.png
+        public static final Upgrade STAT_HEALTH_1 = new Upgrade(137, "STAT_HEALTH_1", "STAT_HEALTH_1_FLAVOR", "STAT_HEALTH_1_DESC", STAT_SKELETON, 12000, null, 3);
+        static { upgrades.add(STAT_HEALTH_1); }
+        // TODO asset: icons/upgrades/StatAttack1.png
+        public static final Upgrade STAT_ATTACK_1 = new Upgrade(138, "STAT_ATTACK_1", "STAT_ATTACK_1_FLAVOR", "STAT_ATTACK_1_DESC", STAT_ACID, 12000, null, 3);
+        static { upgrades.add(STAT_ATTACK_1); }
+        // TODO asset: icons/upgrades/StatDefense1.png
+        public static final Upgrade STAT_DEFENSE_1 = new Upgrade(139, "STAT_DEFENSE_1", "STAT_DEFENSE_1_FLAVOR", "STAT_DEFENSE_1_DESC", STAT_SKELETON, 10000, null, 3);
+        static { upgrades.add(STAT_DEFENSE_1); }
+        // TODO asset: icons/upgrades/StatHealth2.png
+        public static final Upgrade STAT_HEALTH_2 = new Upgrade(140, "STAT_HEALTH_2", "STAT_HEALTH_2_FLAVOR", "STAT_HEALTH_2_DESC", STAT_HEALTH_1, 500000, null, 6);
+        static { upgrades.add(STAT_HEALTH_2); }
+        // TODO asset: icons/upgrades/StatAttack2.png
+        public static final Upgrade STAT_ATTACK_2 = new Upgrade(141, "STAT_ATTACK_2", "STAT_ATTACK_2_FLAVOR", "STAT_ATTACK_2_DESC", STAT_ATTACK_1, 500000, null, 6);
+        static { upgrades.add(STAT_ATTACK_2); }
+        // TODO asset: icons/upgrades/StatDefense2.png
+        public static final Upgrade STAT_DEFENSE_2 = new Upgrade(142, "STAT_DEFENSE_2", "STAT_DEFENSE_2_FLAVOR", "STAT_DEFENSE_2_DESC", STAT_DEFENSE_1, 450000, null, 6);
+        static { upgrades.add(STAT_DEFENSE_2); }
+        // TODO asset: icons/upgrades/StatAttackSpeed1.png
+        public static final Upgrade STAT_ATTACK_SPEED_1 = new Upgrade(143, "STAT_ATTACK_SPEED_1", "STAT_ATTACK_SPEED_1_FLAVOR", "STAT_ATTACK_SPEED_1_DESC", STAT_ATTACK_1, 550000, null, 6);
+        static { upgrades.add(STAT_ATTACK_SPEED_1); }
         // -- Assimilated --
         public static final Upgrade ASSIMILATED_FARMING = new Upgrade(1001, "ASSIMILATED_FARMING", "ASSIMILATED_FARMING_FLAVOR", "ASSIMILATED_FARMING_DESC", ABILITY_ASSIMILATION, 0, loadIcon("icons/upgrades/AssimilatedFarming.png"), 0);
         static { upgrades.add(ASSIMILATED_FARMING); }

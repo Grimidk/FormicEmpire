@@ -119,6 +119,12 @@ public final class GameNumbers {
     public static final int ANT_REGEN_PERCENT_BASE = 10;
     public static final float BOOST_REGEN_NEXT_REDEPLOY_MULT = 2f;
     public static final int MILITARY_BASELINE_ATTACK_SPEED = 1;
+    public static final float STAT_HEALTH_1_BONUS = 0.50f;
+    public static final float STAT_HEALTH_2_BONUS = 0.80f;
+    public static final float STAT_ATTACK_1_BONUS = 0.30f;
+    public static final float STAT_ATTACK_2_BONUS = 0.50f;
+    public static final int STAT_DEFENSE_FLAT_BONUS = 5;
+    public static final int STAT_ATTACK_SPEED_1_FLAT = 1;
     public static final float ASSIMILATED_DAMAGE_ADD_FIRE = 0.5f;
     public static final float ASSIMILATED_DAMAGE_ADD_DEADLY = 0.5f;
     public static final float ASSIMILATED_DAMAGE_SYNERGY_FIRE_DEADLY = 3f;

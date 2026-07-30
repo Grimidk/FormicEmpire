@@ -1853,7 +1853,29 @@ public class Dynasty {
             }
         }
         DynastySynergyService.refreshUnlocked(this);
+        if (affectsAntCombatStats(upgrade)) {
+            for (Colony colony : colonies) {
+                if (colony != null) {
+                    colony.refreshAntStats();
+                }
+            }
+        }
         invalidateAffordableAlertCaches();
+    }
+
+    private static boolean affectsAntCombatStats(Upgrade upgrade) {
+        return upgrade == GameUnlocks.STAT_SKELETON
+                || upgrade == GameUnlocks.STAT_ACID
+                || upgrade == GameUnlocks.STAT_HEALTH_1
+                || upgrade == GameUnlocks.STAT_HEALTH_2
+                || upgrade == GameUnlocks.STAT_ATTACK_1
+                || upgrade == GameUnlocks.STAT_ATTACK_2
+                || upgrade == GameUnlocks.STAT_DEFENSE_1
+                || upgrade == GameUnlocks.STAT_DEFENSE_2
+                || upgrade == GameUnlocks.STAT_ATTACK_SPEED_1
+                || upgrade == GameUnlocks.ASSIMILATED_FASTBITE
+                || upgrade == GameUnlocks.ASSIMILATED_FIREVENOM
+                || upgrade == GameUnlocks.ASSIMILATED_DEADLYVENOM;
     }
 
     public void revokeUpgrade(Upgrade upgrade) {

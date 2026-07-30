@@ -225,7 +225,24 @@ public class ColonyStatsService {
     }
 
     // --- Stats ---
-    public int getBaseHealth(Colony colony) { return colony.hasUpgrade(GameUnlocks.STAT_SKELETON) ? 100 : 0; }
+    public int getBaseHealth(Colony colony) {
+        return resolveBaseHealth(colony != null ? colony.getDynasty() : null);
+    }
+
+    public static int resolveBaseHealth(Dynasty dynasty) {
+        if (dynasty == null || !dynasty.hasUpgrade(GameUnlocks.STAT_SKELETON)) {
+            return 0;
+        }
+        float bonus = 0f;
+        if (dynasty.hasUpgrade(GameUnlocks.STAT_HEALTH_1)) {
+            bonus += GameNumbers.STAT_HEALTH_1_BONUS;
+        }
+        if (dynasty.hasUpgrade(GameUnlocks.STAT_HEALTH_2)) {
+            bonus += GameNumbers.STAT_HEALTH_2_BONUS;
+        }
+        return Math.round(GameNumbers.MILITARY_BASELINE_HEALTH * (1f + bonus));
+    }
+
     public int getBaseTempRes(Colony colony) { return colony.hasUpgrade(GameUnlocks.STAT_LONGEVITY) ? 25 : 0; }
     public int getBaseRegen(Colony colony) {
         return colony.hasUpgrade(GameUnlocks.STAT_SKELETON) ? GameNumbers.ANT_REGEN_PERCENT_BASE : 0;
@@ -256,24 +273,64 @@ public class ColonyStatsService {
         return 1f;
     }
 
+    public static float getCombatAttackUpgradeMultiplier(Dynasty dynasty) {
+        if (dynasty == null) {
+            return 1f;
+        }
+        float bonus = 0f;
+        if (dynasty.hasUpgrade(GameUnlocks.STAT_ATTACK_1)) {
+            bonus += GameNumbers.STAT_ATTACK_1_BONUS;
+        }
+        if (dynasty.hasUpgrade(GameUnlocks.STAT_ATTACK_2)) {
+            bonus += GameNumbers.STAT_ATTACK_2_BONUS;
+        }
+        return 1f + bonus;
+    }
+
     public int getBaseAttack(Colony colony) {
-        if (!colony.hasUpgrade(GameUnlocks.STAT_ACID)) {
+        return resolveBaseAttack(colony != null ? colony.getDynasty() : null);
+    }
+
+    public static int resolveBaseAttack(Dynasty dynasty) {
+        if (dynasty == null || !dynasty.hasUpgrade(GameUnlocks.STAT_ACID)) {
             return 0;
         }
-        float mult = getAssimilatedDamageMultiplier(colony.getDynasty());
+        float mult = getAssimilatedDamageMultiplier(dynasty) * getCombatAttackUpgradeMultiplier(dynasty);
         return Math.round(GameNumbers.MILITARY_BASELINE_ATTACK * mult);
     }
 
     public int getBaseAttackSpeed(Colony colony) {
-        if (!colony.hasUpgrade(GameUnlocks.STAT_ACID)) {
+        return resolveBaseAttackSpeed(colony != null ? colony.getDynasty() : null);
+    }
+
+    public static int resolveBaseAttackSpeed(Dynasty dynasty) {
+        if (dynasty == null || !dynasty.hasUpgrade(GameUnlocks.STAT_ACID)) {
             return 0;
         }
-        float mult = getAssimilatedAttackSpeedMultiplier(colony.getDynasty());
-        return Math.round(GameNumbers.MILITARY_BASELINE_ATTACK_SPEED * mult);
+        int base = Math.round(GameNumbers.MILITARY_BASELINE_ATTACK_SPEED
+                * getAssimilatedAttackSpeedMultiplier(dynasty));
+        if (dynasty.hasUpgrade(GameUnlocks.STAT_ATTACK_SPEED_1)) {
+            base += GameNumbers.STAT_ATTACK_SPEED_1_FLAT;
+        }
+        return base;
     }
 
     public int getBaseDefense(Colony colony) {
-        return 0;
+        return resolveBaseDefense(colony != null ? colony.getDynasty() : null);
+    }
+
+    public static int resolveBaseDefense(Dynasty dynasty) {
+        if (dynasty == null) {
+            return 0;
+        }
+        int defense = 0;
+        if (dynasty.hasUpgrade(GameUnlocks.STAT_DEFENSE_1)) {
+            defense += GameNumbers.STAT_DEFENSE_FLAT_BONUS;
+        }
+        if (dynasty.hasUpgrade(GameUnlocks.STAT_DEFENSE_2)) {
+            defense += GameNumbers.STAT_DEFENSE_FLAT_BONUS;
+        }
+        return defense;
     }
     public int getBaseSpeed(Colony colony) { return colony.hasUpgrade(GameUnlocks.STAT_ACID) ? 1 : 0; }
     public int getBaseSize(Colony colony){ return colony.hasUpgrade(GameUnlocks.STAT_LONGEVITY) ? 1 : 0; }

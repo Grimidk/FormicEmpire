@@ -59,7 +59,7 @@ public class Ant extends Critter {
         this.setConsumption(colony.getBaseConsumption() * type.getConsumptionMult());
         this.setAttack((int)(colony.getBaseAttack() * type.getAttackMult()));
         this.setAttackSpeed((int)(colony.getBaseAttackSpeed() * type.getAttackSpeedMult()));
-        this.setDefense(GameNumbers.clampDefensePercent(type.getDefenseMult()));        
+        this.setDefense(GameNumbers.clampDefensePercent(type.getDefenseMult() + colony.getBaseDefense()));        
         this.setSpeed(colony.getBaseSpeed() * type.getSpeedMult());
         
         this.setDimension(WorldSpaces.OVERWORLD);
@@ -185,7 +185,7 @@ public class Ant extends Critter {
             this.setConsumption(colony.getBaseConsumption() * newType.getConsumptionMult());
             this.setAttack((int)(colony.getBaseAttack() * newType.getAttackMult()));
             this.setAttackSpeed((int)(colony.getBaseAttackSpeed() * newType.getAttackSpeedMult()));
-            this.setDefense(GameNumbers.clampDefensePercent(newType.getDefenseMult()));
+            this.setDefense(GameNumbers.clampDefensePercent(newType.getDefenseMult() + colony.getBaseDefense()));
             this.setSpeed(colony.getBaseSpeed() * newType.getSpeedMult());
         }
     }
@@ -206,7 +206,7 @@ public class Ant extends Critter {
         this.setConsumption(colony.getBaseConsumption() * type.getConsumptionMult());
         this.setAttack((int)(colony.getBaseAttack() * type.getAttackMult()));
         this.setAttackSpeed((int)(colony.getBaseAttackSpeed() * type.getAttackSpeedMult()));
-        this.setDefense(GameNumbers.clampDefensePercent(type.getDefenseMult()));        
+        this.setDefense(GameNumbers.clampDefensePercent(type.getDefenseMult() + colony.getBaseDefense()));        
         this.setSpeed(colony.getBaseSpeed() * type.getSpeedMult());
     }
 
