@@ -8,6 +8,7 @@ To Fix (By decreasing priority):
 		TODO: icons for 70 unlocks
 		TODO: tune AntSpeciesPalette hexes + icons for placeholder species (carpenter, weaver, floodplain, jet, army, ghost, silver, shining black, desert)
 		check translations and tags
+		make save selection buttons transparent, centered and unmoving
 		
 	Mid:
 		(none right now)

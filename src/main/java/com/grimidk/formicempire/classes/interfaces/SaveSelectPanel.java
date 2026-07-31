@@ -23,6 +23,8 @@ import java.util.Set;
 public class SaveSelectPanel extends JPanel {
     private static final Dimension CREATE_SAVE_FIELD_SIZE = new Dimension(460, 32);
     private static final Dimension CREATE_SAVE_PANEL_SIZE = new Dimension(640, 220);
+    private static final Dimension SLOT_LABEL_SIZE = new Dimension(AssetStyles.MENU_BUTTON_WIDTH, 28);
+    private static final int SLOT_ACTION_GAP = 8;
 
     private final MainFrame frame;
     private final SaveManager saveManager;
@@ -41,52 +43,69 @@ public class SaveSelectPanel extends JPanel {
         setOpaque(false);
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.insets = new Insets(8, 8, 8, 8);
         c.gridx = 0;
+        c.insets = new Insets(8, 8, 8, 8);
         c.anchor = GridBagConstraints.CENTER;
+        c.fill = GridBagConstraints.NONE;
 
         c.gridy = 0;
-        c.gridwidth = 3;
-        c.fill = GridBagConstraints.NONE;
         add(menuHeader, c);
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.gridwidth = 1;
 
+        int row = 1;
         for (int i = 0; i < 3; i++) {
             int slotId = i + 1;
             slotLabels[i] = new JLabel(LanguageStrings.get(LanguageStrings.SAVE_EMPTY_SLOT));
+            slotLabels[i].setFont(AssetStyles.FONT_NORMAL);
+            slotLabels[i].setForeground(AssetStyles.FONT_COLOR);
+            slotLabels[i].setHorizontalAlignment(SwingConstants.CENTER);
+            slotLabels[i].setPreferredSize(SLOT_LABEL_SIZE);
+            slotLabels[i].setMinimumSize(SLOT_LABEL_SIZE);
+            slotLabels[i].setMaximumSize(SLOT_LABEL_SIZE);
+
             slotButtons[i] = new JButton(LanguageStrings.get(LanguageStrings.UI_CREATE));
             deleteButtons[i] = new JButton(LanguageStrings.get(LanguageStrings.UI_DELETE));
-            AssetStyles.styleButton(slotButtons[i]);
-            AssetStyles.styleButton(deleteButtons[i]);
-            deleteButtons[i].setVisible(false);
-            
+            AssetStyles.styleMenuButton(slotButtons[i]);
+            AssetStyles.styleMenuButton(deleteButtons[i]);
+            sizePairedMenuButton(slotButtons[i]);
+            sizePairedMenuButton(deleteButtons[i]);
+            deleteButtons[i].setEnabled(false);
+
             setupNavigation(slotButtons[i]);
             setupNavigation(deleteButtons[i]);
 
             int idx = i;
             slotButtons[i].addActionListener(e -> onCreateOrLoad(slotId, idx));
             deleteButtons[i].addActionListener(e -> onDelete(slotId, idx));
-            c.gridx = 0;
-            c.gridy = i + 1;
+
+            c.gridy = row++;
+            c.insets = new Insets(i == 0 ? 8 : 16, 8, 4, 8);
             add(slotLabels[i], c);
-            c.gridx = 1;
-            add(slotButtons[i], c);
-            c.gridx = 2;
-            add(deleteButtons[i], c);
+
+            JPanel actions = new JPanel(new GridLayout(1, 2, SLOT_ACTION_GAP, 0));
+            actions.setOpaque(false);
+            Dimension actionsSize = new Dimension(
+                    AssetStyles.MENU_BUTTON_WIDTH,
+                    slotButtons[i].getPreferredSize().height);
+            actions.setPreferredSize(actionsSize);
+            actions.setMinimumSize(actionsSize);
+            actions.setMaximumSize(actionsSize);
+            actions.add(slotButtons[i]);
+            actions.add(deleteButtons[i]);
+
+            c.gridy = row++;
+            c.insets = new Insets(4, 8, 8, 8);
+            add(actions, c);
         }
 
         backButton = new JButton(LanguageStrings.get(LanguageStrings.UI_BACK));
-        AssetStyles.styleButton(backButton);
+        AssetStyles.styleMenuButton(backButton);
         setupNavigation(backButton);
         backButton.addActionListener(e -> {
             frame.showCard(MainFrame.CARD_INIT);
         });
 
-        c.gridx = 0;
-        c.gridy = 5;
-        c.gridwidth = 2;
+        c.gridy = row;
+        c.insets = new Insets(16, 8, 8, 8);
         add(backButton, c);
 
         addAncestorListener(new AncestorListener() {
@@ -107,6 +126,15 @@ public class SaveSelectPanel extends JPanel {
             public void ancestorMoved(AncestorEvent event) {}
         });
     }
+
+    private static void sizePairedMenuButton(JButton button) {
+        Dimension full = button.getPreferredSize();
+        int width = (AssetStyles.MENU_BUTTON_WIDTH - SLOT_ACTION_GAP) / 2;
+        Dimension size = new Dimension(width, full.height);
+        button.setPreferredSize(size);
+        button.setMinimumSize(size);
+        button.setMaximumSize(size);
+    }
     
     public void refreshTranslations() {
         applySlotLabels();
@@ -115,6 +143,10 @@ public class SaveSelectPanel extends JPanel {
 
     public void refreshTheme() {
         AssetStyles.applyThemeToContainer(this);
+        for (int i = 0; i < 3; i++) {
+            sizePairedMenuButton(slotButtons[i]);
+            sizePairedMenuButton(deleteButtons[i]);
+        }
     }
     
     private void setupNavigation(JButton button) {
@@ -153,7 +185,7 @@ public class SaveSelectPanel extends JPanel {
                 slotLabels[i].setText(LanguageStrings.get(LanguageStrings.SAVE_EMPTY_SLOT));
                 slotButtons[i].setText(LanguageStrings.get(LanguageStrings.UI_CREATE));
                 deleteButtons[i].setText(LanguageStrings.get(LanguageStrings.UI_DELETE));
-                deleteButtons[i].setVisible(false);
+                deleteButtons[i].setEnabled(false);
             } else {
                 int totalDays = (s.getDay() - 1) + ((s.getMonth() - 1) * 30) + (s.getYear() * 12 * 30);
                 String displayName = LanguageStrings.formatSaveSlotDisplayName(
@@ -161,7 +193,7 @@ public class SaveSelectPanel extends JPanel {
                 slotLabels[i].setText(LanguageStrings.format(LanguageStrings.SAVE_DAYS_FORMAT, displayName, totalDays));
                 slotButtons[i].setText(LanguageStrings.get(LanguageStrings.UI_LOAD));
                 deleteButtons[i].setText(LanguageStrings.get(LanguageStrings.UI_DELETE));
-                deleteButtons[i].setVisible(true);
+                deleteButtons[i].setEnabled(true);
             }
         }
     }
