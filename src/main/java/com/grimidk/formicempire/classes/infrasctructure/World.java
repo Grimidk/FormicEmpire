@@ -484,6 +484,8 @@ public class World {
 
         linkNeighbors(hexMap);
         applyCoastalLandRings();
+        convertEnclosedOceansToLakes();
+        convertLakesTouchingOceanToOcean();
         classifyLandmasses();
 
         List<Hex> eligibleNpcHexes = new ArrayList<>();
@@ -596,6 +598,71 @@ public class World {
         }
         for (Hex neighbor : hex.getAdjacentNeighbors()) {
             if (neighbor != null && mainland.contains(neighbor)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void convertEnclosedOceansToLakes() {
+        Set<Hex> openOcean = new HashSet<>();
+        ArrayDeque<Hex> queue = new ArrayDeque<>();
+        for (Hex hex : this.hexes) {
+            if (hex.getBiome() != GameConstants.BIOME_OCEAN) {
+                continue;
+            }
+            if (!isMapEdgeHex(hex)) {
+                continue;
+            }
+            if (openOcean.add(hex)) {
+                queue.add(hex);
+            }
+        }
+        while (!queue.isEmpty()) {
+            Hex current = queue.poll();
+            for (Hex neighbor : current.getAdjacentNeighbors()) {
+                if (neighbor == null || neighbor.getBiome() != GameConstants.BIOME_OCEAN) {
+                    continue;
+                }
+                if (openOcean.add(neighbor)) {
+                    queue.add(neighbor);
+                }
+            }
+        }
+        for (Hex hex : this.hexes) {
+            if (hex.getBiome() == GameConstants.BIOME_OCEAN && !openOcean.contains(hex)) {
+                hex.setBiome(GameConstants.BIOME_LAKE);
+                hex.setLocalWeather(getRandomWeather(GameConstants.BIOME_LAKE));
+            }
+        }
+    }
+
+    public void convertLakesTouchingOceanToOcean() {
+        ArrayDeque<Hex> queue = new ArrayDeque<>();
+        for (Hex hex : this.hexes) {
+            if (hex.getBiome() == GameConstants.BIOME_OCEAN) {
+                queue.add(hex);
+            }
+        }
+        while (!queue.isEmpty()) {
+            Hex current = queue.poll();
+            for (Hex neighbor : current.getAdjacentNeighbors()) {
+                if (neighbor == null || neighbor.getBiome() != GameConstants.BIOME_LAKE) {
+                    continue;
+                }
+                neighbor.setBiome(GameConstants.BIOME_OCEAN);
+                neighbor.setLocalWeather(getRandomWeather(GameConstants.BIOME_OCEAN));
+                queue.add(neighbor);
+            }
+        }
+    }
+
+    private static boolean isMapEdgeHex(Hex hex) {
+        if (hex == null) {
+            return false;
+        }
+        for (Hex neighbor : hex.getAdjacentNeighbors()) {
+            if (neighbor == null) {
                 return true;
             }
         }

@@ -60,9 +60,12 @@ public class AssetStyles {
     public static final String META_AUDIT = "/texts/audit.txt";
 
     public static final String ICON_BUTTON_CLIENT_KEY = "formicempire.iconButton";
+    public static final String MENU_BUTTON_CLIENT_KEY = "formicempire.menuButton";
 
     public static final int MIN_CONTROL_HIT_SIZE = 20;
     public static final int MIN_SPINNER_HEIGHT = MIN_CONTROL_HIT_SIZE * 2;
+    public static final int MENU_BUTTON_WIDTH = 400;
+    public static final int MENU_BUTTON_ALPHA = 180;
 
     // --- Palette ---
     public static final Color COLOR_ABSOLUTE_BLACK = UiPalette.COLOR_ABSOLUTE_BLACK;
@@ -246,6 +249,10 @@ public class AssetStyles {
 
     public static void styleIconButton(AbstractButton button) {
         UiButtonStyles.styleIcon(button);
+    }
+
+    public static void styleMenuButton(AbstractButton button) {
+        UiButtonStyles.styleMenu(button);
     }
 
     public static void styleSectionTabButton(AbstractButton button) {

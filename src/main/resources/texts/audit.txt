@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 71% (244/344 checked)
+Completion: 70% (244/347 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -14,6 +14,7 @@ Legend: [ ] = not tested yet   [x] = tested (reset to [ ] if the mechanic change
 [X] Help — encyclopedia (all tabs; see section 18)
 [X] Roadmap — development roadmap text dialog
 [X] Credits — credits text dialog
+[ ] Discord — opens Discord invite in browser
 [X] Mechanics Audit — this file (only when enabled in Settings > General)
 [X] Settings — full settings panel (see section 2)
 [X] Quit — exit app (respects confirm-on-quit when a game session is active)
@@ -138,6 +139,7 @@ Dynasty submenu (always available in session):
 [ ] Wars (F)
 
 [X] Settings
+[ ] Help — encyclopedia (in-game dialog)
 [X] Tutorial (in-game)
 [X] Mechanics Audit (when enabled in Settings > General)
 [X] Back to main menu
@@ -483,8 +485,9 @@ World:
 [X] Day / month / year / hour ticks
 [X] Weather changes
 [X] Biome differences on hexes
-[ ] World gen — continent core landmass + 5 coastal rings (80/40/20/10/5% land; rings 1–4 mainland-connected; ring 5 can form islands) + outer pure ocean
+[ ] World gen — continent core landmass + 5 coastal rings (80/40/20/10/5% land; rings 1–4 mainland-connected; ring 5 can form islands) + outer pure ocean; enclosed ocean pockets become lakes; lakes touching ocean become ocean
 [ ] Continents vs islands counted; colonies never spawn or spread onto islands
+[ ] Map biome hex colors come from Biome mapColorHex (editable in GameConstants)
 [X] Resource sources on map — hover tooltip shows type, size tier, remaining amount
 [X] Nuptial flight colony founding on new hexes
 [ ] Spreading onto dead/defeated hex inherits species genomes and completed assimilations

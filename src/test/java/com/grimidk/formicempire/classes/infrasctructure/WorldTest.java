@@ -229,4 +229,106 @@ public class WorldTest {
         assertFalse(core.isIsland());
         assertTrue(island.isIsland());
     }
+
+    @Test
+    void convertEnclosedOceansToLakesLeavesOpenOcean() {
+        World world = new World();
+
+        Hex inlandOcean = new Hex();
+        inlandOcean.setQ(0);
+        inlandOcean.setR(0);
+        inlandOcean.setBiome(GameConstants.BIOME_OCEAN);
+
+        Hex[] ring = new Hex[6];
+        for (int i = 0; i < 6; i++) {
+            Hex land = new Hex();
+            land.setQ(i + 1);
+            land.setR(0);
+            land.setBiome(GameConstants.BIOME_PLAINS);
+            ring[i] = land;
+        }
+        inlandOcean.setNorth(ring[0]);
+        inlandOcean.setNorthEast(ring[1]);
+        inlandOcean.setSouthEast(ring[2]);
+        inlandOcean.setSouth(ring[3]);
+        inlandOcean.setSouthWest(ring[4]);
+        inlandOcean.setNorthWest(ring[5]);
+        ring[0].setSouth(inlandOcean);
+        ring[1].setSouthWest(inlandOcean);
+        ring[2].setNorthWest(inlandOcean);
+        ring[3].setNorth(inlandOcean);
+        ring[4].setNorthEast(inlandOcean);
+        ring[5].setSouthEast(inlandOcean);
+
+        Hex openOcean = new Hex();
+        openOcean.setQ(10);
+        openOcean.setR(0);
+        openOcean.setBiome(GameConstants.BIOME_OCEAN);
+
+        Hex channelOcean = new Hex();
+        channelOcean.setQ(11);
+        channelOcean.setR(0);
+        channelOcean.setBiome(GameConstants.BIOME_OCEAN);
+        openOcean.setSouthEast(channelOcean);
+        channelOcean.setNorthWest(openOcean);
+
+        ArrayList<Hex> hexes = new ArrayList<>();
+        hexes.add(inlandOcean);
+        for (Hex land : ring) {
+            hexes.add(land);
+        }
+        hexes.add(openOcean);
+        hexes.add(channelOcean);
+        world.setHexes(hexes);
+
+        world.convertEnclosedOceansToLakes();
+
+        assertEquals(GameConstants.BIOME_LAKE, inlandOcean.getBiome());
+        assertEquals(GameConstants.BIOME_OCEAN, openOcean.getBiome());
+        assertEquals(GameConstants.BIOME_OCEAN, channelOcean.getBiome());
+    }
+
+    @Test
+    void convertLakesTouchingOceanToOceanCascadesThroughConnectedLakes() {
+        World world = new World();
+
+        Hex ocean = new Hex();
+        ocean.setQ(0);
+        ocean.setR(0);
+        ocean.setBiome(GameConstants.BIOME_OCEAN);
+
+        Hex lakeTouching = new Hex();
+        lakeTouching.setQ(1);
+        lakeTouching.setR(0);
+        lakeTouching.setBiome(GameConstants.BIOME_LAKE);
+
+        Hex lakeBehind = new Hex();
+        lakeBehind.setQ(2);
+        lakeBehind.setR(0);
+        lakeBehind.setBiome(GameConstants.BIOME_LAKE);
+
+        Hex inlandLake = new Hex();
+        inlandLake.setQ(5);
+        inlandLake.setR(0);
+        inlandLake.setBiome(GameConstants.BIOME_LAKE);
+
+        ocean.setSouthEast(lakeTouching);
+        lakeTouching.setNorthWest(ocean);
+        lakeTouching.setSouthEast(lakeBehind);
+        lakeBehind.setNorthWest(lakeTouching);
+
+        ArrayList<Hex> hexes = new ArrayList<>();
+        hexes.add(ocean);
+        hexes.add(lakeTouching);
+        hexes.add(lakeBehind);
+        hexes.add(inlandLake);
+        world.setHexes(hexes);
+
+        world.convertLakesTouchingOceanToOcean();
+
+        assertEquals(GameConstants.BIOME_OCEAN, ocean.getBiome());
+        assertEquals(GameConstants.BIOME_OCEAN, lakeTouching.getBiome());
+        assertEquals(GameConstants.BIOME_OCEAN, lakeBehind.getBiome());
+        assertEquals(GameConstants.BIOME_LAKE, inlandLake.getBiome());
+    }
 }

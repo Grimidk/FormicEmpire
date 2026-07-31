@@ -7,10 +7,11 @@ To Fix (By decreasing priority):
 	High:
 		TODO: icons for 70 unlocks
 		TODO: tune AntSpeciesPalette hexes + icons for placeholder species (carpenter, weaver, floodplain, jet, army, ghost, silver, shining black, desert)
-		check translations
+		check translations and tags
 		
 	Mid:
 		(none right now)
+
 	Low:
 		(none right now)
 
@@ -24,9 +25,8 @@ To Fix (By decreasing priority):
 To Feature (to be done in order):
 Needed for launch (v1.0) (Launch Version):
 	Priority:
-		minerals with uprades to find it and increase miner efficency, also mushroom detection 
+		minerals with uprades to find it and increase miner efficency, also mushroom detection, more buildings lvl 4 a 5 using minerals
 		research tree and building tree (orchard) (after icons) with available, purchasable, locked and list trigger based upgrades 
-		more buildings lvl 4 a 5 using minerals
 		music and sounds and settings for them and player panel (to include in core engine)
 		critter sprite composite:
 			Ant walking cycle on viewport, sprites needed for leg 4 frame cycle
@@ -47,7 +47,6 @@ Needed for launch (v1.0) (Launch Version):
 		(Wood burrowing and mounds (Carpenter ants), Silk weaving (Weaver ants), Rafting (Flood plains ants), Jumping (Jet ants), Swarming (Army ants), Stealth (Ghost ants), Heat resistance (Saharan silver ants), reinforced Hive building (Shining black ants), Location sensing (Desert ants))
 		Silk weaving + Hive building = Web building (Passive proteing capture)
 		uncolonizable terrain with boss enemies  (non ant assimilation reward, unique bosses)
-		proper air vs air warfare
 		random events (meteor, earthquake, tornado, tsunami, hunts (for later) plus special weathers (rare events))
 		more stats (kills, historic productions, graphs?)
 		non-ant assimilation ( Winged workers (Bees), Spiked larvae, Chemical throwing (Bombardier beetle), Chirping (Grass hopper), Diving, Mineralized exoskeletons and dense armor (diabolical ironclad beetles), Rock mining, Bioluminescence (Fireflies), Static electricity generation, Pollination (Flies) )
@@ -85,6 +84,7 @@ Post launch (v1.1) (Improvements Update):
 	more langs 
 	link to IRL documentation for ant facts  and bug facts
 	achievements (to include in core)
+	map loading
 
 Post launch (v1.2) (Civilization Update):
 	(Secret for now)

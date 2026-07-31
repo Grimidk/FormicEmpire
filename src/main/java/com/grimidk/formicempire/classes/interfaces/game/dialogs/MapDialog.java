@@ -23,7 +23,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -982,54 +981,13 @@ public class MapDialog extends ZeroDialog {
                 return biomeColorCache.get(biome.getId());
             }
 
-            if (biome.getIcon() == null) {
+            Color mapColor = biome.getMapColor();
+            if (mapColor == null) {
                 return AssetStyles.BACKGROUND_COLOR;
             }
 
-            Color avgColor = calculateAverageColor(biome.getIcon());
-            avgColor = AssetStyles.lightenTowardBackground(avgColor, 0.5f);
-
-            biomeColorCache.put(biome.getId(), avgColor);
-            return avgColor;
-        }
-
-        private Color calculateAverageColor(ImageIcon icon) {
-            try {
-                Image img = icon.getImage();
-                BufferedImage bi = new BufferedImage(
-                    img.getWidth(null),
-                    img.getHeight(null),
-                    BufferedImage.TYPE_INT_ARGB
-                );
-
-                Graphics g = bi.createGraphics();
-                g.drawImage(img, 0, 0, null);
-                g.dispose();
-
-                long sumR = 0, sumG = 0, sumB = 0;
-                long count = 0;
-
-                for (int x = 0; x < bi.getWidth(); x++) {
-                    for (int y = 0; y < bi.getHeight(); y++) {
-                        int pixel = bi.getRGB(x, y);
-                        int alpha = (pixel >> 24) & 0xff;
-
-                        if (alpha < 20) continue;
-
-                        if ((x % 3 == 0) && (y % 3 == 0)) {
-                            sumR += (pixel >> 16) & 0xff;
-                            sumG += (pixel >> 8) & 0xff;
-                            sumB += (pixel) & 0xff;
-                            count++;
-                        }
-                    }
-                }
-
-                return AssetStyles.colorFromAveragedRgb(sumR, sumG, sumB, count);
-
-            } catch (Exception e) {
-                return AssetStyles.BACKGROUND_COLOR;
-            }
+            biomeColorCache.put(biome.getId(), mapColor);
+            return mapColor;
         }
     }
 }

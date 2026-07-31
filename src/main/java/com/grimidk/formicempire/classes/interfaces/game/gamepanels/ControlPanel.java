@@ -35,6 +35,7 @@ public class ControlPanel extends ZeroGamePanel {
     private final Runnable showDiplomacyDialogCallback;
     private final Runnable showWarDialogCallback;
     private final Runnable showSettingsDialogCallback;
+    private final Runnable showHelpDialogCallback;
     private final BooleanSupplier dynastyDialogOpenCheck;
 
     // --- UI Components ---
@@ -63,6 +64,7 @@ public class ControlPanel extends ZeroGamePanel {
     private JMenuItem manageDiplomacy;
     private JMenuItem manageWars;
     private JMenuItem openSettings;
+    private JMenuItem showHelp;
     private JMenuItem showTutorial;
     private JMenuItem showAudit;
     private JMenuItem quitToMenu;
@@ -88,6 +90,7 @@ public class ControlPanel extends ZeroGamePanel {
                         Runnable showDiplomacyDialogCallback,
                         Runnable showWarDialogCallback,
                         Runnable showSettingsDialogCallback,
+                        Runnable showHelpDialogCallback,
                         BooleanSupplier dynastyDialogOpenCheck) {
         super(new FlowLayout(FlowLayout.RIGHT));
         
@@ -108,6 +111,7 @@ public class ControlPanel extends ZeroGamePanel {
         this.showDiplomacyDialogCallback = showDiplomacyDialogCallback;
         this.showWarDialogCallback = showWarDialogCallback;
         this.showSettingsDialogCallback = showSettingsDialogCallback;
+        this.showHelpDialogCallback = showHelpDialogCallback;
         this.dynastyDialogOpenCheck = dynastyDialogOpenCheck;
 
         initComponents();
@@ -154,6 +158,7 @@ public class ControlPanel extends ZeroGamePanel {
         manageDiplomacy = new JMenuItem();
         manageWars = new JMenuItem();
         openSettings = new JMenuItem();
+        showHelp = new JMenuItem();
         showTutorial = new JMenuItem();
         showAudit = new JMenuItem();
         quitToMenu = new JMenuItem();
@@ -195,6 +200,7 @@ public class ControlPanel extends ZeroGamePanel {
         manageDiplomacy.setText(LanguageStrings.get(LanguageStrings.MENU_DIPLOMACY));
         manageWars.setText(LanguageStrings.get(LanguageStrings.MENU_WARS));
         openSettings.setText(LanguageStrings.get(LanguageStrings.UI_SETTINGS));
+        showHelp.setText(LanguageStrings.get(LanguageStrings.UI_HELP));
         showTutorial.setText(LanguageStrings.get(LanguageStrings.UI_TUTORIAL));
         showAudit.setText(LanguageStrings.get(LanguageStrings.UI_AUDIT));
         quitToMenu.setText(LanguageStrings.get(LanguageStrings.UI_BACK_TO_MENU));
@@ -333,6 +339,8 @@ public class ControlPanel extends ZeroGamePanel {
         openSettings.addActionListener(e -> {
             showSettingsDialogCallback.run();
         });
+
+        showHelp.addActionListener(e -> showHelpDialogCallback.run());
         
         showTutorial.addActionListener(e -> HelpPanel.showTutorialDialog(frame));
 
@@ -364,6 +372,7 @@ public class ControlPanel extends ZeroGamePanel {
         gameMenu.add(dynastyMenu);
 
         gameMenu.add(openSettings);
+        gameMenu.add(showHelp);
         gameMenu.add(showTutorial);
         gameMenu.add(showAudit);
         gameMenu.add(AssetStyles.createInternalSeparator());

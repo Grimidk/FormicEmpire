@@ -350,40 +350,40 @@ public final class GameConstants {
 
     // --- Biomes ---
     public static final Biome BIOME_PLAINS = new Biome(1, LanguageStrings.BIOME_PLAINS, 25, 2, 1f, 1f, 0f, 1,
-        loadIcon("icons/biomes/Plains.png"), null);
+        "#A8C76A", loadIcon("icons/biomes/Plains.png"), null);
     static { biomes.add(BIOME_PLAINS); }
     public static final Biome BIOME_FOREST = new Biome(2, LanguageStrings.BIOME_FOREST, 22, 3, 2f, 2f, 0.1f, 1,
-        loadIcon("icons/biomes/Forest.png"), null);
+        "#3D7A3D", loadIcon("icons/biomes/Forest.png"), null);
     static { biomes.add(BIOME_FOREST); }
     public static final Biome BIOME_JUNGLE = new Biome(3, LanguageStrings.BIOME_JUNGLE, 30, 4, 2.5f, 2.5f, 0.2f, 3,
-        loadIcon("icons/biomes/Jungle.png"), null);
+        "#1E6B3C", loadIcon("icons/biomes/Jungle.png"), null);
     static { biomes.add(BIOME_JUNGLE); }
     public static final Biome BIOME_SWAMP = new Biome(4, LanguageStrings.BIOME_SWAMP, 26, 5, 1.5f, 1.5f, 0f, 2,
-        loadIcon("icons/biomes/Swamp.png"), null);
+        "#5A6B3A", loadIcon("icons/biomes/Swamp.png"), null);
     static { biomes.add(BIOME_SWAMP); }
     public static final Biome BIOME_URBAN = new Biome(5, LanguageStrings.BIOME_URBAN, 28, 1, 0.5f, 0.5f, 0.5f, 2,
-        loadIcon("icons/biomes/Urban.png"), null);
+        "#8A8A8A", loadIcon("icons/biomes/Urban.png"), null);
     static { biomes.add(BIOME_URBAN); }
     public static final Biome BIOME_TUNDRA = new Biome(6, LanguageStrings.BIOME_TUNDRA, 5, 2, 0.2f, 0.2f, 0.3f, 4,
-        loadIcon("icons/biomes/Tundra.png"), null);
+        "#D8E0E8", loadIcon("icons/biomes/Tundra.png"), null);
     static { biomes.add(BIOME_TUNDRA); }
     public static final Biome BIOME_TAIGA = new Biome(7, LanguageStrings.BIOME_TAIGA, 12, 1, 0.4f, 0.3f, 0.5f, 3,
-        loadIcon("icons/biomes/Taiga.png"), null);
+        "#4A6B5A", loadIcon("icons/biomes/Taiga.png"), null);
     static { biomes.add(BIOME_TAIGA); }
     public static final Biome BIOME_DESERT = new Biome(8, LanguageStrings.BIOME_DESERT, 45, 0, 0.05f, 0.02f, 1f, 4,
-        loadIcon("icons/biomes/Dessert.png"), null);
+        "#E0C070", loadIcon("icons/biomes/Dessert.png"), null);
     static { biomes.add(BIOME_DESERT); }
     public static final Biome BIOME_MOUNTAIN = new Biome(9, LanguageStrings.BIOME_MOUNTAIN, 12, 1, 0.1f, 0.3f, 2f, 3,
-        loadIcon("icons/biomes/Mountain.png"), null);
+        "#8B7D6B", loadIcon("icons/biomes/Mountain.png"), null);
     static { biomes.add(BIOME_MOUNTAIN); }
     public static final Biome BIOME_VOLCANIC = new Biome(10, LanguageStrings.BIOME_VOLCANIC, 60, 0, 0.01f, 0.01f, 5f, 5,
-        loadIcon("icons/biomes/Volcanic.png"), null);
+        "#5A3030", loadIcon("icons/biomes/Volcanic.png"), null);
     static { biomes.add(BIOME_VOLCANIC); }
     public static final Biome BIOME_LAKE = new Biome(11, LanguageStrings.BIOME_LAKE, 25, 5, 0.5f, 0.5f, 0f, 1,
-        loadIcon("icons/biomes/Lake.png"), null);
+        "#4A90A8", loadIcon("icons/biomes/Lake.png"), null);
     static { biomes.add(BIOME_LAKE); }
     public static final Biome BIOME_OCEAN = new Biome(12, LanguageStrings.BIOME_OCEAN, 20, 5, 0.2f, 0.2f, 0f, 2,
-        loadIcon("icons/biomes/Ocean.png"), null);
+        "#1E4A6E", loadIcon("icons/biomes/Ocean.png"), null);
     static { biomes.add(BIOME_OCEAN); }
 
     // --- Resources ---
@@ -815,7 +815,7 @@ public final class GameConstants {
     static { antRoles.add(ROLE_RANCHER); }
     public static final AntRole ROLE_GRAVER = new AntRole(7, TYPE_WORKER, LanguageStrings.ROLE_GRAVER, loadIcon("icons/roles/Graver.png"));
     static { antRoles.add(ROLE_GRAVER); }
-    public static final AntRole ROLE_MINER = new AntRole(8, TYPE_WORKER, LanguageStrings.ROLE_MINER, loadIcon("icons/roles/Miner.png"));
+    public static final AntRole ROLE_MINER = new AntRole(8, TYPE_SOLDIER, LanguageStrings.ROLE_MINER, loadIcon("icons/roles/Miner.png"));
     static { antRoles.add(ROLE_MINER); }
     public static final AntRole ROLE_COURIER = new AntRole(9, TYPE_WORKER, LanguageStrings.ROLE_COURIER, loadIcon("icons/roles/Courier.png"));
     static { antRoles.add(ROLE_COURIER); }

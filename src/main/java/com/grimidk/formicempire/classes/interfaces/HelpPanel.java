@@ -29,6 +29,7 @@ import com.grimidk.formicempire.classes.constants.world.Season;
 import com.grimidk.formicempire.classes.constants.world.Temperature;
 import com.grimidk.formicempire.classes.constants.world.TimeOfDay;
 import com.grimidk.formicempire.classes.constants.world.Weather;
+import com.grimidk.formicempire.classes.interfaces.game.dialogs.ZeroDialog;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiDialogUtils;
 import com.grimidk.formicempire.classes.infrasctructure.assets.ClasspathTextFiles;
@@ -55,12 +56,18 @@ import java.util.stream.Collectors;
 
 public class HelpPanel extends JPanel {
     private final MainFrame frame;
+    private final boolean inDialog;
     private final JTabbedPane mainTabs;
     private final JButton backButton;
     private boolean tabsContentDirty;
 
     public HelpPanel(MainFrame frame) {
+        this(frame, false);
+    }
+
+    public HelpPanel(MainFrame frame, boolean isInDialog) {
         this.frame = frame;
+        this.inDialog = isInDialog;
         setLayout(new BorderLayout());
         setBackground(AssetStyles.BACKGROUND_COLOR);
 
@@ -78,7 +85,16 @@ public class HelpPanel extends JPanel {
         southPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
 
         AssetStyles.styleButton(backButton);
-        backButton.addActionListener(e -> this.frame.showCard(MainFrame.CARD_INIT));
+        backButton.addActionListener(e -> {
+            if (inDialog) {
+                Window window = SwingUtilities.getWindowAncestor(this);
+                if (window instanceof JDialog) {
+                    window.dispose();
+                }
+            } else {
+                this.frame.showCard(MainFrame.CARD_INIT);
+            }
+        });
         
         setupButtonNavigation(backButton);
         
@@ -1803,5 +1819,31 @@ public class HelpPanel extends JPanel {
 
         dialog.add(buttonPanel, BorderLayout.SOUTH);
         UiDialogUtils.show(dialog, parent);
+    }
+
+    public static class HelpDialog extends ZeroDialog {
+        private final HelpPanel helpPanel;
+
+        public HelpDialog(MainFrame frame) {
+            super(frame, LanguageStrings.UI_HELP, AssetStyles.DEFAULT_DIALOG_SIZE);
+
+            setLayout(new BorderLayout());
+
+            helpPanel = new HelpPanel(frame, true);
+            helpPanel.ensureTabsContentCurrent();
+
+            add(helpPanel, BorderLayout.CENTER);
+        }
+
+        @Override
+        protected void refreshDialog() {
+            helpPanel.refreshTranslations();
+        }
+
+        @Override
+        public void refreshTheme() {
+            super.refreshTheme();
+            helpPanel.refreshTheme();
+        }
     }
 }

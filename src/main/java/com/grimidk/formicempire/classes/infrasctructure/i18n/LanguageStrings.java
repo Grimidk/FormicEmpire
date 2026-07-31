@@ -512,6 +512,7 @@ public final class LanguageStrings {
     public static final String ROADMAP_TITLE = "ROADMAP_TITLE";
     public static final String ROADMAP_UNAVAILABLE = "ROADMAP_UNAVAILABLE";
     public static final String UI_CREDITS = "UI_CREDITS";
+    public static final String UI_DISCORD = "UI_DISCORD";
     public static final String CREDITS_TITLE = "CREDITS_TITLE";
     public static final String CREDITS_UNAVAILABLE = "CREDITS_UNAVAILABLE";
     public static final String UI_AUDIT = "UI_AUDIT";

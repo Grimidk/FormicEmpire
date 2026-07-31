@@ -69,6 +69,7 @@ public class GamePanel extends ZeroGamePanel {
     private WarBattleDialog warBattleDialog;
     private ConvoyDialog convoyDialog;
     private SettingsPanel.SettingsDialog settingsDialog;
+    private HelpPanel.HelpDialog helpDialog;
 
     private AlertManager alertManager;
     private TriggerManager triggerManager; 
@@ -460,6 +461,7 @@ public class GamePanel extends ZeroGamePanel {
         if (warBattleDialog != null && warBattleDialog.isShowing()) warBattleDialog.refreshTranslations();
         if (convoyDialog != null && convoyDialog.isShowing()) convoyDialog.refreshTranslations();
         if (settingsDialog != null && settingsDialog.isShowing()) settingsDialog.refreshDialog();
+        if (helpDialog != null && helpDialog.isShowing()) helpDialog.refreshDialog();
     }
 
     @Override
@@ -484,6 +486,7 @@ public class GamePanel extends ZeroGamePanel {
         if (warBattleDialog != null && warBattleDialog.isShowing()) warBattleDialog.refreshTheme();
         if (convoyDialog != null && convoyDialog.isShowing()) convoyDialog.refreshTheme();
         if (settingsDialog != null && settingsDialog.isShowing()) settingsDialog.refreshTheme();
+        if (helpDialog != null && helpDialog.isShowing()) helpDialog.refreshTheme();
     }
     
     private void initControlPanelCallbacks() {
@@ -501,6 +504,7 @@ public class GamePanel extends ZeroGamePanel {
         Runnable showDiplomacyDialogCallback = this::showDiplomacyDialog;
         Runnable showWarDialogCallback = this::showWarDialog;
         Runnable showSettingsDialogCallback = this::showSettingsDialog;
+        Runnable showHelpDialogCallback = this::showHelpDialog;
         ControlPanel.RoleManagementCallback showRoleManagementDialogCallback = this::showRoleManagementDialog;
         
         Runnable toggleViewCallback = () -> {
@@ -548,6 +552,7 @@ public class GamePanel extends ZeroGamePanel {
             showDiplomacyDialogCallback,
             showWarDialogCallback,
             showSettingsDialogCallback,
+            showHelpDialogCallback,
             () -> dynastyDialog != null && dynastyDialog.isShowing());
     }
 
@@ -1064,6 +1069,20 @@ public class GamePanel extends ZeroGamePanel {
         settingsDialog.showDialog();
     }
 
+    private void showHelpDialog() {
+        if (helpDialog != null && helpDialog.isShowing()) {
+            helpDialog.dispose();
+            return;
+        }
+
+        if (helpDialog != null) {
+            helpDialog.dispose();
+        }
+
+        helpDialog = new HelpPanel.HelpDialog(frame);
+        helpDialog.showDialog();
+    }
+
     private void handleGoToColony(Colony target) {
         Engine engine = frame.getEngine();
         if (engine == null || engine.getWorld() == null) return;
@@ -1168,6 +1187,11 @@ public class GamePanel extends ZeroGamePanel {
             settingsDialog = null;
             closed = true;
         }
+        if (helpDialog != null && helpDialog.isShowing()) {
+            helpDialog.dispose();
+            helpDialog = null;
+            closed = true;
+        }
         return closed;
     }
 
@@ -1182,6 +1206,7 @@ public class GamePanel extends ZeroGamePanel {
         if (warBattleDialog != null) { warBattleDialog.dispose(); warBattleDialog = null; }
         if (convoyDialog != null) { convoyDialog.dispose(); convoyDialog = null; }
         if (settingsDialog != null) { settingsDialog.dispose(); settingsDialog = null; }
+        if (helpDialog != null) { helpDialog.dispose(); helpDialog = null; }
     }
 
     public void endSession() {
