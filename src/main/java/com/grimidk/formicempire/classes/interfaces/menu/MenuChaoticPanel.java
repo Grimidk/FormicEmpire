@@ -224,24 +224,34 @@ public class MenuChaoticPanel extends JPanel {
         RouteViewVisuals.paintConvoyResources(g2d, world.getConvoyResources(), 0, 0, fieldW, fieldH, scrollPixels,
                 travelingRight, this);
         Rectangle field = new Rectangle(0, 0, fieldW, fieldH);
-        drawConvoyFormation(g2d, world.getAnts(), field, travelingRight);
+        drawConvoyFormation(g2d, world.getAnts(), field, travelingRight, world.getConvoyBackground());
     }
 
     private void drawWanderingAnt(Graphics2D g2d, MenuChaoticWorld.ShowcaseAnt ant, int fieldW, int fieldH) {
         float anim = quantizedAnimSeconds();
+        boolean moving = Math.abs(ant.vx) > 0.001f || Math.abs(ant.vy) > 0.001f;
+        int legFrame = RouteViewVisuals.resolveLegFrame(ant.type, false, moving, ant.wobblePhase, anim, ant.motionRate);
         int jawFrame = RouteViewVisuals.resolveJawFrame(ant.type, false, ant.wobblePhase, anim, ant.motionRate);
         int wingFrame = RouteViewVisuals.resolveWingFrame(ant.type, RouteViewVisuals.isWinged(ant.type),
                 ant.wobblePhase, anim, ant.motionRate);
         float angle = RouteViewVisuals.movementFacingDegrees(ant.vx, ant.vy);
-        drawCachedAnt(g2d, ant, jawFrame, wingFrame, Math.round(ant.xNorm * fieldW), Math.round(ant.yNorm * fieldH),
-                angle);
+        drawCachedAnt(g2d, ant, legFrame, jawFrame, wingFrame, Math.round(ant.xNorm * fieldW),
+                Math.round(ant.yNorm * fieldH), angle);
     }
 
     private void drawCritter(Graphics2D g2d, MenuChaoticWorld.ShowcaseCritter critter, int fieldW, int fieldH) {
-        if (critter.species == null || critter.species.getSprite() == null) {
+        if (critter.species == null) {
             return;
         }
-        ImageIcon icon = critter.species.getSprite();
+        float anim = quantizedAnimSeconds();
+        boolean moving = Math.abs(critter.vx) > 0.001f || Math.abs(critter.vy) > 0.001f;
+        int legFrame = critter.species.hasLegWalkCycle()
+                ? RouteViewVisuals.resolveLegFrame(null, false, moving, critter.wobblePhase, anim, critter.motionRate)
+                : 1;
+        ImageIcon icon = GameConstants.getCritterSprite(critter.species, legFrame);
+        if (icon == null) {
+            return;
+        }
         Image sprite = icon.getImage();
         int w = Math.max(6, icon.getIconWidth() / SPRITE_SCALE);
         int h = Math.max(6, icon.getIconHeight() / SPRITE_SCALE);
@@ -269,10 +279,12 @@ public class MenuChaoticPanel extends JPanel {
             }
             boolean winged = RouteViewVisuals.isWinged(ant.type);
             boolean airSupport = !ant.reserve && ant.battleLine == GameConstants.BATTLE_LINE_AIR_SUPPORT;
+            int legFrame = RouteViewVisuals.resolveLegFrame(ant.type, airSupport && winged, !airSupport, ant.wobblePhase,
+                    anim, ant.motionRate);
             int jawFrame = RouteViewVisuals.resolveJawFrame(ant.type, ant.reserve, ant.wobblePhase, anim, ant.motionRate);
             int wingFrame = RouteViewVisuals.resolveWingFrame(ant.type, airSupport && winged, ant.wobblePhase, anim,
                     ant.motionRate);
-            ensureCachedSprite(ant, jawFrame, wingFrame);
+            ensureCachedSprite(ant, legFrame, jawFrame, wingFrame);
             int w = ant.cachedDrawW > 0 ? ant.cachedDrawW : 12;
             int h = ant.cachedDrawH > 0 ? ant.cachedDrawH : 12;
 
@@ -323,7 +335,7 @@ public class MenuChaoticPanel extends JPanel {
     }
 
     private void drawConvoyFormation(Graphics2D g2d, List<MenuChaoticWorld.ShowcaseAnt> ants, Rectangle field,
-            boolean travelingRight) {
+            boolean travelingRight, ConvoyScene.BackgroundKind backgroundKind) {
         if (ants.isEmpty() || field.width <= 4 || field.height <= 4) {
             return;
         }
@@ -333,13 +345,16 @@ public class MenuChaoticPanel extends JPanel {
         float radiusY = Math.min(field.height * 0.34f, 44f + ants.size() * 0.38f);
         float faceAngle = RouteViewVisuals.convoyFacingDegrees(travelingRight);
         float anim = quantizedAnimSeconds();
+        boolean skyConvoy = backgroundKind == ConvoyScene.BackgroundKind.SKY;
         for (MenuChaoticWorld.ShowcaseAnt ant : ants) {
+            boolean winged = RouteViewVisuals.isWinged(ant.type);
+            boolean flying = skyConvoy && winged;
+            int legFrame = RouteViewVisuals.resolveLegFrame(ant.type, flying, true, ant.wobblePhase, anim, ant.motionRate);
             int jawFrame = RouteViewVisuals.resolveJawFrame(ant.type, false, ant.wobblePhase, anim, ant.motionRate);
-            int wingFrame = RouteViewVisuals.resolveWingFrame(ant.type, RouteViewVisuals.isWinged(ant.type),
-                    ant.wobblePhase, anim, ant.motionRate);
+            int wingFrame = RouteViewVisuals.resolveWingFrame(ant.type, winged, ant.wobblePhase, anim, ant.motionRate);
             int drawX = centerX + Math.round(ant.offsetX * radiusX);
             int drawY = centerY + Math.round(ant.offsetY * radiusY);
-            drawCachedAnt(g2d, ant, jawFrame, wingFrame, drawX, drawY, faceAngle);
+            drawCachedAnt(g2d, ant, legFrame, jawFrame, wingFrame, drawX, drawY, faceAngle);
         }
     }
 
@@ -446,9 +461,9 @@ public class MenuChaoticPanel extends JPanel {
         }
     }
 
-    private void drawCachedAnt(Graphics2D g2d, MenuChaoticWorld.ShowcaseAnt ant, int jawFrame, int wingFrame,
-            int drawX, int drawY, float angleDegrees) {
-        ensureCachedSprite(ant, jawFrame, wingFrame);
+    private void drawCachedAnt(Graphics2D g2d, MenuChaoticWorld.ShowcaseAnt ant, int legFrame, int jawFrame,
+            int wingFrame, int drawX, int drawY, float angleDegrees) {
+        ensureCachedSprite(ant, legFrame, jawFrame, wingFrame);
         if (ant.cachedSprite == null) {
             return;
         }
@@ -461,13 +476,15 @@ public class MenuChaoticPanel extends JPanel {
         g2d.setTransform(old);
     }
 
-    private void ensureCachedSprite(MenuChaoticWorld.ShowcaseAnt ant, int jawFrame, int wingFrame) {
-        if (ant.cachedSprite != null && ant.cachedJawFrame == jawFrame && ant.cachedWingFrame == wingFrame) {
+    private void ensureCachedSprite(MenuChaoticWorld.ShowcaseAnt ant, int legFrame, int jawFrame, int wingFrame) {
+        if (ant.cachedSprite != null && ant.cachedLegFrame == legFrame && ant.cachedJawFrame == jawFrame
+                && ant.cachedWingFrame == wingFrame) {
             return;
         }
-        ImageIcon icon = GameConstants.getAntSprite(ant.type, ant.species, ant.profile, 1, jawFrame, wingFrame);
+        ImageIcon icon = GameConstants.getAntSprite(ant.type, ant.species, ant.profile, legFrame, jawFrame, wingFrame);
         if (icon == null) {
             ant.cachedSprite = null;
+            ant.cachedLegFrame = legFrame;
             ant.cachedJawFrame = jawFrame;
             ant.cachedWingFrame = wingFrame;
             return;
@@ -475,6 +492,7 @@ public class MenuChaoticPanel extends JPanel {
         ant.cachedSprite = icon.getImage();
         ant.cachedDrawW = Math.max(6, icon.getIconWidth() / SPRITE_SCALE);
         ant.cachedDrawH = Math.max(6, icon.getIconHeight() / SPRITE_SCALE);
+        ant.cachedLegFrame = legFrame;
         ant.cachedJawFrame = jawFrame;
         ant.cachedWingFrame = wingFrame;
     }

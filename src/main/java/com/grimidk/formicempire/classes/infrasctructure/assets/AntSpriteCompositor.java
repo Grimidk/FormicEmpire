@@ -17,6 +17,7 @@ import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeProfile;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeSlot;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 
 public final class AntSpriteCompositor {
     public static final int MARKER_HEAD = 0xFF0000;
@@ -61,7 +62,9 @@ public final class AntSpriteCompositor {
         }
 
         AntSubtypeProfile safeProfile = profile != null ? profile : AntSubtypeProfile.standard();
-        int safeLeg = clampFrame(legFrame, 1, 4);
+        boolean flyingLegs = legFrame == GameNumbers.ANT_LEG_FRAME_FLYING
+                && (type == GameConstants.TYPE_DRONE || type == GameConstants.TYPE_PRINCESS);
+        int safeLeg = flyingLegs ? GameNumbers.ANT_LEG_FRAME_FLYING : clampFrame(legFrame, 1, 4);
         int safeJaw = clampFrame(jawFrame, 1, 2);
         int safeWing = clampFrame(wingFrame, 1, 2);
         String cacheKey = species.getId() + "|" + type.getId() + "|" + safeProfile.getCode()
@@ -110,7 +113,15 @@ public final class AntSpriteCompositor {
         String abdomenVariant = abdomenVariantName(profile, drone);
         String jawVariant = headVariant;
 
-        BufferedImage legs = loadLayer("legs/" + typeName + "/Leg" + legFrame + ".png");
+        BufferedImage legs;
+        if (legFrame == GameNumbers.ANT_LEG_FRAME_FLYING) {
+            legs = loadLayer("legs/" + typeName + "/LegFlying.png");
+            if (legs == null) {
+                legs = loadLayer("legs/" + typeName + "/Leg1.png");
+            }
+        } else {
+            legs = loadLayer("legs/" + typeName + "/Leg" + legFrame + ".png");
+        }
         BufferedImage abdomen = loadLayer("abdomen/" + typeName + "/Abdomen" + abdomenVariant + ".png");
         BufferedImage torso = loadLayer("torso/" + typeName + "/TorsoNone.png");
         BufferedImage head = loadLayer("head/" + typeName + "/Head" + headVariant + ".png");

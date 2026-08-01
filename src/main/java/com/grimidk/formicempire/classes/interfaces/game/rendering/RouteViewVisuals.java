@@ -4,6 +4,7 @@ import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.entities.services.colony.ConvoyScene;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 
 import javax.swing.ImageIcon;
 import java.awt.Graphics2D;
@@ -21,6 +22,7 @@ public final class RouteViewVisuals {
     private static final float WING_FLICKER_CYCLE_SEC = 5.5f;
     private static final float WING_FLICKER_CLOSED_START_SEC = 4.2f;
     private static final float WING_FLICKER_CLOSED_END_SEC = 5.2f;
+    private static final float LEG_WALK_CYCLE_SPEED = 6.5f;
     public static final int CONVOY_RESOURCE_LOOP_PX = 960;
 
     public record ConvoyResourceProp(
@@ -54,6 +56,22 @@ public final class RouteViewVisuals {
         }
         double attackPulse = Math.sin(wobblePhase + animationSeconds * ATTACK_JAW_SNAP_SPEED * motionRate);
         return attackPulse > 0.82 ? 2 : 1;
+    }
+
+    public static int resolveLegFrame(AntType type, boolean flying, boolean moving, float wobblePhase,
+            float animationSeconds, float motionRate) {
+        if (flying && isWinged(type)) {
+            return GameNumbers.ANT_LEG_FRAME_FLYING;
+        }
+        if (!moving) {
+            return 1;
+        }
+        double phase = wobblePhase + animationSeconds * LEG_WALK_CYCLE_SPEED * Math.max(0.01f, motionRate);
+        int index = (int) Math.floor(phase) % GameNumbers.ANT_LEG_FRAME_COUNT;
+        if (index < 0) {
+            index += GameNumbers.ANT_LEG_FRAME_COUNT;
+        }
+        return index + 1;
     }
 
     public static int resolveWingFrame(AntType type, boolean preferOpenWings, float wobblePhase, float animationSeconds,

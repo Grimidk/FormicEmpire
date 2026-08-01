@@ -823,7 +823,7 @@ public class GameAreaPanel extends ZeroGamePanel {
                         type,
                         colony.getSpecies(),
                         ant.getSubtypeProfile(),
-                        1,
+                        ant.getLegFrame(),
                         ant.getJawFrame(),
                         ant.getWingFrame());
                 if (antSpriteIcon == null) continue;
@@ -902,7 +902,7 @@ public class GameAreaPanel extends ZeroGamePanel {
                 continue;
             }
 
-            ImageIcon spriteIcon = bug.getSpecies().getSprite();
+            ImageIcon spriteIcon = GameConstants.getCritterSprite(bug.getSpecies(), bug.getLegFrame());
             if (spriteIcon == null) {
                 continue;
             }

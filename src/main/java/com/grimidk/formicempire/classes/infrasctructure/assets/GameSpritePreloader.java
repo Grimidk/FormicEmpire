@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.infrasctructure.assets;
 
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import java.awt.Image;
 import java.util.LinkedHashSet;
@@ -44,7 +45,13 @@ public final class GameSpritePreloader {
     public static void warmSession(Colony colony, BooleanSupplier cancelled) {
         Set<Image> images = new LinkedHashSet<>();
         for (Species bugType : GameConstants.getCritterSpecies()) {
-            collectIcon(images, bugType.getSprite());
+            if (bugType.hasComposedSprite()) {
+                for (int leg = 1; leg <= GameNumbers.ANT_LEG_FRAME_COUNT; leg++) {
+                    collectIcon(images, GameConstants.getCritterSprite(bugType, leg));
+                }
+            } else {
+                collectIcon(images, bugType.getSprite());
+            }
             collectIcon(images, bugType.getIcon());
         }
         for (ResourceType resourceType : GameConstants.getResources()) {

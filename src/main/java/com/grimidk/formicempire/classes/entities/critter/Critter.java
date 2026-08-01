@@ -39,6 +39,7 @@ public class Critter {
     private double preciseY;
     private Point targetPosition;
     private Room currentRoom;
+    private int legFrame = 1;
 
     public Critter(Species species) {
         this.species = species;
@@ -234,6 +235,14 @@ public class Critter {
         this.r = r;
     }
 
+    public int getLegFrame() {
+        return legFrame;
+    }
+
+    protected void setLegFrame(int legFrame) {
+        this.legFrame = legFrame;
+    }
+
     public void setPosition(Point p) {
         this.x = p.x;
         this.y = p.y;
@@ -241,6 +250,9 @@ public class Critter {
         this.preciseY = p.y;
         this.targetPosition = null;
         this.moveStatus = GameConstants.MOVE_STATIC;
+        if (usesLegWalkCycle()) {
+            this.legFrame = 1;
+        }
     }
 
     public void moveTo(Point p) {
@@ -254,8 +266,12 @@ public class Critter {
     }
 
     public void updatePosition(float speedMultiplier) {
-        if (targetPosition == null || this.moveStatus == GameConstants.MOVE_STATIC)
+        if (targetPosition == null || this.moveStatus == GameConstants.MOVE_STATIC) {
+            if (usesLegWalkCycle()) {
+                this.legFrame = 1;
+            }
             return;
+        }
 
         double dx = targetPosition.x - this.preciseX;
         double dy = targetPosition.y - this.preciseY;
@@ -279,6 +295,13 @@ public class Critter {
             this.x = (int) this.preciseX;
             this.y = (int) this.preciseY;
         }
+        if (usesLegWalkCycle()) {
+            this.legFrame = this.legFrame >= GameNumbers.ANT_LEG_FRAME_COUNT ? 1 : this.legFrame + 1;
+        }
+    }
+
+    private boolean usesLegWalkCycle() {
+        return species != null && species.hasLegWalkCycle();
     }
 
     private void calculateRotation() {

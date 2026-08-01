@@ -42,6 +42,7 @@ public final class MenuChaoticWorld {
         public float offsetY;
         public float wanderTimer;
         public Image cachedSprite;
+        public int cachedLegFrame = -1;
         public int cachedJawFrame = -1;
         public int cachedWingFrame = -1;
         public int cachedDrawW;

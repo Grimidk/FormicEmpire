@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.infrasctructure.registries;
 
 import com.grimidk.formicempire.classes.infrasctructure.assets.AntSpriteCompositor;
+import com.grimidk.formicempire.classes.infrasctructure.assets.CritterSpriteCompositor;
 import com.grimidk.formicempire.classes.infrasctructure.assets.GameSpritePreloader;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.constants.critter.CritterClass;
@@ -120,6 +121,20 @@ public final class GameConstants {
     public static final ImageIcon CONVOY_TILE_SKY = loadIcon("backgrounds/convoy/SkyConvoyTile.png");
 
     public static final ImageIcon TUNNEL_SPRITE = loadIcon("sprites/buildings/TunnelSprite.png");
+
+    public static ImageIcon getCritterSprite(Species species) {
+        return getCritterSprite(species, 1);
+    }
+
+    public static ImageIcon getCritterSprite(Species species, int legFrame) {
+        if (species == null) {
+            return null;
+        }
+        if (species.hasComposedSprite()) {
+            return CritterSpriteCompositor.getSprite(species, legFrame);
+        }
+        return species.getSprite();
+    }
 
     public static ImageIcon getAntSprite(AntType type, AntSpecies species) {
         return getAntSprite(type, species, AntSubtypeProfile.standard());
@@ -646,19 +661,29 @@ public final class GameConstants {
         loadIcon("icons/ants/omni/Worker.png"), loadIcon("icons/ants/omni/Worker.png"), false, List.of(SKILL_BASIC_BITE));
     static { critterSpecies.add(TYPE_ANT); }
     public static final Species TYPE_APHID = new Species(2, LanguageStrings.BUG_APHID, CRITTER_CLASS_INSECT, LanguageStrings.BUG_APHID_SCIENTIFIC, 1, 1, 0, 0, 0, 0.5f,
-        loadIcon("icons/critters/Aphid.png") , loadIcon("sprites/critters/Aphid.png"), true);
+        loadIcon("icons/critters/Aphid.png"),
+        CritterSpriteCompositor.getSprite("aphid", "Aphid.png", true),
+        "aphid", "Aphid.png", true, true);
     static { critterSpecies.add(TYPE_APHID); }
     public static final Species TYPE_PARASITE_ANT = new Species(3, LanguageStrings.BUG_PARASITE_ANT, CRITTER_CLASS_ANT, LanguageStrings.BUG_PARASITE_ANT_SCIENTIFIC, 1, 1, 0, 0, 1, 1,
-        loadIcon("icons/critters/Parasite.png") , loadIcon("sprites/critters/Parasite.png"));
+        loadIcon("icons/critters/ParasiticAnt.png"),
+        CritterSpriteCompositor.getSprite("parasiticAnt", "ParasiticAnt.png", true),
+        "parasiticAnt", "ParasiticAnt.png", true, false);
     static { critterSpecies.add(TYPE_PARASITE_ANT); }
-    public static final Species TYPE_SYMBIOTIC_MITE = new Species(4, LanguageStrings.BUG_SYMBIOTIC_MITE, CRITTER_CLASS_ARACHNID, LanguageStrings.BUG_SYMBIOTIC_MITE_SCIENTIFIC, 1, 0, 0, 0, 0, 0.4f, 
-        loadIcon("icons/critters/SoilMite.png"), loadIcon("sprites/critters/SoilMite.png"), true);
+    public static final Species TYPE_SYMBIOTIC_MITE = new Species(4, LanguageStrings.BUG_SYMBIOTIC_MITE, CRITTER_CLASS_ARACHNID, LanguageStrings.BUG_SYMBIOTIC_MITE_SCIENTIFIC, 1, 0, 0, 0, 0, 0.4f,
+        loadIcon("icons/critters/SoilMite.png"),
+        CritterSpriteCompositor.getSprite("soilMite", "SoilMite.png", true),
+        "soilMite", "SoilMite.png", true, true);
     static { critterSpecies.add(TYPE_SYMBIOTIC_MITE); }
     public static final Species TYPE_DERMESTID = new Species(5, LanguageStrings.BUG_DERMESTID, CRITTER_CLASS_INSECT, LanguageStrings.BUG_DERMESTID_SCIENTIFIC, 1, 0, 0, 0, 0, 0.35f,
-            loadIcon("icons/critters/Dermestid.png"), loadIcon("sprites/critters/Dermestid.png"), true);
+        loadIcon("icons/critters/Dermestid.png"),
+        CritterSpriteCompositor.getSprite("dermestid", "Dermestid.png", true),
+        "dermestid", "Dermestid.png", true, true);
     static { critterSpecies.add(TYPE_DERMESTID); }
     public static final Species TYPE_PARASITIC_MITE = new Species(6, LanguageStrings.BUG_PARASITIC_MITE, CRITTER_CLASS_ARACHNID, LanguageStrings.BUG_PARASITIC_MITE_SCIENTIFIC, 1, 0, 0, 0, 1, 0.25f,
-            loadIcon("icons/critters/ParasiticMite.png"), loadIcon("sprites/critters/ParasiticMite.png"));
+        loadIcon("icons/critters/ParasiticMite.png"),
+        CritterSpriteCompositor.getSprite("parasiticMite", "ParasiticMite.png", false),
+        "parasiticMite", "ParasiticMite.png", false, false);
     static { critterSpecies.add(TYPE_PARASITIC_MITE); }
 
     static {

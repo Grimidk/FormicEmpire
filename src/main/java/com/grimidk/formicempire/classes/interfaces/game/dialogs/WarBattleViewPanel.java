@@ -260,13 +260,15 @@ public class WarBattleViewPanel extends JPanel {
         for (BattleAnt ant : ants) {
             boolean winged = RouteViewVisuals.isWinged(ant.type);
             boolean airSupport = !ant.reserve && ant.battleLine == GameConstants.BATTLE_LINE_AIR_SUPPORT;
+            int legFrame = RouteViewVisuals.resolveLegFrame(ant.type, airSupport && winged, !airSupport, ant.wobblePhase,
+                    animationSeconds, ant.motionRate);
             int jawFrame = RouteViewVisuals.resolveJawFrame(ant.type, ant.reserve, ant.wobblePhase, animationSeconds,
                     ant.motionRate);
             int wingFrame = RouteViewVisuals.resolveWingFrame(ant.type, airSupport && winged, ant.wobblePhase,
                     animationSeconds, ant.motionRate);
 
             ImageIcon icon = GameConstants.getAntSprite(
-                    ant.type, ant.species, ant.profile, 1, jawFrame, wingFrame);
+                    ant.type, ant.species, ant.profile, legFrame, jawFrame, wingFrame);
             Image image = icon != null ? icon.getImage() : null;
             int w = icon != null ? Math.max(8, icon.getIconWidth() / ANT_SPRITE_SCALE) : 12;
             int h = icon != null ? Math.max(8, icon.getIconHeight() / ANT_SPRITE_SCALE) : 12;

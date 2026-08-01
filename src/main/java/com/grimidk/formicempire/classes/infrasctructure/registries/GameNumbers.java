@@ -11,6 +11,8 @@ public final class GameNumbers {
     public static final double ANT_JAW_SNAP_CHANCE_PER_HOUR = 0.08;
     public static final double ANT_WING_FLICK_CHANCE_PER_HOUR = 0.06;
     public static final int ANT_SPRITE_SNAP_MINUTES = 30;
+    public static final int ANT_LEG_FRAME_COUNT = 4;
+    public static final int ANT_LEG_FRAME_FLYING = 0;
     public static final float BASE_SPRITE_SPEED = 2.5f;
     public static final float GATHER_FULL_EFFICIENCY_RADIUS_BASE = 500f;
     public static final double GATHER_MIN_EFFICIENCY = 0.01;

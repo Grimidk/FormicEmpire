@@ -15,6 +15,7 @@ import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtype;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeProfile;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSubtypeSlot;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 
 class AntSpriteCompositorTest {
 
@@ -62,6 +63,44 @@ class AntSpriteCompositorTest {
             }
         }
         assertTrue(found, "composed worker should contain omni headColor pixels");
+    }
+
+    @Test
+    void composeWorkerLegFramesOneThroughFour() {
+        AntSubtypeProfile profile = AntSubtypeProfile.standard();
+        for (int leg = 1; leg <= 4; leg++) {
+            ImageIcon icon = AntSpriteCompositor.getSprite(
+                    GameConstants.TYPE_WORKER,
+                    GameConstants.SPECIES_OMNI,
+                    profile,
+                    leg,
+                    1,
+                    1);
+            assertNotNull(icon, "leg frame " + leg);
+            assertTrue(icon.getIconWidth() > 0);
+            assertTrue(icon.getIconHeight() > 0);
+        }
+    }
+
+    @Test
+    void composeDroneFlyingLegsUsesLegFlyingLayer() {
+        ImageIcon flying = AntSpriteCompositor.getSprite(
+                GameConstants.TYPE_DRONE,
+                GameConstants.SPECIES_OMNI,
+                AntSubtypeProfile.standard(),
+                GameNumbers.ANT_LEG_FRAME_FLYING,
+                1,
+                2);
+        ImageIcon walking = AntSpriteCompositor.getSprite(
+                GameConstants.TYPE_DRONE,
+                GameConstants.SPECIES_OMNI,
+                AntSubtypeProfile.standard(),
+                1,
+                1,
+                2);
+        assertNotNull(flying);
+        assertNotNull(walking);
+        assertTrue(flying.getIconWidth() > 0);
     }
 
     @Test

@@ -252,13 +252,19 @@ public class ConvoyViewPanel extends JPanel {
         float radiusX = Math.min(field.width * 0.2f, 56f + ants.size() * 0.5f);
         float radiusY = Math.min(field.height * 0.34f, 44f + ants.size() * 0.38f);
         float faceAngle = RouteViewVisuals.convoyFacingDegrees(travelingRight);
+        boolean skyConvoy = scene != null && scene.getBackgroundKind() == ConvoyScene.BackgroundKind.SKY;
 
         for (ConvoyAnt ant : ants) {
+            boolean winged = RouteViewVisuals.isWinged(ant.type);
+            boolean flying = skyConvoy && winged;
+            int legFrame = RouteViewVisuals.resolveLegFrame(ant.type, flying, true, ant.wobblePhase, animationSeconds,
+                    ant.motionRate);
             int jawFrame = RouteViewVisuals.resolveJawFrame(ant.type, false, ant.wobblePhase, animationSeconds,
                     ant.motionRate);
-            int wingFrame = RouteViewVisuals.resolveWingFrame(ant.type, RouteViewVisuals.isWinged(ant.type),
-                    ant.wobblePhase, animationSeconds, ant.motionRate);
-            ImageIcon icon = GameConstants.getAntSprite(ant.type, ant.species, ant.profile, 1, jawFrame, wingFrame);
+            int wingFrame = RouteViewVisuals.resolveWingFrame(ant.type, winged, ant.wobblePhase, animationSeconds,
+                    ant.motionRate);
+            ImageIcon icon = GameConstants.getAntSprite(ant.type, ant.species, ant.profile, legFrame, jawFrame,
+                    wingFrame);
             if (icon == null) {
                 continue;
             }

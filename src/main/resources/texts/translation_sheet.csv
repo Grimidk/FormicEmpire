@@ -947,7 +947,7 @@ BUG_ANT,Ant,Hormiga,Formiga,Fourmi
 BUG_APHID,Aphid,Pulgón,Pulgão,Puceron
 BUG_SYMBIOTIC_MITE,Symbiotic mite,Ácaro simbiótico,Ácaro simbiótico,Acarien symbiotique
 BUG_DERMESTID,Dermestid beetle,Escarabajo derméstido,Besouro dermestídeo,Dermeste
-BUG_PARASITE_ANT,Parasite ant,Hormiga parásita,Formiga parasita,Fourmi parasite
+BUG_PARASITE_ANT,Parasitic ant,Hormiga parásita,Formiga parasita,Fourmi parasite
 BUG_ANT_SCIENTIFIC,Formica,Formica,Formica,Formica
 BUG_APHID_SCIENTIFIC,Aphididae,Aphididae,Aphididae,Aphididae
 BUG_SYMBIOTIC_MITE_SCIENTIFIC,Stratiolaelaps scimitus,Stratiolaelaps scimitus,Stratiolaelaps scimitus,Stratiolaelaps scimitus

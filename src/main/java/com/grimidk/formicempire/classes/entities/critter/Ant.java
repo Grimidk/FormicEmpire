@@ -1,5 +1,6 @@
 package com.grimidk.formicempire.classes.entities.critter;
 
+import java.awt.Point;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -97,7 +98,14 @@ public class Ant extends Critter {
     public void setOnTrade(boolean onTrade) { this.isOnTrade = onTrade; }
 
     public boolean isNuptial() { return isNuptial; }
-    public void setNuptial(boolean isNuptial) { this.isNuptial = isNuptial; }
+    public void setNuptial(boolean isNuptial) {
+        this.isNuptial = isNuptial;
+        if (isNuptial && (type == GameConstants.TYPE_DRONE || type == GameConstants.TYPE_PRINCESS)) {
+            setLegFrame(GameNumbers.ANT_LEG_FRAME_FLYING);
+        } else if (!isMoving()) {
+            setLegFrame(1);
+        }
+    }
 
     public boolean isParasiticMiteInfected() { return parasiticMiteInfected; }
     public void setParasiticMiteInfected(boolean parasiticMiteInfected) {
@@ -216,6 +224,35 @@ public class Ant extends Critter {
 
     public int getWingFrame() {
         return wingFrame;
+    }
+
+    @Override
+    public void updatePosition(float speedMultiplier) {
+        boolean wingedFlyer = isNuptial()
+                && (type == GameConstants.TYPE_DRONE || type == GameConstants.TYPE_PRINCESS);
+        if (wingedFlyer) {
+            setLegFrame(GameNumbers.ANT_LEG_FRAME_FLYING);
+            super.updatePosition(speedMultiplier);
+            return;
+        }
+        boolean wasMoving = isMoving();
+        super.updatePosition(speedMultiplier);
+        if (wasMoving) {
+            int next = getLegFrame() >= GameNumbers.ANT_LEG_FRAME_COUNT ? 1 : getLegFrame() + 1;
+            setLegFrame(next);
+        } else {
+            setLegFrame(1);
+        }
+    }
+
+    @Override
+    public void setPosition(Point p) {
+        super.setPosition(p);
+        if (isNuptial() && (type == GameConstants.TYPE_DRONE || type == GameConstants.TYPE_PRINCESS)) {
+            setLegFrame(GameNumbers.ANT_LEG_FRAME_FLYING);
+        } else {
+            setLegFrame(1);
+        }
     }
 
     public void tickSpriteAnimMinute() {
