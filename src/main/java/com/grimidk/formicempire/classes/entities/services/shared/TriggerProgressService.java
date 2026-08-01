@@ -232,6 +232,16 @@ public final class TriggerProgressService {
                 plantHarvestProgress(colony),
                 GameNumbers.TRIGGER_SCOUT_PLANT_COLLECTED));
 
+        entries.add(numeric(
+                GameUnlocks.ROLE_MINER,
+                LanguageStrings.TRIGGER_MINER_ROLE_TITLE,
+                LanguageStrings.TRIGGER_PROGRESS_HINT_MINER,
+                LanguageStrings.TRIGGER_PROGRESS_METRIC_TIER3_BUILDINGS,
+                colony.hasUpgrade(GameUnlocks.ROLE_MINER),
+                colony.hasUpgrade(GameUnlocks.TYPE_SOLDIER),
+                GameUnlocks.countDynastyBuildingsOfTier(dynasty, GameConstants.TIER_3),
+                GameNumbers.TRIGGER_MINER_TIER3_BUILDINGS));
+
         boolean parasiticMiteUnlocked = colony.hasUpgrade(GameUnlocks.ABILITY_PARASITIC_MITE_ALERT);
         entries.add(numeric(
                 GameUnlocks.ABILITY_PARASITIC_MITE_ALERT,

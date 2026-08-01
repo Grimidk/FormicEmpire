@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 70% (244/347 checked)
+Completion: 67% (243/361 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -196,10 +196,12 @@ Worker roles:
 
 Soldier roles:
 [X] Hunter, Warrior, Police, Catcher
+[ ] Miner (trigger: 10 Tier 3 buildings across dynasty; enables mineral scouting; 10% gather chance)
 [ ] Bomber (unlocked by Exploding Ant / Selfdestruct assimilation; war-economy active military)
 
 Major roles:
 [X] Brute, Crane
+[ ] Siege (RP purchase; Tier 4; hex-assault only)
 
 Princess roles:
 [X] Breeder, Diplomat, Assistant (assistants research at 1/50 queen efficiency)
@@ -250,16 +252,16 @@ Assimilated species passives (research tree):
 ================================================================================
 11. CONSTRUCTION (U) — UpgradeDialog Build tab
 ================================================================================
-Room upgrade chains (each tier L0→L3 where applicable):
-[X] Royal Chamber
-[X] Egg Chamber
-[X] Mushroom Chamber
-[X] Plant Chamber
-[X] Water Reservoir
-[X] Meat Chamber
-[X] Syrup Reservoir
-[X] Rock Warehouse
-[X] Resin Reservoir
+Room upgrade chains (each tier L0→L5 where applicable; L4–L5 cost minerals + resin):
+[ ] Royal Chamber
+[ ] Egg Chamber
+[ ] Mushroom Chamber
+[ ] Plant Chamber
+[ ] Water Reservoir
+[ ] Meat Chamber
+[ ] Syrup Reservoir
+[ ] Rock Warehouse (gated behind Miner role)
+[ ] Resin Reservoir (gated behind Resin ability)
 
 Passive / special rooms:
 [X] Passive Lab, Passive Water, Passive Aphid, Passive Nurse
@@ -333,6 +335,7 @@ Neighbor trade rows (per adjacent hex):
 [ ] Bilateral Optimization button in trade creator footer (visible with Bilateral Trade unlock; enabled when incoming one-way route exists and bilateral unchecked)
 [X] Confirm / update trade
 [X] Cancel trade dialog
+[ ] Excess cargo over destination capacity returns to origin (discarded if origin is also full)
 [X] Active trade edit from table actions (Manage / Establish)
 [X] See convoy option in logistics Actions menu (opens convoy transit view)
 [ ] Make two-way trade option in logistics Actions menu (enabled when matching incoming one-way route exists)
@@ -441,6 +444,7 @@ Monthly:
 Daily:
 [X] Graver role unlock
 [X] Scout unlock from plant harvest (any plant source)
+[ ] Miner unlock from 10 Tier 3 buildings across dynasty (requires Soldier type; scouts then spot minerals)
 [ ] Hunter / Breeder / Brute role unlocks
 [ ] Queendom rank unlocks Air Support princess role
 [ ] Commander role unlock (3 wars participated + multi-queen colony)

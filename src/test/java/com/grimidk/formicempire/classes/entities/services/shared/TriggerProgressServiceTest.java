@@ -105,6 +105,39 @@ class TriggerProgressServiceTest {
         assertTrue(mites != null && mites.isUnlocked());
     }
 
+    @Test
+    void minerHiddenUntilSoldierTypeUnlocked() {
+        colony.unlockBuilding(GameUnlocks.ROYAL_CHAMBER_3);
+        List<TriggerProgress> before = TriggerProgressService.getVisible(colony, null);
+        assertTrue(find(before, GameUnlocks.ROLE_MINER) == null);
+
+        colony.unlockUpgrade(GameUnlocks.TYPE_SOLDIER);
+        List<TriggerProgress> after = TriggerProgressService.getVisible(colony, null);
+        TriggerProgress miner = find(after, GameUnlocks.ROLE_MINER);
+        assertTrue(miner != null);
+        assertFalse(miner.isUnlocked());
+        assertEquals(1, miner.getCurrent());
+        assertEquals(GameNumbers.TRIGGER_MINER_TIER3_BUILDINGS, miner.getRequired());
+    }
+
+    @Test
+    void minerCountsTier3BuildingsAcrossDynasty() {
+        colony.unlockUpgrade(GameUnlocks.TYPE_SOLDIER);
+        colony.unlockBuilding(GameUnlocks.ROYAL_CHAMBER_3);
+        colony.unlockBuilding(GameUnlocks.EGG_CHAMBER_3);
+        Colony satellite = new Colony(2, "Secundus", false);
+        dynasty.addColony(satellite);
+        satellite.setDynasty(dynasty);
+        satellite.unlockBuilding(GameUnlocks.EGG_CHAMBER_3);
+        satellite.unlockBuilding(GameUnlocks.BUILDING_COMPOSTER);
+        satellite.unlockBuilding(GameUnlocks.PLANT_CHAMBER_3);
+
+        List<TriggerProgress> visible = TriggerProgressService.getVisible(colony, null);
+        TriggerProgress miner = find(visible, GameUnlocks.ROLE_MINER);
+        assertTrue(miner != null);
+        assertEquals(5, miner.getCurrent());
+    }
+
     private static TriggerProgress find(List<TriggerProgress> list, Object upgrade) {
         for (TriggerProgress progress : list) {
             if (progress.getUpgrade() == upgrade) {

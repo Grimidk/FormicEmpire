@@ -189,15 +189,49 @@ public class Trade {
 
     private void deliverLoad() {
         Colony dest = destination.getColony();
-        if (dest != null) {
-            Map<ResourceType, Double> securedLoad = calculateSecuredLoad(load);
-            for (Map.Entry<ResourceType, Double> entry : securedLoad.entrySet()) {
-                dest.getResourceService().addResource(dest, entry.getKey(), entry.getValue());
+        Colony originColony = origin.getColony();
+        if (dest == null) {
+            if (originColony != null) {
+                Map<ResourceType, Double> securedLoad = calculateSecuredLoad(load);
+                returnOverflowToOrigin(originColony, securedLoad);
             }
-            if (origin.getColony() != null) {
-                origin.getColony().logEvent(ColonyLogPrefixes.TRADE + " "
-                    + String.format(LanguageStrings.get(LanguageStrings.LOG_TRADE_ARRIVED_FMT), dest.getName()));
+            return;
+        }
+
+        Map<ResourceType, Double> securedLoad = calculateSecuredLoad(load);
+        Map<ResourceType, Double> overflow = new HashMap<>();
+        ColonyResourceService destRes = dest.getResourceService();
+        for (Map.Entry<ResourceType, Double> entry : securedLoad.entrySet()) {
+            double intended = entry.getValue();
+            if (intended <= 0) {
+                continue;
             }
+            double added = destRes.addResource(dest, entry.getKey(), intended);
+            double leftover = intended - added;
+            if (leftover > 0) {
+                overflow.put(entry.getKey(), leftover);
+            }
+        }
+
+        if (originColony != null) {
+            if (!overflow.isEmpty()) {
+                returnOverflowToOrigin(originColony, overflow);
+                originColony.logEvent(ColonyLogPrefixes.TRADE + " "
+                        + LanguageStrings.format(LanguageStrings.LOG_TRADE_OVERFLOW_RETURN_FMT, dest.getName()));
+            } else {
+                originColony.logEvent(ColonyLogPrefixes.TRADE + " "
+                        + String.format(LanguageStrings.get(LanguageStrings.LOG_TRADE_ARRIVED_FMT), dest.getName()));
+            }
+        }
+    }
+
+    private void returnOverflowToOrigin(Colony originColony, Map<ResourceType, Double> overflow) {
+        if (originColony == null || overflow == null || overflow.isEmpty()) {
+            return;
+        }
+        ColonyResourceService originRes = originColony.getResourceService();
+        for (Map.Entry<ResourceType, Double> entry : overflow.entrySet()) {
+            originRes.addResource(originColony, entry.getKey(), entry.getValue());
         }
     }
 

@@ -620,8 +620,9 @@ public class UpgradeDialog extends ZeroDialog {
                     boolean owned = colony.hasBuilding(building);
                     boolean reqMet = (building.getRequirement() == null || colony.hasBuilding(building.getRequirement()));
                     boolean tierMet = building.isAvailableFor(colony.getDynasty());
+                    boolean unlockMet = GameUnlocks.meetsBuildingUnlockRequirement(colony, building);
 
-                    if (!owned && reqMet && tierMet) {
+                    if (!owned && reqMet && tierMet && unlockMet) {
                         availableBuildings.add(building);
                     }
                 }

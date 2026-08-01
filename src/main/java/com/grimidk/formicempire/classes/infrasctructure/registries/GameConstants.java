@@ -1091,7 +1091,7 @@ public final class GameConstants {
     static { geneticIntegrityModifiers.add(GI_MODIFIER_GENETIC_EXCHANGE); }
 
     private static final Set<AntRole> UNOBTAINABLE_ROLES = Set.of(
-            ROLE_CARRIER, ROLE_SIEGE, ROLE_MINER);
+            ROLE_CARRIER);
 
     private static final AntRole[] ACTIVE_MILITARY_ROLES = antRoles.stream()
             .filter(AntRole::isActiveMilitary)

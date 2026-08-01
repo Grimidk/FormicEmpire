@@ -1,6 +1,8 @@
 package com.grimidk.formicempire.classes.infrasctructure.registries;
 
 import com.grimidk.formicempire.classes.constants.unlocks.*;
+import com.grimidk.formicempire.classes.constants.misc.Tier;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.infrasctructure.assets.GameSpritePreloader;
 
@@ -85,7 +87,8 @@ public final class GameUnlocks {
         static { upgrades.add(ROLE_BUILDER); }
         public static final Upgrade ROLE_SCOUT = new Upgrade(16, "ROLE_SCOUT_UPGRADE", "ROLE_SCOUT_FLAVOR", "ROLE_SCOUT_DESC", TYPE_WORKER, 0, loadIcon("icons/upgrades/RoleScout.png"), 0);
         static { upgrades.add(ROLE_SCOUT); }
-        public static final Upgrade ROLE_MINER = new Upgrade(17, "ROLE_MINER_UPGRADE", "ROLE_MINER_FLAVOR", "ROLE_MINER_DESC", TYPE_WORKER, 0, loadIcon("icons/upgrades/RoleMiner.png"), 0);
+        public static final Upgrade ROLE_MINER = new Upgrade(17, "ROLE_MINER_UPGRADE", "ROLE_MINER_FLAVOR", "ROLE_MINER_DESC", TYPE_SOLDIER, 0, loadIcon("icons/upgrades/RoleMiner.png"), 0);
+        static { upgrades.add(ROLE_MINER); }
         public static final Upgrade ROLE_POTTER = new Upgrade(19, "ROLE_POTTER_UPGRADE", "ROLE_POTTER_FLAVOR", "ROLE_POTTER_DESC", TYPE_WORKER, 0, loadIcon("icons/upgrades/RolePotter.png"), 0);
         static { upgrades.add(ROLE_POTTER); }
         public static final Upgrade ROLE_WARRIOR = new Upgrade(21, "ROLE_WARRIOR_UPGRADE", "ROLE_WARRIOR_FLAVOR", "ROLE_WARRIOR_DESC", TYPE_SOLDIER, 0, loadIcon("icons/upgrades/RoleWarrior.png"), 0);
@@ -101,7 +104,8 @@ public final class GameUnlocks {
         public static final Upgrade ROLE_CARRIER = new Upgrade(26, "ROLE_CARRIER_UPGRADE", "ROLE_CARRIER_FLAVOR", "ROLE_CARRIER_DESC", TYPE_MAJOR, 0, loadIcon("icons/upgrades/RoleCarrier.png"), 0);
         public static final Upgrade ROLE_ARTILLERY = new Upgrade(27, "ROLE_ARTILLERY_UPGRADE", "ROLE_ARTILLERY_FLAVOR", "ROLE_ARTILLERY_DESC", TYPE_MAJOR, 0, loadIcon("icons/upgrades/RoleArtillery.png"), 0);
         static { upgrades.add(ROLE_ARTILLERY); }
-        public static final Upgrade ROLE_SIEGE = new Upgrade(28, "ROLE_SIEGE_UPGRADE", "ROLE_SIEGE_FLAVOR", "ROLE_SIEGE_DESC", TYPE_MAJOR, 0, loadIcon("icons/upgrades/RoleSiege.png"), 0);
+        public static final Upgrade ROLE_SIEGE = new Upgrade(28, "ROLE_SIEGE_UPGRADE", "ROLE_SIEGE_FLAVOR", "ROLE_SIEGE_DESC", TYPE_MAJOR, 200000, loadIcon("icons/upgrades/RoleSiege.png"), 4);
+        static { upgrades.add(ROLE_SIEGE); }
         public static final Upgrade ROLE_BREEDER = new Upgrade(30, "ROLE_BREEDER_UPGRADE", "ROLE_BREEDER_FLAVOR", "ROLE_BREEDER_DESC", TYPE_PRINCESS, 0, loadIcon("icons/upgrades/RoleBreeder.png"), 0);
         static { upgrades.add(ROLE_BREEDER); }
         public static final Upgrade ROLE_DIPLOMAT = new Upgrade(31, "ROLE_DIPLOMAT_UPGRADE", "ROLE_DIPLOMAT_FLAVOR", "ROLE_DIPLOMAT_DESC", TYPE_PRINCESS, 1500, loadIcon("icons/upgrades/RoleDiplomat.png"), 3);
@@ -493,7 +497,43 @@ public final class GameUnlocks {
         public static final Building RESIN_RESERVOIR_3 = new Building(36, "RESIN_RESERVOIR_3", 3, "RESIN_RESERVOIR_3_DESC", RESIN_RESERVOIR_2, 900, 0, 10000, GameConstants.ROOM_RESIN_L3, 3);
         static { buildings.add(RESIN_RESERVOIR_3); }
         // -- Tier 4 --
+        public static final Building ROYAL_CHAMBER_4 = new Building(37, "ROYAL_CHAMBER_4", 4, "ROYAL_CHAMBER_4_DESC", ROYAL_CHAMBER_3, 2000, 1000, 37500, GameConstants.ROOM_ROYAL_L3, 4);
+        static { buildings.add(ROYAL_CHAMBER_4); }
+        public static final Building EGG_CHAMBER_4 = new Building(38, "EGG_CHAMBER_4", 4, "EGG_CHAMBER_4_DESC", EGG_CHAMBER_3, 1000, 500, 12500, GameConstants.ROOM_EGG_L3, 4);
+        static { buildings.add(EGG_CHAMBER_4); }
+        public static final Building MUSHROOM_CHAMBER_4 = new Building(39, "MUSHROOM_CHAMBER_4", 4, "MUSHROOM_CHAMBER_4_DESC", MUSHROOM_CHAMBER_3, 1600, 800, 12500, GameConstants.ROOM_MUSHROOM_L3, 4);
+        static { buildings.add(MUSHROOM_CHAMBER_4); }
+        public static final Building PLANT_CHAMBER_4 = new Building(40, "PLANT_CHAMBER_4", 4, "PLANT_CHAMBER_4_DESC", PLANT_CHAMBER_3, 1400, 700, 12500, GameConstants.ROOM_PLANT_L3, 4);
+        static { buildings.add(PLANT_CHAMBER_4); }
+        public static final Building WATER_RESERVOIR_4 = new Building(41, "WATER_RESERVOIR_4", 4, "WATER_RESERVOIR_4_DESC", WATER_RESERVOIR_3, 1800, 900, 12500, GameConstants.ROOM_WATER_L3, 4);
+        static { buildings.add(WATER_RESERVOIR_4); }
+        public static final Building MEAT_CHAMBER_4 = new Building(42, "MEAT_CHAMBER_4", 4, "MEAT_CHAMBER_4_DESC", MEAT_CHAMBER_3, 1700, 850, 25000, GameConstants.ROOM_MEAT_L3, 4);
+        static { buildings.add(MEAT_CHAMBER_4); }
+        public static final Building SYRUP_RESERVOIR_4 = new Building(43, "SYRUP_RESERVOIR_4", 4, "SYRUP_RESERVOIR_4_DESC", SYRUP_RESERVOIR_3, 1600, 800, 25000, GameConstants.ROOM_SYRUP_L3, 4);
+        static { buildings.add(SYRUP_RESERVOIR_4); }
+        public static final Building ROCK_WAREHOUSE_4 = new Building(44, "ROCK_WAREHOUSE_4", 4, "ROCK_WAREHOUSE_4_DESC", ROCK_WAREHOUSE_3, 1900, 950, 25000, GameConstants.ROOM_ROCK_L3, 4);
+        static { buildings.add(ROCK_WAREHOUSE_4); }
+        public static final Building RESIN_RESERVOIR_4 = new Building(45, "RESIN_RESERVOIR_4", 4, "RESIN_RESERVOIR_4_DESC", RESIN_RESERVOIR_3, 1800, 900, 25000, GameConstants.ROOM_RESIN_L3, 4);
+        static { buildings.add(RESIN_RESERVOIR_4); }
         // -- Tier 5 --
+        public static final Building ROYAL_CHAMBER_5 = new Building(46, "ROYAL_CHAMBER_5", 5, "ROYAL_CHAMBER_5_DESC", ROYAL_CHAMBER_4, 4000, 2500, 75000, GameConstants.ROOM_ROYAL_L3, 5);
+        static { buildings.add(ROYAL_CHAMBER_5); }
+        public static final Building EGG_CHAMBER_5 = new Building(47, "EGG_CHAMBER_5", 5, "EGG_CHAMBER_5_DESC", EGG_CHAMBER_4, 2000, 1250, 25000, GameConstants.ROOM_EGG_L3, 5);
+        static { buildings.add(EGG_CHAMBER_5); }
+        public static final Building MUSHROOM_CHAMBER_5 = new Building(48, "MUSHROOM_CHAMBER_5", 5, "MUSHROOM_CHAMBER_5_DESC", MUSHROOM_CHAMBER_4, 3200, 2000, 25000, GameConstants.ROOM_MUSHROOM_L3, 5);
+        static { buildings.add(MUSHROOM_CHAMBER_5); }
+        public static final Building PLANT_CHAMBER_5 = new Building(49, "PLANT_CHAMBER_5", 5, "PLANT_CHAMBER_5_DESC", PLANT_CHAMBER_4, 2800, 1750, 25000, GameConstants.ROOM_PLANT_L3, 5);
+        static { buildings.add(PLANT_CHAMBER_5); }
+        public static final Building WATER_RESERVOIR_5 = new Building(50, "WATER_RESERVOIR_5", 5, "WATER_RESERVOIR_5_DESC", WATER_RESERVOIR_4, 3600, 2250, 25000, GameConstants.ROOM_WATER_L3, 5);
+        static { buildings.add(WATER_RESERVOIR_5); }
+        public static final Building MEAT_CHAMBER_5 = new Building(51, "MEAT_CHAMBER_5", 5, "MEAT_CHAMBER_5_DESC", MEAT_CHAMBER_4, 3400, 2125, 50000, GameConstants.ROOM_MEAT_L3, 5);
+        static { buildings.add(MEAT_CHAMBER_5); }
+        public static final Building SYRUP_RESERVOIR_5 = new Building(52, "SYRUP_RESERVOIR_5", 5, "SYRUP_RESERVOIR_5_DESC", SYRUP_RESERVOIR_4, 3200, 2000, 50000, GameConstants.ROOM_SYRUP_L3, 5);
+        static { buildings.add(SYRUP_RESERVOIR_5); }
+        public static final Building ROCK_WAREHOUSE_5 = new Building(53, "ROCK_WAREHOUSE_5", 5, "ROCK_WAREHOUSE_5_DESC", ROCK_WAREHOUSE_4, 3800, 2375, 50000, GameConstants.ROOM_ROCK_L3, 5);
+        static { buildings.add(ROCK_WAREHOUSE_5); }
+        public static final Building RESIN_RESERVOIR_5 = new Building(54, "RESIN_RESERVOIR_5", 5, "RESIN_RESERVOIR_5_DESC", RESIN_RESERVOIR_4, 3600, 2250, 50000, GameConstants.ROOM_RESIN_L3, 5);
+        static { buildings.add(RESIN_RESERVOIR_5); }
         // -- Tier Misc. (passive overlays) --
         public static final Building PASSIVE_LAB = new Building(101, "PASSIVE_LAB", 0, "PASSIVE_LAB_DESC", ROYAL_CHAMBER_1, 150, 0, 800, GameConstants.ROOM_PASSIVE_LAB, 2);
         static { buildings.add(PASSIVE_LAB); }
@@ -511,31 +551,31 @@ public final class GameUnlocks {
         static { buildings.add(BUILDING_COMPOSTER); }
 
         public static final Building[] BUILDING_CHAIN_ROYAL = {
-                ROYAL_CHAMBER_3, ROYAL_CHAMBER_2, ROYAL_CHAMBER_1, ROYAL_CHAMBER_0
+                ROYAL_CHAMBER_5, ROYAL_CHAMBER_4, ROYAL_CHAMBER_3, ROYAL_CHAMBER_2, ROYAL_CHAMBER_1, ROYAL_CHAMBER_0
         };
         public static final Building[] BUILDING_CHAIN_EGG = {
-                EGG_CHAMBER_3, EGG_CHAMBER_2, EGG_CHAMBER_1, EGG_CHAMBER_0
+                EGG_CHAMBER_5, EGG_CHAMBER_4, EGG_CHAMBER_3, EGG_CHAMBER_2, EGG_CHAMBER_1, EGG_CHAMBER_0
         };
         public static final Building[] BUILDING_CHAIN_MUSHROOM = {
-                MUSHROOM_CHAMBER_3, MUSHROOM_CHAMBER_2, MUSHROOM_CHAMBER_1, MUSHROOM_CHAMBER_0
+                MUSHROOM_CHAMBER_5, MUSHROOM_CHAMBER_4, MUSHROOM_CHAMBER_3, MUSHROOM_CHAMBER_2, MUSHROOM_CHAMBER_1, MUSHROOM_CHAMBER_0
         };
         public static final Building[] BUILDING_CHAIN_PLANT = {
-                PLANT_CHAMBER_3, PLANT_CHAMBER_2, PLANT_CHAMBER_1, PLANT_CHAMBER_0
+                PLANT_CHAMBER_5, PLANT_CHAMBER_4, PLANT_CHAMBER_3, PLANT_CHAMBER_2, PLANT_CHAMBER_1, PLANT_CHAMBER_0
         };
         public static final Building[] BUILDING_CHAIN_WATER = {
-                WATER_RESERVOIR_3, WATER_RESERVOIR_2, WATER_RESERVOIR_1, WATER_RESERVOIR_0
+                WATER_RESERVOIR_5, WATER_RESERVOIR_4, WATER_RESERVOIR_3, WATER_RESERVOIR_2, WATER_RESERVOIR_1, WATER_RESERVOIR_0
         };
         public static final Building[] BUILDING_CHAIN_MEAT = {
-                MEAT_CHAMBER_3, MEAT_CHAMBER_2, MEAT_CHAMBER_1, MEAT_CHAMBER_0
+                MEAT_CHAMBER_5, MEAT_CHAMBER_4, MEAT_CHAMBER_3, MEAT_CHAMBER_2, MEAT_CHAMBER_1, MEAT_CHAMBER_0
         };
         public static final Building[] BUILDING_CHAIN_SYRUP = {
-                SYRUP_RESERVOIR_3, SYRUP_RESERVOIR_2, SYRUP_RESERVOIR_1, SYRUP_RESERVOIR_0
+                SYRUP_RESERVOIR_5, SYRUP_RESERVOIR_4, SYRUP_RESERVOIR_3, SYRUP_RESERVOIR_2, SYRUP_RESERVOIR_1, SYRUP_RESERVOIR_0
         };
         public static final Building[] BUILDING_CHAIN_ROCK = {
-                ROCK_WAREHOUSE_3, ROCK_WAREHOUSE_2, ROCK_WAREHOUSE_1, ROCK_WAREHOUSE_0
+                ROCK_WAREHOUSE_5, ROCK_WAREHOUSE_4, ROCK_WAREHOUSE_3, ROCK_WAREHOUSE_2, ROCK_WAREHOUSE_1, ROCK_WAREHOUSE_0
         };
         public static final Building[] BUILDING_CHAIN_RESIN = {
-                RESIN_RESERVOIR_3, RESIN_RESERVOIR_2, RESIN_RESERVOIR_1, RESIN_RESERVOIR_0
+                RESIN_RESERVOIR_5, RESIN_RESERVOIR_4, RESIN_RESERVOIR_3, RESIN_RESERVOIR_2, RESIN_RESERVOIR_1, RESIN_RESERVOIR_0
         };
 
         // --- Assimilations ---
@@ -641,4 +681,44 @@ public final class GameUnlocks {
         public static List<Synergy> getSynergies() { return Collections.unmodifiableList(synergies); }
 
         public static List<Assimilation> getAssimilations() { return Collections.unmodifiableList(assimilations); }
+
+        public static boolean meetsBuildingUnlockRequirement(Colony colony, Building building) {
+                if (colony == null || building == null) {
+                        return false;
+                }
+                if (isInBuildingChain(building, BUILDING_CHAIN_ROCK)) {
+                        return colony.hasUpgrade(ROLE_MINER);
+                }
+                if (isInBuildingChain(building, BUILDING_CHAIN_RESIN)) {
+                        return colony.hasUpgrade(ABILITY_RESIN);
+                }
+                return true;
+        }
+
+        public static int countDynastyBuildingsOfTier(Dynasty dynasty, Tier tier) {
+                if (dynasty == null || tier == null || dynasty.getColonies() == null) {
+                        return 0;
+                }
+                int count = 0;
+                for (Colony colony : dynasty.getColonies()) {
+                        if (colony == null || colony.getUnlockedBuildings() == null) {
+                                continue;
+                        }
+                        for (Building building : colony.getUnlockedBuildings()) {
+                                if (building != null && building.getTier() == tier) {
+                                        count++;
+                                }
+                        }
+                }
+                return count;
+        }
+
+        private static boolean isInBuildingChain(Building building, Building[] chain) {
+                for (Building candidate : chain) {
+                        if (candidate == building) {
+                                return true;
+                        }
+                }
+                return false;
+        }
 }

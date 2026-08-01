@@ -17,6 +17,8 @@ public class ColonyStatsService {
     
     // --- Capacities ---
     public int getPlantsCapacity(Colony colony) { 
+        if (colony.hasBuilding(GameUnlocks.PLANT_CHAMBER_5)) return 400000;
+        if (colony.hasBuilding(GameUnlocks.PLANT_CHAMBER_4)) return 150000;
         if (colony.hasBuilding(GameUnlocks.PLANT_CHAMBER_3)) return 60000;
         if (colony.hasBuilding(GameUnlocks.PLANT_CHAMBER_2)) return 25000;
         if (colony.hasBuilding(GameUnlocks.PLANT_CHAMBER_1)) return 10000;
@@ -24,6 +26,8 @@ public class ColonyStatsService {
         return 0;
     }
     public int getMushroomsCapacity(Colony colony) { 
+        if (colony.hasBuilding(GameUnlocks.MUSHROOM_CHAMBER_5)) return 600000;
+        if (colony.hasBuilding(GameUnlocks.MUSHROOM_CHAMBER_4)) return 250000;
         if (colony.hasBuilding(GameUnlocks.MUSHROOM_CHAMBER_3)) return 100000;
         if (colony.hasBuilding(GameUnlocks.MUSHROOM_CHAMBER_2)) return 40000;
         if (colony.hasBuilding(GameUnlocks.MUSHROOM_CHAMBER_1)) return 15000;
@@ -31,6 +35,8 @@ public class ColonyStatsService {
         return 0;
     }
     public int getProteinCapacity(Colony colony) { 
+        if (colony.hasBuilding(GameUnlocks.MEAT_CHAMBER_5)) return 250000;
+        if (colony.hasBuilding(GameUnlocks.MEAT_CHAMBER_4)) return 100000;
         if (colony.hasBuilding(GameUnlocks.MEAT_CHAMBER_3)) return 40000;
         if (colony.hasBuilding(GameUnlocks.MEAT_CHAMBER_2)) return 15000;
         if (colony.hasBuilding(GameUnlocks.MEAT_CHAMBER_1)) return 5000;
@@ -38,6 +44,8 @@ public class ColonyStatsService {
         return 0;
     }
     public int getWaterCapacity(Colony colony) {
+        if (colony.hasBuilding(GameUnlocks.WATER_RESERVOIR_5)) return 150000;
+        if (colony.hasBuilding(GameUnlocks.WATER_RESERVOIR_4)) return 60000;
         if (colony.hasBuilding(GameUnlocks.WATER_RESERVOIR_3)) return 25000;
         if (colony.hasBuilding(GameUnlocks.WATER_RESERVOIR_2)) return 10000;
         if (colony.hasBuilding(GameUnlocks.WATER_RESERVOIR_1)) return 2500;
@@ -45,6 +53,8 @@ public class ColonyStatsService {
         return 0;
     }
     public int getSyrupsCapacity(Colony colony) { 
+        if (colony.hasBuilding(GameUnlocks.SYRUP_RESERVOIR_5)) return 60000;
+        if (colony.hasBuilding(GameUnlocks.SYRUP_RESERVOIR_4)) return 25000;
         if (colony.hasBuilding(GameUnlocks.SYRUP_RESERVOIR_3)) return 10000;
         if (colony.hasBuilding(GameUnlocks.SYRUP_RESERVOIR_2)) return 3500;
         if (colony.hasBuilding(GameUnlocks.SYRUP_RESERVOIR_1)) return 1200;
@@ -52,6 +62,8 @@ public class ColonyStatsService {
         return 0;
     }
     public int getResinsCapacity(Colony colony) { 
+        if (colony.hasBuilding(GameUnlocks.RESIN_RESERVOIR_5)) return 20000;
+        if (colony.hasBuilding(GameUnlocks.RESIN_RESERVOIR_4)) return 7500;
         if (colony.hasBuilding(GameUnlocks.RESIN_RESERVOIR_3)) return 3000;
         if (colony.hasBuilding(GameUnlocks.RESIN_RESERVOIR_2)) return 1200;
         if (colony.hasBuilding(GameUnlocks.RESIN_RESERVOIR_1)) return 500;
@@ -59,6 +71,8 @@ public class ColonyStatsService {
         return 0;
     }
     public int getMineralsCapacity(Colony colony) { 
+        if (colony.hasBuilding(GameUnlocks.ROCK_WAREHOUSE_5)) return 15000;
+        if (colony.hasBuilding(GameUnlocks.ROCK_WAREHOUSE_4)) return 6000;
         if (colony.hasBuilding(GameUnlocks.ROCK_WAREHOUSE_3)) return 2500;
         if (colony.hasBuilding(GameUnlocks.ROCK_WAREHOUSE_2)) return 750;
         if (colony.hasBuilding(GameUnlocks.ROCK_WAREHOUSE_1)) return 250;
@@ -66,6 +80,8 @@ public class ColonyStatsService {
         return 0;
     }
     public int getEggsCapacity(Colony colony) {
+        if (colony.hasBuilding(GameUnlocks.EGG_CHAMBER_5)) return 3000;
+        if (colony.hasBuilding(GameUnlocks.EGG_CHAMBER_4)) return 1200;
         if (colony.hasBuilding(GameUnlocks.EGG_CHAMBER_3)) return 500;
         if (colony.hasBuilding(GameUnlocks.EGG_CHAMBER_2)) return 150;
         if (colony.hasBuilding(GameUnlocks.EGG_CHAMBER_1)) return 80;
@@ -75,6 +91,8 @@ public class ColonyStatsService {
     public int getQueensCapacity(Colony colony) {
         boolean canMultiQueen = colony.hasUpgrade(GameUnlocks.ASSIMILATED_MULTIQUEEN);
         
+        if (colony.hasBuilding(GameUnlocks.ROYAL_CHAMBER_5)) return canMultiQueen ? 40 : 1;
+        if (colony.hasBuilding(GameUnlocks.ROYAL_CHAMBER_4)) return canMultiQueen ? 20 : 1;
         if (colony.hasBuilding(GameUnlocks.ROYAL_CHAMBER_3)) return canMultiQueen ? 10 : 1;
         if (colony.hasBuilding(GameUnlocks.ROYAL_CHAMBER_2)) return canMultiQueen ? 4 : 1;
         if (colony.hasBuilding(GameUnlocks.ROYAL_CHAMBER_1)) return canMultiQueen ? 2 : 1;
@@ -390,7 +408,7 @@ public class ColonyStatsService {
 
     public double getMineralProductionHourly(Colony colony) {
         int minerCount = colony.getAssignedRoleCount(GameConstants.ROLE_MINER);
-        return minerCount * getCollectingRate(colony);
+        return minerCount * getCollectingRate(colony) * GameNumbers.MINING_GATHER_SUCCESS_CHANCE;
     }
 
     

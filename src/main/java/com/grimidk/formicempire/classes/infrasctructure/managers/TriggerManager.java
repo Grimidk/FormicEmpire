@@ -166,6 +166,7 @@ public class TriggerManager {
         checkCommanderRoleUnlock();
         checkSpreadAbilityUnlock();
         checkScoutRoleUnlock();
+        checkMinerRoleUnlock();
         checkDynastyTriggers();
         checkTradeRoleTriggers();
         checkTunnelRoleUnlock();
@@ -195,6 +196,7 @@ public class TriggerManager {
             checkNPCResearcher(npc);
             checkNPCGraver(npc);
             checkNPCScout(npc);
+            checkNPCMiner(npc);
             checkNPCPolice(npc);
             checkNPCAirSupport(npc);
             checkNPCUnitRoles(npc);
@@ -279,6 +281,16 @@ public class TriggerManager {
         boolean highPop = npc.getAntTotal() > GameNumbers.TRIGGER_NPC_SCOUT_MIN_ANTS;
         if (lowFood || highPop) {
             npc.unlockUpgrade(GameUnlocks.ROLE_SCOUT);
+        }
+    }
+
+    private void checkNPCMiner(Colony npc) {
+        if (npc.hasUpgrade(GameUnlocks.ROLE_MINER)) return;
+        if (!npc.hasUpgrade(GameUnlocks.TYPE_SOLDIER)) return;
+        Dynasty dynasty = npc.getDynasty();
+        if (GameUnlocks.countDynastyBuildingsOfTier(dynasty, GameConstants.TIER_3)
+                >= GameNumbers.TRIGGER_MINER_TIER3_BUILDINGS) {
+            npc.unlockUpgrade(GameUnlocks.ROLE_MINER);
         }
     }
 
@@ -448,11 +460,24 @@ public class TriggerManager {
     
     private void checkScoutRoleUnlock() {
         if (playerColony.hasUpgrade(GameUnlocks.ROLE_SCOUT)) return;
-
+        
         if (plantHarvestProgress(playerColony) >= GameNumbers.TRIGGER_SCOUT_PLANT_COLLECTED) {
             fireLocalizedTrigger(GameUnlocks.ROLE_SCOUT,
                 LanguageStrings.TRIGGER_SCOUT_ROLE_TITLE,
                 LanguageStrings.TRIGGER_SCOUT_ROLE_MSG);
+        }
+    }
+
+    private void checkMinerRoleUnlock() {
+        if (playerColony.hasUpgrade(GameUnlocks.ROLE_MINER)) return;
+        if (!playerColony.hasUpgrade(GameUnlocks.TYPE_SOLDIER)) return;
+
+        Dynasty dynasty = playerColony.getDynasty();
+        if (GameUnlocks.countDynastyBuildingsOfTier(dynasty, GameConstants.TIER_3)
+                >= GameNumbers.TRIGGER_MINER_TIER3_BUILDINGS) {
+            fireLocalizedTrigger(GameUnlocks.ROLE_MINER,
+                LanguageStrings.TRIGGER_MINER_ROLE_TITLE,
+                LanguageStrings.TRIGGER_MINER_ROLE_MSG);
         }
     }
 

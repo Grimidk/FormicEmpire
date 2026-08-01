@@ -648,6 +648,7 @@ public final class LanguageStrings {
     public static final String TRIGGER_PROGRESS_METRIC_WARS = "TRIGGER_PROGRESS_METRIC_WARS";
     public static final String TRIGGER_PROGRESS_METRIC_RANK = "TRIGGER_PROGRESS_METRIC_RANK";
     public static final String TRIGGER_PROGRESS_METRIC_PLANTS = "TRIGGER_PROGRESS_METRIC_PLANTS";
+    public static final String TRIGGER_PROGRESS_METRIC_TIER3_BUILDINGS = "TRIGGER_PROGRESS_METRIC_TIER3_BUILDINGS";
     public static final String TRIGGER_PROGRESS_METRIC_RESOURCES = "TRIGGER_PROGRESS_METRIC_RESOURCES";
     public static final String TRIGGER_PROGRESS_HINT_RESEARCHER = "TRIGGER_PROGRESS_HINT_RESEARCHER";
     public static final String TRIGGER_PROGRESS_HINT_GRAVER = "TRIGGER_PROGRESS_HINT_GRAVER";
@@ -662,6 +663,7 @@ public final class LanguageStrings {
     public static final String TRIGGER_PROGRESS_HINT_COMMANDER = "TRIGGER_PROGRESS_HINT_COMMANDER";
     public static final String TRIGGER_PROGRESS_HINT_RANK = "TRIGGER_PROGRESS_HINT_RANK";
     public static final String TRIGGER_PROGRESS_HINT_SCOUT = "TRIGGER_PROGRESS_HINT_SCOUT";
+    public static final String TRIGGER_PROGRESS_HINT_MINER = "TRIGGER_PROGRESS_HINT_MINER";
     public static final String TRIGGER_PROGRESS_HINT_PARASITIC_MITE = "TRIGGER_PROGRESS_HINT_PARASITIC_MITE";
 
     public static final String DIALOG_HATCH_RATES_TITLE = "DIALOG_HATCH_RATES_TITLE";
@@ -1349,6 +1351,7 @@ public final class LanguageStrings {
     public static final String LOG_MATURATION_COMPLETE = "LOG_MATURATION_COMPLETE";
     public static final String LOG_TRADE_CANCELLED_FMT = "LOG_TRADE_CANCELLED_FMT";
     public static final String LOG_TRADE_ARRIVED_FMT = "LOG_TRADE_ARRIVED_FMT";
+    public static final String LOG_TRADE_OVERFLOW_RETURN_FMT = "LOG_TRADE_OVERFLOW_RETURN_FMT";
     public static final String LOG_TRADE_CONVOY_RETURN_FMT = "LOG_TRADE_CONVOY_RETURN_FMT";
     public static final String LOG_TRADE_BILATERAL_RETURN_FMT = "LOG_TRADE_BILATERAL_RETURN_FMT";
     public static final String LOG_TRADE_ROUTE_CANCELLED_FMT = "LOG_TRADE_ROUTE_CANCELLED_FMT";
@@ -2293,6 +2296,44 @@ public final class LanguageStrings {
     public static final String RESIN_RESERVOIR_3 = "RESIN_RESERVOIR_3";
     public static final String RESIN_RESERVOIR_3_DESC = "RESIN_RESERVOIR_3_DESC";
 
+    public static final String ROYAL_CHAMBER_4 = "ROYAL_CHAMBER_4";
+    public static final String ROYAL_CHAMBER_4_DESC = "ROYAL_CHAMBER_4_DESC";
+    public static final String EGG_CHAMBER_4 = "EGG_CHAMBER_4";
+    public static final String EGG_CHAMBER_4_DESC = "EGG_CHAMBER_4_DESC";
+    public static final String MUSHROOM_CHAMBER_4 = "MUSHROOM_CHAMBER_4";
+    public static final String MUSHROOM_CHAMBER_4_DESC = "MUSHROOM_CHAMBER_4_DESC";
+    public static final String PLANT_CHAMBER_4 = "PLANT_CHAMBER_4";
+    public static final String PLANT_CHAMBER_4_DESC = "PLANT_CHAMBER_4_DESC";
+    public static final String WATER_RESERVOIR_4 = "WATER_RESERVOIR_4";
+    public static final String WATER_RESERVOIR_4_DESC = "WATER_RESERVOIR_4_DESC";
+    public static final String MEAT_CHAMBER_4 = "MEAT_CHAMBER_4";
+    public static final String MEAT_CHAMBER_4_DESC = "MEAT_CHAMBER_4_DESC";
+    public static final String SYRUP_RESERVOIR_4 = "SYRUP_RESERVOIR_4";
+    public static final String SYRUP_RESERVOIR_4_DESC = "SYRUP_RESERVOIR_4_DESC";
+    public static final String ROCK_WAREHOUSE_4 = "ROCK_WAREHOUSE_4";
+    public static final String ROCK_WAREHOUSE_4_DESC = "ROCK_WAREHOUSE_4_DESC";
+    public static final String RESIN_RESERVOIR_4 = "RESIN_RESERVOIR_4";
+    public static final String RESIN_RESERVOIR_4_DESC = "RESIN_RESERVOIR_4_DESC";
+
+    public static final String ROYAL_CHAMBER_5 = "ROYAL_CHAMBER_5";
+    public static final String ROYAL_CHAMBER_5_DESC = "ROYAL_CHAMBER_5_DESC";
+    public static final String EGG_CHAMBER_5 = "EGG_CHAMBER_5";
+    public static final String EGG_CHAMBER_5_DESC = "EGG_CHAMBER_5_DESC";
+    public static final String MUSHROOM_CHAMBER_5 = "MUSHROOM_CHAMBER_5";
+    public static final String MUSHROOM_CHAMBER_5_DESC = "MUSHROOM_CHAMBER_5_DESC";
+    public static final String PLANT_CHAMBER_5 = "PLANT_CHAMBER_5";
+    public static final String PLANT_CHAMBER_5_DESC = "PLANT_CHAMBER_5_DESC";
+    public static final String WATER_RESERVOIR_5 = "WATER_RESERVOIR_5";
+    public static final String WATER_RESERVOIR_5_DESC = "WATER_RESERVOIR_5_DESC";
+    public static final String MEAT_CHAMBER_5 = "MEAT_CHAMBER_5";
+    public static final String MEAT_CHAMBER_5_DESC = "MEAT_CHAMBER_5_DESC";
+    public static final String SYRUP_RESERVOIR_5 = "SYRUP_RESERVOIR_5";
+    public static final String SYRUP_RESERVOIR_5_DESC = "SYRUP_RESERVOIR_5_DESC";
+    public static final String ROCK_WAREHOUSE_5 = "ROCK_WAREHOUSE_5";
+    public static final String ROCK_WAREHOUSE_5_DESC = "ROCK_WAREHOUSE_5_DESC";
+    public static final String RESIN_RESERVOIR_5 = "RESIN_RESERVOIR_5";
+    public static final String RESIN_RESERVOIR_5_DESC = "RESIN_RESERVOIR_5_DESC";
+
     public static final String PASSIVE_LAB = "PASSIVE_LAB";
     public static final String PASSIVE_LAB_DESC = "PASSIVE_LAB_DESC";
     public static final String PASSIVE_WATER = "PASSIVE_WATER";
@@ -2505,6 +2546,8 @@ public final class LanguageStrings {
     public static final String TRIGGER_SPREAD_ABILITY_MSG = "TRIGGER_SPREAD_ABILITY_MSG";
     public static final String TRIGGER_SCOUT_ROLE_TITLE = "TRIGGER_SCOUT_ROLE_TITLE";
     public static final String TRIGGER_SCOUT_ROLE_MSG = "TRIGGER_SCOUT_ROLE_MSG";
+    public static final String TRIGGER_MINER_ROLE_TITLE = "TRIGGER_MINER_ROLE_TITLE";
+    public static final String TRIGGER_MINER_ROLE_MSG = "TRIGGER_MINER_ROLE_MSG";
     public static final String TRIGGER_POLICE_ROLE_TITLE = "TRIGGER_POLICE_ROLE_TITLE";
     public static final String TRIGGER_POLICE_ROLE_MSG = "TRIGGER_POLICE_ROLE_MSG";
     public static final String TRIGGER_PARASITIC_MITE_TITLE = "TRIGGER_PARASITIC_MITE_TITLE";

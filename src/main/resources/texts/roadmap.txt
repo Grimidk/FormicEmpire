@@ -21,16 +21,17 @@ To Fix (By decreasing priority):
 	Important not Urgent:
 		map hexes look kinda yank
 		Font - self explanatory
+		improve late game performance and hourly hang ups
 	
 To Feature (to be done in order):
 Needed for launch (v1.0) (Launch Version):
 	Priority:
-		minerals with uprades to find it and increase miner efficency, also mushroom detection, more buildings lvl 4 a 5 using minerals
 		research tree and building tree (orchard) (after icons) with available, purchasable, locked and list trigger based upgrades 
 		music and sounds and settings for them and player panel (to include in core engine)
-		rework how carrying looks completely, maybe have an resource icon (do not scale) inside jaws
 	
 	Everything else :
+		rework how carrying looks completely, maybe have an resource icon (do not scale) inside jaws
+		mushroom detection and mushroom abudance
 		swarm vs creature battles
 		more enemies (single battle or swarm battles):
 			Bugs (Bombardier beetle, ant lions, soldier and exploding aphids, termites, bees, hornets, dragonfly, dung beetle, cuban cockroach, goliath beetle, cricket moles, locust swarms, scalopendra)

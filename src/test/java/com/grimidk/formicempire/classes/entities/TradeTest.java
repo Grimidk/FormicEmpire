@@ -55,6 +55,76 @@ public class TradeTest {
     }
 
     @Test
+    public void testOverflowReturnsToOriginWhenDestinationFull() throws Exception {
+        origin.unlockBuilding(GameUnlocks.PLANT_CHAMBER_0);
+        destination.unlockBuilding(GameUnlocks.PLANT_CHAMBER_0);
+        origin.setPlants(200);
+        destination.setPlants(destination.getPlantsCapacity());
+
+        transport.clear();
+        transport.put(GameConstants.TYPE_SOLDIER, 50);
+
+        Trade trade = new Trade(originHex, destHex, load, null, transport, false, false, GameConstants.METHOD_LAND);
+        assertTrue(trade.startTrip());
+        assertEquals(100.0, origin.getPlantsPrecise(), 0.01);
+
+        Field remainingHoursField = Trade.class.getDeclaredField("remainingHours");
+        remainingHoursField.setAccessible(true);
+        remainingHoursField.set(trade, 1);
+        trade.tick();
+
+        assertEquals(destination.getPlantsCapacity(), destination.getPlantsPrecise(), 0.01);
+        assertEquals(200.0, origin.getPlantsPrecise(), 0.01);
+    }
+
+    @Test
+    public void testOverflowDiscardedWhenOriginAlsoFull() throws Exception {
+        origin.unlockBuilding(GameUnlocks.PLANT_CHAMBER_0);
+        destination.unlockBuilding(GameUnlocks.PLANT_CHAMBER_0);
+        origin.setPlants(origin.getPlantsCapacity());
+        destination.setPlants(destination.getPlantsCapacity());
+
+        // Temporarily free space at origin so startTrip can consume cargo, then refill.
+        origin.setPlants(origin.getPlantsCapacity() - 100);
+        transport.clear();
+        transport.put(GameConstants.TYPE_SOLDIER, 50);
+
+        Trade trade = new Trade(originHex, destHex, load, null, transport, false, false, GameConstants.METHOD_LAND);
+        assertTrue(trade.startTrip());
+        origin.setPlants(origin.getPlantsCapacity());
+
+        Field remainingHoursField = Trade.class.getDeclaredField("remainingHours");
+        remainingHoursField.setAccessible(true);
+        remainingHoursField.set(trade, 1);
+        trade.tick();
+
+        assertEquals(destination.getPlantsCapacity(), destination.getPlantsPrecise(), 0.01);
+        assertEquals(origin.getPlantsCapacity(), origin.getPlantsPrecise(), 0.01);
+    }
+
+    @Test
+    public void testPartialOverflowReturnsRemainder() throws Exception {
+        origin.unlockBuilding(GameUnlocks.PLANT_CHAMBER_0);
+        destination.unlockBuilding(GameUnlocks.PLANT_CHAMBER_0);
+        origin.setPlants(200);
+        destination.setPlants(destination.getPlantsCapacity() - 40);
+
+        transport.clear();
+        transport.put(GameConstants.TYPE_SOLDIER, 50);
+
+        Trade trade = new Trade(originHex, destHex, load, null, transport, false, false, GameConstants.METHOD_LAND);
+        assertTrue(trade.startTrip());
+
+        Field remainingHoursField = Trade.class.getDeclaredField("remainingHours");
+        remainingHoursField.setAccessible(true);
+        remainingHoursField.set(trade, 1);
+        trade.tick();
+
+        assertEquals(destination.getPlantsCapacity(), destination.getPlantsPrecise(), 0.01);
+        assertEquals(160.0, origin.getPlantsPrecise(), 0.01);
+    }
+
+    @Test
     public void testCapacityCheckSucceedsWhenNotFull() {
         destination.unlockBuilding(GameUnlocks.PLANT_CHAMBER_0); 
         origin.unlockBuilding(GameUnlocks.PLANT_CHAMBER_0);

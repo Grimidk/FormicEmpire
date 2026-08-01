@@ -91,9 +91,9 @@ class EngineDefaultRolesTest {
     @Test
     void sanitizeRejectsUnobtainableRole() {
         int safe = Engine.sanitizeDefaultRoleId(
-                GameConstants.TYPE_WORKER,
-                GameConstants.ROLE_MINER.getId(),
-                GameConstants.ROLE_FORAGER.getId());
-        assertEquals(GameConstants.ROLE_FORAGER.getId(), safe);
+                GameConstants.TYPE_MAJOR,
+                GameConstants.ROLE_CARRIER.getId(),
+                GameConstants.ROLE_CRANE.getId());
+        assertEquals(GameConstants.ROLE_CRANE.getId(), safe);
     }
 }

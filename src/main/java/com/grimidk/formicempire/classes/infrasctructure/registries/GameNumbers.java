@@ -201,6 +201,8 @@ public final class GameNumbers {
     public static final int TRIGGER_MASS_FLIGHT_MIN_NUPTIALS = 10;
     public static final int TRIGGER_BILATERAL_MIN_TRADES = 5;
     public static final int TRIGGER_SCOUT_PLANT_COLLECTED = 6000;
+    public static final int TRIGGER_MINER_TIER3_BUILDINGS = 10;
+    public static final double MINING_GATHER_SUCCESS_CHANCE = 0.10;
     public static final int TRIGGER_DYNASTY_MIN_COLONIES = 2;
     public static final int TRIGGER_TRADE_MIN_COLONIES = 3;
     public static final int TRIGGER_MANAGEMENT_MIN_COLONIES = 4;

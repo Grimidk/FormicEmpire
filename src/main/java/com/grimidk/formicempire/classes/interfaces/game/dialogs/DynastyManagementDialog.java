@@ -1108,6 +1108,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 JSpinner s = new JSpinner(new SpinnerNumberModel(initialVal, 0.0, available, 10.0));
                 s.setFocusable(false);
                 AssetStyles.styleSpinner(s);
+                s.setPreferredSize(AssetStyles.preferredSpinnerSize(140));
                 s.addChangeListener(e -> updateStats());
                 resourceSpinners.put(rt, s);
                 p.add(s);
@@ -1146,6 +1147,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 JSpinner s = new JSpinner(new SpinnerNumberModel(initialVal, 0.0, 1000000.0, 10.0));
                 s.setFocusable(false);
                 AssetStyles.styleSpinner(s);
+                s.setPreferredSize(AssetStyles.preferredSpinnerSize(140));
                 s.addChangeListener(e -> updateStats());
                 returnResourceSpinners.put(rt, s);
                 p.add(s);
@@ -1213,6 +1215,7 @@ public class DynastyManagementDialog extends ZeroDialog {
                 JSpinner s = new JSpinner(new SpinnerNumberModel(initialVal, 0, available, 1));
                 s.setFocusable(false);
                 AssetStyles.styleSpinner(s);
+                s.setPreferredSize(AssetStyles.preferredSpinnerSize(100));
                 s.addChangeListener(e -> {
                     updateAvailableMethods();
                     updateStats();

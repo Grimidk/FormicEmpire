@@ -812,6 +812,7 @@ public class Colony {
     public void setDynasty(Dynasty dynasty) { 
         this.dynasty = dynasty; 
         if (dynasty != null) {
+            this.isPlayer = dynasty.isPlayer();
             if (!dynasty.getColonies().contains(this)) {
                 dynasty.addColony(this); 
             }
@@ -875,6 +876,11 @@ public class Colony {
     
     public boolean isPlayer() { return isPlayer; }
     public void setIsPlayer(boolean isPlayer) { this.isPlayer = isPlayer; }
+
+    public boolean belongsToPlayerDynasty() {
+        return dynasty != null && dynasty.isPlayer();
+    }
+
     public Rank getRank() { return rank; }
     public void setRank(Rank rank) { this.rank = rank; }
     public boolean isActive() { return isActive; }
@@ -994,6 +1000,8 @@ public class Colony {
     public boolean startBuildingProject(Building building) {
         if (currentBuildingProject != null) return false;
         if (building == null || !building.isAvailableFor(getDynasty())) return false;
+        if (!GameUnlocks.meetsBuildingUnlockRequirement(this, building)) return false;
+        if (building.getRequirement() != null && !hasBuilding(building.getRequirement())) return false;
         if (getMinerals() < building.getMineralCost() || getResins() < building.getResinCost()) {
             return false; 
         }
@@ -1398,8 +1406,10 @@ public class Colony {
         int resins = getResins();
         for (Building building : GameUnlocks.getBuildings()) {
             if (!hasBuilding(building) && minerals >= building.getMineralCost()
-                    && resins >= building.getResinCost() && hasBuilding(building.getRequirement())
-                    && building.isAvailableFor(getDynasty())) {
+                    && resins >= building.getResinCost()
+                    && (building.getRequirement() == null || hasBuilding(building.getRequirement()))
+                    && building.isAvailableFor(getDynasty())
+                    && GameUnlocks.meetsBuildingUnlockRequirement(this, building)) {
                 return building;
             }
         }

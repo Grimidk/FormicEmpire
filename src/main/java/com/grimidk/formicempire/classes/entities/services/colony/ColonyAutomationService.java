@@ -92,9 +92,10 @@ public class ColonyAutomationService {
             boolean notOwned = !colony.hasBuilding(b);
             boolean reqMet = (b.getRequirement() == null || colony.hasBuilding(b.getRequirement()));
             boolean tierMet = b.isAvailableFor(colony.getDynasty());
+            boolean unlockMet = GameUnlocks.meetsBuildingUnlockRequirement(colony, b);
             boolean canAfford = colony.getMinerals() >= b.getMineralCost() && colony.getResins() >= b.getResinCost();
 
-            if (notOwned && reqMet && tierMet && canAfford) {
+            if (notOwned && reqMet && tierMet && unlockMet && canAfford) {
                 candidates.add(b);
             }
         }

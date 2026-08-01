@@ -171,9 +171,11 @@ public class ColonyLabourService {
             List<Ant> miners = getWorkingAnts(colony, GameConstants.ROLE_MINER);
             if (!miners.isEmpty()) {
                 for(Ant a : miners) a.clearLoad();
-                int totalPower = (int) (miners.size() * stats.getCollectingRate(colony));
-                List<ResourceSource> sources = locations.getSourcesByType(GameConstants.RESOURCE_ROCK);
-                processGathering(colony, sources, totalPower, GameConstants.RESOURCE_ROCK, miners);
+                if (GameRandom.nextDouble() < GameNumbers.MINING_GATHER_SUCCESS_CHANCE) {
+                    int totalPower = (int) (miners.size() * stats.getCollectingRate(colony));
+                    List<ResourceSource> sources = locations.getSourcesByType(GameConstants.RESOURCE_ROCK);
+                    processGathering(colony, sources, totalPower, GameConstants.RESOURCE_ROCK, miners);
+                }
             }
         }
 
@@ -514,7 +516,8 @@ public class ColonyLabourService {
         if (colony.hasUpgrade(GameUnlocks.ROLE_HUNTER) && !locations.isSourceFull(colony, GameConstants.RESOURCE_MEAT)) {
             possibleTypes.add(GameConstants.RESOURCE_MEAT);
         }
-        if (colony.hasUpgrade(GameUnlocks.ROLE_MINER) && !locations.isSourceFull(colony, GameConstants.RESOURCE_ROCK)) {
+        if (colony.hasUpgrade(GameUnlocks.ROLE_MINER) && !locations.isSourceFull(colony, GameConstants.RESOURCE_ROCK)
+                && biome != null && biome.getMineralAbundance() > 0) {
             possibleTypes.add(GameConstants.RESOURCE_ROCK);
         }
         if (!locations.isSourceFull(colony, GameConstants.RESOURCE_WATER)) {

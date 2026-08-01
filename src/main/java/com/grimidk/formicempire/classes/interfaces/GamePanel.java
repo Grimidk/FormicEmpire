@@ -693,7 +693,7 @@ public class GamePanel extends ZeroGamePanel {
     private void showHatchRateDialog() {
         Engine engine = frame.getEngine();
         Colony colony = getColonyFromEngine(engine);
-        if (colony == null || !colony.isPlayer()) return;
+        if (colony == null || !colony.belongsToPlayerDynasty()) return;
         
         if (hatchDialog != null && hatchDialog.isShowing()) {
             hatchDialog.dispose();
@@ -710,7 +710,7 @@ public class GamePanel extends ZeroGamePanel {
     private void showRoleManagementDialog(int tabType) {
         Engine engine = frame.getEngine();
         Colony colony = getColonyFromEngine(engine);
-        if (colony == null || !colony.isPlayer()) return;
+        if (colony == null || !colony.belongsToPlayerDynasty()) return;
         
         if (roleDialog != null && roleDialog.getColony() != colony) {
             roleDialog.dispose();
@@ -738,7 +738,7 @@ public class GamePanel extends ZeroGamePanel {
     private void showResearchDialog() {
         Engine engine = frame.getEngine();
         Colony colony = getColonyFromEngine(engine);
-        if (colony == null || !colony.isPlayer()) return;
+        if (colony == null || !colony.belongsToPlayerDynasty()) return;
         
         if (upgradeDialog != null && upgradeDialog.isTabOpen(UpgradeDialog.TAB_RESEARCH)) {
             upgradeDialog.dispose();
@@ -761,7 +761,7 @@ public class GamePanel extends ZeroGamePanel {
     private void showBuildDialog() {
         Engine engine = frame.getEngine();
         Colony colony = getColonyFromEngine(engine);
-        if (colony == null || !colony.isPlayer()) return;
+        if (colony == null || !colony.belongsToPlayerDynasty()) return;
         
         if (upgradeDialog != null && upgradeDialog.isTabOpen(UpgradeDialog.TAB_BUILD)) {
             upgradeDialog.dispose();
@@ -784,7 +784,7 @@ public class GamePanel extends ZeroGamePanel {
     private void showAssimilationDialog() {
         Engine engine = frame.getEngine();
         Colony colony = getColonyFromEngine(engine);
-        if (colony == null || !colony.isPlayer()) return;
+        if (colony == null || !colony.belongsToPlayerDynasty()) return;
         
         if (upgradeDialog != null && upgradeDialog.isTabOpen(UpgradeDialog.TAB_ASSIMILATION)) {
             upgradeDialog.dispose();
@@ -807,7 +807,7 @@ public class GamePanel extends ZeroGamePanel {
     private void showSynergyDialog() {
         Engine engine = frame.getEngine();
         Colony colony = getColonyFromEngine(engine);
-        if (colony == null || !colony.isPlayer()) return;
+        if (colony == null || !colony.belongsToPlayerDynasty()) return;
 
         if (upgradeDialog != null && upgradeDialog.isTabOpen(UpgradeDialog.TAB_SYNERGY)) {
             upgradeDialog.dispose();
@@ -830,7 +830,7 @@ public class GamePanel extends ZeroGamePanel {
     private void showAbilitiesDialog() {
         Engine engine = frame.getEngine();
         Colony colony = getColonyFromEngine(engine);
-        if (colony == null || !colony.isPlayer()) return;
+        if (colony == null || !colony.belongsToPlayerDynasty()) return;
         
         if (abilitiesDialog != null && abilitiesDialog.isShowing()) {
             abilitiesDialog.dispose();
@@ -1359,7 +1359,7 @@ public class GamePanel extends ZeroGamePanel {
                     if (world != null && world.getActiveHex() != null) {
                         colony = world.getActiveHex().getColony();
                     }
-                    if (colony == null || !colony.isPlayer()) {
+                    if (colony == null || !colony.belongsToPlayerDynasty()) {
                         cleanupSession();
                         UiOptionPane.showMessageDialog(frame,
                                 LanguageStrings.get(LanguageStrings.UI_ERROR_LOADING),
@@ -1594,11 +1594,11 @@ public class GamePanel extends ZeroGamePanel {
         worldPanel.updateHourData(world);
         colonyPanel.updateHourData(colony);
         
-        if (colony != null && colony.isPlayer()) {
+        if (colony != null && colony.belongsToPlayerDynasty()) {
             updateGameAreaSize();
         }
 
-        if (colony != null && colony.isPlayer()) {
+        if (colony != null && colony.belongsToPlayerDynasty()) {
             if (upgradeDialog != null && upgradeDialog.isShowing()) {
                 upgradeDialog.liveUpdate();
             }
@@ -1622,7 +1622,7 @@ public class GamePanel extends ZeroGamePanel {
                 controlPanel.updateBuildMenu(colony.hasUpgrade(GameUnlocks.ABILITY_BUILD));
                 controlPanel.updateAssimilationMenu(colony.hasUpgrade(GameUnlocks.ABILITY_ASSIMILATION));
                 controlPanel.updateSynergyMenu(colony.hasUpgrade(GameUnlocks.ABILITY_SYNERGY));
-                controlPanel.updateAbilitiesMenu(colony.hasUpgrade(GameUnlocks.ABILITY_FORCED_FLIGHT));
+                controlPanel.updateAbilitiesMenu(colony.hasUpgrade(GameUnlocks.ABILITY_ABILITY));
                 controlPanel.updateDynastyMenu(true);
                 controlPanel.updateTradeMenu(true);
                 controlPanel.updateWarsMenu(true);
