@@ -22,7 +22,6 @@ To Fix (By decreasing priority):
 To Feature (to be done in priority order by blocks):
 Needed for launch (v1.0) (Launch Version):
 	Priority:
-		research tree and building tree (orchard) by tiers
 		music and sounds and player panel (plays anything in music folder)
 	
 	Everything else :
@@ -43,7 +42,7 @@ Needed for launch (v1.0) (Launch Version):
 		uncolonizable terrain with boss enemies  (non ant assimilation reward, unique bosses)
 		random events (meteor, earthquake, tornado, tsunami, hunts (for later) plus special weathers (rare events))
 		more stats (kills, historic productions, graphs?)
-		more biomes (beach, wetlands, burnt forest, ice field (cant start), ) and make contients have more variation with rivers in borders that may make unpassable terrain
+		more biomes (beach, wetlands, burnt forest (resin source, no water, cant start), ice field (cant start), ) and make contients have more variation with rivers in borders that may make unpassable terrain, lock species to certain biome, need an ant that only eats protein
 		non-ant assimilation ( Winged workers (Bees), Spiked larvae, Chemical throwing (Bombardier beetle), Chirping (Grass hopper), Diving, Mineralized exoskeletons and dense armor (diabolical ironclad beetles), Rock mining, Bioluminescence (Fireflies), Static electricity generation, Pollination (Flies) )
 		revamp story and lore and maybe intro screen
 		more hive rooms, specially more twisty (research room after royal chamber, barrack room before royal chamber)

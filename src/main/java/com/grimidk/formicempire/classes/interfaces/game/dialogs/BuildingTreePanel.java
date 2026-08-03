@@ -1,18 +1,17 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
-import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
+import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
-import com.grimidk.formicempire.classes.entities.services.shared.TriggerProgressService;
-import com.grimidk.formicempire.classes.entities.services.shared.TriggerProgressService.TriggerProgress;
-import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.GrayFilter;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -44,48 +43,57 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.FilteredImageSource;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdatePanel {
+public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdatePanel {
 
     private static final int NODE_SIZE = AssetStyles.MIN_CONTROL_HIT_SIZE;
     private static final int NODE_PAD = 4;
     private static final int NODE_HIT = NODE_SIZE + NODE_PAD * 2;
-    /** One layout unit = one node size; grid step 1.5 → centers are 1.5 nodes apart. */
     private static final int UNIT_SIZE = NODE_HIT;
     private static final int PADDING = 32;
     private static final float EDGE_STROKE = 2.5f;
+    private static final float DIVIDER_STROKE = 1.5f;
     private static final int BORDER_STROKE = 2;
     private static final int ARROW_SIZE = 9;
     private static final int DRAG_THRESHOLD_PX = 6;
     private static final Dimension DETAIL_CARD_SIZE = new Dimension(360, 400);
 
     private final Colony colony;
-    private final Engine engine;
     private final Runnable onTreeChanged;
-    private final JLabel researchPointsLabel;
+    private final JLabel mineralsLabel;
+    private final JLabel resinLabel;
+    private final JLabel buildersLabel;
+    private final JLabel cranesLabel;
     private final TreeCanvas canvas;
     private final JScrollPane scrollPane;
     private final DetailCard detailCard;
 
-    private ResearchTreeGraph.Result graph = ResearchTreeGraph.build(null, null);
+    private BuildingTreeGraph.Result graph = BuildingTreeGraph.build(null);
 
-    public ResearchTreePanel(Colony colony, Engine engine, Runnable onTreeChanged) {
+    public BuildingTreePanel(Colony colony, Runnable onTreeChanged) {
         super(new BorderLayout());
         this.colony = colony;
-        this.engine = engine;
         this.onTreeChanged = onTreeChanged;
         setBackground(AssetStyles.BACKGROUND_COLOR);
-
-        researchPointsLabel = new JLabel();
-        researchPointsLabel.setFont(AssetStyles.FONT_BOLD);
-        researchPointsLabel.setForeground(AssetStyles.FONT_COLOR_HEADER);
 
         JPanel northPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         northPanel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
         northPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-        northPanel.add(researchPointsLabel);
+        mineralsLabel = statusLabel(GameConstants.RESOURCE_ROCK.getIcon());
+        resinLabel = statusLabel(GameConstants.RESOURCE_RESIN.getIcon());
+        buildersLabel = statusLabel(GameConstants.ROLE_BUILDER.getIcon());
+        cranesLabel = statusLabel(GameConstants.ROLE_CRANE.getIcon());
+        northPanel.add(mineralsLabel);
+        northPanel.add(Box.createRigidArea(new Dimension(10, 0)));
+        northPanel.add(resinLabel);
+        northPanel.add(Box.createRigidArea(new Dimension(10, 0)));
+        northPanel.add(buildersLabel);
+        northPanel.add(Box.createRigidArea(new Dimension(10, 0)));
+        northPanel.add(cranesLabel);
         add(northPanel, BorderLayout.NORTH);
 
         canvas = new TreeCanvas();
@@ -118,36 +126,54 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
         add(stack, BorderLayout.CENTER);
     }
 
+    private JLabel statusLabel(Icon icon) {
+        JLabel label = new JLabel(icon);
+        label.setFont(AssetStyles.FONT_NORMAL);
+        label.setForeground(AssetStyles.FONT_COLOR);
+        return label;
+    }
+
     @Override
     public void updateData() {
-        updateResearchPointsLabel();
-        graph = ResearchTreeGraph.build(colony, engine);
+        updateResourceLabels();
+        graph = BuildingTreeGraph.build(colony);
         if (detailCard.isVisible()) {
             detailCard.refreshFromSelection();
         }
         canvas.rebuildLayout();
         canvas.revalidate();
         canvas.repaint();
-        SwingUtilities.invokeLater(canvas::scrollCenterIntoView);
+        SwingUtilities.invokeLater(canvas::scrollBasicsIntoView);
     }
 
     @Override
     public void liveUpdate() {
-        updateResearchPointsLabel();
-        graph = ResearchTreeGraph.build(colony, engine);
+        updateResourceLabels();
+        graph = BuildingTreeGraph.build(colony);
         if (detailCard.isVisible()) {
             detailCard.refreshFromSelection();
         }
         canvas.repaint();
     }
 
-    private void updateResearchPointsLabel() {
-        researchPointsLabel.setText(LanguageStrings.format(
-                LanguageStrings.UPGRADE_RESEARCH_AVAILABLE, colony.getResearchPoints()));
+    private void updateResourceLabels() {
+        mineralsLabel.setText(AssetStyles.formatRatio(colony.getMinerals(), colony.getMineralsCapacity()));
+        resinLabel.setText(AssetStyles.formatRatio(colony.getResins(), colony.getResinsCapacity()));
+        buildersLabel.setText(LanguageStrings.format(
+                LanguageStrings.BUILD_STATUS_BUILDERS,
+                colony.getAssignedRoleCount(GameConstants.ROLE_BUILDER)));
+        if (colony.hasUpgrade(GameUnlocks.ROLE_CRANE)) {
+            cranesLabel.setVisible(true);
+            cranesLabel.setText(LanguageStrings.format(
+                    LanguageStrings.BUILD_STATUS_CRANES,
+                    colony.getAssignedRoleCount(GameConstants.ROLE_CRANE)));
+        } else {
+            cranesLabel.setVisible(false);
+        }
     }
 
-    private void openDetail(ResearchTreeGraph.Node node) {
-        detailCard.showUpgrade(node);
+    private void openDetail(BuildingTreeGraph.Node node) {
+        detailCard.showBuilding(node);
         detailCard.setVisible(true);
         detailCard.revalidate();
         detailCard.repaint();
@@ -158,8 +184,8 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
     }
 
     private final class DetailCard extends JPanel {
-        private Upgrade selectedUpgrade;
-        private ResearchTreeGraph.NodeState selectedState;
+        private Building selectedBuilding;
+        private BuildingTreeGraph.NodeState selectedState;
         private final JTextArea titleArea;
         private final JLabel iconLabel;
         private final JLabel tierLabel;
@@ -167,8 +193,8 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
         private final JTextArea requirementArea;
         private final JTextArea progressArea;
         private final JTextArea descriptionArea;
-        private final JButton buyButton;
-        private final JButton cancelButton;
+        private final JButton actionButton;
+        private final JButton closeButton;
 
         DetailCard() {
             setLayout(new BorderLayout(8, 8));
@@ -201,20 +227,19 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
             center.add(Box.createRigidArea(new Dimension(0, 6)));
 
             descriptionArea = wrappingArea(AssetStyles.FONT_NORMAL, AssetStyles.FONT_COLOR);
-            descriptionArea.setAlignmentX(Component.LEFT_ALIGNMENT);
             center.add(descriptionArea);
             add(center, BorderLayout.CENTER);
 
             JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 4));
             actions.setOpaque(false);
-            cancelButton = new JButton(LanguageStrings.get(LanguageStrings.UI_CANCEL));
-            AssetStyles.styleButton(cancelButton);
-            cancelButton.addActionListener(e -> closeDetail());
-            buyButton = new JButton(LanguageStrings.get(LanguageStrings.UI_BUY));
-            AssetStyles.styleButton(buyButton);
-            buyButton.addActionListener(e -> purchaseSelected());
-            actions.add(cancelButton);
-            actions.add(buyButton);
+            closeButton = new JButton(LanguageStrings.get(LanguageStrings.UI_CANCEL));
+            AssetStyles.styleButton(closeButton);
+            closeButton.addActionListener(e -> closeDetail());
+            actionButton = new JButton(LanguageStrings.get(LanguageStrings.UI_BUILD));
+            AssetStyles.styleButton(actionButton);
+            actionButton.addActionListener(e -> onAction());
+            actions.add(closeButton);
+            actions.add(actionButton);
             add(actions, BorderLayout.SOUTH);
         }
 
@@ -240,42 +265,43 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
             return area;
         }
 
-        void showUpgrade(ResearchTreeGraph.Node node) {
-            selectedUpgrade = node.getUpgrade();
+        void showBuilding(BuildingTreeGraph.Node node) {
+            selectedBuilding = node.getBuilding();
             selectedState = node.getState();
             refreshFromSelection();
         }
 
         void hideCard() {
-            selectedUpgrade = null;
+            selectedBuilding = null;
             selectedState = null;
             setVisible(false);
         }
 
         void refreshFromSelection() {
-            if (selectedUpgrade == null) {
+            if (selectedBuilding == null) {
                 return;
             }
-            selectedState = ResearchTreeGraph.stateFor(colony, engine, selectedUpgrade);
-            Upgrade upgrade = selectedUpgrade;
+            selectedState = BuildingTreeGraph.stateFor(colony, selectedBuilding);
+            Building building = selectedBuilding;
 
-            titleArea.setText(upgrade.getDisplayName());
-            ImageIcon icon = upgrade.getIcon() != null ? upgrade.getIcon() : GameConstants.ICON_UNKNOWN;
+            titleArea.setText(building.getDisplayName());
+            ImageIcon icon = building.getIcon() != null ? building.getIcon() : GameConstants.ICON_UNKNOWN;
             iconLabel.setIcon(icon);
 
-            tierLabel.setIcon(upgrade.getTierIcon());
+            tierLabel.setIcon(building.getTierIcon());
             tierLabel.setText(null);
-            tierLabel.setToolTipText(upgrade.getTier().getName());
+            tierLabel.setToolTipText(building.getTier().getName());
 
-            if (upgrade.getCost() > 0) {
-                costArea.setText(LanguageStrings.format(LanguageStrings.UPGRADE_COST_RP, upgrade.getCost()));
-                costArea.setVisible(true);
-            } else {
-                costArea.setText("");
-                costArea.setVisible(false);
-            }
+            costArea.setText(
+                    GameConstants.RESOURCE_ROCK.getName() + ": "
+                            + AssetStyles.formatNumber(building.getMineralCost()) + "\n"
+                            + GameConstants.RESOURCE_RESIN.getName() + ": "
+                            + AssetStyles.formatNumber(building.getResinCost()) + "\n"
+                            + LanguageStrings.get(LanguageStrings.HELP_BUILD_BASE_COST) + ": "
+                            + AssetStyles.formatNumber(building.getBuildTime()));
+            costArea.setVisible(true);
 
-            Upgrade requirement = upgrade.getRequirement();
+            Building requirement = building.getRequirement();
             if (requirement != null) {
                 requirementArea.setText(LanguageStrings.format(
                         LanguageStrings.UPGRADE_REQUIRES_FMT, requirement.getDisplayName()));
@@ -285,67 +311,104 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
                 requirementArea.setVisible(false);
             }
 
-            TriggerProgress progress = TriggerProgressService.find(colony, engine, upgrade);
-            if (progress != null) {
-                progressArea.setText(progress.getHint() + " — " + LanguageStrings.format(
-                        LanguageStrings.TRIGGER_PROGRESS_METRIC_FMT,
-                        progress.getMetricLabel(),
-                        progress.getCurrent(),
-                        progress.getRequired()));
+            if (selectedState == BuildingTreeGraph.NodeState.IN_PROGRESS
+                    || colony.getCurrentBuildingProject() == building) {
+                double efficiency = colony.getConstructionEfficiency();
+                double requiredHours = efficiency > 0
+                        ? building.getBuildTime() / efficiency
+                        : Double.POSITIVE_INFINITY;
+                double progressHours = colony.getBuildingProgressHours();
+                progressArea.setText(LanguageStrings.format(
+                        LanguageStrings.BUILD_PROGRESS_HOURS, progressHours, requiredHours));
                 progressArea.setVisible(true);
             } else {
                 progressArea.setText("");
                 progressArea.setVisible(false);
             }
 
-            descriptionArea.setText(upgrade.getDescription());
+            descriptionArea.setText(building.getDescription());
             descriptionArea.setCaretPosition(0);
             titleArea.setCaretPosition(0);
 
-            cancelButton.setText(LanguageStrings.get(LanguageStrings.UI_CANCEL));
-            buyButton.setText(LanguageStrings.get(LanguageStrings.UI_BUY));
-            boolean canBuy = selectedState == ResearchTreeGraph.NodeState.AFFORDABLE;
-            buyButton.setVisible(upgrade.getCost() > 0 && selectedState != ResearchTreeGraph.NodeState.OWNED);
-            buyButton.setEnabled(canBuy);
-            if (upgrade.getCost() > 0
-                    && selectedState != ResearchTreeGraph.NodeState.OWNED
-                    && selectedState != ResearchTreeGraph.NodeState.AFFORDABLE
-                    && (upgrade.getRequirement() == null || colony.hasUpgrade(upgrade.getRequirement()))) {
-                buyButton.setToolTipText(LanguageStrings.get(LanguageStrings.UPGRADE_NOT_ENOUGH_RP));
+            closeButton.setText(LanguageStrings.get(LanguageStrings.UI_CANCEL));
+            if (selectedState == BuildingTreeGraph.NodeState.OWNED) {
+                actionButton.setVisible(false);
+            } else if (selectedState == BuildingTreeGraph.NodeState.IN_PROGRESS
+                    || colony.getCurrentBuildingProject() == building) {
+                actionButton.setVisible(true);
+                actionButton.setEnabled(true);
+                actionButton.setText(LanguageStrings.get(LanguageStrings.UI_CANCEL));
+                actionButton.setToolTipText(null);
             } else {
-                buyButton.setToolTipText(null);
+                actionButton.setVisible(true);
+                actionButton.setText(LanguageStrings.get(LanguageStrings.UI_BUILD));
+                boolean canBuild = selectedState == BuildingTreeGraph.NodeState.AFFORDABLE;
+                actionButton.setEnabled(canBuild);
+                if (!canBuild) {
+                    int builders = colony.getAssignedRoleCount(GameConstants.ROLE_BUILDER);
+                    int cranes = colony.getAssignedRoleCount(GameConstants.ROLE_CRANE);
+                    if (builders <= 0 && cranes <= 0) {
+                        actionButton.setToolTipText(LanguageStrings.get(LanguageStrings.BUILD_REQUIREMENT_ERROR));
+                    } else if (colony.getMinerals() < building.getMineralCost()
+                            || colony.getResins() < building.getResinCost()) {
+                        actionButton.setToolTipText(LanguageStrings.get(LanguageStrings.BUILD_RESOURCES_ERROR));
+                    } else {
+                        actionButton.setToolTipText(null);
+                    }
+                } else {
+                    actionButton.setToolTipText(null);
+                }
             }
         }
 
-        private void purchaseSelected() {
-            if (selectedUpgrade == null) {
+        private void onAction() {
+            if (selectedBuilding == null) {
                 return;
             }
-            Upgrade upgrade = selectedUpgrade;
-            if (upgrade.getCost() <= 0 || colony.getResearchPoints() < upgrade.getCost()) {
+            Building building = selectedBuilding;
+            if (colony.getCurrentBuildingProject() == building) {
+                colony.setMinerals(colony.getMinerals() + building.getMineralCost());
+                colony.setResins(colony.getResins() + building.getResinCost());
+                colony.setCurrentBuildingProject(null);
+                colony.setBuildingProgressHours(0.0);
+                closeDetail();
+                if (onTreeChanged != null) {
+                    onTreeChanged.run();
+                }
                 return;
             }
-            if (ResearchTreeGraph.stateFor(colony, engine, upgrade) != ResearchTreeGraph.NodeState.AFFORDABLE) {
+            if (BuildingTreeGraph.stateFor(colony, building) != BuildingTreeGraph.NodeState.AFFORDABLE) {
                 return;
             }
-            colony.setResearchPoints(colony.getResearchPoints() - upgrade.getCost());
-            colony.unlockUpgrade(upgrade);
-            closeDetail();
-            if (onTreeChanged != null) {
-                onTreeChanged.run();
+            if (colony.startBuildingProject(building)) {
+                closeDetail();
+                if (onTreeChanged != null) {
+                    onTreeChanged.run();
+                }
             }
         }
     }
 
     private final class TreeCanvas extends JPanel {
-        private final Map<Upgrade, Rectangle> nodeBounds = new HashMap<>();
-        private final Map<Upgrade, Image> colorIcons = new HashMap<>();
-        private final Map<Upgrade, Image> greyIcons = new HashMap<>();
-        private int centerX;
-        private int centerY;
+        private final Map<Building, Rectangle> nodeBounds = new HashMap<>();
+        private final Map<Building, Image> colorIcons = new HashMap<>();
+        private final Map<Building, Image> greyIcons = new HashMap<>();
+        private final List<DividerLabel> dividerLabels = new ArrayList<>();
+        private int originX;
+        private int originY;
         private Point pressScreen;
         private Point viewOrigin;
         private boolean dragged;
+
+        private final class DividerLabel {
+            private final Rectangle bounds;
+            private final String tip;
+
+            DividerLabel(Rectangle bounds, String tip) {
+                this.bounds = bounds;
+                this.tip = tip;
+            }
+        }
 
         TreeCanvas() {
             setBackground(AssetStyles.BACKGROUND_COLOR);
@@ -372,7 +435,7 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
                     if (dragged) {
                         return;
                     }
-                    ResearchTreeGraph.Node node = nodeAt(e.getPoint());
+                    BuildingTreeGraph.Node node = nodeAt(e.getPoint());
                     if (node == null) {
                         closeDetail();
                         return;
@@ -423,10 +486,11 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
             nodeBounds.clear();
             colorIcons.clear();
             greyIcons.clear();
+            dividerLabels.clear();
 
             if (graph.getNodes().isEmpty()) {
-                centerX = PADDING;
-                centerY = PADDING;
+                originX = PADDING;
+                originY = PADDING;
                 setPreferredSize(new Dimension(200, 80));
                 return;
             }
@@ -435,30 +499,42 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
             double spanY = graph.getMaxY() - graph.getMinY();
             int width = (int) Math.ceil(spanX * UNIT_SIZE) + NODE_HIT + PADDING * 2;
             int height = (int) Math.ceil(spanY * UNIT_SIZE) + NODE_HIT + PADDING * 2;
-            centerX = PADDING + (int) Math.round((-graph.getMinX()) * UNIT_SIZE) + NODE_HIT / 2;
-            centerY = PADDING + (int) Math.round((-graph.getMinY()) * UNIT_SIZE) + NODE_HIT / 2;
+            originX = PADDING + (int) Math.round((-graph.getMinX()) * UNIT_SIZE) + NODE_HIT / 2;
+            originY = PADDING + (int) Math.round((-graph.getMinY()) * UNIT_SIZE) + NODE_HIT / 2;
             setPreferredSize(new Dimension(Math.max(width, 200), Math.max(height, 200)));
 
-            for (ResearchTreeGraph.Node node : graph.getNodes()) {
-                int x = centerX + (int) Math.round(node.getPosX() * UNIT_SIZE) - NODE_HIT / 2;
-                int y = centerY + (int) Math.round(node.getPosY() * UNIT_SIZE) - NODE_HIT / 2;
-                nodeBounds.put(node.getUpgrade(), new Rectangle(x, y, NODE_HIT, NODE_HIT));
-                Image base = iconImage(node.getUpgrade());
-                colorIcons.put(node.getUpgrade(), base);
-                greyIcons.put(node.getUpgrade(), greyed(base));
+            for (BuildingTreeGraph.Node node : graph.getNodes()) {
+                int x = originX + (int) Math.round(node.getPosX() * UNIT_SIZE) - NODE_HIT / 2;
+                int y = originY + (int) Math.round(node.getPosY() * UNIT_SIZE) - NODE_HIT / 2;
+                nodeBounds.put(node.getBuilding(), new Rectangle(x, y, NODE_HIT, NODE_HIT));
+                Image base = iconImage(node.getBuilding());
+                colorIcons.put(node.getBuilding(), base);
+                greyIcons.put(node.getBuilding(), greyed(base));
+            }
+
+            int lineLeft = PADDING / 2;
+            for (BuildingTreeGraph.TierDivider divider : graph.getTierDividers()) {
+                if (divider.getUpperTier() < 0 || divider.getUpperTier() >= GameConstants.getTiers().size()) {
+                    continue;
+                }
+                int y = originY + (int) Math.round(divider.getPosY() * UNIT_SIZE);
+                dividerLabels.add(new DividerLabel(
+                        new Rectangle(lineLeft + 4, y - NODE_SIZE / 2, NODE_SIZE, NODE_SIZE),
+                        GameConstants.getTiers().get(divider.getUpperTier()).getName()));
             }
         }
 
-        void scrollCenterIntoView() {
+        void scrollBasicsIntoView() {
             JViewport viewport = scrollPane.getViewport();
-            Dimension viewSize = viewport.getExtentSize();
-            int x = Math.max(0, centerX - viewSize.width / 2);
-            int y = Math.max(0, centerY - viewSize.height / 2);
+            Dimension extent = viewport.getExtentSize();
+            int basicsY = originY + (int) Math.round(0 * UNIT_SIZE);
+            int x = Math.max(0, originX - extent.width / 2);
+            int y = Math.max(0, basicsY - extent.height * 3 / 4);
             viewport.setViewPosition(new Point(x, y));
         }
 
-        private Image iconImage(Upgrade upgrade) {
-            ImageIcon icon = upgrade.getIcon();
+        private Image iconImage(Building building) {
+            ImageIcon icon = building.getIcon();
             if (icon == null || icon.getImage() == null) {
                 icon = GameConstants.ICON_UNKNOWN;
             }
@@ -481,9 +557,9 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
             return buffer;
         }
 
-        private ResearchTreeGraph.Node nodeAt(Point point) {
-            for (ResearchTreeGraph.Node node : graph.getNodes()) {
-                Rectangle bounds = nodeBounds.get(node.getUpgrade());
+        private BuildingTreeGraph.Node nodeAt(Point point) {
+            for (BuildingTreeGraph.Node node : graph.getNodes()) {
+                Rectangle bounds = nodeBounds.get(node.getBuilding());
                 if (bounds != null && bounds.contains(point)) {
                     return node;
                 }
@@ -491,24 +567,28 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
             return null;
         }
 
-        private Color borderColor(ResearchTreeGraph.NodeState state) {
+        private Color borderColor(BuildingTreeGraph.NodeState state) {
             return switch (state) {
                 case OWNED -> AssetStyles.COLOR_MEDIUM_GREEN;
                 case AFFORDABLE -> AssetStyles.COLOR_MEDIUM_RED;
-                case TRIGGER_PROGRESS -> AssetStyles.COLOR_MEDIUM_BLUE;
-                case SPECIAL_PROGRESS -> AssetStyles.COLOR_LIGHT_YELLOW;
+                case IN_PROGRESS -> AssetStyles.COLOR_MEDIUM_BLUE;
                 case UNAVAILABLE -> AssetStyles.COLOR_MEDIUM_GRAY;
             };
         }
 
         @Override
         public String getToolTipText(MouseEvent event) {
-            ResearchTreeGraph.Node node = nodeAt(event.getPoint());
-            if (node == null) {
-                return null;
+            BuildingTreeGraph.Node node = nodeAt(event.getPoint());
+            if (node != null) {
+                return node.getBuilding().getDisplayName()
+                        + " (" + LanguageStrings.get(LanguageStrings.UPGRADE_CLICK_FOR_DETAILS) + ")";
             }
-            return node.getUpgrade().getDisplayName()
-                    + " (" + LanguageStrings.get(LanguageStrings.UPGRADE_CLICK_FOR_DETAILS) + ")";
+            for (DividerLabel label : dividerLabels) {
+                if (label.bounds.contains(event.getPoint())) {
+                    return label.tip;
+                }
+            }
+            return null;
         }
 
         @Override
@@ -521,14 +601,41 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
             if (graph.getNodes().isEmpty()) {
                 g2d.setColor(AssetStyles.FONT_COLOR);
                 g2d.setFont(AssetStyles.FONT_NORMAL);
-                g2d.drawString(LanguageStrings.get(LanguageStrings.UPGRADE_NO_RESEARCH), PADDING, PADDING + 16);
+                g2d.drawString(LanguageStrings.get(LanguageStrings.BUILD_NO_CONSTRUCTIONS), PADDING, PADDING + 16);
                 g2d.dispose();
                 return;
             }
 
+            g2d.setColor(AssetStyles.COLOR_MEDIUM_GRAY);
+            g2d.setStroke(new BasicStroke(
+                    DIVIDER_STROKE,
+                    BasicStroke.CAP_BUTT,
+                    BasicStroke.JOIN_MITER,
+                    10f,
+                    new float[] {6f, 6f},
+                    0f));
+            int lineLeft = PADDING / 2;
+            int lineRight = getPreferredSize().width - PADDING / 2;
+            for (BuildingTreeGraph.TierDivider divider : graph.getTierDividers()) {
+                int y = originY + (int) Math.round(divider.getPosY() * UNIT_SIZE);
+                g2d.drawLine(lineLeft, y, lineRight, y);
+                if (divider.getUpperTier() >= 0 && divider.getUpperTier() < GameConstants.getTiers().size()) {
+                    ImageIcon icon = GameConstants.getTiers().get(divider.getUpperTier()).getIcon();
+                    if (icon != null && icon.getImage() != null) {
+                        g2d.drawImage(
+                                icon.getImage(),
+                                lineLeft + 4,
+                                y - NODE_SIZE / 2,
+                                NODE_SIZE,
+                                NODE_SIZE,
+                                this);
+                    }
+                }
+            }
+
             g2d.setColor(AssetStyles.BORDER_COLOR);
             g2d.setStroke(new BasicStroke(EDGE_STROKE, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-            for (ResearchTreeGraph.Edge edge : graph.getEdges()) {
+            for (BuildingTreeGraph.Edge edge : graph.getEdges()) {
                 Rectangle from = nodeBounds.get(edge.getFrom());
                 Rectangle to = nodeBounds.get(edge.getTo());
                 if (from == null || to == null) {
@@ -542,8 +649,8 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
                         to.y + to.height / 2);
             }
 
-            for (ResearchTreeGraph.Node node : graph.getNodes()) {
-                Rectangle rect = nodeBounds.get(node.getUpgrade());
+            for (BuildingTreeGraph.Node node : graph.getNodes()) {
+                Rectangle rect = nodeBounds.get(node.getBuilding());
                 if (rect == null) {
                     continue;
                 }
@@ -552,9 +659,9 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
                 g2d.setColor(AssetStyles.BACKGROUND_COLOR);
                 g2d.fillRect(rect.x, rect.y, rect.width, rect.height);
 
-                Image image = node.getState() == ResearchTreeGraph.NodeState.UNAVAILABLE
-                        ? greyIcons.get(node.getUpgrade())
-                        : colorIcons.get(node.getUpgrade());
+                Image image = node.getState() == BuildingTreeGraph.NodeState.UNAVAILABLE
+                        ? greyIcons.get(node.getBuilding())
+                        : colorIcons.get(node.getBuilding());
                 if (image != null) {
                     g2d.drawImage(image, iconX, iconY, NODE_SIZE, NODE_SIZE, this);
                 }

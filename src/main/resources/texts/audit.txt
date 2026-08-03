@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 67% (233/349 checked)
+Completion: 67% (233/350 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -251,6 +251,8 @@ Assimilated species passives (research tree):
 ================================================================================
 11. CONSTRUCTION (U) — UpgradeDialog Build tab
 ================================================================================
+[ ] Building tree: upward chains from basic rooms, tier divider lines, detail card (cost/requires/build), node colors (green owned, red affordable, blue in progress, grey unavailable)
+
 Room upgrade chains (each tier L0→L5 where applicable; L4–L5 cost minerals + resin):
 [ ] Royal Chamber
 [ ] Egg Chamber

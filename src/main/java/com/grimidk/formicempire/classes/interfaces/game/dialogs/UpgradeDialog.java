@@ -2,7 +2,6 @@ package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
-import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.constants.unlocks.Synergy;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
@@ -15,7 +14,6 @@ import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
@@ -40,7 +38,7 @@ public class UpgradeDialog extends ZeroDialog {
     private final JTabbedPane tabbedPane;
     
     private ResearchTreePanel researchPanel;
-    private BuildPanel buildPanel;
+    private BuildingTreePanel buildPanel;
     private JPanel assimilationPanel;
     private SynergyPanel synergyPanel;
 
@@ -113,7 +111,9 @@ public class UpgradeDialog extends ZeroDialog {
 
         // --- Build Tab ---
         if (colony.hasUpgrade(GameUnlocks.ROLE_BUILDER)) {
-            if (buildPanel == null) buildPanel = new BuildPanel(colony);
+            if (buildPanel == null) {
+                buildPanel = new BuildingTreePanel(colony, this::refreshDialog);
+            }
             buildPanel.updateData();
             tabbedPane.addTab(LanguageStrings.get(LanguageStrings.TAB_CONSTRUCTION), GameConstants.ROLE_BUILDER.getIcon(), buildPanel);
             tabIndexMap.put(TAB_BUILD, currentIndex++);
@@ -221,313 +221,6 @@ public class UpgradeDialog extends ZeroDialog {
     interface LiveUpdatePanel {
         void liveUpdate();
         void updateData();
-    }
-
-    private class BuildPanel extends JPanel implements LiveUpdatePanel {
-        private final Colony colony;
-        private final JPanel listPanel;
-        private final JScrollPane scrollPane;
-        private final JLabel mineralsLabel;
-        private final JLabel resinLabel;
-        private final JLabel buildersLabel;
-        private final JLabel cranesLabel;
-        private final Map<JButton, Building> buttonBuildingMap = new HashMap<>();
-
-        public BuildPanel(Colony colony) {
-            super(new BorderLayout());
-            this.colony = colony;
-            setBackground(AssetStyles.BACKGROUND_COLOR);
-
-            JPanel northPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-            northPanel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
-            northPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-            
-            mineralsLabel = createStatusLabel(GameConstants.RESOURCE_ROCK.getIcon());
-            resinLabel = createStatusLabel(GameConstants.RESOURCE_RESIN.getIcon());
-            buildersLabel = createStatusLabel(GameConstants.ROLE_BUILDER.getIcon());
-            cranesLabel = createStatusLabel(GameConstants.ROLE_CRANE.getIcon());
-
-            northPanel.add(mineralsLabel);
-            northPanel.add(Box.createRigidArea(new Dimension(10, 0)));
-            northPanel.add(resinLabel);
-            northPanel.add(Box.createRigidArea(new Dimension(10, 0)));
-            northPanel.add(buildersLabel);
-            northPanel.add(Box.createRigidArea(new Dimension(10, 0)));
-            northPanel.add(cranesLabel);
-            add(northPanel, BorderLayout.NORTH);
-
-            listPanel = new JPanel();
-            listPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
-            listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
-            scrollPane = new JScrollPane(listPanel);
-            scrollPane.getViewport().setBackground(AssetStyles.BACKGROUND_COLOR);
-            scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-            add(scrollPane, BorderLayout.CENTER);
-        }
-        
-        private JLabel createStatusLabel(Icon icon) {
-            JLabel label = new JLabel(icon);
-            label.setFont(AssetStyles.FONT_NORMAL);
-            label.setForeground(AssetStyles.FONT_COLOR);
-            return label;
-        }
-
-        @Override
-        public void updateData() {
-            listPanel.removeAll();
-            buttonBuildingMap.clear();
-
-            updateResourceLabels();
-
-            Building currentProject = colony.getCurrentBuildingProject();
-
-            if (currentProject != null) {
-                listPanel.add(createProgressPanel(currentProject));
-            } else {
-                List<Building> allBuildings = GameUnlocks.getBuildings();
-                List<Building> availableBuildings = new ArrayList<>();
-
-                for (Building building : allBuildings) {
-                    boolean owned = colony.hasBuilding(building);
-                    boolean reqMet = (building.getRequirement() == null || colony.hasBuilding(building.getRequirement()));
-                    boolean tierMet = building.isAvailableFor(colony.getDynasty());
-                    boolean unlockMet = GameUnlocks.meetsBuildingUnlockRequirement(colony, building);
-
-                    if (!owned && reqMet && tierMet && unlockMet) {
-                        availableBuildings.add(building);
-                    }
-                }
-
-                availableBuildings.sort((b1, b2) -> Integer.compare(b1.getBuildTime(), b2.getBuildTime()));
-
-                if (availableBuildings.isEmpty()) {
-                    JLabel emptyLabel = new JLabel(LanguageStrings.get(LanguageStrings.BUILD_NO_CONSTRUCTIONS));
-                    emptyLabel.setForeground(AssetStyles.FONT_COLOR);
-                    listPanel.add(emptyLabel);
-                } else {
-                    for (Building building : availableBuildings) {
-                        listPanel.add(createBuildingPanel(building));
-                        listPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-                    }
-                }
-            }
-
-            listPanel.revalidate();
-            listPanel.repaint();
-
-            SwingUtilities.invokeLater(() -> scrollPane.getViewport().setViewPosition(new Point(0, 0)));
-        }
-
-        private void updateResourceLabels() {
-            mineralsLabel.setText(AssetStyles.formatRatio(colony.getMinerals(), colony.getMineralsCapacity()));
-            resinLabel.setText(AssetStyles.formatRatio(colony.getResins(), colony.getResinsCapacity()));
-            buildersLabel.setText(LanguageStrings.format(LanguageStrings.BUILD_STATUS_BUILDERS, colony.getAssignedRoleCount(GameConstants.ROLE_BUILDER)));
-            
-            if (colony.hasUpgrade(GameUnlocks.ROLE_CRANE)) {
-                cranesLabel.setVisible(true);
-                cranesLabel.setText(LanguageStrings.format(LanguageStrings.BUILD_STATUS_CRANES, colony.getAssignedRoleCount(GameConstants.ROLE_CRANE)));
-            } else {
-                cranesLabel.setVisible(false);
-            }
-        }
-
-        private JPanel createBuildingPanel(Building building) {
-            JPanel panel = new JPanel(new BorderLayout(10, 10));
-            panel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
-            
-            TitledBorder border = new TitledBorder(AssetStyles.PANEL_BORDER, building.getDisplayName());
-            border.setTitleColor(AssetStyles.FONT_COLOR_HEADER);
-            border.setTitleFont(AssetStyles.FONT_BOLD);
-            panel.setBorder(border);
-
-            JLabel tierIcon = new JLabel(building.getTierIcon());
-            tierIcon.setToolTipText(building.getTier().getName());
-            tierIcon.setBorder(new EmptyBorder(4, 6, 0, 0));
-            tierIcon.setVerticalAlignment(SwingConstants.TOP);
-            panel.add(tierIcon, BorderLayout.WEST);
-
-            JPanel infoPanel = new JPanel();
-            infoPanel.setOpaque(false);
-            infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
-
-            JTextArea descriptionArea = new JTextArea(building.getDescription());
-            descriptionArea.setWrapStyleWord(true);
-            descriptionArea.setLineWrap(true);
-            descriptionArea.setEditable(false);
-            descriptionArea.setFocusable(false);
-            descriptionArea.setBackground(panel.getBackground());
-            descriptionArea.setForeground(AssetStyles.FONT_COLOR);
-            descriptionArea.setFont(AssetStyles.FONT_NORMAL);
-            descriptionArea.setBorder(null);
-            infoPanel.add(descriptionArea);
-            panel.add(infoPanel, BorderLayout.CENTER);
-
-            JPanel actionPanel = new JPanel();
-            actionPanel.setOpaque(false);
-            actionPanel.setLayout(new BoxLayout(actionPanel, BoxLayout.Y_AXIS));
-            actionPanel.setBorder(new EmptyBorder(0, 0, 0, 5));
-
-            JButton purchaseButton = new JButton(LanguageStrings.get(LanguageStrings.UI_BUILD));
-            purchaseButton.setFocusable(false);
-            AssetStyles.styleButton(purchaseButton);
-
-            buttonBuildingMap.put(purchaseButton, building);
-            updateBuildButtonState(purchaseButton, building);
-
-            purchaseButton.addActionListener(e -> {
-                if (colony.startBuildingProject(building)) {
-                    updateData();
-                }
-            });
-
-            String costString = LanguageStrings.format(LanguageStrings.BUILD_COST_FORMAT, building.getMineralCost(), building.getResinCost(), building.getBuildTime());
-
-            JLabel costLabel = new JLabel(costString);
-            costLabel.setFont(AssetStyles.FONT_BOLD);
-            costLabel.setForeground(AssetStyles.FONT_COLOR_VALUE);
-            costLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-            purchaseButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-            actionPanel.add(costLabel);
-            actionPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-            actionPanel.add(purchaseButton);
-            panel.add(actionPanel, BorderLayout.EAST);
-
-            return panel;
-        }
-
-        private JPanel createProgressPanel(Building project) {
-            JPanel panel = new JPanel(new BorderLayout(10, 10));
-            panel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
-            
-            TitledBorder border = new TitledBorder(AssetStyles.PANEL_BORDER, LanguageStrings.format(LanguageStrings.BUILD_UNDER_CONSTRUCTION, project.getDisplayName()));
-            border.setTitleColor(AssetStyles.FONT_COLOR_HEADER);
-            border.setTitleFont(AssetStyles.FONT_BOLD);
-            panel.setBorder(border);
-
-            JLabel tierIcon = new JLabel(project.getTierIcon());
-            tierIcon.setToolTipText(project.getTier().getName());
-            tierIcon.setBorder(new EmptyBorder(4, 6, 0, 0));
-            tierIcon.setVerticalAlignment(SwingConstants.TOP);
-            panel.add(tierIcon, BorderLayout.WEST);
-
-            int builderCount = colony.getAssignedRoleCount(GameConstants.ROLE_BUILDER);
-            int craneCount = colony.getAssignedRoleCount(GameConstants.ROLE_CRANE);
-            double efficiency = colony.getConstructionEfficiency();
-            double requiredHours = (efficiency > 0) ? (project.getBuildTime() / efficiency) : Double.POSITIVE_INFINITY;
-            double progressHours = colony.getBuildingProgressHours();
-
-            int progressPercent = 0;
-            if (requiredHours > 0 && !Double.isInfinite(requiredHours)) {
-                progressPercent = (int) ((progressHours / requiredHours) * 100);
-            }
-
-            JProgressBar progressBar = new JProgressBar(0, 100);
-            AssetStyles.styleProgressBar(progressBar);
-            progressBar.setValue(progressPercent);
-            progressBar.setStringPainted(true);
-            progressBar.setString(LanguageStrings.format(LanguageStrings.BUILD_PROGRESS_HOURS, progressHours, requiredHours));
-
-            panel.add(progressBar, BorderLayout.CENTER);
-
-            String buildersStr = LanguageStrings.format(LanguageStrings.BUILD_STATUS_BUILDERS, builderCount);
-            if (colony.hasUpgrade(GameUnlocks.ROLE_CRANE)) {
-                buildersStr += " & " + LanguageStrings.format(LanguageStrings.BUILD_STATUS_CRANES, craneCount);
-            }
-            JLabel progressLabel = new JLabel(LanguageStrings.format(LanguageStrings.BUILD_STATUS_SPEED, buildersStr, efficiency * 100));
-            progressLabel.setForeground(AssetStyles.FONT_COLOR);
-            progressLabel.setFont(AssetStyles.FONT_NORMAL);
-            progressLabel.setHorizontalAlignment(SwingConstants.CENTER);
-            panel.add(progressLabel, BorderLayout.SOUTH);
-
-            JButton cancelButton = new JButton(LanguageStrings.get(LanguageStrings.UI_CANCEL));
-            cancelButton.setFocusable(false);
-            AssetStyles.styleButton(cancelButton);
-            cancelButton.addActionListener(e -> {
-                colony.setMinerals(colony.getMinerals() + project.getMineralCost());
-                colony.setResins(colony.getResins() + project.getResinCost());
-                colony.setCurrentBuildingProject(null);
-                colony.setBuildingProgressHours(0.0);
-                updateData();
-            });
-
-            JPanel eastPanel = new JPanel(new GridBagLayout());
-            eastPanel.setOpaque(false);
-            eastPanel.add(cancelButton);
-            panel.add(eastPanel, BorderLayout.EAST);
-
-            return panel;
-        }
-
-        private void updateBuildButtonState(JButton button, Building building) {
-            int builders = colony.getAssignedRoleCount(GameConstants.ROLE_BUILDER);
-            int cranes = colony.getAssignedRoleCount(GameConstants.ROLE_CRANE);
-            int minerals = colony.getMinerals();
-            int resin = colony.getResins();
-
-            if (builders <= 0 && cranes <= 0) {
-                button.setEnabled(false);
-                button.setToolTipText(LanguageStrings.get(LanguageStrings.BUILD_REQUIREMENT_ERROR));
-            } else if (minerals < building.getMineralCost() || resin < building.getResinCost()) {
-                button.setEnabled(false);
-                button.setToolTipText(LanguageStrings.get(LanguageStrings.BUILD_RESOURCES_ERROR));
-            } else {
-                button.setEnabled(true);
-                button.setToolTipText(null);
-            }
-        }
-
-        @Override
-        public void liveUpdate() {
-            updateResourceLabels();
-            Building currentProject = colony.getCurrentBuildingProject();
-            if (currentProject != null) {
-                if (listPanel.getComponentCount() > 0 && listPanel.getComponent(0) instanceof JPanel) {
-                    JPanel progressPanel = (JPanel) listPanel.getComponent(0);
-                    Border b = progressPanel.getBorder();
-                    
-                    if (b instanceof TitledBorder && ((TitledBorder) b).getTitle().contains(currentProject.getDisplayName())
-                            && progressPanel.getComponentCount() > 0 
-                            && progressPanel.getComponent(0) instanceof JProgressBar) {
-                        
-                        JProgressBar progressBar = (JProgressBar) progressPanel.getComponent(0);
-                        JLabel progressLabel = (JLabel) progressPanel.getComponent(1);
-
-                        int builderCount = colony.getAssignedRoleCount(GameConstants.ROLE_BUILDER);
-                        int craneCount = colony.getAssignedRoleCount(GameConstants.ROLE_CRANE);
-                        double efficiency = colony.getConstructionEfficiency();
-                        double requiredHours = (efficiency > 0) ? (currentProject.getBuildTime() / efficiency) : Double.POSITIVE_INFINITY;
-                        double progressHours = colony.getBuildingProgressHours();
-
-                        int progressPercent = 0;
-                        if (requiredHours > 0 && !Double.isInfinite(requiredHours)) {
-                            progressPercent = (int) ((progressHours / requiredHours) * 100);
-                        }
-
-                        progressBar.setValue(progressPercent);
-                        progressBar.setString(LanguageStrings.format(LanguageStrings.BUILD_PROGRESS_HOURS, progressHours, requiredHours));
-                        
-                        String buildersStr = LanguageStrings.format(LanguageStrings.BUILD_STATUS_BUILDERS, builderCount);
-                        if (colony.hasUpgrade(GameUnlocks.ROLE_CRANE)) {
-                            buildersStr += " & " + LanguageStrings.format(LanguageStrings.BUILD_STATUS_CRANES, craneCount);
-                        }
-                        progressLabel.setText(LanguageStrings.format(LanguageStrings.BUILD_STATUS_SPEED, buildersStr, efficiency * 100));
-                    } else {
-                        updateData();
-                    }
-                } else {
-                    updateData();
-                }
-            } else {
-                if (!buttonBuildingMap.isEmpty()) {
-                    for (Map.Entry<JButton, Building> entry : buttonBuildingMap.entrySet()) {
-                        updateBuildButtonState(entry.getKey(), entry.getValue());
-                    }
-                } else if (listPanel.getComponentCount() > 0 && listPanel.getComponent(0) instanceof JPanel) {
-                    updateData();
-                }
-            }
-        }
     }
 
     private class AssimilationPanel extends JPanel implements LiveUpdatePanel {
