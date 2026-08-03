@@ -3,31 +3,27 @@ Here is the current roadmap of features and fixes:
 To Fix (By decreasing priority): 
 	Game Breaking:
 		(none right now)
-	
 	High:
 		TODO: icons for 70 unlocks
 		TODO: tune AntSpeciesPalette hexcodes + icons for placeholder species (carpenter, weaver, floodplain, jet, army, ghost, silver, shining black, desert)
 		check translations and tags
-		
+		improve late game performance and hourly hang ups
 	Mid:
 		(none right now)
-
 	Low:
 		(none right now)
-
 	Can't reproduce:
 		(none right now)
-
 	Important not Urgent:
 		map hexes look kinda yank
 		Font - self explanatory
-		improve late game performance and hourly hang ups
+		minimap?
 	
-To Feature (to be done in order):
+To Feature (to be done in priority order by blocks):
 Needed for launch (v1.0) (Launch Version):
 	Priority:
-		research tree and building tree (orchard) (after icons) with available, purchasable, locked and list trigger based upgrades 
-		music and sounds and settings for them and player panel (to include in core engine)
+		research tree and building tree (orchard) by tiers
+		music and sounds and player panel (plays anything in music folder)
 	
 	Everything else :
 		rework how carrying looks completely, maybe have an resource icon (do not scale) inside jaws
@@ -47,6 +43,7 @@ Needed for launch (v1.0) (Launch Version):
 		uncolonizable terrain with boss enemies  (non ant assimilation reward, unique bosses)
 		random events (meteor, earthquake, tornado, tsunami, hunts (for later) plus special weathers (rare events))
 		more stats (kills, historic productions, graphs?)
+		more biomes (beach, wetlands, burnt forest, ice field (cant start), ) and make contients have more variation with rivers in borders that may make unpassable terrain
 		non-ant assimilation ( Winged workers (Bees), Spiked larvae, Chemical throwing (Bombardier beetle), Chirping (Grass hopper), Diving, Mineralized exoskeletons and dense armor (diabolical ironclad beetles), Rock mining, Bioluminescence (Fireflies), Static electricity generation, Pollination (Flies) )
 		revamp story and lore and maybe intro screen
 		more hive rooms, specially more twisty (research room after royal chamber, barrack room before royal chamber)
@@ -59,6 +56,7 @@ Needed for launch (v1.0) (Launch Version):
 		rework abilities and alerts and triggers (new classes?)
 		rework saves to be cleaner
 		rework manager and aux files
+		rework tests to optimize compile
 		promo video 
 		langs (GER, RUS, CHN, JAP) and translate credits and roadmap
 		proper start animation and roadmap and credits design

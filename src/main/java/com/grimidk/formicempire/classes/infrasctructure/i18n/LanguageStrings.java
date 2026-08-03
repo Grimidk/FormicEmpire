@@ -586,8 +586,6 @@ public final class LanguageStrings {
 
     public static final String DIALOG_UPGRADES_TITLE = "DIALOG_UPGRADES_TITLE";
     public static final String TAB_RESEARCH = "TAB_RESEARCH";
-    public static final String TAB_RESEARCH_AVAILABLE = "TAB_RESEARCH_AVAILABLE";
-    public static final String TAB_TRIGGERS = "TAB_TRIGGERS";
     public static final String TAB_CONSTRUCTION = "TAB_CONSTRUCTION";
     public static final String TAB_ASSIMILATIONS = "TAB_ASSIMILATIONS";
     public static final String TAB_SYNERGIES = "TAB_SYNERGIES";
@@ -595,6 +593,8 @@ public final class LanguageStrings {
     public static final String UPGRADE_NO_RESEARCH = "UPGRADE_NO_RESEARCH";
     public static final String UPGRADE_COST_RP = "UPGRADE_COST_RP";
     public static final String UPGRADE_NOT_ENOUGH_RP = "UPGRADE_NOT_ENOUGH_RP";
+    public static final String UPGRADE_CLICK_FOR_DETAILS = "UPGRADE_CLICK_FOR_DETAILS";
+    public static final String UPGRADE_REQUIRES_FMT = "UPGRADE_REQUIRES_FMT";
     public static final String BUILD_NO_CONSTRUCTIONS = "BUILD_NO_CONSTRUCTIONS";
     public static final String BUILD_UNDER_CONSTRUCTION = "BUILD_UNDER_CONSTRUCTION";
     public static final String BUILD_PROGRESS_HOURS = "BUILD_PROGRESS_HOURS";

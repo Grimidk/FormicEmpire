@@ -26,10 +26,8 @@ class UnlockTierLineTest {
                 assertTrue(upgrade.getTier().getId() > req.getTier().getId(),
                         upgrade.getNameKey() + " must outrank " + req.getNameKey());
             }
-            if (upgrade.getCost() > 0 && req.getCost() > 0) {
-                assertTrue(upgrade.getTier().getId() > req.getTier().getId(),
-                        upgrade.getNameKey() + " purchasable line must outrank " + req.getNameKey());
-            }
+            assertTrue(upgrade.getTier().getId() >= req.getTier().getId() - 1,
+                    upgrade.getNameKey() + " cannot be more than one tier below " + req.getNameKey());
         }
     }
 

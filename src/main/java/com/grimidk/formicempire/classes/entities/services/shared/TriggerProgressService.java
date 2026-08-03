@@ -38,6 +38,18 @@ public final class TriggerProgressService {
         return visible;
     }
 
+    public static TriggerProgress find(Colony colony, Engine engine, Upgrade upgrade) {
+        if (colony == null || upgrade == null) {
+            return null;
+        }
+        for (TriggerProgress progress : buildAll(colony, engine)) {
+            if (progress.getUpgrade() == upgrade) {
+                return progress;
+            }
+        }
+        return null;
+    }
+
     public static boolean isVisible(TriggerProgress progress) {
         return isVisible(progress, true);
     }

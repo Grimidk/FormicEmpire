@@ -138,6 +138,14 @@ class TriggerProgressServiceTest {
         assertEquals(5, miner.getCurrent());
     }
 
+    @Test
+    void findReturnsProgressEvenWhenNotVisibleYet() {
+        TriggerProgress researcher = TriggerProgressService.find(colony, null, GameUnlocks.ROLE_RESEARCHER);
+        assertTrue(researcher != null);
+        assertFalse(researcher.isUnlocked());
+        assertEquals(GameNumbers.TRIGGER_RESEARCHER_MIN_MONTHS, researcher.getRequired());
+    }
+
     private static TriggerProgress find(List<TriggerProgress> list, Object upgrade) {
         for (TriggerProgress progress : list) {
             if (progress.getUpgrade() == upgrade) {

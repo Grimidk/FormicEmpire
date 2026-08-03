@@ -301,6 +301,8 @@ public final class GameConstants {
     static { misc.add(ICON_PARASITIC_MITE); }
     public static final ImageIcon ICON_RESEARCH = loadIcon("icons/misc/Research.png");
     static { misc.add(ICON_RESEARCH); }
+    public static final ImageIcon ICON_UNKNOWN = loadIcon("icons/misc/Unknown.png");
+    static { misc.add(ICON_UNKNOWN); }
     public static final ImageIcon ICON_STAT_LOYALTY = loadIcon("icons/misc/Loyalty.png");
     static { misc.add(ICON_STAT_LOYALTY); }
     public static final ImageIcon ICON_STAT_REPUTATION = loadIcon("icons/misc/Reputation.png");

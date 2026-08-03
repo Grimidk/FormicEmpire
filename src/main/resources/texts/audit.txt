@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 67% (243/361 checked)
+Completion: 67% (233/349 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -185,8 +185,7 @@ Per ant type tab (Worker, Soldier, Major, Princess, Queen):
 ================================================================================
 Purchase with research points (RP). Test buy on each category:
 
-[X] Research → Triggers subtab lists in-progress and unlocked trigger goals
-[X] Research → Available subtab still lists purchasable RP upgrades (gated by dynasty tier)
+[ ] Research tree: radial grid, detail card (cost/trigger when owned, wrapping name/desc), node colors (green owned, red affordable, blue trigger progress, yellow assimilation/synergy progress, grey unavailable)
 
 Ant types:
 [X] Egg, Worker, Soldier, Major, Princess, Queen
@@ -468,7 +467,6 @@ Daily:
 
 Hourly:
 [X] Hourly trigger checks
-[ ] Research → Triggers subtab mirrors in-progress / unlocked goals (also listed under Research)
 
 [X] Trigger popup pauses game, shows title + message, grants upgrade
 

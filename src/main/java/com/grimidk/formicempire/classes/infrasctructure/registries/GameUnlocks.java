@@ -53,7 +53,7 @@ public final class GameUnlocks {
         static { upgrades.add(TYPE_MAJOR); }
         public static final Upgrade TYPE_PRINCESS = new Upgrade(5, "TYPE_PRINCESS_DRONE", "TYPE_PRINCESS_FLAVOR", "TYPE_PRINCESS_DESC", TYPE_EGG, 1000, loadIcon("icons/upgrades/TypePrincess.png"), 2);
         static { upgrades.add(TYPE_PRINCESS); }
-        public static final Upgrade TYPE_QUEEN = new Upgrade(6, "TYPE_QUEEN", "TYPE_QUEEN_FLAVOR", "TYPE_QUEEN_DESC", TYPE_PRINCESS, 0, loadIcon("icons/upgrades/TypeQueen.png"), 0);
+        public static final Upgrade TYPE_QUEEN = new Upgrade(6, "TYPE_QUEEN", "TYPE_QUEEN_FLAVOR", "TYPE_QUEEN_DESC", TYPE_PRINCESS, 0, loadIcon("icons/upgrades/TypeQueen.png"), 1);
         static { upgrades.add(TYPE_QUEEN); }
         
         // -- Roles --
@@ -75,13 +75,13 @@ public final class GameUnlocks {
         static { upgrades.add(ROLE_RESEARCHER); }
         public static final Upgrade ROLE_COMMANDER = new Upgrade(40, "ROLE_COMMANDER_UPGRADE", "ROLE_COMMANDER_FLAVOR", "ROLE_COMMANDER_DESC", TYPE_QUEEN, 0, loadIcon("icons/upgrades/RoleCommander.png"), 0);
         static { upgrades.add(ROLE_COMMANDER); }
-        public static final Upgrade ROLE_CAPTAIN = new Upgrade(41, "ROLE_CAPTAIN_UPGRADE", "ROLE_CAPTAIN_FLAVOR", "ROLE_CAPTAIN_DESC", TYPE_PRINCESS, 0, loadIcon("icons/upgrades/RoleCaptain.png"), 0);
+        public static final Upgrade ROLE_CAPTAIN = new Upgrade(41, "ROLE_CAPTAIN_UPGRADE", "ROLE_CAPTAIN_FLAVOR", "ROLE_CAPTAIN_DESC", TYPE_PRINCESS, 0, loadIcon("icons/upgrades/RoleCaptain.png"), 1);
         static { upgrades.add(ROLE_CAPTAIN); }
         // TODO asset: icons/upgrades/RoleAirSupport.png (placeholder)
-        public static final Upgrade ROLE_AIR_SUPPORT = new Upgrade(42, "ROLE_AIR_SUPPORT_UPGRADE", "ROLE_AIR_SUPPORT_FLAVOR", "ROLE_AIR_SUPPORT_DESC", TYPE_PRINCESS, 0, loadIcon("icons/upgrades/RoleAirSupport.png"), 0);
+        public static final Upgrade ROLE_AIR_SUPPORT = new Upgrade(42, "ROLE_AIR_SUPPORT_UPGRADE", "ROLE_AIR_SUPPORT_FLAVOR", "ROLE_AIR_SUPPORT_DESC", TYPE_PRINCESS, 0, loadIcon("icons/upgrades/RoleAirSupport.png"), 1);
         static { upgrades.add(ROLE_AIR_SUPPORT); }
         // TODO asset: icons/upgrades/RoleAirBomber.png (placeholder)
-        public static final Upgrade ROLE_AIR_BOMBER = new Upgrade(43, "ROLE_AIR_BOMBER_UPGRADE", "ROLE_AIR_BOMBER_FLAVOR", "ROLE_AIR_BOMBER_DESC", TYPE_PRINCESS, 0, loadIcon("icons/upgrades/RoleAirBomber.png"), 0);
+        public static final Upgrade ROLE_AIR_BOMBER = new Upgrade(43, "ROLE_AIR_BOMBER_UPGRADE", "ROLE_AIR_BOMBER_FLAVOR", "ROLE_AIR_BOMBER_DESC", TYPE_PRINCESS, 0, loadIcon("icons/upgrades/RoleAirBomber.png"), 1);
         static { upgrades.add(ROLE_AIR_BOMBER); }
         public static final Upgrade ROLE_BUILDER = new Upgrade(15, "ROLE_BUILDER_UPGRADE", "ROLE_BUILDER_FLAVOR", "ROLE_BUILDER_DESC", TYPE_WORKER, 150, loadIcon("icons/upgrades/RoleBuilder.png"), 1);
         static { upgrades.add(ROLE_BUILDER); }
@@ -106,7 +106,7 @@ public final class GameUnlocks {
         static { upgrades.add(ROLE_ARTILLERY); }
         public static final Upgrade ROLE_SIEGE = new Upgrade(28, "ROLE_SIEGE_UPGRADE", "ROLE_SIEGE_FLAVOR", "ROLE_SIEGE_DESC", TYPE_MAJOR, 200000, loadIcon("icons/upgrades/RoleSiege.png"), 4);
         static { upgrades.add(ROLE_SIEGE); }
-        public static final Upgrade ROLE_BREEDER = new Upgrade(30, "ROLE_BREEDER_UPGRADE", "ROLE_BREEDER_FLAVOR", "ROLE_BREEDER_DESC", TYPE_PRINCESS, 0, loadIcon("icons/upgrades/RoleBreeder.png"), 0);
+        public static final Upgrade ROLE_BREEDER = new Upgrade(30, "ROLE_BREEDER_UPGRADE", "ROLE_BREEDER_FLAVOR", "ROLE_BREEDER_DESC", TYPE_PRINCESS, 0, loadIcon("icons/upgrades/RoleBreeder.png"), 1);
         static { upgrades.add(ROLE_BREEDER); }
         public static final Upgrade ROLE_DIPLOMAT = new Upgrade(31, "ROLE_DIPLOMAT_UPGRADE", "ROLE_DIPLOMAT_FLAVOR", "ROLE_DIPLOMAT_DESC", TYPE_PRINCESS, 1500, loadIcon("icons/upgrades/RoleDiplomat.png"), 3);
         static { upgrades.add(ROLE_DIPLOMAT); }
@@ -163,7 +163,7 @@ public final class GameUnlocks {
         public static final Upgrade ABILITY_MANAGEMENT = new Upgrade(511, "ABILITY_MANAGEMENT", "ABILITY_MANAGEMENT_FLAVOR", "ABILITY_MANAGEMENT_DESC", ABILITY_DYNASTY, 0, null, 0);
         static { upgrades.add(ABILITY_MANAGEMENT); }
         // TODO asset: icons/upgrades/AbilityMassFlight.png
-        public static final Upgrade ABILITY_MASS_FLIGHT = new Upgrade(512, "ABILITY_MASS_FLIGHT", "ABILITY_MASS_FLIGHT_FLAVOR", "ABILITY_MASS_FLIGHT_DESC", ABILITY_FORCED_FLIGHT, 0, null, 0);
+        public static final Upgrade ABILITY_MASS_FLIGHT = new Upgrade(512, "ABILITY_MASS_FLIGHT", "ABILITY_MASS_FLIGHT_FLAVOR", "ABILITY_MASS_FLIGHT_DESC", ABILITY_FORCED_FLIGHT, 0, null, 1);
         static { upgrades.add(ABILITY_MASS_FLIGHT); }
         // TODO asset: icons/upgrades/AbilityCloning.png
         public static final Upgrade ABILITY_CLONING = new Upgrade(514, "ABILITY_CLONING", "ABILITY_CLONING_FLAVOR", "ABILITY_CLONING_DESC", ABILITY_RESEARCH, 0, null, 0);
@@ -215,7 +215,7 @@ public final class GameUnlocks {
         // -- Advanced Roles --
         public static final Upgrade ROLE_COURIER = new Upgrade(18, "ROLE_COURIER_UPGRADE", "ROLE_COURIER_FLAVOR", "ROLE_COURIER_DESC", ABILITY_TRADE, 0, loadIcon("icons/upgrades/RoleCourier.png"), 0);
         static { upgrades.add(ROLE_COURIER); }
-        public static final Upgrade ROLE_BORER = new Upgrade(29, "ROLE_BORER_UPGRADE", "ROLE_BORER_FLAVOR", "ROLE_BORER_DESC", ABILITY_TUNNELS, 0, loadIcon("icons/upgrades/RoleBorer.png"), 0);
+        public static final Upgrade ROLE_BORER = new Upgrade(29, "ROLE_BORER_UPGRADE", "ROLE_BORER_FLAVOR", "ROLE_BORER_DESC", ABILITY_TUNNELS, 0, loadIcon("icons/upgrades/RoleBorer.png"), 3);
         static { upgrades.add(ROLE_BORER); }
         public static final Upgrade ROLE_TRANSPORT = new Upgrade(35, "ROLE_TRANSPORT_UPGRADE", "ROLE_TRANSPORT_FLAVOR", "ROLE_TRANSPORT_DESC", ROLE_COURIER, 100000, loadIcon("icons/upgrades/RoleTransport.png"), 4);
         static { upgrades.add(ROLE_TRANSPORT); }
