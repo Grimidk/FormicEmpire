@@ -49,6 +49,16 @@ class ResearchTreeGraphTest {
     }
 
     @Test
+    void buildWithNullColonyStillLayoutsFullEncyclopediaTree() {
+        ResearchTreeGraph.Result result = ResearchTreeGraph.build(null, null);
+
+        assertEquals(GameUnlocks.TYPE_EGG, result.getCenter());
+        assertEquals(GameUnlocks.getUpgrades().size(), result.getNodes().size());
+        assertTrue(result.getNodes().stream()
+                .allMatch(node -> node.getState() == ResearchTreeGraph.NodeState.UNAVAILABLE));
+    }
+
+    @Test
     void statesCoverOwnedAffordableUnavailableAndTriggerProgress() {
         colony.unlockUpgrade(GameUnlocks.TYPE_SOLDIER);
         colony.setResearchPoints(0);

@@ -12,7 +12,6 @@ import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.GrayFilter;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -42,8 +41,6 @@ import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
-import java.awt.image.BufferedImage;
-import java.awt.image.FilteredImageSource;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -64,6 +61,7 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
     private final Colony colony;
     private final Engine engine;
     private final Runnable onTreeChanged;
+    private final boolean encyclopediaMode;
     private final JLabel researchPointsLabel;
     private final TreeCanvas canvas;
     private final JScrollPane scrollPane;
@@ -72,10 +70,15 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
     private ResearchTreeGraph.Result graph = ResearchTreeGraph.build(null, null);
 
     public ResearchTreePanel(Colony colony, Engine engine, Runnable onTreeChanged) {
+        this(colony, engine, onTreeChanged, false);
+    }
+
+    public ResearchTreePanel(Colony colony, Engine engine, Runnable onTreeChanged, boolean encyclopediaMode) {
         super(new BorderLayout());
         this.colony = colony;
         this.engine = engine;
         this.onTreeChanged = onTreeChanged;
+        this.encyclopediaMode = encyclopediaMode;
         setBackground(AssetStyles.BACKGROUND_COLOR);
 
         researchPointsLabel = new JLabel();
@@ -86,6 +89,7 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
         northPanel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
         northPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
         northPanel.add(researchPointsLabel);
+        northPanel.setVisible(!encyclopediaMode);
         add(northPanel, BorderLayout.NORTH);
 
         canvas = new TreeCanvas();
@@ -142,6 +146,9 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
     }
 
     private void updateResearchPointsLabel() {
+        if (encyclopediaMode || colony == null) {
+            return;
+        }
         researchPointsLabel.setText(LanguageStrings.format(
                 LanguageStrings.UPGRADE_RESEARCH_AVAILABLE, colony.getResearchPoints()));
     }
@@ -285,7 +292,9 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
                 requirementArea.setVisible(false);
             }
 
-            TriggerProgress progress = TriggerProgressService.find(colony, engine, upgrade);
+            TriggerProgress progress = colony == null
+                    ? null
+                    : TriggerProgressService.find(colony, engine, upgrade);
             if (progress != null) {
                 progressArea.setText(progress.getHint() + " — " + LanguageStrings.format(
                         LanguageStrings.TRIGGER_PROGRESS_METRIC_FMT,
@@ -304,10 +313,16 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
 
             cancelButton.setText(LanguageStrings.get(LanguageStrings.UI_CANCEL));
             buyButton.setText(LanguageStrings.get(LanguageStrings.UI_BUY));
+            if (encyclopediaMode) {
+                buyButton.setVisible(false);
+                buyButton.setToolTipText(null);
+                return;
+            }
             boolean canBuy = selectedState == ResearchTreeGraph.NodeState.AFFORDABLE;
             buyButton.setVisible(upgrade.getCost() > 0 && selectedState != ResearchTreeGraph.NodeState.OWNED);
             buyButton.setEnabled(canBuy);
-            if (upgrade.getCost() > 0
+            if (colony != null
+                    && upgrade.getCost() > 0
                     && selectedState != ResearchTreeGraph.NodeState.OWNED
                     && selectedState != ResearchTreeGraph.NodeState.AFFORDABLE
                     && (upgrade.getRequirement() == null || colony.hasUpgrade(upgrade.getRequirement()))) {
@@ -318,7 +333,7 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
         }
 
         private void purchaseSelected() {
-            if (selectedUpgrade == null) {
+            if (encyclopediaMode || colony == null || selectedUpgrade == null) {
                 return;
             }
             Upgrade upgrade = selectedUpgrade;
@@ -340,7 +355,6 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
     private final class TreeCanvas extends JPanel {
         private final Map<Upgrade, Rectangle> nodeBounds = new HashMap<>();
         private final Map<Upgrade, Image> colorIcons = new HashMap<>();
-        private final Map<Upgrade, Image> greyIcons = new HashMap<>();
         private int centerX;
         private int centerY;
         private Point pressScreen;
@@ -422,7 +436,6 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
         void rebuildLayout() {
             nodeBounds.clear();
             colorIcons.clear();
-            greyIcons.clear();
 
             if (graph.getNodes().isEmpty()) {
                 centerX = PADDING;
@@ -443,9 +456,7 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
                 int x = centerX + (int) Math.round(node.getPosX() * UNIT_SIZE) - NODE_HIT / 2;
                 int y = centerY + (int) Math.round(node.getPosY() * UNIT_SIZE) - NODE_HIT / 2;
                 nodeBounds.put(node.getUpgrade(), new Rectangle(x, y, NODE_HIT, NODE_HIT));
-                Image base = iconImage(node.getUpgrade());
-                colorIcons.put(node.getUpgrade(), base);
-                greyIcons.put(node.getUpgrade(), greyed(base));
+                colorIcons.put(node.getUpgrade(), iconImage(node.getUpgrade()));
             }
         }
 
@@ -467,18 +478,6 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
                 return image.getScaledInstance(NODE_SIZE, NODE_SIZE, Image.SCALE_SMOOTH);
             }
             return image;
-        }
-
-        private Image greyed(Image source) {
-            Image grey = createImage(new FilteredImageSource(source.getSource(), new GrayFilter(true, 50)));
-            if (grey == null) {
-                return source;
-            }
-            BufferedImage buffer = new BufferedImage(NODE_SIZE, NODE_SIZE, BufferedImage.TYPE_INT_ARGB);
-            Graphics2D g2 = buffer.createGraphics();
-            g2.drawImage(grey, 0, 0, NODE_SIZE, NODE_SIZE, null);
-            g2.dispose();
-            return buffer;
         }
 
         private ResearchTreeGraph.Node nodeAt(Point point) {
@@ -552,9 +551,7 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
                 g2d.setColor(AssetStyles.BACKGROUND_COLOR);
                 g2d.fillRect(rect.x, rect.y, rect.width, rect.height);
 
-                Image image = node.getState() == ResearchTreeGraph.NodeState.UNAVAILABLE
-                        ? greyIcons.get(node.getUpgrade())
-                        : colorIcons.get(node.getUpgrade());
+                Image image = colorIcons.get(node.getUpgrade());
                 if (image != null) {
                     g2d.drawImage(image, iconX, iconY, NODE_SIZE, NODE_SIZE, this);
                 }

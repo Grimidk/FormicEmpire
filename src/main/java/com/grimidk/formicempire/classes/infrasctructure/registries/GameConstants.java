@@ -62,7 +62,14 @@ public final class GameConstants {
         URL resourceUrl = Thread.currentThread().getContextClassLoader().getResource(path);
         if (resourceUrl == null) {
             System.err.println("CRITICAL ERROR: Resource not found: " + path);
-            return null; 
+            URL fallback = Thread.currentThread().getContextClassLoader().getResource("icons/misc/Unknown.png");
+            if (fallback == null) {
+                return null;
+            }
+            ImageIcon todo = new ImageIcon(fallback);
+            GameSpritePreloader.ensureLoaded(todo);
+            iconCache.put(path, todo);
+            return todo;
         }
         ImageIcon icon = new ImageIcon(resourceUrl);
         GameSpritePreloader.ensureLoaded(icon);

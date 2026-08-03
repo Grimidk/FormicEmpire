@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 67% (233/350 checked)
+Completion: 67% (238/357 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -428,8 +428,8 @@ Help encyclopedia (main menu Help):
 [ ] Critter Species
 [X] Ant roles
 [ ] Dynasty tab (ranks, tiers, trade, loyalty, military, reputation)
-[X] Upgrades list (all GameUnlocks upgrades)
-[X] Buildings list
+[ ] Upgrades research tree (Help > Upgrades — browse nodes; read-only)
+[ ] Buildings research tree (Help > Buildings — browse nodes; read-only)
 [X] Synergies list (Help > Synergies — Super Venom and future combos)
 [ ] Combat (Help > Combat — creature battles, skills, battle lines, capacity/reserves, war phases)
 [X] World / biomes / hexes

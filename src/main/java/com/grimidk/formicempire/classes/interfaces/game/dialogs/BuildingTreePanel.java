@@ -10,7 +10,6 @@ import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.GrayFilter;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -41,8 +40,6 @@ import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
-import java.awt.image.BufferedImage;
-import java.awt.image.FilteredImageSource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -64,6 +61,7 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
 
     private final Colony colony;
     private final Runnable onTreeChanged;
+    private final boolean encyclopediaMode;
     private final JLabel mineralsLabel;
     private final JLabel resinLabel;
     private final JLabel buildersLabel;
@@ -75,9 +73,14 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
     private BuildingTreeGraph.Result graph = BuildingTreeGraph.build(null);
 
     public BuildingTreePanel(Colony colony, Runnable onTreeChanged) {
+        this(colony, onTreeChanged, false);
+    }
+
+    public BuildingTreePanel(Colony colony, Runnable onTreeChanged, boolean encyclopediaMode) {
         super(new BorderLayout());
         this.colony = colony;
         this.onTreeChanged = onTreeChanged;
+        this.encyclopediaMode = encyclopediaMode;
         setBackground(AssetStyles.BACKGROUND_COLOR);
 
         JPanel northPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -94,6 +97,7 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
         northPanel.add(buildersLabel);
         northPanel.add(Box.createRigidArea(new Dimension(10, 0)));
         northPanel.add(cranesLabel);
+        northPanel.setVisible(!encyclopediaMode);
         add(northPanel, BorderLayout.NORTH);
 
         canvas = new TreeCanvas();
@@ -157,6 +161,9 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
     }
 
     private void updateResourceLabels() {
+        if (encyclopediaMode || colony == null) {
+            return;
+        }
         mineralsLabel.setText(AssetStyles.formatRatio(colony.getMinerals(), colony.getMineralsCapacity()));
         resinLabel.setText(AssetStyles.formatRatio(colony.getResins(), colony.getResinsCapacity()));
         buildersLabel.setText(LanguageStrings.format(
@@ -311,8 +318,9 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
                 requirementArea.setVisible(false);
             }
 
-            if (selectedState == BuildingTreeGraph.NodeState.IN_PROGRESS
-                    || colony.getCurrentBuildingProject() == building) {
+            if (colony != null
+                    && (selectedState == BuildingTreeGraph.NodeState.IN_PROGRESS
+                    || colony.getCurrentBuildingProject() == building)) {
                 double efficiency = colony.getConstructionEfficiency();
                 double requiredHours = efficiency > 0
                         ? building.getBuildTime() / efficiency
@@ -331,10 +339,16 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
             titleArea.setCaretPosition(0);
 
             closeButton.setText(LanguageStrings.get(LanguageStrings.UI_CANCEL));
+            if (encyclopediaMode) {
+                actionButton.setVisible(false);
+                actionButton.setToolTipText(null);
+                return;
+            }
             if (selectedState == BuildingTreeGraph.NodeState.OWNED) {
                 actionButton.setVisible(false);
-            } else if (selectedState == BuildingTreeGraph.NodeState.IN_PROGRESS
-                    || colony.getCurrentBuildingProject() == building) {
+            } else if (colony != null
+                    && (selectedState == BuildingTreeGraph.NodeState.IN_PROGRESS
+                    || colony.getCurrentBuildingProject() == building)) {
                 actionButton.setVisible(true);
                 actionButton.setEnabled(true);
                 actionButton.setText(LanguageStrings.get(LanguageStrings.UI_CANCEL));
@@ -344,7 +358,7 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
                 actionButton.setText(LanguageStrings.get(LanguageStrings.UI_BUILD));
                 boolean canBuild = selectedState == BuildingTreeGraph.NodeState.AFFORDABLE;
                 actionButton.setEnabled(canBuild);
-                if (!canBuild) {
+                if (!canBuild && colony != null) {
                     int builders = colony.getAssignedRoleCount(GameConstants.ROLE_BUILDER);
                     int cranes = colony.getAssignedRoleCount(GameConstants.ROLE_CRANE);
                     if (builders <= 0 && cranes <= 0) {
@@ -362,7 +376,7 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
         }
 
         private void onAction() {
-            if (selectedBuilding == null) {
+            if (encyclopediaMode || colony == null || selectedBuilding == null) {
                 return;
             }
             Building building = selectedBuilding;
@@ -392,7 +406,6 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
     private final class TreeCanvas extends JPanel {
         private final Map<Building, Rectangle> nodeBounds = new HashMap<>();
         private final Map<Building, Image> colorIcons = new HashMap<>();
-        private final Map<Building, Image> greyIcons = new HashMap<>();
         private final List<DividerLabel> dividerLabels = new ArrayList<>();
         private int originX;
         private int originY;
@@ -485,7 +498,6 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
         void rebuildLayout() {
             nodeBounds.clear();
             colorIcons.clear();
-            greyIcons.clear();
             dividerLabels.clear();
 
             if (graph.getNodes().isEmpty()) {
@@ -507,9 +519,7 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
                 int x = originX + (int) Math.round(node.getPosX() * UNIT_SIZE) - NODE_HIT / 2;
                 int y = originY + (int) Math.round(node.getPosY() * UNIT_SIZE) - NODE_HIT / 2;
                 nodeBounds.put(node.getBuilding(), new Rectangle(x, y, NODE_HIT, NODE_HIT));
-                Image base = iconImage(node.getBuilding());
-                colorIcons.put(node.getBuilding(), base);
-                greyIcons.put(node.getBuilding(), greyed(base));
+                colorIcons.put(node.getBuilding(), iconImage(node.getBuilding()));
             }
 
             int lineLeft = PADDING / 2;
@@ -543,18 +553,6 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
                 return image.getScaledInstance(NODE_SIZE, NODE_SIZE, Image.SCALE_SMOOTH);
             }
             return image;
-        }
-
-        private Image greyed(Image source) {
-            Image grey = createImage(new FilteredImageSource(source.getSource(), new GrayFilter(true, 50)));
-            if (grey == null) {
-                return source;
-            }
-            BufferedImage buffer = new BufferedImage(NODE_SIZE, NODE_SIZE, BufferedImage.TYPE_INT_ARGB);
-            Graphics2D g2 = buffer.createGraphics();
-            g2.drawImage(grey, 0, 0, NODE_SIZE, NODE_SIZE, null);
-            g2.dispose();
-            return buffer;
         }
 
         private BuildingTreeGraph.Node nodeAt(Point point) {
@@ -659,9 +657,7 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
                 g2d.setColor(AssetStyles.BACKGROUND_COLOR);
                 g2d.fillRect(rect.x, rect.y, rect.width, rect.height);
 
-                Image image = node.getState() == BuildingTreeGraph.NodeState.UNAVAILABLE
-                        ? greyIcons.get(node.getBuilding())
-                        : colorIcons.get(node.getBuilding());
+                Image image = colorIcons.get(node.getBuilding());
                 if (image != null) {
                     g2d.drawImage(image, iconX, iconY, NODE_SIZE, NODE_SIZE, this);
                 }

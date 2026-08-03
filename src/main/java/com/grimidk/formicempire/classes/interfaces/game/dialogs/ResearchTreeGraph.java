@@ -266,14 +266,12 @@ public final class ResearchTreeGraph {
     }
 
     public static Result build(Colony colony, Engine engine) {
-        if (colony == null) {
-            return emptyResult();
-        }
-
         Upgrade center = GameUnlocks.TYPE_EGG;
         Map<Upgrade, NodeState> nodeStates = new LinkedHashMap<>();
         for (Upgrade upgrade : GameUnlocks.getUpgrades()) {
-            nodeStates.put(upgrade, stateFor(colony, engine, upgrade));
+            nodeStates.put(upgrade, colony == null
+                    ? NodeState.UNAVAILABLE
+                    : stateFor(colony, engine, upgrade));
         }
         if (!nodeStates.containsKey(center)) {
             return emptyResult();

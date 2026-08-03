@@ -29,6 +29,10 @@ import com.grimidk.formicempire.classes.constants.world.Season;
 import com.grimidk.formicempire.classes.constants.world.Temperature;
 import com.grimidk.formicempire.classes.constants.world.TimeOfDay;
 import com.grimidk.formicempire.classes.constants.world.Weather;
+import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.infrasctructure.Engine;
+import com.grimidk.formicempire.classes.interfaces.game.dialogs.BuildingTreePanel;
+import com.grimidk.formicempire.classes.interfaces.game.dialogs.ResearchTreePanel;
 import com.grimidk.formicempire.classes.interfaces.game.dialogs.ZeroDialog;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiDialogUtils;
@@ -129,9 +133,9 @@ public class HelpPanel extends JPanel {
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_ANT_ROLES), createAntRolesPanel());
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_EMPIRE), createEmpirePanel());
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_UPGRADES),
-                createDictionaryPanel(new ArrayList<>(GameUnlocks.getUpgrades())));
+                createResearchTreeHelpPanel());
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_BUILDINGS),
-                createDictionaryPanel(new ArrayList<>(GameUnlocks.getBuildings()), false));
+                createBuildingTreeHelpPanel());
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_SYNERGIES),
                 createDictionaryPanel(new ArrayList<>(GameUnlocks.getSynergies())));
         mainTabs.addTab(LanguageStrings.get(LanguageStrings.HELP_TAB_COMBAT), createCombatPanel());
@@ -1443,6 +1447,27 @@ public class HelpPanel extends JPanel {
         label.setForeground(AssetStyles.FONT_COLOR);
         label.setIconTextGap(8);
         return label;
+    }
+
+    private Colony resolveHelpColony() {
+        Engine engine = frame.getEngine();
+        if (engine == null || engine.getWorld() == null || engine.getWorld().getActiveHex() == null) {
+            return null;
+        }
+        return engine.getWorld().getActiveHex().getColony();
+    }
+
+    private JComponent createResearchTreeHelpPanel() {
+        Engine engine = frame.getEngine();
+        ResearchTreePanel panel = new ResearchTreePanel(resolveHelpColony(), engine, null, true);
+        panel.updateData();
+        return panel;
+    }
+
+    private JComponent createBuildingTreeHelpPanel() {
+        BuildingTreePanel panel = new BuildingTreePanel(resolveHelpColony(), null, true);
+        panel.updateData();
+        return panel;
     }
 
     private JComponent createDictionaryPanel(List<Constant> items) {
