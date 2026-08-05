@@ -308,6 +308,14 @@ public final class GameConstants {
     static { misc.add(ICON_PARASITIC_MITE); }
     public static final ImageIcon ICON_RESEARCH = loadIcon("icons/misc/Research.png");
     static { misc.add(ICON_RESEARCH); }
+    public static final ImageIcon ICON_TRADE = loadIcon("icons/misc/Trade.png");
+    static { misc.add(ICON_TRADE); }
+    public static final ImageIcon ICON_AUTOMATION = loadIcon("icons/misc/Automation.png");
+    static { misc.add(ICON_AUTOMATION); }
+    public static final ImageIcon ICON_ATTACK = loadIcon("icons/misc/Attack.png");
+    static { misc.add(ICON_ATTACK); }
+    public static final ImageIcon ICON_DEFENSE = loadIcon("icons/misc/Defense.png");
+    static { misc.add(ICON_DEFENSE); }
     public static final ImageIcon ICON_UNKNOWN = loadIcon("icons/misc/Unknown.png");
     static { misc.add(ICON_UNKNOWN); }
     public static final ImageIcon ICON_STAT_LOYALTY = loadIcon("icons/misc/Loyalty.png");

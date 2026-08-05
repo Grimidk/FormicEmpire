@@ -408,6 +408,9 @@ public class HelpPanel extends JPanel {
         class HotkeyRow {
             private int gridY = 0;
             void add(String key, String desc) {
+                add(key, desc, null);
+            }
+            void add(String key, String desc, ImageIcon icon) {
                 c.gridx = 0;
                 c.gridy = gridY;
                 JLabel keyLabel = new JLabel(key);
@@ -416,9 +419,12 @@ public class HelpPanel extends JPanel {
                 hotkeyPanel.add(keyLabel, c);
 
                 c.gridx = 1;
-                JLabel descLabel = new JLabel(desc);
+                JLabel descLabel = new JLabel(desc, icon, SwingConstants.LEFT);
                 descLabel.setFont(AssetStyles.FONT_NORMAL);
                 descLabel.setForeground(AssetStyles.FONT_COLOR);
+                if (icon != null) {
+                    descLabel.setIconTextGap(8);
+                }
                 hotkeyPanel.add(descLabel, c);
                 gridY++;
             }
@@ -444,9 +450,9 @@ public class HelpPanel extends JPanel {
         row.add("Q / W / E / R / T", LanguageStrings.get("HOTKEY_ROLES"));
         row.addSeparator();
         row.add("P", LanguageStrings.get("HOTKEY_P"));
-        row.add("Y / U / I / O", LanguageStrings.get("HOTKEY_UPGRADES"));
-        row.add("C", LanguageStrings.get("HOTKEY_ABILITIES"));
-        row.add("A / S / D / F", LanguageStrings.get("HOTKEY_DYNASTY"));
+        row.add("Y / U / I / O", LanguageStrings.get("HOTKEY_UPGRADES"), GameUnlocks.ABILITY_RESEARCH.getIcon());
+        row.add("C", LanguageStrings.get("HOTKEY_ABILITIES"), GameUnlocks.ABILITY_ABILITY.getIcon());
+        row.add("A / S / D / F", LanguageStrings.get("HOTKEY_DYNASTY"), GameUnlocks.ABILITY_DYNASTY.getIcon());
         row.add("M", LanguageStrings.get("HOTKEY_M"));
         row.add("X", LanguageStrings.get("HOTKEY_X"));
 
@@ -599,6 +605,8 @@ public class HelpPanel extends JPanel {
         panel.add(buildCombatSection(LanguageStrings.HELP_COMBAT_WAR_PHASES, buildCombatWarPhasesSection()));
         panel.add(Box.createRigidArea(new Dimension(0, 12)));
         panel.add(buildCombatSection(LanguageStrings.HELP_COMBAT_WAR_STANDING, buildCombatWarStandingSection()));
+        panel.add(Box.createRigidArea(new Dimension(0, 12)));
+        panel.add(buildCombatUnitStatsSection());
 
         JScrollPane scrollPane = new JScrollPane(panel);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
@@ -664,6 +672,22 @@ public class HelpPanel extends JPanel {
             panel.add(Box.createRigidArea(new Dimension(0, 5)));
         }
         return panel;
+    }
+
+    private JPanel buildCombatUnitStatsSection() {
+        JPanel content = new JPanel();
+        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
+        content.setBackground(AssetStyles.BACKGROUND_COLOR);
+        content.add(buildCombatConstantEntry(content,
+                LanguageStrings.get(LanguageStrings.UNIT_STAT_ATTACK),
+                GameConstants.ICON_ATTACK,
+                LanguageStrings.get(LanguageStrings.UNIT_STAT_ATTACK_DESC)));
+        content.add(Box.createRigidArea(new Dimension(0, 5)));
+        content.add(buildCombatConstantEntry(content,
+                LanguageStrings.get(LanguageStrings.UNIT_STAT_DEFENSE),
+                GameConstants.ICON_DEFENSE,
+                LanguageStrings.get(LanguageStrings.UNIT_STAT_DEFENSE_DESC)));
+        return buildCombatSection(LanguageStrings.HELP_COMBAT_UNIT_STATS, content);
     }
 
     private String formatWarPhaseHelpBody(WarStagePhase phase) {

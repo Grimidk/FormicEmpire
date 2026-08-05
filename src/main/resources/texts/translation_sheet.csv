@@ -1732,6 +1732,7 @@ HELP_COMBAT_SKILLS,Skills,Habilidades,Habilidades,Compétences
 HELP_COMBAT_BATTLE_LINES,Battle Lines,Líneas de batalla,Linhas de batalha,Lignes de bataille
 HELP_COMBAT_WAR_PHASES,War Stage Phases,Fases de etapa de guerra,Fases de etapa de guerra,Phases d'étape de guerre
 HELP_COMBAT_WAR_STANDING,War Standing,Posición en la guerra,Posição na guerra,Position de guerre
+HELP_COMBAT_UNIT_STATS,Unit Stats,Estadísticas de unidad,Estatísticas de unidade,Stats d'unité
 HELP_SKILL_ACCURACY_FMT,Accuracy: %s,Precisión: %s,Precisão: %s,Précision : %s
 HELP_SKILL_DAMAGE_FMT,Damage: %s,Daño: %s,Dano: %s,Dégâts : %s
 HELP_SKILL_TARGETS_FMT,Targets: %s,Objetivos: %s,Alvos: %s,Cibles : %s

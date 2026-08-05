@@ -9,6 +9,7 @@ import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.interfaces.game.gamepanels.AlertPanel;
 import com.grimidk.formicempire.classes.interfaces.game.gamepanels.AlertPanel.Alert;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
@@ -111,7 +112,7 @@ public class AlertManager {
                 return iconOf(GameConstants.ICON_RESEARCH);
             case "BUILD":
             case "SUCC":
-                return iconOf(GameConstants.ROLE_BUILDER.getIcon());
+                return iconOf(GameUnlocks.ABILITY_BUILD.getIcon());
             case "COMP":
                 return iconOf(GameConstants.ROOM_PASSIVE_COMPOSTER);
             case "REBEL":
@@ -119,7 +120,7 @@ public class AlertManager {
             case "WAR":
                 return iconOf(GameConstants.ICON_STAT_MILITARY_POWER);
             case "TRADE":
-                return iconOf(GameConstants.METHOD_LAND.getIcon());
+                return iconOf(GameConstants.ICON_TRADE);
             case "NUPTIAL":
             case "PROMO":
                 return iconOf(GameConstants.TYPE_QUEEN.getIcon());
@@ -130,7 +131,7 @@ public class AlertManager {
             case "DYN":
                 return iconOf(GameConstants.ICON_STAT_REPUTATION);
             case "AUTO":
-                return iconOf(GameConstants.ICON_SOCIALISM);
+                return iconOf(GameConstants.ICON_AUTOMATION);
             case "INFO":
             default:
                 return iconOf(GameConstants.REPUTATION_NEUTRAL.getIcon());

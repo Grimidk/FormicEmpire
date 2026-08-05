@@ -105,7 +105,7 @@ public class UpgradeDialog extends ZeroDialog {
                 researchPanel = new ResearchTreePanel(colony, engine, this::refreshDialog);
             }
             researchPanel.updateData();
-            tabbedPane.addTab(LanguageStrings.get(LanguageStrings.TAB_RESEARCH), GameConstants.ROLE_RESEARCHER.getIcon(), researchPanel);
+            tabbedPane.addTab(LanguageStrings.get(LanguageStrings.TAB_RESEARCH), GameUnlocks.ABILITY_RESEARCH.getIcon(), researchPanel);
             tabIndexMap.put(TAB_RESEARCH, currentIndex++);
         }
 
@@ -115,7 +115,7 @@ public class UpgradeDialog extends ZeroDialog {
                 buildPanel = new BuildingTreePanel(colony, this::refreshDialog);
             }
             buildPanel.updateData();
-            tabbedPane.addTab(LanguageStrings.get(LanguageStrings.TAB_CONSTRUCTION), GameConstants.ROLE_BUILDER.getIcon(), buildPanel);
+            tabbedPane.addTab(LanguageStrings.get(LanguageStrings.TAB_CONSTRUCTION), GameUnlocks.ABILITY_BUILD.getIcon(), buildPanel);
             tabIndexMap.put(TAB_BUILD, currentIndex++);
         }
 
@@ -125,7 +125,7 @@ public class UpgradeDialog extends ZeroDialog {
                 assimilationPanel = new AssimilationPanel(colony);
             }
             ((AssimilationPanel) assimilationPanel).updateData();
-            tabbedPane.addTab(LanguageStrings.get(LanguageStrings.TAB_ASSIMILATIONS), null, assimilationPanel);
+            tabbedPane.addTab(LanguageStrings.get(LanguageStrings.TAB_ASSIMILATIONS), GameUnlocks.ABILITY_ASSIMILATION.getIcon(), assimilationPanel);
             tabIndexMap.put(TAB_ASSIMILATION, currentIndex++);
         }
 
@@ -135,7 +135,7 @@ public class UpgradeDialog extends ZeroDialog {
                 synergyPanel = new SynergyPanel(colony);
             }
             synergyPanel.updateData();
-            tabbedPane.addTab(LanguageStrings.get(LanguageStrings.TAB_SYNERGIES), null, synergyPanel);
+            tabbedPane.addTab(LanguageStrings.get(LanguageStrings.TAB_SYNERGIES), GameUnlocks.ABILITY_SYNERGY.getIcon(), synergyPanel);
             tabIndexMap.put(TAB_SYNERGY, currentIndex++);
         }
         

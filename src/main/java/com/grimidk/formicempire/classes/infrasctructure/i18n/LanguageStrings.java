@@ -2379,6 +2379,7 @@ public final class LanguageStrings {
     public static final String HELP_COMBAT_BATTLE_LINES = "HELP_COMBAT_BATTLE_LINES";
     public static final String HELP_COMBAT_WAR_PHASES = "HELP_COMBAT_WAR_PHASES";
     public static final String HELP_COMBAT_WAR_STANDING = "HELP_COMBAT_WAR_STANDING";
+    public static final String HELP_COMBAT_UNIT_STATS = "HELP_COMBAT_UNIT_STATS";
     public static final String HELP_SKILL_ACCURACY_FMT = "HELP_SKILL_ACCURACY_FMT";
     public static final String HELP_SKILL_DAMAGE_FMT = "HELP_SKILL_DAMAGE_FMT";
     public static final String HELP_SKILL_TARGETS_FMT = "HELP_SKILL_TARGETS_FMT";

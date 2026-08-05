@@ -80,6 +80,7 @@ public class AbilitiesDialog extends ZeroDialog {
             int currentCost = colony.getNuptialFlightCost();
             AbilityRow row = createAbilityPanel(
                     LanguageStrings.get(LanguageStrings.ABILITY_FORCED_FLIGHT),
+                    GameUnlocks.ABILITY_FORCED_FLIGHT.getIcon(),
                     LanguageStrings.format(LanguageStrings.ABILITY_FORCED_FLIGHT_DESC, currentCost),
                     createCostLabel(GameConstants.ICON_RESEARCH, currentCost),
                     e -> {
@@ -117,6 +118,7 @@ public class AbilitiesDialog extends ZeroDialog {
             int massCost = colony.getDynasty().getMassNuptialFlightCost();
             AbilityRow row = createAbilityPanel(
                     LanguageStrings.get(LanguageStrings.ABILITY_MASS_FLIGHT),
+                    GameUnlocks.ABILITY_MASS_FLIGHT.getIcon(),
                     LanguageStrings.format(LanguageStrings.ABILITY_MASS_FLIGHT_DESC, massCost),
                     createCostLabel(GameConstants.ICON_RESEARCH, massCost),
                     e -> {
@@ -137,6 +139,7 @@ public class AbilitiesDialog extends ZeroDialog {
             int syrupCost = GameNumbers.PHEROMONE_STORM_SYRUP_COST;
             AbilityRow row = createAbilityPanel(
                     GameUnlocks.ABILITY_PHEROMONE_STORM.getName(),
+                    GameUnlocks.ABILITY_PHEROMONE_STORM.getIcon(),
                     GameUnlocks.ABILITY_PHEROMONE_STORM.getDescription(),
                     createCostLabel(GameConstants.RESOURCE_SYRUP.getIcon(), syrupCost),
                     e -> {
@@ -159,6 +162,7 @@ public class AbilitiesDialog extends ZeroDialog {
             int proteinCost = GameNumbers.CREATINE_DIET_PROTEIN_COST;
             AbilityRow row = createAbilityPanel(
                     GameUnlocks.ABILITY_CREATINE_DIET.getName(),
+                    GameUnlocks.ABILITY_CREATINE_DIET.getIcon(),
                     GameUnlocks.ABILITY_CREATINE_DIET.getDescription(),
                     createCostLabel(GameConstants.RESOURCE_MEAT.getIcon(), proteinCost),
                     e -> {
@@ -261,7 +265,7 @@ public class AbilitiesDialog extends ZeroDialog {
         return label;
     }
 
-    private AbilityRow createAbilityPanel(String title, String desc, JLabel costLabel, ActionListener action) {
+    private AbilityRow createAbilityPanel(String title, Icon titleIcon, String desc, JLabel costLabel, ActionListener action) {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBackground(AssetStyles.UI_BG_SECONDARY);
         panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
@@ -270,6 +274,12 @@ public class AbilitiesDialog extends ZeroDialog {
         border.setTitleColor(AssetStyles.TEXT_HEADER);
         border.setTitleFont(AssetStyles.FONT_BOLD);
         panel.setBorder(border);
+
+        if (titleIcon != null) {
+            JLabel iconLabel = new JLabel(titleIcon);
+            iconLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
+            panel.add(iconLabel, BorderLayout.WEST);
+        }
 
         JTextArea descriptionArea = new JTextArea(desc);
         descriptionArea.setWrapStyleWord(true);
