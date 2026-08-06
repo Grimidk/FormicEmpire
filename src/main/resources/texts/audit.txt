@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 67% (238/357 checked)
+Completion: 66% (231/352 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -89,6 +89,8 @@ Side panels (live updates while playing):
 [X] Resources panel
 [X] Ant population panel
 [X] Alerts panel (icons + short labels; mite outbreaks, shortages, etc.)
+[ ] Music panel below alerts (track name; prev / play-pause / next; shuffle; mute; shows No music when empty)
+[ ] Menu music starts after intro (never during intro); session music starts when a game loads; volumes use Settings > Audio
 
 ================================================================================
 5. HOTKEYS (also in Help > Tutorials > Hotkeys)

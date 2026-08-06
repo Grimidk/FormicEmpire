@@ -9,6 +9,7 @@ To Fix (By decreasing priority):
 		TODO: tune AntSpeciesPalette hexcodes + icons for placeholder species (carpenter, weaver, floodplain, jet, army, ghost, silver, shining black, desert)
 		check translations and tags
 		improve late game performance and hourly hang ups
+		3 songs (menu, peace, war) a 3 effects (game start, war start, trigger triggering)
 	Mid:
 		(none right now)
 	Low:

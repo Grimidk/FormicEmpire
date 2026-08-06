@@ -33,6 +33,11 @@ if [ "$HOST_OS" = "Linux" ]; then
     ./scripts/setup_jre_linux.sh
 fi
 
+echo "[Build] Syncing music tracks..."
+java "$ROOT/tools/MusicTracksCodegen.java" \
+    "$ROOT/src/main/resources/audio/music" \
+    "$ROOT/src/main/java/com/grimidk/formicempire/classes/infrasctructure/registries/MusicTracks.java"
+
 echo "[Build] Building Formic Empire..."
 $MVN_EXEC clean package -DskipTests
 

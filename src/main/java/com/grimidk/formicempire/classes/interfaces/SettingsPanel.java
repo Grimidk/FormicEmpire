@@ -536,9 +536,9 @@ public class SettingsPanel extends JPanel {
     }
 
     private void resetAudioTabToDefaults() {
-        masterVolSlider.setValue(80);
-        musicVolSlider.setValue(70);
-        sfxVolSlider.setValue(100);
+        masterVolSlider.setValue(50);
+        musicVolSlider.setValue(50);
+        sfxVolSlider.setValue(50);
     }
 
     private void resetRolesTabToDefaults() {
@@ -728,10 +728,10 @@ public class SettingsPanel extends JPanel {
     }
 
     private JSlider createVolumeSlider() {
-        JSlider slider = new JSlider(0, 100);
+        JSlider slider = new JSlider(0, 100, 50);
         slider.setMajorTickSpacing(10);
         slider.setPaintTicks(true);
-        slider.setSnapToTicks(true);
+        slider.setSnapToTicks(false);
         AssetStyles.styleSlider(slider);
         return slider;
     }

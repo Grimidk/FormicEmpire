@@ -13,6 +13,7 @@ import javax.swing.plaf.basic.BasicSliderUI;
 
 public final class FlatSliderUI extends BasicSliderUI {
     public static final Dimension VERTICAL_SIZE = new Dimension(AssetStyles.MIN_CONTROL_HIT_SIZE, 96);
+    private static final int TICK_LENGTH = 5;
 
     public FlatSliderUI(JSlider slider) {
         super(slider);
@@ -26,11 +27,19 @@ public final class FlatSliderUI extends BasicSliderUI {
     protected void installDefaults(JSlider slider) {
         super.installDefaults(slider);
         focusInsets = new Insets(0, 0, 0, 0);
+        slider.setOpaque(true);
     }
 
     @Override
     protected int getTickLength() {
-        return 0;
+        return slider != null && slider.getPaintTicks() ? TICK_LENGTH : 0;
+    }
+
+    @Override
+    public void paint(Graphics g, JComponent c) {
+        g.setColor(c.getBackground());
+        g.fillRect(0, 0, c.getWidth(), c.getHeight());
+        super.paint(g, c);
     }
 
     @Override
@@ -42,12 +51,15 @@ public final class FlatSliderUI extends BasicSliderUI {
     public Dimension getPreferredHorizontalSize() {
         Dimension size = super.getPreferredHorizontalSize();
         int min = AssetStyles.MIN_CONTROL_HIT_SIZE;
-        size.height = Math.max(size.height, min);
+        int ticks = getTickLength();
+        size.height = Math.max(size.height, min + ticks);
         return size;
     }
 
     @Override
     public Dimension getPreferredSize(JComponent c) {
+        recalculateIfInsetsChanged();
+        recalculateIfOrientationChanged();
         if (slider.getOrientation() == JSlider.VERTICAL) {
             return getPreferredVerticalSize();
         }
@@ -91,7 +103,7 @@ public final class FlatSliderUI extends BasicSliderUI {
             return;
         }
         int spacing = slider.getMajorTickSpacing();
-        if (spacing <= 0) {
+        if (spacing <= 0 || tickRect == null || tickRect.isEmpty()) {
             return;
         }
         g.setColor(AssetStyles.UI_BORDER_COLOR);
@@ -100,10 +112,10 @@ public final class FlatSliderUI extends BasicSliderUI {
         for (int value = min; value <= max; value += spacing) {
             if (slider.getOrientation() == SwingConstants.HORIZONTAL) {
                 int x = xPositionForValue(value);
-                g.drawLine(x, trackRect.y + 1, x, trackRect.y + trackRect.height - 2);
+                g.drawLine(x, tickRect.y, x, tickRect.y + tickRect.height - 1);
             } else {
                 int y = yPositionForValue(value);
-                g.drawLine(trackRect.x + 1, y, trackRect.x + trackRect.width - 2, y);
+                g.drawLine(tickRect.x, y, tickRect.x + tickRect.width - 1, y);
             }
         }
     }
@@ -111,9 +123,6 @@ public final class FlatSliderUI extends BasicSliderUI {
     @Override
     protected Dimension getThumbSize() {
         int hit = AssetStyles.MIN_CONTROL_HIT_SIZE;
-        if (slider.getOrientation() == SwingConstants.HORIZONTAL) {
-            return new Dimension(Math.max(FlatScrollBarUI.MIN_THUMB_LENGTH, hit), hit);
-        }
         return new Dimension(hit, hit);
     }
 }

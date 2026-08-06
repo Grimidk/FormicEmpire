@@ -1843,6 +1843,8 @@ public class SaveManager {
             writeJsonLine(w, "masterVolume", engine.getMasterVolume(), false);
             writeJsonLine(w, "musicVolume", engine.getMusicVolume(), false);
             writeJsonLine(w, "sfxVolume", engine.getSfxVolume(), false);
+            writeJsonLine(w, "musicMuted", engine.isMusicMuted(), false);
+            writeJsonLine(w, "musicShuffle", engine.isMusicShuffle(), false);
             writeJsonLine(w, "pauseOnFocusLoss", engine.isPauseOnFocusLoss(), false);
             writeJsonLine(w, "confirmOnQuit", engine.isConfirmOnQuit(), false);
             writeJsonLine(w, "escapeKeyGameActions", engine.isEscapeKeyGameActions(), false);
@@ -1940,6 +1942,8 @@ public class SaveManager {
             engine.setMasterVolume(Integer.parseInt(m.getOrDefault("masterVolume", String.valueOf(engine.getMasterVolume()))));
             engine.setMusicVolume(Integer.parseInt(m.getOrDefault("musicVolume", String.valueOf(engine.getMusicVolume()))));
             engine.setSfxVolume(Integer.parseInt(m.getOrDefault("sfxVolume", String.valueOf(engine.getSfxVolume()))));
+            engine.setMusicMuted(Boolean.parseBoolean(m.getOrDefault("musicMuted", String.valueOf(engine.isMusicMuted()))));
+            engine.setMusicShuffle(Boolean.parseBoolean(m.getOrDefault("musicShuffle", String.valueOf(engine.isMusicShuffle()))));
             engine.setPauseOnFocusLoss(Boolean.parseBoolean(m.getOrDefault("pauseOnFocusLoss", String.valueOf(engine.isPauseOnFocusLoss()))));
             engine.setConfirmOnQuit(Boolean.parseBoolean(m.getOrDefault("confirmOnQuit", String.valueOf(engine.isConfirmOnQuit()))));
             engine.setEscapeKeyGameActions(Boolean.parseBoolean(m.getOrDefault("escapeKeyGameActions",

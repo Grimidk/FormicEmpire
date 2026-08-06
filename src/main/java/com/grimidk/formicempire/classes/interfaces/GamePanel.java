@@ -54,7 +54,8 @@ public class GamePanel extends ZeroGamePanel {
     
     private ColonyPanel colonyPanel; 
     private WorldPanel worldPanel;  
-    private AlertPanel alertPanel; 
+    private AlertPanel alertPanel;
+    private MusicPanel musicPanel;
     private ControlPanel controlPanel;
     private GameAreaPanel gameAreaPanel;
     private JScrollPane gameScrollPane;
@@ -123,6 +124,7 @@ public class GamePanel extends ZeroGamePanel {
         colonyPanel.setEngine(frame.getEngine());
         worldPanel = new WorldPanel();
         alertPanel = new AlertPanel();
+        musicPanel = new MusicPanel(frame.getEngine());
         gameAreaPanel = new GameAreaPanel();
         gameAreaPanel.setEngine(frame.getEngine());
         
@@ -448,6 +450,9 @@ public class GamePanel extends ZeroGamePanel {
         worldPanel.refreshTranslations();
         colonyPanel.refreshTranslations();
         alertPanel.refreshTranslations();
+        if (musicPanel != null) {
+            musicPanel.refreshTranslations();
+        }
         controlPanel.refreshTranslations();
         
         // Refresh open dialogs
@@ -471,6 +476,9 @@ public class GamePanel extends ZeroGamePanel {
         worldPanel.refreshTheme();
         colonyPanel.refreshTheme();
         alertPanel.refreshTheme();
+        if (musicPanel != null) {
+            musicPanel.refreshTheme();
+        }
         controlPanel.refreshTheme();
         refreshOpenDialogThemes();
     }
@@ -674,13 +682,18 @@ public class GamePanel extends ZeroGamePanel {
         gbc.weightx = 0.6; 
         center.add(gameScrollPane, gbc); 
 
-        // --- Right Panel Container (World + Alert) ---
+        // --- Right Panel Container (World + Alert + Music) ---
         JPanel rightPanel = new JPanel(new BorderLayout());
         rightPanel.setOpaque(false);
         rightPanel.setPreferredSize(new Dimension(230, 0));
         rightPanel.setMinimumSize(new Dimension(230, 0));
         rightPanel.add(worldPanel, BorderLayout.NORTH);
-        rightPanel.add(alertPanel, BorderLayout.CENTER); 
+
+        JPanel alertAndMusic = new JPanel(new BorderLayout());
+        alertAndMusic.setOpaque(false);
+        alertAndMusic.add(alertPanel, BorderLayout.CENTER);
+        alertAndMusic.add(musicPanel, BorderLayout.SOUTH);
+        rightPanel.add(alertAndMusic, BorderLayout.CENTER); 
 
         gbc.gridx = 2;
         gbc.weightx = 0.0;
@@ -1398,6 +1411,9 @@ public class GamePanel extends ZeroGamePanel {
                     controlPanel.setPlayPauseButtonText(engine.isPaused());
                     updateStatusIndicator(engine.isPaused());
                     paintGameAreaWhilePaused();
+                    if (engine.getMusicService() != null) {
+                        engine.getMusicService().enterSession();
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                     cleanupSession();

@@ -527,6 +527,15 @@ public final class LanguageStrings {
 
     public static final String PANEL_ALERTS = "PANEL_ALERTS";
     public static final String PANEL_NO_ALERTS = "PANEL_NO_ALERTS";
+    public static final String PANEL_MUSIC = "PANEL_MUSIC";
+    public static final String PANEL_NO_MUSIC = "PANEL_NO_MUSIC";
+    public static final String MUSIC_PLAY_TT = "MUSIC_PLAY_TT";
+    public static final String MUSIC_PAUSE_TT = "MUSIC_PAUSE_TT";
+    public static final String MUSIC_PREV_TT = "MUSIC_PREV_TT";
+    public static final String MUSIC_NEXT_TT = "MUSIC_NEXT_TT";
+    public static final String MUSIC_SHUFFLE_TT = "MUSIC_SHUFFLE_TT";
+    public static final String MUSIC_MUTE_TT = "MUSIC_MUTE_TT";
+    public static final String MUSIC_UNMUTE_TT = "MUSIC_UNMUTE_TT";
     public static final String PANEL_TIME = "PANEL_TIME";
     public static final String PANEL_WORLD = "PANEL_WORLD";
     public static final String PANEL_COLONY = "PANEL_COLONY";

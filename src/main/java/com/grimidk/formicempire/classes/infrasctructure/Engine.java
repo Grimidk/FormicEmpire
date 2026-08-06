@@ -9,6 +9,7 @@ import com.grimidk.formicempire.classes.constants.critter.ant.AntRole;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.GameSpeed;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.infrasctructure.audio.MusicService;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
@@ -23,6 +24,7 @@ public class Engine extends Thread {
     
     // --- Managers ---
     private final TradeManager tradeManager;
+    private final MusicService musicService;
 
     // --- Listeners ---
     private final CopyOnWriteArrayList<Runnable> minuteTickListeners = new CopyOnWriteArrayList<>();
@@ -46,6 +48,8 @@ public class Engine extends Thread {
     private int masterVolume = 50;
     private int musicVolume = 50;
     private int sfxVolume = 50;
+    private boolean musicMuted = false;
+    private boolean musicShuffle = true;
     
     private boolean pauseOnFocusLoss = true;
     private boolean confirmOnQuit = true;
@@ -75,10 +79,15 @@ public class Engine extends Thread {
         this.addHourTickListener(this.tradeManager);
         this.settingsSaveManager = new SaveManager();
         this.loadGlobalSettings();
+        this.musicService = new MusicService(this);
     }
 
     public TradeManager getTradeManager() {
         return tradeManager;
+    }
+
+    public MusicService getMusicService() {
+        return musicService;
     }
 
     public SaveManager getSaveManager() {
@@ -413,6 +422,9 @@ public class Engine extends Thread {
 
     public void setMasterVolume(int masterVolume) {
         this.masterVolume = masterVolume;
+        if (musicService != null) {
+            musicService.refreshVolume();
+        }
     }
 
     public int getMusicVolume() {
@@ -421,6 +433,9 @@ public class Engine extends Thread {
 
     public void setMusicVolume(int musicVolume) {
         this.musicVolume = musicVolume;
+        if (musicService != null) {
+            musicService.refreshVolume();
+        }
     }
 
     public int getSfxVolume() {
@@ -429,6 +444,25 @@ public class Engine extends Thread {
 
     public void setSfxVolume(int sfxVolume) {
         this.sfxVolume = sfxVolume;
+    }
+
+    public boolean isMusicMuted() {
+        return musicMuted;
+    }
+
+    public void setMusicMuted(boolean musicMuted) {
+        this.musicMuted = musicMuted;
+        if (musicService != null) {
+            musicService.refreshVolume();
+        }
+    }
+
+    public boolean isMusicShuffle() {
+        return musicShuffle;
+    }
+
+    public void setMusicShuffle(boolean musicShuffle) {
+        this.musicShuffle = musicShuffle;
     }
 
     public boolean isPauseOnFocusLoss() {

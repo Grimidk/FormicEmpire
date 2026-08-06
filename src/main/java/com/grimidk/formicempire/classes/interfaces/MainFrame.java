@@ -284,6 +284,9 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         gamePanel.endSession();
         menuChaoticPanel.setActive(false);
         LanguageStrings.removeListener(translationRefresh);
+        if (engine.getMusicService() != null) {
+            engine.getMusicService().shutdown();
+        }
         engine.pauseEngine();
         SaveManager.shutdownSharedExecutor();
         if (cursorEventListener != null) {
@@ -342,6 +345,9 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         }
         if (menuChaoticPanel != null) {
             menuChaoticPanel.applyVisualFrameInterval(engine.getVisualFrameIntervalMs());
+        }
+        if (engine.getMusicService() != null) {
+            engine.getMusicService().refreshVolume();
         }
         applyTheme();
     }
@@ -427,6 +433,7 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         cardLayout.show(cards, card);
         boolean showcaseActive = CARD_INIT.equals(card) || CARD_SAVE.equals(card);
         menuChaoticPanel.setActive(showcaseActive);
+        syncMusicForCard(card);
         applyGameCursors(this);
         SwingUtilities.invokeLater(() -> {
             Container parent = cards.getParent();
@@ -438,6 +445,17 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
                 cards.setBounds(0, 0, w, h);
             }
         });
+    }
+
+    private void syncMusicForCard(String card) {
+        if (engine == null || engine.getMusicService() == null) {
+            return;
+        }
+        if (CARD_INTRO.equals(card)) {
+            engine.getMusicService().stopAll();
+        } else if (!CARD_GAME.equals(card)) {
+            engine.getMusicService().enterMenu();
+        }
     }
 
     public void openGameWithSave(Savefile savefile) {

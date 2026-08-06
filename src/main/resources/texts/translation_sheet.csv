@@ -86,6 +86,15 @@ UI_CONFIRM_EXIT_TITLE,Confirm Exit,Confirmar Salida,Confirmar Saída,Confirmer l
 UI_CONFIRM_EXIT_MSG,You have unsaved progress! Are you sure you want to exit?,¡Tienes progreso sin guardar! ¿Estás seguro de que quieres salir?,Você tem progresso não salvo! Tem certeza de que deseja sair?,Progression non enregistrée ! Quitter quand même ?
 PANEL_ALERTS,Alerts,Alertas,Alertas,Alertes
 PANEL_NO_ALERTS,No alerts,Sin alertas,Sem alertas,Aucune alerte
+PANEL_MUSIC,Music,Música,Música,Musique
+PANEL_NO_MUSIC,No music,Sin música,Sem música,Pas de musique
+MUSIC_PLAY_TT,Play,Reproducir,Reproduzir,Lecture
+MUSIC_PAUSE_TT,Pause,Pausa,Pausa,Pause
+MUSIC_PREV_TT,Previous track,Pista anterior,Faixa anterior,Piste précédente
+MUSIC_NEXT_TT,Next track,Pista siguiente,Faixa seguinte,Piste suivante
+MUSIC_SHUFFLE_TT,Shuffle,Aleatorio,Aleatório,Aléatoire
+MUSIC_MUTE_TT,Mute music,Silenciar música,Silenciar música,Couper la musique
+MUSIC_UNMUTE_TT,Unmute music,Activar música,Ativar música,Réactiver la musique
 PANEL_TIME,Time,Tiempo,Tempo,Temps
 PANEL_WORLD,World,Mundo,Mundo,Monde
 PANEL_COLONY,Colony,Colonia,Colônia,Colonie
