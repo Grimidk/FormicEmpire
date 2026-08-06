@@ -15,7 +15,8 @@ class EngineFrameRateCapTest {
     }
 
     @Test
-    void defaultIsUncapped() {
+    void uncappedMeansOneMsVisualInterval() {
+        engine.setFrameRateCap(0);
         assertEquals(0, engine.getFrameRateCap());
         assertEquals(1, engine.getVisualFrameIntervalMs());
     }

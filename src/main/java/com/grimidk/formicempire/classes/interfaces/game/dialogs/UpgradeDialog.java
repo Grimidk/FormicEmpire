@@ -8,6 +8,7 @@ import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.services.dynasty.DynastySynergyService;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.util.EdgeTriggeredKeyBindings;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
@@ -17,7 +18,6 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -168,54 +168,20 @@ public class UpgradeDialog extends ZeroDialog {
         InputMap inputMap = getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         ActionMap actionMap = getRootPane().getActionMap();
 
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, 0), "toggleResearch");
-        actionMap.put("toggleResearch", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (isTabOpen(TAB_RESEARCH)) {
-                    dispose();
-                } else if (tabIndexMap.containsKey(TAB_RESEARCH)) {
-                    tabbedPane.setSelectedIndex(tabIndexMap.get(TAB_RESEARCH));
-                }
+        bindTabToggle(inputMap, actionMap, KeyEvent.VK_Y, "toggleResearch", TAB_RESEARCH);
+        bindTabToggle(inputMap, actionMap, KeyEvent.VK_U, "toggleBuild", TAB_BUILD);
+        bindTabToggle(inputMap, actionMap, KeyEvent.VK_I, "toggleAssimilation", TAB_ASSIMILATION);
+        bindTabToggle(inputMap, actionMap, KeyEvent.VK_O, "toggleSynergy", TAB_SYNERGY);
+    }
+
+    private void bindTabToggle(InputMap inputMap, ActionMap actionMap, int keyCode, String actionId, int tab) {
+        EdgeTriggeredKeyBindings.bind(inputMap, actionMap, keyCode, actionId, () -> {
+            if (isTabOpen(tab)) {
+                dispose();
+            } else if (tabIndexMap.containsKey(tab)) {
+                tabbedPane.setSelectedIndex(tabIndexMap.get(tab));
             }
         });
-
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0), "toggleBuild");
-        actionMap.put("toggleBuild", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (isTabOpen(TAB_BUILD)) {
-                    dispose();
-                } else if (tabIndexMap.containsKey(TAB_BUILD)) {
-                    tabbedPane.setSelectedIndex(tabIndexMap.get(TAB_BUILD));
-                }
-            }
-        });
-
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_I, 0), "toggleAssimilation");
-        actionMap.put("toggleAssimilation", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (isTabOpen(TAB_ASSIMILATION)) {
-                    dispose();
-                } else if (tabIndexMap.containsKey(TAB_ASSIMILATION)) {
-                    tabbedPane.setSelectedIndex(tabIndexMap.get(TAB_ASSIMILATION));
-                }
-            }
-        });
-
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_O, 0), "toggleSynergy");
-        actionMap.put("toggleSynergy", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (isTabOpen(TAB_SYNERGY)) {
-                    dispose();
-                } else if (tabIndexMap.containsKey(TAB_SYNERGY)) {
-                    tabbedPane.setSelectedIndex(tabIndexMap.get(TAB_SYNERGY));
-                }
-            }
-        });
-
     }
 
     interface LiveUpdatePanel {

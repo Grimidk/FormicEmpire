@@ -25,6 +25,7 @@ import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.DynastyColorSwatch;
 import com.grimidk.formicempire.classes.interfaces.ui.styles.UiTableStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.util.EdgeTriggeredKeyBindings;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiDialogUtils;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiNameSearchBar;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
@@ -243,15 +244,8 @@ public class DynastyManagementDialog extends ZeroDialog {
 
     private void registerTabKeyBinding(InputMap windowMap, InputMap tabMap, ActionMap actionMap,
             int keyCode, int tabIndex, String actionId) {
-        KeyStroke stroke = KeyStroke.getKeyStroke(keyCode, 0);
-        windowMap.put(stroke, actionId);
-        tabMap.put(stroke, actionId);
-        actionMap.put(actionId, new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                switchTabOrClose(tabIndex);
-            }
-        });
+        EdgeTriggeredKeyBindings.bind(windowMap, tabMap, actionMap, keyCode, actionId,
+                () -> switchTabOrClose(tabIndex));
     }
 
     private void switchTabOrClose(int tabIndex) {

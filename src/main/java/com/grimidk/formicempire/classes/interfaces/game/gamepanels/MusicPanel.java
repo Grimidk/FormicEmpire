@@ -123,6 +123,7 @@ public class MusicPanel extends ZeroGamePanel {
 
     private JButton createControlButton(String label) {
         JButton button = new JButton(label);
+        button.setFocusable(false);
         AssetStyles.styleCompactButton(button);
         Dimension size = AssetStyles.minControlHitSize();
         button.setPreferredSize(size);

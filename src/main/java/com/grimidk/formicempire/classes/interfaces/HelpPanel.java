@@ -1879,7 +1879,7 @@ public class HelpPanel extends JPanel {
         buttonPanel.add(closeButton);
 
         dialog.add(buttonPanel, BorderLayout.SOUTH);
-        UiDialogUtils.show(dialog, parent);
+        UiDialogUtils.show(dialog, window != null ? window : parent);
     }
 
     public static class HelpDialog extends ZeroDialog {

@@ -14,10 +14,10 @@ import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.interfaces.MainFrame;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.util.EdgeTriggeredKeyBindings;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -240,15 +240,11 @@ public class RoleManagementDialog extends ZeroDialog {
     }
     
     private void addTabSwitchAction(InputMap im, ActionMap am, String name, int key, int tabType) {
-        im.put(KeyStroke.getKeyStroke(key, 0), name);
-        am.put(name, new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (isTabOpen(tabType)) {
-                    dispose();
-                } else if (tabIndexMap.containsKey(tabType)) {
-                    tabbedPane.setSelectedIndex(tabIndexMap.get(tabType));
-                }
+        EdgeTriggeredKeyBindings.bind(im, am, key, name, () -> {
+            if (isTabOpen(tabType)) {
+                dispose();
+            } else if (tabIndexMap.containsKey(tabType)) {
+                tabbedPane.setSelectedIndex(tabIndexMap.get(tabType));
             }
         });
     }

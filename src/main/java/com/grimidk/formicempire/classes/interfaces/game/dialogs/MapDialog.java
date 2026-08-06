@@ -508,7 +508,7 @@ public class MapDialog extends ZeroDialog {
                 JPanel item = new JPanel(new BorderLayout(4, 0));
                 item.setOpaque(false);
                 item.setAlignmentX(Component.LEFT_ALIGNMENT);
-                item.setMaximumSize(new Dimension(Integer.MAX_VALUE, 28));
+                item.setMaximumSize(new Dimension(Integer.MAX_VALUE, DynastyColorSwatch.HITBOX_SIZE + 8));
 
                 JPanel badges = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 2));
                 badges.setOpaque(false);

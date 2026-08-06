@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
+import com.grimidk.formicempire.classes.interfaces.ui.util.EdgeTriggeredKeyBindings;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.interfaces.MainFrame;
 
@@ -39,9 +40,12 @@ public abstract class ZeroDialog extends JDialog {
         southPanel.add(closeButton);
         add(southPanel, BorderLayout.SOUTH);
 
-        getRootPane().registerKeyboardAction(e -> handleEscapeKey(),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_IN_FOCUSED_WINDOW);
+        EdgeTriggeredKeyBindings.bind(
+                getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW),
+                getRootPane().getActionMap(),
+                KeyEvent.VK_ESCAPE,
+                "escapeClose",
+                this::handleEscapeKey);
         
         setFocusable(true);
     }
@@ -80,9 +84,12 @@ public abstract class ZeroDialog extends JDialog {
     }
 
     protected void registerCloseKey(int keyEvent) {
-        getRootPane().registerKeyboardAction(e -> dispose(),
-                KeyStroke.getKeyStroke(keyEvent, 0),
-                JComponent.WHEN_IN_FOCUSED_WINDOW);
+        EdgeTriggeredKeyBindings.bind(
+                getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW),
+                getRootPane().getActionMap(),
+                keyEvent,
+                "closeKey",
+                this::dispose);
     }
 
     protected void addToSouthPanel(JComponent component) {

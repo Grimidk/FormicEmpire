@@ -21,9 +21,9 @@ public class TranslationSheetCodegen {
 
     private static final Lang[] LANGS = {
             new Lang("english", "English", "en", "EnglishTranslation"),
-            new Lang("spanish", "Spanish", "es", "SpanishTranslation"),
-            new Lang("portuguese", "Portuguese", "pt", "PortugueseTranslation"),
-            new Lang("french", "French", "fr", "FrenchTranslation"),
+            new Lang("spanish", "Espa\u00f1ol", "es", "SpanishTranslation"),
+            new Lang("portuguese", "Portugu\u00eas", "pt", "PortugueseTranslation"),
+            new Lang("french", "Fran\u00e7ais", "fr", "FrenchTranslation"),
     };
 
     public static void main(String[] args) throws Exception {
