@@ -803,6 +803,10 @@ public class GameAreaPanel extends ZeroGamePanel {
                 continue;
             }
 
+            ImageIcon typeSpriteIcon = GameConstants.getAntSprite(type, colony.getSpecies());
+            int typeW = typeSpriteIcon != null ? typeSpriteIcon.getIconWidth() : 16;
+            int typeH = typeSpriteIcon != null ? typeSpriteIcon.getIconHeight() : 16;
+
             List<AntSpecies> assimilatedSpecies = new ArrayList<>();
             if (type == GameConstants.TYPE_DRONE && colony.getDynasty() != null
                     && colony.getDynasty().hasUpgrade(GameUnlocks.ABILITY_CLONING)) {
@@ -819,6 +823,10 @@ public class GameAreaPanel extends ZeroGamePanel {
                 if (ant.getDimension() != currentDimension) continue;
                 if (ant.getDimension() == WorldSpaces.TUNNEL_WORLD) continue;
 
+                if (!ViewportPhysicsLod.antIntersectsViewport(lodViewportRect, ant.getX(), ant.getY(), typeW, typeH)) {
+                    continue;
+                }
+
                 ImageIcon antSpriteIcon = GameConstants.getAntSprite(
                         type,
                         colony.getSpecies(),
@@ -830,10 +838,6 @@ public class GameAreaPanel extends ZeroGamePanel {
                 Image sprite = antSpriteIcon.getImage();
                 int w = antSpriteIcon.getIconWidth();
                 int h = antSpriteIcon.getIconHeight();
-
-                if (!ViewportPhysicsLod.antIntersectsViewport(lodViewportRect, ant.getX(), ant.getY(), w, h)) {
-                    continue;
-                }
                 
                 Image currentSprite = sprite;
                 if (!assimilatedSpecies.isEmpty()) {

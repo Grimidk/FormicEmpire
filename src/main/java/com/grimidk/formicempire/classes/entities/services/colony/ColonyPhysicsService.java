@@ -52,14 +52,19 @@ public class ColonyPhysicsService {
 
                     boolean sameDim = ant.getDimension() == activeDimension;
                     boolean lodSameDim = ViewportPhysicsLod.isLodActive(viewportBounds) && sameDim;
-                    boolean inView = ViewportPhysicsLod.antIntersectsViewport(
+                    boolean inView = sameDim && ViewportPhysicsLod.antIntersectsViewport(
                         viewportBounds, ant.getX(), ant.getY(), spriteW, spriteH);
 
                     boolean shouldRunAI;
                     if (!sameDim) {
                         shouldRunAI = GameRandom.nextDouble() < 0.05;
                     } else if (lodSameDim && !inView) {
-                        shouldRunAI = ViewportPhysicsLod.shouldRunOffViewportAi(physicsStepIndex, ant);
+                        boolean runOffscreenAi = ViewportPhysicsLod.shouldRunOffViewportAi(physicsStepIndex, ant);
+                        boolean runOffscreenMove = ViewportPhysicsLod.shouldRunOffViewportPosition(physicsStepIndex, ant);
+                        if (!runOffscreenAi && !runOffscreenMove && !ant.isMoving() && !ant.hasRoute()) {
+                            continue;
+                        }
+                        shouldRunAI = runOffscreenAi;
                     } else {
                         shouldRunAI = true;
                     }
@@ -112,6 +117,11 @@ public class ColonyPhysicsService {
 
                 boolean runBugAi = !lod || bugInView
                     || ViewportPhysicsLod.shouldRunOffViewportBugAi(physicsStepIndex, bugHash);
+                boolean runBugMove = !lod || bugInView
+                    || ViewportPhysicsLod.shouldRunOffViewportBugMove(physicsStepIndex, bugHash);
+                if (lod && !bugInView && !runBugAi && !runBugMove && !bug.isMoving()) {
+                    continue;
+                }
                 if (!bug.isMoving() && runBugAi) {
                     updateBugLogic(colony, bug);
                 }

@@ -78,6 +78,8 @@ public class Colony {
     private final Map<AntRole, Set<Integer>> peaceRoleDisallowedSubtypes = new HashMap<>();
     private final Map<AntRole, Set<Integer>> warRoleDisallowedSubtypes = new HashMap<>();
     private Map<AntRole, Integer> activeRoleCountCache;
+    private boolean roleAssignmentDirty = true;
+    private int lastRoleAssignmentPopKey = Integer.MIN_VALUE;
     private final Map<Integer, Integer> outgoingColonyDiplomatMissions = new HashMap<>();
     private final Map<Integer, Integer> incomingColonyDiplomatSupport = new HashMap<>();
     private final Map<Integer, Integer> outgoingDynastyDiplomatMissions = new HashMap<>();
@@ -559,6 +561,7 @@ public class Colony {
     }
 
     public void handleAntCasualtyAftermath(Ant ant, AntType formerType, AntRole formerRole, boolean wasOnTrade) {
+        markRoleAssignmentDirty();
         if (wasOnTrade) {
             ant.setOnTrade(false);
             handleConvoyEscortCasualty();
@@ -1153,8 +1156,11 @@ public class Colony {
     public void setAssignedRoleCount(AntRole role, int count) {
         if (count >= 0) {
             int previous = activeAssignedRoleCounts().getOrDefault(role, 0);
-            activeAssignedRoleCounts().put(role, count);
-            reconcileDiplomatDeploymentsIfNeeded(role, previous, count, true);
+            if (previous != count) {
+                activeAssignedRoleCounts().put(role, count);
+                markRoleAssignmentDirty();
+                reconcileDiplomatDeploymentsIfNeeded(role, previous, count, true);
+            }
         }
     }
 
@@ -1182,8 +1188,11 @@ public class Colony {
         }
         if (count >= 0) {
             int previous = peaceAssignedRoleCounts.getOrDefault(role, 0);
-            peaceAssignedRoleCounts.put(role, count);
-            reconcileDiplomatDeploymentsIfNeeded(role, previous, count, !usesWarEconomyRoles());
+            if (previous != count) {
+                peaceAssignedRoleCounts.put(role, count);
+                markRoleAssignmentDirty();
+                reconcileDiplomatDeploymentsIfNeeded(role, previous, count, !usesWarEconomyRoles());
+            }
         }
     }
 
@@ -1203,8 +1212,11 @@ public class Colony {
             count = Math.min(count, getMaxAssignableCommanders());
         }
         int previous = warAssignedRoleCounts.getOrDefault(role, 0);
-        warAssignedRoleCounts.put(role, count);
-        reconcileDiplomatDeploymentsIfNeeded(role, previous, count, usesWarEconomyRoles());
+        if (previous != count) {
+            warAssignedRoleCounts.put(role, count);
+            markRoleAssignmentDirty();
+            reconcileDiplomatDeploymentsIfNeeded(role, previous, count, usesWarEconomyRoles());
+        }
     }
 
     public int getMaxAssignableCommanders() {
@@ -1242,6 +1254,7 @@ public class Colony {
             warAssignedRoleCounts.put(role, peaceAssignedRoleCounts.getOrDefault(role, 0));
         }
         copyPeaceRoleSubtypeAllowsToWar();
+        markRoleAssignmentDirty();
     }
 
     public void copyPeaceRoleSubtypeAllowsToWar() {
@@ -1303,13 +1316,17 @@ public class Colony {
             allowed = true;
         }
         Set<Integer> blocked = disallowedByRole.computeIfAbsent(role, ignored -> new HashSet<>());
+        boolean changed;
         if (allowed) {
-            blocked.remove(subtype.getId());
+            changed = blocked.remove(subtype.getId());
             if (blocked.isEmpty()) {
                 disallowedByRole.remove(role);
             }
         } else {
-            blocked.add(subtype.getId());
+            changed = blocked.add(subtype.getId());
+        }
+        if (changed) {
+            markRoleAssignmentDirty();
         }
     }
 
@@ -1358,6 +1375,35 @@ public class Colony {
 
     public void invalidateActiveRoleCountCache() {
         activeRoleCountCache = null;
+    }
+
+    public void markRoleAssignmentDirty() {
+        roleAssignmentDirty = true;
+    }
+
+    public boolean isRoleAssignmentDirty() {
+        return roleAssignmentDirty;
+    }
+
+    private int roleBearingPopulationKey() {
+        return listSize(getWorkers())
+                + 31 * listSize(getSoldiers())
+                + 961 * listSize(getMajors())
+                + 29791 * listSize(getPrincesses())
+                + 923521 * listSize(getQueens());
+    }
+
+    private static int listSize(List<Ant> list) {
+        return list != null ? list.size() : 0;
+    }
+
+    private boolean needsRoleAssignment() {
+        return roleAssignmentDirty || roleBearingPopulationKey() != lastRoleAssignmentPopKey;
+    }
+
+    private void clearRoleAssignmentDirty() {
+        roleAssignmentDirty = false;
+        lastRoleAssignmentPopKey = roleBearingPopulationKey();
     }
 
     public void invalidateAffordableAlertCache() {
@@ -1593,6 +1639,13 @@ public class Colony {
 
     public void runRoleAssignment(Engine engine) {
         populationService.runRoleAssignment(this, engine);
+        clearRoleAssignmentDirty();
+    }
+
+    public void runRoleAssignmentIfNeeded(Engine engine) {
+        if (needsRoleAssignment()) {
+            runRoleAssignment(engine);
+        }
     }
     public void runHatching(){ populationService.runHatching(this); }
     public void rankUp() { populationService.rankUp(this); }
@@ -1839,7 +1892,7 @@ public class Colony {
             if (this.automationEnabled) {
                 this.automationService.runAutomation(this, biome, season);
             }
-            this.runRoleAssignment(engine);
+            this.runRoleAssignmentIfNeeded(engine);
             invalidateActiveRoleCountCache();
             this.runLaying();
             this.runResearch();
@@ -1852,7 +1905,7 @@ public class Colony {
             if (this.automationEnabled) {
                 this.automationService.runAutomation(this, biome, season);
             }
-            this.populationService.runRoleAssignment(this, engine);
+            this.runRoleAssignmentIfNeeded(engine);
             invalidateActiveRoleCountCache();
             this.labourService.runTunnelConstruction(this);
             ColonyJobRules.runHourlyLite(this, biome);

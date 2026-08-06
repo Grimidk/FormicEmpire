@@ -122,6 +122,9 @@ public class Trade {
                         found++;
                     }
                 }
+                if (found > 0) {
+                    originColony.markRoleAssignmentDirty();
+                }
             }
         }
 
@@ -303,6 +306,9 @@ public class Trade {
         Colony originColony = origin.getColony();
         if (originColony != null) {
             originColony.getConvoyTransitService().restoreConvoyAnts(originColony, this);
+        }
+        if (!antsOnTrip.isEmpty() && originColony != null) {
+            originColony.markRoleAssignmentDirty();
         }
         for (Ant ant : antsOnTrip) {
             ant.setOnTrade(false);

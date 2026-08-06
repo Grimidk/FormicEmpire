@@ -24,8 +24,7 @@ To Fix (By decreasing priority):
 To Feature (to be done in priority order by blocks):
 Needed for launch (v1.0) (Launch Version):
 	Priority:
-		music and sounds and player panel (plays anything in music folder)
-	
+		(none right now)
 	Everything else :
 		auto diplomacy withing dyansty (excess materials go to neighboring lacking colonies)
 		rework how carrying looks completely, maybe have an resource icon (do not scale) inside jaws

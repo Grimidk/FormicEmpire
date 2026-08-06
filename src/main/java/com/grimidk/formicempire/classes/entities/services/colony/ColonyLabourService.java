@@ -38,11 +38,16 @@ public class ColonyLabourService {
     // --- Actual Ant Objects ---
     private List<Ant> getWorkingAnts(Colony colony, AntRole role) {
         workingAntsScratch.clear();
-        for (List<Ant> group : colony.getAntGroups().values()) {
-            for (Ant ant : group) {
-                if (ant.isAlive() && !ant.isOnTrade() && ant.getRole() == role) {
-                    workingAntsScratch.add(ant);
-                }
+        if (role == null) {
+            return workingAntsScratch;
+        }
+        List<Ant> group = colony.getAntsByType(role.getAntType());
+        if (group == null || group.isEmpty()) {
+            return workingAntsScratch;
+        }
+        for (Ant ant : group) {
+            if (ant.isAlive() && !ant.isOnTrade() && ant.getRole() == role) {
+                workingAntsScratch.add(ant);
             }
         }
         return workingAntsScratch;

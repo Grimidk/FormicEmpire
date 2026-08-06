@@ -46,4 +46,19 @@ class ViewportPhysicsLodTest {
         }
         assertTrue(any);
     }
+
+    @Test
+    void shouldRunOffViewportPosition_periodMatchesConstant() {
+        Colony colony = new Colony(1, "c", true);
+        Dynasty d = new Dynasty(1, "d", true, GameConstants.SPECIES_OMNI);
+        colony.setDynasty(d);
+        Ant ant = new Ant(colony, GameConstants.TYPE_WORKER);
+        int hits = 0;
+        for (long step = 0; step < ViewportPhysicsLod.OFF_VIEWPORT_MOVE_PERIOD * 8; step++) {
+            if (ViewportPhysicsLod.shouldRunOffViewportPosition(step, ant)) {
+                hits++;
+            }
+        }
+        assertTrue(hits >= 6 && hits <= 10);
+    }
 }

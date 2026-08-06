@@ -22,6 +22,7 @@ import com.grimidk.formicempire.classes.interfaces.ui.util.UiDialogUtils;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
 import com.grimidk.formicempire.classes.infrasctructure.assets.GameSpritePreloader;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import com.grimidk.formicempire.classes.infrasctructure.registries.WorldSpaces;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
@@ -1500,7 +1501,12 @@ public class GamePanel extends ZeroGamePanel {
         if (steps <= 0) {
             return;
         }
-        performMinuteGuiUpdate(steps);
+        int runNow = Math.min(steps, GameNumbers.MAX_PHYSICS_STEPS_PER_GUI_DRAIN);
+        int leftover = steps - runNow;
+        if (leftover > 0) {
+            pendingMinuteGuiSteps.addAndGet(leftover);
+        }
+        performMinuteGuiUpdate(runNow);
     }
 
     public void updateStatusIndicator(boolean paused) {
