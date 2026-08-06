@@ -15,9 +15,7 @@ import java.util.Map;
 
 public final class BuildingTreeGraph {
 
-    /** Center-to-center grid step in node-size units (horizontal). */
     public static final double GRID_STEP = 1.5;
-    /** Vertical distance between consecutive tiers. */
     public static final double TIER_SPACING = GRID_STEP * 2.0;
 
     public enum NodeState {

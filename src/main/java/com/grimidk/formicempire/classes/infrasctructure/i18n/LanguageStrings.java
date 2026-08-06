@@ -509,12 +509,17 @@ public final class LanguageStrings {
     public static final String UI_QUIT = "UI_QUIT";
     public static final String INTRO_WARNING = "INTRO_WARNING";
     public static final String INTRO_PHOTOSENSITIVITY_WARNING = "INTRO_PHOTOSENSITIVITY_WARNING";
+    public static final String INTRO_LICENSE_SUMMARY = "INTRO_LICENSE_SUMMARY";
     public static final String ROADMAP_TITLE = "ROADMAP_TITLE";
     public static final String ROADMAP_UNAVAILABLE = "ROADMAP_UNAVAILABLE";
     public static final String UI_CREDITS = "UI_CREDITS";
     public static final String UI_DISCORD = "UI_DISCORD";
     public static final String CREDITS_TITLE = "CREDITS_TITLE";
     public static final String CREDITS_UNAVAILABLE = "CREDITS_UNAVAILABLE";
+    public static final String UI_LICENSE = "UI_LICENSE";
+    public static final String LICENSE_TITLE = "LICENSE_TITLE";
+    public static final String LICENSE_UNAVAILABLE = "LICENSE_UNAVAILABLE";
+    public static final String VERSION_UNAVAILABLE = "VERSION_UNAVAILABLE";
     public static final String UI_AUDIT = "UI_AUDIT";
     public static final String AUDIT_TITLE = "AUDIT_TITLE";
     public static final String AUDIT_UNAVAILABLE = "AUDIT_UNAVAILABLE";

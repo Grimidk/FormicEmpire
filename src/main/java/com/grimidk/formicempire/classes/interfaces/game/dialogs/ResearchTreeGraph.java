@@ -25,9 +25,7 @@ import java.util.Set;
 
 public final class ResearchTreeGraph {
 
-    /** Center-to-center grid step in node-size units. */
     public static final double GRID_STEP = 1.5;
-    /** Radial ring distance in node-size units (two grid steps). */
     private static final double RING_SPACING = GRID_STEP * 2.0;
 
     public enum NodeState {

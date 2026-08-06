@@ -58,6 +58,8 @@ public class AssetStyles {
     public static final String META_ROADMAP = "/texts/roadmap.txt";
     public static final String META_CREDITS = "/texts/credits.txt";
     public static final String META_AUDIT = "/texts/audit.txt";
+    public static final String META_VERSION = "/texts/version.txt";
+    public static final String META_LICENSE = "/texts/license.txt";
 
     public static final String ICON_BUTTON_CLIENT_KEY = "formicempire.iconButton";
     public static final String MENU_BUTTON_CLIENT_KEY = "formicempire.menuButton";

@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.interfaces;
 
 import com.grimidk.formicempire.classes.interfaces.menu.MenuHeaderPanel;
+import com.grimidk.formicempire.classes.interfaces.menu.VersionLicenseFooter;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
@@ -20,6 +21,9 @@ public class InitPanel extends JPanel {
     private final MainFrame frame;
     
     private final MenuHeaderPanel menuHeader = new MenuHeaderPanel();
+    private final JPanel menuColumn = new JPanel(new GridBagLayout());
+    private final VersionLicenseFooter footer =
+            new VersionLicenseFooter(AssetStyles.COLOR_ABSOLUTE_BLACK);
     
     private JButton play;
     private JButton help;
@@ -33,7 +37,11 @@ public class InitPanel extends JPanel {
     public InitPanel(MainFrame frame) {
         this.frame = frame;
         setOpaque(false);
-        setLayout(new GridBagLayout());
+        setLayout(new BorderLayout());
+
+        menuColumn.setOpaque(false);
+        add(menuColumn, BorderLayout.CENTER);
+        add(footer, BorderLayout.SOUTH);
         
         initComponents();
         
@@ -102,7 +110,7 @@ public class InitPanel extends JPanel {
     }
 
     private void layoutMenuButtons() {
-        removeAll();
+        menuColumn.removeAll();
 
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
@@ -111,7 +119,7 @@ public class InitPanel extends JPanel {
         c.fill = GridBagConstraints.NONE;
 
         c.gridy = 0;
-        add(menuHeader, c);
+        menuColumn.add(menuHeader, c);
 
         JButton[] buttons = audit.isVisible()
                 ? new JButton[] { play, help, audit, roadmap, credits, discord, settings, quit }
@@ -119,11 +127,11 @@ public class InitPanel extends JPanel {
 
         for (int i = 0; i < buttons.length; i++) {
             c.gridy = i + 1;
-            add(buttons[i], c);
+            menuColumn.add(buttons[i], c);
         }
 
-        revalidate();
-        repaint();
+        menuColumn.revalidate();
+        menuColumn.repaint();
     }
     
     public void refreshTranslations() {
@@ -135,10 +143,12 @@ public class InitPanel extends JPanel {
         discord.setText(LanguageStrings.get(LanguageStrings.UI_DISCORD));
         settings.setText(LanguageStrings.get(LanguageStrings.UI_SETTINGS));
         quit.setText(LanguageStrings.get(LanguageStrings.UI_QUIT));
+        footer.refreshTranslations();
     }
 
     public void refreshTheme() {
         AssetStyles.applyThemeToContainer(this);
+        footer.applyTextColor();
     }
 
     private void setupNavigation(JButton button) {

@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 66% (231/352 checked)
+Completion: 65% (230/354 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -9,11 +9,13 @@ Legend: [ ] = not tested yet   [x] = tested (reset to [ ] if the mechanic change
 ================================================================================
 1. LAUNCHER / MAIN MENU
 ================================================================================
-[X] Intro splash (studio name, arthropod/arachnophobia warning, photosensitivity warning; click or timer to advance) auto-advances to main menu
+[ ] Intro splash (studio name, arthropod/arachnophobia warning, photosensitivity warning, then short translated license summary pointing to full License on main menu; click or timer to advance) auto-advances to main menu
 [X] Play — opens save slot screen
 [X] Help — encyclopedia (all tabs; see section 18)
 [X] Roadmap — development roadmap text dialog
 [X] Credits — credits text dialog
+[ ] Main menu version text (bottom left, black)
+[ ] Main menu License (bottom right) — opens full license dialog
 [ ] Discord — opens Discord invite in browser
 [X] Mechanics Audit — this file (only when enabled in Settings > General)
 [X] Settings — full settings panel (see section 2)

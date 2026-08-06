@@ -49,7 +49,6 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
     private static final int NODE_SIZE = AssetStyles.MIN_CONTROL_HIT_SIZE;
     private static final int NODE_PAD = 4;
     private static final int NODE_HIT = NODE_SIZE + NODE_PAD * 2;
-    /** One layout unit = one node size; grid step 1.5 → centers are 1.5 nodes apart. */
     private static final int UNIT_SIZE = NODE_HIT;
     private static final int PADDING = 32;
     private static final float EDGE_STROKE = 2.5f;

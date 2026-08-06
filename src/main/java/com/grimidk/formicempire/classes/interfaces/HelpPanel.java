@@ -1839,6 +1839,18 @@ public class HelpPanel extends JPanel {
                 ClasspathTextFiles.load(AssetStyles.META_AUDIT, LanguageStrings.AUDIT_UNAVAILABLE));
     }
 
+    public static void showLicenseDialog(Component parent) {
+        showTextFileDialog(parent, LanguageStrings.LICENSE_TITLE,
+                ClasspathTextFiles.load(AssetStyles.META_LICENSE, LanguageStrings.LICENSE_UNAVAILABLE));
+    }
+
+    public static String loadVersionText() {
+        String version = ClasspathTextFiles.load(AssetStyles.META_VERSION, LanguageStrings.VERSION_UNAVAILABLE).trim();
+        return version.isEmpty()
+                ? LanguageStrings.get(LanguageStrings.VERSION_UNAVAILABLE)
+                : version;
+    }
+
     private static void showTextFileDialog(Component parent, String titleKey, String text) {
         Window window = SwingUtilities.getWindowAncestor(parent);
         JDialog dialog = new JDialog(window, LanguageStrings.get(titleKey), Dialog.ModalityType.APPLICATION_MODAL);

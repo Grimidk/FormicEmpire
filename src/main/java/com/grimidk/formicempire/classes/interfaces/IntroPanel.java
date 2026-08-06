@@ -13,12 +13,14 @@ import java.awt.event.MouseEvent;
 public class IntroPanel extends JPanel {
     private static final int STUDIO_SLIDE_MS = 5000;
     private static final int WARNING_SLIDE_MS = 10000;
+    private static final int LICENSE_SLIDE_MS = 10000;
     private static final long SKIP_DEBOUNCE_MS = 200;
     private static final String STUDIO_NAME = "GrimIDK";
 
     private static final int SLIDE_STUDIO = 0;
     private static final int SLIDE_ARACHNOPHOBIA = 1;
     private static final int SLIDE_PHOTOSENSITIVITY = 2;
+    private static final int SLIDE_LICENSE = 3;
 
     private final MainFrame frame;
     private final JLabel messageLabel = new FullAreaLabel();
@@ -77,6 +79,8 @@ public class IntroPanel extends JPanel {
             showArachnophobiaSlide();
         } else if (slideIndex == SLIDE_PHOTOSENSITIVITY) {
             showPhotosensitivitySlide();
+        } else if (slideIndex == SLIDE_LICENSE) {
+            showLicenseSlide();
         }
     }
 
@@ -116,6 +120,11 @@ public class IntroPanel extends JPanel {
         messageLabel.setText(warningHtml(text));
     }
 
+    private void showLicenseSlide() {
+        String text = LanguageStrings.get(LanguageStrings.INTRO_LICENSE_SUMMARY);
+        messageLabel.setText(warningHtml(text));
+    }
+
     private static String warningHtml(String text) {
         return "<html><body style='width: 520px; text-align: center; color: " + AssetStyles.COLOR_ABSOLUTE_WHITE_HTML
                 + "; font-family: " + AssetStyles.themeFontFamilyCss() + "; font-size: 13pt;'>"
@@ -139,6 +148,10 @@ public class IntroPanel extends JPanel {
             slideIndex = SLIDE_PHOTOSENSITIVITY;
             showPhotosensitivitySlide();
             scheduleNextSlide(WARNING_SLIDE_MS);
+        } else if (slideIndex == SLIDE_PHOTOSENSITIVITY) {
+            slideIndex = SLIDE_LICENSE;
+            showLicenseSlide();
+            scheduleNextSlide(LICENSE_SLIDE_MS);
         } else {
             frame.showCard(MainFrame.CARD_INIT);
         }
