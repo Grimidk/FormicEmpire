@@ -4,14 +4,17 @@ import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.entities.Tunnel;
+import com.grimidk.formicempire.classes.constants.world.Biome;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -175,6 +178,9 @@ public class WorldTest {
         assertEquals(core, world.getContinentCoreRadius());
         assertEquals(GameNumbers.worldRadiusForContinentCore(core), world.getWorldRadius());
         assertTrue(world.getContinentCount() >= 1);
+        assertTrue(world.getIslandCount() >= GameNumbers.WORLD_MIN_ISLAND_COUNT,
+                "Expected at least " + GameNumbers.WORLD_MIN_ISLAND_COUNT + " islands, got " + world.getIslandCount());
+        assertBiomeMinimums(world);
 
         int outerDist = world.getWorldRadius();
         for (Hex hex : world.getHexes()) {
@@ -188,6 +194,39 @@ public class WorldTest {
                 assertNotEquals(GameConstants.BIOME_OCEAN, hex.getBiome());
                 assertNotEquals(GameConstants.BIOME_LAKE, hex.getBiome());
             }
+        }
+    }
+
+    @Test
+    void generateWorldEnsuresMinimumIslandsForSmallCore() {
+        World world = new World();
+        Colony colony = new Colony(1, "Test Prime", true);
+        world.generateWorld(
+                GameConstants.BIOME_PLAINS,
+                0,
+                colony,
+                "Test",
+                LanguageStrings.DYNASTY_TITLE_DYNASTY);
+
+        assertTrue(world.getIslandCount() >= GameNumbers.WORLD_MIN_ISLAND_COUNT,
+                "Expected at least " + GameNumbers.WORLD_MIN_ISLAND_COUNT + " islands, got " + world.getIslandCount());
+        for (Hex hex : world.getHexes()) {
+            if (hex.isIsland()) {
+                assertNull(hex.getColony(), "Islands must not spawn colonies");
+            }
+        }
+    }
+
+    private static void assertBiomeMinimums(World world) {
+        Map<Biome, Integer> counts = new HashMap<>();
+        for (Hex hex : world.getHexes()) {
+            counts.merge(hex.getBiome(), 1, Integer::sum);
+        }
+        for (Biome biome : GameConstants.getBiomes()) {
+            int count = counts.getOrDefault(biome, 0);
+            assertTrue(count >= GameNumbers.WORLD_MIN_HEXES_PER_BIOME,
+                    "Expected at least " + GameNumbers.WORLD_MIN_HEXES_PER_BIOME
+                            + " hexes of " + biome.getId() + ", got " + count);
         }
     }
 

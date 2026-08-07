@@ -293,6 +293,30 @@ public final class ResearchTreeGraph {
         return layoutRadial(nodeStates, parentByUpgrade, edges, center);
     }
 
+    public static Result refreshStates(Result previous, Colony colony, Engine engine) {
+        if (previous == null || previous.getNodes().isEmpty()) {
+            return build(colony, engine);
+        }
+        List<Node> nodes = new ArrayList<>(previous.getNodes().size());
+        for (Node old : previous.getNodes()) {
+            nodes.add(new Node(
+                    old.getUpgrade(),
+                    stateFor(colony, engine, old.getUpgrade()),
+                    old.getDepth(),
+                    old.getPosX(),
+                    old.getPosY()));
+        }
+        return new Result(
+                nodes,
+                previous.getEdges(),
+                previous.getMaxDepth(),
+                previous.getCenter(),
+                previous.getMinX(),
+                previous.getMaxX(),
+                previous.getMinY(),
+                previous.getMaxY());
+    }
+
     private static Result emptyResult() {
         return new Result(List.of(), List.of(), -1, null, 0, 0, 0, 0);
     }

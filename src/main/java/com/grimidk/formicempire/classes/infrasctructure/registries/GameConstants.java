@@ -587,15 +587,15 @@ public final class GameConstants {
     // --- Move Status ---
     public static final MoveStatus MOVE_STATIC = new MoveStatus(1, LanguageStrings.MOVE_STATIC, 0, loadIcon("icons/moves/Static.png"));
     static { moveStatuses.add(MOVE_STATIC); }
-    public static final MoveStatus MOVE_WANDER = new MoveStatus(2, LanguageStrings.MOVE_WANDER, 1/2f, loadIcon("icons/moves/Wander.png"));
+    public static final MoveStatus MOVE_WANDER = new MoveStatus(2, LanguageStrings.MOVE_WANDER, 1f, loadIcon("icons/moves/Wander.png"));
     static { moveStatuses.add(MOVE_WANDER); }
-    public static final MoveStatus MOVE_MARCH = new MoveStatus(3, LanguageStrings.MOVE_MARCH, 1f, loadIcon("icons/moves/March.png"));
+    public static final MoveStatus MOVE_MARCH = new MoveStatus(3, LanguageStrings.MOVE_MARCH, 2f, loadIcon("icons/moves/March.png"));
     static { moveStatuses.add(MOVE_MARCH); }
-    public static final MoveStatus MOVE_SPEED = new MoveStatus(4, LanguageStrings.MOVE_SPEED, 3/2f, loadIcon("icons/moves/Speed.png"));
+    public static final MoveStatus MOVE_SPEED = new MoveStatus(4, LanguageStrings.MOVE_SPEED, 3f, loadIcon("icons/moves/Speed.png"));
     static { moveStatuses.add(MOVE_SPEED); }
-    public static final MoveStatus MOVE_FLY = new MoveStatus(5, LanguageStrings.MOVE_FLY, 3f, loadIcon("icons/moves/Fly.png"));
+    public static final MoveStatus MOVE_FLY = new MoveStatus(5, LanguageStrings.MOVE_FLY, 6f, loadIcon("icons/moves/Fly.png"));
     static { moveStatuses.add(MOVE_FLY); }
-    public static final MoveStatus MOVE_PATROL = new MoveStatus(6, LanguageStrings.MOVE_PATROL, 1f, loadIcon("icons/moves/Patrol.png"));
+    public static final MoveStatus MOVE_PATROL = new MoveStatus(6, LanguageStrings.MOVE_PATROL, 2f, loadIcon("icons/moves/Patrol.png"));
     static { moveStatuses.add(MOVE_PATROL); }
 
     // --- Critter Class ---
@@ -1014,27 +1014,27 @@ public final class GameConstants {
 
     // --- Game speeds ---
     public static final GameSpeed SPEED_VERY_SLOW = new GameSpeed(
-            GameSpeed.ID_VERY_SLOW, LanguageStrings.UI_SPEED_VERY_SLOW, 200,
+            GameSpeed.ID_VERY_SLOW, LanguageStrings.UI_SPEED_VERY_SLOW, 50,
             loadIcon("icons/speed/VerySlow.png"));
     static { gameSpeeds.add(SPEED_VERY_SLOW); }
     public static final GameSpeed SPEED_SLOW = new GameSpeed(
-            GameSpeed.ID_SLOW, LanguageStrings.UI_SPEED_SLOW, 100,
+            GameSpeed.ID_SLOW, LanguageStrings.UI_SPEED_SLOW, 25,
             loadIcon("icons/speed/Slow.png"));
     static { gameSpeeds.add(SPEED_SLOW); }
     public static final GameSpeed SPEED_NORMAL = new GameSpeed(
-            GameSpeed.ID_NORMAL, LanguageStrings.UI_SPEED_NORMAL, 50,
+            GameSpeed.ID_NORMAL, LanguageStrings.UI_SPEED_NORMAL, 10,
             loadIcon("icons/speed/Normal.png"));
     static { gameSpeeds.add(SPEED_NORMAL); }
     public static final GameSpeed SPEED_FAST = new GameSpeed(
-            GameSpeed.ID_FAST, LanguageStrings.UI_SPEED_FAST, 20,
+            GameSpeed.ID_FAST, LanguageStrings.UI_SPEED_FAST, 5,
             loadIcon("icons/speed/Fast.png"));
     static { gameSpeeds.add(SPEED_FAST); }
     public static final GameSpeed SPEED_VERY_FAST = new GameSpeed(
-            GameSpeed.ID_VERY_FAST, LanguageStrings.UI_SPEED_VERY_FAST, 10,
+            GameSpeed.ID_VERY_FAST, LanguageStrings.UI_SPEED_VERY_FAST, 2,
             loadIcon("icons/speed/VeryFast.png"));
     static { gameSpeeds.add(SPEED_VERY_FAST); }
     public static final GameSpeed SPEED_TURBO = new GameSpeed(
-            GameSpeed.ID_TURBO, LanguageStrings.UI_SPEED_TURBO, 1,
+            GameSpeed.ID_TURBO, LanguageStrings.UI_SPEED_TURBO, 0,
             loadIcon("icons/speed/Turbo.png"));
     static { gameSpeeds.add(SPEED_TURBO); }
     public static final ImageIcon ICON_SPEED_ZERO = loadIcon("icons/speed/Zero.png");
@@ -1128,6 +1128,23 @@ public final class GameConstants {
 
     public static boolean isObtainableRole(AntRole role) {
         return role != null && !UNOBTAINABLE_ROLES.contains(role);
+    }
+
+    public static boolean isEligibleDefaultHatchRole(AntRole role) {
+        return isObtainableRole(role) && !isWarEconomyExclusiveRole(role);
+    }
+
+    public static List<AntRole> eligibleDefaultHatchRoles(AntType type) {
+        List<AntRole> out = new ArrayList<>();
+        if (type == null) {
+            return out;
+        }
+        for (AntRole role : antRoles) {
+            if (role.getAntType() == type && isEligibleDefaultHatchRole(role)) {
+                out.add(role);
+            }
+        }
+        return out;
     }
 
     public static boolean isActiveMilitaryRole(AntRole role) {

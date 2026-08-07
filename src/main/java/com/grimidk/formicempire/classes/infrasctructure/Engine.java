@@ -61,11 +61,11 @@ public class Engine extends Thread {
     private boolean overworldAutoRecenter = true;
     private boolean darkMode = false;
     private int frameRateCap = 0;
-    private int defaultRoleWorker = 1; // ROLE_FORAGER
-    private int defaultRoleSoldier = 16; // ROLE_HUNTER
-    private int defaultRoleMajor = 29; // ROLE_CRANE
-    private int defaultRolePrincess = 23; // ROLE_BREEDER
-    private int defaultRoleQueen = 25; // ROLE_LAYER
+    private int defaultRoleWorker = GameConstants.ROLE_FORAGER.getId();
+    private int defaultRoleSoldier = GameConstants.ROLE_HUNTER.getId();
+    private int defaultRoleMajor = GameConstants.ROLE_CRANE.getId();
+    private int defaultRolePrincess = GameConstants.ROLE_BREEDER.getId();
+    private int defaultRoleQueen = GameConstants.ROLE_LAYER.getId();
 
     private long lastSpeedDownStepMs;
     private long lastSpeedUpStepMs;
@@ -622,19 +622,18 @@ public class Engine extends Thread {
             } else if (type == GameConstants.TYPE_QUEEN) {
                 roleId = engine.getDefaultRoleQueen();
             } else {
-                return legacyDefaultRoleForAntType(type);
+                return builtinDefaultRoleForAntType(type);
             }
             AntRole chosen = GameConstants.getAntRoleById(roleId);
             if (chosen != null && chosen.getAntType() == type
-                    && !GameConstants.isWarEconomyExclusiveRole(chosen)
-                    && GameConstants.isObtainableRole(chosen)) {
+                    && GameConstants.isEligibleDefaultHatchRole(chosen)) {
                 return chosen;
             }
         }
-        return legacyDefaultRoleForAntType(type);
+        return builtinDefaultRoleForAntType(type);
     }
 
-    private static AntRole legacyDefaultRoleForAntType(AntType type) {
+    public static AntRole builtinDefaultRoleForAntType(AntType type) {
         if (type == GameConstants.TYPE_WORKER) {
             return GameConstants.ROLE_FORAGER;
         }
@@ -658,18 +657,16 @@ public class Engine extends Thread {
 
     public static int sanitizeDefaultRoleId(AntType type, int desiredRoleId, int fallbackRoleId) {
         AntRole r = GameConstants.getAntRoleById(desiredRoleId);
-        if (r != null && r.getAntType() == type && !GameConstants.isWarEconomyExclusiveRole(r)
-                && GameConstants.isObtainableRole(r)) {
+        if (r != null && r.getAntType() == type && GameConstants.isEligibleDefaultHatchRole(r)) {
             return desiredRoleId;
         }
         AntRole fallback = GameConstants.getAntRoleById(fallbackRoleId);
         if (fallback != null && fallback.getAntType() == type
-                && !GameConstants.isWarEconomyExclusiveRole(fallback)
-                && GameConstants.isObtainableRole(fallback)) {
+                && GameConstants.isEligibleDefaultHatchRole(fallback)) {
             return fallbackRoleId;
         }
-        AntRole legacy = legacyDefaultRoleForAntType(type);
-        return legacy != null ? legacy.getId() : fallbackRoleId;
+        AntRole builtin = builtinDefaultRoleForAntType(type);
+        return builtin != null ? builtin.getId() : fallbackRoleId;
     }
 
     public static int defaultRoleIdForAntType(AntType type, Engine engine) {

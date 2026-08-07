@@ -435,11 +435,7 @@ public class SettingsPanel extends JPanel {
 
     private JComboBox<AntRole> createAntRoleCombo(AntType type) {
         JComboBox<AntRole> combo = new JComboBox<>();
-        for (AntRole r : Engine.antRolesForAntType(type)) {
-            if (!GameConstants.isWarEconomyExclusiveRole(r) && GameConstants.isObtainableRole(r)) {
-                combo.addItem(r);
-            }
-        }
+        refillAntRoleCombo(combo, type);
         styleComboBox(combo);
         combo.setRenderer(new DefaultListCellRenderer() {
             @Override
@@ -456,12 +452,28 @@ public class SettingsPanel extends JPanel {
         return combo;
     }
 
-    private void applyDefaultRoleFromCombo(JComboBox<AntRole> combo, AntType type, int legacyFallbackId) {
+    private void refillAntRoleCombo(JComboBox<AntRole> combo, AntType type) {
         AntRole selected = (AntRole) combo.getSelectedItem();
-        if (selected == null) {
-            return;
+        combo.removeAllItems();
+        for (AntRole role : GameConstants.eligibleDefaultHatchRoles(type)) {
+            combo.addItem(role);
         }
-        int safe = Engine.sanitizeDefaultRoleId(type, selected.getId(), legacyFallbackId);
+        if (selected != null) {
+            selectRoleCombo(combo, type, selected.getId());
+        }
+    }
+
+    private void applyDefaultRoleFromCombo(JComboBox<AntRole> combo, AntType type) {
+        AntRole selected = (AntRole) combo.getSelectedItem();
+        AntRole builtin = Engine.builtinDefaultRoleForAntType(type);
+        int fallbackId = builtin != null ? builtin.getId() : -1;
+        if (selected == null) {
+            if (builtin == null) {
+                return;
+            }
+            selected = builtin;
+        }
+        int safe = Engine.sanitizeDefaultRoleId(type, selected.getId(), fallbackId);
         if (type == GameConstants.TYPE_WORKER) {
             engine.setDefaultRoleWorker(safe);
         } else if (type == GameConstants.TYPE_SOLDIER) {
@@ -542,11 +554,18 @@ public class SettingsPanel extends JPanel {
     }
 
     private void resetRolesTabToDefaults() {
-        selectRoleCombo(defaultRoleWorkerCombo, GameConstants.TYPE_WORKER, GameConstants.ROLE_FORAGER.getId());
-        selectRoleCombo(defaultRoleSoldierCombo, GameConstants.TYPE_SOLDIER, GameConstants.ROLE_HUNTER.getId());
-        selectRoleCombo(defaultRoleMajorCombo, GameConstants.TYPE_MAJOR, GameConstants.ROLE_CRANE.getId());
-        selectRoleCombo(defaultRolePrincessCombo, GameConstants.TYPE_PRINCESS, GameConstants.ROLE_BREEDER.getId());
-        selectRoleCombo(defaultRoleQueenCombo, GameConstants.TYPE_QUEEN, GameConstants.ROLE_LAYER.getId());
+        selectBuiltinDefaultRole(defaultRoleWorkerCombo, GameConstants.TYPE_WORKER);
+        selectBuiltinDefaultRole(defaultRoleSoldierCombo, GameConstants.TYPE_SOLDIER);
+        selectBuiltinDefaultRole(defaultRoleMajorCombo, GameConstants.TYPE_MAJOR);
+        selectBuiltinDefaultRole(defaultRolePrincessCombo, GameConstants.TYPE_PRINCESS);
+        selectBuiltinDefaultRole(defaultRoleQueenCombo, GameConstants.TYPE_QUEEN);
+    }
+
+    private void selectBuiltinDefaultRole(JComboBox<AntRole> combo, AntType type) {
+        AntRole builtin = Engine.builtinDefaultRoleForAntType(type);
+        if (builtin != null) {
+            selectRoleCombo(combo, type, builtin.getId());
+        }
     }
 
     private void selectRoleCombo(JComboBox<AntRole> combo, AntType type, int id) {
@@ -556,10 +575,19 @@ public class SettingsPanel extends JPanel {
                 return;
             }
         }
-        AntRole fallback = Engine.resolveDefaultRoleForAntType(type, engine);
-        if (fallback != null) {
+        AntRole resolved = Engine.resolveDefaultRoleForAntType(type, engine);
+        if (resolved != null) {
             for (int i = 0; i < combo.getItemCount(); i++) {
-                if (combo.getItemAt(i).getId() == fallback.getId()) {
+                if (combo.getItemAt(i).getId() == resolved.getId()) {
+                    combo.setSelectedIndex(i);
+                    return;
+                }
+            }
+        }
+        AntRole builtin = Engine.builtinDefaultRoleForAntType(type);
+        if (builtin != null) {
+            for (int i = 0; i < combo.getItemCount(); i++) {
+                if (combo.getItemAt(i).getId() == builtin.getId()) {
                     combo.setSelectedIndex(i);
                     return;
                 }
@@ -567,6 +595,29 @@ public class SettingsPanel extends JPanel {
         }
         if (combo.getItemCount() > 0) {
             combo.setSelectedIndex(0);
+        }
+    }
+
+    private void loadDefaultRoleCombos() {
+        refillAntRoleCombo(defaultRoleWorkerCombo, GameConstants.TYPE_WORKER);
+        refillAntRoleCombo(defaultRoleSoldierCombo, GameConstants.TYPE_SOLDIER);
+        refillAntRoleCombo(defaultRoleMajorCombo, GameConstants.TYPE_MAJOR);
+        refillAntRoleCombo(defaultRolePrincessCombo, GameConstants.TYPE_PRINCESS);
+        refillAntRoleCombo(defaultRoleQueenCombo, GameConstants.TYPE_QUEEN);
+
+        selectResolvedDefaultRole(defaultRoleWorkerCombo, GameConstants.TYPE_WORKER);
+        selectResolvedDefaultRole(defaultRoleSoldierCombo, GameConstants.TYPE_SOLDIER);
+        selectResolvedDefaultRole(defaultRoleMajorCombo, GameConstants.TYPE_MAJOR);
+        selectResolvedDefaultRole(defaultRolePrincessCombo, GameConstants.TYPE_PRINCESS);
+        selectResolvedDefaultRole(defaultRoleQueenCombo, GameConstants.TYPE_QUEEN);
+    }
+
+    private void selectResolvedDefaultRole(JComboBox<AntRole> combo, AntType type) {
+        AntRole resolved = Engine.resolveDefaultRoleForAntType(type, engine);
+        if (resolved != null) {
+            selectRoleCombo(combo, type, resolved.getId());
+        } else {
+            selectBuiltinDefaultRole(combo, type);
         }
     }
     
@@ -893,11 +944,7 @@ public class SettingsPanel extends JPanel {
         musicVolSlider.setValue(engine.getMusicVolume());
         sfxVolSlider.setValue(engine.getSfxVolume());
 
-        selectRoleCombo(defaultRoleWorkerCombo, GameConstants.TYPE_WORKER, engine.getDefaultRoleWorker());
-        selectRoleCombo(defaultRoleSoldierCombo, GameConstants.TYPE_SOLDIER, engine.getDefaultRoleSoldier());
-        selectRoleCombo(defaultRoleMajorCombo, GameConstants.TYPE_MAJOR, engine.getDefaultRoleMajor());
-        selectRoleCombo(defaultRolePrincessCombo, GameConstants.TYPE_PRINCESS, engine.getDefaultRolePrincess());
-        selectRoleCombo(defaultRoleQueenCombo, GameConstants.TYPE_QUEEN, engine.getDefaultRoleQueen());
+        loadDefaultRoleCombos();
 
         loadedFullScreen = engine.isFullScreen();
         loadedScreenSize = engine.getScreenSize();
@@ -977,11 +1024,11 @@ public class SettingsPanel extends JPanel {
         engine.setMusicVolume(musicVolSlider.getValue());
         engine.setSfxVolume(sfxVolSlider.getValue());
 
-        applyDefaultRoleFromCombo(defaultRoleWorkerCombo, GameConstants.TYPE_WORKER, GameConstants.ROLE_FORAGER.getId());
-        applyDefaultRoleFromCombo(defaultRoleSoldierCombo, GameConstants.TYPE_SOLDIER, GameConstants.ROLE_HUNTER.getId());
-        applyDefaultRoleFromCombo(defaultRoleMajorCombo, GameConstants.TYPE_MAJOR, GameConstants.ROLE_CRANE.getId());
-        applyDefaultRoleFromCombo(defaultRolePrincessCombo, GameConstants.TYPE_PRINCESS, GameConstants.ROLE_BREEDER.getId());
-        applyDefaultRoleFromCombo(defaultRoleQueenCombo, GameConstants.TYPE_QUEEN, GameConstants.ROLE_LAYER.getId());
+        applyDefaultRoleFromCombo(defaultRoleWorkerCombo, GameConstants.TYPE_WORKER);
+        applyDefaultRoleFromCombo(defaultRoleSoldierCombo, GameConstants.TYPE_SOLDIER);
+        applyDefaultRoleFromCombo(defaultRoleMajorCombo, GameConstants.TYPE_MAJOR);
+        applyDefaultRoleFromCombo(defaultRolePrincessCombo, GameConstants.TYPE_PRINCESS);
+        applyDefaultRoleFromCombo(defaultRoleQueenCombo, GameConstants.TYPE_QUEEN);
 
         engine.saveGlobalSettings();
         boolean chromeChanged = windowChromeChanged();

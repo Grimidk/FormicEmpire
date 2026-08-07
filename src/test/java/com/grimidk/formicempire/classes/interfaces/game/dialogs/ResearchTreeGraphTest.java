@@ -137,4 +137,24 @@ class ResearchTreeGraphTest {
         assertEquals(0.0, egg.getPosX(), 1e-9);
         assertEquals(0.0, egg.getPosY(), 1e-9);
     }
+
+    @Test
+    void refreshStatesKeepsLayoutAndUpdatesOwned() {
+        ResearchTreeGraph.Result before = ResearchTreeGraph.build(colony, null);
+        colony.unlockUpgrade(GameUnlocks.ROLE_BUILDER);
+        ResearchTreeGraph.Result after = ResearchTreeGraph.refreshStates(before, colony, null);
+
+        assertEquals(before.getNodes().size(), after.getNodes().size());
+        assertEquals(before.getEdges().size(), after.getEdges().size());
+        for (int i = 0; i < before.getNodes().size(); i++) {
+            assertEquals(before.getNodes().get(i).getUpgrade(), after.getNodes().get(i).getUpgrade());
+            assertEquals(before.getNodes().get(i).getPosX(), after.getNodes().get(i).getPosX(), 1e-9);
+            assertEquals(before.getNodes().get(i).getPosY(), after.getNodes().get(i).getPosY(), 1e-9);
+        }
+        ResearchTreeGraph.Node builder = after.getNodes().stream()
+                .filter(n -> n.getUpgrade() == GameUnlocks.ROLE_BUILDER)
+                .findFirst()
+                .orElseThrow();
+        assertEquals(ResearchTreeGraph.NodeState.OWNED, builder.getState());
+    }
 }

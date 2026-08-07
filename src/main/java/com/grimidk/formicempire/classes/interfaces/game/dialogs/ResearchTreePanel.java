@@ -136,12 +136,6 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
 
     @Override
     public void liveUpdate() {
-        updateResearchPointsLabel();
-        graph = ResearchTreeGraph.build(colony, engine);
-        if (detailCard.isVisible()) {
-            detailCard.refreshFromSelection();
-        }
-        canvas.repaint();
     }
 
     private void updateResearchPointsLabel() {
@@ -265,69 +259,96 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
             selectedState = ResearchTreeGraph.stateFor(colony, engine, selectedUpgrade);
             Upgrade upgrade = selectedUpgrade;
 
-            titleArea.setText(upgrade.getDisplayName());
+            setTextIfChanged(titleArea, upgrade.getDisplayName());
             ImageIcon icon = upgrade.getIcon() != null ? upgrade.getIcon() : GameConstants.ICON_UNKNOWN;
-            iconLabel.setIcon(icon);
+            if (iconLabel.getIcon() != icon) {
+                iconLabel.setIcon(icon);
+            }
 
-            tierLabel.setIcon(upgrade.getTierIcon());
+            if (tierLabel.getIcon() != upgrade.getTierIcon()) {
+                tierLabel.setIcon(upgrade.getTierIcon());
+            }
             tierLabel.setText(null);
             tierLabel.setToolTipText(upgrade.getTier().getName());
 
             if (upgrade.getCost() > 0) {
-                costArea.setText(LanguageStrings.format(LanguageStrings.UPGRADE_COST_RP, upgrade.getCost()));
-                costArea.setVisible(true);
+                setTextIfChanged(costArea, LanguageStrings.format(LanguageStrings.UPGRADE_COST_RP, upgrade.getCost()));
+                setVisibleIfChanged(costArea, true);
             } else {
-                costArea.setText("");
-                costArea.setVisible(false);
+                setTextIfChanged(costArea, "");
+                setVisibleIfChanged(costArea, false);
             }
 
             Upgrade requirement = upgrade.getRequirement();
             if (requirement != null) {
-                requirementArea.setText(LanguageStrings.format(
+                setTextIfChanged(requirementArea, LanguageStrings.format(
                         LanguageStrings.UPGRADE_REQUIRES_FMT, requirement.getDisplayName()));
-                requirementArea.setVisible(true);
+                setVisibleIfChanged(requirementArea, true);
             } else {
-                requirementArea.setText("");
-                requirementArea.setVisible(false);
+                setTextIfChanged(requirementArea, "");
+                setVisibleIfChanged(requirementArea, false);
             }
 
             TriggerProgress progress = colony == null
                     ? null
                     : TriggerProgressService.find(colony, engine, upgrade);
             if (progress != null) {
-                progressArea.setText(progress.getHint() + " — " + LanguageStrings.format(
+                setTextIfChanged(progressArea, progress.getHint() + " — " + LanguageStrings.format(
                         LanguageStrings.TRIGGER_PROGRESS_METRIC_FMT,
                         progress.getMetricLabel(),
                         progress.getCurrent(),
                         progress.getRequired()));
-                progressArea.setVisible(true);
+                setVisibleIfChanged(progressArea, true);
             } else {
-                progressArea.setText("");
-                progressArea.setVisible(false);
+                setTextIfChanged(progressArea, "");
+                setVisibleIfChanged(progressArea, false);
             }
 
-            descriptionArea.setText(upgrade.getDescription());
-            descriptionArea.setCaretPosition(0);
-            titleArea.setCaretPosition(0);
+            setTextIfChanged(descriptionArea, upgrade.getDescription());
 
-            cancelButton.setText(LanguageStrings.get(LanguageStrings.UI_CANCEL));
-            buyButton.setText(LanguageStrings.get(LanguageStrings.UI_BUY));
+            String cancelText = LanguageStrings.get(LanguageStrings.UI_CANCEL);
+            if (!cancelText.equals(cancelButton.getText())) {
+                cancelButton.setText(cancelText);
+            }
+            String buyText = LanguageStrings.get(LanguageStrings.UI_BUY);
+            if (!buyText.equals(buyButton.getText())) {
+                buyButton.setText(buyText);
+            }
             if (encyclopediaMode) {
-                buyButton.setVisible(false);
+                setVisibleIfChanged(buyButton, false);
                 buyButton.setToolTipText(null);
                 return;
             }
             boolean canBuy = selectedState == ResearchTreeGraph.NodeState.AFFORDABLE;
-            buyButton.setVisible(upgrade.getCost() > 0 && selectedState != ResearchTreeGraph.NodeState.OWNED);
-            buyButton.setEnabled(canBuy);
+            boolean showBuy = upgrade.getCost() > 0 && selectedState != ResearchTreeGraph.NodeState.OWNED;
+            setVisibleIfChanged(buyButton, showBuy);
+            if (buyButton.isEnabled() != canBuy) {
+                buyButton.setEnabled(canBuy);
+            }
+            String tip = null;
             if (colony != null
                     && upgrade.getCost() > 0
                     && selectedState != ResearchTreeGraph.NodeState.OWNED
                     && selectedState != ResearchTreeGraph.NodeState.AFFORDABLE
                     && (upgrade.getRequirement() == null || colony.hasUpgrade(upgrade.getRequirement()))) {
-                buyButton.setToolTipText(LanguageStrings.get(LanguageStrings.UPGRADE_NOT_ENOUGH_RP));
-            } else {
-                buyButton.setToolTipText(null);
+                tip = LanguageStrings.get(LanguageStrings.UPGRADE_NOT_ENOUGH_RP);
+            }
+            if (tip == null ? buyButton.getToolTipText() != null : !tip.equals(buyButton.getToolTipText())) {
+                buyButton.setToolTipText(tip);
+            }
+        }
+
+        private void setTextIfChanged(JTextArea area, String text) {
+            String next = text != null ? text : "";
+            if (!next.equals(area.getText())) {
+                area.setText(next);
+                area.setCaretPosition(0);
+            }
+        }
+
+        private void setVisibleIfChanged(Component component, boolean visible) {
+            if (component.isVisible() != visible) {
+                component.setVisible(visible);
             }
         }
 

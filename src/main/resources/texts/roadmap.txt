@@ -4,8 +4,9 @@ To Fix (By decreasing priority):
 	Game Breaking:
 		(none right now)
 	High:
-		check translations and tags
-		3 songs (menu, peace, war) a 3 effects (game start, war start, trigger triggering)
+		3 songs (menu, peace, war) and effects (game start, war start, trigger triggering, spinner up and down)
+		need to obscure research tree
+		omni assimilation should already be assimilated by omni, make sure each species does so
 	Mid:
 		TODO: icons for stats (Skeleton, Acid, Longevity, Research/Growth/Thirst/Laying/Scouting/Farming/Contamination/Graving/Policing 1–3, Logistics 1, Passive 1, Symbiotic Mite 1, Dermestid 1, Hex Sustain, Worker Speed 2, Health/Attack/Defense 1–2, Attack Speed 1)
 		TODO: icons for buildings under icons/buildings/ (Royal/Egg/Mushroom/Plant/Water/Meat/Syrup/Rock/Resin L0–L5, Passive Lab/Water/Aphid/Nurse/Farm/Grave, Composter) — separate from sprites/buildings/rooms/
@@ -17,8 +18,7 @@ To Fix (By decreasing priority):
 	Important not Urgent:
 		map hexes look kinda yank
 		Font - self explanatory
-		minimap?
-	
+
 To Feature (to be done in priority order by blocks):
 Needed for launch (v1.0) (Launch Version):
 	Priority:
@@ -60,7 +60,7 @@ Needed for launch (v1.0) (Launch Version):
 		langs (GER, RUS, CHN, JAP) and translate credits and roadmap
 		proper start animation and roadmap and credits design
 		register Grim Games or Grimidk in steam as dev team
-		steam upload and demo version
+		steam upload and demo version and make sure saves are not overwritten by updates
 		versioning to go back to previous stable patches
 		cleanup code (no placeholders) and refactor inefficiencies with inheritance and stuff, hexagonal architecture, async functions and clean comments, avoid monolithic classes no hardcoded pseudo constant, remove code related to retrofit saves and oneoff use code
 

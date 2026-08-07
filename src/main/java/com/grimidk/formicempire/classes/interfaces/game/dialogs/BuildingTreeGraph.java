@@ -283,6 +283,30 @@ public final class BuildingTreeGraph {
         return new Result(nodes, edges, dividers, roots, minX, maxX, minY, maxY);
     }
 
+    public static Result refreshStates(Result previous, Colony colony) {
+        if (previous == null || previous.getNodes().isEmpty()) {
+            return build(colony);
+        }
+        List<Node> nodes = new ArrayList<>(previous.getNodes().size());
+        for (Node old : previous.getNodes()) {
+            nodes.add(new Node(
+                    old.getBuilding(),
+                    stateFor(colony, old.getBuilding()),
+                    old.getTierIndex(),
+                    old.getPosX(),
+                    old.getPosY()));
+        }
+        return new Result(
+                nodes,
+                previous.getEdges(),
+                previous.getTierDividers(),
+                previous.getRoots(),
+                previous.getMinX(),
+                previous.getMaxX(),
+                previous.getMinY(),
+                previous.getMaxY());
+    }
+
     private static Result emptyResult() {
         return new Result(List.of(), List.of(), List.of(), List.of(), 0, 0, 0, 0);
     }

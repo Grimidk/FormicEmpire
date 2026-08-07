@@ -152,12 +152,6 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
 
     @Override
     public void liveUpdate() {
-        updateResourceLabels();
-        graph = BuildingTreeGraph.build(colony);
-        if (detailCard.isVisible()) {
-            detailCard.refreshFromSelection();
-        }
-        canvas.repaint();
     }
 
     private void updateResourceLabels() {
@@ -291,31 +285,35 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
             selectedState = BuildingTreeGraph.stateFor(colony, selectedBuilding);
             Building building = selectedBuilding;
 
-            titleArea.setText(building.getDisplayName());
+            setTextIfChanged(titleArea, building.getDisplayName());
             ImageIcon icon = building.getIcon() != null ? building.getIcon() : GameConstants.ICON_UNKNOWN;
-            iconLabel.setIcon(icon);
+            if (iconLabel.getIcon() != icon) {
+                iconLabel.setIcon(icon);
+            }
 
-            tierLabel.setIcon(building.getTierIcon());
+            if (tierLabel.getIcon() != building.getTierIcon()) {
+                tierLabel.setIcon(building.getTierIcon());
+            }
             tierLabel.setText(null);
             tierLabel.setToolTipText(building.getTier().getName());
 
-            costArea.setText(
+            setTextIfChanged(costArea,
                     GameConstants.RESOURCE_ROCK.getName() + ": "
                             + AssetStyles.formatNumber(building.getMineralCost()) + "\n"
                             + GameConstants.RESOURCE_RESIN.getName() + ": "
                             + AssetStyles.formatNumber(building.getResinCost()) + "\n"
                             + LanguageStrings.get(LanguageStrings.HELP_BUILD_BASE_COST) + ": "
                             + AssetStyles.formatNumber(building.getBuildTime()));
-            costArea.setVisible(true);
+            setVisibleIfChanged(costArea, true);
 
             Building requirement = building.getRequirement();
             if (requirement != null) {
-                requirementArea.setText(LanguageStrings.format(
+                setTextIfChanged(requirementArea, LanguageStrings.format(
                         LanguageStrings.UPGRADE_REQUIRES_FMT, requirement.getDisplayName()));
-                requirementArea.setVisible(true);
+                setVisibleIfChanged(requirementArea, true);
             } else {
-                requirementArea.setText("");
-                requirementArea.setVisible(false);
+                setTextIfChanged(requirementArea, "");
+                setVisibleIfChanged(requirementArea, false);
             }
 
             if (colony != null
@@ -326,52 +324,78 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
                         ? building.getBuildTime() / efficiency
                         : Double.POSITIVE_INFINITY;
                 double progressHours = colony.getBuildingProgressHours();
-                progressArea.setText(LanguageStrings.format(
+                setTextIfChanged(progressArea, LanguageStrings.format(
                         LanguageStrings.BUILD_PROGRESS_HOURS, progressHours, requiredHours));
-                progressArea.setVisible(true);
+                setVisibleIfChanged(progressArea, true);
             } else {
-                progressArea.setText("");
-                progressArea.setVisible(false);
+                setTextIfChanged(progressArea, "");
+                setVisibleIfChanged(progressArea, false);
             }
 
-            descriptionArea.setText(building.getDescription());
-            descriptionArea.setCaretPosition(0);
-            titleArea.setCaretPosition(0);
+            setTextIfChanged(descriptionArea, building.getDescription());
 
-            closeButton.setText(LanguageStrings.get(LanguageStrings.UI_CANCEL));
+            String closeText = LanguageStrings.get(LanguageStrings.UI_CANCEL);
+            if (!closeText.equals(closeButton.getText())) {
+                closeButton.setText(closeText);
+            }
             if (encyclopediaMode) {
-                actionButton.setVisible(false);
+                setVisibleIfChanged(actionButton, false);
                 actionButton.setToolTipText(null);
                 return;
             }
             if (selectedState == BuildingTreeGraph.NodeState.OWNED) {
-                actionButton.setVisible(false);
+                setVisibleIfChanged(actionButton, false);
             } else if (colony != null
                     && (selectedState == BuildingTreeGraph.NodeState.IN_PROGRESS
                     || colony.getCurrentBuildingProject() == building)) {
-                actionButton.setVisible(true);
-                actionButton.setEnabled(true);
-                actionButton.setText(LanguageStrings.get(LanguageStrings.UI_CANCEL));
+                setVisibleIfChanged(actionButton, true);
+                if (!actionButton.isEnabled()) {
+                    actionButton.setEnabled(true);
+                }
+                String cancelText = LanguageStrings.get(LanguageStrings.UI_CANCEL);
+                if (!cancelText.equals(actionButton.getText())) {
+                    actionButton.setText(cancelText);
+                }
                 actionButton.setToolTipText(null);
             } else {
-                actionButton.setVisible(true);
-                actionButton.setText(LanguageStrings.get(LanguageStrings.UI_BUILD));
+                setVisibleIfChanged(actionButton, true);
+                String buildText = LanguageStrings.get(LanguageStrings.UI_BUILD);
+                if (!buildText.equals(actionButton.getText())) {
+                    actionButton.setText(buildText);
+                }
                 boolean canBuild = selectedState == BuildingTreeGraph.NodeState.AFFORDABLE;
-                actionButton.setEnabled(canBuild);
+                if (actionButton.isEnabled() != canBuild) {
+                    actionButton.setEnabled(canBuild);
+                }
+                String tip = null;
                 if (!canBuild && colony != null) {
                     int builders = colony.getAssignedRoleCount(GameConstants.ROLE_BUILDER);
                     int cranes = colony.getAssignedRoleCount(GameConstants.ROLE_CRANE);
                     if (builders <= 0 && cranes <= 0) {
-                        actionButton.setToolTipText(LanguageStrings.get(LanguageStrings.BUILD_REQUIREMENT_ERROR));
+                        tip = LanguageStrings.get(LanguageStrings.BUILD_REQUIREMENT_ERROR);
                     } else if (colony.getMinerals() < building.getMineralCost()
                             || colony.getResins() < building.getResinCost()) {
-                        actionButton.setToolTipText(LanguageStrings.get(LanguageStrings.BUILD_RESOURCES_ERROR));
-                    } else {
-                        actionButton.setToolTipText(null);
+                        tip = LanguageStrings.get(LanguageStrings.BUILD_RESOURCES_ERROR);
                     }
-                } else {
-                    actionButton.setToolTipText(null);
                 }
+                if (tip == null ? actionButton.getToolTipText() != null
+                        : !tip.equals(actionButton.getToolTipText())) {
+                    actionButton.setToolTipText(tip);
+                }
+            }
+        }
+
+        private void setTextIfChanged(JTextArea area, String text) {
+            String next = text != null ? text : "";
+            if (!next.equals(area.getText())) {
+                area.setText(next);
+                area.setCaretPosition(0);
+            }
+        }
+
+        private void setVisibleIfChanged(Component component, boolean visible) {
+            if (component.isVisible() != visible) {
+                component.setVisible(visible);
             }
         }
 

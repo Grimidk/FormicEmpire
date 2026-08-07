@@ -533,6 +533,7 @@ public final class LanguageStrings {
     public static final String PANEL_ALERTS = "PANEL_ALERTS";
     public static final String PANEL_NO_ALERTS = "PANEL_NO_ALERTS";
     public static final String PANEL_MUSIC = "PANEL_MUSIC";
+    public static final String PANEL_MINIMAP = "PANEL_MINIMAP";
     public static final String PANEL_NO_MUSIC = "PANEL_NO_MUSIC";
     public static final String MUSIC_PLAY_TT = "MUSIC_PLAY_TT";
     public static final String MUSIC_PAUSE_TT = "MUSIC_PAUSE_TT";

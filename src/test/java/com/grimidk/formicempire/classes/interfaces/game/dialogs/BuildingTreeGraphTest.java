@@ -108,4 +108,24 @@ class BuildingTreeGraphTest {
                 BuildingTreeGraph.NodeState.UNAVAILABLE,
                 BuildingTreeGraph.stateFor(colony, GameUnlocks.ROYAL_CHAMBER_2));
     }
+
+    @Test
+    void refreshStatesKeepsLayoutAndUpdatesOwned() {
+        BuildingTreeGraph.Result before = BuildingTreeGraph.build(colony);
+        colony.unlockBuilding(GameUnlocks.ROYAL_CHAMBER_0);
+        BuildingTreeGraph.Result after = BuildingTreeGraph.refreshStates(before, colony);
+
+        assertEquals(before.getNodes().size(), after.getNodes().size());
+        assertEquals(before.getEdges().size(), after.getEdges().size());
+        for (int i = 0; i < before.getNodes().size(); i++) {
+            assertEquals(before.getNodes().get(i).getBuilding(), after.getNodes().get(i).getBuilding());
+            assertEquals(before.getNodes().get(i).getPosX(), after.getNodes().get(i).getPosX(), 1e-9);
+            assertEquals(before.getNodes().get(i).getPosY(), after.getNodes().get(i).getPosY(), 1e-9);
+        }
+        BuildingTreeGraph.Node owned = after.getNodes().stream()
+                .filter(n -> n.getBuilding() == GameUnlocks.ROYAL_CHAMBER_0)
+                .findFirst()
+                .orElseThrow();
+        assertEquals(BuildingTreeGraph.NodeState.OWNED, owned.getState());
+    }
 }

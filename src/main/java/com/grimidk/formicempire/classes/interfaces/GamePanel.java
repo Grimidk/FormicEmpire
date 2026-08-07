@@ -56,6 +56,7 @@ public class GamePanel extends ZeroGamePanel {
     private ColonyPanel colonyPanel; 
     private WorldPanel worldPanel;  
     private AlertPanel alertPanel;
+    private MiniMapPanel miniMapPanel;
     private MusicPanel musicPanel;
     private ControlPanel controlPanel;
     private GameAreaPanel gameAreaPanel;
@@ -125,6 +126,7 @@ public class GamePanel extends ZeroGamePanel {
         colonyPanel.setEngine(frame.getEngine());
         worldPanel = new WorldPanel();
         alertPanel = new AlertPanel();
+        miniMapPanel = new MiniMapPanel(frame.getEngine(), this::openMapDialogFromMiniMap);
         musicPanel = new MusicPanel(frame.getEngine());
         gameAreaPanel = new GameAreaPanel();
         gameAreaPanel.setEngine(frame.getEngine());
@@ -451,6 +453,9 @@ public class GamePanel extends ZeroGamePanel {
         worldPanel.refreshTranslations();
         colonyPanel.refreshTranslations();
         alertPanel.refreshTranslations();
+        if (miniMapPanel != null) {
+            miniMapPanel.refreshTranslations();
+        }
         if (musicPanel != null) {
             musicPanel.refreshTranslations();
         }
@@ -477,6 +482,9 @@ public class GamePanel extends ZeroGamePanel {
         worldPanel.refreshTheme();
         colonyPanel.refreshTheme();
         alertPanel.refreshTheme();
+        if (miniMapPanel != null) {
+            miniMapPanel.refreshTheme();
+        }
         if (musicPanel != null) {
             musicPanel.refreshTheme();
         }
@@ -683,7 +691,7 @@ public class GamePanel extends ZeroGamePanel {
         gbc.weightx = 0.6; 
         center.add(gameScrollPane, gbc); 
 
-        // --- Right Panel Container (World + Alert + Music) ---
+        // --- Right Panel Container (World + Alert + Minimap + Music) ---
         JPanel rightPanel = new JPanel(new BorderLayout());
         rightPanel.setOpaque(false);
         rightPanel.setPreferredSize(new Dimension(230, 0));
@@ -693,7 +701,12 @@ public class GamePanel extends ZeroGamePanel {
         JPanel alertAndMusic = new JPanel(new BorderLayout());
         alertAndMusic.setOpaque(false);
         alertAndMusic.add(alertPanel, BorderLayout.CENTER);
-        alertAndMusic.add(musicPanel, BorderLayout.SOUTH);
+
+        JPanel miniMapAndMusic = new JPanel(new BorderLayout());
+        miniMapAndMusic.setOpaque(false);
+        miniMapAndMusic.add(miniMapPanel, BorderLayout.CENTER);
+        miniMapAndMusic.add(musicPanel, BorderLayout.SOUTH);
+        alertAndMusic.add(miniMapAndMusic, BorderLayout.SOUTH);
         rightPanel.add(alertAndMusic, BorderLayout.CENTER); 
 
         gbc.gridx = 2;
@@ -868,6 +881,23 @@ public class GamePanel extends ZeroGamePanel {
             return;
         }
         
+        openMapDialog(world);
+    }
+
+    private void openMapDialogFromMiniMap() {
+        Engine engine = frame.getEngine();
+        World world = engine != null ? engine.getWorld() : null;
+        if (world == null) {
+            return;
+        }
+        if (mapDialog != null && mapDialog.isShowing()) {
+            mapDialog.toFront();
+            return;
+        }
+        openMapDialog(world);
+    }
+
+    private void openMapDialog(World world) {
         if (mapDialog == null || mapDialog.getOwner() != frame) {
             if (mapDialog != null) mapDialog.dispose();
             mapDialog = new MapDialog(frame, world, this::refreshAllGUIData, this::showWarDialog);
@@ -1248,6 +1278,7 @@ public class GamePanel extends ZeroGamePanel {
         if (colonyPanel != null) colonyPanel.reset();
         if (worldPanel != null) worldPanel.reset();
         if (alertPanel != null) alertPanel.updateAlerts(new ArrayList<>());
+        if (miniMapPanel != null) miniMapPanel.reset();
 
         Engine eng = frame.getEngine();
         if (eng != null) {
@@ -1545,6 +1576,9 @@ public class GamePanel extends ZeroGamePanel {
         World world = frame.getEngine().getWorld();
         if (world == null) return;
         worldPanel.updateStaticData(world);
+        if (miniMapPanel != null) {
+            miniMapPanel.refreshMap();
+        }
         if (world.getActiveHex() != null && world.getActiveHex().getBiome() != null) {
             gameAreaPanel.setBackgroundBiome(world.getActiveHex().getBiome());
         }
@@ -1615,6 +1649,9 @@ public class GamePanel extends ZeroGamePanel {
 
         worldPanel.updateHourData(world);
         colonyPanel.updateHourData(colony);
+        if (miniMapPanel != null) {
+            miniMapPanel.refreshMap();
+        }
         
         if (colony != null && colony.belongsToPlayerDynasty()) {
             updateGameAreaSize();

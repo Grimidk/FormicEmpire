@@ -1960,23 +1960,23 @@ public class SaveManager {
             engine.setDefaultRoleWorker(Engine.sanitizeDefaultRoleId(
                     GameConstants.TYPE_WORKER,
                     Integer.parseInt(m.getOrDefault("defaultRoleWorker", String.valueOf(engine.getDefaultRoleWorker()))),
-                    GameConstants.ROLE_FORAGER.getId()));
+                    Engine.builtinDefaultRoleForAntType(GameConstants.TYPE_WORKER).getId()));
             engine.setDefaultRoleSoldier(Engine.sanitizeDefaultRoleId(
                     GameConstants.TYPE_SOLDIER,
                     Integer.parseInt(m.getOrDefault("defaultRoleSoldier", String.valueOf(engine.getDefaultRoleSoldier()))),
-                    GameConstants.ROLE_HUNTER.getId()));
+                    Engine.builtinDefaultRoleForAntType(GameConstants.TYPE_SOLDIER).getId()));
             engine.setDefaultRoleMajor(Engine.sanitizeDefaultRoleId(
                     GameConstants.TYPE_MAJOR,
                     Integer.parseInt(m.getOrDefault("defaultRoleMajor", String.valueOf(engine.getDefaultRoleMajor()))),
-                    GameConstants.ROLE_CRANE.getId()));
+                    Engine.builtinDefaultRoleForAntType(GameConstants.TYPE_MAJOR).getId()));
             engine.setDefaultRolePrincess(Engine.sanitizeDefaultRoleId(
                     GameConstants.TYPE_PRINCESS,
                     Integer.parseInt(m.getOrDefault("defaultRolePrincess", String.valueOf(engine.getDefaultRolePrincess()))),
-                    GameConstants.ROLE_BREEDER.getId()));
+                    Engine.builtinDefaultRoleForAntType(GameConstants.TYPE_PRINCESS).getId()));
             engine.setDefaultRoleQueen(Engine.sanitizeDefaultRoleId(
                     GameConstants.TYPE_QUEEN,
                     Integer.parseInt(m.getOrDefault("defaultRoleQueen", String.valueOf(engine.getDefaultRoleQueen()))),
-                    GameConstants.ROLE_LAYER.getId()));
+                    Engine.builtinDefaultRoleForAntType(GameConstants.TYPE_QUEEN).getId()));
 
             System.out.println("[SaveManager] Global settings loaded.");
         } catch (Exception e) {

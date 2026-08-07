@@ -102,7 +102,7 @@ public class UpgradeDialog extends ZeroDialog {
         // --- Research Tab ---
         if (colony.hasUpgrade(GameUnlocks.ABILITY_RESEARCH)) {
             if (researchPanel == null) {
-                researchPanel = new ResearchTreePanel(colony, engine, this::refreshDialog);
+                researchPanel = new ResearchTreePanel(colony, engine, this::onTreePanelChanged);
             }
             researchPanel.updateData();
             tabbedPane.addTab(LanguageStrings.get(LanguageStrings.TAB_RESEARCH), GameUnlocks.ABILITY_RESEARCH.getIcon(), researchPanel);
@@ -112,7 +112,7 @@ public class UpgradeDialog extends ZeroDialog {
         // --- Build Tab ---
         if (colony.hasUpgrade(GameUnlocks.ROLE_BUILDER)) {
             if (buildPanel == null) {
-                buildPanel = new BuildingTreePanel(colony, this::refreshDialog);
+                buildPanel = new BuildingTreePanel(colony, this::onTreePanelChanged);
             }
             buildPanel.updateData();
             tabbedPane.addTab(LanguageStrings.get(LanguageStrings.TAB_CONSTRUCTION), GameUnlocks.ABILITY_BUILD.getIcon(), buildPanel);
@@ -143,6 +143,40 @@ public class UpgradeDialog extends ZeroDialog {
             tabbedPane.setSelectedIndex(tabIndexMap.get(targetTab));
             targetTab = -1; 
         }
+    }
+
+    private void onTreePanelChanged() {
+        if (tabsNeedRebuild()) {
+            int preferred = -1;
+            for (Map.Entry<Integer, Integer> entry : tabIndexMap.entrySet()) {
+                if (entry.getValue() != null && entry.getValue() == tabbedPane.getSelectedIndex()) {
+                    preferred = entry.getKey();
+                    break;
+                }
+            }
+            if (preferred >= 0) {
+                targetTab = preferred;
+            }
+            refreshDialog();
+            return;
+        }
+        if (researchPanel != null) {
+            researchPanel.updateData();
+        }
+        if (buildPanel != null) {
+            buildPanel.updateData();
+        }
+    }
+
+    private boolean tabsNeedRebuild() {
+        boolean wantResearch = colony.hasUpgrade(GameUnlocks.ABILITY_RESEARCH);
+        boolean wantBuild = colony.hasUpgrade(GameUnlocks.ROLE_BUILDER);
+        boolean wantAssimilation = colony.hasUpgrade(GameUnlocks.ABILITY_ASSIMILATION);
+        boolean wantSynergy = colony.hasUpgrade(GameUnlocks.ABILITY_SYNERGY);
+        return wantResearch != tabIndexMap.containsKey(TAB_RESEARCH)
+                || wantBuild != tabIndexMap.containsKey(TAB_BUILD)
+                || wantAssimilation != tabIndexMap.containsKey(TAB_ASSIMILATION)
+                || wantSynergy != tabIndexMap.containsKey(TAB_SYNERGY);
     }
 
     private JPanel createPlaceholderPanel(String message) {

@@ -24,6 +24,8 @@ public final class GameNumbers {
     public static final int WORLD_COASTAL_RING_COUNT = 5;
     public static final int WORLD_OUTER_OCEAN_RING_COUNT = 1;
     public static final int[] WORLD_COASTAL_LAND_CHANCE_PERCENT = { 80, 40, 20, 10, 5 };
+    public static final int WORLD_MIN_ISLAND_COUNT = 6;
+    public static final int WORLD_MIN_HEXES_PER_BIOME = 2;
 
     public static int worldRadiusForContinentCore(int continentCoreRadius) {
         return Math.max(0, continentCoreRadius)

@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 65% (230/354 checked)
+Completion: 74% (263/355 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -9,14 +9,14 @@ Legend: [ ] = not tested yet   [x] = tested (reset to [ ] if the mechanic change
 ================================================================================
 1. LAUNCHER / MAIN MENU
 ================================================================================
-[ ] Intro splash (studio name, arthropod/arachnophobia warning, photosensitivity warning, then short translated license summary pointing to full License on main menu; click or timer to advance) auto-advances to main menu
+[X] Intro splash (studio name, arthropod/arachnophobia warning, photosensitivity warning, then short translated license summary pointing to full License on main menu; click or timer to advance) auto-advances to main menu
 [X] Play — opens save slot screen
 [X] Help — encyclopedia (all tabs; see section 18)
 [X] Roadmap — development roadmap text dialog
 [X] Credits — credits text dialog
-[ ] Main menu version text (bottom left, black)
-[ ] Main menu License (bottom right) — opens full license dialog
-[ ] Discord — opens Discord invite in browser
+[X] Main menu version text (bottom left, black)
+[X] Main menu License (bottom right) — opens full license dialog
+[X] Discord — opens Discord invite in browser
 [X] Mechanics Audit — this file (only when enabled in Settings > General)
 [X] Settings — full settings panel (see section 2)
 [X] Quit — exit app (respects confirm-on-quit when a game session is active)
@@ -44,7 +44,7 @@ Video:
 [X] Daylight color overlay
 [X] Weather color overlay
 [X] Dark mode
-[ ] Frame rate cap (Uncapped / 30 Hz / 60 Hz / 120 Hz)
+[X] Frame rate cap (Uncapped / 30 Hz / 60 Hz / 120 Hz)
 [X] Reset tab to defaults
 
 Audio:
@@ -52,12 +52,12 @@ Audio:
 [X] Reset tab to defaults
 
 Roles (default hatch roles for new ants):
-[X] Default worker role combo
-[X] Default soldier role combo
-[X] Default major role combo
-[X] Default princess role combo
-[X] Default queen role combo
-[X] Reset tab to defaults
+[ ] Default worker role combo (all implemented peacetime worker roles; shows actual default)
+[ ] Default soldier role combo (all implemented peacetime soldier roles; shows actual default)
+[ ] Default major role combo (all implemented peacetime major roles; shows actual default)
+[ ] Default princess role combo (all implemented peacetime princess roles; shows actual default)
+[ ] Default queen role combo (all implemented peacetime queen roles; shows actual default)
+[ ] Reset tab to defaults
 
 [X] Save & Apply persists to settings.json and applies live
 
@@ -91,8 +91,9 @@ Side panels (live updates while playing):
 [X] Resources panel
 [X] Ant population panel
 [X] Alerts panel (icons + short labels; mite outbreaks, shortages, etc.)
-[ ] Music panel below alerts (track name; prev / play-pause / next; shuffle; mute; shows No music when empty)
-[ ] Menu music starts after intro (never during intro); session music starts when a game loads; volumes use Settings > Audio
+[ ] Minimap panel above music (land hex biome colors + dynasty borders; ocean hexes hidden; click opens map)
+[X] Music panel below alerts (track name; prev / play-pause / next; shuffle; mute; shows No music when empty)
+[X] Menu music starts after intro (never during intro); session music starts when a game loads; volumes use Settings > Audio
 
 ================================================================================
 5. HOTKEYS (also in Help > Tutorials > Hotkeys)
@@ -113,9 +114,9 @@ Side panels (live updates while playing):
 [X] O — Synergies (when unlocked)
 [X] C — Colony Operations / abilities (when unlocked)
 [X] A — Dynasty Overview tab (always available; toggle)
-[ ] S — Dynasty Trade / Logistics tab (always available; toggle)
+[X] S — Dynasty Trade / Logistics tab (always available; toggle)
 [X] D — Dynasty Diplomacy tab (always available; toggle)
-[ ] F — Dynasty Wars tab (always available; toggle)
+[X] F — Dynasty Wars tab (always available; toggle)
 [X] M — World map (toggle)
 [X] X — Statistics (toggle)
 [X] Repeat same hotkey closes the bound dialog/tab
@@ -137,13 +138,13 @@ Colony submenu (items appear when unlocked):
 [X] Colony Operations (C)
 
 Dynasty submenu (always available in session):
-[ ] Dynasty management (overview)
-[ ] Trade / logistics (S)
-[ ] Diplomacy (D)
-[ ] Wars (F)
+[X] Dynasty management (overview)
+[X] Trade / logistics (S)
+[X] Diplomacy (D)
+[X] Wars (F)
 
 [X] Settings
-[ ] Help — encyclopedia (in-game dialog)
+[X] Help — encyclopedia (in-game dialog)
 [X] Tutorial (in-game)
 [X] Mechanics Audit (when enabled in Settings > General)
 [X] Back to main menu
@@ -182,14 +183,14 @@ Per ant type tab (Worker, Soldier, Major, Princess, Queen):
 [X] Automated colonies assign subtype rates by assimilation (honeypot workers/princesses, trapjaw/bullet soldiers/majors, doorhead workers/soldiers)
 [X] Automated colonies reduce or drop subtypes when fungi stock is below water
 [X] Each active body-part subtype adds +50% food consumption (two parts = 2x food); visible in Stats as subtype food overhead
-[ ] Stinger abdomen subtype: 1.5x attack on that ant (additive with Trapjaw; not dynasty-wide)
+[X] Stinger abdomen subtype: 1.5x attack on that ant (additive with Trapjaw; not dynasty-wide)
 
 ================================================================================
 10. RESEARCH (Y) — UpgradeDialog Research tab
 ================================================================================
 Purchase with research points (RP). Test buy on each category:
 
-[ ] Research tree: radial grid, detail card (cost/trigger when owned, wrapping name/desc), node colors (green owned, red affordable, blue trigger progress, yellow assimilation/synergy progress, grey unavailable)
+[X] Research tree: radial grid, detail card (cost/trigger when owned, wrapping name/desc), node colors (green owned, red affordable, blue trigger progress, yellow assimilation/synergy progress, grey unavailable); usable while game is running (hour liveUpdate refreshes state without rebuilding layout)
 
 Ant types:
 [X] Egg, Worker, Soldier, Major, Princess, Queen
@@ -255,18 +256,18 @@ Assimilated species passives (research tree):
 ================================================================================
 11. CONSTRUCTION (U) — UpgradeDialog Build tab
 ================================================================================
-[ ] Building tree: upward chains from basic rooms, tier divider lines, detail card (cost/requires/build), node colors (green owned, red affordable, blue in progress, grey unavailable)
+[ ] Building tree: upward chains from basic rooms, tier divider lines, detail card (cost/requires/build), node colors (green owned, red affordable, blue in progress, grey unavailable); usable while game is running (hour liveUpdate refreshes state without rebuilding layout)
 
 Room upgrade chains (each tier L0→L5 where applicable; L4–L5 cost minerals + resin):
-[ ] Royal Chamber
-[ ] Egg Chamber
-[ ] Mushroom Chamber
-[ ] Plant Chamber
-[ ] Water Reservoir
-[ ] Meat Chamber
-[ ] Syrup Reservoir
-[ ] Rock Warehouse (gated behind Miner role)
-[ ] Resin Reservoir (gated behind Resin ability)
+[X] Royal Chamber
+[X] Egg Chamber
+[X] Mushroom Chamber
+[X] Plant Chamber
+[X] Water Reservoir
+[X] Meat Chamber
+[X] Syrup Reservoir
+[X] Rock Warehouse (gated behind Miner role)
+[X] Resin Reservoir (gated behind Resin ability)
 
 Passive / special rooms:
 [X] Passive Lab, Passive Water, Passive Aphid, Passive Nurse
@@ -426,16 +427,16 @@ In-game tutorial dialog (on new game + ESC > Tutorial):
 
 Help encyclopedia (main menu Help):
 [X] Tutorials — Welcome, Getting Started, Dynasty, Hotkeys
-[ ] Ant Species (assimilation name, icon, description; representative castes / subtypes)
+[X] Ant Species (assimilation name, icon, description; representative castes / subtypes)
 [X] Ant types
 [X] Ant subtypes (Help > Ant Types tab, right column)
-[ ] Critter Species
+[X] Critter Species
 [X] Ant roles
-[ ] Dynasty tab (ranks, tiers, trade, loyalty, military, reputation)
-[ ] Upgrades research tree (Help > Upgrades — browse nodes; read-only)
-[ ] Buildings research tree (Help > Buildings — browse nodes; read-only)
+[X] Dynasty tab (ranks, tiers, trade, loyalty, military, reputation)
+[X] Upgrades research tree (Help > Upgrades — browse nodes; read-only)
+[X] Buildings research tree (Help > Buildings — browse nodes; read-only)
 [X] Synergies list (Help > Synergies — Super Venom and future combos)
-[ ] Combat (Help > Combat — creature battles, skills, battle lines, capacity/reserves, war phases)
+[X] Combat (Help > Combat — creature battles, skills, battle lines, capacity/reserves, war phases)
 [X] World / biomes / hexes
 [X] UI controls (Help > UI Controls tab — speed bar and icons)
 
@@ -454,7 +455,7 @@ Daily:
 [ ] Queendom rank unlocks Air Support princess role
 [ ] Commander role unlock (3 wars participated + multi-queen colony)
 [ ] Commander assignment: max 1 per colony; requires spare queen off combat; raises dynasty combat capacity 1k→2.5k once
-[ ] Research / Build / Spread ability unlocks
+[X] Research / Build / Spread ability unlocks
 [ ] Dynasty / Trade / Management / Spread 2 / Automation unlocks by colony count
 [ ] Bilateral Trade unlock from active trade count
 [ ] Courier / Borer role unlocks
@@ -465,7 +466,7 @@ Daily:
 [ ] Mass Flight unlock
 [ ] Police role unlock (fused into Duchy rank-up popup)
 [ ] Cloning unlock (fused into Empire rank-up popup)
-[ ] Dynasty rank-up popups (County→Giga; Duchy grants Police, Empire grants Cloning; Ant/Colony skipped)
+[X] Dynasty rank-up popups (County→Giga; Duchy grants Police, Empire grants Cloning; Ant/Colony skipped)
 [ ] Auto-Tunnels / Auto-Diplomacy unlocks (after Automation + prerequisites)
 [ ] Colony death detection
 [ ] NPC dynasty triggers
@@ -480,7 +481,7 @@ Hourly:
 23. SIMULATION MECHANICS (indirect player interaction — observe while playing)
 ================================================================================
 Colony labour & resources:
-[ ] Foraging, farming, nursing, laying, research generation
+[X] Foraging, farming, nursing, laying, research generation
 [X] Water / food / protein / syrup / rock / resin economy
 [ ] Grave cleaning, policing, mite / parasite ant handling
 [ ] Pet insects — aphids on rancher capacity; mites/dermestids on catcher pool; slow breeding; over-capacity escape next day
@@ -493,9 +494,9 @@ World:
 [X] Day / month / year / hour ticks
 [X] Weather changes
 [X] Biome differences on hexes
-[ ] World gen — continent core landmass + 5 coastal rings (80/40/20/10/5% land; rings 1–4 mainland-connected; ring 5 can form islands) + outer pure ocean; enclosed ocean pockets become lakes; lakes touching ocean become ocean
-[ ] Continents vs islands counted; colonies never spawn or spread onto islands
-[ ] Map biome hex colors come from Biome mapColorHex (editable in GameConstants)
+[ ] World gen — continent core landmass + 5 coastal rings (80/40/20/10/5% land; rings 1–4 mainland-connected; ring 5 can form islands) + outer pure ocean; enclosed ocean pockets become lakes; lakes touching ocean become ocean; at least 6 islands guaranteed; on standard+ core size, at least 2 hexes per biome (shortfalls taken from the most common non-ocean biome)
+[X] Continents vs islands counted; colonies never spawn or spread onto islands
+[X] Map biome hex colors come from Biome mapColorHex (editable in GameConstants)
 [X] Resource sources on map — hover tooltip shows type, size tier, remaining amount
 [X] Nuptial flight colony founding on new hexes
 [ ] Spreading onto dead/defeated hex inherits species genomes and completed assimilations
@@ -521,8 +522,8 @@ Combat:
 [X] Toggle dark mode — theme refreshes on all open panels
 [X] Custom cursors — normal default, clickable on controls/links, writeable on text fields, click glyph while pressed
 [X] Small controls (spinner arrows, chevrons, checkboxes, color swatches, combo arrows) — hitboxes at least cursor-sized
-[ ] Open multiple dialogs — ESC closes topmost; dynasty keys defer when dynasty dialog open
+[X] Open multiple dialogs — ESC closes topmost; dynasty keys defer when dynasty dialog open
 [X] cleanupSession on back-to-menu — no leaked tick listeners
-[ ] Load second save while first loaded — prior session torn down
-[ ] Confirm exit with unsaved active session
-[ ] Arachnophobia mode — spider substitutes in gameplay & UI
+[X] Load second save while first loaded — prior session torn down
+[X] Confirm exit with unsaved active session
+[X] Arachnophobia mode — spider substitutes in gameplay & UI
