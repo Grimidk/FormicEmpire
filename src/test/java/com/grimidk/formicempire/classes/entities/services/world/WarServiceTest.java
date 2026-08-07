@@ -230,13 +230,15 @@ class WarServiceTest {
         World leafWorld = buildBorderWorld(leafcutterDynasty);
         leafcutterDynasty.absorbSpecies(GameConstants.SPECIES_PHARAOH.getId());
         leafcutterDynasty.completeAssimilation(GameUnlocks.ASSIMILATION_LEAFCUTTER);
+        leafcutterDynasty.completeAssimilation(GameUnlocks.ASSIMILATION_PHARAOH);
 
         War war = leafWorld.getWarService().beginWar(player, leafcutterDynasty);
         leafWorld.getWarService().concludeWar(war, player.getId(), LanguageStrings.WAR_CONCLUSION_ABSOLUTE_VICTORY);
 
         assertTrue(player.getDefeatedSpeciesIds().contains(GameConstants.SPECIES_LEAFCUTTER.getId()));
         assertTrue(player.getDefeatedSpeciesIds().contains(GameConstants.SPECIES_PHARAOH.getId()));
-        assertTrue(player.isAssimilationCompleted(GameUnlocks.ASSIMILATION_LEAFCUTTER));
+        assertFalse(player.isAssimilationCompleted(GameUnlocks.ASSIMILATION_LEAFCUTTER));
+        assertTrue(player.isAssimilationCompleted(GameUnlocks.ASSIMILATION_PHARAOH));
         assertEquals(2, player.getDefeatedSpeciesIds().size());
     }
 

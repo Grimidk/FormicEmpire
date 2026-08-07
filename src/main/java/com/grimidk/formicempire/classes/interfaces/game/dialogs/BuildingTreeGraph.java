@@ -9,9 +9,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public final class BuildingTreeGraph {
 
@@ -194,7 +196,25 @@ public final class BuildingTreeGraph {
         return NodeState.AFFORDABLE;
     }
 
+    public static boolean isVisible(Colony colony, Building building) {
+        if (colony == null || building == null) {
+            return false;
+        }
+        if (colony.hasBuilding(building)) {
+            return true;
+        }
+        Building requirement = building.getRequirement();
+        if (requirement == null) {
+            return true;
+        }
+        return colony.hasBuilding(requirement);
+    }
+
     public static Result build(Colony colony) {
+        return build(colony, false);
+    }
+
+    public static Result build(Colony colony, boolean revealAll) {
         List<Building> all = GameUnlocks.getBuildings();
         if (all.isEmpty()) {
             return emptyResult();
@@ -206,7 +226,7 @@ public final class BuildingTreeGraph {
         }
 
         Map<Building, List<Building>> children = new HashMap<>();
-        List<Edge> edges = new ArrayList<>();
+        List<Edge> allEdges = new ArrayList<>();
         List<Building> roots = new ArrayList<>();
         for (Building building : all) {
             children.put(building, new ArrayList<>());
@@ -217,7 +237,7 @@ public final class BuildingTreeGraph {
                 roots.add(building);
             } else if (states.containsKey(requirement)) {
                 children.get(requirement).add(building);
-                edges.add(new Edge(requirement, building));
+                allEdges.add(new Edge(requirement, building));
             } else {
                 roots.add(building);
             }
@@ -242,7 +262,6 @@ public final class BuildingTreeGraph {
             cursorX += width * GRID_STEP + gapBetweenTrees;
         }
 
-        List<Node> nodes = new ArrayList<>();
         double minX = 0;
         double maxX = 0;
         double minY = 0;
@@ -251,7 +270,6 @@ public final class BuildingTreeGraph {
         for (Building building : all) {
             double x = posX.getOrDefault(building, 0.0);
             double y = posY.getOrDefault(building, 0.0);
-            int tier = building.getTier().getId();
             if (first) {
                 minX = maxX = x;
                 minY = maxY = y;
@@ -262,6 +280,30 @@ public final class BuildingTreeGraph {
                 minY = Math.min(minY, y);
                 maxY = Math.max(maxY, y);
             }
+        }
+
+        boolean obscure = !revealAll && colony != null;
+        Set<Building> visible = new HashSet<>();
+        if (obscure) {
+            for (Building building : all) {
+                if (isVisible(colony, building)) {
+                    visible.add(building);
+                }
+            }
+        } else {
+            visible.addAll(all);
+        }
+
+        List<Node> nodes = new ArrayList<>();
+        Set<Integer> occupiedTiers = new HashSet<>();
+        for (Building building : all) {
+            if (!visible.contains(building)) {
+                continue;
+            }
+            double x = posX.getOrDefault(building, 0.0);
+            double y = posY.getOrDefault(building, 0.0);
+            int tier = building.getTier().getId();
+            occupiedTiers.add(tier);
             nodes.add(new Node(building, states.get(building), tier, x, y));
         }
         nodes.sort(Comparator
@@ -269,42 +311,39 @@ public final class BuildingTreeGraph {
                 .thenComparingDouble(Node::getPosX)
                 .thenComparingInt(n -> n.getBuilding().getId()));
 
+        List<Edge> edges = new ArrayList<>();
+        for (Edge edge : allEdges) {
+            if (visible.contains(edge.getFrom()) && visible.contains(edge.getTo())) {
+                edges.add(edge);
+            }
+        }
+
+        List<Building> visibleRoots = new ArrayList<>();
+        for (Building root : roots) {
+            if (visible.contains(root)) {
+                visibleRoots.add(root);
+            }
+        }
+
         List<TierDivider> dividers = new ArrayList<>();
         int maxTier = 0;
-        for (Building building : all) {
-            maxTier = Math.max(maxTier, building.getTier().getId());
+        for (int tier : occupiedTiers) {
+            maxTier = Math.max(maxTier, tier);
         }
         for (int tier = 0; tier < maxTier; tier++) {
+            if (!occupiedTiers.contains(tier) || !occupiedTiers.contains(tier + 1)) {
+                continue;
+            }
             double lowerY = -tier * TIER_SPACING;
             double upperY = -(tier + 1) * TIER_SPACING;
             dividers.add(new TierDivider(tier + 1, (lowerY + upperY) / 2.0));
         }
 
-        return new Result(nodes, edges, dividers, roots, minX, maxX, minY, maxY);
+        return new Result(nodes, edges, dividers, visibleRoots, minX, maxX, minY, maxY);
     }
 
     public static Result refreshStates(Result previous, Colony colony) {
-        if (previous == null || previous.getNodes().isEmpty()) {
-            return build(colony);
-        }
-        List<Node> nodes = new ArrayList<>(previous.getNodes().size());
-        for (Node old : previous.getNodes()) {
-            nodes.add(new Node(
-                    old.getBuilding(),
-                    stateFor(colony, old.getBuilding()),
-                    old.getTierIndex(),
-                    old.getPosX(),
-                    old.getPosY()));
-        }
-        return new Result(
-                nodes,
-                previous.getEdges(),
-                previous.getTierDividers(),
-                previous.getRoots(),
-                previous.getMinX(),
-                previous.getMaxX(),
-                previous.getMinY(),
-                previous.getMaxY());
+        return build(colony);
     }
 
     private static Result emptyResult() {

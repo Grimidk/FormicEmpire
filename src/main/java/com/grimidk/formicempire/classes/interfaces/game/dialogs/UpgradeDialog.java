@@ -1,6 +1,5 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
-import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
 import com.grimidk.formicempire.classes.constants.unlocks.Synergy;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
@@ -120,7 +119,7 @@ public class UpgradeDialog extends ZeroDialog {
         }
 
         // --- Assimilations Tab ---
-        if (colony.hasUpgrade(GameUnlocks.ABILITY_ASSIMILATION)) { 
+        if (GameUnlocks.shouldShowAssimilationUi(colony.getDynasty())) { 
             if (assimilationPanel == null) {
                 assimilationPanel = new AssimilationPanel(colony);
             }
@@ -171,7 +170,7 @@ public class UpgradeDialog extends ZeroDialog {
     private boolean tabsNeedRebuild() {
         boolean wantResearch = colony.hasUpgrade(GameUnlocks.ABILITY_RESEARCH);
         boolean wantBuild = colony.hasUpgrade(GameUnlocks.ROLE_BUILDER);
-        boolean wantAssimilation = colony.hasUpgrade(GameUnlocks.ABILITY_ASSIMILATION);
+        boolean wantAssimilation = GameUnlocks.shouldShowAssimilationUi(colony.getDynasty());
         boolean wantSynergy = colony.hasUpgrade(GameUnlocks.ABILITY_SYNERGY);
         return wantResearch != tabIndexMap.containsKey(TAB_RESEARCH)
                 || wantBuild != tabIndexMap.containsKey(TAB_BUILD)
@@ -273,30 +272,10 @@ public class UpgradeDialog extends ZeroDialog {
             if (dynasty.getCurrentAssimilation() != null) {
                 listPanel.add(createProgressPanel(dynasty.getCurrentAssimilation()));
             } else {
-                List<Assimilation> all = GameUnlocks.getAssimilations();
                 List<Assimilation> available = new ArrayList<>();
 
-                for (Assimilation a : all) {
-                    int speciesId = -1;
-                    for (AntSpecies s : GameConstants.getSpecies()) {
-                        if (s.getAssimilation() == a) {
-                            speciesId = s.getId();
-                            break;
-                        }
-                    }
-
-                    boolean completed = dynasty.isAssimilationCompleted(a);
-                    if (completed) {
-                        continue;
-                    }
-
-                    boolean isOmniKeystone = a == GameUnlocks.ASSIMILATION_OMNI;
-                    boolean defeated = speciesId != -1 && dynasty.getDefeatedSpeciesIds().contains(speciesId);
-                    boolean omniSelfAvailable = isOmniKeystone
-                            && dynasty.getSpecies() == GameConstants.SPECIES_OMNI;
-                    boolean foreignAllowed = isOmniKeystone || GameUnlocks.canAssimilateForeignSpecies(dynasty);
-
-                    if ((defeated || omniSelfAvailable) && foreignAllowed) {
+                for (Assimilation a : GameUnlocks.getAssimilations()) {
+                    if (GameUnlocks.isAssimilationAvailable(dynasty, a)) {
                         available.add(a);
                     }
                 }

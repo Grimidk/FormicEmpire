@@ -20,6 +20,41 @@ class OmniAssimilationAndCommandRolesTest {
     }
 
     @Test
+    void omniStartsWithNativeAssimilationButNoAssimilationUi() {
+        Dynasty dynasty = new Dynasty(1, "Omni", true, GameConstants.SPECIES_OMNI);
+        dynasty.getStarterService().initializeDynasty(dynasty);
+
+        assertTrue(dynasty.isAssimilationCompleted(GameUnlocks.ASSIMILATION_OMNI));
+        assertTrue(dynasty.hasUpgrade(GameUnlocks.ASSIMILATED_ASSIMILATION));
+        assertTrue(GameUnlocks.canAssimilateForeignSpecies(dynasty));
+        assertFalse(dynasty.hasUpgrade(GameUnlocks.ABILITY_ASSIMILATION));
+        assertFalse(GameUnlocks.shouldShowAssimilationUi(dynasty));
+    }
+
+    @Test
+    void assimilationUiAppearsOnlyWhenAbilityUnlockedAndGenomeAvailable() {
+        Dynasty dynasty = new Dynasty(1, "Omni", true, GameConstants.SPECIES_OMNI);
+        dynasty.getStarterService().initializeDynasty(dynasty);
+        dynasty.unlockUpgrade(GameUnlocks.ABILITY_ASSIMILATION);
+        assertFalse(GameUnlocks.shouldShowAssimilationUi(dynasty));
+
+        dynasty.absorbSpecies(GameConstants.SPECIES_LEAFCUTTER.getId());
+        assertTrue(GameUnlocks.isAssimilationAvailable(dynasty, GameUnlocks.ASSIMILATION_LEAFCUTTER));
+        assertTrue(GameUnlocks.shouldShowAssimilationUi(dynasty));
+    }
+
+    @Test
+    void leafcutterStartsWithNativeAssimilationCompleted() {
+        Dynasty dynasty = new Dynasty(2, "Leaf", false, GameConstants.SPECIES_LEAFCUTTER);
+        dynasty.getStarterService().initializeDynasty(dynasty);
+
+        assertTrue(dynasty.isAssimilationCompleted(GameUnlocks.ASSIMILATION_LEAFCUTTER));
+        assertTrue(dynasty.hasUpgrade(GameUnlocks.ASSIMILATED_FARMING));
+        assertFalse(GameUnlocks.canAssimilateForeignSpecies(dynasty));
+        assertFalse(GameUnlocks.shouldShowAssimilationUi(dynasty));
+    }
+
+    @Test
     void commanderUnlockAlsoUnlocksCaptainAndPassiveSkills() {
         Dynasty dynasty = new Dynasty(1, "Test", true, GameConstants.SPECIES_OMNI);
         dynasty.unlockUpgrade(GameUnlocks.ROLE_COMMANDER);

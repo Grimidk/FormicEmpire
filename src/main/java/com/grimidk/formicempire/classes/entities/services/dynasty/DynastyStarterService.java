@@ -15,5 +15,6 @@ public class DynastyStarterService {
                 dynasty.unlockUpgrade(upgrade);
             }
         }
+        dynasty.ensureNativeAssimilationCompleted();
     }
 }

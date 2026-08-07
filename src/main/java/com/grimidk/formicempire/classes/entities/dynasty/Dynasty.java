@@ -290,7 +290,7 @@ public class Dynasty {
                 }
             }
         }
-        
+
         if (savedDynasty.deathStatistics != null) {
             Map<String, Integer> migrated = DeathCause.migrateStatistics(savedDynasty.deathStatistics);
             if (migrated != null) {
@@ -496,6 +496,7 @@ public class Dynasty {
         
         initializeColor();
         initializeServices();
+        ensureNativeAssimilationCompleted();
 
         applyLocalizedName();
         rankUp();
@@ -668,10 +669,11 @@ public class Dynasty {
         }
         int inherited = 0;
 
-        AntSpecies species = defeated.getSpecies();
-        if (species != null) {
+        AntSpecies defeatedSpecies = defeated.getSpecies();
+        Assimilation defeatedNativeAssimilation = defeatedSpecies != null ? defeatedSpecies.getAssimilation() : null;
+        if (defeatedSpecies != null) {
             int before = defeatedSpeciesIds.size();
-            absorbSpecies(species.getId());
+            absorbSpecies(defeatedSpecies.getId());
             if (defeatedSpeciesIds.size() > before) {
                 inherited++;
             }
@@ -686,6 +688,9 @@ public class Dynasty {
         }
 
         for (Assimilation assimilation : new ArrayList<>(defeated.getCompletedAssimilations())) {
+            if (assimilation == defeatedNativeAssimilation) {
+                continue;
+            }
             if (isAssimilationCompleted(assimilation)) {
                 continue;
             }
@@ -1925,6 +1930,22 @@ public class Dynasty {
 
     public Set<Assimilation> getCompletedAssimilations() { return completedAssimilations; }
     public boolean isAssimilationCompleted(Assimilation a) { return completedAssimilations.contains(a); }
+
+    public void ensureNativeAssimilationCompleted() {
+        if (species == null) {
+            return;
+        }
+        Assimilation nativeAssimilation = species.getAssimilation();
+        if (nativeAssimilation == null) {
+            return;
+        }
+        if (!completedAssimilations.contains(nativeAssimilation)) {
+            completedAssimilations.add(nativeAssimilation);
+        }
+        if (nativeAssimilation.getReward() != null) {
+            unlockUpgrade(nativeAssimilation.getReward());
+        }
+    }
     
     public void completeAssimilation(Assimilation a) { 
         if (a != null && !completedAssimilations.contains(a)) {

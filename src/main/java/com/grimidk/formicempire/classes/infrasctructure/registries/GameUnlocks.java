@@ -1,6 +1,7 @@
 package com.grimidk.formicempire.classes.infrasctructure.registries;
 
 import com.grimidk.formicempire.classes.constants.unlocks.*;
+import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.constants.misc.Tier;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
@@ -639,6 +640,50 @@ public final class GameUnlocks {
         public static boolean canAssimilateForeignSpecies(Dynasty dynasty) {
                 return dynasty != null && (dynasty.hasUpgrade(ASSIMILATED_ASSIMILATION)
                         || dynasty.isAssimilationCompleted(ASSIMILATION_OMNI));
+        }
+
+        public static boolean isAssimilationAvailable(Dynasty dynasty, Assimilation assimilation) {
+                if (dynasty == null || assimilation == null) {
+                        return false;
+                }
+                if (dynasty.isAssimilationCompleted(assimilation) || dynasty.getCurrentAssimilation() != null) {
+                        return false;
+                }
+
+                int speciesId = -1;
+                for (AntSpecies species : GameConstants.getSpecies()) {
+                        if (species.getAssimilation() == assimilation) {
+                                speciesId = species.getId();
+                                break;
+                        }
+                }
+
+                boolean isOmniKeystone = assimilation == ASSIMILATION_OMNI;
+                boolean defeated = speciesId != -1 && dynasty.getDefeatedSpeciesIds().contains(speciesId);
+                boolean omniSelfAvailable = isOmniKeystone && dynasty.getSpecies() == GameConstants.SPECIES_OMNI;
+                boolean foreignAllowed = isOmniKeystone || canAssimilateForeignSpecies(dynasty);
+                return (defeated || omniSelfAvailable) && foreignAllowed;
+        }
+
+        public static boolean hasAssimilationUiContent(Dynasty dynasty) {
+                if (dynasty == null) {
+                        return false;
+                }
+                if (dynasty.getCurrentAssimilation() != null) {
+                        return true;
+                }
+                for (Assimilation assimilation : getAssimilations()) {
+                        if (isAssimilationAvailable(dynasty, assimilation)) {
+                                return true;
+                        }
+                }
+                return false;
+        }
+
+        public static boolean shouldShowAssimilationUi(Dynasty dynasty) {
+                return dynasty != null
+                        && dynasty.hasUpgrade(ABILITY_ASSIMILATION)
+                        && hasAssimilationUiContent(dynasty);
         }
 
         public static final Assimilation ASSIMILATION_LEAFCUTTER = new Assimilation(1, "ASSIMILATION_LEAFCUTTER", "ASSIMILATION_LEAFCUTTER_DESC", ASSIMILATED_FARMING, ASSIMILATION_COST, loadIcon("icons/assimilations/Leafcutter.png"));

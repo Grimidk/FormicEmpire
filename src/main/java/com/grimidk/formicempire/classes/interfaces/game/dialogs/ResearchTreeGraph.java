@@ -1,6 +1,5 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
-import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
 import com.grimidk.formicempire.classes.constants.unlocks.Synergy;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
@@ -10,7 +9,6 @@ import com.grimidk.formicempire.classes.entities.services.dynasty.DynastySynergy
 import com.grimidk.formicempire.classes.entities.services.shared.TriggerProgressService;
 import com.grimidk.formicempire.classes.entities.services.shared.TriggerProgressService.TriggerProgress;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
-import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 
 import java.util.ArrayList;
@@ -229,26 +227,7 @@ public final class ResearchTreeGraph {
     }
 
     private static boolean isAssimilationAvailableNow(Dynasty dynasty, Assimilation assimilation) {
-        if (dynasty == null || assimilation == null) {
-            return false;
-        }
-        if (dynasty.isAssimilationCompleted(assimilation) || dynasty.getCurrentAssimilation() != null) {
-            return false;
-        }
-
-        int speciesId = -1;
-        for (AntSpecies species : GameConstants.getSpecies()) {
-            if (species.getAssimilation() == assimilation) {
-                speciesId = species.getId();
-                break;
-            }
-        }
-
-        boolean isOmniKeystone = assimilation == GameUnlocks.ASSIMILATION_OMNI;
-        boolean defeated = speciesId != -1 && dynasty.getDefeatedSpeciesIds().contains(speciesId);
-        boolean omniSelfAvailable = isOmniKeystone && dynasty.getSpecies() == GameConstants.SPECIES_OMNI;
-        boolean foreignAllowed = isOmniKeystone || GameUnlocks.canAssimilateForeignSpecies(dynasty);
-        return (defeated || omniSelfAvailable) && foreignAllowed;
+        return GameUnlocks.isAssimilationAvailable(dynasty, assimilation);
     }
 
     public static EdgeShape classifyEdge(double fromX, double fromY, double toX, double toY) {
@@ -263,7 +242,29 @@ public final class ResearchTreeGraph {
         return EdgeShape.SKEWED;
     }
 
+    public static boolean isVisible(Colony colony, Engine engine, Upgrade upgrade) {
+        if (colony == null || upgrade == null) {
+            return false;
+        }
+        if (colony.hasUpgrade(upgrade)) {
+            return true;
+        }
+        Upgrade requirement = upgrade.getRequirement();
+        if (requirement == null) {
+            return true;
+        }
+        if (colony.hasUpgrade(requirement)) {
+            return true;
+        }
+        NodeState state = stateFor(colony, engine, upgrade);
+        return state == NodeState.TRIGGER_PROGRESS || state == NodeState.SPECIAL_PROGRESS;
+    }
+
     public static Result build(Colony colony, Engine engine) {
+        return build(colony, engine, false);
+    }
+
+    public static Result build(Colony colony, Engine engine, boolean revealAll) {
         Upgrade center = GameUnlocks.TYPE_EGG;
         Map<Upgrade, NodeState> nodeStates = new LinkedHashMap<>();
         for (Upgrade upgrade : GameUnlocks.getUpgrades()) {
@@ -276,7 +277,7 @@ public final class ResearchTreeGraph {
         }
 
         Map<Upgrade, Upgrade> parentByUpgrade = new HashMap<>();
-        List<Edge> edges = new ArrayList<>();
+        List<Edge> allEdges = new ArrayList<>();
         for (Upgrade upgrade : nodeStates.keySet()) {
             if (upgrade == center) {
                 continue;
@@ -284,37 +285,53 @@ public final class ResearchTreeGraph {
             Upgrade requirement = upgrade.getRequirement();
             if (requirement != null && nodeStates.containsKey(requirement)) {
                 parentByUpgrade.put(upgrade, requirement);
-                edges.add(new Edge(requirement, upgrade));
+                allEdges.add(new Edge(requirement, upgrade));
             } else {
                 parentByUpgrade.put(upgrade, center);
             }
         }
 
-        return layoutRadial(nodeStates, parentByUpgrade, edges, center);
-    }
-
-    public static Result refreshStates(Result previous, Colony colony, Engine engine) {
-        if (previous == null || previous.getNodes().isEmpty()) {
-            return build(colony, engine);
+        Result laidOut = layoutRadial(nodeStates, parentByUpgrade, allEdges, center);
+        boolean obscure = !revealAll && colony != null;
+        if (!obscure) {
+            return laidOut;
         }
-        List<Node> nodes = new ArrayList<>(previous.getNodes().size());
-        for (Node old : previous.getNodes()) {
-            nodes.add(new Node(
-                    old.getUpgrade(),
-                    stateFor(colony, engine, old.getUpgrade()),
-                    old.getDepth(),
-                    old.getPosX(),
-                    old.getPosY()));
+
+        Set<Upgrade> visible = new HashSet<>();
+        for (Upgrade upgrade : nodeStates.keySet()) {
+            if (isVisible(colony, engine, upgrade)) {
+                visible.add(upgrade);
+            }
+        }
+        if (!visible.contains(center)) {
+            visible.add(center);
+        }
+
+        List<Node> nodes = new ArrayList<>();
+        for (Node node : laidOut.getNodes()) {
+            if (visible.contains(node.getUpgrade())) {
+                nodes.add(node);
+            }
+        }
+        List<Edge> edges = new ArrayList<>();
+        for (Edge edge : laidOut.getEdges()) {
+            if (visible.contains(edge.getFrom()) && visible.contains(edge.getTo())) {
+                edges.add(edge);
+            }
         }
         return new Result(
                 nodes,
-                previous.getEdges(),
-                previous.getMaxDepth(),
-                previous.getCenter(),
-                previous.getMinX(),
-                previous.getMaxX(),
-                previous.getMinY(),
-                previous.getMaxY());
+                edges,
+                laidOut.getMaxDepth(),
+                laidOut.getCenter(),
+                laidOut.getMinX(),
+                laidOut.getMaxX(),
+                laidOut.getMinY(),
+                laidOut.getMaxY());
+    }
+
+    public static Result refreshStates(Result previous, Colony colony, Engine engine) {
+        return build(colony, engine);
     }
 
     private static Result emptyResult() {

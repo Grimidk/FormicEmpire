@@ -42,8 +42,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdatePanel {
 
@@ -71,6 +73,7 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
     private final DetailCard detailCard;
 
     private BuildingTreeGraph.Result graph = BuildingTreeGraph.build(null);
+    private boolean didInitialScroll;
 
     public BuildingTreePanel(Colony colony, Runnable onTreeChanged) {
         this(colony, onTreeChanged, false);
@@ -81,6 +84,7 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
         this.colony = colony;
         this.onTreeChanged = onTreeChanged;
         this.encyclopediaMode = encyclopediaMode;
+        this.didInitialScroll = false;
         setBackground(AssetStyles.BACKGROUND_COLOR);
 
         JPanel northPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -140,14 +144,17 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
     @Override
     public void updateData() {
         updateResourceLabels();
-        graph = BuildingTreeGraph.build(colony);
+        graph = BuildingTreeGraph.build(colony, encyclopediaMode);
         if (detailCard.isVisible()) {
             detailCard.refreshFromSelection();
         }
         canvas.rebuildLayout();
         canvas.revalidate();
         canvas.repaint();
-        SwingUtilities.invokeLater(canvas::scrollBasicsIntoView);
+        if (!didInitialScroll) {
+            didInitialScroll = true;
+            SwingUtilities.invokeLater(canvas::scrollBasicsIntoView);
+        }
     }
 
     @Override
@@ -521,13 +528,13 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
 
         void rebuildLayout() {
             nodeBounds.clear();
-            colorIcons.clear();
             dividerLabels.clear();
 
             if (graph.getNodes().isEmpty()) {
                 originX = PADDING;
                 originY = PADDING;
                 setPreferredSize(new Dimension(200, 80));
+                colorIcons.clear();
                 return;
             }
 
@@ -539,12 +546,16 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
             originY = PADDING + (int) Math.round((-graph.getMinY()) * UNIT_SIZE) + NODE_HIT / 2;
             setPreferredSize(new Dimension(Math.max(width, 200), Math.max(height, 200)));
 
+            Set<Building> keep = new HashSet<>();
             for (BuildingTreeGraph.Node node : graph.getNodes()) {
+                Building building = node.getBuilding();
+                keep.add(building);
                 int x = originX + (int) Math.round(node.getPosX() * UNIT_SIZE) - NODE_HIT / 2;
                 int y = originY + (int) Math.round(node.getPosY() * UNIT_SIZE) - NODE_HIT / 2;
-                nodeBounds.put(node.getBuilding(), new Rectangle(x, y, NODE_HIT, NODE_HIT));
-                colorIcons.put(node.getBuilding(), iconImage(node.getBuilding()));
+                nodeBounds.put(building, new Rectangle(x, y, NODE_HIT, NODE_HIT));
+                colorIcons.computeIfAbsent(building, this::iconImage);
             }
+            colorIcons.keySet().retainAll(keep);
 
             int lineLeft = PADDING / 2;
             for (BuildingTreeGraph.TierDivider divider : graph.getTierDividers()) {
@@ -572,11 +583,7 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
             if (icon == null || icon.getImage() == null) {
                 icon = GameConstants.ICON_UNKNOWN;
             }
-            Image image = icon.getImage();
-            if (image.getWidth(null) != NODE_SIZE || image.getHeight(null) != NODE_SIZE) {
-                return image.getScaledInstance(NODE_SIZE, NODE_SIZE, Image.SCALE_SMOOTH);
-            }
-            return image;
+            return icon.getImage();
         }
 
         private BuildingTreeGraph.Node nodeAt(Point point) {

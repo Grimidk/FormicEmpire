@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 74% (263/355 checked)
+Completion: 74% (270/363 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -190,7 +190,7 @@ Per ant type tab (Worker, Soldier, Major, Princess, Queen):
 ================================================================================
 Purchase with research points (RP). Test buy on each category:
 
-[X] Research tree: radial grid, detail card (cost/trigger when owned, wrapping name/desc), node colors (green owned, red affordable, blue trigger progress, yellow assimilation/synergy progress, grey unavailable); usable while game is running (hour liveUpdate refreshes state without rebuilding layout)
+[ ] Research tree: radial grid, detail card (cost/trigger when owned, wrapping name/desc), node colors (green owned, red affordable, blue trigger progress, yellow assimilation/synergy progress, grey unavailable); locked nodes hidden unless owned, directly after an owned node, or showing trigger/assimilation/synergy progress (stable full-tree layout; no edges to hidden nodes); Help encyclopedia reveals full tree
 
 Ant types:
 [X] Egg, Worker, Soldier, Major, Princess, Queen
@@ -248,7 +248,7 @@ Assimilated species passives (research tree):
 [ ] Farsight (Far Sight head subtype: +15% accuracy to all skills, capped at 100%)
 [X] Hivebuild, Locsense
 [ ] Acidspit (Green Ant — unlocks Acid Spitting skill)
-[ ] Assimilation / Genome Bridge (Omni — required before other species assimilations)
+[ ] Assimilation / Genome Bridge (Omni starts with it completed; still required before other species assimilations)
 
 [X] Insufficient RP blocks purchase with message
 [X] Prerequisites hide or disable locked nodes
@@ -256,7 +256,7 @@ Assimilated species passives (research tree):
 ================================================================================
 11. CONSTRUCTION (U) — UpgradeDialog Build tab
 ================================================================================
-[ ] Building tree: upward chains from basic rooms, tier divider lines, detail card (cost/requires/build), node colors (green owned, red affordable, blue in progress, grey unavailable); usable while game is running (hour liveUpdate refreshes state without rebuilding layout)
+[ ] Building tree: upward chains from basic rooms, tier divider lines only between occupied adjacent tiers, detail card (cost/requires/build), node colors (green owned, red affordable, blue in progress, grey unavailable); locked nodes hidden unless owned or directly after an owned node (stable full-tree layout; no edges to hidden nodes); Help encyclopedia reveals full tree
 
 Room upgrade chains (each tier L0→L5 where applicable; L4–L5 cost minerals + resin):
 [X] Royal Chamber
@@ -281,6 +281,7 @@ Passive / special rooms:
 12. ASSIMILATION (I) — UpgradeDialog Assimilation tab
 ================================================================================
 Start / progress assimilations (RP + time). Target RP cost scales +25% per completed assimilation (5th = 200% base). Each species:
+[ ] Species start with their native assimilation already completed (including Omni Genome Bridge); Assimilation tab/menu (I) only appears after Genetic Assimilation unlock and when a new genome is available to research
 [X] Leafcutter, Pharaoh, Marauder, Trapjaw, Honeypot, Doorhead
 [ ] Woodburrow, Silkweave, Rafting, Firevenom, Jumping
 [ ] Stinging, Swarming, Stealth, Fastbite (ants 1→2; soldiers/majors 2→4), Heatresist, Deadlyvenom
@@ -460,7 +461,7 @@ Daily:
 [ ] Bilateral Trade unlock from active trade count
 [ ] Courier / Borer role unlocks
 [ ] Assimilation ability unlock from absorbed dynasties
-[ ] Omni Assimilation (Genome Bridge) gates other species assimilations; Omni dynasty can start it without defeating Omni
+[ ] Omni starts with Genome Bridge completed; other species assimilations still gated until Genome Bridge; Assimilation UI only when a new genome is researchable
 [ ] Subtype hatch ability unlock after body-part assimilation
 [ ] Colony Operations ability unlock
 [ ] Mass Flight unlock

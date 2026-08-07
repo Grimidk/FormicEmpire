@@ -42,7 +42,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdatePanel {
 
@@ -67,6 +69,7 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
     private final DetailCard detailCard;
 
     private ResearchTreeGraph.Result graph = ResearchTreeGraph.build(null, null);
+    private boolean didInitialScroll;
 
     public ResearchTreePanel(Colony colony, Engine engine, Runnable onTreeChanged) {
         this(colony, engine, onTreeChanged, false);
@@ -78,6 +81,7 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
         this.engine = engine;
         this.onTreeChanged = onTreeChanged;
         this.encyclopediaMode = encyclopediaMode;
+        this.didInitialScroll = false;
         setBackground(AssetStyles.BACKGROUND_COLOR);
 
         researchPointsLabel = new JLabel();
@@ -124,14 +128,17 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
     @Override
     public void updateData() {
         updateResearchPointsLabel();
-        graph = ResearchTreeGraph.build(colony, engine);
+        graph = ResearchTreeGraph.build(colony, engine, encyclopediaMode);
         if (detailCard.isVisible()) {
             detailCard.refreshFromSelection();
         }
         canvas.rebuildLayout();
         canvas.revalidate();
         canvas.repaint();
-        SwingUtilities.invokeLater(canvas::scrollCenterIntoView);
+        if (!didInitialScroll) {
+            didInitialScroll = true;
+            SwingUtilities.invokeLater(canvas::scrollCenterIntoView);
+        }
     }
 
     @Override
@@ -455,12 +462,12 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
 
         void rebuildLayout() {
             nodeBounds.clear();
-            colorIcons.clear();
 
             if (graph.getNodes().isEmpty()) {
                 centerX = PADDING;
                 centerY = PADDING;
                 setPreferredSize(new Dimension(200, 80));
+                colorIcons.clear();
                 return;
             }
 
@@ -472,12 +479,16 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
             centerY = PADDING + (int) Math.round((-graph.getMinY()) * UNIT_SIZE) + NODE_HIT / 2;
             setPreferredSize(new Dimension(Math.max(width, 200), Math.max(height, 200)));
 
+            Set<Upgrade> keep = new HashSet<>();
             for (ResearchTreeGraph.Node node : graph.getNodes()) {
+                Upgrade upgrade = node.getUpgrade();
+                keep.add(upgrade);
                 int x = centerX + (int) Math.round(node.getPosX() * UNIT_SIZE) - NODE_HIT / 2;
                 int y = centerY + (int) Math.round(node.getPosY() * UNIT_SIZE) - NODE_HIT / 2;
-                nodeBounds.put(node.getUpgrade(), new Rectangle(x, y, NODE_HIT, NODE_HIT));
-                colorIcons.put(node.getUpgrade(), iconImage(node.getUpgrade()));
+                nodeBounds.put(upgrade, new Rectangle(x, y, NODE_HIT, NODE_HIT));
+                colorIcons.computeIfAbsent(upgrade, this::iconImage);
             }
+            colorIcons.keySet().retainAll(keep);
         }
 
         void scrollCenterIntoView() {
@@ -493,11 +504,7 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
             if (icon == null || icon.getImage() == null) {
                 icon = GameConstants.ICON_UNKNOWN;
             }
-            Image image = icon.getImage();
-            if (image.getWidth(null) != NODE_SIZE || image.getHeight(null) != NODE_SIZE) {
-                return image.getScaledInstance(NODE_SIZE, NODE_SIZE, Image.SCALE_SMOOTH);
-            }
-            return image;
+            return icon.getImage();
         }
 
         private ResearchTreeGraph.Node nodeAt(Point point) {

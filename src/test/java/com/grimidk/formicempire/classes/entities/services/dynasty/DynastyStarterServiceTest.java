@@ -4,6 +4,7 @@ import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -26,6 +27,8 @@ public class DynastyStarterServiceTest {
             assertTrue(dynasty.hasUpgrade(expected), 
                 "Dynasty should have unlocked upgrade: " + expected.getName());
         }
+        assertTrue(dynasty.isAssimilationCompleted(GameUnlocks.ASSIMILATION_OMNI));
+        assertTrue(dynasty.hasUpgrade(GameUnlocks.ASSIMILATED_ASSIMILATION));
     }
 
     @Test
@@ -44,5 +47,6 @@ public class DynastyStarterServiceTest {
             assertTrue(dynasty.hasUpgrade(expected), 
                 "Dynasty should have unlocked upgrade: " + expected.getName());
         }
+        assertTrue(dynasty.isAssimilationCompleted(GameUnlocks.ASSIMILATION_LEAFCUTTER));
     }
 }

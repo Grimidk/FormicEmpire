@@ -5,15 +5,18 @@ import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ResearchTreeGraphTest {
@@ -32,8 +35,8 @@ class ResearchTreeGraphTest {
     }
 
     @Test
-    void buildIncludesEveryUpgradeCenteredOnEgg() {
-        ResearchTreeGraph.Result result = ResearchTreeGraph.build(colony, null);
+    void revealAllIncludesEveryUpgradeCenteredOnEgg() {
+        ResearchTreeGraph.Result result = ResearchTreeGraph.build(colony, null, true);
 
         assertEquals(GameUnlocks.TYPE_EGG, result.getCenter());
         assertEquals(GameUnlocks.getUpgrades().size(), result.getNodes().size());
@@ -59,6 +62,106 @@ class ResearchTreeGraphTest {
     }
 
     @Test
+    void obscuredBuildKeepsStablePositionsMatchingFullLayout() {
+        ResearchTreeGraph.Result obscured = ResearchTreeGraph.build(colony, null);
+        ResearchTreeGraph.Result full = ResearchTreeGraph.build(colony, null, true);
+
+        assertEquals(full.getMinX(), obscured.getMinX(), 1e-9);
+        assertEquals(full.getMaxX(), obscured.getMaxX(), 1e-9);
+        assertEquals(full.getMinY(), obscured.getMinY(), 1e-9);
+        assertEquals(full.getMaxY(), obscured.getMaxY(), 1e-9);
+
+        Map<Upgrade, ResearchTreeGraph.Node> fullByUpgrade = full.getNodes().stream()
+                .collect(Collectors.toMap(ResearchTreeGraph.Node::getUpgrade, n -> n));
+        for (ResearchTreeGraph.Node node : obscured.getNodes()) {
+            ResearchTreeGraph.Node match = fullByUpgrade.get(node.getUpgrade());
+            assertEquals(match.getPosX(), node.getPosX(), 1e-9, node.getUpgrade().getNameKey());
+            assertEquals(match.getPosY(), node.getPosY(), 1e-9, node.getUpgrade().getNameKey());
+        }
+    }
+
+    @Test
+    void obscuredBuildShowsOwnedAndDirectChildrenOnly() {
+        ResearchTreeGraph.Result result = ResearchTreeGraph.build(colony, null);
+
+        Set<Upgrade> visible = result.getNodes().stream()
+                .map(ResearchTreeGraph.Node::getUpgrade)
+                .collect(Collectors.toSet());
+        assertTrue(visible.contains(GameUnlocks.TYPE_EGG));
+        assertTrue(visible.contains(GameUnlocks.TYPE_WORKER));
+        assertTrue(visible.contains(GameUnlocks.ROLE_BUILDER));
+        assertFalse(visible.contains(GameUnlocks.ABILITY_BUILD));
+        assertTrue(result.getNodes().size() < GameUnlocks.getUpgrades().size());
+
+        assertFalse(result.getEdges().stream().anyMatch(edge ->
+                edge.getTo() == GameUnlocks.ABILITY_BUILD));
+    }
+
+    @Test
+    void triggerProgressShowsPastUnlockFrontier() {
+        assertFalse(colony.hasUpgrade(GameUnlocks.ROLE_RESEARCHER));
+        colony.setResearchPoints(GameNumbers.TRIGGER_RESEARCH_MIN_RP);
+
+        assertEquals(
+                ResearchTreeGraph.NodeState.TRIGGER_PROGRESS,
+                ResearchTreeGraph.stateFor(colony, null, GameUnlocks.ABILITY_RESEARCH));
+        assertTrue(ResearchTreeGraph.isVisible(colony, null, GameUnlocks.ABILITY_RESEARCH));
+
+        ResearchTreeGraph.Result result = ResearchTreeGraph.build(colony, null);
+        assertTrue(result.getNodes().stream()
+                .anyMatch(n -> n.getUpgrade() == GameUnlocks.ABILITY_RESEARCH));
+    }
+
+    @Test
+    void unlockingDoesNotMoveExistingNodes() {
+        ResearchTreeGraph.Result before = ResearchTreeGraph.build(colony, null);
+        Map<Upgrade, double[]> positions = before.getNodes().stream()
+                .collect(Collectors.toMap(
+                        ResearchTreeGraph.Node::getUpgrade,
+                        n -> new double[] {n.getPosX(), n.getPosY()}));
+
+        colony.unlockUpgrade(GameUnlocks.ROLE_BUILDER);
+        ResearchTreeGraph.Result after = ResearchTreeGraph.build(colony, null);
+        for (ResearchTreeGraph.Node node : after.getNodes()) {
+            double[] prior = positions.get(node.getUpgrade());
+            if (prior == null) {
+                continue;
+            }
+            assertEquals(prior[0], node.getPosX(), 1e-9, node.getUpgrade().getNameKey());
+            assertEquals(prior[1], node.getPosY(), 1e-9, node.getUpgrade().getNameKey());
+        }
+    }
+
+    @Test
+    void assimilationProgressShowsPastUnlockFrontier() {
+        assertFalse(colony.hasUpgrade(GameUnlocks.ABILITY_ASSIMILATION));
+        dynasty.setCurrentAssimilation(GameUnlocks.ASSIMILATION_LEAFCUTTER);
+
+        assertEquals(
+                ResearchTreeGraph.NodeState.SPECIAL_PROGRESS,
+                ResearchTreeGraph.stateFor(colony, null, GameUnlocks.ASSIMILATED_FARMING));
+        assertTrue(ResearchTreeGraph.isVisible(colony, null, GameUnlocks.ASSIMILATED_FARMING));
+
+        ResearchTreeGraph.Result result = ResearchTreeGraph.build(colony, null);
+        assertTrue(result.getNodes().stream()
+                .anyMatch(n -> n.getUpgrade() == GameUnlocks.ASSIMILATED_FARMING));
+    }
+
+    @Test
+    void unlockingRevealsNextFrontier() {
+        colony.unlockUpgrade(GameUnlocks.ROLE_BUILDER);
+        ResearchTreeGraph.Result result = ResearchTreeGraph.build(colony, null);
+
+        Set<Upgrade> visible = result.getNodes().stream()
+                .map(ResearchTreeGraph.Node::getUpgrade)
+                .collect(Collectors.toSet());
+        assertTrue(visible.contains(GameUnlocks.ABILITY_BUILD));
+        assertTrue(result.getEdges().stream().anyMatch(edge ->
+                edge.getFrom() == GameUnlocks.ROLE_BUILDER
+                        && edge.getTo() == GameUnlocks.ABILITY_BUILD));
+    }
+
+    @Test
     void statesCoverOwnedAffordableUnavailableAndTriggerProgress() {
         colony.unlockUpgrade(GameUnlocks.TYPE_SOLDIER);
         colony.setResearchPoints(0);
@@ -81,16 +184,18 @@ class ResearchTreeGraphTest {
     }
 
     @Test
-    void edgesFollowDirectRequirements() {
+    void edgesFollowDirectRequirementsAmongVisibleNodes() {
         ResearchTreeGraph.Result result = ResearchTreeGraph.build(colony, null);
 
         boolean workerEdge = result.getEdges().stream().anyMatch(edge ->
                 edge.getFrom() == GameUnlocks.TYPE_EGG
                         && edge.getTo() == GameUnlocks.TYPE_WORKER);
-        boolean researchEdge = result.getEdges().stream().anyMatch(edge ->
+        assertTrue(workerEdge);
+
+        ResearchTreeGraph.Result revealed = ResearchTreeGraph.build(colony, null, true);
+        boolean researchEdge = revealed.getEdges().stream().anyMatch(edge ->
                 edge.getFrom() == GameUnlocks.STAT_RESEARCH_1
                         && edge.getTo() == GameUnlocks.STAT_RESEARCH_2);
-        assertTrue(workerEdge);
         assertTrue(researchEdge);
     }
 
@@ -139,22 +244,20 @@ class ResearchTreeGraphTest {
     }
 
     @Test
-    void refreshStatesKeepsLayoutAndUpdatesOwned() {
+    void refreshStatesRebuildsFrontierAfterUnlock() {
         ResearchTreeGraph.Result before = ResearchTreeGraph.build(colony, null);
+        assertFalse(before.getNodes().stream()
+                .anyMatch(n -> n.getUpgrade() == GameUnlocks.ABILITY_BUILD));
+
         colony.unlockUpgrade(GameUnlocks.ROLE_BUILDER);
         ResearchTreeGraph.Result after = ResearchTreeGraph.refreshStates(before, colony, null);
 
-        assertEquals(before.getNodes().size(), after.getNodes().size());
-        assertEquals(before.getEdges().size(), after.getEdges().size());
-        for (int i = 0; i < before.getNodes().size(); i++) {
-            assertEquals(before.getNodes().get(i).getUpgrade(), after.getNodes().get(i).getUpgrade());
-            assertEquals(before.getNodes().get(i).getPosX(), after.getNodes().get(i).getPosX(), 1e-9);
-            assertEquals(before.getNodes().get(i).getPosY(), after.getNodes().get(i).getPosY(), 1e-9);
-        }
         ResearchTreeGraph.Node builder = after.getNodes().stream()
                 .filter(n -> n.getUpgrade() == GameUnlocks.ROLE_BUILDER)
                 .findFirst()
                 .orElseThrow();
         assertEquals(ResearchTreeGraph.NodeState.OWNED, builder.getState());
+        assertTrue(after.getNodes().stream()
+                .anyMatch(n -> n.getUpgrade() == GameUnlocks.ABILITY_BUILD));
     }
 }

@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -32,8 +33,8 @@ class BuildingTreeGraphTest {
     }
 
     @Test
-    void buildIncludesEveryBuildingUnderBasicRoots() {
-        BuildingTreeGraph.Result result = BuildingTreeGraph.build(colony);
+    void revealAllIncludesEveryBuildingUnderBasicRoots() {
+        BuildingTreeGraph.Result result = BuildingTreeGraph.build(colony, true);
 
         assertEquals(GameUnlocks.getBuildings().size(), result.getNodes().size());
         assertFalse(result.getRoots().isEmpty());
@@ -54,7 +55,81 @@ class BuildingTreeGraphTest {
     }
 
     @Test
+    void obscuredBuildShowsOwnedAndDirectChildrenOnly() {
+        BuildingTreeGraph.Result result = BuildingTreeGraph.build(colony);
+
+        Set<Building> visible = result.getNodes().stream()
+                .map(BuildingTreeGraph.Node::getBuilding)
+                .collect(Collectors.toSet());
+        assertTrue(visible.contains(GameUnlocks.ROYAL_CHAMBER_0));
+        assertTrue(visible.contains(GameUnlocks.ROYAL_CHAMBER_1));
+        assertFalse(visible.contains(GameUnlocks.ROYAL_CHAMBER_2));
+        assertFalse(visible.contains(GameUnlocks.PASSIVE_LAB));
+        assertTrue(result.getNodes().size() < GameUnlocks.getBuildings().size());
+        assertTrue(result.getEdges().stream().noneMatch(edge ->
+                edge.getTo() == GameUnlocks.ROYAL_CHAMBER_2
+                        || edge.getTo() == GameUnlocks.PASSIVE_LAB));
+    }
+
+    @Test
+    void obscuredBuildKeepsStablePositionsMatchingFullLayout() {
+        BuildingTreeGraph.Result obscured = BuildingTreeGraph.build(colony);
+        BuildingTreeGraph.Result full = BuildingTreeGraph.build(colony, true);
+
+        assertEquals(full.getMinX(), obscured.getMinX(), 1e-9);
+        assertEquals(full.getMaxX(), obscured.getMaxX(), 1e-9);
+        assertEquals(full.getMinY(), obscured.getMinY(), 1e-9);
+        assertEquals(full.getMaxY(), obscured.getMaxY(), 1e-9);
+
+        Map<Building, BuildingTreeGraph.Node> fullByBuilding = full.getNodes().stream()
+                .collect(Collectors.toMap(BuildingTreeGraph.Node::getBuilding, n -> n));
+        for (BuildingTreeGraph.Node node : obscured.getNodes()) {
+            BuildingTreeGraph.Node match = fullByBuilding.get(node.getBuilding());
+            assertEquals(match.getPosX(), node.getPosX(), 1e-9, node.getBuilding().getNameKey());
+            assertEquals(match.getPosY(), node.getPosY(), 1e-9, node.getBuilding().getNameKey());
+        }
+    }
+
+    @Test
+    void unlockingDoesNotMoveExistingNodes() {
+        BuildingTreeGraph.Result before = BuildingTreeGraph.build(colony);
+        Map<Building, double[]> positions = before.getNodes().stream()
+                .collect(Collectors.toMap(
+                        BuildingTreeGraph.Node::getBuilding,
+                        n -> new double[] {n.getPosX(), n.getPosY()}));
+
+        colony.unlockBuilding(GameUnlocks.ROYAL_CHAMBER_1);
+        BuildingTreeGraph.Result after = BuildingTreeGraph.build(colony);
+        for (BuildingTreeGraph.Node node : after.getNodes()) {
+            double[] prior = positions.get(node.getBuilding());
+            if (prior == null) {
+                continue;
+            }
+            assertEquals(prior[0], node.getPosX(), 1e-9, node.getBuilding().getNameKey());
+            assertEquals(prior[1], node.getPosY(), 1e-9, node.getBuilding().getNameKey());
+        }
+    }
+
+    @Test
+    void unlockingRevealsDirectChildrenAndEdges() {
+        colony.unlockBuilding(GameUnlocks.ROYAL_CHAMBER_1);
+        BuildingTreeGraph.Result result = BuildingTreeGraph.build(colony);
+
+        Set<Building> visible = result.getNodes().stream()
+                .map(BuildingTreeGraph.Node::getBuilding)
+                .collect(Collectors.toSet());
+        assertTrue(visible.contains(GameUnlocks.ROYAL_CHAMBER_2));
+        assertTrue(visible.contains(GameUnlocks.PASSIVE_LAB));
+        assertFalse(visible.contains(GameUnlocks.ROYAL_CHAMBER_3));
+
+        assertTrue(result.getEdges().stream().anyMatch(edge ->
+                edge.getFrom() == GameUnlocks.ROYAL_CHAMBER_1
+                        && edge.getTo() == GameUnlocks.PASSIVE_LAB));
+    }
+
+    @Test
     void edgesPointFromRequirementToChild() {
+        colony.unlockBuilding(GameUnlocks.ROYAL_CHAMBER_1);
         BuildingTreeGraph.Result result = BuildingTreeGraph.build(colony);
         boolean royalEdge = result.getEdges().stream().anyMatch(edge ->
                 edge.getFrom() == GameUnlocks.ROYAL_CHAMBER_0
@@ -68,6 +143,7 @@ class BuildingTreeGraphTest {
 
     @Test
     void higherTiersSitAboveBasics() {
+        colony.unlockBuilding(GameUnlocks.ROYAL_CHAMBER_1);
         BuildingTreeGraph.Result result = BuildingTreeGraph.build(colony);
         BuildingTreeGraph.Node basic = result.getNodes().stream()
                 .filter(n -> n.getBuilding() == GameUnlocks.ROYAL_CHAMBER_0)
@@ -81,11 +157,31 @@ class BuildingTreeGraphTest {
     }
 
     @Test
-    void tierDividersSeparateConsecutiveTiers() {
+    void tierDividersOnlyBetweenOccupiedAdjacentTiers() {
         BuildingTreeGraph.Result result = BuildingTreeGraph.build(colony);
         assertFalse(result.getTierDividers().isEmpty());
         for (BuildingTreeGraph.TierDivider divider : result.getTierDividers()) {
             assertTrue(divider.getPosY() < 0);
+        }
+
+        Set<Integer> occupied = result.getNodes().stream()
+                .map(BuildingTreeGraph.Node::getTierIndex)
+                .collect(Collectors.toSet());
+        for (BuildingTreeGraph.TierDivider divider : result.getTierDividers()) {
+            int upper = divider.getUpperTier();
+            assertTrue(occupied.contains(upper));
+            assertTrue(occupied.contains(upper - 1));
+        }
+
+        colony.unlockBuilding(GameUnlocks.ROYAL_CHAMBER_1);
+        BuildingTreeGraph.Result deeper = BuildingTreeGraph.build(colony);
+        Set<Integer> deeperOccupied = deeper.getNodes().stream()
+                .map(BuildingTreeGraph.Node::getTierIndex)
+                .collect(Collectors.toSet());
+        for (BuildingTreeGraph.TierDivider divider : deeper.getTierDividers()) {
+            int upper = divider.getUpperTier();
+            assertTrue(deeperOccupied.contains(upper));
+            assertTrue(deeperOccupied.contains(upper - 1));
         }
     }
 
@@ -100,7 +196,6 @@ class BuildingTreeGraphTest {
 
     @Test
     void ownedAndUnavailableStates() {
-        colony.unlockBuilding(GameUnlocks.ROYAL_CHAMBER_0);
         assertEquals(
                 BuildingTreeGraph.NodeState.OWNED,
                 BuildingTreeGraph.stateFor(colony, GameUnlocks.ROYAL_CHAMBER_0));
@@ -110,22 +205,20 @@ class BuildingTreeGraphTest {
     }
 
     @Test
-    void refreshStatesKeepsLayoutAndUpdatesOwned() {
+    void refreshStatesRebuildsFrontierAfterUnlock() {
         BuildingTreeGraph.Result before = BuildingTreeGraph.build(colony);
-        colony.unlockBuilding(GameUnlocks.ROYAL_CHAMBER_0);
+        assertFalse(before.getNodes().stream()
+                .anyMatch(n -> n.getBuilding() == GameUnlocks.ROYAL_CHAMBER_2));
+
+        colony.unlockBuilding(GameUnlocks.ROYAL_CHAMBER_1);
         BuildingTreeGraph.Result after = BuildingTreeGraph.refreshStates(before, colony);
 
-        assertEquals(before.getNodes().size(), after.getNodes().size());
-        assertEquals(before.getEdges().size(), after.getEdges().size());
-        for (int i = 0; i < before.getNodes().size(); i++) {
-            assertEquals(before.getNodes().get(i).getBuilding(), after.getNodes().get(i).getBuilding());
-            assertEquals(before.getNodes().get(i).getPosX(), after.getNodes().get(i).getPosX(), 1e-9);
-            assertEquals(before.getNodes().get(i).getPosY(), after.getNodes().get(i).getPosY(), 1e-9);
-        }
         BuildingTreeGraph.Node owned = after.getNodes().stream()
-                .filter(n -> n.getBuilding() == GameUnlocks.ROYAL_CHAMBER_0)
+                .filter(n -> n.getBuilding() == GameUnlocks.ROYAL_CHAMBER_1)
                 .findFirst()
                 .orElseThrow();
         assertEquals(BuildingTreeGraph.NodeState.OWNED, owned.getState());
+        assertTrue(after.getNodes().stream()
+                .anyMatch(n -> n.getBuilding() == GameUnlocks.ROYAL_CHAMBER_2));
     }
 }
