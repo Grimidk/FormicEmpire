@@ -287,6 +287,9 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         if (engine.getMusicService() != null) {
             engine.getMusicService().shutdown();
         }
+        if (engine.getSfxService() != null) {
+            engine.getSfxService().shutdown();
+        }
         engine.pauseEngine();
         SaveManager.shutdownSharedExecutor();
         if (cursorEventListener != null) {
@@ -348,6 +351,9 @@ public class MainFrame extends JFrame implements TriggerManager.TriggerListener 
         }
         if (engine.getMusicService() != null) {
             engine.getMusicService().refreshVolume();
+        }
+        if (engine.getSfxService() != null) {
+            engine.getSfxService().refreshVolume();
         }
         applyTheme();
     }

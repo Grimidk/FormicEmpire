@@ -10,6 +10,7 @@ import com.grimidk.formicempire.classes.constants.critter.ant.AntType;
 import com.grimidk.formicempire.classes.constants.misc.GameSpeed;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.infrasctructure.audio.MusicService;
+import com.grimidk.formicempire.classes.infrasctructure.audio.SfxService;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
@@ -25,6 +26,7 @@ public class Engine extends Thread {
     // --- Managers ---
     private final TradeManager tradeManager;
     private final MusicService musicService;
+    private final SfxService sfxService;
 
     // --- Listeners ---
     private final CopyOnWriteArrayList<Runnable> minuteTickListeners = new CopyOnWriteArrayList<>();
@@ -80,6 +82,7 @@ public class Engine extends Thread {
         this.settingsSaveManager = new SaveManager();
         this.loadGlobalSettings();
         this.musicService = new MusicService(this);
+        this.sfxService = new SfxService(this);
     }
 
     public TradeManager getTradeManager() {
@@ -88,6 +91,10 @@ public class Engine extends Thread {
 
     public MusicService getMusicService() {
         return musicService;
+    }
+
+    public SfxService getSfxService() {
+        return sfxService;
     }
 
     public SaveManager getSaveManager() {
@@ -425,6 +432,9 @@ public class Engine extends Thread {
         if (musicService != null) {
             musicService.refreshVolume();
         }
+        if (sfxService != null) {
+            sfxService.refreshVolume();
+        }
     }
 
     public int getMusicVolume() {
@@ -444,6 +454,9 @@ public class Engine extends Thread {
 
     public void setSfxVolume(int sfxVolume) {
         this.sfxVolume = sfxVolume;
+        if (sfxService != null) {
+            sfxService.refreshVolume();
+        }
     }
 
     public boolean isMusicMuted() {

@@ -9,11 +9,13 @@ import com.grimidk.formicempire.classes.entities.dynasty.War;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyMilitaryService;
 import com.grimidk.formicempire.classes.entities.services.colony.ColonyStarterService;
 import com.grimidk.formicempire.classes.entities.services.shared.WarCombatSkillService;
+import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.infrasctructure.World;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.ColonyLogPrefixes;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
+import com.grimidk.formicempire.classes.infrasctructure.registries.SoundEffects;
 import com.grimidk.formicempire.classes.infrasctructure.util.GameRandom;
 
 import java.util.List;
@@ -393,9 +395,11 @@ public final class WarProgressService {
         ColonyMilitaryService.refreshDynastyMilitaryPower(stageAttacker);
         ColonyMilitaryService.refreshDynastyMilitaryPower(stageDefender);
         if (outcome == WarCreatureCombatService.TickOutcome.ATTACKER_WINS) {
+            playBattleFinishedSfx(world, war);
             war.setDeployedActiveDefender(0);
             beginReserveAssault(world, war, stageAttacker, stageDefender);
         } else if (outcome == WarCreatureCombatService.TickOutcome.DEFENDER_WINS) {
+            playBattleFinishedSfx(world, war);
             war.setDeployedActiveAttacker(0);
             beginReserveAssault(world, war, stageAttacker, stageDefender);
         }
@@ -447,10 +451,12 @@ public final class WarProgressService {
         ColonyMilitaryService.refreshDynastyMilitaryPower(stageDefender);
 
         if (outcome == WarCreatureCombatService.TickOutcome.ATTACKER_WINS) {
+            playBattleFinishedSfx(world, war);
             WarCreatureCombatService.clear(war);
             completeStage(world, warService, war, aggressor, defender, stageAttacker,
                     contested.getDynasty(), contested, StageOutcome.CAPTURE, true);
         } else if (outcome == WarCreatureCombatService.TickOutcome.DEFENDER_WINS) {
+            playBattleFinishedSfx(world, war);
             WarCreatureCombatService.clear(war);
             completeStage(world, warService, war, aggressor, defender, stageAttacker,
                     contested.getDynasty(), contested, StageOutcome.DEFENDER_HOLD, true);
@@ -1019,6 +1025,21 @@ public final class WarProgressService {
         static BattleTickResult none() {
             return new BattleTickResult(0, 0);
         }
+    }
+
+    private static void playBattleFinishedSfx(World world, War war) {
+        if (world == null || war == null) {
+            return;
+        }
+        Dynasty player = findPlayerDynasty(world);
+        if (player == null || !war.involves(player.getId())) {
+            return;
+        }
+        Engine engine = world.getEngine();
+        if (engine == null || engine.getSfxService() == null) {
+            return;
+        }
+        engine.getSfxService().playEffect(SoundEffects.BATTLE);
     }
 
     private static void notifyPlayerWarStageComplete(World world, War war, Dynasty victor,

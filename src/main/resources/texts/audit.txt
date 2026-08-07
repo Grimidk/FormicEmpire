@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 74% (270/363 checked)
+Completion: 74% (270/366 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -49,6 +49,9 @@ Video:
 
 Audio:
 [X] Master / music / SFX volume sliders
+[ ] Popup SFX on UiOptionPane dialogs (master × SFX volume; one SFX at a time)
+[ ] Spinner up/down SFX on spinner step buttons
+[ ] Battle finished SFX when a player-involved war battle resolves
 [X] Reset tab to defaults
 
 Roles (default hatch roles for new ants):

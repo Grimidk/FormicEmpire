@@ -14,11 +14,11 @@ class MusicTracksTest {
     @Test
     void registryIncludesPlaylistSampleAndMainMenu() {
         assertFalse(MusicTracks.getTracks().isEmpty());
-        MusicTrack sample = MusicTracks.getById("sample1");
+        MusicTrack sample = MusicTracks.getById("freshOne");
         assertNotNull(sample);
-        assertEquals("Sample 1", sample.getDisplayName());
+        assertEquals("Fresh One", sample.getDisplayName());
         assertTrue(sample.isResourcePresent());
-        assertEquals("/audio/music/base/sample1.mp3", sample.getResourcePath());
+        assertEquals("/audio/music/base/freshOne.mp3", sample.getResourcePath());
         assertFalse(MusicTracks.getPlayableSessionTracks().isEmpty());
 
         MusicTrack mainMenu = MusicTracks.getById(MusicTrack.MAIN_MENU_ID);

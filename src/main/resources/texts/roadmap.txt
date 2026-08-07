@@ -4,7 +4,7 @@ To Fix (By decreasing priority):
 	Game Breaking:
 		(none right now)
 	High:
-		3 songs (menu, peace, war) and effects (game start, war start, trigger triggering, spinner up and down)
+		1 menu song
 	Mid:
 		TODO: icons for stats (Skeleton, Acid, Longevity, Research/Growth/Thirst/Laying/Scouting/Farming/Contamination/Graving/Policing 1–3, Logistics 1, Passive 1, Symbiotic Mite 1, Dermestid 1, Hex Sustain, Worker Speed 2, Health/Attack/Defense 1–2, Attack Speed 1)
 		TODO: icons for buildings under icons/buildings/ (Royal/Egg/Mushroom/Plant/Water/Meat/Syrup/Rock/Resin L0–L5, Passive Lab/Water/Aphid/Nurse/Farm/Grave, Composter) — separate from sprites/buildings/rooms/
@@ -16,6 +16,7 @@ To Fix (By decreasing priority):
 	Important not Urgent:
 		map hexes look kinda yank
 		Font - self explanatory
+		check full screen and game focus mode
 
 To Feature (to be done in priority order by blocks):
 Needed for launch (v1.0) (Launch Version):

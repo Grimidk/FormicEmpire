@@ -212,6 +212,36 @@ public class StatsDialog extends ZeroDialog {
         AssetStyles.applyTableColumnAlignment(table, columnIndex, SwingConstants.RIGHT);
     }
 
+    private static void applyFormattedValueColumnRenderer(JTable table, int columnIndex, int alignment) {
+        if (table == null || columnIndex < 0 || columnIndex >= table.getColumnCount()) {
+            return;
+        }
+        table.getColumnModel().getColumn(columnIndex).setCellRenderer(new FormattedValueCellRenderer(alignment));
+        AssetStyles.applyTableColumnAlignment(table, columnIndex, alignment);
+    }
+
+    private static final class FormattedValueCellRenderer extends UiTableStyles.TooltipCellRenderer {
+        private final int alignment;
+
+        private FormattedValueCellRenderer(int alignment) {
+            this.alignment = alignment;
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                boolean hasFocus, int row, int column) {
+            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            setHorizontalAlignment(alignment);
+            if (value instanceof Number number) {
+                setText(AssetStyles.formatNumber(number));
+            } else {
+                setText(value != null ? value.toString() : "");
+            }
+            updateTruncationTooltip(table, column);
+            return this;
+        }
+    }
+
     private static void applyGeneralValueRenderer(JTable table) {
         if (table == null || table.getColumnCount() < 3) {
             return;
@@ -349,7 +379,7 @@ public class StatsDialog extends ZeroDialog {
         applyIconColumnRenderer(dynastyTable, 0);
         applyTextColumnRenderer(dynastyTable, 1, SwingConstants.LEFT);
         applyTextColumnRenderer(dynastyTable, 2, SwingConstants.LEFT);
-        applyTextColumnRenderer(dynastyTable, 3, SwingConstants.LEFT);
+        applyFormattedValueColumnRenderer(dynastyTable, 3, SwingConstants.LEFT);
         
         dynastyScrollPane = createTablePane(dynastyTable);
         tabbedPane.addTab(LanguageStrings.get(LanguageStrings.STATS_TAB_DYNASTY), dynastyScrollPane);
@@ -421,7 +451,7 @@ public class StatsDialog extends ZeroDialog {
         applyTextColumnRenderer(populationTable, 1, SwingConstants.LEFT);
         applyTextColumnRenderer(populationTable, 2, SwingConstants.LEFT);
         applyNumericColumnRenderer(populationTable, 3);
-        applyTextColumnRenderer(populationTable, 4, SwingConstants.LEFT);
+        applyFormattedValueColumnRenderer(populationTable, 4, SwingConstants.LEFT);
 
         populationScrollPane = createTablePane(populationTable);
         tabbedPane.addTab(LanguageStrings.get(LanguageStrings.STATS_TAB_POPULATION), populationScrollPane);
@@ -432,7 +462,7 @@ public class StatsDialog extends ZeroDialog {
         localHexTable = new JTable(createIconModel(columns));
         applyTextColumnRenderer(localHexTable, 0, SwingConstants.LEFT);
         applyTextColumnRenderer(localHexTable, 1, SwingConstants.LEFT);
-        applyTextColumnRenderer(localHexTable, 2, SwingConstants.LEFT);
+        applyFormattedValueColumnRenderer(localHexTable, 2, SwingConstants.LEFT);
         localHexScrollPane = createTablePane(localHexTable);
         tabbedPane.addTab(LanguageStrings.get(LanguageStrings.STATS_TAB_LOCAL_HEX), localHexScrollPane);
     }
@@ -535,8 +565,8 @@ public class StatsDialog extends ZeroDialog {
                 ? GameNumbers.GATHER_FULL_EFFICIENCY_RADIUS_BASE
                 : locations.computeFullEfficiencyRadius(colony, sampleWorker);
         model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_CAT_OVERWORLD), LanguageStrings.get(LanguageStrings.STAT_HEX_DEPLETION), depletionPct + "%"});
-        model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_CAT_OVERWORLD), LanguageStrings.get(LanguageStrings.STAT_HEX_SOURCES_FOUND), String.valueOf(sourcesFound)});
-        model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_CAT_OVERWORLD), LanguageStrings.get(LanguageStrings.STAT_HEX_MAX_EFFICIENCY_DISTANCE), String.format("%.0f", maxEffDistance)});
+        model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_CAT_OVERWORLD), LanguageStrings.get(LanguageStrings.STAT_HEX_SOURCES_FOUND), sourcesFound});
+        model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.STAT_CAT_OVERWORLD), LanguageStrings.get(LanguageStrings.STAT_HEX_MAX_EFFICIENCY_DISTANCE), AssetStyles.formatNumber(maxEffDistance)});
 
         // Neighbors
         model.addRow(new Object[]{null, null, sep, sep});
@@ -579,8 +609,8 @@ public class StatsDialog extends ZeroDialog {
             model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_COLONY), LanguageStrings.get(LanguageStrings.COL_VALUE), colony.getRank().getName()});
             model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_COLONY), LanguageStrings.get(LanguageStrings.COL_VALUE), colony.getSpecies() != null ? colony.getSpecies().getName() : LanguageStrings.get(LanguageStrings.STAT_UNKNOWN)});
             model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_COLONY), LanguageStrings.get(LanguageStrings.STAT_SPECIES_SCIENTIFIC), colony.getSpecies() != null ? colony.getSpecies().getScientific() : LanguageStrings.get(LanguageStrings.STAT_UNKNOWN)});
-            model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_COLONY), LanguageStrings.get(LanguageStrings.STAT_LABEL_ID), colony.getId()});
-            model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_COLONY), LanguageStrings.get(LanguageStrings.STAT_AGE), colony.getAge() + LanguageStrings.get(LanguageStrings.STAT_DAYS_SUFFIX)});
+            model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_COLONY), LanguageStrings.get(LanguageStrings.STAT_LABEL_ID), String.valueOf(colony.getId())});
+            model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_COLONY), LanguageStrings.get(LanguageStrings.STAT_AGE), AssetStyles.formatNumber(colony.getAge()) + LanguageStrings.get(LanguageStrings.STAT_DAYS_SUFFIX)});
 
             int effectiveLoyalty = colony.getEffectiveLoyalty(engine.getTradeManager(), engine.getWorld());
             model.addRow(new Object[]{
@@ -595,9 +625,9 @@ public class StatsDialog extends ZeroDialog {
             });
             
             if (colony.getQueens().isEmpty()) {
-                model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_COLONY), LanguageStrings.get(LanguageStrings.STAT_QUEEN_STATUS), LanguageStrings.get(LanguageStrings.UI_MISSING) + " (" + colony.getDaysWithoutQueen() + LanguageStrings.get(LanguageStrings.STAT_DAYS_SUFFIX) + ")"});
+                model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_COLONY), LanguageStrings.get(LanguageStrings.STAT_QUEEN_STATUS), LanguageStrings.get(LanguageStrings.UI_MISSING) + " (" + AssetStyles.formatNumber(colony.getDaysWithoutQueen()) + LanguageStrings.get(LanguageStrings.STAT_DAYS_SUFFIX) + ")"});
             } else {
-                model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_COLONY), LanguageStrings.get(LanguageStrings.STAT_QUEEN_STATUS), LanguageStrings.get(LanguageStrings.UI_HEALTHY) + " (" + colony.getQueens().size() + " " + LanguageStrings.get(LanguageStrings.UI_TOTAL) + ")"});
+                model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_COLONY), LanguageStrings.get(LanguageStrings.STAT_QUEEN_STATUS), LanguageStrings.get(LanguageStrings.UI_HEALTHY) + " (" + AssetStyles.formatNumber(colony.getQueens().size()) + " " + LanguageStrings.get(LanguageStrings.UI_TOTAL) + ")"});
             }
 
             model.addRow(new Object[]{LanguageStrings.get(LanguageStrings.PANEL_COLONY), LanguageStrings.get(LanguageStrings.STAT_AUTOMATION), colony.isAutomationEnabled() ? LanguageStrings.get(LanguageStrings.UI_ENABLED) : LanguageStrings.get(LanguageStrings.UI_DISABLED)});
@@ -852,20 +882,20 @@ public class StatsDialog extends ZeroDialog {
 
         model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_TABLE_SEPARATOR), "---", "---", "---", "---", "---", "---"});
         int netFood = prodMushrooms - consMushrooms;
-        model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_TOTAL_FOOD), "---", "---", "---", prodMushrooms, consMushrooms, (netFood >= 0 ? "+" : "") + netFood});
+        model.addRow(new Object[]{null, LanguageStrings.get(LanguageStrings.STAT_TOTAL_FOOD), "---", "---", "---", prodMushrooms, consMushrooms, AssetStyles.formatSignedNumber(netFood)});
         if (subtypeFoodOverhead > 0) {
             model.addRow(new Object[]{GameConstants.ICON_STAT_FOOD_CONSUMPTION, LanguageStrings.get(LanguageStrings.STAT_SUBTYPE_FOOD_OVERHEAD),
-                    "---", "---", "---", "---", subtypeFoodOverhead, "+" + subtypeFoodOverhead});
+                    "---", "---", "---", "---", subtypeFoodOverhead, AssetStyles.formatSignedNumber(subtypeFoodOverhead)});
         }
     }
 
     private void addResourceRow(DefaultTableModel model, ImageIcon icon, String name, int current, int cap, int sources, int maxSources, int production, int consumption) {
         String sourceStr = (maxSources > 0) ? AssetStyles.formatRatio(sources, maxSources) : LanguageStrings.get(LanguageStrings.WORLD_NA);
-        String prodStr = String.valueOf(production);
-        String consStr = String.valueOf(consumption);
+        String prodStr = AssetStyles.formatNumber(production);
+        String consStr = AssetStyles.formatNumber(consumption);
         
         int net = production - consumption;
-        String netStr = (net >= 0 ? "+" : "") + net;
+        String netStr = AssetStyles.formatSignedNumber(net);
         
         if (name.equals(LanguageStrings.get(LanguageStrings.RESOURCE_SYRUP)) || name.equals(LanguageStrings.get(LanguageStrings.RESOURCE_RESIN))) {
             if (production == 0 && consumption == 0) {
@@ -1080,12 +1110,12 @@ public class StatsDialog extends ZeroDialog {
                 model.addRow(new Object[]{null, sep, sep, sep, sep});
             }
             if (showParasitic) {
-                String rateCol = String.format(
-                        LanguageStrings.get(LanguageStrings.STAT_INSECT_PARASITIC_KILL_FMT),
+                String rateCol = LanguageStrings.format(
+                        LanguageStrings.STAT_INSECT_PARASITIC_KILL_FMT,
                         slowedAnts, parasiticKillPerDay);
                 if (projectedParasiticMiteSpawn > 0) {
-                    String prevention = String.format(
-                            LanguageStrings.get(LanguageStrings.STAT_OUTBREAK_PREV_FMT),
+                    String prevention = LanguageStrings.format(
+                            LanguageStrings.STAT_OUTBREAK_PREV_FMT,
                             symbioticMitesForPrevention, requiredSymbioticMites, projectedParasiticMiteSpawn);
                     if (symbioticMitesForPrevention >= requiredSymbioticMites) {
                         prevention = LanguageStrings.get(LanguageStrings.STAT_OUTBREAK_PREV_BLOCKED) + " — " + prevention;
@@ -1205,8 +1235,8 @@ public class StatsDialog extends ZeroDialog {
                     : LanguageStrings.format(LanguageStrings.STAT_RATE_PARASITE_ANTS_FMT, parasiteAnts);
             String rateCol = LanguageStrings.format(LanguageStrings.STAT_RATE_DET_DAY, dailyDetect);
             if (projectedParasiteAntSpawn > 0) {
-                String prevention = String.format(
-                        LanguageStrings.get(LanguageStrings.STAT_OUTBREAK_PREV_FMT),
+                String prevention = LanguageStrings.format(
+                        LanguageStrings.STAT_OUTBREAK_PREV_FMT,
                         police, requiredPoliceForPrevention, projectedParasiteAntSpawn);
                 if (police >= requiredPoliceForPrevention) {
                     prevention = LanguageStrings.get(LanguageStrings.STAT_OUTBREAK_PREV_BLOCKED) + " — " + prevention;

@@ -1,11 +1,15 @@
 package com.grimidk.formicempire.classes.interfaces.ui.plaf;
 
+import com.grimidk.formicempire.classes.infrasctructure.audio.SfxService;
+import com.grimidk.formicempire.classes.infrasctructure.audio.SoundEffect;
+import com.grimidk.formicempire.classes.infrasctructure.registries.SoundEffects;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.styles.UiButtonStyles;
 
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.LayoutManager;
+import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JSpinner;
@@ -22,6 +26,7 @@ public final class FlatSpinnerUI extends BasicSpinnerUI {
     protected Component createPreviousButton() {
         Component button = createStepButton("\u25BC");
         installPreviousButtonListeners(button);
+        installStepSound(button, SoundEffects.SPIN_DOWN);
         return button;
     }
 
@@ -29,7 +34,14 @@ public final class FlatSpinnerUI extends BasicSpinnerUI {
     protected Component createNextButton() {
         Component button = createStepButton("\u25B2");
         installNextButtonListeners(button);
+        installStepSound(button, SoundEffects.SPIN_UP);
         return button;
+    }
+
+    private static void installStepSound(Component button, SoundEffect effect) {
+        if (button instanceof AbstractButton abstractButton && effect != null) {
+            abstractButton.addActionListener(e -> SfxService.play(effect));
+        }
     }
 
     @Override

@@ -9,8 +9,9 @@ import java.util.List;
 public final class MusicTracks {
     private static final List<MusicTrack> TRACKS = new ArrayList<>();
 
-    public static final MusicTrack MAIN_MENU = track("MainMenu", "Main Menu", "Unknown");
-    public static final MusicTrack SAMPLE1 = track("sample1", "Sample 1", "Unknown");
+    public static final MusicTrack FRESH_ONE = track("freshOne", "Fresh One", "GrimIDK");
+    public static final MusicTrack HARD_WAR = track("hardWar", "Hard War", "GrimIDK");
+    public static final MusicTrack MAIN_MENU = track("MainMenu", "Main Menu", "GrimIDK");
 
     private MusicTracks() {}
 
