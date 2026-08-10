@@ -36,6 +36,7 @@ public class SaveSelectPanel extends JPanel {
     private final JButton backButton;
     
     private final Savefile[] cachedSaves = new Savefile[3];
+    private boolean slotActionsEnabled = true;
 
     public SaveSelectPanel(MainFrame frame) {
         this.frame = frame;
@@ -176,6 +177,14 @@ public class SaveSelectPanel extends JPanel {
         applySlotLabels();
     }
 
+    public void setSlotActionsEnabled(boolean enabled) {
+        slotActionsEnabled = enabled;
+        for (int i = 0; i < 3; i++) {
+            slotButtons[i].setEnabled(enabled);
+            deleteButtons[i].setEnabled(enabled && cachedSaves[i] != null);
+        }
+    }
+
     private void applySlotLabels() {
         for (int i = 0; i < 3; i++) {
             int slotId = i + 1;
@@ -193,8 +202,9 @@ public class SaveSelectPanel extends JPanel {
                 slotLabels[i].setText(LanguageStrings.format(LanguageStrings.SAVE_DAYS_FORMAT, displayName, totalDays));
                 slotButtons[i].setText(LanguageStrings.get(LanguageStrings.UI_LOAD));
                 deleteButtons[i].setText(LanguageStrings.get(LanguageStrings.UI_DELETE));
-                deleteButtons[i].setEnabled(true);
+                deleteButtons[i].setEnabled(slotActionsEnabled);
             }
+            slotButtons[i].setEnabled(slotActionsEnabled);
         }
     }
 
@@ -226,7 +236,18 @@ public class SaveSelectPanel extends JPanel {
                 }
             });
         } else {
-            frame.openGameWithSave(existing);
+            Savefile fresh = saveManager.loadSlot(slotId);
+            if (fresh == null) {
+                refreshSlots();
+                UiOptionPane.showMessageDialog(frame,
+                        LanguageStrings.get(LanguageStrings.UI_ERROR_LOADING),
+                        LanguageStrings.get(LanguageStrings.UI_ERROR),
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            cachedSaves[idx] = fresh;
+            applySlotLabels();
+            frame.openGameWithSave(fresh);
         }
     }
 

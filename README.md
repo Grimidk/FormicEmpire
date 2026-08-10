@@ -25,7 +25,7 @@ Running the game with Java installed (bash):
 
     ./scripts/run.sh
 
-Uses your system JDK and saves in `./saves/`.
+Uses your system JDK and saves in `./saves/` (dev / project checkout).
 
 Generating a release bundle (bash):
 
@@ -37,10 +37,20 @@ Produces **`outputs/`** with separate bundles per platform:
 
 | Path | Contents |
 |------|----------|
-| `outputs/FormicEmpire.jar.zip` | JAR + `FormicEmpire.sh` + `saves/` — **JAR download** (needs Java 17+ installed) |
+| `outputs/FormicEmpire.jar.zip` | JAR + `FormicEmpire.sh` — **JAR download** (needs Java 17+ installed) |
 | `outputs/FormicEmpire.windows.zip` | `FormicEmpire.exe` (game embedded) + `jre/` — **Windows download** |
 | `outputs/FormicEmpire.linux.zip` | jpackage app-image (`FormicEmpire/bin/FormicEmpire` + embedded runtime) — **Linux download** |
 | `outputs/FormicEmpire.app` | macOS app bundle (built on macOS via `jpackage`) |
+
+**Packaged saves/settings** are stored outside the app so replacing the `.app` / zip does not wipe progress:
+
+| Platform | Path |
+|----------|------|
+| macOS | `~/Library/Application Support/GrimIDK/FormicEmpire/saves/` |
+| Windows | `%APPDATA%\GrimIDK\FormicEmpire\saves\` |
+| Linux | `~/.local/share/GrimIDK/FormicEmpire/saves/` |
+
+On first launch after an upgrade, any older `saves/` files still found next to the previous install are copied into that folder **only when the destination file is missing** (existing App Support files are never overwritten).
 
 ### Bundled runtimes (not committed to git)
 
@@ -71,8 +81,8 @@ Produces **`outputs/`** with separate bundles per platform:
     iconutil -c icns src/main/resources/meta/icon.iconset -o src/main/resources/meta/icon.icns
 
 Run on macOS: `open outputs/FormicEmpire.app`  
-Run on Linux: ship `outputs/FormicEmpire.linux.zip` (unzip, then run `FormicEmpire/bin/FormicEmpire`). Saves are created beside the app folder at first run.  
-Run on Windows: ship `outputs/FormicEmpire.windows.zip` (unzip, then run `FormicEmpire.exe`). Saves are created beside the exe at first run.  
+Run on Linux: ship `outputs/FormicEmpire.linux.zip` (unzip, then run `FormicEmpire/bin/FormicEmpire`).  
+Run on Windows: ship `outputs/FormicEmpire.windows.zip` (unzip, then run `FormicEmpire.exe`).  
 Run anywhere with Java 17+: unzip `outputs/FormicEmpire.jar.zip` and run `./FormicEmpire.sh`
 
 In order to add new ant assets you need to use these colors in order to properly map the species: 

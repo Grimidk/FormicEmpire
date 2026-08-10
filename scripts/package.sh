@@ -102,9 +102,9 @@ HAS_LINUX_ZIP=0
 HAS_APP=0
 
 pack_jar_zip() {
-    echo "[Pack] JAR zip -> $JAR_ZIP (jar + launcher + saves)..."
+    echo "[Pack] JAR zip -> $JAR_ZIP (jar + launcher)..."
     rm -rf "$JAR_STAGING"
-    mkdir -p "$JAR_STAGING/saves"
+    mkdir -p "$JAR_STAGING"
     cp "$BUILD_JAR" "$JAR_STAGING/$JAR_NAME"
 
     cat > "$JAR_STAGING/FormicEmpire.sh" <<EOF
@@ -173,7 +173,7 @@ pack_macos_app() {
     echo "[Pack] macOS app -> $MAC_APP..."
     JPACKAGE_INPUT="$OUTPUT_DIR/.jpackage-input"
     rm -rf "$JPACKAGE_INPUT"
-    mkdir -p "$JPACKAGE_INPUT/saves"
+    mkdir -p "$JPACKAGE_INPUT"
     cp "$BUILD_JAR" "$JPACKAGE_INPUT/$JAR_NAME"
 
     JPACKAGE_ARGS=(
@@ -226,7 +226,7 @@ pack_linux_app() {
     echo "[Pack] Linux app-image -> $LINUX_ZIP (runtime from $LINUX_JRE/)..."
     JPACKAGE_INPUT="$OUTPUT_DIR/.jpackage-input"
     rm -rf "$JPACKAGE_INPUT" "$LINUX_APP_DIR"
-    mkdir -p "$JPACKAGE_INPUT/saves"
+    mkdir -p "$JPACKAGE_INPUT"
     cp "$BUILD_JAR" "$JPACKAGE_INPUT/$JAR_NAME"
 
     jpackage \
@@ -270,11 +270,15 @@ echo ""
 echo "Outputs in $OUTPUT_DIR/:"
 find "$OUTPUT_DIR" -maxdepth 1 -mindepth 1 | sort
 echo ""
-[ "$HAS_JAR_ZIP" -eq 1 ] && echo "  zip   FormicEmpire.jar.zip (jar + FormicEmpire.sh + saves — needs Java 17+)"
+[ "$HAS_JAR_ZIP" -eq 1 ] && echo "  zip   FormicEmpire.jar.zip (jar + FormicEmpire.sh — needs Java 17+)"
 [ "$HAS_WIN_ZIP" -eq 1 ] && echo "  zip   FormicEmpire.windows.zip (FormicEmpire.exe + jre/)"
 [ "$HAS_LINUX_ZIP" -eq 1 ] && echo "  zip   FormicEmpire.linux.zip (jpackage app-image — bin/FormicEmpire + embedded runtime)"
 [ "$HAS_APP" -eq 1 ] && echo "  app   FormicEmpire.app (macOS only)"
 echo ""
+echo "Saves/settings (packaged builds) live in the OS user-data folder, not inside the app:"
+echo "  macOS:  ~/Library/Application Support/GrimIDK/FormicEmpire/saves/"
+echo "  Windows: %APPDATA%\\\\GrimIDK\\\\FormicEmpire\\\\saves\\"
+echo "  Linux:  ~/.local/share/GrimIDK/FormicEmpire/saves/"
 echo "(Maven build intermediates stay in target/ — ship artifacts under $OUTPUT_DIR/.)"
 
 if [ "$HAS_JAR_ZIP" -ne 1 ]; then

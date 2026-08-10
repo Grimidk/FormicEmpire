@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 75% (268/359 checked)
+Completion: 74% (265/359 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -67,14 +67,14 @@ Roles (default hatch roles for new ants):
 ================================================================================
 3. SAVE / LOAD FLOW
 ================================================================================
-[X] Three save slots — empty slot shows Create
+[ ] Three save slots — empty slot shows Create; packaged builds use GrimIDK/FormicEmpire under OS Application Support / AppData (not inside .app)
 [X] Create new save — name + title, live dynasty preview (EN: Theme Title; ES/FR/PT: Title Theme), confirm prompt; full dynasty name shown in slot list
 [X] Tutorial dialog auto-opens on first create
-[X] Load existing save — resumes session
+[ ] Load existing save — resumes session; re-reads latest file from disk
 [X] Delete save — removes slot data
 [X] Back to main menu
 [X] Autosave runs per settings frequency during play
-[X] Back to menu from game (ESC > Back to Menu) — saves progress
+[ ] Back to menu from game (ESC > Back to Menu) — saves progress; slot list refreshes after write; Load re-reads disk
 [X] Colony death — Reload or Main Menu options
 
 ================================================================================

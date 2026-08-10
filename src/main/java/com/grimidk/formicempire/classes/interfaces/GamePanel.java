@@ -1325,13 +1325,21 @@ public class GamePanel extends ZeroGamePanel {
         }
 
         cleanupSession();
-        frame.showCard(MainFrame.CARD_SAVE);
 
+        SaveSelectPanel saveSelectPanel = frame.getSaveSelectPanel();
         if (worldToSave != null && sm != null && engine != null) {
             World capturedWorld = worldToSave;
             int capturedSlot = slotId;
             String capturedName = saveName;
+            if (saveSelectPanel != null) {
+                saveSelectPanel.setSlotActionsEnabled(false);
+            }
+            frame.showCard(MainFrame.CARD_SAVE);
             sm.saveWorldToSlotUserAsync(capturedWorld, engine, capturedSlot, capturedName, success -> {
+                if (saveSelectPanel != null) {
+                    saveSelectPanel.refreshSlots();
+                    saveSelectPanel.setSlotActionsEnabled(true);
+                }
                 if (!success) {
                     UiOptionPane.showMessageDialog(frame,
                             LanguageStrings.get(LanguageStrings.SAVE_ERROR_WRITE),
@@ -1339,6 +1347,8 @@ public class GamePanel extends ZeroGamePanel {
                             JOptionPane.ERROR_MESSAGE);
                 }
             });
+        } else {
+            frame.showCard(MainFrame.CARD_SAVE);
         }
     }
     
