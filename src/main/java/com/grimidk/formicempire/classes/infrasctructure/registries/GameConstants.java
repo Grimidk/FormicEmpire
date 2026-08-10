@@ -1777,6 +1777,20 @@ public final class GameConstants {
         return null;
     }
 
+    public static Tier getHighestUnlockedTier(Rank rank) {
+        if (rank == null) {
+            return null;
+        }
+        Tier highest = null;
+        for (Tier tier : tiers) {
+            Rank requirement = tier.getRankRequirement();
+            if (requirement != null && rank.getId() >= requirement.getId()) {
+                highest = tier;
+            }
+        }
+        return highest;
+    }
+
     public static long getTierMaximumRpExclusive(Tier tier) {
         if (tier == null) {
             return Long.MAX_VALUE;

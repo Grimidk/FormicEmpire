@@ -1,9 +1,11 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
+import com.grimidk.formicempire.classes.constants.misc.Tier;
 import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
 import com.grimidk.formicempire.classes.constants.unlocks.Synergy;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.services.shared.TriggerProgressService;
 import com.grimidk.formicempire.classes.entities.services.shared.TriggerProgressService.TriggerProgress;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
@@ -70,6 +72,7 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
     private final Runnable onTreeChanged;
     private final boolean encyclopediaMode;
     private final JLabel researchPointsLabel;
+    private final JLabel tierLabel;
     private final TreeCanvas canvas;
     private final JScrollPane scrollPane;
     private final DetailCard detailCard;
@@ -94,10 +97,17 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
         researchPointsLabel.setFont(AssetStyles.FONT_BOLD);
         researchPointsLabel.setForeground(AssetStyles.FONT_COLOR_HEADER);
 
+        tierLabel = new JLabel();
+        tierLabel.setFont(AssetStyles.FONT_BOLD);
+        tierLabel.setForeground(AssetStyles.FONT_COLOR_HEADER);
+        tierLabel.setIconTextGap(6);
+
         JPanel northPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         northPanel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
         northPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
         northPanel.add(researchPointsLabel);
+        northPanel.add(Box.createRigidArea(new Dimension(15, 0)));
+        northPanel.add(tierLabel);
         northPanel.setVisible(!encyclopediaMode);
         add(northPanel, BorderLayout.NORTH);
 
@@ -133,7 +143,7 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
 
     @Override
     public void updateData() {
-        updateResearchPointsLabel();
+        updateStatusLabels();
         graph = ResearchTreeGraph.build(colony, engine, encyclopediaMode);
         if (detailCard.isVisible()) {
             detailCard.refreshFromSelection();
@@ -149,18 +159,29 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
 
     @Override
     public void liveUpdate() {
-        updateResearchPointsLabel();
+        updateStatusLabels();
         if (detailCard.isVisible()) {
             detailCard.refreshFromSelection();
         }
     }
 
-    private void updateResearchPointsLabel() {
+    private void updateStatusLabels() {
         if (encyclopediaMode || colony == null) {
             return;
         }
         researchPointsLabel.setText(LanguageStrings.format(
                 LanguageStrings.UPGRADE_RESEARCH_AVAILABLE, colony.getResearchPoints()));
+        Dynasty dynasty = colony.getDynasty();
+        Tier tier = dynasty != null ? GameConstants.getHighestUnlockedTier(dynasty.getRank()) : null;
+        if (tier == null) {
+            tierLabel.setVisible(false);
+            return;
+        }
+        tierLabel.setVisible(true);
+        if (tierLabel.getIcon() != tier.getIcon()) {
+            tierLabel.setIcon(tier.getIcon());
+        }
+        tierLabel.setText(tier.getName());
     }
 
     private void openDetail(ResearchTreeGraph.Node node) {

@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 78% (286/368 checked)
+Completion: 89% (329/370 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -193,7 +193,7 @@ Per ant type tab (Worker, Soldier, Major, Princess, Queen):
 ================================================================================
 Purchase with research points (RP). Test buy on each category:
 
-[X] Research tree: radial grid with ring-constrained placement and edge-untangle (fewer crossing diagonals), detail card (centered bold title via translated name with flavor fallback + icon, centered flavor when distinct from title + description; left-aligned tier icon/name with ant-count tip, requirement incl. assimilation/synergy when that is the unlock path, RP/trigger progress bar; Buy on every non-owned node — disabled with tip for unmet parent/tier(ants)/assimilation/synergy/RP/trigger; tip shows specific requirements accurately), node colors (green owned, red affordable, blue trigger progress, yellow assimilation/synergy progress, grey unavailable); buy gated by parent+tier+RP; press on node opens card (no pan steal); empty-space drag pans after threshold; ESC closes detail card before dialog; locked nodes hidden unless owned, directly after an owned node, or showing trigger/assimilation/synergy progress (stable full-tree layout; no edges to hidden nodes); Help encyclopedia reveals full tree with all nodes marked owned
+[ ] Research tree: radial grid with ring-constrained placement and edge-untangle (fewer crossing diagonals), status bar shows available RP and current dynasty tier (icon+name); detail card (centered bold title via translated name with flavor fallback + icon, centered flavor when distinct from title + description; left-aligned tier icon/name with ant-count tip, requirement incl. assimilation/synergy when that is the unlock path, RP/trigger progress bar; Buy on every non-owned node — disabled with tip for unmet parent/tier(ants)/assimilation/synergy/RP/trigger; tip shows specific requirements accurately), node colors (green owned, red affordable, blue trigger progress, yellow assimilation/synergy progress, grey unavailable); buy gated by parent+tier+RP; press on node opens card (no pan steal); empty-space drag pans after threshold; ESC closes detail card before dialog; locked nodes hidden unless owned, directly after an owned node, or showing trigger/assimilation/synergy progress (stable full-tree layout; no edges to hidden nodes); Help encyclopedia reveals full tree with all nodes marked owned
 
 Ant types:
 [X] Egg, Worker, Soldier, Major, Princess, Queen
@@ -213,7 +213,7 @@ Major roles:
 Princess roles:
 [X] Breeder, Diplomat, Assistant (Assistant Tier 2; assistants research at 1/50 queen efficiency)
 [ ] Captain (unlocked with Commander; infantry line; Infantry Leader +25% infantry damage)
-[ ] Air Support (Queendom rank; princesses; air-support line; Close Ant Support 1000%/90%)
+[X] Air Support (Queendom rank; princesses; air-support line; Close Ant Support 1000%/90%)
 [ ] Air Bomber (synergy: Air Support + Bomber + Acid Spit; Air Bombing 2000%/90%/7 targets; ant dies)
 
 Queen roles:
@@ -227,7 +227,7 @@ Colony abilities (unlock tree):
 [X] Research, Build, Spread, Resin, Synergy, Assimilation
 [X] Forced Flight, Dynasty, Trade, Spread 2, Automation, Tunnels
 [X] Bilateral Trade, Management, Mass Flight, Cloning
-[ ] Parasitic Mite Alert, Catch Symbiotic Mite, Catch Dermestid
+[X] Parasitic Mite Alert, Catch Symbiotic Mite, Catch Dermestid
 [X] Diplomat Pressure 2 & 3
 [X] Ability slot, Pheromone Storm, Creatine Diet
 [X] Auto-Tunnels
@@ -239,19 +239,19 @@ Stat upgrades (RP tiers):
 [X] Research 1–3, Growth 1–3, Thirst 1–3
 [X] Logistics 1, Passive 1, Laying 1–3
 [X] Scouting 1–3, Farming 1–3, Contamination 1–3
-[ ] Symbiotic Mite 1, Dermestid 1, Graving 1–3
+[X] Symbiotic Mite 1, Dermestid 1, Graving 1–3
 [X] Policing 1–3, Hex Sustain, Worker Speed 2
 
 Assimilated species passives (research tree):
-[ ] Farming, Multiqueen, Trapjaw (Powerful Bite; infantry attack), Woodburrow
-[ ] Honeypot (Potter role + Boost Regen), Doorhead (Defender role + Shielding)
-[ ] Silkweave, Rafting, Firevenom, Jumping, Stinging (Stinging skill; infantry attack)
-[ ] Swarming, Stealth, Fastbite (ants 1→2; soldiers/majors 2→4), Heatresist, Deadlyvenom
-[ ] Selfdestruct (Bomber role + Selfdestruct skill 500%/90%/5 targets; ant dies)
-[ ] Farsight (Far Sight head subtype: +15% accuracy to all skills, capped at 100%)
+[X] Farming, Multiqueen, Trapjaw (Powerful Bite; infantry attack), Woodburrow
+[X] Honeypot (Potter role + Boost Regen), Doorhead (Defender role + Shielding)
+[X] Silkweave, Rafting, Firevenom, Jumping, Stinging (Stinging skill; infantry attack)
+[X] Swarming, Stealth, Fastbite (ants 1→2; soldiers/majors 2→4), Heatresist, Deadlyvenom
+[X] Selfdestruct (Bomber role + Selfdestruct skill 500%/90%/5 targets; ant dies)
+[X] Farsight (Far Sight head subtype: +15% accuracy to all skills, capped at 100%)
 [X] Hivebuild, Locsense
-[ ] Acidspit (Green Ant — unlocks Acid Spitting skill)
-[ ] Assimilation / Genome Bridge (Omni starts with it completed; still required before other species assimilations)
+[X] Acidspit (Green Ant — unlocks Acid Spitting skill)
+[X] Assimilation / Genome Bridge (Omni starts with it completed; still required before other species assimilations)
 
 [X] Insufficient RP blocks purchase with message
 [X] Prerequisites hide or disable locked nodes
@@ -259,7 +259,7 @@ Assimilated species passives (research tree):
 ================================================================================
 11. CONSTRUCTION (U) — UpgradeDialog Build tab
 ================================================================================
-[X] Building tree: upward chains from basic rooms, tier divider lines for Tier 0 below basics and between occupied adjacent tiers, detail card (centered bold name+icon+description; left-aligned tier icon/name, requirement, cost bar swapped to build-progress bar while constructing; Build/Cancel; Build disabled tooltip explains missing Miner/Resin unlock before builders/resources), node colors (green owned, red affordable, blue in progress, grey unavailable); press on node opens card (no pan steal); empty-space drag pans after threshold; locked nodes hidden unless owned or directly after an owned node (stable full-tree layout; no edges to hidden nodes); Help encyclopedia reveals full tree with all nodes marked owned
+[ ] Building tree: upward chains from basic rooms, tier divider lines for Tier 0 below basics and between occupied adjacent tiers, status bar shows minerals/resin plus current dynasty tier (icon+name) beside materials then builders/cranes; detail card (centered bold name+icon+description; left-aligned tier icon/name, requirement, cost bar swapped to build-progress bar while constructing; Build/Cancel; Build disabled tooltip explains missing Miner/Resin unlock before builders/resources), node colors (green owned, red affordable, blue in progress, grey unavailable); press on node opens card (no pan steal); empty-space drag pans after threshold; locked nodes hidden unless owned or directly after an owned node (stable full-tree layout; no edges to hidden nodes); Help encyclopedia reveals full tree with all nodes marked owned
 
 Room upgrade chains (each tier L0→L5 where applicable; L4–L5 cost minerals + resin):
 [X] Royal Chamber
@@ -292,9 +292,9 @@ Start / progress assimilations (RP + time). Target RP cost scales +25% per compl
 [ ] Acidspit (Green Ant)
 
 [X] Assimilation RP target cost scales +25% per completed assimilation (5th = 200% base)
-[ ] Notice: You won't generate RP while assimilating a genome
-[ ] Completed assimilation unlocks hatch subtypes (trapjaw, honeypot, doorhead, stinger, farsight/bulldog); other passives still pending
-[ ] Far Sight (bulldog) assimilation unlocks subtype hatch UI / Hatch Rates (P) controls
+[X] Notice: You won't generate RP while assimilating a genome
+[X] Completed assimilation unlocks hatch subtypes (trapjaw, honeypot, doorhead, stinger, farsight/bulldog); other passives still pending
+[X] Far Sight (bulldog) assimilation unlocks subtype hatch UI / Hatch Rates (P) controls
 
 ================================================================================
 13. SYNERGIES (O) — UpgradeDialog Synergy tab
@@ -329,8 +329,10 @@ Start / progress assimilations (RP + time). Target RP cost scales +25% per compl
 [X] Dynasty-wide automation toggles (when unlocked):
     [X] Default auto-build
     [X] Default automation
+    [ ] Peace automation assigns unlocked combat/support roles (Potter, Militia, Warrior, Defender, Bomber, Artillery, Siege, Captain, Air Support, Air Bomber, Commander) at ≥5% of that ant type
+    [ ] War automation keeps essential farm/forage/nurse (plus outbreak police/catchers / minimal layers) and sends the rest to unlocked active military roles
     [X] Default Auto-Tunnels
-    [ ] Auto-Diplomacy (sends from capital/militant sources; never exceeds 5 diplomats on one colony target)
+    [X] Auto-Diplomacy (sends from capital/militant sources; never exceeds 5 diplomats on one colony target)
 [X] Title progression as empire grows
 
 ================================================================================
@@ -345,13 +347,13 @@ Neighbor trade rows (per adjacent hex):
 [X] Bilateral trade mode (when unlocked)
 [X] Trade method combo (land / tunnel / etc. per unlocks)
 [X] Max resource buttons on trade creator
-[ ] Bilateral Optimization button in trade creator footer (visible with Bilateral Trade unlock; enabled when incoming one-way route exists and bilateral unchecked)
+[X] Bilateral Optimization button in trade creator footer (visible with Bilateral Trade unlock; enabled when incoming one-way route exists and bilateral unchecked)
 [X] Confirm / update trade
-[ ] Cancel trade dialog (Cancel button or ESC closes setup only; leaves Dynasty Trade open)
+[X] Cancel trade dialog (Cancel button or ESC closes setup only; leaves Dynasty Trade open)
 [ ] Excess cargo over destination capacity returns to origin (discarded if origin is also full)
 [X] Active trade edit from table actions (Manage / Establish)
 [X] See convoy option in logistics Actions menu (opens convoy transit view)
-[ ] Make two-way trade option in logistics Actions menu (enabled when matching incoming one-way route exists)
+[X] Make two-way trade option in logistics Actions menu (enabled when matching incoming one-way route exists)
 
 ================================================================================
 17. DYNASTY — DIPLOMACY (D)
@@ -376,7 +378,7 @@ Per foreign dynasty Actions menu:
 [X] Integration progress advances daily; ETA shows completion date
 [X] Manage integration diplomats (assign count; shown on progress bar)
 [X] Cancel integration (player overlord only)
-[ ] War on integration target redirects to overlord (vassal attack popup)
+[X] War on integration target redirects to overlord (vassal attack popup)
 [ ] Integration complete popup when annexation finishes
 [ ] Integrated colonies keep species; gain Recently Integrated loyalty (+25)
 
@@ -387,10 +389,10 @@ Per foreign dynasty Actions menu:
 [X] War entries in dynasty table
 [X] View battle — opens WarBattleDialog (hour-tick battle animation)
 [X] Battle view updates each hour while open
-[ ] War standing / stage progression over time
-[ ] Creature combat: border clash resolves by ~90% army casualties (active + reserves); hex assault by last queen; combat capacity per battle line + reserves; battle view shows active/reserve
-[ ] Battle won/lost popup when a war stage resolves
-[ ] War role economy in role dialogs (wartime quotas + subtype allows; copy from peacetime)
+[X] War standing / stage progression over time
+[X] Creature combat: border clash resolves by ~90% army casualties (active + reserves); hex assault by last queen; combat capacity per battle line + reserves; battle view shows active/reserve
+[X] Battle won/lost popup when a war stage resolves
+[X] War role economy in role dialogs (wartime quotas + subtype allows; copy from peacetime)
 
 ================================================================================
 19. WORLD MAP (M)
@@ -452,31 +454,31 @@ Help encyclopedia (main menu Help):
 ================================================================================
 Monthly:
 [X] Researcher role unlock
-[ ] Parasitic mite outbreak event (dynasty-wide unlock; grants Catch Symbiotic Mite)
+[X] Parasitic mite outbreak event (dynasty-wide unlock; grants Catch Symbiotic Mite)
 
 Daily:
 [X] Graver role unlock
 [X] Scout unlock from plant harvest (any plant source)
 [ ] Miner unlock from 10 Tier 3 buildings across dynasty (requires Soldier type; scouts then spot minerals)
-[ ] Hunter / Breeder / Brute role unlocks
-[ ] Queendom rank unlocks Air Support princess role
+[X] Hunter / Breeder / Brute role unlocks
+[X] Queendom rank unlocks Air Support princess role
 [ ] Commander role unlock (3 wars participated + multi-queen colony)
 [ ] Commander assignment: max 1 per colony; requires spare queen off combat; raises dynasty combat capacity 1k→2.5k once
 [X] Research / Build / Spread ability unlocks
 [X] Dynasty / Trade / Management / Spread 2 / Automation unlocks by colony count
-[ ] Bilateral Trade unlock from active trade count
+[X] Bilateral Trade unlock from active trade count
 [ ] Courier / Borer role unlocks
-[ ] Assimilation ability unlock from absorbed dynasties
+[X] Assimilation ability unlock from absorbed dynasties
 [X] Omni starts with Genome Bridge completed; other species assimilations still gated until Genome Bridge; Assimilation UI only when a new genome is researchable
-[ ] Subtype hatch ability unlock after body-part assimilation
-[ ] Colony Operations ability unlock
+[X] Subtype hatch ability unlock after body-part assimilation
+[X] Colony Operations ability unlock
 [ ] Mass Flight unlock
-[ ] Police role unlock (fused into Duchy rank-up popup)
+[X] Police role unlock (fused into Duchy rank-up popup)
 [ ] Cloning unlock (fused into Empire rank-up popup)
 [X] Dynasty rank-up popups (County→Giga; Duchy grants Police, Empire grants Cloning; Ant/Colony skipped)
 [ ] Auto-Tunnels / Auto-Diplomacy unlocks (after Automation + prerequisites)
 [ ] Colony death detection
-[ ] NPC dynasty triggers
+[X] NPC dynasty triggers
 
 Hourly:
 [X] Hourly trigger checks
@@ -510,15 +512,15 @@ World:
 
 Combat:
 [X] Colony military power calculation
-[ ] War skips active clash when defender has no border-battle active roles (goes to hex defense)
-[ ] Hex defense: contested colony fields all local ants; attackers use dynasty-wide border-active + dynasty Siege (Defenders never assault)
-[ ] Hex defense mults: defending ants 1.5x attack/defense; Defender role 3x; Siege attackers 3x; other attackers 1x; defense capped at 100%
-[ ] Withdraw to hex defense during border clash (preserve army; NPC baits when hex odds beat border and counterattack looks viable); holding hex awards stage + flips stageAttacker for counterattack; Fallback still forfeits the stage
-[ ] Redeploy: ants heal regen% of max HP; Boost Regen doubles next redeploy heal (Potter / Honeypot)
-[ ] Shielding: doorhead Defenders absorb queen losses in hex defense until dead
-[ ] Defender and Siege are active military but only fight in hex defense (not border clash)
-[ ] Battle lines: Infantry (Militia, Warrior, Defender, Brute, Siege, Bomber, Captain); Artillery (Artillery, Potter, Commander); Air Support (Air Support, Air Bomber) with flyby + reload dwell
-[ ] Honeypot unlocks Potter (honeypot workers only); Doorhead unlocks Defender (doorhead soldiers only)
+[X] War skips active clash when defender has no border-battle active roles (goes to hex defense)
+[X] Hex defense: contested colony fields all local ants; attackers use dynasty-wide border-active + dynasty Siege (Defenders never assault)
+[X] Hex defense mults: defending ants 1.5x attack/defense; Defender role 3x; Siege attackers 3x; other attackers 1x; defense capped at 100%
+[X] Withdraw to hex defense during border clash (preserve army; NPC baits when hex odds beat border and counterattack looks viable); holding hex awards stage + flips stageAttacker for counterattack; Fallback still forfeits the stage
+[X] Redeploy: ants heal regen% of max HP; Boost Regen doubles next redeploy heal (Potter / Honeypot)
+[X] Shielding: doorhead Defenders absorb queen losses in hex defense until dead
+[X] Defender and Siege are active military but only fight in hex defense (not border clash)
+[X] Battle lines: Infantry (Militia, Warrior, Defender, Brute, Siege, Bomber, Captain); Artillery (Artillery, Potter, Commander); Air Support (Air Support, Air Bomber) with flyby + reload dwell
+[X] Honeypot unlocks Potter (honeypot workers only); Doorhead unlocks Defender (doorhead soldiers only)
 [X] Battle view stat multipliers vs standing multipliers
 
 ================================================================================

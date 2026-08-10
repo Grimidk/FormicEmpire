@@ -13,7 +13,6 @@ To Fix (By decreasing priority):
 		change icons for music player to be like the other (add them to help)
 		music: main menu song, more songs in general
 		sounds: building done, research done, basic click,
-		parasitic mites not triggeering
 	Low:
 		(none right now)
 	Can't reproduce:

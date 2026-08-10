@@ -1,8 +1,10 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
 import com.grimidk.formicempire.classes.constants.misc.ResourceType;
+import com.grimidk.formicempire.classes.constants.misc.Tier;
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
+import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
@@ -71,6 +73,7 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
     private final boolean encyclopediaMode;
     private final JLabel mineralsLabel;
     private final JLabel resinLabel;
+    private final JLabel tierLabel;
     private final JLabel buildersLabel;
     private final JLabel cranesLabel;
     private final TreeCanvas canvas;
@@ -97,11 +100,14 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
         northPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
         mineralsLabel = statusLabel(GameConstants.RESOURCE_ROCK.getIcon());
         resinLabel = statusLabel(GameConstants.RESOURCE_RESIN.getIcon());
+        tierLabel = statusLabel(null);
         buildersLabel = statusLabel(GameConstants.ROLE_BUILDER.getIcon());
         cranesLabel = statusLabel(GameConstants.ROLE_CRANE.getIcon());
         northPanel.add(mineralsLabel);
         northPanel.add(Box.createRigidArea(new Dimension(10, 0)));
         northPanel.add(resinLabel);
+        northPanel.add(Box.createRigidArea(new Dimension(10, 0)));
+        northPanel.add(tierLabel);
         northPanel.add(Box.createRigidArea(new Dimension(10, 0)));
         northPanel.add(buildersLabel);
         northPanel.add(Box.createRigidArea(new Dimension(10, 0)));
@@ -176,6 +182,17 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
         }
         mineralsLabel.setText(AssetStyles.formatRatio(colony.getMinerals(), colony.getMineralsCapacity()));
         resinLabel.setText(AssetStyles.formatRatio(colony.getResins(), colony.getResinsCapacity()));
+        Dynasty dynasty = colony.getDynasty();
+        Tier tier = dynasty != null ? GameConstants.getHighestUnlockedTier(dynasty.getRank()) : null;
+        if (tier == null) {
+            tierLabel.setVisible(false);
+        } else {
+            tierLabel.setVisible(true);
+            if (tierLabel.getIcon() != tier.getIcon()) {
+                tierLabel.setIcon(tier.getIcon());
+            }
+            tierLabel.setText(tier.getName());
+        }
         buildersLabel.setText(LanguageStrings.format(
                 LanguageStrings.BUILD_STATUS_BUILDERS,
                 colony.getAssignedRoleCount(GameConstants.ROLE_BUILDER)));

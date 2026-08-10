@@ -245,6 +245,96 @@ class ColonyAutomationServiceTest {
     }
 
     @Test
+    void peaceAutomationReservesUnlockedCombatRolesAtFivePercent() {
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_WARRIOR);
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_DEFENDER);
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_BOMBER);
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_ARTILLERY);
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_SIEGE);
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_POTTER);
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_MILITIA);
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_CAPTAIN);
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_AIR_SUPPORT);
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_AIR_BOMBER);
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_HUNTER);
+
+        for (int i = 0; i < 100; i++) {
+            colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+            colony.getSoldiers().add(new Ant(colony, GameConstants.TYPE_SOLDIER));
+            colony.getMajors().add(new Ant(colony, GameConstants.TYPE_MAJOR));
+            colony.getPrincesses().add(new Ant(colony, GameConstants.TYPE_PRINCESS));
+        }
+        for (int i = 0; i < 5; i++) {
+            colony.getQueens().add(new Ant(colony, GameConstants.TYPE_QUEEN));
+        }
+
+        automationService.runAutomation(colony);
+
+        assertEquals(5, colony.getAssignedRoleCount(GameConstants.ROLE_POTTER));
+        assertEquals(5, colony.getAssignedRoleCount(GameConstants.ROLE_MILITIA));
+        assertEquals(5, colony.getAssignedRoleCount(GameConstants.ROLE_WARRIOR));
+        assertEquals(5, colony.getAssignedRoleCount(GameConstants.ROLE_DEFENDER));
+        assertEquals(5, colony.getAssignedRoleCount(GameConstants.ROLE_BOMBER));
+        assertEquals(5, colony.getAssignedRoleCount(GameConstants.ROLE_ARTILLERY));
+        assertEquals(5, colony.getAssignedRoleCount(GameConstants.ROLE_SIEGE));
+        assertEquals(5, colony.getAssignedRoleCount(GameConstants.ROLE_CAPTAIN));
+        assertEquals(5, colony.getAssignedRoleCount(GameConstants.ROLE_AIR_SUPPORT));
+        assertEquals(5, colony.getAssignedRoleCount(GameConstants.ROLE_AIR_BOMBER));
+    }
+
+    @Test
+    void warAutomationSendsSurplusToActiveMilitaryRoles() {
+        Dynasty rival = new Dynasty(2, "Rival", false, GameConstants.SPECIES_OMNI);
+        dynasty.addDiplomaticModifierKey(rival.getId(), GameConstants.DIPLO_MODIFIER_WAR.getNameKey());
+
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_MILITIA);
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_WARRIOR);
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_BOMBER);
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_BRUTE);
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_ARTILLERY);
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_CAPTAIN);
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_AIR_SUPPORT);
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_BREEDER);
+        dynasty.unlockUpgrade(GameUnlocks.ROLE_LAYER);
+
+        for (int i = 0; i < 40; i++) {
+            colony.getWorkers().add(new Ant(colony, GameConstants.TYPE_WORKER));
+        }
+        for (int i = 0; i < 30; i++) {
+            colony.getSoldiers().add(new Ant(colony, GameConstants.TYPE_SOLDIER));
+        }
+        for (int i = 0; i < 12; i++) {
+            colony.getMajors().add(new Ant(colony, GameConstants.TYPE_MAJOR));
+        }
+        for (int i = 0; i < 10; i++) {
+            colony.getPrincesses().add(new Ant(colony, GameConstants.TYPE_PRINCESS));
+        }
+        for (int i = 0; i < 3; i++) {
+            colony.getQueens().add(new Ant(colony, GameConstants.TYPE_QUEEN));
+        }
+
+        assertTrue(dynasty.isAtWar());
+        automationService.runAutomation(colony);
+
+        assertTrue(colony.getAssignedRoleCount(GameConstants.ROLE_FARMER) >= 1);
+        assertTrue(colony.getAssignedRoleCount(GameConstants.ROLE_FORAGER) >= 1);
+        assertTrue(colony.getAssignedRoleCount(GameConstants.ROLE_NURSE) >= 1);
+        assertTrue(colony.getAssignedRoleCount(GameConstants.ROLE_MILITIA) >= 1);
+
+        int militarySoldiers = colony.getAssignedRoleCount(GameConstants.ROLE_WARRIOR)
+                + colony.getAssignedRoleCount(GameConstants.ROLE_BOMBER);
+        assertTrue(militarySoldiers >= 20);
+        assertEquals(0, colony.getAssignedRoleCount(GameConstants.ROLE_DEFENDER));
+
+        assertEquals(12, colony.getAssignedRoleCount(GameConstants.ROLE_BRUTE)
+                + colony.getAssignedRoleCount(GameConstants.ROLE_ARTILLERY));
+        assertEquals(10, colony.getAssignedRoleCount(GameConstants.ROLE_CAPTAIN)
+                + colony.getAssignedRoleCount(GameConstants.ROLE_AIR_SUPPORT));
+        assertEquals(0, colony.getAssignedRoleCount(GameConstants.ROLE_BREEDER));
+        assertEquals(3, colony.getAssignedRoleCount(GameConstants.ROLE_LAYER));
+    }
+
+    @Test
     void assignsCatchersToPreventParasiticMiteOutbreak() {
         dynasty.unlockUpgrade(GameUnlocks.ROLE_CATCHER);
         dynasty.unlockUpgrade(GameUnlocks.ABILITY_CATCH_SYMBIOTIC_MITE);
