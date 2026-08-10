@@ -621,6 +621,7 @@ public final class LanguageStrings {
     public static final String BUILD_STATUS_CRANES = "BUILD_STATUS_CRANES";
     public static final String BUILD_STATUS_SPEED = "BUILD_STATUS_SPEED";
     public static final String BUILD_REQUIREMENT_ERROR = "BUILD_REQUIREMENT_ERROR";
+    public static final String BUILD_MATERIAL_UNLOCK_ERROR = "BUILD_MATERIAL_UNLOCK_ERROR";
     public static final String BUILD_RESOURCES_ERROR = "BUILD_RESOURCES_ERROR";
     public static final String BUILD_COST_FORMAT = "BUILD_COST_FORMAT";
     public static final String ASSIMILATION_CURRENT = "ASSIMILATION_CURRENT";
@@ -630,6 +631,7 @@ public final class LanguageStrings {
     public static final String ASSIMILATION_ACTIVE = "ASSIMILATION_ACTIVE";
     public static final String ASSIMILATION_PROGRESS = "ASSIMILATION_PROGRESS";
     public static final String ASSIMILATION_INFO = "ASSIMILATION_INFO";
+    public static final String ASSIMILATION_RP_PAUSE_NOTE = "ASSIMILATION_RP_PAUSE_NOTE";
     public static final String SYNERGY_COMING_SOON = "SYNERGY_COMING_SOON";
     public static final String SYNERGY_REQUIREMENTS_FMT = "SYNERGY_REQUIREMENTS_FMT";
     public static final String SYNERGY_NONE_IN_PROGRESS = "SYNERGY_NONE_IN_PROGRESS";

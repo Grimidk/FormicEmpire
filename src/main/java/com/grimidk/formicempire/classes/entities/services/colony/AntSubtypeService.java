@@ -80,10 +80,19 @@ public final class AntSubtypeService {
         if (colony == null) {
             return false;
         }
-        return colony.hasUpgrade(GameUnlocks.ASSIMILATED_TRAPJAW)
-                || colony.hasUpgrade(GameUnlocks.ASSIMILATED_HONEYPOT)
-                || colony.hasUpgrade(GameUnlocks.ASSIMILATED_DOORHEAD)
-                || colony.hasUpgrade(GameUnlocks.ASSIMILATED_STINGING);
+        Dynasty dynasty = colony.getDynasty();
+        if (dynasty == null) {
+            return false;
+        }
+        for (AntSubtype subtype : GameConstants.getAntSubtypes()) {
+            if (subtype == null || subtype.isNone() || subtype.getRequiredUpgrade() == null) {
+                continue;
+            }
+            if (dynasty.hasUpgrade(subtype.getRequiredUpgrade())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static float consumptionMult(AntSubtypeProfile profile) {
@@ -123,6 +132,7 @@ public final class AntSubtypeService {
         boolean honeypot = colony.hasUpgrade(GameUnlocks.ASSIMILATED_HONEYPOT);
         boolean doorhead = colony.hasUpgrade(GameUnlocks.ASSIMILATED_DOORHEAD);
         boolean bullet = colony.hasUpgrade(GameUnlocks.ASSIMILATED_STINGING);
+        boolean farsight = colony.hasUpgrade(GameUnlocks.ASSIMILATED_FARSIGHT);
 
         if (honeypot) {
             setAutomatedSlotRate(rates, GameConstants.TYPE_WORKER, AntSubtypeSlot.ABDOMEN, 3, 50f);
@@ -138,6 +148,16 @@ public final class AntSubtypeService {
             setAutomatedSlotRate(rates, GameConstants.TYPE_WORKER, AntSubtypeSlot.HEAD, 3, 50f);
             if (!trapjaw && colony.hasUpgrade(GameUnlocks.TYPE_SOLDIER)) {
                 setAutomatedSlotRate(rates, GameConstants.TYPE_SOLDIER, AntSubtypeSlot.HEAD, 3, 50f);
+            }
+        }
+        if (farsight && !trapjaw) {
+            if (colony.hasUpgrade(GameUnlocks.TYPE_SOLDIER)) {
+                setAutomatedSlotRate(rates, GameConstants.TYPE_SOLDIER, AntSubtypeSlot.HEAD,
+                        GameConstants.SUBTYPE_HEAD_FARSIGHT.getDigit(), 50f);
+            }
+            if (colony.hasUpgrade(GameUnlocks.TYPE_MAJOR)) {
+                setAutomatedSlotRate(rates, GameConstants.TYPE_MAJOR, AntSubtypeSlot.HEAD,
+                        GameConstants.SUBTYPE_HEAD_FARSIGHT.getDigit(), 50f);
             }
         }
         if (bullet) {

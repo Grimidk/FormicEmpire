@@ -1,6 +1,8 @@
 package com.grimidk.formicempire.classes.infrasctructure.registries;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -42,5 +44,34 @@ class GameUnlocksBuildingGateTest {
     void otherBuildingsDoNotNeedSpecialUnlock() {
         assertTrue(GameUnlocks.meetsBuildingUnlockRequirement(colony, GameUnlocks.PLANT_CHAMBER_0));
         assertTrue(GameUnlocks.meetsBuildingUnlockRequirement(colony, GameUnlocks.ROYAL_CHAMBER_5));
+    }
+
+    @Test
+    void blockingMaterialIsMineralForRockWarehousesWithoutMiner() {
+        assertEquals(GameConstants.RESOURCE_ROCK,
+                GameUnlocks.getBlockingBuildingMaterial(colony, GameUnlocks.ROCK_WAREHOUSE_0));
+        colony.unlockUpgrade(GameUnlocks.ROLE_MINER);
+        assertNull(GameUnlocks.getBlockingBuildingMaterial(colony, GameUnlocks.ROCK_WAREHOUSE_0));
+    }
+
+    @Test
+    void blockingMaterialIsResinForResinReservoirsWithoutAbility() {
+        assertEquals(GameConstants.RESOURCE_RESIN,
+                GameUnlocks.getBlockingBuildingMaterial(colony, GameUnlocks.RESIN_RESERVOIR_0));
+        colony.unlockUpgrade(GameUnlocks.ABILITY_RESIN);
+        assertNull(GameUnlocks.getBlockingBuildingMaterial(colony, GameUnlocks.RESIN_RESERVOIR_0));
+    }
+
+    @Test
+    void blockingMaterialFollowsMineralOrResinCostWithoutMatchingUnlock() {
+        assertEquals(GameConstants.RESOURCE_RESIN,
+                GameUnlocks.getBlockingBuildingMaterial(colony, GameUnlocks.PLANT_CHAMBER_2));
+        colony.unlockUpgrade(GameUnlocks.ABILITY_RESIN);
+        assertNull(GameUnlocks.getBlockingBuildingMaterial(colony, GameUnlocks.PLANT_CHAMBER_2));
+
+        assertEquals(GameConstants.RESOURCE_ROCK,
+                GameUnlocks.getBlockingBuildingMaterial(colony, GameUnlocks.PLANT_CHAMBER_4));
+        colony.unlockUpgrade(GameUnlocks.ROLE_MINER);
+        assertNull(GameUnlocks.getBlockingBuildingMaterial(colony, GameUnlocks.PLANT_CHAMBER_4));
     }
 }

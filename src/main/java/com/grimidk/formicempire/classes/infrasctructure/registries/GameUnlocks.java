@@ -2,6 +2,7 @@ package com.grimidk.formicempire.classes.infrasctructure.registries;
 
 import com.grimidk.formicempire.classes.constants.unlocks.*;
 import com.grimidk.formicempire.classes.constants.critter.ant.AntSpecies;
+import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.misc.Tier;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
@@ -775,6 +776,29 @@ public final class GameUnlocks {
                         return colony.hasUpgrade(ABILITY_RESIN);
                 }
                 return true;
+        }
+
+        public static ResourceType getBlockingBuildingMaterial(Colony colony, Building building) {
+                if (colony == null || building == null) {
+                        return null;
+                }
+                if (isInBuildingChain(building, BUILDING_CHAIN_ROCK) && !colony.hasUpgrade(ROLE_MINER)) {
+                        return GameConstants.RESOURCE_ROCK;
+                }
+                if (isInBuildingChain(building, BUILDING_CHAIN_RESIN) && !colony.hasUpgrade(ABILITY_RESIN)) {
+                        return GameConstants.RESOURCE_RESIN;
+                }
+                if (building.getMineralCost() > 0
+                                && colony.getMinerals() < building.getMineralCost()
+                                && !colony.hasUpgrade(ROLE_MINER)) {
+                        return GameConstants.RESOURCE_ROCK;
+                }
+                if (building.getResinCost() > 0
+                                && colony.getResins() < building.getResinCost()
+                                && !colony.hasUpgrade(ABILITY_RESIN)) {
+                        return GameConstants.RESOURCE_RESIN;
+                }
+                return null;
         }
 
         public static int countDynastyBuildingsOfTier(Dynasty dynasty, Tier tier) {

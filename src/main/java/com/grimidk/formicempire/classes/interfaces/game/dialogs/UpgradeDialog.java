@@ -364,6 +364,7 @@ public class UpgradeDialog extends ZeroDialog {
         private final JScrollPane scrollPane;
         private final JLabel statusLabel;
         private final JLabel geneticIntegrityLabel;
+        private final JLabel rpPauseNoteLabel;
         private final Map<JButton, Assimilation> buttonMap = new HashMap<>();
 
         public AssimilationPanel(Colony colony) {
@@ -371,8 +372,13 @@ public class UpgradeDialog extends ZeroDialog {
             this.colony = colony;
             setBackground(AssetStyles.BACKGROUND_COLOR);
 
+            JPanel header = new JPanel();
+            header.setLayout(new BoxLayout(header, BoxLayout.Y_AXIS));
+            header.setBackground(AssetStyles.BACKGROUND_SECONDARY);
+
             JPanel northPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 5));
             northPanel.setBackground(AssetStyles.BACKGROUND_SECONDARY);
+            northPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
             statusLabel = new JLabel(LanguageStrings.format(LanguageStrings.ASSIMILATION_CURRENT, LanguageStrings.get(LanguageStrings.ASSIMILATION_NONE)));
             statusLabel.setFont(AssetStyles.FONT_BOLD);
             statusLabel.setForeground(AssetStyles.FONT_COLOR_HEADER);
@@ -384,7 +390,15 @@ public class UpgradeDialog extends ZeroDialog {
             geneticIntegrityLabel.setIcon(GameConstants.ICON_STAT_GENETIC_INTEGRITY);
             geneticIntegrityLabel.setIconTextGap(8);
             northPanel.add(geneticIntegrityLabel);
-            add(northPanel, BorderLayout.NORTH);
+            header.add(northPanel);
+
+            rpPauseNoteLabel = new JLabel(LanguageStrings.get(LanguageStrings.ASSIMILATION_RP_PAUSE_NOTE));
+            rpPauseNoteLabel.setFont(AssetStyles.FONT_NORMAL);
+            rpPauseNoteLabel.setForeground(AssetStyles.FONT_COLOR);
+            rpPauseNoteLabel.setBorder(new EmptyBorder(0, 15, 8, 15));
+            rpPauseNoteLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            header.add(rpPauseNoteLabel);
+            add(header, BorderLayout.NORTH);
 
             listPanel = new JPanel();
             listPanel.setBackground(AssetStyles.BACKGROUND_COLOR);
@@ -447,6 +461,7 @@ public class UpgradeDialog extends ZeroDialog {
             } else {
                 statusLabel.setText(LanguageStrings.format(LanguageStrings.ASSIMILATION_CURRENT, LanguageStrings.get(LanguageStrings.ASSIMILATION_NONE)));
             }
+            rpPauseNoteLabel.setText(LanguageStrings.get(LanguageStrings.ASSIMILATION_RP_PAUSE_NOTE));
             updateGeneticIntegrityDisplay(d);
         }
 

@@ -646,13 +646,19 @@ public class ColonyAutomationService {
             }
         }
 
-        int assistantCount = (int) ((totalPrincesses - skyTrans) * 0.80);
+        int diplomatReserve = 0;
+        Dynasty dynasty = colony.getDynasty();
+        if (dynasty != null
+                && dynasty.hasUpgrade(GameUnlocks.ABILITY_AUTO_DIPLOMACY)
+                && colony.hasUpgrade(GameUnlocks.ROLE_DIPLOMAT)) {
+            diplomatReserve = Math.min(2, Math.max(0, totalPrincesses - skyTrans));
+        }
+        int remaining = Math.max(0, totalPrincesses - skyTrans - diplomatReserve);
+        int assistantCount = (int) (remaining * 0.80);
         targets.put(GameConstants.ROLE_ASSISTANT, assistantCount);
         targets.put(GameConstants.ROLE_SKYTRANS, skyTrans);
-
-        int breederCount = totalPrincesses - assistantCount - skyTrans;
-        targets.put(GameConstants.ROLE_BREEDER, breederCount);
-        assignAutomatedDiplomatQuotas(colony, targets);
+        targets.put(GameConstants.ROLE_DIPLOMAT, diplomatReserve);
+        targets.put(GameConstants.ROLE_BREEDER, remaining - assistantCount);
     }
 
     private void calculateSatellitePrincessQuotas(Colony colony, Map<AntRole, Integer> targets, int totalPrincesses) {
@@ -660,6 +666,7 @@ public class ColonyAutomationService {
                 ? percentOf(totalPrincesses, SATELLITE_BREEDER_SHARE) : 0;
         int diplomats = colony.hasUpgrade(GameUnlocks.ROLE_DIPLOMAT)
                 ? percentOf(totalPrincesses, SATELLITE_DIPLOMAT_SHARE) : 0;
+        diplomats = Math.min(diplomats, GameNumbers.DIPLOMAT_MAX_PER_DYNASTY_MISSION);
         int skyTrans = colony.hasUpgrade(GameUnlocks.ROLE_SKYTRANS)
                 ? percentOf(totalPrincesses, SATELLITE_SKYTRANS_SHARE) : 0;
         int assistants = Math.max(0, totalPrincesses - breeders - diplomats - skyTrans);
@@ -672,33 +679,6 @@ public class ColonyAutomationService {
 
     private static int percentOf(int total, double share) {
         return (int) Math.round(total * share);
-    }
-
-    private void assignAutomatedDiplomatQuotas(Colony colony, Map<AntRole, Integer> targets) {
-        if (!colony.isCapital()) {
-            return;
-        }
-        Dynasty dynasty = colony.getDynasty();
-        if (dynasty == null || !dynasty.hasUpgrade(GameUnlocks.ABILITY_AUTO_DIPLOMACY)) {
-            return;
-        }
-        if (!colony.hasUpgrade(GameUnlocks.ROLE_DIPLOMAT) || colony.getPrincesses().isEmpty()) {
-            return;
-        }
-        boolean isSource = colony.isCapital()
-                || colony.getLoyalty() >= GameConstants.LOYALTY_MILITANT.getMinScore();
-        if (!isSource) {
-            return;
-        }
-        int princesses = colony.getPrincesses().size();
-        int assignedElsewhere = targets.values().stream().mapToInt(Integer::intValue).sum();
-        int available = Math.max(0, princesses - assignedElsewhere);
-        if (available <= 0) {
-            return;
-        }
-        int diplomatTarget = Math.min(2, available);
-        targets.put(GameConstants.ROLE_DIPLOMAT,
-                targets.getOrDefault(GameConstants.ROLE_DIPLOMAT, 0) + diplomatTarget);
     }
 
     private boolean usesAggressiveTunnelAutomation(Colony colony) {

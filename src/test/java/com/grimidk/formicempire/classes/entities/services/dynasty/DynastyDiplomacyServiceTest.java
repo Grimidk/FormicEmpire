@@ -931,6 +931,38 @@ class DynastyDiplomacyServiceTest {
                 .anyMatch(line -> line.delta() == GameConstants.DIPLO_MODIFIER_WARMONGER.getReputationDelta()));
     }
 
+    @Test
+    void autoDiplomacyDoesNotExceedPerTargetDiplomatLimit() {
+        World world = emptyWorld();
+        TradeManager tradeManager = new TradeManager();
+        Colony capital = player.getCapital();
+        capital.setAge(7);
+        capital.setLoyalty(GameConstants.LOYALTY_MILITANT.getMinScore());
+        capital.unlockUpgrade(GameUnlocks.ROLE_DIPLOMAT);
+        capital.setAssignedRoleCount(GameConstants.ROLE_DIPLOMAT, 5);
+
+        Colony militant = new Colony(103, "Militant", true);
+        player.addColony(militant);
+        militant.setAge(7);
+        militant.setLoyalty(GameConstants.LOYALTY_MILITANT.getMinScore());
+        militant.unlockUpgrade(GameUnlocks.ROLE_DIPLOMAT);
+        militant.setAssignedRoleCount(GameConstants.ROLE_DIPLOMAT, 5);
+
+        Colony target = new Colony(104, "Unstable", true);
+        player.addColony(target);
+        target.setAge(7);
+        target.setLoyalty(GameConstants.LOYALTY_DISLOYAL.getMinScore());
+
+        player.unlockUpgrade(GameUnlocks.ROLE_DIPLOMAT);
+        player.unlockUpgrade(GameUnlocks.ABILITY_AUTO_DIPLOMACY);
+        player.setAutoDiplomacyEnabled(true);
+
+        player.getDiplomacyService().runAutomatedColonyLoyalty(player, world, tradeManager);
+
+        assertEquals(GameNumbers.DIPLOMAT_MAX_PER_DYNASTY_MISSION,
+                player.getDiplomacyService().countColonyMissionDiplomatsOn(target));
+    }
+
     private void advanceWorldDays(World world, int days) {
         TradeManager tradeManager = new TradeManager();
         for (int i = 0; i < days; i++) {

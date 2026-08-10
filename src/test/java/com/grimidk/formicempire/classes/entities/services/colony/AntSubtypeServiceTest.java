@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -299,5 +300,42 @@ class AntSubtypeServiceTest {
         AntSubtypeService.applySubtypeStats(soldier, colony);
         Ant baseline = new Ant(colony, GameConstants.TYPE_SOLDIER);
         assertEquals(baseline.getConsumption() * 2f, soldier.getConsumption(), 0.0001f);
+    }
+
+    @Test
+    void farsightAssimilationCountsAsSubtypeAssimilation() {
+        Dynasty dynasty = new Dynasty(21, "D", true, GameConstants.SPECIES_OMNI);
+        Colony colony = new Colony(21, "C", true);
+        dynasty.addColony(colony);
+        colony.setDynasty(dynasty);
+
+        assertFalse(AntSubtypeService.hasSubtypeAssimilation(colony));
+
+        dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_FARSIGHT);
+
+        assertTrue(AntSubtypeService.hasSubtypeAssimilation(colony));
+        assertTrue(AntSubtypeService.getAvailableSubtypes(colony, AntSubtypeSlot.HEAD)
+                .contains(GameConstants.SUBTYPE_HEAD_FARSIGHT));
+        assertTrue(AntSubtypeService.listUnlockedSpecialSubtypes(colony)
+                .contains(GameConstants.SUBTYPE_HEAD_FARSIGHT));
+    }
+
+    @Test
+    void automatedFarsightRatesSoldiersAndMajorsWhenNoTrapjaw() {
+        Dynasty dynasty = new Dynasty(22, "D", true, GameConstants.SPECIES_OMNI);
+        dynasty.unlockUpgrade(GameUnlocks.TYPE_SOLDIER);
+        dynasty.unlockUpgrade(GameUnlocks.TYPE_MAJOR);
+        dynasty.unlockUpgrade(GameUnlocks.ASSIMILATED_FARSIGHT);
+        Colony colony = new Colony(22, "C", true);
+        dynasty.addColony(colony);
+        colony.setDynasty(dynasty);
+        colony.setMushrooms(1000);
+        colony.setWater(100);
+
+        AntSubtypeService.applyAutomatedSubtypeRates(colony);
+
+        int digit = GameConstants.SUBTYPE_HEAD_FARSIGHT.getDigit();
+        assertEquals(50f, colony.getSubtypeHatchRate(GameConstants.TYPE_SOLDIER, AntSubtypeSlot.HEAD, digit));
+        assertEquals(50f, colony.getSubtypeHatchRate(GameConstants.TYPE_MAJOR, AntSubtypeSlot.HEAD, digit));
     }
 }

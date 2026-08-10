@@ -13,6 +13,7 @@ import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
 import com.grimidk.formicempire.classes.entities.Hex;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 
 class ColonyAutomationServiceTest {
@@ -170,6 +171,32 @@ class ColonyAutomationServiceTest {
         assertEquals(3, satellite.getAssignedRoleCount(GameConstants.ROLE_ASSISTANT));
         assertEquals(3, satellite.getAssignedRoleCount(GameConstants.ROLE_RESEARCHER));
         assertEquals(7, satellite.getAssignedRoleCount(GameConstants.ROLE_LAYER));
+    }
+
+    @Test
+    void satelliteAutomationCapsDiplomatsAtMissionLimit() {
+        Colony capital = new Colony(1, "Capital", false);
+        capital.setCapital(true);
+        Colony satellite = new Colony(2, "Satellite", false);
+        dynasty.addColony(capital);
+        dynasty.addColony(satellite);
+        satellite.setDynasty(dynasty);
+        satellite.setAutomationEnabled(true);
+        satellite.setAge(7);
+        satellite.unlockUpgrade(GameUnlocks.ROLE_DIPLOMAT);
+        satellite.unlockUpgrade(GameUnlocks.ROLE_BREEDER);
+
+        for (int i = 0; i < 40; i++) {
+            satellite.getPrincesses().add(new Ant(satellite, GameConstants.TYPE_PRINCESS));
+        }
+        for (int i = 0; i < 5; i++) {
+            satellite.getQueens().add(new Ant(satellite, GameConstants.TYPE_QUEEN));
+        }
+
+        automationService.runAutomation(satellite);
+
+        assertEquals(GameNumbers.DIPLOMAT_MAX_PER_DYNASTY_MISSION,
+                satellite.getAssignedRoleCount(GameConstants.ROLE_DIPLOMAT));
     }
 
     @Test

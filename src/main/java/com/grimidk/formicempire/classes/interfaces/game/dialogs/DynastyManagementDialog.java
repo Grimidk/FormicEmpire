@@ -138,6 +138,15 @@ public class DynastyManagementDialog extends ZeroDialog {
         super.dispose();
     }
 
+    @Override
+    protected boolean consumeEscape() {
+        if (tradeCreationDialog != null && tradeCreationDialog.isShowing()) {
+            disposeTradeCreationDialog();
+            return true;
+        }
+        return false;
+    }
+
     private void disposeTradeCreationDialog() {
         if (tradeCreationDialog != null) {
             tradeCreationDialog.dispose();
@@ -314,8 +323,15 @@ public class DynastyManagementDialog extends ZeroDialog {
 
     private void openTradeDialog(Colony origin, Colony target, Trade existingTrade) {
         disposeTradeCreationDialog();
-        tradeCreationDialog = new TradeCreationDialog(
-                SwingUtilities.getWindowAncestor(this), origin, target, engine, existingTrade);
+        tradeCreationDialog = new TradeCreationDialog(this, origin, target, engine, existingTrade);
+        tradeCreationDialog.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                if (tradeCreationDialog == e.getWindow()) {
+                    tradeCreationDialog = null;
+                }
+            }
+        });
         tradeCreationDialog.setVisible(true);
     }
 
@@ -1321,6 +1337,12 @@ public class DynastyManagementDialog extends ZeroDialog {
             add(footerPanel, BorderLayout.SOUTH);
             
             UiDialogUtils.prepareDialog(this, owner);
+            EdgeTriggeredKeyBindings.bind(
+                    getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW),
+                    getRootPane().getActionMap(),
+                    KeyEvent.VK_ESCAPE,
+                    "escapeCloseTrade",
+                    this::dispose);
             updateStats();
         }
 

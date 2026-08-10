@@ -1,5 +1,6 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
+import com.grimidk.formicempire.classes.constants.misc.ResourceType;
 import com.grimidk.formicempire.classes.constants.unlocks.Building;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
@@ -396,13 +397,19 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
                 }
                 String tip = null;
                 if (!canBuild && colony != null) {
-                    int builders = colony.getAssignedRoleCount(GameConstants.ROLE_BUILDER);
-                    int cranes = colony.getAssignedRoleCount(GameConstants.ROLE_CRANE);
-                    if (builders <= 0 && cranes <= 0) {
-                        tip = LanguageStrings.get(LanguageStrings.BUILD_REQUIREMENT_ERROR);
-                    } else if (colony.getMinerals() < building.getMineralCost()
-                            || colony.getResins() < building.getResinCost()) {
-                        tip = LanguageStrings.get(LanguageStrings.BUILD_RESOURCES_ERROR);
+                    ResourceType blockedMaterial = GameUnlocks.getBlockingBuildingMaterial(colony, building);
+                    if (blockedMaterial != null) {
+                        tip = LanguageStrings.format(
+                                LanguageStrings.BUILD_MATERIAL_UNLOCK_ERROR, blockedMaterial.getName());
+                    } else {
+                        int builders = colony.getAssignedRoleCount(GameConstants.ROLE_BUILDER);
+                        int cranes = colony.getAssignedRoleCount(GameConstants.ROLE_CRANE);
+                        if (builders <= 0 && cranes <= 0) {
+                            tip = LanguageStrings.get(LanguageStrings.BUILD_REQUIREMENT_ERROR);
+                        } else if (colony.getMinerals() < building.getMineralCost()
+                                || colony.getResins() < building.getResinCost()) {
+                            tip = LanguageStrings.get(LanguageStrings.BUILD_RESOURCES_ERROR);
+                        }
                     }
                 }
                 if (tip == null ? actionButton.getToolTipText() != null

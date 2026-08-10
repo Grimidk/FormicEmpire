@@ -1335,8 +1335,10 @@ public class DynastyDiplomacyService {
         if (!canSendDiplomatsToColony(from, target, tradeManager, world) || requestedCount <= 0) {
             return 0;
         }
+        int room = Math.max(0, getMaxDiplomatsPerTarget() - countColonyMissionDiplomatsOn(target));
         int toSend = Math.min(requestedCount, Math.min(
-                countAvailableDiplomats(from), getMaxDiplomatsForColonyMission()));
+                countAvailableDiplomats(from),
+                Math.min(getMaxDiplomatsForColonyMission(), room)));
         if (toSend <= 0) {
             return 0;
         }
@@ -1375,7 +1377,12 @@ public class DynastyDiplomacyService {
                 if (source == target || !canSendDiplomatsToColony(source, target, tradeManager, world)) {
                     continue;
                 }
-                int max = Math.min(countAvailableDiplomats(source), getMaxDiplomatsForColonyMission());
+                int room = Math.max(0, getMaxDiplomatsPerTarget() - countColonyMissionDiplomatsOn(target));
+                if (room <= 0) {
+                    break;
+                }
+                int max = Math.min(countAvailableDiplomats(source),
+                        Math.min(getMaxDiplomatsForColonyMission(), room));
                 int sent = sendDiplomatsToColony(source, target, max, tradeManager, world);
                 if (sent > 0) {
                     int gain = sent * getDiplomatStabilityGainPerAnt();
@@ -1429,8 +1436,10 @@ public class DynastyDiplomacyService {
         if (!canSendDiplomatsToDynasty(from, other, world) || requestedCount <= 0) {
             return 0;
         }
+        int room = Math.max(0, getMaxDiplomatsPerTarget() - countDynastyMissionDiplomatsToward(other));
         int toSend = Math.min(requestedCount, Math.min(
-                countAvailableDiplomats(from), getMaxDiplomatsForDynastyMission()));
+                countAvailableDiplomats(from),
+                Math.min(getMaxDiplomatsForDynastyMission(), room)));
         if (toSend <= 0) {
             return 0;
         }

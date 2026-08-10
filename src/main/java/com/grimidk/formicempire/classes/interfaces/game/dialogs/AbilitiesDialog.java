@@ -278,6 +278,7 @@ public class AbilitiesDialog extends ZeroDialog {
         if (titleIcon != null) {
             JLabel iconLabel = new JLabel(titleIcon);
             iconLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
+            iconLabel.setVerticalAlignment(SwingConstants.TOP);
             panel.add(iconLabel, BorderLayout.WEST);
         }
 
