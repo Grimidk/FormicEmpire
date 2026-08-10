@@ -4,13 +4,13 @@ To Fix (By decreasing priority):
 	Game Breaking:
 		(none right now)
 	High:
-		fullscreen aint working and resolutions not working
-		change icons for music player to be like the other (add them to help)
-		uprades using tag not proper names
+		(none right now)
 	Mid:
 		TODO: icons for stats (Skeleton, Acid, Longevity, Research/Growth/Thirst/Laying/Scouting/Farming/Contamination/Graving/Policing 1–3, Logistics 1, Passive 1, Symbiotic Mite 1, Dermestid 1, Hex Sustain, Worker Speed 2, Health/Attack/Defense 1–2, Attack Speed 1)
 		TODO: icons for buildings under icons/buildings/ (Royal/Egg/Mushroom/Plant/Water/Meat/Syrup/Rock/Resin L0–L5, Passive Lab/Water/Aphid/Nurse/Farm/Grave, Composter) — separate from sprites/buildings/rooms/
 		TODO: tune AntSpeciesPalette hexcodes + icons for placeholder species (carpenter, weaver, floodplain, jet, army, ghost, silver, shining black, desert)
+		fullscreen aint working and resolutions not working
+		change icons for music player to be like the other (add them to help)
 		music: main menu song, more songs in general
 		sounds: building done, research done, basic click, 
 	Low:

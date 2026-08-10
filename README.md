@@ -10,6 +10,8 @@ Please enjoy Formice Empire, and send feedback to: thegrimidk@gmail.com or leave
 
 Check the roadmap to see planned features and known bugs and credits for acknowledgments, if you want to help out let me know and I'll add you to the credits. 
 
+Note that there is a version for each operating system, for the linux version you will have to go to the development repository (https://github.com/Grimidk/FormicEmpire) to compile locally or use the .jar with your own JRE. If you want to you can add the App to your application folder or manage it trough Steam, future updates will not overwrite your savefiles.
+
 DEVELOPMENT INSTRUCTIONS:
 
 This are instructions to modify or test the game, if you are instered in just playing please go to: https://grimidk.itch.io/formic-empire 

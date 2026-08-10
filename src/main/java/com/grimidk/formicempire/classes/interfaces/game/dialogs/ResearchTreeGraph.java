@@ -1,5 +1,7 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
+import com.grimidk.formicempire.classes.constants.dynasty.Rank;
+import com.grimidk.formicempire.classes.constants.misc.Tier;
 import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
 import com.grimidk.formicempire.classes.constants.unlocks.Synergy;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
@@ -9,7 +11,9 @@ import com.grimidk.formicempire.classes.entities.services.dynasty.DynastySynergy
 import com.grimidk.formicempire.classes.entities.services.shared.TriggerProgressService;
 import com.grimidk.formicempire.classes.entities.services.shared.TriggerProgressService.TriggerProgress;
 import com.grimidk.formicempire.classes.infrasctructure.Engine;
+import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
+import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -210,6 +214,98 @@ public final class ResearchTreeGraph {
                 triggers,
                 assimilationRewardIndex(),
                 synergyRewardIndex());
+    }
+
+    public static Assimilation assimilationForReward(Upgrade upgrade) {
+        if (upgrade == null) {
+            return null;
+        }
+        return assimilationRewardIndex().get(upgrade);
+    }
+
+    public static Synergy synergyForReward(Upgrade upgrade) {
+        if (upgrade == null) {
+            return null;
+        }
+        return synergyRewardIndex().get(upgrade);
+    }
+
+    public static String formatTierRequirement(Tier tier) {
+        if (tier == null) {
+            return "";
+        }
+        Rank rank = tier.getRankRequirement();
+        long ants = rank != null ? rank.getPopulation() : 0L;
+        return LanguageStrings.format(
+                LanguageStrings.UPGRADE_REQUIRES_TIER_ANTS_FMT,
+                tier.getName(),
+                AssetStyles.formatNumber(ants));
+    }
+
+    public static String buyButtonTooltip(Colony colony, Engine engine, Upgrade upgrade) {
+        if (colony == null || upgrade == null || colony.hasUpgrade(upgrade)) {
+            return null;
+        }
+        if (stateFor(colony, engine, upgrade) == NodeState.AFFORDABLE) {
+            return null;
+        }
+
+        List<String> parts = new ArrayList<>();
+        Assimilation assimilation = assimilationForReward(upgrade);
+        if (assimilation != null) {
+            parts.add(LanguageStrings.format(
+                    LanguageStrings.UPGRADE_REQUIRES_ASSIMILATION_FMT, assimilation.getName()));
+        }
+        Synergy synergy = synergyForReward(upgrade);
+        if (synergy != null) {
+            parts.add(LanguageStrings.format(
+                    LanguageStrings.UPGRADE_REQUIRES_SYNERGY_FMT, synergy.getName()));
+        }
+
+        if (assimilation == null && synergy == null) {
+            Upgrade requirement = upgrade.getRequirement();
+            if (requirement != null && !colony.hasUpgrade(requirement)) {
+                parts.add(requirement.getDisplayName());
+            }
+            Dynasty dynasty = colony.getDynasty();
+            if (!upgrade.isAvailableFor(dynasty)) {
+                parts.add(formatTierRequirement(upgrade.getTier()));
+            }
+            if (!GameUnlocks.meetsExtraAutomationPrerequisites(dynasty, upgrade)) {
+                TriggerProgress progress = TriggerProgressService.find(colony, engine, upgrade);
+                if (progress != null) {
+                    String metric = progress.getMetricLabel();
+                    if (metric != null && !metric.isBlank()) {
+                        parts.add(metric);
+                    } else {
+                        parts.add(progress.getHint());
+                    }
+                }
+            }
+            boolean gatesMet = (requirement == null || colony.hasUpgrade(requirement))
+                    && upgrade.isAvailableFor(dynasty)
+                    && GameUnlocks.meetsExtraAutomationPrerequisites(dynasty, upgrade);
+            if (gatesMet && upgrade.getCost() > 0 && colony.getResearchPoints() < upgrade.getCost()) {
+                parts.add(LanguageStrings.get(LanguageStrings.UPGRADE_NOT_ENOUGH_RP));
+            } else if (parts.isEmpty() && upgrade.getCost() <= 0) {
+                TriggerProgress progress = TriggerProgressService.find(colony, engine, upgrade);
+                if (progress != null) {
+                    String metric = progress.getMetricLabel();
+                    if (metric != null && !metric.isBlank()) {
+                        parts.add(metric);
+                    } else {
+                        parts.add(progress.getHint());
+                    }
+                }
+            }
+        }
+
+        if (parts.isEmpty()) {
+            return null;
+        }
+        return LanguageStrings.format(
+                LanguageStrings.UPGRADE_REQUIRES_FMT,
+                String.join(LanguageStrings.get(LanguageStrings.UPGRADE_REQUIRES_LIST_SEPARATOR), parts));
     }
 
     private static NodeState stateFor(

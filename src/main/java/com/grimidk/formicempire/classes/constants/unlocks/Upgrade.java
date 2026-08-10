@@ -42,6 +42,15 @@ public class Upgrade extends Constant {
         return LanguageStrings.get(descriptionKey);
     }
 
+    public String getTitleName() {
+        String name = getName();
+        return name.equals(getNameKey()) ? getFlavorName() : name;
+    }
+
+    public boolean hasTranslatedName() {
+        return !getName().equals(getNameKey());
+    }
+
     public Upgrade getRequirement() {
         return requirement;
     }

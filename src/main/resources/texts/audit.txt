@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 74% (265/359 checked)
+Completion: 79% (289/368 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -193,7 +193,7 @@ Per ant type tab (Worker, Soldier, Major, Princess, Queen):
 ================================================================================
 Purchase with research points (RP). Test buy on each category:
 
-[X] Research tree: radial grid with ring-constrained placement and edge-untangle (fewer crossing diagonals), detail card (centered bold name+icon, centered flavor+description; left-aligned tier icon/name, requirement, RP/trigger progress bar; Buy only for RP-cost nodes with parent met — hidden for trigger/special progress; tip shows tier requirement or not-enough-RP accurately), node colors (green owned, red affordable, blue trigger progress, yellow assimilation/synergy progress, grey unavailable); buy gated by parent+tier+RP; press on node opens card (no pan steal); empty-space drag pans after threshold; ESC closes detail card before dialog; locked nodes hidden unless owned, directly after an owned node, or showing trigger/assimilation/synergy progress (stable full-tree layout; no edges to hidden nodes); Help encyclopedia reveals full tree with all nodes marked owned
+[ ] Research tree: radial grid with ring-constrained placement and edge-untangle (fewer crossing diagonals), detail card (centered bold title via translated name with flavor fallback + icon, centered flavor when distinct from title + description; left-aligned tier icon/name with ant-count tip, requirement incl. assimilation/synergy when that is the unlock path, RP/trigger progress bar; Buy on every non-owned node — disabled with tip for unmet parent/tier(ants)/assimilation/synergy/RP/trigger; tip shows specific requirements accurately), node colors (green owned, red affordable, blue trigger progress, yellow assimilation/synergy progress, grey unavailable); buy gated by parent+tier+RP; press on node opens card (no pan steal); empty-space drag pans after threshold; ESC closes detail card before dialog; locked nodes hidden unless owned, directly after an owned node, or showing trigger/assimilation/synergy progress (stable full-tree layout; no edges to hidden nodes); Help encyclopedia reveals full tree with all nodes marked owned
 
 Ant types:
 [X] Egg, Worker, Soldier, Major, Princess, Queen
@@ -211,7 +211,7 @@ Major roles:
 [ ] Siege (RP purchase; Tier 4; hex-assault only)
 
 Princess roles:
-[X] Breeder, Diplomat, Assistant (assistants research at 1/50 queen efficiency)
+[ ] Breeder, Diplomat, Assistant (Assistant Tier 2; assistants research at 1/50 queen efficiency)
 [ ] Captain (unlocked with Commander; infantry line; Infantry Leader +25% infantry damage)
 [ ] Air Support (Queendom rank; princesses; air-support line; Close Ant Support 1000%/90%)
 [ ] Air Bomber (synergy: Air Support + Bomber + Acid Spit; Air Bombing 2000%/90%/7 targets; ant dies)
@@ -356,7 +356,7 @@ Neighbor trade rows (per adjacent hex):
 [X] Sort dynasty list (reputation / distance closest / distance furthest)
 [X] Search filter by dynasty or colony name (substring match)
 Per foreign dynasty Actions menu:
-[ ] Incoming pact request policy (Ask / Auto accept / Auto decline; max one received per day)
+[X] Incoming pact request policy (Ask / Auto accept / Auto decline; max one received per day)
 [X] Non-aggression pact — propose / accept / break
 [X] Declare war (confirm dialog; population + attacker active military; target may lack active roles → hex defense)
 [ ] Request trade agreement
@@ -402,7 +402,7 @@ Per foreign dynasty Actions menu:
 [X] Mouse wheel zoom on map
 [X] Legend / overlay toggles if present
 [X] Go Back Home button — recenters map on player capital
-[ ] New colonies after capital use randomized city titles (City/Berg/Grad/Burg/Haven/Nest/Hold/Ford), no repeats within dynasty
+[X] New colonies after capital use randomized city titles (City/Berg/Grad/Burg/Haven/Nest/Hold/Ford), no repeats within dynasty
 
 ================================================================================
 20. STATISTICS (X)
@@ -460,11 +460,11 @@ Daily:
 [ ] Commander role unlock (3 wars participated + multi-queen colony)
 [ ] Commander assignment: max 1 per colony; requires spare queen off combat; raises dynasty combat capacity 1k→2.5k once
 [X] Research / Build / Spread ability unlocks
-[ ] Dynasty / Trade / Management / Spread 2 / Automation unlocks by colony count
+[X] Dynasty / Trade / Management / Spread 2 / Automation unlocks by colony count
 [ ] Bilateral Trade unlock from active trade count
 [ ] Courier / Borer role unlocks
 [ ] Assimilation ability unlock from absorbed dynasties
-[ ] Omni starts with Genome Bridge completed; other species assimilations still gated until Genome Bridge; Assimilation UI only when a new genome is researchable
+[X] Omni starts with Genome Bridge completed; other species assimilations still gated until Genome Bridge; Assimilation UI only when a new genome is researchable
 [ ] Subtype hatch ability unlock after body-part assimilation
 [ ] Colony Operations ability unlock
 [ ] Mass Flight unlock
@@ -474,7 +474,6 @@ Daily:
 [ ] Auto-Tunnels / Auto-Diplomacy unlocks (after Automation + prerequisites)
 [ ] Colony death detection
 [ ] NPC dynasty triggers
-[ ] (and other TriggerManager daily checks)
 
 Hourly:
 [X] Hourly trigger checks

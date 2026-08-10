@@ -1,5 +1,7 @@
 package com.grimidk.formicempire.classes.interfaces.game.dialogs;
 
+import com.grimidk.formicempire.classes.constants.unlocks.Assimilation;
+import com.grimidk.formicempire.classes.constants.unlocks.Synergy;
 import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.services.shared.TriggerProgressService;
@@ -322,7 +324,7 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
             selectedState = ResearchTreeGraph.stateFor(colony, engine, selectedUpgrade);
             Upgrade upgrade = selectedUpgrade;
 
-            String name = upgrade.getName();
+            String name = upgrade.getTitleName();
             if (!name.equals(nameLabel.getText())) {
                 nameLabel.setText(name);
             }
@@ -331,8 +333,9 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
                 iconLabel.setIcon(icon);
             }
 
-            setCenteredText(flavorPane, upgrade.getFlavorName());
-            setVisibleIfChanged(flavorPane, true);
+            String flavor = upgrade.getFlavorName();
+            setCenteredText(flavorPane, flavor);
+            setVisibleIfChanged(flavorPane, !flavor.isBlank() && !flavor.equals(name));
             setCenteredText(descriptionPane, upgrade.getDescription());
 
             if (tierLabel.getIcon() != upgrade.getTierIcon()) {
@@ -342,12 +345,26 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
             if (!tierName.equals(tierLabel.getText())) {
                 tierLabel.setText(tierName);
             }
-            tierLabel.setToolTipText(tierName);
+            String tierTip = ResearchTreeGraph.formatTierRequirement(upgrade.getTier());
+            if (tierTip == null ? tierLabel.getToolTipText() != null : !tierTip.equals(tierLabel.getToolTipText())) {
+                tierLabel.setToolTipText(tierTip);
+            }
 
             Upgrade requirement = upgrade.getRequirement();
-            if (requirement != null) {
-                String reqText = LanguageStrings.format(
-                        LanguageStrings.UPGRADE_REQUIRES_FMT, requirement.getDisplayName());
+            Assimilation assimilation = ResearchTreeGraph.assimilationForReward(upgrade);
+            Synergy synergy = ResearchTreeGraph.synergyForReward(upgrade);
+            String reqDetail = null;
+            if (assimilation != null) {
+                reqDetail = LanguageStrings.format(
+                        LanguageStrings.UPGRADE_REQUIRES_ASSIMILATION_FMT, assimilation.getName());
+            } else if (synergy != null) {
+                reqDetail = LanguageStrings.format(
+                        LanguageStrings.UPGRADE_REQUIRES_SYNERGY_FMT, synergy.getName());
+            } else if (requirement != null) {
+                reqDetail = requirement.getDisplayName();
+            }
+            if (reqDetail != null) {
+                String reqText = LanguageStrings.format(LanguageStrings.UPGRADE_REQUIRES_FMT, reqDetail);
                 if (!reqText.equals(requirementLabel.getText())) {
                     requirementLabel.setText(reqText);
                 }
@@ -375,26 +392,14 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
                 return;
             }
             boolean canBuy = selectedState == ResearchTreeGraph.NodeState.AFFORDABLE;
-            boolean reqMet = upgrade.getRequirement() == null
-                    || (colony != null && colony.hasUpgrade(upgrade.getRequirement()));
-            boolean showBuy = upgrade.getCost() > 0
-                    && selectedState != ResearchTreeGraph.NodeState.OWNED
-                    && selectedState != ResearchTreeGraph.NodeState.TRIGGER_PROGRESS
-                    && selectedState != ResearchTreeGraph.NodeState.SPECIAL_PROGRESS
-                    && reqMet;
+            boolean showBuy = selectedState != ResearchTreeGraph.NodeState.OWNED;
             setVisibleIfChanged(buyButton, showBuy);
             if (buyButton.isEnabled() != canBuy) {
                 buyButton.setEnabled(canBuy);
             }
-            String tip = null;
-            if (showBuy && !canBuy && colony != null) {
-                if (!upgrade.isAvailableFor(colony.getDynasty())) {
-                    tip = LanguageStrings.format(
-                            LanguageStrings.UPGRADE_REQUIRES_FMT, upgrade.getTier().getName());
-                } else if (colony.getResearchPoints() < upgrade.getCost()) {
-                    tip = LanguageStrings.get(LanguageStrings.UPGRADE_NOT_ENOUGH_RP);
-                }
-            }
+            String tip = showBuy && !canBuy
+                    ? ResearchTreeGraph.buyButtonTooltip(colony, engine, upgrade)
+                    : null;
             if (tip == null ? buyButton.getToolTipText() != null : !tip.equals(buyButton.getToolTipText())) {
                 buyButton.setToolTipText(tip);
             }

@@ -4,9 +4,11 @@ import com.grimidk.formicempire.classes.constants.unlocks.Upgrade;
 import com.grimidk.formicempire.classes.entities.critter.Ant;
 import com.grimidk.formicempire.classes.entities.dynasty.Colony;
 import com.grimidk.formicempire.classes.entities.dynasty.Dynasty;
+import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
+import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -410,5 +412,56 @@ class ResearchTreeGraphTest {
         assertEquals(ResearchTreeGraph.NodeState.OWNED, builder.getState());
         assertTrue(after.getNodes().stream()
                 .anyMatch(n -> n.getUpgrade() == GameUnlocks.ABILITY_BUILD));
+    }
+
+    @Test
+    void buyButtonTooltipNamesTierWithAntCount() {
+        dynasty.setRank(GameConstants.RANK_COLONY);
+        colony.unlockUpgrade(GameUnlocks.TYPE_EGG);
+        colony.setResearchPoints(GameUnlocks.TYPE_PRINCESS.getCost());
+
+        String tip = ResearchTreeGraph.buyButtonTooltip(colony, null, GameUnlocks.TYPE_PRINCESS);
+
+        assertTrue(tip.contains(GameConstants.TIER_1.getName()), tip);
+        assertTrue(tip.contains(AssetStyles.formatNumber(GameConstants.RANK_COUNTY.getPopulation())), tip);
+    }
+
+    @Test
+    void buyButtonTooltipNamesAssimilationReward() {
+        String tip = ResearchTreeGraph.buyButtonTooltip(
+                colony, null, GameUnlocks.ASSIMILATED_FIREVENOM);
+
+        assertTrue(tip.contains(GameUnlocks.ASSIMILATION_FIREVENOM.getName()), tip);
+        assertEquals(
+                GameUnlocks.ASSIMILATION_FIREVENOM,
+                ResearchTreeGraph.assimilationForReward(GameUnlocks.ASSIMILATED_FIREVENOM));
+    }
+
+    @Test
+    void buyButtonTooltipNamesSynergyReward() {
+        String tip = ResearchTreeGraph.buyButtonTooltip(colony, null, GameUnlocks.SYNERGY_SUPER_VENOM);
+
+        assertTrue(tip.contains(GameUnlocks.SUPER_VENOM_SYNERGY.getName()), tip);
+        assertEquals(
+                GameUnlocks.SUPER_VENOM_SYNERGY,
+                ResearchTreeGraph.synergyForReward(GameUnlocks.SYNERGY_SUPER_VENOM));
+    }
+
+    @Test
+    void buyButtonTooltipReportsMissingParentAndNotEnoughRp() {
+        dynasty.setRank(GameConstants.RANK_DUCHY);
+        colony.setResearchPoints(0);
+
+        String missingParent = ResearchTreeGraph.buyButtonTooltip(
+                colony, null, GameUnlocks.ROLE_ASSISTANT);
+        assertTrue(missingParent.contains(GameUnlocks.TYPE_PRINCESS.getDisplayName()), missingParent);
+
+        colony.unlockUpgrade(GameUnlocks.TYPE_PRINCESS);
+        String missingRp = ResearchTreeGraph.buyButtonTooltip(colony, null, GameUnlocks.ROLE_ASSISTANT);
+        assertTrue(missingRp.contains(
+                LanguageStrings.get(LanguageStrings.UPGRADE_NOT_ENOUGH_RP)), missingRp);
+
+        colony.setResearchPoints(GameUnlocks.ROLE_ASSISTANT.getCost());
+        assertEquals(null, ResearchTreeGraph.buyButtonTooltip(colony, null, GameUnlocks.ROLE_ASSISTANT));
     }
 }
