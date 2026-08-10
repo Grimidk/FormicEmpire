@@ -15,6 +15,7 @@ public abstract class ZeroDialog extends JDialog {
     
     private final String titleKey;
     private final JButton closeButton;
+    private boolean hideOnClose;
 
     public ZeroDialog(JFrame owner, String titleKey, Dimension preferredSize) {
         super(owner, LanguageStrings.get(titleKey), true);
@@ -36,7 +37,7 @@ public abstract class ZeroDialog extends JDialog {
         closeButton = new JButton(LanguageStrings.get(LanguageStrings.UI_CLOSE));
         closeButton.setFocusable(false);
         AssetStyles.styleButton(closeButton);
-        closeButton.addActionListener(e -> dispose());
+        closeButton.addActionListener(e -> requestClose());
         southPanel.add(closeButton);
         add(southPanel, BorderLayout.SOUTH);
 
@@ -48,6 +49,18 @@ public abstract class ZeroDialog extends JDialog {
                 this::handleEscapeKey);
         
         setFocusable(true);
+    }
+
+    protected void setHideOnClose(boolean hideOnClose) {
+        this.hideOnClose = hideOnClose;
+    }
+
+    public void requestClose() {
+        if (hideOnClose) {
+            setVisible(false);
+        } else {
+            dispose();
+        }
     }
     
     public void refreshTranslations() {
@@ -83,7 +96,7 @@ public abstract class ZeroDialog extends JDialog {
                 && frame.getGamePanel().handleEscapeKey()) {
             return;
         }
-        dispose();
+        requestClose();
     }
 
     protected boolean consumeEscape() {
@@ -96,7 +109,7 @@ public abstract class ZeroDialog extends JDialog {
                 getRootPane().getActionMap(),
                 keyEvent,
                 "closeKey",
-                this::dispose);
+                this::requestClose);
     }
 
     protected void addToSouthPanel(JComponent component) {

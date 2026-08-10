@@ -42,16 +42,24 @@ public class UpgradeDialog extends ZeroDialog {
     private SynergyPanel synergyPanel;
 
     private final Map<Integer, Integer> tabIndexMap = new HashMap<>();
+    private final Map<Integer, JPanel> lazyStubs = new HashMap<>();
     
     private int targetTab = -1;
+    private boolean materializingTab;
 
     public UpgradeDialog(JFrame owner, Colony colony, Engine engine) {
         super(owner, LanguageStrings.DIALOG_UPGRADES_TITLE, AssetStyles.DEFAULT_DIALOG_SIZE);
         this.colony = colony;
         this.engine = engine;
+        setHideOnClose(true);
 
         tabbedPane = new JTabbedPane();
         AssetStyles.styleTabbedPane(tabbedPane);
+        tabbedPane.addChangeListener(e -> {
+            if (!materializingTab) {
+                materializeSelectedTab();
+            }
+        });
         add(tabbedPane, BorderLayout.CENTER);
 
         initKeyBindings();
@@ -64,6 +72,10 @@ public class UpgradeDialog extends ZeroDialog {
         });
     }
 
+    public Colony getColony() {
+        return colony;
+    }
+
     public void showDialog(int preferredType) {
         this.targetTab = preferredType;
         super.showDialog();
@@ -72,6 +84,7 @@ public class UpgradeDialog extends ZeroDialog {
     public void setTab(int tabType) {
         if (tabIndexMap.containsKey(tabType)) {
             tabbedPane.setSelectedIndex(tabIndexMap.get(tabType));
+            materializeSelectedTab();
         }
     }
     
@@ -95,53 +108,163 @@ public class UpgradeDialog extends ZeroDialog {
     protected void refreshDialog() {
         tabbedPane.removeAll();
         tabIndexMap.clear();
+        lazyStubs.clear();
 
         int currentIndex = 0;
 
-        // --- Research Tab ---
         if (colony.hasUpgrade(GameUnlocks.ABILITY_RESEARCH)) {
-            if (researchPanel == null) {
-                researchPanel = new ResearchTreePanel(colony, engine, this::onTreePanelChanged);
-            }
-            researchPanel.updateData();
-            tabbedPane.addTab(LanguageStrings.get(LanguageStrings.TAB_RESEARCH), GameUnlocks.ABILITY_RESEARCH.getIcon(), researchPanel);
-            tabIndexMap.put(TAB_RESEARCH, currentIndex++);
+            addUpgradeTab(
+                    TAB_RESEARCH,
+                    LanguageStrings.get(LanguageStrings.TAB_RESEARCH),
+                    GameUnlocks.ABILITY_RESEARCH.getIcon(),
+                    currentIndex++);
         }
 
-        // --- Build Tab ---
         if (colony.hasUpgrade(GameUnlocks.ROLE_BUILDER)) {
-            if (buildPanel == null) {
-                buildPanel = new BuildingTreePanel(colony, this::onTreePanelChanged);
-            }
-            buildPanel.updateData();
-            tabbedPane.addTab(LanguageStrings.get(LanguageStrings.TAB_CONSTRUCTION), GameUnlocks.ABILITY_BUILD.getIcon(), buildPanel);
-            tabIndexMap.put(TAB_BUILD, currentIndex++);
+            addUpgradeTab(
+                    TAB_BUILD,
+                    LanguageStrings.get(LanguageStrings.TAB_CONSTRUCTION),
+                    GameUnlocks.ABILITY_BUILD.getIcon(),
+                    currentIndex++);
         }
 
-        // --- Assimilations Tab ---
-        if (GameUnlocks.shouldShowAssimilationUi(colony.getDynasty())) { 
-            if (assimilationPanel == null) {
-                assimilationPanel = new AssimilationPanel(colony);
-            }
-            ((AssimilationPanel) assimilationPanel).updateData();
-            tabbedPane.addTab(LanguageStrings.get(LanguageStrings.TAB_ASSIMILATIONS), GameUnlocks.ABILITY_ASSIMILATION.getIcon(), assimilationPanel);
-            tabIndexMap.put(TAB_ASSIMILATION, currentIndex++);
+        if (GameUnlocks.shouldShowAssimilationUi(colony.getDynasty())) {
+            addUpgradeTab(
+                    TAB_ASSIMILATION,
+                    LanguageStrings.get(LanguageStrings.TAB_ASSIMILATIONS),
+                    GameUnlocks.ABILITY_ASSIMILATION.getIcon(),
+                    currentIndex++);
         }
 
-        // --- Synergies Tab ---
         if (colony.hasUpgrade(GameUnlocks.ABILITY_SYNERGY)) {
-            if (synergyPanel == null) {
-                synergyPanel = new SynergyPanel(colony);
-            }
-            synergyPanel.updateData();
-            tabbedPane.addTab(LanguageStrings.get(LanguageStrings.TAB_SYNERGIES), GameUnlocks.ABILITY_SYNERGY.getIcon(), synergyPanel);
-            tabIndexMap.put(TAB_SYNERGY, currentIndex++);
+            addUpgradeTab(
+                    TAB_SYNERGY,
+                    LanguageStrings.get(LanguageStrings.TAB_SYNERGIES),
+                    GameUnlocks.ABILITY_SYNERGY.getIcon(),
+                    currentIndex++);
         }
         
         if (targetTab != -1 && tabIndexMap.containsKey(targetTab)) {
-            tabbedPane.setSelectedIndex(tabIndexMap.get(targetTab));
-            targetTab = -1; 
+            materializingTab = true;
+            try {
+                tabbedPane.setSelectedIndex(tabIndexMap.get(targetTab));
+            } finally {
+                materializingTab = false;
+            }
+            targetTab = -1;
         }
+        materializeSelectedTab();
+    }
+
+    private void addUpgradeTab(int tabType, String title, Icon icon, int index) {
+        tabIndexMap.put(tabType, index);
+        if (shouldMaterialize(tabType)) {
+            tabbedPane.addTab(title, icon, materializePanel(tabType));
+            return;
+        }
+        JPanel stub = createLazyStub();
+        lazyStubs.put(tabType, stub);
+        tabbedPane.addTab(title, icon, stub);
+    }
+
+    private boolean shouldMaterialize(int tabType) {
+        return targetTab == tabType;
+    }
+
+    private void materializeSelectedTab() {
+        Integer selected = null;
+        int selectedIndex = tabbedPane.getSelectedIndex();
+        for (Map.Entry<Integer, Integer> entry : tabIndexMap.entrySet()) {
+            if (entry.getValue() != null && entry.getValue() == selectedIndex) {
+                selected = entry.getKey();
+                break;
+            }
+        }
+        if (selected == null) {
+            return;
+        }
+        Component current = tabbedPane.getComponentAt(selectedIndex);
+        JPanel stub = lazyStubs.get(selected);
+        if (stub != null && current == stub) {
+            materializingTab = true;
+            try {
+                tabbedPane.setComponentAt(selectedIndex, materializePanel(selected));
+            } finally {
+                materializingTab = false;
+            }
+            lazyStubs.remove(selected);
+            return;
+        }
+        refreshPanelData(selected);
+    }
+
+    private Component materializePanel(int tabType) {
+        switch (tabType) {
+            case TAB_RESEARCH -> {
+                if (researchPanel == null) {
+                    researchPanel = new ResearchTreePanel(colony, engine, this::onTreePanelChanged);
+                }
+                researchPanel.updateData();
+                return researchPanel;
+            }
+            case TAB_BUILD -> {
+                if (buildPanel == null) {
+                    buildPanel = new BuildingTreePanel(colony, this::onTreePanelChanged);
+                }
+                buildPanel.updateData();
+                return buildPanel;
+            }
+            case TAB_ASSIMILATION -> {
+                if (assimilationPanel == null) {
+                    assimilationPanel = new AssimilationPanel(colony);
+                }
+                ((AssimilationPanel) assimilationPanel).updateData();
+                return assimilationPanel;
+            }
+            case TAB_SYNERGY -> {
+                if (synergyPanel == null) {
+                    synergyPanel = new SynergyPanel(colony);
+                }
+                synergyPanel.updateData();
+                return synergyPanel;
+            }
+            default -> {
+                return createLazyStub();
+            }
+        }
+    }
+
+    private void refreshPanelData(int tabType) {
+        switch (tabType) {
+            case TAB_RESEARCH -> {
+                if (researchPanel != null) {
+                    researchPanel.updateData();
+                }
+            }
+            case TAB_BUILD -> {
+                if (buildPanel != null) {
+                    buildPanel.updateData();
+                }
+            }
+            case TAB_ASSIMILATION -> {
+                if (assimilationPanel != null) {
+                    ((AssimilationPanel) assimilationPanel).updateData();
+                }
+            }
+            case TAB_SYNERGY -> {
+                if (synergyPanel != null) {
+                    synergyPanel.updateData();
+                }
+            }
+            default -> {
+            }
+        }
+    }
+
+    private JPanel createLazyStub() {
+        JPanel stub = new JPanel(new BorderLayout());
+        stub.setBackground(AssetStyles.BACKGROUND_COLOR);
+        return stub;
     }
 
     private void onTreePanelChanged() {
@@ -210,9 +333,10 @@ public class UpgradeDialog extends ZeroDialog {
     private void bindTabToggle(InputMap inputMap, ActionMap actionMap, int keyCode, String actionId, int tab) {
         EdgeTriggeredKeyBindings.bind(inputMap, actionMap, keyCode, actionId, () -> {
             if (isTabOpen(tab)) {
-                dispose();
+                requestClose();
             } else if (tabIndexMap.containsKey(tab)) {
                 tabbedPane.setSelectedIndex(tabIndexMap.get(tab));
+                materializeSelectedTab();
             }
         });
     }

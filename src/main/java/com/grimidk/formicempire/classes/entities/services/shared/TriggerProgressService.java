@@ -14,7 +14,9 @@ import com.grimidk.formicempire.classes.infrasctructure.registries.GameUnlocks;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public final class TriggerProgressService {
 
@@ -38,16 +40,19 @@ public final class TriggerProgressService {
         return visible;
     }
 
+    public static Map<Upgrade, TriggerProgress> indexByUpgrade(Colony colony, Engine engine) {
+        Map<Upgrade, TriggerProgress> indexed = new HashMap<>();
+        for (TriggerProgress progress : buildAll(colony, engine)) {
+            indexed.put(progress.getUpgrade(), progress);
+        }
+        return indexed;
+    }
+
     public static TriggerProgress find(Colony colony, Engine engine, Upgrade upgrade) {
         if (colony == null || upgrade == null) {
             return null;
         }
-        for (TriggerProgress progress : buildAll(colony, engine)) {
-            if (progress.getUpgrade() == upgrade) {
-                return progress;
-            }
-        }
-        return null;
+        return indexByUpgrade(colony, engine).get(upgrade);
     }
 
     public static boolean isVisible(TriggerProgress progress) {

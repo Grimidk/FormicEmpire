@@ -159,7 +159,65 @@ public final class ResearchTreeGraph {
     private ResearchTreeGraph() {
     }
 
+    private static final class LayoutCache {
+        private final Map<Upgrade, double[]> positions;
+        private final Map<Upgrade, Integer> depths;
+        private final List<Edge> edges;
+        private final Upgrade center;
+        private final int maxDepth;
+        private final double minX;
+        private final double maxX;
+        private final double minY;
+        private final double maxY;
+
+        private LayoutCache(
+                Map<Upgrade, double[]> positions,
+                Map<Upgrade, Integer> depths,
+                List<Edge> edges,
+                Upgrade center,
+                int maxDepth,
+                double minX,
+                double maxX,
+                double minY,
+                double maxY) {
+            this.positions = positions;
+            this.depths = depths;
+            this.edges = edges;
+            this.center = center;
+            this.maxDepth = maxDepth;
+            this.minX = minX;
+            this.maxX = maxX;
+            this.minY = minY;
+            this.maxY = maxY;
+        }
+    }
+
+    private static volatile LayoutCache layoutCache;
+    private static volatile Map<Upgrade, Assimilation> assimilationByReward;
+    private static volatile Map<Upgrade, Synergy> synergyByReward;
+
     public static NodeState stateFor(Colony colony, Engine engine, Upgrade upgrade) {
+        if (colony == null || upgrade == null) {
+            return NodeState.UNAVAILABLE;
+        }
+        if (colony.hasUpgrade(upgrade)) {
+            return NodeState.OWNED;
+        }
+        Map<Upgrade, TriggerProgress> triggers = TriggerProgressService.indexByUpgrade(colony, engine);
+        return stateFor(
+                colony,
+                upgrade,
+                triggers,
+                assimilationRewardIndex(),
+                synergyRewardIndex());
+    }
+
+    private static NodeState stateFor(
+            Colony colony,
+            Upgrade upgrade,
+            Map<Upgrade, TriggerProgress> triggers,
+            Map<Upgrade, Assimilation> assimilations,
+            Map<Upgrade, Synergy> synergies) {
         if (colony == null || upgrade == null) {
             return NodeState.UNAVAILABLE;
         }
@@ -177,24 +235,29 @@ public final class ResearchTreeGraph {
             return NodeState.AFFORDABLE;
         }
 
-        TriggerProgress trigger = TriggerProgressService.find(colony, engine, upgrade);
+        TriggerProgress trigger = triggers.get(upgrade);
         if (trigger != null && trigger.isGateMet() && trigger.getCurrent() > 0) {
             return NodeState.TRIGGER_PROGRESS;
         }
 
-        if (hasSpecialProgress(dynasty, upgrade, gatesMet)) {
+        if (hasSpecialProgress(dynasty, upgrade, gatesMet, assimilations, synergies)) {
             return NodeState.SPECIAL_PROGRESS;
         }
 
         return NodeState.UNAVAILABLE;
     }
 
-    private static boolean hasSpecialProgress(Dynasty dynasty, Upgrade upgrade, boolean gatesMet) {
+    private static boolean hasSpecialProgress(
+            Dynasty dynasty,
+            Upgrade upgrade,
+            boolean gatesMet,
+            Map<Upgrade, Assimilation> assimilations,
+            Map<Upgrade, Synergy> synergies) {
         if (dynasty == null || upgrade == null) {
             return false;
         }
 
-        Assimilation assimilation = assimilationForReward(upgrade);
+        Assimilation assimilation = assimilations.get(upgrade);
         if (assimilation != null) {
             if (dynasty.getCurrentAssimilation() == assimilation) {
                 return true;
@@ -204,26 +267,46 @@ public final class ResearchTreeGraph {
             }
         }
 
-        Synergy synergy = synergyForReward(upgrade);
+        Synergy synergy = synergies.get(upgrade);
         return synergy != null && DynastySynergyService.isPartiallyComplete(dynasty, synergy);
     }
 
-    private static Assimilation assimilationForReward(Upgrade upgrade) {
-        for (Assimilation assimilation : GameUnlocks.getAssimilations()) {
-            if (assimilation.getReward() == upgrade) {
-                return assimilation;
-            }
+    private static Map<Upgrade, Assimilation> assimilationRewardIndex() {
+        Map<Upgrade, Assimilation> cached = assimilationByReward;
+        if (cached != null) {
+            return cached;
         }
-        return null;
+        synchronized (ResearchTreeGraph.class) {
+            if (assimilationByReward == null) {
+                Map<Upgrade, Assimilation> map = new HashMap<>();
+                for (Assimilation assimilation : GameUnlocks.getAssimilations()) {
+                    if (assimilation.getReward() != null) {
+                        map.put(assimilation.getReward(), assimilation);
+                    }
+                }
+                assimilationByReward = map;
+            }
+            return assimilationByReward;
+        }
     }
 
-    private static Synergy synergyForReward(Upgrade upgrade) {
-        for (Synergy synergy : GameUnlocks.getSynergies()) {
-            if (synergy.getReward() == upgrade) {
-                return synergy;
-            }
+    private static Map<Upgrade, Synergy> synergyRewardIndex() {
+        Map<Upgrade, Synergy> cached = synergyByReward;
+        if (cached != null) {
+            return cached;
         }
-        return null;
+        synchronized (ResearchTreeGraph.class) {
+            if (synergyByReward == null) {
+                Map<Upgrade, Synergy> map = new HashMap<>();
+                for (Synergy synergy : GameUnlocks.getSynergies()) {
+                    if (synergy.getReward() != null) {
+                        map.put(synergy.getReward(), synergy);
+                    }
+                }
+                synergyByReward = map;
+            }
+            return synergyByReward;
+        }
     }
 
     private static boolean isAssimilationAvailableNow(Dynasty dynasty, Assimilation assimilation) {
@@ -260,26 +343,145 @@ public final class ResearchTreeGraph {
         return state == NodeState.TRIGGER_PROGRESS || state == NodeState.SPECIAL_PROGRESS;
     }
 
+    private static boolean isVisible(Upgrade upgrade, Colony colony, Map<Upgrade, NodeState> nodeStates) {
+        if (colony == null || upgrade == null) {
+            return false;
+        }
+        if (colony.hasUpgrade(upgrade)) {
+            return true;
+        }
+        Upgrade requirement = upgrade.getRequirement();
+        if (requirement == null) {
+            return true;
+        }
+        if (colony.hasUpgrade(requirement)) {
+            return true;
+        }
+        NodeState state = nodeStates.get(upgrade);
+        return state == NodeState.TRIGGER_PROGRESS || state == NodeState.SPECIAL_PROGRESS;
+    }
+
     public static Result build(Colony colony, Engine engine) {
         return build(colony, engine, false);
     }
 
     public static Result build(Colony colony, Engine engine, boolean revealAll) {
-        Upgrade center = GameUnlocks.TYPE_EGG;
+        LayoutCache layout = ensureLayoutCache();
+        if (layout == null || layout.center == null) {
+            return emptyResult();
+        }
+
+        Map<Upgrade, Assimilation> assimilations = assimilationRewardIndex();
+        Map<Upgrade, Synergy> synergies = synergyRewardIndex();
+        Map<Upgrade, TriggerProgress> triggers = (!revealAll && colony != null)
+                ? TriggerProgressService.indexByUpgrade(colony, engine)
+                : Map.of();
+
         Map<Upgrade, NodeState> nodeStates = new LinkedHashMap<>();
-        for (Upgrade upgrade : GameUnlocks.getUpgrades()) {
+        for (Upgrade upgrade : layout.positions.keySet()) {
             NodeState state;
             if (revealAll) {
                 state = NodeState.OWNED;
             } else if (colony == null) {
                 state = NodeState.UNAVAILABLE;
             } else {
-                state = stateFor(colony, engine, upgrade);
+                state = stateFor(colony, upgrade, triggers, assimilations, synergies);
             }
             nodeStates.put(upgrade, state);
         }
+
+        boolean obscure = !revealAll && colony != null;
+        Set<Upgrade> visible = new HashSet<>();
+        if (obscure) {
+            for (Upgrade upgrade : nodeStates.keySet()) {
+                if (isVisible(upgrade, colony, nodeStates)) {
+                    visible.add(upgrade);
+                }
+            }
+            visible.add(layout.center);
+        } else {
+            visible.addAll(nodeStates.keySet());
+        }
+
+        List<Node> nodes = new ArrayList<>();
+        for (Map.Entry<Upgrade, NodeState> entry : nodeStates.entrySet()) {
+            Upgrade upgrade = entry.getKey();
+            if (!visible.contains(upgrade)) {
+                continue;
+            }
+            double[] pos = layout.positions.get(upgrade);
+            if (pos == null) {
+                continue;
+            }
+            nodes.add(new Node(
+                    upgrade,
+                    entry.getValue(),
+                    layout.depths.getOrDefault(upgrade, 0),
+                    pos[0],
+                    pos[1]));
+        }
+        nodes.sort(Comparator
+                .comparingInt(Node::getDepth)
+                .thenComparingDouble(Node::getPosY)
+                .thenComparingDouble(Node::getPosX)
+                .thenComparingInt(n -> n.getUpgrade().getId()));
+
+        List<Edge> edges = new ArrayList<>();
+        for (Edge edge : layout.edges) {
+            if (visible.contains(edge.getFrom()) && visible.contains(edge.getTo())) {
+                edges.add(edge);
+            }
+        }
+        return new Result(
+                nodes,
+                edges,
+                layout.maxDepth,
+                layout.center,
+                layout.minX,
+                layout.maxX,
+                layout.minY,
+                layout.maxY);
+    }
+
+    public static Result refreshStates(Result previous, Colony colony, Engine engine) {
+        return build(colony, engine);
+    }
+
+    private static Result emptyResult() {
+        return new Result(List.of(), List.of(), -1, null, 0, 0, 0, 0);
+    }
+
+    private static LayoutCache ensureLayoutCache() {
+        LayoutCache cached = layoutCache;
+        if (cached != null) {
+            return cached;
+        }
+        synchronized (ResearchTreeGraph.class) {
+            if (layoutCache != null) {
+                return layoutCache;
+            }
+            layoutCache = computeLayoutCache();
+            return layoutCache;
+        }
+    }
+
+    private static LayoutCache computeLayoutCache() {
+        Upgrade center = GameUnlocks.TYPE_EGG;
+        Map<Upgrade, NodeState> nodeStates = new LinkedHashMap<>();
+        for (Upgrade upgrade : GameUnlocks.getUpgrades()) {
+            nodeStates.put(upgrade, NodeState.UNAVAILABLE);
+        }
         if (!nodeStates.containsKey(center)) {
-            return emptyResult();
+            return new LayoutCache(
+                    Map.of(),
+                    Map.of(),
+                    List.of(),
+                    null,
+                    -1,
+                    0,
+                    0,
+                    0,
+                    0);
         }
 
         Map<Upgrade, Upgrade> parentByUpgrade = new HashMap<>();
@@ -298,50 +500,22 @@ public final class ResearchTreeGraph {
         }
 
         Result laidOut = layoutRadial(nodeStates, parentByUpgrade, allEdges, center);
-        boolean obscure = !revealAll && colony != null;
-        if (!obscure) {
-            return laidOut;
-        }
-
-        Set<Upgrade> visible = new HashSet<>();
-        for (Upgrade upgrade : nodeStates.keySet()) {
-            if (isVisible(colony, engine, upgrade)) {
-                visible.add(upgrade);
-            }
-        }
-        if (!visible.contains(center)) {
-            visible.add(center);
-        }
-
-        List<Node> nodes = new ArrayList<>();
+        Map<Upgrade, double[]> positions = new HashMap<>();
+        Map<Upgrade, Integer> depths = new HashMap<>();
         for (Node node : laidOut.getNodes()) {
-            if (visible.contains(node.getUpgrade())) {
-                nodes.add(node);
-            }
+            positions.put(node.getUpgrade(), new double[] {node.getPosX(), node.getPosY()});
+            depths.put(node.getUpgrade(), node.getDepth());
         }
-        List<Edge> edges = new ArrayList<>();
-        for (Edge edge : laidOut.getEdges()) {
-            if (visible.contains(edge.getFrom()) && visible.contains(edge.getTo())) {
-                edges.add(edge);
-            }
-        }
-        return new Result(
-                nodes,
-                edges,
+        return new LayoutCache(
+                Collections.unmodifiableMap(positions),
+                Collections.unmodifiableMap(depths),
+                Collections.unmodifiableList(new ArrayList<>(laidOut.getEdges())),
+                center,
                 laidOut.getMaxDepth(),
-                laidOut.getCenter(),
                 laidOut.getMinX(),
                 laidOut.getMaxX(),
                 laidOut.getMinY(),
                 laidOut.getMaxY());
-    }
-
-    public static Result refreshStates(Result previous, Colony colony, Engine engine) {
-        return build(colony, engine);
-    }
-
-    private static Result emptyResult() {
-        return new Result(List.of(), List.of(), -1, null, 0, 0, 0, 0);
     }
 
     private static Result layoutRadial(

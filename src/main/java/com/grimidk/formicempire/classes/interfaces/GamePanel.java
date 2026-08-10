@@ -763,95 +763,46 @@ public class GamePanel extends ZeroGamePanel {
     }
 
     private void showResearchDialog() {
-        Engine engine = frame.getEngine();
-        Colony colony = getColonyFromEngine(engine);
-        if (colony == null || !colony.belongsToPlayerDynasty()) return;
-        
-        if (upgradeDialog != null && upgradeDialog.isTabOpen(UpgradeDialog.TAB_RESEARCH)) {
-            upgradeDialog.dispose();
-            return;
-        }
-
-        if (upgradeDialog != null && upgradeDialog.isShowing()) {
-            upgradeDialog.setTab(UpgradeDialog.TAB_RESEARCH);
-            upgradeDialog.requestFocus();
-            return;
-        }
-        
-        if (upgradeDialog != null) {
-            upgradeDialog.dispose();
-        }
-        upgradeDialog = new UpgradeDialog(frame, colony, engine);
-        upgradeDialog.showDialog(UpgradeDialog.TAB_RESEARCH);
+        showUpgradeDialog(UpgradeDialog.TAB_RESEARCH);
     }
     
     private void showBuildDialog() {
-        Engine engine = frame.getEngine();
-        Colony colony = getColonyFromEngine(engine);
-        if (colony == null || !colony.belongsToPlayerDynasty()) return;
-        
-        if (upgradeDialog != null && upgradeDialog.isTabOpen(UpgradeDialog.TAB_BUILD)) {
-            upgradeDialog.dispose();
-            return;
-        }
-
-        if (upgradeDialog != null && upgradeDialog.isShowing()) {
-            upgradeDialog.setTab(UpgradeDialog.TAB_BUILD);
-            upgradeDialog.requestFocus();
-            return;
-        }
-        
-        if (upgradeDialog != null) {
-            upgradeDialog.dispose();
-        }
-        upgradeDialog = new UpgradeDialog(frame, colony, engine);
-        upgradeDialog.showDialog(UpgradeDialog.TAB_BUILD);
+        showUpgradeDialog(UpgradeDialog.TAB_BUILD);
     }
 
     private void showAssimilationDialog() {
-        Engine engine = frame.getEngine();
-        Colony colony = getColonyFromEngine(engine);
-        if (colony == null || !colony.belongsToPlayerDynasty()) return;
-        
-        if (upgradeDialog != null && upgradeDialog.isTabOpen(UpgradeDialog.TAB_ASSIMILATION)) {
-            upgradeDialog.dispose();
-            return;
-        }
-
-        if (upgradeDialog != null && upgradeDialog.isShowing()) {
-            upgradeDialog.setTab(UpgradeDialog.TAB_ASSIMILATION);
-            upgradeDialog.requestFocus();
-            return;
-        }
-        
-        if (upgradeDialog != null) {
-            upgradeDialog.dispose();
-        }
-        upgradeDialog = new UpgradeDialog(frame, colony, engine);
-        upgradeDialog.showDialog(UpgradeDialog.TAB_ASSIMILATION);
+        showUpgradeDialog(UpgradeDialog.TAB_ASSIMILATION);
     }
 
     private void showSynergyDialog() {
+        showUpgradeDialog(UpgradeDialog.TAB_SYNERGY);
+    }
+
+    private void showUpgradeDialog(int tabType) {
         Engine engine = frame.getEngine();
         Colony colony = getColonyFromEngine(engine);
         if (colony == null || !colony.belongsToPlayerDynasty()) return;
 
-        if (upgradeDialog != null && upgradeDialog.isTabOpen(UpgradeDialog.TAB_SYNERGY)) {
+        if (upgradeDialog != null && (!upgradeDialog.isDisplayable() || upgradeDialog.getColony() != colony)) {
             upgradeDialog.dispose();
+            upgradeDialog = null;
+        }
+
+        if (upgradeDialog != null && upgradeDialog.isTabOpen(tabType)) {
+            upgradeDialog.requestClose();
             return;
         }
 
         if (upgradeDialog != null && upgradeDialog.isShowing()) {
-            upgradeDialog.setTab(UpgradeDialog.TAB_SYNERGY);
+            upgradeDialog.setTab(tabType);
             upgradeDialog.requestFocus();
             return;
         }
 
-        if (upgradeDialog != null) {
-            upgradeDialog.dispose();
+        if (upgradeDialog == null) {
+            upgradeDialog = new UpgradeDialog(frame, colony, engine);
         }
-        upgradeDialog = new UpgradeDialog(frame, colony, engine);
-        upgradeDialog.showDialog(UpgradeDialog.TAB_SYNERGY);
+        upgradeDialog.showDialog(tabType);
     }
 
     private void showAbilitiesDialog() {

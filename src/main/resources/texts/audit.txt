@@ -4,7 +4,7 @@ Completion: 74% (265/359 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
-Legend: [ ] = not tested yet   [x] = tested (reset to [ ] if the mechanic changes)
+Legend: [ ] = not tested yet   [X] = tested (reset to [ ] if the mechanic changes)
 
 ================================================================================
 1. LAUNCHER / MAIN MENU
@@ -49,32 +49,32 @@ Video:
 
 Audio:
 [X] Master / music / SFX volume sliders
-[ ] Popup SFX on UiOptionPane dialogs (master × SFX volume; one SFX at a time)
-[ ] Spinner up/down SFX on spinner step buttons
-[ ] Battle finished SFX when a player-involved war battle resolves
+[X] Popup SFX on UiOptionPane dialogs (master × SFX volume; one SFX at a time)
+[X] Spinner up/down SFX on spinner step buttons
+[X] Battle finished SFX when a player-involved war battle resolves
 [X] Reset tab to defaults
 
 Roles (default hatch roles for new ants):
-[ ] Default worker role combo (all implemented peacetime worker roles; shows actual default)
-[ ] Default soldier role combo (all implemented peacetime soldier roles; shows actual default)
-[ ] Default major role combo (all implemented peacetime major roles; shows actual default)
-[ ] Default princess role combo (all implemented peacetime princess roles; shows actual default)
-[ ] Default queen role combo (all implemented peacetime queen roles; shows actual default)
-[ ] Reset tab to defaults
+[X] Default worker role combo (all implemented peacetime worker roles; shows actual default)
+[X] Default soldier role combo (all implemented peacetime soldier roles; shows actual default)
+[X] Default major role combo (all implemented peacetime major roles; shows actual default)
+[X] Default princess role combo (all implemented peacetime princess roles; shows actual default)
+[X] Default queen role combo (all implemented peacetime queen roles; shows actual default)
+[X] Reset tab to defaults
 
 [X] Save & Apply persists to settings.json and applies live
 
 ================================================================================
 3. SAVE / LOAD FLOW
 ================================================================================
-[ ] Three save slots — empty slot shows Create; packaged builds use GrimIDK/FormicEmpire under OS Application Support / AppData (not inside .app)
+[X] Three save slots — empty slot shows Create; packaged builds use GrimIDK/FormicEmpire under OS Application Support / AppData (not inside .app)
 [X] Create new save — name + title, live dynasty preview (EN: Theme Title; ES/FR/PT: Title Theme), confirm prompt; full dynasty name shown in slot list
 [X] Tutorial dialog auto-opens on first create
-[ ] Load existing save — resumes session; re-reads latest file from disk
+[X] Load existing save — resumes session; re-reads latest file from disk
 [X] Delete save — removes slot data
 [X] Back to main menu
 [X] Autosave runs per settings frequency during play
-[ ] Back to menu from game (ESC > Back to Menu) — saves progress; slot list refreshes after write; Load re-reads disk
+[X] Back to menu from game (ESC > Back to Menu) — saves progress; slot list refreshes after write; Load re-reads disk
 [X] Colony death — Reload or Main Menu options
 
 ================================================================================
@@ -94,7 +94,7 @@ Side panels (live updates while playing):
 [X] Resources panel
 [X] Ant population panel
 [X] Alerts panel (icons + short labels; mite outbreaks, shortages, etc.)
-[ ] Minimap panel above music (land hex biome colors + dynasty borders; ocean hexes hidden; click opens map)
+[X] Minimap panel above music (land hex biome colors + dynasty borders; ocean hexes hidden; click opens map)
 [X] Music panel below alerts (track name; prev / play-pause / next; shuffle; mute; shows No music when empty)
 [X] Menu music starts after intro (never during intro); session music starts when a game loads; volumes use Settings > Audio
 
@@ -193,7 +193,7 @@ Per ant type tab (Worker, Soldier, Major, Princess, Queen):
 ================================================================================
 Purchase with research points (RP). Test buy on each category:
 
-[ ] Research tree: radial grid with ring-constrained placement and edge-untangle (fewer crossing diagonals), detail card (centered bold name+icon, centered flavor+description; left-aligned tier icon/name, requirement, RP/trigger progress bar; Buy only for RP-cost nodes with parent met — hidden for trigger/special progress; tip shows tier requirement or not-enough-RP accurately), node colors (green owned, red affordable, blue trigger progress, yellow assimilation/synergy progress, grey unavailable); buy gated by parent+tier+RP; press on node opens card (no pan steal); empty-space drag pans after threshold; ESC closes detail card before dialog; locked nodes hidden unless owned, directly after an owned node, or showing trigger/assimilation/synergy progress (stable full-tree layout; no edges to hidden nodes); Help encyclopedia reveals full tree with all nodes marked owned
+[X] Research tree: radial grid with ring-constrained placement and edge-untangle (fewer crossing diagonals), detail card (centered bold name+icon, centered flavor+description; left-aligned tier icon/name, requirement, RP/trigger progress bar; Buy only for RP-cost nodes with parent met — hidden for trigger/special progress; tip shows tier requirement or not-enough-RP accurately), node colors (green owned, red affordable, blue trigger progress, yellow assimilation/synergy progress, grey unavailable); buy gated by parent+tier+RP; press on node opens card (no pan steal); empty-space drag pans after threshold; ESC closes detail card before dialog; locked nodes hidden unless owned, directly after an owned node, or showing trigger/assimilation/synergy progress (stable full-tree layout; no edges to hidden nodes); Help encyclopedia reveals full tree with all nodes marked owned
 
 Ant types:
 [X] Egg, Worker, Soldier, Major, Princess, Queen

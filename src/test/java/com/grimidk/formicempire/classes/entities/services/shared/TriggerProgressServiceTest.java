@@ -146,6 +146,21 @@ class TriggerProgressServiceTest {
         assertEquals(GameNumbers.TRIGGER_RESEARCHER_MIN_MONTHS, researcher.getRequired());
     }
 
+    @Test
+    void indexByUpgradeMatchesFindForEachEntry() {
+        var indexed = TriggerProgressService.indexByUpgrade(colony, null);
+        assertFalse(indexed.isEmpty());
+        for (var entry : indexed.entrySet()) {
+            TriggerProgress found = TriggerProgressService.find(colony, null, entry.getKey());
+            assertTrue(found != null);
+            assertEquals(entry.getValue().getUpgrade(), found.getUpgrade());
+            assertEquals(entry.getValue().getCurrent(), found.getCurrent());
+            assertEquals(entry.getValue().getRequired(), found.getRequired());
+            assertEquals(entry.getValue().isUnlocked(), found.isUnlocked());
+            assertEquals(entry.getValue().isGateMet(), found.isGateMet());
+        }
+    }
+
     private static TriggerProgress find(List<TriggerProgress> list, Object upgrade) {
         for (TriggerProgress progress : list) {
             if (progress.getUpgrade() == upgrade) {

@@ -164,6 +164,38 @@ public final class BuildingTreeGraph {
     private BuildingTreeGraph() {
     }
 
+    private static final class LayoutCache {
+        private final Map<Building, Double> posX;
+        private final Map<Building, Double> posY;
+        private final List<Edge> edges;
+        private final List<Building> roots;
+        private final double minX;
+        private final double maxX;
+        private final double minY;
+        private final double maxY;
+
+        private LayoutCache(
+                Map<Building, Double> posX,
+                Map<Building, Double> posY,
+                List<Edge> edges,
+                List<Building> roots,
+                double minX,
+                double maxX,
+                double minY,
+                double maxY) {
+            this.posX = posX;
+            this.posY = posY;
+            this.edges = edges;
+            this.roots = roots;
+            this.minX = minX;
+            this.maxX = maxX;
+            this.minY = minY;
+            this.maxY = maxY;
+        }
+    }
+
+    private static volatile LayoutCache layoutCache;
+
     public static NodeState stateFor(Colony colony, Building building) {
         if (colony == null || building == null) {
             return NodeState.UNAVAILABLE;
@@ -215,14 +247,116 @@ public final class BuildingTreeGraph {
     }
 
     public static Result build(Colony colony, boolean revealAll) {
-        List<Building> all = GameUnlocks.getBuildings();
-        if (all.isEmpty()) {
+        LayoutCache layout = ensureLayoutCache();
+        if (layout.posX.isEmpty()) {
             return emptyResult();
         }
 
         Map<Building, NodeState> states = new LinkedHashMap<>();
-        for (Building building : all) {
+        for (Building building : layout.posX.keySet()) {
             states.put(building, revealAll ? NodeState.OWNED : stateFor(colony, building));
+        }
+
+        boolean obscure = !revealAll && colony != null;
+        Set<Building> visible = new HashSet<>();
+        if (obscure) {
+            for (Building building : layout.posX.keySet()) {
+                if (isVisible(colony, building)) {
+                    visible.add(building);
+                }
+            }
+        } else {
+            visible.addAll(layout.posX.keySet());
+        }
+
+        List<Node> nodes = new ArrayList<>();
+        Set<Integer> occupiedTiers = new HashSet<>();
+        for (Building building : layout.posX.keySet()) {
+            if (!visible.contains(building)) {
+                continue;
+            }
+            double x = layout.posX.getOrDefault(building, 0.0);
+            double y = layout.posY.getOrDefault(building, 0.0);
+            int tier = tierRow(building);
+            occupiedTiers.add(tier);
+            nodes.add(new Node(building, states.get(building), tier, x, y));
+        }
+        nodes.sort(Comparator
+                .comparingInt(Node::getTierIndex)
+                .thenComparingDouble(Node::getPosX)
+                .thenComparingInt(n -> n.getBuilding().getId()));
+
+        List<Edge> edges = new ArrayList<>();
+        for (Edge edge : layout.edges) {
+            if (visible.contains(edge.getFrom()) && visible.contains(edge.getTo())) {
+                edges.add(edge);
+            }
+        }
+
+        List<Building> visibleRoots = new ArrayList<>();
+        for (Building root : layout.roots) {
+            if (visible.contains(root)) {
+                visibleRoots.add(root);
+            }
+        }
+
+        List<TierDivider> dividers = new ArrayList<>();
+        double resultMaxY = layout.maxY;
+        if (occupiedTiers.contains(0)) {
+            double tier0LineY = TIER_SPACING / 2.0;
+            dividers.add(new TierDivider(0, tier0LineY));
+            resultMaxY = Math.max(resultMaxY, tier0LineY);
+        }
+        int maxTier = 0;
+        for (int tier : occupiedTiers) {
+            maxTier = Math.max(maxTier, tier);
+        }
+        for (int tier = 0; tier < maxTier; tier++) {
+            if (!occupiedTiers.contains(tier) || !occupiedTiers.contains(tier + 1)) {
+                continue;
+            }
+            double lowerY = -tier * TIER_SPACING;
+            double upperY = -(tier + 1) * TIER_SPACING;
+            dividers.add(new TierDivider(tier + 1, (lowerY + upperY) / 2.0));
+        }
+
+        return new Result(
+                nodes,
+                edges,
+                dividers,
+                visibleRoots,
+                layout.minX,
+                layout.maxX,
+                layout.minY,
+                resultMaxY);
+    }
+
+    public static Result refreshStates(Result previous, Colony colony) {
+        return build(colony);
+    }
+
+    private static Result emptyResult() {
+        return new Result(List.of(), List.of(), List.of(), List.of(), 0, 0, 0, 0);
+    }
+
+    private static LayoutCache ensureLayoutCache() {
+        LayoutCache cached = layoutCache;
+        if (cached != null) {
+            return cached;
+        }
+        synchronized (BuildingTreeGraph.class) {
+            if (layoutCache != null) {
+                return layoutCache;
+            }
+            layoutCache = computeLayoutCache();
+            return layoutCache;
+        }
+    }
+
+    private static LayoutCache computeLayoutCache() {
+        List<Building> all = GameUnlocks.getBuildings();
+        if (all.isEmpty()) {
+            return new LayoutCache(Map.of(), Map.of(), List.of(), List.of(), 0, 0, 0, 0);
         }
 
         Map<Building, List<Building>> children = new HashMap<>();
@@ -235,7 +369,7 @@ public final class BuildingTreeGraph {
             Building requirement = building.getRequirement();
             if (requirement == null) {
                 roots.add(building);
-            } else if (states.containsKey(requirement)) {
+            } else if (children.containsKey(requirement)) {
                 children.get(requirement).add(building);
                 allEdges.add(new Edge(requirement, building));
             } else {
@@ -282,78 +416,15 @@ public final class BuildingTreeGraph {
             }
         }
 
-        boolean obscure = !revealAll && colony != null;
-        Set<Building> visible = new HashSet<>();
-        if (obscure) {
-            for (Building building : all) {
-                if (isVisible(colony, building)) {
-                    visible.add(building);
-                }
-            }
-        } else {
-            visible.addAll(all);
-        }
-
-        List<Node> nodes = new ArrayList<>();
-        Set<Integer> occupiedTiers = new HashSet<>();
-        for (Building building : all) {
-            if (!visible.contains(building)) {
-                continue;
-            }
-            double x = posX.getOrDefault(building, 0.0);
-            double y = posY.getOrDefault(building, 0.0);
-            int tier = tierRow(building);
-            occupiedTiers.add(tier);
-            nodes.add(new Node(building, states.get(building), tier, x, y));
-        }
-        nodes.sort(Comparator
-                .comparingInt(Node::getTierIndex)
-                .thenComparingDouble(Node::getPosX)
-                .thenComparingInt(n -> n.getBuilding().getId()));
-
-        List<Edge> edges = new ArrayList<>();
-        for (Edge edge : allEdges) {
-            if (visible.contains(edge.getFrom()) && visible.contains(edge.getTo())) {
-                edges.add(edge);
-            }
-        }
-
-        List<Building> visibleRoots = new ArrayList<>();
-        for (Building root : roots) {
-            if (visible.contains(root)) {
-                visibleRoots.add(root);
-            }
-        }
-
-        List<TierDivider> dividers = new ArrayList<>();
-        double resultMaxY = maxY;
-        if (occupiedTiers.contains(0)) {
-            double tier0LineY = TIER_SPACING / 2.0;
-            dividers.add(new TierDivider(0, tier0LineY));
-            resultMaxY = Math.max(resultMaxY, tier0LineY);
-        }
-        int maxTier = 0;
-        for (int tier : occupiedTiers) {
-            maxTier = Math.max(maxTier, tier);
-        }
-        for (int tier = 0; tier < maxTier; tier++) {
-            if (!occupiedTiers.contains(tier) || !occupiedTiers.contains(tier + 1)) {
-                continue;
-            }
-            double lowerY = -tier * TIER_SPACING;
-            double upperY = -(tier + 1) * TIER_SPACING;
-            dividers.add(new TierDivider(tier + 1, (lowerY + upperY) / 2.0));
-        }
-
-        return new Result(nodes, edges, dividers, visibleRoots, minX, maxX, minY, resultMaxY);
-    }
-
-    public static Result refreshStates(Result previous, Colony colony) {
-        return build(colony);
-    }
-
-    private static Result emptyResult() {
-        return new Result(List.of(), List.of(), List.of(), List.of(), 0, 0, 0, 0);
+        return new LayoutCache(
+                Collections.unmodifiableMap(posX),
+                Collections.unmodifiableMap(posY),
+                Collections.unmodifiableList(allEdges),
+                Collections.unmodifiableList(roots),
+                minX,
+                maxX,
+                minY,
+                maxY);
     }
 
     private static void assignLocalX(
