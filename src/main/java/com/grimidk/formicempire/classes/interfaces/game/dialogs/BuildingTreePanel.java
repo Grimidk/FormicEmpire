@@ -15,21 +15,25 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 import javax.swing.JViewport;
 import javax.swing.OverlayLayout;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.border.EmptyBorder;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -58,7 +62,7 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
     private static final float DIVIDER_STROKE = 1.5f;
     private static final int BORDER_STROKE = 2;
     private static final int ARROW_SIZE = 9;
-    private static final int DRAG_THRESHOLD_PX = 6;
+    private static final int DRAG_THRESHOLD_PX = 8;
     private static final Dimension DETAIL_CARD_SIZE = new Dimension(360, 400);
 
     private final Colony colony;
@@ -159,6 +163,10 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
 
     @Override
     public void liveUpdate() {
+        updateResourceLabels();
+        if (detailCard.isVisible()) {
+            detailCard.refreshFromSelection();
+        }
     }
 
     private void updateResourceLabels() {
@@ -191,16 +199,23 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
         detailCard.hideCard();
     }
 
+    public boolean closeDetailIfOpen() {
+        if (!detailCard.isVisible()) {
+            return false;
+        }
+        closeDetail();
+        return true;
+    }
+
     private final class DetailCard extends JPanel {
         private Building selectedBuilding;
         private BuildingTreeGraph.NodeState selectedState;
-        private final JTextArea titleArea;
         private final JLabel iconLabel;
+        private final JLabel nameLabel;
+        private final JTextPane descriptionPane;
         private final JLabel tierLabel;
-        private final JTextArea costArea;
-        private final JTextArea requirementArea;
-        private final JTextArea progressArea;
-        private final JTextArea descriptionArea;
+        private final JLabel requirementLabel;
+        private final JProgressBar costBar;
         private final JButton actionButton;
         private final JButton closeButton;
 
@@ -210,32 +225,49 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
             setBorder(AssetStyles.PANEL_BORDER);
             setOpaque(true);
 
-            titleArea = wrappingArea(AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER);
-            titleArea.setBorder(new EmptyBorder(8, 10, 0, 10));
-            add(titleArea, BorderLayout.NORTH);
-
             JPanel center = new JPanel();
             center.setOpaque(false);
             center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));
-            center.setBorder(new EmptyBorder(4, 10, 4, 10));
+            center.setBorder(new EmptyBorder(8, 10, 4, 10));
 
+            JPanel nameRow = new JPanel(new FlowLayout(FlowLayout.CENTER, 6, 0));
+            nameRow.setOpaque(false);
+            nameRow.setAlignmentX(Component.LEFT_ALIGNMENT);
+            nameRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
             iconLabel = new JLabel();
-            iconLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-            center.add(iconLabel);
+            nameLabel = new JLabel(" ");
+            nameLabel.setFont(AssetStyles.FONT_BOLD);
+            nameLabel.setForeground(AssetStyles.FONT_COLOR_HEADER);
+            nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            nameRow.add(iconLabel);
+            nameRow.add(nameLabel);
+            center.add(nameRow);
             center.add(Box.createRigidArea(new Dimension(0, 6)));
+
+            descriptionPane = centeredPane(AssetStyles.FONT_NORMAL, AssetStyles.FONT_COLOR);
+            center.add(descriptionPane);
+            center.add(Box.createRigidArea(new Dimension(0, 10)));
+
+            JPanel meta = new JPanel();
+            meta.setOpaque(false);
+            meta.setLayout(new BoxLayout(meta, BoxLayout.Y_AXIS));
+            meta.setAlignmentX(Component.LEFT_ALIGNMENT);
+            meta.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
 
             tierLabel = metaLabel();
-            costArea = wrappingArea(AssetStyles.FONT_NORMAL, AssetStyles.FONT_COLOR_VALUE);
-            requirementArea = wrappingArea(AssetStyles.FONT_NORMAL, AssetStyles.FONT_COLOR_VALUE);
-            progressArea = wrappingArea(AssetStyles.FONT_NORMAL, AssetStyles.FONT_COLOR_VALUE);
-            center.add(tierLabel);
-            center.add(costArea);
-            center.add(requirementArea);
-            center.add(progressArea);
-            center.add(Box.createRigidArea(new Dimension(0, 6)));
-
-            descriptionArea = wrappingArea(AssetStyles.FONT_NORMAL, AssetStyles.FONT_COLOR);
-            center.add(descriptionArea);
+            requirementLabel = metaLabel();
+            costBar = new JProgressBar(0, 100);
+            AssetStyles.styleProgressBar(costBar);
+            costBar.setStringPainted(true);
+            costBar.setAlignmentX(Component.LEFT_ALIGNMENT);
+            costBar.setMaximumSize(new Dimension(Integer.MAX_VALUE, AssetStyles.MIN_CONTROL_HIT_SIZE * 2));
+            costBar.setPreferredSize(new Dimension(10, AssetStyles.MIN_CONTROL_HIT_SIZE));
+            meta.add(tierLabel);
+            meta.add(Box.createRigidArea(new Dimension(0, 4)));
+            meta.add(requirementLabel);
+            meta.add(Box.createRigidArea(new Dimension(0, 4)));
+            meta.add(costBar);
+            center.add(meta);
             add(center, BorderLayout.CENTER);
 
             JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 4));
@@ -256,21 +288,21 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
             label.setFont(AssetStyles.FONT_NORMAL);
             label.setForeground(AssetStyles.FONT_COLOR_VALUE);
             label.setAlignmentX(Component.LEFT_ALIGNMENT);
+            label.setHorizontalAlignment(SwingConstants.LEFT);
             return label;
         }
 
-        private JTextArea wrappingArea(Font font, Color color) {
-            JTextArea area = new JTextArea();
-            area.setLineWrap(true);
-            area.setWrapStyleWord(true);
-            area.setEditable(false);
-            area.setFocusable(false);
-            area.setOpaque(false);
-            area.setBorder(null);
-            area.setFont(font);
-            area.setForeground(color);
-            area.setAlignmentX(Component.LEFT_ALIGNMENT);
-            return area;
+        private JTextPane centeredPane(java.awt.Font font, Color color) {
+            JTextPane pane = new JTextPane();
+            pane.setEditable(false);
+            pane.setFocusable(false);
+            pane.setOpaque(false);
+            pane.setBorder(null);
+            pane.setFont(font);
+            pane.setForeground(color);
+            pane.setAlignmentX(Component.LEFT_ALIGNMENT);
+            pane.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
+            return pane;
         }
 
         void showBuilding(BuildingTreeGraph.Node node) {
@@ -292,54 +324,42 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
             selectedState = BuildingTreeGraph.stateFor(colony, selectedBuilding);
             Building building = selectedBuilding;
 
-            setTextIfChanged(titleArea, building.getDisplayName());
+            String name = building.getDisplayName();
+            if (!name.equals(nameLabel.getText())) {
+                nameLabel.setText(name);
+            }
             ImageIcon icon = building.getIcon() != null ? building.getIcon() : GameConstants.ICON_UNKNOWN;
             if (iconLabel.getIcon() != icon) {
                 iconLabel.setIcon(icon);
             }
 
+            setCenteredText(descriptionPane, building.getDescription());
+
             if (tierLabel.getIcon() != building.getTierIcon()) {
                 tierLabel.setIcon(building.getTierIcon());
             }
-            tierLabel.setText(null);
-            tierLabel.setToolTipText(building.getTier().getName());
-
-            setTextIfChanged(costArea,
-                    GameConstants.RESOURCE_ROCK.getName() + ": "
-                            + AssetStyles.formatNumber(building.getMineralCost()) + "\n"
-                            + GameConstants.RESOURCE_RESIN.getName() + ": "
-                            + AssetStyles.formatNumber(building.getResinCost()) + "\n"
-                            + LanguageStrings.get(LanguageStrings.HELP_BUILD_BASE_COST) + ": "
-                            + AssetStyles.formatNumber(building.getBuildTime()));
-            setVisibleIfChanged(costArea, true);
+            String tierName = building.getTier().getName();
+            if (!tierName.equals(tierLabel.getText())) {
+                tierLabel.setText(tierName);
+            }
+            tierLabel.setToolTipText(tierName);
 
             Building requirement = building.getRequirement();
             if (requirement != null) {
-                setTextIfChanged(requirementArea, LanguageStrings.format(
-                        LanguageStrings.UPGRADE_REQUIRES_FMT, requirement.getDisplayName()));
-                setVisibleIfChanged(requirementArea, true);
+                String reqText = LanguageStrings.format(
+                        LanguageStrings.UPGRADE_REQUIRES_FMT, requirement.getDisplayName());
+                if (!reqText.equals(requirementLabel.getText())) {
+                    requirementLabel.setText(reqText);
+                }
+                setVisibleIfChanged(requirementLabel, true);
             } else {
-                setTextIfChanged(requirementArea, "");
-                setVisibleIfChanged(requirementArea, false);
+                if (!requirementLabel.getText().isEmpty()) {
+                    requirementLabel.setText("");
+                }
+                setVisibleIfChanged(requirementLabel, false);
             }
 
-            if (colony != null
-                    && (selectedState == BuildingTreeGraph.NodeState.IN_PROGRESS
-                    || colony.getCurrentBuildingProject() == building)) {
-                double efficiency = colony.getConstructionEfficiency();
-                double requiredHours = efficiency > 0
-                        ? building.getBuildTime() / efficiency
-                        : Double.POSITIVE_INFINITY;
-                double progressHours = colony.getBuildingProgressHours();
-                setTextIfChanged(progressArea, LanguageStrings.format(
-                        LanguageStrings.BUILD_PROGRESS_HOURS, progressHours, requiredHours));
-                setVisibleIfChanged(progressArea, true);
-            } else {
-                setTextIfChanged(progressArea, "");
-                setVisibleIfChanged(progressArea, false);
-            }
-
-            setTextIfChanged(descriptionArea, building.getDescription());
+            updateCostBar(building);
 
             String closeText = LanguageStrings.get(LanguageStrings.UI_CANCEL);
             if (!closeText.equals(closeButton.getText())) {
@@ -392,12 +412,69 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
             }
         }
 
-        private void setTextIfChanged(JTextArea area, String text) {
-            String next = text != null ? text : "";
-            if (!next.equals(area.getText())) {
-                area.setText(next);
-                area.setCaretPosition(0);
+        private void updateCostBar(Building building) {
+            boolean inProgress = colony != null
+                    && (selectedState == BuildingTreeGraph.NodeState.IN_PROGRESS
+                    || colony.getCurrentBuildingProject() == building);
+            if (inProgress) {
+                double efficiency = colony.getConstructionEfficiency();
+                double requiredHours = efficiency > 0
+                        ? building.getBuildTime() / efficiency
+                        : Double.POSITIVE_INFINITY;
+                double progressHours = colony.getBuildingProgressHours();
+                int max = requiredHours > 0 && Double.isFinite(requiredHours)
+                        ? Math.max(1, (int) Math.ceil(requiredHours))
+                        : 1;
+                int value = Double.isFinite(progressHours)
+                        ? (int) Math.min(max, Math.round(progressHours))
+                        : 0;
+                costBar.setMaximum(max);
+                costBar.setValue(value);
+                String barText = LanguageStrings.format(
+                        LanguageStrings.BUILD_PROGRESS_HOURS, progressHours, requiredHours);
+                if (!barText.equals(costBar.getString())) {
+                    costBar.setString(barText);
+                }
+                setVisibleIfChanged(costBar, true);
+                return;
             }
+
+            String costText = GameConstants.RESOURCE_ROCK.getName() + ": "
+                    + AssetStyles.formatNumber(building.getMineralCost()) + "  "
+                    + GameConstants.RESOURCE_RESIN.getName() + ": "
+                    + AssetStyles.formatNumber(building.getResinCost()) + "  "
+                    + LanguageStrings.get(LanguageStrings.HELP_BUILD_BASE_COST) + ": "
+                    + AssetStyles.formatNumber(building.getBuildTime());
+            int mineralNeed = Math.max(0, building.getMineralCost());
+            int resinNeed = Math.max(0, building.getResinCost());
+            int totalNeed = mineralNeed + resinNeed;
+            if (totalNeed <= 0) {
+                costBar.setMaximum(1);
+                costBar.setValue(selectedState == BuildingTreeGraph.NodeState.OWNED ? 1 : 0);
+            } else {
+                long minerals = colony != null ? Math.max(0L, colony.getMinerals()) : 0L;
+                long resins = colony != null ? Math.max(0L, colony.getResins()) : 0L;
+                long have = Math.min(minerals, mineralNeed) + Math.min(resins, resinNeed);
+                costBar.setMaximum(totalNeed);
+                costBar.setValue((int) Math.min(totalNeed, have));
+            }
+            if (!costText.equals(costBar.getString())) {
+                costBar.setString(costText);
+            }
+            setVisibleIfChanged(costBar, true);
+        }
+
+        private void setCenteredText(JTextPane pane, String text) {
+            String next = text != null ? text : "";
+            if (next.equals(pane.getText())) {
+                return;
+            }
+            pane.setText(next);
+            StyledDocument doc = pane.getStyledDocument();
+            SimpleAttributeSet center = new SimpleAttributeSet();
+            StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
+            doc.setParagraphAttributes(0, doc.getLength(), center, false);
+            pane.setCaretPosition(0);
         }
 
         private void setVisibleIfChanged(Component component, boolean visible) {
@@ -443,6 +520,7 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
         private Point pressScreen;
         private Point viewOrigin;
         private boolean dragged;
+        private BuildingTreeGraph.Node pressedNode;
 
         private final class DividerLabel {
             private final Rectangle bounds;
@@ -466,39 +544,34 @@ public class BuildingTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
                     pressScreen = e.getLocationOnScreen();
                     viewOrigin = scrollPane.getViewport().getViewPosition();
                     dragged = false;
+                    pressedNode = nodeAt(e.getPoint());
                 }
 
                 @Override
                 public void mouseReleased(MouseEvent e) {
+                    if (pressedNode != null && !dragged) {
+                        openDetail(pressedNode);
+                    } else if (!dragged && nodeAt(e.getPoint()) == null) {
+                        closeDetail();
+                    }
                     pressScreen = null;
                     viewOrigin = null;
-                }
-
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    if (dragged) {
-                        return;
-                    }
-                    BuildingTreeGraph.Node node = nodeAt(e.getPoint());
-                    if (node == null) {
-                        closeDetail();
-                        return;
-                    }
-                    openDetail(node);
+                    pressedNode = null;
                 }
             });
             addMouseMotionListener(new MouseAdapter() {
                 @Override
                 public void mouseDragged(MouseEvent e) {
-                    if (pressScreen == null || viewOrigin == null) {
+                    if (pressScreen == null || viewOrigin == null || pressedNode != null) {
                         return;
                     }
                     Point now = e.getLocationOnScreen();
                     int dx = now.x - pressScreen.x;
                     int dy = now.y - pressScreen.y;
-                    if (Math.abs(dx) >= DRAG_THRESHOLD_PX || Math.abs(dy) >= DRAG_THRESHOLD_PX) {
-                        dragged = true;
+                    if (Math.abs(dx) < DRAG_THRESHOLD_PX && Math.abs(dy) < DRAG_THRESHOLD_PX) {
+                        return;
                     }
+                    dragged = true;
                     JViewport viewport = scrollPane.getViewport();
                     Dimension viewSize = getPreferredSize();
                     Dimension extent = viewport.getExtentSize();

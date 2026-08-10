@@ -9,6 +9,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class GameNumbersDefenseTest {
 
     @Test
+    void snapVolumePercentUsesTenPercentSteps() {
+        assertEquals(0, GameNumbers.snapVolumePercent(-5));
+        assertEquals(0, GameNumbers.snapVolumePercent(4));
+        assertEquals(10, GameNumbers.snapVolumePercent(5));
+        assertEquals(50, GameNumbers.snapVolumePercent(50));
+        assertEquals(50, GameNumbers.snapVolumePercent(54));
+        assertEquals(60, GameNumbers.snapVolumePercent(55));
+        assertEquals(100, GameNumbers.snapVolumePercent(100));
+        assertEquals(100, GameNumbers.snapVolumePercent(150));
+    }
+
+    @Test
     void clampDefensePercentStaysWithinZeroToOneHundred() {
         assertEquals(0f, GameNumbers.clampDefensePercent(-10f), 0.0001f);
         assertEquals(0f, GameNumbers.clampDefensePercent(Float.NaN), 0.0001f);

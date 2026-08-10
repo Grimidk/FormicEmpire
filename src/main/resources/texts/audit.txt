@@ -1,6 +1,6 @@
 FORMIC EMPIRE — MANUAL MECHANICS AUDIT
 ========================================
-Completion: 74% (270/366 checked)
+Completion: 75% (268/359 checked)
 Use this checklist to exercise every player-facing interaction.
 Enable "Show mechanics audit" in Settings > General to open this file from the main menu or in-game ESC menu.
 
@@ -193,7 +193,7 @@ Per ant type tab (Worker, Soldier, Major, Princess, Queen):
 ================================================================================
 Purchase with research points (RP). Test buy on each category:
 
-[ ] Research tree: radial grid, detail card (cost/trigger when owned, wrapping name/desc), node colors (green owned, red affordable, blue trigger progress, yellow assimilation/synergy progress, grey unavailable); locked nodes hidden unless owned, directly after an owned node, or showing trigger/assimilation/synergy progress (stable full-tree layout; no edges to hidden nodes); Help encyclopedia reveals full tree
+[ ] Research tree: radial grid with ring-constrained placement and edge-untangle (fewer crossing diagonals), detail card (centered bold name+icon, centered flavor+description; left-aligned tier icon/name, requirement, RP/trigger progress bar; Buy only for RP-cost nodes with parent met — hidden for trigger/special progress; tip shows tier requirement or not-enough-RP accurately), node colors (green owned, red affordable, blue trigger progress, yellow assimilation/synergy progress, grey unavailable); buy gated by parent+tier+RP; press on node opens card (no pan steal); empty-space drag pans after threshold; ESC closes detail card before dialog; locked nodes hidden unless owned, directly after an owned node, or showing trigger/assimilation/synergy progress (stable full-tree layout; no edges to hidden nodes); Help encyclopedia reveals full tree with all nodes marked owned
 
 Ant types:
 [X] Egg, Worker, Soldier, Major, Princess, Queen
@@ -234,7 +234,7 @@ Colony abilities (unlock tree):
 [X] Auto-Diplomacy
 
 Stat upgrades (RP tiers):
-[ ] Skeleton, Acid, Longevity
+[X] Skeleton, Acid, Longevity
 [ ] Health 1–2, Attack 1–2, Defense 1–2, Attack Speed 1
 [X] Research 1–3, Growth 1–3, Thirst 1–3
 [X] Logistics 1, Passive 1, Laying 1–3
@@ -259,7 +259,7 @@ Assimilated species passives (research tree):
 ================================================================================
 11. CONSTRUCTION (U) — UpgradeDialog Build tab
 ================================================================================
-[ ] Building tree: upward chains from basic rooms, tier divider lines only between occupied adjacent tiers, detail card (cost/requires/build), node colors (green owned, red affordable, blue in progress, grey unavailable); locked nodes hidden unless owned or directly after an owned node (stable full-tree layout; no edges to hidden nodes); Help encyclopedia reveals full tree
+[ ] Building tree: upward chains from basic rooms, tier divider lines for Tier 0 below basics and between occupied adjacent tiers, detail card (centered bold name+icon+description; left-aligned tier icon/name, requirement, cost bar swapped to build-progress bar while constructing; Build/Cancel), node colors (green owned, red affordable, blue in progress, grey unavailable); press on node opens card (no pan steal); empty-space drag pans after threshold; locked nodes hidden unless owned or directly after an owned node (stable full-tree layout; no edges to hidden nodes); Help encyclopedia reveals full tree with all nodes marked owned
 
 Room upgrade chains (each tier L0→L5 where applicable; L4–L5 cost minerals + resin):
 [X] Royal Chamber
@@ -284,7 +284,7 @@ Passive / special rooms:
 12. ASSIMILATION (I) — UpgradeDialog Assimilation tab
 ================================================================================
 Start / progress assimilations (RP + time). Target RP cost scales +25% per completed assimilation (5th = 200% base). Each species:
-[ ] Species start with their native assimilation already completed (including Omni Genome Bridge); Assimilation tab/menu (I) only appears after Genetic Assimilation unlock and when a new genome is available to research
+[X] Species start with their native assimilation already completed (including Omni Genome Bridge); Assimilation tab/menu (I) only appears after Genetic Assimilation unlock and when a new genome is available to research
 [X] Leafcutter, Pharaoh, Marauder, Trapjaw, Honeypot, Doorhead
 [ ] Woodburrow, Silkweave, Rafting, Firevenom, Jumping
 [ ] Stinging, Swarming, Stealth, Fastbite (ants 1→2; soldiers/majors 2→4), Heatresist, Deadlyvenom
@@ -487,8 +487,8 @@ Hourly:
 Colony labour & resources:
 [X] Foraging, farming, nursing, laying, research generation
 [X] Water / food / protein / syrup / rock / resin economy
-[ ] Grave cleaning, policing, mite / parasite ant handling
-[ ] Pet insects — aphids on rancher capacity; mites/dermestids on catcher pool; slow breeding; over-capacity escape next day
+[X] Grave cleaning, policing, mite / parasite ant handling
+[X] Pet insects — aphids on rancher capacity; mites/dermestids on catcher pool; slow breeding; over-capacity escape next day
 [ ] NPC colonies catch and breed pet insects
 [ ] NPC colonies scout for resource sources (lite daily)
 [X] Building construction jobs
@@ -498,7 +498,7 @@ World:
 [X] Day / month / year / hour ticks
 [X] Weather changes
 [X] Biome differences on hexes
-[ ] World gen — continent core landmass + 5 coastal rings (80/40/20/10/5% land; rings 1–4 mainland-connected; ring 5 can form islands) + outer pure ocean; enclosed ocean pockets become lakes; lakes touching ocean become ocean; at least 6 islands guaranteed; on standard+ core size, at least 2 hexes per biome (shortfalls taken from the most common non-ocean biome)
+[X] World gen — continent core landmass + 5 coastal rings (80/40/20/10/5% land; rings 1–4 mainland-connected; ring 5 can form islands) + outer pure ocean; enclosed ocean pockets become lakes; lakes touching ocean become ocean; at least 6 islands guaranteed; on standard+ core size, at least 2 hexes per biome (shortfalls taken from the most common non-ocean biome)
 [X] Continents vs islands counted; colonies never spawn or spread onto islands
 [X] Map biome hex colors come from Biome mapColorHex (editable in GameConstants)
 [X] Resource sources on map — hover tooltip shows type, size tier, remaining amount

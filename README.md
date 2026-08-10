@@ -1,16 +1,18 @@
-Manage a colony of ants, then a whole dynasty, and eventually the world. Unlock more upgrades by researching or defeating enemy species or other bugs. Think of this game like an unholy combination of games like Stellaris, Rimworld, and Spore with an Ant coat of paint.
+GAME DESCRIPTION:
 
-A game about ants developed solely on Java, autism, energy drinks (or coffee), and cigarettes. 
-I refuse to use an engine or learn proper UI/UX.
-Cursor is being used to help me debug and test, all pixelart made using Aseprite with my own trackpad. 
-I plan to make everything from scratch including the music, assets, fonts and more.
+Formic Empire is an open source, ant managment and simulation game completely made in Java by a single developer. This game is equal parts grand strategy, colony managment, and incremental. Grow your ant dynasty from a few ants to millions and billions by conquering more territory and assimilating new abilities that allow you to expand further. Think of it as an unholy cross between rimworld, stellaris and spore. 
 
-Please enjoy it, and send feedback to: thegrimidk@gmail.com .
-Check the roadmap to see planned features and known bugs and credits for acknowledgments. 
+All the assets from images, music, ui, font and code was made by me and so I give it freely to whoever wants to use it. Including to a package of core reusable classes with code-gen tools so its easier to make more games in the future, read the license for details but in general just don't sell my stuff without permission. Tools use include: Aseprite to make pixelart, Cursor to code, LMMS to make audio, GitHub to host the project, Java as the sole programming language with the relevant development tools. 
 
-The game will eventually be published, but I don't care about profits. Donations are always welcome.
-I aim to publish the game around October 2026, maybe, until then betas are available at itch.io or github.
-After that expect regular but sparse updates including a Core Engine Package.
+Formic Empire will eventually release on steam for a few dollars at most, I'm aiming for Q4 of 2026, while the itch.io version will always stay at donations based price. Please be on the lookout for a demo version and wishlist on Steam soon. After the 1.0 release there will be regular but not common major updates for as long as I have ideas, these may include community ideas or even forks. The project does not have a budget other than my own time and money spent on my vices, so all donations and steam income will go to pay the fees and fuel the further development of Formic Empire and other projects. 
+
+Please enjoy Formice Empire, and send feedback to: thegrimidk@gmail.com or leave a comment here. I'll answer every single inquiry I get, but please do be kind since this is my very first game. 
+
+Check the roadmap to see planned features and known bugs and credits for acknowledgments, if you want to help out let me know and I'll add you to the credits. 
+
+DEVELOPMENT INSTRUCTIONS:
+
+This are instructions to modify or test the game, if you are instered in just playing please go to: https://grimidk.itch.io/formic-empire 
 
 Use 'production' branch for a stable version and 'development' branch for unstable beta features.
 
@@ -79,3 +81,5 @@ In order to add new ant assets you need to use these colors in order to properly
 		borders (and appendages) 000000
 
 In case of wanting to edit or add new languages, please look into the translation_sheet.csv, there you can look for the string or add a new column (you still need to declare it in the codegen tool and for the settings).
+
+You can add new .mp3 to the audio/music/base in order to add them to the random track selection, the compile will add them as unknown artists, you will have to add that manually in the MusicTracks.java repository

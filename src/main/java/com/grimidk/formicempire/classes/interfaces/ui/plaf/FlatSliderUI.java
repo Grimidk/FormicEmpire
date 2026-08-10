@@ -14,6 +14,7 @@ import javax.swing.plaf.basic.BasicSliderUI;
 public final class FlatSliderUI extends BasicSliderUI {
     public static final Dimension VERTICAL_SIZE = new Dimension(AssetStyles.MIN_CONTROL_HIT_SIZE, 96);
     private static final int TICK_LENGTH = 5;
+    private static final int TRACK_BREADTH = Math.max(4, UiControlChrome.THUMB_BREADTH);
 
     public FlatSliderUI(JSlider slider) {
         super(slider);
@@ -36,10 +37,31 @@ public final class FlatSliderUI extends BasicSliderUI {
     }
 
     @Override
+    public void setThumbLocation(int x, int y) {
+        thumbRect.setLocation(x, y);
+        slider.repaint();
+    }
+
+    @Override
     public void paint(Graphics g, JComponent c) {
-        g.setColor(c.getBackground());
+        recalculateIfInsetsChanged();
+        recalculateIfOrientationChanged();
+        g.setColor(c.getBackground() != null ? c.getBackground() : AssetStyles.BACKGROUND_COLOR);
         g.fillRect(0, 0, c.getWidth(), c.getHeight());
-        super.paint(g, c);
+        if (slider.getPaintTrack()) {
+            paintTrack(g);
+        }
+        if (slider.getPaintTicks()) {
+            paintTicks(g);
+        }
+        if (slider.getPaintLabels()) {
+            paintLabels(g);
+        }
+        paintThumb(g);
+    }
+
+    @Override
+    public void paintFocus(Graphics g) {
     }
 
     @Override
@@ -85,6 +107,43 @@ public final class FlatSliderUI extends BasicSliderUI {
             return new Dimension(VERTICAL_SIZE.width, Integer.MAX_VALUE);
         }
         return new Dimension(Integer.MAX_VALUE, getPreferredHorizontalSize().height);
+    }
+
+    @Override
+    protected void calculateTrackRect() {
+        if (slider.getOrientation() != JSlider.HORIZONTAL) {
+            super.calculateTrackRect();
+            int cx = trackRect.x + trackRect.width / 2;
+            trackRect.width = TRACK_BREADTH;
+            trackRect.x = cx - TRACK_BREADTH / 2;
+            return;
+        }
+        int tickSpace = getTickLength();
+        int labelSpace = slider.getPaintLabels() ? getHeightOfTallestLabel() : 0;
+        int thumbH = thumbRect.height;
+        int block = thumbH + tickSpace + labelSpace;
+        int top = contentRect.y + Math.max(0, (contentRect.height - block - 1) / 2);
+        trackRect.x = contentRect.x + trackBuffer;
+        trackRect.width = Math.max(0, contentRect.width - (trackBuffer * 2));
+        trackRect.height = TRACK_BREADTH;
+        trackRect.y = top + Math.max(0, (thumbH - TRACK_BREADTH) / 2);
+    }
+
+    @Override
+    protected void calculateTickRect() {
+        if (slider.getOrientation() != JSlider.HORIZONTAL) {
+            super.calculateTickRect();
+            return;
+        }
+        int tickSpace = getTickLength();
+        int labelSpace = slider.getPaintLabels() ? getHeightOfTallestLabel() : 0;
+        int thumbH = thumbRect.height;
+        int block = thumbH + tickSpace + labelSpace;
+        int top = contentRect.y + Math.max(0, (contentRect.height - block - 1) / 2);
+        tickRect.x = trackRect.x;
+        tickRect.width = trackRect.width;
+        tickRect.y = top + thumbH;
+        tickRect.height = tickSpace;
     }
 
     @Override

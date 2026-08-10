@@ -1034,7 +1034,7 @@ public final class GameConstants {
             loadIcon("icons/speed/VeryFast.png"));
     static { gameSpeeds.add(SPEED_VERY_FAST); }
     public static final GameSpeed SPEED_TURBO = new GameSpeed(
-            GameSpeed.ID_TURBO, LanguageStrings.UI_SPEED_TURBO, 0,
+            GameSpeed.ID_TURBO, LanguageStrings.UI_SPEED_TURBO, 1,
             loadIcon("icons/speed/Turbo.png"));
     static { gameSpeeds.add(SPEED_TURBO); }
     public static final ImageIcon ICON_SPEED_ZERO = loadIcon("icons/speed/Zero.png");

@@ -6,6 +6,7 @@ import com.grimidk.formicempire.classes.infrasctructure.Engine;
 import com.grimidk.formicempire.classes.interfaces.ui.AssetStyles;
 import com.grimidk.formicempire.classes.interfaces.ui.util.UiOptionPane;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 import com.grimidk.formicempire.classes.interfaces.game.dialogs.ZeroDialog;
 
@@ -548,9 +549,9 @@ public class SettingsPanel extends JPanel {
     }
 
     private void resetAudioTabToDefaults() {
-        masterVolSlider.setValue(50);
-        musicVolSlider.setValue(50);
-        sfxVolSlider.setValue(50);
+        masterVolSlider.setValue(GameNumbers.VOLUME_DEFAULT_PERCENT);
+        musicVolSlider.setValue(GameNumbers.VOLUME_DEFAULT_PERCENT);
+        sfxVolSlider.setValue(GameNumbers.VOLUME_DEFAULT_PERCENT);
     }
 
     private void resetRolesTabToDefaults() {
@@ -779,10 +780,13 @@ public class SettingsPanel extends JPanel {
     }
 
     private JSlider createVolumeSlider() {
-        JSlider slider = new JSlider(0, 100, 50);
-        slider.setMajorTickSpacing(10);
+        JSlider slider = new JSlider(
+                GameNumbers.VOLUME_MIN_PERCENT,
+                GameNumbers.VOLUME_MAX_PERCENT,
+                GameNumbers.VOLUME_DEFAULT_PERCENT);
+        slider.setMajorTickSpacing(GameNumbers.VOLUME_STEP_PERCENT);
         slider.setPaintTicks(true);
-        slider.setSnapToTicks(false);
+        slider.setSnapToTicks(true);
         AssetStyles.styleSlider(slider);
         return slider;
     }

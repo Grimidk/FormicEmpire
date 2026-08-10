@@ -16,21 +16,25 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 import javax.swing.JViewport;
 import javax.swing.OverlayLayout;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.border.EmptyBorder;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -56,7 +60,7 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
     private static final float EDGE_STROKE = 2.5f;
     private static final int BORDER_STROKE = 2;
     private static final int ARROW_SIZE = 9;
-    private static final int DRAG_THRESHOLD_PX = 6;
+    private static final int DRAG_THRESHOLD_PX = 8;
     private static final Dimension DETAIL_CARD_SIZE = new Dimension(360, 400);
 
     private final Colony colony;
@@ -143,6 +147,10 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
 
     @Override
     public void liveUpdate() {
+        updateResearchPointsLabel();
+        if (detailCard.isVisible()) {
+            detailCard.refreshFromSelection();
+        }
     }
 
     private void updateResearchPointsLabel() {
@@ -164,16 +172,27 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
         detailCard.hideCard();
     }
 
+    public boolean closeDetailIfOpen() {
+        if (!detailCard.isVisible()) {
+            return false;
+        }
+        closeDetail();
+        return true;
+    }
+
     private final class DetailCard extends JPanel {
         private Upgrade selectedUpgrade;
         private ResearchTreeGraph.NodeState selectedState;
-        private final JTextArea titleArea;
         private final JLabel iconLabel;
+        private final JLabel nameLabel;
+        private final JTextPane flavorPane;
+        private final JTextPane descriptionPane;
         private final JLabel tierLabel;
-        private final JTextArea costArea;
-        private final JTextArea requirementArea;
-        private final JTextArea progressArea;
-        private final JTextArea descriptionArea;
+        private final JLabel requirementLabel;
+        private final JTextPane progressHintPane;
+        private final JLabel progressMetricLabel;
+        private final JPanel progressCopyPanel;
+        private final JProgressBar costBar;
         private final JButton buyButton;
         private final JButton cancelButton;
 
@@ -183,33 +202,66 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
             setBorder(AssetStyles.PANEL_BORDER);
             setOpaque(true);
 
-            titleArea = wrappingArea(AssetStyles.FONT_BOLD, AssetStyles.FONT_COLOR_HEADER);
-            titleArea.setBorder(new EmptyBorder(8, 10, 0, 10));
-            add(titleArea, BorderLayout.NORTH);
-
             JPanel center = new JPanel();
             center.setOpaque(false);
             center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));
-            center.setBorder(new EmptyBorder(4, 10, 4, 10));
+            center.setBorder(new EmptyBorder(8, 10, 4, 10));
 
+            JPanel nameRow = new JPanel(new FlowLayout(FlowLayout.CENTER, 6, 0));
+            nameRow.setOpaque(false);
+            nameRow.setAlignmentX(Component.LEFT_ALIGNMENT);
+            nameRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
             iconLabel = new JLabel();
-            iconLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-            center.add(iconLabel);
+            nameLabel = new JLabel(" ");
+            nameLabel.setFont(AssetStyles.FONT_BOLD);
+            nameLabel.setForeground(AssetStyles.FONT_COLOR_HEADER);
+            nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            nameRow.add(iconLabel);
+            nameRow.add(nameLabel);
+            center.add(nameRow);
+            center.add(Box.createRigidArea(new Dimension(0, 4)));
+
+            flavorPane = centeredPane(AssetStyles.FONT_NORMAL, AssetStyles.FONT_COLOR_VALUE);
+            center.add(flavorPane);
             center.add(Box.createRigidArea(new Dimension(0, 6)));
+
+            descriptionPane = centeredPane(AssetStyles.FONT_NORMAL, AssetStyles.FONT_COLOR);
+            center.add(descriptionPane);
+            center.add(Box.createRigidArea(new Dimension(0, 10)));
+
+            JPanel meta = new JPanel();
+            meta.setOpaque(false);
+            meta.setLayout(new BoxLayout(meta, BoxLayout.Y_AXIS));
+            meta.setAlignmentX(Component.LEFT_ALIGNMENT);
+            meta.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
 
             tierLabel = metaLabel();
-            costArea = wrappingArea(AssetStyles.FONT_NORMAL, AssetStyles.FONT_COLOR_VALUE);
-            requirementArea = wrappingArea(AssetStyles.FONT_NORMAL, AssetStyles.FONT_COLOR_VALUE);
-            progressArea = wrappingArea(AssetStyles.FONT_NORMAL, AssetStyles.FONT_COLOR_VALUE);
-            center.add(tierLabel);
-            center.add(costArea);
-            center.add(requirementArea);
-            center.add(progressArea);
-            center.add(Box.createRigidArea(new Dimension(0, 6)));
-
-            descriptionArea = wrappingArea(AssetStyles.FONT_NORMAL, AssetStyles.FONT_COLOR);
-            descriptionArea.setAlignmentX(Component.LEFT_ALIGNMENT);
-            center.add(descriptionArea);
+            requirementLabel = metaLabel();
+            progressHintPane = leftPane(AssetStyles.FONT_NORMAL, AssetStyles.FONT_COLOR);
+            progressMetricLabel = metaLabel();
+            progressCopyPanel = new JPanel();
+            progressCopyPanel.setOpaque(false);
+            progressCopyPanel.setLayout(new BoxLayout(progressCopyPanel, BoxLayout.Y_AXIS));
+            progressCopyPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            progressCopyPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
+            progressCopyPanel.add(progressHintPane);
+            progressCopyPanel.add(Box.createRigidArea(new Dimension(0, 2)));
+            progressCopyPanel.add(progressMetricLabel);
+            progressCopyPanel.setVisible(false);
+            costBar = new JProgressBar(0, 100);
+            AssetStyles.styleProgressBar(costBar);
+            costBar.setStringPainted(true);
+            costBar.setAlignmentX(Component.LEFT_ALIGNMENT);
+            costBar.setMaximumSize(new Dimension(Integer.MAX_VALUE, AssetStyles.MIN_CONTROL_HIT_SIZE * 2));
+            costBar.setPreferredSize(new Dimension(10, AssetStyles.MIN_CONTROL_HIT_SIZE));
+            meta.add(tierLabel);
+            meta.add(Box.createRigidArea(new Dimension(0, 4)));
+            meta.add(requirementLabel);
+            meta.add(Box.createRigidArea(new Dimension(0, 4)));
+            meta.add(progressCopyPanel);
+            meta.add(Box.createRigidArea(new Dimension(0, 4)));
+            meta.add(costBar);
+            center.add(meta);
             add(center, BorderLayout.CENTER);
 
             JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 4));
@@ -230,21 +282,25 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
             label.setFont(AssetStyles.FONT_NORMAL);
             label.setForeground(AssetStyles.FONT_COLOR_VALUE);
             label.setAlignmentX(Component.LEFT_ALIGNMENT);
+            label.setHorizontalAlignment(SwingConstants.LEFT);
             return label;
         }
 
-        private JTextArea wrappingArea(Font font, Color color) {
-            JTextArea area = new JTextArea();
-            area.setLineWrap(true);
-            area.setWrapStyleWord(true);
-            area.setEditable(false);
-            area.setFocusable(false);
-            area.setOpaque(false);
-            area.setBorder(null);
-            area.setFont(font);
-            area.setForeground(color);
-            area.setAlignmentX(Component.LEFT_ALIGNMENT);
-            return area;
+        private JTextPane centeredPane(java.awt.Font font, Color color) {
+            JTextPane pane = new JTextPane();
+            pane.setEditable(false);
+            pane.setFocusable(false);
+            pane.setOpaque(false);
+            pane.setBorder(null);
+            pane.setFont(font);
+            pane.setForeground(color);
+            pane.setAlignmentX(Component.LEFT_ALIGNMENT);
+            pane.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
+            return pane;
+        }
+
+        private JTextPane leftPane(java.awt.Font font, Color color) {
+            return centeredPane(font, color);
         }
 
         void showUpgrade(ResearchTreeGraph.Node node) {
@@ -266,52 +322,44 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
             selectedState = ResearchTreeGraph.stateFor(colony, engine, selectedUpgrade);
             Upgrade upgrade = selectedUpgrade;
 
-            setTextIfChanged(titleArea, upgrade.getDisplayName());
+            String name = upgrade.getName();
+            if (!name.equals(nameLabel.getText())) {
+                nameLabel.setText(name);
+            }
             ImageIcon icon = upgrade.getIcon() != null ? upgrade.getIcon() : GameConstants.ICON_UNKNOWN;
             if (iconLabel.getIcon() != icon) {
                 iconLabel.setIcon(icon);
             }
 
+            setCenteredText(flavorPane, upgrade.getFlavorName());
+            setVisibleIfChanged(flavorPane, true);
+            setCenteredText(descriptionPane, upgrade.getDescription());
+
             if (tierLabel.getIcon() != upgrade.getTierIcon()) {
                 tierLabel.setIcon(upgrade.getTierIcon());
             }
-            tierLabel.setText(null);
-            tierLabel.setToolTipText(upgrade.getTier().getName());
-
-            if (upgrade.getCost() > 0) {
-                setTextIfChanged(costArea, LanguageStrings.format(LanguageStrings.UPGRADE_COST_RP, upgrade.getCost()));
-                setVisibleIfChanged(costArea, true);
-            } else {
-                setTextIfChanged(costArea, "");
-                setVisibleIfChanged(costArea, false);
+            String tierName = upgrade.getTier().getName();
+            if (!tierName.equals(tierLabel.getText())) {
+                tierLabel.setText(tierName);
             }
+            tierLabel.setToolTipText(tierName);
 
             Upgrade requirement = upgrade.getRequirement();
             if (requirement != null) {
-                setTextIfChanged(requirementArea, LanguageStrings.format(
-                        LanguageStrings.UPGRADE_REQUIRES_FMT, requirement.getDisplayName()));
-                setVisibleIfChanged(requirementArea, true);
+                String reqText = LanguageStrings.format(
+                        LanguageStrings.UPGRADE_REQUIRES_FMT, requirement.getDisplayName());
+                if (!reqText.equals(requirementLabel.getText())) {
+                    requirementLabel.setText(reqText);
+                }
+                setVisibleIfChanged(requirementLabel, true);
             } else {
-                setTextIfChanged(requirementArea, "");
-                setVisibleIfChanged(requirementArea, false);
+                if (!requirementLabel.getText().isEmpty()) {
+                    requirementLabel.setText("");
+                }
+                setVisibleIfChanged(requirementLabel, false);
             }
 
-            TriggerProgress progress = colony == null
-                    ? null
-                    : TriggerProgressService.find(colony, engine, upgrade);
-            if (progress != null) {
-                setTextIfChanged(progressArea, progress.getHint() + " — " + LanguageStrings.format(
-                        LanguageStrings.TRIGGER_PROGRESS_METRIC_FMT,
-                        progress.getMetricLabel(),
-                        progress.getCurrent(),
-                        progress.getRequired()));
-                setVisibleIfChanged(progressArea, true);
-            } else {
-                setTextIfChanged(progressArea, "");
-                setVisibleIfChanged(progressArea, false);
-            }
-
-            setTextIfChanged(descriptionArea, upgrade.getDescription());
+            updateCostBar(upgrade);
 
             String cancelText = LanguageStrings.get(LanguageStrings.UI_CANCEL);
             if (!cancelText.equals(cancelButton.getText())) {
@@ -327,30 +375,132 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
                 return;
             }
             boolean canBuy = selectedState == ResearchTreeGraph.NodeState.AFFORDABLE;
-            boolean showBuy = upgrade.getCost() > 0 && selectedState != ResearchTreeGraph.NodeState.OWNED;
+            boolean reqMet = upgrade.getRequirement() == null
+                    || (colony != null && colony.hasUpgrade(upgrade.getRequirement()));
+            boolean showBuy = upgrade.getCost() > 0
+                    && selectedState != ResearchTreeGraph.NodeState.OWNED
+                    && selectedState != ResearchTreeGraph.NodeState.TRIGGER_PROGRESS
+                    && selectedState != ResearchTreeGraph.NodeState.SPECIAL_PROGRESS
+                    && reqMet;
             setVisibleIfChanged(buyButton, showBuy);
             if (buyButton.isEnabled() != canBuy) {
                 buyButton.setEnabled(canBuy);
             }
             String tip = null;
-            if (colony != null
-                    && upgrade.getCost() > 0
-                    && selectedState != ResearchTreeGraph.NodeState.OWNED
-                    && selectedState != ResearchTreeGraph.NodeState.AFFORDABLE
-                    && (upgrade.getRequirement() == null || colony.hasUpgrade(upgrade.getRequirement()))) {
-                tip = LanguageStrings.get(LanguageStrings.UPGRADE_NOT_ENOUGH_RP);
+            if (showBuy && !canBuy && colony != null) {
+                if (!upgrade.isAvailableFor(colony.getDynasty())) {
+                    tip = LanguageStrings.format(
+                            LanguageStrings.UPGRADE_REQUIRES_FMT, upgrade.getTier().getName());
+                } else if (colony.getResearchPoints() < upgrade.getCost()) {
+                    tip = LanguageStrings.get(LanguageStrings.UPGRADE_NOT_ENOUGH_RP);
+                }
             }
             if (tip == null ? buyButton.getToolTipText() != null : !tip.equals(buyButton.getToolTipText())) {
                 buyButton.setToolTipText(tip);
             }
         }
 
-        private void setTextIfChanged(JTextArea area, String text) {
-            String next = text != null ? text : "";
-            if (!next.equals(area.getText())) {
-                area.setText(next);
-                area.setCaretPosition(0);
+        private void updateCostBar(Upgrade upgrade) {
+            if (selectedState == ResearchTreeGraph.NodeState.OWNED) {
+                clearTriggerProgressCopy();
+                costBar.setValue(0);
+                costBar.setString("");
+                setVisibleIfChanged(costBar, false);
+                return;
             }
+
+            TriggerProgress progress = colony == null
+                    ? null
+                    : TriggerProgressService.find(colony, engine, upgrade);
+            boolean showTrigger = progress != null
+                    && progress.getRequired() > 0
+                    && (selectedState == ResearchTreeGraph.NodeState.TRIGGER_PROGRESS
+                    || selectedState == ResearchTreeGraph.NodeState.SPECIAL_PROGRESS
+                    || upgrade.getCost() <= 0);
+            if (showTrigger) {
+                int current = Math.max(0, progress.getCurrent());
+                int required = Math.max(1, progress.getRequired());
+                costBar.setMaximum(required);
+                costBar.setValue(Math.min(current, required));
+                String barText = AssetStyles.formatNumber(current) + " / " + AssetStyles.formatNumber(required);
+                if (!barText.equals(costBar.getString())) {
+                    costBar.setString(barText);
+                }
+                setAlignedText(progressHintPane, progress.getHint(), false);
+                String metric = progress.getMetricLabel();
+                if (!metric.equals(progressMetricLabel.getText())) {
+                    progressMetricLabel.setText(metric);
+                }
+                setVisibleIfChanged(progressCopyPanel, true);
+                setVisibleIfChanged(costBar, true);
+                return;
+            }
+
+            clearTriggerProgressCopy();
+
+            if (upgrade.getCost() > 0) {
+                long owned = colony != null ? colony.getResearchPoints() : 0L;
+                int cost = upgrade.getCost();
+                costBar.setMaximum(cost);
+                costBar.setValue((int) Math.min(Math.max(0L, owned), cost));
+                String barText = LanguageStrings.format(
+                        LanguageStrings.UPGRADE_COST_RP,
+                        AssetStyles.formatNumber(owned) + " / " + AssetStyles.formatNumber(cost));
+                if (!barText.equals(costBar.getString())) {
+                    costBar.setString(barText);
+                }
+                setVisibleIfChanged(costBar, true);
+                return;
+            }
+
+            if (progress != null && progress.getRequired() > 0) {
+                int current = Math.max(0, progress.getCurrent());
+                int required = Math.max(1, progress.getRequired());
+                costBar.setMaximum(required);
+                costBar.setValue(Math.min(current, required));
+                String barText = AssetStyles.formatNumber(current) + " / " + AssetStyles.formatNumber(required);
+                if (!barText.equals(costBar.getString())) {
+                    costBar.setString(barText);
+                }
+                setAlignedText(progressHintPane, progress.getHint(), false);
+                String metric = progress.getMetricLabel();
+                if (!metric.equals(progressMetricLabel.getText())) {
+                    progressMetricLabel.setText(metric);
+                }
+                setVisibleIfChanged(progressCopyPanel, true);
+                setVisibleIfChanged(costBar, true);
+                return;
+            }
+
+            costBar.setValue(0);
+            costBar.setString("");
+            setVisibleIfChanged(costBar, false);
+        }
+
+        private void clearTriggerProgressCopy() {
+            setAlignedText(progressHintPane, "", false);
+            if (!progressMetricLabel.getText().isEmpty()) {
+                progressMetricLabel.setText("");
+            }
+            setVisibleIfChanged(progressCopyPanel, false);
+        }
+
+        private void setCenteredText(JTextPane pane, String text) {
+            setAlignedText(pane, text, true);
+        }
+
+        private void setAlignedText(JTextPane pane, String text, boolean center) {
+            String next = text != null ? text : "";
+            if (next.equals(pane.getText())) {
+                return;
+            }
+            pane.setText(next);
+            StyledDocument doc = pane.getStyledDocument();
+            SimpleAttributeSet attrs = new SimpleAttributeSet();
+            StyleConstants.setAlignment(
+                    attrs, center ? StyleConstants.ALIGN_CENTER : StyleConstants.ALIGN_LEFT);
+            doc.setParagraphAttributes(0, doc.getLength(), attrs, false);
+            pane.setCaretPosition(0);
         }
 
         private void setVisibleIfChanged(Component component, boolean visible) {
@@ -387,6 +537,7 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
         private Point pressScreen;
         private Point viewOrigin;
         private boolean dragged;
+        private ResearchTreeGraph.Node pressedNode;
 
         TreeCanvas() {
             setBackground(AssetStyles.BACKGROUND_COLOR);
@@ -400,39 +551,34 @@ public class ResearchTreePanel extends JPanel implements UpgradeDialog.LiveUpdat
                     pressScreen = e.getLocationOnScreen();
                     viewOrigin = scrollPane.getViewport().getViewPosition();
                     dragged = false;
+                    pressedNode = nodeAt(e.getPoint());
                 }
 
                 @Override
                 public void mouseReleased(MouseEvent e) {
+                    if (pressedNode != null && !dragged) {
+                        openDetail(pressedNode);
+                    } else if (!dragged && nodeAt(e.getPoint()) == null) {
+                        closeDetail();
+                    }
                     pressScreen = null;
                     viewOrigin = null;
-                }
-
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    if (dragged) {
-                        return;
-                    }
-                    ResearchTreeGraph.Node node = nodeAt(e.getPoint());
-                    if (node == null) {
-                        closeDetail();
-                        return;
-                    }
-                    openDetail(node);
+                    pressedNode = null;
                 }
             });
             addMouseMotionListener(new MouseAdapter() {
                 @Override
                 public void mouseDragged(MouseEvent e) {
-                    if (pressScreen == null || viewOrigin == null) {
+                    if (pressScreen == null || viewOrigin == null || pressedNode != null) {
                         return;
                     }
                     Point now = e.getLocationOnScreen();
                     int dx = now.x - pressScreen.x;
                     int dy = now.y - pressScreen.y;
-                    if (Math.abs(dx) >= DRAG_THRESHOLD_PX || Math.abs(dy) >= DRAG_THRESHOLD_PX) {
-                        dragged = true;
+                    if (Math.abs(dx) < DRAG_THRESHOLD_PX && Math.abs(dy) < DRAG_THRESHOLD_PX) {
+                        return;
                     }
+                    dragged = true;
                     JViewport viewport = scrollPane.getViewport();
                     Dimension viewSize = getPreferredSize();
                     Dimension extent = viewport.getExtentSize();

@@ -222,7 +222,7 @@ public final class BuildingTreeGraph {
 
         Map<Building, NodeState> states = new LinkedHashMap<>();
         for (Building building : all) {
-            states.put(building, stateFor(colony, building));
+            states.put(building, revealAll ? NodeState.OWNED : stateFor(colony, building));
         }
 
         Map<Building, List<Building>> children = new HashMap<>();
@@ -302,7 +302,7 @@ public final class BuildingTreeGraph {
             }
             double x = posX.getOrDefault(building, 0.0);
             double y = posY.getOrDefault(building, 0.0);
-            int tier = building.getTier().getId();
+            int tier = tierRow(building);
             occupiedTiers.add(tier);
             nodes.add(new Node(building, states.get(building), tier, x, y));
         }
@@ -326,6 +326,12 @@ public final class BuildingTreeGraph {
         }
 
         List<TierDivider> dividers = new ArrayList<>();
+        double resultMaxY = maxY;
+        if (occupiedTiers.contains(0)) {
+            double tier0LineY = TIER_SPACING / 2.0;
+            dividers.add(new TierDivider(0, tier0LineY));
+            resultMaxY = Math.max(resultMaxY, tier0LineY);
+        }
         int maxTier = 0;
         for (int tier : occupiedTiers) {
             maxTier = Math.max(maxTier, tier);
@@ -339,7 +345,7 @@ public final class BuildingTreeGraph {
             dividers.add(new TierDivider(tier + 1, (lowerY + upperY) / 2.0));
         }
 
-        return new Result(nodes, edges, dividers, visibleRoots, minX, maxX, minY, maxY);
+        return new Result(nodes, edges, dividers, visibleRoots, minX, maxX, minY, resultMaxY);
     }
 
     public static Result refreshStates(Result previous, Colony colony) {
@@ -380,9 +386,14 @@ public final class BuildingTreeGraph {
         int local = localX.getOrDefault(node, 0);
         double centered = local - (treeWidth - 1) / 2.0;
         posX.put(node, treeOrigin + centered * GRID_STEP);
-        posY.put(node, -node.getTier().getId() * TIER_SPACING);
+        posY.put(node, -tierRow(node) * TIER_SPACING);
         for (Building kid : children.getOrDefault(node, List.of())) {
             placeTree(kid, children, localX, treeOrigin, treeWidth, posX, posY);
         }
+    }
+
+    private static int tierRow(Building building) {
+        int index = GameConstants.getTiers().indexOf(building.getTier());
+        return Math.max(0, index);
     }
 }

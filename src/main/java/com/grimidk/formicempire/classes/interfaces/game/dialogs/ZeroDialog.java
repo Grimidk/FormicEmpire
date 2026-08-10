@@ -76,11 +76,18 @@ public abstract class ZeroDialog extends JDialog {
     }
 
     private void handleEscapeKey() {
+        if (consumeEscape()) {
+            return;
+        }
         if (getOwner() instanceof MainFrame frame && frame.getGamePanel() != null
                 && frame.getGamePanel().handleEscapeKey()) {
             return;
         }
         dispose();
+    }
+
+    protected boolean consumeEscape() {
+        return false;
     }
 
     protected void registerCloseKey(int keyEvent) {

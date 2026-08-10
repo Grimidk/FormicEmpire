@@ -229,7 +229,19 @@ public final class GameNumbers {
     // --- Research ---
     public static final int RESEARCH_ASSISTANT_EFFICIENCY_DIVISOR = 50;
 
+    // --- Audio ---
+    public static final int VOLUME_MIN_PERCENT = 0;
+    public static final int VOLUME_MAX_PERCENT = 100;
+    public static final int VOLUME_DEFAULT_PERCENT = 50;
+    public static final int VOLUME_STEP_PERCENT = 10;
+
     // --- Numeric helpers ---
+
+    public static int snapVolumePercent(int volume) {
+        int clamped = Math.max(VOLUME_MIN_PERCENT, Math.min(VOLUME_MAX_PERCENT, volume));
+        int stepped = ((clamped + VOLUME_STEP_PERCENT / 2) / VOLUME_STEP_PERCENT) * VOLUME_STEP_PERCENT;
+        return Math.max(VOLUME_MIN_PERCENT, Math.min(VOLUME_MAX_PERCENT, stepped));
+    }
 
     public static int capPenNonAntSprites(int count) {
         return Math.min(Math.max(0, count), MAX_PEN_NON_ANT_SPRITES);

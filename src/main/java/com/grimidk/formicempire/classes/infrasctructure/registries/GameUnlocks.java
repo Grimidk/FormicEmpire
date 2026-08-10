@@ -62,7 +62,7 @@ public final class GameUnlocks {
         static { upgrades.add(TYPE_SOLDIER); }  
         public static final Upgrade TYPE_MAJOR = new Upgrade(4, "TYPE_MAJOR", "TYPE_MAJOR_FLAVOR", "TYPE_MAJOR_DESC", TYPE_SOLDIER, 0, loadIcon("icons/upgrades/TypeMajor.png"), 0);
         static { upgrades.add(TYPE_MAJOR); }
-        public static final Upgrade TYPE_PRINCESS = new Upgrade(5, "TYPE_PRINCESS_DRONE", "TYPE_PRINCESS_FLAVOR", "TYPE_PRINCESS_DESC", TYPE_EGG, 1000, loadIcon("icons/upgrades/TypePrincess.png"), 2);
+        public static final Upgrade TYPE_PRINCESS = new Upgrade(5, "TYPE_PRINCESS_DRONE", "TYPE_PRINCESS_FLAVOR", "TYPE_PRINCESS_DESC", TYPE_EGG, 1000, loadIcon("icons/upgrades/TypePrincess.png"), 1);
         static { upgrades.add(TYPE_PRINCESS); }
         public static final Upgrade TYPE_QUEEN = new Upgrade(6, "TYPE_QUEEN", "TYPE_QUEEN_FLAVOR", "TYPE_QUEEN_DESC", TYPE_PRINCESS, 0, loadIcon("icons/upgrades/TypeQueen.png"), 1);
         static { upgrades.add(TYPE_QUEEN); }
@@ -161,9 +161,11 @@ public final class GameUnlocks {
         static { upgrades.add(ABILITY_MASS_FLIGHT); }
         public static final Upgrade ABILITY_CLONING = new Upgrade(514, "ABILITY_CLONING", "ABILITY_CLONING_FLAVOR", "ABILITY_CLONING_DESC", ABILITY_RESEARCH, 0, loadIcon("icons/upgrades/AbilityCloning.png"), 0);
         static { upgrades.add(ABILITY_CLONING); }
-        public static final Upgrade ABILITY_PARASITIC_MITE_ALERT = new Upgrade(515, "ABILITY_PARASITIC_MITE_ALERT", "ABILITY_PARASITIC_MITE_ALERT_FLAVOR", "ABILITY_PARASITIC_MITE_ALERT_DESC", null, 0, loadIcon("icons/upgrades/AbilityParasiticMiteAlert.png"), 0);
+        public static final Upgrade ABILITY_ABILITY = new Upgrade(900, "ABILITY_ABILITY", "ABILITY_ABILITY_FLAVOR", "ABILITY_ABILITY_DESC", TYPE_QUEEN, 0, loadIcon("icons/upgrades/AbilityAbility.png"), 0);
+        static { upgrades.add(ABILITY_ABILITY); }
+        public static final Upgrade ABILITY_PARASITIC_MITE_ALERT = new Upgrade(515, "ABILITY_PARASITIC_MITE_ALERT", "ABILITY_PARASITIC_MITE_ALERT_FLAVOR", "ABILITY_PARASITIC_MITE_ALERT_DESC", ABILITY_ABILITY, 0, loadIcon("icons/upgrades/AbilityParasiticMiteAlert.png"), 0);
         static { upgrades.add(ABILITY_PARASITIC_MITE_ALERT); }
-        public static final Upgrade ABILITY_CATCH_SYMBIOTIC_MITE = new Upgrade(516, "ABILITY_CATCH_SYMBIOTIC_MITE", "ABILITY_CATCH_SYMBIOTIC_MITE_FLAVOR", "ABILITY_CATCH_SYMBIOTIC_MITE_DESC", null, 0, loadIcon("icons/upgrades/AbilityCatchSymbioticMite.png"), 0);
+        public static final Upgrade ABILITY_CATCH_SYMBIOTIC_MITE = new Upgrade(516, "ABILITY_CATCH_SYMBIOTIC_MITE", "ABILITY_CATCH_SYMBIOTIC_MITE_FLAVOR", "ABILITY_CATCH_SYMBIOTIC_MITE_DESC", ABILITY_ABILITY, 0, loadIcon("icons/upgrades/AbilityCatchSymbioticMite.png"), 0);
         static { upgrades.add(ABILITY_CATCH_SYMBIOTIC_MITE); }
         public static final Upgrade ABILITY_CATCH_DERMESTID = new Upgrade(517, "ABILITY_CATCH_DERMESTID", "ABILITY_CATCH_DERMESTID_FLAVOR", "ABILITY_CATCH_DERMESTID_DESC", ROLE_GRAVER, 2000, loadIcon("icons/upgrades/AbilityCatchDermestid.png"), 2);
         static { upgrades.add(ABILITY_CATCH_DERMESTID); }
@@ -171,8 +173,6 @@ public final class GameUnlocks {
         static { upgrades.add(ABILITY_DIPLOMAT_PRESSURE_2); }
         public static final Upgrade ABILITY_DIPLOMAT_PRESSURE_3 = new Upgrade(519, "ABILITY_DIPLOMAT_PRESSURE_3", "ABILITY_DIPLOMAT_PRESSURE_3_FLAVOR", "ABILITY_DIPLOMAT_PRESSURE_3_DESC", ABILITY_DIPLOMAT_PRESSURE_2, 10000, loadIcon("icons/upgrades/AbilityDiplomatPressure3.png"), 5);
         static { upgrades.add(ABILITY_DIPLOMAT_PRESSURE_3); }
-        public static final Upgrade ABILITY_ABILITY = new Upgrade(900, "ABILITY_ABILITY", "ABILITY_ABILITY_FLAVOR", "ABILITY_ABILITY_DESC", null, 0, loadIcon("icons/upgrades/AbilityAbility.png"), 0);
-        static { upgrades.add(ABILITY_ABILITY); }
         public static final Upgrade ABILITY_PHEROMONE_STORM = new Upgrade(520, "ABILITY_PHEROMONE_STORM", "ABILITY_PHEROMONE_STORM_FLAVOR", "ABILITY_PHEROMONE_STORM_DESC", ABILITY_ABILITY, 4000, loadIcon("icons/upgrades/AbilityPheromoneStorm.png"), 2);
         static { upgrades.add(ABILITY_PHEROMONE_STORM); }
         public static final Upgrade ABILITY_CREATINE_DIET = new Upgrade(521, "ABILITY_CREATINE_DIET", "ABILITY_CREATINE_DIET_FLAVOR", "ABILITY_CREATINE_DIET_DESC", ABILITY_ABILITY, 4000, loadIcon("icons/upgrades/AbilityCreatineDiet.png"), 2);
@@ -394,9 +394,9 @@ public final class GameUnlocks {
         public static final Upgrade ASSIMILATED_ASSIMILATION = new Upgrade(1023, "ASSIMILATED_ASSIMILATION", "ASSIMILATED_ASSIMILATION_FLAVOR", "ASSIMILATED_ASSIMILATION_DESC", ABILITY_ASSIMILATION, 0, loadIcon("icons/upgrades/AssimilatedAssimilation.png"), 0);
         static { upgrades.add(ASSIMILATED_ASSIMILATION); }
 
-        public static final Upgrade SYNERGY_SUPER_VENOM = new Upgrade(10001, "SYNERGY_SUPER_VENOM", "SYNERGY_SUPER_VENOM_FLAVOR", "SYNERGY_SUPER_VENOM_DESC", null, 0, loadIcon("icons/synergies/SuperVenom.png"), 0);
+        public static final Upgrade SYNERGY_SUPER_VENOM = new Upgrade(10001, "SYNERGY_SUPER_VENOM", "SYNERGY_SUPER_VENOM_FLAVOR", "SYNERGY_SUPER_VENOM_DESC", STAT_ACID, 0, loadIcon("icons/synergies/SuperVenom.png"), 0);
         static { upgrades.add(SYNERGY_SUPER_VENOM); }
-        public static final Upgrade SYNERGY_CORROSIVE_BOMBS = new Upgrade(10002, "SYNERGY_CORROSIVE_BOMBS", "SYNERGY_CORROSIVE_BOMBS_FLAVOR", "SYNERGY_CORROSIVE_BOMBS_DESC", null, 0, loadIcon("icons/synergies/CorrosiveBombs.png"), 0);
+        public static final Upgrade SYNERGY_CORROSIVE_BOMBS = new Upgrade(10002, "SYNERGY_CORROSIVE_BOMBS", "SYNERGY_CORROSIVE_BOMBS_FLAVOR", "SYNERGY_CORROSIVE_BOMBS_DESC", ROLE_BOMBER, 0, loadIcon("icons/synergies/CorrosiveBombs.png"), 0);
         static { upgrades.add(SYNERGY_CORROSIVE_BOMBS); }
 
         // --- Buildings ---

@@ -217,6 +217,18 @@ public class UpgradeDialog extends ZeroDialog {
         });
     }
 
+    @Override
+    protected boolean consumeEscape() {
+        Component selected = tabbedPane.getSelectedComponent();
+        if (selected instanceof ResearchTreePanel research) {
+            return research.closeDetailIfOpen();
+        }
+        if (selected instanceof BuildingTreePanel build) {
+            return build.closeDetailIfOpen();
+        }
+        return false;
+    }
+
     interface LiveUpdatePanel {
         void liveUpdate();
         void updateData();

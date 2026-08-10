@@ -37,6 +37,8 @@ class BuildingTreeGraphTest {
         BuildingTreeGraph.Result result = BuildingTreeGraph.build(colony, true);
 
         assertEquals(GameUnlocks.getBuildings().size(), result.getNodes().size());
+        assertTrue(result.getNodes().stream()
+                .allMatch(node -> node.getState() == BuildingTreeGraph.NodeState.OWNED));
         assertFalse(result.getRoots().isEmpty());
         for (Building root : result.getRoots()) {
             assertEquals(null, root.getRequirement());
@@ -157,20 +159,43 @@ class BuildingTreeGraphTest {
     }
 
     @Test
-    void tierDividersOnlyBetweenOccupiedAdjacentTiers() {
+    void tierDividersIncludeTier0BelowBasicsAndBetweenOccupiedAdjacentTiers() {
         BuildingTreeGraph.Result result = BuildingTreeGraph.build(colony);
         assertFalse(result.getTierDividers().isEmpty());
-        for (BuildingTreeGraph.TierDivider divider : result.getTierDividers()) {
-            assertTrue(divider.getPosY() < 0);
-        }
 
         Set<Integer> occupied = result.getNodes().stream()
                 .map(BuildingTreeGraph.Node::getTierIndex)
                 .collect(Collectors.toSet());
+        assertTrue(occupied.contains(0));
+        assertTrue(occupied.contains(1));
+        assertTrue(result.getTierDividers().stream().anyMatch(d -> d.getUpperTier() == 0));
+        assertTrue(result.getTierDividers().stream().anyMatch(d -> d.getUpperTier() == 1));
+
+        BuildingTreeGraph.TierDivider tier0Line = result.getTierDividers().stream()
+                .filter(d -> d.getUpperTier() == 0)
+                .findFirst()
+                .orElseThrow();
+        assertEquals(BuildingTreeGraph.TIER_SPACING / 2.0, tier0Line.getPosY(), 1e-9);
+        assertTrue(result.getMaxY() >= tier0Line.getPosY());
+
+        double tier0Y = 0.0;
+        double tier1Y = -BuildingTreeGraph.TIER_SPACING;
+        BuildingTreeGraph.TierDivider tier1Line = result.getTierDividers().stream()
+                .filter(d -> d.getUpperTier() == 1)
+                .findFirst()
+                .orElseThrow();
+        assertEquals((tier0Y + tier1Y) / 2.0, tier1Line.getPosY(), 1e-9);
+
         for (BuildingTreeGraph.TierDivider divider : result.getTierDividers()) {
             int upper = divider.getUpperTier();
+            assertTrue(upper >= 0 && upper < GameConstants.getTiers().size());
             assertTrue(occupied.contains(upper));
-            assertTrue(occupied.contains(upper - 1));
+            if (upper > 0) {
+                assertTrue(occupied.contains(upper - 1));
+                assertTrue(divider.getPosY() < 0);
+            } else {
+                assertTrue(divider.getPosY() > 0);
+            }
         }
 
         colony.unlockBuilding(GameUnlocks.ROYAL_CHAMBER_1);
@@ -178,10 +203,13 @@ class BuildingTreeGraphTest {
         Set<Integer> deeperOccupied = deeper.getNodes().stream()
                 .map(BuildingTreeGraph.Node::getTierIndex)
                 .collect(Collectors.toSet());
+        assertTrue(deeper.getTierDividers().stream().anyMatch(d -> d.getUpperTier() == 0));
         for (BuildingTreeGraph.TierDivider divider : deeper.getTierDividers()) {
             int upper = divider.getUpperTier();
             assertTrue(deeperOccupied.contains(upper));
-            assertTrue(deeperOccupied.contains(upper - 1));
+            if (upper > 0) {
+                assertTrue(deeperOccupied.contains(upper - 1));
+            }
         }
     }
 

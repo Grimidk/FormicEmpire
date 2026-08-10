@@ -14,6 +14,7 @@ import com.grimidk.formicempire.classes.infrasctructure.audio.SfxService;
 import com.grimidk.formicempire.classes.infrasctructure.managers.SaveManager;
 import com.grimidk.formicempire.classes.infrasctructure.managers.TradeManager;
 import com.grimidk.formicempire.classes.infrasctructure.registries.GameConstants;
+import com.grimidk.formicempire.classes.infrasctructure.registries.GameNumbers;
 import com.grimidk.formicempire.classes.infrasctructure.i18n.LanguageStrings;
 
 public class Engine extends Thread {
@@ -47,9 +48,9 @@ public class Engine extends Thread {
     private boolean weatherColorOverlayEnabled = true;
     private boolean arachnophobiaMode = false;
     
-    private int masterVolume = 50;
-    private int musicVolume = 50;
-    private int sfxVolume = 50;
+    private int masterVolume = GameNumbers.VOLUME_DEFAULT_PERCENT;
+    private int musicVolume = GameNumbers.VOLUME_DEFAULT_PERCENT;
+    private int sfxVolume = GameNumbers.VOLUME_DEFAULT_PERCENT;
     private boolean musicMuted = false;
     private boolean musicShuffle = true;
     
@@ -428,7 +429,7 @@ public class Engine extends Thread {
     }
 
     public void setMasterVolume(int masterVolume) {
-        this.masterVolume = masterVolume;
+        this.masterVolume = GameNumbers.snapVolumePercent(masterVolume);
         if (musicService != null) {
             musicService.refreshVolume();
         }
@@ -442,7 +443,7 @@ public class Engine extends Thread {
     }
 
     public void setMusicVolume(int musicVolume) {
-        this.musicVolume = musicVolume;
+        this.musicVolume = GameNumbers.snapVolumePercent(musicVolume);
         if (musicService != null) {
             musicService.refreshVolume();
         }
@@ -453,7 +454,7 @@ public class Engine extends Thread {
     }
 
     public void setSfxVolume(int sfxVolume) {
-        this.sfxVolume = sfxVolume;
+        this.sfxVolume = GameNumbers.snapVolumePercent(sfxVolume);
         if (sfxService != null) {
             sfxService.refreshVolume();
         }
