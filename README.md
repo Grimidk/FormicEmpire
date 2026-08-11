@@ -10,7 +10,7 @@ Please enjoy Formic Empire, and send feedback to: thegrimidk@gmail.com or leave 
 
 Check the roadmap to see planned features, known bugs, and credits for acknowledgments. If you want to help out, let me know, and I'll add you to the credits.
 
-Note that there is a version for each operating system; for the Linux version, you will have to go to the development repository (https://github.com/Grimidk/FormicEmpire) to compile locally or use the .jar with your own JRE. If you want to, you can add the App to your application folder or manage it through Steam; future updates will not overwrite your save files.
+Note that there is a version for each operating system. If you want to, you can add the App to your application folder or manage it through Steam; future updates will not overwrite your save files.
 
 DEVELOPMENT INSTRUCTIONS:
 
@@ -33,9 +33,9 @@ Generating a release bundle (bash):
 
     ./scripts/package.sh
 
-`scripts/package.sh` calls `./scripts/setup_jre.sh` first to verify `jre/` is present.
+`scripts/package.sh` verifies bundled JREs, builds the shaded JAR, then packs platform bundles into **`outputs/`**.
 
-Produces **`outputs/`** with separate bundles per platform:
+On **macOS** (with Docker Desktop running), one run produces **all four** release artifacts. On **Linux**, it produces the JAR + Linux zip (macOS `.app` still needs a Mac).
 
 | Path | Contents |
 |------|----------|
@@ -59,9 +59,10 @@ On first launch after an upgrade, any older `saves/` files still found next to t
 | Folder | Platform | Required? |
 |--------|----------|-----------|
 | `jre/` | **Windows x64** Temurin 17 JRE | Yes on macOS, for Windows zip |
-| `jre-linux/` or `jdk-*-jre/` | **Linux x64** Temurin 17 JRE | Yes on Linux, for Linux zip |
+| `jre-linux/` or `jdk-*-jre/` | **Linux x64** Temurin 17 JRE | Yes on macOS (Docker pack) and on Linux |
 | System JDK 17 | **macOS** dev + `.app` build via `jpackage` | Yes on Mac (already installed) |
-| System JDK 17 | **Linux** dev + `.linux.zip` build via `jpackage` | Yes on Linux |
+| System JDK 17 | **Linux** native `.linux.zip` via `jpackage` | Yes on Linux (or use Docker from macOS instead) |
+| Docker Desktop | **macOS** cross-build of `.linux.zip` (`linux/amd64`) | Yes on Mac for the Linux zip |
 | `jre-mac/` | Optional custom macOS runtime for `.app` | No — only if you want a specific embedded JRE |
 
 **Windows JRE setup (once):**
@@ -70,13 +71,14 @@ On first launch after an upgrade, any older `saves/` files still found next to t
 2. Extract into the project root as **`jre/`** (must contain `jre/bin/java.exe`)
 3. Run `./scripts/package.sh` (validates `jre/` automatically)
 
-**Linux JRE setup (once, on the Linux build machine):**
+**Linux JRE setup (once):**
 
 1. Download [Temurin 17 JRE — Linux x64](https://adoptium.net/temurin/releases/?version=17&os=linux&arch=x64&package=jre)
 2. Extract into the project root as **`jre-linux/`** (or leave as `jdk-*-jre/` — `setup_jre_linux.sh` detects both)
-3. Run `./scripts/package.sh` on **Linux** (requires `jpackage` from JDK 17+)
+3. On **macOS**: install/start [Docker Desktop](https://www.docker.com/products/docker-desktop/), then run `./scripts/package.sh` (builds `.linux.zip` in a `linux/amd64` container via `jpackage`)
+4. On **Linux**: run `./scripts/package.sh` natively (requires `jpackage` from JDK 17+; Docker not needed)
 
-**macOS:** No separate JRE download is required. `./scripts/run.sh` and the `.app` use your installed JDK 17. `jpackage` embeds a runtime when building `outputs/FormicEmpire.app`.
+**macOS:** No separate macOS JRE download is required. `./scripts/run.sh` and the `.app` use your installed JDK 17. `jpackage` embeds a runtime when building `outputs/FormicEmpire.app`. For a full release set (JAR + Windows + Linux + `.app`), also set up `jre/`, `jre-linux/`, and Docker Desktop as above.
 
 **App icons:** `src/main/resources/meta/icon.ico` (Windows) and `icon.icns` (macOS) are committed assets. To refresh `icon.icns` after editing PNGs in `icon.iconset/` on macOS:
 

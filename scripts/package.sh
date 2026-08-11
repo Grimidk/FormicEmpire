@@ -29,7 +29,8 @@ if [ -f "jre/bin/java.exe" ]; then
 elif [ "$HOST_OS" = "Darwin" ]; then
     ./scripts/setup_jre.sh
 fi
-if [ "$HOST_OS" = "Linux" ]; then
+# Native Linux pack, or macOS cross-pack via Docker, both need jre-linux/.
+if [ "$HOST_OS" = "Linux" ] || [ "$HOST_OS" = "Darwin" ]; then
     ./scripts/setup_jre_linux.sh
 fi
 
@@ -83,7 +84,7 @@ if [ "$HOST_OS" = "Darwin" ] && [ ! -f "$ICON_ICNS" ]; then
     exit 1
 fi
 
-if [ "$HOST_OS" = "Linux" ] && [ ! -f "$ICON_PNG" ]; then
+if { [ "$HOST_OS" = "Linux" ] || [ "$HOST_OS" = "Darwin" ]; } && [ ! -f "$ICON_PNG" ]; then
     echo "Error: $ICON_PNG not found (required for Linux jpackage icon)."
     exit 1
 fi
@@ -207,12 +208,25 @@ pack_macos_app() {
     HAS_APP=1
 }
 
-pack_linux_app() {
-    if [ "$HOST_OS" != "Linux" ]; then
-        echo "[Pack] Skipping Linux app-image (run scripts/package.sh on Linux to build $LINUX_ZIP)."
+find_docker() {
+    if command -v docker >/dev/null 2>&1; then
+        command -v docker
         return 0
     fi
+    for candidate in \
+        /usr/local/bin/docker \
+        /opt/homebrew/bin/docker \
+        "/Applications/Docker.app/Contents/Resources/bin/docker"
+    do
+        if [ -x "$candidate" ]; then
+            echo "$candidate"
+            return 0
+        fi
+    done
+    return 1
+}
 
+pack_linux_app_native() {
     if ! command -v jpackage >/dev/null 2>&1; then
         echo "Error: jpackage not found (needs JDK 17+ on Linux to build the Linux app-image)."
         return 1
@@ -261,6 +275,100 @@ pack_linux_app() {
     HAS_LINUX_ZIP=1
 }
 
+pack_linux_app_docker() {
+    DOCKER_BIN="$(find_docker)" || {
+        echo "Error: Docker not found (needed on macOS to build $LINUX_ZIP)."
+        echo "Install and start Docker Desktop, then re-run ./scripts/package.sh."
+        return 1
+    }
+    if ! "$DOCKER_BIN" info >/dev/null 2>&1; then
+        echo "Error: Docker is installed but not running (needed to build $LINUX_ZIP)."
+        echo "Start Docker Desktop, then re-run ./scripts/package.sh."
+        return 1
+    fi
+
+    LINUX_JRE="$(resolve_linux_jre_dir)" || {
+        echo "Error: Linux JRE not found (jre-linux/ or jdk-*-jre/)."
+        return 1
+    }
+
+    echo "[Pack] Linux app-image via Docker (linux/amd64) -> $LINUX_ZIP (runtime from $LINUX_JRE/)..."
+    rm -rf "$LINUX_APP_DIR"
+    rm -f "$LINUX_ZIP"
+
+    "$DOCKER_BIN" run --rm --platform linux/amd64 \
+        -v "$ROOT:/work" \
+        -w /work \
+        eclipse-temurin:17-jdk \
+        bash -euo pipefail -c "
+            export DEBIAN_FRONTEND=noninteractive
+            apt-get update -qq
+            apt-get install -y -qq zip file >/dev/null
+
+            OUTPUT_DIR='$OUTPUT_DIR'
+            JAR_NAME='$JAR_NAME'
+            MAIN_CLASS='$MAIN_CLASS'
+            ICON_PNG='$ICON_PNG'
+            LINUX_JRE='$LINUX_JRE'
+            LINUX_APP_DIR=\"\$OUTPUT_DIR/FormicEmpire\"
+            LINUX_ZIP=\"\$OUTPUT_DIR/FormicEmpire.linux.zip\"
+            JPACKAGE_INPUT=\"\$OUTPUT_DIR/.jpackage-input\"
+
+            rm -rf \"\$JPACKAGE_INPUT\" \"\$LINUX_APP_DIR\"
+            mkdir -p \"\$JPACKAGE_INPUT\"
+            cp \"target/\$JAR_NAME\" \"\$JPACKAGE_INPUT/\$JAR_NAME\"
+
+            jpackage \\
+                --input \"\$JPACKAGE_INPUT\" \\
+                --name FormicEmpire \\
+                --main-jar \"\$JAR_NAME\" \\
+                --main-class \"\$MAIN_CLASS\" \\
+                --type app-image \\
+                --dest \"\$OUTPUT_DIR\" \\
+                --runtime-image \"\$LINUX_JRE\" \\
+                --icon \"\$ICON_PNG\" \\
+                --app-version 1.0 \\
+                --vendor GrimIDK \\
+                --description \"A game about ants.\" \\
+                --java-options \"-Dawt.useSystemAAFontSettings=on\" \\
+                --java-options \"-Dswing.aatext=true\"
+
+            rm -rf \"\$JPACKAGE_INPUT\"
+            test -x \"\$LINUX_APP_DIR/bin/FormicEmpire\"
+
+            (
+                cd \"\$OUTPUT_DIR\"
+                zip -r -X FormicEmpire.linux.zip FormicEmpire \\
+                    -x \"*.DS_Store\" \\
+                    -x \"*/.*\"
+            )
+            rm -rf \"\$LINUX_APP_DIR\"
+        "
+
+    if [ ! -f "$LINUX_ZIP" ]; then
+        echo "Error: Docker jpackage did not produce $LINUX_ZIP"
+        return 1
+    fi
+    # Docker may leave root ownership on bind-mounted files; ignore if not permitted.
+    chown "$(id -u):$(id -g)" "$LINUX_ZIP" 2>/dev/null || true
+    HAS_LINUX_ZIP=1
+}
+
+pack_linux_app() {
+    if [ "$HOST_OS" = "Linux" ]; then
+        pack_linux_app_native
+        return $?
+    fi
+
+    if [ "$HOST_OS" = "Darwin" ]; then
+        pack_linux_app_docker
+        return $?
+    fi
+
+    echo "[Pack] Skipping Linux app-image (run on macOS with Docker, or on Linux, to build $LINUX_ZIP)."
+    return 0
+}
+
 pack_jar_zip
 pack_windows_zip
 pack_macos_app
@@ -298,6 +406,11 @@ if [ "$HOST_OS" = "Darwin" ]; then
         echo "Error: FormicEmpire.app was not created."
         exit 1
     fi
+    if [ "$HAS_LINUX_ZIP" -ne 1 ]; then
+        echo ""
+        echo "Error: Linux zip is required when packaging on macOS (Docker + jre-linux/)."
+        exit 1
+    fi
 elif [ "$HOST_OS" = "Linux" ]; then
     if [ "$HAS_LINUX_ZIP" -ne 1 ]; then
         echo ""
@@ -315,9 +428,9 @@ if [ "$HAS_APP" -ne 1 ] && [ "$HOST_OS" != "Darwin" ]; then
     echo "Note: Run ./scripts/package.sh on macOS to also produce $MAC_APP."
 fi
 
-if [ "$HAS_LINUX_ZIP" -ne 1 ] && [ "$HOST_OS" != "Linux" ]; then
+if [ "$HAS_LINUX_ZIP" -ne 1 ] && [ "$HOST_OS" != "Linux" ] && [ "$HOST_OS" != "Darwin" ]; then
     echo ""
-    echo "Note: Run ./scripts/package.sh on Linux to also produce $LINUX_ZIP."
+    echo "Note: Run ./scripts/package.sh on macOS (Docker) or Linux to also produce $LINUX_ZIP."
 fi
 
 echo ""
